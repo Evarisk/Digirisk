@@ -189,110 +189,11 @@ abstract class ModeleODTListingRisksPhoto extends CommonDocGenerator
 			try {
 				$foundtagforlines = 1;
 				if ($foundtagforlines) {
-					$risk = new Risk($this->db);
+					$digiriskelementobject = new DigiriskElement($this->db);
+					$risk                  = new Risk($this->db);
+
 					$risks = $risk->fetchRisksOrderedByCotation($digiriskelement->id > 0 ? $digiriskelement->id : 0, true, $conf->global->DIGIRISKDOLIBARR_SHOW_INHERITED_RISKS_IN_DOCUMENTS, $conf->global->DIGIRISKDOLIBARR_SHOW_SHARED_RISKS);
-					for ($i = 1; $i <= 4; $i++ ) {
-						$listlines = $odfHandler->setSegment('risk' . $i);
-						if (is_array($risks) && !empty($risks)) {
-							foreach ($risks as $line) {
-								$lastEvaluation = $line->lastEvaluation;
-								if ( ! empty($lastEvaluation) && $lastEvaluation > 0 && is_object($lastEvaluation)) {
-									$scale = $lastEvaluation->get_evaluation_scale();
-									if ($scale == $i) {
-										$element = new DigiriskElement($this->db);
-										$linked_element =  new DigiriskElement($this->db);
-										$linked_element->fetch($line->appliedOn);
-										$element->fetch($line->fk_element);
-
-										if ($conf->global->DIGIRISKDOLIBARR_SHOW_RISK_ORIGIN) {
-											$nomElement = (!empty($conf->global->DIGIRISKDOLIBARR_SHOW_SHARED_RISKS) ? 'S' . $element->entity . ' - ' : '') . $element->ref . ' - ' . $element->label;
-											if ($line->fk_element != $line->appliedOn) {
-												$nomElement .=  "\n" . $langs->trans('AppliedOn') . ' ' . $linked_element->ref . ' - ' . $linked_element->label;
-											}
-										} else {
-											if ($linked_element->id > 0) {
-												$nomElement =  "\n" . $linked_element->ref . ' - ' . $linked_element->label;
-											} else {
-												$nomElement =  "\n" . $element->ref . ' - ' . $element->label;
-											}
-										}
-										$tmparray['nomElement']            = $nomElement;
-										$tmparray['nomDanger']             = DOL_DOCUMENT_ROOT . '/custom/digiriskdolibarr/img/categorieDangers/' . $line->get_danger_category($line) . '.png';
-										$tmparray['nomPicto']              = $line->get_danger_category_name($line);
-										$tmparray['identifiantRisque']     = $line->ref . ' - ' . $lastEvaluation->ref;
-										$tmparray['quotationRisque']       = $lastEvaluation->cotation ?: '0';
-										$tmparray['descriptionRisque']     = $line->description;
-										$tmparray['commentaireEvaluation'] = $lastEvaluation->comment ? dol_print_date((($conf->global->DIGIRISKDOLIBARR_SHOW_RISKASSESSMENT_DATE && ( ! empty($lastEvaluation->date_riskassessment))) ? $lastEvaluation->date_riskassessment : $lastEvaluation->date_creation), 'dayreduceformat') . ': ' . $lastEvaluation->comment : '';
-
-										if (dol_strlen($lastEvaluation->photo) && $lastEvaluation !== 'undefined') {
-											$entity = $lastEvaluation->entity > 1 ? '/' . $lastEvaluation->entity : '';
-											$path                      = DOL_DATA_ROOT . $entity . '/digiriskdolibarr/riskassessment/' . $lastEvaluation->ref;
-											$thumb_name               = getThumbName($lastEvaluation->photo);
-											$image                    = $path . '/thumbs/' . $thumb_name;
-											$tmparray['photoAssociee'] = $image;
-										} else {
-											$tmparray['photoAssociee'] = $langs->transnoentities('NoFileLinked');
-										}
-										unset($tmparray['object_fields']);
-
-										complete_substitutions_array($tmparray, $outputlangs, $object, $line, "completesubstitutionarray_lines");
-										// Call the ODTSubstitutionLine hook
-										$parameters = array('odfHandler' => &$odfHandler, 'file' => $file, 'object' => $object, 'outputlangs' => $outputlangs, 'substitutionarray' => &$tmparray, 'line' => $line);
-										$hookmanager->executeHooks('ODTSubstitutionLine', $parameters, $this, $action); // Note that $action and $object may have been modified by some hooks
-										foreach ($tmparray as $key => $val) {
-											try {
-												if ($key == 'photoAssociee') {
-													if (file_exists($val)) {
-														$listlines->setImage($key, $val);
-													} else {
-														$listlines->setVars($key, $langs->trans('NoData'), true, 'UTF-8');
-													}
-												} elseif ($key == 'nomDanger') {
-													if (file_exists($val)) {
-														$listlines->setImage($key, $val);
-													} else {
-														$listlines->setVars($key, $langs->trans('NoData'), true, 'UTF-8');
-													}
-												} elseif (empty($val) && $val != '0') {
-													$listlines->setVars($key, $langs->trans('NoData'), true, 'UTF-8');
-												} else {
-													$listlines->setVars($key, html_entity_decode($val, ENT_QUOTES | ENT_HTML5), true, 'UTF-8');
-												}
-											} catch (OdfException $e) {
-												dol_syslog($e->getMessage(), LOG_INFO);
-											} catch (SegmentException $e) {
-												dol_syslog($e->getMessage(), LOG_INFO);
-											}
-										}
-
-										$listlines->merge();
-									}
-								}
-							}
-						} else {
-							$tmparray['nomElement']            = $langs->trans('NoData');
-							$tmparray['nomDanger']             = $langs->trans('NoData');
-							$tmparray['nomPicto']              = $langs->trans('NoData');
-							$tmparray['identifiantRisque']     = $langs->trans('NoData');
-							$tmparray['descriptionRisque']     = $langs->trans('NoDescriptionThere');
-							$tmparray['quotationRisque']       = $langs->trans('NoData');
-							$tmparray['commentaireEvaluation'] = $langs->trans('NoRiskThere');
-							$tmparray['photoAssociee']         = $langs->transnoentities('NoFileLinked');
-							foreach ($tmparray as $key => $val) {
-								try {
-									if (empty($val)) {
-										$listlines->setVars($key, $langs->trans('NoData'), true, 'UTF-8');
-									} else {
-										$listlines->setVars($key, html_entity_decode($val, ENT_QUOTES | ENT_HTML5), true, 'UTF-8');
-									}
-								} catch (SegmentException $e) {
-									dol_syslog($e->getMessage(), LOG_INFO);
-								}
-							}
-							$listlines->merge();
-						}
-						$odfHandler->mergeSegment($listlines);
-					}
+					require_once __DIR__ . '/../../../../tpl/digiriskdocuments/digiriskdolibarr_fillriskdata.tpl.php';
 				}
 			} catch (OdfException $e) {
 				$this->error = $e->getMessage();
