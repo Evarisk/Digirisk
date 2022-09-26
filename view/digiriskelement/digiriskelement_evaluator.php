@@ -75,6 +75,7 @@ $object           = new DigiriskElement($db);
 $digiriskstandard = new DigiriskStandard($db);
 $evaluator        = new Evaluator($db);
 $extrafields      = new ExtraFields($db);
+$usertmp          = new User($db);
 $refEvaluatorMod  = new $conf->global->DIGIRISKDOLIBARR_EVALUATOR_ADDON();
 
 $hookmanager->initHooks(array('evaluatorcard', 'globalcard')); // Note that conf->hooks_modules contains array
@@ -175,19 +176,34 @@ if (empty($reshook)) {
 
 		$duration    = $data['duration'];
 		$date        = $data['date'];
-		$post        = $data['post'];
+		$job         = $data['job'];
 		$evaluatorID = $data['evaluatorID'];
+
+		$usertmp->fetch($evaluatorID);
 
 		$evaluator->ref             = $refEvaluatorMod->getNextValue($evaluator);
 		$evaluator->ref_ext         = $evaluator->ref;
 		$evaluator->assignment_date = strtotime(preg_replace('/\//', '-', $date));
 		$evaluator->duration        = $duration;
-		$evaluator->post            = $post;
+		$evaluator->job             = (!empty($job) ? $job : $usertmp->job);
 		$evaluator->fk_user         = $evaluatorID;
 		$evaluator->fk_parent       = $object->id;
 		$evaluator->status          = 1;
 
-		$evaluator->create($user);
+		if ( ! $error) {
+			$result = $evaluator->create($user);
+			if ($result > 0) {
+				// Creation evaluator OK
+				$urltogo = str_replace('__ID__', $id, $backtopage);
+				$urltogo = preg_replace('/--IDFORBACKTOPAGE--/', $id, $urltogo); // New method to autoselect project after a New on another form object creation
+				header("Location: " . $urltogo);
+				exit;
+			} else {
+				// Creation evaluator KO
+				if ( ! empty($object->errors)) setEventMessages(null, $object->errors, 'errors');
+				else setEventMessages($object->error, null, 'errors');
+			}
+		}
 	}
 
 	if ( ! $error && ($massaction == 'delete' || ($action == 'delete' && $confirm == 'yes')) && $permissiontodelete) {
@@ -219,6 +235,12 @@ if (empty($reshook)) {
 				exit;
 			}
 		}
+	}
+
+	if ( ! $error && $action == 'getEvaluatorJob' && $permissiontoadd) {
+		$data = json_decode(file_get_contents('php://input'), true);
+		$userID = $data['userID'];
+		$usertmp->fetch($userID);
 	}
 }
 
@@ -282,7 +304,7 @@ if ($object->id > 0 || $fromid > 0) {
 		print '<div class="underbanner clearboth"></div>';
 	}
 
-	print '<div class="fichecenter wpeo-wrap">';
+	print '<div class="fichecenter evaluatorlist wpeo-wrap">';
 	print '<form method="POST" id="searchFormList" action="' . $_SERVER["PHP_SELF"] . (empty($fromid) ? '?id=' . $object->id : '?fromid=' . $fromid) . '" name="evaluator_form"">' . "\n";
 	print '<input type="hidden" name="token" value="' . newToken() . '">';
 	print '<input type="hidden" name="formfilteraction" id="formfilteraction" value="list">';
@@ -469,9 +491,9 @@ if ($object->id > 0 || $fromid > 0) {
 								<span class="title"><?php echo $langs->trans('Date'); ?></span>
 								<?php print $form->selectDate('', 'EvaluatorDate', 0, 0, 0, 'evaluator_form', 1, 1,'','','','','',1,'','','tzuserrel'); ?>
 							</div>
-							<div class="evaluator-post">
+							<div class="evaluator-job">
 								<span class="title"><?php echo $langs->trans('PostOrFunction'); ?></span>
-								<span class=""><input type="text" class="post" name="evaluatorPost"></span>
+								<span class=""><input type="text" class="evaluatorJob" name="evaluatorJob" value="<?php echo $usertmp->job; ?>"></span>
 							</div>
 						</div>
 					</div>

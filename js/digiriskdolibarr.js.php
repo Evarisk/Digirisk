@@ -3333,13 +3333,31 @@ window.eoxiaJS.evaluator.event = function() {
  * @return {void}
  */
 window.eoxiaJS.evaluator.selectUser = function( event ) {
-	$(this).closest('.evaluator-user').find('.user-selected').val(this.value)
-
 	var elementParent = $(this).closest('.modal-container');
+	let userID = elementParent.find('#fk_user_employer').val();
+	let token = $('.fichecenter.evaluatorlist').find('input[name="token"]').val();
+
+	window.eoxiaJS.loader.display(elementParent.find('input[name="evaluatorJob"]'));
+
+	$.ajax({
+		url:  document.URL + '&action=getEvaluatorJob&token='+token,
+		type: "POST",
+		processData: false,
+		data: JSON.stringify({
+			userID: userID
+		}),
+		contentType: false,
+		success: function ( resp ) {
+			elementParent.find('input[name="evaluatorJob"]').val($(resp).find('input[name="evaluatorJob"]').val())
+			$('.wpeo-loader').removeClass('wpeo-loader')
+		},
+		error: function ( resp ) {
+		}
+	});
 
 	// Rend le bouton "active".
 	window.eoxiaJS.evaluator.haveDataInInput(elementParent);
-};
+}
 
 /**
  * Check value on evaluatorUser.
@@ -3355,9 +3373,10 @@ window.eoxiaJS.evaluator.haveDataInInput = function( elementParent ) {
 
 	if (element.hasClass('evaluator-add-modal')) {
 		var evaluator_user = element.find('#fk_user_employer');
-		console.log(evaluator_user.val())
-		if ( evaluator_user.val() >= 0 ) {
+		if ( evaluator_user.val() > 0 ) {
 			element.find('.button-disable').removeClass('button-disable');
+		} else {
+			element.find('.evaluator-create').addClass('button-disable');
 		}
 	}
 };
@@ -3378,7 +3397,7 @@ window.eoxiaJS.evaluator.createEvaluator = function ( event ) {
 
 	var date     = elementEvaluator.find('#EvaluatorDate').val();
 	var duration = elementEvaluator.find('.evaluator-duration .duration').val();
-	var post     = elementEvaluator.find('.evaluator-post .post').val();
+	var job      = elementEvaluator.find('.evaluatorJob').val();
 
 	let elementParent = $(this).closest('.fichecenter').find('.div-table-responsive');
 
@@ -3393,7 +3412,7 @@ window.eoxiaJS.evaluator.createEvaluator = function ( event ) {
 			evaluatorID: userID,
 			date: date,
 			duration: duration,
-			post: post
+			job: job
 		}),
 		processData: false,
 		contentType: false,

@@ -82,5 +82,5 @@ ALTER TABLE llx_digiriskdolibarr_accident_workstop ADD date_end_workstop DATETIM
 ALTER TABLE llx_digiriskdolibarr_object_signature CHANGE `signature` `signature` LONGTEXT;
 
 -- 9.6.0
-ALTER TABLE llx_digiriskdolibarr_evaluator ADD post VARCHAR(80) AFTER assignment_date;
+ALTER TABLE llx_digiriskdolibarr_evaluator ADD job VARCHAR(80) AFTER assignment_date;
 ALTER TABLE llx_digiriskdolibarr_digiriskelement ADD show_in_selector BOOLEAN NOT NULL DEFAULT TRUE AFTER photo;

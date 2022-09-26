@@ -83,7 +83,7 @@ class Evaluator extends CommonObject
 		'status'          => array('type' => 'smallint', 'label' => 'Status', 'enabled' => '1', 'position' => 70, 'notnull' => 0, 'visible' => 0, 'index' => 1,),
 		'duration'        => array('type' => 'smallint', 'label' => 'EvaluationDuration', 'enabled' => '1', 'position' => 80, 'notnull' => 0, 'visible' => 1, 'index' => 1,),
 		'assignment_date' => array('type' => 'datetime', 'label' => 'AssignmentDate', 'enabled' => '1', 'position' => 90, 'notnull' => 1, 'visible' => 1,),
-		'post'            => array('type' => 'varchar(80)', 'label' => 'PostOrFunction', 'enabled' => '1', 'position' => 140, 'notnull' => 0, 'visible' => 1,),
+		'job'             => array('type' => 'varchar(80)', 'label' => 'PostOrFunction', 'enabled' => '1', 'position' => 140, 'notnull' => 0, 'visible' => 1,),
 		'fk_user_creat'   => array('type' => 'integer:User:user/class/user.class.php', 'label' => 'UserAuthor', 'enabled' => '1', 'position' => 110, 'notnull' => 1, 'visible' => 0, 'foreignkey' => 'user.rowid',),
 		'fk_user_modif'   => array('type' => 'integer:User:user/class/user.class.php', 'label' => 'UserModif', 'enabled' => '1', 'position' => 120, 'notnull' => -1, 'visible' => 0,),
 		'fk_user'         => array('type' => 'integer:User:user/class/user.class.php', 'label' => 'UserAssigned', 'enabled' => '1', 'position' => 130, 'notnull' => 1, 'visible' => 1, 'default' => 0,),
