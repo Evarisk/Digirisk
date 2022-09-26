@@ -2233,7 +2233,7 @@ window.eoxiaJS.evaluation.deleteEvaluation = function ( event ) {
 			processData: false,
 			contentType: false,
 			success: function ( resp ) {
-				$('risk-evaluation-ref-' + evaluationID).fadeOut(400)
+				$('.risk-evaluation' + evaluationID).fadeOut(400)
 
 				let evaluationCounterText = $('#risk_row_'+riskId).find('.table-cell-header-label').text()
 				let evaluationCounter = evaluationCounterText.split(/\(/)[1].split(/\)/)[0]
