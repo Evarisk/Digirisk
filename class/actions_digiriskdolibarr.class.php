@@ -348,7 +348,7 @@ class ActionsDigiriskdolibarr
 
 				require_once __DIR__ . '/digiriskelement.class.php';
 				$digiriskelement = new DigiriskElement($db);
-				$selectDigiriskElement = '<span>'. $langs->trans('GP/UT') .'</span>';
+				$selectDigiriskElement = '<span><b>'. $langs->trans('GP/UT') .'</b><span style="color:red"> *</span></span>';
 
 				$alldisableddigiriskelement = $digiriskelement->fetchAll('', '', 0, 0, array('customsql' => 't.show_in_selector = 0'));
 				if (is_array($alldisableddigiriskelement) && !empty($alldisableddigiriskelement)) {
