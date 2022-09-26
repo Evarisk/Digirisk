@@ -27,6 +27,7 @@ require_once DOL_DOCUMENT_ROOT . '/core/lib/images.lib.php';
 require_once DOL_DOCUMENT_ROOT . '/core/lib/company.lib.php';
 require_once DOL_DOCUMENT_ROOT . '/core/lib/doc.lib.php';
 require_once DOL_DOCUMENT_ROOT . '/contact/class/contact.class.php';
+require_once DOL_DOCUMENT_ROOT . '/ticket/class/ticket.class.php';
 require_once __DIR__ . '/../../../../../class/digiriskelement.class.php';
 require_once __DIR__ . '/../../../../../class/evaluator.class.php';
 require_once __DIR__ . '/../../../../../class/riskanalysis/risk.class.php';

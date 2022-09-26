@@ -192,6 +192,7 @@ abstract class ModeleODTRiskAssessmentDocument extends CommonDocGenerator
 					$digiriskelementobject = new DigiriskElement($this->db);
 					$digiriskelementlist   = $digiriskelementobject->fetchDigiriskElementFlat(0);
 					$risk                  = new Risk($this->db);
+					$ticket    = new Ticket($this->db);
 					$risks                 = $risk->fetchRisksOrderedByCotation(0, true, $conf->global->DIGIRISKDOLIBARR_SHOW_INHERITED_RISKS, $conf->global->DIGIRISKDOLIBARR_SHOW_SHARED_RISKS);
 
 					if ( ! empty($digiriskelementlist) ) {
@@ -357,7 +358,7 @@ abstract class ModeleODTRiskAssessmentDocument extends CommonDocGenerator
 											$tmparray['commentaireEvaluation'] = $lastEvaluation->comment ? dol_print_date((($conf->global->DIGIRISKDOLIBARR_SHOW_RISKASSESSMENT_DATE && (!empty($lastEvaluation->date_riskassessment))) ? $lastEvaluation->date_riskassessment : $lastEvaluation->date_creation), 'dayreduceformat') . ': ' . $lastEvaluation->comment : '';
 
 											$related_tasks = $line->get_related_tasks($line);
-											$user = new User($this->db);
+											$usertmp = new User($this->db);
 
 											if (!empty($related_tasks) && is_array($related_tasks)) {
 												foreach ($related_tasks as $related_task) {
@@ -365,8 +366,8 @@ abstract class ModeleODTRiskAssessmentDocument extends CommonDocGenerator
 													$related_task_contact_ids = $related_task->getListContactId();
 													if (!empty($related_task_contact_ids) && is_array($related_task_contact_ids)) {
 														foreach ($related_task_contact_ids as $related_task_contact_id) {
-															$user->fetch($related_task_contact_id);
-															$AllInitiales .= strtoupper(str_split($user->firstname, 1)[0]. str_split($user->lastname, 1)[0] . ',');
+															$usertmp->fetch($related_task_contact_id);
+															$AllInitiales .= strtoupper(str_split($usertmp->firstname, 1)[0]. str_split($usertmp->lastname, 1)[0] . ',');
 														}
 													}
 
@@ -472,6 +473,54 @@ abstract class ModeleODTRiskAssessmentDocument extends CommonDocGenerator
 						}
 						$odfHandler->mergeSegment($listlines);
 					}
+
+					//Fill tickets data
+					$filter = array('t.fk_project' => $conf->global->DIGIRISKDOLIBARR_TICKET_PROJECT);
+					$ticket->fetchAll($user, '', '', '', 0, '', $filter);
+
+					$listlines = $odfHandler->setSegment('tickets');
+					if (is_array($ticket->lines) && !empty($ticket->lines)) {
+						foreach ($ticket->lines as $line) {
+
+							$tmparray['refticket']     = $line->ref;
+							$tmparray['creation_date'] = dol_print_date($line->datec, 'dayhoursec', 'tzuser');
+							$tmparray['subject']       = $line->subject;
+							$tmparray['progress']      = (($line->progress) ?: 0) . ' %';
+
+							$tickettmp = new Ticket($this->db);
+							$tickettmp->fetch($line->id);
+							$tickettmp->fetch_optionals();
+							$digiriskelementtmp = new DigiriskElement($this->db);
+							$digiriskelementtmp->fetch($tickettmp->array_options['options_digiriskdolibarr_ticket_service']);
+							$tmparray['digiriskelement_ref_label'] = $digiriskelementtmp->ref . ' - ' . $digiriskelementtmp->label;
+
+							$tmparray['status'] = $tickettmp->getLibStatut();
+
+							unset($tmparray['object_fields']);
+
+							complete_substitutions_array($tmparray, $outputlangs, $object, $line, "completesubstitutionarray_lines");
+							// Call the ODTSubstitutionLine hook
+							$parameters = array('odfHandler' => &$odfHandler, 'file' => $file, 'object' => $object, 'outputlangs' => $outputlangs, 'substitutionarray' => &$tmparray, 'line' => $line);
+							$hookmanager->executeHooks('ODTSubstitutionLine', $parameters, $this, $action); // Note that $action and $object may have been modified by some hooks
+							foreach ($tmparray as $key => $val) {
+								try {
+									if (file_exists($val)) {
+										$listlines->setImage($key, $val);
+									} elseif (empty($val)) {
+										$listlines->setVars($key, $langs->trans('NoData'), true, 'UTF-8');
+									} else {
+										$listlines->setVars($key, html_entity_decode($val, ENT_QUOTES | ENT_HTML5), true, 'UTF-8');
+									}
+								} catch (OdfException $e) {
+									dol_syslog($e->getMessage(), LOG_INFO);
+								} catch (SegmentException $e) {
+									dol_syslog($e->getMessage(), LOG_INFO);
+								}
+							}
+							$listlines->merge();
+						}
+					}
+					$odfHandler->mergeSegment($listlines);
 				}
 			} catch (OdfException $e) {
 				$this->error = $e->getMessage();
