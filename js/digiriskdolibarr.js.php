@@ -1846,6 +1846,8 @@ window.eoxiaJS.risk.createRisk = function ( event ) {
 window.eoxiaJS.risk.saveRisk = function ( event ) {
 	let editedRiskId = $(this).attr('value');
 	let elementRisk = $(this).closest('.risk-container').find('.risk-content');
+	var params = new window.URLSearchParams(window.location.search);
+	var id = params.get('id')
 
 	let riskCommentText = elementRisk.find('.risk-description textarea').val()
 	riskCommentText = window.eoxiaJS.risk.sanitizeBeforeRequest(riskCommentText)
@@ -1857,10 +1859,11 @@ window.eoxiaJS.risk.saveRisk = function ( event ) {
 	} else {
 		var description = '';
 	}
-	var newParent = $(this).closest('.risk-container').find('#socid option:selected').val();
 
+	var newParent = $(this).closest('.risk-container').find('#socid option:selected').val();
 	let elementParent = $('.fichecenter.risklist').find('.div-title-and-table-responsive');
-	if (riskCommentText) {
+
+	if (newParent == id) {
 		window.eoxiaJS.loader.display($(this).closest('.risk-row-content-' + editedRiskId).find('.risk-description-'+editedRiskId));
 	} else {
 		window.eoxiaJS.loader.display($(this).closest('.risk-row-content-' + editedRiskId))
@@ -1881,12 +1884,15 @@ window.eoxiaJS.risk.saveRisk = function ( event ) {
 		}),
 		contentType: false,
 		success: function ( resp ) {
-			elementParent.removeClass('wpeo-loader');
-			elementParent.html($(resp).find('.div-title-and-table-responsive'))
+			$('.wpeo-loader').removeClass('wpeo-loader');
 			let actionContainerSuccess = $('.messageSuccessRiskEdit');
-
-			$('#risk_row_' + editedRiskId).fadeOut(800);
-			$('#risk_row_' + editedRiskId).fadeIn(800);
+			if (newParent == id) {
+				elementParent.html($(resp).find('.div-title-and-table-responsive'))
+				$('.risk-row-content-' + editedRiskId).find('.risk-description-'+editedRiskId).fadeOut(800);
+				$('.risk-row-content-' + editedRiskId).find('.risk-description-'+editedRiskId).fadeIn(800);
+			} else {
+				$('#risk_row_'+editedRiskId).fadeOut(800);
+			}
 
 			let textToShow = '';
 			textToShow += actionContainerSuccess.find('.valueForEditRisk1').val()
