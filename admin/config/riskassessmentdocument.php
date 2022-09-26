@@ -275,13 +275,24 @@ print '</td>';
 print '</tr>';
 
 print '<tr class="oddeven"><td>';
-print $langs->trans('ShowInheritedRisks');
+print $langs->trans('ShowInheritedRisksInDocuments');
 print "</td><td>";
-print $langs->trans('ShowInheritedRisksDescription');
+print $langs->trans('ShowInheritedRisksInDocumentsDescription');
 print '</td>';
 
 print '<td class="center">';
-print ajax_constantonoff('DIGIRISKDOLIBARR_SHOW_INHERITED_RISKS');
+print ajax_constantonoff('DIGIRISKDOLIBARR_SHOW_INHERITED_RISKS_IN_DOCUMENTS');
+print '</td>';
+print '</tr>';
+
+print '<tr class="oddeven"><td>';
+print $langs->trans('ShowInheritedRisksInListings');
+print "</td><td>";
+print $langs->trans('ShowInheritedRisksInListingsDescription');
+print '</td>';
+
+print '<td class="center">';
+print ajax_constantonoff('DIGIRISKDOLIBARR_SHOW_INHERITED_RISKS_IN_LISTINGS');
 print '</td>';
 print '</tr>';
 

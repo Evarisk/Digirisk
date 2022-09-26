@@ -1069,8 +1069,10 @@ RiskNotUnlinkShared = Erreur : Risque délié
 HasBeenUnlinkSharedM =  a été délié
 HasNotBeenUnlinkSharedM = n'a pas été délié
 RiskSharedTooltip = Cette option permet de partager les risques. <br> INFO : Si vous souhaitez pouvoir afficher les tâches, il faut activer l'option de partage des projets.
-ShowInheritedRisks = Risques hérités
-ShowInheritedRisksDescription = Afficher les risques hérités dans les documents et les listings
+ShowInheritedRisksInListings = Risques hérités - Listings
+ShowInheritedRisksInListingsDescription = Afficher les risques hérités dans les listings de Digirisk
+ShowInheritedRisksInDocuments = Risques hérités - Documents
+ShowInheritedRisksInDocumentsDescription = Afficher les risques hérités dans les documents de Digirisk
 ShowRisks = Risques
 ShowRisksDescription = Afficher les risques dans les documents et les listings
 DigiriskElementInheritedRisksList Liste des risques hérités

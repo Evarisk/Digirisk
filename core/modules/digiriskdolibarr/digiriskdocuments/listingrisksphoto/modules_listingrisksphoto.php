@@ -190,7 +190,7 @@ abstract class ModeleODTListingRisksPhoto extends CommonDocGenerator
 				$foundtagforlines = 1;
 				if ($foundtagforlines) {
 					$risk = new Risk($this->db);
-					$risks = $risk->fetchRisksOrderedByCotation($digiriskelement->id > 0 ? $digiriskelement->id : 0, true, $conf->global->DIGIRISKDOLIBARR_SHOW_INHERITED_RISKS, $conf->global->DIGIRISKDOLIBARR_SHOW_SHARED_RISKS);
+					$risks = $risk->fetchRisksOrderedByCotation($digiriskelement->id > 0 ? $digiriskelement->id : 0, true, $conf->global->DIGIRISKDOLIBARR_SHOW_INHERITED_RISKS_IN_DOCUMENTS, $conf->global->DIGIRISKDOLIBARR_SHOW_SHARED_RISKS);
 					for ($i = 1; $i <= 4; $i++ ) {
 						$listlines = $odfHandler->setSegment('risk' . $i);
 						if (is_array($risks) && !empty($risks)) {

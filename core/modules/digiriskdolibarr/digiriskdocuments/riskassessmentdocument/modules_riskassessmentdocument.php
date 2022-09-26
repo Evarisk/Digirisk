@@ -193,7 +193,7 @@ abstract class ModeleODTRiskAssessmentDocument extends CommonDocGenerator
 					$digiriskelementlist   = $digiriskelementobject->fetchDigiriskElementFlat(0);
 					$risk                  = new Risk($this->db);
 					$ticket    = new Ticket($this->db);
-					$risks                 = $risk->fetchRisksOrderedByCotation(0, true, $conf->global->DIGIRISKDOLIBARR_SHOW_INHERITED_RISKS, $conf->global->DIGIRISKDOLIBARR_SHOW_SHARED_RISKS);
+					$risks                 = $risk->fetchRisksOrderedByCotation(0, true, $conf->global->DIGIRISKDOLIBARR_SHOW_INHERITED_RISKS_IN_DOCUMENTS, $conf->global->DIGIRISKDOLIBARR_SHOW_SHARED_RISKS);
 
 					if ( ! empty($digiriskelementlist) ) {
 						$listlines = $odfHandler->setSegment('elementParHierarchie');
