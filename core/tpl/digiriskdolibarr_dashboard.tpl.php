@@ -6,7 +6,7 @@
 if ($action == 'adddashboardinfo') {
 	$data = json_decode(file_get_contents('php://input'), true);
 
-	$dashboardWidgetName = $data['widgetName'];
+	$dashboardWidgetName = $data['dashboardWidgetName'];
 
 	$visible = json_decode($user->conf->DIGIRISKDOLIBARR_DISABLED_DASHBOARD_INFO);
 	unset($visible->$dashboardWidgetName);

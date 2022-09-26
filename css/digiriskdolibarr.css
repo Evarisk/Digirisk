@@ -146,7 +146,7 @@
 .box-flex-item .info-box-icon img, .box-flex-item .info-box-icon i {
   margin: auto;
 }
-.box-flex-item .close-dashboard-info {
+.box-flex-item .close-dashboard-info, .box-flex-item .close-dashboard-widget {
   width: 20px;
   height: 20px;
   line-height: 20px;
@@ -159,14 +159,14 @@
   top: -5px;
   right: -5px;
 }
-.box-flex-item .close-dashboard-info:hover {
+.box-flex-item .close-dashboard-info:hover, .box-flex-item .close-dashboard-widget:hover {
   cursor: pointer;
   background: #e05353;
   color: #fff;
   -webkit-transform: scale(1.2);
   transform: scale(1.2);
 }
-.box-flex-item .close-dashboard-info > [class*=fa] {
+.box-flex-item .close-dashboard-info > [class*=fa], .box-flex-item .close-dashboard-widget > [class*=fa] {
   display: inline-block;
   line-height: 20px;
 }

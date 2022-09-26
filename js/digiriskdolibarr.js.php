@@ -1846,6 +1846,8 @@ window.eoxiaJS.risk.createRisk = function ( event ) {
 window.eoxiaJS.risk.saveRisk = function ( event ) {
 	let editedRiskId = $(this).attr('value');
 	let elementRisk = $(this).closest('.risk-container').find('.risk-content');
+	var params = new window.URLSearchParams(window.location.search);
+	var id = params.get('id')
 
 	let riskCommentText = elementRisk.find('.risk-description textarea').val()
 	riskCommentText = window.eoxiaJS.risk.sanitizeBeforeRequest(riskCommentText)
@@ -1857,10 +1859,11 @@ window.eoxiaJS.risk.saveRisk = function ( event ) {
 	} else {
 		var description = '';
 	}
-	var newParent = $(this).closest('.risk-container').find('#socid option:selected').val();
 
+	var newParent = $(this).closest('.risk-container').find('#socid option:selected').val();
 	let elementParent = $('.fichecenter.risklist').find('.div-title-and-table-responsive');
-	if (riskCommentText) {
+
+	if (newParent == id) {
 		window.eoxiaJS.loader.display($(this).closest('.risk-row-content-' + editedRiskId).find('.risk-description-'+editedRiskId));
 	} else {
 		window.eoxiaJS.loader.display($(this).closest('.risk-row-content-' + editedRiskId))
@@ -1881,12 +1884,15 @@ window.eoxiaJS.risk.saveRisk = function ( event ) {
 		}),
 		contentType: false,
 		success: function ( resp ) {
-			elementParent.removeClass('wpeo-loader');
-			elementParent.html($(resp).find('.div-title-and-table-responsive'))
+			$('.wpeo-loader').removeClass('wpeo-loader');
 			let actionContainerSuccess = $('.messageSuccessRiskEdit');
-
-			$('#risk_row_' + editedRiskId).fadeOut(800);
-			$('#risk_row_' + editedRiskId).fadeIn(800);
+			if (newParent == id) {
+				elementParent.html($(resp).find('.div-title-and-table-responsive'))
+				$('.risk-row-content-' + editedRiskId).find('.risk-description-'+editedRiskId).fadeOut(800);
+				$('.risk-row-content-' + editedRiskId).find('.risk-description-'+editedRiskId).fadeIn(800);
+			} else {
+				$('#risk_row_'+editedRiskId).fadeOut(800);
+			}
 
 			let textToShow = '';
 			textToShow += actionContainerSuccess.find('.valueForEditRisk1').val()
@@ -3558,8 +3564,8 @@ window.eoxiaJS.ticket.event = function() {
 	$( document ).on( 'click', '.ticket-subCategory', window.eoxiaJS.ticket.selectSubCategory );
 	$( document ).on( 'submit', '#sendFile', window.eoxiaJS.ticket.tmpStockFile );
 	$( document ).on( 'click', '.linked-file-delete', window.eoxiaJS.ticket.removeFile );
-	$( document ).on( 'change', '.add-dashboard-info', window.eoxiaJS.ticket.addDashBoardInfo );
-	$( document ).on( 'click', '.close-dashboard-info', window.eoxiaJS.ticket.closeDashBoardInfo );
+	$( document ).on( 'change', '.add-dashboard-info', window.eoxiaJS.ticket.addDashBoardTicketInfo );
+	$( document ).on( 'click', '.close-dashboard-info', window.eoxiaJS.ticket.closeDashBoardTicketInfo );
 	$( document ).on( 'keyup', '.email', window.eoxiaJS.ticket.checkValidEmail );
 };
 
@@ -3706,7 +3712,7 @@ window.eoxiaJS.ticket.removeFile = function( event ) {
  *
  * @return {void}
  */
-window.eoxiaJS.ticket.addDashBoardInfo = function() {
+window.eoxiaJS.ticket.addDashBoardTicketInfo = function() {
 	let selectTitle = $('#select2-boxcombo-container').attr('title')
 	let digiriskelementID = selectTitle.split(' : ')[0];
 	let catID = selectTitle.split(' : ')[2];
@@ -3741,7 +3747,7 @@ window.eoxiaJS.ticket.addDashBoardInfo = function() {
  *
  * @return {void}
  */
-window.eoxiaJS.ticket.closeDashBoardInfo = function() {
+window.eoxiaJS.ticket.closeDashBoardTicketInfo = function() {
 	let box = $(this);
 	let digiriskelementID = $(this).attr('data-digiriskelementid');
 	let catID = $(this).attr('data-catid');
@@ -3761,8 +3767,6 @@ window.eoxiaJS.ticket.closeDashBoardInfo = function() {
 		}),
 		contentType: false,
 		success: function ( resp ) {
-			console.log(resp)
-			console.log($(resp).find('.add-widget-box').children())
 			box.closest('.box-flex-item').fadeOut(400)
             $('.add-widget-box').attr('style', '')
 			$('.add-widget-box').html($(resp).find('.add-widget-box').children())
@@ -4294,9 +4298,7 @@ window.eoxiaJS.dashboard.event = function() {
  * @return {void}
  */
 window.eoxiaJS.dashboard.addDashBoardInfo = function() {
-	var dashboardWidgetName = document.getElementById('dashBoardForm');
-	var formData = new FormData(dashboardWidgetName);
-	let widgetName = formData.get('boxcombo')
+	let dashboardWidgetName = $('#select2-boxcombo-container').attr('title')
 	let querySeparator = '?';
 	let token = $('.dashboard').find('input[name="token"]').val();
 	document.URL.match(/\?/) ? querySeparator = '&' : 1
@@ -4306,7 +4308,7 @@ window.eoxiaJS.dashboard.addDashBoardInfo = function() {
 		type: "POST",
 		processData: false,
 		data: JSON.stringify({
-			widgetName: widgetName
+			dashboardWidgetName: dashboardWidgetName
 		}),
 		contentType: false,
 		success: function ( resp ) {
@@ -4330,7 +4332,6 @@ window.eoxiaJS.dashboard.closeDashBoardInfo = function() {
 	let dashboardWidgetName = $(this).attr('data-widgetname');
 	let querySeparator = '?';
 	let token = $('.dashboard').find('input[name="token"]').val();
-
 	document.URL.match(/\?/) ? querySeparator = '&' : 1
 
 	$.ajax({
