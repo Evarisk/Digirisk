@@ -21,7 +21,6 @@
  *       \brief      Fichier de la classe de gestion des stats du dashboard
  */
 
-require_once DOL_DOCUMENT_ROOT . '/projet/class/task.class.php';
 require_once DOL_DOCUMENT_ROOT . '/core/class/dolgraph.class.php';
 require_once DOL_DOCUMENT_ROOT . '/core/class/html.form.class.php';
 

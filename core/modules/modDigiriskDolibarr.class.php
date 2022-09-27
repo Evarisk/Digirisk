@@ -626,9 +626,10 @@ class modDigiriskdolibarr extends DolibarrModules
 			220 => array('DIGIRISKDOLIBARR_TASK_MANAGEMENT', 'integer', 1, '', 0, 'current'),
 			221 => array('DIGIRISKDOLIBARR_SHOW_TASK_START_DATE', 'integer', 0, '', 0, 'current'),
 			222 => array('DIGIRISKDOLIBARR_SHOW_TASK_END_DATE', 'integer', 0, '', 0, 'current'),
-			223 => array('DIGIRISKDOLIBARR_SHOW_TASK_PROGRESS', 'integer', 1, '', 0, 'current'),
-			224 => array('DIGIRISKDOLIBARR_SHOW_ALL_TASKS', 'integer', 1, '', 0, 'current'),
-			225 => array('DIGIRISKDOLIBARR_TASK_TIMESPENT_DURATION', 'integer', 15, '', 0, 'current'),
+			223 => array('DIGIRISKDOLIBARR_SHOW_TASKS_DONE', 'integer', 1, '', 0, 'current'),
+			224 => array('DIGIRISKDOLIBARR_SHOW_TASK_CALCULATED_PROGRESS', 'integer', 0, '', 0, 'current'),
+			225 => array('DIGIRISKDOLIBARR_SHOW_ALL_TASKS', 'integer', 1, '', 0, 'current'),
+			226 => array('DIGIRISKDOLIBARR_TASK_TIMESPENT_DURATION', 'integer', 15, '', 0, 'current'),
 
 			// CONST PREVENTION PLAN LINE
 			240 => array('MAIN_AGENDA_ACTIONAUTO_PREVENTIONPLANDET_CREATE', 'integer', 1, '', 0, 'current'),

@@ -22,10 +22,10 @@
  */
 
 require_once DOL_DOCUMENT_ROOT . '/core/class/commonobject.class.php';
-require_once DOL_DOCUMENT_ROOT . '/projet/class/task.class.php';
 
 require_once __DIR__ . '/../../lib/digiriskdolibarr_function.lib.php';
 require_once __DIR__ . '/../digiriskelement.class.php';
+require_once __DIR__ . '/../digirisktask.class.php';
 
 /**
  * Class for Risk
@@ -605,7 +605,7 @@ class Risk extends CommonObject
 			$records = array();
 			while ($i < $num) {
 				$obj = $this->db->fetch_object($resql);
-				$record = new Task($this->db);
+				$record = new DigiriskTask($this->db);
 				$record->fetch($obj->fk_object);
 				$records[$record->id] = $record;
 				$i++;

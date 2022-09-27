@@ -66,7 +66,18 @@ for ($i = 1; $i <= 4; $i++ ) {
 									}
 								}
 
-								if ($related_task->progress == 100) {
+								if ($conf->global->DIGIRISKDOLIBARR_SHOW_TASK_CALCULATED_PROGRESS) {
+									$tmparray = $related_task->getSummaryOfTimeSpent();
+									if ($tmparray['total_duration'] > 0 && !empty($related_task->planned_workload)) {
+										$task_progress = round($tmparray['total_duration'] / $related_task->planned_workload * 100, 2);
+									} else {
+										$task_progress = 0;
+									}
+								} else {
+									$task_progress = $related_task->progress;
+								}
+
+								if ($task_progress == 100) {
 									if ($conf->global->DIGIRISKDOLIBARR_WORKUNITDOCUMENT_SHOW_TASK_DONE > 0) {
 										$tmparray['actionPreventionCompleted'] .= $langs->trans('Ref') . ' : ' . ($related_task->ref ?: $langs->trans('NoData')) . "\n";
 										$tmparray['actionPreventionCompleted'] .= $langs->trans('Responsible') . ' : ' . ($responsible ?: $langs->trans('NoData')) . "\n";
@@ -91,7 +102,7 @@ for ($i = 1; $i <= 4; $i++ ) {
 									} else {
 										$tmparray['actionPreventionUncompleted'] .= $langs->trans('Budget') . ' : ' . $langs->trans('NoData') . ' - ';
 									}
-									$tmparray['actionPreventionUncompleted'] .= $langs->trans('DigiriskProgress') . ' : ' . ($related_task->progress ?: 0) . ' %' . "\n";
+									$tmparray['actionPreventionUncompleted'] .= $langs->trans('DigiriskProgress') . ' : ' . ($task_progress ?: 0) . ' %' . "\n";
 									$tmparray['actionPreventionUncompleted'] .= $langs->trans('ContactsAction') . ' : ' . ($AllInitiales ?: $langs->trans('NoData')) . "\n";
 									$tmparray['actionPreventionUncompleted'] .= $langs->trans('Label') . ' : ' . ($related_task->label ?: $langs->trans('NoData')) . "\n";
 									$tmparray['actionPreventionUncompleted'] .= $langs->trans('Description') . ' : ' . ($related_task->description ?: $langs->trans('NoData')) . "\n\n";

@@ -193,7 +193,7 @@ class ActionsDigiriskdolibarr
 
 				global $user;
 
-				$task           = new Task($db);
+				$task           = new DigiriskTask($db);
 				$risk           = new Risk($db);
 				$preventionplan = new PreventionPlan($db);
 				$firepermit     = new FirePermit($db);

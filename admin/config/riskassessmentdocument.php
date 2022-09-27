@@ -534,15 +534,27 @@ print '</td>';
 print '</tr>';
 
 print '<tr class="oddeven"><td>';
-print $langs->trans('ShowTaskProgress');
+print $langs->trans('ShowTasksDone');
 print "</td><td>";
-print $langs->trans('ShowTaskProgressDescription') . ' % ' . $langs->trans('ShowTaskProgressDescriptionExtend');
+print $langs->trans('ShowTasksDoneDescription') . ' % ' . $langs->trans('ShowTasksDoneDescriptionExtend');
 print '</td>';
 
 print '<td class="center">';
-print ajax_constantonoff('DIGIRISKDOLIBARR_SHOW_TASK_PROGRESS');
+print ajax_constantonoff('DIGIRISKDOLIBARR_SHOW_TASKS_DONE');
 print '</td>';
 print '</tr>';
+
+print '<tr class="oddeven"><td>';
+print $langs->trans('ShowTaskCalculatedProgress');
+print "</td><td>";
+print $langs->trans('ShowTaskCalculatedProgressDescription');
+print '</td>';
+
+print '<td class="center">';
+print ajax_constantonoff('DIGIRISKDOLIBARR_SHOW_TASK_CALCULATED_PROGRESS');
+print '</td>';
+print '</tr>';
+
 
 print '<tr class="oddeven"><td>';
 print $langs->trans('ShowAllTasks');
