@@ -187,6 +187,11 @@ if (is_array($objects)) {
 			tolerance:'intersect',
 			over:function(event,ui){
 				$('.save-organization').removeClass('button-disable')
+				$('a').click(function(e) {
+					if (confirm("Modifications non enregistrées") == false) {
+						e.preventDefault();
+					}
+				})
 				$('.save-organization').attr('style','z-index:1050')
 				$('.save-organization .fas').attr('style','display:none')
 			},
