@@ -3162,3 +3162,28 @@ function getAllThumbsNames($filename)
 
 	return $thumbs_fullnames;
 }
+
+/**
+ * get all working hours
+ *
+ * @return float
+*/
+function getWorkingHours()
+{
+	global $conf, $user;
+
+	$userList = $user->get_full_tree(0, 'entity IN (0,' . $conf->entity . ')');
+	$total_workhours = 0;
+	foreach ($userList as $sub_user) {
+		$user->fetch($sub_user['rowid']);
+		if ($user->employee && $user->weeklyhours && $user->dateemployment) {
+			$employmentdate = $user->dateemployment;
+			$weeklyhours    = $user->weeklyhours;
+
+			$diff = dol_now() - $employmentdate;
+			$work_weeks = floor($diff / 604800);
+			$total_workhours += $work_weeks * $weeklyhours;
+		}
+	}
+	return $total_workhours;
+}

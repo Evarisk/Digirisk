@@ -186,10 +186,11 @@ class Evaluator extends CommonObject
 	 * @param int $offset Offset
 	 * @param array $filter Filter array. Example array('field'=>'valueforlike', 'customurl'=>...)
 	 * @param string $filtermode Filter mode (AND or OR)
+	 * @param  string  $groupby add GROUP BY key word
 	 * @return array|int                 int <0 if KO, array of pages if OK
 	 * @throws Exception
 	 */
-	public function fetchAll($sortorder = '', $sortfield = '', $limit = 0, $offset = 0, array $filter = array(), $filtermode = 'AND')
+	public function fetchAll($sortorder = '', $sortfield = '', $limit = 0, $offset = 0, array $filter = array(), $filtermode = 'AND', $groupby = '')
 	{
 		dol_syslog(__METHOD__, LOG_DEBUG);
 
@@ -217,6 +218,10 @@ class Evaluator extends CommonObject
 		}
 		if (count($sqlwhere) > 0) {
 			$sql .= ' AND (' . implode(' ' . $filtermode . ' ', $sqlwhere) . ')';
+		}
+
+		if (!empty($groupby)) {
+			$sql .= ' GROUP BY ' . $groupby;
 		}
 
 		if ( ! empty($sortfield)) {
@@ -319,5 +324,57 @@ class Evaluator extends CommonObject
 		} else {
 			dol_print_error($this->db);
 		}
+	}
+
+	/**
+	 * Load dashboard info evaluator.
+	 * - get number employees involved
+	 *
+	 * @return array
+	 * @throws Exception
+	 */
+	public function load_dashboard()
+	{
+		$arrayNbEmployeesInvolved = $this->getNbEmployeesInvolved();
+		$arrayNbEmployees         = $this->getNbEmployees();
+
+		$array = array_merge($arrayNbEmployeesInvolved, $arrayNbEmployees);
+
+		return $array;
+	}
+
+	/**
+	 * Get number employees involved.
+	 *
+	 * @return array
+	 * @throws Exception
+	 */
+	public function getNbEmployeesInvolved() {
+		// Number employees involved
+		$allevaluators = $this->fetchAll('','', 0, 0, array(), 'AND', 'fk_user');
+		if (is_array($allevaluators) && !empty($allevaluators)) {
+			$array['nbemployeesinvolved'] = count($allevaluators);
+		} else {
+			$array['nbemployeesinvolved'] = 'N/A';
+		}
+		return $array;
+	}
+
+	/**
+	 * Get number employees.
+	 *
+	 * @return array
+	 * @throws Exception
+	 */
+	public function getNbEmployees() {
+		// Number employees
+		$user = new User($this->db);
+		$allusers = $user->fetchAll('','', 0, 0, array(), 'AND', true);
+		if ($allusers > 0) {
+			$array['nbemployees'] = $allusers;
+		} else {
+			$array['nbemployees'] = 'N/A';
+		}
+		return $array;
 	}
 }

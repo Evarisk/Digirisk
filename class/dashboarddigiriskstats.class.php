@@ -30,12 +30,18 @@ require_once __DIR__ . '/riskanalysis/risk.class.php';
 require_once __DIR__ . '/digirisktask.class.php';
 require_once __DIR__ . '/digiriskdocuments/riskassessmentdocument.class.php';
 require_once __DIR__ . '/accident.class.php';
+require_once __DIR__ . '/evaluator.class.php';
 
 /**
  *	Class to manage stats for dashboard
  */
 class DashboardDigiriskStats extends DigiriskStats
 {
+	const DASHBOARD_RISKASSESSMENTDOCUMENT = 0;
+	const DASHBOARD_ACCIDENT = 1;
+	const DASHBOARD_EVALUATOR = 2;
+	const DASHBOARD_ACCIDENT_INDICATOR_RATE = 3;
+
 	/**
 	 * 	Constructor
 	 *
@@ -47,16 +53,17 @@ class DashboardDigiriskStats extends DigiriskStats
 	}
 
 	/**
-	 * Load data and show dashboard.
+	 * Show dashboard.
 	 *
 	 * @param  int       $show_risk                  Show dashboard risk info
 	 * @param  int       $show_task                  Show dashboard task info
 	 * @param  int       $show_riskassementdocument  Show dashboard riskassessmentdocument info
 	 * @param  int       $show_accident              Show dashboard accident info
+	 * @param  int       $show_evaluator             Show dashboard evaluator info
 	 * @return void
 	 * @throws Exception
 	 */
-	public function show_dashboard($show_risk = 1, $show_task = 1, $show_riskassementdocument = 1, $show_accident = 1)
+	public function show_dashboard($show_risk = 1, $show_task = 1, $show_riskassementdocument = 1, $show_accident = 1, $show_evaluator = 1)
 	{
 		global $conf, $langs, $user;
 
@@ -67,30 +74,46 @@ class DashboardDigiriskStats extends DigiriskStats
 		$digirisktask         = new DigiriskTask($this->db);
 		$accident             = new Accident($this->db);
 		$riskassementdocument = new RiskAssessmentDocument($this->db);
+		$evaluator            = new Evaluator($this->db);
 
 		$dataseries = array(
-			'risk' => ($show_risk) ? $risk->load_dashboard() : -1,
-			'task' => ($show_task) ? $digirisktask->load_dashboard() : -1,
+			'risk'     => ($show_risk) ? $risk->load_dashboard() : -1,
+			'task'     => ($show_task) ? $digirisktask->load_dashboard() : -1,
 			'accident' => ($show_accident) ? $accident->load_dashboard() : -1
 		);
 
 		$accidentdata             = ($show_accident) ? $accident->load_dashboard() : -1;
 		$riskassementdocumentdata = ($show_riskassementdocument) ? $riskassementdocument->load_dashboard() : -1;
+		$evaluatordata            = ($show_evaluator) ? $evaluator->load_dashboard() : -1;
 
 		print '<form method="POST" action="' . $_SERVER["PHP_SELF"] . '" class="dashboard" id="dashBoardForm">';
 		print '<input type="hidden" name="token" value="' . newToken() . '">';
 		print '<input type="hidden" name="action" value="view">';
 
 		$dashboardLines = array(
-			$langs->trans('Accident') => ($show_accident) ? array(
-				'label' => array($langs->trans("DayWithoutAccident"), $langs->trans("WorkStopDays")),
-				'content' => array($accidentdata['daywithoutaccident'], $accidentdata['nbworkstopdays']),
-				'picto' => 'fas fa-user-injured'
+			self::DASHBOARD_RISKASSESSMENTDOCUMENT => ($show_riskassementdocument) ? array(
+				'label'      => array($langs->trans("LastGenerateDate"), $langs->trans("NextGenerateDate")),
+				'content'    => array($riskassementdocumentdata['lastgeneratedate'], $riskassementdocumentdata['nextgeneratedate']),
+				'picto'      => 'fas fa-info-circle',
+				'widgetName' => $langs->trans('RiskAssessmentDocument')
 			) : -1,
-			$langs->trans('RiskAssessmentDocument') => ($show_riskassementdocument) ? array(
-				'label' => array($langs->trans("LastGenerateDate"), $langs->trans("NextGenerateDate")),
-				'content' => array($riskassementdocumentdata[0], $riskassementdocumentdata[1]),
-				'picto' => 'fas fa-info-circle'
+			self::DASHBOARD_ACCIDENT => ($show_accident) ? array(
+				'label'      => array($langs->trans("DayWithoutAccident"), $langs->trans("WorkStopDays"), $langs->trans("NbAccidentsByEmployees")),
+				'content'    => array($accidentdata['daywithoutaccident'], $accidentdata['nbworkstopdays'], $accidentdata['nbaccidentsbyemployees']),
+				'picto'      => 'fas fa-user-injured',
+				'widgetName' => $langs->trans('Accident')
+			) : -1,
+			self::DASHBOARD_EVALUATOR => ($show_evaluator) ? array(
+				'label'      => array($langs->trans("NbEmployeesInvolved"), $langs->trans("NbEmployees")),
+				'content'    => array($evaluatordata['nbemployeesinvolved'], $evaluatordata['nbemployees']),
+				'picto'      => 'fas fa-user-check',
+				'widgetName' => $langs->trans('Evaluator')
+			) : -1,
+			self::DASHBOARD_ACCIDENT_INDICATOR_RATE => ($show_accident) ? array(
+				'label' => array($langs->trans("FrequencyIndex"), $langs->trans("FrequencyRate"), $langs->trans("GravityRate")),
+				'content' => array($accidentdata['frequencyindex'], $accidentdata['frequencyrate'], $accidentdata['gravityrate']),
+				'picto' => 'fas fa-chart-bar',
+				'widgetName' => $langs->trans('AccidentRateIndicator')
 			) : -1
 		);
 
@@ -99,13 +122,13 @@ class DashboardDigiriskStats extends DigiriskStats
 		if (!empty($dashboardLines)) {
 			foreach ($dashboardLines as $key => $dashboardLine) {
 				if (isset($disableWidgetList->$key) && $disableWidgetList->$key == 0) {
-					$dashboardLinesArray[] = $key;
+					$dashboardLinesArray[$key] = $dashboardLine['widgetName'];
 				}
 			}
 		}
 
 		print '<div class="add-widget-box" style="' . (!empty((array)$disableWidgetList) ? '' : 'display:none') . '">';
-		print Form::selectarray('boxcombo', $dashboardLinesArray, -1, $langs->trans("ChooseBoxToAdd") . '...', 0, 0, '', 0, 0, 0, 'ASC', 'maxwidth150onsmartphone hideonprint add-dashboard-widget', 0, 'hidden selected', 0, 1);
+		print Form::selectarray('boxcombo', $dashboardLinesArray, -1, $langs->trans("ChooseBoxToAdd") . '...', 0, 0, '', 1, 0, 0, 'DESC', 'maxwidth150onsmartphone hideonprint add-dashboard-widget', 0, 'hidden selected', 0, 1);
 		if (!empty($conf->use_javascript_ajax)) {
 			include_once DOL_DOCUMENT_ROOT . '/core/lib/ajax.lib.php';
 			print ajax_combobox("boxcombo");
@@ -147,19 +170,19 @@ class DashboardDigiriskStats extends DigiriskStats
 		print '<div class="box-flex-container">';
 
 		if (is_array($dataseries) && !empty($dataseries)) {
-			foreach ($dataseries as $keyelement => $datagraph['data']) {
-				if (is_array($datagraph['data']['data']) && !empty($datagraph['data']['data'])) {
-					foreach ($datagraph['data']['data'] as $datagraphsingle) {
+			foreach ($dataseries as $keyelement => $datagraph) {
+				if (is_array($datagraph['data']) && !empty($datagraph['data'])) {
+					foreach ($datagraph['data'] as $datagraphsingle) {
 						$nbdata += $datagraphsingle;
 					}
 					if ($nbdata > 0) {
-						$arraykeys = array_keys($datagraph['data']['data']);
+						$arraykeys = array_keys($datagraph['data']);
 						foreach ($arraykeys as $key) {
 							$data[$keyelement][] = array(
-								0 => $langs->trans($datagraph['data']['labels'][$key]['label']),
-								1 => $datagraph['data']['data'][$key]
+								0 => $langs->trans($datagraph['labels'][$key]['label']),
+								1 => $datagraph['data'][$key]
 							);
-							$datacolor[$keyelement][] = $langs->trans($datagraph['data']['labels'][$key]['color']);
+							$datacolor[$keyelement][] = $langs->trans($datagraph['labels'][$key]['color']);
 						}
 
 						$filename[$keyelement] = $keyelement . '.png';
@@ -175,7 +198,7 @@ class DashboardDigiriskStats extends DigiriskStats
 						$graph->draw($filename[$keyelement], $fileurl[$keyelement]);
 						print '<div class="box-flex-item">';
 						print '<div class="titre inline-block">';
-						print $datagraph['data']['picto'] . ' ' . $datagraph['data']['title'];
+						print $datagraph['picto'] . ' ' . $datagraph['title'];
 						print '</div>';
 						print $graph->show();
 						print '</div>';

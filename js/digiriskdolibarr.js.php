@@ -4345,7 +4345,9 @@ window.eoxiaJS.dashboard.event = function() {
  * @return {void}
  */
 window.eoxiaJS.dashboard.addDashBoardInfo = function() {
-	let dashboardWidgetName = $('#select2-boxcombo-container').attr('title')
+	var dashboardWidgetForm = document.getElementById('dashBoardForm');
+	var formData = new FormData(dashboardWidgetForm);
+	let dashboardWidgetName = formData.get('boxcombo')
 	let querySeparator = '?';
 	let token = $('.dashboard').find('input[name="token"]').val();
 	document.URL.match(/\?/) ? querySeparator = '&' : 1

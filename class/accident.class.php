@@ -28,7 +28,7 @@ require_once DOL_DOCUMENT_ROOT . '/societe/class/societe.class.php';
 require_once __DIR__ . '/digiriskdocuments.class.php';
 require_once __DIR__ . '/digirisksignature.class.php';
 require_once __DIR__ . '/openinghours.class.php';
-
+require_once __DIR__ . '/evaluator.class.php';
 
 /**
  * Class for Accident
@@ -486,14 +486,28 @@ class Accident extends CommonObject
 	 */
 	public function load_dashboard()
 	{
-		$arrayNbDaysWithoutAccident = $this->getNbDaysWithoutAccident();
-		$arrayNbAccidents           = $this->getNbAccidents();
+		$arrayNbDaysWithoutAccident  = $this->getNbDaysWithoutAccident();
+		$arrayNbAccidents            = $this->getNbAccidents();
+		$arrayNbWorkstopDays         = $this->getNbWorkstopDays();
+		$arrayNbAccidentsByEmployees = $this->getNbAccidentsByEmployees();
+		$arrayFrequencyIndex         = $this->getFrequencyIndex();
+		$arrayFrequencyRate          = $this->getFrequencyRate();
+		//$arrayGravityIndex           = $this->getGravityIndex();
+		$arrayGravityRate            = $this->getGravityRate();
 
-		$array = array_merge($arrayNbDaysWithoutAccident, $arrayNbAccidents);
+		$array = array_merge(
+			$arrayNbDaysWithoutAccident,
+			$arrayNbAccidents,
+			$arrayNbWorkstopDays,
+			$arrayNbAccidentsByEmployees,
+			$arrayFrequencyIndex,
+			$arrayFrequencyRate,
+			//$arrayGravityIndex,
+			$arrayGravityRate
+		);
 
 		return $array;
 	}
-
 
 	/**
 	 * Get number days without accident.
@@ -513,7 +527,6 @@ class Accident extends CommonObject
 		return $array;
 	}
 
-
 	/**
 	 * Get number accidents.
 	 *
@@ -529,15 +542,43 @@ class Accident extends CommonObject
 			$array['title'] = $langs->transnoentities('AccidentRepartition');
 			$array['picto'] = '<i class="fas fa-user-injured"></i>';
 			$array['labels'] = array(
-				0 => array(
+				'accidents' => array(
 					'label' => $langs->transnoentities('AccidentWithDIAT'),
 					'color' => '#e05353'
 				),
-				1 => array(
+				'accidentswithoutDIAT' => array(
 					'label' => $langs->transnoentities('AccidentWithoutDIAT'),
 					'color' => '#e9ad4f'
 				),
 			);
+			$accidentworkstop = new AccidentWorkStop($this->db);
+			foreach ($allaccidents as $accident) {
+				$allaccidentworkstop = $accidentworkstop->fetchFromParent($accident->id);
+				if (is_array($allaccidentworkstop) && !empty($allaccidentworkstop)) {
+					$nbaccidents += 1;
+				} else {
+					$nbaccidentswithoutDIAT += 1;
+				}
+			}
+			$array['data']['accidents'] = $nbaccidents;
+			$array['data']['accidentswithoutDIAT'] = $nbaccidentswithoutDIAT;
+		} else {
+			$array['data']['accidents'] = 0;
+			$array['data']['accidentswithoutDIAT'] = 0;
+		}
+		return $array;
+	}
+
+	/**
+	 * Get number workstop days.
+	 *
+	 * @return array
+	 * @throws Exception
+	 */
+	public function getNbWorkstopDays() {
+		// Number workstop days
+		$allaccidents = $this->fetchAll();
+		if (is_array($allaccidents) && !empty($allaccidents)) {
 			$accidentworkstop = new AccidentWorkStop($this->db);
 			foreach ($allaccidents as $accident) {
 				$allaccidentworkstop = $accidentworkstop->fetchFromParent($accident->id);
@@ -547,18 +588,107 @@ class Accident extends CommonObject
 							$nbworkstopdays += $accidentworkstop->workstop_days;
 						}
 					}
-					$nbaccidents += 1;
-				} else {
-					$nbaccidentswithoutDIAT += 1;
 				}
 			}
-			$array['data'][0] = $nbaccidents;
-			$array['data'][1] = $nbaccidentswithoutDIAT;
 			$array['nbworkstopdays'] = $nbworkstopdays ?: 0;
 		} else {
-			$array['data'][0] = 0;
-			$array['data'][1] = 0;
 			$array['nbworkstopdays'] = 0;
+		}
+		return $array;
+	}
+
+	/**
+	 * Get number accidents by employees.
+	 *
+	 * @return array
+	 * @throws Exception
+	 */
+	public function getNbAccidentsByEmployees() {
+		$evaluator = new Evaluator($this->db);
+
+		// Number accidents by employees
+		$arrayNbAccidents = $this->getNbAccidents();
+		$arrayNbEmployees = $evaluator->getNbEmployees();
+		if ($arrayNbEmployees['nbemployees'] > 0) {
+			$nbaccidentsbyemployees = ($arrayNbAccidents['data']['accidents'] + $arrayNbAccidents['data']['accidentswithoutDIAT']) / $arrayNbEmployees['nbemployees'];
+			if ($nbaccidentsbyemployees > 0) {
+				$array['nbaccidentsbyemployees'] = price2Num($nbaccidentsbyemployees, 2);
+			} else {
+				$array['nbaccidentsbyemployees'] = 'N/A';
+			}
+		} else {
+			$array['nbaccidentsbyemployees'] = 'N/A';
+		}
+		return $array;
+	}
+
+	/**
+	 * Get frequency index (number accidents with DIAT by employees) x 1000.
+	 *
+	 * @return array
+	 * @throws Exception
+	 */
+	public function getFrequencyIndex() {
+		$evaluator = new Evaluator($this->db);
+
+		// (Number accidents with DIAT by employees) x 1 000
+		$arrayNbAccidents = $this->getNbAccidents();
+		$arrayNbEmployees = $evaluator->getNbEmployees();
+		if ($arrayNbEmployees['nbemployees'] > 0) {
+			$frequencyindex = ($arrayNbAccidents['data']['accidents']/$arrayNbEmployees['nbemployees']) * 1000;
+			if ($frequencyindex > 0) {
+				$array['frequencyindex'] = price2Num($frequencyindex, 2);
+			} else {
+				$array['frequencyindex'] = 'N/A';
+			}
+		} else {
+			$array['frequencyindex'] = 'N/A';
+		}
+		return $array;
+	}
+
+	/**
+	 * Get frequency rate (number accidents with DIAT by working hours) x 1 000 000.
+	 *
+	 * @return array
+	 * @throws Exception
+	 */
+	public function getFrequencyRate() {
+		// (Number accidents with DIAT by working hours) x 1 000 000
+		$arrayNbAccidents = $this->getNbAccidents();
+		$total_workhours  = getWorkingHours();
+		if ($total_workhours > 0) {
+			$frequencyrate = ($arrayNbAccidents['data']['accidents']/$total_workhours) * 1000000;
+			if ($frequencyrate > 0) {
+				$array['frequencyrate'] = price2Num($frequencyrate, 2);
+			} else {
+				$array['frequencyrate'] = 'N/A';
+			}
+		} else {
+			$array['frequencyrate'] = 'N/A';
+		}
+		return $array;
+	}
+
+	/**
+	 * Get gravity rate (number workstop days by working hours) x 1 000.
+	 *
+	 * @return array
+	 * @throws Exception
+	 */
+	public function getGravityRate() {
+		// (Number workstop days by working hours) x 1 000
+		$arrayNbWorkstopDays = $this->getNbWorkstopDays();
+		$total_workhours     = getWorkingHours();
+		if ($total_workhours > 0) {
+			$gravityrate = ($arrayNbWorkstopDays['nbworkstopdays']/$total_workhours) * 1000;
+			if ($gravityrate > 0) {
+				$array['gravityrate'] = price2Num($gravityrate, 2);
+			} else {
+				$array['gravityrate'] = 'N/A';
+			}
+		} else {
+			$array['gravityrate'] = 'N/A';
 		}
 		return $array;
 	}
