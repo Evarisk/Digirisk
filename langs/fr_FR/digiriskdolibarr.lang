@@ -1344,7 +1344,7 @@ SignatureManagement = Gestion des signatures
 HasNoEmail = n'a pas d'email
 GoToEmailSetup = Pour configurer votre serveur de mail, rendez-vous dans
 PathToEmailSetup = "Accueil -> Configuration -> Emails" </a>
-
+SendToNoEmail = Les destinataires n'ont pas d'email
 
 #
 # Ticket - Interface publique ticket

@@ -634,6 +634,13 @@ if (empty($reshook)) {
 	$labour_inspector_id = $labour_inspector->id;
 	$thirdparty->fetch($labour_inspector_id);
 	$object->thirdparty = $thirdparty;
+
+	if ($action == 'send' && dol_strlen(GETPOST('sendto') < 1)) {
+		setEventMessages($langs->trans("SendToNoEmail"), null, 'errors');
+		header("Location: " . $_SERVER['PHP_SELF'] . '?id=' . $id);
+		exit();
+	}
+
 	include DOL_DOCUMENT_ROOT . '/core/actions_sendmails.inc.php';
 }
 
