@@ -390,8 +390,10 @@ if (empty($reshook)) {
 	// Action to add line
 	if ($action == 'addLine' && $permissiontoadd) {
 		// Get parameters
-		$workstop_days = GETPOST('workstop_days');
-		$parent_id     = GETPOST('parent_id');
+		$workstop_days    = GETPOST('workstop_days');
+		$parent_id        = GETPOST('parent_id');
+		$declaration_link = GETPOST('declarationLink');
+
 
 		// Initialize object accident line
 		$now                             = dol_now();
@@ -400,6 +402,7 @@ if (empty($reshook)) {
 		$objectline->ref                 = $refAccidentWorkStopMod->getNextValue($objectline);
 		$objectline->entity              = $conf->entity;
 		$objectline->workstop_days       = $workstop_days;
+		$objectline->declaration_link    = $declaration_link;
 
 		$date_start_workstop = dol_mktime(GETPOST('datestarthour', 'int'), GETPOST('datestartmin', 'int'), 0, GETPOST('datestartmonth', 'int'), GETPOST('datestartday', 'int'), GETPOST('datestartyear', 'int'));
 		$date_end_workstop   = dol_mktime(GETPOST('dateendhour', 'int'), GETPOST('dateendmin', 'int'), 0, GETPOST('dateendmonth', 'int'), GETPOST('dateendday', 'int'), GETPOST('dateendyear', 'int'));
@@ -436,8 +439,9 @@ if (empty($reshook)) {
 	// Action to update line
 	if ($action == 'updateLine' && $permissiontoadd) {
 		// Get parameters
-		$workstop_days = GETPOST('workstop_days');
-		$parent_id     = GETPOST('parent_id');
+		$workstop_days    = GETPOST('workstop_days');
+		$parent_id        = GETPOST('parent_id');
+		$declaration_link = GETPOST('declarationLink');
 
 		$objectline->fetch($lineid);
 
@@ -450,6 +454,15 @@ if (empty($reshook)) {
 		$objectline->date_start_workstop = $date_start_workstop;
 		$objectline->date_end_workstop   = $date_end_workstop;
 		$objectline->fk_accident         = $parent_id;
+		$objectline->declaration_link    = $declaration_link;
+
+		// Check parameters
+		if (empty($workstop_days)) {
+			setEventMessages($langs->trans('ErrorFieldNotEmpty', $langs->transnoentitiesnoconv('WorkStopDays')), null, 'errors');
+			header("Location: " . $_SERVER['PHP_SELF'] . '?id=' . $id . '&action=editline&lineid=' .  $lineid);
+			exit;
+			$error++;
+		}
 
 		if ( ! $error) {
 			$result = $objectline->update($user, false);
@@ -1040,6 +1053,7 @@ if ((empty($action) || ($action != 'create' && $action != 'edit'))) {
 
 		if ( ! empty($accidentlines) && $accidentlines > 0) {
 			foreach ($accidentlines as $key => $item) {
+				//action edit
 				if (($action == 'editline' || $subaction == 'editline') && $lineid == $key) {
 					print '<form method="POST" action="' . $_SERVER["PHP_SELF"] . '?id=' . $object->id . '">';
 					print '<input type="hidden" name="token" value="' . newToken() . '">';
@@ -1069,62 +1083,8 @@ if ((empty($action) || ($action != 'create' && $action != 'edit'))) {
 					print '</td>';
 
 					$coldisplay++;
-					print '<td>'; ?>
-					<div class="wpeo-gridlayout grid-2">
-						<span class="form-label"><?php print $langs->trans("FilesLinked"); ?></span>
-						<label class="wpeo-button button-blue" for="sendfile">
-							<i class="fas fa-image button-icon"></i>
-							<span class="button-label"><?php print $langs->trans('AddDocument'); ?></span>
-							<input type="file" name="userfile[]" class="sendfile" multiple="multiple" id="sendfile" onchange="window.eoxiaJS.accident.tmpStockFile(<?php echo $item->id ?>, 'editline')"  style="display: none"/>
-						</label>
-					</div>
-				<div id="sendFileForm<?php echo $item->id ?>">
-				<div id="fileLinkedTable<?php echo $item->id ?>" class="tableforinputfields objectline" value="<?php echo 0 ?>">
-					<?php $fileLinkedList = dol_dir_list($conf->digiriskdolibarr->multidir_output[isset($conf->entity) ? $conf->entity : 1] . '/accident/' . $object->ref . '/workstop/' . $item->ref . '/'); ?>
-					<div class="wpeo-table table-flex table-3 objectline" value="<?php echo $item->id ?>"">
-					<?php
-					if ( ! empty($fileLinkedList)) {
-						foreach ($fileLinkedList as $fileLinked) {
-							$file_extension = pathinfo($fileLinked['name'], PATHINFO_EXTENSION);
-							if (in_array($file_extension, $img_extensions)) :
-								$thumb_name = getThumbName($fileLinked['name'], 'mini');
-								?>
-								<div class="table-row">
-									<div class="table-cell">
-										<?php print '<img class="photo"  width="50" src="' . DOL_URL_ROOT . '/viewimage.php?modulepart=digiriskdolibarr&entity=' . $conf->entity . '&file=' . urlencode('/accident/' . $object->ref . '/workstop/' . $item->ref . '/thumbs/' . $thumb_name) . '" title="' . dol_escape_htmltag($alt) . '">'; ?>
-									</div>
-									<div class="table-cell">
-										<?php print $fileLinked['name']; ?>
-									</div>
-									<div class="table-cell table-50 table-end table-padding-0">
-										<?php print '<div class="linked-file-delete-workstop edit-line wpeo-button button-square-50 button-transparent" value="' . $fileLinked['name'] . '"><i class="fas fa-trash button-icon"></i></div>'; ?>
-									</div>
-								</div> <?php
-							elseif ($fileLinked['type'] != 'dir') : ?>
-								<div class="table-row">
-									<div class="table-cell  table-padding-100">
-										<i class="fas fa-file"></i>
-									</div>
-									<div class="table-cell">
-										<?php print $fileLinked['name']; ?>
-									</div>
-									<div class="table-cell table-50 table-end table-padding-0">
-										<?php print '<div class="linked-file-delete-workstop edit-line wpeo-button button-square-50 button-transparent" value="' . $fileLinked['name'] . '"><i class="fas fa-trash button-icon"></i></div>'; ?>
-									</div>
-								</div>
-							<?php
-							endif;
-						} ?> </div>
-						</div> <?php
-					} else {
-						?>
-						<div class="table-row">
-							<div class="table-cell"><?php print $langs->trans('NoFileLinked'); ?></div>
-						</div>
-						<?php
-					}
-					?>
-					</div> <?php
+					print '<td>';
+					print '<input name="declarationLink" value="'. (GETPOST('declarationLink') ?: $item->declaration_link) .'">';
 					print '</td>';
 
 					$coldisplay += $colspan;
@@ -1134,6 +1094,7 @@ if ((empty($action) || ($action != 'create' && $action != 'edit'))) {
 					print '</td>';
 					print '</tr>';
 					print '</form>';
+				//action view
 				} elseif ($item->status == 1) {
 					print '<td>';
 					print $item->ref;
@@ -1155,45 +1116,9 @@ if ((empty($action) || ($action != 'create' && $action != 'edit'))) {
 					print '</td>';
 
 					$coldisplay++;
-					print '<td>'; ?>
-					<?php $fileLinkedList = dol_dir_list($conf->digiriskdolibarr->multidir_output[isset($conf->entity) ? $conf->entity : 1] . '/accident/' . $object->ref . '/workstop/' . $item->ref . '/'); ?>
-					<div class="wpeo-table table-flex table-3 objectline" value="<?php echo $item->id ?>">
-						<?php
-						if ( ! empty($fileLinkedList)) {
-							foreach ($fileLinkedList as $fileLinked) {
-								$file_extension = pathinfo($fileLinked['name'], PATHINFO_EXTENSION);
-								if (in_array($file_extension, $img_extensions)) :
-									$thumb_name = getThumbName($fileLinked['name'], 'mini');
-									?>
-									<div class="table-row">
-										<div class="table-cell">
-											<?php print '<img class="photo"  width="50" src="' . DOL_URL_ROOT . '/viewimage.php?modulepart=digiriskdolibarr&entity=' . $conf->entity . '&file=' . urlencode('/accident/' . $object->ref . '/workstop/' . $item->ref . '/thumbs/' . $thumb_name) . '" title="' . dol_escape_htmltag($alt) . '">'; ?>
-										</div>
-										<div class="table-cell">
-											<?php print $fileLinked['name']; ?>
-										</div>
-									</div> <?php
-								elseif ($fileLinked['type'] != 'dir') : ?>
-									<div class="table-row">
-										<div class="table-cell  table-padding-100">
-											<i class="fas fa-file"></i>
-										</div>
-										<div class="table-cell">
-											<?php print $fileLinked['name']; ?>
-										</div>
-									</div>
-								<?php
-								endif;
-							}
-						} else {
-							?>
-							<div class="table-row">
-								<div class="table-cell"><?php print $langs->trans('NoFileLinked'); ?></div>
-							</div>
-							<?php
-						}
-						?>
-					</div> <?php
+					print '<td>';
+					$is_link = dol_is_url($item->declaration_link);
+					print ($is_link ? '<a target="_blank" href="'. $item->declaration_link .'">' : '') . $item->declaration_link . ($is_link ? '</a>' : '') ;
 					print '</td>';
 
 					$coldisplay += $colspan;
@@ -1217,6 +1142,7 @@ if ((empty($action) || ($action != 'create' && $action != 'edit'))) {
 			}
 			print '</tr>';
 		}
+		//action create
 		if ($object->status == 1 && $permissiontoadd && $action != 'editline') {
 			print '<form method="POST" action="' . $_SERVER["PHP_SELF"] . '?id=' . $object->id . '">';
 			print '<input type="hidden" name="token" value="' . newToken() . '">';
@@ -1246,69 +1172,7 @@ if ((empty($action) || ($action != 'create' && $action != 'edit'))) {
 
 			$coldisplay++;
 			print '<td class="maxwidth100">';
-			?>
-
-			<div class="form-element">
-				<div class="wpeo-gridlayout grid-2">
-					<span class="form-label"><?php print $langs->trans("FilesLinked"); ?></span>
-					<label class="wpeo-button button-blue" for="sendfile">
-						<i class="fas fa-image button-icon"></i>
-						<span class="button-label"><?php print $langs->trans('AddDocument'); ?></span>
-						<input type="file" name="userfile[]" class="sendfile" multiple="multiple" id="sendfile" onchange="window.eoxiaJS.accident.tmpStockFile(<?php echo 0 ?>)"  style="display: none"/>
-					</label>
-				</div>
-
-				<div id="sendFileForm<?php echo 0 ?>">
-					<div id="fileLinkedTable<?php echo 0 ?>" class="tableforinputfields objectline" value="<?php echo 0 ?>">
-						<?php $fileLinkedList = dol_dir_list($conf->digiriskdolibarr->multidir_output[isset($conf->entity) ? $conf->entity : 1] . '/accident/' . $object->ref . '/workstop/temp/'); ?>
-						<div class="wpeo-table table-flex table-3">
-							<?php
-							if ( ! empty($fileLinkedList)) {
-								foreach ($fileLinkedList as $fileLinked) {
-									$file_extension = pathinfo($fileLinked['name'], PATHINFO_EXTENSION);
-									if (in_array($file_extension, $img_extensions)) :
-										$thumb_name = getThumbName($fileLinked['name'], 'mini');
-										?>
-										<div class="table-row">
-											<div class="table-cell">
-												<?php print '<img class="photo"  width="50" src="' . DOL_URL_ROOT . '/viewimage.php?modulepart=digiriskdolibarr&entity=' . $conf->entity . '&file=' . urlencode('/accident/' . $object->ref . '/workstop/temp/thumbs/' . $thumb_name) . '" title="' . dol_escape_htmltag($alt) . '">'; ?>
-											</div>
-											<div class="table-cell">
-												<?php print $fileLinked['name']; ?>
-											</div>
-											<div class="table-cell table-50 table-end table-padding-0">
-												<?php print '<div class="linked-file-delete-workstop wpeo-button button-square-50 button-transparent" value="' . $fileLinked['name'] . '"><i class="fas fa-trash button-icon"></i></div>'; ?>
-											</div>
-										</div> <?php
-									elseif ($fileLinked['type'] != 'dir') : ?>
-										<div class="table-row">
-											<div class="table-cell  table-padding-100">
-												<i class="fas fa-file"></i>
-											</div>
-											<div class="table-cell">
-												<?php print $fileLinked['name']; ?>
-											</div>
-											<div class="table-cell table-50 table-end table-padding-0">
-												<?php print '<div class="linked-file-delete-workstop wpeo-button button-square-50 button-transparent" value="' . $fileLinked['name'] . '"><i class="fas fa-trash button-icon"></i></div>'; ?>
-											</div>
-										</div>
-									<?php
-									endif;
-								}
-							} else {
-								?>
-								<div class="table-row">
-									<div class="table-cell"><?php print $langs->trans('NoFileLinked'); ?></div>
-								</div>
-								<?php
-							}
-							?>
-						</div>
-					</div>
-				</div>
-
-			</div>
-			<?php
+			print '<input name="declarationLink" id="declarationLink" value="'. GETPOST('declarationLink') . '">';
 			print '</td>';
 
 			$coldisplay += $colspan;
@@ -1317,9 +1181,6 @@ if ((empty($action) || ($action != 'create' && $action != 'edit'))) {
 			print '</td>';
 			print '</tr>';
 
-			if (is_object($objectline)) {
-				//              print $objectline->showOptionals($extrafields, 'edit', array('style' => $bcnd[$var], 'colspan' => $coldisplay), '', '', 1);
-			}
 			print '</form>';
 		}
 		print '</table>';

@@ -608,6 +608,7 @@ class AccidentWorkStop extends CommonObjectLine
 		'workstop_days'       => array('type' => 'integer', 'label' => 'WorkStopDays', 'enabled' => '1', 'position' => 70, 'notnull' => -1, 'visible' => -1,),
 		'date_start_workstop' => array('type' => 'datetime', 'label' => 'DateStartWorkStop', 'enabled' => '1', 'position' => 80, 'notnull' => 0, 'visible' => 0,),
 		'date_end_workstop'   => array('type' => 'datetime', 'label' => 'DateEndWorkStop', 'enabled' => '1', 'position' => 81, 'notnull' => 0, 'visible' => 0,),
+		'declaration_link'    => array('type' => 'text', 'label' => 'DeclarationLink', 'enabled' => '1', 'position' => 82, 'notnull' => 0, 'visible' => 0,),
 		'fk_accident'         => array('type' => 'integer', 'label' => 'FkAccident', 'enabled' => '1', 'position' => 90, 'notnull' => 1, 'visible' => 0,),
 	);
 
@@ -620,6 +621,7 @@ class AccidentWorkStop extends CommonObjectLine
 	public $workstop_days;
 	public $date_start_workstop;
 	public $date_end_workstop;
+	public $declaration_link;
 	public $fk_accident;
 
 	/**
@@ -647,7 +649,7 @@ class AccidentWorkStop extends CommonObjectLine
 	{
 		global $db;
 
-		$sql  = 'SELECT t.rowid, t.ref, t.date_creation, t.status, t.workstop_days, t.date_start_workstop, t.date_end_workstop, t.fk_accident';
+		$sql  = 'SELECT t.rowid, t.ref, t.date_creation, t.status, t.workstop_days, t.date_start_workstop, t.date_end_workstop, t.declaration_link, t.fk_accident';
 		$sql .= ' FROM ' . MAIN_DB_PREFIX . 'digiriskdolibarr_accident_workstop as t';
 		$sql .= ' WHERE t.rowid = ' . $rowid;
 		$sql .= ' AND entity IN (' . getEntity($this->table_element) . ')';
@@ -663,6 +665,7 @@ class AccidentWorkStop extends CommonObjectLine
 			$this->workstop_days       = $objp->workstop_days;
 			$this->date_start_workstop = $objp->date_start_workstop;
 			$this->date_end_workstop   = $objp->date_end_workstop;
+			$this->declaration_link    = $objp->declaration_link;
 			$this->fk_accident         = $objp->fk_accident;
 
 			$db->free($result);
@@ -684,7 +687,7 @@ class AccidentWorkStop extends CommonObjectLine
 	public function fetchFromParent($parent_id = 0, $limit = 0)
 	{
 		global $db;
-		$sql  = 'SELECT t.rowid, t.ref, t.date_creation, t.status, t.workstop_days, t.date_start_workstop, t.date_end_workstop';
+		$sql  = 'SELECT t.rowid, t.ref, t.date_creation, t.status, t.workstop_days, t.date_start_workstop, t.date_end_workstop, t.declaration_link';
 		$sql .= ' FROM ' . MAIN_DB_PREFIX . 'digiriskdolibarr_accident_workstop as t';
 		if ($parent_id > 0) {
 			$sql .= ' WHERE t.fk_accident = ' . $parent_id;
@@ -712,6 +715,7 @@ class AccidentWorkStop extends CommonObjectLine
 				$record->workstop_days       = $obj->workstop_days;
 				$record->date_start_workstop = $obj->date_start_workstop;
 				$record->date_end_workstop   = $obj->date_end_workstop;
+				$record->declaration_link    = $obj->declaration_link;
 				$record->fk_accident         = $obj->fk_accident;
 
 				$records[$record->id] = $record;
@@ -745,7 +749,7 @@ class AccidentWorkStop extends CommonObjectLine
 
 		// Insertion dans base de la ligne
 		$sql  = 'INSERT INTO ' . MAIN_DB_PREFIX . 'digiriskdolibarr_accident_workstop';
-		$sql .= ' (ref, entity, date_creation, status, workstop_days, date_start_workstop, date_end_workstop, fk_accident';
+		$sql .= ' (ref, entity, date_creation, status, workstop_days, date_start_workstop, date_end_workstop, declaration_link, fk_accident';
 		$sql .= ')';
 		$sql .= " VALUES (";
 		$sql .= "'" . $db->escape($this->ref) . "'" . ", ";
@@ -755,6 +759,7 @@ class AccidentWorkStop extends CommonObjectLine
 		$sql .= $this->workstop_days . ", ";
 		$sql .= "'" . $db->escape($db->idate($this->date_start_workstop)) . "'" . ", ";
 		$sql .= "'" . $db->escape($db->idate($this->date_end_workstop)) . "'" . ", ";
+		$sql .= "'" . $this->declaration_link . "'" . ", ";
 		$sql .= $this->fk_accident;
 
 		$sql .= ')';
@@ -800,6 +805,7 @@ class AccidentWorkStop extends CommonObjectLine
 		$sql .= " workstop_days=" . $this->workstop_days . ",";
 		$sql .= " date_start_workstop='" . $db->escape($db->idate($this->date_start_workstop)) . "',";
 		$sql .= " date_end_workstop='" . $db->escape($db->idate($this->date_end_workstop)) . "',";
+		$sql .= " declaration_link='" . $this->declaration_link . "',";
 		$sql .= " fk_accident=" . $db->escape($this->fk_accident);
 		$sql .= " WHERE rowid = " . $this->id;
 

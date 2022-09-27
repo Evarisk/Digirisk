@@ -84,3 +84,4 @@ ALTER TABLE llx_digiriskdolibarr_object_signature CHANGE `signature` `signature`
 -- 9.6.0
 ALTER TABLE llx_digiriskdolibarr_evaluator ADD job VARCHAR(80) AFTER assignment_date;
 ALTER TABLE llx_digiriskdolibarr_digiriskelement ADD show_in_selector BOOLEAN NOT NULL DEFAULT TRUE AFTER photo;
+ALTER TABLE llx_digiriskdolibarr_accident_workstop ADD declaration_link text AFTER date_end_workstop;
