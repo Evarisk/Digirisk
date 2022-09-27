@@ -222,9 +222,10 @@ abstract class ModeleODTGroupmentDocument extends CommonDocGenerator
 								$tmparray['nomElement']                 = (!empty($conf->global->DIGIRISKDOLIBARR_SHOW_SHARED_EVALUATORS) ? 'S' . $element->entity . ' - ' : '') . $element->ref . ' - ' . $element->label;
 								$tmparray['idUtilisateur']              = $line->ref;
 								$tmparray['dateAffectationUtilisateur'] = dol_print_date($line->assignment_date, '%d/%m/%Y');
-								$tmparray['dureeEntretien']             = $line->duration . ' mins';
+								$tmparray['dureeEntretien']             = $line->duration . ' min';
 								$tmparray['nomUtilisateur']             = $usertmp->lastname;
 								$tmparray['prenomUtilisateur']          = $usertmp->firstname;
+								$tmparray['travailUtilisateur']         = $line->job;
 
 								unset($tmparray['object_fields']);
 
