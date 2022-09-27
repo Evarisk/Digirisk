@@ -187,7 +187,7 @@ if ($action == 'send') {
 						setEventMessages($mesg, null, 'warnings');
 					}
 				} else {
-					setEventMessages($langs->trans('ErrorSetupEmail'), '', 'errors');
+					setEventMessages($langs->trans('ErrorSetupEmail') . '<br>' . $langs->trans('GoToEmailSetup') . '<a target="_blank" href="'. DOL_URL_ROOT .'/admin/mails.php"> '. $langs->trans('PathToEmailSetup') .'</a>', '', 'errors');
 				}
 			}
 		} else {
