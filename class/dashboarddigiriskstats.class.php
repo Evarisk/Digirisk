@@ -30,6 +30,7 @@ require_once __DIR__ . '/digirisktask.class.php';
 require_once __DIR__ . '/digiriskdocuments/riskassessmentdocument.class.php';
 require_once __DIR__ . '/accident.class.php';
 require_once __DIR__ . '/evaluator.class.php';
+require_once __DIR__ . '/digiriskresources.class.php';
 
 /**
  *	Class to manage stats for dashboard
@@ -40,6 +41,7 @@ class DashboardDigiriskStats extends DigiriskStats
 	const DASHBOARD_ACCIDENT = 1;
 	const DASHBOARD_EVALUATOR = 2;
 	const DASHBOARD_ACCIDENT_INDICATOR_RATE = 3;
+	const DASHBOARD_DIGIRISKRESOURCES = 4;
 
 	/**
 	 * 	Constructor
@@ -59,10 +61,11 @@ class DashboardDigiriskStats extends DigiriskStats
 	 * @param  int       $show_riskassementdocument  Show dashboard riskassessmentdocument info
 	 * @param  int       $show_accident              Show dashboard accident info
 	 * @param  int       $show_evaluator             Show dashboard evaluator info
+	 * @param  int       $show_digiriskresources     Show dashboard digiriskresources info
 	 * @return void
 	 * @throws Exception
 	 */
-	public function show_dashboard($show_risk = 1, $show_task = 1, $show_riskassementdocument = 1, $show_accident = 1, $show_evaluator = 1)
+	public function show_dashboard($show_risk = 1, $show_task = 1, $show_riskassementdocument = 1, $show_accident = 1, $show_evaluator = 1, $show_digiriskresources = 1)
 	{
 		global $conf, $langs, $user;
 
@@ -74,6 +77,7 @@ class DashboardDigiriskStats extends DigiriskStats
 		$accident             = new Accident($this->db);
 		$riskassementdocument = new RiskAssessmentDocument($this->db);
 		$evaluator            = new Evaluator($this->db);
+		$digiriskresources    = new DigiriskResources($this->db);
 
 		$dataseries = array(
 			'risk'     => ($show_risk) ? $risk->load_dashboard() : -1,
@@ -84,6 +88,7 @@ class DashboardDigiriskStats extends DigiriskStats
 		$accidentdata             = ($show_accident) ? $accident->load_dashboard() : -1;
 		$riskassementdocumentdata = ($show_riskassementdocument) ? $riskassementdocument->load_dashboard() : -1;
 		$evaluatordata            = ($show_evaluator) ? $evaluator->load_dashboard() : -1;
+		$digiriskresourcesdata    = ($show_digiriskresources) ? $digiriskresources->load_dashboard() : -1;
 
 		print '<form method="POST" action="' . $_SERVER["PHP_SELF"] . '" class="dashboard" id="dashBoardForm">';
 		print '<input type="hidden" name="token" value="' . newToken() . '">';
@@ -91,8 +96,8 @@ class DashboardDigiriskStats extends DigiriskStats
 
 		$dashboardLines = array(
 			self::DASHBOARD_RISKASSESSMENTDOCUMENT => ($show_riskassementdocument) ? array(
-				'label'      => array($langs->trans("LastGenerateDate"), $langs->trans("NextGenerateDate")),
-				'content'    => array($riskassementdocumentdata['lastgeneratedate'], $riskassementdocumentdata['nextgeneratedate']),
+				'label'      => array($langs->trans("LastGenerateDate"), $langs->trans("NextGenerateDate"), $langs->trans("NbDaysBeforeNextGenerateDate"), $langs->trans("NbDaysAfterNextGenerateDate")),
+				'content'    => array($riskassementdocumentdata['lastgeneratedate'], $riskassementdocumentdata['nextgeneratedate'], $riskassementdocumentdata['nbdaysbeforenextgeneratedate'], $riskassementdocumentdata['nbdaysafternextgeneratedate']),
 				'picto'      => 'fas fa-info-circle',
 				'widgetName' => $langs->trans('RiskAssessmentDocument')
 			) : -1,
@@ -113,6 +118,12 @@ class DashboardDigiriskStats extends DigiriskStats
 				'content' => array($accidentdata['frequencyindex'], $accidentdata['frequencyrate'], $accidentdata['gravityrate']),
 				'picto' => 'fas fa-chart-bar',
 				'widgetName' => $langs->trans('AccidentRateIndicator')
+			) : -1,
+			self::DASHBOARD_DIGIRISKRESOURCES => ($show_digiriskresources) ? array(
+				'label' => array($langs->trans("SiretNumber")),
+				'content' => array($digiriskresourcesdata['siretnumber']),
+				'picto' => 'fas fa-building',
+				'widgetName' => $langs->trans('Society')
 			) : -1
 		);
 

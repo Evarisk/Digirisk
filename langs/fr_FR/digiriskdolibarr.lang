@@ -801,9 +801,11 @@ RiskAssessmentDocumentImportantNote = Notes importantes :<br />Vous pouvez lire 
 # Boxes - Widget
 RiskAssessmentDocumentBox = Box Document unique
 RiskAssessmentDocumentBoxTitle = Informations du Document unique
-LastGenerateDate = Date de dernière génération du document unique
+LastGenerateDate = Date de dernière génération du Document Unique
 MandatoryUpdateEvery = Mise à jour obligatoire tous les
-NextGenerateDate = Date de prochaine génération du document unique
+NextGenerateDate = Date de prochaine génération du Document Unique
+NbDaysBeforeNextGenerateDate = Nombre de jours avant la prochaine date de génération du Document Unique
+NbDaysAfterNextGenerateDate = Nombre de jours de retard pour la génération du Document Unique
 
 # Email - Mail
 RiskAssessmentDocumentLabel = Récapitulatif du document unique
@@ -1569,4 +1571,6 @@ DashBoard = Tableau de bord
 Close = Fermer
 DateRange = Plage de dates
 UseDateRange = Utiliser la plage de dates
+SiretNumber = N°Siret
+Society = Société
 

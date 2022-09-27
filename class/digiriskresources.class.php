@@ -467,4 +467,33 @@ class DigiriskResources extends CommonObject
 	{
 		return $this->deleteCommon($user, $notrigger);
 	}
+
+	/**
+	 * Load dashboard info digirisk resources
+	 *
+	 * @return array
+	 * @throws Exception
+	 */
+	public function load_dashboard()
+	{
+		$arraySiretNumber  = $this->getSiretNumber();
+
+		$array = $arraySiretNumber;
+
+		return $array;
+	}
+
+	/**
+	 * Get siret number.
+	 *
+	 * @return array
+	 */
+	public function getSiretNumber()
+	{
+		// Siret number
+		global $mysoc;
+
+		$array['siretnumber'] = (!empty($mysoc->idprof2) ? $mysoc->idprof2 : 'N/A');
+		return $array;
+	}
 }
