@@ -555,7 +555,7 @@ if ($entity > 0) {
 				print '<div class="card" style="height: 200px">';
 				print '<br>';
 				print '<img src="'. DOL_URL_ROOT . '/custom/digiriskdolibarr/documents/viewimage.php?modulepart=mycompany&entity=' . $entityId . '&file=' . urlencode('logos/' . $logo_fullname) .'" alt="societyLogo" style="width:40%">';
-				print '<div class="container">';
+				print '<div class="card-container">';
 				print '<h4><b>'. $entityName .'</b></h4>';
 				print '</div>';
 				print '</div>';

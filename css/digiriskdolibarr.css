@@ -2067,7 +2067,7 @@
 }
 
 /* Add some padding inside the card container */
-.container {
+.card-container {
   display: -webkit-box;
   display: -ms-flexbox;
   display: flex;

@@ -179,6 +179,7 @@ class Risk extends CommonObject
 	 * @param int $parent_id Id parent object
 	 * @param bool $get_children_data Get children risks data
 	 * @param bool $get_parents_data Get parents risks data
+	 * @param bool $get_shared_data Get parents risks data
 	 * @return array|int         <0 if KO, 0 if not found, >0 if OK
 	 * @throws Exception
 	 */
