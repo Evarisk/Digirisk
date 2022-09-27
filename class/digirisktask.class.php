@@ -41,14 +41,30 @@ class DigiriskTask extends Task
 	}
 
 	/**
-	 * Load dashboard info task, get number tasks by progress.
+	 * Load dashboard info task
 	 *
 	 * @return array|int
+	 * @throws Exception
 	 */
 	public function load_dashboard()
 	{
-		global $conf, $langs;
+		$arrayTasksByProgress = $this->getTasksByProgress();
 
+		$array = $arrayTasksByProgress;
+
+		return $array;
+	}
+
+	/**
+	 * Get tasks by progress.
+	 *
+	 * @return array|int
+	 * @throws Exception
+	 */
+	public function getTasksByProgress()
+	{
+		// Tasks by progress
+		global $conf, $langs;
 
 		$taskarray = $this->getTasksArray(0, 0, $conf->global->DIGIRISKDOLIBARR_DU_PROJECT);
 		if (is_array($taskarray) && !empty($taskarray)) {
@@ -83,7 +99,16 @@ class DigiriskTask extends Task
 			return -1;
 		}
 	}
-	public function getTaskProgressColorClass($progress) {
+
+	/**
+	 * get task progress css class.
+	 *
+	 * @param  float  $progress Progress of the task
+	 *
+	 * @return string           CSS class
+	 */
+	public function getTaskProgressColorClass($progress)
+	{
 		switch ($progress) {
 			case $progress < 50 :
 				return 'progress-red';

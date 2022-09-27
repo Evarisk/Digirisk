@@ -25,6 +25,7 @@ require_once DOL_DOCUMENT_ROOT . '/user/class/user.class.php';
 require_once DOL_DOCUMENT_ROOT . '/contact/class/contact.class.php';
 require_once DOL_DOCUMENT_ROOT . '/societe/class/societe.class.php';
 
+require_once __DIR__ . '/../lib/digiriskdolibarr_function.lib.php';
 require_once __DIR__ . '/digiriskdocuments.class.php';
 require_once __DIR__ . '/digirisksignature.class.php';
 require_once __DIR__ . '/openinghours.class.php';

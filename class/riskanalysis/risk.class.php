@@ -697,6 +697,22 @@ class Risk extends CommonObject
 	 */
 	public function load_dashboard()
 	{
+		$arrayRisksByCotation = $this->getRisksByCotation();
+
+		$array = $arrayRisksByCotation;
+
+		return $array;
+	}
+
+	/**
+	 * Get risks by cotation.
+	 *
+	 * @return array
+	 * @throws Exception
+	 */
+	public function getRisksByCotation() 
+	{
+		// Risks by cotation
 		global $langs;
 
 		$digiriskelement = new DigiriskElement($this->db);
