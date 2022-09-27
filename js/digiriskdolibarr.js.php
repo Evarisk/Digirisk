@@ -269,8 +269,11 @@ window.eoxiaJS.navigation.toggleAll = function( event ) {
 		$( '.digirisk-wrap .navigation-container .workunit-list .unit' ).addClass( 'toggled' );
 
 		// local storage add all
-		let MENU = $( '.digirisk-wrap .navigation-container .workunit-list .unit .title' ).get().map(v.attributes.value.value)
-		localStorage.setItem('menu', JSON.stringify(Object.values(MENU)) );
+		let MENU = []
+		$( '.digirisk-wrap .navigation-container .workunit-list .unit .title' ).get().map(function (v){
+			MENU.push($(v).attr('value'))
+		})
+		localStorage.setItem('menu', JSON.stringify(Array.from(MENU.keys())) );
 
 	}
 

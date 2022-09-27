@@ -1044,7 +1044,7 @@ if ((empty($action) || ($action != 'create' && $action != 'edit'))) {
 
 		print '<tr class="liste_titre">';
 		print '<td><span>' . $langs->trans('Ref.') . '</span></td>';
-		print '<td>' . $langs->trans('WorkStopDays') . '</td>';
+		print '<td>' . '<b>' . $langs->trans('WorkStopDays') . '*</b>' . '</td>';
 		print '<td>' . $langs->trans('DateStartWorkStop') . '</td>';
 		print '<td>' . $langs->trans('DateEndWorkStop') . '</td>';
 		print '<td>' . $langs->trans('WorkStopDocument') . '</td>';

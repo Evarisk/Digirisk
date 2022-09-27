@@ -49,9 +49,8 @@ class DigiriskTask extends Task
 	{
 		global $conf, $langs;
 
-		$task = new Task($this->db);
 
-		$taskarray = $task->getTasksArray(0, 0, $conf->global->DIGIRISKDOLIBARR_DU_PROJECT);
+		$taskarray = $this->getTasksArray(0, 0, $conf->global->DIGIRISKDOLIBARR_DU_PROJECT);
 		if (is_array($taskarray) && !empty($taskarray)) {
 			$array = array();
 			$array['title'] = $langs->transnoentities('TasksRepartition');
@@ -82,6 +81,16 @@ class DigiriskTask extends Task
 			return $array;
 		} else {
 			return -1;
+		}
+	}
+	public function getTaskProgressColorClass($progress) {
+		switch ($progress) {
+			case $progress < 50 :
+				return 'progress-red';
+			case $progress < 99 :
+				return 'progress-yellow';
+			case $progress :
+				return 'progress-green';
 		}
 	}
 }

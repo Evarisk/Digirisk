@@ -38,7 +38,19 @@ $related_tasks = $risk->get_related_tasks($risk); ?>
 						<?php else : ?>
 							<?php $result = 1 ?>
 						<?php endif; ?>
-						<?php if ((($conf->global->DIGIRISKDOLIBARR_SHOW_TASK_PROGRESS) ? $related_task->progress <= 100 : $related_task->progress < 100) && $result) : ?>
+						<?php
+						if ($conf->global->DIGIRISKDOLIBARR_SHOW_TASK_CALCULATED_PROGRESS) {
+							$tmparray = $related_task->getSummaryOfTimeSpent();
+							if ($tmparray['total_duration'] > 0 && !empty($related_task->planned_workload)) {
+								$task_progress = round($tmparray['total_duration'] / $related_task->planned_workload * 100, 2);
+							} else {
+								$task_progress = 0;
+							}
+						} else {
+							$task_progress = $related_task->progress;
+						}
+						?>
+						<?php if ((($conf->global->DIGIRISKDOLIBARR_SHOW_TASKS_DONE) ? $task_progress <= 100 : $task_progress < 100) && $result) : ?>
 							<?php  $nb_of_tasks_in_progress++ ?>
 							<div class="table-cell riskassessment-task-container riskassessment-task-container-<?php echo $related_task->id ?>" value="<?php echo $related_task->ref ?>">
 							<input type="hidden" class="labelForDelete" value="<?php echo $langs->trans('DeleteTask') . ' ' . $related_task->ref . ' ?'; ?>">
@@ -63,12 +75,12 @@ $related_tasks = $risk->get_related_tasks($risk); ?>
 												?>
 												<i class="fas fa-clock"></i> <?php echo $allTimeSpent/60 . '/' . $related_task->planned_workload/60 ?>
 											</span>
-											<span class="riskassessment-task-progress progress-<?php echo $related_task->progress ? $related_task->progress : 0 ?>"><?php echo $related_task->progress ? $related_task->progress . " %" : 0 . " %" ?></span>
+											<span class="riskassessment-task-progress <?php echo $related_task->getTaskProgressColorClass($task_progress); ?>"><?php echo $task_progress ? $task_progress . " %" : 0 . " %" ?></span>
 										</div>
 										<div class="riskassessment-task-title">
-											<?php if ($contextpage != 'sharedrisk' && $contextpage != 'inheritedrisk') : ?>
+											<?php if ($contextpage != 'sharedrisk' && $contextpage != 'inheritedrisk' && !$conf->global->DIGIRISKDOLIBARR_SHOW_TASK_CALCULATED_PROGRESS) : ?>
 												<span class="riskassessment-task-progress-checkbox <?php echo ($contextpage != 'sharedrisk' && $contextpage != 'inheritedrisk') ? '' : 'riskassessment-task-progress-checkbox-readonly'?>">
-													<input type="checkbox" id="" class="riskassessment-task-progress-checkbox<?php echo $related_task->id; echo($related_task->progress == 100) ? ' progress-checkbox-check' : ' progress-checkbox-uncheck' ?>" name="progress-checkbox" value="" <?php echo ($related_task->progress == 100) ? 'checked' : ''; ?>>
+													<input type="checkbox" id="" class="riskassessment-task-progress-checkbox<?php echo $related_task->id; echo($task_progress == 100) ? ' progress-checkbox-check' : ' progress-checkbox-uncheck' ?>" name="progress-checkbox" value="" <?php echo ($task_progress == 100) ? 'checked' : ''; ?>>
 												</span>
 											<?php endif; ?>
 											<span class="riskassessment-task-author-label">
@@ -122,7 +134,7 @@ $related_tasks = $risk->get_related_tasks($risk); ?>
 																		?>
 																		<i class="fas fa-clock"></i> <?php echo $allTimeSpent/60 . '/' . $related_task->planned_workload/60 ?>
 																	</span>
-															<span class="riskassessment-task-progress progress-<?php echo $related_task->progress ? $related_task->progress : 0 ?>"><?php echo $related_task->progress ? $related_task->progress . " %" : 0 . " %" ?></span>
+															<span class="riskassessment-task-progress <?php echo $related_task->getTaskProgressColorClass($task_progress); ?>"><?php echo $task_progress ? $task_progress . " %" : 0 . " %" ?></span>
 														</div>
 
 														<div class="modal-close"><i class="fas fa-times"></i></div>
@@ -131,9 +143,11 @@ $related_tasks = $risk->get_related_tasks($risk); ?>
 													<div class="modal-content">
 														<?php $allTimeSpentArray = $related_task->fetchAllTimeSpent($user, 'AND ptt.fk_task='.$related_task->id); ?>
 														<div class="riskassessment-task-title">
+															<?php if (!$conf->global->DIGIRISKDOLIBARR_SHOW_TASK_CALCULATED_PROGRESS) : ?>
 															<span class="riskassessment-task-progress-checkbox">
-																<input type="checkbox" id="" class="riskassessment-task-progress-checkbox<?php echo $related_task->id ?>" name="progress-checkbox" value="" <?php echo ($related_task->progress == 100) ? 'checked' : ''; ?>>
+																<input type="checkbox" id="" class="riskassessment-task-progress-checkbox<?php echo $related_task->id ?>" name="progress-checkbox" value="" <?php echo ($task_progress == 100) ? 'checked' : ''; ?>>
 															</span>
+															<?php endif; ?>
 															<input type="text" class="riskassessment-task-author-label riskassessment-task-label<?php echo $related_task->id ?>" name="label" value="<?php echo $related_task->label ?>">
 														</div>
 														<hr>
@@ -373,7 +387,19 @@ $related_tasks = $risk->get_related_tasks($risk); ?>
 						</div>
 					<?php endif; ?>
 			<?php else : ?>
-					<?php $related_task = end($related_tasks); ?>
+					<?php
+						$related_task = end($related_tasks);
+						if ($conf->global->DIGIRISKDOLIBARR_SHOW_TASK_CALCULATED_PROGRESS) {
+							$tmparray = $related_task->getSummaryOfTimeSpent();
+							if ($tmparray['total_duration'] > 0 && !empty($related_task->planned_workload)) {
+								$task_progress = round($tmparray['total_duration'] / $related_task->planned_workload * 100, 2);
+							} else {
+								$task_progress = 0;
+							}
+						} else {
+							$task_progress = $related_task->progress;
+						}
+					?>
 					<div class="table-cell riskassessment-task-container riskassessment-task-container-<?php echo $related_task->id ?>" value="<?php echo $related_task->ref ?>">
 						<input type="hidden" class="labelForDelete" value="<?php echo $langs->trans('DeleteTask') . ' ' . $related_task->ref . ' ?'; ?>">
 						<div class="riskassessment-task-single-content riskassessment-task-single-content-<?php echo $risk->id ?>">
@@ -397,12 +423,12 @@ $related_tasks = $risk->get_related_tasks($risk); ?>
 											?>
 											<i class="fas fa-clock"></i> <?php echo $allTimeSpent/60 . '/' . $related_task->planned_workload/60 ?>
 										</span>
-										<span class="riskassessment-task-progress progress-<?php echo $related_task->progress ? $related_task->progress : 0 ?>"><?php echo $related_task->progress ? $related_task->progress . " %" : 0 . " %" ?></span>
+										<span class="riskassessment-task-progress <?php echo $related_task->getTaskProgressColorClass($task_progress); ?>"><?php echo $task_progress ? $task_progress . " %" : 0 . " %" ?></span>
 									</div>
 									<div class="riskassessment-task-title">
-										<?php if ($contextpage != 'sharedrisk' && $contextpage != 'inheritedrisk') : ?>
+										<?php if ($contextpage != 'sharedrisk' && $contextpage != 'inheritedrisk' && !$conf->global->DIGIRISKDOLIBARR_SHOW_TASK_CALCULATED_PROGRESS) : ?>
 											<span class="riskassessment-task-progress-checkbox <?php echo ($contextpage != 'sharedrisk' && $contextpage != 'inheritedrisk') ? '' : 'riskassessment-task-progress-checkbox-readonly'?>">
-												<input type="checkbox" id="" class="riskassessment-task-progress-checkbox<?php echo $related_task->id; echo($related_task->progress == 100) ? ' progress-checkbox-check' : ' progress-checkbox-uncheck' ?>" name="progress-checkbox" value="" <?php echo ($related_task->progress == 100) ? 'checked' : ''; ?>>
+												<input type="checkbox" id="" class="riskassessment-task-progress-checkbox<?php echo $related_task->id; echo($task_progress == 100) ? ' progress-checkbox-check' : ' progress-checkbox-uncheck' ?>" name="progress-checkbox" value="" <?php echo ($task_progress == 100) ? 'checked' : ''; ?>>
 											</span>
 										<?php endif; ?>
 										<span class="riskassessment-task-author-label">
@@ -605,6 +631,18 @@ $related_tasks = $risk->get_related_tasks($risk); ?>
 						</div>
 						<?php if ( ! empty($related_tasks) && $related_tasks > 0) : ?>
 							<?php foreach ($related_tasks as $related_task) : ?>
+								<?php
+								if ($conf->global->DIGIRISKDOLIBARR_SHOW_TASK_CALCULATED_PROGRESS) {
+									$tmparray = $related_task->getSummaryOfTimeSpent();
+									if ($tmparray['total_duration'] > 0 && !empty($related_task->planned_workload)) {
+										$task_progress = round($tmparray['total_duration'] / $related_task->planned_workload * 100, 2);
+									} else {
+										$task_progress = 0;
+									}
+								} else {
+									$task_progress = $related_task->progress;
+								}
+								?>
 								<div class="riskassessment-task-list-content" value="<?php echo $risk->id ?>">
 									<ul class="riskassessment-task-list riskassessment-task-list-<?php echo $related_task->id ?>">
 										<li class="riskassessment-task riskassessment-task<?php echo $related_task->id ?>" value="<?php echo $related_task->id ?>">
@@ -622,12 +660,12 @@ $related_tasks = $risk->get_related_tasks($risk); ?>
 																<span class="riskassessment-task-date">
 																	<i class="fas fa-calendar-alt"></i> <?php echo date('d/m/Y', (($conf->global->DIGIRISKDOLIBARR_SHOW_TASK_START_DATE && ( ! empty($related_task->date_start))) ? $related_task->date_start : $related_task->date_c)) . (($conf->global->DIGIRISKDOLIBARR_SHOW_TASK_END_DATE && ( ! empty($related_task->date_end))) ? ' - ' . date('d/m/Y', $related_task->date_end) : ''); ?>
 																</span>
-																<span class="riskassessment-task-progress progress-<?php echo $related_task->progress ? $related_task->progress : 0 ?>"><?php echo $related_task->progress ? $related_task->progress . " %" : 0 . " %" ?></span>
+																<span class="riskassessment-task-progress <?php echo $related_task->getTaskProgressColorClass($task_progress); ?>"><?php echo $task_progress ? $task_progress . " %" : 0 . " %" ?></span>
 															</div>
 															<div class="riskassessment-task-title">
-																<?php if ($contextpage != 'sharedrisk' && $contextpage != 'inheritedrisk') : ?>
+																<?php if ($contextpage != 'sharedrisk' && $contextpage != 'inheritedrisk' && !$conf->global->DIGIRISKDOLIBARR_SHOW_TASK_CALCULATED_PROGRESS) : ?>
 																	<span class="riskassessment-task-progress-checkbox <?php echo ($contextpage != 'sharedrisk' && $contextpage != 'inheritedrisk') ? '' : 'riskassessment-task-progress-checkbox-readonly'?>">
-																		<input type="checkbox" id="" class="riskassessment-task-progress-checkbox<?php echo $related_task->id; echo($related_task->progress == 100) ? ' progress-checkbox-check' : ' progress-checkbox-uncheck' ?>" name="progress-checkbox" value="" <?php echo ($related_task->progress == 100) ? 'checked' : ''; ?>>
+																		<input type="checkbox" id="" class="riskassessment-task-progress-checkbox<?php echo $related_task->id; echo($task_progress == 100) ? ' progress-checkbox-check' : ' progress-checkbox-uncheck' ?>" name="progress-checkbox" value="" <?php echo ($task_progress == 100) ? 'checked' : ''; ?>>
 																	</span>
 																<?php endif;?>
 																<span class="riskassessment-task-label">

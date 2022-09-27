@@ -804,7 +804,7 @@ if ($conf->global->DIGIRISKDOLIBARR_CONF_BACKWARD_COMPATIBILITY == 0) {
 	dolibarr_set_const($db, 'DIGIRISKDOLIBARR_TASK_MANAGEMENT', dolibarr_get_const($db,'DIGIRISKDOLIBARR_TASK_MANAGEMENT'), 'integer', 0, '', $conf->entity);
 	dolibarr_set_const($db, 'DIGIRISKDOLIBARR_SHOW_TASK_START_DATE', dolibarr_get_const($db,'DIGIRISKDOLIBARR_SHOW_TASK_START_DATE'), 'integer', 0, '', $conf->entity);
 	dolibarr_set_const($db, 'DIGIRISKDOLIBARR_SHOW_TASK_END_DATE', dolibarr_get_const($db,'DIGIRISKDOLIBARR_SHOW_TASK_END_DATE'), 'integer', 0, '', $conf->entity);
-	dolibarr_set_const($db, 'DIGIRISKDOLIBARR_SHOW_TASK_PROGRESS', dolibarr_get_const($db,'DIGIRISKDOLIBARR_SHOW_TASK_PROGRESS'), 'integer', 0, '', $conf->entity);
+	dolibarr_set_const($db, 'DIGIRISKDOLIBARR_SHOW_TASKS_DONE', dolibarr_get_const($db,'DIGIRISKDOLIBARR_SHOW_TASKS_DONE'), 'integer', 0, '', $conf->entity);
 	dolibarr_set_const($db, 'DIGIRISKDOLIBARR_SHOW_ALL_TASKS', dolibarr_get_const($db,'DIGIRISKDOLIBARR_SHOW_ALL_TASKS'), 'integer', 0, '', $conf->entity);
 	dolibarr_set_const($db, 'DIGIRISKDOLIBARR_TASK_TIMESPENT_DURATION', dolibarr_get_const($db,'DIGIRISKDOLIBARR_TASK_TIMESPENT_DURATION'), 'integer', 0, '', $conf->entity);
 
