@@ -620,7 +620,6 @@ if ( ! $error && $action == "addFiles" && $permissiontodelete) {
 		}
 		$riskassessment->update($user, true);
 	}
-	exit;
 }
 
 if ( ! $error && $action == "unlinkFile" && $permissiontodelete) {

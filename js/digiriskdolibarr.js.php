@@ -1274,7 +1274,7 @@ window.eoxiaJS.mediaGallery.savePhoto = function( event ) {
 		let newPhoto = filepath + thumbName
 
 		$.ajax({
-			url: document.URL + "&action=addFiles&token=" + token,
+			url: document.URL + "&action=addFiles&token=" + token +'&favorite='+favorite,
 			type: "POST",
 			data: JSON.stringify({
 				risk_id: riskId,
@@ -1304,7 +1304,8 @@ window.eoxiaJS.mediaGallery.savePhoto = function( event ) {
 				favorite = favorite.replace(/\)/g, '%29')
 				favorite = favorite.replace(/\+/g, '%2B')
 
-				mediaLinked.load(document.URL+'&favorite='+favorite + ' .element-linked-medias-'+idToSave+'.risk-'+riskId)
+				mediaLinked.html($(resp).find('.element-linked-medias-'+idToSave+'.risk-'+riskId).first())
+
 				modalFrom.find('.messageSuccessSavePhoto').removeClass('hidden')
 			},
 			error: function ( ) {
