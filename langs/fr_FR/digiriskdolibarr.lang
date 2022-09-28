@@ -1573,4 +1573,5 @@ DateRange = Plage de dates
 UseDateRange = Utiliser la plage de dates
 SiretNumber = N°Siret
 Society = Société
+MulticompanyTransverseModeEnabled = La gestion centralisée des utilisateurs et des groupes sur l'entité principale est activé.<br>Vous ne pouvez donc pas créer utilisateur ou de groupe sur cette entité.<br>Veuillez vous rendre sur l'entité principale pour réaliser cette ajout.
 

@@ -770,7 +770,7 @@ print "</table>";
 
 print "</form>\n";
 
-if ($canadduser) {
+if ($canadduser && (empty($conf->global->MULTICOMPANY_TRANSVERSE_MODE) || $conf->entity == 1)) {
 	print '<form action="' . $_SERVER['PHP_SELF'] . '" method="POST" name="createuser">';
 	print '<input type="hidden" name="token" value="' . newToken() . '">';
 	print '<input type="hidden" name="action" value="add">';
@@ -818,7 +818,13 @@ if ($canadduser) {
 	$action = '';
 	print '</form>';
 	print '</table></tr>';
-}
+} else { ?>
+	<div class="wpeo-notice notice-info">
+		<div class="notice-content">
+			<div class="notice-subtitle"><?php echo $langs->trans("MulticompanyTransverseModeEnabled"); ?></div>
+		</div>
+	</div>
+<?php }
 
 print '</div>';
 
