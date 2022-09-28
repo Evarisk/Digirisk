@@ -169,6 +169,7 @@ class DashboardDigiriskStats extends DigiriskStats
 
 		if (is_array($dashboard_data['graphs']) && !empty($dashboard_data['graphs'])) {
 			foreach ($dashboard_data['graphs'] as $keyelement => $datagraph) {
+				$nbdata = 0;
 				if (is_array($datagraph['data']) && !empty($datagraph['data'])) {
 					foreach ($datagraph['data'] as $datagraphsingle) {
 						$nbdata += $datagraphsingle;

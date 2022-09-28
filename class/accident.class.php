@@ -547,20 +547,20 @@ class Accident extends CommonObject
 		global $langs;
 
 		// Number accidents
+		$array['title'] = $langs->transnoentities('AccidentRepartition');
+		$array['picto'] = '<i class="fas fa-user-injured"></i>';
+		$array['labels'] = array(
+			'accidents' => array(
+				'label' => $langs->transnoentities('AccidentWithDIAT'),
+				'color' => '#e05353'
+			),
+			'accidentswithoutDIAT' => array(
+				'label' => $langs->transnoentities('AccidentWithoutDIAT'),
+				'color' => '#e9ad4f'
+			),
+		);
 		$allaccidents = $this->fetchAll();
 		if (is_array($allaccidents) && !empty($allaccidents)) {
-			$array['title'] = $langs->transnoentities('AccidentRepartition');
-			$array['picto'] = '<i class="fas fa-user-injured"></i>';
-			$array['labels'] = array(
-				'accidents' => array(
-					'label' => $langs->transnoentities('AccidentWithDIAT'),
-					'color' => '#e05353'
-				),
-				'accidentswithoutDIAT' => array(
-					'label' => $langs->transnoentities('AccidentWithoutDIAT'),
-					'color' => '#e9ad4f'
-				),
-			);
 			$accidentworkstop = new AccidentWorkStop($this->db);
 			foreach ($allaccidents as $accident) {
 				$allaccidentworkstop = $accidentworkstop->fetchFromParent($accident->id);

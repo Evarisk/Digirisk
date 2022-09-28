@@ -58,7 +58,7 @@ class DigiriskTask extends Task
 	/**
 	 * Get tasks by progress.
 	 *
-	 * @return array|int
+	 * @return array
 	 * @throws Exception
 	 */
 	public function getTasksByProgress()
@@ -66,38 +66,39 @@ class DigiriskTask extends Task
 		// Tasks by progress
 		global $conf, $langs;
 
+		$array['title'] = $langs->transnoentities('TasksRepartition');
+		$array['picto'] = '<i class="fas fa-tasks"></i>';
+		$array['labels'] = array(
+			'taskat0percent' => array(
+				'label' => $langs->transnoentities('TaskAt0Percent') . ' %',
+				'color' => '#e05353'
+			),
+			'taskinprogress' => array(
+				'label' => $langs->transnoentities('TaskInProgress'),
+				'color' => '#e9ad4f'
+			),
+			'taskat100percent' => array(
+				'label' => $langs->transnoentities('TaskAt100Percent') . ' %',
+				'color' => '#47e58e'
+			),
+		);
 		$taskarray = $this->getTasksArray(0, 0, $conf->global->DIGIRISKDOLIBARR_DU_PROJECT);
 		if (is_array($taskarray) && !empty($taskarray)) {
-			$array = array();
-			$array['title'] = $langs->transnoentities('TasksRepartition');
-			$array['picto'] = '<i class="fas fa-tasks"></i>';
-			$array['labels'] = array(
-				0 => array(
-					'label' => $langs->transnoentities('TaskAt0Percent') . ' %',
-					'color' => '#e05353'
-				),
-				1 => array(
-					'label' => $langs->transnoentities('TaskInProgress'),
-					'color' => '#e9ad4f'
-				),
-				2 => array(
-					'label' => $langs->transnoentities('TaskAt100Percent') . ' %',
-					'color' => '#47e58e'
-				),
-			);
 			foreach ($taskarray as $tasksingle) {
 				if ($tasksingle->progress == 0) {
-					$array['data'][0] = $array['data'][0] + 1;
+					$array['data']['taskat0percent'] = $array['data']['taskat0percent'] + 1;
 				} elseif ($tasksingle->progress > 0 && $tasksingle->progress < 100) {
-					$array['data'][1] = $array['data'][1] + 1;
+					$array['data']['taskinprogress'] = $array['data']['taskinprogress'] + 1;
 				} else {
-					$array['data'][2] = $array['data'][2] + 1;
+					$array['data']['taskat100percent'] = $array['data']['taskat100percent'] + 1;
 				}
 			}
-			return $array;
 		} else {
-			return -1;
+			$array['data']['taskat0percent']   = 0;
+			$array['data']['taskinprogress']   = 0;
+			$array['data']['taskat100percent'] = 0;
 		}
+		return $array;
 	}
 
 	/**
