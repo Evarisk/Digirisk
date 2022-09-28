@@ -77,15 +77,15 @@ class DashboardDigiriskStats extends DigiriskStats
 
 		$dashboard_data = array(
 			'widgets' => array(
-				'riskassementdocument' => ($load_riskassementdocument) ? $riskassementdocument->load_dashboard()['widgets'] : -1,
-				'accident'             => ($load_accident) ? $accident->load_dashboard()['widgets'] : -1,
-				'evaluator'            => ($load_evaluator) ? $evaluator->load_dashboard()['widgets'] : -1,
-				'digiriskresources'    => ($load_digiriskresources) ? $digiriskresources->load_dashboard()['widgets'] : -1
+				'riskassementdocument' => ($load_riskassementdocument) ? $riskassementdocument->load_dashboard()['widgets'] : array(),
+				'accident'             => ($load_accident) ? $accident->load_dashboard()['widgets'] : array(),
+				'evaluator'            => ($load_evaluator) ? $evaluator->load_dashboard()['widgets'] : array(),
+				'digiriskresources'    => ($load_digiriskresources) ? $digiriskresources->load_dashboard()['widgets'] : array()
 			),
 			'graphs' => array(
-				'risk'     => ($load_risk) ? $risk->load_dashboard()['graphs'] : -1,
-				'task'     => ($load_task) ? $digirisktask->load_dashboard()['graphs'] : -1,
-				'accident' => ($load_accident) ? $accident->load_dashboard()['graphs'] : -1
+				'risk'     => ($load_risk) ? $risk->load_dashboard()['graphs'] : array(),
+				'task'     => ($load_task) ? $digirisktask->load_dashboard()['graphs'] : array(),
+				'accident' => ($load_accident) ? $accident->load_dashboard()['graphs'] : array()
 			)
 		);
 

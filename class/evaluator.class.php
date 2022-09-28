@@ -378,11 +378,13 @@ class Evaluator extends CommonObject
 	 * @throws Exception
 	 */
 	public function getNbEmployees() {
+		global $conf;
+
 		// Number employees
 		$user = new User($this->db);
-		$allusers = $user->fetchAll('','', 0, 0, array(), 'AND', true);
-		if ($allusers > 0) {
-			$array['nbemployees'] = $allusers;
+		$allusers = $user->get_full_tree(0, 'u.entity IN (0,' . $conf->entity . ')');
+		if (!empty($allusers) && is_array($allusers)) {
+			$array['nbemployees'] = count($allusers);
 		} else {
 			$array['nbemployees'] = 'N/A';
 		}
