@@ -1493,12 +1493,40 @@ if ((empty($action) || ($action != 'create' && $action != 'edit'))) {
 		// Build document if it not exists
 		$forcebuilddoc = true;
 		if ($forcebuilddoc) {   // If there is no default value for supplier invoice, we do not generate file, even if modelpdf was set by a manual generation
-			if (( ! $file || ! is_readable($file)) && method_exists($object, 'generateDocument')) {
-				$result = $object->generateDocument(GETPOST('model') ? GETPOST('model') : $object->model_pdf, $outputlangs, $hidedetails, $hidedesc, $hideref);
-				if ($result < 0) {
-					dol_print_error($db, $object->error, $object->errors);
-					exit();
+			if (( ! $file || ! is_readable($file)) && method_exists($firepermitdocument, 'generateDocument')) {
+				$moreparams['object'] = $object;
+				$moreparams['user']   = $user;
+
+				$modellist = getListOfModelsDigirisk($db, 'firepermitdocument');
+				if ( ! empty($modellist)) {
+					asort($modellist);
+					$modellist = array_filter($modellist, 'remove_index');
+					if (is_array($modellist)) {
+						foreach ($modellist as $key => $modellistsingle) {
+							$arrayvalues = preg_replace('/template_/', '', $modellistsingle);
+							$modellist[$key] = $langs->trans($arrayvalues);
+							$modelselected = $key;
+						}
+					}
 				}
+
+				$result = $firepermitdocument->generateDocument($modelselected, $outputlangs, $hidedetails, $hidedesc, $hideref, $moreparams);
+				if ($result < 0) {
+					dol_print_error($db, $firepermitdocument->error, $firepermitdocument->errors);
+					exit();
+				} else {
+					$signatories = $signatory->fetchSignatory("", $object->id, 'firepermit');
+
+					if ( ! empty($signatories) && $signatories > 0) {
+						foreach ($signatories as $arrayRole) {
+							foreach ($arrayRole as $signatory) {
+								$signatory->signature = $langs->transnoentities("FileGenerated");
+								$signatory->update($user, false);
+							}
+						}
+					}
+				}
+
 				$fileparams = dol_most_recent_file($diroutput . '/' . $ref, preg_quote($ref, '/') . '[^\-]+');
 				$file       = $fileparams['fullname'];
 			}
