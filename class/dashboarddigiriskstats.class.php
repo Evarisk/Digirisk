@@ -75,17 +75,24 @@ class DashboardDigiriskStats extends DigiriskStats
 		$evaluator            = new Evaluator($this->db);
 		$digiriskresources    = new DigiriskResources($this->db);
 
+		$risk_dashboard                 = $risk->load_dashboard();
+		$digiriskresources_dashboard    = $digiriskresources->load_dashboard();
+		$evaluator_dashboard            = $evaluator->load_dashboard();
+		$accident_dashboard             = $accident->load_dashboard();
+		$riskassementdocument_dashboard = $riskassementdocument->load_dashboard();
+		$digirisktask_dashboard         = $digirisktask->load_dashboard();
+
 		$dashboard_data = array(
 			'widgets' => array(
-				'riskassementdocument' => ($load_riskassementdocument) ? $riskassementdocument->load_dashboard()['widgets'] : array(),
-				'accident'             => ($load_accident) ? $accident->load_dashboard()['widgets'] : array(),
-				'evaluator'            => ($load_evaluator) ? $evaluator->load_dashboard()['widgets'] : array(),
-				'digiriskresources'    => ($load_digiriskresources) ? $digiriskresources->load_dashboard()['widgets'] : array()
+				'riskassementdocument' => ($load_riskassementdocument) ? $riskassementdocument_dashboard['widgets'] : -1,
+				'accident'             => ($load_accident) ? $accident_dashboard['widgets'] : -1,
+				'evaluator'            => ($load_evaluator) ? $evaluator_dashboard['widgets'] : -1,
+				'digiriskresources'    => ($load_digiriskresources) ? $digiriskresources_dashboard['widgets'] : -1
 			),
 			'graphs' => array(
-				'risk'     => ($load_risk) ? $risk->load_dashboard()['graphs'] : array(),
-				'task'     => ($load_task) ? $digirisktask->load_dashboard()['graphs'] : array(),
-				'accident' => ($load_accident) ? $accident->load_dashboard()['graphs'] : array()
+				'risk'     => ($load_risk) ? $risk_dashboard['graphs'] : -1,
+				'task'     => ($load_task) ? $digirisktask_dashboard['graphs'] : -1,
+				'accident' => ($load_accident) ? $accident_dashboard['graphs'] : -1
 			)
 		);
 

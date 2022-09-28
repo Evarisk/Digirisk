@@ -92,10 +92,13 @@ $params = array(
 $externalmodule = json_decode($conf->global->MULTICOMPANY_EXTERNAL_MODULES_SHARING, true);
 $externalmodule = !empty($conf->global->MULTICOMPANY_EXTERNAL_MODULES_SHARING) ? array_merge($externalmodule, $params) : $params;
 $jsonformat = json_encode($externalmodule);
-dolibarr_set_const($db, "MULTICOMPANY_EXTERNAL_MODULES_SHARING", $jsonformat, 'json', 0, '', 0);
+
+if (!array_key_exists('digiriskdolibarr', $externalmodule)) {
+	dolibarr_set_const($db, "MULTICOMPANY_EXTERNAL_MODULES_SHARING", $jsonformat, 'json', 0, '', 0);
+}
 
 //Check projet
-if ($conf->global->DIGIRISKDOLIBARR_DU_PROJECT > 0) {
+if ($conf->global->DIGIRISKDOLIBARR_DU_PROJECT > 0 && $conf->global->DIGIRISKDOLIBARR_DU_PROJECT_BACKWARD_COMPATIBILITY == 0) {
 	$project->fetch($conf->global->DIGIRISKDOLIBARR_DU_PROJECT);
 	//Backward compatibility
 	if ($project->title == $langs->trans('RiskAssessmentDocument')) {
@@ -109,6 +112,7 @@ if ($conf->global->DIGIRISKDOLIBARR_DU_PROJECT > 0) {
 
 	$tags->fetch('', 'DU');
 	$tags->add_type($project, 'project');
+	dolibarr_set_const($db, 'DIGIRISKDOLIBARR_DU_PROJECT_BACKWARD_COMPATIBILITY', 1, 'integer', 0, '', $conf->entity);
 }
 
 if ( $conf->global->DIGIRISKDOLIBARR_DU_PROJECT == 0 || $project->statut == 2 ) {
@@ -172,7 +176,7 @@ if ($conf->global->DIGIRISKDOLIBARR_DIGIRISKSTANDARD_MENU_UPDATED == 0) {
 
 }
 
-if ($conf->global->DIGIRISKDOLIBARR_PREVENTIONPLAN_PROJECT > 0) {
+if ($conf->global->DIGIRISKDOLIBARR_PREVENTIONPLAN_PROJECT > 0 && $conf->global->DIGIRISKDOLIBARR_PREVENTIONPLAN_PROJECT_BACKWARD_COMPATIBILITY == 0 ) {
 	$project->fetch($conf->global->DIGIRISKDOLIBARR_PREVENTIONPLAN_PROJECT);
 	//Backward compatibility
 	if ($project->title == $langs->trans('PreventionPlan')) {
@@ -185,6 +189,7 @@ if ($conf->global->DIGIRISKDOLIBARR_PREVENTIONPLAN_PROJECT > 0) {
 
 	$tags->fetch('', 'PP');
 	$tags->add_type($project, 'project');
+	dolibarr_set_const($db, 'DIGIRISKDOLIBARR_PREVENTIONPLAN_PROJECT_BACKWARD_COMPATIBILITY', 1, 'integer', 0, '', $conf->entity);
 }
 
 if ( $conf->global->DIGIRISKDOLIBARR_PREVENTIONPLAN_PROJECT == 0 || $project->statut == 2 ) {
