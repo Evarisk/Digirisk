@@ -3352,7 +3352,7 @@ window.eoxiaJS.evaluator.selectUser = function( event ) {
 		contentType: false,
 		success: function ( resp ) {
 			elementParent.find('input[name="evaluatorJob"]').val($(resp).find('input[name="evaluatorJob"]').val())
-			$('.wpeo-loader').removeClass('wpeo-loader')
+			elementParent.find('input[name="evaluatorJob"]').removeClass('wpeo-loader')
 		},
 		error: function ( resp ) {
 		}
