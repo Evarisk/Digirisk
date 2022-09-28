@@ -25,6 +25,13 @@ use Luracast\Restler\RestException;
 
 require_once __DIR__ . '/../core/modules/modDigiriskDolibarr.class.php';
 
+require_once __DIR__ . '/riskanalysis/risk.class.php';
+require_once __DIR__ . '/digirisktask.class.php';
+require_once __DIR__ . '/digiriskdocuments/riskassessmentdocument.class.php';
+require_once __DIR__ . '/accident.class.php';
+require_once __DIR__ . '/digiriskresources.class.php';
+require_once __DIR__ . '/evaluator.class.php';
+
 /**
  * API class for orders
  *
@@ -54,12 +61,26 @@ class DigiriskDolibarr extends DolibarrApi
 	}
 
 	/**
+	 * Set conf entity
+	 *
+	 * @param  integer $entity Entity ID
+	 *
+	 */
+	public function setConfEntity($entity)
+	{
+		global $conf;
+		$entity = GETPOST('DOLENTITY') ? GETPOST('DOLENTITY') : $entity;
+		$conf->setEntityValues($this->db, $entity);
+	}
+
+	/**
 	 * Get properties of an order object by id
 	 *
-	 * Return an array with order informations
+	 * Return an array with order information
 	 *
-	 * @return 	array|mixed data without useless information
+	 * @return    int data without useless information
 	 *
+	 * @throws Exception
 	 */
 	public function enableModule()
 	{
@@ -96,9 +117,9 @@ class DigiriskDolibarr extends DolibarrApi
 	/**
 	 * Get properties of an order object by ref
 	 *
-	 * Return an array with order informations
+	 * Return an array with order information
 	 *
-	 * @return    array|mixed data without useless information
+	 * @return    int data without useless information
 	 *
 	 * @url GET    disableModule
 	 *
@@ -111,9 +132,9 @@ class DigiriskDolibarr extends DolibarrApi
 	/**
 	 * Get properties of an order object by ref_ext
 	 *
-	 * Return an array with order informations
+	 * Return an array with order information
 	 *
-	 * @return 	string|mixed data without useless information
+	 * @return    string data without useless information
 	 *
 	 * @url GET    getFilesVersion
 	 *
@@ -126,7 +147,7 @@ class DigiriskDolibarr extends DolibarrApi
 	/**
 	 * Get properties of an order object by ref_ext
 	 *
-	 * Return an array with order informations
+	 * Return an array with order information
 	 *
 	 * @return 	string|mixed data without useless information
 	 *
@@ -143,7 +164,7 @@ class DigiriskDolibarr extends DolibarrApi
 	/**
 	 * Get properties of an order object by ref_ext
 	 *
-	 * Return an array with order informations
+	 * Return an array with order information
 	 *
 	 * @return 	string|mixed data without useless information
 	 *
@@ -160,9 +181,9 @@ class DigiriskDolibarr extends DolibarrApi
 	/**
 	 * Get properties of an order object by ref_ext
 	 *
-	 * Return an array with order informations
+	 * Return an array with order information
 	 *
-	 * @return 	string|mixed data without useless information
+	 * @return 	string|false data without useless information
 	 *
 	 * @url GET    uploadNewModule
 	 *
@@ -192,25 +213,22 @@ class DigiriskDolibarr extends DolibarrApi
 			throw new RestException(401);
 		}
 
-		global $conf, $db;
-		$entity = GETPOST('DOLENTITY') ? GETPOST('DOLENTITY') : $entity;
-		$conf->setEntityValues($db, $entity);
+		$this->setConfEntity($entity);
 
-		require_once __DIR__ . '/riskanalysis/risk.class.php';
-
-		$risk = new Risk($db);
+		$risk = new Risk($this->db);
 		return $risk->load_dashboard();
 	}
 
 	/**
 	 * Get dashboard info tasks
 	 *
-	 * @param  integer       $entity Entity ID
+	 * @param integer $entity Entity ID
 	 *
 	 * @return array                 All data for dashboard info tasks
 	 *
 	 * @url    GET                   dashboard/getDashBoardInfoTasks
 	 *
+	 * @throws Exception
 	 * @throws RestException         401 Not allowed
 	 */
 	public function getDashBoardInfoTasks($entity = 1)
@@ -219,11 +237,7 @@ class DigiriskDolibarr extends DolibarrApi
 			throw new RestException(401);
 		}
 
-		global $conf;
-		$entity = GETPOST('DOLENTITY') ? GETPOST('DOLENTITY') : $entity;
-		$conf->setEntityValues($this->db, $entity);
-
-		require_once __DIR__ . '/digirisktask.class.php';
+		$this->setConfEntity($entity);
 
 		$digirisktask = new DigiriskTask($this->db);
 		return $digirisktask->load_dashboard();
@@ -247,11 +261,7 @@ class DigiriskDolibarr extends DolibarrApi
 			throw new RestException(401);
 		}
 
-		global $conf;
-		$entity = GETPOST('DOLENTITY') ? GETPOST('DOLENTITY') : $entity;
-		$conf->setEntityValues($this->db, $entity);
-
-		require_once __DIR__ . '/digiriskdocuments/riskassessmentdocument.class.php';
+		$this->setConfEntity($entity);
 
 		$riskassessmentdocument = new RiskAssessmentDocument($this->db);
 		return $riskassessmentdocument->load_dashboard();
@@ -275,11 +285,7 @@ class DigiriskDolibarr extends DolibarrApi
 			throw new RestException(401);
 		}
 
-		global $conf;
-		$entity = GETPOST('DOLENTITY') ? GETPOST('DOLENTITY') : $entity;
-		$conf->setEntityValues($this->db, $entity);
-
-		require_once __DIR__ . '/accident.class.php';
+		$this->setConfEntity($entity);
 
 		$accident = new Accident($this->db);
 		return $accident->load_dashboard();
@@ -303,11 +309,7 @@ class DigiriskDolibarr extends DolibarrApi
 			throw new RestException(401);
 		}
 
-		global $conf;
-		$entity = GETPOST('DOLENTITY') ? GETPOST('DOLENTITY') : $entity;
-		$conf->setEntityValues($this->db, $entity);
-
-		require_once __DIR__ . '/digiriskresources.class.php';
+		$this->setConfEntity($entity);
 
 		$digiriskresources = new DigiriskResources($this->db);
 		return $digiriskresources->load_dashboard();
@@ -331,11 +333,7 @@ class DigiriskDolibarr extends DolibarrApi
 			throw new RestException(401);
 		}
 
-		global $conf;
-		$entity = GETPOST('DOLENTITY') ? GETPOST('DOLENTITY') : $entity;
-		$conf->setEntityValues($this->db, $entity);
-
-		require_once __DIR__ . '/evaluator.class.php';
+		$this->setConfEntity($entity);
 
 		$evaluator = new Evaluator($this->db);
 		return $evaluator->load_dashboard();
@@ -369,8 +367,6 @@ class DigiriskDolibarr extends DolibarrApi
 		$entity = GETPOST('DOLENTITY') ? GETPOST('DOLENTITY') : $entity;
 		$conf->setEntityValues($db, $entity);
 
-		require_once __DIR__ . '/riskanalysis/risk.class.php';
-
 		$risk = new Risk($db);
 		return $risk->getRisksByCotation()['data'];
 	}
@@ -395,11 +391,7 @@ class DigiriskDolibarr extends DolibarrApi
 			throw new RestException(401);
 		}
 
-		global $conf;
-		$entity = GETPOST('DOLENTITY') ? GETPOST('DOLENTITY') : $entity;
-		$conf->setEntityValues($this->db, $entity);
-
-		require_once __DIR__ . '/digirisktask.class.php';
+		$this->setConfEntity($entity);
 
 		$digirisktask = new DigiriskTask($this->db);
 		return $digirisktask->getTasksByProgress()['data'];
@@ -425,11 +417,7 @@ class DigiriskDolibarr extends DolibarrApi
 			throw new RestException(401);
 		}
 
-		global $conf;
-		$entity = GETPOST('DOLENTITY') ? GETPOST('DOLENTITY') : $entity;
-		$conf->setEntityValues($this->db, $entity);
-
-		require_once __DIR__ . '/digiriskdocuments/riskassessmentdocument.class.php';
+		$this->setConfEntity($entity);
 
 		$riskassessmentdocument = new RiskAssessmentDocument($this->db);
 		return $riskassessmentdocument->getLastGenerateDate();
@@ -453,11 +441,7 @@ class DigiriskDolibarr extends DolibarrApi
 			throw new RestException(401);
 		}
 
-		global $conf;
-		$entity = GETPOST('DOLENTITY') ? GETPOST('DOLENTITY') : $entity;
-		$conf->setEntityValues($this->db, $entity);
-
-		require_once __DIR__ . '/digiriskdocuments/riskassessmentdocument.class.php';
+		$this->setConfEntity($entity);
 
 		$riskassessmentdocument = new RiskAssessmentDocument($this->db);
 		return $riskassessmentdocument->getNextGenerateDate();
@@ -481,11 +465,7 @@ class DigiriskDolibarr extends DolibarrApi
 			throw new RestException(401);
 		}
 
-		global $conf;
-		$entity = GETPOST('DOLENTITY') ? GETPOST('DOLENTITY') : $entity;
-		$conf->setEntityValues($this->db, $entity);
-
-		require_once __DIR__ . '/digiriskdocuments/riskassessmentdocument.class.php';
+		$this->setConfEntity($entity);
 
 		$riskassessmentdocument = new RiskAssessmentDocument($this->db);
 		return $riskassessmentdocument->getNbDaysBeforeNextGenerateDate();
@@ -509,11 +489,7 @@ class DigiriskDolibarr extends DolibarrApi
 			throw new RestException(401);
 		}
 
-		global $conf;
-		$entity = GETPOST('DOLENTITY') ? GETPOST('DOLENTITY') : $entity;
-		$conf->setEntityValues($this->db, $entity);
-
-		require_once __DIR__ . '/digiriskdocuments/riskassessmentdocument.class.php';
+		$this->setConfEntity($entity);
 
 		$riskassessmentdocument = new RiskAssessmentDocument($this->db);
 		return $riskassessmentdocument->getNbDaysAfterNextGenerateDate();
@@ -539,11 +515,7 @@ class DigiriskDolibarr extends DolibarrApi
 			throw new RestException(401);
 		}
 
-		global $conf;
-		$entity = GETPOST('DOLENTITY') ? GETPOST('DOLENTITY') : $entity;
-		$conf->setEntityValues($this->db, $entity);
-
-		require_once __DIR__ . '/accident.class.php';
+		$this->setConfEntity($entity);
 
 		$accident = new Accident($this->db);
 		return $accident->getNbDaysWithoutAccident();
@@ -567,11 +539,7 @@ class DigiriskDolibarr extends DolibarrApi
 			throw new RestException(401);
 		}
 
-		global $conf;
-		$entity = GETPOST('DOLENTITY') ? GETPOST('DOLENTITY') : $entity;
-		$conf->setEntityValues($this->db, $entity);
-
-		require_once __DIR__ . '/accident.class.php';
+		$this->setConfEntity($entity);
 
 		$accident = new Accident($this->db);
 		return $accident->getNbAccidents()['data'];
@@ -595,11 +563,7 @@ class DigiriskDolibarr extends DolibarrApi
 			throw new RestException(401);
 		}
 
-		global $conf;
-		$entity = GETPOST('DOLENTITY') ? GETPOST('DOLENTITY') : $entity;
-		$conf->setEntityValues($this->db, $entity);
-
-		require_once __DIR__ . '/accident.class.php';
+		$this->setConfEntity($entity);
 
 		$accident = new Accident($this->db);
 		return $accident->getNbWorkstopDays();
@@ -623,14 +587,9 @@ class DigiriskDolibarr extends DolibarrApi
 			throw new RestException(401);
 		}
 
-		global $conf;
-		$entity = GETPOST('DOLENTITY') ? GETPOST('DOLENTITY') : $entity;
-		$conf->setEntityValues($this->db, $entity);
-
-		require_once __DIR__ . '/accident.class.php';
+		$this->setConfEntity($entity);
 
 		$accident = new Accident($this->db);
-
 		return $accident->getNbAccidentsByEmployees();
 	}
 
@@ -652,11 +611,7 @@ class DigiriskDolibarr extends DolibarrApi
 			throw new RestException(401);
 		}
 
-		global $conf;
-		$entity = GETPOST('DOLENTITY') ? GETPOST('DOLENTITY') : $entity;
-		$conf->setEntityValues($this->db, $entity);
-
-		require_once __DIR__ . '/accident.class.php';
+		$this->setConfEntity($entity);
 
 		$accident = new Accident($this->db);
 		return $accident->getFrequencyIndex();
@@ -680,11 +635,7 @@ class DigiriskDolibarr extends DolibarrApi
 			throw new RestException(401);
 		}
 
-		global $conf;
-		$entity = GETPOST('DOLENTITY') ? GETPOST('DOLENTITY') : $entity;
-		$conf->setEntityValues($this->db, $entity);
-
-		require_once __DIR__ . '/accident.class.php';
+		$this->setConfEntity($entity);
 
 		$accident = new Accident($this->db);
 		return $accident->getFrequencyRate();
@@ -708,11 +659,7 @@ class DigiriskDolibarr extends DolibarrApi
 			throw new RestException(401);
 		}
 
-		global $conf;
-		$entity = GETPOST('DOLENTITY') ? GETPOST('DOLENTITY') : $entity;
-		$conf->setEntityValues($this->db, $entity);
-
-		require_once __DIR__ . '/accident.class.php';
+		$this->setConfEntity($entity);
 
 		$accident = new Accident($this->db);
 		return $accident->getGravityRate();
@@ -738,11 +685,7 @@ class DigiriskDolibarr extends DolibarrApi
 			throw new RestException(401);
 		}
 
-		global $conf;
-		$entity = GETPOST('DOLENTITY') ? GETPOST('DOLENTITY') : $entity;
-		$conf->setEntityValues($this->db, $entity);
-
-		require_once __DIR__ . '/digiriskresources.class.php';
+		$this->setConfEntity($entity);
 
 		$digiriskresources = new DigiriskResources($this->db);
 		return $digiriskresources->getSiretNumber();
@@ -768,11 +711,7 @@ class DigiriskDolibarr extends DolibarrApi
 			throw new RestException(401);
 		}
 
-		global $conf;
-		$entity = GETPOST('DOLENTITY') ? GETPOST('DOLENTITY') : $entity;
-		$conf->setEntityValues($this->db, $entity);
-
-		require_once __DIR__ . '/evaluator.class.php';
+		$this->setConfEntity($entity);
 
 		$evaluator = new Evaluator($this->db);
 		return $evaluator->getNbEmployeesInvolved();
@@ -796,11 +735,7 @@ class DigiriskDolibarr extends DolibarrApi
 			throw new RestException(401);
 		}
 
-		global $conf;
-		$entity = GETPOST('DOLENTITY') ? GETPOST('DOLENTITY') : $entity;
-		$conf->setEntityValues($this->db, $entity);
-
-		require_once __DIR__ . '/evaluator.class.php';
+		$this->setConfEntity($entity);
 
 		$evaluator = new Evaluator($this->db);
 		return $evaluator->getNbEmployees();
