@@ -54,24 +54,20 @@ class DashboardDigiriskStats extends DigiriskStats
 	}
 
 	/**
-	 * Show dashboard.
+	 * Load dashboard info.
 	 *
-	 * @param  int       $show_risk                  Show dashboard risk info
-	 * @param  int       $show_task                  Show dashboard task info
-	 * @param  int       $show_riskassementdocument  Show dashboard riskassessmentdocument info
-	 * @param  int       $show_accident              Show dashboard accident info
-	 * @param  int       $show_evaluator             Show dashboard evaluator info
-	 * @param  int       $show_digiriskresources     Show dashboard digiriskresources info
-	 * @return void
+	 * @param  int       $load_risk                  Load dashboard risk info
+	 * @param  int       $load_task                  Load dashboard task info
+	 * @param  int       $load_riskassementdocument  Load dashboard riskassessmentdocument info
+	 * @param  int       $load_accident              Load dashboard accident info
+	 * @param  int       $load_evaluator             Load dashboard evaluator info
+	 * @param  int       $load_digiriskresources     Load dashboard digiriskresources info
+	 *
+	 * @return array
 	 * @throws Exception
 	 */
-	public function show_dashboard($show_risk = 1, $show_task = 1, $show_riskassementdocument = 1, $show_accident = 1, $show_evaluator = 1, $show_digiriskresources = 1)
+	public function load_dashboard($load_risk = 1, $load_task = 1, $load_riskassementdocument = 1, $load_accident = 1, $load_evaluator = 1, $load_digiriskresources = 1)
 	{
-		global $conf, $langs, $user;
-
-		$WIDTH  = DolGraph::getDefaultGraphSizeForStats('width');
-		$HEIGHT = DolGraph::getDefaultGraphSizeForStats('height');
-
 		$risk                 = new Risk($this->db);
 		$digirisktask         = new DigiriskTask($this->db);
 		$accident             = new Accident($this->db);
@@ -79,60 +75,50 @@ class DashboardDigiriskStats extends DigiriskStats
 		$evaluator            = new Evaluator($this->db);
 		$digiriskresources    = new DigiriskResources($this->db);
 
-		$dataseries = array(
-			'risk'     => ($show_risk) ? $risk->load_dashboard() : -1,
-			'task'     => ($show_task) ? $digirisktask->load_dashboard() : -1,
-			'accident' => ($show_accident) ? $accident->load_dashboard() : -1
+		$dashboard_data = array(
+			'widgets' => array(
+				'riskassementdocument' => ($load_riskassementdocument) ? $riskassementdocument->load_dashboard()['widgets'] : -1,
+				'accident'             => ($load_accident) ? $accident->load_dashboard()['widgets'] : -1,
+				'evaluator'            => ($load_evaluator) ? $evaluator->load_dashboard()['widgets'] : -1,
+				'digiriskresources'    => ($load_digiriskresources) ? $digiriskresources->load_dashboard()['widgets'] : -1
+			),
+			'graphs' => array(
+				'risk'     => ($load_risk) ? $risk->load_dashboard()['graphs'] : -1,
+				'task'     => ($load_task) ? $digirisktask->load_dashboard()['graphs'] : -1,
+				'accident' => ($load_accident) ? $accident->load_dashboard()['graphs'] : -1
+			)
 		);
 
-		$accidentdata             = ($show_accident) ? $accident->load_dashboard() : -1;
-		$riskassementdocumentdata = ($show_riskassementdocument) ? $riskassementdocument->load_dashboard() : -1;
-		$evaluatordata            = ($show_evaluator) ? $evaluator->load_dashboard() : -1;
-		$digiriskresourcesdata    = ($show_digiriskresources) ? $digiriskresources->load_dashboard() : -1;
+		return $dashboard_data;
+	}
+
+	/**
+	 * Show dashboard.
+	 *
+	 * @return void
+	 * @throws Exception
+	 */
+	public function show_dashboard()
+	{
+		global $conf, $langs, $user;
+
+		$WIDTH  = DolGraph::getDefaultGraphSizeForStats('width');
+		$HEIGHT = DolGraph::getDefaultGraphSizeForStats('height');
+
+		$dashboard_data = $this->load_dashboard();
 
 		print '<form method="POST" action="' . $_SERVER["PHP_SELF"] . '" class="dashboard" id="dashBoardForm">';
 		print '<input type="hidden" name="token" value="' . newToken() . '">';
 		print '<input type="hidden" name="action" value="view">';
 
-		$dashboardLines = array(
-			self::DASHBOARD_RISKASSESSMENTDOCUMENT => ($show_riskassementdocument) ? array(
-				'label'      => array($langs->trans("LastGenerateDate"), $langs->trans("NextGenerateDate"), $langs->trans("NbDaysBeforeNextGenerateDate"), $langs->trans("NbDaysAfterNextGenerateDate")),
-				'content'    => array($riskassementdocumentdata['lastgeneratedate'], $riskassementdocumentdata['nextgeneratedate'], $riskassementdocumentdata['nbdaysbeforenextgeneratedate'], $riskassementdocumentdata['nbdaysafternextgeneratedate']),
-				'picto'      => 'fas fa-info-circle',
-				'widgetName' => $langs->trans('RiskAssessmentDocument')
-			) : -1,
-			self::DASHBOARD_ACCIDENT => ($show_accident) ? array(
-				'label'      => array($langs->trans("DayWithoutAccident"), $langs->trans("WorkStopDays"), $langs->trans("NbAccidentsByEmployees")),
-				'content'    => array($accidentdata['daywithoutaccident'], $accidentdata['nbworkstopdays'], $accidentdata['nbaccidentsbyemployees']),
-				'picto'      => 'fas fa-user-injured',
-				'widgetName' => $langs->trans('Accident')
-			) : -1,
-			self::DASHBOARD_EVALUATOR => ($show_evaluator) ? array(
-				'label'      => array($langs->trans("NbEmployeesInvolved"), $langs->trans("NbEmployees")),
-				'content'    => array($evaluatordata['nbemployeesinvolved'], $evaluatordata['nbemployees']),
-				'picto'      => 'fas fa-user-check',
-				'widgetName' => $langs->trans('Evaluator')
-			) : -1,
-			self::DASHBOARD_ACCIDENT_INDICATOR_RATE => ($show_accident) ? array(
-				'label' => array($langs->trans("FrequencyIndex"), $langs->trans("FrequencyRate"), $langs->trans("GravityRate")),
-				'content' => array($accidentdata['frequencyindex'], $accidentdata['frequencyrate'], $accidentdata['gravityrate']),
-				'picto' => 'fas fa-chart-bar',
-				'widgetName' => $langs->trans('AccidentRateIndicator')
-			) : -1,
-			self::DASHBOARD_DIGIRISKRESOURCES => ($show_digiriskresources) ? array(
-				'label' => array($langs->trans("SiretNumber")),
-				'content' => array($digiriskresourcesdata['siretnumber']),
-				'picto' => 'fas fa-building',
-				'widgetName' => $langs->trans('Society')
-			) : -1
-		);
-
 		$disableWidgetList = json_decode($user->conf->DIGIRISKDOLIBARR_DISABLED_DASHBOARD_INFO);
 
-		if (!empty($dashboardLines)) {
-			foreach ($dashboardLines as $key => $dashboardLine) {
-				if (isset($disableWidgetList->$key) && $disableWidgetList->$key == 0) {
-					$dashboardLinesArray[$key] = $dashboardLine['widgetName'];
+		if (!empty($dashboard_data['widgets'])) {
+			foreach ($dashboard_data['widgets'] as $dashboardLine) {
+				foreach ($dashboardLine as $key => $dashboardLinesingle) {
+					if (isset($disableWidgetList->$key) && $disableWidgetList->$key == 0) {
+						$dashboardLinesArray[$key] = $dashboardLinesingle['widgetName'];
+					}
 				}
 			}
 		}
@@ -146,32 +132,34 @@ class DashboardDigiriskStats extends DigiriskStats
 		print '</div>';
 		print '<div class="fichecenter">';
 
-		if (!empty($dashboardLines)) {
+		if (!empty($dashboard_data['widgets'])) {
 			$openedDashBoard = '';
-			foreach ($dashboardLines as $key => $dashboardLine) {
-				if (!isset($disableWidgetList->$key) && is_array($dashboardLine) &&!empty($dashboardLine)) {
-					$openedDashBoard .= '<div class="box-flex-item"><div class="box-flex-item-with-margin">';
-					$openedDashBoard .= '<div class="info-box info-box-sm">';
-					$openedDashBoard .= '<span class="info-box-icon">';
-					$openedDashBoard .= '<i class="' . $dashboardLine["picto"] . '"></i>';
-					$openedDashBoard .= '</span>';
-					$openedDashBoard .= '<div class="info-box-content">';
-					$openedDashBoard .= '<div class="info-box-title" title="' . $langs->trans("Close") . '">';
-					$openedDashBoard .= '<span class="close-dashboard-widget" data-widgetname="' . $key . '"><i class="fas fa-times"></i></span>';
-					$openedDashBoard .= '</div>';
-					$openedDashBoard .= '<div class="info-box-lines">';
-					$openedDashBoard .= '<div class="info-box-line" style="font-size : 20px;">';
-					for ($i = 0; $i < count($dashboardLine['label']); $i++) {
-						$openedDashBoard .= '<span class=""><strong>' . $dashboardLine["label"][$i] . ' : ' . '</strong>';
-						$openedDashBoard .= '<span class="classfortooltip badge badge-info" title="' . $dashboardLine["label"][$i]  . ' ' . $dashboardLine["content"][$i]  . '" >' . $dashboardLine["content"][$i]  . '</span>';
+			foreach ($dashboard_data['widgets'] as $dashboardLine) {
+				foreach ($dashboardLine as $key => $dashboardLinesingle) {
+					if (!isset($disableWidgetList->$key) && is_array($dashboardLinesingle) && !empty($dashboardLinesingle)) {
+						$openedDashBoard .= '<div class="box-flex-item"><div class="box-flex-item-with-margin">';
+						$openedDashBoard .= '<div class="info-box info-box-sm">';
+						$openedDashBoard .= '<span class="info-box-icon">';
+						$openedDashBoard .= '<i class="' . $dashboardLinesingle["picto"] . '"></i>';
 						$openedDashBoard .= '</span>';
-						$openedDashBoard .= '<br>';
+						$openedDashBoard .= '<div class="info-box-content">';
+						$openedDashBoard .= '<div class="info-box-title" title="' . $langs->trans("Close") . '">';
+						$openedDashBoard .= '<span class="close-dashboard-widget" data-widgetname="' . $key . '"><i class="fas fa-times"></i></span>';
+						$openedDashBoard .= '</div>';
+						$openedDashBoard .= '<div class="info-box-lines">';
+						$openedDashBoard .= '<div class="info-box-line" style="font-size : 20px;">';
+						for ($i = 0; $i < count($dashboardLinesingle['label']); $i++) {
+							$openedDashBoard .= '<span class=""><strong>' . $dashboardLinesingle["label"][$i] . ' : ' . '</strong>';
+							$openedDashBoard .= '<span class="classfortooltip badge badge-info" title="' . $dashboardLinesingle["label"][$i] . ' ' . $dashboardLinesingle["content"][$i] . '" >' . $dashboardLinesingle["content"][$i] . '</span>';
+							$openedDashBoard .= '</span>';
+							$openedDashBoard .= '<br>';
+						}
+						$openedDashBoard .= '</div>';
+						$openedDashBoard .= '</div><!-- /.info-box-lines --></div><!-- /.info-box-content -->';
+						$openedDashBoard .= '</div><!-- /.info-box -->';
+						$openedDashBoard .= '</div><!-- /.box-flex-item-with-margin -->';
+						$openedDashBoard .= '</div>';
 					}
-					$openedDashBoard .= '</div>';
-					$openedDashBoard .= '</div><!-- /.info-box-lines --></div><!-- /.info-box-content -->';
-					$openedDashBoard .= '</div><!-- /.info-box -->';
-					$openedDashBoard .= '</div><!-- /.box-flex-item-with-margin -->';
-					$openedDashBoard .= '</div>';
 				}
 			}
 			print '<div class="opened-dash-board-wrap"><div class="box-flex-container">' . $openedDashBoard . '</div></div>';
@@ -179,8 +167,8 @@ class DashboardDigiriskStats extends DigiriskStats
 
 		print '<div class="box-flex-container">';
 
-		if (is_array($dataseries) && !empty($dataseries)) {
-			foreach ($dataseries as $keyelement => $datagraph) {
+		if (is_array($dashboard_data['graphs']) && !empty($dashboard_data['graphs'])) {
+			foreach ($dashboard_data['graphs'] as $keyelement => $datagraph) {
 				if (is_array($datagraph['data']) && !empty($datagraph['data'])) {
 					foreach ($datagraph['data'] as $datagraphsingle) {
 						$nbdata += $datagraphsingle;

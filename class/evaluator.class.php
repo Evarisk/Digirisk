@@ -23,6 +23,8 @@
 
 require_once DOL_DOCUMENT_ROOT . '/core/class/commonobject.class.php';
 
+require_once __DIR__ . '/dashboarddigiriskstats.class.php';
+
 /**
  * Class for Evaluator
  */
@@ -335,10 +337,19 @@ class Evaluator extends CommonObject
 	 */
 	public function load_dashboard()
 	{
+		global $langs;
+
 		$arrayNbEmployeesInvolved = $this->getNbEmployeesInvolved();
 		$arrayNbEmployees         = $this->getNbEmployees();
 
-		$array = array_merge($arrayNbEmployeesInvolved, $arrayNbEmployees);
+		$array['widgets'] = array(
+			DashboardDigiriskStats::DASHBOARD_EVALUATOR => array(
+				'label'      => array($langs->transnoentities("NbEmployeesInvolved"), $langs->transnoentities("NbEmployees")),
+				'content'    => array($arrayNbEmployeesInvolved['nbemployeesinvolved'], $arrayNbEmployees['nbemployees']),
+				'picto'      => 'fas fa-user-check',
+				'widgetName' => $langs->transnoentities('Evaluator')
+			)
+		);
 
 		return $array;
 	}

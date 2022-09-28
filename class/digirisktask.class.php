@@ -50,7 +50,7 @@ class DigiriskTask extends Task
 	{
 		$arrayTasksByProgress = $this->getTasksByProgress();
 
-		$array = $arrayTasksByProgress;
+		$array['graphs'] = $arrayTasksByProgress;
 
 		return $array;
 	}

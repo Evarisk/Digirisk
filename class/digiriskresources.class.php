@@ -23,6 +23,8 @@
 
 require_once DOL_DOCUMENT_ROOT.'/core/class/commonobject.class.php';
 
+require_once __DIR__ . '/dashboarddigiriskstats.class.php';
+
 /**
  * Class for DigiriskResources
  */
@@ -476,9 +478,18 @@ class DigiriskResources extends CommonObject
 	 */
 	public function load_dashboard()
 	{
+		global $langs;
+
 		$arraySiretNumber  = $this->getSiretNumber();
 
-		$array = $arraySiretNumber;
+		$array['widgets'] = array(
+			DashboardDigiriskStats::DASHBOARD_DIGIRISKRESOURCES => array(
+				'label'      => array($langs->transnoentities("SiretNumber")),
+				'content'    => array($arraySiretNumber['siretnumber']),
+				'picto'      => 'fas fa-building',
+				'widgetName' => $langs->transnoentities('Society')
+			)
+		);
 
 		return $array;
 	}

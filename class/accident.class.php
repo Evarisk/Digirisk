@@ -30,6 +30,7 @@ require_once __DIR__ . '/digiriskdocuments.class.php';
 require_once __DIR__ . '/digirisksignature.class.php';
 require_once __DIR__ . '/openinghours.class.php';
 require_once __DIR__ . '/evaluator.class.php';
+require_once __DIR__ . '/dashboarddigiriskstats.class.php';
 
 /**
  * Class for Accident
@@ -487,6 +488,8 @@ class Accident extends CommonObject
 	 */
 	public function load_dashboard()
 	{
+		global $langs;
+
 		$arrayNbDaysWithoutAccident  = $this->getNbDaysWithoutAccident();
 		$arrayNbAccidents            = $this->getNbAccidents();
 		$arrayNbWorkstopDays         = $this->getNbWorkstopDays();
@@ -496,16 +499,22 @@ class Accident extends CommonObject
 		//$arrayGravityIndex           = $this->getGravityIndex();
 		$arrayGravityRate            = $this->getGravityRate();
 
-		$array = array_merge(
-			$arrayNbDaysWithoutAccident,
-			$arrayNbAccidents,
-			$arrayNbWorkstopDays,
-			$arrayNbAccidentsByEmployees,
-			$arrayFrequencyIndex,
-			$arrayFrequencyRate,
-			//$arrayGravityIndex,
-			$arrayGravityRate
+		$array['widgets'] = array(
+			DashboardDigiriskStats::DASHBOARD_ACCIDENT => array(
+				'label'      => array($langs->transnoentities("DayWithoutAccident"), $langs->transnoentities("WorkStopDays"), $langs->transnoentities("NbAccidentsByEmployees")),
+				'content'    => array($arrayNbDaysWithoutAccident['daywithoutaccident'], $arrayNbWorkstopDays['nbworkstopdays'], $arrayNbAccidentsByEmployees['nbaccidentsbyemployees']),
+				'picto'      => 'fas fa-user-injured',
+				'widgetName' => $langs->transnoentities('Accident')
+			),
+			DashboardDigiriskStats::DASHBOARD_ACCIDENT_INDICATOR_RATE => array(
+				'label' => array($langs->transnoentities("FrequencyIndex"), $langs->transnoentities("FrequencyRate"), $langs->transnoentities("GravityRate")),
+				'content' => array($arrayFrequencyIndex['frequencyindex'], $arrayFrequencyRate['frequencyrate'], $arrayGravityRate['gravityrate']),
+				'picto' => 'fas fa-chart-bar',
+				'widgetName' => $langs->transnoentities('AccidentRateIndicator')
+			)
 		);
+
+		$array['graphs'] = $arrayNbAccidents;
 
 		return $array;
 	}

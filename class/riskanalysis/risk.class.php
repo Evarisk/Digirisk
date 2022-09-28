@@ -699,7 +699,7 @@ class Risk extends CommonObject
 	{
 		$arrayRisksByCotation = $this->getRisksByCotation();
 
-		$array = $arrayRisksByCotation;
+		$array['graphs'] = $arrayRisksByCotation;
 
 		return $array;
 	}
@@ -710,7 +710,7 @@ class Risk extends CommonObject
 	 * @return array
 	 * @throws Exception
 	 */
-	public function getRisksByCotation() 
+	public function getRisksByCotation()
 	{
 		// Risks by cotation
 		global $langs;
