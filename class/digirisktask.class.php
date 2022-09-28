@@ -109,8 +109,8 @@ class DigiriskTask extends Task
 	 * @return string           CSS class
 	 */
 	public function getTaskProgressColorClass($progress)
-	{
-		switch ($progress) {
+	{	
+		switch (true) {
 			case $progress < 50 :
 				return 'progress-red';
 			case $progress < 99 :
