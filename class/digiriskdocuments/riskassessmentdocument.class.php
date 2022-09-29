@@ -228,7 +228,7 @@ class RiskAssessmentDocument extends DigiriskDocuments
 		// Number days before next riskassessmentdocument generate date
 		$arrayNextGenerateDate = $this->getNextGenerateDate();
 		if ($arrayNextGenerateDate['nextgeneratedate'] > 0) {
-			$array['nbdaysbeforenextgeneratedate'] = num_between_day(dol_now(), dol_stringtotime($arrayNextGenerateDate['nextgeneratedate']));
+			$array['nbdaysbeforenextgeneratedate'] = num_between_day(dol_now(), dol_stringtotime($arrayNextGenerateDate['nextgeneratedate']), 1);
 		} else {
 			$array['nbdaysbeforenextgeneratedate'] = 'N/A';
 		}
@@ -246,7 +246,7 @@ class RiskAssessmentDocument extends DigiriskDocuments
 		// Number days after next riskassessmentdocument generate date
 		$arrayNextGenerateDate = $this->getNextGenerateDate();
 		if ($arrayNextGenerateDate['nextgeneratedate'] > 0) {
-			$array['nbdaysafternextgeneratedate'] = num_between_day(dol_stringtotime($arrayNextGenerateDate['nextgeneratedate']), dol_now());
+			$array['nbdaysafternextgeneratedate'] = num_between_day(dol_stringtotime($arrayNextGenerateDate['nextgeneratedate']), dol_now(), 1);
 		} else {
 			$array['nbdaysafternextgeneratedate'] = 'N/A';
 		}
