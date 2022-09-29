@@ -1405,6 +1405,7 @@ window.eoxiaJS.mediaGallery.sendPhoto = function( event ) {
     let progress = 0
 	let token = $('.id-container.page-ut-gp-list').find('input[name="token"]').val();
     $('#myProgress').attr('style', 'display:block')
+	window.eoxiaJS.loader.display($('#myProgress'));
 	$.each(files, function(index, file) {
 		let formdata = new FormData();
 		formdata.append("userfile[]", file);
@@ -1423,6 +1424,8 @@ window.eoxiaJS.mediaGallery.sendPhoto = function( event ) {
 					elementParent.load( document.URL + '&uploadMediasSuccess=1' + ' .ecm-photo-list', () => {
 						setTimeout(() => {
 							$('#myProgress').fadeOut(800)
+							$('.wpeo-loader').removeClass('wpeo-loader');
+							$('#myProgress').find('.loader-spin').remove();
 						}, 800)
 					});
 					actionContainerSuccess.removeClass('hidden');
