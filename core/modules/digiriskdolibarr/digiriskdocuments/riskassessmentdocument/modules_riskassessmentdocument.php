@@ -316,7 +316,7 @@ abstract class ModeleODTRiskAssessmentDocument extends CommonDocGenerator
 					}
 
 					//Fill risks data
-					require_once __DIR__ . '/../../../../tpl/digiriskdocuments/digiriskdolibarr_fillriskdata.tpl.php';
+					$object->fillRiskData($odfHandler, $object, $outputlangs, $tmparray, $file, $risks);
 
 					//Fill tickets data
 					$filter = array('t.fk_project' => $conf->global->DIGIRISKDOLIBARR_TICKET_PROJECT);

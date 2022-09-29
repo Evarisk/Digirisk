@@ -189,11 +189,10 @@ abstract class ModeleODTListingRisksPhoto extends CommonDocGenerator
 			try {
 				$foundtagforlines = 1;
 				if ($foundtagforlines) {
-					$digiriskelementobject = new DigiriskElement($this->db);
-					$risk                  = new Risk($this->db);
+					$risk = new Risk($this->db);
 
 					$risks = $risk->fetchRisksOrderedByCotation($digiriskelement->id > 0 ? $digiriskelement->id : 0, true, $conf->global->DIGIRISKDOLIBARR_SHOW_INHERITED_RISKS_IN_DOCUMENTS, $conf->global->DIGIRISKDOLIBARR_SHOW_SHARED_RISKS);
-					require_once __DIR__ . '/../../../../tpl/digiriskdocuments/digiriskdolibarr_fillriskdata.tpl.php';
+					$object->fillRiskData($odfHandler, $object, $outputlangs, $tmparray, $file, $risks);
 				}
 			} catch (OdfException $e) {
 				$this->error = $e->getMessage();

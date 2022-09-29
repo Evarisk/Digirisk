@@ -184,7 +184,6 @@ abstract class ModeleODTDigiriskElementDocument extends CommonDocGenerator
 			try {
 				$foundtagforlines = 1;
 				if ($foundtagforlines) {
-					$digiriskelementobject = new DigiriskElement($this->db);
 					$risk                  = new Risk($this->db);
 					$evaluator             = new Evaluator($this->db);
 					$usertmp               = new User($this->db);
@@ -195,7 +194,7 @@ abstract class ModeleODTDigiriskElementDocument extends CommonDocGenerator
 					if ( ! empty($digiriskelement) ) {
 						//Fill risks data
 						$risks = $risk->fetchRisksOrderedByCotation($digiriskelement->id, false, $conf->global->DIGIRISKDOLIBARR_SHOW_INHERITED_RISKS_IN_DOCUMENTS, $conf->global->DIGIRISKDOLIBARR_SHOW_SHARED_RISKS);
-						require_once __DIR__ . '/../../../../tpl/digiriskdocuments/digiriskdolibarr_fillriskdata.tpl.php';
+						$object->fillRiskData($odfHandler, $object, $outputlangs, $tmparray, $file, $risks);
 
 						//Fill evaluators data
 						$evaluators = $evaluator->fetchFromParent($digiriskelement->id);
