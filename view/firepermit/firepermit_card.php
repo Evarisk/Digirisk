@@ -475,13 +475,14 @@ if (empty($reshook)) {
 		} else {
 			setEventMessages($langs->trans("FileGenerated") . ' - ' . $firepermitdocument->last_main_doc, null);
 
-			$signatories = $signatory->fetchSignatory("", $object->id, 'firepermit');
-
-			if ( ! empty($signatories) && $signatories > 0) {
-				foreach ($signatories as $arrayRole) {
-					foreach ($arrayRole as $signatory) {
-						$signatory->signature = $langs->transnoentities("FileGenerated");
-						$signatory->update($user, false);
+			if ($object->status == $object::STATUS_LOCKED) {
+				$signatories = $signatory->fetchSignatory("", $object->id, 'firepermit');
+				if (!empty($signatories) && $signatories > 0) {
+					foreach ($signatories as $arrayRole) {
+						foreach ($arrayRole as $signatory) {
+							$signatory->signature = $langs->transnoentities("FileGenerated");
+							$signatory->update($user, false);
+						}
 					}
 				}
 			}
@@ -1418,7 +1419,16 @@ if ((empty($action) || ($action != 'create' && $action != 'edit'))) {
 			$genallowed = 1;
 		}
 
-		print digiriskshowdocuments($modulepart, $dir_files, $filedir, $urlsource, $genallowed, 0, $defaultmodel, 1, 0, '', $title, '', '', $firepermitdocument, 0, 'remove_file', $object->status == 3 && empty(dol_dir_list($filedir)), $langs->trans('FirePermitMustBeLocked'));
+		$filelist = dol_dir_list($filedir, 'files');
+		if (!empty($filelist) && is_array($filelist)) {
+			foreach ($filelist as $file) {
+				if (preg_match('/sign/', $file['name'])) {
+					$filesigned = 1;
+				}
+			}
+		}
+
+		print digiriskshowdocuments($modulepart, $dir_files, $filedir, $urlsource, $genallowed, 0, $defaultmodel, 1, 0, '', $title, '', '', $firepermitdocument, 0, 'remove_file', $object->status < $object::STATUS_ARCHIVED && $filesigned == 0, $langs->trans('FirePermitMustBeLocked'));
 	}
 
 	if ($permissiontoadd) {
@@ -1515,13 +1525,14 @@ if ((empty($action) || ($action != 'create' && $action != 'edit'))) {
 					dol_print_error($db, $firepermitdocument->error, $firepermitdocument->errors);
 					exit();
 				} else {
-					$signatories = $signatory->fetchSignatory("", $object->id, 'firepermit');
-
-					if ( ! empty($signatories) && $signatories > 0) {
-						foreach ($signatories as $arrayRole) {
-							foreach ($arrayRole as $signatory) {
-								$signatory->signature = $langs->transnoentities("FileGenerated");
-								$signatory->update($user, false);
+					if ($object->status == $object::STATUS_LOCKED) {
+						$signatories = $signatory->fetchSignatory("", $object->id, 'firepermit');
+						if (!empty($signatories) && $signatories > 0) {
+							foreach ($signatories as $arrayRole) {
+								foreach ($arrayRole as $signatory) {
+									$signatory->signature = $langs->transnoentities("FileGenerated");
+									$signatory->update($user, false);
+								}
 							}
 						}
 					}
