@@ -1894,10 +1894,10 @@ window.eoxiaJS.risk.saveRisk = function ( event ) {
 			$('.wpeo-loader').removeClass('wpeo-loader');
 			let actionContainerSuccess = $('.messageSuccessRiskEdit');
 			if (newParent == id) {
-				elementParent.html($(resp).find('.div-title-and-table-responsive'))
 				$('.risk-row-content-' + editedRiskId).find('.risk-description-'+editedRiskId).fadeOut(800);
 				$('.risk-row-content-' + editedRiskId).find('.risk-description-'+editedRiskId).fadeIn(800);
 			} else {
+				elementParent.html($(resp).find('.div-title-and-table-responsive'))
 				$('#risk_row_'+editedRiskId).fadeOut(800);
 			}
 
