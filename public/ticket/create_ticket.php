@@ -64,7 +64,7 @@ require_once DOL_DOCUMENT_ROOT . '/core/modules/ticket/mod_ticket_simple.php';
 require_once '../../lib/digiriskdolibarr_function.lib.php';
 require_once '../../class/digiriskelement.class.php';
 
-global $conf, $db, $hookmanager, $langs, $mc;
+global $conf, $db, $hookmanager, $langs, $mc, $user;
 
 // Load translation files required by the page
 $langs->loadLangs(array('companies', 'other', 'mails', 'ticket', 'digiriskdolibarr@digiriskdolibarr'));
@@ -367,7 +367,7 @@ if ($entity > 0) {
 
 	print '<div class="ticketpublicarea digirisk-page-container">';
 
-	print load_fiche_titre($title_edit, '', "digiriskdolibarr32px@digiriskdolibarr");
+	print load_fiche_titre($langs->trans("CreateTicket"), '', "digiriskdolibarr32px@digiriskdolibarr");
 
 	print '<form method="POST" action="' . $_SERVER["PHP_SELF"] . '" id="sendTicketForm">';
 	print '<input type="hidden" name="token" value="' . newToken() . '">';
@@ -377,13 +377,20 @@ if ($entity > 0) {
 	print '<input type="hidden" id="subCategory" name="subCategory" value="' . GETPOST('subCategory') . '">';
 	print '<input type="hidden" id="ticket_id" name="ticket_id" value="' . $ticket_tmp_id . '">';
 	print '<input type="hidden" name="id" value="' . $object->id . '">';
-	if ($backtopage) print '<input type="hidden" name="backtopage" value="' . $backtopage . '">';
-	if ($backtopageforcancel) print '<input type="hidden" name="backtopageforcancel" value="' . $backtopageforcancel . '">';
 
 	print dol_get_fiche_head(array(), '0', '', 1);
 
 	print '<div class="img-fields-container">';
 	print '<div class="centpercent tableforimgfields form-registre">' . "\n";
+
+	if (empty($conf->global->DIGIRISKDOLIBARR_TICKET_CATEGORIES_CREATED)) : ?>
+		<div class="wpeo-notice notice-info">
+			<div class="notice-content">
+				<div class="notice-title"><strong><?php echo $langs->trans("TicketCategoriesNotCreated"); ?></strong></div>
+				<div class="notice-subtitle"><strong><?php echo $langs->trans("HowToSetupTicketCategories") . '  ' ?><a href="../../admin/ticket/ticket.php#TicketCategories"><?php echo $langs->trans('ConfigTicketCategories'); ?></a></strong></div>
+			</div>
+		</div>
+	<?php endif;
 
 	print '<p><strong>' . $conf->global->DIGIRISKDOLIBARR_TICKET_PARENT_CATEGORY_LABEL . '</strong></p>';
 	print '';
@@ -507,7 +514,7 @@ if ($entity > 0) {
 			print '</span>';
 			print '<span class="nowrap inline-block">';
 			print '<img class="inline-block valignmiddle" src="' . DOL_URL_ROOT . '/core/antispamimage.php" border="0" width="80" height="32" id="img_securitycode" />';
-			print '<a class="inline-block valignmiddle" href="' . $php_self . '" tabindex="4" data-role="button">' . img_picto($langs->trans("Refresh"), 'refresh', 'id="captcha_refresh_img"') . '</a>';
+			print '<a class="inline-block valignmiddle" href="' . $_SERVER["PHP_SELF"] . '" tabindex="4" data-role="button">' . img_picto($langs->trans("Refresh"), 'refresh', 'id="captcha_refresh_img"') . '</a>';
 			print '</span>';
 			print '</div>';
 		}?>

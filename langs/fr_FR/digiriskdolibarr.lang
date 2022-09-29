@@ -1465,6 +1465,7 @@ PleaseSelectAnEntity = Veuillez sélectionner une entité :
 ShowSelectorOnTicketPublicInterface = Afficher le sélecteur multi-entité sur l'interface publique des tickets au lieu de la liste des entités
 ShowSelectorOnTicketPublicInterfaceHelp = Afficher le sélecteur multi-entité sur l'interface publique des tickets au lieu de la liste des entités avec leur logo
 MultiEntityPublicInterface = Interface publique des tickets multi-société
+TicketCategoriesNotCreated = Vous n'avez pas créé de catégories de tickets
 
 
 
