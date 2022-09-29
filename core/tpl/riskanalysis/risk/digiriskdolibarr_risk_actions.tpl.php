@@ -83,7 +83,7 @@ if ( ! $error && $action == 'add' && $permissiontoadd) {
 				}
 			}
 
-			$result2 = $evaluation->create($user, true);
+			$result2 = $evaluation->create($user, false);
 
 			if ($result2 > 0) {
 				$tasktitle = $data['task'];
