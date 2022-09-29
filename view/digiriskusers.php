@@ -794,13 +794,13 @@ if ($canadduser && (empty($conf->global->MULTICOMPANY_TRANSVERSE_MODE) || $conf-
 								<input type="hidden" name="action" value="add" />
 								<input type="hidden" class="input-domain-mail" name="societyname" value="<?php echo preg_replace('/ /', '', $conf->global->MAIN_INFO_SOCIETE_NOM) . '.fr' ?>" />
 								<div class="table-cell table-150">
-									<input type="text" id="lastname" placeholder="<?php echo $langs->trans('LastName'); ?>" name="lastname" value="<?php dol_escape_htmltag(GETPOST('lastname', 'alphanohtml'))?>" />
+									<input type="text" id="lastname" placeholder="<?php echo $langs->trans('LastName'); ?>" name="lastname" value="<?php echo dol_escape_htmltag(GETPOST('lastname')); ?>" />
 								</div>
 								<div class="table-cell table-150">
-									<input type="text" id="firstname" placeholder="<?php echo $langs->trans('FirstName'); ?>" name="firstname" value="<?php dol_escape_htmltag(GETPOST('firstname', 'alphanohtml'))?>" />
+									<input type="text" id="firstname" placeholder="<?php echo $langs->trans('FirstName'); ?>" name="firstname" value="<?php echo dol_escape_htmltag(GETPOST('firstname')); ?>" />
 								</div>
 								<div class="table-cell table-300">
-									<input style="width:100%" type="email" id="email" class="email" placeholder="<?php echo $langs->trans('Email') ; ?>" name="email" value="" />
+									<input style="width:100%" type="email" id="email" class="email" placeholder="<?php echo $langs->trans('Email') ; ?>" name="email" value="<?php echo GETPOST('email'); ?>" />
 								</div>
 								<div class="table-cell">
 									<input type="submit" id="createuseraction" name="createuseraction" style="display : none">
