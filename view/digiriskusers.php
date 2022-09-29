@@ -326,8 +326,11 @@ if ( ! empty($search_categ) || ! empty($catid)) $sql                            
 // Add fields from hooks
 $parameters = array();
 $reshook    = $hookmanager->executeHooks('printUserListWhere', $parameters); // Note that $action and $object may have been modified by hook
-$entities = '0,' . $conf->entity;
-$sql .= " WHERE u.entity IN (" . $entities . ")";
+if ($reshook > 0) {
+	$sql .= $hookmanager->resPrint;
+} else {
+	$sql .= " WHERE u.entity IN (".getEntity('user').")";
+}
 if ($socid > 0) $sql .= " AND u.fk_soc = " . $socid;
 //if ($search_user != '')       $sql.=natural_search(array('u.login', 'u.lastname', 'u.firstname'), $search_user);
 if ($search_supervisor > 0)   $sql                           .= " AND u.fk_user IN (" . $db->escape($search_supervisor) . ")";
