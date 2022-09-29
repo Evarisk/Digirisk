@@ -362,6 +362,14 @@ class ActionsDigiriskdolibarr
 
 				$selectDigiriskElement .= $digiriskelement->select_digiriskelement_list(GETPOST('options_digiriskdolibarr_ticket_service'), 'options_digiriskdolibarr_ticket_service', (!empty($filter) ? $filter : ''), $langs->trans('PleaseSelectADigiriskElement'), 0, array(), 0, 0, 'minwidth500 maxwidthonsmartphone', 0, false, 1);
 				$selectDigiriskElement .= '<div><br></div>';
+
+				$emailfield = '<div class="form-element">';
+				$emailfield .= '<span class="form-label"' . (($conf->global->DIGIRISKDOLIBARR_TICKET_EMAIL_REQUIRED) ? '' : 'style="font-weight:300"') .'>' . $langs->trans("Email") . (($conf->global->DIGIRISKDOLIBARR_TICKET_EMAIL_REQUIRED) ? '<span style="color:red"> *</span>' : '') . '</span>';
+				$emailfield .= '<label class="form-field-container">';
+				$emailfield .= '<input class="email" type="email" name="email" id="email" value="' . GETPOST('email') . '"/>';
+				$emailfield .= '</label>';
+				$emailfield .= '</div>';
+
 				?>
 				<script>
 					let date = new Date();
@@ -374,6 +382,8 @@ class ActionsDigiriskdolibarr
 
 					jQuery('#options_digiriskdolibarr_ticket_lastname').parent().html(jQuery('#options_digiriskdolibarr_ticket_lastname').parent().html().replace(/Nom/, '<b>Nom</b><span style="color:red"> *</span>'))
 					jQuery('#options_digiriskdolibarr_ticket_lastname').parent().html(jQuery('#options_digiriskdolibarr_ticket_lastname').parent().html().replace(/Prénom/, '<b>Prénom</b><span style="color:red"> *</span>'))
+
+					jQuery('#options_digiriskdolibarr_ticket_lastname').after(<?php echo json_encode($emailfield) ; ?>);
 
 					jQuery('#options_digiriskdolibarr_ticket_date').val(fulldate);
 					jQuery('#options_digiriskdolibarr_ticket_dateday').val((day < 10 ? '0' : '') + day);

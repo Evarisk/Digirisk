@@ -3839,7 +3839,7 @@ window.eoxiaJS.ticket.closeDashBoardTicketInfo = function() {
 window.eoxiaJS.ticket.checkValidEmail = function() {
 	var reEmail = /^([A-Za-z0-9_\-\.])+\@([A-Za-z0-9_\-\.])+\.([A-Za-z]{2,4})$/;
 	if (reEmail.test(this.value) == false) {
-		$(this).attr('style', 'border :3px solid red');
+		$(this).css("border", "3px solid red");
 	} else {
 		$(this).css("border", "3px solid green");
 	}

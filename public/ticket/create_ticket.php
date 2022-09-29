@@ -444,12 +444,6 @@ if ($entity > 0) {
 	} ?>
 
 	<div class="wpeo-form tableforinputfields">
-		<div class="form-element">
-			<span class="form-label" <?php echo (($conf->global->DIGIRISKDOLIBARR_TICKET_EMAIL_REQUIRED) ? '' : 'style="font-weight:300"'); ?>><?php print $langs->trans("Email"); ?><?php echo (($conf->global->DIGIRISKDOLIBARR_TICKET_EMAIL_REQUIRED) ? '<span style="color:red"> *</span>' : ''); ?></span>
-			<label class="form-field-container">
-				<input class="email" type="email" name="email" id="email" value="<?php echo GETPOST('email');?>"/>
-			</label>
-		</div>
 		<div class="wpeo-gridlayout grid-2">
 			<div class="form-element">
 				<span class="form-label"><?php print $langs->trans("Message"); ?><span style="color:red"> *</span></span>

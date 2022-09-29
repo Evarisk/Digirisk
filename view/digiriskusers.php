@@ -797,7 +797,7 @@ if ($canadduser && (empty($conf->global->MULTICOMPANY_TRANSVERSE_MODE) || $conf-
 									<input type="text" id="firstname" placeholder="<?php echo $langs->trans('FirstName'); ?>" name="firstname" value="<?php dol_escape_htmltag(GETPOST('firstname', 'alphanohtml'))?>" />
 								</div>
 								<div class="table-cell table-300">
-									<input style="width:100%" type="email" id="email" placeholder="<?php echo $langs->trans('Email') ; ?>" name="email" value="" />
+									<input style="width:100%" type="email" id="email" class="email" placeholder="<?php echo $langs->trans('Email') ; ?>" name="email" value="" />
 								</div>
 								<div class="table-cell">
 									<input type="submit" id="createuseraction" name="createuseraction" style="display : none">
