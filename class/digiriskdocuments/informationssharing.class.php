@@ -148,7 +148,7 @@ class InformationsSharing extends DigiriskDocuments
 				$json['InformationsSharing']['harassment_officer_cse']['phone'] = $harassment_officer_cse->phone_pro;
 			}
 
-			$json['InformationsSharing']['delegues_du_personnels_date']    	  = $conf->global->DIGIRISKDOLIBARR_DP_ELECTION_DATE;
+			$json['InformationsSharing']['delegues_du_personnels_date']    	  = (dol_strlen($conf->global->DIGIRISKDOLIBARR_DP_ELECTION_DATE) > 0 && $conf->global->DIGIRISKDOLIBARR_DP_ELECTION_DATE != '--' ? $conf->global->DIGIRISKDOLIBARR_DP_ELECTION_DATE : '');
 			$json['InformationsSharing']['delegues_du_personnels_titulaires'] = '';
 			if (!empty ($digirisk_resources['TitularsDP']->id )) {
 				foreach ($digirisk_resources['TitularsDP']->id as $dp_titular) {
@@ -176,7 +176,7 @@ class InformationsSharing extends DigiriskDocuments
 			}
 
 			// CSE
-			$json['InformationsSharing']['membres_du_comite_entreprise_date']       = $conf->global->DIGIRISKDOLIBARR_CSE_ELECTION_DATE;
+			$json['InformationsSharing']['membres_du_comite_entreprise_date']       = (dol_strlen($conf->global->DIGIRISKDOLIBARR_CSE_ELECTION_DATE) > 0 && $conf->global->DIGIRISKDOLIBARR_CSE_ELECTION_DATE != '--' ? $conf->global->DIGIRISKDOLIBARR_CSE_ELECTION_DATE : '');
 			$json['InformationsSharing']['membres_du_comite_entreprise_titulaires'] = '';
 			if (!empty ($digirisk_resources['TitularsCSE']->id )) {
 				foreach ($digirisk_resources['TitularsCSE']->id as $cse_titular) {
