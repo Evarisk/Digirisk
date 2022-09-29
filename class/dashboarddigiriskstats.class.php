@@ -107,7 +107,7 @@ class DashboardDigiriskStats extends DigiriskStats
 	 */
 	public function show_dashboard()
 	{
-		global $conf, $langs, $user;
+		global $conf, $form, $langs, $user;
 
 		$WIDTH  = DolGraph::getDefaultGraphSizeForStats('width');
 		$HEIGHT = DolGraph::getDefaultGraphSizeForStats('height');
@@ -157,8 +157,8 @@ class DashboardDigiriskStats extends DigiriskStats
 						$openedDashBoard .= '<div class="info-box-line" style="font-size : 20px;">';
 						for ($i = 0; $i < count($dashboardLinesingle['label']); $i++) {
 							$openedDashBoard .= '<span class=""><strong>' . $dashboardLinesingle["label"][$i] . ' : ' . '</strong>';
-							$openedDashBoard .= '<span class="classfortooltip badge badge-info" title="' . $dashboardLinesingle["label"][$i] . ' ' . $dashboardLinesingle["content"][$i] . '" >' . $dashboardLinesingle["content"][$i] . '</span>';
-							$openedDashBoard .= '</span>';
+							$openedDashBoard .= '<span class="classfortooltip badge badge-info" title="' . $dashboardLinesingle["label"][$i] . ' : ' . $dashboardLinesingle["content"][$i] . '" >' . $dashboardLinesingle["content"][$i] . '</span>';
+							$openedDashBoard .= (!empty($dashboardLinesingle["tooltip"][$i]) ? $form->textwithpicto('', $langs->transnoentities($dashboardLinesingle["tooltip"][$i])) : '') . '</span>';
 							$openedDashBoard .= '<br>';
 						}
 						$openedDashBoard .= '</div>';

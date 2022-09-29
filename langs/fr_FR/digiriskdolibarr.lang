@@ -629,7 +629,7 @@ AccidentMetaDataSave = Les données complémentaires de l'accident ont bien ét�
 ErrorFieldNotEmpty = Erreur : le champ <b>'%s'</b> ne peut pas être vide
 ConfirmDeleteAccidentWorkStop = Êtes-vous sûr de vouloir supprimer l'arrêt de travail <b>%s</b> sur l'accident ?
 AccidentMetaDataLesion = Données complémentaires des lésions
-TotalWorkStopDays = Nombre total de jour d'arrêt de travail
+TotalWorkStopDays = Nombre total de jours d'arrêt de travail
 RegisterAccident = Accident bénin
 AccidentLinked = Accident lié
 GaugeCounter = Ce champ est utilisé dans le compteur de la jauge
@@ -654,6 +654,9 @@ VictimWorkHoursTooltip = Indiquez les heures de travail effectuées par votre sa
 ConsequenceTooltip = Si la victime a arrêté son travail sur prescription d’un médecin, vous devez OBLIGATOIREMENT établir et envoyer le formulaire « attestation de salaire accident du travail ou maladie professionnelle » - référencé S6202, à la Caisse primaire du lieu de résidence habituelle de la victime. <br> Par la suite, en cas de nouvel arrêt après une période de soins ou une reprise du travail, sur un mois différent, vous devrez également remplir cette même formalité
 FirstPersonNoticedIsWitnessTooltip = Indiquez le nom, le prénom et l’adresse du témoin. <br> En l’absence de témoin, indiquez la 1ère personne de l’entreprise qui a été avisée de l’accident
 ThirdPartyResponsabilityTooltip = Lorsque vous avez connaissance de l’implication d’un tiers, quelle que soit sa part de responsabilité, dans un accident du travail ou de trajet, cette mention doit impérativement être reportée dans cette partie
+FrequencyIndexTooltip = Nombre d'accidents par salarié x 1 000
+FrequencyRateTooltip  = Nombre d'accidents par heures travaillées x 1 000 000
+GravityRateTooltip = Nombre de jours d'arrêt de travail par heures travaillées x 1 000
 
 # Dictionnary - Dictionnaire
 UsualWorkplace = Lieu de travail habituel
@@ -983,6 +986,8 @@ EvaluatorDuration = Durée de l'évalution par l'évaluateur
 EvaluatorDurationDescription = Le temps que met l'évaluateur à réaliser son évaluation des risques
 NbEmployeesInvolved = Nombre de salariés impliqués
 NbEmployees = Nombre de salariés
+NbEmployeesInvolvedTooltip = Nombre de salariés (evaluateurs) unique
+NbEmployeesTooltip = Si la gestion centralisée des utilisateurs et des groupes sur l'entité principale est activée.<br>Le nombre de salariés correspond au nombre d'utilisateurs partagés/affectés à un groupe et aussi au nombre d'administrateur de l'entité principale
 
 
 

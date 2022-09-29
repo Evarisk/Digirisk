@@ -509,6 +509,7 @@ class Accident extends CommonObject
 			DashboardDigiriskStats::DASHBOARD_ACCIDENT_INDICATOR_RATE => array(
 				'label' => array($langs->transnoentities("FrequencyIndex"), $langs->transnoentities("FrequencyRate"), $langs->transnoentities("GravityRate")),
 				'content' => array($arrayFrequencyIndex['frequencyindex'], $arrayFrequencyRate['frequencyrate'], $arrayGravityRate['gravityrate']),
+				'tooltip' => array($langs->transnoentities("FrequencyIndexTooltip"), $langs->transnoentities("FrequencyRateTooltip"), $langs->transnoentities("GravityRateTooltip")),
 				'picto' => 'fas fa-chart-bar',
 				'widgetName' => $langs->transnoentities('AccidentRateIndicator')
 			)
