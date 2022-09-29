@@ -391,11 +391,11 @@ if ((empty($action) || ($action != 'create' && $action != 'edit'))) {
 		require __DIR__ . "/../../core/tpl/signature/digiriskdolibarr_signature_action_view.tpl.php";
 	}
 	print '</td>';
+	print '<td class="center">';
 	if ($element->signature != $langs->transnoentities("FileGenerated") && $permissiontoadd) {
-		print '<td class="center">';
 		require __DIR__ . "/../../core/tpl/signature/digiriskdolibarr_signature_view.tpl.php";
-		print '</td>';
 	}
+	print '</td>';
 	print '</tr>';
 	print '</table>';
 	print '<br>';
@@ -443,12 +443,13 @@ if ((empty($action) || ($action != 'create' && $action != 'edit'))) {
 	print '<td class="center">';
 	if ($object->status == 2 && $permissiontoadd) {
 		require __DIR__ . "/../../core/tpl/signature/digiriskdolibarr_signature_action_view.tpl.php";
-	}	print '</td>';
-	if ($element->signature != $langs->transnoentities("FileGenerated") && $permissiontoadd) {
-		print '<td class="center">';
-		require __DIR__ . "/../../core/tpl/signature/digiriskdolibarr_signature_view.tpl.php";
-		print '</td>';
 	}
+	print '</td>';
+	print '<td class="center">';
+	if ($element->signature != $langs->transnoentities("FileGenerated") && $permissiontoadd) {
+		require __DIR__ . "/../../core/tpl/signature/digiriskdolibarr_signature_view.tpl.php";
+	}
+	print '</td>';
 	print '</tr>';
 	print '</table>';
 	print '<br>';
@@ -500,11 +501,11 @@ if ((empty($action) || ($action != 'create' && $action != 'edit'))) {
 				require __DIR__ . "/../../core/tpl/signature/digiriskdolibarr_signature_action_view.tpl.php";
 			}
 			print '</td>';
+			print '<td class="center">';
 			if ($element->signature != $langs->transnoentities("FileGenerated") && $permissiontoadd) {
-				print '<td class="center">';
 				require __DIR__ . "/../../core/tpl/signature/digiriskdolibarr_signature_view.tpl.php";
-				print '</td>';
 			}
+			print '</td>';
 			print '</tr>';
 			$already_selected_intervenants[$element->element_id] = $element->element_id;
 			$j++;
