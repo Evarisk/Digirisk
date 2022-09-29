@@ -139,7 +139,7 @@ if ($action == 'add') {
 			if (preg_match($regEmail, $email)) {
 				$object->origin_email = $email;
 			} else {
-				setEventMessages($langs->trans('ErrorFieldEmail', $email), array(), 'errors');
+				setEventMessages($langs->trans('ErrorFieldEmail'), array(), 'errors');
 				$error++;
 			}
 		}
@@ -148,7 +148,7 @@ if ($action == 'add') {
 		if (preg_match($regEmail, $email) || empty($email)) {
 			$object->origin_email = $email;
 		} else {
-			setEventMessages($langs->trans('ErrorFieldEmail', $email), array(), 'errors');
+			setEventMessages($langs->trans('ErrorFieldEmail'), array(), 'errors');
 			$error++;
 		}
 	}

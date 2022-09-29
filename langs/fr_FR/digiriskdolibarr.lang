@@ -1159,10 +1159,11 @@ ShowRiskAssessmentDate = Date des évaluations
 ShowRiskAssessmentDateDescription = Remplace la date de création par la date de début des évaluations dans la fiche et les documents
 
 # Stats - Statistisques
-TasksRepartition = Répartition des tâches par avancement
+TasksRepartition = Répartition des tâches par avancement réel déclaré
 TaskAt0Percent = Tâche à 0
 TaskInProgress = Tâche en cours
 TaskAt100Percent = Tâche à 100
+
 
 
 #
@@ -1267,8 +1268,8 @@ ShowTasksDoneDescription = Afficher les tâches complétées à 100
 ShowTasksDoneDescriptionExtend = sur les listes de risques
 ShowTaskCalculatedProgress = Avancement de la tâche
 ShowTaskCalculatedProgressDescription = Afficher l'avancement calculé de la tâche au lieu de l'avancement déclaré
-ShowAllTasks = Toutes les tâches
-ShowAllTasksDescription = Afficher toutes les tâches
+ShowAllTasks = Toutes les tâches d'un risque dans les listings
+ShowAllTasksDescription = Afficher toutes les tâches dans la liste des tâches d'un risque dans les listings
 NoTaskCompletedThere = Aucune tâche en cours
 NoTaskUnCompletedThere = Aucune tâche terminée
 DeleteTaskTimeSpent = Êtes-vous sûr(e) de vouloir supprimer %s mins de temps consommé de la tâche
@@ -1456,7 +1457,7 @@ GenerateCSV = Générer le fichier CSV
 SuccessGenerateCSV = Fichier CSV %s généré avec succès
 ErrorMissingData = Erreur : impossible de générer le fichier CSV, les données envoyées au fichier sont incorrecte. <br> Veuillez vérifier que vous avez bien des GP/UT assignés à des tickets.
 CSVFile = Fichier CSV
-ErrorFieldEmail = Erreur : l'email doit correspondre au format suivant : <b>'aaa@aaa.fr'</b><br> L'email saisi <b>'%s'</b> ne correspondant pas
+ErrorFieldEmail = Erreur : l'email doit correspondre au format suivant : <b>'aaa@aaa.fr'</b>
 TicketEmailRequired = Email obligatoire pour créer un ticket
 TicketEmailRequiredHelp = Activer cette option pour rendre obligatoire la saisie d'un email pour créer un ticket dans l'interface publique
 WelcomeToPublicTicketInterface = Bienvenue sur l'interface publique des tickets
@@ -1573,5 +1574,5 @@ DateRange = Plage de dates
 UseDateRange = Utiliser la plage de dates
 SiretNumber = N°Siret
 Society = Société
-MulticompanyTransverseModeEnabled = La gestion centralisée des utilisateurs et des groupes sur l'entité principale est activé.<br>Vous ne pouvez donc pas créer utilisateur ou de groupe sur cette entité.<br>Veuillez vous rendre sur l'entité principale pour réaliser cette ajout.
+MulticompanyTransverseModeEnabled = La gestion centralisée des utilisateurs et des groupes sur l'entité principale est activée.<br>Vous ne pouvez donc pas créer d'utilisateur ou de groupe sur cette entité.<br>Veuillez vous rendre sur l'entité principale pour réaliser cet ajout.
 

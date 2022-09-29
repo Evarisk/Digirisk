@@ -224,7 +224,7 @@ if ($action == 'add' && $canadduser && $permissiontoadd) {
 		if (preg_match($regEmail, $email)) {
 			$object->origin_email = $email;
 		} else {
-			setEventMessages($langs->trans('ErrorFieldEmail', $email), array(), 'errors');
+			setEventMessages($langs->trans('ErrorFieldEmail'), array(), 'errors');
 			$error++;
 		}
 	}
