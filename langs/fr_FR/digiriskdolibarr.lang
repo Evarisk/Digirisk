@@ -1466,6 +1466,10 @@ ShowSelectorOnTicketPublicInterface = Afficher le sélecteur multi-entité sur l
 ShowSelectorOnTicketPublicInterfaceHelp = Afficher le sélecteur multi-entité sur l'interface publique des tickets au lieu de la liste des entités avec leur logo
 MultiEntityPublicInterface = Interface publique des tickets multi-société
 TicketCategoriesNotCreated = Vous n'avez pas créé de catégories de tickets
+TicketPublicInterfaceQRCode = QR Code de l'interface publique des tickets
+MultiEntityTicketPublicInterfaceQRCode =  QR Code de l'interface publique des tickets multi-société
+TicketDigiriskElementRequired = GP/UT obligatoire pour créer un ticket
+TicketDigiriskElementRequiredHelp = Activer cette option pour rendre obligatoire la selection d'un GP/UT pour créer un ticket dans l'interface publique
 
 
 
