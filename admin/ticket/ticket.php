@@ -328,28 +328,30 @@ if ( ! empty($conf->global->DIGIRISKDOLIBARR_TICKET_ENABLE_PUBLIC_INTERFACE)) {
 	print '</td>';
 	print '</tr>';
 
-	//Page de sélection de l'entité
-	print '<tr class="oddeven"><td>' . $langs->transnoentities("ShowSelectorOnTicketPublicInterface") . '</td>';
-	print '<td class="center">';
-	if (empty($conf->global->DIGIRISKDOLIBARR_SHOW_MULTI_ENTITY_SELECTOR_ON_TICKET_PUBLIC_INTERFACE)) {
-		// Button off, click to enable
-		print '<a class="reposition valignmiddle" href="' . $_SERVER["PHP_SELF"] . '?action=setMultiEntitySelector&token=' . newToken() . '&value=1' . $param . '">';
-		print img_picto($langs->transnoentities("Disabled"), 'switch_off');
-		print '</a>';
-	} else {
-		// Button on, click to disable
-		print '<a class="reposition valignmiddle" href="' . $_SERVER["PHP_SELF"] . '?action=setMultiEntitySelector&token=' . newToken() . '&value=0' . $param . '">';
-		print img_picto($langs->transnoentities("Activated"), 'switch_on');
-		print '</a>';
+	if ($conf->multicompany->enabled) {
+		//Page de sélection de l'entité
+		print '<tr class="oddeven"><td>' . $langs->transnoentities("ShowSelectorOnTicketPublicInterface") . '</td>';
+		print '<td class="center">';
+		if (empty($conf->global->DIGIRISKDOLIBARR_SHOW_MULTI_ENTITY_SELECTOR_ON_TICKET_PUBLIC_INTERFACE)) {
+			// Button off, click to enable
+			print '<a class="reposition valignmiddle" href="' . $_SERVER["PHP_SELF"] . '?action=setMultiEntitySelector&token=' . newToken() . '&value=1' . $param . '">';
+			print img_picto($langs->transnoentities("Disabled"), 'switch_off');
+			print '</a>';
+		} else {
+			// Button on, click to disable
+			print '<a class="reposition valignmiddle" href="' . $_SERVER["PHP_SELF"] . '?action=setMultiEntitySelector&token=' . newToken() . '&value=0' . $param . '">';
+			print img_picto($langs->transnoentities("Activated"), 'switch_on');
+			print '</a>';
+		}
+		print '</td>';
+		print '<td class="center">';
+		print '';
+		print '</td>';
+		print '<td class="center">';
+		print $form->textwithpicto('', $langs->transnoentities("ShowSelectorOnTicketPublicInterfaceHelp"), 1, 'help');
+		print '</td>';
+		print '</tr>';
 	}
-	print '</td>';
-	print '<td class="center">';
-	print '';
-	print '</td>';
-	print '<td class="center">';
-	print $form->textwithpicto('', $langs->transnoentities("ShowSelectorOnTicketPublicInterfaceHelp"), 1, 'help');
-	print '</td>';
-	print '</tr>';
 
 	//Email to send ticket submitted
 	print '<form method="POST" action="' . $_SERVER["PHP_SELF"] . '">';
