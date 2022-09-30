@@ -386,7 +386,7 @@ class Evaluator extends CommonObject
 			$array['nbemployees'] = $conf->global->DIGIRISKDOLIBARR_NB_EMPLOYEES;
 		} else {
 			$user = new User($this->db);
-			$allusers = $user->get_full_tree(0, 'u.entity IN (0,' . $conf->entity . ')');
+			$allusers = $user->get_full_tree(0, 'u.employee = 1');
 			if (!empty($allusers) && is_array($allusers)) {
 				$array['nbemployees'] = count($allusers);
 			} else {

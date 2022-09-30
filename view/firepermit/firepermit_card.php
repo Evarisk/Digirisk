@@ -1507,7 +1507,7 @@ if ((empty($action) || ($action != 'create' && $action != 'edit'))) {
 		if ( ! in_array($object->element, array('societe', 'user', 'member'))) {
 			$ref = dol_sanitizeFileName($object->ref);
 			include_once DOL_DOCUMENT_ROOT . '/core/lib/files.lib.php';
-			$fileparams = dol_most_recent_file($diroutput . '/' . $ref, preg_quote($ref, '/') . '[^\-]+'));
+			$fileparams = dol_most_recent_file($diroutput . '/' . $ref, preg_quote($ref, '/') . '[^\-]+');
 			$file       = $fileparams['fullname'];
 		}
 
