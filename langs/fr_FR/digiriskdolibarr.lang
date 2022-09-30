@@ -988,6 +988,7 @@ NbEmployeesInvolved = Nombre de salariés impliqués
 NbEmployees = Nombre de salariés
 NbEmployeesInvolvedTooltip = Nombre de salariés (evaluateurs) unique
 NbEmployeesTooltip = Si la gestion centralisée des utilisateurs et des groupes sur l'entité principale est activée.<br>Le nombre de salariés correspond au nombre d'utilisateurs partagés/affectés à un groupe et aussi au nombre d'administrateur de l'entité principale
+NbEmployeesConfTooltip = Le nombre de salariés a été saisi manuellement
 
 
 
