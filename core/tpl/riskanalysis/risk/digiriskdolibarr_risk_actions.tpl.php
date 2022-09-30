@@ -83,7 +83,7 @@ if ( ! $error && $action == 'add' && $permissiontoadd) {
 				}
 			}
 
-			$result2 = $evaluation->create($user, true);
+			$result2 = $evaluation->create($user, false);
 
 			if ($result2 > 0) {
 				$tasktitle = $data['task'];
@@ -119,6 +119,7 @@ if ( ! $error && $action == 'add' && $permissiontoadd) {
 					$result3 = $task->create($user, true);
 
 					if ($result3 > 0) {
+						$task->call_trigger('TASK_CREATE', $user);
 						// Creation risk + evaluation + task OK
 						$urltogo = str_replace('__ID__', $result3, $backtopage);
 						$urltogo = preg_replace('/--IDFORBACKTOPAGE--/', $id, $urltogo); // New method to autoselect project after a New on another form object creation
@@ -433,6 +434,7 @@ if ( ! $error && $action == 'addRiskAssessmentTask' && $permissiontoadd) {
 	$result = $task->create($user, true);
 
 	if ($result > 0) {
+		$task->call_trigger('TASK_CREATE', $user);
 		// Creation task OK
 		$urltogo = str_replace('__ID__', $result, $backtopage);
 		$urltogo = preg_replace('/--IDFORBACKTOPAGE--/', $id, $urltogo); // New method to autoselect project after a New on another form object creation
@@ -483,7 +485,7 @@ if ( ! $error && $action == 'saveRiskAssessmentTask' && $permissiontoadd) {
 		$task->progress = 0;
 	}
 
-	$result = $task->update($user, true);
+	$result = $task->update($user, false);
 
 	if ($result > 0) {
 		// Update task OK
@@ -503,7 +505,7 @@ if ( ! $error && $action == "deleteRiskAssessmentTask" && $permissiontodelete) {
 
 	$task->fetch($deleteRiskAssessmentTaskId);
 
-	$result = $task->delete($user, true);
+	$result = $task->delete($user, false);
 
 	if ($result > 0) {
 		// Delete task OK
@@ -625,7 +627,7 @@ if ( ! $error && $action == 'checkTaskProgress' && $permissiontoadd) {
 		$task->progress = 0;
 	}
 
-	$result = $task->update($user, true);
+	$result = $task->update($user, false);
 
 	if ($result > 0) {
 		// Update task OK
