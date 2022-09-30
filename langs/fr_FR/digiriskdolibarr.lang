@@ -1239,6 +1239,10 @@ DigiriskRiskSignData = Données configurables des signalisations
 TaskTimeSpentCreateTrigger = Temps consommé créé
 TaskTimeSpentModifyTrigger = Temps consommé modifié
 TaskTimeSpentDeleteTrigger = Temps consommé supprimé
+TaskCompleted = Tâche %s complétée
+TaskCreated = Tâche %s crée
+TaskModified = Tâche %s modifée
+TaskDeleted = Tâche %s supprimée
 
 # Data - Donnée
 ActionPlan = Plan d'action
@@ -1292,10 +1296,6 @@ TaskTimeSpentDuration = Durée du temps consommé
 TaskTimeSpentDurationDescription = Le temps consommé ajouté par défaut à chaque tâche
 NoTaskShared = Pas de tâche en cours ou partagées
 WarningTaskLabel = Attention vous avez dépassé le nombre de caractères maximum autorisé (255)
-TaskCompleted = Tâche %s complétée
-TaskCreated = Tâche %s crée
-TaskModified = Tâche %s modifée
-TaskDeleted = Tâche %s supprimée
 TotalProgress = Avancement réel global des tâches
 TotalBudget = Somme du budget des tâches
 
