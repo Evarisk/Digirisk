@@ -1098,6 +1098,95 @@ class InterfaceDigiriskdolibarrTriggers extends DolibarrTriggers
 				$actioncomm->create($user);
 				break;
 
+			case 'TASK_CREATE' :
+
+				if (!empty($object->array_options['options_fk_risk'])) {
+					dol_syslog("Trigger '" . $this->name . "' for action '$action' launched by " . __FILE__ . ". id=" . $object->id);
+					require_once DOL_DOCUMENT_ROOT . '/comm/action/class/actioncomm.class.php';
+					require_once __DIR__ . '/../../class/digiriskelement.class.php';
+					$now = dol_now();
+					$actioncomm = new ActionComm($this->db);
+					$digiriskelement = new DigiriskElement($this->db);
+					$risk = new Risk($this->db);
+					$digiriskelement->fetch($object->fk_element);
+					$risk->fetch($object->array_options['options_fk_risk']);
+
+					$actioncomm->elementtype = 'digiriskelement@digiriskdolibarr';
+					$actioncomm->code = 'AC_TASK_CREATE';
+					$actioncomm->type_code = 'AC_OTH_AUTO';
+					$actioncomm->label = $langs->transnoentities('TaskCreated', $object->ref);
+					$actioncomm->note_private .= $langs->trans('Ref') . ' : ' . $object->ref . '<br>';
+					$actioncomm->note_private .= $langs->trans('Label') . ' : ' . $object->label . '<br>';
+					$actioncomm->note_private .= $langs->trans('DateCreation') . ' : ' . dol_print_date($object->date_c, 'dayhoursec', 'tzuser') . '<br>';
+					$actioncomm->datep = $now;
+					$actioncomm->fk_element = $risk->fk_element;
+					$actioncomm->userownerid = $user->id;
+					$actioncomm->percentage = -1;
+
+					$actioncomm->create($user);
+				}
+				break;
+
+			case 'TASK_MODIFY' :
+
+				if (!empty($object->array_options['options_fk_risk'])) {
+					dol_syslog("Trigger '" . $this->name . "' for action '$action' launched by " . __FILE__ . ". id=" . $object->id);
+					require_once DOL_DOCUMENT_ROOT . '/comm/action/class/actioncomm.class.php';
+					require_once __DIR__ . '/../../class/digiriskelement.class.php';
+					$now = dol_now();
+					$actioncomm = new ActionComm($this->db);
+					$digiriskelement = new DigiriskElement($this->db);
+					$risk = new Risk($this->db);
+					$digiriskelement->fetch($object->fk_element);
+					$risk->fetch($object->array_options['options_fk_risk']);
+
+					$actioncomm->elementtype = 'digiriskelement@digiriskdolibarr';
+					$actioncomm->code = 'AC_TASK_MODIFY';
+					$actioncomm->type_code = 'AC_OTH_AUTO';
+					$actioncomm->label = $langs->transnoentities('TaskModified', $object->ref);
+					$actioncomm->note_private .= $langs->trans('Ref') . ' : ' . $object->ref . '<br>';
+					$actioncomm->note_private .= $langs->trans('Label') . ' : ' . $object->label . '<br>';
+					$actioncomm->note_private .= $langs->trans('DateCreation') . ' : ' . dol_print_date($object->date_c, 'dayhoursec', 'tzuser') . '<br>';
+					$actioncomm->note_private .= $langs->trans('DateModification') . ' : ' . dol_print_date($now, 'dayhoursec', 'tzuser') . '<br>';
+					$actioncomm->datep = $now;
+					$actioncomm->fk_element = $risk->fk_element;
+					$actioncomm->userownerid = $user->id;
+					$actioncomm->percentage = -1;
+
+					$actioncomm->create($user);
+				}
+				break;
+
+			case 'TASK_DELETE' :
+
+				if ($object->array_options['options_fk_risk'] != 0) {
+					dol_syslog("Trigger '" . $this->name . "' for action '$action' launched by " . __FILE__ . ". id=" . $object->id);
+					require_once DOL_DOCUMENT_ROOT . '/comm/action/class/actioncomm.class.php';
+					require_once __DIR__ . '/../../class/digiriskelement.class.php';
+					$now = dol_now();
+					$actioncomm = new ActionComm($this->db);
+					$digiriskelement = new DigiriskElement($this->db);
+					$risk = new Risk($this->db);
+					$digiriskelement->fetch($object->fk_element);
+					$risk->fetch($object->array_options['options_fk_risk']);
+
+					$actioncomm->elementtype = 'digiriskelement@digiriskdolibarr';
+					$actioncomm->code = 'AC_TASK_DELETE';
+					$actioncomm->type_code = 'AC_OTH_AUTO';
+					$actioncomm->label = $langs->transnoentities('TaskDeleted', $object->ref);
+					$actioncomm->note_private .= $langs->trans('Ref') . ' : ' . $object->ref . '<br>';
+					$actioncomm->note_private .= $langs->trans('Label') . ' : ' . $object->label . '<br>';
+					$actioncomm->note_private .= $langs->trans('DateCreation') . ' : ' . dol_print_date($object->date_c, 'dayhoursec', 'tzuser') . '<br>';
+					$actioncomm->note_private .= $langs->trans('DateModification') . ' : ' . dol_print_date($now, 'dayhoursec', 'tzuser') . '<br>';
+					$actioncomm->datep = $now;
+					$actioncomm->fk_element = $risk->fk_element;
+					$actioncomm->userownerid = $user->id;
+					$actioncomm->percentage = -1;
+
+					$actioncomm->create($user);
+				}
+				break;
+
 			case 'RISKASSESSMENT_CREATE' :
 
 				dol_syslog("Trigger '" . $this->name . "' for action '$action' launched by " . __FILE__ . ". id=" . $object->id);
