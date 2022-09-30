@@ -165,7 +165,7 @@ if (empty($reshook)) {
 				$accidenttodelete->fetch($toselectedid);
 
 				$accidenttodelete->status = 0;
-				$result                   = $accidenttodelete->update($user, true);
+				$result                   = $accidenttodelete->update($user, false);
 
 				if ($result < 0) {
 					// Delete accident KO
