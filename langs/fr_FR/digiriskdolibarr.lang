@@ -1296,6 +1296,10 @@ TaskTimeSpentDuration = Durée du temps consommé
 TaskTimeSpentDurationDescription = Le temps consommé ajouté par défaut à chaque tâche
 NoTaskShared = Pas de tâche en cours ou partagées
 WarningTaskLabel = Attention vous avez dépassé le nombre de caractères maximum autorisé (255)
+ErrorRecordHasSubTasks = La tâche a des enfants
+TotalConsumedTime = Total temps consommé sur le projet
+TotalConsumedTimeAmount = Coût du temps consommé
+NbTasks = Nombre de tâches
 TotalProgress = Avancement réel global des tâches
 TotalBudget = Somme du budget des tâches
 
