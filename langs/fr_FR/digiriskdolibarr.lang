@@ -518,13 +518,14 @@ CreateAccident = Créer/Modifier l'accident
 DeleteAccident = Supprimer l'accident
 
 # Trigger - Déclencheur
-ACCIDENT_CREATEInDolibarr = Accident créé dans Dolibarr
+AccidentCreateTrigger = Accident %s créé
 ActionsOnAccident = Événements liés au accident
 AccidentGeneratedWithDolibarr = Accident généré avec Dolibarr
 AccidentWorkStopCreateTrigger = Un arrêt de travail a été ajouté à l'accident
 AccidentWorkStopModifyTrigger = Un arrêt de travail a été modifié sur l'accident
 AccidentWorkStopDeleteTrigger = Un arrêt de travail a été suprimmé de l'accident
-AccidentModifyTrigger = Modification de l'accident
+AccidentModifyTrigger = Modification de l'accident %s
+AccidentDeleteTrigger = Suppression de l'accident %s
 AccidentMetaDataCreateTrigger = Enregistrement des données complémentaires de l'accident
 AccidentLesionCreateTrigger = Une lésion a été ajoutée à l'accident
 AccidentLesionModifyTrigger = Une lésion a été modifiée sur l'accident
@@ -955,9 +956,9 @@ DeleteEvaluator = Supprimer les évaluateurs
 # Trigger - Déclencheur
 EVALUATOR_CREATEInDolibarr = Évaluateur créé dans Dolibarr
 ActionsOnÉvaluateur = Événements liés au évaluateur
-EvaluatorCreateTrigger = Évaluateur créé
-EvaluatorModifyTrigger = Évaluateur modifié
-EvaluatorDeleteTrigger = Évaluateur supprimé
+EvaluatorCreateTrigger = Évaluateur %s créé
+EvaluatorModifyTrigger = Évaluateur %s modifié
+EvaluatorDeleteTrigger = Évaluateur %s supprimé
 
 # Mod Numbering - Modèle de numérotation
 DigiriskEvaluatorNumberingModule = Modèle de numérotation des évaluateurs de Digirisk
@@ -1022,9 +1023,9 @@ CreateDigiriskRisk = Créer/Modifier les risques
 DeleteDigiriskRisk = Supprimer les risques
 
 # Trigger - Déclencheur
-RiskCreateTrigger = Risque créé
-RiskModifyTrigger = Risque modifié
-RiskDeleteTrigger = Risque supprimé
+RiskCreateTrigger = Risque %s créé
+RiskModifyTrigger = Risque %s modifié
+RiskDeleteTrigger = Risque %s supprimé
 
 # Mod Numbering - Modèle de numérotation
 DigiriskRiskNumberingModule = Modèle de numérotation des risques de Digirisk
@@ -1113,9 +1114,9 @@ BlackRisk = Risque inacceptable
 #
 
 # Trigger - Déclencheur
-RiskAssessmentCreateTrigger = Évaluation créée
-RiskAssessmentModifyTrigger = Évaluation modifiée
-RiskAssessmentDeleteTrigger = Évaluation supprimée
+RiskAssessmentCreateTrigger = Évaluation %s créée
+RiskAssessmentModifyTrigger = Évaluation %s modifiée
+RiskAssessmentDeleteTrigger = Évaluation %s supprimée
 
 # Mod Numbering - Modèle de numérotation
 DigiriskRiskAssessmentStandardModel = Renvoie le numéro sous la forme RAn où n est un compteur séquentiel sans rupture et sans remise à 0.
@@ -1162,7 +1163,7 @@ AddRiskAssessmentTask = Ajouter une tâche au risque
 ListRiskAssessmentTask = Liste des tâches du risque
 ShowRiskAssessmentDate = Date des évaluations
 ShowRiskAssessmentDateDescription = Remplace la date de création par la date de début des évaluations dans la fiche et les documents
-
+RiskTaskComplete = Tâche %s complétée
 # Stats - Statistisques
 TasksRepartition = Répartition des tâches par avancement réel déclaré
 TaskAt0Percent = Tâche à 0
@@ -1181,9 +1182,9 @@ CreateDigiriskRiskSign = Créer/Modifier les signalisations
 DeleteDigiriskRiskSign = Supprimer les signalisations
 
 # Trigger - Déclencheur
-RiskSignCreateTrigger = Signalisation créée
-RiskSignModifyTrigger = Signalisation modifiée
-RiskSignDeleteTrigger = Signalisation supprimée
+RiskSignCreateTrigger = Signalisation %s créée
+RiskSignModifyTrigger = Signalisation %s modifiée
+RiskSignDeleteTrigger = Signalisation %s supprimée
 
 # Mod Numbering - Modèle de numérotation
 DigiriskRiskSignStandardModel = Renvoie le numéro sous la forme RSn où n est un compteur séquentiel sans rupture et sans remise à 0.
@@ -1291,10 +1292,10 @@ TaskTimeSpentDuration = Durée du temps consommé
 TaskTimeSpentDurationDescription = Le temps consommé ajouté par défaut à chaque tâche
 NoTaskShared = Pas de tâche en cours ou partagées
 WarningTaskLabel = Attention vous avez dépassé le nombre de caractères maximum autorisé (255)
-ErrorRecordHasSubTasks = La tâche a des enfants
-TotalConsumedTime = Total temps consommé sur le projet
-TotalConsumedTimeAmount = Coût du temps consommé
-NbTasks = Nombre de tâches
+TaskCompleted = Tâche %s complétée
+TaskCreated = Tâche %s crée
+TaskModified = Tâche %s modifée
+TaskDeleted = Tâche %s supprimée
 TotalProgress = Avancement réel global des tâches
 TotalBudget = Somme du budget des tâches
 
