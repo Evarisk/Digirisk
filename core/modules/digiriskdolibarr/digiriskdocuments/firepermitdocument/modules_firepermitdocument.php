@@ -175,7 +175,6 @@ abstract class ModeleODTFirePermitDocument extends CommonDocGenerator
 
 			$firepermitlines = $firepermitline->fetchAll('', '', 0, 0, array(), 'AND', $firepermit->id);
 
-
 			$digirisk_resources     = $resources->digirisk_dolibarr_fetch_resources();
 			$extsociety             = $resources->fetchResourcesFromObject('FP_EXT_SOCIETY', $firepermit);
 			if ($extsociety < 1) {
@@ -310,10 +309,14 @@ abstract class ModeleODTFirePermitDocument extends CommonDocGenerator
 				$tmparray['maitre_oeuvre_phone'] = $maitreoeuvre->phone;
 
 				$tmparray['maitre_oeuvre_signature_date'] = dol_print_date($maitreoeuvre->signature_date, 'dayhoursec');
-				$encoded_image                            = explode(",",  $maitreoeuvre->signature)[1];
-				$decoded_image                            = base64_decode($encoded_image);
-				file_put_contents($tempdir . "signature.png", $decoded_image);
-				$tmparray['maitre_oeuvre_signature'] = $tempdir . "signature.png";
+				if ((!preg_match('/specimen/i', $tempfilepath[1]) && $firepermit->status >= $firepermit::STATUS_LOCKED)) {
+					$encoded_image = explode(",", $maitreoeuvre->signature)[1];
+					$decoded_image = base64_decode($encoded_image);
+					file_put_contents($tempdir . "signature.png", $decoded_image);
+					$tmparray['maitre_oeuvre_signature'] = $tempdir . "signature.png";
+				} else {
+					$tmparray['maitre_oeuvre_signature'] = '';
+				}
 			}
 
 			if ( ! empty($extsocietyresponsible) && $extsocietyresponsible > 0) {
@@ -323,23 +326,31 @@ abstract class ModeleODTFirePermitDocument extends CommonDocGenerator
 				$tmparray['intervenant_exterieur_phone'] = $extsocietyresponsible->phone;
 
 				$tmparray['intervenant_exterieur_signature_date'] = dol_print_date($extsocietyresponsible->signature_date, 'dayhoursec');
-				$encoded_image                                    = explode(",",  $extsocietyresponsible->signature)[1];
-				$decoded_image                                    = base64_decode($encoded_image);
-				file_put_contents($tempdir . "signature2.png", $decoded_image);
-				$tmparray['intervenant_exterieur_signature'] = $tempdir . "signature2.png";
+				if ((!preg_match('/specimen/i', $tempfilepath[1]) && $firepermit->status >= $firepermit::STATUS_LOCKED)) {
+					$encoded_image = explode(",", $extsocietyresponsible->signature)[1];
+					$decoded_image = base64_decode($encoded_image);
+					file_put_contents($tempdir . "signature2.png", $decoded_image);
+					$tmparray['intervenant_exterieur_signature'] = $tempdir . "signature2.png";
+				} else {
+					$tmparray['intervenant_exterieur_signature'] = '';
+				}
 			}
 
 			foreach ($tmparray as $key => $value) {
 				try {
 					if ($key == 'maitre_oeuvre_signature' || $key == 'intervenant_exterieur_signature') { // Image
-						$list     = getimagesize($value);
-						$newWidth = 350;
-						if ($list[0]) {
-							$ratio     = $newWidth / $list[0];
-							$newHeight = $ratio * $list[1];
-							dol_imageResizeOrCrop($value, 0, $newWidth, $newHeight);
+						if (file_exists($value)) {
+							$list = getimagesize($value);
+							$newWidth = 350;
+							if ($list[0]) {
+								$ratio = $newWidth / $list[0];
+								$newHeight = $ratio * $list[1];
+								dol_imageResizeOrCrop($value, 0, $newWidth, $newHeight);
+							}
+							$odfHandler->setImage($key, $value);
+						} else {
+							$odfHandler->setVars($key, $langs->trans('NoData'), true, 'UTF-8');
 						}
-						$odfHandler->setImage($key, $value);
 					} elseif (preg_match('/logo$/', $key)) {
 						if (file_exists($value)) $odfHandler->setImage($key, $value);
 						else $odfHandler->setVars($key, $langs->transnoentities('ErrorFileNotFound'), true, 'UTF-8');
@@ -467,10 +478,14 @@ abstract class ModeleODTFirePermitDocument extends CommonDocGenerator
 						$k         = 3;
 						foreach ($extsocietyintervenants as $line) {
 							if ($line->status == 5) {
-								$encoded_image = explode(",", $line->signature)[1];
-								$decoded_image = base64_decode($encoded_image);
-								file_put_contents($tempdir . "signature" . $k . ".png", $decoded_image);
-								$tmparray['intervenants_signature'] = $tempdir . "signature" . $k . ".png";
+								if ((!preg_match('/specimen/i', $tempfilepath[1]) && $firepermit->status >= $firepermit::STATUS_LOCKED)) {
+									$encoded_image = explode(",", $line->signature)[1];
+									$decoded_image = base64_decode($encoded_image);
+									file_put_contents($tempdir . "signature" . $k . ".png", $decoded_image);
+									$tmparray['intervenants_signature'] = $tempdir . "signature" . $k . ".png";
+								} else {
+									$tmparray['intervenants_signature'] = '';
+								}
 							} else {
 								$tmparray['intervenants_signature'] = '';
 							}
@@ -486,14 +501,18 @@ abstract class ModeleODTFirePermitDocument extends CommonDocGenerator
 							foreach ($tmparray as $key => $value) {
 								try {
 									if ($key == 'intervenants_signature' && $line->status == 5) { // Image
-										$list     = getimagesize($value);
-										$newWidth = 200;
-										if ($list[0]) {
-											$ratio     = $newWidth / $list[0];
-											$newHeight = $ratio * $list[1];
-											dol_imageResizeOrCrop($value, 0, $newWidth, $newHeight);
+										if (file_exists($value)) {
+											$list = getimagesize($value);
+											$newWidth = 200;
+											if ($list[0]) {
+												$ratio = $newWidth / $list[0];
+												$newHeight = $ratio * $list[1];
+												dol_imageResizeOrCrop($value, 0, $newWidth, $newHeight);
+											}
+											$listlines->setImage($key, $value);
+										} else {
+											$odfHandler->setVars($key, $langs->trans('NoData'), true, 'UTF-8');
 										}
-										$listlines->setImage($key, $value);
 									} elseif (empty($value)) {  // Text
 										$listlines->setVars($key, $langs->trans('NoData'), true, 'UTF-8');
 									} else {
@@ -507,7 +526,9 @@ abstract class ModeleODTFirePermitDocument extends CommonDocGenerator
 							}
 							$listlines->merge();
 
-							dol_delete_file($tempdir . "signature" . $k . ".png");
+							if ((!preg_match('/specimen/i', $tempfilepath[1]) && $firepermit->status >= $firepermit::STATUS_LOCKED)) {
+								dol_delete_file($tempdir . "signature" . $k . ".png");
+							}
 						}
 						$odfHandler->mergeSegment($listlines);
 					} else {
@@ -581,8 +602,10 @@ abstract class ModeleODTFirePermitDocument extends CommonDocGenerator
 
 			$odfHandler = null; // Destroy object
 
-			dol_delete_file($tempdir . "signature.png");
-			dol_delete_file($tempdir . "signature2.png");
+			if ((!preg_match('/specimen/i', $tempfilepath[1]) && $firepermit->status >= $firepermit::STATUS_LOCKED)) {
+				dol_delete_file($tempdir . "signature.png");
+				dol_delete_file($tempdir . "signature2.png");
+			}
 
 			$this->result = array('fullpath' => $file);
 
