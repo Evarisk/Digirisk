@@ -150,6 +150,11 @@ if (is_array($objects)) {
 <script>
 	$(document).ready(function() {
 		calcWidth($('#title0'));
+		$('a').click(function(e) {
+			if (confirm("Modifications non enregistrées") == false) {
+				e.preventDefault();
+			}
+		})
 
 		window.onresize = function(event) {
 			//method to execute one time after a timer
@@ -187,11 +192,6 @@ if (is_array($objects)) {
 			tolerance:'intersect',
 			over:function(event,ui){
 				$('.save-organization').removeClass('button-disable')
-				$('a').click(function(e) {
-					if (confirm("Modifications non enregistrées") == false) {
-						e.preventDefault();
-					}
-				})
 				$('.save-organization').attr('style','z-index:1050')
 				$('.save-organization .fas').attr('style','display:none')
 			},
