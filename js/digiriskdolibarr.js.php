@@ -219,7 +219,6 @@ window.eoxiaJS.navigation.event = function() {
  * @return {void}
  */
 window.eoxiaJS.navigation.switchToggle = function( event ) {
-	console.log($(this))
 	event.preventDefault();
 
 	var MENU = localStorage.menu
@@ -273,8 +272,7 @@ window.eoxiaJS.navigation.toggleAll = function( event ) {
 		$( '.digirisk-wrap .navigation-container .workunit-list .unit .title' ).get().map(function (v){
 			MENU.push($(v).attr('value'))
 		})
-		localStorage.setItem('menu', JSON.stringify(Array.from(MENU.keys())) );
-
+		localStorage.setItem('menu', JSON.stringify(Array.from(MENU.values())) );
 	}
 
 	if ( $( this ).hasClass( 'toggle-minus' ) ) {
@@ -284,7 +282,6 @@ window.eoxiaJS.navigation.toggleAll = function( event ) {
 		// local storage delete all
 		let emptyMenu = new Set('0');
 		localStorage.setItem('menu', JSON.stringify(Object.values(emptyMenu)) );
-
 	}
 };
 
@@ -1626,10 +1623,6 @@ window.eoxiaJS.mediaGallery.addToFavorite = function( event ) {
 			success: function ( resp ) {
 
 				if (id === element_linked_id) {
-					console.log($('.arearef.heightref.valignmiddle.centpercent'))
-					console.log($(resp).find('.arearef.heightref.valignmiddle.centpercent'))
-					console.log(resp)
-
 					$('.arearef.heightref.valignmiddle.centpercent').load(' .arearef.heightref.valignmiddle.centpercent')
 				}
 				newPhoto = newPhoto.replace(/\ /g, '%20')
@@ -4031,7 +4024,6 @@ window.eoxiaJS.keyEvent.keyup = function( event ) {
  */
 window.eoxiaJS.keyEvent.checkUrlFormat = function( event ) {
 	var urlRegex = /[-a-zA-Z0-9@:%._\+~#=]{1,256}\.[a-zA-Z0-9()]{1,6}\b([-a-zA-Z0-9()@:%_\+.~#?&//=]*)?/gi;
-	console.log($('input:focus').val())
 	if ($(this).val().match(urlRegex)) {
 		$(this).attr('style', 'border: solid; border-color: green')
 	} else if ($('input:focus').val().length > 0) {
@@ -4229,9 +4221,6 @@ window.eoxiaJS.accident.tmpStockFile = function(id, subaction = '') {
 		data: formData,
 		success: function ( resp ) {
 			// ca ne marche pas car l'action ici est sendfile et plus editline donc le % resp ne peut pas contenir la réponse
-			console.log('#fileLinkedTable' + id)/
-			console.log($('#fileLinkedTable' + id))
-			console.log($(resp).find('#fileLinkedTable' + id))
 			$('#sendFileForm' + id).html($(resp).find('#fileLinkedTable' + id))
 		},
 		error: function ( ) {
