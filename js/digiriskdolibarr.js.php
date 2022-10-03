@@ -1401,6 +1401,7 @@ window.eoxiaJS.mediaGallery.sendPhoto = function( event ) {
 	let totalCount = files.length
     let progress = 0
 	let token = $('.id-container.page-ut-gp-list').find('input[name="token"]').val();
+	$('#myBar').width(0)
     $('#myProgress').attr('style', 'display:block')
 	window.eoxiaJS.loader.display($('#myProgress'));
 	$.each(files, function(index, file) {
