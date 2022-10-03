@@ -1431,8 +1431,9 @@ window.eoxiaJS.mediaGallery.sendPhoto = function( event ) {
 			},
 			error : function (resp) {
 				$('#myBar').animate({
-					color: 'red'
+					backgroundColor: 'red'
 				}, 300);
+				$('.wpeo-loader').removeClass('wpeo-loader');
 				actionContainerError.removeClass('hidden');
 			}
 		});
