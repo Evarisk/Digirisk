@@ -1445,6 +1445,7 @@ TicketProjectUpdated = Le projet par défaut des tickets a été mis à jour
 QRCodeAlreadyGenerated = QR Code généré
 GenerateQRCode = Générer le QR Code
 CompanyQRCodeGeneration = Génération du QR Code de l'entité
+QRCodeGeneration = Génération du QR Code
 MultiCompanyQRCodeGeneration = Génération du QR Code multi-entité
 TicketCreationMailWellSent = Mail de confirmation de création du ticket envoyé
 TicketCreationMailSent = Le mail de création du ticket a été envoyé à %s
