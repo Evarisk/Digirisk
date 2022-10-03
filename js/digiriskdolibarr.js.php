@@ -1855,7 +1855,7 @@ window.eoxiaJS.risk.saveRisk = function ( event ) {
 	let elementRisk = $(this).closest('.risk-container').find('.risk-content');
 	var params = new window.URLSearchParams(window.location.search);
 	var id = params.get('id')
-
+	let moveRiskDisabled = $(this).closest('.risk-container').find('.move-risk').hasClass('move-disabled')
 	let riskCommentText = elementRisk.find('.risk-description textarea').val()
 	riskCommentText = window.eoxiaJS.risk.sanitizeBeforeRequest(riskCommentText)
 
@@ -1870,7 +1870,7 @@ window.eoxiaJS.risk.saveRisk = function ( event ) {
 	var newParent = $(this).closest('.risk-container').find('#socid option:selected').val();
 	let elementParent = $('.fichecenter.risklist').find('.div-title-and-table-responsive');
 
-	if (newParent == id) {
+	if (newParent == id || moveRiskDisabled) {
 		window.eoxiaJS.loader.display($(this).closest('.risk-row-content-' + editedRiskId).find('.risk-description-'+editedRiskId));
 	} else {
 		window.eoxiaJS.loader.display($(this).closest('.risk-row-content-' + editedRiskId))
@@ -1893,7 +1893,7 @@ window.eoxiaJS.risk.saveRisk = function ( event ) {
 		success: function ( resp ) {
 			$('.wpeo-loader').removeClass('wpeo-loader');
 			let actionContainerSuccess = $('.messageSuccessRiskEdit');
-			if (newParent == id) {
+			if (newParent == id || moveRiskDisabled) {
 				$('.risk-row-content-' + editedRiskId).find('.risk-description-'+editedRiskId).fadeOut(800);
 				$('.risk-row-content-' + editedRiskId).find('.risk-description-'+editedRiskId).fadeIn(800);
 			} else {

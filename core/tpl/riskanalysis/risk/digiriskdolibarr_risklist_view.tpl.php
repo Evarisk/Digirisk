@@ -1158,7 +1158,7 @@
 											</div>
 										<?php endif; ?>
 									</div>
-									<div class="move-risk">
+									<div class="move-risk <?php echo $conf->global->DIGIRISKDOLIBARR_MOVE_RISKS ? '' : 'move-disabled'?>">
 										<span class="title"><?php echo $langs->trans('MoveRisk'); ?></span>
 										<?php $objecttmp = new DigiriskElement($db);
 										$objecttmp->fetch($risk->fk_element);
