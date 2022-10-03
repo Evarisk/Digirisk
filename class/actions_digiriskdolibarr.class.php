@@ -390,7 +390,7 @@ class ActionsDigiriskdolibarr
 					jQuery('#options_digiriskdolibarr_ticket_lastname').parent().html(jQuery('#options_digiriskdolibarr_ticket_lastname').parent().html().replace(/Nom/, '<b>Nom</b><span style="color:red"> *</span>'))
 					jQuery('#options_digiriskdolibarr_ticket_lastname').parent().html(jQuery('#options_digiriskdolibarr_ticket_lastname').parent().html().replace(/Prénom/, '<b>Prénom</b><span style="color:red"> *</span>'))
 
-					jQuery('#options_digiriskdolibarr_ticket_lastname').after(<?php echo json_encode($emailfield) ; ?>);
+					jQuery('#options_digiriskdolibarr_ticket_firstname').after(<?php echo json_encode($emailfield) ; ?>);
 
 					jQuery('#options_digiriskdolibarr_ticket_date').val(fulldate);
 					jQuery('#options_digiriskdolibarr_ticket_dateday').val((day < 10 ? '0' : '') + day);
