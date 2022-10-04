@@ -192,10 +192,10 @@ abstract class ModeleODTRiskAssessmentDocument extends CommonDocGenerator
 					$digiriskelementobject = new DigiriskElement($this->db);
 					$digiriskelementlist   = $digiriskelementobject->fetchDigiriskElementFlat(0);
 					$risk                  = new Risk($this->db);
-					$ticket    = new Ticket($this->db);
+					$ticket                = new Ticket($this->db);
 					$risks                 = $risk->fetchRisksOrderedByCotation(0, true, $conf->global->DIGIRISKDOLIBARR_SHOW_INHERITED_RISKS_IN_DOCUMENTS, $conf->global->DIGIRISKDOLIBARR_SHOW_SHARED_RISKS);
 
-					if ( ! empty($digiriskelementlist) ) {
+					if (!empty($digiriskelementlist)) {
 						$listlines = $odfHandler->setSegment('elementParHierarchie');
 
 						//Fill digirisk element list table
@@ -319,13 +319,13 @@ abstract class ModeleODTRiskAssessmentDocument extends CommonDocGenerator
 					$object->fillRiskData($odfHandler, $object, $outputlangs, $tmparray, $file, $risks);
 
 					//Fill tickets data
-					$filter = array('t.fk_project' => $conf->global->DIGIRISKDOLIBARR_TICKET_PROJECT);
-					$ticket->fetchAll($user, '', '', '', 0, '', $filter);
-
+					if ($conf->global->DIGIRISKDOLIBARR_DIGIRISKDOLIBARR_TICKET_EXTRAFIELDS == 1) {
+						$filter = array('t.fk_project' => $conf->global->DIGIRISKDOLIBARR_TICKET_PROJECT);
+						$ticket->fetchAll($user, '', '', '', 0, '', $filter);
+					}
 					$listlines = $odfHandler->setSegment('tickets');
 					if (is_array($ticket->lines) && !empty($ticket->lines)) {
 						foreach ($ticket->lines as $line) {
-
 							$tmparray['refticket']     = $line->ref;
 							$tmparray['creation_date'] = dol_print_date($line->datec, 'dayhoursec', 'tzuser');
 							$tmparray['subject']       = $line->subject;
@@ -363,6 +363,25 @@ abstract class ModeleODTRiskAssessmentDocument extends CommonDocGenerator
 							}
 							$listlines->merge();
 						}
+					} else {
+						$tmparray['refticket']                 = $langs->trans('NoData');
+						$tmparray['creation_date']             = $langs->trans('NoData');
+						$tmparray['subject']                   = $langs->trans('NoData');
+						$tmparray['progress']                  = $langs->trans('NoData');
+						$tmparray['digiriskelement_ref_label'] = $langs->trans('NoData');
+						$tmparray['status']                    = $langs->trans('NoData');
+						foreach ($tmparray as $key => $val) {
+							try {
+								if (empty($val)) {
+									$listlines->setVars($key, $langs->trans('NoData'), true, 'UTF-8');
+								} else {
+									$listlines->setVars($key, html_entity_decode($val, ENT_QUOTES | ENT_HTML5), true, 'UTF-8');
+								}
+							} catch (SegmentException $e) {
+								dol_syslog($e->getMessage());
+							}
+						}
+						$listlines->merge();
 					}
 					$odfHandler->mergeSegment($listlines);
 				}
