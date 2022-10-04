@@ -24,6 +24,7 @@
 require_once DOL_DOCUMENT_ROOT . '/user/class/user.class.php';
 require_once DOL_DOCUMENT_ROOT . '/contact/class/contact.class.php';
 require_once DOL_DOCUMENT_ROOT . '/societe/class/societe.class.php';
+require_once DOL_DOCUMENT_ROOT . '/categories/class/categorie.class.php';
 
 require_once __DIR__ . '/../lib/digiriskdolibarr_function.lib.php';
 require_once __DIR__ . '/digiriskdocuments.class.php';
@@ -490,19 +491,21 @@ class Accident extends CommonObject
 	{
 		global $langs;
 
-		$arrayNbDaysWithoutAccident  = $this->getNbDaysWithoutAccident();
-		$arrayNbAccidents            = $this->getNbAccidents();
-		$arrayNbWorkstopDays         = $this->getNbWorkstopDays();
-		$arrayNbAccidentsByEmployees = $this->getNbAccidentsByEmployees();
-		$arrayFrequencyIndex         = $this->getFrequencyIndex();
-		$arrayFrequencyRate          = $this->getFrequencyRate();
+		$arrayNbDaysWithoutAccident    = $this->getNbDaysWithoutAccident();
+		$arrayNbAccidents              = $this->getNbAccidents();
+		$arrayNbWorkstopDays           = $this->getNbWorkstopDays();
+		$arrayNbAccidentsByEmployees   = $this->getNbAccidentsByEmployees();
+		$arrayNbPresquAccidents        = $this->getNbPresquAccidents();
+		$arrayNbAccidentInvestigations = $this->getNbAccidentInvestigations();
+		$arrayFrequencyIndex           = $this->getFrequencyIndex();
+		$arrayFrequencyRate            = $this->getFrequencyRate();
 		//$arrayGravityIndex           = $this->getGravityIndex();
-		$arrayGravityRate            = $this->getGravityRate();
+		$arrayGravityRate              = $this->getGravityRate();
 
 		$array['widgets'] = array(
 			DashboardDigiriskStats::DASHBOARD_ACCIDENT => array(
-				'label'      => array($langs->transnoentities("DayWithoutAccident"), $langs->transnoentities("WorkStopDays"), $langs->transnoentities("NbAccidentsByEmployees")),
-				'content'    => array($arrayNbDaysWithoutAccident['daywithoutaccident'], $arrayNbWorkstopDays['nbworkstopdays'], $arrayNbAccidentsByEmployees['nbaccidentsbyemployees']),
+				'label'      => array($langs->transnoentities("DayWithoutAccident"), $langs->transnoentities("WorkStopDays"), $langs->transnoentities("NbAccidentsByEmployees"), $langs->transnoentities("NbPresquAccidents"), $langs->transnoentities("NbAccidentInvestigations")),
+				'content'    => array($arrayNbDaysWithoutAccident['daywithoutaccident'], $arrayNbWorkstopDays['nbworkstopdays'], $arrayNbAccidentsByEmployees['nbaccidentsbyemployees'], $arrayNbPresquAccidents['nbpresquaccidents'], $arrayNbAccidentInvestigations['nbaccidentinvestigations']),
 				'picto'      => 'fas fa-user-injured',
 				'widgetName' => $langs->transnoentities('Accident')
 			),
@@ -629,6 +632,55 @@ class Accident extends CommonObject
 			}
 		} else {
 			$array['nbaccidentsbyemployees'] = 'N/A';
+		}
+		return $array;
+	}
+
+	/**
+	 * Get number presqu'accidents.
+	 *
+	 * @return array
+	 * @throws Exception
+	 */
+	public function getNbPresquAccidents() {
+		global $langs;
+
+		$category = new Categorie($this->db);
+
+		// Number accidents presqu'accidents
+		$category->fetch(0, $langs->transnoentities('PresquAccident'));
+		$alltickets = $category->getObjectsInCateg(Categorie::TYPE_TICKET);
+		if (is_array($alltickets) && !empty($alltickets)) {
+			$array['nbpresquaccidents'] = count($alltickets);
+		} else {
+			$array['nbpresquaccidents'] = 'N/A';
+		}
+		return $array;
+	}
+
+	/**
+	 * Get number accident investigations.
+	 *
+	 * @return array
+	 * @throws Exception
+	 */
+	public function getNbAccidentInvestigations() {
+		// Number accident investigations
+		$allaccidents = $this->fetchAll();
+		if (is_array($allaccidents) && !empty($allaccidents)) {
+			$accidentmetadata = new AccidentMetaData($this->db);
+			foreach ($allaccidents as $accident) {
+				$filter = ' AND t.fk_accident = ' . $accident->id . ' AND t.status = 1 AND t.accident_investigation = 1';
+				$result = $accidentmetadata->fetch(0, '', $filter);
+				if ($result > 0) {
+					$nbaccidentinvestigations += 1;
+				} else {
+					$array['nbaccidentinvestigations'] = 'N/A';
+				}
+			}
+			$array['nbaccidentinvestigations'] = $nbaccidentinvestigations;
+		} else {
+			$array['nbaccidentinvestigations'] = 'N/A';
 		}
 		return $array;
 	}

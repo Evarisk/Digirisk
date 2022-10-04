@@ -594,6 +594,54 @@ class DigiriskDolibarr extends DolibarrApi
 	}
 
 	/**
+	 * Get number presqu'accidents.
+	 *
+	 * @param  integer       $entity Entity ID
+	 *
+	 * @return array                 All data for number presqu'accidents.
+	 *
+	 * @url    GET                   accident/getNbPresquAccidents
+	 *
+	 * @throws Exception
+	 * @throws RestException         401 Not allowed
+	 */
+	public function getNbPresquAccidents($entity = 1)
+	{
+		if (!DolibarrApiAccess::$user->rights->digiriskdolibarr->accident->read) {
+			throw new RestException(401);
+		}
+
+		$this->setConfEntity($entity);
+
+		$accident = new Accident($this->db);
+		return $accident->getNbPresquAccidents();
+	}
+
+	/**
+	 * Get number accident investigations.
+	 *
+	 * @param  integer       $entity Entity ID
+	 *
+	 * @return array                 All data for number accident investigations.
+	 *
+	 * @url    GET                   accident/getNbAccidentInvestigations
+	 *
+	 * @throws Exception
+	 * @throws RestException         401 Not allowed
+	 */
+	public function getNbAccidentInvestigations($entity = 1)
+	{
+		if (!DolibarrApiAccess::$user->rights->digiriskdolibarr->accident->read) {
+			throw new RestException(401);
+		}
+
+		$this->setConfEntity($entity);
+
+		$accident = new Accident($this->db);
+		return $accident->getNbAccidentInvestigations();
+	}
+
+	/**
 	 * Get frequency index (number accidents with DIAT by employees) x 1000.
 	 *
 	 * @param  integer       $entity Entity ID
