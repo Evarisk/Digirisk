@@ -2290,7 +2290,7 @@ window.eoxiaJS.evaluation.saveEvaluation = function ( event ) {
 
 	let evaluationText = element.find('.risk-evaluation-comment textarea').val()
 
-	let elementParent = $(this).closest('.risk-evaluation-container').find('.risk-evaluations-list-content');
+	let elementParent = $(this).closest('.risk-row').find('.risk-evaluations-list-content');
 	let riskId = elementParent.attr('value');
 	let evaluationRef =  $('.risk-evaluation-ref-'+evaluationID).attr('value');
 	let listModalContainer = $('.risk-evaluation-list-modal-'+riskId)
@@ -2343,16 +2343,22 @@ window.eoxiaJS.evaluation.saveEvaluation = function ( event ) {
 		}),
 		contentType: false,
 		success: function ( resp ) {
-
 			if (fromList) {
-				listModalContainer.find('.risk-evaluation-ref-'+evaluationID).html($(resp).find('.risk-evaluation-ref-'+evaluationID).children())
 				$('.risk-evaluation-ref-'+evaluationID+':not(.last-risk-assessment)').fadeOut(800);
 				$('.risk-evaluation-ref-'+evaluationID+':not(.last-risk-assessment)').fadeIn(800);
 			} else {
-				$('.risk-evaluation-container-'+evaluationID+':not(.last-risk-assessment)').html($(resp).find('.risk-evaluation-container-'+evaluationID+':not(.last-risk-assessment)').children())
 				$('.risk-evaluation-container-'+evaluationID+':not(.last-risk-assessment)').fadeOut(800);
 				$('.risk-evaluation-container-'+evaluationID+':not(.last-risk-assessment)').fadeIn(800);
 			}
+			//refresh risk assessment single in modal list
+			listModalContainer.find('.risk-evaluation-ref-'+evaluationID).html($(resp).find('.risk-evaluation-ref-'+evaluationID).children())
+
+			//refresh risk assessment single in list
+			$('.risk-evaluation-container.risk-evaluation-container-'+evaluationID+':not(.last-risk-assessment)').html($(resp).find('.risk-evaluation-container.risk-evaluation-container-'+evaluationID+':not(.last-risk-assessment)').children())
+
+			//refresh risk assessment add modal to actualize last risk assessment
+			$('#risk_evaluation_add' + riskId).html($(resp).find('#risk_evaluation_add' + riskId).children())
+
 			$('.wpeo-loader').removeClass('wpeo-loader')
 			let actionContainerSuccess = $('.messageSuccessEvaluationEdit');
 
