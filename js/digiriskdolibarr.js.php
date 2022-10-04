@@ -1414,27 +1414,39 @@ window.eoxiaJS.mediaGallery.sendPhoto = function( event ) {
 			processData: false,
 			contentType: false,
 			success: function (resp) {
-				progress += (1 / totalCount) * 100
-				$('#myBar').animate({
-					width: progress + '%'
-				}, 300);
-				if (index + 1 === totalCount) {
-					elementParent.load( document.URL + '&uploadMediasSuccess=1' + ' .ecm-photo-list', () => {
-						setTimeout(() => {
-							$('#myProgress').fadeOut(800)
-							$('.wpeo-loader').removeClass('wpeo-loader');
-							$('#myProgress').find('.loader-spin').remove();
-						}, 800)
-					});
-					actionContainerSuccess.removeClass('hidden');
+				if ($(resp).find('.error-medias')) {
+					let response = $(resp).find('.error-medias').val()
+					let decoded_response = JSON.parse(response)
+					$('#myBar').width('100%')
+					$('#myBar').css('background-color','red')
+					$('.wpeo-loader').removeClass('wpeo-loader');
+
+					let textToShow = '';
+					textToShow += decoded_response.message
+
+					actionContainerError.find('.notice-subtitle').text(textToShow)
+
+					actionContainerError.removeClass('hidden');
+
+				} else {
+					progress += (1 / totalCount) * 100
+					$('#myBar').animate({
+						width: progress + '%'
+					}, 300);
+					if (index + 1 === totalCount) {
+						elementParent.load( document.URL + '&uploadMediasSuccess=1' + ' .ecm-photo-list', () => {
+							setTimeout(() => {
+								$('#myProgress').fadeOut(800)
+								$('.wpeo-loader').removeClass('wpeo-loader');
+								$('#myProgress').find('.loader-spin').remove();
+							}, 800)
+						});
+						actionContainerSuccess.removeClass('hidden');
+					}
 				}
 			},
 			error : function (resp) {
-				$('#myBar').animate({
-					backgroundColor: 'red'
-				}, 300);
-				$('.wpeo-loader').removeClass('wpeo-loader');
-				actionContainerError.removeClass('hidden');
+
 			}
 		});
 	})

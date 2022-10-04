@@ -12,8 +12,12 @@ if ( ! $error && $action == "uploadPhoto" && ! empty($conf->global->MAIN_UPLOAD_
 			$error++;
 			if ($_FILES['userfile']['error'][$key] == 1 || $_FILES['userfile']['error'][$key] == 2) {
 				setEventMessages($langs->trans('ErrorFileSizeTooLarge'), null, 'errors');
+				$submit_file_error_text = array('message' => $langs->trans('ErrorFileSizeTooLarge'), 'code' => '1337');
+
 			} else {
 				setEventMessages($langs->trans("ErrorFieldRequired", $langs->transnoentitiesnoconv("File")), null, 'errors');
+				$submit_file_error_text = array('message' => $langs->trans('ErrorFieldRequired'), 'code' => '1337');
+
 			}
 		}
 	}
@@ -39,7 +43,12 @@ if ( ! $error && $action == "uploadPhoto" && ! empty($conf->global->MAIN_UPLOAD_
 		background-color: green;
 	}
 </style>
+<?php
 
+if (is_array($submit_file_error_text)) {
+	print '<input class="error-medias" value="'. htmlspecialchars(json_encode($submit_file_error_text)) .'">';
+}
+?>
 <!-- START MEDIA GALLERY MODAL -->
 <div class="wpeo-modal modal-photo" id="media_gallery" data-id="<?php echo $object->id ?>">
 	<div class="modal-container wpeo-modal-event">
@@ -62,6 +71,7 @@ if ( ! $error && $action == "uploadPhoto" && ! empty($conf->global->MAIN_UPLOAD_
 				<div class="wpeo-notice notice-warning send-photo-error-notice">
 					<div class="notice-content">
 						<div class="notice-title"><?php echo $langs->trans('PhotoNotSent') ?></div>
+						<div class="notice-subtitle"></div>
 					</div>
 					<div class="notice-close"><i class="fas fa-times"></i></div>
 				</div>

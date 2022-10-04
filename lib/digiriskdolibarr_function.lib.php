@@ -818,8 +818,10 @@ function display_recurse_tree($results)
 				$error++;
 				if ($_FILES['userfile']['error'][$key] == 1 || $_FILES['userfile']['error'][$key] == 2) {
 					setEventMessages($langs->trans('ErrorFileSizeTooLarge'), null, 'errors');
+					$submit_file_error_text = array('message' => $langs->trans('ErrorFileSizeTooLarge'), 'code' => '1337');
 				} else {
 					setEventMessages($langs->trans("ErrorFieldRequired", $langs->transnoentitiesnoconv("File")), null, 'errors');
+					$submit_file_error_text = array('message' => $langs->trans('ErrorFieldRequired'), 'code' => '1337');
 				}
 			}
 		}
@@ -841,13 +843,16 @@ function display_recurse_tree($results)
 	$workunit_prefix = dol_strlen($mod_workunit->prefix) > 0 ? $mod_workunit->prefix : $conf->global->DIGIRISKDOLIBARR_WORKUNIT_CANOPUS_ADDON;
 	$workunit_prefix = preg_match('/{/',$workunit_prefix) ? preg_split('/{/', $workunit_prefix)[0] : $workunit_prefix;
 
+	if (is_array($submit_file_error_text)) {
+		print '<input class="error-medias" value="'. htmlspecialchars(json_encode($submit_file_error_text)) .'">';
+	}
+
 	if ($user->rights->digiriskdolibarr->digiriskelement->read) {
 		if ( ! empty($results)) {
 			foreach ($results as $element) { ?>
 				<?php if ($element['object']->id == $conf->global->DIGIRISKDOLIBARR_DIGIRISKELEMENT_TRASH) : ?>
 				<hr>
 				<?php endif; ?>
-
 			<li class="unit type-<?php echo $element['object']->element_type; ?>" id="unit<?php  echo $element['object']->id; ?>">
 				<div class="unit-container">
 					<?php if ($element['object']->element_type == 'groupment' && count($element['children'])) { ?>
