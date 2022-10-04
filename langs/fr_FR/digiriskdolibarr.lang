@@ -1591,3 +1591,7 @@ UseDateRange = Utiliser la plage de dates
 SiretNumber = N°Siret
 Society = Société
 MulticompanyTransverseModeEnabled = La gestion centralisée des utilisateurs et des groupes sur l'entité principale est activée.<br>Vous ne pouvez donc pas créer d'utilisateur ou de groupe sur cette entité.<br>Veuillez vous rendre sur l'entité principale pour réaliser cet ajout.
+ManuelInputNBEmployees = Saisir manuellement le nombre de salariés
+ManuelInputNBEmployeesDescription = Si l'option est activée, saisir manuellement le nombre de salariés ce passe dans la configuration de la société.<br>Sinon le nombre de salariés est calculé.<br>Consulter la documentation pour plus d'informations.
+ManuelInputNBWorkedHours = Saisir manuellement le nombre d'heures travaillées
+ManuelInputNBWorkedHoursDescription = Si l'option est activée, saisir manuellement le nombre d'heures travaillées ce passe dans la configuration de la société.<br>Sinon le nombre d'heures travaillées est calculé.<br>Consulter la documentation pour plus d'informations.

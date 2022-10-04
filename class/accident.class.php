@@ -513,9 +513,9 @@ class Accident extends CommonObject
 				'label'      => array($langs->transnoentities("FrequencyIndex"), $langs->transnoentities("FrequencyRate"), $langs->transnoentities("GravityRate")),
 				'content'    => array($arrayFrequencyIndex['frequencyindex'], $arrayFrequencyRate['frequencyrate'], $arrayGravityRate['gravityrate']),
 				'tooltip'    => array(
-					(($conf->global->DIGIRISKDOLIBARR_NB_WORKED_HOURS > 0) ? $langs->transnoentities("FrequencyIndexTooltip") . '<br>' . $langs->transnoentities("NbWorkedHoursTooltip") : $langs->transnoentities("FrequencyIndexTooltip")),
-					(($conf->global->DIGIRISKDOLIBARR_NB_WORKED_HOURS > 0) ? $langs->transnoentities("FrequencyRateTooltip") . '<br>' . $langs->transnoentities("NbWorkedHoursTooltip") : $langs->transnoentities("FrequencyRateTooltip")),
-					(($conf->global->DIGIRISKDOLIBARR_NB_WORKED_HOURS > 0) ? $langs->transnoentities("GravityRateTooltip") . '<br>' . $langs->transnoentities("NbWorkedHoursTooltip") : $langs->transnoentities("GravityRateTooltip"))
+					(($conf->global->DIGIRISKDOLIBARR_NB_WORKED_HOURS > 0 && $conf->global->DIGIRISKDOLIBARR_MANUEL_INPUT_NB_WORKED_HOURS) ? $langs->transnoentities("FrequencyIndexTooltip") . '<br>' . $langs->transnoentities("NbWorkedHoursTooltip") : $langs->transnoentities("FrequencyIndexTooltip")),
+					(($conf->global->DIGIRISKDOLIBARR_NB_WORKED_HOURS > 0 && $conf->global->DIGIRISKDOLIBARR_MANUEL_INPUT_NB_WORKED_HOURS) ? $langs->transnoentities("FrequencyRateTooltip") . '<br>' . $langs->transnoentities("NbWorkedHoursTooltip") : $langs->transnoentities("FrequencyRateTooltip")),
+					(($conf->global->DIGIRISKDOLIBARR_NB_WORKED_HOURS > 0 && $conf->global->DIGIRISKDOLIBARR_MANUEL_INPUT_NB_WORKED_HOURS) ? $langs->transnoentities("GravityRateTooltip") . '<br>' . $langs->transnoentities("NbWorkedHoursTooltip") : $langs->transnoentities("GravityRateTooltip"))
 				),
 				'picto'      => 'fas fa-chart-bar',
 				'widgetName' => $langs->transnoentities('AccidentRateIndicator')

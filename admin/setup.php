@@ -169,6 +169,28 @@ print '<td class="center">';
 print ajax_constantonoff('DIGIRISKDOLIBARR_TOOLS_ADVANCED_IMPORT');
 print '</td>';
 print '</tr>';
+
+// Manuel input number employees
+print '<tr class="oddeven"><td>';
+print  $langs->trans("ManuelInputNBEmployees");
+print '</td><td>';
+print $langs->trans('ManuelInputNBEmployeesDescription');
+print '</td>';
+print '<td class="center">';
+print ajax_constantonoff('DIGIRISKDOLIBARR_MANUEL_INPUT_NB_EMPLOYEES');
+print '</td>';
+print '</tr>';
+
+// Manuel input number worked hours
+print '<tr class="oddeven"><td>';
+print  $langs->trans("ManuelInputNBWorkedHours");
+print '</td><td>';
+print $langs->trans('ManuelInputNBWorkedHoursDescription');
+print '</td>';
+print '<td class="center">';
+print ajax_constantonoff('DIGIRISKDOLIBARR_MANUEL_INPUT_NB_WORKED_HOURS');
+print '</td>';
+print '</tr>';
 print '</table>';
 
 print load_fiche_titre($langs->trans("MediaData"), '', '');

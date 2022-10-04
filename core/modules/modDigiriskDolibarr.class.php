@@ -667,10 +667,8 @@ class modDigiriskdolibarr extends DolibarrModules
 			282 => array('DIGIRISKDOLIBARR_MEDIA_MAX_WIDTH_LARGE', 'integer', 1280, '', 0, 'current'),
 			283 => array('DIGIRISKDOLIBARR_MEDIA_MAX_HEIGHT_LARGE', 'integer', 720, '', 0, 'current'),
 			284 => array('DIGIRISKDOLIBARR_CUSTOM_DOCUMENTS_SET', 'integer', 0, '', 0, 'current'),
-
-			// CONST SIGNATURE
-			285 => array('DIGIRISKDOLIBARR_SIGNATURE_ENABLE_PUBLIC_INTERFACE', 'integer', 1, '', 0, 'current'),
-			286 => array('DIGIRISKDOLIBARR_SIGNATURE_SHOW_COMPANY_LOGO', 'integer', 1, '', 0, 'current'),
+			285 => array('DIGIRISKDOLIBARR_MANUEL_INPUT_NB_EMPLOYEES', 'integer', 0, '', 0, 'current'),
+			286 => array('DIGIRISKDOLIBARR_MANUEL_INPUT_NB_WORKED_HOURS', 'integer', 0, '', 0, 'current'),
 
 			//CONST TICKET & REGISTERS
 			290 => array('DIGIRISKDOLIBARR_TICKET_EXTRAFIELDS', 'integer', 0, '', 0, 0),
@@ -725,6 +723,10 @@ class modDigiriskdolibarr extends DolibarrModules
 			362 => array('DIGIRISKDOLIBARR_TOOLS_RISKS_ALREADY_IMPORTED', 'integer', 0, '', 0, 'current'),
 			363 => array('DIGIRISKDOLIBARR_TOOLS_RISKSIGNS_ALREADY_IMPORTED', 'integer', 0, '', 0, 'current'),
 			364 => array('DIGIRISKDOLIBARR_TOOLS_GLOBAL_ALREADY_IMPORTED', 'integer', 0, '', 0, 'current'),
+
+			// CONST SIGNATURE
+			370 => array('DIGIRISKDOLIBARR_SIGNATURE_ENABLE_PUBLIC_INTERFACE', 'integer', 1, '', 0, 'current'),
+			371 => array('DIGIRISKDOLIBARR_SIGNATURE_SHOW_COMPANY_LOGO', 'integer', 1, '', 0, 'current'),
 		);
 
 		if ( ! isset($conf->digiriskdolibarr) || ! isset($conf->digiriskdolibarr->enabled) ) {
