@@ -83,8 +83,8 @@ $related_tasks = $risk->get_related_tasks($risk); ?>
 													<input type="checkbox" id="" class="riskassessment-task-progress-checkbox<?php echo $related_task->id; echo($task_progress == 100) ? ' progress-checkbox-check' : ' progress-checkbox-uncheck' ?>" name="progress-checkbox" value="" <?php echo ($task_progress == 100) ? 'checked' : ''; ?>>
 												</span>
 											<?php endif; ?>
-											<span class="riskassessment-task-author-label">
-												<?php echo dol_trunc($related_task->label, 255, 'right', 'UTF-8', 0, $display = 1); ?>
+											<span class="riskassessment-task-author-label" title="<?php echo $related_task->label; ?>">
+												<?php echo dol_trunc($related_task->label, 255); ?>
 											</span>
 										</div>
 									</div>
@@ -148,7 +148,7 @@ $related_tasks = $risk->get_related_tasks($risk); ?>
 																<input type="checkbox" id="" class="riskassessment-task-progress-checkbox<?php echo $related_task->id ?>" name="progress-checkbox" value="" <?php echo ($task_progress == 100) ? 'checked' : ''; ?>>
 															</span>
 															<?php endif; ?>
-															<input type="text" class="riskassessment-task-author-label riskassessment-task-label<?php echo $related_task->id ?>" name="label" value="<?php echo $related_task->label ?>">
+															<input type="text" class="riskassessment-task-author-label riskassessment-task-label<?php echo $related_task->id ?>" name="label" value="<?php echo $related_task->label; ?>">
 														</div>
 														<hr>
 														<!-- RISKASSESSMENT TASK TIME SPENT NOTICE -->
@@ -431,8 +431,8 @@ $related_tasks = $risk->get_related_tasks($risk); ?>
 												<input type="checkbox" id="" class="riskassessment-task-progress-checkbox<?php echo $related_task->id; echo($task_progress == 100) ? ' progress-checkbox-check' : ' progress-checkbox-uncheck' ?>" name="progress-checkbox" value="" <?php echo ($task_progress == 100) ? 'checked' : ''; ?>>
 											</span>
 										<?php endif; ?>
-										<span class="riskassessment-task-author-label">
-											<?php echo dol_trunc($related_task->label, 48, 'wrap', 'UTF-8', 0, $display = 1); ?>
+										<span class="riskassessment-task-author-label" title="<?php echo $related_task->label; ?>">
+											<?php echo dol_trunc($related_task->label, 255); ?>
 										</span>
 									</div>
 								</div>
@@ -470,7 +470,7 @@ $related_tasks = $risk->get_related_tasks($risk); ?>
 										<div class="modal-content" id="#modalContent<?php echo $related_task->id ?>">
 											<div class="riskassessment-task-container">
 												<div class="riskassessment-task">
-													<span class="title"><?php echo $langs->trans('Label'); ?> <input type="text" class="riskassessment-task-label<?php echo $related_task->id ?>" name="label" value="<?php echo $related_task->label ?>"></span>
+													<span class="title"><?php echo $langs->trans('Label'); ?> <input type="text" class="riskassessment-task-label<?php echo $related_task->id ?>" name="label" value="<?php echo $related_task->label; ?>"></span>
 												</div>
 											</div>
 										</div>
@@ -668,8 +668,8 @@ $related_tasks = $risk->get_related_tasks($risk); ?>
 																		<input type="checkbox" id="" class="riskassessment-task-progress-checkbox<?php echo $related_task->id; echo($task_progress == 100) ? ' progress-checkbox-check' : ' progress-checkbox-uncheck' ?>" name="progress-checkbox" value="" <?php echo ($task_progress == 100) ? 'checked' : ''; ?>>
 																	</span>
 																<?php endif;?>
-																<span class="riskassessment-task-label">
-																	<?php echo dol_trunc($related_task->label, 48, 'wrap', 'UTF-8', 0, $display = 1); ?>
+																<span class="riskassessment-task-label" title="<?php echo $related_task->label; ?>">
+																	<?php echo dol_trunc($related_task->label, 255); ?>
 																</span>
 															</div>
 														</div>
@@ -706,7 +706,7 @@ $related_tasks = $risk->get_related_tasks($risk); ?>
 														<div class="modal-content" id="#modalContent<?php echo $related_task->id ?>">
 															<div class="riskassessment-task-container">
 																<div class="riskassessment-task">
-																	<span class="title"><?php echo $langs->trans('Label'); ?> <input type="text" class="riskassessment-task-label<?php echo $related_task->id ?>" name="label" value="<?php echo $related_task->label ?>"></span>
+																	<span class="title"><?php echo $langs->trans('Label'); ?> <input type="text" class="riskassessment-task-label<?php echo $related_task->id ?>" name="label" value="<?php echo $related_task->label; ?>"></span>
 																</div>
 															</div>
 														</div>
