@@ -2211,7 +2211,7 @@ window.eoxiaJS.evaluation.createEvaluation = function ( event ) {
  * @return {boolean}
  */
 window.eoxiaJS.evaluation.deleteEvaluation = function ( event ) {
-	let element = $(this).closest('.risk-evaluation');
+	let element = $(this).closest('.risk-evaluation-in-modal');
 	let deletedEvaluationId = element.attr('value');
 	let textToShowBeforeDelete = element.find('.labelForDelete').val();
 	let actionContainerSuccess = $('.messageSuccessEvaluationDelete');
@@ -2235,8 +2235,16 @@ window.eoxiaJS.evaluation.deleteEvaluation = function ( event ) {
 			processData: false,
 			contentType: false,
 			success: function ( resp ) {
-				$('.risk-evaluation' + evaluationID).fadeOut(400)
+				//remove risk assessment from list in modal
+				$('.risk-evaluation-container-' + evaluationID).fadeOut(400)
 
+				//refresh risk assessment list
+				$('.risk-evaluation-list-content-' + riskId).html($(resp).find('.risk-evaluation-list-content-' + riskId).children())
+
+				//refresh risk assessment add modal to actualize last risk assessment
+				$('#risk_evaluation_add' + riskId).html($(resp).find('#risk_evaluation_add' + riskId).children())
+
+				//update risk assessment counter
 				let evaluationCounterText = $('#risk_row_'+riskId).find('.table-cell-header-label').text()
 				let evaluationCounter = evaluationCounterText.split(/\(/)[1].split(/\)/)[0]
 				$('#risk_row_'+riskId).find('.table-cell-header-label').html('<strong>' + evaluationCounterText.split(/\(/)[0] + '(' + (+evaluationCounter - 1) + ')' + '</strong>')

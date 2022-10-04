@@ -3094,7 +3094,7 @@
   border: 0;
 }
 
-td > .risk-evaluation-container {
+td > .risk-evaluation-list-content .risk-evaluation-container:not(.advanced, .standard) {
   min-width: 340px;
   border: 1px solid rgba(0, 0, 0, 0.1);
   background: rgba(0, 0, 0, 0.05);

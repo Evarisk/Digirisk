@@ -455,7 +455,7 @@ print $langs->trans('ShowAllRiskAssessmentsDescription');
 print '</td>';
 
 print '<td class="center">';
-print ajax_constantonoff('DIGIRISKDOLIBARR_SHOW_ALL_RISKASESSMENTS');
+print ajax_constantonoff('DIGIRISKDOLIBARR_SHOW_ALL_RISKASSESSMENTS');
 print '</td>';
 print '</tr>';
 print '</table>';
