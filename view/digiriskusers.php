@@ -52,6 +52,7 @@ $langs->loadLangs(array('users', 'companies', 'hrm'));
 // Get parameters
 $action      = GETPOST('action', 'aZ09');
 $contextpage = GETPOST('contextpage', 'aZ') ? GETPOST('contextpage', 'aZ') : 'digiriskuserslist'; // To manage different context of search
+$backtopage  = GETPOST('backtopage', 'alpha');
 
 // Load mode employee
 $mode  = GETPOST("mode", 'alpha');
@@ -281,7 +282,8 @@ if ($action == 'add' && $canadduser && $permissiontoadd) {
 
 			$db->commit();
 
-			header("Location: " . $_SERVER['PHP_SELF'] . '?id=' . $id);
+			$urltogo = str_replace('USERID', $id, $backtopage);
+			header("Location: " . $urltogo);
 			exit;
 		} else {
 			$langs->load("errors");
@@ -777,6 +779,7 @@ if ($canadduser && (empty($conf->global->MULTICOMPANY_TRANSVERSE_MODE) || $conf-
 	print '<form action="' . $_SERVER['PHP_SELF'] . '" method="POST" name="createuser">';
 	print '<input type="hidden" name="token" value="' . newToken() . '">';
 	print '<input type="hidden" name="action" value="add">';
+	print '<input type="hidden" name="backtopage" value="' . $backtopage . '">';
 	if ( ! empty($ldap_sid)) print '<input type="hidden" name="ldap_sid" value="' . dol_escape_htmltag($ldap_sid) . '">';
 	print '<input type="hidden" name="entity" value="' . $conf->entity . '">';
 
@@ -784,7 +787,7 @@ if ($canadduser && (empty($conf->global->MULTICOMPANY_TRANSVERSE_MODE) || $conf-
 	$password           = (GETPOSTISSET('password') ? GETPOST('password') : $generated_password);
 
 	?>
-	<div class="digirisk-wrap wpeo-wrap digirisk-users" style="padding-right: 0 !important;">
+	<div class="digirisk-wrap wpeo-wrap digirisk-users" id="addUser" style="padding-right: 0 !important;">
 		<div class="main-container" style="width:auto;  margin-top:0 !important; padding-left:0 !important;">
 			<div class="wpeo-tab">
 				<div class="tab-container">
