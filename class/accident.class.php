@@ -489,7 +489,7 @@ class Accident extends CommonObject
 	 */
 	public function load_dashboard()
 	{
-		global $langs;
+		global $conf, $langs;
 
 		$arrayNbDaysWithoutAccident    = $this->getNbDaysWithoutAccident();
 		$arrayNbAccidents              = $this->getNbAccidents();
@@ -510,10 +510,14 @@ class Accident extends CommonObject
 				'widgetName' => $langs->transnoentities('Accident')
 			),
 			DashboardDigiriskStats::DASHBOARD_ACCIDENT_INDICATOR_RATE => array(
-				'label' => array($langs->transnoentities("FrequencyIndex"), $langs->transnoentities("FrequencyRate"), $langs->transnoentities("GravityRate")),
-				'content' => array($arrayFrequencyIndex['frequencyindex'], $arrayFrequencyRate['frequencyrate'], $arrayGravityRate['gravityrate']),
-				'tooltip' => array($langs->transnoentities("FrequencyIndexTooltip"), $langs->transnoentities("FrequencyRateTooltip"), $langs->transnoentities("GravityRateTooltip")),
-				'picto' => 'fas fa-chart-bar',
+				'label'      => array($langs->transnoentities("FrequencyIndex"), $langs->transnoentities("FrequencyRate"), $langs->transnoentities("GravityRate")),
+				'content'    => array($arrayFrequencyIndex['frequencyindex'], $arrayFrequencyRate['frequencyrate'], $arrayGravityRate['gravityrate']),
+				'tooltip'    => array(
+					(($conf->global->DIGIRISKDOLIBARR_NB_WORKED_HOURS > 0) ? $langs->transnoentities("FrequencyIndexTooltip") . '<br>' . $langs->transnoentities("NbWorkedHoursTooltip") : $langs->transnoentities("FrequencyIndexTooltip")),
+					(($conf->global->DIGIRISKDOLIBARR_NB_WORKED_HOURS > 0) ? $langs->transnoentities("FrequencyRateTooltip") . '<br>' . $langs->transnoentities("NbWorkedHoursTooltip") : $langs->transnoentities("FrequencyRateTooltip")),
+					(($conf->global->DIGIRISKDOLIBARR_NB_WORKED_HOURS > 0) ? $langs->transnoentities("GravityRateTooltip") . '<br>' . $langs->transnoentities("NbWorkedHoursTooltip") : $langs->transnoentities("GravityRateTooltip"))
+				),
+				'picto'      => 'fas fa-chart-bar',
 				'widgetName' => $langs->transnoentities('AccidentRateIndicator')
 			)
 		);

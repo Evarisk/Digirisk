@@ -646,6 +646,7 @@ GravityRate = Taux de gravité
 AccidentRateIndicator = Taux et indice des indicateurs de performance des accidents
 NbPresquAccidents = Nombre de presqu'accidents
 NbAccidentInvestigations = Nombre d'enquête accidents
+NbWorkedHours = Nombre d\'heures travaillées
 
 # AccidentTooltip - Tooltip des accidents
 VictimActivityTooltip = Précisez l’activité ou la tâche de la victime au moment de l’accident, c’est-à-dire ce que faisait la victime
@@ -659,6 +660,7 @@ ThirdPartyResponsabilityTooltip = Lorsque vous avez connaissance de l’implicat
 FrequencyIndexTooltip = Nombre d'accidents par salarié x 1 000
 FrequencyRateTooltip  = Nombre d'accidents par heures travaillées x 1 000 000
 GravityRateTooltip = Nombre de jours d'arrêt de travail par heures travaillées x 1 000
+NbWorkedHoursTooltip = Le nombre de heures travaillées a été saisi manuellement
 
 # Dictionnary - Dictionnaire
 UsualWorkplace = Lieu de travail habituel
@@ -1589,4 +1591,3 @@ UseDateRange = Utiliser la plage de dates
 SiretNumber = N°Siret
 Society = Société
 MulticompanyTransverseModeEnabled = La gestion centralisée des utilisateurs et des groupes sur l'entité principale est activée.<br>Vous ne pouvez donc pas créer d'utilisateur ou de groupe sur cette entité.<br>Veuillez vous rendre sur l'entité principale pour réaliser cet ajout.
-
