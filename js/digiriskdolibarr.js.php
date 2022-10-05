@@ -385,6 +385,7 @@ window.eoxiaJS.navigation.saveOrganization = function( event ) {
 			$('.wpeo-loader').addClass('button-disable')
 			$('.wpeo-loader').attr('style','background: #47e58e !important;border-color: #47e58e !important;')
 			$('.wpeo-loader').find('.fas.fa-check').attr('style', '')
+			$("a").attr("onclick", "").unbind("click");
 
 			$('.wpeo-loader').removeClass('wpeo-loader')
 		},
