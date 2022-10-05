@@ -1620,6 +1620,7 @@ window.eoxiaJS.mediaGallery.addToFavorite = function( event ) {
 
 				elementPhotos.each( function() {
 					$(this).find('.clicked-photo-preview').attr('src',newPhoto )
+					$(this).find('.clicked-photo-preview').hasClass('photodigiriskdolibarr') ? $(this).find('.clicked-photo-preview').removeClass('photodigiriskdolibarr').addClass('photo') : 0
 				});
 				saveButton.removeClass('button-disable')
 				$('.wpeo-loader').removeClass('wpeo-loader')
