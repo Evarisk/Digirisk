@@ -660,7 +660,7 @@ ThirdPartyResponsabilityTooltip = Lorsque vous avez connaissance de l’implicat
 FrequencyIndexTooltip = Nombre d'accidents par salarié x 1 000
 FrequencyRateTooltip  = Nombre d'accidents par heures travaillées x 1 000 000
 GravityRateTooltip = Nombre de jours d'arrêt de travail par heures travaillées x 1 000
-NbWorkedHoursTooltip = Le nombre de heures travaillées a été saisi manuellement
+NbWorkedHoursTooltip = Le nombre d'heures travaillées a été saisi manuellement
 
 # Dictionnary - Dictionnaire
 UsualWorkplace = Lieu de travail habituel
