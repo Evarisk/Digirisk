@@ -1544,7 +1544,7 @@ MediaMaxWidthLarge = Largeur du média large
 MediaMaxWidthLargeDescription = Largeur du média (dimension large) avec pour ratio 16:9
 MediaMaxHeightLarge = Hauteur du média large
 MediaMaxHeightLargeDescription = Hauteur du média (dimension large) avec pour ratio 16:9
-
+ErrorFileSizeTooLarge = Le fichier est trop volumineux
 
 
 #

@@ -1423,7 +1423,7 @@ window.eoxiaJS.mediaGallery.sendPhoto = function( event ) {
 					let response = $(resp).find('.error-medias').val()
 					let decoded_response = JSON.parse(response)
 					$('#myBar').width('100%')
-					$('#myBar').css('background-color','red')
+					$('#myBar').css('background-color','#e05353')
 					$('.wpeo-loader').removeClass('wpeo-loader');
 
 					let textToShow = '';
