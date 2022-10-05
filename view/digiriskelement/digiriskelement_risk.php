@@ -296,13 +296,13 @@ if ($sharedrisks) {
 				$importValue .= '</div>';
 
 				if ($alreadyImported > 0) {
-					$formquestionimportsharedrisks[] = array('type' => 'checkbox', 'name' => 'import_shared_risks' . '_S' . $risks->entity . '_' . $digiriskelementtmp->ref . '_' . $risks->ref, 'label' => $importValue . '<span class="importsharedrisk imported">' . $langs->trans('AlreadyImported') . '</span>', 'value' => 0, 'disabled' => 1);
+					$formquestionimportsharedrisks[] = array('type' => 'checkbox', 'name' => $risks->id, 'label' => $importValue . '<span class="importsharedrisk imported">' . $langs->trans('AlreadyImported') . '</span>', 'value' => 0, 'disabled' => 1);
 				} else {
-					$formquestionimportsharedrisks[] = array('type' => 'checkbox', 'name' => 'import_shared_risks' . '_S' . $risks->entity . '_' . $digiriskelementtmp->ref . '_' . $risks->ref, 'label' => $importValue, 'value' => 0);
+					$formquestionimportsharedrisks[] = array('type' => 'checkbox', 'name' => $risks->id, 'label' => $importValue, 'value' => 0);
 				}
 			}
 		}
-		$formconfirm .= $form->formconfirm($_SERVER["PHP_SELF"] . '?id=' . $object->id, $langs->trans('ImportSharedRisks'), '', 'confirm_import_shared_risks', $formquestionimportsharedrisks, 'yes', 'actionButtonImportSharedRisks', 800, 800);
+		$formconfirm .= digiriskformconfirm($_SERVER["PHP_SELF"] . '?id=' . $object->id, $langs->trans('ImportSharedRisks'), '', 'confirm_import_shared_risks', $formquestionimportsharedrisks, 'yes', 'actionButtonImportSharedRisks', 800, 800);
 	}
 
 	// Call Hook formConfirm

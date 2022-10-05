@@ -706,7 +706,7 @@ if ($action == 'confirm_import_shared_risks' && $confirm == 'yes') {
 
 	foreach ($allrisks as $key => $risks) {
 		$digiriskelementtmp->fetch($risks->fk_element);
-		$options['import_shared_risks'][$risks->id] = GETPOST('import_shared_risks'.'_S' . $risks->entity . '_' . $digiriskelementtmp->ref . '_' . $risks->ref);
+		$options['import_shared_risks'][$risks->id] = GETPOST($risks->id);
 
 		if ($options['import_shared_risks'][$risks->id] == 'on') {
 			if ($object->id > 0) {

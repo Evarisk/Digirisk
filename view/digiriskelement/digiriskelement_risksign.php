@@ -265,7 +265,7 @@ if (empty($reshook)) {
 
 		foreach ($allrisksigns as $key => $risksigns) {
 			$digiriskelementtmp->fetch($risksigns->fk_element);
-			$options['import_shared_risksigns'][$risksigns->id] = GETPOST('import_shared_risksigns'.'_S' . $risksigns->entity . '_' . $digiriskelementtmp->ref . '_' . $risksigns->ref);
+			$options['import_shared_risksigns'][$risksigns->id] = GETPOST($risksigns->id);
 
 			if ($options['import_shared_risksigns'][$risksigns->id] == 'on') {
 				if ($object->id > 0) {
@@ -380,14 +380,14 @@ if ($sharedrisksigns) {
 				$importValue .= '</div>';
 
 				if ($alreadyImported > 0) {
-					$formquestionimportsharedrisksigns[] = array('type' => 'checkbox', 'name' => 'import_shared_risksigns' . '_S' . $risksigns->entity . '_' . $digiriskelementtmp->ref . '_' . $risksigns->ref, 'label' => $importValue . '<span class="importsharedrisksigns imported">' . $langs->trans('AlreadyImported') . '</span>', 'value' => 0, 'disabled' => 1);
+					$formquestionimportsharedrisksigns[] = array('type' => 'checkbox', 'name' => $risksigns->id, 'label' => $importValue . '<span class="importsharedrisksigns imported">' . $langs->trans('AlreadyImported') . '</span>', 'value' => 0, 'disabled' => 1);
 				} else {
-					$formquestionimportsharedrisksigns[] = array('type' => 'checkbox', 'name' => 'import_shared_risksigns' . '_S' . $risksigns->entity . '_' . $digiriskelementtmp->ref . '_' . $risksigns->ref, 'label' => $importValue, 'value' => 0);
+					$formquestionimportsharedrisksigns[] = array('type' => 'checkbox', 'name' => $risksigns->id, 'label' => $importValue, 'value' => 0);
 				}
 			}
 
 		}
-		$formconfirm .= $form->formconfirm($_SERVER["PHP_SELF"] . '?id=' . $object->id, $langs->trans('ImportSharedRiskSigns'), '', 'confirm_import_shared_risksigns', $formquestionimportsharedrisksigns, 'yes', 'actionButtonImportSharedRiskSigns', 800, 800);
+		$formconfirm .= digiriskformconfirm($_SERVER["PHP_SELF"] . '?id=' . $object->id, $langs->trans('ImportSharedRiskSigns'), '', 'confirm_import_shared_risksigns', $formquestionimportsharedrisksigns, 'yes', 'actionButtonImportSharedRiskSigns', 800, 800);
 	}
 
 	// Call Hook formConfirm
