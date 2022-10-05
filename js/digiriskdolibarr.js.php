@@ -1405,17 +1405,21 @@ window.eoxiaJS.mediaGallery.sendPhoto = function( event ) {
 	$('#myBar').width(0)
     $('#myProgress').attr('style', 'display:block')
 	window.eoxiaJS.loader.display($('#myProgress'));
+	let querySeparator = '?'
+	document.URL.match(/\?/) ? querySeparator = '&' : 1
+
 	$.each(files, function(index, file) {
 		let formdata = new FormData();
 		formdata.append("userfile[]", file);
+		//@to
 		$.ajax({
-			url: document.URL + "&action=uploadPhoto&uploadMediasSuccess=1&token=" + token,
+			url: document.URL + querySeparator + "action=uploadPhoto&uploadMediasSuccess=1&token=" + token,
 			type: "POST",
 			data: formdata,
 			processData: false,
 			contentType: false,
 			success: function (resp) {
-				if ($(resp).find('.error-medias')) {
+				if ($(resp).find('.error-medias').length) {
 					let response = $(resp).find('.error-medias').val()
 					let decoded_response = JSON.parse(response)
 					$('#myBar').width('100%')
@@ -1435,7 +1439,7 @@ window.eoxiaJS.mediaGallery.sendPhoto = function( event ) {
 						width: progress + '%'
 					}, 300);
 					if (index + 1 === totalCount) {
-						elementParent.load( document.URL + '&uploadMediasSuccess=1' + ' .ecm-photo-list', () => {
+						elementParent.load( document.URL + querySeparator + 'uploadMediasSuccess=1' + ' .ecm-photo-list', () => {
 							setTimeout(() => {
 								$('#myProgress').fadeOut(800)
 								$('.wpeo-loader').removeClass('wpeo-loader');
