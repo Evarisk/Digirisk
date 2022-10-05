@@ -1128,6 +1128,17 @@ class InterfaceDigiriskdolibarrTriggers extends DolibarrTriggers
 					$digiriskelement->fetch($object->fk_element);
 					$risk->fetch($object->array_options['options_fk_risk']);
 
+					if ($conf->global->DIGIRISKDOLIBARR_SHOW_TASK_CALCULATED_PROGRESS) {
+						$timeSpent = $object->getSummaryOfTimeSpent();
+						if ($timeSpent['total_duration'] > 0 && !empty($object->planned_workload)) {
+							$task_progress = round($timeSpent['total_duration'] / $object->planned_workload * 100, 2);
+						} else {
+							$task_progress = 0;
+						}
+					} else {
+						(!empty($object->progress) ? $task_progress = $object->progress : $task_progress = 0);
+					}
+
 					$actioncomm->elementtype = 'digiriskelement@digiriskdolibarr';
 					$actioncomm->code = 'AC_TASK_CREATE';
 					$actioncomm->type_code = 'AC_OTH_AUTO';
@@ -1136,6 +1147,7 @@ class InterfaceDigiriskdolibarrTriggers extends DolibarrTriggers
 					$actioncomm->note_private .= $langs->trans('Entity') . ' : ' . $conf->entity . '<br>';
 					$actioncomm->note_private .= $langs->trans('TechnicalID') . ' : ' . $object->id . '<br>';
 					$actioncomm->note_private .= $langs->trans('Label') . ' : ' . $object->label . '<br>';
+					$actioncomm->note_private .= $langs->trans('Progress') . ' : ' . $task_progress . '<br>';
 					$actioncomm->note_private .= $langs->trans('DateCreation') . ' : ' . dol_print_date($object->date_c, 'dayhoursec', 'tzuser') . '<br>';
 					$actioncomm->datep = $now;
 					$actioncomm->fk_element = $risk->fk_element;
@@ -1159,6 +1171,17 @@ class InterfaceDigiriskdolibarrTriggers extends DolibarrTriggers
 					$digiriskelement->fetch($object->fk_element);
 					$risk->fetch($object->array_options['options_fk_risk']);
 
+					if ($conf->global->DIGIRISKDOLIBARR_SHOW_TASK_CALCULATED_PROGRESS) {
+						$timeSpent = $object->getSummaryOfTimeSpent();
+						if ($timeSpent['total_duration'] > 0 && !empty($object->planned_workload)) {
+							$task_progress = round($timeSpent['total_duration'] / $object->planned_workload * 100, 2);
+						} else {
+							$task_progress = 0;
+						}
+					} else {
+						(!empty($object->progress) ? $task_progress = $object->progress : $task_progress = 0);
+					}
+
 					$actioncomm->elementtype = 'digiriskelement@digiriskdolibarr';
 					$actioncomm->code = 'AC_TASK_MODIFY';
 					$actioncomm->type_code = 'AC_OTH_AUTO';
@@ -1167,6 +1190,7 @@ class InterfaceDigiriskdolibarrTriggers extends DolibarrTriggers
 					$actioncomm->note_private .= $langs->trans('Entity') . ' : ' . $conf->entity . '<br>';
 					$actioncomm->note_private .= $langs->trans('TechnicalID') . ' : ' . $object->id . '<br>';
 					$actioncomm->note_private .= $langs->trans('Label') . ' : ' . $object->label . '<br>';
+					$actioncomm->note_private .= $langs->trans('Progress') . ' : ' . $task_progress . '<br>';
 					$actioncomm->note_private .= $langs->trans('DateCreation') . ' : ' . dol_print_date($object->date_c, 'dayhoursec', 'tzuser') . '<br>';
 					$actioncomm->note_private .= $langs->trans('DateModification') . ' : ' . dol_print_date($now, 'dayhoursec', 'tzuser') . '<br>';
 					$actioncomm->datep = $now;
@@ -1191,6 +1215,17 @@ class InterfaceDigiriskdolibarrTriggers extends DolibarrTriggers
 					$digiriskelement->fetch($object->fk_element);
 					$risk->fetch($object->array_options['options_fk_risk']);
 
+					if ($conf->global->DIGIRISKDOLIBARR_SHOW_TASK_CALCULATED_PROGRESS) {
+						$timeSpent = $object->getSummaryOfTimeSpent();
+						if ($timeSpent['total_duration'] > 0 && !empty($object->planned_workload)) {
+							$task_progress = round($timeSpent['total_duration'] / $object->planned_workload * 100, 2);
+						} else {
+							$task_progress = 0;
+						}
+					} else {
+						(!empty($object->progress) ? $task_progress = $object->progress : $task_progress = 0);
+					}
+
 					$actioncomm->elementtype = 'digiriskelement@digiriskdolibarr';
 					$actioncomm->code = 'AC_TASK_DELETE';
 					$actioncomm->type_code = 'AC_OTH_AUTO';
@@ -1199,6 +1234,7 @@ class InterfaceDigiriskdolibarrTriggers extends DolibarrTriggers
 					$actioncomm->note_private .= $langs->trans('Entity') . ' : ' . $conf->entity . '<br>';
 					$actioncomm->note_private .= $langs->trans('TechnicalID') . ' : ' . $object->id . '<br>';
 					$actioncomm->note_private .= $langs->trans('Label') . ' : ' . $object->label . '<br>';
+					$actioncomm->note_private .= $langs->trans('Progress') . ' : ' . $task_progress . '<br>';
 					$actioncomm->note_private .= $langs->trans('DateCreation') . ' : ' . dol_print_date($object->date_c, 'dayhoursec', 'tzuser') . '<br>';
 					$actioncomm->note_private .= $langs->trans('DateModification') . ' : ' . dol_print_date($now, 'dayhoursec', 'tzuser') . '<br>';
 					$actioncomm->datep = $now;
