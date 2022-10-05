@@ -959,7 +959,6 @@ ActionsOnÉvaluateur = Événements liés au évaluateur
 EvaluatorCreateTrigger = Évaluateur %s créé
 EvaluatorModifyTrigger = Évaluateur %s modifié
 EvaluatorDeleteTrigger = Évaluateur %s supprimé
-PostOrFunction = Poste ou fonction
 
 # Mod Numbering - Modèle de numérotation
 DigiriskEvaluatorNumberingModule = Modèle de numérotation des évaluateurs de Digirisk
@@ -1118,7 +1117,6 @@ BlackRisk = Risque inacceptable
 RiskAssessmentCreateTrigger = Évaluation %s créée
 RiskAssessmentModifyTrigger = Évaluation %s modifiée
 RiskAssessmentDeleteTrigger = Évaluation %s supprimée
-ParentRisk = Risque parent
 RiskAssessmentDate = Date création du risque
 
 # Mod Numbering - Modèle de numérotation
@@ -1153,6 +1151,7 @@ RiskAssessmentList = Liste des évaluations du risque
 EditRiskAssessment = Editer l'évaluation
 ShowAllRiskAssessments = Voir toutes les évaluations
 ShowAllRiskAssessmentsDescription = Afficher la liste complète des évaluations des risques dans la liste des risques
+ParentRisk = Risque parent
 
 SimpleCotation = Cotation simple
 AdvancedCotation = Cotation avancée
@@ -1243,9 +1242,9 @@ TaskTimeSpentCreateTrigger = Temps consommé créé
 TaskTimeSpentModifyTrigger = Temps consommé modifié
 TaskTimeSpentDeleteTrigger = Temps consommé supprimé
 TaskCompleted = Tâche %s complétée
-TaskCreated = Tâche %s créée
-TaskModified = Tâche %s modifée
-TaskDeleted = Tâche %s supprimée
+TaskCreateTrigger = Tâche %s créée
+TaskModifyTrigger = Tâche %s modifée
+TaskDeleteTrigger = Tâche %s supprimée
 
 # Data - Donnée
 ActionPlan = Plan d'action
