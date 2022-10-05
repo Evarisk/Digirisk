@@ -1119,6 +1119,7 @@ RiskAssessmentCreateTrigger = Évaluation %s créée
 RiskAssessmentModifyTrigger = Évaluation %s modifiée
 RiskAssessmentDeleteTrigger = Évaluation %s supprimée
 ParentRisk = Risque parent
+RiskAssessmentDate = Date création du risque
 
 # Mod Numbering - Modèle de numérotation
 DigiriskRiskAssessmentStandardModel = Renvoie le numéro sous la forme RAn où n est un compteur séquentiel sans rupture et sans remise à 0.

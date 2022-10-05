@@ -1215,25 +1215,23 @@ class InterfaceDigiriskdolibarrTriggers extends DolibarrTriggers
 				$actioncomm->type_code	 = 'AC_OTH_AUTO';
 				$actioncomm->label		 = $langs->transnoentities('RiskAssessmentCreateTrigger', $refRiskAssessmentMod->getLastValue($object));
 
-				$object->method == 'standard' ?
-				$match = '/RefExt|ImportId|UserAuthor|UserModif|DateModification|RiskAssessmentDate|Tasks|Photo|Evaluation|Gravity|Protection|Occurrence|Formation|Exposition/' :
-				$match = '/RefExt|ImportId|UserAuthor|UserModif|DateModification|RiskAssessmentDate|Tasks|Photo/';
-				foreach($object->fields as $key => $field) {
-					if (preg_match($match, $field['label']) === 0) {
-						if ($field['label'] == 'Ref') {
-							$actioncomm->note_private .= $langs->trans($field['label']) . ' : ' . $refRiskAssessmentMod->getLastValue($object) . '<br>';
-						} else if ($field['label'] == 'ParentRisk') {
-							$actioncomm->note_private .= $langs->trans($field['label']) . ' : ' . $risk->ref . '<br>';
-						} else if ($field['label'] == 'DateCreation')  {
-							$actioncomm->note_private .= $langs->trans($field['label']) . ' : ' . dol_print_date($now, 'dayhoursec', 'tzuser') . '<br>';
-						} else if ($field['label'] == 'TechnicalID') {
-							$actioncomm->note_private .= $langs->trans($field['label']) . ' : ' . $object->id . '<br>';
-						} else if ($field['label'] == 'Comment') {
-							$actioncomm->note_private .= $langs->trans($field['label']) . ' : ' . (!empty($object->comment) ? $object->comment : 'N/A') . '<br>';
-						} else {
-							$actioncomm->note_private .= $langs->trans($field['label']) . ' : ' . $object->$key . '<br>';
-						}
-					}
+				$actioncomm->note_private .= $langs->trans('ParentRisk') . ' : ' . $risk->ref . '<br>';
+				$actioncomm->note_private .= $langs->trans('Ref') . ' : ' . $refRiskAssessmentMod->getLastValue($object) . '<br>';
+				$actioncomm->note_private .= $langs->trans('Entity') . ' : ' . $conf->entity . '<br>';
+				$actioncomm->note_private .= $langs->trans('TechnicalID') . ' : ' . $object->id . '<br>';
+				$actioncomm->note_private .= $langs->trans('Comment') . ' : ' . (!empty($object->comment) ? $object->comment : 'N/A') . '<br>';
+				$actioncomm->note_private .= $langs->trans('DateCreation') . ' : ' . dol_print_date($now, 'dayhoursec', 'tzuser') . '<br>';
+				$actioncomm->note_private .= $langs->trans('RiskAssessmentDate') . ' : ' . dol_print_date($risk->date_creation, 'dayhoursec', 'tzuser') . '<br>';
+				$actioncomm->note_private .= $langs->trans('Photo') . ' : ' . (!empty($object->photo) ? $object->photo : 'N/A') . '<br>';
+				$actioncomm->note_private .= $langs->trans('Status') . ' : ' . $object->status . '<br>';
+				if ($object->method == 'advanced')
+				{
+					$actioncomm->note_private .= $langs->trans('Evaluation') . ' : ' . $object->cotation . '<br>';
+					$actioncomm->note_private .= $langs->trans('Gravity') . ' : ' . $object->gravite . '<br>';
+					$actioncomm->note_private .= $langs->trans('Protection') . ' : ' . $object->protection . '<br>';
+					$actioncomm->note_private .= $langs->trans('Occurrence') . ' : ' . $object->occurrence . '<br>';
+					$actioncomm->note_private .= $langs->trans('Formation') . ' : ' . $object->formation . '<br>';
+					$actioncomm->note_private .= $langs->trans('Exposition') . ' : ' . $object->exposition . '<br>';
 				}
 				$actioncomm->datep       = $now;
 				$actioncomm->fk_element  = $risk->fk_element;
@@ -1261,27 +1259,24 @@ class InterfaceDigiriskdolibarrTriggers extends DolibarrTriggers
 				$actioncomm->type_code   = 'AC_OTH_AUTO';
 				$actioncomm->label       = $langs->transnoentities('RiskAssessmentModifyTrigger', $object->ref);
 
-				$object->method == 'standard' ?
-					$match = '/RefExt|ImportId|UserAuthor|UserModif|RiskAssessmentDate|Tasks|Photo|Evaluation|Gravity|Protection|Occurrence|Formation|Exposition/' :
-					$match = '/RefExt|ImportId|UserAuthor|UserModif|RiskAssessmentDate|Tasks|Photo/';
-				foreach($object->fields as $key => $field) {
-					if (preg_match($match, $field['label']) === 0) {
-						if ($field['label'] == 'Ref') {
-							$actioncomm->note_private .= $langs->trans($field['label']) . ' : ' . $object->ref . '<br>';
-						} else if ($field['label'] == 'ParentRisk') {
-							$actioncomm->note_private .= $langs->trans($field['label']) . ' : ' . $risk->ref . '<br>';
-						} else if ($field['label'] == 'DateCreation') {
-							$actioncomm->note_private .= $langs->trans($field['label']) . ' : ' . dol_print_date($object->date_creation, 'dayhoursec', 'tzuser') . '<br>';
-						} else if ($field['label'] == 'DateModification') {
-							$actioncomm->note_private .= $langs->trans($field['label']) . ' : ' . dol_print_date($now, 'dayhoursec', 'tzuser') . '<br>';
-						} else if ($field['label'] == 'TechnicalID') {
-							$actioncomm->note_private .= $langs->trans($field['label']) . ' : ' . $object->id . '<br>';
-						} else if ($field['label'] == 'Comment') {
-							$actioncomm->note_private .= $langs->trans($field['label']) . ' : ' . (!empty($object->comment) ? $object->comment : 'N/A') . '<br>';
-						} else {
-							$actioncomm->note_private .= $langs->trans($field['label']) . ' : ' . $object->$key . '<br>';
-						}
-					}
+				$actioncomm->note_private .= $langs->trans('ParentRisk') . ' : ' . $risk->ref . '<br>';
+				$actioncomm->note_private .= $langs->trans('Ref') . ' : ' . $object->ref . '<br>';
+				$actioncomm->note_private .= $langs->trans('Entity') . ' : ' . $conf->entity . '<br>';
+				$actioncomm->note_private .= $langs->trans('TechnicalID') . ' : ' . $object->id . '<br>';
+				$actioncomm->note_private .= $langs->trans('Comment') . ' : ' . (!empty($object->comment) ? $object->comment : 'N/A') . '<br>';
+				$actioncomm->note_private .= $langs->trans('DateCreation') . ' : ' . dol_print_date($object->date_creation, 'dayhoursec', 'tzuser') . '<br>';
+				$actioncomm->note_private .= $langs->trans('DateModification') . ' : ' . dol_print_date($now, 'dayhoursec', 'tzuser') . '<br>';
+				$actioncomm->note_private .= $langs->trans('RiskAssessmentDate') . ' : ' . dol_print_date($risk->date_creation, 'dayhoursec', 'tzuser') . '<br>';
+				$actioncomm->note_private .= $langs->trans('Photo') . ' : ' . (!empty($object->photo) ? $object->photo : 'N/A') . '<br>';
+				$actioncomm->note_private .= $langs->trans('Status') . ' : ' . $object->status . '<br>';
+				if ($object->method == 'advanced')
+				{
+					$actioncomm->note_private .= $langs->trans('Evaluation') . ' : ' . $object->cotation . '<br>';
+					$actioncomm->note_private .= $langs->trans('Gravity') . ' : ' . $object->gravite . '<br>';
+					$actioncomm->note_private .= $langs->trans('Protection') . ' : ' . $object->protection . '<br>';
+					$actioncomm->note_private .= $langs->trans('Occurrence') . ' : ' . $object->occurrence . '<br>';
+					$actioncomm->note_private .= $langs->trans('Formation') . ' : ' . $object->formation . '<br>';
+					$actioncomm->note_private .= $langs->trans('Exposition') . ' : ' . $object->exposition . '<br>';
 				}
 				$actioncomm->datep       = $now;
 				$actioncomm->fk_element  = $risk->fk_element;
@@ -1309,27 +1304,24 @@ class InterfaceDigiriskdolibarrTriggers extends DolibarrTriggers
 				$actioncomm->type_code   = 'AC_OTH_AUTO';
 				$actioncomm->label       = $langs->transnoentities('RiskAssessmentDeleteTrigger', $object->ref);
 
-				$object->method == 'standard' ?
-					$match = '/RefExt|ImportId|UserAuthor|UserModif|RiskAssessmentDate|Tasks|Photo|Evaluation|Gravity|Protection|Occurrence|Formation|Exposition/' :
-					$match = '/RefExt|ImportId|UserAuthor|UserModif|RiskAssessmentDate|Tasks|Photo/';
-				foreach($object->fields as $key => $field) {
-					if (preg_match($match, $field['label']) === 0) {
-						if ($field['label'] == 'Ref') {
-							$actioncomm->note_private .= $langs->trans($field['label']) . ' : ' . $object->ref . '<br>';
-						} else if ($field['label'] == 'ParentRisk') {
-							$actioncomm->note_private .= $langs->trans($field['label']) . ' : ' . $risk->ref . '<br>';
-						} else if ($field['label'] == 'DateCreation') {
-							$actioncomm->note_private .= $langs->trans($field['label']) . ' : ' . dol_print_date($object->date_creation, 'dayhoursec', 'tzuser') . '<br>';
-						} else if ($field['label'] == 'DateModification') {
-							$actioncomm->note_private .= $langs->trans($field['label']) . ' : ' . dol_print_date($now, 'dayhoursec', 'tzuser') . '<br>';
-						} else if ($field['label'] == 'TechnicalID') {
-							$actioncomm->note_private .= $langs->trans($field['label']) . ' : ' . $object->id . '<br>';
-						} else if ($field['label'] == 'Comment') {
-							$actioncomm->note_private .= $langs->trans($field['label']) . ' : ' . (!empty($object->comment) ? $object->comment : 'N/A') . '<br>';
-						} else {
-							$actioncomm->note_private .= $langs->trans($field['label']) . ' : ' . $object->$key . '<br>';
-						}
-					}
+				$actioncomm->note_private .= $langs->trans('ParentRisk') . ' : ' . $risk->ref . '<br>';
+				$actioncomm->note_private .= $langs->trans('Ref') . ' : ' . $object->ref . '<br>';
+				$actioncomm->note_private .= $langs->trans('Entity') . ' : ' . $conf->entity . '<br>';
+				$actioncomm->note_private .= $langs->trans('TechnicalID') . ' : ' . $object->id . '<br>';
+				$actioncomm->note_private .= $langs->trans('Comment') . ' : ' . (!empty($object->comment) ? $object->comment : 'N/A') . '<br>';
+				$actioncomm->note_private .= $langs->trans('DateCreation') . ' : ' . dol_print_date($object->date_creation, 'dayhoursec', 'tzuser') . '<br>';
+				$actioncomm->note_private .= $langs->trans('DateModification') . ' : ' . dol_print_date($now, 'dayhoursec', 'tzuser') . '<br>';
+				$actioncomm->note_private .= $langs->trans('RiskAssessmentDate') . ' : ' . dol_print_date($risk->date_creation, 'dayhoursec', 'tzuser') . '<br>';
+				$actioncomm->note_private .= $langs->trans('Photo') . ' : ' . (!empty($object->photo) ? $object->photo : 'N/A') . '<br>';
+				$actioncomm->note_private .= $langs->trans('Status') . ' : ' . $object->status . '<br>';
+				if ($object->method == 'advanced')
+				{
+					$actioncomm->note_private .= $langs->trans('Evaluation') . ' : ' . $object->cotation . '<br>';
+					$actioncomm->note_private .= $langs->trans('Gravity') . ' : ' . $object->gravite . '<br>';
+					$actioncomm->note_private .= $langs->trans('Protection') . ' : ' . $object->protection . '<br>';
+					$actioncomm->note_private .= $langs->trans('Occurrence') . ' : ' . $object->occurrence . '<br>';
+					$actioncomm->note_private .= $langs->trans('Formation') . ' : ' . $object->formation . '<br>';
+					$actioncomm->note_private .= $langs->trans('Exposition') . ' : ' . $object->exposition . '<br>';
 				}
 				$actioncomm->datep       = $now;
 				$actioncomm->fk_element  = $risk->fk_element;
