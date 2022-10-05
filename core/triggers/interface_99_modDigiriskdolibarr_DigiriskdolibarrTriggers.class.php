@@ -306,7 +306,7 @@ class InterfaceDigiriskdolibarrTriggers extends DolibarrTriggers
 				$actioncomm->elementid   = $object->id;
 				$actioncomm->code        = 'AC_DIGIRISKELEMENT_CREATE';
 				$actioncomm->type_code   = 'AC_OTH_AUTO';
-				$actioncomm->label       = $langs->transnoentities($object->element_type . 'CreatedWithDolibarr', $refDigiriskElementMod->getLastValue($object));
+				$actioncomm->label       = $langs->transnoentities($object->element_type . 'CreateTrigger', $refDigiriskElementMod->getLastValue($object));
 				$actioncomm->note_private .= $langs->trans('Ref') . ' : ' . $refDigiriskElementMod->getLastValue($object) . '<br/>';
 				$actioncomm->note_private .= $langs->trans('Label') . ' : ' . $object->label . '<br/>';
 				$actioncomm->note_private .= $langs->trans('Entity') . ' : ' . $conf->entity . '<br>';
