@@ -296,11 +296,25 @@ class InterfaceDigiriskdolibarrTriggers extends DolibarrTriggers
 				$now        = dol_now();
 				$actioncomm = new ActionComm($this->db);
 
+				if ($object->element_type == 'groupment') {
+					$refDigiriskElementMod = new $conf->global->DIGIRISKDOLIBARR_GROUPMENT_ADDON;
+				} else if ($object->element_type == 'workunit') {
+					$refDigiriskElementMod = new $conf->global->DIGIRISKDOLIBARR_WORKUNIT_ADDON;
+				}
+
 				$actioncomm->elementtype = 'digiriskelement@digiriskdolibarr';
 				$actioncomm->elementid   = $object->id;
 				$actioncomm->code        = 'AC_DIGIRISKELEMENT_CREATE';
 				$actioncomm->type_code   = 'AC_OTH_AUTO';
-				$actioncomm->label       = $langs->transnoentities($object->element_type . 'CreatedWithDolibarr');
+				$actioncomm->label       = $langs->transnoentities($object->element_type . 'CreatedWithDolibarr', $refDigiriskElementMod->getLastValue($object));
+				$actioncomm->note_private .= $langs->trans('Ref') . ' : ' . $refDigiriskElementMod->getLastValue($object) . '<br/>';
+				$actioncomm->note_private .= $langs->trans('Label') . ' : ' . $object->label . '<br/>';
+				$actioncomm->note_private .= $langs->trans('Entity') . ' : ' . $conf->entity . '<br>';
+				$actioncomm->note_private .= $langs->trans('TechnicalID') . ' : ' . $object->id . '<br>';
+				$actioncomm->note_private .= $langs->trans('Description') . ' : ' . (!empty($object->description) ? $object->description : 'N/A') . '<br>';
+				$actioncomm->note_private .= $langs->trans('Photo') . ' : ' . (!empty($object->photo) ? $object->photo : 'N/A') . '<br>';
+				$actioncomm->note_private .= $langs->trans('DateCreation') . ' : ' . dol_print_date($now, 'dayhoursec', 'tzuser') . '<br>';
+				$actioncomm->note_private .= $langs->trans('ElementType') . ' : ' . $langs->trans($object->element_type) . '<br>';
 				$actioncomm->datep       = $now;
 				$actioncomm->fk_element  = $object->id;
 				$actioncomm->userownerid = $user->id;
@@ -1570,9 +1584,9 @@ class InterfaceDigiriskdolibarrTriggers extends DolibarrTriggers
 
 				$actioncomm->code        = 'AC_ACCIDENT_CREATE';
 				$actioncomm->type_code   = 'AC_OTH_AUTO';
-				$actioncomm->label       = $langs->transnoentities('AccidentCreateTrigger', $refAccidentMod->getNextValue($object));
+				$actioncomm->label       = $langs->transnoentities('AccidentCreateTrigger', $refAccidentMod->getLastValue($object));
 				$actioncomm->note_private .= $langs->trans('Label') . ' : ' . $object->label . '<br>';
-				$actioncomm->note_private .= $langs->trans('Ref') . ' : ' . $refAccidentMod->getNextValue($object) . '<br>';
+				$actioncomm->note_private .= $langs->trans('Ref') . ' : ' . $refAccidentMod->getLastValue($object) . '<br>';
 				$actioncomm->note_private .= $langs->trans('TechnicalID') . ' : ' . $object->id . '<br>';
 				$actioncomm->note_private .= $langs->trans('Entity') . ' : ' . getEntity($object->element) . '<br>';
 				$actioncomm->note_private .= $langs->trans('Description') . ' : ' . (!empty($object->description) ? $object->description : 'N/A') . '<br>';
