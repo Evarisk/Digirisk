@@ -1291,8 +1291,9 @@ window.eoxiaJS.mediaGallery.savePhoto = function( event ) {
 
 				//Update risk assessment main img in "photo" of risk assessment modal
 				riskAssessmentPhoto.each( function() {
-					$(this).find('.clicked-photo-preview').attr('src',newPhoto )
+					$(this).find('.clicked-photo-preview').attr('src',newPhoto)
 					$(this).find('.filename').attr('value', favorite)
+					$(this).find('.clicked-photo-preview').hasClass('photodigiriskdolibarr') ? $(this).find('.clicked-photo-preview').removeClass('photodigiriskdolibarr').addClass('photo') : 0
 				});
 
 				//Remove special chars from img
