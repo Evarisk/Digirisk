@@ -477,7 +477,7 @@ if ($object->id > 0 || $fromid > 0) {
 									print '<table><tr>';
 									print '<td>';
 									print $form->selectarray('fk_user_employer', $userlist, (GETPOST('userid') ? GETPOST('userid') : $usertmp->id), $langs->trans('SelectUser'), null, null, null, "40%", 0, 0, '', 'minwidth300', 1);
-									print ' <a href="' . dol_buildpath('custom/digiriskdolibarr/view/digiriskusers?backtopage=' . urlencode($_SERVER["PHP_SELF"] . '?id=' . $id . '&userid=USERID&modalactive=1') . '#addUser', 1) . '" target="_blank"><span class="fa fa-plus-circle valignmiddle paddingleft" title="' . $langs->trans("AddUser") . '"></span></a>';
+									print ' <a href="' . dol_buildpath('custom/digiriskdolibarr/view/digiriskusers?backtopage=' . urlencode($_SERVER["PHP_SELF"] . '?id=' . $id . '&userid=USERID&modalactive=1') . '#addUser', 1) . '"><span class="fa fa-plus-circle valignmiddle paddingleft" title="' . $langs->trans("AddUser") . '"></span></a>';
 									print '</td></tr></table>';
 									?>
 
