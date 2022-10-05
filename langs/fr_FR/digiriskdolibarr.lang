@@ -907,8 +907,7 @@ ShowInSelectOnPublicTicketInterface = Doit apparaître dans la liste des éléme
 # Trigger - Déclencheur
 GROUPMENT_CREATEInDolibarr = Groupement créé dans Dolibarr
 ActionsOnGroupment = Événements liés au groupement
-groupmentCreatedWithDolibarr = Groupement %s créé
-workunitCreatedWithDolibarr = Unité de travail %s créée
+groupmentCreateTrigger = Groupement %s créé
 
 # Mod Numbering - Modèle de numérotation
 DigiriskGroupmentNumberingModule = Modèle de numérotation des groupements de Digirisk
@@ -931,6 +930,7 @@ ShowDeletedDigiriskElement = Afficher les groupements / unités de travail qui s
 # Trigger - Déclencheur
 WORKUNIT_CREATEInDolibarr = Unité de travail créée dans Dolibarr
 ActionsOnWorkUnit = Événements liés au unité de travail
+workunitCreateTrigger = Unité de travail %s créée
 
 # Mod Numbering - Modèle de numérotation
 DigiriskWorkUnitNumberingModule = Modèle de numérotation des unités de travail de Digirisk
