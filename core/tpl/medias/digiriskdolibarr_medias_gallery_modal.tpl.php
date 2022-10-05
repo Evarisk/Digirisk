@@ -68,7 +68,7 @@ if (is_array($submit_file_error_text)) {
 				</div>
 			</div>
 			<div class="messageErrorSendPhoto notice hidden">
-				<div class="wpeo-notice notice-warning send-photo-error-notice">
+				<div class="wpeo-notice notice-error send-photo-error-notice">
 					<div class="notice-content">
 						<div class="notice-title"><?php echo $langs->trans('PhotoNotSent') ?></div>
 						<div class="notice-subtitle"></div>
