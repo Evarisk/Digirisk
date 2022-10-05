@@ -990,7 +990,7 @@ EvaluatorDuration = Durée de l'évalution par l'évaluateur
 EvaluatorDurationDescription = Le temps que met l'évaluateur à réaliser son évaluation des risques
 NbEmployeesInvolved = Nombre de salariés impliqués
 NbEmployees = Nombre de salariés
-NbEmployeesInvolvedTooltip = Nombre de salariés (evaluateurs) unique
+NbEmployeesInvolvedTooltip = Nombre de salariés (évaluateurs) uniques
 NbEmployeesTooltip = Si la gestion centralisée des utilisateurs et des groupes sur l'entité principale est activée.<br>Le nombre de salariés correspond au nombre d'utilisateurs partagés/affectés à un groupe et aussi au nombre d'administrateur de l'entité principale
 NbEmployeesConfTooltip = Le nombre de salariés a été saisi manuellement
 
@@ -1592,6 +1592,6 @@ SiretNumber = N°Siret
 Society = Société
 MulticompanyTransverseModeEnabled = La gestion centralisée des utilisateurs et des groupes sur l'entité principale est activée.<br>Vous ne pouvez donc pas créer d'utilisateur ou de groupe sur cette entité.<br>Veuillez vous rendre sur l'entité principale pour réaliser cet ajout.
 ManuelInputNBEmployees = Saisir manuellement le nombre de salariés
-ManuelInputNBEmployeesDescription = Si l'option est activée, saisir manuellement le nombre de salariés ce passe dans la configuration de la société.<br>Sinon le nombre de salariés est calculé.<br>Consulter la documentation pour plus d'informations.
+ManuelInputNBEmployeesDescription = Si l'option est activée, vous pouvez saisir manuellement le nombre de salariés dans la configuration de la société.<br>Sinon le nombre de salariés est calculé.<br>Consulter la documentation pour plus d'informations.
 ManuelInputNBWorkedHours = Saisir manuellement le nombre d'heures travaillées
-ManuelInputNBWorkedHoursDescription = Si l'option est activée, saisir manuellement le nombre d'heures travaillées ce passe dans la configuration de la société.<br>Sinon le nombre d'heures travaillées est calculé.<br>Consulter la documentation pour plus d'informations.
+ManuelInputNBWorkedHoursDescription = Si l'option est activée, vous pouvez saisir manuellement le nombre d'heures travaillées dans la configuration de la société.<br>Sinon le nombre d'heures travaillées est calculé.<br>Consulter la documentation pour plus d'informations.
