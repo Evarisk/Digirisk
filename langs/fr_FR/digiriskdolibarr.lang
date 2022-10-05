@@ -524,8 +524,8 @@ AccidentGeneratedWithDolibarr = Accident généré avec Dolibarr
 AccidentWorkStopCreateTrigger = Un arrêt de travail a été ajouté à l'accident
 AccidentWorkStopModifyTrigger = Un arrêt de travail a été modifié sur l'accident
 AccidentWorkStopDeleteTrigger = Un arrêt de travail a été suprimmé de l'accident
-AccidentModifyTrigger = Modification de l'accident %s
-AccidentDeleteTrigger = Suppression de l'accident %s
+AccidentModifyTrigger = Accident %s modifié
+AccidentDeleteTrigger = Accident %s supprimé
 AccidentMetaDataCreateTrigger = Enregistrement des données complémentaires de l'accident
 AccidentLesionCreateTrigger = Une lésion a été ajoutée à l'accident
 AccidentLesionModifyTrigger = Une lésion a été modifiée sur l'accident
@@ -1118,6 +1118,7 @@ BlackRisk = Risque inacceptable
 RiskAssessmentCreateTrigger = Évaluation %s créée
 RiskAssessmentModifyTrigger = Évaluation %s modifiée
 RiskAssessmentDeleteTrigger = Évaluation %s supprimée
+ParentRisk = Risque parent
 
 # Mod Numbering - Modèle de numérotation
 DigiriskRiskAssessmentStandardModel = Renvoie le numéro sous la forme RAn où n est un compteur séquentiel sans rupture et sans remise à 0.
@@ -1241,7 +1242,7 @@ TaskTimeSpentCreateTrigger = Temps consommé créé
 TaskTimeSpentModifyTrigger = Temps consommé modifié
 TaskTimeSpentDeleteTrigger = Temps consommé supprimé
 TaskCompleted = Tâche %s complétée
-TaskCreated = Tâche %s crée
+TaskCreated = Tâche %s créée
 TaskModified = Tâche %s modifée
 TaskDeleted = Tâche %s supprimée
 
