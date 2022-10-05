@@ -524,8 +524,8 @@ AccidentGeneratedWithDolibarr = Accident généré avec Dolibarr
 AccidentWorkStopCreateTrigger = Un arrêt de travail a été ajouté à l'accident
 AccidentWorkStopModifyTrigger = Un arrêt de travail a été modifié sur l'accident
 AccidentWorkStopDeleteTrigger = Un arrêt de travail a été suprimmé de l'accident
-AccidentModifyTrigger = Modification de l'accident %s
-AccidentDeleteTrigger = Suppression de l'accident %s
+AccidentModifyTrigger = Accident %s modifié
+AccidentDeleteTrigger = Accident %s supprimé
 AccidentMetaDataCreateTrigger = Enregistrement des données complémentaires de l'accident
 AccidentLesionCreateTrigger = Une lésion a été ajoutée à l'accident
 AccidentLesionModifyTrigger = Une lésion a été modifiée sur l'accident
@@ -1150,6 +1150,8 @@ RiskAssessmentList = Liste des évaluations du risque
 EditRiskAssessment = Editer l'évaluation
 ShowAllRiskAssessments = Voir toutes les évaluations
 ShowAllRiskAssessmentsDescription = Afficher la liste complète des évaluations des risques dans la liste des risques
+ParentRisk = Risque parent
+RiskAssessmentDate = Date de l'évaluation
 
 SimpleCotation = Cotation simple
 AdvancedCotation = Cotation avancée
@@ -1239,10 +1241,9 @@ DigiriskRiskSignData = Données configurables des signalisations
 TaskTimeSpentCreateTrigger = Temps consommé créé
 TaskTimeSpentModifyTrigger = Temps consommé modifié
 TaskTimeSpentDeleteTrigger = Temps consommé supprimé
-TaskCompleted = Tâche %s complétée
-TaskCreated = Tâche %s crée
-TaskModified = Tâche %s modifée
-TaskDeleted = Tâche %s supprimée
+TaskCreateTrigger = Tâche %s créée
+TaskModifyTrigger = Tâche %s modifée
+TaskDeleteTrigger = Tâche %s supprimée
 
 # Data - Donnée
 ActionPlan = Plan d'action
