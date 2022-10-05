@@ -192,6 +192,7 @@ abstract class ModeleODTRiskAssessmentDocument extends CommonDocGenerator
 					$digiriskelementobject = new DigiriskElement($this->db);
 					$digiriskelementlist   = $digiriskelementobject->fetchDigiriskElementFlat(0);
 					$risk                  = new Risk($this->db);
+					$riskassessment        = new RiskAssessment($this->db);
 					$ticket                = new Ticket($this->db);
 					$risks                 = $risk->fetchRisksOrderedByCotation(0, true, $conf->global->DIGIRISKDOLIBARR_SHOW_INHERITED_RISKS_IN_DOCUMENTS, $conf->global->DIGIRISKDOLIBARR_SHOW_SHARED_RISKS);
 
@@ -242,8 +243,7 @@ abstract class ModeleODTRiskAssessmentDocument extends CommonDocGenerator
 							$digiriskelementrisks = $risk->fetchFromParent($digiriskelementsingle['object']->id);
 							if ($digiriskelementrisks > 0 && ! empty($digiriskelementrisks)) {
 								foreach ($digiriskelementrisks as $line) {
-									$evaluation      = new RiskAssessment($this->db);
-									$lastEvaluation  = $evaluation->fetchFromParent($line->id, 1);
+									$lastEvaluation  = $riskassessment->fetchFromParent($line->id, 1);
 									if ($lastEvaluation > 0 && ! empty($lastEvaluation) && is_array($lastEvaluation)) {
 										$lastEvaluation = array_shift($lastEvaluation);
 										$totalQuotation += $lastEvaluation->cotation;
@@ -260,8 +260,7 @@ abstract class ModeleODTRiskAssessmentDocument extends CommonDocGenerator
 									if ($digiriskelementtmp->linkedObjectsIds['digiriskdolibarr_digiriskelement'] > 0 && is_array($digiriskelementtmp->linkedObjectsIds['digiriskdolibarr_digiriskelement'])) {
 										$digiriskelementLinkedId = array_values($digiriskelementtmp->linkedObjectsIds['digiriskdolibarr_digiriskelement']);
 										if (in_array($digiriskelementsingle['object']->id, $digiriskelementLinkedId)) {
-											$evaluation = new RiskAssessment($this->db);
-											$lastEvaluation = $evaluation->fetchFromParent($riskline->id, 1);
+											$lastEvaluation = $riskassessment->fetchFromParent($riskline->id, 1);
 											if ($lastEvaluation > 0 && !empty($lastEvaluation) && is_array($lastEvaluation)) {
 												$lastEvaluation = array_shift($lastEvaluation);
 												$totalQuotation += $lastEvaluation->cotation;
@@ -274,7 +273,7 @@ abstract class ModeleODTRiskAssessmentDocument extends CommonDocGenerator
 							}
 
 							$elementName                   = (!empty($conf->global->DIGIRISKDOLIBARR_SHOW_SHARED_RISKS) ? 'S' . $digiriskelementsingle['object']->entity . ' - ' : '') . $digiriskelementsingle['object']->ref . ' ' . $digiriskelementsingle['object']->label;
-							$scaleCounterWithoutSharedRisk = $digiriskelementsingle['object']->getRiskAssessmentCategoriesNumber();
+							$scaleCounterWithoutSharedRisk = $riskassessment->getRiskAssessmentCategoriesNumber($digiriskelementsingle['object']->id);
 
 							foreach ($scale_counter as $key => $value) {
 								$final_scale_counter[$key] = $scale_counter[$key] + $scaleCounterWithoutSharedRisk[$key];

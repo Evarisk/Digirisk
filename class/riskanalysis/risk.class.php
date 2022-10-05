@@ -26,6 +26,7 @@ require_once DOL_DOCUMENT_ROOT . '/core/class/commonobject.class.php';
 require_once __DIR__ . '/../../lib/digiriskdolibarr_function.lib.php';
 require_once __DIR__ . '/../digiriskelement.class.php';
 require_once __DIR__ . '/../digirisktask.class.php';
+require_once __DIR__ . '/riskassessment.class.php';
 
 /**
  * Class for Risk
@@ -715,7 +716,7 @@ class Risk extends CommonObject
 		// Risks by cotation
 		global $langs;
 
-		$digiriskelement = new DigiriskElement($this->db);
+		$riskassessment = new RiskAssessment($this->db);
 		$array['title'] = $langs->transnoentities('RisksRepartition');
 		$array['picto'] = '<i class="fas fa-exclamation-triangle"></i>';
 		$array['labels'] = array(
@@ -736,7 +737,7 @@ class Risk extends CommonObject
 				'color' => '#2b2b2b'
 			),
 		);
-		$array['data'] = $digiriskelement->getRiskAssessmentCategoriesNumber();
+		$array['data'] = $riskassessment->getRiskAssessmentCategoriesNumber();
 		return $array;
 	}
 }

@@ -23,6 +23,8 @@
 
 require_once DOL_DOCUMENT_ROOT . '/core/class/commonobject.class.php';
 
+require_once __DIR__ . '/risk.class.php';
+
 /**
  * Class for RiskAssessment
  */
@@ -355,5 +357,40 @@ class RiskAssessment extends CommonObject
 			default :
 				return -1;
 		}
+	}
+
+	/**
+	 * Get riskassessment categories number
+	 *
+	 * @param  int       $digiriskelementID Digiriskelement ID
+	 * @return array
+	 * @throws Exception
+	 */
+	public function getRiskAssessmentCategoriesNumber($digiriskelementID = 0)
+	{
+		$risk = new Risk($this->db);
+		if ($digiriskelementID > 0) {
+			$risks = $risk->fetchFromParent($digiriskelementID);
+		} else {
+			$risks = $risk->fetchRisksOrderedByCotation(0, true, false, true);
+		}
+
+		$scale_counter = array(
+			1 => 0,
+			2 => 0,
+			3 => 0,
+			4 => 0
+		);
+		if (!empty($risks) && $risks > 0) {
+			foreach ($risks as $risk) {
+				$arrayRiskassessment = $this->fetchFromParent($risk->id, 1);
+				if ( ! empty($arrayRiskassessment) && $arrayRiskassessment > 0 && is_array($arrayRiskassessment)) {
+					$riskassessment         = array_shift($arrayRiskassessment);
+					$scale                  = $riskassessment->get_evaluation_scale();
+					$scale_counter[$scale] += 1;
+				}
+			}
+		}
+		return $scale_counter;
 	}
 }
