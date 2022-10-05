@@ -57,7 +57,7 @@ if ( ! empty($allRiskAssessment) && $allRiskAssessment > 0) :
 									</span>
 									<span class="risk-evaluation-author">
 										<?php $user->fetch($lastEvaluation->fk_user_creat); ?>
-										<?php echo getNomUrl(0, '', 0, 0, 2, 0, '', '', -1, $user); ?>
+										<?php echo getNomUrlUser($user); ?>
 									</span>
 								</div>
 								<div class="risk-evaluation-comment">
@@ -315,7 +315,7 @@ if ( ! empty($allRiskAssessment) && $allRiskAssessment > 0) :
 								</span>
 								 <span class="risk-evaluation-author">
 									<?php $user->fetch($lastEvaluation->fk_user_creat); ?>
-									<?php echo getNomUrl(0, '', 0, 0, 2, 0, '', '', -1, $user); ?>
+									<?php echo getNomUrlUser($user); ?>
 								</span>
 							 </div>
 							 <div class="risk-evaluation-comment">
@@ -636,7 +636,7 @@ if ( ! empty($allRiskAssessment) && $allRiskAssessment > 0) :
 												</span>
 												<span class="risk-evaluation-author">
 													<?php $user->fetch($lastEvaluation->fk_user_creat); ?>
-													<?php echo getNomUrl(0, '', 0, 0, 2, 0, '', '', -1, $user); ?>
+													<?php echo getNomUrlUser($user); ?>
 												</span>
 											</div>
 											<div class="risk-evaluation-comment">
@@ -909,7 +909,7 @@ $evaluation->method = $evaluation->method ?: "standard" ;
 										</span>
 										<span class="risk-evaluation-author">
 											<?php $user->fetch($lastEvaluation->fk_user_creat); ?>
-											<?php echo getNomUrl(0, '', 0, 0, 2, 0, '', '', -1, $user); ?>
+											<?php echo getNomUrlUser($user); ?>
 										</span>
 									</div>
 									<div class="risk-evaluation-comment">

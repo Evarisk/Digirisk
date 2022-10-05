@@ -479,12 +479,12 @@ while ($i < ($limit ? min($num, $limit) : $num)) {
 			} elseif ($key == 'fk_user_employer') {
 				$usertmp->fetch($accident->fk_user_employer);
 				if ($usertmp > 0) {
-					print getNomUrl(1, 'blank', 0, 0, 0, 0, '', '', -1, $usertmp, 0);
+					print getNomUrlUser($usertmp, 1, 'blank', 0, 0, 0, 0, '', '', -1, 0);
 				}
 			} elseif ($key == 'fk_user_victim') {
 				$usertmp->fetch($accident->fk_user_victim);
 				if ($usertmp > 0) {
-					print getNomUrl(1, 'blank', 0, 0, 0, 0, '', '', -1, $usertmp, 0);
+					print getNomUrlUser($usertmp, 1, 'blank', 0, 0, 0, 0, '', '', -1, 0);
 				}
 			} elseif ($key == 'accident_type') {
 				if ($accident->accident_type == 0) {

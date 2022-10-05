@@ -123,15 +123,15 @@ class DigiriskTask extends Task
 	/**
 	 *	Return clickable name (with picto eventually)
 	 *
-	 * @param $task
-	 * @param	int		$withpicto		0=No picto, 1=Include picto into link, 2=Only picto
-	 * @param	string	$option			'withproject' or ''
-	 * @param	string	$mode			Mode 'task', 'time', 'contact', 'note', document' define page to link to.
-	 * @param	int		$addlabel		0=Default, 1=Add label into string, >1=Add first chars into string
-	 * @param	string	$sep			Separator between ref and label if option addlabel is set
-	 * @param	int   	$notooltip		1=Disable tooltip
-	 * @param  int     $save_lastsearch_value    -1=Auto, 0=No save of lastsearch_values when clicking, 1=Save lastsearch_values whenclicking
-	 * @return	string					Chaine avec URL
+	 * @param  Task     $task                   Task object
+	 * @param  int		$withpicto		        0=No picto, 1=Include picto into link, 2=Only picto
+	 * @param  string	$option			        'withproject' or ''
+	 * @param  string	$mode			        Mode 'task', 'time', 'contact', 'note', document' define page to link to.
+	 * @param  int		$addlabel		        0=Default, 1=Add label into string, >1=Add first chars into string
+	 * @param  string	$sep					Separator between ref and label if option addlabel is set
+	 * @param  int   	$notooltip		        1=Disable tooltip
+	 * @param  int      $save_lastsearch_value  -1=Auto, 0=No save of lastsearch_values when clicking, 1=Save lastsearch_values whenclicking
+	 * @return string					        Chaine avec URL
 	 */
 	public function getNomUrlTask($task, $withpicto = 0, $option = '', $mode = 'task', $addlabel = 0, $sep = ' - ', $notooltip = 0, $save_lastsearch_value = -1)
 	{
