@@ -1348,7 +1348,7 @@ class InterfaceDigiriskdolibarrTriggers extends DolibarrTriggers
 				$actioncomm->code        = 'AC_EVALUATOR_CREATE';
 				$actioncomm->type_code   = 'AC_OTH_AUTO';
 				$actioncomm->label       = $langs->transnoentities('EvaluatorCreateTrigger', $object->ref_ext);
-				$actioncomm->note_private .= $langs->trans('ParentElement') . ' : ' . $object->fk_parent . '<br>';
+				$actioncomm->note_private .= $langs->trans('ParentElement') . ' : ' . $digiriskelement->ref . " - " . $digiriskelement->label . '<br>';
 				$actioncomm->note_private .= $langs->trans('Ref') . ' : ' . $object->ref_ext . '<br>';
 				$actioncomm->note_private .= $langs->trans('Entity') . ' : ' . $conf->entity . '<br>';
 				$actioncomm->note_private .= $langs->trans('TechnicalID') . ' : ' . $object->id . '<br>';
@@ -1381,7 +1381,7 @@ class InterfaceDigiriskdolibarrTriggers extends DolibarrTriggers
 				$actioncomm->code        = 'AC_EVALUATOR_MODIFY';
 				$actioncomm->type_code   = 'AC_OTH_AUTO';
 				$actioncomm->label       = $langs->transnoentities('EvaluatorModifyTrigger', $object->ref);
-				$actioncomm->note_private .= $langs->trans('ParentElement') . ' : ' . $object->fk_parent . '<br>';
+				$actioncomm->note_private .= $langs->trans('ParentElement') . ' : ' . $digiriskelement->ref . " - " . $digiriskelement->label . '<br>';
 				$actioncomm->note_private .= $langs->trans('Ref') . ' : ' . $object->ref . '<br>';
 				$actioncomm->note_private .= $langs->trans('Entity') . ' : ' . $conf->entity . '<br>';
 				$actioncomm->note_private .= $langs->trans('TechnicalID') . ' : ' . $object->id . '<br>';
@@ -1415,7 +1415,7 @@ class InterfaceDigiriskdolibarrTriggers extends DolibarrTriggers
 				$actioncomm->code        = 'AC_EVALUATOR_DELETE';
 				$actioncomm->type_code   = 'AC_OTH_AUTO';
 				$actioncomm->label       = $langs->transnoentities('EvaluatorDeleteTrigger', $object->ref);
-				$actioncomm->note_private .= $langs->trans('ParentElement') . ' : ' . $object->fk_parent . '<br>';
+				$actioncomm->note_private .= $langs->trans('ParentElement') . ' : ' . $digiriskelement->ref . " - " . $digiriskelement->label . '<br>';
 				$actioncomm->note_private .= $langs->trans('Ref') . ' : ' . $object->ref . '<br>';
 				$actioncomm->note_private .= $langs->trans('Entity') . ' : ' . $conf->entity . '<br>';
 				$actioncomm->note_private .= $langs->trans('TechnicalID') . ' : ' . $object->id . '<br>';
