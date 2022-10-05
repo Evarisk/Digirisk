@@ -368,11 +368,13 @@ class RiskAssessment extends CommonObject
 	 */
 	public function getRiskAssessmentCategoriesNumber($digiriskelementID = 0)
 	{
+		global $conf;
+
 		$risk = new Risk($this->db);
 		if ($digiriskelementID > 0) {
 			$risks = $risk->fetchFromParent($digiriskelementID);
 		} else {
-			$risks = $risk->fetchRisksOrderedByCotation(0, false, false, true);
+			$risks = $risk->fetchRisksOrderedByCotation(0, true, $conf->global->DIGIRISKDOLIBARR_SHOW_INHERITED_RISKS_IN_LISTINGS, $conf->global->DIGIRISKDOLIBARR_SHOW_SHARED_RISKS);
 		}
 
 		$scale_counter = array(
