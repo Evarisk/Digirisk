@@ -736,7 +736,7 @@ else : ?>
 $lastEvaluation         = new RiskAssessment($db);
 $lastEvaluation         = $evaluation->fetchFromParent($risk->id, 1);
 $lastEvaluation         = array_shift($lastEvaluation);
-$evaluation->method = $evaluation->method ?: "standard" ;
+$evaluation->method = $lastEvaluation->method ?: "standard" ;
 ?>
 <!-- RISK EVALUATION ADD MODAL-->
 <div class="risk-evaluation-add-modal">
