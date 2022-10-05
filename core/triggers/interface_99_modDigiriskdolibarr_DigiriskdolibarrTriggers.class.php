@@ -1139,6 +1139,7 @@ class InterfaceDigiriskdolibarrTriggers extends DolibarrTriggers
 					$actioncomm->label = $langs->transnoentities('TaskCreated', $object->ref);
 					$actioncomm->note_private .= $langs->trans('Ref') . ' : ' . $object->ref . '<br>';
 					$actioncomm->note_private .= $langs->trans('Entity') . ' : ' . $conf->entity . '<br>';
+					$actioncomm->note_private .= $langs->trans('TechnicalID') . ' : ' . $object->id . '<br>';
 					$actioncomm->note_private .= $langs->trans('Label') . ' : ' . $object->label . '<br>';
 					$actioncomm->note_private .= $langs->trans('DateCreation') . ' : ' . dol_print_date($object->date_c, 'dayhoursec', 'tzuser') . '<br>';
 					$actioncomm->datep = $now;
@@ -1169,6 +1170,7 @@ class InterfaceDigiriskdolibarrTriggers extends DolibarrTriggers
 					$actioncomm->label = $langs->transnoentities('TaskModified', $object->ref);
 					$actioncomm->note_private .= $langs->trans('Ref') . ' : ' . $object->ref . '<br>';
 					$actioncomm->note_private .= $langs->trans('Entity') . ' : ' . $conf->entity . '<br>';
+					$actioncomm->note_private .= $langs->trans('TechnicalID') . ' : ' . $object->id . '<br>';
 					$actioncomm->note_private .= $langs->trans('Label') . ' : ' . $object->label . '<br>';
 					$actioncomm->note_private .= $langs->trans('DateCreation') . ' : ' . dol_print_date($object->date_c, 'dayhoursec', 'tzuser') . '<br>';
 					$actioncomm->note_private .= $langs->trans('DateModification') . ' : ' . dol_print_date($now, 'dayhoursec', 'tzuser') . '<br>';
@@ -1200,6 +1202,7 @@ class InterfaceDigiriskdolibarrTriggers extends DolibarrTriggers
 					$actioncomm->label = $langs->transnoentities('TaskDeleted', $object->ref);
 					$actioncomm->note_private .= $langs->trans('Ref') . ' : ' . $object->ref . '<br>';
 					$actioncomm->note_private .= $langs->trans('Entity') . ' : ' . $conf->entity . '<br>';
+					$actioncomm->note_private .= $langs->trans('TechnicalID') . ' : ' . $object->id . '<br>';
 					$actioncomm->note_private .= $langs->trans('Label') . ' : ' . $object->label . '<br>';
 					$actioncomm->note_private .= $langs->trans('DateCreation') . ' : ' . dol_print_date($object->date_c, 'dayhoursec', 'tzuser') . '<br>';
 					$actioncomm->note_private .= $langs->trans('DateModification') . ' : ' . dol_print_date($now, 'dayhoursec', 'tzuser') . '<br>';
@@ -1377,6 +1380,7 @@ class InterfaceDigiriskdolibarrTriggers extends DolibarrTriggers
 				$actioncomm->note_private .= $langs->trans('Entity') . ' : ' . $conf->entity . '<br>';
 				$actioncomm->note_private .= $langs->trans('TechnicalID') . ' : ' . $object->id . '<br>';
 				$actioncomm->note_private .= $langs->trans('UserAssigned') . ' : ' . $userstat->firstname . " " . $userstat->lastname . '<br>';
+				$actioncomm->note_private .= $langs->trans('PostOrFunction') . ' : ' . (!empty($object->job) ? $object->job : 'N/A') . '<br>';
 				$actioncomm->note_private .= $langs->trans('AssignmentDate') . ' : ' . dol_print_date($now, 'dayhoursec', 'tzuser') . '<br>';
 				$actioncomm->note_private .= $langs->trans('EvaluationDuration') . ' : ' . convertSecondToTime($object->duration * 60, 'allhourmin') . ' min' . '<br>';
 				$actioncomm->datep       = $now;
@@ -1409,6 +1413,7 @@ class InterfaceDigiriskdolibarrTriggers extends DolibarrTriggers
 				$actioncomm->note_private .= $langs->trans('Entity') . ' : ' . $conf->entity . '<br>';
 				$actioncomm->note_private .= $langs->trans('TechnicalID') . ' : ' . $object->id . '<br>';
 				$actioncomm->note_private .= $langs->trans('UserAssigned') . ' : ' . $userstat->firstname . " " . $userstat->lastname . '<br>';
+				$actioncomm->note_private .= $langs->trans('PostOrFunction') . ' : ' . (!empty($object->job) ? $object->job : 'N/A') . '<br>';
 				$actioncomm->note_private .= $langs->trans('AssignmentDate') . ' : ' . dol_print_date($object->date_creation, 'dayhoursec', 'tzuser') . '<br>';
 				$actioncomm->note_private .= $langs->trans('DateModification') . ' : ' . dol_print_date($now, 'dayhoursec', 'tzuser') . '<br>';
 				$actioncomm->note_private .= $langs->trans('EvaluationDuration') . ' : ' . convertSecondToTime($object->duration * 60, 'allhourmin') . ' min' . '<br>';
@@ -1442,6 +1447,7 @@ class InterfaceDigiriskdolibarrTriggers extends DolibarrTriggers
 				$actioncomm->note_private .= $langs->trans('Entity') . ' : ' . $conf->entity . '<br>';
 				$actioncomm->note_private .= $langs->trans('TechnicalID') . ' : ' . $object->id . '<br>';
 				$actioncomm->note_private .= $langs->trans('UserAssigned') . ' : ' . $userstat->firstname . " " . $userstat->lastname . '<br>';
+				$actioncomm->note_private .= $langs->trans('PostOrFunction') . ' : ' . (!empty($object->job) ? $object->job : 'N/A') . '<br>';
 				$actioncomm->note_private .= $langs->trans('AssignmentDate') . ' : ' . dol_print_date($object->date_creation, 'dayhoursec', 'tzuser') . '<br>';
 				$actioncomm->note_private .= $langs->trans('DateModification') . ' : ' . dol_print_date($now, 'dayhoursec', 'tzuser') . '<br>';
 				$actioncomm->note_private .= $langs->trans('EvaluationDuration') . ' : ' . convertSecondToTime($object->duration * 60, 'allhourmin') . ' min' . '<br>';
