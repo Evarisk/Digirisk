@@ -514,8 +514,8 @@ class Accident extends CommonObject
 				'content'    => array($arrayFrequencyIndex['frequencyindex'], $arrayFrequencyRate['frequencyrate'], $arrayGravityRate['gravityrate']),
 				'tooltip'    => array(
 					(($conf->global->DIGIRISKDOLIBARR_NB_EMPLOYEES > 0 && $conf->global->DIGIRISKDOLIBARR_MANUEL_INPUT_NB_EMPLOYEES) ? $langs->transnoentities("FrequencyIndexTooltip") . '<br>' . $langs->transnoentities("NbEmployeesConfTooltip") : $langs->transnoentities("FrequencyIndexTooltip")),
-					(($conf->global->DIGIRISKDOLIBARR_NB_WORKED_HOURS > 0 && $conf->global->DIGIRISKDOLIBARR_MANUEL_INPUT_NB_WORKED_HOURS) ? $langs->transnoentities("FrequencyRateTooltip") . '<br>' . $langs->transnoentities("NbWorkedHoursTooltip") : $langs->transnoentities("FrequencyRateTooltip")),
-					(($conf->global->DIGIRISKDOLIBARR_NB_WORKED_HOURS > 0 && $conf->global->DIGIRISKDOLIBARR_MANUEL_INPUT_NB_WORKED_HOURS) ? $langs->transnoentities("GravityRateTooltip") . '<br>' . $langs->transnoentities("NbWorkedHoursTooltip") : $langs->transnoentities("GravityRateTooltip"))
+					(($conf->global->DIGIRISKDOLIBARR_NB_WORKED_HOURS > 0 && $conf->global->DIGIRISKDOLIBARR_MANUAL_INPUT_NB_WORKED_HOURS) ? $langs->transnoentities("FrequencyRateTooltip") . '<br>' . $langs->transnoentities("NbWorkedHoursTooltip") : $langs->transnoentities("FrequencyRateTooltip")),
+					(($conf->global->DIGIRISKDOLIBARR_NB_WORKED_HOURS > 0 && $conf->global->DIGIRISKDOLIBARR_MANUAL_INPUT_NB_WORKED_HOURS) ? $langs->transnoentities("GravityRateTooltip") . '<br>' . $langs->transnoentities("NbWorkedHoursTooltip") : $langs->transnoentities("GravityRateTooltip"))
 				),
 				'picto'      => 'fas fa-chart-bar',
 				'widgetName' => $langs->transnoentities('AccidentRateIndicator')
@@ -726,10 +726,11 @@ class Accident extends CommonObject
 		// (Number accidents with DIAT by working hours) x 1 000 000
 		$arrayNbAccidents = $this->getNbAccidents();
 		$total_workhours  = getWorkingHours();
+
 		if ($total_workhours > 0) {
 			$frequencyrate = ($arrayNbAccidents['data']['accidents']/$total_workhours) * 1000000;
 			if ($frequencyrate > 0) {
-				$array['frequencyrate'] = price2Num($frequencyrate, 2);
+				$array['frequencyrate'] = price2Num($frequencyrate, 5);
 			} else {
 				$array['frequencyrate'] = 'N/A';
 			}
@@ -752,7 +753,7 @@ class Accident extends CommonObject
 		if ($total_workhours > 0) {
 			$gravityrate = ($arrayNbWorkstopDays['nbworkstopdays']/$total_workhours) * 1000;
 			if ($gravityrate > 0) {
-				$array['gravityrate'] = price2Num($gravityrate, 2);
+				$array['gravityrate'] = price2Num($gravityrate, 5);
 			} else {
 				$array['gravityrate'] = 'N/A';
 			}

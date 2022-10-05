@@ -87,7 +87,7 @@ class ActionsDigiriskdolibarr
 				if ($conf->global->DIGIRISKDOLIBARR_MANUEL_INPUT_NB_EMPLOYEES) {
 					$nbemployees_input = '<input type="number" name="DIGIRISKDOLIBARR_NB_EMPLOYEES" class="minwidth200" value="' . $conf->global->DIGIRISKDOLIBARR_NB_EMPLOYEES . '">';
 				}
-				if ($conf->global->DIGIRISKDOLIBARR_MANUEL_INPUT_NB_WORKED_HOURS) {
+				if ($conf->global->DIGIRISKDOLIBARR_MANUAL_INPUT_NB_WORKED_HOURS) {
 					$nbworkedhours_input = '<input type="number" name="DIGIRISKDOLIBARR_NB_WORKED_HOURS" class="minwidth200" value="' . $conf->global->DIGIRISKDOLIBARR_NB_WORKED_HOURS . '">';
 				}
 				?>
@@ -106,13 +106,13 @@ class ActionsDigiriskdolibarr
 						nbemployeesInput.append('<td><i class="fas fa-users"></i> ' + <?php echo json_encode($nbemployees_input); ?> + '</td></tr>');
 					<?php endif; ?>
 
-					<?php if ($conf->global->DIGIRISKDOLIBARR_MANUEL_INPUT_NB_WORKED_HOURS) : ?>
+					<?php if ($conf->global->DIGIRISKDOLIBARR_MANUAL_INPUT_NB_WORKED_HOURS) : ?>
 						let nbworkedhoursInput = $('<tr class="oddeven"><td><label for="nbworkedhours"><?php print $pictoDigirisk . $langs->transnoentities('NbWorkedHours'); ?></label></td>');
 						nbworkedhoursInput.append('<td><i class="fas fa-clock"></i> ' + <?php echo json_encode($nbworkedhours_input); ?> + '</td></tr>');
 					<?php endif; ?>
 
 					let currentOtherElement = $('table:nth-child(3) .oddeven:last-child');
-					<?php if ($conf->global->DIGIRISKDOLIBARR_MANUEL_INPUT_NB_WORKED_HOURS) : ?>
+					<?php if ($conf->global->DIGIRISKDOLIBARR_MANUAL_INPUT_NB_WORKED_HOURS) : ?>
 						currentOtherElement.after(nbworkedhoursInput);
 					<?php endif; ?>
 					<?php if ($conf->global->DIGIRISKDOLIBARR_MANUEL_INPUT_NB_EMPLOYEES) : ?>
@@ -456,7 +456,7 @@ class ActionsDigiriskdolibarr
 				if ($conf->global->DIGIRISKDOLIBARR_MANUEL_INPUT_NB_EMPLOYEES) {
 					dolibarr_set_const($db, "DIGIRISKDOLIBARR_NB_EMPLOYEES", GETPOST("DIGIRISKDOLIBARR_NB_EMPLOYEES"), 'integer', 0, '', $conf->entity);
 				}
-				if ($conf->global->DIGIRISKDOLIBARR_MANUEL_INPUT_NB_WORKED_HOURS) {
+				if ($conf->global->DIGIRISKDOLIBARR_MANUAL_INPUT_NB_WORKED_HOURS) {
 					dolibarr_set_const($db, "DIGIRISKDOLIBARR_NB_WORKED_HOURS", GETPOST("DIGIRISKDOLIBARR_NB_WORKED_HOURS"), 'integer', 0, '', $conf->entity);
 				}
 			}

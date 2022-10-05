@@ -188,7 +188,7 @@ print '</td><td>';
 print $langs->trans('ManuelInputNBWorkedHoursDescription');
 print '</td>';
 print '<td class="center">';
-print ajax_constantonoff('DIGIRISKDOLIBARR_MANUEL_INPUT_NB_WORKED_HOURS');
+print ajax_constantonoff('DIGIRISKDOLIBARR_MANUAL_INPUT_NB_WORKED_HOURS');
 print '</td>';
 print '</tr>';
 print '</table>';

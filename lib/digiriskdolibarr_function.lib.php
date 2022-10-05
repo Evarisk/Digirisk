@@ -3120,7 +3120,10 @@ function getWorkingHours()
 {
 	global $conf, $user;
 
-	$userList = $user->get_full_tree();
+	if ($conf->global->DIGIRISKDOLIBARR_MANUAL_INPUT_NB_WORKED_HOURS) {
+		$total_workhours = $conf->global->DIGIRISKDOLIBARR_NB_WORKED_HOURS;
+	} else {
+		$userList = $user->get_full_tree();
 	$total_workhours = 0;
 	if (!empty($userList) && is_array($userList)) {
 		foreach ($userList as $sub_user) {
@@ -3135,6 +3138,8 @@ function getWorkingHours()
 			}
 		}
 	}
+	}
+
 	return $total_workhours;
 }
 
