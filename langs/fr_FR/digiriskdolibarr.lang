@@ -924,8 +924,8 @@ Organization = Organisation GP/UT
 # Trigger - Déclencheur
 GROUPMENT_CREATEInDolibarr = Groupement créé dans Dolibarr
 ActionsOnGroupment = Événements liés au groupement
-groupmentCreatedWithDolibarr = Groupement créé dans Dolibarr
-workunitCreatedWithDolibarr = Unité de travail créée dans Dolibarr
+groupmentCreatedWithDolibarr = Groupement %s créé
+workunitCreatedWithDolibarr = Unité de travail %s créée
 
 # Mod Numbering - Modèle de numérotation
 DigiriskGroupmentNumberingModule = Modèle de numérotation des groupements de Digirisk
