@@ -276,16 +276,16 @@ if ($sharedrisks) {
 				$pathToThumb  = DOL_URL_ROOT . '/custom/digiriskdolibarr/documents/viewimage.php?modulepart=digiriskdolibarr&entity=' . $risks->entity . '&file=' . urlencode($lastEvaluation->element . '/' . $lastEvaluation->ref . '/thumbs/');
 				$nophoto      = DOL_URL_ROOT.'/public/theme/common/nophoto.png';
 
-				$importValue .= '<div class="risk-evaluation-photo risk-evaluation-photo-'. ($lastEvaluation->id > 0 ? $lastEvaluation->id : 0) .  ($risk->id > 0 ? ' risk-' . $risk->id : ' risk-new') .' open-medias-linked">';
+				$importValue .= '<div class="risk-evaluation-photo risk-evaluation-photo-'. ($lastEvaluation->id > 0 ? $lastEvaluation->id : 0) .  ($risk->id > 0 ? ' risk-' . $risk->id : ' risk-new') .' open-medias-linked" style="margin-right: 0.5em">';
 				$importValue .= '<span class="floatleft inline-block valignmiddle divphotoref risk-evaluation-photo-single">';
 				$importValue .= '<input class="filepath-to-riskassessment filepath-to-riskassessment-'.( $risk->id > 0 ? $risk->id : 'new') .'" type="hidden" value="'. $pathToThumb .'">';
 				$importValue .=	'<input class="filename" type="hidden" value="">';
 				if (isset($lastEvaluation->photo) && dol_strlen($lastEvaluation->photo) > 0) {
 					$accessallowed = 1;
 					$thumb_name = getThumbName($lastEvaluation->photo);
-					$importValue .=	 '<img width="40" class="photo clicked-photo-preview" src="' . DOL_URL_ROOT . '/custom/digiriskdolibarr/documents/viewimage.php?modulepart=digiriskdolibarr&entity=' . $risks->entity . '&file=' . urlencode($lastEvaluation->element . '/' . $lastEvaluation->ref . '/thumbs/' . $thumb_name) . '" >';
+					$importValue .=	 '<img width="40" height="40" class="photo clicked-photo-preview" src="' . DOL_URL_ROOT . '/custom/digiriskdolibarr/documents/viewimage.php?modulepart=digiriskdolibarr&entity=' . $risks->entity . '&file=' . urlencode($lastEvaluation->element . '/' . $lastEvaluation->ref . '/thumbs/' . $thumb_name) . '" >';
 				} else {
-					$importValue .=	 '<img width="40" class="photo clicked-photo-preview" src="'. $nophoto .'" >';
+					$importValue .=	 '<img width="40" height="40" class="photo clicked-photo-preview" src="'. $nophoto .'" >';
 				}
 				$importValue .= '</span></div>';
 
