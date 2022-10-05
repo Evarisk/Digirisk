@@ -808,11 +808,11 @@ RiskAssessmentDocumentImportantNote = Notes importantes :<br />Vous pouvez lire 
 # Boxes - Widget
 RiskAssessmentDocumentBox = Box Document unique
 RiskAssessmentDocumentBoxTitle = Informations du Document unique
-LastGenerateDate = Date de dernière génération du Document Unique
+LastGenerateDate = DU généré le
 MandatoryUpdateEvery = Mise à jour obligatoire tous les
-NextGenerateDate = Date de prochaine génération du Document Unique
-NbDaysBeforeNextGenerateDate = Nombre de jours avant la prochaine date de génération du Document Unique
-NbDaysAfterNextGenerateDate = Nombre de jours de retard pour la génération du Document Unique
+NextGenerateDate = Prochain DU le
+NbDaysBeforeNextGenerateDate = Nombre de jours avant la prochaine date de génération du DU
+NbDaysAfterNextGenerateDate = Nombre de jours de retard pour la génération du DU
 
 # Email - Mail
 RiskAssessmentDocumentLabel = Récapitulatif du document unique
