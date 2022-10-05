@@ -1130,6 +1130,7 @@ class InterfaceDigiriskdolibarrTriggers extends DolibarrTriggers
 
 					if ($conf->global->DIGIRISKDOLIBARR_SHOW_TASK_CALCULATED_PROGRESS) {
 						$timeSpent = $object->getSummaryOfTimeSpent();
+						$label_progress = 'ShowTaskCalculatedProgress';
 						if ($timeSpent['total_duration'] > 0 && !empty($object->planned_workload)) {
 							$task_progress = round($timeSpent['total_duration'] / $object->planned_workload * 100, 2);
 						} else {
@@ -1137,6 +1138,7 @@ class InterfaceDigiriskdolibarrTriggers extends DolibarrTriggers
 						}
 					} else {
 						(!empty($object->progress) ? $task_progress = $object->progress : $task_progress = 0);
+						$label_progress = 'Progress';
 					}
 
 					$actioncomm->elementtype = 'digiriskelement@digiriskdolibarr';
@@ -1147,7 +1149,7 @@ class InterfaceDigiriskdolibarrTriggers extends DolibarrTriggers
 					$actioncomm->note_private .= $langs->trans('Entity') . ' : ' . $conf->entity . '<br>';
 					$actioncomm->note_private .= $langs->trans('TechnicalID') . ' : ' . $object->id . '<br>';
 					$actioncomm->note_private .= $langs->trans('Label') . ' : ' . $object->label . '<br>';
-					$actioncomm->note_private .= $langs->trans('Progress') . ' : ' . $task_progress . '<br>';
+					$actioncomm->note_private .= $langs->trans($label_progress) . ' : ' . $task_progress . '<br>';
 					$actioncomm->note_private .= $langs->trans('DateCreation') . ' : ' . dol_print_date($object->date_c, 'dayhoursec', 'tzuser') . '<br>';
 					$actioncomm->datep = $now;
 					$actioncomm->fk_element = $risk->fk_element;
@@ -1173,6 +1175,7 @@ class InterfaceDigiriskdolibarrTriggers extends DolibarrTriggers
 
 					if ($conf->global->DIGIRISKDOLIBARR_SHOW_TASK_CALCULATED_PROGRESS) {
 						$timeSpent = $object->getSummaryOfTimeSpent();
+						$label_progress = 'ShowTaskCalculatedProgress';
 						if ($timeSpent['total_duration'] > 0 && !empty($object->planned_workload)) {
 							$task_progress = round($timeSpent['total_duration'] / $object->planned_workload * 100, 2);
 						} else {
@@ -1180,6 +1183,7 @@ class InterfaceDigiriskdolibarrTriggers extends DolibarrTriggers
 						}
 					} else {
 						(!empty($object->progress) ? $task_progress = $object->progress : $task_progress = 0);
+						$label_progress = 'Progress';
 					}
 
 					$actioncomm->elementtype = 'digiriskelement@digiriskdolibarr';
@@ -1190,7 +1194,7 @@ class InterfaceDigiriskdolibarrTriggers extends DolibarrTriggers
 					$actioncomm->note_private .= $langs->trans('Entity') . ' : ' . $conf->entity . '<br>';
 					$actioncomm->note_private .= $langs->trans('TechnicalID') . ' : ' . $object->id . '<br>';
 					$actioncomm->note_private .= $langs->trans('Label') . ' : ' . $object->label . '<br>';
-					$actioncomm->note_private .= $langs->trans('Progress') . ' : ' . $task_progress . '<br>';
+					$actioncomm->note_private .= $langs->trans($label_progress) . ' : ' . $task_progress . '<br>';
 					$actioncomm->note_private .= $langs->trans('DateCreation') . ' : ' . dol_print_date($object->date_c, 'dayhoursec', 'tzuser') . '<br>';
 					$actioncomm->note_private .= $langs->trans('DateModification') . ' : ' . dol_print_date($now, 'dayhoursec', 'tzuser') . '<br>';
 					$actioncomm->datep = $now;
@@ -1217,6 +1221,7 @@ class InterfaceDigiriskdolibarrTriggers extends DolibarrTriggers
 
 					if ($conf->global->DIGIRISKDOLIBARR_SHOW_TASK_CALCULATED_PROGRESS) {
 						$timeSpent = $object->getSummaryOfTimeSpent();
+						$label_progress = 'ShowTaskCalculatedProgress';
 						if ($timeSpent['total_duration'] > 0 && !empty($object->planned_workload)) {
 							$task_progress = round($timeSpent['total_duration'] / $object->planned_workload * 100, 2);
 						} else {
@@ -1224,6 +1229,7 @@ class InterfaceDigiriskdolibarrTriggers extends DolibarrTriggers
 						}
 					} else {
 						(!empty($object->progress) ? $task_progress = $object->progress : $task_progress = 0);
+						$label_progress = 'Progress';
 					}
 
 					$actioncomm->elementtype = 'digiriskelement@digiriskdolibarr';
@@ -1234,7 +1240,7 @@ class InterfaceDigiriskdolibarrTriggers extends DolibarrTriggers
 					$actioncomm->note_private .= $langs->trans('Entity') . ' : ' . $conf->entity . '<br>';
 					$actioncomm->note_private .= $langs->trans('TechnicalID') . ' : ' . $object->id . '<br>';
 					$actioncomm->note_private .= $langs->trans('Label') . ' : ' . $object->label . '<br>';
-					$actioncomm->note_private .= $langs->trans('Progress') . ' : ' . $task_progress . '<br>';
+					$actioncomm->note_private .= $langs->trans($label_progress) . ' : ' . $task_progress . '<br>';
 					$actioncomm->note_private .= $langs->trans('DateCreation') . ' : ' . dol_print_date($object->date_c, 'dayhoursec', 'tzuser') . '<br>';
 					$actioncomm->note_private .= $langs->trans('DateModification') . ' : ' . dol_print_date($now, 'dayhoursec', 'tzuser') . '<br>';
 					$actioncomm->datep = $now;
