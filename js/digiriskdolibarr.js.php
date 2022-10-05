@@ -2266,6 +2266,9 @@ window.eoxiaJS.evaluation.deleteEvaluation = function ( event ) {
 				let evaluationCounterText = $('#risk_row_'+riskId).find('.table-cell-header-label').text()
 				let evaluationCounter = evaluationCounterText.split(/\(/)[1].split(/\)/)[0]
 				$('#risk_row_'+riskId).find('.table-cell-header-label').html('<strong>' + evaluationCounterText.split(/\(/)[0] + '(' + (+evaluationCounter - 1) + ')' + '</strong>')
+				if (evaluationCounter - 1 < 1) {
+					$('.fichecenter.risklist').html($(resp).find('#searchFormListRisks'))
+				}
 
 				elementParent.removeClass('wpeo-loader');
 
