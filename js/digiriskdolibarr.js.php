@@ -2187,6 +2187,7 @@ window.eoxiaJS.evaluation.createEvaluation = function ( event ) {
 		processData: false,
 		contentType: false,
 		success: function( resp ) {
+			//refresh risk assessment list
 			$('.risk-evaluation-list-container-' + riskToAssign).html($(resp).find('.risk-evaluation-list-container-' + riskToAssign).children())
 
 			let actionContainerSuccess = $('.messageSuccessEvaluationCreate');

@@ -357,7 +357,7 @@ class DigiriskElement extends CommonObject
 	}
 
 	/**
-	 * Get riskassessment categorires number
+	 * Get riskassessment categories number
 	 *
 	 * @return array
 	 * @throws Exception
@@ -689,5 +689,24 @@ class DigiriskElement extends CommonObject
 		} else {
 			return array();
 		}
+	}
+
+	/**
+	 *  Return list of parent ids for an element
+	 *
+	 * 	@return    array  Array with ids
+	 * 	@throws Exception
+	 */
+	public function getBranch($parent_id)
+	{
+		$object = new self($this->db);
+		$object->fetch($parent_id);
+		$branch_ids = array($parent_id);
+
+		while ($object->fk_parent > 0) {
+			$branch_ids[] = $object->fk_parent;
+			$object->fetch($object->fk_parent);
+		}
+		return $branch_ids;
 	}
 }

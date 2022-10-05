@@ -640,6 +640,12 @@ function digiriskHeader($title = '', $help_url = '', $arrayofjs = array(), $arra
 									jQuery( '#unit'+id ).addClass( 'toggled' );
 								});
 
+								var elementBranch = <?php echo json_encode($object->getBranch(GETPOST('id'))); ?>
+								elementBranch.forEach((id) =>  {
+									jQuery( '#menu'+id).removeClass( 'fa-chevron-right').addClass( 'fa-chevron-down' );
+									jQuery( '#unit'+id ).addClass( 'toggled' );
+								});
+
 								<?php $object->fetch(GETPOST('id') ?: GETPOST('fromid')); ?>
 								var idParent = <?php echo json_encode($object->fk_parent);?> ;
 
@@ -981,7 +987,6 @@ function display_recurse_tree($results)
 		print $langs->trans('YouDontHaveTheRightToSeeThis');
 	}
 }
-
 
 /**
  *	Display Recursive tree for edit
