@@ -58,7 +58,7 @@ $related_tasks = $risk->get_related_tasks($risk); ?>
 								<div class="riskassessment-task-single riskassessment-task-single-<?php echo $related_task->id ?>   wpeo-table table-row">
 									<div class="riskassessment-task-content table-cell">
 										<div class="riskassessment-task-data">
-											<span class="riskassessment-task-reference" value="<?php echo $related_task->id ?>"><?php echo $task->getNomUrlTask($related_task, 0, 'withproject'); ?></span>
+											<span class="riskassessment-task-reference" value="<?php echo $related_task->id ?>"><?php echo $related_task->getNomUrlTask(0, 'withproject'); ?></span>
 											<span class="riskassessment-task-author">
 												<?php $user->fetch($related_task->fk_user_creat); ?>
 												<?php echo getNomUrlUser($user); ?>
@@ -117,7 +117,7 @@ $related_tasks = $risk->get_related_tasks($risk); ?>
 													<!-- Modal-Header -->
 													<div class="modal-header">
 														<div class="riskassessment-task-data">
-															<span class="riskassessment-task-reference" value="<?php echo $related_task->id ?>"><?php echo $task->getNomUrlTask($related_task, 0, 'withproject'); ?></span>
+															<span class="riskassessment-task-reference" value="<?php echo $related_task->id ?>"><?php echo $related_task->getNomUrlTask(0, 'withproject'); ?></span>
 															<span class="riskassessment-task-author">
 																		<?php $user->fetch($related_task->fk_user_creat); ?>
 																		<?php echo getNomUrlUser($user); ?>
@@ -300,7 +300,7 @@ $related_tasks = $risk->get_related_tasks($risk); ?>
 																							<div class="modal-container wpeo-modal-event">
 																								<!-- Modal-Header -->
 																								<div class="modal-header">
-																									<h2 class="modal-title"><?php echo $langs->trans('TaskTimeSpentEdit') . ' ' . $task->getNomUrlTask($related_task, 0, 'withproject') ?></h2>
+																									<h2 class="modal-title"><?php echo $langs->trans('TaskTimeSpentEdit') . ' ' . $task->getNomUrlTask(0, 'withproject') ?></h2>
 																									<div class="modal-close"><i class="fas fa-times"></i></div>
 																								</div>
 																								<!-- Modal EDIT RISK ASSESSMENT TASK Content-->
@@ -406,7 +406,7 @@ $related_tasks = $risk->get_related_tasks($risk); ?>
 							<div class="riskassessment-task-single riskassessment-task-single-<?php echo $related_task->id ?>   wpeo-table table-row">
 								<div class="riskassessment-task-content table-cell">
 									<div class="riskassessment-task-data">
-										<span class="riskassessment-task-reference" value="<?php echo $related_task->id ?>"><?php echo $task->getNomUrlTask($related_task, 0, 'withproject'); ?></span>
+										<span class="riskassessment-task-reference" value="<?php echo $related_task->id ?>"><?php echo $related_task->getNomUrlTask(0, 'withproject'); ?></span>
 										<span class="riskassessment-task-author">
 											<?php $user->fetch($related_task->fk_user_creat); ?>
 											<?php echo getNomUrlUser($user); ?>
@@ -652,7 +652,7 @@ $related_tasks = $risk->get_related_tasks($risk); ?>
 													<div class="riskassessment-task-single">
 														<div class="riskassessment-task-content">
 															<div class="riskassessment-task-data">
-																<span class="riskassessment-task-reference" value="<?php echo $related_task->id ?>"><?php echo $task->getNomUrlTask($related_task, 0, 'withproject'); ?></span>
+																<span class="riskassessment-task-reference" value="<?php echo $related_task->id ?>"><?php echo $related_task->getNomUrlTask(0, 'withproject'); ?></span>
 																<span class="riskassessment-task-author">
 																	<?php $user->fetch($related_task->fk_user_creat); ?>
 																	<?php echo getNomUrlUser($user); ?>

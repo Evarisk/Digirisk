@@ -372,7 +372,7 @@ class RiskAssessment extends CommonObject
 		if ($digiriskelementID > 0) {
 			$risks = $risk->fetchFromParent($digiriskelementID);
 		} else {
-			$risks = $risk->fetchRisksOrderedByCotation(0, true, false, true);
+			$risks = $risk->fetchRisksOrderedByCotation(0, false, false, true);
 		}
 
 		$scale_counter = array(

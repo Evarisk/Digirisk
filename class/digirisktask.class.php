@@ -123,7 +123,6 @@ class DigiriskTask extends Task
 	/**
 	 *	Return clickable name (with picto eventually)
 	 *
-	 * @param  Task     $task                   Task object
 	 * @param  int		$withpicto		        0=No picto, 1=Include picto into link, 2=Only picto
 	 * @param  string	$option			        'withproject' or ''
 	 * @param  string	$mode			        Mode 'task', 'time', 'contact', 'note', document' define page to link to.
@@ -133,23 +132,23 @@ class DigiriskTask extends Task
 	 * @param  int      $save_lastsearch_value  -1=Auto, 0=No save of lastsearch_values when clicking, 1=Save lastsearch_values whenclicking
 	 * @return string					        Chaine avec URL
 	 */
-	public function getNomUrlTask($task, $withpicto = 0, $option = '', $mode = 'task', $addlabel = 0, $sep = ' - ', $notooltip = 0, $save_lastsearch_value = -1)
+	public function getNomUrlTask($withpicto = 0, $option = '', $mode = 'task', $addlabel = 0, $sep = ' - ', $notooltip = 0, $save_lastsearch_value = -1)
 	{
 		global $conf, $langs;
 
 		if ( ! empty($conf->dol_no_mouse_hover)) $notooltip = 1; // Force disable tooltips
 
 		$result     = '';
-		$label      = img_picto('', $task->picto) . ' <u>' . $langs->trans("Task") . '</u>';
-		if ( ! empty($task->ref))
-			$label .= '<br><b>' . $langs->trans('Ref') . ':</b> ' . $task->ref;
-		if ( ! empty($task->label))
-			$label .= '<br><b>' . $langs->trans('LabelTask') . ':</b> ' . $task->label;
-		if ($task->date_start || $task->date_end) {
-			$label .= "<br>" . get_date_range($task->date_start, $task->date_end, '', $langs, 0);
+		$label      = img_picto('', $this->picto) . ' <u>' . $langs->trans("Task") . '</u>';
+		if ( ! empty($this->ref))
+			$label .= '<br><b>' . $langs->trans('Ref') . ':</b> ' . $this->ref;
+		if ( ! empty($this->label))
+			$label .= '<br><b>' . $langs->trans('LabelTask') . ':</b> ' . $this->label;
+		if ($this->date_start || $this->date_end) {
+			$label .= "<br>" . get_date_range($this->date_start, $this->date_end, '', $langs, 0);
 		}
 
-		$url = DOL_URL_ROOT . '/projet/tasks/' . $mode . '.php?id=' . $task->id . ($option == 'withproject' ? '&withproject=1' : '');
+		$url = DOL_URL_ROOT . '/projet/tasks/' . $mode . '.php?id=' . $this->id . ($option == 'withproject' ? '&withproject=1' : '');
 		// Add param to save lastsearch_values or not
 		$add_save_lastsearch_values                                                                                      = ($save_lastsearch_value == 1 ? 1 : 0);
 		if ($save_lastsearch_value == -1 && preg_match('/list\.php/', $_SERVER["PHP_SELF"])) $add_save_lastsearch_values = 1;
@@ -175,9 +174,9 @@ class DigiriskTask extends Task
 
 		$result                      .= $linkstart;
 		if ($withpicto) $result      .= img_object(($notooltip ? '' : $label), $picto, ($notooltip ? (($withpicto != 2) ? 'class="paddingright"' : '') : 'class="' . (($withpicto != 2) ? 'paddingright ' : '') . 'classfortooltip"'), 0, 0, $notooltip ? 0 : 1);
-		if ($withpicto != 2) $result .= $task->ref;
+		if ($withpicto != 2) $result .= $this->ref;
 		$result                      .= $linkend;
-		if ($withpicto != 2) $result .= (($addlabel && $task->label) ? $sep . dol_trunc($task->label, ($addlabel > 1 ? $addlabel : 0)) : '');
+		if ($withpicto != 2) $result .= (($addlabel && $this->label) ? $sep . dol_trunc($this->label, ($addlabel > 1 ? $addlabel : 0)) : '');
 
 		return $result;
 	}
