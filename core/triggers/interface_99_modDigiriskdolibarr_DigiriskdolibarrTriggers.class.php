@@ -1136,7 +1136,7 @@ class InterfaceDigiriskdolibarrTriggers extends DolibarrTriggers
 					$actioncomm->elementtype = 'digiriskelement@digiriskdolibarr';
 					$actioncomm->code = 'AC_TASK_CREATE';
 					$actioncomm->type_code = 'AC_OTH_AUTO';
-					$actioncomm->label = $langs->transnoentities('TaskCreated', $object->ref);
+					$actioncomm->label = $langs->transnoentities('TaskCreateTrigger', $object->ref);
 					$actioncomm->note_private .= $langs->trans('Ref') . ' : ' . $object->ref . '<br>';
 					$actioncomm->note_private .= $langs->trans('Entity') . ' : ' . $conf->entity . '<br>';
 					$actioncomm->note_private .= $langs->trans('TechnicalID') . ' : ' . $object->id . '<br>';
@@ -1167,7 +1167,7 @@ class InterfaceDigiriskdolibarrTriggers extends DolibarrTriggers
 					$actioncomm->elementtype = 'digiriskelement@digiriskdolibarr';
 					$actioncomm->code = 'AC_TASK_MODIFY';
 					$actioncomm->type_code = 'AC_OTH_AUTO';
-					$actioncomm->label = $langs->transnoentities('TaskModified', $object->ref);
+					$actioncomm->label = $langs->transnoentities('TaskModifyTrigger', $object->ref);
 					$actioncomm->note_private .= $langs->trans('Ref') . ' : ' . $object->ref . '<br>';
 					$actioncomm->note_private .= $langs->trans('Entity') . ' : ' . $conf->entity . '<br>';
 					$actioncomm->note_private .= $langs->trans('TechnicalID') . ' : ' . $object->id . '<br>';
@@ -1199,7 +1199,7 @@ class InterfaceDigiriskdolibarrTriggers extends DolibarrTriggers
 					$actioncomm->elementtype = 'digiriskelement@digiriskdolibarr';
 					$actioncomm->code = 'AC_TASK_DELETE';
 					$actioncomm->type_code = 'AC_OTH_AUTO';
-					$actioncomm->label = $langs->transnoentities('TaskDeleted', $object->ref);
+					$actioncomm->label = $langs->transnoentities('TaskDeleteTrigger', $object->ref);
 					$actioncomm->note_private .= $langs->trans('Ref') . ' : ' . $object->ref . '<br>';
 					$actioncomm->note_private .= $langs->trans('Entity') . ' : ' . $conf->entity . '<br>';
 					$actioncomm->note_private .= $langs->trans('TechnicalID') . ' : ' . $object->id . '<br>';
@@ -1243,8 +1243,7 @@ class InterfaceDigiriskdolibarrTriggers extends DolibarrTriggers
 				$actioncomm->note_private .= $langs->trans('RiskAssessmentDate') . ' : ' . dol_print_date($risk->date_creation, 'dayhoursec', 'tzuser') . '<br>';
 				$actioncomm->note_private .= $langs->trans('Photo') . ' : ' . (!empty($object->photo) ? $object->photo : 'N/A') . '<br>';
 				$actioncomm->note_private .= $langs->trans('Status') . ' : ' . $object->status . '<br>';
-				if ($object->method == 'advanced')
-				{
+				if ($object->method == 'advanced') {
 					$actioncomm->note_private .= $langs->trans('Evaluation') . ' : ' . $object->cotation . '<br>';
 					$actioncomm->note_private .= $langs->trans('Gravity') . ' : ' . $object->gravite . '<br>';
 					$actioncomm->note_private .= $langs->trans('Protection') . ' : ' . $object->protection . '<br>';
@@ -1288,8 +1287,7 @@ class InterfaceDigiriskdolibarrTriggers extends DolibarrTriggers
 				$actioncomm->note_private .= $langs->trans('RiskAssessmentDate') . ' : ' . dol_print_date($risk->date_creation, 'dayhoursec', 'tzuser') . '<br>';
 				$actioncomm->note_private .= $langs->trans('Photo') . ' : ' . (!empty($object->photo) ? $object->photo : 'N/A') . '<br>';
 				$actioncomm->note_private .= $langs->trans('Status') . ' : ' . $object->status . '<br>';
-				if ($object->method == 'advanced')
-				{
+				if ($object->method == 'advanced') {
 					$actioncomm->note_private .= $langs->trans('Evaluation') . ' : ' . $object->cotation . '<br>';
 					$actioncomm->note_private .= $langs->trans('Gravity') . ' : ' . $object->gravite . '<br>';
 					$actioncomm->note_private .= $langs->trans('Protection') . ' : ' . $object->protection . '<br>';
@@ -1333,8 +1331,7 @@ class InterfaceDigiriskdolibarrTriggers extends DolibarrTriggers
 				$actioncomm->note_private .= $langs->trans('RiskAssessmentDate') . ' : ' . dol_print_date($risk->date_creation, 'dayhoursec', 'tzuser') . '<br>';
 				$actioncomm->note_private .= $langs->trans('Photo') . ' : ' . (!empty($object->photo) ? $object->photo : 'N/A') . '<br>';
 				$actioncomm->note_private .= $langs->trans('Status') . ' : ' . $object->status . '<br>';
-				if ($object->method == 'advanced')
-				{
+				if ($object->method == 'advanced') {
 					$actioncomm->note_private .= $langs->trans('Evaluation') . ' : ' . $object->cotation . '<br>';
 					$actioncomm->note_private .= $langs->trans('Gravity') . ' : ' . $object->gravite . '<br>';
 					$actioncomm->note_private .= $langs->trans('Protection') . ' : ' . $object->protection . '<br>';
@@ -1362,6 +1359,7 @@ class InterfaceDigiriskdolibarrTriggers extends DolibarrTriggers
 				$userstat 		 = new User($this->db);
 				$digiriskelement->fetch($object->fk_parent);
 				$userstat->fetch($object->fk_user);
+				$langs->load('companies');
 
 				$actioncomm->elementtype = 'digiriskelement@digiriskdolibarr';
 				$actioncomm->code        = 'AC_EVALUATOR_CREATE';
@@ -1395,6 +1393,7 @@ class InterfaceDigiriskdolibarrTriggers extends DolibarrTriggers
 				$userstat 		 = new User($this->db);
 				$digiriskelement->fetch($object->fk_parent);
 				$userstat->fetch($object->fk_user);
+				$langs->load('companies');
 
 				$actioncomm->elementtype = 'digiriskelement@digiriskdolibarr';
 				$actioncomm->code        = 'AC_EVALUATOR_MODIFY';
@@ -1429,6 +1428,7 @@ class InterfaceDigiriskdolibarrTriggers extends DolibarrTriggers
 				$userstat 		 = new User($this->db);
 				$digiriskelement->fetch($object->fk_parent);
 				$userstat->fetch($object->fk_user);
+				$langs->load('companies');
 
 				$actioncomm->elementtype = 'digiriskelement@digiriskdolibarr';
 				$actioncomm->code        = 'AC_EVALUATOR_DELETE';
