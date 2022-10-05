@@ -1117,7 +1117,6 @@ BlackRisk = Risque inacceptable
 RiskAssessmentCreateTrigger = Évaluation %s créée
 RiskAssessmentModifyTrigger = Évaluation %s modifiée
 RiskAssessmentDeleteTrigger = Évaluation %s supprimée
-RiskAssessmentDate = Date création du risque
 
 # Mod Numbering - Modèle de numérotation
 DigiriskRiskAssessmentStandardModel = Renvoie le numéro sous la forme RAn où n est un compteur séquentiel sans rupture et sans remise à 0.
@@ -1152,6 +1151,7 @@ EditRiskAssessment = Editer l'évaluation
 ShowAllRiskAssessments = Voir toutes les évaluations
 ShowAllRiskAssessmentsDescription = Afficher la liste complète des évaluations des risques dans la liste des risques
 ParentRisk = Risque parent
+RiskAssessmentDate = Date de l'évaluation
 
 SimpleCotation = Cotation simple
 AdvancedCotation = Cotation avancée
@@ -1241,7 +1241,6 @@ DigiriskRiskSignData = Données configurables des signalisations
 TaskTimeSpentCreateTrigger = Temps consommé créé
 TaskTimeSpentModifyTrigger = Temps consommé modifié
 TaskTimeSpentDeleteTrigger = Temps consommé supprimé
-TaskCompleted = Tâche %s complétée
 TaskCreateTrigger = Tâche %s créée
 TaskModifyTrigger = Tâche %s modifée
 TaskDeleteTrigger = Tâche %s supprimée
