@@ -217,8 +217,7 @@ class Risk extends CommonObject
 
 		}
 
-
-		//For groupment document if conf is activated and for risks listing of risk assessment document
+		//For risks listing of risk assessment document
 		if ( $get_children_data ) {
 			if (is_array($objects)) {
 				$elements = recurse_tree($parent_id, 0, $objects);
@@ -234,14 +233,14 @@ class Risk extends CommonObject
 					$element[$key][$v] = $v;
 				}
 
-				$children_id = array_shift($element);
+				$children_ids = $element['id'];
 
 				// RISKS parent children.
-				if ( ! empty($children_id)) {
-					foreach ($children_id as $element) {
+				if ( ! empty($children_ids)) {
+					foreach ($children_ids as $child_id) {
 						$risk = new Risk($this->db);
 
-						$result = $risk->fetchFromParent($element);
+						$result = $risk->fetchFromParent($child_id);
 						if ( ! empty($result)) {
 							foreach ($result as $risk) {
 								$evaluation     = new RiskAssessment($this->db);
@@ -250,7 +249,7 @@ class Risk extends CommonObject
 									$lastEvaluation       = array_shift($lastEvaluation);
 									$risk->lastEvaluation = $lastEvaluation;
 								}
-								$risk->appliedOn = $element;
+								$risk->appliedOn = $child_id;
 								$risks[] = $risk;
 							}
 						}
@@ -261,22 +260,57 @@ class Risk extends CommonObject
 
 		//for groupment & workunit document if get inherited risks conf is activated
 		if ( $get_parents_data ) {
-			$parent_element_id = $objects[$parent_id]->id;
-			while ($parent_element_id > 0) {
-				$result = $risk->fetchFromParent($parent_element_id);
-				if ($result > 0 && ! empty($result) && $parent_element_id !== $parent_id) {
-					foreach ($result as $risk) {
-						$evaluation     = new RiskAssessment($this->db);
-						$lastEvaluation = $evaluation->fetchFromParent($risk->id, 1);
-						if ( $lastEvaluation > 0 && ! empty($lastEvaluation)  && is_array($lastEvaluation)) {
-							$lastEvaluation       = array_shift($lastEvaluation);
-							$risk->lastEvaluation = $lastEvaluation;
+			if ($parent_id > 0) {
+				$parent_element_id = $objects[$parent_id]->id;
+				while ($parent_element_id > 0) {
+					$result = $risk->fetchFromParent($parent_element_id);
+					if ($result > 0 && ! empty($result) && $parent_element_id !== $parent_id) {
+						foreach ($result as $risk) {
+							$evaluation     = new RiskAssessment($this->db);
+							$lastEvaluation = $evaluation->fetchFromParent($risk->id, 1);
+							if ( $lastEvaluation > 0 && ! empty($lastEvaluation)  && is_array($lastEvaluation)) {
+								$lastEvaluation       = array_shift($lastEvaluation);
+								$risk->lastEvaluation = $lastEvaluation;
+							}
+							$risk->appliedOn = $parent_id;
+							$risks[] = $risk;
 						}
-						$risk->appliedOn = $parent_id;
-						$risks[] = $risk;
+					}
+					$parent_element_id = $objects[$parent_element_id]->fk_parent;
+				}
+			} else {
+				// Super function iterations flat.
+				$it = new RecursiveIteratorIterator(new RecursiveArrayIterator($elements));
+				$element = array();
+				foreach ($it as $key => $v) {
+					$element[$key][$v] = $v;
+				}
+
+				$children_ids = $element['id'];
+				// RISKS parent children.
+				if ( ! empty($children_ids)) {
+					foreach ($children_ids as $child_id) {
+						$object->fetch($child_id);
+						$parent_element_id = $object->fk_parent;
+						while ($parent_element_id > 0) {
+							$result = $risk->fetchFromParent($parent_element_id);
+							if ($result > 0 && !empty($result)) {
+								foreach ($result as $risk) {
+									$evaluation     = new RiskAssessment($this->db);
+									$lastEvaluation = $evaluation->fetchFromParent($risk->id, 1);
+									if ( $lastEvaluation > 0 && ! empty($lastEvaluation)  && is_array($lastEvaluation)) {
+										$lastEvaluation       = array_shift($lastEvaluation);
+										$risk->lastEvaluation = $lastEvaluation;
+									}
+									$risk->appliedOn = $child_id;
+									$risks[] = $risk;
+								}
+							}
+							$object->fetch($parent_element_id);
+							$parent_element_id = $object->fk_parent;
+						}
 					}
 				}
-				$parent_element_id = $objects[$parent_element_id]->fk_parent;
 			}
 		}
 
