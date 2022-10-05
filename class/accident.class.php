@@ -725,7 +725,7 @@ class Accident extends CommonObject
 	public function getFrequencyRate() {
 		// (Number accidents with DIAT by working hours) x 1 000 000
 		$arrayNbAccidents = $this->getNbAccidents();
-		$total_workhours  = getWorkingHours();
+		$total_workhours  = getWorkedHours();
 
 		if ($total_workhours > 0) {
 			$frequencyrate = ($arrayNbAccidents['data']['accidents']/$total_workhours) * 1000000;
@@ -749,7 +749,7 @@ class Accident extends CommonObject
 	public function getGravityRate() {
 		// (Number workstop days by working hours) x 1 000
 		$arrayNbWorkstopDays = $this->getNbWorkstopDays();
-		$total_workhours     = getWorkingHours();
+		$total_workhours     = getWorkedHours();
 		if ($total_workhours > 0) {
 			$gravityrate = ($arrayNbWorkstopDays['nbworkstopdays']/$total_workhours) * 1000;
 			if ($gravityrate > 0) {

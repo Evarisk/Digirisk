@@ -3116,7 +3116,7 @@ function getAllThumbsNames($filename)
  *
  * @return float
 */
-function getWorkingHours()
+function getWorkedHours()
 {
 	global $conf, $user;
 
@@ -3124,20 +3124,20 @@ function getWorkingHours()
 		$total_workhours = $conf->global->DIGIRISKDOLIBARR_NB_WORKED_HOURS;
 	} else {
 		$userList = $user->get_full_tree();
-	$total_workhours = 0;
-	if (!empty($userList) && is_array($userList)) {
-		foreach ($userList as $sub_user) {
-			$user->fetch($sub_user['rowid']);
-			if ($user->employee && $user->weeklyhours && $user->dateemployment) {
-				$employmentdate = $user->dateemployment;
-				$weeklyhours    = $user->weeklyhours;
+		$total_workhours = 0;
+		if (!empty($userList) && is_array($userList)) {
+			foreach ($userList as $sub_user) {
+				$user->fetch($sub_user['rowid']);
+				if ($user->employee && $user->weeklyhours && $user->dateemployment) {
+					$employmentdate = $user->dateemployment;
+					$weeklyhours    = $user->weeklyhours;
 
-				$diff = dol_now() - $employmentdate;
-				$work_weeks = floor($diff / 604800);
-				$total_workhours += $work_weeks * $weeklyhours;
+					$diff = dol_now() - $employmentdate;
+					$work_weeks = floor($diff / 604800);
+					$total_workhours += $work_weeks * $weeklyhours;
+				}
 			}
 		}
-	}
 	}
 
 	return $total_workhours;
