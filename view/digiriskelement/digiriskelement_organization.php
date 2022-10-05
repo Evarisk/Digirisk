@@ -149,12 +149,9 @@ if (is_array($objects)) {
 
 <script>
 	$(document).ready(function() {
+		let organizationEdited = 0
+
 		calcWidth($('#title0'));
-		$('a').click(function(e) {
-			if (confirm("Modifications non enregistrées") == false) {
-				e.preventDefault();
-			}
-		})
 
 		window.onresize = function(event) {
 			//method to execute one time after a timer
@@ -196,6 +193,14 @@ if (is_array($objects)) {
 				$('.save-organization .fas').attr('style','display:none')
 			},
 			receive:function(event, ui){
+				organizationEdited++
+				if (organizationEdited == 1) {
+					$('a').click(function(e) {
+						if (confirm("Modifications non enregistrées") == false) {
+							e.preventDefault();
+						}
+					})
+				}
 				calcWidth($(this).siblings('.title'));
 			},
 
