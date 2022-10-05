@@ -346,7 +346,7 @@ class Evaluator extends CommonObject
 			DashboardDigiriskStats::DASHBOARD_EVALUATOR => array(
 				'label'      => array($langs->transnoentities("NbEmployeesInvolved"), $langs->transnoentities("NbEmployees")),
 				'content'    => array($arrayNbEmployeesInvolved['nbemployeesinvolved'], $arrayNbEmployees['nbemployees']),
-				'tooltip'    => array($langs->transnoentities("NbEmployeesInvolvedTooltip"), (($conf->global->DIGIRISKDOLIBARR_NB_EMPLOYEES > 0 && $conf->global->DIGIRISKDOLIBARR_MANUEL_INPUT_NB_EMPLOYEES) ? $langs->transnoentities("NbEmployeesConfTooltip") : $langs->transnoentities("NbEmployeesTooltip"))),
+				'tooltip'    => array($langs->transnoentities("NbEmployeesInvolvedTooltip"), (($conf->global->DIGIRISKDOLIBARR_NB_EMPLOYEES > 0 && $conf->global->DIGIRISKDOLIBARR_MANUAL_INPUT_NB_EMPLOYEES) ? $langs->transnoentities("NbEmployeesConfTooltip") : $langs->transnoentities("NbEmployeesTooltip"))),
 				'picto'      => 'fas fa-user-check',
 				'widgetName' => $langs->transnoentities('Evaluator')
 			)
@@ -382,7 +382,7 @@ class Evaluator extends CommonObject
 		global $conf;
 
 		// Number employees
-		if ($conf->global->DIGIRISKDOLIBARR_NB_EMPLOYEES > 0 && $conf->global->DIGIRISKDOLIBARR_MANUEL_INPUT_NB_EMPLOYEES) {
+		if ($conf->global->DIGIRISKDOLIBARR_NB_EMPLOYEES > 0 && $conf->global->DIGIRISKDOLIBARR_MANUAL_INPUT_NB_EMPLOYEES) {
 			$array['nbemployees'] = $conf->global->DIGIRISKDOLIBARR_NB_EMPLOYEES;
 		} else {
 			$user = new User($this->db);

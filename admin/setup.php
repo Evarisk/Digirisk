@@ -177,7 +177,7 @@ print '</td><td>';
 print $langs->trans('ManuelInputNBEmployeesDescription');
 print '</td>';
 print '<td class="center">';
-print ajax_constantonoff('DIGIRISKDOLIBARR_MANUEL_INPUT_NB_EMPLOYEES');
+print ajax_constantonoff('DIGIRISKDOLIBARR_MANUAL_INPUT_NB_EMPLOYEES');
 print '</td>';
 print '</tr>';
 
