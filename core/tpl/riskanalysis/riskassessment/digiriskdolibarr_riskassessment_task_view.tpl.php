@@ -61,7 +61,7 @@ $related_tasks = $risk->get_related_tasks($risk); ?>
 											<span class="riskassessment-task-reference" value="<?php echo $related_task->id ?>"><?php echo $task->getNomUrlTask($related_task, 0, 'withproject'); ?></span>
 											<span class="riskassessment-task-author">
 												<?php $user->fetch($related_task->fk_user_creat); ?>
-												<?php echo getNomUrl(0, '', 0, 0, 2, 0, '', '', -1, $user); ?>
+												<?php echo getNomUrlUser($user); ?>
 											</span>
 											<span class="riskassessment-task-date">
 												<i class="fas fa-calendar-alt"></i> <?php echo date('d/m/Y', (($conf->global->DIGIRISKDOLIBARR_SHOW_TASK_START_DATE && ( ! empty($related_task->date_start))) ? $related_task->date_start : $related_task->date_c)) . (($conf->global->DIGIRISKDOLIBARR_SHOW_TASK_END_DATE && ( ! empty($related_task->date_end))) ? ' - ' . date('d/m/Y', $related_task->date_end) : ''); ?>
@@ -120,7 +120,7 @@ $related_tasks = $risk->get_related_tasks($risk); ?>
 															<span class="riskassessment-task-reference" value="<?php echo $related_task->id ?>"><?php echo $task->getNomUrlTask($related_task, 0, 'withproject'); ?></span>
 															<span class="riskassessment-task-author">
 																		<?php $user->fetch($related_task->fk_user_creat); ?>
-																		<?php echo getNomUrl(0, '', 0, 0, 2, 0, '', '', -1, $user); ?>
+																		<?php echo getNomUrlUser($user); ?>
 																	</span>
 															<span class="riskassessment-task-date">
 																		<i class="fas fa-calendar-alt"></i> <?php echo date('d/m/Y', (($conf->global->DIGIRISKDOLIBARR_SHOW_TASK_START_DATE && ( ! empty($related_task->date_start))) ? $related_task->date_start : $related_task->date_c)) . (($conf->global->DIGIRISKDOLIBARR_SHOW_TASK_END_DATE && ( ! empty($related_task->date_end))) ? ' - ' . date('d/m/Y', $related_task->date_end) : ''); ?>
@@ -259,7 +259,7 @@ $related_tasks = $risk->get_related_tasks($risk); ?>
 																									<div class="riskassessment-task-data">
 																								<span class="riskassessment-task-author">
 																									<?php $user->fetch($related_task->fk_user_creat); ?>
-																									<?php echo getNomUrl(0, '', 0, 0, 2, 0, '', '', -1, $user); ?>
+																									<?php echo getNomUrlUser($user); ?>
 																								</span>
 																										<span class="riskassessment-task-timespent-date">
 																									<i class="fas fa-calendar-alt"></i> <?php echo dol_print_date($time_spent->timespent_datehour, 'dayhour'); ?>
@@ -409,7 +409,7 @@ $related_tasks = $risk->get_related_tasks($risk); ?>
 										<span class="riskassessment-task-reference" value="<?php echo $related_task->id ?>"><?php echo $task->getNomUrlTask($related_task, 0, 'withproject'); ?></span>
 										<span class="riskassessment-task-author">
 											<?php $user->fetch($related_task->fk_user_creat); ?>
-											<?php echo getNomUrl(0, '', 0, 0, 2, 0, '', '', -1, $user); ?>
+											<?php echo getNomUrlUser($user); ?>
 										</span>
 										<span class="riskassessment-task-date">
 											<i class="fas fa-calendar-alt"></i> <?php echo date('d/m/Y', (($conf->global->DIGIRISKDOLIBARR_SHOW_TASK_START_DATE && ( ! empty($related_task->date_start))) ? $related_task->date_start : $related_task->date_c)) . (($conf->global->DIGIRISKDOLIBARR_SHOW_TASK_END_DATE && ( ! empty($related_task->date_end))) ? ' - ' . date('d/m/Y', $related_task->date_end) : ''); ?>
@@ -655,7 +655,7 @@ $related_tasks = $risk->get_related_tasks($risk); ?>
 																<span class="riskassessment-task-reference" value="<?php echo $related_task->id ?>"><?php echo $task->getNomUrlTask($related_task, 0, 'withproject'); ?></span>
 																<span class="riskassessment-task-author">
 																	<?php $user->fetch($related_task->fk_user_creat); ?>
-																	<?php echo getNomUrl(0, '', 0, 0, 2, 0, '', '', -1, $user); ?>
+																	<?php echo getNomUrlUser($user); ?>
 																</span>
 																<span class="riskassessment-task-date">
 																	<i class="fas fa-calendar-alt"></i> <?php echo date('d/m/Y', (($conf->global->DIGIRISKDOLIBARR_SHOW_TASK_START_DATE && ( ! empty($related_task->date_start))) ? $related_task->date_start : $related_task->date_c)) . (($conf->global->DIGIRISKDOLIBARR_SHOW_TASK_END_DATE && ( ! empty($related_task->date_end))) ? ' - ' . date('d/m/Y', $related_task->date_end) : ''); ?>
