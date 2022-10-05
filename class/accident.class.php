@@ -678,11 +678,13 @@ class Accident extends CommonObject
 				$result = $accidentmetadata->fetch(0, '', $filter);
 				if ($result > 0) {
 					$nbaccidentinvestigations += 1;
-				} else {
-					$array['nbaccidentinvestigations'] = 'N/A';
 				}
 			}
-			$array['nbaccidentinvestigations'] = $nbaccidentinvestigations;
+			if ($nbaccidentinvestigations > 0) {
+				$array['nbaccidentinvestigations'] = $nbaccidentinvestigations;
+			} else {
+				$array['nbaccidentinvestigations'] = 'N/A';
+			}
 		} else {
 			$array['nbaccidentinvestigations'] = 'N/A';
 		}
