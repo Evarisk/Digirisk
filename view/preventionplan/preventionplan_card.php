@@ -1428,7 +1428,7 @@ if ((empty($action) || ($action != 'create' && $action != 'edit'))) {
 			}
 		}
 
-		print digiriskshowdocuments($modulepart, $dir_files, $filedir, $urlsource, $genallowed, 0, $defaultmodel, 1, 0, '', $title, '', '', $preventionplandocument, 0, 'remove_file', $object->status < $object::STATUS_ARCHIVED && $filesigned == 0, $langs->trans('PreventionPlanMustBeLocked'));
+		print digiriskshowdocuments($modulepart, $dir_files, $filedir, $urlsource, $genallowed, 0, $defaultmodel, 1, 0, '', $title, '', '', $preventionplandocument, 0, 'remove_file', $object->status < $object::STATUS_ARCHIVED && $filesigned == 0, $langs->trans('PreventionPlanGenerated'));
 	}
 
 	if ($permissiontoadd) {
