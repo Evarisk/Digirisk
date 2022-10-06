@@ -435,7 +435,7 @@ if ($object->id > 0) {
 	print '</div>';
 
 	if (!empty($conf->global->DIGIRISKDOLIBARR_SHOW_RISKSIGNS)) {
-		$contextpage = 'risksigncard';
+		$contextpage = 'risksignlist';
 		require_once './../../core/tpl/riskanalysis/risksign/digiriskdolibarr_risksignlist_view.tpl.php';
 	}
 

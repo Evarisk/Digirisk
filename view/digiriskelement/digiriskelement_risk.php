@@ -350,7 +350,7 @@ if ($object->id > 0) {
 	print '</div>';
 
 	if (!empty($conf->global->DIGIRISKDOLIBARR_SHOW_RISKS)) {
-		$contextpage = 'riskcard';
+		$contextpage = 'risklist';
 		require_once './../../core/tpl/riskanalysis/risk/digiriskdolibarr_risklist_view.tpl.php';
 	}
 

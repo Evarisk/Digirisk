@@ -209,7 +209,7 @@ llxHeader('', $title, $help_url, '', '', '', $morejs, $morecss);
 $allRisks = 1;
 require_once './../../core/tpl/medias/digiriskdolibarr_medias_gallery_modal.tpl.php';
 if (!empty($conf->global->DIGIRISKDOLIBARR_SHOW_RISKS)) {
-	$contextpage = 'riskcard';
+	$contextpage = 'risklist';
 	require_once './../../core/tpl/riskanalysis/risk/digiriskdolibarr_risklist_view.tpl.php';
 }
 if (!empty($conf->global->DIGIRISKDOLIBARR_SHOW_SHARED_RISKS)) {
