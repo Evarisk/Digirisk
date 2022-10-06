@@ -282,8 +282,12 @@ if ($action == 'add' && $canadduser && $permissiontoadd) {
 
 			$db->commit();
 
-			$urltogo = str_replace('USERID', $id, $backtopage);
-			header("Location: " . $urltogo);
+			if ($backtopage) {
+				$urltogo = str_replace('USERID', $id, $backtopage);
+				header("Location: " . $urltogo);
+			} else {
+				header("Location: " . $_SERVER['PHP_SELF']);
+			}
 			exit;
 		} else {
 			$langs->load("errors");
