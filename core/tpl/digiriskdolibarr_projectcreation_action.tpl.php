@@ -743,7 +743,8 @@ if ($conf->global->DIGIRISKDOLIBARR_CONF_BACKWARD_COMPATIBILITY == 0) {
 	dolibarr_set_const($db, 'DIGIRISKDOLIBARR_WORKUNITDOCUMENT_DEFAULT_MODEL', 'workunitdocument_odt', 'chaine', 0, '', $conf->entity);
 
 	// CONST PREVENTION PLAN
-	dolibarr_set_const($db, 'MAIN_AGENDA_ACTIONAUTO_PREVENTIONPLAN_CREATE', 1, 'integer', 0, '', $conf->entity);
+	//dolibarr_set_const($db, 'MAIN_AGENDA_ACTIONAUTO_PREVENTIONPLAN_CREATE', 1, 'integer', 0, '', $conf->entity);
+	dolibarr_set_const($db, 'MAIN_AGENDA_ACTIONAUTO_PREVENTIONPLAN_CREATE', 0, 'integer', 0, '', $conf->entity);
 	dolibarr_set_const($db, 'MAIN_AGENDA_ACTIONAUTO_PREVENTIONPLAN_EDIT', 1, 'integer', 0, '', $conf->entity);
 	dolibarr_set_const($db, 'DIGIRISKDOLIBARR_PREVENTIONPLAN_ADDON', 'mod_preventionplan_standard', 'chaine', 0, '', $conf->entity);
 	dolibarr_set_const($db, 'DIGIRISKDOLIBARR_PREVENTIONPLAN_PROJECT', dolibarr_get_const($db,'DIGIRISKDOLIBARR_PREVENTIONPLAN_PROJECT'), 'integer', 0, '', $conf->entity);
@@ -758,7 +759,8 @@ if ($conf->global->DIGIRISKDOLIBARR_CONF_BACKWARD_COMPATIBILITY == 0) {
 	dolibarr_set_const($db, 'DIGIRISKDOLIBARR_PREVENTIONPLANDOCUMENT_DEFAULT_MODEL', 'preventionplandocument_odt', 'chaine', 0, '', $conf->entity);
 
 	// CONST FIRE PERMIT
-	dolibarr_set_const($db, 'MAIN_AGENDA_ACTIONAUTO_FIREPERMIT_CREATE', 1, 'integer', 0, '', $conf->entity);
+	//dolibarr_set_const($db, 'MAIN_AGENDA_ACTIONAUTO_FIREPERMIT_CREATE', 1, 'integer', 0, '', $conf->entity);
+	dolibarr_set_const($db, 'MAIN_AGENDA_ACTIONAUTO_FIREPERMIT_CREATE', 0, 'integer', 0, '', $conf->entity);
 	dolibarr_set_const($db, 'MAIN_AGENDA_ACTIONAUTO_FIREPERMIT_EDIT', 1, 'integer', 0, '', $conf->entity);
 	dolibarr_set_const($db, 'DIGIRISKDOLIBARR_FIREPERMIT_ADDON', 'mod_firepermit_standard', 'chaine', 0, '', $conf->entity);
 	dolibarr_set_const($db, 'DIGIRISKDOLIBARR_FIREPERMIT_PROJECT',  dolibarr_get_const($db,'DIGIRISKDOLIBARR_FIREPERMIT_PROJECT'), 'integer', 0, '', $conf->entity);
