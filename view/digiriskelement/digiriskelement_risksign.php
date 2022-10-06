@@ -322,7 +322,7 @@ $form = new Form($db);
 
 $title    = $langs->trans("RiskSigns");
 $help_url = 'FR:Module_DigiriskDolibarr#Signalisation';
-$morejs   = array("/digiriskdolibarr/js/digiriskdolibarr.js.php");
+$morejs   = array("/digiriskdolibarr/js/digiriskdolibarr.js");
 $morecss  = array("/digiriskdolibarr/css/digiriskdolibarr.css");
 
 digiriskHeader($title, $help_url, $morejs, $morecss);

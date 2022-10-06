@@ -195,7 +195,7 @@ if ($fromid > 0) {
 	$head = digiriskelementPrepareHead($objectlinked);
 }
 
-$morejs  = array("/digiriskdolibarr/js/digiriskdolibarr.js.php");
+$morejs  = array("/digiriskdolibarr/js/digiriskdolibarr.js");
 $morecss = array("/digiriskdolibarr/css/digiriskdolibarr.css");
 
 if ($fromid > 0) {

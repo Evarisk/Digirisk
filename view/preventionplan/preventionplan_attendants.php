@@ -289,7 +289,7 @@ if ($action == 'deleteAttendant') {
 
 $title    = $langs->trans("PreventionPlanAttendants");
 $help_url = '';
-$morejs   = array("/digiriskdolibarr/js/signature-pad.min.js", "/digiriskdolibarr/js/digiriskdolibarr.js.php");
+$morejs   = array("/digiriskdolibarr/js/signature-pad.min.js", "/digiriskdolibarr/js/digiriskdolibarr.js");
 $morecss  = array("/digiriskdolibarr/css/digiriskdolibarr.css");
 
 llxHeader('', $title, $help_url, '', '', '', $morejs, $morecss);

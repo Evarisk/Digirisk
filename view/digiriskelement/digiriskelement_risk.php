@@ -202,7 +202,7 @@ if (empty($reshook)) {
 $form = new Form($db);
 $title    = $langs->trans("DigiriskElementRisk");
 $help_url = 'FR:Module_DigiriskDolibarr#Risques';
-$morejs   = array("/digiriskdolibarr/js/digiriskdolibarr.js.php");
+$morejs   = array("/digiriskdolibarr/js/digiriskdolibarr.js");
 $morecss  = array("/digiriskdolibarr/css/digiriskdolibarr.css");
 
 digiriskHeader($title, $help_url, $morejs, $morecss);

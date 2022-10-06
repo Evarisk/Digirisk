@@ -156,7 +156,7 @@ $emptyobject = new stdClass();
 
 $title    = $langs->trans('InformationsSharing');
 $help_url = 'FR:Module_DigiriskDolibarr#Diffusion_d.27informations';
-$morejs   = array("/digiriskdolibarr/js/digiriskdolibarr.js.php");
+$morejs   = array("/digiriskdolibarr/js/digiriskdolibarr.js");
 $morecss  = array("/digiriskdolibarr/css/digiriskdolibarr.css");
 
 digiriskHeader($title, $help_url, $morejs, $morecss); ?>

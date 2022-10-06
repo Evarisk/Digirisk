@@ -252,7 +252,7 @@ $form = new Form($db);
 
 $title    = $langs->trans("Evaluators");
 $help_url = 'FR:Module_DigiriskDolibarr#.C3.89valuateur';
-$morejs   = array("/digiriskdolibarr/js/digiriskdolibarr.js.php");
+$morejs   = array("/digiriskdolibarr/js/digiriskdolibarr.js");
 $morecss  = array("/digiriskdolibarr/css/digiriskdolibarr.css");
 
 if ($fromid > 0) {

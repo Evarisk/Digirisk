@@ -131,7 +131,7 @@ elseif ($reshook > 0) $formconfirm = $hookmanager->resPrint;
 
 $help_url = 'FR:Module_DigiriskDolibarr';
 $title    = $langs->trans('DigiriskElementOrganization');
-$morejs   = array("/digiriskdolibarr/js/digiriskdolibarr.js.php");
+$morejs   = array("/digiriskdolibarr/js/digiriskdolibarr.js");
 $morecss  = array("/digiriskdolibarr/css/digiriskdolibarr.css");
 
 llxHeader('', $title, $help_url, '', '', '', $morejs, $morecss);

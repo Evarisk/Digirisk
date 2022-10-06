@@ -223,7 +223,7 @@ $title         = $langs->trans("AccidentMetaData");
 $object->picto = 'accident@digiriskdolibarr';
 
 $help_url = 'FR:Module_DigiriskDolibarr';
-$morejs   = array("/digiriskdolibarr/js/digiriskdolibarr.js.php");
+$morejs   = array("/digiriskdolibarr/js/digiriskdolibarr.js");
 $morecss  = array("/digiriskdolibarr/css/digiriskdolibarr.css");
 
 llxHeader('', $title, $help_url, '', '', '', $morejs, $morecss);

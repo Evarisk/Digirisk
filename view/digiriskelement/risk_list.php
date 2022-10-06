@@ -199,7 +199,7 @@ $form = new Form($db);
 
 $title    = $langs->trans("RiskList");
 $help_url = 'FR:Module_DigiriskDolibarr';
-$morejs   = array("/digiriskdolibarr/js/digiriskdolibarr.js.php");
+$morejs   = array("/digiriskdolibarr/js/digiriskdolibarr.js");
 $morecss  = array("/digiriskdolibarr/css/digiriskdolibarr.css");
 
 llxHeader('', $title, $help_url, '', '', '', $morejs, $morecss);

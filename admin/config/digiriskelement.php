@@ -71,7 +71,7 @@ if (GETPOST('action') == 'updateMask') {
 $help_url = 'FR:Module_DigiriskDolibarr#L.27onglet_.C3.89l.C3.A9ment_Digirisk';
 $title    = $langs->trans("Arborescence");
 
-$morejs  = array("/digiriskdolibarr/js/digiriskdolibarr.js.php");
+$morejs  = array("/digiriskdolibarr/js/digiriskdolibarr.js");
 $morecss = array("/digiriskdolibarr/css/digiriskdolibarr.css");
 
 llxHeader('', $title, $help_url, '', '', '', $morejs, $morecss);

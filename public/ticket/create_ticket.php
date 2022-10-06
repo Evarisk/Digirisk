@@ -356,7 +356,7 @@ if ($action == 'removefile') {
 $form       = new Form($db);
 $formticket = new FormTicket($db);
 
-$arrayofjs  = array("/digiriskdolibarr/js/digiriskdolibarr.js.php");
+$arrayofjs  = array("/digiriskdolibarr/js/digiriskdolibarr.js");
 $arrayofcss = array('/opensurvey/css/style.css', '/ticket/css/styles.css.php', "/digiriskdolibarr/css/digiriskdolibarr.css");
 
 llxHeaderTicketDigirisk($langs->trans("CreateTicket"), "", 0, 0, $arrayofjs, $arrayofcss);

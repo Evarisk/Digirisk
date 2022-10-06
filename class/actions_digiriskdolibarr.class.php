@@ -74,7 +74,7 @@ class ActionsDigiriskdolibarr
 		/* print_r($parameters); print_r($object); echo "action: " . $action; */
 		if ($parameters['currentcontext'] == 'admincompany') {	    // do something only for the context 'somecontext1' or 'somecontext2'
 			?>
-			<script src="../custom/digiriskdolibarr/js/digiriskdolibarr.js.php"></script>
+			<script src="../custom/digiriskdolibarr/js/digiriskdolibarr.js"></script>
 			<?php
 			if ($conf->global->MAIN_INFO_SOCIETE_COUNTRY == '1:FR:France') {
 				require_once __DIR__ . '/../lib/digiriskdolibarr_function.lib.php';
