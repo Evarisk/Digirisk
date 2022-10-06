@@ -546,7 +546,7 @@ if ($entity > 0) {
 		print '<div class="wpeo-gridlayout grid-4">';
 		if (!empty($entities_list)) {
 			foreach($entities_list as $entityId => $entityName) {
-				$logos_path = DOL_DATA_ROOT . ($entity > 0 ? '/' . $entity : '/') . 'mycompany/logos';
+				$logos_path = DOL_DATA_ROOT . ($entityId > 1 ? '/' . $entityId . '/' : '/') . 'mycompany/logos';
 				$logos_list = dol_dir_list($logos_path);
 				if (is_array($logos_list) && !empty($logos_list)) {
 					$logo = array_shift($logos_list);
