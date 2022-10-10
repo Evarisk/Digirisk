@@ -187,7 +187,7 @@ if ($action == 'send') {
 						setEventMessages($mesg, null, 'warnings');
 					}
 				} else {
-					setEventMessages($langs->trans('ErrorSetupEmail'), '', 'errors');
+					setEventMessages($langs->trans('ErrorSetupEmail') . '<br>' . $langs->trans('GoToEmailSetup') . '<a target="_blank" href="'. DOL_URL_ROOT .'/admin/mails.php"> '. $langs->trans('PathToEmailSetup') .'</a>', '', 'errors');
 				}
 			}
 		} else {
@@ -234,7 +234,7 @@ $form = new Form($db);
 
 $title    = $langs->trans("AccidentAttendants");
 $help_url = '';
-$morejs   = array("/digiriskdolibarr/js/signature-pad.min.js", "/digiriskdolibarr/js/digiriskdolibarr.js.php");
+$morejs   = array("/digiriskdolibarr/js/signature-pad.min.js", "/digiriskdolibarr/js/digiriskdolibarr.js");
 $morecss  = array("/digiriskdolibarr/css/digiriskdolibarr.css");
 
 llxHeader('', $title, $help_url, '', '', '', $morejs, $morecss);

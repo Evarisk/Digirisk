@@ -132,7 +132,7 @@ $form = new Form($db);
 $help_url = 'FR:Module_DigiriskDolibarr#L.27onglet_S.C3.A9curit.C3.A9';
 $title    = $langs->trans("CompanyFoundation") . ' - ' . $langs->trans("Security");
 
-$morejs  = array("/digiriskdolibarr/js/digiriskdolibarr.js.php");
+$morejs  = array("/digiriskdolibarr/js/digiriskdolibarr.js");
 $morecss = array("/digiriskdolibarr/css/digiriskdolibarr.css");
 
 $counter = 0;
@@ -480,7 +480,7 @@ print '</td></tr>';
 // * Location of detailed instructions - Emplacement de la consigne détaillée *
 
 print '<tr class="oddeven"><td><label for="emplacementCD">' . $langs->trans("LocationOfDetailedInstructions") . '</label></td><td>';
-$doleditor = new DolEditor('emplacementCD', $conf->global->DIGIRISKDOLIBARR_LOCATION_OF_DETAILED_INSTRUCTION ? $conf->global->DIGIRISKDOLIBARR_LOCATION_OF_DETAILED_INSTRUCTION : '', '', 90, 'dolibarr_details', '', false, true, $conf->global->FCKEDITOR_ENABLE_SOCIETE, ROWS_3, '90%');
+$doleditor = new DolEditor('emplacementCD', $conf->global->DIGIRISKDOLIBARR_LOCATION_OF_DETAILED_INSTRUCTION ? $conf->global->DIGIRISKDOLIBARR_LOCATION_OF_DETAILED_INSTRUCTION : '', '', 200, 'dolibarr_details', '', false, true, $conf->global->FCKEDITOR_ENABLE_SOCIETE, ROWS_3, '90%');
 $doleditor->Create();
 print '</td></tr>';
 
@@ -493,28 +493,28 @@ print '<tr class="liste_titre"><th class="titlefield">' . $langs->trans("Society
 // * Description - Emplacement de la consigne détaillée *
 
 print '<tr class="oddeven"><td><label for="description">' . $langs->trans("Description") . '</label></td><td>';
-$doleditor = new DolEditor('description', $conf->global->DIGIRISKDOLIBARR_SOCIETY_DESCRIPTION ? $conf->global->DIGIRISKDOLIBARR_SOCIETY_DESCRIPTION : '', '', 90, 'dolibarr_details', '', false, true, $conf->global->FCKEDITOR_ENABLE_SOCIETE, ROWS_3, '90%');
+$doleditor = new DolEditor('description', $conf->global->DIGIRISKDOLIBARR_SOCIETY_DESCRIPTION ? $conf->global->DIGIRISKDOLIBARR_SOCIETY_DESCRIPTION : '', '', 200, 'dolibarr_details', '', false, true, $conf->global->FCKEDITOR_ENABLE_SOCIETE, ROWS_3, '90%');
 $doleditor->Create();
 print '</td></tr>';
 
 // * General means at disposal - Moyens généraux mis à disposition *
 
 print '<tr class="oddeven"><td><label for="moyensgeneraux">' . $langs->trans("GeneralMeansAtDisposal") . '</label></td><td>';
-$doleditor = new DolEditor('moyensgeneraux', $conf->global->DIGIRISKDOLIBARR_GENERAL_MEANS ? $conf->global->DIGIRISKDOLIBARR_GENERAL_MEANS : '', '', 90, 'dolibarr_details', '', false, true, $conf->global->FCKEDITOR_ENABLE_SOCIETE, ROWS_3, '90%');
+$doleditor = new DolEditor('moyensgeneraux', $conf->global->DIGIRISKDOLIBARR_GENERAL_MEANS ? $conf->global->DIGIRISKDOLIBARR_GENERAL_MEANS : '', '', 200, 'dolibarr_details', '', false, true, $conf->global->FCKEDITOR_ENABLE_SOCIETE, ROWS_3, '90%');
 $doleditor->Create();
 print '</td></tr>';
 
 // * General instructions - Consignes générales *
 
 print '<tr class="oddeven"><td><label for="consignesgenerales">' . $langs->trans("GeneralInstructions") . '</label></td><td>';
-$doleditor = new DolEditor('consignesgenerales', $conf->global->DIGIRISKDOLIBARR_GENERAL_RULES ? $conf->global->DIGIRISKDOLIBARR_GENERAL_RULES : '', '', 90, 'dolibarr_details', '', false, true, $conf->global->FCKEDITOR_ENABLE_SOCIETE, ROWS_3, '90%');
+$doleditor = new DolEditor('consignesgenerales', $conf->global->DIGIRISKDOLIBARR_GENERAL_RULES ? $conf->global->DIGIRISKDOLIBARR_GENERAL_RULES : '', '', 200, 'dolibarr_details', '', false, true, $conf->global->FCKEDITOR_ENABLE_SOCIETE, ROWS_3, '90%');
 $doleditor->Create();
 print '</td></tr>';
 
 // * General instructions - Consignes générales *
 
 print '<tr class="oddeven"><td><label for="firstaid">' . $langs->trans("FirstAid") . '</label></td><td>';
-$doleditor = new DolEditor('firstaid', $conf->global->DIGIRISKDOLIBARR_FIRST_AID ? $conf->global->DIGIRISKDOLIBARR_FIRST_AID : '', '', 90, 'dolibarr_details', '', false, true, $conf->global->FCKEDITOR_ENABLE_SOCIETE, ROWS_3, '90%');
+$doleditor = new DolEditor('firstaid', $conf->global->DIGIRISKDOLIBARR_FIRST_AID ? $conf->global->DIGIRISKDOLIBARR_FIRST_AID : '', '', 200, 'dolibarr_details', '', false, true, $conf->global->FCKEDITOR_ENABLE_SOCIETE, ROWS_3, '90%');
 $doleditor->Create();
 print '</td></tr>';
 
@@ -525,7 +525,7 @@ print '<tr class="liste_titre"><th class="titlefield wordbreak">' . $langs->tran
 // * Rules of procedure location - Emplacement du règlement intérieur *
 
 print '<tr class="oddeven"><td><label for="emplacementRI">' . $langs->trans("Location") . '</label></td><td>';
-$doleditor = new DolEditor('emplacementRI', $conf->global->DIGIRISKDOLIBARR_RULES_LOCATION ? $conf->global->DIGIRISKDOLIBARR_RULES_LOCATION : '', '', 90, 'dolibarr_details', '', false, true, $conf->global->FCKEDITOR_ENABLE_SOCIETE, ROWS_3, '90%');
+$doleditor = new DolEditor('emplacementRI', $conf->global->DIGIRISKDOLIBARR_RULES_LOCATION ? $conf->global->DIGIRISKDOLIBARR_RULES_LOCATION : '', '', 200, 'dolibarr_details', '', false, true, $conf->global->FCKEDITOR_ENABLE_SOCIETE, ROWS_3, '90%');
 $doleditor->Create();
 print '</td></tr>';
 
@@ -536,7 +536,7 @@ print '<tr class="liste_titre"><th class="titlefield wordbreak">' . $langs->tran
 // * Risks evaluation location - Emplacement du Document Unique *
 
 print '<tr class="oddeven"><td><label for="emplacementDU">' . $langs->trans("Location") . '</label></td><td>';
-$doleditor = new DolEditor('emplacementDU', $conf->global->DIGIRISKDOLIBARR_DUER_LOCATION ? $conf->global->DIGIRISKDOLIBARR_DUER_LOCATION : '', '', 90, 'dolibarr_details', '', false, true, $conf->global->FCKEDITOR_ENABLE_SOCIETE, ROWS_3, '90%');
+$doleditor = new DolEditor('emplacementDU', $conf->global->DIGIRISKDOLIBARR_DUER_LOCATION ? $conf->global->DIGIRISKDOLIBARR_DUER_LOCATION : '', '', 200, 'dolibarr_details', '', false, true, $conf->global->FCKEDITOR_ENABLE_SOCIETE, ROWS_3, '90%');
 $doleditor->Create();
 print '</td></tr>';
 
@@ -547,7 +547,7 @@ print '<tr class="liste_titre"><th class="titlefield wordbreak">' . $langs->tran
 // * Collective Agreement location - Emplacement de la Convention collective *
 
 print '<tr class="oddeven"><td><label for="emplacementCC">' . $langs->trans("Location") . '</label></td><td>';
-$doleditor = new DolEditor('emplacementCC', $conf->global->DIGIRISKDOLIBARR_COLLECTIVE_AGREEMENT_LOCATION ? $conf->global->DIGIRISKDOLIBARR_COLLECTIVE_AGREEMENT_LOCATION : '', '', 90, 'dolibarr_details', '', false, true, $conf->global->FCKEDITOR_ENABLE_SOCIETE, ROWS_3, '90%');
+$doleditor = new DolEditor('emplacementCC', $conf->global->DIGIRISKDOLIBARR_COLLECTIVE_AGREEMENT_LOCATION ? $conf->global->DIGIRISKDOLIBARR_COLLECTIVE_AGREEMENT_LOCATION : '', '', 200, 'dolibarr_details', '', false, true, $conf->global->FCKEDITOR_ENABLE_SOCIETE, ROWS_3, '90%');
 $doleditor->Create();
 print '</td></tr>';
 print '</table>';

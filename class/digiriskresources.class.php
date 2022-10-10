@@ -23,6 +23,8 @@
 
 require_once DOL_DOCUMENT_ROOT.'/core/class/commonobject.class.php';
 
+require_once __DIR__ . '/dashboarddigiriskstats.class.php';
+
 /**
  * Class for DigiriskResources
  */
@@ -466,5 +468,43 @@ class DigiriskResources extends CommonObject
 	public function delete(User $user, $notrigger = false)
 	{
 		return $this->deleteCommon($user, $notrigger);
+	}
+
+	/**
+	 * Load dashboard info digirisk resources
+	 *
+	 * @return array
+	 * @throws Exception
+	 */
+	public function load_dashboard()
+	{
+		global $langs;
+
+		$arraySiretNumber  = $this->getSiretNumber();
+
+		$array['widgets'] = array(
+			DashboardDigiriskStats::DASHBOARD_DIGIRISKRESOURCES => array(
+				'label'      => array($langs->transnoentities("SiretNumber")),
+				'content'    => array($arraySiretNumber['siretnumber']),
+				'picto'      => 'fas fa-building',
+				'widgetName' => $langs->transnoentities('Society')
+			)
+		);
+
+		return $array;
+	}
+
+	/**
+	 * Get siret number.
+	 *
+	 * @return array
+	 */
+	public function getSiretNumber()
+	{
+		// Siret number
+		global $mysoc;
+
+		$array['siretnumber'] = (!empty($mysoc->idprof2) ? $mysoc->idprof2 : 'N/A');
+		return $array;
 	}
 }

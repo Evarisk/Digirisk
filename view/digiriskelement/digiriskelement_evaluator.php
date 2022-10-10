@@ -75,6 +75,7 @@ $object           = new DigiriskElement($db);
 $digiriskstandard = new DigiriskStandard($db);
 $evaluator        = new Evaluator($db);
 $extrafields      = new ExtraFields($db);
+$usertmp          = new User($db);
 $refEvaluatorMod  = new $conf->global->DIGIRISKDOLIBARR_EVALUATOR_ADDON();
 
 $hookmanager->initHooks(array('evaluatorcard', 'globalcard')); // Note that conf->hooks_modules contains array
@@ -175,17 +176,34 @@ if (empty($reshook)) {
 
 		$duration    = $data['duration'];
 		$date        = $data['date'];
+		$job         = $data['job'];
 		$evaluatorID = $data['evaluatorID'];
+
+		$usertmp->fetch($evaluatorID);
 
 		$evaluator->ref             = $refEvaluatorMod->getNextValue($evaluator);
 		$evaluator->ref_ext         = $evaluator->ref;
 		$evaluator->assignment_date = strtotime(preg_replace('/\//', '-', $date));
 		$evaluator->duration        = $duration;
+		$evaluator->job             = (!empty($job) ? $job : $usertmp->job);
 		$evaluator->fk_user         = $evaluatorID;
 		$evaluator->fk_parent       = $object->id;
 		$evaluator->status          = 1;
 
-		$evaluator->create($user);
+		if ( ! $error) {
+			$result = $evaluator->create($user);
+			if ($result > 0) {
+				// Creation evaluator OK
+				$urltogo = str_replace('__ID__', $id, $backtopage);
+				$urltogo = preg_replace('/--IDFORBACKTOPAGE--/', $id, $urltogo); // New method to autoselect project after a New on another form object creation
+				header("Location: " . $urltogo);
+				exit;
+			} else {
+				// Creation evaluator KO
+				if ( ! empty($object->errors)) setEventMessages(null, $object->errors, 'errors');
+				else setEventMessages($object->error, null, 'errors');
+			}
+		}
 	}
 
 	if ( ! $error && ($massaction == 'delete' || ($action == 'delete' && $confirm == 'yes')) && $permissiontodelete) {
@@ -218,6 +236,12 @@ if (empty($reshook)) {
 			}
 		}
 	}
+
+	if ( ! $error && $action == 'getEvaluatorJob' && $permissiontoadd) {
+		$data = json_decode(file_get_contents('php://input'), true);
+		$userID = $data['userID'];
+		$usertmp->fetch($userID);
+	}
 }
 
 /*
@@ -226,9 +250,9 @@ if (empty($reshook)) {
 
 $form = new Form($db);
 
-$title    = $langs->trans("Evaluator");
+$title    = $langs->trans("Evaluators");
 $help_url = 'FR:Module_DigiriskDolibarr#.C3.89valuateur';
-$morejs   = array("/digiriskdolibarr/js/digiriskdolibarr.js.php");
+$morejs   = array("/digiriskdolibarr/js/digiriskdolibarr.js");
 $morecss  = array("/digiriskdolibarr/css/digiriskdolibarr.css");
 
 if ($fromid > 0) {
@@ -280,7 +304,7 @@ if ($object->id > 0 || $fromid > 0) {
 		print '<div class="underbanner clearboth"></div>';
 	}
 
-	print '<div class="fichecenter wpeo-wrap">';
+	print '<div class="fichecenter evaluatorlist wpeo-wrap">';
 	print '<form method="POST" id="searchFormList" action="' . $_SERVER["PHP_SELF"] . (empty($fromid) ? '?id=' . $object->id : '?fromid=' . $fromid) . '" name="evaluator_form"">' . "\n";
 	print '<input type="hidden" name="token" value="' . newToken() . '">';
 	print '<input type="hidden" name="formfilteraction" id="formfilteraction" value="list">';
@@ -434,7 +458,7 @@ if ($object->id > 0 || $fromid > 0) {
 	} ?>
 	<!-- EVALUATOR ADD MODAL-->
 	<div class="evaluator-add-modal" value="<?php echo $object->id ?>">
-		<div class="wpeo-modal modal-evaluator-0" id="evaluator_add<?php echo $object->id ?>">
+		<div class="wpeo-modal modal-evaluator-0 <?php echo (GETPOST('modalactive') ? 'modal-active' : ''); ?>" id="evaluator_add<?php echo $object->id ?>">
 			<div class="modal-container wpeo-modal-event">
 				<!-- Modal-Header -->
 				<div class="modal-header">
@@ -452,13 +476,13 @@ if ($object->id > 0 || $fromid > 0) {
 									$userlist = $form->select_dolusers(GETPOST('responsible_socid'), '', 0, null, 0, '', '', 0, 0, 0, 'AND u.statut = 1', 0, '', 'minwidth300', 0, 1);
 									print '<table><tr>';
 									print '<td>';
-									print $form->selectarray('fk_user_employer', $userlist, $usertmp->id, $langs->trans('SelectUser'), null, null, null, "40%", 0, 0, '', 'minwidth300', 1);
-									print ' <a href="' . DOL_URL_ROOT . '/user/card.php?action=create&backtopage=' . urlencode($_SERVER["PHP_SELF"] . '?action=create') . '" target="_blank"><span class="fa fa-plus-circle valignmiddle paddingleft" title="' . $langs->trans("AddUser") . '"></span></a>';
+									print $form->selectarray('fk_user_employer', $userlist, (GETPOST('userid') ? GETPOST('userid') : $usertmp->id), $langs->trans('SelectUser'), null, null, null, "40%", 0, 0, '', 'minwidth300', 1);
+									print ' <a href="' . dol_buildpath('custom/digiriskdolibarr/view/digiriskusers?backtopage=' . urlencode($_SERVER["PHP_SELF"] . '?id=' . $id . '&userid=USERID&modalactive=1') . '#addUser', 1) . '"><span class="fa fa-plus-circle valignmiddle paddingleft" title="' . $langs->trans("AddUser") . '"></span></a>';
 									print '</td></tr></table>';
 									?>
 
 						</div>
-						<div class="evaluator-assignment wpeo-gridlayout grid-2">
+						<div class="evaluator-assignment wpeo-gridlayout grid-3">
 							<div class="evaluator-duration">
 								<span class="title"><?php echo $langs->trans('Duration'); ?></span>
 								<span class="time"><?php print '<input type="number" class="duration" name="evaluatorDuration" rows="' . ROWS_2 . '" value="' . $conf->global->DIGIRISKDOLIBARR_EVALUATOR_DURATION . '"> min'; ?></span>
@@ -467,13 +491,17 @@ if ($object->id > 0 || $fromid > 0) {
 								<span class="title"><?php echo $langs->trans('Date'); ?></span>
 								<?php print $form->selectDate('', 'EvaluatorDate', 0, 0, 0, 'evaluator_form', 1, 1,'','','','','',1,'','','tzuserrel'); ?>
 							</div>
+							<div class="evaluator-job">
+								<span class="title"><?php echo $langs->trans('PostOrFunction'); ?></span>
+								<span class=""><input type="text" class="evaluatorJob" name="evaluatorJob" value="<?php echo $usertmp->job; ?>"></span>
+							</div>
 						</div>
 					</div>
 				</div>
 				<!-- Modal-Footer -->
 				<div class="modal-footer">
 					<?php if ($permissiontoadd) : ?>
-						<div class="evaluator-create wpeo-button button-primary modal-close">
+						<div class="evaluator-create wpeo-button button-primary modal-close<?php echo (GETPOST('modalactive') ? '' : ' button-disable'); ?>">
 							<span><i class="fas fa-plus"></i>  <?php echo $langs->trans('AddEvaluatorButton'); ?></span>
 						</div>
 					<?php else : ?>

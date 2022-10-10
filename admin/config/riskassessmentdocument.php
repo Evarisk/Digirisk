@@ -36,7 +36,7 @@ if ( ! $res && file_exists("../../../main.inc.php")) $res    = @include "../../.
 if ( ! $res && file_exists("../../../../main.inc.php")) $res = @include "../../../../main.inc.php";
 if ( ! $res) die("Include of main fails");
 
-global $langs, $user;
+global $conf, $db, $langs, $user;
 
 // Libraries
 require_once DOL_DOCUMENT_ROOT . "/core/lib/admin.lib.php";
@@ -55,6 +55,7 @@ $langs->loadLangs(array("admin", "digiriskdolibarr@digiriskdolibarr"));
 if ( ! $user->admin) accessforbidden();
 
 // Parameters
+$action     = GETPOST('action', 'alpha');
 $backtopage = GETPOST('backtopage', 'alpha');
 
 /*
@@ -62,8 +63,12 @@ $backtopage = GETPOST('backtopage', 'alpha');
  */
 
 if (($action == 'update' && ! GETPOST("cancel", 'alpha')) || ($action == 'updateedit')) {
+	$DUProject = GETPOST('DUProject', 'none');
+	$DUProject = preg_split('/_/', $DUProject);
 	$EvaluatorDuration = GETPOST('EvaluatorDuration', 'alpha');
 	$TaskTimeSpentDuration = GETPOST('TaskTimeSpentDuration', 'alpha');
+
+	dolibarr_set_const($db, "DIGIRISKDOLIBARR_DU_PROJECT", $DUProject[0], 'integer', 0, '', $conf->entity);
 
 	if (!empty($EvaluatorDuration) || $EvaluatorDuration === '0') {
 		dolibarr_set_const($db, "DIGIRISKDOLIBARR_EVALUATOR_DURATION", $EvaluatorDuration, 'integer', 0, '', $conf->entity);
@@ -88,7 +93,7 @@ if ( ! empty($conf->projet->enabled)) { $formproject = new FormProjets($db); }
 $help_url = 'FR:Module_DigiriskDolibarr#L.27onglet_Analyse_des_risques';
 $title    = $langs->trans("RiskAssessmentDocument");
 
-$morejs  = array("/digiriskdolibarr/js/digiriskdolibarr.js.php");
+$morejs  = array("/digiriskdolibarr/js/digiriskdolibarr.js");
 $morecss = array("/digiriskdolibarr/css/digiriskdolibarr.css");
 
 llxHeader('', $title, $help_url, '', '', '', $morejs, $morecss);
@@ -270,13 +275,24 @@ print '</td>';
 print '</tr>';
 
 print '<tr class="oddeven"><td>';
-print $langs->trans('ShowInheritedRisks');
+print $langs->trans('ShowInheritedRisksInDocuments');
 print "</td><td>";
-print $langs->trans('ShowInheritedRisksDescription');
+print $langs->trans('ShowInheritedRisksInDocumentsDescription');
 print '</td>';
 
 print '<td class="center">';
-print ajax_constantonoff('DIGIRISKDOLIBARR_SHOW_INHERITED_RISKS');
+print ajax_constantonoff('DIGIRISKDOLIBARR_SHOW_INHERITED_RISKS_IN_DOCUMENTS');
+print '</td>';
+print '</tr>';
+
+print '<tr class="oddeven"><td>';
+print $langs->trans('ShowInheritedRisksInListings');
+print "</td><td>";
+print $langs->trans('ShowInheritedRisksInListingsDescription');
+print '</td>';
+
+print '<td class="center">';
+print ajax_constantonoff('DIGIRISKDOLIBARR_SHOW_INHERITED_RISKS_IN_LISTINGS');
 print '</td>';
 print '</tr>';
 
@@ -439,7 +455,7 @@ print $langs->trans('ShowAllRiskAssessmentsDescription');
 print '</td>';
 
 print '<td class="center">';
-print ajax_constantonoff('DIGIRISKDOLIBARR_SHOW_ALL_RISKASESSMENTS');
+print ajax_constantonoff('DIGIRISKDOLIBARR_SHOW_ALL_RISKASSESSMENTS');
 print '</td>';
 print '</tr>';
 print '</table>';
@@ -518,15 +534,27 @@ print '</td>';
 print '</tr>';
 
 print '<tr class="oddeven"><td>';
-print $langs->trans('ShowTaskProgress');
+print $langs->trans('ShowTasksDone');
 print "</td><td>";
-print $langs->trans('ShowTaskProgressDescription') . ' %';
+print $langs->trans('ShowTasksDoneDescription') . ' % ' . $langs->trans('ShowTasksDoneDescriptionExtend');
 print '</td>';
 
 print '<td class="center">';
-print ajax_constantonoff('DIGIRISKDOLIBARR_SHOW_TASK_PROGRESS');
+print ajax_constantonoff('DIGIRISKDOLIBARR_SHOW_TASKS_DONE');
 print '</td>';
 print '</tr>';
+
+print '<tr class="oddeven"><td>';
+print $langs->trans('ShowTaskCalculatedProgress');
+print "</td><td>";
+print $langs->trans('ShowTaskCalculatedProgressDescription');
+print '</td>';
+
+print '<td class="center">';
+print ajax_constantonoff('DIGIRISKDOLIBARR_SHOW_TASK_CALCULATED_PROGRESS');
+print '</td>';
+print '</tr>';
+
 
 print '<tr class="oddeven"><td>';
 print $langs->trans('ShowAllTasks');

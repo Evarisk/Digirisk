@@ -146,7 +146,7 @@
 .box-flex-item .info-box-icon img, .box-flex-item .info-box-icon i {
   margin: auto;
 }
-.box-flex-item .close-dashboard-info {
+.box-flex-item .close-dashboard-info, .box-flex-item .close-dashboard-widget {
   width: 20px;
   height: 20px;
   line-height: 20px;
@@ -159,14 +159,14 @@
   top: -5px;
   right: -5px;
 }
-.box-flex-item .close-dashboard-info:hover {
+.box-flex-item .close-dashboard-info:hover, .box-flex-item .close-dashboard-widget:hover {
   cursor: pointer;
   background: #e05353;
   color: #fff;
   -webkit-transform: scale(1.2);
   transform: scale(1.2);
 }
-.box-flex-item .close-dashboard-info > [class*=fa] {
+.box-flex-item .close-dashboard-info > [class*=fa], .box-flex-item .close-dashboard-widget > [class*=fa] {
   display: inline-block;
   line-height: 20px;
 }
@@ -2052,6 +2052,31 @@
 
 /* Simple */
 /* Moderne */
+.card {
+  /* Add shadows to create the "card" effect */
+  -webkit-box-shadow: 0 4px 8px 0 rgba(0, 0, 0, 0.2);
+  box-shadow: 0 4px 8px 0 rgba(0, 0, 0, 0.2);
+  -webkit-transition: 0.3s;
+  transition: 0.3s;
+}
+
+/* On mouse-over, add a deeper shadow */
+.card:hover {
+  -webkit-box-shadow: 0 8px 16px 0 rgba(0, 0, 0, 0.2);
+  box-shadow: 0 8px 16px 0 rgba(0, 0, 0, 0.2);
+}
+
+/* Add some padding inside the card container */
+.card-container {
+  display: -webkit-box;
+  display: -ms-flexbox;
+  display: flex;
+  padding: 2px 16px;
+  -webkit-box-pack: center;
+  -ms-flex-pack: center;
+  justify-content: center;
+}
+
 .page-ut-gp-list {
   margin-left: -30px;
   -webkit-box-sizing: border-box;
@@ -2098,6 +2123,7 @@
 .page-ut-gp-list .side-nav .navigation-container {
   max-height: 1000px;
   overflow-y: auto;
+  height: 90vh;
 }
 .page-ut-gp-list .side-nav .add-container {
   position: absolute;
@@ -2988,407 +3014,15 @@
   font-weight: 700;
   color: rgba(0, 0, 0, 0.6);
 }
-.riskassessment-task-container .riskassessment-task-single .riskassessment-task-content .riskassessment-task-data .riskassessment-task-progress.progress-0 {
+.riskassessment-task-container .riskassessment-task-single .riskassessment-task-content .riskassessment-task-data .riskassessment-task-progress.progress-red {
   background: #e05353;
   color: #fff;
 }
-.riskassessment-task-container .riskassessment-task-single .riskassessment-task-content .riskassessment-task-data .riskassessment-task-progress.progress-1 {
-  background: #e05353;
-  color: #fff;
-}
-.riskassessment-task-container .riskassessment-task-single .riskassessment-task-content .riskassessment-task-data .riskassessment-task-progress.progress-2 {
-  background: #e05353;
-  color: #fff;
-}
-.riskassessment-task-container .riskassessment-task-single .riskassessment-task-content .riskassessment-task-data .riskassessment-task-progress.progress-3 {
-  background: #e05353;
-  color: #fff;
-}
-.riskassessment-task-container .riskassessment-task-single .riskassessment-task-content .riskassessment-task-data .riskassessment-task-progress.progress-4 {
-  background: #e05353;
-  color: #fff;
-}
-.riskassessment-task-container .riskassessment-task-single .riskassessment-task-content .riskassessment-task-data .riskassessment-task-progress.progress-5 {
-  background: #e05353;
-  color: #fff;
-}
-.riskassessment-task-container .riskassessment-task-single .riskassessment-task-content .riskassessment-task-data .riskassessment-task-progress.progress-6 {
-  background: #e05353;
-  color: #fff;
-}
-.riskassessment-task-container .riskassessment-task-single .riskassessment-task-content .riskassessment-task-data .riskassessment-task-progress.progress-7 {
-  background: #e05353;
-  color: #fff;
-}
-.riskassessment-task-container .riskassessment-task-single .riskassessment-task-content .riskassessment-task-data .riskassessment-task-progress.progress-8 {
-  background: #e05353;
-  color: #fff;
-}
-.riskassessment-task-container .riskassessment-task-single .riskassessment-task-content .riskassessment-task-data .riskassessment-task-progress.progress-9 {
-  background: #e05353;
-  color: #fff;
-}
-.riskassessment-task-container .riskassessment-task-single .riskassessment-task-content .riskassessment-task-data .riskassessment-task-progress.progress-10 {
-  background: #e05353;
-  color: #fff;
-}
-.riskassessment-task-container .riskassessment-task-single .riskassessment-task-content .riskassessment-task-data .riskassessment-task-progress.progress-11 {
-  background: #e05353;
-  color: #fff;
-}
-.riskassessment-task-container .riskassessment-task-single .riskassessment-task-content .riskassessment-task-data .riskassessment-task-progress.progress-12 {
-  background: #e05353;
-  color: #fff;
-}
-.riskassessment-task-container .riskassessment-task-single .riskassessment-task-content .riskassessment-task-data .riskassessment-task-progress.progress-13 {
-  background: #e05353;
-  color: #fff;
-}
-.riskassessment-task-container .riskassessment-task-single .riskassessment-task-content .riskassessment-task-data .riskassessment-task-progress.progress-14 {
-  background: #e05353;
-  color: #fff;
-}
-.riskassessment-task-container .riskassessment-task-single .riskassessment-task-content .riskassessment-task-data .riskassessment-task-progress.progress-15 {
-  background: #e05353;
-  color: #fff;
-}
-.riskassessment-task-container .riskassessment-task-single .riskassessment-task-content .riskassessment-task-data .riskassessment-task-progress.progress-16 {
-  background: #e05353;
-  color: #fff;
-}
-.riskassessment-task-container .riskassessment-task-single .riskassessment-task-content .riskassessment-task-data .riskassessment-task-progress.progress-17 {
-  background: #e05353;
-  color: #fff;
-}
-.riskassessment-task-container .riskassessment-task-single .riskassessment-task-content .riskassessment-task-data .riskassessment-task-progress.progress-18 {
-  background: #e05353;
-  color: #fff;
-}
-.riskassessment-task-container .riskassessment-task-single .riskassessment-task-content .riskassessment-task-data .riskassessment-task-progress.progress-19 {
-  background: #e05353;
-  color: #fff;
-}
-.riskassessment-task-container .riskassessment-task-single .riskassessment-task-content .riskassessment-task-data .riskassessment-task-progress.progress-20 {
-  background: #e05353;
-  color: #fff;
-}
-.riskassessment-task-container .riskassessment-task-single .riskassessment-task-content .riskassessment-task-data .riskassessment-task-progress.progress-21 {
-  background: #e05353;
-  color: #fff;
-}
-.riskassessment-task-container .riskassessment-task-single .riskassessment-task-content .riskassessment-task-data .riskassessment-task-progress.progress-22 {
-  background: #e05353;
-  color: #fff;
-}
-.riskassessment-task-container .riskassessment-task-single .riskassessment-task-content .riskassessment-task-data .riskassessment-task-progress.progress-23 {
-  background: #e05353;
-  color: #fff;
-}
-.riskassessment-task-container .riskassessment-task-single .riskassessment-task-content .riskassessment-task-data .riskassessment-task-progress.progress-24 {
-  background: #e05353;
-  color: #fff;
-}
-.riskassessment-task-container .riskassessment-task-single .riskassessment-task-content .riskassessment-task-data .riskassessment-task-progress.progress-25 {
-  background: #e05353;
-  color: #fff;
-}
-.riskassessment-task-container .riskassessment-task-single .riskassessment-task-content .riskassessment-task-data .riskassessment-task-progress.progress-26 {
-  background: #e05353;
-  color: #fff;
-}
-.riskassessment-task-container .riskassessment-task-single .riskassessment-task-content .riskassessment-task-data .riskassessment-task-progress.progress-27 {
-  background: #e05353;
-  color: #fff;
-}
-.riskassessment-task-container .riskassessment-task-single .riskassessment-task-content .riskassessment-task-data .riskassessment-task-progress.progress-28 {
-  background: #e05353;
-  color: #fff;
-}
-.riskassessment-task-container .riskassessment-task-single .riskassessment-task-content .riskassessment-task-data .riskassessment-task-progress.progress-29 {
-  background: #e05353;
-  color: #fff;
-}
-.riskassessment-task-container .riskassessment-task-single .riskassessment-task-content .riskassessment-task-data .riskassessment-task-progress.progress-30 {
-  background: #e05353;
-  color: #fff;
-}
-.riskassessment-task-container .riskassessment-task-single .riskassessment-task-content .riskassessment-task-data .riskassessment-task-progress.progress-31 {
-  background: #e05353;
-  color: #fff;
-}
-.riskassessment-task-container .riskassessment-task-single .riskassessment-task-content .riskassessment-task-data .riskassessment-task-progress.progress-32 {
-  background: #e05353;
-  color: #fff;
-}
-.riskassessment-task-container .riskassessment-task-single .riskassessment-task-content .riskassessment-task-data .riskassessment-task-progress.progress-33 {
-  background: #e05353;
-  color: #fff;
-}
-.riskassessment-task-container .riskassessment-task-single .riskassessment-task-content .riskassessment-task-data .riskassessment-task-progress.progress-34 {
-  background: #e05353;
-  color: #fff;
-}
-.riskassessment-task-container .riskassessment-task-single .riskassessment-task-content .riskassessment-task-data .riskassessment-task-progress.progress-35 {
-  background: #e05353;
-  color: #fff;
-}
-.riskassessment-task-container .riskassessment-task-single .riskassessment-task-content .riskassessment-task-data .riskassessment-task-progress.progress-36 {
-  background: #e05353;
-  color: #fff;
-}
-.riskassessment-task-container .riskassessment-task-single .riskassessment-task-content .riskassessment-task-data .riskassessment-task-progress.progress-37 {
-  background: #e05353;
-  color: #fff;
-}
-.riskassessment-task-container .riskassessment-task-single .riskassessment-task-content .riskassessment-task-data .riskassessment-task-progress.progress-38 {
-  background: #e05353;
-  color: #fff;
-}
-.riskassessment-task-container .riskassessment-task-single .riskassessment-task-content .riskassessment-task-data .riskassessment-task-progress.progress-39 {
-  background: #e05353;
-  color: #fff;
-}
-.riskassessment-task-container .riskassessment-task-single .riskassessment-task-content .riskassessment-task-data .riskassessment-task-progress.progress-40 {
-  background: #e05353;
-  color: #fff;
-}
-.riskassessment-task-container .riskassessment-task-single .riskassessment-task-content .riskassessment-task-data .riskassessment-task-progress.progress-41 {
-  background: #e05353;
-  color: #fff;
-}
-.riskassessment-task-container .riskassessment-task-single .riskassessment-task-content .riskassessment-task-data .riskassessment-task-progress.progress-42 {
-  background: #e05353;
-  color: #fff;
-}
-.riskassessment-task-container .riskassessment-task-single .riskassessment-task-content .riskassessment-task-data .riskassessment-task-progress.progress-43 {
-  background: #e05353;
-  color: #fff;
-}
-.riskassessment-task-container .riskassessment-task-single .riskassessment-task-content .riskassessment-task-data .riskassessment-task-progress.progress-44 {
-  background: #e05353;
-  color: #fff;
-}
-.riskassessment-task-container .riskassessment-task-single .riskassessment-task-content .riskassessment-task-data .riskassessment-task-progress.progress-45 {
-  background: #e05353;
-  color: #fff;
-}
-.riskassessment-task-container .riskassessment-task-single .riskassessment-task-content .riskassessment-task-data .riskassessment-task-progress.progress-46 {
-  background: #e05353;
-  color: #fff;
-}
-.riskassessment-task-container .riskassessment-task-single .riskassessment-task-content .riskassessment-task-data .riskassessment-task-progress.progress-47 {
-  background: #e05353;
-  color: #fff;
-}
-.riskassessment-task-container .riskassessment-task-single .riskassessment-task-content .riskassessment-task-data .riskassessment-task-progress.progress-48 {
-  background: #e05353;
-  color: #fff;
-}
-.riskassessment-task-container .riskassessment-task-single .riskassessment-task-content .riskassessment-task-data .riskassessment-task-progress.progress-49 {
-  background: #e05353;
-  color: #fff;
-}
-.riskassessment-task-container .riskassessment-task-single .riskassessment-task-content .riskassessment-task-data .riskassessment-task-progress.progress-50 {
-  background: #e05353;
-  color: #fff;
-}
-.riskassessment-task-container .riskassessment-task-single .riskassessment-task-content .riskassessment-task-data .riskassessment-task-progress.progress-51 {
+.riskassessment-task-container .riskassessment-task-single .riskassessment-task-content .riskassessment-task-data .riskassessment-task-progress.progress-yellow {
   background: #e9ad4f;
   color: #fff;
 }
-.riskassessment-task-container .riskassessment-task-single .riskassessment-task-content .riskassessment-task-data .riskassessment-task-progress.progress-52 {
-  background: #e9ad4f;
-  color: #fff;
-}
-.riskassessment-task-container .riskassessment-task-single .riskassessment-task-content .riskassessment-task-data .riskassessment-task-progress.progress-53 {
-  background: #e9ad4f;
-  color: #fff;
-}
-.riskassessment-task-container .riskassessment-task-single .riskassessment-task-content .riskassessment-task-data .riskassessment-task-progress.progress-54 {
-  background: #e9ad4f;
-  color: #fff;
-}
-.riskassessment-task-container .riskassessment-task-single .riskassessment-task-content .riskassessment-task-data .riskassessment-task-progress.progress-55 {
-  background: #e9ad4f;
-  color: #fff;
-}
-.riskassessment-task-container .riskassessment-task-single .riskassessment-task-content .riskassessment-task-data .riskassessment-task-progress.progress-56 {
-  background: #e9ad4f;
-  color: #fff;
-}
-.riskassessment-task-container .riskassessment-task-single .riskassessment-task-content .riskassessment-task-data .riskassessment-task-progress.progress-57 {
-  background: #e9ad4f;
-  color: #fff;
-}
-.riskassessment-task-container .riskassessment-task-single .riskassessment-task-content .riskassessment-task-data .riskassessment-task-progress.progress-58 {
-  background: #e9ad4f;
-  color: #fff;
-}
-.riskassessment-task-container .riskassessment-task-single .riskassessment-task-content .riskassessment-task-data .riskassessment-task-progress.progress-59 {
-  background: #e9ad4f;
-  color: #fff;
-}
-.riskassessment-task-container .riskassessment-task-single .riskassessment-task-content .riskassessment-task-data .riskassessment-task-progress.progress-60 {
-  background: #e9ad4f;
-  color: #fff;
-}
-.riskassessment-task-container .riskassessment-task-single .riskassessment-task-content .riskassessment-task-data .riskassessment-task-progress.progress-61 {
-  background: #e9ad4f;
-  color: #fff;
-}
-.riskassessment-task-container .riskassessment-task-single .riskassessment-task-content .riskassessment-task-data .riskassessment-task-progress.progress-62 {
-  background: #e9ad4f;
-  color: #fff;
-}
-.riskassessment-task-container .riskassessment-task-single .riskassessment-task-content .riskassessment-task-data .riskassessment-task-progress.progress-63 {
-  background: #e9ad4f;
-  color: #fff;
-}
-.riskassessment-task-container .riskassessment-task-single .riskassessment-task-content .riskassessment-task-data .riskassessment-task-progress.progress-64 {
-  background: #e9ad4f;
-  color: #fff;
-}
-.riskassessment-task-container .riskassessment-task-single .riskassessment-task-content .riskassessment-task-data .riskassessment-task-progress.progress-65 {
-  background: #e9ad4f;
-  color: #fff;
-}
-.riskassessment-task-container .riskassessment-task-single .riskassessment-task-content .riskassessment-task-data .riskassessment-task-progress.progress-66 {
-  background: #e9ad4f;
-  color: #fff;
-}
-.riskassessment-task-container .riskassessment-task-single .riskassessment-task-content .riskassessment-task-data .riskassessment-task-progress.progress-67 {
-  background: #e9ad4f;
-  color: #fff;
-}
-.riskassessment-task-container .riskassessment-task-single .riskassessment-task-content .riskassessment-task-data .riskassessment-task-progress.progress-68 {
-  background: #e9ad4f;
-  color: #fff;
-}
-.riskassessment-task-container .riskassessment-task-single .riskassessment-task-content .riskassessment-task-data .riskassessment-task-progress.progress-69 {
-  background: #e9ad4f;
-  color: #fff;
-}
-.riskassessment-task-container .riskassessment-task-single .riskassessment-task-content .riskassessment-task-data .riskassessment-task-progress.progress-70 {
-  background: #e9ad4f;
-  color: #fff;
-}
-.riskassessment-task-container .riskassessment-task-single .riskassessment-task-content .riskassessment-task-data .riskassessment-task-progress.progress-71 {
-  background: #e9ad4f;
-  color: #fff;
-}
-.riskassessment-task-container .riskassessment-task-single .riskassessment-task-content .riskassessment-task-data .riskassessment-task-progress.progress-72 {
-  background: #e9ad4f;
-  color: #fff;
-}
-.riskassessment-task-container .riskassessment-task-single .riskassessment-task-content .riskassessment-task-data .riskassessment-task-progress.progress-73 {
-  background: #e9ad4f;
-  color: #fff;
-}
-.riskassessment-task-container .riskassessment-task-single .riskassessment-task-content .riskassessment-task-data .riskassessment-task-progress.progress-74 {
-  background: #e9ad4f;
-  color: #fff;
-}
-.riskassessment-task-container .riskassessment-task-single .riskassessment-task-content .riskassessment-task-data .riskassessment-task-progress.progress-75 {
-  background: #e9ad4f;
-  color: #fff;
-}
-.riskassessment-task-container .riskassessment-task-single .riskassessment-task-content .riskassessment-task-data .riskassessment-task-progress.progress-76 {
-  background: #e9ad4f;
-  color: #fff;
-}
-.riskassessment-task-container .riskassessment-task-single .riskassessment-task-content .riskassessment-task-data .riskassessment-task-progress.progress-77 {
-  background: #e9ad4f;
-  color: #fff;
-}
-.riskassessment-task-container .riskassessment-task-single .riskassessment-task-content .riskassessment-task-data .riskassessment-task-progress.progress-78 {
-  background: #e9ad4f;
-  color: #fff;
-}
-.riskassessment-task-container .riskassessment-task-single .riskassessment-task-content .riskassessment-task-data .riskassessment-task-progress.progress-79 {
-  background: #e9ad4f;
-  color: #fff;
-}
-.riskassessment-task-container .riskassessment-task-single .riskassessment-task-content .riskassessment-task-data .riskassessment-task-progress.progress-80 {
-  background: #e9ad4f;
-  color: #fff;
-}
-.riskassessment-task-container .riskassessment-task-single .riskassessment-task-content .riskassessment-task-data .riskassessment-task-progress.progress-81 {
-  background: #e9ad4f;
-  color: #fff;
-}
-.riskassessment-task-container .riskassessment-task-single .riskassessment-task-content .riskassessment-task-data .riskassessment-task-progress.progress-82 {
-  background: #e9ad4f;
-  color: #fff;
-}
-.riskassessment-task-container .riskassessment-task-single .riskassessment-task-content .riskassessment-task-data .riskassessment-task-progress.progress-83 {
-  background: #e9ad4f;
-  color: #fff;
-}
-.riskassessment-task-container .riskassessment-task-single .riskassessment-task-content .riskassessment-task-data .riskassessment-task-progress.progress-84 {
-  background: #e9ad4f;
-  color: #fff;
-}
-.riskassessment-task-container .riskassessment-task-single .riskassessment-task-content .riskassessment-task-data .riskassessment-task-progress.progress-85 {
-  background: #e9ad4f;
-  color: #fff;
-}
-.riskassessment-task-container .riskassessment-task-single .riskassessment-task-content .riskassessment-task-data .riskassessment-task-progress.progress-86 {
-  background: #e9ad4f;
-  color: #fff;
-}
-.riskassessment-task-container .riskassessment-task-single .riskassessment-task-content .riskassessment-task-data .riskassessment-task-progress.progress-87 {
-  background: #e9ad4f;
-  color: #fff;
-}
-.riskassessment-task-container .riskassessment-task-single .riskassessment-task-content .riskassessment-task-data .riskassessment-task-progress.progress-88 {
-  background: #e9ad4f;
-  color: #fff;
-}
-.riskassessment-task-container .riskassessment-task-single .riskassessment-task-content .riskassessment-task-data .riskassessment-task-progress.progress-89 {
-  background: #e9ad4f;
-  color: #fff;
-}
-.riskassessment-task-container .riskassessment-task-single .riskassessment-task-content .riskassessment-task-data .riskassessment-task-progress.progress-90 {
-  background: #e9ad4f;
-  color: #fff;
-}
-.riskassessment-task-container .riskassessment-task-single .riskassessment-task-content .riskassessment-task-data .riskassessment-task-progress.progress-91 {
-  background: #e9ad4f;
-  color: #fff;
-}
-.riskassessment-task-container .riskassessment-task-single .riskassessment-task-content .riskassessment-task-data .riskassessment-task-progress.progress-92 {
-  background: #e9ad4f;
-  color: #fff;
-}
-.riskassessment-task-container .riskassessment-task-single .riskassessment-task-content .riskassessment-task-data .riskassessment-task-progress.progress-93 {
-  background: #e9ad4f;
-  color: #fff;
-}
-.riskassessment-task-container .riskassessment-task-single .riskassessment-task-content .riskassessment-task-data .riskassessment-task-progress.progress-94 {
-  background: #e9ad4f;
-  color: #fff;
-}
-.riskassessment-task-container .riskassessment-task-single .riskassessment-task-content .riskassessment-task-data .riskassessment-task-progress.progress-95 {
-  background: #e9ad4f;
-  color: #fff;
-}
-.riskassessment-task-container .riskassessment-task-single .riskassessment-task-content .riskassessment-task-data .riskassessment-task-progress.progress-96 {
-  background: #e9ad4f;
-  color: #fff;
-}
-.riskassessment-task-container .riskassessment-task-single .riskassessment-task-content .riskassessment-task-data .riskassessment-task-progress.progress-97 {
-  background: #e9ad4f;
-  color: #fff;
-}
-.riskassessment-task-container .riskassessment-task-single .riskassessment-task-content .riskassessment-task-data .riskassessment-task-progress.progress-98 {
-  background: #e9ad4f;
-  color: #fff;
-}
-.riskassessment-task-container .riskassessment-task-single .riskassessment-task-content .riskassessment-task-data .riskassessment-task-progress.progress-99 {
-  background: #e9ad4f;
-  color: #fff;
-}
-.riskassessment-task-container .riskassessment-task-single .riskassessment-task-content .riskassessment-task-data .riskassessment-task-progress.progress-100 {
+.riskassessment-task-container .riskassessment-task-single .riskassessment-task-content .riskassessment-task-data .riskassessment-task-progress.progress-green {
   background: #47e58e;
   color: #fff;
 }
@@ -3460,7 +3094,7 @@
   border: 0;
 }
 
-td > .risk-evaluation-container {
+td > .risk-evaluation-list-content .risk-evaluation-container:not(.advanced, .standard) {
   min-width: 340px;
   border: 1px solid rgba(0, 0, 0, 0.1);
   background: rgba(0, 0, 0, 0.05);
@@ -4113,6 +3747,14 @@ td > .risk-evaluation-container {
   border: 5px solid #0d8aff;
 }
 
+.box-flex-item {
+  width: auto !important;
+}
+
+ul {
+  list-style-type: none;
+}
+
 tr.liste_titre th.liste_titre:not(.maxwidthsearch), tr.liste_titre td.liste_titre:not(.maxwidthsearch) {
   opacity: 1;
 }
@@ -4153,4 +3795,7 @@ tr.liste_titre th.liste_titre:not(.maxwidthsearch), tr.liste_titre td.liste_titr
   div.secondcolumn div.box {
     padding-left: 0px;
   }
+}
+.ui-dialog.ui-corner-all.ui-widget.ui-widget-content.ui-front.ui-dialog-buttons.ui-draggable {
+  z-index: 1500 !important;
 }

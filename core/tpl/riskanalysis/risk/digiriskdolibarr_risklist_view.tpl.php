@@ -889,6 +889,7 @@
 		<?php endif; ?>
 	<?php endif; ?>
 	<?php $title = $langs->trans('DigiriskElementRisksList');
+	print '<div class="div-title-and-table-responsive">';
 	print_barre_liste($title, $page, $_SERVER["PHP_SELF"], $param, $sortfield, $sortorder, $massactionbutton, $num, $nbtotalofrecords, 'digiriskdolibarr32px.png@digiriskdolibarr', 0, $newcardbutton, '', $limit, 0, 0, 1);
 
 	include DOL_DOCUMENT_ROOT . '/core/tpl/massactions_pre.tpl.php';
@@ -915,7 +916,7 @@
 	$menuConf = 'MAIN_SELECTEDFIELDS_' . $varpage;
 
 	if (dol_strlen($user->conf->$menuConf) < 1) {
-		$user->conf->$menuConf = ($contextpage == 'risklist' ? 't.fk_element' : '') . 't.ref,t.category,evaluation.cotation,';
+		$user->conf->$menuConf = ($contextpage == 'risklist' ? 't.fk_element,' : '') . 't.ref,t.category,evaluation.cotation,';
 	}
 
 	if ( ! preg_match('/t.description/', $user->conf->$menuConf) && $conf->global->DIGIRISKDOLIBARR_RISK_DESCRIPTION) {
@@ -1072,7 +1073,7 @@
 					<?php $parent_element = new DigiriskElement($db);
 					$result               = $parent_element->fetch($risk->fk_element);
 					if ($result > 0) {
-						print $parent_element->getNomUrl(1, 'blank');
+						print $parent_element->getNomUrl(1, 'blank', 1);
 					}
 				} elseif ($key == 'category') { ?>
 					<div class="table-cell table-50 cell-risk" data-title="Risque">
@@ -1157,7 +1158,7 @@
 											</div>
 										<?php endif; ?>
 									</div>
-									<div class="move-risk">
+									<div class="move-risk <?php echo $conf->global->DIGIRISKDOLIBARR_MOVE_RISKS ? '' : 'move-disabled'?>">
 										<span class="title"><?php echo $langs->trans('MoveRisk'); ?></span>
 										<?php $objecttmp = new DigiriskElement($db);
 										$objecttmp->fetch($risk->fk_element);
@@ -1207,9 +1208,8 @@
 			$cssforfield                              = (empty($val['css']) ? '' : $val['css']);
 			if ($key == 'status') $cssforfield       .= ($cssforfield ? ' ' : '') . 'center';
 			elseif ($key == 'ref') $cssforfield      .= ($cssforfield ? ' ' : '') . 'nowrap';
-			elseif ($key == 'cotation') $cssforfield .= ($cssforfield ? ' ' : '') . 'nowrap';
+			elseif ($key == 'cotation') $cssforfield .= ($cssforfield ? ' ' : '') . 'risk-evaluation-list-container-' . $risk->id;
 			if ( ! empty($arrayfields['evaluation.' . $key]['checked'])) {
-				$cssforfield = '';
 				print '<td' . ($cssforfield ? ' class="' . $cssforfield . '"' : '') . ' style="vertical-align: top;">';
 				if ($key == 'cotation') {
 					require './../../core/tpl/riskanalysis/riskassessment/digiriskdolibarr_riskassessment_view.tpl.php';
@@ -1266,6 +1266,8 @@
 	print '<!-- End table -->';
 	print '</div>' . "\n";
 	print '<!-- End div class="div-table-responsive" -->';
+	print '</div>' . "\n";
+	print '<!-- End div class="div-title-and-table-responsive" -->';
 	print '</form>' . "\n";
 	print '<!-- End form -->';
 	print '</div>' . "\n";

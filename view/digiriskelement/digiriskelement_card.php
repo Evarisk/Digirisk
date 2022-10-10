@@ -251,7 +251,7 @@ if ( $object->element_type == 'groupment' ) {
 }
 
 $help_url = 'FR:Module_DigiriskDolibarr';
-$morejs   = array("/digiriskdolibarr/js/digiriskdolibarr.js.php");
+$morejs   = array("/digiriskdolibarr/js/digiriskdolibarr.js");
 $morecss  = array("/digiriskdolibarr/css/digiriskdolibarr.css");
 
 digiriskHeader($title, $help_url, $morejs, $morecss); ?>
@@ -279,6 +279,7 @@ if ($action == 'create') {
 	unset($object->fields['last_main_doc']);
 	unset($object->fields['entity']);
 	unset($object->fields['description']);
+	unset($object->fields['show_in_selector']);
 
 	print '<table class="border centpercent tableforfieldcreate">' . "\n";
 
@@ -301,6 +302,10 @@ if ($action == 'create') {
 
 	print '<input hidden class="flat" type="text" size="36" name="element_type" value="' . $element_type . '">';
 	print '<input hidden class="flat" type="text" size="36" name="fk_parent" value="' . $fk_parent . '">';
+
+	print '<tr><td>' . $langs->trans("ShowInSelectOnPublicTicketInterface") . '</td><td>';
+	print '<input type="checkbox" id="show_in_selector" name="show_in_selector" checked="checked">';
+	print '</td></tr>';
 
 	// Other attributes
 	include DOL_DOCUMENT_ROOT . '/core/tpl/extrafields_add.tpl.php';
@@ -336,11 +341,19 @@ if (($id || $ref) && $action == 'edit') {
 	unset($object->fields['fk_parent']);
 	unset($object->fields['last_main_doc']);
 	unset($object->fields['entity']);
+	unset($object->fields['show_in_selector']);
 
 	print '<table class="border centpercent tableforfieldedit">' . "\n";
 
 	// Common attributes
 	include DOL_DOCUMENT_ROOT . '/core/tpl/commonfields_edit.tpl.php';
+
+	print '<tr><td>';
+	print $langs->trans("ShowInSelectOnPublicTicketInterface");
+	print '</td>';
+	print '<td>';
+	print '<input type="checkbox" id="show_in_selector" name="show_in_selector"' . (($object->show_in_selector == 0) ?  '' : ' checked=""') . '"> ';
+	print '</td></tr>';
 
 	// Other attributes
 	include DOL_DOCUMENT_ROOT . '/core/tpl/extrafields_edit.tpl.php';
@@ -418,32 +431,16 @@ if ((empty($action) || ($action != 'edit' && $action != 'create'))) {
 
 	digirisk_banner_tab($object, 'ref', '', 0, 'ref', 'ref', $morehtmlref, '', 0, $morehtmlleft);
 
-	unset($object->fields['element_type']);
-	unset($object->fields['fk_parent']);
-	unset($object->fields['last_main_doc']);
-	unset($object->fields['entity']);
-
 	print '<div class="fichecenter">';
 	print '<div class="fichehalfleft">';
-	print '<table class="border centpercent tableforfield">' . "\n";
+	print '<table class="border centpercent tableforfield">';
 
-	if ($object->id) {
-		print '<tr><td class="titlefield">' . $langs->trans("ElementType") . '</td><td>';
-		print $langs->trans($object->element_type);
-		print '</td></tr>';
-
-		print '<div class="titlefield hidden elementID" id="elementID" value="' . $object->id . '">' . $langs->trans("ID") . '</div>';
-		print '<tr><td class="titlefield">' . $langs->trans("ParentElement") . '</td><td>';
-		$parent_element = new DigiriskElement($db);
-		$result         = $parent_element->fetch($object->fk_parent);
-		if ($result > 0) {
-			print $parent_element->ref . ( ! empty($parent_element->label) ? ' - ' . $parent_element->label : '');
-		} else {
-			print $conf->global->MAIN_INFO_SOCIETE_NOM;
-		}
-
-		print '</td></tr>';
-	}
+	print '<tr><td class="titlefield">';
+	print $langs->trans("ShowInSelectOnPublicTicketInterface");
+	print '</td>';
+	print '<td>';
+	print '<input type="checkbox" id="show_in_selectorshow_in_selector" name="show_in_selectorshow_in_selector"' . (($object->show_in_selector == 0) ?  '' : ' checked=""') . '" disabled> ';
+	print '</td></tr>';
 
 	//Show common fields
 	//  include DOL_DOCUMENT_ROOT.'/core/tpl/commonfields_view.tpl.php';
@@ -452,25 +449,6 @@ if ((empty($action) || ($action != 'edit' && $action != 'create'))) {
 	include DOL_DOCUMENT_ROOT . '/core/tpl/extrafields_view.tpl.php';
 
 	print '</table>';
-	print '</div>';
-
-	print '<div class="fichehalfright">';
-	print '<div class="ficheaddleft">';
-
-	print '<table class="border tableforfield" width="100%">';
-
-	// label
-	print '<td class="titlefield tdtop">' . $langs->trans("label") . '</td><td>';
-	print dol_htmlentitiesbr($object->label);
-	print '</td></tr>';
-
-	// Description
-	print '<td class="titlefield tdtop">' . $langs->trans("Description") . '</td><td>';
-	print dol_htmlentitiesbr($object->description);
-	print '</td></tr>';
-
-	print '</table>';
-	print '</div>';
 	print '</div>';
 
 	print '<div class="clearboth"></div>';
@@ -522,7 +500,7 @@ if ((empty($action) || ($action != 'edit' && $action != 'create'))) {
 
 			if ($permissiontoadd || $permissiontoread) {
 				$genallowed = 1;
-			}		
+			}
 
 			print digiriskshowdocuments($modulepart, $dir_files, $filedir, $urlsource, $genallowed, $permissiontodelete, $defaultmodel, 1, 0, '', $title, '', '', $digiriskelementdocument);
 		}

@@ -57,10 +57,41 @@ $value      = GETPOST('value', 'alpha');
 $type       = GETPOST('type', 'alpha');
 $const 		= GETPOST('const', 'alpha');
 $label 		= GETPOST('label', 'alpha');
+$modulepart = GETPOST('modulepart', 'aZ09');	// Used by actions_setmoduleoptions.inc.php
 
 /*
  * Actions
  */
+
+if ($action == 'deletefile' && $modulepart == 'ecm' && !empty($user->admin)) {
+	include_once DOL_DOCUMENT_ROOT.'/core/lib/files.lib.php';
+	$keyforuploaddir = GETPOST('keyforuploaddir', 'aZ09');
+
+	$listofdir = explode(',', preg_replace('/[\r\n]+/', ',', trim(getDolGlobalString($keyforuploaddir))));
+	foreach ($listofdir as $key => $tmpdir) {
+		$tmpdir = preg_replace('/DOL_DATA_ROOT\/*/', '', $tmpdir);	// Clean string if we found a hardcoded DOL_DATA_ROOT
+		if (!$tmpdir) {
+			unset($listofdir[$key]);
+			continue;
+		}
+		$tmpdir = DOL_DATA_ROOT.'/'.$tmpdir;	// Complete with DOL_DATA_ROOT. Only files into DOL_DATA_ROOT can be reach/set
+		if (!is_dir($tmpdir)) {
+			if (empty($nomessageinsetmoduleoptions)) {
+				setEventMessages($langs->trans("ErrorDirNotFound", $tmpdir), null, 'warnings');
+			}
+		} else {
+			$upload_dir = $tmpdir;
+			break;	// So we take the first directory found into setup $conf->global->$keyforuploaddir
+		}
+	}
+
+	$filetodelete = $tmpdir.'/'.GETPOST('file');
+	$result = dol_delete_file($filetodelete);
+	if ($result > 0) {
+		setEventMessages($langs->trans("FileWasRemoved", GETPOST('file')), null, 'mesgs');
+		header("Location: " . $_SERVER["PHP_SELF"]);
+	}
+}
 
 // Activate a model
 if ($action == 'set') {
@@ -94,12 +125,26 @@ if ($action == 'setdoc') {
 }
 
 if ($action == 'setModuleOptions') {
-	$subdir = GETPOST('path');
-	$subdir = preg_replace('/DOL_DATA_ROOT\/ecm\/digiriskdolibarr\//', '', $subdir);
-	$subdir = preg_replace('/\//', '', $subdir);
+	include_once DOL_DOCUMENT_ROOT.'/core/lib/files.lib.php';
+	$keyforuploaddir = GETPOST('keyforuploaddir', 'aZ09');
 
-	$ecmdir = $conf->ecm->multidir_output[$conf->entity?:1];
-	$path = $ecmdir . '/digiriskdolibarr/'. $subdir .'/';
+	$listofdir = explode(',', preg_replace('/[\r\n]+/', ',', trim(getDolGlobalString($keyforuploaddir))));
+	foreach ($listofdir as $key => $tmpdir) {
+		$tmpdir = preg_replace('/DOL_DATA_ROOT\/*/', '', $tmpdir);	// Clean string if we found a hardcoded DOL_DATA_ROOT
+		if (!$tmpdir) {
+			unset($listofdir[$key]);
+			continue;
+		}
+		$tmpdir = DOL_DATA_ROOT.'/'.$tmpdir;	// Complete with DOL_DATA_ROOT. Only files into DOL_DATA_ROOT can be reach/set
+		if (!is_dir($tmpdir)) {
+			if (empty($nomessageinsetmoduleoptions)) {
+				setEventMessages($langs->trans("ErrorDirNotFound", $tmpdir), null, 'warnings');
+			}
+		} else {
+			$upload_dir = $tmpdir;
+			break;	// So we take the first directory found into setup $conf->global->$keyforuploaddir
+		}
+	}
 
 	if (!empty($_FILES)) {
 		if (is_array($_FILES['userfile']['tmp_name'])) {
@@ -132,8 +177,8 @@ if ($action == 'setModuleOptions') {
 
 			if (!empty($upload_dirold) && !empty($conf->global->PRODUCT_USE_OLD_PATH_FOR_PHOTO)) {
 				$result = dol_add_file_process($upload_dirold, $allowoverwrite, 1, 'userfile', GETPOST('savingdocmask', 'alpha'), null, '', $generatethumbs, $object);
-			} elseif (!empty($path)) {
-				$result = dol_add_file_process($path, $allowoverwrite, 1, 'userfile', GETPOST('savingdocmask', 'alpha'), null, '' );
+			} elseif (!empty($tmpdir)) {
+				$result = dol_add_file_process($tmpdir, $allowoverwrite, 1, 'userfile', GETPOST('savingdocmask', 'alpha'), null, '' );
 			}
 		}
 	}
@@ -148,20 +193,10 @@ if ($action == 'setModuleOptions') {
 $help_url = 'FR:Module_DigiriskDolibarr#L.27onglet_Document_Digirisk';
 $title    = $langs->trans("YourDocuments");
 
-$morejs   = array("/digiriskdolibarr/js/digiriskdolibarr.js.php");
+$morejs   = array("/digiriskdolibarr/js/digiriskdolibarr.js");
 $morecss  = array("/digiriskdolibarr/css/digiriskdolibarr.css");
 
 llxHeader('', $title, $help_url, '', '', '', $morejs, $morecss);
-
-// Subheader
-$linkback = '<a href="'.($backtopage ? $backtopage : DOL_URL_ROOT.'/admin/modules.php?restore_lastsearch_values=1').'">'.$langs->trans("BackToModuleList").'</a>';
-
-print load_fiche_titre($title, $linkback, 'digiriskdolibarr32px@digiriskdolibarr');
-
-// Configuration header
-$head = digiriskdolibarrAdminPrepareHead();
-print dol_get_fiche_head($head, 'digiriskdocuments', '', -1, "digiriskdolibarr@digiriskdolibarr");
-
 
 $types = array(
 	'LegalDisplay' 				=> 'legaldisplay',
@@ -189,9 +224,22 @@ $pictos = array(
 	'Ticket'	 				=> '<i class="fa fa-ticket"></i> '
 );
 
+// Subheader
+$selectorAnchor = '<select onchange="location = this.value;">';
+foreach ($types as $type => $documentType) {
+	$selectorAnchor .= '<option value="#' . $langs->trans($type) . '">' . $langs->trans($type) . '</option>';
+}
+$selectorAnchor .= '</select>';
+
+print load_fiche_titre($title, $selectorAnchor, 'digiriskdolibarr32px@digiriskdolibarr');
+
+// Configuration header
+$head = digiriskdolibarrAdminPrepareHead();
+print dol_get_fiche_head($head, 'digiriskdocuments', '', -1, "digiriskdolibarr@digiriskdolibarr");
+
 foreach ($types as $type => $documentType) {
 
-	print load_fiche_titre($pictos[$type] . $langs->trans($type), '', '');
+	print load_fiche_titre($pictos[$type] . $langs->trans($type), '', '', 0, $langs->trans($type));
 	print '<hr>';
 
 	$trad = 'Digirisk' . $type . 'DocumentNumberingModule';

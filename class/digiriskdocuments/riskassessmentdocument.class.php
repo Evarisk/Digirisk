@@ -21,7 +21,10 @@
  * \brief       This file is a class file for RiskAssessmentDocument
  */
 
+require_once DOL_DOCUMENT_ROOT . '/core/lib/date.lib.php';
+
 require_once __DIR__ . '/../digiriskdocuments.class.php';
+require_once __DIR__ . '/../dashboarddigiriskstats.class.php';
 
 /**
  * Class for RiskAssessmentDocument
@@ -139,5 +142,114 @@ class RiskAssessmentDocument extends DigiriskDocuments
 		$object->json = json_encode($json, JSON_UNESCAPED_UNICODE);
 
 		return $object->json;
+	}
+
+	/**
+	 * Load dashboard info riskassessmentdocument
+	 *
+	 * @return array
+	 * @throws Exception
+	 */
+	public function load_dashboard()
+	{
+		global $langs;
+
+		$arrayLastGenerateDate   = $this->getLastGenerateDate();
+		$arrayNextGenerateDate   = $this->getNextGenerateDate();
+		$arrayNbDaysBeforeNextGenerateDate = $this->getNbDaysBeforeNextGenerateDate();
+
+		if (empty($arrayNbDaysBeforeNextGenerateDate['nbdaysbeforenextgeneratedate'])) {
+			$arrayNbDaysAfterNextGenerateDate = $this->getNbDaysAfterNextGenerateDate();
+			$arrayNbDaysBeforeNextGenerateDate = array('nbdaysbeforenextgeneratedate' => 'N/A');
+		} else {
+			$arrayNbDaysAfterNextGenerateDate = array('nbdaysafternextgeneratedate' => 'N/A');
+		}
+
+		$array['widgets'] = array(
+			DashboardDigiriskStats::DASHBOARD_RISKASSESSMENTDOCUMENT => array(
+				'label'      => array($langs->transnoentities("LastGenerateDate"), $langs->transnoentities("NextGenerateDate"), $langs->transnoentities("NbDaysBeforeNextGenerateDate"), $langs->transnoentities("NbDaysAfterNextGenerateDate")),
+				'content'    => array($arrayLastGenerateDate['lastgeneratedate'], $arrayNextGenerateDate['nextgeneratedate'], $arrayNbDaysBeforeNextGenerateDate['nbdaysbeforenextgeneratedate'], $arrayNbDaysAfterNextGenerateDate['nbdaysafternextgeneratedate']),
+				'picto'      => 'fas fa-info-circle',
+				'widgetName' => $langs->transnoentities('RiskAssessmentDocument')
+			),
+		);
+
+		return $array;
+	}
+
+	/**
+	 * Get last riskassessmentdocument generate date.
+	 *
+	 * @return array
+	 * @throws Exception
+	 */
+	public function getLastGenerateDate()
+	{
+		// Last riskassessmentdocument generate date
+		$filter                      = array('customsql' => "t.type='riskassessmentdocument'");
+		$riskassessmentdocumentarray = $this->fetchAll('desc', 't.rowid', 1, 0, $filter, 'AND');
+		if ( ! empty($riskassessmentdocumentarray) && $riskassessmentdocumentarray > 0 && is_array($riskassessmentdocumentarray)) {
+			$riskassessmentdocument = array_shift($riskassessmentdocumentarray);
+			$array['lastgeneratedate'] = dol_print_date($riskassessmentdocument->date_creation, 'day');
+		} else {
+			$array['lastgeneratedate'] = 'N/A';
+		}
+		return $array;
+	}
+
+	/**
+	 * Get next riskassessmentdocument generate date.
+	 *
+	 * @return array
+	 * @throws Exception
+	 */
+	public function getNextGenerateDate()
+	{
+		// Next riskassessmentdocument generate date
+		$filter                      = array('customsql' => "t.type='riskassessmentdocument'");
+		$riskassessmentdocumentarray = $this->fetchAll('desc', 't.rowid', 1, 0, $filter, 'AND');
+		if ( ! empty($riskassessmentdocumentarray) && $riskassessmentdocumentarray > 0 && is_array($riskassessmentdocumentarray)) {
+			$riskassessmentdocument = array_shift($riskassessmentdocumentarray);
+			$array['nextgeneratedate'] = dol_print_date(dol_time_plus_duree($riskassessmentdocument->date_creation, '1', 'y'), 'day');
+		} else {
+			$array['nextgeneratedate'] = 'N/A';
+		}
+		return $array;
+	}
+
+	/**
+	 * Get number days before next riskassessmentdocument generate date.
+	 *
+	 * @return array
+	 * @throws Exception
+	 */
+	public function getNbDaysBeforeNextGenerateDate()
+	{
+		// Number days before next riskassessmentdocument generate date
+		$arrayNextGenerateDate = $this->getNextGenerateDate();
+		if ($arrayNextGenerateDate['nextgeneratedate'] > 0) {
+			$array['nbdaysbeforenextgeneratedate'] = num_between_day(dol_now(), dol_stringtotime($arrayNextGenerateDate['nextgeneratedate']), 1);
+		} else {
+			$array['nbdaysbeforenextgeneratedate'] = 'N/A';
+		}
+		return $array;
+	}
+
+	/**
+	 * Get number days after next riskassessmentdocument generate date.
+	 *
+	 * @return array
+	 * @throws Exception
+	 */
+	public function getNbDaysAfterNextGenerateDate()
+	{
+		// Number days after next riskassessmentdocument generate date
+		$arrayNextGenerateDate = $this->getNextGenerateDate();
+		if ($arrayNextGenerateDate['nextgeneratedate'] > 0) {
+			$array['nbdaysafternextgeneratedate'] = num_between_day(dol_stringtotime($arrayNextGenerateDate['nextgeneratedate']), dol_now(), 1);
+		} else {
+			$array['nbdaysafternextgeneratedate'] = 'N/A';
+		}
+		return $array;
 	}
 }

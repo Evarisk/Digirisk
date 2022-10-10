@@ -125,21 +125,13 @@ if ( ! $error && $action == 'add' && $permissiontoadd) {
 if ( ! $error && $action == 'saveRisk' && $permissiontoadd) {
 	$data = json_decode(file_get_contents('php://input'), true);
 
-	$riskID          = $data['riskID'];
-	$description     = $data['comment'];
-	$category        = $data['category'];
-	$digiriskelement = new DigiriskElement($db);
-
-	if (dol_strlen($data['newParent'])) {
-		$parent_element = $digiriskelement->fetchAll('', '', 0, 0, array('ref' => $data['newParent']));
-		if (is_array($parent_element)) {
-			$parent_id = array_keys($parent_element)[0];
-		}
-	}
+	$riskID      = $data['riskID'];
+	$description = $data['comment'];
+	$category    = $data['category'];
 
 	$risk->fetch($riskID);
-	if ($parent_id > 0) {
-		$risk->fk_element = $parent_id;
+	if ($data['newParent'] > 0) {
+		$risk->fk_element = $data['newParent'];
 	}
 	$risk->description = $description;
 	$risk->category    = $category;
@@ -355,8 +347,14 @@ if ( ! $error && $action == "deleteEvaluation" && $permissiontodelete) {
 		unlink($file['fullname']);
 	}
 
-	dol_delete_dir($pathToEvaluationPhoto . '/thumbs');
-	dol_delete_dir($pathToEvaluationPhoto);
+	if (is_dir($pathToEvaluationPhoto . '/thumbs')) {
+		dol_delete_dir($pathToEvaluationPhoto . '/thumbs');
+	}
+
+	if (is_dir($pathToEvaluationPhoto)) {
+
+		dol_delete_dir($pathToEvaluationPhoto);
+	}
 
 	$previousEvaluation = $evaluation;
 	$result             = $evaluation->delete($user);
@@ -622,7 +620,6 @@ if ( ! $error && $action == "addFiles" && $permissiontodelete) {
 		}
 		$riskassessment->update($user, true);
 	}
-	exit;
 }
 
 if ( ! $error && $action == "unlinkFile" && $permissiontodelete) {
@@ -645,24 +642,25 @@ if ( ! $error && $action == "unlinkFile" && $permissiontodelete) {
 		$pathToEvaluationPhoto = $conf->digiriskdolibarr->multidir_output[$conf->entity] . '/riskassessment/tmp/' . $risktmp->ref;
 	} elseif ($risk_id == 'new') {
 		//create risk
-		$pathToEvaluationPhoto = $conf->digiriskdolibarr->multidir_output[$conf->entity] . '/riskassessment/tmp/RK0/';
+		$pathToEvaluationPhoto = $conf->digiriskdolibarr->multidir_output[$conf->entity] . '/riskassessment/tmp/RK0';
 	}
 
+	//Delete file
+	if (file_exists($pathToEvaluationPhoto . '/' . $filename)) {
+		unlink($pathToEvaluationPhoto . '/' . $filename);
+	}
 
-	$files = dol_dir_list($pathToEvaluationPhoto);
-
-	foreach ($files as $file) {
-		if (is_file($file['fullname']) && $file['name'] == $filename) {
-			unlink($file['fullname']);
+	//Delete file thumbs
+	$thumbs_names = getAllThumbsNames($filename);
+	if (!empty($thumbs_names)) {
+		foreach($thumbs_names as $thumb_name) {
+			$thumb_fullname  = $pathToEvaluationPhoto . '/thumbs/' . $thumb_name;
+			if (file_exists($thumb_fullname)) {
+				unlink($thumb_fullname);
+			}
 		}
 	}
 
-	$files = dol_dir_list($pathToEvaluationPhoto . '/thumbs');
-	foreach ($files as $file) {
-		if (preg_match('/' . preg_split('/\./', $filename)[0] . '/', $file['name'])) {
-			unlink($file['fullname']);
-		}
-	}
 	if ($riskassessment->photo == $filename) {
 		$riskassessment->photo = '';
 		$riskassessment->update($user, true);
@@ -708,7 +706,7 @@ if ($action == 'confirm_import_shared_risks' && $confirm == 'yes') {
 
 	foreach ($allrisks as $key => $risks) {
 		$digiriskelementtmp->fetch($risks->fk_element);
-		$options['import_shared_risks'][$risks->id] = GETPOST('import_shared_risks'.'_S' . $risks->entity . '_' . $digiriskelementtmp->ref . '_' . $risks->ref);
+		$options['import_shared_risks'][$risks->id] = GETPOST($risks->id);
 
 		if ($options['import_shared_risks'][$risks->id] == 'on') {
 			if ($object->id > 0) {

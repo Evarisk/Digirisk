@@ -128,7 +128,7 @@ if ($object->id > 0) {
 	$title = $langs->trans("Agenda");
 	//if (! empty($conf->global->MAIN_HTML_TITLE) && preg_match('/thirdpartynameonly/',$conf->global->MAIN_HTML_TITLE) && $object->name) $title=$object->name." - ".$title;
 	$help_url = 'FR:Module_DigiriskDolibarr';
-	$morejs   = array("/digiriskdolibarr/js/digiriskdolibarr.js.php");
+	$morejs   = array("/digiriskdolibarr/js/digiriskdolibarr.js");
 	$morecss  = array("/digiriskdolibarr/css/digiriskdolibarr.css");
 
 	digiriskHeader($title, $help_url, $morejs, $morecss);

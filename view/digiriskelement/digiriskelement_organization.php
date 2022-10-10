@@ -131,7 +131,7 @@ elseif ($reshook > 0) $formconfirm = $hookmanager->resPrint;
 
 $help_url = 'FR:Module_DigiriskDolibarr';
 $title    = $langs->trans('DigiriskElementOrganization');
-$morejs   = array("/digiriskdolibarr/js/digiriskdolibarr.js.php");
+$morejs   = array("/digiriskdolibarr/js/digiriskdolibarr.js");
 $morecss  = array("/digiriskdolibarr/css/digiriskdolibarr.css");
 
 llxHeader('', $title, $help_url, '', '', '', $morejs, $morecss);
@@ -149,6 +149,8 @@ if (is_array($objects)) {
 
 <script>
 	$(document).ready(function() {
+		let organizationEdited = 0
+
 		calcWidth($('#title0'));
 
 		window.onresize = function(event) {
@@ -191,6 +193,14 @@ if (is_array($objects)) {
 				$('.save-organization .fas').attr('style','display:none')
 			},
 			receive:function(event, ui){
+				organizationEdited++
+				if (organizationEdited == 1) {
+					$('a').click(function(e) {
+						if (confirm("Modifications non enregistrées") == false) {
+							e.preventDefault();
+						}
+					})
+				}
 				calcWidth($(this).siblings('.title'));
 			},
 

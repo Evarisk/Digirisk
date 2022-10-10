@@ -24,6 +24,7 @@ CREATE TABLE llx_digiriskdolibarr_evaluator(
 	status          smallint DEFAULT 1,
 	duration        integer,
 	assignment_date datetime NOT NULL,
+    job             varchar(80),
 	fk_user_creat   integer NOT NULL,
 	fk_user_modif   integer,
 	fk_user         integer DEFAULT 0 NOT NULL,

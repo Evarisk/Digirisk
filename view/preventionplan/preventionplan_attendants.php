@@ -201,7 +201,6 @@ if ($action == 'send') {
 		exit;
 	}
 
-
 	if ( ! $error) {
 		$langs->load('mails');
 		$sendto = $signatory->email;
@@ -245,7 +244,7 @@ if ($action == 'send') {
 						setEventMessages($mesg, null, 'warnings');
 					}
 				} else {
-					setEventMessages($langs->trans('ErrorSetupEmail'), '', 'errors');
+					setEventMessages($langs->trans('ErrorSetupEmail') . '<br>' . $langs->trans('GoToEmailSetup') . '<a target="_blank" href="'. DOL_URL_ROOT .'/admin/mails.php"> '. $langs->trans('PathToEmailSetup') .'</a>', '', 'errors');
 				}
 			}
 		} else {
@@ -290,7 +289,7 @@ if ($action == 'deleteAttendant') {
 
 $title    = $langs->trans("PreventionPlanAttendants");
 $help_url = '';
-$morejs   = array("/digiriskdolibarr/js/signature-pad.min.js", "/digiriskdolibarr/js/digiriskdolibarr.js.php");
+$morejs   = array("/digiriskdolibarr/js/signature-pad.min.js", "/digiriskdolibarr/js/digiriskdolibarr.js");
 $morecss  = array("/digiriskdolibarr/css/digiriskdolibarr.css");
 
 llxHeader('', $title, $help_url, '', '', '', $morejs, $morecss);
@@ -326,7 +325,7 @@ print dol_get_fiche_end(); ?>
 		<div class="notice-title"><?php echo $langs->trans('DisclaimerSignatureTitle') ?></div>
 		<div class="notice-subtitle"><?php echo $langs->trans("PreventionPlanMustBeValidatedToSign") ?></div>
 	</div>
-	<a class="butAction" style="width = 100%;margin-right:0" href="<?php echo DOL_URL_ROOT ?>/custom/digiriskdolibarr/view/preventionplan/preventionplan_card.php?id=<?php echo $id ?>"><?php echo $langs->trans("GoToValidate") ?></a>;
+	<a class="butAction" style="width = 100%;margin-right:0" href="<?php echo DOL_URL_ROOT ?>/custom/digiriskdolibarr/view/preventionplan/preventionplan_card.php?id=<?php echo $id ?>"><?php echo $langs->trans("GoToValidatePreventionPlan") ?></a>;
 </div>
 <?php endif; ?>
 <div class="noticeSignatureSuccess wpeo-notice notice-success hidden">
@@ -337,7 +336,7 @@ print dol_get_fiche_end(); ?>
 		</div>
 		<?php
 		if ($signatory->checkSignatoriesSignatures($object->id, 'preventionplan')) {
-			print '<a class="butAction" style="width = 100%;margin-right:0" href="' . DOL_URL_ROOT . '/custom/digiriskdolibarr/view/preventionplan/preventionplan_card.php?id=' . $id . '">' . $langs->trans("GoToLock") . '</a>';
+			print '<a class="butAction" style="width = 100%;margin-right:0" href="' . DOL_URL_ROOT . '/custom/digiriskdolibarr/view/preventionplan/preventionplan_card.php?id=' . $id . '">' . $langs->trans("GoToLockPreventionPlan") . '</a>';
 		}
 		?>
 	</div>
@@ -396,11 +395,11 @@ if ((empty($action) || ($action != 'create' && $action != 'edit'))) {
 		require __DIR__ . "/../../core/tpl/signature/digiriskdolibarr_signature_action_view.tpl.php";
 	}
 	print '</td>';
+	print '<td class="center">';
 	if ($element->signature != $langs->transnoentities("FileGenerated") && $permissiontoadd) {
-		print '<td class="center">';
 		require __DIR__ . "/../../core/tpl/signature/digiriskdolibarr_signature_view.tpl.php";
-		print '</td>';
 	}
+	print '</td>';
 	print '</tr>';
 	print '</table>';
 	print '<br>';
@@ -448,12 +447,13 @@ if ((empty($action) || ($action != 'create' && $action != 'edit'))) {
 	print '<td class="center">';
 	if ($object->status == 2 && $permissiontoadd) {
 		require __DIR__ . "/../../core/tpl/signature/digiriskdolibarr_signature_action_view.tpl.php";
-	}	print '</td>';
-	if ($element->signature != $langs->transnoentities("FileGenerated") && $permissiontoadd) {
-		print '<td class="center">';
-		require __DIR__ . "/../../core/tpl/signature/digiriskdolibarr_signature_view.tpl.php";
-		print '</td>';
 	}
+	print '</td>';
+	print '<td class="center">';
+	if ($element->signature != $langs->transnoentities("FileGenerated") && $permissiontoadd) {
+		require __DIR__ . "/../../core/tpl/signature/digiriskdolibarr_signature_view.tpl.php";
+	}
+	print '</td>';
 	print '</tr>';
 	print '</table>';
 	print '<br>';
@@ -505,11 +505,11 @@ if ((empty($action) || ($action != 'create' && $action != 'edit'))) {
 				require __DIR__ . "/../../core/tpl/signature/digiriskdolibarr_signature_action_view.tpl.php";
 			}
 			print '</td>';
+			print '<td class="center">';
 			if ($element->signature != $langs->transnoentities("FileGenerated") && $permissiontoadd) {
-				print '<td class="center">';
 				require __DIR__ . "/../../core/tpl/signature/digiriskdolibarr_signature_view.tpl.php";
-				print '</td>';
 			}
+			print '</td>';
 			print '</tr>';
 			$already_selected_intervenants[$element->element_id] = $element->element_id;
 			$j++;

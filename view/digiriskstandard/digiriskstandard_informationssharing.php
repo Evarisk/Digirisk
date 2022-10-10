@@ -55,6 +55,8 @@ $action = GETPOST('action', 'aZ09');
 // Initialize technical objects
 $object              = new DigiriskStandard($db);
 $informationssharing = new InformationsSharing($db);
+$contact             = new Contact($db);
+
 $hookmanager->initHooks(array('digiriskelementinformationssharing', 'globalcard')); // Note that conf->hooks_modules contains array
 
 $object->fetch($conf->global->DIGIRISKDOLIBARR_ACTIVE_STANDARD);
@@ -154,7 +156,7 @@ $emptyobject = new stdClass();
 
 $title    = $langs->trans('InformationsSharing');
 $help_url = 'FR:Module_DigiriskDolibarr#Diffusion_d.27informations';
-$morejs   = array("/digiriskdolibarr/js/digiriskdolibarr.js.php");
+$morejs   = array("/digiriskdolibarr/js/digiriskdolibarr.js");
 $morecss  = array("/digiriskdolibarr/css/digiriskdolibarr.css");
 
 digiriskHeader($title, $help_url, $morejs, $morecss); ?>

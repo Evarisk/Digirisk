@@ -38,7 +38,19 @@ $related_tasks = $risk->get_related_tasks($risk); ?>
 						<?php else : ?>
 							<?php $result = 1 ?>
 						<?php endif; ?>
-						<?php if ((($conf->global->DIGIRISKDOLIBARR_SHOW_TASK_PROGRESS) ? $related_task->progress <= 100 : $related_task->progress < 100) && $result) : ?>
+						<?php
+						if ($conf->global->DIGIRISKDOLIBARR_SHOW_TASK_CALCULATED_PROGRESS) {
+							$tmparray = $related_task->getSummaryOfTimeSpent();
+							if ($tmparray['total_duration'] > 0 && !empty($related_task->planned_workload)) {
+								$task_progress = round($tmparray['total_duration'] / $related_task->planned_workload * 100, 2);
+							} else {
+								$task_progress = 0;
+							}
+						} else {
+							$task_progress = $related_task->progress;
+						}
+						?>
+						<?php if ((($conf->global->DIGIRISKDOLIBARR_SHOW_TASKS_DONE) ? $task_progress <= 100 : $task_progress < 100) && $result) : ?>
 							<?php  $nb_of_tasks_in_progress++ ?>
 							<div class="table-cell riskassessment-task-container riskassessment-task-container-<?php echo $related_task->id ?>" value="<?php echo $related_task->ref ?>">
 							<input type="hidden" class="labelForDelete" value="<?php echo $langs->trans('DeleteTask') . ' ' . $related_task->ref . ' ?'; ?>">
@@ -46,10 +58,10 @@ $related_tasks = $risk->get_related_tasks($risk); ?>
 								<div class="riskassessment-task-single riskassessment-task-single-<?php echo $related_task->id ?>   wpeo-table table-row">
 									<div class="riskassessment-task-content table-cell">
 										<div class="riskassessment-task-data">
-											<span class="riskassessment-task-reference" value="<?php echo $related_task->id ?>"><?php echo getNomUrlTask($related_task, 0, 'withproject'); ?></span>
+											<span class="riskassessment-task-reference" value="<?php echo $related_task->id ?>"><?php echo $related_task->getNomUrlTask(0, 'withproject'); ?></span>
 											<span class="riskassessment-task-author">
 												<?php $user->fetch($related_task->fk_user_creat); ?>
-												<?php echo getNomUrl(0, '', 0, 0, 2, 0, '', '', -1, $user); ?>
+												<?php echo getNomUrlUser($user); ?>
 											</span>
 											<span class="riskassessment-task-date">
 												<i class="fas fa-calendar-alt"></i> <?php echo date('d/m/Y', (($conf->global->DIGIRISKDOLIBARR_SHOW_TASK_START_DATE && ( ! empty($related_task->date_start))) ? $related_task->date_start : $related_task->date_c)) . (($conf->global->DIGIRISKDOLIBARR_SHOW_TASK_END_DATE && ( ! empty($related_task->date_end))) ? ' - ' . date('d/m/Y', $related_task->date_end) : ''); ?>
@@ -63,16 +75,16 @@ $related_tasks = $risk->get_related_tasks($risk); ?>
 												?>
 												<i class="fas fa-clock"></i> <?php echo $allTimeSpent/60 . '/' . $related_task->planned_workload/60 ?>
 											</span>
-											<span class="riskassessment-task-progress progress-<?php echo $related_task->progress ? $related_task->progress : 0 ?>"><?php echo $related_task->progress ? $related_task->progress . " %" : 0 . " %" ?></span>
+											<span class="riskassessment-task-progress <?php echo $related_task->getTaskProgressColorClass($task_progress); ?>"><?php echo $task_progress ? $task_progress . " %" : 0 . " %" ?></span>
 										</div>
 										<div class="riskassessment-task-title">
-											<?php if ($contextpage != 'sharedrisk' && $contextpage != 'inheritedrisk') : ?>
+											<?php if ($contextpage != 'sharedrisk' && $contextpage != 'inheritedrisk' && !$conf->global->DIGIRISKDOLIBARR_SHOW_TASK_CALCULATED_PROGRESS) : ?>
 												<span class="riskassessment-task-progress-checkbox <?php echo ($contextpage != 'sharedrisk' && $contextpage != 'inheritedrisk') ? '' : 'riskassessment-task-progress-checkbox-readonly'?>">
-													<input type="checkbox" id="" class="riskassessment-task-progress-checkbox<?php echo $related_task->id; echo($related_task->progress == 100) ? ' progress-checkbox-check' : ' progress-checkbox-uncheck' ?>" name="progress-checkbox" value="" <?php echo ($related_task->progress == 100) ? 'checked' : ''; ?>>
+													<input type="checkbox" id="" class="riskassessment-task-progress-checkbox<?php echo $related_task->id; echo($task_progress == 100) ? ' progress-checkbox-check' : ' progress-checkbox-uncheck' ?>" name="progress-checkbox" value="" <?php echo ($task_progress == 100) ? 'checked' : ''; ?>>
 												</span>
 											<?php endif; ?>
-											<span class="riskassessment-task-author-label">
-												<?php echo dol_trunc($related_task->label, 255, 'right', 'UTF-8', 0, $display = 1); ?>
+											<span class="riskassessment-task-author-label" title="<?php echo $related_task->label; ?>">
+												<?php echo dol_trunc($related_task->label, 255); ?>
 											</span>
 										</div>
 									</div>
@@ -105,10 +117,10 @@ $related_tasks = $risk->get_related_tasks($risk); ?>
 													<!-- Modal-Header -->
 													<div class="modal-header">
 														<div class="riskassessment-task-data">
-															<span class="riskassessment-task-reference" value="<?php echo $related_task->id ?>"><?php echo getNomUrlTask($related_task, 0, 'withproject'); ?></span>
+															<span class="riskassessment-task-reference" value="<?php echo $related_task->id ?>"><?php echo $related_task->getNomUrlTask(0, 'withproject'); ?></span>
 															<span class="riskassessment-task-author">
 																		<?php $user->fetch($related_task->fk_user_creat); ?>
-																		<?php echo getNomUrl(0, '', 0, 0, 2, 0, '', '', -1, $user); ?>
+																		<?php echo getNomUrlUser($user); ?>
 																	</span>
 															<span class="riskassessment-task-date">
 																		<i class="fas fa-calendar-alt"></i> <?php echo date('d/m/Y', (($conf->global->DIGIRISKDOLIBARR_SHOW_TASK_START_DATE && ( ! empty($related_task->date_start))) ? $related_task->date_start : $related_task->date_c)) . (($conf->global->DIGIRISKDOLIBARR_SHOW_TASK_END_DATE && ( ! empty($related_task->date_end))) ? ' - ' . date('d/m/Y', $related_task->date_end) : ''); ?>
@@ -122,7 +134,7 @@ $related_tasks = $risk->get_related_tasks($risk); ?>
 																		?>
 																		<i class="fas fa-clock"></i> <?php echo $allTimeSpent/60 . '/' . $related_task->planned_workload/60 ?>
 																	</span>
-															<span class="riskassessment-task-progress progress-<?php echo $related_task->progress ? $related_task->progress : 0 ?>"><?php echo $related_task->progress ? $related_task->progress . " %" : 0 . " %" ?></span>
+															<span class="riskassessment-task-progress <?php echo $related_task->getTaskProgressColorClass($task_progress); ?>"><?php echo $task_progress ? $task_progress . " %" : 0 . " %" ?></span>
 														</div>
 
 														<div class="modal-close"><i class="fas fa-times"></i></div>
@@ -131,10 +143,12 @@ $related_tasks = $risk->get_related_tasks($risk); ?>
 													<div class="modal-content">
 														<?php $allTimeSpentArray = $related_task->fetchAllTimeSpent($user, 'AND ptt.fk_task='.$related_task->id); ?>
 														<div class="riskassessment-task-title">
+															<?php if (!$conf->global->DIGIRISKDOLIBARR_SHOW_TASK_CALCULATED_PROGRESS) : ?>
 															<span class="riskassessment-task-progress-checkbox">
-																<input type="checkbox" id="" class="riskassessment-task-progress-checkbox<?php echo $related_task->id ?>" name="progress-checkbox" value="" <?php echo ($related_task->progress == 100) ? 'checked' : ''; ?>>
+																<input type="checkbox" id="" class="riskassessment-task-progress-checkbox<?php echo $related_task->id ?>" name="progress-checkbox" value="" <?php echo ($task_progress == 100) ? 'checked' : ''; ?>>
 															</span>
-															<input type="text" class="riskassessment-task-author-label riskassessment-task-label<?php echo $related_task->id ?>" name="label" value="<?php echo $related_task->label ?>">
+															<?php endif; ?>
+															<input type="text" class="riskassessment-task-author-label riskassessment-task-label<?php echo $related_task->id ?>" name="label" value="<?php echo $related_task->label; ?>">
 														</div>
 														<hr>
 														<!-- RISKASSESSMENT TASK TIME SPENT NOTICE -->
@@ -245,7 +259,7 @@ $related_tasks = $risk->get_related_tasks($risk); ?>
 																									<div class="riskassessment-task-data">
 																								<span class="riskassessment-task-author">
 																									<?php $user->fetch($related_task->fk_user_creat); ?>
-																									<?php echo getNomUrl(0, '', 0, 0, 2, 0, '', '', -1, $user); ?>
+																									<?php echo getNomUrlUser($user); ?>
 																								</span>
 																										<span class="riskassessment-task-timespent-date">
 																									<i class="fas fa-calendar-alt"></i> <?php echo dol_print_date($time_spent->timespent_datehour, 'dayhour'); ?>
@@ -286,7 +300,7 @@ $related_tasks = $risk->get_related_tasks($risk); ?>
 																							<div class="modal-container wpeo-modal-event">
 																								<!-- Modal-Header -->
 																								<div class="modal-header">
-																									<h2 class="modal-title"><?php echo $langs->trans('TaskTimeSpentEdit') . ' ' . getNomUrlTask($related_task, 0, 'withproject') ?></h2>
+																									<h2 class="modal-title"><?php echo $langs->trans('TaskTimeSpentEdit') . ' ' . $task->getNomUrlTask(0, 'withproject') ?></h2>
 																									<div class="modal-close"><i class="fas fa-times"></i></div>
 																								</div>
 																								<!-- Modal EDIT RISK ASSESSMENT TASK Content-->
@@ -373,17 +387,29 @@ $related_tasks = $risk->get_related_tasks($risk); ?>
 						</div>
 					<?php endif; ?>
 			<?php else : ?>
-					<?php $related_task = end($related_tasks); ?>
+					<?php
+						$related_task = end($related_tasks);
+						if ($conf->global->DIGIRISKDOLIBARR_SHOW_TASK_CALCULATED_PROGRESS) {
+							$tmparray = $related_task->getSummaryOfTimeSpent();
+							if ($tmparray['total_duration'] > 0 && !empty($related_task->planned_workload)) {
+								$task_progress = round($tmparray['total_duration'] / $related_task->planned_workload * 100, 2);
+							} else {
+								$task_progress = 0;
+							}
+						} else {
+							$task_progress = $related_task->progress;
+						}
+					?>
 					<div class="table-cell riskassessment-task-container riskassessment-task-container-<?php echo $related_task->id ?>" value="<?php echo $related_task->ref ?>">
 						<input type="hidden" class="labelForDelete" value="<?php echo $langs->trans('DeleteTask') . ' ' . $related_task->ref . ' ?'; ?>">
 						<div class="riskassessment-task-single-content riskassessment-task-single-content-<?php echo $risk->id ?>">
 							<div class="riskassessment-task-single riskassessment-task-single-<?php echo $related_task->id ?>   wpeo-table table-row">
 								<div class="riskassessment-task-content table-cell">
 									<div class="riskassessment-task-data">
-										<span class="riskassessment-task-reference" value="<?php echo $related_task->id ?>"><?php echo getNomUrlTask($related_task, 0, 'withproject'); ?></span>
+										<span class="riskassessment-task-reference" value="<?php echo $related_task->id ?>"><?php echo $related_task->getNomUrlTask(0, 'withproject'); ?></span>
 										<span class="riskassessment-task-author">
 											<?php $user->fetch($related_task->fk_user_creat); ?>
-											<?php echo getNomUrl(0, '', 0, 0, 2, 0, '', '', -1, $user); ?>
+											<?php echo getNomUrlUser($user); ?>
 										</span>
 										<span class="riskassessment-task-date">
 											<i class="fas fa-calendar-alt"></i> <?php echo date('d/m/Y', (($conf->global->DIGIRISKDOLIBARR_SHOW_TASK_START_DATE && ( ! empty($related_task->date_start))) ? $related_task->date_start : $related_task->date_c)) . (($conf->global->DIGIRISKDOLIBARR_SHOW_TASK_END_DATE && ( ! empty($related_task->date_end))) ? ' - ' . date('d/m/Y', $related_task->date_end) : ''); ?>
@@ -397,16 +423,16 @@ $related_tasks = $risk->get_related_tasks($risk); ?>
 											?>
 											<i class="fas fa-clock"></i> <?php echo $allTimeSpent/60 . '/' . $related_task->planned_workload/60 ?>
 										</span>
-										<span class="riskassessment-task-progress progress-<?php echo $related_task->progress ? $related_task->progress : 0 ?>"><?php echo $related_task->progress ? $related_task->progress . " %" : 0 . " %" ?></span>
+										<span class="riskassessment-task-progress <?php echo $related_task->getTaskProgressColorClass($task_progress); ?>"><?php echo $task_progress ? $task_progress . " %" : 0 . " %" ?></span>
 									</div>
 									<div class="riskassessment-task-title">
-										<?php if ($contextpage != 'sharedrisk' && $contextpage != 'inheritedrisk') : ?>
+										<?php if ($contextpage != 'sharedrisk' && $contextpage != 'inheritedrisk' && !$conf->global->DIGIRISKDOLIBARR_SHOW_TASK_CALCULATED_PROGRESS) : ?>
 											<span class="riskassessment-task-progress-checkbox <?php echo ($contextpage != 'sharedrisk' && $contextpage != 'inheritedrisk') ? '' : 'riskassessment-task-progress-checkbox-readonly'?>">
-												<input type="checkbox" id="" class="riskassessment-task-progress-checkbox<?php echo $related_task->id; echo($related_task->progress == 100) ? ' progress-checkbox-check' : ' progress-checkbox-uncheck' ?>" name="progress-checkbox" value="" <?php echo ($related_task->progress == 100) ? 'checked' : ''; ?>>
+												<input type="checkbox" id="" class="riskassessment-task-progress-checkbox<?php echo $related_task->id; echo($task_progress == 100) ? ' progress-checkbox-check' : ' progress-checkbox-uncheck' ?>" name="progress-checkbox" value="" <?php echo ($task_progress == 100) ? 'checked' : ''; ?>>
 											</span>
 										<?php endif; ?>
-										<span class="riskassessment-task-author-label">
-											<?php echo dol_trunc($related_task->label, 48, 'wrap', 'UTF-8', 0, $display = 1); ?>
+										<span class="riskassessment-task-author-label" title="<?php echo $related_task->label; ?>">
+											<?php echo dol_trunc($related_task->label, 255); ?>
 										</span>
 									</div>
 								</div>
@@ -444,7 +470,7 @@ $related_tasks = $risk->get_related_tasks($risk); ?>
 										<div class="modal-content" id="#modalContent<?php echo $related_task->id ?>">
 											<div class="riskassessment-task-container">
 												<div class="riskassessment-task">
-													<span class="title"><?php echo $langs->trans('Label'); ?> <input type="text" class="riskassessment-task-label<?php echo $related_task->id ?>" name="label" value="<?php echo $related_task->label ?>"></span>
+													<span class="title"><?php echo $langs->trans('Label'); ?> <input type="text" class="riskassessment-task-label<?php echo $related_task->id ?>" name="label" value="<?php echo $related_task->label; ?>"></span>
 												</div>
 											</div>
 										</div>
@@ -605,6 +631,18 @@ $related_tasks = $risk->get_related_tasks($risk); ?>
 						</div>
 						<?php if ( ! empty($related_tasks) && $related_tasks > 0) : ?>
 							<?php foreach ($related_tasks as $related_task) : ?>
+								<?php
+								if ($conf->global->DIGIRISKDOLIBARR_SHOW_TASK_CALCULATED_PROGRESS) {
+									$tmparray = $related_task->getSummaryOfTimeSpent();
+									if ($tmparray['total_duration'] > 0 && !empty($related_task->planned_workload)) {
+										$task_progress = round($tmparray['total_duration'] / $related_task->planned_workload * 100, 2);
+									} else {
+										$task_progress = 0;
+									}
+								} else {
+									$task_progress = $related_task->progress;
+								}
+								?>
 								<div class="riskassessment-task-list-content" value="<?php echo $risk->id ?>">
 									<ul class="riskassessment-task-list riskassessment-task-list-<?php echo $related_task->id ?>">
 										<li class="riskassessment-task riskassessment-task<?php echo $related_task->id ?>" value="<?php echo $related_task->id ?>">
@@ -614,24 +652,24 @@ $related_tasks = $risk->get_related_tasks($risk); ?>
 													<div class="riskassessment-task-single">
 														<div class="riskassessment-task-content">
 															<div class="riskassessment-task-data">
-																<span class="riskassessment-task-reference" value="<?php echo $related_task->id ?>"><?php echo getNomUrlTask($related_task, 0, 'withproject'); ?></span>
+																<span class="riskassessment-task-reference" value="<?php echo $related_task->id ?>"><?php echo $related_task->getNomUrlTask(0, 'withproject'); ?></span>
 																<span class="riskassessment-task-author">
 																	<?php $user->fetch($related_task->fk_user_creat); ?>
-																	<?php echo getNomUrl(0, '', 0, 0, 2, 0, '', '', -1, $user); ?>
+																	<?php echo getNomUrlUser($user); ?>
 																</span>
 																<span class="riskassessment-task-date">
 																	<i class="fas fa-calendar-alt"></i> <?php echo date('d/m/Y', (($conf->global->DIGIRISKDOLIBARR_SHOW_TASK_START_DATE && ( ! empty($related_task->date_start))) ? $related_task->date_start : $related_task->date_c)) . (($conf->global->DIGIRISKDOLIBARR_SHOW_TASK_END_DATE && ( ! empty($related_task->date_end))) ? ' - ' . date('d/m/Y', $related_task->date_end) : ''); ?>
 																</span>
-																<span class="riskassessment-task-progress progress-<?php echo $related_task->progress ? $related_task->progress : 0 ?>"><?php echo $related_task->progress ? $related_task->progress . " %" : 0 . " %" ?></span>
+																<span class="riskassessment-task-progress <?php echo $related_task->getTaskProgressColorClass($task_progress); ?>"><?php echo $task_progress ? $task_progress . " %" : 0 . " %" ?></span>
 															</div>
 															<div class="riskassessment-task-title">
-																<?php if ($contextpage != 'sharedrisk' && $contextpage != 'inheritedrisk') : ?>
+																<?php if ($contextpage != 'sharedrisk' && $contextpage != 'inheritedrisk' && !$conf->global->DIGIRISKDOLIBARR_SHOW_TASK_CALCULATED_PROGRESS) : ?>
 																	<span class="riskassessment-task-progress-checkbox <?php echo ($contextpage != 'sharedrisk' && $contextpage != 'inheritedrisk') ? '' : 'riskassessment-task-progress-checkbox-readonly'?>">
-																		<input type="checkbox" id="" class="riskassessment-task-progress-checkbox<?php echo $related_task->id; echo($related_task->progress == 100) ? ' progress-checkbox-check' : ' progress-checkbox-uncheck' ?>" name="progress-checkbox" value="" <?php echo ($related_task->progress == 100) ? 'checked' : ''; ?>>
+																		<input type="checkbox" id="" class="riskassessment-task-progress-checkbox<?php echo $related_task->id; echo($task_progress == 100) ? ' progress-checkbox-check' : ' progress-checkbox-uncheck' ?>" name="progress-checkbox" value="" <?php echo ($task_progress == 100) ? 'checked' : ''; ?>>
 																	</span>
 																<?php endif;?>
-																<span class="riskassessment-task-label">
-																	<?php echo dol_trunc($related_task->label, 48, 'wrap', 'UTF-8', 0, $display = 1); ?>
+																<span class="riskassessment-task-label" title="<?php echo $related_task->label; ?>">
+																	<?php echo dol_trunc($related_task->label, 255); ?>
 																</span>
 															</div>
 														</div>
@@ -668,7 +706,7 @@ $related_tasks = $risk->get_related_tasks($risk); ?>
 														<div class="modal-content" id="#modalContent<?php echo $related_task->id ?>">
 															<div class="riskassessment-task-container">
 																<div class="riskassessment-task">
-																	<span class="title"><?php echo $langs->trans('Label'); ?> <input type="text" class="riskassessment-task-label<?php echo $related_task->id ?>" name="label" value="<?php echo $related_task->label ?>"></span>
+																	<span class="title"><?php echo $langs->trans('Label'); ?> <input type="text" class="riskassessment-task-label<?php echo $related_task->id ?>" name="label" value="<?php echo $related_task->label; ?>"></span>
 																</div>
 															</div>
 														</div>

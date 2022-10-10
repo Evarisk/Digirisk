@@ -105,14 +105,6 @@ if ($action == 'setmodFirePermitDet') {
 if ($action == 'setMaitreOeuvre') {
 	$maitre_oeuvre_id = GETPOST('maitre_oeuvre');
 
-	if ($maitre_oeuvre_id > 0) {
-		$usertmp->fetch($maitre_oeuvre_id);
-		if ( ! dol_strlen($usertmp->email)) {
-			setEventMessages($langs->trans('ErrorNoEmailForMaitreOeuvre', $langs->transnoentitiesnoconv('MaitreOeuvre')) . ' : ' . '<a target="_blank" href="' . dol_buildpath('/user/card.php?id=' . $usertmp->id, 2) . '">' . $usertmp->lastname . ' ' . $usertmp->firstname . '</a>', null, 'errors');
-			$error++;
-		}
-	}
-
 	if ( ! $error) {
 		$constforval = 'DIGIRISKDOLIBARR_' . strtoupper($type) . "_MAITRE_OEUVRE";
 		dolibarr_set_const($db, $constforval, $maitre_oeuvre_id, 'integer', 0, '', $conf->entity);
@@ -130,7 +122,7 @@ $form = new Form($db);
 $help_url = 'FR:Module_DigiriskDolibarr#L.27onglet_.C3.89l.C3.A9ment_Digirisk';
 $title    = $langs->trans("FirePermit");
 
-$morejs  = array("/digiriskdolibarr/js/digiriskdolibarr.js.php");
+$morejs  = array("/digiriskdolibarr/js/digiriskdolibarr.js");
 $morecss = array("/digiriskdolibarr/css/digiriskdolibarr.css");
 
 llxHeader('', $title, $help_url, '', '', '', $morejs, $morecss);

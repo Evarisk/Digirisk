@@ -35,68 +35,85 @@ try {
 	return -1;
 }
 
+// Médecin du travail
+print '<tr>';
+print '<td class="titlefield"><i class="fas fa-hospital-alt"></i> ' . $form->textwithpicto($langs->trans("LabourDoctor"), $langs->trans('HowToSetDataLegalDisplay')) . '</td>';
+print '<td>';
+$contact->fetch($informationssharing->occupational_health_service->id);
+print $contact->getNomUrl(1) . ' ';
+print '<i class="fas fa-phone"></i> '  . $informationssharing->occupational_health_service->phone;
+print '</td></tr>';
+
+// Inspecteur du travail
+print '<tr>';
+print '<td class="titlefield minwidth300"><i class="fas fa-search"></i> ' . $form->textwithpicto($langs->trans("LabourInspector"), $langs->trans('HowToSetDataLegalDisplay')) . '</td>';
+print '<td>';
+$contact->fetch($informationssharing->detective_work->id);
+print $contact->getNomUrl(1) . ' ';
+print '<i class="fas fa-phone"></i> ' . $informationssharing->detective_work->phone;
+print '</td></tr>';
+
+// Harassment officer more 250 employees
+print '<tr>';
+print '<td class="titlefield"><i class="fas fa-user"></i> ' . $form->textwithpicto($langs->trans("HarassmentOfficer"), $langs->trans('HowToSetDataInformationsSharing')) . '</td>';
+print '<td>';
+$user->fetch($informationssharing->harassment_officer->id);
+print $user->getNomUrl(1) . ' ';
+print '<i class="fas fa-phone"></i> ' . $informationssharing->harassment_officer->phone;
+print '</td></tr>';
+
+// Harassment officer CSE
+print '<tr>';
+print '<td class="titlefield"><i class="fas fa-user"></i> ' . $form->textwithpicto($langs->trans("HarassmentOfficerCSE"), $langs->trans('HowToSetDataInformationsSharing')) . '</td>';
+print '<td>';
+$user->fetch($informationssharing->harassment_officer_cse->id);
+print $user->getNomUrl(1) . ' ';
+print '<i class="fas fa-phone"></i> ' . $informationssharing->harassment_officer_cse->phone;
+print '</td></tr>';
+
 // CSE
 
-//Date
+// Date
 print '<tr>';
-print '<td class="titlefield">' . $form->textwithpicto($langs->trans("ElectionDateCSE"), $langs->trans('HowToSetDataInformationsSharing')) . '</td>';
+print '<td class="titlefield"><i class="fas fa-calendar-alt"></i> ' . $form->textwithpicto($langs->trans("ElectionDateCSE"), $langs->trans('HowToSetDataInformationsSharing')) . '</td>';
 print '<td>';
-
-print $informationssharing->membres_du_comite_entreprise_date;
+print '<i class="fas fa-calendar-alt"></i> ' . dol_print_date($informationssharing->membres_du_comite_entreprise_date, 'day');
 print '</td></tr>';
 
-print '</td></tr>';
-
-//Titulars
+// Titulars
 print '<tr>';
-print '<td class="titlefield">' . $form->textwithpicto($langs->trans("Titulars"), $langs->trans('HowToSetDataInformationsSharing')) . '</td>';
+print '<td class="titlefield"><i class="fas fa-user"></i> ' . $form->textwithpicto($langs->trans("Titulars"), $langs->trans('HowToSetDataInformationsSharing')) . '</td>';
 print '<td>';
-
-print $informationssharing->membres_du_comite_entreprise_titulaires;
+print $informationssharing->membres_du_comite_entreprise_titulairesFullName;
 print '</td></tr>';
 
-print '</td></tr>';
-
-//Alternates
+// Alternates
 print '<tr>';
-print '<td class="titlefield">' . $form->textwithpicto($langs->trans("Alternates"), $langs->trans('HowToSetDataInformationsSharing')) . '</td>';
+print '<td class="titlefield"><i class="fas fa-user"></i> ' . $form->textwithpicto($langs->trans("Alternates"), $langs->trans('HowToSetDataInformationsSharing')) . '</td>';
 print '<td>';
-
-print $informationssharing->membres_du_comite_entreprise_suppleants;
-print '</td></tr>';
-
+print $informationssharing->membres_du_comite_entreprise_suppleantsFullName;
 print '</td></tr>';
 
 // DP
-
 //Date
 print '<tr>';
-print '<td class="titlefield">' . $form->textwithpicto($langs->trans("ElectionDateDP"), $langs->trans('HowToSetDataInformationsSharing')) . '</td>';
+print '<td class="titlefield"><i class="fas fa-calendar-alt"></i> ' . $form->textwithpicto($langs->trans("ElectionDateDP"), $langs->trans('HowToSetDataInformationsSharing')) . '</td>';
 print '<td>';
-
-print $informationssharing->delegues_du_personnels_date;
-print '</td></tr>';
-
+print '<i class="fas fa-calendar-alt"></i> ' . dol_print_date($informationssharing->delegues_du_personnels_date, 'day');
 print '</td></tr>';
 
 //Titulars
 print '<tr>';
-print '<td class="titlefield">' . $form->textwithpicto($langs->trans("Titulars"), $langs->trans('HowToSetDataInformationsSharing')) . '</td>';
+print '<td class="titlefield"><i class="fas fa-user"></i> ' . $form->textwithpicto($langs->trans("Titulars"), $langs->trans('HowToSetDataInformationsSharing')) . '</td>';
 print '<td>';
-
-print $informationssharing->delegues_du_personnels_titulaires;
-print '</td></tr>';
-
+print $informationssharing->delegues_du_personnels_titulairesFullName;
 print '</td></tr>';
 
 //Alternates
 print '<tr>';
-print '<td class="titlefield">' . $form->textwithpicto($langs->trans("Alternates"), $langs->trans('HowToSetDataInformationsSharing')) . '</td>';
+print '<td class="titlefield"><i class="fas fa-user"></i> ' . $form->textwithpicto($langs->trans("Alternates"), $langs->trans('HowToSetDataInformationsSharing')) . '</td>';
 print '<td>';
-
-print $informationssharing->delegues_du_personnels_suppleants;
-print '</td></tr>';
-
+print $informationssharing->delegues_du_personnels_suppleantsFullName;
 print '</td></tr>';
 
 ?>

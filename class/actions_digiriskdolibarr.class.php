@@ -69,22 +69,23 @@ class ActionsDigiriskdolibarr
 	 */
 	public function printCommonFooter($parameters)
 	{
-		global $db, $conf, $langs;
+		global $conf, $db, $form, $langs;
 
 		/* print_r($parameters); print_r($object); echo "action: " . $action; */
 		if ($parameters['currentcontext'] == 'admincompany') {	    // do something only for the context 'somecontext1' or 'somecontext2'
 			?>
-			<script src="../custom/digiriskdolibarr/js/digiriskdolibarr.js.php"></script>
+			<script src="../custom/digiriskdolibarr/js/digiriskdolibarr.js"></script>
 			<?php
 			if ($conf->global->MAIN_INFO_SOCIETE_COUNTRY == '1:FR:France') {
 				require_once __DIR__ . '/../lib/digiriskdolibarr_function.lib.php';
 				$form      = new Form($db);
 				$pictopath = dol_buildpath('/digiriskdolibarr/img/digiriskdolibarr32px.png', 1);
 				$pictoDigirisk = img_picto('', $pictopath, '', 1, 0, 0, '', 'pictoDigirisk');
-				$idcc_form = digirisk_select_dictionary('DIGIRISKDOLIBARR_COLLECTIVE_AGREEMENT_TITLE', 'c_conventions_collectives', 'code', 'libelle', $conf->global->DIGIRISKDOLIBARR_COLLECTIVE_AGREEMENT_TITLE, 1);
+				$idcc_form = digirisk_select_dictionary('DIGIRISKDOLIBARR_COLLECTIVE_AGREEMENT_TITLE', 'c_conventions_collectives', 'code', 'libelle', $conf->global->DIGIRISKDOLIBARR_COLLECTIVE_AGREEMENT_TITLE, 1, '', '', 'minwidth100');
 				$pee_input = '<input type="checkbox" name="DIGIRISKDOLIBARR_PEE_ENABLED" '. ($conf->global->DIGIRISKDOLIBARR_PEE_ENABLED ? 'checked' : '') .'>';
 				$perco_input = '<input type="checkbox" name="DIGIRISKDOLIBARR_PERCO_ENABLED" '. ($conf->global->DIGIRISKDOLIBARR_PERCO_ENABLED ? 'checked' : '') .'>';
-				$holding_agreement = '<input type="text" name="DIGIRISKDOLIBARR_HOLDING_AGREEMENT" value="'. $conf->global->DIGIRISKDOLIBARR_HOLDING_AGREEMENT .'">';
+				$nbemployees_input = '<input type="number" name="DIGIRISKDOLIBARR_NB_EMPLOYEES" class="minwidth200" value="' . $conf->global->DIGIRISKDOLIBARR_NB_EMPLOYEES . '"' . ($conf->global->DIGIRISKDOLIBARR_MANUAL_INPUT_NB_EMPLOYEES ? '' : 'disabled') . '>';
+				$nbworkedhours_input = '<input type="number" name="DIGIRISKDOLIBARR_NB_WORKED_HOURS" class="minwidth200" value="' . $conf->global->DIGIRISKDOLIBARR_NB_WORKED_HOURS . '"' . ($conf->global->DIGIRISKDOLIBARR_MANUAL_INPUT_NB_WORKED_HOURS ? '' : 'disabled') . '>';
 				?>
 				<script>
 					let collectiveAgreementDictionary = $('<tr class="oddeven"><td><label for="selectidcc_id"><?php print $pictoDigirisk . $form->textwithpicto($langs->trans('IDCC'), $langs->trans('IDCCTooltip'));?></label></td>');
@@ -95,6 +96,16 @@ class ActionsDigiriskdolibarr
 
 					let percoInput = $('<tr class="oddeven"><td><label for="perco"><?php print $pictoDigirisk . $form->textwithpicto($langs->trans('PERCO'), $langs->trans('PERCOTooltip'));?></label></td>');
 					percoInput.append('<td>' + <?php echo json_encode($perco_input) ; ?> + '</td></tr>');
+
+					let nbemployeesInput = $('<tr class="oddeven"><td><label for="nbemployees"><?php print $pictoDigirisk . $form->textwithpicto($langs->transnoentities('NbEmployees'), $langs->transnoentities('HowToConfigureSetupConf')); ?></label></td>');
+					nbemployeesInput.append('<td><i class="fas fa-users"></i> ' + <?php echo json_encode($nbemployees_input); ?> + '</td></tr>');
+
+					let nbworkedhoursInput = $('<tr class="oddeven"><td><label for="nbworkedhours"><?php print $pictoDigirisk . $form->textwithpicto($langs->transnoentities('NbWorkedHours'), $langs->transnoentities('HowToConfigureSetupConf')); ?></label></td>');
+					nbworkedhoursInput.append('<td><i class="fas fa-clock"></i> ' + <?php echo json_encode($nbworkedhours_input); ?> + '</td></tr>');
+
+					let currentOtherElement = $('table:nth-child(3) .oddeven:last-child');
+					currentOtherElement.after(nbworkedhoursInput);
+					currentOtherElement.after(nbemployeesInput);
 
 					let currentElement = $('table:nth-child(7) .oddeven:last-child');
 					currentElement.after(collectiveAgreementDictionary);
@@ -182,19 +193,25 @@ class ActionsDigiriskdolibarr
 				</script>
 				<?php
 			}
-		} else if (($parameters['currentcontext'] == 'projecttaskcard') || ($parameters['currentcontext'] == 'projecttaskscard') || ($parameters['currentcontext'] == 'tasklist')) {
+		} else if (in_array($parameters['currentcontext'], array('projectcard', 'projectcontactcard', 'projecttaskscard', 'projecttasktime', 'projectOverview', 'projecttaskscard', 'tasklist'))) {
 			if ((GETPOST('action') == '' || empty(GETPOST('action')) || GETPOST('action') != 'edit')) {
-				require_once __DIR__ . '/../../../projet/class/task.class.php';
+				require_once DOL_DOCUMENT_ROOT.'/projet/class/project.class.php';
+				require_once DOL_DOCUMENT_ROOT.'/projet/class/task.class.php';
+
 				require_once __DIR__ . '/../class/riskanalysis/risk.class.php';
 				require_once __DIR__ . '/../class/preventionplan.class.php';
 				require_once __DIR__ . '/../class/firepermit.class.php';
 				require_once __DIR__ . '/../class/accident.class.php';
 
-				$task           = new Task($db);
+				global $user;
+
+				$task           = new DigiriskTask($db);
 				$risk           = new Risk($db);
 				$preventionplan = new PreventionPlan($db);
 				$firepermit     = new FirePermit($db);
 				$accident       = new Accident($db);
+				$project        = new Project($db);
+				$extrafields    = new ExtraFields($db);
 
 				if ($parameters['currentcontext'] == 'projecttaskcard') {
 					$task->fetch(GETPOST('id'));
@@ -233,9 +250,6 @@ class ActionsDigiriskdolibarr
 				}
 
 				if (($parameters['currentcontext'] == 'projecttaskscard') || ($parameters['currentcontext'] == 'tasklist')) {
-					$task        = new Task($db);
-					$extrafields = new ExtraFields($db);
-
 					$extrafields->fetch_name_optionals_label($task->table_element);
 					$alltasks = $task->getTasksArray(null, null, 0, 0, 0, '', '-1', '', 0, 0, $extrafields);
 
@@ -297,41 +311,106 @@ class ActionsDigiriskdolibarr
 						}
 					}
 				}
+
+				if (in_array($parameters['currentcontext'], array('projectcard', 'projectcontactcard', 'projecttaskscard', 'projecttasktime', 'projectOverview'))) {
+					if ($parameters['currentcontext'] == 'projecttasktime') {
+						$project->fetch(GETPOST('projectid'), GETPOST('project_ref'));
+					} else {
+						$project->fetch(GETPOST('id'), GETPOST('ref'));
+					}
+					$alltasks = $task->getTasksArray(null, null, $project->id, 0, 0, '', '-1', '', 0, 0, $extrafields);
+					if (is_array($alltasks) && !empty($alltasks)) {
+						$nbtasks = count($alltasks);
+						foreach ($alltasks as $tasksignle) {
+							$filter = ' AND ptt.fk_task = ' . $tasksignle->id;
+							$alltimespent = $tasksignle->fetchAllTimeSpent($user, $filter);
+							foreach ($alltimespent as $timespent) {
+								$totatconsumedtimeamount += convertSecondToTime($timespent->timespent_duration, 'allhourmin') * $timespent->timespent_thm;
+							}
+							$totatconsumedtime += $tasksignle->duration;
+							$totalprogress += $tasksignle->progress;
+							$totaltasksbudget += $tasksignle->budget_amount;
+						}
+					} else {
+						$totatconsumedtime = 0;
+						$totatconsumedtimeamount = 0;
+						$nbtasks = 0;
+						$totalprogress = 0;
+						$totaltasksbudget = 0;
+					}
+					$outTotatconsumedtime = '<tr><td>' . $langs->trans('TotalConsumedTime') . '</td><td>' . convertSecondToTime($totatconsumedtime, 'allhourmin') . '</td></tr>';
+					$outTotatconsumedtimeamount = '<tr><td>' . $langs->trans('TotalConsumedTimeAmount') . '</td><td>' . price($totatconsumedtimeamount, 0, $langs, 1, 0, 0, $conf->currency) . '</td></tr>';
+					$outNbtasks = '<tr><td>' . $langs->trans('NbTasks') . '</td><td>' . $nbtasks . '</td></tr>';
+					$outTotalprogress = '<tr><td>' . $langs->trans('TotalProgress') . '</td><td>' . (($totalprogress) ? price2num($totalprogress/$nbtasks, 2) . ' %' : '0 %') . '</td></tr>';
+					$outTotaltasksbudget = '<tr><td>' . $langs->trans('TotalBudget') . '</td><td>' . price($totaltasksbudget, 0, $langs, 1, 0, 0, $conf->currency) . '</td></tr>'; ?>
+					<script>
+						jQuery('.fichecenter .fichehalfright .tableforfield tbody tr:last-child').after(<?php echo json_encode($outTotatconsumedtime) ?>);
+						jQuery('.fichecenter .fichehalfright .tableforfield tbody tr:last-child').after(<?php echo json_encode($outTotatconsumedtimeamount) ?>);
+						jQuery('.fichecenter .fichehalfright .tableforfield tbody tr:last-child').after(<?php echo json_encode($outNbtasks) ?>);
+						jQuery('.fichecenter .fichehalfright .tableforfield tbody tr:last-child').after(<?php echo json_encode($outTotalprogress) ?>);
+						jQuery('.fichecenter .fichehalfright .tableforfield tbody tr:last-child').after(<?php echo json_encode($outTotaltasksbudget) ?>);
+					</script>
+					<?php
+				}
 			}
 		} else if ($parameters['currentcontext'] == 'publicnewticketcard') {
-			require_once __DIR__ . '/../lib/digiriskdolibarr_function.lib.php';
 
-			require_once __DIR__ . '/digiriskelement.class.php';
-			$digiriskelement = new DigiriskElement($db);
-			$selectDigiriskElement = '<span>'. $langs->trans('GP/UT') .'</span>';
-			$selectDigiriskElement .= $digiriskelement->select_digiriskelement_list(GETPOST('options_digiriskdolibarr_ticket_service'), 'options_digiriskdolibarr_ticket_service', '', $langs->trans('PleaseSelectADigiriskElement'), 0, array(), 0, 0, 'minwidth500', 0, false, 1);
-			$selectDigiriskElement .= '<div><br></div>';
-			?>
-			<script>
-				let date = new Date();
+			if (GETPOST('entity') > 0) {
+				require_once __DIR__ . '/../lib/digiriskdolibarr_function.lib.php';
 
-				let month    = date.getMonth() + 1;
-				let day      = date.getDate();
-				let fulldate = (day < 10 ? '0' : '') + day + '/' + (month < 10 ? '0' : '') + month + '/' + date.getFullYear();
-				let hour     = date.getHours();
-				let min      = date.getMinutes();
+				require_once __DIR__ . '/digiriskelement.class.php';
+				$digiriskelement = new DigiriskElement($db);
+				$selectDigiriskElement = '<span ' . (($conf->global->DIGIRISKDOLIBARR_TICKET_DIGIRISKELEMENT_REQUIRED) ? 'style="font-weight:600"' : '') . '>' . $langs->trans('GP/UT') . (($conf->global->DIGIRISKDOLIBARR_TICKET_DIGIRISKELEMENT_REQUIRED) ? '<span style="color:red"> *</span>' : '') . '</span>';
 
-				jQuery('#options_digiriskdolibarr_ticket_lastname').parent().html(jQuery('#options_digiriskdolibarr_ticket_lastname').parent().html().replace(/Nom/, '<b>Nom</b>'))
-                jQuery('#options_digiriskdolibarr_ticket_lastname').parent().html(jQuery('#options_digiriskdolibarr_ticket_lastname').parent().html().replace(/Prénom/, '<b>Prénom</b>'))
+				$alldisableddigiriskelement = $digiriskelement->fetchAll('', '', 0, 0, array('customsql' => 't.show_in_selector = 0'));
+				if (is_array($alldisableddigiriskelement) && !empty($alldisableddigiriskelement)) {
+					$filter = 's.rowid NOT IN (';
+					foreach ($alldisableddigiriskelement as $disabled_digiriskelement) {
+						$filter .= $disabled_digiriskelement->id . ',';
+					}
+					$filter = substr($filter, 0, -1);
+					$filter .= ')';
+				}
 
-                jQuery('#options_digiriskdolibarr_ticket_date').val(fulldate);
-                jQuery('#options_digiriskdolibarr_ticket_dateday').val((day < 10 ? '0' : '') + day);
-                jQuery('#options_digiriskdolibarr_ticket_datemonth').val((month < 10 ? '0' : '') + month);
-                jQuery('#options_digiriskdolibarr_ticket_dateyear').val(date.getFullYear());
-                jQuery('#options_digiriskdolibarr_ticket_datehour').val((hour < 10 ? '0' : '') + hour);
-                jQuery('#options_digiriskdolibarr_ticket_datemin').val((min < 10 ? '0' : '') + min);
+				$selectDigiriskElement .= $digiriskelement->select_digiriskelement_list(GETPOST('options_digiriskdolibarr_ticket_service'), 'options_digiriskdolibarr_ticket_service', (!empty($filter) ? $filter : ''), $langs->trans('PleaseSelectADigiriskElement'), 0, array(), 0, 0, 'minwidth500 maxwidthonsmartphone', 0, false, 1);
+				$selectDigiriskElement .= '<div><br></div>';
 
-                jQuery('#options_digiriskdolibarr_ticket_service').remove()
-                jQuery('.select2.select2-container.select2-container--default').remove()
+				$emailfield = '<div class="form-element">';
+				$emailfield .= '<span class="form-label"' . (($conf->global->DIGIRISKDOLIBARR_TICKET_EMAIL_REQUIRED) ? '' : 'style="font-weight:300"') . '>' . $langs->trans("Email") . (($conf->global->DIGIRISKDOLIBARR_TICKET_EMAIL_REQUIRED) ? '<span style="color:red"> *</span>' : '') . '</span>';
+				$emailfield .= '<label class="form-field-container">';
+				$emailfield .= '<input class="email" type="email" name="email" id="email" value="' . GETPOST('email') . '"/>';
+				$emailfield .= '</label>';
+				$emailfield .= '</div>';
 
-                jQuery('.wpeo-form.tableforinputfields').prepend(<?php echo json_encode($selectDigiriskElement) ; ?>)
-			</script>
-			<?php
+				?>
+				<script>
+					let date = new Date();
+
+					let month    = date.getMonth() + 1;
+					let day      = date.getDate();
+					let fulldate = (day < 10 ? '0' : '') + day + '/' + (month < 10 ? '0' : '') + month + '/' + date.getFullYear();
+					let hour     = date.getHours();
+					let min      = date.getMinutes();
+
+					jQuery('#options_digiriskdolibarr_ticket_lastname').parent().html(jQuery('#options_digiriskdolibarr_ticket_lastname').parent().html().replace(/Nom/, '<b>Nom</b><span style="color:red"> *</span>'))
+					jQuery('#options_digiriskdolibarr_ticket_lastname').parent().html(jQuery('#options_digiriskdolibarr_ticket_lastname').parent().html().replace(/Prénom/, '<b>Prénom</b><span style="color:red"> *</span>'))
+
+					jQuery('#options_digiriskdolibarr_ticket_firstname').after(<?php echo json_encode($emailfield) ; ?>);
+
+					jQuery('#options_digiriskdolibarr_ticket_date').val(fulldate);
+					jQuery('#options_digiriskdolibarr_ticket_dateday').val((day < 10 ? '0' : '') + day);
+					jQuery('#options_digiriskdolibarr_ticket_datemonth').val((month < 10 ? '0' : '') + month);
+					jQuery('#options_digiriskdolibarr_ticket_dateyear').val(date.getFullYear());
+					jQuery('#options_digiriskdolibarr_ticket_datehour').val((hour < 10 ? '0' : '') + hour);
+					jQuery('#options_digiriskdolibarr_ticket_datemin').val((min < 10 ? '0' : '') + min);
+
+					jQuery('#options_digiriskdolibarr_ticket_service').remove()
+					jQuery('.select2.select2-container.select2-container--default').remove()
+
+					jQuery('.wpeo-form.tableforinputfields').prepend(<?php echo json_encode($selectDigiriskElement) ; ?>)
+				</script>
+				<?php
+			}
 		}
 
 		if (true) {
@@ -362,6 +441,12 @@ class ActionsDigiriskdolibarr
 				dolibarr_set_const($db, "DIGIRISKDOLIBARR_COLLECTIVE_AGREEMENT_TITLE", GETPOST("DIGIRISKDOLIBARR_COLLECTIVE_AGREEMENT_TITLE", 'nohtml'), 'chaine', 0, '', $conf->entity);
 				dolibarr_set_const($db, "DIGIRISKDOLIBARR_PEE_ENABLED", GETPOST("DIGIRISKDOLIBARR_PEE_ENABLED") == 'on' ? 1 : 0, 'integer', 0, '', $conf->entity);
 				dolibarr_set_const($db, "DIGIRISKDOLIBARR_PERCO_ENABLED", GETPOST("DIGIRISKDOLIBARR_PERCO_ENABLED") == 'on' ? 1 : 0, 'integer', 0, '', $conf->entity);
+				if ($conf->global->DIGIRISKDOLIBARR_MANUAL_INPUT_NB_EMPLOYEES) {
+					dolibarr_set_const($db, "DIGIRISKDOLIBARR_NB_EMPLOYEES", GETPOST("DIGIRISKDOLIBARR_NB_EMPLOYEES"), 'integer', 0, '', $conf->entity);
+				}
+				if ($conf->global->DIGIRISKDOLIBARR_MANUAL_INPUT_NB_WORKED_HOURS) {
+					dolibarr_set_const($db, "DIGIRISKDOLIBARR_NB_WORKED_HOURS", GETPOST("DIGIRISKDOLIBARR_NB_WORKED_HOURS"), 'integer', 0, '', $conf->entity);
+				}
 			}
 		} else if ($parameters['currentcontext'] == 'ticketcard') {
 			if ($action == 'digiriskbuilddoc') {

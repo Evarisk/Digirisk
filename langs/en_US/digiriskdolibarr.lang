@@ -914,7 +914,7 @@ DigiriskEvaluatorNumberingModule = Modèle de numérotation des évaluateurs de 
 DigiriskEvaluatorStandardModel = Renvoie le numéro sous la forme EVn où n est un compteur séquentiel sans rupture et sans remise à 0.
 
 # Data - Donnée
-Evaluator = Évaluateur
+Evaluators = Évaluateurs
 TheEvaluator = L'évaluateur
 EvaluatorWellCreated = Évaluateur créé
 EvaluatorNotCreated = Erreur lors de la création de l'évaluateur

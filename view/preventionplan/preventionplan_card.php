@@ -455,7 +455,7 @@ if (empty($reshook)) {
 	}
 
 	// Action to build doc
-	if ($action == 'builddoc' && $permissiontoadd) {
+	if (($action == 'builddoc' || GETPOST('forcebuilddoc')) && $permissiontoadd) {
 		$outputlangs = $langs;
 		$newlang     = '';
 
@@ -483,13 +483,14 @@ if (empty($reshook)) {
 		} else {
 			setEventMessages($langs->trans("FileGenerated") . ' - ' . $preventionplandocument->last_main_doc, null);
 
-			$signatories = $signatory->fetchSignatory("", $object->id, 'preventionplan');
-
-			if ( ! empty($signatories) && $signatories > 0) {
-				foreach ($signatories as $arrayRole) {
-					foreach ($arrayRole as $signatory) {
-						$signatory->signature = $langs->transnoentities("FileGenerated");
-						$signatory->update($user, false);
+			if ($object->status == $object::STATUS_LOCKED) {
+				$signatories = $signatory->fetchSignatory("", $object->id, 'preventionplan');
+				if ( ! empty($signatories) && $signatories > 0) {
+					foreach ($signatories as $arrayRole) {
+						foreach ($arrayRole as $signatory) {
+							$signatory->signature = $langs->transnoentities("FileGenerated");
+							$signatory->update($user, false);
+						}
 					}
 				}
 			}
@@ -497,8 +498,12 @@ if (empty($reshook)) {
 			$urltoredirect = $_SERVER['REQUEST_URI'];
 			$urltoredirect = preg_replace('/#builddoc$/', '', $urltoredirect);
 			$urltoredirect = preg_replace('/action=builddoc&?/', '', $urltoredirect); // To avoid infinite loop
-
-			header('Location: ' . $urltoredirect . '#builddoc');
+			if (preg_match('/forcebuilddoc=1/', $urltoredirect)) {
+				$urltoredirect = preg_replace('/forcebuilddoc=1&?/', '', $urltoredirect); // To avoid infinite loop
+				header('Location: ' . $urltoredirect . '#sendEmail');
+			} else {
+				header('Location: ' . $urltoredirect . '#builddoc');
+			}
 			exit;
 		}
 	}
@@ -605,6 +610,7 @@ if (empty($reshook)) {
 
 	// Action clone object
 	if ($action == 'confirm_clone' && $confirm == 'yes') {
+		$options['clone_label']         = GETPOST('clone_label');
 		$options['preventionplan_risk'] = GETPOST('clone_preventionplan_risk');
 		$options['attendants']          = GETPOST('clone_attendants');
 		$options['schedule']            = GETPOST('clone_schedule');
@@ -633,6 +639,13 @@ if (empty($reshook)) {
 	$labour_inspector_id = $labour_inspector->id;
 	$thirdparty->fetch($labour_inspector_id);
 	$object->thirdparty = $thirdparty;
+
+	if ($action == 'send' && dol_strlen(GETPOST('sendto') < 1)) {
+		setEventMessages($langs->trans("SendToNoEmail"), null, 'errors');
+		header("Location: " . $_SERVER['PHP_SELF'] . '?id=' . $id);
+		exit();
+	}
+
 	include DOL_DOCUMENT_ROOT . '/core/actions_sendmails.inc.php';
 }
 
@@ -648,7 +661,7 @@ $title_edit    = $langs->trans("ModifyPreventionPlan");
 $object->picto = 'preventionplandocument@digiriskdolibarr';
 
 $help_url = 'FR:Module_DigiriskDolibarr';
-$morejs   = array("/digiriskdolibarr/js/digiriskdolibarr.js.php");
+$morejs   = array("/digiriskdolibarr/js/digiriskdolibarr.js");
 $morecss  = array("/digiriskdolibarr/css/digiriskdolibarr.css");
 
 llxHeader('', $title, $help_url, '', '', '', $morejs, $morecss);
@@ -957,7 +970,7 @@ if (($action == 'clone' && (empty($conf->use_javascript_ajax) || ! empty($conf->
 	// Define confirmation messages
 	$formquestionclone = array(
 		'text' => $langs->trans("ConfirmClone"),
-		array('type' => 'text', 'name' => 'clone_ref', 'label' => $langs->trans("NewRefForClonePreventionPlan"), 'value' => empty($tmpcode) ? $langs->trans("CopyOf") . ' ' . $object->ref : $tmpcode, 'size' => 24),
+		array('type' => 'text', 'name' => 'clone_label', 'label' => $langs->trans("NewLabelForClonePreventionPlan"), 'value' => empty($tmpcode) ? $langs->trans("CopyOf") . ' ' . $object->ref : $tmpcode, 'size' => 24),
 		array('type' => 'checkbox', 'name' => 'clone_preventionplan_risk', 'label' => $langs->trans("ClonePreventionPlanRisk"), 'value' => 1),
 		array('type' => 'checkbox', 'name' => 'clone_attendants', 'label' => $langs->trans("CloneAttendantsPreventionPlan"), 'value' => 1),
 		array('type' => 'checkbox', 'name' => 'clone_schedule', 'label' => $langs->trans("CloneSchedulePreventionPlan"), 'value' => 1),
@@ -995,9 +1008,6 @@ if ((empty($action) || ($action != 'create' && $action != 'edit'))) {
 	$project->fetch($object->fk_project);
 	$morehtmlref .= '<br>' . $langs->trans('Project') . ' : ' . getNomUrlProject($project, 1, 'blank');
 	$morehtmlref .= '</div>';
-
-
-
 
 	//$morehtmlleft = '<div class="floatleft inline-block valignmiddle divphotoref">'.digirisk_show_photos('digiriskdolibarr', $conf->digiriskdolibarr->multidir_output[$entity].'/'.$object->element_type, 'small', 5, 0, 0, 0, $width,0, 0, 0, 0, $object->element_type, $object).'</div>';
 
@@ -1065,7 +1075,10 @@ if ((empty($action) || ($action != 'create' && $action != 'edit'))) {
 		print '</td></tr>';
 	}
 
-	include DOL_DOCUMENT_ROOT . '/core/tpl/commonfields_view.tpl.php';
+	print '</table>';
+	print '</div>';
+	print '<div class="fichehalfright">';
+	print '<table class="border centpercent tableforfield">';
 
 	//Labour inspector Society -- Entreprise Inspecteur du travail
 	print '<tr><td class="titlefield">';
@@ -1121,7 +1134,38 @@ if ((empty($action) || ($action != 'create' && $action != 'edit'))) {
 			print '<span class="' . ($object->status == 2 ? 'butAction' : 'butActionRefused classfortooltip') . '" id="' . ($object->status == 2 ? 'actionButtonInProgress' : '') . '" title="' . ($object->status == 2 ? '' : dol_escape_htmltag($langs->trans("PreventionPlanMustBeValidated"))) . '" href="' . ($object->status == 2 ? ($_SERVER["PHP_SELF"] . '?id=' . $object->id . '&action=setInProgress') : '#') . '">' . $langs->trans("ReOpenDigi") . '</span>';
 			print '<a class="' . (($object->status == 2 && ! $signatory->checkSignatoriesSignatures($object->id, 'preventionplan')) ? 'butAction' : 'butActionRefused classfortooltip') . '" id="actionButtonSign" title="' . (($object->status == 2 && ! $signatory->checkSignatoriesSignatures($object->id, 'preventionplan')) ? '' : dol_escape_htmltag($langs->trans("PreventionPlanMustBeValidatedToSign"))) . '" href="' . (($object->status == 2 && ! $signatory->checkSignatoriesSignatures($object->id, 'preventionplan')) ? $url : '#') . '">' . $langs->trans("Sign") . '</a>';
 			print '<span class="' . (($object->status == 2 && $signatory->checkSignatoriesSignatures($object->id, 'preventionplan')) ? 'butAction' : 'butActionRefused classfortooltip') . '" id="' . (($object->status == 2 && $signatory->checkSignatoriesSignatures($object->id, 'preventionplan')) ? 'actionButtonLock' : '') . '" title="' . (($object->status == 2 && $signatory->checkSignatoriesSignatures($object->id, 'preventionplan')) ? '' : dol_escape_htmltag($langs->trans("AllSignatoriesMustHaveSigned"))) . '">' . $langs->trans("Lock") . '</span>';
-			print '<a class="' . ($object->status == 3 ? 'butAction' : 'butActionRefused classfortooltip') . '" id="actionButtonSign" title="' . dol_escape_htmltag($langs->trans("PreventionPlanMustBeLockedToSendEmail")) . '" href="' . ($object->status == 3 ? ($_SERVER['PHP_SELF'] . '?id=' . $object->id . '&action=presend&mode=init#formmailbeforetitle&sendto=' . $allLinks['LabourInspectorSociety']->id[0]) : '#') . '">' . $langs->trans('SendMail') . '</a>';
+
+			$objref    = dol_sanitizeFileName($object->ref);
+			$dir_files = $preventionplandocument->element . '/' . $objref;
+			$filedir   = $upload_dir . '/' . $dir_files;
+
+			$filelist = dol_dir_list($filedir, 'files');
+			if (!empty($filelist) && is_array($filelist)) {
+				foreach ($filelist as $file) {
+					if (preg_match('/sign/', $file['name'])) {
+						$filesigned = 1;
+					}
+				}
+			}
+
+			if ($filesigned == 0) {
+				$modellist = getListOfModelsDigirisk($db, 'preventionplandocument');
+				if (!empty($modellist)) {
+					asort($modellist);
+					$modellist = array_filter($modellist, 'remove_index');
+					if (is_array($modellist)) {
+						foreach ($modellist as $key => $modellistsingle) {
+							$arrayvalues = preg_replace('/template_/', '', $modellistsingle);
+							$modellist[$key] = $langs->trans($arrayvalues);
+							$modelselected = $key;
+						}
+					}
+				}
+				print '<a class="' . ($object->status == 3 ? 'butAction' : 'butActionRefused classfortooltip') . '" id="actionButtonSign" title="' . dol_escape_htmltag($langs->trans("PreventionPlanMustBeLockedToSendEmail")) . '" href="' . ($object->status == 3 ? ($_SERVER['PHP_SELF'] . '?id=' . $object->id . '&action=presend&forcebuilddoc=1&model='.$modelselected.'&mode=init&sendto=' . $allLinks['LabourInspectorSociety']->id[0]) : '#') . '">' . $langs->trans('SendMail') . '</a>';
+			} else {
+				print '<a class="' . ($object->status == 3 ? 'butAction' : 'butActionRefused classfortooltip') . '" id="actionButtonSign" title="' . dol_escape_htmltag($langs->trans("PreventionPlanMustBeLockedToSendEmail")) . '" href="' . ($object->status == 3 ? ($_SERVER['PHP_SELF'] . '?id=' . $object->id . '&action=presend&mode=init&sendto=' . $allLinks['LabourInspectorSociety']->id[0].'#sendEmail') : '#') . '">' . $langs->trans('SendMail') . '</a>';
+			}
+
 			print '<a class="' . ($object->status == 3 ? 'butAction' : 'butActionRefused classfortooltip') . '" id="actionButtonClose" title="' . ($object->status == 3 ? '' : dol_escape_htmltag($langs->trans("PreventionPlanMustBeLocked"))) . '" href="' . ($object->status == 3 ? ($_SERVER["PHP_SELF"] . '?id=' . $object->id . '&action=setArchived') : '#') . '">' . $langs->trans("Close") . '</a>';
 			print '<span class="butAction" id="actionButtonClone" title="" href="' . $_SERVER["PHP_SELF"] . '?id=' . $object->id . '&action=clone' . '">' . $langs->trans("ToClone") . '</span>';
 
@@ -1375,7 +1419,16 @@ if ((empty($action) || ($action != 'create' && $action != 'edit'))) {
 			$genallowed = 1;
 		}
 
-		print digiriskshowdocuments($modulepart, $dir_files, $filedir, $urlsource, $genallowed, 0, $defaultmodel, 1, 0, '', $title, '', '', $preventionplandocument, 0, 'remove_file', $object->status == 3 && empty(dol_dir_list($filedir)), $langs->trans('PreventionPlanMustBeLocked'));
+		$filelist = dol_dir_list($filedir, 'files');
+		if (!empty($filelist) && is_array($filelist)) {
+			foreach ($filelist as $file) {
+				if (preg_match('/sign/', $file['name'])) {
+					$filesigned = 1;
+				}
+			}
+		}
+
+		print digiriskshowdocuments($modulepart, $dir_files, $filedir, $urlsource, $genallowed, 0, $defaultmodel, 1, 0, '', $title, '', '', $preventionplandocument, 0, 'remove_file', $object->status < $object::STATUS_ARCHIVED && $filesigned == 0, $langs->trans('PreventionPlanGenerated'));
 	}
 
 	if ($permissiontoadd) {
@@ -1394,7 +1447,6 @@ if ((empty($action) || ($action != 'create' && $action != 'edit'))) {
 	include_once DOL_DOCUMENT_ROOT . '/core/class/html.formactions.class.php';
 	$formactions    = new FormActions($db);
 	$somethingshown = $formactions->showactions($object, $object->element . '@digiriskdolibarr', '', 1, '', $MAXEVENT, '', $morehtmlright);
-
 
 	print '</div></div></div>';
 
@@ -1420,7 +1472,7 @@ if ((empty($action) || ($action != 'create' && $action != 'edit'))) {
 		if ( ! in_array($object->element, array('societe', 'user', 'member'))) {
 			$ref = dol_sanitizeFileName($object->ref);
 			include_once DOL_DOCUMENT_ROOT . '/core/lib/files.lib.php';
-			$fileparams = dol_most_recent_file($diroutput . '/' . $ref, '');
+			$fileparams = dol_most_recent_file($diroutput . '/' . $ref, preg_quote($ref, '/') . '[^\-]+');
 			$file       = $fileparams['fullname'];
 		}
 
@@ -1448,24 +1500,7 @@ if ((empty($action) || ($action != 'create' && $action != 'edit'))) {
 			$topicmail = $outputlangs->trans($defaulttopic, '__REF__ (__REFCLIENT__)');
 		}
 
-		// Build document if it not exists
-		$forcebuilddoc = true;
-		if ($forcebuilddoc) {    // If there is no default value for supplier invoice, we do not generate file, even if modelpdf was set by a manual generation
-			if (( ! $file || ! is_readable($file)) && method_exists($object, 'generateDocument')) {
-				$result = $object->generateDocument(GETPOST('model') ? GETPOST('model') : $object->model_pdf, $outputlangs, $hidedetails, $hidedesc, $hideref);
-				if ($result < 0) {
-					dol_print_error($db, $object->error, $object->errors);
-					exit();
-				}
-				$fileparams = dol_most_recent_file($diroutput . '/' . $ref, preg_quote($ref, '/') . '[^\-]+');
-				$file       = $fileparams['fullname'];
-			}
-		}
-
-		print '<div id="formmailbeforetitle" name="formmailbeforetitle"></div>';
-		print '<div class="clearboth"></div>';
-		print '<br>';
-		print load_fiche_titre($langs->trans($titreform));
+		print load_fiche_titre($langs->trans($titreform), '', 'digiriskdolibarr32px@digiriskdolibarr', '', 'sendEmail');
 
 		print dol_get_fiche_head('');
 

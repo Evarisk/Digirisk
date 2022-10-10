@@ -45,12 +45,18 @@ if ( ! $res && file_exists("../../../main.inc.php")) $res    = @include "../../.
 if ( ! $res && file_exists("../../../../main.inc.php")) $res = @include "../../../../main.inc.php";
 if ( ! $res) die("Include of main fails");
 
+// Libraries
+require_once DOL_DOCUMENT_ROOT . '/ticket/class/ticket.class.php';
+
 require_once '../../lib/digiriskdolibarr_function.lib.php';
 
-global $langs, $mysoc;
+global $db, $langs, $mysoc;
 
 // Load translation files required by the page
 $langs->loadLangs(array("digiriskdolibarr@digiriskdolibarr", "other", "errors"));
+
+// Initialize technical objects
+$object = new Ticket($db);
 
 // Get parameters
 $track_id = GETPOST('track_id');
@@ -64,17 +70,23 @@ if (empty($conf->global->DIGIRISKDOLIBARR_TICKET_ENABLE_PUBLIC_INTERFACE)) {
 	exit;
 }
 
-$morejs  = array("/digiriskdolibarr/js/ticket-pad.min.js", "/digiriskdolibarr/js/digiriskdolibarr.js.php");
+$morejs  = array("/digiriskdolibarr/js/ticket-pad.min.js", "/digiriskdolibarr/js/digiriskdolibarr.js");
 $morecss = array("/digiriskdolibarr/css/digiriskdolibarr.css");
 
 llxHeaderTicketDigirisk($langs->trans("CreateTicket"), "", 0, 0, $morejs, $morecss);
+
+$object->fetch('', '', $track_id);
+
+$substitutionarray = getCommonSubstitutionArray($langs, 0, null, $object);
+complete_substitutions_array($substitutionarray, $langs, $object);
+$ticketsuccessmessage = make_substitutions($langs->transnoentities($conf->global->DIGIRISKDOLIBARR_TICKET_SUCCESS_MESSAGE), $substitutionarray);
+
 ?>
 <div class="digirisk-signature-container" style="">
 	<p class="center"><?php echo $langs->trans("TicketSuccess") . ' ' ?><b><?php echo $track_id; ?> </b></p>
-	<b><i><p class="center"</p></b></i>
 	<span class="wpeo-notice notice-warning center" style="margin-left: 16%;width: 70%; border-left: solid red 6px; color: red;background: rgba(255, 0, 0, 0.05)">
 		<span class="notice-content" >
-			<span class="notice-subtitle" style="color: red"><?php echo $langs->trans($conf->global->DIGIRISKDOLIBARR_TICKET_SUCCESS_MESSAGE) ?: $langs->transnoentities('YouMustNotifyYourHierarchy'); ?></span>
+			<span class="notice-subtitle" style="color: red"><?php echo $langs->transnoentities($ticketsuccessmessage) ?: $langs->transnoentities('YouMustNotifyYourHierarchy'); ?></span>
 		</span>
 	</span>
 </div>

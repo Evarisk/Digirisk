@@ -132,7 +132,8 @@ PleaseNameTheFile = De préférence, nommez le fichier <b> %s </b>
 # Page index
 #
 
-DigiriskIndexNotice1 = À venir, le Dashboard de DigiRisk
+DigiriskPatchNote = Note de mise à jour DigiRisk %s
+ShowPatchNote = Consulter la note de mise à jour
 
 #
 # Horaires d'ouverture
@@ -144,7 +145,9 @@ ThirdPartyOpeningHours = Horaires du tiers
 
 ExceptionsToWorkingHours = Dérogations aux horaires de travail
 PermanentDerogation = Dérogation permanente
+PermanentDerogationValue = Non
 OccasionalDerogation = Dérogation occasionnelle
+OccasionalDerogationValue = Oui
 ThirdPartyOpeningHoursSave = Les horaires d'ouverture du tiers ont bien été enregistrés
 
 
@@ -156,10 +159,9 @@ ThirdPartyOpeningHoursSave = Les horaires d'ouverture du tiers ont bien été en
 DigiriskDocuments = Document Digirisk
 Responsible = Responsable
 ContactsAction = Contacts action
-HoldingAgreement = Accord de participation
-HoldingAgreementTooltip = Entrez ici les informations relatives à l\'accord de participation
 PERCOTooltip = Si votre société possède un PERCO, cochez cette case
 PEETooltip = Si votre société possède un PEE, cochez cette case
+
 
 
 #
@@ -200,16 +202,22 @@ Police = Police secours
 SafetyInstructions = Consignes de sécurité
 ResponsibleToNotify = Responsable à prévenir
 LocationOfDetailedInstructions = Emplacement de la consigne détaillée
+LocationOfDetailedInstructionsValue = Pas de consigne détaillée sur ce site
 FirstAid = Premiers secours
+FirstAidValue = <h2>Liste des SST présents sur site (Nom, Entreprise, Téléphone)</h2><br><br>Chaque équipe doit être constituée de manière à pouvoir dans toute circonstance prodiguer les gestes de premiers secours à n'importe quel membre de l'équipe.<br />Les Sauveteurs Secouristes au Travail doivent être clairement identifiés et connus de tous.<h2>Conduite à tenir en cas d'accident</h2><br><br><h3>Accident bénin</h3><br><ul><li> - Soins prodigués par les SST</li><br><li> - Présence d'une trousse de secours</li></ul><br><br>Chaque machine est équipée d'au moins une trousse de secours permettent de prodiguer des soins pour des blessures légères.<br><br><h3>Accident grave</h3><br><ul><li> - Avertir le SST présent sur le site</li><br><li> - Déclencher la procédure en cas d'urgence</li><br><li> - Informer le responsable de l'Entreprise Utilisatrice Astreinte Exploitation 24/24h</li><br><li> - Contacter en cas d'accident</li></ul><br><br>L'Entreprise Utilisatrice rappelle en annexe numéros d'urgence. <br />
 AddPhoneNumber = Ajouter un numéro de téléphone à l'utilisateur
 ConfigureLabourInspector = Configurer un inspecteur du travail
 SocietyAdditionalDetails = Informations complémentaires de la société
 GeneralMeansAtDisposal = Moyens généraux mis à disposition
+GeneralMeansAtDisposalValue = <h2>Moyen de secours mis à disposition</h2><br><ul><li> - Infirmerie</li><br><li> - Nos personnels SST sont identifiés sur leurs casques et leur équipement de travail avec le badge SST</li><br><li> - Trousses à pharmacie pour les accidents bénins disponibles sur chaque sites</li></ul><br><br><h2>Consignes en cas d'accident bénins</h2><br><ul><li> - Contacter le SST le plus proche</li><br><li> - Soin avec la trousse à pharmacie mise à disposition</li><br><li> - Déclaration sur le site :</li></ul><br><br><h2>Consignes en cas d'accident</h2><br><ul><li> - Appel Pompiers : 18</li><br><li> - SAMU : 15</li><br><li> - Police Gendarmerie 17</li><br><li> - N&deg; de secours européen : 112</li></ul><br><br><h2>Consignes en cas d'incendie</h2><br>En cas d'incendie, procéder dans cet ordre :<br><ol><li> - Déclencher le signal d'alarme.</li><br><li> - Attaquer le feu (s'il n'est pas trop important) avec un extincteur.</li><br><li> - Si le feu n'est pas éteint après l'usage d'un seul extincteur, ou si le feu est déjà trop important, prévenir les sapeurs-pompiers.</li><br><li> - Fermer les portes et les fenêtres avant de quitter les locaux.</li><br><li> - Demander l'aide des équipes formées.</li><br></ol>
 GeneralInstructions = Consignes générales
+GeneralInstructionsValue = <h2>Toutes les installations</h2><br><br><p>Il est formellement interdit de fumer, de faire du feu ou d'utiliser une flamme nue dans et sur les installations.<br />Si l'intervention nécessite l'utilisation d'une flamme vive (travaux de soudage, etc.), il est impératif d'établir un permis de feu (voir exemple en annexe 9.5).<br />D'une manière générale, l'accès aux installations est interdit aux personnes non autorisées.<br />Chaque intervenant doit être muni de ses titres d'habilitation et attestations de formation. Il doit pouvoir les montrer sur site à la demande de l'Entreprise Utilisatrice.</p><br><br><h2>Habilitations</h2><br>Toute personne intervenante doit disposer d'une copie des habilitations suivantes :<br><ul><li> - Habilitation électrique en fonction des travaux à réaliser</li><br><li> - Attestation de formation ou habilitation aux travaux en hauteur et sauvetage en hauteur</li></ul><br>Et, être en mesure de la présenter sur simple demande de l'Entreprise Utilisatrice, du chargé d'intervention/de travaux ou de tout inspecteur assermenté<br><br><h2>Protections individuelles</h2><br>Toute personne intervenante doit être en mesure de disposer des Équipements de Protection Individuelle suivants selon les types de travaux effectués et les mesures de protection définies dans l'analyse des risques.<br><br><h3>Travaux divers</h3><br><ul><li> - Casque conçu pour les travaux en hauteur (EN397) avec jugulaire et/ou satisfaisant à l'isolement électrique (environnement électrique)</li><br><li> - Chaussures de sécurité</li><br><li> - Protections auditives, en cas de besoin</li><br><li> - Autres (à préciser) : en fonction des travaux réalisés et des risques associés.</li></ul><br><br><h3>Travaux électriques</h3><br><ul><li> - Tapis isolant ou tabouret isolant</li><br><li> - Gants adaptés au domaine de tension</li><br><li> - Casques pour travaux électrique avec écran facial (EN166)</li><br><li> - EPI réglementaires pour intervention HTA (UTE C 18-510)</li></ul><br><br><h3>Autres</h3><br>Note : Les entreprises extérieures doivent fournir à leurs intervenants les EPI désignés ci-dessus. Un tabouret et une perche se trouvent dans les postes de livraison.<br><br><h3>Travaux en hauteur</h3><br><ul><li> - EPI réglementaires (harnais, casque, 2 longes à absorbeurs ou double longe en Y, mousquetons, stop-chute, etc.) à jour de vérification</li><br><li> - Système d'évacuation automatique :</li><br><li> - Nombre : 1 kit évacuateur (désigné pour 2 personnes)</li><li>Localisation : dans la nacelle</li><br><li> - Penser à se munir d'un kit évacuateur supplémentaire si plus de deux personnes en nacelle</li><br><li> - Autre (à préciser) : stop-chute utilisé : HACA de référence 0529 7103 (attache en sternal sur le harnais)</li></ul><br><br>Les stop-chutes doivent être compatibles avec le système d'assurage rigide qui équipe les machines. Les stop-chutes doivent êtres conformes à la dernière norme et avoir passés avec succès les essais complémentaires (tests additionnels CNB/P/11.073 du 13/10/2010) rendus obligatoires par l'Avis du Ministère du Travail du 28 Septembre 2010 afin de garantir la conformité aux exigences de la directive 89/686/CEE.
 RulesOfProcedure = Règlement intérieur
-
+RulesOfProcedureValue = Disponible sur l'affichage obligatoire dans la salle de pause
 CollectiveAgreement = Conventions collectives
+CollectiveAgreementValue = Disponible sur le site du gouvernement :<br /><a href="https://www.service-public.fr/particuliers/vosdroits/F78" target="_blank">https://www.service-public.fr/particuliers/vosdroits/F78</a>
 legaldisplay.odt = Affichage légal
+legaldisplay_custom.odt = Affichage légal personnalisé
 
 
 
@@ -242,6 +250,7 @@ HowToSetDataInformationsSharing = Pour configurer les données sur la diffusion 
 ConfigureSecurityAndSocialData = Configurer les données de la société
 
 ParticipationAgreement = Accords de participation
+ParticipationAgreementValue = Oui pour tous les collaborateurs ayant un contrat de travail à durée indéterminée ou déterminée en cours avec l'entreprise, quelle qu'en soit la nature, pourront bénéficier de la participation.<br />Toutefois, une condition d'ancienneté est  requise : 6 mois dans l'entreprise.<br />Pour la détermination de l'ancienneté requise, sont prises en compte tous les contrats de travail exécutés au cours de la période de calcul et des 12 mois qui la précédent.<br />L'ancienneté s'apprécie à la date de clôture de l'exercice concerné ou à la date de départ en cas de rupture de contrat en cours d'exercice.
 TermsAndConditions = Modalités
 
 ESC = Comité Social & Économique
@@ -253,7 +262,11 @@ ElectionDateDP = Date d'élection des DP
 Titulars = Titulaires
 Alternates = Suppléants
 informationssharing.odt = Diffusion d'informations
+informationssharing_custom.odt = Diffusion d'informations personnalisée
 ChooseBoxToAdd = Ajouter le widget au tableau de bord...
+ActionOnUser = Utilisateur concerné
+HarassmentOfficer = Responsable harcèlement
+HarassmentOfficerCSE = Responsable harcèlement CSE
 
 
 
@@ -369,13 +382,13 @@ ErrorNoAttendantSelected = Erreur : Aucun intervenant n'a été sélectionné
 SignatureEmailSubject = Signature du plan de prevention
 DocumentName = Référence du document
 PreventionPlanScheduleSave = Les horaires du plan de prévention ont bien été enregistrés
-GoToLock = Verrouiller le plan de prévention
-GoToValidate = Valider le plan de prévention
+GoToLockPreventionPlan = Verrouiller le plan de prévention
+GoToValidatePreventionPlan = Valider le plan de prévention
 PreventionPlanMustBeValidated = Le plan de prévention doit être validé pour le rouvrir
 PreventionPlanMustBeInProgress = Le plan de prévention doit être en cours pour accéder à cette fonctionnalité
 PreventionPlanMustBeInProgressToValidate = Le plan de prévention est déjà validé
 PreventionPlanMustBeLockedToSendEmail = Le plan de prévention doit être verrouillé pour envoyer un email
-CSEMustBeAlerted3DaysBeforeVisit = Le CSE doit être prévenu 3 jours avant l'inspection commune préalable
+CSEMustBeAlerted3DaysBeforeVisit = Le CSE doit être prévenu 3 jours avant l'inspection commune préalable (art. R. 4514-1 1°, R. 4514-3 et R. 4514-9 du Code du travail)
 LabourInspectorFirstName = Inspecteur du
 LabourInspectorLastName = travail
 PreventionPlanData = Données du Plan de prévention
@@ -385,13 +398,15 @@ NoPreventionPlanRisk = Aucun risque sur le plan de prévention
 NoPreventionPlanLinked = Aucun plan de prévention lié
 PreventionPlanManagement = Gestion des plans de prévention
 PPRProject = Projet lié aux plans de prévention
-NewRefForClonePreventionPlan = Réf. du nouveau plan de prévention
+NewLabelForClonePreventionPlan = Libellé du nouveau plan de prévention
 ClonePreventionPlanRisk = Cloner les risques du plan de prévention
 CloneAttendantsPreventionPlan = Cloner les participants du plan de prévention
 CloneSchedulePreventionPlan = Cloner les horaires du plan de prévention
 ConfirmClonePreventionPlan = Êtes-vous sûr de vouloir cloner le plan de prévention <b> %s </b> ?
 Archived = Archivé
 preventionplandocument.odt = Plan de prévention
+preventionplandocument_custom.odt = Plan de prévention personnalisé
+PreventionPlanGenerated = Le plan de prévention est déjà généré
 
 # Email - Mail
 PreventionPlanLabel = Récapitulatif du plan de prévention
@@ -473,7 +488,7 @@ GoToLockFirePermit = Verrouiller le permis de feu
 GoToValidateFirePermit = Valider le permis de feu
 FirePermitAttendants = Permis de feu - Participants
 FirePermitScheduleSave = Les horaires du permis de feu ont bien été enregistrés
-NewRefForCloneFirePermit = Réf. du nouveau permis de feu
+NewLabelForCloneFirePermit = Libellé du nouveau permis de feu
 CloneFirePermitRisk = Cloner les risques du permis de feu
 CloneAttendantsFirePermit = Cloner les participants du permis de feu
 CloneScheduleFirePermit = Cloner les horaires du permis de feu
@@ -485,6 +500,8 @@ FirePermitManagement = Gestion des permis de feu
 FPRProject = Projet lié aux permis de feu
 FirePermitLinked = Permis de feu lié
 firepermitdocument.odt = Permis de feu
+firepermitdocument_custom.odt = Permis de feu personnalisé
+FirePermitGenerated = Le permis de feu est déjà généré
 
 # Email - Mail
 FirePermitLabel = Récapitulatif du permis de feu
@@ -606,21 +623,32 @@ AccidentAttendants = Accident - Participants
 UserEmployer = Responsable de la société
 SignatureUserEmployer = Signature du responsable de la société
 CerfaLink = Lien vers le Cerfa
-WorkStopDays = Nombre de jour d'arrêt de travail
+WorkStopDays = Nombre de jours d'arrêt de travail
 AccidentLesionList = Liste des lésions liées à l'accident
 DocumentsMetaData = Fichiers joints complémentaires
 WorkStopDocument = Déclaration d'arrêt de travail
 AccidentMetaDataSave = Les données complémentaires de l'accident ont bien été enregistrées
-ErrorFieldNotEmpty = Erreur : Le champ '%s' ne peut pas être vide
+ErrorFieldNotEmpty = Erreur : le champ <b>'%s'</b> ne peut pas être vide
 ConfirmDeleteAccidentWorkStop = Êtes-vous sûr de vouloir supprimer l'arrêt de travail <b>%s</b> sur l'accident ?
 AccidentMetaDataLesion = Données complémentaires des lésions
-TotalWorkStopDays = Nombre total de jour d'arrêt de travail
+TotalWorkStopDays = Nombre total de jours d'arrêt de travail
 RegisterAccident = Accident bénin
 AccidentLinked = Accident lié
 GaugeCounter = Ce champ est utilisé dans le compteur de la jauge
 DateStartWorkStop = Date de début d'arrêt de travail
 DateEndWorkStop = Date de fin d'arrêt de travail
 ReturnWorkDate = Date de reprise d'activité
+DayWithoutAccident = Jours sans accident(s)
+AccidentRepartition = Répartition des accidents par type
+NbAccidentsByEmployees = Nombre d'accidents par salarié
+FrequencyIndex = Indice de fréquence
+FrequencyRate = Taux de fréquence
+GravityIndex = Indice de gravité
+GravityRate = Taux de gravité
+AccidentRateIndicator = Taux et indice des indicateurs de performance des accidents
+NbPresquAccidents = Nombre de presqu'accidents
+NbAccidentInvestigations = Nombre d'enquête accidents
+NbWorkedHours = Nombre d\'heures travaillées
 
 # AccidentTooltip - Tooltip des accidents
 VictimActivityTooltip = Précisez l’activité ou la tâche de la victime au moment de l’accident, c’est-à-dire ce que faisait la victime
@@ -631,6 +659,10 @@ VictimWorkHoursTooltip = Indiquez les heures de travail effectuées par votre sa
 ConsequenceTooltip = Si la victime a arrêté son travail sur prescription d’un médecin, vous devez OBLIGATOIREMENT établir et envoyer le formulaire « attestation de salaire accident du travail ou maladie professionnelle » - référencé S6202, à la Caisse primaire du lieu de résidence habituelle de la victime. <br> Par la suite, en cas de nouvel arrêt après une période de soins ou une reprise du travail, sur un mois différent, vous devrez également remplir cette même formalité
 FirstPersonNoticedIsWitnessTooltip = Indiquez le nom, le prénom et l’adresse du témoin. <br> En l’absence de témoin, indiquez la 1ère personne de l’entreprise qui a été avisée de l’accident
 ThirdPartyResponsabilityTooltip = Lorsque vous avez connaissance de l’implication d’un tiers, quelle que soit sa part de responsabilité, dans un accident du travail ou de trajet, cette mention doit impérativement être reportée dans cette partie
+FrequencyIndexTooltip = Nombre d'accidents par salarié x 1 000
+FrequencyRateTooltip  = Nombre d'accidents par heures travaillées x 1 000 000
+GravityRateTooltip = Nombre de jours d'arrêt de travail par heures travaillées x 1 000
+NbWorkedHoursTooltip = Le nombre d'heures travaillées a été saisi manuellement
 
 # Dictionnary - Dictionnaire
 UsualWorkplace = Lieu de travail habituel
@@ -693,6 +725,7 @@ ListingRisksPhotoDigiriskTemplate = ODT par défaut des listing des risques avec
 # Data - Donnée
 ListingRisksPhoto = Listing des risques avec photos
 listingrisksphoto.odt = Listing des risques avec photos
+listingrisksphoto_custom.odt = Listing des risques avec photos personnalisé
 
 
 
@@ -719,7 +752,8 @@ ListingRisksActionDigiriskTemplate = ODT par défaut des listing des risques ave
 
 # Data - Donnée
 ListingRisksAction = Listing des risques avec actions correctives
-listingriskaction.odt = Listing des risques avec actions correctives
+listingrisksaction.odt = Listing des risques avec actions correctives
+listingrisksaction_custom.odt = Listing des risques avec actions correctives personnalisé
 DigiriskListingRisksActionData = Données configurables des listing des risques avec actions correctives
 ShowTaskDoneListingRisksActionDescription = Permettre d'afficher ou non les tâches soldées dans le listing des risques avec actions correctives
 
@@ -763,18 +797,24 @@ SetStartEndDateBefore = Définissez la date de début et la date de fin d'audit 
 SetStartEndDateBeforeSendEmail = Définissez la date de début et la date de fin d'audit sur cette page pour envoyer un email
 NoSitePlans = Aucun plan de la société renseigné
 riskassessmentdocument.odt = Document Unique
+riskassessmentdocument_custom.odt = Document Unique personnalisé
 DigiriskRiskAssessmentDocumentData = Données configurables du document unique
 ShowTaskDone = Afficher les tâches soldées
 ShowTaskDoneRiskAssessmentDocumentDescription = Permettre d'afficher ou non les tâches soldées dans le Document Unique
 ActionPreventionCompletedTaskDone = Les actions soldées ne sont pas affichées
 AppliedOn = Actif sur :
-
+RiskAssessmentDocumentMethod = * Étape 1 : Récupération des informations<br />- Visite des locaux<br />- Récupération des données du personnel<br /><br />* Étape 2 : Définition de la méthodologie et de document<br />- Validation des fiches d'unité de travail standard<br />- Validation de l'arborescence des unités<br /><br />* Étape 3 : Réalisation de l'étude de risques<br />- Sensibilisation des personnels aux risques et aux dangers<br />- Création des unités de travail avec le personnel et le ou les responsables<br />- Évaluations des risques par unités de travail avec le personnel<br /><br />* Étape 4<br />- Traitement et rédaction du document unique
+RiskAssessmentDocumentSources = La sensibilisation des risques est définie dans l'ED840 édité par L'INRS.<br />Dans ce document vous trouverez:<br />- La définition d'un risque, d'un danger et un schéma explicatif<br />- Les explications concernant les différentes méthodes d'évaluation
+RiskAssessmentDocumentImportantNote = Notes importantes :<br />Vous pouvez lire la documentation de DigiRisk ici<br /><a href="https://wiki.dolibarr.org/index.php?title=Module_Digirisk" target="_blank">https://wiki.dolibarr.org/index.php?title=Module_Digirisk</a><br />Vous pouvez suivre le projet ici :<br /><a href="https://github.com/Evarisk/Digirisk/projects?type=classic" target="_blank">https://github.com/Evarisk/Digirisk/projects?type=classic</a><br />Reporter un bug ici<br /><a href="https://github.com/Evarisk/Digirisk/issues" target="_blank">https://github.com/Evarisk/Digirisk/issues</a>
 
 # Boxes - Widget
 RiskAssessmentDocumentBox = Box Document unique
 RiskAssessmentDocumentBoxTitle = Informations du Document unique
-LastGenerateDate = Date de dernière génération du document unique
+LastGenerateDate = DU généré le
 MandatoryUpdateEvery = Mise à jour obligatoire tous les
+NextGenerateDate = Prochain DU le
+NbDaysBeforeNextGenerateDate = Nombre de jours avant la prochaine date de génération du DU
+NbDaysAfterNextGenerateDate = Nombre de jours de retard pour la génération du DU
 
 # Email - Mail
 RiskAssessmentDocumentLabel = Récapitulatif du document unique
@@ -804,6 +844,7 @@ GroupmentDocumentDigiriskTemplate = ODT par défaut des fiches de groupement
 # Data - Donnée
 GroupmentDocument = Fiche de Groupement
 groupmentdocument.odt = Fiche de Groupement
+groupmentdocument_custom.odt = Fiche de Groupement personnalisée
 DigiriskGroupmentDocumentData = Données configurables des fiches de groupement
 ShowTaskDoneGroupmentDocumentDescription = Permettre d'afficher ou non les tâches soldées dans la fiche de groupement
 
@@ -830,6 +871,7 @@ WorkUnitDocumentDigiriskTemplate = ODT par défaut des fiches d'unité de travai
 # Data - Donnée
 WorkUnitDocument = Fiche d'Unité de travail
 workunitdocument.odt = Fiche d'Unité de travail
+workunitdocument_custom.odt = Fiche d'Unité de travail personnalisée
 DigiriskWorkUnitDocumentData = Données configurables des fiches d'unités de travail
 ShowTaskDoneWorkUnitDocumentDescription = Permettre d'afficher ou non les tâches soldées dans la fiche d'unité de travail
 
@@ -853,13 +895,14 @@ ElementType = Type d'élément
 ParentElement = Élément parent
 OrganizationSaved = L'organisation et des groupements et des unités de travail a été sauvegardée
 OrganizationNotSaved = L'organisation et des groupements et des unités de travail n'a pas pu être sauvegardée
-DigiriskElementOrganization = Organisation de l'arborescence*
+DigiriskElementOrganization = Organisation de l'arborescence
 ShareDigiriskelement = Activer le partage des groupements et unités de travail
 DIGIRISKELEMENTSharing = Partage des des groupements et unités de travail
 DIGIRISKELEMENTSharingDescription = Sélection des entités qui partageront leurs groupements et unités de travail avec cette entité.
 DigiriskElementSharedTooltip = Cette option permet de partager les groupements et unités de travail. <br> INFO : Si vous souhaitez pouvoir afficher les tâches, il faut activer l'option de partage des projets.
 PleaseSelectADigiriskElement = Sélectionner un groupement ou une unité de travail...
 Registers = Registres
+ShowInSelectOnPublicTicketInterface = Doit apparaître dans la liste des éléments de l'interface publique des tickets
 
 
 #
@@ -947,6 +990,11 @@ DeleteEvaluatorMessage = Suppression de l'évaluateur
 DigiriskEvaluatorData = Données configurables des évaluateurs
 EvaluatorDuration = Durée de l'évalution par l'évaluateur
 EvaluatorDurationDescription = Le temps que met l'évaluateur à réaliser son évaluation des risques
+NbEmployeesInvolved = Nombre de salariés impliqués
+NbEmployees = Nombre de salariés
+NbEmployeesInvolvedTooltip = Nombre de salariés (évaluateurs) uniques
+NbEmployeesTooltip = Si la gestion centralisée des utilisateurs et des groupes sur l'entité principale est activée.<br>Le nombre de salariés correspond au nombre d'utilisateurs partagés/affectés à un groupe et aussi au nombre d'administrateur de l'entité principale
+NbEmployeesConfTooltip = Le nombre de salariés a été saisi manuellement
 
 
 
@@ -1046,8 +1094,10 @@ RiskNotUnlinkShared = Erreur : Risque délié
 HasBeenUnlinkSharedM =  a été délié
 HasNotBeenUnlinkSharedM = n'a pas été délié
 RiskSharedTooltip = Cette option permet de partager les risques. <br> INFO : Si vous souhaitez pouvoir afficher les tâches, il faut activer l'option de partage des projets.
-ShowInheritedRisks = Risques hérités
-ShowInheritedRisksDescription = Afficher les risques hérités dans les documents et les listings
+ShowInheritedRisksInListings = Risques hérités - Listings
+ShowInheritedRisksInListingsDescription = Afficher les risques hérités dans les listings de Digirisk
+ShowInheritedRisksInDocuments = Risques hérités - Documents
+ShowInheritedRisksInDocumentsDescription = Afficher les risques hérités dans les documents de Digirisk
 ShowRisks = Risques
 ShowRisksDescription = Afficher les risques dans les documents et les listings
 DigiriskElementInheritedRisksList Liste des risques hérités
@@ -1055,6 +1105,14 @@ ConfirmImportSharedRisks = Veuillez choisir les risques partagés à importer
 RisksRepartition = Répartition des risques par cotation
 ShowRiskOrigin = Afficher la provenance du risque
 ShowRiskOriginDescription = Afficher la provenance des risques dans les documents (Fiche UT, Fiche GP, Document Unique, Listings de risques, etc.)
+
+# Stats - Statistiques
+GreyRisk = Risque faible
+OrangeRisk = Risque à planifier
+RedRisk = Risque à traiter
+BlackRisk = Risque inacceptable
+
+
 
 
 #
@@ -1112,6 +1170,13 @@ ListRiskAssessmentTask = Liste des tâches du risque
 ShowRiskAssessmentDate = Date des évaluations
 ShowRiskAssessmentDateDescription = Remplace la date de création par la date de début des évaluations dans la fiche et les documents
 
+# Stats - Statistisques
+TasksRepartition = Répartition des tâches par avancement réel déclaré
+TaskAt0Percent = Tâche à 0
+TaskInProgress = Tâche en cours
+TaskAt100Percent = Tâche à 100
+
+
 
 #
 # RiskSign - Signalisation
@@ -1147,7 +1212,7 @@ AddRiskSignButton = Ajouter la signalisation
 EditRiskSign = Édition d'une signalisation
 DeleteRiskSignMessage = Suppression de la signalisation
 DigiriskElementRiskSignList = Liste des signalisations
-DigiriskElementRiskSign = Signalisation
+RiskSigns = Signalisations
 DigiriskElementSharedRiskSignsList = Liste des signalisations partagées
 ImportSharedRiskSigns = Importer des signalisations partagées
 AlreadyImportedF = Déja importée
@@ -1210,10 +1275,13 @@ ShowTaskStartDate = Date de début des tâches
 ShowTaskStartDateDescription = Remplace la date de création par la date de début des tâches dans la fiche et les documents
 ShowTaskEndDate = Date de fin des tâches
 ShowTaskEndDateDescription = Afficher la date de fin des tâches
-ShowTaskProgress = Progression des tâches
-ShowTaskProgressDescription = Afficher les tâches complétées dans la liste des risques
-ShowAllTasks = Toutes les tâches
-ShowAllTasksDescription = Afficher toutes les tâches
+ShowTasksDone = Tâches complétées
+ShowTasksDoneDescription = Afficher les tâches complétées à 100
+ShowTasksDoneDescriptionExtend = sur les listes de risques
+ShowTaskCalculatedProgress = Avancement de la tâche
+ShowTaskCalculatedProgressDescription = Afficher l'avancement calculé de la tâche au lieu de l'avancement déclaré
+ShowAllTasks = Toutes les tâches d'un risque dans les listings
+ShowAllTasksDescription = Afficher toutes les tâches dans la liste des tâches d'un risque dans les listings
 NoTaskCompletedThere = Aucune tâche en cours
 NoTaskUnCompletedThere = Aucune tâche terminée
 DeleteTaskTimeSpent = Êtes-vous sûr(e) de vouloir supprimer %s mins de temps consommé de la tâche
@@ -1231,6 +1299,12 @@ TaskTimeSpentDurationDescription = Le temps consommé ajouté par défaut à cha
 NoTaskShared = Pas de tâche en cours ou partagées
 WarningTaskLabel = Attention vous avez dépassé le nombre de caractères maximum autorisé (255)
 ErrorRecordHasSubTasks = La tâche a des enfants
+TotalConsumedTime = Total temps consommé sur le projet
+TotalConsumedTimeAmount = Coût du temps consommé
+NbTasks = Nombre de tâches
+TotalProgress = Avancement réel global des tâches
+TotalBudget = Somme du budget des tâches
+
 
 
 #
@@ -1293,7 +1367,9 @@ AddAttendants = Ajouter
 NoAttendants = Pas d'intervenants liés à cet objet. Pour ajouter des intervenants, le statut doit être "En cours".
 SignatureManagement = Gestion des signatures
 HasNoEmail = n'a pas d'email
-
+GoToEmailSetup = Pour configurer votre serveur de mail, rendez-vous dans
+PathToEmailSetup = "Accueil -> Configuration -> Emails" </a>
+SendToNoEmail = Les destinataires n'ont pas d'email
 
 #
 # Ticket - Interface publique ticket
@@ -1338,7 +1414,7 @@ GenerateCategories = Génération des catégories de ticket par défaut
 AlreadyGenerated = Déjà généré(e)s
 NotGenerated = Pas encore généré(e)
 NotCreated = Pas encore créé(e)s
-ExtrafieldsGeneration = Cette option permet la génération des extrafields par défaut des tickets. Les extrafields créés seront : <br> Nom, Prénom, Téléphone, Service, Lieu & Date
+ExtrafieldsGeneration = Cette option permet la génération des extrafields par défaut des tickets. Les extrafields créés seront : <br> Nom, Prénom, Téléphone, GP/UT, Lieu & Date
 CategoriesGeneration = Cette option permet la génération des catégories par défaut des tickets. Les catégories créées seront : <br> - Registre <br> - - Accident <br> - - - Presqu'accident, Accident bénin, Accident du travail <br> - - Santé & Sécurité au travail <br> - - - Départ anticipé, Autres, Problème humain, Problème matériel <br> - - Danger grave et imminent <br> - - Qualité <br> - - - Non conformité, Suggestion d'amélioration <br> - - Environnement <br> - - - Non conformité, Autres
 TicketSuccess = Votre registre a été transmis au service prévention sous le numéro :
 TicketPublicAccess = Lien de retour vers l'interface publique des tickets :
@@ -1374,8 +1450,9 @@ TicketDescription = Projet des tickets
 TicketProjectUpdated = Le projet par défaut des tickets a été mis à jour
 QRCodeAlreadyGenerated = QR Code généré
 GenerateQRCode = Générer le QR Code
+CompanyQRCodeGeneration = Génération du QR Code de l'entité
 QRCodeGeneration = Génération du QR Code
-PleaseSelectAService = Veuillez sélectionner un service
+MultiCompanyQRCodeGeneration = Génération du QR Code multi-entité
 TicketCreationMailWellSent = Mail de confirmation de création du ticket envoyé
 TicketCreationMailSent = Le mail de création du ticket a été envoyé à %s
 HowToSetupTicketCategories = Pour configurer les catégories de ticket, veuillez cliquer sur ce lien :
@@ -1393,6 +1470,19 @@ GenerateCSV = Générer le fichier CSV
 SuccessGenerateCSV = Fichier CSV %s généré avec succès
 ErrorMissingData = Erreur : impossible de générer le fichier CSV, les données envoyées au fichier sont incorrecte. <br> Veuillez vérifier que vous avez bien des GP/UT assignés à des tickets.
 CSVFile = Fichier CSV
+ErrorFieldEmail = Erreur : l'email doit correspondre au format suivant : <b>'aaa@aaa.fr'</b>
+TicketEmailRequired = Email obligatoire pour créer un ticket
+TicketEmailRequiredHelp = Activer cette option pour rendre obligatoire la saisie d'un email pour créer un ticket dans l'interface publique
+WelcomeToPublicTicketInterface = Bienvenue sur l'interface publique des tickets
+PleaseSelectAnEntity = Veuillez sélectionner une entité :
+ShowSelectorOnTicketPublicInterface = Afficher le sélecteur multi-entité sur l'interface publique des tickets au lieu de la liste des entités
+ShowSelectorOnTicketPublicInterfaceHelp = Afficher le sélecteur multi-entité sur l'interface publique des tickets au lieu de la liste des entités avec leur logo
+MultiEntityPublicInterface = Interface publique des tickets multi-société
+TicketCategoriesNotCreated = Vous n'avez pas créé de catégories de tickets
+TicketPublicInterfaceQRCode = QR Code de l'interface publique des tickets
+MultiEntityTicketPublicInterfaceQRCode =  QR Code de l'interface publique des tickets multi-société
+TicketDigiriskElementRequired = GP/UT obligatoire pour créer un ticket
+TicketDigiriskElementRequiredHelp = Activer cette option pour rendre obligatoire la selection d'un GP/UT pour créer un ticket dans l'interface publique
 
 
 
@@ -1425,13 +1515,13 @@ TicketSuccessMessageSet = Le message a bien été modifié
 Tools = Outils
 DigiriskDataMigration = Gestion des données de migration
 DataMigrationImport = Importation des données de l'arborescence de Digirisk
-DataMigrationImportDescription = Importation des données de l'arborescence de Digirisk WordPress au format JSON
+DataMigrationImportDescription = Importation des données de l'arborescence de Digirisk WordPress au format ZIP
 DataMigrationImportRisks = Importation des données des risques de Digirisk
-DataMigrationImportRisksDescription = Importation des données des risques de Digirisk WordPress au format JSON
+DataMigrationImportRisksDescription = Importation des données des risques de Digirisk WordPress au format ZIP
 ErrorFileNotWellFormatted = Le fichier n'est pas au bon format ou est vide. Vous devez joindre un fichier d'import provenant de Digirisk WordPress nommé DATE_OBJET_export.json
 ErrorFileNotWellFormattedZIP = Le fichier n'est pas au bon format ou est vide. Vous devez joindre un fichier d'import provenant de Digirisk WordPress nommé DATE_OBJET_export.zip
 DataMigrationImportRiskSigns = Importation des données des signalisations de Digirisk
-DataMigrationImportRiskSignsDescription = Importation des données des signalisations de Digirisk WordPress au format JSON
+DataMigrationImportRiskSignsDescription = Importation des données des signalisations de Digirisk WordPress au format ZIP
 DataMigrationImportGlobal = Importation des données globales de Digirisk <br> (Arborescence, risques et signalisations)
 DataMigrationImportGlobalDescription = Importation des données globales de Digirisk WordPress au format ZIP <br> (Arborescence, risques et signalisations)
 DataMigrationTreeAlreadyImported = Importation des données de l'arborescence déjà réalisée
@@ -1456,7 +1546,7 @@ MediaMaxWidthLarge = Largeur du média large
 MediaMaxWidthLargeDescription = Largeur du média (dimension large) avec pour ratio 16:9
 MediaMaxHeightLarge = Hauteur du média large
 MediaMaxHeightLargeDescription = Hauteur du média (dimension large) avec pour ratio 16:9
-
+ErrorFileSizeTooLarge = Le fichier est trop volumineux
 
 
 #
@@ -1469,7 +1559,7 @@ AT = au
 
 ModalAddPhoto = Ajout Photo
 SendEmailAt = Envoi de l'email à
-ErrorFileNotFound = Aucun logo de la société renseigné
+ErrorFileNotFound = Fichier non trouvé
 LabourInspectorName = DREETS
 UrlLabourInspector = https://travail-emploi.gouv.fr/ministere/organisation/article/dreets-directions-regionales-de-l-economie-de-l-emploi-du-travail-et-des
 ErrorSetupEmail = Erreur de configuration des mails, vous n'avez pas configuré votre serveur d'envoi de mail
@@ -1497,8 +1587,14 @@ LabourDoctorName = AMETRA
 LabourDoctorFirstName = Médecin du
 LabourDoctorLastName = travail
 DashBoard = Tableau de bord
-DayWithoutAccident = Jours sans accident(s):
 Close = Fermer
 DateRange = Plage de dates
 UseDateRange = Utiliser la plage de dates
-
+SiretNumber = N°Siret
+Society = Société
+MulticompanyTransverseModeEnabled = La gestion centralisée des utilisateurs et des groupes sur l'entité principale est activée.<br>Vous ne pouvez donc pas créer d'utilisateur ou de groupe sur cette entité.<br>Veuillez vous rendre sur l'entité principale pour réaliser cet ajout.
+ManuelInputNBEmployees = Saisir manuellement le nombre de salariés
+ManuelInputNBEmployeesDescription = Si l'option est activée, vous pouvez saisir manuellement le nombre de salariés dans la configuration de la société.<br>Sinon le nombre de salariés est calculé.<br>Consulter la documentation pour plus d'informations.
+ManuelInputNBWorkedHours = Saisir manuellement le nombre d'heures travaillées
+ManuelInputNBWorkedHoursDescription = Si l'option est activée, vous pouvez saisir manuellement le nombre d'heures travaillées dans la configuration de la société.<br>Sinon le nombre d'heures travaillées est calculé.<br>Consulter la documentation pour plus d'informations.
+HowToConfigureSetupConf = Pour configurer les donnés de la société lié à Digirisk,<br>veuillez vous rendre sur Digirisk - Configuration - Réglages

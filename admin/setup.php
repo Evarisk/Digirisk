@@ -104,7 +104,7 @@ if ($action == 'setMediaDimension') {
 $page_name = "DigiriskdolibarrSetup";
 $help_url  = 'FR:Module_DigiriskDolibarr#Configuration';
 
-$morejs  = array("/digiriskdolibarr/js/digiriskdolibarr.js.php");
+$morejs  = array("/digiriskdolibarr/js/digiriskdolibarr.js");
 $morecss = array("/digiriskdolibarr/css/digiriskdolibarr.css");
 
 llxHeader('', $langs->trans($page_name), $help_url, '', '', '', $morejs, $morecss);
@@ -167,6 +167,28 @@ print $langs->trans('AdvancedImportDescription');
 print '</td>';
 print '<td class="center">';
 print ajax_constantonoff('DIGIRISKDOLIBARR_TOOLS_ADVANCED_IMPORT');
+print '</td>';
+print '</tr>';
+
+// Manuel input number employees
+print '<tr class="oddeven"><td>';
+print  $langs->trans("ManuelInputNBEmployees");
+print '</td><td>';
+print $langs->trans('ManuelInputNBEmployeesDescription');
+print '</td>';
+print '<td class="center">';
+print ajax_constantonoff('DIGIRISKDOLIBARR_MANUAL_INPUT_NB_EMPLOYEES');
+print '</td>';
+print '</tr>';
+
+// Manuel input number worked hours
+print '<tr class="oddeven"><td>';
+print  $langs->trans("ManuelInputNBWorkedHours");
+print '</td><td>';
+print $langs->trans('ManuelInputNBWorkedHoursDescription');
+print '</td>';
+print '<td class="center">';
+print ajax_constantonoff('DIGIRISKDOLIBARR_MANUAL_INPUT_NB_WORKED_HOURS');
 print '</td>';
 print '</tr>';
 print '</table>';

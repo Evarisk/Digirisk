@@ -22,8 +22,11 @@
  */
 
 require_once DOL_DOCUMENT_ROOT . '/core/class/commonobject.class.php';
-require_once DOL_DOCUMENT_ROOT . '/projet/class/task.class.php';
+
 require_once __DIR__ . '/../../lib/digiriskdolibarr_function.lib.php';
+require_once __DIR__ . '/../digiriskelement.class.php';
+require_once __DIR__ . '/../digirisktask.class.php';
+require_once __DIR__ . '/riskassessment.class.php';
 
 /**
  * Class for Risk
@@ -177,6 +180,7 @@ class Risk extends CommonObject
 	 * @param int $parent_id Id parent object
 	 * @param bool $get_children_data Get children risks data
 	 * @param bool $get_parents_data Get parents risks data
+	 * @param bool $get_shared_data Get parents risks data
 	 * @return array|int         <0 if KO, 0 if not found, >0 if OK
 	 * @throws Exception
 	 */
@@ -213,7 +217,7 @@ class Risk extends CommonObject
 
 		}
 
-		//For groupment document if conf is activated and for risks listing of risk assessment document
+		//For risks listing of risk assessment document
 		if ( $get_children_data ) {
 			if (is_array($objects)) {
 				$elements = recurse_tree($parent_id, 0, $objects);
@@ -229,14 +233,14 @@ class Risk extends CommonObject
 					$element[$key][$v] = $v;
 				}
 
-				$children_id = array_shift($element);
+				$children_ids = $element['id'];
 
 				// RISKS parent children.
-				if ( ! empty($children_id)) {
-					foreach ($children_id as $element) {
+				if ( ! empty($children_ids)) {
+					foreach ($children_ids as $child_id) {
 						$risk = new Risk($this->db);
 
-						$result = $risk->fetchFromParent($element);
+						$result = $risk->fetchFromParent($child_id);
 						if ( ! empty($result)) {
 							foreach ($result as $risk) {
 								$evaluation     = new RiskAssessment($this->db);
@@ -245,7 +249,7 @@ class Risk extends CommonObject
 									$lastEvaluation       = array_shift($lastEvaluation);
 									$risk->lastEvaluation = $lastEvaluation;
 								}
-								$risk->appliedOn = $element;
+								$risk->appliedOn = $child_id;
 								$risks[] = $risk;
 							}
 						}
@@ -256,22 +260,57 @@ class Risk extends CommonObject
 
 		//for groupment & workunit document if get inherited risks conf is activated
 		if ( $get_parents_data ) {
-			$parent_element_id = $objects[$parent_id]->id;
-			while ($parent_element_id > 0) {
-				$result = $risk->fetchFromParent($parent_element_id);
-				if ($result > 0 && ! empty($result)) {
-					foreach ($result as $risk) {
-						$evaluation     = new RiskAssessment($this->db);
-						$lastEvaluation = $evaluation->fetchFromParent($risk->id, 1);
-						if ( $lastEvaluation > 0 && ! empty($lastEvaluation)  && is_array($lastEvaluation)) {
-							$lastEvaluation       = array_shift($lastEvaluation);
-							$risk->lastEvaluation = $lastEvaluation;
+			if ($parent_id > 0) {
+				$parent_element_id = $objects[$parent_id]->id;
+				while ($parent_element_id > 0) {
+					$result = $risk->fetchFromParent($parent_element_id);
+					if ($result > 0 && ! empty($result) && $parent_element_id !== $parent_id) {
+						foreach ($result as $risk) {
+							$evaluation     = new RiskAssessment($this->db);
+							$lastEvaluation = $evaluation->fetchFromParent($risk->id, 1);
+							if ( $lastEvaluation > 0 && ! empty($lastEvaluation)  && is_array($lastEvaluation)) {
+								$lastEvaluation       = array_shift($lastEvaluation);
+								$risk->lastEvaluation = $lastEvaluation;
+							}
+							$risk->appliedOn = $parent_id;
+							$risks[] = $risk;
 						}
-						$risk->appliedOn = $parent_id;
-						$risks[] = $risk;
+					}
+					$parent_element_id = $objects[$parent_element_id]->fk_parent;
+				}
+			} else {
+				// Super function iterations flat.
+				$it = new RecursiveIteratorIterator(new RecursiveArrayIterator($elements));
+				$element = array();
+				foreach ($it as $key => $v) {
+					$element[$key][$v] = $v;
+				}
+
+				$children_ids = $element['id'];
+				// RISKS parent children.
+				if ( ! empty($children_ids)) {
+					foreach ($children_ids as $child_id) {
+						$object->fetch($child_id);
+						$parent_element_id = $object->fk_parent;
+						while ($parent_element_id > 0) {
+							$result = $risk->fetchFromParent($parent_element_id);
+							if ($result > 0 && !empty($result)) {
+								foreach ($result as $risk) {
+									$evaluation     = new RiskAssessment($this->db);
+									$lastEvaluation = $evaluation->fetchFromParent($risk->id, 1);
+									if ( $lastEvaluation > 0 && ! empty($lastEvaluation)  && is_array($lastEvaluation)) {
+										$lastEvaluation       = array_shift($lastEvaluation);
+										$risk->lastEvaluation = $lastEvaluation;
+									}
+									$risk->appliedOn = $child_id;
+									$risks[] = $risk;
+								}
+							}
+							$object->fetch($parent_element_id);
+							$parent_element_id = $object->fk_parent;
+						}
 					}
 				}
-				$parent_element_id = $objects[$parent_element_id]->fk_parent;
 			}
 		}
 
@@ -324,6 +363,7 @@ class Risk extends CommonObject
 				}
 			}
 		}
+
 		if ( ! empty($risks) && is_array($risks)) {
 			usort($risks, function ($first, $second) {
 				return $first->lastEvaluation->cotation < $second->lastEvaluation->cotation;
@@ -600,7 +640,7 @@ class Risk extends CommonObject
 			$records = array();
 			while ($i < $num) {
 				$obj = $this->db->fetch_object($resql);
-				$record = new Task($this->db);
+				$record = new DigiriskTask($this->db);
 				$record->fetch($obj->fk_object);
 				$records[$record->id] = $record;
 				$i++;
@@ -682,5 +722,56 @@ class Risk extends CommonObject
 		else $result             .= $hookmanager->resPrint;
 
 		return $result;
+	}
+
+	/**
+	 * Load dashboard info risk, get number risks by cotation.
+	 *
+	 * @return array
+	 * @throws Exception
+	 */
+	public function load_dashboard()
+	{
+		$arrayRisksByCotation = $this->getRisksByCotation();
+
+		$array['graphs'] = $arrayRisksByCotation;
+
+		return $array;
+	}
+
+	/**
+	 * Get risks by cotation.
+	 *
+	 * @return array
+	 * @throws Exception
+	 */
+	public function getRisksByCotation()
+	{
+		// Risks by cotation
+		global $langs;
+
+		$riskassessment = new RiskAssessment($this->db);
+		$array['title'] = $langs->transnoentities('RisksRepartition');
+		$array['picto'] = '<i class="fas fa-exclamation-triangle"></i>';
+		$array['labels'] = array(
+			1 => array(
+				'label' => $langs->transnoentities('GreyRisk'),
+				'color' => '#ececec'
+			),
+			2 => array(
+				'label' => $langs->transnoentities('OrangeRisk'),
+				'color' => '#e9ad4f'
+			),
+			3 => array(
+				'label' => $langs->transnoentities('RedRisk'),
+				'color' => 'e05353'
+			),
+			4 => array(
+				'label' => $langs->transnoentities('BlackRisk'),
+				'color' => '#2b2b2b'
+			),
+		);
+		$array['data'] = $riskassessment->getRiskAssessmentCategoriesNumber();
+		return $array;
 	}
 }

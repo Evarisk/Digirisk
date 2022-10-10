@@ -100,9 +100,9 @@ if (empty($reshook)) {
 		$auditStartDate = GETPOST('AuditStartDate', 'none');
 		$auditEndDate   = GETPOST('AuditEndDate', 'none');
 		$recipent       = GETPOST('Recipient', 'alpha');
-		$method         = GETPOST('Method', 'alpha');
-		$sources        = GETPOST('Sources', 'alpha');
-		$importantNote  = GETPOST('ImportantNote', 'alpha');
+		$method         = GETPOST('Method', 'none');
+		$sources        = GETPOST('Sources', 'none');
+		$importantNote  = GETPOST('ImportantNote', 'none');
 
 		if ( strlen($auditStartDate) ) {
 			$auditStartDate = explode('/', $auditStartDate);
@@ -271,9 +271,12 @@ if (empty($reshook)) {
 				$urltoredirect = $_SERVER['REQUEST_URI'];
 				$urltoredirect = preg_replace('/#builddoc$/', '', $urltoredirect);
 				$urltoredirect = preg_replace('/action=builddoc&?/', '', $urltoredirect); // To avoid infinite loop
-				$urltoredirect = preg_replace('/forcebuilddoc=1&?/', '', $urltoredirect); // To avoid infinite loop
-
-				header('Location: ' . $urltoredirect . '#builddoc');
+				if (preg_match('/forcebuilddoc=1/', $urltoredirect)) {
+					$urltoredirect = preg_replace('/forcebuilddoc=1&?/', '', $urltoredirect); // To avoid infinite loop
+					header('Location: ' . $urltoredirect . '#sendEmail');
+				} else {
+					header('Location: ' . $urltoredirect . '#builddoc');
+				}
 				exit;
 			}
 		}
@@ -322,7 +325,7 @@ $emptyobject = new stdClass();
 
 $title    = $langs->trans('RiskAssessmentDocument');
 $help_url = 'FR:Module_DigiriskDolibarr#Document_unique_2';
-$morejs   = array("/digiriskdolibarr/js/digiriskdolibarr.js.php");
+$morejs   = array("/digiriskdolibarr/js/digiriskdolibarr.js");
 $morecss  = array("/digiriskdolibarr/css/digiriskdolibarr.css");
 
 digiriskHeader($title, $help_url, $morejs, $morecss); ?>
@@ -388,7 +391,7 @@ if (empty($reshook)) {
 				}
 
 				if ($empty == 0) {
-					print '<a class="butAction" id="actionButtonSendMail" href="' . $_SERVER['PHP_SELF'] . '?id=' . $object->id . '&action=presend&mode=init#formmailbeforetitle&sendto=' . $allLinks['LabourInspectorSociety']->id[0] . '">' . $langs->trans('SendMail') . '</a>';
+					print '<a class="butAction" id="actionButtonSendMail" href="' . $_SERVER['PHP_SELF'] . '?id=' . $object->id . '&action=presend&mode=init&sendto=' . $allLinks['LabourInspectorSociety']->id[0] . '#sendEmail' . '">' . $langs->trans('SendMail') . '</a>';
 				} else {
 					// Model
 					$class     = 'ModeleODTRiskAssessmentDocument';
@@ -405,9 +408,9 @@ if (empty($reshook)) {
 						}
 					}
 					if (dol_strlen($modelselected) > 0) {
-						print '<a class="butAction send-risk-assessment-document-by-mail" id="actionButtonSendMail"  href="' . $_SERVER['PHP_SELF'] . '?id=' . $object->id . '&action=presend&forcebuilddoc=1&model=' . $modelselected . '&mode=init#formmailbeforetitle&sendto=' . $allLinks['LabourInspectorSociety']->id[0] . '">' . $langs->trans('SendMail') . '</a>';
+						print '<a class="butAction send-risk-assessment-document-by-mail" id="actionButtonSendMail"  href="' . $_SERVER['PHP_SELF'] . '?id=' . $object->id . '&action=presend&forcebuilddoc=1&model=' . $modelselected . '&mode=init&sendto=' . $allLinks['LabourInspectorSociety']->id[0] . '#sendEmail' . '">' . $langs->trans('SendMail') . '</a>';
 					} else {
-						print '<a class="butAction send-risk-assessment-document-by-mail" id="actionButtonSendMail"  href="' . $_SERVER['PHP_SELF'] . '?id=' . $object->id . '&action=presend&mode=init#formmailbeforetitle&sendto=' . $allLinks['LabourInspectorSociety']->id[0] . '">' . $langs->trans('SendMail') . '</a>';
+						print '<a class="butAction send-risk-assessment-document-by-mail" id="actionButtonSendMail"  href="' . $_SERVER['PHP_SELF'] . '?id=' . $object->id . '&action=presend&mode=init&sendto=' . $allLinks['LabourInspectorSociety']->id[0] . '#sendEmail' . '">' . $langs->trans('SendMail') . '</a>';
 					}
 				}
 			} else {
@@ -500,10 +503,7 @@ if ($action == 'presend' && ! empty($riskassessmentdocument)) {
 		$topicmail = $outputlangs->trans($defaulttopic, '__REF__ (__REFCLIENT__)');
 	}
 
-	print '<div id="formmailbeforetitle" name="formmailbeforetitle"></div>';
-	print '<div class="clearboth"></div>';
-	print '<br>';
-	print load_fiche_titre($langs->trans($titreform));
+	print load_fiche_titre($langs->trans($titreform), '', 'digiriskdolibarr32px@digiriskdolibarr', '', 'sendEmail');
 
 	print dol_get_fiche_head('');
 

@@ -568,11 +568,14 @@ function digiriskHeader($title = '', $help_url = '', $arrayofjs = array(), $arra
 		$objects = $object->fetchAll('',  'ranks',  0,  0, array('customsql' => 'status > 0'));
 	}
 
-	$results = array();
 
-	if (is_array($objects)) {
+	$results = array();
+	if (!is_array($objects) && $objects<0) {
+		setEventMessages($object->error, $object->errors, 'errors');
+	} elseif (is_array($objects) && count($objects)>0) {
 		$results = recurse_tree(0, 0, $objects);
-	} ?>
+	}
+	?>
 
 	<?php require_once './../../core/tpl/medias/digiriskdolibarr_medias_gallery_modal.tpl.php'; ?>
 
@@ -651,8 +654,19 @@ function digiriskHeader($title = '', $help_url = '', $arrayofjs = array(), $arra
 								id = !id ? params.get('fromid') : id
 
 								if ((document.URL.match(/digiriskelement/) || document.URL.match(/accident/)) && !document.URL.match(/type=standard/)) {
+									var elementBranch = <?php echo json_encode($object->getBranch(GETPOST('id'))); ?>;
+									elementBranch.forEach((id) =>  {
+										jQuery( '#menu'+id).removeClass( 'fa-chevron-right').addClass( 'fa-chevron-down' );
+										jQuery( '#unit'+id ).addClass( 'toggled' );
+									});
+
 									jQuery( '#unit'  + id ).addClass( 'active' );
 									jQuery( '#unit'  + id ).closest( '.unit' ).attr( 'value', id );
+
+									var container = jQuery('.navigation-container');
+									$(container).animate({
+										scrollTop: $("#unit"  + id).offset().top - 100
+									}, 500);
 								}
 							</script>
 						</ul>
@@ -774,31 +788,27 @@ function display_recurse_tree($results)
 		$digiriskelement = new DigiriskElement($db);
 		$digiriskelement->fetch($digiriskelement_id);
 
-		//edit evaluation
 		if ($digiriskelement->id > 0) {
 			$pathToDigiriskElementPhoto = $conf->digiriskdolibarr->multidir_output[$conf->entity] . '/' . $digiriskelement->element_type . '/' . $digiriskelement->ref ;
-			$files = dol_dir_list($pathToDigiriskElementPhoto);
 
-			foreach ($files as $file) {
-				if (is_file($file['fullname']) && $file['name'] == $filename) {
-					unlink($file['fullname']);
+			//Delete file
+			unlink($pathToDigiriskElementPhoto . '/' . $filename);
+
+			//Delete file thumbs
+			$thumbs_names = getAllThumbsNames($filename);
+			if (!empty($thumbs_names)) {
+				foreach($thumbs_names as $thumb_name) {
+					$thumb_fullname  = $pathToDigiriskElementPhoto . '/thumbs/' . $thumb_name;
+					if (file_exists($thumb_fullname)) {
+						unlink($thumb_fullname);
+					}
 				}
 			}
 
-			$files = dol_dir_list($pathToDigiriskElementPhoto . '/thumbs');
-			foreach ($files as $file) {
-				if (preg_match('/' . preg_split('/\./', $filename)[0] . '/', $file['name'])) {
-					unlink($file['fullname']);
-				}
-			}
 			if ($digiriskelement->photo == $filename) {
 				$digiriskelement->photo = '';
 				$digiriskelement->update($user, true);
 			}
-//			$urltogo = str_replace('__ID__', $id, $backtopage);
-//			$urltogo = preg_replace('/--IDFORBACKTOPAGE--/', $id, $urltogo); // New method to autoselect project after a New on another form object creation
-//			header("Location: " . $urltogo);
-//			exit;
 		}
 	}
 
@@ -814,8 +824,10 @@ function display_recurse_tree($results)
 				$error++;
 				if ($_FILES['userfile']['error'][$key] == 1 || $_FILES['userfile']['error'][$key] == 2) {
 					setEventMessages($langs->trans('ErrorFileSizeTooLarge'), null, 'errors');
+					$submit_file_error_text = array('message' => $langs->trans('ErrorFileSizeTooLarge'), 'code' => '1337');
 				} else {
 					setEventMessages($langs->trans("ErrorFieldRequired", $langs->transnoentitiesnoconv("File")), null, 'errors');
+					$submit_file_error_text = array('message' => $langs->trans('ErrorFieldRequired'), 'code' => '1337');
 				}
 			}
 		}
@@ -837,13 +849,16 @@ function display_recurse_tree($results)
 	$workunit_prefix = dol_strlen($mod_workunit->prefix) > 0 ? $mod_workunit->prefix : $conf->global->DIGIRISKDOLIBARR_WORKUNIT_CANOPUS_ADDON;
 	$workunit_prefix = preg_match('/{/',$workunit_prefix) ? preg_split('/{/', $workunit_prefix)[0] : $workunit_prefix;
 
+	if (is_array($submit_file_error_text)) {
+		print '<input class="error-medias" value="'. htmlspecialchars(json_encode($submit_file_error_text)) .'">';
+	}
+
 	if ($user->rights->digiriskdolibarr->digiriskelement->read) {
 		if ( ! empty($results)) {
 			foreach ($results as $element) { ?>
 				<?php if ($element['object']->id == $conf->global->DIGIRISKDOLIBARR_DIGIRISKELEMENT_TRASH) : ?>
 				<hr>
 				<?php endif; ?>
-
 			<li class="unit type-<?php echo $element['object']->element_type; ?>" id="unit<?php  echo $element['object']->id; ?>">
 				<div class="unit-container">
 					<?php if ($element['object']->element_type == 'groupment' && count($element['children'])) { ?>
@@ -858,7 +873,7 @@ function display_recurse_tree($results)
 					$filearray   = dol_dir_list($conf->digiriskdolibarr->multidir_output[$conf->entity] . '/' . $element['object']->element_type . '/' . $element['object']->ref . '/', "files", 0, '', '(\.odt|_preview.*\.png)$', 'position_name', 'asc', 1);
 					if (count($filearray)) {
 						print '<span class="floatleft inline-block valignmiddle divphotoref open-medias-linked modal-open digirisk-element digirisk-element-' . $element['object']->id . '" value="' . $element['object']->id . '">';
-						$img_path =  dol_strlen($element['object']->photo) > 0 ? DOL_URL_ROOT . '/viewimage.php?modulepart=digiriskdolibarr&entity=' . $conf->entity . '&file=' . urlencode($element['object']->element_type . '/' . $element['object']->ref . '/thumbs/' . preg_replace('/\./', '_small.', $element['object']->photo)) : $nophoto;
+						$img_path =  dol_strlen($element['object']->photo) > 0 ? DOL_URL_ROOT . '/viewimage.php?modulepart=digiriskdolibarr&entity=' . $conf->entity . '&file=' . urlencode($element['object']->element_type . '/' . $element['object']->ref . '/thumbs/' . getThumbName($element['object']->photo)) : $nophoto;
 						print '<img width="50" height="50" class="photo clicked-photo-preview" src="'. $img_path .'" >';
 						print '<input type="hidden" class="filepath-to-digiriskelement" value="' . $pathToThumb . '"/>';
 						print '</span>';
@@ -921,14 +936,14 @@ function display_recurse_tree($results)
 					<div class="title" id="scores" value="<?php echo $element['object']->id ?>">
 						<?php
 						if ($user->rights->digiriskdolibarr->risk->read) : ?>
-							<a id="slider" class="linkElement id<?php echo $element['object']->id;?>" href="../digiriskelement/digiriskelement_risk.php?id=<?php echo $element['object']->id; ?>#unit<?php echo $element['object']->id; ?>">
+							<a id="slider" class="linkElement id<?php echo $element['object']->id;?>" href="../digiriskelement/digiriskelement_risk.php?id=<?php echo $element['object']->id; ?>">
 								<span class="title-container">
 									<span class="ref"><?php echo $element['object']->ref; ?></span>
 									<span class="name"><?php echo $element['object']->label; ?></span>
 								</span>
 							</a>
 						<?php else : ?>
-							<a id="slider" class="linkElement id<?php echo $element['object']->id;?>" href="../digiriskelement/digiriskelement_card.php?id=<?php echo $element['object']->id; ?>#unit<?php echo $element['object']->id; ?>">
+							<a id="slider" class="linkElement id<?php echo $element['object']->id;?>" href="../digiriskelement/digiriskelement_card.php?id=<?php echo $element['object']->id; ?>">
 								<span class="title-container">
 									<span class="ref"><?php echo $element['object']->ref; ?></span>
 									<span class="name"><?php echo $element['object']->label; ?></span>
@@ -972,7 +987,6 @@ function display_recurse_tree($results)
 		print $langs->trans('YouDontHaveTheRightToSeeThis');
 	}
 }
-
 
 /**
  *	Display Recursive tree for edit
@@ -1035,20 +1049,20 @@ function digirisk_banner_tab($object, $paramid, $morehtml = '', $shownav = 1, $f
 *  Return a link to the user card (with optionaly the picto)
 *  Use this->id,this->lastname, this->firstname
 *
-* @param	int		$withpictoimg				Include picto in link (0=No picto, 1=Include picto into link, 2=Only picto, -1=Include photo into link, -2=Only picto photo, -3=Only photo very small)
-* @param	string	$option						On what the link point to ('leave', 'nolink', )
-* @param  int $infologin      			0=Add default info tooltip, 1=Add complete info tooltip, -1=No info tooltip
-* @param	int	$notooltip					1=Disable tooltip on picto and name
-* @param	int		$maxlen						Max length of visible user name
-* @param	int		$hidethirdpartylogo			Hide logo of thirdparty if user is external user
-* @param  string  $mode               		''=Show firstname and lastname, 'firstname'=Show only firstname, 'firstelselast'=Show firstname or lastname if not defined, 'login'=Show login
-* @param  string  $morecss            		Add more css on link
-* @param  int     $save_lastsearch_value    	-1=Auto, 0=No save of lastsearch_values when clicking, 1=Save lastsearch_values whenclicking
-* @param User $object
-* @param int $display_initials
-* @return	string								String with URL
+* @param  User   $object                    User object
+* @param  int	 $withpictoimg				Include picto in link (0=No picto, 1=Include picto into link, 2=Only picto, -1=Include photo into link, -2=Only picto photo, -3=Only photo very small)
+* @param  string $option					On what the link point to ('leave', 'nolink', )
+* @param  int    $infologin      			0=Add default info tooltip, 1=Add complete info tooltip, -1=No info tooltip
+* @param  int	 $notooltip					1=Disable tooltip on picto and name
+* @param  int	 $maxlen					Max length of visible username
+* @param  int	 $hidethirdpartylogo		Hide logo of thirdparty if user is external user
+* @param  string $mode               		''=Show firstname and lastname, 'firstname'=Show only firstname, 'firstelselast'=Show firstname or lastname if not defined, 'login'=Show login
+* @param  string $morecss            		Add more css on link
+* @param  int    $save_lastsearch_value    	-1=Auto, 0=No save of lastsearch_values when clicking, 1=Save lastsearch_values whenclicking
+* @param  int    $display_initials          Show only initials for firstname/lastname of user
+* @return string							String with URL
 */
-function getNomUrl($withpictoimg = 0, $option = '', $infologin = 0, $notooltip = 0, $maxlen = 24, $hidethirdpartylogo = 0, $mode = '', $morecss = '', $save_lastsearch_value = -1, User $object, $display_initials = 1)
+function getNomUrlUser(User $object, $withpictoimg = 0, $option = '', $infologin = 0, $notooltip = 0, $maxlen = 24, $hidethirdpartylogo = 0, $mode = '', $morecss = '', $save_lastsearch_value = -1, $display_initials = 1)
 {
 	global $langs, $conf, $db, $hookmanager, $dolibarr_main_demo;
 	global $menumanager;
@@ -1184,72 +1198,10 @@ function getNomUrl($withpictoimg = 0, $option = '', $infologin = 0, $notooltip =
 
 	global $action;
 	$hookmanager->initHooks(array('userdao'));
-	$parameters               = array('id' => $object->id, 'getnomurl' => $result);
-	$reshook                  = $hookmanager->executeHooks('getNomUrl', $parameters, $object, $action); // Note that $action and $object may have been modified by some hooks
+	$parameters               = array('id' => $object->id, 'getnomurluser' => $result);
+	$reshook                  = $hookmanager->executeHooks('getNomUrlUser', $parameters, $object, $action); // Note that $action and $object may have been modified by some hooks
 	if ($reshook > 0) $result = $hookmanager->resPrint;
 	else $result             .= $hookmanager->resPrint;
-
-	return $result;
-}
-
-/**
- *	Return clicable name (with picto eventually)
- *
-* @param $task
-* @param	int		$withpicto		0=No picto, 1=Include picto into link, 2=Only picto
-* @param	string	$option			'withproject' or ''
-* @param	string	$mode			Mode 'task', 'time', 'contact', 'note', document' define page to link to.
-* @param	int		$addlabel		0=Default, 1=Add label into string, >1=Add first chars into string
-* @param	string	$sep			Separator between ref and label if option addlabel is set
-* @param	int   	$notooltip		1=Disable tooltip
-* @param  int     $save_lastsearch_value    -1=Auto, 0=No save of lastsearch_values when clicking, 1=Save lastsearch_values whenclicking
-* @return	string					Chaine avec URL
-*/
-function getNomUrlTask($task, $withpicto = 0, $option = '', $mode = 'task', $addlabel = 0, $sep = ' - ', $notooltip = 0, $save_lastsearch_value = -1)
-{
-	global $conf, $langs;
-
-	if ( ! empty($conf->dol_no_mouse_hover)) $notooltip = 1; // Force disable tooltips
-
-	$result     = '';
-	$label      = img_picto('', $task->picto) . ' <u>' . $langs->trans("Task") . '</u>';
-	if ( ! empty($task->ref))
-		$label .= '<br><b>' . $langs->trans('Ref') . ':</b> ' . $task->ref;
-	if ( ! empty($task->label))
-		$label .= '<br><b>' . $langs->trans('LabelTask') . ':</b> ' . $task->label;
-	if ($task->date_start || $task->date_end) {
-		$label .= "<br>" . get_date_range($task->date_start, $task->date_end, '', $langs, 0);
-	}
-
-	$url = DOL_URL_ROOT . '/projet/tasks/' . $mode . '.php?id=' . $task->id . ($option == 'withproject' ? '&withproject=1' : '');
-	// Add param to save lastsearch_values or not
-	$add_save_lastsearch_values                                                                                      = ($save_lastsearch_value == 1 ? 1 : 0);
-	if ($save_lastsearch_value == -1 && preg_match('/list\.php/', $_SERVER["PHP_SELF"])) $add_save_lastsearch_values = 1;
-	if ($add_save_lastsearch_values) $url                                                                           .= '&save_lastsearch_values=1';
-
-	$linkclose = '';
-	if (empty($notooltip)) {
-		if ( ! empty($conf->global->MAIN_OPTIMIZEFORTEXTBROWSER)) {
-			$label      = $langs->trans("ShowTask");
-			$linkclose .= ' alt="' . dol_escape_htmltag($label, 1) . '"';
-		}
-		$linkclose .= ' title="' . dol_escape_htmltag($label, 1) . '"';
-		$linkclose .= ' class="classfortooltip nowraponall"';
-	} else {
-		$linkclose .= ' class="nowraponall"';
-	}
-
-	$linkstart  = '<a target="_blank" href="' . $url . '"';
-	$linkstart .= $linkclose . '>';
-	$linkend    = '</a>';
-
-	$picto = 'projecttask';
-
-	$result                      .= $linkstart;
-	if ($withpicto) $result      .= img_object(($notooltip ? '' : $label), $picto, ($notooltip ? (($withpicto != 2) ? 'class="paddingright"' : '') : 'class="' . (($withpicto != 2) ? 'paddingright ' : '') . 'classfortooltip"'), 0, 0, $notooltip ? 0 : 1);
-	if ($withpicto != 2) $result .= $task->ref;
-	$result                      .= $linkend;
-	if ($withpicto != 2) $result .= (($addlabel && $task->label) ? $sep . dol_trunc($task->label, ($addlabel > 1 ? $addlabel : 0)) : '');
 
 	return $result;
 }
@@ -2056,7 +2008,7 @@ function digirisk_select_dictionary($htmlname, $dictionarytable, $keyfield = 'co
 				} else {
 					$out .= '<option value="' . $langs->transnoentities($obj->$keyfield) . '">';
 				}
-				$out .= $langs->transnoentities($obj->$labelfield);
+				$out .= $langs->transnoentities($obj->$keyfield) . ' - ' .  $langs->transnoentities($obj->$labelfield);
 				$out .= '</option>';
 				$i++;
 			}
@@ -3111,4 +3063,455 @@ function getObjectsInCategDigirisk($object, $type, $onlyids = 0, $limit = 0, $of
 		$object->error = $object->db->error().' sql='.$sql;
 		return -1;
 	}
+}
+
+/**
+ * Return file specified thumb name
+ *
+ * @param  object            $object           Category object
+ * @param  string     	     $filename         File name
+ * @param  string        	 $thumb_type       Thumb type (small, mini, large, medium)
+ * @return string
+ * @throws Exception
+*/
+function getThumbName($filename, $thumb_type = 'small')
+{
+	$img_name = pathinfo($filename, PATHINFO_FILENAME);
+	$img_extension = pathinfo($filename, PATHINFO_EXTENSION);
+	$thumb_fullname = $img_name . '_'. $thumb_type .'.' . $img_extension;
+
+	return $thumb_fullname;
+}
+
+/**
+ * Return file thumbs names
+ *
+ * @param  object            $object           Category object
+ * @param  string     	     $filename         File name
+ * @param  string        	 $thumb_type       Thumb type (small, mini, large, medium)
+ * @return string
+ * @throws Exception
+*/
+function getAllThumbsNames($filename)
+{
+	$thumbs_fullnames = array();
+	$thumb_types = array(
+		'large',
+		'medium',
+		'small',
+		'mini'
+	);
+	$img_name = pathinfo($filename, PATHINFO_FILENAME);
+	$img_extension = pathinfo($filename, PATHINFO_EXTENSION);
+
+	foreach ($thumb_types as $thumb_type) {
+		$thumbs_fullnames[] = $img_name . '_'. $thumb_type .'.' . $img_extension;
+	}
+
+	return $thumbs_fullnames;
+}
+
+/**
+ * get all working hours
+ *
+ * @return float
+*/
+function getWorkedHours()
+{
+	global $conf, $user;
+
+	if ($conf->global->DIGIRISKDOLIBARR_MANUAL_INPUT_NB_WORKED_HOURS) {
+		$total_workhours = $conf->global->DIGIRISKDOLIBARR_NB_WORKED_HOURS;
+	} else {
+		$userList = $user->get_full_tree();
+		$total_workhours = 0;
+		if (!empty($userList) && is_array($userList)) {
+			foreach ($userList as $sub_user) {
+				$user->fetch($sub_user['rowid']);
+				if ($user->employee && $user->weeklyhours && $user->dateemployment) {
+					$employmentdate = $user->dateemployment;
+					$weeklyhours    = $user->weeklyhours;
+
+					$diff = dol_now() - $employmentdate;
+					$work_weeks = floor($diff / 604800);
+					$total_workhours += $work_weeks * $weeklyhours;
+				}
+			}
+		}
+	}
+
+	return $total_workhours;
+}
+
+/**
+ *     Show a confirmation HTML form or AJAX popup.
+ *     Easiest way to use this is with useajax=1.
+ *     If you use useajax='xxx', you must also add jquery code to trigger opening of box (with correct parameters)
+ *     just after calling this method. For example:
+ *       print '<script type="text/javascript">'."\n";
+ *       print 'jQuery(document).ready(function() {'."\n";
+ *       print 'jQuery(".xxxlink").click(function(e) { jQuery("#aparamid").val(jQuery(this).attr("rel")); jQuery("#dialog-confirm-xxx").dialog("open"); return false; });'."\n";
+ *       print '});'."\n";
+ *       print '</script>'."\n";
+ *
+ *     @param  	string			$page        	   	Url of page to call if confirmation is OK. Can contains parameters (param 'action' and 'confirm' will be reformated)
+ *     @param	string			$title       	   	Title
+ *     @param	string			$question    	   	Question
+ *     @param 	string			$action      	   	Action
+ *	   @param  	array|string	$formquestion	   	An array with complementary inputs to add into forms: array(array('label'=> ,'type'=> , 'size'=>, 'morecss'=>, 'moreattr'=>))
+ *													type can be 'hidden', 'text', 'password', 'checkbox', 'radio', 'date', 'morecss', 'other' or 'onecolumn'...
+ * 	   @param  	string			$selectedchoice  	'' or 'no', or 'yes' or '1' or '0'
+ * 	   @param  	int|string		$useajax		   	0=No, 1=Yes, 2=Yes but submit page with &confirm=no if choice is No, 'xxx'=Yes and preoutput confirm box with div id=dialog-confirm-xxx
+ *     @param  	int|string		$height          	Force height of box (0 = auto)
+ *     @param	int				$width				Force width of box ('999' or '90%'). Ignored and forced to 90% on smartphones.
+ *     @param	int				$disableformtag		1=Disable form tag. Can be used if we are already inside a <form> section.
+ *     @return 	string      		    			HTML ajax code if a confirm ajax popup is required, Pure HTML code if it's an html form
+ */
+function digiriskformconfirm($page, $title, $question, $action, $formquestion = '', $selectedchoice = '', $useajax = 0, $height = 0, $width = 500, $disableformtag = 0)
+{
+	global $conf, $form, $langs;
+
+	$more = '<!-- formconfirm before calling page='.dol_escape_htmltag($page).' -->';
+	$formconfirm = '';
+	$inputok = array();
+	$inputko = array();
+
+	// Clean parameters
+	$newselectedchoice = empty($selectedchoice) ? "no" : $selectedchoice;
+	if ($conf->browser->layout == 'phone') {
+		$width = '95%';
+	}
+
+	// Set height automatically if not defined
+	if (empty($height)) {
+		$height = 220;
+		if (is_array($formquestion) && count($formquestion) > 2) {
+			$height += ((count($formquestion) - 2) * 24);
+		}
+	}
+
+	if (is_array($formquestion) && !empty($formquestion)) {
+		// First add hidden fields and value
+		foreach ($formquestion as $key => $input) {
+			if (is_array($input) && !empty($input)) {
+				if ($input['type'] == 'hidden') {
+					$more .= '<input type="hidden" id="'.dol_escape_htmltag($input['name']).'" name="'.dol_escape_htmltag($input['name']).'" value="'.dol_escape_htmltag($input['value']).'">'."\n";
+				}
+			}
+		}
+
+		// Now add questions
+		$moreonecolumn = '';
+		$more .= '<div class="tagtable paddingtopbottomonly centpercent noborderspacing">'."\n";
+		foreach ($formquestion as $key => $input) {
+			if (is_array($input) && !empty($input)) {
+				$size = (!empty($input['size']) ? ' size="'.$input['size'].'"' : '');	// deprecated. Use morecss instead.
+				$moreattr = (!empty($input['moreattr']) ? ' '.$input['moreattr'] : '');
+				$morecss = (!empty($input['morecss']) ? ' '.$input['morecss'] : '');
+
+				if ($input['type'] == 'text') {
+					$more .= '<div class="tagtr"><div class="tagtd'.(empty($input['tdclass']) ? '' : (' '.$input['tdclass'])).'">'.$input['label'].'</div><div class="tagtd"><input type="text" class="flat'.$morecss.'" id="'.dol_escape_htmltag($input['name']).'" name="'.dol_escape_htmltag($input['name']).'"'.$size.' value="'.$input['value'].'"'.$moreattr.' /></div></div>'."\n";
+				} elseif ($input['type'] == 'password')	{
+					$more .= '<div class="tagtr"><div class="tagtd'.(empty($input['tdclass']) ? '' : (' '.$input['tdclass'])).'">'.$input['label'].'</div><div class="tagtd"><input type="password" class="flat'.$morecss.'" id="'.dol_escape_htmltag($input['name']).'" name="'.dol_escape_htmltag($input['name']).'"'.$size.' value="'.$input['value'].'"'.$moreattr.' /></div></div>'."\n";
+				} elseif ($input['type'] == 'textarea') {
+					/*$more .= '<div class="tagtr"><div class="tagtd'.(empty($input['tdclass']) ? '' : (' '.$input['tdclass'])).'">'.$input['label'].'</div><div class="tagtd">';
+					$more .= '<textarea name="'.$input['name'].'" class="'.$morecss.'"'.$moreattr.'>';
+					$more .= $input['value'];
+					$more .= '</textarea>';
+					$more .= '</div></div>'."\n";*/
+					$moreonecolumn .= '<div class="margintoponly">';
+					$moreonecolumn .= $input['label'].'<br>';
+					$moreonecolumn .= '<textarea name="'.dol_escape_htmltag($input['name']).'" id="'.dol_escape_htmltag($input['name']).'" class="'.$morecss.'"'.$moreattr.'>';
+					$moreonecolumn .= $input['value'];
+					$moreonecolumn .= '</textarea>';
+					$moreonecolumn .= '</div>';
+				} elseif ($input['type'] == 'select') {
+					if (empty($morecss)) {
+						$morecss = 'minwidth100';
+					}
+
+					$show_empty = isset($input['select_show_empty']) ? $input['select_show_empty'] : 1;
+					$key_in_label = isset($input['select_key_in_label']) ? $input['select_key_in_label'] : 0;
+					$value_as_key = isset($input['select_value_as_key']) ? $input['select_value_as_key'] : 0;
+					$translate = isset($input['select_translate']) ? $input['select_translate'] : 0;
+					$maxlen = isset($input['select_maxlen']) ? $input['select_maxlen'] : 0;
+					$disabled = isset($input['select_disabled']) ? $input['select_disabled'] : 0;
+					$sort = isset($input['select_sort']) ? $input['select_sort'] : '';
+
+					$more .= '<div class="tagtr"><div class="tagtd'.(empty($input['tdclass']) ? '' : (' '.$input['tdclass'])).'">';
+					if (!empty($input['label'])) {
+						$more .= $input['label'].'</div><div class="tagtd left">';
+					}
+					$more .= $form->selectarray($input['name'], $input['values'], $input['default'], $show_empty, $key_in_label, $value_as_key, $moreattr, $translate, $maxlen, $disabled, $sort, $morecss);
+					$more .= '</div></div>'."\n";
+				} elseif ($input['type'] == 'checkbox') {
+					$more .= '<div class="tagtr">';
+					$more .= '<div class="tagtd'.(empty($input['tdclass']) ? '' : (' '.$input['tdclass'])).'">'.$input['label'].' </div><div class="tagtd">';
+					$more .= '<input type="checkbox" class="flat'.$morecss.'" id="'.dol_escape_htmltag($input['name']).'" name="'.dol_escape_htmltag($input['name']).'"'.$moreattr;
+					if (!is_bool($input['value']) && $input['value'] != 'false' && $input['value'] != '0' && $input['value'] != '') {
+						$more .= ' checked';
+					}
+					if (is_bool($input['value']) && $input['value']) {
+						$more .= ' checked';
+					}
+					if (isset($input['disabled'])) {
+						$more .= ' disabled';
+					}
+					$more .= ' /></div>';
+					$more .= '</div>'."\n";
+				} elseif ($input['type'] == 'radio') {
+					$i = 0;
+					foreach ($input['values'] as $selkey => $selval) {
+						$more .= '<div class="tagtr">';
+						if ($i == 0) {
+							$more .= '<div class="tagtd'.(empty($input['tdclass']) ? ' tdtop' : (' tdtop '.$input['tdclass'])).'">'.$input['label'].'</div>';
+						} else {
+							$more .= '<div clas="tagtd'.(empty($input['tdclass']) ? '' : (' "'.$input['tdclass'])).'">&nbsp;</div>';
+						}
+						$more .= '<div class="tagtd'.($i == 0 ? ' tdtop' : '').'"><input type="radio" class="flat'.$morecss.'" id="'.dol_escape_htmltag($input['name'].$selkey).'" name="'.dol_escape_htmltag($input['name']).'" value="'.$selkey.'"'.$moreattr;
+						if ($input['disabled']) {
+							$more .= ' disabled';
+						}
+						if (isset($input['default']) && $input['default'] === $selkey) {
+							$more .= ' checked="checked"';
+						}
+						$more .= ' /> ';
+						$more .= '<label for="'.dol_escape_htmltag($input['name'].$selkey).'">'.$selval.'</label>';
+						$more .= '</div></div>'."\n";
+						$i++;
+					}
+				} elseif ($input['type'] == 'date') {
+					$more .= '<div class="tagtr"><div class="tagtd'.(empty($input['tdclass']) ? '' : (' '.$input['tdclass'])).'">'.$input['label'].'</div>';
+					$more .= '<div class="tagtd">';
+					$addnowlink = (empty($input['datenow']) ? 0 : 1);
+					$more .= $form->selectDate($input['value'], $input['name'], 0, 0, 0, '', 1, $addnowlink);
+					$more .= '</div></div>'."\n";
+					$formquestion[] = array('name'=>$input['name'].'day');
+					$formquestion[] = array('name'=>$input['name'].'month');
+					$formquestion[] = array('name'=>$input['name'].'year');
+					$formquestion[] = array('name'=>$input['name'].'hour');
+					$formquestion[] = array('name'=>$input['name'].'min');
+				} elseif ($input['type'] == 'other') {
+					$more .= '<div class="tagtr"><div class="tagtd'.(empty($input['tdclass']) ? '' : (' '.$input['tdclass'])).'">';
+					if (!empty($input['label'])) {
+						$more .= $input['label'].'</div><div class="tagtd">';
+					}
+					$more .= $input['value'];
+					$more .= '</div></div>'."\n";
+				} elseif ($input['type'] == 'onecolumn') {
+					$moreonecolumn .= '<div class="margintoponly">';
+					$moreonecolumn .= $input['value'];
+					$moreonecolumn .= '</div>'."\n";
+				} elseif ($input['type'] == 'hidden') {
+					// Do nothing more, already added by a previous loop
+				} elseif ($input['type'] == 'separator') {
+					$more .= '<br>';
+				} else {
+					$more .= 'Error type '.$input['type'].' for the confirm box is not a supported type';
+				}
+			}
+		}
+		$more .= '</div>'."\n";
+		$more .= $moreonecolumn;
+	}
+
+	// JQUERY method dialog is broken with smartphone, we use standard HTML.
+	// Note: When using dol_use_jmobile or no js, you must also check code for button use a GET url with action=xxx and check that you also output the confirm code when action=xxx
+	// See page product/card.php for example
+	if (!empty($conf->dol_use_jmobile)) {
+		$useajax = 0;
+	}
+	if (empty($conf->use_javascript_ajax)) {
+		$useajax = 0;
+	}
+
+	if ($useajax) {
+		$autoOpen = true;
+		$dialogconfirm = 'dialog-confirm';
+		$button = '';
+		if (!is_numeric($useajax)) {
+			$button = $useajax;
+			$useajax = 1;
+			$autoOpen = false;
+			$dialogconfirm .= '-'.$button;
+		}
+		$pageyes = $page.(preg_match('/\?/', $page) ? '&' : '?').'action='.$action.'&confirm=yes';
+		$pageno = ($useajax == 2 ? $page.(preg_match('/\?/', $page) ? '&' : '?').'confirm=no' : '');
+
+		// Add input fields into list of fields to read during submit (inputok and inputko)
+		if (is_array($formquestion)) {
+			foreach ($formquestion as $key => $input) {
+				//print "xx ".$key." rr ".is_array($input)."<br>\n";
+				// Add name of fields to propagate with the GET when submitting the form with button OK.
+				if (is_array($input) && isset($input['name'])) {
+					if (strpos($input['name'], ',') > 0) {
+						$inputok = array_merge($inputok, explode(',', $input['name']));
+					} else {
+						array_push($inputok, $input['name']);
+					}
+				}
+				// Add name of fields to propagate with the GET when submitting the form with button KO.
+				if (isset($input['inputko']) && $input['inputko'] == 1) {
+					array_push($inputko, $input['name']);
+				}
+			}
+		}
+
+		// Show JQuery confirm box.
+		$formconfirm .= '<div id="'.$dialogconfirm.'" title="'.dol_escape_htmltag($title).'" style="display: none;">';
+		if (is_array($formquestion) && !empty($formquestion['text'])) {
+			$formconfirm .= '<div class="confirmtext">'.$formquestion['text'].'</div>'."\n";
+		}
+		if (!empty($more)) {
+			$formconfirm .= '<div class="confirmquestions">'.$more.'</div>'."\n";
+		}
+		$formconfirm .= ($question ? '<div class="confirmmessage">'.img_help('', '').' '.$question.'</div>' : '');
+		$formconfirm .= '</div>'."\n";
+
+		$formconfirm .= "\n<!-- begin code of popup for formconfirm page=".$page." -->\n";
+		$formconfirm .= '<script type="text/javascript">'."\n";
+		$formconfirm .= "/* Code for the jQuery('#dialogforpopup').dialog() */\n";
+		$formconfirm .= 'jQuery(document).ready(function() {
+		$(function() {
+			$( "#'.$dialogconfirm.'" ).dialog(
+			{
+				autoOpen: '.($autoOpen ? "true" : "false").',';
+		if ($newselectedchoice == 'no') {
+			$formconfirm .= '
+					open: function() {
+						$(this).parent().find("button.ui-button:eq(2)").focus();
+					},';
+		}
+		$formconfirm .= '
+				resizable: false,
+				height: "'.$height.'",
+				width: "'.$width.'",
+				modal: true,
+				closeOnEscape: false,
+				buttons: {
+					"'.dol_escape_js($langs->transnoentities("Yes")).'": function() {
+						var options = "&token='.urlencode(newToken()).'";
+						var inputok = '.json_encode($inputok).';	/* List of fields into form */
+						var pageyes = "'.dol_escape_js(!empty($pageyes) ? $pageyes : '').'";
+						if (inputok.length>0) {
+							$.each(inputok, function(i, inputname) {
+								var more = "";
+								var inputvalue;
+								if ($("input[name=\'" + inputname + "\']").attr("type") == "radio") {
+									inputvalue = $("input[name=\'" + inputname + "\']:checked").val();
+								} else {
+									if ($("#" + inputname).attr("type") == "checkbox") { more = ":checked"; }
+									inputvalue = $("#" + inputname + more).val();
+								}
+								if (typeof inputvalue == "undefined") { inputvalue=""; }
+								console.log("formconfirm check inputname="+inputname+" inputvalue="+inputvalue);
+								if (inputvalue) {
+									options += "&" + inputname + "=" + encodeURIComponent(inputvalue);
+								}
+							});
+						}
+						var urljump = pageyes + (pageyes.indexOf("?") < 0 ? "?" : "") + options;
+						if (pageyes.length > 0) { location.href = urljump; }
+						$(this).dialog("close");
+					},
+					"'.dol_escape_js($langs->transnoentities("No")).'": function() {
+						var options = "&token='.urlencode(newToken()).'";
+						var inputko = '.json_encode($inputko).';	/* List of fields into form */
+						var pageno="'.dol_escape_js(!empty($pageno) ? $pageno : '').'";
+						if (inputko.length>0) {
+							$.each(inputko, function(i, inputname) {
+								var more = "";
+								if ($("#" + inputname).attr("type") == "checkbox") { more = ":checked"; }
+								var inputvalue = $("#" + inputname + more).val();
+								if (typeof inputvalue == "undefined") { inputvalue=""; }
+								if (inputvalue) {
+									options += "&" + inputname + "=" + encodeURIComponent(inputvalue);
+								}
+							});
+						}
+						var urljump=pageno + (pageno.indexOf("?") < 0 ? "?" : "") + options;
+						//alert(urljump);
+						if (pageno.length > 0) { location.href = urljump; }
+						$(this).dialog("close");
+					}
+				}
+			}
+			);
+
+			var button = "'.$button.'";
+			if (button.length > 0) {
+				$( "#" + button ).click(function() {
+					$("#'.$dialogconfirm.'").dialog("open");
+				});
+			}
+		});
+		});
+		</script>';
+		$formconfirm .= "<!-- end ajax formconfirm -->\n";
+	} else {
+		$formconfirm .= "\n<!-- begin formconfirm page=".dol_escape_htmltag($page)." -->\n";
+
+		if (empty($disableformtag)) {
+			$formconfirm .= '<form method="POST" action="'.$page.'" class="notoptoleftroright">'."\n";
+		}
+
+		$formconfirm .= '<input type="hidden" name="action" value="'.$action.'">'."\n";
+		$formconfirm .= '<input type="hidden" name="token" value="'.newToken().'">'."\n";
+
+		$formconfirm .= '<table class="valid centpercent">'."\n";
+
+		// Line title
+		$formconfirm .= '<tr class="validtitre"><td class="validtitre" colspan="2">';
+		$formconfirm .= img_picto('', 'recent').' '.$title;
+		$formconfirm .= '</td></tr>'."\n";
+
+		// Line text
+		if (is_array($formquestion) && !empty($formquestion['text'])) {
+			$formconfirm .= '<tr class="valid"><td class="valid" colspan="2">'.$formquestion['text'].'</td></tr>'."\n";
+		}
+
+		// Line form fields
+		if ($more) {
+			$formconfirm .= '<tr class="valid"><td class="valid" colspan="2">'."\n";
+			$formconfirm .= $more;
+			$formconfirm .= '</td></tr>'."\n";
+		}
+
+		// Line with question
+		$formconfirm .= '<tr class="valid">';
+		$formconfirm .= '<td class="valid">'.$question.'</td>';
+		$formconfirm .= '<td class="valid center">';
+		$formconfirm .= $form->selectyesno("confirm", $newselectedchoice, 0, false, 0, 0, 'marginleftonly marginrightonly');
+		$formconfirm .= '<input class="button valignmiddle confirmvalidatebutton small" type="submit" value="'.$langs->trans("Validate").'">';
+		$formconfirm .= '</td>';
+		$formconfirm .= '</tr>'."\n";
+
+		$formconfirm .= '</table>'."\n";
+
+		if (empty($disableformtag)) {
+			$formconfirm .= "</form>\n";
+		}
+		$formconfirm .= '<br>';
+
+		if (!empty($conf->use_javascript_ajax)) {
+			$formconfirm .= '<!-- code to disable button to avoid double clic -->';
+			$formconfirm .= '<script type="text/javascript">'."\n";
+			$formconfirm .= '
+			$(document).ready(function () {
+				$(".confirmvalidatebutton").on("click", function() {
+					console.log("We click on button");
+					$(this).attr("disabled", "disabled");
+					setTimeout(\'$(".confirmvalidatebutton").removeAttr("disabled")\', 3000);
+					//console.log($(this).closest("form"));
+					$(this).closest("form").submit();
+				});
+			});
+			';
+			$formconfirm .= '</script>'."\n";
+		}
+
+		$formconfirm .= "<!-- end formconfirm -->\n";
+	}
+
+	return $formconfirm;
 }

@@ -42,13 +42,13 @@ require_once DOL_DOCUMENT_ROOT . '/core/lib/date.lib.php';
 require_once DOL_DOCUMENT_ROOT . '/core/class/html.form.class.php';
 require_once DOL_DOCUMENT_ROOT . '/ecm/class/ecmdirectory.class.php';
 require_once DOL_DOCUMENT_ROOT . '/projet/class/project.class.php';
-require_once DOL_DOCUMENT_ROOT . '/projet/class/task.class.php';
 require_once DOL_DOCUMENT_ROOT . '/core/modules/project/mod_project_simple.php';
 require_once DOL_DOCUMENT_ROOT . '/core/modules/project/task/mod_task_simple.php';
 
 require_once './../../class/digiriskelement.class.php';
 require_once './../../class/digiriskstandard.class.php';
 require_once './../../class/riskanalysis/risk.class.php';
+require_once './../../class/digiriskelement.class.php';
 require_once './../../class/riskanalysis/riskassessment.class.php';
 require_once './../../core/modules/digiriskdolibarr/riskanalysis/risk/mod_risk_standard.php';
 require_once './../../core/modules/digiriskdolibarr/riskanalysis/riskassessment/mod_riskassessment_standard.php';
@@ -85,7 +85,7 @@ $risk             = new Risk($db);
 $evaluation       = new RiskAssessment($db);
 $ecmdir           = new EcmDirectory($db);
 $project          = new Project($db);
-$task             = new Task($db);
+$task             = new DigiriskTask($db);
 $extrafields      = new ExtraFields($db);
 $refRiskMod       = new $conf->global->DIGIRISKDOLIBARR_RISK_ADDON();
 $refEvaluationMod = new $conf->global->DIGIRISKDOLIBARR_RISKASSESSMENT_ADDON();
@@ -199,7 +199,7 @@ $form = new Form($db);
 
 $title    = $langs->trans("RiskList");
 $help_url = 'FR:Module_DigiriskDolibarr';
-$morejs   = array("/digiriskdolibarr/js/digiriskdolibarr.js.php");
+$morejs   = array("/digiriskdolibarr/js/digiriskdolibarr.js");
 $morecss  = array("/digiriskdolibarr/css/digiriskdolibarr.css");
 
 llxHeader('', $title, $help_url, '', '', '', $morejs, $morecss);
@@ -209,7 +209,7 @@ llxHeader('', $title, $help_url, '', '', '', $morejs, $morecss);
 $allRisks = 1;
 require_once './../../core/tpl/medias/digiriskdolibarr_medias_gallery_modal.tpl.php';
 if (!empty($conf->global->DIGIRISKDOLIBARR_SHOW_RISKS)) {
-	$contextpage = 'riskcard';
+	$contextpage = 'risklist';
 	require_once './../../core/tpl/riskanalysis/risk/digiriskdolibarr_risklist_view.tpl.php';
 }
 if (!empty($conf->global->DIGIRISKDOLIBARR_SHOW_SHARED_RISKS)) {

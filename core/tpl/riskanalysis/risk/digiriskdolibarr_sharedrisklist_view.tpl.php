@@ -546,7 +546,7 @@
 					<?php $parent_element = new DigiriskElement($db);
 					$result               = $parent_element->fetch($risk->fk_element);
 					if ($result > 0) {
-						print $parent_element->getNomUrl(1, 'nolink');
+						print $parent_element->getNomUrl(1, 'nolink', 1);
 					}
 				} elseif ($key == 'category') { ?>
 					<div class="table-cell table-50 cell-risk" data-title="Risque">
@@ -593,9 +593,8 @@
 			$cssforfield                              = (empty($val['css']) ? '' : $val['css']);
 			if ($key == 'status') $cssforfield       .= ($cssforfield ? ' ' : '') . 'center';
 			elseif ($key == 'ref') $cssforfield      .= ($cssforfield ? ' ' : '') . 'nowrap';
-			elseif ($key == 'cotation') $cssforfield .= ($cssforfield ? ' ' : '') . 'nowrap';
+			elseif ($key == 'cotation') $cssforfield .= ($cssforfield ? ' ' : '') . 'risk-evaluation-list-container-' . $risk->id;
 			if ( ! empty($arrayfields['evaluation.' . $key]['checked'])) {
-				$cssforfield = '';
 				print '<td' . ($cssforfield ? ' class="' . $cssforfield . '"' : '') . ' style="vertical-align: top;">';
 				if ($key == 'cotation') {
 					require './../../core/tpl/riskanalysis/riskassessment/digiriskdolibarr_riskassessment_view.tpl.php';

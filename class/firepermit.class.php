@@ -265,7 +265,7 @@ class FirePermit extends CommonObject
 			$object->ref_ext = 'digirisk_' . $object->ref;
 		}
 		if (property_exists($object, 'label')) {
-			$object->label = empty($this->fields['label']['default']) ? $langs->trans("CopyOf") . " " . $object->label : $this->fields['label']['default'];
+			$object->label = $options['clone_label'];
 		}
 		if (property_exists($object, 'date_creation')) {
 			$object->date_creation = dol_now();

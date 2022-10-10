@@ -45,14 +45,14 @@ function digiriskelementPrepareHead($object)
 
 		if ($user->rights->digiriskdolibarr->evaluator->read) {
 			$head[$h][0] = dol_buildpath("/digiriskdolibarr/view/digiriskelement/digiriskelement_evaluator.php", 1) . '?id=' . $object->id;
-			$head[$h][1] = '<i class="fas fa-user-check"></i> ' . $langs->trans("Evaluator");
+			$head[$h][1] = '<i class="fas fa-user-check"></i> ' . $langs->trans("Evaluators");
 			$head[$h][2] = 'elementEvaluator';
 			$h++;
 		}
 
 		if ($user->rights->digiriskdolibarr->risksign->read) {
 			$head[$h][0] = dol_buildpath("/digiriskdolibarr/view/digiriskelement/digiriskelement_risksign.php", 1) . '?id=' . $object->id;
-			$head[$h][1] = '<i class="fas fa-map-signs"></i> ' . $langs->trans("RiskSign");
+			$head[$h][1] = '<i class="fas fa-map-signs"></i> ' . $langs->trans("RiskSigns");
 			$head[$h][2] = 'elementRiskSign';
 			$h++;
 		}

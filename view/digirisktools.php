@@ -93,8 +93,8 @@ if ( ! $user->rights->digiriskdolibarr->adminpage->read) accessforbidden();
 if (GETPOST('dataMigrationImport', 'alpha') && ! empty($conf->global->MAIN_UPLOAD_DOC)) {
 	// Submit file
 	if ( ! empty($_FILES)) {
-		if ( ! preg_match('/\.json/', $_FILES['dataMigrationImportfile']['name'][0]) || $_FILES['dataMigrationImportfile']['size'][0] < 1) {
-			setEventMessages($langs->trans('ErrorFileNotWellFormatted'), null, 'errors');
+		if ( ! preg_match('/arborescence_export.zip/', $_FILES['dataMigrationImportfile']['name'][0]) || $_FILES['dataMigrationImportfile']['size'][0] < 1) {
+			setEventMessages($langs->trans('ErrorFileNotWellFormattedZIP'), null, 'errors');
 		} else {
 			if (is_array($_FILES['dataMigrationImportfile']['tmp_name'])) $userfiles = $_FILES['dataMigrationImportfile']['tmp_name'];
 			else $userfiles                                                          = array($_FILES['dataMigrationImportfile']['tmp_name']);
@@ -117,11 +117,21 @@ if (GETPOST('dataMigrationImport', 'alpha') && ! empty($conf->global->MAIN_UPLOA
 				}
 			}
 
-			$json                = file_get_contents($filedir . $_FILES['dataMigrationImportfile']['name'][0]);
+			if ($result > 0) {
+				$zip = new ZipArchive;
+				if ($zip->open($filedir . $_FILES['dataMigrationImportfile']['name'][0]) === TRUE) {
+					$zip->extractTo($filedir);
+					$zip->close();
+				}
+			}
+
+			$filename = preg_replace( '/\.zip/', '.json', $_FILES['dataMigrationImportfile']['name'][0]);
+
+			$json                = file_get_contents($filedir . $filename);
 			$digiriskExportArray = json_decode($json, true);
 			$digiriskExportArray = end($digiriskExportArray);
 
-			$it = new RecursiveIteratorIterator(new RecursiveArrayIterator($digiriskExportArray));
+			$it = new RecursiveIteratorIterator(new RecursiveArrayIterator($digiriskExportArray['digiriskelements']['digiriskelements']));
 			foreach ($it as $key => $v) {
 				$element[$key][] = $v;
 			}
@@ -151,10 +161,11 @@ if (GETPOST('dataMigrationImport', 'alpha') && ! empty($conf->global->MAIN_UPLOA
 			}
 		}
 
-		$fileImport = dol_dir_list($filedir, "files", 0, '', '', '', '', 1);
-		$fileImport = array_shift($fileImport);
-		if ( ! empty($fileImport)) {
-			unlink($fileImport['fullname']);
+		$fileImports = dol_dir_list($filedir, "files", 0, '', '', '', '', 1);
+		if ( ! empty($fileImports)) {
+			foreach ($fileImports as $fileImport) {
+				unlink($fileImport['fullname']);
+			}
 		}
 
 		dolibarr_set_const($db, 'DIGIRISKDOLIBARR_TOOLS_TREE_ALREADY_IMPORTED', 1, 'integer', 0, '', $conf->entity);
@@ -164,8 +175,8 @@ if (GETPOST('dataMigrationImport', 'alpha') && ! empty($conf->global->MAIN_UPLOA
 if (GETPOST('dataMigrationImportRisks', 'alpha') && ! empty($conf->global->MAIN_UPLOAD_DOC)) {
 	// Submit file
 	if ( ! empty($_FILES)) {
-		if ( ! preg_match('/\.json/', $_FILES['dataMigrationImportRisksfile']['name'][0]) || $_FILES['dataMigrationImportRisksfile']['size'][0] < 1) {
-			setEventMessages($langs->trans('ErrorFileNotWellFormatted'), null, 'errors');
+		if ( ! preg_match('/risques_export.zip/', $_FILES['dataMigrationImportRisksfile']['name'][0]) || $_FILES['dataMigrationImportRisksfile']['size'][0] < 1) {
+			setEventMessages($langs->trans('ErrorFileNotWellFormattedZIP'), null, 'errors');
 		} else {
 			if (is_array($_FILES['dataMigrationImportRisksfile']['tmp_name'])) $userfiles = $_FILES['dataMigrationImportRisksfile']['tmp_name'];
 			else $userfiles                                                               = array($_FILES['dataMigrationImportRisksfile']['tmp_name']);
@@ -188,11 +199,21 @@ if (GETPOST('dataMigrationImportRisks', 'alpha') && ! empty($conf->global->MAIN_
 				}
 			}
 
-			$json                = file_get_contents($filedir . $_FILES['dataMigrationImportRisksfile']['name'][0]);
+			if ($result > 0) {
+				$zip = new ZipArchive;
+				if ($zip->open($filedir . $_FILES['dataMigrationImportRisksfile']['name'][0]) === TRUE) {
+					$zip->extractTo($filedir);
+					$zip->close();
+				}
+			}
+
+			$filename = preg_replace( '/\.zip/', '.json', $_FILES['dataMigrationImportRisksfile']['name'][0]);
+
+			$json                = file_get_contents($filedir . $filename);
 			$digiriskExportArray = json_decode($json, true);
 
 			//Risk
-			foreach ($digiriskExportArray as $digiriskExportRisk) {
+			foreach ($digiriskExportArray['risks'] as $digiriskExportRisk) {
 				$risk->ref        = $refRiskMod->getNextValue($risk);
 				$risk->category   = $risk->get_danger_category_position_by_name($digiriskExportRisk['danger_category']['name']);
 				$risk->fk_element = $digiriskElement->fetch_id_from_wp_digi_id($digiriskExportRisk['parent_id']);
@@ -241,9 +262,10 @@ if (GETPOST('dataMigrationImportRisks', 'alpha') && ! empty($conf->global->MAIN_
 		}
 
 		$fileImportRisks = dol_dir_list($filedir, "files", 0, '', '', '', '', 1);
-		$fileImportRisks = array_shift($fileImportRisks);
 		if ( ! empty($fileImportRisks)) {
-			unlink($fileImportRisks['fullname']);
+			foreach ($fileImportRisks as $fileImportRisk) {
+				unlink($fileImportRisk['fullname']);
+			}
 		}
 
 		dolibarr_set_const($db, 'DIGIRISKDOLIBARR_TOOLS_RISKS_ALREADY_IMPORTED', 1, 'integer', 0, '', $conf->entity);
@@ -253,8 +275,8 @@ if (GETPOST('dataMigrationImportRisks', 'alpha') && ! empty($conf->global->MAIN_
 if (GETPOST('dataMigrationImportRiskSigns', 'alpha') && ! empty($conf->global->MAIN_UPLOAD_DOC)) {
 	// Submit file
 	if ( ! empty($_FILES)) {
-		if ( ! preg_match('/\.json/', $_FILES['dataMigrationImportRiskSignsfile']['name'][0]) || $_FILES['dataMigrationImportRiskSignsfile']['size'][0] < 1) {
-			setEventMessages($langs->trans('ErrorFileNotWellFormatted'), null, 'errors');
+		if ( ! preg_match('/signalisations_export.zip/', $_FILES['dataMigrationImportRiskSignsfile']['name'][0]) || $_FILES['dataMigrationImportRiskSignsfile']['size'][0] < 1) {
+			setEventMessages($langs->trans('ErrorFileNotWellFormattedZIP'), null, 'errors');
 		} else {
 			if (is_array($_FILES['dataMigrationImportRiskSignsfile']['tmp_name'])) $userfiles = $_FILES['dataMigrationImportRiskSignsfile']['tmp_name'];
 			else $userfiles                                                               = array($_FILES['dataMigrationImportRiskSignsfile']['tmp_name']);
@@ -277,11 +299,21 @@ if (GETPOST('dataMigrationImportRiskSigns', 'alpha') && ! empty($conf->global->M
 				}
 			}
 
-			$json                = file_get_contents($filedir . $_FILES['dataMigrationImportRiskSignsfile']['name'][0]);
+			if ($result > 0) {
+				$zip = new ZipArchive;
+				if ($zip->open($filedir . $_FILES['dataMigrationImportRiskSignsfile']['name'][0]) === TRUE) {
+					$zip->extractTo($filedir);
+					$zip->close();
+				}
+			}
+
+			$filename = preg_replace( '/\.zip/', '.json', $_FILES['dataMigrationImportRiskSignsfile']['name'][0]);
+
+			$json                = file_get_contents($filedir . $filename);
 			$digiriskExportArray = json_decode($json, true);
 
 			//RiskSign
-			foreach ($digiriskExportArray as $digiriskExportRiskSign) {
+			foreach ($digiriskExportArray['risksigns'] as $digiriskExportRiskSign) {
 				$risksign->ref         = $refRiskSignMod->getNextValue($risksign);
 				$risksign->category    = $risksign->get_risksign_category_position_by_name($digiriskExportRiskSign['recommendation_category']['name']);
 				$risksign->description = $digiriskExportRiskSign['comment']['content'];
@@ -299,9 +331,10 @@ if (GETPOST('dataMigrationImportRiskSigns', 'alpha') && ! empty($conf->global->M
 		}
 
 		$fileImportRiskSigns = dol_dir_list($filedir, "files", 0, '', '', '', '', 1);
-		$fileImportRiskSigns = array_shift($fileImportRiskSigns);
 		if ( ! empty($fileImportRiskSigns)) {
-			unlink($fileImportRiskSigns['fullname']);
+			foreach ($fileImportRiskSigns as $fileImportRiskSign) {
+				unlink($fileImportRiskSign['fullname']);
+			}
 		}
 
 		dolibarr_set_const($db, 'DIGIRISKDOLIBARR_TOOLS_RISKSIGNS_ALREADY_IMPORTED', 1, 'integer', 0, '', $conf->entity);
@@ -311,7 +344,7 @@ if (GETPOST('dataMigrationImportRiskSigns', 'alpha') && ! empty($conf->global->M
 if (GETPOST('dataMigrationImportGlobal', 'alpha') && ! empty($conf->global->MAIN_UPLOAD_DOC)) {
 	// Submit file
 	if ( ! empty($_FILES)) {
-		if ( ! preg_match('/\.zip/', $_FILES['dataMigrationImportGlobalfile']['name'][0]) || $_FILES['dataMigrationImportGlobalfile']['size'][0] < 1) {
+		if ( ! preg_match('/global_export.zip/', $_FILES['dataMigrationImportGlobalfile']['name'][0]) || $_FILES['dataMigrationImportGlobalfile']['size'][0] < 1) {
 			setEventMessages($langs->trans('ErrorFileNotWellFormattedZIP'), null, 'errors');
 		} else {
 			if (is_array($_FILES['dataMigrationImportGlobalfile']['tmp_name'])) $userfiles = $_FILES['dataMigrationImportGlobalfile']['tmp_name'];
@@ -348,7 +381,7 @@ if (GETPOST('dataMigrationImportGlobal', 'alpha') && ! empty($conf->global->MAIN
 			$json                = file_get_contents($filedir . $filename);
 			$digiriskExportArray = json_decode($json, true);
 
-			$it = new RecursiveIteratorIterator(new RecursiveArrayIterator($digiriskExportArray[0]));
+			$it = new RecursiveIteratorIterator(new RecursiveArrayIterator($digiriskExportArray['digiriskelements']['digiriskelements']));
 			foreach ($it as $key => $v) {
 				$element[$key][] = $v;
 			}
@@ -378,7 +411,7 @@ if (GETPOST('dataMigrationImportGlobal', 'alpha') && ! empty($conf->global->MAIN
 			}
 
 			//Risk
-			foreach ($digiriskExportArray[1] as $digiriskExportRisk) {
+			foreach ($digiriskExportArray['risks'] as $digiriskExportRisk) {
 				$risk->ref        = $refRiskMod->getNextValue($risk);
 				$risk->category   = $risk->get_danger_category_position_by_name($digiriskExportRisk['danger_category']['name']);
 				$risk->fk_element = $digiriskElement->fetch_id_from_wp_digi_id($digiriskExportRisk['parent_id']);
@@ -426,7 +459,7 @@ if (GETPOST('dataMigrationImportGlobal', 'alpha') && ! empty($conf->global->MAIN
 			}
 
 			//RiskSign
-			foreach ($digiriskExportArray[2] as $digiriskExportRiskSign) {
+			foreach ($digiriskExportArray['risksigns'] as $digiriskExportRiskSign) {
 				$risksign->ref         = $refRiskSignMod->getNextValue($risksign);
 				$risksign->category    = $risksign->get_risksign_category_position_by_name($digiriskExportRiskSign['recommendation_category']['name']);
 				$risksign->description = $digiriskExportRiskSign['comment']['content'];
@@ -459,7 +492,7 @@ if (GETPOST('dataMigrationImportGlobal', 'alpha') && ! empty($conf->global->MAIN
  */
 
 $help_url = 'FR:Module_DigiriskDolibarr';
-$morejs   = array("/digiriskdolibarr/js/digiriskdolibarr.js.php");
+$morejs   = array("/digiriskdolibarr/js/digiriskdolibarr.js");
 $morecss  = array("/digiriskdolibarr/css/digiriskdolibarr.css");
 
 llxHeader("", $langs->trans("Tools"), $help_url, '', '', '', $morejs, $morecss);

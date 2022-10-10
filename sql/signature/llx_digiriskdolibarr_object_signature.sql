@@ -31,7 +31,7 @@ CREATE TABLE llx_digiriskdolibarr_object_signature(
 	signature_comment    text DEFAULT NULL,
 	element_id           integer NOT NULL,
 	element_type         varchar(255),
-    signature            text,
+    signature            longtext,
     stamp                text,
 	last_email_sent_date datetime DEFAULT NULL,
 	signature_url        varchar(255),

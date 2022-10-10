@@ -54,7 +54,6 @@ if ( $action == "edit" && $permissiontoadd ) {
 	print '</td></tr>';
 
 	// Méthodologie
-
 	print '<tr>';
 	print '<td class="titlefield"><label for="Method">' . $langs->trans("Method") . '</label></td>';
 	print '<td>';
@@ -63,7 +62,6 @@ if ( $action == "edit" && $permissiontoadd ) {
 	print '</td></tr>';
 
 	// Sources
-
 	print '<tr>';
 	print '<td class="titlefield"><label for="Sources">' . $langs->trans("Sources") . '</label></td>';
 	print '<td>';
@@ -72,7 +70,6 @@ if ( $action == "edit" && $permissiontoadd ) {
 	print '</td></tr>';
 
 	// Remarque Importante
-
 	print '<tr>';
 	print '<td class="titlefield"><label for="ImportantNote">' . $langs->trans("ImportantNote") . '</label></td>';
 	print '<td>';
@@ -84,6 +81,21 @@ if ( $action == "edit" && $permissiontoadd ) {
 	print '<tr>';
 	print '<td class="titlefield">' . $form->editfieldkey($langs->trans("SitePlans"), 'SitePlans', '', $object, 0) . '</td>';
 	print '<td>';
+	$filearray = dol_dir_list($conf->digiriskdolibarr->multidir_output[$conf->entity] . '/riskassessmentdocument/', "files", 0, '', '(\.odt|\.zip)', 'date', 'asc', 1);
+	if (count($filearray)) : ?>
+		<?php
+		$file = array_shift($filearray);
+		$thumb_name               = getThumbName($file['name']);
+		?>
+		<span class="">
+				<?php print '<img class="" src="' . DOL_URL_ROOT . '/viewimage.php?modulepart=digiriskdolibarr&entity=' . $conf->entity . '&file=' . urlencode('/riskassessmentdocument/thumbs/' . $thumb_name) . '" >'; ?>
+		</span>
+	<?php else : ?>
+		<?php $nophoto = DOL_URL_ROOT . '/public/theme/common/nophoto.png'; ?>
+		<span class="">
+			<img class="" alt="No photo" src="<?php echo $nophoto ?>">
+		</span>
+	<?php endif;
 	print '<input class="flat" type="file" name="userfile[]" id="SitePlans" />';
 	print '</td></tr>';
 } else {
@@ -98,7 +110,6 @@ if ( $action == "edit" && $permissiontoadd ) {
 	print '</td></tr>';
 
 	// Destinataire
-
 	print '<tr>';
 	print '<td class="titlefield">' . $langs->trans("Recipient") . '</td><td colspan="2">';
 	$user->fetch($conf->global->DIGIRISKDOLIBARR_RISKASSESSMENTDOCUMENT_RECIPIENT);
@@ -106,7 +117,6 @@ if ( $action == "edit" && $permissiontoadd ) {
 	print '</td></tr>';
 
 	// Méthodologie
-
 	print '<tr>';
 	print '<td class="titlefield">' . $langs->trans("Method") . '</td>';
 	print '<td>';
@@ -114,7 +124,6 @@ if ( $action == "edit" && $permissiontoadd ) {
 	print '</td></tr>';
 
 	// Sources
-
 	print '<tr>';
 	print '<td class="titlefield">' . $langs->trans("Sources") . '</td>';
 	print '<td>';
@@ -122,7 +131,6 @@ if ( $action == "edit" && $permissiontoadd ) {
 	print '</td></tr>';
 
 	// Remarque Importante
-
 	print '<tr>';
 	print '<td class="titlefield">' . $langs->trans("ImportantNote") . '</td>';
 	print '<td>';
@@ -130,15 +138,17 @@ if ( $action == "edit" && $permissiontoadd ) {
 	print '</td></tr>';
 
 	// Disponibilité des plans
-
 	print '<tr>';
 	print '<td class="titlefield">' . $langs->trans("SitePlans") . '</td>';
 	print '<td>';
 	$filearray = dol_dir_list($conf->digiriskdolibarr->multidir_output[$conf->entity] . '/riskassessmentdocument/', "files", 0, '', '(\.odt|\.zip)', 'date', 'asc', 1);
 	if (count($filearray)) : ?>
-		<?php $file = array_shift($filearray); ?>
+		<?php
+		$file = array_shift($filearray);
+		$thumb_name               = getThumbName($file['name']);
+		?>
 		<span class="">
-			<?php print '<img class="" src="' . DOL_URL_ROOT . '/viewimage.php?modulepart=digiriskdolibarr&entity=' . $conf->entity . '&file=' . urlencode('/riskassessmentdocument/thumbs/' . preg_replace('/\./', '_small.', $file['name'])) . '" >'; ?>
+			<?php print '<img class="" src="' . DOL_URL_ROOT . '/viewimage.php?modulepart=digiriskdolibarr&entity=' . $conf->entity . '&file=' . urlencode('/riskassessmentdocument/thumbs/' . $thumb_name) . '" >'; ?>
 		</span>
 	<?php else : ?>
 		<?php $nophoto = DOL_URL_ROOT . '/public/theme/common/nophoto.png'; ?>

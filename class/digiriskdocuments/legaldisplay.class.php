@@ -128,6 +128,7 @@ class LegalDisplay extends DigiriskDocuments
 			$labour_doctor_contact = new Contact($this->db);
 			$result = $labour_doctor_contact->fetch($digirisk_resources['LabourDoctorContact']->id[0]);
 			if ($result > 0) {
+				$json['LegalDisplay']['occupational_health_service']['id']      = $labour_doctor_contact->id;
 				$json['LegalDisplay']['occupational_health_service']['name']    = $labour_doctor_contact->firstname . " " . $labour_doctor_contact->lastname;
 				$json['LegalDisplay']['occupational_health_service']['address'] = preg_replace('/\s\s+/', ' ', $labour_doctor_contact->address);
 				$json['LegalDisplay']['occupational_health_service']['zip']     = $labour_doctor_contact->zip;
@@ -150,6 +151,7 @@ class LegalDisplay extends DigiriskDocuments
 			$result = $labour_inspector_contact->fetch($digirisk_resources['LabourInspectorContact']->id[0]);
 
 			if ($result > 0) {
+				$json['LegalDisplay']['detective_work']['id']      = $labour_inspector_contact->id;
 				$json['LegalDisplay']['detective_work']['name']    = $labour_inspector_contact->firstname . " " . $labour_inspector_contact->lastname;
 				$json['LegalDisplay']['detective_work']['address'] = preg_replace('/\s\s+/', ' ', $labour_inspector_contact->address);
 				$json['LegalDisplay']['detective_work']['zip']     = $labour_inspector_contact->zip;
@@ -203,6 +205,7 @@ class LegalDisplay extends DigiriskDocuments
 			$result = $responsible_prevent->fetch($digirisk_resources['Responsible']->id[0]);
 
 			if ($result > 0) {
+				$json['LegalDisplay']['safety_rule']['id']                         = $responsible_prevent->id;
 				$json['LegalDisplay']['safety_rule']['responsible_for_preventing'] = $responsible_prevent->firstname . " " . $responsible_prevent->lastname;
 				$json['LegalDisplay']['safety_rule']['phone']                      = $responsible_prevent->office_phone;
 			}

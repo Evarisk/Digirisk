@@ -23,11 +23,13 @@
  */
 
 require_once DOL_DOCUMENT_ROOT . '/core/class/commondocgenerator.class.php';
+require_once DOL_DOCUMENT_ROOT . '/ticket/class/ticket.class.php';
+require_once __DIR__ . '/../digiriskelementdocument/modules_digiriskelementdocument.php';
 
 /**
  *	Parent class for documents models
  */
-abstract class ModeleODTGroupmentDocument extends CommonDocGenerator
+abstract class ModeleODTGroupmentDocument extends ModeleODTDigiriskElementDocument
 {
 
 	// phpcs:disable PEAR.NamingConventions.ValidFunctionName.ScopeNotCamelCaps

@@ -218,9 +218,12 @@ class doc_ticketdocument_custom_odt extends ModeleODTTicketDocument
 			$texte .= '</b>';
 		}
 		if ($nbofiles) {
-			$texte .= '<div id="div_' . get_class($this) . '" class="hidden">';
+			$texte .= '<div id="div_'.get_class($this).'" class="hiddenx">';
+			// Show list of found files
 			foreach ($listoffiles as $file) {
-				$texte .= $file['name'] . '<br>';
+				$texte .= '- '.$file['name'].' &nbsp; <a class="reposition" href="'.DOL_URL_ROOT.'/document.php?modulepart=ecm&file=digiriskdolibarr/ticketdocument/'.urlencode(basename($file['name'])).'">'.img_picto('', 'listlight').'</a>';
+				$texte .= ' &nbsp; <a class="reposition" href="'.$_SERVER["PHP_SELF"].'?modulepart=ecm&keyforuploaddir=DIGIRISKDOLIBARR_TICKETDOCUMENT_CUSTOM_ADDON_ODT_PATH&action=deletefile&token='.newToken().'&file='.urlencode(basename($file['name'])).'">'.img_picto('', 'delete').'</a>';
+				$texte .= '<br>';
 			}
 			$texte .= '</div>';
 		}

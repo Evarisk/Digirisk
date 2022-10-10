@@ -21,6 +21,8 @@
  * \brief       This file is a class file for InformationsSharing
  */
 
+require_once DOL_DOCUMENT_ROOT.'/contact/class/contact.class.php';
+
 require_once __DIR__ . '/../digiriskdocuments.class.php';
 require_once __DIR__ . '/../digiriskresources.class.php';
 
@@ -101,8 +103,8 @@ class InformationsSharing extends DigiriskDocuments
 	 * @return false|string
 	 * @throws Exception
 	 */
-	public function InformationsSharingFillJSON($object) {
-
+	public function InformationsSharingFillJSON($object)
+	{
 		global $conf;
 
 		$resources 			= new DigiriskResources($this->db);
@@ -111,83 +113,98 @@ class InformationsSharing extends DigiriskDocuments
 
 		// 		*** JSON FILLING ***
 		if (!empty ($digirisk_resources)) {
+			$labour_doctor_contact = new Contact($this->db);
+			$result = $labour_doctor_contact->fetch($digirisk_resources['LabourDoctorContact']->id[0]);
+			if ($result > 0) {
+				$json['InformationsSharing']['occupational_health_service']['id']    = $labour_doctor_contact->id;
+				$json['InformationsSharing']['occupational_health_service']['name']  = $labour_doctor_contact->firstname . " " . $labour_doctor_contact->lastname;
+				$json['InformationsSharing']['occupational_health_service']['phone'] = $labour_doctor_contact->phone_pro;
+			}
 
-			$json['InformationsSharing']['delegues_du_personnels_date']    	  = $conf->global->DIGIRISKDOLIBARR_DP_ELECTION_DATE;
+			$labour_inspector_contact = new Contact($this->db);
+			$result = $labour_inspector_contact->fetch($digirisk_resources['LabourInspectorContact']->id[0]);
+
+			if ($result > 0) {
+				$json['InformationsSharing']['detective_work']['id']    = $labour_inspector_contact->id;
+				$json['InformationsSharing']['detective_work']['name']  = $labour_inspector_contact->firstname . " " . $labour_inspector_contact->lastname;
+				$json['InformationsSharing']['detective_work']['phone'] = $labour_inspector_contact->phone_pro;
+			}
+
+			$harassment_officer = new User($this->db);
+			$result = $harassment_officer->fetch($digirisk_resources['HarassmentOfficer']->id[0]);
+
+			if ($result > 0) {
+				$json['InformationsSharing']['harassment_officer']['id']    = $harassment_officer->id;
+				$json['InformationsSharing']['harassment_officer']['name']  = $harassment_officer->getFullName($langs);
+				$json['InformationsSharing']['harassment_officer']['phone'] = $harassment_officer->phone_pro;
+			}
+
+			$harassment_officer_cse = new User($this->db);
+			$result = $harassment_officer_cse->fetch($digirisk_resources['HarassmentOfficerCSE']->id[0]);
+
+			if ($result > 0) {
+				$json['InformationsSharing']['harassment_officer_cse']['id']    = $harassment_officer_cse->id;
+				$json['InformationsSharing']['harassment_officer_cse']['name']  = $harassment_officer_cse->getFullName($langs);
+				$json['InformationsSharing']['harassment_officer_cse']['phone'] = $harassment_officer_cse->phone_pro;
+			}
+
+			$json['InformationsSharing']['delegues_du_personnels_date']    	  = (dol_strlen($conf->global->DIGIRISKDOLIBARR_DP_ELECTION_DATE) > 0 && $conf->global->DIGIRISKDOLIBARR_DP_ELECTION_DATE != '--' ? $conf->global->DIGIRISKDOLIBARR_DP_ELECTION_DATE : '');
 			$json['InformationsSharing']['delegues_du_personnels_titulaires'] = '';
-
 			if (!empty ($digirisk_resources['TitularsDP']->id )) {
 				foreach ($digirisk_resources['TitularsDP']->id as $dp_titular) {
 
 					$dp_titulars = new User($this->db);
 					$result = $dp_titulars->fetch($dp_titular);
 					if ($result > 0) {
-						$json['InformationsSharing']['delegues_du_personnels_titulaires']  .= $dp_titulars->firstname . " " . $dp_titulars->lastname ;
+						$json['InformationsSharing']['delegues_du_personnels_titulaires']  .= $dp_titulars->firstname . " " . $dp_titulars->lastname . '<br>';
+						$json['InformationsSharing']['delegues_du_personnels_titulairesFullName']  .= $dp_titulars->getNomUrl(1) . '<br>';
 					}
 				}
 			}
 
 			$json['InformationsSharing']['delegues_du_personnels_suppleants'] = '';
-
 			if (!empty ($digirisk_resources['AlternatesDP']->id )) {
 				foreach ($digirisk_resources['AlternatesDP']->id as $dp_alternate) {
 
 					$dp_alternates = new User($this->db);
 					$result = $dp_alternates->fetch($dp_alternate);
 					if ($result > 0) {
-						$json['InformationsSharing']['delegues_du_personnels_suppleants']  .= $dp_alternates->firstname . " " . $dp_alternates->lastname ;
-					}
-				}
-			}
-
-			$json['InformationsSharing']['delegues_du_personnels_suppleants'] = '';
-
-			if (!empty ($digirisk_resources['AlternatesDP']->id )) {
-				foreach ($digirisk_resources['AlternatesDP']->id as $dp_alternate) {
-
-					$dp_alternates = new User($this->db);
-					$result = $dp_alternates->fetch($dp_alternate);
-					if ($result > 0) {
-						$json['InformationsSharing']['delegues_du_personnels_suppleants']  .= $dp_alternates->firstname . " " . $dp_alternates->lastname ;
+						$json['InformationsSharing']['delegues_du_personnels_suppleants']  .= $dp_alternates->firstname . " " . $dp_alternates->lastname . '<br>';
+						$json['InformationsSharing']['delegues_du_personnels_suppleantsFullName']  .= $dp_alternates->getNomUrl(1) . '<br>';
 					}
 				}
 			}
 
 			// CSE
-			$json['InformationsSharing']['membres_du_comite_entreprise_date'] = $conf->global->DIGIRISKDOLIBARR_CSE_ELECTION_DATE;
-
-
+			$json['InformationsSharing']['membres_du_comite_entreprise_date']       = (dol_strlen($conf->global->DIGIRISKDOLIBARR_CSE_ELECTION_DATE) > 0 && $conf->global->DIGIRISKDOLIBARR_CSE_ELECTION_DATE != '--' ? $conf->global->DIGIRISKDOLIBARR_CSE_ELECTION_DATE : '');
 			$json['InformationsSharing']['membres_du_comite_entreprise_titulaires'] = '';
-
 			if (!empty ($digirisk_resources['TitularsCSE']->id )) {
 				foreach ($digirisk_resources['TitularsCSE']->id as $cse_titular) {
-
 					$cse_titulars = new User($this->db);
 					$result = $cse_titulars->fetch($cse_titular);
 					if ($result > 0) {
-						$json['InformationsSharing']['membres_du_comite_entreprise_titulaires']  .= $cse_titulars->firstname . " " . $cse_titulars->lastname ;
+						$json['InformationsSharing']['membres_du_comite_entreprise_titulaires']  .= $cse_titulars->firstname . " " . $cse_titulars->lastname  . '<br>';
+						$json['InformationsSharing']['membres_du_comite_entreprise_titulairesFullName']  .= $cse_titulars->getNomUrl(1) . '<br>';
 					}
 				}
 			}
 
 			$json['InformationsSharing']['membres_du_comite_entreprise_suppleants'] = '';
-
 			if (!empty ($digirisk_resources['AlternatesCSE']->id )) {
 				foreach ($digirisk_resources['AlternatesCSE']->id as $cse_alternate) {
-
 					$cse_alternates = new User($this->db);
 					$result = $cse_alternates->fetch($cse_alternate);
 					if ($result > 0) {
-						$json['InformationsSharing']['membres_du_comite_entreprise_suppleants']  .= $cse_alternates->firstname . " " . $cse_alternates->lastname ;
+						$json['InformationsSharing']['membres_du_comite_entreprise_suppleants']  .= $cse_alternates->firstname . " " . $cse_alternates->lastname  . '<br>';
+						$json['InformationsSharing']['membres_du_comite_entreprise_suppleantsFullName']  .= $cse_alternates->getNomUrl(1) . '<br>';
 					}
 				}
 			}
 
 			$object->json = json_encode($json, JSON_UNESCAPED_UNICODE);
 			return $object->json;
-
 		}
-		else
-		{
+		else {
 			return -1;
 		}
 	}

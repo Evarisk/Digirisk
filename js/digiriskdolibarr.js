@@ -1,4 +1,4 @@
-/* Copyright (C) 2021 EOXIA <dev@eoxia.com>
+/* Copyright (C) 2022 EVARISK <dev@evarisk.com>
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -15,56 +15,9 @@
  *
  * Library javascript to enable Browser notifications
  */
-<?php
-if ( ! defined('NOREQUIRESOC')) {
-	define('NOREQUIRESOC', '1');
-}
-if ( ! defined('NOCSRFCHECK')) {
-	define('NOCSRFCHECK', 1);
-}
-if ( ! defined('NOTOKENRENEWAL')) {
-	define('NOTOKENRENEWAL', 1);
-}
-if ( ! defined('NOLOGIN')) {
-	define('NOLOGIN', 1);
-}
-if ( ! defined('NOREQUIREMENU')) {
-	define('NOREQUIREMENU', 1);
-}
-if ( ! defined('NOREQUIREHTML')) {
-	define('NOREQUIREHTML', 1);
-}
-if ( ! defined('NOREQUIREAJAX')) {
-	define('NOREQUIREAJAX', '1');
-}
-
-session_cache_limiter('public');
-
-$res = 0;
-// Try main.inc.php into web root known defined into CONTEXT_DOCUMENT_ROOT (not always defined)
-if ( ! $res && ! empty($_SERVER["CONTEXT_DOCUMENT_ROOT"])) $res = @include $_SERVER["CONTEXT_DOCUMENT_ROOT"] . "/main.inc.php";
-// Try main.inc.php into web root detected using web root calculated from SCRIPT_FILENAME
-$tmp = empty($_SERVER['SCRIPT_FILENAME']) ? '' : $_SERVER['SCRIPT_FILENAME']; $tmp2 = realpath(__FILE__); $i = strlen($tmp) - 1; $j = strlen($tmp2) - 1;
-while ($i > 0 && $j > 0 && isset($tmp[$i]) && isset($tmp2[$j]) && $tmp[$i] == $tmp2[$j]) { $i--; $j--; }
-if ( ! $res && $i > 0 && file_exists(substr($tmp, 0, ($i + 1)) . "/main.inc.php")) $res    = @include substr($tmp, 0, ($i + 1)) . "/main.inc.php";
-if ( ! $res && $i > 0 && file_exists(substr($tmp, 0, ($i + 1)) . "/../main.inc.php")) $res = @include substr($tmp, 0, ($i + 1)) . "/../main.inc.php";
-// Try main.inc.php using relative path
-if ( ! $res && file_exists("../../main.inc.php")) $res    = @include "../../main.inc.php";
-if ( ! $res && file_exists("../../../main.inc.php")) $res = @include "../../../main.inc.php";
-if ( ! $res) die("Include of main fails");
-
-// Define javascript type
-top_httphead('text/javascript; charset=UTF-8');
-// Important: Following code is to avoid page request by browser and PHP CPU at each Dolibarr page access.
-if (empty($dolibarr_nocache)) {
-	header('Cache-Control: max-age=10800, public, must-revalidate');
-} else {
-	header('Cache-Control: no-cache');
-}
-?>
 
 /**
- * \file    js/digiriskdolibarr.js.php
+ * \file    js/digiriskdolibarr.js
  * \ingroup digiriskdolibarr
  * \brief   JavaScript file for module DigiriskDolibarr.
  */
@@ -219,7 +172,6 @@ window.eoxiaJS.navigation.event = function() {
  * @return {void}
  */
 window.eoxiaJS.navigation.switchToggle = function( event ) {
-	console.log($(this))
 	event.preventDefault();
 
 	var MENU = localStorage.menu
@@ -269,9 +221,11 @@ window.eoxiaJS.navigation.toggleAll = function( event ) {
 		$( '.digirisk-wrap .navigation-container .workunit-list .unit' ).addClass( 'toggled' );
 
 		// local storage add all
-		let MENU = $( '.digirisk-wrap .navigation-container .workunit-list .unit .title' ).get().map(v.attributes.value.value)
-		localStorage.setItem('menu', JSON.stringify(Object.values(MENU)) );
-
+		let MENU = []
+		$( '.digirisk-wrap .navigation-container .workunit-list .unit .title' ).get().map(function (v){
+			MENU.push($(v).attr('value'))
+		})
+		localStorage.setItem('menu', JSON.stringify(Array.from(MENU.values())) );
 	}
 
 	if ( $( this ).hasClass( 'toggle-minus' ) ) {
@@ -281,7 +235,6 @@ window.eoxiaJS.navigation.toggleAll = function( event ) {
 		// local storage delete all
 		let emptyMenu = new Set('0');
 		localStorage.setItem('menu', JSON.stringify(Object.values(emptyMenu)) );
-
 	}
 };
 
@@ -385,6 +338,7 @@ window.eoxiaJS.navigation.saveOrganization = function( event ) {
 			$('.wpeo-loader').addClass('button-disable')
 			$('.wpeo-loader').attr('style','background: #47e58e !important;border-color: #47e58e !important;')
 			$('.wpeo-loader').find('.fas.fa-check').attr('style', '')
+			$("a").attr("onclick", "").unbind("click");
 
 			$('.wpeo-loader').removeClass('wpeo-loader')
 		},
@@ -511,6 +465,11 @@ window.eoxiaJS.modal.openModal = function ( event ) {
 	if ($(this).hasClass('modal-signature-open')) {
 		$('#modal-signature' + idSelected).addClass('modal-active');
 		window.eoxiaJS.signature.modalSignatureOpened( $(this) );
+	}
+
+	// Open modal patch note.
+	if ($(this).hasClass('show-patchnote')) {
+		$('.fiche .wpeo-modal-patchnote').addClass('modal-active');
 	}
 
 	$('.notice').addClass('hidden');
@@ -1262,10 +1221,11 @@ window.eoxiaJS.mediaGallery.savePhoto = function( event ) {
 		riskAssessmentPhoto = $('.risk-evaluation-photo-'+idToSave+'.risk-'+riskId)
 
 		let filepath = modalFrom.find('.risk-evaluation-photo-single .filepath-to-riskassessment').val()
-		let newPhoto = filepath + favorite.replace(/\./, '_small.')
+		let thumbName = window.eoxiaJS.file.getThumbName(favorite)
+		let newPhoto = filepath + thumbName
 
 		$.ajax({
-			url: document.URL + "&action=addFiles&token=" + token,
+			url: document.URL + "&action=addFiles&token=" + token +'&favorite='+favorite,
 			type: "POST",
 			data: JSON.stringify({
 				risk_id: riskId,
@@ -1283,17 +1243,21 @@ window.eoxiaJS.mediaGallery.savePhoto = function( event ) {
 				newPhoto = newPhoto.replace(/\)/g, '%29')
 				newPhoto = newPhoto.replace(/\+/g, '%2B')
 
+				//Update risk assessment main img in "photo" of risk assessment modal
 				riskAssessmentPhoto.each( function() {
-					$(this).find('.clicked-photo-preview').attr('src',newPhoto )
-					$(this).find('.filename').attr('value', favorite.match(/_small/) ? favorite.replace(/\./, '_small.') : favorite)
+					$(this).find('.clicked-photo-preview').attr('src',newPhoto)
+					$(this).find('.filename').attr('value', favorite)
+					$(this).find('.clicked-photo-preview').hasClass('photodigiriskdolibarr') ? $(this).find('.clicked-photo-preview').removeClass('photodigiriskdolibarr').addClass('photo') : 0
 				});
 
+				//Remove special chars from img
 				favorite = favorite.replace(/\ /g, '%20')
 				favorite = favorite.replace(/\(/g, '%28')
 				favorite = favorite.replace(/\)/g, '%29')
 				favorite = favorite.replace(/\+/g, '%2B')
 
-				mediaLinked.load(document.URL+'&favorite='+favorite + ' .element-linked-medias-'+idToSave+'.risk-'+riskId)
+				mediaLinked.html($(resp).find('.element-linked-medias-'+idToSave+'.risk-'+riskId).first())
+
 				modalFrom.find('.messageSuccessSavePhoto').removeClass('hidden')
 			},
 			error: function ( ) {
@@ -1309,7 +1273,8 @@ window.eoxiaJS.mediaGallery.savePhoto = function( event ) {
 		digiriskElementPhoto = $('.digirisk-element-'+idToSave).find('.clicked-photo-preview')
 
 		let filepath = $('.digirisk-element-'+idToSave).find('.filepath-to-digiriskelement').val()
-		let newPhoto = filepath + favorite.replace(/\./, '_small.')
+		let thumbName = window.eoxiaJS.file.getThumbName(favorite)
+		let newPhoto = filepath + thumbName
 
 		$.ajax({
 			url: document.URL + "&action=addDigiriskElementFiles&token=" + token,
@@ -1391,35 +1356,56 @@ window.eoxiaJS.mediaGallery.sendPhoto = function( event ) {
 	let totalCount = files.length
     let progress = 0
 	let token = $('.id-container.page-ut-gp-list').find('input[name="token"]').val();
+	$('#myBar').width(0)
     $('#myProgress').attr('style', 'display:block')
+	window.eoxiaJS.loader.display($('#myProgress'));
+	let querySeparator = '?'
+	document.URL.match(/\?/) ? querySeparator = '&' : 1
+
 	$.each(files, function(index, file) {
 		let formdata = new FormData();
 		formdata.append("userfile[]", file);
+		//@to
 		$.ajax({
-			url: document.URL + "&action=uploadPhoto&uploadMediasSuccess=1&token=" + token,
+			url: document.URL + querySeparator + "action=uploadPhoto&uploadMediasSuccess=1&token=" + token,
 			type: "POST",
 			data: formdata,
 			processData: false,
 			contentType: false,
 			success: function (resp) {
-				progress += (1 / totalCount) * 100
-				$('#myBar').animate({
-					width: progress + '%'
-				}, 300);
-				if (index + 1 === totalCount) {
-					elementParent.load( document.URL + '&uploadMediasSuccess=1' + ' .ecm-photo-list', () => {
-						setTimeout(() => {
-							$('#myProgress').fadeOut(800)
-						}, 800)
-					});
-					actionContainerSuccess.removeClass('hidden');
+				if ($(resp).find('.error-medias').length) {
+					let response = $(resp).find('.error-medias').val()
+					let decoded_response = JSON.parse(response)
+					$('#myBar').width('100%')
+					$('#myBar').css('background-color','#e05353')
+					$('.wpeo-loader').removeClass('wpeo-loader');
+
+					let textToShow = '';
+					textToShow += decoded_response.message
+
+					actionContainerError.find('.notice-subtitle').text(textToShow)
+
+					actionContainerError.removeClass('hidden');
+
+				} else {
+					progress += (1 / totalCount) * 100
+					$('#myBar').animate({
+						width: progress + '%'
+					}, 300);
+					if (index + 1 === totalCount) {
+						elementParent.load( document.URL + querySeparator + 'uploadMediasSuccess=1' + ' .ecm-photo-list', () => {
+							setTimeout(() => {
+								$('#myProgress').fadeOut(800)
+								$('.wpeo-loader').removeClass('wpeo-loader');
+								$('#myProgress').find('.loader-spin').remove();
+							}, 800)
+						});
+						actionContainerSuccess.removeClass('hidden');
+					}
 				}
 			},
 			error : function (resp) {
-				$('#myBar').animate({
-					color: 'red'
-				}, 300);
-				actionContainerError.removeClass('hidden');
+
 			}
 		});
 	})
@@ -1477,13 +1463,6 @@ window.eoxiaJS.mediaGallery.unlinkFile = function( event ) {
 	if (type === 'riskassessment') {
 		let riskAssessmentPhoto = $('.risk-evaluation-photo-'+element_linked_id)
 		previousPhoto = $(this).closest('.modal-container').find('.risk-evaluation-photo .clicked-photo-preview')
-		//previousName = previousPhoto[0].src.trim().split(/thumbs%2F/)[1].split(/"/)[0]
-
-		//if (previousName == filename.replace(/\./, '_small.')) {
-		//	newPhoto = previousPhoto[0].src.replace(previousName, '')
-		//} else {
-		//	newPhoto = previousPhoto[0].src
-		//}
 		newPhoto = previousPhoto[0].src
 		$.ajax({
 			url: document.URL + querySeparator + "action=unlinkFile&token=" + token,
@@ -1504,13 +1483,6 @@ window.eoxiaJS.mediaGallery.unlinkFile = function( event ) {
 		});
 	} else if (type === 'digiriskelement') {
 		previousPhoto = $('.digirisk-element-'+element_linked_id).find('.photo.clicked-photo-preview')
-		//previousName = previousPhoto[0].src.trim().split(/thumbs%2F/)[1].split(/"/)[0]
-
-		//if (previousName == filename.replace(/\./, '_small.')) {
-		//	newPhoto = previousPhoto[0].src.replace(previousName, '')
-		//} else {
-		//	newPhoto = previousPhoto[0].src
-		//}
 		newPhoto = previousPhoto[0].src
 
 		$.ajax({
@@ -1580,7 +1552,8 @@ window.eoxiaJS.mediaGallery.addToFavorite = function( event ) {
 		$(this).closest('.modal-content').find('.risk-evaluation-photo-single .filename').attr('value', filename)
 
 		let filepath = modalFrom.find('.risk-evaluation-photo-single .filepath-to-riskassessment').val()
-		let newPhoto = filepath + filename.replace(/\./, '_small.')
+		let thumbName = window.eoxiaJS.file.getThumbName(filename)
+		let newPhoto = filepath + thumbName
 
 		let saveButton = $(this).closest('.modal-container').find('.risk-evaluation-save')
 		saveButton.addClass('button-disable')
@@ -1600,6 +1573,7 @@ window.eoxiaJS.mediaGallery.addToFavorite = function( event ) {
 
 				elementPhotos.each( function() {
 					$(this).find('.clicked-photo-preview').attr('src',newPhoto )
+					$(this).find('.clicked-photo-preview').hasClass('photodigiriskdolibarr') ? $(this).find('.clicked-photo-preview').removeClass('photodigiriskdolibarr').addClass('photo') : 0
 				});
 				saveButton.removeClass('button-disable')
 				$('.wpeo-loader').removeClass('wpeo-loader')
@@ -1609,7 +1583,8 @@ window.eoxiaJS.mediaGallery.addToFavorite = function( event ) {
 		previousPhoto = $('.digirisk-element-'+element_linked_id).find('.photo.clicked-photo-preview')
 
 		let filepath =$('.digirisk-element-'+element_linked_id).find('.filepath-to-digiriskelement').val()
-		let newPhoto = filepath + filename.replace(/\./, '_small.')
+		let thumbName = window.eoxiaJS.file.getThumbName(filename)
+		let newPhoto = filepath + thumbName
 
 		jQuery.ajax({
 			url: document.URL + querySeparator + "action=addDigiriskElementPhotoToFavorite&token=" + token,
@@ -1622,10 +1597,6 @@ window.eoxiaJS.mediaGallery.addToFavorite = function( event ) {
 			success: function ( resp ) {
 
 				if (id === element_linked_id) {
-					console.log($('.arearef.heightref.valignmiddle.centpercent'))
-					console.log($(resp).find('.arearef.heightref.valignmiddle.centpercent'))
-					console.log(resp)
-
 					$('.arearef.heightref.valignmiddle.centpercent').load(' .arearef.heightref.valignmiddle.centpercent')
 				}
 				newPhoto = newPhoto.replace(/\ /g, '%20')
@@ -1849,7 +1820,9 @@ window.eoxiaJS.risk.createRisk = function ( event ) {
 window.eoxiaJS.risk.saveRisk = function ( event ) {
 	let editedRiskId = $(this).attr('value');
 	let elementRisk = $(this).closest('.risk-container').find('.risk-content');
-
+	var params = new window.URLSearchParams(window.location.search);
+	var id = params.get('id')
+	let moveRiskDisabled = $(this).closest('.risk-container').find('.move-risk').hasClass('move-disabled')
 	let riskCommentText = elementRisk.find('.risk-description textarea').val()
 	riskCommentText = window.eoxiaJS.risk.sanitizeBeforeRequest(riskCommentText)
 
@@ -1860,16 +1833,14 @@ window.eoxiaJS.risk.saveRisk = function ( event ) {
 	} else {
 		var description = '';
 	}
-	//var newParent = $(this).closest('.risk-container').find('#select2-socid-container').attr('title');
-	var newParent = $(this).closest('.risk-container').find('#socid option:selected').text();
-	if (newParent) {
-		newParent = newParent.split(/ /)[0];
-	}
 
-	let elementParent = $('.fichecenter.risklist').find('.div-table-responsive');
-	//window.eoxiaJS.loader.display($(this));
-	if (riskCommentText) {
+	var newParent = $(this).closest('.risk-container').find('#socid option:selected').val();
+	let elementParent = $('.fichecenter.risklist').find('.div-title-and-table-responsive');
+
+	if (newParent == id || moveRiskDisabled) {
 		window.eoxiaJS.loader.display($(this).closest('.risk-row-content-' + editedRiskId).find('.risk-description-'+editedRiskId));
+	} else {
+		window.eoxiaJS.loader.display($(this).closest('.risk-row-content-' + editedRiskId))
 	}
 	let riskRef =  $('.risk_row_'+editedRiskId).find('.risk-container > div:nth-child(1)').text();
 
@@ -1887,11 +1858,15 @@ window.eoxiaJS.risk.saveRisk = function ( event ) {
 		}),
 		contentType: false,
 		success: function ( resp ) {
-			elementParent.html($(resp).find('.div-table-responsive'))
+			$('.wpeo-loader').removeClass('wpeo-loader');
 			let actionContainerSuccess = $('.messageSuccessRiskEdit');
-
-			$('#risk_row_' + editedRiskId).fadeOut(800);
-			$('#risk_row_' + editedRiskId).fadeIn(800);
+			if (newParent == id || moveRiskDisabled) {
+				$('.risk-row-content-' + editedRiskId).find('.risk-description-'+editedRiskId).fadeOut(800);
+				$('.risk-row-content-' + editedRiskId).find('.risk-description-'+editedRiskId).fadeIn(800);
+			} else {
+				elementParent.html($(resp).find('.div-title-and-table-responsive'))
+				$('#risk_row_'+editedRiskId).fadeOut(800);
+			}
 
 			let textToShow = '';
 			textToShow += actionContainerSuccess.find('.valueForEditRisk1').val()
@@ -2147,7 +2122,7 @@ window.eoxiaJS.evaluation.createEvaluation = function ( event ) {
 	})
 
 	window.eoxiaJS.loader.display($(this));
-	window.eoxiaJS.loader.display($('.risk-evaluation-container-' + riskToAssign));
+	window.eoxiaJS.loader.display($('.risk-evaluation-list-container-' + riskToAssign));
 
 	let token = $('.fichecenter.risklist').find('input[name="token"]').val();
 
@@ -2172,17 +2147,18 @@ window.eoxiaJS.evaluation.createEvaluation = function ( event ) {
 		processData: false,
 		contentType: false,
 		success: function( resp ) {
-			$('.fichecenter.risklist').html($(resp).find('#searchFormListRisks'))
+			//refresh risk assessment list
+			$('.risk-evaluation-list-container-' + riskToAssign).html($(resp).find('.risk-evaluation-list-container-' + riskToAssign).children())
 
 			let actionContainerSuccess = $('.messageSuccessEvaluationCreate');
 
-			$('#risk_row_' + riskToAssign).fadeOut(800);
-			$('#risk_row_' + riskToAssign).fadeIn(800);
-			console.log(riskToAssign)
+			$('.risk-evaluation-list-container-' + riskToAssign).fadeOut(800);
+			$('.risk-evaluation-list-container-' + riskToAssign).fadeIn(800);
 			actionContainerSuccess.empty()
 			actionContainerSuccess.html($(resp).find('.riskassessment-create-success-notice'))
 			actionContainerSuccess.find('a').attr('href', '#risk_row_'+riskToAssign)
 
+			$('.wpeo-loader').removeClass('wpeo-loader')
 			actionContainerSuccess.removeClass('hidden');
 		},
 		error: function ( resp ) {
@@ -2208,7 +2184,7 @@ window.eoxiaJS.evaluation.createEvaluation = function ( event ) {
  * @return {boolean}
  */
 window.eoxiaJS.evaluation.deleteEvaluation = function ( event ) {
-	let element = $(this).closest('.risk-evaluation');
+	let element = $(this).closest('.risk-evaluation-in-modal');
 	let deletedEvaluationId = element.attr('value');
 	let textToShowBeforeDelete = element.find('.labelForDelete').val();
 	let actionContainerSuccess = $('.messageSuccessEvaluationDelete');
@@ -2222,10 +2198,9 @@ window.eoxiaJS.evaluation.deleteEvaluation = function ( event ) {
 
 		let elementParent = $(this).closest('.risk-evaluations-list-content');
 		let riskId = elementParent.attr('value');
-		let evaluationSingle = $('.risk-evaluation-single-content-'+riskId);
 		let evaluationRef =  $('.risk-evaluation-ref-'+evaluationID).attr('value');
 
-		window.eoxiaJS.loader.display($(this));
+		window.eoxiaJS.loader.display($('.risk-evaluation-ref-'+evaluationID));
 
 		$.ajax({
 			url:document.URL + '&action=deleteEvaluation&deletedEvaluationId=' + deletedEvaluationId + '&token=' + token,
@@ -2233,14 +2208,22 @@ window.eoxiaJS.evaluation.deleteEvaluation = function ( event ) {
 			processData: false,
 			contentType: false,
 			success: function ( resp ) {
-				elementParent.load( document.URL + ' .risk-evaluations-list-'+riskId);
-				//elementParent.html($(resp).find('.risk-evaluations-list-'+riskId));
-				evaluationSingle.load( document.URL + ' .risk-evaluation-single-'+riskId);
+				//remove risk assessment from list in modal
+				$('.risk-evaluation-container-' + evaluationID).fadeOut(400)
 
+				//refresh risk assessment list
+				$('.risk-evaluation-list-content-' + riskId).html($(resp).find('.risk-evaluation-list-content-' + riskId).children())
+
+				//refresh risk assessment add modal to actualize last risk assessment
+				$('#risk_evaluation_add' + riskId).html($(resp).find('#risk_evaluation_add' + riskId).children())
+
+				//update risk assessment counter
 				let evaluationCounterText = $('#risk_row_'+riskId).find('.table-cell-header-label').text()
 				let evaluationCounter = evaluationCounterText.split(/\(/)[1].split(/\)/)[0]
 				$('#risk_row_'+riskId).find('.table-cell-header-label').html('<strong>' + evaluationCounterText.split(/\(/)[0] + '(' + (+evaluationCounter - 1) + ')' + '</strong>')
-				//evaluationSingle.html($(resp).find('.risk-evaluation-single-'+riskId));
+				if (evaluationCounter - 1 < 1) {
+					$('.fichecenter.risklist').html($(resp).find('#searchFormListRisks'))
+				}
 
 				elementParent.removeClass('wpeo-loader');
 
@@ -2283,7 +2266,7 @@ window.eoxiaJS.evaluation.saveEvaluation = function ( event ) {
 
 	let evaluationText = element.find('.risk-evaluation-comment textarea').val()
 
-	let elementParent = $(this).closest('.risk-evaluation-container').find('.risk-evaluations-list-content');
+	let elementParent = $(this).closest('.risk-row').find('.risk-evaluations-list-content');
 	let riskId = elementParent.attr('value');
 	let evaluationRef =  $('.risk-evaluation-ref-'+evaluationID).attr('value');
 	let listModalContainer = $('.risk-evaluation-list-modal-'+riskId)
@@ -2306,6 +2289,12 @@ window.eoxiaJS.evaluation.saveEvaluation = function ( event ) {
 	})
 
 	window.eoxiaJS.loader.display($(this));
+
+	if (fromList) {
+		window.eoxiaJS.loader.display($('.risk-evaluation-ref-'+evaluationID));
+	} else {
+		window.eoxiaJS.loader.display($('.risk-evaluation-container-'+evaluationID));
+	}
 
 	let token = $('.fichecenter.risklist').find('input[name="token"]').val();
 
@@ -2331,14 +2320,21 @@ window.eoxiaJS.evaluation.saveEvaluation = function ( event ) {
 		contentType: false,
 		success: function ( resp ) {
 			if (fromList) {
-				listModalContainer.find('.modal-content .risk-evaluations-list-content').html($(resp).find('.risk-evaluations-list-'+riskId))
-				$('.risk-evaluation-single-content-'+riskId).html($(resp).find('.risk-evaluation-single-'+riskId))
+				$('.risk-evaluation-ref-'+evaluationID+':not(.last-risk-assessment)').fadeOut(800);
+				$('.risk-evaluation-ref-'+evaluationID+':not(.last-risk-assessment)').fadeIn(800);
 			} else {
-				$('.fichecenter.risklist').html($(resp).find('#searchFormListRisks'))
-				$('#risk_row_' + riskId).fadeOut(800);
-				$('#risk_row_' + riskId).fadeIn(800);
-
+				$('.risk-evaluation-container-'+evaluationID+':not(.last-risk-assessment)').fadeOut(800);
+				$('.risk-evaluation-container-'+evaluationID+':not(.last-risk-assessment)').fadeIn(800);
 			}
+			//refresh risk assessment single in modal list
+			listModalContainer.find('.risk-evaluation-ref-'+evaluationID).html($(resp).find('.risk-evaluation-ref-'+evaluationID).children())
+
+			//refresh risk assessment single in list
+			$('.risk-evaluation-container.risk-evaluation-container-'+evaluationID+':not(.last-risk-assessment)').html($(resp).find('.risk-evaluation-container.risk-evaluation-container-'+evaluationID+':not(.last-risk-assessment)').children())
+
+			//refresh risk assessment add modal to actualize last risk assessment
+			$('#risk_evaluation_add' + riskId).html($(resp).find('#risk_evaluation_add' + riskId).children())
+
 			$('.wpeo-loader').removeClass('wpeo-loader')
 			let actionContainerSuccess = $('.messageSuccessEvaluationEdit');
 
@@ -2535,6 +2531,7 @@ window.eoxiaJS.riskassessmenttask.createRiskAssessmentTask = function ( event ) 
 	taskText = window.eoxiaJS.risk.sanitizeBeforeRequest(taskText)
 
 	window.eoxiaJS.loader.display($(this));
+	window.eoxiaJS.loader.display($('.riskassessment-tasks' + riskToAssign));
 
 	let token = $('.fichecenter.risklist').find('input[name="token"]').val();
 
@@ -2591,7 +2588,7 @@ window.eoxiaJS.riskassessmenttask.deleteRiskAssessmentTask = function ( event ) 
 
 		let riskAssessmentTaskRef =  $('.riskassessment-task-container-'+deletedRiskAssessmentTaskId).attr('value');
 
-		window.eoxiaJS.loader.display($(this));
+		window.eoxiaJS.loader.display($('.riskassessment-task-container-'+deletedRiskAssessmentTaskId));
 
 		$.ajax({
 			url: document.URL + '&action=deleteRiskAssessmentTask&deletedRiskAssessmentTaskId=' + deletedRiskAssessmentTaskId + '&token=' + token,
@@ -3309,26 +3306,71 @@ window.eoxiaJS.evaluator.init = function() {
  * La méthode contenant tous les événements pour l'évaluateur.
  *
  * @since   1.0.0
- * @version 1.0.0
+ * @version 9.6.0
  *
  * @return {void}
  */
 window.eoxiaJS.evaluator.event = function() {
 	$( document ).on( 'click', '.evaluator-create', window.eoxiaJS.evaluator.createEvaluator );
-	$( document ).on( 'change', '#userid', window.eoxiaJS.evaluator.selectUser );
+	$( document ).on( 'change', '#fk_user_employer', window.eoxiaJS.evaluator.selectUser );
 };
 
 /**
  * Clique sur une des user de la liste.
  *
  * @since   1.0.0
- * @version 1.0.0
+ * @version 9.6.0
  *
  * @param  {ClickEvent} event L'état du clic.
  * @return {void}
  */
 window.eoxiaJS.evaluator.selectUser = function( event ) {
-	$(this).closest('.evaluator-user').find('.user-selected').val(this.value)
+	var elementParent = $(this).closest('.modal-container');
+	let userID = elementParent.find('#fk_user_employer').val();
+	let token = $('.fichecenter.evaluatorlist').find('input[name="token"]').val();
+
+	window.eoxiaJS.loader.display(elementParent.find('input[name="evaluatorJob"]'));
+
+	$.ajax({
+		url:  document.URL + '&action=getEvaluatorJob&token='+token,
+		type: "POST",
+		processData: false,
+		data: JSON.stringify({
+			userID: userID
+		}),
+		contentType: false,
+		success: function ( resp ) {
+			elementParent.find('input[name="evaluatorJob"]').val($(resp).find('input[name="evaluatorJob"]').val())
+			elementParent.find('input[name="evaluatorJob"]').removeClass('wpeo-loader')
+		},
+		error: function ( resp ) {
+		}
+	});
+
+	// Rend le bouton "active".
+	window.eoxiaJS.evaluator.haveDataInInput(elementParent);
+}
+
+/**
+ * Check value on evaluatorUser.
+ *
+ * @since   9.6.0
+ * @version 9.6.0
+ *
+ * @param  elementParent --- Parent element
+ * @return {void}
+ */
+window.eoxiaJS.evaluator.haveDataInInput = function( elementParent ) {
+	var element = elementParent.parent().parent();
+
+	if (element.hasClass('evaluator-add-modal')) {
+		var evaluator_user = element.find('#fk_user_employer');
+		if ( evaluator_user.val() > 0 ) {
+			element.find('.button-disable').removeClass('button-disable');
+		} else {
+			element.find('.evaluator-create').addClass('button-disable');
+		}
+	}
 };
 
 /**
@@ -3345,9 +3387,10 @@ window.eoxiaJS.evaluator.createEvaluator = function ( event ) {
 	var userName = $('#select2-fk_user_employer-container').attr('title')
 	var userID = $('#fk_user_employer').find("option:contains('"+userName+"')").attr('value')
 
-	var date = elementEvaluator.find('#EvaluatorDate').val();
-
+	var date     = elementEvaluator.find('#EvaluatorDate').val();
 	var duration = elementEvaluator.find('.evaluator-duration .duration').val();
+	var job      = elementEvaluator.find('.evaluatorJob').val();
+
 	let elementParent = $(this).closest('.fichecenter').find('.div-table-responsive');
 
 	window.eoxiaJS.loader.display(elementParent);
@@ -3360,7 +3403,8 @@ window.eoxiaJS.evaluator.createEvaluator = function ( event ) {
 		data: JSON.stringify({
 			evaluatorID: userID,
 			date: date,
-			duration: duration
+			duration: duration,
+			job: job
 		}),
 		processData: false,
 		contentType: false,
@@ -3557,8 +3601,9 @@ window.eoxiaJS.ticket.event = function() {
 	$( document ).on( 'click', '.ticket-subCategory', window.eoxiaJS.ticket.selectSubCategory );
 	$( document ).on( 'submit', '#sendFile', window.eoxiaJS.ticket.tmpStockFile );
 	$( document ).on( 'click', '.linked-file-delete', window.eoxiaJS.ticket.removeFile );
-	$( document ).on( 'change', '.add-dashboard-info', window.eoxiaJS.ticket.addDashBoardInfo );
-	$( document ).on( 'click', '.close-dashboard-info', window.eoxiaJS.ticket.closeDashBoardInfo );
+	$( document ).on( 'change', '.add-dashboard-info', window.eoxiaJS.ticket.addDashBoardTicketInfo );
+	$( document ).on( 'click', '.close-dashboard-info', window.eoxiaJS.ticket.closeDashBoardTicketInfo );
+	$( document ).on( 'keyup', '.email', window.eoxiaJS.ticket.checkValidEmail );
 };
 
 /**
@@ -3704,7 +3749,7 @@ window.eoxiaJS.ticket.removeFile = function( event ) {
  *
  * @return {void}
  */
-window.eoxiaJS.ticket.addDashBoardInfo = function() {
+window.eoxiaJS.ticket.addDashBoardTicketInfo = function() {
 	let selectTitle = $('#select2-boxcombo-container').attr('title')
 	let digiriskelementID = selectTitle.split(' : ')[0];
 	let catID = selectTitle.split(' : ')[2];
@@ -3739,7 +3784,7 @@ window.eoxiaJS.ticket.addDashBoardInfo = function() {
  *
  * @return {void}
  */
-window.eoxiaJS.ticket.closeDashBoardInfo = function() {
+window.eoxiaJS.ticket.closeDashBoardTicketInfo = function() {
 	let box = $(this);
 	let digiriskelementID = $(this).attr('data-digiriskelementid');
 	let catID = $(this).attr('data-catid');
@@ -3759,8 +3804,6 @@ window.eoxiaJS.ticket.closeDashBoardInfo = function() {
 		}),
 		contentType: false,
 		success: function ( resp ) {
-			console.log(resp)
-			console.log($(resp).find('.add-widget-box').children())
 			box.closest('.box-flex-item').fadeOut(400)
             $('.add-widget-box').attr('style', '')
 			$('.add-widget-box').html($(resp).find('.add-widget-box').children())
@@ -3768,6 +3811,23 @@ window.eoxiaJS.ticket.closeDashBoardInfo = function() {
 		error: function ( ) {
 		}
 	});
+};
+
+/**
+ * Check if email is valid
+ *
+ * @since   9.6.0
+ * @version 9.6.0
+ *
+ * @return {void}
+ */
+window.eoxiaJS.ticket.checkValidEmail = function() {
+	var reEmail = /^([A-Za-z0-9_\-\.])+\@([A-Za-z0-9_\-\.])+\.([A-Za-z]{2,4})$/;
+	if (reEmail.test(this.value) == false) {
+		$(this).css("border", "3px solid red");
+	} else {
+		$(this).css("border", "3px solid green");
+	}
 };
 
 /**
@@ -3956,7 +4016,6 @@ window.eoxiaJS.keyEvent.keyup = function( event ) {
  */
 window.eoxiaJS.keyEvent.checkUrlFormat = function( event ) {
 	var urlRegex = /[-a-zA-Z0-9@:%._\+~#=]{1,256}\.[a-zA-Z0-9()]{1,6}\b([-a-zA-Z0-9()@:%_\+.~#?&//=]*)?/gi;
-	console.log($('input:focus').val())
 	if ($(this).val().match(urlRegex)) {
 		$(this).attr('style', 'border: solid; border-color: green')
 	} else if ($('input:focus').val().length > 0) {
@@ -4058,36 +4117,38 @@ window.eoxiaJS.menu.toggleMenu = function() {
  * @return {void}
  */
 window.eoxiaJS.menu.setMenu = function() {
-	if ($('.blockvmenu.blockvmenufirst').html().match(/digiriskdolibarr/)) {
-		$('span.vmenu').find('.fa-chevron-circle-left').parent().parent().parent().attr('style', 'cursor:pointer ! important')
+	if ($('.blockvmenu.blockvmenufirst').length > 0) {
+		if ($('.blockvmenu.blockvmenufirst').html().match(/digiriskdolibarr/)) {
+			$('span.vmenu').find('.fa-chevron-circle-left').parent().parent().parent().attr('style', 'cursor:pointer ! important')
 
-		if (localStorage.maximized == 'false') {
-			$('#id-left').attr('style', 'display:none !important')
+			if (localStorage.maximized == 'false') {
+				$('#id-left').attr('style', 'display:none !important')
+			}
+
+			if (localStorage.maximized == 'false') {
+				var text = '';
+				var menu = $('#id-left').find('a.vmenu, font.vmenudisabled, span.vmenu');
+				var elementParent = $(document).find('div.vmenu')
+
+				menu.each(function () {
+					text = $(this).html().split('</i>');
+					$(this).attr('title', text[1])
+					$(this).html(text[0]);
+				});
+
+				$('#id-left').attr('style', 'display:block !important')
+				$('div.menu_titre').attr('style', 'width: 50px !important')
+				$('span.vmenu').attr('title', ' Agrandir le menu')
+
+				$('span.vmenu').html($('span.vmenu').html())
+				$('span.vmenu').find('.fa-chevron-circle-left').removeClass('fa-chevron-circle-left').addClass('fa-chevron-circle-right');
+
+				elementParent.css('width', '30px');
+				elementParent.find('.blockvmenusearch').hide();
+			}
+			localStorage.setItem('currentString', '')
+			localStorage.setItem('keypressNumber', 0)
 		}
-
-		if (localStorage.maximized == 'false') {
-			var text = '';
-			var menu = $('#id-left').find('a.vmenu, font.vmenudisabled, span.vmenu');
-			var elementParent = $(document).find('div.vmenu')
-
-			menu.each(function () {
-				text = $(this).html().split('</i>');
-				$(this).attr('title', text[1])
-				$(this).html(text[0]);
-			});
-
-			$('#id-left').attr('style', 'display:block !important')
-			$('div.menu_titre').attr('style', 'width: 50px !important')
-			$('span.vmenu').attr('title', ' Agrandir le menu')
-
-			$('span.vmenu').html($('span.vmenu').html())
-			$('span.vmenu').find('.fa-chevron-circle-left').removeClass('fa-chevron-circle-left').addClass('fa-chevron-circle-right');
-
-			elementParent.css('width', '30px');
-			elementParent.find('.blockvmenusearch').hide();
-		}
-		localStorage.setItem('currentString', '')
-		localStorage.setItem('keypressNumber', 0)
 	}
 };
 
@@ -4133,7 +4194,7 @@ window.eoxiaJS.accident.event = function() {
  *
  * @return {void}
  */
-window.eoxiaJS.accident.tmpStockFile = function(id) {
+window.eoxiaJS.accident.tmpStockFile = function(id, subaction = '') {
 	var files = $('#sendfile').prop('files');
 
 	const formData = new FormData();
@@ -4143,14 +4204,15 @@ window.eoxiaJS.accident.tmpStockFile = function(id) {
 	}
 
 	let token = $('.div-table-responsive-no-min').find('input[name="token"]').val();
-
+	let subactionPost = subaction.length > 0 ? '&subaction=' + subaction : ''
 	$.ajax({
-		url: document.URL + '&action=sendfile&objectlineid=' + id + '&token=' + token,
+		url: document.URL + '&action=sendfile&objectlineid=' + id + '&token=' + token + subactionPost,
 		type: "POST",
 		processData: false,
 		contentType: false,
 		data: formData,
 		success: function ( resp ) {
+			// ca ne marche pas car l'action ici est sendfile et plus editline donc le % resp ne peut pas contenir la réponse
 			$('#sendFileForm' + id).html($(resp).find('#fileLinkedTable' + id))
 		},
 		error: function ( ) {
@@ -4169,12 +4231,13 @@ window.eoxiaJS.accident.tmpStockFile = function(id) {
 
 window.eoxiaJS.accident.removeFile = function( event ) {
 	let filetodelete = $(this).attr('value');
+	let subActionPost = $(this).hasClass('edit-line') ? '&subaction=editline' : ''
 	filetodelete = filetodelete.replace('_mini', '')
 	let objectlineid = $(this).closest('.objectline').attr('value')
 	let token = $('.div-table-responsive-no-min').find('input[name="token"]').val();
 
 	$.ajax({
-		url: document.URL + '&action=removefile&filetodelete='+filetodelete+'&objectlineid='+objectlineid+'&token='+token,
+		url: document.URL + '&action=removefile&filetodelete='+filetodelete+'&objectlineid='+objectlineid+'&token='+token+subActionPost,
 		type: "POST",
 		processData: false,
 		contentType: false,
@@ -4270,9 +4333,9 @@ window.eoxiaJS.dashboard.event = function() {
  * @return {void}
  */
 window.eoxiaJS.dashboard.addDashBoardInfo = function() {
-	var dashboardWidgetName = document.getElementById('dashBoardForm');
-	var formData = new FormData(dashboardWidgetName);
-	let widgetName = formData.get('boxcombo')
+	var dashboardWidgetForm = document.getElementById('dashBoardForm');
+	var formData = new FormData(dashboardWidgetForm);
+	let dashboardWidgetName = formData.get('boxcombo')
 	let querySeparator = '?';
 	let token = $('.dashboard').find('input[name="token"]').val();
 	document.URL.match(/\?/) ? querySeparator = '&' : 1
@@ -4282,7 +4345,7 @@ window.eoxiaJS.dashboard.addDashBoardInfo = function() {
 		type: "POST",
 		processData: false,
 		data: JSON.stringify({
-			widgetName: widgetName
+			dashboardWidgetName: dashboardWidgetName
 		}),
 		contentType: false,
 		success: function ( resp ) {
@@ -4306,7 +4369,6 @@ window.eoxiaJS.dashboard.closeDashBoardInfo = function() {
 	let dashboardWidgetName = $(this).attr('data-widgetname');
 	let querySeparator = '?';
 	let token = $('.dashboard').find('input[name="token"]').val();
-
 	document.URL.match(/\?/) ? querySeparator = '&' : 1
 
 	$.ajax({
@@ -4325,4 +4387,38 @@ window.eoxiaJS.dashboard.closeDashBoardInfo = function() {
 		error: function ( ) {
 		}
 	});
+};
+
+/**
+ * Initialise l'objet "file" ainsi que la méthode "init" obligatoire pour la bibliothèque EoxiaJS.
+ *
+ * @since   1.1.0
+ * @version 1.1.0
+ */
+window.eoxiaJS.file = {};
+
+/**
+ * La méthode appelée automatiquement par la bibliothèque EoxiaJS.
+ *
+ * @since   1.1.0
+ * @version 1.1.0
+ *
+ * @return {void}
+ */
+window.eoxiaJS.file.init = function() {
+};
+
+/**
+ * Close widget dashboard info
+ *
+ * @since   9.5.0
+ * @version 9.5.0
+ *
+ * @return {void}
+ */
+window.eoxiaJS.file.getThumbName = function(file, type = 'small') {
+	let fileExtension = file.split('.').pop();
+	let fileName = file.split('.'+fileExtension)[0]
+	let thumbName = fileName + '_' + type + '.' + fileExtension
+	return thumbName;
 };

@@ -24,8 +24,6 @@
 // Put here all includes required by your class file
 require_once DOL_DOCUMENT_ROOT . '/core/class/commonobject.class.php';
 require_once DOL_DOCUMENT_ROOT . '/core/lib/files.lib.php';
-require_once __DIR__ . '/riskanalysis/risk.class.php';
-require_once __DIR__ . '/riskanalysis/riskassessment.class.php';
 
 /**
  * Class for DigiriskElement
@@ -82,23 +80,24 @@ class DigiriskElement extends CommonObject
 	 * @var array  Array with all fields and their property. Do not use it as a static var. It may be modified by constructor.
 	 */
 	public $fields = array(
-		'rowid'         => array('type' => 'integer', 'label' => 'TechnicalID', 'enabled' => '1', 'position' => 1, 'notnull' => 1, 'visible' => 0, 'noteditable' => '1', 'index' => 1, 'comment' => "Id"),
-		'ref'           => array('type' => 'varchar(128)', 'label' => 'Ref', 'enabled' => '1', 'position' => 10, 'notnull' => 1, 'visible' => 1, 'noteditable' => '1', 'default' => '(PROV)', 'index' => 1, 'searchall' => 1, 'showoncombobox' => '1', 'comment' => "Reference of object"),
-		'ref_ext'       => array('type' => 'varchar(128)', 'label' => 'RefExt', 'enabled' => '1', 'position' => 20, 'notnull' => 0, 'visible' => 0,),
-		'entity'        => array('type' => 'integer', 'label' => 'Entity', 'enabled' => '1', 'position' => 30, 'notnull' => 1, 'visible' => -1,),
-		'date_creation' => array('type' => 'datetime', 'label' => 'DateCreation', 'enabled' => '1', 'position' => 40, 'notnull' => 1, 'visible' => -2,),
-		'tms'           => array('type' => 'timestamp', 'label' => 'DateModification', 'enabled' => '1', 'position' => 50, 'notnull' => 0, 'visible' => -2,),
-		'import_key'    => array('type' => 'integer', 'label' => 'ImportId', 'enabled' => '1', 'position' => 60, 'notnull' => 1, 'visible' => -2,),
-		'status'        => array('type' => 'smallint', 'label' => 'Status', 'enabled' => '1', 'position' => 70, 'notnull' => 1, 'default' => 1, 'visible' => 1, 'index' => 1,),
-		'label'         => array('type' => 'varchar(255)', 'label' => 'Label', 'enabled' => '1', 'position' => 80, 'notnull' => 1, 'visible' => 1, 'searchall' => 1, 'css' => 'minwidth400', 'help' => "Help text", 'showoncombobox' => '1',),
-		'description'   => array('type' => 'textarea', 'label' => 'Description', 'enabled' => '1', 'position' => 90, 'notnull' => 0, 'visible' => 3,),
-		'element_type'  => array('type' => 'varchar(50)', 'label' => 'ElementType', 'enabled' => '1', 'position' => 100, 'notnull' => -1, 'visible' => 1,),
-		'photo'         => array('type' => 'varchar(255)', 'label' => 'Photo', 'enabled' => '1', 'position' => 105, 'notnull' => -1, 'visible' => -2,),
-		'fk_user_creat' => array('type' => 'integer:User:user/class/user.class.php', 'label' => 'UserAuthor', 'enabled' => '1', 'position' => 110, 'notnull' => 1, 'visible' => -2, 'foreignkey' => 'user.rowid',),
-		'fk_user_modif' => array('type' => 'integer:User:user/class/user.class.php', 'label' => 'UserModif', 'enabled' => '1', 'position' => 120, 'notnull' => -1, 'visible' => -2,),
-		'fk_parent'     => array('type' => 'integer', 'label' => 'ParentElement', 'enabled' => '1', 'position' => 130, 'notnull' => 1, 'visible' => 1, 'default' => 0,),
-		'fk_standard'   => array('type' => 'integer', 'label' => 'Standard', 'enabled' => '1', 'position' => 140, 'notnull' => 1, 'visible' => 0, 'default' => 1,),
-		'ranks'         => array('type' => 'integer', 'label' => 'Order', 'enabled' => '1', 'position' => 150, 'notnull' => 1, 'visible' => 0),
+		'rowid'            => array('type' => 'integer', 'label' => 'TechnicalID', 'enabled' => '1', 'position' => 1, 'notnull' => 1, 'visible' => 0, 'noteditable' => '1', 'index' => 1, 'comment' => "Id"),
+		'ref'              => array('type' => 'varchar(128)', 'label' => 'Ref', 'enabled' => '1', 'position' => 10, 'notnull' => 1, 'visible' => 1, 'noteditable' => '1', 'default' => '(PROV)', 'index' => 1, 'searchall' => 1, 'showoncombobox' => '1', 'comment' => "Reference of object"),
+		'ref_ext'          => array('type' => 'varchar(128)', 'label' => 'RefExt', 'enabled' => '1', 'position' => 20, 'notnull' => 0, 'visible' => 0,),
+		'entity'           => array('type' => 'integer', 'label' => 'Entity', 'enabled' => '1', 'position' => 30, 'notnull' => 1, 'visible' => -1,),
+		'date_creation'    => array('type' => 'datetime', 'label' => 'DateCreation', 'enabled' => '1', 'position' => 40, 'notnull' => 1, 'visible' => -2,),
+		'tms'              => array('type' => 'timestamp', 'label' => 'DateModification', 'enabled' => '1', 'position' => 50, 'notnull' => 0, 'visible' => -2,),
+		'import_key'       => array('type' => 'integer', 'label' => 'ImportId', 'enabled' => '1', 'position' => 60, 'notnull' => 1, 'visible' => -2,),
+		'status'           => array('type' => 'smallint', 'label' => 'Status', 'enabled' => '1', 'position' => 70, 'notnull' => 1, 'default' => 1, 'visible' => 1, 'index' => 1,),
+		'label'            => array('type' => 'varchar(255)', 'label' => 'Label', 'enabled' => '1', 'position' => 80, 'notnull' => 1, 'visible' => 1, 'searchall' => 1, 'css' => 'minwidth400', 'help' => "Help text", 'showoncombobox' => '1',),
+		'description'      => array('type' => 'textarea', 'label' => 'Description', 'enabled' => '1', 'position' => 90, 'notnull' => 0, 'visible' => 3,),
+		'element_type'     => array('type' => 'varchar(50)', 'label' => 'ElementType', 'enabled' => '1', 'position' => 100, 'notnull' => -1, 'visible' => 1,),
+		'photo'            => array('type' => 'varchar(255)', 'label' => 'Photo', 'enabled' => '1', 'position' => 105, 'notnull' => -1, 'visible' => -2,),
+		'show_in_selector' => array('type' => 'boolean', 'label' => 'ShowInSelectOnPublicTicketInterface', 'enabled' => '1', 'position' => 106, 'notnull' => 1, 'visible' => 1, 'default' => 1,),
+		'fk_user_creat'    => array('type' => 'integer:User:user/class/user.class.php', 'label' => 'UserAuthor', 'enabled' => '1', 'position' => 110, 'notnull' => 1, 'visible' => -2, 'foreignkey' => 'user.rowid',),
+		'fk_user_modif'    => array('type' => 'integer:User:user/class/user.class.php', 'label' => 'UserModif', 'enabled' => '1', 'position' => 120, 'notnull' => -1, 'visible' => -2,),
+		'fk_parent'        => array('type' => 'integer', 'label' => 'ParentElement', 'enabled' => '1', 'position' => 130, 'notnull' => 1, 'visible' => 1, 'default' => 0,),
+		'fk_standard'      => array('type' => 'integer', 'label' => 'Standard', 'enabled' => '1', 'position' => 140, 'notnull' => 1, 'visible' => 0, 'default' => 1,),
+		'ranks'            => array('type' => 'integer', 'label' => 'Order', 'enabled' => '1', 'position' => 150, 'notnull' => 1, 'visible' => 0),
 	);
 
 	public $rowid;
@@ -113,6 +112,7 @@ class DigiriskElement extends CommonObject
 	public $description;
 	public $element_type;
 	public $photo;
+	public $show_in_selector;
 	public $fk_user_creat;
 	public $fk_user_modif;
 	public $fk_parent;
@@ -355,42 +355,6 @@ class DigiriskElement extends CommonObject
 	}
 
 	/**
-	 * Get riskassessment categorires number
-	 *
-	 * @return array
-	 * @throws Exception
-	 */
-	public function getRiskAssessmentCategoriesNumber()
-	{
-		$risk          = new Risk($this->db);
-		if ($this->id > 0) {
-			$risks         = $risk->fetchFromParent($this->id);
- 		} else {
-			$risks = $risk->fetchRisksOrderedByCotation(0, true, false, true);
-		}
-
-		$scale_counter = array(
-			1 => 0,
-			2 => 0,
-			3 => 0,
-			4 => 0
-		);
-		if ( ! empty($risks) && $risks > 0) {
-			foreach ($risks as $risk) {
-				$riskassessment = new RiskAssessment($this->db);
-				$riskassessment = $riskassessment->fetchFromParent($risk->id, 1);
-				if ( ! empty($riskassessment) && $riskassessment > 0 && is_array($riskassessment)) {
-					$riskassessment         = array_shift($riskassessment);
-					$scale                  = $riskassessment->get_evaluation_scale();
-					$scale_counter[$scale] += 1;
-				}
-			}
-		}
-
-		return $scale_counter;
-	}
-
-	/**
 	 *  Output html form to select a third party.
 	 *  Note, you must use the select_company to get the component to select a third party. This function must only be called by select_company.
 	 *
@@ -452,7 +416,7 @@ class DigiriskElement extends CommonObject
 			}
 		}
 
-		$sql .= $this->db->order("rowid", "ASC");
+		$sql .= $this->db->order("ranks", "ASC");
 		$sql .= $this->db->plimit($limit, 0);
 
 		// Build output string
@@ -476,13 +440,25 @@ class DigiriskElement extends CommonObject
 
 			if ( ! $noroot) $out .= '<option value="0" selected>' . $langs->trans('Root') . ' : ' . $conf->global->MAIN_INFO_SOCIETE_NOM . '</option>';
 
+			$digiriskelementlist = $this->fetchDigiriskElementFlat(0);
+
+			if ( ! empty($digiriskelementlist) ) {
+				foreach ($digiriskelementlist as $line) {
+					$depthHyphens = '';
+					for ($k = 0; $k < $line['depth']; $k++) {
+						$depthHyphens .= '- ';
+					}
+					$depth[$line['object']->id] = $depthHyphens;
+				}
+			}
+
 			if ($num) {
 				while ($i < $num) {
 					$obj   = $this->db->fetch_object($resql);
 					if ((!empty($conf->global->DIGIRISKDOLIBARR_SHOW_SHARED_RISKS) && $contextpage == 'sharedrisk') || (!empty($conf->global->DIGIRISKDOLIBARR_SHOW_SHARED_RISKSIGNS) && $contextpage == 'sharedrisksign')) {
-						$label = 'S'. $obj->entity . ' - ' . $obj->ref . ' - ' . $obj->label;
+						$label = $depth[$obj->rowid] . 'S'. $obj->entity . ' - ' . $obj->ref . ' - ' . $obj->label;
 					} else {
-						$label =  $obj->ref . ' - ' . $obj->label;
+						$label = $depth[$obj->rowid] . $obj->ref . ' - ' . $obj->label;
 					}
 
 					if (empty($outputmode)) {
@@ -676,5 +652,24 @@ class DigiriskElement extends CommonObject
 		} else {
 			return array();
 		}
+	}
+
+	/**
+	 *  Return list of parent ids for an element
+	 *
+	 * 	@return    array  Array with ids
+	 * 	@throws Exception
+	 */
+	public function getBranch($parent_id)
+	{
+		$object = new self($this->db);
+		$object->fetch($parent_id);
+		$branch_ids = array($parent_id);
+
+		while ($object->fk_parent > 0) {
+			$branch_ids[] = $object->fk_parent;
+			$object->fetch($object->fk_parent);
+		}
+		return $branch_ids;
 	}
 }

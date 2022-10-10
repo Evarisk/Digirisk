@@ -23,6 +23,8 @@
 
 require_once DOL_DOCUMENT_ROOT . '/core/class/commonobject.class.php';
 
+require_once __DIR__ . '/dashboarddigiriskstats.class.php';
+
 /**
  * Class for Evaluator
  */
@@ -83,6 +85,7 @@ class Evaluator extends CommonObject
 		'status'          => array('type' => 'smallint', 'label' => 'Status', 'enabled' => '1', 'position' => 70, 'notnull' => 0, 'visible' => 0, 'index' => 1,),
 		'duration'        => array('type' => 'smallint', 'label' => 'EvaluationDuration', 'enabled' => '1', 'position' => 80, 'notnull' => 0, 'visible' => 1, 'index' => 1,),
 		'assignment_date' => array('type' => 'datetime', 'label' => 'AssignmentDate', 'enabled' => '1', 'position' => 90, 'notnull' => 1, 'visible' => 1,),
+		'job'             => array('type' => 'varchar(80)', 'label' => 'PostOrFunction', 'enabled' => '1', 'position' => 140, 'notnull' => 0, 'visible' => 1,),
 		'fk_user_creat'   => array('type' => 'integer:User:user/class/user.class.php', 'label' => 'UserAuthor', 'enabled' => '1', 'position' => 110, 'notnull' => 1, 'visible' => 0, 'foreignkey' => 'user.rowid',),
 		'fk_user_modif'   => array('type' => 'integer:User:user/class/user.class.php', 'label' => 'UserModif', 'enabled' => '1', 'position' => 120, 'notnull' => -1, 'visible' => 0,),
 		'fk_user'         => array('type' => 'integer:User:user/class/user.class.php', 'label' => 'UserAssigned', 'enabled' => '1', 'position' => 130, 'notnull' => 1, 'visible' => 1, 'default' => 0,),
@@ -99,6 +102,7 @@ class Evaluator extends CommonObject
 	public $status;
 	public $duration;
 	public $assignment_date;
+	public $post;
 	public $fk_user_creat;
 	public $fk_user_modif;
 	public $fk_user;
@@ -184,10 +188,11 @@ class Evaluator extends CommonObject
 	 * @param int $offset Offset
 	 * @param array $filter Filter array. Example array('field'=>'valueforlike', 'customurl'=>...)
 	 * @param string $filtermode Filter mode (AND or OR)
+	 * @param  string  $groupby add GROUP BY key word
 	 * @return array|int                 int <0 if KO, array of pages if OK
 	 * @throws Exception
 	 */
-	public function fetchAll($sortorder = '', $sortfield = '', $limit = 0, $offset = 0, array $filter = array(), $filtermode = 'AND')
+	public function fetchAll($sortorder = '', $sortfield = '', $limit = 0, $offset = 0, array $filter = array(), $filtermode = 'AND', $groupby = '')
 	{
 		dol_syslog(__METHOD__, LOG_DEBUG);
 
@@ -215,6 +220,10 @@ class Evaluator extends CommonObject
 		}
 		if (count($sqlwhere) > 0) {
 			$sql .= ' AND (' . implode(' ' . $filtermode . ' ', $sqlwhere) . ')';
+		}
+
+		if (!empty($groupby)) {
+			$sql .= ' GROUP BY ' . $groupby;
 		}
 
 		if ( ! empty($sortfield)) {
@@ -317,5 +326,73 @@ class Evaluator extends CommonObject
 		} else {
 			dol_print_error($this->db);
 		}
+	}
+
+	/**
+	 * Load dashboard info evaluator.
+	 * - get number employees involved
+	 *
+	 * @return array
+	 * @throws Exception
+	 */
+	public function load_dashboard()
+	{
+		global $conf, $langs;
+
+		$arrayNbEmployeesInvolved = $this->getNbEmployeesInvolved();
+		$arrayNbEmployees         = $this->getNbEmployees();
+
+		$array['widgets'] = array(
+			DashboardDigiriskStats::DASHBOARD_EVALUATOR => array(
+				'label'      => array($langs->transnoentities("NbEmployeesInvolved"), $langs->transnoentities("NbEmployees")),
+				'content'    => array($arrayNbEmployeesInvolved['nbemployeesinvolved'], $arrayNbEmployees['nbemployees']),
+				'tooltip'    => array($langs->transnoentities("NbEmployeesInvolvedTooltip"), (($conf->global->DIGIRISKDOLIBARR_NB_EMPLOYEES > 0 && $conf->global->DIGIRISKDOLIBARR_MANUAL_INPUT_NB_EMPLOYEES) ? $langs->transnoentities("NbEmployeesConfTooltip") : $langs->transnoentities("NbEmployeesTooltip"))),
+				'picto'      => 'fas fa-user-check',
+				'widgetName' => $langs->transnoentities('Evaluator')
+			)
+		);
+
+		return $array;
+	}
+
+	/**
+	 * Get number employees involved.
+	 *
+	 * @return array
+	 * @throws Exception
+	 */
+	public function getNbEmployeesInvolved() {
+		// Number employees involved
+		$allevaluators = $this->fetchAll('','', 0, 0, array(), 'AND', 'fk_user');
+		if (is_array($allevaluators) && !empty($allevaluators)) {
+			$array['nbemployeesinvolved'] = count($allevaluators);
+		} else {
+			$array['nbemployeesinvolved'] = 'N/A';
+		}
+		return $array;
+	}
+
+	/**
+	 * Get number employees.
+	 *
+	 * @return array
+	 * @throws Exception
+	 */
+	public function getNbEmployees() {
+		global $conf;
+
+		// Number employees
+		if ($conf->global->DIGIRISKDOLIBARR_NB_EMPLOYEES > 0 && $conf->global->DIGIRISKDOLIBARR_MANUAL_INPUT_NB_EMPLOYEES) {
+			$array['nbemployees'] = $conf->global->DIGIRISKDOLIBARR_NB_EMPLOYEES;
+		} else {
+			$user = new User($this->db);
+			$allusers = $user->get_full_tree(0, 'u.employee = 1');
+			if (!empty($allusers) && is_array($allusers)) {
+				$array['nbemployees'] = count($allusers);
+			} else {
+				$array['nbemployees'] = 'N/A';
+			}
+		}
+		return $array;
 	}
 }

@@ -214,21 +214,24 @@ class doc_workunitdocument_custom_odt extends ModeleODTWorkUnitDocument
 			$texte .= '</b>';
 		}
 		if ($nbofiles) {
-			$texte .= '<div id="div_' . get_class($this) . '" class="hidden">';
+			$texte .= '<div id="div_' . get_class($this) . '" class="hiddenx">';
+			// Show list of found files
 			foreach ($listoffiles as $file) {
-				$texte .= $file['name'] . '<br>';
+				$texte .= '- '.$file['name'].' &nbsp; <a class="reposition" href="'.DOL_URL_ROOT.'/document.php?modulepart=ecm&file=digiriskdolibarr/workunitdocument/'.urlencode(basename($file['name'])).'">'.img_picto('', 'listlight').'</a>';
+				$texte .= ' &nbsp; <a class="reposition" href="'.$_SERVER["PHP_SELF"].'?modulepart=ecm&keyforuploaddir=DIGIRISKDOLIBARR_WORKUNITDOCUMENT_CUSTOM_ADDON_ODT_PATH&action=deletefile&token='.newToken().'&file='.urlencode(basename($file['name'])).'">'.img_picto('', 'delete').'</a>';
+				$texte .= '<br>';
 			}
 			$texte .= '</div>';
 		}
 		// Add input to upload a new template file.
-		$texte .= '<div>' . $langs->trans("UploadNewTemplate") . ' <input type="file" name="uploadfile">';
+		$texte .= '<div>' . $langs->trans("UploadNewTemplate") . ' <input type="file" name="userfile">';
 		$texte .= '<input type="hidden" value="DIGIRISKDOLIBARR_WORKUNITDOCUMENT_CUSTOM_ADDON_ODT_PATH" name="keyforuploaddir">';
 		$texte .= '<input type="submit" class="button" value="' . dol_escape_htmltag($langs->trans("Upload")) . '" name="upload">';
 		$texte .= '</div>';
 		$texte .= '</td>';
 
 		$texte .= '<td rowspan="2" class="tdtop hideonsmartphone">';
-		$texte .= $langs->trans("ExampleOfDirectoriesForModelGen");
+		$texte .= $langs->trans("PleaseNameTheFile", 'template_workunitdocument_custom.odt');
 		$texte .= '</td>';
 		$texte .= '</tr>';
 
@@ -236,237 +239,5 @@ class doc_workunitdocument_custom_odt extends ModeleODTWorkUnitDocument
 		$texte .= '</form>';
 
 		return $texte;
-	}
-
-	// phpcs:disable PEAR.NamingConventions.ValidFunctionName.ScopeNotCamelCaps
-
-	/**
-	 *  Function to build a document on disk using the generic odt module.
-	 *
-	 * @param WorkUnitDocument $object Object source to build document
-	 * @param Translate $outputlangs Lang output object
-	 * @param string $srctemplatepath Full path of source filename for generator using a template file
-	 * @return        int                            1 if OK, <=0 if KO
-	 * @throws Exception
-	 */
-	public function write_file($object, $outputlangs, $srctemplatepath)
-	{
-		// phpcs:enable
-		global $user, $langs, $conf, $hookmanager, $action;
-
-		if (empty($srctemplatepath)) {
-			dol_syslog("doc_workunitdocument_custom_odt::write_file parameter srctemplatepath empty", LOG_WARNING);
-			return -1;
-		}
-
-		// Add odtgeneration hook
-		if ( ! is_object($hookmanager)) {
-			include_once DOL_DOCUMENT_ROOT . '/core/class/hookmanager.class.php';
-			$hookmanager = new HookManager($this->db);
-		}
-		$hookmanager->initHooks(array('odtgeneration'));
-
-		if ( ! is_object($outputlangs)) $outputlangs = $langs;
-		$outputlangs->charset_output                 = 'UTF-8';
-
-		$outputlangs->loadLangs(array("main", "dict", "companies", "digiriskdolibarr@digiriskdolibarr"));
-
-		$mod = new $conf->global->DIGIRISKDOLIBARR_WORKUNITDOCUMENT_ADDON($this->db);
-		$ref = $mod->getNextValue($object);
-
-		$object->ref = $ref;
-		$object->create($user);
-
-		$dir                                             = $conf->digiriskdolibarr->multidir_output[isset($object->entity) ? $object->entity : 1] . '/workunitdocument';
-		$objectref                                       = dol_sanitizeFileName($ref);
-		if (preg_match('/specimen/i', $objectref)) $dir .= '/specimen';
-
-		if ( ! file_exists($dir)) {
-			if (dol_mkdir($dir) < 0) {
-				$this->error = $langs->transnoentities("ErrorCanNotCreateDir", $dir);
-				return -1;
-			}
-		}
-
-		if (file_exists($dir)) {
-			$filename = preg_split('/workunitdocument\//', $srctemplatepath);
-			$filename = preg_replace('/template_/', '', $filename[1]);
-
-			$filename = $objectref . '_' . $filename;
-
-			$object->last_main_doc = $filename;
-
-			$sql  = "UPDATE " . MAIN_DB_PREFIX . "digiriskdolibarr_digiriskdocuments";
-			$sql .= " SET last_main_doc =" . ( ! empty($filename) ? "'" . $this->db->escape($filename) . "'" : 'null');
-			$sql .= " WHERE rowid = " . $object->id;
-
-			dol_syslog("admin.lib::Insert last main doc", LOG_DEBUG);
-			$this->db->query($sql);
-			$file = $dir . '/' . $filename;
-
-			dol_mkdir($conf->digiriskdolibarr->dir_temp);
-
-			// Make substitution
-			$substitutionarray = array();
-			complete_substitutions_array($substitutionarray, $langs, $object);
-			// Call the ODTSubstitution hook
-			$parameters = array('file' => $file, 'object' => $object, 'outputlangs' => $outputlangs, 'substitutionarray' => &$substitutionarray);
-			$hookmanager->executeHooks('ODTSubstitution', $parameters, $this, $action); // Note that $action and $object may have been modified by some hooks
-
-			// Open and load template
-			require_once ODTPHP_PATH . 'odf.php';
-			try {
-				$odfHandler = new odf(
-					$srctemplatepath,
-					array(
-						'PATH_TO_TMP'	  => $conf->digiriskdolibarr->dir_temp,
-						'ZIP_PROXY'		  => 'PclZipProxy', // PhpZipProxy or PclZipProxy. Got "bad compression method" error when using PhpZipProxy.
-						'DELIMITER_LEFT'  => '{',
-						'DELIMITER_RIGHT' => '}'
-					)
-				);
-			} catch (Exception $e) {
-				$this->error = $e->getMessage();
-				dol_syslog($e->getMessage(), LOG_INFO);
-				return -1;
-			}
-
-			// Define substitution array
-			$substitutionarray            = getCommonSubstitutionArray($outputlangs, 0, null, $object);
-			$array_object_from_properties = $this->get_substitutionarray_each_var_object($object, $outputlangs);
-			$array_object                 = $this->get_substitutionarray_object($object, $outputlangs);
-
-			$tmparray = array_merge($substitutionarray, $array_object_from_properties, $array_object);
-			complete_substitutions_array($tmparray, $outputlangs, $object);
-
-			// Call the ODTSubstitution hook
-			$parameters = array('odfHandler' => &$odfHandler, 'file' => $file, 'object' => $object, 'outputlangs' => $outputlangs, 'substitutionarray' => &$tmparray);
-			$hookmanager->executeHooks('ODTSubstitution', $parameters, $this, $action); // Note that $action and $object may have been modified by some hooks
-
-			foreach ($tmparray as $key => $value) {
-				try {
-					if (preg_match('/logo$/', $key)) { // Image
-						if (file_exists($value)) $odfHandler->setImage($key, $value);
-						else $odfHandler->setVars($key, 'ErrorFileNotFound', true, 'UTF-8');
-					} else // Text
-					{
-						$odfHandler->setVars($key, $value, true, 'UTF-8');
-					}
-				} catch (OdfException $e) {
-					dol_syslog($e->getMessage(), LOG_INFO);
-				}
-			}
-			// Replace tags of lines
-			try {
-				$foundtagforlines = 1;
-				if ($foundtagforlines) {
-					$risk = new Risk($this->db);
-					if ( ! empty($object) ) {
-						$risks = $risk->fetchRisksOrderedByCotation($object->id, false, $conf->global->DIGIRISKDOLIBARR_SHOW_INHERITED_RISKS, $conf->global->DIGIRISKDOLIBARR_SHOW_SHARED_RISKS);
-						if ($risks < 1) {
-							$risks = array();
-						}
-						if (! empty($risks)) {
-							for ($i = 1; $i <= 4; $i++ ) {
-								$listlines = $odfHandler->setSegment('risq' . $i);
-
-								foreach ($risks as $line) {
-									$evaluation     = new RiskAssessment($this->db);
-									$lastEvaluation = $evaluation->fetchFromParent($line->id, 1);
-									if ($lastEvaluation > 0 && ! empty($lastEvaluation) && is_array($lastEvaluation)) {
-										$lastEvaluation = array_shift($lastEvaluation);
-										$scale = $lastEvaluation->get_evaluation_scale();
-
-										if ($scale == $i) {
-											$element = new DigiriskElement($this->db);
-											$element->fetch($line->fk_element);
-											$tmparray['nomElement'] = (!empty($conf->global->DIGIRISKDOLIBARR_SHOW_SHARED_RISKS) ? 'S' . $element->entity . ' - ' : '') . $element->ref . ' - ' . $element->label;
-											$tmparray['nomDanger'] = DOL_DOCUMENT_ROOT . '/custom/digiriskdolibarr/img/categorieDangers/' . $line->get_danger_category($line) . '.png';
-											$tmparray['identifiantRisque'] = $line->ref . ' - ' . $lastEvaluation->ref;
-											$tmparray['quotationRisque'] = $lastEvaluation->cotation;
-											$tmparray['commentaireRisque'] = dol_print_date($lastEvaluation->date_creation, '%A %e %B %G %H:%M') . ': ' . $lastEvaluation->comment;
-
-											unset($tmparray['object_fields']);
-
-											complete_substitutions_array($tmparray, $outputlangs, $object, $line, "completesubstitutionarray_lines");
-											// Call the ODTSubstitutionLine hook
-											$parameters = array('odfHandler' => &$odfHandler, 'file' => $file, 'object' => $object, 'outputlangs' => $outputlangs, 'substitutionarray' => &$tmparray, 'line' => $line);
-											$hookmanager->executeHooks('ODTSubstitutionLine', $parameters, $this, $action); // Note that $action and $object may have been modified by some hooks
-											foreach ($tmparray as $key => $val) {
-												try {
-													if ($val == $tmparray['nomDanger']) {
-														$listlines->setImage($key, $val);
-													} else {
-														$listlines->setVars($key, $val, true, 'UTF-8');
-													}
-												} catch (OdfException $e) {
-													dol_syslog($e->getMessage(), LOG_INFO);
-												} catch (SegmentException $e) {
-													dol_syslog($e->getMessage(), LOG_INFO);
-												}
-											}
-											$listlines->merge();
-										}
-									}
-								}
-								$odfHandler->mergeSegment($listlines);
-							}
-						}
-					}
-				}
-			} catch (OdfException $e) {
-				$this->error = $e->getMessage();
-				dol_syslog($this->error, LOG_WARNING);
-				return -1;
-			}
-
-			// Replace labels translated
-			$tmparray = $outputlangs->get_translations_for_substitutions();
-			foreach ($tmparray as $key => $value) {
-				try {
-					$odfHandler->setVars($key, $value, true, 'UTF-8');
-				} catch (OdfException $e) {
-					dol_syslog($e->getMessage(), LOG_INFO);
-				}
-			}
-
-			// Call the beforeODTSave hook
-			$parameters = array('odfHandler' => &$odfHandler, 'file' => $file, 'object' => $object, 'outputlangs' => $outputlangs, 'substitutionarray' => &$tmparray);
-			$hookmanager->executeHooks('beforeODTSave', $parameters, $this, $action); // Note that $action and $object may have been modified by some hooks
-
-			// Write new file
-			if ( ! empty($conf->global->MAIN_ODT_AS_PDF)) {
-				try {
-					$odfHandler->exportAsAttachedPDF($file);
-				} catch (Exception $e) {
-					$this->error = $e->getMessage();
-					dol_syslog($e->getMessage(), LOG_INFO);
-					return -1;
-				}
-			} else {
-				try {
-					$odfHandler->saveToDisk($file);
-				} catch (Exception $e) {
-					$this->error = $e->getMessage();
-					dol_syslog($e->getMessage(), LOG_INFO);
-					return -1;
-				}
-			}
-
-			$parameters = array('odfHandler' => &$odfHandler, 'file' => $file, 'object' => $object, 'outputlangs' => $outputlangs, 'substitutionarray' => &$tmparray);
-			$hookmanager->executeHooks('afterODTCreation', $parameters, $this, $action); // Note that $action and $object may have been modified by some hooks
-
-//			if ( ! empty($conf->global->MAIN_UMASK))
-//				@chmod($file, octdec($conf->global->MAIN_UMASK));
-
-			$odfHandler = null; // Destroy object
-
-			$this->result = array('fullpath' => $file);
-
-			return 1; // Success
-		} else {
-			$this->error = $langs->transnoentities("ErrorCanNotCreateDir", $dir);
-			return -1;
-		}
 	}
 }
