@@ -124,7 +124,7 @@ if (empty($reshook)) {
 if ($object->id > 0) {
 	$title    = $langs->trans("Accident") . ' - ' . $langs->trans("Agenda");
 	$help_url = 'FR:Module_DigiriskDolibarr';
-	$morejs   = array("/digiriskdolibarr/js/digiriskdolibarr.js.php");
+	$morejs   = array("/digiriskdolibarr/js/digiriskdolibarr.js");
 	$morecss  = array("/digiriskdolibarr/css/digiriskdolibarr.css");
 
 	llxHeader('', $title, $help_url, '', '', '', $morejs, $morecss);

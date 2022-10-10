@@ -93,7 +93,7 @@ if ($reshook < 0) setEventMessages($hookmanager->error, $hookmanager->errors, 'e
 if ($object->id > 0) {
 	$title    = $langs->trans("Register");
 	$help_url = 'FR:Module_DigiriskDolibarr';
-	$morejs   = array("/digiriskdolibarr/js/digiriskdolibarr.js.php");
+	$morejs   = array("/digiriskdolibarr/js/digiriskdolibarr.js");
 	$morecss  = array("/digiriskdolibarr/css/digiriskdolibarr.css");
 
 	digiriskHeader($title, $help_url, $morejs, $morecss);

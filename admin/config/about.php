@@ -61,7 +61,7 @@ $backtopage = GETPOST('backtopage', 'alpha');
 $page_name = "DigiriskdolibarrAbout";
 $help_url  = 'FR:Module_DigiriskDolibarr';
 
-$morejs  = array("/digiriskdolibarr/js/digiriskdolibarr.js.php");
+$morejs  = array("/digiriskdolibarr/js/digiriskdolibarr.js");
 $morecss = array("/digiriskdolibarr/css/digiriskdolibarr.css");
 
 llxHeader('', $langs->trans($page_name), $help_url, '', '', '', $morejs, $morecss);

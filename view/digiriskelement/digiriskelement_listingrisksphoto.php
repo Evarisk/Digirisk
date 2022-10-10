@@ -166,7 +166,7 @@ $emptyobject = new stdClass();
 
 $title    = $langs->trans('ListingRisksPhoto');
 $help_url = 'FR:Module_DigiriskDolibarr#Listing_des_risques_photo';
-$morejs   = array("/digiriskdolibarr/js/digiriskdolibarr.js.php");
+$morejs   = array("/digiriskdolibarr/js/digiriskdolibarr.js");
 $morecss  = array("/digiriskdolibarr/css/digiriskdolibarr.css");
 
 digiriskHeader($title, $help_url, $morejs, $morecss); ?>

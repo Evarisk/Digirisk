@@ -795,7 +795,7 @@ if ($conf->global->DIGIRISKDOLIBARR_CONF_BACKWARD_COMPATIBILITY == 0) {
 	dolibarr_set_const($db, 'DIGIRISKDOLIBARR_MULTIPLE_RISKASSESSMENT_METHOD', dolibarr_get_const($db,'DIGIRISKDOLIBARR_MULTIPLE_RISKASSESSMENT_METHOD'), 'integer', 0, '', $conf->entity);
 	dolibarr_set_const($db, 'DIGIRISKDOLIBARR_ADVANCED_RISKASSESSMENT_METHOD', dolibarr_get_const($db,'DIGIRISKDOLIBARR_ADVANCED_RISKASSESSMENT_METHOD'), 'integer', 0, '', $conf->entity);
 	dolibarr_set_const($db, 'DIGIRISKDOLIBARR_SHOW_RISKASSESSMENT_DATE', dolibarr_get_const($db,'DIGIRISKDOLIBARR_SHOW_RISKASSESSMENT_DATE'), 'integer', 0, '', $conf->entity);
-	dolibarr_set_const($db, 'DIGIRISKDOLIBARR_SHOW_ALL_RISKASESSMENTS', dolibarr_get_const($db,'DIGIRISKDOLIBARR_SHOW_ALL_RISKASESSMENTS'), 'integer', 0, '', $conf->entity);
+	dolibarr_set_const($db, 'DIGIRISKDOLIBARR_SHOW_ALL_RISKASSESSMENTS', dolibarr_get_const($db,'DIGIRISKDOLIBARR_SHOW_ALL_RISKASSESSMENTS'), 'integer', 0, '', $conf->entity);
 
 	// CONST RISK SIGN
 	dolibarr_set_const($db, 'MAIN_AGENDA_ACTIONAUTO_RISKSIGN_CREATE', 1, 'integer', 0, '', $conf->entity);

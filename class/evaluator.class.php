@@ -337,7 +337,7 @@ class Evaluator extends CommonObject
 	 */
 	public function load_dashboard()
 	{
-		global $langs;
+		global $conf, $langs;
 
 		$arrayNbEmployeesInvolved = $this->getNbEmployeesInvolved();
 		$arrayNbEmployees         = $this->getNbEmployees();
@@ -346,7 +346,7 @@ class Evaluator extends CommonObject
 			DashboardDigiriskStats::DASHBOARD_EVALUATOR => array(
 				'label'      => array($langs->transnoentities("NbEmployeesInvolved"), $langs->transnoentities("NbEmployees")),
 				'content'    => array($arrayNbEmployeesInvolved['nbemployeesinvolved'], $arrayNbEmployees['nbemployees']),
-				'tooltip' => array($langs->transnoentities("NbEmployeesInvolvedTooltip"), $langs->transnoentities("NbEmployeesTooltip")),
+				'tooltip'    => array($langs->transnoentities("NbEmployeesInvolvedTooltip"), (($conf->global->DIGIRISKDOLIBARR_NB_EMPLOYEES > 0 && $conf->global->DIGIRISKDOLIBARR_MANUAL_INPUT_NB_EMPLOYEES) ? $langs->transnoentities("NbEmployeesConfTooltip") : $langs->transnoentities("NbEmployeesTooltip"))),
 				'picto'      => 'fas fa-user-check',
 				'widgetName' => $langs->transnoentities('Evaluator')
 			)
@@ -382,12 +382,16 @@ class Evaluator extends CommonObject
 		global $conf;
 
 		// Number employees
-		$user = new User($this->db);
-		$allusers = $user->get_full_tree(0, 'u.entity IN (0,' . $conf->entity . ')');
-		if (!empty($allusers) && is_array($allusers)) {
-			$array['nbemployees'] = count($allusers);
+		if ($conf->global->DIGIRISKDOLIBARR_NB_EMPLOYEES > 0 && $conf->global->DIGIRISKDOLIBARR_MANUAL_INPUT_NB_EMPLOYEES) {
+			$array['nbemployees'] = $conf->global->DIGIRISKDOLIBARR_NB_EMPLOYEES;
 		} else {
-			$array['nbemployees'] = 'N/A';
+			$user = new User($this->db);
+			$allusers = $user->get_full_tree(0, 'u.employee = 1');
+			if (!empty($allusers) && is_array($allusers)) {
+				$array['nbemployees'] = count($allusers);
+			} else {
+				$array['nbemployees'] = 'N/A';
+			}
 		}
 		return $array;
 	}

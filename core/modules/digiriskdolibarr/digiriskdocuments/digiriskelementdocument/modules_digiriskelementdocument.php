@@ -337,8 +337,10 @@ abstract class ModeleODTDigiriskElementDocument extends CommonDocGenerator
 						$odfHandler->mergeSegment($listlines);
 
 						//Fill tickets data
-						$filter = array('ef.digiriskdolibarr_ticket_service' => $digiriskelement->id);
-						$ticket->fetchAll($user, '', '', '', 0, '', $filter);
+						if ($conf->global->DIGIRISKDOLIBARR_DIGIRISKDOLIBARR_TICKET_EXTRAFIELDS == 1) {
+							$filter = array('ef.digiriskdolibarr_ticket_service' => $digiriskelement->id);
+							$ticket->fetchAll($user, '', '', '', 0, '', $filter);
+						}
 						$listlines = $odfHandler->setSegment('tickets');
 						if (is_array($ticket->lines) && !empty($ticket->lines)) {
 							foreach ($ticket->lines as $line) {
@@ -374,6 +376,24 @@ abstract class ModeleODTDigiriskElementDocument extends CommonDocGenerator
 								}
 								$listlines->merge();
 							}
+						} else {
+							$tmparray['refticket']     = $langs->trans('NoData');
+							$tmparray['creation_date'] = $langs->trans('NoData');
+							$tmparray['subject']       = $langs->trans('NoData');
+							$tmparray['progress']      = $langs->trans('NoData');
+							$tmparray['status']        = $langs->trans('NoData');
+							foreach ($tmparray as $key => $val) {
+								try {
+									if (empty($val)) {
+										$listlines->setVars($key, $langs->trans('NoData'), true, 'UTF-8');
+									} else {
+										$listlines->setVars($key, html_entity_decode($val, ENT_QUOTES | ENT_HTML5), true, 'UTF-8');
+									}
+								} catch (SegmentException $e) {
+									dol_syslog($e->getMessage());
+								}
+							}
+							$listlines->merge();
 						}
 						$odfHandler->mergeSegment($listlines);
 					}

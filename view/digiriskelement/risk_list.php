@@ -199,7 +199,7 @@ $form = new Form($db);
 
 $title    = $langs->trans("RiskList");
 $help_url = 'FR:Module_DigiriskDolibarr';
-$morejs   = array("/digiriskdolibarr/js/digiriskdolibarr.js.php");
+$morejs   = array("/digiriskdolibarr/js/digiriskdolibarr.js");
 $morecss  = array("/digiriskdolibarr/css/digiriskdolibarr.css");
 
 llxHeader('', $title, $help_url, '', '', '', $morejs, $morecss);
@@ -209,7 +209,7 @@ llxHeader('', $title, $help_url, '', '', '', $morejs, $morecss);
 $allRisks = 1;
 require_once './../../core/tpl/medias/digiriskdolibarr_medias_gallery_modal.tpl.php';
 if (!empty($conf->global->DIGIRISKDOLIBARR_SHOW_RISKS)) {
-	$contextpage = 'riskcard';
+	$contextpage = 'risklist';
 	require_once './../../core/tpl/riskanalysis/risk/digiriskdolibarr_risklist_view.tpl.php';
 }
 if (!empty($conf->global->DIGIRISKDOLIBARR_SHOW_SHARED_RISKS)) {

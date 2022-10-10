@@ -193,7 +193,7 @@ if ($action == 'setModuleOptions') {
 $help_url = 'FR:Module_DigiriskDolibarr#L.27onglet_Document_Digirisk';
 $title    = $langs->trans("YourDocuments");
 
-$morejs   = array("/digiriskdolibarr/js/digiriskdolibarr.js.php");
+$morejs   = array("/digiriskdolibarr/js/digiriskdolibarr.js");
 $morecss  = array("/digiriskdolibarr/css/digiriskdolibarr.css");
 
 llxHeader('', $title, $help_url, '', '', '', $morejs, $morecss);

@@ -132,7 +132,7 @@ $form = new Form($db);
 $help_url = 'FR:Module_DigiriskDolibarr#L.27onglet_S.C3.A9curit.C3.A9';
 $title    = $langs->trans("CompanyFoundation") . ' - ' . $langs->trans("Security");
 
-$morejs  = array("/digiriskdolibarr/js/digiriskdolibarr.js.php");
+$morejs  = array("/digiriskdolibarr/js/digiriskdolibarr.js");
 $morecss = array("/digiriskdolibarr/css/digiriskdolibarr.css");
 
 $counter = 0;

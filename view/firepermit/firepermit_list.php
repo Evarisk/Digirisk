@@ -183,7 +183,7 @@ $formother = new FormOther($db);
 $title    = $langs->trans("FirePermitList");
 $help_url = '';
 
-$morejs  = array("/digiriskdolibarr/js/digiriskdolibarr.js.php");
+$morejs  = array("/digiriskdolibarr/js/digiriskdolibarr.js");
 $morecss = array("/digiriskdolibarr/css/digiriskdolibarr.css");
 
 llxHeader("", $title, $help_url, '', '', '', $morejs, $morecss);

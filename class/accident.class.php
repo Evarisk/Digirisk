@@ -24,6 +24,7 @@
 require_once DOL_DOCUMENT_ROOT . '/user/class/user.class.php';
 require_once DOL_DOCUMENT_ROOT . '/contact/class/contact.class.php';
 require_once DOL_DOCUMENT_ROOT . '/societe/class/societe.class.php';
+require_once DOL_DOCUMENT_ROOT . '/categories/class/categorie.class.php';
 
 require_once __DIR__ . '/../lib/digiriskdolibarr_function.lib.php';
 require_once __DIR__ . '/digiriskdocuments.class.php';
@@ -488,29 +489,35 @@ class Accident extends CommonObject
 	 */
 	public function load_dashboard()
 	{
-		global $langs;
+		global $conf, $langs;
 
-		$arrayNbDaysWithoutAccident  = $this->getNbDaysWithoutAccident();
-		$arrayNbAccidents            = $this->getNbAccidents();
-		$arrayNbWorkstopDays         = $this->getNbWorkstopDays();
-		$arrayNbAccidentsByEmployees = $this->getNbAccidentsByEmployees();
-		$arrayFrequencyIndex         = $this->getFrequencyIndex();
-		$arrayFrequencyRate          = $this->getFrequencyRate();
+		$arrayNbDaysWithoutAccident    = $this->getNbDaysWithoutAccident();
+		$arrayNbAccidents              = $this->getNbAccidents();
+		$arrayNbWorkstopDays           = $this->getNbWorkstopDays();
+		$arrayNbAccidentsByEmployees   = $this->getNbAccidentsByEmployees();
+		$arrayNbPresquAccidents        = $this->getNbPresquAccidents();
+		$arrayNbAccidentInvestigations = $this->getNbAccidentInvestigations();
+		$arrayFrequencyIndex           = $this->getFrequencyIndex();
+		$arrayFrequencyRate            = $this->getFrequencyRate();
 		//$arrayGravityIndex           = $this->getGravityIndex();
-		$arrayGravityRate            = $this->getGravityRate();
+		$arrayGravityRate              = $this->getGravityRate();
 
 		$array['widgets'] = array(
 			DashboardDigiriskStats::DASHBOARD_ACCIDENT => array(
-				'label'      => array($langs->transnoentities("DayWithoutAccident"), $langs->transnoentities("WorkStopDays"), $langs->transnoentities("NbAccidentsByEmployees")),
-				'content'    => array($arrayNbDaysWithoutAccident['daywithoutaccident'], $arrayNbWorkstopDays['nbworkstopdays'], $arrayNbAccidentsByEmployees['nbaccidentsbyemployees']),
+				'label'      => array($langs->transnoentities("DayWithoutAccident"), $langs->transnoentities("WorkStopDays"), $langs->transnoentities("NbAccidentsByEmployees"), $langs->transnoentities("NbPresquAccidents"), $langs->transnoentities("NbAccidentInvestigations")),
+				'content'    => array($arrayNbDaysWithoutAccident['daywithoutaccident'], $arrayNbWorkstopDays['nbworkstopdays'], $arrayNbAccidentsByEmployees['nbaccidentsbyemployees'], $arrayNbPresquAccidents['nbpresquaccidents'], $arrayNbAccidentInvestigations['nbaccidentinvestigations']),
 				'picto'      => 'fas fa-user-injured',
 				'widgetName' => $langs->transnoentities('Accident')
 			),
 			DashboardDigiriskStats::DASHBOARD_ACCIDENT_INDICATOR_RATE => array(
-				'label' => array($langs->transnoentities("FrequencyIndex"), $langs->transnoentities("FrequencyRate"), $langs->transnoentities("GravityRate")),
-				'content' => array($arrayFrequencyIndex['frequencyindex'], $arrayFrequencyRate['frequencyrate'], $arrayGravityRate['gravityrate']),
-				'tooltip' => array($langs->transnoentities("FrequencyIndexTooltip"), $langs->transnoentities("FrequencyRateTooltip"), $langs->transnoentities("GravityRateTooltip")),
-				'picto' => 'fas fa-chart-bar',
+				'label'      => array($langs->transnoentities("FrequencyIndex"), $langs->transnoentities("FrequencyRate"), $langs->transnoentities("GravityRate")),
+				'content'    => array($arrayFrequencyIndex['frequencyindex'], $arrayFrequencyRate['frequencyrate'], $arrayGravityRate['gravityrate']),
+				'tooltip'    => array(
+					(($conf->global->DIGIRISKDOLIBARR_NB_EMPLOYEES > 0 && $conf->global->DIGIRISKDOLIBARR_MANUAL_INPUT_NB_EMPLOYEES) ? $langs->transnoentities("FrequencyIndexTooltip") . '<br>' . $langs->transnoentities("NbEmployeesConfTooltip") : $langs->transnoentities("FrequencyIndexTooltip")),
+					(($conf->global->DIGIRISKDOLIBARR_NB_WORKED_HOURS > 0 && $conf->global->DIGIRISKDOLIBARR_MANUAL_INPUT_NB_WORKED_HOURS) ? $langs->transnoentities("FrequencyRateTooltip") . '<br>' . $langs->transnoentities("NbWorkedHoursTooltip") : $langs->transnoentities("FrequencyRateTooltip")),
+					(($conf->global->DIGIRISKDOLIBARR_NB_WORKED_HOURS > 0 && $conf->global->DIGIRISKDOLIBARR_MANUAL_INPUT_NB_WORKED_HOURS) ? $langs->transnoentities("GravityRateTooltip") . '<br>' . $langs->transnoentities("NbWorkedHoursTooltip") : $langs->transnoentities("GravityRateTooltip"))
+				),
+				'picto'      => 'fas fa-chart-bar',
 				'widgetName' => $langs->transnoentities('AccidentRateIndicator')
 			)
 		);
@@ -634,6 +641,57 @@ class Accident extends CommonObject
 	}
 
 	/**
+	 * Get number presqu'accidents.
+	 *
+	 * @return array
+	 * @throws Exception
+	 */
+	public function getNbPresquAccidents() {
+		global $langs;
+
+		$category = new Categorie($this->db);
+
+		// Number accidents presqu'accidents
+		$category->fetch(0, $langs->transnoentities('PresquAccident'));
+		$alltickets = $category->getObjectsInCateg(Categorie::TYPE_TICKET);
+		if (is_array($alltickets) && !empty($alltickets)) {
+			$array['nbpresquaccidents'] = count($alltickets);
+		} else {
+			$array['nbpresquaccidents'] = 'N/A';
+		}
+		return $array;
+	}
+
+	/**
+	 * Get number accident investigations.
+	 *
+	 * @return array
+	 * @throws Exception
+	 */
+	public function getNbAccidentInvestigations() {
+		// Number accident investigations
+		$allaccidents = $this->fetchAll();
+		if (is_array($allaccidents) && !empty($allaccidents)) {
+			$accidentmetadata = new AccidentMetaData($this->db);
+			foreach ($allaccidents as $accident) {
+				$filter = ' AND t.fk_accident = ' . $accident->id . ' AND t.status = 1 AND t.accident_investigation = 1';
+				$result = $accidentmetadata->fetch(0, '', $filter);
+				if ($result > 0) {
+					$nbaccidentinvestigations += 1;
+				}
+			}
+			if ($nbaccidentinvestigations > 0) {
+				$array['nbaccidentinvestigations'] = $nbaccidentinvestigations;
+			} else {
+				$array['nbaccidentinvestigations'] = 'N/A';
+			}
+		} else {
+			$array['nbaccidentinvestigations'] = 'N/A';
+		}
+		return $array;
+	}
+
+	/**
 	 * Get frequency index (number accidents with DIAT by employees) x 1000.
 	 *
 	 * @return array
@@ -667,11 +725,12 @@ class Accident extends CommonObject
 	public function getFrequencyRate() {
 		// (Number accidents with DIAT by working hours) x 1 000 000
 		$arrayNbAccidents = $this->getNbAccidents();
-		$total_workhours  = getWorkingHours();
+		$total_workhours  = getWorkedHours();
+
 		if ($total_workhours > 0) {
 			$frequencyrate = ($arrayNbAccidents['data']['accidents']/$total_workhours) * 1000000;
 			if ($frequencyrate > 0) {
-				$array['frequencyrate'] = price2Num($frequencyrate, 2);
+				$array['frequencyrate'] = price2Num($frequencyrate, 5);
 			} else {
 				$array['frequencyrate'] = 'N/A';
 			}
@@ -690,11 +749,11 @@ class Accident extends CommonObject
 	public function getGravityRate() {
 		// (Number workstop days by working hours) x 1 000
 		$arrayNbWorkstopDays = $this->getNbWorkstopDays();
-		$total_workhours     = getWorkingHours();
+		$total_workhours     = getWorkedHours();
 		if ($total_workhours > 0) {
 			$gravityrate = ($arrayNbWorkstopDays['nbworkstopdays']/$total_workhours) * 1000;
 			if ($gravityrate > 0) {
-				$array['gravityrate'] = price2Num($gravityrate, 2);
+				$array['gravityrate'] = price2Num($gravityrate, 5);
 			} else {
 				$array['gravityrate'] = 'N/A';
 			}
