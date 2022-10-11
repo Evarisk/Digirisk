@@ -1483,6 +1483,8 @@ TicketPublicInterfaceQRCode = QR Code de l'interface publique des tickets
 MultiEntityTicketPublicInterfaceQRCode =  QR Code de l'interface publique des tickets multi-société
 TicketDigiriskElementRequired = GP/UT obligatoire pour créer un ticket
 TicketDigiriskElementRequiredHelp = Activer cette option pour rendre obligatoire la selection d'un GP/UT pour créer un ticket dans l'interface publique
+TicketDigiriskElementHideRef = Cacher la référence des GP/UT
+TicketDigiriskElementHideRefHelp = Activer cette option pour rendre cacher la référence d'un GP/UT dans l'interface publique
 
 
 

@@ -357,25 +357,27 @@ class DigiriskElement extends CommonObject
 	}
 
 	/**
-	 *  Output html form to select a third party.
-	 *  Note, you must use the select_company to get the component to select a third party. This function must only be called by select_company.
+	 *  Output html form to select a digirisk element.
 	 *
-	 * @param  string 		$selected Preselected type
-	 * @param  string 		$htmlname Name of field in form
-	 * @param  string 		$filter Optional filters criteras (example: 's.rowid <> x', 's.client in (1,3)')
-	 * @param  string 		$showempty Add an empty field (Can be '1' or text to use on empty line like 'SelectThirdParty')
-	 * @param  int 			$forcecombo Force to use standard HTML select component without beautification
-	 * @param  array 		$events Event options. Example: array(array('method'=>'getContacts', 'url'=>dol_buildpath('/core/ajax/contacts.php',1), 'htmlname'=>'contactid', 'params'=>array('add-customer-contact'=>'disabled')))
-	 * @param  int 			$outputmode 0=HTML select string, 1=Array
-	 * @param  int 			$limit Limit number of answers
-	 * @param  string 		$morecss Add more css styles to the SELECT component
-	 * @param  int	 		$current_element id of current digiriskelement
-	 * @param  bool 		$multiple add [] in the name of element and add 'multiple' attribut
-	 * @param  int 			$noroot
-	 * @return string HTML string with
+	 * @param  string 		$selected 			Preselected type
+	 * @param  string 		$htmlname 			Name of field in form
+	 * @param  string 		$filter 			Optional filters criteras (example: 's.rowid <> x', 's.client in (1,3)')
+	 * @param  string 		$showempty 			Add an empty field (Can be '1' or text to use on empty line like 'SelectThirdParty')
+	 * @param  int 			$forcecombo 		Force to use standard HTML select component without beautification
+	 * @param  array 		$events 			Event options. Example: array(array('method'=>'getContacts', 'url'=>dol_buildpath('/core/ajax/contacts.php',1), 'htmlname'=>'contactid', 'params'=>array('add-customer-contact'=>'disabled')))
+	 * @param  int 			$outputmode 		0=HTML select string, 1=Array
+	 * @param  int 			$limit 				Limit number of answers
+	 * @param  string 		$morecss 			Add more css styles to the SELECT component
+	 * @param  int	 		$current_element 	id of current digiriskelement
+	 * @param  bool 		$multiple 			add [] in the name of element and add 'multiple' attribut
+	 * @param  int 			$noroot  			Don't show root element
+	 * @param  string 		$contextpage 		Context page
+	 * @param  bool 		$multientitymanaged Multi entity filter
+	 * @param  bool 		$hideref 			Hide ref
+	 * @return string 							HTML string with
 	 * @throws Exception
 	 */
-	public function select_digiriskelement_list($selected = '', $htmlname = 'fk_element', $filter = '', $showempty = '1', $forcecombo = 0, $events = array(), $outputmode = 0, $limit = 0, $morecss = 'minwidth100', $current_element = 0, $multiple = false, $noroot = 0, $contextpage = '', $multientitymanaged = true)
+	public function select_digiriskelement_list($selected = '', $htmlname = 'fk_element', $filter = '', $showempty = '1', $forcecombo = 0, $events = array(), $outputmode = 0, $limit = 0, $morecss = 'minwidth100', $current_element = 0, $multiple = false, $noroot = 0, $contextpage = '', $multientitymanaged = true, $hideref  = false)
 	{
 		global $conf, $langs;
 
@@ -458,9 +460,9 @@ class DigiriskElement extends CommonObject
 				while ($i < $num) {
 					$obj   = $this->db->fetch_object($resql);
 					if ((!empty($conf->global->DIGIRISKDOLIBARR_SHOW_SHARED_RISKS) && $contextpage == 'sharedrisk') || (!empty($conf->global->DIGIRISKDOLIBARR_SHOW_SHARED_RISKSIGNS) && $contextpage == 'sharedrisksign')) {
-						$label = $depth[$obj->rowid] . 'S'. $obj->entity . ' - ' . $obj->ref . ' - ' . $obj->label;
+						$label = $depth[$obj->rowid] . 'S'. $obj->entity . ' - ' . ($hideref ?  '' : $obj->ref . ' - ') . $obj->label;
 					} else {
-						$label = $depth[$obj->rowid] . $obj->ref . ' - ' . $obj->label;
+						$label = $depth[$obj->rowid] . ($hideref ?  '' : $obj->ref . ' - ') . $obj->label;
 					}
 
 					if (empty($outputmode)) {
