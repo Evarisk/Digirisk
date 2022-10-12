@@ -457,7 +457,7 @@ if (empty($reshook)) {
 		$objectline->declaration_link    = $declaration_link;
 
 		// Check parameters
-		if (empty($workstop_days)) {
+		if ($workstop_days <= 0) {
 			setEventMessages($langs->trans('ErrorFieldNotEmpty', $langs->transnoentitiesnoconv('WorkStopDays')), null, 'errors');
 			header("Location: " . $_SERVER['PHP_SELF'] . '?id=' . $id . '&action=editline&lineid=' .  $lineid);
 			exit;
