@@ -303,6 +303,19 @@ if ( ! empty($conf->global->DIGIRISKDOLIBARR_TICKET_ENABLE_PUBLIC_INTERFACE)) {
 	print '</td>';
 	print '</tr>';
 
+	// GP/UT Visible
+	print '<tr class="oddeven"><td>' . $langs->transnoentities("TicketDigiriskElementVisible") . '</td>';
+	print '<td class="center">';
+	print ajax_constantonoff('DIGIRISKDOLIBARR_TICKET_DIGIRISKELEMENT_VISIBLE');
+	print '</td>';
+	print '<td class="center">';
+	print '';
+	print '</td>';
+	print '<td class="center">';
+	print $form->textwithpicto('', $langs->transnoentities("TicketDigiriskElementVisibleHelp"));
+	print '</td>';
+	print '</tr>';
+
 	// GP/UT Required
 	print '<tr class="oddeven"><td>' . $langs->transnoentities("TicketDigiriskElementRequired") . '</td>';
 	print '<td class="center">';

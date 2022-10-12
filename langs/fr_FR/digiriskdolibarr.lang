@@ -1485,6 +1485,8 @@ TicketDigiriskElementRequired = GP/UT obligatoire pour créer un ticket
 TicketDigiriskElementRequiredHelp = Activer cette option pour rendre obligatoire la selection d'un GP/UT pour créer un ticket dans l'interface publique
 TicketDigiriskElementHideRef = Cacher la référence des GP/UT
 TicketDigiriskElementHideRefHelp = Activer cette option pour rendre cacher la référence d'un GP/UT dans l'interface publique
+TicketDigiriskElementVisible = Afficher le champ GP/UT pour créer un ticket
+TicketDigiriskElementVisibleHelp = Activer cette option pour afficher le champ GP/UT dans l'interface publique
 
 
 
