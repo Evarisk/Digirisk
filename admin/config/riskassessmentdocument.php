@@ -93,7 +93,7 @@ if ( ! empty($conf->projet->enabled)) { $formproject = new FormProjets($db); }
 $help_url = 'FR:Module_DigiriskDolibarr#L.27onglet_Analyse_des_risques';
 $title    = $langs->trans("RiskAssessmentDocument");
 
-$morejs  = array("/digiriskdolibarr/js/digiriskdolibarr.js.php");
+$morejs  = array("/digiriskdolibarr/js/digiriskdolibarr.js");
 $morecss = array("/digiriskdolibarr/css/digiriskdolibarr.css");
 
 llxHeader('', $title, $help_url, '', '', '', $morejs, $morecss);
@@ -455,7 +455,7 @@ print $langs->trans('ShowAllRiskAssessmentsDescription');
 print '</td>';
 
 print '<td class="center">';
-print ajax_constantonoff('DIGIRISKDOLIBARR_SHOW_ALL_RISKASESSMENTS');
+print ajax_constantonoff('DIGIRISKDOLIBARR_SHOW_ALL_RISKASSESSMENTS');
 print '</td>';
 print '</tr>';
 print '</table>';

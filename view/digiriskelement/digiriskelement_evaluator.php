@@ -252,7 +252,7 @@ $form = new Form($db);
 
 $title    = $langs->trans("Evaluators");
 $help_url = 'FR:Module_DigiriskDolibarr#.C3.89valuateur';
-$morejs   = array("/digiriskdolibarr/js/digiriskdolibarr.js.php");
+$morejs   = array("/digiriskdolibarr/js/digiriskdolibarr.js");
 $morecss  = array("/digiriskdolibarr/css/digiriskdolibarr.css");
 
 if ($fromid > 0) {
@@ -458,7 +458,7 @@ if ($object->id > 0 || $fromid > 0) {
 	} ?>
 	<!-- EVALUATOR ADD MODAL-->
 	<div class="evaluator-add-modal" value="<?php echo $object->id ?>">
-		<div class="wpeo-modal modal-evaluator-0" id="evaluator_add<?php echo $object->id ?>">
+		<div class="wpeo-modal modal-evaluator-0 <?php echo (GETPOST('modalactive') ? 'modal-active' : ''); ?>" id="evaluator_add<?php echo $object->id ?>">
 			<div class="modal-container wpeo-modal-event">
 				<!-- Modal-Header -->
 				<div class="modal-header">
@@ -476,8 +476,8 @@ if ($object->id > 0 || $fromid > 0) {
 									$userlist = $form->select_dolusers(GETPOST('responsible_socid'), '', 0, null, 0, '', '', 0, 0, 0, 'AND u.statut = 1', 0, '', 'minwidth300', 0, 1);
 									print '<table><tr>';
 									print '<td>';
-									print $form->selectarray('fk_user_employer', $userlist, $usertmp->id, $langs->trans('SelectUser'), null, null, null, "40%", 0, 0, '', 'minwidth300', 1);
-									print ' <a href="' . DOL_URL_ROOT . '/user/card.php?action=create&backtopage=' . urlencode($_SERVER["PHP_SELF"] . '?action=create') . '" target="_blank"><span class="fa fa-plus-circle valignmiddle paddingleft" title="' . $langs->trans("AddUser") . '"></span></a>';
+									print $form->selectarray('fk_user_employer', $userlist, (GETPOST('userid') ? GETPOST('userid') : $usertmp->id), $langs->trans('SelectUser'), null, null, null, "40%", 0, 0, '', 'minwidth300', 1);
+									print ' <a href="' . dol_buildpath('custom/digiriskdolibarr/view/digiriskusers?backtopage=' . urlencode($_SERVER["PHP_SELF"] . '?id=' . $id . '&userid=USERID&modalactive=1') . '#addUser', 1) . '"><span class="fa fa-plus-circle valignmiddle paddingleft" title="' . $langs->trans("AddUser") . '"></span></a>';
 									print '</td></tr></table>';
 									?>
 
@@ -501,7 +501,7 @@ if ($object->id > 0 || $fromid > 0) {
 				<!-- Modal-Footer -->
 				<div class="modal-footer">
 					<?php if ($permissiontoadd) : ?>
-						<div class="evaluator-create wpeo-button button-primary button-disable modal-close">
+						<div class="evaluator-create wpeo-button button-primary modal-close<?php echo (GETPOST('modalactive') ? '' : ' button-disable'); ?>">
 							<span><i class="fas fa-plus"></i>  <?php echo $langs->trans('AddEvaluatorButton'); ?></span>
 						</div>
 					<?php else : ?>

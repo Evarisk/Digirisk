@@ -3094,7 +3094,7 @@
   border: 0;
 }
 
-td > .risk-evaluation-container {
+td > .risk-evaluation-list-content .risk-evaluation-container:not(.advanced, .standard) {
   min-width: 340px;
   border: 1px solid rgba(0, 0, 0, 0.1);
   background: rgba(0, 0, 0, 0.05);
@@ -3795,4 +3795,7 @@ tr.liste_titre th.liste_titre:not(.maxwidthsearch), tr.liste_titre td.liste_titr
   div.secondcolumn div.box {
     padding-left: 0px;
   }
+}
+.ui-dialog.ui-corner-all.ui-widget.ui-widget-content.ui-front.ui-dialog-buttons.ui-draggable {
+  z-index: 1500 !important;
 }

@@ -131,7 +131,7 @@ if (GETPOST('dataMigrationImport', 'alpha') && ! empty($conf->global->MAIN_UPLOA
 			$digiriskExportArray = json_decode($json, true);
 			$digiriskExportArray = end($digiriskExportArray);
 
-			$it = new RecursiveIteratorIterator(new RecursiveArrayIterator($digiriskExportArray));
+			$it = new RecursiveIteratorIterator(new RecursiveArrayIterator($digiriskExportArray['digiriskelements']['digiriskelements']));
 			foreach ($it as $key => $v) {
 				$element[$key][] = $v;
 			}
@@ -213,7 +213,7 @@ if (GETPOST('dataMigrationImportRisks', 'alpha') && ! empty($conf->global->MAIN_
 			$digiriskExportArray = json_decode($json, true);
 
 			//Risk
-			foreach ($digiriskExportArray as $digiriskExportRisk) {
+			foreach ($digiriskExportArray['risks'] as $digiriskExportRisk) {
 				$risk->ref        = $refRiskMod->getNextValue($risk);
 				$risk->category   = $risk->get_danger_category_position_by_name($digiriskExportRisk['danger_category']['name']);
 				$risk->fk_element = $digiriskElement->fetch_id_from_wp_digi_id($digiriskExportRisk['parent_id']);
@@ -313,7 +313,7 @@ if (GETPOST('dataMigrationImportRiskSigns', 'alpha') && ! empty($conf->global->M
 			$digiriskExportArray = json_decode($json, true);
 
 			//RiskSign
-			foreach ($digiriskExportArray as $digiriskExportRiskSign) {
+			foreach ($digiriskExportArray['risksigns'] as $digiriskExportRiskSign) {
 				$risksign->ref         = $refRiskSignMod->getNextValue($risksign);
 				$risksign->category    = $risksign->get_risksign_category_position_by_name($digiriskExportRiskSign['recommendation_category']['name']);
 				$risksign->description = $digiriskExportRiskSign['comment']['content'];
@@ -381,7 +381,7 @@ if (GETPOST('dataMigrationImportGlobal', 'alpha') && ! empty($conf->global->MAIN
 			$json                = file_get_contents($filedir . $filename);
 			$digiriskExportArray = json_decode($json, true);
 
-			$it = new RecursiveIteratorIterator(new RecursiveArrayIterator($digiriskExportArray[0]));
+			$it = new RecursiveIteratorIterator(new RecursiveArrayIterator($digiriskExportArray['digiriskelements']['digiriskelements']));
 			foreach ($it as $key => $v) {
 				$element[$key][] = $v;
 			}
@@ -411,7 +411,7 @@ if (GETPOST('dataMigrationImportGlobal', 'alpha') && ! empty($conf->global->MAIN
 			}
 
 			//Risk
-			foreach ($digiriskExportArray[1] as $digiriskExportRisk) {
+			foreach ($digiriskExportArray['risks'] as $digiriskExportRisk) {
 				$risk->ref        = $refRiskMod->getNextValue($risk);
 				$risk->category   = $risk->get_danger_category_position_by_name($digiriskExportRisk['danger_category']['name']);
 				$risk->fk_element = $digiriskElement->fetch_id_from_wp_digi_id($digiriskExportRisk['parent_id']);
@@ -459,7 +459,7 @@ if (GETPOST('dataMigrationImportGlobal', 'alpha') && ! empty($conf->global->MAIN
 			}
 
 			//RiskSign
-			foreach ($digiriskExportArray[2] as $digiriskExportRiskSign) {
+			foreach ($digiriskExportArray['risksigns'] as $digiriskExportRiskSign) {
 				$risksign->ref         = $refRiskSignMod->getNextValue($risksign);
 				$risksign->category    = $risksign->get_risksign_category_position_by_name($digiriskExportRiskSign['recommendation_category']['name']);
 				$risksign->description = $digiriskExportRiskSign['comment']['content'];
@@ -492,7 +492,7 @@ if (GETPOST('dataMigrationImportGlobal', 'alpha') && ! empty($conf->global->MAIN
  */
 
 $help_url = 'FR:Module_DigiriskDolibarr';
-$morejs   = array("/digiriskdolibarr/js/digiriskdolibarr.js.php");
+$morejs   = array("/digiriskdolibarr/js/digiriskdolibarr.js");
 $morecss  = array("/digiriskdolibarr/css/digiriskdolibarr.css");
 
 llxHeader("", $langs->trans("Tools"), $help_url, '', '', '', $morejs, $morecss);

@@ -325,7 +325,7 @@ $emptyobject = new stdClass();
 
 $title    = $langs->trans('RiskAssessmentDocument');
 $help_url = 'FR:Module_DigiriskDolibarr#Document_unique_2';
-$morejs   = array("/digiriskdolibarr/js/digiriskdolibarr.js.php");
+$morejs   = array("/digiriskdolibarr/js/digiriskdolibarr.js");
 $morecss  = array("/digiriskdolibarr/css/digiriskdolibarr.css");
 
 digiriskHeader($title, $help_url, $morejs, $morecss); ?>

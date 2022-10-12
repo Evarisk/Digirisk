@@ -24,8 +24,6 @@
 // Put here all includes required by your class file
 require_once DOL_DOCUMENT_ROOT . '/core/class/commonobject.class.php';
 require_once DOL_DOCUMENT_ROOT . '/core/lib/files.lib.php';
-require_once __DIR__ . '/riskanalysis/risk.class.php';
-require_once __DIR__ . '/riskanalysis/riskassessment.class.php';
 
 /**
  * Class for DigiriskElement
@@ -357,41 +355,6 @@ class DigiriskElement extends CommonObject
 	}
 
 	/**
-	 * Get riskassessment categorires number
-	 *
-	 * @return array
-	 * @throws Exception
-	 */
-	public function getRiskAssessmentCategoriesNumber()
-	{
-		$risk          = new Risk($this->db);
-		if ($this->id > 0) {
-			$risks         = $risk->fetchFromParent($this->id);
- 		} else {
-			$risks = $risk->fetchRisksOrderedByCotation(0, true, false, true);
-		}
-
-		$scale_counter = array(
-			1 => 0,
-			2 => 0,
-			3 => 0,
-			4 => 0
-		);
-		if ( ! empty($risks) && $risks > 0) {
-			foreach ($risks as $risk) {
-				$riskassessment = new RiskAssessment($this->db);
-				$riskassessment = $riskassessment->fetchFromParent($risk->id, 1);
-				if ( ! empty($riskassessment) && $riskassessment > 0 && is_array($riskassessment)) {
-					$riskassessment         = array_shift($riskassessment);
-					$scale                  = $riskassessment->get_evaluation_scale();
-					$scale_counter[$scale] += 1;
-				}
-			}
-		}
-		return $scale_counter;
-	}
-
-	/**
 	 *  Output html form to select a third party.
 	 *  Note, you must use the select_company to get the component to select a third party. This function must only be called by select_company.
 	 *
@@ -689,5 +652,24 @@ class DigiriskElement extends CommonObject
 		} else {
 			return array();
 		}
+	}
+
+	/**
+	 *  Return list of parent ids for an element
+	 *
+	 * 	@return    array  Array with ids
+	 * 	@throws Exception
+	 */
+	public function getBranch($parent_id)
+	{
+		$object = new self($this->db);
+		$object->fetch($parent_id);
+		$branch_ids = array($parent_id);
+
+		while ($object->fk_parent > 0) {
+			$branch_ids[] = $object->fk_parent;
+			$object->fetch($object->fk_parent);
+		}
+		return $branch_ids;
 	}
 }

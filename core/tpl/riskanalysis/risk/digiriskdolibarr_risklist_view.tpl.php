@@ -916,7 +916,7 @@
 	$menuConf = 'MAIN_SELECTEDFIELDS_' . $varpage;
 
 	if (dol_strlen($user->conf->$menuConf) < 1) {
-		$user->conf->$menuConf = ($contextpage == 'risklist' ? 't.fk_element' : '') . 't.ref,t.category,evaluation.cotation,';
+		$user->conf->$menuConf = ($contextpage == 'risklist' ? 't.fk_element,' : '') . 't.ref,t.category,evaluation.cotation,';
 	}
 
 	if ( ! preg_match('/t.description/', $user->conf->$menuConf) && $conf->global->DIGIRISKDOLIBARR_RISK_DESCRIPTION) {
@@ -1158,7 +1158,7 @@
 											</div>
 										<?php endif; ?>
 									</div>
-									<div class="move-risk">
+									<div class="move-risk <?php echo $conf->global->DIGIRISKDOLIBARR_MOVE_RISKS ? '' : 'move-disabled'?>">
 										<span class="title"><?php echo $langs->trans('MoveRisk'); ?></span>
 										<?php $objecttmp = new DigiriskElement($db);
 										$objecttmp->fetch($risk->fk_element);

@@ -383,8 +383,8 @@ ErrorNoAttendantSelected = Erreur : Aucun intervenant n'a été sélectionné
 SignatureEmailSubject = Signature du plan de prevention
 DocumentName = Référence du document
 PreventionPlanScheduleSave = Les horaires du plan de prévention ont bien été enregistrés
-GoToLock = Verrouiller le plan de prévention
-GoToValidate = Valider le plan de prévention
+GoToLockPreventionPlan = Verrouiller le plan de prévention
+GoToValidatePreventionPlan = Valider le plan de prévention
 PreventionPlanMustBeValidated = Le plan de prévention doit être validé pour le rouvrir
 PreventionPlanMustBeInProgress = Le plan de prévention doit être en cours pour accéder à cette fonctionnalité
 PreventionPlanMustBeInProgressToValidate = Le plan de prévention est déjà validé
@@ -407,6 +407,7 @@ ConfirmClonePreventionPlan = Êtes-vous sûr de vouloir cloner le plan de préve
 Archived = Archivé
 preventionplandocument.odt = Plan de prévention
 preventionplandocument_custom.odt = Plan de prévention personnalisé
+PreventionPlanGenerated = Le plan de prévention est déjà généré
 
 # Email - Mail
 PreventionPlanLabel = Récapitulatif du plan de prévention
@@ -502,6 +503,7 @@ FPRProject = Projet lié aux permis de feu
 FirePermitLinked = Permis de feu lié
 firepermitdocument.odt = Permis de feu
 firepermitdocument_custom.odt = Permis de feu personnalisé
+FirePermitGenerated = Le permis de feu est déjà généré
 
 # Email - Mail
 FirePermitLabel = Récapitulatif du permis de feu
@@ -526,8 +528,8 @@ AccidentGeneratedWithDolibarr = Accident généré avec Dolibarr
 AccidentWorkStopCreateTrigger = Un arrêt de travail a été ajouté à l'accident
 AccidentWorkStopModifyTrigger = Un arrêt de travail a été modifié sur l'accident
 AccidentWorkStopDeleteTrigger = Un arrêt de travail a été suprimmé de l'accident
-AccidentModifyTrigger = Modification de l'accident %s
-AccidentDeleteTrigger = Suppression de l'accident %s
+AccidentModifyTrigger = Accident %s modifié
+AccidentDeleteTrigger = Accident %s supprimé
 AccidentMetaDataCreateTrigger = Enregistrement des données complémentaires de l'accident
 AccidentLesionCreateTrigger = Une lésion a été ajoutée à l'accident
 AccidentLesionModifyTrigger = Une lésion a été modifiée sur l'accident
@@ -647,6 +649,9 @@ FrequencyRate = Taux de fréquence
 GravityIndex = Indice de gravité
 GravityRate = Taux de gravité
 AccidentRateIndicator = Taux et indice des indicateurs de performance des accidents
+NbPresquAccidents = Nombre de presqu'accidents
+NbAccidentInvestigations = Nombre d'enquête accidents
+NbWorkedHours = Nombre d\'heures travaillées
 
 # AccidentTooltip - Tooltip des accidents
 VictimActivityTooltip = Précisez l’activité ou la tâche de la victime au moment de l’accident, c’est-à-dire ce que faisait la victime
@@ -660,6 +665,7 @@ ThirdPartyResponsabilityTooltip = Lorsque vous avez connaissance de l’implicat
 FrequencyIndexTooltip = Nombre d'accidents par salarié x 1 000
 FrequencyRateTooltip  = Nombre d'accidents par heures travaillées x 1 000 000
 GravityRateTooltip = Nombre de jours d'arrêt de travail par heures travaillées x 1 000
+NbWorkedHoursTooltip = Le nombre d'heures travaillées a été saisi manuellement
 
 # Dictionnary - Dictionnaire
 UsualWorkplace = Lieu de travail habituel
@@ -807,11 +813,11 @@ RiskAssessmentDocumentImportantNote = Notes importantes :<br />Vous pouvez lire 
 # Boxes - Widget
 RiskAssessmentDocumentBox = Box Document unique
 RiskAssessmentDocumentBoxTitle = Informations du Document unique
-LastGenerateDate = Date de dernière génération du Document Unique
+LastGenerateDate = DU généré le
 MandatoryUpdateEvery = Mise à jour obligatoire tous les
-NextGenerateDate = Date de prochaine génération du Document Unique
-NbDaysBeforeNextGenerateDate = Nombre de jours avant la prochaine date de génération du Document Unique
-NbDaysAfterNextGenerateDate = Nombre de jours de retard pour la génération du Document Unique
+NextGenerateDate = Prochain DU le
+NbDaysBeforeNextGenerateDate = Nombre de jours avant la prochaine date de génération du DU
+NbDaysAfterNextGenerateDate = Nombre de jours de retard pour la génération du DU
 
 # Email - Mail
 RiskAssessmentDocumentLabel = Récapitulatif du document unique
@@ -991,8 +997,9 @@ EvaluatorDuration = Durée de l'évalution par l'évaluateur
 EvaluatorDurationDescription = Le temps que met l'évaluateur à réaliser son évaluation des risques
 NbEmployeesInvolved = Nombre de salariés impliqués
 NbEmployees = Nombre de salariés
-NbEmployeesInvolvedTooltip = Nombre de salariés (evaluateurs) unique
+NbEmployeesInvolvedTooltip = Nombre de salariés (évaluateurs) uniques
 NbEmployeesTooltip = Si la gestion centralisée des utilisateurs et des groupes sur l'entité principale est activée.<br>Le nombre de salariés correspond au nombre d'utilisateurs partagés/affectés à un groupe et aussi au nombre d'administrateur de l'entité principale
+NbEmployeesConfTooltip = Le nombre de salariés a été saisi manuellement
 
 
 
@@ -1154,6 +1161,8 @@ RiskAssessmentList = Liste des évaluations du risque
 EditRiskAssessment = Editer l'évaluation
 ShowAllRiskAssessments = Voir toutes les évaluations
 ShowAllRiskAssessmentsDescription = Afficher la liste complète des évaluations des risques dans la liste des risques
+ParentRisk = Risque parent
+RiskAssessmentDate = Date de l'évaluation
 
 SimpleCotation = Cotation simple
 AdvancedCotation = Cotation avancée
@@ -1243,10 +1252,9 @@ DigiriskRiskSignData = Données configurables des signalisations
 TaskTimeSpentCreateTrigger = Temps consommé créé
 TaskTimeSpentModifyTrigger = Temps consommé modifié
 TaskTimeSpentDeleteTrigger = Temps consommé supprimé
-TaskCompleted = Tâche %s complétée
-TaskCreated = Tâche %s crée
-TaskModified = Tâche %s modifée
-TaskDeleted = Tâche %s supprimée
+TaskCreateTrigger = Tâche %s créée
+TaskModifyTrigger = Tâche %s modifée
+TaskDeleteTrigger = Tâche %s supprimée
 
 # Data - Donnée
 ActionPlan = Plan d'action
@@ -1453,6 +1461,7 @@ TicketProjectUpdated = Le projet par défaut des tickets a été mis à jour
 QRCodeAlreadyGenerated = QR Code généré
 GenerateQRCode = Générer le QR Code
 CompanyQRCodeGeneration = Génération du QR Code de l'entité
+QRCodeGeneration = Génération du QR Code
 MultiCompanyQRCodeGeneration = Génération du QR Code multi-entité
 TicketCreationMailWellSent = Mail de confirmation de création du ticket envoyé
 TicketCreationMailSent = Le mail de création du ticket a été envoyé à %s
@@ -1547,7 +1556,7 @@ MediaMaxWidthLarge = Largeur du média large
 MediaMaxWidthLargeDescription = Largeur du média (dimension large) avec pour ratio 16:9
 MediaMaxHeightLarge = Hauteur du média large
 MediaMaxHeightLargeDescription = Hauteur du média (dimension large) avec pour ratio 16:9
-
+ErrorFileSizeTooLarge = Le fichier est trop volumineux
 
 
 #
@@ -1594,4 +1603,8 @@ UseDateRange = Utiliser la plage de dates
 SiretNumber = N°Siret
 Society = Société
 MulticompanyTransverseModeEnabled = La gestion centralisée des utilisateurs et des groupes sur l'entité principale est activée.<br>Vous ne pouvez donc pas créer d'utilisateur ou de groupe sur cette entité.<br>Veuillez vous rendre sur l'entité principale pour réaliser cet ajout.
-
+ManuelInputNBEmployees = Saisir manuellement le nombre de salariés
+ManuelInputNBEmployeesDescription = Si l'option est activée, vous pouvez saisir manuellement le nombre de salariés dans la configuration de la société.<br>Sinon le nombre de salariés est calculé.<br>Consulter la documentation pour plus d'informations.
+ManuelInputNBWorkedHours = Saisir manuellement le nombre d'heures travaillées
+ManuelInputNBWorkedHoursDescription = Si l'option est activée, vous pouvez saisir manuellement le nombre d'heures travaillées dans la configuration de la société.<br>Sinon le nombre d'heures travaillées est calculé.<br>Consulter la documentation pour plus d'informations.
+HowToConfigureSetupConf = Pour configurer les donnés de la société lié à Digirisk,<br>veuillez vous rendre sur Digirisk - Configuration - Réglages
