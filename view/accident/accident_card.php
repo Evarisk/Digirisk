@@ -412,7 +412,7 @@ if (empty($reshook)) {
 		$objectline->fk_accident         = $parent_id;
 
 		// Check parameters
-		if (empty($workstop_days)) {
+		if ($workstop_days <= 0) {
 			setEventMessages($langs->trans('ErrorFieldNotEmpty', $langs->transnoentitiesnoconv('WorkStopDays')), null, 'errors');
 			$error++;
 		}
