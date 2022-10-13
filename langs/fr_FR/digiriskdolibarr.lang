@@ -408,6 +408,9 @@ Archived = Archivé
 preventionplandocument.odt = Plan de prévention
 preventionplandocument_custom.odt = Plan de prévention personnalisé
 PreventionPlanGenerated = Le plan de prévention est déjà généré
+PP_EXT_SOCIETY_INTERVENANTS = Intervenant
+PP_EXT_SOCIETY_RESPONSIBLE = Responsable de la société extérieure
+PP_MAITRE_OEUVRE = Maître d'oeuvre
 
 # Email - Mail
 PreventionPlanLabel = Récapitulatif du plan de prévention
@@ -504,6 +507,9 @@ FirePermitLinked = Permis de feu lié
 firepermitdocument.odt = Permis de feu
 firepermitdocument_custom.odt = Permis de feu personnalisé
 FirePermitGenerated = Le permis de feu est déjà généré
+FP_EXT_SOCIETY_INTERVENANTS = Intervenant
+FP_EXT_SOCIETY_RESPONSIBLE = Responsable de la société extérieure
+FP_MAITRE_OEUVRE = Maître d'oeuvre
 
 # Email - Mail
 FirePermitLabel = Récapitulatif du permis de feu
@@ -525,15 +531,15 @@ DeleteAccident = Supprimer l'accident
 AccidentCreateTrigger = Accident %s créé
 ActionsOnAccident = Événements liés au accident
 AccidentGeneratedWithDolibarr = Accident généré avec Dolibarr
-AccidentWorkStopCreateTrigger = Un arrêt de travail a été ajouté à l'accident
-AccidentWorkStopModifyTrigger = Un arrêt de travail a été modifié sur l'accident
-AccidentWorkStopDeleteTrigger = Un arrêt de travail a été suprimmé de l'accident
+AccidentWorkStopCreateTrigger = Arrêt de travail %s ajouté à l'accident
+AccidentWorkStopModifyTrigger = Arrêt de travail %s modifié sur l'accident
+AccidentWorkStopDeleteTrigger = Arrêt de travail %s supprimmé de l'accident
 AccidentModifyTrigger = Accident %s modifié
 AccidentDeleteTrigger = Accident %s supprimé
 AccidentMetaDataCreateTrigger = Enregistrement des données complémentaires de l'accident
-AccidentLesionCreateTrigger = Une lésion a été ajoutée à l'accident
-AccidentLesionModifyTrigger = Une lésion a été modifiée sur l'accident
-AccidentLesionDeleteTrigger = Une lésion a été supprimée de l'accident
+AccidentLesionCreateTrigger = Lésion %s ajoutée à l'accident
+AccidentLesionModifyTrigger = Lésion %s modifiée sur l'accident
+AccidentLesionDeleteTrigger = Lésion %s supprimée de l'accident
 ACC_USER_EMPLOYERSigned = Signature du reponsable de l'entreprise
 
 # Mod Numbering - Modèle de numérotation
@@ -1314,7 +1320,7 @@ TotalConsumedTimeAmount = Coût du temps consommé
 NbTasks = Nombre de tâches
 TotalProgress = Avancement réel global des tâches
 TotalBudget = Somme du budget des tâches
-
+TaskTimeSpentDate = Date du temps consommé
 
 
 #
