@@ -931,9 +931,9 @@ Organization = Organisation GP/UT
 
 # Trigger - Déclencheur
 ActionsOnGroupment = Événements liés au groupement
-groupmentCreateTrigger = Groupement %s créé
-groupmentModifyTrigger = Groupement %s modifié
-groupmentDeleteTrigger = Groupement %s supprimé
+GroupmentCreateTrigger = Groupement %s créé
+GroupmentModifyTrigger = Groupement %s modifié
+GroupmentDeleteTrigger = Groupement %s supprimé
 
 # Mod Numbering - Modèle de numérotation
 DigiriskGroupmentNumberingModule = Modèle de numérotation des groupements de Digirisk
@@ -955,9 +955,9 @@ ShowDeletedDigiriskElement = Afficher les groupements / unités de travail qui s
 
 # Trigger - Déclencheur
 ActionsOnWorkUnit = Événements liés au unité de travail
-workunitCreateTrigger = Unité de travail %s créée
-workunitModifyTrigger = Unité de travail %s modifiée
-workunitDeleteTrigger = Unité de travail %s supprimée
+WorkunitCreateTrigger = Unité de travail %s créée
+WorkunitModifyTrigger = Unité de travail %s modifiée
+WorkunitDeleteTrigger = Unité de travail %s supprimée
 
 # Mod Numbering - Modèle de numérotation
 DigiriskWorkUnitNumberingModule = Modèle de numérotation des unités de travail de Digirisk
