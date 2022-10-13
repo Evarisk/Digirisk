@@ -512,14 +512,42 @@ class ActionsDigiriskdolibarr
 					}
 				}
 			}
-		}
+		} else if ($parameters['currentcontext'] == 'thirdpartycard') {
+			if ($action == 'confirm_delete') {
+				require_once __DIR__ . '/preventionplan.class.php';
+				require_once __DIR__ . '/firepermit.class.php';
+				require_once __DIR__ . '/digiriskresources.class.php';
 
-		if (true) {
+				$preventionplan 	  = new PreventionPlan($this->db);
+				$firepermit 		  = new FirePermit($this->db);
+				$digiriskresources 	  = new DigiriskResources($this->db);
+				$alldigiriskresources = $digiriskresources->fetchAll('', '', 0, 0, array('customsql' => 't.element_id = ' . $object->id));
+
+				if (is_array($alldigiriskresources) && !empty($alldigiriskresources)) {
+					foreach ($alldigiriskresources as $digiriskresourcesingle) {
+						$preventionplan->fetch($digiriskresourcesingle->object_id);
+						$firepermit->fetch($digiriskresourcesingle->object_id);
+					}
+					($preventionplan->status != 0 ? $result = $preventionplan->isObjectUsed($object->id) : '');
+					($result <= 0 && $firepermit->status != 0 ? $result = $firepermit->isObjectUsed($object->id) : '');
+				}
+
+				if ($result > 0) {
+					($preventionplan->status != 0 ? $errors = $preventionplan->errors : $errors = $firepermit->errors);
+					$error++;
+				} else {
+					$error = 0;
+				}
+			}
+		}
+		// and when deleted from list and when delete users
+
+		if (!$error) {
 			$this->results   = array('myreturn' => 999);
 			$this->resprints = 'A text to show';
 			return 0; // or return 1 to replace standard code
 		} else {
-			$this->errors[] = 'Error message';
+			$this->errors = $errors;
 			return -1;
 		}
 	}
