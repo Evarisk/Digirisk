@@ -357,17 +357,11 @@ class InterfaceDigiriskdolibarrTriggers extends DolibarrTriggers
 					$actioncomm->note_private .= $langs->trans('ParentElement') . ' : ' .  $digiriskparent->ref . ' - ' . $digiriskparent->label . '<br/>';
 				}
 
-				if ($object->element_type == 'groupment') {
-					$refDigiriskElementMod = new $conf->global->DIGIRISKDOLIBARR_GROUPMENT_ADDON;
-				} else if ($object->element_type == 'workunit') {
-					$refDigiriskElementMod = new $conf->global->DIGIRISKDOLIBARR_WORKUNIT_ADDON;
-				}
-
 				$actioncomm->elementtype = 'digiriskelement@digiriskdolibarr';
 				$actioncomm->elementid   = $object->id;
 				$actioncomm->code        = 'AC_DIGIRISKELEMENT_CREATE';
 				$actioncomm->type_code   = 'AC_OTH_AUTO';
-				$actioncomm->label       = $langs->transnoentities($object->element_type . 'CreateTrigger', $object->ref);
+				$actioncomm->label       = $langs->transnoentities(ucfirst($object->element_type). 'CreateTrigger', $object->ref);
 				$actioncomm->note_private .= $langs->trans('Standard') . ' : ' . $digiriskstandard->ref . ' - ' . $conf->global->MAIN_INFO_SOCIETE_NOM . '<br/>';
 				$actioncomm->note_private .= $langs->trans('Ref') . ' : ' . $object->ref . '<br/>';
 				$actioncomm->note_private .= $langs->trans('Label') . ' : ' . $object->label . '<br/>';
