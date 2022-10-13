@@ -155,7 +155,7 @@ if (empty($reshook)) {
 				$firepermittodelete->fetch($toselectedid);
 
 				$firepermittodelete->status = 0;
-				$result                     = $firepermittodelete->update($user, true);
+				$result                     = $firepermittodelete->update($user, false);
 
 				if ($result < 0) {
 					// Delete firepermit KO
