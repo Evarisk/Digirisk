@@ -293,13 +293,14 @@ NewPreventionPlan = Nouveau plan de prévention
 PreventionPlanDet = Lignes des plans de prévention
 
 # Trigger - Déclencheur
-PREVENTIONPLAN_CREATEInDolibarr = Plan de prévention créé dans Dolibarr
 ActionsOnPreventionPlan = Événements liés au plan de prévention
 PreventionPlanGeneratedWithDolibarr = Plan de prévention généré avec Dolibarr
-PreventionPlanLineCreateTrigger = Ligne de plan de prévention créée
-PreventionPlanLineModifyTrigger = Ligne de plan de prévention modifiée
-PreventionPlanLineDeleteTrigger = Ligne de plan de prévention supprimée
-PreventionPlanModifyTrigger = Modification du plan de prévention
+PreventionPlanLineCreateTrigger = Ligne de plan de prévention %s créée
+PreventionPlanLineModifyTrigger = Ligne de plan de prévention %s modifiée
+PreventionPlanLineDeleteTrigger = Ligne de plan de prévention %s supprimée
+PreventionPlanCreateTrigger = Plan de prévention %s crée
+PreventionPlanModifyTrigger = Plan de prévention %s modifié
+PreventionPlanDeleteTrigger = Plan de prévention %s supprimé
 PreventionPlanInprogressTrigger = Plan de prévention rouvert
 PreventionPlanPendingSignatureTrigger = Plan de prévention en attente de signature des participants
 PreventionPlanLockTrigger = Plan de prévention verrouillé - Prêt pour la génération du documuent
@@ -437,13 +438,14 @@ CreateFirePermit = Créer/Modifier le permis de feu
 DeleteFirePermit = Supprimer le permis de feu
 
 # Trigger - Déclencheur
-FIREPERMIT_CREATEInDolibarr = Permis de feu créé dans Dolibarr
 ActionsOnFirePermit = Événements liés au permis de feu
 FirePermitGeneratedWithDolibarr = Permis de feu généré avec Dolibarr
-FirePermitLineCreateTrigger = Ligne de permis de Feu créée
-FirePermitLineModifyTrigger = Ligne de permis de feu modifiée
-FirePermitLineDeleteTrigger = Ligne de permis de feu supprimée
-FirePermitModifyTrigger = Modification du permis de feu
+FirePermitLineCreateTrigger = Ligne de permis de Feu %s créée
+FirePermitLineModifyTrigger = Ligne de permis de feu %s modifiée
+FirePermitLineDeleteTrigger = Ligne de permis de feu %s supprimée
+FirePermitCreateTrigger = Permis de Feu %s créé
+FirePermitModifyTrigger = Permis de feu %s modifié
+FirePermitDeleteTrigger = Permis de feu %s supprimé
 FirePermitInprogressTrigger = Permis de feu rouvert
 FirePermitPendingSignatureTrigger = Permis de feu en attente de signature des participants
 FirePermitLockTrigger = Permis de feu verrouillé - Prêt pour la génération du documuent
@@ -922,9 +924,10 @@ Organization = Organisation GP/UT
 #
 
 # Trigger - Déclencheur
-GROUPMENT_CREATEInDolibarr = Groupement créé dans Dolibarr
 ActionsOnGroupment = Événements liés au groupement
 groupmentCreateTrigger = Groupement %s créé
+groupmentModifyTrigger = Groupement %s modifié
+groupmentDeleteTrigger = Groupement %s supprimé
 
 # Mod Numbering - Modèle de numérotation
 DigiriskGroupmentNumberingModule = Modèle de numérotation des groupements de Digirisk
@@ -945,9 +948,10 @@ ShowDeletedDigiriskElement = Afficher les groupements / unités de travail qui s
 #
 
 # Trigger - Déclencheur
-WORKUNIT_CREATEInDolibarr = Unité de travail créée dans Dolibarr
 ActionsOnWorkUnit = Événements liés au unité de travail
 workunitCreateTrigger = Unité de travail %s créée
+workunitModifyTrigger = Unité de travail %s modifiée
+workunitDeleteTrigger = Unité de travail %s supprimée
 
 # Mod Numbering - Modèle de numérotation
 DigiriskWorkUnitNumberingModule = Modèle de numérotation des unités de travail de Digirisk

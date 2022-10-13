@@ -149,7 +149,7 @@ if (empty($reshook)) {
 				$preventionplantodelete->fetch($toselectedid);
 
 				$preventionplantodelete->status = 0;
-				$result                         = $preventionplantodelete->update($user, true);
+				$result                         = $preventionplantodelete->update($user, false);
 
 				if ($result < 0) {
 					// Delete preventionplan KO
