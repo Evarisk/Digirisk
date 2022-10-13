@@ -83,7 +83,7 @@ function ticketPrepareHead()
 		$h++;
 
 		$head[$h][0] = DOL_URL_ROOT . '/custom/digiriskdolibarr/view/ticket/ticketstatscsv.php';
-		$head[$h][1] = '<i class="fas fa-file-alt"></i> ' . $langs->trans("DocumentsAndCSV");
+		$head[$h][1] = '<i class="fas fa-file-csv"></i> ' . $langs->trans("ExportCSV");
 		$head[$h][2] = 'exportcsv';
 	}
 

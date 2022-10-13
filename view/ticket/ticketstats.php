@@ -60,15 +60,15 @@ if (!$user->rights->ticket->read) {
 	accessforbidden();
 }
 
-$action             = GETPOST('action', 'aZ09');
-$object_status      = GETPOST('object_status', 'array');
-$userid             = GETPOST('userid', 'int');
-$userassignid       = GETPOST('userassignid', 'int');
-$socid              = GETPOST('socid', 'int');
-$digiriskelementid  = GETPOST('digiriskelementid', 'int');
-$categticketid      = GETPOST('categticketid', 'int');
-$ticketcats         = GETPOST('ticketcats', 'array');
-$digirkelementlist  = GETPOST('digirkelementlist', 'array');
+$action              = GETPOST('action', 'aZ09');
+$object_status       = GETPOST('object_status', 'array');
+$userid              = GETPOST('userid', 'int');
+$userassignid        = GETPOST('userassignid', 'int');
+$socid               = GETPOST('socid', 'int');
+$digiriskelementid   = GETPOST('digiriskelementid', 'int');
+$categticketid       = GETPOST('categticketid', 'int');
+$ticketcats          = GETPOST('ticketcats', 'array');
+$digiriskelementlist = GETPOST('digiriskelementlist', 'array');
 
 // Initialize technical objects
 $object          = new Ticket($db);
@@ -86,8 +86,11 @@ dol_mkdir($upload_dir);
 
 $nowyear   = strftime("%Y", dol_now());
 $year      = GETPOST('year') > 0 ? GETPOST('year', 'int') : $nowyear;
-$startyear = $year - (empty($conf->global->MAIN_STATS_GRAPHS_SHOW_N_YEARS) ? 2 : max(1, min(10, $conf->global->MAIN_STATS_GRAPHS_SHOW_N_YEARS)));
-$endyear   = $year;
+//$startyear = $year - (empty($conf->global->MAIN_STATS_GRAPHS_SHOW_N_YEARS) ? 2 : max(1, min(10, $conf->global->MAIN_STATS_GRAPHS_SHOW_N_YEARS)));
+$date_start = dol_mktime(0, 0, 0, GETPOST('datestartmonth', 'int'), GETPOST('datestartday', 'int'), GETPOST('datestartyear', 'int'));
+$date_end   = dol_mktime(0, 0, 0, GETPOST('dateendmonth', 'int'), GETPOST('dateendday', 'int'), GETPOST('dateendyear', 'int'));
+$startyear = strftime("%Y", !empty($date_start) ? $date_start : dol_now());
+$endyear   = strftime("%Y", !empty($date_end) ? $date_end : dol_now() + 1);
 
 /*
  * Action
@@ -121,17 +124,41 @@ $head = ticketPrepareHead();
 print dol_get_fiche_head($head, 'byyear', $langs->trans("TicketStatistics"), -1);
 
 $stats = new TicketDigiriskStats($db, $socid, ($userid > 0 ? $userid: 0), ($userassignid > 0 ? $userassignid: 0), ($digiriskelementid > 0 ? $digiriskelementid : 0), ($categticketid > 0 ? $categticketid: 0));
-if (is_array($object_status) && !empty($object_status)) {
-	$stats->where .= ' AND tk.fk_statut IN ('.$db->sanitize(implode(',', $object_status)).')';
+if (is_array($object_status)) {
+	if (in_array($langs->trans('All'), $object_status)) {
+		unset($object_status[array_search($langs->trans('All'), $object_status)]);
+	} else {
+		if (!empty($object_status)) {
+			$stats->where .= ' AND tk.fk_statut IN ('.$db->sanitize(implode(',', $object_status)).')';
+		} else if (!empty(GETPOST('refresh', 'int'))) {
+			$stats->where .= ' AND tk.fk_statut IS NULL';
+		}
+	}
 }
-if (is_array($ticketcats) && !empty($ticketcats)) {
-	$stats->from .= ' LEFT JOIN '.MAIN_DB_PREFIX.'categorie_ticket as cattk ON (tk.rowid = cattk.fk_ticket)';
-	$stats->where .= ' AND cattk.fk_categorie IN ('.$db->sanitize(implode(',', $ticketcats)).')';
+if (is_array($ticketcats)) {
+	if (in_array($langs->trans('All'), $ticketcats)) {
+		unset($ticketcats[array_search($langs->trans('All'), $ticketcats)]);
+	} else {
+		$stats->from .= ' LEFT JOIN '.MAIN_DB_PREFIX.'categorie_ticket as cattk ON (tk.rowid = cattk.fk_ticket)';
+		if (!empty($ticketcats)) {
+			$stats->where .= ' AND cattk.fk_categorie IN ('.$db->sanitize(implode(',', $ticketcats)).')';
+		} else if (!empty(GETPOST('refresh', 'int'))) {
+			$stats->where .= ' AND cattk.fk_categorie IS NULL';
+		}
+	}
 }
-if (is_array($digirkelementlist) && !empty($digirkelementlist)) {
-	$stats->join .= ' LEFT JOIN '.MAIN_DB_PREFIX.'ticket_extrafields as tkextra ON tk.rowid = tkextra.fk_object';
-	$stats->join .= ' LEFT JOIN '.MAIN_DB_PREFIX.'digiriskdolibarr_digiriskelement as e ON tkextra.digiriskdolibarr_ticket_service = e.rowid';
-	$stats->where .= ' AND e.rowid IN ('.$db->sanitize(implode(',', $digirkelementlist)).')';
+if (is_array($digiriskelementlist)) {
+	if (in_array($langs->trans('All'), $digiriskelementlist)) {
+		unset($digiriskelementlist[array_search($langs->trans('All'), $digiriskelementlist)]);
+	} else {
+		$stats->join .= ' LEFT JOIN '.MAIN_DB_PREFIX.'ticket_extrafields as tkextra ON tk.rowid = tkextra.fk_object';
+		$stats->join .= ' LEFT JOIN '.MAIN_DB_PREFIX.'digiriskdolibarr_digiriskelement as e ON tkextra.digiriskdolibarr_ticket_service = e.rowid';
+		if (!empty($digiriskelementlist)) {
+			$stats->where .= ' AND e.rowid IN ('.$db->sanitize(implode(',', $digiriskelementlist)).')';
+		} else if (!empty(GETPOST('refresh', 'int'))) {
+			$stats->where .= ' AND e.rowid IS NULL';
+		}
+	}
 }
 
 // Build graphic number of object
@@ -210,55 +237,56 @@ if (!count($arrayyears)) {
 print '<div class="fichecenter"><div class="fichethirdleft">';
 
 // Show filter box
-print '<form class="ticketstats" name="stats" method="POST" action="'.$_SERVER["PHP_SELF"].'">';
+print '<form class="ticketstats" name="stats" method="POST" action="'.$_SERVER["PHP_SELF"].'?refresh=1">';
 print '<input type="hidden" name="token" value="'.newToken().'">';
 
 print '<table class="noborder centpercent">';
 print '<tr class="liste_titre"><td class="liste_titre" colspan="2">'.$langs->trans("Filter").'</td></tr>';
 // Company
-print '<tr><td class="left">'.$langs->trans("ThirdParty").'</td><td class="left">';
+print '<tr><td class="left">'.$form->textwithpicto($langs->trans("ThirdParty"), $langs->trans("ThirdPartyHelp")).'</td><td class="left">';
 print img_picto('', 'company', 'class="pictofixedwidth"');
 print $form->select_company($socid, 'socid', '', 1, 0, 0, array(), 0, 'widthcentpercentminusx maxwidth300');
 print '</td></tr>';
 // DigiriskElement
-print '<tr><td class="left">'.$langs->trans("GP/UT").'</td><td class="left">';
-print img_picto('', '', 'class="pictofixedwidth"');
-$digirkelementlist = $digiriskelement->select_digiriskelement_list($digiriskelementid, 'digiriskelementid', '', 0, 0, array(), 1);
-print $form->multiselectarray('digirkelementlist', $digirkelementlist, GETPOST('digirkelementlist', 'array'), 0, 0, 'widthcentpercentminusx maxwidth300');
+print '<tr><td class="left">'.$form->textwithpicto($langs->trans("GP/UT"), $langs->trans("GP/UTHelp")).'</td><td class="left">';
+$digiriskelementlist = $digiriskelement->select_digiriskelement_list($digiriskelementid, 'digiriskelementid', '', 1, 0, array(), 1);
+$digiriskelementlist[$langs->trans('All')] = $langs->trans('All');
+print $form->multiselectarray('digiriskelementlist', $digiriskelementlist, ((!empty(GETPOST('refresh', 'int'))) ? GETPOST('digiriskelementlist', 'array') : $digiriskelementlist), 0, 0, 'widthcentpercentminusx maxwidth300');
 print '</td></tr>';
 // Category
 if (!empty($conf->category->enabled)) {
 	$cat_type = Categorie::TYPE_TICKET;
 	$cat_label = $langs->trans("Category") . ' ' .lcfirst($langs->trans("Ticket"));
-	print '<tr><td>'.$cat_label.'</td><td>';
+	print '<tr><td>'.$form->textwithpicto($cat_label, $langs->trans("CategoryTicketHelp")).'</td><td>';
 	$cate_arbo = $form->select_all_categories($cat_type, null, 'parent', null, null, 1);
 	print img_picto('', 'category', 'class="pictofixedwidth"');
-	print $form->multiselectarray('ticketcats', $cate_arbo, GETPOST('ticketcats', 'array'), 0, 0, 'widthcentpercentminusx maxwidth300');
+	$cate_arbo[$langs->trans('All')] = $langs->trans('All');
+	print $form->multiselectarray('ticketcats', $cate_arbo, ((!empty(GETPOST('refresh', 'int'))) ? GETPOST('ticketcats', 'array') : $cate_arbo), 0, 0, 'widthcentpercentminusx maxwidth300');
 	print '</td></tr>';
 }
 // User
-print '<tr><td class="left">'.$langs->trans("CreatedBy").'</td><td class="left">';
+print '<tr><td class="left">'.$form->textwithpicto($langs->trans("CreatedBy"), $langs->trans("CreatedByHelp")) .'</td><td class="left">';
 print img_picto('', 'user', 'class="pictofixedwidth"');
 print $form->select_dolusers($userid, 'userid', 1, '', 0, '', '', $conf->entity, 0, 0, '', 0, '', 'widthcentpercentminusx maxwidth300');
 // Assign at user
-print '<tr><td class="left">'.$langs->trans("AssignedTo").'</td><td class="left">';
+print '<tr><td class="left">'.$form->textwithpicto($langs->trans("AssignedTo"), $langs->trans("AssignedToHelp")).'</td><td class="left">';
 print img_picto('', 'user', 'class="pictofixedwidth"');
 print $form->select_dolusers($userassignid, 'userassignid', 1, '', 0, '', '', $conf->entity, 0, 0, '', 0, '', 'widthcentpercentminusx maxwidth300');
 // Status
-print '<tr><td class="left">'.$langs->trans("Status").'</td><td class="left">';
+print '<tr><td class="left">'.$form->textwithpicto($langs->trans("Status"), $langs->trans("StatusHelp")).'</td><td class="left">';
 $liststatus = $object->statuts_short;
-print $form->multiselectarray('object_status', $liststatus, GETPOST('object_status', 'array'), 0, 0, 'widthcentpercentminusx maxwidth300', 1);
+$liststatus[$langs->trans('All')] = $langs->trans('All');
+print $form->multiselectarray('object_status', $liststatus, ((!empty(GETPOST('refresh', 'int'))) ? GETPOST('object_status', 'array') : $liststatus), 0, 0, 'widthcentpercentminusx maxwidth300', 1);
 print '</td></tr>';
-// Year
-print '<tr><td class="left">'.$langs->trans("Year").'</td><td class="left">';
-if (!in_array($year, $arrayyears)) {
-	$arrayyears[$year] = $year;
+//DateRange -- Plage de date
+if (!empty($conf->global->SOCIETE_FISCAL_MONTH_START)) {
+	$startday = dol_mktime(0, 0, 0, $conf->global->SOCIETE_FISCAL_MONTH_START, 1, strftime("%Y", dol_now()));
+} else {
+	$startday = dol_now();
 }
-if (!in_array($nowyear, $arrayyears)) {
-	$arrayyears[$nowyear] = $nowyear;
-}
-arsort($arrayyears);
-print $form->selectarray('year', $arrayyears, $year, 0, 0, 0, '', 0, 0, 0, '', 'width75');
+print '<tr><td class="left">' . $langs->trans("DateRange") . '</td><td class="left">';
+print $langs->trans('From') . $form->selectDate((!empty($date_start) ? $date_start : $startday), 'datestart', 0, 0, 0, '', 1);
+print $langs->trans('At') . $form->selectDate((!empty($date_end) ? $date_end : dol_time_plus_duree($startday, 1, 'y')), 'dateend', 0, 0, 0, '', 1);
 print '</td></tr>';
 print '<tr><td class="center" colspan="2"><input type="submit" name="submit" class="button small" value="'.$langs->trans("Refresh").'"></td></tr>';
 print '</table>';
@@ -293,6 +321,49 @@ foreach ($data as $val) {
 	print '<td class="right" style="'.(($val['nb_diff'] >= 0) ? 'color: green;' : 'color: red;').'">'.round($val['nb_diff']).'</td>';
 	print '</tr>';
 	$oldyear = $year;
+}
+
+print '</table>';
+print '</div>';
+
+// Get list of files
+if ( ! empty($upload_dir)) {
+	$file_list = dol_dir_list($upload_dir, 'files', 0, '(\.png)', '', 'date', SORT_DESC, 1);
+}
+
+print load_fiche_titre($langs->trans("Documents"), '', 'digiriskdolibarr@digiriskdolibarr');
+
+// Show table
+print '<div class="div-table-responsive-no-min">';
+print '<table class="liste noborder centpercent">';
+print '<tr class="liste_titre">';
+print '<th class="liste_titre center" colspan="3"></th>';
+print '</tr>';
+
+// Get list of files
+if ( ! empty($upload_dir)) {
+	// Loop on each file found
+	if (is_array($file_list)) {
+		foreach ($file_list as $file) {
+			// Show file name with link to download
+			print '<tr class="oddeven">';
+			print '<td class="minwidth200">';
+			print '<a class="documentdownload paddingright" href="' . DOL_URL_ROOT . '/document.php?modulepart=digiriskdolibarr&file=' . urlencode('ticketstats/'.$file['name']) . '&entiy='.$conf->entity . '">';
+			print  img_mime($file["name"], $langs->trans("File") . ': ' . $file["name"]);
+			print  dol_trunc($file["name"], 150);
+			print  '</a>';
+			print  '</td>';
+
+			// Show file size
+			$size = (!empty($file['size']) ? $file['size'] : dol_filesize($upload_dir . "/" . $file["name"]));
+			print '<td class="nowrap right">' . dol_print_size($size, 1, 1) . '</td>';
+
+			// Show file date
+			$date = (!empty($file['date']) ? $file['date'] : dol_filemtime($upload_dir . "/" . $file["name"]));
+			print '<td class="nowrap right">' . dol_print_date($date, 'dayhour', 'tzuser') . '</td>';
+			print '</tr>';
+		}
+	}
 }
 
 print '</table>';
