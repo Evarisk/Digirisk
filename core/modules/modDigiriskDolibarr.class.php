@@ -418,6 +418,7 @@ class modDigiriskdolibarr extends DolibarrModules
 				'projectOverview',
 				'userlist'
 				'thirdpartycard',
+				'contactcard',
 			),
 			'tabs' => array(
 				'mycompany_admin'
