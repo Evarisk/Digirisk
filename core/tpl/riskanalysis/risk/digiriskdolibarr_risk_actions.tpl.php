@@ -561,6 +561,7 @@ if ( ! $error && $action == 'addRiskAssessmentTaskTimeSpent' && $permissiontoadd
 if ( ! $error && $action == 'saveRiskAssessmentTaskTimeSpent' && $permissiontoadd) {
 	$data = json_decode(file_get_contents('php://input'), true);
 
+	$taskID 					   = $data['taskID'];
 	$riskAssessmentTaskTimeSpentID = $data['riskAssessmentTaskTimeSpentID'];
 	$date                          = $data['date'];
 	$hour                          = $data['hour'];
@@ -569,6 +570,7 @@ if ( ! $error && $action == 'saveRiskAssessmentTaskTimeSpent' && $permissiontoad
 	$duration                      = $data['duration'];
 
 	$task->fetchTimeSpent($riskAssessmentTaskTimeSpentID);
+	$task->fetch($taskID);
 
 	if (!empty($date)) {
 		$task->timespent_datehour = strtotime(preg_replace('/\//', '-', $date));
@@ -597,6 +599,7 @@ if ( ! $error && $action == "deleteRiskAssessmentTaskTimeSpent" && $permissionto
 	$deleteRiskAssessmentTaskTimeSpentId = GETPOST('deletedRiskAssessmentTaskTimeSpentId');
 
 	$task->fetchTimeSpent($deleteRiskAssessmentTaskTimeSpentId);
+	$task->fetch($task->id);
 
 	$result = $task->delTimeSpent($user, false);
 
