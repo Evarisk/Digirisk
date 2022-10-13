@@ -118,7 +118,7 @@ class FirePermit extends CommonObject
 	 */
 	public $fields = array(
 		'rowid'                => array('type' => 'integer', 'label' => 'TechnicalID', 'enabled' => '1', 'position' => 1, 'notnull' => 1, 'visible' => 0, 'noteditable' => '1', 'index' => 1, 'comment' => "Id"),
-		'ref'                  => array('type' => 'varchar(128)', 'label' => 'Ref', 'enabled' => '1', 'position' => 10, 'notnull' => 1, 'visible' => 1, 'noteditable' => '1', 'default' => '(PROV)', 'index' => 1, 'searchall' => 1, 'showoncombobox' => '1', 'comment' => "Reference of object"),
+		'ref'                  => array('type' => 'varchar(128)', 'label' => 'Ref', 'enabled' => '1', 'position' => 10, 'notnull' => 1, 'visible' => 1, 'noteditable' => '1', 'index' => 1, 'searchall' => 1, 'showoncombobox' => '1', 'comment' => "Reference of object"),
 		'ref_ext'              => array('type' => 'varchar(128)', 'label' => 'RefExt', 'enabled' => '1', 'position' => 20, 'notnull' => 0, 'visible' => 0,),
 		'entity'               => array('type' => 'integer', 'label' => 'Entity', 'enabled' => '1', 'position' => 30, 'notnull' => 1, 'visible' => 0,),
 		'date_creation'        => array('type' => 'datetime', 'label' => 'DateCreation', 'enabled' => '1', 'position' => 40, 'notnull' => 1, 'visible' => 0,),
@@ -149,6 +149,18 @@ class FirePermit extends CommonObject
 	public $fk_user_creat;
 	public $fk_user_modif;
 	public $fk_preventionplan;
+
+	/**
+	 * @var string	Field with ID of parent key if this object has a parent
+	 */
+	public $fk_element = 'element_id';
+
+	/**
+	 * @var array	List of child tables. To test if we can delete object.
+	 */
+	protected $childtables = array(
+		'digiriskdolibarr_digiriskresources' => 'DigiriskResources'
+	);
 
 	/**
 	 * Constructor
@@ -698,7 +710,7 @@ class FirePermitLine extends CommonObjectLine
 		'entity'        => array('type' => 'integer', 'label' => 'Entity', 'enabled' => '1', 'position' => 30, 'notnull' => 1, 'visible' => 0,),
 		'date_creation' => array('type' => 'datetime', 'label' => 'DateCreation', 'enabled' => '1', 'position' => 40, 'notnull' => 1, 'visible' => 0,),
 		'tms'           => array('type' => 'timestamp', 'label' => 'DateModification', 'enabled' => '1', 'position' => 50, 'notnull' => 0, 'visible' => 0,),
-		'category'      => array('type' => 'integer', 'label' => 'PriorVisit', 'enabled' => '1', 'position' => 60, 'notnull' => -1, 'visible' => -1,),
+		'category'      => array('type' => 'integer', 'label' => 'INRSRisk', 'enabled' => '1', 'position' => 60, 'notnull' => -1, 'visible' => -1,),
 		'description'   => array('type' => 'text', 'label' => 'Description', 'enabled' => '1', 'position' => 70, 'notnull' => -1, 'visible' => -1,),
 		'use_equipment' => array('type' => 'text', 'label' => 'UseEquipment', 'enabled' => '1', 'position' => 80, 'notnull' => -1, 'visible' => -1,),
 		'fk_firepermit' => array('type' => 'integer', 'label' => 'FkFirePermit', 'enabled' => '1', 'position' => 90, 'notnull' => 1, 'visible' => 0,),
