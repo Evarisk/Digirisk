@@ -91,6 +91,8 @@ $date_start = dol_mktime(0, 0, 0, GETPOST('datestartmonth', 'int'), GETPOST('dat
 $date_end   = dol_mktime(0, 0, 0, GETPOST('dateendmonth', 'int'), GETPOST('dateendday', 'int'), GETPOST('dateendyear', 'int'));
 $startyear = strftime("%Y", !empty($date_start) ? $date_start : dol_now());
 $endyear   = strftime("%Y", !empty($date_end) ? $date_end : dol_now() + 1);
+$datestart = dol_print_date((!empty($date_start) ? $date_start : dol_now()), 'dayxcard');
+$dateend   = dol_print_date((!empty($date_end) ? $date_end : dol_now()), 'dayxcard');
 
 /*
  * Action
@@ -104,7 +106,7 @@ if ($action == 'savegraph') {
 	list($type, $data) = explode(';', $data);
 	list(, $data)      = explode(',', $data);
 	$data = base64_decode($data);
-	$filenamenb = $upload_dir.'/ticketdigiriskstatsnbinyear-'.$year.'.png';
+	$filenamenb = $upload_dir.'/ticketdigiriskstats.png';
 	file_put_contents($filenamenb, $data);
 }
 
@@ -165,11 +167,11 @@ if (is_array($digiriskelementlist)) {
 $data = $stats->getNbByMonthWithPrevYear($endyear, $startyear, 0, 0, $conf->global->SOCIETE_FISCAL_MONTH_START);
 
 if (empty($user->rights->societe->client->voir) || $user->socid) {
-	$filenamenb = $upload_dir.'/ticketdigiriskstatsnbinyear-'.$user->id.'-'.$year.'.png';
-	$fileurlnb = DOL_URL_ROOT.'/viewimage.php?modulepart=ticketdigiriskstats&file=ticketdigiriskstatsnbinyear-'.$user->id.'-'.$year.'.png';
+	$filenamenb = $upload_dir.'/ticketdigiriskstats-'.$user->id.'_'.$datestart.'_'.$dateend.'.png';
+	$fileurlnb = DOL_URL_ROOT.'/viewimage.php?modulepart=ticketdigiriskstats&file=ticketdigiriskstats-'.$user->id.'_'.$datestart.'_'.$dateend.'.png';
 } else {
-	$filenamenb = $upload_dir.'/ticketdigiriskstatsnbinyear-'.$year.'.png';
-	$fileurlnb = DOL_URL_ROOT.'/viewimage.php?modulepart=ticketdigiriskstats&file=ticketdigiriskstatsnbinyear-'.$year.'.png';
+	$filenamenb = $upload_dir.'/ticketdigiriskstats_'.$datestart.'_'.$dateend.'.png';
+	$fileurlnb = DOL_URL_ROOT.'/viewimage.php?modulepart=ticketdigiriskstats&file=ticketdigiriskstats_'.$datestart.'_'.$dateend.'.png';
 }
 
 $px1 = new DolGraph();
@@ -197,15 +199,17 @@ if (!$mesg) {
 
 <script>
 	var checkExist = setInterval(function() {
-		if ($("#canvas_ticketdigiriskstatsnbinyear_<?php echo $year; ?>_png").length) {
+		if ($("#canvas_ticketdigiriskstats_<?php echo $datestart . '_' . $dateend; ?>_png").length) {
 			clearInterval(checkExist);
-			var canvas = document.getElementById("canvas_ticketdigiriskstatsnbinyear_<?php echo $year; ?>_png")
+			var canvas = document.getElementById("canvas_ticketdigiriskstats_<?php echo $datestart . '_' . $dateend; ?>_png")
 			var image = canvas.toDataURL()
+			let querySeparator = '?'
+			document.URL.match(/\?/) ? querySeparator = '&' : 1
 
 			let token = $('.ticketstats').find('input[name="token"]').val();
 
 			$.ajax({
-				url: document.URL + "?action=savegraph&token=" + token,
+				url: document.URL + querySeparator + "action=savegraph&token=" + token,
 				type: "POST",
 				processData: false,
 				contentType: 'application/octet-stream',
