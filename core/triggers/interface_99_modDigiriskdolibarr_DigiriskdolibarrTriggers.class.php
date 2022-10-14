@@ -132,7 +132,11 @@ class InterfaceDigiriskdolibarrTriggers extends DolibarrTriggers
 				$actioncomm->userownerid = $user->id;
 				$actioncomm->percentage  = -1;
 
-				$actioncomm->create($user);
+				$resultCreate=$actioncomm->create($user);
+				if ($resultCreate < 0) {
+					$this->errors = array_merge($this->errors, $actioncomm->errors);
+					return $resultCreate;
+				}
 				break;
 
 			case 'LEGALDISPLAY_GENERATE' :
