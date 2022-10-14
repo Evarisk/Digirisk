@@ -357,23 +357,25 @@ class ActionsDigiriskdolibarr
 
 			if (GETPOST('entity') > 0) {
 				require_once __DIR__ . '/../lib/digiriskdolibarr_function.lib.php';
-
 				require_once __DIR__ . '/digiriskelement.class.php';
-				$digiriskelement = new DigiriskElement($db);
-				$selectDigiriskElement = '<span ' . (($conf->global->DIGIRISKDOLIBARR_TICKET_DIGIRISKELEMENT_REQUIRED) ? 'style="font-weight:600"' : '') . '>' . $langs->trans('GP/UT') . (($conf->global->DIGIRISKDOLIBARR_TICKET_DIGIRISKELEMENT_REQUIRED) ? '<span style="color:red"> *</span>' : '') . '</span>';
 
-				$alldisableddigiriskelement = $digiriskelement->fetchAll('', '', 0, 0, array('customsql' => 't.show_in_selector = 0'));
-				if (is_array($alldisableddigiriskelement) && !empty($alldisableddigiriskelement)) {
-					$filter = 's.rowid NOT IN (';
-					foreach ($alldisableddigiriskelement as $disabled_digiriskelement) {
-						$filter .= $disabled_digiriskelement->id . ',';
+				if ($conf->global->DIGIRISKDOLIBARR_TICKET_DIGIRISKELEMENT_VISIBLE) {
+					$digiriskelement = new DigiriskElement($db);
+					$selectDigiriskElement = '<span ' . (($conf->global->DIGIRISKDOLIBARR_TICKET_DIGIRISKELEMENT_REQUIRED) ? 'style="font-weight:600"' : '') . '>' . $langs->trans('Service') . (($conf->global->DIGIRISKDOLIBARR_TICKET_DIGIRISKELEMENT_REQUIRED) ? '<span style="color:red"> *</span>' : '') . '</span>';
+
+					$alldisableddigiriskelement = $digiriskelement->fetchAll('', '', 0, 0, array('customsql' => 't.show_in_selector = 0'));
+					if (is_array($alldisableddigiriskelement) && !empty($alldisableddigiriskelement)) {
+						$filter = 's.rowid NOT IN (';
+						foreach ($alldisableddigiriskelement as $disabled_digiriskelement) {
+							$filter .= $disabled_digiriskelement->id . ',';
+						}
+						$filter = substr($filter, 0, -1);
+						$filter .= ')';
 					}
-					$filter = substr($filter, 0, -1);
-					$filter .= ')';
-				}
 
-				$selectDigiriskElement .= $digiriskelement->select_digiriskelement_list(GETPOST('options_digiriskdolibarr_ticket_service'), 'options_digiriskdolibarr_ticket_service', (!empty($filter) ? $filter : ''), $langs->trans('PleaseSelectADigiriskElement'), 0, array(), 0, 0, 'minwidth500 maxwidthonsmartphone', 0, false, 1);
-				$selectDigiriskElement .= '<div><br></div>';
+					$selectDigiriskElement .= $digiriskelement->select_digiriskelement_list(GETPOST('options_digiriskdolibarr_ticket_service'), 'options_digiriskdolibarr_ticket_service', (!empty($filter) ? $filter : ''), $langs->trans('PleaseSelectADigiriskElement'), 0, array(), 0, 0, 'minwidth500 maxwidthonsmartphone', 0, false, 1, '', true, $conf->global->DIGIRISKDOLIBARR_TICKET_DIGIRISKELEMENT_HIDE_REF);
+					$selectDigiriskElement .= '<div><br></div>';
+				}
 
 				$emailfield = '<div class="form-element">';
 				$emailfield .= '<span class="form-label"' . (($conf->global->DIGIRISKDOLIBARR_TICKET_EMAIL_REQUIRED) ? '' : 'style="font-weight:300"') . '>' . $langs->trans("Email") . (($conf->global->DIGIRISKDOLIBARR_TICKET_EMAIL_REQUIRED) ? '<span style="color:red"> *</span>' : '') . '</span>';

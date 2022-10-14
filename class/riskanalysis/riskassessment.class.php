@@ -153,18 +153,20 @@ class RiskAssessment extends CommonObject
 	/**
 	 * Create object into database
 	 *
-	 * @param User $user User that creates
-	 * @param bool $notrigger false=launch triggers after, true=disable triggers
-	 * @return int             <0 if KO, Id of created object if OK
-	 * @throws Exception
+	 * @param  User $user         User that creates
+	 * @param  bool $notrigger    False=launch triggers after, true=disable triggers
+	 * @param  bool $updatestatus Update previous riskassessment status
+	 * @return int                if < KO, ID of created object if OK
 	 */
-	public function create(User $user, $notrigger = false)
+	public function create(User $user, $notrigger = false, $updatestatus = true)
 	{
 		// Change status previous ressources at 0
-		$sql   = "UPDATE " . MAIN_DB_PREFIX . "digiriskdolibarr_riskassessment";
-		$sql  .= " SET status = 0";
-		$sql  .= " WHERE fk_risk = " . $this->fk_risk;
-		$this->db->query($sql);
+		if ($updatestatus) {
+			$sql = "UPDATE " . MAIN_DB_PREFIX . "digiriskdolibarr_riskassessment";
+			$sql .= " SET status = 0";
+			$sql .= " WHERE fk_risk = " . $this->fk_risk;
+			$this->db->query($sql);
+		}
 
 		//ADD LINES POUR LE SELECT ENTITY
 		return $this->createCommon($user, $notrigger);

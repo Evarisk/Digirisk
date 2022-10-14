@@ -1464,12 +1464,6 @@ TicketCreationSubject = Création de ticket via l'interface publique de Digirisk
 TicketDocumentCustomDigiriskTemplate = ODT custom des fiches de tickets
 HowToSetupDigiriskElement = Pour configurer les éléments de Digirisk (groupements/unités de travail), veuillez cliquer sur ce lien :
 ConfigDigiriskElement = Configuration des éléments de Digirisk
-TicketStatistics = Statistiques des tickets
-DocumentsAndCSV = Fichiers joints et CSV
-GenerateCSV = Générer le fichier CSV
-SuccessGenerateCSV = Fichier CSV %s généré avec succès
-ErrorMissingData = Erreur : impossible de générer le fichier CSV, les données envoyées au fichier sont incorrecte. <br> Veuillez vérifier que vous avez bien des GP/UT assignés à des tickets.
-CSVFile = Fichier CSV
 ErrorFieldEmail = Erreur : l'email doit correspondre au format suivant : <b>'aaa@aaa.fr'</b>
 TicketEmailRequired = Email obligatoire pour créer un ticket
 TicketEmailRequiredHelp = Activer cette option pour rendre obligatoire la saisie d'un email pour créer un ticket dans l'interface publique
@@ -1483,6 +1477,24 @@ TicketPublicInterfaceQRCode = QR Code de l'interface publique des tickets
 MultiEntityTicketPublicInterfaceQRCode =  QR Code de l'interface publique des tickets multi-société
 TicketDigiriskElementRequired = GP/UT obligatoire pour créer un ticket
 TicketDigiriskElementRequiredHelp = Activer cette option pour rendre obligatoire la selection d'un GP/UT pour créer un ticket dans l'interface publique
+TicketDigiriskElementHideRef = Cacher la référence des GP/UT
+TicketDigiriskElementHideRefHelp = Activer cette option pour rendre cacher la référence d'un GP/UT dans l'interface publique
+TicketDigiriskElementVisible = Afficher le champ GP/UT pour créer un ticket
+TicketDigiriskElementVisibleHelp = Activer cette option pour afficher le champ GP/UT dans l'interface publique
+
+# Stats - Statistiques
+TicketStatistics = Statistiques des tickets
+ExportCSV = Export CSV
+GenerateCSV = Générer le fichier CSV
+SuccessGenerateCSV = Fichier CSV %s généré avec succès
+ErrorMissingData = Erreur : impossible de générer le fichier CSV, les données envoyées au fichier sont incorrecte. <br> Veuillez vérifier que vous avez bien des GP/UT assignés à des tickets.
+CSVFileExport = Export des registres au format CSV associé à des GP/UT
+ThirdPartyHelp = Si le filtre "Tiers" est vide, aucun tiers n'est utilisé pour la recherche
+GP/UTHelp = Par défaut, le filtre prend toutes les GP/UT
+CategoryTicketHelp = Par défaut, le filtre prend toutes les catégories
+CreatedByHelp = Si le filtre "Créer par" est vide, aucun utilisateur n'est utilisé pour la recherche
+AssignedToHelp = Si le filtre "Assigné à" est vide, aucun utilisateur n'est utilisé pour la recherche
+StatusHelp = Par défaut, le filtre prend tous les états<br>
 
 
 
@@ -1524,12 +1536,18 @@ DataMigrationImportRiskSigns = Importation des données des signalisations de Di
 DataMigrationImportRiskSignsDescription = Importation des données des signalisations de Digirisk WordPress au format ZIP
 DataMigrationImportGlobal = Importation des données globales de Digirisk <br> (Arborescence, risques et signalisations)
 DataMigrationImportGlobalDescription = Importation des données globales de Digirisk WordPress au format ZIP <br> (Arborescence, risques et signalisations)
+DataMigrationExportGlobal = Exportation des données globales de Digirisk <br> (Arborescence, risques et signalisations)
+DataMigrationExportGlobalDescription = Exportation des données globales de Digirisk Dolibarr au format ZIP <br> (Arborescence, risques et signalisations)
+DataMigrationImportGlobalDolibarrDescription = Importation des données globales de Digirisk Dolibarr au format ZIP <br> (Arborescence, risques et signalisations)
 DataMigrationTreeAlreadyImported = Importation des données de l'arborescence déjà réalisée
 DataMigrationRisksAlreadyImported = Importation des données des risques déjà réalisée
 DataMigrationRiskSignsAlreadyImported = Importation des données des signalisations déjà réalisée
 DataMigrationGlobalAlreadyImported = Importation des données globales (Arborescence, risques et signalisations) déjà réalisée
 AdvancedImport = Import avancé
 AdvancedImportDescription = Permet d'importer chaque élément indépendamment (Arborescence, risques et signalisations)
+ExportData = Exporter mes données
+DataMigrationWordPressToDolibarr = Migration des données de WordPress vers Dolibarr
+DataMigrationDolibarrToDolibarr = Migration des données de Dolibarr vers Dolibarr
 
 
 #
