@@ -108,36 +108,4 @@ class mod_workunit_standard extends ModeleNumRefDigiriskElement
 		dol_syslog("mod_workunit_standard::getNextValue return " . $this->prefix . $num);
 		return $this->prefix . $num;
 	}
-
-	/**
-	 *    Return last value
-	 *
-	 * @param Object $object Object we need next value for
-	 * @return string                Value if KO, <0 if KO
-	 * @throws Exception
-	 */
-	public function getLastValue($object)
-	{
-		global $db, $conf;
-
-		// first we get the max value
-		$posindice = strlen($this->prefix) + 1;
-		$sql       = "SELECT MAX(CAST(SUBSTRING(ref FROM " . $posindice . ") AS SIGNED)) as max";
-		$sql      .= " FROM " . MAIN_DB_PREFIX . "digiriskdolibarr_digiriskelement";
-		$sql      .= " WHERE ref LIKE '" . $db->escape($this->prefix) . "%'";
-		if ($object->ismultientitymanaged == 1) {
-			$sql .= " AND entity = " . $conf->entity;
-		}
-		$sql .= " ORDER BY rowid DESC LIMIT 1";
-
-		$resql = $db->query($sql);
-
-		if ($resql) {
-			$obj = $db->fetch_object($resql);
-		} else {
-			dol_syslog("mod_workunit_standard::getlastValue", LOG_DEBUG);
-			return -1;
-		}
-		return $this->prefix . $obj->max;
-	}
 }
