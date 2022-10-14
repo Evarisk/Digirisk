@@ -196,9 +196,9 @@ class DigiriskStandard extends CommonObject
 		} else $linkclose = ($morecss ? ' class="' . $morecss . '"' : '');
 
 		if ($option != 'nolink') {
-			$linkstart = '<a href="' . $url . '"';
+			$linkstart  = '<a href="' . $url . '"';
 			$linkstart .= $linkclose . '>';
-			$linkend = '</a>';
+			$linkend 	= '</a>';
 		}
 
 		$result                      .= $linkstart;
