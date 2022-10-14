@@ -415,9 +415,7 @@ class modDigiriskdolibarr extends DolibarrModules
 				'projectcard',
 				'projectcontactcard',
 				'projecttasktime',
-				'projectOverview',
-				'thirdpartycard',
-				'contactcard',
+				'projectOverview'
 			),
 			'tabs' => array(
 				'mycompany_admin'

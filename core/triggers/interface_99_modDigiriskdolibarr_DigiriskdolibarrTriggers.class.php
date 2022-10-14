@@ -141,6 +141,58 @@ class InterfaceDigiriskdolibarrTriggers extends DolibarrTriggers
 				$actioncomm->create($user);
 				break;
 
+			case 'COMPANY_DELETE' :
+				dol_syslog("Trigger '" . $this->name . "' for action '$action' launched by " . __FILE__ . ". id=" . $object->id);
+				require_once __DIR__ . '/../../class/preventionplan.class.php';
+				require_once __DIR__ . '/../../class/firepermit.class.php';
+				require_once __DIR__ . '/../../class/digiriskresources.class.php';
+
+				$preventionplan 	  = new PreventionPlan($this->db);
+				$firepermit 		  = new FirePermit($this->db);
+				$digiriskresources 	  = new DigiriskResources($this->db);
+				$alldigiriskresources = $digiriskresources->fetchAll('', '', 0, 0, array('customsql' => 't.element_id = ' . $object->id));
+
+				if (is_array($alldigiriskresources) && !empty($alldigiriskresources)) {
+					foreach ($alldigiriskresources as $digiriskresourcesingle) {
+						($digiriskresourcesingle->object_type == 'preventionplan' ? $preventionplan->fetch($digiriskresourcesingle->object_id) : '');
+						($digiriskresourcesingle->object_type == 'firepermit' ? $firepermit->fetch($digiriskresourcesingle->object_id) : '');
+					}
+					($preventionplan->status != 0 ? $result = $preventionplan->isObjectUsed($object->id) : '');
+					($result <= 0 && $firepermit->status != 0 ? $result = $firepermit->isObjectUsed($object->id) : '');
+				}
+
+				if ($result > 0) {
+					($preventionplan->status != 0 ? $object->errors = $preventionplan->errors : $object->errors = $firepermit->errors);
+					return -1;
+				}
+				break;
+
+			case 'CONTACT_DELETE' :
+				dol_syslog("Trigger '" . $this->name . "' for action '$action' launched by " . __FILE__ . ". id=" . $object->id);
+				require_once __DIR__ . '/../../class/preventionplan.class.php';
+				require_once __DIR__ . '/../../class/firepermit.class.php';
+				require_once __DIR__ . '/../../class/digiriskresources.class.php';
+
+				$preventionplan 	  = new PreventionPlan($this->db);
+				$firepermit 		  = new FirePermit($this->db);
+				$digiriskresources 	  = new DigiriskResources($this->db);
+				$alldigiriskresources = $digiriskresources->fetchAll('', '', 0, 0, array('customsql' => 't.element_id = ' . $object->fk_soc));
+
+				if (is_array($alldigiriskresources) && !empty($alldigiriskresources)) {
+					foreach ($alldigiriskresources as $digiriskresourcesingle) {
+						($digiriskresourcesingle->object_type == 'preventionplan' ? $preventionplan->fetch($digiriskresourcesingle->object_id) : '');
+						($digiriskresourcesingle->object_type == 'firepermit' ? $firepermit->fetch($digiriskresourcesingle->object_id) : '');
+					}
+					($preventionplan->status != 0 ? $result = $preventionplan->isObjectUsed($object->fk_soc) : '');
+					($result <= 0 && $firepermit->status != 0 ? $result = $firepermit->isObjectUsed($object->fk_soc) : '');
+				}
+
+				if ($result > 0) {
+					($preventionplan->status != 0 ? $object->errors = $preventionplan->errors : $object->errors = $firepermit->errors);
+					return -1;
+				}
+				break;
+
 			case 'LEGALDISPLAY_GENERATE' :
 				dol_syslog("Trigger '" . $this->name . "' for action '$action' launched by " . __FILE__ . ". id=" . $object->id);
 				require_once DOL_DOCUMENT_ROOT . '/comm/action/class/actioncomm.class.php';
