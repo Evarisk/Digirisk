@@ -266,7 +266,7 @@ if ($sharedrisks) {
 				$importValue .= '</div>';
 
 				$importValue .= '<div class="importsharedrisk risk-evaluation-cotation"  data-scale="'. $lastEvaluation->get_evaluation_scale() .'">';
-				$importValue .= '<span class="importsharedrisk-risk-assessment">' . $lastEvaluation->cotation  . '</span>';
+				$importValue .= '<span class="importsharedrisk-risk-assessment">' . (!empty($lastEvaluation->cotation) ? $lastEvaluation->cotation : 0) . '</span>';
 				$importValue .= '</div>';
 
 				$relativepath = 'digiriskdolibarr/medias/thumbs/';
