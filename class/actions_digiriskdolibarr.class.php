@@ -323,7 +323,7 @@ class ActionsDigiriskdolibarr
 						$nbtasks = count($alltasks);
 						foreach ($alltasks as $tasksignle) {
 							$filter = ' AND ptt.fk_task = ' . $tasksignle->id;
-							$alltimespent = $tasksignle->fetchAllTimeSpent($user, $filter);
+							$alltimespent = $task->fetchAllTimeSpentAllUser($filter);
 							foreach ($alltimespent as $timespent) {
 								$totatconsumedtimeamount += convertSecondToTime($timespent->timespent_duration, 'allhourmin') * $timespent->timespent_thm;
 							}
@@ -339,10 +339,10 @@ class ActionsDigiriskdolibarr
 						$totaltasksbudget = 0;
 					}
 					$outTotatconsumedtime = '<tr><td>' . $langs->trans('TotalConsumedTime') . '</td><td>' . convertSecondToTime($totatconsumedtime, 'allhourmin') . '</td></tr>';
-					$outTotatconsumedtimeamount = '<tr><td>' . $langs->trans('TotalConsumedTimeAmount') . '</td><td>' . price($totatconsumedtimeamount, 0, $langs, 1, 0, 0, $conf->currency) . '</td></tr>';
+					$outTotatconsumedtimeamount = '<tr><td>' . $langs->trans('TotalConsumedTimeAmount') . '</td><td>' . price($totatconsumedtimeamount, 0, $langs, 1, -1, 2, $conf->currency) . '</td></tr>';
 					$outNbtasks = '<tr><td>' . $langs->trans('NbTasks') . '</td><td>' . $nbtasks . '</td></tr>';
 					$outTotalprogress = '<tr><td>' . $langs->trans('TotalProgress') . '</td><td>' . (($totalprogress) ? price2num($totalprogress/$nbtasks, 2) . ' %' : '0 %') . '</td></tr>';
-					$outTotaltasksbudget = '<tr><td>' . $langs->trans('TotalBudget') . '</td><td>' . price($totaltasksbudget, 0, $langs, 1, 0, 0, $conf->currency) . '</td></tr>'; ?>
+					$outTotaltasksbudget = '<tr><td>' . $langs->trans('TotalBudget') . '</td><td>' . price($totaltasksbudget, 0, $langs, 1, -1, 2, $conf->currency) . '</td></tr>'; ?>
 					<script>
 						jQuery('.fichecenter .fichehalfright .tableforfield tbody tr:last-child').after(<?php echo json_encode($outTotatconsumedtime) ?>);
 						jQuery('.fichecenter .fichehalfright .tableforfield tbody tr:last-child').after(<?php echo json_encode($outTotatconsumedtimeamount) ?>);
