@@ -1122,7 +1122,7 @@ class modDigiriskdolibarr extends DolibarrModules
 			'titre'    => $langs->trans('Arborescence'),
 			'prefix'   => '<i class="fas fa-network-wired pictofixedwidth"></i>  ',
 			'mainmenu' => 'digiriskdolibarr',
-			'leftmenu' => 'digiriskstandard',
+			'leftmenu' => 'digiriskorganization',
 			'url'      => '/digiriskdolibarr/view/digiriskelement/digiriskelement_organization.php',
 			'langs'    => 'digiriskdolibarr@digiriskdolibarr',	        // Lang file to use (without .lang) by module. File must be in langs/code_CODE/ directory.
 			'position' => 48520 + $r,
