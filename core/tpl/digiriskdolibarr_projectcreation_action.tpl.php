@@ -728,7 +728,6 @@ if ($conf->global->DIGIRISKDOLIBARR_CONF_BACKWARD_COMPATIBILITY == 0) {
 	dolibarr_set_const($db, 'DIGIRISKDOLIBARR_WORKUNITDOCUMENT_DEFAULT_MODEL', 'workunitdocument_odt', 'chaine', 0, '', $conf->entity);
 
 	// CONST PREVENTION PLAN
-	//dolibarr_set_const($db, 'MAIN_AGENDA_ACTIONAUTO_PREVENTIONPLAN_CREATE', 1, 'integer', 0, '', $conf->entity);
 	dolibarr_set_const($db, 'MAIN_AGENDA_ACTIONAUTO_PREVENTIONPLAN_CREATE', 0, 'integer', 0, '', $conf->entity);
 	dolibarr_set_const($db, 'MAIN_AGENDA_ACTIONAUTO_PREVENTIONPLAN_EDIT', 1, 'integer', 0, '', $conf->entity);
 	dolibarr_set_const($db, 'DIGIRISKDOLIBARR_PREVENTIONPLAN_ADDON', 'mod_preventionplan_standard', 'chaine', 0, '', $conf->entity);
@@ -744,7 +743,6 @@ if ($conf->global->DIGIRISKDOLIBARR_CONF_BACKWARD_COMPATIBILITY == 0) {
 	dolibarr_set_const($db, 'DIGIRISKDOLIBARR_PREVENTIONPLANDOCUMENT_DEFAULT_MODEL', 'preventionplandocument_odt', 'chaine', 0, '', $conf->entity);
 
 	// CONST FIRE PERMIT
-	//dolibarr_set_const($db, 'MAIN_AGENDA_ACTIONAUTO_FIREPERMIT_CREATE', 1, 'integer', 0, '', $conf->entity);
 	dolibarr_set_const($db, 'MAIN_AGENDA_ACTIONAUTO_FIREPERMIT_CREATE', 0, 'integer', 0, '', $conf->entity);
 	dolibarr_set_const($db, 'MAIN_AGENDA_ACTIONAUTO_FIREPERMIT_EDIT', 1, 'integer', 0, '', $conf->entity);
 	dolibarr_set_const($db, 'DIGIRISKDOLIBARR_FIREPERMIT_ADDON', 'mod_firepermit_standard', 'chaine', 0, '', $conf->entity);
@@ -877,6 +875,31 @@ if ($conf->global->DIGIRISKDOLIBARR_CONF_BACKWARD_COMPATIBILITY == 0) {
 	//dolibarr_set_const($db, 'MAIN_EXTRAFIELDS_USE_SELECT2', 1, 'integer', 0, '', $conf->entity);
 
 	dolibarr_set_const($db, 'DIGIRISKDOLIBARR_CONF_BACKWARD_COMPATIBILITY', 1, 'integer', 0, '', $conf->entity);
+} else if ($conf->global->DIGIRISKDOLIBARR_CONF_BACKWARD_COMPATIBILITY == 1) {
+	dolibarr_del_const($db, 'MAIN_AGENDA_ACTIONAUTO_RISKASSESSMENTDOCUMENT_CREATE' ,$conf->entity);
+	dolibarr_del_const($db, 'MAIN_AGENDA_ACTIONAUTO_LEGALDISPLAY_CREATE' ,$conf->entity);
+	dolibarr_del_const($db, 'MAIN_AGENDA_ACTIONAUTO_INFORMATIONSSHARING_CREATE' ,$conf->entity);
+	dolibarr_del_const($db, 'MAIN_AGENDA_ACTIONAUTO_LISTINGRISKSACTION_CREATE' ,$conf->entity);
+	dolibarr_del_const($db, 'MAIN_AGENDA_ACTIONAUTO_LISTINGRISKSPHOTO_CREATE' ,$conf->entity);
+	dolibarr_del_const($db, 'MAIN_AGENDA_ACTIONAUTO_GROUPMENTDOCUMENT_CREATE' ,$conf->entity);
+	dolibarr_del_const($db, 'MAIN_AGENDA_ACTIONAUTO_WORKUNITDOCUMENT_CREATE' ,$conf->entity);
+	dolibarr_del_const($db, 'MAIN_AGENDA_ACTIONAUTO_PREVENTIONPLAN_CREATE' ,$conf->entity);
+	dolibarr_del_const($db, 'MAIN_AGENDA_ACTIONAUTO_PREVENTIONPLAN_EDIT' ,$conf->entity);
+	dolibarr_del_const($db, 'MAIN_AGENDA_ACTIONAUTO_PREVENTIONPLANDOCUMENT_CREATE' ,$conf->entity);
+	dolibarr_del_const($db, 'MAIN_AGENDA_ACTIONAUTO_FIREPERMIT_CREATE' ,$conf->entity);
+	dolibarr_del_const($db, 'MAIN_AGENDA_ACTIONAUTO_FIREPERMIT_EDIT' ,$conf->entity);
+	dolibarr_del_const($db, 'MAIN_AGENDA_ACTIONAUTO_FIREPERMITDOCUMENT_CREATE' ,$conf->entity);
+	dolibarr_del_const($db, 'MAIN_AGENDA_ACTIONAUTO_GROUPMENT_CREATE' ,$conf->entity);
+	dolibarr_del_const($db, 'MAIN_AGENDA_ACTIONAUTO_WORKUNIT_CREATE' ,$conf->entity);
+	dolibarr_del_const($db, 'MAIN_AGENDA_ACTIONAUTO_EVALUATOR_CREATE' ,$conf->entity);
+	dolibarr_del_const($db, 'MAIN_AGENDA_ACTIONAUTO_RISK_CREATE' ,$conf->entity);
+	dolibarr_del_const($db, 'MAIN_AGENDA_ACTIONAUTO_RISKASSESSMENT_CREATE' ,$conf->entity);
+	dolibarr_del_const($db, 'MAIN_AGENDA_ACTIONAUTO_RISKSIGN_CREATE' ,$conf->entity);
+	dolibarr_del_const($db, 'MAIN_AGENDA_ACTIONAUTO_PREVENTIONPLANDET_CREATE' ,$conf->entity);
+	dolibarr_del_const($db, 'MAIN_AGENDA_ACTIONAUTO_FIREPERMITDET_CREATE' ,$conf->entity);
+	dolibarr_del_const($db, 'MAIN_AGENDA_ACTIONAUTO_ACCIDENT_CREATE' ,$conf->entity);
+	dolibarr_del_const($db, 'MAIN_AGENDA_ACTIONAUTO_ACCIDENT_EDIT' ,$conf->entity);
+	dolibarr_del_const($db, 'MAIN_AGENDA_ACTIONAUTO_ACCIDENT_WORKSTOP_CREATE' ,$conf->entity);
 }
 
 if ($conf->global->DIGIRISKDOLIBARR_ENCODE_BACKWARD_COMPATIBILITY == 0) {
