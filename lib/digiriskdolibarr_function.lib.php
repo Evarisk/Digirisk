@@ -556,7 +556,7 @@ function digiriskHeader($title = '', $help_url = '', $arrayofjs = array(), $arra
 		$tmpcsstouse .= ' colorblind-' . strip_tags($conf->global->MAIN_OPTIMIZEFORCOLORBLIND);
 	}
 
-	print '<body id="mainbody" class="' . $tmpcsstouse . '">' . "\n";
+	//print '<body id="mainbody" class="' . $tmpcsstouse . '">' . "\n";
 
 	llxHeader('', $title, $help_url, '', '', '', $arrayofjs, $arrayofcss, $morequerystring, $morecssonbody);
 
