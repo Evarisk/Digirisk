@@ -138,7 +138,67 @@ class InterfaceDigiriskdolibarrTriggers extends DolibarrTriggers
 				$actioncomm->userownerid = $user->id;
 				$actioncomm->percentage  = -1;
 
-				$actioncomm->create($user);
+				$result = $actioncomm->create($user);
+				if ($result < 0) {
+					$object->errors = array_merge($object->error, $actioncomm->errors);
+					return $result;
+				}
+				break;
+
+			case 'COMPANY_DELETE' :
+				dol_syslog("Trigger '" . $this->name . "' for action '$action' launched by " . __FILE__ . ". id=" . $object->id);
+				require_once __DIR__ . '/../../class/preventionplan.class.php';
+				require_once __DIR__ . '/../../class/firepermit.class.php';
+				require_once __DIR__ . '/../../class/digiriskresources.class.php';
+
+				$preventionplan 	  = new PreventionPlan($this->db);
+				$firepermit 		  = new FirePermit($this->db);
+				$digiriskresources 	  = new DigiriskResources($this->db);
+				$alldigiriskresources = $digiriskresources->fetchAll('', '', 0, 0, array('customsql' => 't.element_id = ' . $object->id));
+
+				if (is_array($alldigiriskresources) && !empty($alldigiriskresources)) {
+					foreach ($alldigiriskresources as $digiriskresourcesingle) {
+						($digiriskresourcesingle->object_type == 'preventionplan' ? $preventionplan->fetch($digiriskresourcesingle->object_id) : '');
+						($digiriskresourcesingle->object_type == 'firepermit' ? $firepermit->fetch($digiriskresourcesingle->object_id) : '');
+					}
+					($preventionplan->status != 0 ? $result = $preventionplan->isObjectUsed($object->id) : '');
+					($result > 0 ? $error[$i++] = $preventionplan->errors[0] : '');
+					($firepermit->status != 0 ? $result = $firepermit->isObjectUsed($object->id) : '');
+					($result > 0 ? $error[$i++] = $firepermit->errors[0] : '');
+				}
+
+				if (!empty($error)) {
+					$object->errors = $error;
+					return -1;
+				}
+				break;
+
+			case 'CONTACT_DELETE' :
+				dol_syslog("Trigger '" . $this->name . "' for action '$action' launched by " . __FILE__ . ". id=" . $object->id);
+				require_once __DIR__ . '/../../class/preventionplan.class.php';
+				require_once __DIR__ . '/../../class/firepermit.class.php';
+				require_once __DIR__ . '/../../class/digiriskresources.class.php';
+
+				$preventionplan 	  = new PreventionPlan($this->db);
+				$firepermit 		  = new FirePermit($this->db);
+				$digiriskresources 	  = new DigiriskResources($this->db);
+				$alldigiriskresources = $digiriskresources->fetchAll('', '', 0, 0, array('customsql' => 't.element_id = ' . $object->fk_soc));
+
+				if (is_array($alldigiriskresources) && !empty($alldigiriskresources)) {
+					foreach ($alldigiriskresources as $digiriskresourcesingle) {
+						($digiriskresourcesingle->object_type == 'preventionplan' ? $preventionplan->fetch($digiriskresourcesingle->object_id) : '');
+						($digiriskresourcesingle->object_type == 'firepermit' ? $firepermit->fetch($digiriskresourcesingle->object_id) : '');
+					}
+					($preventionplan->status != 0 ? $result = $preventionplan->isObjectUsed($object->fk_soc) : '');
+					($result > 0 ? $error[$i++] = $preventionplan->errors[0] : '');
+					($firepermit->status != 0 ? $result = $firepermit->isObjectUsed($object->fk_soc) : '');
+					($result > 0 ? $error[$i++] = $firepermit->errors[0] : '');
+				}
+
+				if (!empty($error)) {
+					$object->errors = $error;
+					return -1;
+				}
 				break;
 
 			case 'LEGALDISPLAY_GENERATE' :
@@ -163,7 +223,11 @@ class InterfaceDigiriskdolibarrTriggers extends DolibarrTriggers
 				$actioncomm->userownerid = $user->id;
 				$actioncomm->percentage  = -1;
 
-				$actioncomm->create($user);
+				$result = $actioncomm->create($user);
+				if ($result < 0) {
+					$object->errors = array_merge($object->error, $actioncomm->errors);
+					return $result;
+				}
 				break;
 
 			case 'PREVENTIONPLANDOCUMENT_GENERATE' :
@@ -188,7 +252,11 @@ class InterfaceDigiriskdolibarrTriggers extends DolibarrTriggers
 				$actioncomm->userownerid = $user->id;
 				$actioncomm->percentage  = -1;
 
-				$actioncomm->create($user);
+				$result = $actioncomm->create($user);
+				if ($result < 0) {
+					$object->errors = array_merge($object->error, $actioncomm->errors);
+					return $result;
+				}
 				break;
 
 			case 'FIREPERMITDOCUMENT_GENERATE' :
@@ -213,7 +281,11 @@ class InterfaceDigiriskdolibarrTriggers extends DolibarrTriggers
 				$actioncomm->userownerid = $user->id;
 				$actioncomm->percentage  = -1;
 
-				$actioncomm->create($user);
+				$result = $actioncomm->create($user);
+				if ($result < 0) {
+					$object->errors = array_merge($object->error, $actioncomm->errors);
+					return $result;
+				}
 				break;
 
 			case 'GROUPMENTDOCUMENT_GENERATE' :
@@ -238,7 +310,11 @@ class InterfaceDigiriskdolibarrTriggers extends DolibarrTriggers
 				$actioncomm->userownerid = $user->id;
 				$actioncomm->percentage  = -1;
 
-				$actioncomm->create($user);
+				$result = $actioncomm->create($user);
+				if ($result < 0) {
+					$object->errors = array_merge($object->error, $actioncomm->errors);
+					return $result;
+				}
 				break;
 
 			case 'WORKUNITDOCUMENT_GENERATE' :
@@ -263,7 +339,11 @@ class InterfaceDigiriskdolibarrTriggers extends DolibarrTriggers
 				$actioncomm->userownerid = $user->id;
 				$actioncomm->percentage  = -1;
 
-				$actioncomm->create($user);
+				$result = $actioncomm->create($user);
+				if ($result < 0) {
+					$object->errors = array_merge($object->error, $actioncomm->errors);
+					return $result;
+				}
 				break;
 
 			case 'LISTINGRISKSPHOTO_GENERATE' :
@@ -289,7 +369,11 @@ class InterfaceDigiriskdolibarrTriggers extends DolibarrTriggers
 				$actioncomm->userownerid = $user->id;
 				$actioncomm->percentage  = -1;
 
-				$actioncomm->create($user);
+				$result = $actioncomm->create($user);
+				if ($result < 0) {
+					$object->errors = array_merge($object->error, $actioncomm->errors);
+					return $result;
+				}
 				break;
 
 			case 'LISTINGRISKSACTION_GENERATE' :
@@ -315,7 +399,11 @@ class InterfaceDigiriskdolibarrTriggers extends DolibarrTriggers
 				$actioncomm->userownerid = $user->id;
 				$actioncomm->percentage  = -1;
 
-				$actioncomm->create($user);
+				$result = $actioncomm->create($user);
+				if ($result < 0) {
+					$object->errors = array_merge($object->error, $actioncomm->errors);
+					return $result;
+				}
 				break;
 
 			case 'RISKASSESSMENTDOCUMENT_GENERATE' :
@@ -340,7 +428,11 @@ class InterfaceDigiriskdolibarrTriggers extends DolibarrTriggers
 				$actioncomm->userownerid = $user->id;
 				$actioncomm->percentage  = -1;
 
-				$actioncomm->create($user);
+				$result = $actioncomm->create($user);
+				if ($result < 0) {
+					$object->errors = array_merge($object->error, $actioncomm->errors);
+					return $result;
+				}
 				break;
 
 			case 'DIGIRISKELEMENT_CREATE' :
@@ -379,7 +471,11 @@ class InterfaceDigiriskdolibarrTriggers extends DolibarrTriggers
 				$actioncomm->userownerid = $user->id;
 				$actioncomm->percentage  = -1;
 
-				$actioncomm->create($user);
+				$result = $actioncomm->create($user);
+				if ($result < 0) {
+					$object->errors = array_merge($object->error, $actioncomm->errors);
+					return $result;
+				}
 				break;
 
 			case 'DIGIRISKELEMENT_MODIFY' :
@@ -419,7 +515,11 @@ class InterfaceDigiriskdolibarrTriggers extends DolibarrTriggers
 				$actioncomm->userownerid = $user->id;
 				$actioncomm->percentage  = -1;
 
-				$actioncomm->create($user);
+				$result = $actioncomm->create($user);
+				if ($result < 0) {
+					$object->errors = array_merge($object->error, $actioncomm->errors);
+					return $result;
+				}
 				break;
 
 			case 'SIGNATURE_GENERATE' :
@@ -438,7 +538,11 @@ class InterfaceDigiriskdolibarrTriggers extends DolibarrTriggers
 				$actioncomm->userownerid = $user->id;
 				$actioncomm->percentage  = -1;
 
-				$actioncomm->create($user);
+				$result = $actioncomm->create($user);
+				if ($result < 0) {
+					$object->errors = array_merge($object->error, $actioncomm->errors);
+					return $result;
+				}
 				break;
 
 			case 'PREVENTIONPLAN_CREATE' :
@@ -471,7 +575,11 @@ class InterfaceDigiriskdolibarrTriggers extends DolibarrTriggers
 				$actioncomm->userownerid = $user->id;
 				$actioncomm->percentage  = -1;
 
-				$actioncomm->create($user);
+				$result = $actioncomm->create($user);
+				if ($result < 0) {
+					$object->errors = array_merge($object->error, $actioncomm->errors);
+					return $result;
+				}
 				break;
 
 			case 'PREVENTIONPLAN_MODIFY' :
@@ -507,7 +615,11 @@ class InterfaceDigiriskdolibarrTriggers extends DolibarrTriggers
 				$actioncomm->userownerid = $user->id;
 				$actioncomm->percentage  = -1;
 
-				$actioncomm->create($user);
+				$result = $actioncomm->create($user);
+				if ($result < 0) {
+					$object->errors = array_merge($object->error, $actioncomm->errors);
+					return $result;
+				}
 				break;
 
 			case 'PREVENTIONPLAN_INPROGRESS' :
@@ -526,7 +638,11 @@ class InterfaceDigiriskdolibarrTriggers extends DolibarrTriggers
 				$actioncomm->userownerid = $user->id;
 				$actioncomm->percentage  = -1;
 
-				$actioncomm->create($user);
+				$result = $actioncomm->create($user);
+				if ($result < 0) {
+					$object->errors = array_merge($object->error, $actioncomm->errors);
+					return $result;
+				}
 				break;
 
 			case 'PREVENTIONPLAN_PENDINGSIGNATURE' :
@@ -545,7 +661,11 @@ class InterfaceDigiriskdolibarrTriggers extends DolibarrTriggers
 				$actioncomm->userownerid = $user->id;
 				$actioncomm->percentage  = -1;
 
-				$actioncomm->create($user);
+				$result = $actioncomm->create($user);
+				if ($result < 0) {
+					$object->errors = array_merge($object->error, $actioncomm->errors);
+					return $result;
+				}
 				break;
 
 			case 'PREVENTIONPLAN_LOCKED' :
@@ -564,7 +684,11 @@ class InterfaceDigiriskdolibarrTriggers extends DolibarrTriggers
 				$actioncomm->userownerid = $user->id;
 				$actioncomm->percentage  = -1;
 
-				$actioncomm->create($user);
+				$result = $actioncomm->create($user);
+				if ($result < 0) {
+					$object->errors = array_merge($object->error, $actioncomm->errors);
+					return $result;
+				}
 				break;
 
 			case 'PREVENTIONPLAN_ARCHIVED' :
@@ -583,7 +707,11 @@ class InterfaceDigiriskdolibarrTriggers extends DolibarrTriggers
 				$actioncomm->userownerid = $user->id;
 				$actioncomm->percentage  = -1;
 
-				$actioncomm->create($user);
+				$result = $actioncomm->create($user);
+				if ($result < 0) {
+					$object->errors = array_merge($object->error, $actioncomm->errors);
+					return $result;
+				}
 				break;
 
 			case 'PREVENTIONPLANLINE_CREATE' :
@@ -613,7 +741,11 @@ class InterfaceDigiriskdolibarrTriggers extends DolibarrTriggers
 				$actioncomm->userownerid = $user->id;
 				$actioncomm->percentage  = -1;
 
-				$actioncomm->create($user);
+				$result = $actioncomm->create($user);
+				if ($result < 0) {
+					$object->errors = array_merge($object->error, $actioncomm->errors);
+					return $result;
+				}
 				break;
 
 			case 'PREVENTIONPLANLINE_MODIFY' :
@@ -644,7 +776,11 @@ class InterfaceDigiriskdolibarrTriggers extends DolibarrTriggers
 				$actioncomm->userownerid = $user->id;
 				$actioncomm->percentage  = -1;
 
-				$actioncomm->create($user);
+				$result = $actioncomm->create($user);
+				if ($result < 0) {
+					$object->errors = array_merge($object->error, $actioncomm->errors);
+					return $result;
+				}
 				break;
 
 			case 'PREVENTIONPLANLINE_DELETE' :
@@ -675,7 +811,11 @@ class InterfaceDigiriskdolibarrTriggers extends DolibarrTriggers
 				$actioncomm->userownerid = $user->id;
 				$actioncomm->percentage  = -1;
 
-				$actioncomm->create($user);
+				$result = $actioncomm->create($user);
+				if ($result < 0) {
+					$object->errors = array_merge($object->error, $actioncomm->errors);
+					return $result;
+				}
 				break;
 
 			case 'PREVENTIONPLANSIGNATURE_ADDATTENDANT' :
@@ -695,7 +835,11 @@ class InterfaceDigiriskdolibarrTriggers extends DolibarrTriggers
 				$actioncomm->userownerid       = $user->id;
 				$actioncomm->percentage        = -1;
 
-				$actioncomm->create($user);
+				$result = $actioncomm->create($user);
+				if ($result < 0) {
+					$object->errors = array_merge($object->error, $actioncomm->errors);
+					return $result;
+				}
 				break;
 
 			case 'PREVENTIONPLAN_SENTBYMAIL' :
@@ -713,7 +857,11 @@ class InterfaceDigiriskdolibarrTriggers extends DolibarrTriggers
 				$actioncomm->userownerid = $user->id;
 				$actioncomm->percentage  = -1;
 
-				$actioncomm->create($user);
+				$result = $actioncomm->create($user);
+				if ($result < 0) {
+					$object->errors = array_merge($object->error, $actioncomm->errors);
+					return $result;
+				}
 				$object->last_email_sent_date = dol_now('tzuser');
 				$object->update($user, true);
 				break;
@@ -742,7 +890,11 @@ class InterfaceDigiriskdolibarrTriggers extends DolibarrTriggers
 				$actioncomm->userownerid = $user->id;
 				$actioncomm->percentage  = -1;
 
-				$actioncomm->create($user);
+				$result = $actioncomm->create($user);
+				if ($result < 0) {
+					$object->errors = array_merge($object->error, $actioncomm->errors);
+					return $result;
+				}
 				break;
 
 			case 'FIREPERMIT_MODIFY' :
@@ -772,7 +924,11 @@ class InterfaceDigiriskdolibarrTriggers extends DolibarrTriggers
 				$actioncomm->userownerid = $user->id;
 				$actioncomm->percentage  = -1;
 
-				$actioncomm->create($user);
+				$result = $actioncomm->create($user);
+				if ($result < 0) {
+					$object->errors = array_merge($object->error, $actioncomm->errors);
+					return $result;
+				}
 				break;
 
 			case 'FIREPERMIT_INPROGRESS' :
@@ -791,7 +947,11 @@ class InterfaceDigiriskdolibarrTriggers extends DolibarrTriggers
 				$actioncomm->userownerid = $user->id;
 				$actioncomm->percentage  = -1;
 
-				$actioncomm->create($user);
+				$result = $actioncomm->create($user);
+				if ($result < 0) {
+					$object->errors = array_merge($object->error, $actioncomm->errors);
+					return $result;
+				}
 				break;
 
 			case 'FIREPERMIT_PENDINGSIGNATURE' :
@@ -809,7 +969,11 @@ class InterfaceDigiriskdolibarrTriggers extends DolibarrTriggers
 				$actioncomm->userownerid = $user->id;
 				$actioncomm->percentage  = -1;
 
-				$actioncomm->create($user);
+				$result = $actioncomm->create($user);
+				if ($result < 0) {
+					$object->errors = array_merge($object->error, $actioncomm->errors);
+					return $result;
+				}
 				break;
 
 			case 'FIREPERMIT_LOCKED' :
@@ -828,7 +992,11 @@ class InterfaceDigiriskdolibarrTriggers extends DolibarrTriggers
 				$actioncomm->userownerid = $user->id;
 				$actioncomm->percentage  = -1;
 
-				$actioncomm->create($user);
+				$result = $actioncomm->create($user);
+				if ($result < 0) {
+					$object->errors = array_merge($object->error, $actioncomm->errors);
+					return $result;
+				}
 				break;
 
 			case 'FIREPERMIT_ARCHIVED' :
@@ -847,7 +1015,11 @@ class InterfaceDigiriskdolibarrTriggers extends DolibarrTriggers
 				$actioncomm->userownerid = $user->id;
 				$actioncomm->percentage  = -1;
 
-				$actioncomm->create($user);
+				$result = $actioncomm->create($user);
+				if ($result < 0) {
+					$object->errors = array_merge($object->error, $actioncomm->errors);
+					return $result;
+				}
 				break;
 
 			case 'FIREPERMITLINE_CREATE' :
@@ -877,7 +1049,11 @@ class InterfaceDigiriskdolibarrTriggers extends DolibarrTriggers
 				$actioncomm->userownerid = $user->id;
 				$actioncomm->percentage  = -1;
 
-				$actioncomm->create($user);
+				$result = $actioncomm->create($user);
+				if ($result < 0) {
+					$object->errors = array_merge($object->error, $actioncomm->errors);
+					return $result;
+				}
 				break;
 
 			case 'FIREPERMITLINE_MODIFY' :
@@ -908,7 +1084,11 @@ class InterfaceDigiriskdolibarrTriggers extends DolibarrTriggers
 				$actioncomm->userownerid = $user->id;
 				$actioncomm->percentage  = -1;
 
-				$actioncomm->create($user);
+				$result = $actioncomm->create($user);
+				if ($result < 0) {
+					$object->errors = array_merge($object->error, $actioncomm->errors);
+					return $result;
+				}
 				break;
 
 			case 'FIREPERMITLINE_DELETE' :
@@ -939,7 +1119,11 @@ class InterfaceDigiriskdolibarrTriggers extends DolibarrTriggers
 				$actioncomm->userownerid = $user->id;
 				$actioncomm->percentage  = -1;
 
-				$actioncomm->create($user);
+				$result = $actioncomm->create($user);
+				if ($result < 0) {
+					$object->errors = array_merge($object->error, $actioncomm->errors);
+					return $result;
+				}
 				break;
 
 			case 'FIREPERMITSIGNATURE_ADDATTENDANT' :
@@ -959,7 +1143,11 @@ class InterfaceDigiriskdolibarrTriggers extends DolibarrTriggers
 				$actioncomm->userownerid       = $user->id;
 				$actioncomm->percentage        = -1;
 
-				$actioncomm->create($user);
+				$result = $actioncomm->create($user);
+				if ($result < 0) {
+					$object->errors = array_merge($object->error, $actioncomm->errors);
+					return $result;
+				}
 				break;
 
 			case 'FIREPERMIT_SENTBYMAIL' :
@@ -977,7 +1165,11 @@ class InterfaceDigiriskdolibarrTriggers extends DolibarrTriggers
 				$actioncomm->userownerid = $user->id;
 				$actioncomm->percentage  = -1;
 
-				$actioncomm->create($user);
+				$result = $actioncomm->create($user);
+				if ($result < 0) {
+					$object->errors = array_merge($object->error, $actioncomm->errors);
+					return $result;
+				}
 				$object->last_email_sent_date = dol_now('tzuser');
 				$object->update($user, true);
 				break;
@@ -1024,7 +1216,11 @@ class InterfaceDigiriskdolibarrTriggers extends DolibarrTriggers
 				$actioncomm->userownerid = $user->id;
 				$actioncomm->percentage  = -1;
 
-				$actioncomm->create($user);
+				$result = $actioncomm->create($user);
+				if ($result < 0) {
+					$object->errors = array_merge($object->error, $actioncomm->errors);
+					return $result;
+				}
 				break;
 
 			case 'DIGIRISKSIGNATURE_PENDING_SIGNATURE' :
@@ -1050,7 +1246,11 @@ class InterfaceDigiriskdolibarrTriggers extends DolibarrTriggers
 				$actioncomm->userownerid       = $user->id;
 				$actioncomm->percentage        = -1;
 
-				$actioncomm->create($user);
+				$result = $actioncomm->create($user);
+				if ($result < 0) {
+					$object->errors = array_merge($object->error, $actioncomm->errors);
+					return $result;
+				}
 				break;
 
 			case 'DIGIRISKSIGNATURE_ABSENT' :
@@ -1076,7 +1276,11 @@ class InterfaceDigiriskdolibarrTriggers extends DolibarrTriggers
 				$actioncomm->userownerid       = $user->id;
 				$actioncomm->percentage        = -1;
 
-				$actioncomm->create($user);
+				$result = $actioncomm->create($user);
+				if ($result < 0) {
+					$object->errors = array_merge($object->error, $actioncomm->errors);
+					return $result;
+				}
 				break;
 
 			case 'DIGIRISKSIGNATURE_DELETED' :
@@ -1102,7 +1306,11 @@ class InterfaceDigiriskdolibarrTriggers extends DolibarrTriggers
 				$actioncomm->userownerid       = $user->id;
 				$actioncomm->percentage        = -1;
 
-				$actioncomm->create($user);
+				$result = $actioncomm->create($user);
+				if ($result < 0) {
+					$object->errors = array_merge($object->error, $actioncomm->errors);
+					return $result;
+				}
 				break;
 
 			case 'TICKET_CREATE' :
@@ -1170,7 +1378,11 @@ class InterfaceDigiriskdolibarrTriggers extends DolibarrTriggers
 										$actioncomm->userownerid = $user->id;
 										$actioncomm->percentage  = -1;
 
-										$actioncomm->create($user);
+										$result = $actioncomm->create($user);
+										if ($result < 0) {
+											$object->errors = array_merge($object->error, $actioncomm->errors);
+											return $result;
+										}
 										break;
 									}
 								} else {
@@ -1230,7 +1442,11 @@ class InterfaceDigiriskdolibarrTriggers extends DolibarrTriggers
 													$actioncomm->fk_element  = $object->id;
 													$actioncomm->userownerid = $user->id;
 													$actioncomm->percentage  = -1;
-													$actioncomm->create($user);
+													$result = $actioncomm->create($user);
+													if ($result < 0) {
+														$object->errors = array_merge($object->error, $actioncomm->errors);
+														return $result;
+													}
 													break;
 												}
 											} else {
@@ -1272,12 +1488,26 @@ class InterfaceDigiriskdolibarrTriggers extends DolibarrTriggers
 				} elseif ($object->element_type == 'firepermit') {
 					$actioncomm->label = $langs->transnoentities('FirePermitOpeningHoursCreateTrigger');
 				}
+				$actioncomm->note_private .= $langs->trans('Entity') . ' : ' . $conf->entity . '<br>';
+				$actioncomm->note_private .= $langs->trans('Day 0') . ' : ' . (!empty($object->monday) ? $object->monday : 'N/A') . '<br>';
+				$actioncomm->note_private .= $langs->trans('Day 1') . ' : ' . (!empty($object->tuesday) ? $object->tuesday : 'N/A') . '<br>';
+				$actioncomm->note_private .= $langs->trans('Day 2') . ' : ' . (!empty($object->wednesday) ? $object->wednesday : 'N/A') . '<br>';
+				$actioncomm->note_private .= $langs->trans('Day 3') . ' : ' . (!empty($object->thursday) ? $object->thursday : 'N/A') . '<br>';
+				$actioncomm->note_private .= $langs->trans('Day 4') . ' : ' . (!empty($object->friday) ? $object->friday : 'N/A') . '<br>';
+				$actioncomm->note_private .= $langs->trans('Day 5') . ' : ' . (!empty($object->saturday) ? $object->saturday : 'N/A') . '<br>';
+				$actioncomm->note_private .= $langs->trans('Day 6') . ' : ' . (!empty($object->sunday) ? $object->sunday : 'N/A') . '<br>';
+				$actioncomm->note_private .= $langs->trans('DateCreation') . ' : ' . dol_print_date($now, 'dayhoursec', 'tzuser') . '<br>';
+				$actioncomm->note_private .= $langs->trans('Status') . ' : ' . $object->status . '<br>';
 				$actioncomm->datep       = $now;
 				$actioncomm->fk_element  = $object->element_id;
 				$actioncomm->userownerid = $user->id;
 				$actioncomm->percentage  = -1;
 
-				$actioncomm->create($user);
+				$result = $actioncomm->create($user);
+				if ($result < 0) {
+					$object->errors = array_merge($object->error, $actioncomm->errors);
+					return $result;
+				}
 				break;
 
 			case 'RISK_CREATE' :
@@ -1309,7 +1539,11 @@ class InterfaceDigiriskdolibarrTriggers extends DolibarrTriggers
 				$actioncomm->fk_element  = $object->fk_element;
 				$actioncomm->userownerid = $user->id;
 				$actioncomm->percentage  = -1;
-				$actioncomm->create($user);
+				$result = $actioncomm->create($user);
+				if ($result < 0) {
+					$object->errors = array_merge($object->error, $actioncomm->errors);
+					return $result;
+				}
 				break;
 
 			case 'RISK_MODIFY' :
@@ -1343,7 +1577,11 @@ class InterfaceDigiriskdolibarrTriggers extends DolibarrTriggers
 				$actioncomm->userownerid = $user->id;
 				$actioncomm->percentage  = -1;
 
-				$actioncomm->create($user);
+				$result = $actioncomm->create($user);
+				if ($result < 0) {
+					$object->errors = array_merge($object->error, $actioncomm->errors);
+					return $result;
+				}
 				break;
 
 			case 'RISK_DELETE' :
@@ -1377,7 +1615,11 @@ class InterfaceDigiriskdolibarrTriggers extends DolibarrTriggers
 				$actioncomm->userownerid = $user->id;
 				$actioncomm->percentage  = -1;
 
-				$actioncomm->create($user);
+				$result = $actioncomm->create($user);
+				if ($result < 0) {
+					$object->errors = array_merge($object->error, $actioncomm->errors);
+					return $result;
+				}
 				break;
 
 			case 'TASK_CREATE' :
@@ -1421,7 +1663,11 @@ class InterfaceDigiriskdolibarrTriggers extends DolibarrTriggers
 					$actioncomm->userownerid = $user->id;
 					$actioncomm->percentage = -1;
 
-					$actioncomm->create($user);
+					$result = $actioncomm->create($user);
+					if ($result < 0) {
+						$object->errors = array_merge($object->error, $actioncomm->errors);
+						return $result;
+					}
 				}
 				break;
 
@@ -1467,7 +1713,11 @@ class InterfaceDigiriskdolibarrTriggers extends DolibarrTriggers
 					$actioncomm->userownerid = $user->id;
 					$actioncomm->percentage = -1;
 
-					$actioncomm->create($user);
+					$result = $actioncomm->create($user);
+					if ($result < 0) {
+						$object->errors = array_merge($object->error, $actioncomm->errors);
+						return $result;
+					}
 				}
 				break;
 
@@ -1513,7 +1763,11 @@ class InterfaceDigiriskdolibarrTriggers extends DolibarrTriggers
 					$actioncomm->userownerid = $user->id;
 					$actioncomm->percentage = -1;
 
-					$actioncomm->create($user);
+					$result = $actioncomm->create($user);
+					if ($result < 0) {
+						$object->errors = array_merge($object->error, $actioncomm->errors);
+						return $result;
+					}
 				}
 				break;
 
@@ -1557,7 +1811,11 @@ class InterfaceDigiriskdolibarrTriggers extends DolibarrTriggers
 				$actioncomm->userownerid = $user->id;
 				$actioncomm->percentage  = -1;
 
-				$actioncomm->create($user);
+				$result = $actioncomm->create($user);
+				if ($result < 0) {
+					$object->errors = array_merge($object->error, $actioncomm->errors);
+					return $result;
+				}
 				break;
 
 			case 'RISKASSESSMENT_MODIFY' :
@@ -1601,7 +1859,11 @@ class InterfaceDigiriskdolibarrTriggers extends DolibarrTriggers
 				$actioncomm->userownerid = $user->id;
 				$actioncomm->percentage  = -1;
 
-				$actioncomm->create($user);
+				$result = $actioncomm->create($user);
+				if ($result < 0) {
+					$object->errors = array_merge($object->error, $actioncomm->errors);
+					return $result;
+				}
 				break;
 
 			case 'RISKASSESSMENT_DELETE' :
@@ -1645,7 +1907,11 @@ class InterfaceDigiriskdolibarrTriggers extends DolibarrTriggers
 				$actioncomm->userownerid = $user->id;
 				$actioncomm->percentage  = -1;
 
-				$actioncomm->create($user);
+				$result = $actioncomm->create($user);
+				if ($result < 0) {
+					$object->errors = array_merge($object->error, $actioncomm->errors);
+					return $result;
+				}
 				break;
 
 			case 'EVALUATOR_CREATE' :
@@ -1679,7 +1945,11 @@ class InterfaceDigiriskdolibarrTriggers extends DolibarrTriggers
 				$actioncomm->userownerid = $user->id;
 				$actioncomm->percentage  = -1;
 
-				$actioncomm->create($user);
+				$result = $actioncomm->create($user);
+				if ($result < 0) {
+					$object->errors = array_merge($object->error, $actioncomm->errors);
+					return $result;
+				}
 				break;
 
 			case 'EVALUATOR_MODIFY' :
@@ -1714,7 +1984,11 @@ class InterfaceDigiriskdolibarrTriggers extends DolibarrTriggers
 				$actioncomm->userownerid = $user->id;
 				$actioncomm->percentage  = -1;
 
-				$actioncomm->create($user);
+				$result = $actioncomm->create($user);
+				if ($result < 0) {
+					$object->errors = array_merge($object->error, $actioncomm->errors);
+					return $result;
+				}
 				break;
 
 			case 'EVALUATOR_DELETE' :
@@ -1749,7 +2023,11 @@ class InterfaceDigiriskdolibarrTriggers extends DolibarrTriggers
 				$actioncomm->userownerid = $user->id;
 				$actioncomm->percentage  = -1;
 
-				$actioncomm->create($user);
+				$result = $actioncomm->create($user);
+				if ($result < 0) {
+					$object->errors = array_merge($object->error, $actioncomm->errors);
+					return $result;
+				}
 				break;
 
 			case 'RISKSIGN_CREATE' :
@@ -1779,7 +2057,11 @@ class InterfaceDigiriskdolibarrTriggers extends DolibarrTriggers
 				$actioncomm->userownerid = $user->id;
 				$actioncomm->percentage  = -1;
 
-				$actioncomm->create($user);
+				$result = $actioncomm->create($user);
+				if ($result < 0) {
+					$object->errors = array_merge($object->error, $actioncomm->errors);
+					return $result;
+				}
 				break;
 
 			case 'RISKSIGN_MODIFY' :
@@ -1810,7 +2092,11 @@ class InterfaceDigiriskdolibarrTriggers extends DolibarrTriggers
 				$actioncomm->userownerid = $user->id;
 				$actioncomm->percentage  = -1;
 
-				$actioncomm->create($user);
+				$result = $actioncomm->create($user);
+				if ($result < 0) {
+					$object->errors = array_merge($object->error, $actioncomm->errors);
+					return $result;
+				}
 				break;
 
 			case 'RISKSIGN_DELETE' :
@@ -1841,7 +2127,11 @@ class InterfaceDigiriskdolibarrTriggers extends DolibarrTriggers
 				$actioncomm->userownerid = $user->id;
 				$actioncomm->percentage  = -1;
 
-				$actioncomm->create($user);
+				$result = $actioncomm->create($user);
+				if ($result < 0) {
+					$object->errors = array_merge($object->error, $actioncomm->errors);
+					return $result;
+				}
 				break;
 
 			case 'ACCIDENT_CREATE' :
@@ -1905,7 +2195,11 @@ class InterfaceDigiriskdolibarrTriggers extends DolibarrTriggers
 				$actioncomm->userownerid = $user->id;
 				$actioncomm->percentage  = -1;
 
-				$actioncomm->create($user);
+				$result = $actioncomm->create($user);
+				if ($result < 0) {
+					$object->errors = array_merge($object->error, $actioncomm->errors);
+					return $result;
+				}
 				break;
 
 			case 'ACCIDENT_MODIFY' :
@@ -1972,7 +2266,11 @@ class InterfaceDigiriskdolibarrTriggers extends DolibarrTriggers
 				$actioncomm->userownerid = $user->id;
 				$actioncomm->percentage  = -1;
 
-				$actioncomm->create($user);
+				$result = $actioncomm->create($user);
+				if ($result < 0) {
+					$object->errors = array_merge($object->error, $actioncomm->errors);
+					return $result;
+				}
 				break;
 
 			case 'ACCIDENTWORKSTOP_CREATE' :
@@ -2000,7 +2298,11 @@ class InterfaceDigiriskdolibarrTriggers extends DolibarrTriggers
 				$actioncomm->userownerid = $user->id;
 				$actioncomm->percentage  = -1;
 
-				$actioncomm->create($user);
+				$result = $actioncomm->create($user);
+				if ($result < 0) {
+					$object->errors = array_merge($object->error, $actioncomm->errors);
+					return $result;
+				}
 				break;
 
 			case 'ACCIDENTWORKSTOP_MODIFY' :
@@ -2029,7 +2331,11 @@ class InterfaceDigiriskdolibarrTriggers extends DolibarrTriggers
 				$actioncomm->userownerid = $user->id;
 				$actioncomm->percentage  = -1;
 
-				$actioncomm->create($user);
+				$result = $actioncomm->create($user);
+				if ($result < 0) {
+					$object->errors = array_merge($object->error, $actioncomm->errors);
+					return $result;
+				}
 				break;
 
 			case 'ACCIDENTWORKSTOP_DELETE' :
@@ -2058,7 +2364,11 @@ class InterfaceDigiriskdolibarrTriggers extends DolibarrTriggers
 				$actioncomm->userownerid = $user->id;
 				$actioncomm->percentage  = -1;
 
-				$actioncomm->create($user);
+				$result = $actioncomm->create($user);
+				if ($result < 0) {
+					$object->errors = array_merge($object->error, $actioncomm->errors);
+					return $result;
+				}
 				break;
 
 			case 'ACCIDENTLESION_CREATE' :
@@ -2083,7 +2393,11 @@ class InterfaceDigiriskdolibarrTriggers extends DolibarrTriggers
 				$actioncomm->userownerid = $user->id;
 				$actioncomm->percentage  = -1;
 
-				$actioncomm->create($user);
+				$result = $actioncomm->create($user);
+				if ($result < 0) {
+					$object->errors = array_merge($object->error, $actioncomm->errors);
+					return $result;
+				}
 				break;
 
 			case 'ACCIDENTLESION_MODIFY' :
@@ -2109,7 +2423,11 @@ class InterfaceDigiriskdolibarrTriggers extends DolibarrTriggers
 				$actioncomm->userownerid = $user->id;
 				$actioncomm->percentage  = -1;
 
-				$actioncomm->create($user);
+				$result = $actioncomm->create($user);
+				if ($result < 0) {
+					$object->errors = array_merge($object->error, $actioncomm->errors);
+					return $result;
+				}
 				break;
 
 			case 'ACCIDENTLESION_DELETE' :
@@ -2135,7 +2453,11 @@ class InterfaceDigiriskdolibarrTriggers extends DolibarrTriggers
 				$actioncomm->userownerid = $user->id;
 				$actioncomm->percentage  = -1;
 
-				$actioncomm->create($user);
+				$result = $actioncomm->create($user);
+				if ($result < 0) {
+					$object->errors = array_merge($object->error, $actioncomm->errors);
+					return $result;
+				}
 				break;
 
 			case 'ACCIDENTMETADATA_CREATE' :
@@ -2155,7 +2477,11 @@ class InterfaceDigiriskdolibarrTriggers extends DolibarrTriggers
 				$actioncomm->userownerid = $user->id;
 				$actioncomm->percentage  = -1;
 
-				$actioncomm->create($user);
+				$result = $actioncomm->create($user);
+				if ($result < 0) {
+					$object->errors = array_merge($object->error, $actioncomm->errors);
+					return $result;
+				}
 				break;
 
 			case 'TASK_TIMESPENT_CREATE' :
@@ -2183,7 +2509,11 @@ class InterfaceDigiriskdolibarrTriggers extends DolibarrTriggers
 				$actioncomm->fk_project  = $object->fk_project;
 				$actioncomm->percentage  = -1;
 
-				$actioncomm->create($user);
+				$result = $actioncomm->create($user);
+				if ($result < 0) {
+					$object->errors = array_merge($object->error, $actioncomm->errors);
+					return $result;
+				}
 				break;
 
 			case 'TASK_TIMESPENT_MODIFY' :
@@ -2212,7 +2542,11 @@ class InterfaceDigiriskdolibarrTriggers extends DolibarrTriggers
 				$actioncomm->fk_project  = $object->fk_project;
 				$actioncomm->percentage  = -1;
 
-				$actioncomm->create($user);
+				$result = $actioncomm->create($user);
+				if ($result < 0) {
+					$object->errors = array_merge($object->error, $actioncomm->errors);
+					return $result;
+				}
 				break;
 
 			case 'TASK_TIMESPENT_DELETE' :
@@ -2241,7 +2575,11 @@ class InterfaceDigiriskdolibarrTriggers extends DolibarrTriggers
 				$actioncomm->fk_project  = $object->fk_project;
 				$actioncomm->percentage  = -1;
 
-				$actioncomm->create($user);
+				$result = $actioncomm->create($user);
+				if ($result < 0) {
+					$object->errors = array_merge($object->error, $actioncomm->errors);
+					return $result;
+				}
 				break;
 
 			default:

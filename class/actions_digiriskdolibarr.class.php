@@ -505,34 +505,6 @@ class ActionsDigiriskdolibarr
 					}
 				}
 			}
-		} else if (in_array($parameters['currentcontext'] , array('thirdpartycard', 'contactcard'))) {
-			if ($action == 'confirm_delete') {
-				require_once __DIR__ . '/preventionplan.class.php';
-				require_once __DIR__ . '/firepermit.class.php';
-				require_once __DIR__ . '/digiriskresources.class.php';
-
-				($parameters['currentcontext'] == 'thirdpartycard' ? $objID = $object->id : $objID = $object->fk_soc);
-				$preventionplan 	  = new PreventionPlan($this->db);
-				$firepermit 		  = new FirePermit($this->db);
-				$digiriskresources 	  = new DigiriskResources($this->db);
-				$alldigiriskresources = $digiriskresources->fetchAll('', '', 0, 0, array('customsql' => 't.element_id = ' . $objID));
-
-				if (is_array($alldigiriskresources) && !empty($alldigiriskresources)) {
-					foreach ($alldigiriskresources as $digiriskresourcesingle) {
-						($digiriskresourcesingle->object_type == 'preventionplan' ? $preventionplan->fetch($digiriskresourcesingle->object_id) : '');
-						($digiriskresourcesingle->object_type == 'firepermit' ? $firepermit->fetch($digiriskresourcesingle->object_id) : '');
-					}
-					($preventionplan->status != 0 ? $result = $preventionplan->isObjectUsed($object->id) : '');
-					($result <= 0 && $firepermit->status != 0 ? $result = $firepermit->isObjectUsed($object->id) : '');
-				}
-
-				if ($result > 0) {
-					($preventionplan->status != 0 ? $errors = $preventionplan->errors : $errors = $firepermit->errors);
-					$error++;
-				} else {
-					$error = 0;
-				}
-			}
 		}
 
 		if (!$error) {
