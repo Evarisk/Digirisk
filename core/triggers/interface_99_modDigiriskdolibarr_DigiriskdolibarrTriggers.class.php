@@ -1488,6 +1488,16 @@ class InterfaceDigiriskdolibarrTriggers extends DolibarrTriggers
 				} elseif ($object->element_type == 'firepermit') {
 					$actioncomm->label = $langs->transnoentities('FirePermitOpeningHoursCreateTrigger');
 				}
+				$actioncomm->note_private .= $langs->trans('Entity') . ' : ' . $conf->entity . '<br>';
+				$actioncomm->note_private .= $langs->trans('Day 0') . ' : ' . (!empty($object->monday) ? $object->monday : 'N/A') . '<br>';
+				$actioncomm->note_private .= $langs->trans('Day 1') . ' : ' . (!empty($object->tuesday) ? $object->tuesday : 'N/A') . '<br>';
+				$actioncomm->note_private .= $langs->trans('Day 2') . ' : ' . (!empty($object->wednesday) ? $object->wednesday : 'N/A') . '<br>';
+				$actioncomm->note_private .= $langs->trans('Day 3') . ' : ' . (!empty($object->thursday) ? $object->thursday : 'N/A') . '<br>';
+				$actioncomm->note_private .= $langs->trans('Day 4') . ' : ' . (!empty($object->friday) ? $object->friday : 'N/A') . '<br>';
+				$actioncomm->note_private .= $langs->trans('Day 5') . ' : ' . (!empty($object->saturday) ? $object->saturday : 'N/A') . '<br>';
+				$actioncomm->note_private .= $langs->trans('Day 6') . ' : ' . (!empty($object->sunday) ? $object->sunday : 'N/A') . '<br>';
+				$actioncomm->note_private .= $langs->trans('DateCreation') . ' : ' . dol_print_date($now, 'dayhoursec', 'tzuser') . '<br>';
+				$actioncomm->note_private .= $langs->trans('Status') . ' : ' . $object->status . '<br>';
 				$actioncomm->datep       = $now;
 				$actioncomm->fk_element  = $object->element_id;
 				$actioncomm->userownerid = $user->id;
