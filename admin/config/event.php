@@ -58,8 +58,7 @@ $search_event = GETPOST('search_event', 'alpha');
 // Get list of triggers available
 $triggers = array();
 $sql = "SELECT a.rowid, a.code, a.label, a.elementtype, a.rang as position";
-$sql .= " FROM ".MAIN_DB_PREFIX."c_action_trigger as a";
-$sql .= " WHERE a.elementtype LIKE '%digiriskdolibarr'";
+$sql .= " FROM ".MAIN_DB_PREFIX."c_digiriskdolibarr_action_trigger as a";
 $sql .= " ORDER BY a.rang ASC";
 
 $resql = $db->query($sql);
@@ -198,6 +197,7 @@ if (!empty($triggers)) {
 		}
 
 		//print 'module='.$module.' code='.$trigger['code'].'<br>';
+
 		if (!empty($conf->$module->enabled)) {
 
 			if ($search_event === '' || preg_match('/'.preg_quote($search_event, '/').'/i', $trigger['code'])) {
