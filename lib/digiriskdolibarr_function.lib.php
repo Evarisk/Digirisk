@@ -544,20 +544,6 @@ function digiriskHeader($title = '', $help_url = '', $arrayofjs = array(), $arra
 	$workunit_prefix = dol_strlen($mod_workunit->prefix) > 0 ? $mod_workunit->prefix : $conf->global->DIGIRISKDOLIBARR_WORKUNIT_CANOPUS_ADDON;
 	$workunit_prefix = preg_match('/{/',$workunit_prefix) ? preg_split('/{/', $workunit_prefix)[0] : $workunit_prefix;
 
-	// html header
-	$tmpcsstouse = 'sidebar-collapse' . ($morecssonbody ? ' ' . $morecssonbody : '');
-	// If theme MD and classic layer, we open the menulayer by default.
-	if ($conf->theme == 'md' && ! in_array($conf->browser->layout, array('phone', 'tablet')) && empty($conf->global->MAIN_OPTIMIZEFORTEXTBROWSER)) {
-		global $mainmenu;
-		if ($mainmenu != 'website') $tmpcsstouse = $morecssonbody; // We do not use sidebar-collpase by default to have menuhider open by default.
-	}
-
-	if ( ! empty($conf->global->MAIN_OPTIMIZEFORCOLORBLIND)) {
-		$tmpcsstouse .= ' colorblind-' . strip_tags($conf->global->MAIN_OPTIMIZEFORCOLORBLIND);
-	}
-
-	//print '<body id="mainbody" class="' . $tmpcsstouse . '">' . "\n";
-
 	llxHeader('', $title, $help_url, '', '', '', $arrayofjs, $arrayofcss, $morequerystring, $morecssonbody);
 
 	//Body navigation digirisk
