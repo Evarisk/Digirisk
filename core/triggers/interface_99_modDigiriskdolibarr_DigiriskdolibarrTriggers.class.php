@@ -162,11 +162,13 @@ class InterfaceDigiriskdolibarrTriggers extends DolibarrTriggers
 						($digiriskresourcesingle->object_type == 'firepermit' ? $firepermit->fetch($digiriskresourcesingle->object_id) : '');
 					}
 					($preventionplan->status != 0 ? $result = $preventionplan->isObjectUsed($object->id) : '');
-					($result <= 0 && $firepermit->status != 0 ? $result = $firepermit->isObjectUsed($object->id) : '');
+					($result > 0 ? $error[$i++] = $preventionplan->errors[0] : '');
+					($firepermit->status != 0 ? $result = $firepermit->isObjectUsed($object->id) : '');
+					($result > 0 ? $error[$i++] = $firepermit->errors[0] : '');
 				}
 
-				if ($result > 0) {
-					($preventionplan->status != 0 ? $object->errors = $preventionplan->errors : $object->errors = $firepermit->errors);
+				if (!empty($error)) {
+					$object->errors = $error;
 					return -1;
 				}
 				break;
@@ -188,11 +190,13 @@ class InterfaceDigiriskdolibarrTriggers extends DolibarrTriggers
 						($digiriskresourcesingle->object_type == 'firepermit' ? $firepermit->fetch($digiriskresourcesingle->object_id) : '');
 					}
 					($preventionplan->status != 0 ? $result = $preventionplan->isObjectUsed($object->fk_soc) : '');
-					($result <= 0 && $firepermit->status != 0 ? $result = $firepermit->isObjectUsed($object->fk_soc) : '');
+					($result > 0 ? $error[$i++] = $preventionplan->errors[0] : '');
+					($firepermit->status != 0 ? $result = $firepermit->isObjectUsed($object->fk_soc) : '');
+					($result > 0 ? $error[$i++] = $firepermit->errors[0] : '');
 				}
 
-				if ($result > 0) {
-					($preventionplan->status != 0 ? $object->errors = $preventionplan->errors : $object->errors = $firepermit->errors);
+				if (!empty($error)) {
+					$object->errors = $error;
 					return -1;
 				}
 				break;
