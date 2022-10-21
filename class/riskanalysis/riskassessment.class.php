@@ -160,6 +160,7 @@ class RiskAssessment extends CommonObject
 	 */
 	public function create(User $user, $notrigger = false)
 	{
+		global $conf;
 		// Change status previous ressources at 0
 		$sql   = "UPDATE " . MAIN_DB_PREFIX . "digiriskdolibarr_riskassessment";
 		$sql  .= " SET status = 0";
@@ -167,7 +168,7 @@ class RiskAssessment extends CommonObject
 		$this->db->query($sql);
 
 		//ADD LINES POUR LE SELECT ENTITY
-		return $this->createCommon($user, $notrigger);
+		return $this->createCommon($user, empty($conf->global->DIGIRISKDOLIBARR_MAIN_AGENDA_ACTIONAUTO_RISKASSESSMENT_CREATE));
 	}
 
 	/**
@@ -283,7 +284,9 @@ class RiskAssessment extends CommonObject
 	 */
 	public function update(User $user, $notrigger = false)
 	{
-		return $this->updateCommon($user, $notrigger);
+		global $conf;
+
+		return $this->updateCommon($user, empty($conf->global->DIGIRISKDOLIBARR_MAIN_AGENDA_ACTIONAUTO_RISKASSESSMENT_MODIFY));
 	}
 
 	/**
@@ -332,7 +335,9 @@ class RiskAssessment extends CommonObject
 	 */
 	public function delete(User $user, $notrigger = false)
 	{
-		return $this->deleteCommon($user, $notrigger);
+		global $conf;
+
+		return $this->deleteCommon($user, empty($conf->global->DIGIRISKDOLIBARR_MAIN_AGENDA_ACTIONAUTO_RISKASSESSMENT_DELETE));
 	}
 
 	/**

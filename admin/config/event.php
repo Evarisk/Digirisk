@@ -99,10 +99,9 @@ if ($action == "save" && empty($cancel)) {
 	$db->begin();
 
 	foreach ($triggers as $trigger) {
-		$keyparam = 'MAIN_AGENDA_ACTIONAUTO_'.$trigger['code'];
-		//print "param=".$param." - ".$_POST[$param];
+		$keyparam = 'DIGIRISKDOLIBARR_MAIN_AGENDA_ACTIONAUTO_'.$trigger['code'];
 		if ($search_event === '' || preg_match('/'.preg_quote($search_event, '/').'/i', $keyparam)) {
-			$res = dolibarr_set_const($db, $keyparam, (GETPOST($keyparam, 'alpha') ?GETPOST($keyparam, 'alpha') : ''), 'chaine', 0, '', $conf->entity);
+			$res = dolibarr_set_const($db, $keyparam, GETPOST($keyparam, 'alpha'), 'chaine', 0, '', $conf->entity);
 			if (!($res > 0)) {
 				$error++;
 			}
@@ -174,19 +173,19 @@ if (!empty($triggers)) {
 			print '<tr class="oddeven">';
 			print '<td>' . $trigger['code'] . '</td>';
 			print '<td>' . $trigger['label'] . '</td>';
-			print '<td class="right" width="40">';
-			$key = 'MAIN_AGENDA_ACTIONAUTO_' . $trigger['code'];
+			print '<td class="right">';
+			$key = 'DIGIRISKDOLIBARR_MAIN_AGENDA_ACTIONAUTO_' . $trigger['code'];
 			$value = $conf->global->$key;
-			print '<input class="oddeven" type="checkbox" name="' . $key . '" value="1"' . ((($action == 'selectall' || $value) && $action != "selectnone") ? ' checked' : '') . '>';
-			print '</td></tr>' . "\n";
+			print '<input class="oddeven" type="checkbox" name="' . $key . '"' . ((($action == 'selectall' || $value) && $action != "selectnone") ? ' checked' : '') . '>';
+			print '</td></tr>';
 		}
 	}
 }
 print '</table>';
 print '</div>';
 
-print $form->buttonsSaveCancel("Save", 'Cancel');
-print "</form>\n";
+print $form->buttonsSaveCancel();
+print "</form>";
 print "<br>";
 // Page end
 print dol_get_fiche_end();

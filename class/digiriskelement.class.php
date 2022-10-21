@@ -171,7 +171,8 @@ class DigiriskElement extends CommonObject
 		}
 		$this->element     = $this->element_type . '@digiriskdolibarr';
 		$this->fk_standard = $conf->global->DIGIRISKDOLIBARR_ACTIVE_STANDARD;
-		return $this->createCommon($user, $notrigger);
+
+		return $this->createCommon($user, empty($conf->global->DIGIRISKDOLIBARR_MAIN_AGENDA_ACTIONAUTO_DIGIRISKELEMENT_CREATE));
 	}
 
 	/**
@@ -310,7 +311,9 @@ class DigiriskElement extends CommonObject
 	 */
 	public function update(User $user, $notrigger = false)
 	{
-		return $this->updateCommon($user, $notrigger);
+		global $conf;
+
+		return $this->updateCommon($user, empty($conf->global->DIGIRISKDOLIBARR_MAIN_AGENDA_ACTIONAUTO_DIGIRISKELEMENT_MODIFY));
 	}
 
 	/**
@@ -325,7 +328,8 @@ class DigiriskElement extends CommonObject
 		global $conf;
 
 		$this->fk_parent = $conf->global->DIGIRISKDOLIBARR_DIGIRISKELEMENT_TRASH;
-		return $this->update($user, $notrigger);
+
+		return $this->update($user, empty($conf->global->DIGIRISKDOLIBARR_MAIN_AGENDA_ACTIONAUTO_DIGIRISKELEMENT_DELETE));
 	}
 
 	/**
