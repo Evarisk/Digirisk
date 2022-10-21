@@ -77,7 +77,7 @@ function digiriskdolibarrAdminPrepareHead()
 
 	$head[$h][0] = dol_buildpath("/digiriskdolibarr/admin/config/event.php", 1);
 	$head[$h][1] = '<i class="fas fa-calendar-alt"></i>  ' . $langs->trans("Event");
-	$head[$h][2] = 'agenda';
+	$head[$h][2] = 'event';
 	$h++;
 
 	$head[$h][0] = dol_buildpath("/digiriskdolibarr/admin/setup.php", 1);
