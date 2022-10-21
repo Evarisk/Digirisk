@@ -18,7 +18,7 @@
 /**
  * \file    admin/config/event.php
  * \ingroup digiriskdolibarr
- * \brief   Digiriskdolibarr event page.
+ * \brief   Digiriskdolibarr config event auto page.
  */
 
 // Load Dolibarr environment
@@ -40,7 +40,6 @@ global $conf, $db, $langs, $user;
 
 // Libraries
 require_once DOL_DOCUMENT_ROOT.'/core/lib/admin.lib.php';
-require_once DOL_DOCUMENT_ROOT.'/core/lib/agenda.lib.php';
 require_once '../../lib/digiriskdolibarr.lib.php';
 
 if (!$user->admin) {
@@ -150,7 +149,7 @@ print dol_get_fiche_head($head, 'event', '', -1, 'digiriskdolibarr@digiriskdolib
 print '<span class="opacitymedium">'.$langs->trans("AgendaAutoActionDesc")." ".$langs->trans("OnlyActiveElementsAreShown", 'modules.php').'</span><br>';
 print "<br>\n";
 
-print '<div class="div-table-responsive">'; // You can use div-table-responsive-no-min if you dont need reserved height for your table
+print '<div class="div-table-responsive">';
 print '<table class="noborder centpercent">';
 print '<tr class="liste_titre">';
 print '<td class="liste_titre"><input type="text" name="search_event" value="'.dol_escape_htmltag($search_event).'"></td>';
@@ -167,49 +166,19 @@ print '<tr class="liste_titre">';
 print '<th class="liste_titre" colspan="2">'.$langs->trans("ActionsEvents").'</th>';
 print '<th class="liste_titre"><a href="'.$_SERVER["PHP_SELF"].'?action=selectall'.($param ? $param : '').'">'.$langs->trans("All").'</a>/<a href="'.$_SERVER["PHP_SELF"].'?action=selectnone'.($param ? $param : '').'">'.$langs->trans("None").'</a></th>';
 print '</tr>'."\n";
-// Show each trigger (list is in c_action_trigger)
+
+// Show each trigger (list is in c_digiriskdolibarr_action_trigger)
 if (!empty($triggers)) {
 	foreach ($triggers as $trigger) {
-		$module = $trigger['element'];
-		if ($module == 'order_supplier' || $module == 'invoice_supplier') {
-			$module = 'fournisseur';
-		}
-		if ($module == 'shipping') {
-			$module = 'expedition_bon';
-		}
-		if ($module == 'member') {
-			$module = 'adherent';
-		}
-		if ($module == 'project') {
-			$module = 'projet';
-		}
-		if ($module == 'proposal_supplier') {
-			$module = 'supplier_proposal';
-		}
-		if ($module == 'contact') {
-			$module = 'societe';
-		}
-
-		// If 'element' value is myobject@mymodule instead of mymodule
-		$tmparray = explode('@', $module);
-		if (!empty($tmparray[1])) {
-			$module = $tmparray[1];
-		}
-
-		//print 'module='.$module.' code='.$trigger['code'].'<br>';
-
-		if (!empty($conf->$module->enabled)) {
-
-			if ($search_event === '' || preg_match('/'.preg_quote($search_event, '/').'/i', $trigger['code'])) {
-				print '<tr class="oddeven">';
-				print '<td>'.$trigger['code'].'</td>';
-				print '<td>'.$trigger['label'].'</td>';
-				print '<td class="right" width="40">';
-				$key = 'MAIN_AGENDA_ACTIONAUTO_'.$trigger['code'];
-				$value = $conf->global->$key;
-				print '<input class="oddeven" type="checkbox" name="'.$key.'" value="1"'.((($action == 'selectall' || $value) && $action != "selectnone") ? ' checked' : '').'>';
-				print '</td></tr>'."\n";
-			}
+		if ($search_event === '' || preg_match('/' . preg_quote($search_event, '/') . '/i', $trigger['code'])) {
+			print '<tr class="oddeven">';
+			print '<td>' . $trigger['code'] . '</td>';
+			print '<td>' . $trigger['label'] . '</td>';
+			print '<td class="right" width="40">';
+			$key = 'MAIN_AGENDA_ACTIONAUTO_' . $trigger['code'];
+			$value = $conf->global->$key;
+			print '<input class="oddeven" type="checkbox" name="' . $key . '" value="1"' . ((($action == 'selectall' || $value) && $action != "selectnone") ? ' checked' : '') . '>';
+			print '</td></tr>' . "\n";
 		}
 	}
 }
