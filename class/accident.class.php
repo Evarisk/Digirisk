@@ -207,7 +207,7 @@ class Accident extends CommonObject
 	public function create(User $user, $notrigger = false)
 	{
 		$this->element = $this->element . '@digiriskdolibarr';
-		return $this->createCommon($user, $notrigger);
+		return $this->createCommon($user, empty($conf->global->DIGIRISKDOLIBARR_MAIN_AGENDA_ACTIONAUTO_ACCIDENT_CREATE));
 	}
 
 	/**
@@ -330,7 +330,7 @@ class Accident extends CommonObject
 	 */
 	public function update(User $user, $notrigger = false)
 	{
-		return $this->updateCommon($user, $notrigger);
+		return $this->updateCommon($user, empty($conf->global->DIGIRISKDOLIBARR_MAIN_AGENDA_ACTIONAUTO_ACCIDENT_MODIFY));
 	}
 
 	/**
@@ -342,7 +342,7 @@ class Accident extends CommonObject
 	 */
 	public function delete(User $user, $notrigger = false)
 	{
-		return $this->deleteCommon($user, $notrigger);
+		return $this->deleteCommon($user, empty($conf->global->DIGIRISKDOLIBARR_MAIN_AGENDA_ACTIONAUTO_ACCIDENT_DELETE));
 	}
 
 	/**
@@ -978,7 +978,7 @@ class AccidentWorkStop extends CommonObjectLine
 			// Triggers
 			if ( ! $notrigger) {
 				// Call triggers
-				$this->call_trigger(strtoupper(get_class($this)) . '_CREATE', $user);
+				if (empty($conf->global->DIGIRISKDOLIBARR_MAIN_AGENDA_ACTIONAUTO_ACCIDENTWORKSTOP_CREATE)) $this->call_trigger(strtoupper(get_class($this)) . '_CREATE', $user);
 				// End call triggers
 			}
 			return $this->id;
@@ -1020,7 +1020,7 @@ class AccidentWorkStop extends CommonObjectLine
 			// Triggers
 			if ( ! $notrigger) {
 				// Call triggers
-				$this->call_trigger(strtoupper(get_class($this)) . '_MODIFY', $user);
+				if (empty($conf->global->DIGIRISKDOLIBARR_MAIN_AGENDA_ACTIONAUTO_ACCIDENTWORKSTOP_MODIFY)) $this->call_trigger(strtoupper(get_class($this)) . '_MODIFY', $user);
 				// End call triggers
 			}
 			return 1;
@@ -1044,7 +1044,7 @@ class AccidentWorkStop extends CommonObjectLine
 		// Triggers
 		if ( ! $notrigger) {
 			// Call trigger
-			$this->call_trigger(strtoupper(get_class($this)) . '_DELETE', $user);
+			if (empty($conf->global->DIGIRISKDOLIBARR_MAIN_AGENDA_ACTIONAUTO_ACCIDENTWORKSTOP_DELETE)) $this->call_trigger(strtoupper(get_class($this)) . '_DELETE', $user);
 			// End call triggers
 		}
 		return $this->update($user, true);
@@ -1451,7 +1451,7 @@ class AccidentLesion extends CommonObjectLine
 			// Triggers
 			if ( ! $notrigger) {
 				// Call triggers
-				$this->call_trigger(strtoupper(get_class($this)) . '_CREATE', $user);
+				if (empty($conf->global->DIGIRISKDOLIBARR_MAIN_AGENDA_ACTIONAUTO_ACCIDENTLESION_CREATE)) $this->call_trigger(strtoupper(get_class($this)) . '_CREATE', $user);
 				// End call triggers
 			}
 			return $this->id;
@@ -1490,7 +1490,7 @@ class AccidentLesion extends CommonObjectLine
 			// Triggers
 			if ( ! $notrigger) {
 				// Call triggers
-				$this->call_trigger(strtoupper(get_class($this)) . '_MODIFY', $user);
+				if (empty($conf->global->DIGIRISKDOLIBARR_MAIN_AGENDA_ACTIONAUTO_ACCIDENTLESION_MODIFY)) $this->call_trigger(strtoupper(get_class($this)) . '_MODIFY', $user);
 				// End call triggers
 			}
 			return 1;
@@ -1522,7 +1522,7 @@ class AccidentLesion extends CommonObjectLine
 			// Triggers
 			if ( ! $notrigger) {
 				// Call trigger
-				$this->call_trigger(strtoupper(get_class($this)) . '_DELETE', $user);
+				if (empty($conf->global->DIGIRISKDOLIBARR_MAIN_AGENDA_ACTIONAUTO_ACCIDENTLESION_DELETE)) $this->call_trigger(strtoupper(get_class($this)) . '_DELETE', $user);
 				// End call triggers
 			}
 			return 1;
