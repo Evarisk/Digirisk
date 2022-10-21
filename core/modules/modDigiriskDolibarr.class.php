@@ -502,21 +502,21 @@ class modDigiriskdolibarr extends DolibarrModules
 			37 => array('DIGIRISKDOLIBARR_PARTICIPATION_AGREEMENT_INFORMATION_PROCEDURE', 'chaine', $langs->transnoentities('ParticipationAgreementValue'), '', 0, 'current'),
 			38 => array('DIGIRISKDOLIBARR_FIRST_AID', 'chaine', $langs->transnoentities('FirstAidValue'), '', 0, 'current'),
 
-			40 => array('DIGIRISKDOLIBARR_MAIN_AGENDA_ACTIONAUTO_LEGALDISPLAY_CREATE', 'integer', 1, '', 0, 'current'),
+			40 => array('DIGIRISKDOLIBARR_MAIN_AGENDA_ACTIONAUTO_LEGALDISPLAY_GENERATE', 'integer', 1, '', 0, 'current'),
 			41 => array('DIGIRISKDOLIBARR_LEGALDISPLAY_ADDON', 'chaine', 'mod_legaldisplay_standard', '', 0, 'current'),
 			42 => array('DIGIRISKDOLIBARR_LEGALDISPLAY_ADDON_ODT_PATH', 'chaine', 'DOL_DOCUMENT_ROOT/custom/digiriskdolibarr/documents/doctemplates/legaldisplay/', '', 0, 'current'),
 			43 => array('DIGIRISKDOLIBARR_LEGALDISPLAY_CUSTOM_ADDON_ODT_PATH','chaine', 'DOL_DATA_ROOT' . (($conf->entity == 1 ) ? '/' : '/' . $conf->entity . '/') . 'ecm/digiriskdolibarr/legaldisplay/', '', 0, 'current'),
 			44 => array('DIGIRISKDOLIBARR_LEGALDISPLAY_DEFAULT_MODEL', 'chaine', 'legaldisplay_odt', '', 0, 'current'),
 
 			// CONST INFORMATIONS SHARING
-			50 => array('DIGIRISKDOLIBARR_MAIN_AGENDA_ACTIONAUTO_INFORMATIONSSHARING_CREATE', 'integer', 1, '', 0, 'current'),
+			50 => array('DIGIRISKDOLIBARR_MAIN_AGENDA_ACTIONAUTO_INFORMATIONSSHARING_GENERATE', 'integer', 1, '', 0, 'current'),
 			51 => array('DIGIRISKDOLIBARR_INFORMATIONSSHARING_ADDON', 'chaine', 'mod_informationssharing_standard', '', 0, 'current'),
 			52 => array('DIGIRISKDOLIBARR_INFORMATIONSSHARING_ADDON_ODT_PATH', 'chaine', 'DOL_DOCUMENT_ROOT/custom/digiriskdolibarr/documents/doctemplates/informationssharing/', '', 0, 'current'),
 			53 => array('DIGIRISKDOLIBARR_INFORMATIONSSHARING_CUSTOM_ADDON_ODT_PATH', 'chaine', 'DOL_DATA_ROOT' . (($conf->entity == 1 ) ? '/' : '/' . $conf->entity . '/') . 'ecm/digiriskdolibarr/informationssharing/', '', 0, 'current'),
 			54 => array('DIGIRISKDOLIBARR_INFORMATIONSSHARING_DEFAULT_MODEL', 'chaine', 'informationssharing_odt', '', 0, 'current'),
 
 			// CONST LISTING RISKS ACTION
-			60 => array('DIGIRISKDOLIBARR_MAIN_AGENDA_ACTIONAUTO_LISTINGRISKSACTION_CREATE', 'integer', 1, '', 0, 'current'),
+			60 => array('DIGIRISKDOLIBARR_MAIN_AGENDA_ACTIONAUTO_LISTINGRISKSACTION_GENERATE', 'integer', 1, '', 0, 'current'),
 			61 => array('DIGIRISKDOLIBARR_LISTINGRISKSACTION_ADDON', 'chaine', 'mod_listingrisksaction_standard', '', 0, 'current'),
 			62 => array('DIGIRISKDOLIBARR_LISTINGRISKSACTION_ADDON_ODT_PATH', 'chaine', 'DOL_DOCUMENT_ROOT/custom/digiriskdolibarr/documents/doctemplates/listingrisksaction/', '', 0, 'current'),
 			63 => array('DIGIRISKDOLIBARR_LISTINGRISKSACTION_CUSTOM_ADDON_ODT_PATH', 'chaine', 'DOL_DATA_ROOT' . (($conf->entity == 1 ) ? '/' : '/' . $conf->entity . '/') . 'ecm/digiriskdolibarr/listingrisksaction/', '', 0, 'current'),
@@ -524,14 +524,14 @@ class modDigiriskdolibarr extends DolibarrModules
 			65 => array('DIGIRISKDOLIBARR_LISTINGRISKSACTION_SHOW_TASK_DONE', 'integer', 1, '', 0, 'current'),
 
 			// CONST LISTING RISKS PHOTO
-			70 => array('DIGIRISKDOLIBARR_MAIN_AGENDA_ACTIONAUTO_LISTINGRISKSPHOTO_CREATE', 'integer', 1, '', 0, 'current'),
+			70 => array('DIGIRISKDOLIBARR_MAIN_AGENDA_ACTIONAUTO_LISTINGRISKSPHOTO_GENERATE', 'integer', 1, '', 0, 'current'),
 			71 => array('DIGIRISKDOLIBARR_LISTINGRISKSPHOTO_ADDON', 'chaine', 'mod_listingrisksphoto_standard', '', 0, 'current'),
 			72 => array('DIGIRISKDOLIBARR_LISTINGRISKSPHOTO_ADDON_ODT_PATH', 'chaine', 'DOL_DOCUMENT_ROOT/custom/digiriskdolibarr/documents/doctemplates/listingrisksphoto/', '', 0, 'current'),
 			73 => array('DIGIRISKDOLIBARR_LISTINGRISKSPHOTO_CUSTOM_ADDON_ODT_PATH', 'chaine', 'DOL_DATA_ROOT' . (($conf->entity == 1 ) ? '/' : '/' . $conf->entity . '/') . 'ecm/digiriskdolibarr/listingrisksphoto/', '', 0, 'current'),
 			74 => array('DIGIRISKDOLIBARR_LISTINGRISKSPHOTO_DEFAULT_MODEL', 'chaine', 'listingrisksphoto_odt', '', 0, 'current'),
 
 			// CONST GROUPMENT DOCUMENT
-			80 => array('DIGIRISKDOLIBARR_MAIN_AGENDA_ACTIONAUTO_GROUPMENTDOCUMENT_CREATE', 'integer', 1, '', 0, 'current'),
+			80 => array('DIGIRISKDOLIBARR_MAIN_AGENDA_ACTIONAUTO_GROUPMENTDOCUMENT_GENERATE', 'integer', 1, '', 0, 'current'),
 			81 => array('DIGIRISKDOLIBARR_GROUPMENTDOCUMENT_ADDON', 'chaine', 'mod_groupmentdocument_standard', '', 0, 'current'),
 			82 => array('DIGIRISKDOLIBARR_GROUPMENTDOCUMENT_ADDON_ODT_PATH', 'chaine', 'DOL_DOCUMENT_ROOT/custom/digiriskdolibarr/documents/doctemplates/groupmentdocument/', '', 0, 'current'),
 			83 => array('DIGIRISKDOLIBARR_GROUPMENTDOCUMENT_CUSTOM_ADDON_ODT_PATH', 'chaine', 'DOL_DATA_ROOT' . (($conf->entity == 1 ) ? '/' : '/' . $conf->entity . '/') . 'ecm/digiriskdolibarr/groupmentdocument/', '', 0, 'current'),
@@ -539,7 +539,7 @@ class modDigiriskdolibarr extends DolibarrModules
 			85 => array('DIGIRISKDOLIBARR_GROUPMENTDOCUMENT_SHOW_TASK_DONE', 'integer', 1, '', 0, 'current'),
 
 			// CONST WORKUNIT DOCUMENT
-			90 => array('DIGIRISKDOLIBARR_MAIN_AGENDA_ACTIONAUTO_WORKUNITDOCUMENT_CREATE', 'integer', 1, '', 0, 'current'),
+			90 => array('DIGIRISKDOLIBARR_MAIN_AGENDA_ACTIONAUTO_WORKUNITDOCUMENT_GENERATE', 'integer', 1, '', 0, 'current'),
 			91 => array('DIGIRISKDOLIBARR_WORKUNITDOCUMENT_ADDON', 'chaine', 'mod_workunitdocument_standard', '', 0, 'current'),
 			92 => array('DIGIRISKDOLIBARR_WORKUNITDOCUMENT_ADDON_ODT_PATH', 'chaine', 'DOL_DOCUMENT_ROOT/custom/digiriskdolibarr/documents/doctemplates/workunitdocument/', '', 0, 'current'),
 			93 => array('DIGIRISKDOLIBARR_WORKUNITDOCUMENT_CUSTOM_ADDON_ODT_PATH', 'chaine', 'DOL_DATA_ROOT' . (($conf->entity == 1 ) ? '/' : '/' . $conf->entity . '/') . 'ecm/digiriskdolibarr/workunitdocument/', '', 0, 'current'),
@@ -555,7 +555,7 @@ class modDigiriskdolibarr extends DolibarrModules
 			105 => array('DIGIRISKDOLIBARR_PREVENTIONPLAN_MAITRE_OEUVRE', 'integer', 0, '', 0, 'current'),
 
 			// CONST PREVENTION PLAN DOCUMENT
-			110 => array('DIGIRISKDOLIBARR_MAIN_AGENDA_ACTIONAUTO_PREVENTIONPLANDOCUMENT_CREATE', 'integer', 1, '', 0, 'current'),
+			110 => array('DIGIRISKDOLIBARR_MAIN_AGENDA_ACTIONAUTO_PREVENTIONPLANDOCUMENT_GENERATE', 'integer', 1, '', 0, 'current'),
 			111 => array('DIGIRISKDOLIBARR_PREVENTIONPLANDOCUMENT_ADDON', 'chaine', 'mod_preventionplandocument_standard', '', 0, 'current'),
 			112 => array('DIGIRISKDOLIBARR_PREVENTIONPLANDOCUMENT_ADDON_ODT_PATH', 'chaine', 'DOL_DOCUMENT_ROOT/custom/digiriskdolibarr/documents/doctemplates/preventionplandocument/', '', 0, 'current'),
 			113 => array('DIGIRISKDOLIBARR_PREVENTIONPLANDOCUMENT_SPECIMEN_ADDON_ODT_PATH', 'chaine', 'DOL_DOCUMENT_ROOT/custom/digiriskdolibarr/documents/doctemplates/preventionplandocument/specimen/', '', 0, 'current'),
@@ -571,7 +571,7 @@ class modDigiriskdolibarr extends DolibarrModules
 			125 => array('DIGIRISKDOLIBARR_FIREPERMIT_MAITRE_OEUVRE', 'integer', 0, '', 0, 'current'),
 
 			// CONST FIRE PERMIT DOCUMENT
-			130 => array('DIGIRISKDOLIBARR_MAIN_AGENDA_ACTIONAUTO_FIREPERMITDOCUMENT_CREATE', 'integer', 1, '', 0, 'current'),
+			130 => array('DIGIRISKDOLIBARR_MAIN_AGENDA_ACTIONAUTO_FIREPERMITDOCUMENT_GENERATE', 'integer', 1, '', 0, 'current'),
 			131 => array('DIGIRISKDOLIBARR_FIREPERMITDOCUMENT_ADDON', 'chaine', 'mod_firepermitdocument_standard', '', 0, 'current'),
 			132 => array('DIGIRISKDOLIBARR_FIREPERMITDOCUMENT_ADDON_ODT_PATH', 'chaine', 'DOL_DOCUMENT_ROOT/custom/digiriskdolibarr/documents/doctemplates/firepermitdocument/', '', 0, 'current'),
 			133 => array('DIGIRISKDOLIBARR_FIREPERMITDOCUMENT_CUSTOM_ADDON_ODT_PATH', 'chaine', 'DOL_DATA_ROOT' . (($conf->entity == 1 ) ? '/' : '/' . $conf->entity . '/') . 'ecm/digiriskdolibarr/firepermitdocument/', '', 0, 'current'),
