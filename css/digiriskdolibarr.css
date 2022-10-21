@@ -171,6 +171,45 @@
   line-height: 20px;
 }
 
+div.wpeo-modal-patchnote .modal-header {
+  background-color: white;
+  border-bottom: solid #cccccc 1px;
+}
+div.wpeo-modal-patchnote .modal-container {
+  background-color: #e9eaed;
+  border-radius: 25px;
+}
+div.wpeo-modal-patchnote .modal-container li {
+  list-style-type: circle;
+  margin-left: 55px;
+}
+div.wpeo-modal-patchnote .modal-container ul {
+  line-height: 30px;
+}
+div.wpeo-modal-patchnote .modal-container code {
+  padding: 3px 5px;
+  border-radius: 6px;
+  background-color: #fafafa;
+}
+div.wpeo-modal-patchnote .modal-content img {
+  width: 100%;
+  -webkit-box-shadow: 5px 5px 18px rgba(0, 0, 0, 0.2);
+  box-shadow: 5px 5px 18px rgba(0, 0, 0, 0.2);
+  margin-bottom: 28px;
+}
+div.wpeo-modal-patchnote .modal-content h3 {
+  margin-left: 30px;
+  color: #666666;
+  font-size: 17px;
+}
+div.wpeo-modal-patchnote .modal-title {
+  color: #0a1464;
+  font-size: 24px !important;
+}
+div.wpeo-modal-patchnote .wpeo-button {
+  background-color: #cccccc;
+}
+
 /*--------------------------------------------------------------
 	Module : Dropdown
 	Version : 1.0.0
