@@ -530,7 +530,7 @@ class Risk extends CommonObject
 	{
 		$risk_categories = $this->get_danger_categories();
 		foreach ($risk_categories as $category) {
-			if ($category['name'] == $name) {
+			if ($category['name'] == $name || $category['nameDigiriskWordPress'] == $name) {
 				return $category['position'];
 			}
 		}
