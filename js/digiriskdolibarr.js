@@ -1861,8 +1861,12 @@ window.eoxiaJS.risk.saveRisk = function ( event ) {
 			$('.wpeo-loader').removeClass('wpeo-loader');
 			let actionContainerSuccess = $('.messageSuccessRiskEdit');
 			if (newParent == id || moveRiskDisabled) {
+				$('.risk-row-content-' + editedRiskId).find('.risk-category').fadeOut(800);
+				$('.risk-row-content-' + editedRiskId).find('.risk-category').fadeIn(800);
 				$('.risk-row-content-' + editedRiskId).find('.risk-description-'+editedRiskId).fadeOut(800);
-				$('.risk-row-content-' + editedRiskId).find('.risk-description-'+editedRiskId).fadeIn(800);
+				$('.risk-row-content-' + editedRiskId).find('.risk-description-'+editedRiskId).fadeIn(800, function () {
+					elementParent.html($(resp).find('.div-table-responsive'))
+				});
 			} else {
 				$('.risk-row-content-'+editedRiskId).fadeOut(800, function () {
 					elementParent.html($(resp).find('.div-title-and-table-responsive'))
