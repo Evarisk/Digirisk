@@ -214,8 +214,11 @@ class PreventionPlan extends CommonObject
 	 */
 	public function create(User $user, $notrigger = false)
 	{
+		global $conf;
+
 		$this->element = $this->element . '@digiriskdolibarr';
-		return $this->createCommon($user, $notrigger);
+
+		return $this->createCommon($user, empty($conf->global->DIGIRISKDOLIBARR_MAIN_AGENDA_ACTIONAUTO_PREVENTIONPLAN_CREATE));
 	}
 
 	/**
@@ -465,7 +468,9 @@ class PreventionPlan extends CommonObject
 	 */
 	public function update(User $user, $notrigger = false)
 	{
-		return $this->updateCommon($user, $notrigger);
+		global $conf;
+
+		return $this->updateCommon($user, empty($conf->global->DIGIRISKDOLIBARR_MAIN_AGENDA_ACTIONAUTO_PREVENTIONPLAN_MODIFY));
 	}
 
 	/**
@@ -477,7 +482,9 @@ class PreventionPlan extends CommonObject
 	 */
 	public function delete(User $user, $notrigger = false)
 	{
-		return $this->deleteCommon($user, $notrigger);
+		global $conf;
+
+		return $this->deleteCommon($user, empty($conf->global->DIGIRISKDOLIBARR_MAIN_AGENDA_ACTIONAUTO_PREVENTIONPLAN_DELETE));
 	}
 
 	/**
@@ -536,9 +543,11 @@ class PreventionPlan extends CommonObject
 	 */
 	public function setInProgress($user, $notrigger = 0)
 	{
+		global $conf;
+
 		$signatory = new PreventionPlanSignature($this->db);
 		$signatory->deleteSignatoriesSignatures($this->id, 'preventionplan');
-		return $this->setStatusCommon($user, self::STATUS_IN_PROGRESS, $notrigger, 'PREVENTIONPLAN_INPROGRESS');
+		return $this->setStatusCommon($user, self::STATUS_IN_PROGRESS, empty($conf->global->DIGIRISKDOLIBARR_MAIN_AGENDA_ACTIONAUTO_PREVENTIONPLAN_INPROGRESS), 'PREVENTIONPLAN_INPROGRESS');
 	}
 	/**
 	 * 	Set pending signature status
@@ -549,7 +558,9 @@ class PreventionPlan extends CommonObject
 	 */
 	public function setPendingSignature($user, $notrigger = 0)
 	{
-		return $this->setStatusCommon($user, self::STATUS_PENDING_SIGNATURE, $notrigger, 'PREVENTIONPLAN_PENDINGSIGNATURE');
+		global $conf;
+
+		return $this->setStatusCommon($user, self::STATUS_PENDING_SIGNATURE, empty($conf->global->DIGIRISKDOLIBARR_MAIN_AGENDA_ACTIONAUTO_PREVENTIONPLAN_PENDINGSIGNATURE), 'PREVENTIONPLAN_PENDINGSIGNATURE');
 	}
 
 	/**
@@ -561,7 +572,9 @@ class PreventionPlan extends CommonObject
 	 */
 	public function setLocked($user, $notrigger = 0)
 	{
-		return $this->setStatusCommon($user, self::STATUS_LOCKED, $notrigger, 'PREVENTIONPLAN_LOCKED');
+		global $conf;
+
+		return $this->setStatusCommon($user, self::STATUS_LOCKED, empty($conf->global->DIGIRISKDOLIBARR_MAIN_AGENDA_ACTIONAUTO_PREVENTIONPLAN_LOCKED), 'PREVENTIONPLAN_LOCKED');
 	}
 
 	/**
@@ -573,7 +586,9 @@ class PreventionPlan extends CommonObject
 	 */
 	public function setArchived($user, $notrigger = 0)
 	{
-		return $this->setStatusCommon($user, self::STATUS_ARCHIVED, $notrigger, 'PREVENTIONPLAN_ARCHIVED');
+		global $conf;
+
+		return $this->setStatusCommon($user, self::STATUS_ARCHIVED, empty($conf->global->DIGIRISKDOLIBARR_MAIN_AGENDA_ACTIONAUTO_PREVENTIONPLAN_ARCHIVED), 'PREVENTIONPLAN_ARCHIVED');
 	}
 
 	/**
@@ -951,7 +966,7 @@ class PreventionPlanLine extends CommonObjectLine
 	 */
 	public function insert(User $user, $notrigger = false)
 	{
-		global $db, $user;
+		global $db, $user, $conf;
 
 		// Clean parameters
 		$this->description = trim($this->description);
@@ -986,7 +1001,7 @@ class PreventionPlanLine extends CommonObjectLine
 			// Triggers
 			if ( ! $notrigger) {
 				// Call triggers
-				$this->call_trigger(strtoupper(get_class($this)) . '_CREATE', $user);
+				if (!empty($conf->global->DIGIRISKDOLIBARR_MAIN_AGENDA_ACTIONAUTO_PREVENTIONPLANLINE_CREATE)) $this->call_trigger(strtoupper(get_class($this)) . '_CREATE', $user);
 				// End call triggers
 			}
 			return $this->id;
@@ -1007,7 +1022,7 @@ class PreventionPlanLine extends CommonObjectLine
 	 */
 	public function update(User $user, $notrigger = false)
 	{
-		global $user, $db;
+		global $user, $db, $conf;
 
 		// Clean parameters
 		$this->description = trim($this->description);
@@ -1032,7 +1047,7 @@ class PreventionPlanLine extends CommonObjectLine
 			// Triggers
 			if ( ! $notrigger) {
 				// Call triggers
-				$this->call_trigger(strtoupper(get_class($this)) . '_MODIFY', $user);
+				if (!empty($conf->global->DIGIRISKDOLIBARR_MAIN_AGENDA_ACTIONAUTO_PREVENTIONPLANLINE_MODIFY)) $this->call_trigger(strtoupper(get_class($this)) . '_MODIFY', $user);
 				// End call triggers
 			}
 			return $this->id;
@@ -1064,7 +1079,7 @@ class PreventionPlanLine extends CommonObjectLine
 			// Triggers
 			if ( ! $notrigger) {
 				// Call trigger
-				$this->call_trigger(strtoupper(get_class($this)) . '_DELETE', $user);
+				if (!empty($conf->global->DIGIRISKDOLIBARR_MAIN_AGENDA_ACTIONAUTO_PREVENTIONPLANLINE_DELETE)) $this->call_trigger(strtoupper(get_class($this)) . '_DELETE', $user);
 				// End call triggers
 			}
 			return 1;
