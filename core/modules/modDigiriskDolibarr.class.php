@@ -767,9 +767,13 @@ class modDigiriskdolibarr extends DolibarrModules
 			$i++ => array('DIGIRISKDOLIBARR_TOOLS_GLOBAL_ALREADY_IMPORTED', 'integer', 0, '', 0, 'current'),
 
 			// CONST SIGNATURE
+			$i++ => array('DIGIRISKDOLIBARR_MAIN_AGENDA_ACTIONAUTO_SIGNATURE_GENERATE', 'integer', 1, '', 0, 'current'),
+			$i++ => array('DIGIRISKDOLIBARR_MAIN_AGENDA_ACTIONAUTO_DIGIRISKSIGNATURE_SIGNED', 'integer', 1, '', 0, 'current'),
+			$i++ => array('DIGIRISKDOLIBARR_MAIN_AGENDA_ACTIONAUTO_DIGIRISKSIGNATURE_PENDING_SIGNATURE', 'integer', 1, '', 0, 'current'),
+			$i++ => array('DIGIRISKDOLIBARR_MAIN_AGENDA_ACTIONAUTO_DIGIRISKSIGNATURE_ABSENT', 'integer', 1, '', 0, 'current'),
+			$i++ => array('DIGIRISKDOLIBARR_MAIN_AGENDA_ACTIONAUTO_DIGIRISKSIGNATURE_DELETED', 'integer', 1, '', 0, 'current'),
 			$i++ => array('DIGIRISKDOLIBARR_SIGNATURE_ENABLE_PUBLIC_INTERFACE', 'integer', 1, '', 0, 'current'),
 			$i++ => array('DIGIRISKDOLIBARR_SIGNATURE_SHOW_COMPANY_LOGO', 'integer', 1, '', 0, 'current'),
-			$i++ => array('DIGIRISKDOLIBARR_MAIN_AGENDA_ACTIONAUTO_SIGNATURE_GENERATE', 'integer', 1, '', 0, 'current'),
 
 
 		);
