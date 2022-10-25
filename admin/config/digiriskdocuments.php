@@ -294,7 +294,7 @@ foreach ($types as $type => $documentType) {
 								print img_picto($langs->trans("Activated"), 'switch_on');
 							}
 							else {
-								print '<a class="reposition" href="'.$_SERVER["PHP_SELF"].'?action=setmod&value='.preg_replace('/\.php$/', '', $file).'&const='.$module->scandir.'&label='.urlencode($module->name).'" alt="'.$langs->trans("Default").'">'.img_picto($langs->trans("Disabled"), 'switch_off').'</a>';
+								print '<a class="reposition" href="'.$_SERVER["PHP_SELF"].'?action=setmod&value='.preg_replace('/\.php$/', '', $file).'&const='.$module->scandir.'&label='.urlencode($module->name).'&token=' . newToken() . '" alt="'.$langs->trans("Default").'">'.img_picto($langs->trans("Disabled"), 'switch_off').'</a>';
 							}
 							print '</td>';
 
@@ -399,7 +399,7 @@ foreach ($types as $type => $documentType) {
 							// Active
 							if (in_array($name, $def)) {
 								print '<td class="center">';
-								print '<a href="'.$_SERVER["PHP_SELF"].'?action=del&amp;value='.$name.'&amp;const='.$module->scandir.'&amp;label='.urlencode($module->name).'&type='.preg_split('/_/',$name)[0].'">';
+								print '<a href="'.$_SERVER["PHP_SELF"].'?action=del&amp;value='.$name.'&amp;const='.$module->scandir.'&amp;label='.urlencode($module->name).'&type='.preg_split('/_/',$name)[0].'&token=' . newToken() . '">';
 								print img_picto($langs->trans("Enabled"), 'switch_on');
 								print '</a>';
 								print "</td>";
@@ -407,7 +407,7 @@ foreach ($types as $type => $documentType) {
 							else
 							{
 								print '<td class="center">';
-								print '<a href="'.$_SERVER["PHP_SELF"].'?action=set&amp;value='.$name.'&amp;const='.$module->scandir.'&amp;label='.urlencode($module->name).'&type='.preg_split('/_/',$name)[0].'">'.img_picto($langs->trans("Disabled"), 'switch_off').'</a>';
+								print '<a href="'.$_SERVER["PHP_SELF"].'?action=set&amp;value='.$name.'&amp;const='.$module->scandir.'&amp;label='.urlencode($module->name).'&type='.preg_split('/_/',$name)[0].'&token=' . newToken() . '">'.img_picto($langs->trans("Disabled"), 'switch_off').'</a>';
 								print "</td>";
 							}
 
@@ -418,7 +418,7 @@ foreach ($types as $type => $documentType) {
 								print img_picto($langs->trans("Default"), 'on');
 							}
 							else {
-								print '<a href="'.$_SERVER["PHP_SELF"].'?action=setdoc&amp;value='.$name.'&amp;const='.$module->scandir.'&amp;label='.urlencode($module->name).'" alt="'.$langs->trans("Default").'">'.img_picto($langs->trans("Disabled"), 'off').'</a>';
+								print '<a href="'.$_SERVER["PHP_SELF"].'?action=setdoc&amp;value='.$name.'&amp;const='.$module->scandir.'&amp;label='.urlencode($module->name).'&token=' . newToken() . '" alt="'.$langs->trans("Default").'">'.img_picto($langs->trans("Disabled"), 'off').'</a>';
 							}
 							print '</td>';
 
@@ -435,7 +435,7 @@ foreach ($types as $type => $documentType) {
 							// Preview
 							print '<td class="center">';
 							if ($module->type == 'pdf') {
-								print '<a href="'.$_SERVER["PHP_SELF"].'?action=specimen&module='.$name.'">'.img_object($langs->trans("Preview"), 'intervention').'</a>';
+								print '<a href="'.$_SERVER["PHP_SELF"].'?action=specimen&module='.$name.'&token=' . newToken() . '">'.img_object($langs->trans("Preview"), 'intervention').'</a>';
 							}
 							else {
 								print img_object($langs->trans("PreviewNotAvailable"), 'generic');

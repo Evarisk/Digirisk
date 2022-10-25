@@ -152,7 +152,7 @@ foreach ($types as $type => $typeWithCase) {
 							if ($conf->global->$typeConf == $file || $conf->global->$typeConf . '.php' == $file) {
 								print img_picto($langs->trans("Activated"), 'switch_on');
 							} else {
-								print '<a class="reposition" href="' . $_SERVER["PHP_SELF"] . '?action=setmod&value=' . preg_replace('/\.php$/', '', $file) . '&type=' . $type . '&scan_dir=' . $module->scandir . '&label=' . urlencode($module->name) . '" alt="' . $langs->trans("Default") . '">' . img_picto($langs->trans("Disabled"), 'switch_off') . '</a>';
+								print '<a class="reposition" href="' . $_SERVER["PHP_SELF"] . '?action=setmod&value=' . preg_replace('/\.php$/', '', $file) . '&type=' . $type . '&scan_dir=' . $module->scandir . '&label=' . urlencode($module->name) . '&token=' . newToken() . '" alt="' . $langs->trans("Default") . '">' . img_picto($langs->trans("Disabled"), 'switch_off') . '</a>';
 							}
 							print '</td>';
 
