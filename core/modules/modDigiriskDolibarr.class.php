@@ -473,6 +473,7 @@ class modDigiriskdolibarr extends DolibarrModules
 			$i++ => array('DIGIRISKDOLIBARR_NB_WORKED_HOURS', 'integer', '', '', 0, 'current'),
 
 			// CONST RISK ASSESSMENTDOCUMENT
+			$i++ => array('DIGIRISKDOLIBARR_MAIN_AGENDA_ACTIONAUTO_RISKASSESSMENTDOCUMENT_GENERATE', 'integer', 1, '', 0, 'current'),
 			$i++ => array('DIGIRISKDOLIBARR_RISKASSESSMENTDOCUMENT_AUDIT_START_DATE', 'date', '', '', 0, 'current'),
 			$i++ => array('DIGIRISKDOLIBARR_RISKASSESSMENTDOCUMENT_AUDIT_END_DATE', 'date', '', '', 0, 'current'),
 			$i++ => array('DIGIRISKDOLIBARR_RISKASSESSMENTDOCUMENT_RECIPIENT', 'integer', 0, '', 0, 'current'),
@@ -480,7 +481,6 @@ class modDigiriskdolibarr extends DolibarrModules
 			$i++ => array('DIGIRISKDOLIBARR_RISKASSESSMENTDOCUMENT_SOURCES', 'chaine', $langs->transnoentities('RiskAssessmentDocumentSources'), '', 0, 'current'),
 			$i++ => array('DIGIRISKDOLIBARR_RISKASSESSMENTDOCUMENT_IMPORTANT_NOTES', 'chaine', $langs->transnoentities('RiskAssessmentDocumentImportantNote'), '', 0, 'current'),
 
-			$i++ => array('DIGIRISKDOLIBARR_MAIN_AGENDA_ACTIONAUTO_RISKASSESSMENTDOCUMENT_CREATE', 'integer', 1, '', 0, 'current'),
 			$i++ => array('DIGIRISKDOLIBARR_RISKASSESSMENTDOCUMENT_ADDON','chaine', 'mod_riskassessmentdocument_standard', '', 0, 'current'),
 			$i++ => array('DIGIRISKDOLIBARR_RISKASSESSMENTDOCUMENT_ADDON_ODT_PATH', 'chaine', 'DOL_DOCUMENT_ROOT/custom/digiriskdolibarr/documents/doctemplates/riskassessmentdocument/', '', 0, 'current'),
 			$i++ => array('DIGIRISKDOLIBARR_RISKASSESSMENTDOCUMENT_CUSTOM_ADDON_ODT_PATH', 'chaine', 'DOL_DATA_ROOT' . (($conf->entity == 1 ) ? '/' : '/' . $conf->entity . '/') . 'ecm/digiriskdolibarr/riskassessmentdocument/', '', 0, 'current'),
@@ -589,7 +589,6 @@ class modDigiriskdolibarr extends DolibarrModules
 			$i++ => array('DIGIRISKDOLIBARR_MAIN_AGENDA_ACTIONAUTO_DIGIRISKELEMENT_CREATE', 'integer', 1, '', 0, 'current'),
 			$i++ => array('DIGIRISKDOLIBARR_MAIN_AGENDA_ACTIONAUTO_DIGIRISKELEMENT_MODIFY', 'integer', 1, '', 0, 'current'),
 			$i++ => array('DIGIRISKDOLIBARR_MAIN_AGENDA_ACTIONAUTO_DIGIRISKELEMENT_DELETE', 'integer', 1, '', 0, 'current'),
-			$i++ => array('DIGIRISKDOLIBARR_MAIN_AGENDA_ACTIONAUTO_OPENINGHOURS_CREATE', 'integer', 1, '', 0, 'current'),
 			$i++ => array('DIGIRISKDOLIBARR_DIGIRISKELEMENT_MEDIAS_BACKWARD_COMPATIBILITY', 'integer', 0, '', 0, 'current'),
 			$i++ => array('DIGIRISKDOLIBARR_DIGIRISKELEMENT_TRASH', 'integer', 0, '', 0, 'current'),
 			$i++ => array('DIGIRISKDOLIBARR_DIGIRISKELEMENT_TRASH_UPDATED', 'integer', 0, '', 0, 'current'),
@@ -630,7 +629,6 @@ class modDigiriskdolibarr extends DolibarrModules
 			$i++ => array('DIGIRISKDOLIBARR_MAIN_AGENDA_ACTIONAUTO_RISKASSESSMENT_CREATE', 'integer', 1, '', 0, 'current'),
 			$i++ => array('DIGIRISKDOLIBARR_MAIN_AGENDA_ACTIONAUTO_RISKASSESSMENT_MODIFY', 'integer', 1, '', 0, 'current'),
 			$i++ => array('DIGIRISKDOLIBARR_MAIN_AGENDA_ACTIONAUTO_RISKASSESSMENT_DELETE', 'integer', 1, '', 0, 'current'),
-			$i++ => array('DIGIRISKDOLIBARR_MAIN_AGENDA_ACTIONAUTO_RISKASSESSMENTDOCUMENT_GENERATE', 'integer', 1, '', 0, 'current'),
 			$i++ => array('DIGIRISKDOLIBARR_RISKASSESSMENT_ADDON', 'chaine', 'mod_riskassessment_standard', '', 0, 'current'),
 			$i++ => array('DIGIRISKDOLIBARR_MULTIPLE_RISKASSESSMENT_METHOD', 'integer', 0, '', 0, 'current'),
 			$i++ => array('DIGIRISKDOLIBARR_ADVANCED_RISKASSESSMENT_METHOD', 'integer', 0, '', 0, 'current'),
@@ -707,6 +705,7 @@ class modDigiriskdolibarr extends DolibarrModules
 			$i++ => array('DIGIRISKDOLIBARR_CUSTOM_DOCUMENTS_SET', 'integer', 0, '', 0, 'current'),
 			$i++ => array('DIGIRISKDOLIBARR_MANUAL_INPUT_NB_EMPLOYEES', 'integer', 0, '', 0, 'current'),
 			$i++ => array('DIGIRISKDOLIBARR_MANUAL_INPUT_NB_WORKED_HOURS', 'integer', 0, '', 0, 'current'),
+			$i++ => array('DIGIRISKDOLIBARR_MAIN_AGENDA_ACTIONAUTO_OPENINGHOURS_CREATE', 'integer', 1, '', 0, 'current'),
 
 			//CONST TICKET & REGISTERS
 			$i++ => array('DIGIRISKDOLIBARR_TICKET_EXTRAFIELDS', 'integer', 0, '', 0, 0),
@@ -769,7 +768,6 @@ class modDigiriskdolibarr extends DolibarrModules
 			$i++ => array('DIGIRISKDOLIBARR_TOOLS_GLOBAL_ALREADY_IMPORTED', 'integer', 0, '', 0, 'current'),
 
 			// CONST SIGNATURE
-			$i++ => array('DIGIRISKDOLIBARR_MAIN_AGENDA_ACTIONAUTO_SIGNATURE_GENERATE', 'integer', 1, '', 0, 'current'),
 			$i++ => array('DIGIRISKDOLIBARR_MAIN_AGENDA_ACTIONAUTO_DIGIRISKSIGNATURE_SIGNED', 'integer', 1, '', 0, 'current'),
 			$i++ => array('DIGIRISKDOLIBARR_MAIN_AGENDA_ACTIONAUTO_DIGIRISKSIGNATURE_PENDING_SIGNATURE', 'integer', 1, '', 0, 'current'),
 			$i++ => array('DIGIRISKDOLIBARR_MAIN_AGENDA_ACTIONAUTO_DIGIRISKSIGNATURE_ABSENT', 'integer', 1, '', 0, 'current'),
