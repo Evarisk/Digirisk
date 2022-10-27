@@ -145,7 +145,7 @@ $param .= '&search_event='.urlencode($search_event);
 $head = digiriskdolibarrAdminPrepareHead();
 print dol_get_fiche_head($head, 'event', '', -1, 'digiriskdolibarr@digiriskdolibarr');
 
-print '<span class="opacitymedium">'.$langs->trans("AgendaAutoActionDesc")." ".$langs->trans("OnlyActiveElementsAreShown", 'modules.php').'</span><br>';
+print '<span class="opacitymedium">'.$langs->trans("DigiriskEventAutoDesc").'</span><br>';
 print "<br>\n";
 
 print '<div class="div-table-responsive">';
@@ -162,7 +162,7 @@ print '</tr>';
 print '</tr>'."\n";
 
 print '<tr class="liste_titre">';
-print '<th class="liste_titre" colspan="2">'.$langs->trans("ActionsEvents").'</th>';
+print '<th class="liste_titre" colspan="2">'.$langs->trans("DigiriskActionsEvents").'</th>';
 print '<th class="liste_titre"><a href="'.$_SERVER["PHP_SELF"].'?action=selectall'.($param ? $param : '').'">'.$langs->trans("All").'</a>/<a href="'.$_SERVER["PHP_SELF"].'?action=selectnone'.($param ? $param : '').'">'.$langs->trans("None").'</a></th>';
 print '</tr>'."\n";
 
