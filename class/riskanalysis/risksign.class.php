@@ -139,7 +139,9 @@ class RiskSign extends CommonObject
 	 */
 	public function create(User $user, $notrigger = false)
 	{
-		return $this->createCommon($user, $notrigger);
+		global $conf;
+
+		return $this->createCommon($user, empty($conf->global->DIGIRISKDOLIBARR_MAIN_AGENDA_ACTIONAUTO_RISKSIGN_CREATE));
 	}
 
 	/**
@@ -435,7 +437,9 @@ class RiskSign extends CommonObject
 	 */
 	public function update(User $user, $notrigger = false)
 	{
-		return $this->updateCommon($user, $notrigger);
+		global $conf;
+
+		return $this->updateCommon($user, empty($conf->global->DIGIRISKDOLIBARR_MAIN_AGENDA_ACTIONAUTO_RISKSIGN_MODIFY));
 	}
 
 	/**
@@ -447,7 +451,9 @@ class RiskSign extends CommonObject
 	 */
 	public function delete(User $user, $notrigger = false)
 	{
-		return $this->deleteCommon($user, $notrigger);
+		global $conf;
+
+		return $this->deleteCommon($user, empty($conf->global->DIGIRISKDOLIBARR_MAIN_AGENDA_ACTIONAUTO_RISKSIGN_DELETE));
 	}
 
 	/**

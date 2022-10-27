@@ -205,8 +205,11 @@ class FirePermit extends CommonObject
 	 */
 	public function create(User $user, $notrigger = false)
 	{
+		global $conf;
+
 		$this->element = $this->element . '@digiriskdolibarr';
-		return $this->createCommon($user, $notrigger);
+
+		return $this->createCommon($user, empty($conf->global->DIGIRISKDOLIBARR_MAIN_AGENDA_ACTIONAUTO_FIREPERMIT_CREATE));
 	}
 
 	/**
@@ -457,7 +460,9 @@ class FirePermit extends CommonObject
 	 */
 	public function update(User $user, $notrigger = false)
 	{
-		return $this->updateCommon($user, $notrigger);
+		global $conf;
+
+		return $this->updateCommon($user, empty($conf->global->DIGIRISKDOLIBARR_MAIN_AGENDA_ACTIONAUTO_FIREPERMIT_MODIFY));
 	}
 
 	/**
@@ -469,7 +474,9 @@ class FirePermit extends CommonObject
 	 */
 	public function delete(User $user, $notrigger = false)
 	{
-		return $this->deleteCommon($user, $notrigger);
+		global $conf;
+
+		return $this->deleteCommon($user, empty($conf->global->DIGIRISKDOLIBARR_MAIN_AGENDA_ACTIONAUTO_FIREPERMIT_DELETE));
 	}
 
 	/**
@@ -527,9 +534,11 @@ class FirePermit extends CommonObject
 	 */
 	public function setInProgress($user, $notrigger = 0)
 	{
+		global $conf;
+
 		$signatory = new PreventionPlanSignature($this->db);
 		$signatory->deleteSignatoriesSignatures($this->id, 'firepermit');
-		return $this->setStatusCommon($user, self::STATUS_IN_PROGRESS, $notrigger, 'FIREPERMIT_INPROGRESS');
+		return $this->setStatusCommon($user, self::STATUS_IN_PROGRESS, empty($conf->global->DIGIRISKDOLIBARR_MAIN_AGENDA_ACTIONAUTO_FIREPERMIT_INPROGRESS), 'FIREPERMIT_INPROGRESS');
 	}
 
 	/**
@@ -541,7 +550,9 @@ class FirePermit extends CommonObject
 	 */
 	public function setPendingSignature($user, $notrigger = 0)
 	{
-		return $this->setStatusCommon($user, self::STATUS_PENDING_SIGNATURE, $notrigger, 'FIREPERMIT_PENDINGSIGNATURE');
+		global $conf;
+
+		return $this->setStatusCommon($user, self::STATUS_PENDING_SIGNATURE, empty($conf->global->DIGIRISKDOLIBARR_MAIN_AGENDA_ACTIONAUTO_FIREPERMIT_PENDINGSIGNATURE), 'FIREPERMIT_PENDINGSIGNATURE');
 	}
 
 	/**
@@ -553,7 +564,9 @@ class FirePermit extends CommonObject
 	 */
 	public function setLocked($user, $notrigger = 0)
 	{
-		return $this->setStatusCommon($user, self::STATUS_LOCKED, $notrigger, 'FIREPERMIT_LOCKED');
+		global $conf;
+
+		return $this->setStatusCommon($user, self::STATUS_LOCKED, empty($conf->global->DIGIRISKDOLIBARR_MAIN_AGENDA_ACTIONAUTO_FIREPERMIT_LOCKED), 'FIREPERMIT_LOCKED');
 	}
 
 	/**
@@ -565,7 +578,9 @@ class FirePermit extends CommonObject
 	 */
 	public function setArchived($user, $notrigger = 0)
 	{
-		return $this->setStatusCommon($user, self::STATUS_ARCHIVED, $notrigger, 'FIREPERMIT_ARCHIVED');
+		global $conf;
+
+		return $this->setStatusCommon($user, self::STATUS_ARCHIVED, empty($conf->global->DIGIRISKDOLIBARR_MAIN_AGENDA_ACTIONAUTO_FIREPERMIT_ARCHIVED), 'FIREPERMIT_ARCHIVED');
 	}
 
 	/**
@@ -852,7 +867,7 @@ class FirePermitLine extends CommonObjectLine
 	 */
 	public function insert(User $user, $notrigger = false)
 	{
-		global $db, $user;
+		global $db, $user, $conf;
 
 		// Clean parameters
 		$this->description = trim($this->description);
@@ -887,7 +902,7 @@ class FirePermitLine extends CommonObjectLine
 			// Triggers
 			if ( ! $notrigger) {
 				// Call triggers
-				$this->call_trigger(strtoupper(get_class($this)) . '_CREATE', $user);
+				if (!empty($conf->global->DIGIRISKDOLIBARR_MAIN_AGENDA_ACTIONAUTO_FIREPERMITLINE_CREATE)) $this->call_trigger(strtoupper(get_class($this)) . '_CREATE', $user);
 				// End call triggers
 			}
 			return $this->id;
@@ -908,7 +923,7 @@ class FirePermitLine extends CommonObjectLine
 	 */
 	public function update($user = '', $notrigger = false)
 	{
-		global $user, $db;
+		global $user, $db, $conf;
 
 		// Clean parameters
 		$this->description = trim($this->description);
@@ -932,7 +947,7 @@ class FirePermitLine extends CommonObjectLine
 			// Triggers
 			if ( ! $notrigger) {
 				// Call triggers
-				$this->call_trigger(strtoupper(get_class($this)) . '_MODIFY', $user);
+				if (!empty($conf->global->DIGIRISKDOLIBARR_MAIN_AGENDA_ACTIONAUTO_FIREPERMITLINE_MODIFY)) $this->call_trigger(strtoupper(get_class($this)) . '_MODIFY', $user);
 				// End call triggers
 			}
 			return $this->id;
@@ -953,7 +968,7 @@ class FirePermitLine extends CommonObjectLine
 	 */
 	public function delete(User $user, $notrigger = false)
 	{
-		global $user, $db;
+		global $user, $db, $conf;
 
 		$db->begin();
 
@@ -964,7 +979,7 @@ class FirePermitLine extends CommonObjectLine
 			// Triggers
 			if ( ! $notrigger) {
 				// Call trigger
-				$this->call_trigger(strtoupper(get_class($this)) . '_DELETE', $user);
+				if (!empty($conf->global->DIGIRISKDOLIBARR_MAIN_AGENDA_ACTIONAUTO_FIREPERMITLINE_DELETE)) $this->call_trigger(strtoupper(get_class($this)) . '_DELETE', $user);
 				// End call triggers
 			}
 			return 1;

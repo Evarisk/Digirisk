@@ -139,6 +139,8 @@ class Openinghours extends CommonObject
 	 */
 	public function create(User $user, $notrigger = false)
 	{
+		global $conf;
+
 		$sql                                                                              = "UPDATE " . MAIN_DB_PREFIX . "$this->table_element";
 		$sql                                                                             .= " SET status = 0";
 		if (isset($this->ismultientitymanaged) && $this->ismultientitymanaged == 1) $sql .= ' WHERE entity IN (' . getEntity($this->table_element) . ')';
@@ -148,7 +150,8 @@ class Openinghours extends CommonObject
 
 		dol_syslog("admin.lib::create", LOG_DEBUG);
 		$this->db->query($sql);
-		return $this->createCommon($user, $notrigger);
+
+		return $this->createCommon($user, empty($conf->global->DIGIRISKDOLIBARR_MAIN_AGENDA_ACTIONAUTO_OPENINGHOURS_CREATE));
 	}
 
 	/**

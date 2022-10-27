@@ -496,7 +496,7 @@ class InterfaceDigiriskdolibarrTriggers extends DolibarrTriggers
 				$actioncomm->elementid   = $object->id;
 				$actioncomm->code        = 'AC_DIGIRISKELEMENT_MODIFY';
 				$actioncomm->type_code   = 'AC_OTH_AUTO';
-				$actioncomm->label       = $langs->transnoentities($object->element_type . 'ModifyTrigger', $object->ref);
+				$actioncomm->label       = $langs->transnoentities(ucfirst($object->element_type) . 'ModifyTrigger', $object->ref);
 				$actioncomm->note_private .= $langs->trans('Standard') . ' : ' . $digiriskstandard->ref . ' - ' . $conf->global->MAIN_INFO_SOCIETE_NOM . '<br/>';
 				$actioncomm->note_private .= $langs->trans('Ref') . ' : ' . $object->ref . '<br/>';
 				$actioncomm->note_private .= $langs->trans('Label') . ' : ' . $object->label . '<br/>';
@@ -512,29 +512,6 @@ class InterfaceDigiriskdolibarrTriggers extends DolibarrTriggers
 				$actioncomm->note_private .= $langs->trans('ShowInSelectOnPublicTicketInterface') . ' : ' . ($object->show_in_selector ? $langs->trans('Yes') : $langs->trans('No')) . '<br>';
 				$actioncomm->datep       = $now;
 				$actioncomm->fk_element  = $object->id;
-				$actioncomm->userownerid = $user->id;
-				$actioncomm->percentage  = -1;
-
-				$result = $actioncomm->create($user);
-				if ($result < 0) {
-					$object->errors = array_merge($object->error, $actioncomm->errors);
-					return $result;
-				}
-				break;
-
-			case 'SIGNATURE_GENERATE' :
-				dol_syslog("Trigger '" . $this->name . "' for action '$action' launched by " . __FILE__ . ". id=" . $object->id);
-				require_once DOL_DOCUMENT_ROOT . '/comm/action/class/actioncomm.class.php';
-				$now        = dol_now();
-				$actioncomm = new ActionComm($this->db);
-
-				$actioncomm->elementtype = 'digirisksignature@digiriskdolibarr';
-				$actioncomm->elementid   = $object->fk_preventionplan;
-				$actioncomm->code        = 'AC_SIGNATURE_GENERATE';
-				$actioncomm->type_code   = 'AC_OTH_AUTO';
-				$actioncomm->label       = $langs->transnoentities('SignatureGeneratedWithDolibarr');
-				$actioncomm->datep       = $now;
-				$actioncomm->fk_element  = $object->fk_preventionplan;
 				$actioncomm->userownerid = $user->id;
 				$actioncomm->percentage  = -1;
 
@@ -876,7 +853,7 @@ class InterfaceDigiriskdolibarrTriggers extends DolibarrTriggers
 				$actioncomm->elementtype = 'firepermit@digiriskdolibarr';
 				$actioncomm->code        = 'AC_FIREPERMIT_CREATE';
 				$actioncomm->type_code   = 'AC_OTH_AUTO';
-				$actioncomm->label       = $langs->transnoentities('PreventionPlanCreateTrigger', $object->ref);
+				$actioncomm->label       = $langs->transnoentities('FirePermitCreateTrigger', $object->ref);
 				$actioncomm->note_private .= $langs->trans('Ref') . ' : ' . $object->ref . '</br>';
 				$actioncomm->note_private .= $langs->trans('Label') . ' : ' . (!empty($object->label) ? $object->label : 'N/A') . '<br>';
 				$actioncomm->note_private .= $langs->trans('Entity') . ' : ' . $conf->entity . '<br>';
@@ -1489,13 +1466,13 @@ class InterfaceDigiriskdolibarrTriggers extends DolibarrTriggers
 					$actioncomm->label = $langs->transnoentities('FirePermitOpeningHoursCreateTrigger');
 				}
 				$actioncomm->note_private .= $langs->trans('Entity') . ' : ' . $conf->entity . '<br>';
-				$actioncomm->note_private .= $langs->trans('Day 0') . ' : ' . (!empty($object->monday) ? $object->monday : 'N/A') . '<br>';
-				$actioncomm->note_private .= $langs->trans('Day 1') . ' : ' . (!empty($object->tuesday) ? $object->tuesday : 'N/A') . '<br>';
-				$actioncomm->note_private .= $langs->trans('Day 2') . ' : ' . (!empty($object->wednesday) ? $object->wednesday : 'N/A') . '<br>';
-				$actioncomm->note_private .= $langs->trans('Day 3') . ' : ' . (!empty($object->thursday) ? $object->thursday : 'N/A') . '<br>';
-				$actioncomm->note_private .= $langs->trans('Day 4') . ' : ' . (!empty($object->friday) ? $object->friday : 'N/A') . '<br>';
-				$actioncomm->note_private .= $langs->trans('Day 5') . ' : ' . (!empty($object->saturday) ? $object->saturday : 'N/A') . '<br>';
-				$actioncomm->note_private .= $langs->trans('Day 6') . ' : ' . (!empty($object->sunday) ? $object->sunday : 'N/A') . '<br>';
+				$actioncomm->note_private .= $langs->trans('Monday') . ' : ' . (!empty($object->monday) ? $object->monday : 'N/A') . '<br>';
+				$actioncomm->note_private .= $langs->trans('Tuesday') . ' : ' . (!empty($object->tuesday) ? $object->tuesday : 'N/A') . '<br>';
+				$actioncomm->note_private .= $langs->trans('Wednesday') . ' : ' . (!empty($object->wednesday) ? $object->wednesday : 'N/A') . '<br>';
+				$actioncomm->note_private .= $langs->trans('Thursday') . ' : ' . (!empty($object->thursday) ? $object->thursday : 'N/A') . '<br>';
+				$actioncomm->note_private .= $langs->trans('Friday') . ' : ' . (!empty($object->friday) ? $object->friday : 'N/A') . '<br>';
+				$actioncomm->note_private .= $langs->trans('Saturday') . ' : ' . (!empty($object->saturday) ? $object->saturday : 'N/A') . '<br>';
+				$actioncomm->note_private .= $langs->trans('Sunday') . ' : ' . (!empty($object->sunday) ? $object->sunday : 'N/A') . '<br>';
 				$actioncomm->note_private .= $langs->trans('DateCreation') . ' : ' . dol_print_date($now, 'dayhoursec', 'tzuser') . '<br>';
 				$actioncomm->note_private .= $langs->trans('Status') . ' : ' . $object->status . '<br>';
 				$actioncomm->datep       = $now;
