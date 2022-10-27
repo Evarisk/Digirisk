@@ -55,8 +55,8 @@ HowToSharedElement = Pour plus d'informations sur la configuration des élément
 HowToSharedElementLink = https://wiki.dolibarr.org/index.php?title=Module_Digirisk#Configuration
 ConfigSharedElement = Configuration des éléments partagés (risques/signalisations)
 DisabledSharedElement = Option désactivée car multi company n'est pas activé ou la configuration des éléments partagés (risques/signalisations) n'a pas été effectuée
-
-
+DigiriskEventAutoDesc = Définissez ici les événements pour lesquels Digirisk créera automatiquement une entrée dans l'agenda. Chaque évènement contient les informations relatives à l'action effectuée.
+DigiriskActionsEvents = Événements pour lesquels Digirisk doit insérer un évènement dans l'agenda en automatique.
 
 #
 # Page À propos
