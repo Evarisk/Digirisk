@@ -160,6 +160,18 @@ class PreventionPlan extends CommonObject
 	public $last_email_sent_date;
 
 	/**
+	 * @var string	Field with ID of parent key if this object has a parent
+	 */
+	public $fk_element = 'element_id';
+
+	/**
+	 * @var array	List of child tables. To test if we can delete object.
+	 */
+	protected $childtables = array(
+		'digiriskdolibarr_digiriskresources' => 'DigiriskResources'
+	);
+
+	/**
 	 * Constructor
 	 *
 	 * @param DoliDb $db Database handler
