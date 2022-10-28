@@ -119,8 +119,10 @@ class InterfaceDigiriskdolibarrTriggers extends DolibarrTriggers
 			case 'INFORMATIONSSHARING_GENERATE' :
 				dol_syslog("Trigger '" . $this->name . "' for action '$action' launched by " . __FILE__ . ". id=" . $object->id);
 				require_once DOL_DOCUMENT_ROOT . '/comm/action/class/actioncomm.class.php';
-				$now        = dol_now();
-				$actioncomm = new ActionComm($this->db);
+				$now        	  = dol_now();
+				$actioncomm 	  = new ActionComm($this->db);
+				$digiriskstandard = new DigiriskStandard($this->db);
+				$digiriskstandard->fetch($object->parent_id);
 
 				$actioncomm->elementtype = $object->parent_type . '@digiriskdolibarr';
 				$actioncomm->elementid   = $object->parent_id;
@@ -128,8 +130,11 @@ class InterfaceDigiriskdolibarrTriggers extends DolibarrTriggers
 				$actioncomm->type_code   = 'AC_OTH_AUTO';
 				$actioncomm->label       = $langs->trans('InformationsSharingGeneratedWithDolibarr');
 				$actioncomm->note_private .= $langs->trans('Ref') . ' : ' . $object->ref . '</br>';
+				$actioncomm->note_private .= $langs->trans('ElementType') . ' : ' . $object->parent_type . '</br>';
+				$actioncomm->note_private .= $langs->trans('ParentElement') . ' : ' . $digiriskstandard->ref . ' ' . $digiriskstandard->label . '</br>';
 				$actioncomm->note_private .= $langs->trans('Entity') . ' : ' . $conf->entity . '<br>';
 				$actioncomm->note_private .= $langs->trans('TechnicalID') . ' : ' . $object->id . '<br>';
+				$actioncomm->note_private .= $langs->trans('LastMainDoc') . ' : ' . $object->last_main_doc . '<br>';
 				$actioncomm->note_private .= $langs->trans('DateCreation') . ' : ' . dol_print_date($now, 'dayhoursec', 'tzuser') . '<br>';
 				$actioncomm->note_private .= $langs->trans('Type') . ' : ' . $object->type . '<br>';
 				$actioncomm->note_private .= $langs->trans('Status') . ' : ' . $object->status . '<br>';
@@ -204,8 +209,10 @@ class InterfaceDigiriskdolibarrTriggers extends DolibarrTriggers
 			case 'LEGALDISPLAY_GENERATE' :
 				dol_syslog("Trigger '" . $this->name . "' for action '$action' launched by " . __FILE__ . ". id=" . $object->id);
 				require_once DOL_DOCUMENT_ROOT . '/comm/action/class/actioncomm.class.php';
-				$now        = dol_now();
-				$actioncomm = new ActionComm($this->db);
+				$now        	  = dol_now();
+				$actioncomm 	  = new ActionComm($this->db);
+				$digiriskstandard = new DigiriskStandard($this->db);
+				$digiriskstandard->fetch($object->parent_id);
 
 				$actioncomm->elementtype = $object->parent_type . '@digiriskdolibarr';
 				$actioncomm->elementid   = $object->parent_id;
@@ -213,8 +220,11 @@ class InterfaceDigiriskdolibarrTriggers extends DolibarrTriggers
 				$actioncomm->type_code   = 'AC_OTH_AUTO';
 				$actioncomm->label       = $langs->trans('LegalDisplayGeneratedWithDolibarr');
 				$actioncomm->note_private .= $langs->trans('Ref') . ' : ' . $object->ref . '</br>';
+				$actioncomm->note_private .= $langs->trans('ElementType') . ' : ' . $object->parent_type . '</br>';
+				$actioncomm->note_private .= $langs->trans('ParentElement') . ' : ' . $digiriskstandard->ref . ' ' . $digiriskstandard->label . '</br>';
 				$actioncomm->note_private .= $langs->trans('Entity') . ' : ' . $conf->entity . '<br>';
 				$actioncomm->note_private .= $langs->trans('TechnicalID') . ' : ' . $object->id . '<br>';
+				$actioncomm->note_private .= $langs->trans('LastMainDoc') . ' : ' . $object->last_main_doc . '<br>';
 				$actioncomm->note_private .= $langs->trans('DateCreation') . ' : ' . dol_print_date($now, 'dayhoursec', 'tzuser') . '<br>';
 				$actioncomm->note_private .= $langs->trans('Type') . ' : ' . $object->type . '<br>';
 				$actioncomm->note_private .= $langs->trans('Status') . ' : ' . $object->status . '<br>';
@@ -233,8 +243,10 @@ class InterfaceDigiriskdolibarrTriggers extends DolibarrTriggers
 			case 'PREVENTIONPLANDOCUMENT_GENERATE' :
 				dol_syslog("Trigger '" . $this->name . "' for action '$action' launched by " . __FILE__ . ". id=" . $object->id);
 				require_once DOL_DOCUMENT_ROOT . '/comm/action/class/actioncomm.class.php';
-				$now        = dol_now();
-				$actioncomm = new ActionComm($this->db);
+				$now        	= dol_now();
+				$actioncomm 	= new ActionComm($this->db);
+				$preventionplan = new PreventionPlan($this->db);
+				$preventionplan->fetch($object->parent_id);
 
 				$actioncomm->elementtype = $object->parent_type . '@digiriskdolibarr';
 				$actioncomm->elementid   = $object->parent_id;
@@ -242,8 +254,11 @@ class InterfaceDigiriskdolibarrTriggers extends DolibarrTriggers
 				$actioncomm->type_code   = 'AC_OTH_AUTO';
 				$actioncomm->label       = $langs->trans('PreventionPlanDocumentGeneratedWithDolibarr');
 				$actioncomm->note_private .= $langs->trans('Ref') . ' : ' . $object->ref . '</br>';
+				$actioncomm->note_private .= $langs->trans('ElementType') . ' : ' . $object->parent_type . '</br>';
+				$actioncomm->note_private .= $langs->trans('ParentElement') . ' : ' . $preventionplan->ref . ' ' . $preventionplan->label . '</br>';
 				$actioncomm->note_private .= $langs->trans('Entity') . ' : ' . $conf->entity . '<br>';
 				$actioncomm->note_private .= $langs->trans('TechnicalID') . ' : ' . $object->id . '<br>';
+				$actioncomm->note_private .= $langs->trans('LastMainDoc') . ' : ' . $object->last_main_doc . '<br>';
 				$actioncomm->note_private .= $langs->trans('DateCreation') . ' : ' . dol_print_date($now, 'dayhoursec', 'tzuser') . '<br>';
 				$actioncomm->note_private .= $langs->trans('Type') . ' : ' . $object->type . '<br>';
 				$actioncomm->note_private .= $langs->trans('Status') . ' : ' . $object->status . '<br>';
@@ -264,6 +279,8 @@ class InterfaceDigiriskdolibarrTriggers extends DolibarrTriggers
 				require_once DOL_DOCUMENT_ROOT . '/comm/action/class/actioncomm.class.php';
 				$now        = dol_now();
 				$actioncomm = new ActionComm($this->db);
+				$firepermit = new FirePermit($this->db);
+				$firepermit->fetch($object->parent_id);
 
 				$actioncomm->elementtype = $object->parent_type . '@digiriskdolibarr';
 				$actioncomm->elementid   = $object->parent_id;
@@ -271,8 +288,11 @@ class InterfaceDigiriskdolibarrTriggers extends DolibarrTriggers
 				$actioncomm->type_code   = 'AC_OTH_AUTO';
 				$actioncomm->label       = $langs->transnoentities('FirePermitDocumentGeneratedWithDolibarr');
 				$actioncomm->note_private .= $langs->trans('Ref') . ' : ' . $object->ref . '</br>';
+				$actioncomm->note_private .= $langs->trans('ElementType') . ' : ' . $object->parent_type . '</br>';
+				$actioncomm->note_private .= $langs->trans('ParentElement') . ' : ' . $firepermit->ref . ' ' . $firepermit->label . '</br>';
 				$actioncomm->note_private .= $langs->trans('Entity') . ' : ' . $conf->entity . '<br>';
 				$actioncomm->note_private .= $langs->trans('TechnicalID') . ' : ' . $object->id . '<br>';
+				$actioncomm->note_private .= $langs->trans('LastMainDoc') . ' : ' . $object->last_main_doc . '<br>';
 				$actioncomm->note_private .= $langs->trans('DateCreation') . ' : ' . dol_print_date($now, 'dayhoursec', 'tzuser') . '<br>';
 				$actioncomm->note_private .= $langs->trans('Type') . ' : ' . $object->type . '<br>';
 				$actioncomm->note_private .= $langs->trans('Status') . ' : ' . $object->status . '<br>';
@@ -293,6 +313,8 @@ class InterfaceDigiriskdolibarrTriggers extends DolibarrTriggers
 				require_once DOL_DOCUMENT_ROOT . '/comm/action/class/actioncomm.class.php';
 				$now        = dol_now();
 				$actioncomm = new ActionComm($this->db);
+				$groupment  = new DigiriskElement($this->db);
+				$groupment->fetch($object->parent_id);
 
 				$actioncomm->elementtype = 'digiriskelement@digiriskdolibarr';
 				$actioncomm->elementid   = $object->parent_id;
@@ -300,8 +322,11 @@ class InterfaceDigiriskdolibarrTriggers extends DolibarrTriggers
 				$actioncomm->type_code   = 'AC_OTH_AUTO';
 				$actioncomm->label       = $langs->transnoentities('GroupmentDocumentGeneratedWithDolibarr');
 				$actioncomm->note_private .= $langs->trans('Ref') . ' : ' . $object->ref . '</br>';
+				$actioncomm->note_private .= $langs->trans('ElementType') . ' : ' . $object->parent_type . '</br>';
+				$actioncomm->note_private .= $langs->trans('ParentElement') . ' : ' . $groupment->ref . ' ' . $groupment->label . '</br>';
 				$actioncomm->note_private .= $langs->trans('Entity') . ' : ' . $conf->entity . '<br>';
 				$actioncomm->note_private .= $langs->trans('TechnicalID') . ' : ' . $object->id . '<br>';
+				$actioncomm->note_private .= $langs->trans('LastMainDoc') . ' : ' . $object->last_main_doc . '<br>';
 				$actioncomm->note_private .= $langs->trans('DateCreation') . ' : ' . dol_print_date($now, 'dayhoursec', 'tzuser') . '<br>';
 				$actioncomm->note_private .= $langs->trans('Type') . ' : ' . $object->type . '<br>';
 				$actioncomm->note_private .= $langs->trans('Status') . ' : ' . $object->status . '<br>';
@@ -322,6 +347,8 @@ class InterfaceDigiriskdolibarrTriggers extends DolibarrTriggers
 				require_once DOL_DOCUMENT_ROOT . '/comm/action/class/actioncomm.class.php';
 				$now        = dol_now();
 				$actioncomm = new ActionComm($this->db);
+				$workunit   = new DigiriskElement($this->db);
+				$workunit->fetch($object->parent_id);
 
 				$actioncomm->elementtype = 'digiriskelement@digiriskdolibarr';
 				$actioncomm->elementid   = $object->parent_id;
@@ -329,8 +356,11 @@ class InterfaceDigiriskdolibarrTriggers extends DolibarrTriggers
 				$actioncomm->type_code   = 'AC_OTH_AUTO';
 				$actioncomm->label       = $langs->transnoentities('WorkUnitDocumentGeneratedWithDolibarr');
 				$actioncomm->note_private .= $langs->trans('Ref') . ' : ' . $object->ref . '</br>';
+				$actioncomm->note_private .= $langs->trans('ElementType') . ' : ' . $object->parent_type . '</br>';
+				$actioncomm->note_private .= $langs->trans('ParentElement') . ' : ' . $workunit->ref . ' ' . $workunit->label . '</br>';
 				$actioncomm->note_private .= $langs->trans('Entity') . ' : ' . $conf->entity . '<br>';
 				$actioncomm->note_private .= $langs->trans('TechnicalID') . ' : ' . $object->id . '<br>';
+				$actioncomm->note_private .= $langs->trans('LastMainDoc') . ' : ' . $object->last_main_doc . '<br>';
 				$actioncomm->note_private .= $langs->trans('DateCreation') . ' : ' . dol_print_date($now, 'dayhoursec', 'tzuser') . '<br>';
 				$actioncomm->note_private .= $langs->trans('Type') . ' : ' . $object->type . '<br>';
 				$actioncomm->note_private .= $langs->trans('Status') . ' : ' . $object->status . '<br>';
@@ -351,16 +381,27 @@ class InterfaceDigiriskdolibarrTriggers extends DolibarrTriggers
 				require_once DOL_DOCUMENT_ROOT . '/comm/action/class/actioncomm.class.php';
 				$now                     = dol_now();
 				$actioncomm              = new ActionComm($this->db);
-				$type                    = $object->parent_type == 'digiriskstandard' ? 'digiriskstandard' : 'digiriskelement';
 
-				$actioncomm->elementtype = $type . '@digiriskdolibarr';
+				if ($object->parent_type == 'digiriskstandard') {
+					$actioncomm->elementtype = 'digiriskstandard@digiriskdolibarr';
+					$parentelement = new DigiriskStandard($this->db);
+					$parentelement->fetch($object->parent_id);
+				} else {
+					$actioncomm->elementtype = 'digiriskelement@digiriskdolibarr';
+					$parentelement = new DigiriskElement($this->db);
+					$parentelement->fetch($object->parent_id);
+				}
+
 				$actioncomm->elementid   = $object->parent_id;
 				$actioncomm->code        = 'AC_LISTINGRISKSPHOTO_GENERATE';
 				$actioncomm->type_code   = 'AC_OTH_AUTO';
 				$actioncomm->label       = $langs->transnoentities('ListingRisksPhotoGeneratedWithDolibarr');
 				$actioncomm->note_private .= $langs->trans('Ref') . ' : ' . $object->ref . '</br>';
+				$actioncomm->note_private .= $langs->trans('ElementType') . ' : ' . $object->parent_type . '</br>';
+				$actioncomm->note_private .= $langs->trans('ParentElement') . ' : ' . $parentelement->ref . ' ' . $parentelement->label . '</br>';
 				$actioncomm->note_private .= $langs->trans('Entity') . ' : ' . $conf->entity . '<br>';
 				$actioncomm->note_private .= $langs->trans('TechnicalID') . ' : ' . $object->id . '<br>';
+				$actioncomm->note_private .= $langs->trans('LastMainDoc') . ' : ' . $object->last_main_doc . '<br>';
 				$actioncomm->note_private .= $langs->trans('DateCreation') . ' : ' . dol_print_date($now, 'dayhoursec', 'tzuser') . '<br>';
 				$actioncomm->note_private .= $langs->trans('Type') . ' : ' . $object->type . '<br>';
 				$actioncomm->note_private .= $langs->trans('Status') . ' : ' . $object->status . '<br>';
@@ -381,16 +422,27 @@ class InterfaceDigiriskdolibarrTriggers extends DolibarrTriggers
 				require_once DOL_DOCUMENT_ROOT . '/comm/action/class/actioncomm.class.php';
 				$now        = dol_now();
 				$actioncomm = new ActionComm($this->db);
-				$type       = $object->parent_type == 'digiriskstandard' ? 'digiriskstandard' : 'digiriskelement';
 
-				$actioncomm->elementtype = $type . '@digiriskdolibarr';
+				if ($object->parent_type == 'digiriskstandard') {
+					$actioncomm->elementtype = 'digiriskstandard@digiriskdolibarr';
+					$parentelement = new DigiriskStandard($this->db);
+					$parentelement->fetch($object->parent_id);
+				} else {
+					$actioncomm->elementtype = 'digiriskelement@digiriskdolibarr';
+					$parentelement = new DigiriskElement($this->db);
+					$parentelement->fetch($object->parent_id);
+				}
+
 				$actioncomm->elementid   = $object->parent_id;
 				$actioncomm->code        = 'AC_LISTINGRISKSACTION_GENERATE';
 				$actioncomm->type_code   = 'AC_OTH_AUTO';
 				$actioncomm->label       = $langs->transnoentities('ListingRisksActionGeneratedWithDolibarr');
 				$actioncomm->note_private .= $langs->trans('Ref') . ' : ' . $object->ref . '</br>';
+				$actioncomm->note_private .= $langs->trans('ElementType') . ' : ' . $object->parent_type . '</br>';
+				$actioncomm->note_private .= $langs->trans('ParentElement') . ' : ' . $parentelement->ref . ' ' . $parentelement->label . '</br>';
 				$actioncomm->note_private .= $langs->trans('Entity') . ' : ' . $conf->entity . '<br>';
 				$actioncomm->note_private .= $langs->trans('TechnicalID') . ' : ' . $object->id . '<br>';
+				$actioncomm->note_private .= $langs->trans('LastMainDoc') . ' : ' . $object->last_main_doc . '<br>';
 				$actioncomm->note_private .= $langs->trans('DateCreation') . ' : ' . dol_print_date($now, 'dayhoursec', 'tzuser') . '<br>';
 				$actioncomm->note_private .= $langs->trans('Type') . ' : ' . $object->type . '<br>';
 				$actioncomm->note_private .= $langs->trans('Status') . ' : ' . $object->status . '<br>';
@@ -411,6 +463,8 @@ class InterfaceDigiriskdolibarrTriggers extends DolibarrTriggers
 				require_once DOL_DOCUMENT_ROOT . '/comm/action/class/actioncomm.class.php';
 				$now        = dol_now();
 				$actioncomm = new ActionComm($this->db);
+				$digiriskstandard = new DigiriskStandard($this->db);
+				$digiriskstandard->fetch($object->parent_id);
 
 				$actioncomm->elementtype = $object->parent_type . '@digiriskdolibarr';
 				$actioncomm->elementid   = $object->parent_id;
@@ -418,8 +472,11 @@ class InterfaceDigiriskdolibarrTriggers extends DolibarrTriggers
 				$actioncomm->type_code   = 'AC_OTH_AUTO';
 				$actioncomm->label       = $langs->transnoentities('RiskAssessmentDocumentGeneratedWithDolibarr');
 				$actioncomm->note_private .= $langs->trans('Ref') . ' : ' . $object->ref . '</br>';
+				$actioncomm->note_private .= $langs->trans('ElementType') . ' : ' . $object->parent_type . '</br>';
+				$actioncomm->note_private .= $langs->trans('ParentElement') . ' : ' . $digiriskstandard->ref . ' ' . $digiriskstandard->label . '</br>';
 				$actioncomm->note_private .= $langs->trans('Entity') . ' : ' . $conf->entity . '<br>';
 				$actioncomm->note_private .= $langs->trans('TechnicalID') . ' : ' . $object->id . '<br>';
+				$actioncomm->note_private .= $langs->trans('LastMainDoc') . ' : ' . $object->last_main_doc . '<br>';
 				$actioncomm->note_private .= $langs->trans('DateCreation') . ' : ' . dol_print_date($now, 'dayhoursec', 'tzuser') . '<br>';
 				$actioncomm->note_private .= $langs->trans('Type') . ' : ' . $object->type . '<br>';
 				$actioncomm->note_private .= $langs->trans('Status') . ' : ' . $object->status . '<br>';
@@ -849,6 +906,8 @@ class InterfaceDigiriskdolibarrTriggers extends DolibarrTriggers
 				require_once DOL_DOCUMENT_ROOT . '/comm/action/class/actioncomm.class.php';
 				$now        		  = dol_now();
 				$actioncomm 		  = new ActionComm($this->db);
+				$preventionplan 	  = new PreventionPlan($this->db);
+				$preventionplan->fetch($object->fk_preventionplan);
 
 				$actioncomm->elementtype = 'firepermit@digiriskdolibarr';
 				$actioncomm->code        = 'AC_FIREPERMIT_CREATE';
@@ -861,6 +920,7 @@ class InterfaceDigiriskdolibarrTriggers extends DolibarrTriggers
 				$actioncomm->note_private .= $langs->trans('DateCreation') . ' : ' . dol_print_date($object->date_creation, 'dayhoursec', 'tzuser') . '<br>';
 				$actioncomm->note_private .= $langs->trans('StartDate') . ' : ' . dol_print_date($object->date_start, 'dayhoursec') . '<br>';
 				$actioncomm->note_private .= $langs->trans('EndDate') . ' : ' . dol_print_date($object->date_end, 'dayhoursec') . '<br>';
+				$actioncomm->note_private .= $langs->trans('PreventionPlan') . ' : ' . $preventionplan->ref . (!empty($preventionplan->label) ? ' ' . $preventionplan->label : '') . '<br>';
 				$actioncomm->note_private .= $langs->trans('Status') . ' : ' . $object->status . '<br>';
 				$actioncomm->datep       = $now;
 				$actioncomm->fk_element  = $object->id;
@@ -1181,9 +1241,13 @@ class InterfaceDigiriskdolibarrTriggers extends DolibarrTriggers
 				!empty($object->signature_comment) ? $actioncomm->note_private .= $langs->trans('SignatureComment') . ' : ' . $object->signature_comment . '<br>' : '';
 				!empty($object->role) ? $actioncomm->note_private .= $langs->trans('Role') . ' : ' . $langs->trans($object->role) . '<br>' : '';
 				$actioncomm->note_private .= $langs->trans('Name') . ' : ' . $object->firstname . ' ' . $object->lastname . '<br>';
+				$actioncomm->note_private .= $langs->trans('SocietyName') . ' : ' . $object->society_name . '<br>';
 				!empty($object->email) ? $actioncomm->note_private .= $langs->trans('Email') . ' : ' . $object->email . '<br>' : '';
+				!empty($object->last_email_sent_date) ? $actioncomm->note_private .= $langs->trans('LastEmailSentDate') . ' : ' . dol_print_date($object->last_email_sent_date, 'dayhoursec', 'tzuser') . '<br>' : '';
 				!empty($object->phone) ? $actioncomm->note_private .= $langs->trans('Phone') . ' : ' . $object->phone . '<br>' : '';
 				$actioncomm->note_private .= $langs->trans('DateCreation') . ' : ' . dol_print_date($now, 'dayhoursec', 'tzuser') . '<br>';
+				$actioncomm->note_private .= $langs->trans('ElementType') . ' : ' . $object->element_type . '<br>';
+				!empty($object->stamp) ? $actioncomm->note_private .= $langs->trans('Stamp') . ' : ' . $object->stamp . '<br>' : '';
 				$actioncomm->note_private .= $langs->trans('Status') . ' : ' . $object->status . '<br>';
 				$actioncomm->datep       = $now;
 				$actioncomm->fk_element  = $object->fk_object;
@@ -1461,6 +1525,7 @@ class InterfaceDigiriskdolibarrTriggers extends DolibarrTriggers
 				require_once DOL_DOCUMENT_ROOT . '/comm/action/class/actioncomm.class.php';
 				$now        = dol_now();
 				$actioncomm = new ActionComm($this->db);
+
 				if ($object->element_type == 'societe') {
 					$actioncomm->socid = $object->element_id;
 				} else {
@@ -1470,10 +1535,16 @@ class InterfaceDigiriskdolibarrTriggers extends DolibarrTriggers
 				$actioncomm->type_code = 'AC_OTH_AUTO';
 				if ($object->element_type == 'preventionplan') {
 					$actioncomm->label = $langs->transnoentities('PreventionPlanOpeningHoursCreateTrigger');
+					$elementParent = new PreventionPlan($this->db);
+					$elementParent->fetch($object->element_id);
 				} elseif ($object->element_type == 'firepermit') {
 					$actioncomm->label = $langs->transnoentities('FirePermitOpeningHoursCreateTrigger');
+					$elementParent = new FirePermit($this->db);
+					$elementParent->fetch($object->element_id);
 				}
 				$actioncomm->note_private .= $langs->trans('Entity') . ' : ' . $conf->entity . '<br>';
+				$actioncomm->note_private .= $langs->trans('Ref') . ' : ' . $elementParent->ref . (!empty($elementparent->label) ? ' ' . $elementparent->label : '') . '<br>';
+				$actioncomm->note_private .= $langs->trans('ElementType') . ' : ' . $object->element_type . '<br>';
 				$actioncomm->note_private .= $langs->trans('Monday') . ' : ' . (!empty($object->monday) ? $object->monday : 'N/A') . '<br>';
 				$actioncomm->note_private .= $langs->trans('Tuesday') . ' : ' . (!empty($object->tuesday) ? $object->tuesday : 'N/A') . '<br>';
 				$actioncomm->note_private .= $langs->trans('Wednesday') . ' : ' . (!empty($object->wednesday) ? $object->wednesday : 'N/A') . '<br>';
@@ -1614,6 +1685,7 @@ class InterfaceDigiriskdolibarrTriggers extends DolibarrTriggers
 					require_once DOL_DOCUMENT_ROOT . '/comm/action/class/actioncomm.class.php';
 					require_once __DIR__ . '/../../class/digiriskelement.class.php';
 					$now = dol_now();
+					$langs->load("projects");
 					$actioncomm = new ActionComm($this->db);
 					$digiriskelement = new DigiriskElement($this->db);
 					$risk = new Risk($this->db);
@@ -1622,7 +1694,7 @@ class InterfaceDigiriskdolibarrTriggers extends DolibarrTriggers
 
 					if ($conf->global->DIGIRISKDOLIBARR_SHOW_TASK_CALCULATED_PROGRESS) {
 						$timeSpent = $object->getSummaryOfTimeSpent();
-						$label_progress = 'ShowTaskCalculatedProgress';
+						$label_progress = 'ProgressDeclared';
 						if ($timeSpent['total_duration'] > 0 && !empty($object->planned_workload)) {
 							$task_progress = round($timeSpent['total_duration'] / $object->planned_workload * 100, 2);
 						} else {
@@ -1630,7 +1702,7 @@ class InterfaceDigiriskdolibarrTriggers extends DolibarrTriggers
 						}
 					} else {
 						(!empty($object->progress) ? $task_progress = $object->progress : $task_progress = 0);
-						$label_progress = 'Progress';
+						$label_progress = 'ProgressCalculated';
 					}
 
 					$actioncomm->elementtype = 'digiriskelement@digiriskdolibarr';
@@ -1641,7 +1713,7 @@ class InterfaceDigiriskdolibarrTriggers extends DolibarrTriggers
 					$actioncomm->note_private .= $langs->trans('Entity') . ' : ' . $conf->entity . '<br>';
 					$actioncomm->note_private .= $langs->trans('TechnicalID') . ' : ' . $object->id . '<br>';
 					$actioncomm->note_private .= $langs->trans('Label') . ' : ' . $object->label . '<br>';
-					$actioncomm->note_private .= $langs->trans($label_progress) . ' : ' . $task_progress . '<br>';
+					$actioncomm->note_private .= $langs->trans($label_progress) . ' : ' . $task_progress . '%' . '<br>';
 					$actioncomm->note_private .= $langs->trans('DateCreation') . ' : ' . dol_print_date($object->date_c, 'dayhoursec', 'tzuser') . '<br>';
 					$actioncomm->datep = $now;
 					$actioncomm->fk_element = $risk->fk_element;
@@ -1663,6 +1735,7 @@ class InterfaceDigiriskdolibarrTriggers extends DolibarrTriggers
 					require_once DOL_DOCUMENT_ROOT . '/comm/action/class/actioncomm.class.php';
 					require_once __DIR__ . '/../../class/digiriskelement.class.php';
 					$now = dol_now();
+					$langs->load("projects");
 					$actioncomm = new ActionComm($this->db);
 					$digiriskelement = new DigiriskElement($this->db);
 					$risk = new Risk($this->db);
@@ -1671,7 +1744,7 @@ class InterfaceDigiriskdolibarrTriggers extends DolibarrTriggers
 
 					if ($conf->global->DIGIRISKDOLIBARR_SHOW_TASK_CALCULATED_PROGRESS) {
 						$timeSpent = $object->getSummaryOfTimeSpent();
-						$label_progress = 'ShowTaskCalculatedProgress';
+						$label_progress = 'ProgressDeclared';
 						if ($timeSpent['total_duration'] > 0 && !empty($object->planned_workload)) {
 							$task_progress = round($timeSpent['total_duration'] / $object->planned_workload * 100, 2);
 						} else {
@@ -1679,7 +1752,7 @@ class InterfaceDigiriskdolibarrTriggers extends DolibarrTriggers
 						}
 					} else {
 						(!empty($object->progress) ? $task_progress = $object->progress : $task_progress = 0);
-						$label_progress = 'Progress';
+						$label_progress = 'ProgressCalculated';
 					}
 
 					$actioncomm->elementtype = 'digiriskelement@digiriskdolibarr';
@@ -1690,7 +1763,7 @@ class InterfaceDigiriskdolibarrTriggers extends DolibarrTriggers
 					$actioncomm->note_private .= $langs->trans('Entity') . ' : ' . $conf->entity . '<br>';
 					$actioncomm->note_private .= $langs->trans('TechnicalID') . ' : ' . $object->id . '<br>';
 					$actioncomm->note_private .= $langs->trans('Label') . ' : ' . $object->label . '<br>';
-					$actioncomm->note_private .= $langs->trans($label_progress) . ' : ' . $task_progress . '<br>';
+					$actioncomm->note_private .= $langs->trans($label_progress) . ' : ' . $task_progress . '%' . '<br>';
 					$actioncomm->note_private .= $langs->trans('DateCreation') . ' : ' . dol_print_date($object->date_c, 'dayhoursec', 'tzuser') . '<br>';
 					$actioncomm->note_private .= $langs->trans('DateModification') . ' : ' . dol_print_date($now, 'dayhoursec', 'tzuser') . '<br>';
 					$actioncomm->datep = $now;
@@ -1713,6 +1786,7 @@ class InterfaceDigiriskdolibarrTriggers extends DolibarrTriggers
 					require_once DOL_DOCUMENT_ROOT . '/comm/action/class/actioncomm.class.php';
 					require_once __DIR__ . '/../../class/digiriskelement.class.php';
 					$now = dol_now();
+					$langs->load("projects");
 					$actioncomm = new ActionComm($this->db);
 					$digiriskelement = new DigiriskElement($this->db);
 					$risk = new Risk($this->db);
@@ -1721,7 +1795,7 @@ class InterfaceDigiriskdolibarrTriggers extends DolibarrTriggers
 
 					if ($conf->global->DIGIRISKDOLIBARR_SHOW_TASK_CALCULATED_PROGRESS) {
 						$timeSpent = $object->getSummaryOfTimeSpent();
-						$label_progress = 'ShowTaskCalculatedProgress';
+						$label_progress = 'ProgressDeclared';
 						if ($timeSpent['total_duration'] > 0 && !empty($object->planned_workload)) {
 							$task_progress = round($timeSpent['total_duration'] / $object->planned_workload * 100, 2);
 						} else {
@@ -1729,7 +1803,7 @@ class InterfaceDigiriskdolibarrTriggers extends DolibarrTriggers
 						}
 					} else {
 						(!empty($object->progress) ? $task_progress = $object->progress : $task_progress = 0);
-						$label_progress = 'Progress';
+						$label_progress = 'ProgressCalculated';
 					}
 
 					$actioncomm->elementtype = 'digiriskelement@digiriskdolibarr';
@@ -1740,7 +1814,7 @@ class InterfaceDigiriskdolibarrTriggers extends DolibarrTriggers
 					$actioncomm->note_private .= $langs->trans('Entity') . ' : ' . $conf->entity . '<br>';
 					$actioncomm->note_private .= $langs->trans('TechnicalID') . ' : ' . $object->id . '<br>';
 					$actioncomm->note_private .= $langs->trans('Label') . ' : ' . $object->label . '<br>';
-					$actioncomm->note_private .= $langs->trans($label_progress) . ' : ' . $task_progress . '<br>';
+					$actioncomm->note_private .= $langs->trans($label_progress) . ' : ' . $task_progress . '%' . '<br>';
 					$actioncomm->note_private .= $langs->trans('DateCreation') . ' : ' . dol_print_date($object->date_c, 'dayhoursec', 'tzuser') . '<br>';
 					$actioncomm->note_private .= $langs->trans('DateModification') . ' : ' . dol_print_date($now, 'dayhoursec', 'tzuser') . '<br>';
 					$actioncomm->datep = $now;
@@ -2483,11 +2557,11 @@ class InterfaceDigiriskdolibarrTriggers extends DolibarrTriggers
 				$actioncomm->label       = $langs->transnoentities('TaskTimeSpentCreateTrigger');
 				$actioncomm->note_private .= $langs->trans('ParentElement') . ' : ' . $object->ref . ' - ' . $object->label . '<br>';
 				$actioncomm->note_private .= $langs->trans('TechnicalID') . ' : ' . $object->timespent_id . '<br>';
-				$actioncomm->note_private .= $langs->trans('Entity') . ' : ' . $object->element . '<br>';
+				$actioncomm->note_private .= $langs->trans('Entity') . ' : ' . $conf->entity . '<br>';
 				$actioncomm->note_private .= $langs->trans('DateCreation') . ' : ' . dol_print_date($now, 'dayhoursec', 'tzuser') . '<br>';
 				$actioncomm->note_private .= $langs->trans('TaskTimeSpentDate') . ' : ' . dol_print_date($object->timespent_datehour, 'dayhoursec') . '<br>';
 				$actioncomm->note_private .= $langs->trans('TaskTimeSpentDuration') . ' : ' .  convertSecondToTime($object->timespent_duration * 60, 'allhourmin') . '<br>';
-				$actioncomm->note_private .= $langs->trans('TaskTimeSpentNote') . ' : ' . (!empty($object->timespent_note) ? $object->timespent_note : 'N/A') . '<br>';
+				$actioncomm->note_private .= $langs->trans('Description') . ' : ' . (!empty($object->timespent_note) ? $object->timespent_note : 'N/A') . '<br>';
 				$actioncomm->datep       = $now;
 				$actioncomm->fk_element  = $object->fk_element;
 				$actioncomm->userownerid = $user->id;
@@ -2515,7 +2589,7 @@ class InterfaceDigiriskdolibarrTriggers extends DolibarrTriggers
 				$actioncomm->label       = $langs->transnoentities('TaskTimeSpentModifyTrigger');
 				$actioncomm->note_private .= $langs->trans('ParentElement') . ' : ' . $object->ref . ' - ' . $object->label . '<br>';
 				$actioncomm->note_private .= $langs->trans('TechnicalID') . ' : ' . $object->timespent_id . '<br>';
-				$actioncomm->note_private .= $langs->trans('Entity') . ' : ' . $object->element . '<br>';
+				$actioncomm->note_private .= $langs->trans('Entity') . ' : ' . $conf->entity . '<br>';
 				$actioncomm->note_private .= $langs->trans('DateCreation') . ' : ' . dol_print_date($object->date_c, 'dayhoursec', 'tzuser') . '<br>';
 				$actioncomm->note_private .= $langs->trans('DateModification') . ' : ' . dol_print_date($now, 'dayhoursec', 'tzuser') . '<br>';
 				$actioncomm->note_private .= $langs->trans('TaskTimeSpentDate') . ' : ' . dol_print_date($object->timespent_datehour, 'dayhoursec') . '<br>';
@@ -2548,7 +2622,7 @@ class InterfaceDigiriskdolibarrTriggers extends DolibarrTriggers
 				$actioncomm->label       = $langs->transnoentities('TaskTimeSpentDeleteTrigger');
 				$actioncomm->note_private .= $langs->trans('ParentElement') . ' : ' . $object->ref . ' - ' . $object->label . '<br>';
 				$actioncomm->note_private .= $langs->trans('TechnicalID') . ' : ' . $object->timespent_id . '<br>';
-				$actioncomm->note_private .= $langs->trans('Entity') . ' : ' . $object->element . '<br>';
+				$actioncomm->note_private .= $langs->trans('Entity') . ' : ' . $conf->entity . '<br>';
 				$actioncomm->note_private .= $langs->trans('DateCreation') . ' : ' . dol_print_date($object->date_c, 'dayhoursec', 'tzuser') . '<br>';
 				$actioncomm->note_private .= $langs->trans('DateModification') . ' : ' . dol_print_date($now, 'dayhoursec', 'tzuser') . '<br>';
 				$actioncomm->note_private .= $langs->trans('TaskTimeSpentDate') . ' : ' . dol_print_date($object->timespent_datehour, 'dayhoursec') . '<br>';

@@ -262,6 +262,7 @@ InformationsSharing = Diffusion d'informations
 InformationsSharingDocumentGenerated = Génération du Document de Diffusion d'Informations
 HowToSetDataInformationsSharing = Pour configurer les données sur la diffusion d'informations, aller dans Accueil - Configuration - Société/Organisation - Social
 ConfigureSecurityAndSocialData = Configurer les données de la société
+LastMainDoc = Dernier document généré
 
 ParticipationAgreement = Accords de participation
 ParticipationAgreementValue = Oui pour tous les collaborateurs ayant un contrat de travail à durée indéterminée ou déterminée en cours avec l'entreprise, quelle qu'en soit la nature, pourront bénéficier de la participation.<br />Toutefois, une condition d'ancienneté est  requise : 6 mois dans l'entreprise.<br />Pour la détermination de l'ancienneté requise, sont prises en compte tous les contrats de travail exécutés au cours de la période de calcul et des 12 mois qui la précédent.<br />L'ancienneté s'apprécie à la date de clôture de l'exercice concerné ou à la date de départ en cas de rupture de contrat en cours d'exercice.
@@ -551,6 +552,7 @@ FirePermitGenerated = Le permis de feu est déjà généré
 FP_EXT_SOCIETY_INTERVENANTS = Intervenant
 FP_EXT_SOCIETY_RESPONSIBLE = Responsable de la société extérieure
 FP_MAITRE_OEUVRE = Maître d'oeuvre
+UseEquipment = Matériel utilisé
 
 # Email - Mail
 FirePermitLabel = Récapitulatif du permis de feu
@@ -1473,6 +1475,7 @@ HasNoEmail = n'a pas d'email
 GoToEmailSetup = Pour configurer votre serveur de mail, rendez-vous dans
 PathToEmailSetup = "Accueil -> Configuration -> Emails" </a>
 SendToNoEmail = Les destinataires n'ont pas d'email
+SocietyName = Nom de la société
 
 #
 # Ticket - Interface publique ticket
