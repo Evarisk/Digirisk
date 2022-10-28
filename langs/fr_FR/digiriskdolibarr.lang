@@ -141,6 +141,7 @@ ShowPatchNote = Consulter la note de mise à jour
 
 # Data - Donnée
 OpeningHours = Horaires
+OpeningHoursCreated = Création d'Heure d'Ouverture
 ThirdPartyOpeningHours = Horaires du tiers
 
 ExceptionsToWorkingHours = Dérogations aux horaires de travail
@@ -190,6 +191,7 @@ LegalDisplayDigiriskTemplate = ODT par défaut des affichages légaux
 
 # Data - Donnée
 LegalDisplay = Affichage légal
+LegalDisplayDocumentGenerated = Génération du Document d'Affichage Légal
 HowToSetDataLegalDisplay = Pour configurer les données sur l'affichage légal, aller dans Accueil - Configuration - Société/Organisation - Sécurité
 
 LabourDoctor = Médecin du travail
@@ -246,6 +248,7 @@ InformationsSharingDigiriskTemplate = ODT par défaut des diffusions d'informati
 
 # Data - Donnée
 InformationsSharing = Diffusion d'informations
+InformationsSharingDocumentGenerated = Génération du Document de Diffusion d'Informations
 HowToSetDataInformationsSharing = Pour configurer les données sur la diffusion d'informations, aller dans Accueil - Configuration - Société/Organisation - Social
 ConfigureSecurityAndSocialData = Configurer les données de la société
 
@@ -320,9 +323,23 @@ PreventionPlanDocumentGeneratedWithDolibarr = Plan de prévention généré avec
 # Data - Donnée
 
 PreventionPlan = Plan de prévention
+PreventionPlanDocumentGenerated = Génération de Plan de Prévention
+PreventionPlanCreated = Création de Plan de Prévention
+PreventionPlanModified = Modification de Plan de Prévention
+PreventionPlanDeleted = Suppression de Plan de Prévention
+PreventionPlanInProgress = Réouverture du Plan de Prévention
+PreventionPlanPendingSignature = Mise en Attente de Signature du Plan de Prévention
+PreventionPlanLocked = Verrou du Plan de Prévention
+PreventionPlanArchived = Archivage du Plan de Prévention
+PreventionPlanSignatureAddAttendant = Ajout de Participant à la Signature du Plan de Prévention
+PreventionPlanSignatureDeleteAttendant = Suppression de Participant à la Signature du Plan de Prévention
+PreventionPlanSentByMail = Envoi par Mail du Plan de Prévention
 PreventionPlanInitial = PPR
 PreventionPlanList = Liste des plans de prévention
 PreventionPlanLine = risque(s)
+PreventionPlanLineCreated = Création de Risque dans Plan de Prévention
+PreventionPlanLineModified = Modification de Risque dans Plan de Prévention
+PreventionPlanLineDeleted = Suppression de Risque dans Plan de Prévention
 PriorVisit = Inspection commune préalable
 PriorVisitYesNo = Visite préliminaire effectuée
 PriorVisitText = Note de l'inspection
@@ -470,7 +487,21 @@ NewFirePermit Nouveau permis de feu
 ModifyFirePermit = Modifier le permis de feu
 FirePermitList = Liste des permis de feu
 FirePermit = Permis de feu
+FirePermitDocumentGenerated = Génération de Permis de Feu
+FirePermitCreated = Création de Permis de Feu
+FirePermitModified = Modification de Permis de Feu
+FirePermitDeleted = Suppression de Permis de Feu
+FirePermitInProgress = Réouverture du Permis de Feu
+FirePermitPendingSignature = Mise en Attente de Signature du Permis de Feu
+FirePermitLocked = Verrou du Permis de Feu
+FirePermitArchived = Archivage du Permis de Feu
+FirePermitSignatureAddAttendant = Ajout de Participant à la Signature du Permis de Feu
+FirePermitSignatureDeleteAttendant = Suppression de Participant à la Signature du Permis de Feu
+FirePermitSentByMail = Envoi par Mail du Permis de Feu
 FirePermitLine = risque(s)
+FirePermitLineCreated = Création de Risque dans Permis de Feu
+FirePermitLineModified = Modification de Risque dans Permis de Feu
+FirePermitLineDeleted = Suppression de Risque dans Permis de Feu
 FirePermitSchedule = Horaires du permis de feu
 FirePermitRiskList = Liste des risques du permis de feu
 AddFirePermitLine = Ajout du risque
@@ -564,13 +595,22 @@ NewAccident = Nouvel accident
 ModifyAccident = Modifier l'accident
 AccidentList = Liste des accidents
 Accident = Accident
+AccidentCreated = Création d'un Accident
+AccidentModified = Modifcation d'un Accident
+AccidentDeleted = Suppression d'un Accident
 AccidentLine = risque(s)
 AccidentDate = Date de l'accident
 AccidentSchedule = Horaires du permis de feu
 AccidentRiskList = Liste d'informations complémentaires sur l'accident
+AccidentWorkStopCreated = Création d'un Arrêt de Travail
+AccidentWorkStopModified = Modification d'un Arrêt de Travail
+AccidentWorkStopDeleted = Suppression d'un Arrêt de Travail
 AddAccidentWorkStop = Ajout d'un arrêt de travail sur l'accident
 UpdateAccidentWorkStop = Mise à jour d'un arrêt de travail sur l'accident
 DeleteAccidentWorkStop = Suppression d'un arrêt de travail sur l'accident
+AccidentLesionCreated = Création d'une Lésion
+AccidentLesionModified = Modification d'une Lésion
+AccidentLesionDeleted = Suppression d'une Lésion
 AddAccidentLesion = Ajout d'une lésion sur l'accident
 UpdateAccidentLesion = Mise à jour d'une lésion sur l'accident
 DeleteAccidentLesion = Suppression d'une lésion sur l'accident
@@ -733,6 +773,7 @@ ListingRisksPhotoDigiriskTemplate = ODT par défaut des listing des risques avec
 
 # Data - Donnée
 ListingRisksPhoto = Listing des risques avec photos
+ListingRisksPhotoGenerated = Génération de Listing des Risques avec Photos
 listingrisksphoto.odt = Listing des risques avec photos
 listingrisksphoto_custom.odt = Listing des risques avec photos personnalisé
 
@@ -761,6 +802,7 @@ ListingRisksActionDigiriskTemplate = ODT par défaut des listing des risques ave
 
 # Data - Donnée
 ListingRisksAction = Listing des risques avec actions correctives
+ListingRisksActionGenerated = Génération de Listing des Risques avec Actions Correctives
 listingrisksaction.odt = Listing des risques avec actions correctives
 listingrisksaction_custom.odt = Listing des risques avec actions correctives personnalisé
 DigiriskListingRisksActionData = Données configurables des listing des risques avec actions correctives
@@ -792,6 +834,7 @@ RiskAssessmentDocumentDigiriskTemplate = ODT par défaut du document unique
 
 # Data - Donnée
 RiskAssessmentDocument = Document unique
+RiskAssessmentDocumentGenerated = Génération du Document Unique
 RiskAssessmentDocumentInitial = DU
 RiskAssessmentDocumentDU = Plan d'action Document Unique
 RiskAssessmentDocumentDescription = Plan d'action Document Unique
@@ -852,6 +895,7 @@ GroupmentDocumentDigiriskTemplate = ODT par défaut des fiches de groupement
 
 # Data - Donnée
 GroupmentDocument = Fiche de Groupement
+GroupmentDocumentGenerated = Génération de Fiche de Groupement
 groupmentdocument.odt = Fiche de Groupement
 groupmentdocument_custom.odt = Fiche de Groupement personnalisée
 DigiriskGroupmentDocumentData = Données configurables des fiches de groupement
@@ -879,6 +923,7 @@ WorkUnitDocumentDigiriskTemplate = ODT par défaut des fiches d'unité de travai
 
 # Data - Donnée
 WorkUnitDocument = Fiche d'Unité de travail
+WorkUnitDocumentGenerated = Génération de Fiche d'Unité de Travail
 workunitdocument.odt = Fiche d'Unité de travail
 workunitdocument_custom.odt = Fiche d'Unité de travail personnalisée
 DigiriskWorkUnitDocumentData = Données configurables des fiches d'unités de travail
@@ -900,6 +945,9 @@ HiddenElements = Corbeille
 NewDigiriskElement = Nouveau élément Digirisk
 GPUTOrganization = Organisation des GP/UT
 DigiriskElement = Élément Digirisk
+DigiriskElementCreated = Création d'Élément Digirisk
+DigiriskElementModified = Modification d'Élément Digirisk
+DigiriskElementDeleted = Suppression d'Élément Digirisk
 ElementType = Type d'élément
 ParentElement = Élément parent
 OrganizationSaved = L'organisation et des groupements et des unités de travail a été sauvegardée
@@ -982,6 +1030,9 @@ DigiriskEvaluatorStandardModel = Renvoie le numéro sous la forme EVn où n est 
 
 # Data - Donnée
 Evaluator = Évaluateur
+EvaluatorCreated = Création d'un Évaluateur
+EvaluatorModified = Modification d'un Évaluateur
+EvaluatorDeleted = Suppression d'un Évaluateur
 TheEvaluator = L'évaluateur
 EvaluatorWellCreated = Évaluateur créé
 EvaluatorNotCreated = Erreur lors de la création de l'évaluateur
@@ -1051,6 +1102,9 @@ DigiriskRiskStandardModel = Renvoie le numéro sous la forme RKn où n est un co
 # Data - Donnée
 Risks = Risques
 Risk = Risque
+RiskCreated = Création d'un Risque
+RiskModified = Modification d'un Risque
+RiskDeleted = Suppression d'un Risque
 RiskConfig = Configuration des données des risques
 TheRisk = Le risque
 RiskWellCreated = Risque créé
@@ -1142,6 +1196,9 @@ DigiriskRiskAssessmentNumberingModule = Modèle de numérotation des évaluation
 # Data - Donnée
 RiskAssessment = Évaluation
 RiskAssessments = Évaluations
+RiskAssessmentCreated = Création d'une Évaluation
+RiskAssessmentModified = Modification d'une Évaluation
+RiskAssessmentDeleted = Suppression d'une Évaluation
 RiskAssessmentConfig = Configuration des données des évaluations
 TheRiskAssessment = L'évaluation
 LastRiskAssessment = Dernière évaluation du risque
@@ -1211,6 +1268,9 @@ DigiriskRiskSignNumberingModule = Modèle de numérotation des signalisations de
 
 # Data - Donnée
 RiskSign = Signalisation
+RiskSignCreated = Création d'une Signalisation
+RiskSignModified = Modification d'une Signalisation
+RiskSignDeleted = Suppression d'une Signalisation
 TheRiskSign = La signalisation
 RiskSignConfig = Configuration des données des signalisations
 RiskSignWellCreated = Signalisation créée
@@ -1265,6 +1325,9 @@ TaskDeleteTrigger = Tâche %s supprimée
 # Data - Donnée
 ActionPlan = Plan d'action
 Task = Tâche
+TaskCreatedEvent = Création d'une Tâche
+TaskModifiedEvent = Modification d'une Tâche
+TaskDeletedEvent = Suppression d'une Tâche
 TheTask = La tâche
 TaskConfig = Configuration des données des tâches
 TaskWellCreated = Tâche créée
@@ -1303,6 +1366,9 @@ NoTaskUnCompletedThere = Aucune tâche terminée
 DeleteTaskTimeSpent = Êtes-vous sûr(e) de vouloir supprimer %s mins de temps consommé de la tâche
 TaskTimeSpentEdit = Édition du temps consommé de la tâche
 TheTaskTimeSpent = Le temps consommé
+TaskTimeSpentCreated = Création de Temps Consommé
+TaskTimeSpentModified = Modification de Temps Consommé
+TaskTimeSpentDeleted = Suppression de Temps Consommé
 TaskTimeSpentWellCreated = Temps consommé créé
 TaskTimeSpentNotCreated = Erreur lors de la création de temps consommé
 TaskTimeSpentWellEdited = Temps consommé édité
@@ -1355,6 +1421,10 @@ SendEmail = Envoyer un email
 # WelcomeOnOnlineSignaturePage = Bienvenue sur la page de signature des documents
 ThisIsInformationOnDocumentToSign = Informations
 DigiriskSignature = Signature
+DigiriskSignatureSigned = Signature d'un Élément Digirisk
+DigiriskSignaturePendingSignature = Attente de Signature d'un Élément Digirisk
+DigiriskSignatureAbsent = Absence de Signature d'un Participant
+DigiriskSignatureDeleted = Suppression de Signature d'un Participant
 SignaturePublicAccess = Une interface publique ne nécessitant aucune identification est disponible à l'url suivante
 SignatureActivatePublicInterface = Activer l'interface publique
 SignatureShowCompanyLogo = Afficher le logo de la société dans l'interface publique
