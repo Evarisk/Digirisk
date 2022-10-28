@@ -1207,11 +1207,7 @@ class InterfaceDigiriskdolibarrTriggers extends DolibarrTriggers
 				$now        = dol_now();
 				$actioncomm = new ActionComm($this->db);
 
-				$object_type = $object->table_element;
-				$object_type = preg_replace('/digiriskdolibarr_/', '', $object_type);
-				$object_type = preg_replace('/_signature/', '', $object_type);
-
-				$actioncomm->elementtype       = $object_type . '@digiriskdolibarr';
+				$actioncomm->elementtype       = $object->object_type . '@digiriskdolibarr';
 				$actioncomm->code              = 'AC_DIGIRISKSIGNATURE_PENDING_SIGNATURE';
 				$actioncomm->type_code         = 'AC_OTH_AUTO';
 				$actioncomm->label             = $langs->transnoentities('DigiriskSignaturePendingSignatureTrigger');
@@ -1237,11 +1233,7 @@ class InterfaceDigiriskdolibarrTriggers extends DolibarrTriggers
 				$now        = dol_now();
 				$actioncomm = new ActionComm($this->db);
 
-				$object_type = $object->table_element;
-				$object_type = preg_replace('/digiriskdolibarr_/', '', $object_type);
-				$object_type = preg_replace('/_signature/', '', $object_type);
-
-				$actioncomm->elementtype       = $object_type . '@digiriskdolibarr';
+				$actioncomm->elementtype       = $object->object_type . '@digiriskdolibarr';
 				$actioncomm->code              = 'AC_DIGIRISKSIGNATURE_ABSENT';
 				$actioncomm->type_code         = 'AC_OTH_AUTO';
 				$actioncomm->label             = $langs->transnoentities('DigiriskSignatureAbsentTrigger');
@@ -1267,11 +1259,7 @@ class InterfaceDigiriskdolibarrTriggers extends DolibarrTriggers
 				$now        = dol_now();
 				$actioncomm = new ActionComm($this->db);
 
-				$object_type = $object->table_element;
-				$object_type = preg_replace('/digiriskdolibarr_/', '', $object_type);
-				$object_type = preg_replace('/_signature/', '', $object_type);
-
-				$actioncomm->elementtype       = $object_type . '@digiriskdolibarr';
+				$actioncomm->elementtype       = $object->object_type . '@digiriskdolibarr';
 				$actioncomm->code              = 'AC_DIGIRISKSIGNATURE_DELETED';
 				$actioncomm->type_code         = 'AC_OTH_AUTO';
 				$actioncomm->label             = $langs->transnoentities('DigiriskSignatureDeletedTrigger');

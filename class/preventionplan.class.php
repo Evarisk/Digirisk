@@ -1056,7 +1056,7 @@ class PreventionPlanLine extends CommonObjectLine
 	 */
 	public function delete(User $user, $notrigger = false)
 	{
-		global $user, $db;
+		global $user, $db, $conf;
 
 		$db->begin();
 
