@@ -153,7 +153,7 @@ class Evaluator extends CommonObject
 		global $conf;
 
 		$this->element = $this->element . '@digiriskdolibarr';
-		return $this->createCommon($user, empty($conf->global->DIGIRISKDOLIBARR_MAIN_AGENDA_ACTIONAUTO_EVALUATOR_CREATE));
+		return $this->createCommon($user, $notrigger || !$conf->global->DIGIRISKDOLIBARR_MAIN_AGENDA_ACTIONAUTO_EVALUATOR_CREATE);
 	}
 
 	/**
@@ -271,7 +271,7 @@ class Evaluator extends CommonObject
 	{
 		global $conf;
 
-		return $this->updateCommon($user, empty($conf->global->DIGIRISKDOLIBARR_MAIN_AGENDA_ACTIONAUTO_EVALUATOR_MODIFY));
+		return $this->updateCommon($user, $notrigger || !$conf->global->DIGIRISKDOLIBARR_MAIN_AGENDA_ACTIONAUTO_EVALUATOR_MODIFY);
 	}
 
 	/**
@@ -285,7 +285,7 @@ class Evaluator extends CommonObject
 	{
 		global $conf;
 
-		return $this->deleteCommon($user, empty($conf->global->DIGIRISKDOLIBARR_MAIN_AGENDA_ACTIONAUTO_EVALUATOR_DELETE));
+		return $this->deleteCommon($user, $notrigger || !$conf->global->DIGIRISKDOLIBARR_MAIN_AGENDA_ACTIONAUTO_EVALUATOR_DELETE);
 	}
 
 	/**

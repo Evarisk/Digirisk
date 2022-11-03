@@ -209,7 +209,7 @@ class FirePermit extends CommonObject
 
 		$this->element = $this->element . '@digiriskdolibarr';
 
-		return $this->createCommon($user, empty($conf->global->DIGIRISKDOLIBARR_MAIN_AGENDA_ACTIONAUTO_FIREPERMIT_CREATE));
+		return $this->createCommon($user, $notrigger || !$conf->global->DIGIRISKDOLIBARR_MAIN_AGENDA_ACTIONAUTO_FIREPERMIT_CREATE);
 	}
 
 	/**
@@ -462,7 +462,7 @@ class FirePermit extends CommonObject
 	{
 		global $conf;
 
-		return $this->updateCommon($user, empty($conf->global->DIGIRISKDOLIBARR_MAIN_AGENDA_ACTIONAUTO_FIREPERMIT_MODIFY));
+		return $this->updateCommon($user, $notrigger || !$conf->global->DIGIRISKDOLIBARR_MAIN_AGENDA_ACTIONAUTO_FIREPERMIT_MODIFY);
 	}
 
 	/**
@@ -476,7 +476,7 @@ class FirePermit extends CommonObject
 	{
 		global $conf;
 
-		return $this->deleteCommon($user, empty($conf->global->DIGIRISKDOLIBARR_MAIN_AGENDA_ACTIONAUTO_FIREPERMIT_DELETE));
+		return $this->deleteCommon($user, $notrigger || !$conf->global->DIGIRISKDOLIBARR_MAIN_AGENDA_ACTIONAUTO_FIREPERMIT_DELETE);
 	}
 
 	/**
@@ -538,7 +538,7 @@ class FirePermit extends CommonObject
 
 		$signatory = new PreventionPlanSignature($this->db);
 		$signatory->deleteSignatoriesSignatures($this->id, 'firepermit');
-		return $this->setStatusCommon($user, self::STATUS_IN_PROGRESS, empty($conf->global->DIGIRISKDOLIBARR_MAIN_AGENDA_ACTIONAUTO_FIREPERMIT_INPROGRESS), 'FIREPERMIT_INPROGRESS');
+		return $this->setStatusCommon($user, self::STATUS_IN_PROGRESS, $notrigger || !$conf->global->DIGIRISKDOLIBARR_MAIN_AGENDA_ACTIONAUTO_FIREPERMIT_INPROGRESS, 'FIREPERMIT_INPROGRESS');
 	}
 
 	/**
@@ -552,7 +552,7 @@ class FirePermit extends CommonObject
 	{
 		global $conf;
 
-		return $this->setStatusCommon($user, self::STATUS_PENDING_SIGNATURE, empty($conf->global->DIGIRISKDOLIBARR_MAIN_AGENDA_ACTIONAUTO_FIREPERMIT_PENDINGSIGNATURE), 'FIREPERMIT_PENDINGSIGNATURE');
+		return $this->setStatusCommon($user, self::STATUS_PENDING_SIGNATURE, $notrigger || !$conf->global->DIGIRISKDOLIBARR_MAIN_AGENDA_ACTIONAUTO_FIREPERMIT_PENDINGSIGNATURE, 'FIREPERMIT_PENDINGSIGNATURE');
 	}
 
 	/**
@@ -566,7 +566,7 @@ class FirePermit extends CommonObject
 	{
 		global $conf;
 
-		return $this->setStatusCommon($user, self::STATUS_LOCKED, empty($conf->global->DIGIRISKDOLIBARR_MAIN_AGENDA_ACTIONAUTO_FIREPERMIT_LOCKED), 'FIREPERMIT_LOCKED');
+		return $this->setStatusCommon($user, self::STATUS_LOCKED, $notrigger || !$conf->global->DIGIRISKDOLIBARR_MAIN_AGENDA_ACTIONAUTO_FIREPERMIT_LOCKED, 'FIREPERMIT_LOCKED');
 	}
 
 	/**
@@ -580,7 +580,7 @@ class FirePermit extends CommonObject
 	{
 		global $conf;
 
-		return $this->setStatusCommon($user, self::STATUS_ARCHIVED, empty($conf->global->DIGIRISKDOLIBARR_MAIN_AGENDA_ACTIONAUTO_FIREPERMIT_ARCHIVED), 'FIREPERMIT_ARCHIVED');
+		return $this->setStatusCommon($user, self::STATUS_ARCHIVED, $notrigger || !$conf->global->DIGIRISKDOLIBARR_MAIN_AGENDA_ACTIONAUTO_FIREPERMIT_ARCHIVED, 'FIREPERMIT_ARCHIVED');
 	}
 
 	/**
