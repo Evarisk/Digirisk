@@ -84,6 +84,7 @@ UPDATE llx_digiriskdolibarr_risk SET category = 20 WHERE category = 18;
 UPDATE llx_digiriskdolibarr_risk SET category = 21 WHERE category = 19;
 
 -- 9.11.1
+ALTER TABLE llx_digiriskdolibarr_firepermitdet CHANGE  `use_equipment` `used_equipment` text;
 DELETE FROM llx_c_action_trigger WHERE elementtype = 'informationssharing@digiriskdolibarr';
 DELETE FROM llx_c_action_trigger WHERE elementtype = 'legaldisplay@digiriskdolibarr';
 DELETE FROM llx_c_action_trigger WHERE elementtype = 'preventionplandocument@digiriskdolibarr';

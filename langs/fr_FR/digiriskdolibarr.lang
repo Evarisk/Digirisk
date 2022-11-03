@@ -558,7 +558,7 @@ FP_EXT_SOCIETY_RESPONSIBLE = Responsable de la société extérieure
 FP_MAITRE_OEUVRE = Maître d'oeuvre
 FP_LABOUR_INSPECTOR = Société inspecteur du travail
 FP_LABOUR_INSPECTOR_ASSIGNED = Inspecteur du travail
-UseEquipment = Matériel utilisé
+UsedEquipment = Matériel utilisé
 
 # Email - Mail
 FirePermitLabel = Récapitulatif du permis de feu
