@@ -218,7 +218,7 @@ class PreventionPlan extends CommonObject
 
 		$this->element = $this->element . '@digiriskdolibarr';
 
-		return $this->createCommon($user, empty($conf->global->DIGIRISKDOLIBARR_MAIN_AGENDA_ACTIONAUTO_PREVENTIONPLAN_CREATE));
+		return $this->createCommon($user, $notrigger || !$conf->global->DIGIRISKDOLIBARR_MAIN_AGENDA_ACTIONAUTO_PREVENTIONPLAN_CREATE);
 	}
 
 	/**
@@ -470,7 +470,7 @@ class PreventionPlan extends CommonObject
 	{
 		global $conf;
 
-		return $this->updateCommon($user, empty($conf->global->DIGIRISKDOLIBARR_MAIN_AGENDA_ACTIONAUTO_PREVENTIONPLAN_MODIFY));
+		return $this->updateCommon($user, $notrigger || !$conf->global->DIGIRISKDOLIBARR_MAIN_AGENDA_ACTIONAUTO_PREVENTIONPLAN_MODIFY);
 	}
 
 	/**
@@ -484,7 +484,7 @@ class PreventionPlan extends CommonObject
 	{
 		global $conf;
 
-		return $this->deleteCommon($user, empty($conf->global->DIGIRISKDOLIBARR_MAIN_AGENDA_ACTIONAUTO_PREVENTIONPLAN_DELETE));
+		return $this->deleteCommon($user, $notrigger || !$conf->global->DIGIRISKDOLIBARR_MAIN_AGENDA_ACTIONAUTO_PREVENTIONPLAN_DELETE);
 	}
 
 	/**
@@ -547,7 +547,7 @@ class PreventionPlan extends CommonObject
 
 		$signatory = new PreventionPlanSignature($this->db);
 		$signatory->deleteSignatoriesSignatures($this->id, 'preventionplan');
-		return $this->setStatusCommon($user, self::STATUS_IN_PROGRESS, empty($conf->global->DIGIRISKDOLIBARR_MAIN_AGENDA_ACTIONAUTO_PREVENTIONPLAN_INPROGRESS), 'PREVENTIONPLAN_INPROGRESS');
+		return $this->setStatusCommon($user, self::STATUS_IN_PROGRESS, $notrigger || !$conf->global->DIGIRISKDOLIBARR_MAIN_AGENDA_ACTIONAUTO_PREVENTIONPLAN_INPROGRESS, 'PREVENTIONPLAN_INPROGRESS');
 	}
 	/**
 	 * 	Set pending signature status
@@ -560,7 +560,7 @@ class PreventionPlan extends CommonObject
 	{
 		global $conf;
 
-		return $this->setStatusCommon($user, self::STATUS_PENDING_SIGNATURE, empty($conf->global->DIGIRISKDOLIBARR_MAIN_AGENDA_ACTIONAUTO_PREVENTIONPLAN_PENDINGSIGNATURE), 'PREVENTIONPLAN_PENDINGSIGNATURE');
+		return $this->setStatusCommon($user, self::STATUS_PENDING_SIGNATURE, $notrigger || !$conf->global->DIGIRISKDOLIBARR_MAIN_AGENDA_ACTIONAUTO_PREVENTIONPLAN_PENDINGSIGNATURE, 'PREVENTIONPLAN_PENDINGSIGNATURE');
 	}
 
 	/**
@@ -574,7 +574,7 @@ class PreventionPlan extends CommonObject
 	{
 		global $conf;
 
-		return $this->setStatusCommon($user, self::STATUS_LOCKED, empty($conf->global->DIGIRISKDOLIBARR_MAIN_AGENDA_ACTIONAUTO_PREVENTIONPLAN_LOCKED), 'PREVENTIONPLAN_LOCKED');
+		return $this->setStatusCommon($user, self::STATUS_LOCKED, $notrigger || !$conf->global->DIGIRISKDOLIBARR_MAIN_AGENDA_ACTIONAUTO_PREVENTIONPLAN_LOCKED, 'PREVENTIONPLAN_LOCKED');
 	}
 
 	/**
@@ -588,7 +588,7 @@ class PreventionPlan extends CommonObject
 	{
 		global $conf;
 
-		return $this->setStatusCommon($user, self::STATUS_ARCHIVED, empty($conf->global->DIGIRISKDOLIBARR_MAIN_AGENDA_ACTIONAUTO_PREVENTIONPLAN_ARCHIVED), 'PREVENTIONPLAN_ARCHIVED');
+		return $this->setStatusCommon($user, self::STATUS_ARCHIVED, $notrigger || !$conf->global->DIGIRISKDOLIBARR_MAIN_AGENDA_ACTIONAUTO_PREVENTIONPLAN_ARCHIVED, 'PREVENTIONPLAN_ARCHIVED');
 	}
 
 	/**

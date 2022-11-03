@@ -209,7 +209,7 @@ class Accident extends CommonObject
 		global $conf;
 
 		$this->element = $this->element . '@digiriskdolibarr';
-		return $this->createCommon($user, empty($conf->global->DIGIRISKDOLIBARR_MAIN_AGENDA_ACTIONAUTO_ACCIDENT_CREATE));
+		return $this->createCommon($user, $notrigger || !$conf->global->DIGIRISKDOLIBARR_MAIN_AGENDA_ACTIONAUTO_ACCIDENT_CREATE);
 	}
 
 	/**
@@ -334,7 +334,7 @@ class Accident extends CommonObject
 	{
 		global $conf;
 
-		return $this->updateCommon($user, empty($conf->global->DIGIRISKDOLIBARR_MAIN_AGENDA_ACTIONAUTO_ACCIDENT_MODIFY));
+		return $this->updateCommon($user, $notrigger || !$conf->global->DIGIRISKDOLIBARR_MAIN_AGENDA_ACTIONAUTO_ACCIDENT_MODIFY);
 	}
 
 	/**
@@ -348,7 +348,7 @@ class Accident extends CommonObject
 	{
 		global $conf;
 
-		return $this->deleteCommon($user, empty($conf->global->DIGIRISKDOLIBARR_MAIN_AGENDA_ACTIONAUTO_ACCIDENT_DELETE));
+		return $this->deleteCommon($user, $notrigger || !$conf->global->DIGIRISKDOLIBARR_MAIN_AGENDA_ACTIONAUTO_ACCIDENT_DELETE);
 	}
 
 	/**

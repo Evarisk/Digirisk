@@ -174,7 +174,7 @@ class RiskAssessment extends CommonObject
 
 		return $result;
 		//ADD LINES POUR LE SELECT ENTITY
-		return $this->createCommon($user, empty($conf->global->DIGIRISKDOLIBARR_MAIN_AGENDA_ACTIONAUTO_RISKASSESSMENT_CREATE));
+		return $this->createCommon($user, $notrigger || !$conf->global->DIGIRISKDOLIBARR_MAIN_AGENDA_ACTIONAUTO_RISKASSESSMENT_CREATE);
 	}
 
 	/**
@@ -292,7 +292,7 @@ class RiskAssessment extends CommonObject
 	{
 		global $conf;
 
-		return $this->updateCommon($user, empty($conf->global->DIGIRISKDOLIBARR_MAIN_AGENDA_ACTIONAUTO_RISKASSESSMENT_MODIFY));
+		return $this->updateCommon($user, $notrigger || !$conf->global->DIGIRISKDOLIBARR_MAIN_AGENDA_ACTIONAUTO_RISKASSESSMENT_MODIFY);
 	}
 
 	/**
@@ -343,7 +343,7 @@ class RiskAssessment extends CommonObject
 	{
 		global $conf;
 
-		return $this->deleteCommon($user, empty($conf->global->DIGIRISKDOLIBARR_MAIN_AGENDA_ACTIONAUTO_RISKASSESSMENT_DELETE));
+		return $this->deleteCommon($user, $notrigger || !$conf->global->DIGIRISKDOLIBARR_MAIN_AGENDA_ACTIONAUTO_RISKASSESSMENT_DELETE);
 	}
 
 	/**

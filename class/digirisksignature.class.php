@@ -341,7 +341,7 @@ class DigiriskSignature extends CommonObject
 	{
 		global $conf;
 
-		return $this->setStatusCommon($user, self::STATUS_PENDING_SIGNATURE, empty($conf->global->DIGIRISKDOLIBARR_MAIN_AGENDA_ACTIONAUTO_DIGIRISKSIGNATURE_PENDING_SIGNATURE), 'DIGIRISKSIGNATURE_PENDING_SIGNATURE');
+		return $this->setStatusCommon($user, self::STATUS_PENDING_SIGNATURE, $notrigger || !$conf->global->DIGIRISKDOLIBARR_MAIN_AGENDA_ACTIONAUTO_DIGIRISKSIGNATURE_PENDING_SIGNATURE, 'DIGIRISKSIGNATURE_PENDING_SIGNATURE');
 	}
 
 	/**
@@ -355,7 +355,7 @@ class DigiriskSignature extends CommonObject
 	{
 		global $conf;
 
-		return $this->setStatusCommon($user, self::STATUS_SIGNED, empty($conf->global->DIGIRISKDOLIBARR_MAIN_AGENDA_ACTIONAUTO_DIGIRISKSIGNATURE_SIGNED), 'DIGIRISKSIGNATURE_SIGNED');
+		return $this->setStatusCommon($user, self::STATUS_SIGNED, $notrigger || !$conf->global->DIGIRISKDOLIBARR_MAIN_AGENDA_ACTIONAUTO_DIGIRISKSIGNATURE_SIGNED, 'DIGIRISKSIGNATURE_SIGNED');
 	}
 
 	/**
@@ -369,7 +369,7 @@ class DigiriskSignature extends CommonObject
 	{
 		global $conf;
 
-		return $this->setStatusCommon($user, self::STATUS_ABSENT, empty($conf->global->DIGIRISKDOLIBARR_MAIN_AGENDA_ACTIONAUTO_DIGIRISKSIGNATURE_ABSENT), 'DIGIRISKSIGNATURE_ABSENT');
+		return $this->setStatusCommon($user, self::STATUS_ABSENT, $notrigger || !$conf->global->DIGIRISKDOLIBARR_MAIN_AGENDA_ACTIONAUTO_DIGIRISKSIGNATURE_ABSENT, 'DIGIRISKSIGNATURE_ABSENT');
 	}
 
 	/**
@@ -383,7 +383,7 @@ class DigiriskSignature extends CommonObject
 	{
 		global $conf;
 
-		return $this->setStatusCommon($user, self::STATUS_DELETED, empty($conf->global->DIGIRISKDOLIBARR_MAIN_AGENDA_ACTIONAUTO_DIGIRISKSIGNATURE_DELETED), 'DIGIRISKSIGNATURE_DELETED');
+		return $this->setStatusCommon($user, self::STATUS_DELETED, $notrigger || !$conf->global->DIGIRISKDOLIBARR_MAIN_AGENDA_ACTIONAUTO_DIGIRISKSIGNATURE_DELETED, 'DIGIRISKSIGNATURE_DELETED');
 	}
 
 	/**
