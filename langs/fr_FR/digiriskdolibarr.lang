@@ -443,6 +443,8 @@ PP_EXT_SOCIETY_RESPONSIBLE = Responsable de la société extérieure
 PP_MAITRE_OEUVRE = Maître d'oeuvre
 PP_LABOUR_INSPECTOR = Société inspecteur du travail
 PP_LABOUR_INSPECTOR_ASSIGNED = Inspecteur du travail
+ErrorThirdPartyHasAtLeastOneChildOfTypePreventionPlan = Le tiers est lié à au moins un enfant de type Plan de Prévention :
+ErrorContactHasAtLeastOneChildOfTypePreventionPlan = Le contact est lié à au moins un enfant de type Plan de Prévention :
 
 # Email - Mail
 PreventionPlanLabel = Récapitulatif du plan de prévention
@@ -559,6 +561,8 @@ FP_MAITRE_OEUVRE = Maître d'oeuvre
 FP_LABOUR_INSPECTOR = Société inspecteur du travail
 FP_LABOUR_INSPECTOR_ASSIGNED = Inspecteur du travail
 UsedEquipment = Matériel utilisé
+ErrorThirdPartyHasAtLeastOneChildOfTypeFirePermit = Le tiers est lié à au moins un enfant de type Permis de Feu :
+ErrorContactHasAtLeastOneChildOfTypeFirePermit = Le contact est lié à au moins un enfant de type Permis de Feu :
 
 # Email - Mail
 FirePermitLabel = Récapitulatif du permis de feu

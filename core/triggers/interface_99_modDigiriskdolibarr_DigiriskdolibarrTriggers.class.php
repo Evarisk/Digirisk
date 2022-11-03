@@ -159,22 +159,27 @@ class InterfaceDigiriskdolibarrTriggers extends DolibarrTriggers
 				$preventionplan 	  = new PreventionPlan($this->db);
 				$firepermit 		  = new FirePermit($this->db);
 				$digiriskresources 	  = new DigiriskResources($this->db);
-				$alldigiriskresources = $digiriskresources->fetchAll('', '', 0, 0, array('customsql' => 't.element_id = ' . $object->id));
+				$alldigiriskresources = $digiriskresources->fetchAll('', '', 0, 0, array('customsql' => 't.element_id = ' . $object->id . ' AND t.element_type = "societe"'));
 
 				if (is_array($alldigiriskresources) && !empty($alldigiriskresources)) {
 					foreach ($alldigiriskresources as $digiriskresourcesingle) {
-						($digiriskresourcesingle->object_type == 'preventionplan' ? $preventionplan->fetch($digiriskresourcesingle->object_id) : '');
-						($digiriskresourcesingle->object_type == 'firepermit' ? $firepermit->fetch($digiriskresourcesingle->object_id) : '');
+						if ($digiriskresourcesingle->object_type == 'preventionplan') {
+							$preventionplan->fetch($digiriskresourcesingle->object_id);
+							if ($preventionplan->status > 0) {
+								$error[++$i] = $langs->trans('ErrorThirdPartyHasAtLeastOneChildOfTypePreventionPlan') . ' ' . $preventionplan->getNomUrl();
+							}
+						} else if ($digiriskresourcesingle->object_type == 'firepermit') {
+							$firepermit->fetch($digiriskresourcesingle->object_id);
+							if ($firepermit->status > 0) {
+								$error[++$i] = $langs->trans('ErrorThirdPartyHasAtLeastOneChildOfTypeFirePermit') . ' ' . $firepermit->getNomUrl();
+							}
+						}
 					}
-					($preventionplan->status != 0 ? $result = $preventionplan->isObjectUsed($object->id) : '');
-					($result > 0 ? $error[$i++] = $preventionplan->errors[0] : '');
-					($firepermit->status != 0 ? $result = $firepermit->isObjectUsed($object->id) : '');
-					($result > 0 ? $error[$i++] = $firepermit->errors[0] : '');
-				}
-
-				if (!empty($error)) {
-					$object->errors = $error;
-					return -1;
+					if (!empty($error)) {
+						$error[++$i] = $langs->trans('ErrorRecordHasChildren');
+						$object->errors = $error;
+						return -1;
+					}
 				}
 				break;
 
@@ -187,22 +192,27 @@ class InterfaceDigiriskdolibarrTriggers extends DolibarrTriggers
 				$preventionplan 	  = new PreventionPlan($this->db);
 				$firepermit 		  = new FirePermit($this->db);
 				$digiriskresources 	  = new DigiriskResources($this->db);
-				$alldigiriskresources = $digiriskresources->fetchAll('', '', 0, 0, array('customsql' => 't.element_id = ' . $object->fk_soc));
+				$alldigiriskresources = $digiriskresources->fetchAll('', '', 0, 0, array('customsql' => 't.element_id = ' . $object->fk_soc . ' AND t.element_type = "societe"'));
 
 				if (is_array($alldigiriskresources) && !empty($alldigiriskresources)) {
 					foreach ($alldigiriskresources as $digiriskresourcesingle) {
-						($digiriskresourcesingle->object_type == 'preventionplan' ? $preventionplan->fetch($digiriskresourcesingle->object_id) : '');
-						($digiriskresourcesingle->object_type == 'firepermit' ? $firepermit->fetch($digiriskresourcesingle->object_id) : '');
+						if ($digiriskresourcesingle->object_type == 'preventionplan') {
+							$preventionplan->fetch($digiriskresourcesingle->object_id);
+							if ($preventionplan->status > 0) {
+								$error[++$i] = $langs->trans('ErrorContactHasAtLeastOneChildOfTypePreventionPlan') . ' ' . $preventionplan->getNomUrl();
+							}
+						} else if ($digiriskresourcesingle->object_type == 'firepermit') {
+							$firepermit->fetch($digiriskresourcesingle->object_id);
+							if ($firepermit->status > 0) {
+								$error[++$i] = $langs->trans('ErrorContactHasAtLeastOneChildOfTypeFirePermit') . ' ' . $firepermit->getNomUrl();
+							}
+						}
 					}
-					($preventionplan->status != 0 ? $result = $preventionplan->isObjectUsed($object->fk_soc) : '');
-					($result > 0 ? $error[$i++] = $preventionplan->errors[0] : '');
-					($firepermit->status != 0 ? $result = $firepermit->isObjectUsed($object->fk_soc) : '');
-					($result > 0 ? $error[$i++] = $firepermit->errors[0] : '');
-				}
-
-				if (!empty($error)) {
-					$object->errors = $error;
-					return -1;
+					if (!empty($error)) {
+						$error[++$i] = $langs->trans('ErrorRecordHasChildren');
+						$object->errors = $error;
+						return -1;
+					}
 				}
 				break;
 
