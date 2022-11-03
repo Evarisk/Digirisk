@@ -215,9 +215,9 @@ if (empty($reshook)) {
 		}
 
 		if ( ! $error) {
-			$result = $object->create($user, false);
+			$result = $object->create($user, true);
 			if ($result > 0) {
-				$object->setStatusCommon($user, 1, true);
+				$object->setInProgress($user,  true);
 				$digiriskresources->digirisk_dolibarr_set_resources($db, $user->id, 'PP_EXT_SOCIETY', 'societe', array($extsociety_id), $conf->entity, 'preventionplan', $object->id, 1);
 				$digiriskresources->digirisk_dolibarr_set_resources($db, $user->id, 'PP_LABOUR_INSPECTOR', 'societe', array($labour_inspector_id), $conf->entity, 'preventionplan', $object->id, 1);
 				$digiriskresources->digirisk_dolibarr_set_resources($db, $user->id, 'PP_LABOUR_INSPECTOR_ASSIGNED', 'socpeople', array($labour_inspector_contact_id), $conf->entity, 'preventionplan', $object->id, 1);
@@ -229,7 +229,7 @@ if (empty($reshook)) {
 				if ($extresponsible_id > 0) {
 					$signatory->setSignatory($object->id, 'preventionplan', 'socpeople', array($extresponsible_id), 'PP_EXT_SOCIETY_RESPONSIBLE');
 				}
-
+				(!empty($conf->global->DIGIRISKDOLIBARR_MAIN_AGENDA_ACTIONAUTO_PREVENTIONPLAN_CREATE) ? $object->call_trigger('PREVENTIONPLAN_CREATE', $user) : '');
 				// Creation prevention plan OK
 				$urltogo = str_replace('__ID__', $result, $backtopage);
 				$urltogo = preg_replace('/--IDFORBACKTOPAGE--/', $id, $urltogo); // New method to autoselect project after a New on another form object creation
