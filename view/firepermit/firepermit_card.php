@@ -339,7 +339,7 @@ if (empty($reshook)) {
 	if ($action == 'addLine' && $permissiontoadd) {
 		// Get parameters
 		$actions_description = GETPOST('actionsdescription');
-		$use_equipment       = GETPOST('use_equipment');
+		$used_equipment       = GETPOST('used_equipment');
 		$location            = GETPOST('fk_element');
 		$risk_category_id    = GETPOST('risk_category_id');
 		$parent_id           = GETPOST('parent_id');
@@ -350,7 +350,7 @@ if (empty($reshook)) {
 		$objectline->entity        = $conf->entity;
 		$objectline->description   = $actions_description;
 		$objectline->category      = $risk_category_id;
-		$objectline->use_equipment = $use_equipment;
+		$objectline->used_equipment = $used_equipment;
 		$objectline->fk_firepermit = $parent_id;
 		$objectline->fk_element    = $location;
 
@@ -387,7 +387,7 @@ if (empty($reshook)) {
 	if ($action == 'updateLine' && $permissiontoadd) {
 		// Get parameters
 		$actions_description = GETPOST('actionsdescription');
-		$use_equipment       = GETPOST('use_equipment');
+		$used_equipment       = GETPOST('used_equipment');
 		$location            = GETPOST('fk_element');
 		$risk_category_id    = GETPOST('risk_category_id');
 		$parent_id           = GETPOST('parent_id');
@@ -397,7 +397,7 @@ if (empty($reshook)) {
 		// Initialize object fire permit line
 		$objectline->description   = $actions_description;
 		$objectline->category      = $risk_category_id;
-		$objectline->use_equipment = $use_equipment;
+		$objectline->used_equipment = $used_equipment;
 		$objectline->fk_firepermit = $parent_id;
 		$objectline->fk_element    = $location;
 
@@ -1296,7 +1296,7 @@ if ((empty($action) || ($action != 'create' && $action != 'edit'))) {
 
 					$coldisplay++;
 					print '<td>';
-					print '<textarea name="use_equipment" class="minwidth150" cols="50" rows="' . ROWS_2 . '">' . $item->use_equipment . '</textarea>' . "\n";
+					print '<textarea name="used_equipment" class="minwidth150" cols="50" rows="' . ROWS_2 . '">' . $item->used_equipment . '</textarea>' . "\n";
 					print '</td>';
 
 					$coldisplay += $colspan;
@@ -1340,7 +1340,7 @@ if ((empty($action) || ($action != 'create' && $action != 'edit'))) {
 
 					$coldisplay++;
 					print '<td>';
-					print $item->use_equipment;
+					print $item->used_equipment;
 					print '</td>';
 
 					$coldisplay += $colspan;
@@ -1419,7 +1419,7 @@ if ((empty($action) || ($action != 'create' && $action != 'edit'))) {
 
 			$coldisplay++;
 			print '<td>';
-			print '<textarea name="use_equipment" class="minwidth150" cols="50" rows="' . ROWS_2 . '">' . ('') . '</textarea>' . "\n";
+			print '<textarea name="used_equipment" class="minwidth150" cols="50" rows="' . ROWS_2 . '">' . ('') . '</textarea>' . "\n";
 			print '</td>';
 
 			$coldisplay += $colspan;

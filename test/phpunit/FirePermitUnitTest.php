@@ -486,7 +486,7 @@ class FirePermitUnitTest extends PHPUnit\Framework\TestCase
 		$localobjectline->date_creation = $localobjectline->db->idate($now);
 		$localobjectline->category      = 1;
 		$localobjectline->description   = "TestFirePermitLine";
-		$localobjectline->use_equipment = "TestFirePermitLineUseEquipment";
+		$localobjectline->used_equipment = "TestFirePermitLineUsedEquipment";
 		$localobjectline->fk_element    = 1;
 		$localobjectline->fk_firepermit = $localobject->id;
 
@@ -552,7 +552,7 @@ class FirePermitUnitTest extends PHPUnit\Framework\TestCase
 		$localobjectline->ref           = "UpdatedTestRefFirePermitLine";
 		$localobjectline->category      = 1;
 		$localobjectline->description   = "UpdatedTestFirePermitLine";
-		$localobjectline->use_equipment = "UpdatedTestFirePermitLineUseEquipmentLine";
+		$localobjectline->used_equipment = "UpdatedTestFirePermitLineUsedEquipmentLine";
 		$localobjectline->fk_element    = 1;
 
 		$result = $localobjectline->update($user);
@@ -568,7 +568,7 @@ class FirePermitUnitTest extends PHPUnit\Framework\TestCase
 		$this->assertSame($localobjectline->ref, $newobjectline->ref);
 		$this->assertEquals($localobjectline->category, $newobjectline->category);
 		$this->assertSame($localobjectline->description, $newobjectline->description);
-		$this->assertSame($localobjectline->use_equipment, $newobjectline->use_equipment);
+		$this->assertSame($localobjectline->used_equipment, $newobjectline->used_equipment);
 		$this->assertEquals($localobjectline->fk_element, $newobjectline->fk_element);
 
 		return $localobjectline;
