@@ -146,7 +146,7 @@ class ActionsDigiriskdolibarr
 					require_once __DIR__ . '/digiriskelement.class.php';
 					$digiriskelement = new DigiriskElement($db);
 					$digiriskelement->fetch($object->array_options['options_digiriskdolibarr_ticket_service']);
-					$selectDictionnary = $digiriskelement->getNomUrl(1, 'blank');
+					$selectDictionnary = $digiriskelement->getNomUrl(1, 'blank', 1);
 					?>
 					<script>
 					jQuery('.ticket_extras_digiriskdolibarr_ticket_service').html('')
