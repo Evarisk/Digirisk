@@ -623,6 +623,10 @@ class InterfaceDigiriskdolibarrTriggers extends DolibarrTriggers
 						} else {
 							$actioncomm->note_private .= $societe->name . '<br>';
 						}
+						if ($societename == 'PP_EXT_SOCIETY') {
+							$actioncomm->note_private .= $langs->trans('Address') . ' : ' . $societe->address . '<br>';
+							$actioncomm->note_private .= $langs->trans('SIRET') . ' : ' . $societe->idprof2 . '<br>';
+						}
 					}
 				}
 				$actioncomm->note_private .= $langs->trans('CSSCTIntervention') . ' : ' . ($object->cssct_intervention ? $langs->trans("Yes") : $langs->trans("No")) . '<br>';
@@ -681,6 +685,10 @@ class InterfaceDigiriskdolibarrTriggers extends DolibarrTriggers
 							$actioncomm->note_private .= $societe->firstname . ' ' . $societe->lastname . '<br>';
 						} else {
 							$actioncomm->note_private .= $societe->name . '<br>';
+						}
+						if ($societename == 'PP_EXT_SOCIETY') {
+							$actioncomm->note_private .= $langs->trans('Address') . ' : ' . $societe->address . '<br>';
+							$actioncomm->note_private .= $langs->trans('SIRET') . ' : ' . $societe->idprof2 . '<br>';
 						}
 					}
 				}
@@ -983,6 +991,10 @@ class InterfaceDigiriskdolibarrTriggers extends DolibarrTriggers
 						} else {
 							$actioncomm->note_private .= $societe->name . '<br>';
 						}
+						if ($societename == 'FP_EXT_SOCIETY') {
+							$actioncomm->note_private .= $langs->trans('Address') . ' : ' . $societe->address . '<br>';
+							$actioncomm->note_private .= $langs->trans('SIRET') . ' : ' . $societe->idprof2 . '<br>';
+						}
 					}
 				}
 				$actioncomm->note_private .= $langs->trans('PreventionPlan') . ' : ' . $preventionplan->ref . (!empty($preventionplan->label) ? ' ' . $preventionplan->label : '') . '<br>';
@@ -1038,6 +1050,10 @@ class InterfaceDigiriskdolibarrTriggers extends DolibarrTriggers
 							$actioncomm->note_private .= $societe->firstname . ' ' . $societe->lastname . '<br>';
 						} else {
 							$actioncomm->note_private .= $societe->name . '<br>';
+						}
+						if ($societename == 'FP_EXT_SOCIETY') {
+							$actioncomm->note_private .= $langs->trans('Address') . ' : ' . $societe->address . '<br>';
+							$actioncomm->note_private .= $langs->trans('SIRET') . ' : ' . $societe->idprof2 . '<br>';
 						}
 					}
 				}
