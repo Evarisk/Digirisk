@@ -196,7 +196,7 @@ LegalDisplayDigiriskTemplate = ODT par défaut des affichages légaux
 
 # Data - Donnée
 LegalDisplay = Affichage légal
-LegalDisplayDocumentGenerated = Génération du document d'Affichage Légal
+LegalDisplayDocumentGenerated = Génération d'Affichage Légal
 HowToSetDataLegalDisplay = Pour configurer les données sur l'affichage légal, aller dans Accueil - Configuration - Société/Organisation - Sécurité
 
 LabourDoctor = Médecin du travail
@@ -259,7 +259,7 @@ InformationsSharingDigiriskTemplate = ODT par défaut des diffusions d'informati
 
 # Data - Donnée
 InformationsSharing = Diffusion d'informations
-InformationsSharingDocumentGenerated = Génération du document de Diffusion d'Informations
+InformationsSharingDocumentGenerated = Génération de Diffusion d'Informations
 HowToSetDataInformationsSharing = Pour configurer les données sur la diffusion d'informations, aller dans Accueil - Configuration - Société/Organisation - Social
 ConfigureSecurityAndSocialData = Configurer les données de la société
 LastMainDoc = Dernier document généré
@@ -343,8 +343,8 @@ PreventionPlanInProgress = Réouverture du Plan de Prévention
 PreventionPlanPendingSignature = Mise en attente de signature du Plan de Prévention
 PreventionPlanLocked = Verrouillage du Plan de Prévention
 PreventionPlanArchived = Archivage du Plan de Prévention
-PreventionPlanSignatureAddAttendant = Ajout de participant à la signature du Plan de Prévention
-PreventionPlanSignatureDeleteAttendant = Suppression de participant à la signature du Plan de Prévention
+PreventionPlanSignatureAddAttendant = Ajout de participant au Plan de Prévention
+PreventionPlanSignatureDeleteAttendant = Suppression de participant au Plan de Prévention
 PreventionPlanSentByMail = Envoi par mail du Plan de Prévention
 PreventionPlanInitial = PPR
 PreventionPlanList = Liste des plans de prévention
@@ -510,8 +510,8 @@ FirePermitInProgress = Réouverture du Permis de Feu
 FirePermitPendingSignature = Mise en attente de signature du Permis de Feu
 FirePermitLocked = Verrouillage du Permis de Feu
 FirePermitArchived = Archivage du Permis de Feu
-FirePermitSignatureAddAttendant = Ajout de participant à la signature du Permis de Feu
-FirePermitSignatureDeleteAttendant = Suppression de participant à la signature du Permis de Feu
+FirePermitSignatureAddAttendant = Ajout de participant au Permis de Feu
+FirePermitSignatureDeleteAttendant = Suppression de participant au Permis de Feu
 FirePermitSentByMail = Envoi par mail du Permis de Feu
 FirePermitLine = risque(s)
 FirePermitLineCreated = Création de risque dans Permis de Feu
@@ -1446,8 +1446,8 @@ SendEmail = Envoyer un email
 # WelcomeOnOnlineSignaturePage = Bienvenue sur la page de signature des documents
 ThisIsInformationOnDocumentToSign = Informations
 DigiriskSignature = Signature
-DigiriskSignatureSigned = Signature d'un élément Digirisk
-DigiriskSignaturePendingSignature = Attente de signature d'un élément Digirisk
+DigiriskSignatureSigned = Signature d'un participant
+DigiriskSignaturePendingSignature = Attente de signature d'un participant
 DigiriskSignatureAbsent = Absence de signature d'un participant
 DigiriskSignatureDeleted = Suppression de signature d'un participant
 SignaturePublicAccess = Une interface publique ne nécessitant aucune identification est disponible à l'url suivante
