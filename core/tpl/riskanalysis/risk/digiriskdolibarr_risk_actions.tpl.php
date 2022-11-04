@@ -718,7 +718,7 @@ if ($action == 'confirm_import_shared_risks' && $confirm == 'yes') {
 				$object->element = 'digiriskdolibarr_' . $digiriskelementtmp->element;
 				$result = $object->add_object_linked('digiriskdolibarr_' . $risk->element, $risks->id);
 				if ($result > 0) {
-					$risks->fields['applied_on'] = $object->id;
+					$risks->applied_on = $object->id;
 					$risks->call_trigger('RISK_IMPORT', $user);
 					continue;
 				} else {

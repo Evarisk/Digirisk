@@ -272,7 +272,7 @@ if (empty($reshook)) {
 					$object->element = 'digiriskdolibarr_' . $digiriskelementtmp->element;
 					$result = $object->add_object_linked('digiriskdolibarr_' . $risksign->element, $risksigns->id);
 					if ($result > 0) {
-						$risksigns->fields['applied_on'] = $object->id;
+						$risksigns->applied_on = $object->id;
 						$risksigns->call_trigger('RISKSIGN_IMPORT', $user);
 						continue;
 					} else {
@@ -304,7 +304,7 @@ if (empty($reshook)) {
 
 		if ($result > 0) {
 			// Unlink shared risk sign OK
-			$risksign->fields['applied_on'] = $object->id;
+			$risksign->applied_on = $object->id;
 			$risksign->call_trigger('RISKSIGN_UNLINK', $user);
 			$urltogo = str_replace('__ID__', $object->id, $backtopage);
 			$urltogo = preg_replace('/--IDFORBACKTOPAGE--/', $id, $urltogo); // New method to autoselect project after a New on another form object creation
