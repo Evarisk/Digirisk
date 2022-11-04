@@ -472,7 +472,12 @@ class PreventionPlan extends CommonObject
 	{
 		global $conf;
 
-		return $this->deleteCommon($user, $notrigger || !$conf->global->DIGIRISKDOLIBARR_MAIN_AGENDA_ACTIONAUTO_PREVENTIONPLAN_DELETE);
+		$result = $this->update($user, true);
+		if ($result > 0 && !empty($conf->global->DIGIRISKDOLIBARR_MAIN_AGENDA_ACTIONAUTO_PREVENTIONPLAN_DELETE)) {
+			$this->call_trigger('PREVENTIONPLAN_DELETE', $user);
+		}
+
+		return $result;
 	}
 
 	/**

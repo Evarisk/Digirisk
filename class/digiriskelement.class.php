@@ -329,7 +329,12 @@ class DigiriskElement extends CommonObject
 
 		$this->fk_parent = $conf->global->DIGIRISKDOLIBARR_DIGIRISKELEMENT_TRASH;
 
-		return $this->update($user, $notrigger || !$conf->global->DIGIRISKDOLIBARR_MAIN_AGENDA_ACTIONAUTO_DIGIRISKELEMENT_DELETE);
+		$result = $this->update($user, true);
+		if ($result > 0 && !empty($conf->global->DIGIRISKDOLIBARR_MAIN_AGENDA_ACTIONAUTO_DIGIRISKELEMENT_DELETE)) {
+			$this->call_trigger('DIGIRISKELEMENT_DELETE', $user);
+		}
+
+		return $result;
 	}
 
 	/**

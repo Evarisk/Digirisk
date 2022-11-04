@@ -464,7 +464,12 @@ class FirePermit extends CommonObject
 	{
 		global $conf;
 
-		return $this->deleteCommon($user, $notrigger || !$conf->global->DIGIRISKDOLIBARR_MAIN_AGENDA_ACTIONAUTO_FIREPERMIT_DELETE);
+		$result = $this->update($user, true);
+		if ($result > 0 && !empty($conf->global->DIGIRISKDOLIBARR_MAIN_AGENDA_ACTIONAUTO_FIREPERMIT_DELETE)) {
+			$this->call_trigger('FIREPERMIT_DELETE', $user);
+		}
+
+		return $result;
 	}
 
 	/**
