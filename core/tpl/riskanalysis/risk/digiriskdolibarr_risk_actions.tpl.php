@@ -819,7 +819,7 @@ if (! $error && $action == 'unlinkSharedRisk' && $permissiontodelete) {
 
 	if ($result > 0) {
 		// Unlink shared risk OK
-		$risk->fields['applied_on'] = $object->id;
+		$risk->applied_on = $object->id;
 		$risk->call_trigger('RISK_UNLINK', $user);
 		$urltogo = str_replace('__ID__', $object->id, $backtopage);
 		$urltogo = preg_replace('/--IDFORBACKTOPAGE--/', $id, $urltogo); // New method to autoselect project after a New on another form object creation
