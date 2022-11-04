@@ -1106,6 +1106,8 @@ DeleteDigiriskRisk = Supprimer les risques
 RiskCreateTrigger = Risque %s créé
 RiskModifyTrigger = Risque %s modifié
 RiskDeleteTrigger = Risque %s supprimé
+RiskImportTrigger = Risque %s importé
+RiskUnlinkTrigger = Risque %s délié
 
 # Mod Numbering - Modèle de numérotation
 DigiriskRiskNumberingModule = Modèle de numérotation des risques de Digirisk
@@ -1273,6 +1275,8 @@ DeleteDigiriskRiskSign = Supprimer les signalisations
 RiskSignCreateTrigger = Signalisation %s créée
 RiskSignModifyTrigger = Signalisation %s modifiée
 RiskSignDeleteTrigger = Signalisation %s supprimée
+RiskSignImportTrigger = Signalisation %s importée
+RiskSignUnlinkTrigger = Signalisation %s déliée
 
 # Mod Numbering - Modèle de numérotation
 DigiriskRiskSignStandardModel = Renvoie le numéro sous la forme RSn où n est un compteur séquentiel sans rupture et sans remise à 0.
