@@ -223,7 +223,9 @@ if (empty($reshook)) {
 				if ($extresponsible_id > 0) {
 					$signatory->setSignatory($object->id, 'firepermit', 'socpeople', array($extresponsible_id), 'FP_EXT_SOCIETY_RESPONSIBLE', 'firepermit');
 				}
-				if (!empty($conf->global->DIGIRISKDOLIBARR_MAIN_AGENDA_ACTIONAUTO_FIREPERMIT_CREATE)) $object->call_trigger('FIREPERMIT_CREATE', $user);
+				if (!empty($conf->global->DIGIRISKDOLIBARR_MAIN_AGENDA_ACTIONAUTO_FIREPERMIT_CREATE)) {
+					$object->call_trigger('FIREPERMIT_CREATE', $user);
+				}
 				// Creation fire permit OK
 				$urltogo = str_replace('__ID__', $result, $backtopage);
 				$urltogo = preg_replace('/--IDFORBACKTOPAGE--/', $id, $urltogo); // New method to autoselect project after a New on another form object creation
