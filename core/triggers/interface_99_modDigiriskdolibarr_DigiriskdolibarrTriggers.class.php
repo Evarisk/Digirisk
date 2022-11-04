@@ -1948,6 +1948,78 @@ class InterfaceDigiriskdolibarrTriggers extends DolibarrTriggers
 				}
 				break;
 
+			case 'RISK_IMPORT' :
+
+				dol_syslog("Trigger '" . $this->name . "' for action '$action' launched by " . __FILE__ . ". id=" . $object->id);
+				require_once DOL_DOCUMENT_ROOT . '/comm/action/class/actioncomm.class.php';
+				require_once __DIR__ . '/../../class/digiriskelement.class.php';
+				$now 			 = dol_now();
+				$actioncomm 	 = new ActionComm($this->db);
+				$digiriskelement = new DigiriskElement($this->db);
+				$project 		 = new Project($this->db);
+				$digiriskelement->fetch($object->fk_element);
+				$project->fetch($object->fk_projet);
+
+				$actioncomm->elementtype = 'digiriskelement@digiriskdolibarr';
+				$actioncomm->code 		 = 'AC_RISK_IMPORT';
+				$actioncomm->type_code   = 'AC_OTH_AUTO';
+				$actioncomm->label 		 = $langs->transnoentities('RiskImportTrigger', $object->ref);
+				$actioncomm->note_private .= $langs->trans('ParentElement') . ' : ' . $digiriskelement->ref . " - " . $digiriskelement->label . '<br>';
+				$actioncomm->note_private .= $langs->trans('Ref') . ' : ' .  $object->ref . '<br>';
+				$actioncomm->note_private .= $langs->trans('Entity') . ' : ' . $conf->entity . '<br>';
+				$actioncomm->note_private .= $langs->trans('TechnicalID') . ' : ' . $object->id . '<br>';
+				$actioncomm->note_private .= $langs->trans('Projet') . ' : ' . $project->ref . " " . $project->title . '<br>';
+				$actioncomm->note_private .= $langs->trans('RiskCategory') . ' : ' . $object->get_danger_category_name($object) . '<br>';
+				$actioncomm->note_private .= $langs->trans('Description') . ' : ' . (!empty($object->description) ? $object->description : 'N/A') . '<br>';
+				$actioncomm->note_private .= $langs->trans('DateCreation') . ' : ' . dol_print_date($now, 'dayhoursec', 'tzuser') . '<br>';
+				$actioncomm->note_private .= $langs->trans('Status') . ' : ' . $object->status . '<br>';
+				$actioncomm->datep		 = $now;
+				$actioncomm->fk_element  = $object->fields['applied_on'];
+				$actioncomm->userownerid = $user->id;
+				$actioncomm->percentage  = -1;
+				$result = $actioncomm->create($user);
+				if ($result < 0) {
+					$object->errors = array_merge($object->error, $actioncomm->errors);
+					return $result;
+				}
+				break;
+
+			case 'RISK_UNLINK' :
+
+				dol_syslog("Trigger '" . $this->name . "' for action '$action' launched by " . __FILE__ . ". id=" . $object->id);
+				require_once DOL_DOCUMENT_ROOT . '/comm/action/class/actioncomm.class.php';
+				require_once __DIR__ . '/../../class/digiriskelement.class.php';
+				$now 			 = dol_now();
+				$actioncomm 	 = new ActionComm($this->db);
+				$digiriskelement = new DigiriskElement($this->db);
+				$project 		 = new Project($this->db);
+				$digiriskelement->fetch($object->fk_element);
+				$project->fetch($object->fk_projet);
+
+				$actioncomm->elementtype = 'digiriskelement@digiriskdolibarr';
+				$actioncomm->code 		 = 'AC_RISK_UNKINK';
+				$actioncomm->type_code   = 'AC_OTH_AUTO';
+				$actioncomm->label 		 = $langs->transnoentities('RiskUnlinkTrigger', $object->ref);
+				$actioncomm->note_private .= $langs->trans('ParentElement') . ' : ' . $digiriskelement->ref . " - " . $digiriskelement->label . '<br>';
+				$actioncomm->note_private .= $langs->trans('Ref') . ' : ' .  $object->ref . '<br>';
+				$actioncomm->note_private .= $langs->trans('Entity') . ' : ' . $conf->entity . '<br>';
+				$actioncomm->note_private .= $langs->trans('TechnicalID') . ' : ' . $object->id . '<br>';
+				$actioncomm->note_private .= $langs->trans('Projet') . ' : ' . $project->ref . " " . $project->title . '<br>';
+				$actioncomm->note_private .= $langs->trans('RiskCategory') . ' : ' . $object->get_danger_category_name($object) . '<br>';
+				$actioncomm->note_private .= $langs->trans('Description') . ' : ' . (!empty($object->description) ? $object->description : 'N/A') . '<br>';
+				$actioncomm->note_private .= $langs->trans('DateCreation') . ' : ' . dol_print_date($now, 'dayhoursec', 'tzuser') . '<br>';
+				$actioncomm->note_private .= $langs->trans('Status') . ' : ' . $object->status . '<br>';
+				$actioncomm->datep		 = $now;
+				$actioncomm->fk_element  = $object->fields['applied_on'];
+				$actioncomm->userownerid = $user->id;
+				$actioncomm->percentage  = -1;
+				$result = $actioncomm->create($user);
+				if ($result < 0) {
+					$object->errors = array_merge($object->error, $actioncomm->errors);
+					return $result;
+				}
+				break;
+
 			case 'TASK_CREATE' :
 
 				if (!empty($object->array_options['options_fk_risk'])) {
@@ -2456,6 +2528,72 @@ class InterfaceDigiriskdolibarrTriggers extends DolibarrTriggers
 				$actioncomm->userownerid = $user->id;
 				$actioncomm->percentage  = -1;
 
+				$result = $actioncomm->create($user);
+				if ($result < 0) {
+					$object->errors = array_merge($object->error, $actioncomm->errors);
+					return $result;
+				}
+				break;
+
+			case 'RISKSIGN_IMPORT' :
+
+				dol_syslog("Trigger '" . $this->name . "' for action '$action' launched by " . __FILE__ . ". id=" . $object->id);
+				require_once DOL_DOCUMENT_ROOT . '/comm/action/class/actioncomm.class.php';
+				require_once __DIR__ . '/../../class/digiriskelement.class.php';
+				$now 			 = dol_now();
+				$actioncomm 	 = new ActionComm($this->db);
+				$digiriskelement = new DigiriskElement($this->db);
+				$digiriskelement->fetch($object->fk_element);
+
+				$actioncomm->elementtype = 'digiriskelement@digiriskdolibarr';
+				$actioncomm->code 		 = 'AC_RISKSIGN_IMPORT';
+				$actioncomm->type_code   = 'AC_OTH_AUTO';
+				$actioncomm->label 		 = $langs->transnoentities('RiskSignImportTrigger', $object->ref);
+				$actioncomm->note_private .= $langs->trans('ParentElement') . ' : ' . $digiriskelement->ref . " - " . $digiriskelement->label . '<br>';
+				$actioncomm->note_private .= $langs->trans('Ref') . ' : ' . $object->ref . '<br>';
+				$actioncomm->note_private .= $langs->trans('Entity') . ' : ' . $conf->entity . '<br>';
+				$actioncomm->note_private .= $langs->trans('TechnicalID') . ' : ' . $object->id . '<br>';
+				$actioncomm->note_private .= $langs->trans('RiskCategory') . ' : ' . $object->get_risksign_category_name($object) . '<br>';
+				$actioncomm->note_private .= $langs->trans('Description') . ' : ' . (!empty($object->description) ? $object->description : 'N/A') . '<br>';
+				$actioncomm->note_private .= $langs->trans('DateCreation') . ' : ' . dol_print_date($now, 'dayhoursec', 'tzuser') . '<br>';
+				$actioncomm->note_private .= $langs->trans('Status') . ' : ' . $object->status . '<br>';
+				$actioncomm->datep		 = $now;
+				$actioncomm->fk_element  = $object->fields['applied_on'];
+				$actioncomm->userownerid = $user->id;
+				$actioncomm->percentage  = -1;
+				$result = $actioncomm->create($user);
+				if ($result < 0) {
+					$object->errors = array_merge($object->error, $actioncomm->errors);
+					return $result;
+				}
+				break;
+
+			case 'RISKSIGN_UNLINK' :
+
+				dol_syslog("Trigger '" . $this->name . "' for action '$action' launched by " . __FILE__ . ". id=" . $object->id);
+				require_once DOL_DOCUMENT_ROOT . '/comm/action/class/actioncomm.class.php';
+				require_once __DIR__ . '/../../class/digiriskelement.class.php';
+				$now 			 = dol_now();
+				$actioncomm 	 = new ActionComm($this->db);
+				$digiriskelement = new DigiriskElement($this->db);
+				$digiriskelement->fetch($object->fk_element);
+
+				$actioncomm->elementtype = 'digiriskelement@digiriskdolibarr';
+				$actioncomm->code 		 = 'AC_RISKSIGN_UNKINK';
+				$actioncomm->type_code   = 'AC_OTH_AUTO';
+				$actioncomm->label 		 = $langs->transnoentities('RiskSignUnlinkTrigger', $object->ref);
+				$actioncomm->note_private .= $langs->trans('ParentElement') . ' : ' . $digiriskelement->ref . " - " . $digiriskelement->label . '<br>';
+				$actioncomm->note_private .= $langs->trans('Ref') . ' : ' . $object->ref . '<br>';
+				$actioncomm->note_private .= $langs->trans('Entity') . ' : ' . $conf->entity . '<br>';
+				$actioncomm->note_private .= $langs->trans('TechnicalID') . ' : ' . $object->id . '<br>';
+				$actioncomm->note_private .= $langs->trans('RiskCategory') . ' : ' . $object->get_risksign_category_name($object) . '<br>';
+				$actioncomm->note_private .= $langs->trans('Description') . ' : ' . (!empty($object->description) ? $object->description : 'N/A') . '<br>';
+				$actioncomm->note_private .= $langs->trans('DateCreation') . ' : ' . dol_print_date($now, 'dayhoursec', 'tzuser') . '<br>';
+				$actioncomm->note_private .= $langs->trans('Status') . ' : ' . $object->status . '<br>';
+				$actioncomm->datep		 = $now;
+				$actioncomm->fk_element  = $object->fields['applied_on'];
+				$actioncomm->userownerid = $user->id;
+				$actioncomm->percentage  = -1;
 				$result = $actioncomm->create($user);
 				if ($result < 0) {
 					$object->errors = array_merge($object->error, $actioncomm->errors);
