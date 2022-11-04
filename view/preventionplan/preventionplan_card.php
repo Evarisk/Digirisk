@@ -345,6 +345,22 @@ if (empty($reshook)) {
 		}
 	}
 
+	// Action to delete record
+	if ($action == 'confirm_delete' &&  $permissiontodelete  && GETPOST("confirm") == "yes") {
+		$object->status = 0;
+		$result         = $object->delete($user);
+
+		if ($result < 0) {
+			// Delete accident KO
+			if (!empty($accident->errors)) setEventMessages(null, $accident->errors, 'errors');
+			else setEventMessages($accident->error, null, 'errors');
+		}
+		// Delete accident OK
+		$urltogo = str_replace('preventionplan_card.php', 'preventionplan_list.php', $_SERVER["PHP_SELF"]);
+		header("Location: " . $urltogo);
+		exit;
+	}
+
 	// Action to add line
 	if ($action == 'addLine' && $permissiontoadd) {
 		// Get parameters
@@ -981,6 +997,11 @@ if (($action == 'clone' && (empty($conf->use_javascript_ajax) || ! empty($conf->
 	$formconfirm .= $form->formconfirm($_SERVER["PHP_SELF"] . '?id=' . $object->id, $langs->trans('ToClone'), $langs->trans('ConfirmClonePreventionPlan', $object->ref), 'confirm_clone', $formquestionclone, 'yes', 'actionButtonClone', 350, 600);
 }
 
+// Delete confirmation
+if ($action == 'delete' && $permissiontodelete) {
+	$formconfirm .= $form->formconfirm($_SERVER["PHP_SELF"]."?id=".$object->id, $langs->trans("DeletePreventionPlan"), $langs->trans('ConfirmDeletePreventionPlan'), "confirm_delete", '', '', 1);
+}
+
 // Call Hook formConfirm
 $parameters                        = array('formConfirm' => $formconfirm, 'object' => $object);
 $reshook                           = $hookmanager->executeHooks('formConfirm', $parameters, $object, $action); // Note that $action and $object may have been modified by hook
@@ -1170,6 +1191,7 @@ if ((empty($action) || ($action != 'create' && $action != 'edit'))) {
 
 			print '<a class="' . ($object->status == 3 ? 'butAction' : 'butActionRefused classfortooltip') . '" id="actionButtonClose" title="' . ($object->status == 3 ? '' : dol_escape_htmltag($langs->trans("PreventionPlanMustBeLocked"))) . '" href="' . ($object->status == 3 ? ($_SERVER["PHP_SELF"] . '?id=' . $object->id . '&action=setArchived') : '#') . '">' . $langs->trans("Close") . '</a>';
 			print '<span class="butAction" id="actionButtonClone" title="" href="' . $_SERVER["PHP_SELF"] . '?id=' . $object->id . '&action=clone' . '">' . $langs->trans("ToClone") . '</span>';
+			print '<a class="' . ($permissiontodelete ? 'butActionDelete' : 'butActionRefused classfortooltip') . '" id="actionButtonDelete" title="' . ($permissiontodelete ? '' : dol_escape_htmltag($langs->trans("PermissionDenied"))) . '" href="' . ($permissiontodelete ? ($_SERVER["PHP_SELF"] . '?id=' . $object->id . '&action=delete') : '#') . '">' . $langs->trans("Delete") . '</a>';
 
 			$langs->load("mails");
 			if ($object->date_end == dol_now()) {
