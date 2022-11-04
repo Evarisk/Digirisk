@@ -1937,13 +1937,15 @@ class InterfaceDigiriskdolibarrTriggers extends DolibarrTriggers
 				$actioncomm 	 = new ActionComm($this->db);
 				$digiriskelement = new DigiriskElement($this->db);
 				$project 		 = new Project($this->db);
-				$digiriskelement->fetch($object->fk_element);
 				$project->fetch($object->fk_projet);
 
 				$actioncomm->elementtype = 'digiriskelement@digiriskdolibarr';
 				$actioncomm->code 		 = 'AC_RISK_IMPORT';
 				$actioncomm->type_code   = 'AC_OTH_AUTO';
 				$actioncomm->label 		 = $langs->transnoentities('RiskImportTrigger', $object->ref);
+				$digiriskelement->fetch($object->applied_on);
+				$actioncomm->note_private .= $langs->trans('RiskSharedWithEntityRefLabel', $object->ref) . ' S' . $conf->entity . ' ' . $digiriskelement->ref . " - " . $digiriskelement->label . '<br>';
+				$digiriskelement->fetch($object->fk_element);
 				$actioncomm->note_private .= $langs->trans('ParentElement') . ' : ' . $digiriskelement->ref . " - " . $digiriskelement->label . '<br>';
 				$actioncomm->note_private .= $langs->trans('Ref') . ' : ' .  $object->ref . '<br>';
 				$actioncomm->note_private .= $langs->trans('Entity') . ' : ' . $object->entity . '<br>';
@@ -1973,13 +1975,15 @@ class InterfaceDigiriskdolibarrTriggers extends DolibarrTriggers
 				$actioncomm 	 = new ActionComm($this->db);
 				$digiriskelement = new DigiriskElement($this->db);
 				$project 		 = new Project($this->db);
-				$digiriskelement->fetch($object->fk_element);
 				$project->fetch($object->fk_projet);
 
 				$actioncomm->elementtype = 'digiriskelement@digiriskdolibarr';
 				$actioncomm->code 		 = 'AC_RISK_UNKINK';
 				$actioncomm->type_code   = 'AC_OTH_AUTO';
 				$actioncomm->label 		 = $langs->transnoentities('RiskUnlinkTrigger', $object->ref);
+				$digiriskelement->fetch($object->applied_on);
+				$actioncomm->note_private .= $langs->trans('RiskUnlinkedFromEntityRefLabel', $object->ref) . ' S' . $conf->entity . ' ' . $digiriskelement->ref . " - " . $digiriskelement->label . '<br>';
+				$digiriskelement->fetch($object->fk_element);
 				$actioncomm->note_private .= $langs->trans('ParentElement') . ' : ' . $digiriskelement->ref . " - " . $digiriskelement->label . '<br>';
 				$actioncomm->note_private .= $langs->trans('Ref') . ' : ' .  $object->ref . '<br>';
 				$actioncomm->note_private .= $langs->trans('Entity') . ' : ' . $object->entity . '<br>';
@@ -2523,12 +2527,14 @@ class InterfaceDigiriskdolibarrTriggers extends DolibarrTriggers
 				$now 			 = dol_now();
 				$actioncomm 	 = new ActionComm($this->db);
 				$digiriskelement = new DigiriskElement($this->db);
-				$digiriskelement->fetch($object->fk_element);
 
 				$actioncomm->elementtype = 'digiriskelement@digiriskdolibarr';
 				$actioncomm->code 		 = 'AC_RISKSIGN_IMPORT';
 				$actioncomm->type_code   = 'AC_OTH_AUTO';
 				$actioncomm->label 		 = $langs->transnoentities('RiskSignImportTrigger', $object->ref);
+				$digiriskelement->fetch($object->applied_on);
+				$actioncomm->note_private .= $langs->trans('RiskSignSharedWithEntityRefLabel', $object->ref) . ' S' . $conf->entity . ' ' . $digiriskelement->ref . " - " . $digiriskelement->label . '<br>';
+				$digiriskelement->fetch($object->fk_element);
 				$actioncomm->note_private .= $langs->trans('ParentElement') . ' : ' . $digiriskelement->ref . " - " . $digiriskelement->label . '<br>';
 				$actioncomm->note_private .= $langs->trans('Ref') . ' : ' . $object->ref . '<br>';
 				$actioncomm->note_private .= $langs->trans('Entity') . ' : ' . $object->entity . '<br>';
@@ -2556,12 +2562,14 @@ class InterfaceDigiriskdolibarrTriggers extends DolibarrTriggers
 				$now 			 = dol_now();
 				$actioncomm 	 = new ActionComm($this->db);
 				$digiriskelement = new DigiriskElement($this->db);
-				$digiriskelement->fetch($object->fk_element);
 
 				$actioncomm->elementtype = 'digiriskelement@digiriskdolibarr';
 				$actioncomm->code 		 = 'AC_RISKSIGN_UNKINK';
 				$actioncomm->type_code   = 'AC_OTH_AUTO';
 				$actioncomm->label 		 = $langs->transnoentities('RiskSignUnlinkTrigger', $object->ref);
+				$digiriskelement->fetch($object->applied_on);
+				$actioncomm->note_private .= $langs->trans('RiskSignUnlinkedFromEntityRefLabel', $object->ref) . ' S' . $conf->entity . ' ' . $digiriskelement->ref . " - " . $digiriskelement->label . '<br>';
+				$digiriskelement->fetch($object->fk_element);
 				$actioncomm->note_private .= $langs->trans('ParentElement') . ' : ' . $digiriskelement->ref . " - " . $digiriskelement->label . '<br>';
 				$actioncomm->note_private .= $langs->trans('Ref') . ' : ' . $object->ref . '<br>';
 				$actioncomm->note_private .= $langs->trans('Entity') . ' : ' . $object->entity . '<br>';

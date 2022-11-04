@@ -1184,6 +1184,8 @@ ConfirmImportSharedRisks = Veuillez choisir les risques partagés à importer
 RisksRepartition = Répartition des risques par cotation
 ShowRiskOrigin = Afficher la provenance du risque
 ShowRiskOriginDescription = Afficher la provenance des risques dans les documents (Fiche UT, Fiche GP, Document Unique, Listings de risques, etc.)
+RiskSharedWithEntityRefLabel = Partage du risque %s avec
+RiskUnlinkedFromEntityRefLabel = Dissociation du risque %s avec
 
 # Stats - Statistiques
 GreyRisk = Risque faible
@@ -1323,7 +1325,8 @@ ShowInheritedRiskSignsDescription = Afficher les signalisations héritées dans 
 DigiriskElementInheritedRiskSignsList Liste des signalisations héritées
 ConfirmImportSharedRiskSigns = Veuillez choisir les signalisations partagées à importer
 DigiriskRiskSignData = Données configurables des signalisations
-
+RiskSignSharedWithEntityRefLabel = Partage de la signalisation %s avec
+RiskSignUnlinkedFromEntityRefLabel = Dissociation de la signalisation %s avec
 
 
 #
