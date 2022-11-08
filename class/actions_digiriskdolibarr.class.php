@@ -354,8 +354,12 @@ class ActionsDigiriskdolibarr
 				}
 			}
 		} else if ($parameters['currentcontext'] == 'publicnewticketcard') {
-
-			if (GETPOST('entity') > 0) {
+			if (!$conf->multicompany->enabled) {
+				$entity = $conf->entity;
+			} else {
+				$entity = GETPOST('entity');
+			}
+			if ($entity > 0) {
 				require_once __DIR__ . '/../lib/digiriskdolibarr_function.lib.php';
 				require_once __DIR__ . '/digiriskelement.class.php';
 
