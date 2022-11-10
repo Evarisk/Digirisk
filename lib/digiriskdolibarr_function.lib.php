@@ -2964,42 +2964,42 @@ function extrafield_soft_delete($attrname, $elementtype = 'member', $extrafields
 }
 
 // phpcs:disable PEAR.NamingConventions.ValidFunctionName.ScopeNotCamelCaps
-	/**
-	 *	Delete description of an optional attribute
-	 *
-	 *	@param	string	$attrname			Code of attribute to delete
-	 *  @param  string	$elementtype        Element type ('member', 'product', 'thirdparty', ...)
-	 *  @return int              			< 0 if KO, 0 if nothing is done, 1 if OK
-	 */
-	function extrafields_delete_label($attrname, $elementtype = 'member', $extrafields)
-	{
-		global $conf;
+/**
+ *	Delete description of an optional attribute
+ *
+ *	@param	string	$attrname			Code of attribute to delete
+ *  @param  string	$elementtype        Element type ('member', 'product', 'thirdparty', ...)
+ *  @return int              			< 0 if KO, 0 if nothing is done, 1 if OK
+ */
+function extrafields_delete_label($attrname, $elementtype = 'member', $extrafields)
+{
+	global $conf;
 
-		if ($elementtype == 'thirdparty') {
-			$elementtype = 'societe';
-		}
-		if ($elementtype == 'contact') {
-			$elementtype = 'socpeople';
-		}
-
-		if (isset($attrname) && $attrname != '' && preg_match("/^\w[a-zA-Z0-9-_]*$/", $attrname)) {
-			$sql = "DELETE FROM ".MAIN_DB_PREFIX."extrafields";
-			$sql .= " WHERE name = '".$extrafields->db->escape($attrname)."'";
-			$sql .= " AND entity IN  (0,".$conf->entity.')';
-			$sql .= " AND elementtype = '".$extrafields->db->escape($elementtype)."'";
-
-			dol_syslog(get_class($extrafields)."::delete_label", LOG_DEBUG);
-			$resql = $extrafields->db->query($sql);
-			if ($resql) {
-				return 1;
-			} else {
-				dol_print_error($extrafields->db);
-				return -1;
-			}
-		} else {
-			return 0;
-		}
+	if ($elementtype == 'thirdparty') {
+		$elementtype = 'societe';
 	}
+	if ($elementtype == 'contact') {
+		$elementtype = 'socpeople';
+	}
+
+	if (isset($attrname) && $attrname != '' && preg_match("/^\w[a-zA-Z0-9-_]*$/", $attrname)) {
+		$sql = "DELETE FROM ".MAIN_DB_PREFIX."extrafields";
+		$sql .= " WHERE name = '".$extrafields->db->escape($attrname)."'";
+		$sql .= " AND entity IN  (0,".$conf->entity.')';
+		$sql .= " AND elementtype = '".$extrafields->db->escape($elementtype)."'";
+
+		dol_syslog(get_class($extrafields)."::delete_label", LOG_DEBUG);
+		$resql = $extrafields->db->query($sql);
+		if ($resql) {
+			return 1;
+		} else {
+			dol_print_error($extrafields->db);
+			return -1;
+		}
+	} else {
+		return 0;
+	}
+}
 
 /**
  * Return list of fetched instance of elements having this category

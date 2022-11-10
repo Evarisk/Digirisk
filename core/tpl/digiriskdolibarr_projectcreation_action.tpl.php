@@ -630,6 +630,7 @@ if ($conf->global->DIGIRISKDOLIBARR_DIGIRISKELEMENT_TRASH_UPDATED == 0) {
 	dol_copy($dirforimage . '/thumbs/trash-alt-solid_small.png', $src_file . '/thumbs/trash-alt-solid_small.png', 0, 0);
 
 	$digiriskelement->photo = $original_file;
+	$digiriskelement->status = 0;
 	$result                 = $digiriskelement->update($user);
 
 	if ($result > 0) {
