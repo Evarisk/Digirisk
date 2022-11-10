@@ -713,7 +713,7 @@ if ($action == 'confirm_import_shared_risks' && $confirm == 'yes') {
 				$object->element = 'digiriskdolibarr_' . $digiriskelementtmp->element;
 				$result = $object->add_object_linked('digiriskdolibarr_' . $risk->element, $risks->id);
 				if ($result > 0) {
-					continue;
+					setEventMessages($langs->trans('SharedRiskImportWithSuccess'), array());
 				} else {
 					setEventMessages($object->error, $object->errors, 'errors');
 					$action = '';
