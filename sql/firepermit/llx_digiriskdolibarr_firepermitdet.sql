@@ -22,7 +22,7 @@ CREATE TABLE llx_digiriskdolibarr_firepermitdet(
 	tms               timestamp,
 	description       text,
 	category          varchar(255),
-	use_equipment     text,
+	used_equipment    text,
 	fk_firepermit     integer NOT NULL,
 	fk_element        integer NOT NULL
 ) ENGINE=innodb;

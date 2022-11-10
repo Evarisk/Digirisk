@@ -172,7 +172,7 @@ if (!empty($triggers)) {
 		if ($search_event === '' || preg_match('/' . preg_quote($search_event, '/') . '/i', $trigger['code'])) {
 			print '<tr class="oddeven">';
 			print '<td>' . $trigger['code'] . '</td>';
-			print '<td>' . $trigger['label'] . '</td>';
+			print '<td>' . $langs->trans($trigger['label']) . '</td>';
 			print '<td class="right">';
 			$key = 'DIGIRISKDOLIBARR_MAIN_AGENDA_ACTIONAUTO_' . $trigger['code'];
 			$value = $conf->global->$key;

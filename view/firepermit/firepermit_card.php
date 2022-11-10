@@ -210,7 +210,7 @@ if (empty($reshook)) {
 		}
 
 		if ( ! $error) {
-			$result = $object->create($user, false);
+			$result = $object->create($user, true);
 			if ($result > 0) {
 				$digiriskresources->digirisk_dolibarr_set_resources($db, $user->id, 'FP_EXT_SOCIETY', 'societe', array($extsociety_id), $conf->entity, 'firepermit', $object->id, 1);
 				$digiriskresources->digirisk_dolibarr_set_resources($db, $user->id, 'FP_LABOUR_INSPECTOR', 'societe', array($labour_inspector_id), $conf->entity, 'firepermit', $object->id, 1);
@@ -223,7 +223,9 @@ if (empty($reshook)) {
 				if ($extresponsible_id > 0) {
 					$signatory->setSignatory($object->id, 'firepermit', 'socpeople', array($extresponsible_id), 'FP_EXT_SOCIETY_RESPONSIBLE', 'firepermit');
 				}
-
+				if (!empty($conf->global->DIGIRISKDOLIBARR_MAIN_AGENDA_ACTIONAUTO_FIREPERMIT_CREATE)) {
+					$object->call_trigger('FIREPERMIT_CREATE', $user);
+				}
 				// Creation fire permit OK
 				$urltogo = str_replace('__ID__', $result, $backtopage);
 				$urltogo = preg_replace('/--IDFORBACKTOPAGE--/', $id, $urltogo); // New method to autoselect project after a New on another form object creation
@@ -335,11 +337,27 @@ if (empty($reshook)) {
 		}
 	}
 
+	// Action to delete record
+	if ($action == 'confirm_delete' && $permissiontodelete) {
+		$object->status = 0;
+		$result         = $object->delete($user);
+
+		if ($result < 0) {
+			// Delete accident KO
+			if (!empty($accident->errors)) setEventMessages(null, $accident->errors, 'errors');
+			else setEventMessages($accident->error, null, 'errors');
+		}
+		// Delete accident OK
+		$urltogo = str_replace('firepermit_card.php', 'firepermit_list.php', $_SERVER["PHP_SELF"]);
+		header("Location: " . $urltogo);
+		exit;
+	}
+
 	// Action to add line
 	if ($action == 'addLine' && $permissiontoadd) {
 		// Get parameters
 		$actions_description = GETPOST('actionsdescription');
-		$use_equipment       = GETPOST('use_equipment');
+		$used_equipment       = GETPOST('used_equipment');
 		$location            = GETPOST('fk_element');
 		$risk_category_id    = GETPOST('risk_category_id');
 		$parent_id           = GETPOST('parent_id');
@@ -350,7 +368,7 @@ if (empty($reshook)) {
 		$objectline->entity        = $conf->entity;
 		$objectline->description   = $actions_description;
 		$objectline->category      = $risk_category_id;
-		$objectline->use_equipment = $use_equipment;
+		$objectline->used_equipment = $used_equipment;
 		$objectline->fk_firepermit = $parent_id;
 		$objectline->fk_element    = $location;
 
@@ -387,7 +405,7 @@ if (empty($reshook)) {
 	if ($action == 'updateLine' && $permissiontoadd) {
 		// Get parameters
 		$actions_description = GETPOST('actionsdescription');
-		$use_equipment       = GETPOST('use_equipment');
+		$used_equipment       = GETPOST('used_equipment');
 		$location            = GETPOST('fk_element');
 		$risk_category_id    = GETPOST('risk_category_id');
 		$parent_id           = GETPOST('parent_id');
@@ -397,7 +415,7 @@ if (empty($reshook)) {
 		// Initialize object fire permit line
 		$objectline->description   = $actions_description;
 		$objectline->category      = $risk_category_id;
-		$objectline->use_equipment = $use_equipment;
+		$objectline->used_equipment = $used_equipment;
 		$objectline->fk_firepermit = $parent_id;
 		$objectline->fk_element    = $location;
 
@@ -936,10 +954,10 @@ if (($action == 'clone' && (empty($conf->use_javascript_ajax) || ! empty($conf->
 	$formconfirm .= $form->formconfirm($_SERVER["PHP_SELF"] . '?id=' . $object->id, $langs->trans('ToClone'), $langs->trans('ConfirmCloneFirePermit', $object->ref), 'confirm_clone', $formquestionclone, 'yes', 'actionButtonClone', 350, 600);
 }
 
-//	// Confirmation to delete
-//	if ($action == 'delete') {
-//		$formconfirm = $form->formconfirm($_SERVER["PHP_SELF"].'?id='.$object->id, $langs->trans('DeleteFirePermit'), $langs->trans('ConfirmDeleteObject'), 'confirm_delete', '', 0, 1);
-//	}
+// Confirmation to delete
+if ($action == 'delete' && $permissiontodelete) {
+	$formconfirm = $form->formconfirm($_SERVER["PHP_SELF"].'?id='.$object->id, $langs->trans('DeleteFirePermit'), $langs->trans('ConfirmDeleteFirePermit'), 'confirm_delete', '', 0, 1);
+}
 
 // Call Hook formConfirm
 $parameters                        = array('formConfirm' => $formconfirm, 'object' => $object);
@@ -963,7 +981,7 @@ if ((empty($action) || ($action != 'create' && $action != 'edit'))) {
 	$morehtmlref                             .= '<div class="refidno">';
 	// External Society -- Société extérieure
 	$ext_society  = $digiriskresources->fetchResourcesFromObject('FP_EXT_SOCIETY', $object);
-	$morehtmlref .= $langs->trans('ExtSociety') . ' : ' . $ext_society->getNomUrl(1);
+	$morehtmlref .= $langs->trans('ExtSociety') . ' : ' . ($ext_society ? $ext_society->getNomUrl(1) : '');
 	// Project
 	$project->fetch($object->fk_project);
 	$morehtmlref .= '<br>' . $langs->trans('Project') . ' : ' . getNomUrlProject($project, 1, 'blank');
@@ -1105,6 +1123,7 @@ if ((empty($action) || ($action != 'create' && $action != 'edit'))) {
 
 			print '<a class="' . ($object->status == 3 ? 'butAction' : 'butActionRefused classfortooltip') . '" id="actionButtonClose" title="' . ($object->status == 3 ? '' : dol_escape_htmltag($langs->trans("FirePermitMustBeLocked"))) . '" href="' . ($object->status == 3 ? ($_SERVER["PHP_SELF"] . '?id=' . $object->id . '&action=setArchived') : '#') . '">' . $langs->trans("Close") . '</a>';
 			print '<span class="butAction" id="actionButtonClone" title="" href="' . $_SERVER["PHP_SELF"] . '?id=' . $object->id . '&action=clone' . '">' . $langs->trans("ToClone") . '</span>';
+			print '<a class="' . ($permissiontodelete ? 'butActionDelete' : 'butActionRefused classfortooltip') . '" id="actionButtonDelete" title="' . ($permissiontodelete ? '' : dol_escape_htmltag($langs->trans("PermissionDenied"))) . '" href="' . ($permissiontodelete ? ($_SERVER["PHP_SELF"] . '?id=' . $object->id . '&action=delete') : '#') . '">' . $langs->trans("Delete") . '</a>';
 
 			$langs->load("mails");
 			if ($object->date_end == dol_now()) {
@@ -1296,7 +1315,7 @@ if ((empty($action) || ($action != 'create' && $action != 'edit'))) {
 
 					$coldisplay++;
 					print '<td>';
-					print '<textarea name="use_equipment" class="minwidth150" cols="50" rows="' . ROWS_2 . '">' . $item->use_equipment . '</textarea>' . "\n";
+					print '<textarea name="used_equipment" class="minwidth150" cols="50" rows="' . ROWS_2 . '">' . $item->used_equipment . '</textarea>' . "\n";
 					print '</td>';
 
 					$coldisplay += $colspan;
@@ -1340,7 +1359,7 @@ if ((empty($action) || ($action != 'create' && $action != 'edit'))) {
 
 					$coldisplay++;
 					print '<td>';
-					print $item->use_equipment;
+					print $item->used_equipment;
 					print '</td>';
 
 					$coldisplay += $colspan;
@@ -1419,7 +1438,7 @@ if ((empty($action) || ($action != 'create' && $action != 'edit'))) {
 
 			$coldisplay++;
 			print '<td>';
-			print '<textarea name="use_equipment" class="minwidth150" cols="50" rows="' . ROWS_2 . '">' . ('') . '</textarea>' . "\n";
+			print '<textarea name="used_equipment" class="minwidth150" cols="50" rows="' . ROWS_2 . '">' . ('') . '</textarea>' . "\n";
 			print '</td>';
 
 			$coldisplay += $colspan;

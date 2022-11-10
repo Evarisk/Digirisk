@@ -151,7 +151,7 @@ class Openinghours extends CommonObject
 		dol_syslog("admin.lib::create", LOG_DEBUG);
 		$this->db->query($sql);
 
-		return $this->createCommon($user, empty($conf->global->DIGIRISKDOLIBARR_MAIN_AGENDA_ACTIONAUTO_OPENINGHOURS_CREATE));
+		return $this->createCommon($user, $notrigger || !$conf->global->DIGIRISKDOLIBARR_MAIN_AGENDA_ACTIONAUTO_OPENINGHOURS_CREATE);
 	}
 
 	/**

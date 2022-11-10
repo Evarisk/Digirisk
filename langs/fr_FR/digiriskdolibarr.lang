@@ -141,6 +141,7 @@ ShowPatchNote = Consulter la note de mise à jour
 
 # Data - Donnée
 OpeningHours = Horaires
+OpeningHoursCreated = Création d'heure d'ouverture
 ThirdPartyOpeningHours = Horaires du tiers
 
 ExceptionsToWorkingHours = Dérogations aux horaires de travail
@@ -190,6 +191,7 @@ LegalDisplayDigiriskTemplate = ODT par défaut des affichages légaux
 
 # Data - Donnée
 LegalDisplay = Affichage légal
+LegalDisplayDocumentGenerated = Génération d'Affichage Légal
 HowToSetDataLegalDisplay = Pour configurer les données sur l'affichage légal, aller dans Accueil - Configuration - Société/Organisation - Sécurité
 
 LabourDoctor = Médecin du travail
@@ -246,8 +248,10 @@ InformationsSharingDigiriskTemplate = ODT par défaut des diffusions d'informati
 
 # Data - Donnée
 InformationsSharing = Diffusion d'informations
+InformationsSharingDocumentGenerated = Génération de Diffusion d'Informations
 HowToSetDataInformationsSharing = Pour configurer les données sur la diffusion d'informations, aller dans Accueil - Configuration - Société/Organisation - Social
 ConfigureSecurityAndSocialData = Configurer les données de la société
+LastMainDoc = Dernier document généré
 
 ParticipationAgreement = Accords de participation
 ParticipationAgreementValue = Oui pour tous les collaborateurs ayant un contrat de travail à durée indéterminée ou déterminée en cours avec l'entreprise, quelle qu'en soit la nature, pourront bénéficier de la participation.<br />Toutefois, une condition d'ancienneté est  requise : 6 mois dans l'entreprise.<br />Pour la détermination de l'ancienneté requise, sont prises en compte tous les contrats de travail exécutés au cours de la période de calcul et des 12 mois qui la précédent.<br />L'ancienneté s'apprécie à la date de clôture de l'exercice concerné ou à la date de départ en cas de rupture de contrat en cours d'exercice.
@@ -320,9 +324,23 @@ PreventionPlanDocumentGeneratedWithDolibarr = Plan de prévention généré avec
 # Data - Donnée
 
 PreventionPlan = Plan de prévention
+PreventionPlanDocumentGenerated = Génération de Plan de Prévention
+PreventionPlanCreated = Création de Plan de Prévention
+PreventionPlanModified = Modification de Plan de Prévention
+PreventionPlanDeleted = Suppression de Plan de Prévention
+PreventionPlanInProgress = Réouverture du Plan de Prévention
+PreventionPlanPendingSignature = Mise en attente de signature du Plan de Prévention
+PreventionPlanLocked = Verrouillage du Plan de Prévention
+PreventionPlanArchived = Archivage du Plan de Prévention
+PreventionPlanSignatureAddAttendant = Ajout de participant au Plan de Prévention
+PreventionPlanSignatureDeleteAttendant = Suppression de participant au Plan de Prévention
+PreventionPlanSentByMail = Envoi par mail du Plan de Prévention
 PreventionPlanInitial = PPR
 PreventionPlanList = Liste des plans de prévention
 PreventionPlanLine = risque(s)
+PreventionPlanLineCreated = Création de risque dans Plan de Prévention
+PreventionPlanLineModified = Modification de risque dans Plan de Prévention
+PreventionPlanLineDeleted = Suppression de risque dans Plan de Prévention
 PriorVisit = Inspection commune préalable
 PriorVisitYesNo = Visite préliminaire effectuée
 PriorVisitText = Note de l'inspection
@@ -408,9 +426,15 @@ Archived = Archivé
 preventionplandocument.odt = Plan de prévention
 preventionplandocument_custom.odt = Plan de prévention personnalisé
 PreventionPlanGenerated = Le plan de prévention est déjà généré
+PP_EXT_SOCIETY = Société extérieure
 PP_EXT_SOCIETY_INTERVENANTS = Intervenant
 PP_EXT_SOCIETY_RESPONSIBLE = Responsable de la société extérieure
 PP_MAITRE_OEUVRE = Maître d'oeuvre
+PP_LABOUR_INSPECTOR = Société inspecteur du travail
+PP_LABOUR_INSPECTOR_ASSIGNED = Inspecteur du travail
+ErrorThirdPartyHasAtLeastOneChildOfTypePreventionPlan = Le tiers est lié à au moins un enfant de type Plan de Prévention :
+ErrorContactHasAtLeastOneChildOfTypePreventionPlan = Le contact est lié à au moins un enfant de type Plan de Prévention :
+ConfirmDeletePreventionPlan = Êtes-vous sûr de vouloir supprimer ce plan de prévention ?
 
 # Email - Mail
 PreventionPlanLabel = Récapitulatif du plan de prévention
@@ -470,7 +494,21 @@ NewFirePermit Nouveau permis de feu
 ModifyFirePermit = Modifier le permis de feu
 FirePermitList = Liste des permis de feu
 FirePermit = Permis de feu
+FirePermitDocumentGenerated = Génération de Permis de Feu
+FirePermitCreated = Création de Permis de Feu
+FirePermitModified = Modification de Permis de Feu
+FirePermitDeleted = Suppression de Permis de Feu
+FirePermitInProgress = Réouverture du Permis de Feu
+FirePermitPendingSignature = Mise en attente de signature du Permis de Feu
+FirePermitLocked = Verrouillage du Permis de Feu
+FirePermitArchived = Archivage du Permis de Feu
+FirePermitSignatureAddAttendant = Ajout de participant au Permis de Feu
+FirePermitSignatureDeleteAttendant = Suppression de participant au Permis de Feu
+FirePermitSentByMail = Envoi par mail du Permis de Feu
 FirePermitLine = risque(s)
+FirePermitLineCreated = Création de risque dans Permis de Feu
+FirePermitLineModified = Modification de risque dans Permis de Feu
+FirePermitLineDeleted = Suppression de risque dans Permis de Feu
 FirePermitSchedule = Horaires du permis de feu
 FirePermitRiskList = Liste des risques du permis de feu
 AddFirePermitLine = Ajout du risque
@@ -507,9 +545,16 @@ FirePermitLinked = Permis de feu lié
 firepermitdocument.odt = Permis de feu
 firepermitdocument_custom.odt = Permis de feu personnalisé
 FirePermitGenerated = Le permis de feu est déjà généré
+FP_EXT_SOCIETY = Société extérieure
 FP_EXT_SOCIETY_INTERVENANTS = Intervenant
 FP_EXT_SOCIETY_RESPONSIBLE = Responsable de la société extérieure
 FP_MAITRE_OEUVRE = Maître d'oeuvre
+FP_LABOUR_INSPECTOR = Société inspecteur du travail
+FP_LABOUR_INSPECTOR_ASSIGNED = Inspecteur du travail
+UsedEquipment = Matériel utilisé
+ErrorThirdPartyHasAtLeastOneChildOfTypeFirePermit = Le tiers est lié à au moins un enfant de type Permis de Feu :
+ErrorContactHasAtLeastOneChildOfTypeFirePermit = Le contact est lié à au moins un enfant de type Permis de Feu :
+ConfirmDeleteFirePermit = Êtes-vous sûr de vouloir supprimer ce permis de feu ?
 
 # Email - Mail
 FirePermitLabel = Récapitulatif du permis de feu
@@ -564,13 +609,22 @@ NewAccident = Nouvel accident
 ModifyAccident = Modifier l'accident
 AccidentList = Liste des accidents
 Accident = Accident
+AccidentCreated = Création d'un accident
+AccidentModified = Modifcation d'un accident
+AccidentDeleted = Suppression d'un accident
 AccidentLine = risque(s)
 AccidentDate = Date de l'accident
 AccidentSchedule = Horaires du permis de feu
 AccidentRiskList = Liste d'informations complémentaires sur l'accident
+AccidentWorkStopCreated = Création d'un arrêt de travail
+AccidentWorkStopModified = Modification d'un arrêt de travail
+AccidentWorkStopDeleted = Suppression d'un arrêt de travail
 AddAccidentWorkStop = Ajout d'un arrêt de travail sur l'accident
 UpdateAccidentWorkStop = Mise à jour d'un arrêt de travail sur l'accident
 DeleteAccidentWorkStop = Suppression d'un arrêt de travail sur l'accident
+AccidentLesionCreated = Création d'une lésion
+AccidentLesionModified = Modification d'une lésion
+AccidentLesionDeleted = Suppression d'une lésion
 AddAccidentLesion = Ajout d'une lésion sur l'accident
 UpdateAccidentLesion = Mise à jour d'une lésion sur l'accident
 DeleteAccidentLesion = Suppression d'une lésion sur l'accident
@@ -658,6 +712,7 @@ AccidentRateIndicator = Taux et indice des indicateurs de performance des accide
 NbPresquAccidents = Nombre de presqu'accidents
 NbAccidentInvestigations = Nombre d'enquête accidents
 NbWorkedHours = Nombre d\'heures travaillées
+ConfirmDeleteAccident = Êtes-vous sûr de vouloir supprimer l'accident ?
 
 # AccidentTooltip - Tooltip des accidents
 VictimActivityTooltip = Précisez l’activité ou la tâche de la victime au moment de l’accident, c’est-à-dire ce que faisait la victime
@@ -733,6 +788,7 @@ ListingRisksPhotoDigiriskTemplate = ODT par défaut des listing des risques avec
 
 # Data - Donnée
 ListingRisksPhoto = Listing des risques avec photos
+ListingRisksPhotoGenerated = Génération de listing des Risques avec Photos
 listingrisksphoto.odt = Listing des risques avec photos
 listingrisksphoto_custom.odt = Listing des risques avec photos personnalisé
 
@@ -761,6 +817,7 @@ ListingRisksActionDigiriskTemplate = ODT par défaut des listing des risques ave
 
 # Data - Donnée
 ListingRisksAction = Listing des risques avec actions correctives
+ListingRisksActionGenerated = Génération de listing des Risques avec Actions Correctives
 listingrisksaction.odt = Listing des risques avec actions correctives
 listingrisksaction_custom.odt = Listing des risques avec actions correctives personnalisé
 DigiriskListingRisksActionData = Données configurables des listing des risques avec actions correctives
@@ -792,6 +849,7 @@ RiskAssessmentDocumentDigiriskTemplate = ODT par défaut du document unique
 
 # Data - Donnée
 RiskAssessmentDocument = Document unique
+RiskAssessmentDocumentGenerated = Génération du Document Unique
 RiskAssessmentDocumentInitial = DU
 RiskAssessmentDocumentDU = Plan d'action Document Unique
 RiskAssessmentDocumentDescription = Plan d'action Document Unique
@@ -852,6 +910,7 @@ GroupmentDocumentDigiriskTemplate = ODT par défaut des fiches de groupement
 
 # Data - Donnée
 GroupmentDocument = Fiche de Groupement
+GroupmentDocumentGenerated = Génération de fiche de Groupement
 groupmentdocument.odt = Fiche de Groupement
 groupmentdocument_custom.odt = Fiche de Groupement personnalisée
 DigiriskGroupmentDocumentData = Données configurables des fiches de groupement
@@ -879,6 +938,7 @@ WorkUnitDocumentDigiriskTemplate = ODT par défaut des fiches d'unité de travai
 
 # Data - Donnée
 WorkUnitDocument = Fiche d'Unité de travail
+WorkUnitDocumentGenerated = Génération de fiche d'Unité de Travail
 workunitdocument.odt = Fiche d'Unité de travail
 workunitdocument_custom.odt = Fiche d'Unité de travail personnalisée
 DigiriskWorkUnitDocumentData = Données configurables des fiches d'unités de travail
@@ -900,6 +960,9 @@ HiddenElements = Corbeille
 NewDigiriskElement = Nouveau élément Digirisk
 GPUTOrganization = Organisation des GP/UT
 DigiriskElement = Élément Digirisk
+DigiriskElementCreated = Création d'élément Digirisk
+DigiriskElementModified = Modification d'élément Digirisk
+DigiriskElementDeleted = Suppression d'élément Digirisk
 ElementType = Type d'élément
 ParentElement = Élément parent
 OrganizationSaved = L'organisation et des groupements et des unités de travail a été sauvegardée
@@ -982,6 +1045,9 @@ DigiriskEvaluatorStandardModel = Renvoie le numéro sous la forme EVn où n est 
 
 # Data - Donnée
 Evaluator = Évaluateur
+EvaluatorCreated = Création d'un évaluateur
+EvaluatorModified = Modification d'un évaluateur
+EvaluatorDeleted = Suppression d'un évaluateur
 TheEvaluator = L'évaluateur
 EvaluatorWellCreated = Évaluateur créé
 EvaluatorNotCreated = Erreur lors de la création de l'évaluateur
@@ -1043,6 +1109,8 @@ DeleteDigiriskRisk = Supprimer les risques
 RiskCreateTrigger = Risque %s créé
 RiskModifyTrigger = Risque %s modifié
 RiskDeleteTrigger = Risque %s supprimé
+RiskImportTrigger = Risque %s importé
+RiskUnlinkTrigger = Risque %s délié
 
 # Mod Numbering - Modèle de numérotation
 DigiriskRiskNumberingModule = Modèle de numérotation des risques de Digirisk
@@ -1051,6 +1119,9 @@ DigiriskRiskStandardModel = Renvoie le numéro sous la forme RKn où n est un co
 # Data - Donnée
 Risks = Risques
 Risk = Risque
+RiskCreated = Création d'un risque
+RiskModified = Modification d'un risque
+RiskDeleted = Suppression d'un risque
 RiskConfig = Configuration des données des risques
 TheRisk = Le risque
 RiskWellCreated = Risque créé
@@ -1116,6 +1187,8 @@ ConfirmImportSharedRisks = Veuillez choisir les risques partagés à importer
 RisksRepartition = Répartition des risques par cotation
 ShowRiskOrigin = Afficher la provenance du risque
 ShowRiskOriginDescription = Afficher la provenance des risques dans les documents (Fiche UT, Fiche GP, Document Unique, Listings de risques, etc.)
+RiskSharedWithEntityRefLabel = Partage du risque %s avec
+RiskUnlinkedFromEntityRefLabel = Dissociation du risque %s avec
 
 # Stats - Statistiques
 GreyRisk = Risque faible
@@ -1142,6 +1215,9 @@ DigiriskRiskAssessmentNumberingModule = Modèle de numérotation des évaluation
 # Data - Donnée
 RiskAssessment = Évaluation
 RiskAssessments = Évaluations
+RiskAssessmentCreated = Création d'une évaluation
+RiskAssessmentModified = Modification d'une évaluation
+RiskAssessmentDeleted = Suppression d'une évaluation
 RiskAssessmentConfig = Configuration des données des évaluations
 TheRiskAssessment = L'évaluation
 LastRiskAssessment = Dernière évaluation du risque
@@ -1204,6 +1280,8 @@ DeleteDigiriskRiskSign = Supprimer les signalisations
 RiskSignCreateTrigger = Signalisation %s créée
 RiskSignModifyTrigger = Signalisation %s modifiée
 RiskSignDeleteTrigger = Signalisation %s supprimée
+RiskSignImportTrigger = Signalisation %s importée
+RiskSignUnlinkTrigger = Signalisation %s déliée
 
 # Mod Numbering - Modèle de numérotation
 DigiriskRiskSignStandardModel = Renvoie le numéro sous la forme RSn où n est un compteur séquentiel sans rupture et sans remise à 0.
@@ -1211,6 +1289,9 @@ DigiriskRiskSignNumberingModule = Modèle de numérotation des signalisations de
 
 # Data - Donnée
 RiskSign = Signalisation
+RiskSignCreated = Création d'une signalisation
+RiskSignModified = Modification d'une signalisation
+RiskSignDeleted = Suppression d'une signalisation
 TheRiskSign = La signalisation
 RiskSignConfig = Configuration des données des signalisations
 RiskSignWellCreated = Signalisation créée
@@ -1247,7 +1328,8 @@ ShowInheritedRiskSignsDescription = Afficher les signalisations héritées dans 
 DigiriskElementInheritedRiskSignsList Liste des signalisations héritées
 ConfirmImportSharedRiskSigns = Veuillez choisir les signalisations partagées à importer
 DigiriskRiskSignData = Données configurables des signalisations
-
+RiskSignSharedWithEntityRefLabel = Partage de la signalisation %s avec
+RiskSignUnlinkedFromEntityRefLabel = Dissociation de la signalisation %s avec
 
 
 #
@@ -1265,6 +1347,9 @@ TaskDeleteTrigger = Tâche %s supprimée
 # Data - Donnée
 ActionPlan = Plan d'action
 Task = Tâche
+TaskCreatedEvent = Création d'une tâche
+TaskModifiedEvent = Modification d'une tâche
+TaskDeletedEvent = Suppression d'une tâche
 TheTask = La tâche
 TaskConfig = Configuration des données des tâches
 TaskWellCreated = Tâche créée
@@ -1303,6 +1388,9 @@ NoTaskUnCompletedThere = Aucune tâche terminée
 DeleteTaskTimeSpent = Êtes-vous sûr(e) de vouloir supprimer %s mins de temps consommé de la tâche
 TaskTimeSpentEdit = Édition du temps consommé de la tâche
 TheTaskTimeSpent = Le temps consommé
+TaskTimeSpentCreated = Création de temps consommé
+TaskTimeSpentModified = Modification de temps consommé
+TaskTimeSpentDeleted = Suppression de temps consommé
 TaskTimeSpentWellCreated = Temps consommé créé
 TaskTimeSpentNotCreated = Erreur lors de la création de temps consommé
 TaskTimeSpentWellEdited = Temps consommé édité
@@ -1355,6 +1443,10 @@ SendEmail = Envoyer un email
 # WelcomeOnOnlineSignaturePage = Bienvenue sur la page de signature des documents
 ThisIsInformationOnDocumentToSign = Informations
 DigiriskSignature = Signature
+DigiriskSignatureSigned = Signature d'un participant
+DigiriskSignaturePendingSignature = Attente de signature d'un participant
+DigiriskSignatureAbsent = Absence de signature d'un participant
+DigiriskSignatureDeleted = Suppression de signature d'un participant
 SignaturePublicAccess = Une interface publique ne nécessitant aucune identification est disponible à l'url suivante
 SignatureActivatePublicInterface = Activer l'interface publique
 SignatureShowCompanyLogo = Afficher le logo de la société dans l'interface publique
@@ -1386,6 +1478,7 @@ HasNoEmail = n'a pas d'email
 GoToEmailSetup = Pour configurer votre serveur de mail, rendez-vous dans
 PathToEmailSetup = "Accueil -> Configuration -> Emails" </a>
 SendToNoEmail = Les destinataires n'ont pas d'email
+SocietyName = Nom de la société
 
 #
 # Ticket - Interface publique ticket

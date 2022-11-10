@@ -197,7 +197,7 @@ class FirePermit extends CommonObject
 
 		$this->element = $this->element . '@digiriskdolibarr';
 
-		return $this->createCommon($user, empty($conf->global->DIGIRISKDOLIBARR_MAIN_AGENDA_ACTIONAUTO_FIREPERMIT_CREATE));
+		return $this->createCommon($user, $notrigger || !$conf->global->DIGIRISKDOLIBARR_MAIN_AGENDA_ACTIONAUTO_FIREPERMIT_CREATE);
 	}
 
 	/**
@@ -450,7 +450,7 @@ class FirePermit extends CommonObject
 	{
 		global $conf;
 
-		return $this->updateCommon($user, empty($conf->global->DIGIRISKDOLIBARR_MAIN_AGENDA_ACTIONAUTO_FIREPERMIT_MODIFY));
+		return $this->updateCommon($user, $notrigger || !$conf->global->DIGIRISKDOLIBARR_MAIN_AGENDA_ACTIONAUTO_FIREPERMIT_MODIFY);
 	}
 
 	/**
@@ -464,7 +464,12 @@ class FirePermit extends CommonObject
 	{
 		global $conf;
 
-		return $this->deleteCommon($user, empty($conf->global->DIGIRISKDOLIBARR_MAIN_AGENDA_ACTIONAUTO_FIREPERMIT_DELETE));
+		$result = $this->update($user, true);
+		if ($result > 0 && !empty($conf->global->DIGIRISKDOLIBARR_MAIN_AGENDA_ACTIONAUTO_FIREPERMIT_DELETE)) {
+			$this->call_trigger('FIREPERMIT_DELETE', $user);
+		}
+
+		return $result;
 	}
 
 	/**
@@ -526,7 +531,7 @@ class FirePermit extends CommonObject
 
 		$signatory = new PreventionPlanSignature($this->db);
 		$signatory->deleteSignatoriesSignatures($this->id, 'firepermit');
-		return $this->setStatusCommon($user, self::STATUS_IN_PROGRESS, empty($conf->global->DIGIRISKDOLIBARR_MAIN_AGENDA_ACTIONAUTO_FIREPERMIT_INPROGRESS), 'FIREPERMIT_INPROGRESS');
+		return $this->setStatusCommon($user, self::STATUS_IN_PROGRESS, $notrigger || !$conf->global->DIGIRISKDOLIBARR_MAIN_AGENDA_ACTIONAUTO_FIREPERMIT_INPROGRESS, 'FIREPERMIT_INPROGRESS');
 	}
 
 	/**
@@ -540,7 +545,7 @@ class FirePermit extends CommonObject
 	{
 		global $conf;
 
-		return $this->setStatusCommon($user, self::STATUS_PENDING_SIGNATURE, empty($conf->global->DIGIRISKDOLIBARR_MAIN_AGENDA_ACTIONAUTO_FIREPERMIT_PENDINGSIGNATURE), 'FIREPERMIT_PENDINGSIGNATURE');
+		return $this->setStatusCommon($user, self::STATUS_PENDING_SIGNATURE, $notrigger || !$conf->global->DIGIRISKDOLIBARR_MAIN_AGENDA_ACTIONAUTO_FIREPERMIT_PENDINGSIGNATURE, 'FIREPERMIT_PENDINGSIGNATURE');
 	}
 
 	/**
@@ -554,7 +559,7 @@ class FirePermit extends CommonObject
 	{
 		global $conf;
 
-		return $this->setStatusCommon($user, self::STATUS_LOCKED, empty($conf->global->DIGIRISKDOLIBARR_MAIN_AGENDA_ACTIONAUTO_FIREPERMIT_LOCKED), 'FIREPERMIT_LOCKED');
+		return $this->setStatusCommon($user, self::STATUS_LOCKED, $notrigger || !$conf->global->DIGIRISKDOLIBARR_MAIN_AGENDA_ACTIONAUTO_FIREPERMIT_LOCKED, 'FIREPERMIT_LOCKED');
 	}
 
 	/**
@@ -568,7 +573,7 @@ class FirePermit extends CommonObject
 	{
 		global $conf;
 
-		return $this->setStatusCommon($user, self::STATUS_ARCHIVED, empty($conf->global->DIGIRISKDOLIBARR_MAIN_AGENDA_ACTIONAUTO_FIREPERMIT_ARCHIVED), 'FIREPERMIT_ARCHIVED');
+		return $this->setStatusCommon($user, self::STATUS_ARCHIVED, $notrigger || !$conf->global->DIGIRISKDOLIBARR_MAIN_AGENDA_ACTIONAUTO_FIREPERMIT_ARCHIVED, 'FIREPERMIT_ARCHIVED');
 	}
 
 	/**
@@ -715,7 +720,7 @@ class FirePermitLine extends CommonObjectLine
 		'tms'           => array('type' => 'timestamp', 'label' => 'DateModification', 'enabled' => '1', 'position' => 50, 'notnull' => 0, 'visible' => 0,),
 		'category'      => array('type' => 'integer', 'label' => 'INRSRisk', 'enabled' => '1', 'position' => 60, 'notnull' => -1, 'visible' => -1,),
 		'description'   => array('type' => 'text', 'label' => 'Description', 'enabled' => '1', 'position' => 70, 'notnull' => -1, 'visible' => -1,),
-		'use_equipment' => array('type' => 'text', 'label' => 'UseEquipment', 'enabled' => '1', 'position' => 80, 'notnull' => -1, 'visible' => -1,),
+		'used_equipment' => array('type' => 'text', 'label' => 'UsedEquipment', 'enabled' => '1', 'position' => 80, 'notnull' => -1, 'visible' => -1,),
 		'fk_firepermit' => array('type' => 'integer', 'label' => 'FkFirePermit', 'enabled' => '1', 'position' => 90, 'notnull' => 1, 'visible' => 0,),
 		'fk_element'    => array('type' => 'integer', 'label' => 'FkElement', 'enabled' => '1', 'position' => 100, 'notnull' => 1, 'visible' => 0,),
 	);
@@ -728,7 +733,7 @@ class FirePermitLine extends CommonObjectLine
 	public $tms;
 	public $category;
 	public $description;
-	public $use_equipment;
+	public $used_equipment;
 	public $fk_firepermit;
 	public $fk_element;
 
@@ -757,7 +762,7 @@ class FirePermitLine extends CommonObjectLine
 	{
 		global $db;
 
-		$sql  = 'SELECT t.rowid, t.ref, t.date_creation, t.description, t.category, t.use_equipment, t.fk_firepermit, t.fk_element ';
+		$sql  = 'SELECT t.rowid, t.ref, t.date_creation, t.description, t.category, t.used_equipment, t.fk_firepermit, t.fk_element ';
 		$sql .= ' FROM ' . MAIN_DB_PREFIX . 'digiriskdolibarr_firepermitdet as t';
 		$sql .= ' WHERE t.rowid = ' . $rowid;
 		$sql .= ' AND entity IN (' . getEntity($this->table_element) . ')';
@@ -771,7 +776,7 @@ class FirePermitLine extends CommonObjectLine
 			$this->date_creation = $objp->date_creation;
 			$this->description   = $objp->description;
 			$this->category      = $objp->category;
-			$this->use_equipment = $objp->use_equipment;
+			$this->used_equipment = $objp->used_equipment;
 			$this->fk_firepermit = $objp->fk_firepermit;
 			$this->fk_element    = $objp->fk_element;
 
@@ -799,7 +804,7 @@ class FirePermitLine extends CommonObjectLine
 	public function fetchAll($sortorder = '', $sortfield = '', $limit = 0, $offset = 0, array $filter = array(), $filtermode = 'AND', $parent_id = 0)
 	{
 		global $db;
-		$sql  = 'SELECT t.rowid, t.ref, t.date_creation, t.description, t.category, t.use_equipment, t.fk_element';
+		$sql  = 'SELECT t.rowid, t.ref, t.date_creation, t.description, t.category, t.used_equipment, t.fk_element';
 		$sql .= ' FROM ' . MAIN_DB_PREFIX . 'digiriskdolibarr_firepermitdet as t';
 		if ($parent_id > 0) {
 			$sql .= ' WHERE t.fk_firepermit = ' . $parent_id;
@@ -826,7 +831,7 @@ class FirePermitLine extends CommonObjectLine
 				$record->date_creation = $obj->date_creation;
 				$record->description   = $obj->description;
 				$record->category      = $obj->category;
-				$record->use_equipment = $obj->use_equipment;
+				$record->used_equipment = $obj->used_equipment;
 				$record->fk_firepermit = $obj->fk_firepermit;
 				$record->fk_element    = $obj->fk_element;
 
@@ -865,7 +870,7 @@ class FirePermitLine extends CommonObjectLine
 
 		// Insertion dans base de la ligne
 		$sql  = 'INSERT INTO ' . MAIN_DB_PREFIX . 'digiriskdolibarr_firepermitdet';
-		$sql .= ' (ref, entity, date_creation, description, category, use_equipment, fk_firepermit, fk_element';
+		$sql .= ' (ref, entity, date_creation, description, category, used_equipment, fk_firepermit, fk_element';
 		$sql .= ')';
 		$sql .= " VALUES (";
 		$sql .= "'" . $db->escape($this->ref) . "'" . ", ";
@@ -873,7 +878,7 @@ class FirePermitLine extends CommonObjectLine
 		$sql .= "'" . $db->escape($db->idate($now)) . "'" . ", ";
 		$sql .= "'" . $db->escape($this->description) . "'" . ", ";
 		$sql .= $this->category . ", ";
-		$sql .= "'" . $db->escape($this->use_equipment) . "'" . ", ";
+		$sql .= "'" . $db->escape($this->used_equipment) . "'" . ", ";
 		$sql .= $this->fk_firepermit . ", ";
 		$sql .= $this->fk_element;
 
@@ -922,7 +927,7 @@ class FirePermitLine extends CommonObjectLine
 		$sql .= " ref='" . $db->escape($this->ref) . "',";
 		$sql .= " description='" . $db->escape($this->description) . "',";
 		$sql .= " category=" . $db->escape($this->category) . ",";
-		$sql .= " use_equipment='" . $db->escape($this->use_equipment) . "'" . ",";
+		$sql .= " used_equipment='" . $db->escape($this->used_equipment) . "'" . ",";
 		$sql .= " fk_firepermit=" . $db->escape($this->fk_firepermit) . ",";
 		$sql .= " fk_element=" . $db->escape($this->fk_element);
 		$sql .= " WHERE rowid = " . $this->id;

@@ -77,6 +77,7 @@ ALTER TABLE llx_digiriskdolibarr_digiriskelement ADD show_in_selector BOOLEAN NO
 ALTER TABLE llx_digiriskdolibarr_accident_workstop ADD declaration_link text AFTER date_end_workstop;
 
 -- 9.9.0
+ALTER TABLE llx_digiriskdolibarr_firepermitdet CHANGE  `use_equipment` `used_equipment` text;
 DELETE FROM llx_c_action_trigger WHERE elementtype = 'informationssharing@digiriskdolibarr';
 DELETE FROM llx_c_action_trigger WHERE elementtype = 'legaldisplay@digiriskdolibarr';
 DELETE FROM llx_c_action_trigger WHERE elementtype = 'preventionplandocument@digiriskdolibarr';

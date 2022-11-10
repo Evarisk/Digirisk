@@ -718,6 +718,8 @@ if ($action == 'confirm_import_shared_risks' && $confirm == 'yes') {
 				$object->element = 'digiriskdolibarr_' . $digiriskelementtmp->element;
 				$result = $object->add_object_linked('digiriskdolibarr_' . $risk->element, $risks->id);
 				if ($result > 0) {
+					$risks->applied_on = $object->id;
+					$risks->call_trigger('RISK_IMPORT', $user);
 					continue;
 				} else {
 					setEventMessages($object->error, $object->errors, 'errors');
@@ -748,6 +750,8 @@ if (! $error && $action == 'unlinkSharedRisk' && $permissiontodelete) {
 
 	if ($result > 0) {
 		// Unlink shared risk OK
+		$risk->applied_on = $object->id;
+		$risk->call_trigger('RISK_UNLINK', $user);
 		$urltogo = str_replace('__ID__', $object->id, $backtopage);
 		$urltogo = preg_replace('/--IDFORBACKTOPAGE--/', $id, $urltogo); // New method to autoselect project after a New on another form object creation
 		header("Location: " . $urltogo);
