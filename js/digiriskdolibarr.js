@@ -1925,6 +1925,9 @@ window.eoxiaJS.risk.unlinkSharedRisk = function ( event ) {
 		}),
 		contentType: false,
 		success: function ( resp ) {
+			//refresh shared risk list form
+			$('.confirmquestions').html($(resp).find('.confirmquestions').children())
+			//refresh shared risk counter
 			$('.fichecenter.sharedrisklist .opacitymedium.colorblack.paddingleft').html($(resp).find('#searchFormSharedListRisks .opacitymedium.colorblack.paddingleft'))
 			let actionContainerSuccess = $('.messageSuccessRiskUnlinkShared');
 
