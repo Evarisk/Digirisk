@@ -14,7 +14,7 @@ Thème: Eldy Menu
 
 Editeur/Licence: [Evarisk](https://www.evarisk.com) / GPL-v3
 
-Assitance: [Forum www.dolibarr.fr](https://www.dolibarr.fr) / Par mail à contact@evarisk.com
+Assistance: [Forum www.dolibarr.fr](https://www.dolibarr.fr) / Par mail à contact@evarisk.com
 
 Demo: [Demo Digirisk](https://www.demodoli.digirisk.com) - ID: demo - Password: demo
 
