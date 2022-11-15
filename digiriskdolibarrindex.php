@@ -74,6 +74,10 @@ $error = 0;
 
 require_once './core/tpl/digiriskdolibarr_projectcreation_action.tpl.php';
 
+if ($action == 'closenotice') {
+	dolibarr_set_const($db, "DIGIRISKDOLIBARR_SHOW_PATCH_NOTE", 0, 'integer', 0, '', $conf->entity);
+}
+
 /*
  * View
  */
@@ -136,49 +140,53 @@ print load_fiche_titre($langs->trans("DigiriskDolibarrArea") . ' ' . $digirisk->
 <script>
 	window.location.reload()
 </script>
-<?php endif; ?>
-<div class="wpeo-notice notice-info">
-	<div class="notice-content">
-		<div class="notice-title"><?php echo $langs->trans("DigiriskPatchNote", $digirisk->version); ?>
-			<div class="show-patchnote wpeo-button button-square-40 button-blue wpeo-tooltip-event modal-open" aria-label="<?php echo $langs->trans('ShowPatchNote'); ?>">
-				<i class="fas fa-list button-icon"></i>
-			</div>
-		</div>
-	</div>
-</div>
+<?php endif;
 
-<div class="wpeo-modal wpeo-modal-patchnote">
-	<div class="modal-container wpeo-modal-event" style="max-width: 1280px; max-height: 1000px">
-		<!-- Modal-Header -->
-		<div class="modal-header">
-			<h2 class="modal-title"><?php echo $langs->trans("DigiriskPatchNote", $digirisk->version);  ?></h2>
-			<div class="modal-close"><i class="fas fa-times"></i></div>
+if ($conf->global->DIGIRISKDOLIBARR_SHOW_PATCH_NOTE) : ?>
+	<div class="wpeo-notice notice notice-info">
+		<input type="hidden" name="token" value="<?php echo newToken(); ?>">
+		<div class="notice-content">
+			<div class="notice-title"><?php echo $langs->trans("DigiriskPatchNote", $digirisk->version); ?>
+				<div class="show-patchnote wpeo-button button-square-40 button-blue wpeo-tooltip-event modal-open" aria-label="<?php echo $langs->trans('ShowPatchNote'); ?>">
+					<i class="fas fa-list button-icon"></i>
+				</div>
+			</div>
 		</div>
-		<!-- Modal Content-->
-		<div class="modal-content">
-			<?php $ch = curl_init();
-			curl_setopt($ch, CURLOPT_URL, 'https://api.github.com/repos/evarisk/digirisk/releases/tags/' . $digirisk->version);
-			curl_setopt($ch, CURLOPT_RETURNTRANSFER, 1);
-			curl_setopt($ch, CURLOPT_SSL_VERIFYPEER, false);
-			curl_setopt($ch, CURLOPT_USERAGENT,'DigiriskDolibarr');
-			$output  = curl_exec($ch);
-			curl_close($ch);
-			$data = json_decode($output);
-			$data->body = preg_replace('/- #\b\d{1,4}\b/', '-', $data->body);
-			$data->body = preg_replace('/- #\b\d{1,4}\b/', '-', $data->body);
-			$html = $parse->text($data->body);
-			print $html;
-			?>
-		</div>
-		<!-- Modal-Footer -->
-		<div class="modal-footer">
-			<div class="wpeo-button button-grey button-uppercase modal-close">
-				<span><?php echo $langs->trans('CloseModal'); ?></span>
+		<div class="notice-close notice-close-forever wpeo-tooltip-event" aria-label="<?php echo $langs->trans("DontShowPatchNote"); ?>" data-direction="left"><i class="fas fa-times"></i></div>
+	</div>
+
+	<div class="wpeo-modal wpeo-modal-patchnote">
+		<div class="modal-container wpeo-modal-event" style="max-width: 1280px; max-height: 1000px">
+			<!-- Modal-Header -->
+			<div class="modal-header">
+				<h2 class="modal-title"><?php echo $langs->trans("DigiriskPatchNote", $digirisk->version);  ?></h2>
+				<div class="modal-close"><i class="fas fa-times"></i></div>
+			</div>
+			<!-- Modal Content-->
+			<div class="modal-content">
+				<?php $ch = curl_init();
+				curl_setopt($ch, CURLOPT_URL, 'https://api.github.com/repos/evarisk/digirisk/releases/tags/' . $digirisk->version);
+				curl_setopt($ch, CURLOPT_RETURNTRANSFER, 1);
+				curl_setopt($ch, CURLOPT_SSL_VERIFYPEER, false);
+				curl_setopt($ch, CURLOPT_USERAGENT,'DigiriskDolibarr');
+				$output  = curl_exec($ch);
+				curl_close($ch);
+				$data = json_decode($output);
+				$data->body = preg_replace('/- #\b\d{1,4}\b/', '-', $data->body);
+				$data->body = preg_replace('/- #\b\d{1,4}\b/', '-', $data->body);
+				$html = $parse->text($data->body);
+				print $html;
+				?>
+			</div>
+			<!-- Modal-Footer -->
+			<div class="modal-footer">
+				<div class="wpeo-button button-grey button-uppercase modal-close">
+					<span><?php echo $langs->trans('CloseModal'); ?></span>
+				</div>
 			</div>
 		</div>
 	</div>
-</div>
-<?php
+<?php endif;
 
 require_once __DIR__ . '/core/tpl/digiriskdolibarr_dashboard.tpl.php';
 

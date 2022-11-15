@@ -3551,7 +3551,21 @@ window.eoxiaJS.notice.event = function() {
  * @return {void}
  */
 window.eoxiaJS.notice.closeNotice = function( event ) {
-	$(this).closest('.notice').addClass("hidden");
+	$(this).closest('.notice').fadeOut(function () {
+		$(this).closest('.notice').addClass("hidden");
+	});
+
+	if ($(this).hasClass('notice-close-forever')) {
+		let token = $(this).closest('.notice').find('input[name="token"]').val();
+		let querySeparator = '?';
+
+		document.URL.match(/\?/) ? querySeparator = '&' : 1
+
+		$.ajax({
+			url: document.URL + querySeparator + 'action=closenotice&token='+token,
+			type: "POST",
+		});
+	}
 };
 
 /**

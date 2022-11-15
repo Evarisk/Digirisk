@@ -669,6 +669,7 @@ class modDigiriskdolibarr extends DolibarrModules
 			284 => array('DIGIRISKDOLIBARR_CUSTOM_DOCUMENTS_SET', 'integer', 0, '', 0, 'current'),
 			285 => array('DIGIRISKDOLIBARR_MANUAL_INPUT_NB_EMPLOYEES', 'integer', 0, '', 0, 'current'),
 			286 => array('DIGIRISKDOLIBARR_MANUAL_INPUT_NB_WORKED_HOURS', 'integer', 0, '', 0, 'current'),
+			287 => array('DIGIRISKDOLIBARR_SHOW_PATCH_NOTE', 'integer', 1, '', 0, 'current'),
 
 			//CONST TICKET & REGISTERS
 			290 => array('DIGIRISKDOLIBARR_TICKET_EXTRAFIELDS', 'integer', 0, '', 0, 0),

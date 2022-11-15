@@ -134,6 +134,7 @@ PleaseNameTheFile = De préférence, nommez le fichier <b> %s </b>
 
 DigiriskPatchNote = Note de mise à jour DigiRisk %s
 ShowPatchNote = Consulter la note de mise à jour
+DontShowPatchNote = Ne plus afficher la note de mise à jour
 
 #
 # Horaires d'ouverture
