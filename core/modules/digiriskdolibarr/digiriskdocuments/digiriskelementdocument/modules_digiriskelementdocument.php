@@ -202,7 +202,7 @@ abstract class ModeleODTDigiriskElementDocument extends CommonDocGenerator
 						if (is_array($evaluators) && !empty($evaluators)) {
 							foreach ($evaluators as $line) {
 								$element = new DigiriskElement($this->db);
-								$element->fetch($line->fk_element);
+								$element->fetch($line->fk_parent);
 								$usertmp->fetch($line->fk_user);
 
 								$tmparray['nomElement']                 = (!empty($conf->global->DIGIRISKDOLIBARR_SHOW_SHARED_EVALUATORS) ? 'S' . $element->entity . ' - ' : '') . $element->ref . ' - ' . $element->label;
