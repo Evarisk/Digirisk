@@ -861,6 +861,18 @@
 						<div class="riskassessment-task">
 							<span class="section-title"><?php echo $langs->trans('Task'); ?></span>
 							<span class="title"><?php echo $langs->trans('Label'); ?> <input type="text" class="" name="label" value=""></span>
+							<div class="riskassessment-task-date wpeo-gridlayout grid-2">
+								<div>
+									<span class="title"><?php echo $langs->trans('DateStart'); ?></span>
+									<?php print $form->selectDate(dol_now('tzuser'), 'RiskassessmentTaskDateStartModalRisk', 1, 1, 0, '', 1, 1); ?>
+								</div>
+								<div>
+									<span class="title"><?php echo $langs->trans('Deadline'); ?></span>
+									<?php print $form->selectDate(-1,'RiskassessmentTaskDateEndModalRisk', 1, 1, 0, '', 1, 1); ?>
+								</div>
+							</div>
+							<span class="title"><?php echo $langs->trans('Budget'); ?></span>
+							<input type="text" class="riskassessment-task-budget" name="budget" value="">
 						</div>
 					<?php endif; ?>
 					<div class="element-linked-medias element-linked-medias-0 risk-new">
