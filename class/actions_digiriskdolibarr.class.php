@@ -740,4 +740,37 @@ class ActionsDigiriskdolibarr
 			return -1;
 		}
 	}
+
+	/**
+	 *  Overloading the commonGenerateDocument function : replacing the parent's function with the one below
+	 *
+	 * @param  Hook   $parameters Metadatas (context, etc...)
+	 * @param  object $object     Current object
+	 * @param  string $action
+	 * @return int               0 < on error, 0 on success, 1 to replace standard code
+	 */
+	public function commonGenerateDocument($parameters, $object, $action) {
+		global $db, $user;
+
+		if ($parameters['currentcontext'] == 'projectcard') {
+			$preventrecursivecall = 0;
+			if ($parameters['modele'] == 'orque_projectdocument') {
+				require_once __DIR__ . '/../class/digiriskdocuments/projectdocument.class.php';
+
+				$projectdocument = new ProjectDocument($db);
+
+				$moreparams['object'] = $object;
+				$moreparams['user']   = $user;
+
+				if (!$parameters['moreparams']['preventrecursivecall']) {
+					$projectdocument->generateDocument($parameters['modele'], $parameters['outputlangs'], $parameters['hidedetails'], $parameters['hidedesc'], $parameters['hideref'], $moreparams, true);
+					$preventrecursivecall = 1; // Need to update this variable because between first call commonGenerateDocument hook we need to replace hook code by itself
+				} else {
+					$preventrecursivecall = 0;
+				}
+			}
+		}
+
+		return $preventrecursivecall; // return 0 or return 1 to replace standard code
+	}
 }

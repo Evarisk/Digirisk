@@ -1503,7 +1503,7 @@ StatusHelp = Par défaut, le filtre prend tous les états<br>
 # Ticket document
 
 # Mod Numbering - Modèle de numérotation
-DigiriskTicketDocumentNumberingModule = Modèle de numérotation des fiches de ticket de Digirisk
+DigiriskTicketDocumentNumberingModule = Modèle de numérotation des fiches de tickets de Digirisk
 DigiriskTicketDocumentStandardModel = Renvoie le numéro sous la forme TDn où n est un compteur séquentiel sans rupture et sans remise à 0
 
 # ODT Template - Template ODT
@@ -1518,6 +1518,18 @@ ticketdocument_events.odt = Fiche du ticket avec évènements
 TicketSuccessMessageData = Message du ticket
 TicketSuccessMessage= Message de succès du ticket
 TicketSuccessMessageSet = Le message a bien été modifié
+
+
+
+# Project document
+
+# Mod Numbering - Modèle de numérotation
+DigiriskProjectDocumentNumberingModule = Modèle de numérotation des fiches de projets de Digirisk
+DigiriskProjectDocumentStandardModel = Renvoie le numéro sous la forme PJDn où n est un compteur séquentiel sans rupture et sans remise à 0
+
+# ODT Template - Template ODT
+DigiriskTemplateDocumentProject = Modèle de documents des fiches de projets de Digirisk
+DocumentModelOrque = Modèles de document de rapport prévisionnel sur les tâches de projets
 
 
 
