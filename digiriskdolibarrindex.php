@@ -136,6 +136,7 @@ print load_fiche_titre($langs->trans("DigiriskDolibarrArea") . ' ' . $digirisk->
 	$digirisk->init();
 
 	dolibarr_set_const($db, 'DIGIRISKDOLIBARR_JUST_UPDATED', 1, 'integer', 0, '', $conf->entity);
+	dolibarr_set_const($db, 'DIGIRISKDOLIBARR_SHOW_PATCH_NOTE', 1, 'integer', 0, '', $conf->entity);
 ?>
 <script>
 	window.location.reload()
