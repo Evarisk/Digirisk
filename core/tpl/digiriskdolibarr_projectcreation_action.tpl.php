@@ -300,7 +300,7 @@ if ( $conf->global->DIGIRISKDOLIBARR_TICKET_PROJECT == 0 || $project->statut == 
 	$tags->add_type($project, 'project');
 }
 
-if ( $conf->global->DIGIRISKDOLIBARR_USERAPI_SET == 0 ) {
+if (!dolibarr_get_const($db, 'DIGIRISKDOLIBARR_USERAPI_SET', 0)) {
 	require_once DOL_DOCUMENT_ROOT . '/user/class/user.class.php';
 
 	$usertmp            = new User($db);
@@ -308,7 +308,7 @@ if ( $conf->global->DIGIRISKDOLIBARR_USERAPI_SET == 0 ) {
 	$usertmp->firstname = 'REST';
 	$usertmp->login     = 'USERAPI';
 	$usertmp->email     = '';
-	$usertmp->entity    = $conf->entity;
+	$usertmp->entity    = 0;
 	$usertmp->setPassword($user);
 	$usertmp->api_key = getRandomPassword(true);
 
@@ -321,7 +321,7 @@ if ( $conf->global->DIGIRISKDOLIBARR_USERAPI_SET == 0 ) {
 		$apiUser->addrights(43630237);
 	}
 
-	dolibarr_set_const($db, 'DIGIRISKDOLIBARR_USERAPI_SET', $user_id, 'integer', 0, '', $conf->entity);
+	dolibarr_set_const($db, 'DIGIRISKDOLIBARR_USERAPI_SET', $user_id, 'integer', 0, '', 0);
 }
 
 if ( $conf->global->DIGIRISKDOLIBARR_READERGROUP_SET == 0 ) {
