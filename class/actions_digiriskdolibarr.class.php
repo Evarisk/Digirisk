@@ -146,7 +146,7 @@ class ActionsDigiriskdolibarr
 					require_once __DIR__ . '/digiriskelement.class.php';
 					$digiriskelement = new DigiriskElement($db);
 					$digiriskelement->fetch($object->array_options['options_digiriskdolibarr_ticket_service']);
-					$selectDictionnary = $digiriskelement->getNomUrl(1, 'blank');
+					$selectDictionnary = $digiriskelement->getNomUrl(1, 'blank', 1);
 					?>
 					<script>
 					jQuery('.ticket_extras_digiriskdolibarr_ticket_service').html('')
@@ -323,7 +323,7 @@ class ActionsDigiriskdolibarr
 						$nbtasks = count($alltasks);
 						foreach ($alltasks as $tasksignle) {
 							$filter = ' AND ptt.fk_task = ' . $tasksignle->id;
-							$alltimespent = $tasksignle->fetchAllTimeSpent($user, $filter);
+							$alltimespent = $task->fetchAllTimeSpentAllUser($filter);
 							foreach ($alltimespent as $timespent) {
 								$totatconsumedtimeamount += convertSecondToTime($timespent->timespent_duration, 'allhourmin') * $timespent->timespent_thm;
 							}
@@ -339,10 +339,10 @@ class ActionsDigiriskdolibarr
 						$totaltasksbudget = 0;
 					}
 					$outTotatconsumedtime = '<tr><td>' . $langs->trans('TotalConsumedTime') . '</td><td>' . convertSecondToTime($totatconsumedtime, 'allhourmin') . '</td></tr>';
-					$outTotatconsumedtimeamount = '<tr><td>' . $langs->trans('TotalConsumedTimeAmount') . '</td><td>' . price($totatconsumedtimeamount, 0, $langs, 1, 0, 0, $conf->currency) . '</td></tr>';
+					$outTotatconsumedtimeamount = '<tr><td>' . $langs->trans('TotalConsumedTimeAmount') . '</td><td>' . price($totatconsumedtimeamount, 0, $langs, 1, -1, 2, $conf->currency) . '</td></tr>';
 					$outNbtasks = '<tr><td>' . $langs->trans('NbTasks') . '</td><td>' . $nbtasks . '</td></tr>';
 					$outTotalprogress = '<tr><td>' . $langs->trans('TotalProgress') . '</td><td>' . (($totalprogress) ? price2num($totalprogress/$nbtasks, 2) . ' %' : '0 %') . '</td></tr>';
-					$outTotaltasksbudget = '<tr><td>' . $langs->trans('TotalBudget') . '</td><td>' . price($totaltasksbudget, 0, $langs, 1, 0, 0, $conf->currency) . '</td></tr>'; ?>
+					$outTotaltasksbudget = '<tr><td>' . $langs->trans('TotalBudget') . '</td><td>' . price($totaltasksbudget, 0, $langs, 1, -1, 2, $conf->currency) . '</td></tr>'; ?>
 					<script>
 						jQuery('.fichecenter .fichehalfright .tableforfield tbody tr:last-child').after(<?php echo json_encode($outTotatconsumedtime) ?>);
 						jQuery('.fichecenter .fichehalfright .tableforfield tbody tr:last-child').after(<?php echo json_encode($outTotatconsumedtimeamount) ?>);
@@ -354,8 +354,12 @@ class ActionsDigiriskdolibarr
 				}
 			}
 		} else if ($parameters['currentcontext'] == 'publicnewticketcard') {
-
-			if (GETPOST('entity') > 0) {
+			if (!$conf->multicompany->enabled) {
+				$entity = $conf->entity;
+			} else {
+				$entity = GETPOST('entity');
+			}
+			if ($entity > 0) {
 				require_once __DIR__ . '/../lib/digiriskdolibarr_function.lib.php';
 				require_once __DIR__ . '/digiriskelement.class.php';
 
@@ -735,5 +739,38 @@ class ActionsDigiriskdolibarr
 			$this->errors[] = 'Error message';
 			return -1;
 		}
+	}
+
+	/**
+	 *  Overloading the commonGenerateDocument function : replacing the parent's function with the one below
+	 *
+	 * @param  Hook   $parameters Metadatas (context, etc...)
+	 * @param  object $object     Current object
+	 * @param  string $action
+	 * @return int               0 < on error, 0 on success, 1 to replace standard code
+	 */
+	public function commonGenerateDocument($parameters, $object, $action) {
+		global $db, $user;
+
+		if ($parameters['currentcontext'] == 'projectcard') {
+			$preventrecursivecall = 0;
+			if ($parameters['modele'] == 'orque_projectdocument') {
+				require_once __DIR__ . '/../class/digiriskdocuments/projectdocument.class.php';
+
+				$projectdocument = new ProjectDocument($db);
+
+				$moreparams['object'] = $object;
+				$moreparams['user']   = $user;
+
+				if (!$parameters['moreparams']['preventrecursivecall']) {
+					$projectdocument->generateDocument($parameters['modele'], $parameters['outputlangs'], $parameters['hidedetails'], $parameters['hidedesc'], $parameters['hideref'], $moreparams, true);
+					$preventrecursivecall = 1; // Need to update this variable because between first call commonGenerateDocument hook we need to replace hook code by itself
+				} else {
+					$preventrecursivecall = 0;
+				}
+			}
+		}
+
+		return $preventrecursivecall; // return 0 or return 1 to replace standard code
 	}
 }

@@ -210,7 +210,7 @@ if (is_dir($dir)) {
 						if ($conf->global->DIGIRISKDOLIBARR_ACCIDENT_ADDON == $file || $conf->global->DIGIRISKDOLIBARR_ACCIDENT_ADDON . '.php' == $file) {
 							print img_picto($langs->trans("Activated"), 'switch_on');
 						} else {
-							print '<a class="reposition" href="' . $_SERVER["PHP_SELF"] . '?action=setmod&value=' . preg_replace('/\.php$/', '', $file) . '&scan_dir=' . $module->scandir . '&label=' . urlencode($module->name) . '" alt="' . $langs->trans("Default") . '">' . img_picto($langs->trans("Disabled"), 'switch_off') . '</a>';
+							print '<a class="reposition" href="' . $_SERVER["PHP_SELF"] . '?action=setmod&value=' . preg_replace('/\.php$/', '', $file) . '&scan_dir=' . $module->scandir . '&label=' . urlencode($module->name) . '&token=' . newToken() . '" alt="' . $langs->trans("Default") . '">' . img_picto($langs->trans("Disabled"), 'switch_off') . '</a>';
 						}
 						print '</td>';
 
@@ -298,7 +298,7 @@ if (is_dir($dir)) {
 						if ($conf->global->DIGIRISKDOLIBARR_ACCIDENT_WORKSTOP_ADDON == $file || $conf->global->DIGIRISKDOLIBARR_ACCIDENT_WORKSTOP_ADDON . '.php' == $file) {
 							print img_picto($langs->trans("Activated"), 'switch_on');
 						} else {
-							print '<a class="reposition" href="' . $_SERVER["PHP_SELF"] . '?action=setmodAccidentWorkStop&value=' . preg_replace('/\.php$/', '', $file) . '&scan_dir=' . $module->scandir . '&label=' . urlencode($module->name) . '" alt="' . $langs->trans("Default") . '">' . img_picto($langs->trans("Disabled"), 'switch_off') . '</a>';
+							print '<a class="reposition" href="' . $_SERVER["PHP_SELF"] . '?action=setmodAccidentWorkStop&value=' . preg_replace('/\.php$/', '', $file) . '&scan_dir=' . $module->scandir . '&label=' . urlencode($module->name) . '&token=' . newToken() . '" alt="' . $langs->trans("Default") . '">' . img_picto($langs->trans("Disabled"), 'switch_off') . '</a>';
 						}
 						print '</td>';
 
@@ -386,7 +386,7 @@ if (is_dir($dir)) {
 						if ($conf->global->DIGIRISKDOLIBARR_ACCIDENT_LESION_ADDON == $file || $conf->global->DIGIRISKDOLIBARR_ACCIDENT_LESION_ADDON . '.php' == $file) {
 							print img_picto($langs->trans("Activated"), 'switch_on');
 						} else {
-							print '<a class="reposition" href="' . $_SERVER["PHP_SELF"] . '?action=setmodAccidentLesion&value=' . preg_replace('/\.php$/', '', $file) . '&scan_dir=' . $module->scandir . '&label=' . urlencode($module->name) . '" alt="' . $langs->trans("Default") . '">' . img_picto($langs->trans("Disabled"), 'switch_off') . '</a>';
+							print '<a class="reposition" href="' . $_SERVER["PHP_SELF"] . '?action=setmodAccidentLesion&value=' . preg_replace('/\.php$/', '', $file) . '&scan_dir=' . $module->scandir . '&label=' . urlencode($module->name) . '&token=' . newToken() . '" alt="' . $langs->trans("Default") . '">' . img_picto($langs->trans("Disabled"), 'switch_off') . '</a>';
 						}
 						print '</td>';
 

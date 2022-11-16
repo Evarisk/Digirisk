@@ -2,9 +2,9 @@
 
 ## Informations
 
-Version du module: 9.7.0
+Version du module : 9.8.0
 
-Dernière mise à jour: 14/10/2022
+Dernière mise à jour : 16/11/2022
 
 Prérequis:
 * Dolibarr min version 15.0.0
@@ -14,7 +14,7 @@ Thème: Eldy Menu
 
 Editeur/Licence: [Evarisk](https://www.evarisk.com) / GPL-v3
 
-Assitance: [Forum www.dolibarr.fr](https://www.dolibarr.fr) / Par mail à contact@evarisk.com
+Assistance: [Forum www.dolibarr.fr](https://www.dolibarr.fr) / Par mail à contact@evarisk.com
 
 Demo: [Demo Digirisk](https://www.demodoli.digirisk.com) - ID: demo - Password: demo
 

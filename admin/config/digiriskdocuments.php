@@ -24,28 +24,28 @@
 // Load Dolibarr environment
 $res = 0;
 // Try main.inc.php into web root known defined into CONTEXT_DOCUMENT_ROOT (not always defined)
-if (!$res && !empty($_SERVER["CONTEXT_DOCUMENT_ROOT"])) $res = @include $_SERVER["CONTEXT_DOCUMENT_ROOT"]."/main.inc.php";
+if (!$res && !empty($_SERVER['CONTEXT_DOCUMENT_ROOT'])) $res = @include $_SERVER['CONTEXT_DOCUMENT_ROOT']. '/main.inc.php';
 // Try main.inc.php into web root detected using web root calculated from SCRIPT_FILENAME
 $tmp = empty($_SERVER['SCRIPT_FILENAME']) ? '' : $_SERVER['SCRIPT_FILENAME']; $tmp2 = realpath(__FILE__); $i = strlen($tmp) - 1; $j = strlen($tmp2) - 1;
 while ($i > 0 && $j > 0 && isset($tmp[$i]) && isset($tmp2[$j]) && $tmp[$i] == $tmp2[$j]) { $i--; $j--; }
-if (!$res && $i > 0 && file_exists(substr($tmp, 0, ($i + 1))."/main.inc.php")) $res = @include substr($tmp, 0, ($i + 1))."/main.inc.php";
-if (!$res && $i > 0 && file_exists(dirname(substr($tmp, 0, ($i + 1)))."/main.inc.php")) $res = @include dirname(substr($tmp, 0, ($i + 1)))."/main.inc.php";
+if (!$res && $i > 0 && file_exists(substr($tmp, 0, ($i + 1)). '/main.inc.php')) $res = @include substr($tmp, 0, ($i + 1)). '/main.inc.php';
+if (!$res && $i > 0 && file_exists(dirname(substr($tmp, 0, ($i + 1))). '/main.inc.php')) $res = @include dirname(substr($tmp, 0, ($i + 1))). '/main.inc.php';
 // Try main.inc.php using relative path
-if (!$res && file_exists("../../main.inc.php")) $res = @include "../../main.inc.php";
-if (!$res && file_exists("../../../main.inc.php")) $res = @include "../../../main.inc.php";
-if (!$res && file_exists("../../../../main.inc.php")) $res = @include "../../../../main.inc.php";
-if (!$res) die("Include of main fails");
+if (!$res && file_exists('../../main.inc.php')) $res = @include '../../main.inc.php';
+if (!$res && file_exists('../../../main.inc.php')) $res = @include '../../../main.inc.php';
+if (!$res && file_exists('../../../../main.inc.php')) $res = @include '../../../../main.inc.php';
+if (!$res) die('Include of main fails');
 
-global $langs, $user;
+global $conf, $db, $langs, $user;
 
 // Libraries
-require_once DOL_DOCUMENT_ROOT . "/core/lib/admin.lib.php";
+require_once DOL_DOCUMENT_ROOT . '/core/lib/admin.lib.php';
 require_once DOL_DOCUMENT_ROOT . '/core/lib/files.lib.php';
 
 require_once '../../lib/digiriskdolibarr.lib.php';
 
 // Translations
-$langs->loadLangs(array("admin", "digiriskdolibarr@digiriskdolibarr"));
+$langs->loadLangs(array('admin', 'digiriskdolibarr@digiriskdolibarr'));
 
 // Access control
 if (!$user->admin) accessforbidden();
@@ -77,7 +77,7 @@ if ($action == 'deletefile' && $modulepart == 'ecm' && !empty($user->admin)) {
 		$tmpdir = DOL_DATA_ROOT.'/'.$tmpdir;	// Complete with DOL_DATA_ROOT. Only files into DOL_DATA_ROOT can be reach/set
 		if (!is_dir($tmpdir)) {
 			if (empty($nomessageinsetmoduleoptions)) {
-				setEventMessages($langs->trans("ErrorDirNotFound", $tmpdir), null, 'warnings');
+				setEventMessages($langs->trans('ErrorDirNotFound', $tmpdir), null, 'warnings');
 			}
 		} else {
 			$upload_dir = $tmpdir;
@@ -88,39 +88,44 @@ if ($action == 'deletefile' && $modulepart == 'ecm' && !empty($user->admin)) {
 	$filetodelete = $tmpdir.'/'.GETPOST('file');
 	$result = dol_delete_file($filetodelete);
 	if ($result > 0) {
-		setEventMessages($langs->trans("FileWasRemoved", GETPOST('file')), null, 'mesgs');
-		header("Location: " . $_SERVER["PHP_SELF"]);
+		setEventMessages($langs->trans('FileWasRemoved', GETPOST('file')), null, 'mesgs');
+		header('Location: ' . $_SERVER['PHP_SELF']);
 	}
 }
 
 // Activate a model
 if ($action == 'set') {
+	if ($type == 'projectdocument') {
+		$type = 'project';
+	}
 	addDocumentModel($value, $type, $label, $const);
-	header("Location: " . $_SERVER["PHP_SELF"]);
+	header('Location: ' . $_SERVER['PHP_SELF']);
 } elseif ($action == 'del') {
+	if ($type == 'projectdocument') {
+		$type = 'project';
+	}
 	delDocumentModel($value, $type);
-	header("Location: " . $_SERVER["PHP_SELF"]);
+	header('Location: ' . $_SERVER['PHP_SELF']);
 }
 
 // Set default model
 if ($action == 'setdoc') {
-	$constforval = "DIGIRISKDOLIBARR_".strtoupper($type)."_DEFAULT_MODEL";
-	$label       = '';
+	$label = '';
 
-	if (dolibarr_set_const($db, $constforval, $value, 'chaine', 0, '', $conf->entity))
-	{
-		$conf->global->$constforval = $value;
+	if ($type != 'projectdocument') {
+		$constforval = 'DIGIRISKDOLIBARR_' .strtoupper($type). '_DEFAULT_MODEL';
+		dolibarr_set_const($db, $constforval, $value, 'chaine', 0, '', $conf->entity);
+	} else {
+		dolibarr_set_const($db, 'PROJECT_ADDON_PDF', $value, 'chaine', 0, '', $conf->entity);
 	}
 
 	// On active le modele
 	$ret = delDocumentModel($value, $type);
-
-	if ($ret > 0)
-	{
+	if ($ret > 0) {
 		$ret = addDocumentModel($value, $type, $label);
 	}
 } elseif ($action == 'setmod') {
-	$constforval = 'DIGIRISKDOLIBARR_'.strtoupper($type)."_ADDON";
+	$constforval = 'DIGIRISKDOLIBARR_'.strtoupper($type). '_ADDON';
 	dolibarr_set_const($db, $constforval, $value, 'chaine', 0, '', $conf->entity);
 }
 
@@ -138,7 +143,7 @@ if ($action == 'setModuleOptions') {
 		$tmpdir = DOL_DATA_ROOT.'/'.$tmpdir;	// Complete with DOL_DATA_ROOT. Only files into DOL_DATA_ROOT can be reach/set
 		if (!is_dir($tmpdir)) {
 			if (empty($nomessageinsetmoduleoptions)) {
-				setEventMessages($langs->trans("ErrorDirNotFound", $tmpdir), null, 'warnings');
+				setEventMessages($langs->trans('ErrorDirNotFound', $tmpdir), null, 'warnings');
 			}
 		} else {
 			$upload_dir = $tmpdir;
@@ -159,7 +164,7 @@ if ($action == 'setModuleOptions') {
 				if ($_FILES['userfile']['error'][$key] == 1 || $_FILES['userfile']['error'][$key] == 2) {
 					setEventMessages($langs->trans('ErrorFileSizeTooLarge'), null, 'errors');
 				} else {
-					setEventMessages($langs->trans("ErrorFieldRequired", $langs->transnoentitiesnoconv("File")), null, 'errors');
+					setEventMessages($langs->trans('ErrorFieldRequired', $langs->transnoentitiesnoconv('File')), null, 'errors');
 				}
 			}
 			if (preg_match('/__.*__/', $_FILES['userfile']['name'][$key])) {
@@ -182,19 +187,51 @@ if ($action == 'setModuleOptions') {
 			}
 		}
 	}
-
 }
 
+//if ($action == 'specimen') {
+//	$modele = GETPOST('module', 'alpha');
+//
+//	if ($type == 'projectdocument') {
+//		require_once DOL_DOCUMENT_ROOT . '/projet/class/project.class.php';
+//		$object = new Project($db);
+//		$object->initAsSpecimen();
+//	}
+//
+//	// Search template files
+//	$file = '';
+//	$classname = '';
+//	$file = dol_buildpath('/custom/digiriskdolibarr/core/modules/digiriskdolibarr/digiriskdocuments/' .$type. '/' . 'pdf_' . $modele . '.modules.php');
+//	if (file_exists($file)) {
+//		require_once __DIR__ . '/../../class/digiriskdocuments/' . $type . '.class.php';
+//
+//		$objectdocument = new $type($db);
+//
+//		$moreparams['object'] = $object;
+//		$moreparams['user']   = $user;
+//
+//		if ($objectdocument->generateDocument($modele, $langs, 0, 0, 0, $moreparams)) {
+//			header("Location: " . DOL_URL_ROOT . "/document.php?modulepart=project&file=SPECIMEN.pdf");
+//			return;
+//		} else {
+//			setEventMessages($objectdocument->error, $objectdocument->errors, 'errors');
+//			dol_syslog($objectdocument->error, LOG_ERR);
+//		}
+//	} else {
+//		setEventMessages($langs->trans("ErrorModuleNotFound"), null, 'errors');
+//		dol_syslog($langs->trans("ErrorModuleNotFound"), LOG_ERR);
+//	}
+//}
 
 /*
  * View
  */
 
 $help_url = 'FR:Module_DigiriskDolibarr#L.27onglet_Document_Digirisk';
-$title    = $langs->trans("YourDocuments");
+$title    = $langs->trans('YourDocuments');
 
-$morejs   = array("/digiriskdolibarr/js/digiriskdolibarr.js");
-$morecss  = array("/digiriskdolibarr/css/digiriskdolibarr.css");
+$morejs   = array('/digiriskdolibarr/js/digiriskdolibarr.js');
+$morecss  = array('/digiriskdolibarr/css/digiriskdolibarr.css');
 
 llxHeader('', $title, $help_url, '', '', '', $morejs, $morecss);
 
@@ -208,7 +245,8 @@ $types = array(
 	'RiskAssessmentDocument' 	=> 'riskassessmentdocument',
 	'PreventionPlan' 			=> 'preventionplandocument',
 	'FirePermit' 				=> 'firepermitdocument',
-	'Ticket' 					=> 'ticketdocument'
+	'Ticket' 					=> 'ticketdocument',
+	'Project' 					=> 'projectdocument'
 );
 
 $pictos = array(
@@ -221,7 +259,8 @@ $pictos = array(
 	'RiskAssessmentDocument' 	=> '<i class="fas fa-file-alt"></i> ',
 	'PreventionPlan' 			=> '<i class="fas fa-info"></i> ',
 	'FirePermit' 				=> '<i class="fas fa-fire-alt"></i> ',
-	'Ticket'	 				=> '<i class="fa fa-ticket"></i> '
+	'Ticket'	 				=> '<i class="fa fa-ticket"></i> ',
+	'Project'	 				=> '<i class="fa fa-project-diagram"></i> '
 );
 
 // Subheader
@@ -235,7 +274,7 @@ print load_fiche_titre($title, $selectorAnchor, 'digiriskdolibarr32px@digiriskdo
 
 // Configuration header
 $head = digiriskdolibarrAdminPrepareHead();
-print dol_get_fiche_head($head, 'digiriskdocuments', '', -1, "digiriskdolibarr@digiriskdolibarr");
+print dol_get_fiche_head($head, 'digiriskdocuments', '', -1, 'digiriskdolibarr@digiriskdolibarr');
 
 foreach ($types as $type => $documentType) {
 
@@ -247,16 +286,16 @@ foreach ($types as $type => $documentType) {
 
 	print '<table class="noborder centpercent">';
 	print '<tr class="liste_titre">';
-	print '<td>'.$langs->trans("Name").'</td>';
-	print '<td>'.$langs->trans("Description").'</td>';
-	print '<td class="nowrap">'.$langs->trans("Example").'</td>';
-	print '<td class="center">'.$langs->trans("Status").'</td>';
-	print '<td class="center">'.$langs->trans("ShortInfo").'</td>';
+	print '<td>'.$langs->trans('Name').'</td>';
+	print '<td>'.$langs->trans('Description').'</td>';
+	print '<td class="nowrap">'.$langs->trans('Example').'</td>';
+	print '<td class="center">'.$langs->trans('Status').'</td>';
+	print '<td class="center">'.$langs->trans('ShortInfo').'</td>';
 	print '</tr>';
 
 	clearstatcache();
 
-	$dir = dol_buildpath("/custom/digiriskdolibarr/core/modules/digiriskdolibarr/digiriskdocuments/".$documentType."/");
+	$dir = dol_buildpath('/custom/digiriskdolibarr/core/modules/digiriskdolibarr/digiriskdocuments/' .$documentType. '/');
 	if (is_dir($dir)) {
 		$handle = opendir($dir);
 		if (is_resource($handle)) {
@@ -276,7 +315,7 @@ foreach ($types as $type => $documentType) {
 						if ($module->isEnabled()) {
 							print '<tr class="oddeven"><td>';
 							print $langs->trans($module->name);
-							print "</td><td>";
+							print '</td><td>';
 							print $module->info();
 							print '</td>';
 
@@ -291,19 +330,19 @@ foreach ($types as $type => $documentType) {
 							print '<td class="center">';
 							$confType = 'DIGIRISKDOLIBARR_' . strtoupper($documentType) . '_ADDON';
 							if ($conf->global->$confType == $file || $conf->global->$confType.'.php' == $file) {
-								print img_picto($langs->trans("Activated"), 'switch_on');
+								print img_picto($langs->trans('Activated'), 'switch_on');
 							}
 							else {
-								print '<a class="reposition" href="'.$_SERVER["PHP_SELF"].'?action=setmod&value='.preg_replace('/\.php$/', '', $file).'&const='.$module->scandir.'&label='.urlencode($module->name).'" alt="'.$langs->trans("Default").'">'.img_picto($langs->trans("Disabled"), 'switch_off').'</a>';
+								print '<a class="reposition" href="'.$_SERVER['PHP_SELF'].'?action=setmod&value='.preg_replace('/\.php$/', '', $file).'&const='.$module->scandir.'&label='.urlencode($module->name).'&token=' . newToken() . '#' . $langs->trans($type) . '"  alt="'.$langs->trans('Default').'">'.img_picto($langs->trans('Disabled'), 'switch_off').'</a>';
 							}
 							print '</td>';
 
 							// Example for listing risks action
 							$htmltooltip = '';
-							$htmltooltip .= ''.$langs->trans("Version").': <b>'.$module->getVersion().'</b><br>';
+							$htmltooltip .= ''.$langs->trans('Version').': <b>'.$module->getVersion().'</b><br>';
 							$nextval = $module->getNextValue($object_document);
-							if ("$nextval" != $langs->trans("NotAvailable")) {  // Keep " on nextval
-								$htmltooltip .= $langs->trans("NextValue").': ';
+							if ("$nextval" != $langs->trans('NotAvailable')) {  // Keep " on nextval
+								$htmltooltip .= $langs->trans('NextValue').': ';
 								if ($nextval) {
 									if (preg_match('/^Error/', $nextval) || $nextval == 'NotConfigured')
 										$nextval = $langs->trans($nextval);
@@ -319,7 +358,7 @@ foreach ($types as $type => $documentType) {
 								if (!empty($module->error)) dol_htmloutput_mesg($module->error, '', 'error', 1);
 							}
 							print '</td>';
-							print "</tr>";
+							print '</tr>';
 						}
 					}
 				}
@@ -328,15 +367,19 @@ foreach ($types as $type => $documentType) {
 		}
 	}
 
-	$trad = "DigiriskTemplateDocument" . $type;
+	$trad = 'DigiriskTemplateDocument' . $type;
 	print load_fiche_titre($langs->trans($trad), '', '');
 
 	// Defini tableau def des modeles
 	$def = array();
-	$sql = "SELECT nom";
-	$sql .= " FROM ".MAIN_DB_PREFIX."document_model";
-	$sql .= " WHERE type = '".$documentType."'";
-	$sql .= " AND entity = ".$conf->entity;
+	$sql = 'SELECT nom';
+	$sql .= ' FROM ' .MAIN_DB_PREFIX. 'document_model';
+	if ($documentType != 'projectdocument') {
+		$sql .= " WHERE type = '" . $documentType . "'";
+	} else {
+		$sql .= " WHERE type = 'project'";
+	}
+	$sql .= ' AND entity = ' .$conf->entity;
 	$resql = $db->query($sql);
 	if ($resql) {
 		$i = 0;
@@ -355,17 +398,17 @@ foreach ($types as $type => $documentType) {
 
 	print '<table class="noborder centpercent">';
 	print '<tr class="liste_titre">';
-	print '<td>'.$langs->trans("Name").'</td>';
-	print '<td>'.$langs->trans("Description").'</td>';
-	print '<td class="center">'.$langs->trans("Status")."</td>";
-	print '<td class="center">'.$langs->trans("Default")."</td>";
-	print '<td class="center">'.$langs->trans("ShortInfo").'</td>';
-	print '<td class="center">'.$langs->trans("Preview").'</td>';
-	print "</tr>";
+	print '<td>'.$langs->trans('Name').'</td>';
+	print '<td>'.$langs->trans('Description').'</td>';
+	print '<td class="center">'.$langs->trans('Status'). '</td>';
+	print '<td class="center">'.$langs->trans('Default'). '</td>';
+	print '<td class="center">'.$langs->trans('ShortInfo').'</td>';
+	print '<td class="center">'.$langs->trans('Preview').'</td>';
+	print '</tr>';
 
 	clearstatcache();
 
-	$dir = dol_buildpath("/custom/digiriskdolibarr/core/modules/digiriskdolibarr/digiriskdocuments/".$documentType."/");
+	$dir = dol_buildpath('/custom/digiriskdolibarr/core/modules/digiriskdolibarr/digiriskdocuments/' .$documentType. '/');
 	if (is_dir($dir)) {
 		$handle = opendir($dir);
 		if (is_resource($handle)) {
@@ -376,7 +419,7 @@ foreach ($types as $type => $documentType) {
 			arsort($filelist);
 
 			foreach ($filelist as $file) {
-				if (preg_match('/\.modules\.php$/i', $file) && preg_match('/^(pdf_|doc_)/', $file) && preg_match('/' . $documentType . '/i', $file) && preg_match('/odt/i', $file)) {
+				if (preg_match('/\.modules\.php$/i', $file) && preg_match('/^(pdf_|doc_)/', $file) && preg_match('/' . $documentType . '/i', $file) && preg_match('/odt|pdf/i', $file)) {
 					if (file_exists($dir.'/'.$file)) {
 						$name = substr($file, 4, dol_strlen($file) - 16);
 						$classname = substr($file, 0, dol_strlen($file) - 12);
@@ -391,7 +434,7 @@ foreach ($types as $type => $documentType) {
 						if ($modulequalified) {
 							print '<tr class="oddeven"><td>';
 							print (empty($module->name) ? $name : $module->name);
-							print "</td><td>";
+							print '</td><td>';
 							if (method_exists($module, 'info')) print $module->info($langs);
 							else print $module->description;
 							print '</td>';
@@ -399,35 +442,40 @@ foreach ($types as $type => $documentType) {
 							// Active
 							if (in_array($name, $def)) {
 								print '<td class="center">';
-								print '<a href="'.$_SERVER["PHP_SELF"].'?action=del&amp;value='.$name.'&amp;const='.$module->scandir.'&amp;label='.urlencode($module->name).'&type='.preg_split('/_/',$name)[0].'">';
-								print img_picto($langs->trans("Enabled"), 'switch_on');
+								print '<a href="'.$_SERVER['PHP_SELF'].'?action=del&amp;value='.$name.'&amp;const='.$module->scandir.'&amp;label='.urlencode($module->name).'&type='.$documentType.'&token=' . newToken() . '#' . $langs->trans($type) . '">';
+								print img_picto($langs->trans('Enabled'), 'switch_on');
 								print '</a>';
-								print "</td>";
+								print '</td>';
 							}
 							else
 							{
 								print '<td class="center">';
-								print '<a href="'.$_SERVER["PHP_SELF"].'?action=set&amp;value='.$name.'&amp;const='.$module->scandir.'&amp;label='.urlencode($module->name).'&type='.preg_split('/_/',$name)[0].'">'.img_picto($langs->trans("Disabled"), 'switch_off').'</a>';
-								print "</td>";
+								print '<a href="'.$_SERVER['PHP_SELF'].'?action=set&amp;value='.$name.'&amp;const='.$module->scandir.'&amp;label='.urlencode($module->name).'&type='.$documentType.'&token=' . newToken() . '#' . $langs->trans($type) . '">'.img_picto($langs->trans('Disabled'), 'switch_off').'</a>';
+								print '</td>';
 							}
 
 							// Default
 							print '<td class="center">';
-							$defaultModelConf = 'DIGIRISKDOLIBARR_' . strtoupper($documentType) . '_DEFAULT_MODEL';
+							if ($documentType != 'projectdocument') {
+								$defaultModelConf = 'DIGIRISKDOLIBARR_' . strtoupper($documentType) . '_DEFAULT_MODEL';
+							} else {
+								$defaultModelConf = 'PROJECT_ADDON_PDF';
+							}
+
 							if ($conf->global->$defaultModelConf == $name) {
-								print img_picto($langs->trans("Default"), 'on');
+								print img_picto($langs->trans('Default'), 'on');
 							}
 							else {
-								print '<a href="'.$_SERVER["PHP_SELF"].'?action=setdoc&amp;value='.$name.'&amp;const='.$module->scandir.'&amp;label='.urlencode($module->name).'" alt="'.$langs->trans("Default").'">'.img_picto($langs->trans("Disabled"), 'off').'</a>';
+								print '<a href="'.$_SERVER['PHP_SELF'].'?action=setdoc&amp;value='.$name.'&amp;const='.$module->scandir.'&amp;label='.urlencode($module->name).'&type='.$documentType.'&token=' . newToken() . '#' . $langs->trans($type) . '" alt="'.$langs->trans('Default').'">'.img_picto($langs->trans('Disabled'), 'off').'</a>';
 							}
 							print '</td>';
 
 							// Info
-							$htmltooltip = ''.$langs->trans("Name").': '.$module->name;
-							$htmltooltip .= '<br>'.$langs->trans("Type").': '.($module->type ? $module->type : $langs->trans("Unknown"));
-							$htmltooltip .= '<br>'.$langs->trans("Width").'/'.$langs->trans("Height").': '.$module->page_largeur.'/'.$module->page_hauteur;
-							$htmltooltip .= '<br><br><u>'.$langs->trans("FeaturesSupported").':</u>';
-							$htmltooltip .= '<br>'.$langs->trans("Logo").': '.yn($module->option_logo, 1, 1);
+							$htmltooltip = ''.$langs->trans('Name').': '.$module->name;
+							$htmltooltip .= '<br>'.$langs->trans('Type').': '.($module->type ? $module->type : $langs->trans('Unknown'));
+							$htmltooltip .= '<br>'.$langs->trans('Width').'/'.$langs->trans('Height').': '.$module->page_largeur.'/'.$module->page_hauteur;
+							$htmltooltip .= '<br><br><u>'.$langs->trans('FeaturesSupported').':</u>';
+							$htmltooltip .= '<br>'.$langs->trans('Logo').': '.yn($module->option_logo, 1, 1);
 							print '<td class="center">';
 							print $form->textwithpicto('', $htmltooltip, -1, 0);
 							print '</td>';
@@ -435,10 +483,10 @@ foreach ($types as $type => $documentType) {
 							// Preview
 							print '<td class="center">';
 							if ($module->type == 'pdf') {
-								print '<a href="'.$_SERVER["PHP_SELF"].'?action=specimen&module='.$name.'">'.img_object($langs->trans("Preview"), 'intervention').'</a>';
+								//print '<a href="'.$_SERVER['PHP_SELF'].'?action=specimen&module='.$name.'&type='.$documentType.'&token=' . newToken() . '#' . $langs->trans($type) . '" >'.img_object($langs->trans('Preview'), 'pdf').'</a>';
 							}
 							else {
-								print img_object($langs->trans("PreviewNotAvailable"), 'generic');
+								print img_object($langs->trans('PreviewNotAvailable'), 'generic');
 							}
 							print '</td>';
 							print '</tr>';
@@ -456,14 +504,14 @@ foreach ($types as $type => $documentType) {
 
 		print '<table class="noborder centpercent">';
 		print '<tr class="liste_titre">';
-		print '<td>' . $langs->trans("Name") . '</td>';
-		print '<td>' . $langs->trans("Description") . '</td>';
-		print '<td class="center">' . $langs->trans("Status") . '</td>';
+		print '<td>' . $langs->trans('Name') . '</td>';
+		print '<td>' . $langs->trans('Description') . '</td>';
+		print '<td class="center">' . $langs->trans('Status') . '</td>';
 		print '</tr>';
 
 		print '<tr class="oddeven"><td>';
 		print $langs->trans('ShowTaskDone');
-		print "</td><td>";
+		print '</td><td>';
 		print $langs->trans('ShowTaskDone'.$type.'Description');
 		print '</td>';
 

@@ -92,10 +92,10 @@ if (empty($backtopage) || ($cancel && empty($id))) {
 // Action to add record
 if ($action == 'addSignature') {
 	$signatoryID  = GETPOST('signatoryID');
-	$request_body = file_get_contents('php://input');
+	$data = json_decode(file_get_contents('php://input'), true);
 
 	$signatory->fetch($signatoryID);
-	$signatory->signature      = $request_body;
+	$signatory->signature      = $data['signature'];
 	$signatory->signature_date = dol_now('tzuser');
 
 	if ( ! $error) {

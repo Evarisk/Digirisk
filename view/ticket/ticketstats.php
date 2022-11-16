@@ -244,6 +244,8 @@ print '<div class="fichecenter"><div class="fichethirdleft">';
 print '<form class="ticketstats" name="stats" method="POST" action="'.$_SERVER["PHP_SELF"].'?refresh=1">';
 print '<input type="hidden" name="token" value="'.newToken().'">';
 
+$all = array($langs->trans('All') => $langs->trans('All'));
+
 print '<table class="noborder centpercent">';
 print '<tr class="liste_titre"><td class="liste_titre" colspan="2">'.$langs->trans("Filter").'</td></tr>';
 // Company
@@ -254,7 +256,7 @@ print '</td></tr>';
 // DigiriskElement
 print '<tr><td class="left">'.$form->textwithpicto($langs->trans("GP/UT"), $langs->trans("GP/UTHelp")).'</td><td class="left">';
 $digiriskelementlist = $digiriskelement->select_digiriskelement_list($digiriskelementid, 'digiriskelementid', '', 1, 0, array(), 1);
-$digiriskelementlist[$langs->trans('All')] = $langs->trans('All');
+$digiriskelementlist = $all + $digiriskelementlist;
 print $form->multiselectarray('digiriskelementlist', $digiriskelementlist, ((!empty(GETPOST('refresh', 'int'))) ? GETPOST('digiriskelementlist', 'array') : $digiriskelementlist), 0, 0, 'widthcentpercentminusx maxwidth300');
 print '</td></tr>';
 // Category
@@ -264,7 +266,7 @@ if (!empty($conf->category->enabled)) {
 	print '<tr><td>'.$form->textwithpicto($cat_label, $langs->trans("CategoryTicketHelp")).'</td><td>';
 	$cate_arbo = $form->select_all_categories($cat_type, null, 'parent', null, null, 1);
 	print img_picto('', 'category', 'class="pictofixedwidth"');
-	$cate_arbo[$langs->trans('All')] = $langs->trans('All');
+	$cate_arbo = $all + $cate_arbo;
 	print $form->multiselectarray('ticketcats', $cate_arbo, ((!empty(GETPOST('refresh', 'int'))) ? GETPOST('ticketcats', 'array') : $cate_arbo), 0, 0, 'widthcentpercentminusx maxwidth300');
 	print '</td></tr>';
 }
@@ -279,7 +281,7 @@ print $form->select_dolusers($userassignid, 'userassignid', 1, '', 0, '', '', $c
 // Status
 print '<tr><td class="left">'.$form->textwithpicto($langs->trans("Status"), $langs->trans("StatusHelp")).'</td><td class="left">';
 $liststatus = $object->statuts_short;
-$liststatus[$langs->trans('All')] = $langs->trans('All');
+$liststatus = $all + $liststatus;
 print $form->multiselectarray('object_status', $liststatus, ((!empty(GETPOST('refresh', 'int'))) ? GETPOST('object_status', 'array') : $liststatus), 0, 0, 'widthcentpercentminusx maxwidth300', 1);
 print '</td></tr>';
 //DateRange -- Plage de date

@@ -119,6 +119,7 @@ $arrayfields = array(
 	'u.employee' => array('label' => $langs->trans("Employee"), 'checked' => ($mode == 'employee' ? 1 : 0)),
 	'u.accountancy_code' => array('label' => $langs->trans("AccountancyCode"), 'checked' => 0),
 	'u.email' => array('label' => $langs->trans("EMail"), 'checked' => 1),
+	'u.job' => array('label' => $langs->trans("PostOrFunction"), 'checked' => 1),
 	'u.api_key' => array('label' => $langs->trans("ApiKey"), 'checked' => 0, "enabled" => ($conf->api->enabled && $user->admin)),
 	'u.fk_soc' => array('label' => $langs->trans("Company"), 'checked' => 1),
 	'u.entity' => array('label' => $langs->trans("Entity"), 'checked' => 1, 'enabled' => ( ! empty($conf->multicompany->enabled) && empty($conf->global->MULTICOMPANY_TRANSVERSE_MODE))),
@@ -152,6 +153,7 @@ $search_gender           = GETPOST('search_gender', 'alpha');
 $search_employee         = GETPOST('search_employee', 'alpha');
 $search_accountancy_code = GETPOST('search_accountancy_code', 'alpha');
 $search_email            = GETPOST('search_email', 'alpha');
+$search_job              = GETPOST('search_job', 'alpha');
 $search_api_key          = GETPOST('search_api_key', 'alphanohtml');
 $search_statut           = GETPOST('search_statut', 'intcomma');
 $search_thirdparty       = GETPOST('search_thirdparty', 'alpha');
@@ -190,6 +192,7 @@ if (empty($reshook)) {
 		$search_employee          = "";
 		$search_accountancy_code  = "";
 		$search_email             = "";
+		$search_job               = "";
 		$search_statut            = "";
 		$search_thirdparty        = "";
 		$search_supervisor        = "";
@@ -244,6 +247,7 @@ if ($action == 'add' && $canadduser && $permissiontoadd) {
 		$object->firstname = GETPOST("firstname", 'alphanohtml');
 		$object->login     = $login;
 		$object->email     = preg_replace('/\s+/', '', GETPOST("email", 'alphanohtml'));
+		$object->job       = GETPOST("job", 'alphanohtml');
 		$object->fk_user   = GETPOST("fk_user", 'int') > 0 ? GETPOST("fk_user", 'int') : 0;
 
 		// Fill array 'array_options' with data from add form
@@ -308,7 +312,7 @@ $formother = new FormOther($db);
 $user2 = new User($db);
 
 
-$sql  = "SELECT DISTINCT u.rowid, u.lastname, u.firstname, u.admin, u.fk_soc, u.login, u.email, u.api_key, u.accountancy_code, u.gender, u.employee, u.photo,";
+$sql  = "SELECT DISTINCT u.rowid, u.lastname, u.firstname, u.admin, u.fk_soc, u.login, u.email, u.job, u.api_key, u.accountancy_code, u.gender, u.employee, u.photo,";
 $sql .= " u.datelastlogin, u.datepreviouslogin,";
 $sql .= " u.ldap_sid, u.statut, u.entity,";
 $sql .= " u.tms as date_update, u.datec as date_creation,";
@@ -350,6 +354,7 @@ if (is_numeric($search_employee) && $search_employee >= 0) {
 }
 if ($search_accountancy_code != '')  $sql             .= natural_search("u.accountancy_code", $search_accountancy_code);
 if ($search_email != '')             $sql             .= natural_search("u.email", $search_email);
+if ($search_job != '')             $sql               .= natural_search("u.job", $search_job);
 if ($search_api_key != '')           $sql             .= natural_search("u.api_key", $search_api_key);
 if ($search_statut != '' && $search_statut >= 0) $sql .= " AND u.statut IN (" . $db->escape($search_statut) . ")";
 if ($sall)                           $sql             .= natural_search(array_keys($fieldstosearchall), $sall);
@@ -411,6 +416,7 @@ if ($search_gender != '') $param                                           .= "&
 if ($search_employee != '') $param                                         .= "&amp;search_employee=" . urlencode($search_employee);
 if ($search_accountancy_code != '') $param                                 .= "&amp;search_accountancy_code=" . urlencode($search_accountancy_code);
 if ($search_email != '') $param                                            .= "&amp;search_email=" . urlencode($search_email);
+if ($search_job != '') $param                                              .= "&amp;search_job=" . urlencode($search_job);
 if ($search_api_key != '') $param                                          .= "&amp;search_api_key=" . urlencode($search_api_key);
 if ($search_supervisor > 0) $param                                         .= "&amp;search_supervisor=" . urlencode($search_supervisor);
 if ($search_fk_usergroup > 0) $param                                       .= "&amp;search_fk_usergroup=" . urlencode($search_fk_usergroup);
@@ -504,6 +510,9 @@ if ( ! empty($arrayfields['u.email']['checked'])) {
 if ( ! empty($arrayfields['u.api_key']['checked'])) {
 	print '<td class="liste_titre"><input type="text" name="search_api_key" class="maxwidth50" value="' . $search_api_key . '"></td>';
 }
+if ( ! empty($arrayfields['u.job']['checked'])) {
+	print '<td class="liste_titre"><input type="text" name="search_job" class="maxwidth75" value="' . $search_job . '"></td>';
+}
 if ( ! empty($arrayfields['u.fk_soc']['checked'])) {
 	print '<td class="liste_titre"><input type="text" name="search_thirdparty" class="maxwidth75" value="' . $search_thirdparty . '"></td>';
 }
@@ -566,6 +575,7 @@ if ( ! empty($arrayfields['u.gender']['checked']))         print_liste_field_tit
 if ( ! empty($arrayfields['u.employee']['checked']))       print_liste_field_titre("Employee", $_SERVER['PHP_SELF'], "u.employee", $param, "", "", $sortfield, $sortorder);
 if ( ! empty($arrayfields['u.accountancy_code']['checked'])) print_liste_field_titre("AccountancyCode", $_SERVER['PHP_SELF'], "u.accountancy_code", $param, "", "", $sortfield, $sortorder);
 if ( ! empty($arrayfields['u.email']['checked']))          print_liste_field_titre("EMail", $_SERVER['PHP_SELF'], "u.email", $param, "", "", $sortfield, $sortorder);
+if ( ! empty($arrayfields['u.job']['checked']))          print_liste_field_titre("PostOrFunction", $_SERVER['PHP_SELF'], "u.job", $param, "", "", $sortfield, $sortorder);
 if ( ! empty($arrayfields['u.api_key']['checked']))        print_liste_field_titre("ApiKey", $_SERVER['PHP_SELF'], "u.api_key", $param, "", "", $sortfield, $sortorder);
 if ( ! empty($arrayfields['u.fk_soc']['checked']))         print_liste_field_titre("Company", $_SERVER['PHP_SELF'], "u.fk_soc", $param, "", "", $sortfield, $sortorder);
 if ( ! empty($arrayfields['u.entity']['checked']))         print_liste_field_titre("Entity", $_SERVER['PHP_SELF'], "u.entity", $param, "", "", $sortfield, $sortorder);
@@ -598,6 +608,7 @@ while ($i < min($num, $limit)) {
 	$userstatic->login     = $obj->login;
 	$userstatic->statut    = $obj->statut;
 	$userstatic->email     = $obj->email;
+	$userstatic->job       = $obj->job;
 	$userstatic->gender    = $obj->gender;
 	$userstatic->socid     = $obj->fk_soc;
 	$userstatic->firstname = $obj->firstname;
@@ -643,6 +654,10 @@ while ($i < min($num, $limit)) {
 	}
 	if ( ! empty($arrayfields['u.email']['checked'])) {
 		print '<td>' . $obj->email . '</td>';
+		if ( ! $i) $totalarray['nbfield']++;
+	}
+	if ( ! empty($arrayfields['u.job']['checked'])) {
+		print '<td>' . $obj->job . '</td>';
 		if ( ! $i) $totalarray['nbfield']++;
 	}
 	if ( ! empty($arrayfields['u.api_key']['checked'])) {
@@ -701,6 +716,7 @@ while ($i < min($num, $limit)) {
 			$user2->photo     = $obj->photo2;
 			$user2->admin     = $obj->admin2;
 			$user2->email     = $obj->email2;
+			$user2->job       = $obj->job;
 			$user2->socid     = $obj->fk_soc2;
 			$user2->statut    = $obj->statut2;
 			print $user2->getNomUrl(-1, '', 0, 0, 24, 0, '', '', 1);
@@ -808,6 +824,9 @@ if ($canadduser && (empty($conf->global->MULTICOMPANY_TRANSVERSE_MODE) || $conf-
 								</div>
 								<div class="table-cell table-300">
 									<input style="width:100%" type="email" id="email" class="email" placeholder="<?php echo $langs->trans('Email') ; ?>" name="email" value="<?php echo GETPOST('email'); ?>" />
+								</div>
+								<div class="table-cell table-150">
+									<input type="text" id="job" placeholder="<?php echo $langs->trans('PostOrFunction'); ?>" name="job" value="<?php echo dol_escape_htmltag(GETPOST('job')); ?>" />
 								</div>
 								<div class="table-cell">
 									<input type="submit" id="createuseraction" name="createuseraction" style="display : none">

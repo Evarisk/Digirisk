@@ -23,7 +23,9 @@
  */
 
 require_once DOL_DOCUMENT_ROOT . '/core/class/commondocgenerator.class.php';
+require_once DOL_DOCUMENT_ROOT . '/core/lib/admin.lib.php';
 require_once DOL_DOCUMENT_ROOT . '/ticket/class/ticket.class.php';
+require_once DOL_DOCUMENT_ROOT . '/categories/class/categorie.class.php';
 
 /**
  *	Parent class for documents models
@@ -145,7 +147,7 @@ abstract class ModeleODTDigiriskElementDocument extends CommonDocGenerator
 			$tmparray = array_merge($substitutionarray, $array_object_from_properties, $array_soc);
 			complete_substitutions_array($tmparray, $outputlangs, $object);
 
-			if (!empty($conf->global->DIGIRISKDOLIBARR_SHOW_SHARED_RISKS)) {
+			if (!empty($conf->multicompany->enabled)) {
 				$tmparray['entity'] = 'S'. $conf->entity . ' - ';
 			} else {
 				$tmparray['entity'] = ' ';
@@ -184,12 +186,13 @@ abstract class ModeleODTDigiriskElementDocument extends CommonDocGenerator
 			try {
 				$foundtagforlines = 1;
 				if ($foundtagforlines) {
-					$risk                  = new Risk($this->db);
-					$evaluator             = new Evaluator($this->db);
-					$usertmp               = new User($this->db);
-					$risksign              = new RiskSign($this->db);
-					$accident              = new Accident($this->db);
-					$ticket                = new Ticket($this->db);
+					$risk      = new Risk($this->db);
+					$evaluator = new Evaluator($this->db);
+					$usertmp   = new User($this->db);
+					$risksign  = new RiskSign($this->db);
+					$accident  = new Accident($this->db);
+					$ticket    = new Ticket($this->db);
+					$category  = new Categorie($this->db);
 
 					if ( ! empty($digiriskelement) ) {
 						//Fill risks data
@@ -202,7 +205,7 @@ abstract class ModeleODTDigiriskElementDocument extends CommonDocGenerator
 						if (is_array($evaluators) && !empty($evaluators)) {
 							foreach ($evaluators as $line) {
 								$element = new DigiriskElement($this->db);
-								$element->fetch($line->fk_element);
+								$element->fetch($line->fk_parent);
 								$usertmp->fetch($line->fk_user);
 
 								$tmparray['nomElement']                 = (!empty($conf->global->DIGIRISKDOLIBARR_SHOW_SHARED_EVALUATORS) ? 'S' . $element->entity . ' - ' : '') . $element->ref . ' - ' . $element->label;
@@ -337,14 +340,25 @@ abstract class ModeleODTDigiriskElementDocument extends CommonDocGenerator
 						$odfHandler->mergeSegment($listlines);
 
 						//Fill tickets data
-						if ($conf->global->DIGIRISKDOLIBARR_DIGIRISKDOLIBARR_TICKET_EXTRAFIELDS == 1) {
+						if (dolibarr_get_const($this->db, 'DIGIRISKDOLIBARR_TICKET_EXTRAFIELDS', 0)) {
 							$filter = array('ef.digiriskdolibarr_ticket_service' => $digiriskelement->id);
 							$ticket->fetchAll($user, '', '', '', 0, '', $filter);
 						}
 						$listlines = $odfHandler->setSegment('tickets');
 						if (is_array($ticket->lines) && !empty($ticket->lines)) {
 							foreach ($ticket->lines as $line) {
-								$tmparray['refticket']     = $line->ref;
+								$tmparray['refticket'] = $line->ref;
+
+								$categories = $category->containing($line->id, Categorie::TYPE_TICKET);
+								if (!empty($categories)) {
+									foreach ($categories as $cat) {
+										$allcategories[] = $cat->label;
+									}
+									$tmparray['categories'] = implode(', ', $allcategories);
+								} else {
+									$tmparray['categories'] = '';
+								}
+
 								$tmparray['creation_date'] = dol_print_date($line->datec, 'dayhoursec', 'tzuser');
 								$tmparray['subject']       = $line->subject;
 								$tmparray['progress']      = (($line->progress) ?: 0) . ' %';
@@ -378,6 +392,7 @@ abstract class ModeleODTDigiriskElementDocument extends CommonDocGenerator
 							}
 						} else {
 							$tmparray['refticket']     = $langs->trans('NoData');
+							$tmparray['categories']    = $langs->trans('NoData');
 							$tmparray['creation_date'] = $langs->trans('NoData');
 							$tmparray['subject']       = $langs->trans('NoData');
 							$tmparray['progress']      = $langs->trans('NoData');

@@ -103,16 +103,8 @@ abstract class ModeleODTTicketDocument extends CommonDocGenerator
 			$filename = preg_split('/ticketdocument\//', $srctemplatepath);
 			preg_replace('/template_/', '', $filename[1]);
 
-			if (preg_match('/_events/', $filename[1])) {
-				$foundtagforlines = 1;
-				$events = '_events';
-			} else {
-				$foundtagforlines = 0;
-				$events = '';
-			}
-
 			$date     = dol_print_date(dol_now(), 'dayxcard');
-			$filename = $date . '_' . $ref . '_' . $objectref . '_' . $conf->global->MAIN_INFO_SOCIETE_NOM . $events . '.odt';
+			$filename = $date . '_' . $ref . '_' . $objectref . '_' . $conf->global->MAIN_INFO_SOCIETE_NOM . '.odt';
 			$filename = str_replace(' ', '_', $filename);
 			$filename = dol_sanitizeFileName($filename);
 
@@ -149,7 +141,7 @@ abstract class ModeleODTTicketDocument extends CommonDocGenerator
 				);
 			} catch (Exception $e) {
 				$this->error = $e->getMessage();
-				dol_syslog($e->getMessage(), LOG_INFO);
+				dol_syslog($e->getMessage());
 				return -1;
 			}
 
@@ -188,12 +180,12 @@ abstract class ModeleODTTicketDocument extends CommonDocGenerator
 				foreach ($categories as $cat) {
 					$allcategories[] = $cat->label;
 				}
-				$tmparray['categories']       = implode(', ', $allcategories);
+				$tmparray['categories'] = implode(', ', $allcategories);
 			} else {
-				$tmparray['categories']       = '';
+				$tmparray['categories'] = '';
 			}
 
-			$tmparray['status']           = $ticket->getLibStatut();
+			$tmparray['status'] = $ticket->getLibStatut();
 
 			$user = new User($this->db);
 			$user->fetch($ticket->fk_user_assign);
@@ -256,7 +248,7 @@ abstract class ModeleODTTicketDocument extends CommonDocGenerator
 						$odfHandler->setVars($key, html_entity_decode($value, ENT_QUOTES | ENT_HTML5), true, 'UTF-8');
 					}
 				} catch (OdfException $e) {
-					dol_syslog($e->getMessage(), LOG_INFO);
+					dol_syslog($e->getMessage());
 				}
 			}
 
@@ -268,10 +260,17 @@ abstract class ModeleODTTicketDocument extends CommonDocGenerator
 
 			// Replace tags of lines
 			try {
+				$foundtagforlines = 1;
+				try  {
+					$listlines = $odfHandler->setSegment('events');
+				} catch (OdfException $e) {
+					// We may arrive here if tags for lines not present into template
+					$foundtagforlines = 0;
+					dol_syslog($e->getMessage());
+				}
+
 				if ($foundtagforlines) {
 					if ( ! empty($event_list) && $event_list > 0) {
-						$listlines = $odfHandler->setSegment('events');
-
 						foreach ($event_list as $event) {
 							$usertmp->fetch($event->authorid);
 							$tmparray['event_ref'] = $event->ref;
@@ -288,10 +287,8 @@ abstract class ModeleODTTicketDocument extends CommonDocGenerator
 									} else {
 										$listlines->setVars($key, html_entity_decode($val, ENT_QUOTES | ENT_HTML5), true, 'UTF-8');
 									}
-								} catch (OdfException $e) {
-									dol_syslog($e->getMessage(), LOG_INFO);
 								} catch (SegmentException $e) {
-									dol_syslog($e->getMessage(), LOG_INFO);
+									dol_syslog($e->getMessage());
 								}
 							}
 							$listlines->merge();
@@ -311,7 +308,7 @@ abstract class ModeleODTTicketDocument extends CommonDocGenerator
 				try {
 					$odfHandler->setVars($key, $value, true, 'UTF-8');
 				} catch (OdfException $e) {
-					dol_syslog($e->getMessage(), LOG_INFO);
+					dol_syslog($e->getMessage());
 				}
 			}
 
@@ -325,7 +322,7 @@ abstract class ModeleODTTicketDocument extends CommonDocGenerator
 					$odfHandler->exportAsAttachedPDF($file);
 				} catch (Exception $e) {
 					$this->error = $e->getMessage();
-					dol_syslog($e->getMessage(), LOG_INFO);
+					dol_syslog($e->getMessage());
 					return -1;
 				}
 			} else {
@@ -333,7 +330,7 @@ abstract class ModeleODTTicketDocument extends CommonDocGenerator
 					$odfHandler->saveToDisk($file);
 				} catch (Exception $e) {
 					$this->error = $e->getMessage();
-					dol_syslog($e->getMessage(), LOG_INFO);
+					dol_syslog($e->getMessage());
 					return -1;
 				}
 			}
@@ -351,5 +348,4 @@ abstract class ModeleODTTicketDocument extends CommonDocGenerator
 			return -1;
 		}
 	}
-
 }

@@ -173,6 +173,7 @@ class DigiriskElement extends CommonObject
 		}
 		$this->element     = $this->element_type . '@digiriskdolibarr';
 		$this->fk_standard = $conf->global->DIGIRISKDOLIBARR_ACTIVE_STANDARD;
+		$this->status      = 1;
 		return $this->createCommon($user, $notrigger);
 	}
 

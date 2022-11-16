@@ -390,22 +390,27 @@ class DigiriskDocuments extends CommonObject
 	/**
 	 *  Create a document onto disk according to template module.
 	 *
-	 *  @param	    string		$modele			Force template to use ('' to not force)
-	 *  @param		Translate	$outputlangs	objet lang a utiliser pour traduction
-	 *  @param      int			$hidedetails    Hide details of lines
-	 *  @param      int			$hidedesc       Hide description
-	 *  @param      int			$hideref        Hide ref
-	 *  @param      null|array  $moreparams     Array to provide more information
-	 *  @return     int         				0 if KO, 1 if OK
+	 *  @param	    string		$modele			       Force template to use ('' to not force)
+	 *  @param		Translate	$outputlangs	       Objet langs use for translation
+	 *  @param      int			$hidedetails           Hide details of lines
+	 *  @param      int			$hidedesc              Hide description
+	 *  @param      int			$hideref               Hide ref
+	 *  @param      null|array  $moreparams            Array to provide more information
+	 *  @param      bool        $preventrecursivecall  Prevent recursive on commonGenerateDocument hook
+	 *  @return     int         				       0 if KO, 1 if OK
 	 */
-	public function generateDocument($modele, $outputlangs, $hidedetails = 0, $hidedesc = 0, $hideref = 0, $moreparams = null)
+	public function generateDocument($modele, $outputlangs, $hidedetails = 0, $hidedesc = 0, $hideref = 0, $moreparams = null, $preventrecursivecall = false)
 	{
 		global $langs;
 		$langs->load("digiriskdolibarr@digiriskdolibarr");
 
 		$modelpath = "custom/digiriskdolibarr/core/modules/digiriskdolibarr/digiriskdocuments/".$this->element."/";
 
-		$result = $this->commonGenerateDocument($modelpath, $modele, $outputlangs, $hidedetails, $hidedesc, $hideref, $moreparams['object']);
+		if ($preventrecursivecall) {
+			$moreparams['preventrecursivecall'] = true;
+		}
+
+		$result = $this->commonGenerateDocument($modelpath, $modele, $outputlangs, $hidedetails, $hidedesc, $hideref, ($preventrecursivecall ? $moreparams : $moreparams['object']));
 
 		$this->call_trigger(strtoupper($this->type).'_GENERATE', $moreparams['user']);
 

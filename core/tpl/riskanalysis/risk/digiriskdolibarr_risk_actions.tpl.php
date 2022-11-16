@@ -87,6 +87,13 @@ if ( ! $error && $action == 'add' && $permissiontoadd) {
 
 			if ($result2 > 0) {
 				$tasktitle = $data['task'];
+				$dateStart = $data['dateStart'];
+				$hourStart = $data['hourStart'];
+				$minStart  = $data['minStart'];
+				$dateEnd   = $data['dateEnd'];
+				$hourEnd   = $data['hourEnd'];
+				$minEnd    = $data['minEnd'];
+				$budget    = $data['budget'];
 				if ( ! empty($tasktitle) && $tasktitle !== 'undefined') {
 					$extrafields->fetch_name_optionals_label($task->table_element);
 
@@ -94,6 +101,13 @@ if ( ! $error && $action == 'add' && $permissiontoadd) {
 					$task->label                            = $tasktitle;
 					$task->fk_project                       = $conf->global->DIGIRISKDOLIBARR_DU_PROJECT;
 					$task->date_c                           = dol_now();
+					$task->date_start                       = strtotime(preg_replace('/\//', '-', $dateStart));
+					$task->date_start                       = dol_time_plus_duree($task->date_start, $hourStart, 'h');
+					$task->date_start                       = dol_time_plus_duree($task->date_start, $minStart, 'i');
+					$task->date_end                         = strtotime(preg_replace('/\//', '-', $dateEnd));
+					$task->date_end                         = dol_time_plus_duree($task->date_end, $hourEnd, 'h');
+					$task->date_end                         = dol_time_plus_duree($task->date_end, $minEnd, 'i');
+					$task->budget_amount                    = $budget;
 					$task->array_options['options_fk_risk'] = $risk->id;
 
 					$result3 = $task->create($user, true);
@@ -378,6 +392,13 @@ if ( ! $error && $action == 'addRiskAssessmentTask' && $permissiontoadd) {
 
 	$riskID    = $data['riskToAssign'];
 	$tasktitle = $data['tasktitle'];
+	$dateStart = $data['dateStart'];
+	$hourStart = $data['hourStart'];
+	$minStart  = $data['minStart'];
+	$dateEnd   = $data['dateEnd'];
+	$hourEnd   = $data['hourEnd'];
+	$minEnd    = $data['minEnd'];
+	$budget    = $data['budget'];
 
 	$extrafields->fetch_name_optionals_label($task->table_element);
 
@@ -385,6 +406,13 @@ if ( ! $error && $action == 'addRiskAssessmentTask' && $permissiontoadd) {
 	$task->label                            = $tasktitle;
 	$task->fk_project                       = $conf->global->DIGIRISKDOLIBARR_DU_PROJECT;
 	$task->date_c                           = dol_now();
+	$task->date_start                       = strtotime(preg_replace('/\//', '-', $dateStart));
+	$task->date_start                       = dol_time_plus_duree($task->date_start, $hourStart, 'h');
+	$task->date_start                       = dol_time_plus_duree($task->date_start, $minStart, 'i');
+	$task->date_end                         = strtotime(preg_replace('/\//', '-', $dateEnd));
+	$task->date_end                         = dol_time_plus_duree($task->date_end, $hourEnd, 'h');
+	$task->date_end                         = dol_time_plus_duree($task->date_end, $minEnd, 'i');
+	$task->budget_amount                    = $budget;
 	$task->fk_task_parent                   = 0;
 	$task->array_options['options_fk_risk'] = $riskID;
 
@@ -408,11 +436,25 @@ if ( ! $error && $action == 'saveRiskAssessmentTask' && $permissiontoadd) {
 
 	$riskAssessmentTaskID = $data['riskAssessmentTaskID'];
 	$tasktitle            = $data['tasktitle'];
+	$dateStart            = $data['dateStart'];
+	$hourStart            = $data['hourStart'];
+	$minStart             = $data['minStart'];
+	$dateEnd              = $data['dateEnd'];
+	$hourEnd              = $data['hourEnd'];
+	$minEnd               = $data['minEnd'];
+	$budget               = $data['budget'];
 	$taskProgress         = $data['taskProgress'];
 
 	$task->fetch($riskAssessmentTaskID);
 
-	$task->label = $tasktitle;
+	$task->label         = $tasktitle;
+	$task->date_start    = strtotime(preg_replace('/\//', '-', $dateStart));
+	$task->date_start    = dol_time_plus_duree($task->date_start, $hourStart, 'h');
+	$task->date_start    = dol_time_plus_duree($task->date_start, $minStart, 'i');
+	$task->date_end      = strtotime(preg_replace('/\//', '-', $dateEnd));
+	$task->date_end      = dol_time_plus_duree($task->date_end, $hourEnd, 'h');
+	$task->date_end      = dol_time_plus_duree($task->date_end, $minEnd, 'i');
+	$task->budget_amount = $budget;
 
 	if ($taskProgress == 1) {
 		$task->progress = 100;
@@ -713,7 +755,7 @@ if ($action == 'confirm_import_shared_risks' && $confirm == 'yes') {
 				$object->element = 'digiriskdolibarr_' . $digiriskelementtmp->element;
 				$result = $object->add_object_linked('digiriskdolibarr_' . $risk->element, $risks->id);
 				if ($result > 0) {
-					continue;
+					setEventMessages($langs->trans('SharedRiskImportWithSuccess'), array());
 				} else {
 					setEventMessages($object->error, $object->errors, 'errors');
 					$action = '';

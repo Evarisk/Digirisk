@@ -1103,7 +1103,7 @@ if ((empty($action) || ($action != 'create' && $action != 'edit'))) {
 				print '<a class="' . ($object->status == 3 ? 'butAction' : 'butActionRefused classfortooltip') . '" id="actionButtonSign" title="' . dol_escape_htmltag($langs->trans("FirePermitMustBeLockedToSendEmail")) . '" href="' . ($object->status == 3 ? ($_SERVER['PHP_SELF'] . '?id=' . $object->id . '&action=presend&mode=init&sendto=' . $allLinks['LabourInspectorSociety']->id[0].'#sendEmail') : '#') . '">' . $langs->trans('SendMail') . '</a>';
 			}
 
-			print '<a class="' . ($object->status == 3 ? 'butAction' : 'butActionRefused classfortooltip') . '" id="actionButtonClose" title="' . ($object->status == 3 ? '' : dol_escape_htmltag($langs->trans("FirePermitMustBeLocked"))) . '" href="' . ($object->status == 3 ? ($_SERVER["PHP_SELF"] . '?id=' . $object->id . '&action=setArchived') : '#') . '">' . $langs->trans("Close") . '</a>';
+			print '<a class="' . ($object->status == 3 ? 'butAction' : 'butActionRefused classfortooltip') . '" id="actionButtonArchive" title="' . ($object->status == 3 ? '' : dol_escape_htmltag($langs->trans("FirePermitMustBeLocked"))) . '" href="' . ($object->status == 3 ? ($_SERVER["PHP_SELF"] . '?id=' . $object->id . '&action=setArchived') : '#') . '">' . $langs->trans("Archive") . '</a>';
 			print '<span class="butAction" id="actionButtonClone" title="" href="' . $_SERVER["PHP_SELF"] . '?id=' . $object->id . '&action=clone' . '">' . $langs->trans("ToClone") . '</span>';
 
 			$langs->load("mails");
