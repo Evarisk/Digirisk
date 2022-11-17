@@ -111,6 +111,7 @@ class PreventionPlan extends CommonObject
 	 */
 	public $lines = array();
 
+	const STATUS_DELETE = 0;
 	const STATUS_IN_PROGRESS = 1;
 	const STATUS_PENDING_SIGNATURE = 2;
 	const STATUS_LOCKED = 3;
@@ -608,6 +609,7 @@ class PreventionPlan extends CommonObject
 			global $langs;
 			$langs->load("digiriskdolibarr@digiriskdolibarr");
 
+			$this->labelStatus[self::STATUS_DELETE]           = $langs->trans('Deleted');
 			$this->labelStatus[self::STATUS_IN_PROGRESS]       = $langs->trans('InProgress');
 			$this->labelStatus[self::STATUS_PENDING_SIGNATURE] = $langs->trans('ValidatePendingSignature');
 			$this->labelStatus[self::STATUS_LOCKED]            = $langs->trans('Locked');
