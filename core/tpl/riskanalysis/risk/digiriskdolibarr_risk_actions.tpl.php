@@ -527,9 +527,13 @@ if ( ! $error && $action == 'addRiskAssessmentTaskTimeSpent' && $permissiontoadd
 
 	$task->fetch($taskID);
 
-	$task->timespent_date     = strtotime(preg_replace('/\//', '-', $date));
-	$task->timespent_date     = dol_time_plus_duree($task->timespent_date, $hour, 'h');
-	$task->timespent_date     = dol_time_plus_duree($task->timespent_date, $min, 'i');
+	if (!empty($date)) {
+		$task->timespent_date = strtotime(preg_replace('/\//', '-', $date));
+		$task->timespent_date = dol_time_plus_duree($task->timespent_date, $hour, 'h');
+		$task->timespent_date = dol_time_plus_duree($task->timespent_date, $min, 'i');
+	} else {
+		$task->date_start = dol_now('tzuser');
+	}
 	$task->timespent_note     = $comment;
 	$task->timespent_duration = $duration * 60;
 	$task->timespent_fk_user  = $user->id;

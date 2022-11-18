@@ -2897,8 +2897,8 @@ window.eoxiaJS.riskassessmenttask.saveRiskAssessmentTaskTimeSpent = function ( e
 	let taskRef    =  element.closest('.riskassessment-task').find('.riskassessment-task-ref-'+taskID).attr('value');
 
 	let date     = single.find('#RiskassessmentTaskTimespentDateEdit' + taskID).val();
-	let hour     = single.find('#RiskassessmentTaskTimespentDateEdithour' + taskID).val();
-	let min      = single.find('#RiskassessmentTaskTimespentDateEditmin' + taskID).val();
+	let hour     = single.find('#RiskassessmentTaskTimespentDateEdit' + taskID + 'hour').val();
+	let min      = single.find('#RiskassessmentTaskTimespentDateEdit' + taskID + 'min').val();
 	let comment  = single.find('.riskassessment-task-timespent-comment').val()
 	comment      = window.eoxiaJS.risk.sanitizeBeforeRequest(comment)
 	let duration = single.find('.riskassessment-task-timespent-duration').val()
