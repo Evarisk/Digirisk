@@ -2552,12 +2552,12 @@ window.eoxiaJS.riskassessmenttask.createRiskAssessmentTask = function ( event ) 
 	let taskText = single.find('.riskassessment-task-label').val()
 	taskText = window.eoxiaJS.risk.sanitizeBeforeRequest(taskText)
 
-	let dateStart = single.find('#RiskassessmentTaskDateStart').val();
-	let hourStart = single.find('#RiskassessmentTaskDateStarthour').val();
-	let minStart  = single.find('#RiskassessmentTaskDateStartmin').val();
-	let dateEnd   = single.find('#RiskassessmentTaskDateEnd').val();
-	let hourEnd   = single.find('#RiskassessmentTaskDateEndhour').val();
-	let minEnd    = single.find('#RiskassessmentTaskDateEndmin').val();
+	let dateStart = single.find('#RiskassessmentTaskDateStart' + riskToAssign).val();
+	let hourStart = single.find('#RiskassessmentTaskDateStart' + riskToAssign + 'hour').val();
+	let minStart  = single.find('#RiskassessmentTaskDateStart' + riskToAssign + 'min').val();
+	let dateEnd   = single.find('#RiskassessmentTaskDateEnd' + riskToAssign).val();
+	let hourEnd   = single.find('#RiskassessmentTaskDateEnd' + riskToAssign + 'hour').val();
+	let minEnd    = single.find('#RiskassessmentTaskDateEnd' + riskToAssign + 'min').val();
 	let budget    = single.find('.riskassessment-task-budget').val()
 
 	window.eoxiaJS.loader.display($(this));
@@ -2693,12 +2693,12 @@ window.eoxiaJS.riskassessmenttask.saveRiskAssessmentTask = function ( event ) {
 	}
 
 	let dateStart = elementRiskAssessmentTask.find('#RiskassessmentTaskDateStart' + editedRiskAssessmentTaskId).val();
-	let hourStart = elementRiskAssessmentTask.find('#RiskassessmentTaskDateStarthour' + editedRiskAssessmentTaskId).val();
-	let minStart  = elementRiskAssessmentTask.find('#RiskassessmentTaskDateStartmin' + editedRiskAssessmentTaskId).val();
+	let hourStart = elementRiskAssessmentTask.find('#RiskassessmentTaskDateStart' + editedRiskAssessmentTaskId + 'hour').val();
+	let minStart  = elementRiskAssessmentTask.find('#RiskassessmentTaskDateStart' + editedRiskAssessmentTaskId + 'min').val();
 	let dateEnd   = elementRiskAssessmentTask.find('#RiskassessmentTaskDateEnd' + editedRiskAssessmentTaskId).val();
-	let hourEnd   = elementRiskAssessmentTask.find('#RiskassessmentTaskDateEndhour' + editedRiskAssessmentTaskId).val();
-	let minEnd    = elementRiskAssessmentTask.find('#RiskassessmentTaskDateEndmin' + editedRiskAssessmentTaskId).val();
-	let budget    = elementRiskAssessmentTask.find('.riskassessment-task-budget').val()
+	let hourEnd   = elementRiskAssessmentTask.find('#RiskassessmentTaskDateEnd' + editedRiskAssessmentTaskId + 'hour').val();
+	let minEnd    = elementRiskAssessmentTask.find('#RiskassessmentTaskDateEnd' + editedRiskAssessmentTaskId + 'min').val();
+	let budget    = elementRiskAssessmentTask.find('.riskassessment-task-budget'  + editedRiskAssessmentTaskId).val()
 
 	window.eoxiaJS.loader.display($(this));
 	window.eoxiaJS.loader.display($('.riskassessment-task-single-'+ editedRiskAssessmentTaskId));

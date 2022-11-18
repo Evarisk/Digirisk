@@ -164,7 +164,7 @@ $related_tasks = $risk->get_related_tasks($risk); ?>
 															</div>
 														</div>
 														<span class="title"><?php echo $langs->trans('Budget'); ?></span>
-														<input type="text" class="riskassessment-task-budget" name="budget" value="<?php echo price2num($related_task->budget_amount); ?>">
+														<input type="text" class="riskassessment-task-budget<?php echo $related_task->id ?>" name="budget" value="<?php echo price2num($related_task->budget_amount); ?>">
 														<hr>
 														<!-- RISKASSESSMENT TASK TIME SPENT NOTICE -->
 														<div class="messageSuccessTaskTimeSpentCreate<?php echo $related_task->id ?> notice hidden">
@@ -497,7 +497,7 @@ $related_tasks = $risk->get_related_tasks($risk); ?>
 														</div>
 													</div>
 													<span class="title"><?php echo $langs->trans('Budget'); ?></span>
-													<input type="text" class="riskassessment-task-budget" name="budget" value="<?php echo price2num($related_task->budget_amount); ?>">
+													<input type="text" class="riskassessment-task-budget<?php echo $related_task->id ?>" name="budget" value="<?php echo price2num($related_task->budget_amount); ?>">
 												</div>
 											</div>
 										</div>
@@ -577,11 +577,11 @@ $related_tasks = $risk->get_related_tasks($risk); ?>
 								<div class="riskassessment-task-date wpeo-gridlayout grid-2">
 									<div>
 										<span class="title"><?php echo $langs->trans('DateStart'); ?></span>
-										<?php print $form->selectDate(dol_now('tzuser'), 'RiskassessmentTaskDateStart', 1, 1, 0, '', 1, 1); ?>
+										<?php print $form->selectDate(dol_now('tzuser'), 'RiskassessmentTaskDateStart' . $risk->id, 1, 1, 0, '', 1, 1); ?>
 									</div>
 									<div>
 										<span class="title"><?php echo $langs->trans('Deadline'); ?></span>
-										<?php print $form->selectDate(-1,'RiskassessmentTaskDateEnd', 1, 1, 0, '', 1, 1); ?>
+										<?php print $form->selectDate(-1,'RiskassessmentTaskDateEnd'. $risk->id, 1, 1, 0, '', 1, 1); ?>
 									</div>
 								</div>
 								<span class="title"><?php echo $langs->trans('Budget'); ?></span>
