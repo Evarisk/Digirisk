@@ -1483,6 +1483,8 @@ TicketDigiriskElementHideRef = Cacher la référence des GP/UT dans l'interface 
 TicketDigiriskElementHideRefHelp = Activer cette option pour rendre cacher la référence d'un GP/UT dans l'interface publique
 TicketDigiriskElementVisible = Afficher le champ GP/UT pour créer un ticket
 TicketDigiriskElementVisibleHelp = Activer cette option pour afficher le champ GP/UT dans l'interface publique
+TicketEmailVisible = Afficher le champ Email pour créer un ticket
+TicketEmailVisibleHelp =  Activer cette option pour afficher le champ Email dans l'interface publique
 
 # Stats - Statistiques
 TicketStatistics = Statistiques des tickets
