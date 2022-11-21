@@ -130,27 +130,19 @@ if ($action == 'add') {
 	}
 
 	$email = GETPOST('email', 'alpha');
-	if ($conf->global->DIGIRISKDOLIBARR_TICKET_EMAIL_REQUIRED) {
+	if ($conf->global->DIGIRISKDOLIBARR_TICKET_EMAIL_REQUIRED && !$conf->global->DIGIRISKDOLIBARR_TICKET_EMAIL_VISIBLE) {
 		if (empty($email)) {
 			setEventMessages($langs->trans('ErrorFieldNotEmpty', $langs->transnoentities('Email')), array(), 'errors');
 			$error++;
-		} else {
-			$regEmail = '/^([A-Za-z0-9_\-\.])+\@([A-Za-z0-9_\-\.])+\.([A-Za-z]{2,4})$/';
-			if (preg_match($regEmail, $email)) {
-				$object->origin_email = $email;
-			} else {
-				setEventMessages($langs->trans('ErrorFieldEmail'), array(), 'errors');
-				$error++;
-			}
 		}
+	}
+
+	$regEmail = '/^([A-Za-z0-9_\-\.])+\@([A-Za-z0-9_\-\.])+\.([A-Za-z]{2,4})$/';
+	if (preg_match($regEmail, $email) || empty($email)) {
+		$object->origin_email = $email;
 	} else {
-		$regEmail = '/^([A-Za-z0-9_\-\.])+\@([A-Za-z0-9_\-\.])+\.([A-Za-z]{2,4})$/';
-		if (preg_match($regEmail, $email) || empty($email)) {
-			$object->origin_email = $email;
-		} else {
-			setEventMessages($langs->trans('ErrorFieldEmail'), array(), 'errors');
-			$error++;
-		}
+		setEventMessages($langs->trans('ErrorFieldEmail'), array(), 'errors');
+		$error++;
 	}
 
 	// Quand le registre choisi est Danger Grave et Imminent, il ne faut pas check ça
@@ -506,7 +498,9 @@ if ($entity > 0) {
 			</div>
 		</div>
 
-		<?php include DOL_DOCUMENT_ROOT . '/core/tpl/extrafields_add.tpl.php'; ?>
+		<?php
+
+		include DOL_DOCUMENT_ROOT . '/core/tpl/extrafields_add.tpl.php'; ?>
 
 		<?php
 		if ( ! empty($conf->global->DIGIRISKDOLIBARR_USE_CAPTCHA)) {

@@ -342,6 +342,19 @@ if ( ! empty($conf->global->DIGIRISKDOLIBARR_TICKET_ENABLE_PUBLIC_INTERFACE)) {
 	print '</td>';
 	print '</tr>';
 
+	// Email Visible
+	print '<tr class="oddeven"><td>' . $langs->transnoentities("TicketEmailVisible") . '</td>';
+	print '<td class="center">';
+	print ajax_constantonoff('DIGIRISKDOLIBARR_TICKET_EMAIL_VISIBLE');
+	print '</td>';
+	print '<td class="center">';
+	print '';
+	print '</td>';
+	print '<td class="center">';
+	print $form->textwithpicto('', $langs->transnoentities("TicketEmailVisibleHelp"));
+	print '</td>';
+	print '</tr>';
+
 	// Email Required
 	print '<tr class="oddeven"><td>' . $langs->transnoentities("TicketEmailRequired") . '</td>';
 	print '<td class="center">';
@@ -355,18 +368,6 @@ if ( ! empty($conf->global->DIGIRISKDOLIBARR_TICKET_ENABLE_PUBLIC_INTERFACE)) {
 	print '</td>';
 	print '</tr>';
 
-	//Envoi d'emails automatiques
-	print '<tr class="oddeven"><td>' . $langs->transnoentities("SendEmailOnTicketSubmit") . '</td>';
-	print '<td class="center">';
-	print ajax_constantonoff('DIGIRISKDOLIBARR_SEND_EMAIL_ON_TICKET_SUBMIT');
-	print '</td>';
-	print '<td class="center">';
-	print '';
-	print '</td>';
-	print '<td class="center">';
-	print $form->textwithpicto('', $langs->transnoentities("SendEmailOnTicketSubmitHelp"));
-	print '</td>';
-	print '</tr>';
 
 	if ($conf->multicompany->enabled) {
 		//Page de sélection de l'entité
@@ -391,6 +392,19 @@ if ( ! empty($conf->global->DIGIRISKDOLIBARR_TICKET_ENABLE_PUBLIC_INTERFACE)) {
 		print '</td>';
 		print '</tr>';
 	}
+
+	//Envoi d'emails automatiques
+	print '<tr class="oddeven"><td>' . $langs->transnoentities("SendEmailOnTicketSubmit") . '</td>';
+	print '<td class="center">';
+	print ajax_constantonoff('DIGIRISKDOLIBARR_SEND_EMAIL_ON_TICKET_SUBMIT');
+	print '</td>';
+	print '<td class="center">';
+	print '';
+	print '</td>';
+	print '<td class="center">';
+	print $form->textwithpicto('', $langs->transnoentities("SendEmailOnTicketSubmitHelp"));
+	print '</td>';
+	print '</tr>';
 
 	//Email to send ticket submitted
 	print '<form method="POST" action="' . $_SERVER["PHP_SELF"] . '">';
