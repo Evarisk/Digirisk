@@ -106,7 +106,7 @@ if ( ! $error && $action == 'add' && $permissiontoadd) {
 						$task->date_start = dol_time_plus_duree($task->date_start, $hourStart, 'h');
 						$task->date_start = dol_time_plus_duree($task->date_start, $minStart, 'i');
 					} else {
-						$task->timespent_date = dol_now('tzuser');
+						$task->date_start = dol_now('tzuser');
 					}
 					if (!empty($dateEnd)) {
 						$task->date_end = strtotime(preg_replace('/\//', '-', $dateEnd));
@@ -417,7 +417,7 @@ if ( ! $error && $action == 'addRiskAssessmentTask' && $permissiontoadd) {
 		$task->date_start = dol_time_plus_duree($task->date_start, $hourStart, 'h');
 		$task->date_start = dol_time_plus_duree($task->date_start, $minStart, 'i');
 	} else {
-		$task->timespent_date = dol_now('tzuser');
+		$task->date_start = dol_now('tzuser');
 	}
 	if (!empty($dateEnd)) {
 		$task->date_end = strtotime(preg_replace('/\//', '-', $dateEnd));
@@ -532,7 +532,7 @@ if ( ! $error && $action == 'addRiskAssessmentTaskTimeSpent' && $permissiontoadd
 		$task->timespent_date = dol_time_plus_duree($task->timespent_date, $hour, 'h');
 		$task->timespent_date = dol_time_plus_duree($task->timespent_date, $min, 'i');
 	} else {
-		$task->date_start = dol_now('tzuser');
+		$task->timespent_date = dol_now('tzuser');
 	}
 	$task->timespent_note     = $comment;
 	$task->timespent_duration = $duration * 60;
@@ -565,9 +565,11 @@ if ( ! $error && $action == 'saveRiskAssessmentTaskTimeSpent' && $permissiontoad
 
 	$task->fetchTimeSpent($riskAssessmentTaskTimeSpentID);
 
-	$task->timespent_datehour = strtotime(preg_replace('/\//', '-', $date));
-	$task->timespent_datehour = dol_time_plus_duree($task->timespent_datehour,  $hour, 'h');
-	$task->timespent_datehour = dol_time_plus_duree($task->timespent_datehour, $min, 'i');
+	if (!empty($date)) {
+		$task->timespent_datehour = strtotime(preg_replace('/\//', '-', $date));
+		$task->timespent_datehour = dol_time_plus_duree($task->timespent_datehour, $hour, 'h');
+		$task->timespent_datehour = dol_time_plus_duree($task->timespent_datehour, $min, 'i');
+	}
 	$task->timespent_note     =  $comment;
 	$task->timespent_duration = $duration * 60;
 

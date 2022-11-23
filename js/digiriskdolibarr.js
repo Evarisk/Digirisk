@@ -2765,9 +2765,9 @@ window.eoxiaJS.riskassessmenttask.createRiskAssessmentTaskTimeSpent = function (
 	let textToShow = '';
 	let taskRef    =  element.find('.riskassessment-task-ref-'+taskID).attr('value');
 
-	let date     = single.find('#RiskassessmentTaskTimespentDate').val();
-	let hour     = single.find('#RiskassessmentTaskTimespentDatehour').val();
-	let min      = single.find('#RiskassessmentTaskTimespentDatemin').val();
+	let date     = single.find('#RiskassessmentTaskTimespentDate' + taskID).val();
+	let hour     = single.find('#RiskassessmentTaskTimespentDate' + taskID + 'hour').val();
+	let min      = single.find('#RiskassessmentTaskTimespentDate' + taskID + 'min').val();
 	let comment  = single.find('.riskassessment-task-timespent-comment').val()
 	comment      = window.eoxiaJS.risk.sanitizeBeforeRequest(comment)
 	let duration = single.find('.riskassessment-task-timespent-duration').val()
@@ -2896,9 +2896,9 @@ window.eoxiaJS.riskassessmenttask.saveRiskAssessmentTaskTimeSpent = function ( e
 	let textToShow = '';
 	let taskRef    =  element.closest('.riskassessment-task').find('.riskassessment-task-ref-'+taskID).attr('value');
 
-	let date     = single.find('#RiskassessmentTaskTimespentDateEdit' + taskID).val();
-	let hour     = single.find('#RiskassessmentTaskTimespentDateEdit' + taskID + 'hour').val();
-	let min      = single.find('#RiskassessmentTaskTimespentDateEdit' + taskID + 'min').val();
+	let date     = single.find('#RiskassessmentTaskTimespentDateEdit' + riskAssessmentTaskTimeSpentID).val();
+	let hour     = single.find('#RiskassessmentTaskTimespentDateEdit' + riskAssessmentTaskTimeSpentID + 'hour').val();
+	let min      = single.find('#RiskassessmentTaskTimespentDateEdit' + riskAssessmentTaskTimeSpentID + 'min').val();
 	let comment  = single.find('.riskassessment-task-timespent-comment').val()
 	comment      = window.eoxiaJS.risk.sanitizeBeforeRequest(comment)
 	let duration = single.find('.riskassessment-task-timespent-duration').val()
