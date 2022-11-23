@@ -67,7 +67,7 @@ $related_tasks = $risk->get_related_tasks($risk); ?>
 												<i class="fas fa-calendar-alt"></i> <?php echo date('d/m/Y', (($conf->global->DIGIRISKDOLIBARR_SHOW_TASK_START_DATE && ( ! empty($related_task->date_start))) ? $related_task->date_start : $related_task->date_c)) . (($conf->global->DIGIRISKDOLIBARR_SHOW_TASK_END_DATE && ( ! empty($related_task->date_end))) ? ' - ' . date('d/m/Y', $related_task->date_end) : ''); ?>
 											</span>
 											<span class="riskassessment-task-timespent">
-												<?php $allTimeSpentArray = $related_task->fetchAllTimeSpentAllUser('AND ptt.fk_task='.$related_task->id);
+												<?php $allTimeSpentArray = $related_task->fetchAllTimeSpentAllUser('AND ptt.fk_task='.$related_task->id, 'task_datehour', 'DESC');
 													$allTimeSpent = 0;
 													foreach ($allTimeSpentArray as $timespent) {
 														$allTimeSpent += $timespent->timespent_duration;
@@ -127,7 +127,7 @@ $related_tasks = $risk->get_related_tasks($risk); ?>
 																		<i class="fas fa-calendar-alt"></i> <?php echo date('d/m/Y', (($conf->global->DIGIRISKDOLIBARR_SHOW_TASK_START_DATE && ( ! empty($related_task->date_start))) ? $related_task->date_start : $related_task->date_c)) . (($conf->global->DIGIRISKDOLIBARR_SHOW_TASK_END_DATE && ( ! empty($related_task->date_end))) ? ' - ' . date('d/m/Y', $related_task->date_end) : ''); ?>
 																	</span>
 															<span class="riskassessment-task-timespent">
-																		<?php $allTimeSpentArray = $related_task->fetchAllTimeSpentAllUser('AND ptt.fk_task='.$related_task->id);
+																		<?php $allTimeSpentArray = $related_task->fetchAllTimeSpentAllUser('AND ptt.fk_task='.$related_task->id, 'task_datehour', 'DESC');
 																		$allTimeSpent = 0;
 																		foreach ($allTimeSpentArray as $timespent) {
 																			$allTimeSpent += $timespent->timespent_duration;
@@ -143,7 +143,7 @@ $related_tasks = $risk->get_related_tasks($risk); ?>
 													</div>
 													<!-- Modal-Content -->
 													<div class="modal-content">
-														<?php $allTimeSpentArray = $related_task->fetchAllTimeSpentAllUser('AND ptt.fk_task='.$related_task->id); ?>
+														<?php $allTimeSpentArray = $related_task->fetchAllTimeSpentAllUser('AND ptt.fk_task='.$related_task->id, 'task_datehour', 'DESC'); ?>
 														<div class="riskassessment-task-title">
 															<?php if (!$conf->global->DIGIRISKDOLIBARR_SHOW_TASK_CALCULATED_PROGRESS) : ?>
 															<span class="riskassessment-task-progress-checkbox">
@@ -430,7 +430,7 @@ $related_tasks = $risk->get_related_tasks($risk); ?>
 											<i class="fas fa-calendar-alt"></i> <?php echo date('d/m/Y', (($conf->global->DIGIRISKDOLIBARR_SHOW_TASK_START_DATE && ( ! empty($related_task->date_start))) ? $related_task->date_start : $related_task->date_c)) . (($conf->global->DIGIRISKDOLIBARR_SHOW_TASK_END_DATE && ( ! empty($related_task->date_end))) ? ' - ' . date('d/m/Y', $related_task->date_end) : ''); ?>
 										</span>
 										<span class="riskassessment-task-timespent">
-											<?php $allTimeSpentArray = $related_task->fetchAllTimeSpentAllUser('AND ptt.fk_task='.$related_task->id);
+											<?php $allTimeSpentArray = $related_task->fetchAllTimeSpentAllUser('AND ptt.fk_task='.$related_task->id, 'task_datehour', 'DESC');
 											$allTimeSpent = 0;
 											foreach ($allTimeSpentArray as $timespent) {
 												$allTimeSpent += $timespent->timespent_duration;
