@@ -528,9 +528,7 @@ class DigiriskDocuments extends CommonObject
 												} else {
 													$tmparray['actionPreventionCompleted'] .= ' - ' . $langs->trans('Deadline') . ' : ' . $langs->trans('NoData') . "\n";
 												}
-												if (strcmp($related_task->budget_amount, '')) {
-													$tmparray['actionPreventionCompleted'] .= $langs->trans('Budget') . ' : ' . price($related_task->budget_amount, 0, $langs, 1, 0, 0, $conf->currency) . "\n";
-												}
+												$tmparray['actionPreventionCompleted'] .= $langs->trans('Budget') . ' : ' . price($related_task->budget_amount, 0, $langs, 1, 0, 0, $conf->currency) . "\n";
 												(($AllInitiales) ? $tmparray['actionPreventionCompleted'] .= $langs->trans('ContactsAction') . ' : ' . $AllInitiales . "\n" : '');
 												(($related_task->label) ? $tmparray['actionPreventionCompleted'] .= $langs->trans('Label') . ' : ' . $related_task->label . "\n" : '');
 												(($related_task->description) ? $tmparray['actionPreventionCompleted'] .= $langs->trans('Description') . ' : ' . $related_task->description . "\n" : '');
@@ -552,9 +550,7 @@ class DigiriskDocuments extends CommonObject
 											} else {
 												$tmparray['actionPreventionUncompleted'] .= ' - ' . $langs->trans('Deadline') . ' : ' . $langs->trans('NoData') . "\n";
 											}
-											if (strcmp($related_task->budget_amount, '')) {
-												$tmparray['actionPreventionUncompleted'] .= $langs->trans('Budget') . ' : ' . price($related_task->budget_amount, 0, $langs, 1, 0, 0, $conf->currency) . ' - ';
-											}
+											$tmparray['actionPreventionUncompleted'] .= $langs->trans('Budget') . ' : ' . price($related_task->budget_amount, 0, $langs, 1, 0, 0, $conf->currency) . ' - ';
 											$tmparray['actionPreventionUncompleted'] .= $langs->trans('DigiriskProgress') . ' : ' . ($task_progress ?: 0) . ' %' . "\n";
 											(($AllInitiales) ? $tmparray['actionPreventionUncompleted'] .= $langs->trans('ContactsAction') . ' : ' . $AllInitiales . "\n" : '');
 											(($related_task->label) ? $tmparray['actionPreventionUncompleted'] .= $langs->trans('Label') . ' : ' . $related_task->label . "\n" : '');
