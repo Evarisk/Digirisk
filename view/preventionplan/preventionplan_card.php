@@ -729,6 +729,7 @@ if ($action == 'create') {
 	print $htmltext;
 	print '</td><td>';
 	print $form->selectcontacts((empty(GETPOST('ext_society', 'int')) ? -1 : GETPOST('ext_society', 'int')), $ext_society_responsible_id, 'ext_society_responsible', 1, '', '', 1, 'minwidth100imp widthcentpercentminusxx maxwidth400');
+	print ' <a href="' . DOL_URL_ROOT . '/contact/card.php?action=create' . (empty(GETPOST('ext_society', 'int')) ? '' : '&socid=' . GETPOST('ext_society', 'int')) .'&backtopage=' . urlencode($_SERVER["PHP_SELF"] . '?action=create') . '" target="_blank"><span class="fa fa-plus-circle valignmiddle paddingleft" title="' . $langs->trans("AddContact") . '"></span></a>';
 	print '</td></tr>';
 
 	// CSSCT Intervention
