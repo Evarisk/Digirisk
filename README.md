@@ -2,7 +2,7 @@
 
 ## Informations
 
-Version du module: 9.6.0
+Version du module: 9.9.0
 
 Dernière mise à jour: 10/10/2022
 
