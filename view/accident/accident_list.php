@@ -466,7 +466,7 @@ while ($i < ($limit ? min($num, $limit) : $num)) {
 					}
 				}
 
-				$advancement = price2Num((($counter / $maxnumber) * 100),2);
+				$advancement = price2Num((($counter / $maxnumber) * 100), 2);
 
 				print $advancement . '%';
 				?>
