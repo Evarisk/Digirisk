@@ -3,7 +3,7 @@
 		<canvas class="" id="advancementGauge<?php echo $kCounter?>" width="40" height="40" style="width:50px !important"></canvas>
 		<?php if (empty($move_title_gauge)) : ?>
 			<h3 class="">
-				<?php echo bcdiv((($counter / $maxnumber) * 100), 1, 2) . '%' ?>
+				<?php echo price2Num(($counter / $maxnumber) * 100, 2) . '%' ?>
 			</h3>
 		<?php endif; ?>
 	</div>
@@ -23,7 +23,7 @@
 			data: {
 				datasets: [{
 					label: '# of Votes',
-					data: [<?php echo bcdiv(((1 - $counter / $maxnumber) * 100), 1, 2);?>, <?php echo bcdiv((($counter / $maxnumber) * 100), 1, 2);?>],
+					data: [<?php echo price2Num((1 - $counter / $maxnumber) * 100, 2);?>, <?php echo price2Num(($counter / $maxnumber) * 100, 2);?>],
 					backgroundColor: [
 						'rgba(108, 108, 108, 0.4)',
 						'rgba(13, 138, 255, 0.8)',
@@ -42,7 +42,7 @@
 
 	<?php if ($move_title_gauge) : ?>
 		<h3 class="">
-			<?php echo bcdiv((($counter / $maxnumber) * 100), 1, 2) . '%' ?>
+			<?php echo price2Num(($counter / $maxnumber) * 100, 2) . '%' ?>
 		</h3>
 	<?php endif; ?>
 </div>
