@@ -104,6 +104,11 @@ if (is_array($submit_file_error_text)) {
 				</div>
 			</div>
 			<div class="ecm-photo-list-content">
+				<?php
+				// Display media library is empty if no media uploaded
+				if (!is_array($_FILES['userfile']['tmp_name'])) {
+					print($langs->trans("EmptyMediaLibrary"));
+				} ?>
 				<div class="wpeo-gridlayout grid-4 grid-gap-3 grid-margin-2 ecm-photo-list ecm-photo-list">
 					<?php
 					$relativepath = 'digiriskdolibarr/medias/thumbs';
