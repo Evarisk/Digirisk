@@ -104,9 +104,10 @@ abstract class ModeleODTFirePermitDocument extends CommonDocGenerator
 		if (file_exists($dir)) {
 			$filename = preg_split('/firepermitdocument\//', $srctemplatepath);
 			$filename = preg_replace('/template_/', '', $filename[1]);
+			$societyname = preg_replace('/\./', '_', $conf->global->MAIN_INFO_SOCIETE_NOM);
 
 			$date     = dol_print_date(dol_now(), 'dayxcard');
-			$filename = $date . '_' . $firepermit->ref . '_' . $objectref . '_' . $conf->global->MAIN_INFO_SOCIETE_NOM . ((preg_match('/specimen/i', $tempfilepath[1]) || $firepermit->status < $firepermit::STATUS_LOCKED) ? '_specimen' : '_sign') . '.odt';
+			$filename = $date . '_' . $firepermit->ref . '_' . $objectref . '_' . $societyname . ((preg_match('/specimen/i', $tempfilepath[1]) || $firepermit->status < $firepermit::STATUS_LOCKED) ? '_specimen' : '_sign') . '.odt';
 			$filename = str_replace(' ', '_', $filename);
 			$filename = dol_sanitizeFileName($filename);
 

@@ -97,9 +97,10 @@ abstract class ModeleODTInformationsSharing extends CommonDocGenerator
 		if (file_exists($dir)) {
 			$filename = preg_split('/informationssharing\//', $srctemplatepath);
 			preg_replace('/template_/', '', $filename[1]);
+			$societyname = preg_replace('/\./', '_', $conf->global->MAIN_INFO_SOCIETE_NOM);
 
 			$date     = dol_print_date(dol_now(), 'dayxcard');
-			$filename = $date . '_' . $objectref . '_' . $conf->global->MAIN_INFO_SOCIETE_NOM . '.odt';
+			$filename = $date . '_' . $objectref . '_' . $societyname . '.odt';
 			$filename = str_replace(' ', '_', $filename);
 			$filename = dol_sanitizeFileName($filename);
 

@@ -246,9 +246,10 @@ class pdf_orque_projectdocument
 			if (!preg_match('/specimen/i', $objectref)) {
 				$dir .= '/' . $objectref;
 			}
+			$societyname = preg_replace('/\./', '_', $conf->global->MAIN_INFO_SOCIETE_NOM);
 
 			$date     = dol_print_date(dol_now(), 'dayxcard');
-			$filename = $date . '_' . $objectDocument->ref . '_' . $objectref . '_' . $conf->global->MAIN_INFO_SOCIETE_NOM . '.pdf';
+			$filename = $date . '_' . $objectDocument->ref . '_' . $objectref . '_' .  $societyname . '.pdf';
 			$filename = str_replace(' ', '_', $filename);
 			$filename = dol_sanitizeFileName($filename);
 			$filename = preg_replace('/[’‘‹›‚]/u', '', $filename);
