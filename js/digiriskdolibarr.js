@@ -485,10 +485,12 @@ window.eoxiaJS.modal.openModal = function ( event ) {
  * @return {void}
  */
 window.eoxiaJS.modal.closeModal = function ( event ) {
-	$(this).closest('.modal-active').removeClass('modal-active')
-	$('.clicked-photo').attr('style', '');
-	$('.clicked-photo').removeClass('clicked-photo');
-	$('.notice').addClass('hidden');
+	if ($(event.target).hasClass('modal-active') || $(event.target).hasClass('fa-times')) {
+		$(this).closest('.modal-active').removeClass('modal-active')
+		$('.clicked-photo').attr('style', '');
+		$('.clicked-photo').removeClass('clicked-photo');
+		$('.notice').addClass('hidden');
+	}
 };
 
 /**
@@ -4047,6 +4049,7 @@ window.eoxiaJS.keyEvent.init = function() {
 window.eoxiaJS.keyEvent.event = function() {
 	$( document ).on( 'keydown', window.eoxiaJS.keyEvent.keyup );
 	$( document ).on( 'keyup', '.url-container' , window.eoxiaJS.keyEvent.checkUrlFormat );
+	$( document ).on( 'click', '.modal-active:not(.modal-container)' , window.eoxiaJS.modal.closeModal );
 }
 
 /**
