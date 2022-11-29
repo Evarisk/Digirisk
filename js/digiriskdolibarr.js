@@ -2584,7 +2584,7 @@ window.eoxiaJS.riskassessmenttask.createRiskAssessmentTask = function ( event ) 
 		processData: false,
 		contentType: false,
 		success: function ( resp ) {
-			$('.fichecenter.risklist').html($(resp).find('#searchFormListRisks'))
+			$('.tasks-list-container-'+riskToAssign).html($(resp).find('.tasks-list-container-'+riskToAssign).children())
 			let actionContainerSuccess = $('.messageSuccessTaskCreate');
 
 			$('.riskassessment-tasks' + riskToAssign).fadeOut(800);
@@ -2635,7 +2635,7 @@ window.eoxiaJS.riskassessmenttask.deleteRiskAssessmentTask = function ( event ) 
 			processData: false,
 			contentType: false,
 			success: function ( resp ) {
-				$('.fichecenter.risklist').html($(resp).find('#searchFormListRisks'))
+				$('.riskassessment-task-container-'+deletedRiskAssessmentTaskId).hide()
 				$('.riskassessment-tasks' + riskId).fadeOut(800);
 				$('.riskassessment-tasks' + riskId).fadeIn(800);
 				let textToShow = '';
@@ -2725,7 +2725,7 @@ window.eoxiaJS.riskassessmenttask.saveRiskAssessmentTask = function ( event ) {
 		processData: false,
 		contentType: false,
 		success: function ( resp ) {
-			$('.fichecenter.risklist').html($(resp).find('#searchFormListRisks'))
+			$('.riskassessment-task-container-'+editedRiskAssessmentTaskId).html($(resp).find('.riskassessment-task-container-'+editedRiskAssessmentTaskId).children())
 			let actionContainerSuccess = $('.messageSuccessTaskEdit');
 			$('.riskassessment-tasks' + riskId).fadeOut(800);
 			$('.riskassessment-tasks' + riskId).fadeIn(800);
