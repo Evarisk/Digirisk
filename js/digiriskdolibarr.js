@@ -1855,6 +1855,7 @@ window.eoxiaJS.risk.saveRisk = function ( event ) {
 
 	if (newParent == id || moveRiskDisabled) {
 		window.eoxiaJS.loader.display($(this).closest('.risk-row-content-' + editedRiskId).find('.risk-description-'+editedRiskId));
+		window.eoxiaJS.loader.display($(this).closest('.risk-row-content-' + editedRiskId).find('.risk-category'));
 	} else {
 		window.eoxiaJS.loader.display($(this).closest('.risk-row-content-' + editedRiskId))
 	}
@@ -1877,15 +1878,16 @@ window.eoxiaJS.risk.saveRisk = function ( event ) {
 			$('.wpeo-loader').removeClass('wpeo-loader');
 			let actionContainerSuccess = $('.messageSuccessRiskEdit');
 			if (newParent == id || moveRiskDisabled) {
+				$('.modal-active').removeClass('modal-active')
+				$('.risk-description-'+editedRiskId).html($(resp).find('.risk-description-'+editedRiskId))
+				$('.risk-row-content-' + editedRiskId).find('.risk-category .cell-risk').html($(resp).find('.risk-row-content-' + editedRiskId).find('.risk-category .cell-risk').children())
 				$('.risk-row-content-' + editedRiskId).find('.risk-category').fadeOut(800);
 				$('.risk-row-content-' + editedRiskId).find('.risk-category').fadeIn(800);
 				$('.risk-row-content-' + editedRiskId).find('.risk-description-'+editedRiskId).fadeOut(800);
-				$('.risk-row-content-' + editedRiskId).find('.risk-description-'+editedRiskId).fadeIn(800, function () {
-					elementParent.html($(resp).find('.div-table-responsive'))
-				});
+				$('.risk-row-content-' + editedRiskId).find('.risk-description-'+editedRiskId).fadeIn(800);
 			} else {
 				$('.risk-row-content-'+editedRiskId).fadeOut(800, function () {
-					elementParent.html($(resp).find('.div-title-and-table-responsive'))
+					$('.fichecenter .opacitymedium.colorblack.paddingleft').html($(resp).find('#searchFormListRisks .opacitymedium.colorblack.paddingleft'))
 				});
 			}
 
