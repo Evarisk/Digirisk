@@ -1460,8 +1460,7 @@ TicketCreationMailSent = Le mail de création du ticket a été envoyé à %s
 HowToSetupTicketCategories = Pour configurer les catégories de ticket, veuillez cliquer sur ce lien :
 ConfigTicketCategories = Configuration des catégories de ticket
 NewTicketSubmitted = Un ticket a été soumis via l'interface publique
-ANewTicketHasBeenSubmitted = Un nouveau ticket a été créé via l'interface publique
-SeeTicketUrl = Voir le ticket :
+ANewTicketHasBeenSubmitted = Nouveau registre de sécurité créé pour %s
 TicketCreationSubject = Création de ticket via l'interface publique de Digirisk
 TicketDocumentCustomDigiriskTemplate = ODT custom des fiches de tickets
 HowToSetupDigiriskElement = Pour configurer les éléments de Digirisk (groupements/unités de travail), veuillez cliquer sur ce lien :
@@ -1500,6 +1499,12 @@ CreatedByHelp = Si le filtre "Créer par" est vide, aucun utilisateur n'est util
 AssignedToHelp = Si le filtre "Assigné à" est vide, aucun utilisateur n'est utilisé pour la recherche
 StatusHelp = Par défaut, le filtre prend tous les états<br>
 
+# Email - Email
+The = Le
+TicketMessage = Message du registre
+SeeTicketUrl = Voir le ticket
+AutoNotificationTicket = Notification mail envoyée automatiquement par
+TicketPublicInterfaceOtherName = Interface de gestion des registres SST et DGI
 
 
 # Ticket document
