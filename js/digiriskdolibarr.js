@@ -1401,6 +1401,7 @@ window.eoxiaJS.mediaGallery.sendPhoto = function( event ) {
 								$('.wpeo-loader').removeClass('wpeo-loader');
 								$('#myProgress').find('.loader-spin').remove();
 							}, 800)
+							$('#add_media_to_gallery').parent().html($(resp).find('#add_media_to_gallery'))
 							if (totalCount == 1) {
 								elementParent.closest('.modal-container').find('.save-photo').removeClass('button-disable');
 								elementParent.find('.clickable-photo0').attr('style', 'border: 5px solid #0d8aff !important');

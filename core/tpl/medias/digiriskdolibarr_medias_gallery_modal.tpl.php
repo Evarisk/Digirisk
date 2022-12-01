@@ -84,7 +84,9 @@ if (is_array($submit_file_error_text)) {
 				include_once DOL_DOCUMENT_ROOT . '/core/class/html.formfile.class.php';
 				print '<strong>' . $langs->trans('AddFile') . '</strong>'
 				?>
-				<input type="file" id="add_media_to_gallery" class="flat minwidth400 maxwidth200onsmartphone" name="userfile[]" multiple accept>
+				<div class="media_to_gallery">
+					<input type="file" id="add_media_to_gallery" class="flat minwidth400 maxwidth200onsmartphone" name="userfile[]" multiple accept>
+				</div>
 			<?php } else print '&nbsp;';
 			// End "Add new file" area
 			?>
