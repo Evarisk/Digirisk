@@ -47,7 +47,7 @@ if ( ! $res) die("Include of main fails");
 
 // Libraries
 require_once DOL_DOCUMENT_ROOT . '/ticket/class/ticket.class.php';
-
+require_once DOL_DOCUMENT_ROOT . '/user/class/user.class.php';
 require_once '../../lib/digiriskdolibarr_function.lib.php';
 
 global $db, $langs, $mysoc;
