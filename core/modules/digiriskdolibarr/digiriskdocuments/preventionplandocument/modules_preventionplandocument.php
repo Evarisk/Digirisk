@@ -107,7 +107,7 @@ abstract class ModeleODTPreventionPlanDocument extends CommonDocGenerator
 			$societyname = preg_replace('/\./', '_', $conf->global->MAIN_INFO_SOCIETE_NOM);
 
 			$date     = dol_print_date(dol_now(), 'dayxcard');
-			$filename = $date . '_' . $preventionplan->ref . '_' . $objectref . '_' . $societyname . ((preg_match('/specimen/i', $tempfilepath[1]) || $preventionplan->status < $preventionplan::STATUS_LOCKED) ? '_specimen' : '_sign') . '.odt';
+			$filename = $date . '_' . $preventionplan->ref . '_' . $objectref . '_' . $societyname . ((preg_match('/specimen/i', $tempfilepath[1]) || $preventionplan->status < $preventionplan::STATUS_LOCKED) ? '_specimen' : '_signed') . '.odt';
 			$filename = str_replace(' ', '_', $filename);
 			$filename = dol_sanitizeFileName($filename);
 
