@@ -1401,6 +1401,7 @@ window.eoxiaJS.mediaGallery.sendPhoto = function( event ) {
 								$('.wpeo-loader').removeClass('wpeo-loader');
 								$('#myProgress').find('.loader-spin').remove();
 							}, 800)
+							$('#add_media_to_gallery').parent().html($(resp).find('#add_media_to_gallery'))
 						});
 						actionContainerSuccess.removeClass('hidden');
 					}
