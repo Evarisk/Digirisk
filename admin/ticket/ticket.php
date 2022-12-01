@@ -654,7 +654,7 @@ if ( ! empty($conf->global->DIGIRISKDOLIBARR_TICKET_ENABLE_PUBLIC_INTERFACE)) {
 	print '<tr class="oddeven"><td>' . $langs->transnoentities("GenerateQRCode") . '</td>';
 
 	$targetPath = $qrCodePath;
-	$urlToEncode = DOL_DOCUMENT_ROOT . '/custom/digiriskdolibarr/public/ticket/create_ticket.php?entity=' . $conf->entity;
+	$urlToEncode = DOL_MAIN_URL_ROOT . '/custom/digiriskdolibarr/public/ticket/create_ticket.php?entity=' . $conf->entity;
 
 	print '<input hidden name="targetPath" value="'. $targetPath .'">';
 	print '<input hidden name="urlToEncode" value="'. $urlToEncode .'">';
@@ -710,7 +710,7 @@ if ( ! empty($conf->global->DIGIRISKDOLIBARR_TICKET_ENABLE_PUBLIC_INTERFACE)) {
 		print '<tr class="oddeven"><td>' . $langs->transnoentities("GenerateQRCode") . '</td>';
 
 		$targetPath = $qrCodePath;
-		$urlToEncode = DOL_DOCUMENT_ROOT . '/custom/digiriskdolibarr/public/ticket/create_ticket.php';
+		$urlToEncode = DOL_MAIN_URL_ROOT . '/custom/digiriskdolibarr/public/ticket/create_ticket.php';
 
 		print '<input hidden name="targetPath" value="'. $targetPath .'">';
 		print '<input hidden name="urlToEncode" value="'. $urlToEncode .'">';
