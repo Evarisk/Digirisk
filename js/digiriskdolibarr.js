@@ -1401,6 +1401,11 @@ window.eoxiaJS.mediaGallery.sendPhoto = function( event ) {
 								$('.wpeo-loader').removeClass('wpeo-loader');
 								$('#myProgress').find('.loader-spin').remove();
 							}, 800)
+							if (totalCount == 1) {
+								elementParent.closest('.modal-container').find('.save-photo').removeClass('button-disable');
+								elementParent.find('.clickable-photo0').attr('style', 'border: 5px solid #0d8aff !important');
+								elementParent.find('.clickable-photo0').addClass('clicked-photo');
+							}
 						});
 						actionContainerSuccess.removeClass('hidden');
 					}
