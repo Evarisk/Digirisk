@@ -904,7 +904,7 @@ class InterfaceDigiriskdolibarrTriggers extends DolibarrTriggers
 										$actioncomm->code      = 'AC_TICKET_CREATION_MAIL_SENT';
 										$actioncomm->type_code = 'AC_OTH_AUTO';
 										$actioncomm->label = $langs->transnoentities('TicketCreationMailWellSent');
-										$actioncomm->note = $langs->transnoentities('TicketCreationMailSent', $listOfMails);
+										$actioncomm->note = $langs->transnoentities('TicketCreationMailSent', $sendto);
 										$actioncomm->datep       = $now;
 										$actioncomm->fk_element  = $object->id;
 										$actioncomm->userownerid = $user->id;
@@ -965,13 +965,12 @@ class InterfaceDigiriskdolibarrTriggers extends DolibarrTriggers
 													$actioncomm->code      = 'AC_TICKET_CREATION_MAIL_SENT';
 													$actioncomm->type_code = 'AC_OTH_AUTO';
 													$actioncomm->label = $langs->transnoentities('TicketCreationMailWellSent');
-													$actioncomm->note = $langs->transnoentities('TicketCreationMailSent', $listOfMails);
+													$actioncomm->note = $langs->transnoentities('TicketCreationMailSent', $sendto);
 													$actioncomm->datep       = $now;
 													$actioncomm->fk_element  = $object->id;
 													$actioncomm->userownerid = $user->id;
 													$actioncomm->percentage  = -1;
 													$actioncomm->create($user);
-													break;
 												}
 											} else {
 												setEventMessages($langs->trans('ErrorSetupEmail'), '', 'errors');
