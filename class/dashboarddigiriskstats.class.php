@@ -105,14 +105,14 @@ class DashboardDigiriskStats extends DigiriskStats
 	 * @return void
 	 * @throws Exception
 	 */
-	public function show_dashboard()
+	public function show_dashboard($load_risk = 1, $load_task = 1, $load_riskassementdocument = 1, $load_accident = 1, $load_evaluator = 1, $load_digiriskresources = 1)
 	{
 		global $conf, $form, $langs, $user;
 
 		$WIDTH  = DolGraph::getDefaultGraphSizeForStats('width');
 		$HEIGHT = DolGraph::getDefaultGraphSizeForStats('height');
 
-		$dashboard_data = $this->load_dashboard();
+		$dashboard_data = $this->load_dashboard($load_risk, $load_task, $load_riskassementdocument, $load_accident, $load_evaluator, $load_digiriskresources);
 
 		print '<form method="POST" action="' . $_SERVER["PHP_SELF"] . '" class="dashboard" id="dashBoardForm">';
 		print '<input type="hidden" name="token" value="' . newToken() . '">';

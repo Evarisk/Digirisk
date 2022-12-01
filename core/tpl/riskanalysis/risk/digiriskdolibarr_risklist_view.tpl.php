@@ -1221,6 +1221,7 @@
 			if ($key == 'status') $cssforfield       .= ($cssforfield ? ' ' : '') . 'center';
 			elseif ($key == 'ref') $cssforfield      .= ($cssforfield ? ' ' : '') . 'nowrap';
 			elseif ($key == 'cotation') $cssforfield .= ($cssforfield ? ' ' : '') . 'risk-evaluation-list-container-' . $risk->id;
+			elseif ($key == 'has_tasks') $cssforfield .= ($cssforfield ? ' ' : '') . 'tasks-list-container-' . $risk->id;
 			if ( ! empty($arrayfields['evaluation.' . $key]['checked'])) {
 				print '<td' . ($cssforfield ? ' class="' . $cssforfield . '"' : '') . ' style="vertical-align: top;">';
 				if ($key == 'cotation') {

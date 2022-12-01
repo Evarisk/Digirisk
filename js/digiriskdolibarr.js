@@ -485,10 +485,12 @@ window.eoxiaJS.modal.openModal = function ( event ) {
  * @return {void}
  */
 window.eoxiaJS.modal.closeModal = function ( event ) {
-	$(this).closest('.modal-active').removeClass('modal-active')
-	$('.clicked-photo').attr('style', '');
-	$('.clicked-photo').removeClass('clicked-photo');
-	$('.notice').addClass('hidden');
+	if ($(event.target).hasClass('modal-active') || $(event.target).hasClass('fa-times')) {
+		$(this).closest('.modal-active').removeClass('modal-active')
+		$('.clicked-photo').attr('style', '');
+		$('.clicked-photo').removeClass('clicked-photo');
+		$('.notice').addClass('hidden');
+	}
 };
 
 /**
@@ -1853,6 +1855,7 @@ window.eoxiaJS.risk.saveRisk = function ( event ) {
 
 	if (newParent == id || moveRiskDisabled) {
 		window.eoxiaJS.loader.display($(this).closest('.risk-row-content-' + editedRiskId).find('.risk-description-'+editedRiskId));
+		window.eoxiaJS.loader.display($(this).closest('.risk-row-content-' + editedRiskId).find('.risk-category'));
 	} else {
 		window.eoxiaJS.loader.display($(this).closest('.risk-row-content-' + editedRiskId))
 	}
@@ -1875,15 +1878,16 @@ window.eoxiaJS.risk.saveRisk = function ( event ) {
 			$('.wpeo-loader').removeClass('wpeo-loader');
 			let actionContainerSuccess = $('.messageSuccessRiskEdit');
 			if (newParent == id || moveRiskDisabled) {
+				$('.modal-active').removeClass('modal-active')
+				$('.risk-description-'+editedRiskId).html($(resp).find('.risk-description-'+editedRiskId))
+				$('.risk-row-content-' + editedRiskId).find('.risk-category .cell-risk').html($(resp).find('.risk-row-content-' + editedRiskId).find('.risk-category .cell-risk').children())
 				$('.risk-row-content-' + editedRiskId).find('.risk-category').fadeOut(800);
 				$('.risk-row-content-' + editedRiskId).find('.risk-category').fadeIn(800);
 				$('.risk-row-content-' + editedRiskId).find('.risk-description-'+editedRiskId).fadeOut(800);
-				$('.risk-row-content-' + editedRiskId).find('.risk-description-'+editedRiskId).fadeIn(800, function () {
-					elementParent.html($(resp).find('.div-table-responsive'))
-				});
+				$('.risk-row-content-' + editedRiskId).find('.risk-description-'+editedRiskId).fadeIn(800);
 			} else {
 				$('.risk-row-content-'+editedRiskId).fadeOut(800, function () {
-					elementParent.html($(resp).find('.div-title-and-table-responsive'))
+					$('.fichecenter .opacitymedium.colorblack.paddingleft').html($(resp).find('#searchFormListRisks .opacitymedium.colorblack.paddingleft'))
 				});
 			}
 
@@ -2582,7 +2586,7 @@ window.eoxiaJS.riskassessmenttask.createRiskAssessmentTask = function ( event ) 
 		processData: false,
 		contentType: false,
 		success: function ( resp ) {
-			$('.fichecenter.risklist').html($(resp).find('#searchFormListRisks'))
+			$('.tasks-list-container-'+riskToAssign).html($(resp).find('.tasks-list-container-'+riskToAssign).children())
 			let actionContainerSuccess = $('.messageSuccessTaskCreate');
 
 			$('.riskassessment-tasks' + riskToAssign).fadeOut(800);
@@ -2633,7 +2637,7 @@ window.eoxiaJS.riskassessmenttask.deleteRiskAssessmentTask = function ( event ) 
 			processData: false,
 			contentType: false,
 			success: function ( resp ) {
-				$('.fichecenter.risklist').html($(resp).find('#searchFormListRisks'))
+				$('.riskassessment-task-container-'+deletedRiskAssessmentTaskId).hide()
 				$('.riskassessment-tasks' + riskId).fadeOut(800);
 				$('.riskassessment-tasks' + riskId).fadeIn(800);
 				let textToShow = '';
@@ -2723,7 +2727,7 @@ window.eoxiaJS.riskassessmenttask.saveRiskAssessmentTask = function ( event ) {
 		processData: false,
 		contentType: false,
 		success: function ( resp ) {
-			$('.fichecenter.risklist').html($(resp).find('#searchFormListRisks'))
+			$('.riskassessment-task-container-'+editedRiskAssessmentTaskId).html($(resp).find('.riskassessment-task-container-'+editedRiskAssessmentTaskId).children())
 			let actionContainerSuccess = $('.messageSuccessTaskEdit');
 			$('.riskassessment-tasks' + riskId).fadeOut(800);
 			$('.riskassessment-tasks' + riskId).fadeIn(800);
@@ -4047,6 +4051,7 @@ window.eoxiaJS.keyEvent.init = function() {
 window.eoxiaJS.keyEvent.event = function() {
 	$( document ).on( 'keydown', window.eoxiaJS.keyEvent.keyup );
 	$( document ).on( 'keyup', '.url-container' , window.eoxiaJS.keyEvent.checkUrlFormat );
+	$( document ).on( 'click', '.modal-active:not(.modal-container)' , window.eoxiaJS.modal.closeModal );
 }
 
 /**

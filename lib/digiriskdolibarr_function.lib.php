@@ -1383,6 +1383,7 @@ function digirisk_show_medias($sdir, $size = '', $maxHeight = 80, $maxWidth = 80
 	$j         = 0;
 
 	if (count($filearray)) {
+		print '<div class="wpeo-gridlayout grid-4 grid-gap-3 grid-margin-2 ecm-photo-list ecm-photo-list">';
 		if ($sortfield && $sortorder) {
 			$filearray = dol_sort_array($filearray, $sortfield, $sortorder);
 		}
@@ -1420,6 +1421,12 @@ function digirisk_show_medias($sdir, $size = '', $maxHeight = 80, $maxWidth = 80
 					}
 				}
 			}
+		}
+		print '</div>';
+	} else {
+		// Display media library is empty if no media uploaded
+		if (!is_array($_FILES['userfile']['tmp_name'])) {
+			print($langs->trans("EmptyMediaLibrary"));
 		}
 	}
 

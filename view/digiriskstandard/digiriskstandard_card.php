@@ -38,10 +38,10 @@ if ( ! $res) die("Include of main fails");
 
 require_once DOL_DOCUMENT_ROOT . '/core/lib/images.lib.php';
 
-require_once './../../class/digiriskstandard.class.php';
-require_once './../../core/boxes/box_riskassessmentdocument.php';
-require_once './../../lib/digiriskdolibarr_digiriskstandard.lib.php';
-require_once './../../lib/digiriskdolibarr_function.lib.php';
+require_once __DIR__ . '/../../class/digiriskstandard.class.php';
+require_once __DIR__ . '/../../lib/digiriskdolibarr_digiriskstandard.lib.php';
+require_once __DIR__ . '/../../lib/digiriskdolibarr_function.lib.php';
+require_once __DIR__ . '/../../class/dashboarddigiriskstats.class.php';
 
 global $db, $conf, $langs, $user,  $maxwidthmini, $maxheightmini, $maxwidthsmall,$maxheightsmall;
 
@@ -50,7 +50,7 @@ $langs->loadLangs(array("digiriskdolibarr@digiriskdolibarr"));
 
 // Initialize technical objects
 $object = new DigiriskStandard($db);
-$box    = new box_riskassessmentdocument($db);
+$stats  = new DashboardDigiriskStats($db);
 
 $object->fetch($conf->global->DIGIRISKDOLIBARR_ACTIVE_STANDARD);
 
@@ -93,13 +93,13 @@ if ((empty($action) || ($action != 'edit' && $action != 'create'))) {
 	print '<div class="fichecenter">';
 	print '<br>';
 
-	$box->loadBox();
-	$box->showBox();
+	$stats->show_dashboard(1,1,1,0);
 
 	print '<div class="fichecenter">';
 
 	print dol_get_fiche_end();
 }
+
 
 // End of page
 llxFooter();
