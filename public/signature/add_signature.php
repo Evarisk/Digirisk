@@ -109,7 +109,7 @@ if ($action == 'addSignature') {
 
 	$signatory->fetch($signatoryID);
 	$signatory->signature      = $data['signature'];
-	$signatory->signature_date = dol_now();
+	$signatory->signature_date = dol_now('tzuser');
 
 	// Check Captcha code if is enabled
 	if ( ! empty($conf->global->DIGIRISKDOLIBARR_USE_CAPTCHA)) {
