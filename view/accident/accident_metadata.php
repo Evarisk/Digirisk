@@ -305,7 +305,7 @@ if (($id || $ref) && $action == 'edit') {
 
 	//AccidentNoticed
 	print '<tr><td class="minwidth400">' . $langs->trans("AccidentNoticed") . '</td><td>';
-	print $form->selectarray('accident_noticed', array('0' => $langs->trans('Found'), '1' => $langs->trans('Known')), $accidentmetadata->accident_noticed, 0, 0, 0, '', 0, 0, 0, '', 'minwidth400', 1);
+	print $form->selectarray('accident_noticed', array('1' => $langs->trans('Found'), '2' => $langs->trans('Known')), $accidentmetadata->accident_noticed, -1, 0, 0, '', 0, 0, 0, '', 'minwidth400', 1);
 	print '</td></tr>';
 
 	//AccidentNoticeDate
@@ -315,7 +315,7 @@ if (($id || $ref) && $action == 'edit') {
 
 	//AccidentNoticeBy
 	print '<tr><td class="minwidth400">' . $langs->trans("AccidentNoticeBy") . '</td><td>';
-	print $form->selectarray('accident_notice_by', array('0' => $langs->trans('ByEmployer'), '1' => $langs->trans('ByEmployees')), $accidentmetadata->accident_notice_by, 0, 0, 0, '', 0, 0, 0, '', 'minwidth400', 1);
+	print $form->selectarray('accident_notice_by', array('1' => $langs->trans('ByEmployer'), '2' => $langs->trans('ByEmployees')), $accidentmetadata->accident_notice_by, -1, 0, 0, '', 0, 0, 0, '', 'minwidth400', 1);
 	print '</td></tr>';
 
 	//AccidentDescribedByVictim
@@ -346,7 +346,7 @@ if (($id || $ref) && $action == 'edit') {
 
 	//Consequence
 	print '<tr><td class="minwidth400">' . $form->textwithpicto($langs->trans("Consequence"), $langs->trans("ConsequenceTooltip")) . '</td><td>';
-	print $form->selectarray('consequence', array('0' => $langs->trans('WithoutWorkStop'), '1' => $langs->trans('WithWorkStop'), '2' => $langs->trans('Fatal')), $accidentmetadata->consequence, 0, 0, 0, '', 0, 0, 0, '', 'minwidth400', 1);
+	print $form->selectarray('consequence', array('1' => $langs->trans('WithoutWorkStop'), '2' => $langs->trans('WithWorkStop'), '3' => $langs->trans('Fatal')), $accidentmetadata->consequence, -1, 0, 0, '', 0, 0, 0, '', 'minwidth400', 1);
 	print '</td></tr>';
 
 	print '<tr></tr>';
@@ -365,7 +365,7 @@ if (($id || $ref) && $action == 'edit') {
 
 	//FirstPersonNoticedIsWitness
 	print '<tr><td class="minwidth400">' . img_picto('', 'user') . ' ' . $form->textwithpicto($langs->trans("FirstPersonNoticedIsWitness"), $langs->trans("FirstPersonNoticedIsWitnessTooltip")) . '</td><td>';
-	print $form->selectarray('first_person_noticed_is_witness', array('0' => $langs->trans('Witness'), '1' => $langs->trans('FirstPersonNoticed')), $accidentmetadata->first_person_noticed_is_witness, 0, 0, 0, '', 0, 0, 0, '', 'minwidth400', 1);
+	print $form->selectarray('first_person_noticed_is_witness', array('1' => $langs->trans('Witness'), '2' => $langs->trans('FirstPersonNoticed')), $accidentmetadata->first_person_noticed_is_witness, -1, 0, 0, '', 0, 0, 0, '', 'minwidth400', 1);
 
 	//FKUserWitness
 	$userlist = $form->select_dolusers('', 'fk_user_witness', 0, null, 0, '', '', $conf->entity, 0, 0, 'AND u.statut = 1', 0, '', 'minwidth300', 0, 1);
@@ -520,33 +520,46 @@ if ((empty($action) || ($action != 'create' && $action != 'edit'))) {
 
 	$object = $accidentmetadata;
 
+	//Relative location
+	if ($object->relative_location < 0) {
+		$object->relative_location = '';
+	}
+
 	//Accident Noticed
-	if ($object->accident_noticed == 0) {
+	if (empty($object->accident_noticed) || $object->accident_noticed < 0) {
+		$object->accident_noticed = '';
+	} else if ($object->accident_noticed == 1) {
 		$object->accident_noticed = $langs->trans('Found');
-	} elseif ($object->accident_type == 1) {
+	} else if ($object->accident_type == 2) {
 		$object->accident_noticed = $langs->trans('Known');
 	}
 
 	//AccidentNoticeBy
-	if ($object->accident_notice_by == 0) {
+	if (empty($object->accident_notice_by) || $object->accident_notice_by < 0) {
+		$object->accident_notice_by = '';
+	} else if ($object->accident_notice_by == 1) {
 		$object->accident_notice_by = $langs->trans('ByEmployer');
-	} elseif ($object->accident_notice_by == 1) {
+	} else if ($object->accident_notice_by == 2) {
 		$object->accident_notice_by = $langs->trans('ByEmployees');
 	}
 
 	//Consequence
-	if ($object->consequence == 0) {
+	if (empty($object->consequence) || $object->consequence < 0) {
+		$object->consequence = '';
+	} else if ($object->consequence == 1) {
 		$object->consequence = $langs->trans('WithoutWorkStop');
-	} elseif ($object->consequence == 1) {
+	} else if ($object->consequence == 2) {
 		$object->consequence = $langs->trans('WithWorkStop');
-	} elseif ($object->consequence == 1) {
+	} else if ($object->consequence == 3) {
 		$object->consequence = $langs->trans('Fatal');
 	}
 
 	//FirstPersonNoticedIsWitness
-	if ($object->first_person_noticed_is_witness == 0) {
+	if (empty($object->first_person_noticed_is_witness) || $object->first_person_noticed_is_witness < 0) {
+		$object->first_person_noticed_is_witness = '';
+	} else if ($object->first_person_noticed_is_witness == 1) {
 		$object->first_person_noticed_is_witness = $langs->trans('Witness');
-	} elseif ($object->first_person_noticed_is_witness == 1) {
+	} else if ($object->first_person_noticed_is_witness == 2) {
 		$object->first_person_noticed_is_witness = $langs->trans('FirstPersonNoticed');
 	}
 
