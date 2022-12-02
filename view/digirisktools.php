@@ -625,6 +625,52 @@ if (GETPOST('dataMigrationExportGlobal', 'alpha') && ! empty($conf->global->MAIN
 	}
 }
 
+if (GETPOST('dataMigrationExportStructureTree', 'alpha') && ! empty($conf->global->MAIN_UPLOAD_DOC)) {
+	// DigiriskElements data
+	$alldigiriskelements = $digiriskElement->fetchAll();
+	if (is_array($alldigiriskelements) && !empty($alldigiriskelements)) {
+		foreach ($alldigiriskelements as $digiriskelementsingle) {
+			$digiriskelementsExportArray['rowid']            = $digiriskelementsingle->id;
+			$digiriskelementsExportArray['label']            = $digiriskelementsingle->label;
+			$digiriskelementsExportArray['status']           = $digiriskelementsingle->status;
+			$digiriskelementsExportArray['description']      = $digiriskelementsingle->description;
+			$digiriskelementsExportArray['element_type']     = $digiriskelementsingle->element_type;
+			$digiriskelementsExportArray['photo']            = $digiriskelementsingle->photo;
+			$digiriskelementsExportArray['show_in_selector'] = $digiriskelementsingle->show_in_selector;
+			$digiriskelementsExportArray['fk_parent']        = $digiriskelementsingle->fk_parent;
+			$digiriskelementsExportArray['ranks']            = $digiriskelementsingle->ranks;
+
+			$digiriskExportArray['digiriskelements'][$digiriskelementsingle->id] = $digiriskelementsExportArray;
+		}
+	}
+
+	$digiriskExportArray = json_encode($digiriskExportArray, JSON_PRETTY_PRINT);
+
+	$filedir = $upload_dir . '/temp/';
+	$export_base = $filedir . dol_print_date(dol_now(), 'dayhourlog', 'tzuser') . '_dolibarr_structure_tree_export';
+	$filename = $export_base . '.json';
+
+	file_put_contents($filename, $digiriskExportArray);
+
+	$zip = new ZipArchive();
+	if ($zip->open($export_base . '.zip', ZipArchive::CREATE ) === TRUE) {
+		$zip->addFile($filename, basename($filename));
+		$zip->close();
+		$filenamezip = dol_print_date(dol_now(), 'dayhourlog', 'tzuser') . '_dolibarr_structure_tree_export.zip';
+		$filepath = DOL_URL_ROOT . '/document.php?modulepart=digiriskdolibarr&file=' . urlencode('temp/'.$filenamezip);
+
+		?>
+		<script>
+			var alink = document.createElement( 'a' );
+			alink.setAttribute('href', <?php echo json_encode($filepath); ?>);
+			alink.setAttribute('download', <?php echo json_encode($filenamezip); ?>);
+			alink.click();
+		</script>
+		<?php
+		$fileExportGlobals = dol_dir_list($filedir, "files", 0, '', '', '', '', 1);
+	}
+}
+
 if (GETPOST('dataMigrationImportGlobalDolibarr', 'alpha') && ! empty($conf->global->MAIN_UPLOAD_DOC)) {
 	// Submit file
 	if ( ! empty($_FILES)) {
@@ -794,6 +840,75 @@ if (GETPOST('dataMigrationImportGlobalDolibarr', 'alpha') && ! empty($conf->glob
 	}
 }
 
+if (GETPOST('dataMigrationImportStructureTreeDolibarr', 'alpha') && ! empty($conf->global->MAIN_UPLOAD_DOC)) {
+	// Submit file
+	if ( ! empty($_FILES)) {
+		if ( ! preg_match('/dolibarr_global_export.zip/', $_FILES['dataMigrationImportStructureTreeDolibarrfile']['name'][0]) || $_FILES['dataMigrationImportStructureTreeDolibarrfile']['size'][0] < 1) {
+			setEventMessages($langs->trans('ErrorFileNotWellFormattedZIP'), null, 'errors');
+		} else {
+			if (is_array($_FILES['dataMigrationImportStructureTreeDolibarrfile']['tmp_name'])) $userfiles = $_FILES['dataMigrationImportStructureTreeDolibarrfile']['tmp_name'];
+			else $userfiles                                                               = array($_FILES['dataMigrationImportStructureTreeDolibarrfile']['tmp_name']);
+
+			foreach ($userfiles as $key => $userfile) {
+				if (empty($_FILES['dataMigrationImportStructureTreeDolibarrfile']['tmp_name'][$key])) {
+					$error++;
+					if ($_FILES['dataMigrationImportStructureTreeDolibarrfile']['error'][$key] == 1 || $_FILES['dataMigrationImportStructureTreeDolibarrfile']['error'][$key] == 2) {
+						setEventMessages($langs->trans('ErrorFileSizeTooLarge'), null, 'errors');
+					} else {
+						setEventMessages($langs->trans("ErrorFieldRequired", $langs->transnoentitiesnoconv("File")), null, 'errors');
+					}
+				}
+			}
+
+			if ( ! $error) {
+				$filedir = $upload_dir . '/temp/';
+				if ( ! empty($filedir)) {
+					$result = dol_add_file_process($filedir, 0, 1, 'dataMigrationImportStructureTreeDolibarrfile', '', null, '', 0, null);
+				}
+			}
+
+			if ($result > 0) {
+				$zip = new ZipArchive;
+				if ($zip->open($filedir . $_FILES['dataMigrationImportStructureTreeDolibarrfile']['name'][0]) === TRUE) {
+					$zip->extractTo($filedir);
+					$zip->close();
+				}
+			}
+
+			$filename = preg_replace( '/\.zip/', '.json', $_FILES['dataMigrationImportStructureTreeDolibarrfile']['name'][0]);
+
+			$json                = file_get_contents($filedir . $filename);
+			$digiriskExportArray = json_decode($json, true);
+
+			if (is_array($digiriskExportArray['digiriskelements']) && !empty($digiriskExportArray['digiriskelements'])) {
+				foreach ($digiriskExportArray['digiriskelements'] as $digiriskelementsingle) {
+					if ($digiriskelementsingle['element_type'] == 'groupment') {
+						$digiriskElement->ref = $refGroupmentMod->getNextValue($digiriskElement);
+					} elseif ($digiriskelementsingle['element_type'] == 'workunit') {
+						$digiriskElement->ref = $refWorkUnitMod->getNextValue($digiriskElement);
+					}
+					$digiriskElement->label            = $digiriskelementsingle['label'];
+					$digiriskElement->status           = $digiriskelementsingle['status'];
+					$digiriskElement->description      = $digiriskelementsingle['description'];
+					$digiriskElement->element          = $digiriskelementsingle['element_type'];
+					$digiriskElement->element_type     = $digiriskelementsingle['element_type'];
+					$digiriskElement->photo            = $digiriskelementsingle['photo'];
+					$digiriskElement->show_in_selector = $digiriskelementsingle['show_in_selector'];
+					$digiriskElement->ranks            = $digiriskelementsingle['ranks'];
+
+					$digiriskElement->array_options['wp_digi_id'] = $digiriskelementsingle['rowid'];
+					$digiriskElement->array_options['entity']     = $conf->entity;
+
+					$digiriskElement->fk_parent = $digiriskElement->fetch_id_from_wp_digi_id($digiriskelementsingle['fk_parent']) ?: 0;
+
+					$digiriskelementid = $digiriskElement->create($user);
+				}
+			}
+		}
+		$fileImportGlobals = dol_dir_list($filedir, "files", 0, '', '', '', '', 1);
+	}
+}
+
 /*
  * View
  */
@@ -947,6 +1062,49 @@ if ($user->rights->digiriskdolibarr->adminpage->read) {
 	print '<td class="center data-migration-import-global-dolibarr">';
 	print '<input class="flat" type="file" name="dataMigrationImportGlobalDolibarrfile[]" id="data-migration-import-global-dolibarr" />';
 	print '<input type="submit" class="button reposition data-migration-submit" name="dataMigrationImportGlobalDolibarr" value="' . $langs->trans("Upload") . '">';
+	print '</td>';
+	print '</tr>';
+	print '</table>';
+	print '</form>';
+
+	print '<form class="data-migration-export-structure-tree-from" name="dataMigrationExportStructureTree" id="dataMigrationExportStructureTree" action="' . $_SERVER["PHP_SELF"] . '" method="POST">';
+	print '<input type="hidden" name="token" value="' . newToken() . '">';
+	print '<input type="hidden" name="action" value="dataMigrationExportStructureTree">';
+
+	print '<table class="noborder centpercent">';
+	print '<tr class="liste_titre">';
+	print '<td>' . $langs->trans("Name") . '</td>';
+	print '<td>' . $langs->trans("Description") . '</td>';
+	print '<td class="center">' . $langs->trans("Action") . '</td>';
+	print '</tr>';
+
+	// Export structure tree from Dolibarr
+	print '<tr class="oddeven"><td>';
+	print $langs->trans('DataMigrationExportStructureTree');
+	print "</td><td>";
+	print $langs->trans('DataMigrationExportStructureTreeDescription');
+	print '</td>';
+
+	print '<td class="center data-migration-export-structure-tree">';
+	print '<input type="submit" class="button reposition data-migration-submit" name="dataMigrationExportStructureTree" value="' . $langs->trans("ExportData") . '">';
+	print '</td>';
+	print '</tr>';
+	print '</form>';
+
+	print '<form class="data-migration-from" name="DataMigration" id="DataMigration" action="' . $_SERVER["PHP_SELF"] . '" enctype="multipart/form-data" method="POST">';
+	print '<input type="hidden" name="token" value="' . newToken() . '">';
+	print '<input type="hidden" name="action" value="">';
+
+	// Import structure tree from Dolibarr
+	print '<tr class="oddeven"><td>';
+	print $langs->trans('DataMigrationImport');
+	print "</td><td>";
+	print $langs->trans('DataMigrationImportStructureTreeDescription');
+	print '</td>';
+
+	print '<td class="center data-migration-import-structure-tree">';
+	print '<input class="flat" type="file" name="dataMigrationImportStructureTreeDolibarrfile[]" id="data-migration-import-structure-tree" />';
+	print '<input type="submit" class="button reposition data-migration-submit" name="dataMigrationImportStructureTree" value="' . $langs->trans("Upload") . '">';
 	print '</td>';
 	print '</tr>';
 	print '</table>';
