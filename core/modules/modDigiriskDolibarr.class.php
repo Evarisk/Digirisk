@@ -744,6 +744,7 @@ class modDigiriskdolibarr extends DolibarrModules
 			362 => array('DIGIRISKDOLIBARR_TOOLS_RISKS_ALREADY_IMPORTED', 'integer', 0, '', 0, 'current'),
 			363 => array('DIGIRISKDOLIBARR_TOOLS_RISKSIGNS_ALREADY_IMPORTED', 'integer', 0, '', 0, 'current'),
 			364 => array('DIGIRISKDOLIBARR_TOOLS_GLOBAL_ALREADY_IMPORTED', 'integer', 0, '', 0, 'current'),
+			365 => array('DIGIRISKDOLIBARR_TOOLS_TRASH_BIN_IMPORT', 'integer', 0, '', 0, 'current'),
 
 			// CONST SIGNATURE
 			370 => array('DIGIRISKDOLIBARR_SIGNATURE_ENABLE_PUBLIC_INTERFACE', 'integer', 1, '', 0, 'current'),
