@@ -195,16 +195,16 @@ if ($conf->societe->enabled) {
 		$events[] = array('method' => 'getContacts', 'url' => dol_buildpath('/core/ajax/contacts.php?showempty=1', 1), 'htmlname' => 'labourdoctor_contactid', 'params' => array('add-customer-contact' => 'disabled'));
 		$societe->fetch($labour_doctor_society->id[0]);
 
-		print $form->select_company($labour_doctor_society->id[0], 'labourdoctor_socid', '', 'SelectThirdParty', 1, 0, $events, 0, 'minwidth300');
+		print $form->select_company($labour_doctor_society->id[0], 'labourdoctor_socid', '', 0, 1, 0, $events, 0, 'minwidth300');
 	} else {
 		$events   = array();
 		$events[] = array('method' => 'getContacts', 'url' => dol_buildpath('/core/ajax/contacts.php?showempty=1', 1), 'htmlname' => 'labourdoctor_contactid', 'params' => array('add-customer-contact' => 'disabled'));
 
 		//For external user force the company to user company
 		if ( ! empty($user->socid)) {
-			print $form->select_company($user->socid, 'labourdoctor_socid', '', 1, 1, 0, $events, 0, 'minwidth300');
+			print $form->select_company($user->socid, 'labourdoctor_socid', '', 0, 1, 0, $events, 0, 'minwidth300');
 		} else {
-			print $form->select_company('', 'labourdoctor_socid', '', 'SelectThirdParty', 1, 0, $events, 0, 'minwidth300');
+			print $form->select_company('', 'labourdoctor_socid', '', 0, 1, 0, $events, 0, 'minwidth300');
 		}
 	}
 	if ( ! GETPOSTISSET('backtopage')) print ' <a href="' . DOL_URL_ROOT . '/societe/card.php?action=create&backtopage=' . urlencode($_SERVER["PHP_SELF"] . '?action=create') . '"><span class="fa fa-plus-circle valignmiddle paddingleft" title="' . $langs->trans("AddThirdParty") . '"></span></a>';
@@ -242,15 +242,15 @@ if ($conf->societe->enabled) {
 		$events[] = array('method' => 'getContacts', 'url' => dol_buildpath('/core/ajax/contacts.php?showempty=1', 1), 'htmlname' => 'labourinspector_contactid', 'params' => array('add-customer-contact' => 'disabled'));
 		$societe->fetch($labour_inspector_societe->id[0]);
 
-		print $form->select_company($labour_inspector_societe->id[0], 'labourinspector_socid', '', 'SelectThirdParty', 1, 0, $events, 0, 'minwidth300');
+		print $form->select_company($labour_inspector_societe->id[0], 'labourinspector_socid', '', 0, 1, 0, $events, 0, 'minwidth300');
 	} else {
 		$events   = array();
 		$events[] = array('method' => 'getContacts', 'url' => dol_buildpath('/core/ajax/contacts.php?showempty=1', 1), 'htmlname' => 'labourinspector_contactid', 'params' => array('add-customer-contact' => 'disabled'));
 		//For external user force the company to user company
 		if ( ! empty($user->socid)) {
-			print $form->select_company($user->socid, 'labourinspector_socid', '', 1, 1, 0, $events, 0, 'minwidth300');
+			print $form->select_company($user->socid, 'labourinspector_socid', '', 0, 1, 0, $events, 0, 'minwidth300');
 		} else {
-			print $form->select_company('', 'labourinspector_socid', '', 'SelectThirdParty', 1, 0, $events, 0, 'minwidth300');
+			print $form->select_company('', 'labourinspector_socid', '', 0, 1, 0, $events, 0, 'minwidth300');
 		}
 	}
 	if ( ! GETPOSTISSET('backtopage')) print ' <a href="' . DOL_URL_ROOT . '/societe/card.php?action=create&backtopage=' . urlencode($_SERVER["PHP_SELF"] . '?action=create') . '"><span class="fa fa-plus-circle valignmiddle paddingleft" title="' . $langs->trans("AddThirdParty") . '"></span></a>';
