@@ -2773,7 +2773,8 @@ window.eoxiaJS.riskassessmenttask.createRiskAssessmentTaskTimeSpent = function (
 	let single     = element.find('.riskassessment-task-timespent-container');
 	let riskId     = element.find('riskassessment-task-single').attr('value');
 	let textToShow = '';
-	let taskRef    =  element.find('.riskassessment-task-ref-'+taskID).attr('value');
+	let taskRef    = element.find('.riskassessment-task-ref-'+taskID).attr('value');
+	let timespent  = $('.modal-header .riskassessment-task-data').find('.riskassessment-task-timespent')
 
 	let date     = single.find('#RiskassessmentTaskTimespentDate' + taskID).val();
 	let hour     = single.find('#RiskassessmentTaskTimespentDate' + taskID + 'hour').val();
@@ -2817,6 +2818,7 @@ window.eoxiaJS.riskassessmenttask.createRiskAssessmentTaskTimeSpent = function (
 
 			actionContainerSuccess.find('.notice-subtitle .text').text(textToShow)
 			actionContainerSuccess.removeClass('hidden');
+			timespent.html($(resp).find('.modal-header .riskassessment-task-data').find('.riskassessment-task-timespent'))
 		},
 		error: function ( resp ) {
 			$(this).closest('.risk-row-content-' + riskId).removeClass('wpeo-loader');
