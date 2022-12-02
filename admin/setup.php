@@ -170,6 +170,17 @@ print ajax_constantonoff('DIGIRISKDOLIBARR_TOOLS_ADVANCED_IMPORT');
 print '</td>';
 print '</tr>';
 
+// Trashbin Import
+print '<tr class="oddeven"><td>';
+print  $langs->trans("TrashBinExport");
+print '</td><td>';
+print $langs->trans('TrashBinExportDescription');
+print '</td>';
+print '<td class="center">';
+print ajax_constantonoff('DIGIRISKDOLIBARR_TOOLS_TRASH_BIN_IMPORT');
+print '</td>';
+print '</tr>';
+
 // Manuel input number employees
 print '<tr class="oddeven"><td>';
 print  $langs->trans("ManuelInputNBEmployees");

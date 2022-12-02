@@ -492,7 +492,14 @@ if (GETPOST('dataMigrationImportGlobal', 'alpha') && ! empty($conf->global->MAIN
 
 if (GETPOST('dataMigrationExportGlobal', 'alpha') && ! empty($conf->global->MAIN_UPLOAD_DOC)) {
 	// DigiriskElements data
-	$alldigiriskelements = $digiriskElement->fetchAll();
+	if ($conf->global->DIGIRISKDOLIBARR_TOOLS_TRASH_BIN_IMPORT == 1) {
+		$filter = array('customsql' => "status NOT LIKE '0'");
+	} else {
+		$idTrashBin = $conf->global->DIGIRISKDOLIBARR_DIGIRISKELEMENT_TRASH;
+		$filter = array('customsql' => "status NOT LIKE '0' AND fk_parent NOT LIKE '$idTrashBin'");
+	}
+	$alldigiriskelements = $digiriskElement->fetchAll('', '', 0, 0, $filter);
+
 	if (is_array($alldigiriskelements) && !empty($alldigiriskelements)) {
 		foreach ($alldigiriskelements as $digiriskelementsingle) {
 			$digiriskelementsExportArray['rowid']            = $digiriskelementsingle->id;
