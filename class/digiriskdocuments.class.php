@@ -447,7 +447,7 @@ class DigiriskDocuments extends CommonObject
 						$tmparray['actionPreventionCompleted']   = "";
 						$lastEvaluation                          = $line->lastEvaluation;
 
-						if ($lastEvaluation->cotation > 0 && !empty($lastEvaluation) && is_object($lastEvaluation)) {
+						if ($lastEvaluation->cotation >= 0 && !empty($lastEvaluation) && is_object($lastEvaluation)) {
 							$scale = $lastEvaluation->get_evaluation_scale();
 
 							if ($scale == $i) {
@@ -473,7 +473,7 @@ class DigiriskDocuments extends CommonObject
 								$tmparray['nomDanger']             = DOL_DOCUMENT_ROOT . '/custom/digiriskdolibarr/img/categorieDangers/' . $line->get_danger_category($line) . '.png';
 								$tmparray['nomPicto']              = $line->get_danger_category_name($line);
 								$tmparray['identifiantRisque']     = $line->ref . ' - ' . $lastEvaluation->ref;
-								$tmparray['quotationRisque']       = $lastEvaluation->cotation ?: '0';
+								$tmparray['quotationRisque']       = $lastEvaluation->cotation ?: 0;
 								$tmparray['descriptionRisque']     = $line->description;
 								$tmparray['commentaireEvaluation'] = $lastEvaluation->comment ? dol_print_date((($conf->global->DIGIRISKDOLIBARR_SHOW_RISKASSESSMENT_DATE && (!empty($lastEvaluation->date_riskassessment))) ? $lastEvaluation->date_riskassessment : $lastEvaluation->date_creation), 'dayreduceformat') . ': ' . $lastEvaluation->comment : '';
 
