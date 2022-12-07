@@ -317,6 +317,7 @@ window.eoxiaJS.navigation.saveOrganization = function( event ) {
 	//Notices
 	let actionContainerSuccess = $('.messageSuccessOrganizationSaved');
 	let actionContainerError = $('.messageErrorOrganizationSaved');
+	let token = $('input[name="token"]').val();
 
 	$('.route').each(function() {
 		id = $(this).attr('id')
@@ -331,7 +332,7 @@ window.eoxiaJS.navigation.saveOrganization = function( event ) {
 	//ajouter sécurité si le nombre de gp à la fin n'est pas le même qu'en bdd alors on stop tout
 
 	$.ajax({
-		url: document.URL + '&action=saveOrganization&ids='+idArray.toString()+'&parent_ids='+parentArray,
+		url: document.URL + '&action=saveOrganization&ids='+idArray.toString()+'&parent_ids='+parentArray+'&token='+token,
 		success: function() {
 			actionContainerSuccess.removeClass('hidden');
 
