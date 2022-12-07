@@ -751,6 +751,7 @@ class modDigiriskdolibarr extends DolibarrModules
 		$this->tabs[] = array('data' => 'mycompany_admin:+social:'. $pictoDigirisk .$langs->trans('Social').':digiriskdolibarr@digiriskdolibarr:1:/custom/digiriskdolibarr/admin/socialconf.php');  					// To add a new tab identified by code tabname1
 		$this->tabs[] = array('data' => 'thirdparty:+openinghours:'. $pictoDigirisk .$langs->trans('OpeningHours').':digiriskdolibarr@digiriskdolibarr:1:/custom/digiriskdolibarr/view/openinghours_card.php?id=__ID__'); // To add a new tab identified by code tabname1
 		$this->tabs[] = array('data' => 'user:+participation:'. $pictoDigirisk .$langs->trans('GP/UTParticipation').':digiriskdolibarr@digiriskdolibarr:1:/custom/digiriskdolibarr/view/digiriskelement/digiriskelement_evaluator.php?fromid=__ID__'); // To add a new tab identified by code tabname1
+		$this->tabs[] = array('data' => 'user:+accidents:'. $pictoDigirisk .$langs->trans('Accidents').':digiriskdolibarr@digiriskdolibarr:1:/custom/digiriskdolibarr/view/accident/accident_list.php?fromiduser=__ID__'); // To add a new tab identified by code tabname1
 
 		// To remove an existing tab identified by code tabname
 		// Dictionaries

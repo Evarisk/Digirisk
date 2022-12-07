@@ -69,6 +69,7 @@ $contextpage         = GETPOST('contextpage', 'aZ') ? GETPOST('contextpage', 'aZ
 $backtopage          = GETPOST('backtopage', 'alpha');
 $backtopageforcancel = GETPOST('backtopageforcancel', 'alpha');
 $fk_parent           = GETPOST('fk_parent', 'int');
+$fromiduser          = GETPOST('fromiduser', 'int'); //element id
 
 // Initialize technical objects
 $object     = new Accident($db);
@@ -110,7 +111,7 @@ if ($reshook < 0) setEventMessages($hookmanager->error, $hookmanager->errors, 'e
 if (empty($reshook)) {
 	$error = 0;
 
-	$backurlforlist = dol_buildpath('/digiriskdolibarr/view/accident/accident_list.php', 1);
+	$backurlforlist = dol_buildpath('/digiriskdolibarr/view/accident/accident_list.php', 1) . (!empty($fromiduser) ? '?fromiduser=' . $fromiduser : '');
 
 	if (empty($backtopage) || ($cancel && empty($id))) {
 		if (empty($backtopage) || ($cancel && strpos($backtopage, '__ID__'))) {
@@ -645,7 +646,7 @@ if ($action == 'create') {
 	print '<tr>';
 	print '<td class="fieldrequired minwidth400" style="width:10%">' . img_picto('', 'user') . ' ' . $form->editfieldkey('UserVictim', 'UserVictim_id', '', $object, 0) . '</td>';
 	print '<td>';
-	print $form->selectarray('fk_user_victim', $userlist, ( ! empty(GETPOST('fk_user_victim')) ? GETPOST('fk_user_victim') : $user->id), $langs->trans('SelectUser'), null, null, null, "40%", 0, 0, '', 'minwidth300', 1);
+	print $form->selectarray('fk_user_victim', $userlist, ( ! empty(GETPOST('fk_user_victim')) ? GETPOST('fk_user_victim') : (! empty(GETPOST('fromiduser')) ? $fromiduser : $user->id)), $langs->trans('SelectUser'), null, null, null, "40%", 0, 0, '', 'minwidth300', 1);
 	print ' <a href="' . DOL_URL_ROOT . '/user/card.php?action=create&backtopage=' . urlencode($_SERVER["PHP_SELF"] . '?action=create') . '" target="_blank"><span class="fa fa-plus-circle valignmiddle paddingleft" title="' . $langs->trans("AddUser") . '"></span></a>';
 	print '</td></tr>';
 
