@@ -127,6 +127,10 @@ ProfessionalQualification = Qualification professionnelle
 DigiriskDocumentation = Documentation de Digirisk
 PleaseNameTheFile = De préférence, nommez le fichier <b> %s </b>
 
+DigiriskDocumentsData = Données configurables des documents
+ShowPictoName = Afficher le nom du pictogramme de danger
+ShowPictoNameDescription = Afficher le nom du pictogramme de danger de risque dans les documents <br> Utile si on souhaite transférer le tableau dans un tableur
+
 
 #
 # Page index

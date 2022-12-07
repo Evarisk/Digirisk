@@ -733,6 +733,9 @@ class modDigiriskdolibarr extends DolibarrModules
 			// CONST SIGNATURE
 			370 => array('DIGIRISKDOLIBARR_SIGNATURE_ENABLE_PUBLIC_INTERFACE', 'integer', 1, '', 0, 'current'),
 			371 => array('DIGIRISKDOLIBARR_SIGNATURE_SHOW_COMPANY_LOGO', 'integer', 1, '', 0, 'current'),
+
+			// CONST DIGIRISK DOCUMENTS
+			390 => array('DIGIRISKDOLIBARR_DOCUMENT_SHOW_PICTO_NAME', 'integer', 0, '', 0, 'current'),
 		);
 
 		if ( ! isset($conf->digiriskdolibarr) || ! isset($conf->digiriskdolibarr->enabled) ) {

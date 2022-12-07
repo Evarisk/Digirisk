@@ -276,6 +276,28 @@ print load_fiche_titre($title, $selectorAnchor, 'digiriskdolibarr32px@digiriskdo
 $head = digiriskdolibarrAdminPrepareHead();
 print dol_get_fiche_head($head, 'digiriskdocuments', '', -1, 'digiriskdolibarr@digiriskdolibarr');
 
+print load_fiche_titre($langs->trans("DigiriskDocumentsData"), '', '');
+
+print '<table class="noborder centpercent">';
+print '<tr class="liste_titre">';
+print '<td>' . $langs->trans("Name") . '</td>';
+print '<td>' . $langs->trans("Description") . '</td>';
+print '<td class="center">' . $langs->trans("Status") . '</td>';
+print '</tr>';
+
+//Use captcha
+print '<tr class="oddeven"><td>';
+print  $langs->trans("ShowPictoName");
+print '</td><td>';
+print $langs->trans('ShowPictoNameDescription');
+print '</td>';
+print '<td class="center">';
+print ajax_constantonoff('DIGIRISKDOLIBARR_DOCUMENT_SHOW_PICTO_NAME');
+print '</td>';
+print '</tr>';
+
+print '</table>';
+
 foreach ($types as $type => $documentType) {
 
 	print load_fiche_titre($pictos[$type] . $langs->trans($type), '', '', 0, $langs->trans($type));
