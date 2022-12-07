@@ -109,7 +109,6 @@ class LegalDisplay extends DigiriskDocuments
 
 		$resources               = new DigiriskResources($this->db);
 		$digirisk_resources      = $resources->digirisk_dolibarr_fetch_resources();
-		$thirdparty_openinghours = new Openinghours($this->db);
 		$json                    = array();
 
 		// *** JSON FILLING ***
@@ -121,6 +120,7 @@ class LegalDisplay extends DigiriskDocuments
 				$morewhere .= ' AND element_type = ' . "'" . $labour_doctor_societe->element . "'";
 				$morewhere .= ' AND status = 1';
 
+				$thirdparty_openinghours = new Openinghours($this->db);
 				$thirdparty_openinghours->fetch(0, '', $morewhere);
 				$json['LegalDisplay']['occupational_health_service']['openinghours'] = "\r\n" . $thirdparty_openinghours->monday . "\r\n" . $thirdparty_openinghours->tuesday . "\r\n" . $thirdparty_openinghours->wednesday . "\r\n" . $thirdparty_openinghours->thursday . "\r\n" . $thirdparty_openinghours->friday . "\r\n" . $thirdparty_openinghours->saturday . "\r\n" . $thirdparty_openinghours->sunday;
 			}
@@ -138,12 +138,14 @@ class LegalDisplay extends DigiriskDocuments
 
 			$labour_inspector_societe = new Societe($this->db);
 			$result = $labour_inspector_societe->fetch($digirisk_resources['LabourInspectorSociety']->id[0]);
+
 			if ($result > 0) {
 				$morewhere = ' AND element_id = ' . $labour_inspector_societe->id;
 				$morewhere .= ' AND element_type = ' . "'" . $labour_inspector_societe->element . "'";
 				$morewhere .= ' AND status = 1';
-
+				$thirdparty_openinghours = new Openinghours($this->db);
 				$thirdparty_openinghours->fetch(0, '', $morewhere);
+
 				$json['LegalDisplay']['detective_work']['openinghours'] = "\r\n" . $thirdparty_openinghours->monday . "\r\n" . $thirdparty_openinghours->tuesday . "\r\n" . $thirdparty_openinghours->wednesday . "\r\n" . $thirdparty_openinghours->thursday . "\r\n" . $thirdparty_openinghours->friday . "\r\n" . $thirdparty_openinghours->saturday . "\r\n" . $thirdparty_openinghours->sunday;
 			}
 
