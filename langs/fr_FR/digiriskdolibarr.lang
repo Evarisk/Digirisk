@@ -324,7 +324,6 @@ PreventionPlanDocumentGeneratedWithDolibarr = Plan de prévention généré avec
 # Data - Donnée
 
 PreventionPlan = Plan de prévention
-PreventionPlanInitial = PPR
 PreventionPlanList = Liste des plans de prévention
 PreventionPlanLine = risque(s)
 PriorVisit = Inspection commune préalable
@@ -498,7 +497,6 @@ CloneFirePermitRisk = Cloner les risques du permis de feu
 CloneAttendantsFirePermit = Cloner les participants du permis de feu
 CloneScheduleFirePermit = Cloner les horaires du permis de feu
 ConfirmCloneFirePermit = Êtes-vous sûr de vouloir cloner le permis de feu <b> %s </b> ?
-FirePermitInitial = FPR
 FirePermitDescription = Projet des permis de feu
 FirePermitData = Données du Permis de feu
 FirePermitManagement = Gestion des permis de feu
@@ -570,7 +568,6 @@ DeleteAccidentWorkStop = Suppression d'un arrêt de travail sur l'accident
 AddAccidentLesion = Ajout d'une lésion sur l'accident
 UpdateAccidentLesion = Mise à jour d'une lésion sur l'accident
 DeleteAccidentLesion = Suppression d'une lésion sur l'accident
-AccidentInitial = ACC
 AccidentDescription = Projet des accidents
 AccidentManagement = Gestion des accidents
 ACCProject = Projet lié aux accidents
@@ -788,7 +785,6 @@ RiskAssessmentDocumentDigiriskTemplate = ODT par défaut du document unique
 
 # Data - Donnée
 RiskAssessmentDocument = Document unique
-RiskAssessmentDocumentInitial = DU
 RiskAssessmentDocumentDU = Plan d'action Document Unique
 RiskAssessmentDocumentDescription = Plan d'action Document Unique
 
@@ -1451,7 +1447,6 @@ ChildCategoryLabelSet = Le titre de la catégorie enfant a été défini
 TicketPublicInterfaceConfigDocumentation = Pour configurer l'interface publique des tickets, consultez la documentation
 ParentCategory = Catégorie parent
 TSProject = Projet lié aux tickets
-TicketInitial = TS
 TicketDescription = Projet des tickets
 TicketProjectUpdated = Le projet par défaut des tickets a été mis à jour
 QRCodeAlreadyGenerated = QR Code généré

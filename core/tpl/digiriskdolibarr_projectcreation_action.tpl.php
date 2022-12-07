@@ -102,7 +102,7 @@ if ($conf->global->DIGIRISKDOLIBARR_DU_PROJECT > 0 && $conf->global->DIGIRISKDOL
 	$project->fetch($conf->global->DIGIRISKDOLIBARR_DU_PROJECT);
 	//Backward compatibility
 	if ($project->title == $langs->trans('RiskAssessmentDocument')) {
-		$project->title       = $langs->trans('RiskAssessmentDocumentInitial') . ' - ' . $conf->global->MAIN_INFO_SOCIETE_NOM;
+		$project->title       = $langs->trans('RiskAssessmentDocument') . ' - ' . $conf->global->MAIN_INFO_SOCIETE_NOM;
 		$project->description = $langs->trans('RiskAssessmentDocumentDescription');
 		$project->update($user);
 	}
@@ -117,7 +117,7 @@ if ($conf->global->DIGIRISKDOLIBARR_DU_PROJECT > 0 && $conf->global->DIGIRISKDOL
 
 if ( $conf->global->DIGIRISKDOLIBARR_DU_PROJECT == 0 || $project->statut == 2 ) {
 	$project->ref         = $projectRef->getNextValue($third_party, $project);
-	$project->title       = $langs->trans('RiskAssessmentDocumentInitial') . ' - ' . $conf->global->MAIN_INFO_SOCIETE_NOM;
+	$project->title       = $langs->trans('RiskAssessmentDocument') . ' - ' . $conf->global->MAIN_INFO_SOCIETE_NOM;
 	$project->description = $langs->trans('RiskAssessmentDocumentDescription');
 	$project->date_c      = dol_now();
 	$currentYear          = dol_print_date(dol_now(), '%Y');
@@ -180,7 +180,7 @@ if ($conf->global->DIGIRISKDOLIBARR_PREVENTIONPLAN_PROJECT > 0 && $conf->global-
 	$project->fetch($conf->global->DIGIRISKDOLIBARR_PREVENTIONPLAN_PROJECT);
 	//Backward compatibility
 	if ($project->title == $langs->trans('PreventionPlan')) {
-		$project->title = $langs->trans('PreventionPlanInitial') . ' - ' . $conf->global->MAIN_INFO_SOCIETE_NOM;
+		$project->title = $langs->trans('PreventionPlan') . ' - ' . $conf->global->MAIN_INFO_SOCIETE_NOM;
 		$project->update($user);
 	}
 
@@ -194,7 +194,7 @@ if ($conf->global->DIGIRISKDOLIBARR_PREVENTIONPLAN_PROJECT > 0 && $conf->global-
 
 if ( $conf->global->DIGIRISKDOLIBARR_PREVENTIONPLAN_PROJECT == 0 || $project->statut == 2 ) {
 	$project->ref         = $projectRef->getNextValue($third_party, $project);
-	$project->title       = $langs->trans('PreventionPlanInitial') . ' - ' . $conf->global->MAIN_INFO_SOCIETE_NOM;
+	$project->title       = $langs->trans('PreventionPlan') . ' - ' . $conf->global->MAIN_INFO_SOCIETE_NOM;
 	$project->description = $langs->transnoentities('PreventionPlanDescription');
 	$project->date_c      = dol_now();
 	$currentYear          = dol_print_date(dol_now(), '%Y');
@@ -221,7 +221,7 @@ if ( $conf->global->DIGIRISKDOLIBARR_PREVENTIONPLAN_PROJECT == 0 || $project->st
 
 if ( $conf->global->DIGIRISKDOLIBARR_FIREPERMIT_PROJECT == 0 || $project->statut == 2 ) {
 	$project->ref         = $projectRef->getNextValue($third_party, $project);
-	$project->title       = $langs->trans('FirePermitInitial') . ' - ' . $conf->global->MAIN_INFO_SOCIETE_NOM;
+	$project->title       = $langs->trans('FirePermit') . ' - ' . $conf->global->MAIN_INFO_SOCIETE_NOM;
 	$project->description = $langs->trans('FirePermitDescription');
 	$project->date_c      = dol_now();
 	$currentYear          = dol_print_date(dol_now(), '%Y');
@@ -248,7 +248,7 @@ if ( $conf->global->DIGIRISKDOLIBARR_FIREPERMIT_PROJECT == 0 || $project->statut
 
 if ( $conf->global->DIGIRISKDOLIBARR_ACCIDENT_PROJECT == 0 || $project->statut == 2 ) {
 	$project->ref         = $projectRef->getNextValue($third_party, $project);
-	$project->title       = $langs->trans('AccidentInitial') . ' - ' . $conf->global->MAIN_INFO_SOCIETE_NOM;
+	$project->title       = $langs->trans('Accident') . ' - ' . $conf->global->MAIN_INFO_SOCIETE_NOM;
 	$project->description = $langs->trans('AccidentDescription');
 	$project->date_c      = dol_now();
 	$currentYear          = dol_print_date(dol_now(), '%Y');
@@ -275,7 +275,7 @@ if ( $conf->global->DIGIRISKDOLIBARR_ACCIDENT_PROJECT == 0 || $project->statut =
 
 if ( $conf->global->DIGIRISKDOLIBARR_TICKET_PROJECT == 0 || $project->statut == 2 ) {
 	$project->ref         = $projectRef->getNextValue($third_party, $project);
-	$project->title       = $langs->trans('TicketInitial') . ' - ' . $conf->global->MAIN_INFO_SOCIETE_NOM;
+	$project->title       = $langs->trans('Ticket') . ' - ' . $conf->global->MAIN_INFO_SOCIETE_NOM;
 	$project->description = $langs->trans('TicketDescription');
 	$project->date_c      = dol_now();
 	$currentYear          = dol_print_date(dol_now(), '%Y');
