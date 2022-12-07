@@ -434,7 +434,7 @@ function digiriskshowdocuments($modulepart, $modulesubdir, $filedir, $urlsource,
 					$out .= '<td class="right nowraponall">';
 					if ($delallowed) {
 						$tmpurlsource = preg_replace('/#[a-zA-Z0-9_]*$/', '', $urlsource);
-						$out         .= '<a href="' . $tmpurlsource . ((strpos($tmpurlsource, '?') === false) ? '?' : '&amp;') . 'action=' . $removeaction . '&amp;file=' . urlencode($relativepath);
+						$out         .= '<a href="' . $tmpurlsource . ((strpos($tmpurlsource, '?') === false) ? '?' : '&amp;') . 'action=' . $removeaction . '&amp;file=' . urlencode($relativepath) . '&token=' . newToken();
 						$out         .= ($param ? '&amp;' . $param : '');
 						$out         .= '">' . img_picto($langs->trans("Delete"), 'delete') . '</a>';
 					}
