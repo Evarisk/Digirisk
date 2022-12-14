@@ -37,6 +37,7 @@ if ( ! $res && file_exists("../../../../main.inc.php")) $res = @include "../../.
 if ( ! $res) die("Include of main fails");
 
 require_once DOL_DOCUMENT_ROOT . '/core/lib/images.lib.php';
+require_once DOL_DOCUMENT_ROOT . '/core/lib/functions2.lib.php';
 
 require_once __DIR__ . '/../../class/digiriskstandard.class.php';
 require_once __DIR__ . '/../../lib/digiriskdolibarr_digiriskstandard.lib.php';
@@ -47,6 +48,9 @@ global $db, $conf, $langs, $user,  $maxwidthmini, $maxheightmini, $maxwidthsmall
 
 // Load translation files required by the page
 $langs->loadLangs(array("digiriskdolibarr@digiriskdolibarr"));
+
+// Get parameters
+$action = GETPOST('action', 'alpha');
 
 // Initialize technical objects
 $object = new DigiriskStandard($db);
@@ -59,6 +63,38 @@ $permissiontoread = $user->rights->digiriskdolibarr->riskassessmentdocument->rea
 
 if ( ! $permissiontoread) accessforbidden();
 require_once './../../core/tpl/digirisk_security_checks.php';
+
+/*
+ *  Actions
+*/
+
+if ($action == 'adddashboardinfo') {
+	$data = json_decode(file_get_contents('php://input'), true);
+
+	$dashboardWidgetName = $data['dashboardWidgetName'];
+
+	$visible = json_decode($user->conf->DIGIRISKDOLIBARR_DISABLED_DASHBOARD_INFO);
+	unset($visible->$dashboardWidgetName);
+
+	$tabparam['DIGIRISKDOLIBARR_DISABLED_DASHBOARD_INFO'] = json_encode($visible);
+
+	dol_set_user_param($db, $conf, $user, $tabparam);
+	$action = '';
+}
+
+if ($action == 'closedashboardinfo') {
+	$data = json_decode(file_get_contents('php://input'), true);
+
+	$dashboardWidgetName = $data['dashboardWidgetName'];
+
+	$visible = json_decode($user->conf->DIGIRISKDOLIBARR_DISABLED_DASHBOARD_INFO);
+	$visible->$dashboardWidgetName = 0;
+
+	$tabparam['DIGIRISKDOLIBARR_DISABLED_DASHBOARD_INFO'] = json_encode($visible);
+
+	dol_set_user_param($db, $conf, $user, $tabparam);
+	$action = '';
+}
 
 /*
  * View
