@@ -471,16 +471,14 @@ if ($object->id > 0 || $fromid > 0) {
 						<div class="evaluator-user">
 							<span class="title"><?php echo $langs->trans('SelectUser'); ?><required>*</required></span>
 							<input type="hidden" class="user-selected" value="<?php echo $user->id ?>">
-
-									<?php
-									$userlist = $form->select_dolusers(GETPOST('responsible_socid'), '', 0, null, 0, '', '', 0, 0, 0, 'AND u.statut = 1', 0, '', 'minwidth300', 0, 1);
-									print '<table><tr>';
-									print '<td>';
-									print $form->selectarray('fk_user_employer', $userlist, (GETPOST('userid') ? GETPOST('userid') : $usertmp->id), $langs->trans('SelectUser'), null, null, null, "40%", 0, 0, '', 'minwidth300', 1);
-									print ' <a href="' . dol_buildpath('custom/digiriskdolibarr/view/digiriskusers?backtopage=' . urlencode($_SERVER["PHP_SELF"] . '?id=' . $id . '&userid=USERID&modalactive=1') . '#addUser', 1) . '"><span class="fa fa-plus-circle valignmiddle paddingleft" title="' . $langs->trans("AddUser") . '"></span></a>';
-									print '</td></tr></table>';
-									?>
-
+							<?php
+							$userlist = $form->select_dolusers(GETPOST('responsible_socid'), '', 0, null, 0, '', '', 0, 0, 0, 'AND u.statut = 1', 0, '', 'minwidth300', 0, 1);
+							print '<table><tr>';
+							print '<td>';
+							print $form->selectarray('fk_user_employer', $userlist, (GETPOST('userid') ? GETPOST('userid') : $usertmp->id), $langs->trans('SelectUser'), null, null, null, "40%", 0, 0, '', 'minwidth300', 1);
+							print ' <a href="' . dol_buildpath('custom/digiriskdolibarr/view/digiriskusers.php?backtopage=' . urlencode($_SERVER["PHP_SELF"] . '?id=' . $id . '&userid=USERID&modalactive=1') . '#addUser', 1) . '"><span class="fa fa-plus-circle valignmiddle paddingleft" title="' . $langs->trans("AddUser") . '"></span></a>';
+							print '</td></tr></table>';
+							?>
 						</div>
 						<div class="evaluator-assignment wpeo-gridlayout grid-3">
 							<div class="evaluator-duration">

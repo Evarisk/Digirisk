@@ -56,7 +56,7 @@ if (empty($conf->global->MAIN_DISABLE_WORKBOARD)) {
 	} else {
 		print '<div class="wpeo-notice notice-info">';
 		print '<div class="notice-content">';
-		print '<div class="notice-subtitle"><strong>'.$langs->trans("HowToSetupDigiriskElement") . '  ' . '<a href="' . DOL_URL_ROOT . '/custom/digiriskdolibarr/view/digiriskstandard/digiriskstandard_card?id=' . $conf->global->DIGIRISKDOLIBARR_ACTIVE_STANDARD . '">' . $langs->trans('ConfigDigiriskElement') . '</a></strong></div>';
+		print '<div class="notice-subtitle"><strong>'.$langs->trans("HowToSetupDigiriskElement") . '  ' . '<a href="' . DOL_URL_ROOT . '/custom/digiriskdolibarr/view/digiriskstandard/digiriskstandard_card.php?id=' . $conf->global->DIGIRISKDOLIBARR_ACTIVE_STANDARD . '">' . $langs->trans('ConfigDigiriskElement') . '</a></strong></div>';
 		print '</div>';
 		print '</div>';
 		exit;
