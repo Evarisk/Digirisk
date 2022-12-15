@@ -144,7 +144,7 @@ print load_fiche_titre($langs->trans("DigiriskDolibarrArea") . ' ' . $digirisk->
 <?php endif;
 
 if ($conf->global->DIGIRISKDOLIBARR_SHOW_PATCH_NOTE) : ?>
-	<div class="wpeo-notice notice notice-info">
+	<div class="wpeo-notice notice-info">
 		<input type="hidden" name="token" value="<?php echo newToken(); ?>">
 		<div class="notice-content">
 			<div class="notice-title"><?php echo $langs->trans("DigiriskPatchNote", $digirisk->version); ?>

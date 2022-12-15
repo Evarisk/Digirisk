@@ -233,7 +233,7 @@ if (is_array($objects)) {
 	</div>
 </div>
 <div class='container'>
-	<input type="hidden" name="token" value="<?php echo newToken() ?>">;
+	<input type="hidden" name="token" value="<?php echo newToken() ?>">
 	<h3 class='title' id='title0'><?php echo $conf->global->MAIN_INFO_SOCIETE_NOM ?></h3>
 	<ul class='space space-0 first-space ui-sortable' id='space0' value="0">
 		<?php display_recurse_tree_organization($results) ?>
