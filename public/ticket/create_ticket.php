@@ -540,7 +540,7 @@ if ($entity > 0) {
 		if (!empty($entities_list)) {
 			foreach($entities_list as $entityId => $entityName) {
 				if (!preg_match('/('.$langs->transnoentities('Hidden').')/', $entityName)) {
-					$logos_path = DOL_DATA_ROOT . ($entityId > 1 ? '/' . $entityId . '/' : '/') . 'mycompany/logos';
+					$logos_path = DOL_DATA_ROOT . ($entityId > 1 ? '/' . $entityId . '/' : '/') . 'mycompany/logos/thumbs/';
 					$logos_list = dol_dir_list($logos_path);
 					if (is_array($logos_list) && !empty($logos_list)) {
 						$logo = array_shift($logos_list);
@@ -552,7 +552,7 @@ if ($entity > 0) {
 					print '<a href="' . $_SERVER["PHP_SELF"] . '?entity=' . $entityId . '">';
 					print '<div class="card" style="height: 200px">';
 					print '<br>';
-					print '<img src="' . DOL_URL_ROOT . '/custom/digiriskdolibarr/documents/viewimage.php?modulepart=mycompany&entity=' . $entityId . '&file=' . urlencode('logos/' . $logo_fullname) . '" alt="societyLogo" style="width:40%">';
+					print '<img src="' . DOL_URL_ROOT . '/custom/digiriskdolibarr/documents/viewimage.php?modulepart=mycompany&entity=' . $entityId . '&file=' . urlencode('logos/thumbs/' . $logo_fullname) . '" alt="SocietyLogo" style="width:40%">';
 					print '<div class="card-container">';
 					print '<h4><b>' . $entityName . '</b></h4>';
 					print '</div>';
