@@ -217,6 +217,32 @@ if (empty($reshook)) {
 	}
 }
 
+$qrCodePath = $conf->digiriskdolibarr->multidir_output[$conf->entity ?: 1] . "/ticketqrcode/";
+$QRCodeList = dol_dir_list($qrCodePath);
+if (is_array($QRCodeList) && !empty($QRCodeList)) {
+	$QRCode = array_shift($QRCodeList);
+} else {
+	$QRCode = array();
+}
+
+if (!array_key_exists('fullname', $QRCode)) {
+	$targetPath = $qrCodePath;
+	$urlToEncode = DOL_MAIN_URL_ROOT . '/custom/digiriskdolibarr/public/ticket/create_ticket.php?entity=' . $conf->entity;
+
+	$size = '400x400';
+	ob_clean();
+
+	$QR = imagecreatefrompng('https://chart.googleapis.com/chart?cht=qr&chld=H|1&chs=' . $size . '&chl=' . urlencode($urlToEncode));
+
+	if (!is_dir($targetPath)) {
+		mkdir($targetPath, 0777, true);
+	}
+
+	$targetPath = $targetPath . "ticketQRCode.png";
+	imagepng($QR, $targetPath);
+	header("Refresh:0");
+}
+
 /*
  * View
  */
@@ -441,6 +467,14 @@ if ((empty($action) || ($action != 'edit' && $action != 'create'))) {
 	print '<td>';
 	print '<input type="checkbox" id="show_in_selectorshow_in_selector" name="show_in_selectorshow_in_selector"' . (($object->show_in_selector == 0) ?  '' : ' checked=""') . '" disabled> ';
 	print '</td></tr>';
+
+	if (!empty($conf->global->DIGIRISKDOLIBARR_TICKET_ENABLE_PUBLIC_INTERFACE) & !empty($conf->global->DIGIRISKDOLIBARR_TICKET_DIGIRISKELEMENT_QRCODE_CARD)) {
+		print '<td class="center">';
+		$urladvanced = getAdvancedPreviewUrl('digiriskdolibarr', 'ticketqrcode/' . $QRCode['name']);
+		print '<a class="clicked-photo-preview" href="' . $urladvanced . '">' . '<img width="200" src="' . DOL_URL_ROOT . '/custom/digiriskdolibarr/documents/viewimage.php?modulepart=digiriskdolibarr&entity=' . $conf->entity . '&file=' . 'ticketqrcode/' . $QRCode['name'] . '" alt="' . $langs->transnoentities("TicketPublicInterfaceQRCode") . '"></a>';
+		print '<a id="download" href="' . DOL_URL_ROOT . '/custom/digiriskdolibarr/documents/viewimage.php?modulepart=digiriskdolibarr&entity=' . $conf->entity . '&file=' . 'ticketqrcode/' . $QRCode['name'] . '" download="' . DOL_URL_ROOT . '/custom/digiriskdolibarr/documents/viewimage.php?modulepart=digiriskdolibarr&entity=' . $conf->entity . '&file=' . 'ticketqrcode/' . $QRCode['name'] . '"><i class="fas fa-download"></i></a>';
+		print '</td>';
+	}
 
 	//Show common fields
 	//  include DOL_DOCUMENT_ROOT.'/core/tpl/commonfields_view.tpl.php';
