@@ -388,11 +388,11 @@ class DigiriskElement extends CommonObject
 		$selected = array($selected);
 
 		// Clean $filter that may contains sql conditions so sql code
-		if (function_exists('testSqlAndScriptInject')) {
+		/*if (function_exists('testSqlAndScriptInject')) {
 			if (testSqlAndScriptInject($filter, 3) > 0) {
 				$filter = '';
 			}
-		}
+		}*/
 
 		$deleted_elements = $this->getMultiEntityTrashList();
 
