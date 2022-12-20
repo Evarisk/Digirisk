@@ -23,6 +23,7 @@
  */
 
 require_once DOL_DOCUMENT_ROOT . '/core/class/commondocgenerator.class.php';
+require_once DOL_DOCUMENT_ROOT . '/categories/class/categorie.class.php';
 
 /**
  *	Parent class for documents models
@@ -195,6 +196,7 @@ abstract class ModeleODTRiskAssessmentDocument extends CommonDocGenerator
 					$risk                  = new Risk($this->db);
 					$riskassessment        = new RiskAssessment($this->db);
 					$ticket                = new Ticket($this->db);
+					$category              = new Categorie($this->db);
 					$risks                 = $risk->fetchRisksOrderedByCotation(0, true, $conf->global->DIGIRISKDOLIBARR_SHOW_INHERITED_RISKS_IN_DOCUMENTS, $conf->global->DIGIRISKDOLIBARR_SHOW_SHARED_RISKS);
 
 					if (!empty($digiriskelementlist)) {
@@ -325,6 +327,17 @@ abstract class ModeleODTRiskAssessmentDocument extends CommonDocGenerator
 					if (is_array($ticket->lines) && !empty($ticket->lines)) {
 						foreach ($ticket->lines as $line) {
 							$tmparray['refticket']     = $line->ref;
+
+							$categories = $category->containing($line->id, Categorie::TYPE_TICKET);
+							if (!empty($categories)) {
+								foreach ($categories as $cat) {
+									$allcategories[] = $cat->label;
+								}
+								$tmparray['categories'] = implode(', ', $allcategories);
+							} else {
+								$tmparray['categories'] = '';
+							}
+
 							$tmparray['creation_date'] = dol_print_date($line->datec, 'dayhoursec', 'tzuser');
 							$tmparray['subject']       = $line->subject;
 							$tmparray['progress']      = (($line->progress) ?: 0) . ' %';
@@ -363,6 +376,7 @@ abstract class ModeleODTRiskAssessmentDocument extends CommonDocGenerator
 						}
 					} else {
 						$tmparray['refticket']                 = $langs->trans('NoData');
+						$tmparray['categories']                = $langs->trans('NoData');
 						$tmparray['creation_date']             = $langs->trans('NoData');
 						$tmparray['subject']                   = $langs->trans('NoData');
 						$tmparray['progress']                  = $langs->trans('NoData');

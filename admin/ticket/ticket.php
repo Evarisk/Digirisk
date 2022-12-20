@@ -225,6 +225,7 @@ if ($action == 'generateQRCode') {
 	$targetPath = $targetPath . "ticketQRCode.png";
 
 	imagepng($QR,$targetPath);
+	setEventMessages($langs->transnoentities('QRCodeGenerated'), array());
 }
 
 /*

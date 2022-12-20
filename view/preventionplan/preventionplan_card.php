@@ -37,6 +37,7 @@ if ( ! $res && file_exists("../../../../main.inc.php")) $res = @include "../../.
 if ( ! $res) die("Include of main fails");
 
 require_once DOL_DOCUMENT_ROOT . '/core/class/html.form.class.php';
+require_once DOL_DOCUMENT_ROOT .'/core/class/html.formprojet.class.php';
 require_once DOL_DOCUMENT_ROOT . '/core/class/doleditor.class.php';
 require_once DOL_DOCUMENT_ROOT . '/core/lib/images.lib.php';
 
@@ -138,6 +139,7 @@ if (empty($reshook)) {
 	// Action to add record
 	if ($action == 'add' && $permissiontoadd) {
 		// Get parameters
+		$project                     = GETPOST('fk_project');
 		$maitre_oeuvre_id            = GETPOST('maitre_oeuvre');
 		$extsociety_id               = GETPOST('ext_society');
 		$extresponsible_id           = GETPOST('ext_society_responsible');
@@ -157,7 +159,7 @@ if (empty($reshook)) {
 		$object->tms           = $now;
 		$object->import_key    = "";
 		$object->label         = $label;
-		$object->fk_project    = $conf->global->DIGIRISKDOLIBARR_PREVENTIONPLAN_PROJECT;
+		$object->fk_project    = $project;
 
 		$date_start       = dol_mktime(GETPOST('dateohour', 'int'), GETPOST('dateomin', 'int'), 0, GETPOST('dateomonth', 'int'), GETPOST('dateoday', 'int'), GETPOST('dateoyear', 'int'));
 		$date_end         = dol_mktime(GETPOST('dateehour', 'int'), GETPOST('dateemin', 'int'), 0, GETPOST('dateemonth', 'int'), GETPOST('dateeday', 'int'), GETPOST('dateeyear', 'int'));
@@ -248,6 +250,7 @@ if (empty($reshook)) {
 	// Action to update record
 	if ($action == 'update' && $permissiontoadd) {
 		// Get parameters
+		$project                     = GETPOST('fk_project');
 		$maitre_oeuvre_id            = GETPOST('maitre_oeuvre');
 		$extsociety_id               = GETPOST('ext_society');
 		$extresponsible_id           = GETPOST('ext_society_responsible');
@@ -279,6 +282,8 @@ if (empty($reshook)) {
 		$object->cssct_intervention = $cssct_intervention;
 
 		$object->fk_user_creat = $user->id ? $user->id : 1;
+
+		$object->fk_project = $project;
 
 		// Check parameters
 		if ($maitre_oeuvre_id < 0) {
@@ -653,7 +658,8 @@ if (empty($reshook)) {
  * View
  */
 
-$form = new Form($db);
+$form        = new Form($db);
+$formproject = new FormProjets($db);
 
 $title         = $langs->trans("PreventionPlan");
 $title_create  = $langs->trans("NewPreventionPlan");
@@ -680,6 +686,11 @@ if ($action == 'create') {
 	print dol_get_fiche_head();
 
 	print '<table class="border centpercent tableforfieldcreate preventionplan-table">';
+
+	//Project -- projet
+	print '<tr><td class="fieldrequired minwidth400">' . img_picto('', 'project') . ' ' . $langs->trans("Project") . '</td><td>';
+	print $formproject->select_projects(-1, $conf->global->DIGIRISKDOLIBARR_PREVENTIONPLAN_PROJECT, 'fk_project', 16, 0, 0);
+	print '</td></tr>';
 
 	//Label -- Libellé
 	print '<tr><td class="minwidth400">' . $langs->trans("Label") . '</td><td>';
@@ -814,6 +825,11 @@ if (($id || $ref) && $action == 'edit') {
 	//Ref -- Ref
 	print '<tr><td class="fieldrequired minwidth400">' . $langs->trans("Ref") . '</td><td>';
 	print $object->ref;
+	print '</td></tr>';
+
+	//Project -- projet
+	print '<tr><td class="fieldrequired minwidth400">' . img_picto('', 'project') . ' ' . $langs->trans("Project") . '</td><td>';
+	print $formproject->select_projects(-1, $object->fk_project, 'fk_project', 16, 0, 0);
 	print '</td></tr>';
 
 	//Label -- Libellé
@@ -1006,7 +1022,7 @@ if ((empty($action) || ($action != 'create' && $action != 'edit'))) {
 	$morehtmlref .= $langs->trans('ExtSociety') . ' : ' . $ext_society->getNomUrl(1);
 	// Project
 	$project->fetch($object->fk_project);
-	$morehtmlref .= '<br>' . $langs->trans('Project') . ' : ' . getNomUrlProject($project, 1, 'blank');
+	$morehtmlref .= '<br>' . $langs->trans('Project') . ' : ' . getNomUrlProject($project, 1, 'blank', 1);
 	$morehtmlref .= '</div>';
 
 	//$morehtmlleft = '<div class="floatleft inline-block valignmiddle divphotoref">'.digirisk_show_photos('digiriskdolibarr', $conf->digiriskdolibarr->multidir_output[$entity].'/'.$object->element_type, 'small', 5, 0, 0, 0, $width,0, 0, 0, 0, $object->element_type, $object).'</div>';
@@ -1282,7 +1298,7 @@ if ((empty($action) || ($action != 'create' && $action != 'edit'))) {
 
 					print '<td>';
 					$digiriskelement->fetch($item->fk_element);
-					print $digiriskelement->ref . " - " . $digiriskelement->label;
+					print $digiriskelement->getNomUrl(1, 'blank', 1);
 					print '</td>';
 
 					$coldisplay++;

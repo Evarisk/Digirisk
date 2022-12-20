@@ -317,6 +317,7 @@ window.eoxiaJS.navigation.saveOrganization = function( event ) {
 	//Notices
 	let actionContainerSuccess = $('.messageSuccessOrganizationSaved');
 	let actionContainerError = $('.messageErrorOrganizationSaved');
+	let token = $('input[name="token"]').val();
 
 	$('.route').each(function() {
 		id = $(this).attr('id')
@@ -331,7 +332,7 @@ window.eoxiaJS.navigation.saveOrganization = function( event ) {
 	//ajouter sécurité si le nombre de gp à la fin n'est pas le même qu'en bdd alors on stop tout
 
 	$.ajax({
-		url: document.URL + '&action=saveOrganization&ids='+idArray.toString()+'&parent_ids='+parentArray,
+		url: document.URL + '&action=saveOrganization&ids='+idArray.toString()+'&parent_ids='+parentArray+'&token='+token,
 		success: function() {
 			actionContainerSuccess.removeClass('hidden');
 
@@ -2773,7 +2774,8 @@ window.eoxiaJS.riskassessmenttask.createRiskAssessmentTaskTimeSpent = function (
 	let single     = element.find('.riskassessment-task-timespent-container');
 	let riskId     = element.find('riskassessment-task-single').attr('value');
 	let textToShow = '';
-	let taskRef    =  element.find('.riskassessment-task-ref-'+taskID).attr('value');
+	let taskRef    = element.find('.riskassessment-task-ref-'+taskID).attr('value');
+	let timespent  = $('.modal-header .riskassessment-task-data').find('.riskassessment-task-timespent')
 
 	let date     = single.find('#RiskassessmentTaskTimespentDate' + taskID).val();
 	let hour     = single.find('#RiskassessmentTaskTimespentDate' + taskID + 'hour').val();
@@ -2817,6 +2819,7 @@ window.eoxiaJS.riskassessmenttask.createRiskAssessmentTaskTimeSpent = function (
 
 			actionContainerSuccess.find('.notice-subtitle .text').text(textToShow)
 			actionContainerSuccess.removeClass('hidden');
+			timespent.html($(resp).find('.modal-header .riskassessment-task-data').find('.riskassessment-task-timespent'))
 		},
 		error: function ( resp ) {
 			$(this).closest('.risk-row-content-' + riskId).removeClass('wpeo-loader');
@@ -3608,12 +3611,12 @@ window.eoxiaJS.notice.event = function() {
  * @return {void}
  */
 window.eoxiaJS.notice.closeNotice = function( event ) {
-	$(this).closest('.notice').fadeOut(function () {
-		$(this).closest('.notice').addClass("hidden");
+	$(this).closest('.wpeo-notice').fadeOut(function () {
+		$(this).closest('.wpeo-notice').addClass("hidden");
 	});
 
 	if ($(this).hasClass('notice-close-forever')) {
-		let token = $(this).closest('.notice').find('input[name="token"]').val();
+		let token = $(this).closest('.wpeo-notice').find('input[name="token"]').val();
 		let querySeparator = '?';
 
 		document.URL.match(/\?/) ? querySeparator = '&' : 1
