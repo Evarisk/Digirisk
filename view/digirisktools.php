@@ -840,7 +840,7 @@ if (GETPOST('dataMigrationImportGlobalDolibarr', 'alpha') && ! empty($conf->glob
 if (GETPOST('dataMigrationImportStructureTreeDolibarr', 'alpha') && ! empty($conf->global->MAIN_UPLOAD_DOC)) {
 	// Submit file
 	if ( ! empty($_FILES)) {
-		if ( ! preg_match('/dolibarr_global_export.zip/', $_FILES['dataMigrationImportStructureTreeDolibarrfile']['name'][0]) || $_FILES['dataMigrationImportStructureTreeDolibarrfile']['size'][0] < 1) {
+		if ( ! preg_match('/dolibarr_structure_tree_export.zip/', $_FILES['dataMigrationImportStructureTreeDolibarrfile']['name'][0]) || $_FILES['dataMigrationImportStructureTreeDolibarrfile']['size'][0] < 1) {
 			setEventMessages($langs->trans('ErrorFileNotWellFormattedZIP'), null, 'errors');
 		} else {
 			if (is_array($_FILES['dataMigrationImportStructureTreeDolibarrfile']['tmp_name'])) $userfiles = $_FILES['dataMigrationImportStructureTreeDolibarrfile']['tmp_name'];
@@ -1101,7 +1101,7 @@ if ($user->rights->digiriskdolibarr->adminpage->read) {
 
 	print '<td class="center data-migration-import-structure-tree">';
 	print '<input class="flat" type="file" name="dataMigrationImportStructureTreeDolibarrfile[]" id="data-migration-import-structure-tree" />';
-	print '<input type="submit" class="button reposition data-migration-submit" name="dataMigrationImportStructureTree" value="' . $langs->trans("Upload") . '">';
+	print '<input type="submit" class="button reposition data-migration-submit" name="dataMigrationImportStructureTreeDolibarr" value="' . $langs->trans("Upload") . '">';
 	print '</td>';
 	print '</tr>';
 	print '</table>';
