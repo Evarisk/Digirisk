@@ -1571,6 +1571,7 @@ DataMigrationWordPressToDolibarr = Migration des données de WordPress vers Doli
 DataMigrationDolibarrToDolibarr = Migration des données de Dolibarr vers Dolibarr
 
 
+
 #
 # Media - Media
 #
@@ -1586,7 +1587,8 @@ MediaMaxWidthLargeDescription = Largeur du média (dimension large) avec pour ra
 MediaMaxHeightLarge = Hauteur du média large
 MediaMaxHeightLargeDescription = Hauteur du média (dimension large) avec pour ratio 16:9
 ErrorFileSizeTooLarge = Le fichier est trop volumineux
-EmptyMediaLibrary = La bibliothèque de média est vide
+EmptyMediaLibrary = La bibliothèque de médias est vide
+
 
 
 #
