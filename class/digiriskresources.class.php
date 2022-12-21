@@ -187,6 +187,7 @@ class DigiriskResources extends CommonObject
 			$sql .= " SET status = 0";
 			$sql .= " WHERE ref = " . $db->encrypt($ref, 1);
 			if ($entity >= 0) $sql .= " AND entity = " . $entity;
+			$sql .= " AND object_id = " . $object_id;
 			dol_syslog("admin.lib::digirisk_dolibarr_set_resources", LOG_DEBUG);
 			$resql = $db->query($sql);
 		}

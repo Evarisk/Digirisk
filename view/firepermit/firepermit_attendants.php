@@ -305,7 +305,7 @@ dol_strlen($object->label) ? $morehtmlref = '<span>' . ' - ' . $object->label . 
 $morehtmlref                             .= '<div class="refidno">';
 // External Society -- Société extérieure
 $ext_society  = $digiriskresources->fetchResourcesFromObject('FP_EXT_SOCIETY', $object);
-$morehtmlref .= $langs->trans('ExtSociety') . ' : ' . $ext_society->getNomUrl(1);
+$morehtmlref .= empty($ext_society) ? $langs->trans('ExtSociety') . ' : N/A': $langs->trans('ExtSociety') . ' : ' . $ext_society->getNomUrl(1);
 // Project
 $project->fetch($object->fk_project);
 $morehtmlref .= '<br>' . $langs->trans('Project') . ' : ' . getNomUrlProject($project, 1, 'blank');

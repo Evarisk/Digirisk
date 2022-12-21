@@ -132,7 +132,7 @@ dol_strlen($preventionplan->label) ? $morehtmlref = '<span>' . ' - ' . $preventi
 $morehtmlref                             .= '<div class="refidno">';
 // External Society -- Société extérieure
 $ext_society  = $digiriskresources->fetchResourcesFromObject('PP_EXT_SOCIETY', $preventionplan);
-$morehtmlref .= $langs->trans('ExtSociety') . ' : ' . $ext_society->getNomUrl(1);
+$morehtmlref .= empty($ext_society) ? $langs->trans('ExtSociety') . ' : N/A': $langs->trans('ExtSociety') . ' : ' . $ext_society->getNomUrl(1);
 // Project
 $project->fetch($preventionplan->fk_project);
 $morehtmlref .= '<br>' . $langs->trans('Project') . ' : ' . getNomUrlProject($project, 1, 'blank');

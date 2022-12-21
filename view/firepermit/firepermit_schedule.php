@@ -130,7 +130,7 @@ dol_strlen($firepermit->label) ? $morehtmlref = '<span>' . ' - ' . $firepermit->
 $morehtmlref                             .= '<div class="refidno">';
 // External Society -- Société extérieure
 $ext_society  = $digiriskresources->fetchResourcesFromObject('FP_EXT_SOCIETY', $firepermit);
-$morehtmlref .= $langs->trans('ExtSociety') . ' : ' . $ext_society->getNomUrl(1);
+$morehtmlref .= empty($ext_society) ? $langs->trans('ExtSociety') . ' : N/A': $langs->trans('ExtSociety') . ' : ' . $ext_society->getNomUrl(1);
 // Project
 $project->fetch($firepermit->fk_project);
 $morehtmlref .= '<br>' . $langs->trans('Project') . ' : ' . getNomUrlProject($project, 1, 'blank');
