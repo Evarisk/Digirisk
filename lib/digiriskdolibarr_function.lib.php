@@ -1319,21 +1319,20 @@ function llxHeaderSignature($title, $head = "", $disablejs = 0, $disablehead = 0
 */
 function llxHeaderTicketDigirisk($title, $head = "", $disablejs = 0, $disablehead = 0,$arrayofjs = array(), $arrayofcss = array())
 {
-	global $conf, $mysoc;
+	global $conf;
 
 	top_htmlhead($head, $title, $disablejs, $disablehead, $arrayofjs, $arrayofcss, 0, 1); // Show html headers
 
-	if ( ! empty($conf->global->DIGIRISKDOLIBARR_TICKET_SHOW_COMPANY_LOGO)) {
-		// Define logo and logosmall
-		$logosmall = $mysoc->logo_small;
-		$logo      = $mysoc->logo;
-		// Define urllogo
-		$urllogo = '';
-		if ( ! empty($logosmall) && is_readable($conf->mycompany->dir_output . '/logos/thumbs/' . $logosmall)) {
-			$urllogo = DOL_URL_ROOT . '/viewimage.php?modulepart=mycompany&amp;entity=' . $conf->entity . '&amp;file=' . urlencode('logos/thumbs/' . $logosmall);
-		} elseif ( ! empty($logo) && is_readable($conf->mycompany->dir_output . '/logos/' . $logo)) {
-			$urllogo = DOL_URL_ROOT . '/viewimage.php?modulepart=mycompany&amp;entity=' . $conf->entity . '&amp;file=' . urlencode('logos/' . $logo);
+	if (!empty($conf->global->DIGIRISKDOLIBARR_TICKET_SHOW_COMPANY_LOGO)) {
+		$filedir  = $conf->mycompany->dir_output . '/logos/thumbs/';
+		$filelist = dol_dir_list($filedir, 'files');
+		if (is_array($filelist) && !empty($filelist)) {
+			foreach ($filelist as $file) {
+				// Define urllogo
+				$urllogo = DOL_URL_ROOT . '/viewimage.php?modulepart=mycompany&entity=' . $conf->entity . '&file=' . urlencode('logos/thumbs/' . $file['name']);
+			}
 		}
+
 		// Output html code for logo
 		if ($urllogo) {
 			print '<div class="center signature-logo">';

@@ -288,6 +288,7 @@ if ($action == 'add' && $canadduser && $permissiontoadd) {
 
 			if ($backtopage) {
 				$urltogo = str_replace('USERID', $id, $backtopage);
+				$urltogo = str_replace('JOB', $object->job, $urltogo);
 				header("Location: " . $urltogo);
 			} else {
 				header("Location: " . $_SERVER['PHP_SELF']);
