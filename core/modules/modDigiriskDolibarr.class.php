@@ -428,6 +428,7 @@ class modDigiriskdolibarr extends DolibarrModules
 			"/digiriskdolibarr/riskassessment",
 			"/digiriskdolibarr/accident",
 			"/digiriskdolibarr/ticketstats",
+			"/digiriskdolibarr/temp",
 			"/ecm/digiriskdolibarr",
 			"/ecm/digiriskdolibarr/riskassessmentdocument",
 			"/ecm/digiriskdolibarr/legaldisplay",
