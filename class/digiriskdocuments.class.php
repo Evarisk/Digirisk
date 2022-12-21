@@ -524,9 +524,9 @@ class DigiriskDocuments extends CommonObject
 													$tmparray['actionPreventionCompleted'] .= dol_print_date(($related_task->date_c), 'dayreduceformat');
 												}
 												if ($conf->global->DIGIRISKDOLIBARR_SHOW_TASK_END_DATE && !empty($related_task->date_end)) {
-													$tmparray['actionPreventionCompleted'] .= "\n" . $langs->trans('Deadline') . ' : ' . dol_print_date($related_task->date_end, 'dayreduceformat') . "\n";
+													$tmparray['actionPreventionCompleted'] .= "\n" . $langs->transnoentities('Deadline') . ' : ' . dol_print_date($related_task->date_end, 'dayreduceformat') . "\n";
 												} else {
-													$tmparray['actionPreventionCompleted'] .= ' - ' . $langs->trans('Deadline') . ' : ' . $langs->trans('NoData') . "\n";
+													$tmparray['actionPreventionCompleted'] .= ' - ' . $langs->transnoentities('Deadline') . ' : ' . $langs->trans('NoData') . "\n";
 												}
 												$tmparray['actionPreventionCompleted'] .= $langs->trans('Budget') . ' : ' . price($related_task->budget_amount, 0, $langs, 1, 0, 0, $conf->currency) . "\n";
 												(($AllInitiales) ? $tmparray['actionPreventionCompleted'] .= $langs->trans('ContactsAction') . ' : ' . $AllInitiales . "\n" : '');
@@ -546,9 +546,9 @@ class DigiriskDocuments extends CommonObject
 												$tmparray['actionPreventionUncompleted'] .= dol_print_date(($related_task->date_c), 'dayreduceformat');
 											}
 											if ($conf->global->DIGIRISKDOLIBARR_SHOW_TASK_END_DATE && !empty($related_task->date_end)) {
-												$tmparray['actionPreventionUncompleted'] .= "\n" . $langs->trans('Deadline') . ' : ' . dol_print_date($related_task->date_end, 'dayreduceformat') . "\n";
+												$tmparray['actionPreventionUncompleted'] .= "\n" . $langs->transnoentities('Deadline') . ' : ' . dol_print_date($related_task->date_end, 'dayreduceformat') . "\n";
 											} else {
-												$tmparray['actionPreventionUncompleted'] .= ' - ' . $langs->trans('Deadline') . ' : ' . $langs->trans('NoData') . "\n";
+												$tmparray['actionPreventionUncompleted'] .= ' - ' . $langs->transnoentities('Deadline') . ' : ' . $langs->trans('NoData') . "\n";
 											}
 											$tmparray['actionPreventionUncompleted'] .= $langs->trans('Budget') . ' : ' . price($related_task->budget_amount, 0, $langs, 1, 0, 0, $conf->currency) . ' - ';
 											$tmparray['actionPreventionUncompleted'] .= $langs->trans('DigiriskProgress') . ' : ' . ($task_progress ?: 0) . ' %' . "\n";
