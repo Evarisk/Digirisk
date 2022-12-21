@@ -532,6 +532,7 @@ if ((empty($action) || ($action != 'create' && $action != 'edit'))) {
 		}
 		print '<tr class="oddeven"><td class="maxwidth200">';
 		print digirisk_selectcontacts($ext_society->id, GETPOST('ext_intervenants'), 'ext_intervenants[]', 0, '', '', 0, 'width200', false, 1, 0, array(), 'multiple', 'ext_intervenants', false, 0, $already_selected_intervenants);
+		print ' <a href="' . DOL_URL_ROOT . '/contact/card.php?action=create&socid='. $ext_society->id .'&backtopage=' . urlencode($_SERVER["PHP_SELF"] . '?id=' . $object->id) . '" target="_blank"><span class="fa fa-plus-circle valignmiddle paddingleft" title="' . $langs->trans("AddContact") . '"></span></a>';
 		print '</td>';
 		print '<td>' . $langs->trans("ExtSocietyIntervenants") . '</td>';
 		print '<td class="center">';
