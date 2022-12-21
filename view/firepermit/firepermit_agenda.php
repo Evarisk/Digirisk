@@ -143,7 +143,7 @@ if ($object->id > 0) {
 	$morehtmlref .= $langs->trans('ExtSociety') . ' : ' . $ext_society->getNomUrl(1);
 	// Project
 	$project->fetch($object->fk_project);
-	$morehtmlref .= '<br>' . $langs->trans('Project') . ' : ' . getNomUrlProject($project, 1, 'blank');
+	$morehtmlref .= '<br>' . $langs->trans('Project') . ' : ' . getNomUrlProject($project, 1, 'blank', 1);
 	$morehtmlref .= '</div>';
 
 	digirisk_banner_tab($object, 'ref', '', 0, 'ref', 'ref', $morehtmlref, '', 0, '', $object->getLibStatut(5));
