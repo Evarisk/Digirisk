@@ -223,6 +223,9 @@
 			foreach ($alldigiriskelement as $digiriskelementsingle) {
 				$digiriskelementList[] = $digiriskelementsingle->id;
 			}
+			if (empty($digiriskelementList)) {
+				$digiriskelementList[] = 0;
+			}
 			$digiriskelementList = array_unique($digiriskelementList);
 			foreach ($digiriskelementList as $digiriskelementsinglefinal) {
 				$sql .= $digiriskelementsinglefinal . ',';
