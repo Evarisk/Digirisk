@@ -105,7 +105,7 @@ class LegalDisplay extends DigiriskDocuments
 	 * @throws Exception
 	 */
 	public function LegalDisplayFillJSON($object) {
-		global $conf;
+		global $con, $langs;
 
 		$resources               = new DigiriskResources($this->db);
 		$digirisk_resources      = $resources->digirisk_dolibarr_fetch_resources();
@@ -122,7 +122,7 @@ class LegalDisplay extends DigiriskDocuments
 
 				$thirdparty_openinghours = new Openinghours($this->db);
 				$thirdparty_openinghours->fetch(0, '', $morewhere);
-				$json['LegalDisplay']['occupational_health_service']['openinghours'] = "\r\n" . $thirdparty_openinghours->monday . "\r\n" . $thirdparty_openinghours->tuesday . "\r\n" . $thirdparty_openinghours->wednesday . "\r\n" . $thirdparty_openinghours->thursday . "\r\n" . $thirdparty_openinghours->friday . "\r\n" . $thirdparty_openinghours->saturday . "\r\n" . $thirdparty_openinghours->sunday;
+				$json['LegalDisplay']['occupational_health_service']['openinghours'] = $langs->trans('Monday') . ' : ' . $thirdparty_openinghours->monday . "\r\n" . $langs->trans('Tuesday') . ' : ' . $thirdparty_openinghours->tuesday . "\r\n" . $langs->trans('Wednesday') . ' : ' . $thirdparty_openinghours->wednesday . "\r\n" . $langs->trans('Thursday') . ' : ' . $thirdparty_openinghours->thursday . "\r\n" . $langs->trans('Friday') . ' : ' . $thirdparty_openinghours->friday . "\r\n" . $langs->trans('Saturday') . ' : ' . $thirdparty_openinghours->saturday . "\r\n" . $langs->trans('Sunday') . ' : ' . $thirdparty_openinghours->sunday;
 			}
 
 			$labour_doctor_contact = new Contact($this->db);
@@ -146,7 +146,7 @@ class LegalDisplay extends DigiriskDocuments
 				$thirdparty_openinghours = new Openinghours($this->db);
 				$thirdparty_openinghours->fetch(0, '', $morewhere);
 
-				$json['LegalDisplay']['detective_work']['openinghours'] = "\r\n" . $thirdparty_openinghours->monday . "\r\n" . $thirdparty_openinghours->tuesday . "\r\n" . $thirdparty_openinghours->wednesday . "\r\n" . $thirdparty_openinghours->thursday . "\r\n" . $thirdparty_openinghours->friday . "\r\n" . $thirdparty_openinghours->saturday . "\r\n" . $thirdparty_openinghours->sunday;
+				$json['LegalDisplay']['detective_work']['openinghours'] = $langs->trans('Monday') . ' : ' . $thirdparty_openinghours->monday . "\r\n" . $langs->trans('Tuesday') . ' : ' . $thirdparty_openinghours->tuesday . "\r\n" . $langs->trans('Wednesday') . ' : ' . $thirdparty_openinghours->wednesday . "\r\n" . $langs->trans('Thursday') . ' : ' . $thirdparty_openinghours->thursday . "\r\n" . $langs->trans('Friday') . ' : ' . $thirdparty_openinghours->friday . "\r\n" . $langs->trans('Saturday') . ' : ' . $thirdparty_openinghours->saturday . "\r\n" . $langs->trans('Sunday') . ' : ' . $thirdparty_openinghours->sunday;
 			}
 
 			$labour_inspector_contact = new Contact($this->db);
