@@ -1321,6 +1321,8 @@ function llxHeaderTicketDigirisk($title, $head = "", $disablejs = 0, $disablehea
 {
 	global $conf;
 
+	require_once DOL_DOCUMENT_ROOT . '/core/lib/files.lib.php';
+
 	top_htmlhead($head, $title, $disablejs, $disablehead, $arrayofjs, $arrayofcss, 0, 1); // Show html headers
 
 	if (!empty($conf->global->DIGIRISKDOLIBARR_TICKET_SHOW_COMPANY_LOGO)) {
