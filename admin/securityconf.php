@@ -195,7 +195,7 @@ if ($conf->societe->enabled) {
 		$events[] = array('method' => 'getContacts', 'url' => dol_buildpath('/core/ajax/contacts.php?showempty=1', 1), 'htmlname' => 'labourdoctor_contactid', 'params' => array('add-customer-contact' => 'disabled'));
 		$societe->fetch($labour_doctor_society->id[0]);
 
-		print $form->select_company($labour_doctor_society->id[0], 'labourdoctor_socid', '', 0, 1, 0, $events, 0, 'minwidth300');
+		print $form->select_company($labour_doctor_society->id[0], 'labourdoctor_socid', '', 'SelectThirdParty', 1, 0, $events, 0, 'minwidth300');
 	} else {
 		$events   = array();
 		$events[] = array('method' => 'getContacts', 'url' => dol_buildpath('/core/ajax/contacts.php?showempty=1', 1), 'htmlname' => 'labourdoctor_contactid', 'params' => array('add-customer-contact' => 'disabled'));
@@ -204,7 +204,7 @@ if ($conf->societe->enabled) {
 		if ( ! empty($user->socid)) {
 			print $form->select_company($user->socid, 'labourdoctor_socid', '', 0, 1, 0, $events, 0, 'minwidth300');
 		} else {
-			print $form->select_company('', 'labourdoctor_socid', '', 0, 1, 0, $events, 0, 'minwidth300');
+			print $form->select_company('', 'labourdoctor_socid', '', 'SelectThirdParty', 1, 0, $events, 0, 'minwidth300');
 		}
 	}
 	if ( ! GETPOSTISSET('backtopage')) print ' <a href="' . DOL_URL_ROOT . '/societe/card.php?action=create&backtopage=' . urlencode($_SERVER["PHP_SELF"] . '?action=create') . '"><span class="fa fa-plus-circle valignmiddle paddingleft" title="' . $langs->trans("AddThirdParty") . '"></span></a>';
@@ -218,7 +218,7 @@ if ($conf->societe->enabled) {
 	$labourdoctorpreselectedids = $labour_doctor_contact->id;
 
 	if ($labour_doctor_contact->id) {
-		print $form->selectcontacts(empty($labour_doctor_society->id[0]) ? - 1 : $labour_doctor_society->id[0], $labour_doctor_contact->id, 'labourdoctor_contactid[]', 0, '', '', 0, 'quatrevingtpercent', false, 0, array(), false, 'multiple', 'labourdoctor_contactid');
+		print $form->selectcontacts(empty($labour_doctor_society->id[0]) ? -1 : $labour_doctor_society->id[0], $labour_doctor_contact->id, 'labourdoctor_contactid[]', 0, '', '', 0, 'quatrevingtpercent', false, 0, array(), false, 'multiple', 'labourdoctor_contactid');
 	} else {
 		$labourdoctorpreselectedids                                                                                             = GETPOST('labourdoctor_contactid', 'array');
 		if (GETPOST('labourdoctor_contactid', 'array')) $labourdoctorpreselectedids[GETPOST('labourdoctor_contactid', 'array')] = GETPOST('labourdoctor_contactid', 'array');

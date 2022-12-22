@@ -39,16 +39,20 @@ try {
 print '<tr>';
 print '<td class="titlefield"><i class="fas fa-hospital-alt"></i> ' . $form->textwithpicto($langs->trans("LabourDoctor"), $langs->trans('HowToSetDataLegalDisplay')) . '</td>';
 print '<td>';
-$contact->fetch($legaldisplay->occupational_health_service->id);
-print $contact->getNomUrl(1);
+if ($legaldisplay->occupational_health_service->id > 0) {
+	$contact->fetch($legaldisplay->occupational_health_service->id);
+	print $contact->getNomUrl(1);
+}
 print '</td></tr>';
 
 // Inspecteur du travail
 print '<tr>';
 print '<td class="titlefield"><i class="fas fa-search"></i> ' . $form->textwithpicto($langs->trans("LabourInspector"), $langs->trans('HowToSetDataLegalDisplay')) . '</td>';
 print '<td>';
-$contact->fetch($legaldisplay->detective_work->id);
-print $contact->getNomUrl(1);
+if ($legaldisplay->detective_work->id > 0) {
+	$contact->fetch($legaldisplay->detective_work->id);
+	print $contact->getNomUrl(1);
+}
 print '</td></tr>';
 
 // SAMU
