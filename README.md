@@ -4,7 +4,7 @@
 
 Version du module : 9.8.1
 
-Dernière mise à jour : 21/11/2022
+Dernière mise à jour : 22/12/2022
 
 Prérequis:
 * Dolibarr min version 15.0.0
