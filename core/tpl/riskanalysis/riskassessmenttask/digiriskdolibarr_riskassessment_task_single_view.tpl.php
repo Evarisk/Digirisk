@@ -58,7 +58,7 @@
 		<!-- RISK ASSESSMENT TASK EDIT MODAL-->
 		<div class="riskassessment-task-edit-modal">
 			<div class="wpeo-modal modal-riskassessment-task" id="risk_assessment_task_edit<?php echo $related_task->id ?>">
-				<div class="modal-container wpeo-modal-event">
+				<div class="modal-container wpeo-modal-event" style="max-width: 900px; max-height: 720px;">
 					<div class="riskassessment-task-single" value="<?php echo $risk->id ?>">
 						<div class="riskassessment-task-content riskassessment-task-ref-<?php echo $related_task->id ?>" value="<?php echo $related_task->ref ?>">
 							<!-- Modal-Header -->
@@ -87,7 +87,7 @@
 								<div class="modal-close"><i class="fas fa-times"></i></div>
 							</div>
 							<!-- Modal-Content -->
-							<div class="modal-content">
+							<div class="modal-content" style="height: 600px;">
 								<?php $allTimeSpentArray = $related_task->fetchAllTimeSpentAllUser('AND ptt.fk_task='.$related_task->id, 'task_datehour', 'DESC'); ?>
 								<div class="riskassessment-task-title">
 									<?php if (!$conf->global->DIGIRISKDOLIBARR_SHOW_TASK_CALCULATED_PROGRESS) : ?>
