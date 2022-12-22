@@ -250,7 +250,7 @@ if ($conf->societe->enabled) {
 		if ( ! empty($user->socid)) {
 			print $form->select_company($user->socid, 'labourinspector_socid', '', 0, 1, 0, $events, 0, 'minwidth300');
 		} else {
-			print $form->select_company('', 'labourinspector_socid', '', 0, 1, 0, $events, 0, 'minwidth300');
+			print $form->select_company('', 'labourinspector_socid', '', 'SelectThirdParty', 1, 0, $events, 0, 'minwidth300');
 		}
 	}
 	if ( ! GETPOSTISSET('backtopage')) print ' <a href="' . DOL_URL_ROOT . '/societe/card.php?action=create&backtopage=' . urlencode($_SERVER["PHP_SELF"] . '?action=create') . '"><span class="fa fa-plus-circle valignmiddle paddingleft" title="' . $langs->trans("AddThirdParty") . '"></span></a>';
