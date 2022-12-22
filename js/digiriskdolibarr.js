@@ -317,6 +317,7 @@ window.eoxiaJS.navigation.saveOrganization = function( event ) {
 	//Notices
 	let actionContainerSuccess = $('.messageSuccessOrganizationSaved');
 	let actionContainerError = $('.messageErrorOrganizationSaved');
+	let token = $('input[name="token"]').val();
 
 	$('.route').each(function() {
 		id = $(this).attr('id')
@@ -331,7 +332,7 @@ window.eoxiaJS.navigation.saveOrganization = function( event ) {
 	//ajouter sécurité si le nombre de gp à la fin n'est pas le même qu'en bdd alors on stop tout
 
 	$.ajax({
-		url: document.URL + '&action=saveOrganization&ids='+idArray.toString()+'&parent_ids='+parentArray,
+		url: document.URL + '&action=saveOrganization&ids='+idArray.toString()+'&parent_ids='+parentArray+'&token='+token,
 		success: function() {
 			actionContainerSuccess.removeClass('hidden');
 
@@ -485,10 +486,12 @@ window.eoxiaJS.modal.openModal = function ( event ) {
  * @return {void}
  */
 window.eoxiaJS.modal.closeModal = function ( event ) {
-	$(this).closest('.modal-active').removeClass('modal-active')
-	$('.clicked-photo').attr('style', '');
-	$('.clicked-photo').removeClass('clicked-photo');
-	$('.notice').addClass('hidden');
+	if ($(event.target).hasClass('modal-active') || $(event.target).hasClass('modal-close') || $(event.target).parent().hasClass('modal-close')) {
+		$(this).closest('.modal-active').removeClass('modal-active')
+		$('.clicked-photo').attr('style', '');
+		$('.clicked-photo').removeClass('clicked-photo');
+		$('.notice').addClass('hidden');
+	}
 };
 
 /**
@@ -1399,6 +1402,12 @@ window.eoxiaJS.mediaGallery.sendPhoto = function( event ) {
 								$('.wpeo-loader').removeClass('wpeo-loader');
 								$('#myProgress').find('.loader-spin').remove();
 							}, 800)
+							$('#add_media_to_gallery').parent().html($(resp).find('#add_media_to_gallery'))
+							if (totalCount == 1) {
+								elementParent.closest('.modal-container').find('.save-photo').removeClass('button-disable');
+								elementParent.find('.clickable-photo0').attr('style', 'border: 5px solid #0d8aff !important');
+								elementParent.find('.clickable-photo0').addClass('clicked-photo');
+							}
 						});
 						actionContainerSuccess.removeClass('hidden');
 					}
@@ -1853,6 +1862,7 @@ window.eoxiaJS.risk.saveRisk = function ( event ) {
 
 	if (newParent == id || moveRiskDisabled) {
 		window.eoxiaJS.loader.display($(this).closest('.risk-row-content-' + editedRiskId).find('.risk-description-'+editedRiskId));
+		window.eoxiaJS.loader.display($(this).closest('.risk-row-content-' + editedRiskId).find('.risk-category'));
 	} else {
 		window.eoxiaJS.loader.display($(this).closest('.risk-row-content-' + editedRiskId))
 	}
@@ -1875,15 +1885,16 @@ window.eoxiaJS.risk.saveRisk = function ( event ) {
 			$('.wpeo-loader').removeClass('wpeo-loader');
 			let actionContainerSuccess = $('.messageSuccessRiskEdit');
 			if (newParent == id || moveRiskDisabled) {
+				$('.modal-active').removeClass('modal-active')
+				$('.risk-description-'+editedRiskId).html($(resp).find('.risk-description-'+editedRiskId))
+				$('.risk-row-content-' + editedRiskId).find('.risk-category .cell-risk').html($(resp).find('.risk-row-content-' + editedRiskId).find('.risk-category .cell-risk').children())
 				$('.risk-row-content-' + editedRiskId).find('.risk-category').fadeOut(800);
 				$('.risk-row-content-' + editedRiskId).find('.risk-category').fadeIn(800);
 				$('.risk-row-content-' + editedRiskId).find('.risk-description-'+editedRiskId).fadeOut(800);
-				$('.risk-row-content-' + editedRiskId).find('.risk-description-'+editedRiskId).fadeIn(800, function () {
-					elementParent.html($(resp).find('.div-table-responsive'))
-				});
+				$('.risk-row-content-' + editedRiskId).find('.risk-description-'+editedRiskId).fadeIn(800);
 			} else {
 				$('.risk-row-content-'+editedRiskId).fadeOut(800, function () {
-					elementParent.html($(resp).find('.div-title-and-table-responsive'))
+					$('.fichecenter .opacitymedium.colorblack.paddingleft').html($(resp).find('#searchFormListRisks .opacitymedium.colorblack.paddingleft'))
 				});
 			}
 
@@ -2552,12 +2563,12 @@ window.eoxiaJS.riskassessmenttask.createRiskAssessmentTask = function ( event ) 
 	let taskText = single.find('.riskassessment-task-label').val()
 	taskText = window.eoxiaJS.risk.sanitizeBeforeRequest(taskText)
 
-	let dateStart = single.find('#RiskassessmentTaskDateStart').val();
-	let hourStart = single.find('#RiskassessmentTaskDateStarthour').val();
-	let minStart  = single.find('#RiskassessmentTaskDateStartmin').val();
-	let dateEnd   = single.find('#RiskassessmentTaskDateEnd').val();
-	let hourEnd   = single.find('#RiskassessmentTaskDateEndhour').val();
-	let minEnd    = single.find('#RiskassessmentTaskDateEndmin').val();
+	let dateStart = single.find('#RiskassessmentTaskDateStart' + riskToAssign).val();
+	let hourStart = single.find('#RiskassessmentTaskDateStart' + riskToAssign + 'hour').val();
+	let minStart  = single.find('#RiskassessmentTaskDateStart' + riskToAssign + 'min').val();
+	let dateEnd   = single.find('#RiskassessmentTaskDateEnd' + riskToAssign).val();
+	let hourEnd   = single.find('#RiskassessmentTaskDateEnd' + riskToAssign + 'hour').val();
+	let minEnd    = single.find('#RiskassessmentTaskDateEnd' + riskToAssign + 'min').val();
 	let budget    = single.find('.riskassessment-task-budget').val()
 
 	window.eoxiaJS.loader.display($(this));
@@ -2582,7 +2593,7 @@ window.eoxiaJS.riskassessmenttask.createRiskAssessmentTask = function ( event ) 
 		processData: false,
 		contentType: false,
 		success: function ( resp ) {
-			$('.fichecenter.risklist').html($(resp).find('#searchFormListRisks'))
+			$('.tasks-list-container-'+riskToAssign).html($(resp).find('.tasks-list-container-'+riskToAssign).children())
 			let actionContainerSuccess = $('.messageSuccessTaskCreate');
 
 			$('.riskassessment-tasks' + riskToAssign).fadeOut(800);
@@ -2633,7 +2644,7 @@ window.eoxiaJS.riskassessmenttask.deleteRiskAssessmentTask = function ( event ) 
 			processData: false,
 			contentType: false,
 			success: function ( resp ) {
-				$('.fichecenter.risklist').html($(resp).find('#searchFormListRisks'))
+				$('.riskassessment-task-container-'+deletedRiskAssessmentTaskId).hide()
 				$('.riskassessment-tasks' + riskId).fadeOut(800);
 				$('.riskassessment-tasks' + riskId).fadeIn(800);
 				let textToShow = '';
@@ -2693,12 +2704,12 @@ window.eoxiaJS.riskassessmenttask.saveRiskAssessmentTask = function ( event ) {
 	}
 
 	let dateStart = elementRiskAssessmentTask.find('#RiskassessmentTaskDateStart' + editedRiskAssessmentTaskId).val();
-	let hourStart = elementRiskAssessmentTask.find('#RiskassessmentTaskDateStarthour' + editedRiskAssessmentTaskId).val();
-	let minStart  = elementRiskAssessmentTask.find('#RiskassessmentTaskDateStartmin' + editedRiskAssessmentTaskId).val();
+	let hourStart = elementRiskAssessmentTask.find('#RiskassessmentTaskDateStart' + editedRiskAssessmentTaskId + 'hour').val();
+	let minStart  = elementRiskAssessmentTask.find('#RiskassessmentTaskDateStart' + editedRiskAssessmentTaskId + 'min').val();
 	let dateEnd   = elementRiskAssessmentTask.find('#RiskassessmentTaskDateEnd' + editedRiskAssessmentTaskId).val();
-	let hourEnd   = elementRiskAssessmentTask.find('#RiskassessmentTaskDateEndhour' + editedRiskAssessmentTaskId).val();
-	let minEnd    = elementRiskAssessmentTask.find('#RiskassessmentTaskDateEndmin' + editedRiskAssessmentTaskId).val();
-	let budget    = elementRiskAssessmentTask.find('.riskassessment-task-budget').val()
+	let hourEnd   = elementRiskAssessmentTask.find('#RiskassessmentTaskDateEnd' + editedRiskAssessmentTaskId + 'hour').val();
+	let minEnd    = elementRiskAssessmentTask.find('#RiskassessmentTaskDateEnd' + editedRiskAssessmentTaskId + 'min').val();
+	let budget    = elementRiskAssessmentTask.find('.riskassessment-task-budget'  + editedRiskAssessmentTaskId).val()
 
 	window.eoxiaJS.loader.display($(this));
 	window.eoxiaJS.loader.display($('.riskassessment-task-single-'+ editedRiskAssessmentTaskId));
@@ -2723,7 +2734,7 @@ window.eoxiaJS.riskassessmenttask.saveRiskAssessmentTask = function ( event ) {
 		processData: false,
 		contentType: false,
 		success: function ( resp ) {
-			$('.fichecenter.risklist').html($(resp).find('#searchFormListRisks'))
+			$('.riskassessment-task-container-'+editedRiskAssessmentTaskId).html($(resp).find('.riskassessment-task-container-'+editedRiskAssessmentTaskId).children())
 			let actionContainerSuccess = $('.messageSuccessTaskEdit');
 			$('.riskassessment-tasks' + riskId).fadeOut(800);
 			$('.riskassessment-tasks' + riskId).fadeIn(800);
@@ -2763,11 +2774,12 @@ window.eoxiaJS.riskassessmenttask.createRiskAssessmentTaskTimeSpent = function (
 	let single     = element.find('.riskassessment-task-timespent-container');
 	let riskId     = element.find('riskassessment-task-single').attr('value');
 	let textToShow = '';
-	let taskRef    =  element.find('.riskassessment-task-ref-'+taskID).attr('value');
+	let taskRef    = element.find('.riskassessment-task-ref-'+taskID).attr('value');
+	let timespent  = $('.modal-header .riskassessment-task-data').find('.riskassessment-task-timespent')
 
-	let date     = single.find('#RiskassessmentTaskTimespentDate').val();
-	let hour     = single.find('#RiskassessmentTaskTimespentDatehour').val();
-	let min      = single.find('#RiskassessmentTaskTimespentDatemin').val();
+	let date     = single.find('#RiskassessmentTaskTimespentDate' + taskID).val();
+	let hour     = single.find('#RiskassessmentTaskTimespentDate' + taskID + 'hour').val();
+	let min      = single.find('#RiskassessmentTaskTimespentDate' + taskID + 'min').val();
 	let comment  = single.find('.riskassessment-task-timespent-comment').val()
 	comment      = window.eoxiaJS.risk.sanitizeBeforeRequest(comment)
 	let duration = single.find('.riskassessment-task-timespent-duration').val()
@@ -2807,6 +2819,7 @@ window.eoxiaJS.riskassessmenttask.createRiskAssessmentTaskTimeSpent = function (
 
 			actionContainerSuccess.find('.notice-subtitle .text').text(textToShow)
 			actionContainerSuccess.removeClass('hidden');
+			timespent.html($(resp).find('.modal-header .riskassessment-task-data').find('.riskassessment-task-timespent'))
 		},
 		error: function ( resp ) {
 			$(this).closest('.risk-row-content-' + riskId).removeClass('wpeo-loader');
@@ -2896,9 +2909,9 @@ window.eoxiaJS.riskassessmenttask.saveRiskAssessmentTaskTimeSpent = function ( e
 	let textToShow = '';
 	let taskRef    =  element.closest('.riskassessment-task').find('.riskassessment-task-ref-'+taskID).attr('value');
 
-	let date     = single.find('#RiskassessmentTaskTimespentDateEdit' + taskID).val();
-	let hour     = single.find('#RiskassessmentTaskTimespentDateEdithour' + taskID).val();
-	let min      = single.find('#RiskassessmentTaskTimespentDateEditmin' + taskID).val();
+	let date     = single.find('#RiskassessmentTaskTimespentDateEdit' + riskAssessmentTaskTimeSpentID).val();
+	let hour     = single.find('#RiskassessmentTaskTimespentDateEdit' + riskAssessmentTaskTimeSpentID + 'hour').val();
+	let min      = single.find('#RiskassessmentTaskTimespentDateEdit' + riskAssessmentTaskTimeSpentID + 'min').val();
 	let comment  = single.find('.riskassessment-task-timespent-comment').val()
 	comment      = window.eoxiaJS.risk.sanitizeBeforeRequest(comment)
 	let duration = single.find('.riskassessment-task-timespent-duration').val()
@@ -3598,12 +3611,12 @@ window.eoxiaJS.notice.event = function() {
  * @return {void}
  */
 window.eoxiaJS.notice.closeNotice = function( event ) {
-	$(this).closest('.notice').fadeOut(function () {
-		$(this).closest('.notice').addClass("hidden");
+	$(this).closest('.wpeo-notice').fadeOut(function () {
+		$(this).closest('.wpeo-notice').addClass("hidden");
 	});
 
 	if ($(this).hasClass('notice-close-forever')) {
-		let token = $(this).closest('.notice').find('input[name="token"]').val();
+		let token = $(this).closest('.wpeo-notice').find('input[name="token"]').val();
 		let querySeparator = '?';
 
 		document.URL.match(/\?/) ? querySeparator = '&' : 1
@@ -4047,6 +4060,7 @@ window.eoxiaJS.keyEvent.init = function() {
 window.eoxiaJS.keyEvent.event = function() {
 	$( document ).on( 'keydown', window.eoxiaJS.keyEvent.keyup );
 	$( document ).on( 'keyup', '.url-container' , window.eoxiaJS.keyEvent.checkUrlFormat );
+	$( document ).on( 'click', '.modal-active:not(.modal-container)' , window.eoxiaJS.modal.closeModal );
 }
 
 /**

@@ -127,6 +127,10 @@ ProfessionalQualification = Qualification professionnelle
 DigiriskDocumentation = Documentation de Digirisk
 PleaseNameTheFile = De préférence, nommez le fichier <b> %s </b>
 
+DigiriskDocumentsData = Données configurables des documents
+ShowPictoName = Afficher le nom du pictogramme de danger
+ShowPictoNameDescription = Afficher le nom du pictogramme de danger de risque dans les documents <br> Utile si on souhaite transférer le tableau dans un tableur
+
 
 #
 # Page index
@@ -320,7 +324,6 @@ PreventionPlanDocumentGeneratedWithDolibarr = Plan de prévention généré avec
 # Data - Donnée
 
 PreventionPlan = Plan de prévention
-PreventionPlanInitial = PPR
 PreventionPlanList = Liste des plans de prévention
 PreventionPlanLine = risque(s)
 PriorVisit = Inspection commune préalable
@@ -494,7 +497,6 @@ CloneFirePermitRisk = Cloner les risques du permis de feu
 CloneAttendantsFirePermit = Cloner les participants du permis de feu
 CloneScheduleFirePermit = Cloner les horaires du permis de feu
 ConfirmCloneFirePermit = Êtes-vous sûr de vouloir cloner le permis de feu <b> %s </b> ?
-FirePermitInitial = FPR
 FirePermitDescription = Projet des permis de feu
 FirePermitData = Données du Permis de feu
 FirePermitManagement = Gestion des permis de feu
@@ -566,7 +568,6 @@ DeleteAccidentWorkStop = Suppression d'un arrêt de travail sur l'accident
 AddAccidentLesion = Ajout d'une lésion sur l'accident
 UpdateAccidentLesion = Mise à jour d'une lésion sur l'accident
 DeleteAccidentLesion = Suppression d'une lésion sur l'accident
-AccidentInitial = ACC
 AccidentDescription = Projet des accidents
 AccidentManagement = Gestion des accidents
 ACCProject = Projet lié aux accidents
@@ -784,7 +785,6 @@ RiskAssessmentDocumentDigiriskTemplate = ODT par défaut du document unique
 
 # Data - Donnée
 RiskAssessmentDocument = Document unique
-RiskAssessmentDocumentInitial = DU
 RiskAssessmentDocumentDU = Plan d'action Document Unique
 RiskAssessmentDocumentDescription = Plan d'action Document Unique
 
@@ -1412,7 +1412,7 @@ Phone = Téléphone
 DigiriskTicketPublicAccess = Une interface publique ne nécessitant aucune identification est disponible à l'url suivante
 TicketActivatePublicInterface = Activer l'interface publique
 GenerateExtrafields = Génération des extrafields de ticket par défaut
-GenerateCategories = Génération des catégories de ticket par défaut
+GenerateTicketCategories = Génération des catégories de ticket par défaut
 AlreadyGenerated = Déjà généré(e)s
 NotGenerated = Pas encore généré(e)
 NotCreated = Pas encore créé(e)s
@@ -1447,7 +1447,6 @@ ChildCategoryLabelSet = Le titre de la catégorie enfant a été défini
 TicketPublicInterfaceConfigDocumentation = Pour configurer l'interface publique des tickets, consultez la documentation
 ParentCategory = Catégorie parent
 TSProject = Projet lié aux tickets
-TicketInitial = TS
 TicketDescription = Projet des tickets
 TicketProjectUpdated = Le projet par défaut des tickets a été mis à jour
 QRCodeAlreadyGenerated = QR Code généré
@@ -1460,8 +1459,7 @@ TicketCreationMailSent = Le mail de création du ticket a été envoyé à %s
 HowToSetupTicketCategories = Pour configurer les catégories de ticket, veuillez cliquer sur ce lien :
 ConfigTicketCategories = Configuration des catégories de ticket
 NewTicketSubmitted = Un ticket a été soumis via l'interface publique
-ANewTicketHasBeenSubmitted = Un nouveau ticket a été créé via l'interface publique
-SeeTicketUrl = Voir le ticket :
+ANewTicketHasBeenSubmitted = Nouveau registre de sécurité créé pour %s
 TicketCreationSubject = Création de ticket via l'interface publique de Digirisk
 TicketDocumentCustomDigiriskTemplate = ODT custom des fiches de tickets
 HowToSetupDigiriskElement = Pour configurer les éléments de Digirisk (groupements/unités de travail), veuillez cliquer sur ce lien :
@@ -1479,10 +1477,13 @@ TicketPublicInterfaceQRCode = QR Code de l'interface publique des tickets
 MultiEntityTicketPublicInterfaceQRCode =  QR Code de l'interface publique des tickets multi-société
 TicketDigiriskElementRequired = GP/UT obligatoire pour créer un ticket
 TicketDigiriskElementRequiredHelp = Activer cette option pour rendre obligatoire la selection d'un GP/UT pour créer un ticket dans l'interface publique
-TicketDigiriskElementHideRef = Cacher la référence des GP/UT
+TicketDigiriskElementHideRef = Cacher la référence des GP/UT dans l'interface publique
 TicketDigiriskElementHideRefHelp = Activer cette option pour rendre cacher la référence d'un GP/UT dans l'interface publique
 TicketDigiriskElementVisible = Afficher le champ GP/UT pour créer un ticket
 TicketDigiriskElementVisibleHelp = Activer cette option pour afficher le champ GP/UT dans l'interface publique
+TicketEmailVisible = Afficher le champ Email pour créer un ticket
+TicketEmailVisibleHelp =  Activer cette option pour afficher le champ Email dans l'interface publique
+QRCodeGenerated = QRCode généré
 
 # Stats - Statistiques
 TicketStatistics = Statistiques des tickets
@@ -1498,6 +1499,12 @@ CreatedByHelp = Si le filtre "Créer par" est vide, aucun utilisateur n'est util
 AssignedToHelp = Si le filtre "Assigné à" est vide, aucun utilisateur n'est utilisé pour la recherche
 StatusHelp = Par défaut, le filtre prend tous les états<br>
 
+# Email - Email
+The = Le
+TicketMessage = Message du registre
+SeeTicketUrl = Voir le ticket
+AutoNotificationTicket = Notification mail envoyée automatiquement par
+TicketPublicInterfaceOtherName = Interface de gestion des registres SST et DGI
 
 
 # Ticket document
@@ -1564,6 +1571,7 @@ DataMigrationWordPressToDolibarr = Migration des données de WordPress vers Doli
 DataMigrationDolibarrToDolibarr = Migration des données de Dolibarr vers Dolibarr
 
 
+
 #
 # Media - Media
 #
@@ -1579,6 +1587,8 @@ MediaMaxWidthLargeDescription = Largeur du média (dimension large) avec pour ra
 MediaMaxHeightLarge = Hauteur du média large
 MediaMaxHeightLargeDescription = Hauteur du média (dimension large) avec pour ratio 16:9
 ErrorFileSizeTooLarge = Le fichier est trop volumineux
+EmptyMediaLibrary = La bibliothèque de médias est vide
+
 
 
 #

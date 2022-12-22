@@ -104,9 +104,10 @@ abstract class ModeleODTFirePermitDocument extends CommonDocGenerator
 		if (file_exists($dir)) {
 			$filename = preg_split('/firepermitdocument\//', $srctemplatepath);
 			$filename = preg_replace('/template_/', '', $filename[1]);
+			$societyname = preg_replace('/\./', '_', $conf->global->MAIN_INFO_SOCIETE_NOM);
 
 			$date     = dol_print_date(dol_now(), 'dayxcard');
-			$filename = $date . '_' . $firepermit->ref . '_' . $objectref . '_' . $conf->global->MAIN_INFO_SOCIETE_NOM . ((preg_match('/specimen/i', $tempfilepath[1]) || $firepermit->status < $firepermit::STATUS_LOCKED) ? '_specimen' : '_sign') . '.odt';
+			$filename = $date . '_' . $firepermit->ref . '_' . $objectref . '_' . $societyname . ((preg_match('/specimen/i', $tempfilepath[1]) || $firepermit->status < $firepermit::STATUS_LOCKED) ? '_specimen' : '_signed') . '.odt';
 			$filename = str_replace(' ', '_', $filename);
 			$filename = dol_sanitizeFileName($filename);
 
@@ -376,7 +377,7 @@ abstract class ModeleODTFirePermitDocument extends CommonDocGenerator
 							$tmparray['unite_travail'] = $digiriskelement->ref . " - " . $digiriskelement->label;
 							$tmparray['action']        = $line->description;
 							$tmparray['risk']          = DOL_DOCUMENT_ROOT . '/custom/digiriskdolibarr/img/categorieDangers/' . $risk->get_danger_category($line) . '.png';
-							$tmparray['nomPicto']      = $risk->get_danger_category_name($line);
+							$tmparray['nomPicto']      = (!empty($conf->global->DIGIRISKDOLIBARR_DOCUMENT_SHOW_PICTO_NAME) ? $risk->get_danger_category_name($line) : ' ');
 							$tmparray['prevention']    = $line->prevention_method;
 
 							foreach ($tmparray as $key => $val) {
@@ -429,7 +430,7 @@ abstract class ModeleODTFirePermitDocument extends CommonDocGenerator
 							$tmparray['unite_travail']   = $digiriskelement->ref . " - " . $digiriskelement->label;
 							$tmparray['action']          = $line->description;
 							$tmparray['type_de_travaux'] = DOL_DOCUMENT_ROOT . '/custom/digiriskdolibarr/img/typeDeTravaux/' . $risk->get_fire_permit_danger_category($line) . '.png';
-							$tmparray['nomPictoT']       = $risk->get_fire_permit_danger_category_name($line);
+							$tmparray['nomPictoT']       = (!empty($conf->global->DIGIRISKDOLIBARR_DOCUMENT_SHOW_PICTO_NAME) ? $risk->get_fire_permit_danger_category_name($line) : ' ');
 							$tmparray['materiel']        = $line->use_equipment;
 
 							foreach ($tmparray as $key => $val) {

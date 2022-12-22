@@ -130,27 +130,19 @@ if ($action == 'add') {
 	}
 
 	$email = GETPOST('email', 'alpha');
-	if ($conf->global->DIGIRISKDOLIBARR_TICKET_EMAIL_REQUIRED) {
+	if ($conf->global->DIGIRISKDOLIBARR_TICKET_EMAIL_REQUIRED && !$conf->global->DIGIRISKDOLIBARR_TICKET_EMAIL_VISIBLE) {
 		if (empty($email)) {
 			setEventMessages($langs->trans('ErrorFieldNotEmpty', $langs->transnoentities('Email')), array(), 'errors');
 			$error++;
-		} else {
-			$regEmail = '/^([A-Za-z0-9_\-\.])+\@([A-Za-z0-9_\-\.])+\.([A-Za-z]{2,4})$/';
-			if (preg_match($regEmail, $email)) {
-				$object->origin_email = $email;
-			} else {
-				setEventMessages($langs->trans('ErrorFieldEmail'), array(), 'errors');
-				$error++;
-			}
 		}
+	}
+
+	$regEmail = '/^([A-Za-z0-9_\-\.])+\@([A-Za-z0-9_\-\.])+\.([A-Za-z]{2,4})$/';
+	if (preg_match($regEmail, $email) || empty($email)) {
+		$object->origin_email = $email;
 	} else {
-		$regEmail = '/^([A-Za-z0-9_\-\.])+\@([A-Za-z0-9_\-\.])+\.([A-Za-z]{2,4})$/';
-		if (preg_match($regEmail, $email) || empty($email)) {
-			$object->origin_email = $email;
-		} else {
-			setEventMessages($langs->trans('ErrorFieldEmail'), array(), 'errors');
-			$error++;
-		}
+		setEventMessages($langs->trans('ErrorFieldEmail'), array(), 'errors');
+		$error++;
 	}
 
 	// Quand le registre choisi est Danger Grave et Imminent, il ne faut pas check ça
@@ -395,8 +387,7 @@ if ($entity > 0) {
 		</div>
 	<?php endif;
 
-	print '<p><strong>' . $conf->global->DIGIRISKDOLIBARR_TICKET_PARENT_CATEGORY_LABEL . '</strong></p>';
-	print '';
+	print '<p><strong>' . $conf->global->DIGIRISKDOLIBARR_TICKET_PARENT_CATEGORY_LABEL . '</strong><span style="color:red"> *</span></p>';
 
 	$mainCategoryObject = $category->rechercher($conf->global->DIGIRISKDOLIBARR_TICKET_MAIN_CATEGORY, '', 'ticket', true);
 
@@ -506,7 +497,9 @@ if ($entity > 0) {
 			</div>
 		</div>
 
-		<?php include DOL_DOCUMENT_ROOT . '/core/tpl/extrafields_add.tpl.php'; ?>
+		<?php
+
+		include DOL_DOCUMENT_ROOT . '/core/tpl/extrafields_add.tpl.php'; ?>
 
 		<?php
 		if ( ! empty($conf->global->DIGIRISKDOLIBARR_USE_CAPTCHA)) {
@@ -547,7 +540,7 @@ if ($entity > 0) {
 		if (!empty($entities_list)) {
 			foreach($entities_list as $entityId => $entityName) {
 				if (!preg_match('/('.$langs->transnoentities('Hidden').')/', $entityName)) {
-					$logos_path = DOL_DATA_ROOT . ($entityId > 1 ? '/' . $entityId . '/' : '/') . 'mycompany/logos';
+					$logos_path = DOL_DATA_ROOT . ($entityId > 1 ? '/' . $entityId . '/' : '/') . 'mycompany/logos/thumbs/';
 					$logos_list = dol_dir_list($logos_path);
 					if (is_array($logos_list) && !empty($logos_list)) {
 						$logo = array_shift($logos_list);
@@ -559,7 +552,7 @@ if ($entity > 0) {
 					print '<a href="' . $_SERVER["PHP_SELF"] . '?entity=' . $entityId . '">';
 					print '<div class="card" style="height: 200px">';
 					print '<br>';
-					print '<img src="' . DOL_URL_ROOT . '/custom/digiriskdolibarr/documents/viewimage.php?modulepart=mycompany&entity=' . $entityId . '&file=' . urlencode('logos/' . $logo_fullname) . '" alt="societyLogo" style="width:40%">';
+					print '<img src="' . DOL_URL_ROOT . '/custom/digiriskdolibarr/documents/viewimage.php?modulepart=mycompany&entity=' . $entityId . '&file=' . urlencode('logos/thumbs/' . $logo_fullname) . '" alt="SocietyLogo" style="width:40%">';
 					print '<div class="card-container">';
 					print '<h4><b>' . $entityName . '</b></h4>';
 					print '</div>';

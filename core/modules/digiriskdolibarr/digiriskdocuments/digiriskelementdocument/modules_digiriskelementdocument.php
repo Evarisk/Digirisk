@@ -26,6 +26,7 @@ require_once DOL_DOCUMENT_ROOT . '/core/class/commondocgenerator.class.php';
 require_once DOL_DOCUMENT_ROOT . '/core/lib/admin.lib.php';
 require_once DOL_DOCUMENT_ROOT . '/ticket/class/ticket.class.php';
 require_once DOL_DOCUMENT_ROOT . '/categories/class/categorie.class.php';
+require_once __DIR__ . '/../../../../../class/riskanalysis/risksign.class.php';
 
 /**
  *	Parent class for documents models
@@ -93,9 +94,10 @@ abstract class ModeleODTDigiriskElementDocument extends CommonDocGenerator
 		if (file_exists($dir)) {
 			$filename = preg_split('/'. $type .'document\//', $srctemplatepath);
 			preg_replace('/template_/', '', $filename[1]);
+			$societyname = preg_replace('/\./', '_', $conf->global->MAIN_INFO_SOCIETE_NOM);
 
 			$date     = dol_print_date(dol_now(), 'dayxcard');
-			$filename = $date . '_' . $digiriskelement->ref . '_' . $objectref . '_' . $conf->global->MAIN_INFO_SOCIETE_NOM . '.odt';
+			$filename = $date . '_' . $digiriskelement->ref . '_' . $objectref . '_' . $societyname . '.odt';
 			$filename = str_replace(' ', '_', $filename);
 			$filename = dol_sanitizeFileName($filename);
 			$filename = preg_replace('/[’‘‹›‚]/u', '', $filename);
@@ -239,6 +241,26 @@ abstract class ModeleODTDigiriskElementDocument extends CommonDocGenerator
 								}
 								$listlines->merge();
 							}
+						} else {
+							$tmparray['nomElement']                 = '';
+							$tmparray['idUtilisateur']              = '';
+							$tmparray['dateAffectationUtilisateur'] = '';
+							$tmparray['dureeEntretien']             = '';
+							$tmparray['nomUtilisateur']             = '';
+							$tmparray['prenomUtilisateur']          = '';
+							$tmparray['travailUtilisateur']         = '';
+							foreach ($tmparray as $key => $val) {
+								try {
+									if (empty($val)) {
+										$listlines->setVars($key, $langs->trans('NoData'), true, 'UTF-8');
+									} else {
+										$listlines->setVars($key, html_entity_decode($val, ENT_QUOTES | ENT_HTML5), true, 'UTF-8');
+									}
+								} catch (SegmentException $e) {
+									dol_syslog($e->getMessage());
+								}
+							}
+							$listlines->merge();
 						}
 						$odfHandler->mergeSegment($listlines);
 
@@ -255,7 +277,7 @@ abstract class ModeleODTDigiriskElementDocument extends CommonDocGenerator
 									$tmparray['nomElement']                = (!empty($conf->global->DIGIRISKDOLIBARR_SHOW_SHARED_RISKSIGNS) ? 'S' . $element->entity . ' - ' : '') . $element->ref . ' - ' . $element->label;
 									$tmparray['recommandationIcon']        = $path . '/' . $risksign->get_risksign_category($line);
 									$tmparray['identifiantRecommandation'] = $line->ref;
-									$tmparray['recommandationName']        = $line->get_risksign_category($line, 'name');
+									$tmparray['recommandationName']        = (!empty($conf->global->DIGIRISKDOLIBARR_DOCUMENT_SHOW_PICTO_NAME) ? $line->get_risksign_category($line, 'name') : ' ');
 									$tmparray['recommandationComment']     = $line->description;
 
 									unset($tmparray['object_fields']);
@@ -282,6 +304,24 @@ abstract class ModeleODTDigiriskElementDocument extends CommonDocGenerator
 									$listlines->merge();
 								}
 							}
+						} else {
+							$tmparray['nomElement']                = '';
+							$tmparray['recommandationIcon']        = '';
+							$tmparray['identifiantRecommandation'] = '';
+							$tmparray['recommandationName']        = '';
+							$tmparray['recommandationComment']     = '';
+							foreach ($tmparray as $key => $val) {
+								try {
+									if (empty($val)) {
+										$listlines->setVars($key, $langs->trans('NoData'), true, 'UTF-8');
+									} else {
+										$listlines->setVars($key, html_entity_decode($val, ENT_QUOTES | ENT_HTML5), true, 'UTF-8');
+									}
+								} catch (SegmentException $e) {
+									dol_syslog($e->getMessage());
+								}
+							}
+							$listlines->merge();
 						}
 						$odfHandler->mergeSegment($listlines);
 
@@ -336,6 +376,24 @@ abstract class ModeleODTDigiriskElementDocument extends CommonDocGenerator
 								}
 								$listlines->merge();
 							}
+						} else {
+							$tmparray['AccidentIcon']         = '';
+							$tmparray['identifiantAccident']  = '';
+							$tmparray['AccidentName']         = '';
+							$tmparray['AccidentWorkStopDays'] = '';
+							$tmparray['AccidentComment']      = '';
+							foreach ($tmparray as $key => $val) {
+								try {
+									if (empty($val)) {
+										$listlines->setVars($key, $langs->trans('NoData'), true, 'UTF-8');
+									} else {
+										$listlines->setVars($key, html_entity_decode($val, ENT_QUOTES | ENT_HTML5), true, 'UTF-8');
+									}
+								} catch (SegmentException $e) {
+									dol_syslog($e->getMessage());
+								}
+							}
+							$listlines->merge();
 						}
 						$odfHandler->mergeSegment($listlines);
 
@@ -391,12 +449,12 @@ abstract class ModeleODTDigiriskElementDocument extends CommonDocGenerator
 								$listlines->merge();
 							}
 						} else {
-							$tmparray['refticket']     = $langs->trans('NoData');
-							$tmparray['categories']    = $langs->trans('NoData');
-							$tmparray['creation_date'] = $langs->trans('NoData');
-							$tmparray['subject']       = $langs->trans('NoData');
-							$tmparray['progress']      = $langs->trans('NoData');
-							$tmparray['status']        = $langs->trans('NoData');
+							$tmparray['refticket']     = '';
+							$tmparray['categories']    = '';
+							$tmparray['creation_date'] = '';
+							$tmparray['subject']       = '';
+							$tmparray['progress']      = '';
+							$tmparray['status']        = '';
 							foreach ($tmparray as $key => $val) {
 								try {
 									if (empty($val)) {

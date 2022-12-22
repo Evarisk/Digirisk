@@ -377,7 +377,7 @@ class ActionsDigiriskdolibarr
 						$filter .= ')';
 					}
 
-					$selectDigiriskElement .= $digiriskelement->select_digiriskelement_list(GETPOST('options_digiriskdolibarr_ticket_service'), 'options_digiriskdolibarr_ticket_service', (!empty($filter) ? $filter : ''), $langs->trans('PleaseSelectADigiriskElement'), 0, array(), 0, 0, 'minwidth500 maxwidthonsmartphone', 0, false, 1, '', true, $conf->global->DIGIRISKDOLIBARR_TICKET_DIGIRISKELEMENT_HIDE_REF);
+					$selectDigiriskElement .= $digiriskelement->select_digiriskelement_list(GETPOST('options_digiriskdolibarr_ticket_service'), 'options_digiriskdolibarr_ticket_service', (!empty($filter) ? $filter : ''), $langs->trans('PleaseSelectADigiriskElement'), 0, array(), 0, 0, 'minwidth500', 0, false, 1, '', true, $conf->global->DIGIRISKDOLIBARR_TICKET_DIGIRISKELEMENT_HIDE_REF);
 					$selectDigiriskElement .= '<div><br></div>';
 				}
 
@@ -400,9 +400,9 @@ class ActionsDigiriskdolibarr
 
 					jQuery('#options_digiriskdolibarr_ticket_lastname').parent().html(jQuery('#options_digiriskdolibarr_ticket_lastname').parent().html().replace(/Nom/, '<b>Nom</b><span style="color:red"> *</span>'))
 					jQuery('#options_digiriskdolibarr_ticket_lastname').parent().html(jQuery('#options_digiriskdolibarr_ticket_lastname').parent().html().replace(/Prénom/, '<b>Prénom</b><span style="color:red"> *</span>'))
-
+					<?php if ($conf->global->DIGIRISKDOLIBARR_TICKET_EMAIL_VISIBLE) : ?>
 					jQuery('#options_digiriskdolibarr_ticket_firstname').after(<?php echo json_encode($emailfield) ; ?>);
-
+					<?php endif; ?>
 					jQuery('#options_digiriskdolibarr_ticket_date').val(fulldate);
 					jQuery('#options_digiriskdolibarr_ticket_dateday').val((day < 10 ? '0' : '') + day);
 					jQuery('#options_digiriskdolibarr_ticket_datemonth').val((month < 10 ? '0' : '') + month);

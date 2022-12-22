@@ -184,12 +184,14 @@ class DigiriskTask extends Task
 	/**
 	 *  Load all records of time spent for all user
 	 *
-	 * @param string      $morewherefilter Add more filter into where SQL request (must start with ' AND ...')
+	 * @param string       $morewherefilter Add more filter into where SQL request (must start with ' AND ...')
+	 * @param string       $sortorder       Sort Order
+	 * @param string       $sortfield       Sort field
 	 *
-	 * @return array|int                   0 < if KO, array of time spent if OK
+	 * @return array|int                    0 < if KO, array of time spent if OK
 	 * @throws Exception
 	 */
-	public function fetchAllTimeSpentAllUser($morewherefilter = '')
+	public function fetchAllTimeSpentAllUser($morewherefilter = '', $sortfield = '', $sortorder = '')
 	{
 		$arrayres = array();
 
@@ -219,6 +221,10 @@ class DigiriskTask extends Task
 		$sql .= " AND pt.entity IN (".getEntity('project').")";
 		if ($morewherefilter) {
 			$sql .= $morewherefilter;
+		}
+
+		if (!empty($sortfield)) {
+			$sql .= $this->db->order($sortfield, $sortorder);
 		}
 
 		dol_syslog(get_class($this)."::fetchAllTimeSpentAllUser", LOG_DEBUG);

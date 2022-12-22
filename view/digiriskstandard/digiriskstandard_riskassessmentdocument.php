@@ -189,12 +189,13 @@ if (empty($reshook)) {
 
 		$date        = dol_print_date(dol_now(), 'dayxcard');
 		$nameSociety = str_replace(' ', '_', $conf->global->MAIN_INFO_SOCIETE_NOM);
+		$nameSociety = preg_replace('/\./', '_', $conf->global->MAIN_INFO_SOCIETE_NOM);
 
 		$pathToZip = DOL_DATA_ROOT . $entity . '/digiriskdolibarr/riskassessmentdocument/' . $date . '_'. $riskassessmentdocument->ref . '_' . $nameSociety;
 		dol_mkdir($pathToZip);
 
 		// Ajout du fichier au dossier à zipper
-		$nameFile = $date . '_' . $riskassessmentdocument->ref . '_' . $conf->global->MAIN_INFO_SOCIETE_NOM . '.odt';
+		$nameFile = $date . '_' . $riskassessmentdocument->ref . '_' . $nameSociety . '.odt';
 		$nameFile = str_replace(' ', '_', $nameFile);
 		$nameFile = dol_sanitizeFileName($nameFile);
 		copy(DOL_DATA_ROOT . $entity . '/digiriskdolibarr/riskassessmentdocument/' . $riskassessmentdocument->last_main_doc, $pathToZip . '/' . $nameFile);

@@ -225,6 +225,7 @@ if ($action == 'generateQRCode') {
 	$targetPath = $targetPath . "ticketQRCode.png";
 
 	imagepng($QR,$targetPath);
+	setEventMessages($langs->transnoentities('QRCodeGenerated'), array());
 }
 
 /*
@@ -342,6 +343,19 @@ if ( ! empty($conf->global->DIGIRISKDOLIBARR_TICKET_ENABLE_PUBLIC_INTERFACE)) {
 	print '</td>';
 	print '</tr>';
 
+	// Email Visible
+	print '<tr class="oddeven"><td>' . $langs->transnoentities("TicketEmailVisible") . '</td>';
+	print '<td class="center">';
+	print ajax_constantonoff('DIGIRISKDOLIBARR_TICKET_EMAIL_VISIBLE');
+	print '</td>';
+	print '<td class="center">';
+	print '';
+	print '</td>';
+	print '<td class="center">';
+	print $form->textwithpicto('', $langs->transnoentities("TicketEmailVisibleHelp"));
+	print '</td>';
+	print '</tr>';
+
 	// Email Required
 	print '<tr class="oddeven"><td>' . $langs->transnoentities("TicketEmailRequired") . '</td>';
 	print '<td class="center">';
@@ -355,18 +369,6 @@ if ( ! empty($conf->global->DIGIRISKDOLIBARR_TICKET_ENABLE_PUBLIC_INTERFACE)) {
 	print '</td>';
 	print '</tr>';
 
-	//Envoi d'emails automatiques
-	print '<tr class="oddeven"><td>' . $langs->transnoentities("SendEmailOnTicketSubmit") . '</td>';
-	print '<td class="center">';
-	print ajax_constantonoff('DIGIRISKDOLIBARR_SEND_EMAIL_ON_TICKET_SUBMIT');
-	print '</td>';
-	print '<td class="center">';
-	print '';
-	print '</td>';
-	print '<td class="center">';
-	print $form->textwithpicto('', $langs->transnoentities("SendEmailOnTicketSubmitHelp"));
-	print '</td>';
-	print '</tr>';
 
 	if ($conf->multicompany->enabled) {
 		//Page de sélection de l'entité
@@ -391,6 +393,19 @@ if ( ! empty($conf->global->DIGIRISKDOLIBARR_TICKET_ENABLE_PUBLIC_INTERFACE)) {
 		print '</td>';
 		print '</tr>';
 	}
+
+	//Envoi d'emails automatiques
+	print '<tr class="oddeven"><td>' . $langs->transnoentities("SendEmailOnTicketSubmit") . '</td>';
+	print '<td class="center">';
+	print ajax_constantonoff('DIGIRISKDOLIBARR_SEND_EMAIL_ON_TICKET_SUBMIT');
+	print '</td>';
+	print '<td class="center">';
+	print '';
+	print '</td>';
+	print '<td class="center">';
+	print $form->textwithpicto('', $langs->transnoentities("SendEmailOnTicketSubmitHelp"));
+	print '</td>';
+	print '</tr>';
 
 	//Email to send ticket submitted
 	print '<form method="POST" action="' . $_SERVER["PHP_SELF"] . '">';
@@ -495,7 +510,7 @@ if ( ! empty($conf->global->DIGIRISKDOLIBARR_TICKET_ENABLE_PUBLIC_INTERFACE)) {
 	print '<input type="hidden" name="action" value="generateCategories">';
 	print '<input type="hidden" name="backtopage" value="' . $backtopage . '">';
 
-	print '<tr class="oddeven"><td>' . $langs->transnoentities("GenerateCategories") . '<sup><a href="https://wiki.dolibarr.org/index.php?title=Module_Digirisk#DigiRisk_-_Registre_de_s.C3.A9curit.C3.A9_et_Tickets" target="_blank" > 1</a></sup></td>';
+	print '<tr class="oddeven"><td>' . $langs->transnoentities("GenerateTicketCategories") . '<sup><a href="https://wiki.dolibarr.org/index.php?title=Module_Digirisk#DigiRisk_-_Registre_de_s.C3.A9curit.C3.A9_et_Tickets" target="_blank" > 1</a></sup></td>';
 	print '<td class="center">';
 	print $conf->global->DIGIRISKDOLIBARR_TICKET_CATEGORIES_CREATED ? $langs->transnoentities('AlreadyGenerated') : $langs->transnoentities('NotCreated');
 	print '</td>';
@@ -640,7 +655,7 @@ if ( ! empty($conf->global->DIGIRISKDOLIBARR_TICKET_ENABLE_PUBLIC_INTERFACE)) {
 	print '<tr class="oddeven"><td>' . $langs->transnoentities("GenerateQRCode") . '</td>';
 
 	$targetPath = $qrCodePath;
-	$urlToEncode = DOL_DOCUMENT_ROOT . '/custom/digiriskdolibarr/public/ticket/create_ticket.php?entity=' . $conf->entity;
+	$urlToEncode = DOL_MAIN_URL_ROOT . '/custom/digiriskdolibarr/public/ticket/create_ticket.php?entity=' . $conf->entity;
 
 	print '<input hidden name="targetPath" value="'. $targetPath .'">';
 	print '<input hidden name="urlToEncode" value="'. $urlToEncode .'">';
@@ -696,7 +711,7 @@ if ( ! empty($conf->global->DIGIRISKDOLIBARR_TICKET_ENABLE_PUBLIC_INTERFACE)) {
 		print '<tr class="oddeven"><td>' . $langs->transnoentities("GenerateQRCode") . '</td>';
 
 		$targetPath = $qrCodePath;
-		$urlToEncode = DOL_DOCUMENT_ROOT . '/custom/digiriskdolibarr/public/ticket/create_ticket.php';
+		$urlToEncode = DOL_MAIN_URL_ROOT . '/custom/digiriskdolibarr/public/ticket/create_ticket.php';
 
 		print '<input hidden name="targetPath" value="'. $targetPath .'">';
 		print '<input hidden name="urlToEncode" value="'. $urlToEncode .'">';

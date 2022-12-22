@@ -185,24 +185,28 @@ class DigiriskResources extends CommonObject
 			// Change status previous ressources at 0
 			$sql = "UPDATE " . MAIN_DB_PREFIX . "digiriskdolibarr_digiriskresources";
 			$sql .= " SET status = 0";
-			$sql .= " WHERE ref = " . $db->encrypt($ref, 1);
+			$sql .= " WHERE ref = " . $db->encrypt($ref);
 			if ($entity >= 0) $sql .= " AND entity = " . $entity;
+			$sql .= " AND element_type = " . $db->encrypt($element_type);
+			$sql .= " AND object_type = " . $db->encrypt($object_type);
+			$sql .= " AND object_id = " . $object_id;
 			dol_syslog("admin.lib::digirisk_dolibarr_set_resources", LOG_DEBUG);
 			$resql = $db->query($sql);
 		}
 
 		if (strcmp($element_type, '') && !empty($element_id))    // true if different. Must work for $value='0' or $value=0
 		{
-			$sql = "INSERT INTO " . MAIN_DB_PREFIX . "digiriskdolibarr_digiriskresources(ref,fk_user_creat,date_creation, element_type,element_id,status,entity, object_type, object_id)";
+			$sql = "INSERT INTO " . MAIN_DB_PREFIX . "digiriskdolibarr_digiriskresources(ref, fk_user_creat, date_creation, tms, element_type, element_id, status, entity, object_type, object_id)";
 			$sql .= " VALUES ";
 			foreach ($element_id as $id) {
-				$sql .= "(" . $db->encrypt($ref, 1);
-				$sql .= ", " . $db->encrypt($user_creat, 1);
-				$sql .= ", '" . date("Y-m-d", $now);
-				$sql .= "', " . $db->encrypt($element_type, 1);
+				$sql .= "(" . $db->encrypt($ref);
+				$sql .= ", " . $user_creat;
+				$sql .= ", " . $db->encrypt($this->db->idate($now));
+				$sql .= ", " . $db->encrypt($this->db->idate($now));
+				$sql .= ", " . $db->encrypt($element_type);
 				$sql .= ", " . $id;
 				$sql .= ", 1";
-				$sql .= ", " . $entity ;
+				$sql .= ", " . $entity;
 				$sql .=  ", '" . $object_type . "'";
 				$sql .=  ", " . $object_id. "),";
 			}

@@ -101,12 +101,18 @@ if ( ! $error && $action == 'add' && $permissiontoadd) {
 					$task->label                            = $tasktitle;
 					$task->fk_project                       = $conf->global->DIGIRISKDOLIBARR_DU_PROJECT;
 					$task->date_c                           = dol_now();
-					$task->date_start                       = strtotime(preg_replace('/\//', '-', $dateStart));
-					$task->date_start                       = dol_time_plus_duree($task->date_start, $hourStart, 'h');
-					$task->date_start                       = dol_time_plus_duree($task->date_start, $minStart, 'i');
-					$task->date_end                         = strtotime(preg_replace('/\//', '-', $dateEnd));
-					$task->date_end                         = dol_time_plus_duree($task->date_end, $hourEnd, 'h');
-					$task->date_end                         = dol_time_plus_duree($task->date_end, $minEnd, 'i');
+					if (!empty($dateStart)) {
+						$task->date_start = strtotime(preg_replace('/\//', '-', $dateStart));
+						$task->date_start = dol_time_plus_duree($task->date_start, $hourStart, 'h');
+						$task->date_start = dol_time_plus_duree($task->date_start, $minStart, 'i');
+					} else {
+						$task->date_start = dol_now('tzuser');
+					}
+					if (!empty($dateEnd)) {
+						$task->date_end = strtotime(preg_replace('/\//', '-', $dateEnd));
+						$task->date_end = dol_time_plus_duree($task->date_end, $hourEnd, 'h');
+						$task->date_end = dol_time_plus_duree($task->date_end, $minEnd, 'i');
+					}
 					$task->budget_amount                    = $budget;
 					$task->array_options['options_fk_risk'] = $risk->id;
 
@@ -406,12 +412,18 @@ if ( ! $error && $action == 'addRiskAssessmentTask' && $permissiontoadd) {
 	$task->label                            = $tasktitle;
 	$task->fk_project                       = $conf->global->DIGIRISKDOLIBARR_DU_PROJECT;
 	$task->date_c                           = dol_now();
-	$task->date_start                       = strtotime(preg_replace('/\//', '-', $dateStart));
-	$task->date_start                       = dol_time_plus_duree($task->date_start, $hourStart, 'h');
-	$task->date_start                       = dol_time_plus_duree($task->date_start, $minStart, 'i');
-	$task->date_end                         = strtotime(preg_replace('/\//', '-', $dateEnd));
-	$task->date_end                         = dol_time_plus_duree($task->date_end, $hourEnd, 'h');
-	$task->date_end                         = dol_time_plus_duree($task->date_end, $minEnd, 'i');
+	if (!empty($dateStart)) {
+		$task->date_start = strtotime(preg_replace('/\//', '-', $dateStart));
+		$task->date_start = dol_time_plus_duree($task->date_start, $hourStart, 'h');
+		$task->date_start = dol_time_plus_duree($task->date_start, $minStart, 'i');
+	} else {
+		$task->date_start = dol_now('tzuser');
+	}
+	if (!empty($dateEnd)) {
+		$task->date_end = strtotime(preg_replace('/\//', '-', $dateEnd));
+		$task->date_end = dol_time_plus_duree($task->date_end, $hourEnd, 'h');
+		$task->date_end = dol_time_plus_duree($task->date_end, $minEnd, 'i');
+	}
 	$task->budget_amount                    = $budget;
 	$task->fk_task_parent                   = 0;
 	$task->array_options['options_fk_risk'] = $riskID;
@@ -448,12 +460,18 @@ if ( ! $error && $action == 'saveRiskAssessmentTask' && $permissiontoadd) {
 	$task->fetch($riskAssessmentTaskID);
 
 	$task->label         = $tasktitle;
-	$task->date_start    = strtotime(preg_replace('/\//', '-', $dateStart));
-	$task->date_start    = dol_time_plus_duree($task->date_start, $hourStart, 'h');
-	$task->date_start    = dol_time_plus_duree($task->date_start, $minStart, 'i');
-	$task->date_end      = strtotime(preg_replace('/\//', '-', $dateEnd));
-	$task->date_end      = dol_time_plus_duree($task->date_end, $hourEnd, 'h');
-	$task->date_end      = dol_time_plus_duree($task->date_end, $minEnd, 'i');
+	if (!empty($dateStart)) {
+		$task->date_start = strtotime(preg_replace('/\//', '-', $dateStart));
+		$task->date_start = dol_time_plus_duree($task->date_start, $hourStart, 'h');
+		$task->date_start = dol_time_plus_duree($task->date_start, $minStart, 'i');
+	} else {
+		$task->date_start = dol_now('tzuser');
+	}
+	if (!empty($dateEnd)) {
+		$task->date_end = strtotime(preg_replace('/\//', '-', $dateEnd));
+		$task->date_end = dol_time_plus_duree($task->date_end, $hourEnd, 'h');
+		$task->date_end = dol_time_plus_duree($task->date_end, $minEnd, 'i');
+	}
 	$task->budget_amount = $budget;
 
 	if ($taskProgress == 1) {
@@ -509,9 +527,13 @@ if ( ! $error && $action == 'addRiskAssessmentTaskTimeSpent' && $permissiontoadd
 
 	$task->fetch($taskID);
 
-	$task->timespent_date     = strtotime(preg_replace('/\//', '-', $date));
-	$task->timespent_date     = dol_time_plus_duree($task->timespent_date, $hour, 'h');
-	$task->timespent_date     = dol_time_plus_duree($task->timespent_date, $min, 'i');
+	if (!empty($date)) {
+		$task->timespent_date = strtotime(preg_replace('/\//', '-', $date));
+		$task->timespent_date = dol_time_plus_duree($task->timespent_date, $hour, 'h');
+		$task->timespent_date = dol_time_plus_duree($task->timespent_date, $min, 'i');
+	} else {
+		$task->timespent_date = dol_now('tzuser');
+	}
 	$task->timespent_note     = $comment;
 	$task->timespent_duration = $duration * 60;
 	$task->timespent_fk_user  = $user->id;
@@ -543,9 +565,11 @@ if ( ! $error && $action == 'saveRiskAssessmentTaskTimeSpent' && $permissiontoad
 
 	$task->fetchTimeSpent($riskAssessmentTaskTimeSpentID);
 
-	$task->timespent_datehour = strtotime(preg_replace('/\//', '-', $date));
-	$task->timespent_datehour = dol_time_plus_duree($task->timespent_datehour,  $hour, 'h');
-	$task->timespent_datehour = dol_time_plus_duree($task->timespent_datehour, $min, 'i');
+	if (!empty($date)) {
+		$task->timespent_datehour = strtotime(preg_replace('/\//', '-', $date));
+		$task->timespent_datehour = dol_time_plus_duree($task->timespent_datehour, $hour, 'h');
+		$task->timespent_datehour = dol_time_plus_duree($task->timespent_datehour, $min, 'i');
+	}
 	$task->timespent_note     =  $comment;
 	$task->timespent_duration = $duration * 60;
 

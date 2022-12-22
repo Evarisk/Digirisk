@@ -434,7 +434,7 @@ function digiriskshowdocuments($modulepart, $modulesubdir, $filedir, $urlsource,
 					$out .= '<td class="right nowraponall">';
 					if ($delallowed) {
 						$tmpurlsource = preg_replace('/#[a-zA-Z0-9_]*$/', '', $urlsource);
-						$out         .= '<a href="' . $tmpurlsource . ((strpos($tmpurlsource, '?') === false) ? '?' : '&amp;') . 'action=' . $removeaction . '&amp;file=' . urlencode($relativepath);
+						$out         .= '<a href="' . $tmpurlsource . ((strpos($tmpurlsource, '?') === false) ? '?' : '&amp;') . 'action=' . $removeaction . '&amp;file=' . urlencode($relativepath) . '&token=' . newToken();
 						$out         .= ($param ? '&amp;' . $param : '');
 						$out         .= '">' . img_picto($langs->trans("Delete"), 'delete') . '</a>';
 					}
@@ -543,20 +543,6 @@ function digiriskHeader($title = '', $help_url = '', $arrayofjs = array(), $arra
 
 	$workunit_prefix = dol_strlen($mod_workunit->prefix) > 0 ? $mod_workunit->prefix : $conf->global->DIGIRISKDOLIBARR_WORKUNIT_CANOPUS_ADDON;
 	$workunit_prefix = preg_match('/{/',$workunit_prefix) ? preg_split('/{/', $workunit_prefix)[0] : $workunit_prefix;
-
-	// html header
-	$tmpcsstouse = 'sidebar-collapse' . ($morecssonbody ? ' ' . $morecssonbody : '');
-	// If theme MD and classic layer, we open the menulayer by default.
-	if ($conf->theme == 'md' && ! in_array($conf->browser->layout, array('phone', 'tablet')) && empty($conf->global->MAIN_OPTIMIZEFORTEXTBROWSER)) {
-		global $mainmenu;
-		if ($mainmenu != 'website') $tmpcsstouse = $morecssonbody; // We do not use sidebar-collpase by default to have menuhider open by default.
-	}
-
-	if ( ! empty($conf->global->MAIN_OPTIMIZEFORCOLORBLIND)) {
-		$tmpcsstouse .= ' colorblind-' . strip_tags($conf->global->MAIN_OPTIMIZEFORCOLORBLIND);
-	}
-
-	print '<body id="mainbody" class="' . $tmpcsstouse . '">' . "\n";
 
 	llxHeader('', $title, $help_url, '', '', '', $arrayofjs, $arrayofcss, $morequerystring, $morecssonbody);
 
@@ -1333,21 +1319,22 @@ function llxHeaderSignature($title, $head = "", $disablejs = 0, $disablehead = 0
 */
 function llxHeaderTicketDigirisk($title, $head = "", $disablejs = 0, $disablehead = 0,$arrayofjs = array(), $arrayofcss = array())
 {
-	global $conf, $mysoc;
+	global $conf;
+
+	require_once DOL_DOCUMENT_ROOT . '/core/lib/files.lib.php';
 
 	top_htmlhead($head, $title, $disablejs, $disablehead, $arrayofjs, $arrayofcss, 0, 1); // Show html headers
 
-	if ( ! empty($conf->global->DIGIRISKDOLIBARR_TICKET_SHOW_COMPANY_LOGO)) {
-		// Define logo and logosmall
-		$logosmall = $mysoc->logo_small;
-		$logo      = $mysoc->logo;
-		// Define urllogo
-		$urllogo = '';
-		if ( ! empty($logosmall) && is_readable($conf->mycompany->dir_output . '/logos/thumbs/' . $logosmall)) {
-			$urllogo = DOL_URL_ROOT . '/viewimage.php?modulepart=mycompany&amp;entity=' . $conf->entity . '&amp;file=' . urlencode('logos/thumbs/' . $logosmall);
-		} elseif ( ! empty($logo) && is_readable($conf->mycompany->dir_output . '/logos/' . $logo)) {
-			$urllogo = DOL_URL_ROOT . '/viewimage.php?modulepart=mycompany&amp;entity=' . $conf->entity . '&amp;file=' . urlencode('logos/' . $logo);
+	if (!empty($conf->global->DIGIRISKDOLIBARR_TICKET_SHOW_COMPANY_LOGO)) {
+		$filedir  = $conf->mycompany->dir_output . '/logos/thumbs/';
+		$filelist = dol_dir_list($filedir, 'files');
+		if (is_array($filelist) && !empty($filelist)) {
+			foreach ($filelist as $file) {
+				// Define urllogo
+				$urllogo = DOL_URL_ROOT . '/viewimage.php?modulepart=mycompany&entity=' . $conf->entity . '&file=' . urlencode('logos/thumbs/' . $file['name']);
+			}
 		}
+
 		// Output html code for logo
 		if ($urllogo) {
 			print '<div class="center signature-logo">';
@@ -1383,6 +1370,7 @@ function digirisk_show_medias($sdir, $size = '', $maxHeight = 80, $maxWidth = 80
 	$j         = 0;
 
 	if (count($filearray)) {
+		print '<div class="wpeo-gridlayout grid-4 grid-gap-3 grid-margin-2 ecm-photo-list ecm-photo-list">';
 		if ($sortfield && $sortorder) {
 			$filearray = dol_sort_array($filearray, $sortfield, $sortorder);
 		}
@@ -1420,6 +1408,12 @@ function digirisk_show_medias($sdir, $size = '', $maxHeight = 80, $maxWidth = 80
 					}
 				}
 			}
+		}
+		print '</div>';
+	} else {
+		// Display media library is empty if no media uploaded
+		if (!is_array($_FILES['userfile']['tmp_name'])) {
+			print($langs->trans("EmptyMediaLibrary"));
 		}
 	}
 

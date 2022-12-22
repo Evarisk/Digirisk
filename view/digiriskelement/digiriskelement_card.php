@@ -360,7 +360,7 @@ if (($id || $ref) && $action == 'edit') {
 
 	if ($id != $conf->global->DIGIRISKDOLIBARR_DIGIRISKELEMENT_TRASH) {
 		print '<tr><td>' . $langs->trans("ParentElement") . '</td><td>';
-		print $object->select_digiriskelement_list($object->fk_parent, 'fk_parent', 'element_type="groupment"', 0, 0, array(), 0, 0, 'minwidth100', GETPOST('id'), false);
+		print $object->select_digiriskelement_list($object->fk_parent, 'fk_parent', 'element_type="groupment" AND fk_parent != ' . $conf->global->DIGIRISKDOLIBARR_DIGIRISKELEMENT_TRASH, 0, 0, array(), 0, 0, 'minwidth100', GETPOST('id'), false);
 	}
 
 	print '</td></tr>';
@@ -471,7 +471,7 @@ if ((empty($action) || ($action != 'edit' && $action != 'create'))) {
 			}
 
 			if ($permissiontodelete && ! array_key_exists($object->id, $trash_list) && $object->id != $conf->global->DIGIRISKDOLIBARR_DIGIRISKELEMENT_TRASH) {
-				print '<a class="butActionDelete" href="' . $_SERVER["PHP_SELF"] . '?id=' . $object->id . '&action=delete">' . $langs->trans("Delete") . '</a>';
+				print '<a class="butActionDelete" href="' . $_SERVER["PHP_SELF"] . '?id=' . $object->id . '&action=delete&token='.newToken().'">' . $langs->trans("Delete") . '</a>';
 			} else {
 				print '<a class="butActionRefused classfortooltip" href="#" title="' . $langs->trans("CanNotDoThis") . '">' . $langs->trans('Delete') . '</a>';
 			}

@@ -72,7 +72,7 @@ class InterfaceDigiriskdolibarrTriggers extends DolibarrTriggers
 		$this->name        = preg_replace('/^Interface/i', '', get_class($this));
 		$this->family      = "demo";
 		$this->description = "Digiriskdolibarr triggers.";
-		$this->version     = '9.8.0';
+		$this->version     = '9.8.1';
 		$this->picto       = 'digiriskdolibarr@digiriskdolibarr';
 	}
 
@@ -827,10 +827,15 @@ class InterfaceDigiriskdolibarrTriggers extends DolibarrTriggers
 
 			case 'TICKET_CREATE' :
 				if ($conf->global->DIGIRISKDOLIBARR_SEND_EMAIL_ON_TICKET_SUBMIT) {
-					//envoi du mail avec les infos de l'objet aux adresses mail configurées
-					//envoi du mail avec une trad puis avec un model
+					// envoi du mail avec les infos de l'objet aux adresses mail configurées
+					// envoi du mail avec une trad puis avec un model
+
+					require_once __DIR__ . '/../../class/digiriskelement.class.php';
+
 					$error = 0;
-					$formmail = new FormMail($this->db);
+					$formmail        = new FormMail($this->db);
+					$digiriskelement = new DigiriskElement($this->db);
+
 					$arraydefaultmessage = $formmail->getEMailTemplate($this->db, 'ticket_send', $user, $langs); // If $model_id is empty, preselect the first one
 
 					$table_element = $object->table_element;
@@ -838,10 +843,25 @@ class InterfaceDigiriskdolibarrTriggers extends DolibarrTriggers
 					$substitutionarray = getCommonSubstitutionArray($langs, 0, null,$object);
 					$object->table_element = $table_element;
 
+					$message = $langs->trans('Hello') . ',' . '<br><br>';
+					$message .= '<span style="color:#c55a11">' . $langs->trans('ANewTicketHasBeenSubmitted', $conf->global->MAIN_INFO_SOCIETE_NOM) . '.' . '</span><br><br>';
+					$message .= '<strong>' . $langs->trans('Service') . ' : ' . '</strong>';
+					$digiriskelement->fetch($object->array_options['options_digiriskdolibarr_ticket_service']);
+					$message .= $digiriskelement->ref . ' - ' . $digiriskelement->label . '<br><br>';
+					$message .= '<strong>' . $langs->trans('Author') . ' : ' . '</strong>';
+					$message .= strtoupper($object->array_options['options_digiriskdolibarr_ticket_lastname']) . ' ' . $object->array_options['options_digiriskdolibarr_ticket_firstname'] . '<br><br>';
+					$message .= '<strong>' . $langs->trans('The') . ' : ' . '</strong>';
+					$message .= dol_print_date($object->array_options['options_digiriskdolibarr_ticket_date'], 'daytext') . '<br><br>';
+					$message .= '<strong>' . $langs->trans('TicketMessage') . ' : ' . '</strong>' . '<br>';
+					$message .= $object->message . '<br><br>';
+					$message .= $langs->trans('WithKindRegards') . ',' . '<br><br>';
+					$message .= '<strong style="color: #c0392b;">' . $langs->trans('SeeTicketUrl') . ' : ' . '</strong><a href="' . DOL_MAIN_URL_ROOT . '/ticket/card.php?id=' . $object->id . '">' . DOL_MAIN_URL_ROOT . '/ticket/card.php?id=' . $object->id . '</a><br><br>';
+					$message .= '<span style="color: #afabab; font-size: 12px;">' . $langs->trans('AutoNotificationTicket') . '<br><span style="color: #1f497d;">' . '- - DOLIBARR - -' . '</span><br>' . $langs->trans('TicketPublicInterfaceOtherName') . '</span><br><br>';
+
 					complete_substitutions_array($substitutionarray, $langs, $object);
 
 					$subject = make_substitutions($arraydefaultmessage->topic,$substitutionarray);
-					$message = make_substitutions($arraydefaultmessage->content,$substitutionarray) . '<br>' . $object->message;
+					$message .= make_substitutions($arraydefaultmessage->content,$substitutionarray);
 
 					if ( ! $error) {
 						$langs->load('mails');
@@ -884,7 +904,7 @@ class InterfaceDigiriskdolibarrTriggers extends DolibarrTriggers
 										$actioncomm->code      = 'AC_TICKET_CREATION_MAIL_SENT';
 										$actioncomm->type_code = 'AC_OTH_AUTO';
 										$actioncomm->label = $langs->transnoentities('TicketCreationMailWellSent');
-										$actioncomm->note = $langs->transnoentities('TicketCreationMailSent', $listOfMails);
+										$actioncomm->note = $langs->transnoentities('TicketCreationMailSent', $sendto);
 										$actioncomm->datep       = $now;
 										$actioncomm->fk_element  = $object->id;
 										$actioncomm->userownerid = $user->id;
@@ -945,13 +965,12 @@ class InterfaceDigiriskdolibarrTriggers extends DolibarrTriggers
 													$actioncomm->code      = 'AC_TICKET_CREATION_MAIL_SENT';
 													$actioncomm->type_code = 'AC_OTH_AUTO';
 													$actioncomm->label = $langs->transnoentities('TicketCreationMailWellSent');
-													$actioncomm->note = $langs->transnoentities('TicketCreationMailSent', $listOfMails);
+													$actioncomm->note = $langs->transnoentities('TicketCreationMailSent', $sendto);
 													$actioncomm->datep       = $now;
 													$actioncomm->fk_element  = $object->id;
 													$actioncomm->userownerid = $user->id;
 													$actioncomm->percentage  = -1;
 													$actioncomm->create($user);
-													break;
 												}
 											} else {
 												setEventMessages($langs->trans('ErrorSetupEmail'), '', 'errors');

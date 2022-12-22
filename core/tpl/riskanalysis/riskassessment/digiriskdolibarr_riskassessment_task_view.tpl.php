@@ -67,7 +67,7 @@ $related_tasks = $risk->get_related_tasks($risk); ?>
 												<i class="fas fa-calendar-alt"></i> <?php echo date('d/m/Y', (($conf->global->DIGIRISKDOLIBARR_SHOW_TASK_START_DATE && ( ! empty($related_task->date_start))) ? $related_task->date_start : $related_task->date_c)) . (($conf->global->DIGIRISKDOLIBARR_SHOW_TASK_END_DATE && ( ! empty($related_task->date_end))) ? ' - ' . date('d/m/Y', $related_task->date_end) : ''); ?>
 											</span>
 											<span class="riskassessment-task-timespent">
-												<?php $allTimeSpentArray = $related_task->fetchAllTimeSpentAllUser('AND ptt.fk_task='.$related_task->id);
+												<?php $allTimeSpentArray = $related_task->fetchAllTimeSpentAllUser('AND ptt.fk_task='.$related_task->id, 'task_datehour', 'DESC');
 													$allTimeSpent = 0;
 													foreach ($allTimeSpentArray as $timespent) {
 														$allTimeSpent += $timespent->timespent_duration;
@@ -75,8 +75,8 @@ $related_tasks = $risk->get_related_tasks($risk); ?>
 												?>
 												<i class="fas fa-clock"></i> <?php echo $allTimeSpent/60 . '/' . $related_task->planned_workload/60 ?>
 											</span>
+											<span class="riskassessment-task-budget"><i class="fas fa-coins"></i> <?php echo price($related_task->budget_amount, 0, $langs, 1, 0, 0, $conf->currency); ?></span>
 											<span class="riskassessment-task-progress <?php echo $related_task->getTaskProgressColorClass($task_progress); ?>"><?php echo $task_progress ? $task_progress . " %" : 0 . " %" ?></span>
-											<span class="riskassessment-task-budget"><i class="fas fa-dollar-sign"></i> <?php echo price($related_task->budget_amount, 0, $langs, 1, 0, 0, $conf->currency); ?></span>
 										</div>
 										<div class="riskassessment-task-title">
 											<?php if ($contextpage != 'sharedrisk' && $contextpage != 'inheritedrisk' && !$conf->global->DIGIRISKDOLIBARR_SHOW_TASK_CALCULATED_PROGRESS) : ?>
@@ -127,7 +127,7 @@ $related_tasks = $risk->get_related_tasks($risk); ?>
 																		<i class="fas fa-calendar-alt"></i> <?php echo date('d/m/Y', (($conf->global->DIGIRISKDOLIBARR_SHOW_TASK_START_DATE && ( ! empty($related_task->date_start))) ? $related_task->date_start : $related_task->date_c)) . (($conf->global->DIGIRISKDOLIBARR_SHOW_TASK_END_DATE && ( ! empty($related_task->date_end))) ? ' - ' . date('d/m/Y', $related_task->date_end) : ''); ?>
 																	</span>
 															<span class="riskassessment-task-timespent">
-																		<?php $allTimeSpentArray = $related_task->fetchAllTimeSpentAllUser('AND ptt.fk_task='.$related_task->id);
+																		<?php $allTimeSpentArray = $related_task->fetchAllTimeSpentAllUser('AND ptt.fk_task='.$related_task->id, 'task_datehour', 'DESC');
 																		$allTimeSpent = 0;
 																		foreach ($allTimeSpentArray as $timespent) {
 																			$allTimeSpent += $timespent->timespent_duration;
@@ -136,14 +136,14 @@ $related_tasks = $risk->get_related_tasks($risk); ?>
 																		<i class="fas fa-clock"></i> <?php echo $allTimeSpent/60 . '/' . $related_task->planned_workload/60 ?>
 																	</span>
 															<span class="riskassessment-task-progress <?php echo $related_task->getTaskProgressColorClass($task_progress); ?>"><?php echo $task_progress ? $task_progress . " %" : 0 . " %" ?></span>
-															<span class="riskassessment-task-budget"><i class="fas fa-dollar-sign"></i> <?php echo price($related_task->budget_amount, 0, $langs, 1, 0, 0, $conf->currency); ?></span>
+															<span class="riskassessment-task-budget"><i class="fas fa-coins"></i> <?php echo price($related_task->budget_amount, 0, $langs, 1, 0, 0, $conf->currency); ?></span>
 														</div>
 
 														<div class="modal-close"><i class="fas fa-times"></i></div>
 													</div>
 													<!-- Modal-Content -->
 													<div class="modal-content">
-														<?php $allTimeSpentArray = $related_task->fetchAllTimeSpentAllUser('AND ptt.fk_task='.$related_task->id); ?>
+														<?php $allTimeSpentArray = $related_task->fetchAllTimeSpentAllUser('AND ptt.fk_task='.$related_task->id, 'task_datehour', 'DESC'); ?>
 														<div class="riskassessment-task-title">
 															<?php if (!$conf->global->DIGIRISKDOLIBARR_SHOW_TASK_CALCULATED_PROGRESS) : ?>
 															<span class="riskassessment-task-progress-checkbox">
@@ -164,7 +164,7 @@ $related_tasks = $risk->get_related_tasks($risk); ?>
 															</div>
 														</div>
 														<span class="title"><?php echo $langs->trans('Budget'); ?></span>
-														<input type="text" class="riskassessment-task-budget" name="budget" value="<?php echo price2num($related_task->budget_amount); ?>">
+														<input type="text" class="riskassessment-task-budget<?php echo $related_task->id ?>" name="budget" value="<?php echo price2num($related_task->budget_amount); ?>">
 														<hr>
 														<!-- RISKASSESSMENT TASK TIME SPENT NOTICE -->
 														<div class="messageSuccessTaskTimeSpentCreate<?php echo $related_task->id ?> notice hidden">
@@ -324,7 +324,7 @@ $related_tasks = $risk->get_related_tasks($risk); ?>
 																										<div class="riskassessment-task-timespent">
 																											<span class="title"><?php echo $langs->trans('TimeSpent'); ?></span>
 																											<span class="title"><?php echo $langs->trans('Date'); ?></span>
-																											<?php print $form->selectDate($time_spent->timespent_datehour, 'RiskassessmentTaskTimespentDateEdit'.$related_task->id, 1, 1, 0, 'riskassessment_task_timespent_form', 1, 0); ?>
+																											<?php print $form->selectDate($time_spent->timespent_datehour, 'RiskassessmentTaskTimespentDateEdit'.$time_spent->timespent_id, 1, 1, 0, 'riskassessment_task_timespent_form', 1, 0); ?>
 																											<span class="title"><?php echo $langs->trans('Comment'); ?> <input type="text" class="riskassessment-task-timespent-comment" name="comment" value="<?php echo $time_spent->timespent_note; ?>"></span>
 																											<span class="title"><?php echo $langs->trans('Duration'); ?></span>
 																											<span class="time"><?php print '<input type="number" placeholder="minutes" class="riskassessment-task-timespent-duration" name="timespentDuration" value="'.($time_spent->timespent_duration/60).'">'; ?></span>
@@ -430,7 +430,7 @@ $related_tasks = $risk->get_related_tasks($risk); ?>
 											<i class="fas fa-calendar-alt"></i> <?php echo date('d/m/Y', (($conf->global->DIGIRISKDOLIBARR_SHOW_TASK_START_DATE && ( ! empty($related_task->date_start))) ? $related_task->date_start : $related_task->date_c)) . (($conf->global->DIGIRISKDOLIBARR_SHOW_TASK_END_DATE && ( ! empty($related_task->date_end))) ? ' - ' . date('d/m/Y', $related_task->date_end) : ''); ?>
 										</span>
 										<span class="riskassessment-task-timespent">
-											<?php $allTimeSpentArray = $related_task->fetchAllTimeSpentAllUser('AND ptt.fk_task='.$related_task->id);
+											<?php $allTimeSpentArray = $related_task->fetchAllTimeSpentAllUser('AND ptt.fk_task='.$related_task->id, 'task_datehour', 'DESC');
 											$allTimeSpent = 0;
 											foreach ($allTimeSpentArray as $timespent) {
 												$allTimeSpent += $timespent->timespent_duration;
@@ -497,7 +497,7 @@ $related_tasks = $risk->get_related_tasks($risk); ?>
 														</div>
 													</div>
 													<span class="title"><?php echo $langs->trans('Budget'); ?></span>
-													<input type="text" class="riskassessment-task-budget" name="budget" value="<?php echo price2num($related_task->budget_amount); ?>">
+													<input type="text" class="riskassessment-task-budget<?php echo $related_task->id ?>" name="budget" value="<?php echo price2num($related_task->budget_amount); ?>">
 												</div>
 											</div>
 										</div>
@@ -577,11 +577,11 @@ $related_tasks = $risk->get_related_tasks($risk); ?>
 								<div class="riskassessment-task-date wpeo-gridlayout grid-2">
 									<div>
 										<span class="title"><?php echo $langs->trans('DateStart'); ?></span>
-										<?php print $form->selectDate(dol_now('tzuser'), 'RiskassessmentTaskDateStart', 1, 1, 0, '', 1, 1); ?>
+										<?php print $form->selectDate(dol_now('tzuser'), 'RiskassessmentTaskDateStart' . $risk->id, 1, 1, 0, '', 1, 1); ?>
 									</div>
 									<div>
 										<span class="title"><?php echo $langs->trans('Deadline'); ?></span>
-										<?php print $form->selectDate(-1,'RiskassessmentTaskDateEnd', 1, 1, 0, '', 1, 1); ?>
+										<?php print $form->selectDate(-1,'RiskassessmentTaskDateEnd'. $risk->id, 1, 1, 0, '', 1, 1); ?>
 									</div>
 								</div>
 								<span class="title"><?php echo $langs->trans('Budget'); ?></span>
@@ -701,7 +701,7 @@ $related_tasks = $risk->get_related_tasks($risk); ?>
 																	<i class="fas fa-calendar-alt"></i> <?php echo date('d/m/Y', (($conf->global->DIGIRISKDOLIBARR_SHOW_TASK_START_DATE && ( ! empty($related_task->date_start))) ? $related_task->date_start : $related_task->date_c)) . (($conf->global->DIGIRISKDOLIBARR_SHOW_TASK_END_DATE && ( ! empty($related_task->date_end))) ? ' - ' . date('d/m/Y', $related_task->date_end) : ''); ?>
 																</span>
 																<span class="riskassessment-task-progress <?php echo $related_task->getTaskProgressColorClass($task_progress); ?>"><?php echo $task_progress ? $task_progress . " %" : 0 . " %" ?></span>
-																<span class="riskassessment-task-budget"><i class="fas fa-dollar-sign"></i> <?php echo price($related_task->budget_amount, 0, $langs, 1, 0, 0, $conf->currency); ?></span>
+																<span class="riskassessment-task-budget"><i class="fas fa-coins"></i> <?php echo price($related_task->budget_amount, 0, $langs, 1, 0, 0, $conf->currency); ?></span>
 															</div>
 															<div class="riskassessment-task-title">
 																<?php if ($contextpage != 'sharedrisk' && $contextpage != 'inheritedrisk' && !$conf->global->DIGIRISKDOLIBARR_SHOW_TASK_CALCULATED_PROGRESS) : ?>

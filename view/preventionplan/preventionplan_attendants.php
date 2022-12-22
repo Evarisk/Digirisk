@@ -309,8 +309,8 @@ $morehtmlref                             .= '<div class="refidno">';
 $ext_society  = $digiriskresources->fetchResourcesFromObject('PP_EXT_SOCIETY', $object);
 $morehtmlref .= $langs->trans('ExtSociety') . ' : ' . $ext_society->getNomUrl(1);
 // Project
-$project->fetch($preventionplan->fk_project);
-$morehtmlref .= '<br>' . $langs->trans('Project') . ' : ' . getNomUrlProject($project, 1, 'blank');
+$project->fetch($object->fk_project);
+$morehtmlref .= '<br>' . $langs->trans('Project') . ' : ' . getNomUrlProject($project, 1, 'blank', 1);
 $morehtmlref .= '</div>';
 
 //$morehtmlleft = '<div class="floatleft inline-block valignmiddle divphotoref">'.digirisk_show_photos('digiriskdolibarr', $conf->digiriskdolibarr->multidir_output[$entity].'/'.$object->element_type, 'small', 5, 0, 0, 0, $width,0, 0, 0, 0, $object->element_type, $object).'</div>';
@@ -536,6 +536,7 @@ if ((empty($action) || ($action != 'create' && $action != 'edit'))) {
 		}
 		print '<tr class="oddeven"><td class="maxwidth200">';
 		print digirisk_selectcontacts($ext_society->id, GETPOST('ext_intervenants'), 'ext_intervenants[]', 0, '', '', 0, 'width200', false, 1, 0, array(), 'multiple', 'ext_intervenants', false, 0, $already_selected_intervenants);
+		print ' <a href="' . DOL_URL_ROOT . '/contact/card.php?action=create&socid='. $ext_society->id .'&backtopage=' . urlencode($_SERVER["PHP_SELF"] . '?id=' . $object->id) . '" target="_blank"><span class="fa fa-plus-circle valignmiddle paddingleft" title="' . $langs->trans("AddContact") . '"></span></a>';
 		print '</td>';
 		print '<td>' . $langs->trans("ExtSocietyIntervenants") . '</td>';
 		print '<td class="center">';

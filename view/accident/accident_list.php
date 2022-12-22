@@ -38,6 +38,7 @@ if ( ! $res) die("Include of main fails");
 
 require_once DOL_DOCUMENT_ROOT . '/projet/class/project.class.php';
 require_once DOL_DOCUMENT_ROOT . '/core/lib/date.lib.php';
+require_once DOL_DOCUMENT_ROOT . '/core/lib/usergroups.lib.php';
 require_once DOL_DOCUMENT_ROOT . '/core/class/html.formother.class.php';
 require_once DOL_DOCUMENT_ROOT . '/user/class/user.class.php';
 require_once DOL_DOCUMENT_ROOT . '/contact/class/contact.class.php';
@@ -67,6 +68,7 @@ $fromid      = GETPOST('fromid');
 $limit       = GETPOST('limit', 'int') ? GETPOST('limit', 'int') : $conf->liste_limit;
 $sortfield   = GETPOST("sortfield", "alpha");
 $sortorder   = GETPOST("sortorder", 'alpha');
+$fromiduser  = GETPOST('fromiduser', 'int'); //element id
 $page        = GETPOSTISSET('pageplusone') ? (GETPOST('pageplusone') - 1) : GETPOST("page", 'int');
 $page        = is_numeric($page) ? $page : 0;
 $page        = $page == -1 ? 0 : $page;
@@ -137,7 +139,7 @@ if (empty($reshook)) {
 	// Selection of new fields
 	include DOL_DOCUMENT_ROOT . '/core/actions_changeselectedfields.inc.php';
 
-	$backtopage = dol_buildpath('/digiriskdolibarr/view/accident/accident_list.php', 1);
+	$backtopage = dol_buildpath('/digiriskdolibarr/view/accident/accident_list.php', 1) . (!empty($fromiduser) ? '?fromiduser=' . $fromiduser : '');
 
 	// Purge search criteria
 	if (GETPOST('button_removefilter_x', 'alpha') || GETPOST('button_removefilter.x', 'alpha') || GETPOST('button_removefilter', 'alpha')) { // All tests are required to be compatible with all browsers
@@ -171,8 +173,8 @@ if (empty($reshook)) {
 			}
 
 			// Delete accident OK
-			$urltogo = str_replace('__ID__', $result, $backtopage);
-			$urltogo = preg_replace('/--IDFORBACKTOPAGE--/', $id, $urltogo); // New method to autoselect project after a New on another form object creation
+			$urltogo = str_replace('__ID__', (empty($fromiduser) ? $id : $fromiduser), $backtopage);
+			$urltogo = preg_replace('/--IDFORBACKTOPAGE--/', (empty($fromiduser) ? $id : $fromiduser), $urltogo); // New method to autoselect project after a New on another form object creation
 			header("Location: " . $_SERVER["PHP_SELF"]);
 			exit;
 		}
@@ -189,27 +191,42 @@ $formother = new FormOther($db);
 $title    = $langs->trans("AccidentList");
 $help_url = '';
 
+$morejs  = array("/digiriskdolibarr/js/digiriskdolibarr.js");
+$morecss = array("/digiriskdolibarr/css/digiriskdolibarr.css");
+
+if ($fromid > 0)  {
+	digiriskHeader($title, $help_url, $morejs, $morecss);
+} else {
+	llxHeader('', $title, $help_url, '', 0, 0, $morejs, $morecss);
+}
+
 if ($fromid > 0) {
 	$objectlinked = $digiriskelement;
 	$objectlinked->fetch($fromid);
 	$head = digiriskelementPrepareHead($objectlinked);
+	print dol_get_fiche_head($head, 'elementAccidents', $langs->trans("Accident"), -1, "digiriskdolibarr@digiriskdolibarr");
+} elseif ($fromiduser > 0) {
+	$userObject = new User($db);
+	$prehead = 'user_prepare_head';
+	$userObject->fetch($fromiduser, '', '', 1);
+	$userObject->getrights();
+	$head = $prehead($userObject);
+	print dol_get_fiche_head($head, 'accidents', $langs->trans('Accidents'), -1, "user");
+} elseif ($accident->id > 0) {
+	$head = digiriskelementPrepareHead($object);
+	print dol_get_fiche_head($head, 'elementAccidents', $langs->trans("Accident"), -1, "digiriskdolibarr@digiriskdolibarr");
 }
 
-$morejs  = array("/digiriskdolibarr/js/digiriskdolibarr.js");
-$morecss = array("/digiriskdolibarr/css/digiriskdolibarr.css");
-
+// Object card
+// ------------------------------------------------------------
 if ($fromid > 0) {
-	digiriskHeader($title, $help_url, $morejs, $morecss);
-	print dol_get_fiche_head($head, 'elementAccidents', $langs->trans("Accident"), -1, "digiriskdolibarr@digiriskdolibarr");
-	// Object card
-	// ------------------------------------------------------------
-	$height                                   = 80;
-	$width                                    = 80;
+	$height = 80;
+	$width = 80;
 	dol_strlen($objectlinked->label) ? $morehtmlref = ' - ' . $objectlinked->label : '';
-	$morehtmlref                             .= '<div class="refidno">';
+	$morehtmlref .= '<div class="refidno">';
 	// ParentElement
 	$parent_element = new DigiriskElement($db);
-	$result         = $parent_element->fetch($objectlinked->fk_parent);
+	$result = $parent_element->fetch($objectlinked->fk_parent);
 	if ($result > 0) {
 		$morehtmlref .= $langs->trans("Description") . ' : ' . $objectlinked->description;
 		$morehtmlref .= '<br>' . $langs->trans("ParentElement") . ' : ' . $parent_element->getNomUrl(1, 'blank', 1);
@@ -221,9 +238,11 @@ if ($fromid > 0) {
 	$morehtmlref .= '</div>';
 	$morehtmlleft = '<div class="floatleft inline-block valignmiddle divphotoref">' . digirisk_show_photos('digiriskdolibarr', $conf->digiriskdolibarr->multidir_output[$conf->entity] . '/' . $objectlinked->element_type, 'small', 5, 0, 0, 0, $height, $width, 0, 0, 0, $objectlinked->element_type, $objectlinked) . '</div>';
 	digirisk_banner_tab($objectlinked, 'ref', '', 0, 'ref', 'ref', $morehtmlref, '', 0, $morehtmlleft);
-} else {
-	llxHeader("", $title, $help_url, '', '', '', $morejs, $morecss);
+} elseif ($fromiduser > 0) {
+	$linkback = '<a href="' . DOL_URL_ROOT . '/user/list.php?restore_lastsearch_values=1">' . $langs->trans("BackToList") . '</a>';
+	dol_banner_tab($userObject, 'fromiduser', $linkback, $user->rights->user->user->lire || $user->admin);
 }
+
 // Add $param from extra fields
 include DOL_DOCUMENT_ROOT . '/core/tpl/extrafields_list_search_param.tpl.php';
 
@@ -236,10 +255,14 @@ $massactionbutton = $form->selectMassAction('', $arrayofmassactions);
 
 $newcardbutton = '';
 if ($permissiontoadd) {
-	$newcardbutton .= dolGetButtonTitle($langs->trans('NewAccident'), '', 'fa fa-plus-circle', DOL_URL_ROOT . '/custom/digiriskdolibarr/view/accident/accident_card.php?action=create' . (!empty($fromid) ? '&fromid=' . $fromid : ''));
+	$newcardbutton .= dolGetButtonTitle($langs->trans('NewAccident'), '', 'fa fa-plus-circle', DOL_URL_ROOT . '/custom/digiriskdolibarr/view/accident/accident_card.php?action=create' . (!empty($fromid) ? '&fromid=' . $fromid : '') . (!empty($fromiduser) ? '&fromiduser=' . $fromiduser : ''));
 }
 
-print '<form method="POST" id="searchFormList" action="' . $_SERVER["PHP_SELF"] . '">';
+if ($fromiduser > 0) {
+	print '<div class="underbanner clearboth"></div>';
+}
+
+print '<form method="POST" id="searchFormList" action="' . $_SERVER["PHP_SELF"] . (!empty($fromiduser) ? '?fromid=' . $fromiduser : '') .'">';
 if ($optioncss != '') print '<input type="hidden" name="optioncss" value="' . $optioncss . '">';
 print '<input type="hidden" name="token" value="' . newToken() . '">';
 print '<input type="hidden" name="formfilteraction" id="formfilteraction" value="list">';
@@ -275,6 +298,8 @@ else $sql                                                                       
 $sql                                                                                                                                                  .= ' AND status != 0';
 if ($fromid > 0) {
 	$sql .= ' AND fk_element =' . $fromid;
+} elseif ($fromiduser > 0){
+	$sql .= " AND fk_user_victim = " . $fromiduser;
 }
 
 foreach ($search as $key => $val) {
@@ -357,6 +382,9 @@ foreach ($accident->fields as $key => $val) {
 
 		if (is_array($val['arrayofkeyval'])) print $form->selectarray('search_' . $key, $val['arrayofkeyval'], $search[$key], $val['notnull'], 0, 0, '', 1, 0, 0, '', 'maxwidth75');
 		elseif (strpos($val['type'], 'integer:') === 0) {
+			if ($key == 'fk_user_victim' && $fromiduser > 0) {
+				$search[$key] = $fromiduser;
+			}
 			print $accident->showInputField($val, $key, $search[$key], '', '', 'search_', 'maxwidth150', 1);
 		} elseif ( ! preg_match('/^(date|timestamp)/', $val['type'])) print '<input type="text" class="flat maxwidth75" name="search_' . $key . '" value="' . dol_escape_htmltag($search[$key]) . '">';
 		print '</td>';
@@ -466,7 +494,7 @@ while ($i < ($limit ? min($num, $limit) : $num)) {
 					}
 				}
 
-				$advancement = bcdiv((($counter / $maxnumber) * 100), 1, 2);
+				$advancement = price2Num((($counter / $maxnumber) * 100), 2);
 
 				print $advancement . '%';
 				?>

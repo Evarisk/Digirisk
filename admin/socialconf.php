@@ -220,7 +220,7 @@ $HarassmentOfficer = $allLinks['HarassmentOfficer'];
 print '<tr>';
 print '<td>' . $langs->trans("ActionOnUser") . '</td>';
 print '<td colspan="3" class="maxwidthonsmartphone">';
-print $form->select_dolusers($HarassmentOfficer->id, 'HarassmentOfficer', 1, null, 0, '', '', 0, 0, 0, 'AND u.statut = 1', 0, '', 'minwidth300');
+print $form->select_dolusers($HarassmentOfficer->id, 'HarassmentOfficer', 1, null, 0, '', '', $conf->entity, 0, 0, 'AND u.statut = 1', 0, '', 'minwidth300');
 if ( ! GETPOSTISSET('backtopage')) print ' <a href="' . DOL_URL_ROOT . '/user/card.php?action=create&backtopage=' . urlencode($_SERVER["PHP_SELF"] . '?action=create') . '"><span class="fa fa-plus-circle valignmiddle paddingleft" title="' . $langs->trans("AddUser") . '"></span></a>';
 print '</td></tr>';
 
@@ -233,7 +233,7 @@ $HarassmentOfficerCSE = $allLinks['HarassmentOfficerCSE'];
 print '<tr>';
 print '<td>' . $langs->trans("ActionOnUser") . '</td>';
 print '<td colspan="3" class="maxwidthonsmartphone">';
-print $form->select_dolusers($HarassmentOfficerCSE->id, 'HarassmentOfficerCSE', 1, null, 0, '', '', 0, 0, 0, 'AND u.statut = 1', 0, '', 'minwidth300');
+print $form->select_dolusers($HarassmentOfficerCSE->id, 'HarassmentOfficerCSE', 1, null, 0, '', '', $conf->entity, 0, 0, 'AND u.statut = 1', 0, '', 'minwidth300');
 if ( ! GETPOSTISSET('backtopage')) print ' <a href="' . DOL_URL_ROOT . '/user/card.php?action=create&backtopage=' . urlencode($_SERVER["PHP_SELF"] . '?action=create') . '"><span class="fa fa-plus-circle valignmiddle paddingleft" title="' . $langs->trans("AddUser") . '"></span></a>';
 print '</td></tr>';
 
@@ -251,7 +251,7 @@ print '</td></tr>';
 
 // * ESC Titulars - Titulaires CSE *
 
-$userlist 	  = $form->select_dolusers('', '', 0, null, 0, '', '', 0, 0, 0, 'AND u.statut = 1', 0, '', '', 0, 1);
+$userlist 	  = $form->select_dolusers('', '', 0, null, 0, '', '', $conf->entity, 0, 0, 'AND u.statut = 1', 0, '', '', 0, 1);
 $titulars_cse = $allLinks['TitularsCSE'];
 
 print '<tr>';
@@ -267,7 +267,7 @@ print '</td></tr>';
 
 // * ESC Alternates - Suppléants CSE *
 
-$userlist       = $form->select_dolusers('', '', 0, null, 0, '', '', 0, 0, 0, 'AND u.statut = 1', 0, '', '', 0, 1);
+$userlist       = $form->select_dolusers('', '', 0, null, 0, '', '', $conf->entity, 0, 0, 'AND u.statut = 1', 0, '', '', 0, 1);
 $alternates_cse = $allLinks['AlternatesCSE'];
 
 print '<tr>';
@@ -292,7 +292,7 @@ print $form->selectDate(strtotime($electionDateDP) ? $electionDateDP : -1, 'Elec
 
 // * Staff Representatives Titulars - Titulaires Délégués du Personnel *
 
-$userlist    = $form->select_dolusers('', '', 0, null, 0, '', '', 0, 0, 0, 'AND u.statut = 1', 0, '', '', 0, 1);
+$userlist    = $form->select_dolusers('', '', 0, null, 0, '', '', $conf->entity, 0, 0, 'AND u.statut = 1', 0, '', '', 0, 1);
 $titulars_dp = $allLinks['TitularsDP'];
 
 print '<tr>';
@@ -307,7 +307,7 @@ print '</td></tr>';
 
 // * Staff Representatives Suppléants - Suppléants Délégués du Personnel *
 
-$userlist      = $form->select_dolusers('', '', 0, null, 0, '', '', 0, 0, 0, 'AND u.statut = 1', 0, '', '', 0, 1);
+$userlist      = $form->select_dolusers('', '', 0, null, 0, '', '', $conf->entity, 0, 0, 'AND u.statut = 1', 0, '', '', 0, 1);
 $alternates_dp = $allLinks['AlternatesDP'];
 
 print '<tr>';

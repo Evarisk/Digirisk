@@ -37,6 +37,7 @@ if ( ! $res && file_exists("../../../../main.inc.php")) $res = @include "../../.
 if ( ! $res) die("Include of main fails");
 
 require_once DOL_DOCUMENT_ROOT . '/core/class/html.formfile.class.php';
+require_once DOL_DOCUMENT_ROOT .'/core/class/html.formprojet.class.php';
 
 require_once __DIR__ . '/../../class/digiriskdocuments.class.php';
 require_once __DIR__ . '/../../class/digiriskelement.class.php';
@@ -135,6 +136,7 @@ if (empty($reshook)) {
 	// Action to add record
 	if ($action == 'add' && $permissiontoadd) {
 		// Get parameters
+		$project                     = GETPOST('fk_project');
 		$maitre_oeuvre_id            = GETPOST('maitre_oeuvre');
 		$extsociety_id               = GETPOST('ext_society');
 		$extresponsible_id           = GETPOST('ext_society_responsible');
@@ -155,7 +157,7 @@ if (empty($reshook)) {
 		$object->status        = 1;
 		$object->label         = $label;
 		$object->description   = $description;
-		$object->fk_project    = $conf->global->DIGIRISKDOLIBARR_FIREPERMIT_PROJECT;
+		$object->fk_project    = $project;
 
 		$date_start = dol_mktime(GETPOST('dateohour', 'int'), GETPOST('dateomin', 'int'), 0, GETPOST('dateomonth', 'int'), GETPOST('dateoday', 'int'), GETPOST('dateoyear', 'int'));
 		$date_end   = dol_mktime(GETPOST('dateehour', 'int'), GETPOST('dateemin', 'int'), 0, GETPOST('dateemonth', 'int'), GETPOST('dateeday', 'int'), GETPOST('dateeyear', 'int'));
@@ -242,6 +244,7 @@ if (empty($reshook)) {
 	// Action to update record
 	if ($action == 'update' && $permissiontoadd) {
 		// Get parameters
+		$project                     = GETPOST('fk_project');
 		$maitre_oeuvre_id            = GETPOST('maitre_oeuvre');
 		$extsociety_id               = GETPOST('ext_society');
 		$extresponsible_id           = GETPOST('ext_society_responsible');
@@ -266,6 +269,8 @@ if (empty($reshook)) {
 
 		$object->fk_preventionplan = $fk_preventionplan;
 		$object->fk_user_creat     = $user->id ? $user->id : 1;
+
+		$object->fk_project = $project;
 
 		// Check parameters
 		if ($maitre_oeuvre_id < 0) {
@@ -645,7 +650,8 @@ if (empty($reshook)) {
  * View
  */
 
-$form = new Form($db);
+$form        = new Form($db);
+$formproject = new FormProjets($db);
 
 $title         = $langs->trans("FirePermit");
 $title_create  = $langs->trans("NewFirePermit");
@@ -672,6 +678,11 @@ if ($action == 'create') {
 	print dol_get_fiche_head();
 
 	print '<table class="border centpercent tableforfieldcreate firepermit-table">' . "\n";
+
+	//Project -- projet
+	print '<tr><td class="fieldrequired minwidth400">' . img_picto('', 'project') . ' ' . $langs->trans("Project") . '</td><td>';
+	print $formproject->select_projects(-1, $conf->global->DIGIRISKDOLIBARR_FIREPERMIT_PROJECT, 'fk_project', 16, 0, 0);
+	print '</td></tr>';
 
 	//Label -- Libellé
 	print '<tr><td class="minwidth400">' . $langs->trans("Label") . '</td><td>';
@@ -793,8 +804,13 @@ if (($id || $ref) && $action == 'edit') {
 	print $object->ref;
 	print '</td></tr>';
 
+	//Project -- projet
+	print '<tr><td class="fieldrequired minwidth400">' . img_picto('', 'project') . ' ' . $langs->trans("Project") . '</td><td>';
+	print $formproject->select_projects(-1, $object->fk_project, 'fk_project', 16, 0, 0);
+	print '</td></tr>';
+
 	//Label -- Libellé
-	print '<tr><td class="fieldrequired minwidth400">' . $langs->trans("Label") . '</td><td>';
+	print '<tr><td class="minwidth400">' . $langs->trans("Label") . '</td><td>';
 	print '<input class="flat" type="text" size="36" name="label" id="label" value="' . $object->label . '">';
 	print '</td></tr>';
 
@@ -884,7 +900,7 @@ if (($id || $ref) && $action == 'edit') {
 	print '</td></tr>';
 
 	//FK PREVENTION PLAN
-	print '<tr class="oddeven"><td>' . $langs->trans("PreventionPlanLinked") . '</td><td>';
+	print '<tr class="fieldrequired"><td>' . $langs->trans("PreventionPlanLinked") . '</td><td>';
 	print $preventionplan->select_preventionplan_list($object->fk_preventionplan);
 	print '</td></tr>';
 
@@ -966,7 +982,7 @@ if ((empty($action) || ($action != 'create' && $action != 'edit'))) {
 	$morehtmlref .= $langs->trans('ExtSociety') . ' : ' . $ext_society->getNomUrl(1);
 	// Project
 	$project->fetch($object->fk_project);
-	$morehtmlref .= '<br>' . $langs->trans('Project') . ' : ' . getNomUrlProject($project, 1, 'blank');
+	$morehtmlref .= '<br>' . $langs->trans('Project') . ' : ' . getNomUrlProject($project, 1, 'blank', 1);
 	$morehtmlref .= '</div>';
 
 	digirisk_banner_tab($object, 'ref', '', 0, 'ref', 'ref', $morehtmlref, '', 0, '', $object->getLibStatut(5));
@@ -1148,7 +1164,7 @@ if ((empty($action) || ($action != 'create' && $action != 'edit'))) {
 
 					print '<td>';
 					$digiriskelement->fetch($item->fk_element);
-					print $digiriskelement->ref . " - " . $digiriskelement->label;
+					print $digiriskelement->getNomUrl(1, 'blank', 1);
 					print '</td>';
 
 					$coldisplay++;
@@ -1317,7 +1333,7 @@ if ((empty($action) || ($action != 'create' && $action != 'edit'))) {
 
 					print '<td>';
 					$digiriskelement->fetch($item->fk_element);
-					print $digiriskelement->ref . " - " . $digiriskelement->label;
+					print $digiriskelement->getNomUrl(1, 'blank', 1);
 					print '</td>';
 
 					$coldisplay++;
