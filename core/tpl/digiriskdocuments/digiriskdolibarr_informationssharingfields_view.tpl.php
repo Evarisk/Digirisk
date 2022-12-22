@@ -39,18 +39,22 @@ try {
 print '<tr>';
 print '<td class="titlefield"><i class="fas fa-hospital-alt"></i> ' . $form->textwithpicto($langs->trans("LabourDoctor"), $langs->trans('HowToSetDataLegalDisplay')) . '</td>';
 print '<td>';
-$contact->fetch($informationssharing->occupational_health_service->id);
-print $contact->getNomUrl(1) . ' ';
-print '<i class="fas fa-phone"></i> '  . $informationssharing->occupational_health_service->phone;
+if ($informationssharing->occupational_health_service->id > 0) {
+	$contact->fetch($informationssharing->occupational_health_service->id);
+	print $contact->getNomUrl(1) . ' ';
+	print '<i class="fas fa-phone"></i> '  . $informationssharing->occupational_health_service->phone;
+}
 print '</td></tr>';
 
 // Inspecteur du travail
 print '<tr>';
 print '<td class="titlefield minwidth300"><i class="fas fa-search"></i> ' . $form->textwithpicto($langs->trans("LabourInspector"), $langs->trans('HowToSetDataLegalDisplay')) . '</td>';
 print '<td>';
-$contact->fetch($informationssharing->detective_work->id);
-print $contact->getNomUrl(1) . ' ';
-print '<i class="fas fa-phone"></i> ' . $informationssharing->detective_work->phone;
+if ($informationssharing->detective_work->id > 0) {
+	$contact->fetch($informationssharing->detective_work->id);
+	print $contact->getNomUrl(1) . ' ';
+	print '<i class="fas fa-phone"></i> ' . $informationssharing->detective_work->phone;
+}
 print '</td></tr>';
 
 // Harassment officer more 250 employees

@@ -202,7 +202,7 @@ if ($conf->societe->enabled) {
 
 		//For external user force the company to user company
 		if ( ! empty($user->socid)) {
-			print $form->select_company($user->socid, 'labourdoctor_socid', '', 1, 1, 0, $events, 0, 'minwidth300');
+			print $form->select_company($user->socid, 'labourdoctor_socid', '', 0, 1, 0, $events, 0, 'minwidth300');
 		} else {
 			print $form->select_company('', 'labourdoctor_socid', '', 'SelectThirdParty', 1, 0, $events, 0, 'minwidth300');
 		}
@@ -218,11 +218,11 @@ if ($conf->societe->enabled) {
 	$labourdoctorpreselectedids = $labour_doctor_contact->id;
 
 	if ($labour_doctor_contact->id) {
-		print $form->selectcontacts($labour_doctor_society->id[0], $labour_doctor_contact->id, 'labourdoctor_contactid[]', 1, '', '', 0, 'quatrevingtpercent', false, 0, array(), false, 'multiple', 'labourdoctor_contactid');
+		print $form->selectcontacts(empty($labour_doctor_society->id[0]) ? -1 : $labour_doctor_society->id[0], $labour_doctor_contact->id, 'labourdoctor_contactid[]', 0, '', '', 0, 'quatrevingtpercent', false, 0, array(), false, 'multiple', 'labourdoctor_contactid');
 	} else {
 		$labourdoctorpreselectedids                                                                                             = GETPOST('labourdoctor_contactid', 'array');
 		if (GETPOST('labourdoctor_contactid', 'array')) $labourdoctorpreselectedids[GETPOST('labourdoctor_contactid', 'array')] = GETPOST('labourdoctor_contactid', 'array');
-		print $form->selectcontacts(GETPOST('labourdoctor_socid', 'int'), $labourdoctorpreselectedids, 'labourdoctor_contactid[]', 1, '', '', 0, 'quatrevingtpercent', false, 0, array(), false, 'multiple', 'labourdoctor_contactid');
+		print $form->selectcontacts(empty(GETPOST('labourdoctor_socid', 'int')) ? -1 : GETPOST('labourdoctor_socid', 'int'), $labourdoctorpreselectedids, 'labourdoctor_contactid[]', 0, '', '', 0, 'quatrevingtpercent', false, 0, array(), false, 'multiple', 'labourdoctor_contactid');
 	}
 	print '</td></tr>';
 
@@ -242,13 +242,13 @@ if ($conf->societe->enabled) {
 		$events[] = array('method' => 'getContacts', 'url' => dol_buildpath('/core/ajax/contacts.php?showempty=1', 1), 'htmlname' => 'labourinspector_contactid', 'params' => array('add-customer-contact' => 'disabled'));
 		$societe->fetch($labour_inspector_societe->id[0]);
 
-		print $form->select_company($labour_inspector_societe->id[0], 'labourinspector_socid', '', 'SelectThirdParty', 1, 0, $events, 0, 'minwidth300');
+		print $form->select_company($labour_inspector_societe->id[0], 'labourinspector_socid', '', 0, 1, 0, $events, 0, 'minwidth300');
 	} else {
 		$events   = array();
 		$events[] = array('method' => 'getContacts', 'url' => dol_buildpath('/core/ajax/contacts.php?showempty=1', 1), 'htmlname' => 'labourinspector_contactid', 'params' => array('add-customer-contact' => 'disabled'));
 		//For external user force the company to user company
 		if ( ! empty($user->socid)) {
-			print $form->select_company($user->socid, 'labourinspector_socid', '', 1, 1, 0, $events, 0, 'minwidth300');
+			print $form->select_company($user->socid, 'labourinspector_socid', '', 0, 1, 0, $events, 0, 'minwidth300');
 		} else {
 			print $form->select_company('', 'labourinspector_socid', '', 'SelectThirdParty', 1, 0, $events, 0, 'minwidth300');
 		}
@@ -264,11 +264,11 @@ if ($conf->societe->enabled) {
 	$preselectedids 		  = $labour_inspector_contact->id;
 
 	if ($labour_inspector_contact->id) {
-		print $form->selectcontacts($labour_inspector_societe->id[0], $labour_inspector_contact->id, 'labourinspector_contactid[]', 1, '', '', 0, 'quatrevingtpercent', false, 0, array(), false, 'multiple', 'labourinspector_contactid');
+		print $form->selectcontacts(empty($labour_inspector_societe->id[0]) ? -1 : $labour_inspector_societe->id[0], $labour_inspector_contact->id, 'labourinspector_contactid[]', 0, '', '', 0, 'quatrevingtpercent', false, 0, array(), false, 'multiple', 'labourinspector_contactid');
 	} else {
 		$preselectedids                                                                                                   = GETPOST('labourinspector_contactid', 'array');
 		if (GETPOST('labourinspector_contactid', 'array')) $preselectedids[GETPOST('labourinspector_contactid', 'array')] = GETPOST('labourinspector_contactid', 'array');
-		print $form->selectcontacts(GETPOST('labourinspector_socid', 'int'), $preselectedids, 'labourinspector_contactid[]', 1, '', '', 0, 'quatrevingtpercent', false, 0, array(), false, 'multiple', 'labourinspector_contactid');
+		print $form->selectcontacts(empty(GETPOST('labourinspector_socid', 'int')) ? -1 : GETPOST('labourinspector_socid', 'int'), $preselectedids, 'labourinspector_contactid[]', 0, '', '', 0, 'quatrevingtpercent', false, 0, array(), false, 'multiple', 'labourinspector_contactid');
 	}
 	print '</td></tr>';
 
