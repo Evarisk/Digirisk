@@ -330,6 +330,19 @@ if ( ! empty($conf->global->DIGIRISKDOLIBARR_TICKET_ENABLE_PUBLIC_INTERFACE)) {
 	print '</td>';
 	print '</tr>';
 
+	// QR Code in Card
+	print '<tr class="oddeven"><td>' . $langs->transnoentities("DisplayQRCodeInCard") . '</td>';
+	print '<td class="center">';
+	print ajax_constantonoff('DIGIRISKDOLIBARR_TICKET_DIGIRISKELEMENT_QRCODE_CARD');
+	print '</td>';
+	print '<td class="center">';
+	print '';
+	print '</td>';
+	print '<td class="center">';
+	print $form->textwithpicto('', $langs->transnoentities("DisplayInCardQRCode"));
+	print '</td>';
+	print '</tr>';
+
 	// GP/UT Hide ref
 	print '<tr class="oddeven"><td>' . $langs->transnoentities("TicketDigiriskElementHideRef") . '</td>';
 	print '<td class="center">';

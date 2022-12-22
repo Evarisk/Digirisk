@@ -1484,6 +1484,8 @@ TicketDigiriskElementVisibleHelp = Activer cette option pour afficher le champ G
 TicketEmailVisible = Afficher le champ Email pour créer un ticket
 TicketEmailVisibleHelp =  Activer cette option pour afficher le champ Email dans l'interface publique
 QRCodeGenerated = QRCode généré
+DisplayQRCodeInCard = Afficher le QR Code dans la fiche d'un GP/UT
+DisplayInCardQRCode = Activer cette option pour afficher un QR Code vers l'inferface publique dans la fiche d'un GP/UT
 
 # Stats - Statistiques
 TicketStatistics = Statistiques des tickets
