@@ -2509,6 +2509,7 @@ window.eoxiaJS.riskassessmenttask.event = function() {
 	$( document ).on( 'change', '#RiskassessmentTaskTimespentDatehour', window.eoxiaJS.riskassessmenttask.selectRiskassessmentTaskTimespentDateHour );
 	$( document ).on( 'change', '#RiskassessmentTaskTimespentDatemin', window.eoxiaJS.riskassessmenttask.selectRiskassessmentTaskTimespentDateMin );
 	$( document ).on( 'keyup', '.riskassessment-task-label', window.eoxiaJS.riskassessmenttask.checkRiskassessmentTaskLabelLength );
+	$( document ).on( 'click', '.listingHeaderTaskTooltip', window.eoxiaJS.riskassessmenttask.redirectOnSharedTaskConfig );
 };
 
 /**
@@ -3080,6 +3081,20 @@ window.eoxiaJS.riskassessmenttask.checkRiskassessmentTaskLabelLength = function(
 		$('.riskassessment-task-create').removeClass('button-grey');
 		$('.riskassessment-task-create').removeClass('button-disable');
 	}
+};
+
+/**
+ * Redirect on shared task config
+ *
+ * @since   9.8.2
+ * @version 9.8.2
+ *
+ * @param  {MouseEvent} event [description]
+ * @return {void}
+ */
+window.eoxiaJS.riskassessmenttask.redirectOnSharedTaskConfig = function( event ) {
+	let url = $('.riskassessment-tasks').find('input[name="sharedTaskTooltipUrl"]').val();
+	window.open(location.origin + url, '_blank');
 };
 
 /**

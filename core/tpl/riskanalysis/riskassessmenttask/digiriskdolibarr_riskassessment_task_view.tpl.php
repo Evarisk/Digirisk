@@ -2,11 +2,27 @@
 $related_tasks = $risk->get_related_tasks($risk); ?>
 <div class="wpeo-table riskassessment-tasks riskassessment-tasks<?php echo $risk->id ?>" value="<?php echo $risk->id ?>">
 	<div class="table-cell riskassessment-task-listing-wrapper riskassessment-task-listing-wrapper-<?php echo $risk->id ?>">
+		<?php if (!empty($related_tasks) && $related_tasks > 0) : ?>
+			<?php foreach ($related_tasks as $related_task) {
+				if (!empty($conf->global->DIGIRISKDOLIBARR_SHOW_SHARED_RISKS) && $contextpage == 'sharedrisk') {
+					$project = new Project($db);
+					$project->fetch($related_task->fk_project);
+					$result = !empty($conf->mc->sharings['project']) ? in_array($project->entity, $conf->mc->sharings['project']) : 0;
+				} else {
+					$result = 1;
+				}
+			} ?>
+		<?php endif; ?>
 		<div class="table-cell-header">
-			<div class="table-cell-header-label"><strong><?php echo $langs->trans('ListingHeaderTask'); ?> (<?php echo $related_tasks ? count($related_tasks) : 0; ?>)</strong></div>
+			<input type="hidden" name="sharedTaskTooltipUrl" value="<?php echo DOL_URL_ROOT . '/custom/multicompany/admin/multicompany.php?action=edit&id=' . $conf->entity;  ?>">
+			<div class="table-cell-header-label"><strong><?php echo $form->textwithpicto($langs->trans('ListingHeaderTask') . ' (' . (($related_tasks && $result) ? count($related_tasks) : 0) . ')', $result == 0 ? $langs->trans('ListingHeaderTaskTooltip') : '', 1, 'help', 'listingHeaderTaskTooltip'); ?></strong></div>
 			<div class="table-cell-header-actions">
-				<?php if ($permissiontoread) : ?>
+				<?php if ($permissiontoread && $result) : ?>
 					<div class="wpeo-button riskassessment-task-list button-square-40 button-grey wpeo-tooltip-event modal-open risk-list-button" aria-label="<?php echo $langs->trans('ListRiskAssessmentTask') ?>" value="<?php echo $risk->id;?>">
+						<i class="button-icon fas fa-list-ul"></i>
+					</div>
+				<?php elseif ($result == 0) : ?>
+					<div class="wpeo-button button-square-40 button-grey wpeo-tooltip-event risk-list-button" aria-label="<?php echo $langs->trans('NoTaskShared') ?>" value="<?php echo $risk->id;?>">
 						<i class="button-icon fas fa-list-ul"></i>
 					</div>
 				<?php else : ?>
@@ -31,13 +47,6 @@ $related_tasks = $risk->get_related_tasks($risk); ?>
 			<?php if ($conf->global->DIGIRISKDOLIBARR_SHOW_ALL_TASKS) : ?>
 				<?php $nb_of_tasks_in_progress = 0;
 				foreach ($related_tasks as $related_task) {
-					if (!empty($conf->global->DIGIRISKDOLIBARR_SHOW_SHARED_RISKS) && $contextpage == 'sharedrisk') {
-						$project = new Project($db);
-						$project->fetch($related_task->fk_project);
-						$result = !empty($conf->mc->sharings['project']) ? in_array($project->entity, $conf->mc->sharings['project']) : 0;
-					} else {
-						$result = 1;
-					}
 					if ($conf->global->DIGIRISKDOLIBARR_SHOW_TASK_CALCULATED_PROGRESS) {
 						$tmparray = $related_task->getSummaryOfTimeSpent();
 						if ($tmparray['total_duration'] > 0 && !empty($related_task->planned_workload)) {
@@ -89,7 +98,32 @@ $related_tasks = $risk->get_related_tasks($risk); ?>
 				} else {
 					$task_progress = $related_task->progress;
 				}
-				require __DIR__ . '/digiriskdolibarr_riskassessment_task_single_view.tpl.php'; ?>
+				if ($result > 0) {
+					require __DIR__ . '/digiriskdolibarr_riskassessment_task_single_view.tpl.php';
+				} else { ?>
+					<div class="riskassessment-task-container riskassessment-no-task">
+						<div class="riskassessment-task-single-content riskassessment-task-single-content-<?php echo $risk->id ?>">
+							<div class="riskassessment-task-single riskassessment-task-single-<?php echo $risk->id ?>">
+								<div class="riskassessment-task-content">
+									<div class="riskassessment-task-data" style="justify-content: center;">
+										<span class="name"><?php echo $result > 0 ? $langs->trans('NoTaskLinked') : $langs->trans('NoTaskShared'); ?></span>
+										<?php if ($contextpage != 'sharedrisk' && $contextpage != 'inheritedrisk') : ?>
+											<?php if ($permissiontoadd) : ?>
+												<div class="riskassessment-task-add wpeo-button button-square-40 button-primary wpeo-tooltip-event modal-open risk-list-button" aria-label="<?php echo $langs->trans('AddRiskAssessmentTask') ?>" value="<?php echo $risk->id;?>">
+													<i class="fas fa-plus button-icon"></i>
+												</div>
+											<?php else : ?>
+												<div class="wpeo-button button-square-40 button-grey wpeo-tooltip-event risk-list-button" aria-label="<?php echo $langs->trans('PermissionDenied') ?>" value="<?php echo $risk->id;?>">
+													<i class="fas fa-plus button-icon"></i>
+												</div>
+											<?php endif; ?>
+										<?php endif; ?>
+									</div>
+								</div>
+							</div>
+						</div>
+					</div>
+				<?php } ?>
 			<?php endif; ?>
 		<?php else : ?>
 			<div class="riskassessment-task-listing-wrapper riskassessment-task-listing-wrapper-<?php echo $risk->id ?>">
@@ -257,9 +291,10 @@ $related_tasks = $risk->get_related_tasks($risk); ?>
 								<div class="riskassessment-task-list-content" value="<?php echo $risk->id ?>">
 									<ul class="riskassessment-task-list riskassessment-task-list-<?php echo $related_task->id ?>">
 										<li>
-											<?php require __DIR__ . '/digiriskdolibarr_riskassessment_task_single_view.tpl.php'; ?>
+											<?php if ($result > 0) : ?>
+												<?php require __DIR__ . '/digiriskdolibarr_riskassessment_task_single_view.tpl.php'; ?>
+											<?php endif; ?>
 										</li>
-										<hr>
 									</ul>
 								</div>
 							<?php endforeach; ?>
