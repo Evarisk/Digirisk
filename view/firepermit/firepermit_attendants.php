@@ -130,11 +130,15 @@ if ($action == 'addSignature') {
 	$signatory->signature_date = dol_now('tzuser');
 
 	if ( ! $error) {
-		$result = $signatory->update($user, false);
+		$result = $signatory->update($user);
 
 		if ($result > 0) {
 			// Creation signature OK
-			$signatory->setSigned($user, 0);
+			if (!empty($signatory->signature)) {
+				$signatory->setSigned($user);
+			} else {
+				$signatory->setRegistered($user);
+			}
 			$urltogo = str_replace('__ID__', $result, $backtopage);
 			$urltogo = preg_replace('/--IDFORBACKTOPAGE--/', $id, $urltogo); // New method to autoselect project after a New on another form object creation
 			header("Location: " . $urltogo);
