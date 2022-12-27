@@ -1173,10 +1173,15 @@ if ((empty($action) || ($action != 'create' && $action != 'edit'))) {
 						foreach ($modellist as $key => $modellistsingle) {
 							$arrayvalues = preg_replace('/template_/', '', $modellistsingle);
 							$modellist[$key] = $langs->trans($arrayvalues);
-							$modelselected = $key;
+							$constforval = 'DIGIRISKDOLIBARR_PREVENTIONPLANDOCUMENT_DEFAULT_MODEL';
+							$defaultmodel = preg_replace('/_odt/', '.odt', $conf->global->$constforval);
+							if ('template_' . $defaultmodel == $modellistsingle) {
+								$modelselected = $key;
+							}
 						}
 					}
 				}
+
 				print '<a class="' . ($object->status == 3 ? 'butAction' : 'butActionRefused classfortooltip') . '" id="actionButtonSign" title="' . dol_escape_htmltag($langs->trans("PreventionPlanMustBeLockedToSendEmail")) . '" href="' . ($object->status == 3 ? ($_SERVER['PHP_SELF'] . '?id=' . $object->id . '&action=presend&forcebuilddoc=1&model='.$modelselected.'&mode=init&sendto=' . $allLinks['LabourInspectorSociety']->id[0]) : '#') . '">' . $langs->trans('SendMail') . '</a>';
 			} else {
 				print '<a class="' . ($object->status == 3 ? 'butAction' : 'butActionRefused classfortooltip') . '" id="actionButtonSign" title="' . dol_escape_htmltag($langs->trans("PreventionPlanMustBeLockedToSendEmail")) . '" href="' . ($object->status == 3 ? ($_SERVER['PHP_SELF'] . '?id=' . $object->id . '&action=presend&mode=init&sendto=' . $allLinks['LabourInspectorSociety']->id[0].'#sendEmail') : '#') . '">' . $langs->trans('SendMail') . '</a>';

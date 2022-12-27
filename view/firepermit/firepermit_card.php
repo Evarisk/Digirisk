@@ -1110,7 +1110,11 @@ if ((empty($action) || ($action != 'create' && $action != 'edit'))) {
 						foreach ($modellist as $key => $modellistsingle) {
 							$arrayvalues = preg_replace('/template_/', '', $modellistsingle);
 							$modellist[$key] = $langs->trans($arrayvalues);
-							$modelselected = $key;
+							$constforval = 'DIGIRISKDOLIBARR_FIREPERMITDOCUMENT_DEFAULT_MODEL';
+							$defaultmodel = preg_replace('/_odt/', '.odt', $conf->global->$constforval);
+							if ('template_' . $defaultmodel == $modellistsingle) {
+								$modelselected = $key;
+							}
 						}
 					}
 				}

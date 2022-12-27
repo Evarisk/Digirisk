@@ -103,6 +103,11 @@ if ($action == 'set') {
 } elseif ($action == 'del') {
 	if ($type == 'projectdocument') {
 		$type = 'project';
+	} else {
+		$constforval = 'DIGIRISKDOLIBARR_' .strtoupper($type). '_DEFAULT_MODEL';
+		if ($value == dolibarr_get_const($db, $constforval)) {
+			dolibarr_del_const($db, $constforval);
+		}
 	}
 	delDocumentModel($value, $type);
 	header('Location: ' . $_SERVER['PHP_SELF']);
@@ -110,8 +115,6 @@ if ($action == 'set') {
 
 // Set default model
 if ($action == 'setdoc') {
-	$label = '';
-
 	if ($type != 'projectdocument') {
 		$constforval = 'DIGIRISKDOLIBARR_' .strtoupper($type). '_DEFAULT_MODEL';
 		dolibarr_set_const($db, $constforval, $value, 'chaine', 0, '', $conf->entity);
@@ -122,7 +125,7 @@ if ($action == 'setdoc') {
 	// On active le modele
 	$ret = delDocumentModel($value, $type);
 	if ($ret > 0) {
-		$ret = addDocumentModel($value, $type, $label);
+		$ret = addDocumentModel($value, $type, $label, $const);
 	}
 } elseif ($action == 'setmod') {
 	$constforval = 'DIGIRISKDOLIBARR_'.strtoupper($type). '_ADDON';
