@@ -41,6 +41,7 @@ require_once DOL_DOCUMENT_ROOT . '/core/lib/images.lib.php';
 
 require_once './../../class/digiriskelement.class.php';
 require_once './../../lib/digiriskdolibarr_function.lib.php';
+require_once __DIR__ . '/../../core/tpl/digirisk_security_checks.php';
 
 global $conf, $db, $hookmanager, $langs, $user;
 
@@ -72,7 +73,6 @@ $hookmanager->initHooks(array('digiriskelementcard', 'globalcard')); // Note tha
 $permissiontoread = $user->rights->digiriskdolibarr->digiriskelement->read;
 
 if ( ! $permissiontoread) accessforbidden();
-require_once './../../core/tpl/digirisk_security_checks.php';
 
 /*
  * Actions

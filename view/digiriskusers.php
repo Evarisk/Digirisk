@@ -42,6 +42,7 @@ require_once DOL_DOCUMENT_ROOT . '/core/class/html.formother.class.php';
 require_once DOL_DOCUMENT_ROOT . '/categories/class/categorie.class.php';
 
 require_once __DIR__ . '/../lib/digiriskdolibarr_function.lib.php';
+require_once __DIR__ . '/../core/tpl/digirisk_security_checks.php';
 
 // Global variables definitions
 global $conf, $db, $hookmanager, $langs, $user;

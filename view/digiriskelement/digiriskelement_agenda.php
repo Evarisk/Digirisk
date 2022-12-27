@@ -95,7 +95,7 @@ $permissiontoadd    = $user->rights->digiriskdolibarr->digiriskelement->write;
 $permissiontodelete = $user->rights->digiriskdolibarr->digiriskelement->delete;
 
 if ( ! $permissiontoread) accessforbidden();
-require_once './../../core/tpl/digirisk_security_checks.php';
+require_once __DIR__ . '/../../core/tpl/digirisk_security_checks.php';
 
 /*
  *  Actions

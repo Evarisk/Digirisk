@@ -70,7 +70,7 @@ $permissiontoadd    = $user->rights->digiriskdolibarr->informationssharing->writ
 $permissiontodelete = $user->rights->digiriskdolibarr->informationssharing->delete;
 
 if ( ! $permissiontoread) accessforbidden();
-require_once './../../core/tpl/digirisk_security_checks.php';
+require_once __DIR__ . '/../../core/tpl/digirisk_security_checks.php';
 
 /*
  * Actions

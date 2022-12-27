@@ -51,6 +51,7 @@ require_once __DIR__ . '/../../class/preventionplan.class.php';
 require_once __DIR__ . '/../../class/digiriskresources.class.php';
 require_once __DIR__ . '/../../lib/digiriskdolibarr_function.lib.php';
 require_once __DIR__ . '/../../lib/digiriskdolibarr_digiriskelement.lib.php';
+require_once __DIR__ . '/../../core/tpl/digirisk_security_checks.php';
 
 global $conf, $db, $hookmanager, $langs, $user;
 
@@ -122,7 +123,6 @@ $permissiontodelete = $user->rights->digiriskdolibarr->accident->delete;
 
 // Security check
 if ( ! $permissiontoread) accessforbidden();
-require_once './../../core/tpl/digirisk_security_checks.php';
 
 /*
  * Actions

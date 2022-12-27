@@ -42,6 +42,7 @@ require_once DOL_DOCUMENT_ROOT . '/core/lib/images.lib.php';
 
 require_once __DIR__ . '/../../class/preventionplan.class.php';
 require_once __DIR__ . '/../../class/digiriskresources.class.php';
+require_once __DIR__ . '/../../core/tpl/digirisk_security_checks.php';
 
 // Load translation files required by the page
 $langs->loadLangs(array('projects', 'companies', 'commercial'));
@@ -108,7 +109,6 @@ $permissiontodelete = $user->rights->digiriskdolibarr->preventionplan->delete;
 
 // Security check - Protection if external user
 if ( ! $permissiontoread) accessforbidden();
-require_once './../../core/tpl/digirisk_security_checks.php';
 
 /*
  * Actions

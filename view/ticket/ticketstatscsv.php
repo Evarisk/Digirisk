@@ -44,6 +44,7 @@ include_once DOL_DOCUMENT_ROOT . '/core/lib/files.lib.php';
 
 require_once __DIR__ . '/../../lib/digiriskdolibarr_ticket.lib.php';
 require_once __DIR__ . '/../../class/ticketdigiriskstats.class.php';
+require_once __DIR__ . '/../../core/tpl/digirisk_security_checks.php';
 
 // Load translation files required by the page
 $langs->loadLangs(array('other'));

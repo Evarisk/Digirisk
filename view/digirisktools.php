@@ -53,6 +53,7 @@ require_once './../core/modules/digiriskdolibarr/digiriskelement/workunit/mod_wo
 require_once './../core/modules/digiriskdolibarr/riskanalysis/risk/mod_risk_standard.php';
 require_once './../core/modules/digiriskdolibarr/riskanalysis/riskassessment/mod_riskassessment_standard.php';
 require_once './../core/modules/digiriskdolibarr/riskanalysis/risksign/mod_risksign_standard.php';
+require_once __DIR__ . '/../core/tpl/digirisk_security_checks.php';
 
 global $conf, $db, $langs, $user;
 

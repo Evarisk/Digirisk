@@ -46,6 +46,7 @@ require_once DOL_DOCUMENT_ROOT . '/societe/class/societe.class.php';
 require_once __DIR__ . '/../../class/firepermit.class.php';
 require_once __DIR__ . '/../../class/preventionplan.class.php';
 require_once __DIR__ . '/../../class/digiriskresources.class.php';
+require_once __DIR__ . '/../../core/tpl/digirisk_security_checks.php';
 
 global $conf, $db;
 
@@ -114,7 +115,6 @@ $permissiontodelete = $user->rights->digiriskdolibarr->firepermit->delete;
 
 // Security check
 if ( ! $permissiontoread) accessforbidden();
-require_once './../../core/tpl/digirisk_security_checks.php';
 
 /*
  * Actions
