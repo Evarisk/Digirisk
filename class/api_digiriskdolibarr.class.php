@@ -126,6 +126,10 @@ class DigiriskDolibarr extends DolibarrApi
 	 */
 	public function disableModule()
 	{
+		if (!DolibarrApiAccess::$user->rights->digiriskdolibarr->adminpage->read || !DolibarrApiAccess::$user->rights->digiriskdolibarr->api->read) {
+			throw new RestException(401);
+		}
+
 		return $this->mod->remove();
 	}
 
@@ -141,6 +145,10 @@ class DigiriskDolibarr extends DolibarrApi
 	 */
 	public function getFilesVersion()
 	{
+		if (!DolibarrApiAccess::$user->rights->digiriskdolibarr->adminpage->read || !DolibarrApiAccess::$user->rights->digiriskdolibarr->api->read) {
+			throw new RestException(401);
+		}
+
 		return $this->mod->version;
 	}
 
@@ -156,6 +164,10 @@ class DigiriskDolibarr extends DolibarrApi
 	 */
 	public function getActiveVersion()
 	{
+		if (!DolibarrApiAccess::$user->rights->digiriskdolibarr->adminpage->read || !DolibarrApiAccess::$user->rights->digiriskdolibarr->api->read) {
+			throw new RestException(401);
+		}
+
 		global $conf;
 
 		return $conf->global->DIGIRISKDOLIBARR_VERSION;
@@ -173,6 +185,10 @@ class DigiriskDolibarr extends DolibarrApi
 	 */
 	public function getLatestVersion()
 	{
+		if (!DolibarrApiAccess::$user->rights->digiriskdolibarr->adminpage->read || !DolibarrApiAccess::$user->rights->digiriskdolibarr->api->read) {
+			throw new RestException(401);
+		}
+
 		global $conf;
 
 		return $conf->global->DIGIRISKDOLIBARR_VERSION;
@@ -190,6 +206,10 @@ class DigiriskDolibarr extends DolibarrApi
 	 */
 	public function uploadNewModule()
 	{
+		if (!DolibarrApiAccess::$user->rights->digiriskdolibarr->adminpage->read || !DolibarrApiAccess::$user->rights->digiriskdolibarr->api->read) {
+			throw new RestException(401);
+		}
+
 		return exec('cd ../custom/digiriskdolibarr/shell/pull && bash update_version.sh');
 	}
 
@@ -209,7 +229,11 @@ class DigiriskDolibarr extends DolibarrApi
 	 */
 	public function getDashBoardRisks($entity = 1)
 	{
-		if (!DolibarrApiAccess::$user->rights->digiriskdolibarr->risk->read) {
+		if (DolibarrApiAccess::$user->entity != $entity && DolibarrApiAccess::$user->entity > 0) {
+			throw new RestException(401 , 'User not allowed in this entity');
+		}
+
+		if (!DolibarrApiAccess::$user->rights->digiriskdolibarr->risk->read || !DolibarrApiAccess::$user->rights->digiriskdolibarr->api->read) {
 			throw new RestException(401);
 		}
 
@@ -233,7 +257,11 @@ class DigiriskDolibarr extends DolibarrApi
 	 */
 	public function getDashBoardInfoTasks($entity = 1)
 	{
-		if (!DolibarrApiAccess::$user->rights->projet->lire) {
+		if (DolibarrApiAccess::$user->entity != $entity && DolibarrApiAccess::$user->entity > 0) {
+			throw new RestException(401 , 'User not allowed in this entity');
+		}
+
+		if (!DolibarrApiAccess::$user->rights->projet->lire || !DolibarrApiAccess::$user->rights->digiriskdolibarr->api->read) {
 			throw new RestException(401);
 		}
 
@@ -257,7 +285,11 @@ class DigiriskDolibarr extends DolibarrApi
 	 */
 	public function getDashBoardInfoRiskAssessmentDocument($entity = 1)
 	{
-		if (!DolibarrApiAccess::$user->rights->digiriskdolibarr->riskassessmentdocument->read) {
+		if (DolibarrApiAccess::$user->entity != $entity && DolibarrApiAccess::$user->entity > 0) {
+			throw new RestException(401 , 'User not allowed in this entity');
+		}
+
+		if (!DolibarrApiAccess::$user->rights->digiriskdolibarr->riskassessmentdocument->read || !DolibarrApiAccess::$user->rights->digiriskdolibarr->api->read) {
 			throw new RestException(401);
 		}
 
@@ -281,7 +313,11 @@ class DigiriskDolibarr extends DolibarrApi
 	 */
 	public function getDashBoardInfoAccidents($entity = 1)
 	{
-		if (!DolibarrApiAccess::$user->rights->digiriskdolibarr->accident->read) {
+		if (DolibarrApiAccess::$user->entity != $entity && DolibarrApiAccess::$user->entity > 0) {
+			throw new RestException(401 , 'User not allowed in this entity');
+		}
+
+		if (!DolibarrApiAccess::$user->rights->digiriskdolibarr->accident->read || !DolibarrApiAccess::$user->rights->digiriskdolibarr->api->read) {
 			throw new RestException(401);
 		}
 
@@ -305,7 +341,11 @@ class DigiriskDolibarr extends DolibarrApi
 	 */
 	public function getDashBoardInfoDigiriskResources($entity = 1)
 	{
-		if (!DolibarrApiAccess::$user->rights->digiriskdolibarr->accident->read) {
+		if (DolibarrApiAccess::$user->entity != $entity && DolibarrApiAccess::$user->entity > 0) {
+			throw new RestException(401 , 'User not allowed in this entity');
+		}
+
+		if (!DolibarrApiAccess::$user->rights->digiriskdolibarr->accident->read || !DolibarrApiAccess::$user->rights->digiriskdolibarr->api->read) {
 			throw new RestException(401);
 		}
 
@@ -329,7 +369,11 @@ class DigiriskDolibarr extends DolibarrApi
 	 */
 	public function getDashBoardInfoEvaluators($entity = 1)
 	{
-		if (!DolibarrApiAccess::$user->rights->digiriskdolibarr->evaluator->read) {
+		if (DolibarrApiAccess::$user->entity != $entity && DolibarrApiAccess::$user->entity > 0) {
+			throw new RestException(401 , 'User not allowed in this entity');
+		}
+
+		if (!DolibarrApiAccess::$user->rights->digiriskdolibarr->evaluator->read || !DolibarrApiAccess::$user->rights->digiriskdolibarr->api->read) {
 			throw new RestException(401);
 		}
 
@@ -359,7 +403,11 @@ class DigiriskDolibarr extends DolibarrApi
 	 */
 	public function getRisksByCotation($entity = 1)
 	{
-		if (!DolibarrApiAccess::$user->rights->digiriskdolibarr->risk->read) {
+		if (DolibarrApiAccess::$user->entity != $entity && DolibarrApiAccess::$user->entity > 0) {
+			throw new RestException(401 , 'User not allowed in this entity');
+		}
+
+		if (!DolibarrApiAccess::$user->rights->digiriskdolibarr->risk->read || !DolibarrApiAccess::$user->rights->digiriskdolibarr->api->read) {
 			throw new RestException(401);
 		}
 
@@ -387,7 +435,11 @@ class DigiriskDolibarr extends DolibarrApi
 	 */
 	public function getTasksByProgress($entity = 1)
 	{
-		if (!DolibarrApiAccess::$user->rights->projet->lire) {
+		if (DolibarrApiAccess::$user->entity != $entity && DolibarrApiAccess::$user->entity > 0) {
+			throw new RestException(401 , 'User not allowed in this entity');
+		}
+
+		if (!DolibarrApiAccess::$user->rights->projet->lire || !DolibarrApiAccess::$user->rights->digiriskdolibarr->api->read) {
 			throw new RestException(401);
 		}
 
@@ -413,7 +465,11 @@ class DigiriskDolibarr extends DolibarrApi
 	 */
 	public function getLastGenerateDate($entity = 1)
 	{
-		if (!DolibarrApiAccess::$user->rights->digiriskdolibarr->riskassessmentdocument->read) {
+		if (DolibarrApiAccess::$user->entity != $entity && DolibarrApiAccess::$user->entity > 0) {
+			throw new RestException(401 , 'User not allowed in this entity');
+		}
+
+		if (!DolibarrApiAccess::$user->rights->digiriskdolibarr->riskassessmentdocument->read || !DolibarrApiAccess::$user->rights->digiriskdolibarr->api->read) {
 			throw new RestException(401);
 		}
 
@@ -437,7 +493,11 @@ class DigiriskDolibarr extends DolibarrApi
 	 */
 	public function getNextGenerateDate($entity = 1)
 	{
-		if (!DolibarrApiAccess::$user->rights->digiriskdolibarr->riskassessmentdocument->read) {
+		if (DolibarrApiAccess::$user->entity != $entity && DolibarrApiAccess::$user->entity > 0) {
+			throw new RestException(401 , 'User not allowed in this entity');
+		}
+
+		if (!DolibarrApiAccess::$user->rights->digiriskdolibarr->riskassessmentdocument->read || !DolibarrApiAccess::$user->rights->digiriskdolibarr->api->read) {
 			throw new RestException(401);
 		}
 
@@ -461,7 +521,11 @@ class DigiriskDolibarr extends DolibarrApi
 	 */
 	public function getNbDaysBeforeNextGenerateDate($entity = 1)
 	{
-		if (!DolibarrApiAccess::$user->rights->digiriskdolibarr->riskassessmentdocument->read) {
+		if (DolibarrApiAccess::$user->entity != $entity && DolibarrApiAccess::$user->entity > 0) {
+			throw new RestException(401 , 'User not allowed in this entity');
+		}
+
+		if (!DolibarrApiAccess::$user->rights->digiriskdolibarr->riskassessmentdocument->read || !DolibarrApiAccess::$user->rights->digiriskdolibarr->api->read) {
 			throw new RestException(401);
 		}
 
@@ -485,7 +549,11 @@ class DigiriskDolibarr extends DolibarrApi
 	 */
 	public function getNbDaysAfterNextGenerateDate($entity = 1)
 	{
-		if (!DolibarrApiAccess::$user->rights->digiriskdolibarr->riskassessmentdocument->read) {
+		if (DolibarrApiAccess::$user->entity != $entity && DolibarrApiAccess::$user->entity > 0) {
+			throw new RestException(401 , 'User not allowed in this entity');
+		}
+
+		if (!DolibarrApiAccess::$user->rights->digiriskdolibarr->riskassessmentdocument->read || !DolibarrApiAccess::$user->rights->digiriskdolibarr->api->read) {
 			throw new RestException(401);
 		}
 
@@ -511,7 +579,11 @@ class DigiriskDolibarr extends DolibarrApi
 	 */
 	public function getNbDaysWithoutAccident($entity = 1)
 	{
-		if (!DolibarrApiAccess::$user->rights->digiriskdolibarr->accident->read) {
+		if (DolibarrApiAccess::$user->entity != $entity && DolibarrApiAccess::$user->entity > 0) {
+			throw new RestException(401 , 'User not allowed in this entity');
+		}
+
+		if (!DolibarrApiAccess::$user->rights->digiriskdolibarr->accident->read || !DolibarrApiAccess::$user->rights->digiriskdolibarr->api->read) {
 			throw new RestException(401);
 		}
 
@@ -535,7 +607,11 @@ class DigiriskDolibarr extends DolibarrApi
 	 */
 	public function getNbAccidents($entity = 1)
 	{
-		if (!DolibarrApiAccess::$user->rights->digiriskdolibarr->accident->read) {
+		if (DolibarrApiAccess::$user->entity != $entity && DolibarrApiAccess::$user->entity > 0) {
+			throw new RestException(401 , 'User not allowed in this entity');
+		}
+
+		if (!DolibarrApiAccess::$user->rights->digiriskdolibarr->accident->read || !DolibarrApiAccess::$user->rights->digiriskdolibarr->api->read) {
 			throw new RestException(401);
 		}
 
@@ -559,7 +635,11 @@ class DigiriskDolibarr extends DolibarrApi
 	 */
 	public function getNbWorkstopDays($entity = 1)
 	{
-		if (!DolibarrApiAccess::$user->rights->digiriskdolibarr->accident->read) {
+		if (DolibarrApiAccess::$user->entity != $entity && DolibarrApiAccess::$user->entity > 0) {
+			throw new RestException(401 , 'User not allowed in this entity');
+		}
+
+		if (!DolibarrApiAccess::$user->rights->digiriskdolibarr->accident->read || !DolibarrApiAccess::$user->rights->digiriskdolibarr->api->read) {
 			throw new RestException(401);
 		}
 
@@ -583,7 +663,11 @@ class DigiriskDolibarr extends DolibarrApi
 	 */
 	public function getNbAccidentsByEmployees($entity = 1)
 	{
-		if (!DolibarrApiAccess::$user->rights->digiriskdolibarr->accident->read) {
+		if (DolibarrApiAccess::$user->entity != $entity && DolibarrApiAccess::$user->entity > 0) {
+			throw new RestException(401 , 'User not allowed in this entity');
+		}
+
+		if (!DolibarrApiAccess::$user->rights->digiriskdolibarr->accident->read || !DolibarrApiAccess::$user->rights->digiriskdolibarr->api->read) {
 			throw new RestException(401);
 		}
 
@@ -607,7 +691,11 @@ class DigiriskDolibarr extends DolibarrApi
 	 */
 	public function getNbPresquAccidents($entity = 1)
 	{
-		if (!DolibarrApiAccess::$user->rights->digiriskdolibarr->accident->read) {
+		if (DolibarrApiAccess::$user->entity != $entity && DolibarrApiAccess::$user->entity > 0) {
+			throw new RestException(401 , 'User not allowed in this entity');
+		}
+
+		if (!DolibarrApiAccess::$user->rights->digiriskdolibarr->accident->read || !DolibarrApiAccess::$user->rights->digiriskdolibarr->api->read) {
 			throw new RestException(401);
 		}
 
@@ -631,7 +719,11 @@ class DigiriskDolibarr extends DolibarrApi
 	 */
 	public function getNbAccidentInvestigations($entity = 1)
 	{
-		if (!DolibarrApiAccess::$user->rights->digiriskdolibarr->accident->read) {
+		if (DolibarrApiAccess::$user->entity != $entity && DolibarrApiAccess::$user->entity > 0) {
+			throw new RestException(401 , 'User not allowed in this entity');
+		}
+
+		if (!DolibarrApiAccess::$user->rights->digiriskdolibarr->accident->read || !DolibarrApiAccess::$user->rights->digiriskdolibarr->api->read) {
 			throw new RestException(401);
 		}
 
@@ -655,7 +747,11 @@ class DigiriskDolibarr extends DolibarrApi
 	 */
 	public function getFrequencyIndex($entity = 1)
 	{
-		if (!DolibarrApiAccess::$user->rights->digiriskdolibarr->accident->read) {
+		if (DolibarrApiAccess::$user->entity != $entity && DolibarrApiAccess::$user->entity > 0) {
+			throw new RestException(401 , 'User not allowed in this entity');
+		}
+
+		if (!DolibarrApiAccess::$user->rights->digiriskdolibarr->accident->read || !DolibarrApiAccess::$user->rights->digiriskdolibarr->api->read) {
 			throw new RestException(401);
 		}
 
@@ -679,7 +775,11 @@ class DigiriskDolibarr extends DolibarrApi
 	 */
 	public function getFrequencyRate($entity = 1)
 	{
-		if (!DolibarrApiAccess::$user->rights->digiriskdolibarr->accident->read) {
+		if (DolibarrApiAccess::$user->entity != $entity && DolibarrApiAccess::$user->entity > 0) {
+			throw new RestException(401 , 'User not allowed in this entity');
+		}
+
+		if (!DolibarrApiAccess::$user->rights->digiriskdolibarr->accident->read || !DolibarrApiAccess::$user->rights->digiriskdolibarr->api->read) {
 			throw new RestException(401);
 		}
 
@@ -703,7 +803,11 @@ class DigiriskDolibarr extends DolibarrApi
 	 */
 	public function getGravityRate($entity = 1)
 	{
-		if (!DolibarrApiAccess::$user->rights->digiriskdolibarr->accident->read) {
+		if (DolibarrApiAccess::$user->entity != $entity && DolibarrApiAccess::$user->entity > 0) {
+			throw new RestException(401 , 'User not allowed in this entity');
+		}
+
+		if (!DolibarrApiAccess::$user->rights->digiriskdolibarr->accident->read || !DolibarrApiAccess::$user->rights->digiriskdolibarr->api->read) {
 			throw new RestException(401);
 		}
 
@@ -729,7 +833,11 @@ class DigiriskDolibarr extends DolibarrApi
 	 */
 	public function getSiretNumber($entity = 1)
 	{
-		if (!DolibarrApiAccess::$user->rights->digiriskdolibarr->accident->read) {
+		if (DolibarrApiAccess::$user->entity != $entity && DolibarrApiAccess::$user->entity > 0) {
+			throw new RestException(401 , 'User not allowed in this entity');
+		}
+
+		if (!DolibarrApiAccess::$user->rights->digiriskdolibarr->accident->read || !DolibarrApiAccess::$user->rights->digiriskdolibarr->api->read) {
 			throw new RestException(401);
 		}
 
@@ -755,7 +863,11 @@ class DigiriskDolibarr extends DolibarrApi
 	 */
 	public function getNbEmployeesInvolved($entity = 1)
 	{
-		if (!DolibarrApiAccess::$user->rights->digiriskdolibarr->evaluator->read) {
+		if (DolibarrApiAccess::$user->entity != $entity && DolibarrApiAccess::$user->entity > 0) {
+			throw new RestException(401 , 'User not allowed in this entity');
+		}
+
+		if (!DolibarrApiAccess::$user->rights->digiriskdolibarr->evaluator->read || !DolibarrApiAccess::$user->rights->digiriskdolibarr->api->read) {
 			throw new RestException(401);
 		}
 
@@ -779,7 +891,11 @@ class DigiriskDolibarr extends DolibarrApi
 	 */
 	public function getNbEmployees($entity = 1)
 	{
-		if (!DolibarrApiAccess::$user->rights->digiriskdolibarr->evaluator->read) {
+		if (DolibarrApiAccess::$user->entity != $entity && DolibarrApiAccess::$user->entity > 0) {
+			throw new RestException(401 , 'User not allowed in this entity');
+		}
+
+		if (!DolibarrApiAccess::$user->rights->digiriskdolibarr->evaluator->read || !DolibarrApiAccess::$user->rights->digiriskdolibarr->api->read) {
 			throw new RestException(401);
 		}
 
