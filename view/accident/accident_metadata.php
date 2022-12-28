@@ -70,12 +70,13 @@ $object->fetch($id);
 $hookmanager->initHooks(array('accidentmetadata', 'globalcard')); // Note that conf->hooks_modules contains array
 
 // Security check
+require_once __DIR__ . '/../../core/tpl/digirisk_security_checks.php';
+
 $permissiontoread   = $user->rights->digiriskdolibarr->accident->read;
 $permissiontoadd    = $user->rights->digiriskdolibarr->accident->write;
 $permissiontodelete = $user->rights->digiriskdolibarr->accident->delete;
 
 if ( ! $permissiontoread) accessforbidden();
-require_once __DIR__ . '/../../core/tpl/digirisk_security_checks.php';
 
 /*
  * Actions

@@ -59,10 +59,11 @@ $stats  = new DashboardDigiriskStats($db);
 $object->fetch($conf->global->DIGIRISKDOLIBARR_ACTIVE_STANDARD);
 
 // Security check
+require_once __DIR__ . '/../../core/tpl/digirisk_security_checks.php';
+
 $permissiontoread = $user->rights->digiriskdolibarr->riskassessmentdocument->read;
 
 if ( ! $permissiontoread) accessforbidden();
-require_once __DIR__ . '/../../core/tpl/digirisk_security_checks.php';
 
 /*
  *  Actions

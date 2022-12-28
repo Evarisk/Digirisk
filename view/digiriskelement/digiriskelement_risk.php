@@ -89,10 +89,6 @@ $ecmdir           = new EcmDirectory($db);
 $project          = new Project($db);
 $task             = new DigiriskTask($db);
 $extrafields      = new ExtraFields($db);
-$refRiskMod       = new $conf->global->DIGIRISKDOLIBARR_RISK_ADDON();
-$refEvaluationMod = new $conf->global->DIGIRISKDOLIBARR_RISKASSESSMENT_ADDON();
-$refProjectMod    = new $conf->global->PROJECT_ADDON();
-$refTaskMod       = new $conf->global->PROJECT_TASK_ADDON();
 
 $hookmanager->initHooks(array('riskcard', 'globalcard')); // Note that conf->hooks_modules contains array
 
@@ -152,13 +148,19 @@ $arrayfields = dol_sort_array($arrayfields, 'position');
 include DOL_DOCUMENT_ROOT . '/core/actions_fetchobject.inc.php'; // Must be include, not include_once.
 
 //Permission for digiriskelement_risk
+require_once __DIR__ . '/../../core/tpl/digirisk_security_checks.php';
+
 $permissiontoread   = $user->rights->digiriskdolibarr->risk->read;
 $permissiontoadd    = $user->rights->digiriskdolibarr->risk->write;
 $permissiontodelete = $user->rights->digiriskdolibarr->risk->delete;
 
 // Security check
 if ( ! $permissiontoread) accessforbidden();
-require_once __DIR__ . '/../../core/tpl/digirisk_security_checks.php';
+
+$refRiskMod       = new $conf->global->DIGIRISKDOLIBARR_RISK_ADDON();
+$refEvaluationMod = new $conf->global->DIGIRISKDOLIBARR_RISKASSESSMENT_ADDON();
+$refProjectMod    = new $conf->global->PROJECT_ADDON();
+$refTaskMod       = new $conf->global->PROJECT_TASK_ADDON();
 
 /*
  * Actions

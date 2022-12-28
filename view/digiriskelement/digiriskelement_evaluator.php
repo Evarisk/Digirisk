@@ -76,7 +76,6 @@ $digiriskstandard = new DigiriskStandard($db);
 $evaluator        = new Evaluator($db);
 $extrafields      = new ExtraFields($db);
 $usertmp          = new User($db);
-$refEvaluatorMod  = new $conf->global->DIGIRISKDOLIBARR_EVALUATOR_ADDON();
 
 $hookmanager->initHooks(array('evaluatorcard', 'globalcard')); // Note that conf->hooks_modules contains array
 
@@ -132,13 +131,16 @@ if ($object->id == 0) {
 }
 
 //Permission for digiriskelement_evaluator
+require_once __DIR__ . '/../../core/tpl/digirisk_security_checks.php';
+
 $permissiontoread   = $user->rights->digiriskdolibarr->evaluator->read;
 $permissiontoadd    = $user->rights->digiriskdolibarr->evaluator->write;
 $permissiontodelete = $user->rights->digiriskdolibarr->evaluator->delete;
 
 // Security check
 if ( ! $permissiontoread) accessforbidden();
-require_once __DIR__ . '/../../core/tpl/digirisk_security_checks.php';
+
+$refEvaluatorMod  = new $conf->global->DIGIRISKDOLIBARR_EVALUATOR_ADDON();
 
 /*
  * Actions

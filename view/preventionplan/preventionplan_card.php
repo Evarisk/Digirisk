@@ -84,8 +84,6 @@ $extrafields             = new ExtraFields($db);
 $resources               = new DigiriskResources($db);
 $thirdparty              = new Societe($db);
 $project                 = new Project($db);
-$refPreventionPlanMod    = new $conf->global->DIGIRISKDOLIBARR_PREVENTIONPLAN_ADDON($db);
-$refPreventionPlanDetMod = new  $conf->global->DIGIRISKDOLIBARR_PREVENTIONPLANDET_ADDON($db);
 
 // Load object
 $object->fetch($id);
@@ -100,13 +98,18 @@ $extrafields->fetch_name_optionals_label($objectline->table_element);
 $hookmanager->initHooks(array('preventionplancard', 'globalcard')); // Note that conf->hooks_modules contains array
 
 $upload_dir = $conf->digiriskdolibarr->multidir_output[isset($object->entity) ? $object->entity : 1];
+
 // Security check
+require_once __DIR__ . '/../../core/tpl/digirisk_security_checks.php';
+
 $permissiontoread   = $user->rights->digiriskdolibarr->preventionplan->read;
 $permissiontoadd    = $user->rights->digiriskdolibarr->preventionplan->write;
 $permissiontodelete = $user->rights->digiriskdolibarr->preventionplan->delete;
 
 if ( ! $permissiontoread) accessforbidden();
-require_once __DIR__ . '/../../core/tpl/digirisk_security_checks.php';
+
+$refPreventionPlanMod    = new $conf->global->DIGIRISKDOLIBARR_PREVENTIONPLAN_ADDON($db);
+$refPreventionPlanDetMod = new  $conf->global->DIGIRISKDOLIBARR_PREVENTIONPLANDET_ADDON($db);
 
 /*
  * Actions

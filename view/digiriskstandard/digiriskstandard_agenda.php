@@ -92,11 +92,12 @@ include DOL_DOCUMENT_ROOT . '/core/actions_fetchobject.inc.php'; // Must be incl
 if ($id > 0 || ! empty($ref)) $upload_dir = $conf->digiriskdolibarr->multidir_output[$object->entity] . "/" . $object->id;
 
 //Security check
+require_once __DIR__ . '/../../core/tpl/digirisk_security_checks.php';
+
 $permissiontoread = $user->rights->digiriskdolibarr->digiriskelement->read;
 $permissiontoadd  = $user->rights->digiriskdolibarr->digiriskelement->write;
 
 if ( ! $permissiontoread) accessforbidden();
-require_once __DIR__ . '/../../core/tpl/digirisk_security_checks.php';
 
 /*
  *  Actions

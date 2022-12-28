@@ -69,12 +69,13 @@ $object->fetch($id);
 $hookmanager->initHooks(array('firepermitsignature', 'globalcard')); // Note that conf->hooks_modules contains array
 
 //Security check
+require_once __DIR__ . '/../../core/tpl/digirisk_security_checks.php';
+
 $permissiontoread   = $user->rights->digiriskdolibarr->firepermit->read;
 $permissiontoadd    = $user->rights->digiriskdolibarr->firepermit->write;
 $permissiontodelete = $user->rights->digiriskdolibarr->firepermit->delete;
 
 if ( ! $permissiontoread) accessforbidden();
-require_once __DIR__ . '/../../core/tpl/digirisk_security_checks.php';
 
 /*
 /*

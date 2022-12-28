@@ -75,7 +75,6 @@ $digiriskelement  = new DigiriskElement($db);
 $digiriskstandard = new DigiriskStandard($db);
 $risksign         = new RiskSign($db);
 $extrafields      = new ExtraFields($db);
-$refRiskSignMod   = new $conf->global->DIGIRISKDOLIBARR_RISKSIGN_ADDON();
 
 $hookmanager->initHooks(array('risksigncard', 'globalcard')); // Note that conf->hooks_modules contains array
 
@@ -123,13 +122,16 @@ $arrayfields = dol_sort_array($arrayfields, 'position');
 include DOL_DOCUMENT_ROOT . '/core/actions_fetchobject.inc.php'; // Must be include, not include_once.
 
 //Permission for digiriskelement_risksign
+require_once __DIR__ . '/../../core/tpl/digirisk_security_checks.php';
+
 $permissiontoread   = $user->rights->digiriskdolibarr->risksign->read;
 $permissiontoadd    = $user->rights->digiriskdolibarr->risksign->write;
 $permissiontodelete = $user->rights->digiriskdolibarr->risksign->delete;
 
 // Security check - Protection if external user
 if ( ! $permissiontoread) accessforbidden();
-require_once __DIR__ . '/../../core/tpl/digirisk_security_checks.php';
+
+$refRiskSignMod = new $conf->global->DIGIRISKDOLIBARR_RISKSIGN_ADDON();
 
 /*
  * Actions

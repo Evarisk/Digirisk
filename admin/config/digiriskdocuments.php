@@ -43,6 +43,7 @@ require_once DOL_DOCUMENT_ROOT . '/core/lib/admin.lib.php';
 require_once DOL_DOCUMENT_ROOT . '/core/lib/files.lib.php';
 
 require_once '../../lib/digiriskdolibarr.lib.php';
+require_once __DIR__ . '/../../core/tpl/digirisk_security_checks.php';
 
 // Translations
 $langs->loadLangs(array('admin', 'digiriskdolibarr@digiriskdolibarr'));

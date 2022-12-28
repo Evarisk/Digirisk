@@ -74,11 +74,12 @@ $morewhere .= ' AND status = 1';
 $object->fetch(0, '', $morewhere);
 
 // Security check
+require_once __DIR__ . '/../../core/tpl/digirisk_security_checks.php';
+
 $permissiontoread = $user->rights->digiriskdolibarr->firepermit->read;
 $permissiontoadd  = $user->rights->digiriskdolibarr->firepermit->write;
 
 if ( ! $permissiontoread) accessforbidden();
-require_once __DIR__ . '/../../core/tpl/digirisk_security_checks.php';
 
 /*
  * Actions

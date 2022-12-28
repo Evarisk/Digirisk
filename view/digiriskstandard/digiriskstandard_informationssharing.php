@@ -65,12 +65,13 @@ $object->fetch($conf->global->DIGIRISKDOLIBARR_ACTIVE_STANDARD);
 $upload_dir = $conf->digiriskdolibarr->multidir_output[isset($conf->entity) ? $conf->entity : 1];
 
 //Security check
+require_once __DIR__ . '/../../core/tpl/digirisk_security_checks.php';
+
 $permissiontoread   = $user->rights->digiriskdolibarr->informationssharing->read;
 $permissiontoadd    = $user->rights->digiriskdolibarr->informationssharing->write;
 $permissiontodelete = $user->rights->digiriskdolibarr->informationssharing->delete;
 
 if ( ! $permissiontoread) accessforbidden();
-require_once __DIR__ . '/../../core/tpl/digirisk_security_checks.php';
 
 /*
  * Actions

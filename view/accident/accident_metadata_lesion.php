@@ -62,7 +62,6 @@ $backtopageforcancel = GETPOST('backtopageforcancel', 'alpha');
 $object               = new Accident($db);
 $objectline           = new AccidentLesion($db);
 $project              = new Project($db);
-$refAccidentLesionMod = new $conf->global->DIGIRISKDOLIBARR_ACCIDENT_LESION_ADDON($db);
 
 // Load object
 $object->fetch($id);
@@ -70,12 +69,15 @@ $object->fetch($id);
 $hookmanager->initHooks(array('accidentmetadatalesion', 'globalcard')); // Note that conf->hooks_modules contains array
 
 // Security check
+require_once __DIR__ . '/../../core/tpl/digirisk_security_checks.php';
+
 $permissiontoread   = $user->rights->digiriskdolibarr->accident->read;
 $permissiontoadd    = $user->rights->digiriskdolibarr->accident->write;
 $permissiontodelete = $user->rights->digiriskdolibarr->accident->delete;
 
 if ( ! $permissiontoread) accessforbidden();
-require_once __DIR__ . '/../../core/tpl/digirisk_security_checks.php';
+
+$refAccidentLesionMod = new $conf->global->DIGIRISKDOLIBARR_ACCIDENT_LESION_ADDON($db);
 
 /*
  * Actions

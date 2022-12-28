@@ -75,11 +75,12 @@ $morewhere .= ' AND status = 1';
 $object->fetch(0, '', $morewhere);
 
 // Security check - Protection if external user
+require_once __DIR__ . '/../../core/tpl/digirisk_security_checks.php';
+
 $permissiontoread = $user->rights->digiriskdolibarr->preventionplan->read;
 $permissiontoadd  = $user->rights->digiriskdolibarr->preventionplan->write;
 
 if ( ! $permissiontoread) accessforbidden();
-require_once __DIR__ . '/../../core/tpl/digirisk_security_checks.php';
 
 /*
  * Actions

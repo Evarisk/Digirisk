@@ -50,6 +50,7 @@ require_once DOL_DOCUMENT_ROOT . '/contact/class/contact.class.php';
 require_once DOL_DOCUMENT_ROOT . '/user/class/user.class.php';
 
 require_once '../class/digiriskresources.class.php';
+require_once __DIR__ . '/../core/tpl/digirisk_security_checks.php';
 
 // Translations
 $langs->loadLangs(array('admin', 'companies', "digiriskdolibarr@digiriskdolibarr"));

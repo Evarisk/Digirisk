@@ -77,13 +77,14 @@ $allLinks = $digiriskresources->digirisk_dolibarr_fetch_resources();
 $upload_dir = $conf->digiriskdolibarr->multidir_output[isset($conf->entity) ? $conf->entity : 1];
 
 //Security check
+require_once __DIR__ . '/../../core/tpl/digirisk_security_checks.php';
+
 $permissiontoread   = $user->rights->digiriskdolibarr->riskassessmentdocument->read;
 $permissiontoadd    = $user->rights->digiriskdolibarr->riskassessmentdocument->write;
 $permissiontodelete = $user->rights->digiriskdolibarr->riskassessmentdocument->delete;
 $permtoupload       = $user->rights->ecm->upload;
 
 if ( ! $permissiontoread) accessforbidden();
-require_once __DIR__ . '/../../core/tpl/digirisk_security_checks.php';
 
 /*
  * Actions

@@ -85,8 +85,6 @@ $extrafields         = new ExtraFields($db);
 $digiriskelement     = new DigiriskElement($db);
 $digiriskresources   = new DigiriskResources($db);
 $project             = new Project($db);
-$refFirePermitMod    = new $conf->global->DIGIRISKDOLIBARR_FIREPERMIT_ADDON($db);
-$refFirePermitDetMod = new $conf->global->DIGIRISKDOLIBARR_FIREPERMITDET_ADDON($db);
 
 // Load object
 $object->fetch($id);
@@ -97,13 +95,18 @@ $allLinks = $digiriskresources->digirisk_dolibarr_fetch_resources();
 $hookmanager->initHooks(array('firepermitcard', 'globalcard')); // Note that conf->hooks_modules contains array
 
 $upload_dir = $conf->digiriskdolibarr->multidir_output[isset($object->entity) ? $object->entity : 1];
+
 // Security check
+require_once __DIR__ . '/../../core/tpl/digirisk_security_checks.php';
+
 $permissiontoread   = $user->rights->digiriskdolibarr->firepermit->read;
 $permissiontoadd    = $user->rights->digiriskdolibarr->firepermit->write;
 $permissiontodelete = $user->rights->digiriskdolibarr->firepermit->delete;
 
 if ( ! $permissiontoread) accessforbidden();
-require_once __DIR__ . '/../../core/tpl/digirisk_security_checks.php';
+
+$refFirePermitMod    = new $conf->global->DIGIRISKDOLIBARR_FIREPERMIT_ADDON($db);
+$refFirePermitDetMod = new $conf->global->DIGIRISKDOLIBARR_FIREPERMITDET_ADDON($db);
 
 /*
  * Actions
