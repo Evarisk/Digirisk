@@ -3682,9 +3682,6 @@ td > .risk-evaluation-list-content .risk-evaluation-container:not(.advanced, .st
   align-items: center;
 }
 
-.risk-evaluation-add-modal .modal-active, .risk-evaluation-edit-modal .modal-active {
-  z-index: 1005;
-}
 .risk-evaluation-add-modal .modal-container, .risk-evaluation-edit-modal .modal-container {
   max-height: 750px;
 }
