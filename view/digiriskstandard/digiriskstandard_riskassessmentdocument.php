@@ -227,7 +227,7 @@ if (empty($reshook)) {
 
 				// Ajout du fichier au dossier à zipper
 				$sourceFilePath = DOL_DATA_ROOT . $entity . '/digiriskdolibarr/' . $subFolder . '/' . $digiriskelementsingle['object']->ref . '/';
-				$nameFile       = $date . '_' . $riskassessmentdocument->ref . '_' . $digiriskelementdocument->ref . '_' . $digiriskelementsingle['object']->label . '.odt';
+				$nameFile       = $date . '_' . $riskassessmentdocument->ref . '_' . $digiriskelementsingle['object']->ref . '_' . $digiriskelementdocument->ref . '_' . $digiriskelementsingle['object']->label . '_' . $nameSociety . '.odt';
 				$nameFile       = str_replace(' ', '_', $nameFile);
 				$nameFile       = dol_sanitizeFileName($nameFile);
 				copy($sourceFilePath . $digiriskelementdocument->last_main_doc, $pathToZip . '/' . $nameFile);
