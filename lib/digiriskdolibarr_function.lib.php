@@ -212,7 +212,7 @@ function digirisk_show_photos($modulepart, $sdir, $size = '', $nbmax = 0, $nbbyr
 * @param      string              $tooltiptext       (optional) Tooltip text when gen button disabled
 * @return		string              					Output string with HTML array of documents (might be empty string)
 */
-function digiriskshowdocuments($modulepart, $modulesubdir, $filedir, $urlsource, $genallowed, $delallowed = 0, $modelselected = '', $allowgenifempty = 1, $noform = 0, $param = '', $title = '', $buttonlabel = '', $morepicto = '', $object = null, $hideifempty = 0, $removeaction = 'remove_file', $active = true, $tooltiptext = '')
+function digiriskshowdocuments($modulepart, $modulesubdir, $filedir, $urlsource, $genallowed, $delallowed = 0, $modelselected = '', $allowgenifempty = 1, $noform = 0, $param = '', $title = '', $buttonlabel = '', $morepicto = '', $object = null, $hideifempty = 0, $removeaction = 'remove_file', $active = true, $tooltiptext = 'PermissionDenied')
 {
 	global $db, $langs, $conf, $hookmanager, $form;
 
@@ -325,17 +325,11 @@ function digiriskshowdocuments($modulepart, $modulesubdir, $filedir, $urlsource,
 			}
 
 			// Button
-			if ($active) {
-				$genbutton  = '<input style="display : none" class="button buttongen" id="' . $forname . '_generatebutton" name="' . $forname . '_generatebutton" type="submit" value="' . $buttonlabel . '"' . '>';
-				$genbutton .= '<label for="' . $forname . '_generatebutton">';
-				$genbutton .= '<div class="wpeo-button button-square-40 button-blue wpeo-tooltip-event" aria-label="' . $langs->trans('Generate') . '"><i class="fas fa-print button-icon"></i></div>';
-				$genbutton .= '</label>';
+			if (!$active) {
+				$genbutton .= '<button class="wpeo-button button-square-40 button-blue button-load wpeo-tooltip-event" id="' . $forname . '_generatebutton" name="' . $forname . '_generatebutton" type="submit" aria-label="' . $langs->trans('Generate') . '"><i class="fas fa-print button-icon"></i></button>';
 			} else {
-				$genbutton  = '<input style="display : none" class="button buttongen disabled" name="' . $forname . '_generatebutton" style="cursor: not-allowed" value="' . $buttonlabel . '"' . '>';
-				$genbutton .= '<label for="' . $forname . '_generatebutton">';
 				$genbutton .= '<i class="fas fa-exclamation-triangle pictowarning wpeo-tooltip-event" aria-label="' . $langs->trans($tooltiptext) . '"></i>';
-				$genbutton .= '<div class="wpeo-button button-square-40 button-grey wpeo-tooltip-event" aria-label="' . $langs->trans('Generate') . '"><i class="fas fa-print button-icon"></i></div>';
-				$genbutton .= '</label>';
+				$genbutton .= '<button class="wpeo-button button-square-40 button-disable" name="' . $forname . '_generatebutton"><i class="fas fa-print button-icon"></i></button>';
 			}
 
 			//		if ( ! $allowgenifempty && ! is_array($modellist) && empty($modellist)) $genbutton .= ' disabled';

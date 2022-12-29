@@ -553,7 +553,7 @@ if ((empty($action) || ($action != 'create' && $action != 'edit'))) {
 		print '</td><td class="center">';
 		print '-';
 		print '</td><td class="center">';
-		print '<button type="submit" class="wpeo-button button-blue " name="addline" id="addline"><i class="fas fa-plus"></i>  ' . $langs->trans('Add') . '</button>';
+		print '<button type="submit" class="wpeo-button button-blue button-load" name="addline" id="addline"><i class="fas fa-plus"></i>  ' . $langs->trans('Add') . '</button>';
 		print '<td class="center">';
 		print '-';
 		print '</td>';

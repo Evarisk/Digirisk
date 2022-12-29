@@ -4485,6 +4485,51 @@ window.eoxiaJS.dashboard.closeDashBoardInfo = function() {
 };
 
 /**
+ * Initialise l'objet "button" ainsi que la méthode "init" obligatoire pour la bibliothèque EoxiaJS.
+ *
+ * @since   9.8.2
+ * @version 9.8.2
+ */
+window.eoxiaJS.button = {};
+
+/**
+ * La méthode appelée automatiquement par la bibliothèque EoxiaJS.
+ *
+ * @since   1.1.0
+ * @version 1.1.0
+ *
+ * @return {void}
+ */
+window.eoxiaJS.button.init = function() {
+	window.eoxiaJS.button.event();
+};
+
+/**
+ * La méthode contenant tous les événements pour les buttons.
+ *
+ * @since   1.1.0
+ * @version 1.1.0
+ *
+ * @return {void}
+ */
+window.eoxiaJS.button.event = function() {
+	$( document ).on( 'click', '.button-load', window.eoxiaJS.button.addLoader );
+};
+
+/**
+ * Add loader on button
+ *
+ * @since   9.8.2
+ * @version 9.8.2
+ *
+ * @return {void}
+ */
+window.eoxiaJS.button.addLoader = function() {
+	window.eoxiaJS.loader.display($(this));
+	$(this).toggleClass('button-blue button-disable');
+};
+
+/**
  * Initialise l'objet "file" ainsi que la méthode "init" obligatoire pour la bibliothèque EoxiaJS.
  *
  * @since   1.1.0
