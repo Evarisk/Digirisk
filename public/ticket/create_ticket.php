@@ -544,15 +544,15 @@ if ($entity > 0) {
 					$logos_list = dol_dir_list($logos_path);
 					if (is_array($logos_list) && !empty($logos_list)) {
 						$logo = array_shift($logos_list);
-						$logo_fullname = $logo['name'];
+						$logo_src = DOL_URL_ROOT . '/custom/digiriskdolibarr/documents/viewimage.php?modulepart=mycompany&entity=' . $entityId . '&file=' . urlencode('logos/thumbs/' . $logo['name']);
 					} else {
-						$logo_fullname = '';
+						$logo_src = DOL_URL_ROOT.'/public/theme/common/nophoto.png';
 					}
 
 					print '<a href="' . $_SERVER["PHP_SELF"] . '?entity=' . $entityId . '">';
 					print '<div class="card" style="height: 200px">';
 					print '<br>';
-					print '<img src="' . DOL_URL_ROOT . '/custom/digiriskdolibarr/documents/viewimage.php?modulepart=mycompany&entity=' . $entityId . '&file=' . urlencode('logos/thumbs/' . $logo_fullname) . '" alt="SocietyLogo" style="width:40%">';
+					print '<img src="' . $logo_src . '" alt="SocietyLogo" style="width:40%">';
 					print '<div class="card-container">';
 					print '<h4><b>' . $entityName . '</b></h4>';
 					print '</div>';
