@@ -1622,6 +1622,82 @@ window.eoxiaJS.mediaGallery.addToFavorite = function( event ) {
 };
 
 /**
+ * Initialise l'objet "digiriskelement" ainsi que la méthode "init" obligatoire pour la bibliothèque EoxiaJS.
+ *
+ * @since   9.8.2
+ * @version 9.8.2
+ */
+window.eoxiaJS.digiriskelement = {};
+
+/**
+ * La méthode appelée automatiquement par la bibliothèque EoxiaJS.
+ *
+ * @since   9.8.2
+ * @version 9.8.2
+ *
+ * @return {void}
+ */
+window.eoxiaJS.digiriskelement.init = function() {
+	window.eoxiaJS.digiriskelement.event();
+};
+
+/**
+ * La méthode contenant tous les événements pour le digiriskelement.
+ *
+ * @since   9.8.2
+ * @version 9.8.2
+ *
+ * @return {void}
+ */
+window.eoxiaJS.digiriskelement.event = function() {
+	$( document ).on( 'click', '#select_all_shared_elements_by_digiriskelement', window.eoxiaJS.digiriskelement.selectAllSharedElementByDigiriskElement );
+	$( document ).on( 'click', '#select_all_shared_elements', window.eoxiaJS.digiriskelement.selectAllSharedElements );
+};
+
+/**
+ * Action select all shared element by digiriskelement.
+ *
+ * @since   9.2.0
+ * @version 9.8.2
+ *
+ * @return {void}
+ */
+window.eoxiaJS.digiriskelement.selectAllSharedElementByDigiriskElement = function ( event ) {
+	let digiriskelementid = $(this).attr('name');
+	if(this.checked) {
+		// Iterate each checkbox
+		$(this).closest('.ui-widget').find('.importsharedelement-digiriskelement-' + digiriskelementid).not(':disabled').each(function() {
+			this.checked = true;
+		});
+	} else {
+		$(this).closest('.ui-widget').find('.importsharedelement-digiriskelement-' + digiriskelementid).not(':disabled').each(function() {
+			this.checked = false;
+		});
+	}
+};
+
+/**
+ * Action select all shared elements.
+ *
+ * @since   9.2.0
+ * @version 9.8.2
+ *
+ * @return {void}
+ */
+window.eoxiaJS.digiriskelement.selectAllSharedElements = function ( event ) {
+	if(this.checked) {
+		// Iterate each checkbox
+		$(this).closest('.ui-widget').find(':checkbox').not(':disabled').not('#select_all_shared_elements_by_digiriskelement').each(function() {
+			this.checked = true;
+		});
+	} else {
+		$(this).closest('.ui-widget').find(':checkbox').not(':disabled').not('#select_all_shared_elements_by_digiriskelement').each(function() {
+			this.checked = false;
+		});
+	}
+};
+
+/**
  * Initialise l'objet "risk" ainsi que la méthode "init" obligatoire pour la bibliothèque EoxiaJS.
  *
  * @since   1.0.0
@@ -1654,7 +1730,6 @@ window.eoxiaJS.risk.event = function() {
 	$( document ).on( 'click', '.risk-create:not(.button-disable)', window.eoxiaJS.risk.createRisk );
 	$( document ).on( 'click', '.risk-save', window.eoxiaJS.risk.saveRisk );
 	$( document ).on( 'click', '.risk-unlink-shared', window.eoxiaJS.risk.unlinkSharedRisk );
-	$( document ).on( 'click', '#select_all_shared_risks', window.eoxiaJS.risk.selectAllSharedRisk );
 };
 
 /**
@@ -1978,27 +2053,6 @@ window.eoxiaJS.risk.unlinkSharedRisk = function ( event ) {
 			actionContainerError.removeClass('hidden');
 		}
 	});
-};
-
-/**
- * Action select All shared risk.
- *
- * @since   9.2.0
- * @version 9.2.0
- *
- * @return {void}
- */
-window.eoxiaJS.risk.selectAllSharedRisk = function ( event ) {
-	if(this.checked) {
-		// Iterate each checkbox
-		$(this).closest('.ui-widget').find(':checkbox').not(':disabled').each(function() {
-			this.checked = true;
-		});
-	} else {
-		$(this).closest('.ui-widget').find(':checkbox').not(':disabled').each(function() {
-			this.checked = false;
-		});
-	}
 };
 
 /**
@@ -3130,7 +3184,6 @@ window.eoxiaJS.risksign.event = function() {
 	$( document ).on( 'click', '.risksign-create:not(.button-disable)', window.eoxiaJS.risksign.createRiskSign );
 	$( document ).on( 'click', '.risksign-save', window.eoxiaJS.risksign.saveRiskSign );
 	$( document ).on( 'click', '.risksign-unlink-shared', window.eoxiaJS.risksign.unlinkSharedRiskSign );
-	$( document ).on( 'click', '#select_all_shared_risksigns', window.eoxiaJS.risksign.selectAllSharedRiskSign );
 };
 
 /**
@@ -3339,27 +3392,6 @@ window.eoxiaJS.risksign.unlinkSharedRiskSign = function ( event ) {
 			actionContainerError.removeClass('hidden');
 		}
 	});
-};
-
-/**
- * Action select All shared risk sign.
- *
- * @since   9.4.0
- * @version 9.4.0
- *
- * @return {void}
- */
-window.eoxiaJS.risksign.selectAllSharedRiskSign = function ( event ) {
-	if(this.checked) {
-		// Iterate each checkbox
-		$(this).closest('.ui-widget').find(':checkbox').not(':disabled').each(function() {
-			this.checked = true;
-		});
-	} else {
-		$(this).closest('.ui-widget').find(':checkbox').not(':disabled').each(function() {
-			this.checked = false;
-		});
-	}
 };
 
 /**

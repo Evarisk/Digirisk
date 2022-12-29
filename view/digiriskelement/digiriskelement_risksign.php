@@ -357,8 +357,9 @@ if ($sharedrisksigns) {
 			'text' => '<i class="fas fa-circle-info"></i>' . $langs->trans("ConfirmImportSharedRiskSigns"),
 		);
 
-		$formquestionimportsharedrisksigns[] = array('type' => 'checkbox', 'name' =>'select_all_shared_risksigns', 'value' => 0);
+		$formquestionimportsharedrisksigns[] = array('type' => 'checkbox', 'name' =>'select_all_shared_elements', 'value' => 0);
 
+		$previousDigiriskElement = 0;
 		foreach ($allrisksigns as $key => $risksigns) {
 			$digiriskelementtmp->fetch($risksigns->fk_element);
 			$digiriskelementtmp->element = 'digiriskdolibarr';
@@ -383,10 +384,15 @@ if ($sharedrisksigns) {
 				$importValue .= '<span>' . dol_trunc($risksigns->description, 32) . '</span>';
 				$importValue .= '</div>';
 
+				if ($alreadyImported == 0 && $previousDigiriskElement != $digiriskelementtmp->id) {
+					$importValue .= '<input type="checkbox" id="select_all_shared_elements_by_digiriskelement" name="' . $digiriskelementtmp->id . '" value="0">';
+				}
+				$previousDigiriskElement = $digiriskelementtmp->id;
+
 				if ($alreadyImported > 0) {
-					$formquestionimportsharedrisksigns[] = array('type' => 'checkbox', 'name' => $risksigns->id, 'label' => $importValue . '<span class="importsharedrisksigns imported">' . $langs->trans('AlreadyImported') . '</span>', 'value' => 0, 'disabled' => 1);
+					$formquestionimportsharedrisksigns[] = array('type' => 'checkbox', 'morecss' => 'importsharedelement-digiriskelement-'.$digiriskelementtmp->id, 'name' => $risksigns->id, 'label' => $importValue . '<span class="importsharedrisksigns imported">' . $langs->trans('AlreadyImported') . '</span>', 'value' => 0, 'disabled' => 1);
 				} else {
-					$formquestionimportsharedrisksigns[] = array('type' => 'checkbox', 'name' => $risksigns->id, 'label' => $importValue, 'value' => 0);
+					$formquestionimportsharedrisksigns[] = array('type' => 'checkbox', 'morecss' => 'importsharedelement-digiriskelement-'.$digiriskelementtmp->id, 'name' => $risksigns->id, 'label' => $importValue, 'value' => 0);
 				}
 			}
 

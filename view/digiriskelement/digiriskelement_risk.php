@@ -235,8 +235,9 @@ if ($sharedrisks) {
 			'text' => '<i class="fas fa-circle-info"></i>' . $langs->trans("ConfirmImportSharedRisks"),
 		);
 
-		$formquestionimportsharedrisks[] = array('type' => 'checkbox', 'name' =>'select_all_shared_risks', 'value' => 0);
+		$formquestionimportsharedrisks[] = array('type' => 'checkbox', 'name' =>'select_all_shared_elements', 'value' => 0);
 
+		$previousDigiriskElement = 0;
 		foreach ($allrisks as $key => $risks) {
 			$digiriskelementtmp->fetch($risks->fk_element);
 			$digiriskelementtmp->element = 'digiriskdolibarr';
@@ -297,10 +298,15 @@ if ($sharedrisks) {
 				$importValue .=  '</span>';
 				$importValue .= '</div>';
 
+				if ($alreadyImported == 0 && $previousDigiriskElement != $digiriskelementtmp->id) {
+					$importValue .= '<input type="checkbox" id="select_all_shared_elements_by_digiriskelement" name="' . $digiriskelementtmp->id . '" value="0">';
+				}
+				$previousDigiriskElement = $digiriskelementtmp->id;
+
 				if ($alreadyImported > 0) {
-					$formquestionimportsharedrisks[] = array('type' => 'checkbox', 'name' => $risks->id, 'label' => $importValue . '<span class="importsharedrisk imported">' . $langs->trans('AlreadyImported') . '</span>', 'value' => 0, 'disabled' => 1);
+					$formquestionimportsharedrisks[] = array('type' => 'checkbox', 'morecss' => 'importsharedelement-digiriskelement-'.$digiriskelementtmp->id, 'name' => $risks->id, 'label' => $importValue . '<span class="importsharedrisk imported">' . $langs->trans('AlreadyImported') . '</span>', 'value' => 0, 'disabled' => 1);
 				} else {
-					$formquestionimportsharedrisks[] = array('type' => 'checkbox', 'name' => $risks->id, 'label' => $importValue, 'value' => 0);
+					$formquestionimportsharedrisks[] = array('type' => 'checkbox', 'morecss' => 'importsharedelement-digiriskelement-'.$digiriskelementtmp->id, 'name' => $risks->id, 'label' => $importValue, 'value' => 0);
 				}
 			}
 		}
