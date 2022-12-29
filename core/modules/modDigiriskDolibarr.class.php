@@ -1605,7 +1605,7 @@ class modDigiriskdolibarr extends DolibarrModules
 			$resources->digirisk_dolibarr_set_resources($this->db, 1,  'RightsDefender',  'societe', array($rights_defenderID), $conf->entity);
 			$resources->digirisk_dolibarr_set_resources($this->db, 1,  'PoisonControlCenter',  'societe', array($poison_control_centerID), $conf->entity);
 
-			dolibarr_set_const($this->db, 'DIGIRISKDOLIBARR_THIRDPARTY_SET', 2, 'integer', 0, '', $conf->entity);
+			dolibarr_set_const($this->db, 'DIGIRISKDOLIBARR_THIRDPARTY_SET', 3, 'integer', 0, '', $conf->entity);
 		} elseif ($conf->global->DIGIRISKDOLIBARR_THIRDPARTY_SET == 1) {
 			//Install after 8.1.2
 
@@ -1648,7 +1648,7 @@ class modDigiriskdolibarr extends DolibarrModules
 			$resources->digirisk_dolibarr_set_resources($this->db, 1,  'RightsDefender',  'societe', array($rights_defenderID), $conf->entity);
 			$resources->digirisk_dolibarr_set_resources($this->db, 1,  'PoisonControlCenter',  'societe', array($poison_control_centerID), $conf->entity);
 
-			dolibarr_set_const($this->db, 'DIGIRISKDOLIBARR_THIRDPARTY_SET', 2, 'integer', 0, '', $conf->entity);
+			dolibarr_set_const($this->db, 'DIGIRISKDOLIBARR_THIRDPARTY_SET', 3, 'integer', 0, '', $conf->entity);
 		} elseif ($conf->global->DIGIRISKDOLIBARR_THIRDPARTY_SET == 2) {
 			require_once DOL_DOCUMENT_ROOT . '/societe/class/societe.class.php';
 			require_once __DIR__ . '/../../class/digiriskresources.class.php';
