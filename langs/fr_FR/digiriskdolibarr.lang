@@ -904,6 +904,8 @@ DigiriskElementSharedTooltip = Cette option permet de partager les groupements e
 PleaseSelectADigiriskElement = Sélectionner un groupement ou une unité de travail...
 Registers = Registres
 ShowInSelectOnPublicTicketInterface = Doit apparaître dans la liste des éléments de l'interface publique des tickets
+Arborescence = Arborescence GP/UT
+
 
 
 #
