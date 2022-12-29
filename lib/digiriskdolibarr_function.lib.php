@@ -181,6 +181,8 @@ function digirisk_show_photos($modulepart, $sdir, $size = '', $nbmax = 0, $nbbyr
 				if ($nbphoto) $return .= '</table>';
 			}
 		}
+	} else {
+		$return .= '<img class="photo photowithmargin" height="' . $maxHeight . '" width="' . $maxWidth . '" src="' . DOL_URL_ROOT . '/public/theme/common/nophoto.png">';
 	}
 	if (is_object($object)) {
 		$object->nbphoto = $nbphoto;
@@ -325,7 +327,7 @@ function digiriskshowdocuments($modulepart, $modulesubdir, $filedir, $urlsource,
 			}
 
 			// Button
-			if (!$active) {
+			if ($active) {
 				$genbutton .= '<button class="wpeo-button button-square-40 button-blue button-load wpeo-tooltip-event" id="' . $forname . '_generatebutton" name="' . $forname . '_generatebutton" type="submit" aria-label="' . $langs->trans('Generate') . '"><i class="fas fa-print button-icon"></i></button>';
 			} else {
 				$genbutton .= '<i class="fas fa-exclamation-triangle pictowarning wpeo-tooltip-event" aria-label="' . $langs->trans($tooltiptext) . '"></i>';
