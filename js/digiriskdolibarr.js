@@ -2831,8 +2831,7 @@ window.eoxiaJS.riskassessmenttask.createRiskAssessmentTaskTimeSpent = function (
 	let textToShow = '';
 	let taskRef    = element.find('.riskassessment-task-ref-'+taskID).attr('value');
 	let timespent  = $('.riskassessment-task-single-'+taskID).find('.riskassessment-task-timespent')
-	let modaltimespent = $('.riskassessment-task-ref-'+taskID).first().find('.riskassessment-task-timespent').first()
-
+	let listtimespent = $('.riskassessment-task-ref-'+taskID).first().find('.riskassessment-task-timespent').first()
 	let date     = single.find('#RiskassessmentTaskTimespentDate' + taskID).val();
 	let hour     = single.find('#RiskassessmentTaskTimespentDate' + taskID + 'hour').val();
 	let min      = single.find('#RiskassessmentTaskTimespentDate' + taskID + 'min').val();
@@ -2868,15 +2867,14 @@ window.eoxiaJS.riskassessmenttask.createRiskAssessmentTaskTimeSpent = function (
 			textToShow += actionContainerSuccess.find('.valueForCreateTaskTimeSpent1').val()
 			textToShow += taskRef
 			textToShow += actionContainerSuccess.find('.valueForCreateTaskTimeSpent2').val()
-
-			$('#risk_assessment_task_edit'+taskID).first().find('.riskassessment-task-timespent-container').first().append($(resp).find('#risk_assessment_task_edit'+taskID).first().find('.riskassessment-task-timespent-list-content').last())
+			$('#risk_assessment_task_edit'+taskID).first().find('.riskassessment-task-timespent-container').first().find('.riskassessment-task-timespent-list-content').first().prepend($(resp).find('#risk_assessment_task_edit'+taskID).first().find('.riskassessment-task-timespent-list-content').first())
 			$('.loader-spin').remove();
 			$('.wpeo-loader').removeClass('wpeo-loader')
 
 			actionContainerSuccess.find('.notice-subtitle .text').text(textToShow)
 			actionContainerSuccess.removeClass('hidden');
 			timespent.html($(resp).find('.riskassessment-task-single-'+taskID).find('.riskassessment-task-timespent'))
-			modaltimespent.html($(resp).find('.riskassessment-task-single-'+taskID).find('.riskassessment-task-timespent'))
+			listtimespent.html($(resp).find('.riskassessment-task-single-'+taskID).find('.riskassessment-task-timespent'))
 		},
 		error: function ( resp ) {
 			$(this).closest('.risk-row-content-' + riskId).removeClass('wpeo-loader');
