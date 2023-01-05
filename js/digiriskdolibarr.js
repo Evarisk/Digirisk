@@ -4545,7 +4545,7 @@ window.eoxiaJS.button.init = function() {
  * @return {void}
  */
 window.eoxiaJS.button.event = function() {
-	$( document ).on( 'click', '.button-load', window.eoxiaJS.button.addLoader );
+	$( document ).on( 'click', '.wpeo-button:submit', window.eoxiaJS.button.addLoader );
 };
 
 /**

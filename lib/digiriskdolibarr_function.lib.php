@@ -328,7 +328,7 @@ function digiriskshowdocuments($modulepart, $modulesubdir, $filedir, $urlsource,
 
 			// Button
 			if ($active) {
-				$genbutton .= '<button class="wpeo-button button-square-40 button-blue button-load wpeo-tooltip-event" id="' . $forname . '_generatebutton" name="' . $forname . '_generatebutton" type="submit" aria-label="' . $langs->trans('Generate') . '"><i class="fas fa-print button-icon"></i></button>';
+				$genbutton .= '<button class="wpeo-button button-square-40 button-blue wpeo-tooltip-event" id="' . $forname . '_generatebutton" name="' . $forname . '_generatebutton" type="submit" aria-label="' . $langs->trans('Generate') . '"><i class="fas fa-print button-icon"></i></button>';
 			} else {
 				$genbutton .= '<i class="fas fa-exclamation-triangle pictowarning wpeo-tooltip-event" aria-label="' . $langs->trans($tooltiptext) . '"></i>';
 				$genbutton .= '<button class="wpeo-button button-square-40 button-disable" name="' . $forname . '_generatebutton"><i class="fas fa-print button-icon"></i></button>';
