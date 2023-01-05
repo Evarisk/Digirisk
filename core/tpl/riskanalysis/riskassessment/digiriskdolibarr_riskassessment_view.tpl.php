@@ -35,8 +35,10 @@ if ( ! empty($allRiskAssessment) && $allRiskAssessment > 0) : ?>
 			require __DIR__ . '/digiriskdolibarr_riskassessment_view_single.tpl.php';
 		}
 	} else {
-		$lastEvaluation = array_shift($lastEvaluation);
-		require __DIR__ . '/digiriskdolibarr_riskassessment_view_single.tpl.php';
+		if (is_array($lastEvaluation) && !empty($lastEvaluation)) {
+			$lastEvaluation = array_shift($lastEvaluation);
+			require __DIR__ . '/digiriskdolibarr_riskassessment_view_single.tpl.php';
+		}
 	}
 	print '</div>'; ?>
 	<!-- RISK EVALUATION LIST MODAL -->
