@@ -1485,7 +1485,17 @@ TicketDigiriskElementHideRefHelp = Activer cette option pour rendre cacher la r�
 TicketDigiriskElementVisible = Afficher le champ GP/UT pour créer un ticket
 TicketDigiriskElementVisibleHelp = Activer cette option pour afficher le champ GP/UT dans l'interface publique
 TicketEmailVisible = Afficher le champ Email pour créer un ticket
-TicketEmailVisibleHelp =  Activer cette option pour afficher le champ Email dans l'interface publique
+TicketEmailVisibleHelp = Activer cette option pour afficher le champ Email dans l'interface publique
+TicketFirstNameVisible = Afficher le champ Prénom pour créer un ticket
+TicketFirstNameVisibleHelp = Activer cette option pour afficher le champ Prénom dans l'interface publique
+TicketLastNameVisible = Afficher le champ Nom pour créer un ticket
+TicketLastNameVisibleHelp = Activer cette option pour afficher le champ Nom dans l'interface publique
+TicketPhoneVisible = Afficher le champ Téléphone pour créer un ticket
+TicketPhoneVisibleHelp = Activer cette option pour afficher le champ Téléphone dans l'interface publique
+TicketLocationVisible = Afficher le champ Lieu pour créer un ticket
+TicketLocationVisibleHelp = Activer cette option pour afficher le champ Lieu dans l'interface publique
+TicketDateVisible = Afficher le champ Date pour créer un ticket
+TicketDateVisibleHelp = Activer cette option pour afficher le champ Date dans l'interface publique
 QRCodeGenerated = QRCode généré
 
 # Stats - Statistiques
