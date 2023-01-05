@@ -32,11 +32,11 @@ if ( ! empty($allRiskAssessment) && $allRiskAssessment > 0) : ?>
 	print '<div class="risk-evaluation-list-content risk-evaluation-list-content-'. $risk->id .'">';
 	if ($conf->global->DIGIRISKDOLIBARR_SHOW_ALL_RISKASSESSMENTS) {
 		foreach ($allRiskAssessment as $lastEvaluation) {
-			require __DIR__ . '/digiriskdolibarr_riskassessment_view_single_view.tpl.php';
+			require __DIR__ . '/digiriskdolibarr_riskassessment_view_single.tpl.php';
 		}
 	} else {
 		$lastEvaluation = array_shift($lastEvaluation);
-		require __DIR__ . '/digiriskdolibarr_riskassessment_view_single_view.tpl.php';
+		require __DIR__ . '/digiriskdolibarr_riskassessment_view_single.tpl.php';
 	}
 	print '</div>'; ?>
 	<!-- RISK EVALUATION LIST MODAL -->
