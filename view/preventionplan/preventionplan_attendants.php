@@ -129,7 +129,11 @@ if ($action == 'addSignature') {
 
 	$signatory->fetch($signatoryID);
 	$signatory->signature      = $data['signature'];
-	$signatory->signature_date = dol_now('tzuser');
+	if (!empty($signatory->signature)) {
+		$signatory->signature_date = dol_now('tzuser');
+	} else {
+		$signatory->signature_date = '';
+	}
 
 	if ( ! $error) {
 		$result = $signatory->update($user);
