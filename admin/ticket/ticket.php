@@ -374,6 +374,8 @@ if ( ! empty($conf->global->DIGIRISKDOLIBARR_TICKET_ENABLE_PUBLIC_INTERFACE)) {
 	print '</tr>';
 	print '</form>';
 
+	print load_fiche_titre($langs->transnoentities("PublicInterfaceConfiguration"), '', '');
+
 	print '<div class="div-table-responsive-no-min">';
 	print '<table class="noborder centpercent">';
 	print '<tr class="liste_titre">';
@@ -381,6 +383,19 @@ if ( ! empty($conf->global->DIGIRISKDOLIBARR_TICKET_ENABLE_PUBLIC_INTERFACE)) {
 	print '<td class="center">' . $langs->transnoentities("Visible") . '</td>';
 	print '<td class="center">' . $langs->transnoentities("Required") . '</td>';
 	print '<td class="center">' . $langs->transnoentities("ShortInfo") . '</td>';
+	print '</tr>';
+
+	// Photo visible
+	print '<tr class="oddeven"><td>' . $langs->transnoentities("TicketPhotoVisible") . '</td>';
+	print '<td class="center">';
+	print ajax_constantonoff('DIGIRISKDOLIBARR_TICKET_PHOTO_VISIBLE');
+	print '</td>';
+	print '<td class="center">';
+	print '';
+	print '</td>';
+	print '<td class="center">';
+	print $form->textwithpicto('', $langs->transnoentities("TicketPhotoVisibleHelp"));
+	print '</td>';
 	print '</tr>';
 
 	// GP/UT Visible and Required

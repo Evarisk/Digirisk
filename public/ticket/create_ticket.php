@@ -137,7 +137,7 @@ if ($action == 'add') {
 		}
 	}
 
-	$firstname = GETPOST('firstname', 'alpha');
+	$firstname = GETPOST('options_digiriskdolibarr_ticket_firstname', 'alpha');
 	if ($conf->global->DIGIRISKDOLIBARR_TICKET_FIRSTNAME_REQUIRED && $conf->global->DIGIRISKDOLIBARR_TICKET_FIRSTNAME_VISIBLE) {
 		if (empty($firstname)) {
 			setEventMessages($langs->trans('ErrorFieldNotEmpty', $langs->transnoentities('FirstName')), array(), 'errors');
@@ -145,7 +145,7 @@ if ($action == 'add') {
 		}
 	}
 
-	$lastname = GETPOST('lastname', 'alpha');
+	$lastname = GETPOST('options_digiriskdolibarr_ticket_lastname', 'alpha');
 	if ($conf->global->DIGIRISKDOLIBARR_TICKET_LASTNAME_REQUIRED && $conf->global->DIGIRISKDOLIBARR_TICKET_LASTNAME_VISIBLE) {
 		if (empty($lastname)) {
 			setEventMessages($langs->trans('ErrorFieldNotEmpty', $langs->transnoentities('LastName')), array(), 'errors');
@@ -153,7 +153,7 @@ if ($action == 'add') {
 		}
 	}
 
-	$phone = GETPOST('phone', 'alpha');
+	$phone = GETPOST('options_digiriskdolibarr_ticket_phone', 'alpha');
 	if ($conf->global->DIGIRISKDOLIBARR_TICKET_PHONE_REQUIRED && $conf->global->DIGIRISKDOLIBARR_TICKET_PHONE_VISIBLE) {
 		if (empty($phone)) {
 			setEventMessages($langs->trans('ErrorFieldNotEmpty', $langs->transnoentities('Phone')), array(), 'errors');
@@ -161,7 +161,7 @@ if ($action == 'add') {
 		}
 	}
 
-	$location = GETPOST('location', 'alpha');
+	$location = GETPOST('options_digiriskdolibarr_ticket_location', 'alpha');
 	if ($conf->global->DIGIRISKDOLIBARR_TICKET_LOCATION_REQUIRED && $conf->global->DIGIRISKDOLIBARR_TICKET_LOCATION_VISIBLE) {
 		if (empty($location)) {
 			setEventMessages($langs->trans('ErrorFieldNotEmpty', $langs->transnoentities('Location')), array(), 'errors');
@@ -174,6 +174,13 @@ if ($action == 'add') {
 		$object->origin_email = $email;
 	} else {
 		setEventMessages($langs->trans('ErrorFieldEmail'), array(), 'errors');
+		$error++;
+	}
+
+	$regPhone = '/^(?:(?:(?:\+|00)\d{2}[\s]?(?:\(0\)[\s]?)?)|0){1}[1-9]{1}([\s.-]?)(?:\d{2}\1?){3}\d{2}$/';
+	if (preg_match($regPhone, $phone) || empty($phone)) {
+	} else {
+		setEventMessages($langs->trans('ErrorFieldPhone'), array(), 'errors');
 		$error++;
 	}
 
@@ -204,7 +211,7 @@ if ($action == 'add') {
 		}
 	}
 
-	$date = GETPOST('date', 'alpha');
+	$date = GETPOST('options_digiriskdolibarr_ticket_date', 'alpha');
 	if ($conf->global->DIGIRISKDOLIBARR_TICKET_DATE_REQUIRED && $conf->global->DIGIRISKDOLIBARR_TICKET_DATE_VISIBLE) {
 		if (empty($date)) {
 			setEventMessages($langs->trans('ErrorFieldNotEmpty', $langs->transnoentitiesnoconv('Date')), array(), 'errors');
@@ -487,6 +494,7 @@ if ($entity > 0) {
 					<textarea name="message" id="message"><?php echo GETPOST('message');?></textarea>
 				</label>
 			</div>
+			<?php if ($conf->global->DIGIRISKDOLIBARR_TICKET_PHOTO_VISIBLE) {?>
 			<div class="form-element">
 				<div class="wpeo-gridlayout grid-2">
 					<span class="form-label"><?php print $langs->trans("FilesLinked"); ?></span>
@@ -529,6 +537,7 @@ if ($entity > 0) {
 						</div>
 					</div>
 				</div>
+				<?php } ?>
 			</div>
 		</div>
 
@@ -538,7 +547,7 @@ if ($entity > 0) {
 		} else {
 			$entity = GETPOST('entity');
 		}
-		if ($entity > 0) {
+		if ($entity > 0 && dolibarr_get_const($db, 'DIGIRISKDOLIBARR_TICKET_EXTRAFIELDS', $conf->entity) == 1) {
 			if ($conf->global->DIGIRISKDOLIBARR_TICKET_DIGIRISKELEMENT_VISIBLE) {
 				$digiriskelement = new DigiriskElement($db);
 				$selectDigiriskElement = '</br> <span ' . (($conf->global->DIGIRISKDOLIBARR_TICKET_DIGIRISKELEMENT_REQUIRED) ? 'style="font-weight:600"' : '') . '>' . $langs->trans('Service') . (($conf->global->DIGIRISKDOLIBARR_TICKET_DIGIRISKELEMENT_REQUIRED) ? '<span style="color:red"> *</span>' : '') . '</span>';
@@ -562,7 +571,7 @@ if ($entity > 0) {
 				$lastnamefield = '<div class="form-element">';
 				$lastnamefield .= '<span class="form-label"' . (($conf->global->DIGIRISKDOLIBARR_TICKET_LASTNAME_REQUIRED) ? '' : 'style="font-weight:300"') . '>' . $langs->trans("LastName") . (($conf->global->DIGIRISKDOLIBARR_TICKET_LASTNAME_REQUIRED) ? '<span style="color:red"> *</span>' : '') . '</span>';
 				$lastnamefield .= '<label class="form-lastname-field-container">';
-				$lastnamefield .= '<input class="lastname" type="lastname" name="lastname" id="lastname" value="' . GETPOST('lastname') . '"/>';
+				$lastnamefield .= '<input class="options_digiriskdolibarr_ticket_lastname" name="options_digiriskdolibarr_ticket_lastname" id="options_digiriskdolibarr_ticket_lastname" value="' . GETPOST('options_digiriskdolibarr_ticket_lastname') . '"/>';
 				$lastnamefield .= '</label>';
 				$lastnamefield .= '</div>';
 				print($lastnamefield);
@@ -572,7 +581,7 @@ if ($entity > 0) {
 				$firstnamefield = '<div class="form-element">';
 				$firstnamefield .= '<span class="form-label"' . (($conf->global->DIGIRISKDOLIBARR_TICKET_FIRSTNAME_REQUIRED) ? '' : 'style="font-weight:300"') . '>' . $langs->trans("FirstName") . (($conf->global->DIGIRISKDOLIBARR_TICKET_FIRSTNAME_REQUIRED) ? '<span style="color:red"> *</span>' : '') . '</span>';
 				$firstnamefield .= '<label class="form-firstname-field-container">';
-				$firstnamefield .= '<input class="firstname" type="firstname" name="firstname" id="firstname" value="' . GETPOST('firstname') . '"/>';
+				$firstnamefield .= '<input class="options_digiriskdolibarr_ticket_firstname" name="options_digiriskdolibarr_ticket_firstname" id="options_digiriskdolibarr_ticket_firstname" value="' . GETPOST('options_digiriskdolibarr_ticket_firstname') . '"/>';
 				$firstnamefield .= '</label>';
 				$firstnamefield .= '</div>';
 				print($firstnamefield);
@@ -591,8 +600,7 @@ if ($entity > 0) {
 			if ($conf->global->DIGIRISKDOLIBARR_TICKET_PHONE_VISIBLE) {
 				$phonefield = '<div class="form-element">';
 				$phonefield .= '<span class="form-label"' . (($conf->global->DIGIRISKDOLIBARR_TICKET_PHONE_REQUIRED) ? '' : 'style="font-weight:300"') . '>' . $langs->trans("Phone") . (($conf->global->DIGIRISKDOLIBARR_TICKET_PHONE_REQUIRED) ? '<span style="color:red"> *</span>' : '') . '</span>';
-				$phonefield .= '<label class="form-field-container">';
-				$phonefield .= '<input class="phone" type="phone" name="phone" id="phone" value="' . GETPOST('phone') . '"/>';
+				$phonefield .= '<input class="options_digiriskdolibarr_ticket_phone" type="tel" name="options_digiriskdolibarr_ticket_phone" id="options_digiriskdolibarr_ticket_phone" value="' . GETPOST('options_digiriskdolibarr_ticket_phone') . '"/>';
 				$phonefield .= '</label>';
 				$phonefield .= '</div>';
 				print($phonefield);
@@ -602,7 +610,7 @@ if ($entity > 0) {
 				$locationfield = '<div class="form-element">';
 				$locationfield .= '<span class="form-label"' . (($conf->global->DIGIRISKDOLIBARR_TICKET_LOCATION_REQUIRED) ? '' : 'style="font-weight:300"') . '>' . $langs->trans("Location") . (($conf->global->DIGIRISKDOLIBARR_TICKET_LOCATION_REQUIRED) ? '<span style="color:red"> *</span>' : '') . '</span>';
 				$locationfield .= '<label class="form-field-container">';
-				$locationfield .= '<input class="location" type="location" name="location" id="location" value="' . GETPOST('location') . '"/>';
+				$locationfield .= '<input class="options_digiriskdolibarr_ticket_location" name="options_digiriskdolibarr_ticket_location" id="options_digiriskdolibarr_ticket_location" value="' . GETPOST('options_digiriskdolibarr_ticket_location') . '"/>';
 				$locationfield .= '</label>';
 				$locationfield .= '</div>';
 				print($locationfield);
@@ -611,7 +619,7 @@ if ($entity > 0) {
 			if ($conf->global->DIGIRISKDOLIBARR_TICKET_DATE_VISIBLE) {
 				$datefield = '<div class="form-element">';
 				$datefield .= '<span class="form-label"' . (($conf->global->DIGIRISKDOLIBARR_TICKET_DATE_REQUIRED) ? '' : 'style="font-weight:300"') . '>' . $langs->trans("Date") . (($conf->global->DIGIRISKDOLIBARR_TICKET_DATE_REQUIRED) ? '<span style="color:red"> *</span>' : '') . '</span>';
-				$datefield .=  $form->selectDate(dol_now('tzuser'), 'date', 1, 1, 0, '', 1, 1);
+				$datefield .=  $form->selectDate(dol_now('tzuser'), 'options_digiriskdolibarr_ticket_date', 1, 1, 0, '', 1, 1);
 				$datefield .= '</div>';
 				print($datefield);
 			}
