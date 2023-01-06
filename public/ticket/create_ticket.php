@@ -194,16 +194,6 @@ if ($action == 'add') {
 		$error++;
 	}
 
-	//	if (empty(GETPOST('options_digiriskdolibarr_ticket_lastname'))) {
-	//		setEventMessages($langs->trans('ErrorFieldNotEmpty', $langs->transnoentitiesnoconv('Lastname')), array(), 'errors');
-	//		$error++;
-	//	}
-
-	//	if (empty(GETPOST('options_digiriskdolibarr_ticket_firstname'))) {
-	//		setEventMessages($langs->trans('ErrorFieldNotEmpty', $langs->transnoentitiesnoconv('Firstname')), array(), 'errors');
-	//		$error++;
-	//	}
-
 	if ($conf->global->DIGIRISKDOLIBARR_TICKET_DIGIRISKELEMENT_REQUIRED) {
 		if (empty(GETPOST('options_digiriskdolibarr_ticket_service')) || GETPOST('options_digiriskdolibarr_ticket_service') == -1) {
 			setEventMessages($langs->trans('ErrorFieldNotEmpty', $langs->transnoentitiesnoconv('GP/UT')), array(), 'errors');
@@ -625,9 +615,8 @@ if ($entity > 0) {
 			}
 		}
 
-		//include DOL_DOCUMENT_ROOT . '/core/tpl/extrafields_add.tpl.php'; ?>
+		//include DOL_DOCUMENT_ROOT . '/core/tpl/extrafields_add.tpl.php'; 
 
-		<?php
 		if ( ! empty($conf->global->DIGIRISKDOLIBARR_USE_CAPTCHA)) {
 			require_once DOL_DOCUMENT_ROOT . '/core/lib/security2.lib.php';
 			print '<div class="center"><label for="email"><span class="fieldrequired">' . $langs->trans("SecurityCode") . '</span><span style="color:red"> *</span></label>';
@@ -636,7 +625,7 @@ if ($entity > 0) {
 			print '</span>';
 			print '<span class="nowrap inline-block">';
 			print '<img class="inline-block valignmiddle" src="' . DOL_URL_ROOT . '/core/antispamimage.php" border="0" width="80" height="32" id="img_securitycode" />';
-			print '<a class="inline-block valignmiddle" href="' . $_SERVER["PHP_SELF"] . '" tabindex="4" data-role="button">' . img_picto($langs->trans("Refresh"), 'refresh', 'id="captcha_refresh_img"') . '</a>';
+			print '<a class="inline-block valignmiddle" href="' . $_SERVER["PHP_SELF"] . '?entity=' . $entity . '" tabindex="4" data-role="button">' . img_picto($langs->trans("Refresh"), 'refresh', 'id="captcha_refresh_img"') . '</a>';
 			print '</span>';
 			print '</div>';
 		}?>
