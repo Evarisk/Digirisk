@@ -484,8 +484,8 @@ if ($entity > 0) {
 					<textarea name="message" id="message"><?php echo GETPOST('message');?></textarea>
 				</label>
 			</div>
-			<?php if ($conf->global->DIGIRISKDOLIBARR_TICKET_PHOTO_VISIBLE) {?>
 			<div class="form-element">
+				<?php if ($conf->global->DIGIRISKDOLIBARR_TICKET_PHOTO_VISIBLE) {?>
 				<div class="wpeo-gridlayout grid-2">
 					<span class="form-label"><?php print $langs->trans("FilesLinked"); ?></span>
 					<label class="wpeo-button button-blue" for="sendfile">
@@ -615,7 +615,7 @@ if ($entity > 0) {
 			}
 		}
 
-		//include DOL_DOCUMENT_ROOT . '/core/tpl/extrafields_add.tpl.php'; 
+		//include DOL_DOCUMENT_ROOT . '/core/tpl/extrafields_add.tpl.php';
 
 		if ( ! empty($conf->global->DIGIRISKDOLIBARR_USE_CAPTCHA)) {
 			require_once DOL_DOCUMENT_ROOT . '/core/lib/security2.lib.php';
