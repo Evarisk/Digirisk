@@ -11,7 +11,7 @@ if ($conf->multicompany->enabled) {
 			}
 		}
 	} else {
-		setEventMessage($langs->trans('EnabledModule'), 'warnings');
+		setEventMessage($langs->trans('EnableModule'), 'warnings');
 		$urltogo = dol_buildpath('/admin/modules.php?search_nature=external_Evarisk', 1);
 		header("Location: " . $urltogo);
 		exit;
