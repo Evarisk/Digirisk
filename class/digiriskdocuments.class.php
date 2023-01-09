@@ -482,80 +482,96 @@ class DigiriskDocuments extends CommonObject
 
 								if (!empty($related_tasks) && is_array($related_tasks)) {
 									foreach ($related_tasks as $related_task) {
-										$AllInitiales = '';
-										$related_task_contact_ids = $related_task->getListContactId();
-										if (!empty($related_task_contact_ids) && is_array($related_task_contact_ids)) {
-											foreach ($related_task_contact_ids as $related_task_contact_id) {
-												$usertmp->fetch($related_task_contact_id);
-												$AllInitiales .= strtoupper(str_split($usertmp->firstname, 1)[0] . str_split($usertmp->lastname, 1)[0] . ',');
-											}
-										}
-
-										$contactslistinternal = $related_task->liste_contact(-1, 'internal');
-										$responsible          = '';
-
-										if (!empty($contactslistinternal) && is_array($contactslistinternal)) {
-											foreach ($contactslistinternal as $contactlistinternal) {
-												if ($contactlistinternal['code'] == 'TASKEXECUTIVE') {
-													$responsible .= $contactlistinternal['firstname'] . ' ' . $contactlistinternal['lastname'] . ', ';
-												}
-											}
-										}
-
-										if ($conf->global->DIGIRISKDOLIBARR_SHOW_TASK_CALCULATED_PROGRESS) {
-											$tmparray = $related_task->getSummaryOfTimeSpent();
-											if ($tmparray['total_duration'] > 0 && !empty($related_task->planned_workload)) {
-												$task_progress = round($tmparray['total_duration'] / $related_task->planned_workload * 100, 2);
+										if (!empty($conf->global->DIGIRISKDOLIBARR_SHOW_SHARED_RISKS)) {
+											$project = new Project($this->db);
+											$project->fetch($related_task->fk_project);
+											if ($project->entity != $conf->entity) {
+												$result = !empty($conf->mc->sharings['project']) ? in_array($project->entity, $conf->mc->sharings['project']) : 0;
 											} else {
-												$task_progress = 0;
+												$result = 1;
 											}
 										} else {
-											$task_progress = $related_task->progress;
+											$result = 1;
 										}
+										if ($result > 0) {
+											$AllInitiales = '';
+											$related_task_contact_ids = $related_task->getListContactId();
+											if (!empty($related_task_contact_ids) && is_array($related_task_contact_ids)) {
+												foreach ($related_task_contact_ids as $related_task_contact_id) {
+													$usertmp->fetch($related_task_contact_id);
+													$AllInitiales .= strtoupper(str_split($usertmp->firstname, 1)[0] . str_split($usertmp->lastname, 1)[0] . ',');
+												}
+											}
 
-										if ($task_progress == 100) {
-											if ($conf->global->DIGIRISKDOLIBARR_WORKUNITDOCUMENT_SHOW_TASK_DONE > 0) {
-												(($related_task->ref) ? $tmparray['actionPreventionCompleted'] .= $langs->trans('Ref') . ' : ' . $related_task->ref . "\n" : '');
-												(($responsible) ? $tmparray['actionPreventionCompleted'] .= $langs->trans('Responsible') . ' : ' . $responsible . "\n" : '');
-												$tmparray['actionPreventionCompleted'] .= $langs->trans('DateStart') . ' : ';
-												if ($conf->global->DIGIRISKDOLIBARR_SHOW_TASK_START_DATE && !empty($related_task->date_start)) {
-													$tmparray['actionPreventionCompleted'] .= dol_print_date(($related_task->date_start), 'dayreduceformat');
+											$contactslistinternal = $related_task->liste_contact(-1, 'internal');
+											$responsible = '';
+
+											if (!empty($contactslistinternal) && is_array($contactslistinternal)) {
+												foreach ($contactslistinternal as $contactlistinternal) {
+													if ($contactlistinternal['code'] == 'TASKEXECUTIVE') {
+														$responsible .= $contactlistinternal['firstname'] . ' ' . $contactlistinternal['lastname'] . ', ';
+													}
+												}
+											}
+
+											if ($conf->global->DIGIRISKDOLIBARR_SHOW_TASK_CALCULATED_PROGRESS) {
+												$tmparray = $related_task->getSummaryOfTimeSpent();
+												if ($tmparray['total_duration'] > 0 && !empty($related_task->planned_workload)) {
+													$task_progress = round($tmparray['total_duration'] / $related_task->planned_workload * 100, 2);
 												} else {
-													$tmparray['actionPreventionCompleted'] .= dol_print_date(($related_task->date_c), 'dayreduceformat');
+													$task_progress = 0;
+												}
+											} else {
+												$task_progress = $related_task->progress;
+											}
+
+											if ($task_progress == 100) {
+												if ($conf->global->DIGIRISKDOLIBARR_WORKUNITDOCUMENT_SHOW_TASK_DONE > 0) {
+													(($related_task->ref) ? $tmparray['actionPreventionCompleted'] .= $langs->trans('Ref') . ' : ' . $related_task->ref . "\n" : '');
+													(($responsible) ? $tmparray['actionPreventionCompleted'] .= $langs->trans('Responsible') . ' : ' . $responsible . "\n" : '');
+													$tmparray['actionPreventionCompleted'] .= $langs->trans('DateStart') . ' : ';
+													if ($conf->global->DIGIRISKDOLIBARR_SHOW_TASK_START_DATE && !empty($related_task->date_start)) {
+														$tmparray['actionPreventionCompleted'] .= dol_print_date(($related_task->date_start), 'dayreduceformat');
+													} else {
+														$tmparray['actionPreventionCompleted'] .= dol_print_date(($related_task->date_c), 'dayreduceformat');
+													}
+													if ($conf->global->DIGIRISKDOLIBARR_SHOW_TASK_END_DATE && !empty($related_task->date_end)) {
+														$tmparray['actionPreventionCompleted'] .= "\n" . $langs->transnoentities('Deadline') . ' : ' . dol_print_date($related_task->date_end, 'dayreduceformat') . "\n";
+													} else {
+														$tmparray['actionPreventionCompleted'] .= ' - ' . $langs->transnoentities('Deadline') . ' : ' . $langs->trans('NoData') . "\n";
+													}
+													$tmparray['actionPreventionCompleted'] .= $langs->trans('Budget') . ' : ' . price($related_task->budget_amount, 0, $langs, 1, 0, 0, $conf->currency) . "\n";
+													(($AllInitiales) ? $tmparray['actionPreventionCompleted'] .= $langs->trans('ContactsAction') . ' : ' . $AllInitiales . "\n" : '');
+													(($related_task->label) ? $tmparray['actionPreventionCompleted'] .= $langs->trans('Label') . ' : ' . $related_task->label . "\n" : '');
+													(($related_task->description) ? $tmparray['actionPreventionCompleted'] .= $langs->trans('Description') . ' : ' . $related_task->description . "\n" : '');
+													$tmparray['actionPreventionCompleted'] .= "\n";
+												} else {
+													$tmparray['actionPreventionCompleted'] = $langs->transnoentities('ActionPreventionCompletedTaskDone');
+												}
+											} else {
+												(($related_task->ref) ? $tmparray['actionPreventionUncompleted'] .= $langs->trans('Ref') . ' : ' . $related_task->ref . "\n" : '');
+												(($responsible) ? $tmparray['actionPreventionUncompleted'] .= $langs->trans('Responsible') . ' : ' . $responsible . "\n" : '');
+												$tmparray['actionPreventionUncompleted'] .= $langs->trans('DateStart') . ' : ';
+												if ($conf->global->DIGIRISKDOLIBARR_SHOW_TASK_START_DATE && !empty($related_task->date_start)) {
+													$tmparray['actionPreventionUncompleted'] .= dol_print_date(($related_task->date_start), 'dayreduceformat');
+												} else {
+													$tmparray['actionPreventionUncompleted'] .= dol_print_date(($related_task->date_c), 'dayreduceformat');
 												}
 												if ($conf->global->DIGIRISKDOLIBARR_SHOW_TASK_END_DATE && !empty($related_task->date_end)) {
-													$tmparray['actionPreventionCompleted'] .= "\n" . $langs->transnoentities('Deadline') . ' : ' . dol_print_date($related_task->date_end, 'dayreduceformat') . "\n";
+													$tmparray['actionPreventionUncompleted'] .= "\n" . $langs->transnoentities('Deadline') . ' : ' . dol_print_date($related_task->date_end, 'dayreduceformat') . "\n";
 												} else {
-													$tmparray['actionPreventionCompleted'] .= ' - ' . $langs->transnoentities('Deadline') . ' : ' . $langs->trans('NoData') . "\n";
+													$tmparray['actionPreventionUncompleted'] .= ' - ' . $langs->transnoentities('Deadline') . ' : ' . $langs->trans('NoData') . "\n";
 												}
-												$tmparray['actionPreventionCompleted'] .= $langs->trans('Budget') . ' : ' . price($related_task->budget_amount, 0, $langs, 1, 0, 0, $conf->currency) . "\n";
-												(($AllInitiales) ? $tmparray['actionPreventionCompleted'] .= $langs->trans('ContactsAction') . ' : ' . $AllInitiales . "\n" : '');
-												(($related_task->label) ? $tmparray['actionPreventionCompleted'] .= $langs->trans('Label') . ' : ' . $related_task->label . "\n" : '');
-												(($related_task->description) ? $tmparray['actionPreventionCompleted'] .= $langs->trans('Description') . ' : ' . $related_task->description . "\n" : '');
-												$tmparray['actionPreventionCompleted'] .= "\n";
-											} else {
-												$tmparray['actionPreventionCompleted'] = $langs->transnoentities('ActionPreventionCompletedTaskDone');
+												$tmparray['actionPreventionUncompleted'] .= $langs->trans('Budget') . ' : ' . price($related_task->budget_amount, 0, $langs, 1, 0, 0, $conf->currency) . ' - ';
+												$tmparray['actionPreventionUncompleted'] .= $langs->trans('DigiriskProgress') . ' : ' . ($task_progress ?: 0) . ' %' . "\n";
+												(($AllInitiales) ? $tmparray['actionPreventionUncompleted'] .= $langs->trans('ContactsAction') . ' : ' . $AllInitiales . "\n" : '');
+												(($related_task->label) ? $tmparray['actionPreventionUncompleted'] .= $langs->trans('Label') . ' : ' . $related_task->label . "\n" : '');
+												(($related_task->description) ? $tmparray['actionPreventionUncompleted'] .= $langs->trans('Description') . ' : ' . $related_task->description . "\n" : '');
+												$tmparray['actionPreventionUncompleted'] .= "\n";
 											}
 										} else {
-											(($related_task->ref) ? $tmparray['actionPreventionUncompleted'] .= $langs->trans('Ref') . ' : ' . $related_task->ref . "\n" : '');
-											(($responsible) ? $tmparray['actionPreventionUncompleted'] .= $langs->trans('Responsible') . ' : ' . $responsible . "\n" : '');
-											$tmparray['actionPreventionUncompleted'] .= $langs->trans('DateStart') . ' : ';
-											if ($conf->global->DIGIRISKDOLIBARR_SHOW_TASK_START_DATE && !empty($related_task->date_start)) {
-												$tmparray['actionPreventionUncompleted'] .= dol_print_date(($related_task->date_start), 'dayreduceformat');
-											} else {
-												$tmparray['actionPreventionUncompleted'] .= dol_print_date(($related_task->date_c), 'dayreduceformat');
-											}
-											if ($conf->global->DIGIRISKDOLIBARR_SHOW_TASK_END_DATE && !empty($related_task->date_end)) {
-												$tmparray['actionPreventionUncompleted'] .= "\n" . $langs->transnoentities('Deadline') . ' : ' . dol_print_date($related_task->date_end, 'dayreduceformat') . "\n";
-											} else {
-												$tmparray['actionPreventionUncompleted'] .= ' - ' . $langs->transnoentities('Deadline') . ' : ' . $langs->trans('NoData') . "\n";
-											}
-											$tmparray['actionPreventionUncompleted'] .= $langs->trans('Budget') . ' : ' . price($related_task->budget_amount, 0, $langs, 1, 0, 0, $conf->currency) . ' - ';
-											$tmparray['actionPreventionUncompleted'] .= $langs->trans('DigiriskProgress') . ' : ' . ($task_progress ?: 0) . ' %' . "\n";
-											(($AllInitiales) ? $tmparray['actionPreventionUncompleted'] .= $langs->trans('ContactsAction') . ' : ' . $AllInitiales . "\n" : '');
-											(($related_task->label) ? $tmparray['actionPreventionUncompleted'] .= $langs->trans('Label') . ' : ' . $related_task->label . "\n" : '');
-											(($related_task->description) ? $tmparray['actionPreventionUncompleted'] .= $langs->trans('Description') . ' : ' . $related_task->description . "\n" : '');
-											$tmparray['actionPreventionUncompleted'] .= "\n";
+											$tmparray['actionPreventionUncompleted'] = $langs->trans('NoTaskShared');
+											$tmparray['actionPreventionCompleted']   = $langs->trans('NoTaskShared');
 										}
 									}
 								} else {
