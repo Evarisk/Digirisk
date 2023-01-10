@@ -720,6 +720,7 @@ class modDigiriskdolibarr extends DolibarrModules
 			// GENERAL CONSTS
 			340 => array('MAIN_USE_EXIF_ROTATION', 'integer', 1, '', 0, 'current'),
 			341 => array('MAIN_EXTRAFIELDS_USE_SELECT2', 'integer', 1, '', 0, 'current'),
+			342 => array('MAIN_ODT_AS_PDF', 'chaine', 'libreoffice', '', 0, 'current'),
 
 			// MENU
 			350 => array('DIGIRISKDOLIBARR_DIGIRISKSTANDARD_MENU_UPDATED', 'integer', 0, '', 0, 'current'),
