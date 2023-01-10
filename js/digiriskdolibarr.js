@@ -1730,6 +1730,7 @@ window.eoxiaJS.risk.event = function() {
 	$( document ).on( 'click', '.risk-create:not(.button-disable)', window.eoxiaJS.risk.createRisk );
 	$( document ).on( 'click', '.risk-save', window.eoxiaJS.risk.saveRisk );
 	$( document ).on( 'click', '.risk-unlink-shared', window.eoxiaJS.risk.unlinkSharedRisk );
+	$( document ).on( 'click', 'div[aria-describedby="dialog-confirm-actionButtonImportSharedRisks"] .ui-button.ui-corner-all.ui-widget', window.eoxiaJS.risk.sharedRiskBoxLoader );
 };
 
 /**
@@ -2053,6 +2054,18 @@ window.eoxiaJS.risk.unlinkSharedRisk = function ( event ) {
 			actionContainerError.removeClass('hidden');
 		}
 	});
+};
+
+/**
+ * Action loader shared risk box.
+ *
+ * @since   9.2.0
+ * @version 9.2.0
+ *
+ * @return {void}
+ */
+window.eoxiaJS.risk.sharedRiskBoxLoader = function ( event ) {
+	window.eoxiaJS.loader.display($('#searchFormSharedListRisks'))
 };
 
 /**
