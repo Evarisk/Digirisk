@@ -3526,6 +3526,10 @@ td > .risk-evaluation-list-content .risk-evaluation-container:not(.advanced, .st
   margin-left: auto;
 }
 
+.riskassessment-task-edit-modal .wpeo-modal.modal-riskassessment-task.modal-active {
+  z-index: 1003;
+}
+
 #dialog-confirm-actionButtonImportSharedRisks .confirmtext {
   text-align: center;
   padding: 0.2em 0 0.4em 0;
