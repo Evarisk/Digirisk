@@ -3690,6 +3690,10 @@ td > .risk-evaluation-list-content .risk-evaluation-container:not(.advanced, .st
   max-height: 750px;
 }
 
+.risk-evaluation-edit-modal .wpeo-modal.modal-risk.modal-active {
+  z-index: 1003;
+}
+
 .wpeo-modal .modal-container ul, .wpeo-modal .modal-container li {
   margin: 0;
   list-style-type: none;
