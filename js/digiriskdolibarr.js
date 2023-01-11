@@ -2389,11 +2389,6 @@ window.eoxiaJS.evaluation.saveEvaluation = function ( event ) {
 
 	window.eoxiaJS.loader.display($(this));
 
-	if (fromList) {
-		window.eoxiaJS.loader.display($('.risk-evaluation-ref-'+evaluationID));
-	} else {
-		window.eoxiaJS.loader.display($('.risk-evaluation-container-'+evaluationID));
-	}
 
 	let token = $('.fichecenter.risklist').find('input[name="token"]').val();
 
@@ -2418,6 +2413,7 @@ window.eoxiaJS.evaluation.saveEvaluation = function ( event ) {
 		}),
 		contentType: false,
 		success: function ( resp ) {
+			$('#risk_evaluation_edit'+evaluationID).removeClass('modal-active')
 			if (fromList) {
 				$('.risk-evaluation-ref-'+evaluationID+':not(.last-risk-assessment)').fadeOut(800);
 				$('.risk-evaluation-ref-'+evaluationID+':not(.last-risk-assessment)').fadeIn(800);
@@ -2801,6 +2797,7 @@ window.eoxiaJS.riskassessmenttask.saveRiskAssessmentTask = function ( event ) {
 		processData: false,
 		contentType: false,
 		success: function ( resp ) {
+			$('#risk_assessment_task_edit'+editedRiskAssessmentTaskId).removeClass('modal-active')
 			$('.riskassessment-task-container-'+editedRiskAssessmentTaskId).html($(resp).find('.riskassessment-task-container-'+editedRiskAssessmentTaskId).first().children())
 			let actionContainerSuccess = $('.messageSuccessTaskEdit');
 			$('.riskassessment-tasks' + riskId).fadeOut(800);

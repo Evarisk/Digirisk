@@ -161,7 +161,7 @@
 			<!-- Modal-Footer -->
 			<div class="modal-footer">
 				<?php if ($permissiontoadd) : ?>
-					<div class="wpeo-button risk-evaluation-save button-green modal-close">
+					<div class="wpeo-button risk-evaluation-save button-green">
 						<i class="fas fa-save"></i> <?php echo $langs->trans('UpdateData'); ?>
 					</div>
 				<?php else : ?>
