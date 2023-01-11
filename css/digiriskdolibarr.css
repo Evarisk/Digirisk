@@ -3775,7 +3775,7 @@ td > .risk-evaluation-list-content .risk-evaluation-container:not(.advanced, .st
     min-width: 0;
   }
 }
-.ui-dialog.ui-corner-all.ui-widget.ui-widget-content.ui-front.ui-dialog-buttons.ui-draggable.ui-resizable.preview-photo {
+.ui-dialog.ui-corner-all.ui-widget.ui-widget-content.ui-front.ui-draggable.ui-resizable.preview-photo {
   z-index: 2100 !important;
 }
 
