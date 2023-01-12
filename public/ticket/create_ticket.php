@@ -178,8 +178,7 @@ if ($action == 'add') {
 	}
 
 	$regPhone = '/^(?:(?:(?:\+|00)\d{2}[\s]?(?:\(0\)[\s]?)?)|0){1}[1-9]{1}([\s.-]?)(?:\d{2}\1?){3}\d{2}$/';
-	if (preg_match($regPhone, $phone) || empty($phone)) {
-	} else {
+	if (!preg_match($regPhone, $phone) && !empty($phone)) {
 		setEventMessages($langs->trans('ErrorFieldPhone'), array(), 'errors');
 		$error++;
 	}
