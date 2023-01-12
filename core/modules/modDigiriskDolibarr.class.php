@@ -689,17 +689,30 @@ class modDigiriskdolibarr extends DolibarrModules
 			303 => array('DIGIRISKDOLIBARR_TICKET_DIGIRISKELEMENT_VISIBLE', 'integer', 1, '', 0, 'current'),
 			304 => array('DIGIRISKDOLIBARR_TICKET_DIGIRISKELEMENT_REQUIRED', 'integer', 1, '', 0, 'current'),
 			305 => array('DIGIRISKDOLIBARR_TICKET_DIGIRISKELEMENT_HIDE_REF', 'integer', 0, '', 0, 'current'),
+			306 => array('DIGIRISKDOLIBARR_TICKET_PHOTO_VISIBLE', 'integer', 1, '', 0, 'current'),
+			307 => array('DIGIRISKDOLIBARR_TICKET_EMAIL_VISIBLE', 'integer', 0, '', 0, 'current'),
+			308 => array('DIGIRISKDOLIBARR_TICKET_EMAIL_REQUIRED', 'integer', 0, '', 0, 'current'),
+			309 => array('DIGIRISKDOLIBARR_TICKET_FIRSTNAME_VISIBLE', 'integer', 1, '', 0, 'current'),
+			310 => array('DIGIRISKDOLIBARR_TICKET_FIRSTNAME_REQUIRED', 'integer', 1, '', 0, 'current'),
+			311 => array('DIGIRISKDOLIBARR_TICKET_LASTNAME_VISIBLE', 'integer', 1, '', 0, 'current'),
+			312 => array('DIGIRISKDOLIBARR_TICKET_LASTNAME_REQUIRED', 'integer', 1, '', 0, 'current'),
+			313 => array('DIGIRISKDOLIBARR_TICKET_PHONE_VISIBLE', 'integer', 1, '', 0, 'current'),
+			314 => array('DIGIRISKDOLIBARR_TICKET_PHONE_REQUIRED', 'integer', 0, '', 0, 'current'),
+			315 => array('DIGIRISKDOLIBARR_TICKET_LOCATION_VISIBLE', 'integer', 1, '', 0, 'current'),
+			316 => array('DIGIRISKDOLIBARR_TICKET_LOCATION_REQUIRED', 'integer', 0, '', 0, 'current'),
+			317 => array('DIGIRISKDOLIBARR_TICKET_DATE_VISIBLE', 'integer', 1, '', 0, 'current'),
+			318 => array('DIGIRISKDOLIBARR_TICKET_DATE_REQUIRED', 'integer', 1, '', 0, 'current'),
 
 			// CONST ACCIDENT
-			310 => array('MAIN_AGENDA_ACTIONAUTO_ACCIDENT_CREATE', 'integer', 1, '', 0, 'current'),
-			311 => array('MAIN_AGENDA_ACTIONAUTO_ACCIDENT_EDIT', 'integer', 1, '', 0, 'current'),
-			312 => array('DIGIRISKDOLIBARR_ACCIDENT_ADDON', 'chaine', 'mod_accident_standard', '', 0, 'current'),
-			313 => array('DIGIRISKDOLIBARR_ACCIDENT_PROJECT', 'integer', 0, '', 0, 'current'),
+			320 => array('MAIN_AGENDA_ACTIONAUTO_ACCIDENT_CREATE', 'integer', 1, '', 0, 'current'),
+			321 => array('MAIN_AGENDA_ACTIONAUTO_ACCIDENT_EDIT', 'integer', 1, '', 0, 'current'),
+			322 => array('DIGIRISKDOLIBARR_ACCIDENT_ADDON', 'chaine', 'mod_accident_standard', '', 0, 'current'),
+			323 => array('DIGIRISKDOLIBARR_ACCIDENT_PROJECT', 'integer', 0, '', 0, 'current'),
 
 			// CONST ACCIDENT LINE
-			320 => array('MAIN_AGENDA_ACTIONAUTO_ACCIDENT_WORKSTOP_CREATE', 'integer', 1, '', 0, 'current'),
-			321 => array('DIGIRISKDOLIBARR_ACCIDENT_WORKSTOP_ADDON', 'chaine', 'mod_accident_workstop_standard', '', 0, 'current'),
-			322 => array('DIGIRISKDOLIBARR_ACCIDENT_LESION_ADDON', 'chaine', 'mod_accident_lesion_standard', '', 0, 'current'),
+			325 => array('MAIN_AGENDA_ACTIONAUTO_ACCIDENT_WORKSTOP_CREATE', 'integer', 1, '', 0, 'current'),
+			326 => array('DIGIRISKDOLIBARR_ACCIDENT_WORKSTOP_ADDON', 'chaine', 'mod_accident_workstop_standard', '', 0, 'current'),
+			327 => array('DIGIRISKDOLIBARR_ACCIDENT_LESION_ADDON', 'chaine', 'mod_accident_lesion_standard', '', 0, 'current'),
 
 			// CONST TICKET DOCUMENT
 			330 => array('DIGIRISKDOLIBARR_TICKETDOCUMENT_ADDON_ODT_PATH', 'chaine', 'DOL_DOCUMENT_ROOT/custom/digiriskdolibarr/documents/doctemplates/ticketdocument/', '', 0, 'current'),
