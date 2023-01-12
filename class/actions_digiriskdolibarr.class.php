@@ -370,18 +370,12 @@ class ActionsDigiriskdolibarr
 					let hour     = date.getHours();
 					let min      = date.getMinutes();
 
-					jQuery('#options_digiriskdolibarr_ticket_lastname').parent().html(jQuery('#options_digiriskdolibarr_ticket_lastname').parent().html().replace(/Nom/, '<b>Nom</b><span style="color:red"> *</span>'))
-					jQuery('#options_digiriskdolibarr_ticket_lastname').parent().html(jQuery('#options_digiriskdolibarr_ticket_lastname').parent().html().replace(/Prénom/, '<b>Prénom</b><span style="color:red"> *</span>'))
 					jQuery('#options_digiriskdolibarr_ticket_date').val(fulldate);
 					jQuery('#options_digiriskdolibarr_ticket_dateday').val((day < 10 ? '0' : '') + day);
 					jQuery('#options_digiriskdolibarr_ticket_datemonth').val((month < 10 ? '0' : '') + month);
 					jQuery('#options_digiriskdolibarr_ticket_dateyear').val(date.getFullYear());
 					jQuery('#options_digiriskdolibarr_ticket_datehour').val((hour < 10 ? '0' : '') + hour);
 					jQuery('#options_digiriskdolibarr_ticket_datemin').val((min < 10 ? '0' : '') + min);
-
-					jQuery('.select2.select2-container.select2-container--default').remove()
-
-					jQuery('.wpeo-form.tableforinputfields').prepend(<?php echo json_encode($selectDigiriskElement) ; ?>)
 				</script>
 				<?php
 			}
