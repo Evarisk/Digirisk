@@ -2840,7 +2840,7 @@ window.eoxiaJS.riskassessmenttask.createRiskAssessmentTaskTimeSpent = function (
 	let textToShow = '';
 	let taskRef    = element.find('.riskassessment-task-ref-'+taskID).attr('value');
 	let timespent  = $('.riskassessment-task-single-'+taskID).find('.riskassessment-task-timespent')
-	let modaltimespent = $('.riskassessment-task-ref-'+taskID).first().find('.riskassessment-task-timespent').first()
+	let modalTimespent = $('.riskassessment-task-ref-'+taskID).first().find('.riskassessment-task-timespent').first()
 
 	let date     = single.find('#RiskassessmentTaskTimespentDate' + taskID).val();
 	let hour     = single.find('#RiskassessmentTaskTimespentDate' + taskID + 'hour').val();
@@ -2877,17 +2877,14 @@ window.eoxiaJS.riskassessmenttask.createRiskAssessmentTaskTimeSpent = function (
 			textToShow += actionContainerSuccess.find('.valueForCreateTaskTimeSpent1').val()
 			textToShow += taskRef
 			textToShow += actionContainerSuccess.find('.valueForCreateTaskTimeSpent2').val()
-
-			console.log($('#risk_assessment_task_edit'+taskID).first().find('.riskassessment-task-timespent-container').first())
-			console.log($('#risk_assessment_task_edit'+taskID).first().find('.riskassessment-task-timespent-list-content').last())
-			$('#risk_assessment_task_edit'+taskID).first().find('.riskassessment-task-timespent-list-content').first().prepend($(resp).find('#risk_assessment_task_edit'+taskID).first().find('.riskassessment-task-timespent-list-content').first())
+			$('.riskassessment-task-timespent-add-container').last().parent().html($(resp).find('.riskassessment-task-timespent-add-container').last().parent())
 			$('.loader-spin').remove();
 			$('.wpeo-loader').removeClass('wpeo-loader')
 
 			actionContainerSuccess.find('.notice-subtitle .text').text(textToShow)
 			actionContainerSuccess.removeClass('hidden');
-			timespent.html($(resp).find('.riskassessment-task-single-'+taskID).find('.riskassessment-task-timespent'))
-			modaltimespent.html($(resp).find('.riskassessment-task-single-'+taskID).find('.riskassessment-task-timespent').first())
+			timespent.html($(resp).find('.riskassessment-task-single-'+taskID).find('.riskassessment-task-timespent').first())
+			modalTimespent.html($(resp).find('.riskassessment-task-single-'+taskID).find('.riskassessment-task-timespent').first())
 		},
 		error: function ( resp ) {
 			$(this).closest('.risk-row-content-' + riskId).removeClass('wpeo-loader');
@@ -2913,7 +2910,7 @@ window.eoxiaJS.riskassessmenttask.deleteRiskAssessmentTaskTimeSpent = function (
 	let RiskAssessmentTaskTimeSpent = $(this)
 	let deletedRiskAssessmentTaskTimeSpentId = RiskAssessmentTaskTimeSpent.attr('value');
 	let timespent = $('.riskassessment-task-single-'+RiskAssessmentTaskId).find('.riskassessment-task-timespent')
-	let modaltimespent = $('.riskassessment-task-ref-'+RiskAssessmentTaskId).first().find('.riskassessment-task-timespent').first()
+	let modalTimespent = $('.riskassessment-task-ref-'+RiskAssessmentTaskId).first().find('.riskassessment-task-timespent').first()
 	let textToShow = element.find('.labelForDelete').val();
 
 	let token = $('.fichecenter.risklist').find('input[name="token"]').val();
@@ -2932,10 +2929,8 @@ window.eoxiaJS.riskassessmenttask.deleteRiskAssessmentTaskTimeSpent = function (
 			contentType: false,
 			success: function ( resp ) {
 				//$('.fichecenter.risklist').html($(resp).find('#searchFormListRisks'))
-				timespent.html($(resp).find('.riskassessment-task-single-'+RiskAssessmentTaskId).find('.riskassessment-task-timespent'))
-				console.log(modaltimespent)
-				console.log($(resp).find('.riskassessment-task-single-'+RiskAssessmentTaskId).find('.riskassessment-task-timespent'))
-				modaltimespent.html($(resp).find('.riskassessment-task-single-'+RiskAssessmentTaskId).find('.riskassessment-task-timespent').first())
+				timespent.html($(resp).find('.riskassessment-task-single-'+RiskAssessmentTaskId).find('.riskassessment-task-timespent').first())
+				modalTimespent.html($(resp).find('.riskassessment-task-single-'+RiskAssessmentTaskId).find('.riskassessment-task-timespent').first())
 				let actionContainerSuccess = $('.messageSuccessTaskTimeSpentDelete');
 				$(RiskAssessmentTaskTimeSpent.closest('.riskassessment-task-container')).fadeOut(800);
 				let textToShow = '';
@@ -2981,8 +2976,8 @@ window.eoxiaJS.riskassessmenttask.saveRiskAssessmentTaskTimeSpent = function ( e
 	let single     = element.find('.riskassessment-task-timespent-container');
 	let riskId     = $(this).closest('.riskassessment-tasks').attr('value')
 	let taskID     = single.attr('value');
-	let parentElement  = $('.riskassessment-task-single-'+taskID)
-	let modaltimespent = $('.riskassessment-task-ref-'+taskID).first().find('.riskassessment-task-timespent').first()
+	let timespent  = $('.riskassessment-task-single-'+taskID).find('.riskassessment-task-timespent')
+	let modalTimespent = $('.riskassessment-task-ref-'+taskID).first().find('.riskassessment-task-timespent').first()
 	let textToShow = '';
 	let taskRef    =  element.closest('.riskassessment-task').find('.riskassessment-task-ref-'+taskID).attr('value');
 
@@ -3014,10 +3009,10 @@ window.eoxiaJS.riskassessmenttask.saveRiskAssessmentTaskTimeSpent = function ( e
 		success: function ( resp ) {
 			//$('.fichecenter.risklist').html($(resp).find('#searchFormListRisks'))
 			currentElement.closest('.modal-active').removeClass('modal-active')
-			parentElement.first().removeClass('wpeo-loader')
+			$('.wpeo-loader').removeClass('wpeo-loader')
 			$('.riskassessment-task-timespent-container').closest('.riskassessment-task'+taskID).first().html($(resp).find('.riskassessment-task-timespent-container').closest('.riskassessment-task'+taskID).first())
-			parentElement.find('.riskassessment-task-timespent').html($(resp).find('.riskassessment-task-single-'+taskID).find('.riskassessment-task-timespent').first())
-			modaltimespent.html($(resp).find('.riskassessment-task-single-'+taskID).find('.riskassessment-task-timespent').first())
+			timespent.html($(resp).find('.riskassessment-task-single-'+taskID).find('.riskassessment-task-timespent').first())
+			modalTimespent.html($(resp).find('.riskassessment-task-single-'+taskID).find('.riskassessment-task-timespent').first())
 			let actionContainerSuccess = $('.messageSuccessTaskTimeSpentEdit');
 			//$('.riskassessment-tasks' + riskId).fadeOut(800);
 			//$('.riskassessment-tasks' + riskId).fadeIn(800);
