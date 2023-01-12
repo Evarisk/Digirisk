@@ -580,7 +580,7 @@ if ($entity > 0) {
 				$emailfield = '<div class="form-element">';
 				$emailfield .= '<span class="form-label"' . (($conf->global->DIGIRISKDOLIBARR_TICKET_EMAIL_REQUIRED) ? '' : 'style="font-weight:300"') . '>' . $langs->trans("Email") . (($conf->global->DIGIRISKDOLIBARR_TICKET_EMAIL_REQUIRED) ? '<span style="color:red"> *</span>' : '') . '</span>';
 				$emailfield .= '<label class="form-field-container">';
-				$emailfield .= '<input class="email" type="email" name="email" id="email" value="' . GETPOST('email') . '"/>';
+				$emailfield .= '<input class="email" name="email" id="email" value="' . GETPOST('email') . '"/>';
 				$emailfield .= '</label>';
 				$emailfield .= '</div>';
 				print($emailfield);
@@ -589,7 +589,7 @@ if ($entity > 0) {
 			if ($conf->global->DIGIRISKDOLIBARR_TICKET_PHONE_VISIBLE) {
 				$phonefield = '<div class="form-element">';
 				$phonefield .= '<span class="form-label"' . (($conf->global->DIGIRISKDOLIBARR_TICKET_PHONE_REQUIRED) ? '' : 'style="font-weight:300"') . '>' . $langs->trans("Phone") . (($conf->global->DIGIRISKDOLIBARR_TICKET_PHONE_REQUIRED) ? '<span style="color:red"> *</span>' : '') . '</span>';
-				$phonefield .= '<input class="options_digiriskdolibarr_ticket_phone" type="tel" name="options_digiriskdolibarr_ticket_phone" id="options_digiriskdolibarr_ticket_phone" value="' . GETPOST('options_digiriskdolibarr_ticket_phone') . '"/>';
+				$phonefield .= '<input class="options_digiriskdolibarr_ticket_phone" name="options_digiriskdolibarr_ticket_phone" id="options_digiriskdolibarr_ticket_phone" value="' . GETPOST('options_digiriskdolibarr_ticket_phone') . '"/>';
 				$phonefield .= '</label>';
 				$phonefield .= '</div>';
 				print($phonefield);
