@@ -3730,6 +3730,7 @@ window.eoxiaJS.ticket.event = function() {
 	$( document ).on( 'change', '.add-dashboard-info', window.eoxiaJS.ticket.addDashBoardTicketInfo );
 	$( document ).on( 'click', '.close-dashboard-info', window.eoxiaJS.ticket.closeDashBoardTicketInfo );
 	$( document ).on( 'keyup', '.email', window.eoxiaJS.ticket.checkValidEmail );
+	$( document ).on( 'keyup', '.options_digiriskdolibarr_ticket_phone', window.eoxiaJS.ticket.checkValidPhone );
 };
 
 /**
@@ -3950,6 +3951,23 @@ window.eoxiaJS.ticket.closeDashBoardTicketInfo = function() {
 window.eoxiaJS.ticket.checkValidEmail = function() {
 	var reEmail = /^([A-Za-z0-9_\-\.])+\@([A-Za-z0-9_\-\.])+\.([A-Za-z]{2,4})$/;
 	if (reEmail.test(this.value) == false) {
+		$(this).css("border", "3px solid red");
+	} else {
+		$(this).css("border", "3px solid green");
+	}
+};
+
+/**
+ * Check if phone is valid
+ *
+ * @since   9.8.2
+ * @version 9.8.2
+ *
+ * @return {void}
+ */
+window.eoxiaJS.ticket.checkValidPhone = function() {
+	var rePhone = /^(?:(?:(?:\+|00)\d{2}[\s]?(?:\(0\)[\s]?)?)|0){1}[1-9]{1}([\s.-]?)(?:\d{2}\1?){3}\d{2}$/;
+	if (rePhone.test(this.value) == false) {
 		$(this).css("border", "3px solid red");
 	} else {
 		$(this).css("border", "3px solid green");
