@@ -2838,7 +2838,7 @@ window.eoxiaJS.riskassessmenttask.createRiskAssessmentTaskTimeSpent = function (
 	let single     = element.find('.riskassessment-task-timespent-container');
 	let riskId     = element.find('riskassessment-task-single').attr('value');
 	let textToShow = '';
-	let taskRef    = element.find('.riskassessment-task-ref-'+taskID).attr('value');
+	let taskRef    = element.find('.riskassessment-task-reference').attr('value');
 	let timespent  = $('.id-container').find('.riskassessment-total-task-timespent-'+taskID)
 
 	let date     = single.find('#RiskassessmentTaskTimespentDate' + taskID).val();
@@ -2903,21 +2903,21 @@ window.eoxiaJS.riskassessmenttask.createRiskAssessmentTaskTimeSpent = function (
  * @return {void}
  */
 window.eoxiaJS.riskassessmenttask.deleteRiskAssessmentTaskTimeSpent = function ( event ) {
-	let taskID     = $(this).closest('.riskassessment-task-single').attr('value');
-	let timespentID = $(this).attr('value');
-	let element = $(this).closest('.riskassessment-task-timespent-list');
-	//let riskId = $(this).closest('.riskassessment-task-timespent-list-content').attr('value');
-	let RiskAssessmentTaskId = $(this).closest('.riskassessment-task').attr('value');
+	let taskID                               = $(this).closest('.riskassessment-task-timespent-list').attr('value');
+	let timespentID                          = $(this).attr('value');
 	let deletedRiskAssessmentTaskTimeSpentId = $(this).attr('value');
-	let textToShow = element.find('.labelForDelete').val();
-	let timespent  = $('.id-container').first().find('.riskassessment-total-task-timespent-'+taskID)
+	//let riskId = $(this).closest('.riskassessment-task-timespent-list-content').attr('value');
 
-	let token = $('.fichecenter.risklist').find('input[name="token"]').val();
+	let element     = $(this).closest('.riskassessment-task-timespent-'+timespentID);
+	let textToShow  = element.find('.labelForDelete').val();
+	let timespent   = $('.id-container').first().find('.riskassessment-total-task-timespent-'+taskID)
+
+	let token = $('input[name="token"]').val();
 
 	var r = confirm(textToShow);
 	if (r == true) {
 
-		let riskAssessmentTaskRef =  $('.riskassessment-task-container-'+RiskAssessmentTaskId).attr('value');
+		let riskAssessmentTaskRef =  $('.riskassessment-task-container-'+taskID).attr('value');
 
 		window.eoxiaJS.loader.display($(this));
 
@@ -3015,7 +3015,7 @@ window.eoxiaJS.riskassessmenttask.saveRiskAssessmentTaskTimeSpent = function ( e
 			textToShow += actionContainerSuccess.find('.valueForEditTaskTimeSpent2').val()
 
 			timespent.html($(resp).find('.modal-content').find('.riskassessment-total-task-timespent-'+taskID).first())
-			currentElement.closest('.riskassessment-task-timespent-container').find('.riskassessment-task-timespent-list').html($(resp).find('.riskassessment-task-timespent-container').find('.riskassessment-task-timespent-list'))
+			$('.riskassessment-task-timespent-list-'+taskID).html($(resp).find('.riskassessment-task-timespent-list-'+taskID).children())
 			//actionContainerSuccess.find('a').attr('href', '#risk_row_'+riskId)
 
 			actionContainerSuccess.find('.notice-subtitle .text').text(textToShow)
