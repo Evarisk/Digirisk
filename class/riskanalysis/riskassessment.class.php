@@ -170,7 +170,6 @@ class RiskAssessment extends CommonObject
 			$this->db->query($sql);
 		}
 
-		//ADD LINES POUR LE SELECT ENTITY
 		return $result;
 	}
 
