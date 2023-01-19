@@ -178,7 +178,9 @@ class DigiriskDocuments extends CommonObject
 		}
 
 		$this->DigiriskFillJSON($this);
-		//$this->element = $this->element . '@digiriskdolibarr';
+		if (version_compare(DOL_VERSION, '16.0.2', '<=')) {
+			$this->element = $this->element . '@digiriskdolibarr';
+		}
 		return $this->createCommon($user, $notrigger);
 	}
 	/**
