@@ -318,8 +318,8 @@ $related_tasks = $risk->get_related_tasks($risk); ?>
 							<div class="modal-close"><i class="fas fa-times"></i></div>
 						</div>
 						<!-- Modal-Content -->
-						<div class="modal-content">
-							<div class="riskassessment-task-single" value="<?php echo $related_task->id ?>">
+						<div class="modal-content riskassessment-task-content">
+							<div class="riskassessment-task-data" value="<?php echo $related_task->id ?>">
 								<span class="riskassessment-task-reference" value="<?php echo $related_task->ref ?>"><?php echo $related_task->getNomUrlTask(0, 'withproject'); ?></span>
 								<span class="riskassessment-task-author">
 									<?php $usertmp->fetch($related_task->fk_user_creat); ?>
@@ -341,17 +341,17 @@ $related_tasks = $risk->get_related_tasks($risk); ?>
 								<span class="riskassessment-task-progress <?php echo $related_task->getTaskProgressColorClass($task_progress); ?>"><?php echo $task_progress ? $task_progress . " %" : 0 . " %" ?></span>
 							</div>
 							<br>
-							<div class="riskassessment-task-data">
-								<div class="riskassessment-task-label">
+							<div class="riskassessment-task-content">
+<!--								<span class="title">--><?php //echo $langs->trans('Label'); ?><!--</span>-->
+								<div class="riskassessment-task-title riskassessment-task-label">
 									<?php if (!$conf->global->DIGIRISKDOLIBARR_SHOW_TASK_CALCULATED_PROGRESS) : ?>
 										<span class="riskassessment-task-progress-checkbox">
 											<input type="checkbox" id="" class="riskassessment-task-progress-checkbox<?php echo $related_task->id ?>" name="progress-checkbox" value="" <?php echo ($task_progress == 100) ? 'checked' : ''; ?>>
 										</span>
 									<?php endif; ?>
-									<span class="title"><?php echo $langs->trans('Label'); ?></span>
 									<input type="text" class="riskassessment-task-author-label riskassessment-task-label<?php echo $related_task->id ?>" name="label" value="<?php echo $related_task->label; ?>">
 								</div>
-								<div class="riskassessment-task-date wpeo-gridlayout grid-2">
+								<div class="riskassessment-task-date wpeo-gridlayout grid-3">
 									<div>
 										<span class="title"><?php echo $langs->trans('DateStart'); ?></span>
 										<?php print $form->selectDate($related_task->date_start ?: -1, 'RiskassessmentTaskDateStart'.$related_task->id, 1, 1, 0, '', 1, 1); ?>
@@ -360,10 +360,10 @@ $related_tasks = $risk->get_related_tasks($risk); ?>
 										<span class="title"><?php echo $langs->trans('Deadline'); ?></span>
 										<?php print $form->selectDate($related_task->date_end ?: -1,'RiskassessmentTaskDateEnd'.$related_task->id, 1, 1, 0, '', 1, 1); ?>
 									</div>
-								</div>
-								<div class="riskassessment-task-budget">
-									<span class="title"><?php echo $langs->trans('Budget'); ?></span>
-									<input type="text" class="riskassessment-task-budget<?php echo $related_task->id ?>" name="budget" value="<?php echo price2num($related_task->budget_amount); ?>">
+									<div class="riskassessment-task-budget">
+										<span class="title"><?php echo $langs->trans('Budget'); ?></span>
+										<input type="text" class="riskassessment-task-budget<?php echo $related_task->id ?>" name="budget" value="<?php echo price2num($related_task->budget_amount); ?>">
+									</div>
 								</div>
 							</div>
 							<hr>

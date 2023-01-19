@@ -23,45 +23,45 @@
   margin-bottom: 0.5em;
 }
 
-.riskassessment-task-container .riskassessment-task-single {
+.riskassessment-task-single {
   display: flex;
   box-sizing: border-box;
 
   * {
     box-sizing: border-box;
   }
+
   > * {
     margin-top: auto;
     margin-bottom: auto;
   }
+}
 
-  .riskassessment-task-content {
-    width: 100%;
+.riskassessment-task-content {
+  .riskassessment-task-author {
+    display: inline-block;
+    width: 25px;
+    min-width: 25px;
+    height: 25px;
+    line-height: 25px;
+    background: rgba(0,0,0,0.5);
+    overflow: hidden;
+    text-transform: uppercase;
+    font-size: 14px;
+    font-weight: 600;
+    border-radius: 50%;
+    vertical-align: sub;
+    text-align: center;
 
-    .riskassessment-task-author {
-      display: inline-block;
-      width: 25px;
-      min-width: 25px;
-      height: 25px;
-      line-height: 25px;
-      background: rgba(0,0,0,0.5);
-      overflow: hidden;
-      text-transform: uppercase;
-      font-size: 14px;
-      font-weight: 600;
-      border-radius: 50%;
-      vertical-align: sub;
-      text-align: center;
-
-      a {
-        color: #fff !important;
-      }
-    }
-    .riskassessment-task-author-label {
-      word-break: break-all;
+    a {
+      color: #fff !important;
     }
   }
-  .riskassessment-task-content .riskassessment-task-data {
+  .riskassessment-task-author-label {
+    word-break: break-all;
+  }
+
+  .riskassessment-task-data {
     display: flex;
     flex-wrap: wrap;
     font-size: 14px;
@@ -192,5 +192,9 @@
   }
   &:nth-of-type(odd) .table-row {
     background: #fff !important;
+  }
+
+  .riskassessment-task-timespent-author {
+    @extend .riskassessment-task-author;
   }
 }

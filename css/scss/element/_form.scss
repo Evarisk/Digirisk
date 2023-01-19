@@ -27,6 +27,7 @@
     width: 100%;
     border: 1px solid rgba(0,0,0,0.2);
     padding: 1em;
+    box-sizing: border-box;
 
     &:focus {
       border: 1px solid rgba(0,0,0,0.6);

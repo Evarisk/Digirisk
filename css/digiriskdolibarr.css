@@ -68,6 +68,8 @@
   width: 100%;
   border: 1px solid rgba(0, 0, 0, 0.2);
   padding: 1em;
+  -webkit-box-sizing: border-box;
+  box-sizing: border-box;
 }
 .wpeo-modal input[type=text]:focus,
 .wpeo-modal input[type=email]:focus,
@@ -2986,25 +2988,23 @@ div.wpeo-modal-patchnote .wpeo-button {
   margin-bottom: 0.5em;
 }
 
-.riskassessment-task-container .riskassessment-task-single {
+.riskassessment-task-single {
   display: -webkit-box;
   display: -ms-flexbox;
   display: flex;
   -webkit-box-sizing: border-box;
   box-sizing: border-box;
 }
-.riskassessment-task-container .riskassessment-task-single * {
+.riskassessment-task-single * {
   -webkit-box-sizing: border-box;
   box-sizing: border-box;
 }
-.riskassessment-task-container .riskassessment-task-single > * {
+.riskassessment-task-single > * {
   margin-top: auto;
   margin-bottom: auto;
 }
-.riskassessment-task-container .riskassessment-task-single .riskassessment-task-content {
-  width: 100%;
-}
-.riskassessment-task-container .riskassessment-task-single .riskassessment-task-content .riskassessment-task-author {
+
+.riskassessment-task-content .riskassessment-task-author, .riskassessment-task-content .riskassessment-task-timespent-list li .riskassessment-task-timespent-author, .riskassessment-task-timespent-list li .riskassessment-task-content .riskassessment-task-timespent-author {
   display: inline-block;
   width: 25px;
   min-width: 25px;
@@ -3019,13 +3019,13 @@ div.wpeo-modal-patchnote .wpeo-button {
   vertical-align: sub;
   text-align: center;
 }
-.riskassessment-task-container .riskassessment-task-single .riskassessment-task-content .riskassessment-task-author a {
+.riskassessment-task-content .riskassessment-task-author a, .riskassessment-task-content .riskassessment-task-timespent-list li .riskassessment-task-timespent-author a, .riskassessment-task-timespent-list li .riskassessment-task-content .riskassessment-task-timespent-author a {
   color: #fff !important;
 }
-.riskassessment-task-container .riskassessment-task-single .riskassessment-task-content .riskassessment-task-author-label {
+.riskassessment-task-content .riskassessment-task-author-label {
   word-break: break-all;
 }
-.riskassessment-task-container .riskassessment-task-single .riskassessment-task-content .riskassessment-task-data {
+.riskassessment-task-content .riskassessment-task-data {
   display: -webkit-box;
   display: -ms-flexbox;
   display: flex;
@@ -3033,24 +3033,24 @@ div.wpeo-modal-patchnote .wpeo-button {
   flex-wrap: wrap;
   font-size: 14px;
 }
-.riskassessment-task-container .riskassessment-task-single .riskassessment-task-content .riskassessment-task-data > * {
+.riskassessment-task-content .riskassessment-task-data > * {
   margin: auto 0.2em;
 }
-.riskassessment-task-container .riskassessment-task-single .riskassessment-task-content .riskassessment-task-data .riskassessment-task-reference {
+.riskassessment-task-content .riskassessment-task-data .riskassessment-task-reference {
   color: #263C5C;
   font-weight: 600;
 }
-.riskassessment-task-container .riskassessment-task-single .riskassessment-task-content .riskassessment-task-data .riskassessment-task-reference:hover {
+.riskassessment-task-content .riskassessment-task-data .riskassessment-task-reference:hover {
   text-decoration: underline;
   cursor: pointer;
 }
-.riskassessment-task-container .riskassessment-task-single .riskassessment-task-content .riskassessment-task-data .riskassessment-task-count {
+.riskassessment-task-content .riskassessment-task-data .riskassessment-task-count {
   background: rgba(0, 0, 0, 0.2);
   font-size: 12px;
   border-radius: 4px;
   padding: 0.2em 0.4em;
 }
-.riskassessment-task-container .riskassessment-task-single .riskassessment-task-content .riskassessment-task-data .riskassessment-task-progress {
+.riskassessment-task-content .riskassessment-task-data .riskassessment-task-progress {
   background: rgba(0, 0, 0, 0.2);
   font-size: 12px;
   border-radius: 4px;
@@ -3058,35 +3058,35 @@ div.wpeo-modal-patchnote .wpeo-button {
   font-weight: 700;
   color: rgba(0, 0, 0, 0.6);
 }
-.riskassessment-task-container .riskassessment-task-single .riskassessment-task-content .riskassessment-task-data .riskassessment-task-progress.progress-red {
+.riskassessment-task-content .riskassessment-task-data .riskassessment-task-progress.progress-red {
   background: #e05353;
   color: #fff;
 }
-.riskassessment-task-container .riskassessment-task-single .riskassessment-task-content .riskassessment-task-data .riskassessment-task-progress.progress-yellow {
+.riskassessment-task-content .riskassessment-task-data .riskassessment-task-progress.progress-yellow {
   background: #e9ad4f;
   color: #fff;
 }
-.riskassessment-task-container .riskassessment-task-single .riskassessment-task-content .riskassessment-task-data .riskassessment-task-progress.progress-green {
+.riskassessment-task-content .riskassessment-task-data .riskassessment-task-progress.progress-green {
   background: #47e58e;
   color: #fff;
 }
-.riskassessment-task-container .riskassessment-task-single .riskassessment-task-title {
+.riskassessment-task-content .riskassessment-task-title {
   display: -webkit-box;
   display: -ms-flexbox;
   display: flex;
 }
-.riskassessment-task-container .riskassessment-task-single .riskassessment-task-title .riskassessment-task-progress-checkbox {
+.riskassessment-task-content .riskassessment-task-title .riskassessment-task-progress-checkbox {
   margin: auto 0;
 }
-.riskassessment-task-container .riskassessment-task-single .riskassessment-task-title .riskassessment-task-progress-checkbox input {
+.riskassessment-task-content .riskassessment-task-title .riskassessment-task-progress-checkbox input {
   width: 20px;
   height: 20px;
 }
-.riskassessment-task-container .riskassessment-task-single .riskassessment-task-add {
+.riskassessment-task-content .riskassessment-task-add {
   min-width: 40px;
   margin-left: 0.5em;
 }
-.riskassessment-task-container .riskassessment-task-single .riskassessment-task-delete {
+.riskassessment-task-content .riskassessment-task-delete {
   margin-right: -0.5em;
 }
 
@@ -3147,7 +3147,6 @@ div.wpeo-modal-patchnote .wpeo-button {
 .riskassessment-task-timespent-list li:nth-of-type(odd) .table-row {
   background: #fff !important;
 }
-
 td > .risk-evaluation-list-content .risk-evaluation-container:not(.advanced, .standard) {
   min-width: 340px;
   border: 1px solid rgba(0, 0, 0, 0.1);
