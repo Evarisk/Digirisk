@@ -1221,15 +1221,20 @@ class AccidentMetaData extends CommonObject
 	 */
 	public function create(User $user, $notrigger = false)
 	{
-		$sql                                                                              = "UPDATE " . MAIN_DB_PREFIX . "$this->table_element";
-		$sql                                                                             .= " SET status = 0";
-		if (isset($this->ismultientitymanaged) && $this->ismultientitymanaged == 1) $sql .= ' WHERE entity IN (' . getEntity($this->table_element) . ')';
-		else $sql                                                                        .= ' WHERE 1 = 1';
-		$sql                                                                             .= " AND fk_accident = " . $this->fk_accident;
+		$result = $this->createCommon($user, $notrigger);
 
-		dol_syslog("accidentmetadata.class::create", LOG_DEBUG);
-		$this->db->query($sql);
-		return $this->createCommon($user, $notrigger);
+		if ($result) {
+			$sql                                                                              = "UPDATE " . MAIN_DB_PREFIX . "$this->table_element";
+			$sql                                                                             .= " SET status = 0";
+			if (isset($this->ismultientitymanaged) && $this->ismultientitymanaged == 1) $sql .= ' WHERE entity IN (' . getEntity($this->table_element) . ')';
+			else $sql                                                                        .= ' WHERE 1 = 1';
+			$sql                                                                             .= " AND fk_accident = " . $this->fk_accident;
+	
+			dol_syslog("accidentmetadata.class::create", LOG_DEBUG);
+			$this->db->query($sql);
+		}
+
+		return $result;
 	}
 
 	/**
