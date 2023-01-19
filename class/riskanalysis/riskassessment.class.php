@@ -163,7 +163,7 @@ class RiskAssessment extends CommonObject
 		$result = $this->createCommon($user, $notrigger);
 
 		// Change status previous ressources at 0
-		if ($result && $updatestatus) {
+		if ($result > 0 && $updatestatus > 0) {
 			$sql = "UPDATE " . MAIN_DB_PREFIX . "digiriskdolibarr_riskassessment";
 			$sql .= " SET status = 0";
 			$sql .= " WHERE fk_risk = " . $this->fk_risk;
