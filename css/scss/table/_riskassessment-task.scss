@@ -176,8 +176,21 @@
 }
 
 /** List of comments */
-.riskassessment-task-timespent-container .riskassessment-task .riskassessment-task-container {
-  background: #fff;
-  border: 0;
+.riskassessment-task-timespent-container {
+  .riskassessment-task .riskassessment-task-container {
+    background: #fff;
+    border: 0;
+  }
 
+  .riskassessment-task-timespent-comment {
+    display: block;
+  }
+}
+.riskassessment-task-timespent-list li {
+  &:nth-of-type(even) .table-row {
+    background: rgba(0,0,0,0.05) !important;
+  }
+  &:nth-of-type(odd) .table-row {
+    background: #fff !important;
+  }
 }

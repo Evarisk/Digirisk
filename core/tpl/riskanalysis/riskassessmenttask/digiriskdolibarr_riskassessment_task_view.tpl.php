@@ -462,17 +462,17 @@ $related_tasks = $risk->get_related_tasks($risk); ?>
 								</div>
 								<?php $allTimeSpentArray = $related_task->fetchAllTimeSpentAllUser('AND ptt.fk_task='.$related_task->id, 'task_datehour', 'DESC'); ?>
 								<div class="riskassessment-task-timespent-list" value="<?php echo $related_task->id ?>">
-									<ul class="riskassessment-task-timespent-list-<?php echo $related_task->id ?>">
+									<ul class="wpeo-table table-flex riskassessment-task-timespent-list-<?php echo $related_task->id ?>">
 										<?php if (!empty($allTimeSpentArray) && $allTimeSpentArray > 0) : ?>
 											<?php foreach ($allTimeSpentArray as $time_spent) :?>
 												<li class="riskassessment-task-timespent-<?php echo $time_spent->timespent_id ?>">
 													<input type="hidden" class="labelForDelete" value="<?php echo $langs->trans('DeleteTaskTimeSpent', $time_spent->timespent_duration/60) . ' ' . $related_task->ref . ' ?'; ?>">
-													<div class="riskassessment-task-timespent-container wpeo-gridlayout grid-2 grid-gap-0">
-														<div class="riskassessment-task-timespent-single wpeo-gridlayout grid-3 grid-gap-0">
-															<span class="riskassessment-task-timespent-author">
-																<?php $usertmp->fetch($time_spent->timespent_fk_user); ?>
-																<?php echo getNomUrlUser($usertmp); ?>
-															</span>
+													<div class="table-row riskassessment-task-timespent-container">
+														<div class="table-cell table-padding-0 riskassessment-task-timespent-single">
+																			<span class="riskassessment-task-timespent-author">
+																				<?php $usertmp->fetch($time_spent->timespent_fk_user); ?>
+																				<?php echo getNomUrlUser($usertmp); ?>
+																			</span>
 															<span class="riskassessment-task-timespent-date">
 																<i class="fas fa-calendar-alt"></i> <?php echo dol_print_date($time_spent->timespent_datehour, 'dayhour'); ?>
 															</span>
@@ -484,13 +484,13 @@ $related_tasks = $risk->get_related_tasks($risk); ?>
 															</span>
 														</div>
 														<!-- BUTTON MODAL RISK ASSESSMENT TASK TIMESPENT EDIT  -->
-														<div class="riskassessment-task-actions">
+														<div class="table-cell table-end table-125 table-padding-0 riskassessment-task-actions">
 															<?php if ($permissiontoadd) : ?>
-																<div class="riskassessment-task-timespent-edit wpeo-button button-square-50 button-grey modal-open" value="<?php echo $time_spent->timespent_id ?>">
+																<div class="riskassessment-task-timespent-edit wpeo-button button-square-50 button-transparent modal-open" value="<?php echo $time_spent->timespent_id ?>">
 																	<i class="fas fa-pencil-alt button-icon"></i>
 																</div>
 															<?php else : ?>
-																<div class="wpeo-button button-square-50 button-grey wpeo-tooltip-event" aria-label="<?php echo $langs->trans('PermissionDenied'); ?>" value="<?php echo $time_spent->timespent_id ?>">
+																<div class="wpeo-button button-square-50 button-transparent wpeo-tooltip-event" aria-label="<?php echo $langs->trans('PermissionDenied'); ?>" value="<?php echo $time_spent->timespent_id ?>">
 																	<i class="fas fa-pencil-alt button-icon"></i>
 																</div>
 															<?php endif; ?>
