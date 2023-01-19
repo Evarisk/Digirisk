@@ -160,16 +160,17 @@ class RiskAssessment extends CommonObject
 	 */
 	public function create(User $user, $notrigger = false, $updatestatus = true)
 	{
+		$result = $this->createCommon($user, $notrigger);
+
 		// Change status previous ressources at 0
-		if ($updatestatus) {
+		if ($result > 0 && $updatestatus > 0) {
 			$sql = "UPDATE " . MAIN_DB_PREFIX . "digiriskdolibarr_riskassessment";
 			$sql .= " SET status = 0";
 			$sql .= " WHERE fk_risk = " . $this->fk_risk;
 			$this->db->query($sql);
 		}
 
-		//ADD LINES POUR LE SELECT ENTITY
-		return $this->createCommon($user, $notrigger);
+		return $result;
 	}
 
 	/**
