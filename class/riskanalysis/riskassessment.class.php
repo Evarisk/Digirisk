@@ -167,6 +167,7 @@ class RiskAssessment extends CommonObject
 			$sql = "UPDATE " . MAIN_DB_PREFIX . "digiriskdolibarr_riskassessment";
 			$sql .= " SET status = 0";
 			$sql .= " WHERE fk_risk = " . $this->fk_risk;
+			$sql .= " AND rowid != " . $result;
 			$this->db->query($sql);
 		}
 

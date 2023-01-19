@@ -1229,6 +1229,7 @@ class AccidentMetaData extends CommonObject
 			if (isset($this->ismultientitymanaged) && $this->ismultientitymanaged == 1) $sql .= ' WHERE entity IN (' . getEntity($this->table_element) . ')';
 			else $sql                                                                        .= ' WHERE 1 = 1';
 			$sql                                                                             .= " AND fk_accident = " . $this->fk_accident;
+			$sql                                                                             .= " AND rowid != " . $result;
 
 			dol_syslog("accidentmetadata.class::create", LOG_DEBUG);
 			$this->db->query($sql);
