@@ -2807,6 +2807,7 @@ window.eoxiaJS.riskassessmenttask.saveRiskAssessmentTask = function ( event ) {
 			textToShow += actionContainerSuccess.find('.valueForEditTask2').val()
 
 			$('.wpeo-loader').removeClass('wpeo-loader')
+			$('.loader-spin').remove()
 			actionContainerSuccess.find('a').attr('href', '#risk_row_'+riskId)
 
 			actionContainerSuccess.find('.notice-subtitle .text').text(textToShow)
@@ -2893,7 +2894,7 @@ window.eoxiaJS.riskassessmenttask.createRiskAssessmentTaskTimeSpent = function (
 			actionContainerError.html($(resp).find('.task-timespent-create-error-notice'))
 			actionContainerError.removeClass('hidden');
 		},
-		complete:  function () {
+		complete: function () {
 			$('#risk_assessment_task_edit'+taskID+'.wpeo-modal').addClass('modal-active')
 		}
 	});
