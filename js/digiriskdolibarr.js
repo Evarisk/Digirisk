@@ -2806,6 +2806,7 @@ window.eoxiaJS.riskassessmenttask.saveRiskAssessmentTask = function ( event ) {
 			textToShow += taskRef
 			textToShow += actionContainerSuccess.find('.valueForEditTask2').val()
 
+			$('.wpeo-loader').removeClass('wpeo-loader')
 			actionContainerSuccess.find('a').attr('href', '#risk_row_'+riskId)
 
 			actionContainerSuccess.find('.notice-subtitle .text').text(textToShow)
@@ -2878,6 +2879,7 @@ window.eoxiaJS.riskassessmenttask.createRiskAssessmentTaskTimeSpent = function (
 			textToShow += actionContainerSuccess.find('.valueForCreateTaskTimeSpent2').val()
 
 			$('.riskassessment-task-timespent-container').find('.riskassessment-task-timespent-list-'+taskID).html($(resp).find('.riskassessment-task-timespent-container').find('.riskassessment-task-timespent-list-'+taskID))
+			$('.riskassessment-task-container-'+taskID).closest('.riskassessment-tasks').html($(resp).find('.riskassessment-task-container-'+taskID).closest('.riskassessment-tasks'))
 			$('.loader-spin').remove();
 			$('.wpeo-loader').removeClass('wpeo-loader')
 
@@ -2890,6 +2892,9 @@ window.eoxiaJS.riskassessmenttask.createRiskAssessmentTaskTimeSpent = function (
 			let actionContainerError = $('.messageErrorTaskTimeSpentCreate'+ taskID);
 			actionContainerError.html($(resp).find('.task-timespent-create-error-notice'))
 			actionContainerError.removeClass('hidden');
+		},
+		complete:  function () {
+			$('#risk_assessment_task_edit'+taskID+'.wpeo-modal').addClass('modal-active')
 		}
 	});
 };
