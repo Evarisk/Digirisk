@@ -393,6 +393,30 @@ class pdf_orque_projectdocument
 				$curY = $tab_top + $heightoftitleline + 1;
 				$nexY = $tab_top + $heightoftitleline + 1;
 
+				// Sort the info by descending order of cotation
+				$objectDoc = array();
+				for ($i = 0; $i < $nblines; $i++) {
+					$risk->fetch($object->lines[$i]->options_fk_risk);
+					$lastEvaluation = $riskassessment->fetchFromParent($risk->id, 1);
+					if ($lastEvaluation > 0 && !empty($lastEvaluation) && is_array($lastEvaluation)) {
+						$lastEvaluation = array_shift($lastEvaluation);
+					}
+
+					$tmpArray = array("cotation" => empty($lastEvaluation->cotation) ? 0 : $lastEvaluation->cotation);
+					$tmpArray += array("task_ref" => $object->lines[$i]->ref);
+					$tmpArray += array("risk_ref" => $risk->ref);
+					$tmpArray += array("label" => $object->lines[$i]->label);
+					$tmpArray += array("budget" => $object->lines[$i]->budget_amount);
+					$tmpArray += array("progress" => $object->lines[$i]->progress ? $object->lines[$i]->progress . '%' : '');
+					$tmpArray += array("date_start" => $object->lines[$i]->date_start);
+					$tmpArray += array("date_end" => $object->lines[$i]->date_end);
+					$tmpArray += array("workload" =>  $object->lines[$i]->planned_workload);
+					array_push($objectDoc, $tmpArray);
+				}
+				usort($objectDoc, function($a, $b) {
+					return $b['cotation'] <=> $a['cotation'];
+				});
+
 				// Loop on each lines
 
 				for ($i = 0; $i < $nblines; $i++) {
@@ -404,22 +428,16 @@ class pdf_orque_projectdocument
 					$pdf->setPageOrientation($this->orientation, 1, $heightforfooter + $heightforfreetext + $heightforinfotot); // The only function to edit the bottom margin of current page to set it.
 					$pageposbefore = $pdf->getPage();
 
-					$risk->fetch($object->lines[$i]->options_fk_risk);
-					$lastEvaluation = $riskassessment->fetchFromParent($risk->id, 1);
-					if ($lastEvaluation > 0 && !empty($lastEvaluation) && is_array($lastEvaluation)) {
-						$lastEvaluation = array_shift($lastEvaluation);
-					}
-
 					// Description of line
-					$ref = $object->lines[$i]->ref;
-					$libelleline = $object->lines[$i]->label;
-					$riskref = $risk->ref;
-					$lastEvaluation = $lastEvaluation->cotation ?: 0;
-					$budget = price($object->lines[$i]->budget_amount, 0, $langs, 1, 0, 0, $conf->currency);
-					$progress = ($object->lines[$i]->progress ? $object->lines[$i]->progress.'%' : '');
-					$datestart = dol_print_date($object->lines[$i]->date_start, 'day');
-					$dateend = dol_print_date($object->lines[$i]->date_end, 'day');
-					$planned_workload = convertSecondToTime((int) $object->lines[$i]->planned_workload, 'allhourmin');
+					$ref = $objectDoc[$i]['task_ref'];
+					$libelleline = $objectDoc[$i]['label'];
+					$riskref = $objectDoc[$i]['risk_ref'];
+					$lastEvaluation = $objectDoc[$i]['cotation'];
+					$budget = price($objectDoc[$i]['budget'], 0, $langs, 1, 0, 0, $conf->currency);
+					$progress = $objectDoc[$i]['progress'];
+					$datestart = dol_print_date($objectDoc[$i]['date_start'], 'day');
+					$dateend = dol_print_date($objectDoc[$i]['date_end'], 'day');
+					$planned_workload = convertSecondToTime((int) $objectDoc[$i]['workload'], 'allhourmin');
 
 					$showpricebeforepagebreak = 1;
 
