@@ -514,6 +514,7 @@ if (GETPOST('dataMigrationExportGlobal', 'alpha') && ! empty($conf->global->MAIN
 			$digiriskelementsExportArray['show_in_selector'] = $digiriskelementsingle->show_in_selector;
 			$digiriskelementsExportArray['fk_parent']        = $digiriskelementsingle->fk_parent;
 			$digiriskelementsExportArray['ranks']            = $digiriskelementsingle->ranks;
+			$digiriskelementsExportArray['entity']           = $conf->entity;
 
 			$digiriskExportArray['digiriskelements'][$digiriskelementsingle->id] = $digiriskelementsExportArray;
 
@@ -646,6 +647,7 @@ if (GETPOST('dataMigrationExportStructureTree', 'alpha') && ! empty($conf->globa
 			$digiriskelementsExportArray['show_in_selector'] = $digiriskelementsingle->show_in_selector;
 			$digiriskelementsExportArray['fk_parent']        = $digiriskelementsingle->fk_parent;
 			$digiriskelementsExportArray['ranks']            = $digiriskelementsingle->ranks;
+			$digiriskelementsExportArray['entity']           = $conf->entity;
 
 			$digiriskExportArray['digiriskelements'][$digiriskelementsingle->id] = $digiriskelementsExportArray;
 		}
@@ -849,8 +851,8 @@ if (GETPOST('dataMigrationImportGlobalDolibarr', 'alpha') && ! empty($conf->glob
 
 if (GETPOST('dataMigrationImportStructureTreeDolibarr', 'alpha') && ! empty($conf->global->MAIN_UPLOAD_DOC)) {
 	// Submit file
-	if ( ! empty($_FILES)) {
-		if ( ! preg_match('/dolibarr_structure_tree_export.zip/', $_FILES['dataMigrationImportStructureTreeDolibarrfile']['name'][0]) || $_FILES['dataMigrationImportStructureTreeDolibarrfile']['size'][0] < 1) {
+	if (!empty($_FILES)) {
+		if (!preg_match('/dolibarr_structure_tree_export.zip/', $_FILES['dataMigrationImportStructureTreeDolibarrfile']['name'][0]) || $_FILES['dataMigrationImportStructureTreeDolibarrfile']['size'][0] < 1) {
 			setEventMessages($langs->trans('ErrorFileNotWellFormattedZIP'), null, 'errors');
 		} else {
 			if (is_array($_FILES['dataMigrationImportStructureTreeDolibarrfile']['tmp_name'])) $userfiles = $_FILES['dataMigrationImportStructureTreeDolibarrfile']['tmp_name'];
@@ -867,7 +869,7 @@ if (GETPOST('dataMigrationImportStructureTreeDolibarr', 'alpha') && ! empty($con
 				}
 			}
 
-			if ( ! $error) {
+			if (!$error) {
 				$filedir = $upload_dir . '/temp/';
 				if ( ! empty($filedir)) {
 					$result = dol_add_file_process($filedir, 0, 1, 'dataMigrationImportStructureTreeDolibarrfile', '', null, '', 0, null);
@@ -905,8 +907,11 @@ if (GETPOST('dataMigrationImportStructureTreeDolibarr', 'alpha') && ! empty($con
 
 					$digiriskElement->array_options['wp_digi_id'] = $digiriskelementsingle['rowid'];
 					$digiriskElement->array_options['entity']     = $conf->entity;
-
-					$digiriskElement->fk_parent = $digiriskElement->fetch_id_from_wp_digi_id($digiriskelementsingle['fk_parent']) ?: 0;
+					if ($digiriskElement->fetch_trash_id_from_entity($digiriskelementsingle['entity']) == $digiriskelementsingle['fk_parent']) {
+						$digiriskElement->fk_parent = $conf->global->DIGIRISKDOLIBARR_DIGIRISKELEMENT_TRASH;
+					} else {
+						$digiriskElement->fk_parent = $digiriskelementsingle['fk_parent'];
+					}
 
 					$digiriskelementid = $digiriskElement->create($user);
 				}
@@ -1071,19 +1076,11 @@ if ($user->rights->digiriskdolibarr->adminpage->read) {
 	print '<input type="submit" class="button reposition data-migration-submit" name="dataMigrationImportGlobalDolibarr" value="' . $langs->trans("Upload") . '">';
 	print '</td>';
 	print '</tr>';
-	print '</table>';
 	print '</form>';
 
 	print '<form class="data-migration-export-structure-tree-from" name="dataMigrationExportStructureTree" id="dataMigrationExportStructureTree" action="' . $_SERVER["PHP_SELF"] . '" method="POST">';
 	print '<input type="hidden" name="token" value="' . newToken() . '">';
 	print '<input type="hidden" name="action" value="dataMigrationExportStructureTree">';
-
-	print '<table class="noborder centpercent">';
-	print '<tr class="liste_titre">';
-	print '<td>' . $langs->trans("Name") . '</td>';
-	print '<td>' . $langs->trans("Description") . '</td>';
-	print '<td class="center">' . $langs->trans("Action") . '</td>';
-	print '</tr>';
 
 	// Export structure tree from Dolibarr
 	print '<tr class="oddeven"><td>';
