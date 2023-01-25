@@ -438,6 +438,7 @@ class pdf_orque_projectdocument
 					$datestart = dol_print_date($objectDoc[$i]['date_start'], 'day');
 					$dateend = dol_print_date($objectDoc[$i]['date_end'], 'day');
 					$planned_workload = convertSecondToTime((int) $objectDoc[$i]['workload'], 'allhourmin');
+					$totalbudget += $objectDoc[$i]['budget'];
 
 					$showpricebeforepagebreak = 1;
 
@@ -604,6 +605,16 @@ class pdf_orque_projectdocument
 						}
 					}
 				}
+
+				// Break line between total budget and tasks
+				$curY += 10;
+				$pdf->line($this->marge_gauche, $curY, $this->page_largeur - $this->marge_droite, $curY);
+				$curY += 5;
+				$totalbudget = price($totalbudget, 0, $langs, 1, 0, 0, $conf->currency);
+
+				// Total budget of task
+				$pdf->SetXY($this->posxref, $curY);
+				$pdf->MultiCell($this->posxbudget - $this->posxlabel, 3, $outputlangs->convToOutputCharset($langs->transnoentities('TotalBudget')) . ' : ' . $outputlangs->convToOutputCharset($totalbudget), 0, 'L');
 
 				// Show square
 				if ($pagenb == 1) {
