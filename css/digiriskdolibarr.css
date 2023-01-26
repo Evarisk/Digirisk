@@ -2737,7 +2737,6 @@ div.wpeo-modal-patchnote .wpeo-button {
     background: none;
     border: 0;
   }
-
   #id-container.page-ut-gp-list .organization .side-nav-responsive {
     display: block;
     background: #263C5C;
@@ -2749,12 +2748,10 @@ div.wpeo-modal-patchnote .wpeo-button {
     -webkit-transition: all 0.2s ease-out;
     transition: all 0.2s ease-out;
   }
-
   #id-container.page-ut-gp-list .organization .side-nav-responsive:hover {
     cursor: pointer;
     background: #446ba4;
   }
-
   #id-container.page-ut-gp-list .organization #id-left {
     opacity: 0;
     pointer-events: none;
@@ -2771,14 +2768,12 @@ div.wpeo-modal-patchnote .wpeo-button {
     max-height: 500px;
     overflow-y: auto;
   }
-
   #id-container.page-ut-gp-list .organization #id-left.active {
     opacity: 1;
     pointer-events: auto;
     -webkit-transform: translateY(0px);
     transform: translateY(0px);
   }
-
   #id-container.page-ut-gp-list #id-right {
     padding-left: 0;
   }
@@ -2998,6 +2993,9 @@ div.wpeo-modal-patchnote .wpeo-button {
 .riskassessment-task-single * {
   -webkit-box-sizing: border-box;
   box-sizing: border-box;
+}
+.riskassessment-task-single .riskassessment-task-actions {
+  margin-left: auto;
 }
 .riskassessment-task-single > * {
   margin-top: auto;
@@ -3775,7 +3773,6 @@ td > .risk-evaluation-list-content .risk-evaluation-container:not(.advanced, .st
   #id-container.page-ut-gp-list .side-nav #id-left:not(.active) .wpeo-button {
     pointer-events: none;
   }
-
   #id-container.page-ut-gp-list #id-right {
     padding-left: 0;
   }
@@ -3822,44 +3819,35 @@ tr.liste_titre th.liste_titre:not(.maxwidthsearch), tr.liste_titre td.liste_titr
 @media only screen and (max-width: 1600px) {
   div.fichecenter {
     width: 100%;
-    clear: both;
-    /* This is to have div fichecenter that are true rectangles */
+    clear: both; /* This is to have div fichecenter that are true rectangles */
   }
-
   div.fichecenterbis {
     margin-top: 8px;
   }
-
   div.fichethirdleft {
     float: none;
     width: auto;
     padding-bottom: 6px;
   }
-
   div.fichetwothirdright {
     float: none;
     width: auto;
     padding-bottom: 6px;
   }
-
   div.fichehalfleft {
     float: none;
     width: auto;
   }
-
   div.fichehalfright {
     float: none;
     width: auto;
   }
-
   div.fichehalfright {
     margin-top: 10px;
   }
-
   div.firstcolumn div.box {
     padding-right: 0px;
   }
-
   div.secondcolumn div.box {
     padding-left: 0px;
   }
