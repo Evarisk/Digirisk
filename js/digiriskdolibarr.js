@@ -2752,7 +2752,7 @@ window.eoxiaJS.riskassessmenttask.deleteRiskAssessmentTask = function ( event ) 
  */
 window.eoxiaJS.riskassessmenttask.saveRiskAssessmentTask = function ( event ) {
 	let editedRiskAssessmentTaskId = $(this).attr('value');
-	let elementRiskAssessmentTask = $(this).closest('.riskassessment-task-container');
+	let elementRiskAssessmentTask = $(this).closest('.modal-container');
 	let riskId = $(this).closest('.riskassessment-tasks').attr('value')
 	let textToShow = '';
 
