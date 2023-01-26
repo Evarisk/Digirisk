@@ -158,7 +158,6 @@ if (GETPOST('dataMigrationImport', 'alpha') && ! empty($conf->global->MAIN_UPLOA
 					$digiriskElement->description  = $element['content'][$i];
 
 					$digiriskElement->array_options['wp_digi_id'] = $element['id'][$i];
-					$digiriskElement->array_options['entity'] = $conf->entity;
 
 					$digiriskElement->fk_parent = $digiriskElement->fetch_id_from_wp_digi_id($element['parent_id'][$i]) ?: 0;
 
@@ -408,7 +407,6 @@ if (GETPOST('dataMigrationImportGlobal', 'alpha') && ! empty($conf->global->MAIN
 					$digiriskElement->description  = $element['content'][$i];
 
 					$digiriskElement->array_options['wp_digi_id'] = $element['id'][$i];
-					$digiriskElement->array_options['entity'] = $conf->entity;
 
 					$digiriskElement->fk_parent = $digiriskElement->fetch_id_from_wp_digi_id($element['parent_id'][$i]) ?: 0;
 
@@ -514,7 +512,6 @@ if (GETPOST('dataMigrationExportGlobal', 'alpha') && ! empty($conf->global->MAIN
 			$digiriskelementsExportArray['show_in_selector'] = $digiriskelementsingle->show_in_selector;
 			$digiriskelementsExportArray['fk_parent']        = $digiriskelementsingle->fk_parent;
 			$digiriskelementsExportArray['ranks']            = $digiriskelementsingle->ranks;
-			$digiriskelementsExportArray['entity']           = $conf->entity;
 
 			$digiriskExportArray['digiriskelements'][$digiriskelementsingle->id] = $digiriskelementsExportArray;
 
@@ -583,7 +580,7 @@ if (GETPOST('dataMigrationExportGlobal', 'alpha') && ! empty($conf->global->MAIN
 				}
 			}
 
-			// Risksings data
+			// Risksigns data
 			$allrisksigns = $risksign->fetchFromParent($digiriskelementsingle->id);
 			if (is_array($allrisksigns) && !empty($allrisksigns)) {
 				foreach ($allrisksigns as $risksignsingle) {
@@ -647,7 +644,6 @@ if (GETPOST('dataMigrationExportStructureTree', 'alpha') && ! empty($conf->globa
 			$digiriskelementsExportArray['show_in_selector'] = $digiriskelementsingle->show_in_selector;
 			$digiriskelementsExportArray['fk_parent']        = $digiriskelementsingle->fk_parent;
 			$digiriskelementsExportArray['ranks']            = $digiriskelementsingle->ranks;
-			$digiriskelementsExportArray['entity']           = $conf->entity;
 
 			$digiriskExportArray['digiriskelements'][$digiriskelementsingle->id] = $digiriskelementsExportArray;
 		}
@@ -737,7 +733,6 @@ if (GETPOST('dataMigrationImportGlobalDolibarr', 'alpha') && ! empty($conf->glob
 					$digiriskElement->ranks            = $digiriskelementsingle['ranks'];
 
 					$digiriskElement->array_options['wp_digi_id'] = $digiriskelementsingle['rowid'];
-					$digiriskElement->array_options['entity']     = $conf->entity;
 
 					$digiriskElement->fk_parent = $digiriskElement->fetch_id_from_wp_digi_id($digiriskelementsingle['fk_parent']) ?: 0;
 
@@ -886,8 +881,9 @@ if (GETPOST('dataMigrationImportStructureTreeDolibarr', 'alpha') && ! empty($con
 
 			$filename = preg_replace( '/\.zip/', '.json', $_FILES['dataMigrationImportStructureTreeDolibarrfile']['name'][0]);
 
-			$json                = file_get_contents($filedir . $filename);
-			$digiriskExportArray = json_decode($json, true);
+			$json                   = file_get_contents($filedir . $filename);
+			$digiriskExportArray    = json_decode($json, true);
+			$digiriskElementTrashes = $digiriskElement->fetch_multi_entity_trash_ids();
 
 			if (is_array($digiriskExportArray['digiriskelements']) && !empty($digiriskExportArray['digiriskelements'])) {
 				foreach ($digiriskExportArray['digiriskelements'] as $digiriskelementsingle) {
@@ -906,11 +902,10 @@ if (GETPOST('dataMigrationImportStructureTreeDolibarr', 'alpha') && ! empty($con
 					$digiriskElement->ranks            = $digiriskelementsingle['ranks'];
 
 					$digiriskElement->array_options['wp_digi_id'] = $digiriskelementsingle['rowid'];
-					$digiriskElement->array_options['entity']     = $conf->entity;
-					if ($digiriskElement->fetch_trash_id_from_entity($digiriskelementsingle['entity']) == $digiriskelementsingle['fk_parent']) {
+					if (in_array($digiriskelementsingle['fk_parent'], $digiriskElementTrashes)) {
 						$digiriskElement->fk_parent = $conf->global->DIGIRISKDOLIBARR_DIGIRISKELEMENT_TRASH;
 					} else {
-						$digiriskElement->fk_parent = $digiriskelementsingle['fk_parent'];
+						$digiriskElement->fk_parent = $digiriskElement->fetch_id_from_wp_digi_id($digiriskelementsingle['fk_parent']) ?: 0;
 					}
 
 					$digiriskelementid = $digiriskElement->create($user);

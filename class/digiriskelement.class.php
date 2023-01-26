@@ -533,42 +533,6 @@ class DigiriskElement extends CommonObject
 	}
 
 	/**
-	 * Return trash_id from selected entity
-	 *
-	 * @param  int         $entity       id of the entity from which you want to fetch the trash
-	 * @return int                       id of the trash of the selected entity
-	 * @throws Exception
-	 */
-	public function fetch_trash_id_from_entity($entity)
-	{
-		dol_syslog(__METHOD__, LOG_DEBUG);
-
-		$sql  = 'SELECT ';
-		$sql .= ' *';
-		$sql .= ' FROM ' . MAIN_DB_PREFIX . 'digiriskdolibarr_digiriskelement as s';
-		$sql .= ' WHERE entity =' . $entity;
-		$sql .= ' AND status = 0';
-
-		$resql = $this->db->query($sql);
-
-		if ($resql) {
-			$num = $this->db->num_rows($resql);
-			$i   = 0;
-			$obj = new stdClass();
-			while ($i < $num) {
-				$obj = $this->db->fetch_object($resql);
-				$i++;
-			}
-			$this->db->free($resql);
-			return $obj->rowid;
-		} else {
-			$this->errors[] = 'Error ' . $this->db->lasterror();
-			dol_syslog(__METHOD__ . ' ' . join(',', $this->errors), LOG_ERR);
-			return -1;
-		}
-	}
-
-	/**
 	 * 	Return clickable name (with picto eventually)
 	 *
 	 * 	@param	int		$withpicto		          0=No picto, 1=Include picto into link, 2=Only picto
@@ -667,6 +631,17 @@ class DigiriskElement extends CommonObject
 	}
 
 	/**
+	 * Return trash_id from every entities
+	 *
+	 * @return array|int     ids of the trash of every entities
+	 * @throws Exception
+	 */
+	public function fetch_multi_entity_trash_ids()
+	{
+		return $this->fetchAll('',  'ranks', '','',array('customsql' => ' status = 0'));
+	}
+
+	/**
 	 *  Return list of deleted elements for all entities
 	 *
 	 * 	@return    array  Array with ids
@@ -676,7 +651,7 @@ class DigiriskElement extends CommonObject
 	{
 		$this->ismultientitymanaged = 0;
 		$objects = $this->fetchAll('',  'ranks', '','',array('customsql' => ' status > 0'));
-		$digiriskelement_trashes = $this->fetchAll('',  'ranks', '','',array('customsql' => ' status = 0'));
+		$digiriskelement_trashes = $this->fetch_multi_entity_trash_ids();
 		$this->ismultientitymanaged = 1;
 		if (is_array($digiriskelement_trashes) && !empty($digiriskelement_trashes)) {
 			$ids          = [];
