@@ -110,7 +110,7 @@ class mod_risk_standard extends ModeleNumRefRiskAnalysis
 	}
 
 	/**
-	 * 	Return next free value
+	 * 	Return last value
 	 *
 	 *  @param  Object		$object		Object we need next value for
 	 *  @return string      			Value if KO, <0 if KO
@@ -134,7 +134,7 @@ class mod_risk_standard extends ModeleNumRefRiskAnalysis
 		if ($resql) {
 			$obj = $db->fetch_object($resql);
 		} else {
-			dol_syslog("mod_risk_standard::getNextValue", LOG_DEBUG);
+			dol_syslog("mod_risk_standard::getLastValue", LOG_DEBUG);
 			return -1;
 		}
 		return $this->prefix . $obj->max;

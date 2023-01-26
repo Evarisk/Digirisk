@@ -2998,6 +2998,7 @@ window.eoxiaJS.riskassessmenttask.saveRiskAssessmentTaskTimeSpent = function ( e
 		url: document.URL + '&action=saveRiskAssessmentTaskTimeSpent&token='+token,
 		data: JSON.stringify({
 			riskAssessmentTaskTimeSpentID: riskAssessmentTaskTimeSpentID,
+			taskID: taskID,
 			date: date,
 			hour: hour,
 			min: min,

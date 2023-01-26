@@ -391,6 +391,22 @@ if (empty($reshook)) {
 		}
 	}
 
+	// Action to delete record
+	if ($action == 'confirm_delete' && $permissiontodelete) {
+		$object->status = 0;
+		$result         = $object->delete($user);
+
+		if ($result < 0) {
+			// Delete accident KO
+			if (!empty($accident->errors)) setEventMessages(null, $accident->errors, 'errors');
+			else setEventMessages($accident->error, null, 'errors');
+		}
+		// Delete accident OK
+		$urltogo = str_replace('accident_card.php', 'accident_list.php', $_SERVER["PHP_SELF"]);
+		header("Location: " . $urltogo);
+		exit;
+	}
+
 	// Action to add line
 	if ($action == 'addLine' && $permissiontoadd) {
 		// Get parameters
@@ -416,7 +432,7 @@ if (empty($reshook)) {
 		$objectline->fk_accident         = $parent_id;
 
 		// Check parameters
-		if (empty($workstop_days)) {
+		if ($workstop_days <= 0) {
 			setEventMessages($langs->trans('ErrorFieldNotEmpty', $langs->transnoentitiesnoconv('WorkStopDays')), null, 'errors');
 			$error++;
 		}
@@ -461,7 +477,7 @@ if (empty($reshook)) {
 		$objectline->declaration_link    = $declaration_link;
 
 		// Check parameters
-		if (empty($workstop_days)) {
+		if ($workstop_days <= 0) {
 			setEventMessages($langs->trans('ErrorFieldNotEmpty', $langs->transnoentitiesnoconv('WorkStopDays')), null, 'errors');
 			header("Location: " . $_SERVER['PHP_SELF'] . '?id=' . $id . '&action=editline&lineid=' .  $lineid);
 			exit;
@@ -821,7 +837,13 @@ if (($id || $ref) && $action == 'edit') {
 }
 
 $formconfirm = '';
+
 // Confirmation to delete
+if ($action == 'delete' && $permissiontodelete) {
+	$formconfirm = $form->formconfirm($_SERVER["PHP_SELF"].'?id='.$object->id, $langs->trans('DeleteAccident'), $langs->trans('ConfirmDeleteAccident'), 'confirm_delete', '', 0, 1);
+}
+
+// Confirmation to delete line
 if ($action == 'deleteline') {
 	$objectline->fetch($lineid);
 	$formconfirm = $form->formconfirm($_SERVER["PHP_SELF"] . '?id=' . $object->id . '&lineid=' . $lineid, $langs->trans('DeleteAccidentWorkStop'), $langs->trans('ConfirmDeleteAccidentWorkStop', $objectline->ref), 'confirm_deleteLine', '', 0, 1);
@@ -1029,6 +1051,7 @@ if ((empty($action) || ($action != 'create' && $action != 'edit'))) {
 
 		if (empty($reshook)) {
 			print '<a class="' . ($object->status == 1 ? 'butAction' : 'butActionRefused classfortooltip') . '" id="actionButtonEdit" title="' . ($object->status == 1 ? '' : dol_escape_htmltag($langs->trans("AccidentMustBeInProgress"))) . '" href="' . ($object->status == 1 ? ($_SERVER["PHP_SELF"] . '?id=' . $object->id . '&action=edit') : '#') . '">' . $langs->trans("Modify") . '</a>';
+			print '<a class="' . ($permissiontodelete ? 'butActionDelete' : 'butActionRefused classfortooltip') . '" id="actionButtonDelete" title="' . ($permissiontodelete ? '' : dol_escape_htmltag($langs->trans("PermissionDenied"))) . '" href="' . ($permissiontodelete ? ($_SERVER["PHP_SELF"] . '?id=' . $object->id . '&action=delete') : '#') . '">' . $langs->trans("Delete") . '</a>';
 		}
 		print '</div>';
 
