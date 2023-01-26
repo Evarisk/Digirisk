@@ -533,6 +533,44 @@ class DigiriskElement extends CommonObject
 	}
 
 	/**
+	 * Return new_id from previous_id extrafields
+	 *
+	 * @param  int $previousId           previous id from which we want the new id
+	 * @return array|int                 int <0 if KO, array of pages if OK
+	 * @throws Exception
+	 */
+	public function fetch_id_from_previous_id($previousId)
+	{
+		global $conf;
+
+		dol_syslog(__METHOD__, LOG_DEBUG);
+
+		$sql  = 'SELECT t.fk_object, e.entity';
+		$sql .= ' FROM ' . MAIN_DB_PREFIX . $this->table_element . '_extrafields as t';
+		$sql .= ' LEFT JOIN ' . MAIN_DB_PREFIX . $this->table_element . ' as e ON t.fk_object = e.rowid';
+		$sql .= ' WHERE t.previous_id = ' . $previousId;
+		$sql .= ' AND e.entity = ' . $conf->entity;
+
+		$resql = $this->db->query($sql);
+
+		if ($resql) {
+			$num = $this->db->num_rows($resql);
+			$i   = 0;
+			$obj = new stdClass();
+			while ($i < $num) {
+				$obj = $this->db->fetch_object($resql);
+				$i++;
+			}
+			$this->db->free($resql);
+			return $obj->fk_object;
+		} else {
+			$this->errors[] = 'Error ' . $this->db->lasterror();
+			dol_syslog(__METHOD__ . ' ' . join(',', $this->errors), LOG_ERR);
+			return -1;
+		}
+	}
+
+	/**
 	 * 	Return clickable name (with picto eventually)
 	 *
 	 * 	@param	int		$withpicto		          0=No picto, 1=Include picto into link, 2=Only picto

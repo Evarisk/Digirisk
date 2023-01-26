@@ -901,11 +901,13 @@ if (GETPOST('dataMigrationImportStructureTreeDolibarr', 'alpha') && ! empty($con
 					$digiriskElement->show_in_selector = $digiriskelementsingle['show_in_selector'];
 					$digiriskElement->ranks            = $digiriskelementsingle['ranks'];
 
-					$digiriskElement->array_options['wp_digi_id'] = $digiriskelementsingle['rowid'];
+					$digiriskElement->array_options['previous_id'] = $digiriskelementsingle['rowid'];
+
+					// If element is in trash, put the element in trash entity, else put element under his fk_parent if he got one
 					if (in_array($digiriskelementsingle['fk_parent'], $digiriskElementTrashes)) {
 						$digiriskElement->fk_parent = $conf->global->DIGIRISKDOLIBARR_DIGIRISKELEMENT_TRASH;
 					} else {
-						$digiriskElement->fk_parent = $digiriskElement->fetch_id_from_wp_digi_id($digiriskelementsingle['fk_parent']) ?: 0;
+						$digiriskElement->fk_parent = $digiriskElement->fetch_id_from_previous_id($digiriskelementsingle['fk_parent']) ?: 0;
 					}
 
 					$digiriskelementid = $digiriskElement->create($user);
