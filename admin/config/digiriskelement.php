@@ -42,6 +42,7 @@ global $langs, $user, $db;
 require_once DOL_DOCUMENT_ROOT . "/core/lib/admin.lib.php";
 
 require_once '../../lib/digiriskdolibarr.lib.php';
+require_once __DIR__ . '/../../core/tpl/digirisk_security_checks.php';
 
 // Translations
 $langs->loadLangs(array("admin", "digiriskdolibarr@digiriskdolibarr"));
@@ -69,7 +70,7 @@ if (GETPOST('action') == 'updateMask') {
  */
 
 $help_url = 'FR:Module_DigiriskDolibarr#L.27onglet_.C3.89l.C3.A9ment_Digirisk';
-$title    = $langs->trans("Arborescence");
+$title    = $langs->trans("Organization");
 
 $morejs  = array("/digiriskdolibarr/js/digiriskdolibarr.js");
 $morecss = array("/digiriskdolibarr/css/digiriskdolibarr.css");

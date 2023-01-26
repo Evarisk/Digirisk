@@ -69,12 +69,13 @@ $object->fetch($id);
 $hookmanager->initHooks(array('preventionplansignature', 'globalcard')); // Note that conf->hooks_modules contains array
 
 //Security check
+require_once __DIR__ . '/../../core/tpl/digirisk_security_checks.php';
+
 $permissiontoread   = $user->rights->digiriskdolibarr->preventionplan->read;
 $permissiontoadd    = $user->rights->digiriskdolibarr->preventionplan->write;
 $permissiontodelete = $user->rights->digiriskdolibarr->preventionplan->delete;
 
 if ( ! $permissiontoread) accessforbidden();
-require_once './../../core/tpl/digirisk_security_checks.php';
 
 /*
 /*
@@ -128,14 +129,22 @@ if ($action == 'addSignature') {
 
 	$signatory->fetch($signatoryID);
 	$signatory->signature      = $data['signature'];
-	$signatory->signature_date = dol_now('tzuser');
+	if (!empty($signatory->signature)) {
+		$signatory->signature_date = dol_now('tzuser');
+	} else {
+		$signatory->signature_date = '';
+	}
 
 	if ( ! $error) {
-		$result = $signatory->update($user, false);
+		$result = $signatory->update($user);
 
 		if ($result > 0) {
 			// Creation signature OK
-			$signatory->setSigned($user, 0);
+			if (!empty($signatory->signature)) {
+				$signatory->setSigned($user);
+			} else {
+				$signatory->setRegistered($user);
+			}
 			$urltogo = str_replace('__ID__', $result, $backtopage);
 			$urltogo = preg_replace('/--IDFORBACKTOPAGE--/', $id, $urltogo); // New method to autoselect project after a New on another form object creation
 			header("Location: " . $urltogo);
@@ -315,7 +324,9 @@ $morehtmlref .= '</div>';
 
 //$morehtmlleft = '<div class="floatleft inline-block valignmiddle divphotoref">'.digirisk_show_photos('digiriskdolibarr', $conf->digiriskdolibarr->multidir_output[$entity].'/'.$object->element_type, 'small', 5, 0, 0, 0, $width,0, 0, 0, 0, $object->element_type, $object).'</div>';
 
-digirisk_banner_tab($object, 'ref', '', 0, 'ref', 'ref', $morehtmlref, '', 0, $morehtmlleft, $object->getLibStatut(5));
+$linkback = '<a href="' . dol_buildpath('/digiriskdolibarr/view/preventionplan/preventionplan_list.php', 1) . '">' . $langs->trans("BackToList") . '</a>';
+
+digirisk_banner_tab($object, 'id', $linkback, 1, 'rowid', 'ref', $morehtmlref, '', 0, '', $object->getLibStatut(5));
 
 print dol_get_fiche_end(); ?>
 
@@ -536,7 +547,7 @@ if ((empty($action) || ($action != 'create' && $action != 'edit'))) {
 		}
 		print '<tr class="oddeven"><td class="maxwidth200">';
 		print digirisk_selectcontacts($ext_society->id, GETPOST('ext_intervenants'), 'ext_intervenants[]', 0, '', '', 0, 'width200', false, 1, 0, array(), 'multiple', 'ext_intervenants', false, 0, $already_selected_intervenants);
-		print ' <a href="' . DOL_URL_ROOT . '/contact/card.php?action=create&socid='. $ext_society->id .'&backtopage=' . urlencode($_SERVER["PHP_SELF"] . '?id=' . $object->id) . '" target="_blank"><span class="fa fa-plus-circle valignmiddle paddingleft" title="' . $langs->trans("AddContact") . '"></span></a>';
+		print '<a href="' . DOL_URL_ROOT . '/contact/card.php?action=create&socid=' . $ext_society->id . '&backtopage=' . urlencode($_SERVER["PHP_SELF"] . '?id=' . $object->id . '&ext_intervenants=&#95;&#95;ID&#95;&#95;') . '" target="_blank"><span class="fa fa-plus-circle valignmiddle paddingleft" title="' . $langs->trans("AddContact") . '"></span></a>';
 		print '</td>';
 		print '<td>' . $langs->trans("ExtSocietyIntervenants") . '</td>';
 		print '<td class="center">';
@@ -548,7 +559,7 @@ if ((empty($action) || ($action != 'create' && $action != 'edit'))) {
 		print '</td><td class="center">';
 		print '-';
 		print '</td><td class="center">';
-		print '<button type="submit" class="wpeo-button button-blue " name="addline" id="addline"><i class="fas fa-plus"></i>  ' . $langs->trans('Add') . '</button>';
+		print '<button type="submit" class="wpeo-button button-blue" name="addline" id="addline"><i class="fas fa-plus"></i>  ' . $langs->trans('Add') . '</button>';
 		print '<td class="center">';
 		print '-';
 		print '</td>';

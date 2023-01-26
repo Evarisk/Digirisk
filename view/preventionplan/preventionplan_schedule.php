@@ -75,11 +75,12 @@ $morewhere .= ' AND status = 1';
 $object->fetch(0, '', $morewhere);
 
 // Security check - Protection if external user
+require_once __DIR__ . '/../../core/tpl/digirisk_security_checks.php';
+
 $permissiontoread = $user->rights->digiriskdolibarr->preventionplan->read;
 $permissiontoadd  = $user->rights->digiriskdolibarr->preventionplan->write;
 
 if ( ! $permissiontoread) accessforbidden();
-require_once './../../core/tpl/digirisk_security_checks.php';
 
 /*
  * Actions
@@ -140,7 +141,9 @@ $morehtmlref .= '</div>';
 
 //$morehtmlleft = '<div class="floatleft inline-block valignmiddle divphotoref">'.digirisk_show_photos('digiriskdolibarr', $conf->digiriskdolibarr->multidir_output[$entity].'/'.$object->element_type, 'small', 5, 0, 0, 0, $width,0, 0, 0, 0, $object->element_type, $object).'</div>';
 
-digirisk_banner_tab($preventionplan, 'ref', '', 0, 'ref', 'ref', $morehtmlref, '', 0, $morehtmlleft, $preventionplan->getLibStatut(5));
+$linkback = '<a href="' . dol_buildpath('/digiriskdolibarr/view/preventionplan/preventionplan_list.php', 1) . '">' . $langs->trans("BackToList") . '</a>';
+
+digirisk_banner_tab($preventionplan, 'id', $linkback, 1, 'rowid', 'ref', $morehtmlref, '', 0, '', $preventionplan->getLibStatut(5));
 
 print dol_get_fiche_end();
 

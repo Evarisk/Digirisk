@@ -74,11 +74,12 @@ $morewhere .= ' AND status = 1';
 $object->fetch(0, '', $morewhere);
 
 // Security check
+require_once __DIR__ . '/../../core/tpl/digirisk_security_checks.php';
+
 $permissiontoread = $user->rights->digiriskdolibarr->firepermit->read;
 $permissiontoadd  = $user->rights->digiriskdolibarr->firepermit->write;
 
 if ( ! $permissiontoread) accessforbidden();
-require_once './../../core/tpl/digirisk_security_checks.php';
 
 /*
  * Actions
@@ -136,7 +137,9 @@ $project->fetch($firepermit->fk_project);
 $morehtmlref .= '<br>' . $langs->trans('Project') . ' : ' . getNomUrlProject($project, 1, 'blank', 1);
 $morehtmlref .= '</div>';
 
-digirisk_banner_tab($firepermit, 'ref', '', 0, 'ref', 'ref', $morehtmlref, '', 0, '', $firepermit->getLibStatut(5));
+$linkback = '<a href="' . dol_buildpath('/digiriskdolibarr/view/firepermit/firepermit_list.php', 1) . '">' . $langs->trans("BackToList") . '</a>';
+
+digirisk_banner_tab($firepermit, 'id', $linkback, 1, 'rowid', 'ref', $morehtmlref, '', 0, '', $firepermit->getLibStatut(5));
 
 print dol_get_fiche_end();
 

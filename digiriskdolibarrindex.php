@@ -44,6 +44,7 @@ require_once DOL_DOCUMENT_ROOT . '/includes/parsedown/Parsedown.php';
 
 require_once './core/modules/modDigiriskDolibarr.class.php';
 require_once __DIR__ . '/class/dashboarddigiriskstats.class.php';
+require_once __DIR__ . '/core/tpl/digirisk_security_checks.php';
 
 global $user, $langs, $conf, $db;
 

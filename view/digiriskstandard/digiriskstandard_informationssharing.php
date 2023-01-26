@@ -37,6 +37,7 @@ if ( ! $res && file_exists("../../../../main.inc.php")) $res = @include "../../.
 if ( ! $res) die("Include of main fails");
 
 require_once DOL_DOCUMENT_ROOT . '/core/lib/images.lib.php';
+require_once DOL_DOCUMENT_ROOT . '/projet/class/project.class.php';
 
 require_once './../../class/digiriskstandard.class.php';
 require_once './../../class/digiriskdocuments/informationssharing.class.php';
@@ -56,6 +57,7 @@ $action = GETPOST('action', 'aZ09');
 $object              = new DigiriskStandard($db);
 $informationssharing = new InformationsSharing($db);
 $contact             = new Contact($db);
+$project             = new Project($db);
 
 $hookmanager->initHooks(array('digiriskelementinformationssharing', 'globalcard')); // Note that conf->hooks_modules contains array
 
@@ -65,12 +67,13 @@ $object->fetch($conf->global->DIGIRISKDOLIBARR_ACTIVE_STANDARD);
 $upload_dir = $conf->digiriskdolibarr->multidir_output[isset($conf->entity) ? $conf->entity : 1];
 
 //Security check
+require_once __DIR__ . '/../../core/tpl/digirisk_security_checks.php';
+
 $permissiontoread   = $user->rights->digiriskdolibarr->informationssharing->read;
 $permissiontoadd    = $user->rights->digiriskdolibarr->informationssharing->write;
 $permissiontodelete = $user->rights->digiriskdolibarr->informationssharing->delete;
 
 if ( ! $permissiontoread) accessforbidden();
-require_once './../../core/tpl/digirisk_security_checks.php';
 
 /*
  * Actions
@@ -171,13 +174,15 @@ print dol_get_fiche_head($head, 'standardInformationsSharing', $title, -1, "digi
 
 // Object card
 // ------------------------------------------------------------
-$width = 80; $cssclass = 'photoref';
-
-$morehtmlref  = '<div class="refidno">';
+// Project
+$morehtmlref = '<div class="refidno">';
+$project->fetch($conf->global->DIGIRISKDOLIBARR_DU_PROJECT);
+$morehtmlref .= $langs->trans('Project') . ' : ' . getNomUrlProject($project, 1, 'blank', 1);
 $morehtmlref .= '</div>';
-$morehtmlleft = '<div class="floatleft inline-block valignmiddle divphotoref">' . digirisk_show_photos('mycompany', $conf->mycompany->dir_output . '/logos', 'small', 1, 0, 0, 0, $width, 0, 0, 0, 0, 'logos', $emptyobject) . '</div>';
+$morehtmlleft = '<div class="floatleft inline-block valignmiddle divphotoref">' . digirisk_show_photos('mycompany', $conf->mycompany->dir_output . '/logos', 'small', 1, 0, 0, 0, 80, 80, 0, 0, 0, 'logos', $emptyobject) . '</div>';
 
-digirisk_banner_tab($object, 'ref', '', 0, 'ref', 'ref', $morehtmlref, '', 0, $morehtmlleft);
+digirisk_banner_tab($object, '', '', 0, '', '', $morehtmlref, '', '', $morehtmlleft);
+
 print '<a href="../../admin/socialconf.php" target="_blank">' . $langs->trans('ConfigureSecurityAndSocialData') . ' <i class="fas fa-external-link-alt"></i></a>';
 print '<hr>';
 print '<div class="fichecenter">';

@@ -84,8 +84,6 @@ $extrafields             = new ExtraFields($db);
 $resources               = new DigiriskResources($db);
 $thirdparty              = new Societe($db);
 $project                 = new Project($db);
-$refPreventionPlanMod    = new $conf->global->DIGIRISKDOLIBARR_PREVENTIONPLAN_ADDON($db);
-$refPreventionPlanDetMod = new  $conf->global->DIGIRISKDOLIBARR_PREVENTIONPLANDET_ADDON($db);
 
 // Load object
 $object->fetch($id);
@@ -100,13 +98,18 @@ $extrafields->fetch_name_optionals_label($objectline->table_element);
 $hookmanager->initHooks(array('preventionplancard', 'globalcard')); // Note that conf->hooks_modules contains array
 
 $upload_dir = $conf->digiriskdolibarr->multidir_output[isset($object->entity) ? $object->entity : 1];
+
 // Security check
+require_once __DIR__ . '/../../core/tpl/digirisk_security_checks.php';
+
 $permissiontoread   = $user->rights->digiriskdolibarr->preventionplan->read;
 $permissiontoadd    = $user->rights->digiriskdolibarr->preventionplan->write;
 $permissiontodelete = $user->rights->digiriskdolibarr->preventionplan->delete;
 
 if ( ! $permissiontoread) accessforbidden();
-require_once './../../core/tpl/digirisk_security_checks.php';
+
+$refPreventionPlanMod    = new $conf->global->DIGIRISKDOLIBARR_PREVENTIONPLAN_ADDON($db);
+$refPreventionPlanDetMod = new  $conf->global->DIGIRISKDOLIBARR_PREVENTIONPLANDET_ADDON($db);
 
 /*
  * Actions
@@ -1027,7 +1030,9 @@ if ((empty($action) || ($action != 'create' && $action != 'edit'))) {
 
 	//$morehtmlleft = '<div class="floatleft inline-block valignmiddle divphotoref">'.digirisk_show_photos('digiriskdolibarr', $conf->digiriskdolibarr->multidir_output[$entity].'/'.$object->element_type, 'small', 5, 0, 0, 0, $width,0, 0, 0, 0, $object->element_type, $object).'</div>';
 
-	digirisk_banner_tab($object, 'ref', '', 0, 'ref', 'ref', $morehtmlref, '', 0, $morehtmlleft, $object->getLibStatut(5));
+	$linkback = '<a href="' . dol_buildpath('/digiriskdolibarr/view/preventionplan/preventionplan_list.php', 1) . '">' . $langs->trans("BackToList") . '</a>';
+
+	digirisk_banner_tab($object, 'id', $linkback, 1, 'rowid', 'ref', $morehtmlref, '', 0, '', $object->getLibStatut(5));
 
 	print '<div class="div-table-responsive">';
 	print '<div class="fichecenter">';
@@ -1173,10 +1178,15 @@ if ((empty($action) || ($action != 'create' && $action != 'edit'))) {
 						foreach ($modellist as $key => $modellistsingle) {
 							$arrayvalues = preg_replace('/template_/', '', $modellistsingle);
 							$modellist[$key] = $langs->trans($arrayvalues);
-							$modelselected = $key;
+							$constforval = 'DIGIRISKDOLIBARR_PREVENTIONPLANDOCUMENT_DEFAULT_MODEL';
+							$defaultmodel = preg_replace('/_odt/', '.odt', $conf->global->$constforval);
+							if ('template_' . $defaultmodel == $modellistsingle) {
+								$modelselected = $key;
+							}
 						}
 					}
 				}
+
 				print '<a class="' . ($object->status == 3 ? 'butAction' : 'butActionRefused classfortooltip') . '" id="actionButtonSign" title="' . dol_escape_htmltag($langs->trans("PreventionPlanMustBeLockedToSendEmail")) . '" href="' . ($object->status == 3 ? ($_SERVER['PHP_SELF'] . '?id=' . $object->id . '&action=presend&forcebuilddoc=1&model='.$modelselected.'&mode=init&sendto=' . $allLinks['LabourInspectorSociety']->id[0]) : '#') . '">' . $langs->trans('SendMail') . '</a>';
 			} else {
 				print '<a class="' . ($object->status == 3 ? 'butAction' : 'butActionRefused classfortooltip') . '" id="actionButtonSign" title="' . dol_escape_htmltag($langs->trans("PreventionPlanMustBeLockedToSendEmail")) . '" href="' . ($object->status == 3 ? ($_SERVER['PHP_SELF'] . '?id=' . $object->id . '&action=presend&mode=init&sendto=' . $allLinks['LabourInspectorSociety']->id[0].'#sendEmail') : '#') . '">' . $langs->trans('SendMail') . '</a>';

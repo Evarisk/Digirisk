@@ -1227,7 +1227,7 @@
 				if ($key == 'cotation') {
 					require './../../core/tpl/riskanalysis/riskassessment/digiriskdolibarr_riskassessment_view.tpl.php';
 				} elseif ($key == 'has_tasks' && $conf->global->DIGIRISKDOLIBARR_TASK_MANAGEMENT) {
-					require './../../core/tpl/riskanalysis/riskassessment/digiriskdolibarr_riskassessment_task_view.tpl.php';
+					require './../../core/tpl/riskanalysis/riskassessmenttask/digiriskdolibarr_riskassessment_task_view.tpl.php';
 				} elseif ($conf->global->DIGIRISKDOLIBARR_TASK_MANAGEMENT == 0) {
 					print $langs->trans('TaskManagementNotActivated');
 				} else print $lastEvaluation->showOutputField($val, $key, $lastEvaluation->$key, '');

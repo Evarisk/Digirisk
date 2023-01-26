@@ -8,7 +8,7 @@
 
 @import "responsive/responsive";
 
-.preview-photo {
+.ui-dialog.ui-corner-all.ui-widget.ui-widget-content.ui-front.ui-draggable.ui-resizable.preview-photo {
   z-index: 2100 !important;
 }
 
@@ -77,5 +77,5 @@ tr.liste_titre th.liste_titre:not(.maxwidthsearch), tr.liste_titre td.liste_titr
   }
 }
 .ui-dialog.ui-corner-all.ui-widget.ui-widget-content.ui-front.ui-dialog-buttons.ui-draggable {
-  z-index: 1500 !important;
+  //z-index: 1500 !important;
 }

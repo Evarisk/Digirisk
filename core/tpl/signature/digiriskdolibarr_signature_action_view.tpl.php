@@ -2,7 +2,7 @@
 		<div class="dropdown-toggle wpeo-button button-main"><span><?php echo $langs->trans('ActionsSignature'); ?></span> <i class="fas fa-caret-down"></i></div>
 		<ul class="dropdown-content">
 		<?php if ($object->status == 2) : ?>
-			<?php if ($element->role == 'PP_EXT_SOCIETY_INTERVENANTS') : ?>
+			<?php if ($element->role == 'PP_EXT_SOCIETY_INTERVENANTS' && empty($element->signature) && $element->status != $element::STATUS_ABSENT) : ?>
 				<li class="dropdown-item">
 					<?php print '<form method="POST" action="' . $_SERVER["PHP_SELF"] . '?id=' . $id . '">';
 					print '<input type="hidden" name="token" value="' . newToken() . '">';

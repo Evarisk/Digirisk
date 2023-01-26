@@ -85,8 +85,6 @@ $extrafields         = new ExtraFields($db);
 $digiriskelement     = new DigiriskElement($db);
 $digiriskresources   = new DigiriskResources($db);
 $project             = new Project($db);
-$refFirePermitMod    = new $conf->global->DIGIRISKDOLIBARR_FIREPERMIT_ADDON($db);
-$refFirePermitDetMod = new $conf->global->DIGIRISKDOLIBARR_FIREPERMITDET_ADDON($db);
 
 // Load object
 $object->fetch($id);
@@ -97,13 +95,18 @@ $allLinks = $digiriskresources->digirisk_dolibarr_fetch_resources();
 $hookmanager->initHooks(array('firepermitcard', 'globalcard')); // Note that conf->hooks_modules contains array
 
 $upload_dir = $conf->digiriskdolibarr->multidir_output[isset($object->entity) ? $object->entity : 1];
+
 // Security check
+require_once __DIR__ . '/../../core/tpl/digirisk_security_checks.php';
+
 $permissiontoread   = $user->rights->digiriskdolibarr->firepermit->read;
 $permissiontoadd    = $user->rights->digiriskdolibarr->firepermit->write;
 $permissiontodelete = $user->rights->digiriskdolibarr->firepermit->delete;
 
 if ( ! $permissiontoread) accessforbidden();
-require_once './../../core/tpl/digirisk_security_checks.php';
+
+$refFirePermitMod    = new $conf->global->DIGIRISKDOLIBARR_FIREPERMIT_ADDON($db);
+$refFirePermitDetMod = new $conf->global->DIGIRISKDOLIBARR_FIREPERMITDET_ADDON($db);
 
 /*
  * Actions
@@ -985,7 +988,9 @@ if ((empty($action) || ($action != 'create' && $action != 'edit'))) {
 	$morehtmlref .= '<br>' . $langs->trans('Project') . ' : ' . getNomUrlProject($project, 1, 'blank', 1);
 	$morehtmlref .= '</div>';
 
-	digirisk_banner_tab($object, 'ref', '', 0, 'ref', 'ref', $morehtmlref, '', 0, '', $object->getLibStatut(5));
+	$linkback = '<a href="' . dol_buildpath('/digiriskdolibarr/view/firepermit/firepermit_list.php', 1) . '">' . $langs->trans("BackToList") . '</a>';
+
+	digirisk_banner_tab($object, 'id', $linkback, 1, 'rowid', 'ref', $morehtmlref, '', 0, '', $object->getLibStatut(5));
 
 	print '<div class="div-table-responsive">';
 	print '<div class="fichecenter">';
@@ -1110,7 +1115,11 @@ if ((empty($action) || ($action != 'create' && $action != 'edit'))) {
 						foreach ($modellist as $key => $modellistsingle) {
 							$arrayvalues = preg_replace('/template_/', '', $modellistsingle);
 							$modellist[$key] = $langs->trans($arrayvalues);
-							$modelselected = $key;
+							$constforval = 'DIGIRISKDOLIBARR_FIREPERMITDOCUMENT_DEFAULT_MODEL';
+							$defaultmodel = preg_replace('/_odt/', '.odt', $conf->global->$constforval);
+							if ('template_' . $defaultmodel == $modellistsingle) {
+								$modelselected = $key;
+							}
 						}
 					}
 				}

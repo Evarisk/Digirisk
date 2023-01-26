@@ -40,6 +40,7 @@ if ( ! $res) die("Include of main fails");
 require_once DOL_DOCUMENT_ROOT . '/core/lib/images.lib.php';
 require_once DOL_DOCUMENT_ROOT . '/core/lib/usergroups.lib.php';
 require_once DOL_DOCUMENT_ROOT . '/core/class/html.form.class.php';
+require_once DOL_DOCUMENT_ROOT . '/projet/class/project.class.php';
 
 require_once './../../class/digiriskelement.class.php';
 require_once './../../class/digiriskstandard.class.php';
@@ -76,7 +77,7 @@ $digiriskstandard = new DigiriskStandard($db);
 $evaluator        = new Evaluator($db);
 $extrafields      = new ExtraFields($db);
 $usertmp          = new User($db);
-$refEvaluatorMod  = new $conf->global->DIGIRISKDOLIBARR_EVALUATOR_ADDON();
+$project          = new Project($db);
 
 $hookmanager->initHooks(array('evaluatorcard', 'globalcard')); // Note that conf->hooks_modules contains array
 
@@ -132,13 +133,16 @@ if ($object->id == 0) {
 }
 
 //Permission for digiriskelement_evaluator
+require_once __DIR__ . '/../../core/tpl/digirisk_security_checks.php';
+
 $permissiontoread   = $user->rights->digiriskdolibarr->evaluator->read;
 $permissiontoadd    = $user->rights->digiriskdolibarr->evaluator->write;
 $permissiontodelete = $user->rights->digiriskdolibarr->evaluator->delete;
 
 // Security check
 if ( ! $permissiontoread) accessforbidden();
-require_once './../../core/tpl/digirisk_security_checks.php';
+
+$refEvaluatorMod  = new $conf->global->DIGIRISKDOLIBARR_EVALUATOR_ADDON();
 
 /*
  * Actions
@@ -279,21 +283,25 @@ if ($object->id > 0 || $fromid > 0) {
 		$width = 80;
 		$height = 80;
 		dol_strlen($object->label) ? $morehtmlref = ' - ' . $object->label : '';
-		$morehtmlref .= '<div class="refidno">';
+		// Project
+		$morehtmlref = '<div class="refidno">';
+		$project->fetch($conf->global->DIGIRISKDOLIBARR_DU_PROJECT);
+		$morehtmlref .= $langs->trans('Project') . ' : ' . getNomUrlProject($project, 1, 'blank', 1);
 		// ParentElement
 		$parent_element = new DigiriskElement($db);
 		$result = $parent_element->fetch($object->fk_parent);
 		if ($result > 0) {
-			$morehtmlref .= $langs->trans("Description") . ' : ' . $object->description;
+			$morehtmlref .= '<br>' . $langs->trans("Description") . ' : ' . $object->description;
 			$morehtmlref .= '<br>' . $langs->trans("ParentElement") . ' : ' . $parent_element->getNomUrl(1, 'blank', 1);
 		} else {
 			$digiriskstandard->fetch($conf->global->DIGIRISKDOLIBARR_ACTIVE_STANDARD);
-			$morehtmlref .= $langs->trans("Description") . ' : ' . $object->description;
+			$morehtmlref .= '<br>' . $langs->trans("Description") . ' : ' . $object->description;
 			$morehtmlref .= '<br>' . $langs->trans("ParentElement") . ' : ' . $digiriskstandard->getNomUrl(1, 'blank', 1);
 		}
 		$morehtmlref .= '</div>';
 		$morehtmlleft = '<div class="floatleft inline-block valignmiddle divphotoref">' . digirisk_show_photos('digiriskdolibarr', $conf->digiriskdolibarr->multidir_output[$conf->entity] . '/' . $object->element_type, 'small', 5, 0, 0, 0, $height, $width, 0, 0, 0, $object->element_type, $object) . '</div>';
-		digirisk_banner_tab($object, 'ref', '', 0, 'ref', 'ref', $morehtmlref, '', 0, $morehtmlleft);
+		$linkback = '<a href="' . dol_buildpath('/digiriskdolibarr/view/digiriskelement/risk_list.php', 1) . '">' . $langs->trans("BackToList") . '</a>';
+		digirisk_banner_tab($object, 'id', $linkback, 1, 'rowid', 'ref', $morehtmlref, '', 0, $morehtmlleft);
 	} else {
 		$linkback = '<a href="' . DOL_URL_ROOT . '/user/list.php?restore_lastsearch_values=1">' . $langs->trans("BackToList") . '</a>';
 

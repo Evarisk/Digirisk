@@ -43,6 +43,7 @@ require_once DOL_DOCUMENT_ROOT . '/core/class/html.formother.class.php';
 require_once DOL_DOCUMENT_ROOT . '/user/class/user.class.php';
 require_once DOL_DOCUMENT_ROOT . '/contact/class/contact.class.php';
 require_once DOL_DOCUMENT_ROOT . '/societe/class/societe.class.php';
+require_once DOL_DOCUMENT_ROOT . '/projet/class/project.class.php';
 
 require_once __DIR__ . '/../../class/accident.class.php';
 require_once __DIR__ . '/../../class/digiriskelement.class.php';
@@ -51,6 +52,7 @@ require_once __DIR__ . '/../../class/preventionplan.class.php';
 require_once __DIR__ . '/../../class/digiriskresources.class.php';
 require_once __DIR__ . '/../../lib/digiriskdolibarr_function.lib.php';
 require_once __DIR__ . '/../../lib/digiriskdolibarr_digiriskelement.lib.php';
+require_once __DIR__ . '/../../core/tpl/digirisk_security_checks.php';
 
 global $conf, $db, $hookmanager, $langs, $user;
 
@@ -83,6 +85,7 @@ $thirdparty        = new Societe($db);
 $digiriskresources = new DigiriskResources($db);
 $digiriskelement   = new DigiriskElement($db);
 $digiriskstandard  = new DigiriskStandard($db);
+$project           = new Project($db);
 
 if ( ! $sortfield) $sortfield = "t.ref";
 if ( ! $sortorder) $sortorder = "ASC";
@@ -122,7 +125,6 @@ $permissiontodelete = $user->rights->digiriskdolibarr->accident->delete;
 
 // Security check
 if ( ! $permissiontoread) accessforbidden();
-require_once './../../core/tpl/digirisk_security_checks.php';
 
 /*
  * Actions
@@ -223,21 +225,25 @@ if ($fromid > 0) {
 	$height = 80;
 	$width = 80;
 	dol_strlen($objectlinked->label) ? $morehtmlref = ' - ' . $objectlinked->label : '';
-	$morehtmlref .= '<div class="refidno">';
+	// Project
+	$morehtmlref = '<div class="refidno">';
+	$project->fetch($conf->global->DIGIRISKDOLIBARR_DU_PROJECT);
+	$morehtmlref .= $langs->trans('Project') . ' : ' . getNomUrlProject($project, 1, 'blank', 1);
 	// ParentElement
 	$parent_element = new DigiriskElement($db);
 	$result = $parent_element->fetch($objectlinked->fk_parent);
 	if ($result > 0) {
-		$morehtmlref .= $langs->trans("Description") . ' : ' . $objectlinked->description;
+		$morehtmlref .= '<br>' . $langs->trans("Description") . ' : ' . $objectlinked->description;
 		$morehtmlref .= '<br>' . $langs->trans("ParentElement") . ' : ' . $parent_element->getNomUrl(1, 'blank', 1);
 	} else {
 		$digiriskstandard->fetch($conf->global->DIGIRISKDOLIBARR_ACTIVE_STANDARD);
-		$morehtmlref .= $langs->trans("Description") . ' : ' . $objectlinked->description;
+		$morehtmlref .= '<br>' . $langs->trans("Description") . ' : ' . $objectlinked->description;
 		$morehtmlref .= '<br>' . $langs->trans("ParentElement") . ' : ' . $digiriskstandard->getNomUrl(1, 'blank', 1);
 	}
 	$morehtmlref .= '</div>';
 	$morehtmlleft = '<div class="floatleft inline-block valignmiddle divphotoref">' . digirisk_show_photos('digiriskdolibarr', $conf->digiriskdolibarr->multidir_output[$conf->entity] . '/' . $objectlinked->element_type, 'small', 5, 0, 0, 0, $height, $width, 0, 0, 0, $objectlinked->element_type, $objectlinked) . '</div>';
-	digirisk_banner_tab($objectlinked, 'ref', '', 0, 'ref', 'ref', $morehtmlref, '', 0, $morehtmlleft);
+	$linkback = '<a href="' . dol_buildpath('/digiriskdolibarr/view/digiriskelement/risk_list.php', 1) . '">' . $langs->trans("BackToList") . '</a>';
+	digirisk_banner_tab($objectlinked, 'fromid', $linkback, 1, 'rowid', 'ref', $morehtmlref, '', 0, $morehtmlleft);
 } elseif ($fromiduser > 0) {
 	$linkback = '<a href="' . DOL_URL_ROOT . '/user/list.php?restore_lastsearch_values=1">' . $langs->trans("BackToList") . '</a>';
 	dol_banner_tab($userObject, 'fromiduser', $linkback, $user->rights->user->user->lire || $user->admin);

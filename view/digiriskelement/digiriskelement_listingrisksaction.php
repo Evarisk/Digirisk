@@ -37,6 +37,7 @@ if ( ! $res && file_exists("../../../../main.inc.php")) $res = @include "../../.
 if ( ! $res) die("Include of main fails");
 
 require_once DOL_DOCUMENT_ROOT . '/core/lib/images.lib.php';
+require_once DOL_DOCUMENT_ROOT . '/projet/class/project.class.php';
 
 require_once './../../class/digiriskelement.class.php';
 require_once './../../class/digiriskstandard.class.php';
@@ -68,14 +69,18 @@ if ($type != 'standard') {
 	$object->fetch($conf->global->DIGIRISKDOLIBARR_ACTIVE_STANDARD);
 }
 $digiriskstandard = new DigiriskStandard($db);
+$project          = new Project($db);
 
 $upload_dir         = $conf->digiriskdolibarr->multidir_output[isset($conf->entity) ? $conf->entity : 1];
+
+// Security check
+require_once __DIR__ . '/../../core/tpl/digirisk_security_checks.php';
+
 $permissiontoread   = $user->rights->digiriskdolibarr->listingrisksaction->read;
 $permissiontoadd    = $user->rights->digiriskdolibarr->listingrisksaction->write;
 $permissiontodelete = $user->rights->digiriskdolibarr->listingrisksaction->delete;
 
 if ( ! $permissiontoread) accessforbidden();
-require_once './../../core/tpl/digirisk_security_checks.php';
 
 /*
  * Actions
@@ -186,30 +191,35 @@ print dol_get_fiche_head($head, 'elementListingRisksAction', $title, -1, "digiri
 
 // Object card
 // ------------------------------------------------------------
-$cssclass = 'photoref';
-$width    = 80;
-$height   = 80;
-
 if ($type != 'standard') {
 	dol_strlen($object->label) ? $morehtmlref = ' - ' . $object->label : '';
-	$morehtmlref                             .= '<div class="refidno">';
+	// Project
+	$morehtmlref = '<div class="refidno">';
+	$project->fetch($conf->global->DIGIRISKDOLIBARR_DU_PROJECT);
+	$morehtmlref .= $langs->trans('Project') . ' : ' . getNomUrlProject($project, 1, 'blank', 1);
 	// ParentElement
 	$parent_element = new DigiriskElement($db);
 	$result         = $parent_element->fetch($object->fk_parent);
 	if ($result > 0) {
-		$morehtmlref .= $langs->trans("Description") . ' : ' . $object->description;
+		$morehtmlref .= '<br>' . $langs->trans("Description") . ' : ' . $object->description;
 		$morehtmlref .= '<br>' . $langs->trans("ParentElement") . ' : ' . $parent_element->getNomUrl(1, 'blank', 1);
 	} else {
 		$digiriskstandard->fetch($conf->global->DIGIRISKDOLIBARR_ACTIVE_STANDARD);
-		$morehtmlref .= $langs->trans("Description") . ' : ' . $object->description;
+		$morehtmlref .= '<br>' . $langs->trans("Description") . ' : ' . $object->description;
 		$morehtmlref .= '<br>' . $langs->trans("ParentElement") . ' : ' . $digiriskstandard->getNomUrl(1, 'blank', 1);
 	}
 	$morehtmlref .= '</div>';
-	$morehtmlleft = '<div class="floatleft inline-block valignmiddle divphotoref">' . digirisk_show_photos('digiriskdolibarr', $conf->digiriskdolibarr->multidir_output[$conf->entity] . '/' . $object->element_type, 'small', 5, 0, 0, 0, $height, $width, 0, 0, 0, $object->element_type, $object) . '</div>';
-	digirisk_banner_tab($object, 'ref', '', 0, 'ref', 'ref', $morehtmlref, '', 0, $morehtmlleft);
+	$morehtmlleft = '<div class="floatleft inline-block valignmiddle divphotoref">' . digirisk_show_photos('digiriskdolibarr', $conf->digiriskdolibarr->multidir_output[$conf->entity] . '/' . $object->element_type, 'small', 5, 0, 0, 0, 80, 80, 0, 0, 0, $object->element_type, $object) . '</div>';
+	$linkback = '<a href="' . dol_buildpath('/digiriskdolibarr/view/digiriskelement/risk_list.php', 1) . '">' . $langs->trans("BackToList") . '</a>';
+	digirisk_banner_tab($object, 'id', $linkback, 1, 'rowid', 'ref', $morehtmlref, '', 0, $morehtmlleft);
 } else {
-	$morehtmlleft = '<div class="floatleft inline-block valignmiddle divphotoref">' . digirisk_show_photos('mycompany', $conf->mycompany->dir_output . '/logos', 'small', 1, 0, 0, 0, $height, $width, 0, 0, 0, 'logos', $emptyobject) . '</div>';
-	digirisk_banner_tab($object, 'ref', '', 0, 'ref', 'ref', '', '', 0, $morehtmlleft);
+	// Project
+	$morehtmlref = '<div class="refidno">';
+	$project->fetch($conf->global->DIGIRISKDOLIBARR_DU_PROJECT);
+	$morehtmlref .= $langs->trans('Project') . ' : ' . getNomUrlProject($project, 1, 'blank', 1);
+	$morehtmlref .= '</div>';
+	$morehtmlleft = '<div class="floatleft inline-block valignmiddle divphotoref">' . digirisk_show_photos('mycompany', $conf->mycompany->dir_output . '/logos', 'small', 1, 0, 0, 0, 80, 80, 0, 0, 0, 'logos', $emptyobject) . '</div>';
+	digirisk_banner_tab($object, '', '', 0, '', '', $morehtmlref, '', '', $morehtmlleft);
 }
 
 unset($object->fields['element_type']);

@@ -23,45 +23,48 @@
   margin-bottom: 0.5em;
 }
 
-.riskassessment-task-container .riskassessment-task-single {
+.riskassessment-task-single {
   display: flex;
   box-sizing: border-box;
 
   * {
     box-sizing: border-box;
   }
+  .riskassessment-task-actions {
+    margin-left: auto;
+  }
+
   > * {
     margin-top: auto;
     margin-bottom: auto;
   }
+}
 
-  .riskassessment-task-content {
-    width: 100%;
+.riskassessment-task-content {
+  .riskassessment-task-author {
+    display: inline-block;
+    width: 25px;
+    min-width: 25px;
+    height: 25px;
+    line-height: 25px;
+    background: rgba(0,0,0,0.5);
+    overflow: hidden;
+    text-transform: uppercase;
+    font-size: 14px;
+    font-weight: 600;
+    border-radius: 50%;
+    vertical-align: sub;
+    text-align: center;
 
-    .riskassessment-task-author {
-      display: inline-block;
-      width: 25px;
-      min-width: 25px;
-      height: 25px;
-      line-height: 25px;
-      background: rgba(0,0,0,0.5);
-      overflow: hidden;
-      text-transform: uppercase;
-      font-size: 14px;
-      font-weight: 600;
-      border-radius: 50%;
-      vertical-align: sub;
-      text-align: center;
-
-      a {
-        color: #fff !important;
-      }
-    }
-    .riskassessment-task-author-label {
-      word-break: break-all;
+    a {
+      color: #fff !important;
     }
   }
-  .riskassessment-task-content .riskassessment-task-data {
+  .riskassessment-task-author-label {
+    word-break: break-all;
+  }
+
+  .riskassessment-task-data {
     display: flex;
     flex-wrap: wrap;
     font-size: 14px;
@@ -176,8 +179,25 @@
 }
 
 /** List of comments */
-.riskassessment-task-timespent-container .riskassessment-task .riskassessment-task-container {
-  background: #fff;
-  border: 0;
+.riskassessment-task-timespent-container {
+  .riskassessment-task .riskassessment-task-container {
+    background: #fff;
+    border: 0;
+  }
 
+  .riskassessment-task-timespent-comment {
+    display: block;
+  }
+}
+.riskassessment-task-timespent-list li {
+  &:nth-of-type(even) .table-row {
+    background: rgba(0,0,0,0.05) !important;
+  }
+  &:nth-of-type(odd) .table-row {
+    background: #fff !important;
+  }
+
+  .riskassessment-task-timespent-author {
+    @extend .riskassessment-task-author;
+  }
 }

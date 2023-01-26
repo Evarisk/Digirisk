@@ -54,6 +54,7 @@ require_once './../../core/modules/digiriskdolibarr/riskanalysis/risk/mod_risk_s
 require_once './../../core/modules/digiriskdolibarr/riskanalysis/riskassessment/mod_riskassessment_standard.php';
 require_once './../../lib/digiriskdolibarr_digiriskstandard.lib.php';
 require_once './../../lib/digiriskdolibarr_function.lib.php';
+require_once __DIR__ . '/../../core/tpl/digirisk_security_checks.php';
 
 global $langs, $user, $conf, $db, $hookmanager;
 $permtoupload = $user->rights->ecm->upload;
@@ -152,7 +153,6 @@ $permissiontodelete = $user->rights->digiriskdolibarr->risk->delete;
 
 // Security check
 if ( ! $permissiontoread) accessforbidden();
-require_once './../../core/tpl/digirisk_security_checks.php';
 
 /*
  * Actions

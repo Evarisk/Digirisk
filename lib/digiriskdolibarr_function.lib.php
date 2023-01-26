@@ -181,6 +181,8 @@ function digirisk_show_photos($modulepart, $sdir, $size = '', $nbmax = 0, $nbbyr
 				if ($nbphoto) $return .= '</table>';
 			}
 		}
+	} else {
+		$return .= '<img class="photo photowithmargin" height="' . $maxHeight . '" width="' . $maxWidth . '" src="' . DOL_URL_ROOT . '/public/theme/common/nophoto.png">';
 	}
 	if (is_object($object)) {
 		$object->nbphoto = $nbphoto;
@@ -212,7 +214,7 @@ function digirisk_show_photos($modulepart, $sdir, $size = '', $nbmax = 0, $nbbyr
 * @param      string              $tooltiptext       (optional) Tooltip text when gen button disabled
 * @return		string              					Output string with HTML array of documents (might be empty string)
 */
-function digiriskshowdocuments($modulepart, $modulesubdir, $filedir, $urlsource, $genallowed, $delallowed = 0, $modelselected = '', $allowgenifempty = 1, $noform = 0, $param = '', $title = '', $buttonlabel = '', $morepicto = '', $object = null, $hideifempty = 0, $removeaction = 'remove_file', $active = true, $tooltiptext = '')
+function digiriskshowdocuments($modulepart, $modulesubdir, $filedir, $urlsource, $genallowed, $delallowed = 0, $modelselected = '', $allowgenifempty = 1, $noform = 0, $param = '', $title = '', $buttonlabel = '', $morepicto = '', $object = null, $hideifempty = 0, $removeaction = 'remove_file', $active = true, $tooltiptext = 'PermissionDenied')
 {
 	global $db, $langs, $conf, $hookmanager, $form;
 
@@ -309,7 +311,11 @@ function digiriskshowdocuments($modulepart, $modulesubdir, $filedir, $urlsource,
 				foreach ($modellist as $key => $modellistsingle) {
 					$arrayvalues              = preg_replace('/template_/', '', $modellistsingle);
 					$modellist[$key] = $langs->trans($arrayvalues);
-					$modelselected            = $key;
+					$constforval = 'DIGIRISKDOLIBARR_' .strtoupper($submodulepart). '_DEFAULT_MODEL';
+					$defaultmodel = preg_replace('/_odt/', '.odt', $conf->global->$constforval);
+					if ('template_' . $defaultmodel == $modellistsingle) {
+						$modelselected = $key;
+					}
 				}
 			}
 			$morecss                                        = 'maxwidth200';
@@ -319,41 +325,35 @@ function digiriskshowdocuments($modulepart, $modulesubdir, $filedir, $urlsource,
 			if ($conf->use_javascript_ajax) {
 				$out .= ajax_combobox('model');
 			}
+
+			// Button
+			if ($active) {
+				$genbutton .= '<button class="wpeo-button button-square-40 button-blue wpeo-tooltip-event" id="' . $forname . '_generatebutton" name="' . $forname . '_generatebutton" type="submit" aria-label="' . $langs->trans('Generate') . '"><i class="fas fa-print button-icon"></i></button>';
+			} else {
+				$genbutton .= '<i class="fas fa-exclamation-triangle pictowarning wpeo-tooltip-event" aria-label="' . $langs->trans($tooltiptext) . '"></i>';
+				$genbutton .= '<button class="wpeo-button button-square-40 button-disable" name="' . $forname . '_generatebutton"><i class="fas fa-print button-icon"></i></button>';
+			}
+
+			//		if ( ! $allowgenifempty && ! is_array($modellist) && empty($modellist)) $genbutton .= ' disabled';
+			//		$genbutton                                                                         .= '>';
+			//		if ($allowgenifempty && ! is_array($modellist) && empty($modellist) && empty($conf->dol_no_mouse_hover) && $modulepart != 'unpaid') {
+			//			$langs->load("errors");
+			//			$genbutton .= ' ' . img_warning($langs->transnoentitiesnoconv("WarningNoDocumentModelActivated"));
+			//		}
+			//		if ( ! $allowgenifempty && ! is_array($modellist) && empty($modellist) && empty($conf->dol_no_mouse_hover) && $modulepart != 'unpaid') $genbutton = '';
+			//		if (empty($modellist) && ! $showempty && $modulepart != 'unpaid') $genbutton                                                                      = '';
+			$out                                                                                                                                             .= $genbutton;
+			//		if ( ! $active) {
+			//			$htmltooltip  = '';
+			//			$htmltooltip .= $tooltiptext;
+			//
+			//			$out .= '<span class="center">';
+			//			$out .= $form->textwithpicto($langs->trans('Help'), $htmltooltip, 1, 0);
+			//			$out .= '</span>';
+			//		}
 		} else {
 			$out .= '<div class="float">' . $langs->trans("Files") . '</div>';
 		}
-
-		// Button
-		if ($active) {
-			$genbutton  = '<input style="display : none" class="button buttongen" id="' . $forname . '_generatebutton" name="' . $forname . '_generatebutton" type="submit" value="' . $buttonlabel . '"' . '>';
-			$genbutton .= '<label for="' . $forname . '_generatebutton">';
-			$genbutton .= '<div class="wpeo-button button-square-40 button-blue wpeo-tooltip-event" aria-label="' . $langs->trans('Generate') . '"><i class="fas fa-print button-icon"></i></div>';
-			$genbutton .= '</label>';
-		} else {
-			$genbutton  = '<input style="display : none" class="button buttongen disabled" name="' . $forname . '_generatebutton" style="cursor: not-allowed" value="' . $buttonlabel . '"' . '>';
-			$genbutton .= '<label for="' . $forname . '_generatebutton">';
-			$genbutton .= '<i class="fas fa-exclamation-triangle pictowarning wpeo-tooltip-event" aria-label="' . $langs->trans($tooltiptext) . '"></i>';
-			$genbutton .= '<div class="wpeo-button button-square-40 button-grey wpeo-tooltip-event" aria-label="' . $langs->trans('Generate') . '"><i class="fas fa-print button-icon"></i></div>';
-			$genbutton .= '</label>';
-		}
-
-//		if ( ! $allowgenifempty && ! is_array($modellist) && empty($modellist)) $genbutton .= ' disabled';
-//		$genbutton                                                                         .= '>';
-//		if ($allowgenifempty && ! is_array($modellist) && empty($modellist) && empty($conf->dol_no_mouse_hover) && $modulepart != 'unpaid') {
-//			$langs->load("errors");
-//			$genbutton .= ' ' . img_warning($langs->transnoentitiesnoconv("WarningNoDocumentModelActivated"));
-//		}
-//		if ( ! $allowgenifempty && ! is_array($modellist) && empty($modellist) && empty($conf->dol_no_mouse_hover) && $modulepart != 'unpaid') $genbutton = '';
-//		if (empty($modellist) && ! $showempty && $modulepart != 'unpaid') $genbutton                                                                      = '';
-		$out                                                                                                                                             .= $genbutton;
-//		if ( ! $active) {
-//			$htmltooltip  = '';
-//			$htmltooltip .= $tooltiptext;
-//
-//			$out .= '<span class="center">';
-//			$out .= $form->textwithpicto($langs->trans('Help'), $htmltooltip, 1, 0);
-//			$out .= '</span>';
-//		}
 
 		$out .= '</th>';
 
@@ -2297,23 +2297,13 @@ function getListOfModelsDigirisk($db, $type, $maxfilenamelength = 0)
 
                 if (count($listoffiles)) {
                     foreach ($listoffiles as $record) {
-                        $max = ($maxfilenamelength ? $maxfilenamelength : 28);
-                        $liste[$obj->id.':'.$record['fullname']] = dol_trunc($record['name'], $max, 'middle');
+                        $liste[$obj->id.':'.$record['fullname']] = $record['name'];
                     }
                 } else {
                     $liste[0] = $obj->label.': '.$langs->trans("None");
                 }
             } else {
-                if ($type == 'member' && $obj->doc_template_name == 'standard') {   // Special case, if member template, we add variant per format
-                    global $_Avery_Labels;
-                    include_once DOL_DOCUMENT_ROOT.'/core/lib/format_cards.lib.php';
-                    foreach ($_Avery_Labels as $key => $val) {
-                        $liste[$obj->id.':'.$key] = ($obj->label ? $obj->label : $obj->doc_template_name).' '.$val['name'];
-                    }
-                } else {
-                    // Common usage
-                    $liste[$obj->id] = $obj->label ? $obj->label : $obj->doc_template_name;
-                }
+                $liste[$obj->id] = $obj->label ?: $obj->doc_template_name;
             }
             $i++;
         }

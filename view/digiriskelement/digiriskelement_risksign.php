@@ -39,6 +39,7 @@ if ( ! $res) die("Include of main fails");
 require_once DOL_DOCUMENT_ROOT . '/core/lib/admin.lib.php';
 require_once DOL_DOCUMENT_ROOT . '/core/lib/images.lib.php';
 require_once DOL_DOCUMENT_ROOT . '/core/class/html.form.class.php';
+require_once DOL_DOCUMENT_ROOT . '/projet/class/project.class.php';
 
 require_once './../../class/digiriskelement.class.php';
 require_once './../../class/digiriskstandard.class.php';
@@ -75,7 +76,7 @@ $digiriskelement  = new DigiriskElement($db);
 $digiriskstandard = new DigiriskStandard($db);
 $risksign         = new RiskSign($db);
 $extrafields      = new ExtraFields($db);
-$refRiskSignMod   = new $conf->global->DIGIRISKDOLIBARR_RISKSIGN_ADDON();
+$project          = new Project($db);
 
 $hookmanager->initHooks(array('risksigncard', 'globalcard')); // Note that conf->hooks_modules contains array
 
@@ -123,13 +124,16 @@ $arrayfields = dol_sort_array($arrayfields, 'position');
 include DOL_DOCUMENT_ROOT . '/core/actions_fetchobject.inc.php'; // Must be include, not include_once.
 
 //Permission for digiriskelement_risksign
+require_once __DIR__ . '/../../core/tpl/digirisk_security_checks.php';
+
 $permissiontoread   = $user->rights->digiriskdolibarr->risksign->read;
 $permissiontoadd    = $user->rights->digiriskdolibarr->risksign->write;
 $permissiontodelete = $user->rights->digiriskdolibarr->risksign->delete;
 
 // Security check - Protection if external user
 if ( ! $permissiontoread) accessforbidden();
-require_once './../../core/tpl/digirisk_security_checks.php';
+
+$refRiskSignMod = new $conf->global->DIGIRISKDOLIBARR_RISKSIGN_ADDON();
 
 /*
  * Actions
@@ -353,8 +357,9 @@ if ($sharedrisksigns) {
 			'text' => '<i class="fas fa-circle-info"></i>' . $langs->trans("ConfirmImportSharedRiskSigns"),
 		);
 
-		$formquestionimportsharedrisksigns[] = array('type' => 'checkbox', 'name' =>'select_all_shared_risksigns', 'value' => 0);
+		$formquestionimportsharedrisksigns[] = array('type' => 'checkbox', 'name' =>'select_all_shared_elements', 'value' => 0);
 
+		$previousDigiriskElement = 0;
 		foreach ($allrisksigns as $key => $risksigns) {
 			$digiriskelementtmp->fetch($risksigns->fk_element);
 			$digiriskelementtmp->element = 'digiriskdolibarr';
@@ -379,10 +384,15 @@ if ($sharedrisksigns) {
 				$importValue .= '<span>' . dol_trunc($risksigns->description, 32) . '</span>';
 				$importValue .= '</div>';
 
+				if ($alreadyImported == 0 && $previousDigiriskElement != $digiriskelementtmp->id) {
+					$importValue .= '<input type="checkbox" id="select_all_shared_elements_by_digiriskelement" name="' . $digiriskelementtmp->id . '" value="0">';
+				}
+				$previousDigiriskElement = $digiriskelementtmp->id;
+
 				if ($alreadyImported > 0) {
-					$formquestionimportsharedrisksigns[] = array('type' => 'checkbox', 'name' => $risksigns->id, 'label' => $importValue . '<span class="importsharedrisksigns imported">' . $langs->trans('AlreadyImported') . '</span>', 'value' => 0, 'disabled' => 1);
+					$formquestionimportsharedrisksigns[] = array('type' => 'checkbox', 'morecss' => 'importsharedelement-digiriskelement-'.$digiriskelementtmp->id, 'name' => $risksigns->id, 'label' => $importValue . '<span class="importsharedrisksigns imported">' . $langs->trans('AlreadyImported') . '</span>', 'value' => 0, 'disabled' => 1);
 				} else {
-					$formquestionimportsharedrisksigns[] = array('type' => 'checkbox', 'name' => $risksigns->id, 'label' => $importValue, 'value' => 0);
+					$formquestionimportsharedrisksigns[] = array('type' => 'checkbox', 'morecss' => 'importsharedelement-digiriskelement-'.$digiriskelementtmp->id, 'name' => $risksigns->id, 'label' => $importValue, 'value' => 0);
 				}
 			}
 
@@ -411,21 +421,25 @@ if ($object->id > 0) {
 	$height = 80;
 	$width = 80;
 	dol_strlen($object->label) ? $morehtmlref = ' - ' . $object->label : '';
-	$morehtmlref .= '<div class="refidno">';
+	// Project
+	$morehtmlref = '<div class="refidno">';
+	$project->fetch($conf->global->DIGIRISKDOLIBARR_DU_PROJECT);
+	$morehtmlref .= $langs->trans('Project') . ' : ' . getNomUrlProject($project, 1, 'blank', 1);
 	// ParentElement
 	$parent_element = new DigiriskElement($db);
 	$result = $parent_element->fetch($object->fk_parent);
 	if ($result > 0) {
-		$morehtmlref .= $langs->trans("Description") . ' : ' . $object->description;
+		$morehtmlref .= '<br>' . $langs->trans("Description") . ' : ' . $object->description;
 		$morehtmlref .= '<br>' . $langs->trans("ParentElement") . ' : ' . $parent_element->getNomUrl(1, 'blank', 1);
 	} else {
 		$digiriskstandard->fetch($conf->global->DIGIRISKDOLIBARR_ACTIVE_STANDARD);
-		$morehtmlref .= $langs->trans("Description") . ' : ' . $object->description;
+		$morehtmlref .= '<br>' . $langs->trans("Description") . ' : ' . $object->description;
 		$morehtmlref .= '<br>' . $langs->trans("ParentElement") . ' : ' . $digiriskstandard->getNomUrl(1, 'blank', 1);
 	}
 	$morehtmlref .= '</div>';
 	$morehtmlleft = '<div class="floatleft inline-block valignmiddle divphotoref">' . digirisk_show_photos('digiriskdolibarr', $conf->digiriskdolibarr->multidir_output[$conf->entity] . '/' . $object->element_type, 'small', 5, 0, 0, 0, $height, $width, 0, 0, 0, $object->element_type, $object) . '</div>';
-	digirisk_banner_tab($object, 'ref', '', 0, 'ref', 'ref', $morehtmlref, '', 0, $morehtmlleft);
+	$linkback = '<a href="' . dol_buildpath('/digiriskdolibarr/view/digiriskelement/risk_list.php', 1) . '">' . $langs->trans("BackToList") . '</a>';
+	digirisk_banner_tab($object, 'id', $linkback, 1, 'rowid', 'ref', $morehtmlref, '', 0, $morehtmlleft);
 
 	// Buttons for actions
 	print '<div class="tabsAction" >';

@@ -111,6 +111,7 @@ class Accident extends CommonObject
 	public $labelStatusShort;
 
 	const STATUS_IN_PROGRESS = 1;
+	const STATUS_PENDING_SIGNATURE = 2;
 
 	/**
 	 * @var array  Array with all fields and their property. Do not use it as a static var. It may be modified by constructor.
@@ -1220,15 +1221,21 @@ class AccidentMetaData extends CommonObject
 	 */
 	public function create(User $user, $notrigger = false)
 	{
-		$sql                                                                              = "UPDATE " . MAIN_DB_PREFIX . "$this->table_element";
-		$sql                                                                             .= " SET status = 0";
-		if (isset($this->ismultientitymanaged) && $this->ismultientitymanaged == 1) $sql .= ' WHERE entity IN (' . getEntity($this->table_element) . ')';
-		else $sql                                                                        .= ' WHERE 1 = 1';
-		$sql                                                                             .= " AND fk_accident = " . $this->fk_accident;
+		$result = $this->createCommon($user, $notrigger);
 
-		dol_syslog("accidentmetadata.class::create", LOG_DEBUG);
-		$this->db->query($sql);
-		return $this->createCommon($user, $notrigger);
+		if ($result > 0) {
+			$sql                                                                              = "UPDATE " . MAIN_DB_PREFIX . "$this->table_element";
+			$sql                                                                             .= " SET status = 0";
+			if (isset($this->ismultientitymanaged) && $this->ismultientitymanaged == 1) $sql .= ' WHERE entity IN (' . getEntity($this->table_element) . ')';
+			else $sql                                                                        .= ' WHERE 1 = 1';
+			$sql                                                                             .= " AND fk_accident = " . $this->fk_accident;
+			$sql                                                                             .= " AND rowid != " . $result;
+
+			dol_syslog("accidentmetadata.class::create", LOG_DEBUG);
+			$this->db->query($sql);
+		}
+
+		return $result;
 	}
 
 	/**

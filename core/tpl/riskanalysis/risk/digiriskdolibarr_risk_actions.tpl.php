@@ -378,9 +378,9 @@ if ( ! $error && $action == "deleteEvaluation" && $permissiontodelete) {
 
 	$previousEvaluation = $evaluation;
 	$result             = $evaluation->delete($user);
-	$previousEvaluation->updateEvaluationStatus($user, $evaluation->fk_risk);
 
 	if ($result > 0) {
+		$previousEvaluation->updateEvaluationStatus($user, $evaluation->fk_risk);
 		// Delete evaluation OK
 		$urltogo = str_replace('__ID__', $result, $backtopage);
 		$urltogo = preg_replace('/--IDFORBACKTOPAGE--/', $id, $urltogo); // New method to autoselect project after a New on another form object creation

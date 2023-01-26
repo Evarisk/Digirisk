@@ -41,7 +41,7 @@ function digiriskdolibarrAdminPrepareHead()
 	$h++;
 
 	$head[$h][0] = dol_buildpath("/digiriskdolibarr/admin/config/digiriskelement.php", 1);
-	$head[$h][1] = '<i class="fas fa-network-wired"></i>  ' . $langs->trans("Arborescence");
+	$head[$h][1] = '<i class="fas fa-network-wired"></i>  ' . $langs->trans("Organization");
 	$head[$h][2] = 'digiriskelement';
 	$h++;
 
