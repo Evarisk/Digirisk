@@ -3,7 +3,7 @@
 ## Informations
 
 - Numéro du module : 436302
-- Version : 9.9.0
+- Version : 9.9.1
 - Dernière mise à jour :  26/01/2022
 - Éditeur : [Evarisk](https://www.evarisk.com)
 - Compatibilité : Dolibarr 15.0.0 - 16.0.4
