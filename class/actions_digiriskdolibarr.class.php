@@ -193,6 +193,30 @@ class ActionsDigiriskdolibarr
 				</script>
 				<?php
 			}
+			if (GETPOST('action') == 'add_message') {
+
+				$object = new Ticket($this->db);
+				$result = $object->fetch(GETPOST('id'),GETPOST('ref','alpha'),GETPOST('track_id','alpha'));
+
+				if ($result > 0) {
+					$object->fetch_optionals();
+
+					require_once __DIR__ . '/../class/digiriskelement.class.php';
+
+					$digiriskelement = new DigiriskElement($this->db);
+					$digiriskelement->fetch($object->array_options['options_digiriskdolibarr_ticket_service']);
+
+					?>
+					<script>
+						let mailContent = $('#message').html()
+						let digiriskElementRefAndLabel = <?php echo json_encode($digiriskelement->ref . ' - ' . $digiriskelement->label); ?>;
+						let digiriskElementId = <?php echo json_encode($digiriskelement->id); ?>;
+						let mailContentWithDigiriskElementLabel = mailContent.replace('__EXTRAFIELD_DIGIRISKDOLIBARR_TICKET_SERVICE_NAME__ ', digiriskElementRefAndLabel);
+						$('#message').html(mailContentWithDigiriskElementLabel);
+					</script>
+					<?php
+				}
+			}
 		} else if (in_array($parameters['currentcontext'], array('projectcard', 'projectcontactcard', 'projecttaskscard', 'projecttasktime', 'projectOverview', 'projecttaskscard', 'tasklist'))) {
 			if ((GETPOST('action') == '' || empty(GETPOST('action')) || GETPOST('action') != 'edit')) {
 				require_once DOL_DOCUMENT_ROOT.'/projet/class/project.class.php';
@@ -475,12 +499,12 @@ class ActionsDigiriskdolibarr
 			}
 		}
 
-		if (true) {
+		if (!$error) {
 			$this->results   = array('myreturn' => 999);
 			$this->resprints = 'A text to show';
 			return 0; // or return 1 to replace standard code
 		} else {
-			$this->errors[] = 'Error message';
+			$this->errors = $errors;
 			return -1;
 		}
 	}

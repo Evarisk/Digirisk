@@ -2707,7 +2707,7 @@ window.eoxiaJS.riskassessmenttask.deleteRiskAssessmentTask = function ( event ) 
 			processData: false,
 			contentType: false,
 			success: function ( resp ) {
-				$('.riskassessment-task-container-'+deletedRiskAssessmentTaskId).hide()
+				$('.riskassessment-task-container-'+deletedRiskAssessmentTaskId).closest('.riskassessment-task-listing-wrapper').html($(resp).find('.tasks-list-container-'+riskId).find('.riskassessment-task-listing-wrapper'))
 				$('.riskassessment-tasks' + riskId).fadeOut(800);
 				$('.riskassessment-tasks' + riskId).fadeIn(800);
 				let textToShow = '';
@@ -2752,7 +2752,7 @@ window.eoxiaJS.riskassessmenttask.deleteRiskAssessmentTask = function ( event ) 
  */
 window.eoxiaJS.riskassessmenttask.saveRiskAssessmentTask = function ( event ) {
 	let editedRiskAssessmentTaskId = $(this).attr('value');
-	let elementRiskAssessmentTask = $(this).closest('.riskassessment-task-container');
+	let elementRiskAssessmentTask = $(this).closest('.modal-container');
 	let riskId = $(this).closest('.riskassessment-tasks').attr('value')
 	let textToShow = '';
 
@@ -2998,6 +2998,7 @@ window.eoxiaJS.riskassessmenttask.saveRiskAssessmentTaskTimeSpent = function ( e
 		url: document.URL + '&action=saveRiskAssessmentTaskTimeSpent&token='+token,
 		data: JSON.stringify({
 			riskAssessmentTaskTimeSpentID: riskAssessmentTaskTimeSpentID,
+			taskID: taskID,
 			date: date,
 			hour: hour,
 			min: min,

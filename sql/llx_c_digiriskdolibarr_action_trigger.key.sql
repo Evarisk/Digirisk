@@ -1,4 +1,4 @@
--- Copyright (C) 2021 EOXIA <dev@eoxia.com>
+-- Copyright (C) 2022 EOXIA <dev@eoxia.com>
 --
 -- This program is free software: you can redistribute it and/or modify
 -- it under the terms of the GNU General Public License as published by
@@ -13,16 +13,5 @@
 -- You should have received a copy of the GNU General Public License
 -- along with this program.  If not, see https://www.gnu.org/licenses/.
 
-CREATE TABLE llx_digiriskdolibarr_firepermitdet(
-	rowid             integer AUTO_INCREMENT PRIMARY KEY NOT NULL,
-	ref               varchar(128) NOT NULL,
-	ref_ext           varchar(128),
-	entity            integer DEFAULT 1 NOT NULL,
-	date_creation     datetime NOT NULL,
-	tms               timestamp,
-	description       text,
-	category          varchar(255),
-	used_equipment    text,
-	fk_firepermit     integer NOT NULL,
-	fk_element        integer NOT NULL
-) ENGINE=innodb;
+ALTER TABLE llx_c_digiriskdolibarr_action_trigger ADD UNIQUE INDEX uk_action_trigger_code (code);
+ALTER TABLE llx_c_digiriskdolibarr_action_trigger ADD INDEX idx_action_trigger_rang (rang);
