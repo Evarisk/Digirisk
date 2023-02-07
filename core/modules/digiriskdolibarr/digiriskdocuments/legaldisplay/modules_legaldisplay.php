@@ -185,13 +185,13 @@ abstract class ModeleODTLegalDisplay extends CommonDocGenerator
 			$hookmanager->executeHooks('beforeODTSave', $parameters, $this, $action); // Note that $action and $object may have been modified by some hooks
 
 			// Write new file
-			if ( ! empty($conf->global->MAIN_ODT_AS_PDF)) {
+			if ( ! empty($conf->global->MAIN_ODT_AS_PDF) && $conf->global->DIGIRISKDOLIBARR_AUTOMATIC_PDF_GENERATION > 0) {
 				try {
 					$odfHandler->exportAsAttachedPDF($file);
 				} catch (Exception $e) {
 					$this->error = $e->getMessage();
+					setEventMessages($langs->transnoentities('FileCouldNotBeGeneratedInPDF') . '<br>' . $langs->transnoentities('CheckDocumentationToEnablePDFGeneration'), null, 'errors');
 					dol_syslog($e->getMessage(), LOG_INFO);
-					return -1;
 				}
 			} else {
 				try {

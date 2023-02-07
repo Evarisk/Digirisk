@@ -223,8 +223,10 @@ CollectiveAgreement = Conventions collectives
 CollectiveAgreementValue = Disponible sur le site du gouvernement :<br /><a href="https://www.service-public.fr/particuliers/vosdroits/F78" target="_blank">https://www.service-public.fr/particuliers/vosdroits/F78</a>
 legaldisplay.odt = Affichage légal
 legaldisplay_custom.odt = Affichage légal personnalisé
-
-
+AutomaticPdfGeneration = Génération automatique des PDF
+AutomaticPdfGenerationDescription = Crée automatiquement le document en PDF lors de la génération
+FileCouldNotBeGeneratedInPDF = Le fichier n'a pas pu être généré en PDF
+CheckDocumentationToEnablePDFGeneration = Veuillez vous référer à la documentation pour la génération en PDF : <a target="_blank" href="https://wiki.dolibarr.org/index.php?title=Module_Digirisk#Impression_du_Document_Unique_au_format_pdf_-_.28.2A.pdf.29">Documentation</a>
 
 #
 # InformationsSharing - Diffusion d'informations

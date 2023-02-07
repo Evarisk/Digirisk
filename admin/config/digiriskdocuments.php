@@ -193,40 +193,6 @@ if ($action == 'setModuleOptions') {
 	}
 }
 
-//if ($action == 'specimen') {
-//	$modele = GETPOST('module', 'alpha');
-//
-//	if ($type == 'projectdocument') {
-//		require_once DOL_DOCUMENT_ROOT . '/projet/class/project.class.php';
-//		$object = new Project($db);
-//		$object->initAsSpecimen();
-//	}
-//
-//	// Search template files
-//	$file = '';
-//	$classname = '';
-//	$file = dol_buildpath('/custom/digiriskdolibarr/core/modules/digiriskdolibarr/digiriskdocuments/' .$type. '/' . 'pdf_' . $modele . '.modules.php');
-//	if (file_exists($file)) {
-//		require_once __DIR__ . '/../../class/digiriskdocuments/' . $type . '.class.php';
-//
-//		$objectdocument = new $type($db);
-//
-//		$moreparams['object'] = $object;
-//		$moreparams['user']   = $user;
-//
-//		if ($objectdocument->generateDocument($modele, $langs, 0, 0, 0, $moreparams)) {
-//			header("Location: " . DOL_URL_ROOT . "/document.php?modulepart=project&file=SPECIMEN.pdf");
-//			return;
-//		} else {
-//			setEventMessages($objectdocument->error, $objectdocument->errors, 'errors');
-//			dol_syslog($objectdocument->error, LOG_ERR);
-//		}
-//	} else {
-//		setEventMessages($langs->trans("ErrorModuleNotFound"), null, 'errors');
-//		dol_syslog($langs->trans("ErrorModuleNotFound"), LOG_ERR);
-//	}
-//}
-
 /*
  * View
  */
@@ -300,6 +266,15 @@ print ajax_constantonoff('DIGIRISKDOLIBARR_DOCUMENT_SHOW_PICTO_NAME');
 print '</td>';
 print '</tr>';
 
+print '<tr class="oddeven"><td>';
+print  $langs->trans("AutomaticPdfGeneration");
+print '</td><td>';
+print $langs->trans('AutomaticPdfGenerationDescription');
+print '</td>';
+print '<td class="center">';
+print ajax_constantonoff('DIGIRISKDOLIBARR_AUTOMATIC_PDF_GENERATION');
+print '</td>';
+print '</tr>';
 print '</table>';
 
 foreach ($types as $type => $documentType) {
