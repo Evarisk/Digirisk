@@ -541,10 +541,14 @@ if (empty($reshook)) {
 			return -1;
 		}
 
+		$fileInfos = pathinfo($filename);
+		$pdfName   = $fileInfos['filename'] . '.pdf';
+
 		// Write new file
-		if ( ! empty($conf->global->MAIN_ODT_AS_PDF) && $conf->global->DIGIRISKDOLIBARR_AUTOMATIC_PDF_GENERATION > 0) {
+		if ( ! empty($conf->global->MAIN_ODT_AS_PDF) && $conf->global->DIGIRISKDOLIBARR_MANUAL_PDF_GENERATION > 0) {
 			try {
 				$odfHandler->exportAsAttachedPDF($file);
+				setEventMessages($langs->trans("FileGenerated") . ' - ' . $pdfName, null);
 			} catch (Exception $e) {
 				$error = $e->getMessage();
 				setEventMessages($langs->transnoentities('FileCouldNotBeGeneratedInPDF') . '<br>' . $langs->transnoentities('CheckDocumentationToEnablePDFGeneration'), null, 'errors');
