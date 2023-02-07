@@ -138,6 +138,7 @@ if (empty($reshook)) {
 		}
 	}
 
+	// Action to generate pdf from odt file
 	if ($action == 'pdfGeneration') {
 		$filename = GETPOST('file');
 
