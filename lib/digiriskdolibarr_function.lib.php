@@ -442,6 +442,7 @@ function digiriskshowdocuments($modulepart, $modulesubdir, $filedir, $urlsource,
 						$out .= '<a href="' . $tmpurlsource . ((strpos($tmpurlsource, '?') === false) ? '?' : '&amp;') . 'action=pdfGeneration&amp;file=' . urlencode($relativepath) . '&token=' . newToken();
 						$out .= ($param ? '&amp;' . $param : '');
 						$out .= '">' . img_picto($langs->trans("PDFGeneration"), 'pdf') . '</a>';
+						$out .= ' ' . $form->textwithpicto('', $langs->trans('PDFGenerationTooltip'));
 					}
 
 					$out .= '</td>';
