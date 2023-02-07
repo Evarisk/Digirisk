@@ -365,6 +365,9 @@ function digiriskshowdocuments($modulepart, $modulesubdir, $filedir, $urlsource,
 				}
 			}
 		}
+		if ($conf->global->DIGIRISKDOLIBARR_MANUAL_PDF_GENERATION > 0) {
+			$out .= '<td></td>';
+		}
 		$out .= '</tr>';
 
 		// Execute hooks
@@ -430,6 +433,14 @@ function digiriskshowdocuments($modulepart, $modulesubdir, $filedir, $urlsource,
 				$date = ( ! empty($file['date']) ? $file['date'] : dol_filemtime($filedir . "/" . $file["name"]));
 				$out .= '<td class="nowrap right">' . dol_print_date($date, 'dayhour', 'tzuser') . '</td>';
 
+				if ($conf->global->DIGIRISKDOLIBARR_MANUAL_PDF_GENERATION > 0) {
+					$tmpurlsource = preg_replace('/#[a-zA-Z0-9_]*$/', '', $urlsource);
+					$out .= '<td class="right">';
+					$out .= '<a href="' . $tmpurlsource . ((strpos($tmpurlsource, '?') === false) ? '?' : '&amp;') . 'action=pdfGeneration&amp;file=' . urlencode($relativepath) . '&token=' . newToken();
+					$out .= ($param ? '&amp;' . $param : '');
+					$out .= '">' . img_picto($langs->trans("PDFGeneration"), 'pdf') . '</a>';
+					$out .= '</td>';
+				}
 				if ($delallowed || $morepicto) {
 					$out .= '<td class="right nowraponall">';
 					if ($delallowed) {

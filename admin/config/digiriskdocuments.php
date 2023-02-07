@@ -275,6 +275,17 @@ print '<td class="center">';
 print ajax_constantonoff('DIGIRISKDOLIBARR_AUTOMATIC_PDF_GENERATION');
 print '</td>';
 print '</tr>';
+
+print '<tr class="oddeven"><td>';
+print  $langs->trans("ManualPdfGeneration");
+print '</td><td>';
+print $langs->trans('ManualPdfGenerationDescription');
+print '</td>';
+print '<td class="center">';
+print ajax_constantonoff('DIGIRISKDOLIBARR_MANUAL_PDF_GENERATION');
+print '</td>';
+print '</tr>';
+
 print '</table>';
 
 foreach ($types as $type => $documentType) {
