@@ -176,9 +176,9 @@ class DigiriskDocuments extends CommonObject
 			$this->parent_id    = $conf->global->DIGIRISKDOLIBARR_ACTIVE_STANDARD;
 			$this->parent_type  = 'digiriskstandard';
 		}
-		$this->element = $this->element . '@digiriskdolibarr';
 
 		$this->DigiriskFillJSON($this);
+		$this->element = $this->element . '@digiriskdolibarr';
 		return $this->createCommon($user, $notrigger);
 	}
 	/**
