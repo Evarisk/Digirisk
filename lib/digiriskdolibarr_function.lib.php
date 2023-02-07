@@ -432,13 +432,18 @@ function digiriskshowdocuments($modulepart, $modulesubdir, $filedir, $urlsource,
 				// Show file date
 				$date = ( ! empty($file['date']) ? $file['date'] : dol_filemtime($filedir . "/" . $file["name"]));
 				$out .= '<td class="nowrap right">' . dol_print_date($date, 'dayhour', 'tzuser') . '</td>';
+				$extension = pathinfo($file['name'], PATHINFO_EXTENSION);
 
 				if ($conf->global->DIGIRISKDOLIBARR_MANUAL_PDF_GENERATION > 0) {
-					$tmpurlsource = preg_replace('/#[a-zA-Z0-9_]*$/', '', $urlsource);
 					$out .= '<td class="right">';
-					$out .= '<a href="' . $tmpurlsource . ((strpos($tmpurlsource, '?') === false) ? '?' : '&amp;') . 'action=pdfGeneration&amp;file=' . urlencode($relativepath) . '&token=' . newToken();
-					$out .= ($param ? '&amp;' . $param : '');
-					$out .= '">' . img_picto($langs->trans("PDFGeneration"), 'pdf') . '</a>';
+
+					if ($extension == 'odt') {
+						$tmpurlsource = preg_replace('/#[a-zA-Z0-9_]*$/', '', $urlsource);
+						$out .= '<a href="' . $tmpurlsource . ((strpos($tmpurlsource, '?') === false) ? '?' : '&amp;') . 'action=pdfGeneration&amp;file=' . urlencode($relativepath) . '&token=' . newToken();
+						$out .= ($param ? '&amp;' . $param : '');
+						$out .= '">' . img_picto($langs->trans("PDFGeneration"), 'pdf') . '</a>';
+					}
+
 					$out .= '</td>';
 				}
 				if ($delallowed || $morepicto) {
