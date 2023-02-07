@@ -193,50 +193,6 @@ class ActionsDigiriskdolibarr
 				</script>
 				<?php
 			}
-			// Action to generate pdf from odt file
-			if (GETPOST('action') == 'pdfGeneration') {
-				$filename = GETPOST('file');
-
-				$file = $upload_dir . '/' . $filename;
-
-				// Open and load template
-				require_once ODTPHP_PATH . 'odf.php';
-				try {
-					$odfHandler = new odf(
-						$file,
-						array(
-							'PATH_TO_TMP'	  => $conf->digiriskdolibarr->dir_temp,
-							'ZIP_PROXY'		  => 'PclZipProxy', // PhpZipProxy or PclZipProxy. Got "bad compression method" error when using PhpZipProxy.
-							'DELIMITER_LEFT'  => '{',
-							'DELIMITER_RIGHT' => '}'
-						)
-					);
-				} catch (Exception $e) {
-					$error = $e->getMessage();
-					dol_syslog($e->getMessage(), LOG_INFO);
-
-					return -1;
-				}
-
-				// Write new file
-				if ( ! empty($conf->global->MAIN_ODT_AS_PDF) && $conf->global->DIGIRISKDOLIBARR_AUTOMATIC_PDF_GENERATION > 0) {
-					try {
-						$odfHandler->exportAsAttachedPDF($file);
-					} catch (Exception $e) {
-						$error = $e->getMessage();
-						setEventMessages($langs->transnoentities('FileCouldNotBeGeneratedInPDF') . '<br>' . $langs->transnoentities('CheckDocumentationToEnablePDFGeneration'), null, 'errors');
-						dol_syslog($e->getMessage(), LOG_INFO);
-					}
-				} else {
-					try {
-						$odfHandler->saveToDisk($file);
-					} catch (Exception $e) {
-						$error = $e->getMessage();
-						dol_syslog($e->getMessage(), LOG_INFO);
-						return -1;
-					}
-				}
-			}
 		} else if (in_array($parameters['currentcontext'], array('projectcard', 'projectcontactcard', 'projecttaskscard', 'projecttasktime', 'projectOverview', 'projecttaskscard', 'tasklist'))) {
 			if ((GETPOST('action') == '' || empty(GETPOST('action')) || GETPOST('action') != 'edit')) {
 				require_once DOL_DOCUMENT_ROOT.'/projet/class/project.class.php';
@@ -505,6 +461,65 @@ class ActionsDigiriskdolibarr
 						exit;
 					}
 				}
+			}
+
+			// Action to generate pdf from odt file
+			if (GETPOST('action') == 'pdfGeneration') {
+				global $langs;
+
+				$upload_dir = $conf->digiriskdolibarr->multidir_output[isset($conf->entity) ? $conf->entity : 1];
+				$filename = GETPOST('file');
+
+				$file = $upload_dir . '/' . $filename;
+
+
+				$fileInfos = pathinfo($filename);
+				$pdfName   = $fileInfos['filename'] . '.pdf';
+
+				// Open and load template
+				require_once ODTPHP_PATH . 'odf.php';
+				try {
+					$odfHandler = new odf(
+						$file,
+						array(
+							'PATH_TO_TMP'	  => $conf->digiriskdolibarr->dir_temp,
+							'ZIP_PROXY'		  => 'PclZipProxy', // PhpZipProxy or PclZipProxy. Got "bad compression method" error when using PhpZipProxy.
+							'DELIMITER_LEFT'  => '{',
+							'DELIMITER_RIGHT' => '}'
+						)
+					);
+				} catch (Exception $e) {
+					$error = $e->getMessage();
+					dol_syslog($e->getMessage(), LOG_INFO);
+
+					return -1;
+				}
+
+				// Write new file
+				if ( ! empty($conf->global->MAIN_ODT_AS_PDF) && $conf->global->DIGIRISKDOLIBARR_MANUAL_PDF_GENERATION > 0) {
+					try {
+						$odfHandler->exportAsAttachedPDF($file);
+						setEventMessages($langs->trans("FileGenerated") . ' - ' . $pdfName, null);
+					} catch (Exception $e) {
+						$error = $e->getMessage();
+						setEventMessages($langs->transnoentities('FileCouldNotBeGeneratedInPDF') . '<br>' . $langs->transnoentities('CheckDocumentationToEnablePDFGeneration'), null, 'errors');
+						dol_syslog($e->getMessage(), LOG_INFO);
+					}
+				} else {
+					try {
+						$odfHandler->saveToDisk($file);
+					} catch (Exception $e) {
+						$error = $e->getMessage();
+						dol_syslog($e->getMessage(), LOG_INFO);
+						return -1;
+					}
+				}
+				$urltoredirect = $_SERVER['REQUEST_URI'];
+				$urltoredirect = preg_replace('/#pdfGeneration$/', '', $urltoredirect);
+				$urltoredirect = preg_replace('/action=pdfGeneration&?/', '', $urltoredirect); // To avoid infinite loop
+
+				header('Location: ' . $urltoredirect );
+				exit;
 			}
 		} elseif (in_array($parameters['currentcontext'] , array('ticketlist', 'thirdpartyticket', 'projectticket'))) {
 			if ($action == 'list') {
