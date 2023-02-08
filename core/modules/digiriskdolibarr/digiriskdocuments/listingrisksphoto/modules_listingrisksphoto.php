@@ -111,7 +111,7 @@ abstract class ModeleODTListingRisksPhoto extends CommonDocGenerator
 
 			$date = dol_print_date(dol_now(), 'dayxcard');
 			if ( ! empty($digiriskelement)) {
-				$filename = $date . '_' . $digiriskelement->ref . '_' . $objectref . '_' . $digiriskelement->label . '.odt';
+				$filename = $date . '_' . $digiriskelement->ref . '_' . $objectref . '_' . $digiriskelement->label . '_' . $societyname . '.odt';
 			} else {
 				$filename = $date . '_' . $objectref . '_' . $societyname . '.odt';
 			}
