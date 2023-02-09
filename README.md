@@ -3,10 +3,10 @@
 ## Informations
 
 - Numéro du module : 436302
-- Version : 9.9.1
-- Dernière mise à jour :  07/02/2022
+- Version : 9.10.0
+- Dernière mise à jour :  09/02/2022
 - Éditeur : [Evarisk](https://www.evarisk.com)
-- Compatibilité : Dolibarr 16.0.0 - 16.0.4
+- Compatibilité : Dolibarr 15.0.0 - 16.0.4
 - Thème : Eldy Menu
 - Licence : GPLv3
 - Disponible sur : Windows - MacOS - Linux
