@@ -230,7 +230,7 @@ ManualPdfGenerationDescription = Ajout d'un bouton pour créer un document ODT e
 FileCouldNotBeGeneratedInPDF = Le fichier n'a pas pu être généré en PDF
 CheckDocumentationToEnablePDFGeneration = Veuillez vous référer à la documentation pour la génération en PDF : <a target="_blank" href="https://wiki.dolibarr.org/index.php?title=Module_Digirisk#Impression_du_Document_Unique_au_format_pdf_-_.28.2A.pdf.29">Documentation</a>
 PDFGenerationTooltip = Appuyez sur ce bouton pour générer le document ODT en PDF
-
+PDFGeneration = Génération du document PDF
 
 #
 # InformationsSharing - Diffusion d'informations
@@ -1664,4 +1664,4 @@ ManuelInputNBWorkedHours = Saisir manuellement le nombre d'heures travaillées
 ManuelInputNBWorkedHoursDescription = Si l'option est activée, vous pouvez saisir manuellement le nombre d'heures travaillées dans la configuration de la société.<br>Sinon le nombre d'heures travaillées est calculé.<br>Consulter la documentation pour plus d'informations.
 HowToConfigureSetupConf = Pour configurer les donnés de la société lié à Digirisk,<br>veuillez vous rendre sur Digirisk - Configuration - Réglages
 Archive = Archiver
-EnableModule = Veuillez activer Digirisk avant d'utiliser ces fonctionnalités
+EnableDigirisk = Veuillez activer Digirisk avant d'utiliser ces fonctionnalités
