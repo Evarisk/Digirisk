@@ -366,6 +366,13 @@ if ($search_categ > 0)   $sql                         .= " AND cu.fk_categorie =
 if ($search_categ == -2) $sql                         .= " AND cu.fk_categorie IS NULL";
 if ($search_fk_usergroup > 0)   $sql                  .= " AND g.fk_usergroup IN (" . $db->escape($search_fk_usergroup) . ")";
 
+$user->fetchAll('','','','',['login' => 'USERAPI']);
+
+if (is_array($user->users) && !empty($user->users)) {
+	$userIds = implode(',', array_keys($user->users));
+	$sql .= ' AND u.rowid NOT IN (' . $userIds . ')';
+}
+
 $sql .= ' GROUP BY u.rowid';
 
 // Add where from extra fields
