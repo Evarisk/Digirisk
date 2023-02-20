@@ -441,7 +441,7 @@ function digiriskshowdocuments($modulepart, $modulesubdir, $filedir, $urlsource,
 						$tmpurlsource = preg_replace('/#[a-zA-Z0-9_]*$/', '', $urlsource);
 						$out .= '<a href="' . $tmpurlsource . ((strpos($tmpurlsource, '?') === false) ? '?' : '&amp;') . 'action=pdfGeneration&amp;file=' . urlencode($relativepath) . '&token=' . newToken();
 						$out .= ($param ? '&amp;' . $param : '');
-						$out .= '">' . img_picto($langs->trans("PDFGeneration"), 'pdf') . '</a>';
+						$out .= '">' . img_picto($langs->trans("PDFGeneration"), 'fontawesome_fa-file-pdf_fas_red') . '</a>';
 						$out .= ' ' . $form->textwithpicto('', $langs->trans('PDFGenerationTooltip'));
 					}
 
