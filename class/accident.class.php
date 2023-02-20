@@ -295,6 +295,7 @@ class Accident extends CommonObject
 			$sql .= ' ' . $this->db->plimit($limit, $offset);
 		}
 		$resql = $this->db->query($sql);
+
 		if ($resql) {
 			$num = $this->db->num_rows($resql);
 			$i   = 0;
@@ -568,7 +569,8 @@ class Accident extends CommonObject
 				'color' => '#e9ad4f'
 			),
 		);
-		$allaccidents = $this->fetchAll();
+		$allaccidents = $this->fetchAll('','','','',['customsql' => ' t.status > 0 ']);
+
 		if (is_array($allaccidents) && !empty($allaccidents)) {
 			$accidentworkstop = new AccidentWorkStop($this->db);
 			foreach ($allaccidents as $accident) {
