@@ -118,6 +118,7 @@ class ActionsDigiriskdolibarr
 		} else if ($parameters['currentcontext'] == 'ticketcard') {
 			if (GETPOST('action') == 'view' || empty(GETPOST('action')) || GETPOST('action') == 'update_extras') {
 				print '<link rel="stylesheet" type="text/css" href="../custom/digiriskdolibarr/css/digiriskdolibarr.css">';
+				print '<script src="../custom/digiriskdolibarr/js/digiriskdolibarr.js"></script>';
 
 				require_once __DIR__ . '/../lib/digiriskdolibarr_function.lib.php';
 				require_once __DIR__ . '/../class/digiriskdocuments/ticketdocument.class.php';

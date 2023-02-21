@@ -435,7 +435,7 @@ function digiriskshowdocuments($modulepart, $modulesubdir, $filedir, $urlsource,
 				$extension = pathinfo($file['name'], PATHINFO_EXTENSION);
 
 				if ($conf->global->DIGIRISKDOLIBARR_MANUAL_PDF_GENERATION > 0) {
-					$out .= '<td class="right">';
+					$out .= '<td class="right pdf-generation">';
 
 					if ($extension == 'odt') {
 						$tmpurlsource = preg_replace('/#[a-zA-Z0-9_]*$/', '', $urlsource);
