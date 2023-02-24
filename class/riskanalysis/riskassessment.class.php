@@ -215,17 +215,11 @@ class RiskAssessment extends CommonObject
 	 * @return array|int                 int <0 if KO, array of pages if OK
 	 * @throws Exception
 	 */
-	public function fetchAll($sortorder = '', $sortfield = '', $limit = 0, $offset = 0, array $filter = array(), $filtermode = 'AND', $multientityfetch = 0, $groupby = '')
+	public function fetchAll($sortorder = '', $sortfield = '', $limit = 0, $offset = 0, array $filter = array(), $filtermode = 'AND', $multientityfetch = 0)
 	{
 		dol_syslog(__METHOD__, LOG_DEBUG);
 
 		$records = array();
-
-//		if (array_key_exists( 'date_creation', $this->fields)) {
-//			$keys = array_keys($this->fields);
-//			$keys[array_search('date_creation', $keys)] = 'MAX(date_creation)';
-//			$this->fields = array_combine($keys, $this->fields);
-//		}
 
 		$sql                                                                              = 'SELECT ';
 		$sql                                                                             .= $this->getFieldList();
@@ -249,10 +243,6 @@ class RiskAssessment extends CommonObject
 		}
 		if (count($sqlwhere) > 0) {
 			$sql .= ' AND (' . implode(' ' . $filtermode . ' ', $sqlwhere) . ')';
-		}
-
-		if (!empty($groupby)) {
-			$sql .= ' GROUP BY ' . $groupby;
 		}
 
 		if ( ! empty($sortfield)) {
@@ -382,15 +372,15 @@ class RiskAssessment extends CommonObject
 	 */
 	public function getRiskAssessmentCategoriesNumber($digiriskelementID = 0)
 	{
-		$scale_counter = array(
+		$scale_counter = [
 			1 => 0,
 			2 => 0,
 			3 => 0,
 			4 => 0
-		);
+		];
 
-		$riskassessments = $this->fetchAll('', '', 0, 0, array('customsql' => 'status = 1'));
-		if (!empty($riskassessments) && $riskassessments > 0) {
+		$riskassessments = $this->fetchAll('', '', 0, 0, ['customsql' => 'status = 1']);
+		if (is_array($riskassessments) && !empty($riskassessments)) {
 			foreach ($riskassessments as $riskassessment) {
 				$scale = $riskassessment->get_evaluation_scale();
 				if ($digiriskelementID) {
