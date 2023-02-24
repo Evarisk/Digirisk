@@ -215,11 +215,17 @@ class RiskAssessment extends CommonObject
 	 * @return array|int                 int <0 if KO, array of pages if OK
 	 * @throws Exception
 	 */
-	public function fetchAll($sortorder = '', $sortfield = '', $limit = 0, $offset = 0, array $filter = array(), $filtermode = 'AND', $multientityfetch = 0)
+	public function fetchAll($sortorder = '', $sortfield = '', $limit = 0, $offset = 0, array $filter = array(), $filtermode = 'AND', $multientityfetch = 0, $groupby = '')
 	{
 		dol_syslog(__METHOD__, LOG_DEBUG);
 
 		$records = array();
+
+//		if (array_key_exists( 'date_creation', $this->fields)) {
+//			$keys = array_keys($this->fields);
+//			$keys[array_search('date_creation', $keys)] = 'MAX(date_creation)';
+//			$this->fields = array_combine($keys, $this->fields);
+//		}
 
 		$sql                                                                              = 'SELECT ';
 		$sql                                                                             .= $this->getFieldList();
@@ -243,6 +249,10 @@ class RiskAssessment extends CommonObject
 		}
 		if (count($sqlwhere) > 0) {
 			$sql .= ' AND (' . implode(' ' . $filtermode . ' ', $sqlwhere) . ')';
+		}
+
+		if (!empty($groupby)) {
+			$sql .= ' GROUP BY ' . $groupby;
 		}
 
 		if ( ! empty($sortfield)) {
@@ -372,31 +382,25 @@ class RiskAssessment extends CommonObject
 	 */
 	public function getRiskAssessmentCategoriesNumber($digiriskelementID = 0)
 	{
-		global $conf;
-
-		$risk = new Risk($this->db);
-		if ($digiriskelementID > 0) {
-			$risks = $risk->fetchFromParent($digiriskelementID);
-		} else {
-			$risks = $risk->fetchRisksOrderedByCotation(0, true, $conf->global->DIGIRISKDOLIBARR_SHOW_INHERITED_RISKS_IN_LISTINGS, $conf->global->DIGIRISKDOLIBARR_SHOW_SHARED_RISKS);
-		}
-
 		$scale_counter = array(
 			1 => 0,
 			2 => 0,
 			3 => 0,
 			4 => 0
 		);
-		if (!empty($risks) && $risks > 0) {
-			foreach ($risks as $risk) {
-				$arrayRiskassessment = $this->fetchFromParent($risk->id, 1);
-				if ( ! empty($arrayRiskassessment) && $arrayRiskassessment > 0 && is_array($arrayRiskassessment)) {
-					$riskassessment         = array_shift($arrayRiskassessment);
-					$scale                  = $riskassessment->get_evaluation_scale();
+
+		$riskassessments = $this->fetchAll('', '', 0, 0, array('customsql' => 'status = 1'));
+		if (!empty($riskassessments) && $riskassessments > 0) {
+			foreach ($riskassessments as $riskassessment) {
+				$scale = $riskassessment->get_evaluation_scale();
+				if ($digiriskelementID) {
+					$scale_counter[$riskassessment->fk_risk][$scale] += 1;
+				} else {
 					$scale_counter[$scale] += 1;
 				}
 			}
 		}
+
 		return $scale_counter;
 	}
 }
