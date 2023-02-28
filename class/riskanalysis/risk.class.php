@@ -765,7 +765,10 @@ class Risk extends CommonObject
 				'color' => '#2b2b2b'
 			),
 		);
-		$array['data'] = $riskassessment->getRiskAssessmentCategoriesNumber();
+
+		$riskAssessmentList = $riskassessment->fetchAll('', '', 0, 0, ['customsql' => 'status = 1']);
+		$array['data']      = $riskassessment->getRiskAssessmentCategoriesNumber($riskAssessmentList);
+
 		return $array;
 	}
 }

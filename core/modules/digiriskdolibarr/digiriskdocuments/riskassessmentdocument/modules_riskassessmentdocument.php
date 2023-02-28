@@ -196,8 +196,10 @@ abstract class ModeleODTRiskAssessmentDocument extends CommonDocGenerator
 					$riskassessment        = new RiskAssessment($this->db);
 					$ticket                = new Ticket($this->db);
 					$category              = new Categorie($this->db);
+					
 					$digiriskelementlist   = $digiriskelementobject->fetchDigiriskElementFlat(0);
 					$risks                 = $risk->fetchRisksOrderedByCotation(0, true, $conf->global->DIGIRISKDOLIBARR_SHOW_INHERITED_RISKS_IN_DOCUMENTS, $conf->global->DIGIRISKDOLIBARR_SHOW_SHARED_RISKS);
+					$riskAssessmentList    = $riskassessment->fetchAll('', '', 0, 0, ['customsql' => 'status = 1']);
 
 					if (is_array($digiriskelementlist) && !empty($digiriskelementlist)) {
 						$listlines = $odfHandler->setSegment('elementParHierarchie');
@@ -233,12 +235,12 @@ abstract class ModeleODTRiskAssessmentDocument extends CommonDocGenerator
 
 						//Fill total cotation by digirisk element table
 						$totalQuotation = 0;
-						$scale_counter = array(
+						$scale_counter = [
 							1 => 0,
 							2 => 0,
 							3 => 0,
 							4 => 0
-						);
+						];
 						$line           = '';
 						$listlines      = $odfHandler->setSegment('risqueFiche');
 
@@ -280,16 +282,12 @@ abstract class ModeleODTRiskAssessmentDocument extends CommonDocGenerator
 							}
 
 							$elementName                   = (!empty($conf->global->DIGIRISKDOLIBARR_SHOW_SHARED_RISKS) ? 'S' . $digiriskelementsingle['object']->entity . ' - ' : '') . $digiriskelementsingle['object']->ref . ' ' . $digiriskelementsingle['object']->label;
-//							$scaleCounterWithoutSharedRisk = $riskassessment->getRiskAssessmentCategoriesNumber($digiriskelementsingle['object']->id);
+							$scaleCounterWithoutSharedRisk = $riskassessment->getRiskAssessmentCategoriesNumber($riskAssessmentList, $risks, $digiriskelementsingle['object']->id);
 
-//							foreach ($risks as $riskline) {
-//								$a[] = $scaleCounterWithoutSharedRisk[$riskline->id];
-//							}
+							foreach ($scale_counter as $key => $value) {
+								$final_scale_counter[$key] = $scale_counter[$key] + $scaleCounterWithoutSharedRisk[$key];
+							}
 
-//							foreach ($scale_counter as $key => $value) {
-//								$final_scale_counter[$key] = $scale_counter[$key] + $scaleCounterWithoutSharedRisk[$key];
-//							}
-							$final_scale_counter = 0;
 							$cotationarray[$elementName] = array($totalQuotation, $digiriskelementsingle['object']->description, $final_scale_counter);
 
 							$totalQuotation = 0;

@@ -370,7 +370,7 @@ class RiskAssessment extends CommonObject
 	 * @return array
 	 * @throws Exception
 	 */
-	public function getRiskAssessmentCategoriesNumber($digiriskelementID = 0)
+	public function getRiskAssessmentCategoriesNumber($riskAssessmentList = [], $riskList = [], $digiriskelementID = 0)
 	{
 		$scale_counter = [
 			1 => 0,
@@ -379,13 +379,17 @@ class RiskAssessment extends CommonObject
 			4 => 0
 		];
 
-		$riskassessments = $this->fetchAll('', '', 0, 0, ['customsql' => 'status = 1']);
-		if (is_array($riskassessments) && !empty($riskassessments)) {
-			foreach ($riskassessments as $riskassessment) {
-				$scale = $riskassessment->get_evaluation_scale();
-				if ($digiriskelementID) {
-					$scale_counter[$riskassessment->fk_risk][$scale] += 1;
+		if (is_array($riskAssessmentList) && !empty($riskAssessmentList)) {
+			foreach ($riskAssessmentList as $riskAssessment) {
+				if ($digiriskelementID > 0) {
+					if (is_array($riskList) && !empty($riskList)) {
+						if (is_object($riskList[$riskAssessment->fk_risk]) && $riskList[$riskAssessment->fk_risk]->fk_element == $digiriskelementID) {
+							$scale = $riskAssessment->get_evaluation_scale();
+							$scale_counter[$scale] += 1;
+						}
+					}
 				} else {
+					$scale = $riskAssessment->get_evaluation_scale();
 					$scale_counter[$scale] += 1;
 				}
 			}
