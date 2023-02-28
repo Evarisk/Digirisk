@@ -325,7 +325,7 @@ abstract class ModeleODTDigiriskElementDocument extends CommonDocGenerator
 						}
 						$odfHandler->mergeSegment($listlines);
 
-						//Fill acidents data
+						//Fill accidents data
 						$accidents = $accident->fetchFromParent($digiriskelement->id);
 						$listlines = $odfHandler->setSegment('affectedAccident');
 						if (is_array($accidents) && !empty($accidents)) {

@@ -273,6 +273,7 @@ class DigiriskElement extends CommonObject
 	{
 		$object  = new DigiriskElement($this->db);
 		$objects = $object->fetchAll('',  '',  0,  0, array('customsql' => 'status > 0' ));
+
 		if (is_array($objects)) {
 			$elements = recurse_tree($parent_id, 0, $objects);
 			$digiriskelementlist = array();
@@ -287,14 +288,10 @@ class DigiriskElement extends CommonObject
 
 				if ( ! empty($children_id)) {
 					foreach ($children_id as $id) {
-						$object = new DigiriskElement($this->db);
-						$result = $object->fetch($id);
-						if ( ! empty($result)) {
-							$depth = 'depth' . $id;
-
-							$digiriskelementlist[$id]['object'] = $object;
-							$digiriskelementlist[$id]['depth']  = array_shift($element[$depth]);
-						}
+						$object = $objects[$id];
+						$depth = 'depth' . $id;
+						$digiriskelementlist[$id]['object'] = $object;
+						$digiriskelementlist[$id]['depth']  = array_shift($element[$depth]);
 					}
 				}
 			}
@@ -676,5 +673,25 @@ class DigiriskElement extends CommonObject
 			$object->fetch($object->fk_parent);
 		}
 		return $branch_ids;
+	}
+
+	/**
+	 *  Return list of non deleted digirisk elements
+	 *
+	 * 	@return    array  Array with ids
+	 * 	@throws Exception
+	 */
+	public function getActiveDigiriskElements()
+	{
+		$object = new self($this->db);
+		$objects = $object->fetchAll('',  '',  0,  0, array('customsql' => 'status > 0' ));
+		$trashList = $object->getMultiEntityTrashList();
+		if (!empty($trashList) && is_array($trashList)) {
+			foreach($trashList as $trash_element_id) {
+				unset($objects[$trash_element_id]);
+			}
+		}
+
+		return $objects;
 	}
 }

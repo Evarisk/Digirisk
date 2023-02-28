@@ -286,6 +286,16 @@ print ajax_constantonoff('DIGIRISKDOLIBARR_MANUAL_PDF_GENERATION');
 print '</td>';
 print '</tr>';
 
+print '<tr class="oddeven"><td>';
+print  $langs->trans("GenerateZipArchiveWithDigiriskElementDocuments");
+print '</td><td>';
+print $langs->trans('GenerateZipArchiveWithDigiriskElementDocumentsDescription');
+print '</td>';
+print '<td class="center">';
+print ajax_constantonoff('DIGIRISKDOLIBARR_GENERATE_ARCHIVE_WITH_DIGIRISKELEMENT_DOCUMENTS');
+print '</td>';
+print '</tr>';
+
 print '</table>';
 
 foreach ($types as $type => $documentType) {
