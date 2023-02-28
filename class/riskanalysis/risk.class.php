@@ -211,13 +211,9 @@ class Risk extends CommonObject
 
 		$risks = [];
 
-		//@todo refacto performance
-
 		//For groupment & workunit documents with given id
 		if ($parent_id > 0) {
-			//@todo refaire avec array filter
 			$result  = $risk->fetchFromParent($parent_id);
-
 			// RISKS de l'élément parent.
 			if ($result > 0 && ! empty($result)) {
 				foreach ($result as $risk) {
@@ -231,13 +227,10 @@ class Risk extends CommonObject
 					$risks[] = $risk;
 				}
 			}
-
 		}
-
 
 		//For risks listing of risk assessment document
 		if ( $get_children_data ) {
-
 			if (is_array($objects) && !empty($objects)) {
 				foreach ($objects as $digiriskElement) {
 					if (is_array($risksOrderedByDigiriskElement[$digiriskElement->id]) && !empty($risksOrderedByDigiriskElement[$digiriskElement->id])) {
@@ -245,135 +238,22 @@ class Risk extends CommonObject
 					}
 				}
 			}
-//			if ( $elements > 0 && ! empty($elements) ) {
-//				// Super function iterations flat.
-//				$it = new RecursiveIteratorIterator(new RecursiveArrayIterator($elements));
-//				$element = array();
-//				foreach ($it as $key => $v) {
-//					$element[$key][$v] = $v;
-//				}
-//
-//				$children_ids = $element['id'];
-//
-//				// RISKS parent children.
-//				if ( ! empty($children_ids)) {
-//					foreach ($children_ids as $child_id) {
-//
-//						$risksOfDigiriskElement = array_filter($riskList, function($riskSingle) use($child_id) {
-//							if (isset($riskSingle->fk_element)) {
-//								if ($riskSingle->fk_element != $child_id) return false;
-//							}
-//							return true;
-//						});
-//
-////						foreach($riskList as $riskSingle) {
-////							if ($riskSingle->fk_element == $child_id) {
-////								$risksOfDigiriskElement[] = $riskSingle;
-////							}
-////						}
-//
-//						if (is_array($risksOfDigiriskElement) && !empty($risksOfDigiriskElement)) {
-//							foreach ($risksOfDigiriskElement as $riskOfDigiriskElement) {
-//								$riskAssessmentParentRiskId = $riskOfDigiriskElement->id;
-//								$lastRiskAssessmentOfRisk = array_filter($riskAssessmentList, function($riskAssessmentSingle) use($riskAssessmentParentRiskId) {
-//									if (isset($riskAssessmentSingle->fk_risk)) {
-//										if ($riskAssessmentSingle->fk_risk != $riskAssessmentParentRiskId && $riskAssessmentSingle->status == 1) {
-//											return false;
-//										}
-//									}
-//									return true;
-//								});
-//
-//								if (is_array($lastRiskAssessmentOfRisk) && !empty($lastRiskAssessmentOfRisk)) {
-//									$lastRiskAssessmentOfRisk = array_shift($lastRiskAssessmentOfRisk);
-//									$riskOfDigiriskElement->lastEvaluation = $lastRiskAssessmentOfRisk;
-//								}
-//								$riskOfDigiriskElement->appliedOn = $child_id;
-//								$risks[] = $riskOfDigiriskElement;
-//							}
-//						}
-//					}
-//				}
-//			}
-//		}
-//			if ( $elements > 0 && ! empty($elements) ) {
-//				// Super function iterations flat.
-//				$it = new RecursiveIteratorIterator(new RecursiveArrayIterator($elements));
-//				$element = array();
-//				foreach ($it as $key => $v) {
-//					$element[$key][$v] = $v;
-//				}
-//
-//				$children_ids = $element['id'];
-//
-//				// RISKS parent children.
-//				if ( ! empty($children_ids)) {
-//					$risks = array_map(function($digiriskElementId) use($riskList, $riskAssessmentList) {
-//						$risksOfDigiriskElement = array_filter($riskList, function($riskSingle) use($digiriskElementId) {
-//							if (isset($riskSingle->fk_element)) {
-//								if ($riskSingle->fk_element != $digiriskElementId) return false;
-//							}
-//							return true;
-//						});
-//
-//						if (is_array($risksOfDigiriskElement) && !empty($risksOfDigiriskElement)) {
-//							foreach ($risksOfDigiriskElement as $riskOfDigiriskElement) {
-//								$riskAssessmentParentRiskId = $riskOfDigiriskElement->id;
-//								$lastRiskAssessmentOfRisk = array_filter($riskAssessmentList, function($riskAssessmentSingle) use($riskAssessmentParentRiskId) {
-//									if (isset($riskAssessmentSingle->fk_risk)) {
-//										if ($riskAssessmentSingle->fk_risk != $riskAssessmentParentRiskId && $riskAssessmentSingle->status == 1) {
-//											return false;
-//										}
-//									}
-//									return true;
-//								});
-//
-//								if (is_array($lastRiskAssessmentOfRisk) && !empty($lastRiskAssessmentOfRisk)) {
-//									$lastRiskAssessmentOfRisk = array_shift($lastRiskAssessmentOfRisk);
-//									$riskOfDigiriskElement->lastEvaluation = $lastRiskAssessmentOfRisk;
-//								}
-//								$riskOfDigiriskElement->appliedOn = $digiriskElementId;
-//								$riskTestitesto[$riskOfDigiriskElement->id] = $riskOfDigiriskElement;
-//							}
-//						}
-//						return $riskTestitesto;
-//
-//					}, $children_ids);
-//				}
-//			}
 		}
-
 
 		//for groupment & workunit document if get inherited risks conf is activated
 		if ( $get_parents_data ) {
 			if ($parent_id > 0) {
 				$parent_element_id = $objects[$parent_id]->id;
 				while ($parent_element_id > 0) {
-//					$result = $risk->fetchFromParent($parent_element_id);
-//					if ($result > 0 && ! empty($result) && $parent_element_id !== $parent_id) {
-//						foreach ($result as $risk) {
-//							$evaluation     = new RiskAssessment($this->db);
-//							$lastEvaluation = $evaluation->fetchFromParent($risk->id, 1);
-//							if ( $lastEvaluation > 0 && ! empty($lastEvaluation)  && is_array($lastEvaluation)) {
-//								$lastEvaluation       = array_shift($lastEvaluation);
-//								$risk->lastEvaluation = $lastEvaluation;
-//							}
-//							$risk->appliedOn = $parent_id;
-//							$risks[] = $risk;
-//						}
-//					}
-
 					if (is_array($risksOrderedByDigiriskElement[$parent_element_id]) && !empty($risksOrderedByDigiriskElement[$parent_element_id])) {
 						foreach($risksOrderedByDigiriskElement[$parent_element_id] as $riskOfParentDigiriskElement) {
 							$riskOfParentDigiriskElement->appliedOn = $parent_id;
 							$risks[] = $riskOfParentDigiriskElement;
 						}
 					}
-
 					$parent_element_id = $objects[$parent_element_id]->fk_parent;
 				}
 			} else {
-
 				if (is_array($objects) && !empty($objects)) {
 					foreach ($objects as $digiriskElement) {
 						$parent_element_id = $digiriskElement->fk_parent;
@@ -390,43 +270,9 @@ class Risk extends CommonObject
 					}
 
 				}
-
-				// Super function iterations flat.
-//				$it = new RecursiveIteratorIterator(new RecursiveArrayIterator($elements));
-//				$element = array();
-//				foreach ($it as $key => $v) {
-//					$element[$key][$v] = $v;
-//				}
-//
-//				$children_ids = $element['id'];
-//				// RISKS parent children.
-//				if ( ! empty($children_ids)) {
-//					foreach ($children_ids as $child_id) {
-//						$object->fetch($child_id);
-//						$parent_element_id = $object->fk_parent;
-//						while ($parent_element_id > 0) {
-//							$result = $risk->fetchFromParent($parent_element_id);
-//							if ($result > 0 && !empty($result)) {
-//								foreach ($result as $risk) {
-//									$evaluation     = new RiskAssessment($this->db);
-//									$lastEvaluation = $evaluation->fetchFromParent($risk->id, 1);
-//									if ( $lastEvaluation > 0 && ! empty($lastEvaluation)  && is_array($lastEvaluation)) {
-//										$lastEvaluation       = array_shift($lastEvaluation);
-//										$risk->lastEvaluation = $lastEvaluation;
-//									}
-//									$risk->appliedOn = $child_id;
-//									$risks[] = $risk;
-//								}
-//							}
-//							$object->fetch($parent_element_id);
-//							$parent_element_id = $object->fk_parent;
-//						}
-//					}
-//				}
 			}
 		}
 
-		//@todo refacto performance
 		//For all documents
 		if ( $get_shared_data ) {
 			$digiriskelementtmp = new DigiriskElement($this->db);
@@ -454,7 +300,6 @@ class Risk extends CommonObject
 						}
 					}
 				}
-
 			} else {
 				$digiriskelementtmp->fetch($parent_id);
 				$digiriskelementtmp->fetchObjectLinked(null, '', $digiriskelementtmp->id, 'digiriskdolibarr_digiriskelement', 'AND', 1, 'sourcetype', 0);
@@ -462,7 +307,7 @@ class Risk extends CommonObject
 					foreach ($digiriskelementtmp->linkedObjectsIds['digiriskdolibarr_risk'] as $risk_id) {
 						$risktmp = new self($this->db);
 						$risktmp->fetch($risk_id);
-						if (!array_key_exists($risktmp->fk_element, $trashList)) {
+						if (array_key_exists($risktmp->fk_element, $objects)) {
 							$evaluation = new RiskAssessment($this->db);
 							$lastEvaluation = $evaluation->fetchFromParent($risktmp->id, 1);
 							if ($lastEvaluation > 0 && !empty($lastEvaluation) && is_array($lastEvaluation)) {

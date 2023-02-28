@@ -192,12 +192,11 @@ abstract class ModeleODTRiskAssessmentDocument extends CommonDocGenerator
 				$foundtagforlines = 1;
 				if ($foundtagforlines) {
 					$digiriskelementobject = new DigiriskElement($this->db);
-					$digiriskelementlist   = $digiriskelementobject->fetchDigiriskElementFlat(0);
-
 					$risk                  = new Risk($this->db);
 					$riskassessment        = new RiskAssessment($this->db);
 					$ticket                = new Ticket($this->db);
 					$category              = new Categorie($this->db);
+					$digiriskelementlist   = $digiriskelementobject->fetchDigiriskElementFlat(0);
 					$risks                 = $risk->fetchRisksOrderedByCotation(0, true, $conf->global->DIGIRISKDOLIBARR_SHOW_INHERITED_RISKS_IN_DOCUMENTS, $conf->global->DIGIRISKDOLIBARR_SHOW_SHARED_RISKS);
 
 					if (is_array($digiriskelementlist) && !empty($digiriskelementlist)) {
@@ -250,20 +249,12 @@ abstract class ModeleODTRiskAssessmentDocument extends CommonDocGenerator
 						}
 
 						foreach ($digiriskelementlist as $digiriskelementsingle) {
-//							$digiriskelementrisks = $risk->fetchFromParent($digiriskelementsingle['object']->id);
-//
 							$digiriskelementrisks = $risksOfDigiriskElement[$digiriskelementsingle['object']->id];
 
 							if ($digiriskelementrisks > 0 && ! empty($digiriskelementrisks)) {
 								foreach ($digiriskelementrisks as $line) {
-//									$lastEvaluation  = $riskassessment->fetchFromParent($line->id, 1);
 									$lastEvaluation  = $line->lastEvaluation;
 									$totalQuotation += $lastEvaluation->cotation;
-//
-//									if ($lastEvaluation > 0 && ! empty($lastEvaluation) && is_array($lastEvaluation)) {
-//										$lastEvaluation = array_shift($lastEvaluation);
-//										$totalQuotation += $lastEvaluation->cotation;
-//									}
 								}
 							}
 

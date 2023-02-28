@@ -448,8 +448,6 @@ class DigiriskDocuments extends CommonObject
 		for ($i = 1; $i <= 4; $i++ ) {
 			$listlines = $odfHandler->setSegment('risk' . $i);
 			if (is_array($risks) && ! empty($risks)) {
-//				$digiriskelementobject->fetch($conf->global->DIGIRISKDOLIBARR_DIGIRISKELEMENT_TRASH);
-//				$trashList = $digiriskelementobject->getMultiEntityTrashList();
 				foreach ($risks as $line) {
 					$j++;
 					if ($line->fk_element > 0 && in_array($line->fk_element, array_keys($activeDigiriskElements))) {
@@ -461,10 +459,6 @@ class DigiriskDocuments extends CommonObject
 							$scale = $lastEvaluation->get_evaluation_scale();
 
 							if ($scale == $i) {
-//								$element = new DigiriskElement($this->db);
-//								$linked_element = new DigiriskElement($this->db);
-//								$element->fetch($line->fk_element);
-//								$linked_element->fetch($line->appliedOn);
 								$element = $activeDigiriskElements[$line->fk_element];
 								$linked_element = $activeDigiriskElements[$line->appliedOn];
 								if ($conf->global->DIGIRISKDOLIBARR_SHOW_RISK_ORIGIN) {
@@ -488,9 +482,7 @@ class DigiriskDocuments extends CommonObject
 								$tmparray['descriptionRisque']     = $line->description;
 								$tmparray['commentaireEvaluation'] = $lastEvaluation->comment ? dol_print_date((($conf->global->DIGIRISKDOLIBARR_SHOW_RISKASSESSMENT_DATE && (!empty($lastEvaluation->date_riskassessment))) ? $lastEvaluation->date_riskassessment : $lastEvaluation->date_creation), 'dayreduceformat') . ': ' . $lastEvaluation->comment : '';
 
-//								$related_tasks = $line->get_related_tasks($line);
 								$related_tasks = $tasksSortedByRisk[$line->id];
-////								@todo rework performance
 								if (!empty($related_tasks) && is_array($related_tasks)) {
 									foreach ($related_tasks as $related_task) {
 										if(is_object($related_task)) {
@@ -632,15 +624,11 @@ class DigiriskDocuments extends CommonObject
 										dol_syslog($e->getMessage());
 									}
 								}
-
 								$listlines->merge();
-
 							}
 						}
 					}
-
 				}
-
 			} else {
 				$tmparray['nomElement']                  = $langs->trans('NoData');
 				$tmparray['nomDanger']                   = $langs->trans('NoData');
