@@ -363,11 +363,11 @@ $related_tasks = $risk->get_related_tasks($risk);
 								<div class="riskassessment-task-date wpeo-gridlayout grid-3">
 									<div>
 										<span class="title"><?php echo $langs->trans('DateStart'); ?></span>
-										<?php print $form->selectDate($related_task->date_start ?: -1, 'RiskassessmentTaskDateStart'.$related_task->id, 1, 1, 0, '', 1, 1); ?>
+										<?php print $form->selectDate($related_task->date_start ?: -1, 'RiskassessmentTaskDateStartEdit'.$related_task->id, 1, 1, 0, '', 1, 1); ?>
 									</div>
 									<div>
 										<span class="title"><?php echo $langs->trans('Deadline'); ?></span>
-										<?php print $form->selectDate($related_task->date_end ?: -1,'RiskassessmentTaskDateEnd'.$related_task->id, 1, 1, 0, '', 1, 1); ?>
+										<?php print $form->selectDate($related_task->date_end ?: -1,'RiskassessmentTaskDateEndEdit'.$related_task->id, 1, 1, 0, '', 1, 1); ?>
 									</div>
 									<div class="riskassessment-task-budget">
 										<span class="title"><?php echo $langs->trans('Budget'); ?></span>
