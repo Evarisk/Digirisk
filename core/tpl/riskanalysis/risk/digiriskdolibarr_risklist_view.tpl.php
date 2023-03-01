@@ -168,10 +168,16 @@
 	</div>
 </div>
 <div class="messageErrorTaskCreate notice hidden">
+	<input type="hidden" class="valueForCreateTask1" value="<?php echo $langs->trans('TheTask') . ' ' ?>">
+	<input type="hidden" class="valueForCreateTask2" value="<?php echo ' ' . $langs->trans('HasNotBeenCreatedF') ?>">
 	<div class="wpeo-notice notice-warning task-create-error-notice">
 		<div class="notice-content">
 			<div class="notice-title"><?php echo $langs->trans('TaskNotCreated') ?></div>
-			<div class="notice-subtitle"><?php echo $langs->trans('TheTask') . ' ' . $langs->trans('HasNotBeenCreatedF') ?></div>
+			<div class="notice-subtitle">
+				<a href="">
+					<span class="text"></span>
+				</a>
+			</div>
 		</div>
 		<div class="notice-close"><i class="fas fa-times"></i></div>
 	</div>

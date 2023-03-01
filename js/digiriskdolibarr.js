@@ -2668,9 +2668,22 @@ window.eoxiaJS.riskassessmenttask.createRiskAssessmentTask = function ( event ) 
 			actionContainerSuccess.removeClass('hidden');
 		},
 		error: function ( resp ) {
-			$(this).closest('.risk-row-content-' + riskToAssign).removeClass('wpeo-loader');
+			$('.wpeo-loader').removeClass('wpeo-loader');
+			window.scrollTo(0, 0);
+			let response = JSON.parse(resp.responseText)
+
 			let actionContainerError = $('.messageErrorTaskCreate');
-			actionContainerError.html($(resp).find('.task-create-error-notice'))
+			$('#risk_assessment_task_add'+riskToAssign).removeClass('modal-active')
+			$('.wpeo-loader').removeClass('wpeo-loader')
+
+			let textToShow = '';
+
+			textToShow += actionContainerError.find('.valueForCreateTask1').val()
+			textToShow += actionContainerError.find('.valueForCreateTask2').val()
+			textToShow += ' : '
+			textToShow += response.message
+
+			actionContainerError.find('.notice-subtitle .text').text(textToShow);
 			actionContainerError.removeClass('hidden');
 		}
 	});

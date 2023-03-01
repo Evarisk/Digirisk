@@ -437,9 +437,9 @@ if ( ! $error && $action == 'addRiskAssessmentTask' && $permissiontoadd) {
 		header("Location: " . $urltogo);
 		exit;
 	} else {
-		// Creation task KO
-		if ( ! empty($task->errors)) setEventMessages(null, $task->errors, 'errors');
-		else setEventMessages($task->error, null, 'errors');
+		// Delete task KO
+		header('HTTP/1.1 500 Internal Server Booboo');
+		die(json_encode(array('message' => html_entity_decode($langs->transnoentities($task->errors[0])), 'code' => '1339')));
 	}
 }
 
@@ -492,7 +492,7 @@ if ( ! $error && $action == 'saveRiskAssessmentTask' && $permissiontoadd) {
 	} else {
 		// Delete task KO
 		header('HTTP/1.1 500 Internal Server Booboo');
-		die(json_encode(array('message' => $langs->transnoentities($task->errors[0]), 'code' => '1338')));
+		die(json_encode(array('message' => html_entity_decode($langs->transnoentities($task->errors[0])), 'code' => '1338')));
 	}
 }
 
