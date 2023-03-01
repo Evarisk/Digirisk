@@ -213,18 +213,12 @@ class Risk extends CommonObject
 
 		//For groupment & workunit documents with given id
 		if ($parent_id > 0) {
-			$result  = $risk->fetchFromParent($parent_id);
+			$risksOfDigiriskElement  = $risksOrderedByDigiriskElement[$parent_id];
 			// RISKS de l'élément parent.
-			if ($result > 0 && ! empty($result)) {
-				foreach ($result as $risk) {
-					$evaluation     = new RiskAssessment($this->db);
-					$lastEvaluation = $evaluation->fetchFromParent($risk->id, 1);
-					if ( $lastEvaluation > 0 && ! empty($lastEvaluation) && is_array($lastEvaluation)) {
-						$lastEvaluation       = array_shift($lastEvaluation);
-						$risk->lastEvaluation = $lastEvaluation;
-					}
-					$risk->appliedOn = $parent_id;
-					$risks[] = $risk;
+			if (is_array($risksOfDigiriskElement) && !empty($risksOfDigiriskElement)) {
+				foreach ($risksOfDigiriskElement as $riskOfDigiriskElement) {
+					$riskOfDigiriskElement->appliedOn = $parent_id;
+					$risks[] = $riskOfDigiriskElement;
 				}
 			}
 		}
