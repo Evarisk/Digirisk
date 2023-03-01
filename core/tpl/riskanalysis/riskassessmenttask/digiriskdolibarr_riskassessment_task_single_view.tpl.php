@@ -1,6 +1,6 @@
 <div class="table-cell riskassessment-task-container riskassessment-task-container-<?php echo $related_task->id ?>" value="<?php echo $related_task->ref ?>">
 	<input type="hidden" class="labelForDelete" value="<?php echo $langs->trans('DeleteTask') . ' ' . $related_task->ref . ' ?'; ?>">
-	<div class="riskassessment-task-single-content riskassessment-task-single-content-<?php echo $risk->id ?>">
+	<div class="riskassessment-task-single-content riskassessment-task-single-content-<?php echo $risk->id ?>" value="<?php echo $related_task->id ?>">
 		<div class="riskassessment-task-single riskassessment-task-single-<?php echo $related_task->id ?> wpeo-table table-row">
 			<div class="riskassessment-task-content table-cell">
 				<div class="riskassessment-task-data">

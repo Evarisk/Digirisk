@@ -71,7 +71,7 @@ $related_tasks = $risk->get_related_tasks($risk);
 				}
 				if ($nb_of_tasks_in_progress == 0) : ?>
 					<div class="riskassessment-task-container riskassessment-no-task">
-						<div class="riskassessment-task-single-content riskassessment-task-single-content-<?php echo $risk->id ?>">
+						<div class="riskassessment-task-single-content riskassessment-task-single-content-<?php echo $risk->id ?>" value="<?php echo $related_task->id ?>">
 							<div class="riskassessment-task-single riskassessment-task-single-<?php echo $risk->id ?>">
 								<div class="riskassessment-task-content">
 									<div class="riskassessment-task-data" style="justify-content: center;">
@@ -109,7 +109,7 @@ $related_tasks = $risk->get_related_tasks($risk);
 					require __DIR__ . '/digiriskdolibarr_riskassessment_task_single_view.tpl.php';
 				} else { ?>
 					<div class="riskassessment-task-container riskassessment-no-task">
-						<div class="riskassessment-task-single-content riskassessment-task-single-content-<?php echo $risk->id ?>">
+						<div class="riskassessment-task-single-content riskassessment-task-single-content-<?php echo $risk->id ?>" value="<?php echo $related_task->id ?>">
 							<div class="riskassessment-task-single riskassessment-task-single-<?php echo $risk->id ?>">
 								<div class="riskassessment-task-content">
 									<div class="riskassessment-task-data" style="justify-content: center;">
@@ -135,7 +135,7 @@ $related_tasks = $risk->get_related_tasks($risk);
 		<?php else : ?>
 			<div class="riskassessment-task-listing-wrapper riskassessment-task-listing-wrapper-<?php echo $risk->id ?>">
 				<div class="riskassessment-task-container riskassessment-no-task">
-					<div class="riskassessment-task-single-content riskassessment-task-single-content-<?php echo $risk->id ?>">
+					<div class="riskassessment-task-single-content riskassessment-task-single-content-<?php echo $risk->id ?>" value="<?php echo $related_task->id ?>">
 						<div class="riskassessment-task-single riskassessment-task-single-<?php echo $risk->id ?>">
 							<div class="riskassessment-task-content">
 								<div class="riskassessment-task-data" style="justify-content: center;">

@@ -3069,7 +3069,7 @@ window.eoxiaJS.riskassessmenttask.saveRiskAssessmentTaskTimeSpent = function ( e
  */
 window.eoxiaJS.riskassessmenttask.checkTaskProgress = function ( event ) {
 	let elementRiskAssessmentTask = $(this).closest('.riskassessment-task-container');
-	let RiskAssessmentTaskId = elementRiskAssessmentTask.find('.riskassessment-task-reference').attr('value');
+	let RiskAssessmentTaskId = elementRiskAssessmentTask.find('.riskassessment-task-single-content').attr('value');
 	let riskId = $(this).closest('.riskassessment-tasks').attr('value');
 	let textToShow = '';
 
