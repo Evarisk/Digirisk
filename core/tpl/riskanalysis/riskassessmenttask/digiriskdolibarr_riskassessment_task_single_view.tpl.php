@@ -4,7 +4,7 @@
 		<div class="riskassessment-task-single riskassessment-task-single-<?php echo $related_task->id ?> wpeo-table table-row">
 			<div class="riskassessment-task-content table-cell">
 				<div class="riskassessment-task-data">
-					<span class="riskassessment-task-reference" value="<?php echo $related_task->id ?>"><?php echo $related_task->getNomUrlTask(0, 'withproject'); ?></span>
+					<span class="riskassessment-task-reference" value="<?php echo $related_task->ref ?>"><?php echo $related_task->getNomUrlTask(0, 'withproject'); ?></span>
 					<span class="riskassessment-task-author">
 						<?php $userAuthor = $usersList[$related_task->timespent_fk_user?:$user->id];
 						echo getNomUrlUser($userAuthor); ?>

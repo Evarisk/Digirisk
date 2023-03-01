@@ -197,6 +197,11 @@
 	<div class="wpeo-notice notice-warning riskassessment-task-edit-error-notice">
 		<div class="notice-content">
 			<div class="notice-title"><?php echo $langs->trans('TaskNotEdited') ?></div>
+			<div class="notice-subtitle">
+				<a href="">
+					<span class="text"></span>
+				</a>
+			</div>
 		</div>
 		<div class="notice-close"><i class="fas fa-times"></i></div>
 	</div>

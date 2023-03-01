@@ -1317,7 +1317,7 @@ TotalConsumedTimeAmount = Coût du temps consommé
 NbTasks = Nombre de tâches
 TotalProgress = Avancement réel global des tâches
 TotalBudget = Somme du budget des tâches
-
+StartDateCannotBeAfterEndDate = La date de fin ne peut pas être antérieure à la date de début
 
 
 #

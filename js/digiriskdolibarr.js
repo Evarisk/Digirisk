@@ -2759,7 +2759,7 @@ window.eoxiaJS.riskassessmenttask.saveRiskAssessmentTask = function ( event ) {
 	let taskText = elementRiskAssessmentTask.find('.riskassessment-task-label' + editedRiskAssessmentTaskId).val()
 	taskText = window.eoxiaJS.risk.sanitizeBeforeRequest(taskText)
 
-	let taskRef =  $('.riskassessment-task-ref-'+editedRiskAssessmentTaskId).attr('value');
+	let taskRef =  $('.riskassessment-task-single-'+editedRiskAssessmentTaskId+' .riskassessment-task-reference').attr('value');
 
 	let taskProgress = 0;
 	if (elementRiskAssessmentTask.find('.riskassessment-task-progress-checkbox' + editedRiskAssessmentTaskId).is(':checked')) {
@@ -2814,11 +2814,19 @@ window.eoxiaJS.riskassessmenttask.saveRiskAssessmentTask = function ( event ) {
 			actionContainerSuccess.removeClass('hidden');
 		},
 		error: function ( resp ) {
+			$('.wpeo-loader').removeClass('wpeo-loader');
+			window.scrollTo(0, 0);
+			let response = JSON.parse(resp.responseText)
+
 			let actionContainerError = $('.messageErrorTaskEdit');
+			$('#risk_assessment_task_edit'+editedRiskAssessmentTaskId).removeClass('modal-active')
+			$('.wpeo-loader').removeClass('wpeo-loader')
 
 			textToShow += actionContainerError.find('.valueForEditTask1').val()
 			textToShow += taskRef
 			textToShow += actionContainerError.find('.valueForEditTask2').val()
+			textToShow += ' : '
+			textToShow += response.message
 
 			actionContainerError.find('.notice-subtitle .text').text(textToShow);
 			actionContainerError.removeClass('hidden');

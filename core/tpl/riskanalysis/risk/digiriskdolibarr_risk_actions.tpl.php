@@ -460,6 +460,7 @@ if ( ! $error && $action == 'saveRiskAssessmentTask' && $permissiontoadd) {
 	$task->fetch($riskAssessmentTaskID);
 
 	$task->label         = $tasktitle;
+
 	if (!empty($dateStart)) {
 		$task->date_start = strtotime(preg_replace('/\//', '-', $dateStart));
 		$task->date_start = dol_time_plus_duree($task->date_start, $hourStart, 'h');
@@ -489,9 +490,9 @@ if ( ! $error && $action == 'saveRiskAssessmentTask' && $permissiontoadd) {
 		header("Location: " . $urltogo);
 		exit;
 	} else {
-		// Update task KO
-		if ( ! empty($task->errors)) setEventMessages(null, $task->errors, 'errors');
-		else setEventMessages($task->error, null, 'errors');
+		// Delete task KO
+		header('HTTP/1.1 500 Internal Server Booboo');
+		die(json_encode(array('message' => $langs->transnoentities($task->errors[0]), 'code' => '1338')));
 	}
 }
 
