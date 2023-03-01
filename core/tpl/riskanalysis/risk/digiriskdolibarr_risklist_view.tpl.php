@@ -290,26 +290,26 @@ $riskAssessment                 = new RiskAssessment($db);
 $digiriskTask                   = new DigiriskTask($db);
 $extrafields                    = new Extrafields($db);
 $usertmp                        = new User($db);
+$project                        = new Project($db);
+$DUProject                      = new Project($db);
 
+$DUProject->fetch($conf->global->DIGIRISKDOLIBARR_DU_PROJECT);
 $extrafields->fetch_name_optionals_label($digiriskTask->table_element);
 
 $activeDigiriskElementList = $digiriskelement->getActiveDigiriskElements();
 $riskAssessmentList        = $riskAssessment->fetchAll();
-$riskAssessmentTaskList    = $digiriskTask->getTasksArray(null, null, 0, 0, 0, '', '-1', '', 0, 0, $extrafields);
+$riskAssessmentNextValue   = $refEvaluationMod->getNextValue($evaluation);
+$riskAssessmentTaskList    = $risk->getTasksWithFkRisk();
+$taskNextValue             = $refTaskMod->getNextValue('', $task);
 $usertmp->fetchAll();
 $usersList                 = $usertmp->users;
+$timeSpentSortedByTasks    = $digiriskTask->fetchAllTimeSpentAllUser('AND ptt.fk_task > 0', 'task_datehour', 'DESC', 1);
+
 if (is_array($riskAssessmentList) && !empty($riskAssessmentList)) {
 	foreach ($riskAssessmentList as $riskAssessmentSingle) {
 		$riskAssessmentsOrderedByRisk[$riskAssessmentSingle->fk_risk][$riskAssessmentSingle->id] = $riskAssessmentSingle;
 	}
 }
-
-//if (is_array($riskAssessmentTaskList) && !empty($riskAssessmentTaskList)) {
-//	foreach ($riskAssessmentTaskList as $riskAssessmentTaskSingle) {
-//		$riskAssessmentTaskSingle->fetch_optionals();
-//		$riskAssessmentTasksOrderedByRisk[$riskAssessmentTaskSingle->array_options['fk_risk']][] = $riskAssessmentTaskSingle;
-//	}
-//}
 
 // Build and execute select
 // --------------------------------------------------------------------

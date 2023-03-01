@@ -625,7 +625,17 @@ class Risk extends CommonObject
 	{
 		$sql = "SELECT * FROM " . MAIN_DB_PREFIX . 'projet_task_extrafields' . ' WHERE fk_risk > 0';
 		$digiriskTask = new DigiriskTask($this->db);
-		$digiriskTasks = $digiriskTask->getTasksArray();
+		$tasksList = $digiriskTask->getTasksArray();
+
+		//Cast tasks as DigiriskTasks
+		if (is_array($tasksList) && !empty($tasksList)) {
+			foreach($tasksList as $task) {
+				foreach (get_object_vars($task) as $key => $name) {
+					$digiriskTask->$key = $name;
+				}
+				$digiriskTasks[$digiriskTask->id] = $digiriskTask;
+			}
+		}
 
 		$resql = $this->db->query($sql);
 
@@ -636,7 +646,7 @@ class Risk extends CommonObject
 			while ($i < $num) {
 
 				$obj = $this->db->fetch_object($resql);
-				$records[$obj->fk_risk][] = $digiriskTasks[$obj->fk_object];
+				$records[$obj->fk_risk][$obj->rowid] = $digiriskTasks[$obj->fk_object];
 				$i++;
 			}
 			$this->db->free($resql);

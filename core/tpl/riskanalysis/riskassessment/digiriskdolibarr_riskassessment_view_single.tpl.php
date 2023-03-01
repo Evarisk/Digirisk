@@ -21,7 +21,7 @@
 						<i class="fas fa-calendar-alt"></i> <?php echo date('d/m/Y', (($conf->global->DIGIRISKDOLIBARR_SHOW_RISKASSESSMENT_DATE && ( ! empty($lastEvaluation->date_riskassessment))) ? $lastEvaluation->date_riskassessment : $lastEvaluation->date_creation)); ?>
 					</span>
 					<span class="risk-evaluation-author">
-						<?php $userAuthor = $usersList[$lastEvaluation->fk_user_creat];
+						<?php $userAuthor = $usersList[$lastEvaluation->fk_user_creat?:$user->id];
 						echo getNomUrlUser($userAuthor); ?>
 					</span>
 				</div>

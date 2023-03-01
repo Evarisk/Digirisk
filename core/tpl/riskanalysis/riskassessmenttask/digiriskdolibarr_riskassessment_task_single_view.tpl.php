@@ -6,17 +6,19 @@
 				<div class="riskassessment-task-data">
 					<span class="riskassessment-task-reference" value="<?php echo $related_task->id ?>"><?php echo $related_task->getNomUrlTask(0, 'withproject'); ?></span>
 					<span class="riskassessment-task-author">
-						<?php $user->fetch($related_task->fk_user_creat); ?>
-						<?php echo getNomUrlUser($user); ?>
+						<?php $userAuthor = $usersList[$related_task->timespent_fk_user?:$user->id];
+						echo getNomUrlUser($userAuthor); ?>
 					</span>
 					<span class="riskassessment-task-date">
 						<i class="fas fa-calendar-alt"></i> <?php echo date('d/m/Y', (($conf->global->DIGIRISKDOLIBARR_SHOW_TASK_START_DATE && ( ! empty($related_task->date_start))) ? $related_task->date_start : $related_task->date_c)) . (($conf->global->DIGIRISKDOLIBARR_SHOW_TASK_END_DATE && ( ! empty($related_task->date_end))) ? ' - ' . date('d/m/Y', $related_task->date_end) : ''); ?>
 					</span>
 					<span class="riskassessment-task-timespent  riskassessment-total-task-timespent-<?php echo $related_task->id ?>">
-						<?php $allTimeSpentArray = $related_task->fetchAllTimeSpentAllUser('AND ptt.fk_task='.$related_task->id, 'task_datehour', 'DESC');
+						<?php $allTimeSpentArray = $timeSpentSortedByTasks[$related_task->id];
 						$allTimeSpent = 0;
-						foreach ($allTimeSpentArray as $timespent) {
-							$allTimeSpent += $timespent->timespent_duration;
+						if (is_array($allTimeSpentArray) && !empty($allTimeSpentArray)) {
+							foreach ($allTimeSpentArray as $timespent) {
+								$allTimeSpent += $timespent->timespent_duration;
+							}
 						}
 						?>
 						<i class="fas fa-clock"></i> <?php echo $allTimeSpent/60 . '/' . $related_task->planned_workload/60 ?>

@@ -126,7 +126,7 @@ if ( ! empty($allRiskAssessment) && $allRiskAssessment > 0) : ?>
 													<i class="fas fa-calendar-alt"></i> <?php echo date('d/m/Y', (($conf->global->DIGIRISKDOLIBARR_SHOW_RISKASSESSMENT_DATE && ( ! empty($lastEvaluation->date_riskassessment))) ? $lastEvaluation->date_riskassessment : $lastEvaluation->date_creation)); ?>
 												</span>
 												<span class="risk-evaluation-author">
-													<?php $userAuthor = $usersList[$lastEvaluation->fk_user_creat];
+													<?php $userAuthor = $usersList[$lastEvaluation->fk_user_creat?:$user->id];
 													echo getNomUrlUser($userAuthor); ?>
 												</span>
 											</div>
@@ -232,7 +232,7 @@ $evaluation->method = $lastEvaluation->method ?: "standard" ;
 		<div class="modal-container wpeo-modal-event">
 			<!-- Modal-Header -->
 			<div class="modal-header">
-				<h2 class="modal-title"><?php echo $langs->trans('EvaluationCreate') . ' ' . $refEvaluationMod->getNextValue($evaluation)?></h2>
+				<h2 class="modal-title"><?php echo $langs->trans('EvaluationCreate') . ' ' . $riskAssessmentNextValue ?></h2>
 				<div class="modal-close"><i class="fas fa-times"></i></div>
 			</div>
 
@@ -396,7 +396,7 @@ $evaluation->method = $lastEvaluation->method ?: "standard" ;
 											<i class="fas fa-calendar-alt"></i> <?php echo date('d/m/Y', (($conf->global->DIGIRISKDOLIBARR_SHOW_RISKASSESSMENT_DATE && ( ! empty($lastEvaluation->date_riskassessment))) ? $lastEvaluation->date_riskassessment : $lastEvaluation->date_creation)); ?>
 										</span>
 										<span class="risk-evaluation-author">
-											<?php $userAuthor = $usersList[$lastEvaluation->fk_user_creat];
+											<?php $userAuthor = $usersList[$lastEvaluation->fk_user_creat?:$user->id];
 											echo getNomUrlUser($userAuthor); ?>
 										</span>
 									</div>

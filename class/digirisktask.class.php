@@ -191,7 +191,7 @@ class DigiriskTask extends Task
 	 * @return array|int                    0 < if KO, array of time spent if OK
 	 * @throws Exception
 	 */
-	public function fetchAllTimeSpentAllUser($morewherefilter = '', $sortfield = '', $sortorder = '')
+	public function fetchAllTimeSpentAllUser($morewherefilter = '', $sortfield = '', $sortorder = '', $sortedByTasks = 0)
 	{
 		$arrayres = array();
 
@@ -272,7 +272,17 @@ class DigiriskTask extends Task
 			return -1;
 		}
 
-		return $arrayres;
+		if ($sortedByTasks > 0) {
+			$timeSpentSortedByTasks = [];
+			if (is_array($arrayres) && !empty($arrayres)) {
+				foreach ($arrayres as $timeSpent) {
+					$timeSpentSortedByTasks[$timeSpent->fk_task][$timeSpent->timespent_id] = $timeSpent;
+				}
+			}
+			return $timeSpentSortedByTasks;
+		} else {
+			return $arrayres;
+		}
 	}
 }
 

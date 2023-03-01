@@ -1,13 +1,19 @@
 <?php
-$usertmp = new User($db);
-$related_tasks = $risk->get_related_tasks($risk); ?>
+//$related_tasks = $riskAssessmentTaskList[$risk->id];
+//
+$related_tasks = $risk->get_related_tasks($risk);
+
+?>
 <div class="wpeo-table riskassessment-tasks riskassessment-tasks<?php echo $risk->id ?>" value="<?php echo $risk->id ?>">
 	<div class="table-cell riskassessment-task-listing-wrapper riskassessment-task-listing-wrapper-<?php echo $risk->id ?>">
 		<?php if (!empty($related_tasks) && $related_tasks > 0) : ?>
 			<?php foreach ($related_tasks as $related_task) {
 				if (!empty($conf->global->DIGIRISKDOLIBARR_SHOW_SHARED_RISKS) && $contextpage == 'sharedrisk') {
-					$project = new Project($db);
-					$project->fetch($related_task->fk_project);
+					if ($related_task->fk_project != $conf->global->DIGIRISKDOLIBARR_DU_PROJECT) {
+						$project->fetch($related_task->fk_project);
+					} else {
+						$project = $DUProject;
+					}
 					$result = !empty($conf->mc->sharings['project']) ? in_array($project->entity, $conf->mc->sharings['project']) : 0;
 				} else {
 					$result = 1;
@@ -153,17 +159,13 @@ $related_tasks = $risk->get_related_tasks($risk); ?>
 			</div>
 		<?php endif; ?>
 
-		<?php $riskAssessment   = new RiskAssessment($db);
-		$riskAssessment->method = $lastEvaluation->method ?: "standard" ; ?>
-
 		<!-- RISK ASSESSMENT TASK ADD MODAL-->
 		<div class="riskassessment-task-add-modal">
 			<div class="wpeo-modal modal-risk" id="risk_assessment_task_add<?php echo $risk->id?>">
 				<div class="modal-container wpeo-modal-event">
 					<!-- Modal-Header -->
 					<div class="modal-header">
-						<?php $project->fetch($conf->global->DIGIRISKDOLIBARR_DU_PROJECT); ?>
-						<h2 class="modal-title"><?php echo $langs->trans('TaskCreate') . ' ' . $refTaskMod->getNextValue('', $task) . '  ' . $langs->trans('AT') . '  ' . $langs->trans('Project') . '  ' . $project->getNomUrl() ?><i class="fas fa-info-circle wpeo-tooltip-event" aria-label="<?php echo $langs->trans('HowToSetDUProject'); ?>"></i></h2>
+						<h2 class="modal-title"><?php echo $langs->trans('TaskCreate') . ' ' . $taskNextValue . '  ' . $langs->trans('AT') . '  ' . $langs->trans('Project') . '  ' . $DUProject->getNomUrl() ?><i class="fas fa-info-circle wpeo-tooltip-event" aria-label="<?php echo $langs->trans('HowToSetDUProject'); ?>"></i></h2>
 						<div class="modal-close"><i class="fas fa-times"></i></div>
 					</div>
 					<!-- MODAL ADD RISK ASSESSMENT TASK CONTENT -->
@@ -217,8 +219,7 @@ $related_tasks = $risk->get_related_tasks($risk); ?>
 				<div class="modal-container wpeo-modal-event">
 					<!-- Modal-Header -->
 					<div class="modal-header">
-						<?php $project->fetch($conf->global->DIGIRISKDOLIBARR_DU_PROJECT); ?>
-						<h2 class="modal-title"><?php echo $langs->trans('TaskList') . ' ' . $risk->ref . '  ' . $langs->trans('AT') . '  ' . $langs->trans('Project') . '  ' . $project->getNomUrl()  ?><i class="fas fa-info-circle wpeo-tooltip-event" aria-label="<?php echo $langs->trans('HowToSetDUProject'); ?>"></i></h2>
+						<h2 class="modal-title"><?php echo $langs->trans('TaskList') . ' ' . $risk->ref . '  ' . $langs->trans('AT') . '  ' . $langs->trans('Project') . '  ' . $DUProject->getNomUrl()  ?><i class="fas fa-info-circle wpeo-tooltip-event" aria-label="<?php echo $langs->trans('HowToSetDUProject'); ?>"></i></h2>
 						<div class="modal-close"><i class="fas fa-times"></i></div>
 					</div>
 					<!-- MODAL RISK ASSESSMENT TASK LIST CONTENT -->
@@ -310,6 +311,7 @@ $related_tasks = $risk->get_related_tasks($risk); ?>
 		<!-- RISK ASSESSMENT TASK EDIT MODALS -->
 		<?php if ( ! empty($related_tasks) && $related_tasks > 0) : ?>
 			<?php foreach ($related_tasks as $related_task) : ?>
+				<?php $allTimeSpentArray = $timeSpentSortedByTasks[$related_task->id]; ?>
 				<div class="wpeo-modal riskassessment-task-edit-modal" id="risk_assessment_task_edit<?php echo $related_task->id ?>">
 					<div class="modal-container wpeo-modal-event">
 						<!-- Modal-Header -->
@@ -322,17 +324,19 @@ $related_tasks = $risk->get_related_tasks($risk); ?>
 							<div class="riskassessment-task-data" value="<?php echo $related_task->id ?>">
 								<span class="riskassessment-task-reference" value="<?php echo $related_task->ref ?>"><?php echo $related_task->getNomUrlTask(0, 'withproject'); ?></span>
 								<span class="riskassessment-task-author">
-									<?php $usertmp->fetch($related_task->fk_user_creat); ?>
-									<?php echo getNomUrlUser($usertmp); ?>
+									<?php $userAuthor = $usersList[$related_task->fk_user_creat?:$user->id];
+									echo getNomUrlUser($userAuthor); ?>
 								</span>
 								<span class="riskassessment-task-date">
 									<i class="fas fa-calendar-alt"></i> <?php echo date('d/m/Y', (($conf->global->DIGIRISKDOLIBARR_SHOW_TASK_START_DATE && ( ! empty($related_task->date_start))) ? $related_task->date_start : $related_task->date_c)) . (($conf->global->DIGIRISKDOLIBARR_SHOW_TASK_END_DATE && ( ! empty($related_task->date_end))) ? ' - ' . date('d/m/Y', $related_task->date_end) : ''); ?>
 								</span>
 								<span class="riskassessment-total-task-timespent riskassessment-total-task-timespent-<?php echo $related_task->id ?>">
-									<?php $allTimeSpentArray = $related_task->fetchAllTimeSpentAllUser('AND ptt.fk_task='.$related_task->id, 'task_datehour', 'DESC');
+									<?php
 									$allTimeSpent = 0;
-									foreach ($allTimeSpentArray as $timespent) {
-										$allTimeSpent += $timespent->timespent_duration;
+									if (is_array($allTimeSpentArray) && !empty($allTimeSpentArray)) {
+										foreach ($allTimeSpentArray as $timespent) {
+											$allTimeSpent += $timespent->timespent_duration;
+										}
 									}
 									?>
 									<i class="fas fa-clock"></i> <?php echo $allTimeSpent/60 . '/' . $related_task->planned_workload/60 ?>
@@ -460,7 +464,6 @@ $related_tasks = $risk->get_related_tasks($risk); ?>
 										</div>
 									<?php endif; ?>
 								</div>
-								<?php $allTimeSpentArray = $related_task->fetchAllTimeSpentAllUser('AND ptt.fk_task='.$related_task->id, 'task_datehour', 'DESC'); ?>
 								<div class="riskassessment-task-timespent-list" value="<?php echo $related_task->id ?>">
 									<ul class="wpeo-table table-flex riskassessment-task-timespent-list-<?php echo $related_task->id ?>">
 										<?php if (!empty($allTimeSpentArray) && $allTimeSpentArray > 0) : ?>
@@ -469,10 +472,10 @@ $related_tasks = $risk->get_related_tasks($risk); ?>
 													<input type="hidden" class="labelForDelete" value="<?php echo $langs->trans('DeleteTaskTimeSpent', $time_spent->timespent_duration/60) . ' ' . $related_task->ref . ' ?'; ?>">
 													<div class="table-row riskassessment-task-timespent-container">
 														<div class="table-cell table-padding-0 riskassessment-task-timespent-single">
-																			<span class="riskassessment-task-timespent-author">
-																				<?php $usertmp->fetch($time_spent->timespent_fk_user); ?>
-																				<?php echo getNomUrlUser($usertmp); ?>
-																			</span>
+															<span class="riskassessment-task-timespent-author">
+																<?php $userAuthor = $usersList[$time_spent->timespent_fk_user?:$user->id];
+																echo getNomUrlUser($userAuthor); ?>
+															</span>
 															<span class="riskassessment-task-timespent-date">
 																<i class="fas fa-calendar-alt"></i> <?php echo dol_print_date($time_spent->timespent_datehour, 'dayhour'); ?>
 															</span>
@@ -533,7 +536,7 @@ $related_tasks = $risk->get_related_tasks($risk); ?>
 						<div class="modal-container wpeo-modal-event">
 							<!-- Modal-Header -->
 							<div class="modal-header">
-								<h2 class="modal-title"><?php echo $langs->trans('TaskTimeSpentEdit') . ' ' . $task->getNomUrlTask(0, 'withproject') ?></h2>
+								<h2 class="modal-title"><?php echo $langs->trans('TaskTimeSpentEdit') . ' ' . $related_task->getNomUrlTask(0, 'withproject') ?></h2>
 								<div class="modal-close"><i class="fas fa-times"></i></div>
 							</div>
 							<!-- Modal EDIT RISK ASSESSMENT TASK Content-->
