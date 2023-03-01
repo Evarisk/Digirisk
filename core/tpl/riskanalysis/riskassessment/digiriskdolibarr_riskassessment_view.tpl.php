@@ -1,7 +1,8 @@
 <?php
-$lastEvaluation      = $evaluation->fetchFromParent($risk->id, 1);
-$allRiskAssessment   = $evaluation->fetchFromParent($risk->id, 0, 'DESC');
-$lastEvaluationCount = count($evaluation->fetchFromParent($risk->id));
+$allRiskAssessment = $riskAssessmentsOrderedByRisk[$risk->id];
+$lastEvaluation    = array_filter($allRiskAssessment, function($lastRiskAssessment) {
+	return $lastRiskAssessment->status == 1;
+});
 if ( ! empty($allRiskAssessment) && $allRiskAssessment > 0) : ?>
 	<div class="table-cell-header">
 		<div class="table-cell-header-label"><strong><?php echo $langs->trans('ListingHeaderCotation'); ?> (<?php echo count($allRiskAssessment); ?>)</strong></div>
@@ -125,8 +126,8 @@ if ( ! empty($allRiskAssessment) && $allRiskAssessment > 0) : ?>
 													<i class="fas fa-calendar-alt"></i> <?php echo date('d/m/Y', (($conf->global->DIGIRISKDOLIBARR_SHOW_RISKASSESSMENT_DATE && ( ! empty($lastEvaluation->date_riskassessment))) ? $lastEvaluation->date_riskassessment : $lastEvaluation->date_creation)); ?>
 												</span>
 												<span class="risk-evaluation-author">
-													<?php $user->fetch($lastEvaluation->fk_user_creat); ?>
-													<?php echo getNomUrlUser($user); ?>
+													<?php $userAuthor = $usersList[$lastEvaluation->fk_user_creat];
+													echo getNomUrlUser($userAuthor); ?>
 												</span>
 											</div>
 											<div class="risk-evaluation-comment">
@@ -223,9 +224,6 @@ else : ?>
 	</div>
 </div>
 <?php endif;
-$lastEvaluation         = new RiskAssessment($db);
-$lastEvaluation         = $evaluation->fetchFromParent($risk->id, 1);
-$lastEvaluation         = array_shift($lastEvaluation);
 $evaluation->method = $lastEvaluation->method ?: "standard" ;
 ?>
 <!-- RISK EVALUATION ADD MODAL-->
@@ -398,8 +396,8 @@ $evaluation->method = $lastEvaluation->method ?: "standard" ;
 											<i class="fas fa-calendar-alt"></i> <?php echo date('d/m/Y', (($conf->global->DIGIRISKDOLIBARR_SHOW_RISKASSESSMENT_DATE && ( ! empty($lastEvaluation->date_riskassessment))) ? $lastEvaluation->date_riskassessment : $lastEvaluation->date_creation)); ?>
 										</span>
 										<span class="risk-evaluation-author">
-											<?php $user->fetch($lastEvaluation->fk_user_creat); ?>
-											<?php echo getNomUrlUser($user); ?>
+											<?php $userAuthor = $usersList[$lastEvaluation->fk_user_creat];
+											echo getNomUrlUser($userAuthor); ?>
 										</span>
 									</div>
 									<div class="risk-evaluation-comment">

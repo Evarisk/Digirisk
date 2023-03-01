@@ -135,7 +135,7 @@
 						<div class="risk-evaluation-calculated-cotation"  style="<?php echo ($lastEvaluation->method == "advanced") ? " display:block" : " display:none" ?>">
 							<span class="title"><i class="fas fa-chart-line"></i> <?php echo $langs->trans('CalculatedCotation'); ?></span>
 							<div data-scale="<?php echo $lastEvaluation->get_evaluation_scale() ?>" class="risk-evaluation-cotation cotation">
-								<span><?php echo  $lastEvaluation->cotation ?: 0 ?></span>
+								<span><?php echo $lastEvaluation->cotation ?: 0 ?></span>
 							</div>
 						</div>
 						<div class="risk-evaluation-comment">
