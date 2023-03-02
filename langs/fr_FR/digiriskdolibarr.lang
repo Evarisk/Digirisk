@@ -1117,6 +1117,8 @@ RisksRepartition = Répartition des risques par cotation
 ShowRiskOrigin = Afficher la provenance du risque
 ShowRiskOriginDescription = Afficher la provenance des risques dans les documents (Fiche UT, Fiche GP, Document Unique, Listings de risques, etc.)
 SharedRiskImportWithSuccess = Risque importé avec succès
+RiskDeleted = Le risque %s a été supprimé
+
 
 # Stats - Statistiques
 GreyRisk = Risque faible

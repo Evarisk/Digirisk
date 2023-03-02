@@ -206,7 +206,9 @@ if ( ! $error && ($massaction == 'delete' || ($action == 'delete' && $confirm ==
 
 			$result = $risk->delete($user);
 
-			if ($result < 0) {
+			if ($result > 0) {
+				setEventMessages($langs->trans('RiskDeleted', $risk->ref), null);
+			} else {
 				// Delete risk KO
 				if ( ! empty($risk->errors)) setEventMessages(null, $risk->errors, 'errors');
 				else setEventMessages($risk->error, null, 'errors');
