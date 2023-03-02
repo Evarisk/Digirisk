@@ -465,34 +465,6 @@ class DigiriskSignatureUnitTest extends PHPUnit\Framework\TestCase
 		return $localobject;
 	}
 
-	/**
-	 * testDigiriskSignatureCheckSignatoriesSignatures
-	 *
-	 * @return void
-	 *
-	 * @covers DigiriskSignature::checkSignatoriesSignatures
-	 *
-	 * @depends testDigiriskSignatureUpdate
-	 * The depends says test is run only if previous is ok
-	 *
-	 * @throws Exception
-	 */
-	public function testDigiriskSignatureCheckSignatoriesSignatures($localobject) : void
-	{
-		global $conf, $user, $langs, $db;
-		$conf  = $this->savconf;
-		$user  = $this->savuser;
-		$langs = $this->savlangs;
-		$db    = $this->savdb;
-
-		$newobject = new DigiriskSignature($this->savdb);
-		$newobject->fetch($localobject->id);
-
-		$result = $newobject->checkSignatoriesSignatures($newobject->fk_object, $newobject->object_type);
-		$this->assertEquals($result, 0);
-
-		print __METHOD__ . " id=" . $localobject->id . " result=" . $result . "\n";
-	}
 
 	/**
 	 * testDigiriskSignatureSetSignatory
@@ -525,6 +497,36 @@ class DigiriskSignatureUnitTest extends PHPUnit\Framework\TestCase
 
 		print __METHOD__ . " result=" . $result . "\n";
 	}
+
+	/**
+	 * testDigiriskSignatureCheckSignatoriesSignatures
+	 *
+	 * @return void
+	 *
+	 * @covers DigiriskSignature::checkSignatoriesSignatures
+	 *
+	 * @depends testDigiriskSignatureUpdate
+	 * The depends says test is run only if previous is ok
+	 *
+	 * @throws Exception
+	 */
+	public function testDigiriskSignatureCheckSignatoriesSignatures($localobject) : void
+	{
+		global $conf, $user, $langs, $db;
+		$conf  = $this->savconf;
+		$user  = $this->savuser;
+		$langs = $this->savlangs;
+		$db    = $this->savdb;
+
+		$newobject = new DigiriskSignature($this->savdb);
+		$newobject->fetch($localobject->id);
+
+		$result = $newobject->checkSignatoriesSignatures($newobject->fk_object, $newobject->object_type);
+		$this->assertEquals($result, 0);
+
+		print __METHOD__ . " id=" . $localobject->id . " result=" . $result . "\n";
+	}
+
 
 	/**
 	 * testDigiriskSignatureFetchAll

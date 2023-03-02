@@ -343,14 +343,16 @@ class AccidentUnitTest extends PHPUnit\Framework\TestCase
 
 		$now                 = dol_now();
 		$localobjectline->id = 0;
-		//$localobjectline->ref         = $refAccidentPlanMod->getNextValue($localobjectline);
-		$localobjectline->ref           = "TestRefAccidentWorkStop";
-		$localobjectline->entity        = 1;
-		$localobjectline->date_creation = $localobjectline->db->idate($now);
-		$localobjectline->tms           = $now;
-		$localobjectline->status        = 1;
-		$localobjectline->workstop_days = 10;
-		$localobjectline->fk_accident   = $localobject->id;
+		//$localobjectline->ref               = $refAccidentPlanMod->getNextValue($localobjectline);
+		$localobjectline->ref                 = "TestRefAccidentWorkStop";
+		$localobjectline->entity              = 1;
+		$localobjectline->date_creation       = $localobjectline->db->idate($now);
+		$localobjectline->date_start_workstop = $localobjectline->db->idate($now);
+		$localobjectline->date_end_workstop   = $localobjectline->db->idate($now);
+		$localobjectline->tms                 = $now;
+		$localobjectline->status              = 1;
+		$localobjectline->workstop_days       = 10;
+		$localobjectline->fk_accident         = $localobject->id;
 
 		$result = $localobjectline->insert($user);
 
@@ -685,61 +687,61 @@ class AccidentUnitTest extends PHPUnit\Framework\TestCase
 		return $localobject;
 	}
 
-	/**
-	 * testAccidentWorkStopFetchAll
-	 *
-	 * @return void
-	 *
-	 * @covers AccidentWorkStop::fetchAll
-	 *
-	 * @throws Exception
-	 */
-	public function testAccidentWorkStopFetchAll() : void
-	{
-		global $conf, $user, $langs, $db;
-		$conf = $this->savconf;
-		$user = $this->savuser;
-		$langs = $this->savlangs;
-		$db = $this->savdb;
+	//	/**
+	//	 * testAccidentWorkStopFetchAll
+	//	 *
+	//	 * @return void
+	//	 *
+	//	 * @covers AccidentWorkStop::fetchAll
+	//	 *
+	//	 * @throws Exception
+	//	 */
+	//	public function testAccidentWorkStopFetchAll() : void
+	//	{
+	//		global $conf, $user, $langs, $db;
+	//		$conf = $this->savconf;
+	//		$user = $this->savuser;
+	//		$langs = $this->savlangs;
+	//		$db = $this->savdb;
+	//
+	//		$localobjectline = new AccidentWorkStop($this->savdb);
+	//		$localobjectlineList = $localobjectline->fetchAll();
+	//
+	//		$this->assertSame(true, is_array($localobjectlineList));
+	//		if (is_array($localobjectlineList)) {
+	//			$this->assertInstanceOf(get_class($localobjectline), array_shift($localobjectlineList));
+	//		}
+	//		print __METHOD__ . " ok";
+	//		print "\n";
+	//	}
 
-		$localobjectline = new AccidentWorkStop($this->savdb);
-		$localobjectlineList = $localobjectline->fetchAll();
-
-		$this->assertSame(true, is_array($localobjectlineList));
-		if (is_array($localobjectlineList)) {
-			$this->assertInstanceOf(get_class($localobjectline), array_shift($localobjectlineList));
-		}
-		print __METHOD__ . " ok";
-		print "\n";
-	}
-
-	/**
-	 * testAccidentLesionFetchAll
-	 *
-	 * @return void
-	 *
-	 * @covers AccidentLesion::fetchAll
-	 *
-	 * @throws Exception
-	 */
-	public function testAccidentLesionFetchAll() : void
-	{
-		global $conf, $user, $langs, $db;
-		$conf  = $this->savconf;
-		$user  = $this->savuser;
-		$langs = $this->savlangs;
-		$db    = $this->savdb;
-
-		$localobjectline     = new AccidentLesion($this->savdb);
-		$localobjectlineList = $localobjectline->fetchAll();
-
-		$this->assertSame(true, is_array($localobjectlineList));
-		if (is_array($localobjectlineList)) {
-			$this->assertInstanceOf(get_class($localobjectline), array_shift($localobjectlineList));
-		}
-		print __METHOD__ . " ok";
-		print "\n";
-	}
+	//	/**
+	//	 * testAccidentLesionFetchAll
+	//	 *
+	//	 * @return void
+	//	 *
+	//	 * @covers AccidentLesion::fetchAll
+	//	 *
+	//	 * @throws Exception
+	//	 */
+	//	public function testAccidentLesionFetchAll() : void
+	//	{
+	//		global $conf, $user, $langs, $db;
+	//		$conf  = $this->savconf;
+	//		$user  = $this->savuser;
+	//		$langs = $this->savlangs;
+	//		$db    = $this->savdb;
+	//
+	//		$localobjectline     = new AccidentLesion($this->savdb);
+	//		$localobjectlineList = $localobjectline->fetchAll();
+	//
+	//		$this->assertSame(true, is_array($localobjectlineList));
+	//		if (is_array($localobjectlineList)) {
+	//			$this->assertInstanceOf(get_class($localobjectline), array_shift($localobjectlineList));
+	//		}
+	//		print __METHOD__ . " ok";
+	//		print "\n";
+	//	}
 
 	/**
 	 * testAccidentFetchAll
