@@ -491,7 +491,7 @@ class ActionsDigiriskdolibarr
 			$upload_dir = $conf->digiriskdolibarr->multidir_output[isset($conf->entity) ? $conf->entity : 1];
 
 			// Action to generate pdf from odt file
-			require_once __DIR__ . '/../../core/tpl/documents/digiriskdolibarr_manual_pdf_generation_action.tpl.php';
+			require_once __DIR__ . '/../core/tpl/documents/digiriskdolibarr_manual_pdf_generation_action.tpl.php';
 
 			if ($action == 'pdfGeneration') {
 				$urltoredirect = $_SERVER['REQUEST_URI'];
