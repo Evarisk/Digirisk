@@ -3,7 +3,10 @@ $allRiskAssessment = $riskAssessmentsOrderedByRisk[$risk->id];
 $lastEvaluation    = array_filter($allRiskAssessment, function($lastRiskAssessment) {
 	return $lastRiskAssessment->status == 1;
 });
-if ( ! empty($allRiskAssessment) && $allRiskAssessment > 0) : ?>
+if (is_array($allRiskAssessment) && !empty($allRiskAssessment)) :
+	usort($allRiskAssessment, function ($riskAssessmentComparer, $riskAssessmentCompared) {
+	return $riskAssessmentComparer->date_creation < $riskAssessmentCompared->date_creation;
+	}); ?>
 	<div class="table-cell-header">
 		<div class="table-cell-header-label"><strong><?php echo $langs->trans('ListingHeaderCotation'); ?> (<?php echo count($allRiskAssessment); ?>)</strong></div>
 		<div class="table-cell-header-actions">
