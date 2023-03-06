@@ -2691,7 +2691,6 @@ window.eoxiaJS.riskassessmenttask.createRiskAssessmentTask = function ( event ) 
 
 			let actionContainerError = $('.messageErrorTaskCreate');
 			$('#risk_assessment_task_add'+riskToAssign).removeClass('modal-active')
-			$('.wpeo-loader').removeClass('wpeo-loader')
 
 			let textToShow = '';
 
