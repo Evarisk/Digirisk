@@ -2246,8 +2246,12 @@ window.eoxiaJS.evaluation.createEvaluation = function ( event ) {
 		processData: false,
 		contentType: false,
 		success: function( resp ) {
-			//refresh risk assessment list
-			$('.risk-evaluation-list-container-' + riskToAssign).html($(resp).find('.risk-evaluation-list-container-' + riskToAssign).children())
+
+			if ($(resp).find('.risk-evaluation-list-container-' + riskToAssign).length > 0) {
+				$('.risk-evaluation-list-container-' + riskToAssign).html($(resp).find('.risk-evaluation-list-container-' + riskToAssign).children())
+			} else {
+				$('.div-table-responsive').html($(resp).find('.div-table-responsive').children());
+			}
 
 			let actionContainerSuccess = $('.messageSuccessEvaluationCreate');
 
@@ -2414,21 +2418,34 @@ window.eoxiaJS.evaluation.saveEvaluation = function ( event ) {
 		contentType: false,
 		success: function ( resp ) {
 			$('#risk_evaluation_edit'+evaluationID).removeClass('modal-active')
-			if (fromList) {
-				$('.risk-evaluation-ref-'+evaluationID+':not(.last-risk-assessment)').fadeOut(800);
-				$('.risk-evaluation-ref-'+evaluationID+':not(.last-risk-assessment)').fadeIn(800);
+
+			if ($(resp).find('.risk-evaluation-container.risk-evaluation-container-'+evaluationID+':not(.last-risk-assessment)').length > 0) {
+				if (fromList) {
+					$('.risk-evaluation-ref-'+evaluationID+':not(.last-risk-assessment)').fadeOut(800);
+					$('.risk-evaluation-ref-'+evaluationID+':not(.last-risk-assessment)').fadeIn(800);
+				} else {
+					$('.risk-evaluation-container-'+evaluationID+':not(.last-risk-assessment)').fadeOut(800);
+					$('.risk-evaluation-container-'+evaluationID+':not(.last-risk-assessment)').fadeIn(800);
+				}
+				//refresh risk assessment single in modal list
+				listModalContainer.find('.risk-evaluation-ref-'+evaluationID).html($(resp).find('.risk-evaluation-ref-'+evaluationID).children())
+
+				//refresh risk assessment single in list
+				$('.risk-evaluation-container.risk-evaluation-container-'+evaluationID+':not(.last-risk-assessment)').html($(resp).find('.risk-evaluation-container.risk-evaluation-container-'+evaluationID+':not(.last-risk-assessment)').children())
+
+				//refresh risk assessment add modal to actualize last risk assessment
+				$('#risk_evaluation_add' + riskId).html($(resp).find('#risk_evaluation_add' + riskId).children())
 			} else {
-				$('.risk-evaluation-container-'+evaluationID+':not(.last-risk-assessment)').fadeOut(800);
-				$('.risk-evaluation-container-'+evaluationID+':not(.last-risk-assessment)').fadeIn(800);
+				$('.div-table-responsive').html($(resp).find('.div-table-responsive').children());
+
+				if (fromList) {
+					$('.risk-evaluation-ref-'+evaluationID+':not(.last-risk-assessment)').fadeOut(800);
+					$('.risk-evaluation-ref-'+evaluationID+':not(.last-risk-assessment)').fadeIn(800);
+				} else {
+					$('.risk-evaluation-container-'+evaluationID+':not(.last-risk-assessment)').fadeOut(800);
+					$('.risk-evaluation-container-'+evaluationID+':not(.last-risk-assessment)').fadeIn(800);
+				}
 			}
-			//refresh risk assessment single in modal list
-			listModalContainer.find('.risk-evaluation-ref-'+evaluationID).html($(resp).find('.risk-evaluation-ref-'+evaluationID).children())
-
-			//refresh risk assessment single in list
-			$('.risk-evaluation-container.risk-evaluation-container-'+evaluationID+':not(.last-risk-assessment)').html($(resp).find('.risk-evaluation-container.risk-evaluation-container-'+evaluationID+':not(.last-risk-assessment)').children())
-
-			//refresh risk assessment add modal to actualize last risk assessment
-			$('#risk_evaluation_add' + riskId).html($(resp).find('#risk_evaluation_add' + riskId).children())
 
 			$('.wpeo-loader').removeClass('wpeo-loader')
 			let actionContainerSuccess = $('.messageSuccessEvaluationEdit');
