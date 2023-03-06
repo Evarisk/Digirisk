@@ -1,4 +1,6 @@
 <!-- RISK EVALUATION SINGLE START -->
+<?php if ($showSingle > 0) : ?>
+
 <div class="risk-evaluation-container risk-evaluation-container-<?php echo $lastEvaluation->id ?>" value="<?php echo $risk->id ?>">
 	<div class="risk-evaluation-single-content risk-evaluation-single-content-<?php echo $risk->id ?>">
 		<div class="risk-evaluation-single risk-evaluation-single-<?php echo $risk->id ?>">
@@ -39,6 +41,10 @@
 			<?php endif; ?>
 		</div>
 	</div>
-	<?php require __DIR__ . '/digiriskdolibarr_riskassessment_view_edit_modal.tpl.php'; ?>
 </div>
+
+<?php endif; ?>
+
+<?php require __DIR__ . '/digiriskdolibarr_riskassessment_view_edit_modal.tpl.php'; ?>
+
 <!-- RISK EVALUATION SINGLE END -->

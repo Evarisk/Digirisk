@@ -34,16 +34,17 @@ if (is_array($allRiskAssessment) && !empty($allRiskAssessment)) :
 	</div>
 	<?php
 	print '<div class="risk-evaluation-list-content risk-evaluation-list-content-'. $risk->id .'">';
-	if ($conf->global->DIGIRISKDOLIBARR_SHOW_ALL_RISKASSESSMENTS) {
-		foreach ($allRiskAssessment as $lastEvaluation) {
-			require __DIR__ . '/digiriskdolibarr_riskassessment_view_single.tpl.php';
+	$riskAssessmentShown = 0;
+	foreach ($allRiskAssessment as $lastEvaluation) {
+		if ($conf->global->DIGIRISKDOLIBARR_SHOW_ALL_RISKASSESSMENTS || $riskAssessmentShown == 0) {
+			$showSingle = 1;
+			$riskAssessmentShown = 1;
+		} else {
+			$showSingle = 0;
 		}
-	} else {
-		if (is_array($lastEvaluation) && !empty($lastEvaluation)) {
-			$lastEvaluation = array_shift($lastEvaluation);
-			require __DIR__ . '/digiriskdolibarr_riskassessment_view_single.tpl.php';
-		}
+		require __DIR__ . '/digiriskdolibarr_riskassessment_view_single.tpl.php';
 	}
+
 	print '</div>'; ?>
 	<!-- RISK EVALUATION LIST MODAL -->
 	<div class="risk-evaluation-list-modal risk-evaluation-list-modal-<?php echo $risk->id ?>">
