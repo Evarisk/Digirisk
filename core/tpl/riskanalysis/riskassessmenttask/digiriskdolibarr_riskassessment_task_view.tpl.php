@@ -1,8 +1,5 @@
 <?php
-//$related_tasks = $riskAssessmentTaskList[$risk->id];
-//
-$related_tasks = $risk->get_related_tasks($risk);
-
+$related_tasks = $riskAssessmentTaskList[$risk->id];
 ?>
 <div class="wpeo-table riskassessment-tasks riskassessment-tasks<?php echo $risk->id ?>" value="<?php echo $risk->id ?>">
 	<div class="table-cell riskassessment-task-listing-wrapper riskassessment-task-listing-wrapper-<?php echo $risk->id ?>">
