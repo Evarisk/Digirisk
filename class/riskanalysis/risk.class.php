@@ -190,10 +190,10 @@ class Risk extends CommonObject
 		$objects = $object->getActiveDigiriskElements();
 
 		$risk    = new Risk($this->db);
-		$riskList   = $risk->fetchAll();
+		$riskList   = $risk->fetchAll('', '', 0, 0, array(), 'AND', $get_shared_data ? 1 : 0);
 
 		$riskAssessment = new RiskAssessment($this->db);
-		$riskAssessmentList = $riskAssessment->fetchAll('', '', 0, 0, ['customsql' => 'status = 1']);
+		$riskAssessmentList = $riskAssessment->fetchAll('', '', 0, 0, ['customsql' => 'status = 1'], 'AND', $get_shared_data ? 1 : 0);
 
 		if (is_array($riskAssessmentList) && !empty($riskAssessmentList)) {
 			foreach ($riskAssessmentList as $riskAssessmentSingle) {
@@ -237,7 +237,7 @@ class Risk extends CommonObject
 		//for groupment & workunit document if get inherited risks conf is activated
 		if ( $get_parents_data ) {
 			if ($parent_id > 0) {
-				$parent_element_id = $objects[$parent_id]->id;
+				$parent_element_id = $objects[$parent_id]->fk_parent;
 				while ($parent_element_id > 0) {
 					if (is_array($risksOrderedByDigiriskElement[$parent_element_id]) && !empty($risksOrderedByDigiriskElement[$parent_element_id])) {
 						foreach($risksOrderedByDigiriskElement[$parent_element_id] as $riskOfParentDigiriskElement) {
@@ -269,47 +269,34 @@ class Risk extends CommonObject
 
 		//For all documents
 		if ( $get_shared_data ) {
-			$digiriskelementtmp = new DigiriskElement($this->db);
 			if ($parent_id == 0) {
-				$digiriskelement_flatlist = $digiriskelementtmp->fetchDigiriskElementFlat(0);
-				if (is_array($digiriskelement_flatlist) && !empty($digiriskelement_flatlist)) {
-					foreach ($digiriskelement_flatlist as $sub_digiriskelement) {
-						$digiriskelement = $sub_digiriskelement['object'];
-						$digiriskelement->fetchObjectLinked(null, '', $digiriskelement->id, 'digiriskdolibarr_digiriskelement', 'AND', 1, 'sourcetype', 0);
-						if (!empty($digiriskelement->linkedObjectsIds['digiriskdolibarr_risk'])) {
-							foreach ($digiriskelement->linkedObjectsIds['digiriskdolibarr_risk'] as $risk_id) {
-								$risktmp = new self($this->db);
-								$risktmp->fetch($risk_id);
-								if (!array_key_exists($risktmp->fk_element, $trashList)) {
-									$evaluation     = new RiskAssessment($this->db);
-									$lastEvaluation = $evaluation->fetchFromParent($risktmp->id, 1);
-									if ( $lastEvaluation > 0 && ! empty($lastEvaluation)  && is_array($lastEvaluation)) {
-										$lastEvaluation       = array_shift($lastEvaluation);
-										$risktmp->lastEvaluation = $lastEvaluation;
-									}
-									$risktmp->appliedOn = $digiriskelement->id;
-									$risks[] = $risktmp;
+				$digiriskElementsOfEntity = $object->getActiveDigiriskElements();
+				if (is_array($digiriskElementsOfEntity) && !empty($digiriskElementsOfEntity)) {
+					foreach ($digiriskElementsOfEntity as $digiriskElementOfEntity) {
+						$digiriskElementOfEntity->fetchObjectLinked(null, '', $digiriskElementOfEntity->id, 'digiriskdolibarr_digiriskelement', 'AND', 1, 'sourcetype', 0);
+
+						if (!empty($digiriskElementOfEntity->linkedObjectsIds['digiriskdolibarr_risk'])) {
+							foreach ($digiriskElementOfEntity->linkedObjectsIds['digiriskdolibarr_risk'] as $sharedRiskId) {
+								$sharedRisk = $riskList[$sharedRiskId];
+								if (is_object($sharedRisk)) {
+									$sharedRisk->appliedOn = $digiriskElementOfEntity->id;
+									$risks[] = $sharedRisk;
 								}
 							}
 						}
 					}
 				}
 			} else {
-				$digiriskelementtmp->fetch($parent_id);
-				$digiriskelementtmp->fetchObjectLinked(null, '', $digiriskelementtmp->id, 'digiriskdolibarr_digiriskelement', 'AND', 1, 'sourcetype', 0);
-				if (!empty($digiriskelementtmp->linkedObjectsIds['digiriskdolibarr_risk'])) {
-					foreach ($digiriskelementtmp->linkedObjectsIds['digiriskdolibarr_risk'] as $risk_id) {
-						$risktmp = new self($this->db);
-						$risktmp->fetch($risk_id);
-						if (array_key_exists($risktmp->fk_element, $objects)) {
-							$evaluation = new RiskAssessment($this->db);
-							$lastEvaluation = $evaluation->fetchFromParent($risktmp->id, 1);
-							if ($lastEvaluation > 0 && !empty($lastEvaluation) && is_array($lastEvaluation)) {
-								$lastEvaluation = array_shift($lastEvaluation);
-								$risktmp->lastEvaluation = $lastEvaluation;
+				if (array_key_exists($parent_id, $objects)) {
+					$parentElement = $objects[$parent_id];
+					$parentElement->fetchObjectLinked(null, '', $parent_id, 'digiriskdolibarr_digiriskelement', 'AND', 1, 'sourcetype', 0);
+					if (!empty($parentElement->linkedObjectsIds['digiriskdolibarr_risk'])) {
+						foreach ($parentElement->linkedObjectsIds['digiriskdolibarr_risk'] as $sharedRiskId) {
+							$sharedRisk = $riskList[$sharedRiskId];
+							if (is_object($sharedRisk)) {
+								$sharedRisk->appliedOn = $parent_id;
+								$risks[] = $sharedRisk;
 							}
-							$risktmp->appliedOn = $parent_id;
-							$risks[] = $risktmp;
 						}
 					}
 				}
@@ -338,7 +325,7 @@ class Risk extends CommonObject
 	 * @return array|int                 int <0 if KO, array of pages if OK
 	 * @throws Exception
 	 */
-	public function fetchAll($sortorder = '', $sortfield = '', $limit = 0, $offset = 0, array $filter = array(), $filtermode = 'AND')
+	public function fetchAll($sortorder = '', $sortfield = '', $limit = 0, $offset = 0, array $filter = array(), $filtermode = 'AND', $multientityfetch = 0)
 	{
 		dol_syslog(__METHOD__, LOG_DEBUG);
 
@@ -347,7 +334,7 @@ class Risk extends CommonObject
 		$sql                                                                              = 'SELECT ';
 		$sql                                                                             .= $this->getFieldList();
 		$sql                                                                             .= ' FROM ' . MAIN_DB_PREFIX . $this->table_element . ' as t';
-		if (isset($this->ismultientitymanaged) && $this->ismultientitymanaged == 1) $sql .= ' WHERE t.entity IN (' . getEntity($this->element) . ')';
+		if (isset($this->ismultientitymanaged) && $this->ismultientitymanaged == 1 && !$multientityfetch) $sql .= ' WHERE t.entity IN (' . getEntity($this->element) . ')';
 		else $sql                                                                        .= ' WHERE 1 = 1';
 
 		// Manage filter

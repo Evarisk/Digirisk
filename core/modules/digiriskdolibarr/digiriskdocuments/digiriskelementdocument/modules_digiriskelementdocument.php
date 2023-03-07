@@ -199,7 +199,7 @@ abstract class ModeleODTDigiriskElementDocument extends CommonDocGenerator
 					if ( ! empty($digiriskelement) ) {
 						//Fill risks data
 						$risks = $risk->fetchRisksOrderedByCotation($digiriskelement->id, false, $conf->global->DIGIRISKDOLIBARR_SHOW_INHERITED_RISKS_IN_DOCUMENTS, $conf->global->DIGIRISKDOLIBARR_SHOW_SHARED_RISKS);
-						$object->fillRiskData($odfHandler, $object, $outputlangs, $tmparray, $file, $risks);
+						$object->fillRiskData($odfHandler, $object, $outputlangs, $tmparray, $file, $risks, $conf->global->DIGIRISKDOLIBARR_SHOW_SHARED_RISKS);
 
 						//Fill evaluators data
 						$evaluators = $evaluator->fetchFromParent($digiriskelement->id);

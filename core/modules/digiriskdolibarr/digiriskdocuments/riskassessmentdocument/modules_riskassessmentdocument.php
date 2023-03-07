@@ -325,7 +325,7 @@ abstract class ModeleODTRiskAssessmentDocument extends CommonDocGenerator
 					}
 
 					//Fill risks data
-					$object->fillRiskData($odfHandler, $object, $outputlangs, $tmparray, $file, $risks);
+					$object->fillRiskData($odfHandler, $object, $outputlangs, $tmparray, $file, $risks, $conf->global->DIGIRISKDOLIBARR_SHOW_SHARED_RISKS);
 
 					//Fill tickets data
 					$filter = array('t.fk_project' => $conf->global->DIGIRISKDOLIBARR_TICKET_PROJECT);

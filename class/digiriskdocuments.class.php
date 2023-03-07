@@ -430,7 +430,7 @@ class DigiriskDocuments extends CommonObject
 	 * @return void
 	 * @throws Exception
 	 */
-	public function fillRiskData($odfHandler, $object, $outputlangs, $tmparray, $file, $risks)
+	public function fillRiskData($odfHandler, $object, $outputlangs, $tmparray, $file, $risks, $allEntities = false)
 	{
 		global $action, $conf, $hookmanager, $langs;
 
@@ -442,7 +442,7 @@ class DigiriskDocuments extends CommonObject
 
 		$DUProject->fetch($conf->global->DIGIRISKDOLIBARR_DU_PROJECT);
 
-		$activeDigiriskElements = $digiriskelementobject->getActiveDigiriskElements();
+		$activeDigiriskElements = $digiriskelementobject->getActiveDigiriskElements($allEntities ? 1 : 0);
 		$tasksSortedByRisk = $risk->getTasksWithFkRisk();
 
 		for ($i = 1; $i <= 4; $i++ ) {
