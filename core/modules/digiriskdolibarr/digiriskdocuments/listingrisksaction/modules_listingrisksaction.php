@@ -193,7 +193,7 @@ abstract class ModeleODTListingRisksAction extends CommonDocGenerator
 					$risk  = new Risk($this->db);
 
 					$risks = $risk->fetchRisksOrderedByCotation($digiriskelement->id > 0 ? $digiriskelement->id : 0, true, $conf->global->DIGIRISKDOLIBARR_SHOW_INHERITED_RISKS_IN_DOCUMENTS, $conf->global->DIGIRISKDOLIBARR_SHOW_SHARED_RISKS);
-					$object->fillRiskData($odfHandler, $object, $outputlangs, $tmparray, $file, $risks);
+					$object->fillRiskData($odfHandler, $object, $outputlangs, $tmparray, $file, $risks, $conf->global->DIGIRISKDOLIBARR_SHOW_SHARED_RISKS);
 				}
 			} catch (OdfException $e) {
 				$this->error = $e->getMessage();
