@@ -304,9 +304,6 @@ if ($sharedrisks) {
 					$importValue .=  '</span>';
 					$importValue .= '</div>';
 
-					if ($alreadyImported == 0 && $previousDigiriskElement != $digiriskelementtmp->id) {
-						$importValue .= '<input type="checkbox" id="select_all_shared_elements_by_digiriskelement" name="' . $digiriskelementtmp->id . '" value="0">';
-					}
 					$previousDigiriskElement = $digiriskelementtmp->id;
 
 					if ($alreadyImported > 0) {
