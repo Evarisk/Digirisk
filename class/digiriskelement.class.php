@@ -681,10 +681,15 @@ class DigiriskElement extends CommonObject
 	 * 	@return    array  Array with ids
 	 * 	@throws Exception
 	 */
-	public function getActiveDigiriskElements()
+	public function getActiveDigiriskElements($allEntities = 0)
 	{
+		global $conf;
 		$object = new self($this->db);
-		$objects = $object->fetchAll('',  '',  0,  0, array('customsql' => 'status > 0' ));
+		if ($allEntities == 1) {
+			$object->ismultientitymanaged = 0;
+		}
+		$objects = $object->fetchAll('',  '',  0,  0, array('customsql' => 'status > 0'));
+
 		$trashList = $object->getMultiEntityTrashList();
 		if (!empty($trashList) && is_array($trashList)) {
 			foreach($trashList as $trash_element_id) {
