@@ -16,9 +16,36 @@
 	if ($object->fk_parent > 0) {
 		$advanced_method_cotation_json = file_get_contents(DOL_DOCUMENT_ROOT . '/custom/digiriskdolibarr/js/json/default.json');
 		$advanced_method_cotation_array = json_decode($advanced_method_cotation_json, true);
-		$digiriskelement = new DigiriskElement($db);
-		$digiriskelement->fetch($conf->global->DIGIRISKDOLIBARR_DIGIRISKELEMENT_TRASH);
-		$trashList = $digiriskelement->getTrashList();
+
+		$digiriskelement                = new DigiriskElement($db);
+		$riskAssessment                 = new RiskAssessment($db);
+		$digiriskTask                   = new DigiriskTask($db);
+		$extrafields                    = new Extrafields($db);
+		$usertmp                        = new User($db);
+		$project                        = new Project($db);
+		$DUProject                      = new Project($db);
+
+		$advanced_method_cotation_json  = file_get_contents(DOL_DOCUMENT_ROOT . '/custom/digiriskdolibarr/js/json/default.json');
+		$advanced_method_cotation_array = json_decode($advanced_method_cotation_json, true);
+
+		$alldigiriskelement = $digiriskelement->getActiveDigiriskElements();
+
+		$DUProject->fetch($conf->global->DIGIRISKDOLIBARR_DU_PROJECT);
+		$extrafields->fetch_name_optionals_label($digiriskTask->table_element);
+
+		$riskAssessmentList        = $riskAssessment->fetchAll();
+		$riskAssessmentNextValue   = $refEvaluationMod->getNextValue($evaluation);
+		$riskAssessmentTaskList    = $risk->getTasksWithFkRisk();
+		$taskNextValue             = $refTaskMod->getNextValue('', $task);
+		$usertmp->fetchAll();
+		$usersList                 = $usertmp->users;
+		$timeSpentSortedByTasks    = $digiriskTask->fetchAllTimeSpentAllUser('AND ptt.fk_task > 0', 'task_datehour', 'DESC', 1);
+
+		if (is_array($riskAssessmentList) && !empty($riskAssessmentList)) {
+			foreach ($riskAssessmentList as $riskAssessmentSingle) {
+				$riskAssessmentsOrderedByRisk[$riskAssessmentSingle->fk_risk][$riskAssessmentSingle->id] = $riskAssessmentSingle;
+			}
+		}
 		// Build and execute select
 		// --------------------------------------------------------------------
 		if (!preg_match('/(evaluation)/', $sortfield)) {
@@ -44,17 +71,23 @@
 				$inherited_risk_id = $object->fk_parent;
 				$sql .= " AND t.fk_element IN (" . $inherited_risk_id;
 				while ($inherited_risk_id > 0) {
-					$digiriskelementtmp = new DigiriskElement($db);
-					$digiriskelementtmp->fetch($inherited_risk_id);
-					$inherited_risk_id = $digiriskelementtmp->fk_parent;
+					$inherited_risk_id = $alldigiriskelement[$inherited_risk_id]->fk_parent;
 					if ($inherited_risk_id > 0) {
 						$sql .= ',' . $inherited_risk_id;
 					}
 				}
 				$sql .= ")";
 			} else {
-				foreach ($trashList as $deleted_element => $element_id) {
-					$sql .= " AND fk_element !=" . $element_id;
+				if (is_array($alldigiriskelement) && !empty($alldigiriskelement)) {
+					$digiriskElementSqlFilter = '(';
+					foreach (array_keys($alldigiriskelement) as $elementId) {
+						$digiriskElementSqlFilter .= $elementId . ', ';
+					}
+					if (preg_match('/, /', $digiriskElementSqlFilter)) {
+						$digiriskElementSqlFilter = rtrim($digiriskElementSqlFilter, ', ');
+					}
+					$digiriskElementSqlFilter .= ')';
+					$sql .= " AND r.fk_element IN " . $digiriskElementSqlFilter;
 				}
 				$sql .= " AND fk_element > 0 ";
 				$sql .= " AND e.entity IN (" . getEntity($risk->element) . ") ";
@@ -151,17 +184,23 @@
 				$inherited_risk_id = $object->fk_parent;
 				$sql .= " AND r.fk_element IN (" . $inherited_risk_id;
 				while ($inherited_risk_id > 0) {
-					$digiriskelementtmp = new DigiriskElement($db);
-					$digiriskelementtmp->fetch($inherited_risk_id);
-					$inherited_risk_id = $digiriskelementtmp->fk_parent;
+					$inherited_risk_id = $alldigiriskelement[$inherited_risk_id]->fk_parent;
 					if ($inherited_risk_id > 0) {
 						$sql .= ',' . $inherited_risk_id;
 					}
 				}
 				$sql .= ")";
 			} else {
-				foreach ($trashList as $deleted_element => $element_id) {
-					$sql .= " AND r.fk_element !=" . $element_id;
+				if (is_array($alldigiriskelement) && !empty($alldigiriskelement)) {
+					$digiriskElementSqlFilter = '(';
+					foreach (array_keys($alldigiriskelement) as $elementId) {
+						$digiriskElementSqlFilter .= $elementId . ', ';
+					}
+					if (preg_match('/, /', $digiriskElementSqlFilter)) {
+						$digiriskElementSqlFilter = rtrim($digiriskElementSqlFilter, ', ');
+					}
+					$digiriskElementSqlFilter .= ')';
+					$sql .= " AND r.fk_element IN " . $digiriskElementSqlFilter;
 				}
 				$sql .= " AND r.fk_element > 0";
 				$sql .= " AND e.entity IN (" . getEntity($evaluation->element) . ")";
@@ -291,13 +330,6 @@
 	$arrayfields = dol_sort_array($arrayfields, 'position');
 
 	$menuConf = 'MAIN_SELECTEDFIELDS_' . $varpage;
-//echo '<pre>'; print_r( $user->conf->$menuConf ); echo '</pre>';
-//$newarray = explode(',', $user->conf->$menuConf);
-//$newarray = array_unique($newarray);
-//$user->conf->$menuConf = implode(',',$newarray);
-//echo '<pre>'; print_r( $newarray ); echo '</pre>';
-//
-//echo '<pre>'; print_r( $arrayfields ); echo '</pre>';
 
 	if (dol_strlen($user->conf->$menuConf) < 1) {
 		$user->conf->$menuConf = 't.fk_element,t.ref,t.category,evaluation.cotation,';
@@ -453,11 +485,9 @@
 			if ( ! empty($arrayfields['t.' . $key]['checked'])) {
 				print '<td' . ($cssforfield ? ' class="' . $cssforfield . '"' : '') . ' style="width:2%">';
 				if ($key == 'status') print $risk->getLibStatut(5);
-				elseif ($key == 'fk_element') { ?>
-					<?php $parent_element = new DigiriskElement($db);
-					$result               = $parent_element->fetch($risk->fk_element);
-					if ($result > 0) {
-						print $parent_element->getNomUrl(1, 'blank', 1);
+				elseif ($key == 'fk_element') {
+					if (is_object($alldigiriskelement[$risk->fk_element])) {
+						print $alldigiriskelement[$risk->fk_element]->getNomUrl(1, 'blank', 1);
 					}
 				} elseif ($key == 'category') { ?>
 					<div class="table-cell table-50 cell-risk" data-title="Risque">
