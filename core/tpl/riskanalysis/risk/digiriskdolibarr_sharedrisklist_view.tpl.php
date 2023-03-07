@@ -64,7 +64,6 @@ $advanced_method_cotation_array = json_decode($advanced_method_cotation_json, tr
 $alldigiriskelement = $digiriskelement->getActiveDigiriskElements(1);
 $digiriskElementsOfEntity = $digiriskelement->getActiveDigiriskElements();
 
-
 $DUProject->fetch($conf->global->DIGIRISKDOLIBARR_DU_PROJECT);
 $extrafields->fetch_name_optionals_label($digiriskTask->table_element);
 
@@ -75,7 +74,6 @@ $taskNextValue             = $refTaskMod->getNextValue('', $task);
 $usertmp->fetchAll();
 $usersList                 = $usertmp->users;
 $timeSpentSortedByTasks    = $digiriskTask->fetchAllTimeSpentAllUser('AND ptt.fk_task > 0', 'task_datehour', 'DESC', 1);
-
 
 if (is_array($riskAssessmentList) && !empty($riskAssessmentList)) {
 	foreach ($riskAssessmentList as $riskAssessmentSingle) {
