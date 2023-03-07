@@ -223,12 +223,31 @@ class Risk extends CommonObject
 			}
 		}
 
-		//For risks listing of risk assessment document
+
+		//For risks listing of risk assessment document & risks listings
 		if ( $get_children_data ) {
 			if (is_array($objects) && !empty($objects)) {
-				foreach ($objects as $digiriskElement) {
-					if (is_array($risksOrderedByDigiriskElement[$digiriskElement->id]) && !empty($risksOrderedByDigiriskElement[$digiriskElement->id])) {
-						$risks = array_merge($risks, $risksOrderedByDigiriskElement[$digiriskElement->id]);
+				$elementsChildren = recurse_tree($parent_id, 0, $objects);
+			} else {
+				return -1;
+			}
+
+			if ( is_array($elementsChildren) && ! empty($elementsChildren) ) {
+				// Super function iterations flat.
+				$it = new RecursiveIteratorIterator(new RecursiveArrayIterator($elementsChildren));
+				$element = array();
+				foreach ($it as $key => $v) {
+					$element[$key][$v] = $v;
+				}
+
+				$children_ids = $element['id'];
+
+				// RISKS parent children.
+				if ( !empty($children_ids)) {
+					foreach ($children_ids as $child_id) {
+						if (is_array($risksOrderedByDigiriskElement[$child_id]) && !empty($risksOrderedByDigiriskElement[$child_id])) {
+							$risks = array_merge($risks, $risksOrderedByDigiriskElement[$child_id]);
+						}
 					}
 				}
 			}
@@ -248,6 +267,7 @@ class Risk extends CommonObject
 					$parent_element_id = $objects[$parent_element_id]->fk_parent;
 				}
 			} else {
+				//For inherited risks in risk assessment document
 				if (is_array($objects) && !empty($objects)) {
 					foreach ($objects as $digiriskElement) {
 						$parent_element_id = $digiriskElement->fk_parent;
@@ -274,7 +294,6 @@ class Risk extends CommonObject
 				if (is_array($digiriskElementsOfEntity) && !empty($digiriskElementsOfEntity)) {
 					foreach ($digiriskElementsOfEntity as $digiriskElementOfEntity) {
 						$digiriskElementOfEntity->fetchObjectLinked(null, '', $digiriskElementOfEntity->id, 'digiriskdolibarr_digiriskelement', 'AND', 1, 'sourcetype', 0);
-
 						if (!empty($digiriskElementOfEntity->linkedObjectsIds['digiriskdolibarr_risk'])) {
 							foreach ($digiriskElementOfEntity->linkedObjectsIds['digiriskdolibarr_risk'] as $sharedRiskId) {
 								$sharedRisk = $riskList[$sharedRiskId];
