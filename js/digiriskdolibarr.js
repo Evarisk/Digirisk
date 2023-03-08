@@ -2064,7 +2064,9 @@ window.eoxiaJS.risk.unlinkSharedRisk = function ( event ) {
  * @return {void}
  */
 window.eoxiaJS.risk.sharedRiskBoxLoader = function ( event ) {
-	window.eoxiaJS.loader.display($('#searchFormSharedListRisks'))
+	if ($(this).text() == 'Oui') {
+		window.eoxiaJS.loader.display($('#searchFormSharedListRisks'))
+	}
 };
 
 /**
