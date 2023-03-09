@@ -110,6 +110,8 @@ $conf->setEntityValues($db, $entity);
 //ici charger les conf de la bonne entité
 $upload_dir = $conf->categorie->multidir_output[isset($entity) ? $entity : 1];
 
+$multiCompanyMention = (empty(dolibarr_get_const($db, 'DIGIRISKDOLIBARR_TICKET_PUBLIC_INTERFACE_USE_MULTIENTITY_CONFIG', $entity)) ? '' : 'MULTICOMPANY_');
+
 /*
  * Actions
  */
@@ -545,7 +547,8 @@ if ($entity > 0) {
 			$entity = GETPOST('entity');
 		}
 		if ($entity > 0 && dolibarr_get_const($db, 'DIGIRISKDOLIBARR_TICKET_EXTRAFIELDS', 0) == 1) {
-			if ($conf->global->DIGIRISKDOLIBARR_TICKET_DIGIRISKELEMENT_VISIBLE) {
+			$digiriskelementVisibleConf = 'DIGIRISKDOLIBARR_'. $multiCompanyMention .'TICKET_DIGIRISKELEMENT_VISIBLE';
+			if ($conf->global->$digiriskelementVisibleConf) {
 				$selectDigiriskElement = '</br> <span ' . (($conf->global->DIGIRISKDOLIBARR_TICKET_DIGIRISKELEMENT_REQUIRED) ? 'style="font-weight:600"' : '') . '>' . $langs->trans('Service') . (($conf->global->DIGIRISKDOLIBARR_TICKET_DIGIRISKELEMENT_REQUIRED) ? '<span style="color:red"> *</span>' : '') . '</span>';
 
 				$alldisableddigiriskelement = $digiriskelement->fetchAll('', '', 0, 0, array('customsql' => 't.show_in_selector = 0'));
@@ -563,7 +566,8 @@ if ($entity > 0) {
 				print($selectDigiriskElement);
 			}
 
-			if ($conf->global->DIGIRISKDOLIBARR_TICKET_LASTNAME_VISIBLE) {
+			$lastnameVisibleConf = 'DIGIRISKDOLIBARR_'. $multiCompanyMention .'TICKET_LASTNAME_VISIBLE';
+			if ($conf->global->$lastnameVisibleConf) {
 				$lastnamefield = '<div class="form-element">';
 				$lastnamefield .= '<span class="form-label"' . (($conf->global->DIGIRISKDOLIBARR_TICKET_LASTNAME_REQUIRED) ? '' : 'style="font-weight:300"') . '>' . $langs->trans("LastName") . (($conf->global->DIGIRISKDOLIBARR_TICKET_LASTNAME_REQUIRED) ? '<span style="color:red"> *</span>' : '') . '</span>';
 				$lastnamefield .= '<label class="form-lastname-field-container">';
@@ -573,7 +577,8 @@ if ($entity > 0) {
 				print($lastnamefield);
 			}
 
-			if ($conf->global->DIGIRISKDOLIBARR_TICKET_FIRSTNAME_VISIBLE) {
+			$firstnameVisibleConf = 'DIGIRISKDOLIBARR_'. $multiCompanyMention .'TICKET_FIRSTNAME_VISIBLE';
+			if ($conf->global->$firstnameVisibleConf) {
 				$firstnamefield = '<div class="form-element">';
 				$firstnamefield .= '<span class="form-label"' . (($conf->global->DIGIRISKDOLIBARR_TICKET_FIRSTNAME_REQUIRED) ? '' : 'style="font-weight:300"') . '>' . $langs->trans("FirstName") . (($conf->global->DIGIRISKDOLIBARR_TICKET_FIRSTNAME_REQUIRED) ? '<span style="color:red"> *</span>' : '') . '</span>';
 				$firstnamefield .= '<label class="form-firstname-field-container">';
@@ -583,7 +588,8 @@ if ($entity > 0) {
 				print($firstnamefield);
 			}
 
-			if ($conf->global->DIGIRISKDOLIBARR_TICKET_EMAIL_VISIBLE) {
+			$emailVisibleConf = 'DIGIRISKDOLIBARR_'. $multiCompanyMention .'TICKET_EMAIL_VISIBLE';
+			if ($conf->global->$emailVisibleConf) {
 				$emailfield = '<div class="form-element">';
 				$emailfield .= '<span class="form-label"' . (($conf->global->DIGIRISKDOLIBARR_TICKET_EMAIL_REQUIRED) ? '' : 'style="font-weight:300"') . '>' . $langs->trans("Email") . (($conf->global->DIGIRISKDOLIBARR_TICKET_EMAIL_REQUIRED) ? '<span style="color:red"> *</span>' : '') . '</span>';
 				$emailfield .= '<label class="form-field-container">';
@@ -593,7 +599,8 @@ if ($entity > 0) {
 				print($emailfield);
 			}
 
-			if ($conf->global->DIGIRISKDOLIBARR_TICKET_PHONE_VISIBLE) {
+			$phoneVisibleConf = 'DIGIRISKDOLIBARR_'. $multiCompanyMention .'TICKET_PHONE_VISIBLE';
+			if ($conf->global->$phoneVisibleConf) {
 				$phonefield = '<div class="form-element">';
 				$phonefield .= '<span class="form-label"' . (($conf->global->DIGIRISKDOLIBARR_TICKET_PHONE_REQUIRED) ? '' : 'style="font-weight:300"') . '>' . $langs->trans("Phone") . (($conf->global->DIGIRISKDOLIBARR_TICKET_PHONE_REQUIRED) ? '<span style="color:red"> *</span>' : '') . '</span>';
 				$phonefield .= '<input class="options_digiriskdolibarr_ticket_phone" name="options_digiriskdolibarr_ticket_phone" id="options_digiriskdolibarr_ticket_phone" value="' . GETPOST('options_digiriskdolibarr_ticket_phone') . '"/>';
@@ -602,7 +609,8 @@ if ($entity > 0) {
 				print($phonefield);
 			}
 
-			if ($conf->global->DIGIRISKDOLIBARR_TICKET_LOCATION_VISIBLE) {
+			$locationVisibleConf = 'DIGIRISKDOLIBARR_'. $multiCompanyMention .'TICKET_LOCATION_VISIBLE';
+			if ($conf->global->$locationVisibleConf) {
 				$locationfield = '<div class="form-element">';
 				$locationfield .= '<span class="form-label"' . (($conf->global->DIGIRISKDOLIBARR_TICKET_LOCATION_REQUIRED) ? '' : 'style="font-weight:300"') . '>' . $langs->trans("Location") . (($conf->global->DIGIRISKDOLIBARR_TICKET_LOCATION_REQUIRED) ? '<span style="color:red"> *</span>' : '') . '</span>';
 				$locationfield .= '<label class="form-field-container">';
@@ -612,7 +620,8 @@ if ($entity > 0) {
 				print($locationfield);
 			}
 
-			if ($conf->global->DIGIRISKDOLIBARR_TICKET_DATE_VISIBLE) {
+			$dateVisibleConf = 'DIGIRISKDOLIBARR_'. $multiCompanyMention .'TICKET_DATE_VISIBLE';
+			if ($conf->global->$dateVisibleConf) {
 				$datefield = '<div class="form-element">';
 				$datefield .= '<span class="form-label"' . (($conf->global->DIGIRISKDOLIBARR_TICKET_DATE_REQUIRED) ? '' : 'style="font-weight:300"') . '>' . $langs->trans("Date") . (($conf->global->DIGIRISKDOLIBARR_TICKET_DATE_REQUIRED) ? '<span style="color:red"> *</span>' : '') . '</span>';
 				$datefield .=  $form->selectDate(dol_now('tzuser'), 'options_digiriskdolibarr_ticket_date', 1, 1, 0, '', 1, 1);
