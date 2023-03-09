@@ -1601,6 +1601,7 @@ MainCategory = Choix de la catégorie principale
 ParentCategoryLabel = Titre de la catégorie parent
 ChildCategoryLabel = Titre de la catégorie enfant
 TicketPublicInterfaceEnabled = L'interface publique des tickets a été activée
+TicketPublicInterfaceDisabled = L'interface publique des tickets a été désactivée
 TicketPublicInterface = Interface publique
 EmailsToNotifySet = Les adresses e-mail à notifier ont bien été enregistrées
 MainCategorySet = La catégorie principale a été définie
@@ -1639,6 +1640,7 @@ TicketCategoriesNotCreated = Vous n'avez pas créé de catégories de tickets
 TicketPublicInterfaceQRCode = QR Code de l'interface publique des tickets
 MultiEntityTicketPublicInterfaceQRCode =  QR Code de l'interface publique des tickets multi-société
 PublicInterfaceConfiguration = Champs visibles / requis de l'interface publique
+PublicInterfaceConfigurationInfo = Les champs ne seront pas visible tant que les extrafields de ticket par défaut n'auront pas été crées
 TicketDigiriskElementRequired = GP/UT obligatoire pour créer un ticket
 TicketDigiriskElementRequiredHelp = Activer cette option pour rendre obligatoire la selection d'un GP/UT pour créer un ticket dans l'interface publique
 TicketDigiriskElementHideRef = Cacher la référence des GP/UT dans l'interface publique
@@ -1660,6 +1662,7 @@ TicketLocationVisibleHelp = Activer cette option pour afficher le champ Lieu dan
 TicketDateVisible = Afficher le champ Date pour créer un ticket
 TicketDateVisibleHelp = Activer cette option pour afficher le champ Date dans l'interface publique et le rendre obligatoire si nécessaire
 QRCodeGenerated = QRCode généré
+UseMulticompanyConfig = Utiliser la configuration multientité pour l'interface publique
 
 # Stats - Statistiques
 TicketStatistics = Statistiques des tickets
