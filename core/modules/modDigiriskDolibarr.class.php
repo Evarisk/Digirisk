@@ -774,6 +774,22 @@ class modDigiriskdolibarr extends DolibarrModules
 			$i++ => ['DIGIRISKDOLIBARR_TICKET_EMAIL_REQUIRED', 'integer', 0, '', 0, 'current'],
 			$i++ => ['DIGIRISKDOLIBARR_SHOW_MULTI_ENTITY_SELECTOR_ON_TICKET_PUBLIC_INTERFACE', 'integer', 0, '', 0, 'current'],
 			$i++ => ['DIGIRISKDOLIBARR_TICKET_DIGIRISKELEMENT_REQUIRED', 'integer', 1, '', 0, 'current'],
+			303 => array('DIGIRISKDOLIBARR_TICKET_DIGIRISKELEMENT_VISIBLE', 'integer', 1, '', 0, 'current'),
+			305 => array('DIGIRISKDOLIBARR_TICKET_DIGIRISKELEMENT_HIDE_REF', 'integer', 0, '', 0, 'current'),
+			306 => array('DIGIRISKDOLIBARR_TICKET_PHOTO_VISIBLE', 'integer', 1, '', 0, 'current'),
+			307 => array('DIGIRISKDOLIBARR_TICKET_EMAIL_VISIBLE', 'integer', 0, '', 0, 'current'),
+			308 => array('DIGIRISKDOLIBARR_TICKET_EMAIL_REQUIRED', 'integer', 0, '', 0, 'current'),
+			309 => array('DIGIRISKDOLIBARR_TICKET_FIRSTNAME_VISIBLE', 'integer', 1, '', 0, 'current'),
+			310 => array('DIGIRISKDOLIBARR_TICKET_FIRSTNAME_REQUIRED', 'integer', 1, '', 0, 'current'),
+			311 => array('DIGIRISKDOLIBARR_TICKET_LASTNAME_VISIBLE', 'integer', 1, '', 0, 'current'),
+			312 => array('DIGIRISKDOLIBARR_TICKET_LASTNAME_REQUIRED', 'integer', 1, '', 0, 'current'),
+			313 => array('DIGIRISKDOLIBARR_TICKET_PHONE_VISIBLE', 'integer', 1, '', 0, 'current'),
+			314 => array('DIGIRISKDOLIBARR_TICKET_PHONE_REQUIRED', 'integer', 0, '', 0, 'current'),
+			315 => array('DIGIRISKDOLIBARR_TICKET_LOCATION_VISIBLE', 'integer', 1, '', 0, 'current'),
+			316 => array('DIGIRISKDOLIBARR_TICKET_LOCATION_REQUIRED', 'integer', 0, '', 0, 'current'),
+			317 => array('DIGIRISKDOLIBARR_TICKET_DATE_VISIBLE', 'integer', 1, '', 0, 'current'),
+			318 => array('DIGIRISKDOLIBARR_TICKET_DATE_REQUIRED', 'integer', 1, '', 0, 'current'),
+			319 => array('DIGIRISKDOLIBARR_TICKET_PUBLIC_INTERFACE_USE_MULTIENTITY_CONFIG', 'integer', 0, '', 0, 'current'),
 
 			// CONST ACCIDENT
 			$i++ => ['DIGIRISKDOLIBARR_MAIN_AGENDA_ACTIONAUTO_ACCIDENT_CREATE', 'integer', 1, '', 0, 'current'],
@@ -868,6 +884,7 @@ class modDigiriskdolibarr extends DolibarrModules
 		$this->tabs[] = ['data' => 'thirdparty:+openinghours:'. $pictoDigirisk .$langs->trans('OpeningHours').':digiriskdolibarr@digiriskdolibarr:1:/custom/digiriskdolibarr/view/openinghours_card.php?id=__ID__']; // To add a new tab identified by code tabname1
 		$this->tabs[] = ['data' => 'user:+participation:'. $pictoDigirisk .$langs->trans('GP/UTParticipation').':digiriskdolibarr@digiriskdolibarr:1:/custom/digiriskdolibarr/view/digiriskelement/digiriskelement_evaluator.php?fromid=__ID__']; // To add a new tab identified by code tabname1
 		$this->tabs[] = ['data' => 'user:+accidents:'. $pictoDigirisk .$langs->trans('Accidents').':digiriskdolibarr@digiriskdolibarr:1:/custom/digiriskdolibarr/view/accident/accident_list.php?fromiduser=__ID__']; // To add a new tab identified by code tabname1
+		$this->tabs[] = array('data' => 'multicompany:+ticket:' . $pictoDigirisk . $langs->trans('Ticket').':digiriskdolibarr@digiriskdolibarr:1:/custom/digiriskdolibarr/admin/ticket/multicompany_ticket.php');														// To add a new tab identified by code tabname1
 
 		// To remove an existing tab identified by code tabname
 		// Dictionaries
