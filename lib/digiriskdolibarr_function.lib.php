@@ -1343,7 +1343,7 @@ function llxHeaderTicketDigirisk($title, $head = "", $disablejs = 0, $disablehea
 
 	top_htmlhead($head, $title, $disablejs, $disablehead, $arrayofjs, $arrayofcss, 0, 1); // Show html headers
 
-	$multiCompanyMention = (empty(dolibarr_get_const($db, 'DIGIRISKDOLIBARR_TICKET_PUBLIC_INTERFACE_USE_MULTICOMPANY_CONFIG', $conf->entity)) ? '' : 'MULTICOMPANY_');
+	$multiCompanyMention = (empty($conf->global->DIGIRISKDOLIBARR_TICKET_PUBLIC_INTERFACE_USE_MULTICOMPANY_CONFIG) ? '' : 'MULTICOMPANY_');
 	$showLogoConf        = 'DIGIRISKDOLIBARR_' . $multiCompanyMention . 'TICKET_SHOW_COMPANY_LOGO';
 	if (!empty($conf->global->$showLogoConf)) {
 		$filedir  = $conf->mycompany->dir_output . '/logos/thumbs/';

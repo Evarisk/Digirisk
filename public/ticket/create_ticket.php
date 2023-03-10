@@ -110,7 +110,7 @@ $conf->setEntityValues($db, $entity);
 //ici charger les conf de la bonne entité
 $upload_dir = $conf->categorie->multidir_output[isset($entity) ? $entity : 1];
 
-$multiCompanyMention = (empty(dolibarr_get_const($db, 'DIGIRISKDOLIBARR_TICKET_PUBLIC_INTERFACE_USE_MULTICOMPANY_CONFIG', $entity)) ? '' : 'MULTICOMPANY_');
+$multiCompanyMention = (empty($conf->global->DIGIRISKDOLIBARR_TICKET_PUBLIC_INTERFACE_USE_MULTICOMPANY_CONFIG) ? '' : 'MULTICOMPANY_');
 
 /*
  * Actions
