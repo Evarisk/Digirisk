@@ -96,9 +96,9 @@ $linkback = '<a href="' . ($backtopage ?: DOL_URL_ROOT . '/admin/modules.php?res
 print load_fiche_titre($title, $linkback, 'digiriskdolibarr32px@digiriskdolibarr');
 
 // Configuration header
-$head = digiriskdolibarrAdminPrepareHead();
+$head = multicompany_prepare_head();
 
-print dol_get_fiche_head($head, 'ticket', '', -1, "digiriskdolibarr@digiriskdolibarr");
+print dol_get_fiche_head($head, 'ticket', '', -1, 'digiriskdolibarr@digiriskdolibarr');
 print load_fiche_titre('<i class="fa fa-ticket"></i> ' . $langs->transnoentities("TicketManagement"), '', '');
 print '<hr>';
 if ($conf->multicompany->enabled) {
@@ -128,6 +128,10 @@ print '<br><br>';
 if (!empty($conf->global->DIGIRISKDOLIBARR_MULTICOMPANY_TICKET_ENABLE_PUBLIC_INTERFACE)) {
 	require_once '../../core/tpl/ticket/digiriskdolibarr_ticket_config_view.tpl.php';
 }
+
+print '</table>';
+print '</div>';
+print '<span class="opacitymedium">' . $langs->transnoentities("TicketPublicInterfaceConfigDocumentation") . '</span> : <a href="https://wiki.dolibarr.org/index.php?title=Module_Digirisk#DigiRisk_-_Registre_de_s.C3.A9curit.C3.A9_et_Tickets" target="_blank" >' . $langs->transnoentities('DigiriskDocumentation') . '</a>';
 
 // End of page
 llxFooter();

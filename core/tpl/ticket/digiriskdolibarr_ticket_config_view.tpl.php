@@ -516,7 +516,3 @@ if ($conf->multicompany->enabled) {
 	print '</tr>';
 	print '</form>';
 }
-
-print '</table>';
-print '</div>';
-print '<span class="opacitymedium">' . $langs->transnoentities("TicketPublicInterfaceConfigDocumentation") . '</span> : <a href="https://wiki.dolibarr.org/index.php?title=Module_Digirisk#DigiRisk_-_Registre_de_s.C3.A9curit.C3.A9_et_Tickets" target="_blank" >' . $langs->transnoentities('DigiriskDocumentation') . '</a>';
