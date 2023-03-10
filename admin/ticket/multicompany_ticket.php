@@ -85,7 +85,7 @@ $form      = new Form($db);
 $formother = new FormOther($db);
 
 $help_url = '';
-$title    = $langs->transnoentities("Ticket");
+$title    = $langs->transnoentities("TicketMultiCompany");
 $morecss  = array("/digiriskdolibarr/css/digiriskdolibarr.css");
 
 llxHeader('', $title, $help_url, '', '', '', '', $morecss);

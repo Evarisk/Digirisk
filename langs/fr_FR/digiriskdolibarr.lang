@@ -1664,6 +1664,7 @@ TicketDateVisible = Afficher le champ Date pour créer un ticket
 TicketDateVisibleHelp = Activer cette option pour afficher le champ Date dans l'interface publique et le rendre obligatoire si nécessaire
 QRCodeGenerated = QRCode généré
 UseMulticompanyConfig = Utiliser la configuration multientité pour l'interface publique
+TicketMultiCompany = Configuration Multi-Société des tickets
 
 # Stats - Statistiques
 TicketStatistics = Statistiques des tickets
