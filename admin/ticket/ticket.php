@@ -99,10 +99,10 @@ if ($action == 'setPublicInterface') {
 
 if ($action == 'setMulticompanyConfig') {
 	if (GETPOST('value')) {
-		dolibarr_set_const($db, 'DIGIRISKDOLIBARR_TICKET_PUBLIC_INTERFACE_USE_MULTIENTITY_CONFIG', 1, 'integer', 0, '', $conf->entity);
+		dolibarr_set_const($db, 'DIGIRISKDOLIBARR_TICKET_PUBLIC_INTERFACE_USE_MULTICOMPANY_CONFIG', 1, 'integer', 0, '', $conf->entity);
 		$transKey = 'TicketPublicInterfaceDisabled';
 	} else {
-		dolibarr_set_const($db, 'DIGIRISKDOLIBARR_TICKET_PUBLIC_INTERFACE_USE_MULTIENTITY_CONFIG', 0, 'integer', 0, '', $conf->entity);
+		dolibarr_set_const($db, 'DIGIRISKDOLIBARR_TICKET_PUBLIC_INTERFACE_USE_MULTICOMPANY_CONFIG', 0, 'integer', 0, '', $conf->entity);
 		$transKey = 'TicketPublicInterfaceEnabled';
 	}
 	setEventMessages($langs->transnoentities($transKey), array());
@@ -283,7 +283,7 @@ if ($conf->multicompany->enabled) {
 print dol_get_fiche_end();
 
 $enableDisableMultiConf = $langs->transnoentities("UseMulticompanyConfig") . ' ';
-if (empty($conf->global->DIGIRISKDOLIBARR_TICKET_PUBLIC_INTERFACE_USE_MULTIENTITY_CONFIG)) {
+if (empty($conf->global->DIGIRISKDOLIBARR_TICKET_PUBLIC_INTERFACE_USE_MULTICOMPANY_CONFIG)) {
 	// Button off, click to enable
 	$enableDisableMultiConf .= '<a class="reposition valignmiddle" href="' . $_SERVER["PHP_SELF"] . '?action=setMulticompanyConfig&token=' . newToken() . '&value=1">';
 	$enableDisableMultiConf .= img_picto($langs->transnoentities("Disabled"), 'switch_off');
@@ -294,11 +294,11 @@ if (empty($conf->global->DIGIRISKDOLIBARR_TICKET_PUBLIC_INTERFACE_USE_MULTIENTIT
 }
 $enableDisableMultiConf .= '</a>';
 print $enableDisableMultiConf;
-print '<input type="hidden" id="DIGIRISKDOLIBARR_TICKET_PUBLIC_INTERFACE_USE_MULTIENTITY_CONFIG" name="DIGIRISKDOLIBARR_TICKET_PUBLIC_INTERFACE_USE_MULTIENTITY_CONFIG" value="' . (empty($conf->global->DIGIRISKDOLIBARR_TICKET_PUBLIC_INTERFACE_USE_MULTIENTITY_CONFIG) ? 1 : 0) . '">';
+print '<input type="hidden" id="DIGIRISKDOLIBARR_TICKET_PUBLIC_INTERFACE_USE_MULTICOMPANY_CONFIG" name="DIGIRISKDOLIBARR_TICKET_PUBLIC_INTERFACE_USE_MULTICOMPANY_CONFIG" value="' . (empty($conf->global->DIGIRISKDOLIBARR_TICKET_PUBLIC_INTERFACE_USE_MULTICOMPANY_CONFIG) ? 1 : 0) . '">';
 
 print '<br><br>';
 
-if (empty($conf->global->DIGIRISKDOLIBARR_TICKET_PUBLIC_INTERFACE_USE_MULTIENTITY_CONFIG)) {
+if (empty($conf->global->DIGIRISKDOLIBARR_TICKET_PUBLIC_INTERFACE_USE_MULTICOMPANY_CONFIG)) {
 	$enabledisablehtml = $langs->transnoentities("TicketActivatePublicInterface") . ' ';
 	if (empty($conf->global->DIGIRISKDOLIBARR_TICKET_ENABLE_PUBLIC_INTERFACE)) {
 		// Button off, click to enable
@@ -316,7 +316,7 @@ if (empty($conf->global->DIGIRISKDOLIBARR_TICKET_PUBLIC_INTERFACE_USE_MULTIENTIT
 	print '<br><br>';
 
 	if (!empty($conf->global->DIGIRISKDOLIBARR_TICKET_ENABLE_PUBLIC_INTERFACE)) {
-		require_once '../../core/tpl/digiriskdolibarr_public_interface.tpl.php';
+		require_once '../../core/tpl/digiriskdolibarr_ticket_config.tpl.php';
 	}
 
 	// Project

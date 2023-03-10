@@ -287,13 +287,12 @@ print '<input type="hidden" name="token" value="' . newToken() . '">';
 print '<input type="hidden" name="action" value="generateCategories">';
 print '<input type="hidden" name="backtopage" value="' . $backtopage . '">';
 
-$categoriesCreatedConf = 'DIGIRISKDOLIBARR_' . $multiCompanyMention . 'TICKET_CATEGORIES_CREATED';
 print '<tr class="oddeven"><td>' . $langs->transnoentities("GenerateTicketCategories") . '<sup><a href="https://wiki.dolibarr.org/index.php?title=Module_Digirisk#DigiRisk_-_Registre_de_s.C3.A9curit.C3.A9_et_Tickets" target="_blank" > 1</a></sup></td>';
 print '<td class="center">';
-print $conf->global->$categoriesCreatedConf ? $langs->transnoentities('AlreadyGenerated') : $langs->transnoentities('NotCreated');
+print $conf->global->DIGIRISKDOLIBARR_TICKET_CATEGORIES_CREATED ? $langs->transnoentities('AlreadyGenerated') : $langs->transnoentities('NotCreated');
 print '</td>';
 print '<td class="center">';
-print $conf->global->$categoriesCreatedConf ? '<a type="" class=" butActionRefused" value="">' . $langs->transnoentities('Create') . '</a>' : '<input type="submit" class="button" value="' . $langs->transnoentities('Create') . '">';
+print $conf->global->DIGIRISKDOLIBARR_TICKET_CATEGORIES_CREATED ? '<a type="" class=" butActionRefused" value="">' . $langs->transnoentities('Create') . '</a>' : '<input type="submit" class="button" value="' . $langs->transnoentities('Create') . '">';
 print '</td>';
 
 print '<td class="center">';

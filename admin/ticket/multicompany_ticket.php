@@ -184,7 +184,7 @@ if ($action == 'generateCategories') {
 		}
 
 		if ($result2 > 0 && $result3 > 0 && $result4 > 0) {
-			dolibarr_set_const($db, 'DIGIRISKDOLIBARR_MULTICOMPANY_TICKET_CATEGORIES_CREATED', 1, 'integer', 0, '', 0);
+			dolibarr_set_const($db, 'DIGIRISKDOLIBARR_TICKET_CATEGORIES_CREATED', 1, 'integer', 0, '', 0);
 			setEventMessages($langs->transnoentities('CategoriesCreated'), array());
 		}
 	} else {
@@ -285,7 +285,7 @@ print '<input type="hidden" id="DIGIRISKDOLIBARR_MULTICOMPANY_TICKET_ENABLE_PUBL
 print '<br><br>';
 
 if (!empty($conf->global->DIGIRISKDOLIBARR_MULTICOMPANY_TICKET_ENABLE_PUBLIC_INTERFACE)) {
-	require_once '../../core/tpl/digiriskdolibarr_public_interface.tpl.php';
+	require_once '../../core/tpl/digiriskdolibarr_ticket_config.tpl.php';
 }
 
 // End of page
