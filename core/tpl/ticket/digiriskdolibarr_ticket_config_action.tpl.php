@@ -86,7 +86,7 @@ global $maxwidthmini, $maxheightmini, $maxwidthsmall, $maxheightsmall;
 if ($action == 'generateCategories') {
 
 	$result = createTicketCategory($langs->transnoentities('Register'), '', '', 1, 'ticket');
-	dolibarr_set_const($db, 'DIGIRISKDOLIBARR_'. $multiCompanyMention . 'TICKET_MAIN_CATEGORY', $result, 'integer', 0, '', $entity);
+	dolibarr_set_const($db, 'DIGIRISKDOLIBARR_TICKET_MAIN_CATEGORY', $result, 'integer', 0, '', $conf->entity);
 
 	if ($result > 0) {
 
@@ -140,7 +140,7 @@ if ($action == 'generateCategories') {
 		}
 
 		if ($result2 > 0 && $result3 > 0 && $result4 > 0) {
-			dolibarr_set_const($db, 'DIGIRISKDOLIBARR_TICKET_CATEGORIES_CREATED', 1, 'integer', 0, '', $entity);
+			dolibarr_set_const($db, 'DIGIRISKDOLIBARR_TICKET_CATEGORIES_CREATED', 1, 'integer', 0, '', $conf->entity);
 			setEventMessages($langs->transnoentities('CategoriesCreated'), array());
 		}
 	} else {
@@ -150,7 +150,7 @@ if ($action == 'generateCategories') {
 
 if ($action == 'setMainCategory') {
 	$category_id = GETPOST('mainCategory');
-	dolibarr_set_const($db, 'DIGIRISKDOLIBARR_'. $multiCompanyMention . 'TICKET_MAIN_CATEGORY', $category_id, 'integer', 0, '', $entity);
+	dolibarr_set_const($db, 'DIGIRISKDOLIBARR_TICKET_MAIN_CATEGORY', $category_id, 'integer', 0, '', $conf->entity);
 	setEventMessages($langs->transnoentities('MainCategorySet'), array());
 }
 

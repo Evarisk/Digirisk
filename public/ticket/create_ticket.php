@@ -151,7 +151,6 @@ $photoVisibleConf            = 'DIGIRISKDOLIBARR_'. $multiCompanyMention . 'TICK
 
 $enablePublicInterfaceConf   = 'DIGIRISKDOLIBARR_'. $multiCompanyMention .'TICKET_ENABLE_PUBLIC_INTERFACE';
 $hideRefConf                 = 'DIGIRISKDOLIBARR_'. $multiCompanyMention .'TICKET_DIGIRISKELEMENT_HIDE_REF';
-$mainCategoryConf            = 'DIGIRISKDOLIBARR_'. $multiCompanyMention .'TICKET_MAIN_CATEGORY';
 $parentCategoryLabel         = 'DIGIRISKDOLIBARR_'. $multiCompanyMention .'TICKET_PARENT_CATEGORY_LABEL';
 $childCategoryLabel          = 'DIGIRISKDOLIBARR_'. $multiCompanyMention .'TICKET_CHILD_CATEGORY_LABEL';
 
@@ -462,7 +461,7 @@ if ($entity > 0) {
 		</div>
 	<?php endif;
 
-	$mainCategoryObject = $category->rechercher($conf->global->$mainCategoryConf, '', 'ticket', true);
+	$mainCategoryObject = $category->rechercher($conf->global->DIGIRISKDOLIBARR_TICKET_MAIN_CATEGORY, '', 'ticket', true);
 
 	if (is_array($mainCategoryObject) && !empty($mainCategoryObject)) {
 		print '<p><strong>' . $conf->global->$parentCategoryLabel . '</strong><span style="color:red"> *</span></p>';

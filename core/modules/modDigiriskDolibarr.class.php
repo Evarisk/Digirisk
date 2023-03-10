@@ -796,7 +796,6 @@ class modDigiriskdolibarr extends DolibarrModules
 			321 => array('DIGIRISKDOLIBARR_MULTICOMPANY_TICKET_SHOW_COMPANY_LOGO', 'integer', 1, '', 0, 'current'),
 			322 => array('DIGIRISKDOLIBARR_MULTICOMPANY_TICKET_SUBMITTED_SEND_MAIL_TO', 'chaine', '', '', 0, 'current'),
 			323 => array('DIGIRISKDOLIBARR_MULTICOMPANY_TICKET_PARENT_CATEGORY', 'integer', 0, '', 0, 'current'),
-			324 => array('DIGIRISKDOLIBARR_MULTICOMPANY_TICKET_MAIN_CATEGORY', 'integer', 0, '', 0, 'current'),
 			325 => array('DIGIRISKDOLIBARR_MULTICOMPANY_TICKET_PARENT_CATEGORY_LABEL', 'chaine', $langs->trans('Registre'), '', 0, 'current'),
 			326 => array('DIGIRISKDOLIBARR_MULTICOMPANY_TICKET_CHILD_CATEGORY_LABEL', 'chaine', $langs->trans('Pertinence'), '', 0, 'current'),
 			327 => array('DIGIRISKDOLIBARR_MULTICOMPANY_TICKET_SUCCESS_MESSAGE', 'chaine', $langs->trans('YouMustNotifyYourHierarchy'), '', 0, 'current'),

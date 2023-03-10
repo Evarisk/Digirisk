@@ -149,39 +149,72 @@ if (empty($conf->global->DIGIRISKDOLIBARR_TICKET_PUBLIC_INTERFACE_USE_MULTICOMPA
 
 	if (!empty($conf->global->DIGIRISKDOLIBARR_TICKET_ENABLE_PUBLIC_INTERFACE)) {
 		require_once '../../core/tpl/ticket/digiriskdolibarr_ticket_config_view.tpl.php';
-
-
-		// Project
-		print load_fiche_titre($langs->transnoentities("LinkedProject"), '', '');
-
-		print '<form method="POST" action="' . $_SERVER["PHP_SELF"] . '" name="project_form">';
-		print '<input type="hidden" name="token" value="' . newToken() . '">';
-		print '<input type="hidden" name="action" value="update">';
-		print '<table class="noborder centpercent editmode">';
-		print '<tr class="liste_titre">';
-		print '<td>' . $langs->transnoentities("Name") . '</td>';
-		print '<td>' . $langs->transnoentities("SelectProject") . '</td>';
-		print '<td>' . $langs->transnoentities("Action") . '</td>';
-		print '</tr>';
-
-		if (!empty($conf->projet->enabled)) {
-			$langs->load("projects");
-			print '<tr class="oddeven"><td><label for="TSProject">' . $langs->transnoentities("TSProject") . '</label></td><td>';
-			$numprojet = $formproject->select_projects(0, $conf->global->DIGIRISKDOLIBARR_TICKET_PROJECT, 'TSProject', 0, 0, 0, 0, 0, 0, 0, '', 0, 0, 'maxwidth500');
-			print ' <a href="' . DOL_URL_ROOT . '/projet/card.php?&action=create&status=1&backtopage=' . urlencode($_SERVER["PHP_SELF"] . '?action=create') . '"><span class="fa fa-plus-circle valignmiddle" title="' . $langs->transnoentities("AddProject") . '"></span></a>';
-			print '<td><input type="submit" class="button" name="save" value="' . $langs->transnoentities("Save") . '">';
-			print '</td></tr>';
-		}
-
-		print '</table>';
-		print '</form>';
 	}
-	print '</div>';
-	print '<span class="opacitymedium">' . $langs->transnoentities("TicketPublicInterfaceConfigDocumentation") . '</span> : <a href="https://wiki.dolibarr.org/index.php?title=Module_Digirisk#DigiRisk_-_Registre_de_s.C3.A9curit.C3.A9_et_Tickets" target="_blank" >' . $langs->transnoentities('DigiriskDocumentation') . '</a>';
 
 } else {
 	print '</br>';
 	print '<span class="opacitymedium">' . $langs->transnoentities("ConfigureMultiCompanyAt") . '</span> : <a class="wordbreak" href="' . dol_buildpath('/custom/digiriskdolibarr/admin/ticket/multicompany_ticket.php', 1) . '" target="_blank" >' . dol_buildpath('/custom/digiriskdolibarr/admin/ticket/multicompany_ticket.php', 2) . '</a>';
+	print '</br> </br>';
+
+	print load_fiche_titre($langs->transnoentities("TicketCategories"), '', '', 0, 'TicketCategories');
+	print '<div class="div-table-responsive-no-min">';
+	print '<table class="noborder centpercent">';
+	print '<tr class="liste_titre">';
+	print '<td>' . $langs->transnoentities("Parameters") . '</td>';
+	print '<td class="center">' . $langs->transnoentities("Status") . '</td>';
+	print '<td class="center">' . $langs->transnoentities("Action") . '</td>';
+	print '<td class="center">' . $langs->transnoentities("ShortInfo") . '</td>';
+	print '</tr>';
+
+	//Set default main category
+	print '<form method="POST" action="' . $_SERVER["PHP_SELF"] . '">';
+	print '<input type="hidden" name="token" value="' . newToken() . '">';
+	print '<input type="hidden" name="action" value="setMainCategory">';
+	print '<input type="hidden" name="backtopage" value="' . $backtopage . '">';
+
+	print '<tr class="oddeven"><td>' . $langs->transnoentities("MainCategory") . '</td>';
+	print '<td class="center">';
+	print $formother->select_categories('ticket', $conf->global->DIGIRISKDOLIBARR_TICKET_MAIN_CATEGORY, 'mainCategory');
+	print '</td>';
+
+	print '<td class="center">';
+	print '<input type="submit" class="button" value="' . $langs->transnoentities('Save') . '">';
+	print '</td>';
+
+	print '<td class="center">';
+	print $form->textwithpicto('', $langs->transnoentities("MainCategorySetting"));
+	print '</td>';
+	print '</tr>';
+	print '</form>';
+
+	// Project
+	print load_fiche_titre($langs->transnoentities("LinkedProject"), '', '');
+
+	print '<form method="POST" action="' . $_SERVER["PHP_SELF"] . '" name="project_form">';
+	print '<input type="hidden" name="token" value="' . newToken() . '">';
+	print '<input type="hidden" name="action" value="update">';
+	print '<table class="noborder centpercent editmode">';
+	print '<tr class="liste_titre">';
+	print '<td>' . $langs->transnoentities("Name") . '</td>';
+	print '<td>' . $langs->transnoentities("SelectProject") . '</td>';
+	print '<td>' . $langs->transnoentities("Action") . '</td>';
+	print '</tr>';
+
+	if (!empty($conf->projet->enabled)) {
+		$langs->load("projects");
+		print '<tr class="oddeven"><td><label for="TSProject">' . $langs->transnoentities("TSProject") . '</label></td><td>';
+		$numprojet = $formproject->select_projects(0, $conf->global->DIGIRISKDOLIBARR_TICKET_PROJECT, 'TSProject', 0, 0, 0, 0, 0, 0, 0, '', 0, 0, 'maxwidth500');
+		print ' <a href="' . DOL_URL_ROOT . '/projet/card.php?&action=create&status=1&backtopage=' . urlencode($_SERVER["PHP_SELF"] . '?action=create') . '"><span class="fa fa-plus-circle valignmiddle" title="' . $langs->transnoentities("AddProject") . '"></span></a>';
+		print '<td><input type="submit" class="button" name="save" value="' . $langs->transnoentities("Save") . '">';
+		print '</td></tr>';
+	}
+
+	print '</table>';
+	print '</form>';
+
+	print '</div>';
+	print '<span class="opacitymedium">' . $langs->transnoentities("TicketPublicInterfaceConfigDocumentation") . '</span> : <a href="https://wiki.dolibarr.org/index.php?title=Module_Digirisk#DigiRisk_-_Registre_de_s.C3.A9curit.C3.A9_et_Tickets" target="_blank" >' . $langs->transnoentities('DigiriskDocumentation') . '</a>';
+
 }
 
 // End of page

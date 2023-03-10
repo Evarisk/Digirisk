@@ -270,6 +270,33 @@ print '</table>';
 
 print '</div>';
 
+if (empty($multiEntityConfig)) {
+	// Project
+	print load_fiche_titre($langs->transnoentities("LinkedProject"), '', '');
+
+	print '<form method="POST" action="' . $_SERVER["PHP_SELF"] . '" name="project_form">';
+	print '<input type="hidden" name="token" value="' . newToken() . '">';
+	print '<input type="hidden" name="action" value="update">';
+	print '<table class="noborder centpercent editmode">';
+	print '<tr class="liste_titre">';
+	print '<td>' . $langs->transnoentities("Name") . '</td>';
+	print '<td>' . $langs->transnoentities("SelectProject") . '</td>';
+	print '<td>' . $langs->transnoentities("Action") . '</td>';
+	print '</tr>';
+
+	if (!empty($conf->projet->enabled)) {
+		$langs->load("projects");
+		print '<tr class="oddeven"><td><label for="TSProject">' . $langs->transnoentities("TSProject") . '</label></td><td>';
+		$numprojet = $formproject->select_projects(0, $conf->global->DIGIRISKDOLIBARR_TICKET_PROJECT, 'TSProject', 0, 0, 0, 0, 0, 0, 0, '', 0, 0, 'maxwidth500');
+		print ' <a href="' . DOL_URL_ROOT . '/projet/card.php?&action=create&status=1&backtopage=' . urlencode($_SERVER["PHP_SELF"] . '?action=create') . '"><span class="fa fa-plus-circle valignmiddle" title="' . $langs->transnoentities("AddProject") . '"></span></a>';
+		print '<td><input type="submit" class="button" name="save" value="' . $langs->transnoentities("Save") . '">';
+		print '</td></tr>';
+	}
+
+	print '</table>';
+	print '</form>';
+}
+
 print load_fiche_titre($langs->transnoentities("TicketCategories"), '', '', 0, 'TicketCategories');
 
 print '<div class="div-table-responsive-no-min">';
@@ -301,27 +328,28 @@ print '</td>';
 print '</tr>';
 print '</form>';
 
-//Set default main category
-print '<form method="POST" action="' . $_SERVER["PHP_SELF"] . '">';
-print '<input type="hidden" name="token" value="' . newToken() . '">';
-print '<input type="hidden" name="action" value="setMainCategory">';
-print '<input type="hidden" name="backtopage" value="' . $backtopage . '">';
+if (empty($multiEntityConfig)) {
+	//Set default main category
+	print '<form method="POST" action="' . $_SERVER["PHP_SELF"] . '">';
+	print '<input type="hidden" name="token" value="' . newToken() . '">';
+	print '<input type="hidden" name="action" value="setMainCategory">';
+	print '<input type="hidden" name="backtopage" value="' . $backtopage . '">';
 
-$mainCategoryConf = 'DIGIRISKDOLIBARR_' . $multiCompanyMention . 'TICKET_MAIN_CATEGORY';
-print '<tr class="oddeven"><td>' . $langs->transnoentities("MainCategory") . '</td>';
-print '<td class="center">';
-print $formother->select_categories('ticket', $conf->global->$mainCategoryConf, 'mainCategory');
-print '</td>';
+	print '<tr class="oddeven"><td>' . $langs->transnoentities("MainCategory") . '</td>';
+	print '<td class="center">';
+	print $formother->select_categories('ticket', $conf->global->DIGIRISKDOLIBARR_TICKET_MAIN_CATEGORY, 'mainCategory');
+	print '</td>';
 
-print '<td class="center">';
-print '<input type="submit" class="button" value="' . $langs->transnoentities('Save') . '">';
-print '</td>';
+	print '<td class="center">';
+	print '<input type="submit" class="button" value="' . $langs->transnoentities('Save') . '">';
+	print '</td>';
 
-print '<td class="center">';
-print $form->textwithpicto('', $langs->transnoentities("MainCategorySetting"));
-print '</td>';
-print '</tr>';
-print '</form>';
+	print '<td class="center">';
+	print $form->textwithpicto('', $langs->transnoentities("MainCategorySetting"));
+	print '</td>';
+	print '</tr>';
+	print '</form>';
+}
 
 //Set parent category label
 print '<form method="POST" action="' . $_SERVER["PHP_SELF"] . '">';
