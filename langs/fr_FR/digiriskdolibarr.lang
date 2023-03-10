@@ -1572,6 +1572,7 @@ FirstName = Prénom
 LastName = Nom
 Phone = Téléphone
 DigiriskTicketPublicAccess = Une interface publique ne nécessitant aucune identification est disponible à l'url suivante
+ConfigureMultiCompanyAt = Modifier la configuration de l'interface publique multientité à l'url suivante
 TicketActivatePublicInterface = Activer l'interface publique
 GenerateExtrafields = Génération des extrafields de ticket par défaut
 GenerateTicketCategories = Génération des catégories de ticket par défaut

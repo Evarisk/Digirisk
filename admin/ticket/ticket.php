@@ -282,21 +282,23 @@ if ($conf->multicompany->enabled) {
 
 print dol_get_fiche_end();
 
-$enableDisableMultiConf = $langs->transnoentities("UseMulticompanyConfig") . ' ';
-if (empty($conf->global->DIGIRISKDOLIBARR_TICKET_PUBLIC_INTERFACE_USE_MULTICOMPANY_CONFIG)) {
-	// Button off, click to enable
-	$enableDisableMultiConf .= '<a class="reposition valignmiddle" href="' . $_SERVER["PHP_SELF"] . '?action=setMulticompanyConfig&token=' . newToken() . '&value=1">';
-	$enableDisableMultiConf .= img_picto($langs->transnoentities("Disabled"), 'switch_off');
-} else {
-	// Button on, click to disable
-	$enableDisableMultiConf .= '<a class="reposition valignmiddle" href="' . $_SERVER["PHP_SELF"] . '?action=setMulticompanyConfig&token=' . newToken() . '&value=0">';
-	$enableDisableMultiConf .= img_picto($langs->transnoentities("Activated"), 'switch_on');
-}
-$enableDisableMultiConf .= '</a>';
-print $enableDisableMultiConf;
-print '<input type="hidden" id="DIGIRISKDOLIBARR_TICKET_PUBLIC_INTERFACE_USE_MULTICOMPANY_CONFIG" name="DIGIRISKDOLIBARR_TICKET_PUBLIC_INTERFACE_USE_MULTICOMPANY_CONFIG" value="' . (empty($conf->global->DIGIRISKDOLIBARR_TICKET_PUBLIC_INTERFACE_USE_MULTICOMPANY_CONFIG) ? 1 : 0) . '">';
+if ($conf->multicompany->enabled) {
+	$enableDisableMultiConf = $langs->transnoentities("UseMulticompanyConfig") . ' ';
+	if (empty($conf->global->DIGIRISKDOLIBARR_TICKET_PUBLIC_INTERFACE_USE_MULTICOMPANY_CONFIG)) {
+		// Button off, click to enable
+		$enableDisableMultiConf .= '<a class="reposition valignmiddle" href="' . $_SERVER["PHP_SELF"] . '?action=setMulticompanyConfig&token=' . newToken() . '&value=1">';
+		$enableDisableMultiConf .= img_picto($langs->transnoentities("Disabled"), 'switch_off');
+	} else {
+		// Button on, click to disable
+		$enableDisableMultiConf .= '<a class="reposition valignmiddle" href="' . $_SERVER["PHP_SELF"] . '?action=setMulticompanyConfig&token=' . newToken() . '&value=0">';
+		$enableDisableMultiConf .= img_picto($langs->transnoentities("Activated"), 'switch_on');
+	}
+	$enableDisableMultiConf .= '</a>';
+	print $enableDisableMultiConf;
+	print '<input type="hidden" id="DIGIRISKDOLIBARR_TICKET_PUBLIC_INTERFACE_USE_MULTICOMPANY_CONFIG" name="DIGIRISKDOLIBARR_TICKET_PUBLIC_INTERFACE_USE_MULTICOMPANY_CONFIG" value="' . (empty($conf->global->DIGIRISKDOLIBARR_TICKET_PUBLIC_INTERFACE_USE_MULTICOMPANY_CONFIG) ? 1 : 0) . '">';
 
-print '<br><br>';
+	print '<br><br>';
+}
 
 if (empty($conf->global->DIGIRISKDOLIBARR_TICKET_PUBLIC_INTERFACE_USE_MULTICOMPANY_CONFIG)) {
 	$enabledisablehtml = $langs->transnoentities("TicketActivatePublicInterface") . ' ';
@@ -343,6 +345,9 @@ if (empty($conf->global->DIGIRISKDOLIBARR_TICKET_PUBLIC_INTERFACE_USE_MULTICOMPA
 
 	print '</table>';
 	print '</form>';
+} else {
+	print '</br>';
+	print '<span class="opacitymedium">' . $langs->transnoentities("ConfigureMultiCompanyAt") . '</span> : <a class="wordbreak" href="' . dol_buildpath('/custom/digiriskdolibarr/admin/ticket/multicompany_ticket.php', 1) . '" target="_blank" >' . dol_buildpath('/custom/digiriskdolibarr/admin/ticket/multicompany_ticket.php', 2) . '</a>';
 }
 
 // End of page
