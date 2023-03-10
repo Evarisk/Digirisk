@@ -147,7 +147,13 @@ $digiriskelementRequiredConf = 'DIGIRISKDOLIBARR_'. $multiCompanyMention .'TICKE
 $dateVisibleConf             = 'DIGIRISKDOLIBARR_'. $multiCompanyMention .'TICKET_DATE_VISIBLE';
 $dateRequiredConf            = 'DIGIRISKDOLIBARR_'. $multiCompanyMention .'TICKET_DATE_REQUIRED';
 
+$photoVisibleConf            = 'DIGIRISKDOLIBARR_'. $multiCompanyMention . 'TICKET_PHOTO_VISIBLE';
+
+$enablePublicInterfaceConf   = 'DIGIRISKDOLIBARR_'. $multiCompanyMention .'TICKET_ENABLE_PUBLIC_INTERFACE';
+$hideRefConf                 = 'DIGIRISKDOLIBARR_'. $multiCompanyMention .'TICKET_DIGIRISKELEMENT_HIDE_REF';
+$mainCategoryConf            = 'DIGIRISKDOLIBARR_'. $multiCompanyMention .'TICKET_MAIN_CATEGORY';
 $parentCategoryLabel         = 'DIGIRISKDOLIBARR_'. $multiCompanyMention .'TICKET_PARENT_CATEGORY_LABEL';
+$childCategoryLabel          = 'DIGIRISKDOLIBARR_'. $multiCompanyMention .'TICKET_CHILD_CATEGORY_LABEL';
 
 if ($action == 'add') {
 	$error = 0;
@@ -419,7 +425,6 @@ $arrayofcss = array('/opensurvey/css/style.css', '/ticket/css/styles.css.php', "
 llxHeaderTicketDigirisk($langs->trans("CreateTicket"), "", 0, 0, $arrayofjs, $arrayofcss);
 
 if ($entity > 0) {
-	$enablePublicInterfaceConf = 'DIGIRISKDOLIBARR_' . $multiCompanyMention . 'TICKET_ENABLE_PUBLIC_INTERFACE';
 	if (!$conf->global->$enablePublicInterfaceConf) {
 		print '<div class="error">' . $langs->trans('TicketPublicInterfaceForbidden') . '</div>';
 		$db->close();
@@ -457,14 +462,13 @@ if ($entity > 0) {
 		</div>
 	<?php endif;
 
-	$mainCategoryConf   = 'DIGIRISKDOLIBARR_' . $multiCompanyMention . 'TICKET_MAIN_CATEGORY';
 	$mainCategoryObject = $category->rechercher($conf->global->$mainCategoryConf, '', 'ticket', true);
 
-	if (!empty($mainCategoryObject) && $mainCategoryObject > 0) {
+	if (is_array($mainCategoryObject) && !empty($mainCategoryObject)) {
 		print '<p><strong>' . $conf->global->$parentCategoryLabel . '</strong><span style="color:red"> *</span></p>';
 		print '<div class="wpeo-gridlayout grid-3">';
 		$mainCategoryChildren = $mainCategoryObject[0]->get_filles();
-		if (!empty($mainCategoryChildren) && $mainCategoryChildren > 0) {
+		if (is_array($mainCategoryChildren) && !empty($mainCategoryChildren)) {
 			$k = 1;
 			foreach ($mainCategoryChildren as $cat) {
 				if ($cat->id == GETPOST('parentCategory')) {
@@ -490,8 +494,6 @@ if ($entity > 0) {
 				$selectedParentCategory->fetch($cat->id);
 				$selectedParentCategoryChildren = $selectedParentCategory->get_filles();
 				if ( ! empty($selectedParentCategoryChildren)) {
-
-					$childCategoryLabel = 'DIGIRISKDOLIBARR_' . $multiCompanyMention .'TICKET_CHILD_CATEGORY_LABEL';
 					print '<div class="subCategories children'. $cat->id .'"'. (GETPOST('parentCategory') == $cat->id ? '' : ' style="display:none">');
 					print '<p><strong>' . $conf->global->$childCategoryLabel . '</strong></p>';
 					print '<div class="wpeo-gridlayout grid-5">';
@@ -525,7 +527,6 @@ if ($entity > 0) {
 			</div>
 			<div class="form-element">
 				<?php
-				$photoVisibleConf = 'DIGIRISKDOLIBARR_'. $multiCompanyMention . 'TICKET_PHOTO_VISIBLE';
 				if ($conf->global->$photoVisibleConf) {?>
 				<div class="wpeo-gridlayout grid-2">
 					<span class="form-label"><?php print $langs->trans("FilesLinked"); ?></span>
@@ -592,7 +593,6 @@ if ($entity > 0) {
 					$filter .= ')';
 				}
 
-				$hideRefConf = 'DIGIRISKDOLIBARR_' . $multiCompanyMention . 'TICKET_DIGIRISKELEMENT_HIDE_REF';
 				$selectDigiriskElement .= $digiriskelement->select_digiriskelement_list(GETPOST('options_digiriskdolibarr_ticket_service'), 'options_digiriskdolibarr_ticket_service', (!empty($filter) ? $filter : ''), $langs->trans('PleaseSelectADigiriskElement'), 0, array(), 0, 0, 'minwidth500', 0, false, 1, '', true, $conf->global->$hideRefConf);
 				$selectDigiriskElement .= '<div><br></div>';
 				print($selectDigiriskElement);
