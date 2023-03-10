@@ -285,7 +285,7 @@ print '<input type="hidden" id="DIGIRISKDOLIBARR_MULTICOMPANY_TICKET_ENABLE_PUBL
 print '<br><br>';
 
 if (!empty($conf->global->DIGIRISKDOLIBARR_MULTICOMPANY_TICKET_ENABLE_PUBLIC_INTERFACE)) {
-	require_once '../../core/tpl/ticket/digiriskdolibarr_ticket_config.tpl.php';
+	require_once '../../core/tpl/ticket/digiriskdolibarr_ticket_config_view.tpl.php';
 }
 
 // End of page

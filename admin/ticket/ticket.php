@@ -316,7 +316,7 @@ if (empty($conf->global->DIGIRISKDOLIBARR_TICKET_PUBLIC_INTERFACE_USE_MULTICOMPA
 	print '<br><br>';
 
 	if (!empty($conf->global->DIGIRISKDOLIBARR_TICKET_ENABLE_PUBLIC_INTERFACE)) {
-		require_once '../../core/tpl/ticket/digiriskdolibarr_ticket_config.tpl.php';
+		require_once '../../core/tpl/ticket/digiriskdolibarr_ticket_config_view.tpl.php';
 	}
 
 	// Project
