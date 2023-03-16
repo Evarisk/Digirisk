@@ -157,7 +157,7 @@ ThirdPartyOpeningHoursSave = Les horaires d'ouverture du tiers ont bien été en
 
 
 #
-# DigriskDocuments - Documents Digirisk
+# DigiriskDocuments - Documents Digirisk
 #
 
 # Data - Donnée
@@ -166,7 +166,8 @@ Responsible = Responsable
 ContactsAction = Contacts action
 PERCOTooltip = Si votre société possède un PERCO, cochez cette case
 PEETooltip = Si votre société possède un PEE, cochez cette case
-
+DeleteFile = Supprimer le fichier
+ConfirmDeleteFile = Êtes-vous sûr de vouloir <b>supprimer ce fichier</b> ? <br> Une fois supprimé ce fichier ne sera <b>plus accessible ni récupérable d'aucune façon</b>.
 
 
 #

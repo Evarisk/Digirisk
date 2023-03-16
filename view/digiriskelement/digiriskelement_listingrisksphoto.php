@@ -144,7 +144,7 @@ if (empty($reshook)) {
 }
 
 // Delete file in doc form
-if ($action == 'remove_file' && $permissiontodelete) {
+if ($action == 'confirm_remove_file' && GETPOST("confirm") == "yes" && $permissiontodelete) {
 	if ( ! empty($upload_dir)) {
 		require_once DOL_DOCUMENT_ROOT . '/core/lib/files.lib.php';
 
@@ -158,13 +158,19 @@ if ($action == 'remove_file' && $permissiontodelete) {
 		// Make a redirect to avoid to keep the remove_file into the url that create side effects
 		$urltoredirect = $_SERVER['REQUEST_URI'];
 		$urltoredirect = preg_replace('/#builddoc$/', '', $urltoredirect);
-		$urltoredirect = preg_replace('/action=remove_file&?/', '', $urltoredirect);
+		$urltoredirect = preg_replace('/action=confirm_remove_file&?/', '', $urltoredirect);
 
 		header('Location: ' . $urltoredirect);
 		exit;
 	} else {
 		setEventMessages('BugFoundVarUploaddirnotDefined', null, 'errors');
 	}
+}
+
+$formconfirm = '';
+// Confirmation to delete file
+if ($action == 'remove_file' && $permissiontodelete) {
+	$formconfirm = digiriskformconfirm($_SERVER["PHP_SELF"] . '?id=' . $object->id, $langs->trans('DeleteFile'), $langs->trans('ConfirmDeleteFile'), 'confirm_remove_file&type='. $type.'&file=' . GETPOST('file', 'alpha'),'', '', 1);
 }
 
 /*
@@ -274,6 +280,7 @@ if ($includedocgeneration) {
 	}
 
 	print digiriskshowdocuments($modulepart, $dir_files, $filedir, $urlsource, $genallowed, $permissiontodelete, $conf->global->DIGIRISKDOLIBARR_LISTINGRISKSPHOTO_DEFAULT_MODEL, 1, 0, '', $langs->trans('ListingRisksPhoto'), '', '', $listingrisksphoto);
+	print $formconfirm;
 }
 
 // End of page
