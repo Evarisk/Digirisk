@@ -51,7 +51,7 @@
 		if (!preg_match('/(evaluation)/', $sortfield)) {
 			$sql = 'SELECT ';
 			foreach ($risk->fields as $key => $val) {
-				$sql .= 't.' . $key . ', ';
+				$sql .= 'r.' . $key . ', ';
 			}
 			// Add fields from extrafields
 			if (!empty($extrafields->attributes[$risk->table_element]['label'])) {
@@ -62,14 +62,14 @@
 			$reshook = $hookmanager->executeHooks('printFieldListSelect', $parameters, $risk); // Note that $action and $risk may have been modified by hook
 			$sql .= preg_replace('/^,/', '', $hookmanager->resPrint);
 			$sql = preg_replace('/,\s*$/', '', $sql);
-			$sql .= " FROM " . MAIN_DB_PREFIX . $risk->table_element . " as t";
-			$sql .= " LEFT JOIN " . MAIN_DB_PREFIX . $digiriskelement->table_element . " as e on (t.fk_element = e.rowid)";
-			if (is_array($extrafields->attributes[$risk->table_element]['label']) && count($extrafields->attributes[$risk->table_element]['label'])) $sql .= " LEFT JOIN " . MAIN_DB_PREFIX . $risk->table_element . "_extrafields as ef on (t.rowid = ef.fk_object)";
-			if ($risk->ismultientitymanaged == 1) $sql .= " WHERE t.entity IN (" . getEntity($risk->element) . ")";
+			$sql .= " FROM " . MAIN_DB_PREFIX . $risk->table_element . " as r";
+			$sql .= " LEFT JOIN " . MAIN_DB_PREFIX . $digiriskelement->table_element . " as e on (r.fk_element = e.rowid)";
+			if (is_array($extrafields->attributes[$risk->table_element]['label']) && count($extrafields->attributes[$risk->table_element]['label'])) $sql .= " LEFT JOIN " . MAIN_DB_PREFIX . $risk->table_element . "_extrafields as ef on (r.rowid = ef.fk_object)";
+			if ($risk->ismultientitymanaged == 1) $sql .= " WHERE r.entity IN (" . getEntity($risk->element) . ")";
 			else $sql .= " WHERE 1 = 1";
 			if (!$allRisks) {
 				$inherited_risk_id = $object->fk_parent;
-				$sql .= " AND t.fk_element IN (" . $inherited_risk_id;
+				$sql .= " AND r.fk_element IN (" . $inherited_risk_id;
 				while ($inherited_risk_id > 0) {
 					$inherited_risk_id = $alldigiriskelement[$inherited_risk_id]->fk_parent;
 					if ($inherited_risk_id > 0) {
@@ -108,9 +108,9 @@
 				}
 				if ($search[$key] != '') {
 					if ($key == 'ref') {
-						$sql .= " AND (t.ref = '$search[$key]')";
+						$sql .= " AND (r.ref = '$search[$key]')";
 					} else {
-						$sql .= natural_search('t.' . $key, $search[$key], (($key == 'status') ? 2 : $mode_search));
+						$sql .= natural_search('r.' . $key, $search[$key], (($key == 'status') ? 2 : $mode_search));
 					}
 				}
 			}
@@ -322,24 +322,24 @@
 
 	$varpage  = empty($contextpage) ? $_SERVER["PHP_SELF"] : $contextpage;
 
-	$arrayfields['t.fk_element']['label'] = $langs->trans('ParentElement');
-	$arrayfields['t.fk_element']['checked'] = 1;
-	$arrayfields['t.fk_element']['enabled'] = 1;
-	$arrayfields['t.fk_element']['position'] = 1;
+	$arrayfields['r.fk_element']['label'] = $langs->trans('ParentElement');
+	$arrayfields['r.fk_element']['checked'] = 1;
+	$arrayfields['r.fk_element']['enabled'] = 1;
+	$arrayfields['r.fk_element']['position'] = 1;
 
 	$arrayfields = dol_sort_array($arrayfields, 'position');
 
 	$menuConf = 'MAIN_SELECTEDFIELDS_' . $varpage;
 
 	if (dol_strlen($user->conf->$menuConf) < 1) {
-		$user->conf->$menuConf = 't.fk_element,t.ref,t.category,evaluation.cotation,';
+		$user->conf->$menuConf = 'r.fk_element,r.ref,r.category,evaluation.cotation,';
 	}
 
-	if ( ! preg_match('/t.description/', $user->conf->$menuConf) && $conf->global->DIGIRISKDOLIBARR_RISK_DESCRIPTION) {
-		$user->conf->$menuConf = $user->conf->$menuConf . 't.description,';
+	if ( ! preg_match('/r.description/', $user->conf->$menuConf) && $conf->global->DIGIRISKDOLIBARR_RISK_DESCRIPTION) {
+		$user->conf->$menuConf = $user->conf->$menuConf . 'r.description,';
 	} elseif ( ! $conf->global->DIGIRISKDOLIBARR_RISK_DESCRIPTION) {
-		$user->conf->$menuConf = preg_replace('/t.description,/', '', $user->conf->$menuConf);
-		$arrayfields['t.description']['enabled'] = 0;
+		$user->conf->$menuConf = preg_replace('/r.description,/', '', $user->conf->$menuConf);
+		$arrayfields['r.description']['enabled'] = 0;
 	}
 
 	if ( ! preg_match('/evaluation.has_tasks/', $user->conf->$menuConf) && $conf->global->DIGIRISKDOLIBARR_TASK_MANAGEMENT) {
@@ -363,7 +363,7 @@
 	foreach ($risk->fields as $key => $val) {
 		$cssforfield                        = (empty($val['css']) ? '' : $val['css']);
 		if ($key == 'status') $cssforfield .= ($cssforfield ? ' ' : '') . 'center';
-		if ( ! empty($arrayfields['t.' . $key]['checked'])) {
+		if ( ! empty($arrayfields['r.' . $key]['checked'])) {
 			print '<td class="liste_titre' . ($cssforfield ? ' ' . $cssforfield : '') . '">';
 			if (is_array($val['arrayofkeyval'])) print $form->selectarray('search_' . $key, $val['arrayofkeyval'], $search[$key], $val['notnull'], 0, 0, '', 1, 0, 0, '', 'maxwidth75');
 			elseif (strpos($val['type'], 'integer:') === 0) {
@@ -430,8 +430,8 @@
 	foreach ($risk->fields as $key => $val) {
 		$cssforfield                        = (empty($val['css']) ? '' : $val['css']);
 		if ($key == 'status') $cssforfield .= ($cssforfield ? ' ' : '') . 'center';
-		if ( ! empty($arrayfields['t.' . $key]['checked'])) {
-			print getTitleFieldOfList($arrayfields['t.' . $key]['label'], 0, $_SERVER['PHP_SELF'], 't.' . $key, '', $param, ($cssforfield ? 'class="' . $cssforfield . '"' : ''), $sortfield, $sortorder, ($cssforfield ? $cssforfield . ' ' : '')) . "\n";
+		if ( ! empty($arrayfields['r.' . $key]['checked'])) {
+			print getTitleFieldOfList($arrayfields['r.' . $key]['label'], 0, $_SERVER['PHP_SELF'], 'r.' . $key, '', $param, ($cssforfield ? 'class="' . $cssforfield . '"' : ''), $sortfield, $sortorder, ($cssforfield ? $cssforfield . ' ' : '')) . "\n";
 		}
 	}
 
@@ -482,7 +482,7 @@
 			elseif ($key == 'ref') $cssforfield         .= ($cssforfield ? ' ' : '') . 'nowrap';
 			elseif ($key == 'category') $cssforfield    .= ($cssforfield ? ' ' : '') . 'risk-category';
 			elseif ($key == 'description') $cssforfield .= ($cssforfield ? ' ' : '') . 'risk-description-' . $risk->id;
-			if ( ! empty($arrayfields['t.' . $key]['checked'])) {
+			if ( ! empty($arrayfields['r.' . $key]['checked'])) {
 				print '<td' . ($cssforfield ? ' class="' . $cssforfield . '"' : '') . ' style="width:2%">';
 				if ($key == 'status') print $risk->getLibStatut(5);
 				elseif ($key == 'fk_element') {
@@ -508,8 +508,8 @@
 				print '</td>';
 				if ( ! $i) $totalarray['nbfield']++;
 				if ( ! empty($val['isameasure'])) {
-					if ( ! $i) $totalarray['pos'][$totalarray['nbfield']] = 't.' . $key;
-					$totalarray['val']['t.' . $key]                      += $risk->$key;
+					if ( ! $i) $totalarray['pos'][$totalarray['nbfield']] = 'r.' . $key;
+					$totalarray['val']['r.' . $key]                      += $risk->$key;
 				}
 			}
 		}
@@ -532,8 +532,8 @@
 				print '</td>';
 				if ( ! $i) $totalarray['nbfield']++;
 				if ( ! empty($val['isameasure'])) {
-					if ( ! $i) $totalarray['pos'][$totalarray['nbfield']] = 't.' . $key;
-					$totalarray['val']['t.' . $key]                      += $lastEvaluation->$key;
+					if ( ! $i) $totalarray['pos'][$totalarray['nbfield']] = 'r.' . $key;
+					$totalarray['val']['r.' . $key]                      += $lastEvaluation->$key;
 				}
 			}
 		}

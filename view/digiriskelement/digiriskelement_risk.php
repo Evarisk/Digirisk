@@ -97,7 +97,7 @@ $extrafields->fetch_name_optionals_label($risk->table_element);
 $search_array_options = $extrafields->getOptionalsFromPost($risk->table_element, '', 'search_');
 
 // Default sort order (if not yet defined by previous GETPOST)
-if ( ! $sortfield) $sortfield = $conf->global->DIGIRISKDOLIBARR_SORT_LISTINGS_BY_COTATION ? "evaluation.cotation" : "t." . key($risk->fields);; // Set here default search field. By default 1st field in definition.
+if ( ! $sortfield) $sortfield = $conf->global->DIGIRISKDOLIBARR_SORT_LISTINGS_BY_COTATION ? "evaluation.cotation" : "r." . key($risk->fields);; // Set here default search field. By default 1st field in definition.
 if ( ! $sortorder) $sortorder         = $conf->global->DIGIRISKDOLIBARR_SORT_LISTINGS_BY_COTATION ? "DESC" : "ASC" ;
 if ( ! $evalsortfield) $evalsortfield = "evaluation." . key($evaluation->fields);
 
@@ -119,7 +119,7 @@ foreach ($risk->fields as $key => $val) {
 // List of fields to search into when doing a "search in all"
 $fieldstosearchall = array();
 foreach ($risk->fields as $key => $val) {
-	if ($val['searchall']) $fieldstosearchall['t.' . $key] = $val['label'];
+	if ($val['searchall']) $fieldstosearchall['r.' . $key] = $val['label'];
 }
 
 // Definition of fields for list
@@ -129,7 +129,7 @@ foreach ($risk->fields as $key => $val) {
 	if ($val['label'] == 'Entity' || $val['label'] == 'ParentElement') {
 		$val['visible'] = 0;
 	}
-	if ( ! empty($val['visible'])) $arrayfields['t.' . $key] = array('label' => $val['label'], 'checked' => (($val['visible'] < 0) ? 0 : 1), 'enabled' => ($val['enabled'] && ($val['visible'] != 3)), 'position' => $val['position']);
+	if ( ! empty($val['visible'])) $arrayfields['r.' . $key] = array('label' => $val['label'], 'checked' => (($val['visible'] < 0) ? 0 : 1), 'enabled' => ($val['enabled'] && ($val['visible'] != 3)), 'position' => $val['position']);
 }
 
 foreach ($evaluation->fields as $key => $val) {

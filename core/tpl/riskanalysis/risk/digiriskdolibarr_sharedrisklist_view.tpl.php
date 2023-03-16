@@ -86,7 +86,7 @@ if (is_array($riskAssessmentList) && !empty($riskAssessmentList)) {
 if ( ! preg_match('/(evaluation)/', $sortfield)) {
 	$sql = 'SELECT DISTINCT ';
 	foreach ($risk->fields as $key => $val) {
-		$sql .= 't.' . $key . ', ';
+		$sql .= 'r.' . $key . ', ';
 	}
 	// Add fields from extrafields
 	if ( ! empty($extrafields->attributes[$risk->table_element]['label'])) {
@@ -97,52 +97,28 @@ if ( ! preg_match('/(evaluation)/', $sortfield)) {
 	$reshook                                                                                                                                       = $hookmanager->executeHooks('printFieldListSelect', $parameters, $risk); // Note that $action and $risk may have been modified by hook
 	$sql                                                                                                                                          .= preg_replace('/^,/', '', $hookmanager->resPrint);
 	$sql                                                                                                                                           = preg_replace('/,\s*$/', '', $sql);
-	$sql                                                                                                                                          .= " FROM " . MAIN_DB_PREFIX . $risk->table_element . " as t";
-	$sql                                                                                                                                          .= " LEFT JOIN " . MAIN_DB_PREFIX . $digiriskelement->table_element . " as e on (t.fk_element = e.rowid)";
-	$sql                                                                                                                                          .= " INNER JOIN " . MAIN_DB_PREFIX . 'element_element' . " as el on (t.rowid = el.fk_source)";
-	if (is_array($extrafields->attributes[$risk->table_element]['label']) && count($extrafields->attributes[$risk->table_element]['label'])) $sql .= " LEFT JOIN " . MAIN_DB_PREFIX . $risk->table_element . "_extrafields as ef on (t.rowid = ef.fk_object)";
-	//if ($risk->ismultientitymanaged == 1) $sql                                                                                                    .= " WHERE t.entity IN (" . getEntity($risk->element) . ")";
-	//else $sql                                                                                                                                     .= " WHERE 1 = 1";
+	$sql                                                                                                                                          .= " FROM " . MAIN_DB_PREFIX . $risk->table_element . " as r";
+	$sql                                                                                                                                          .= " LEFT JOIN " . MAIN_DB_PREFIX . $digiriskelement->table_element . " as e on (r.fk_element = e.rowid)";
+	$sql                                                                                                                                          .= " INNER JOIN " . MAIN_DB_PREFIX . 'element_element' . " as el on (r.rowid = el.fk_source)";
+	if (is_array($extrafields->attributes[$risk->table_element]['label']) && count($extrafields->attributes[$risk->table_element]['label'])) $sql .= " LEFT JOIN " . MAIN_DB_PREFIX . $risk->table_element . "_extrafields as ef on (r.rowid = ef.fk_object)";
+
 	if ( ! $allRisks) {
 		$sql .= " AND el.fk_target = " . $id;
-		$sql .= " AND el.sourcetype = 'digiriskdolibarr_risk'";
-		if (is_array($alldigiriskelement) && !empty($alldigiriskelement)) {
-			$digiriskElementSqlFilter = '(';
-			foreach (array_keys($alldigiriskelement) as $elementId) {
-				$digiriskElementSqlFilter .= $elementId . ', ';
-			}
-			if (preg_match('/, /', $digiriskElementSqlFilter)) {
-				$digiriskElementSqlFilter = rtrim($digiriskElementSqlFilter, ', ');
-			}
-			$digiriskElementSqlFilter .= ')';
-			$sql .= " AND r.fk_element IN " . $digiriskElementSqlFilter;
-		}
 	} else {
-		if (is_array($alldigiriskelement) && !empty($alldigiriskelement)) {
+		if (is_array($digiriskElementsOfEntity) && !empty($digiriskElementsOfEntity)) {
 			$digiriskElementSqlFilter = '(';
-			foreach (array_keys($alldigiriskelement) as $elementId) {
+			foreach (array_keys($digiriskElementsOfEntity) as $elementId) {
 				$digiriskElementSqlFilter .= $elementId . ', ';
 			}
 			if (preg_match('/, /', $digiriskElementSqlFilter)) {
 				$digiriskElementSqlFilter = rtrim($digiriskElementSqlFilter, ', ');
 			}
 			$digiriskElementSqlFilter .= ')';
-			$sql .= " AND r.fk_element IN " . $digiriskElementSqlFilter;
+
+			$sql .= " AND el.fk_target IN " . $digiriskElementSqlFilter;
 		}
-		$sql .= " AND fk_element > 0 ";
-		$sql .= " AND el.fk_target IN (";
-		foreach ($alldigiriskelement as $digiriskelementsingle) {
-			$digiriskelementList[] = $digiriskelementsingle->id;
-		}
-		$digiriskelementList = array_unique($digiriskelementList);
-		foreach ($digiriskelementList as $digiriskelementsinglefinal) {
-			$sql .= $digiriskelementsinglefinal . ',';
-		}
-		$sql = dol_substr($sql, 0 , -1);
-		$sql .= ")";
-		$sql .= " AND el.sourcetype = 'digiriskdolibarr_risk'";
-		//$sql .= " AND e.entity IN (" . getEntity($risk->element) . ") ";
 	}
+	$sql .= " AND el.sourcetype = 'digiriskdolibarr_risk'";
 
 	foreach ($search as $key => $val) {
 		if ($key == 'status' && $search[$key] == -1) continue;
@@ -159,7 +135,7 @@ if ( ! preg_match('/(evaluation)/', $sortfield)) {
 		}
 		if ($search[$key] != '') {
 			if ($key == 'ref') {
-				$sql .= " AND (t.ref = '$search[$key]')";
+				$sql .= " AND (r.ref = '$search[$key]')";
 			} elseif ($key == 'fk_element') {
 				if ( $search[$key] > 0){
 					$sql .= " AND (e.rowid = '$search[$key]')";
@@ -167,7 +143,7 @@ if ( ! preg_match('/(evaluation)/', $sortfield)) {
 			} elseif ($key == 'entity') {
 				$sql .= " AND (e.entity = '$search[$key]')";
 			} else {
-				$sql .= natural_search('t.'.$key, $search[$key], (($key == 'status') ? 2 : $mode_search));
+				$sql .= natural_search('r.'.$key, $search[$key], (($key == 'status') ? 2 : $mode_search));
 			}
 		}
 	}
@@ -241,48 +217,21 @@ if ( ! preg_match('/(evaluation)/', $sortfield)) {
 
 	if ( ! $allRisks) {
 		$sql .= " AND el.fk_target = " . $id;
-		$sql .= " AND el.sourcetype = 'digiriskdolibarr_risk'";
-		if (is_array($alldigiriskelement) && !empty($alldigiriskelement)) {
-			$digiriskElementSqlFilter = '(';
-			foreach (array_keys($alldigiriskelement) as $elementId) {
-				$digiriskElementSqlFilter .= $elementId . ', ';
-			}
-			if (preg_match('/, /', $digiriskElementSqlFilter)) {
-				$digiriskElementSqlFilter = rtrim($digiriskElementSqlFilter, ', ');
-			}
-			$digiriskElementSqlFilter .= ')';
-			$sql .= " AND r.fk_element IN " . $digiriskElementSqlFilter;
-		}
-		//$sql .= " AND r.fk_element =" . $id;
 	} else {
-		if (is_array($alldigiriskelement) && !empty($alldigiriskelement)) {
+		if (is_array($digiriskElementsOfEntity) && !empty($digiriskElementsOfEntity)) {
 			$digiriskElementSqlFilter = '(';
-			foreach (array_keys($alldigiriskelement) as $elementId) {
+			foreach (array_keys($digiriskElementsOfEntity) as $elementId) {
 				$digiriskElementSqlFilter .= $elementId . ', ';
 			}
 			if (preg_match('/, /', $digiriskElementSqlFilter)) {
 				$digiriskElementSqlFilter = rtrim($digiriskElementSqlFilter, ', ');
 			}
 			$digiriskElementSqlFilter .= ')';
-			$sql .= " AND r.fk_element IN " . $digiriskElementSqlFilter;
+
+			$sql .= " AND el.fk_target IN " . $digiriskElementSqlFilter;
 		}
-		$sql .= " AND r.fk_element > 0";
-		$sql .= " AND el.fk_target IN (";
-		foreach ($alldigiriskelement as $digiriskelementsingle) {
-			$digiriskelementList[] = $digiriskelementsingle->id;
-		}
-		if (empty($digiriskelementList)) {
-			$digiriskelementList[] = 0;
-		}
-		$digiriskelementList = array_unique($digiriskelementList);
-		foreach ($digiriskelementList as $digiriskelementsinglefinal) {
-			$sql .= $digiriskelementsinglefinal . ',';
-		}
-		$sql = dol_substr($sql, 0 , -1);
-		$sql .= ")";
-		$sql .= " AND el.sourcetype = 'digiriskdolibarr_risk'";
-		//$sql .= " AND e.entity IN (" . getEntity($evaluation->element) . ")";
 	}
+	$sql .= " AND el.sourcetype = 'digiriskdolibarr_risk'";
 
 	foreach ($search as $key => $val) {
 		if ($key == 'status' && $search[$key] == -1) continue;
@@ -402,35 +351,35 @@ if ( ! empty($moreforfilter)) {
 
 $varpage  = empty($contextpage) ? $_SERVER["PHP_SELF"] : $contextpage;
 
-$arrayfields['t.entity']['checked']  = 1;
-$arrayfields['t.entity']['label']    = $langs->trans('Entity');
-$arrayfields['t.entity']['enabled']  = 1;
-$arrayfields['t.entity']['position'] = 1;
+$arrayfields['r.entity']['checked']  = 1;
+$arrayfields['r.entity']['label']    = $langs->trans('Entity');
+$arrayfields['r.entity']['enabled']  = 1;
+$arrayfields['r.entity']['position'] = 1;
 
-$arrayfields['t.fk_element']['checked']  = 1;
-$arrayfields['t.fk_element']['label']    = $langs->trans('ParentElement');
-$arrayfields['t.fk_element']['enabled']  = 1;
-$arrayfields['t.fk_element']['position'] = 2;
+$arrayfields['r.fk_element']['checked']  = 1;
+$arrayfields['r.fk_element']['label']    = $langs->trans('ParentElement');
+$arrayfields['r.fk_element']['enabled']  = 1;
+$arrayfields['r.fk_element']['position'] = 2;
 
-$arrayfields['t.applied_on']['checked']  = 1;
-$arrayfields['t.applied_on']['label']    = $langs->trans('AppliedOn');
-$arrayfields['t.applied_on']['enabled']  = 1;
-$arrayfields['t.applied_on']['position'] = 9;
-$arrayfields['t.applied_on']['disablesort'] = 1;
+$arrayfields['r.applied_on']['checked']  = 1;
+$arrayfields['r.applied_on']['label']    = $langs->trans('AppliedOn');
+$arrayfields['r.applied_on']['enabled']  = 1;
+$arrayfields['r.applied_on']['position'] = 9;
+$arrayfields['r.applied_on']['disablesort'] = 1;
 
 $arrayfields = dol_sort_array($arrayfields, 'position');
 
 $menuConf = 'MAIN_SELECTEDFIELDS_' . $varpage;
 
 if (dol_strlen($user->conf->$menuConf) < 1) {
-	$user->conf->$menuConf = 't.entity,t.fk_element,t.applied_on,t.ref,t.category,evaluation.cotation,';
+	$user->conf->$menuConf = 'r.entity,r.fk_element,r.applied_on,r.ref,r.category,evaluation.cotation,';
 }
 
-if ( ! preg_match('/t.description/', $user->conf->$menuConf) && $conf->global->DIGIRISKDOLIBARR_RISK_DESCRIPTION) {
-	$user->conf->$menuConf = $user->conf->$menuConf  . 't.description,';
+if ( ! preg_match('/r.description/', $user->conf->$menuConf) && $conf->global->DIGIRISKDOLIBARR_RISK_DESCRIPTION) {
+	$user->conf->$menuConf = $user->conf->$menuConf  . 'r.description,';
 } elseif ( ! $conf->global->DIGIRISKDOLIBARR_RISK_DESCRIPTION) {
-	$user->conf->$menuConf = preg_replace('/t.description,/', '', $user->conf->$menuConf);
-	$arrayfields['t.description']['enabled'] = 0;
+	$user->conf->$menuConf = preg_replace('/r.description,/', '', $user->conf->$menuConf);
+	$arrayfields['r.description']['enabled'] = 0;
 }
 
 if ( ! preg_match('/evaluation.has_tasks/', $user->conf->$menuConf) && $conf->global->DIGIRISKDOLIBARR_TASK_MANAGEMENT) {
@@ -452,13 +401,13 @@ print '<table class="tagtable nobottomiftotal liste' . ($moreforfilter ? " listw
 // --------------------------------------------------------------------
 print '<tr class="liste_titre">';
 
-$risk->fields['applied_on'] = $arrayfields['t.applied_on'] ;
+$risk->fields['applied_on'] = $arrayfields['r.applied_on'] ;
 $risk->fields = dol_sort_array($risk->fields, 'position');
 
 foreach ($risk->fields as $key => $val) {
 	$cssforfield                        = (empty($val['css']) ? '' : $val['css']);
 	if ($key == 'status') $cssforfield .= ($cssforfield ? ' ' : '') . 'center';
-	if ( ! empty($arrayfields['t.' . $key]['checked'])) {
+	if ( ! empty($arrayfields['r.' . $key]['checked'])) {
 		print '<td class="liste_titre' . ($cssforfield ? ' ' . $cssforfield : '') . '">';
 		if (is_array($val['arrayofkeyval'])) print $form->selectarray('search_' . $key, $val['arrayofkeyval'], $search[$key], $val['notnull'], 0, 0, '', 1, 0, 0, '', 'maxwidth75');
 		elseif (strpos($val['type'], 'integer:') === 0) {
@@ -530,8 +479,8 @@ print '<tr class="liste_titre">';
 foreach ($risk->fields as $key => $val) {
 	$cssforfield                        = (empty($val['css']) ? '' : $val['css']);
 	if ($key == 'status') $cssforfield .= ($cssforfield ? ' ' : '') . 'center';
-	if ( ! empty($arrayfields['t.' . $key]['checked'])) {
-		print getTitleFieldOfList($arrayfields['t.' . $key]['label'], 0, $_SERVER['PHP_SELF'], 't.' . $key, '', $param, ($cssforfield ? 'class="' . $cssforfield . '"' : ''), $sortfield, $sortorder, ($cssforfield ? $cssforfield . ' ' : ''), $arrayfields['t.' . $key]['disablesort']) . "\n";
+	if ( ! empty($arrayfields['r.' . $key]['checked'])) {
+		print getTitleFieldOfList($arrayfields['r.' . $key]['label'], 0, $_SERVER['PHP_SELF'], 'r.' . $key, '', $param, ($cssforfield ? 'class="' . $cssforfield . '"' : ''), $sortfield, $sortorder, ($cssforfield ? $cssforfield . ' ' : ''), $arrayfields['r.' . $key]['disablesort']) . "\n";
 	}
 }
 
@@ -578,7 +527,7 @@ while ($i < ($limit ? min($num, $limit) : $num)) {
 
 	// Show here line of result
 	print '<tr class="oddeven risk-row risk_row_' . $risk->id . ' risk-row-content-' . $risk->id . '" id="risk_row_' . $risk->id . '">';
-	$risk->fields['applied_on'] = $arrayfields['t.applied_on'] ;
+	$risk->fields['applied_on'] = $arrayfields['r.applied_on'] ;
 	$risk->fields = dol_sort_array($risk->fields, 'position');
 
 	foreach ($risk->fields as $key => $val) {
@@ -587,7 +536,7 @@ while ($i < ($limit ? min($num, $limit) : $num)) {
 		elseif ($key == 'ref') $cssforfield         .= ($cssforfield ? ' ' : '') . 'nowrap';
 		elseif ($key == 'category') $cssforfield    .= ($cssforfield ? ' ' : '') . 'risk-category';
 		elseif ($key == 'description') $cssforfield .= ($cssforfield ? ' ' : '') . 'risk-description-' . $risk->id;
-		if ( ! empty($arrayfields['t.' . $key]['checked'])) {
+		if ( ! empty($arrayfields['r.' . $key]['checked'])) {
 			print '<td' . ($cssforfield ? ' class="' . $cssforfield . '"' : '') . ' style="width:2%">';
 			if ($key == 'status') print $risk->getLibStatut(5);
 			elseif ($key == 'entity') { ?>
@@ -630,8 +579,8 @@ while ($i < ($limit ? min($num, $limit) : $num)) {
 			print '</td>';
 			if ( ! $i) $totalarray['nbfield']++;
 			if ( ! empty($val['isameasure'])) {
-				if ( ! $i) $totalarray['pos'][$totalarray['nbfield']] = 't.' . $key;
-				$totalarray['val']['t.' . $key]                      += $risk->$key;
+				if ( ! $i) $totalarray['pos'][$totalarray['nbfield']] = 'r.' . $key;
+				$totalarray['val']['r.' . $key]                      += $risk->$key;
 			}
 		}
 	}
@@ -655,8 +604,8 @@ while ($i < ($limit ? min($num, $limit) : $num)) {
 			print '</td>';
 			if ( ! $i) $totalarray['nbfield']++;
 			if ( ! empty($val['isameasure'])) {
-				if ( ! $i) $totalarray['pos'][$totalarray['nbfield']] = 't.' . $key;
-				$totalarray['val']['t.' . $key]                      += $lastEvaluation->$key;
+				if ( ! $i) $totalarray['pos'][$totalarray['nbfield']] = 'r.' . $key;
+				$totalarray['val']['r.' . $key]                      += $lastEvaluation->$key;
 			}
 		}
 	}
