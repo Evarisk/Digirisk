@@ -85,7 +85,7 @@ $form      = new Form($db);
 $formother = new FormOther($db);
 
 $help_url = '';
-$title    = $langs->transnoentities("TicketMultiCompany");
+$title    = $langs->transnoentities("MultiCompanySetup");
 $morecss  = array("/digiriskdolibarr/css/digiriskdolibarr.css");
 
 llxHeader('', $title, $help_url, '', '', '', '', $morecss);
@@ -93,13 +93,13 @@ llxHeader('', $title, $help_url, '', '', '', '', $morecss);
 // Subheader
 $linkback = '<a href="' . ($backtopage ?: DOL_URL_ROOT . '/admin/modules.php?restore_lastsearch_values=1') . '">' . $langs->transnoentities("BackToModuleList") . '</a>';
 
-print load_fiche_titre($title, $linkback, 'digiriskdolibarr32px@digiriskdolibarr');
+print load_fiche_titre($title, $linkback, 'multicompany@multicompany');
 
 // Configuration header
 $head = multicompany_prepare_head();
 
 print dol_get_fiche_head($head, 'ticket', '', -1, 'digiriskdolibarr@digiriskdolibarr');
-print load_fiche_titre('<i class="fa fa-ticket"></i> ' . $langs->transnoentities("TicketManagement"), '', '');
+print load_fiche_titre('<i class="fa fa-ticket"></i> ' . $langs->transnoentities("MultiCompanyTicketManagement"), '', '');
 print '<hr>';
 if ($conf->multicompany->enabled) {
 	print load_fiche_titre($langs->transnoentities("MultiEntityPublicInterface"), '', '');
