@@ -510,6 +510,16 @@ foreach ($types as $type => $documentType) {
 							else {
 								print img_object($langs->trans('PreviewNotAvailable'), 'generic');
 							}
+
+							if ($documentType == 'projectdocument') {
+								print '<tr class="oddeven"><td>';
+								print $langs->trans('RiskAssessmentColor');
+								print '</td><td>';
+								print $langs->trans('DisplayRiskAssessmentInColor');
+								print '</td>';
+								print '<td class="center">';
+								print ajax_constantonoff('DIGIRISKDOLIBARR_DISPLAY_RISKASSESSMENT_COLOR_ORQUE');
+							}
 							print '</td>';
 							print '</tr>';
 						}

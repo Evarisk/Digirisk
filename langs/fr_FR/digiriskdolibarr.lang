@@ -168,6 +168,8 @@ PERCOTooltip = Si votre société possède un PERCO, cochez cette case
 PEETooltip = Si votre société possède un PEE, cochez cette case
 
 
+RiskAssessmentColor = Couleur des évaluations
+DisplayRiskAssessmentInColor = Affiche la couleur des évaluations dans le document Orque
 
 #
 # LegalDisplay - Affichage légal

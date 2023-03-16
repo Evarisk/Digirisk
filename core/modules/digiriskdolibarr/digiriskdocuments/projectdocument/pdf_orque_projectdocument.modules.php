@@ -509,8 +509,20 @@ class pdf_orque_projectdocument
 					$pdf->SetXY($this->posxrisk, $curY);
 					$pdf->MultiCell($this->posxriskassessment - $this->posxrisk, 3, $riskref, 0, 'L');
 					// Risk assessment
+					if ($conf->global->DIGIRISKDOLIBARR_DISPLAY_RISKASSESSMENT_COLOR_ORQUE) {
+						if ($lastEvaluation < 47) {
+							$pdf->SetTextColor(169, 169, 169);
+						} else if ($lastEvaluation < 51) {
+							$pdf->SetTextColor(255, 165, 0);
+						} else if ($lastEvaluation < 80) {
+							$pdf->SetTextColor(255, 0, 0);
+						} else {
+							$pdf->SetTextColor(0, 0, 0);
+						}
+					}
 					$pdf->SetXY($this->posxriskassessment, $curY);
 					$pdf->MultiCell($this->posxlabel - $this->posxriskassessment, 3, $lastEvaluation, 0, 'C');
+					$pdf->SetTextColor(0, 0, 0);
 					// task budget
 					$pdf->SetXY($this->posxbudget, $curY);
 					$pdf->MultiCell($this->posxworkload - $this->posxbudget, 3, $budget, 0, 'R');
