@@ -208,6 +208,13 @@ class doc_workunitdocument_odt extends ModeleODTWorkUnitDocument
 		}
 
 		if ($nbofiles) {
+			$texte .= '<div id="div_' . get_class($this) . '" class="hiddenx">';
+			// Show list of found files
+			foreach ($listoffiles as $file) {
+				$texte .= '- '.$file['name'].' &nbsp; <a class="reposition" href="'.DOL_URL_ROOT . '/custom/digiriskdolibarr/documents/doctemplates/workunitdocument/'.urlencode(basename($file['name'])).'?">'.img_picto('', 'listlight').'</a>';
+				$texte .= '<br>';
+			}
+			$texte .= '</div>';
 			$texte .= '<div id="div_' . get_class($this) . '" class="hidden">';
 			foreach ($listoffiles as $file) {
 				$texte .= $file['name'] . '<br>';
