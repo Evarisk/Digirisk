@@ -199,10 +199,14 @@ if (empty($reshook)) {
 		dol_mkdir($pathToZip);
 
 		// Ajout du fichier au dossier à zipper
-		$nameFile = $date . '_' . $riskassessmentdocument->ref . '_' . $nameSociety . '.odt';
+		$nameFile = $date . '_' . $riskassessmentdocument->ref . '_' . $nameSociety;
 		$nameFile = str_replace(' ', '_', $nameFile);
 		$nameFile = dol_sanitizeFileName($nameFile);
-		copy(DOL_DATA_ROOT . $entity . '/digiriskdolibarr/riskassessmentdocument/' . $riskassessmentdocument->last_main_doc, $pathToZip . '/' . $nameFile);
+		copy(DOL_DATA_ROOT . $entity . '/digiriskdolibarr/riskassessmentdocument/' . $riskassessmentdocument->last_main_doc, $pathToZip . '/' . $nameFile . '.odt');
+		$pathinfo = pathinfo($riskassessmentdocument->last_main_doc);
+		if (file_exists(DOL_DATA_ROOT . $entity . '/digiriskdolibarr/riskassessmentdocument/' . $pathinfo['filename'] . '.pdf')) {
+			copy(DOL_DATA_ROOT . $entity . '/digiriskdolibarr/riskassessmentdocument/' . $pathinfo['filename'] . '.pdf', $pathToZip . '/' . $nameFile . '.pdf');
+		}
 
 		if ($conf->global->DIGIRISKDOLIBARR_GENERATE_ARCHIVE_WITH_DIGIRISKELEMENT_DOCUMENTS) {
 			$digiriskelementlist = $digiriskelement->fetchDigiriskElementFlat(0);
@@ -228,10 +232,14 @@ if (empty($reshook)) {
 
 					// Ajout du fichier au dossier à zipper
 					$sourceFilePath = DOL_DATA_ROOT . $entity . '/digiriskdolibarr/' . $subFolder . '/' . $digiriskelementsingle['object']->ref . '/';
-					$nameFile       = $date . '_' . $riskassessmentdocument->ref . '_' . $digiriskelementsingle['object']->ref . '_' . $digiriskelementdocument->ref . '_' . $digiriskelementsingle['object']->label . '_' . $nameSociety . '.odt';
+					$nameFile       = $date . '_' . $riskassessmentdocument->ref . '_' . $digiriskelementsingle['object']->ref . '_' . $digiriskelementdocument->ref . '_' . $digiriskelementsingle['object']->label . '_' . $nameSociety;
 					$nameFile       = str_replace(' ', '_', $nameFile);
 					$nameFile       = dol_sanitizeFileName($nameFile);
-					copy($sourceFilePath . $digiriskelementdocument->last_main_doc, $pathToZip . '/' . $nameFile);
+					copy($sourceFilePath . $digiriskelementdocument->last_main_doc, $pathToZip . '/' . $nameFile . '.odt');
+					$pathinfo = pathinfo($digiriskelementdocument->last_main_doc);
+					if (file_exists($sourceFilePath . $pathinfo['filename'] . '.pdf')) {
+						copy($sourceFilePath . $pathinfo['filename'] . '.pdf', $pathToZip . '/' . $nameFile . '.pdf');
+					}
 				}
 
 				// Get real path for our folder
