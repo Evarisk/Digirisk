@@ -1100,6 +1100,7 @@ window.eoxiaJS.signature.autoDownloadSpecimen = function( event ) {
 			let path = element.find('.specimen-path').attr('value')
 
 			window.eoxiaJS.signature.download(path + filename, filename);
+			$('.wpeo-loader').removeClass('wpeo-loader')
 			$.ajax({
 				url: document.URL + '&action=remove_file&token=' + token,
 				type: "POST",
@@ -4141,6 +4142,7 @@ window.eoxiaJS.document.event = function() {
 	$( document ).on( 'click', '#builddoc_generatebutton', window.eoxiaJS.document.displayLoader );
 	$( document ).on( 'click', '.pdf-generation', window.eoxiaJS.document.displayLoader );
 	$( document ).on( 'click', ' .send-risk-assessment-document-by-mail', window.eoxiaJS.document.displayLoader );
+	$( document ).on( 'click', ' .auto-download', window.eoxiaJS.document.displayLoader );
 };
 
 /**
