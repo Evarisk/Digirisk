@@ -196,10 +196,11 @@ abstract class ModeleODTRiskAssessmentDocument extends CommonDocGenerator
 					$riskassessment        = new RiskAssessment($this->db);
 					$ticket                = new Ticket($this->db);
 					$category              = new Categorie($this->db);
-					
+
 					$digiriskelementlist   = $digiriskelementobject->fetchDigiriskElementFlat(0);
 					$risks                 = $risk->fetchRisksOrderedByCotation(0, true, $conf->global->DIGIRISKDOLIBARR_SHOW_INHERITED_RISKS_IN_DOCUMENTS, $conf->global->DIGIRISKDOLIBARR_SHOW_SHARED_RISKS);
 					$riskAssessmentList    = $riskassessment->fetchAll('', '', 0, 0, ['customsql' => 'status = 1']);
+					$riskList              = $risk->fetchAll('', '', 0, 0, array(), 'AND', $conf->global->DIGIRISKDOLIBARR_SHOW_SHARED_RISKS);
 
 					if (is_array($digiriskelementlist) && !empty($digiriskelementlist)) {
 						$listlines = $odfHandler->setSegment('elementParHierarchie');
@@ -246,49 +247,26 @@ abstract class ModeleODTRiskAssessmentDocument extends CommonDocGenerator
 
 						if (is_array($risks) && !empty($risks)) {
 							foreach($risks as $riskSingle) {
-								$risksOfDigiriskElement[$riskSingle->appliedOn][] = $riskSingle;
+								$risksOfDigiriskElements[$riskSingle->appliedOn][] = $riskSingle;
 							}
 						}
 
 						foreach ($digiriskelementlist as $digiriskelementsingle) {
-							$digiriskelementrisks = $risksOfDigiriskElement[$digiriskelementsingle['object']->id];
+							$digiriskElementId = $digiriskelementsingle['object']->id;
+							$risksOfDigiriskElement = $risksOfDigiriskElements[$digiriskElementId];
 
-							if ($digiriskelementrisks > 0 && ! empty($digiriskelementrisks)) {
-								foreach ($digiriskelementrisks as $line) {
-									$lastEvaluation  = $line->lastEvaluation;
-									$totalQuotation += $lastEvaluation->cotation;
+							if ($risksOfDigiriskElement > 0 && ! empty($risksOfDigiriskElement)) {
+								foreach ($risksOfDigiriskElement as $riskOfDigiriskElement) {
+									$lastEvaluation                     = $riskOfDigiriskElement->lastEvaluation;
+									$totalQuotation                    += $lastEvaluation->cotation;
+									$riskAssessmentsOfDigiriskElement[$digiriskElementId][] = $lastEvaluation;
 								}
 							}
 
-							if (!empty($conf->global->DIGIRISKDOLIBARR_SHOW_SHARED_RISKS)) {
-								foreach ($risks as $riskline) {
-									$digiriskelementtmp = new DigiriskElement($this->db);
-									$digiriskelementtmp->fetch($riskline->fk_element);
-									$digiriskelementtmp->element = 'digiriskdolibarr';
-									$digiriskelementtmp->fetchObjectLinked($riskline->id, 'digiriskdolibarr_risk', $digiriskelementsingle['object']->id, 'digiriskdolibarr_digiriskelement', 'AND', 1, 'sourcetype', 0);
-									if ($digiriskelementtmp->linkedObjectsIds['digiriskdolibarr_digiriskelement'] > 0 && is_array($digiriskelementtmp->linkedObjectsIds['digiriskdolibarr_digiriskelement'])) {
-										$digiriskelementLinkedId = array_values($digiriskelementtmp->linkedObjectsIds['digiriskdolibarr_digiriskelement']);
-										if (in_array($digiriskelementsingle['object']->id, $digiriskelementLinkedId)) {
-											$lastEvaluation = $riskassessment->fetchFromParent($riskline->id, 1);
-											if ($lastEvaluation > 0 && !empty($lastEvaluation) && is_array($lastEvaluation)) {
-												$lastEvaluation = array_shift($lastEvaluation);
-												$totalQuotation += $lastEvaluation->cotation;
-												$scale                  = $lastEvaluation->get_evaluation_scale();
-												$scale_counter[$scale] += 1;
-											}
-										}
-									}
-								}
-							}
+							$elementName  = (!empty($conf->global->DIGIRISKDOLIBARR_SHOW_SHARED_RISKS) ? 'S' . $digiriskelementsingle['object']->entity . ' - ' : '') . $digiriskelementsingle['object']->ref . ' ' . $digiriskelementsingle['object']->label;
+							$scaleCounter = $riskassessment->getRiskAssessmentCategoriesNumber($riskAssessmentsOfDigiriskElement[$digiriskElementId], $risksOfDigiriskElement, $digiriskElementId);
 
-							$elementName                   = (!empty($conf->global->DIGIRISKDOLIBARR_SHOW_SHARED_RISKS) ? 'S' . $digiriskelementsingle['object']->entity . ' - ' : '') . $digiriskelementsingle['object']->ref . ' ' . $digiriskelementsingle['object']->label;
-							$scaleCounterWithoutSharedRisk = $riskassessment->getRiskAssessmentCategoriesNumber($riskAssessmentList, $digiriskelementrisks, $digiriskelementsingle['object']->id);
-
-							foreach ($scale_counter as $key => $value) {
-								$final_scale_counter[$key] = $scale_counter[$key] + $scaleCounterWithoutSharedRisk[$key];
-							}
-
-							$cotationarray[$elementName] = array($totalQuotation, $digiriskelementsingle['object']->description, $final_scale_counter);
+							$cotationarray[$elementName] = array($totalQuotation, $digiriskelementsingle['object']->description, $scaleCounter);
 
 							$totalQuotation = 0;
 							$scale_counter = array(
@@ -304,6 +282,7 @@ abstract class ModeleODTRiskAssessmentDocument extends CommonDocGenerator
 						arsort($cotationarray);
 
 						complete_substitutions_array($tmparray, $outputlangs, $object, $line, "completesubstitutionarray_lines");
+
 						// Call the ODTSubstitutionLine hook
 						$parameters = array('odfHandler' => &$odfHandler, 'file' => $file, 'object' => $object, 'outputlangs' => $outputlangs, 'substitutionarray' => &$tmparray, 'line' => $line);
 						$hookmanager->executeHooks('ODTSubstitutionLine', $parameters, $this, $action); // Note that $action and $object may have been modified by some hooks

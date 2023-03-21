@@ -299,7 +299,7 @@ class Risk extends CommonObject
 		//For all documents
 		if ( $get_shared_data ) {
 			if ($parent_id == 0) {
-				$digiriskElementsOfEntity = $object->getActiveDigiriskElements();
+				$digiriskElementsOfEntity = $objects;
 				if (is_array($digiriskElementsOfEntity) && !empty($digiriskElementsOfEntity)) {
 					foreach ($digiriskElementsOfEntity as $digiriskElementOfEntity) {
 						$digiriskElementOfEntity->fetchObjectLinked(null, '', $digiriskElementOfEntity->id, 'digiriskdolibarr_digiriskelement', 'AND', 1, 'sourcetype', 0);
