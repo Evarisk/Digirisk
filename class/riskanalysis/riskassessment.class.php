@@ -379,18 +379,18 @@ class RiskAssessment extends CommonObject
 			4 => 0
 		];
 
+		$riskListOrderedByIds = [];
+		if (is_array($riskList) && !empty($riskList)) {
+			foreach ($riskList as $risk) {
+				$riskListOrderedByIds[$risk->id] = $risk;
+			}
+		}
+
 		if (is_array($riskAssessmentList) && !empty($riskAssessmentList)) {
 			foreach ($riskAssessmentList as $riskAssessment) {
 				if ($digiriskelementID > 0) {
-					$riskListOrderedByIds = [];
-					if (is_array($riskList) && !empty($riskList)) {
-						foreach ($riskList as $risk) {
-							$riskListOrderedByIds[$risk->id] = $risk;
-						}
-					}
-
 					if (is_array($riskListOrderedByIds) && !empty($riskListOrderedByIds)) {
-						if (is_object($riskListOrderedByIds[$riskAssessment->fk_risk]) && $riskListOrderedByIds[$riskAssessment->fk_risk]->fk_element == $digiriskelementID) {
+						if (is_object($riskListOrderedByIds[$riskAssessment->fk_risk]) && $riskListOrderedByIds[$riskAssessment->fk_risk]->appliedOn == $digiriskelementID) {
 							$scale = $riskAssessment->get_evaluation_scale();
 							$scale_counter[$scale] += 1;
 						}

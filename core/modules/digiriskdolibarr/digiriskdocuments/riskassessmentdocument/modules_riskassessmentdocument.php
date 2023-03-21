@@ -282,7 +282,7 @@ abstract class ModeleODTRiskAssessmentDocument extends CommonDocGenerator
 							}
 
 							$elementName                   = (!empty($conf->global->DIGIRISKDOLIBARR_SHOW_SHARED_RISKS) ? 'S' . $digiriskelementsingle['object']->entity . ' - ' : '') . $digiriskelementsingle['object']->ref . ' ' . $digiriskelementsingle['object']->label;
-							$scaleCounterWithoutSharedRisk = $riskassessment->getRiskAssessmentCategoriesNumber($riskAssessmentList, $risks, $digiriskelementsingle['object']->id);
+							$scaleCounterWithoutSharedRisk = $riskassessment->getRiskAssessmentCategoriesNumber($riskAssessmentList, $digiriskelementrisks, $digiriskelementsingle['object']->id);
 
 							foreach ($scale_counter as $key => $value) {
 								$final_scale_counter[$key] = $scale_counter[$key] + $scaleCounterWithoutSharedRisk[$key];
