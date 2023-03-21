@@ -103,6 +103,8 @@ class Risk extends CommonObject
 	public $fk_user_modif;
 	public $fk_element;
 	public $fk_projet;
+	public $lastEvaluation;
+	public $appliedOn;
 
 	/**
 	 * Constructor
@@ -189,10 +191,10 @@ class Risk extends CommonObject
 		$object  = new DigiriskElement($this->db);
 		$objects = $object->getActiveDigiriskElements();
 
-		$risk    = new Risk($this->db);
-		$riskList   = $risk->fetchAll('', '', 0, 0, array(), 'AND', $get_shared_data ? 1 : 0);
+		$risk     = new Risk($this->db);
+		$riskList = $risk->fetchAll('', '', 0, 0, array(), 'AND', $get_shared_data ? 1 : 0);
 
-		$riskAssessment = new RiskAssessment($this->db);
+		$riskAssessment     = new RiskAssessment($this->db);
 		$riskAssessmentList = $riskAssessment->fetchAll('', '', 0, 0, ['customsql' => 'status = 1'], 'AND', $get_shared_data ? 1 : 0);
 
 		if (is_array($riskAssessmentList) && !empty($riskAssessmentList)) {
@@ -213,7 +215,7 @@ class Risk extends CommonObject
 
 		//For groupment & workunit documents with given id
 		if ($parent_id > 0) {
-			$risksOfDigiriskElement  = $risksOrderedByDigiriskElement[$parent_id];
+			$risksOfDigiriskElement = $risksOrderedByDigiriskElement[$parent_id];
 			// RISKS de l'élément parent.
 			if (is_array($risksOfDigiriskElement) && !empty($risksOfDigiriskElement)) {
 				foreach ($risksOfDigiriskElement as $riskOfDigiriskElement) {
@@ -253,7 +255,7 @@ class Risk extends CommonObject
 			}
 		}
 
-		//for groupment & workunit document if get inherited risks conf is activated
+//		for groupment & workunit document & risk assessment document if get inherited risks conf is activated
 		if ( $get_parents_data ) {
 			if ($parent_id > 0) {
 				$parent_element_id = $objects[$parent_id]->fk_parent;
@@ -274,15 +276,22 @@ class Risk extends CommonObject
 						while ($parent_element_id > 0) {
 							if (is_array($risksOrderedByDigiriskElement[$parent_element_id]) && !empty($risksOrderedByDigiriskElement[$parent_element_id])) {
 								foreach($risksOrderedByDigiriskElement[$parent_element_id] as $riskOfParentDigiriskElement) {
-									$riskOfParentDigiriskElement->appliedOn = $digiriskElement->id;
-									$risks[] = $riskOfParentDigiriskElement;
+									$tempRiskOfParentDigiriskElement = new Risk($this->db);
+									$tempRiskOfParentDigiriskElement->setVarsFromFetchObj($riskOfParentDigiriskElement);
+
+									$tempRiskOfParentDigiriskElement->lastEvaluation = $riskOfParentDigiriskElement->lastEvaluation;
+									$tempRiskOfParentDigiriskElement->appliedOn = $digiriskElement->id;
+									$tempRiskOfParentDigiriskElement->id = $riskOfParentDigiriskElement->id;
+
+									$appliedOnIds[$riskOfParentDigiriskElement->id][] = $digiriskElement->id;
+
+									$risks[] = $tempRiskOfParentDigiriskElement;
 								}
 							}
 							$parentDigiriskElement = $objects[$parent_element_id];
 							$parent_element_id = $parentDigiriskElement->fk_parent;
 						}
 					}
-
 				}
 			}
 		}
