@@ -269,12 +269,7 @@ abstract class ModeleODTRiskAssessmentDocument extends CommonDocGenerator
 							$cotationarray[$elementName] = array($totalQuotation, $digiriskelementsingle['object']->description, $scaleCounter);
 
 							$totalQuotation = 0;
-							$scale_counter = array(
-								1 => 0,
-								2 => 0,
-								3 => 0,
-								4 => 0
-							);
+						
 							unset($tmparray['object_fields']);
 						}
 
