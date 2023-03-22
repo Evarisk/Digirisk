@@ -371,7 +371,7 @@ $arrayfields = dol_sort_array($arrayfields, 'position');
 
 $menuConf = 'MAIN_SELECTEDFIELDS_' . $varpage;
 
-if (dol_strlen($user->conf->$menuConf) < 1) {
+if (dol_strlen($user->conf->$menuConf) < 1 || preg_match('/t./', $user->conf->$menuConf)) {
 	$user->conf->$menuConf = 'r.entity,r.fk_element,r.applied_on,r.ref,r.category,evaluation.cotation,';
 }
 
