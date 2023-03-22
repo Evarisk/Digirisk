@@ -1,5 +1,12 @@
 <?php
 $related_tasks = $riskAssessmentTaskList[$risk->id];
+if (!empty($related_tasks) && $related_tasks > 0) {
+	foreach ($related_tasks as $related_task_id => $related_task) {
+		if (!is_object($related_task)) {
+			unset($related_tasks[$related_task_id]);
+		}
+	}
+}
 ?>
 <div class="wpeo-table riskassessment-tasks riskassessment-tasks<?php echo $risk->id ?>" value="<?php echo $risk->id ?>">
 	<div class="table-cell riskassessment-task-listing-wrapper riskassessment-task-listing-wrapper-<?php echo $risk->id ?>">
