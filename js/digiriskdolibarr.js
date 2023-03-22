@@ -4675,3 +4675,77 @@ window.eoxiaJS.file.getThumbName = function(file, type = 'small') {
 	let thumbName = fileName + '_' + type + '.' + fileExtension
 	return thumbName;
 };
+
+
+/**
+ * Initialise l'objet "form" ainsi que la méthode "init" obligatoire pour la bibliothèque EoxiaJS.
+ *
+ * @since   1.1.0
+ * @version 1.1.0
+ */
+window.eoxiaJS.form = {};
+
+/**
+ * La méthode appelée automatiquement par la bibliothèque EoxiaJS.
+ *
+ * @since   1.1.0
+ * @version 1.1.0
+ *
+ * @return {void}
+ */
+window.eoxiaJS.form.init = function() {
+	window.eoxiaJS.form.event();
+};
+
+/**
+ * La méthode contenant tous les événements pour les buttons.
+ *
+ * @since   1.1.0
+ * @version 1.1.0
+ *
+ * @return {void}
+ */
+window.eoxiaJS.form.event = function() {
+	$( document ).on( 'submit', '#searchFormListRisks, #searchFormInheritedListRisks, #searchFormSharedListRisks', window.eoxiaJS.form.searchForm );
+};
+
+window.eoxiaJS.form.searchForm = function(event) {
+	event.preventDefault()
+
+	let formId = $(this).closest('form').attr('id');
+
+	var searchFormListRisks = document.getElementById(formId);
+	var formData = new FormData(searchFormListRisks);
+	let newFormData = new FormData();
+
+	let dataToSend = [
+		'token',
+		'formfilteraction',
+		'action',
+		'id',
+		'sortfield',
+		'sortorder',
+		'page',
+		'contextpage'
+	]
+
+	for (const pair of formData.entries()) {
+		if (dataToSend.includes(pair[0]) || pair[0].match(/search_/)) {
+			newFormData.append(pair[0], pair[1])
+		}
+	}
+
+	window.eoxiaJS.loader.display($('#' + formId));
+
+	$.ajax({
+		url: document.URL,
+		type: "POST",
+		data: newFormData,
+		processData: false,
+		contentType: false,
+		success: function (resp) {
+			$('.wpeo-loader').removeClass('wpeo-loader');
+			$('#' + formId).html($(resp).find('#' + formId).children())
+		},
+	});
+}
