@@ -4726,7 +4726,8 @@ window.eoxiaJS.form.searchForm = function(event) {
 		'sortfield',
 		'sortorder',
 		'page',
-		'contextpage'
+		'contextpage',
+		'limit'
 	]
 
 	for (const pair of formData.entries()) {
