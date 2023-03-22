@@ -4142,7 +4142,6 @@ window.eoxiaJS.document.event = function() {
 	$( document ).on( 'click', '#builddoc_generatebutton', window.eoxiaJS.document.displayLoader );
 	$( document ).on( 'click', '.pdf-generation', window.eoxiaJS.document.displayLoader );
 	$( document ).on( 'click', ' .send-risk-assessment-document-by-mail', window.eoxiaJS.document.displayLoader );
-	$( document ).on( 'click', ' .auto-download', window.eoxiaJS.document.displayLoader );
 };
 
 /**
@@ -4627,6 +4626,7 @@ window.eoxiaJS.button.init = function() {
  */
 window.eoxiaJS.button.event = function() {
 	$( document ).on( 'click', '.wpeo-button:submit', window.eoxiaJS.button.addLoader );
+	$( document ).on( 'click', '.auto-download', window.eoxiaJS.button.addLoader );
 };
 
 /**
