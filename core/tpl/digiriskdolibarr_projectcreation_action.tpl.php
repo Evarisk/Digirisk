@@ -1014,47 +1014,6 @@ if ($conf->global->DIGIRISKDOLIBARR_ENCODE_BACKWARD_COMPATIBILITY == 0) {
 	dolibarr_set_const($db, 'DIGIRISKDOLIBARR_ENCODE_BACKWARD_COMPATIBILITY', 1, 'integer', 0, '', $conf->entity);
 }
 
-if ($conf->global->DIGIRISKDOLIBARR_CUSTOM_DOCUMENTS_SET == 0) {
-	require_once DOL_DOCUMENT_ROOT . '/ecm/class/ecmfiles.class.php';
-	require_once DOL_DOCUMENT_ROOT . '/core/lib/functions.lib.php';
-
-	$ecmfile = new EcmFiles($db);
-
-	$types = array(
-		'LegalDisplay' 				=> 'legaldisplay',
-		'InformationsSharing' 		=> 'informationssharing',
-		'ListingRisksAction' 		=> 'listingrisksaction',
-		'ListingRisksPhoto' 		=> 'listingrisksphoto',
-		'GroupmentDocument' 		=> 'groupmentdocument',
-		'WorkUnitDocument' 			=> 'workunitdocument',
-		'RiskAssessmentDocument' 	=> 'riskassessmentdocument',
-		'PreventionPlan' 			=> 'preventionplandocument',
-		'FirePermit' 				=> 'firepermitdocument',
-		'Ticket' 					=> 'ticketdocument'
-	);
-
-   	foreach ($types as $documentType) {
-		dolibarr_get_const($db, 'DIGIRISKDOLIBARR_' . strtoupper($documentType) . '_CUSTOM_ADDON_ODT_PATH');
-		dolibarr_set_const($db, 'DIGIRISKDOLIBARR_' . strtoupper($documentType) . '_CUSTOM_ADDON_ODT_PATH', 'DOL_DATA_ROOT' . (($conf->entity == 1 ) ? '/' : '/' . $conf->entity . '/') . 'ecm/digiriskdolibarr/'. $documentType . '/', 'chaine', 0, '', $conf->entity);
-
-		$srcfullpath  = DOL_DOCUMENT_ROOT . '/custom/digiriskdolibarr/documents/doctemplates/' . $documentType . '/template_' . $documentType . '.odt';
-		$ecmdir       = $conf->ecm->multidir_output[$conf->entity?:1];
-		$destfullpath = $ecmdir . '/digiriskdolibarr/' . $documentType . '/template_' . $documentType . '_custom.odt';
-
-		$result = dol_copy($srcfullpath, $destfullpath, 0, 0);
-		if ($result > 0) {
-			$ecmfile->label           = md5_file(dol_osencode($destfullpath));
-			$ecmfile->filepath        = (($conf->entity == 1 ) ? '' : $conf->entity . '/') . 'ecm/digiriskdolibarr/' . $documentType;
-			$ecmfile->filename        = 'template_' . $documentType . '_custom.odt';
-			$ecmfile->fullpath_orig   = 'template_' . $documentType . '_custom.odt';
-			$ecmfile->gen_or_uploaded = 'uploaded';
-			$ecmfile->create($user);
-		}
-	}
-
-	dolibarr_set_const($db, 'DIGIRISKDOLIBARR_CUSTOM_DOCUMENTS_SET', 1, 'integer', 0, '', $conf->entity);
-}
-
 if ($conf->global->DIGIRISKDOLIBARR_SECURITY_SOCIAL_CONF_UPDATED == 0) {
 	// Security conf
 	if (empty(dolibarr_get_const($db, 'DIGIRISKDOLIBARR_LOCATION_OF_DETAILED_INSTRUCTION'))) {
