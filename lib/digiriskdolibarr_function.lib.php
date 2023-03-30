@@ -1336,21 +1336,14 @@ function llxHeaderSignature($title, $head = "", $disablejs = 0, $disablehead = 0
 */
 function llxHeaderTicketDigirisk($title, $head = "", $disablejs = 0, $disablehead = 0,$arrayofjs = array(), $arrayofcss = array())
 {
-	global $conf;
+	global $conf, $mysoc;
 
 	require_once DOL_DOCUMENT_ROOT . '/core/lib/files.lib.php';
 
 	top_htmlhead($head, $title, $disablejs, $disablehead, $arrayofjs, $arrayofcss, 0, 1); // Show html headers
 
 	if (!empty($conf->global->DIGIRISKDOLIBARR_TICKET_SHOW_COMPANY_LOGO)) {
-		$filedir  = $conf->mycompany->dir_output . '/logos/thumbs/';
-		$filelist = dol_dir_list($filedir, 'files');
-		if (is_array($filelist) && !empty($filelist)) {
-			foreach ($filelist as $file) {
-				// Define urllogo
-				$urllogo = DOL_URL_ROOT . '/viewimage.php?modulepart=mycompany&entity=' . $conf->entity . '&file=' . urlencode('logos/thumbs/' . $file['name']);
-			}
-		}
+		$urllogo = DOL_URL_ROOT . '/viewimage.php?modulepart=mycompany&entity=' . $conf->entity . '&file=' . urlencode('/logos/thumbs/'.$mysoc->logo_small);
 
 		// Output html code for logo
 		if ($urllogo) {
