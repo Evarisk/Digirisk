@@ -4727,7 +4727,13 @@ window.eoxiaJS.form.searchForm = function(event) {
 		'sortorder',
 		'page',
 		'contextpage',
-		'limit'
+		'limit',
+		'toselect[]',
+		'massaction',
+		'confirm',
+		'cancel',
+		'pageplusone',
+		'backtopage'
 	]
 
 	for (const pair of formData.entries()) {
