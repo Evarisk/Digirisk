@@ -223,8 +223,14 @@ CollectiveAgreement = Conventions collectives
 CollectiveAgreementValue = Disponible sur le site du gouvernement :<br /><a href="https://www.service-public.fr/particuliers/vosdroits/F78" target="_blank">https://www.service-public.fr/particuliers/vosdroits/F78</a>
 legaldisplay.odt = Affichage légal
 legaldisplay_custom.odt = Affichage légal personnalisé
-
-
+AutomaticPdfGeneration = Génération automatique des PDF
+AutomaticPdfGenerationDescription = Crée automatiquement le document en PDF lors de la génération
+ManualPdfGeneration = Génération manuelle des PDF
+ManualPdfGenerationDescription = Ajout d'un bouton pour créer un document ODT en PDF
+FileCouldNotBeGeneratedInPDF = Le fichier n'a pas pu être généré en PDF
+CheckDocumentationToEnablePDFGeneration = Veuillez vous référer à la documentation pour la génération en PDF : <a target="_blank" href="https://wiki.dolibarr.org/index.php?title=Module_Digirisk#Impression_du_Document_Unique_au_format_pdf_-_.28.2A.pdf.29">Documentation</a>
+PDFGenerationTooltip = Appuyez sur ce bouton pour générer le document ODT en PDF
+PDFGeneration = Génération du document PDF
 
 #
 # InformationsSharing - Diffusion d'informations
@@ -807,6 +813,8 @@ AppliedOn = Actif sur :
 RiskAssessmentDocumentMethod = * Étape 1 : Récupération des informations<br />- Visite des locaux<br />- Récupération des données du personnel<br /><br />* Étape 2 : Définition de la méthodologie et de document<br />- Validation des fiches d'unité de travail standard<br />- Validation de l'arborescence des unités<br /><br />* Étape 3 : Réalisation de l'étude de risques<br />- Sensibilisation des personnels aux risques et aux dangers<br />- Création des unités de travail avec le personnel et le ou les responsables<br />- Évaluations des risques par unités de travail avec le personnel<br /><br />* Étape 4<br />- Traitement et rédaction du document unique
 RiskAssessmentDocumentSources = La sensibilisation des risques est définie dans l'ED840 édité par L'INRS.<br />Dans ce document vous trouverez:<br />- La définition d'un risque, d'un danger et un schéma explicatif<br />- Les explications concernant les différentes méthodes d'évaluation
 RiskAssessmentDocumentImportantNote = Notes importantes :<br />Vous pouvez lire la documentation de DigiRisk ici<br /><a href="https://wiki.dolibarr.org/index.php?title=Module_Digirisk" target="_blank">https://wiki.dolibarr.org/index.php?title=Module_Digirisk</a><br />Vous pouvez suivre le projet ici :<br /><a href="https://github.com/Evarisk/Digirisk/projects?type=classic" target="_blank">https://github.com/Evarisk/Digirisk/projects?type=classic</a><br />Reporter un bug ici<br /><a href="https://github.com/Evarisk/Digirisk/issues" target="_blank">https://github.com/Evarisk/Digirisk/issues</a>
+GenerateZipArchiveWithDigiriskElementDocuments = Génération d'une archive ZIP avec le Document Unique
+GenerateZipArchiveWithDigiriskElementDocumentsDescription = Génération automatique d'une archive ZIP contenant le Document Unique et toutes les fiches de poste lors de la génération du Document Unique
 
 # Boxes - Widget
 RiskAssessmentDocumentBox = Box Document unique
@@ -1109,6 +1117,8 @@ RisksRepartition = Répartition des risques par cotation
 ShowRiskOrigin = Afficher la provenance du risque
 ShowRiskOriginDescription = Afficher la provenance des risques dans les documents (Fiche UT, Fiche GP, Document Unique, Listings de risques, etc.)
 SharedRiskImportWithSuccess = Risque importé avec succès
+RiskDeleted = Le risque %s a été supprimé
+
 
 # Stats - Statistiques
 GreyRisk = Risque faible
@@ -1309,7 +1319,7 @@ TotalConsumedTimeAmount = Coût du temps consommé
 NbTasks = Nombre de tâches
 TotalProgress = Avancement réel global des tâches
 TotalBudget = Somme du budget des tâches
-
+StartDateCannotBeAfterEndDate = La date de fin ne peut pas être antérieure à la date de début
 
 
 #
@@ -1658,4 +1668,4 @@ ManuelInputNBWorkedHours = Saisir manuellement le nombre d'heures travaillées
 ManuelInputNBWorkedHoursDescription = Si l'option est activée, vous pouvez saisir manuellement le nombre d'heures travaillées dans la configuration de la société.<br>Sinon le nombre d'heures travaillées est calculé.<br>Consulter la documentation pour plus d'informations.
 HowToConfigureSetupConf = Pour configurer les donnés de la société lié à Digirisk,<br>veuillez vous rendre sur Digirisk - Configuration - Réglages
 Archive = Archiver
-EnableModule = Veuillez activer Digirisk avant d'utiliser ces fonctionnalités
+EnableDigirisk = Veuillez activer Digirisk avant d'utiliser ces fonctionnalités

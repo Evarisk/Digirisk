@@ -370,33 +370,38 @@ class RiskAssessment extends CommonObject
 	 * @return array
 	 * @throws Exception
 	 */
-	public function getRiskAssessmentCategoriesNumber($digiriskelementID = 0)
+	public function getRiskAssessmentCategoriesNumber($riskAssessmentList = [], $riskList = [], $digiriskelementID = 0)
 	{
-		global $conf;
-
-		$risk = new Risk($this->db);
-		if ($digiriskelementID > 0) {
-			$risks = $risk->fetchFromParent($digiriskelementID);
-		} else {
-			$risks = $risk->fetchRisksOrderedByCotation(0, true, $conf->global->DIGIRISKDOLIBARR_SHOW_INHERITED_RISKS_IN_LISTINGS, $conf->global->DIGIRISKDOLIBARR_SHOW_SHARED_RISKS);
-		}
-
-		$scale_counter = array(
+		$scale_counter = [
 			1 => 0,
 			2 => 0,
 			3 => 0,
 			4 => 0
-		);
-		if (!empty($risks) && $risks > 0) {
-			foreach ($risks as $risk) {
-				$arrayRiskassessment = $this->fetchFromParent($risk->id, 1);
-				if ( ! empty($arrayRiskassessment) && $arrayRiskassessment > 0 && is_array($arrayRiskassessment)) {
-					$riskassessment         = array_shift($arrayRiskassessment);
-					$scale                  = $riskassessment->get_evaluation_scale();
+		];
+
+		$riskListOrderedByIds = [];
+		if (is_array($riskList) && !empty($riskList)) {
+			foreach ($riskList as $risk) {
+				$riskListOrderedByIds[$risk->id] = $risk;
+			}
+		}
+
+		if (is_array($riskAssessmentList) && !empty($riskAssessmentList)) {
+			foreach ($riskAssessmentList as $riskAssessment) {
+				if ($digiriskelementID > 0) {
+					if (is_array($riskListOrderedByIds) && !empty($riskListOrderedByIds)) {
+						if (is_object($riskListOrderedByIds[$riskAssessment->fk_risk]) && $riskListOrderedByIds[$riskAssessment->fk_risk]->appliedOn == $digiriskelementID) {
+							$scale = $riskAssessment->get_evaluation_scale();
+							$scale_counter[$scale] += 1;
+						}
+					}
+				} else {
+					$scale = $riskAssessment->get_evaluation_scale();
 					$scale_counter[$scale] += 1;
 				}
 			}
 		}
+
 		return $scale_counter;
 	}
 }

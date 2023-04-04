@@ -508,6 +508,10 @@ if (empty($reshook)) {
 		}
 	}
 
+	// Action to generate pdf from odt file
+	require_once __DIR__ . '/../../core/tpl/documents/digiriskdolibarr_manual_pdf_generation_action.tpl.php';
+
+
 	// Delete file in doc form
 	if ($action == 'remove_file' && $permissiontodelete) {
 		if ( ! empty($upload_dir)) {

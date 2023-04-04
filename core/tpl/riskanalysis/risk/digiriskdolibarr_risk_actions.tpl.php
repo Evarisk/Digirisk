@@ -206,7 +206,9 @@ if ( ! $error && ($massaction == 'delete' || ($action == 'delete' && $confirm ==
 
 			$result = $risk->delete($user);
 
-			if ($result < 0) {
+			if ($result > 0) {
+				setEventMessages($langs->trans('RiskDeleted', $risk->ref), null);
+			} else {
 				// Delete risk KO
 				if ( ! empty($risk->errors)) setEventMessages(null, $risk->errors, 'errors');
 				else setEventMessages($risk->error, null, 'errors');
@@ -437,9 +439,9 @@ if ( ! $error && $action == 'addRiskAssessmentTask' && $permissiontoadd) {
 		header("Location: " . $urltogo);
 		exit;
 	} else {
-		// Creation task KO
-		if ( ! empty($task->errors)) setEventMessages(null, $task->errors, 'errors');
-		else setEventMessages($task->error, null, 'errors');
+		// Delete task KO
+		header('HTTP/1.1 500 Internal Server Booboo');
+		die(json_encode(array('message' => html_entity_decode($langs->transnoentities($task->errors[0])), 'code' => '1339')));
 	}
 }
 
@@ -460,6 +462,7 @@ if ( ! $error && $action == 'saveRiskAssessmentTask' && $permissiontoadd) {
 	$task->fetch($riskAssessmentTaskID);
 
 	$task->label         = $tasktitle;
+
 	if (!empty($dateStart)) {
 		$task->date_start = strtotime(preg_replace('/\//', '-', $dateStart));
 		$task->date_start = dol_time_plus_duree($task->date_start, $hourStart, 'h');
@@ -489,9 +492,9 @@ if ( ! $error && $action == 'saveRiskAssessmentTask' && $permissiontoadd) {
 		header("Location: " . $urltogo);
 		exit;
 	} else {
-		// Update task KO
-		if ( ! empty($task->errors)) setEventMessages(null, $task->errors, 'errors');
-		else setEventMessages($task->error, null, 'errors');
+		// Delete task KO
+		header('HTTP/1.1 500 Internal Server Booboo');
+		die(json_encode(array('message' => html_entity_decode($langs->transnoentities($task->errors[0])), 'code' => '1338')));
 	}
 }
 

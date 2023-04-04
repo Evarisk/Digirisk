@@ -105,7 +105,7 @@ class LegalDisplay extends DigiriskDocuments
 	 * @throws Exception
 	 */
 	public function LegalDisplayFillJSON($object) {
-		global $con, $langs;
+		global $conf, $langs;
 
 		$resources               = new DigiriskResources($this->db);
 		$digirisk_resources      = $resources->digirisk_dolibarr_fetch_resources();

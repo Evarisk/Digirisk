@@ -365,6 +365,9 @@ function digiriskshowdocuments($modulepart, $modulesubdir, $filedir, $urlsource,
 				}
 			}
 		}
+		if ($conf->global->DIGIRISKDOLIBARR_MANUAL_PDF_GENERATION > 0) {
+			$out .= '<td></td>';
+		}
 		$out .= '</tr>';
 
 		// Execute hooks
@@ -429,7 +432,21 @@ function digiriskshowdocuments($modulepart, $modulesubdir, $filedir, $urlsource,
 				// Show file date
 				$date = ( ! empty($file['date']) ? $file['date'] : dol_filemtime($filedir . "/" . $file["name"]));
 				$out .= '<td class="nowrap right">' . dol_print_date($date, 'dayhour', 'tzuser') . '</td>';
+				$extension = pathinfo($file['name'], PATHINFO_EXTENSION);
 
+				if ($conf->global->DIGIRISKDOLIBARR_MANUAL_PDF_GENERATION > 0) {
+					$out .= '<td class="right pdf-generation">';
+
+					if ($extension == 'odt') {
+						$tmpurlsource = preg_replace('/#[a-zA-Z0-9_]*$/', '', $urlsource);
+						$out .= '<a href="' . $tmpurlsource . ((strpos($tmpurlsource, '?') === false) ? '?' : '&amp;') . 'action=pdfGeneration&amp;file=' . urlencode($relativepath) . '&token=' . newToken();
+						$out .= ($param ? '&amp;' . $param : '');
+						$out .= '">' . img_picto($langs->trans("PDFGeneration"), 'fontawesome_fa-file-pdf_fas_red') . '</a>';
+						$out .= ' ' . $form->textwithpicto('', $langs->trans('PDFGenerationTooltip'));
+					}
+
+					$out .= '</td>';
+				}
 				if ($delallowed || $morepicto) {
 					$out .= '<td class="right nowraponall">';
 					if ($delallowed) {
@@ -1319,21 +1336,14 @@ function llxHeaderSignature($title, $head = "", $disablejs = 0, $disablehead = 0
 */
 function llxHeaderTicketDigirisk($title, $head = "", $disablejs = 0, $disablehead = 0,$arrayofjs = array(), $arrayofcss = array())
 {
-	global $conf;
+	global $conf, $mysoc;
 
 	require_once DOL_DOCUMENT_ROOT . '/core/lib/files.lib.php';
 
 	top_htmlhead($head, $title, $disablejs, $disablehead, $arrayofjs, $arrayofcss, 0, 1); // Show html headers
 
 	if (!empty($conf->global->DIGIRISKDOLIBARR_TICKET_SHOW_COMPANY_LOGO)) {
-		$filedir  = $conf->mycompany->dir_output . '/logos/thumbs/';
-		$filelist = dol_dir_list($filedir, 'files');
-		if (is_array($filelist) && !empty($filelist)) {
-			foreach ($filelist as $file) {
-				// Define urllogo
-				$urllogo = DOL_URL_ROOT . '/viewimage.php?modulepart=mycompany&entity=' . $conf->entity . '&file=' . urlencode('logos/thumbs/' . $file['name']);
-			}
-		}
+		$urllogo = DOL_URL_ROOT . '/viewimage.php?modulepart=mycompany&entity=' . $conf->entity . '&file=' . urlencode('/logos/thumbs/'.$mysoc->logo_small);
 
 		// Output html code for logo
 		if ($urllogo) {

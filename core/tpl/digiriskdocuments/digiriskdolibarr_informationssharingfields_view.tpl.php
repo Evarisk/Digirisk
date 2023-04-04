@@ -61,18 +61,22 @@ print '</td></tr>';
 print '<tr>';
 print '<td class="titlefield"><i class="fas fa-user"></i> ' . $form->textwithpicto($langs->trans("HarassmentOfficer"), $langs->trans('HowToSetDataInformationsSharing')) . '</td>';
 print '<td>';
-$user->fetch($informationssharing->harassment_officer->id);
-print $user->getNomUrl(1) . ' ';
-print '<i class="fas fa-phone"></i> ' . $informationssharing->harassment_officer->phone;
+if ($informationssharing->harassment_officer->id > 0) {
+	$user->fetch($informationssharing->harassment_officer->id);
+	print $user->getNomUrl(1) . ' ';
+	print '<i class="fas fa-phone"></i> ' . $informationssharing->harassment_officer->phone;
+}
 print '</td></tr>';
 
 // Harassment officer CSE
 print '<tr>';
 print '<td class="titlefield"><i class="fas fa-user"></i> ' . $form->textwithpicto($langs->trans("HarassmentOfficerCSE"), $langs->trans('HowToSetDataInformationsSharing')) . '</td>';
 print '<td>';
-$user->fetch($informationssharing->harassment_officer_cse->id);
-print $user->getNomUrl(1) . ' ';
-print '<i class="fas fa-phone"></i> ' . $informationssharing->harassment_officer_cse->phone;
+if ($informationssharing->harassment_officer_cse->id > 0) {
+	$user->fetch($informationssharing->harassment_officer_cse->id);
+	print $user->getNomUrl(1) . ' ';
+	print '<i class="fas fa-phone"></i> ' . $informationssharing->harassment_officer_cse->phone;
+}
 print '</td></tr>';
 
 // CSE

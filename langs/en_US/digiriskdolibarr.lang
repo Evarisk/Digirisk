@@ -1302,6 +1302,7 @@ ErrorFileNotFound = Aucun logo de la société renseigné
 LabourInspectorName = DREETS
 UrlLabourInspector = https://travail-emploi.gouv.fr/ministere/organisation/article/dreets-directions-regionales-de-l-economie-de-l-emploi-du-travail-et-des
 ErrorSetupEmail = Erreur de configuration des mails, vous n'avez pas configuré votre serveur d'envoi de mail
+IDCC = Convention collective
 IDCCTooltip = Ce champ provient du module Digirisk pour Dolibarr </br> La nomenclature des conventions collectives provient de travail-emploi.gouv.fr
 ContactNoEmail = Les contacts affichés en grisé sont des contacts qui ne possèdent pas d'email
 NoEmailContact = Pas d'email sur ce contact

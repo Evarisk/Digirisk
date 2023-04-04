@@ -349,6 +349,9 @@ print dol_get_fiche_end(); ?>
 	</div>
 </div>
 <?php
+if ($object->status == $object::STATUS_PENDING_SIGNATURE && $signatory->checkSignatoriesSignatures($object->id, 'firepermit')) {
+	print '<a class="butAction" style="width = 100%;margin-right:0" href="' . DOL_URL_ROOT . '/custom/digiriskdolibarr/view/firepermit/firepermit_card.php?id=' . $id . '">' . $langs->trans("GoToLockFirePermit") . '</a>';
+}
 
 // Part to show record
 if ((empty($action) || ($action != 'create' && $action != 'edit'))) {

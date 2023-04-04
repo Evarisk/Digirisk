@@ -192,14 +192,17 @@ abstract class ModeleODTRiskAssessmentDocument extends CommonDocGenerator
 				$foundtagforlines = 1;
 				if ($foundtagforlines) {
 					$digiriskelementobject = new DigiriskElement($this->db);
-					$digiriskelementlist   = $digiriskelementobject->fetchDigiriskElementFlat(0);
 					$risk                  = new Risk($this->db);
 					$riskassessment        = new RiskAssessment($this->db);
 					$ticket                = new Ticket($this->db);
 					$category              = new Categorie($this->db);
-					$risks                 = $risk->fetchRisksOrderedByCotation(0, true, $conf->global->DIGIRISKDOLIBARR_SHOW_INHERITED_RISKS_IN_DOCUMENTS, $conf->global->DIGIRISKDOLIBARR_SHOW_SHARED_RISKS);
 
-					if (!empty($digiriskelementlist)) {
+					$digiriskelementlist   = $digiriskelementobject->fetchDigiriskElementFlat(0);
+					$risks                 = $risk->fetchRisksOrderedByCotation(0, true, $conf->global->DIGIRISKDOLIBARR_SHOW_INHERITED_RISKS_IN_DOCUMENTS, $conf->global->DIGIRISKDOLIBARR_SHOW_SHARED_RISKS);
+					$riskAssessmentList    = $riskassessment->fetchAll('', '', 0, 0, ['customsql' => 'status = 1']);
+					$riskList              = $risk->fetchAll('', '', 0, 0, array(), 'AND', $conf->global->DIGIRISKDOLIBARR_SHOW_SHARED_RISKS);
+
+					if (is_array($digiriskelementlist) && !empty($digiriskelementlist)) {
 						$listlines = $odfHandler->setSegment('elementParHierarchie');
 
 						//Fill digirisk element list table
@@ -233,70 +236,48 @@ abstract class ModeleODTRiskAssessmentDocument extends CommonDocGenerator
 
 						//Fill total cotation by digirisk element table
 						$totalQuotation = 0;
-						$scale_counter = array(
+						$scale_counter = [
 							1 => 0,
 							2 => 0,
 							3 => 0,
 							4 => 0
-						);
+						];
 						$line           = '';
 						$listlines      = $odfHandler->setSegment('risqueFiche');
 
+						if (is_array($risks) && !empty($risks)) {
+							foreach($risks as $riskSingle) {
+								$risksOfDigiriskElements[$riskSingle->appliedOn][] = $riskSingle;
+							}
+						}
+
 						foreach ($digiriskelementlist as $digiriskelementsingle) {
-							$digiriskelementrisks = $risk->fetchFromParent($digiriskelementsingle['object']->id);
-							if ($digiriskelementrisks > 0 && ! empty($digiriskelementrisks)) {
-								foreach ($digiriskelementrisks as $line) {
-									$lastEvaluation  = $riskassessment->fetchFromParent($line->id, 1);
-									if ($lastEvaluation > 0 && ! empty($lastEvaluation) && is_array($lastEvaluation)) {
-										$lastEvaluation = array_shift($lastEvaluation);
-										$totalQuotation += $lastEvaluation->cotation;
-									}
+							$digiriskElementId = $digiriskelementsingle['object']->id;
+							$risksOfDigiriskElement = $risksOfDigiriskElements[$digiriskElementId];
+
+							if ($risksOfDigiriskElement > 0 && ! empty($risksOfDigiriskElement)) {
+								foreach ($risksOfDigiriskElement as $riskOfDigiriskElement) {
+									$lastEvaluation                     = $riskOfDigiriskElement->lastEvaluation;
+									$totalQuotation                    += $lastEvaluation->cotation;
+									$riskAssessmentsOfDigiriskElement[$digiriskElementId][] = $lastEvaluation;
 								}
 							}
 
-							if (!empty($conf->global->DIGIRISKDOLIBARR_SHOW_SHARED_RISKS)) {
-								foreach ($risks as $riskline) {
-									$digiriskelementtmp = new DigiriskElement($this->db);
-									$digiriskelementtmp->fetch($riskline->fk_element);
-									$digiriskelementtmp->element = 'digiriskdolibarr';
-									$digiriskelementtmp->fetchObjectLinked($riskline->id, 'digiriskdolibarr_risk', $digiriskelementsingle['object']->id, 'digiriskdolibarr_digiriskelement', 'AND', 1, 'sourcetype', 0);
-									if ($digiriskelementtmp->linkedObjectsIds['digiriskdolibarr_digiriskelement'] > 0 && is_array($digiriskelementtmp->linkedObjectsIds['digiriskdolibarr_digiriskelement'])) {
-										$digiriskelementLinkedId = array_values($digiriskelementtmp->linkedObjectsIds['digiriskdolibarr_digiriskelement']);
-										if (in_array($digiriskelementsingle['object']->id, $digiriskelementLinkedId)) {
-											$lastEvaluation = $riskassessment->fetchFromParent($riskline->id, 1);
-											if ($lastEvaluation > 0 && !empty($lastEvaluation) && is_array($lastEvaluation)) {
-												$lastEvaluation = array_shift($lastEvaluation);
-												$totalQuotation += $lastEvaluation->cotation;
-												$scale                  = $lastEvaluation->get_evaluation_scale();
-												$scale_counter[$scale] += 1;
-											}
-										}
-									}
-								}
-							}
+							$elementName  = (!empty($conf->global->DIGIRISKDOLIBARR_SHOW_SHARED_RISKS) ? 'S' . $digiriskelementsingle['object']->entity . ' - ' : '') . $digiriskelementsingle['object']->ref . ' ' . $digiriskelementsingle['object']->label;
+							$scaleCounter = $riskassessment->getRiskAssessmentCategoriesNumber($riskAssessmentsOfDigiriskElement[$digiriskElementId], $risksOfDigiriskElement, $digiriskElementId);
 
-							$elementName                   = (!empty($conf->global->DIGIRISKDOLIBARR_SHOW_SHARED_RISKS) ? 'S' . $digiriskelementsingle['object']->entity . ' - ' : '') . $digiriskelementsingle['object']->ref . ' ' . $digiriskelementsingle['object']->label;
-							$scaleCounterWithoutSharedRisk = $riskassessment->getRiskAssessmentCategoriesNumber($digiriskelementsingle['object']->id);
-
-							foreach ($scale_counter as $key => $value) {
-								$final_scale_counter[$key] = $scale_counter[$key] + $scaleCounterWithoutSharedRisk[$key];
-							}
-
-							$cotationarray[$elementName] = array($totalQuotation, $digiriskelementsingle['object']->description,$final_scale_counter);
+							$cotationarray[$elementName] = array($totalQuotation, $digiriskelementsingle['object']->description, $scaleCounter);
 
 							$totalQuotation = 0;
-							$scale_counter = array(
-								1 => 0,
-								2 => 0,
-								3 => 0,
-								4 => 0
-							);
+						
 							unset($tmparray['object_fields']);
 						}
+
 						//use arsort to sort array according to value
 						arsort($cotationarray);
 
 						complete_substitutions_array($tmparray, $outputlangs, $object, $line, "completesubstitutionarray_lines");
+
 						// Call the ODTSubstitutionLine hook
 						$parameters = array('odfHandler' => &$odfHandler, 'file' => $file, 'object' => $object, 'outputlangs' => $outputlangs, 'substitutionarray' => &$tmparray, 'line' => $line);
 						$hookmanager->executeHooks('ODTSubstitutionLine', $parameters, $this, $action); // Note that $action and $object may have been modified by some hooks
@@ -318,7 +299,7 @@ abstract class ModeleODTRiskAssessmentDocument extends CommonDocGenerator
 					}
 
 					//Fill risks data
-					$object->fillRiskData($odfHandler, $object, $outputlangs, $tmparray, $file, $risks);
+					$object->fillRiskData($odfHandler, $object, $outputlangs, $tmparray, $file, $risks, $conf->global->DIGIRISKDOLIBARR_SHOW_SHARED_RISKS);
 
 					//Fill tickets data
 					$filter = array('t.fk_project' => $conf->global->DIGIRISKDOLIBARR_TICKET_PROJECT);
@@ -417,14 +398,18 @@ abstract class ModeleODTRiskAssessmentDocument extends CommonDocGenerator
 			$parameters = array('odfHandler' => &$odfHandler, 'file' => $file, 'object' => $object, 'outputlangs' => $outputlangs, 'substitutionarray' => &$tmparray);
 			$hookmanager->executeHooks('beforeODTSave', $parameters, $this, $action); // Note that $action and $object may have been modified by some hooks
 
+			$fileInfos = pathinfo($filename);
+			$pdfName   = $fileInfos['filename'] . '.pdf';
+
 			// Write new file
-			if ( ! empty($conf->global->MAIN_ODT_AS_PDF)) {
+			if ( ! empty($conf->global->MAIN_ODT_AS_PDF) && $conf->global->DIGIRISKDOLIBARR_AUTOMATIC_PDF_GENERATION > 0) {
 				try {
 					$odfHandler->exportAsAttachedPDF($file);
+					setEventMessages($langs->trans("FileGenerated") . ' - ' . $pdfName, null);
 				} catch (Exception $e) {
 					$this->error = $e->getMessage();
+					setEventMessages($langs->transnoentities('FileCouldNotBeGeneratedInPDF') . '<br>' . $langs->transnoentities('CheckDocumentationToEnablePDFGeneration'), null, 'errors');
 					dol_syslog($e->getMessage(), LOG_INFO);
-					return -1;
 				}
 			} else {
 				try {

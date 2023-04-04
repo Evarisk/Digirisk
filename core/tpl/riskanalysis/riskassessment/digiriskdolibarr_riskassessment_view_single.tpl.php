@@ -1,4 +1,6 @@
 <!-- RISK EVALUATION SINGLE START -->
+<?php if ($showSingle > 0) : ?>
+
 <div class="risk-evaluation-container risk-evaluation-container-<?php echo $lastEvaluation->id ?>" value="<?php echo $risk->id ?>">
 	<div class="risk-evaluation-single-content risk-evaluation-single-content-<?php echo $risk->id ?>">
 		<div class="risk-evaluation-single risk-evaluation-single-<?php echo $risk->id ?>">
@@ -21,8 +23,8 @@
 						<i class="fas fa-calendar-alt"></i> <?php echo date('d/m/Y', (($conf->global->DIGIRISKDOLIBARR_SHOW_RISKASSESSMENT_DATE && ( ! empty($lastEvaluation->date_riskassessment))) ? $lastEvaluation->date_riskassessment : $lastEvaluation->date_creation)); ?>
 					</span>
 					<span class="risk-evaluation-author">
-						<?php $user->fetch($lastEvaluation->fk_user_creat); ?>
-						<?php echo getNomUrlUser($user); ?>
+						<?php $userAuthor = $usersList[$lastEvaluation->fk_user_creat?:$user->id];
+						echo getNomUrlUser($userAuthor); ?>
 					</span>
 				</div>
 				<div class="risk-evaluation-comment">
@@ -39,6 +41,10 @@
 			<?php endif; ?>
 		</div>
 	</div>
-	<?php require __DIR__ . '/digiriskdolibarr_riskassessment_view_edit_modal.tpl.php'; ?>
 </div>
+
+<?php endif; ?>
+
+<?php require __DIR__ . '/digiriskdolibarr_riskassessment_view_edit_modal.tpl.php'; ?>
+
 <!-- RISK EVALUATION SINGLE END -->

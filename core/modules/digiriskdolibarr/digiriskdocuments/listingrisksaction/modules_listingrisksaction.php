@@ -112,7 +112,7 @@ abstract class ModeleODTListingRisksAction extends CommonDocGenerator
 
 			$date = dol_print_date(dol_now(), 'dayxcard');
 			if ( ! empty($digiriskelement)) {
-				$filename = $date . '_' . $digiriskelement->ref . '_' . $objectref . '_' . $digiriskelement->label . '.odt';
+				$filename = $date . '_' . $digiriskelement->ref . '_' . $objectref . '_' . $digiriskelement->label . '_' . $societyname . '.odt';
 			} else {
 				$filename = $date . '_' . $objectref . '_' . $societyname . '.odt';
 			}
@@ -193,7 +193,7 @@ abstract class ModeleODTListingRisksAction extends CommonDocGenerator
 					$risk  = new Risk($this->db);
 
 					$risks = $risk->fetchRisksOrderedByCotation($digiriskelement->id > 0 ? $digiriskelement->id : 0, true, $conf->global->DIGIRISKDOLIBARR_SHOW_INHERITED_RISKS_IN_DOCUMENTS, $conf->global->DIGIRISKDOLIBARR_SHOW_SHARED_RISKS);
-					$object->fillRiskData($odfHandler, $object, $outputlangs, $tmparray, $file, $risks);
+					$object->fillRiskData($odfHandler, $object, $outputlangs, $tmparray, $file, $risks, $conf->global->DIGIRISKDOLIBARR_SHOW_SHARED_RISKS);
 				}
 			} catch (OdfException $e) {
 				$this->error = $e->getMessage();
@@ -215,14 +215,18 @@ abstract class ModeleODTListingRisksAction extends CommonDocGenerator
 			$parameters = array('odfHandler' => &$odfHandler, 'file' => $file, 'object' => $object, 'outputlangs' => $outputlangs, 'substitutionarray' => &$tmparray);
 			$hookmanager->executeHooks('beforeODTSave', $parameters, $this, $action); // Note that $action and $object may have been modified by some hooks
 
+			$fileInfos = pathinfo($filename);
+			$pdfName   = $fileInfos['filename'] . '.pdf';
+
 			// Write new file
-			if ( ! empty($conf->global->MAIN_ODT_AS_PDF)) {
+			if ( ! empty($conf->global->MAIN_ODT_AS_PDF) && $conf->global->DIGIRISKDOLIBARR_AUTOMATIC_PDF_GENERATION > 0) {
 				try {
 					$odfHandler->exportAsAttachedPDF($file);
+					setEventMessages($langs->trans("FileGenerated") . ' - ' . $pdfName, null);
 				} catch (Exception $e) {
 					$this->error = $e->getMessage();
+					setEventMessages($langs->transnoentities('FileCouldNotBeGeneratedInPDF') . '<br>' . $langs->transnoentities('CheckDocumentationToEnablePDFGeneration'), null, 'errors');
 					dol_syslog($e->getMessage(), LOG_INFO);
-					return -1;
 				}
 			} else {
 				try {

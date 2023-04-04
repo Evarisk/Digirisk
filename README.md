@@ -3,26 +3,26 @@
 ## Informations
 
 - Numéro du module : 436302
-- Version : 9.9.0
-- Dernière mise à jour :  26/01/2022
+- Version : 9.10.0
+- Dernière mise à jour :  04/04/2023
 - Éditeur : [Evarisk](https://www.evarisk.com)
-- Compatibilité : Dolibarr 15.0.0 - 16.0.4
+- Compatibilité : Dolibarr 16.0.0 - 16.0.5
 - Thème : Eldy Menu
 - Licence : GPLv3
 - Disponible sur : Windows - MacOS - Linux
 
 ## Liens
 
-- Support & Assistance : [Forum www.dolibarr.fr](https://www.dolibarr.fr) / Par mail à contact@evarisk.com
+- Support & Assistance : [Forum www.dolibarr.fr](https://www.dolibarr.fr) / Par mail à technique@evarisk.com
 - Demo : [Demo Digirisk](https://www.demodoli.digirisk.com) - ID: demo - Password: demo
 - Documentation : [Wiki Digirisk](https://wiki.dolibarr.org/index.php/Module_DigiriskDolibarr)
-- Projet Github : [Projet Digirisk](https://github.com/Evarisk/Digirisk/projects?type=classic)
+- Projet GitHub : [Projet Digirisk](https://github.com/Evarisk/Digirisk/projects?type=classic)
 - Forum : [Forum Digirisk](https://www.dolibarr.fr/forum/t/module-digirisk-document-unique/37119)
-- D'autres modules développés par Evarisk disponible sur [Dolistore.com](https://www.dolistore.com)
+- D'autres modules développés par Evarisk disponibles sur [Dolistore.com](https://www.dolistore.com)
 
 ## Fonctionnalités
 
-Gérez les risques de votre entreprise et créez votre document unique en toute simplicité
+Gérez les risques de votre entreprise et créez votre Document Unique en toute simplicité
 
 ## Traduction
 

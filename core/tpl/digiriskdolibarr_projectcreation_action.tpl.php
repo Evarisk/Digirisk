@@ -601,6 +601,20 @@ if ( $conf->global->DIGIRISKDOLIBARR_ADMINUSERGROUP_UPDATED == 2 ) {
 	dolibarr_set_const($db, 'DIGIRISKDOLIBARR_ADMINUSERGROUP_UPDATED', 3, 'integer', 0, '', $conf->entity);
 }
 
+if ( $conf->global->DIGIRISKDOLIBARR_ADMINUSERGROUP_UPDATED == 3 ) {
+	require_once DOL_DOCUMENT_ROOT . '/user/class/usergroup.class.php';
+
+	$usergroup = new UserGroup($db);
+	$usergroup_id = $conf->global->DIGIRISKDOLIBARR_ADMINUSERGROUP_SET;
+
+	if ($usergroup_id > 0) {
+		$usergroup->fetch($usergroup_id);
+		$usergroup->addrights('', 'projet');
+	}
+
+	dolibarr_set_const($db, 'DIGIRISKDOLIBARR_ADMINUSERGROUP_UPDATED', 4, 'integer', 0, '', $conf->entity);
+}
+
 if ($conf->global->DIGIRISKDOLIBARR_DIGIRISKELEMENT_TRASH_UPDATED == 0) {
 	require_once __DIR__ . '/../../class/digiriskelement/groupment.class.php';
 

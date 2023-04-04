@@ -118,6 +118,7 @@ class ActionsDigiriskdolibarr
 		} else if ($parameters['currentcontext'] == 'ticketcard') {
 			if (GETPOST('action') == 'view' || empty(GETPOST('action')) || GETPOST('action') == 'update_extras') {
 				print '<link rel="stylesheet" type="text/css" href="../custom/digiriskdolibarr/css/digiriskdolibarr.css">';
+				print '<script src="../custom/digiriskdolibarr/js/digiriskdolibarr.js"></script>';
 
 				require_once __DIR__ . '/../lib/digiriskdolibarr_function.lib.php';
 				require_once __DIR__ . '/../class/digiriskdocuments/ticketdocument.class.php';
@@ -192,6 +193,30 @@ class ActionsDigiriskdolibarr
 					jQuery('tr.ticket_extras_digiriskdolibarr_ticket_firstname').after(<?php echo json_encode($selectDigiriskElement) ; ?>)
 				</script>
 				<?php
+			}
+			if (GETPOST('action') == 'add_message') {
+
+				$object = new Ticket($this->db);
+				$result = $object->fetch(GETPOST('id'),GETPOST('ref','alpha'),GETPOST('track_id','alpha'));
+
+				if ($result > 0) {
+					$object->fetch_optionals();
+
+					require_once __DIR__ . '/../class/digiriskelement.class.php';
+
+					$digiriskelement = new DigiriskElement($this->db);
+					$digiriskelement->fetch($object->array_options['options_digiriskdolibarr_ticket_service']);
+
+					?>
+					<script>
+						let mailContent = $('#message').html()
+						let digiriskElementRefAndLabel = <?php echo json_encode($digiriskelement->ref . ' - ' . $digiriskelement->label); ?>;
+						let digiriskElementId = <?php echo json_encode($digiriskelement->id); ?>;
+						let mailContentWithDigiriskElementLabel = mailContent.replace('__EXTRAFIELD_DIGIRISKDOLIBARR_TICKET_SERVICE_NAME__ ', digiriskElementRefAndLabel);
+						$('#message').html(mailContentWithDigiriskElementLabel);
+					</script>
+					<?php
+				}
 			}
 		} else if (in_array($parameters['currentcontext'], array('projectcard', 'projectcontactcard', 'projecttaskscard', 'projecttasktime', 'projectOverview', 'projecttaskscard', 'tasklist'))) {
 			if ((GETPOST('action') == '' || empty(GETPOST('action')) || GETPOST('action') != 'edit')) {
@@ -462,6 +487,20 @@ class ActionsDigiriskdolibarr
 					}
 				}
 			}
+
+			$upload_dir = $conf->digiriskdolibarr->multidir_output[isset($conf->entity) ? $conf->entity : 1];
+
+			// Action to generate pdf from odt file
+			require_once __DIR__ . '/../core/tpl/documents/digiriskdolibarr_manual_pdf_generation_action.tpl.php';
+
+			if ($action == 'pdfGeneration') {
+				$urltoredirect = $_SERVER['REQUEST_URI'];
+				$urltoredirect = preg_replace('/#pdfGeneration$/', '', $urltoredirect);
+				$urltoredirect = preg_replace('/action=pdfGeneration&?/', '', $urltoredirect); // To avoid infinite loop
+
+				header('Location: ' . $urltoredirect );
+				exit;
+			}
 		} elseif (in_array($parameters['currentcontext'] , array('ticketlist', 'thirdpartyticket', 'projectticket'))) {
 			if ($action == 'list') {
 				if (GETPOST('button_removefilter_x', 'alpha') || GETPOST('button_removefilter.x', 'alpha') || GETPOST('button_removefilter', 'alpha')) {
@@ -617,6 +656,15 @@ class ActionsDigiriskdolibarr
 			}
 		}
 
+		if ($parameters['currentcontext'] == 'userlist') {
+			$user->fetchAll('','','','',['login' => 'USERAPI']);
+
+			if (is_array($user->users) && !empty($user->users)) {
+				$userIds = implode(',', array_keys($user->users));
+				$sql .= ' AND u.rowid NOT IN (' . $userIds . ')';
+			}
+		}
+
 		if (true) {
 			$this->resprints = $sql;
 			return 0; // or return 1 to replace standard code
@@ -732,7 +780,6 @@ class ActionsDigiriskdolibarr
 				}
 			}
 		}
-
 		return $preventrecursivecall; // return 0 or return 1 to replace standard code
 	}
 }
