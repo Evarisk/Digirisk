@@ -145,7 +145,7 @@ class DashboardDigiriskStats extends DigiriskStats
 				foreach ($dashboardLine as $key => $dashboardLinesingle) {
 					if (!isset($disableWidgetList->$key) && is_array($dashboardLinesingle) && !empty($dashboardLinesingle)) {
 						$openedDashBoard .= '<div class="box-flex-item"><div class="box-flex-item-with-margin">';
-						$openedDashBoard .= '<div class="info-box info-box-sm">';
+						$openedDashBoard .= '<div class="info-box">';
 						$openedDashBoard .= '<span class="info-box-icon">';
 						$openedDashBoard .= '<i class="' . $dashboardLinesingle["picto"] . '"></i>';
 						$openedDashBoard .= '</span>';
