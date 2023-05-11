@@ -115,7 +115,7 @@ include DOL_DOCUMENT_ROOT . '/core/actions_linkedfiles.inc.php';
 $form = new Form($db);
 
 $title    = $langs->trans("Accident") . ' - ' . $langs->trans("Files");
-$help_url = '';
+$help_url = 'FR:Module_Digirisk#DigiRisk_-_Accident_b.C3.A9nins_et_presque_accidents';
 //$help_url='EN:Module_Third_Parties|FR:Module_Tiers|ES:Empresas';
 llxHeader('', $title, $help_url);
 

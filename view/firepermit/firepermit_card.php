@@ -665,7 +665,7 @@ $title_create  = $langs->trans("NewFirePermit");
 $title_edit    = $langs->trans("ModifyFirePermit");
 $object->picto = 'firepermitdocument@digiriskdolibarr';
 
-$help_url = 'FR:Module_DigiriskDolibarr';
+$help_url = 'FR:Module_Digirisk#DigiRisk_-_Permis_de_feu';
 $morejs   = array("/digiriskdolibarr/js/digiriskdolibarr.js");
 $morecss  = array("/digiriskdolibarr/css/digiriskdolibarr.css");
 

@@ -181,7 +181,7 @@ $form      = new Form($db);
 $formother = new FormOther($db);
 
 $title    = $langs->trans("FirePermitList");
-$help_url = '';
+$help_url = 'FR:Module_Digirisk#DigiRisk_-_Permis_de_feu';
 
 $morejs  = array("/digiriskdolibarr/js/digiriskdolibarr.js");
 $morecss = array("/digiriskdolibarr/css/digiriskdolibarr.css");

@@ -129,7 +129,7 @@ if (empty($reshook)) $formconfirm .= $hookmanager->resPrint;
 elseif ($reshook > 0) $formconfirm = $hookmanager->resPrint;
 
 
-$help_url = 'FR:Module_DigiriskDolibarr';
+$help_url = 'FR:Module_Digirisk';
 $title    = $langs->trans('DigiriskElementOrganization');
 $morejs   = array("/digiriskdolibarr/js/digiriskdolibarr.js");
 $morecss  = array("/digiriskdolibarr/css/digiriskdolibarr.css");

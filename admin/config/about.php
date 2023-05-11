@@ -60,7 +60,7 @@ $backtopage = GETPOST('backtopage', 'alpha');
  */
 
 $page_name = "DigiriskdolibarrAbout";
-$help_url  = 'FR:Module_DigiriskDolibarr';
+$help_url  = 'FR:Module_Digirisk#Informations';
 
 $morejs  = array("/digiriskdolibarr/js/digiriskdolibarr.js");
 $morecss = array("/digiriskdolibarr/css/digiriskdolibarr.css");

@@ -114,7 +114,7 @@ if (empty($reshook)) {
  */
 
 $title    = $langs->trans("FirePermit") . ' - ' . $langs->trans("Schedule");
-$help_url = '';
+$help_url = 'FR:Module_Digirisk#DigiRisk_-_Permis_de_feu';
 $morecss  = array("/digiriskdolibarr/css/digiriskdolibarr.css");
 
 llxHeader('', $title, $help_url, '', '', '', '', $morecss);

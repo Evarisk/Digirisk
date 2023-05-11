@@ -106,7 +106,7 @@ if ($action == 'closedashboardinfo') {
 $emptyobject = new stdClass();
 
 $title    = $langs->trans("DigiriskStandardInformation");
-$help_url = 'FR:Module_DigiriskDolibarr';
+$help_url = 'FR:Module_Digirisk#DigiRisk_-_Document_Unique';
 $morejs   = array("/digiriskdolibarr/js/digiriskdolibarr.js");
 $morecss  = array("/digiriskdolibarr/css/digiriskdolibarr.css");
 

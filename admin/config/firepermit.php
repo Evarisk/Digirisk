@@ -120,7 +120,7 @@ if ($action == 'setMaitreOeuvre') {
 if ( ! empty($conf->projet->enabled)) { $formproject = new FormProjets($db); }
 $form = new Form($db);
 
-$help_url = 'FR:Module_DigiriskDolibarr#L.27onglet_.C3.89l.C3.A9ment_Digirisk';
+$help_url = 'FR:Module_Digirisk';
 $title    = $langs->trans("FirePermit");
 
 $morejs  = array("/digiriskdolibarr/js/digiriskdolibarr.js");

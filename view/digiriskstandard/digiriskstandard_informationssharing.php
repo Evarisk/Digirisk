@@ -162,7 +162,7 @@ if ($action == 'remove_file' && $permissiontodelete) {
 $emptyobject = new stdClass();
 
 $title    = $langs->trans('InformationsSharing');
-$help_url = 'FR:Module_DigiriskDolibarr#Diffusion_d.27informations';
+$help_url = 'FR:Module_Digirisk#Soci.C3.A9t.C3.A9.2FOrganisation';
 $morejs   = array("/digiriskdolibarr/js/digiriskdolibarr.js");
 $morecss  = array("/digiriskdolibarr/css/digiriskdolibarr.css");
 

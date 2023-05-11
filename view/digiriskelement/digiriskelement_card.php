@@ -255,7 +255,7 @@ if ( $object->element_type == 'groupment' ) {
 	}
 }
 
-$help_url = 'FR:Module_DigiriskDolibarr';
+$help_url = 'FR:Module_Digirisk#Cr.C3.A9ation_UT_et_GP';
 $morejs   = array("/digiriskdolibarr/js/digiriskdolibarr.js");
 $morecss  = array("/digiriskdolibarr/css/digiriskdolibarr.css");
 

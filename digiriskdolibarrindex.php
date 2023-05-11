@@ -83,7 +83,7 @@ if ($action == 'closenotice') {
  * View
  */
 
-$help_url = 'FR:Module_DigiriskDolibarr';
+$help_url = 'FR:Module_Digirisk#Le_tableau_de_bord_et_indicateurs';
 $morejs   = array("/digiriskdolibarr/js/digiriskdolibarr.js");
 $morecss  = array("/digiriskdolibarr/css/digiriskdolibarr.css");
 

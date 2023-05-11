@@ -208,7 +208,7 @@ $form = new Form($db);
 $title         = $langs->trans("AccidentMetaDataLesion");
 $object->picto = 'accident@digiriskdolibarr';
 
-$help_url = 'FR:Module_DigiriskDolibarr';
+$help_url = 'FR:Module_Digirisk#DigiRisk_-_Accident_b.C3.A9nins_et_presque_accidents';
 $morejs   = array("/digiriskdolibarr/js/digiriskdolibarr.js");
 $morecss  = array("/digiriskdolibarr/css/digiriskdolibarr.css");
 

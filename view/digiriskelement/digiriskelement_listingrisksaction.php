@@ -174,7 +174,7 @@ if ($action == 'remove_file' && $permissiontodelete) {
 $emptyobject = new stdClass();
 
 $title    = $langs->trans('ListingRisksAction');
-$help_url = 'FR:Module_DigiriskDolibarr#Listing_des_actions_correctives';
+$help_url = 'FR:Module_Digirisk#Impression_des_listings_de_risques';
 $morejs   = array("/digiriskdolibarr/js/digiriskdolibarr.js");
 $morecss  = array("/digiriskdolibarr/css/digiriskdolibarr.css");
 

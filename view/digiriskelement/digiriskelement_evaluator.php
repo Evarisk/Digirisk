@@ -255,7 +255,7 @@ if (empty($reshook)) {
 $form = new Form($db);
 
 $title    = $langs->trans("Evaluators");
-$help_url = 'FR:Module_DigiriskDolibarr#.C3.89valuateur';
+$help_url = 'FR:Module_Digirisk#.C3.89valuateurs';
 $morejs   = array("/digiriskdolibarr/js/digiriskdolibarr.js");
 $morecss  = array("/digiriskdolibarr/css/digiriskdolibarr.css");
 

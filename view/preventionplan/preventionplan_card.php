@@ -672,7 +672,7 @@ $title_create  = $langs->trans("NewPreventionPlan");
 $title_edit    = $langs->trans("ModifyPreventionPlan");
 $object->picto = 'preventionplandocument@digiriskdolibarr';
 
-$help_url = 'FR:Module_DigiriskDolibarr';
+$help_url = 'FR:Module_Digirisk#DigiRisk_-_Plan_de_pr.C3.A9vention';
 $morejs   = array("/digiriskdolibarr/js/digiriskdolibarr.js");
 $morecss  = array("/digiriskdolibarr/css/digiriskdolibarr.css");
 
