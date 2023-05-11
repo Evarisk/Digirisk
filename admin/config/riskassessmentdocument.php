@@ -243,9 +243,9 @@ print '</td>';
 print '</tr>';
 
 print '<tr class="oddeven"><td>';
-print $langs->trans('SortRisksListingsByCotation');
+print $langs->trans('SortRisksListingsByEvaluation');
 print "</td><td>";
-print $langs->trans('SortRisksListingsByCotationDescription');
+print $langs->trans('SortRisksListingsByEvaluationDescription');
 print '</td>';
 
 print '<td class="center">';
