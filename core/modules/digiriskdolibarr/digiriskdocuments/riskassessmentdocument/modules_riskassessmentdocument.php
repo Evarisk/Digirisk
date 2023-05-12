@@ -269,7 +269,7 @@ abstract class ModeleODTRiskAssessmentDocument extends CommonDocGenerator
 							$cotationarray[$elementName] = array($totalQuotation, $digiriskelementsingle['object']->description, $scaleCounter);
 
 							$totalQuotation = 0;
-						
+
 							unset($tmparray['object_fields']);
 						}
 
@@ -311,6 +311,7 @@ abstract class ModeleODTRiskAssessmentDocument extends CommonDocGenerator
 
 							$categories = $category->containing($line->id, Categorie::TYPE_TICKET);
 							if (!empty($categories)) {
+								$allcategories = [];
 								foreach ($categories as $cat) {
 									$allcategories[] = $cat->label;
 								}
