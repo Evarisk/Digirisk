@@ -142,10 +142,11 @@ if (is_array($ticketcats)) {
 	if (in_array($langs->trans('All'), $ticketcats)) {
 		unset($ticketcats[array_search($langs->trans('All'), $ticketcats)]);
 	} else {
-		$stats->from .= ' LEFT JOIN '.MAIN_DB_PREFIX.'categorie_ticket as cattk ON (tk.rowid = cattk.fk_ticket)';
 		if (!empty($ticketcats)) {
+			$stats->from .= ' LEFT JOIN '.MAIN_DB_PREFIX.'categorie_ticket as cattk ON (tk.rowid = cattk.fk_ticket)';
 			$stats->where .= ' AND cattk.fk_categorie IN ('.$db->sanitize(implode(',', $ticketcats)).')';
 		} else if (!empty(GETPOST('refresh', 'int'))) {
+			$stats->from .= ' LEFT JOIN '.MAIN_DB_PREFIX.'categorie_ticket as cattk ON (tk.rowid = cattk.fk_ticket)';
 			$stats->where .= ' AND cattk.fk_categorie IS NULL';
 		}
 	}
@@ -154,11 +155,13 @@ if (is_array($digiriskelementlist)) {
 	if (in_array($langs->trans('All'), $digiriskelementlist)) {
 		unset($digiriskelementlist[array_search($langs->trans('All'), $digiriskelementlist)]);
 	} else {
-		$stats->join .= ' LEFT JOIN '.MAIN_DB_PREFIX.'ticket_extrafields as tkextra ON tk.rowid = tkextra.fk_object';
-		$stats->join .= ' LEFT JOIN '.MAIN_DB_PREFIX.'digiriskdolibarr_digiriskelement as e ON tkextra.digiriskdolibarr_ticket_service = e.rowid';
 		if (!empty($digiriskelementlist)) {
+			$stats->join .= ' LEFT JOIN '.MAIN_DB_PREFIX.'ticket_extrafields as tkextra ON tk.rowid = tkextra.fk_object';
+			$stats->join .= ' LEFT JOIN '.MAIN_DB_PREFIX.'digiriskdolibarr_digiriskelement as e ON tkextra.digiriskdolibarr_ticket_service = e.rowid';
 			$stats->where .= ' AND e.rowid IN ('.$db->sanitize(implode(',', $digiriskelementlist)).')';
 		} else if (!empty(GETPOST('refresh', 'int'))) {
+			$stats->join .= ' LEFT JOIN '.MAIN_DB_PREFIX.'ticket_extrafields as tkextra ON tk.rowid = tkextra.fk_object';
+			$stats->join .= ' LEFT JOIN '.MAIN_DB_PREFIX.'digiriskdolibarr_digiriskelement as e ON tkextra.digiriskdolibarr_ticket_service = e.rowid';
 			$stats->where .= ' AND e.rowid IS NULL';
 		}
 	}
