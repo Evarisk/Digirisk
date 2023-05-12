@@ -70,7 +70,7 @@ $resources = new DigiriskResources($db);
 
 $allLinks = $resources->digirisk_dolibarr_fetch_resources();
 
-$hookmanager->initHooks(array('admincompany', 'globaladmin'));
+$hookmanager->initHooks(array('adminsecurity', 'globaladmin'));
 
 /*
  * Actions

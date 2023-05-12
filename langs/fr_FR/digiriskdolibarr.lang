@@ -266,7 +266,11 @@ TermsAndConditions = Modalités
 
 ESC = Comité Social & Économique
 StaffRepresentatives = Délégués du personnel
+DeficiencyReport = Procès-verbal de carence
+DeficiencyReportDate = Date du procès-verbal de carence
+SubmissionElectionDate = Date de présentation de l'élection
 ElectionDate = Date d'élection
+SecondElectionDate = Date d'élection du second tour
 ElectionDateCSE = Date d'élection du CSE
 ElectionDateDP = Date d'élection des DP
 
