@@ -176,6 +176,7 @@ class InformationsSharing extends DigiriskDocuments
 			}
 
 			// CSE
+			$json['InformationsSharing']['deficiency_report_date']                  = (dol_strlen($conf->global->DIGIRISKDOLIBARR_CSE_SUBMISSION_ELECTION_DATE) > 0 && $conf->global->DIGIRISKDOLIBARR_CSE_SUBMISSION_ELECTION_DATE != '--' && dol_now() > dol_time_plus_duree(dol_stringtotime($conf->global->DIGIRISKDOLIBARR_CSE_SUBMISSION_ELECTION_DATE), '30', 'd') ? dol_time_plus_duree(dol_stringtotime($conf->global->DIGIRISKDOLIBARR_CSE_SUBMISSION_ELECTION_DATE), '30', 'd') : '');
 			$json['InformationsSharing']['membres_du_comite_entreprise_date']       = (dol_strlen($conf->global->DIGIRISKDOLIBARR_CSE_ELECTION_DATE) > 0 && $conf->global->DIGIRISKDOLIBARR_CSE_ELECTION_DATE != '--' ? $conf->global->DIGIRISKDOLIBARR_CSE_ELECTION_DATE : '');
 			$json['InformationsSharing']['membres_du_comite_entreprise_titulaires'] = '';
 			if (!empty ($digirisk_resources['TitularsCSE']->id )) {

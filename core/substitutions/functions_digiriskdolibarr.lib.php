@@ -107,6 +107,7 @@ function digiriskdolibarr_completesubstitutionarray(&$substitutionarray, $langs,
 			$substitutionarray['referant_harcelement_nom']       = $informationssharing->harassment_officer_cse->name;
 			$substitutionarray['referant_harcelement_telephone'] = $informationssharing->harassment_officer_cse->phone;
 
+			$substitutionarray['deficiency_report_date']                  = dol_print_date($informationssharing->deficiency_report_date, 'day');
 			$substitutionarray['membres_du_comite_entreprise_date']       = dol_print_date($informationssharing->membres_du_comite_entreprise_date, 'day');
 			$substitutionarray['membres_du_comite_entreprise_titulaires'] = dol_htmlentitiesbr_decode(strip_tags($informationssharing->membres_du_comite_entreprise_titulaires, '<br>'));
 			$substitutionarray['membres_du_comite_entreprise_suppleants'] = dol_htmlentitiesbr_decode(strip_tags($informationssharing->membres_du_comite_entreprise_suppleants, '<br>'));
