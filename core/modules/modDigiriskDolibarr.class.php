@@ -453,8 +453,8 @@ class modDigiriskdolibarr extends DolibarrModules
 		$this->requiredby              = array();
 		$this->conflictwith            = array();
 		$this->langfiles               = array("digiriskdolibarr@digiriskdolibarr");
-		$this->phpmin                  = array(5, 5); // Minimum version of PHP required by module
-		$this->need_dolibarr_version   = array(13, -3); // Minimum version of Dolibarr required by module
+		$this->phpmin                  = array(7, 4); // Minimum version of PHP required by module
+		$this->need_dolibarr_version   = array(16, 0); // Minimum version of Dolibarr required by module
 		$this->warnings_activation     = array(); // Warning to show when we activate module. array('always'='text') or array('FR'='textfr','ES'='textes'...)
 		$this->warnings_activation_ext = array(); // Warning to show when we activate an external module. array('always'='text') or array('FR'='textfr','ES'='textes'...)
 		//$this->automatic_activation = array('FR'=>'DigiriskDolibarrWasAutomaticallyActivatedBecauseOfYourCountryChoice');
