@@ -5,7 +5,7 @@ $lastEvaluation    = array_filter($allRiskAssessment, function($lastRiskAssessme
 });
 if (is_array($allRiskAssessment) && !empty($allRiskAssessment)) :
 	usort($allRiskAssessment, function ($riskAssessmentComparer, $riskAssessmentCompared) {
-	return $riskAssessmentComparer->date_creation < $riskAssessmentCompared->date_creation;
+		return $riskAssessmentComparer->cotation < $riskAssessmentCompared->cotation;
 	}); ?>
 	<div class="table-cell-header">
 		<div class="table-cell-header-label"><strong><?php echo $langs->trans('ListingHeaderCotation'); ?> (<?php echo count($allRiskAssessment); ?>)</strong></div>
