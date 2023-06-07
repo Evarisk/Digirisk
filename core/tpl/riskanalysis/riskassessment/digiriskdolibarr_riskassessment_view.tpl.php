@@ -376,7 +376,12 @@ $evaluation->method = $lastEvaluation->method ?: "standard" ;
 					</div>
 				</div>
 				<!-- RISK EVALUATION SINGLE -->
-				<?php if ( ! empty($lastEvaluation) && $lastEvaluation > 0) : ?>
+				<?php
+				$lastEvaluation = array_filter($allRiskAssessment, function($lastRiskAssessment) {
+					return $lastRiskAssessment->status == 1;
+				});
+				$lastEvaluation = $lastEvaluation[0];
+				if (!empty($lastEvaluation) && $lastEvaluation > 0) : ?>
 					<div class="risk-evaluation-container last-risk-assessment risk-evaluation-container-<?php echo $lastEvaluation->id ?>">
 						<h2><?php echo $langs->trans('LastRiskAssessment') . ' ' . $risk->ref; ?></h2>
 						<div class="risk-evaluation-single-content risk-evaluation-single-content-<?php echo $risk->id ?>">
