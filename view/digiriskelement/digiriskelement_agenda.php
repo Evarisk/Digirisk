@@ -41,10 +41,10 @@ require_once DOL_DOCUMENT_ROOT . '/projet/class/project.class.php';
 require_once DOL_DOCUMENT_ROOT . '/core/lib/company.lib.php';
 require_once DOL_DOCUMENT_ROOT . '/core/lib/functions2.lib.php';
 
-require_once './../../class/digiriskelement.class.php';
-require_once './../../class/digiriskstandard.class.php';
-require_once './../../lib/digiriskdolibarr_digiriskelement.lib.php';
-require_once './../../lib/digiriskdolibarr_function.lib.php';
+require_once __DIR__ . '/../../class/digiriskelement.class.php';
+require_once __DIR__ . '/../../class/digiriskstandard.class.php';
+require_once __DIR__ . '/../../lib/digiriskdolibarr_digiriskelement.lib.php';
+require_once __DIR__ . '/../../lib/digiriskdolibarr_function.lib.php';
 
 global $conf, $db, $hookmanager, $langs, $user;
 

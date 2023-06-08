@@ -46,15 +46,15 @@ require_once DOL_DOCUMENT_ROOT . '/projet/class/project.class.php';
 require_once DOL_DOCUMENT_ROOT . '/core/modules/project/mod_project_simple.php';
 require_once DOL_DOCUMENT_ROOT . '/core/modules/project/task/mod_task_simple.php';
 
-require_once './../../class/digiriskelement.class.php';
-require_once './../../class/digiriskstandard.class.php';
-require_once './../../class/digiriskelement.class.php';
-require_once './../../class/riskanalysis/risk.class.php';
-require_once './../../class/riskanalysis/riskassessment.class.php';
-require_once './../../core/modules/digiriskdolibarr/riskanalysis/risk/mod_risk_standard.php';
-require_once './../../core/modules/digiriskdolibarr/riskanalysis/riskassessment/mod_riskassessment_standard.php';
-require_once './../../lib/digiriskdolibarr_digiriskelement.lib.php';
-require_once './../../lib/digiriskdolibarr_function.lib.php';
+require_once __DIR__ . '/../../class/digiriskelement.class.php';
+require_once __DIR__ . '/../../class/digiriskstandard.class.php';
+require_once __DIR__ . '/../../class/digiriskelement.class.php';
+require_once __DIR__ . '/../../class/riskanalysis/risk.class.php';
+require_once __DIR__ . '/../../class/riskanalysis/riskassessment.class.php';
+require_once __DIR__ . '/../../core/modules/digiriskdolibarr/riskanalysis/risk/mod_risk_standard.php';
+require_once __DIR__ . '/../../core/modules/digiriskdolibarr/riskanalysis/riskassessment/mod_riskassessment_standard.php';
+require_once __DIR__ . '/../../lib/digiriskdolibarr_digiriskelement.lib.php';
+require_once __DIR__ . '/../../lib/digiriskdolibarr_function.lib.php';
 
 global $conf, $db, $hookmanager, $langs, $user;
 
@@ -194,7 +194,7 @@ if (empty($reshook)) {
 
 	$backtopage = dol_buildpath('/digiriskdolibarr/view/digiriskelement/digiriskelement_risk.php', 1) . '?id=' . ($id > 0 ? $id : '__ID__');
 
-	require_once './../../core/tpl/riskanalysis/risk/digiriskdolibarr_risk_actions.tpl.php';
+	require_once __DIR__ . '/../../core/tpl/riskanalysis/risk/digiriskdolibarr_risk_actions.tpl.php';
 }
 
 /*
@@ -371,17 +371,17 @@ if ($object->id > 0) {
 
 	if (!empty($conf->global->DIGIRISKDOLIBARR_SHOW_RISKS)) {
 		$contextpage = 'risklist';
-		require_once './../../core/tpl/riskanalysis/risk/digiriskdolibarr_risklist_view.tpl.php';
+		require_once __DIR__ . '/../../core/tpl/riskanalysis/risk/digiriskdolibarr_risklist_view.tpl.php';
 	}
 
 	if (!empty($conf->global->DIGIRISKDOLIBARR_SHOW_INHERITED_RISKS_IN_LISTINGS)) {
 		$contextpage = 'inheritedrisk';
-		require_once './../../core/tpl/riskanalysis/risk/digiriskdolibarr_inheritedrisklist_view.tpl.php';
+		require_once __DIR__ . '/../../core/tpl/riskanalysis/risk/digiriskdolibarr_inheritedrisklist_view.tpl.php';
 	}
 
 	if (!empty($conf->global->DIGIRISKDOLIBARR_SHOW_SHARED_RISKS)) {
 		$contextpage = 'sharedrisk';
-		require_once './../../core/tpl/riskanalysis/risk/digiriskdolibarr_sharedrisklist_view.tpl.php';
+		require_once __DIR__ . '/../../core/tpl/riskanalysis/risk/digiriskdolibarr_sharedrisklist_view.tpl.php';
 	}
 }
 
