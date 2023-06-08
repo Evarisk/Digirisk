@@ -580,7 +580,7 @@ function digiriskHeader($title = '', $help_url = '', $arrayofjs = array(), $arra
 	}
 	?>
 
-	<?php require_once __DIR__ . '/../../core/tpl/medias/digiriskdolibarr_medias_gallery_modal.tpl.php'; ?>
+	<?php require_once __DIR__ . '/../core/tpl/medias/digiriskdolibarr_medias_gallery_modal.tpl.php'; ?>
 
 	<div id="id-container" class="id-container page-ut-gp-list">
 		<input type="hidden" name="token" value="<?php echo newToken(); ?>">
