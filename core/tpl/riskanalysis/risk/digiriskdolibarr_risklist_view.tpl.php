@@ -647,9 +647,10 @@ if ($action != 'list') {
 											<span class="title"><i class="fas fa-chart-line"></i><?php echo ' ' . $langs->trans('Cotation'); ?><required>*</required></span>
 											<div class="cotation-listing wpeo-gridlayout grid-4 grid-gap-0">
 												<?php
-												$defaultCotation = array(0, 48, 51, 100);
+												$defaultCotation = array(0, 48, 51, 80);
 												if ( ! empty($defaultCotation)) :
-													foreach ($defaultCotation as $request) :
+													foreach ($defaultCotation as $key => $request) :
+														$nextRequest = isset($defaultCotation[$key+1]) ? ($defaultCotation[$key + 1] - 1) : 100;
 														$evaluation->cotation = $request; ?>
 														<div data-id="<?php echo 0; ?>"
 															 data-evaluation-method="standard"
@@ -657,7 +658,7 @@ if ($action != 'list') {
 															 data-variable-id="<?php echo 152 + $request; ?>"
 															 data-seuil="<?php echo  $evaluation->get_evaluation_scale(); ?>"
 															 data-scale="<?php echo  $evaluation->get_evaluation_scale(); ?>"
-															 class="risk-evaluation-cotation cotation"><?php echo $request; ?></div>
+															 class="risk-evaluation-cotation cotation"><?php echo $request . '-' . $nextRequest; ?></div>
 													<?php endforeach;
 												endif; ?>
 											</div>
@@ -832,9 +833,10 @@ if ($action != 'list') {
 									<span class="title"><i class="fas fa-chart-line"></i><?php echo ' ' . $langs->trans('Cotation'); ?><required>*</required></span>
 									<div class="cotation-listing wpeo-gridlayout grid-4 grid-gap-0">
 										<?php
-										$defaultCotation = array(0, 48, 51, 100);
+										$defaultCotation = array(0, 48, 51, 80);
 										if ( ! empty($defaultCotation)) :
-											foreach ($defaultCotation as $request) :
+											foreach ($defaultCotation as $key => $request) :
+												$nextRequest = isset($defaultCotation[$key+1]) ? ($defaultCotation[$key + 1] - 1) : 100;
 												$evaluation->cotation = $request; ?>
 												<div data-id="<?php echo 0; ?>"
 													 data-evaluation-method="standard"
@@ -842,7 +844,7 @@ if ($action != 'list') {
 													 data-variable-id="<?php echo 152 + $request; ?>"
 													 data-seuil="<?php echo  $evaluation->get_evaluation_scale(); ?>"
 													 data-scale="<?php echo  $evaluation->get_evaluation_scale(); ?>"
-													 class="risk-evaluation-cotation cotation"><?php echo $request; ?></div>
+													 class="risk-evaluation-cotation cotation"><?php echo $request . '-' . $nextRequest; ?></div>
 											<?php endforeach;
 										endif; ?>
 									</div>
