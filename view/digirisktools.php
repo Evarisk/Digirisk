@@ -35,9 +35,13 @@ if ( ! $res && file_exists("../../main.inc.php")) $res    = @include "../../main
 if ( ! $res && file_exists("../../../main.inc.php")) $res = @include "../../../main.inc.php";
 if ( ! $res) die("Include of main fails");
 
+global $conf, $db, $langs, $user;
+
+$taskRefClass = $conf->global->PROJECT_TASK_ADDON;
+
 require_once DOL_DOCUMENT_ROOT . '/core/lib/admin.lib.php';
 require_once DOL_DOCUMENT_ROOT . '/core/lib/images.lib.php';
-require_once DOL_DOCUMENT_ROOT . '/core/modules/project/task/mod_task_simple.php';
+require_once DOL_DOCUMENT_ROOT . '/core/modules/project/task/' . $taskRefClass . '.php';
 
 require_once './../class/digiriskstandard.class.php';
 require_once './../class/digiriskelement.class.php';
@@ -54,8 +58,6 @@ require_once './../core/modules/digiriskdolibarr/riskanalysis/risk/mod_risk_stan
 require_once './../core/modules/digiriskdolibarr/riskanalysis/riskassessment/mod_riskassessment_standard.php';
 require_once './../core/modules/digiriskdolibarr/riskanalysis/risksign/mod_risksign_standard.php';
 require_once __DIR__ . '/../core/tpl/digirisk_security_checks.php';
-
-global $conf, $db, $langs, $user;
 
 // Load translation files required by the page
 $langs->loadLangs(array("digiriskdolibarr@digiriskdolibarr"));
@@ -82,7 +84,7 @@ $refWorkUnitMod       = new $conf->global->DIGIRISKDOLIBARR_WORKUNIT_ADDON();
 $refRiskMod           = new $conf->global->DIGIRISKDOLIBARR_RISK_ADDON();
 $refRiskAssessmentMod = new $conf->global->DIGIRISKDOLIBARR_RISKASSESSMENT_ADDON();
 $refRiskSignMod       = new $conf->global->DIGIRISKDOLIBARR_RISKSIGN_ADDON();
-$refTaskMod           = new $conf->global->PROJECT_TASK_ADDON();
+$refTaskMod           = new $taskRefClass();
 
 $upload_dir = $conf->digiriskdolibarr->multidir_output[isset($conf->entity) ? $conf->entity : 1];
 

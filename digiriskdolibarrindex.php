@@ -35,18 +35,20 @@ if ( ! $res && file_exists("../../main.inc.php")) $res    = @include "../../main
 if ( ! $res && file_exists("../../../main.inc.php")) $res = @include "../../../main.inc.php";
 if ( ! $res) die("Include of main fails");
 
+global $user, $langs, $conf, $db;
+
+$projectRefClass = $conf->global->PROJECT_ADDON;
+
 require_once DOL_DOCUMENT_ROOT . '/core/lib/admin.lib.php';
 require_once DOL_DOCUMENT_ROOT . '/core/lib/date.lib.php';
 require_once DOL_DOCUMENT_ROOT . '/projet/class/project.class.php';
 require_once DOL_DOCUMENT_ROOT . '/societe/class/societe.class.php';
-require_once DOL_DOCUMENT_ROOT . '/core/modules/project/mod_project_simple.php';
+require_once DOL_DOCUMENT_ROOT . '/core/modules/project/' . $projectRefClass . '.php';
 require_once DOL_DOCUMENT_ROOT . '/includes/parsedown/Parsedown.php';
 
 require_once './core/modules/modDigiriskDolibarr.class.php';
 require_once __DIR__ . '/class/dashboarddigiriskstats.class.php';
 require_once __DIR__ . '/core/tpl/digirisk_security_checks.php';
-
-global $user, $langs, $conf, $db;
 
 // Load translation files required by the page
 $langs->loadLangs(array("digiriskdolibarr@digiriskdolibarr"));
@@ -57,7 +59,7 @@ $project     = new Project($db);
 $third_party = new Societe($db);
 $stats       = new DashboardDigiriskStats($db);
 $parse       = new Parsedown();
-$projectRef  = new $conf->global->PROJECT_ADDON();
+$projectRef  = new $projectRefClass();
 
 // Security check
 if ( ! $user->rights->digiriskdolibarr->lire) accessforbidden();

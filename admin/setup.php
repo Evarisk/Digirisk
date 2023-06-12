@@ -38,12 +38,14 @@ if ( ! $res) die("Include of main fails");
 
 global $conf, $db, $langs, $user;
 
+$projectRefClass = $conf->global->PROJECT_ADDON;
+
 // Libraries
 require_once DOL_DOCUMENT_ROOT . "/core/lib/admin.lib.php";
 require_once DOL_DOCUMENT_ROOT . "/core/lib/files.lib.php";
 require_once DOL_DOCUMENT_ROOT . '/projet/class/project.class.php';
 require_once DOL_DOCUMENT_ROOT . '/societe/class/societe.class.php';
-require_once DOL_DOCUMENT_ROOT . '/core/modules/project/mod_project_simple.php';
+require_once DOL_DOCUMENT_ROOT . '/core/modules/project/' . $projectRefClass . '.php';
 
 require_once '../lib/digiriskdolibarr.lib.php';
 require_once __DIR__ . '/../core/tpl/digirisk_security_checks.php';
@@ -54,7 +56,7 @@ $langs->loadLangs(array("admin", "digiriskdolibarr@digiriskdolibarr"));
 // Initialize technical objects
 $project     = new Project($db);
 $third_party = new Societe($db);
-$projectRef  = new $conf->global->PROJECT_ADDON();
+$projectRef  = new $projectRefClass();
 
 // Parameters
 $action     = GETPOST('action', 'alpha');
