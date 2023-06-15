@@ -40,19 +40,19 @@ require_once DOL_DOCUMENT_ROOT . '/core/class/html.formfile.class.php';
 require_once DOL_DOCUMENT_ROOT . '/projet/class/project.class.php';
 require_once DOL_DOCUMENT_ROOT . '/core/lib/images.lib.php';
 
-require_once './../../class/digiriskdocuments.class.php';
-require_once './../../class/digiriskelement.class.php';
-require_once './../../class/digiriskstandard.class.php';
-require_once './../../class/digiriskdocuments/groupmentdocument.class.php';
-require_once './../../class/digiriskdocuments/workunitdocument.class.php';
-require_once './../../lib/digiriskdolibarr_digiriskelement.lib.php';
-require_once './../../lib/digiriskdolibarr_function.lib.php';
-require_once './../../core/modules/digiriskdolibarr/digiriskelement/groupment/mod_groupment_standard.php';
-require_once './../../core/modules/digiriskdolibarr/digiriskelement/groupment/mod_groupment_sirius.php';
-require_once './../../core/modules/digiriskdolibarr/digiriskelement/workunit/mod_workunit_standard.php';
-require_once './../../core/modules/digiriskdolibarr/digiriskelement/workunit/mod_workunit_canopus.php';
-require_once './../../core/modules/digiriskdolibarr/digiriskdocuments/groupmentdocument/modules_groupmentdocument.php';
-require_once './../../core/modules/digiriskdolibarr/digiriskdocuments/workunitdocument/modules_workunitdocument.php';
+require_once __DIR__ . '/../../class/digiriskdocuments.class.php';
+require_once __DIR__ . '/../../class/digiriskelement.class.php';
+require_once __DIR__ . '/../../class/digiriskstandard.class.php';
+require_once __DIR__ . '/../../class/digiriskdocuments/groupmentdocument.class.php';
+require_once __DIR__ . '/../../class/digiriskdocuments/workunitdocument.class.php';
+require_once __DIR__ . '/../../lib/digiriskdolibarr_digiriskelement.lib.php';
+require_once __DIR__ . '/../../lib/digiriskdolibarr_function.lib.php';
+require_once __DIR__ . '/../../core/modules/digiriskdolibarr/digiriskelement/groupment/mod_groupment_standard.php';
+require_once __DIR__ . '/../../core/modules/digiriskdolibarr/digiriskelement/groupment/mod_groupment_sirius.php';
+require_once __DIR__ . '/../../core/modules/digiriskdolibarr/digiriskelement/workunit/mod_workunit_standard.php';
+require_once __DIR__ . '/../../core/modules/digiriskdolibarr/digiriskelement/workunit/mod_workunit_canopus.php';
+require_once __DIR__ . '/../../core/modules/digiriskdolibarr/digiriskdocuments/groupmentdocument/modules_groupmentdocument.php';
+require_once __DIR__ . '/../../core/modules/digiriskdolibarr/digiriskdocuments/workunitdocument/modules_workunitdocument.php';
 
 global $conf, $db, $hookmanager, $langs, $user;
 

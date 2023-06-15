@@ -39,11 +39,11 @@ if ( ! $res) die("Include of main fails");
 require_once DOL_DOCUMENT_ROOT . '/core/lib/images.lib.php';
 require_once DOL_DOCUMENT_ROOT . '/projet/class/project.class.php';
 
-require_once './../../class/digiriskstandard.class.php';
-require_once './../../class/digiriskdocuments/informationssharing.class.php';
-require_once './../../lib/digiriskdolibarr_digiriskstandard.lib.php';
-require_once './../../lib/digiriskdolibarr_function.lib.php';
-require_once './../../core/modules/digiriskdolibarr/digiriskdocuments/informationssharing/modules_informationssharing.php';
+require_once __DIR__ . '/../../class/digiriskstandard.class.php';
+require_once __DIR__ . '/../../class/digiriskdocuments/informationssharing.class.php';
+require_once __DIR__ . '/../../lib/digiriskdolibarr_digiriskstandard.lib.php';
+require_once __DIR__ . '/../../lib/digiriskdolibarr_function.lib.php';
+require_once __DIR__ . '/../../core/modules/digiriskdolibarr/digiriskdocuments/informationssharing/modules_informationssharing.php';
 
 global $db, $conf, $langs, $hookmanager, $user;
 
@@ -193,7 +193,7 @@ print '<div class="fichecenter">';
 print '<table class="border centpercent tableforfield">' . "\n";
 
 //JSON Decode and show fields
-require_once './../../core/tpl/digiriskdocuments/digiriskdolibarr_informationssharingfields_view.tpl.php';
+require_once __DIR__ . '/../../core/tpl/digiriskdocuments/digiriskdolibarr_informationssharingfields_view.tpl.php';
 
 print '</table>';
 print '</div>';

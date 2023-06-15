@@ -38,7 +38,7 @@ if ( ! $res) die("Include of main fails");
 require_once DOL_DOCUMENT_ROOT . '/core/lib/company.lib.php';
 require_once DOL_DOCUMENT_ROOT . '/core/lib/images.lib.php';
 
-require_once './../class/openinghours.class.php';
+require_once __DIR__ . '/../class/openinghours.class.php';
 require_once __DIR__ . '/../core/tpl/digirisk_security_checks.php';
 
 $langs->loadLangs(array("digiriskdolibarr@digiriskdolibarr"));

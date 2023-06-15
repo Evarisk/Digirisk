@@ -42,7 +42,7 @@ require_once DOL_DOCUMENT_ROOT . '/societe/class/societe.class.php';
 require_once DOL_DOCUMENT_ROOT . '/core/modules/project/mod_project_simple.php';
 require_once DOL_DOCUMENT_ROOT . '/includes/parsedown/Parsedown.php';
 
-require_once './core/modules/modDigiriskDolibarr.class.php';
+require_once __DIR__ . '/core/modules/modDigiriskDolibarr.class.php';
 require_once __DIR__ . '/class/dashboarddigiriskstats.class.php';
 require_once __DIR__ . '/core/tpl/digirisk_security_checks.php';
 
@@ -73,7 +73,7 @@ $error = 0;
  *  Actions
 */
 
-require_once './core/tpl/digiriskdolibarr_projectcreation_action.tpl.php';
+require_once __DIR__ . '/core/tpl/digiriskdolibarr_projectcreation_action.tpl.php';
 
 if ($action == 'closenotice') {
 	dolibarr_set_const($db, "DIGIRISKDOLIBARR_SHOW_PATCH_NOTE", 0, 'integer', 0, '', $conf->entity);

@@ -42,9 +42,9 @@ require_once DOL_DOCUMENT_ROOT . '/core/lib/company.lib.php';
 require_once DOL_DOCUMENT_ROOT . '/core/lib/functions2.lib.php';
 require_once DOL_DOCUMENT_ROOT . '/core/lib/images.lib.php';
 
-require_once './../../class/digiriskstandard.class.php';
-require_once './../../lib/digiriskdolibarr_digiriskstandard.lib.php';
-require_once './../../lib/digiriskdolibarr_function.lib.php';
+require_once __DIR__ . '/../../class/digiriskstandard.class.php';
+require_once __DIR__ . '/../../lib/digiriskdolibarr_digiriskstandard.lib.php';
+require_once __DIR__ . '/../../lib/digiriskdolibarr_function.lib.php';
 
 global $conf, $db, $langs, $user, $hookmanager;
 
