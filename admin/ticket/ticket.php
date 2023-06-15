@@ -237,7 +237,7 @@ if ( ! empty($conf->projet->enabled)) { $formproject = new FormProjets($db); }
 $form      = new Form($db);
 $formother = new FormOther($db);
 
-$help_url = '';
+$help_url = 'FR:Module_Digirisk';
 $title    = $langs->transnoentities("Ticket");
 $morecss  = array("/digiriskdolibarr/css/digiriskdolibarr.css");
 

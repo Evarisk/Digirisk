@@ -297,7 +297,7 @@ if ($action == 'deleteAttendant') {
  */
 
 $title    = $langs->trans("PreventionPlanAttendants");
-$help_url = '';
+$help_url = 'FR:Module_Digirisk#DigiRisk_-_Plan_de_pr.C3.A9vention';
 $morejs   = array("/digiriskdolibarr/js/signature-pad.min.js", "/digiriskdolibarr/js/digiriskdolibarr.js");
 $morecss  = array("/digiriskdolibarr/css/digiriskdolibarr.css");
 

@@ -296,7 +296,7 @@ if ($action == 'deleteAttendant') {
  */
 
 $title    = $langs->trans("FirePermitAttendants");
-$help_url = '';
+$help_url = 'FR:Module_Digirisk#DigiRisk_-_Permis_de_feu';
 $morejs   = array("/digiriskdolibarr/js/signature-pad.min.js", "/digiriskdolibarr/js/digiriskdolibarr.js");
 $morecss  = array("/digiriskdolibarr/css/digiriskdolibarr.css");
 

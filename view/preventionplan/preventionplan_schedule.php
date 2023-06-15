@@ -115,7 +115,7 @@ if (empty($reshook)) {
  */
 
 $title    = $langs->trans("PreventionPlan") . ' - ' . $langs->trans("Schedule");
-$help_url = '';
+$help_url = 'FR:Module_Digirisk#DigiRisk_-_Plan_de_pr.C3.A9vention';
 $morecss  = array("/digiriskdolibarr/css/digiriskdolibarr.css");
 
 llxHeader('', $title, $help_url, '', '', '', '', $morecss);

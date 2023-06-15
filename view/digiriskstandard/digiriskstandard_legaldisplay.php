@@ -162,7 +162,7 @@ if ($action == 'remove_file' && $permissiontodelete) {
 $emptyobject = new stdClass();
 
 $title    = $langs->trans('LegalDisplay');
-$help_url = 'FR:Module_DigiriskDolibarr#Affichage_l.C3.A9gal';
+$help_url = 'FR:Module_Digirisk#Soci.C3.A9t.C3.A9.2FOrganisation';
 $morejs   = array("/digiriskdolibarr/js/digiriskdolibarr.js");
 $morecss  = array("/digiriskdolibarr/css/digiriskdolibarr.css");
 

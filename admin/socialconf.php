@@ -122,7 +122,7 @@ if (empty($reshook)) {
  * View
  */
 
-$help_url = 'FR:Module_DigiriskDolibarr#L.27onglet_Social';
+$help_url = 'FR:Module_Digirisk#L.27onglet_Social';
 $title    = $langs->trans("CompanyFoundation") . ' - ' . $langs->trans("Social");
 
 $morejs  = array("/digiriskdolibarr/js/digiriskdolibarr.js");

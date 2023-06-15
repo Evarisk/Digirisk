@@ -117,9 +117,10 @@ if ($action == 'savegraph') {
 
 $form   = new Form($db);
 
-$title = $langs->trans("TicketStatistics");
+$title    = $langs->trans("TicketStatistics");
+$help_url = 'FR:Module_Digirisk#Statistiques_des_tickets';
 
-llxHeader('', $title);
+llxHeader('', $title, $help_url);
 
 print load_fiche_titre($title, '', 'ticket');
 

@@ -344,7 +344,7 @@ if (empty($reshook)) {
 $emptyobject = new stdClass();
 
 $title    = $langs->trans('RiskAssessmentDocument');
-$help_url = 'FR:Module_DigiriskDolibarr#Document_unique_2';
+$help_url = 'FR:Module_Digirisk#Impression_du_Document_Unique';
 $morejs   = array("/digiriskdolibarr/js/digiriskdolibarr.js");
 $morecss  = array("/digiriskdolibarr/css/digiriskdolibarr.css");
 

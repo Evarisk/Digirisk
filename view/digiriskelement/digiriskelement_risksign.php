@@ -325,7 +325,7 @@ if (empty($reshook)) {
 $form = new Form($db);
 
 $title    = $langs->trans("RiskSigns");
-$help_url = 'FR:Module_DigiriskDolibarr#Signalisation';
+$help_url = 'FR:Module_Digirisk#Signalisation';
 $morejs   = array("/digiriskdolibarr/js/digiriskdolibarr.js");
 $morecss  = array("/digiriskdolibarr/css/digiriskdolibarr.css");
 

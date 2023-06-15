@@ -103,7 +103,7 @@ if ($action == 'setMediaDimension') {
  */
 
 $page_name = "DigiriskdolibarrSetup";
-$help_url  = 'FR:Module_DigiriskDolibarr#Configuration';
+$help_url  = 'FR:Module_Digirisk#Configuration';
 
 $morejs  = array("/digiriskdolibarr/js/digiriskdolibarr.js");
 $morecss = array("/digiriskdolibarr/css/digiriskdolibarr.css");

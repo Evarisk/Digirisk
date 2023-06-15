@@ -162,7 +162,7 @@ $form     = new Form($db);
 $formfile = new FormFile($db);
 
 $title    = $langs->trans("Accident") . ' - ' . $langs->trans("Files");
-$help_url = '';
+$help_url = 'FR:Module_Digirisk#DigiRisk_-_Accident_b.C3.A9nins_et_presque_accidents';
 llxHeader('', $title, $help_url);
 
 if ($object->id) {

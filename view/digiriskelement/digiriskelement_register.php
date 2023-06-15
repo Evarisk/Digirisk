@@ -95,7 +95,7 @@ if ($reshook < 0) setEventMessages($hookmanager->error, $hookmanager->errors, 'e
 
 if ($object->id > 0) {
 	$title    = $langs->trans("Register");
-	$help_url = 'FR:Module_DigiriskDolibarr';
+	$help_url = 'FR:Module_Digirisk#Le_tableau_de_bord_et_indicateurs';
 	$morejs   = array("/digiriskdolibarr/js/digiriskdolibarr.js");
 	$morecss  = array("/digiriskdolibarr/css/digiriskdolibarr.css");
 

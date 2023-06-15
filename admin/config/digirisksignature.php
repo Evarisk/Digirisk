@@ -70,7 +70,7 @@ if ($action == 'setPublicInterface') {
 
 $form = new Form($db);
 
-$help_url = '';
+$help_url = 'FR:Module_Digirisk';
 $title    = $langs->trans("DigiriskSignature");
 
 $morejs  = array("/digiriskdolibarr/js/digiriskdolibarr.js");
