@@ -1,6 +1,6 @@
 [
 	{
-		"name": "Risques de trébuchement, heurt ou autre perturbation du mouvement",
+		"name": "Risques de chute de plain-pied",
 		"nameDigiriskWordPress": "Risques de trébuchement, heurt ou autre pertubation du mouvement",
 		"thumbnail_name": "chutePP_PictoCategorie_v2",
 		"position": 0
@@ -11,7 +11,7 @@
 		"position": 1
 	},
 	{
-		"name": "Risques liés aux circulations internes de véhicules",
+		"name": "Risques liés aux circulations internes de véhicules et d'engins",
 		"thumbnail_name": "circulation_PictoCategorie_v2",
 		"position": 3
 	},
@@ -31,7 +31,7 @@
 		"position": 6
 	},
 	{
-		"name": "Risques liés aux produits, aux émissions et aux déchets",
+		"name": "Risques liés aux produits chimiques, aux émissions et aux déchets",
 		"thumbnail_name": "produitsC_PictoCategorie_v2",
 		"position": 7
 	},
@@ -61,7 +61,7 @@
 		"position": 12
 	},
 	{
-		"name": "Risques d'incendie, d'explosion",
+		"name": "Risques d'incendie et d'explosion",
 		"thumbnail_name": "incendies_PictoCategorie_v2",
 		"position": 13
 	},
@@ -85,14 +85,24 @@
 		"thumbnail_name": "rps_v2",
 		"position": 17
 	},
+    {
+      "name": "Risques liés aux vibrations",
+      "thumbnail_name": "vibration_PictoCategorie_v2",
+      "position": 18
+    },
+    {
+      "name": "Risques de heurt, de cognement",
+      "thumbnail_name": "heurt_PictoCategorie_v2",
+      "position": 19
+    },
 	{
 		"name": "Risques liés à l'amiante",
 		"thumbnail_name": "amiante_v2",
-		"position": 18
+		"position": 20
 	},
 	{
 		"name": "Risques autres",
 		"thumbnail_name": "autre_PictoCategorie_v2",
-		"position": 19
+		"position": 21
 	}
 ]
