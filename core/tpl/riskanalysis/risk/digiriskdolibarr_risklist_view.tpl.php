@@ -626,10 +626,10 @@ if ($action != 'list') {
 							<div class="risk-evaluation-header">
 								<?php if ($conf->global->DIGIRISKDOLIBARR_ADVANCED_RISKASSESSMENT_METHOD) : ?>
 									<div class="wpeo-button evaluation-standard select-evaluation-method selected button-blue button-radius-2">
-										<span><?php echo $langs->trans('SimpleCotation') ?></span>
+										<span><?php echo $langs->trans('SimpleEvaluation') ?></span>
 									</div>
 									<div class="wpeo-button evaluation-advanced select-evaluation-method button-grey button-radius-2">
-										<span><?php echo $langs->trans('AdvancedCotation') ?></span>
+										<span><?php echo $langs->trans('AdvancedEvaluation') ?></span>
 									</div>
 									<i class="fas fa-info-circle wpeo-tooltip-event" aria-label="<?php echo $langs->trans("HowToSetMultipleRiskAssessmentMethod") ?>"></i>
 								<?php endif; ?>
@@ -644,7 +644,7 @@ if ($action != 'list') {
 								<div class="risk-evaluation-content">
 									<div class="cotation-container">
 										<div class="cotation-standard">
-											<span class="title"><i class="fas fa-chart-line"></i><?php echo ' ' . $langs->trans('Cotation'); ?><required>*</required></span>
+											<span class="title"><i class="fas fa-chart-line"></i><?php echo ' ' . $langs->trans('RiskAssessment'); ?><required>*</required></span>
 											<div class="cotation-listing wpeo-gridlayout grid-4 grid-gap-0">
 												<?php
 												$defaultCotation = array(0, 48, 51, 100);
@@ -670,7 +670,7 @@ if ($action != 'list') {
 										<div class="wpeo-gridlayout cotation-advanced" style="display:none">
 											<input type="hidden" class="digi-method-evaluation-id" value="<?php echo $risk->id ; ?>" />
 											<textarea style="display: none" name="evaluation_variables" class="tmp_evaluation_variable"><?php echo '{}'; ?></textarea>
-											<span class="title"><i class="fas fa-info-circle"></i> <?php echo $langs->trans('SelectCotation') ?><required>*</required></span>
+											<span class="title"><i class="fas fa-info-circle"></i> <?php echo $langs->trans('SelectEvaluation') ?><required>*</required></span>
 											<div class="wpeo-table evaluation-method table-flex table-<?php echo count($evaluation_method_survey) + 1; ?>">
 												<div class="table-row table-header">
 													<div class="table-cell">
@@ -707,7 +707,7 @@ if ($action != 'list') {
 								<?php include DOL_DOCUMENT_ROOT . '/custom/digiriskdolibarr/core/tpl/medias/digiriskdolibarr_photo_view.tpl.php'; ?>
 
 								<div class="risk-evaluation-calculated-cotation" style="display: none">
-									<span class="title"><i class="fas fa-chart-line"></i> <?php echo $langs->trans('CalculatedCotation'); ?><required>*</required></span>
+									<span class="title"><i class="fas fa-chart-line"></i> <?php echo $langs->trans('CalculatedEvaluation'); ?><required>*</required></span>
 									<div data-scale="1" class="risk-evaluation-cotation cotation">
 										<span><?php echo 0 ?></span>
 									</div>
@@ -812,10 +812,10 @@ if ($action != 'list') {
 					<div class="risk-evaluation-header">
 						<?php if ($conf->global->DIGIRISKDOLIBARR_ADVANCED_RISKASSESSMENT_METHOD) : ?>
 							<div class="wpeo-button evaluation-standard select-evaluation-method selected button-blue">
-								<span><?php echo $langs->trans('SimpleCotation') ?></span>
+								<span><?php echo $langs->trans('SimpleEvaluation') ?></span>
 							</div>
 							<div class="wpeo-button evaluation-advanced select-evaluation-method button-grey">
-								<span><?php echo $langs->trans('AdvancedCotation') ?></span>
+								<span><?php echo $langs->trans('AdvancedEvaluation') ?></span>
 							</div>
 						<?php endif; ?>
 						<input class="risk-evaluation-method" type="hidden" value="standard">
@@ -829,7 +829,7 @@ if ($action != 'list') {
 						<div class="risk-evaluation-content">
 							<div class="cotation-container">
 								<div class="cotation-standard">
-									<span class="title"><i class="fas fa-chart-line"></i><?php echo ' ' . $langs->trans('Cotation'); ?><required>*</required></span>
+									<span class="title"><i class="fas fa-chart-line"></i><?php echo ' ' . $langs->trans('RiskAssessment'); ?><required>*</required></span>
 									<div class="cotation-listing wpeo-gridlayout grid-4 grid-gap-0">
 										<?php
 										$defaultCotation = array(0, 48, 51, 100);
@@ -855,7 +855,7 @@ if ($action != 'list') {
 								<div class="wpeo-gridlayout cotation-advanced" style="display:none">
 									<input type="hidden" class="digi-method-evaluation-id" value="<?php echo $risk->id ; ?>" />
 									<textarea style="display: none" name="evaluation_variables" class="tmp_evaluation_variable"><?php echo '{}'; ?></textarea>
-									<span class="title"><i class="fas fa-info-circle"></i> <?php echo $langs->trans('SelectCotation') ?><required>*</required></span>
+									<span class="title"><i class="fas fa-info-circle"></i> <?php echo $langs->trans('SelectEvaluation') ?><required>*</required></span>
 									<div class="wpeo-table evaluation-method table-flex table-<?php echo count($evaluation_method_survey) + 1; ?>">
 										<div class="table-row table-header">
 											<div class="table-cell">
@@ -892,7 +892,7 @@ if ($action != 'list') {
 						<?php include DOL_DOCUMENT_ROOT . '/custom/digiriskdolibarr/core/tpl/medias/digiriskdolibarr_photo_view.tpl.php'; ?>
 
 						<div class="risk-evaluation-calculated-cotation" style="display: none">
-							<span class="title"><i class="fas fa-chart-line"></i> <?php echo $langs->trans('CalculatedCotation'); ?><required>*</required></span>
+							<span class="title"><i class="fas fa-chart-line"></i> <?php echo $langs->trans('CalculatedEvaluation'); ?><required>*</required></span>
 							<div data-scale="1" class="risk-evaluation-cotation cotation">
 								<span><?php echo 0 ?></span>
 							</div>

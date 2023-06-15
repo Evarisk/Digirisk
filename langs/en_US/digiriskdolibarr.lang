@@ -1000,8 +1000,8 @@ DigiriskElementRisk = Risques
 RiskDescriptionNotEnabled = Le champ description du risque n'est pas activé
 HowToEnableRiskDescription = Pour activer le champ description du risque, allez dans "Configuration du module -> Document unique"
 HowToEnableRiskCategoryEdit = Pour activer la modification de la catégorie de risque, allez dans "Configuration du module -> Document unique"
-SortRisksListingsByCotation = Trier les risques par cotation
-SortRisksListingsByCotationDescription =  Activer le tri automatique des risques par cotation dans les listings
+SortRisksListingsByEvaluation = Trier les risques par cotation
+SortRisksListingsByEvaluationDescription =  Activer le tri automatique des risques par cotation dans les listings
 
 DigiriskRiskData = Données configurables des risques
 RiskDescription = Description du risque
@@ -1060,10 +1060,10 @@ NoRiskAssessment = Pas d'évaluation assignée au risque
 RiskAssessmentList = Liste des évaluations du risque
 EditRiskAssessment = Editer l'évaluation
 
-SimpleCotation = Cotation simple
-AdvancedCotation = Cotation avancée
-CalculatedCotation = Cotation calculée
-SelectCotation = Sélectionnez les cases pour calculer votre cotation
+SimpleEvaluation = Cotation simple
+AdvancedEvaluation = Cotation avancée
+CalculatedEvaluation = Cotation calculée
+SelectEvaluation = Sélectionnez les cases pour calculer votre cotation
 EvaluationList = Liste des évaluations du risque
 HowToSetMultipleRiskAssessmentMethod = Pour configurer l'utilisation multiple des méthodes d'évaluation, aller dans Configuration du module - Analyse des risques - Évaluation
 NoFileLinked = Pas de photo liée
