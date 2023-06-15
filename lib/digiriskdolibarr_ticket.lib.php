@@ -87,7 +87,5 @@ function ticketPrepareHead()
 		$head[$h][2] = 'exportcsv';
 	}
 
-	complete_head_from_modules($conf, $langs, null, $head, $h, 'ticket');
-
 	return $head;
 }
