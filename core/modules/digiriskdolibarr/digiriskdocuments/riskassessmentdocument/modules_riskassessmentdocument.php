@@ -321,6 +321,7 @@ abstract class ModeleODTRiskAssessmentDocument extends CommonDocGenerator
 
 							$tmparray['creation_date'] = dol_print_date($line->datec, 'dayhoursec', 'tzuser');
 							$tmparray['subject']       = $line->subject;
+							$tmparray['message']       = $line->message;
 							$tmparray['progress']      = (($line->progress) ?: 0) . ' %';
 
 							$tickettmp = new Ticket($this->db);
@@ -360,6 +361,7 @@ abstract class ModeleODTRiskAssessmentDocument extends CommonDocGenerator
 						$tmparray['categories']                = $langs->trans('NoData');
 						$tmparray['creation_date']             = $langs->trans('NoData');
 						$tmparray['subject']                   = $langs->trans('NoData');
+						$tmparray['message']                   = $langs->trans('NoData');
 						$tmparray['progress']                  = $langs->trans('NoData');
 						$tmparray['digiriskelement_ref_label'] = $langs->trans('NoData');
 						$tmparray['status']                    = $langs->trans('NoData');
