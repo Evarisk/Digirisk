@@ -409,6 +409,7 @@ abstract class ModeleODTDigiriskElementDocument extends CommonDocGenerator
 
 								$categories = $category->containing($line->id, Categorie::TYPE_TICKET);
 								if (!empty($categories)) {
+									$allcategories = [];
 									foreach ($categories as $cat) {
 										$allcategories[] = $cat->label;
 									}
