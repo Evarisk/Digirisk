@@ -65,11 +65,13 @@ $resources = new DigiriskResources($db);
 
 $allLinks = $resources->digirisk_dolibarr_fetch_resources();
 
-$hookmanager->initHooks(array('admincompany', 'globaladmin'));
+$hookmanager->initHooks(array('adminsocial', 'globaladmin'));
 
-$electionDateCSE = dol_mktime(0, 0, 0, GETPOST('date_debutmonth', 'int'), GETPOST('date_debutday', 'int'), GETPOST('date_debutyear', 'int'));
-$electionDateDP  = dol_mktime(0, 0, 0, GETPOST('date_finmonth', 'int'), GETPOST('date_finday', 'int'), GETPOST('date_finyear', 'int'));
-$date            = dol_mktime(0, 0, 0, GETPOST('datemonth', 'int'), GETPOST('dateday', 'int'), GETPOST('dateyear', 'int'));
+$submissionElectionDateCSE = dol_mktime(0, 0, 0, GETPOST('SubmissionElectionDateCSEmonth', 'int'), GETPOST('SubmissionElectionDateCSEday', 'int'), GETPOST('SubmissionElectionDateCSEyear', 'int'));
+$electionDateCSE           = dol_mktime(0, 0, 0, GETPOST('date_debutmonth', 'int'), GETPOST('date_debutday', 'int'), GETPOST('date_debutyear', 'int'));
+$secondElectionDateCSE     = dol_mktime(0, 0, 0, GETPOST('SecondElectionDateCSEmonth', 'int'), GETPOST('SecondElectionDateCSEday', 'int'), GETPOST('SecondElectionDateCSEyear', 'int'));
+$electionDateDP            = dol_mktime(0, 0, 0, GETPOST('date_finmonth', 'int'), GETPOST('date_finday', 'int'), GETPOST('date_finyear', 'int'));
+$date                      = dol_mktime(0, 0, 0, GETPOST('datemonth', 'int'), GETPOST('dateday', 'int'), GETPOST('dateyear', 'int'));
 
 /*
  * Actions
@@ -81,18 +83,24 @@ if ($reshook < 0) setEventMessages($hookmanager->error, $hookmanager->errors, 'e
 
 if (empty($reshook)) {
 	if (($action == 'update' && ! GETPOST("cancel", 'alpha')) || ($action == 'updateedit')) {
-		$electionDateCSE = GETPOST('ElectionDateCSE', 'none');
-		$electionDateCSE = explode('/', $electionDateCSE);
-		$electionDateCSE = $electionDateCSE[2] . '-' . $electionDateCSE[1] . '-' . $electionDateCSE[0];
+		$submissionElectionDateCSE = GETPOST('SubmissionElectionDateCSE');
+		$submissionElectionDateCSE = dol_print_date(dol_stringtotime($submissionElectionDateCSE), 'dayrfc');
 
-		$electionDateDP = GETPOST('ElectionDateDP', 'none');
-		$electionDateDP = explode('/', $electionDateDP);
-		$electionDateDP = $electionDateDP[2] . '-' . $electionDateDP[1] . '-' . $electionDateDP[0];
+		$electionDateCSE = GETPOST('ElectionDateCSE');
+		$electionDateCSE = dol_print_date(dol_stringtotime($electionDateCSE), 'dayrfc');
+
+		$secondElectionDateCSE = GETPOST('SecondElectionDateCSE');
+		$secondElectionDateCSE = dol_print_date(dol_stringtotime($secondElectionDateCSE), 'dayrfc');
+
+		$electionDateDP = GETPOST('ElectionDateDP');
+		$electionDateDP = dol_print_date(dol_stringtotime($electionDateDP), 'dayrfc');
 
 		dolibarr_set_const($db, "DIGIRISKDOLIBARR_PARTICIPATION_AGREEMENT_INFORMATION_PROCEDURE", GETPOST("modalites", 'none'), 'chaine', 0, '', $conf->entity);
 		dolibarr_set_const($db, "DIGIRISKDOLIBARR_DEROGATION_SCHEDULE_PERMANENT", GETPOST("permanent", 'none'), 'chaine', 0, '', $conf->entity);
 		dolibarr_set_const($db, "DIGIRISKDOLIBARR_DEROGATION_SCHEDULE_OCCASIONAL", GETPOST("occasional", 'none'), 'chaine', 0, '', $conf->entity);
+		dolibarr_set_const($db, "DIGIRISKDOLIBARR_CSE_SUBMISSION_ELECTION_DATE", $submissionElectionDateCSE, 'date', 0, '', $conf->entity);
 		dolibarr_set_const($db, "DIGIRISKDOLIBARR_CSE_ELECTION_DATE", $electionDateCSE, 'date', 0, '', $conf->entity);
+		dolibarr_set_const($db, "DIGIRISKDOLIBARR_CSE_SECOND_ELECTION_DATE", $secondElectionDateCSE, 'date', 0, '', $conf->entity);
 		dolibarr_set_const($db, "DIGIRISKDOLIBARR_DP_ELECTION_DATE", $electionDateDP, 'date', 0, '', $conf->entity);
 
 		$CSEtitulaires = ! empty(GETPOST('TitularsCSE', 'array')) ? GETPOST('TitularsCSE', 'array') : (GETPOST('TitularsCSE', 'int') > 0 ? array(GETPOST('TitularsCSE', 'int')) : array());
@@ -111,9 +119,51 @@ if (empty($reshook)) {
 		$resources->digirisk_dolibarr_set_resources($db, $user->id, 'HarassmentOfficer', 'user', array($HarassmentOfficer), $conf->entity);
 		$resources->digirisk_dolibarr_set_resources($db, $user->id, 'HarassmentOfficerCSE', 'user', array($HarassmentOfficerCSE), $conf->entity);
 
+		// Submit file
+		if (!empty($conf->global->MAIN_UPLOAD_DOC)) {
+			if (!empty($_FILES) && ! empty($_FILES['userfile']['name'][0])) {
+				if (is_array($_FILES['userfile']['tmp_name'])) {
+					$userFiles = $_FILES['userfile']['tmp_name'];
+				} else {
+					$userFiles = [$_FILES['userfile']['tmp_name']];
+				}
+
+				foreach ($userFiles as $key => $userFile) {
+					if (empty($_FILES['userfile']['tmp_name'][$key])) {
+						$error++;
+						if ($_FILES['userfile']['error'][$key] == 1 || $_FILES['userfile']['error'][$key] == 2) {
+							setEventMessages($langs->trans('ErrorFileSizeTooLarge'), [], 'errors');
+						}
+					}
+				}
+
+				$fileDir = $conf->digiriskdolibarr->multidir_output[$conf->entity] . '/informationssharing/deficiencyreport/';
+				if (!file_exists($fileDir)) {
+					if (dol_mkdir($fileDir) < 0) {
+						$db->error = $langs->transnoentities('ErrorCanNotCreateDir', $fileDir);
+						$error++;
+					}
+				}
+
+				if (!$error) {
+					digirisk_dol_add_file_process($fileDir, 0, 1, 'userfile', '', null, '', 0);
+				}
+			}
+		}
+
 		if ($action != 'updateedit' && ! $error) {
 			header("Location: " . $_SERVER["PHP_SELF"]);
 			exit;
+		}
+	}
+
+	if ($action == 'delete_file' && !empty($user->admin)) {
+		include_once DOL_DOCUMENT_ROOT . '/core/lib/files.lib.php';
+		$fileToDelete = $conf->digiriskdolibarr->multidir_output[$conf->entity] . '/informationssharing/deficiencyreport/' . GETPOST('file');
+		$result       = dol_delete_file($fileToDelete);
+		if ($result > 0) {
+			setEventMessage($langs->trans('FileWasRemoved', GETPOST('file')));
+			header('Location: ' . $_SERVER['PHP_SELF']);
 		}
 	}
 }
@@ -131,7 +181,7 @@ $morecss = array("/digiriskdolibarr/css/digiriskdolibarr.css");
 $counter = 0;
 
 $socialResources = array("TitularsCSE", "AlternatesCSE", "TitularsDP", "AlternatesDP");
-$socialConsts    = array("DIGIRISKDOLIBARR_PARTICIPATION_AGREEMENT_INFORMATION_PROCEDURE", "DIGIRISKDOLIBARR_DEROGATION_SCHEDULE_PERMANENT", "DIGIRISKDOLIBARR_DEROGATION_SCHEDULE_OCCASIONAL", "DIGIRISKDOLIBARR_CSE_ELECTION_DATE", "DIGIRISKDOLIBARR_DP_ELECTION_DATE");
+$socialConsts    = array("DIGIRISKDOLIBARR_PARTICIPATION_AGREEMENT_INFORMATION_PROCEDURE", "DIGIRISKDOLIBARR_DEROGATION_SCHEDULE_PERMANENT", "DIGIRISKDOLIBARR_DEROGATION_SCHEDULE_OCCASIONAL", 'DIGIRISKDOLIBARR_CSE_SUBMISSION_ELECTION_DATE', "DIGIRISKDOLIBARR_CSE_ELECTION_DATE", "DIGIRISKDOLIBARR_DP_ELECTION_DATE");
 
 $maxnumber = count($socialResources) + count($socialConsts);
 
@@ -159,13 +209,15 @@ $resources = new DigiriskResources($db);
 
 $allLinks = $resources->digirisk_dolibarr_fetch_resources();
 
-$electionDateCSE = $conf->global->DIGIRISKDOLIBARR_CSE_ELECTION_DATE;
-$electionDateDP  = $conf->global->DIGIRISKDOLIBARR_DP_ELECTION_DATE;
+$submissionElectionDateCSE = $conf->global->DIGIRISKDOLIBARR_CSE_SUBMISSION_ELECTION_DATE;
+$electionDateCSE           = $conf->global->DIGIRISKDOLIBARR_CSE_ELECTION_DATE;
+$secondElectionDateCSE     = $conf->global->DIGIRISKDOLIBARR_CSE_SECOND_ELECTION_DATE;
+$electionDateDP            = $conf->global->DIGIRISKDOLIBARR_DP_ELECTION_DATE;
 
 print '<span class="opacitymedium">' . $langs->trans("DigiriskMenu") . "</span><br>\n";
 print "<br>";
 
-print '<form method="POST" action="' . $_SERVER["PHP_SELF"] . '" name="social_form">';
+print '<form method="POST" action="' . $_SERVER["PHP_SELF"] . '" name="social_form" enctype="multipart/form-data">';
 print '<input type="hidden" name="token" value="' . newToken() . '">';
 print '<input type="hidden" name="action" value="update">'; ?>
 
@@ -225,18 +277,20 @@ print $form->select_dolusers($HarassmentOfficer->id, 'HarassmentOfficer', 1, nul
 if ( ! GETPOSTISSET('backtopage')) print ' <a href="' . DOL_URL_ROOT . '/user/card.php?action=create&backtopage=' . urlencode($_SERVER["PHP_SELF"] . '?action=create') . '"><span class="fa fa-plus-circle valignmiddle paddingleft" title="' . $langs->trans("AddUser") . '"></span></a>';
 print '</td></tr>';
 
-/*
-* Harassment officer CSE
-*/
+if (!empty($allLinks['TitularsCSE']) || !empty($allLinks['AlternatesCSE'])) {
+	/*
+	* Harassment officer CSE
+	*/
 
-print '<tr class="liste_titre"><th class="titlefield wordbreak">' . $langs->trans("HarassmentOfficerCSE") . '</th><th>' . $langs->trans("") . '</th></tr>' . "\n";
-$HarassmentOfficerCSE = $allLinks['HarassmentOfficerCSE'];
-print '<tr>';
-print '<td>' . $langs->trans("ActionOnUser") . '</td>';
-print '<td colspan="3" class="maxwidthonsmartphone">';
-print $form->select_dolusers($HarassmentOfficerCSE->id, 'HarassmentOfficerCSE', 1, null, 0, '', '', $conf->entity, 0, 0, 'AND u.statut = 1', 0, '', 'minwidth300');
-if ( ! GETPOSTISSET('backtopage')) print ' <a href="' . DOL_URL_ROOT . '/user/card.php?action=create&backtopage=' . urlencode($_SERVER["PHP_SELF"] . '?action=create') . '"><span class="fa fa-plus-circle valignmiddle paddingleft" title="' . $langs->trans("AddUser") . '"></span></a>';
-print '</td></tr>';
+	print '<tr class="liste_titre"><th class="titlefield wordbreak">' . $langs->trans("HarassmentOfficerCSE") . '</th><th>' . $langs->trans("") . '</th></tr>' . "\n";
+	$HarassmentOfficerCSE = $allLinks['HarassmentOfficerCSE'];
+	print '<tr>';
+	print '<td>' . $langs->trans("ActionOnUser") . '</td>';
+	print '<td colspan="3" class="maxwidthonsmartphone">';
+	print $form->select_dolusers($HarassmentOfficerCSE->id, 'HarassmentOfficerCSE', 1, null, 0, '', '', $conf->entity, 0, 0, 'AND u.statut = 1', 0, '', 'minwidth300');
+	if ( ! GETPOSTISSET('backtopage')) print ' <a href="' . DOL_URL_ROOT . '/user/card.php?action=create&backtopage=' . urlencode($_SERVER["PHP_SELF"] . '?action=create') . '"><span class="fa fa-plus-circle valignmiddle paddingleft" title="' . $langs->trans("AddUser") . '"></span></a>';
+	print '</td></tr>';
+}
 
 /*
 *** ESC -- CSE ***
@@ -244,42 +298,69 @@ print '</td></tr>';
 
 print '<tr class="liste_titre"><th class="titlefield wordbreak">' . $langs->trans("ESC") . '</th><th>' . $langs->trans("") . '</th></tr>' . "\n";
 
-// * ESC Election Date - Date d'élection du CSE *
-
-print '<tr class="oddeven"><td><label for="ElectionDateCSE">' . $langs->trans("ElectionDate") . '</label></td><td>';
-print $form->selectDate(strtotime($electionDateCSE) ? $electionDateCSE : -1, 'ElectionDateCSE', 0, 0, 0, 'social_form', 1, 1);
+// ESC submission election date - Date de présentation de l'élection du CSE
+print '<tr class="oddeven"><td><label for="SubmissionElectionDateCSE">' . $langs->trans('SubmissionElectionDate') . '</label></td><td>';
+print $form->selectDate(strtotime($submissionElectionDateCSE) ? $submissionElectionDateCSE : -1, 'SubmissionElectionDateCSE', 0, 0, 0, 'social_form', 1, 1);
 print '</td></tr>';
 
-// * ESC Titulars - Titulaires CSE *
+if (!empty($submissionElectionDateCSE)) {
+	$deficiencyReportDate = dol_time_plus_duree(dol_stringtotime($submissionElectionDateCSE), '30', 'd');
+	if ((dol_now() > $deficiencyReportDate) || (!empty($secondElectionDateCSE) && dol_now() > dol_stringtotime($secondElectionDateCSE) && empty($allLinks['TitularsCSE']) && empty($allLinks['AlternatesCSE']))) {
+		// Deficiency report - Procès-verbal de carence
+		print '<tr class="oddeven"><td><label for="DeficiencyReport">' . $langs->trans('DeficiencyReport') . '</label></td><td>';
+		print ajax_constantonoff('DIGIRISKDOLIBARR_DEFICIENCY_REPORT');
+		print '<input class="flat" type="file" name="userfile[]" id="DeficiencyReportFile" />';
+		$fileArray = dol_dir_list($conf->digiriskdolibarr->multidir_output[$conf->entity] . '/informationssharing/deficiencyreport/', 'files');
+		// Scan directories
+		if (is_array($fileArray) && !empty($fileArray)) {
+			$out = '<div>';
+			// Show list of found files
+			foreach ($fileArray as $file) {
+				$out .= $file['name'] . ' <a class="reposition" href="' . DOL_URL_ROOT . '/document.php?modulepart=digiriskdolibarr&file=informationssharing/deficiencyreport/' . urlencode(basename($file['name'])) . '">' . img_picto('', 'listlight') . '</a>';
+				$out .= ' <a class="reposition" href="' . $_SERVER['PHP_SELF'] . '?action=delete_file&token=' . newToken() . '&file=' . urlencode(basename($file['name'])) . '">' . img_picto('', 'delete') . '</a>';
+				$out .= '<br>';
+			}
+			$out .= '</div>';
+			print $out;
+		}
+		print '</td></tr>';
 
-$userlist 	  = $form->select_dolusers('', '', 0, null, 0, '', '', $conf->entity, 0, 0, 'AND u.statut = 1', 0, '', '', 0, 1);
-$titulars_cse = $allLinks['TitularsCSE'];
+		// Deficiency report date - Date du procès-verbal de carence
+		print '<tr class="oddeven"><td><label for="DeficiencyReportDate">' . $langs->trans('DeficiencyReportDate') . '</label></td><td>';
+		print dol_print_date($deficiencyReportDate, 'day');
+		print '</td></tr>';
+	} else {
+		// ESC election date - Date d'élection du CSE
+		print '<tr class="oddeven"><td><label for="ElectionDateCSE">' . $langs->trans("ElectionDate") . '</label></td><td>';
+		print $form->selectDate(strtotime($electionDateCSE) ? $electionDateCSE : -1, 'ElectionDateCSE', 0, 0, 0, 'social_form', 1, 1);
+		print '</td></tr>';
 
-print '<tr>';
-print '<td>' . $form->editfieldkey('Titulars', 'TitularsCSE_id', '', $object, 0) . '</td>';
-print '<td colspan="3" class="maxwidthonsmartphone">';
+		// ESC Second election date - Date d'élection du second tour du CSE
+		print '<tr class="oddeven"><td><label for="SecondElectionDateCSE">' . $langs->trans("SecondElectionDate") . '</label></td><td>';
+		print $form->selectDate(strtotime($secondElectionDateCSE) ? $secondElectionDateCSE : -1, 'SecondElectionDateCSE', 0, 0, 0, 'social_form', 1, 1);
+		print '</td></tr>';
 
+		// ESC titulars - Titulaires CSE
+		$userlist 	  = $form->select_dolusers('', '', 0, null, 0, '', '', $conf->entity, 0, 0, 'AND u.statut = 1', 0, '', '', 0, 1);
+		$titulars_cse = $allLinks['TitularsCSE'];
+		print '<tr>';
+		print '<td>' . $form->editfieldkey('Titulars', 'TitularsCSE_id', '', $object, 0) . '</td>';
+		print '<td colspan="3" class="maxwidthonsmartphone">';
+		print $form->multiselectarray('TitularsCSE', $userlist, $titulars_cse->id, null, null, null, null, "300");
+		if (!GETPOSTISSET('backtopage')) print ' <a href="' . DOL_URL_ROOT . '/user/card.php?action=create&backtopage=' . urlencode($_SERVER["PHP_SELF"] . '?action=create') . '"><span class="fa fa-plus-circle valignmiddle paddingleft" title="' . $langs->trans("AddUser") . '"></span></a>';
+		print '</td></tr>';
 
-print $form->multiselectarray('TitularsCSE', $userlist, $titulars_cse->id, null, null, null, null, "300");
-
-if ( ! GETPOSTISSET('backtopage')) print ' <a href="' . DOL_URL_ROOT . '/user/card.php?action=create&backtopage=' . urlencode($_SERVER["PHP_SELF"] . '?action=create') . '"><span class="fa fa-plus-circle valignmiddle paddingleft" title="' . $langs->trans("AddUser") . '"></span></a>';
-
-print '</td></tr>';
-
-// * ESC Alternates - Suppléants CSE *
-
-$userlist       = $form->select_dolusers('', '', 0, null, 0, '', '', $conf->entity, 0, 0, 'AND u.statut = 1', 0, '', '', 0, 1);
-$alternates_cse = $allLinks['AlternatesCSE'];
-
-print '<tr>';
-print '<td>' . $form->editfieldkey('Alternates', 'AlternatesCSE_id', '', $object, 0) . '</td>';
-print '<td colspan="3" class="maxwidthonsmartphone">';
-
-print $form->multiselectarray('AlternatesCSE', $userlist, $alternates_cse->id, null, null, null, null, "300");
-
-if ( ! GETPOSTISSET('backtopage')) print ' <a href="' . DOL_URL_ROOT . '/user/card.php?action=create&backtopage=' . urlencode($_SERVER["PHP_SELF"] . '?action=create') . '"><span class="fa fa-plus-circle valignmiddle paddingleft" title="' . $langs->trans("AddUser") . '"></span></a>';
-
-print '</td></tr>';
+		// ESC alternates - Suppléants CSE
+		$userlist       = $form->select_dolusers('', '', 0, null, 0, '', '', $conf->entity, 0, 0, 'AND u.statut = 1', 0, '', '', 0, 1);
+		$alternates_cse = $allLinks['AlternatesCSE'];
+		print '<tr>';
+		print '<td>' . $form->editfieldkey('Alternates', 'AlternatesCSE_id', '', $object, 0) . '</td>';
+		print '<td colspan="3" class="maxwidthonsmartphone">';
+		print $form->multiselectarray('AlternatesCSE', $userlist, $alternates_cse->id, null, null, null, null, "300");
+		if (!GETPOSTISSET('backtopage')) print ' <a href="' . DOL_URL_ROOT . '/user/card.php?action=create&backtopage=' . urlencode($_SERVER["PHP_SELF"] . '?action=create') . '"><span class="fa fa-plus-circle valignmiddle paddingleft" title="' . $langs->trans("AddUser") . '"></span></a>';
+		print '</td></tr>';
+	}
+}
 
 /*
 *** Staff Representative -- Délégués du Personnel ***

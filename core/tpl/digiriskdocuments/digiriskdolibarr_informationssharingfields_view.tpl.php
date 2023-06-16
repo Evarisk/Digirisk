@@ -68,39 +68,46 @@ if ($informationssharing->harassment_officer->id > 0) {
 }
 print '</td></tr>';
 
-// Harassment officer CSE
-print '<tr>';
-print '<td class="titlefield"><i class="fas fa-user"></i> ' . $form->textwithpicto($langs->trans("HarassmentOfficerCSE"), $langs->trans('HowToSetDataInformationsSharing')) . '</td>';
-print '<td>';
-if ($informationssharing->harassment_officer_cse->id > 0) {
-	$user->fetch($informationssharing->harassment_officer_cse->id);
-	print $user->getNomUrl(1) . ' ';
-	print '<i class="fas fa-phone"></i> ' . $informationssharing->harassment_officer_cse->phone;
+if (dol_now() > dol_time_plus_duree(dol_stringtotime($conf->global->DIGIRISKDOLIBARR_CSE_SUBMISSION_ELECTION_DATE), '30', 'd')) {
+	// Deficiency report date
+	print '<tr><td class="titlefield"><i class="fas fa-calendar-alt"></i> ' . $form->textwithpicto($langs->trans('DeficiencyReportDate'), $langs->trans('HowToSetDataInformationsSharing')) . '</td><td>';
+	print img_picto('', 'calendar', 'class="pictofixedwidth"') . dol_print_date($informationssharing->deficiency_report_date, 'day');
+	print '</td></tr>';
+} else {
+	// Harassment officer CSE
+	print '<tr>';
+	print '<td class="titlefield"><i class="fas fa-user"></i> ' . $form->textwithpicto($langs->trans("HarassmentOfficerCSE"), $langs->trans('HowToSetDataInformationsSharing')) . '</td>';
+	print '<td>';
+	if ($informationssharing->harassment_officer_cse->id > 0) {
+		$user->fetch($informationssharing->harassment_officer_cse->id);
+		print $user->getNomUrl(1) . ' ';
+		print '<i class="fas fa-phone"></i> ' . $informationssharing->harassment_officer_cse->phone;
+	}
+	print '</td></tr>';
+
+	// CSE
+
+	// Date
+	print '<tr>';
+	print '<td class="titlefield"><i class="fas fa-calendar-alt"></i> ' . $form->textwithpicto($langs->trans("ElectionDate"), $langs->trans('HowToSetDataInformationsSharing')) . '</td>';
+	print '<td>';
+	print '<i class="fas fa-calendar-alt"></i> ' . dol_print_date($informationssharing->membres_du_comite_entreprise_date, 'day');
+	print '</td></tr>';
+
+	// Titulars
+	print '<tr>';
+	print '<td class="titlefield"><i class="fas fa-user"></i> ' . $form->textwithpicto($langs->trans("Titulars"), $langs->trans('HowToSetDataInformationsSharing')) . '</td>';
+	print '<td>';
+	print $informationssharing->membres_du_comite_entreprise_titulairesFullName;
+	print '</td></tr>';
+
+	// Alternates
+	print '<tr>';
+	print '<td class="titlefield"><i class="fas fa-user"></i> ' . $form->textwithpicto($langs->trans("Alternates"), $langs->trans('HowToSetDataInformationsSharing')) . '</td>';
+	print '<td>';
+	print $informationssharing->membres_du_comite_entreprise_suppleantsFullName;
+	print '</td></tr>';
 }
-print '</td></tr>';
-
-// CSE
-
-// Date
-print '<tr>';
-print '<td class="titlefield"><i class="fas fa-calendar-alt"></i> ' . $form->textwithpicto($langs->trans("ElectionDateCSE"), $langs->trans('HowToSetDataInformationsSharing')) . '</td>';
-print '<td>';
-print '<i class="fas fa-calendar-alt"></i> ' . dol_print_date($informationssharing->membres_du_comite_entreprise_date, 'day');
-print '</td></tr>';
-
-// Titulars
-print '<tr>';
-print '<td class="titlefield"><i class="fas fa-user"></i> ' . $form->textwithpicto($langs->trans("Titulars"), $langs->trans('HowToSetDataInformationsSharing')) . '</td>';
-print '<td>';
-print $informationssharing->membres_du_comite_entreprise_titulairesFullName;
-print '</td></tr>';
-
-// Alternates
-print '<tr>';
-print '<td class="titlefield"><i class="fas fa-user"></i> ' . $form->textwithpicto($langs->trans("Alternates"), $langs->trans('HowToSetDataInformationsSharing')) . '</td>';
-print '<td>';
-print $informationssharing->membres_du_comite_entreprise_suppleantsFullName;
-print '</td></tr>';
 
 // DP
 //Date
