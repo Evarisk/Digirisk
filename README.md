@@ -1,24 +1,28 @@
-# DigiriskDolibarr sur [DOLIBARR ERP CRM](https://www.dolibarr.org)
+# DigiriskDolibarr sur [DOLIBARR ERP CRM](https://dolibarr.org)
 
 ## Informations
 
 - Numéro du module : 436302
-- Version : 9.10.0
-- Dernière mise à jour :  04/04/2023
-- Éditeur : [Evarisk](https://www.evarisk.com)
-- Compatibilité : Dolibarr 16.0.0 - 16.0.5
+- Dernière mise à jour : 19/06/2023
+- Éditeur : [Evarisk](https://evarisk.com)
 - Thème : Eldy Menu
 - Licence : GPLv3
 - Disponible sur : Windows - MacOS - Linux
 
+### Version
+
+- Version : 9.11.0
+- PHP : 7.4
+- Compatibilité : Dolibarr 16.0.0 - 17.0.2
+
 ## Liens
 
-- Support & Assistance : [Forum www.dolibarr.fr](https://www.dolibarr.fr) / Par mail à technique@evarisk.com
-- Demo : [Demo Digirisk](https://www.demodoli.digirisk.com) - ID: demo - Password: demo
+- Support & Assistance : [Forum dolibarr.fr](https://dolibarr.fr) / Par mail à technique@evarisk.com
+- Demo : [Demo Digirisk](https://demodoli.digirisk.com) - ID: demo - Password: demo
 - Documentation : [Wiki Digirisk](https://wiki.dolibarr.org/index.php/Module_DigiriskDolibarr)
 - Projet GitHub : [Projet Digirisk](https://github.com/Evarisk/Digirisk/projects?type=classic)
-- Forum : [Forum Digirisk](https://www.dolibarr.fr/forum/t/module-digirisk-document-unique/37119)
-- D'autres modules développés par Evarisk disponibles sur [Dolistore.com](https://www.dolistore.com)
+- Forum : [Forum Digirisk](https://dolibarr.fr/forum/t/module-digirisk-document-unique/37119)
+- D'autres modules développés par Evarisk disponibles sur [Dolistore.com](https://dolistore.com)
 
 ## Fonctionnalités
 
