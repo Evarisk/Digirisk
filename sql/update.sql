@@ -87,4 +87,8 @@ ALTER TABLE llx_digiriskdolibarr_digiriskelement ADD show_in_selector BOOLEAN NO
 ALTER TABLE llx_digiriskdolibarr_accident_workstop ADD declaration_link text AFTER date_end_workstop;
 
 -- 9.8.1
-UPDATE llx_c_email_templates SET content = '__(QHSEService)__<br>__MYCOMPANY_NAME__<br>\r\n__MYCOMPANY_FULLADDRESS__<br>\r\n__MYCOMPANY_EMAIL__' WHERE label = '(TicketCreationSubject)'
+UPDATE llx_c_email_templates SET content = '__(QHSEService)__<br>__MYCOMPANY_NAME__<br>\r\n__MYCOMPANY_FULLADDRESS__<br>\r\n__MYCOMPANY_EMAIL__' WHERE label = '(TicketCreationSubject)';
+
+-- 9.11.0
+UPDATE llx_digiriskdolibarr_risk SET category = 20 WHERE category = 18;
+UPDATE llx_digiriskdolibarr_risk SET category = 21 WHERE category = 19;

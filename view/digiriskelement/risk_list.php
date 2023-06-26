@@ -36,14 +36,19 @@ if ( ! $res && file_exists("../../../main.inc.php")) $res    = @include "../../.
 if ( ! $res && file_exists("../../../../main.inc.php")) $res = @include "../../../../main.inc.php";
 if ( ! $res) die("Include of main fails");
 
+global $langs, $user, $conf, $db, $hookmanager;
+
+$projectRefClass = $conf->global->PROJECT_ADDON;
+$taskRefClass    = $conf->global->PROJECT_TASK_ADDON;
+
 require_once DOL_DOCUMENT_ROOT . '/core/lib/images.lib.php';
 require_once DOL_DOCUMENT_ROOT . '/core/lib/files.lib.php';
 require_once DOL_DOCUMENT_ROOT . '/core/lib/date.lib.php';
 require_once DOL_DOCUMENT_ROOT . '/core/class/html.form.class.php';
 require_once DOL_DOCUMENT_ROOT . '/ecm/class/ecmdirectory.class.php';
 require_once DOL_DOCUMENT_ROOT . '/projet/class/project.class.php';
-require_once DOL_DOCUMENT_ROOT . '/core/modules/project/mod_project_simple.php';
-require_once DOL_DOCUMENT_ROOT . '/core/modules/project/task/mod_task_simple.php';
+require_once DOL_DOCUMENT_ROOT . '/core/modules/project/' . $projectRefClass . '.php';
+require_once DOL_DOCUMENT_ROOT . '/core/modules/project/task/' . $taskRefClass . '.php';
 
 require_once './../../class/digiriskelement.class.php';
 require_once './../../class/digiriskstandard.class.php';
@@ -56,7 +61,6 @@ require_once './../../lib/digiriskdolibarr_digiriskstandard.lib.php';
 require_once './../../lib/digiriskdolibarr_function.lib.php';
 require_once __DIR__ . '/../../core/tpl/digirisk_security_checks.php';
 
-global $langs, $user, $conf, $db, $hookmanager;
 $permtoupload = $user->rights->ecm->upload;
 
 // Load translation files required by the page
@@ -78,8 +82,6 @@ $page        = GETPOSTISSET('pageplusone') ? (GETPOST('pageplusone') - 1) : GETP
 $page        = is_numeric($page) ? $page : 0;
 $page        = $page == -1 ? 0 : $page;
 
-global $db, $conf, $langs, $user, $hookmanager;
-
 // Initialize technical objects
 $object           = new DigiriskStandard($db);
 $risk             = new Risk($db);
@@ -90,8 +92,8 @@ $task             = new DigiriskTask($db);
 $extrafields      = new ExtraFields($db);
 $refRiskMod       = new $conf->global->DIGIRISKDOLIBARR_RISK_ADDON();
 $refEvaluationMod = new $conf->global->DIGIRISKDOLIBARR_RISKASSESSMENT_ADDON();
-$refProjectMod    = new $conf->global->PROJECT_ADDON();
-$refTaskMod       = new $conf->global->PROJECT_TASK_ADDON();
+$refProjectMod    = new $projectRefClass();
+$refTaskMod       = new $taskRefClass();
 
 $object->fetch($conf->global->DIGIRISKDOLIBARR_ACTIVE_STANDARD);
 $hookmanager->initHooks(array('risklist', 'globalcard')); // Note that conf->hooks_modules contains array
@@ -198,7 +200,7 @@ if (empty($reshook)) {
 $form = new Form($db);
 
 $title    = $langs->trans("RiskList");
-$help_url = 'FR:Module_DigiriskDolibarr';
+$help_url = 'FR:Module_Digirisk#.C3.89valuation_des_Risques';
 $morejs   = array("/digiriskdolibarr/js/digiriskdolibarr.js");
 $morecss  = array("/digiriskdolibarr/css/digiriskdolibarr.css");
 

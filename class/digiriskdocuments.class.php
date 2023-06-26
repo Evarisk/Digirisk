@@ -518,9 +518,9 @@ class DigiriskDocuments extends CommonObject
 												}
 
 												if ($conf->global->DIGIRISKDOLIBARR_SHOW_TASK_CALCULATED_PROGRESS) {
-													$tmparray = $related_task->getSummaryOfTimeSpent();
-													if ($tmparray['total_duration'] > 0 && !empty($related_task->planned_workload)) {
-														$task_progress = round($tmparray['total_duration'] / $related_task->planned_workload * 100, 2);
+													$timeSpentArray = $related_task->getSummaryOfTimeSpent();
+													if ($timeSpentArray['total_duration'] > 0 && !empty($related_task->planned_workload)) {
+														$task_progress = round($timeSpentArray['total_duration'] / $related_task->planned_workload * 100, 2);
 													} else {
 														$task_progress = 0;
 													}
@@ -607,6 +607,9 @@ class DigiriskDocuments extends CommonObject
 											if (file_exists($val)) {
 												$listlines->setImage($key, $val);
 											} else {
+
+
+
 												$listlines->setVars($key, $langs->trans('NoData'), true, 'UTF-8');
 											}
 										} elseif ($key == 'nomDanger') {
@@ -616,8 +619,10 @@ class DigiriskDocuments extends CommonObject
 												$listlines->setVars($key, $langs->trans('NoData'), true, 'UTF-8');
 											}
 										} elseif (empty($val) && $val != '0') {
+
 											$listlines->setVars($key, $langs->trans('NoData'), true, 'UTF-8');
 										} else {
+
 											$listlines->setVars($key, html_entity_decode($val, ENT_QUOTES | ENT_HTML5), true, 'UTF-8');
 										}
 									} catch (OdfException $e) {

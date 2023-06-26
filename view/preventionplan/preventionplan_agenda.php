@@ -126,7 +126,7 @@ if (empty($reshook)) {
 
 if ($object->id > 0) {
 	$title    = $langs->trans("PreventionPlan") . ' - ' . $langs->trans("Agenda");
-	$help_url = 'FR:Module_DigiriskDolibarr';
+	$help_url = 'FR:Module_Digirisk#DigiRisk_-_Plan_de_pr.C3.A9vention';
 	$morejs   = array("/digiriskdolibarr/js/digiriskdolibarr.js");
 	$morecss  = array("/digiriskdolibarr/css/digiriskdolibarr.css");
 

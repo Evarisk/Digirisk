@@ -38,7 +38,7 @@ if ( ! $res) die("Include of main fails");
 require_once DOL_DOCUMENT_ROOT . '/core/lib/company.lib.php';
 require_once DOL_DOCUMENT_ROOT . '/core/lib/images.lib.php';
 
-require_once './../class/openinghours.class.php';
+require_once __DIR__ . '/../class/openinghours.class.php';
 require_once __DIR__ . '/../core/tpl/digirisk_security_checks.php';
 
 $langs->loadLangs(array("digiriskdolibarr@digiriskdolibarr"));
@@ -119,7 +119,7 @@ if ($socid > 0 && empty($societe->id)) {
 
 $title = $langs->trans("ThirdParty");
 if ( ! empty($conf->global->MAIN_HTML_TITLE) && preg_match('/thirdpartynameonly/', $conf->global->MAIN_HTML_TITLE) && $societe->name) $title = $societe->name . " - " . $langs->trans('OpeningHours');
-$help_url = 'EN:Module_Third_Parties|FR:Module_DigiriskDolibarr#L.27onglet_Horaire_de_travail|ES:Empresas';
+$help_url = 'FR:Module_Digirisk#L.27onglet_Horaire_d.27ouverture';
 
 $morecss = array("/digiriskdolibarr/css/digiriskdolibarr.css");
 

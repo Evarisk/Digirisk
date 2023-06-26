@@ -130,7 +130,7 @@ if (($action == 'update' && ! GETPOST("cancel", 'alpha')) || ($action == 'update
 
 $form = new Form($db);
 
-$help_url = 'FR:Module_DigiriskDolibarr#L.27onglet_S.C3.A9curit.C3.A9';
+$help_url = 'FR:Module_Digirisk#L.27onglet_S.C3.A9curit.C3.A9';
 $title    = $langs->trans("CompanyFoundation") . ' - ' . $langs->trans("Security");
 
 $morejs  = array("/digiriskdolibarr/js/digiriskdolibarr.js");

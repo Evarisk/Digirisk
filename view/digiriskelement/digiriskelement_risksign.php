@@ -41,12 +41,12 @@ require_once DOL_DOCUMENT_ROOT . '/core/lib/images.lib.php';
 require_once DOL_DOCUMENT_ROOT . '/core/class/html.form.class.php';
 require_once DOL_DOCUMENT_ROOT . '/projet/class/project.class.php';
 
-require_once './../../class/digiriskelement.class.php';
-require_once './../../class/digiriskstandard.class.php';
-require_once './../../class/riskanalysis/risksign.class.php';
-require_once './../../core/modules/digiriskdolibarr/riskanalysis/risksign/mod_risksign_standard.php';
-require_once './../../lib/digiriskdolibarr_digiriskelement.lib.php';
-require_once './../../lib/digiriskdolibarr_function.lib.php';
+require_once __DIR__ . '/../../class/digiriskelement.class.php';
+require_once __DIR__ . '/../../class/digiriskstandard.class.php';
+require_once __DIR__ . '/../../class/riskanalysis/risksign.class.php';
+require_once __DIR__ . '/../../core/modules/digiriskdolibarr/riskanalysis/risksign/mod_risksign_standard.php';
+require_once __DIR__ . '/../../lib/digiriskdolibarr_digiriskelement.lib.php';
+require_once __DIR__ . '/../../lib/digiriskdolibarr_function.lib.php';
 
 global $conf, $db, $hookmanager, $langs, $user;
 
@@ -325,7 +325,7 @@ if (empty($reshook)) {
 $form = new Form($db);
 
 $title    = $langs->trans("RiskSigns");
-$help_url = 'FR:Module_DigiriskDolibarr#Signalisation';
+$help_url = 'FR:Module_Digirisk#Signalisation';
 $morejs   = array("/digiriskdolibarr/js/digiriskdolibarr.js");
 $morecss  = array("/digiriskdolibarr/css/digiriskdolibarr.css");
 
@@ -450,17 +450,17 @@ if ($object->id > 0) {
 
 	if (!empty($conf->global->DIGIRISKDOLIBARR_SHOW_RISKSIGNS)) {
 		$contextpage = 'risksignlist';
-		require_once './../../core/tpl/riskanalysis/risksign/digiriskdolibarr_risksignlist_view.tpl.php';
+		require_once __DIR__ . '/../../core/tpl/riskanalysis/risksign/digiriskdolibarr_risksignlist_view.tpl.php';
 	}
 
 	if (!empty($conf->global->DIGIRISKDOLIBARR_SHOW_INHERITED_RISKSIGNS)) {
 		$contextpage = 'inheritedrisksign';
-		require_once './../../core/tpl/riskanalysis/risksign/digiriskdolibarr_inheritedrisksignlist_view.tpl.php';
+		require_once __DIR__ . '/../../core/tpl/riskanalysis/risksign/digiriskdolibarr_inheritedrisksignlist_view.tpl.php';
 	}
 
 	if (!empty($conf->global->DIGIRISKDOLIBARR_SHOW_SHARED_RISKSIGNS)) {
 		$contextpage = 'sharedrisksign';
-		require_once './../../core/tpl/riskanalysis/risksign/digiriskdolibarr_sharedrisksignlist_view.tpl.php';
+		require_once __DIR__ . '/../../core/tpl/riskanalysis/risksign/digiriskdolibarr_sharedrisksignlist_view.tpl.php';
 	}
 }
 

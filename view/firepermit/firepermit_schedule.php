@@ -114,7 +114,7 @@ if (empty($reshook)) {
  */
 
 $title    = $langs->trans("FirePermit") . ' - ' . $langs->trans("Schedule");
-$help_url = '';
+$help_url = 'FR:Module_Digirisk#DigiRisk_-_Permis_de_feu';
 $morecss  = array("/digiriskdolibarr/css/digiriskdolibarr.css");
 
 llxHeader('', $title, $help_url, '', '', '', '', $morecss);
@@ -146,7 +146,7 @@ print dol_get_fiche_end();
 print load_fiche_titre($langs->trans("FirePermitSchedule"), '', '');
 
 //Show common fields
-require_once './../../core/tpl/digiriskdolibarr_openinghours_view.tpl.php';
+require_once __DIR__ . '/../../core/tpl/digiriskdolibarr_openinghours_view.tpl.php';
 
 // End of page
 llxFooter();

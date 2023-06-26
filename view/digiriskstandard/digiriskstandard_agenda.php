@@ -42,9 +42,9 @@ require_once DOL_DOCUMENT_ROOT . '/core/lib/company.lib.php';
 require_once DOL_DOCUMENT_ROOT . '/core/lib/functions2.lib.php';
 require_once DOL_DOCUMENT_ROOT . '/core/lib/images.lib.php';
 
-require_once './../../class/digiriskstandard.class.php';
-require_once './../../lib/digiriskdolibarr_digiriskstandard.lib.php';
-require_once './../../lib/digiriskdolibarr_function.lib.php';
+require_once __DIR__ . '/../../class/digiriskstandard.class.php';
+require_once __DIR__ . '/../../lib/digiriskdolibarr_digiriskstandard.lib.php';
+require_once __DIR__ . '/../../lib/digiriskdolibarr_function.lib.php';
 
 global $conf, $db, $langs, $user, $hookmanager;
 
@@ -130,7 +130,7 @@ if (empty($reshook)) {
 if ($object->id > 0) {
 	$title = $langs->trans("Agenda");
 	//if (! empty($conf->global->MAIN_HTML_TITLE) && preg_match('/thirdpartynameonly/',$conf->global->MAIN_HTML_TITLE) && $object->name) $title=$object->name." - ".$title;
-	$help_url = 'FR:Module_DigiriskDolibarr';
+	$help_url = 'FR:Module_Digirisk#DigiRisk_-_Document_Unique';
 	$morejs   = array("/digiriskdolibarr/js/digiriskdolibarr.js");
 	$morecss  = array("/digiriskdolibarr/css/digiriskdolibarr.css");
 

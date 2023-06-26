@@ -65,7 +65,7 @@ if ( ! $permissiontoread && $user->rights->ticket->read) accessforbidden();
  * View
  */
 
-$help_url = 'FR:Module_DigiriskDolibarr';
+$help_url = 'FR:Module_Digirisk#Statistiques_des_tickets';
 $morejs   = array("/digiriskdolibarr/js/digiriskdolibarr.js");
 $morecss  = array("/digiriskdolibarr/css/digiriskdolibarr.css");
 

@@ -69,7 +69,7 @@ if (GETPOST('action') == 'updateMask') {
  * View
  */
 
-$help_url = 'FR:Module_DigiriskDolibarr#L.27onglet_.C3.89l.C3.A9ment_Digirisk';
+$help_url = 'FR:Module_Digirisk#L.27onglet_.C3.89l.C3.A9ment_DigiRisk';
 $title    = $langs->trans("Organization");
 
 $morejs  = array("/digiriskdolibarr/js/digiriskdolibarr.js");

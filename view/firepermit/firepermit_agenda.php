@@ -125,7 +125,7 @@ if (empty($reshook)) {
 
 if ($object->id > 0) {
 	$title    = $langs->trans("FirePermit") . ' - ' . $langs->trans("Agenda");
-	$help_url = 'FR:Module_DigiriskDolibarr';
+	$help_url = 'FR:Module_Digirisk#DigiRisk_-_Permis_de_feu';
 	$morejs   = array("/digiriskdolibarr/js/digiriskdolibarr.js");
 	$morecss  = array("/digiriskdolibarr/css/digiriskdolibarr.css");
 

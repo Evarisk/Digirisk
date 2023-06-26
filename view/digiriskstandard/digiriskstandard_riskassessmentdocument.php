@@ -42,16 +42,16 @@ require_once DOL_DOCUMENT_ROOT . '/contact/class/contact.class.php';
 require_once DOL_DOCUMENT_ROOT . '/core/lib/images.lib.php';
 require_once DOL_DOCUMENT_ROOT . '/projet/class/project.class.php';
 
-require_once './../../class/digiriskresources.class.php';
-require_once './../../class/digiriskstandard.class.php';
-require_once './../../class/digiriskelement.class.php';
-require_once './../../class/digiriskdocuments/groupmentdocument.class.php';
-require_once './../../class/digiriskdocuments/workunitdocument.class.php';
-require_once './../../class/digiriskdocuments/riskassessmentdocument.class.php';
-require_once './../../lib/digiriskdolibarr_digiriskstandard.lib.php';
-require_once './../../lib/digiriskdolibarr_function.lib.php';
-require_once './../../core/modules/digiriskdolibarr/digiriskdocuments/riskassessmentdocument/mod_riskassessmentdocument_standard.php';
-require_once './../../core/modules/digiriskdolibarr/digiriskdocuments/riskassessmentdocument/modules_riskassessmentdocument.php';
+require_once __DIR__ . '/../../class/digiriskresources.class.php';
+require_once __DIR__ . '/../../class/digiriskstandard.class.php';
+require_once __DIR__ . '/../../class/digiriskelement.class.php';
+require_once __DIR__ . '/../../class/digiriskdocuments/groupmentdocument.class.php';
+require_once __DIR__ . '/../../class/digiriskdocuments/workunitdocument.class.php';
+require_once __DIR__ . '/../../class/digiriskdocuments/riskassessmentdocument.class.php';
+require_once __DIR__ . '/../../lib/digiriskdolibarr_digiriskstandard.lib.php';
+require_once __DIR__ . '/../../lib/digiriskdolibarr_function.lib.php';
+require_once __DIR__ . '/../../core/modules/digiriskdolibarr/digiriskdocuments/riskassessmentdocument/mod_riskassessmentdocument_standard.php';
+require_once __DIR__ . '/../../core/modules/digiriskdolibarr/digiriskdocuments/riskassessmentdocument/modules_riskassessmentdocument.php';
 
 global $db, $conf, $langs, $hookmanager, $user;
 
@@ -344,7 +344,7 @@ if (empty($reshook)) {
 $emptyobject = new stdClass();
 
 $title    = $langs->trans('RiskAssessmentDocument');
-$help_url = 'FR:Module_DigiriskDolibarr#Document_unique_2';
+$help_url = 'FR:Module_Digirisk#Impression_du_Document_Unique';
 $morejs   = array("/digiriskdolibarr/js/digiriskdolibarr.js");
 $morecss  = array("/digiriskdolibarr/css/digiriskdolibarr.css");
 
@@ -379,7 +379,7 @@ print '<div class="fichecenter">';
 print '<table class="border centpercent tableforfield">' . "\n";
 
 //JSON Decode and show fields
-require_once './../../core/tpl/digiriskdocuments/digiriskdolibarr_riskassessmentdocumentfields_view.tpl.php';
+require_once __DIR__ . '/../../core/tpl/digiriskdocuments/digiriskdolibarr_riskassessmentdocumentfields_view.tpl.php';
 
 print '</table>';
 print '</div>';

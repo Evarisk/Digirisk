@@ -39,8 +39,8 @@ if ( ! $res) die("Include of main fails");
 require_once DOL_DOCUMENT_ROOT . '/core/class/html.formfile.class.php';
 require_once DOL_DOCUMENT_ROOT . '/core/lib/images.lib.php';
 
-require_once './../../class/digiriskelement.class.php';
-require_once './../../lib/digiriskdolibarr_function.lib.php';
+require_once __DIR__ . '/../../class/digiriskelement.class.php';
+require_once __DIR__ . '/../../lib/digiriskdolibarr_function.lib.php';
 require_once __DIR__ . '/../../core/tpl/digirisk_security_checks.php';
 
 global $conf, $db, $hookmanager, $langs, $user;
@@ -129,7 +129,7 @@ if (empty($reshook)) $formconfirm .= $hookmanager->resPrint;
 elseif ($reshook > 0) $formconfirm = $hookmanager->resPrint;
 
 
-$help_url = 'FR:Module_DigiriskDolibarr';
+$help_url = 'FR:Module_Digirisk';
 $title    = $langs->trans('DigiriskElementOrganization');
 $morejs   = array("/digiriskdolibarr/js/digiriskdolibarr.js");
 $morecss  = array("/digiriskdolibarr/css/digiriskdolibarr.css");

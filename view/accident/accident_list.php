@@ -191,7 +191,7 @@ $form      = new Form($db);
 $formother = new FormOther($db);
 
 $title    = $langs->trans("AccidentList");
-$help_url = '';
+$help_url = 'FR:Module_Digirisk#DigiRisk_-_Accident_b.C3.A9nins_et_presque_accidents';
 
 $morejs  = array("/digiriskdolibarr/js/digiriskdolibarr.js");
 $morecss = array("/digiriskdolibarr/css/digiriskdolibarr.css");

@@ -91,7 +91,7 @@ if (($action == 'update' && ! GETPOST("cancel", 'alpha')) || ($action == 'update
 
 if ( ! empty($conf->projet->enabled)) { $formproject = new FormProjets($db); }
 
-$help_url = 'FR:Module_DigiriskDolibarr#L.27onglet_Analyse_des_risques';
+$help_url = 'FR:Module_Digirisk#L.27onglet_Analyse_des_risques';
 $title    = $langs->trans("RiskAssessmentDocument");
 
 $morejs  = array("/digiriskdolibarr/js/digiriskdolibarr.js");
@@ -243,9 +243,9 @@ print '</td>';
 print '</tr>';
 
 print '<tr class="oddeven"><td>';
-print $langs->trans('SortRisksListingsByCotation');
+print $langs->trans('SortRisksListingsByEvaluation');
 print "</td><td>";
-print $langs->trans('SortRisksListingsByCotationDescription');
+print $langs->trans('SortRisksListingsByEvaluationDescription');
 print '</td>';
 
 print '<td class="center">';

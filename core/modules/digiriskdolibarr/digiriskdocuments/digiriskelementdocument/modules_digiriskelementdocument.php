@@ -409,6 +409,7 @@ abstract class ModeleODTDigiriskElementDocument extends CommonDocGenerator
 
 								$categories = $category->containing($line->id, Categorie::TYPE_TICKET);
 								if (!empty($categories)) {
+									$allcategories = [];
 									foreach ($categories as $cat) {
 										$allcategories[] = $cat->label;
 									}
@@ -419,6 +420,7 @@ abstract class ModeleODTDigiriskElementDocument extends CommonDocGenerator
 
 								$tmparray['creation_date'] = dol_print_date($line->datec, 'dayhoursec', 'tzuser');
 								$tmparray['subject']       = $line->subject;
+								$tmparray['message']       = $line->message;
 								$tmparray['progress']      = (($line->progress) ?: 0) . ' %';
 
 								$ticketmp = new Ticket($this->db);
@@ -453,6 +455,7 @@ abstract class ModeleODTDigiriskElementDocument extends CommonDocGenerator
 							$tmparray['categories']    = '';
 							$tmparray['creation_date'] = '';
 							$tmparray['subject']       = '';
+							$tmparray['message']       = '';
 							$tmparray['progress']      = '';
 							$tmparray['status']        = '';
 							foreach ($tmparray as $key => $val) {

@@ -39,9 +39,9 @@ if ( ! $res) die("Include of main fails");
 require_once DOL_DOCUMENT_ROOT . '/core/lib/images.lib.php';
 require_once DOL_DOCUMENT_ROOT . '/projet/class/project.class.php';
 
-require_once './../../class/digiriskelement.class.php';
-require_once './../../class/digiriskstandard.class.php';
-require_once './../../class/digiriskdocuments/listingrisksaction.class.php';
+require_once __DIR__ . '/../../class/digiriskelement.class.php';
+require_once __DIR__ . '/../../class/digiriskstandard.class.php';
+require_once __DIR__ . '/../../class/digiriskdocuments/listingrisksaction.class.php';
 require_once './../../lib/digiriskdolibarr_digiriskelement.lib.php';
 require_once './../../lib/digiriskdolibarr_digiriskstandard.lib.php';
 require_once './../../lib/digiriskdolibarr_function.lib.php';
@@ -174,7 +174,7 @@ if ($action == 'remove_file' && $permissiontodelete) {
 $emptyobject = new stdClass();
 
 $title    = $langs->trans('ListingRisksAction');
-$help_url = 'FR:Module_DigiriskDolibarr#Listing_des_actions_correctives';
+$help_url = 'FR:Module_Digirisk#Impression_des_listings_de_risques';
 $morejs   = array("/digiriskdolibarr/js/digiriskdolibarr.js");
 $morecss  = array("/digiriskdolibarr/css/digiriskdolibarr.css");
 

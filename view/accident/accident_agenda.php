@@ -124,7 +124,7 @@ if (empty($reshook)) {
 
 if ($object->id > 0) {
 	$title    = $langs->trans("Accident") . ' - ' . $langs->trans("Agenda");
-	$help_url = 'FR:Module_DigiriskDolibarr';
+	$help_url = 'FR:Module_Digirisk#DigiRisk_-_Accident_b.C3.A9nins_et_presque_accidents';
 	$morejs   = array("/digiriskdolibarr/js/digiriskdolibarr.js");
 	$morecss  = array("/digiriskdolibarr/css/digiriskdolibarr.css");
 

@@ -35,27 +35,29 @@ if ( ! $res && file_exists("../../main.inc.php")) $res    = @include "../../main
 if ( ! $res && file_exists("../../../main.inc.php")) $res = @include "../../../main.inc.php";
 if ( ! $res) die("Include of main fails");
 
+global $conf, $db, $langs, $user;
+
+$taskRefClass = $conf->global->PROJECT_TASK_ADDON;
+
 require_once DOL_DOCUMENT_ROOT . '/core/lib/admin.lib.php';
 require_once DOL_DOCUMENT_ROOT . '/core/lib/images.lib.php';
-require_once DOL_DOCUMENT_ROOT . '/core/modules/project/task/mod_task_simple.php';
+require_once DOL_DOCUMENT_ROOT . '/core/modules/project/task/' . $taskRefClass . '.php';
 
-require_once './../class/digiriskstandard.class.php';
-require_once './../class/digiriskelement.class.php';
-require_once './../class/digiriskelement/groupment.class.php';
-require_once './../class/digiriskelement/workunit.class.php';
-require_once './../class/riskanalysis/risk.class.php';
-require_once './../class/riskanalysis/riskassessment.class.php';
-require_once './../class/riskanalysis/risksign.class.php';
-require_once './../core/modules/digiriskdolibarr/digiriskelement/groupment/mod_groupment_standard.php';
-require_once './../core/modules/digiriskdolibarr/digiriskelement/groupment/mod_groupment_sirius.php';
-require_once './../core/modules/digiriskdolibarr/digiriskelement/workunit/mod_workunit_standard.php';
-require_once './../core/modules/digiriskdolibarr/digiriskelement/workunit/mod_workunit_canopus.php';
-require_once './../core/modules/digiriskdolibarr/riskanalysis/risk/mod_risk_standard.php';
-require_once './../core/modules/digiriskdolibarr/riskanalysis/riskassessment/mod_riskassessment_standard.php';
-require_once './../core/modules/digiriskdolibarr/riskanalysis/risksign/mod_risksign_standard.php';
+require_once __DIR__ . '/../class/digiriskstandard.class.php';
+require_once __DIR__ . '/../class/digiriskelement.class.php';
+require_once __DIR__ . '/../class/digiriskelement/groupment.class.php';
+require_once __DIR__ . '/../class/digiriskelement/workunit.class.php';
+require_once __DIR__ . '/../class/riskanalysis/risk.class.php';
+require_once __DIR__ . '/../class/riskanalysis/riskassessment.class.php';
+require_once __DIR__ . '/../class/riskanalysis/risksign.class.php';
+require_once __DIR__ . '/../core/modules/digiriskdolibarr/digiriskelement/groupment/mod_groupment_standard.php';
+require_once __DIR__ . '/../core/modules/digiriskdolibarr/digiriskelement/groupment/mod_groupment_sirius.php';
+require_once __DIR__ . '/../core/modules/digiriskdolibarr/digiriskelement/workunit/mod_workunit_standard.php';
+require_once __DIR__ . '/../core/modules/digiriskdolibarr/digiriskelement/workunit/mod_workunit_canopus.php';
+require_once __DIR__ . '/../core/modules/digiriskdolibarr/riskanalysis/risk/mod_risk_standard.php';
+require_once __DIR__ . '/../core/modules/digiriskdolibarr/riskanalysis/riskassessment/mod_riskassessment_standard.php';
+require_once __DIR__ . '/../core/modules/digiriskdolibarr/riskanalysis/risksign/mod_risksign_standard.php';
 require_once __DIR__ . '/../core/tpl/digirisk_security_checks.php';
-
-global $conf, $db, $langs, $user;
 
 // Load translation files required by the page
 $langs->loadLangs(array("digiriskdolibarr@digiriskdolibarr"));
@@ -82,7 +84,7 @@ $refWorkUnitMod       = new $conf->global->DIGIRISKDOLIBARR_WORKUNIT_ADDON();
 $refRiskMod           = new $conf->global->DIGIRISKDOLIBARR_RISK_ADDON();
 $refRiskAssessmentMod = new $conf->global->DIGIRISKDOLIBARR_RISKASSESSMENT_ADDON();
 $refRiskSignMod       = new $conf->global->DIGIRISKDOLIBARR_RISKSIGN_ADDON();
-$refTaskMod           = new $conf->global->PROJECT_TASK_ADDON();
+$refTaskMod           = new $taskRefClass();
 
 $upload_dir = $conf->digiriskdolibarr->multidir_output[isset($conf->entity) ? $conf->entity : 1];
 
@@ -791,7 +793,7 @@ if (GETPOST('dataMigrationImportGlobalDolibarr', 'alpha') && ! empty($conf->glob
  * View
  */
 
-$help_url = 'FR:Module_DigiriskDolibarr';
+$help_url = 'FR:Module_Digirisk#Import.2Fexport_de_donn.C3.A9es';
 $morejs   = array("/digiriskdolibarr/js/digiriskdolibarr.js");
 $morecss  = array("/digiriskdolibarr/css/digiriskdolibarr.css");
 

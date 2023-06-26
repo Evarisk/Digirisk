@@ -407,7 +407,7 @@ if ($num == 1 && ! empty($conf->global->MAIN_SEARCH_DIRECT_OPEN_IF_ONLY_ONE) && 
 }
 
 $title    = $langs->trans("ListOfUsers");
-$help_url = '';
+$help_url = 'FR:Module_Digirisk';
 $morejs   = array("/digiriskdolibarr/js/digiriskdolibarr.js");
 $morecss  = array("/digiriskdolibarr/css/digiriskdolibarr.css");
 
