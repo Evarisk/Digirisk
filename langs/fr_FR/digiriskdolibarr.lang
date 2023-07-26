@@ -657,6 +657,11 @@ AccidentRateIndicator = Taux et indice des indicateurs de performance des accide
 NbPresquAccidents = Nombre de presqu'accidents
 NbAccidentInvestigations = Nombre d'enquête accidents
 NbWorkedHours = Nombre d\'heures travaillées
+AccidentInvestigation = Enquête Accident
+AccidentInvestigationDocument = Document d'enquête accident
+accidentinvestigation.odt = Enquête accident
+NewAccidentInvestigation = Nouvelle Enquête Accident
+AccidentInvestigationList = Liste des Enquêtes Accidents
 
 # AccidentTooltip - Tooltip des accidents
 VictimActivityTooltip = Précisez l’activité ou la tâche de la victime au moment de l’accident, c’est-à-dire ce que faisait la victime
