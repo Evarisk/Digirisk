@@ -825,7 +825,16 @@ class modDigiriskdolibarr extends DolibarrModules
 			$i++ => array('DIGIRISKDOLIBARR_MAIN_AGENDA_ACTIONAUTO_DIGIRISKSIGNATURE_SIGNED', 'integer', 1, '', 0, 'current'),
 			$i++ => array('DIGIRISKDOLIBARR_MAIN_AGENDA_ACTIONAUTO_DIGIRISKSIGNATURE_PENDING_SIGNATURE', 'integer', 1, '', 0, 'current'),
 			$i++ => array('DIGIRISKDOLIBARR_MAIN_AGENDA_ACTIONAUTO_DIGIRISKSIGNATURE_ABSENT', 'integer', 1, '', 0, 'current'),
-			$i   => array('DIGIRISKDOLIBARR_MAIN_AGENDA_ACTIONAUTO_DIGIRISKSIGNATURE_DELETED', 'integer', 1, '', 0, 'current')
+			$i++ => array('DIGIRISKDOLIBARR_MAIN_AGENDA_ACTIONAUTO_DIGIRISKSIGNATURE_DELETED', 'integer', 1, '', 0, 'current'),
+			$i++ => array('DIGIRISKDOLIBARR_DOCUMENT_SHOW_PICTO_NAME', 'integer', 0, '', 0, 'current'),
+			$i++ => array('DIGIRISKDOLIBARR_AUTOMATIC_PDF_GENERATION', 'integer', 0, '', 0, 'current'),
+			$i++ => array('DIGIRISKDOLIBARR_MANUAL_PDF_GENERATION', 'integer', 0, '', 0, 'current'),
+
+			// CONST ACCIDENT INVESTIGATION DOCUMENT
+			$i++ => array('DIGIRISKDOLIBARR_ACCIDENT_INVESTIGATION_ADDON', 'chaine', 'mod_accident_investigation_standard', '', 0, 'current'),
+			$i++ => array('DIGIRISKDOLIBARR_ACCIDENTINVESTIGATIONDOCUMENT_ADDON_ODT_PATH','chaine', 'DOL_DOCUMENT_ROOT/custom/digiriskdolibarr/documents/doctemplates/accident_investigation/', '', 0, 'current'),
+			$i++ => array('DIGIRISKDOLIBARR_ACCIDENTINVESTIGATIONDOCUMENT_CUSTOM_ADDON_ODT_PATH', 'chaine', 'DOL_DATA_ROOT/ecm/digiriskdolibarr/accident_investigation/', '', 0, 'current'),
+			$i   => array('DIGIRISKDOLIBARR_ACCIDENTINVESTIGATION_DOCUMENT_DEFAULT_MODEL', 'chaine', 'template_accidentinvestigation_odt', '', 0, 'current')
 		);
 
 		if ( ! isset($conf->digiriskdolibarr) || ! isset($conf->digiriskdolibarr->enabled) ) {
@@ -1171,6 +1180,22 @@ class modDigiriskdolibarr extends DolibarrModules
 		$this->rights[$r][4] = 'accident';
 		$this->rights[$r][5] = 'delete';
 
+		/* ACCIDENT PERMISSIONS */
+		$this->rights[$r][0] = $this->numero . $r;
+		$this->rights[$r][1] = $langs->trans('ReadAccidentInvestigation');
+		$this->rights[$r][4] = 'accidentinvestigation';
+		$this->rights[$r][5] = 'read';
+		$r++;
+		$this->rights[$r][0] = $this->numero . $r;
+		$this->rights[$r][1] = $langs->transnoentities('CreateAccidentInvestigation');
+		$this->rights[$r][4] = 'accidentinvestigation';
+		$this->rights[$r][5] = 'write';
+		$r++;
+		$this->rights[$r][0] = $this->numero . $r;
+		$this->rights[$r][1] = $langs->trans('DeleteAccidentInvestigation');
+		$this->rights[$r][4] = 'accidentinvestigation';
+		$this->rights[$r][5] = 'delete';
+
 		// Main menu entries to add
 		$this->menu       = array();
 		$r                = 0;
@@ -1431,6 +1456,21 @@ class modDigiriskdolibarr extends DolibarrModules
 			'user'     => 0,				                // 0=Menu for internal users, 1=external users, 2=both
 		);
 
+		$this->menu[$r++] = array(
+			'fk_menu'  => 'fk_mainmenu=digiriskdolibarr,fk_leftmenu=digiriskaccident',	    // '' if this is a top menu. For left menu, use 'fk_mainmenu=xxx' or 'fk_mainmenu=xxx,fk_leftmenu=yyy' where xxx is mainmenucode and yyy is a leftmenucode
+			'type'     => 'left',			                // This is a Left menu entry
+			'titre'    => '<i class="fas fa-tasks pictofixedwidth" style="padding-right: 4px;"></i>' . $langs->transnoentities('AccidentInvestigation'),
+			'mainmenu' => 'digiriskdolibarr',
+			'leftmenu' => 'digiriskaccident',
+			'url'      => '/digiriskdolibarr/view/accident_investigation/accident_investigation_list.php',
+			'langs'    => 'digiriskdolibarr@digiriskdolibarr',	        // Lang file to use (without .lang) by module. File must be in langs/code_CODE/ directory.
+			'position' => 48520 + $r,
+			'enabled'  => '$conf->digiriskdolibarr->enabled && $conf->saturne->enabled',  // Define condition to show or hide menu entry. Use '$conf->digiriskdolibarr->enabled' if entry must be visible if module is enabled. Use '$leftmenu==\'system\'' to show if leftmenu system is selected.
+			'perms'    => '$user->rights->digiriskdolibarr->lire', // Use 'perms'=>'$user->rights->digiriskdolibarr->level1->level2' if you want your menu with a permission rules
+			'target'   => '',
+			'user'     => 0,				                // 0=Menu for internal users, 1=external users, 2=both
+		);
+
 //		$this->menu[$r++] = array(
 //			'fk_menu'  => 'fk_mainmenu=ticket',	    // '' if this is a top menu. For left menu, use 'fk_mainmenu=xxx' or 'fk_mainmenu=xxx,fk_leftmenu=yyy' where xxx is mainmenucode and yyy is a leftmenucode
 //			'type'     => 'left',			                // This is a Left menu entry
@@ -1587,6 +1627,7 @@ class modDigiriskdolibarr extends DolibarrModules
 		delDocumentModel('riskassessmentdocument_odt', 'riskassessmentdocument');
 		delDocumentModel('ticketdocument_odt', 'ticketdocument');
 		delDocumentModel('orque_projectdocument', 'project');
+		delDocumentModel('accidentinvestigationdocument_odt', 'accidentinvestigationdocument');
 
 		addDocumentModel('informationssharing_odt', 'informationssharing', 'ODT templates', 'DIGIRISKDOLIBARR_INFORMATIONSSHARING_ADDON_ODT_PATH');
 		addDocumentModel('legaldisplay_odt', 'legaldisplay', 'ODT templates', 'DIGIRISKDOLIBARR_LEGALDISPLAY_ADDON_ODT_PATH');
@@ -1600,6 +1641,7 @@ class modDigiriskdolibarr extends DolibarrModules
 		addDocumentModel('riskassessmentdocument_odt', 'riskassessmentdocument', 'ODT templates', 'DIGIRISKDOLIBARR_RISKASSESSMENTDOCUMENT_ADDON_ODT_PATH');
 		addDocumentModel('ticketdocument_odt', 'ticketdocument', 'ODT templates', 'DIGIRISKDOLIBARR_TICKETDOCUMENT_ADDON_ODT_PATH');
 		addDocumentModel('orque_projectdocument', 'project', 'orque');
+		addDocumentModel('accidentinvestigationdocument_odt', 'accidentinvestigationdocument', 'ODT templates', 'DIGIRISKDOLIBARR_ACCIDENTINVESTIGATIONDOCUMENT_ADDON_ODT_PATH');
 
 		if ( $conf->global->DIGIRISKDOLIBARR_DIGIRISKELEMENT_TRASH == 0 ) {
 			require_once __DIR__ . '/../../class/digiriskelement/groupment.class.php';
