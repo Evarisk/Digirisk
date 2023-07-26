@@ -356,6 +356,14 @@ class modDigiriskdolibarr extends DolibarrModules
 
 		$this->db = $db;
 
+		if (file_exists(__DIR__ . '/../../../saturne/lib/saturne_functions.lib.php')) {
+			require_once __DIR__ . '/../../../saturne/lib/saturne_functions.lib.php';
+			saturne_load_langs(['digiriskdolibarr@digiriskdolibarr']);
+		} else {
+			$this->error++;
+			$this->errors[] = $langs->trans('activateModuleDependNotSatisfied', 'Digirisk', 'Saturne');
+		}
+
 		$langs->load("digiriskdolibarr@digiriskdolibarr");
 
 		// Id for module (must be unique).
@@ -449,7 +457,7 @@ class modDigiriskdolibarr extends DolibarrModules
 		// Dependencies
 
 		$this->hidden                  = false;
-		$this->depends                 = array('modECM', 'modProjet', 'modSociete', 'modTicket', 'modCategorie', 'modFckeditor', 'modApi','modExport');
+		$this->depends                 = array('modSaturne', 'modECM', 'modProjet', 'modSociete', 'modTicket', 'modCategorie', 'modFckeditor', 'modApi','modExport');
 		$this->requiredby              = array();
 		$this->conflictwith            = array();
 		$this->langfiles               = array("digiriskdolibarr@digiriskdolibarr");
