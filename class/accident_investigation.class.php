@@ -125,7 +125,7 @@ class AccidentInvestigation extends SaturneObject
 		'victim_skills'        => ['type' => 'html',         'label' => 'VictimSkills',           'enabled' => 1, 'position' => 120, 'notnull' => 0, 'visible' => 1,],
 		'circumstances'        => ['type' => 'html',         'label' => 'Circumstances',          'enabled' => 1, 'position' => 130, 'notnull' => 0, 'visible' => 1,],
 		'fk_accident'          => ['type' => 'integer:Accident:custom/digiriskdolibarr/class/accident/accident.class.php', 'label' => 'RefAccident', 'enabled' => 1, 'position' => 11, 'notnull' => 1, 'visible' => 1,],
-		'fk_task'              => ['type' => 'integer:Task:projet/class/task.class.php', 'label' => 'FkTask',     'picto' => 'Task', 'enabled' => 1, 'position' => 140, 'notnull' => 1, 'visible' => 4,  'noteditable' => 1],
+		'fk_task'              => ['type' => 'integer:Task:projet/class/task.class.php', 'label' => 'Task',       'picto' => 'Task', 'enabled' => 1, 'position' => 140, 'notnull' => 1, 'visible' => 4,  'noteditable' => 1],
 		'fk_user_creat'        => ['type' => 'integer:User:user/class/user.class.php',   'label' => 'UserAuthor', 'picto' => 'user', 'enabled' => 1, 'position' => 160, 'notnull' => 1, 'visible' => 0, 'foreignkey' => 'user.rowid'],
 		'fk_user_modif'        => ['type' => 'integer:User:user/class/user.class.php',   'label' => 'UserModif',  'picto' => 'user', 'enabled' => 1, 'position' => 170, 'notnull' => 0, 'visible' => 0, 'foreignkey' => 'user.rowid'],
 	];
