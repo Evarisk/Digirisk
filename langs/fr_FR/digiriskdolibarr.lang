@@ -658,6 +658,7 @@ NbPresquAccidents = Nombre de presqu'accidents
 NbAccidentInvestigations = Nombre d'enquête accidents
 NbWorkedHours = Nombre d\'heures travaillées
 AccidentInvestigation = Enquête Accident
+Accident_investigation = Enquête Accident
 AccidentInvestigationDocument = Document d'enquête accident
 accidentinvestigation.odt = Enquête accident
 NewAccidentInvestigation = Nouvelle Enquête Accident

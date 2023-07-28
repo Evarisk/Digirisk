@@ -1108,17 +1108,17 @@ class modDigiriskdolibarr extends DolibarrModules
 		/* ACCIDENT PERMISSIONS */
 		$this->rights[$r][0] = $this->numero . $r;
 		$this->rights[$r][1] = $langs->trans('ReadAccidentInvestigation');
-		$this->rights[$r][4] = 'accidentinvestigation';
+		$this->rights[$r][4] = 'accident_investigation';
 		$this->rights[$r][5] = 'read';
 		$r++;
 		$this->rights[$r][0] = $this->numero . $r;
 		$this->rights[$r][1] = $langs->transnoentities('CreateAccidentInvestigation');
-		$this->rights[$r][4] = 'accidentinvestigation';
+		$this->rights[$r][4] = 'accident_investigation';
 		$this->rights[$r][5] = 'write';
 		$r++;
 		$this->rights[$r][0] = $this->numero . $r;
 		$this->rights[$r][1] = $langs->trans('DeleteAccidentInvestigation');
-		$this->rights[$r][4] = 'accidentinvestigation';
+		$this->rights[$r][4] = 'accident_investigation';
 		$this->rights[$r][5] = 'delete';
 
 		// Main menu entries to add

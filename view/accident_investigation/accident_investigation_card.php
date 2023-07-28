@@ -30,17 +30,21 @@ if (file_exists('../../digiriskdolibarr.main.inc.php')) {
 	die('Include of digiriskdolibarr main fails');
 }
 
+// Global variables definitions
+global $conf, $db, $hookmanager, $langs, $user;
+
+$taskRefClass = $conf->global->PROJECT_TASK_ADDON;
+
 // Load Dolibarr libraries
 require_once DOL_DOCUMENT_ROOT . '/core/lib/company.lib.php';
+require_once DOL_DOCUMENT_ROOT . '/core/lib/project.lib.php';
 require_once DOL_DOCUMENT_ROOT . '/core/class/html.formcompany.class.php';
+require_once DOL_DOCUMENT_ROOT . '/core/modules/project/task/' . $taskRefClass . '.php';
 
 // Load Digirisk librairies
 require_once __DIR__ . '/../../class/accident.class.php';
-require_once __DIR__ . '/../../class/accidentinvestigation.class.php';
-require_once __DIR__ . '/../../lib/digiriskdolibarr_accidentinvestigation.lib.php';
-
-// Global variables definitions
-global $conf, $db, $hookmanager, $langs, $user;
+require_once __DIR__ . '/../../class/accident_investigation.class.php';
+require_once __DIR__ . '/../../lib/digiriskdolibarr_accident_investigation.lib.php';
 
 // Load translation files required by the page
 saturne_load_langs();
@@ -56,8 +60,11 @@ $cancel      = GETPOST('cancel', 'aZ09');
 $backtopage  = GETPOST('backtopage', 'alpha') ? GETPOST('backtopage', 'alpha') : 'accident_investigation_list.php';
 
 // Initialize technical objects
-$accident = new Accident($db);
-$object   = new AccidentInvestigation($db);
+$accident   = new Accident($db);
+$object     = new AccidentInvestigation($db);
+$project    = new Project($db);
+$task       = new Task($db);
+$refTaskMod = new $taskRefClass();
 
 // Initialize view objects
 $form        = new Form($db);
@@ -65,10 +72,17 @@ $formcompany = new FormCompany($db);
 
 $hookmanager->initHooks(['accidentinvestigation', 'accidentinvestigationcard', 'digiriskdolibarrglobal', 'globalcard']); // Note that conf->hooks_modules contains array
 
+if (empty($action) && empty($id) && empty($ref)) {
+	$action = 'view';
+}
+
+// Load object
+require_once DOL_DOCUMENT_ROOT . '/core/actions_fetchobject.inc.php'; // Must be included, not include_once.
+
 // Security check - Protection if external user
-$permissiontoread   = $user->rights->digiriskdolibarr->accident->read;
-$permissiontoadd    = $user->rights->digiriskdolibarr->accident->write;
-$permissiontodelete = $user->rights->digiriskdolibarr->accident->delete;
+$permissiontoread   = $user->rights->digiriskdolibarr->accident_investigation->read;
+$permissiontoadd    = $user->rights->digiriskdolibarr->accident_investigation->write;
+$permissiontodelete = $user->rights->digiriskdolibarr->accident_investigation->delete;
 saturne_check_access($permissiontoread);
 
 /*
@@ -88,11 +102,8 @@ if (empty($reshook)) {
 		exit;
 	}
 
-	if ($action == 'add_accident_investigation') {
-		if (!empty($fkAccident)) {
-			$object->create($user);
-		}
-	}
+	// Actions cancel, add, update, update_extras, confirm_validate, confirm_delete, confirm_deleteline, confirm_clone, confirm_close, confirm_setdraft, confirm_reopen
+	include DOL_DOCUMENT_ROOT.'/core/actions_addupdatedelete.inc.php';
 }
 
 /*
@@ -111,7 +122,7 @@ if ($action == 'create') {
 
 	print '<form method="POST" action="' . $_SERVER['PHP_SELF'] . '?id=' . $id . '">';
 	print '<input type="hidden" name="token" value="' . newToken() . '">';
-	print '<input type="hidden" name="action" value="add_accident_investigation">';
+	print '<input type="hidden" name="action" value="add">';
 	if ($backtopage) {
 		print '<input type="hidden" name="backtopage" value="' . $backtopage . '">';
 	}
@@ -131,12 +142,12 @@ if ($action == 'create') {
 
 	saturne_get_fiche_head($object, 'accidentinvestigation', $title);
 
-	$morehtml = '<a href="' . dol_buildpath('/custom/digiriskdolibarr/view/accident_investigation/accident_investigation_list.php', 1) . '?restore_lastsearch_values=1">' . $langs->trans('BackToList') . '</a>';
+	$morehtml = '<a href="' . dol_buildpath('digiriskdolibarr/view/accident_investigation/accident_investigation_list.php', 1) . '?restore_lastsearch_values=1">' . $langs->trans('BackToList') . '</a>';
 	saturne_banner_tab($object, 'ref', $morehtml, 1, 'ref', 'ref', '', !empty($object->photo));
 
 	print '<div class="fichecenter">';
 
-	print '<div class="addresses-container">';
+	print '<div class="accident-investigation-container">';
 
 	$parameters = ['address' => $object];
 	$reshook    = $hookmanager->executeHooks('digiriskdolibarrAccidentInvestigationHead', $parameters, $object); // Note that $action and $object may have been modified by some hooks

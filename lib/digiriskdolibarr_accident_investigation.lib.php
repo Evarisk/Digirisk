@@ -22,16 +22,13 @@
  */
 
 /**
- * Prepare array of tabs for Accident
+ * Prepare array of tabs for Accident investigation
  *
- * @param	Accident $object Accident
- * @return 	array					Array of tabs
+ * @param  AccidentInvestigation $object Accident
+ * @return array                         Array of tabs
+ * @throws Exception
  */
-function accident_investigation_prepare_head($object)
+function accident_investigation_prepare_head(AccidentInvestigation $object): array
 {
-	global $langs, $conf, $user;
-
-	$object->element = 'accidentinvestigation';
-
 	return saturne_object_prepare_head($object);
 }
