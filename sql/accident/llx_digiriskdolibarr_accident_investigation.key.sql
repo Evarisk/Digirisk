@@ -14,3 +14,9 @@
 -- along with this program.  If not, see https://www.gnu.org/licenses/.
 
 ALTER TABLE llx_digiriskdolibarr_accident_investigation ADD INDEX idx_digiriskdolibarr_accident_investigation_rowid (rowid);
+ALTER TABLE llx_digiriskdolibarr_accident_investigation ADD INDEX idx_digiriskdolibarr_accident_investigation_ref (ref);
+ALTER TABLE llx_digiriskdolibarr_accident_investigation ADD INDEX idx_digiriskdolibarr_accident_investigation_status (status);
+ALTER TABLE llx_digiriskdolibarr_accident_investigation ADD INDEX idx_digiriskdolibarr_accident_investigation_fk_accident (fk_accident);
+ALTER TABLE llx_digiriskdolibarr_accident_investigation ADD INDEX idx_digiriskdolibarr_accident_investigation_fk_element (fk_element);
+ALTER TABLE llx_digiriskdolibarr_accident_investigation ADD UNIQUE INDEX uk_digiriskdolibarr_accident_investigation_ref (ref, entity);
+ALTER TABLE llx_digiriskdolibarr_accident_investigation ADD CONSTRAINT llx_digiriskdolibarr_accident_investigation_fk_user_creat FOREIGN KEY (fk_user_creat) REFERENCES llx_user(rowid);
