@@ -122,7 +122,7 @@ class AccidentInvestigation extends SaturneObject
 		'note_private'         => ['type' => 'html',         'label' => 'NotePrivate',            'enabled' => 1, 'position' => 90,  'notnull' => 0, 'visible' => 4,],
 		'seniority_in_company' => ['type' => 'integer',      'label' => 'SeniorityInCompany',     'enabled' => 1, 'position' => 110, 'notnull' => 0, 'visible' => 4,],
 		'date_start'           => ['type' => 'timestamp',    'label' => 'DateInvestigationStart', 'enabled' => 1, 'position' => 110, 'notnull' => 0, 'visible' => 4,],
-		'victim_skill'         => ['type' => 'text',         'label' => 'VictimSkills',           'enabled' => 1, 'position' => 120, 'notnull' => 0, 'visible' => 1,],
+		'victim_skills'        => ['type' => 'text',         'label' => 'VictimSkills',           'enabled' => 1, 'position' => 120, 'notnull' => 0, 'visible' => 1,],
 		'circumstances'        => ['type' => 'text',         'label' => 'Circumstances',          'enabled' => 1, 'position' => 130, 'notnull' => 0, 'visible' => 4,],
 		'fk_task'              => ['type' => 'integer',      'label' => 'FkTask',                 'enabled' => 1, 'position' => 140, 'notnull' => 1, 'visible' => 4, 'noteditable' => 1],
 		'fk_accident'          => ['type' => 'integer:Accident:custom/digiriskdolibarr/class/accident/accident.class.php', 'label' => 'FkAccident', 'enabled' => 1, 'position' => 150, 'notnull' => 1, 'visible' => 1,],
@@ -191,9 +191,9 @@ class AccidentInvestigation extends SaturneObject
 	public $date_start;
 
 	/**
-	 * @var string|null Victim skill.
+	 * @var string|null Victim skills.
 	 */
-	public ?string $victim_skill;
+	public ?string $victim_skills;
 
 	/**
 	 * @var string|null Circumstances.
