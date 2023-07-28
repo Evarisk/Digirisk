@@ -36,7 +36,7 @@ require_once DOL_DOCUMENT_ROOT . '/core/class/html.formfile.class.php';
 // Load Digirisk librairies
 require_once __DIR__ . '/../../class/digiriskdocuments.class.php';
 require_once __DIR__ . '/../../class/accident.class.php';
-require_once __DIR__ . '/../../class/accidentinvestigation.class.php';
+require_once __DIR__ . '/../../class/accident_investigation.class.php';
 require_once __DIR__ . '/../../class/digiriskstandard.class.php';
 require_once __DIR__ . '/../../lib/digiriskdolibarr_function.lib.php';
 require_once __DIR__ . '/../../lib/digiriskdolibarr_accident.lib.php';
@@ -155,9 +155,9 @@ include DOL_DOCUMENT_ROOT . '/core/tpl/extrafields_list_array_fields.tpl.php';
 $object->fields = dol_sort_array($object->fields, 'position');
 $arrayfields    = dol_sort_array($arrayfields, 'position');
 
-$permissiontoread   = $user->rights->digiriskdolibarr->accident->read;
-$permissiontoadd    = $user->rights->digiriskdolibarr->accident->write;
-$permissiontodelete = $user->rights->digiriskdolibarr->accident->delete;
+$permissiontoread   = $user->rights->digiriskdolibarr->accident_investigation->read;
+$permissiontoadd    = $user->rights->digiriskdolibarr->accident_investigation->write;
+$permissiontodelete = $user->rights->digiriskdolibarr->accident_investigation->delete;
 
 saturne_check_access($permissiontoread);
 
@@ -325,7 +325,7 @@ $num = $db->num_rows($resql);
 if ($num == 1 && !empty($conf->global->MAIN_SEARCH_DIRECT_OPEN_IF_ONLY_ONE) && $search_all && !$page) {
 	$obj = $db->fetch_object($resql);
 	$id  = $obj->rowid;
-	header('Location: ' . dol_buildpath('/digiriskdolibarr/view/accident/accident_investigation_card.php', 1) . '?id=' . $id);
+	header('Location: ' . dol_buildpath('digiriskdolibarr/view/accident_investigation/accident_investigation_card.php', 1) . '?id=' . $id);
 	exit;
 }
 
@@ -391,7 +391,7 @@ $newcardbutton = '';
 $newcardbutton .= dolGetButtonTitle($langs->trans('ViewList'), '', 'fa fa-bars imgforviewmode', $_SERVER['PHP_SELF'] . '?mode=common' . preg_replace('/([&?])*mode=[^&]+/', '', $param), '', ((empty($mode) || $mode == 'common') ? 2 : 1), ['morecss' => 'reposition']);
 $newcardbutton .= dolGetButtonTitle($langs->trans('ViewKanban'), '', 'fa fa-th-list imgforviewmode', $_SERVER['PHP_SELF'] . '?mode=kanban' . preg_replace('/([&?])*mode=[^&]+/', '', $param), '', ($mode == 'kanban' ? 2 : 1), ['morecss' => 'reposition']);
 $newcardbutton .= dolGetButtonTitleSeparator();
-$newcardbutton .= dolGetButtonTitle($langs->trans('New'), '', 'fa fa-plus-circle', dol_buildpath('/digiriskdolibarr/view/accident/accident_investigation_card.php', 1) . '?action=create', '', $permissiontoadd);
+$newcardbutton .= dolGetButtonTitle($langs->trans('New'), '', 'fa fa-plus-circle', dol_buildpath('digiriskdolibarr/view/accident_investigation/accident_investigation_card.php', 1) . '?action=create', '', $permissiontoadd);
 
 print_barre_liste($title, $page, $_SERVER['PHP_SELF'], $param, $sortfield, $sortorder, $massactionbutton, $num, $nbTotalOfRecords, 'object_' . $object->picto, 0, $newcardbutton, '', $limit, 0, 0, 1);
 
@@ -615,7 +615,6 @@ while ($i < $imaxinloop) {
 					print ' title="' . dol_escape_htmltag($object->$key) . '"';
 				}
 				print '>';
-				$object->module = 'custom/' . $object->module;
 				if ($key == 'status') {
 					print $object->getLibStatut(5);
 				} elseif ($key == 'rowid') {
