@@ -31,7 +31,7 @@ CREATE TABLE llx_digiriskdolibarr_accident_investigation(
     victim_skills        text,
     circumstances        text,
     fk_accident          integer NOT NULL,
-    fk_task              integer NOT NULL,
+    fk_task              integer,
     fk_user_creat        integer NOT NULL,
     fk_user_modif        integer
 ) ENGINE=innodb;
