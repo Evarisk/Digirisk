@@ -76,6 +76,8 @@ if (empty($action) && empty($id) && empty($ref)) {
 	$action = 'view';
 }
 
+$uploadDir = $conf->digiriskdolibarr->multidir_output[$object->entity ?? 1];
+
 // Load object
 require_once DOL_DOCUMENT_ROOT . '/core/actions_fetchobject.inc.php'; // Must be included, not include_once.
 
@@ -104,6 +106,10 @@ if (empty($reshook)) {
 
 	// Actions cancel, add, update, update_extras, confirm_validate, confirm_delete, confirm_deleteline, confirm_clone, confirm_close, confirm_setdraft, confirm_reopen
 	include DOL_DOCUMENT_ROOT.'/core/actions_addupdatedelete.inc.php';
+
+	// Actions builddoc, forcebuilddoc, remove_file.
+	require_once __DIR__ . '/../../../saturne/core/tpl/documents/documents_action.tpl.php';
+
 }
 
 /*
@@ -141,26 +147,42 @@ if ($action == 'create') {
 	$object->fetch($id);
 
 	saturne_get_fiche_head($object, 'accidentinvestigation', $title);
-
-	$morehtml = '<a href="' . dol_buildpath('digiriskdolibarr/view/accident_investigation/accident_investigation_list.php', 1) . '?restore_lastsearch_values=1">' . $langs->trans('BackToList') . '</a>';
-	saturne_banner_tab($object, 'ref', $morehtml, 1, 'ref', 'ref', '', !empty($object->photo));
+	saturne_banner_tab($object, 'ref', '', 1, 'ref', 'ref', '', !empty($object->photo));
 
 	print '<div class="fichecenter">';
+	print '<div class="fichehalfleft">';
+	print '<table class="border centpercent tableforfield">';
 
-	print '<div class="accident-investigation-container">';
+	require_once DOL_DOCUMENT_ROOT . '/core/tpl/commonfields_view.tpl.php';
 
-	$parameters = ['address' => $object];
-	$reshook    = $hookmanager->executeHooks('digiriskdolibarrAccidentInvestigationHead', $parameters, $object); // Note that $action and $object may have been modified by some hooks
-	if ($reshook > 0) {
-		// do smth
-	} else {
-		// do smth else
+	// Categories.
+	if (isModEnabled('categorie')) {
+		print '<tr><td class="valignmiddle">' . $langs->trans('Categories') . '</td><td>';
+		print $form->showCategories($object->id, $object->element, 1);
+		print '</td></tr>';
 	}
 
-	print load_fiche_titre($langs->trans('AccidentInvestigation'), '', $object->picto);
+	print '</table></div>';
 
+	if ($action != 'presend') {
+		print '<div class="fichecenter"><div class="fichehalfleft">';
+		// Documents.
+		$objRef    = dol_sanitizeFileName($object->ref);
+		$dirFiles  = $object->element . 'document/' . $objRef;
+		$fileDir   = $uploadDir . '/' . $dirFiles;
+		$urlSource = $_SERVER['PHP_SELF'] . '?id=' . $object->id;
 
-	print dol_get_fiche_end();
+		print saturne_show_documents('digiriskdolibarr:AccidentInvestigationDocument', $dirFiles, $fileDir, $urlSource, $permissiontoadd, $permissiontodelete, $conf->global->DIGIRISKDOLIBARR_ACCIDENTINVESTIGATION_DOCUMENT_DEFAULT_MODEL, 1, 0, 0, 0, 0, '', '', '', $langs->defaultlang, $object, 0, 'remove_file', empty(dol_dir_list($fileDir)), $langs->trans('ObjectMustBeLockedToGenerate', ucfirst($langs->transnoentities('The' . ucfirst($object->element)))));
+
+		print '</div><div class="fichehalfright">';
+
+		// List of actions on element.
+		require_once DOL_DOCUMENT_ROOT . '/core/class/html.formactions.class.php';
+		$formActions = new FormActions($db);
+		$formActions->showactions($object, $object->element . '@' . $object->module, 0, 1, '', 10);
+
+		print '</div></div>';
+	}
 }
 
 // End of page
