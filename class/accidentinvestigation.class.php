@@ -116,7 +116,7 @@ class AccidentInvestigation extends SaturneObject
 		'entity'                     => ['type' => 'integer',       'label' => 'Entity',                  'enabled' => '1', 'position' => 10, 'notnull' => 1, 'visible' => 0,],
 		'date_creation'              => ['type' => 'datetime',      'label' => 'DateCreation',            'enabled' => '1', 'position' => 20, 'notnull' => 1, 'visible' => 0,],
 		'tms'                        => ['type' => 'timestamp',     'label' => 'DateModification',        'enabled' => '1', 'position' => 30, 'notnull' => 0, 'visible' => 0,],
-		'status'                     => ['type' => 'smallint',      'label' => 'Status',                  'enabled' => '1', 'position' => 40, 'notnull' => 0, 'visible' => 0, 'index' => 0,],
+		'status'                     => ['type' => 'smallint',      'label' => 'Status',                  'enabled' => '1', 'position' => 40, 'notnull' => 1, 'visible' => 0, 'default' => 0, 'index' => 0,],
 		'seniority_at_post'          => ['type' => 'varchar(255)',  'label' => 'SeniorityAtPost',         'enabled' => '1', 'position' => 60, 'notnull' => 0, 'visible' => 4,],
 		'fk_usual_task'              => ['type' => 'integer',       'label' => 'FkTask',                  'enabled' => '1', 'position' => 70, 'notnull' => 0, 'visible' => 4,],
 		'accident_on_job'            => ['type' => 'boolean',       'label' => 'AccidentOnJob',           'enabled' => '1', 'position' => 80, 'notnull' => 0, 'visible' => 4,],
