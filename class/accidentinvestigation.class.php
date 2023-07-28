@@ -110,50 +110,115 @@ class AccidentInvestigation extends SaturneObject
 	* @var array  Array with all fields and their property. Do not use it as a static var. It may be modified by constructor.
 	*/
 	public $fields = [
-		'rowid'                      => ['type' => 'integer',       'label' => 'TechnicalID',             'enabled' => '1', 'position' => 1,  'notnull' => 1, 'visible' => 0, 'noteditable' => '1', 'index' => 1, 'comment' => "Id"],
-		'ref'                        => ['type' => 'varchar(128)',  'label' => 'Ref',                     'enabled' => '1', 'position' => 10, 'notnull' => 1, 'visible' => 4, 'noteditable' => '1', 'default' => '(PROV)', 'index' => 1, 'searchall' => 1, 'showoncombobox' => '1', 'comment' => "Reference of object"],
-		'ref_ext'                    => ['type' => 'varchar(128)',  'label' => 'RefExt',                  'enabled' => '1', 'position' => 20, 'notnull' => 0, 'visible' => 0,],
-		'entity'                     => ['type' => 'integer',       'label' => 'Entity',                  'enabled' => '1', 'position' => 10, 'notnull' => 1, 'visible' => 0,],
-		'date_creation'              => ['type' => 'datetime',      'label' => 'DateCreation',            'enabled' => '1', 'position' => 20, 'notnull' => 1, 'visible' => 0,],
-		'tms'                        => ['type' => 'timestamp',     'label' => 'DateModification',        'enabled' => '1', 'position' => 30, 'notnull' => 0, 'visible' => 0,],
-		'status'                     => ['type' => 'smallint',      'label' => 'Status',                  'enabled' => '1', 'position' => 40, 'notnull' => 1, 'visible' => 0, 'default' => 0, 'index' => 0,],
-		'seniority_at_post'          => ['type' => 'varchar(255)',  'label' => 'SeniorityAtPost',         'enabled' => '1', 'position' => 60, 'notnull' => 0, 'visible' => 4,],
-		'fk_usual_task'              => ['type' => 'integer',       'label' => 'FkTask',                  'enabled' => '1', 'position' => 70, 'notnull' => 0, 'visible' => 4,],
-		'accident_on_job'            => ['type' => 'boolean',       'label' => 'AccidentOnJob',           'enabled' => '1', 'position' => 80, 'notnull' => 0, 'visible' => 4,],
-		'near_miss_on_job'           => ['type' => 'boolean',       'label' => 'NearMissOnJob',           'enabled' => '1', 'position' => 90, 'notnull' => 0, 'visible' => 4,],
-		'circumstances'              => ['type' => 'text',          'label' => 'Circumstances',           'enabled' => '1', 'position' => 130, 'notnull' => 0, 'visible' => 4,],
-//		'consequences'               => ['type' => 'text',          'label' => 'Consequences',            'enabled' => '1', 'position' => 140, 'notnull' => 0, 'visible' => 1,],
-		'special_note'               => ['type' => 'text',          'label' => 'SpecialNote',             'enabled' => '1', 'position' => 150, 'notnull' => 0, 'visible' => 4,],
-		'emergency_called'           => ['type' => 'boolean',       'label' => 'EmergencyCalled',         'enabled' => '1', 'position' => 160, 'notnull' => 0, 'visible' => 4,],
-		'fk_emergency'               => ['type' => 'integer',       'label' => 'EmergencyType',           'enabled' => '1', 'position' => 170, 'notnull' => 0, 'visible' => 4,],
-		'fk_who_called_emergency'    => ['type' => 'integer',       'label' => 'WhoCalledEmergency',      'enabled' => '1', 'position' => 180, 'notnull' => 0, 'visible' => 4,],
-		'when_were_emergency_called' => ['type' => 'timestamp',     'label' => 'WhenWereEmergencyCalled', 'enabled' => '1', 'position' => 190, 'notnull' => 0, 'visible' => 4,],
-		'fk_accident'                => ['type' => 'integer:Accident:custom/digiriskdolibarr/class/accident/accident.class.php', 'label' => 'FkAccident', 'enabled' => '1', 'position' => 200, 'notnull' => 1, 'visible' => 1,],
-		'fk_user_creat'              => ['type' => 'integer:User:user/class/user.class.php', 'label' => 'UserAuthor', 'picto' => 'user', 'enabled' => 1, 'position' => 210, 'notnull' => 1, 'visible' => 0, 'foreignkey' => 'user.rowid'],
-		'fk_user_modif'              => ['type' => 'integer:User:user/class/user.class.php', 'label' => 'UserModif',  'picto' => 'user', 'enabled' => 1, 'position' => 220, 'notnull' => 0, 'visible' => 0, 'foreignkey' => 'user.rowid'],
+		'rowid'                => ['type' => 'integer',      'label' => 'TechnicalID',            'enabled' => 1, 'position' => 1,   'notnull' => 1, 'visible' => 0, 'noteditable' => 1, 'index' => 1, 'comment' => "Id"],
+		'ref'                  => ['type' => 'varchar(128)', 'label' => 'Ref',                    'enabled' => 1, 'position' => 10,  'notnull' => 1, 'visible' => 4, 'noteditable' => 1, 'default' => '(PROV)', 'index' => 1, 'searchall' => 1, 'showoncombobox' => 1, 'comment' => "Reference of object"],
+		'ref_ext'              => ['type' => 'varchar(128)', 'label' => 'RefExt',                 'enabled' => 1, 'position' => 20,  'notnull' => 0, 'visible' => 0,],
+		'entity'               => ['type' => 'integer',      'label' => 'Entity',                 'enabled' => 1, 'position' => 30,  'notnull' => 1, 'visible' => 0,],
+		'date_creation'        => ['type' => 'datetime',     'label' => 'DateCreation',           'enabled' => 1, 'position' => 40,  'notnull' => 1, 'visible' => 0,],
+		'tms'                  => ['type' => 'timestamp',    'label' => 'DateModification',       'enabled' => 1, 'position' => 50,  'notnull' => 0, 'visible' => 0,],
+		'import_key'           => ['type' => 'varchar(14)',  'label' => 'ImportId',               'enabled' => 1, 'position' => 60,  'notnull' => 0, 'visible' => 0, 'index' => 0],
+		'status'               => ['type' => 'smallint',     'label' => 'Status',                 'enabled' => 1, 'position' => 70,  'notnull' => 1, 'visible' => 0, 'default' => 0, 'index' => 0,],
+		'note_public'          => ['type' => 'html',         'label' => 'NotePublic',             'enabled' => 1, 'position' => 80,  'notnull' => 0, 'visible' => 4,],
+		'note_private'         => ['type' => 'html',         'label' => 'NotePrivate',            'enabled' => 1, 'position' => 90,  'notnull' => 0, 'visible' => 4,],
+		'seniority_in_company' => ['type' => 'integer',      'label' => 'SeniorityInCompany',     'enabled' => 1, 'position' => 110, 'notnull' => 0, 'visible' => 4,],
+		'date_start'           => ['type' => 'timestamp',    'label' => 'DateInvestigationStart', 'enabled' => 1, 'position' => 110, 'notnull' => 0, 'visible' => 4,],
+		'victim_skill'         => ['type' => 'text',         'label' => 'VictimSkills',           'enabled' => 1, 'position' => 120, 'notnull' => 0, 'visible' => 1,],
+		'circumstances'        => ['type' => 'text',         'label' => 'Circumstances',          'enabled' => 1, 'position' => 130, 'notnull' => 0, 'visible' => 4,],
+		'fk_task'              => ['type' => 'integer',      'label' => 'FkTask',                 'enabled' => 1, 'position' => 140, 'notnull' => 1, 'visible' => 4, 'noteditable' => 1],
+		'fk_accident'          => ['type' => 'integer:Accident:custom/digiriskdolibarr/class/accident/accident.class.php', 'label' => 'FkAccident', 'enabled' => 1, 'position' => 150, 'notnull' => 1, 'visible' => 1,],
+		'fk_user_creat'        => ['type' => 'integer:User:user/class/user.class.php', 'label' => 'UserAuthor', 'picto' => 'user', 'enabled' => 1, 'position' => 160, 'notnull' => 1, 'visible' => 0, 'foreignkey' => 'user.rowid'],
+		'fk_user_modif'        => ['type' => 'integer:User:user/class/user.class.php', 'label' => 'UserModif',  'picto' => 'user', 'enabled' => 1, 'position' => 170, 'notnull' => 0, 'visible' => 0, 'foreignkey' => 'user.rowid'],
 	];
 
-	public $rowid;
+	/**
+	 * @var int ID.
+	 */
+	public int $rowid;
+
+	/**
+	 * @var string Ref.
+	 */
 	public $ref;
+
+	/**
+	 * @var string Ref ext.
+	 */
 	public $ref_ext;
+
+	/**
+	 * @var int Entity.
+	 */
 	public $entity;
+
+	/**
+	 * @var int|string Creation date.
+	 */
 	public $date_creation;
+
+	/**
+	 * @var int|string Timestamp.
+	 */
 	public $tms;
+
+	/**
+	 * @var string Import key.
+	 */
+	public $import_key;
+
+	/**
+	 * @var int Status.
+	 */
 	public $status;
-	public $seniority_at_post;
-	public $fk_usual_task;
-	public $accident_on_job;
-	public $near_miss_on_job;
-	public $circumstances;
-	//public $consequences;
-	public $special_note;
-	public $emergency_called;
-	public $fk_emergency;
-	public $fk_who_called_emergency;
-	public $when_were_emergency_called;
-	public $fk_accident;
-	public $fk_user_creat;
-	public $fk_user_modif;
+
+	/**
+	 * @var string Public note.
+	 */
+	public $note_public;
+
+	/**
+	 * @var string Private note.
+	 */
+	public $note_private;
+
+	/**
+	 * @var int Seniority in company.
+	 */
+	public $seniority_in_company;
+
+	/**
+	 * @var int|string Date investigation start.
+	 */
+	public $date_start;
+
+	/**
+	 * @var string|null Victim skill.
+	 */
+	public ?string $victim_skill;
+
+	/**
+	 * @var string|null Circumstances.
+	 */
+	public ?string $circumstances;
+
+	/**
+	 * @var int Task ID.
+	 */
+	public int $fk_task;
+
+	/**
+	 * @var int Accident ID.
+	 */
+	public int $fk_accident;
+
+	/**
+	 * @var int User ID.
+	 */
+	public int $fk_user_creat;
+
+	/**
+	 * @var int|null User ID.
+	 */
+	public ?int $fk_user_modif;
 
 	/**
 	* Constructor
