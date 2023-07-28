@@ -13,25 +13,25 @@
 -- You should have received a copy of the GNU General Public License
 -- along with this program.  If not, see https://www.gnu.org/licenses/.
 
+-- Users involved with investigation should be added with saturne_attendants
+
 CREATE TABLE llx_digiriskdolibarr_accident_investigation(
-    rowid                      integer AUTO_INCREMENT PRIMARY KEY NOT NULL,
-    ref                        varchar(128) NOT NULL,
-    ref_ext                    varchar(128),
-    entity                     integer DEFAULT 1 NOT NULL,
-    date_creation              datetime NOT NULL,
-    tms                        timestamp,
-    status                     smallint,
-    seniority_at_post          varchar(255),
-    fk_usual_task              integer,
-    accident_on_job            boolean,
-    near_miss_on_job           boolean,
-    circumstances              text,
-    special_note               text,
-    emergency_called           boolean,
-    fk_emergency               integer,
-    fk_who_called_emergency    integer,
-    when_were_emergency_called timestamp,
-    fk_accident                integer,
-    fk_user_creat              integer NOT NULL,
-    fk_user_modif              integer
+    rowid                    integer AUTO_INCREMENT PRIMARY KEY NOT NULL,
+    ref                      varchar(128) NOT NULL,
+    ref_ext                  varchar(128),
+    entity                   integer DEFAULT 1 NOT NULL,
+    date_creation            datetime NOT NULL,
+    tms                      timestamp,
+    import_key               varchar(14),
+    status                   smallint,
+    note_public              text,
+    note_private             text,
+    seniority_in_company     varchar(255),
+    date_investigation_start timestamp,
+    victim_skills            text,
+    circumstances            text,
+    fk_accident              integer NOT NULL,
+    fk_element               integer NOT NULL,
+    fk_user_creat            integer NOT NULL,
+    fk_user_modif            integer
 ) ENGINE=innodb;
