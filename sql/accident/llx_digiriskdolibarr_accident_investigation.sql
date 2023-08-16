@@ -28,6 +28,7 @@ CREATE TABLE llx_digiriskdolibarr_accident_investigation(
     note_private         text,
     seniority_in_company integer,
     date_start           timestamp,
+    date_end             timestamp,
     victim_skills        text,
     circumstances        text,
     fk_accident          integer NOT NULL,
