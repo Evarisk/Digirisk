@@ -100,7 +100,7 @@ if ($reshook < 0) {
 if (empty($reshook)) {
 	// Cancel
 	if ($cancel && !empty($backtopage)) {
-		header('Location: ' . $backtopage);
+		header('Location: ' . ($action == 'update' ? $_SERVER['PHP_SELF'] . '?id=' . $id : $backtopage));
 		exit;
 	}
 
@@ -119,10 +119,16 @@ if (empty($reshook)) {
 $title   = $langs->trans('AccidentInvestigation');
 $helpUrl = 'FR:Module_Digirisk#DigiRisk_-_Accident_b.C3.A9nins_et_presque_accidents';
 
+if ($conf->browser->layout == 'phone') {
+	$onPhone = 1;
+} else {
+	$onPhone = 0;
+}
+
 saturne_header(0,'', $title, $helpUrl);
 
 if ($action == 'create') {
-	print load_fiche_titre($langs->trans("NewAccidentInvestigation"), $backtopage, $object->picto);
+	print load_fiche_titre($langs->trans("NewAccidentInvestigation"), '', $object->picto);
 
 	print dol_get_fiche_head();
 
@@ -133,7 +139,7 @@ if ($action == 'create') {
 		print '<input type="hidden" name="backtopage" value="' . $backtopage . '">';
 	}
 
-	print '<table class="border centpercent tableforfieldcreate address-table">' . "\n";
+	print '<table class="border centpercent tableforfieldcreate">' . "\n";
 
 	// Common attributes
 	include DOL_DOCUMENT_ROOT.'/core/tpl/commonfields_add.tpl.php';
@@ -143,6 +149,28 @@ if ($action == 'create') {
 	print dol_get_fiche_end();
 
 	print $form->buttonsSaveCancel('Create');
+} else if ($id > 0 && $action == 'edit') {
+	print load_fiche_titre($langs->trans("UpdateAccidentInvestigation"), '', $object->picto);
+
+	print dol_get_fiche_head();
+
+	print '<form method="POST" action="' . $_SERVER['PHP_SELF'] . '?id=' . $id . '">';
+	print '<input type="hidden" name="token" value="' . newToken() . '">';
+	print '<input type="hidden" name="action" value="update">';
+	if ($backtopage) {
+		print '<input type="hidden" name="backtopage" value="' . $backtopage . '">';
+	}
+
+	print '<table class="border centpercent tableforfieldupdate">' . "\n";
+
+	// Common attributes
+	include DOL_DOCUMENT_ROOT.'/core/tpl/commonfields_edit.tpl.php';
+
+	print '</table></br>';
+
+	print dol_get_fiche_end();
+
+	print $form->buttonsSaveCancel('Update');
 } else if ($id > 0 || (!empty($ref) && empty($action))) {
 	$object->fetch($id);
 
@@ -164,8 +192,23 @@ if ($action == 'create') {
 
 	print '</table></div>';
 
+	print '<div class="clearboth"></div>';
+
 	if ($action != 'presend') {
+		print '<div class="tabsAction">';
+
+		// Edit
+		$displayButton = $onPhone ? '<i class="fas fa-pencil-alt fa-2x"></i>' : '<i class="fas fa-pencil-alt"></i>' . ' ' . $langs->trans('Update');
+		if ($object->status < $object::STATUS_LOCKED) {
+			print '<a class="butAction" id="actionButtonEdit" href="' . $_SERVER['PHP_SELF'] . '?id=' . $object->id . '&action=edit' . '">' . $displayButton . '</a>';
+		} else {
+			print '<span class="butActionRefused classfortooltip" title="' . dol_escape_htmltag($langs->trans('AccidentInvestigationMustBeOpen')) . '">' . $displayButton . '</span>';
+		}
+
+		print '</div>';
+
 		print '<div class="fichecenter"><div class="fichehalfleft">';
+
 		// Documents.
 		$objRef    = dol_sanitizeFileName($object->ref);
 		$dirFiles  = $object->element . 'document/' . $objRef;
