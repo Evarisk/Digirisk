@@ -191,6 +191,11 @@ class AccidentInvestigation extends SaturneObject
 	public $date_start;
 
 	/**
+	 * @var int|string Date investigation end.
+	 */
+	public $date_end;
+
+	/**
 	 * @var string|null Victim skills.
 	 */
 	public ?string $victim_skills = '';
