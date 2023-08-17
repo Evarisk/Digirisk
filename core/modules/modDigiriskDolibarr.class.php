@@ -1185,7 +1185,7 @@ class modDigiriskdolibarr extends DolibarrModules
 		$this->rights[$r][4] = 'accident';
 		$this->rights[$r][5] = 'delete';
 
-		/* ACCIDENT PERMISSIONS */
+		/* ACCIDENT INVESTIGATION PERMISSIONS */
 		$this->rights[$r][0] = $this->numero . $r;
 		$this->rights[$r][1] = $langs->trans('ReadAccidentInvestigation');
 		$this->rights[$r][4] = 'accident_investigation';
@@ -1466,12 +1466,12 @@ class modDigiriskdolibarr extends DolibarrModules
 			'type'     => 'left',			                // This is a Left menu entry
 			'titre'    => '<i class="fas fa-tasks pictofixedwidth" style="padding-right: 4px;"></i>' . $langs->transnoentities('AccidentInvestigation'),
 			'mainmenu' => 'digiriskdolibarr',
-			'leftmenu' => 'digiriskaccident',
+			'leftmenu' => 'digiriskaccidentinvestigation',
 			'url'      => '/digiriskdolibarr/view/accident_investigation/accident_investigation_list.php',
 			'langs'    => 'digiriskdolibarr@digiriskdolibarr',	        // Lang file to use (without .lang) by module. File must be in langs/code_CODE/ directory.
 			'position' => 48520 + $r,
 			'enabled'  => '$conf->digiriskdolibarr->enabled && $conf->saturne->enabled',  // Define condition to show or hide menu entry. Use '$conf->digiriskdolibarr->enabled' if entry must be visible if module is enabled. Use '$leftmenu==\'system\'' to show if leftmenu system is selected.
-			'perms'    => '$user->rights->digiriskdolibarr->lire', // Use 'perms'=>'$user->rights->digiriskdolibarr->level1->level2' if you want your menu with a permission rules
+			'perms'    => '$user->rights->digiriskdolibarr->lire && $user->rights->digiriskdolibarr->accident_investigation->read', // Use 'perms'=>'$user->rights->digiriskdolibarr->level1->level2' if you want your menu with a permission rules
 			'target'   => '',
 			'user'     => 0,				                // 0=Menu for internal users, 1=external users, 2=both
 		);
