@@ -124,11 +124,13 @@ class AccidentInvestigation extends SaturneObject
 		'date_start'           => ['type' => 'timestamp',    'label' => 'DateInvestigationStart', 'enabled' => 1, 'position' => 110, 'notnull' => 0, 'visible' => 4,],
 		'date_end'             => ['type' => 'timestamp',    'label' => 'DateInvestigationEnd',   'enabled' => 1, 'position' => 120, 'notnull' => 0, 'visible' => 4,],
 		'victim_skills'        => ['type' => 'text',         'label' => 'VictimSkills',           'enabled' => 1, 'position' => 130, 'notnull' => 0, 'visible' => -4,],
-		'circumstances'        => ['type' => 'text',         'label' => 'Circumstances',          'enabled' => 1, 'position' => 140, 'notnull' => 0, 'visible' => -4,],
-		'fk_accident'          => ['type' => 'integer:Accident:custom/digiriskdolibarr/class/accident/accident.class.php', 'label' => 'FkAccident', 'enabled' => 1, 'position' => 150, 'notnull' => 1, 'visible' => 1,],
-		'fk_task'              => ['type' => 'integer:Task:projet/class/task.class.php', 'label' => 'FkTask',     'picto' => 'Task', 'enabled' => 1, 'position' => 160, 'notnull' => 1, 'visible' => 4,  'noteditable' => 1],
-		'fk_user_creat'        => ['type' => 'integer:User:user/class/user.class.php',   'label' => 'UserAuthor', 'picto' => 'user', 'enabled' => 1, 'position' => 170, 'notnull' => 1, 'visible' => 0, 'foreignkey' => 'user.rowid'],
-		'fk_user_modif'        => ['type' => 'integer:User:user/class/user.class.php',   'label' => 'UserModif',  'picto' => 'user', 'enabled' => 1, 'position' => 180, 'notnull' => 0, 'visible' => 0, 'foreignkey' => 'user.rowid'],
+		'collective_equipment' => ['type' => 'text',         'label' => 'CollectiveEquipment',    'enabled' => 1, 'position' => 140, 'notnull' => 0, 'visible' => -4,],
+		'individual_equipment' => ['type' => 'text',         'label' => 'IndividualEquipment',    'enabled' => 1, 'position' => 150, 'notnull' => 0, 'visible' => -4,],
+		'circumstances'        => ['type' => 'text',         'label' => 'Circumstances',          'enabled' => 1, 'position' => 160, 'notnull' => 0, 'visible' => -4,],
+		'fk_accident'          => ['type' => 'integer:Accident:custom/digiriskdolibarr/class/accident/accident.class.php', 'label' => 'FkAccident', 'enabled' => 1, 'position' => 170, 'notnull' => 1, 'visible' => 1,],
+		'fk_task'              => ['type' => 'integer:Task:projet/class/task.class.php', 'label' => 'FkTask',     'picto' => 'Task', 'enabled' => 1, 'position' => 180, 'notnull' => 1, 'visible' => 4,  'noteditable' => 1],
+		'fk_user_creat'        => ['type' => 'integer:User:user/class/user.class.php',   'label' => 'UserAuthor', 'picto' => 'user', 'enabled' => 1, 'position' => 190, 'notnull' => 1, 'visible' => 0, 'foreignkey' => 'user.rowid'],
+		'fk_user_modif'        => ['type' => 'integer:User:user/class/user.class.php',   'label' => 'UserModif',  'picto' => 'user', 'enabled' => 1, 'position' => 200, 'notnull' => 0, 'visible' => 0, 'foreignkey' => 'user.rowid'],
 	];
 
 	/**
@@ -195,6 +197,16 @@ class AccidentInvestigation extends SaturneObject
 	 * @var string|null Victim skills.
 	 */
 	public ?string $victim_skills;
+
+	/**
+	 * @var string|null Collective Equipment.
+	 */
+	public ?string $collective_equipment;
+
+	/**
+	 * @var string|null Individual Equipment.
+	 */
+	public ?string $individual_equipment;
 
 	/**
 	 * @var string|null Circumstances.
