@@ -17,52 +17,31 @@
  */
 
 /**
- *  \file			core/modules/digiriskdolibarr/modules_accidentinvestigationdocument.php
- *  \ingroup		digiriskdolibarr
- *  \brief			File that contains parent class for digiriskelementdocuments document models
+ *  \file    core/modules/digiriskdolibarr/modules_accidentinvestigationdocument.php
+ *  \ingroup digiriskdolibarr
+ *  \brief   File that contains parent class for accident investigation document models
  */
 
-require_once DOL_DOCUMENT_ROOT . '/core/class/commondocgenerator.class.php';
-require_once DOL_DOCUMENT_ROOT . '/core/lib/admin.lib.php';
-require_once DOL_DOCUMENT_ROOT . '/categories/class/categorie.class.php';
+// Load Saturne libraries.
+require_once __DIR__ . '/../../../../../../saturne/core/modules/saturne/modules_saturne.php';
 
 /**
- *	Parent class for documents models
+ *	Parent class for accident investigation document models
  */
-abstract class ModeleODTAccidentInvestigationDocument extends CommonDocGenerator
+abstract class ModeleODTAccidentInvestigationDocument extends SaturneDocumentModel
 {
-
 	/**
-	 *  Function to build a document on disk using the generic odt module.
+	 * Return list of active generation modules.
 	 *
-	 * @param AccidentInvestigationDocument $object Object source to build document
-	 * @param Translate $outputlangs Lang output object
-	 * @param string $srctemplatepath Full path of source filename for generator using a template file
-	 * @param int $hidedetails Do not show line details
-	 * @param int $hidedesc Do not show desc
-	 * @param int $hideref Do not show ref
-	 * @param DigiriskElement $digiriskelement Object for get DigiriskElement info
-	 * @return    int                                             1 if OK, <=0 if KO
-	 * @throws    Exception
-	 */
-	public function write_file($object, $outputlangs, $srctemplatepath, $hidedetails, $hidedesc, $hideref, $digiriskelement)
-	{
-		return 0;
-	}
-
-	// phpcs:disable PEAR.NamingConventions.ValidFunctionName.ScopeNotCamelCaps
-	/**
-	 *  Return list of active generation modules
+	 * @param  DoliDB $db                Database handler.
+	 * @param  string $type              Document type.
+	 * @param  int    $maxfilenamelength Max length of value to show.
 	 *
-	 * @param  DoliDB $db                Database handler
-	 * @param  int    $maxfilenamelength Max length of value to show
-	 * @return array                     List of templates
+	 * @return array|int                 0 if no module is activated, or array(key=>label). For modules that need directory scan, key is completed with ":filename".
+	 * @throws Exception
 	 */
-	public static function liste_modeles($db, $maxfilenamelength = 0)
+	public static function liste_modeles(DoliDB $db, string $type, int $maxfilenamelength = 0): array
 	{
-		$type = 'accidentinvestigationdocument';
-
-		require_once __DIR__ . '/../../../../../lib/digiriskdolibarr_function.lib.php';
-		return getListOfModelsDigirisk($db, $type, $maxfilenamelength);
+		return parent::liste_modeles($db, 'accidentinvestigationdocument', $maxfilenamelength);
 	}
 }
