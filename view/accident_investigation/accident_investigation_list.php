@@ -16,12 +16,12 @@
  */
 
 /**
- *   	\file       view/accident/accident_investigation_list.php
- *		\ingroup    digiriskdolibarr
- *		\brief      Page to generate accident investigation document
+ *   	\file    view/accident/accident_investigation_list.php
+ *		\ingroup digiriskdolibarr
+ *		\brief   List page for accident investigation
  */
 
-// Load Digirisk environment
+// Load DigiriskDolibarr environment
 if (file_exists('../../digiriskdolibarr.main.inc.php')) {
 	require_once __DIR__ . '/../../digiriskdolibarr.main.inc.php';
 } elseif (file_exists('../../../digiriskdolibarr.main.inc.php')) {
@@ -33,11 +33,9 @@ if (file_exists('../../digiriskdolibarr.main.inc.php')) {
 // Load Dolibarr libraries
 require_once DOL_DOCUMENT_ROOT . '/core/class/html.formfile.class.php';
 
-// Load Digirisk librairies
-require_once __DIR__ . '/../../class/digiriskdocuments.class.php';
+// Load DigiriskDolibarr librairies
 require_once __DIR__ . '/../../class/accident.class.php';
 require_once __DIR__ . '/../../class/accident_investigation.class.php';
-require_once __DIR__ . '/../../class/digiriskstandard.class.php';
 require_once __DIR__ . '/../../lib/digiriskdolibarr_function.lib.php';
 require_once __DIR__ . '/../../lib/digiriskdolibarr_accident.lib.php';
 
@@ -88,8 +86,6 @@ $contact          = new Contact($db);
 $usertmp          = new User($db);
 $thirdparty       = new Societe($db);
 $extrafields      = new ExtraFields($db);
-$digiriskelement  = new DigiriskElement($db);
-$digiriskstandard = new DigiriskStandard($db);
 $project          = new Project($db);
 
 // Load object

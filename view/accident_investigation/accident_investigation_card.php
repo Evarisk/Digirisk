@@ -16,12 +16,12 @@
  */
 
 /**
- *  \file       view/accident_investigation.php
- *  \ingroup    digiriskdolibarr
- *  \brief      Tab of accident investigation on generic element
+ *  \file    view/accident_investigation.php
+ *  \ingroup digiriskdolibarr
+ *  \brief   Tab of accident investigation on generic element
  */
 
-// Load EasyCRM environment
+// Load DigiriskDolibarr environment
 if (file_exists('../../digiriskdolibarr.main.inc.php')) {
 	require_once __DIR__ . '/../../digiriskdolibarr.main.inc.php';
 } elseif (file_exists('../../../digiriskdolibarr.main.inc.php')) {
@@ -41,7 +41,7 @@ require_once DOL_DOCUMENT_ROOT . '/core/lib/project.lib.php';
 require_once DOL_DOCUMENT_ROOT . '/core/class/html.formcompany.class.php';
 require_once DOL_DOCUMENT_ROOT . '/core/modules/project/task/' . $taskRefClass . '.php';
 
-// Load Digirisk librairies
+// Load DigiriskDolibarr librairies
 require_once __DIR__ . '/../../class/accident.class.php';
 require_once __DIR__ . '/../../class/accident_investigation.class.php';
 require_once __DIR__ . '/../../class/digiriskdocuments/accidentinvestigationdocument.class.php';
@@ -51,14 +51,13 @@ require_once __DIR__ . '/../../lib/digiriskdolibarr_accident_investigation.lib.p
 saturne_load_langs();
 
 // Get parameters
-$id          = GETPOST('id', 'int');
-$fkAccident  = GETPOST('fk_accident', 'int');
-$objectType  = GETPOST('from_type', 'alpha');
-$ref         = GETPOST('ref', 'alpha');
-$action      = GETPOST('action', 'aZ09');
-$contextpage = GETPOST('contextpage', 'aZ') ? GETPOST('contextpage', 'aZ') : 'accidentinvestigationcard'; // To manage different context of search
-$cancel      = GETPOST('cancel', 'aZ09');
-$backtopage  = GETPOST('backtopage', 'alpha') ? GETPOST('backtopage', 'alpha') : 'accident_investigation_list.php';
+$id                  = GETPOST('id', 'int');
+$ref                 = GETPOST('ref', 'alpha');
+$action              = GETPOST('action', 'aZ09');
+$contextpage         = GETPOST('contextpage', 'aZ') ? GETPOST('contextpage', 'aZ') : 'accidentinvestigationcard'; // To manage different context of search
+$cancel              = GETPOST('cancel', 'aZ09');
+$backtopage          = GETPOST('backtopage', 'alpha');
+$backtopageforcancel = GETPOST('backtopageforcancel', 'alpha');
 
 // Initialize technical objects
 $accident   = new Accident($db);
@@ -72,7 +71,7 @@ $refTaskMod = new $taskRefClass();
 $form        = new Form($db);
 $formcompany = new FormCompany($db);
 
-$hookmanager->initHooks(['accidentinvestigation', 'accidentinvestigationcard', 'digiriskdolibarrglobal', 'globalcard']); // Note that conf->hooks_modules contains array
+$hookmanager->initHooks(['accidentinvestigationcard', 'digiriskdolibarrglobal', 'globalcard']); // Note that conf->hooks_modules contains array
 
 if (empty($action) && empty($id) && empty($ref)) {
 	$action = 'view';
@@ -100,18 +99,27 @@ if ($reshook < 0) {
 }
 
 if (empty($reshook)) {
-	// Cancel
-	if ($cancel && !empty($backtopage)) {
-		header('Location: ' . ($action == 'update' ? $_SERVER['PHP_SELF'] . '?id=' . $id : $backtopage));
-		exit;
+
+	$backurlforlist = dol_buildpath('/digiriskdolibarr/view/accident_investigation/accident_investigation_list.php', 1);
+
+	if (empty($backtopage) || ($cancel && empty($id))) {
+		if (empty($backtopage) || ($cancel && strpos($backtopage, '__ID__'))) {
+			if (empty($id) && (($action != 'add' && $action != 'create') || $cancel)) {
+				$backtopage = $backurlforlist;
+			} else {
+				$backtopage = dol_buildpath('/digiriskdolibarr/view/accident_investigation/accident_investigation_card.php', 1) . '?id=' . ((!empty($id) && $id > 0) ? $id : '__ID__');
+			}
+		}
 	}
 
 	// Actions cancel, add, update, update_extras, confirm_validate, confirm_delete, confirm_deleteline, confirm_clone, confirm_close, confirm_setdraft, confirm_reopen
-	include DOL_DOCUMENT_ROOT.'/core/actions_addupdatedelete.inc.php';
+	require_once DOL_DOCUMENT_ROOT . '/core/actions_addupdatedelete.inc.php';
 
 	// Actions builddoc, forcebuilddoc, remove_file.
 	require_once __DIR__ . '/../../../saturne/core/tpl/documents/documents_action.tpl.php';
 
+	// Action to generate pdf from odt file.
+	require_once __DIR__ . '/../../../saturne/core/tpl/documents/saturne_manual_pdf_generation_action.tpl.php';
 }
 
 /*
@@ -140,8 +148,11 @@ if ($action == 'create') {
 	if ($backtopage) {
 		print '<input type="hidden" name="backtopage" value="' . $backtopage . '">';
 	}
+	if ($backtopageforcancel) {
+		print '<input type="hidden" name="backtopageforcancel" value="'. $backtopageforcancel . '">';
+	}
 
-	print '<table class="border centpercent tableforfieldcreate">' . "\n";
+	print '<table class="border centpercent tableforfieldcreate">';
 
 	// Common attributes
 	include DOL_DOCUMENT_ROOT.'/core/tpl/commonfields_add.tpl.php';
@@ -162,11 +173,14 @@ if ($action == 'create') {
 	if ($backtopage) {
 		print '<input type="hidden" name="backtopage" value="' . $backtopage . '">';
 	}
+	if ($backtopageforcancel) {
+		print '<input type="hidden" name="backtopageforcancel" value="'. $backtopageforcancel . '">';
+	}
 
-	print '<table class="border centpercent tableforfieldupdate">' . "\n";
+	print '<table class="border centpercent tableforfieldupdate">';
 
 	// Common attributes
-	include DOL_DOCUMENT_ROOT.'/core/tpl/commonfields_edit.tpl.php';
+	include DOL_DOCUMENT_ROOT . '/core/tpl/commonfields_edit.tpl.php';
 
 	print '</table></br>';
 
@@ -177,20 +191,13 @@ if ($action == 'create') {
 	$object->fetch($id);
 
 	saturne_get_fiche_head($object, 'accidentinvestigation', $title);
-	saturne_banner_tab($object, 'ref', '', 1, 'ref', 'ref', '', !empty($object->photo));
+	saturne_banner_tab($object);
 
 	print '<div class="fichecenter">';
 	print '<div class="fichehalfleft">';
 	print '<table class="border centpercent tableforfield">';
 
 	require_once DOL_DOCUMENT_ROOT . '/core/tpl/commonfields_view.tpl.php';
-
-	// Categories.
-	if (isModEnabled('categorie')) {
-		print '<tr><td class="valignmiddle">' . $langs->trans('Categories') . '</td><td>';
-		print $form->showCategories($object->id, $object->element, 1);
-		print '</td></tr>';
-	}
 
 	print '</table></div>';
 
@@ -200,11 +207,11 @@ if ($action == 'create') {
 		print '<div class="tabsAction">';
 
 		// Edit
-		$displayButton = $onPhone ? '<i class="fas fa-pencil-alt fa-2x"></i>' : '<i class="fas fa-pencil-alt"></i>' . ' ' . $langs->trans('Update');
+		$displayButton = $onPhone ? '<i class="fas fa-edit fa-2x"></i>' : '<i class="fas fa-edit"></i>' . ' ' . $langs->trans('Modify');
 		if ($object->status < $object::STATUS_LOCKED) {
 			print '<a class="butAction" id="actionButtonEdit" href="' . $_SERVER['PHP_SELF'] . '?id=' . $object->id . '&action=edit' . '">' . $displayButton . '</a>';
 		} else {
-			print '<span class="butActionRefused classfortooltip" title="' . dol_escape_htmltag($langs->trans('AccidentInvestigationMustBeOpen')) . '">' . $displayButton . '</span>';
+			print '<span class="butActionRefused classfortooltip" title="' . dol_escape_htmltag($langs->trans('ObjectMustBeDraft', ucfirst($langs->transnoentities('The' . ucfirst($object->element))))) . '">' . $displayButton . '</span>';
 		}
 
 		print '</div>';

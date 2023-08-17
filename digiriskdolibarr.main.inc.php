@@ -21,8 +21,9 @@
  * \brief   File that defines environment for Saturne common functions
  */
 
-$moduleName = 'digiriskdolibarr';
+$moduleName          = 'digiriskdolibarr';
 $moduleNameLowerCase = strtolower($moduleName);
+$moduleNameUpperCase = strtoupper($moduleName);
 
 // Load Saturne environment
 if (file_exists(__DIR__ . '/../saturne/saturne.main.inc.php')) {
