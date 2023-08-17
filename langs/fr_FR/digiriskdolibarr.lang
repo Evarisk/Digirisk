@@ -728,7 +728,7 @@ ConfirmDeleteAccident = Êtes-vous sûr de vouloir supprimer l'accident ?
 AccidentInvestigation = Enquête Accident
 Accident_investigation = Enquête Accident
 AccidentInvestigationDocument = Document d'enquête accident
-accidentinvestigation.odt = Enquête accident
+accidentinvestigationdocument.odt = Enquête accident
 NewAccidentInvestigation = Nouvelle Enquête Accident
 AccidentInvestigationList = Liste des Enquêtes Accidents
 

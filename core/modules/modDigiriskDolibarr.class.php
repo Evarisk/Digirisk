@@ -451,6 +451,7 @@ class modDigiriskdolibarr extends DolibarrModules
 			"/ecm/digiriskdolibarr/listingrisksaction",
 			"/ecm/digiriskdolibarr/listingrisksphoto",
 			"/ecm/digiriskdolibarr/ticketdocument",
+			"/ecm/digiriskdolibarr/accidentinvestigationdocument",
 			"/ecm/digiriskdolibarr/medias"
 		);
 
@@ -830,16 +831,14 @@ class modDigiriskdolibarr extends DolibarrModules
 			$i++ => array('DIGIRISKDOLIBARR_AUTOMATIC_PDF_GENERATION', 'integer', 0, '', 0, 'current'),
 			$i++ => array('DIGIRISKDOLIBARR_MANUAL_PDF_GENERATION', 'integer', 0, '', 0, 'current'),
 
+			// CONST ACCIDENT INVESTIGATION
+			$i++ => array('DIGIRISKDOLIBARR_ACCIDENTINVESTIGATION_ADDON', 'chaine', 'mod_accident_investigation_standard', '', 0, 'current'),
+
 			// CONST ACCIDENT INVESTIGATION DOCUMENT
-			$i++ => array('DIGIRISKDOLIBARR_ACCIDENT_INVESTIGATION_ADDON', 'chaine', 'mod_accident_investigation_standard', '', 0, 'current'),
-			$i++ => array('DIGIRISKDOLIBARR_ACCIDENTINVESTIGATIONDOCUMENT_ADDON_ODT_PATH','chaine', 'DOL_DOCUMENT_ROOT/custom/digiriskdolibarr/documents/doctemplates/accident_investigation/', '', 0, 'current'),
-			$i++ => array('DIGIRISKDOLIBARR_ACCIDENTINVESTIGATIONDOCUMENT_CUSTOM_ADDON_ODT_PATH', 'chaine', 'DOL_DATA_ROOT/ecm/digiriskdolibarr/accident_investigation/', '', 0, 'current'),
-			$i++ => array('DIGIRISKDOLIBARR_ACCIDENTINVESTIGATION_DOCUMENT_DEFAULT_MODEL', 'chaine', 'template_accidentinvestigation_odt', '', 0, 'current'),
-			$i++ => array('DIGIRISKDOLIBARR_ACCIDENT_INVESTIGATION_ADDON', 'chaine', 'mod_accident_investigation_standard', '', 0, 'current'),
 			$i++ => array('DIGIRISKDOLIBARR_ACCIDENTINVESTIGATIONDOCUMENT_ADDON', 'chaine', 'mod_accident_investigation_document_standard', '', 0, 'current'),
-			$i++ => array('DIGIRISKDOLIBARR_ACCIDENTINVESTIGATIONDOCUMENT_ADDON_ODT_PATH','chaine', 'DOL_DOCUMENT_ROOT/custom/digiriskdolibarr/documents/doctemplates/accident_investigation/', '', 0, 'current'),
-			$i++ => array('DIGIRISKDOLIBARR_ACCIDENTINVESTIGATIONDOCUMENT_CUSTOM_ADDON_ODT_PATH', 'chaine', 'DOL_DATA_ROOT/ecm/digiriskdolibarr/accident_investigation/', '', 0, 'current'),
-			$i   => array('DIGIRISKDOLIBARR_ACCIDENTINVESTIGATION_DOCUMENT_DEFAULT_MODEL', 'chaine', 'template_accidentinvestigation_odt', '', 0, 'current')
+			$i++ => array('DIGIRISKDOLIBARR_ACCIDENTINVESTIGATIONDOCUMENT_ADDON_ODT_PATH','chaine', 'DOL_DOCUMENT_ROOT/custom/digiriskdolibarr/documents/doctemplates/accidentinvestigationdocument/', '', 0, 'current'),
+			$i++ => array('DIGIRISKDOLIBARR_ACCIDENTINVESTIGATIONDOCUMENT_CUSTOM_ADDON_ODT_PATH', 'chaine', 'DOL_DATA_ROOT' . (($conf->entity == 1 ) ? '/' : '/' . $conf->entity . '/') . 'ecm/digiriskdolibarr/accidentinvestigationdocument/', '', 0, 'current'),
+			$i   => array('DIGIRISKDOLIBARR_ACCIDENTINVESTIGATIONDOCUMENT_DEFAULT_MODEL', 'chaine', 'template_accidentinvestigationdocument_odt', '', 0, 'current')
 		);
 
 		if ( ! isset($conf->digiriskdolibarr) || ! isset($conf->digiriskdolibarr->enabled) ) {
