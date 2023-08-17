@@ -110,24 +110,27 @@ class AccidentInvestigation extends SaturneObject
 	* @var array  Array with all fields and their property. Do not use it as a static var. It may be modified by constructor.
 	*/
 	public $fields = [
-		'rowid'                => ['type' => 'integer',      'label' => 'TechnicalID',            'enabled' => 1, 'position' => 1,   'notnull' => 1, 'visible' => 0,  'noteditable' => 1, 'index' => 1, 'comment' => "Id"],
-		'ref'                  => ['type' => 'varchar(128)', 'label' => 'Ref',                    'enabled' => 1, 'position' => 10,  'notnull' => 1, 'visible' => 4,  'noteditable' => 1, 'default' => '(PROV)', 'index' => 1, 'searchall' => 1, 'showoncombobox' => 1, 'comment' => "Reference of object"],
+		'rowid'                => ['type' => 'integer',      'label' => 'TechnicalID',            'enabled' => 1, 'position' => 1,   'notnull' => 1, 'visible' => 0, 'noteditable' => 1, 'index' => 1, 'comment' => "Id"],
+		'ref'                  => ['type' => 'varchar(128)', 'label' => 'Ref',                    'enabled' => 1, 'position' => 10,  'notnull' => 1, 'visible' => 4, 'noteditable' => 1, 'default' => '(PROV)', 'index' => 1, 'searchall' => 1, 'showoncombobox' => 1, 'comment' => "Reference of object"],
 		'ref_ext'              => ['type' => 'varchar(128)', 'label' => 'RefExt',                 'enabled' => 1, 'position' => 20,  'notnull' => 0, 'visible' => 0,],
 		'entity'               => ['type' => 'integer',      'label' => 'Entity',                 'enabled' => 1, 'position' => 30,  'notnull' => 1, 'visible' => 0,],
 		'date_creation'        => ['type' => 'datetime',     'label' => 'DateCreation',           'enabled' => 1, 'position' => 40,  'notnull' => 1, 'visible' => 2,],
 		'tms'                  => ['type' => 'timestamp',    'label' => 'DateModification',       'enabled' => 1, 'position' => 50,  'notnull' => 0, 'visible' => 0,],
-		'import_key'           => ['type' => 'varchar(14)',  'label' => 'ImportId',               'enabled' => 1, 'position' => 60,  'notnull' => 0, 'visible' => 0,  'index' => 0],
+		'import_key'           => ['type' => 'varchar(14)',  'label' => 'ImportId',               'enabled' => 1, 'position' => 60,  'notnull' => 0, 'visible' => 0, 'index' => 0],
 		'status'               => ['type' => 'smallint',     'label' => 'Status',                 'enabled' => 1, 'position' => 70,  'notnull' => 1, 'visible' => 2, 'noteditable' => 1, 'default' => 0, 'index' => 0,],
 		'note_public'          => ['type' => 'html',         'label' => 'NotePublic',             'enabled' => 1, 'position' => 80,  'notnull' => 0, 'visible' => -1,],
 		'note_private'         => ['type' => 'html',         'label' => 'NotePrivate',            'enabled' => 1, 'position' => 90,  'notnull' => 0, 'visible' => 0,],
-		'seniority_in_company' => ['type' => 'integer',      'label' => 'SeniorityInCompany',     'enabled' => 1, 'position' => 110, 'notnull' => 0, 'visible' => 1,],
-		'date_start'           => ['type' => 'datetime',     'label' => 'DateInvestigationStart', 'enabled' => 1, 'position' => 110, 'notnull' => 0, 'visible' => 1,],
-		'victim_skills'        => ['type' => 'html',         'label' => 'VictimSkills',           'enabled' => 1, 'position' => 120, 'notnull' => 0, 'visible' => 1,],
-		'circumstances'        => ['type' => 'html',         'label' => 'Circumstances',          'enabled' => 1, 'position' => 130, 'notnull' => 0, 'visible' => 1,],
-		'fk_accident'          => ['type' => 'integer:Accident:custom/digiriskdolibarr/class/accident/accident.class.php', 'label' => 'RefAccident', 'enabled' => 1, 'position' => 11, 'notnull' => 1, 'visible' => 1,],
-		'fk_task'              => ['type' => 'integer:Task:projet/class/task.class.php', 'label' => 'Task',       'picto' => 'Task', 'enabled' => 1, 'position' => 140, 'notnull' => 1, 'visible' => 4,  'noteditable' => 1],
-		'fk_user_creat'        => ['type' => 'integer:User:user/class/user.class.php',   'label' => 'UserAuthor', 'picto' => 'user', 'enabled' => 1, 'position' => 160, 'notnull' => 1, 'visible' => 0, 'foreignkey' => 'user.rowid'],
-		'fk_user_modif'        => ['type' => 'integer:User:user/class/user.class.php',   'label' => 'UserModif',  'picto' => 'user', 'enabled' => 1, 'position' => 170, 'notnull' => 0, 'visible' => 0, 'foreignkey' => 'user.rowid'],
+		'seniority_in_company' => ['type' => 'integer',      'label' => 'SeniorityInCompany',     'enabled' => 1, 'position' => 100, 'notnull' => 0, 'visible' => 1,],
+		'date_start'           => ['type' => 'timestamp',    'label' => 'DateInvestigationStart', 'enabled' => 1, 'position' => 110, 'notnull' => 0, 'visible' => 1,],
+		'date_end'             => ['type' => 'timestamp',    'label' => 'DateInvestigationEnd',   'enabled' => 1, 'position' => 120, 'notnull' => 0, 'visible' => 1,],
+		'victim_skills'        => ['type' => 'text',         'label' => 'VictimSkills',           'enabled' => 1, 'position' => 130, 'notnull' => 0, 'visible' => 1,],
+		'collective_equipment' => ['type' => 'text',         'label' => 'CollectiveEquipment',    'enabled' => 1, 'position' => 140, 'notnull' => 0, 'visible' => 1,],
+		'individual_equipment' => ['type' => 'text',         'label' => 'IndividualEquipment',    'enabled' => 1, 'position' => 150, 'notnull' => 0, 'visible' => 1,],
+		'circumstances'        => ['type' => 'text',         'label' => 'Circumstances',          'enabled' => 1, 'position' => 160, 'notnull' => 0, 'visible' => 1,],
+		'fk_accident'          => ['type' => 'integer:Accident:custom/digiriskdolibarr/class/accident/accident.class.php', 'label' => 'FkAccident', 'enabled' => 1, 'position' => 170, 'notnull' => 1, 'visible' => 1,],
+		'fk_task'              => ['type' => 'integer:Task:projet/class/task.class.php', 'label' => 'FkTask',     'picto' => 'Task', 'enabled' => 1, 'position' => 180, 'notnull' => 1, 'visible' => 4,  'noteditable' => 1],
+		'fk_user_creat'        => ['type' => 'integer:User:user/class/user.class.php',   'label' => 'UserAuthor', 'picto' => 'user', 'enabled' => 1, 'position' => 190, 'notnull' => 1, 'visible' => 0, 'foreignkey' => 'user.rowid'],
+		'fk_user_modif'        => ['type' => 'integer:User:user/class/user.class.php',   'label' => 'UserModif',  'picto' => 'user', 'enabled' => 1, 'position' => 200, 'notnull' => 0, 'visible' => 0, 'foreignkey' => 'user.rowid'],
 	];
 
 	/**
@@ -199,6 +202,16 @@ class AccidentInvestigation extends SaturneObject
 	 * @var string|null Victim skills.
 	 */
 	public ?string $victim_skills = '';
+
+	/**
+	 * @var string|null Collective Equipment.
+	 */
+	public ?string $collective_equipment;
+
+	/**
+	 * @var string|null Individual Equipment.
+	 */
+	public ?string $individual_equipment;
 
 	/**
 	 * @var string|null Circumstances.
