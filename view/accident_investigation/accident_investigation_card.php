@@ -44,6 +44,7 @@ require_once DOL_DOCUMENT_ROOT . '/core/modules/project/task/' . $taskRefClass .
 // Load Digirisk librairies
 require_once __DIR__ . '/../../class/accident.class.php';
 require_once __DIR__ . '/../../class/accident_investigation.class.php';
+require_once __DIR__ . '/../../class/digiriskdocuments/accidentinvestigationdocument.class.php';
 require_once __DIR__ . '/../../lib/digiriskdolibarr_accident_investigation.lib.php';
 
 // Load translation files required by the page
@@ -62,6 +63,7 @@ $backtopage  = GETPOST('backtopage', 'alpha') ? GETPOST('backtopage', 'alpha') :
 // Initialize technical objects
 $accident   = new Accident($db);
 $object     = new AccidentInvestigation($db);
+$document   = new AccidentInvestigationDocument($db);
 $project    = new Project($db);
 $task       = new Task($db);
 $refTaskMod = new $taskRefClass();
@@ -76,7 +78,7 @@ if (empty($action) && empty($id) && empty($ref)) {
 	$action = 'view';
 }
 
-$uploadDir = $conf->digiriskdolibarr->multidir_output[$object->entity ?? 1];
+$upload_dir = $conf->digiriskdolibarr->multidir_output[$object->entity ?? 1];
 
 // Load object
 require_once DOL_DOCUMENT_ROOT . '/core/actions_fetchobject.inc.php'; // Must be included, not include_once.
@@ -212,10 +214,10 @@ if ($action == 'create') {
 		// Documents.
 		$objRef    = dol_sanitizeFileName($object->ref);
 		$dirFiles  = $object->element . 'document/' . $objRef;
-		$fileDir   = $uploadDir . '/' . $dirFiles;
+		$fileDir   = $upload_dir . '/' . $dirFiles;
 		$urlSource = $_SERVER['PHP_SELF'] . '?id=' . $object->id;
 
-		print saturne_show_documents('digiriskdolibarr:AccidentInvestigationDocument', $dirFiles, $fileDir, $urlSource, $permissiontoadd, $permissiontodelete, $conf->global->DIGIRISKDOLIBARR_ACCIDENTINVESTIGATION_DOCUMENT_DEFAULT_MODEL, 1, 0, 0, 0, 0, '', '', '', $langs->defaultlang, $object, 0, 'remove_file', empty(dol_dir_list($fileDir)), $langs->trans('ObjectMustBeLockedToGenerate', ucfirst($langs->transnoentities('The' . ucfirst($object->element)))));
+		print saturne_show_documents('digiriskdolibarr:AccidentInvestigationDocument', $dirFiles, $fileDir, $urlSource, $permissiontoadd, $permissiontodelete, $conf->global->DIGIRISKDOLIBARR_ACCIDENTINVESTIGATION_DOCUMENT_DEFAULT_MODEL, 1, 0, 0, 0, 0, '', '', '', $langs->defaultlang, $object);
 
 		print '</div><div class="fichehalfright">';
 
