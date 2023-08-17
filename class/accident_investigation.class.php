@@ -116,17 +116,17 @@ class AccidentInvestigation extends SaturneObject
 		'entity'               => ['type' => 'integer',      'label' => 'Entity',                 'enabled' => 1, 'position' => 30,  'notnull' => 1, 'visible' => 0,],
 		'date_creation'        => ['type' => 'datetime',     'label' => 'DateCreation',           'enabled' => 1, 'position' => 40,  'notnull' => 1, 'visible' => 2,],
 		'tms'                  => ['type' => 'timestamp',    'label' => 'DateModification',       'enabled' => 1, 'position' => 50,  'notnull' => 0, 'visible' => 0,],
-		'import_key'           => ['type' => 'varchar(14)',  'label' => 'ImportId',               'enabled' => 1, 'position' => 60,  'notnull' => 0, 'visible' => 0,  'index' => 0],
-		'status'               => ['type' => 'smallint',     'label' => 'Status',                 'enabled' => 1, 'position' => 70,  'notnull' => 1, 'visible' => -5, 'noteditable' => 1, 'default' => 0, 'index' => 0,],
-		'note_public'          => ['type' => 'html',         'label' => 'NotePublic',             'enabled' => 1, 'position' => 80,  'notnull' => 0, 'visible' => -4,],
-		'note_private'         => ['type' => 'html',         'label' => 'NotePrivate',            'enabled' => 1, 'position' => 90,  'notnull' => 0, 'visible' => -4,],
-		'seniority_in_company' => ['type' => 'integer',      'label' => 'SeniorityInCompany',     'enabled' => 1, 'position' => 100, 'notnull' => 0, 'visible' => 4,],
-		'date_start'           => ['type' => 'timestamp',    'label' => 'DateInvestigationStart', 'enabled' => 1, 'position' => 110, 'notnull' => 0, 'visible' => 4,],
-		'date_end'             => ['type' => 'timestamp',    'label' => 'DateInvestigationEnd',   'enabled' => 1, 'position' => 120, 'notnull' => 0, 'visible' => 4,],
-		'victim_skills'        => ['type' => 'text',         'label' => 'VictimSkills',           'enabled' => 1, 'position' => 130, 'notnull' => 0, 'visible' => -4,],
-		'collective_equipment' => ['type' => 'text',         'label' => 'CollectiveEquipment',    'enabled' => 1, 'position' => 140, 'notnull' => 0, 'visible' => -4,],
-		'individual_equipment' => ['type' => 'text',         'label' => 'IndividualEquipment',    'enabled' => 1, 'position' => 150, 'notnull' => 0, 'visible' => -4,],
-		'circumstances'        => ['type' => 'text',         'label' => 'Circumstances',          'enabled' => 1, 'position' => 160, 'notnull' => 0, 'visible' => -4,],
+		'import_key'           => ['type' => 'varchar(14)',  'label' => 'ImportId',               'enabled' => 1, 'position' => 60,  'notnull' => 0, 'visible' => 0, 'index' => 0],
+		'status'               => ['type' => 'smallint',     'label' => 'Status',                 'enabled' => 1, 'position' => 70,  'notnull' => 1, 'visible' => 2, 'noteditable' => 1, 'default' => 0, 'index' => 0,],
+		'note_public'          => ['type' => 'html',         'label' => 'NotePublic',             'enabled' => 1, 'position' => 80,  'notnull' => 0, 'visible' => -1,],
+		'note_private'         => ['type' => 'html',         'label' => 'NotePrivate',            'enabled' => 1, 'position' => 90,  'notnull' => 0, 'visible' => 0,],
+		'seniority_in_company' => ['type' => 'integer',      'label' => 'SeniorityInCompany',     'enabled' => 1, 'position' => 100, 'notnull' => 0, 'visible' => 1,],
+		'date_start'           => ['type' => 'timestamp',    'label' => 'DateInvestigationStart', 'enabled' => 1, 'position' => 110, 'notnull' => 0, 'visible' => 1,],
+		'date_end'             => ['type' => 'timestamp',    'label' => 'DateInvestigationEnd',   'enabled' => 1, 'position' => 120, 'notnull' => 0, 'visible' => 1,],
+		'victim_skills'        => ['type' => 'text',         'label' => 'VictimSkills',           'enabled' => 1, 'position' => 130, 'notnull' => 0, 'visible' => 1,],
+		'collective_equipment' => ['type' => 'text',         'label' => 'CollectiveEquipment',    'enabled' => 1, 'position' => 140, 'notnull' => 0, 'visible' => 1,],
+		'individual_equipment' => ['type' => 'text',         'label' => 'IndividualEquipment',    'enabled' => 1, 'position' => 150, 'notnull' => 0, 'visible' => 1,],
+		'circumstances'        => ['type' => 'text',         'label' => 'Circumstances',          'enabled' => 1, 'position' => 160, 'notnull' => 0, 'visible' => 1,],
 		'fk_accident'          => ['type' => 'integer:Accident:custom/digiriskdolibarr/class/accident/accident.class.php', 'label' => 'FkAccident', 'enabled' => 1, 'position' => 170, 'notnull' => 1, 'visible' => 1,],
 		'fk_task'              => ['type' => 'integer:Task:projet/class/task.class.php', 'label' => 'FkTask',     'picto' => 'Task', 'enabled' => 1, 'position' => 180, 'notnull' => 1, 'visible' => 4,  'noteditable' => 1],
 		'fk_user_creat'        => ['type' => 'integer:User:user/class/user.class.php',   'label' => 'UserAuthor', 'picto' => 'user', 'enabled' => 1, 'position' => 190, 'notnull' => 1, 'visible' => 0, 'foreignkey' => 'user.rowid'],
@@ -194,9 +194,14 @@ class AccidentInvestigation extends SaturneObject
 	public $date_start;
 
 	/**
+	 * @var int|string Date investigation end.
+	 */
+	public $date_end;
+
+	/**
 	 * @var string|null Victim skills.
 	 */
-	public ?string $victim_skills;
+	public ?string $victim_skills = '';
 
 	/**
 	 * @var string|null Collective Equipment.
@@ -211,7 +216,7 @@ class AccidentInvestigation extends SaturneObject
 	/**
 	 * @var string|null Circumstances.
 	 */
-	public ?string $circumstances;
+	public ?string $circumstances = '';
 
 	/**
 	 * @var int Task ID.
