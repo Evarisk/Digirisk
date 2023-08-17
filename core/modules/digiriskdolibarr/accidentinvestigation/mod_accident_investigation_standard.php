@@ -19,7 +19,7 @@
 /**
  *  \file    core/modules/digiriskdolibarr/address/mod_accident_investigation_standard.php
  *  \ingroup digiriskdolibarr
- *  \brief   File of class to manage address numbering rules standard.
+ *  \brief   File of class to manage accident investigation numbering rules standard.
  */
 
 // Load Saturne libraries.

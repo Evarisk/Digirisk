@@ -18,17 +18,17 @@
 /**
  * \file    lib/digiriskdolibarr_accident_investigation.lib.php
  * \ingroup digiriskdolibarr
- * \brief   Library files with common functions for Accident
+ * \brief   Library files with common functions for Accident investigation
  */
 
 /**
  * Prepare array of tabs for Accident investigation
  *
- * @param  AccidentInvestigation $object Accident
+ * @param  AccidentInvestigation $object Accident investigation
  * @return array                         Array of tabs
  * @throws Exception
  */
 function accident_investigation_prepare_head(AccidentInvestigation $object): array
 {
-	return saturne_object_prepare_head($object);
+	return saturne_object_prepare_head($object, [], [], true);
 }
