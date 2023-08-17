@@ -184,9 +184,9 @@ class AccidentInvestigation extends SaturneObject
 	public $note_private;
 
 	/**
-	 * @var int Seniority in company.
+	 * @var int|string Seniority in company.
 	 */
-	public int $seniority_in_company;
+	public $seniority_in_company;
 
 	/**
 	 * @var int|string Date investigation start.
