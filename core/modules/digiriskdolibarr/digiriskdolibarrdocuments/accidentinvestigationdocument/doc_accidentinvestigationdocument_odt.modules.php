@@ -92,6 +92,8 @@ class doc_accidentinvestigationdocument_odt extends ModeleODTAccidentInvestigati
 	 */
 	public function write_file(SaturneDocuments $objectDocument, Translate $outputLangs, string $srcTemplatePath, int $hideDetails = 0, int $hideDesc = 0, int $hideRef = 0, array $moreParam): int
 	{
+		require_once __DIR__ . '/../../../../../../saturne/class/task/saturnetask.class.php';
+
 		global $conf, $db, $langs;
 
 		$object           = $moreParam['object'];
@@ -99,10 +101,25 @@ class doc_accidentinvestigationdocument_odt extends ModeleODTAccidentInvestigati
 		$accidentMetadata = new AccidentMetaData($db);
 		$victim           = new User($db);
 		$tmpArray         = [];
+		$totalBudget      = 0;
 
 		$accident->fetch($object->fk_accident);
 		$accidentMetadata->fetch(0, '', 'AND status = 1 AND fk_accident = ' . $accident->id);
 		$victim->fetch($accident->fk_user_victim);
+
+		$curativeActionTask   = saturne_fetch_all_object_type('SaturneTask', '', '', 0, 0, ['customsql' => 'fk_task_parent = ' . $object->fk_task . ') AND (label LIKE "%- T1 -%"']);
+		$curativeActionTask   = array_pop($curativeActionTask);
+		$preventiveActionTask = saturne_fetch_all_object_type('SaturneTask', '', '', 0, 0, ['customsql' => 'fk_task_parent = ' . $object->fk_task . ') AND (label LIKE "%- T2 -%"']);
+		$preventiveActionTask = array_pop($preventiveActionTask);
+		$totalCATask          = $curativeActionTask->hasChildren();
+		$totalPATask          = $preventiveActionTask->hasChildren();
+		$totalBudget          = getRecursiveTaskBudget($object->fk_task);
+
+		$tmpArray['investigation_date_start'] = dol_print_date($object->date_start, 'dayhour');
+		$tmpArray['investigation_date_end']   = dol_print_date($object->date_end, 'dayhour');
+		$tmpArray['total_curative_action']    = $totalCATask > 0 ? $totalCATask :$langs->trans('None');
+		$tmpArray['total_preventive_action']  = $totalPATask > 0 ? $totalPATask : $langs->trans('None');
+		$tmpArray['total_planned_budget']   = price($totalBudget,0, '', 1, -1, -1, 'auto');
 
 		$tmpArray['mycompany_name']    = $conf->global->MAIN_INFO_SOCIETE_NOM;
 		$tmpArray['mycompany_siret']   = $conf->global->MAIN_INFO_SIRET;
@@ -118,7 +135,8 @@ class doc_accidentinvestigationdocument_odt extends ModeleODTAccidentInvestigati
 
 		$tmpArray['victim_lastname']        = $victim->lastname;
 		$tmpArray['victim_firstname']       = $victim->firstname;
-		$tmpArray['victim_date_employment'] = $victim->dateemployment;
+		$tmpArray['seniority_at_post']      = $object->seniority_at_post . ' ' . ($object->seniority_at_post <= 1 ? $langs->trans('Day') : $langs->trans('Days'));
+		$tmpArray['victim_date_employment'] = dol_print_date($victim->dateemployment, 'day');
 
 		$tmpArray['accident_date'] = dol_print_date($accident->accident_date, 'day');
 		$tmpArray['accident_hour'] = dol_print_date($accident->accident_date, 'hour');
@@ -128,25 +146,23 @@ class doc_accidentinvestigationdocument_odt extends ModeleODTAccidentInvestigati
 			if ($accident->fk_element > 0) {
 				$element = new DigiriskElement($db);
 				$element->fetch($accident->fk_element);
+				$tmpArray['gp_ut'] = $element->ref . ' - ' . $element->label;
 			} else {
 				$element = new DigiriskStandard($db);
 				$element->fetch($accident->fk_standard);
+				$tmpArray['gp_ut'] = $element->ref . ' - ' . $conf->global->MAIN_INFO_SOCIETE_NOM;
 			}
-			$tmpArray['gp_ut'] = $element->getNomUrl(0, 'nolink', 1);
 		} else if ($accident->external_accident == 2) {
 			$societe = new Societe($db);
 			$societe->fetch($accident->fk_soc);
-			$tmpArray['gp_ut'] = $societe->getNomUrl(0, 'nolink');
+			$tmpArray['gp_ut'] = $societe->name;
 		} else {
 			$tmpArray['gp_ut'] = $accident->accident_location;
 		}
 
-		$tmpArray['investigation_date_start'] = dol_print_date($object->date_start, 'dayhour');
-		$tmpArray['investigation_date_end']   = dol_print_date($object->date_end, 'dayhour');
-
 		$tmpArray['victim_skills']        = $object->victim_skills;
-		$tmpArray['collective_equipment'] = $object->victim_skills;
-		$tmpArray['individual_equipment'] = $object->victim_skills;
+		$tmpArray['collective_equipment'] = $object->collective_equipment;
+		$tmpArray['individual_equipment'] = $object->individual_equipment;
 		$tmpArray['circumstances']        = $object->circumstances;
 		$tmpArray['public_note']          = $object->note_public;
 
