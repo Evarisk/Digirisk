@@ -75,6 +75,11 @@ function digiriskdolibarrAdminPrepareHead()
 	$head[$h][2] = 'digirisksignature';
 	$h++;
 
+	$head[$h][0] = dol_buildpath("/digiriskdolibarr/admin/config/event.php", 1);
+	$head[$h][1] = '<i class="fas fa-calendar-alt"></i>  ' . $langs->trans("Events");
+	$head[$h][2] = 'event';
+	$h++;
+
 	$head[$h][0] = dol_buildpath("/digiriskdolibarr/admin/setup.php", 1);
 	$head[$h][1] = '<i class="fas fa-cog"></i>  ' . $langs->trans("Settings");
 	$head[$h][2] = 'settings';

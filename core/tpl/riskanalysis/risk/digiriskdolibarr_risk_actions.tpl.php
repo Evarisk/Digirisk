@@ -83,7 +83,7 @@ if ( ! $error && $action == 'add' && $permissiontoadd) {
 				}
 			}
 
-			$result2 = $evaluation->create($user, true);
+			$result2 = $evaluation->create($user, false);
 
 			if ($result2 > 0) {
 				$tasktitle = $data['task'];
@@ -119,6 +119,7 @@ if ( ! $error && $action == 'add' && $permissiontoadd) {
 					$result3 = $task->create($user, true);
 
 					if ($result3 > 0) {
+						if (!empty($conf->global->DIGIRISKDOLIBARR_MAIN_AGENDA_ACTIONAUTO_TASK_CREATE)) $task->call_trigger('TASK_CREATE', $user);
 						// Creation risk + evaluation + task OK
 						$urltogo = str_replace('__ID__', $result3, $backtopage);
 						$urltogo = preg_replace('/--IDFORBACKTOPAGE--/', $id, $urltogo); // New method to autoselect project after a New on another form object creation
@@ -433,6 +434,7 @@ if ( ! $error && $action == 'addRiskAssessmentTask' && $permissiontoadd) {
 	$result = $task->create($user, true);
 
 	if ($result > 0) {
+		if (!empty($conf->global->DIGIRISKDOLIBARR_MAIN_AGENDA_ACTIONAUTO_TASK_CREATE)) $task->call_trigger('TASK_CREATE', $user);
 		// Creation task OK
 		$urltogo = str_replace('__ID__', $result, $backtopage);
 		$urltogo = preg_replace('/--IDFORBACKTOPAGE--/', $id, $urltogo); // New method to autoselect project after a New on another form object creation
@@ -483,7 +485,7 @@ if ( ! $error && $action == 'saveRiskAssessmentTask' && $permissiontoadd) {
 		$task->progress = 0;
 	}
 
-	$result = $task->update($user, true);
+	$result = $task->update($user, empty($conf->global->DIGIRISKDOLIBARR_MAIN_AGENDA_ACTIONAUTO_TASK_MODIFY));
 
 	if ($result > 0) {
 		// Update task OK
@@ -503,7 +505,7 @@ if ( ! $error && $action == "deleteRiskAssessmentTask" && $permissiontodelete) {
 
 	$task->fetch($deleteRiskAssessmentTaskId);
 
-	$result = $task->delete($user, true);
+	$result = $task->delete($user, empty($conf->global->DIGIRISKDOLIBARR_MAIN_AGENDA_ACTIONAUTO_TASK_DELETE));
 
 	if ($result > 0) {
 		// Delete task OK
@@ -541,7 +543,7 @@ if ( ! $error && $action == 'addRiskAssessmentTaskTimeSpent' && $permissiontoadd
 	$task->timespent_duration = $duration * 60;
 	$task->timespent_fk_user  = $user->id;
 
-	$result = $task->addTimeSpent($user, false);
+	$result = $task->addTimeSpent($user, empty($conf->global->DIGIRISKDOLIBARR_MAIN_AGENDA_ACTIONAUTO_TASK_TIMESPENT_CREATE));
 
 	if ($result > 0) {
 		// Creation task time spent OK
@@ -559,6 +561,7 @@ if ( ! $error && $action == 'addRiskAssessmentTaskTimeSpent' && $permissiontoadd
 if ( ! $error && $action == 'saveRiskAssessmentTaskTimeSpent' && $permissiontoadd) {
 	$data = json_decode(file_get_contents('php://input'), true);
 
+	$taskID 					   = $data['taskID'];
 	$riskAssessmentTaskTimeSpentID = $data['riskAssessmentTaskTimeSpentID'];
 	$date                          = $data['date'];
 	$hour                          = $data['hour'];
@@ -567,6 +570,7 @@ if ( ! $error && $action == 'saveRiskAssessmentTaskTimeSpent' && $permissiontoad
 	$duration                      = $data['duration'];
 
 	$task->fetchTimeSpent($riskAssessmentTaskTimeSpentID);
+	$task->fetch($taskID);
 
 	if (!empty($date)) {
 		$task->timespent_datehour = strtotime(preg_replace('/\//', '-', $date));
@@ -576,7 +580,7 @@ if ( ! $error && $action == 'saveRiskAssessmentTaskTimeSpent' && $permissiontoad
 	$task->timespent_note     =  $comment;
 	$task->timespent_duration = $duration * 60;
 
-	$result = $task->updateTimeSpent($user, false);
+	$result = $task->updateTimeSpent($user, empty($conf->global->DIGIRISKDOLIBARR_MAIN_AGENDA_ACTIONAUTO_TASK_TIMESPENT_MODIFY));
 
 	if ($result > 0) {
 		// Update task time spent OK
@@ -595,6 +599,7 @@ if ( ! $error && $action == "deleteRiskAssessmentTaskTimeSpent" && $permissionto
 	$deleteRiskAssessmentTaskTimeSpentId = GETPOST('deletedRiskAssessmentTaskTimeSpentId');
 
 	$task->fetchTimeSpent($deleteRiskAssessmentTaskTimeSpentId);
+	$task->fetch($task->id);
 
 	$result = $task->delTimeSpent($user, false);
 
@@ -625,7 +630,7 @@ if ( ! $error && $action == 'checkTaskProgress' && $permissiontoadd) {
 		$task->progress = 0;
 	}
 
-	$result = $task->update($user, true);
+	$result = $task->update($user, empty($conf->global->DIGIRISKDOLIBARR_MAIN_AGENDA_ACTIONAUTO_TASK_TIMESPENT_DELETE));
 
 	if ($result > 0) {
 		// Update task OK
@@ -782,7 +787,9 @@ if ($action == 'confirm_import_shared_risks' && $confirm == 'yes') {
 				$object->element = 'digiriskdolibarr_' . $digiriskelementtmp->element;
 				$result = $object->add_object_linked('digiriskdolibarr_' . $risk->element, $risks->id);
 				if ($result > 0) {
-					setEventMessages($langs->trans('SharedRiskImportWithSuccess'), array());
+					$risks->applied_on = $object->id;
+					$risks->call_trigger('RISK_IMPORT', $user);
+					continue;
 				} else {
 					setEventMessages($object->error, $object->errors, 'errors');
 					$action = '';
@@ -812,6 +819,8 @@ if (! $error && $action == 'unlinkSharedRisk' && $permissiontodelete) {
 
 	if ($result > 0) {
 		// Unlink shared risk OK
+		$risk->applied_on = $object->id;
+		$risk->call_trigger('RISK_UNLINK', $user);
 		$urltogo = str_replace('__ID__', $object->id, $backtopage);
 		$urltogo = preg_replace('/--IDFORBACKTOPAGE--/', $id, $urltogo); // New method to autoselect project after a New on another form object creation
 		header("Location: " . $urltogo);

@@ -514,12 +514,12 @@ class ActionsDigiriskdolibarr
 			}
 		}
 
-		if (true) {
+		if (!$error) {
 			$this->results   = array('myreturn' => 999);
 			$this->resprints = 'A text to show';
 			return 0; // or return 1 to replace standard code
 		} else {
-			$this->errors[] = 'Error message';
+			$this->errors = $errors;
 			return -1;
 		}
 	}
