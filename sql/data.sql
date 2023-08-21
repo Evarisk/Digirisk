@@ -882,3 +882,6 @@ INSERT INTO `llx_c_conventions_collectives` (`rowid`, `entity`, `tms`, `code`, `
 INSERT INTO `llx_c_conventions_collectives` (`rowid`, `entity`, `tms`, `code`, `libelle`, `description`, `tracking`, `active`, `module`) VALUES(773, 0, '2021-01-22 09:27:09', '9998', 'Convention non encore en vigueur ', 'Convention non encore en vigueur ', '1', 1, NULL);
 INSERT INTO `llx_c_conventions_collectives` (`rowid`, `entity`, `tms`, `code`, `libelle`, `description`, `tracking`, `active`, `module`) VALUES(774, 0, '2021-01-22 09:27:09', '9999', 'Sans convention collectives', 'Sans convention collectives', '1', 1, NULL);
 
+INSERT INTO `llx_c_accident_investigation_attendants_role` (`rowid`, `entity`, `ref`, `label`, `description`, `active`, `position`) VALUES(1, 0, 'Witness', 'Witness', '', 1, 1);
+INSERT INTO `llx_c_accident_investigation_attendants_role` (`rowid`, `entity`, `ref`, `label`, `description`, `active`, `position`) VALUES(2, 0, 'Investigator', 'Investigator', '', 1, 10);
+INSERT INTO `llx_c_accident_investigation_attendants_role` (`rowid`, `entity`, `ref`, `label`, `description`, `active`, `position`) VALUES(3, 0, 'Rescuer', 'Rescuer', '', 1, 20);
