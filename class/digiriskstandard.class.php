@@ -198,7 +198,7 @@ class DigiriskStandard extends CommonObject
 		if ($option != 'nolink') {
 			$linkstart  = '<a href="' . $url . '"';
 			$linkstart .= $linkclose . '>';
-			$linkend 	= '</a>';
+			$linkend    = '</a>';
 		}
 
 		$result                      .= $linkstart;
