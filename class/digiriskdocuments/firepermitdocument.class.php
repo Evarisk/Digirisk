@@ -280,7 +280,7 @@ class FirePermitDocument extends DigiriskDocuments
 				$json['FirePermit']['risk'][$line->id]['unite_travail'] = $digiriskelement->ref . " - " . $digiriskelement->label;
 				$json['FirePermit']['risk'][$line->id]['description']   = $line->description;
 				$json['FirePermit']['risk'][$line->id]['name']          = $risk->get_fire_permit_danger_category_name($line);
-				$json['FirePermit']['risk'][$line->id]['use_equipment'] = $line->use_equipment;
+				$json['FirePermit']['risk'][$line->id]['used_equipment'] = $line->used_equipment;
 			}
 		}
 		return json_encode($json, JSON_UNESCAPED_UNICODE);

@@ -431,7 +431,7 @@ abstract class ModeleODTFirePermitDocument extends CommonDocGenerator
 							$tmparray['action']          = $line->description;
 							$tmparray['type_de_travaux'] = DOL_DOCUMENT_ROOT . '/custom/digiriskdolibarr/img/typeDeTravaux/' . $risk->get_fire_permit_danger_category($line) . '.png';
 							$tmparray['nomPictoT']       = (!empty($conf->global->DIGIRISKDOLIBARR_DOCUMENT_SHOW_PICTO_NAME) ? $risk->get_fire_permit_danger_category_name($line) : ' ');
-							$tmparray['materiel']        = $line->use_equipment;
+							$tmparray['materiel']        = $line->used_equipment;
 
 							foreach ($tmparray as $key => $val) {
 								try {
