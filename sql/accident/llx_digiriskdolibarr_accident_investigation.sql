@@ -33,6 +33,7 @@ CREATE TABLE llx_digiriskdolibarr_accident_investigation(
     collective_equipment text,
     individual_equipment text,
     circumstances        text,
+    causality_tree       text,
     fk_accident          integer NOT NULL,
     fk_task              integer,
     fk_user_creat        integer NOT NULL,

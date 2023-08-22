@@ -40,6 +40,7 @@ require_once DOL_DOCUMENT_ROOT . '/core/lib/company.lib.php';
 require_once DOL_DOCUMENT_ROOT . '/core/lib/project.lib.php';
 require_once DOL_DOCUMENT_ROOT . '/core/class/html.formcompany.class.php';
 require_once DOL_DOCUMENT_ROOT . '/core/modules/project/task/' . $taskRefClass . '.php';
+require_once DOL_DOCUMENT_ROOT . '/core/lib/images.lib.php';
 
 // Load DigiriskDolibarr librairies
 require_once __DIR__ . '/../../class/accident.class.php';
@@ -54,6 +55,7 @@ saturne_load_langs();
 $id                  = GETPOST('id', 'int');
 $ref                 = GETPOST('ref', 'alpha');
 $action              = GETPOST('action', 'aZ09');
+$subaction           = GETPOST('subaction', 'aZ09');
 $contextpage         = GETPOST('contextpage', 'aZ') ? GETPOST('contextpage', 'aZ') : 'accidentinvestigationcard'; // To manage different context of search
 $cancel              = GETPOST('cancel', 'aZ09');
 $backtopage          = GETPOST('backtopage', 'alpha');
@@ -154,6 +156,8 @@ if (empty($reshook)) {
 		} else {
 			setEventMessages($object->error, [], 'errors');
 		}
+		header('Location: ' . $_SERVER["PHP_SELF"] . '?id=' . $id);
+		exit();
 	}
 
 	if ($action == 'confirm_set_draft') {
@@ -164,6 +168,8 @@ if (empty($reshook)) {
 		} else {
 			setEventMessages($object->error, [], 'errors');
 		}
+		header('Location: ' . $_SERVER["PHP_SELF"] . '?id=' . $id);
+		exit();
 	}
 
 	if ($action == 'confirm_set_lock') {
@@ -174,6 +180,8 @@ if (empty($reshook)) {
 		} else {
 			setEventMessages($object->error, [], 'errors');
 		}
+		header('Location: ' . $_SERVER["PHP_SELF"] . '?id=' . $id);
+		exit();
 	}
 
 	if ($action == 'confirm_set_archive') {
@@ -184,6 +192,8 @@ if (empty($reshook)) {
 		} else {
 			setEventMessages($object->error, [], 'errors');
 		}
+		header('Location: ' . $_SERVER["PHP_SELF"] . '?id=' . $id);
+		exit();
 	}
 
 	// Actions cancel, add, update, update_extras, confirm_validate, confirm_delete, confirm_deleteline, confirm_clone, confirm_close, confirm_setdraft, confirm_reopen
@@ -209,7 +219,7 @@ if ($conf->browser->layout == 'phone') {
 	$onPhone = 0;
 }
 
-saturne_header(0,'', $title, $helpUrl);
+saturne_header(1,'', $title, $helpUrl);
 
 if ($action == 'create') {
 	print load_fiche_titre($langs->trans("NewAccidentInvestigation"), '', $object->picto);
@@ -312,6 +322,28 @@ if ($action == 'create') {
 
 	require_once DOL_DOCUMENT_ROOT . '/core/tpl/commonfields_view.tpl.php';
 
+	print '<tr class="linked-medias causality_tree question-table"><td class=""><label for="causality_tree">' . $langs->trans("CausalityTree") . '</label></td><td class="linked-medias-list">';
+	$pathPhotos = $conf->digiriskdolibarr->multidir_output[$conf->entity] . '/accidentinvestigation/'. $object->ref . '/causality_tree/';
+	$fileArray  = dol_dir_list($pathPhotos, 'files');
+	?>
+	<span class="add-medias" <?php echo ($object->status != AccidentInvestigation::STATUS_LOCKED && empty($object->causality_tree)) ? '' : 'style="display:none"' ?>>
+		<input hidden multiple class="fast-upload" id="fast-upload-photo-default" type="file" name="userfile[]" capture="environment" accept="image/*">
+		<label for="fast-upload-photo-default">
+			<div class="wpeo-button button-square-50">
+				<i class="fas fa-camera"></i><i class="fas fa-plus-circle button-add"></i>
+			</div>
+		</label>
+		<input type="hidden" class="favorite-photo" id="photo" name="photo" value="<?php echo $object->causality_tree ?>"/>
+		<div class="wpeo-button button-square-50 open-media-gallery add-media modal-open" value="0">
+			<input type="hidden" class="modal-options" data-modal-to-open="media_gallery" data-from-id="<?php echo $object->id?>" data-from-type="accidentinvestigation" data-from-subtype="causality_tree" data-from-subdir="causality_tree"/>
+			<i class="fas fa-folder-open"></i><i class="fas fa-plus-circle button-add"></i>
+		</div>
+	</span>
+	<?php
+	$relativepath = 'digiriskdolibarr/medias/thumbs';
+	print saturne_show_medias_linked('digiriskdolibarr', $pathPhotos, 'small', 1, 0, 0, 0, 50, 50, 0, 0, 0, 'accidentinvestigation/'. $object->ref . '/causality_tree/', $object, 'causality_tree', $object->status != AccidentInvestigation::STATUS_LOCKED, $permissiontodelete && $object->status != AccidentInvestigation::STATUS_LOCKED);
+	print '</td></tr>';
+
 	print '</table></div>';
 
 	print '<div class="clearboth"></div>';
@@ -373,7 +405,7 @@ if ($action == 'create') {
 		$fileDir   = $upload_dir . '/' . $dirFiles;
 		$urlSource = $_SERVER['PHP_SELF'] . '?id=' . $object->id;
 
-		print saturne_show_documents('digiriskdolibarr:AccidentInvestigationDocument', $dirFiles, $fileDir, $urlSource, $permissiontoadd, $permissiontodelete, $conf->global->DIGIRISKDOLIBARR_ACCIDENTINVESTIGATION_DOCUMENT_DEFAULT_MODEL, 1, 0, 0, 0, 0, '', '', '', $langs->defaultlang, $object, 0, 'remove_file', (($object->status > $object::STATUS_DRAFT) ? 1 : 0), $langs->trans('AccidentInvestigationMustBeValidatedToGenerate'));
+		print saturne_show_documents('digiriskdolibarr:AccidentInvestigationDocument', $dirFiles, $fileDir, $urlSource, $permissiontoadd, $permissiontodelete, $conf->global->DIGIRISKDOLIBARR_ACCIDENTINVESTIGATION_DOCUMENT_DEFAULT_MODEL, 1, 0, 0, 0, 0, '', '', $langs->defaultlang, '', $object, 0, 'remove_file', (($object->status > $object::STATUS_DRAFT) ? 1 : 0), $langs->trans('AccidentInvestigationMustBeValidatedToGenerate'));
 
 		print '</div><div class="fichehalfright">';
 
