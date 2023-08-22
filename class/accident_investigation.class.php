@@ -49,7 +49,7 @@ class AccidentInvestigation extends SaturneObject
 	* @var int  Does this object support multicompany module ?
 	* 0=No test on entity, 1=Test with field entity, 'field@table'=Test with link by field@table
 	*/
-	public int $ismultientitymanaged = 1;
+	public $ismultientitymanaged = 1;
 
 	/**
 	* @var int  Does object support extrafields ? 0=No, 1=Yes
@@ -109,7 +109,7 @@ class AccidentInvestigation extends SaturneObject
 	/**
 	* @var array  Array with all fields and their property. Do not use it as a static var. It may be modified by constructor.
 	*/
-	public array $fields = [
+	public $fields = [
 		'rowid'                => ['type' => 'integer',      'label' => 'TechnicalID',            'enabled' => 1, 'position' => 1,   'notnull' => 1, 'visible' => 0, 'noteditable' => 1, 'index' => 1, 'comment' => "Id"],
 		'ref'                  => ['type' => 'varchar(128)', 'label' => 'Ref',                    'enabled' => 1, 'position' => 10,  'notnull' => 1, 'visible' => 4, 'noteditable' => 1, 'default' => '(PROV)', 'index' => 1, 'searchall' => 1, 'showoncombobox' => 1, 'comment' => "Reference of object"],
 		'ref_ext'              => ['type' => 'varchar(128)', 'label' => 'RefExt',                 'enabled' => 1, 'position' => 20,  'notnull' => 0, 'visible' => 0,],
