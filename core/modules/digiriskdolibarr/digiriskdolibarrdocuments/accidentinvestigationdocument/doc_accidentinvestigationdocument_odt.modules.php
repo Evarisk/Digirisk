@@ -265,9 +265,6 @@ class doc_accidentinvestigationdocument_odt extends ModeleODTAccidentInvestigati
 											if (file_exists($val)) {
 												$listlines->setImage($key, $val);
 											} else {
-
-
-
 												$listlines->setVars($key, $outputLangs->trans('NoData'), true, 'UTF-8');
 											}
 										} elseif ($key == 'nomDanger') {
@@ -321,6 +318,86 @@ class doc_accidentinvestigationdocument_odt extends ModeleODTAccidentInvestigati
 	}
 
 	/**
+	 * Set attendants segment.
+	 *
+	 * @param  Odf       $odfHandler  Object builder odf library.
+	 * @param  Translate $outputLangs Lang object to use for output.
+	 * @param  array     $moreParam   More param (Object/user/etc).
+	 *
+	 * @throws Exception
+	 */
+	public function setTaskSegment(Odf $odfHandler, Translate $outputLangs, array $moreParam)
+	{
+		global $conf, $moduleNameLowerCase, $langs;
+
+		// Get tasks.
+		$foundTagForLines = 1;
+		$tmpArray         = [];
+		$now              = dol_now();
+		try {
+			$listLinesCur  = $odfHandler->setSegment('cur_task');
+			$listLinesPrev = $odfHandler->setSegment('prev_task');
+		} catch (OdfException $e) {
+			// We may arrive here if tags for lines not present into template.
+			$foundTagForLines = 0;
+			$listLinesCur     = '';
+			$listLinesPrev    = '';
+			dol_syslog($e->getMessage());
+		}
+
+		$curativeActionTasks   = saturne_fetch_all_object_type('SaturneTask', '', '', 0, 0, ['customsql' => 'fk_task_parent = ' . $moreParam['curativeTaskId']]);
+		$preventiveActionTasks = saturne_fetch_all_object_type('SaturneTask', '', '', 0, 0, ['customsql' => 'fk_task_parent = ' . $moreParam['preventiveTaskId']]);
+
+		if ($foundTagForLines) {
+			if (is_array($curativeActionTasks) && !empty($curativeActionTasks)) {
+				foreach ($curativeActionTasks as $line) {
+					$tmpArray['cur_task_ref']         = $line->ref;
+					$tmpArray['cur_task_description'] = $line->description;
+
+					$delay  = $line->datee > 0 ? round(($line->datee - $now) / 60 /60 / 24) : 0;
+					$delay .= $delay > 1 ? ' ' . $langs->trans('Days') : $langs->trans('Day');
+
+					$tmpArray['cur_task_resp']        = '';
+					$tmpArray['cur_task_delay']       = $delay;
+					$tmpArray['cur_task_budget']      = price($line->budget_amount,0, '', 1, -1, -1, 'auto');
+					$this->setTmpArrayVars($tmpArray, $listLinesCur, $outputLangs);
+				}
+			} else {
+				$tmpArray['cur_task_ref']         = '';
+				$tmpArray['cur_task_description'] = '';
+				$tmpArray['cur_task_resp']        = '';
+				$tmpArray['cur_task_delay']       = '';
+				$tmpArray['cur_task_budget']      = '';
+				$this->setTmpArrayVars($tmpArray, $listLinesCur, $outputLangs);
+			}
+			$odfHandler->mergeSegment($listLinesCur);
+
+			if (is_array($preventiveActionTasks) && !empty($preventiveActionTasks)) {
+				foreach ($preventiveActionTasks as $line) {
+					$tmpArray['prev_task_ref']         = $line->ref;
+					$tmpArray['prev_task_description'] = $line->description;
+
+					$delay  = $line->datee > 0 ? round(($line->datee - $now) / 60 /60 / 24) : 0;
+					$delay .= $delay > 1 ? ' ' . $langs->trans('Days') : $langs->trans('Day');
+
+					$tmpArray['prev_task_resp']        = '';
+					$tmpArray['prev_task_delay']       = $delay;
+					$tmpArray['prev_task_budget']      = price($line->budget_amount,0, '', 1, -1, -1, 'auto');
+					$this->setTmpArrayVars($tmpArray, $listLinesPrev, $outputLangs);
+				}
+			} else {
+				$tmpArray['prev_task_ref']         = '';
+				$tmpArray['prev_task_description'] = '';
+				$tmpArray['prev_task_resp']        = '';
+				$tmpArray['prev_task_delay']       = '';
+				$tmpArray['prev_task_budget']      = '';
+				$this->setTmpArrayVars($tmpArray, $listLinesPrev, $outputLangs);
+			}
+			$odfHandler->mergeSegment($listLinesPrev);
+		}
+	}
+
+	/**
 	 * Fill all odt tags for segments lines.
 	 *
 	 * @param  Odf       $odfHandler  Object builder odf library.
@@ -336,6 +413,7 @@ class doc_accidentinvestigationdocument_odt extends ModeleODTAccidentInvestigati
 		try {
 			$this->setAttendantsSegment($odfHandler, $outputLangs, $moreParam);
 			$this->setRiskSegment($odfHandler, $outputLangs, $moreParam);
+			$this->setTaskSegment($odfHandler, $outputLangs, $moreParam);
 		} catch (OdfException $e) {
 			$this->error = $e->getMessage();
 			dol_syslog($this->error, LOG_WARNING);
@@ -367,6 +445,7 @@ class doc_accidentinvestigationdocument_odt extends ModeleODTAccidentInvestigati
 		$accident         = new Accident($db);
 		$accidentMetadata = new AccidentMetaData($db);
 		$victim           = new User($db);
+		$signatory        = new SaturneSignature($this->db, $this->module, $object->element);
 		$totalBudget      = 0;
 
 		$accident->fetch($object->fk_accident);
@@ -381,11 +460,19 @@ class doc_accidentinvestigationdocument_odt extends ModeleODTAccidentInvestigati
 		$totalPATask          = $preventiveActionTask->hasChildren();
 		$totalBudget          = getRecursiveTaskBudget($object->fk_task);
 
+		$moreParam['curativeTaskId']   = $curativeActionTask->id;
+		$moreParam['preventiveTaskId'] = $preventiveActionTask->id;
+
 		$tmpArray['investigation_date_start'] = dol_print_date($object->date_start, 'dayhour');
 		$tmpArray['investigation_date_end']   = dol_print_date($object->date_end, 'dayhour');
 		$tmpArray['total_curative_action']    = $totalCATask > 0 ? $totalCATask :$langs->trans('None');
 		$tmpArray['total_preventive_action']  = $totalPATask > 0 ? $totalPATask : $langs->trans('None');
 		$tmpArray['total_planned_budget']     = price($totalBudget,0, '', 1, -1, -1, 'auto');
+
+		$signatoriesArray = $signatory->fetchSignatories($moreParam['object']->id, $moreParam['object']->element);
+		if (!empty($signatoriesArray) && is_array($signatoriesArray)) {
+			$tmpArray['attendants_number'] = count($signatoriesArray);
+		}
 
 		$tmpArray['mycompany_name']    = $conf->global->MAIN_INFO_SOCIETE_NOM;
 		$tmpArray['mycompany_siret']   = $conf->global->MAIN_INFO_SIRET;
@@ -428,14 +515,11 @@ class doc_accidentinvestigationdocument_odt extends ModeleODTAccidentInvestigati
 		$tmpArray['individual_equipment'] = $object->individual_equipment;
 		$tmpArray['circumstances']        = $object->circumstances;
 		$tmpArray['public_note']          = $object->note_public;
+		$tmpArray['relative_location']    = $accidentMetadata->relative_location;
 
-		$tmpArray['relative_location'] = $accidentMetadata->relative_location;
-
-		$signatory        = new SaturneSignature($this->db, $this->module, $moreParam['object']->element);
-		$signatoriesArray = $signatory->fetchSignatories($moreParam['object']->id, $moreParam['object']->element);
-		if (!empty($signatoriesArray) && is_array($signatoriesArray)) {
-			$tmpArray['attendants_number'] = count($signatoriesArray);
-		}
+		$pathPhoto                        = $conf->digiriskdolibarr->multidir_output[$conf->entity] . '/accidentinvestigation/'. $object->ref . '/causality_tree/thumbs/';
+		$causalityTreePath                = $pathPhoto . getThumbName($object->causality_tree, 'medium');
+		$tmpArray['causality_tree_photo'] = $causalityTreePath;
 
 		$moreParam['tmparray'] = $tmpArray;
 
