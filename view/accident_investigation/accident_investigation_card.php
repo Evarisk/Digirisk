@@ -33,14 +33,14 @@ if (file_exists('../../digiriskdolibarr.main.inc.php')) {
 // Global variables definitions
 global $conf, $db, $hookmanager, $langs, $user;
 
-$taskRefClass = $conf->global->PROJECT_TASK_ADDON;
-
 // Load Dolibarr libraries
 require_once DOL_DOCUMENT_ROOT . '/core/lib/company.lib.php';
 require_once DOL_DOCUMENT_ROOT . '/core/lib/project.lib.php';
 require_once DOL_DOCUMENT_ROOT . '/core/class/html.formcompany.class.php';
-require_once DOL_DOCUMENT_ROOT . '/core/modules/project/task/' . $taskRefClass . '.php';
 require_once DOL_DOCUMENT_ROOT . '/core/lib/images.lib.php';
+
+// Load Saturne libraries.
+require_once __DIR__ . '/../../../saturne/class/saturnesignature.class.php';
 
 // Load DigiriskDolibarr librairies
 require_once __DIR__ . '/../../class/accident.class.php';
@@ -68,7 +68,14 @@ $object     = new AccidentInvestigation($db);
 $document   = new AccidentInvestigationDocument($db);
 $project    = new Project($db);
 $task       = new Task($db);
-$refTaskMod = new $taskRefClass();
+$signatory  = new SaturneSignature($db);
+
+$numRefConf = strtoupper($task->element) . '_ADDON';
+
+$numberingModuleName = [
+	'project/task' => $conf->global->$numRefConf,
+];
+list($modTask) = saturne_require_objects_mod($numberingModuleName);
 
 // Initialize view objects
 $form        = new Form($db);
@@ -125,7 +132,8 @@ if (empty($reshook)) {
 				$accident->fetch($object->fk_accident);
 
 				$task->fk_project = $accident->fk_project;
-				$task->ref        = $refTaskMod->getNextValue('', $task);
+
+				$task->ref        = $modTask->getNextValue(0, $task);
 				$task->label      = $accident->ref . ' - ' . $accident->label;
 				$result           = $task->create($user);
 
@@ -134,13 +142,13 @@ if (empty($reshook)) {
 					$object->update($user, true);
 
 					$task->fk_project     = $accident->fk_project;
-					$task->ref            = $refTaskMod->getNextValue('', $task);
+					$task->ref            = $modTask->getNextValue(0, $task);
 					$task->label          = $accident->ref . ' - T1 - ' . $langs->trans('CurativeAction');
 					$task->fk_task_parent = $result;
 					$resOne               = $task->create($user);
 
 					$task->fk_project     = $accident->fk_project;
-					$task->ref            = $refTaskMod->getNextValue('', $task);
+					$task->ref            = $modTask->getNextValue(0, $task);
 					$task->label          = $accident->ref . ' - T2 - ' . $langs->trans('PreventiveAction');
 					$task->fk_task_parent = $result;
 					$resTwo               = $task->create($user);
@@ -273,7 +281,7 @@ if ($action == 'create') {
 	}
 	// Remove file confirmation
 	if ($action == 'removefile') {
-		$formConfirm = $form->formconfirm($_SERVER['PHP_SELF'] . '?id=' . $object->id . '&file=' . GETPOST('file') . '&entity=' . $conf->entity, $langs->trans('RemoveFileObject', $langs->transnoentities('The' . ucfirst($object->element))), $langs->trans('ConfirmRemoveFileObject', $langs->transnoentities('The' . ucfirst($object->element))), 'remove_file', '', 'yes', 1, 350, 600);
+		$formConfirm = $form->formconfirm($_SERVER['PHP_SELF'] . '?id=' . $object->id . '&file=' . GETPOST('file') . '&entity=' . $conf->entity, $langs->trans('RemoveFileObject'), $langs->trans('ConfirmRemoveFileObject', GETPOST('file')), 'remove_file', '', 'yes', 1, 350, 600);
 	}
 
 	// Call Hook formConfirm.
@@ -313,7 +321,7 @@ if ($action == 'create') {
 	</span>
 	<?php
 	$relativepath = 'digiriskdolibarr/medias/thumbs';
-	print saturne_show_medias_linked('digiriskdolibarr', $pathPhotos, 'small', 1, 0, 0, 0, 50, 50, 0, 0, 0, 'accident_investigation/'. $object->ref . '/causality_tree/', $object, 'causality_tree', $object->status != AccidentInvestigation::STATUS_LOCKED, $permissiontodelete && $object->status != AccidentInvestigation::STATUS_LOCKED);
+	print saturne_show_medias_linked('digiriskdolibarr', $pathPhotos, 'small', 1, 0, 0, 0, 50, 50, 0, 0, 0, 'accident_investigation/'. $object->ref . '/causality_tree/', $object, 'causality_tree', $object->status < AccidentInvestigation::STATUS_LOCKED, $permissiontodelete && $object->status < AccidentInvestigation::STATUS_LOCKED);
 	print '</td></tr>';
 
 	print '</table></div>';
@@ -377,7 +385,7 @@ if ($action == 'create') {
 		$fileDir   = $upload_dir . '/' . $dirFiles;
 		$urlSource = $_SERVER['PHP_SELF'] . '?id=' . $object->id;
 
-		print saturne_show_documents('digiriskdolibarr:AccidentInvestigationDocument', $dirFiles, $fileDir, $urlSource, $permissiontoadd, $permissiontodelete, $conf->global->DIGIRISKDOLIBARR_ACCIDENTINVESTIGATION_DOCUMENT_DEFAULT_MODEL, 1, 0, 0, 0, 0, '', '', $langs->defaultlang, '', $object, 0, 'removefile', (($object->status > $object::STATUS_DRAFT) ? 1 : 0), $langs->trans('AccidentInvestigationMustBeValidatedToGenerate'));
+		print saturne_show_documents('digiriskdolibarr:AccidentInvestigationDocument', $dirFiles, $fileDir, $urlSource, $permissiontoadd, $permissiontodelete, $conf->global->DIGIRISKDOLIBARR_ACCIDENTINVESTIGATION_DOCUMENT_DEFAULT_MODEL, 1, 0, 0, 0, 0, '', '', $langs->defaultlang, '', $object, 0, 'removefile', (($object->status > $object::STATUS_DRAFT) ? 1 : 0), $langs->trans('ObjectMustBeValidatedToGenerate', ucfirst($langs->transnoentities('The' . ucfirst($object->element)))));
 
 		print '</div><div class="fichehalfright">';
 
