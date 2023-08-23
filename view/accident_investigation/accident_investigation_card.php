@@ -160,42 +160,6 @@ if (empty($reshook)) {
 		exit();
 	}
 
-	if ($action == 'confirm_set_draft') {
-		$result = $object->setDraft($user);
-
-		if ($result > 0) {
-			setEventMessages('AccidentInvestigationUnvalidated', []);
-		} else {
-			setEventMessages($object->error, [], 'errors');
-		}
-		header('Location: ' . $_SERVER["PHP_SELF"] . '?id=' . $id);
-		exit();
-	}
-
-	if ($action == 'confirm_set_lock') {
-		$result = $object->setLocked($user);
-
-		if ($result > 0) {
-			setEventMessages('AccidentInvestigationLocked', []);
-		} else {
-			setEventMessages($object->error, [], 'errors');
-		}
-		header('Location: ' . $_SERVER["PHP_SELF"] . '?id=' . $id);
-		exit();
-	}
-
-	if ($action == 'confirm_set_archive') {
-		$result = $object->setArchived($user);
-
-		if ($result > 0) {
-			setEventMessages('AccidentInvestigationArchived', []);
-		} else {
-			setEventMessages($object->error, [], 'errors');
-		}
-		header('Location: ' . $_SERVER["PHP_SELF"] . '?id=' . $id);
-		exit();
-	}
-
 	// Actions cancel, add, update, update_extras, confirm_validate, confirm_delete, confirm_deleteline, confirm_clone, confirm_close, confirm_setdraft, confirm_reopen
 	require_once DOL_DOCUMENT_ROOT . '/core/actions_addupdatedelete.inc.php';
 
@@ -204,6 +168,9 @@ if (empty($reshook)) {
 
 	// Action to generate pdf from odt file.
 	require_once __DIR__ . '/../../../saturne/core/tpl/documents/saturne_manual_pdf_generation_action.tpl.php';
+
+	// Action confirm_lock, confirm_archive.
+	require_once __DIR__ . '/../../../saturne/core/tpl/signature/signature_action_workflow.tpl.php';
 }
 
 /*
@@ -238,6 +205,8 @@ if ($action == 'create') {
 
 	print '<table class="border centpercent tableforfieldcreate">';
 
+	$conf->tzuserinputkey = 'tzuser';
+
 	// Common attributes
 	include DOL_DOCUMENT_ROOT.'/core/tpl/commonfields_add.tpl.php';
 
@@ -263,6 +232,8 @@ if ($action == 'create') {
 
 	print '<table class="border centpercent tableforfieldupdate">';
 
+	$conf->tzuserinputkey = 'tzuser';
+
 	// Common attributes
 	include DOL_DOCUMENT_ROOT . '/core/tpl/commonfields_edit.tpl.php';
 
@@ -281,7 +252,7 @@ if ($action == 'create') {
 
 	// Draft confirmation
 	if (($action == 'set_draft' && (empty($conf->use_javascript_ajax) || !empty($conf->dol_use_jmobile))) || (!empty($conf->use_javascript_ajax) && empty($conf->dol_use_jmobile))) {
-		$formConfirm .= $form->formconfirm($_SERVER['PHP_SELF'] . '?id=' . $object->id, $langs->trans('ReOpenObject', $langs->transnoentities('The' . ucfirst($object->element))),  $langs->trans('ConfirmReOpenObject', $langs->transnoentities('The' . ucfirst($object->element)), $langs->transnoentities('The' . ucfirst($object->element))), 'confirm_set_draft', '', 'yes', 'actionButtonInProgress', 350, 600);
+		$formConfirm .= $form->formconfirm($_SERVER['PHP_SELF'] . '?id=' . $object->id, $langs->trans('ReOpenObject', $langs->transnoentities('The' . ucfirst($object->element))),  $langs->trans('ConfirmReOpenObject', $langs->transnoentities('The' . ucfirst($object->element)), $langs->transnoentities('The' . ucfirst($object->element))), 'confirm_setdraft', '', 'yes', 'actionButtonInProgress', 350, 600);
 	}
 	// Validate confirmation
 	if (($action == 'set_validate' && (empty($conf->use_javascript_ajax) || !empty($conf->dol_use_jmobile))) || (!empty($conf->use_javascript_ajax) && empty($conf->dol_use_jmobile))) {
@@ -289,11 +260,11 @@ if ($action == 'create') {
 	}
 	// Lock confirmation
 	if (($action == 'set_lock' && (empty($conf->use_javascript_ajax) || !empty($conf->dol_use_jmobile))) || (!empty($conf->use_javascript_ajax) && empty($conf->dol_use_jmobile))) {
-		$formConfirm .= $form->formconfirm($_SERVER['PHP_SELF'] . '?id=' . $object->id, $langs->trans('LockObject', $langs->transnoentities('The' . ucfirst($object->element))), $langs->trans('ConfirmLockObject', $langs->transnoentities('The' . ucfirst($object->element))), 'confirm_set_lock', '', 'yes', 'actionButtonLock', 350, 600);
+		$formConfirm .= $form->formconfirm($_SERVER['PHP_SELF'] . '?id=' . $object->id, $langs->trans('LockObject', $langs->transnoentities('The' . ucfirst($object->element))), $langs->trans('ConfirmLockObject', $langs->transnoentities('The' . ucfirst($object->element))), 'confirm_lock', '', 'yes', 'actionButtonLock', 350, 600);
 	}
 	// Archive confirmation
 	if (($action == 'set_archive' && (empty($conf->use_javascript_ajax) || !empty($conf->dol_use_jmobile))) || (!empty($conf->use_javascript_ajax) && empty($conf->dol_use_jmobile))) {
-		$formConfirm .= $form->formconfirm($_SERVER['PHP_SELF'] . '?id=' . $object->id, $langs->trans('ArchiveObject', $langs->transnoentities('The' . ucfirst($object->element))), $langs->trans('ConfirmArchiveObject', $langs->transnoentities('The' . ucfirst($object->element))), 'confirm_set_archive', '', 'yes', 'actionButtonArchive', 350, 600);
+		$formConfirm .= $form->formconfirm($_SERVER['PHP_SELF'] . '?id=' . $object->id, $langs->trans('ArchiveObject', $langs->transnoentities('The' . ucfirst($object->element))), $langs->trans('ConfirmArchiveObject', $langs->transnoentities('The' . ucfirst($object->element))), 'confirm_archive', '', 'yes', 'actionButtonArchive', 350, 600);
 	}
 	// Delete confirmation
 	if ($action == 'delete') {
@@ -301,7 +272,7 @@ if ($action == 'create') {
 	}
 	// Remove file confirmation
 	if ($action == 'removefile') {
-		$formConfirm = $form->formconfirm($_SERVER['PHP_SELF'] . '?id=' . $object->id . '&file=' . GETPOST('file') . '&entity=' . $conf->entity, $langs->trans('RemoveFileTimeSheet'), $langs->trans('ConfirmRemoveFileTimeSheet'), 'remove_file', '', 'yes', 1, 350, 600);
+		$formConfirm = $form->formconfirm($_SERVER['PHP_SELF'] . '?id=' . $object->id . '&file=' . GETPOST('file') . '&entity=' . $conf->entity, $langs->trans('RemoveFileObject', $langs->transnoentities('The' . ucfirst($object->element))), $langs->trans('ConfirmRemoveFileObject', $langs->transnoentities('The' . ucfirst($object->element))), 'remove_file', '', 'yes', 1, 350, 600);
 	}
 
 	// Call Hook formConfirm.
@@ -405,7 +376,7 @@ if ($action == 'create') {
 		$fileDir   = $upload_dir . '/' . $dirFiles;
 		$urlSource = $_SERVER['PHP_SELF'] . '?id=' . $object->id;
 
-		print saturne_show_documents('digiriskdolibarr:AccidentInvestigationDocument', $dirFiles, $fileDir, $urlSource, $permissiontoadd, $permissiontodelete, $conf->global->DIGIRISKDOLIBARR_ACCIDENTINVESTIGATION_DOCUMENT_DEFAULT_MODEL, 1, 0, 0, 0, 0, '', '', $langs->defaultlang, '', $object, 0, 'remove_file', (($object->status > $object::STATUS_DRAFT) ? 1 : 0), $langs->trans('AccidentInvestigationMustBeValidatedToGenerate'));
+		print saturne_show_documents('digiriskdolibarr:AccidentInvestigationDocument', $dirFiles, $fileDir, $urlSource, $permissiontoadd, $permissiontodelete, $conf->global->DIGIRISKDOLIBARR_ACCIDENTINVESTIGATION_DOCUMENT_DEFAULT_MODEL, 1, 0, 0, 0, 0, '', '', $langs->defaultlang, '', $object, 0, 'removefile', (($object->status > $object::STATUS_DRAFT) ? 1 : 0), $langs->trans('AccidentInvestigationMustBeValidatedToGenerate'));
 
 		print '</div><div class="fichehalfright">';
 
