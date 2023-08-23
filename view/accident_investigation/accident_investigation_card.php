@@ -58,6 +58,7 @@ $action              = GETPOST('action', 'aZ09');
 $subaction           = GETPOST('subaction', 'aZ09');
 $contextpage         = GETPOST('contextpage', 'aZ') ? GETPOST('contextpage', 'aZ') : 'accidentinvestigationcard'; // To manage different context of search
 $cancel              = GETPOST('cancel', 'aZ09');
+$confirm             = GETPOST('confirm', 'aZ09');
 $backtopage          = GETPOST('backtopage', 'alpha');
 $backtopageforcancel = GETPOST('backtopageforcancel', 'alpha');
 
