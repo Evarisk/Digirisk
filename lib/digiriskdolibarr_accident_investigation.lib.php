@@ -30,5 +30,7 @@
  */
 function accident_investigation_prepare_head(AccidentInvestigation $object): array
 {
-	return saturne_object_prepare_head($object, [], [], true);
+	$moreparam['attendantTableMode'] = 'simple';
+
+	return saturne_object_prepare_head($object, [], $moreparam, true);
 }

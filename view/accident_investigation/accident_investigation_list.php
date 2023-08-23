@@ -243,6 +243,7 @@ if ($object->ismultientitymanaged == 1) {
 } else {
 	$sql .= ' WHERE 1 = 1';
 }
+$sql .= ' AND status >= 0';
 
 foreach ($search as $key => $val) {
 	if (array_key_exists($key, $object->fields)) {
