@@ -351,15 +351,17 @@ class doc_accidentinvestigationdocument_odt extends ModeleODTAccidentInvestigati
 		if ($foundTagForLines) {
 			if (is_array($curativeActionTasks) && !empty($curativeActionTasks)) {
 				foreach ($curativeActionTasks as $line) {
+					$taskExecutive = $line->liste_contact(-1, 'internal', 0, 'TASKEXECUTIVE');
+
 					$tmpArray['cur_task_ref']         = $line->ref;
 					$tmpArray['cur_task_description'] = $line->description;
 
 					$delay  = $line->datee > 0 ? round(($line->datee - $now) / 60 /60 / 24) : 0;
-					$delay .= $delay > 1 ? ' ' . $langs->trans('Days') : $langs->trans('Day');
+					$delay .= ' ' . ($delay > 1 ? $langs->trans('Days') : $langs->trans('Day'));
 
-					$tmpArray['cur_task_resp']        = '';
-					$tmpArray['cur_task_delay']       = $delay;
-					$tmpArray['cur_task_budget']      = price($line->budget_amount,0, '', 1, -1, -1, 'auto');
+					$tmpArray['cur_task_resp']   = $taskExecutive[0]['lastname'] . ' ' . $taskExecutive[0]['firstname'];
+					$tmpArray['cur_task_delay']  = $delay;
+					$tmpArray['cur_task_budget'] = price($line->budget_amount,0, '', 1, -1, -1, 'auto');
 					$this->setTmpArrayVars($tmpArray, $listLinesCur, $outputLangs);
 				}
 			} else {
@@ -378,11 +380,11 @@ class doc_accidentinvestigationdocument_odt extends ModeleODTAccidentInvestigati
 					$tmpArray['prev_task_description'] = $line->description;
 
 					$delay  = $line->datee > 0 ? round(($line->datee - $now) / 60 /60 / 24) : 0;
-					$delay .= $delay > 1 ? ' ' . $langs->trans('Days') : $langs->trans('Day');
+					$delay .= ' ' . ($delay > 1 ? $langs->trans('Days') : $langs->trans('Day'));
 
-					$tmpArray['prev_task_resp']        = '';
-					$tmpArray['prev_task_delay']       = $delay;
-					$tmpArray['prev_task_budget']      = price($line->budget_amount,0, '', 1, -1, -1, 'auto');
+					$tmpArray['prev_task_resp']   = $taskExecutive[0]['lastname'] . ' ' . $taskExecutive[0]['firstname'];;
+					$tmpArray['prev_task_delay']  = $delay;
+					$tmpArray['prev_task_budget'] = price($line->budget_amount,0, '', 1, -1, -1, 'auto');
 					$this->setTmpArrayVars($tmpArray, $listLinesPrev, $outputLangs);
 				}
 			} else {
@@ -463,8 +465,8 @@ class doc_accidentinvestigationdocument_odt extends ModeleODTAccidentInvestigati
 		$moreParam['curativeTaskId']   = $curativeActionTask->id;
 		$moreParam['preventiveTaskId'] = $preventiveActionTask->id;
 
-		$tmpArray['investigation_date_start'] = dol_print_date($object->date_start, 'dayhour');
-		$tmpArray['investigation_date_end']   = dol_print_date($object->date_end, 'dayhour');
+		$tmpArray['investigation_date_start'] = dol_print_date($object->date_start, 'dayhour', 'tzuser');
+		$tmpArray['investigation_date_end']   = dol_print_date($object->date_end, 'dayhour', 'tzuser');
 		$tmpArray['total_curative_action']    = $totalCATask > 0 ? $totalCATask :$langs->trans('None');
 		$tmpArray['total_preventive_action']  = $totalPATask > 0 ? $totalPATask : $langs->trans('None');
 		$tmpArray['total_planned_budget']     = price($totalBudget,0, '', 1, -1, -1, 'auto');
@@ -484,7 +486,7 @@ class doc_accidentinvestigationdocument_odt extends ModeleODTAccidentInvestigati
 		$tmpArray['victim_lastname']        = $victim->lastname;
 		$tmpArray['victim_firstname']       = $victim->firstname;
 		$tmpArray['seniority_at_post']      = $object->seniority_at_post . ' ' . ($object->seniority_at_post <= 1 ? $langs->trans('Day') : $langs->trans('Days'));
-		$tmpArray['victim_date_employment'] = dol_print_date($victim->dateemployment, 'day');
+		$tmpArray['victim_date_employment'] = dol_print_date($victim->dateemployment, 'day', 'tzuser');
 
 		$tmpArray['accident_date'] = dol_print_date($accident->accident_date, 'day');
 		$tmpArray['accident_hour'] = dol_print_date($accident->accident_date, 'hour');
@@ -517,7 +519,7 @@ class doc_accidentinvestigationdocument_odt extends ModeleODTAccidentInvestigati
 		$tmpArray['public_note']          = $object->note_public;
 		$tmpArray['relative_location']    = $accidentMetadata->relative_location;
 
-		$pathPhoto                        = $conf->digiriskdolibarr->multidir_output[$conf->entity] . '/accidentinvestigation/'. $object->ref . '/causality_tree/thumbs/';
+		$pathPhoto                        = $conf->digiriskdolibarr->multidir_output[$conf->entity] . '/accident_investigation/'. $object->ref . '/causality_tree/thumbs/';
 		$causalityTreePath                = $pathPhoto . getThumbName($object->causality_tree, 'medium');
 		$tmpArray['causality_tree_photo'] = $causalityTreePath;
 
