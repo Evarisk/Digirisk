@@ -27,7 +27,7 @@ require_once DOL_DOCUMENT_ROOT . '/core/class/html.form.class.php';
 require_once __DIR__ . '/digiriskstats.php';
 require_once __DIR__ . '/riskanalysis/risk.class.php';
 require_once __DIR__ . '/digirisktask.class.php';
-require_once __DIR__ . '/digiriskdocuments/riskassessmentdocument.class.php';
+require_once __DIR__ . '/digiriskdolibarrdocuments/riskassessmentdocument.class.php';
 require_once __DIR__ . '/accident.class.php';
 require_once __DIR__ . '/evaluator.class.php';
 require_once __DIR__ . '/digiriskresources.class.php';

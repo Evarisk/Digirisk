@@ -1,4 +1,4 @@
--- Copyright (C) 2021 EOXIA <dev@eoxia.com>
+-- Copyright (C) 2021-2023 EVARISK <technique@evarisk.com>
 --
 -- This program is free software: you can redistribute it and/or modify
 -- it under the terms of the GNU General Public License as published by
@@ -13,5 +13,12 @@
 -- You should have received a copy of the GNU General Public License
 -- along with this program.  If not, see https://www.gnu.org/licenses/.
 
-ALTER TABLE llx_digiriskdolibarr_object_signature ADD INDEX idx_digiriskdolibarr_object_signature_rowid (rowid);
-ALTER TABLE llx_digiriskdolibarr_object_signature  ADD CONSTRAINT llx_digiriskdolibarr_object_signature_fk_object FOREIGN KEY (fk_object) REFERENCES llx_digiriskdolibarr_object(rowid);
+CREATE TABLE llx_c_firepermit_attendants_role(
+    rowid       integer AUTO_INCREMENT PRIMARY KEY NOT NULL,
+    entity      integer default 1,
+    ref         varchar(128),
+    label       varchar(255),
+    description text,
+    active      tinyint(4) DEFAULT 1,
+    position    integer DEFAULT 0
+) ENGINE=innodb;

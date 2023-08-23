@@ -782,4 +782,51 @@ class ActionsDigiriskdolibarr
 		}
 		return $preventrecursivecall; // return 0 or return 1 to replace standard code
 	}
+
+    /**
+     * Overloading the saturneAttendantsRole function : replacing the parent's function with the one below.
+     *
+     * @param  array $parameters Hook metadatas (context, etc...).
+     * @return int              0 < on error, 0 on success, 1 to replace standard code.
+     */
+    public function saturneBannerTab(array $parameters, $object)
+    {
+        global $langs;
+
+        // Do something only for the current context.
+        if ($parameters['currentcontext'] == 'firepermitsignature') {
+            require_once __DIR__ . '/../class/digiriskresources.class.php';
+
+            $digiriskresources = new DigiriskResources($this->db);
+
+            $extSociety  = $digiriskresources->fetchResourcesFromObject('FP_EXT_SOCIETY', $object);
+            $moreHtmlRef = $langs->trans('ExtSociety') . ' : ' . $extSociety->getNomUrl(1);
+
+            $this->resprints = $moreHtmlRef;
+        }
+
+        return 0; // or return 1 to replace standard code.
+    }
+
+    /**
+     * Overloading the saturneAttendantsRole function : replacing the parent's function with the one below.
+     *
+     * @param  array $parameters Hook metadatas (context, etc...).
+     * @return int               0 < on error, 0 on success, 1 to replace standard code.
+     */
+    public function saturneAttendantsRole(array $parameters, $object)
+    {
+        // Do something only for the current context.
+        if ($parameters['currentcontext'] == 'firepermitsignature') {
+//            $signatory->fetchSignatory('FP_MAITRE_OEUVRE', $id, 'firepermit');
+//            $signatory->fetchSignatory('FP_EXT_SOCIETY_RESPONSIBLE', $id, 'firepermit');
+//            $signatory->fetchSignatory('FP_EXT_SOCIETY_INTERVENANTS', $id, 'firepermit');
+            $signatoriesByRole['InternalResponsible'] = $parameters['signatory']->fetchSignatory('InternalResponsible', $object->id, $object->element);
+            $signatoriesByRole['ExternalResponsible'] = $parameters['signatory']->fetchSignatory('ExternalResponsible', $object->id, $object->element);
+            $signatoriesByRole['Attendant']           = $parameters['signatory']->fetchSignatory('Attendant', $object->id, $object->element);
+            $this->results = $signatoriesByRole;
+        }
+
+        return 1; // or return 1 to replace standard code.
+    }
 }

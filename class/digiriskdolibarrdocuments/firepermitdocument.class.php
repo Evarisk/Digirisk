@@ -1,5 +1,5 @@
 <?php
-/* Copyright (C) 2021 EOXIA <dev@eoxia.com>
+/* Copyright (C) 2022-2023 EVARISK <technique@evarisk.com>
  *
  * This program is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -16,80 +16,38 @@
  */
 
 /**
- * \file        class/digiriskdocuments/firepermitdocument.class.php
- * \ingroup     digiriskdolibarr
- * \brief       This file is a class file for FirePermitDocument
+ * \file    class/digiriskdolibarrdocuments/firepermitdocument.class.php
+ * \ingroup digiriskdolibarr
+ * \brief   This file is a class file for FirePermitDocument.
  */
 
-require_once DOL_DOCUMENT_ROOT.'/contact/class/contact.class.php';
-
-require_once __DIR__ . '/../digiriskdocuments.class.php';
-require_once __DIR__ . '/../digiriskresources.class.php';
-require_once __DIR__ . '/../openinghours.class.php';
+// Load Saturne libraries.
+require_once __DIR__ . '/../../../saturne/class/saturnedocuments.class.php';
 
 /**
- * Class for FirePermitDocument
+ * Class for FirePermitDocument.
  */
-class FirePermitDocument extends DigiriskDocuments
+class FirePermitDocument extends SaturneDocuments
 {
-	/**
-	 * @var DoliDB Database handler.
-	 */
-	public $db;
+    /**
+     * @var string Module name.
+     */
+    public string $module = 'digiriskdolibarr';
 
-	/**
-	 * @var string ID to identify managed object.
-	 */
-	public $element = 'firepermitdocument';
+    /**
+     * @var string Element type of object.
+     */
+    public $element = 'firepermitdocument';
 
-	/**
-	 * @var int  Does this object support multicompany module ?
-	 * 0=No test on entity, 1=Test with field entity, 'field@table'=Test with link by field@table
-	 */
-	public $ismultientitymanaged = 1;
-
-	/**
-	 * @var int  Does object support extrafields ? 0=No, 1=Yes
-	 */
-	public $isextrafieldmanaged = 1;
-
-	/**
-	 * @var string String with name of icon for firepermitdocument. Must be the part after the 'object_' into object_firepermitdocument.png
-	 */
-	public $picto = 'firepermitdocument@digiriskdolibarr';
-
-	/**
-	 * Constructor
-	 *
-	 * @param DoliDb $db Database handler
-	 */
-	public function __construct(DoliDB $db)
-	{
-		global $conf, $langs;
-
-		$this->db = $db;
-
-		if (empty($conf->global->MAIN_SHOW_TECHNICAL_ID) && isset($this->fields['rowid'])) $this->fields['rowid']['visible'] = 0;
-		if (empty($conf->multicompany->enabled) && isset($this->fields['entity'])) $this->fields['entity']['enabled'] = 0;
-
-		// Unset fields that are disabled
-		foreach ($this->fields as $key => $val) {
-			if (isset($val['enabled']) && empty($val['enabled'])) {
-				unset($this->fields[$key]);
-			}
-		}
-
-		// Translate some data of arrayofkeyval
-		if (is_object($langs)) {
-			foreach ($this->fields as $key => $val) {
-				if (is_array($val['arrayofkeyval'])) {
-					foreach ($val['arrayofkeyval'] as $key2 => $val2) {
-						$this->fields[$key]['arrayofkeyval'][$key2] = $langs->trans($val2);
-					}
-				}
-			}
-		}
-	}
+    /**
+     * Constructor.
+     *
+     * @param DoliDb $db Database handler.
+     */
+    public function __construct(DoliDB $db)
+    {
+        parent::__construct($db, $this->module, $this->element);
+    }
 
 	/**
 	 * Function for JSON filling before saving in database
@@ -100,6 +58,11 @@ class FirePermitDocument extends DigiriskDocuments
 	public function FirePermitDocumentFillJSON()
 	{
 		global $conf;
+
+        require_once DOL_DOCUMENT_ROOT.'/contact/class/contact.class.php';
+
+        require_once __DIR__ . '/../digiriskresources.class.php';
+        require_once __DIR__ . '/../openinghours.class.php';
 
 		$digiriskelement    = new DigiriskElement($this->db);
 		$resources          = new DigiriskResources($this->db);

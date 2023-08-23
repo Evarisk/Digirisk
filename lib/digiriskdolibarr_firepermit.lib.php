@@ -1,9 +1,9 @@
 <?php
-/* Copyright (C) 2021 EOXIA <dev@eoxia.com>
+/* Copyright (C) 2021-2023 EVARISK <technique@evarisk.com>
  *
- * This program is free software: you can redistribute it and/or modify
+ * This program is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
- * the Free Software Foundation, either version 3 of the License, or
+ * the Free Software Foundation; either version 3 of the License, or
  * (at your option) any later version.
  *
  * This program is distributed in the hope that it will be useful,
@@ -12,53 +12,37 @@
  * GNU General Public License for more details.
  *
  * You should have received a copy of the GNU General Public License
- * along with this program.  If not, see <https://www.gnu.org/licenses/>.
+ * along with this program. If not, see <https://www.gnu.org/licenses/>.
  */
 
 /**
  * \file    lib/digiriskdolibarr_firepermit.lib.php
  * \ingroup digiriskdolibarr
- * \brief   Library files with common functions for DigiriskElement
+ * \brief   Library files with common functions for Firepermit.
  */
+
+// Load Saturne libraries.
+require_once __DIR__ . '/../../saturne/lib/object.lib.php';
 
 /**
- * Prepare array of tabs for DigiriskElement
+ * Prepare array of tabs for firepermit.
  *
- * @param	DigiriskElement $object DigiriskElement
- * @return 	array					Array of tabs
+ * @param  FirePermit $object Firepermit object.
+ * @return array              Array of tabs.
+ * @throws Exception
  */
-function firepermitPrepareHead($object)
+function firepermit_prepare_head(FirePermit $object): array
 {
-	global $langs, $conf, $user;
+    // Global variables definitions.
+    global $langs;
 
-	$langs->load("digiriskdolibarr@digiriskdolibarr");
+    $head = [];
 
-	$h    = 0;
-	$head = array();
+    $head[1][0] = dol_buildpath("/digiriskdolibarr/view/firepermit/firepermit_schedule.php", 1) . '?id=' . $object->id;
+    $head[1][1] = '<i class="fas fa-calendar-times"></i> ' . $langs->trans("Schedule");
+    $head[1][2] = 'firepermitSchedule';
 
-	if ($user->rights->digiriskdolibarr->firepermit->read) {
-		$head[$h][0] = dol_buildpath("/digiriskdolibarr/view/firepermit/firepermit_card.php", 1) . '?id=' . $object->id;
-		$head[$h][1] = '<i class="fas fa-address-card"></i> ' . $langs->trans("Card");
-		$head[$h][2] = 'firepermitCard';
-		$h++;
+    $moreParams['documentType'] = 'FirePermitDocument';
 
-		$head[$h][0] = dol_buildpath("/digiriskdolibarr/view/firepermit/firepermit_agenda.php", 1) . '?id=' . $object->id;
-		$head[$h][1] = '<i class="fas fa-calendar"></i> ' . $langs->trans("Events");
-		$head[$h][2] = 'firepermitAgenda';
-		$h++;
-
-		$head[$h][0] = dol_buildpath("/digiriskdolibarr/view/firepermit/firepermit_schedule.php", 1) . '?id=' . $object->id;
-		$head[$h][1] = '<i class="fas fa-calendar-times"></i> ' . $langs->trans("Schedule");
-		$head[$h][2] = 'firepermitSchedule';
-		$h++;
-
-		$head[$h][0] = dol_buildpath("/digiriskdolibarr/view/firepermit/firepermit_attendants.php", 1) . '?id=' . $object->id;
-		$head[$h][1] = '<i class="fas fa-file-signature"></i> ' . $langs->trans("Attendants");
-		$head[$h][2] = 'firepermitAttendants';
-		$h++;
-	}
-
-	complete_head_from_modules($conf, $langs, $object, $head, $h, 'firepermitdocument@digiriskdolibarr');
-
-	return $head;
+    return saturne_object_prepare_head($object, $head, $moreParams, true);
 }
