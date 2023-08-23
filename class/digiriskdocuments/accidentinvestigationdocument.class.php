@@ -32,7 +32,7 @@ class AccidentInvestigationDocument extends SaturneDocuments
 	/**
 	 * @var string Module name.
 	 */
-	public string $module = 'digiriskdolibarr';
+	public $module = 'digiriskdolibarr';
 
 	/**
 	 * @var string Element type of object.
