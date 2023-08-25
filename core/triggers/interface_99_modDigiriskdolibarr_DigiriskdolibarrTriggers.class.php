@@ -2080,6 +2080,7 @@ class InterfaceDigiriskdolibarrTriggers extends DolibarrTriggers
 					dol_syslog("Trigger '" . $this->name . "' for action '$action' launched by " . __FILE__ . ". id=" . $object->id);
 					require_once DOL_DOCUMENT_ROOT . '/comm/action/class/actioncomm.class.php';
 					require_once __DIR__ . '/../../class/digiriskelement.class.php';
+					require_once __DIR__ . '/../../class/riskanalysis/risk.class.php';
 					$now = dol_now();
 					$langs->load("projects");
 					$actioncomm = new ActionComm($this->db);
