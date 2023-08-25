@@ -2107,6 +2107,19 @@ class modDigiriskdolibarr extends DolibarrModules
 			dolibarr_set_const($this->db, 'DIGIRISKDOLIBARR_TRIGGERS_UPDATED', 1, 'integer', 0, '', $conf->entity);
 		}
 
+		if (empty($conf->global->DIGIRISKDOLIBARR_DEFAULT_TASK_CONTACT_TYPE) && empty($conf->global->DIGIRISKDOLIBARR_DEFAULT_PROJECT_CONTACT_TYPE)) {
+			require_once DOL_DOCUMENT_ROOT . '/projet/class/project.class.php';
+			require_once DOL_DOCUMENT_ROOT . '/projet/class/task.class.php';
+
+			$project       = new Project($this->db);
+			$projectTypeId = array_key_first($project->liste_type_contact('internal', 'position', 0, 1, 'PROJECTCONTRIBUTOR'));
+			dolibarr_set_const($this->db, 'DIGIRISKDOLIBARR_DEFAULT_PROJECT_CONTACT_TYPE', $projectTypeId, 'integer', 0, '', $conf->entity);
+
+			$task       = new Task($this->db);
+			$taskTypeId = array_key_first($task->liste_type_contact('internal', 'position', 0, 1, 'PROJECTCONTRIBUTOR'));
+			dolibarr_set_const($this->db, 'DIGIRISKDOLIBARR_DEFAULT_TASK_CONTACT_TYPE', $taskTypeId, 'integer', 0, '', $conf->entity);
+		}
+
 		$params = [
 			'digiriskdolibarr' => [																			// nom informatif du module externe qui apporte ses paramètres
 				'sharingelements' => [																			// section des paramètres 'element' et 'object'
