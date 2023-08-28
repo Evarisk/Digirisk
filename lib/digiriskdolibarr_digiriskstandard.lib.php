@@ -27,7 +27,7 @@
  * @param	DigiriskStandard	$object		DigiriskStandard
  * @return 	array					Array of tabs
  */
-function digiriskstandardPrepareHead($object)
+function digiriskstandard_prepare_head($object)
 {
 	global $langs, $conf, $user;
 

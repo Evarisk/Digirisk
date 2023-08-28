@@ -543,7 +543,7 @@ function remove_index($model)
 * @return	void
 *@throws Exception
 */
-function digiriskHeader($title = '', $help_url = '', $arrayofjs = array(), $arrayofcss =  array(), $morequerystring = '', $morecssonbody = '', $replacemainareaby = '')
+function digirisk_header($title = '', $helpUrl = '', $arrayofjs = [], $arrayofcss =  [], $morequerystring = '', $morecssonbody = '', $replacemainareaby = '')
 {
 	global $conf, $langs, $db, $user;
 
@@ -552,6 +552,7 @@ function digiriskHeader($title = '', $help_url = '', $arrayofjs = array(), $arra
 	require_once __DIR__ . '/../core/modules/digiriskdolibarr/digiriskelement/groupment/mod_groupment_sirius.php';
 	require_once __DIR__ . '/../core/modules/digiriskdolibarr/digiriskelement/workunit/mod_workunit_standard.php';
 	require_once __DIR__ . '/../core/modules/digiriskdolibarr/digiriskelement/workunit/mod_workunit_canopus.php';
+
 	$mod_groupment = new $conf->global->DIGIRISKDOLIBARR_GROUPMENT_ADDON();
 	$mod_workunit  = new $conf->global->DIGIRISKDOLIBARR_WORKUNIT_ADDON();
 
@@ -561,7 +562,7 @@ function digiriskHeader($title = '', $help_url = '', $arrayofjs = array(), $arra
 	$workunit_prefix = dol_strlen($mod_workunit->prefix) > 0 ? $mod_workunit->prefix : $conf->global->DIGIRISKDOLIBARR_WORKUNIT_CANOPUS_ADDON;
 	$workunit_prefix = preg_match('/{/',$workunit_prefix) ? preg_split('/{/', $workunit_prefix)[0] : $workunit_prefix;
 
-	llxHeader('', $title, $help_url, '', '', '', $arrayofjs, $arrayofcss, $morequerystring, $morecssonbody);
+	saturne_header(1, '', $title, $helpUrl, '', 0, 0, $arrayofjs, $arrayofcss, $morequerystring, $morecssonbody);
 
 	//Body navigation digirisk
 	$object = new DigiriskElement($db);
