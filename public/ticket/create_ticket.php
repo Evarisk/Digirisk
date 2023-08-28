@@ -498,7 +498,7 @@ if ($entity > 0) {
 					<label class="wpeo-button button-blue" for="sendfile">
 						<i class="fas fa-image button-icon"></i>
 						<span class="button-label"><?php print $langs->trans('AddDocument'); ?></span>
-						<input type="file" name="userfile[]" multiple="multiple" id="sendfile" onchange="window.eoxiaJS.ticket.tmpStockFile()"  style="display: none"/>
+						<input type="file" name="userfile[]" multiple="multiple" id="sendfile" onchange="window.digiriskdolibarr.ticket.tmpStockFile()"  style="display: none"/>
 					</label>
 				</div>
 

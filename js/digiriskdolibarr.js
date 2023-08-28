@@ -1,46 +1,28 @@
-/* Copyright (C) 2022 EVARISK <dev@evarisk.com>
- *
- * This program is free software: you can redistribute it and/or modify
- * it under the terms of the GNU General Public License as published by
- * the Free Software Foundation, either version 3 of the License, or
- * (at your option) any later version.
- *
- * This program is distributed in the hope that it will be useful,
- * but WITHOUT ANY WARRANTY; without even the implied warranty of
- * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
- * GNU General Public License for more details.
- *
- * You should have received a copy of the GNU General Public License
- * along with this program.  If not, see <https://www.gnu.org/licenses/>.
- *
- * Library javascript to enable Browser notifications
- */
-
-/**
- * \file    js/digiriskdolibarr.js
- * \ingroup digiriskdolibarr
- * \brief   JavaScript file for module DigiriskDolibarr.
- */
-
 /* Javascript library of module DigiriskDolibarr */
 
+/**
+ * @namespace DigiriskDolibarr_Framework_Init
+ *
+ * @author Evarisk <technique@evarisk.com>
+ * @copyright 2015-2023 Evarisk
+ */
 'use strict';
 /**
  * @namespace EO_Framework_Init
  *
- * @author Eoxia <technique@evarisk.com>
- * @copyright 2015-2021-2023 EVARISK
+ * @author Evarisk <technique@evarisk.com>
+ * @copyright 2015-2021 Evarisk
  */
 
-if ( ! window.eoxiaJS ) {
+if ( ! window.digiriskdolibarr ) {
 	/**
-	 * [eoxiaJS description]
+	 * [digiriskdolibarr description]
 	 *
 	 * @memberof EO_Framework_Init
 	 *
 	 * @type {Object}
 	 */
-	window.eoxiaJS = {};
+	window.digiriskdolibarr = {};
 
 	/**
 	 * [scriptsLoaded description]
@@ -49,10 +31,10 @@ if ( ! window.eoxiaJS ) {
 	 *
 	 * @type {Boolean}
 	 */
-	window.eoxiaJS.scriptsLoaded = false;
+	window.digiriskdolibarr.scriptsLoaded = false;
 }
 
-if ( ! window.eoxiaJS.scriptsLoaded ) {
+if ( ! window.digiriskdolibarr.scriptsLoaded ) {
 	/**
 	 * [description]
 	 *
@@ -60,8 +42,8 @@ if ( ! window.eoxiaJS.scriptsLoaded ) {
 	 *
 	 * @returns {void} [description]
 	 */
-	window.eoxiaJS.init = function() {
-		window.eoxiaJS.load_list_script();
+	window.digiriskdolibarr.init = function() {
+		window.digiriskdolibarr.load_list_script();
 	};
 
 	/**
@@ -71,25 +53,25 @@ if ( ! window.eoxiaJS.scriptsLoaded ) {
 	 *
 	 * @returns {void} [description]
 	 */
-	window.eoxiaJS.load_list_script = function() {
-		if ( ! window.eoxiaJS.scriptsLoaded) {
+	window.digiriskdolibarr.load_list_script = function() {
+		if ( ! window.digiriskdolibarr.scriptsLoaded) {
 			var key = undefined, slug = undefined;
-			for ( key in window.eoxiaJS ) {
+			for ( key in window.digiriskdolibarr ) {
 
-				if ( window.eoxiaJS[key].init ) {
-					window.eoxiaJS[key].init();
+				if ( window.digiriskdolibarr[key].init ) {
+					window.digiriskdolibarr[key].init();
 				}
 
-				for ( slug in window.eoxiaJS[key] ) {
+				for ( slug in window.digiriskdolibarr[key] ) {
 
-					if ( window.eoxiaJS[key] && window.eoxiaJS[key][slug] && window.eoxiaJS[key][slug].init ) {
-						window.eoxiaJS[key][slug].init();
+					if ( window.digiriskdolibarr[key] && window.digiriskdolibarr[key][slug] && window.digiriskdolibarr[key][slug].init ) {
+						window.digiriskdolibarr[key][slug].init();
 					}
 
 				}
 			}
 
-			window.eoxiaJS.scriptsLoaded = true;
+			window.digiriskdolibarr.scriptsLoaded = true;
 		}
 	};
 
@@ -100,24 +82,24 @@ if ( ! window.eoxiaJS.scriptsLoaded ) {
 	 *
 	 * @returns {void} [description]
 	 */
-	window.eoxiaJS.refresh = function() {
+	window.digiriskdolibarr.refresh = function() {
 		var key = undefined;
 		var slug = undefined;
-		for ( key in window.eoxiaJS ) {
-			if ( window.eoxiaJS[key].refresh ) {
-				window.eoxiaJS[key].refresh();
+		for ( key in window.digiriskdolibarr ) {
+			if ( window.digiriskdolibarr[key].refresh ) {
+				window.digiriskdolibarr[key].refresh();
 			}
 
-			for ( slug in window.eoxiaJS[key] ) {
+			for ( slug in window.digiriskdolibarr[key] ) {
 
-				if ( window.eoxiaJS[key] && window.eoxiaJS[key][slug] && window.eoxiaJS[key][slug].refresh ) {
-					window.eoxiaJS[key][slug].refresh();
+				if ( window.digiriskdolibarr[key] && window.digiriskdolibarr[key][slug] && window.digiriskdolibarr[key][slug].refresh ) {
+					window.digiriskdolibarr[key][slug].refresh();
 				}
 			}
 		}
 	};
 
-	$( document ).ready( window.eoxiaJS.init );
+	$( document ).ready( window.digiriskdolibarr.init );
 }
 
 /**
@@ -699,7 +681,7 @@ window.eoxiaJS.dropdown.toggleAngleClass = function( button ) {
 /**
  * @namespace EO_Framework_Tooltip
  *
- * @author Eoxia <technique@evarisk.com>
+ * @author Eoxia <dev@eoxia.com>
  * @copyright 2015-2018 Eoxia
  */
 
@@ -825,7 +807,7 @@ if ( ! window.eoxiaJS.tooltip ) {
 /**
  * @namespace EO_Framework_Loader
  *
- * @author Eoxia <technique@evarisk.com>
+ * @author Eoxia <dev@eoxia.com>
  * @copyright 2015-2018 Eoxia
  */
 
