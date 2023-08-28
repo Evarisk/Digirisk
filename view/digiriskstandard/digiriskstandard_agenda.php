@@ -21,20 +21,14 @@
  *  \brief      Page of DigiriskStandard events
  */
 
-// Load Dolibarr environment
-$res = 0;
-// Try main.inc.php into web root known defined into CONTEXT_DOCUMENT_ROOT (not always defined)
-if ( ! $res && ! empty($_SERVER["CONTEXT_DOCUMENT_ROOT"])) $res = @include $_SERVER["CONTEXT_DOCUMENT_ROOT"] . "/main.inc.php";
-// Try main.inc.php into web root detected using web root calculated from SCRIPT_FILENAME
-$tmp = empty($_SERVER['SCRIPT_FILENAME']) ? '' : $_SERVER['SCRIPT_FILENAME']; $tmp2 = realpath(__FILE__); $i = strlen($tmp) - 1; $j = strlen($tmp2) - 1;
-while ($i > 0 && $j > 0 && isset($tmp[$i]) && isset($tmp2[$j]) && $tmp[$i] == $tmp2[$j]) { $i--; $j--; }
-if ( ! $res && $i > 0 && file_exists(substr($tmp, 0, ($i + 1)) . "/main.inc.php")) $res          = @include substr($tmp, 0, ($i + 1)) . "/main.inc.php";
-if ( ! $res && $i > 0 && file_exists(dirname(substr($tmp, 0, ($i + 1))) . "/main.inc.php")) $res = @include dirname(substr($tmp, 0, ($i + 1))) . "/main.inc.php";
-// Try main.inc.php using relative path
-if ( ! $res && file_exists("../../main.inc.php")) $res       = @include "../../main.inc.php";
-if ( ! $res && file_exists("../../../main.inc.php")) $res    = @include "../../../main.inc.php";
-if ( ! $res && file_exists("../../../../main.inc.php")) $res = @include "../../../../main.inc.php";
-if ( ! $res) die("Include of main fails");
+// Load DigiriskDolibarr environment
+if (file_exists('../digiriskdolibarr.main.inc.php')) {
+	require_once __DIR__ . '/../digiriskdolibarr.main.inc.php';
+} elseif (file_exists('../../digiriskdolibarr.main.inc.php')) {
+	require_once __DIR__ . '/../../digiriskdolibarr.main.inc.php';
+} else {
+	die('Include of digiriskdolibarr main fails');
+}
 
 require_once DOL_DOCUMENT_ROOT . '/contact/class/contact.class.php';
 require_once DOL_DOCUMENT_ROOT . '/projet/class/project.class.php';
@@ -49,7 +43,7 @@ require_once __DIR__ . '/../../lib/digiriskdolibarr_function.lib.php';
 global $conf, $db, $langs, $user, $hookmanager;
 
 // Load translation files required by the page
-$langs->loadLangs(array("digiriskdolibarr@digiriskdolibarr", "other"));
+saturne_load_langs(['other']);
 
 // Get parameters
 $id         = GETPOST('id', 'int');
@@ -70,6 +64,7 @@ $limit     = GETPOST('limit', 'int') ? GETPOST('limit', 'int') : $conf->liste_li
 $sortfield = GETPOST("sortfield", 'alpha');
 $sortorder = GETPOST("sortorder", 'alpha');
 $page      = GETPOSTISSET('pageplusone') ? (GETPOST('pageplusone') - 1) : GETPOST("page", 'int');
+
 if (empty($page) || $page == -1) { $page = 0; }     // If $page is not defined, or '' or -1
 $offset                       = $limit * $page;
 $pageprev                     = $page - 1;
@@ -85,20 +80,16 @@ $project     = new Project($db);
 
 $object->fetch($conf->global->DIGIRISKDOLIBARR_ACTIVE_STANDARD);
 
-$hookmanager->initHooks(array('digiriskstandardagenda', 'globalcard')); // Note that conf->hooks_modules contains array
+$hookmanager->initHooks(array('digiriskstandardagenda', 'globalcard'));
+
 // Fetch optionals attributes and labels
 $extrafields->fetch_name_optionals_label($object->table_element);
 
-// Load object
-include DOL_DOCUMENT_ROOT . '/core/actions_fetchobject.inc.php'; // Must be include, not include_once  // Must be include, not include_once. Include fetch and fetch_thirdparty but not fetch_optionals
-if ($id > 0 || ! empty($ref)) $upload_dir = $conf->digiriskdolibarr->multidir_output[$object->entity] . "/" . $object->id;
-
-//Security check
-
+// Security check - Protection if external user
 $permissiontoread = $user->rights->digiriskdolibarr->digiriskelement->read;
 $permissiontoadd  = $user->rights->digiriskdolibarr->digiriskelement->write;
 
-if ( ! $permissiontoread) accessforbidden();
+saturne_check_access($permissiontoread);
 
 /*
  *  Actions
@@ -127,19 +118,17 @@ if (empty($reshook)) {
  */
 
 if ($object->id > 0) {
-	$title = $langs->trans("Agenda");
-	//if (! empty($conf->global->MAIN_HTML_TITLE) && preg_match('/thirdpartynameonly/',$conf->global->MAIN_HTML_TITLE) && $object->name) $title=$object->name." - ".$title;
-	$help_url = 'FR:Module_Digirisk#DigiRisk_-_Document_Unique';
-	$morejs   = array("/digiriskdolibarr/js/digiriskdolibarr.js");
-	$morecss  = array("/digiriskdolibarr/css/digiriskdolibarr.css");
+	$title   = $langs->trans("Agenda");
+	$helpUrl = 'FR:Module_Digirisk#DigiRisk_-_Document_Unique';
 
-	digiriskHeader($title, $help_url, $morejs, $morecss);
+	digirisk_header($title, $helpUrl);
 	print '<div id="cardContent" value="">';
 
-	if ( ! empty($conf->notification->enabled)) $langs->load("mails");
-	$head = digiriskstandardPrepareHead($object);
+	if (isModEnabled('notification')) {
+		$langs->load("mails");
+	}
 
-	print dol_get_fiche_head($head, 'standardAgenda', $title, -1, "digiriskdolibarr@digiriskdolibarr");
+	saturne_get_fiche_head($object, 'standardAgenda', $title);
 
 	// Object card
 	// ------------------------------------------------------------
@@ -148,7 +137,7 @@ if ($object->id > 0) {
 	$project->fetch($conf->global->DIGIRISKDOLIBARR_DU_PROJECT);
 	$morehtmlref .= $langs->trans('Project') . ' : ' . getNomUrlProject($project, 1, 'blank', 1);
 	$morehtmlref .= '</div>';
-	$morehtmlleft = '<div class="floatleft inline-block valignmiddle divphotoref">' . digirisk_show_photos('mycompany', $conf->mycompany->dir_output . '/logos', 'small', 1, 0, 0, 0, 80, 80, 0, 0, 0, 'logos', $emptyobject) . '</div>';
+	$morehtmlleft = '<div class="floatleft inline-block valignmiddle divphotoref">' . saturne_show_medias_linked('mycompany', $conf->mycompany->dir_output . '/logos', 'small', 1, 0, 0, 0, 80, 80, 0, 0, 0, 'logos', $object, 0,0, 0) . '</div>';
 
 	digirisk_banner_tab($object, '', '', 0, '', '', $morehtmlref, '', '', $morehtmlleft);
 
@@ -160,26 +149,24 @@ if ($object->id > 0) {
 	// Actions buttons
 	$out = '&origin=' . $object->element . '@digiriskdolibarr' . '&originid=' . $object->id . '&backtopage='. $_SERVER["PHP_SELF"] . '?id=' . $object->id . '&percentage=-1';
 
-	if ( ! empty($conf->agenda->enabled)) {
+	if (isModEnabled('agenda')) {
 		$linktocreatetimeBtnStatus = ! empty($user->rights->agenda->myactions->create) || ! empty($user->rights->agenda->allactions->create);
 		$morehtmlcenter            = dolGetButtonTitle($langs->trans('AddAction'), '', 'fa fa-plus-circle', DOL_URL_ROOT . '/comm/action/card.php?action=create' . $out, '', $linktocreatetimeBtnStatus);
-	}
 
-	if ( ! empty($conf->agenda->enabled) && ( ! empty($user->rights->agenda->myactions->read) || ! empty($user->rights->agenda->allactions->read))) {
-		$param                                                                      = '&id=' . $object->id;
-		if ( ! empty($contextpage) && $contextpage != $_SERVER["PHP_SELF"]) $param .= '&contextpage=' . urlencode($contextpage);
-		if ($limit > 0 && $limit != $conf->liste_limit) $param                     .= '&limit=' . urlencode($limit);
+		if (( ! empty($user->rights->agenda->myactions->read) || ! empty($user->rights->agenda->allactions->read))) {
+			$param                                                                      = '&id=' . $object->id;
+			if ( ! empty($contextpage) && $contextpage != $_SERVER["PHP_SELF"]) $param .= '&contextpage=' . urlencode($contextpage);
+			if ($limit > 0 && $limit != $conf->liste_limit) $param                     .= '&limit=' . urlencode($limit);
 
-		print_barre_liste($langs->trans("ActionsOnDigiriskStandard"), 0, $_SERVER["PHP_SELF"], '', $sortfield, $sortorder, '', 0, -1, '', 0, $morehtmlcenter, '', 0, 1, 1);
+			print_barre_liste($langs->trans("ActionsOnDigiriskStandard"), 0, $_SERVER["PHP_SELF"], '', $sortfield, $sortorder, '', 0, -1, '', 0, $morehtmlcenter, '', 0, 1, 1);
 
-		// List of all actions
-		$filters                        = array();
-		$filters['search_agenda_label'] = $search_agenda_label;
+			// List of all actions
+			$filters                        = array();
+			$filters['search_agenda_label'] = $search_agenda_label;
 
-		// TODO Replace this with same code than into list.php
-
-		show_actions_done($conf, $langs, $db, $object, null, 0, $actioncode, '', $filters, $sortfield, $sortorder, 'digiriskdolibarr');
-		print '</div>';
+			show_actions_done($conf, $langs, $db, $object, null, 0, $actioncode, '', $filters, $sortfield, $sortorder, 'digiriskdolibarr');
+			print '</div>';
+		}
 	}
 }
 

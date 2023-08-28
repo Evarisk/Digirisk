@@ -42,7 +42,7 @@ require_once __DIR__ . '/../../core/modules/digiriskdolibarr/digiriskdocuments/l
 global $db, $conf, $langs, $user, $hookmanager;
 
 // Load translation files required by the page
-saturne_load_langs(['others']);
+saturne_load_langs(['other']);
 
 // Get parameters
 $action = GETPOST('action', 'aZ09');
@@ -84,14 +84,13 @@ if (empty($reshook)) {
 	// Action to generate pdf from odt file
 	require_once __DIR__ . '/../../../saturne/core/tpl/documents/saturne_manual_pdf_generation_action.tpl.php';
 }
+
 /*
  * View
  */
 
-$emptyobject = new stdClass();
-
-$title    = $langs->trans('LegalDisplay');
-$helpUrl  = 'FR:Module_Digirisk#Soci.C3.A9t.C3.A9.2FOrganisation';
+$title   = $langs->trans('LegalDisplay');
+$helpUrl = 'FR:Module_Digirisk#Soci.C3.A9t.C3.A9.2FOrganisation';
 
 digirisk_header($title, $helpUrl); ?>
 
@@ -102,6 +101,7 @@ $res  = $object->fetch_optionals();
 
 saturne_get_fiche_head($object, 'standardLegalDisplay', $title);
 
+
 // Object card
 // ------------------------------------------------------------
 // Project
@@ -109,7 +109,7 @@ $morehtmlref = '<div class="refidno">';
 $project->fetch($conf->global->DIGIRISKDOLIBARR_DU_PROJECT);
 $morehtmlref .= $langs->trans('Project') . ' : ' . getNomUrlProject($project, 1, 'blank', 1);
 $morehtmlref .= '</div>';
-$morehtmlleft = '<div class="floatleft inline-block valignmiddle divphotoref">' . digirisk_show_photos('mycompany', $conf->mycompany->dir_output . '/logos', 'small', 1, 0, 0, 0, 80, 80, 0, 0, 0, 'logos', $emptyobject) . '</div>';
+$morehtmlleft = '<div class="floatleft inline-block valignmiddle divphotoref">' . saturne_show_medias_linked('mycompany', $conf->mycompany->dir_output . '/logos', 'small', 1, 0, 0, 0, 80, 80, 0, 0, 0, 'logos', $object, 0,0, 0) . '</div>';
 
 digirisk_banner_tab($object, '', '', 0, '', '', $morehtmlref, '', '', $morehtmlleft);
 
