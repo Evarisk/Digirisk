@@ -1,5 +1,5 @@
 <?php
-/* Copyright (C) 2021 EOXIA <dev@eoxia.com>
+/* Copyright (C) 2021-2023 EVARISK <technique@evarisk.com>
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -61,7 +61,6 @@ $project = new Project($db);
 $object->fetch($conf->global->DIGIRISKDOLIBARR_ACTIVE_STANDARD);
 
 // Security check
-require_once __DIR__ . '/../../core/tpl/digirisk_security_checks.php';
 
 $permissiontoread = $user->rights->digiriskdolibarr->riskassessmentdocument->read;
 

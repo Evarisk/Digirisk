@@ -53,7 +53,7 @@ class DigiriskElement extends SaturneObject
      * @var int Does this object support multicompany module ?
      * 0 = No test on entity, 1 = Test with field entity, 'field@table' = Test with link by field@table.
      */
-    public int $ismultientitymanaged = 1;
+    public $ismultientitymanaged = 1;
 
     /**
      * @var int Does object support extrafields ? 0 = No, 1 = Yes.

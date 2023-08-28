@@ -1,5 +1,5 @@
 <?php
-/* Copyright (C) 2021 EOXIA <dev@eoxia.com>
+/* Copyright (C) 2021-2023 EVARISK <technique@evarisk.com>
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -67,7 +67,6 @@ $object->fetch($id);
 $hookmanager->initHooks(array('accidentmetadata', 'globalcard')); // Note that conf->hooks_modules contains array
 
 // Security check
-require_once __DIR__ . '/../../core/tpl/digirisk_security_checks.php';
 
 $permissiontoread   = $user->rights->digiriskdolibarr->accident->read;
 $permissiontoadd    = $user->rights->digiriskdolibarr->accident->write;

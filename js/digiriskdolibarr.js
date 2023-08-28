@@ -28,8 +28,8 @@
 /**
  * @namespace EO_Framework_Init
  *
- * @author Eoxia <dev@eoxia.com>
- * @copyright 2015-2021 Eoxia
+ * @author Eoxia <technique@evarisk.com>
+ * @copyright 2015-2021-2023 EVARISK
  */
 
 if ( ! window.eoxiaJS ) {
@@ -699,7 +699,7 @@ window.eoxiaJS.dropdown.toggleAngleClass = function( button ) {
 /**
  * @namespace EO_Framework_Tooltip
  *
- * @author Eoxia <dev@eoxia.com>
+ * @author Eoxia <technique@evarisk.com>
  * @copyright 2015-2018 Eoxia
  */
 
@@ -825,7 +825,7 @@ if ( ! window.eoxiaJS.tooltip ) {
 /**
  * @namespace EO_Framework_Loader
  *
- * @author Eoxia <dev@eoxia.com>
+ * @author Eoxia <technique@evarisk.com>
  * @copyright 2015-2018 Eoxia
  */
 

@@ -1,5 +1,5 @@
 <?php
-/* Copyright (C) 2021 EOXIA <dev@eoxia.com>
+/* Copyright (C) 2021-2023 EVARISK <technique@evarisk.com>
  *
  * This program is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -21,20 +21,14 @@
  * \brief   Digiriskdolibarr setup page for social data configuration.
  */
 
-// Load Dolibarr environment
-$res = 0;
-// Try main.inc.php into web root known defined into CONTEXT_DOCUMENT_ROOT (not always defined)
-if ( ! $res && ! empty($_SERVER["CONTEXT_DOCUMENT_ROOT"])) $res = @include $_SERVER["CONTEXT_DOCUMENT_ROOT"] . "/main.inc.php";
-// Try main.inc.php into web root detected using web root calculated from SCRIPT_FILENAME
-$tmp = empty($_SERVER['SCRIPT_FILENAME']) ? '' : $_SERVER['SCRIPT_FILENAME']; $tmp2 = realpath(__FILE__); $i = strlen($tmp) - 1; $j = strlen($tmp2) - 1;
-while ($i > 0 && $j > 0 && isset($tmp[$i]) && isset($tmp2[$j]) && $tmp[$i] == $tmp2[$j]) { $i--; $j--; }
-if ( ! $res && $i > 0 && file_exists(substr($tmp, 0, ($i + 1)) . "/main.inc.php")) $res          = @include substr($tmp, 0, ($i + 1)) . "/main.inc.php";
-if ( ! $res && $i > 0 && file_exists(dirname(substr($tmp, 0, ($i + 1))) . "/main.inc.php")) $res = @include dirname(substr($tmp, 0, ($i + 1))) . "/main.inc.php";
-// Try main.inc.php using relative path
-if ( ! $res && file_exists("../../main.inc.php")) $res       = @include "../../main.inc.php";
-if ( ! $res && file_exists("../../../main.inc.php")) $res    = @include "../../../main.inc.php";
-if ( ! $res && file_exists("../../../../main.inc.php")) $res = @include "../../../../main.inc.php";
-if ( ! $res) die("Include of main fails");
+// Load DigiriskDolibarr environment
+if (file_exists('../digiriskdolibarr.main.inc.php')) {
+	require_once __DIR__ . '/../digiriskdolibarr.main.inc.php';
+} elseif (file_exists('../../digiriskdolibarr.main.inc.php')) {
+	require_once __DIR__ . '/../../digiriskdolibarr.main.inc.php';
+} else {
+	die('Include of digiriskdolibarr main fails');
+}
 
 global $conf, $db, $langs, $user, $hookmanager;
 
@@ -47,14 +41,11 @@ require_once DOL_DOCUMENT_ROOT . '/core/class/html.formother.class.php';
 require_once DOL_DOCUMENT_ROOT . '/core/class/html.formactions.class.php';
 require_once DOL_DOCUMENT_ROOT . '/core/class/html.form.class.php';
 
-require_once '../class/digiriskresources.class.php';
+require_once __DIR__ . '/../class/digiriskresources.class.php';
 require_once __DIR__ . '/../core/tpl/digirisk_security_checks.php';
 
 // Translations
-$langs->loadLangs(array('admin', 'companies', "digiriskdolibarr@digiriskdolibarr"));
-
-// Access control
-if ( ! $user->admin) accessforbidden();
+saturne_load_langs(["admin", "companies"]);
 
 // Parameters
 $action = GETPOST('action', 'aZ09');
@@ -67,9 +58,9 @@ $allLinks = $resources->digirisk_dolibarr_fetch_resources();
 
 $hookmanager->initHooks(array('admincompany', 'globaladmin'));
 
-$electionDateCSE = dol_mktime(0, 0, 0, GETPOST('date_debutmonth', 'int'), GETPOST('date_debutday', 'int'), GETPOST('date_debutyear', 'int'));
-$electionDateDP  = dol_mktime(0, 0, 0, GETPOST('date_finmonth', 'int'), GETPOST('date_finday', 'int'), GETPOST('date_finyear', 'int'));
-$date            = dol_mktime(0, 0, 0, GETPOST('datemonth', 'int'), GETPOST('dateday', 'int'), GETPOST('dateyear', 'int'));
+// Security check - Protection if external user
+$permissiontoread = $user->rights->digiriskdolibarr->adminpage->read;
+saturne_check_access($permissiontoread);
 
 /*
  * Actions
@@ -105,11 +96,11 @@ if (empty($reshook)) {
 		$resources->digirisk_dolibarr_set_resources($db, $user->id, 'TitularsDP', 'societe', $TitularsDP, $conf->entity);
 		$resources->digirisk_dolibarr_set_resources($db, $user->id, 'AlternatesDP', 'societe', $AlternatesDP, $conf->entity);
 
-		$HarassmentOfficer = GETPOST('HarassmentOfficer', 'int');
-		$HarassmentOfficerCSE = GETPOST('HarassmentOfficerCSE', 'int');
+		$harassmentOfficer = GETPOST('HarassmentOfficer', 'int');
+		$harassmentOfficerCSE = GETPOST('HarassmentOfficerCSE', 'int');
 
-		$resources->digirisk_dolibarr_set_resources($db, $user->id, 'HarassmentOfficer', 'user', array($HarassmentOfficer), $conf->entity);
-		$resources->digirisk_dolibarr_set_resources($db, $user->id, 'HarassmentOfficerCSE', 'user', array($HarassmentOfficerCSE), $conf->entity);
+		$resources->digirisk_dolibarr_set_resources($db, $user->id, 'HarassmentOfficer', 'user', array($harassmentOfficer), $conf->entity);
+		$resources->digirisk_dolibarr_set_resources($db, $user->id, 'HarassmentOfficerCSE', 'user', array($harassmentOfficerCSE), $conf->entity);
 
 		if ($action != 'updateedit' && ! $error) {
 			header("Location: " . $_SERVER["PHP_SELF"]);
@@ -217,11 +208,11 @@ print '</td></tr>';
 */
 
 print '<tr class="liste_titre"><th class="titlefield wordbreak">' . $langs->trans("HarassmentOfficer") . '</th><th>' . $langs->trans("") . '</th></tr>' . "\n";
-$HarassmentOfficer = $allLinks['HarassmentOfficer'];
+$harassmentOfficer = $allLinks['HarassmentOfficer'];
 print '<tr>';
 print '<td>' . $langs->trans("ActionOnUser") . '</td>';
 print '<td colspan="3" class="maxwidthonsmartphone">';
-print $form->select_dolusers($HarassmentOfficer->id, 'HarassmentOfficer', 1, null, 0, '', '', $conf->entity, 0, 0, 'AND u.statut = 1', 0, '', 'minwidth300');
+print $form->select_dolusers($harassmentOfficer->id, 'HarassmentOfficer', 1, null, 0, '', '', $conf->entity, 0, 0, 'AND u.statut = 1', 0, '', 'minwidth300');
 if ( ! GETPOSTISSET('backtopage')) print ' <a href="' . DOL_URL_ROOT . '/user/card.php?action=create&backtopage=' . urlencode($_SERVER["PHP_SELF"] . '?action=create') . '"><span class="fa fa-plus-circle valignmiddle paddingleft" title="' . $langs->trans("AddUser") . '"></span></a>';
 print '</td></tr>';
 
@@ -230,11 +221,11 @@ print '</td></tr>';
 */
 
 print '<tr class="liste_titre"><th class="titlefield wordbreak">' . $langs->trans("HarassmentOfficerCSE") . '</th><th>' . $langs->trans("") . '</th></tr>' . "\n";
-$HarassmentOfficerCSE = $allLinks['HarassmentOfficerCSE'];
+$harassmentOfficerCSE = $allLinks['HarassmentOfficerCSE'];
 print '<tr>';
 print '<td>' . $langs->trans("ActionOnUser") . '</td>';
 print '<td colspan="3" class="maxwidthonsmartphone">';
-print $form->select_dolusers($HarassmentOfficerCSE->id, 'HarassmentOfficerCSE', 1, null, 0, '', '', $conf->entity, 0, 0, 'AND u.statut = 1', 0, '', 'minwidth300');
+print $form->select_dolusers($harassmentOfficerCSE->id, 'HarassmentOfficerCSE', 1, null, 0, '', '', $conf->entity, 0, 0, 'AND u.statut = 1', 0, '', 'minwidth300');
 if ( ! GETPOSTISSET('backtopage')) print ' <a href="' . DOL_URL_ROOT . '/user/card.php?action=create&backtopage=' . urlencode($_SERVER["PHP_SELF"] . '?action=create') . '"><span class="fa fa-plus-circle valignmiddle paddingleft" title="' . $langs->trans("AddUser") . '"></span></a>';
 print '</td></tr>';
 
@@ -253,14 +244,14 @@ print '</td></tr>';
 // * ESC Titulars - Titulaires CSE *
 
 $userlist 	  = $form->select_dolusers('', '', 0, null, 0, '', '', $conf->entity, 0, 0, 'AND u.statut = 1', 0, '', '', 0, 1);
-$titulars_cse = $allLinks['TitularsCSE'];
+$titularsCse = $allLinks['TitularsCSE'];
 
 print '<tr>';
 print '<td>' . $form->editfieldkey('Titulars', 'TitularsCSE_id', '', $object, 0) . '</td>';
 print '<td colspan="3" class="maxwidthonsmartphone">';
 
 
-print $form->multiselectarray('TitularsCSE', $userlist, $titulars_cse->id, null, null, null, null, "300");
+print $form->multiselectarray('TitularsCSE', $userlist, $titularsCse->id, null, null, null, null, "300");
 
 if ( ! GETPOSTISSET('backtopage')) print ' <a href="' . DOL_URL_ROOT . '/user/card.php?action=create&backtopage=' . urlencode($_SERVER["PHP_SELF"] . '?action=create') . '"><span class="fa fa-plus-circle valignmiddle paddingleft" title="' . $langs->trans("AddUser") . '"></span></a>';
 
@@ -269,13 +260,13 @@ print '</td></tr>';
 // * ESC Alternates - Suppléants CSE *
 
 $userlist       = $form->select_dolusers('', '', 0, null, 0, '', '', $conf->entity, 0, 0, 'AND u.statut = 1', 0, '', '', 0, 1);
-$alternates_cse = $allLinks['AlternatesCSE'];
+$alternatesCse = $allLinks['AlternatesCSE'];
 
 print '<tr>';
 print '<td>' . $form->editfieldkey('Alternates', 'AlternatesCSE_id', '', $object, 0) . '</td>';
 print '<td colspan="3" class="maxwidthonsmartphone">';
 
-print $form->multiselectarray('AlternatesCSE', $userlist, $alternates_cse->id, null, null, null, null, "300");
+print $form->multiselectarray('AlternatesCSE', $userlist, $alternatesCse->id, null, null, null, null, "300");
 
 if ( ! GETPOSTISSET('backtopage')) print ' <a href="' . DOL_URL_ROOT . '/user/card.php?action=create&backtopage=' . urlencode($_SERVER["PHP_SELF"] . '?action=create') . '"><span class="fa fa-plus-circle valignmiddle paddingleft" title="' . $langs->trans("AddUser") . '"></span></a>';
 
@@ -294,13 +285,13 @@ print $form->selectDate(strtotime($electionDateDP) ? $electionDateDP : -1, 'Elec
 // * Staff Representatives Titulars - Titulaires Délégués du Personnel *
 
 $userlist    = $form->select_dolusers('', '', 0, null, 0, '', '', $conf->entity, 0, 0, 'AND u.statut = 1', 0, '', '', 0, 1);
-$titulars_dp = $allLinks['TitularsDP'];
+$titularsDp = $allLinks['TitularsDP'];
 
 print '<tr>';
 print '<td>' . $form->editfieldkey('Titulars', 'TitularsDP_id', '', $object, 0) . '</td>';
 print '<td colspan="3" class="maxwidthonsmartphone">';
 
-print $form->multiselectarray('TitularsDP', $userlist, $titulars_dp->id, null, null, null, null, "300");
+print $form->multiselectarray('TitularsDP', $userlist, $titularsDp->id, null, null, null, null, "300");
 
 if ( ! GETPOSTISSET('backtopage')) print ' <a href="' . DOL_URL_ROOT . '/user/card.php?action=create&backtopage=' . urlencode($_SERVER["PHP_SELF"] . '?action=create') . '"><span class="fa fa-plus-circle valignmiddle paddingleft" title="' . $langs->trans("AddUser") . '"></span></a>';
 
@@ -309,13 +300,13 @@ print '</td></tr>';
 // * Staff Representatives Suppléants - Suppléants Délégués du Personnel *
 
 $userlist      = $form->select_dolusers('', '', 0, null, 0, '', '', $conf->entity, 0, 0, 'AND u.statut = 1', 0, '', '', 0, 1);
-$alternates_dp = $allLinks['AlternatesDP'];
+$alternatesDp = $allLinks['AlternatesDP'];
 
 print '<tr>';
 print '<td>' . $form->editfieldkey('Alternates', 'AlternatesDP', '', $object, 0) . '</td>';
 print '<td colspan="3" class="maxwidthonsmartphone">';
 
-print $form->multiselectarray('AlternatesDP', $userlist, $alternates_dp->id, null, null, null, null, "300");
+print $form->multiselectarray('AlternatesDP', $userlist, $alternatesDp->id, null, null, null, null, "300");
 
 if ( ! GETPOSTISSET('backtopage')) print ' <a href="' . DOL_URL_ROOT . '/user/card.php?action=create&backtopage=' . urlencode($_SERVER["PHP_SELF"] . '?action=create') . '"><span class="fa fa-plus-circle valignmiddle paddingleft" title="' . $langs->trans("AddUser") . '"></span></a>';
 

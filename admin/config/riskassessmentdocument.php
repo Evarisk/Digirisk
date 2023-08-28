@@ -1,5 +1,5 @@
 <?php
-/* Copyright (C) 2021 EOXIA <dev@eoxia.com>
+/* Copyright (C) 2021-2023 EVARISK <technique@evarisk.com>
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -21,20 +21,14 @@
  * \brief   Digiriskdolibarr riskassessmentdocument page.
  */
 
-// Load Dolibarr environment
-$res = 0;
-// Try main.inc.php into web root known defined into CONTEXT_DOCUMENT_ROOT (not always defined)
-if ( ! $res && ! empty($_SERVER["CONTEXT_DOCUMENT_ROOT"])) $res = @include $_SERVER["CONTEXT_DOCUMENT_ROOT"] . "/main.inc.php";
-// Try main.inc.php into web root detected using web root calculated from SCRIPT_FILENAME
-$tmp = empty($_SERVER['SCRIPT_FILENAME']) ? '' : $_SERVER['SCRIPT_FILENAME']; $tmp2 = realpath(__FILE__); $i = strlen($tmp) - 1; $j = strlen($tmp2) - 1;
-while ($i > 0 && $j > 0 && isset($tmp[$i]) && isset($tmp2[$j]) && $tmp[$i] == $tmp2[$j]) { $i--; $j--; }
-if ( ! $res && $i > 0 && file_exists(substr($tmp, 0, ($i + 1)) . "/main.inc.php")) $res          = @include substr($tmp, 0, ($i + 1)) . "/main.inc.php";
-if ( ! $res && $i > 0 && file_exists(dirname(substr($tmp, 0, ($i + 1))) . "/main.inc.php")) $res = @include dirname(substr($tmp, 0, ($i + 1))) . "/main.inc.php";
-// Try main.inc.php using relative path
-if ( ! $res && file_exists("../../main.inc.php")) $res       = @include "../../main.inc.php";
-if ( ! $res && file_exists("../../../main.inc.php")) $res    = @include "../../../main.inc.php";
-if ( ! $res && file_exists("../../../../main.inc.php")) $res = @include "../../../../main.inc.php";
-if ( ! $res) die("Include of main fails");
+// Load DigiriskDolibarr environment
+if (file_exists('../digiriskdolibarr.main.inc.php')) {
+	require_once __DIR__ . '/../digiriskdolibarr.main.inc.php';
+} elseif (file_exists('../../digiriskdolibarr.main.inc.php')) {
+	require_once __DIR__ . '/../../digiriskdolibarr.main.inc.php';
+} else {
+	die('Include of digiriskdolibarr main fails');
+}
 
 global $conf, $db, $langs, $user;
 
@@ -45,8 +39,7 @@ require_once DOL_DOCUMENT_ROOT . "/core/class/html.formcompany.class.php";
 require_once DOL_DOCUMENT_ROOT . '/projet/class/project.class.php';
 require_once DOL_DOCUMENT_ROOT . '/projet/class/task.class.php';
 
-require_once '../../lib/digiriskdolibarr.lib.php';
-require_once __DIR__ . '/../../core/tpl/digirisk_security_checks.php';
+require_once __DIR__ . '/../../lib/digiriskdolibarr.lib.php';
 
 $action     = GETPOST('action', 'alpha');
 $backtopage = GETPOST('backtopage', 'alpha');
@@ -56,33 +49,34 @@ $project = new Project($db);
 $task    = new Task($db);
 
 // Translations
-$langs->loadLangs(array("admin", "digiriskdolibarr@digiriskdolibarr"));
-
-// Access control
-if ( ! $user->admin) accessforbidden();
+saturne_load_langs(["admin"]);
 
 // Parameters
 $action     = GETPOST('action', 'alpha');
 $backtopage = GETPOST('backtopage', 'alpha');
+
+// Security check - Protection if external user
+$permissiontoread = $user->rights->digiriskdolibarr->adminpage->read;
+saturne_check_access($permissiontoread);
 
 /*
  * Actions
  */
 
 if (($action == 'update' && ! GETPOST("cancel", 'alpha')) || ($action == 'updateedit')) {
-	$DUProject = GETPOST('DUProject', 'none');
-	$DUProject = preg_split('/_/', $DUProject);
-	$EvaluatorDuration = GETPOST('EvaluatorDuration', 'alpha');
-	$TaskTimeSpentDuration = GETPOST('TaskTimeSpentDuration', 'alpha');
+	$DUProject             = GETPOST('DUProject', 'none');
+	$DUProject             = preg_split('/_/', $DUProject);
+	$evaluatorDuration     = GETPOST('EvaluatorDuration', 'alpha');
+	$taskTimeSpentDuration = GETPOST('TaskTimeSpentDuration', 'alpha');
 
 	dolibarr_set_const($db, "DIGIRISKDOLIBARR_DU_PROJECT", $DUProject[0], 'integer', 0, '', $conf->entity);
 
-	if (!empty($EvaluatorDuration) || $EvaluatorDuration === '0') {
-		dolibarr_set_const($db, "DIGIRISKDOLIBARR_EVALUATOR_DURATION", $EvaluatorDuration, 'integer', 0, '', $conf->entity);
+	if (!empty($evaluatorDuration) || $evaluatorDuration === '0') {
+		dolibarr_set_const($db, "DIGIRISKDOLIBARR_EVALUATOR_DURATION", $evaluatorDuration, 'integer', 0, '', $conf->entity);
 	}
 
-	if (!empty($TaskTimeSpentDuration) || $TaskTimeSpentDuration === '0') {
-		dolibarr_set_const($db, "DIGIRISKDOLIBARR_TASK_TIMESPENT_DURATION", $TaskTimeSpentDuration, 'integer', 0, '', $conf->entity);
+	if (!empty($taskTimeSpentDuration) || $taskTimeSpentDuration === '0') {
+		dolibarr_set_const($db, "DIGIRISKDOLIBARR_TASK_TIMESPENT_DURATION", $taskTimeSpentDuration, 'integer', 0, '', $conf->entity);
 	}
 
 	if (!empty(GETPOST('project_contact_type'))) {
@@ -104,35 +98,27 @@ if (($action == 'update' && ! GETPOST("cancel", 'alpha')) || ($action == 'update
  * View
  */
 
-if ( ! empty($conf->projet->enabled)) {
+if (isModEnabled('project')) {
 	$formproject = new FormProjets($db);
 }
 
-$formcompany = new FormCompany($db);
-
-$help_url = 'FR:Module_Digirisk#L.27onglet_Analyse_des_risques';
+$helpUrl  = 'FR:Module_Digirisk#L.27onglet_Analyse_des_risques';
 $title    = $langs->trans("RiskAssessmentDocument");
 
-$morejs  = array("/digiriskdolibarr/js/digiriskdolibarr.js");
-$morecss = array("/digiriskdolibarr/css/digiriskdolibarr.css");
-
-llxHeader('', $title, $help_url, '', '', '', $morejs, $morecss);
+saturne_header(0,'', $title, $helpUrl);
 
 // Subheader
-$linkback = '<a href="' . ($backtopage ? $backtopage : DOL_URL_ROOT . '/admin/modules.php?restore_lastsearch_values=1') . '">' . $langs->trans("BackToModuleList") . '</a>';
-
+$linkback = '<a href="' . ($backtopage ?: DOL_URL_ROOT . '/admin/modules.php?restore_lastsearch_values=1') . '">' . $langs->trans("BackToModuleList") . '</a>';
 print load_fiche_titre($title, $linkback, 'digiriskdolibarr32px@digiriskdolibarr');
 
 // Configuration header
-$head = digiriskdolibarrAdminPrepareHead();
+$head = digiriskdolibarr_admin_prepare_head();
 print dol_get_fiche_head($head, 'riskassessmentdocument', '', -1, "digiriskdolibarr@digiriskdolibarr");
 
 
-// RISKS
-
+// Risks
 print load_fiche_titre('<i class="fas fa-exclamation-triangle"></i> ' . $langs->trans('RiskConfig'), '', '');
 print '<hr>';
-
 
 print load_fiche_titre($langs->trans("DigiriskRiskNumberingModule"), '', '');
 
@@ -316,7 +302,7 @@ print ajax_constantonoff('DIGIRISKDOLIBARR_SHOW_INHERITED_RISKS_IN_LISTINGS');
 print '</td>';
 print '</tr>';
 
-$result = !empty($conf->mc->entities['risk']) ? strpos($conf->mc->entities['risk'], $conf->entity) : 0;
+$areRisksShared = !empty($conf->mc->entities['risk']) ? strpos($conf->mc->entities['risk'], $conf->entity) : 0;
 
 print '<tr class="oddeven"><td>';
 print $langs->trans('ShowSharedRisks');
@@ -325,7 +311,7 @@ print $langs->trans('ShowSharedRisksDescription');
 print '</td>';
 
 print '<td class="center">';
-if ($conf->multicompany->enabled && !empty($conf->mc->sharings['risk']) && $result > 0) {
+if (isModEnabled('multicompany') && !empty($conf->mc->sharings['risk']) && $areRisksShared > 0) {
 	print ajax_constantonoff('DIGIRISKDOLIBARR_SHOW_SHARED_RISKS');
 } else {
 	print $langs->trans('DisabledSharedElement');
@@ -334,10 +320,8 @@ print '</td>';
 print '</tr>';
 
 print '</table>';
-print '<hr>';
 
-// Risk Assessment
-
+// Risk Assessments
 print load_fiche_titre('<i class="fas fa-exclamation-circle"></i> ' . $langs->trans('RiskAssessmentConfig'), '', '');
 print '<hr>';
 
@@ -481,25 +465,23 @@ print '</tr>';
 print '</table>';
 
 // Tasks
-
-print '<hr>';
 print load_fiche_titre('<i class="fas fa-tasks"></i> ' . $langs->trans("TaskConfig"), '', '');
 print '<hr>';
 
 print load_fiche_titre($langs->trans("TasksManagement"), '', '');
 
-print '<form method="POST" action="' . $_SERVER["PHP_SELF"] . '" name="social_form">';
-print '<input type="hidden" name="token" value="' . newToken() . '">';
-print '<input type="hidden" name="action" value="update">';
-print '<table class="noborder centpercent editmode">';
-print '<tr class="liste_titre">';
-print '<td>' . $langs->trans("Name") . '</td>';
-print '<td>' . $langs->trans("SelectProject") . '</td>';
-print '<td>' . $langs->trans("Action") . '</td>';
-print '</tr>';
-
 // Project
-if ( ! empty($conf->projet->enabled)) {
+if (isModEnabled('project')) {
+	print '<form method="POST" action="' . $_SERVER["PHP_SELF"] . '">';
+	print '<input type="hidden" name="token" value="' . newToken() . '">';
+	print '<input type="hidden" name="action" value="update">';
+	print '<table class="noborder centpercent editmode">';
+	print '<tr class="liste_titre">';
+	print '<td>' . $langs->trans("Name") . '</td>';
+	print '<td>' . $langs->trans("SelectProject") . '</td>';
+	print '<td>' . $langs->trans("Action") . '</td>';
+	print '</tr>';
+
 	$langs->load("projects");
 	print '<tr class="oddeven"><td><label for="DUProject">' . $langs->trans("DUProject") . '</label></td><td>';
 	$formproject->select_projects(0,  $conf->global->DIGIRISKDOLIBARR_DU_PROJECT, 'DUProject', 0, 0, 0, 0, 0, 0, 0, '', 0, 0, 'maxwidth500');
@@ -516,10 +498,10 @@ if ( ! empty($conf->projet->enabled)) {
 	$formcompany->selectTypeContact($task, $conf->global->DIGIRISKDOLIBARR_DEFAULT_TASK_CONTACT_TYPE, 'task_contact_type', 'internal', 'position', 0, 'minwidth500');
 	print '<td><input type="submit" class="button" name="save" value="' . $langs->trans("Save") . '">';
 	print '</td></tr>';
-}
 
-print '</table>';
-print '</form>';
+	print '</table>';
+	print '</form>';
+}
 
 print load_fiche_titre($langs->trans("DigiriskTaskData"), '', '');
 
@@ -585,7 +567,6 @@ print ajax_constantonoff('DIGIRISKDOLIBARR_SHOW_TASK_CALCULATED_PROGRESS');
 print '</td>';
 print '</tr>';
 
-
 print '<tr class="oddeven"><td>';
 print $langs->trans('ShowAllTasks');
 print "</td><td>";
@@ -597,9 +578,8 @@ print ajax_constantonoff('DIGIRISKDOLIBARR_SHOW_ALL_TASKS');
 print '</td>';
 print '</tr>';
 print '</table>';
-print '<hr>';
 
-print '<form method="POST" action="' . $_SERVER["PHP_SELF"] . '" name="social_form">';
+print '<form method="POST" action="' . $_SERVER["PHP_SELF"] . '">';
 print '<input type="hidden" name="token" value="' . newToken() . '">';
 print '<input type="hidden" name="action" value="update">';
 print '<table class="noborder centpercent editmode">';
@@ -618,13 +598,10 @@ print '</td></tr>';
 
 print '</table>';
 print '</form>';
-print '<hr>';
 
 // Evaluators
-
 print load_fiche_titre('<i class="fas fa-user-check"></i> ' . $langs->trans("EvaluatorConfig"), '', '');
 print '<hr>';
-
 
 print load_fiche_titre($langs->trans("DigiriskEvaluatorNumberingModule"), '', '');
 
@@ -713,7 +690,7 @@ print '</table>';
 
 print load_fiche_titre($langs->trans("DigiriskEvaluatorData"), '', '');
 
-print '<form method="POST" action="' . $_SERVER["PHP_SELF"] . '" name="social_form">';
+print '<form method="POST" action="' . $_SERVER["PHP_SELF"] . '">';
 print '<input type="hidden" name="token" value="' . newToken() . '">';
 print '<input type="hidden" name="action" value="update">';
 print '<table class="noborder centpercent editmode">';
@@ -732,9 +709,8 @@ print '</td></tr>';
 
 print '</table>';
 print '</form>';
-print '<hr>';
 
-// Risk sign
+// Risk signs
 print load_fiche_titre('<i class="fas fa-map-signs"></i> ' . $langs->trans("RiskSignConfig"), '', '');
 print '<hr>';
 
@@ -842,7 +818,7 @@ print ajax_constantonoff('DIGIRISKDOLIBARR_SHOW_INHERITED_RISKSIGNS');
 print '</td>';
 print '</tr>';
 
-$result = !empty($conf->mc->entities['risksign']) ? strpos($conf->mc->entities['risksign'], $conf->entity) : 0;
+$areRiskSignsShared = !empty($conf->mc->entities['risksign']) ? strpos($conf->mc->entities['risksign'], $conf->entity) : 0;
 
 print '<tr class="oddeven"><td>';
 print $langs->trans('ShowSharedRiskSigns');
@@ -851,7 +827,7 @@ print $langs->trans('ShowSharedRiskSignsDescription');
 print '</td>';
 
 print '<td class="center">';
-if ($conf->multicompany->enabled && !empty($conf->mc->sharings['risksign']) && $result > 0) {
+if (isModEnabled('multicompany') && !empty($conf->mc->sharings['risksign']) && $areRiskSignsShared > 0) {
 	print ajax_constantonoff('DIGIRISKDOLIBARR_SHOW_SHARED_RISKSIGNS');
 } else {
 	print $langs->trans('DisabledSharedElement');

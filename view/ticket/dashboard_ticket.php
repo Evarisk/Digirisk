@@ -41,7 +41,6 @@ require_once DOL_DOCUMENT_ROOT . '/categories/class/categorie.class.php';
 
 require_once './../../lib/digiriskdolibarr_function.lib.php';
 require_once __DIR__ . '/../../class/digiriskelement.class.php';
-require_once __DIR__ . '/../../core/tpl/digirisk_security_checks.php';
 
 global $conf, $db, $langs, $user;
 

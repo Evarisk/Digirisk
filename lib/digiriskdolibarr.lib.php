@@ -1,5 +1,5 @@
 <?php
-/* Copyright (C) 2021 EOXIA <dev@eoxia.com>
+/* Copyright (C) 2021-2023 EVARISK <technique@evarisk.com>
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -26,7 +26,7 @@
  *
  * @return array
  */
-function digiriskdolibarrAdminPrepareHead()
+function digiriskdolibarr_admin_prepare_head()
 {
 	global $langs, $conf;
 
@@ -70,25 +70,16 @@ function digiriskdolibarrAdminPrepareHead()
 	$head[$h][2] = 'digiriskdocuments';
 	$h++;
 
-	$head[$h][0] = dol_buildpath("/digiriskdolibarr/admin/config/digirisksignature.php", 1);
-	$head[$h][1] = '<i class="fas fa-file-signature"></i> ' . $langs->trans("DigiriskSignature");
-	$head[$h][2] = 'digirisksignature';
-	$h++;
-
-	$head[$h][0] = dol_buildpath("/digiriskdolibarr/admin/config/event.php", 1);
-	$head[$h][1] = '<i class="fas fa-calendar-alt"></i>  ' . $langs->trans("Events");
-	$head[$h][2] = 'event';
-	$h++;
-
 	$head[$h][0] = dol_buildpath("/digiriskdolibarr/admin/setup.php", 1);
 	$head[$h][1] = '<i class="fas fa-cog"></i>  ' . $langs->trans("Settings");
 	$head[$h][2] = 'settings';
 	$h++;
 
-	$head[$h][0] = dol_buildpath("/digiriskdolibarr/admin/config/about.php", 1);
-	$head[$h][1] = '<i class="fab fa-readme"></i> ' . $langs->trans("About");
+	$head[$h][0] = dol_buildpath('/saturne/admin/about.php?module_name=DigiriskDolibarr', 1);
+	$head[$h][1] = '<i class="fab fa-readme pictofixedwidth"></i>' . $langs->trans('About');
 	$head[$h][2] = 'about';
 	$h++;
+
 
 	complete_head_from_modules($conf, $langs, null, $head, $h, 'digiriskdolibarr');
 

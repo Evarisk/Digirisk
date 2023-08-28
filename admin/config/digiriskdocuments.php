@@ -1,5 +1,5 @@
 <?php
-/* Copyright (C) 2021 EOXIA <dev@eoxia.com>
+/* Copyright (C) 2021-2023 EVARISK <technique@evarisk.com>
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -21,20 +21,14 @@
  * \brief   Digiriskdolibarr digiriskdocuments page.
  */
 
-// Load Dolibarr environment
-$res = 0;
-// Try main.inc.php into web root known defined into CONTEXT_DOCUMENT_ROOT (not always defined)
-if (!$res && !empty($_SERVER['CONTEXT_DOCUMENT_ROOT'])) $res = @include $_SERVER['CONTEXT_DOCUMENT_ROOT']. '/main.inc.php';
-// Try main.inc.php into web root detected using web root calculated from SCRIPT_FILENAME
-$tmp = empty($_SERVER['SCRIPT_FILENAME']) ? '' : $_SERVER['SCRIPT_FILENAME']; $tmp2 = realpath(__FILE__); $i = strlen($tmp) - 1; $j = strlen($tmp2) - 1;
-while ($i > 0 && $j > 0 && isset($tmp[$i]) && isset($tmp2[$j]) && $tmp[$i] == $tmp2[$j]) { $i--; $j--; }
-if (!$res && $i > 0 && file_exists(substr($tmp, 0, ($i + 1)). '/main.inc.php')) $res = @include substr($tmp, 0, ($i + 1)). '/main.inc.php';
-if (!$res && $i > 0 && file_exists(dirname(substr($tmp, 0, ($i + 1))). '/main.inc.php')) $res = @include dirname(substr($tmp, 0, ($i + 1))). '/main.inc.php';
-// Try main.inc.php using relative path
-if (!$res && file_exists('../../main.inc.php')) $res = @include '../../main.inc.php';
-if (!$res && file_exists('../../../main.inc.php')) $res = @include '../../../main.inc.php';
-if (!$res && file_exists('../../../../main.inc.php')) $res = @include '../../../../main.inc.php';
-if (!$res) die('Include of main fails');
+// Load DigiriskDolibarr environment
+if (file_exists('../digiriskdolibarr.main.inc.php')) {
+	require_once __DIR__ . '/../digiriskdolibarr.main.inc.php';
+} elseif (file_exists('../../digiriskdolibarr.main.inc.php')) {
+	require_once __DIR__ . '/../../digiriskdolibarr.main.inc.php';
+} else {
+	die('Include of digiriskdolibarr main fails');
+}
 
 global $conf, $db, $langs, $user;
 
@@ -42,14 +36,11 @@ global $conf, $db, $langs, $user;
 require_once DOL_DOCUMENT_ROOT . '/core/lib/admin.lib.php';
 require_once DOL_DOCUMENT_ROOT . '/core/lib/files.lib.php';
 
-require_once '../../lib/digiriskdolibarr.lib.php';
-require_once __DIR__ . '/../../core/tpl/digirisk_security_checks.php';
+require_once __DIR__ . '/../../lib/digiriskdolibarr.lib.php';
 
 // Translations
-$langs->loadLangs(array('admin', 'digiriskdolibarr@digiriskdolibarr'));
+saturne_load_langs(["admin"]);
 
-// Access control
-if (!$user->admin) accessforbidden();
 
 // Parameters
 $action     = GETPOST('action', 'alpha');
@@ -58,36 +49,39 @@ $value      = GETPOST('value', 'alpha');
 $type       = GETPOST('type', 'alpha');
 $const 		= GETPOST('const', 'alpha');
 $label 		= GETPOST('label', 'alpha');
-$modulepart = GETPOST('modulepart', 'aZ09');	// Used by actions_setmoduleoptions.inc.php
+$modulepart = GETPOST('modulepart', 'aZ09');
+
+// Security check - Protection if external user
+$permissiontoread = $user->rights->digiriskdolibarr->adminpage->read;
+saturne_check_access($permissiontoread);
 
 /*
  * Actions
  */
 
 if ($action == 'deletefile' && $modulepart == 'ecm' && !empty($user->admin)) {
-	include_once DOL_DOCUMENT_ROOT.'/core/lib/files.lib.php';
-	$keyforuploaddir = GETPOST('keyforuploaddir', 'aZ09');
+	$keyForUploadDir = GETPOST('keyforuploaddir', 'aZ09');
 
-	$listofdir = explode(',', preg_replace('/[\r\n]+/', ',', trim(getDolGlobalString($keyforuploaddir))));
-	foreach ($listofdir as $key => $tmpdir) {
-		$tmpdir = preg_replace('/DOL_DATA_ROOT\/*/', '', $tmpdir);	// Clean string if we found a hardcoded DOL_DATA_ROOT
-		if (!$tmpdir) {
-			unset($listofdir[$key]);
+	$listOfDir = explode(',', preg_replace('/[\r\n]+/', ',', trim(getDolGlobalString($keyForUploadDir))));
+	foreach ($listOfDir as $key => $tmpDir) {
+		$tmpDir = preg_replace('/DOL_DATA_ROOT\/*/', '', $tmpDir);	// Clean string if we found a hardcoded DOL_DATA_ROOT
+		if (!$tmpDir) {
+			unset($listOfDir[$key]);
 			continue;
 		}
-		$tmpdir = DOL_DATA_ROOT.'/'.$tmpdir;	// Complete with DOL_DATA_ROOT. Only files into DOL_DATA_ROOT can be reach/set
-		if (!is_dir($tmpdir)) {
-			if (empty($nomessageinsetmoduleoptions)) {
-				setEventMessages($langs->trans('ErrorDirNotFound', $tmpdir), null, 'warnings');
+		$tmpDir = DOL_DATA_ROOT . '/' . $tmpDir;	// Complete with DOL_DATA_ROOT. Only files into DOL_DATA_ROOT can be reach/set
+		if (!is_dir($tmpDir)) {
+			if (empty($noMessageInSetModuleOptions)) {
+				setEventMessages($langs->trans('ErrorDirNotFound', $tmpDir), null, 'warnings');
 			}
 		} else {
-			$upload_dir = $tmpdir;
-			break;	// So we take the first directory found into setup $conf->global->$keyforuploaddir
+			$upload_dir = $tmpDir;
+			break;	// So we take the first directory found into setup $conf->global->$keyForUploadDir
 		}
 	}
 
-	$filetodelete = $tmpdir.'/'.GETPOST('file');
-	$result = dol_delete_file($filetodelete);
+	$fileToDelete = $tmpDir.'/'.GETPOST('file');
+	$result = dol_delete_file($fileToDelete);
 	if ($result > 0) {
 		setEventMessages($langs->trans('FileWasRemoved', GETPOST('file')), null, 'mesgs');
 		header('Location: ' . $_SERVER['PHP_SELF']);
@@ -105,7 +99,7 @@ if ($action == 'set') {
 	if ($type == 'projectdocument') {
 		$type = 'project';
 	} else {
-		$constforval = 'DIGIRISKDOLIBARR_' .strtoupper($type). '_DEFAULT_MODEL';
+		$constforval = 'DIGIRISKDOLIBARR_' . strtoupper($type) . '_DEFAULT_MODEL';
 		if ($value == dolibarr_get_const($db, $constforval)) {
 			dolibarr_del_const($db, $constforval);
 		}
@@ -117,13 +111,12 @@ if ($action == 'set') {
 // Set default model
 if ($action == 'setdoc') {
 	if ($type != 'projectdocument') {
-		$constforval = 'DIGIRISKDOLIBARR_' .strtoupper($type). '_DEFAULT_MODEL';
+		$constforval = 'DIGIRISKDOLIBARR_' . strtoupper($type) . '_DEFAULT_MODEL';
 		dolibarr_set_const($db, $constforval, $value, 'chaine', 0, '', $conf->entity);
 	} else {
 		dolibarr_set_const($db, 'PROJECT_ADDON_PDF', $value, 'chaine', 0, '', $conf->entity);
 	}
 
-	// On active le modele
 	$ret = delDocumentModel($value, $type);
 	if ($ret > 0) {
 		$ret = addDocumentModel($value, $type, $label, $const);
@@ -134,24 +127,23 @@ if ($action == 'setdoc') {
 }
 
 if ($action == 'setModuleOptions') {
-	include_once DOL_DOCUMENT_ROOT.'/core/lib/files.lib.php';
-	$keyforuploaddir = GETPOST('keyforuploaddir', 'aZ09');
+	$keyForUploadDir = GETPOST('keyforuploaddir', 'aZ09');
 
-	$listofdir = explode(',', preg_replace('/[\r\n]+/', ',', trim(getDolGlobalString($keyforuploaddir))));
-	foreach ($listofdir as $key => $tmpdir) {
-		$tmpdir = preg_replace('/DOL_DATA_ROOT\/*/', '', $tmpdir);	// Clean string if we found a hardcoded DOL_DATA_ROOT
-		if (!$tmpdir) {
-			unset($listofdir[$key]);
+	$listOfDir = explode(',', preg_replace('/[\r\n]+/', ',', trim(getDolGlobalString($keyForUploadDir))));
+	foreach ($listOfDir as $key => $tmpDir) {
+		$tmpDir = preg_replace('/DOL_DATA_ROOT\/*/', '', $tmpDir);	// Clean string if we found a hardcoded DOL_DATA_ROOT
+		if (!$tmpDir) {
+			unset($listOfDir[$key]);
 			continue;
 		}
-		$tmpdir = DOL_DATA_ROOT.'/'.$tmpdir;	// Complete with DOL_DATA_ROOT. Only files into DOL_DATA_ROOT can be reach/set
-		if (!is_dir($tmpdir)) {
-			if (empty($nomessageinsetmoduleoptions)) {
-				setEventMessages($langs->trans('ErrorDirNotFound', $tmpdir), null, 'warnings');
+		$tmpDir = DOL_DATA_ROOT.'/'.$tmpDir;	// Complete with DOL_DATA_ROOT. Only files into DOL_DATA_ROOT can be reach/set
+		if (!is_dir($tmpDir)) {
+			if (empty($noMessageInSetModuleOptions)) {
+				setEventMessages($langs->trans('ErrorDirNotFound', $tmpDir), null, 'warnings');
 			}
 		} else {
-			$upload_dir = $tmpdir;
-			break;	// So we take the first directory found into setup $conf->global->$keyforuploaddir
+			$upload_dir = $tmpDir;
+			break;	// So we take the first directory found into setup $conf->global->$keyForUploadDir
 		}
 	}
 
@@ -186,8 +178,8 @@ if ($action == 'setModuleOptions') {
 
 			if (!empty($upload_dirold) && !empty($conf->global->PRODUCT_USE_OLD_PATH_FOR_PHOTO)) {
 				$result = dol_add_file_process($upload_dirold, $allowoverwrite, 1, 'userfile', GETPOST('savingdocmask', 'alpha'), null, '', $generatethumbs, $object);
-			} elseif (!empty($tmpdir)) {
-				$result = dol_add_file_process($tmpdir, $allowoverwrite, 1, 'userfile', GETPOST('savingdocmask', 'alpha'), null, '' );
+			} elseif (!empty($tmpDir)) {
+				$result = dol_add_file_process($tmpDir, $allowoverwrite, 1, 'userfile', GETPOST('savingdocmask', 'alpha'), null, '' );
 			}
 		}
 	}
@@ -197,13 +189,10 @@ if ($action == 'setModuleOptions') {
  * View
  */
 
-$help_url = 'FR:Module_Digirisk#L.27onglet_Document_Unique';
+$helpUrl  = 'FR:Module_Digirisk#L.27onglet_Document_Unique';
 $title    = $langs->trans('YourDocuments');
 
-$morejs   = array('/digiriskdolibarr/js/digiriskdolibarr.js');
-$morecss  = array('/digiriskdolibarr/css/digiriskdolibarr.css');
-
-llxHeader('', $title, $help_url, '', '', '', $morejs, $morecss);
+saturne_header(0,'', $title, $helpUrl);
 
 $types = array(
 	'LegalDisplay' 				=> 'legaldisplay',
@@ -243,7 +232,7 @@ $selectorAnchor .= '</select>';
 print load_fiche_titre($title, $selectorAnchor, 'digiriskdolibarr32px@digiriskdolibarr');
 
 // Configuration header
-$head = digiriskdolibarrAdminPrepareHead();
+$head = digiriskdolibarr_admin_prepare_head();
 print dol_get_fiche_head($head, 'digiriskdocuments', '', -1, 'digiriskdolibarr@digiriskdolibarr');
 
 print load_fiche_titre($langs->trans("DigiriskDocumentsData"), '', '');
@@ -543,9 +532,6 @@ foreach ($types as $type => $documentType) {
 		print '</tr>';
 		print '</table>';
 	}
-
-	print '<hr>';
-
 }
 // Page end
 print dol_get_fiche_end();
