@@ -21,27 +21,19 @@
  *	\brief      Tools page of digiriskdolibarr top menu
  */
 
-// Load Dolibarr environment
-$res = 0;
-// Try main.inc.php into web root known defined into CONTEXT_DOCUMENT_ROOT (not always defined)
-if ( ! $res && ! empty($_SERVER["CONTEXT_DOCUMENT_ROOT"])) $res = @include $_SERVER["CONTEXT_DOCUMENT_ROOT"] . "/main.inc.php";
-// Try main.inc.php into web root detected using web root calculated from SCRIPT_FILENAME
-$tmp = empty($_SERVER['SCRIPT_FILENAME']) ? '' : $_SERVER['SCRIPT_FILENAME']; $tmp2 = realpath(__FILE__); $i = strlen($tmp) - 1; $j = strlen($tmp2) - 1;
-while ($i > 0 && $j > 0 && isset($tmp[$i]) && isset($tmp2[$j]) && $tmp[$i] == $tmp2[$j]) { $i--; $j--; }
-if ( ! $res && $i > 0 && file_exists(substr($tmp, 0, ($i + 1)) . "/main.inc.php")) $res          = @include substr($tmp, 0, ($i + 1)) . "/main.inc.php";
-if ( ! $res && $i > 0 && file_exists(dirname(substr($tmp, 0, ($i + 1))) . "/main.inc.php")) $res = @include dirname(substr($tmp, 0, ($i + 1))) . "/main.inc.php";
-// Try main.inc.php using relative path
-if ( ! $res && file_exists("../../main.inc.php")) $res    = @include "../../main.inc.php";
-if ( ! $res && file_exists("../../../main.inc.php")) $res = @include "../../../main.inc.php";
-if ( ! $res) die("Include of main fails");
+// Load DigiriskDolibarr environment
+if (file_exists('../digiriskdolibarr.main.inc.php')) {
+	require_once __DIR__ . '/../digiriskdolibarr.main.inc.php';
+} elseif (file_exists('../../digiriskdolibarr.main.inc.php')) {
+	require_once __DIR__ . '/../../digiriskdolibarr.main.inc.php';
+} else {
+	die('Include of digiriskdolibarr main fails');
+}
 
 global $conf, $db, $langs, $user;
 
-$taskRefClass = $conf->global->PROJECT_TASK_ADDON;
-
 require_once DOL_DOCUMENT_ROOT . '/core/lib/admin.lib.php';
 require_once DOL_DOCUMENT_ROOT . '/core/lib/images.lib.php';
-require_once DOL_DOCUMENT_ROOT . '/core/modules/project/task/' . $taskRefClass . '.php';
 
 require_once __DIR__ . '/../class/digiriskstandard.class.php';
 require_once __DIR__ . '/../class/digiriskelement.class.php';
@@ -60,7 +52,7 @@ require_once __DIR__ . '/../core/modules/digiriskdolibarr/riskanalysis/risksign/
 require_once __DIR__ . '/../core/tpl/digirisk_security_checks.php';
 
 // Load translation files required by the page
-$langs->loadLangs(array("digiriskdolibarr@digiriskdolibarr"));
+saturne_load_langs();
 
 // Parameters
 $action     = GETPOST('action', 'alpha');
@@ -84,15 +76,19 @@ $refWorkUnitMod       = new $conf->global->DIGIRISKDOLIBARR_WORKUNIT_ADDON();
 $refRiskMod           = new $conf->global->DIGIRISKDOLIBARR_RISK_ADDON();
 $refRiskAssessmentMod = new $conf->global->DIGIRISKDOLIBARR_RISKASSESSMENT_ADDON();
 $refRiskSignMod       = new $conf->global->DIGIRISKDOLIBARR_RISKSIGN_ADDON();
-$refTaskMod           = new $taskRefClass();
 
-$upload_dir = $conf->digiriskdolibarr->multidir_output[isset($conf->entity) ? $conf->entity : 1];
+$numberingModuleName = [
+	'project/task' => $conf->global->PROJECT_TASK_ADDON,
+];
+list($refTaskMod)     = saturne_require_objects_mod($numberingModuleName);
 
-// Security check
+$upload_dir = $conf->digiriskdolibarr->multidir_output[$conf->entity ?? 1];
+
+// Security check - Protection if external user
 $permissiontoread = $user->rights->digiriskdolibarr->adminpage->read;
 $permtoupload     = $user->rights->ecm->upload;
 
-if ( ! $user->rights->digiriskdolibarr->adminpage->read) accessforbidden();
+saturne_check_access($permissiontoread);
 
 /*
  * Actions
@@ -793,13 +789,12 @@ if (GETPOST('dataMigrationImportGlobalDolibarr', 'alpha') && ! empty($conf->glob
  * View
  */
 
-$help_url = 'FR:Module_Digirisk#Import.2Fexport_de_donn.C3.A9es';
-$morejs   = array("/digiriskdolibarr/js/digiriskdolibarr.js");
-$morecss  = array("/digiriskdolibarr/css/digiriskdolibarr.css");
+$title   = $langs->trans("Tools");
+$helpUrl = 'FR:Module_Digirisk#Import.2Fexport_de_donn.C3.A9es';
 
-llxHeader("", $langs->trans("Tools"), $help_url, '', '', '', $morejs, $morecss);
+saturne_header(0,"", $title, $helpUrl);
 
-print load_fiche_titre($langs->trans("Tools"), '', 'wrench');
+print load_fiche_titre($title, '', 'wrench');
 
 if ($user->rights->digiriskdolibarr->adminpage->read) {
 	if ($conf->global->DIGIRISKDOLIBARR_TOOLS_TREE_ALREADY_IMPORTED == 1) : ?>

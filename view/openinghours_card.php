@@ -21,19 +21,14 @@
  *		\brief      Page to view Opening Hours
  */
 
-// Load Dolibarr environment
-$res = 0;
-// Try main.inc.php into web root known defined into CONTEXT_DOCUMENT_ROOT (not always defined)
-if ( ! $res && ! empty($_SERVER["CONTEXT_DOCUMENT_ROOT"])) $res = @include $_SERVER["CONTEXT_DOCUMENT_ROOT"] . "/main.inc.php";
-// Try main.inc.php into web root detected using web root calculated from SCRIPT_FILENAME
-$tmp = empty($_SERVER['SCRIPT_FILENAME']) ? '' : $_SERVER['SCRIPT_FILENAME']; $tmp2 = realpath(__FILE__); $i = strlen($tmp) - 1; $j = strlen($tmp2) - 1;
-while ($i > 0 && $j > 0 && isset($tmp[$i]) && isset($tmp2[$j]) && $tmp[$i] == $tmp2[$j]) { $i--; $j--; }
-if ( ! $res && $i > 0 && file_exists(substr($tmp, 0, ($i + 1)) . "/main.inc.php")) $res          = @include substr($tmp, 0, ($i + 1)) . "/main.inc.php";
-if ( ! $res && $i > 0 && file_exists(dirname(substr($tmp, 0, ($i + 1))) . "/main.inc.php")) $res = @include dirname(substr($tmp, 0, ($i + 1))) . "/main.inc.php";
-// Try main.inc.php using relative path
-if ( ! $res && file_exists("../../main.inc.php")) $res    = @include "../../main.inc.php";
-if ( ! $res && file_exists("../../../main.inc.php")) $res = @include "../../../main.inc.php";
-if ( ! $res) die("Include of main fails");
+// Load DigiriskDolibarr environment
+if (file_exists('../digiriskdolibarr.main.inc.php')) {
+	require_once __DIR__ . '/../digiriskdolibarr.main.inc.php';
+} elseif (file_exists('../../digiriskdolibarr.main.inc.php')) {
+	require_once __DIR__ . '/../../digiriskdolibarr.main.inc.php';
+} else {
+	die('Include of digiriskdolibarr main fails');
+}
 
 require_once DOL_DOCUMENT_ROOT . '/core/lib/company.lib.php';
 require_once DOL_DOCUMENT_ROOT . '/core/lib/images.lib.php';
@@ -41,7 +36,10 @@ require_once DOL_DOCUMENT_ROOT . '/core/lib/images.lib.php';
 require_once __DIR__ . '/../class/openinghours.class.php';
 require_once __DIR__ . '/../core/tpl/digirisk_security_checks.php';
 
-$langs->loadLangs(array("digiriskdolibarr@digiriskdolibarr"));
+global $db, $conf, $langs, $user, $hookmanager;
+
+// Load translation files required by the page
+saturne_load_langs();
 
 $action = (GETPOST('action', 'aZ09') ? GETPOST('action', 'aZ09') : 'view');
 
@@ -60,19 +58,9 @@ if ($action == 'view' && $societe->fetch($socid) <= 0) {
 	exit;
 }
 
-// Get object canvas (By default, this is not defined, so standard usage of dolibarr)
-$societe->getCanvas($socid);
-$canvas    = $societe->canvas ? $societe->canvas : GETPOST("canvas");
-$objcanvas = null;
-if ( ! empty($canvas)) {
-	require_once DOL_DOCUMENT_ROOT . '/core/class/canvas.class.php';
-	$objcanvas = new Canvas($db, $action);
-	$objcanvas->getCanvas('thirdparty', 'card', $canvas);
-}
-
-// Security check
+// Security check - Protection if external user
 $permissiontoadd = $user->rights->societe->creer;
-restrictedArea($user, 'societe', $socid, '&societe', '', 'fk_soc', 'rowid', $objcanvas);
+saturne_check_access($permissiontoadd);
 
 /*
 /*
@@ -96,7 +84,7 @@ if (($action == 'update' && ! GETPOST("cancel", 'alpha')) || ($action == 'update
 	$object->saturday     = GETPOST('saturday', 'string');
 	$object->sunday       = GETPOST('sunday', 'string');
 	$object->create($user);
-	setEventMessages($langs->trans('ThirdPartyOpeningHoursSave'), null, 'mesgs');
+	setEventMessages($langs->trans('ThirdPartyOpeningHoursSave'), null,);
 }
 
 
@@ -119,22 +107,20 @@ if ($socid > 0 && empty($societe->id)) {
 
 $title = $langs->trans("ThirdParty");
 if ( ! empty($conf->global->MAIN_HTML_TITLE) && preg_match('/thirdpartynameonly/', $conf->global->MAIN_HTML_TITLE) && $societe->name) $title = $societe->name . " - " . $langs->trans('OpeningHours');
-$help_url = 'FR:Module_Digirisk#L.27onglet_Horaire_d.27ouverture';
+$helpUrl = 'FR:Module_Digirisk#L.27onglet_Horaire_d.27ouverture';
 
-$morecss = array("/digiriskdolibarr/css/digiriskdolibarr.css");
+saturne_header(0,'', $title, $helpUrl);
 
-llxHeader('', $title, $help_url, '', '', '', array(), $morecss);
-
-if ( ! empty($societe->id)) $res = $societe->fetch_optionals();
+$societe->fetch_optionals();
 
 // Object card
 // ------------------------------------------------------------
-$morehtmlref  = '<div class="refidno">';
-$morehtmlref .= '</div>';
-$head = societe_prepare_head($societe);
-print dol_get_fiche_head($head, 'openinghours', $langs->trans("ThirdParty"), 0, 'company');
+
+print saturne_get_fiche_head($societe, 'openinghours', $title);
+
 $linkback = '<a href="' . DOL_URL_ROOT . '/societe/list.php?restore_lastsearch_values=1">' . $langs->trans("BackToList") . '</a>';
-dol_banner_tab($societe, 'socid', $linkback, ($user->socid ? 0 : 1), 'rowid', 'nom');
+
+saturne_banner_tab($societe, 'socid', $linkback, ($user->socid ? 0 : 1), 'rowid', 'nom');
 
 print dol_get_fiche_end();
 

@@ -47,12 +47,12 @@ class WorkUnit extends DigiriskElement
 	/**
 	 * @var int  Does object support extrafields ? 0=No, 1=Yes
 	 */
-	public $isextrafieldmanaged = 1;
+	public int $isextrafieldmanaged = 1;
 
 	/**
 	 * @var string String with name of icon for workunit. Must be the part after the 'object_' into object_workunit.png
 	 */
-	public $picto = 'workunit@digiriskdolibarr';
+	public string $picto = 'workunit@digiriskdolibarr';
 
 	/**
 	 * Constructor
