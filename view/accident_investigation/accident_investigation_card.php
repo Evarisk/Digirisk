@@ -180,6 +180,11 @@ if (empty($reshook)) {
 
 	// Action confirm_lock, confirm_archive.
 	require_once __DIR__ . '/../../../saturne/core/tpl/signature/signature_action_workflow.tpl.php';
+
+	// Actions to send emails.
+	$triggersendname = strtoupper($object->element) . '_SENTBYMAIL';
+	$autocopy        = 'MAIN_MAIL_AUTOCOPY_' . strtoupper($object->element) . '_TO';
+	require_once DOL_DOCUMENT_ROOT . '/core/actions_sendmails.inc.php';
 }
 
 /*
@@ -195,7 +200,7 @@ if ($conf->browser->layout == 'phone') {
 	$onPhone = 0;
 }
 
-saturne_header(1,'', $title, $helpUrl);
+saturne_header(0,'', $title, $helpUrl);
 
 if ($action == 'create') {
 	print load_fiche_titre($langs->trans("NewAccidentInvestigation"), '', $object->picto);
@@ -363,6 +368,17 @@ if ($action == 'create') {
 			print '<span class="butActionRefused classfortooltip" title="' . dol_escape_htmltag($langs->trans('ObjectMustBeValidated', $langs->transnoentities('The' . ucfirst($object->element)))) . '">' . $displayButton . '</span>';
 		}
 
+		// Send email.
+		$displayButton = $onPhone ? '<i class="fas fa-paper-plane fa-2x"></i>' : '<i class="fas fa-paper-plane"></i>' . ' ' . $langs->trans('SendMail') . ' ';
+		if ($object->status == AccidentInvestigation::STATUS_LOCKED) {
+			$fileParams    = dol_most_recent_file($upload_dir . '/' . $object->element . 'document' . '/' . $object->ref);
+			$file          = $fileParams['fullname'];
+			$forcebuilddoc = (file_exists($file) && !strstr($fileParams['name'], 'specimen')) ? 0 : 1;
+			print dolGetButtonAction($displayButton, '', 'default', $_SERVER['PHP_SELF'] . '?id=' . $object->id . '&action=presend&forcebuilddoc=' . $forcebuilddoc . '&mode=init#formmailbeforetitle');
+		} else {
+			print '<span class="butActionRefused classfortooltip" title="'.dol_escape_htmltag($langs->trans('ObjectMustBeLockedToSendEmail', ucfirst($langs->transnoentities('The' . ucfirst($object->element))))) . '">' . $displayButton . '</span>';
+		}
+
 		// Archive.
 		$displayButton = $onPhone ?  '<i class="fas fa-archive fa-2x"></i>' : '<i class="fas fa-archive"></i>' . ' ' . $langs->trans('Archive');
 		if ($object->status == AccidentInvestigation::STATUS_LOCKED) {
@@ -380,26 +396,47 @@ if ($action == 'create') {
 		print dolGetButtonAction($displayButton, '', 'delete', $_SERVER['PHP_SELF'] . '?id=' . $object->id . '&action=delete&token=' . newToken(), '', $permissiontodelete || ($object->status == AccidentInvestigation::STATUS_DRAFT));
 
 		print '</div>';
-
-		print '<div class="fichecenter"><div class="fichehalfleft">';
-
-		// Documents.
-		$objRef    = dol_sanitizeFileName($object->ref);
-		$dirFiles  = $object->element . 'document/' . $objRef;
-		$fileDir   = $upload_dir . '/' . $dirFiles;
-		$urlSource = $_SERVER['PHP_SELF'] . '?id=' . $object->id;
-
-		print saturne_show_documents('digiriskdolibarr:AccidentInvestigationDocument', $dirFiles, $fileDir, $urlSource, $permissiontoadd, $permissiontodelete, $conf->global->DIGIRISKDOLIBARR_ACCIDENTINVESTIGATION_DOCUMENT_DEFAULT_MODEL, 1, 0, 0, 0, 0, '', '', $langs->defaultlang, '', $object, 0, 'removefile', (($object->status > $object::STATUS_DRAFT) ? 1 : 0), $langs->trans('ObjectMustBeValidatedToGenerate', ucfirst($langs->transnoentities('The' . ucfirst($object->element)))));
-
-		print '</div><div class="fichehalfright">';
-
-		// List of actions on element.
-		require_once DOL_DOCUMENT_ROOT . '/core/class/html.formactions.class.php';
-		$formActions = new FormActions($db);
-		$formActions->showactions($object, $object->element . '@' . $object->module, 0, 1, '', 10);
-
-		print '</div></div>';
 	}
+
+		// Select mail models is same action as presend.
+		if (GETPOST('modelselected')) {
+			$action = 'presend';
+		}
+
+		if ($action != 'presend') {
+			print '<div class="fichecenter"><div class="fichehalfleft">';
+			// Documents.
+			$objRef    = dol_sanitizeFileName($object->ref);
+			$dirFiles  = $object->element . 'document/' . $objRef;
+			$fileDir   = $upload_dir . '/' . $dirFiles;
+			$urlSource = $_SERVER['PHP_SELF'] . '?id=' . $object->id;
+
+			print saturne_show_documents('digiriskdolibarr:' . ucfirst('AccidentInvestigation') . 'Document', $dirFiles, $fileDir, $urlSource, $permissiontoadd, $permissiontodelete, $conf->global->DIGIRISKDOLIBARR_ACCIDENTINVESTIGATIONDOCUMENT_DEFAULT_MODEL, 1, 0, 0, 0, 0, '', '', '', $langs->defaultlang, $object, 0, 'remove_file', $object->status == AccidentInvestigation::STATUS_LOCKED && empty(dol_dir_list($fileDir)), $langs->trans('ObjectMustBeLockedToGenerate', ucfirst($langs->transnoentities('The' . ucfirst($object->element)))));
+
+			print '</div><div class="fichehalfright">';
+
+			$moreHtmlCenter = dolGetButtonTitle($langs->trans('SeeAll'), '', 'fa fa-bars imgforviewmode', dol_buildpath('/saturne/view/saturne_agenda.php', 1) . '?id=' . $object->id . '&module_name=DoliSIRH&object_type=' . $object->element);
+
+			// List of actions on element.
+			require_once DOL_DOCUMENT_ROOT . '/core/class/html.formactions.class.php';
+			$formActions = new FormActions($db);
+			$formActions->showactions($object, $object->element . '@' . $object->module, 0, 1, '', 10, '', $moreHtmlCenter);
+
+			print '</div></div>';
+		}
+
+		//Select mail models is same action as presend.
+		if (GETPOST('modelselected')) {
+			$action = 'presend';
+		}
+
+		// Presend form.
+		$modelmail    = $object->element;
+		$defaulttopic = 'InformationMessage';
+		$diroutput    = $conf->digiriskdolibarr->dir_output;
+		$trackid      = $object->element . $object->id;
+
+		require_once DOL_DOCUMENT_ROOT.'/core/tpl/card_presend.tpl.php';
 }
 
 // End of page
