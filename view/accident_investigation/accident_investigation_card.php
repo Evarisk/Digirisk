@@ -235,7 +235,7 @@ if ($conf->browser->layout == 'phone') {
 	$onPhone = 0;
 }
 
-saturne_header(0,'', $title, $helpUrl);
+saturne_header(1,'', $title, $helpUrl);
 
 if ($action == 'create') {
 	print load_fiche_titre($langs->trans("NewAccidentInvestigation"), '', $object->picto);
@@ -346,7 +346,7 @@ if ($action == 'create') {
 	$pathPhotos = $conf->digiriskdolibarr->multidir_output[$conf->entity] . '/accident_investigation/'. $object->ref . '/causality_tree/';
 	$fileArray  = dol_dir_list($pathPhotos, 'files');
 	?>
-	<span class="add-medias" <?php echo ($object->status != AccidentInvestigation::STATUS_LOCKED && empty($object->causality_tree)) ? '' : 'style="display:none"' ?>>
+	<span class="add-medias" <?php echo ($object->status < AccidentInvestigation::STATUS_LOCKED && empty($object->causality_tree)) ? '' : 'style="display:none"' ?>>
 		<input hidden multiple class="fast-upload" id="fast-upload-photo-default" type="file" name="userfile[]" capture="environment" accept="image/*">
 		<label for="fast-upload-photo-default">
 			<div class="wpeo-button button-square-50">
