@@ -52,6 +52,7 @@ abstract class ModeleODTDigiriskElementDocument extends CommonDocGenerator
 		// phpcs:enable
 		global $user, $langs, $conf, $hookmanager, $action, $mysoc;
 
+		$digiriskelement = $digiriskelement['object'];
 		$type = $digiriskelement->element_type;
 
 		if (empty($srctemplatepath)) {
@@ -72,6 +73,7 @@ abstract class ModeleODTDigiriskElementDocument extends CommonDocGenerator
 		$outputlangs->loadLangs(array("main", "dict", "companies", "digiriskdolibarr@digiriskdolibarr"));
 
 		$refModName = 'DIGIRISKDOLIBARR_' . strtoupper($type) . 'DOCUMENT_ADDON';
+
 		$mod = new $conf->global->$refModName($this->db);
 		$ref = $mod->getNextValue($object);
 
@@ -104,7 +106,7 @@ abstract class ModeleODTDigiriskElementDocument extends CommonDocGenerator
 
 			$object->last_main_doc = $filename;
 
-			$sql  = "UPDATE " . MAIN_DB_PREFIX . "digiriskdolibarr_digiriskdocuments";
+			$sql  = "UPDATE " . MAIN_DB_PREFIX . "saturne_object_documents";
 			$sql .= " SET last_main_doc =" . ( ! empty($filename) ? "'" . $this->db->escape($filename) . "'" : 'null');
 			$sql .= " WHERE rowid = " . $object->id;
 
@@ -199,6 +201,7 @@ abstract class ModeleODTDigiriskElementDocument extends CommonDocGenerator
 					if ( ! empty($digiriskelement) ) {
 						//Fill risks data
 						$risks = $risk->fetchRisksOrderedByCotation($digiriskelement->id, false, $conf->global->DIGIRISKDOLIBARR_SHOW_INHERITED_RISKS_IN_DOCUMENTS, $conf->global->DIGIRISKDOLIBARR_SHOW_SHARED_RISKS);
+
 						$object->fillRiskData($odfHandler, $object, $outputlangs, $tmparray, $file, $risks, $conf->global->DIGIRISKDOLIBARR_SHOW_SHARED_RISKS);
 
 						//Fill evaluators data

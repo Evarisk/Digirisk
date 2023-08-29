@@ -253,7 +253,7 @@ abstract class ModeleODTTicketDocument extends CommonDocGenerator
 				}
 			}
 
-			require_once DOL_DOCUMENT_ROOT.'/comm/action/class/actioncomm.class.php';
+			require_once DOL_DOCUMENT_ROOT . '/comm/action/class/actioncomm.class.php';
 			$actioncomm = new ActionComm($this->db);
 			$event_list = $actioncomm->getActions('',$ticket->id,$ticket->element,'');
 

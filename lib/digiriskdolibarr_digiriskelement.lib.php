@@ -27,11 +27,11 @@
  * @param	DigiriskElement $object DigiriskElement
  * @return 	array					Array of tabs
  */
-function digiriskelementPrepareHead($object)
+function digiriskelement_prepare_head($object)
 {
 	global $langs, $conf, $user;
 
-	$langs->load("digiriskdolibarr@digiriskdolibarr");
+	saturne_load_langs();
 
 	$h    = 0;
 	$head = array();

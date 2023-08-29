@@ -21,13 +21,11 @@
  * \brief   This file is a class file for GroupmentDocument.
  */
 
-// Load Saturne libraries.
-require_once __DIR__ . '/../../../saturne/class/saturnedocuments.class.php';
 
 /**
  * Class for GroupmentDocument.
  */
-class GroupmentDocument extends SaturneDocuments
+class GroupmentDocument extends DigiriskDocuments
 {
     /**
      * @var string Module name.

@@ -31,7 +31,7 @@ function digiriskstandard_prepare_head($object)
 {
 	global $langs, $conf, $user;
 
-	$langs->load("digiriskdolibarr@digiriskdolibarr");
+	saturne_load_langs();
 
 	$h    = 0;
 	$head = array();

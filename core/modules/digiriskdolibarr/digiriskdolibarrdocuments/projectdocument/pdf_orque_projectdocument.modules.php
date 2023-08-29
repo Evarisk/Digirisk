@@ -22,13 +22,13 @@
  *	\brief      File of class to generate project document orque
  */
 
-require_once DOL_DOCUMENT_ROOT.'/core/modules/project/modules_project.php';
-require_once DOL_DOCUMENT_ROOT.'/projet/class/project.class.php';
-require_once DOL_DOCUMENT_ROOT.'/projet/class/task.class.php';
-require_once DOL_DOCUMENT_ROOT.'/core/lib/company.lib.php';
-require_once DOL_DOCUMENT_ROOT.'/core/lib/pdf.lib.php';
-require_once DOL_DOCUMENT_ROOT.'/core/lib/date.lib.php';
-require_once DOL_DOCUMENT_ROOT.'/core/lib/functions2.lib.php';
+require_once DOL_DOCUMENT_ROOT . '/core/modules/project/modules_project.php';
+require_once DOL_DOCUMENT_ROOT . '/projet/class/project.class.php';
+require_once DOL_DOCUMENT_ROOT . '/projet/class/task.class.php';
+require_once DOL_DOCUMENT_ROOT . '/core/lib/company.lib.php';
+require_once DOL_DOCUMENT_ROOT . '/core/lib/pdf.lib.php';
+require_once DOL_DOCUMENT_ROOT . '/core/lib/date.lib.php';
+require_once DOL_DOCUMENT_ROOT . '/core/lib/functions2.lib.php';
 
 require_once __DIR__ . '/mod_projectdocument_standard.php';
 require_once __DIR__ . '/../../../../../class/riskanalysis/risk.class.php';
@@ -274,7 +274,7 @@ class pdf_orque_projectdocument
 			if (file_exists($dir)) {
 				// Add pdfgeneration hook
 				if (!is_object($hookmanager)) {
-					include_once DOL_DOCUMENT_ROOT.'/core/class/hookmanager.class.php';
+					include_once DOL_DOCUMENT_ROOT . '/core/class/hookmanager.class.php';
 					$hookmanager = new HookManager($this->db);
 				}
 				$hookmanager->initHooks(array('pdfgeneration'));
@@ -331,7 +331,8 @@ class pdf_orque_projectdocument
 				$pdf->SetSubject($outputlangs->transnoentities('Project'));
 				$pdf->SetCreator('Dolibarr ' .DOL_VERSION);
 				$pdf->SetAuthor($outputlangs->convToOutputCharset($user->getFullName($outputlangs)));
-				$pdf->SetKeyWords($outputlangs->convToOutputCharset($object->ref). ' ' .$outputlangs->transnoentities('Project'));
+				$pdf->SetKeyWords(
+                    $outputlangs->convToOutputCharset($object->ref) . ' pdf_orque_projectdocument.modules.php' .$outputlangs->transnoentities('Project'));
 				if (!empty($conf->global->MAIN_DISABLE_PDF_COMPRESSION)) {
 					$pdf->SetCompression(false);
 				}
@@ -730,7 +731,7 @@ class pdf_orque_projectdocument
 		$pdf->SetFont('', 'B', $default_font_size + 3);
 		$pdf->SetXY($posx, $posy);
 		$pdf->SetTextColor(0, 0, 60);
-		$pdf->MultiCell(100, 4, $outputlangs->transnoentities('Project'). ' ' .$outputlangs->convToOutputCharset($object->ref), '', 'R');
+		$pdf->MultiCell(100, 4, $outputlangs->transnoentities('Project') . ' pdf_orque_projectdocument.modules.php' .$outputlangs->convToOutputCharset($object->ref), '', 'R');
 		$pdf->SetFont('', '', $default_font_size + 2);
 
 		$posy += 6;
