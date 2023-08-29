@@ -3124,6 +3124,166 @@ class InterfaceDigiriskdolibarrTriggers extends DolibarrTriggers
 				}
 				break;
 
+			case 'ACCIDENTINVESTIGATION_CREATE' :
+
+				dol_syslog("Trigger '" . $this->name . "' for action '$action' launched by " . __FILE__ . ". id=" . $object->id);
+				require_once DOL_DOCUMENT_ROOT . '/comm/action/class/actioncomm.class.php';
+				require_once __DIR__ . '/../../class/digiriskelement.class.php';
+				$now        = dol_now();
+				$actioncomm = new ActionComm($this->db);
+
+				$actioncomm->elementtype = $object->element . '@digiriskdolibarr';
+				$actioncomm->code        = 'AC_' . dol_strtoupper(get_class($object))  . '_CREATE';
+				$actioncomm->type_code   = 'AC_OTH_AUTO';
+				$actioncomm->label       = $langs->trans('ObjectCreateTrigger', $langs->transnoentities(ucfirst($object->element)), $object->ref);
+				$actioncomm->datep       = $now;
+				$actioncomm->fk_element  = $object->id;
+				$actioncomm->userownerid = $user->id;
+				$actioncomm->percentage  = -1;
+				$result = $actioncomm->create($user);
+				if ($result < 0) {
+					$object->errors = array_merge($object->error, $actioncomm->errors);
+					return $result;
+				}
+				break;
+
+			case 'ACCIDENTINVESTIGATION_MODIFY' :
+
+				dol_syslog("Trigger '" . $this->name . "' for action '$action' launched by " . __FILE__ . ". id=" . $object->id);
+				require_once DOL_DOCUMENT_ROOT . '/comm/action/class/actioncomm.class.php';
+				require_once __DIR__ . '/../../class/digiriskelement.class.php';
+				$now        = dol_now();
+				$actioncomm = new ActionComm($this->db);
+
+				$actioncomm->elementtype = $object->element . '@digiriskdolibarr';
+				$actioncomm->code        = 'AC_' . dol_strtoupper(get_class($object))  . '_MODIFY';
+				$actioncomm->type_code   = 'AC_OTH_AUTO';
+				$actioncomm->label       = $langs->trans('ObjectModifyTrigger', $langs->transnoentities(ucfirst($object->element)), $object->ref);
+				$actioncomm->datep       = $now;
+				$actioncomm->fk_element  = $object->id;
+				$actioncomm->userownerid = $user->id;
+				$actioncomm->percentage  = -1;
+				$result = $actioncomm->create($user);
+				if ($result < 0) {
+					$object->errors = array_merge($object->error, $actioncomm->errors);
+					return $result;
+				}
+				break;
+
+			case 'ACCIDENTINVESTIGATION_DELETE' :
+
+				dol_syslog("Trigger '" . $this->name . "' for action '$action' launched by " . __FILE__ . ". id=" . $object->id);
+				require_once DOL_DOCUMENT_ROOT . '/comm/action/class/actioncomm.class.php';
+				require_once __DIR__ . '/../../class/digiriskelement.class.php';
+				$now        = dol_now();
+				$actioncomm = new ActionComm($this->db);
+
+				$actioncomm->elementtype = $object->element . '@digiriskdolibarr';
+				$actioncomm->code        = 'AC_' . dol_strtoupper(get_class($object))  . '_DELETE';
+				$actioncomm->type_code   = 'AC_OTH_AUTO';
+				$actioncomm->label       = $langs->trans('ObjectDeleteTrigger', $langs->transnoentities(ucfirst($object->element)), $object->ref);
+				$actioncomm->datep       = $now;
+				$actioncomm->fk_element  = $object->id;
+				$actioncomm->userownerid = $user->id;
+				$actioncomm->percentage  = -1;
+				$result = $actioncomm->create($user);
+				if ($result < 0) {
+					$object->errors = array_merge($object->error, $actioncomm->errors);
+					return $result;
+				}
+				break;
+
+			case 'ACCIDENTINVESTIGATION_VALIDATE' :
+
+				dol_syslog("Trigger '" . $this->name . "' for action '$action' launched by " . __FILE__ . ". id=" . $object->id);
+				require_once DOL_DOCUMENT_ROOT . '/comm/action/class/actioncomm.class.php';
+				require_once __DIR__ . '/../../class/digiriskelement.class.php';
+				$now        = dol_now();
+				$actioncomm = new ActionComm($this->db);
+
+				$actioncomm->elementtype = $object->element . '@digiriskdolibarr';
+				$actioncomm->code        = 'AC_' . dol_strtoupper(get_class($object))  . '_VALIDATE';
+				$actioncomm->type_code   = 'AC_OTH_AUTO';
+				$actioncomm->label       = $langs->trans('ObjectValidateTrigger', $langs->transnoentities(ucfirst($object->element)), $object->ref);
+				$actioncomm->datep       = $now;
+				$actioncomm->fk_element  = $object->id;
+				$actioncomm->userownerid = $user->id;
+				$actioncomm->percentage  = -1;
+				$result = $actioncomm->create($user);
+				if ($result < 0) {
+					$object->errors = array_merge($object->error, $actioncomm->errors);
+					return $result;
+				}
+				break;
+
+			case 'ACCIDENTINVESTIGATION_UNVALIDATE' :
+
+				dol_syslog("Trigger '" . $this->name . "' for action '$action' launched by " . __FILE__ . ". id=" . $object->id);
+				require_once DOL_DOCUMENT_ROOT . '/comm/action/class/actioncomm.class.php';
+				require_once __DIR__ . '/../../class/digiriskelement.class.php';
+				$now        = dol_now();
+				$actioncomm = new ActionComm($this->db);
+
+				$actioncomm->elementtype = $object->element . '@digiriskdolibarr';
+				$actioncomm->code        = 'AC_' . dol_strtoupper(get_class($object))  . '_UNVALIDATE';
+				$actioncomm->type_code   = 'AC_OTH_AUTO';
+				$actioncomm->label       = $langs->trans('ObjectUnValidateTrigger', $langs->transnoentities(ucfirst($object->element)), $object->ref);
+				$actioncomm->datep       = $now;
+				$actioncomm->fk_element  = $object->id;
+				$actioncomm->userownerid = $user->id;
+				$actioncomm->percentage  = -1;
+				$result = $actioncomm->create($user);
+				if ($result < 0) {
+					$object->errors = array_merge($object->error, $actioncomm->errors);
+					return $result;
+				}
+				break;
+
+			case 'ACCIDENTINVESTIGATION_LOCK' :
+
+				dol_syslog("Trigger '" . $this->name . "' for action '$action' launched by " . __FILE__ . ". id=" . $object->id);
+				require_once DOL_DOCUMENT_ROOT . '/comm/action/class/actioncomm.class.php';
+				require_once __DIR__ . '/../../class/digiriskelement.class.php';
+				$now        = dol_now();
+				$actioncomm = new ActionComm($this->db);
+
+				$actioncomm->elementtype = $object->element . '@digiriskdolibarr';
+				$actioncomm->code        = 'AC_' . dol_strtoupper(get_class($object))  . '_LOCK';
+				$actioncomm->type_code   = 'AC_OTH_AUTO';
+				$actioncomm->label       = $langs->trans('ObjectLockedTrigger', $langs->transnoentities(ucfirst($object->element)), $object->ref);
+				$actioncomm->datep       = $now;
+				$actioncomm->fk_element  = $object->id;
+				$actioncomm->userownerid = $user->id;
+				$actioncomm->percentage  = -1;
+				$result = $actioncomm->create($user);
+				if ($result < 0) {
+					$object->errors = array_merge($object->error, $actioncomm->errors);
+					return $result;
+				}
+				break;
+
+			case 'ACCIDENTINVESTIGATION_ARCHIVE' :
+
+				dol_syslog("Trigger '" . $this->name . "' for action '$action' launched by " . __FILE__ . ". id=" . $object->id);
+				require_once DOL_DOCUMENT_ROOT . '/comm/action/class/actioncomm.class.php';
+				require_once __DIR__ . '/../../class/digiriskelement.class.php';
+				$now        = dol_now();
+				$actioncomm = new ActionComm($this->db);
+
+				$actioncomm->elementtype = $object->element . '@digiriskdolibarr';
+				$actioncomm->code        = 'AC_' . dol_strtoupper(get_class($object))  . '_ARCHIVE';
+				$actioncomm->type_code   = 'AC_OTH_AUTO';
+				$actioncomm->label       = $langs->trans('ObjectArchivedTrigger', $langs->transnoentities(ucfirst($object->element)), $object->ref);
+				$actioncomm->datep       = $now;
+				$actioncomm->fk_element  = $object->id;
+				$actioncomm->userownerid = $user->id;
+				$actioncomm->percentage  = -1;
+				$result = $actioncomm->create($user);
+				if ($result < 0) {
+					$object->errors = array_merge($object->error, $actioncomm->errors);
+					return $result;
+				}
+				break;
 			default:
 				dol_syslog("Trigger '" . $this->name . "' for action '$action' launched by " . __FILE__ . ". id=" . $object->id);
 				break;
