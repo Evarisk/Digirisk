@@ -745,7 +745,9 @@ Circumstances = Circonstances
 CurativeAction = Actions curatives
 PreventiveAction = Actions préventives
 AccidentInvestigationValidated = L'enquête accident a été validée
+AccidentInvestigationReOpened = L'enquête accident a été rouverte
 AccidentInvestigationTaskCreated = Les tâches de l'enquête accident ont été crées
+AccidentInvestigationTaskDeleted = Les tâches de l'enquête accident ont été supprimées
 CausalityTree = Arbre des causes
 
 # AccidentTooltip - Tooltip des accidents

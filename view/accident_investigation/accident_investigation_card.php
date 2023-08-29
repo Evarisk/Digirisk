@@ -34,13 +34,14 @@ if (file_exists('../../digiriskdolibarr.main.inc.php')) {
 global $conf, $db, $hookmanager, $langs, $user;
 
 // Load Dolibarr libraries
+require_once DOL_DOCUMENT_ROOT . '/core/class/html.formcompany.class.php';
 require_once DOL_DOCUMENT_ROOT . '/core/lib/company.lib.php';
 require_once DOL_DOCUMENT_ROOT . '/core/lib/project.lib.php';
-require_once DOL_DOCUMENT_ROOT . '/core/class/html.formcompany.class.php';
 require_once DOL_DOCUMENT_ROOT . '/core/lib/images.lib.php';
 
 // Load Saturne libraries.
 require_once __DIR__ . '/../../../saturne/class/saturnesignature.class.php';
+require_once __DIR__ . '/../../../saturne/class/task/saturnetask.class.php';
 
 // Load DigiriskDolibarr librairies
 require_once __DIR__ . '/../../class/accident.class.php';
@@ -167,6 +168,40 @@ if (empty($reshook)) {
 		}
 		header('Location: ' . $_SERVER["PHP_SELF"] . '?id=' . $id);
 		exit();
+	}
+
+	if ($action == 'confirm_setdraft') {
+		if ($object->fk_task > 0) {
+			$curativeActionTask   = saturne_fetch_all_object_type('SaturneTask', '', '', 0, 0, ['customsql' => 'fk_task_parent = ' . $object->fk_task . ') AND (label LIKE "%- T1 -%"']);
+			$curativeActionTask   = array_pop($curativeActionTask);
+			$resOne = $curativeActionTask->delete($user);
+			$preventiveActionTask = saturne_fetch_all_object_type('SaturneTask', '', '', 0, 0, ['customsql' => 'fk_task_parent = ' . $object->fk_task . ') AND (label LIKE "%- T2 -%"']);
+			$preventiveActionTask = array_pop($preventiveActionTask);
+			$resTwo = $preventiveActionTask->delete($user);
+
+			if ($resOne > 0 && $resTwo > 0) {
+				setEventMessages('AccidentInvestigationTaskDeleted', []);
+
+				$task->fetch($object->fk_task);
+				$result = $task->delete($user);
+
+				if ($result > 0) {
+					$object->fk_task = 0;
+					$object->update($user);
+					$result = $object->setDraft($user);
+				}
+			} else {
+				setEventMessages($task->error, [], 'errors');
+			}
+		} else {
+			$result = $object->setDraft($user);
+		}
+
+		if ($result > 0) {
+			setEventMessages('AccidentInvestigationReOpened', []);
+		} else {
+			setEventMessages($object->error, [], 'errors');
+		}
 	}
 
 	// Actions cancel, add, update, update_extras, confirm_validate, confirm_delete, confirm_deleteline, confirm_clone, confirm_close, confirm_setdraft, confirm_reopen
