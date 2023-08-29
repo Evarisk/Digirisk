@@ -22,6 +22,9 @@
  */
 
 
+// Load DigiriskDolibarr libraries
+require_once __DIR__ . '/../digiriskdocuments.class.php';
+
 /**
  * Class for GroupmentDocument.
  */

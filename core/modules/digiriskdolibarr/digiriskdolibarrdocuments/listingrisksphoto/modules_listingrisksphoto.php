@@ -64,6 +64,8 @@ abstract class ModeleODTListingRisksPhoto extends CommonDocGenerator
 		// phpcs:enable
 		global $user, $langs, $conf, $hookmanager, $action, $mysoc;
 
+		$digiriskelement = $digiriskelement['object'];
+
 		if (empty($srctemplatepath)) {
 			dol_syslog("doc_listingrisksphoto_odt::write_file parameter srctemplatepath empty", LOG_WARNING);
 			return -1;

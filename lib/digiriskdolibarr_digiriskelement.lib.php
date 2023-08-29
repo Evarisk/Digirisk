@@ -33,7 +33,7 @@ function digiriskelement_prepare_head($object)
 
 	saturne_load_langs();
 
-	$h    = 0;
+	$h    = 1;
 	$head = array();
 	if ($object->id > 0) {
 		if ($user->rights->digiriskdolibarr->risk->read) {
@@ -64,11 +64,6 @@ function digiriskelement_prepare_head($object)
 			$h++;
 		}
 
-		$head[$h][0] = dol_buildpath("/digiriskdolibarr/view/digiriskelement/digiriskelement_card.php", 1) . '?id=' . $object->id;
-		$head[$h][1] = '<i class="fas fa-info-circle"></i> ' . $langs->trans("Card");
-		$head[$h][2] = 'elementCard';
-		$h++;
-
 		if ($object->element_type == 'groupment') {
 			if ($user->rights->digiriskdolibarr->listingrisksaction->read) {
 				$head[$h][0] = dol_buildpath("/digiriskdolibarr/view/digiriskelement/digiriskelement_listingrisksaction.php", 1) . '?id=' . $object->id;
@@ -85,17 +80,11 @@ function digiriskelement_prepare_head($object)
 			}
 		}
 
-		$head[$h][0] = dol_buildpath("/digiriskdolibarr/view/digiriskelement/digiriskelement_agenda.php", 1) . '?id=' . $object->id;
-		$head[$h][1] = '<i class="fas fa-calendar"></i> ' . $langs->trans("Events");
-		$head[$h][2] = 'elementAgenda';
-		$h++;
-
 		$head[$h][0] = dol_buildpath("/digiriskdolibarr/view/digiriskelement/digiriskelement_register.php", 1) . '?id=' . $object->id;
 		$head[$h][1] = '<i class="fa fa-ticket"></i> ' . $langs->trans("Registers");
 		$head[$h][2] = 'elementRegister';
-		$h++;
 
-		complete_head_from_modules($conf, $langs, $object, $head, $h, 'digiriskelement@digiriskdolibarr');
 	}
-	return $head;
+
+	return saturne_object_prepare_head($object, $head, []);
 }

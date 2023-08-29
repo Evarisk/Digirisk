@@ -21,21 +21,14 @@
  *		\brief      Page to create/edit/view evaluator
  */
 
-
-// Load Dolibarr environment
-$res = 0;
-// Try main.inc.php into web root known defined into CONTEXT_DOCUMENT_ROOT (not always defined)
-if ( ! $res && ! empty($_SERVER["CONTEXT_DOCUMENT_ROOT"])) $res = @include $_SERVER["CONTEXT_DOCUMENT_ROOT"] . "/main.inc.php";
-// Try main.inc.php into web root detected using web root calculated from SCRIPT_FILENAME
-$tmp = empty($_SERVER['SCRIPT_FILENAME']) ? '' : $_SERVER['SCRIPT_FILENAME']; $tmp2 = realpath(__FILE__); $i = strlen($tmp) - 1; $j = strlen($tmp2) - 1;
-while ($i > 0 && $j > 0 && isset($tmp[$i]) && isset($tmp2[$j]) && $tmp[$i] == $tmp2[$j]) { $i--; $j--; }
-if ( ! $res && $i > 0 && file_exists(substr($tmp, 0, ($i + 1)) . "/main.inc.php")) $res          = @include substr($tmp, 0, ($i + 1)) . "/main.inc.php";
-if ( ! $res && $i > 0 && file_exists(dirname(substr($tmp, 0, ($i + 1))) . "/main.inc.php")) $res = @include dirname(substr($tmp, 0, ($i + 1))) . "/main.inc.php";
-// Try main.inc.php using relative path
-if ( ! $res && file_exists("../../main.inc.php")) $res       = @include "../../main.inc.php";
-if ( ! $res && file_exists("../../../main.inc.php")) $res    = @include "../../../main.inc.php";
-if ( ! $res && file_exists("../../../../main.inc.php")) $res = @include "../../../../main.inc.php";
-if ( ! $res) die("Include of main fails");
+// Load DigiriskDolibarr environment
+if (file_exists('../digiriskdolibarr.main.inc.php')) {
+	require_once __DIR__ . '/../digiriskdolibarr.main.inc.php';
+} elseif (file_exists('../../digiriskdolibarr.main.inc.php')) {
+	require_once __DIR__ . '/../../digiriskdolibarr.main.inc.php';
+} else {
+	die('Include of digiriskdolibarr main fails');
+}
 
 require_once DOL_DOCUMENT_ROOT . '/core/lib/images.lib.php';
 require_once DOL_DOCUMENT_ROOT . '/core/lib/usergroups.lib.php';
@@ -52,7 +45,7 @@ require_once __DIR__ . '/../../lib/digiriskdolibarr_function.lib.php';
 global $conf, $db, $hookmanager, $langs, $user;
 
 // Load translation files required by the page
-$langs->loadLangs(array("digiriskdolibarr@digiriskdolibarr", "other"));
+saturne_load_langs(['other']);
 
 // Get parameters
 $id          = GETPOST('id', 'int');
@@ -78,6 +71,12 @@ $evaluator        = new Evaluator($db);
 $extrafields      = new ExtraFields($db);
 $usertmp          = new User($db);
 $project          = new Project($db);
+
+$numberingModuleName = [
+	$evaluator->element => $conf->global->DIGIRISKDOLIBARR_EVALUATOR_ADDON,
+];
+
+list($refEvaluatorMod) = saturne_require_objects_mod($numberingModuleName);
 
 $hookmanager->initHooks(array('evaluatorcard', 'globalcard')); // Note that conf->hooks_modules contains array
 
@@ -133,15 +132,12 @@ if ($object->id == 0) {
 }
 
 //Permission for digiriskelement_evaluator
-
 $permissiontoread   = $user->rights->digiriskdolibarr->evaluator->read;
 $permissiontoadd    = $user->rights->digiriskdolibarr->evaluator->write;
 $permissiontodelete = $user->rights->digiriskdolibarr->evaluator->delete;
 
 // Security check
-if ( ! $permissiontoread) accessforbidden();
-
-$refEvaluatorMod  = new $conf->global->DIGIRISKDOLIBARR_EVALUATOR_ADDON();
+saturne_check_access($permissiontoread);
 
 /*
  * Actions
@@ -184,7 +180,7 @@ if (empty($reshook)) {
 
 		$usertmp->fetch($evaluatorID);
 
-		$evaluator->ref             = $refEvaluatorMod->getNextValue($evaluator);
+		$evaluator->ref             = $evaluator->getNextNumRef();
 		$evaluator->ref_ext         = $evaluator->ref;
 		$evaluator->assignment_date = strtotime(preg_replace('/\//', '-', $date));
 		$evaluator->duration        = $duration;
@@ -254,14 +250,12 @@ if (empty($reshook)) {
 $form = new Form($db);
 
 $title    = $langs->trans("Evaluators");
-$help_url = 'FR:Module_Digirisk#.C3.89valuateurs';
-$morejs   = array("/digiriskdolibarr/js/digiriskdolibarr.js");
-$morecss  = array("/digiriskdolibarr/css/digiriskdolibarr.css");
+$helpUrl  = 'FR:Module_Digirisk#.C3.89valuateurs';
 
 if ($fromid > 0) {
-	llxHeader('', $title, $help_url, '', 0, 0, $morejs, $morecss);
+	saturne_header(0,'', $title, $helpUrl);
 } else {
-	digiriskHeader($title, $help_url, $morejs, $morecss);
+	digirisk_header($title, $helpUrl);
 }
 
 print '<div id="cardContent" value="">';
@@ -270,8 +264,7 @@ if ($object->id > 0 || $fromid > 0) {
 	$res = $object->fetch_optionals();
 
 	if (empty($fromid)) {
-		$head = digiriskelementPrepareHead($object);
-		print dol_get_fiche_head($head, 'elementEvaluator', $title, -1, "digiriskdolibarr@digiriskdolibarr");
+		saturne_get_fiche_head($object, 'elementEvaluator', $title);
 	} else {
 		print dol_get_fiche_head($head, 'participation', $langs->trans('User'), -1, "user");
 	}
@@ -298,7 +291,7 @@ if ($object->id > 0 || $fromid > 0) {
 			$morehtmlref .= '<br>' . $langs->trans("ParentElement") . ' : ' . $digiriskstandard->getNomUrl(1, 'blank', 1);
 		}
 		$morehtmlref .= '</div>';
-		$morehtmlleft = '<div class="floatleft inline-block valignmiddle divphotoref">' . digirisk_show_photos('digiriskdolibarr', $conf->digiriskdolibarr->multidir_output[$conf->entity] . '/' . $object->element_type, 'small', 5, 0, 0, 0, $height, $width, 0, 0, 0, $object->element_type, $object) . '</div>';
+		$morehtmlleft = '<div class="floatleft inline-block valignmiddle divphotoref">' . saturne_show_medias_linked('digiriskdolibarr', $conf->digiriskdolibarr->multidir_output[$conf->entity] . '/' . $object->element_type, 'small', 5, 0, 0, 0, $height, $width, 0, 0, 0, $object->element_type, $object, 'photo', 0, 0) . '</div>';
 		$linkback = '<a href="' . dol_buildpath('/digiriskdolibarr/view/digiriskelement/risk_list.php', 1) . '">' . $langs->trans("BackToList") . '</a>';
 		digirisk_banner_tab($object, 'id', $linkback, 1, 'rowid', 'ref', $morehtmlref, '', 0, $morehtmlleft);
 	} else {
@@ -459,10 +452,14 @@ if ($object->id > 0 || $fromid > 0) {
 
 	<!-- BUTTON MODAL EVALUATOR ADD -->
 	<?php if ($permissiontoadd) {
-		$newcardbutton = '<div class="evaluator-add wpeo-button button-square-40 button-blue modal-open" value="' . $object->id . '"><i class="fas fa-user-check button-icon"></i><i class="fas fa-plus-circle button-add animated"></i></div>';
+		$newcardbutton = '<div class="evaluator-add wpeo-button button-blue modal-open" value="' . $object->id . '">';
+		$newcardbutton .= '<i class="fas fa-user-check button-icon"></i><i class="fas fa-plus-circle button-add animated"></i>';
+		$newcardbutton .= '	<input type="hidden" class="modal-options" data-modal-to-open="evaluator_add'. $object->id .'" data-from-id="'. $object->id .'" data-from-type="digiriskelement" data-from-subtype="photo" data-from-subdir="photos"/>';
+		$newcardbutton .= '</div>';
 	} else {
 		$newcardbutton = '<div class="wpeo-button button-square-40 button-grey" value="' . $object->id . '"><i class="fas fa-user-check button-icon wpeo-tooltip-event" aria-label="' . $langs->trans('PermissionDenied') . '"></i><i class="fas fa-plus-circle button-add animated"></i></div>';
 	} ?>
+
 	<!-- EVALUATOR ADD MODAL-->
 	<div class="evaluator-add-modal" value="<?php echo $object->id ?>">
 		<div class="wpeo-modal modal-evaluator-0 <?php echo (GETPOST('modalactive') ? 'modal-active' : ''); ?>" id="evaluator_add<?php echo $object->id ?>">

@@ -21,18 +21,18 @@
  * \brief   This file is a class file for ListingRisksAction.
  */
 
-// Load Saturne libraries.
-require_once __DIR__ . '/../../../saturne/class/saturnedocuments.class.php';
+// Load DigiriskDolibarr libraries
+require_once __DIR__ . '/../digiriskdocuments.class.php';
 
 /**
  * Class for ListingRisksAction.
  */
-class ListingRisksAction extends SaturneDocuments
+class ListingRisksAction extends DigiriskDocuments
 {
     /**
      * @var string Module name.
      */
-    public string $module = 'digiriskdolibarr';
+    public $module = 'digiriskdolibarr';
 
     /**
      * @var string Element type of object.

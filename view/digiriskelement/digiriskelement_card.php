@@ -168,7 +168,6 @@ $reshook                           = $hookmanager->executeHooks('formConfirm', $
 if (empty($reshook)) $formconfirm .= $hookmanager->resPrint;
 elseif ($reshook > 0) $formconfirm = $hookmanager->resPrint;
 
-
 if ( $object->element_type == 'groupment' ) {
 	$title         = $langs->trans("Groupment");
 	$titleCreate   = $langs->trans("NewGroupment");
@@ -182,9 +181,9 @@ if ( $object->element_type == 'groupment' ) {
 } else {
 	$element_type = GETPOST('element_type', 'alpha');
 	if ( $element_type == 'groupment' ) {
-		$titleCreate = $langs->trans("NewGroupment");
+		$title = $langs->trans("NewGroupment");
 	} else {
-		$titleCreate = $langs->trans("NewWorkUnit");
+		$title = $langs->trans("NewWorkUnit");
 	}
 }
 
@@ -197,7 +196,7 @@ digirisk_header($title, $help_url); ?>
 <?php // Part to create
 if ($action == 'create') {
 	$object->fetch($fkParent);
-	print load_fiche_titre($titleCreate, '', "digiriskdolibarr32px@digiriskdolibarr");
+	print load_fiche_titre($title, '', "digiriskdolibarr32px@digiriskdolibarr");
 
 	print '<form method="POST" action="' . $_SERVER["PHP_SELF"] . '">';
 	print '<input type="hidden" name="token" value="' . newToken() . '">';
@@ -331,7 +330,7 @@ if ((empty($action) || ($action != 'edit' && $action != 'create'))) {
 	print $formconfirm;
 	$res = $object->fetch_optionals();
 
-	saturne_get_fiche_head($object, 'elementCard', $title);
+	saturne_get_fiche_head($object, 'card', $title);
 
 	$trashList = $object->fetchDigiriskElementFlat($conf->global->DIGIRISKDOLIBARR_DIGIRISKELEMENT_TRASH);
 

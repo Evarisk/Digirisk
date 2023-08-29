@@ -65,6 +65,9 @@ class DigiriskElement extends SaturneObject
      */
     public string $picto = 'digiriskelement@digiriskdolibarr';
 
+	public const STATUS_DRAFT     = 0;
+	public const STATUS_VALIDATED = 1;
+
     /**
      * 'type' field format:
      *      'integer', 'integer:ObjectClass:PathToClass[:AddCreateButtonOrNot[:Filter[:Sortfield]]]',
@@ -176,7 +179,8 @@ class DigiriskElement extends SaturneObject
 		$this->element     = $this->element_type . '@digiriskdolibarr';
 		$this->fk_standard = $conf->global->DIGIRISKDOLIBARR_ACTIVE_STANDARD;
 		$this->status      = 1;
-		return $this->createCommon($user, $notrigger || !$conf->global->DIGIRISKDOLIBARR_MAIN_AGENDA_ACTIONAUTO_DIGIRISKELEMENT_CREATE);
+
+		return $this->createCommon($user, $notrigger);
 	}
 
 	/**
@@ -238,6 +242,21 @@ class DigiriskElement extends SaturneObject
 		}
 
 		return $result;
+	}
+
+	/**
+	 * Sets object to supplied categories.
+	 *
+	 * Deletes object from existing categories not supplied.
+	 * Adds it to non-existing supplied categories.
+	 * Existing categories are left untouched.
+	 *
+	 * @param  int[]|int $categories Category or categories IDs.
+	 * @return float|int
+	 */
+	public function setCategories($categories)
+	{
+		return 1;
 	}
 
 	/**
@@ -512,5 +531,32 @@ class DigiriskElement extends SaturneObject
 		}
 
 		return $objects;
+	}
+
+	/**
+	 * Return the status.
+	 *
+	 * @param  int    $status ID status.
+	 * @param  int    $mode   0 = long label, 1 = short label, 2 = Picto + short label, 3 = Picto, 4 = Picto + long label, 5 = Short label + Picto, 6 = Long label + Picto.
+	 * @return string         Label of status.
+	 */
+	public function LibStatut(int $status, int $mode = 0): string
+	{
+		if (empty($this->labelStatus) || empty($this->labelStatusShort)) {
+			global $langs;
+
+			$this->labelStatus[self::STATUS_DRAFT]          = $langs->transnoentitiesnoconv('StatusDraft');
+			$this->labelStatus[self::STATUS_VALIDATED]      = $langs->transnoentitiesnoconv('Validated');
+
+			$this->labelStatusShort[self::STATUS_DRAFT]     = $langs->transnoentitiesnoconv('StatusDraft');
+			$this->labelStatusShort[self::STATUS_VALIDATED] = $langs->transnoentitiesnoconv('Validated');
+		}
+
+		$statusType = 'status' . $status;
+		if ($status == self::STATUS_VALIDATED) {
+			$statusType = 'status4';
+		}
+
+		return dolGetStatus($this->labelStatus[$status], $this->labelStatusShort[$status], '', $statusType, $mode);
 	}
 }

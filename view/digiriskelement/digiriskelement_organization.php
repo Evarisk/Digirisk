@@ -21,20 +21,14 @@
  *		\brief      Page to organize arborescence
  */
 
-// Load Dolibarr environment
-$res = 0;
-// Try main.inc.php into web root known defined into CONTEXT_DOCUMENT_ROOT (not always defined)
-if ( ! $res && ! empty($_SERVER["CONTEXT_DOCUMENT_ROOT"])) $res = @include $_SERVER["CONTEXT_DOCUMENT_ROOT"] . "/main.inc.php";
-// Try main.inc.php into web root detected using web root calculated from SCRIPT_FILENAME
-$tmp = empty($_SERVER['SCRIPT_FILENAME']) ? '' : $_SERVER['SCRIPT_FILENAME']; $tmp2 = realpath(__FILE__); $i = strlen($tmp) - 1; $j = strlen($tmp2) - 1;
-while ($i > 0 && $j > 0 && isset($tmp[$i]) && isset($tmp2[$j]) && $tmp[$i] == $tmp2[$j]) { $i--; $j--; }
-if ( ! $res && $i > 0 && file_exists(substr($tmp, 0, ($i + 1)) . "/main.inc.php")) $res          = @include substr($tmp, 0, ($i + 1)) . "/main.inc.php";
-if ( ! $res && $i > 0 && file_exists(dirname(substr($tmp, 0, ($i + 1))) . "/main.inc.php")) $res = @include dirname(substr($tmp, 0, ($i + 1))) . "/main.inc.php";
-// Try main.inc.php using relative path
-if ( ! $res && file_exists("../../main.inc.php")) $res       = @include "../../main.inc.php";
-if ( ! $res && file_exists("../../../main.inc.php")) $res    = @include "../../../main.inc.php";
-if ( ! $res && file_exists("../../../../main.inc.php")) $res = @include "../../../../main.inc.php";
-if ( ! $res) die("Include of main fails");
+// Load DigiriskDolibarr environment
+if (file_exists('../digiriskdolibarr.main.inc.php')) {
+	require_once __DIR__ . '/../digiriskdolibarr.main.inc.php';
+} elseif (file_exists('../../digiriskdolibarr.main.inc.php')) {
+	require_once __DIR__ . '/../../digiriskdolibarr.main.inc.php';
+} else {
+	die('Include of digiriskdolibarr main fails');
+}
 
 require_once DOL_DOCUMENT_ROOT . '/core/class/html.formfile.class.php';
 require_once DOL_DOCUMENT_ROOT . '/core/lib/images.lib.php';
@@ -45,8 +39,7 @@ require_once __DIR__ . '/../../lib/digiriskdolibarr_function.lib.php';
 global $conf, $db, $hookmanager, $langs, $user;
 
 // Load translation files required by the page
-$langs->loadLangs(array("digiriskdolibarr@digiriskdolibarr", "other"));
-
+saturne_load_langs(['other']);
 // Get parameters
 $id                  = GETPOST('id', 'int');
 $ref                 = GETPOST('ref', 'alpha');
@@ -71,7 +64,7 @@ $hookmanager->initHooks(array('digiriskelementcard', 'globalcard')); // Note tha
 //Security check
 $permissiontoread = $user->rights->digiriskdolibarr->digiriskelement->read;
 
-if ( ! $permissiontoread) accessforbidden();
+saturne_check_access($permissiontoread);
 
 /*
  * Actions
@@ -95,17 +88,17 @@ if (empty($reshook)) {
 
 	if ($action == 'saveOrganization') {
 		$ids              = GETPOST('ids');
-		$parent_ids       = GETPOST('parent_ids');
-		$array_ids        = preg_split('/,/', $ids);
-		$array_parent_ids = preg_split('/,/', $parent_ids);
+		$parentIds        = GETPOST('parent_ids');
+		$arrayIds         = preg_split('/,/', $ids);
+		$arrayParentIds   = preg_split('/,/', $parentIds);
 		$i                = 0;
 
-		if ( ! empty($array_ids) && $array_ids > 0) {
-			foreach ($array_ids as $id) {
+		if ( ! empty($arrayIds) && $arrayIds > 0) {
+			foreach ($arrayIds as $id) {
 				$digiriskelement = new DigiriskElement($db);
 				$digiriskelement->fetch((int) $id);
 				$digiriskelement->ranks     = $i + 1;
-				$digiriskelement->fk_parent = $array_parent_ids[$i];
+				$digiriskelement->fk_parent = $arrayParentIds[$i];
 
 				$digiriskelement->update($user);
 				$i++;
@@ -119,7 +112,6 @@ if (empty($reshook)) {
  */
 
 $form        = new Form($db);
-$emptyobject = new stdClass();
 $formconfirm = '';
 
 $parameters                        = array('formConfirm' => $formconfirm, 'object' => $object);
@@ -127,13 +119,10 @@ $reshook                           = $hookmanager->executeHooks('formConfirm', $
 if (empty($reshook)) $formconfirm .= $hookmanager->resPrint;
 elseif ($reshook > 0) $formconfirm = $hookmanager->resPrint;
 
-
-$help_url = 'FR:Module_Digirisk';
+$helpUrl  = 'FR:Module_Digirisk';
 $title    = $langs->trans('DigiriskElementOrganization');
-$morejs   = array("/digiriskdolibarr/js/digiriskdolibarr.js");
-$morecss  = array("/digiriskdolibarr/css/digiriskdolibarr.css");
 
-llxHeader('', $title, $help_url, '', '', '', $morejs, $morecss);
+saturne_header(0, '', $title, $helpUrl);
 
 ?>
 <div id="cardContent" value="">
