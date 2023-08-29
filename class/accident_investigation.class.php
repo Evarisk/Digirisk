@@ -255,6 +255,33 @@ class AccidentInvestigation extends SaturneObject
 	}
 
 	/**
+	 * Write information of trigger description
+	 *
+	 * @param  Object $object Object calling the trigger
+	 * @return string         Description to display in actioncomm->note_private
+	 */
+	public function getTriggerDescription(SaturneObject $object): string
+	{
+		global $langs;
+
+		$accident = new Accident($this->db);
+		$accident->fetch($object->fk_accident);
+
+		$ret   = parent::getTriggerDescription($object);
+		$ret  .= $langs->transnoentities('Accident') . ' : ' . $accident->ref . ' - ' . $accident->label . '</br>';
+		$ret  .= (!empty($object->seniority_at_post) ? $langs->transnoentities('SeniorityAtPost') . ' : ' . $object->seniority_at_post . '</br>' : '');
+		$ret  .= (!empty($object->victim_skills) ? $langs->transnoentities('VictimSkills') . ' : ' . $object->victim_skills . '</br>' : '');
+		$ret  .= (!empty($object->collective_equipment) ? $langs->transnoentities('CollectiveEquipment') . ' : ' . $object->collective_equipment . '</br>' : '');
+		$ret  .= (!empty($object->individual_equipment) ? $langs->transnoentities('IndividualEquipment') . ' : ' . $object->individual_equipment . '</br>' : '');
+		$ret  .= (!empty($object->circumstances) ? $langs->transnoentities('Circumstances') . ' : ' . $object->circumstances . '</br>' : '');
+		$ret  .= (!empty($object->causality_tree) ? $langs->transnoentities('CausalityTree') . ' : ' . $object->causality_tree . '</br>' : '');
+		$ret  .= (!empty($object->note_public) ? $langs->transnoentities('NotePublic') . ' : ' . $object->note_public . '</br>' : '');
+		$ret  .= (!empty($object->note_private) ? $langs->transnoentities('NotePrivate') . ' : ' . $object->note_private . '</br>' : '');
+
+		return $ret;
+	}
+
+	/**
 	 *  Return the label of the status
 	 *
 	 *  @param  int		$mode 0=long label, 1=short label, 2=Picto + short label, 3=Picto, 4=Picto + long label, 5=Short label + Picto, 6=Long label + Picto
