@@ -309,8 +309,8 @@ $evaluation->method = $lastEvaluation->method ?: "standard" ;
 									</div>
 								</div>
 								<input class="risk-evaluation-seuil" type="hidden">
-								<?php $evaluation_method  = $advancedCotationMethodArray[0];
-								$evaluationMethodSurvey = $evaluation_method['option']['variable']; ?>
+								<?php $evaluationMethod  = $advancedCotationMethodArray[0];
+								$evaluationMethodSurvey = $evaluationMethod['option']['variable']; ?>
 								<div class="wpeo-gridlayout cotation-advanced" style="<?php echo ($lastEvaluation->method == "advanced") ? " display:block" : " display:none" ?>">
 									<input type="hidden" class="digi-method-evaluation-id" value="<?php echo $risk->id ; ?>" />
 									<textarea style="display: none" name="evaluation_variables" class="tmp_evaluation_variable"><?php echo '{}'; ?></textarea>

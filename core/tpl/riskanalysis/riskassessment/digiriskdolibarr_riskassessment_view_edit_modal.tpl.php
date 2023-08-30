@@ -82,8 +82,8 @@
 								<input class="risk-evaluation-seuil" type="hidden" value="<?php echo $lastEvaluation->cotation ?>">
 								<?php if ( $lastEvaluation->method == "advanced" || $conf->global->DIGIRISKDOLIBARR_MULTIPLE_RISKASSESSMENT_METHOD) : ?>
 									<?php
-									$evaluation_method        = $advancedCotationMethodArray[0];
-									$evaluationMethodSurvey = $evaluation_method['option']['variable'];
+									$evaluationMethod       = $advancedCotationMethodArray[0];
+									$evaluationMethodSurvey = $evaluationMethod['option']['variable'];
 									?>
 									<div class="wpeo-gridlayout cotation-advanced" style="<?php echo ($lastEvaluation->method == "advanced") ? " display:block" : " display:none" ?>">
 										<input type="hidden" class="digi-method-evaluation-id" value="<?php echo $risk->id ; ?>" />
@@ -127,9 +127,7 @@
 						</div>
 
 						<?php
-						$editModal = 1;
-						include DOL_DOCUMENT_ROOT . '/custom/digiriskdolibarr/core/tpl/medias/digiriskdolibarr_photo_view.tpl.php';
-						$editModal = 0;
+						print saturne_show_medias_linked('digiriskdolibarr', $conf->digiriskdolibarr->multidir_output[$conf->entity] . '/riskassessment/tmp/' . $lastEvaluation->photo, 'small', 0, 0, 0, 0, 150, 150, 0, 0, 0, '/riskassessment/tmp/' . $lastEvaluation->photo, $lastEvaluation);
 						?>
 
 						<div class="risk-evaluation-calculated-cotation"  style="<?php echo ($lastEvaluation->method == "advanced") ? " display:block" : " display:none" ?>">
@@ -152,8 +150,9 @@
 					<div class="element-linked-medias element-linked-medias-<?php echo $lastEvaluation->id ?> risk-<?php echo $risk->id ?>">
 						<div class="medias"><i class="fas fa-picture-o"></i><?php echo $langs->trans('Medias'); ?></div>
 						<?php
-						$relativepath = 'digiriskdolibarr/medias/thumbs';
-						print digirisk_show_medias_linked('digiriskdolibarr', $conf->digiriskdolibarr->multidir_output[$conf->entity] . '/riskassessment/', 'small', 0, 0, 0, 0, 150, 150, 1, 0, 0, $lastEvaluation->element, $lastEvaluation);
+						print '<div class="wpeo-grid grid-5">';
+						print saturne_show_medias_linked('digiriskdolibarr', $conf->digiriskdolibarr->multidir_output[$conf->entity] . '/riskassessment/' . $lastEvaluation->ref, 'small', 0, 0, 0, 0, 150, 150, 1, 0, 0, '/riskassessment/' . $lastEvaluation->ref, $lastEvaluation);
+						print '</div>';
 						?>
 					</div>
 				</div>

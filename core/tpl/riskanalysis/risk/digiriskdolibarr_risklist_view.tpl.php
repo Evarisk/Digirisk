@@ -668,8 +668,8 @@ if ($action != 'list') {
 										</div>
 										<input class="risk-evaluation-seuil" type="hidden" value="undefined">
 										<?php
-										$evaluation_method        = $advancedCotationMethodArray[0];
-										$evaluationMethodSurvey = $evaluation_method['option']['variable'];
+										$evaluationMethod        = $advancedCotationMethodArray[0];
+										$evaluationMethodSurvey = $evaluationMethod['option']['variable'];
 										?>
 										<div class="wpeo-gridlayout cotation-advanced" style="display:none">
 											<input type="hidden" class="digi-method-evaluation-id" value="<?php echo $risk->id ; ?>" />
@@ -825,7 +825,7 @@ if ($action != 'list') {
 						<input class="risk-evaluation-method" type="hidden" value="standard">
 						<input class="risk-evaluation-multiple-method" type="hidden" value="1">
 						<div class="wpeo-button open-media-gallery add-media modal-open" value="0">
-							<input type="hidden" class="modal-options" data-modal-to-open="media_gallery" data-from-id="0" data-from-type="riskassessment" data-from-subtype="photo" data-from-subdir=""/>
+							<input type="hidden" class="modal-options" data-modal-to-open="media_gallery" data-from-id="0" data-from-type="riskassessment" data-from-subtype="photo" data-from-subdir="" data-photo-class="riskassessment-from-risk-create"/>
 							<span><i class="fas fa-camera"></i>  <?php echo $langs->trans('AddMedia') ?></span>
 						</div>
 					</div>
@@ -853,8 +853,8 @@ if ($action != 'list') {
 								</div>
 								<input class="risk-evaluation-seuil" type="hidden" value="undefined">
 								<?php
-								$evaluation_method        = $advancedCotationMethodArray[0];
-								$evaluationMethodSurvey = $evaluation_method['option']['variable'];
+								$evaluationMethod        = $advancedCotationMethodArray[0];
+								$evaluationMethodSurvey = $evaluationMethod['option']['variable'];
 								?>
 								<div class="wpeo-gridlayout cotation-advanced" style="display:none">
 									<input type="hidden" class="digi-method-evaluation-id" value="<?php echo $risk->id ; ?>" />
@@ -892,9 +892,10 @@ if ($action != 'list') {
 								</div>
 							</div>
 						</div>
-
-						<?php include DOL_DOCUMENT_ROOT . '/custom/digiriskdolibarr/core/tpl/medias/digiriskdolibarr_photo_view.tpl.php'; ?>
-
+						<div class="photo riskassessment-from-risk-create" style="margin: auto">
+							<?php
+							print saturne_show_medias_linked('digiriskdolibarr', $conf->digiriskdolibarr->multidir_output[$conf->entity] . '/riskassessment/tmp/RA0', 'small', 1, 0, 0, 0, 50, 50, 0, 0, 0, '/riskassessment/tmp/RA0', $lastEvaluation, 'photo', 0, 0);							?>
+						</div>
 						<div class="risk-evaluation-calculated-cotation" style="display: none">
 							<span class="title"><i class="fas fa-chart-line"></i> <?php echo $langs->trans('CalculatedEvaluation'); ?><required>*</required></span>
 							<div data-scale="1" class="risk-evaluation-cotation cotation">
@@ -931,7 +932,7 @@ if ($action != 'list') {
 						<input type="text" class="riskassessment-task-budget" name="budget" value="">
 					</div>
 				<?php endif; ?>
-				<div class="linked-medias element-linked-medias-0 photo-0">
+				<div class="linked-medias riskassessment-from-risk-create">
 					<div class="medias"><i class="fas fa-picture-o"></i><?php echo $langs->trans('Medias'); ?></div>
 					<?php
 					$relativepath = 'digiriskdolibarr/medias/thumbs';

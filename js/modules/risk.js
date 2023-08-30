@@ -117,9 +117,10 @@ window.digiriskdolibarr.risk.sanitizeBeforeRequest = function ( text ) {
 window.digiriskdolibarr.risk.createRisk = function ( event ) {
 	let token = window.saturne.toolbox.getToken()
 
-	let elementRisk       = $(this).closest('.fichecenter').find('.risk-content');
-	let elementEvaluation = $(this).closest('.fichecenter').find('.risk-evaluation-container');
-	let elementTask       = $(this).closest('.fichecenter').find('.riskassessment-task');
+	let riskAddModal      = $('.risk-add-modal')
+	let elementRisk       = riskAddModal.closest('.fichecenter').find('.risk-content');
+	let elementEvaluation = riskAddModal.closest('.fichecenter').find('.risk-evaluation-container');
+	let elementTask       = riskAddModal.closest('.fichecenter').find('.riskassessment-task');
 
 	let riskCommentText = elementRisk.find('.risk-description textarea').val()
 	let evaluationText  = elementEvaluation.find('.risk-evaluation-comment textarea').val()
@@ -137,7 +138,7 @@ window.digiriskdolibarr.risk.createRisk = function ( event ) {
 	//Risk assessment
 	var method   = elementEvaluation.find('.risk-evaluation-header .risk-evaluation-method').val();
 	var cotation = elementEvaluation.find('.risk-evaluation-seuil').val();
-	var photo    = elementEvaluation.find('.risk-evaluation-photo-single .filename').val();
+	var photo    = riskAddModal.find('.media-container .file-name').val();
 	var comment  = evaluationText;
 	var date     = elementEvaluation.find('#RiskAssessmentDate').val();
 	var criteres = []
