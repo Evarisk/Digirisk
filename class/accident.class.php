@@ -26,6 +26,8 @@ require_once DOL_DOCUMENT_ROOT . '/contact/class/contact.class.php';
 require_once DOL_DOCUMENT_ROOT . '/societe/class/societe.class.php';
 require_once DOL_DOCUMENT_ROOT . '/categories/class/categorie.class.php';
 
+require_once __DIR__ . '/../../saturne/class/saturneobject.class.php';
+
 require_once __DIR__ . '/../lib/digiriskdolibarr_function.lib.php';
 require_once __DIR__ . '/digiriskdocuments.class.php';
 require_once __DIR__ . '/digirisksignature.class.php';
@@ -36,12 +38,12 @@ require_once __DIR__ . '/dashboarddigiriskstats.class.php';
 /**
  * Class for Accident
  */
-class Accident extends CommonObject
+class Accident extends SaturneObject
 {
 	/**
-	 * @var DoliDB Database handler.
+	 * @var string Module name.
 	 */
-	public $db;
+	public $module = 'digiriskdolibarr';
 
 	/**
 	 * @var string Error string
@@ -93,7 +95,7 @@ class Accident extends CommonObject
 	/**
 	 * @var int  Does object support extrafields ? 0=No, 1=Yes
 	 */
-	public $isextrafieldmanaged = 1;
+	public int $isextrafieldmanaged = 1;
 
 	/**
 	 * @var string String with name of icon for digiriskelement. Must be the part after the 'object_' into object_digiriskelement.png
@@ -110,7 +112,8 @@ class Accident extends CommonObject
 	 */
 	public $labelStatusShort;
 
-	const STATUS_IN_PROGRESS = 1;
+	const STATUS_DELETED           = -1;
+	const STATUS_IN_PROGRESS       = 1;
 	const STATUS_PENDING_SIGNATURE = 2;
 
 	/**
@@ -204,24 +207,12 @@ class Accident extends CommonObject
 	 * @param  bool $notrigger false=launch triggers after, true=disable triggers
 	 * @return int             <0 if KO, Id of created object if OK
 	 */
-	public function create(User $user, $notrigger = false)
+	public function create(User $user, bool $notrigger = false): int
 	{
 		global $conf;
 
 		$this->element = $this->element . '@digiriskdolibarr';
 		return $this->createCommon($user, $notrigger || !$conf->global->DIGIRISKDOLIBARR_MAIN_AGENDA_ACTIONAUTO_ACCIDENT_CREATE);
-	}
-
-	/**
-	 * Load object in memory from the database
-	 *
-	 * @param int    $id   Id object
-	 * @param string $ref  Ref
-	 * @return int         <0 if KO, 0 if not found, >0 if OK
-	 */
-	public function fetch($id, $ref = null)
-	{
-		return $this->fetchCommon($id, $ref);
 	}
 
 	/**
@@ -235,17 +226,6 @@ class Accident extends CommonObject
 	{
 		$filter = array('customsql' => 'fk_element=' . $this->db->escape($parent_id));
 		return $this->fetchAll('', '', 0, 0, $filter, 'AND');
-	}
-
-	/**
-	 * Load object lines in memory from the database
-	 *
-	 * @return int         <0 if KO, 0 if not found, >0 if OK
-	 */
-	public function fetchLines()
-	{
-		$this->lines = array();
-		return $this->fetchLinesCommon();
 	}
 
 	/**
@@ -330,7 +310,7 @@ class Accident extends CommonObject
 	 * @param  bool $notrigger false=launch triggers after, true=disable triggers
 	 * @return int             <0 if KO, >0 if OK
 	 */
-	public function update(User $user, $notrigger = false)
+	public function update(User $user, bool $notrigger = false): int
 	{
 		global $conf;
 
@@ -338,20 +318,18 @@ class Accident extends CommonObject
 	}
 
 	/**
-	 * Delete object in database
+	 * Delete object in database.
 	 *
-	 * @param User $user       User that deletes
-	 * @param bool $notrigger  false=launch triggers after, true=disable triggers
-	 * @return int             <0 if KO, >0 if OK
+	 * @param  User $user       User that deletes.
+	 * @param  bool $notrigger  false = launch triggers after, true = disable triggers.
+	 * @param  bool $softDelete Don't delete object.
+	 * @return int              0 < if KO, > 0 if OK.
 	 */
-	public function delete(User $user, $notrigger = false)
+	public function delete(User $user, bool $notrigger = false, bool $softDelete = true): int
 	{
 		global $conf;
 
-		$result = $this->update($user, true);
-		if ($result > 0 && !empty($conf->global->DIGIRISKDOLIBARR_MAIN_AGENDA_ACTIONAUTO_ACCIDENT_DELETE)) {
-			$this->call_trigger('ACCIDENT_DELETE', $user);
-		}
+		$result = parent::delete($user, $notrigger && !empty($conf->global->DIGIRISKDOLIBARR_MAIN_AGENDA_ACTIONAUTO_ACCIDENT_DELETE));
 
 		return $result;
 	}
@@ -408,7 +386,7 @@ class Accident extends CommonObject
 	 *  @param  int		$mode          0=long label, 1=short label, 2=Picto + short label, 3=Picto, 4=Picto + long label, 5=Short label + Picto, 6=Long label + Picto
 	 *  @return	string 			       Label of status
 	 */
-	public function getLibStatut($mode = 0)
+	public function getLibStatut($mode = 0): string
 	{
 		return $this->LibStatut($this->status, $mode);
 	}
@@ -432,66 +410,6 @@ class Accident extends CommonObject
 		$statusType = 'status' . $status;
 
 		return dolGetStatus($this->labelStatus[$status], $this->labelStatusShort[$status], '', $statusType, $mode);
-	}
-
-	/**
-	 *        Return a link on thirdparty (with picto)
-	 *
-	 * @param int $withpicto Add picto into link (0=No picto, 1=Include picto with link, 2=Picto only)
-	 * @param int $maxlen Max length of name
-	 * @param int $notooltip 1=Disable tooltip
-	 * @return    string                              String with URL
-	 */
-	public function getNomUrl($withpicto = 0, $maxlen = 0, $notooltip = 0)
-	{
-		global $conf, $langs, $hookmanager;
-
-		if ( ! empty($conf->dol_no_mouse_hover)) $notooltip = 1; // Force disable tooltips
-
-		$name = $this->ref;
-		$result = ''; $label = '';
-
-		if ( ! empty($this->logo) && class_exists('Form')) {
-			$label .= '<div class="photointooltip">';
-			$label .= Form::showphoto('societe', $this, 0, 40, 0, '', 'mini', 0); // Important, we must force height so image will have height tags and if image is inside a tooltip, the tooltip manager can calculate height and position correctly the tooltip.
-			$label .= '</div><div style="clear: both;"></div>';
-		}
-
-		$label .= '<div class="centpercent">';
-
-
-		// By default
-		$label    .= '<u>' . $langs->trans("Accident") . '</u>';
-		$linkstart = '<a href="' . DOL_URL_ROOT . '/custom/digiriskdolibarr/view/accident/accident_card.php?id=' . $this->id;
-
-		if ( ! empty($this->ref)) {
-			$label .= '<br><b>' . $langs->trans('Ref') . ':</b> ' . $this->ref;
-		}
-
-		$label .= '</div>';
-
-		$linkstart .= '"';
-
-		$linkclose = '';
-		if (empty($notooltip)) {
-			if ( ! empty($conf->global->MAIN_OPTIMIZEFORTEXTBROWSER)) {
-				$label      = $langs->trans("ShowCompany");
-				$linkclose .= ' alt="' . dol_escape_htmltag($label, 1) . '"';
-			}
-			$linkclose .= ' title="' . dol_escape_htmltag($label, 1) . '"';
-			$linkclose .= ' class="classfortooltip refurl"';
-		}
-		$linkstart .= $linkclose . '>';
-		$linkend    = '</a>';
-
-		$result                      .= $linkstart;
-		if ($withpicto) $result      .= '<i class="fas fa-user-injured"></i>' . ' ';
-		if ($withpicto != 2) $result .= ($maxlen ? dol_trunc($name, $maxlen) : $name);
-		$result                      .= $linkend;
-
-		 $result .= $hookmanager->resPrint;
-
-		return $result;
 	}
 
 	/**

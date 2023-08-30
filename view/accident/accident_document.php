@@ -170,7 +170,7 @@ if ($object->id) {
 
 	print dol_get_fiche_end();
 
-	$modulepart = 'accident';
+	$modulepart = 'digiriskdolibarr';
 	//$permissiontoadd = $user->rights->digiriskdolibarr->myobject->write;
 	$permissiontoadd = 1;
 	//$permtoedit = $user->rights->digiriskdolibarr->myobject->write;

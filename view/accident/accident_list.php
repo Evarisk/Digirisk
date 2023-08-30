@@ -307,6 +307,7 @@ if ($fromid > 0) {
 } elseif ($fromiduser > 0){
 	$sql .= " AND fk_user_victim = " . $fromiduser;
 }
+$sql .= ' AND status >= 0';
 
 foreach ($search as $key => $val) {
 	if ($key == 'status' && $search[$key] == -1) continue;

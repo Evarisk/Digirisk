@@ -21,20 +21,14 @@
  *		\brief      Page to create/edit/view accident
  */
 
-// Load Dolibarr environment
-$res = 0;
-// Try main.inc.php into web root known defined into CONTEXT_DOCUMENT_ROOT (not always defined)
-if ( ! $res && ! empty($_SERVER["CONTEXT_DOCUMENT_ROOT"])) $res = @include $_SERVER["CONTEXT_DOCUMENT_ROOT"] . "/main.inc.php";
-// Try main.inc.php into web root detected using web root calculated from SCRIPT_FILENAME
-$tmp = empty($_SERVER['SCRIPT_FILENAME']) ? '' : $_SERVER['SCRIPT_FILENAME']; $tmp2 = realpath(__FILE__); $i = strlen($tmp) - 1; $j = strlen($tmp2) - 1;
-while ($i > 0 && $j > 0 && isset($tmp[$i]) && isset($tmp2[$j]) && $tmp[$i] == $tmp2[$j]) { $i--; $j--; }
-if ( ! $res && $i > 0 && file_exists(substr($tmp, 0, ($i + 1)) . "/main.inc.php")) $res          = @include substr($tmp, 0, ($i + 1)) . "/main.inc.php";
-if ( ! $res && $i > 0 && file_exists(dirname(substr($tmp, 0, ($i + 1))) . "/main.inc.php")) $res = @include dirname(substr($tmp, 0, ($i + 1))) . "/main.inc.php";
-// Try main.inc.php using relative path
-if ( ! $res && file_exists("../../main.inc.php")) $res       = @include "../../main.inc.php";
-if ( ! $res && file_exists("../../../main.inc.php")) $res    = @include "../../../main.inc.php";
-if ( ! $res && file_exists("../../../../main.inc.php")) $res = @include "../../../../main.inc.php";
-if ( ! $res) die("Include of main fails");
+// Load DigiriskDolibarr environment
+if (file_exists('../../digiriskdolibarr.main.inc.php')) {
+	require_once __DIR__ . '/../../digiriskdolibarr.main.inc.php';
+} elseif (file_exists('../../../digiriskdolibarr.main.inc.php')) {
+	require_once __DIR__ . '/../../../digiriskdolibarr.main.inc.php';
+} else {
+	die('Include of digiriskdolibarr main fails');
+}
 
 require_once DOL_DOCUMENT_ROOT . '/core/lib/date.lib.php';
 require_once DOL_DOCUMENT_ROOT . '/core/class/html.formfile.class.php';
@@ -44,18 +38,15 @@ require_once __DIR__ . '/../../class/digiriskdocuments.class.php';
 require_once __DIR__ . '/../../class/digiriskelement.class.php';
 require_once __DIR__ . '/../../class/accident.class.php';
 require_once __DIR__ . '/../../class/digiriskstandard.class.php';
-//require_once __DIR__ . '/../../class/digiriskdocuments/accidentdocument.class.php';
 require_once __DIR__ . '/../../lib/digiriskdolibarr_function.lib.php';
 require_once __DIR__ . '/../../lib/digiriskdolibarr_accident.lib.php';
 require_once __DIR__ . '/../../core/modules/digiriskdolibarr/digiriskelement/accident/mod_accident_standard.php';
 require_once __DIR__ . '/../../core/modules/digiriskdolibarr/digiriskelement/accident_workstop/mod_accident_workstop_standard.php';
-//require_once __DIR__ . '/../../core/modules/digiriskdolibarr/digiriskdocuments/accidentdocument/mod_accidentdocument_standard.php';
-//require_once __DIR__ . '/../../core/modules/digiriskdolibarr/digiriskdocuments/accidentdocument/modules_accidentdocument.php';
 
 global $conf, $db, $hookmanager, $langs, $mysoc, $user;
 
 // Load translation files required by the page
-$langs->loadLangs(array("digiriskdolibarr@digiriskdolibarr", "other"));
+saturne_load_langs(['"digiriskdolibarr@digiriskdolibarr", "other"']);
 
 // Get parameters
 $id                  = GETPOST('id', 'int');
@@ -72,33 +63,29 @@ $fk_parent           = GETPOST('fk_parent', 'int');
 $fromiduser          = GETPOST('fromiduser', 'int'); //element id
 
 // Initialize technical objects
-$object     = new Accident($db);
-$signatory  = new AccidentSignature($db);
-$objectline = new AccidentWorkStop($db);
-//$accidentdocument     = new AccidentDocument($db);
-$contact                = new Contact($db);
-$usertmp                = new User($db);
-$thirdparty             = new Societe($db);
-$extrafields            = new ExtraFields($db);
-$digiriskelement        = new DigiriskElement($db);
-$digiriskstandard       = new DigiriskStandard($db);
-$project                = new Project($db);
+$object           = new Accident($db);
+$signatory        = new AccidentSignature($db);
+$objectline       = new AccidentWorkStop($db);
+$contact          = new Contact($db);
+$usertmp          = new User($db);
+$thirdparty       = new Societe($db);
+$extrafields      = new ExtraFields($db);
+$digiriskelement  = new DigiriskElement($db);
+$digiriskstandard = new DigiriskStandard($db);
+$project          = new Project($db);
 
 // Load object
 $object->fetch($id);
 
-$hookmanager->initHooks(array('accidentcard', 'globalcard')); // Note that conf->hooks_modules contains array
+$hookmanager->initHooks(['accidentcard', 'globalcard']); // Note that conf->hooks_modules contains array
 
 $upload_dir = $conf->digiriskdolibarr->multidir_output[$conf->entity];
 
-// Security check
-require_once __DIR__ . '/../../core/tpl/digirisk_security_checks.php';
-
-$permissiontoread   = $user->rights->digiriskdolibarr->accident->read;
-$permissiontoadd    = $user->rights->digiriskdolibarr->accident->write;
-$permissiontodelete = $user->rights->digiriskdolibarr->accident->delete;
-
-if ( ! $permissiontoread) accessforbidden();
+// Security check - Protection if external user
+$permissiontoread   = $user->rights->digiriskdolibarr->accident_investigation->read;
+$permissiontoadd    = $user->rights->digiriskdolibarr->accident_investigation->write;
+$permissiontodelete = $user->rights->digiriskdolibarr->accident_investigation->delete;
+saturne_check_access($permissiontoread);
 
 $refAccidentMod         = new $conf->global->DIGIRISKDOLIBARR_ACCIDENT_ADDON($db);
 $refAccidentWorkStopMod = new $conf->global->DIGIRISKDOLIBARR_ACCIDENT_WORKSTOP_ADDON($db);
@@ -318,7 +305,7 @@ if (empty($reshook)) {
 		}
 		$object->fk_user_victim   = $user_victim_id;
 		$object->fk_user_employer = $user_employer_id;
-		$object->fk_user_creat    = $user->id ? $user->id : 1;
+		$object->fk_user_creat    = $user->id > 0 ? $user->id : 1;
 
 		// Check parameters
 		if ($user_victim_id < 0) {
@@ -366,7 +353,7 @@ if (empty($reshook)) {
 		}
 
 		if ( ! $error) {
-			$result = $object->update($user, false);
+			$result = $object->update($user);
 			if ($result > 0) {
 				if (empty($object->fk_user_employer)) {
 					$usertmp->fetch('', $mysoc->managers, $mysoc->id, 0, $conf->entity);
@@ -609,6 +596,24 @@ if (empty($reshook)) {
 
 		$action = '';
 	}
+
+	// Action to set status STATUS_LOCKED
+	if ($action == 'confirm_lock') {
+		$object->fetch($id);
+		$result = $object->setStatusCommon($user, Accident::STATUS_PENDING_SIGNATURE, false, 'ACCIDENT_LOCK');
+		if ($result > 0) {
+			// Set Locked OK
+			setEventMessages($langs->trans('ObjectLockedTrigger', $langs->transnoentities(ucfirst($object->element)), $object->ref), []);
+			$urltogo = str_replace('__ID__', $result, $backtopage);
+			$urltogo = preg_replace('/--IDFORBACKTOPAGE--/', $id, $urltogo);
+			header('Location: ' . $urltogo);
+			exit;
+		} elseif (!empty($object->errors)) { // Set Locked KO.
+			setEventMessages('', $object->errors, 'errors');
+		} else {
+			setEventMessages($object->error, [], 'errors');
+		}
+	}
 }
 
 /*
@@ -840,13 +845,18 @@ $formconfirm = '';
 
 // Confirmation to delete
 if ($action == 'delete' && $permissiontodelete) {
-	$formconfirm = $form->formconfirm($_SERVER["PHP_SELF"].'?id='.$object->id, $langs->trans('DeleteAccident'), $langs->trans('ConfirmDeleteAccident'), 'confirm_delete', '', 0, 1);
+	$formconfirm = $form->formconfirm($_SERVER["PHP_SELF"].'?id=' . $object->id, $langs->trans('DeleteAccident'), $langs->trans('ConfirmDeleteAccident'), 'confirm_delete', '', 0, 1);
 }
 
 // Confirmation to delete line
 if ($action == 'deleteline') {
 	$objectline->fetch($lineid);
 	$formconfirm = $form->formconfirm($_SERVER["PHP_SELF"] . '?id=' . $object->id . '&lineid=' . $lineid, $langs->trans('DeleteAccidentWorkStop'), $langs->trans('ConfirmDeleteAccidentWorkStop', $objectline->ref), 'confirm_deleteLine', '', 0, 1);
+}
+
+// Confirmation to delete
+if ($action == 'set_lock') {
+	$formconfirm = $form->formconfirm($_SERVER["PHP_SELF"].'?id=' . $object->id, $langs->trans('LockObject', $langs->transnoentities('The' . ucfirst($object->element))), $langs->trans('ConfirmLockObject', $langs->transnoentities('The' . ucfirst($object->element))), 'confirm_lock', '', 0, 1);
 }
 
 // Call Hook formConfirm
@@ -1051,7 +1061,9 @@ if ((empty($action) || ($action != 'create' && $action != 'edit'))) {
 
 		if (empty($reshook)) {
 			print '<a class="' . ($object->status == 1 ? 'butAction' : 'butActionRefused classfortooltip') . '" id="actionButtonEdit" title="' . ($object->status == 1 ? '' : dol_escape_htmltag($langs->trans("AccidentMustBeInProgress"))) . '" href="' . ($object->status == 1 ? ($_SERVER["PHP_SELF"] . '?id=' . $object->id . '&action=edit') : '#') . '">' . $langs->trans("Modify") . '</a>';
-			print '<a class="' . ($permissiontodelete ? 'butActionDelete' : 'butActionRefused classfortooltip') . '" id="actionButtonDelete" title="' . ($permissiontodelete ? '' : dol_escape_htmltag($langs->trans("PermissionDenied"))) . '" href="' . ($permissiontodelete ? ($_SERVER["PHP_SELF"] . '?id=' . $object->id . '&action=delete') : '#') . '">' . $langs->trans("Delete") . '</a>';
+			print '<a class="' . ($object->status == 1 ? 'butAction' : 'butActionRefused classfortooltip') . '" id="actionButtonLock" title="' . ($object->status == 1 ? '' : dol_escape_htmltag($langs->trans("AccidentMustBeInProgress"))) . '" href="' . ($object->status == 1 ? ($_SERVER["PHP_SELF"] . '?id=' . $object->id . '&action=set_lock&token=' . newToken()) : '#') . '">' . $langs->trans("Lock") . '</a>';
+			print '<a class="' . ($object->status == 2 ? 'butAction' : 'butActionRefused classfortooltip') . '" id="actionButtonCreateInvestigation" title="' . ($object->status == 2 ? '' : dol_escape_htmltag($langs->trans('ObjectMustBeLocked', ucfirst($langs->transnoentities('The' . ucfirst($object->element)))))) . '" href="' . ($object->status == 2 ? (dol_buildpath('/custom/digiriskdolibarr/view/accident_investigation/accident_investigation_card.php?action=create&fk_accident=' . $id, 1)) : '#') . '"><i class="fas fa-plus-circle"></i> ' . $langs->trans("CreateInvestigation") . '</a>';
+			print '<a class="' . ($permissiontodelete ? 'butActionDelete' : 'butActionRefused classfortooltip') . '" id="actionButtonDelete" title="' . ($permissiontodelete ? '' : dol_escape_htmltag($langs->trans("PermissionDenied"))) . '" href="' . ($permissiontodelete ? ($_SERVER["PHP_SELF"] . '?id=' . $object->id . '&action=delete&token=' . newToken()) : '#') . '">' . $langs->trans("Delete") . '</a>';
 		}
 		print '</div>';
 
@@ -1157,7 +1169,7 @@ if ((empty($action) || ($action != 'create' && $action != 'edit'))) {
 						print '<td class="center">';
 						$coldisplay++;
 						print '<a href="' . $_SERVER["PHP_SELF"] . '?id=' . $id . '&amp;action=editline&amp;lineid=' . $item->id . '" style="padding-right: 20px"><i class="fas fa-pencil-alt" style="color: #666"></i></a>';
-						print '<a href="' . $_SERVER["PHP_SELF"] . '?id=' . $id . '&amp;action=deleteline&amp;lineid=' . $item->id . '">';
+						print '<a href="' . $_SERVER["PHP_SELF"] . '?id=' . $id . '&amp;action=deleteline&amp;lineid=' . $item->id . '&amp;token=' . newToken() . '">';
 						print img_delete();
 						print '</a>';
 						print '</td>';
