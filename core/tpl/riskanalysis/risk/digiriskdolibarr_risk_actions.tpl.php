@@ -49,7 +49,7 @@ if ( ! $error && $action == 'add' && $permissiontoadd) {
 				$evaluation->exposition = $exposition;
 			}
 
-			$pathToTmpPhoto = $conf->digiriskdolibarr->multidir_output[$conf->entity] . '/riskassessment/tmp/RK0/';
+			$pathToTmpPhoto = $conf->digiriskdolibarr->multidir_output[$conf->entity] . '/riskassessment/tmp/RA0/';
 			$files          = dol_dir_list($pathToTmpPhoto);
 
 			if ( ! empty($files)) {
@@ -357,9 +357,9 @@ if ( ! $error && $action == 'saveEvaluation' && $permissiontoadd) {
 }
 
 if ( ! $error && $action == "deleteEvaluation" && $permissiontodelete) {
-	$evaluation_id = GETPOST('deletedEvaluationId');
+	$evaluationId = GETPOST('deletedEvaluationId');
 
-	$evaluation->fetch($evaluation_id);
+	$evaluation->fetch($evaluationId);
 
 	$pathToEvaluationPhoto = DOL_DATA_ROOT . '/digiriskdolibarr/riskassessment/' . $evaluation->ref;
 	$files                 = dol_dir_list($pathToEvaluationPhoto);

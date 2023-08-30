@@ -640,6 +640,7 @@ if ($action != 'list') {
 								<input class="risk-evaluation-multiple-method" type="hidden" value="1">
 								<div class="wpeo-button open-media-gallery add-media modal-open" value="0">
 									<input type="hidden" class="type-from" value="riskassessment"/>
+									<input type="hidden" class="modal-options" data-modal-to-open="media_gallery" data-from-id="0" data-from-type="riskassessment" data-from-subtype="" data-from-subdir=""/>
 									<span><i class="fas fa-camera"></i>  <?php echo $langs->trans('AddMedia') ?></span>
 								</div>
 							</div>
@@ -668,25 +669,25 @@ if ($action != 'list') {
 										<input class="risk-evaluation-seuil" type="hidden" value="undefined">
 										<?php
 										$evaluation_method        = $advancedCotationMethodArray[0];
-										$evaluation_method_survey = $evaluation_method['option']['variable'];
+										$evaluationMethodSurvey = $evaluation_method['option']['variable'];
 										?>
 										<div class="wpeo-gridlayout cotation-advanced" style="display:none">
 											<input type="hidden" class="digi-method-evaluation-id" value="<?php echo $risk->id ; ?>" />
 											<textarea style="display: none" name="evaluation_variables" class="tmp_evaluation_variable"><?php echo '{}'; ?></textarea>
 											<span class="title"><i class="fas fa-info-circle"></i> <?php echo $langs->trans('SelectEvaluation') ?><required>*</required></span>
-											<div class="wpeo-table evaluation-method table-flex table-<?php echo count($evaluation_method_survey) + 1; ?>">
+											<div class="wpeo-table evaluation-method table-flex table-<?php echo count($evaluationMethodSurvey) + 1; ?>">
 												<div class="table-row table-header">
 													<div class="table-cell">
 														<span></span>
 													</div>
-													<?php for ( $l = 0; $l < count($evaluation_method_survey); $l++ ) : ?>
+													<?php for ( $l = 0; $l < count($evaluationMethodSurvey); $l++ ) : ?>
 														<div class="table-cell">
 															<span><?php echo $l; ?></span>
 														</div>
 													<?php endfor; ?>
 												</div>
 												<?php $l = 0; ?>
-												<?php foreach ($evaluation_method_survey as $critere) :
+												<?php foreach ($evaluationMethodSurvey as $critere) :
 													$name = strtolower($critere['name']); ?>
 													<div class="table-row">
 														<div class="table-cell"><?php echo $critere['name'] ; ?></div>
@@ -694,7 +695,7 @@ if ($action != 'list') {
 															<div class="table-cell can-select cell-<?php echo  $risk->id ? $risk->id : 0 ; ?>"
 																 data-type="<?php echo $name ?>"
 																 data-id="<?php echo  $risk->id ?: 0 ; ?>"
-																 data-evaluation-id="<?php echo $evaluation_id ? $evaluation_id : 0 ; ?>"
+																 data-evaluation-id="<?php echo $evaluationId ? $evaluationId : 0 ; ?>"
 																 data-variable-id="<?php echo $l ; ?>"
 																 data-seuil="<?php echo  $request['seuil']; ?>">
 																<?php echo  $request['question'] ; ?>
@@ -824,7 +825,7 @@ if ($action != 'list') {
 						<input class="risk-evaluation-method" type="hidden" value="standard">
 						<input class="risk-evaluation-multiple-method" type="hidden" value="1">
 						<div class="wpeo-button open-media-gallery add-media modal-open" value="0">
-							<input type="hidden" class="type-from" value="riskassessment"/>
+							<input type="hidden" class="modal-options" data-modal-to-open="media_gallery" data-from-id="0" data-from-type="riskassessment" data-from-subtype="photo" data-from-subdir=""/>
 							<span><i class="fas fa-camera"></i>  <?php echo $langs->trans('AddMedia') ?></span>
 						</div>
 					</div>
@@ -853,25 +854,25 @@ if ($action != 'list') {
 								<input class="risk-evaluation-seuil" type="hidden" value="undefined">
 								<?php
 								$evaluation_method        = $advancedCotationMethodArray[0];
-								$evaluation_method_survey = $evaluation_method['option']['variable'];
+								$evaluationMethodSurvey = $evaluation_method['option']['variable'];
 								?>
 								<div class="wpeo-gridlayout cotation-advanced" style="display:none">
 									<input type="hidden" class="digi-method-evaluation-id" value="<?php echo $risk->id ; ?>" />
 									<textarea style="display: none" name="evaluation_variables" class="tmp_evaluation_variable"><?php echo '{}'; ?></textarea>
 									<span class="title"><i class="fas fa-info-circle"></i> <?php echo $langs->trans('SelectEvaluation') ?><required>*</required></span>
-									<div class="wpeo-table evaluation-method table-flex table-<?php echo count($evaluation_method_survey) + 1; ?>">
+									<div class="wpeo-table evaluation-method table-flex table-<?php echo count($evaluationMethodSurvey) + 1; ?>">
 										<div class="table-row table-header">
 											<div class="table-cell">
 												<span></span>
 											</div>
-											<?php for ( $l = 0; $l < count($evaluation_method_survey); $l++ ) : ?>
+											<?php for ( $l = 0; $l < count($evaluationMethodSurvey); $l++ ) : ?>
 												<div class="table-cell">
 													<span><?php echo $l; ?></span>
 												</div>
 											<?php endfor; ?>
 										</div>
 										<?php $l = 0; ?>
-										<?php foreach ($evaluation_method_survey as $critere) :
+										<?php foreach ($evaluationMethodSurvey as $critere) :
 											$name = strtolower($critere['name']); ?>
 											<div class="table-row">
 												<div class="table-cell"><?php echo $critere['name'] ; ?></div>
@@ -930,11 +931,13 @@ if ($action != 'list') {
 						<input type="text" class="riskassessment-task-budget" name="budget" value="">
 					</div>
 				<?php endif; ?>
-				<div class="element-linked-medias element-linked-medias-0 risk-new">
+				<div class="linked-medias element-linked-medias-0 photo-0">
 					<div class="medias"><i class="fas fa-picture-o"></i><?php echo $langs->trans('Medias'); ?></div>
 					<?php
 					$relativepath = 'digiriskdolibarr/medias/thumbs';
-					print digirisk_show_medias_linked('digiriskdolibarr', $conf->digiriskdolibarr->multidir_output[$conf->entity] . '/riskassessment/tmp/RK0', 'small', 0, 0, 0, 0, 150, 150, 1, 0, 0, '/riskassessment/tmp/RK0');
+					print '<div class="wpeo-grid grid-5">';
+					print saturne_show_medias_linked('digiriskdolibarr', $conf->digiriskdolibarr->multidir_output[$conf->entity] . '/riskassessment/tmp/RA0', 'small', 0, 0, 0, 0, 150, 150, 0, 0, 0, '/riskassessment/tmp/RA0', $evaluation);
+					print '</div>';
 					?>
 				</div>
 			</div>

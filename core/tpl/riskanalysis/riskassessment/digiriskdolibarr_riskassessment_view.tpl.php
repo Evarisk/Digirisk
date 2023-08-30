@@ -282,8 +282,8 @@ $evaluation->method = $lastEvaluation->method ?: "standard" ;
 						<input class="risk-evaluation-method" type="hidden" value="<?php echo ($lastEvaluation->method == "standard") ? "standard" : "advanced" ?>">
 						<input class="risk-evaluation-multiple-method" type="hidden" value="<?php echo $conf->global->DIGIRISKDOLIBARR_MULTIPLE_RISKASSESSMENT_METHOD ?>">
 						<div class="wpeo-button open-media-gallery add-media modal-open" value="0">
-							<input type="hidden" class="type-from" value="riskassessment"/>
-							<span><i class="fas fa-camera"></i>  <?php echo $langs->trans('AddMedia') ?></span>
+								<input type="hidden" class="modal-options" data-modal-to-open="media_gallery" data-from-id="0" data-from-type="riskassessment" data-from-subtype="photo" data-from-subdir="<?php echo $risk->ref ?>"/>
+								<span><i class="fas fa-camera"></i>  <?php echo $langs->trans('AddMedia') ?></span>
 						</div>
 					</div>
 					<div class="risk-evaluation-content-wrapper">
@@ -309,33 +309,33 @@ $evaluation->method = $lastEvaluation->method ?: "standard" ;
 									</div>
 								</div>
 								<input class="risk-evaluation-seuil" type="hidden">
-								<?php $evaluation_method  = $advanced_method_cotation_array[0];
-								$evaluation_method_survey = $evaluation_method['option']['variable']; ?>
+								<?php $evaluation_method  = $advancedCotationMethodArray[0];
+								$evaluationMethodSurvey = $evaluation_method['option']['variable']; ?>
 								<div class="wpeo-gridlayout cotation-advanced" style="<?php echo ($lastEvaluation->method == "advanced") ? " display:block" : " display:none" ?>">
 									<input type="hidden" class="digi-method-evaluation-id" value="<?php echo $risk->id ; ?>" />
 									<textarea style="display: none" name="evaluation_variables" class="tmp_evaluation_variable"><?php echo '{}'; ?></textarea>
 									<p><i class="fas fa-info-circle"></i> <?php echo $langs->trans('SelectEvaluation') ?></p>
-									<div class="wpeo-table evaluation-method table-flex table-<?php echo count($evaluation_method_survey) + 1; ?>">
+									<div class="wpeo-table evaluation-method table-flex table-<?php echo count($evaluationMethodSurvey) + 1; ?>">
 										<div class="table-row table-header">
 											<div class="table-cell">
 												<span></span>
 											</div>
-											<?php for ( $l = 0; $l < count($evaluation_method_survey); $l++ ) : ?>
+											<?php for ( $l = 0; $l < count($evaluationMethodSurvey); $l++ ) : ?>
 												<div class="table-cell">
 													<span><?php echo $l; ?></span>
 												</div>
 											<?php endfor; ?>
 										</div>
 										<?php $l = 0; ?>
-										<?php foreach ($evaluation_method_survey as $critere) :
+										<?php foreach ($evaluationMethodSurvey as $critere) :
 											$name = strtolower($critere['name']); ?>
 											<div class="table-row">
 												<div class="table-cell"><?php echo $critere['name'] ; ?></div>
 												<?php foreach ($critere['option']['survey']['request'] as $request) : ?>
-													<div class="table-cell can-select cell-<?php echo  $evaluation_id ? $evaluation_id : 0 ; ?>"
+													<div class="table-cell can-select cell-<?php echo  $evaluationId ? $evaluationId : 0 ; ?>"
 														 data-type="<?php echo $name ?>"
 														 data-id="<?php echo  $risk->id ? $risk->id : 0 ; ?>"
-														 data-evaluation-id="<?php echo $evaluation_id ? $evaluation_id : 0 ; ?>"
+														 data-evaluation-id="<?php echo $evaluationId ? $evaluationId : 0 ; ?>"
 														 data-variable-id="<?php echo $l ; ?>"
 														 data-seuil="<?php echo  $request['seuil']; ?>">
 														<?php echo  $request['question'] ; ?>
@@ -367,11 +367,11 @@ $evaluation->method = $lastEvaluation->method ?: "standard" ;
 							<?php print $form->selectDate('', 'RiskAssessmentDateCreate0', 0, 0, 0, '', 1, 1); ?>
 						</div>
 					<?php endif; ?>
-					<div class="element-linked-medias element-linked-medias-0 risk-<?php echo $risk->id ?>">
+					<div class="linked-medias photo element-linked-medias-0 risk-<?php echo $risk->id ?>">
 						<div class="medias"><i class="fas fa-picture-o"></i><?php echo $langs->trans('Medias'); ?></div>
 						<?php
 						$relativepath = 'digiriskdolibarr/medias/thumbs';
-						print digirisk_show_medias_linked('digiriskdolibarr', $conf->digiriskdolibarr->multidir_output[$conf->entity] . '/riskassessment/tmp/' . $risk->ref . '/', 'small', 0, 0, 0, 0, 150, 150, 1, 0, 0, $lastEvaluation->element . '/tmp/' . $risk->ref);
+						print saturne_show_medias_linked('digiriskdolibarr', $conf->digiriskdolibarr->multidir_output[$conf->entity] . '/riskassessment/tmp/' . $risk->ref . '/', 'small', 0, 0, 0, 0, 150, 150, 1, 0, 0, $lastEvaluation->element . '/tmp/' . $risk->ref);
 						?>
 					</div>
 				</div>

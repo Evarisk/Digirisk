@@ -82,26 +82,26 @@
 								<input class="risk-evaluation-seuil" type="hidden" value="<?php echo $lastEvaluation->cotation ?>">
 								<?php if ( $lastEvaluation->method == "advanced" || $conf->global->DIGIRISKDOLIBARR_MULTIPLE_RISKASSESSMENT_METHOD) : ?>
 									<?php
-									$evaluation_method        = $advanced_method_cotation_array[0];
-									$evaluation_method_survey = $evaluation_method['option']['variable'];
+									$evaluation_method        = $advancedCotationMethodArray[0];
+									$evaluationMethodSurvey = $evaluation_method['option']['variable'];
 									?>
 									<div class="wpeo-gridlayout cotation-advanced" style="<?php echo ($lastEvaluation->method == "advanced") ? " display:block" : " display:none" ?>">
 										<input type="hidden" class="digi-method-evaluation-id" value="<?php echo $risk->id ; ?>" />
 										<textarea style="display: none" name="evaluation_variables" class="tmp_evaluation_variable"><?php echo '{}'; ?></textarea>
 										<span class="title"><i class="fas fa-info-circle"></i> <?php echo $langs->trans('SelectEvaluation') ?></span>
-										<div class="wpeo-table evaluation-method table-flex table-<?php echo count($evaluation_method_survey) + 1; ?>">
+										<div class="wpeo-table evaluation-method table-flex table-<?php echo count($evaluationMethodSurvey) + 1; ?>">
 											<div class="table-row table-header">
 												<div class="table-cell">
 													<span></span>
 												</div>
-												<?php for ( $l = 0; $l < count($evaluation_method_survey); $l++ ) : ?>
+												<?php for ( $l = 0; $l < count($evaluationMethodSurvey); $l++ ) : ?>
 													<div class="table-cell">
 														<span><?php echo $l; ?></span>
 													</div>
 												<?php endfor; ?>
 											</div>
 											<?php $l = 0;
-											foreach ($evaluation_method_survey as $critere) :
+											foreach ($evaluationMethodSurvey as $critere) :
 												$name = strtolower($critere['name']); ?>
 												<div class="table-row">
 													<div class="table-cell"><?php echo $critere['name'] ; ?></div>

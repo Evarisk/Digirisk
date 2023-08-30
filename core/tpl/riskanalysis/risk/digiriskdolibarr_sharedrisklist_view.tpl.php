@@ -59,7 +59,7 @@ $project                        = new Project($db);
 $DUProject                      = new Project($db);
 
 $advanced_method_cotation_json  = file_get_contents(DOL_DOCUMENT_ROOT . '/custom/digiriskdolibarr/js/json/default.json');
-$advanced_method_cotation_array = json_decode($advanced_method_cotation_json, true);
+$advancedCotationMethodArray = json_decode($advanced_method_cotation_json, true);
 
 $alldigiriskelement = $digiriskelement->getActiveDigiriskElements(1);
 $digiriskElementsOfEntity = $digiriskelement->getActiveDigiriskElements();
