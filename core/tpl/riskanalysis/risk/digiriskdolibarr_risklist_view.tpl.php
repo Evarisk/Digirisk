@@ -1,7 +1,7 @@
 <?php
 	$selectedfields_label = 'risklist_selectedfields';
 	// Selection of new fields
-	require './../../class/actions_changeselectedfields.php';
+	require __DIR__ . '/../../../../class/actions_changeselectedfields.php';
 
 	print '<div class="fichecenter risklist wpeo-wrap">';
 	print '<form method="POST" id="searchFormListRisks" enctype="multipart/form-data" action="' . $_SERVER["PHP_SELF"] . ($object->element == 'digiriskelement' ? '?id=' . $object->id : '?mainmenu=digiriskdolibarr') . '">' . "\n";
@@ -294,15 +294,15 @@
 
 <?php
 
-$advanced_method_cotation_json  = file_get_contents(DOL_DOCUMENT_ROOT . '/custom/digiriskdolibarr/js/json/default.json');
-$advanced_method_cotation_array = json_decode($advanced_method_cotation_json, true);
-$digiriskelement                = new DigiriskElement($db);
-$riskAssessment                 = new RiskAssessment($db);
-$digiriskTask                   = new DigiriskTask($db);
-$extrafields                    = new Extrafields($db);
-$usertmp                        = new User($db);
-$project                        = new Project($db);
-$DUProject                      = new Project($db);
+$advancedCotationMethodJson  = file_get_contents(DOL_DOCUMENT_ROOT . '/custom/digiriskdolibarr/js/json/default.json');
+$advancedCotationMethodArray = json_decode($advancedCotationMethodJson, true);
+$digiriskelement             = new DigiriskElement($db);
+$riskAssessment              = new RiskAssessment($db);
+$digiriskTask                = new DigiriskTask($db);
+$extrafields                 = new Extrafields($db);
+$usertmp                     = new User($db);
+$project                     = new Project($db);
+$DUProject                   = new Project($db);
 
 $DUProject->fetch($conf->global->DIGIRISKDOLIBARR_DU_PROJECT);
 $extrafields->fetch_name_optionals_label($digiriskTask->table_element);
@@ -565,7 +565,10 @@ if ($action != 'list') {
 <?php if ( ! $allRisks) : ?>
 	<!-- BUTTON MODAL RISK ADD -->
 	<?php if ($permissiontoadd) {
-		$newcardbutton = '<div class="risk-add wpeo-button button-square-40 button-blue wpeo-tooltip-event modal-open" aria-label="' . $langs->trans('AddRisk') . '" value="' . $object->id . '"><i class="fas fa-exclamation-triangle button-icon"></i><i class="fas fa-plus-circle button-add animated"></i></div>';
+		$newcardbutton = '<div class="risk-add wpeo-button button-square-40 button-blue wpeo-tooltip-event modal-open"  aria-label="' . $langs->trans('AddRisk') . '"  value="' . $object->id . '">';
+		$newcardbutton .= '<i class="fas fa-exclamation-triangle button-icon"></i><i class="fas fa-plus-circle button-add animated"></i>';
+		$newcardbutton .= '	<input type="hidden" class="modal-options" data-modal-to-open="risk_add'. $object->id .'" data-from-id="'. $object->id .'" data-from-type="digiriskelement" data-from-subtype="photo" data-from-subdir="photos"/>';
+		$newcardbutton .= '</div>';
 	} else {
 		$newcardbutton = '<div class="wpeo-button button-square-40 button-grey wpeo-tooltip-event" aria-label="' . $langs->trans('PermissionDenied') . '" data-direction="left" value="' . $object->id . '"><i class="fas fa-exclamation-triangle button-icon"></i><i class="fas fa-plus-circle button-add animated"></i></div>';
 	} ?>
@@ -664,7 +667,7 @@ if ($action != 'list') {
 										</div>
 										<input class="risk-evaluation-seuil" type="hidden" value="undefined">
 										<?php
-										$evaluation_method        = $advanced_method_cotation_array[0];
+										$evaluation_method        = $advancedCotationMethodArray[0];
 										$evaluation_method_survey = $evaluation_method['option']['variable'];
 										?>
 										<div class="wpeo-gridlayout cotation-advanced" style="display:none">
@@ -849,7 +852,7 @@ if ($action != 'list') {
 								</div>
 								<input class="risk-evaluation-seuil" type="hidden" value="undefined">
 								<?php
-								$evaluation_method        = $advanced_method_cotation_array[0];
+								$evaluation_method        = $advancedCotationMethodArray[0];
 								$evaluation_method_survey = $evaluation_method['option']['variable'];
 								?>
 								<div class="wpeo-gridlayout cotation-advanced" style="display:none">

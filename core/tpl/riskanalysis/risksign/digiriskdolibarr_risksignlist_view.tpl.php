@@ -1,7 +1,7 @@
 <?php
 $selectedfields_label = 'risksignlist_selectedfields';
 // Selection of new fields
-require './../../class/actions_changeselectedfields.php';
+require __DIR__ . '/../../../../class/actions_changeselectedfields.php';
 
 print '<div class="fichecenter risksignlist wpeo-wrap">';
 print '<form method="POST" id="searchFormListRiskSigns" action="' . $_SERVER["PHP_SELF"] . (($contextpage != 'risksignlist') ? '?id=' . $object->id : '') . '">' . "\n";
@@ -16,51 +16,51 @@ print '<input type="hidden" name="contextpage" value="' . $contextpage . '">';
 
 // NOTICES FOR ACTIONS
 ?>
-	<!--	RISK SIGN-->
-	<div class="messageSuccessRiskSignCreate notice hidden">
-		<div class="wpeo-notice notice-success risksign-create-success-notice">
-			<div class="notice-content">
-				<div class="notice-title"><?php echo $langs->trans('RiskSignWellCreated') ?></div>
-				<div class="notice-subtitle"><?php echo $langs->trans('TheRiskSign') . ' ' . $refRiskSignMod->getLastValue($risksign) . ' ' . $langs->trans('HasBeenCreatedF') ?></div>
-			</div>
-			<div class="notice-close"><i class="fas fa-times"></i></div>
+<!--	RISK SIGN-->
+<div class="messageSuccessRiskSignCreate notice hidden">
+	<div class="wpeo-notice notice-success risksign-create-success-notice">
+		<div class="notice-content">
+			<div class="notice-title"><?php echo $langs->trans('RiskSignWellCreated') ?></div>
+			<div class="notice-subtitle"><?php echo $langs->trans('TheRiskSign') . ' ' . $refRiskSignMod->getLastValue($risksign) . ' ' . $langs->trans('HasBeenCreatedF') ?></div>
 		</div>
+		<div class="notice-close"><i class="fas fa-times"></i></div>
 	</div>
-	<div class="messageErrorRiskSignCreate notice hidden">
-		<div class="wpeo-notice notice-warning risksign-create-error-notice">
-			<div class="notice-content">
-				<div class="notice-title"><?php echo $langs->trans('RiskSignNotCreated') ?></div>
-				<div class="notice-subtitle"><?php echo $langs->trans('TheRiskSign') . ' ' . $refRiskSignMod->getLastValue($risksign) . ' ' . $langs->trans('HasNotBeenCreatedF') ?></div>
-			</div>
-			<div class="notice-close"><i class="fas fa-times"></i></div>
+</div>
+<div class="messageErrorRiskSignCreate notice hidden">
+	<div class="wpeo-notice notice-warning risksign-create-error-notice">
+		<div class="notice-content">
+			<div class="notice-title"><?php echo $langs->trans('RiskSignNotCreated') ?></div>
+			<div class="notice-subtitle"><?php echo $langs->trans('TheRiskSign') . ' ' . $refRiskSignMod->getLastValue($risksign) . ' ' . $langs->trans('HasNotBeenCreatedF') ?></div>
 		</div>
+		<div class="notice-close"><i class="fas fa-times"></i></div>
 	</div>
-	<div class="messageSuccessRiskSignEdit notice hidden">
-		<input type="hidden" class="valueForEditRiskSign1" value="<?php echo $langs->trans('TheRiskSign') . ' ' ?>">
-		<input type="hidden" class="valueForEditRiskSign2" value="<?php echo ' ' . $langs->trans('HasBeenEditedF') ?>">
-		<div class="wpeo-notice notice-success risksign-edit-success-notice">
-			<div class="notice-content">
-				<div class="notice-title"><?php echo $langs->trans('RiskSignWellEdited') ?></div>
-				<div class="notice-subtitle">
-					<span class="text"></span>
-				</div>
+</div>
+<div class="messageSuccessRiskSignEdit notice hidden">
+	<input type="hidden" class="valueForEditRiskSign1" value="<?php echo $langs->trans('TheRiskSign') . ' ' ?>">
+	<input type="hidden" class="valueForEditRiskSign2" value="<?php echo ' ' . $langs->trans('HasBeenEditedF') ?>">
+	<div class="wpeo-notice notice-success risksign-edit-success-notice">
+		<div class="notice-content">
+			<div class="notice-title"><?php echo $langs->trans('RiskSignWellEdited') ?></div>
+			<div class="notice-subtitle">
+				<span class="text"></span>
 			</div>
-			<div class="notice-close"><i class="fas fa-times"></i></div>
 		</div>
+		<div class="notice-close"><i class="fas fa-times"></i></div>
 	</div>
-	<div class="messageErrorRiskSignEdit notice hidden">
-		<input type="hidden" class="valueForEditRiskSign1" value="<?php echo $langs->trans('TheRiskSign') . ' ' ?>">
-		<input type="hidden" class="valueForEditRiskSign2" value="<?php echo ' ' . $langs->trans('HasNotBeenEditedF') ?>">
-		<div class="wpeo-notice notice-warning risksign-edit-error-notice">
-			<div class="notice-content">
-				<div class="notice-title"><?php echo $langs->trans('RiskSignNotEdited') ?></div>
-				<div class="notice-subtitle">
-					<span class="text"></span>
-				</div>
+</div>
+<div class="messageErrorRiskSignEdit notice hidden">
+	<input type="hidden" class="valueForEditRiskSign1" value="<?php echo $langs->trans('TheRiskSign') . ' ' ?>">
+	<input type="hidden" class="valueForEditRiskSign2" value="<?php echo ' ' . $langs->trans('HasNotBeenEditedF') ?>">
+	<div class="wpeo-notice notice-warning risksign-edit-error-notice">
+		<div class="notice-content">
+			<div class="notice-title"><?php echo $langs->trans('RiskSignNotEdited') ?></div>
+			<div class="notice-subtitle">
+				<span class="text"></span>
 			</div>
-			<div class="notice-close"><i class="fas fa-times"></i></div>
 		</div>
+		<div class="notice-close"><i class="fas fa-times"></i></div>
 	</div>
+</div>
 <?php
 // Build and execute select
 // --------------------------------------------------------------------
@@ -157,7 +157,10 @@ if ($action != 'list') {
 
 	<!-- BUTTON MODAL RISKSIGN ADD -->
 <?php if ($permissiontoadd) {
-	$newcardbutton = '<div class="risksign-add wpeo-button button-square-40 button-blue modal-open" value="' . $object->id . '"><i class="fas fa-map-signs button-icon"></i><i class="fas fa-plus-circle button-add animated"></i></div>';
+	$newcardbutton = '<div class="risksign-add wpeo-button button-square-40 button-blue modal-open" value="' . $object->id . '">';
+	$newcardbutton .= '<i class="fas fa-map-signs button-icon"></i><i class="fas fa-plus-circle button-add animated"></i>';
+	$newcardbutton .= '	<input type="hidden" class="modal-options" data-modal-to-open="risksign_add'. $object->id .'" data-from-id="'. $object->id .'" data-from-type="digiriskelement" data-from-subtype="photo" data-from-subdir="photos"/>';
+	$newcardbutton .= '</div>';
 } else {
 	$newcardbutton = '<div class="wpeo-button button-square-40 button-grey" value="' . $object->id . '"><i class="fas fa-map-signs button-icon wpeo-tooltip-event" aria-label="' . $langs->trans('PermissionDenied') . '"></i><i class="fas fa-plus-circle button-add animated"></i></div>';
 } ?>
