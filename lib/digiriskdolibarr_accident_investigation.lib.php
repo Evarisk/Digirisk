@@ -34,3 +34,27 @@ function accident_investigation_prepare_head(AccidentInvestigation $object): arr
 
 	return saturne_object_prepare_head($object, [], $moreparam, true);
 }
+
+/**
+ * Return total budget of a task and his children
+ *
+ * @param  int $taskId ID of the task.
+ * @return int         Label of status.
+ * @throws Exception
+ */
+function getRecursiveTaskBudget(int $taskId): int {
+	$totalBudget  = 0;
+	$childrenTask = saturne_fetch_all_object_type('SaturneTask', '', '', 0, 0, ['customsql' => 'fk_task_parent = ' . $taskId]);
+
+	if (is_array($childrenTask) && !empty($childrenTask)) {
+		foreach ($childrenTask as $childTask) {
+			$totalBudget   += $childTask->budget_amount;
+			$childrenBudget = getRecursiveTaskBudget($childTask->id);
+			$totalBudget   += $childrenBudget;
+		}
+	} else {
+		return 0;
+	}
+
+	return $totalBudget;
+}

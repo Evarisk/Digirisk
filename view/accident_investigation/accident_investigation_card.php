@@ -58,6 +58,7 @@ $action              = GETPOST('action', 'aZ09');
 $subaction           = GETPOST('subaction', 'aZ09');
 $contextpage         = GETPOST('contextpage', 'aZ') ? GETPOST('contextpage', 'aZ') : 'accidentinvestigationcard'; // To manage different context of search
 $cancel              = GETPOST('cancel', 'aZ09');
+$confirm             = GETPOST('confirm', 'aZ09');
 $backtopage          = GETPOST('backtopage', 'alpha');
 $backtopageforcancel = GETPOST('backtopageforcancel', 'alpha');
 
@@ -294,7 +295,7 @@ if ($action == 'create') {
 	require_once DOL_DOCUMENT_ROOT . '/core/tpl/commonfields_view.tpl.php';
 
 	print '<tr class="linked-medias causality_tree question-table"><td class=""><label for="causality_tree">' . $langs->trans("CausalityTree") . '</label></td><td class="linked-medias-list">';
-	$pathPhotos = $conf->digiriskdolibarr->multidir_output[$conf->entity] . '/accidentinvestigation/'. $object->ref . '/causality_tree/';
+	$pathPhotos = $conf->digiriskdolibarr->multidir_output[$conf->entity] . '/accident_investigation/'. $object->ref . '/causality_tree/';
 	$fileArray  = dol_dir_list($pathPhotos, 'files');
 	?>
 	<span class="add-medias" <?php echo ($object->status != AccidentInvestigation::STATUS_LOCKED && empty($object->causality_tree)) ? '' : 'style="display:none"' ?>>
@@ -306,13 +307,13 @@ if ($action == 'create') {
 		</label>
 		<input type="hidden" class="favorite-photo" id="photo" name="photo" value="<?php echo $object->causality_tree ?>"/>
 		<div class="wpeo-button button-square-50 open-media-gallery add-media modal-open" value="0">
-			<input type="hidden" class="modal-options" data-modal-to-open="media_gallery" data-from-id="<?php echo $object->id?>" data-from-type="accidentinvestigation" data-from-subtype="causality_tree" data-from-subdir="causality_tree"/>
+			<input type="hidden" class="modal-options" data-modal-to-open="media_gallery" data-from-id="<?php echo $object->id?>" data-from-type="accident_investigation" data-from-subtype="causality_tree" data-from-subdir="causality_tree"/>
 			<i class="fas fa-folder-open"></i><i class="fas fa-plus-circle button-add"></i>
 		</div>
 	</span>
 	<?php
 	$relativepath = 'digiriskdolibarr/medias/thumbs';
-	print saturne_show_medias_linked('digiriskdolibarr', $pathPhotos, 'small', 1, 0, 0, 0, 50, 50, 0, 0, 0, 'accidentinvestigation/'. $object->ref . '/causality_tree/', $object, 'causality_tree', $object->status != AccidentInvestigation::STATUS_LOCKED, $permissiontodelete && $object->status != AccidentInvestigation::STATUS_LOCKED);
+	print saturne_show_medias_linked('digiriskdolibarr', $pathPhotos, 'small', 1, 0, 0, 0, 50, 50, 0, 0, 0, 'accident_investigation/'. $object->ref . '/causality_tree/', $object, 'causality_tree', $object->status != AccidentInvestigation::STATUS_LOCKED, $permissiontodelete && $object->status != AccidentInvestigation::STATUS_LOCKED);
 	print '</td></tr>';
 
 	print '</table></div>';
