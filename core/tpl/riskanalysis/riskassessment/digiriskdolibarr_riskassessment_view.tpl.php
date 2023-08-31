@@ -11,7 +11,8 @@ if (is_array($allRiskAssessment) && !empty($allRiskAssessment)) :
 		<div class="table-cell-header-label"><strong><?php echo $langs->trans('ListingHeaderEvaluation'); ?> (<?php echo count($allRiskAssessment); ?>)</strong></div>
 		<div class="table-cell-header-actions">
 			<?php if ($permissiontoread) : ?>
-				<div class="risk-evaluation-list risk-evaluation-button wpeo-button button-square-40 button-grey wpeo-tooltip-event modal-open" aria-label="<?php echo $langs->trans('RiskAssessmentList') ?>" value="<?php echo $risk->id ?>">
+				<div class="wpeo-button button-square-40 button-grey wpeo-tooltip-event modal-open" aria-label="<?php echo $langs->trans('RiskAssessmentList') ?>" value="<?php echo $risk->id ?>">
+					<input type="hidden" class="modal-options" data-modal-to-open="risk_evaluation_list<?php echo $risk->id; ?>" data-from-id="0" data-from-type="riskassessment" data-from-subtype="photo" data-from-subdir="" data-photo-class="riskassessment-from-riskassessment-create-<?php echo $risk->id; ?>"/>
 					<i class="fas fa-list button-icon"></i>
 				</div>
 			<?php else : ?>
@@ -22,10 +23,11 @@ if (is_array($allRiskAssessment) && !empty($allRiskAssessment)) :
 			<?php if ($contextpage != 'sharedrisk' && $contextpage != 'inheritedrisk') : ?>
 				<?php if ($permissiontoadd) : ?>
 					<div class="risk-evaluation-add risk-evaluation-button wpeo-button button-square-40 button-primary wpeo-tooltip-event modal-open" aria-label="<?php echo $langs->trans('AddRiskAssessment') ?>" value="<?php echo $risk->id;?>">
+						<input type="hidden" class="modal-options" data-modal-to-open="risk_evaluation_add<?php echo $risk->id; ?>" data-from-id="0" data-from-type="riskassessment" data-from-subtype="photo" data-from-subdir="" data-photo-class="riskassessment-from-riskassessment-create-<?php echo $risk->id; ?>"/>
 						<i class="fas fa-plus button-icon"></i>
 					</div>
 				<?php else : ?>
-					<div class="wpeo-button button-square-40 button-grey wpeo-tooltip-event risk-list-button" aria-label="<?php echo $langs->trans('PermissionDenied') ?>" value="<?php echo $risk->id;?>">
+					<div class="wpeo-button button-square-40 button-grey wpeo-tooltip-event" aria-label="<?php echo $langs->trans('PermissionDenied') ?>" value="<?php echo $risk->id;?>">
 						<i class="fas fa-plus button-icon"></i>
 					</div>
 				<?php endif; ?>
@@ -115,12 +117,9 @@ if (is_array($allRiskAssessment) && !empty($allRiskAssessment)) :
 										<div class="risk-evaluation-cotation" data-scale="<?php echo $lastEvaluation->get_evaluation_scale() ?>">
 											<span><?php echo $lastEvaluation->cotation ?: 0; ?></span>
 										</div>
-										<div class="risk-evaluation-photo risk-evaluation-photo-<?php echo $lastEvaluation->id > 0 ? $lastEvaluation->id : 0 ; echo $risk->id > 0 ? ' risk-' . $risk->id : ' risk-new' ?>">
+										<div class="photo riskassessment-photo-<?php echo $lastEvaluation->id; ?>" style="margin:auto">
 											<?php
-											$riskAssessment = $lastEvaluation;
-											$view = 1;
-											include DOL_DOCUMENT_ROOT . '/custom/digiriskdolibarr/core/tpl/medias/digiriskdolibarr_photo_view.tpl.php';
-											$view = 0;
+											print saturne_show_medias_linked('digiriskdolibarr', $conf->digiriskdolibarr->multidir_output[$conf->entity] . '/riskassessment/' . $lastEvaluation->ref, 'small', 1, 0, 0, 0, 40, 40, 0, 0, 0, '/riskassessment/' . $lastEvaluation->ref, $lastEvaluation, 'photo', 0, 0, 0, 1);
 											?>
 										</div>
 										<div class="risk-evaluation-content">
@@ -143,6 +142,7 @@ if (is_array($allRiskAssessment) && !empty($allRiskAssessment)) :
 											<div class="risk-evaluation-actions wpeo-gridlayout grid-2 grid-gap-0">
 												<?php if ($permissiontoadd) : ?>
 													<div class="risk-evaluation-edit wpeo-button button-square-50 button-grey modal-open" value="<?php echo $lastEvaluation->id ?>">
+														<input type="hidden" class="modal-options" data-modal-to-open="risk_evaluation_edit<?php echo $lastEvaluation->id; ?>" data-from-id="<?php echo $lastEvaluation->id; ?>" data-from-type="riskassessment" data-from-subtype="photo" data-from-subdir="" data-photo-class="riskassessment-from-riskassessment-edit-<?php echo $lastEvaluation->id; ?>"/>
 														<i class="fas fa-pencil-alt button-icon"></i>
 													</div>
 												<?php else : ?>
@@ -184,6 +184,7 @@ else : ?>
 	<div class="table-cell-header-actions">
 		<?php if ($permissiontoread) : ?>
 			<div class="risk-evaluation-list risk-evaluation-button wpeo-button button-square-40 button-grey wpeo-tooltip-event modal-open" aria-label="<?php echo $langs->trans('RiskAssessmentList') ?>" value="<?php echo $risk->id ?>">
+				<input type="hidden" class="modal-options" data-modal-to-open="risk_evaluation_list<?php echo $risk->id; ?>" data-from-id="<?php echo $lastEvaluation->id; ?>" data-from-type="riskassessment" data-from-subtype="photo" data-from-subdir="" data-photo-class="riskassessment-from-riskassessment-edit-<?php echo $lastEvaluation->id; ?>"/>
 				<i class="fas fa-list button-icon"></i>
 			</div>
 		<?php else : ?>
@@ -282,7 +283,7 @@ $evaluation->method = $lastEvaluation->method ?: "standard" ;
 						<input class="risk-evaluation-method" type="hidden" value="<?php echo ($lastEvaluation->method == "standard") ? "standard" : "advanced" ?>">
 						<input class="risk-evaluation-multiple-method" type="hidden" value="<?php echo $conf->global->DIGIRISKDOLIBARR_MULTIPLE_RISKASSESSMENT_METHOD ?>">
 						<div class="wpeo-button open-media-gallery add-media modal-open" value="0">
-								<input type="hidden" class="modal-options" data-modal-to-open="media_gallery" data-from-id="0" data-from-type="riskassessment" data-from-subtype="photo" data-from-subdir="<?php echo $risk->ref ?>"/>
+								<input type="hidden" class="modal-options" data-modal-to-open="media_gallery" data-from-id="0" data-from-type="riskassessment" data-from-subtype="photo" data-from-subdir="<?php echo $risk->ref ?>" data-photo-class="riskassessment-from-riskassessment-create-<?php echo $risk->id ?>"/>
 								<span><i class="fas fa-camera"></i>  <?php echo $langs->trans('AddMedia') ?></span>
 						</div>
 					</div>
@@ -310,7 +311,7 @@ $evaluation->method = $lastEvaluation->method ?: "standard" ;
 								</div>
 								<input class="risk-evaluation-seuil" type="hidden">
 								<?php $evaluationMethod  = $advancedCotationMethodArray[0];
-								$evaluationMethodSurvey = $evaluationMethod['option']['variable']; ?>
+								$evaluationMethodSurvey  = $evaluationMethod['option']['variable']; ?>
 								<div class="wpeo-gridlayout cotation-advanced" style="<?php echo ($lastEvaluation->method == "advanced") ? " display:block" : " display:none" ?>">
 									<input type="hidden" class="digi-method-evaluation-id" value="<?php echo $risk->id ; ?>" />
 									<textarea style="display: none" name="evaluation_variables" class="tmp_evaluation_variable"><?php echo '{}'; ?></textarea>
@@ -347,9 +348,21 @@ $evaluation->method = $lastEvaluation->method ?: "standard" ;
 								</div>
 							</div>
 						</div>
-						<?php $riskAssessment = $evaluation; ?>
-						<?php include DOL_DOCUMENT_ROOT . '/custom/digiriskdolibarr/core/tpl/medias/digiriskdolibarr_photo_view.tpl.php'; ?>
-
+						<div class="photo riskassessment-from-riskassessment-create-<?php echo $risk->id ?>" style="margin: auto">
+							<?php $riskAssessment = $evaluation;
+							$data = json_decode(file_get_contents('php://input'), true);
+							if ($subaction != 'unlinkFile') {
+								$fileName =  $data['filename'];
+							}
+							if (dol_strlen($fileName) > 0) {
+								$evaluation->photo = $fileName;
+								$showOnlyFavorite = 1;
+							} else {
+								$showOnlyFavorite = 0;
+							}
+							print saturne_show_medias_linked('digiriskdolibarr', $conf->digiriskdolibarr->multidir_output[$conf->entity] . '/riskassessment/tmp/RA0/' . $risk->ref, 'small', 1, 0, 0, 0, 50, 50, 0, 0, 0, '/riskassessment/tmp/RA0/' . $risk->ref, $evaluation, 'photo', 0, 0, 0, $showOnlyFavorite);
+							?>
+						</div>
 						<div class="risk-evaluation-calculated-cotation" style="<?php echo ($lastEvaluation->method == "advanced") ? " display:block" : " display:none" ?>">
 							<span class="title"><i class="fas fa-chart-line"></i> <?php echo $langs->trans('CalculatedEvaluation'); ?><required>*</required></span>
 							<div data-scale="1" class="risk-evaluation-cotation cotation">
@@ -367,11 +380,13 @@ $evaluation->method = $lastEvaluation->method ?: "standard" ;
 							<?php print $form->selectDate('', 'RiskAssessmentDateCreate0', 0, 0, 0, '', 1, 1); ?>
 						</div>
 					<?php endif; ?>
-					<div class="linked-medias photo element-linked-medias-0 risk-<?php echo $risk->id ?>">
+					<div class="linked-medias riskassessment-from-riskassessment-create-<?php echo $risk->id ?>">
 						<div class="medias"><i class="fas fa-picture-o"></i><?php echo $langs->trans('Medias'); ?></div>
 						<?php
 						$relativepath = 'digiriskdolibarr/medias/thumbs';
-						print saturne_show_medias_linked('digiriskdolibarr', $conf->digiriskdolibarr->multidir_output[$conf->entity] . '/riskassessment/tmp/' . $risk->ref . '/', 'small', 0, 0, 0, 0, 150, 150, 1, 0, 0, $lastEvaluation->element . '/tmp/' . $risk->ref);
+						print '<div class="wpeo-grid grid-5">';
+						print saturne_show_medias_linked('digiriskdolibarr', $conf->digiriskdolibarr->multidir_output[$conf->entity] . '/riskassessment/tmp/RA0/' . $risk->ref, 'small', 0, 0, 0, 0, 150, 150, 0, 0, 0, '/riskassessment/tmp/RA0/' . $risk->ref, $evaluation);
+						print '</div>';
 						?>
 					</div>
 				</div>

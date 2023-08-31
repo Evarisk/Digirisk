@@ -7,9 +7,9 @@
 			<div class="risk-evaluation-cotation risk-evaluation-list modal-open" value="<?php echo $risk->id ?>" data-scale="<?php echo $lastEvaluation->get_evaluation_scale() ?>">
 				<span><?php echo $lastEvaluation->cotation ?: 0; ?></span>
 			</div>
-			<div class="photo riskassessment-photo-<?php echo $lastEvaluation->id; ?>" value="<?php echo $lastEvaluation->id ?>">
+			<div class="photo riskassessment-photo-<?php echo $lastEvaluation->id; ?>" style="margin:auto">
 				<?php
-				print saturne_show_medias_linked('digiriskdolibarr', $conf->digiriskdolibarr->multidir_output[$conf->entity] . '/riskassessment/' . $lastEvaluation->ref, 'small', 1, 0, 0, 0, 50, 50, 0, 0, 0, '/riskassessment/' . $lastEvaluation->ref, $lastEvaluation, 'photo', 0, 0, 0, 1);
+				print saturne_show_medias_linked('digiriskdolibarr', $conf->digiriskdolibarr->multidir_output[$conf->entity] . '/riskassessment/' . $lastEvaluation->ref, 'small', 1, 0, 0, 0, 40, 40, 0, 0, 0, '/riskassessment/' . $lastEvaluation->ref, $lastEvaluation, 'photo', 0, 0, 0, 1);
 				?>
 			</div>
 			<div class="risk-evaluation-content">

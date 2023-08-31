@@ -265,7 +265,7 @@ if ( ! $error && $action == 'addEvaluation' && $permissiontoadd) {
 		$evaluation->exposition = $exposition;
 	}
 
-	$pathToTmpPhoto = $conf->digiriskdolibarr->multidir_output[$conf->entity] . '/riskassessment/tmp/' . $risktmp->ref;
+	$pathToTmpPhoto = $conf->digiriskdolibarr->multidir_output[$conf->entity] . '/riskassessment/tmp/RA0/' . $risktmp->ref;
 	$files          = dol_dir_list($pathToTmpPhoto);
 
 	if ( ! empty($files)) {

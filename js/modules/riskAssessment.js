@@ -133,8 +133,8 @@ window.digiriskdolibarr.evaluation.getDynamicScale = function (cotation) {
 window.digiriskdolibarr.evaluation.createEvaluation = function ( event ) {
 	let token = window.saturne.toolbox.getToken()
 
-	var riskToAssign = $(this).attr('value');
 	let element      = $(this).closest('.risk-evaluation-add-modal');
+	var riskToAssign = element.find('.modal-risk').attr('value');
 	let single       = element.find('.risk-evaluation-container');
 
 	let evaluationText = single.find('.risk-evaluation-comment textarea').val()
@@ -144,7 +144,7 @@ window.digiriskdolibarr.evaluation.createEvaluation = function ( event ) {
 	var cotation = single.find('.risk-evaluation-seuil').val();
 	var comment  = evaluationText
 	var date     = single.find('#RiskAssessmentDateCreate0').val();
-	var photo    = single.find('.risk-evaluation-photo-single .filename').val();
+	var photo    = single.find('.photo .media-container .file-name').val();
 
 	let criteres = [];
 	Object.values($('.table-cell.active.cell-0')).forEach(function(v) {
@@ -152,6 +152,8 @@ window.digiriskdolibarr.evaluation.createEvaluation = function ( event ) {
 			criteres[ $(v).data( 'type' )] = $(v).data( 'seuil' )
 		}
 	})
+	console.log(element)
+	console.log(element.find('.modal-risk.modal-active'))
 
 	window.saturne.loader.display($(this));
 	window.saturne.loader.display($('.risk-evaluation-list-container-' + riskToAssign));
