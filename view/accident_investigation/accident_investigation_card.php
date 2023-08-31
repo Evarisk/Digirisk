@@ -33,14 +33,15 @@ if (file_exists('../../digiriskdolibarr.main.inc.php')) {
 // Global variables definitions
 global $conf, $db, $hookmanager, $langs, $user;
 
-$taskRefClass = $conf->global->PROJECT_TASK_ADDON;
-
 // Load Dolibarr libraries
+require_once DOL_DOCUMENT_ROOT . '/core/class/html.formcompany.class.php';
 require_once DOL_DOCUMENT_ROOT . '/core/lib/company.lib.php';
 require_once DOL_DOCUMENT_ROOT . '/core/lib/project.lib.php';
-require_once DOL_DOCUMENT_ROOT . '/core/class/html.formcompany.class.php';
-require_once DOL_DOCUMENT_ROOT . '/core/modules/project/task/' . $taskRefClass . '.php';
 require_once DOL_DOCUMENT_ROOT . '/core/lib/images.lib.php';
+
+// Load Saturne libraries.
+require_once __DIR__ . '/../../../saturne/class/saturnesignature.class.php';
+require_once __DIR__ . '/../../../saturne/class/task/saturnetask.class.php';
 
 // Load DigiriskDolibarr librairies
 require_once __DIR__ . '/../../class/accident.class.php';
@@ -68,7 +69,14 @@ $object     = new AccidentInvestigation($db);
 $document   = new AccidentInvestigationDocument($db);
 $project    = new Project($db);
 $task       = new Task($db);
-$refTaskMod = new $taskRefClass();
+$signatory  = new SaturneSignature($db);
+
+$numRefConf = strtoupper($task->element) . '_ADDON';
+
+$numberingModuleName = [
+	'project/task' => $conf->global->$numRefConf,
+];
+list($modTask) = saturne_require_objects_mod($numberingModuleName);
 
 // Initialize view objects
 $form        = new Form($db);
@@ -125,7 +133,8 @@ if (empty($reshook)) {
 				$accident->fetch($object->fk_accident);
 
 				$task->fk_project = $accident->fk_project;
-				$task->ref        = $refTaskMod->getNextValue('', $task);
+
+				$task->ref        = $modTask->getNextValue(0, $task);
 				$task->label      = $accident->ref . ' - ' . $accident->label;
 				$result           = $task->create($user);
 
@@ -134,13 +143,13 @@ if (empty($reshook)) {
 					$object->update($user, true);
 
 					$task->fk_project     = $accident->fk_project;
-					$task->ref            = $refTaskMod->getNextValue('', $task);
+					$task->ref            = $modTask->getNextValue(0, $task);
 					$task->label          = $accident->ref . ' - T1 - ' . $langs->trans('CurativeAction');
 					$task->fk_task_parent = $result;
 					$resOne               = $task->create($user);
 
 					$task->fk_project     = $accident->fk_project;
-					$task->ref            = $refTaskMod->getNextValue('', $task);
+					$task->ref            = $modTask->getNextValue(0, $task);
 					$task->label          = $accident->ref . ' - T2 - ' . $langs->trans('PreventiveAction');
 					$task->fk_task_parent = $result;
 					$resTwo               = $task->create($user);
@@ -161,6 +170,40 @@ if (empty($reshook)) {
 		exit();
 	}
 
+	if ($action == 'confirm_setdraft') {
+		if ($object->fk_task > 0) {
+			$curativeActionTask   = saturne_fetch_all_object_type('SaturneTask', '', '', 0, 0, ['customsql' => 'fk_task_parent = ' . $object->fk_task . ') AND (label LIKE "%- T1 -%"']);
+			$curativeActionTask   = array_pop($curativeActionTask);
+			$resOne = $curativeActionTask->delete($user);
+			$preventiveActionTask = saturne_fetch_all_object_type('SaturneTask', '', '', 0, 0, ['customsql' => 'fk_task_parent = ' . $object->fk_task . ') AND (label LIKE "%- T2 -%"']);
+			$preventiveActionTask = array_pop($preventiveActionTask);
+			$resTwo = $preventiveActionTask->delete($user);
+
+			if ($resOne > 0 && $resTwo > 0) {
+				setEventMessages('AccidentInvestigationTaskDeleted', []);
+
+				$task->fetch($object->fk_task);
+				$result = $task->delete($user);
+
+				if ($result > 0) {
+					$object->fk_task = 0;
+					$object->update($user);
+					$result = $object->setDraft($user);
+				}
+			} else {
+				setEventMessages($task->error, [], 'errors');
+			}
+		} else {
+			$result = $object->setDraft($user);
+		}
+
+		if ($result > 0) {
+			setEventMessages('AccidentInvestigationReOpened', []);
+		} else {
+			setEventMessages($object->error, [], 'errors');
+		}
+	}
+
 	// Actions cancel, add, update, update_extras, confirm_validate, confirm_delete, confirm_deleteline, confirm_clone, confirm_close, confirm_setdraft, confirm_reopen
 	require_once DOL_DOCUMENT_ROOT . '/core/actions_addupdatedelete.inc.php';
 
@@ -172,6 +215,11 @@ if (empty($reshook)) {
 
 	// Action confirm_lock, confirm_archive.
 	require_once __DIR__ . '/../../../saturne/core/tpl/signature/signature_action_workflow.tpl.php';
+
+	// Actions to send emails.
+	$triggersendname = strtoupper($object->element) . '_SENTBYMAIL';
+	$autocopy        = 'MAIN_MAIL_AUTOCOPY_' . strtoupper($object->element) . '_TO';
+	require_once DOL_DOCUMENT_ROOT . '/core/actions_sendmails.inc.php';
 }
 
 /*
@@ -273,7 +321,7 @@ if ($action == 'create') {
 	}
 	// Remove file confirmation
 	if ($action == 'removefile') {
-		$formConfirm = $form->formconfirm($_SERVER['PHP_SELF'] . '?id=' . $object->id . '&file=' . GETPOST('file') . '&entity=' . $conf->entity, $langs->trans('RemoveFileObject', $langs->transnoentities('The' . ucfirst($object->element))), $langs->trans('ConfirmRemoveFileObject', $langs->transnoentities('The' . ucfirst($object->element))), 'remove_file', '', 'yes', 1, 350, 600);
+		$formConfirm = $form->formconfirm($_SERVER['PHP_SELF'] . '?id=' . $object->id . '&file=' . GETPOST('file') . '&entity=' . $conf->entity, $langs->trans('RemoveFileObject'), $langs->trans('ConfirmRemoveFileObject', GETPOST('file')), 'remove_file', '', 'yes', 1, 350, 600);
 	}
 
 	// Call Hook formConfirm.
@@ -298,7 +346,7 @@ if ($action == 'create') {
 	$pathPhotos = $conf->digiriskdolibarr->multidir_output[$conf->entity] . '/accident_investigation/'. $object->ref . '/causality_tree/';
 	$fileArray  = dol_dir_list($pathPhotos, 'files');
 	?>
-	<span class="add-medias" <?php echo ($object->status != AccidentInvestigation::STATUS_LOCKED && empty($object->causality_tree)) ? '' : 'style="display:none"' ?>>
+	<span class="add-medias" <?php echo ($object->status < AccidentInvestigation::STATUS_LOCKED && empty($object->causality_tree)) ? '' : 'style="display:none"' ?>>
 		<input hidden multiple class="fast-upload" id="fast-upload-photo-default" type="file" name="userfile[]" capture="environment" accept="image/*">
 		<label for="fast-upload-photo-default">
 			<div class="wpeo-button button-square-50">
@@ -313,7 +361,7 @@ if ($action == 'create') {
 	</span>
 	<?php
 	$relativepath = 'digiriskdolibarr/medias/thumbs';
-	print saturne_show_medias_linked('digiriskdolibarr', $pathPhotos, 'small', 1, 0, 0, 0, 50, 50, 0, 0, 0, 'accident_investigation/'. $object->ref . '/causality_tree/', $object, 'causality_tree', $object->status != AccidentInvestigation::STATUS_LOCKED, $permissiontodelete && $object->status != AccidentInvestigation::STATUS_LOCKED);
+	print saturne_show_medias_linked('digiriskdolibarr', $pathPhotos, 'small', 1, 0, 0, 0, 50, 50, 0, 0, 0, 'accident_investigation/'. $object->ref . '/causality_tree/', $object, 'causality_tree', $object->status < AccidentInvestigation::STATUS_LOCKED, $permissiontodelete && $object->status < AccidentInvestigation::STATUS_LOCKED);
 	print '</td></tr>';
 
 	print '</table></div>';
@@ -355,6 +403,17 @@ if ($action == 'create') {
 			print '<span class="butActionRefused classfortooltip" title="' . dol_escape_htmltag($langs->trans('ObjectMustBeValidated', $langs->transnoentities('The' . ucfirst($object->element)))) . '">' . $displayButton . '</span>';
 		}
 
+		// Send email.
+		$displayButton = $onPhone ? '<i class="fas fa-paper-plane fa-2x"></i>' : '<i class="fas fa-paper-plane"></i>' . ' ' . $langs->trans('SendMail') . ' ';
+		if ($object->status == AccidentInvestigation::STATUS_LOCKED) {
+			$fileParams    = dol_most_recent_file($upload_dir . '/' . $object->element . 'document' . '/' . $object->ref);
+			$file          = $fileParams['fullname'];
+			$forcebuilddoc = (file_exists($file) && !strstr($fileParams['name'], 'specimen')) ? 0 : 1;
+			print dolGetButtonAction($displayButton, '', 'default', $_SERVER['PHP_SELF'] . '?id=' . $object->id . '&action=presend&forcebuilddoc=' . $forcebuilddoc . '&mode=init#formmailbeforetitle');
+		} else {
+			print '<span class="butActionRefused classfortooltip" title="'.dol_escape_htmltag($langs->trans('ObjectMustBeLockedToSendEmail', ucfirst($langs->transnoentities('The' . ucfirst($object->element))))) . '">' . $displayButton . '</span>';
+		}
+
 		// Archive.
 		$displayButton = $onPhone ?  '<i class="fas fa-archive fa-2x"></i>' : '<i class="fas fa-archive"></i>' . ' ' . $langs->trans('Archive');
 		if ($object->status == AccidentInvestigation::STATUS_LOCKED) {
@@ -363,31 +422,56 @@ if ($action == 'create') {
 			print '<span class="butActionRefused classfortooltip" title="' . dol_escape_htmltag($langs->trans('ObjectMustBeLockedToArchive', ucfirst($langs->transnoentities('The' . ucfirst($object->element))))) . '">' . $displayButton . '</span>';
 		}
 
+		// Clone.
+		$displayButton = $onPhone ? '<i class="fas fa-clone fa-2x"></i>' : '<i class="fas fa-clone"></i>' . ' ' . $langs->trans('ToClone');
+		print '<span class="butAction" id="actionButtonClone">' . $displayButton . '</span>';
+
 		// Delete (need delete permission, or if draft, just need create/modify permission).
 		$displayButton = $onPhone ? '<i class="fas fa-trash fa-2x"></i>' : '<i class="fas fa-trash"></i>' . ' ' . $langs->trans('Delete');
 		print dolGetButtonAction($displayButton, '', 'delete', $_SERVER['PHP_SELF'] . '?id=' . $object->id . '&action=delete&token=' . newToken(), '', $permissiontodelete || ($object->status == AccidentInvestigation::STATUS_DRAFT));
 
 		print '</div>';
-
-		print '<div class="fichecenter"><div class="fichehalfleft">';
-
-		// Documents.
-		$objRef    = dol_sanitizeFileName($object->ref);
-		$dirFiles  = $object->element . 'document/' . $objRef;
-		$fileDir   = $upload_dir . '/' . $dirFiles;
-		$urlSource = $_SERVER['PHP_SELF'] . '?id=' . $object->id;
-
-		print saturne_show_documents('digiriskdolibarr:AccidentInvestigationDocument', $dirFiles, $fileDir, $urlSource, $permissiontoadd, $permissiontodelete, $conf->global->DIGIRISKDOLIBARR_ACCIDENTINVESTIGATION_DOCUMENT_DEFAULT_MODEL, 1, 0, 0, 0, 0, '', '', $langs->defaultlang, '', $object, 0, 'removefile', (($object->status > $object::STATUS_DRAFT) ? 1 : 0), $langs->trans('AccidentInvestigationMustBeValidatedToGenerate'));
-
-		print '</div><div class="fichehalfright">';
-
-		// List of actions on element.
-		require_once DOL_DOCUMENT_ROOT . '/core/class/html.formactions.class.php';
-		$formActions = new FormActions($db);
-		$formActions->showactions($object, $object->element . '@' . $object->module, 0, 1, '', 10);
-
-		print '</div></div>';
 	}
+
+		// Select mail models is same action as presend.
+		if (GETPOST('modelselected')) {
+			$action = 'presend';
+		}
+
+		if ($action != 'presend') {
+			print '<div class="fichecenter"><div class="fichehalfleft">';
+			// Documents.
+			$objRef    = dol_sanitizeFileName($object->ref);
+			$dirFiles  = $object->element . 'document/' . $objRef;
+			$fileDir   = $upload_dir . '/' . $dirFiles;
+			$urlSource = $_SERVER['PHP_SELF'] . '?id=' . $object->id;
+
+			print saturne_show_documents('digiriskdolibarr:' . ucfirst('AccidentInvestigation') . 'Document', $dirFiles, $fileDir, $urlSource, $permissiontoadd, $permissiontodelete, $conf->global->DIGIRISKDOLIBARR_ACCIDENTINVESTIGATIONDOCUMENT_DEFAULT_MODEL, 1, 0, 0, 0, 0, '', '', '', $langs->defaultlang, $object, 0, 'remove_file', $object->status == AccidentInvestigation::STATUS_LOCKED && empty(dol_dir_list($fileDir)), $langs->trans('ObjectMustBeLockedToGenerate', ucfirst($langs->transnoentities('The' . ucfirst($object->element)))));
+
+			print '</div><div class="fichehalfright">';
+
+			$moreHtmlCenter = dolGetButtonTitle($langs->trans('SeeAll'), '', 'fa fa-bars imgforviewmode', dol_buildpath('/saturne/view/saturne_agenda.php', 1) . '?id=' . $object->id . '&module_name=DoliSIRH&object_type=' . $object->element);
+
+			// List of actions on element.
+			require_once DOL_DOCUMENT_ROOT . '/core/class/html.formactions.class.php';
+			$formActions = new FormActions($db);
+			$formActions->showactions($object, $object->element . '@' . $object->module, 0, 1, '', 10, '', $moreHtmlCenter);
+
+			print '</div></div>';
+		}
+
+		//Select mail models is same action as presend.
+		if (GETPOST('modelselected')) {
+			$action = 'presend';
+		}
+
+		// Presend form.
+		$modelmail    = $object->element;
+		$defaulttopic = 'InformationMessage';
+		$diroutput    = $conf->digiriskdolibarr->dir_output;
+		$trackid      = $object->element . $object->id;
+
+		require_once DOL_DOCUMENT_ROOT.'/core/tpl/card_presend.tpl.php';
 }
 
 // End of page
