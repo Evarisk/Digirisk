@@ -647,22 +647,17 @@ if (empty($reshook)) {
  * View
  */
 
-$form = new Form($db);
-
-$title         = $langs->trans("Accident");
-$title_create  = $langs->trans("NewAccident");
-$title_edit    = $langs->trans("ModifyAccident");
-$object->picto = 'accident@digiriskdolibarr';
-
-$help_url = 'FR:Module_Digirisk#DigiRisk_-_Accident_b.C3.A9nins_et_presque_accidents';
+$form     = new Form($db);
+$title    = $langs->trans("Accident");
+$helpUrl  = 'FR:Module_Digirisk#DigiRisk_-_Accident_b.C3.A9nins_et_presque_accidents';
 $morejs   = array("/digiriskdolibarr/js/digiriskdolibarr.js");
 $morecss  = array("/digiriskdolibarr/css/digiriskdolibarr.css");
 
-llxHeader('', $title, $help_url, '', '', '', $morejs, $morecss);
+saturne_header(0,'', $title, $helpUrl, '', 0, 0, $morejs, $morecss);
 
 // Part to create
 if ($action == 'create') {
-	print load_fiche_titre($title_create, '', "digiriskdolibarr32px@digiriskdolibarr");
+	print load_fiche_titre($langs->trans("NewAccident"), '', "digiriskdolibarr32px@digiriskdolibarr");
 
 	print '<form method="POST" action="' . $_SERVER["PHP_SELF"] . '" enctype="multipart/form-data">';
 	print '<input type="hidden" name="token" value="' . newToken() . '">';
@@ -766,7 +761,7 @@ if ($action == 'create') {
 
 // Part to edit record
 if (($id || $ref) && $action == 'edit') {
-	print load_fiche_titre($title_edit, '', "digiriskdolibarr32px@digiriskdolibarr");
+	print load_fiche_titre($langs->trans("ModifyAccident"), '', "digiriskdolibarr32px@digiriskdolibarr");
 
 	print '<form method="POST" action="' . $_SERVER["PHP_SELF"] . '" enctype="multipart/form-data">';
 	print '<input type="hidden" name="token" value="' . newToken() . '">';
@@ -939,8 +934,6 @@ if ((empty($action) || ($action != 'create' && $action != 'edit'))) {
 	$head = accidentPrepareHead($object);
 	print dol_get_fiche_head($head, 'accidentCard', $title, -1, "digiriskdolibarr@digiriskdolibarr");
 
-	$height                                   = 80;
-	$width                                    = 80;
 	dol_strlen($object->label) ? $morehtmlref = '<span>' . ' - ' . $object->label . '</span>' : '';
 	$morehtmlref                             .= '<div class="refidno">';
 	// Project
@@ -967,7 +960,7 @@ if ((empty($action) || ($action != 'create' && $action != 'edit'))) {
 
 	include_once './../../core/tpl/digiriskdolibarr_configuration_gauge_view.tpl.php';
 
-	$morehtmlleft = '<div class="floatleft inline-block valignmiddle divphotoref">' . digirisk_show_photos('digiriskdolibarr', $conf->digiriskdolibarr->multidir_output[$conf->entity] . '/' . $object->element, 'small', 5, 0, 0, 0, $height, $width, 0, 0, 0, $object->element, $object) . '</div>';
+	$morehtmlleft = '<div class="floatleft inline-block valignmiddle divphotoref">' . digirisk_show_photos('digiriskdolibarr', $conf->digiriskdolibarr->multidir_output[$conf->entity] . '/' . $object->element, 'small', 5, 0, 0, 0, 80, 80, 0, 0, 0, $object->element, $object) . '</div>';
 
 	$linkback = '<a href="' . dol_buildpath('/digiriskdolibarr/view/accident/accident_list.php', 1) . '">' . $langs->trans("BackToList") . '</a>';
 
@@ -1088,9 +1081,9 @@ if ((empty($action) || ($action != 'create' && $action != 'edit'))) {
 		if ($reshook < 0) setEventMessages($hookmanager->error, $hookmanager->errors, 'errors');
 
 		if (empty($reshook)) {
-			print '<a class="' . ($object->status == 1 ? 'butAction' : 'butActionRefused classfortooltip') . '" id="actionButtonEdit" title="' . ($object->status == 1 ? '' : dol_escape_htmltag($langs->trans("AccidentMustBeInProgress"))) . '" href="' . ($object->status == 1 ? ($_SERVER["PHP_SELF"] . '?id=' . $object->id . '&action=edit') : '#') . '">' . $langs->trans("Modify") . '</a>';
-			print '<a class="' . ($object->status == 1 ? 'butAction' : 'butActionRefused classfortooltip') . '" id="actionButtonLock" title="' . ($object->status == 1 ? '' : dol_escape_htmltag($langs->trans("AccidentMustBeInProgress"))) . '" href="' . ($object->status == 1 ? ($_SERVER["PHP_SELF"] . '?id=' . $object->id . '&action=set_lock&token=' . newToken()) : '#') . '">' . $langs->trans("Lock") . '</a>';
-			print '<a class="' . ($object->status == 2 ? 'butAction' : 'butActionRefused classfortooltip') . '" id="actionButtonCreateInvestigation" title="' . ($object->status == 2 ? '' : dol_escape_htmltag($langs->trans('ObjectMustBeLocked', ucfirst($langs->transnoentities('The' . ucfirst($object->element)))))) . '" href="' . ($object->status == 2 ? (dol_buildpath('/custom/digiriskdolibarr/view/accident_investigation/accident_investigation_card.php?action=create&fk_accident=' . $id, 1)) : '#') . '"><i class="fas fa-plus-circle"></i> ' . $langs->trans("CreateInvestigation") . '</a>';
+			print '<a class="' . ($object->status == Accident::STATUS_IN_PROGRESS ? 'butAction' : 'butActionRefused classfortooltip') . '" id="actionButtonEdit" title="' . ($object->status == 1 ? '' : dol_escape_htmltag($langs->trans("AccidentMustBeInProgress"))) . '" href="' . ($object->status == 1 ? ($_SERVER["PHP_SELF"] . '?id=' . $object->id . '&action=edit') : '#') . '">' . $langs->trans("Modify") . '</a>';
+			print '<a class="' . ($object->status == Accident::STATUS_IN_PROGRESS ? 'butAction' : 'butActionRefused classfortooltip') . '" id="actionButtonLock" title="' . ($object->status == 1 ? '' : dol_escape_htmltag($langs->trans("AccidentMustBeInProgress"))) . '" href="' . ($object->status == 1 ? ($_SERVER["PHP_SELF"] . '?id=' . $object->id . '&action=set_lock&token=' . newToken()) : '#') . '">' . $langs->trans("Lock") . '</a>';
+			print '<a class="' . ($object->status == Accident::STATUS_PENDING_SIGNATURE ? 'butAction' : 'butActionRefused classfortooltip') . '" id="actionButtonCreateInvestigation" title="' . ($object->status == 2 ? '' : dol_escape_htmltag($langs->trans('ObjectMustBeLocked', ucfirst($langs->transnoentities('The' . ucfirst($object->element)))))) . '" href="' . ($object->status == 2 ? (dol_buildpath('/custom/digiriskdolibarr/view/accident_investigation/accident_investigation_card.php?action=create&fk_accident=' . $id, 1)) : '#') . '"><i class="fas fa-plus-circle"></i> ' . $langs->trans("CreateInvestigation") . '</a>';
 			print '<a class="' . ($permissiontodelete ? 'butActionDelete' : 'butActionRefused classfortooltip') . '" id="actionButtonDelete" title="' . ($permissiontodelete ? '' : dol_escape_htmltag($langs->trans("PermissionDenied"))) . '" href="' . ($permissiontodelete ? ($_SERVER["PHP_SELF"] . '?id=' . $object->id . '&action=delete&token=' . newToken()) : '#') . '">' . $langs->trans("Delete") . '</a>';
 		}
 		print '</div>';
@@ -1098,7 +1091,7 @@ if ((empty($action) || ($action != 'create' && $action != 'edit'))) {
 		// Accident Lines
 		$accidentlines = $objectline->fetchFromParent($object->id);
 
-		if (($object->status == Accident::STATUS_IN_PROGRESS) || ($object->status != Accident::STATUS_IN_PROGRESS && !empty($accidentlines))) {
+		if (($object->status == Accident::STATUS_IN_PROGRESS) || (!empty($accidentlines))) {
 			// ACCIDENT LINES
 			print '<div class="div-table-responsive-no-min" style="overflow-x: unset !important">';
 			print load_fiche_titre($langs->trans("AccidentRiskList"), '', '');
@@ -1264,8 +1257,6 @@ if ((empty($action) || ($action != 'create' && $action != 'edit'))) {
 		print '</div><div class="">';
 	}
 
-	$MAXEVENT = 10;
-
 	$morehtmlright  = '<a href="' . dol_buildpath('/digiriskdolibarr/view/accident/accident_agenda.php', 1) . '?id=' . $object->id . '">';
 	$morehtmlright .= $langs->trans("SeeAll");
 	$morehtmlright .= '</a>';
@@ -1273,7 +1264,7 @@ if ((empty($action) || ($action != 'create' && $action != 'edit'))) {
 	// List of actions on element
 	include_once DOL_DOCUMENT_ROOT . '/core/class/html.formactions.class.php';
 	$formactions    = new FormActions($db);
-	$somethingshown = $formactions->showactions($object, $object->element . '@digiriskdolibarr', '', 1, '', $MAXEVENT, '', $morehtmlright);
+	$somethingshown = $formactions->showactions($object, $object->element . '@digiriskdolibarr', '', 1, '', 10, '', $morehtmlright);
 
 	print '</div></div></div>';
 }
