@@ -50,8 +50,8 @@
 						<?php endif; ?>
 						<input class="risk-evaluation-method" type="hidden" value="<?php echo $lastEvaluation->method ?>" />
 						<input class="risk-evaluation-multiple-method" type="hidden" value="<?php echo $conf->global->DIGIRISKDOLIBARR_MULTIPLE_RISKASSESSMENT_METHOD ?>">
-						<div class="wpeo-button open-media-gallery add-media modal-open" value="<?php echo $lastEvaluation->id ?>">
-							<input type="hidden" class="type-from" value="riskassessment"/>
+						<div class="wpeo-button open-media-gallery add-media modal-open" value="<?php echo $lastEvaluation->id; ?>">
+							<input type="hidden" class="modal-options" data-modal-to-open="media_gallery" data-from-id="<?php echo $lastEvaluation->id; ?>" data-from-type="riskassessment" data-from-subtype="photo" data-from-subdir="" data-photo-class="riskassessment-photo-<?php echo $lastEvaluation->id; ?>"/>
 							<span><i class="fas fa-camera"></i>  <?php echo $langs->trans('AddMedia') ?></span>
 						</div>
 					</div>
@@ -125,11 +125,11 @@
 								<?php endif; ?>
 							</div>
 						</div>
-
-						<?php
-						print saturne_show_medias_linked('digiriskdolibarr', $conf->digiriskdolibarr->multidir_output[$conf->entity] . '/riskassessment/tmp/' . $lastEvaluation->photo, 'small', 0, 0, 0, 0, 150, 150, 0, 0, 0, '/riskassessment/tmp/' . $lastEvaluation->photo, $lastEvaluation);
-						?>
-
+						<div class="photo riskassessment-photo-<?php echo $lastEvaluation->id; ?>" style="margin: auto">
+							<?php
+							print saturne_show_medias_linked('digiriskdolibarr', $conf->digiriskdolibarr->multidir_output[$conf->entity] . '/riskassessment/' . $lastEvaluation->ref, 'small', 1, 0, 0, 0, 50, 50, 0, 0, 0, '/riskassessment/' . $lastEvaluation->ref, $lastEvaluation, 'photo', 0, 0, 0, 1);
+							?>
+						</div>
 						<div class="risk-evaluation-calculated-cotation"  style="<?php echo ($lastEvaluation->method == "advanced") ? " display:block" : " display:none" ?>">
 							<span class="title"><i class="fas fa-chart-line"></i> <?php echo $langs->trans('CalculatedEvaluation'); ?></span>
 							<div data-scale="<?php echo $lastEvaluation->get_evaluation_scale() ?>" class="risk-evaluation-cotation cotation">
@@ -147,7 +147,7 @@
 							<?php print $form->selectDate($lastEvaluation->date_riskassessment, 'RiskAssessmentDateEdit' . $lastEvaluation->id, 0, 0, 0, '', 1, 1); ?>
 						</div>
 					<?php endif; ?>
-					<div class="element-linked-medias element-linked-medias-<?php echo $lastEvaluation->id ?> risk-<?php echo $risk->id ?>">
+					<div class="linked-medias riskassessment-photo-<?php echo $lastEvaluation->id; ?>"">
 						<div class="medias"><i class="fas fa-picture-o"></i><?php echo $langs->trans('Medias'); ?></div>
 						<?php
 						print '<div class="wpeo-grid grid-5">';
