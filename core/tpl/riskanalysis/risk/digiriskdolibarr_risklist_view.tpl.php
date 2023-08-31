@@ -894,7 +894,17 @@ if ($action != 'list') {
 						</div>
 						<div class="photo riskassessment-from-risk-create" style="margin: auto">
 							<?php
-							print saturne_show_medias_linked('digiriskdolibarr', $conf->digiriskdolibarr->multidir_output[$conf->entity] . '/riskassessment/tmp/RA0', 'small', 1, 0, 0, 0, 50, 50, 0, 0, 0, '/riskassessment/tmp/RA0', $lastEvaluation, 'photo', 0, 0);							?>
+
+							$data              = json_decode(file_get_contents('php://input'), true);
+							$fileName          =  $data['filename'];
+							if (dol_strlen($fileName) > 0) {
+								$evaluation->photo = $fileName;
+								$showOnlyFavorite = 1;
+							} else {
+								$showOnlyFavorite = 0;
+							}
+
+							print saturne_show_medias_linked('digiriskdolibarr', $conf->digiriskdolibarr->multidir_output[$conf->entity] . '/riskassessment/tmp/RA0', 'small', 1, 0, 0, 0, 50, 50, 0, 0, 0, '/riskassessment/tmp/RA0', $evaluation, 'photo', 0, 0, 0, $showOnlyFavorite);							?>
 						</div>
 						<div class="risk-evaluation-calculated-cotation" style="display: none">
 							<span class="title"><i class="fas fa-chart-line"></i> <?php echo $langs->trans('CalculatedEvaluation'); ?><required>*</required></span>
