@@ -88,8 +88,8 @@ window.digiriskdolibarr.riskassessmenttask.haveDataInInput = function( elementPa
 window.digiriskdolibarr.riskassessmenttask.createRiskAssessmentTask = function ( event ) {
 	let token = window.saturne.toolbox.getToken()
 
-	var riskToAssign = $(this).attr('value');
 	let element      = $(this).closest('.riskassessment-task-add-modal');
+	var riskToAssign = element.find('.modal-risk').attr('value');
 	let single       = element.find('.riskassessment-task-container');
 
 	let taskText = single.find('.riskassessment-task-label').val()
@@ -166,13 +166,12 @@ window.digiriskdolibarr.riskassessmenttask.createRiskAssessmentTask = function (
 window.digiriskdolibarr.riskassessmenttask.deleteRiskAssessmentTask = function ( event ) {
 	let token = window.saturne.toolbox.getToken()
 
-	let element                     = $(this).closest('.riskassessment-tasks');
-	let riskId                      = $(this).closest('.riskassessment-tasks').attr('value');
-	let deletedRiskAssessmentTaskId = $(this).attr('value');
+	var riskId                      = $(this).closest('.wpeo-table.riskassessment-tasks').attr('value');
+	let deletedRiskAssessmentTaskId = $(this).closest('.riskassessment-task-single-content').attr('value');
+	let element                     = $(this).closest('.riskassessment-task-container-'+deletedRiskAssessmentTaskId);
 	let textToShow                  = element.find('.labelForDelete').val();
 	let actionContainerSuccess      = $('.messageSuccessTaskDelete');
 	let actionContainerError        = $('.messageErrorTaskDelete');
-
 	var r = confirm(textToShow);
 	if (r == true) {
 
@@ -186,7 +185,9 @@ window.digiriskdolibarr.riskassessmenttask.deleteRiskAssessmentTask = function (
 			processData: false,
 			contentType: false,
 			success: function ( resp ) {
-				$('.riskassessment-task-container-'+deletedRiskAssessmentTaskId).closest('.riskassessment-task-listing-wrapper').html($(resp).find('.tasks-list-container-'+riskId).find('.riskassessment-task-listing-wrapper'))
+				console.log($('.riskassessment-task-listing-wrapper-'+riskId))
+				console.log(riskId)
+				$('.riskassessment-task-listing-wrapper-'+riskId).replaceWith($(resp).find('.riskassessment-task-listing-wrapper-'+riskId))
 				$('.riskassessment-tasks' + riskId).fadeOut(800);
 				$('.riskassessment-tasks' + riskId).fadeIn(800);
 				let textToShow = '';
@@ -234,7 +235,7 @@ window.digiriskdolibarr.riskassessmenttask.saveRiskAssessmentTask = function ( e
 
 	let editedRiskAssessmentTaskId = $(this).attr('value');
 	let elementRiskAssessmentTask  = $(this).closest('.modal-container');
-	let riskId                     = $(this).closest('.riskassessment-tasks').attr('value')
+	var riskId                     = $(this).closest('.modal-risk').attr('value');
 	let textToShow                 = '';
 
 	let taskText = elementRiskAssessmentTask.find('.riskassessment-task-label' + editedRiskAssessmentTaskId).val()

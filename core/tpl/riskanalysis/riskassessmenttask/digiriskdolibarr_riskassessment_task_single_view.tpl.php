@@ -41,7 +41,8 @@
 			<?php if ($contextpage != 'sharedrisk' && $contextpage != 'inheritedrisk') : ?>
 				<div class="table-cell riskassessment-task-actions wpeo-gridlayout grid-2 grid-gap-0">
 					<?php if ($permissiontoadd) : ?>
-						<div class="riskassessment-task-edit wpeo-button button-square-40 button-transparent modal-open" value="<?php echo $related_task->id ?>">
+						<div class="wpeo-button button-square-40 button-transparent modal-open" value="<?php echo $related_task->id ?>">
+							<input type="hidden" class="modal-options" data-modal-to-open="risk_assessment_task_edit<?php echo $related_task->id; ?>" data-from-id="<?php echo $related_task->id; ?>" data-from-type="riskassessmenttask" data-from-subtype="photo" data-from-subdir="" data-photo-class="riskassessment-from-riskassessment-create-<?php echo $risk->id; ?>"/>
 							<i class="fas fa-pencil-alt button-icon"></i>
 						</div>
 					<?php else : ?>
