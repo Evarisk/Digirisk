@@ -503,7 +503,8 @@ if (!empty($related_tasks) && $related_tasks > 0) {
 														<!-- BUTTON MODAL RISK ASSESSMENT TASK TIMESPENT EDIT  -->
 														<div class="table-cell table-end table-125 table-padding-0 riskassessment-task-actions">
 															<?php if ($permissiontoadd) : ?>
-																<div class="riskassessment-task-timespent-edit wpeo-button button-square-50 button-transparent modal-open" value="<?php echo $time_spent->timespent_id ?>">
+																<div class="wpeo-button button-square-50 button-transparent modal-open" value="<?php echo $time_spent->timespent_id ?>">
+																	<input type="hidden" class="modal-options" data-modal-to-open="risk_assessment_task_timespent_edit<?php echo $time_spent->timespent_id; ?>" data-from-id="<?php echo $time_spent->timespent_id; ?>" data-from-type="riskassessmenttasktimespent" data-from-subtype="photo" data-from-subdir="" data-photo-class="riskassessment-from-riskassessment-create-<?php echo $risk->id; ?>"/>
 																	<i class="fas fa-pencil-alt button-icon"></i>
 																</div>
 															<?php else : ?>
