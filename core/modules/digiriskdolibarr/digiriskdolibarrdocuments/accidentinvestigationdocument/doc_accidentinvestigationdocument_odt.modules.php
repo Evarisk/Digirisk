@@ -201,7 +201,7 @@ class doc_accidentinvestigationdocument_odt extends SaturneDocumentModel
 		$accidentMetadata = new AccidentMetaData($this->db);
 		$victim           = new User($this->db);
 		$signatory        = new SaturneSignature($this->db, $this->module, $object->element);
-		$totalBudget      = 0;
+		$now              = dol_now();
 
 		$accident->fetch($object->fk_accident);
 		$accidentMetadata->fetch(0, '', 'AND status = 1 AND fk_accident = ' . $accident->id);
@@ -219,26 +219,38 @@ class doc_accidentinvestigationdocument_odt extends SaturneDocumentModel
 
 		$tmpArray['investigation_date_start'] = dol_print_date($object->date_start, 'dayhour', 'tzuser');
 		$tmpArray['investigation_date_end']   = dol_print_date($object->date_end, 'dayhour', 'tzuser');
-		$tmpArray['total_curative_action']    = $totalCATask > 0 ? $totalCATask : $outputLangs->trans('None');
-		$tmpArray['total_preventive_action']  = $totalPATask > 0 ? $totalPATask : $outputLangs->trans('None');
+		$tmpArray['total_curative_action']    = $totalCATask > 0 ? $totalCATask : '0 ';
+		$tmpArray['total_preventive_action']  = $totalPATask > 0 ? $totalPATask : '0 ';
 		$tmpArray['total_planned_budget']     = price($totalBudget,0, '', 1, -1, -1, 'auto');
 
 		$signatoriesArray = $signatory->fetchSignatories($moreParam['object']->id, $moreParam['object']->element);
 		if (!empty($signatoriesArray) && is_array($signatoriesArray)) {
 			$tmpArray['attendants_number'] = count($signatoriesArray);
 		} else {
-			$tmpArray['attendants_number'] = $outputLangs->trans('None');
+			$tmpArray['attendants_number'] = '0 ';
 		}
 
 		$tmpArray['mycompany_siret']   = $conf->global->MAIN_INFO_SIRET;
 		$tmpArray['mycompany_contact'] = $conf->global->MAIN_INFO_SOCIETE_MANAGERS;
 		$tmpArray['mycompany_mail']    = $conf->global->MAIN_INFO_SOCIETE_MAIL;
 
-		$tmpArray['victim_lastname']        = dol_strtoupper($victim->lastname);
-		$tmpArray['victim_firstname']       = ucfirst($victim->firstname);
-		$tmpArray['seniority_at_post']      = $object->seniority_at_post . ' ' . ($object->seniority_at_post <= 1 ? $outputLangs->trans('Day') : $outputLangs->trans('Days'));
-		$tmpArray['victim_date_employment'] = dol_print_date($victim->dateemployment, 'day', 'tzuser');
+		$tmpArray['victim_lastname']  = dol_strtoupper($victim->lastname);
+		$tmpArray['victim_firstname'] = ucfirst($victim->firstname);
 
+		if ($object->seniority_at_post > 0) {
+			$daysAtPost                    = dol_time_plus_duree($now, -$object->seniority_at_post, 's');
+			$daysAtPost                    = round($daysAtPost / 60 / 60 / 24);
+			$tmpArray['seniority_at_post'] = dol_print_date($object->seniority_at_post, 'day', 'tzuser') . ' - ' . $daysAtPost . ' ' . ($daysAtPost <= 1 ? $outputLangs->trans('Day') : $outputLangs->trans('Days'));
+		} else {
+			$tmpArray['seniority_at_post'] = '';
+		}
+		if ($victim->dateemployment > 0) {
+			$daysEmployee                       = dol_time_plus_duree($now, -$victim->dateemployment, 's');
+			$daysEmployee                       = round($daysEmployee / 60 / 60 / 24);
+			$tmpArray['victim_date_employment'] = dol_print_date($victim->dateemployment, 'day', 'tzuser') . ' - ' . $daysEmployee . ' ' . ($daysEmployee <= 1 ? $outputLangs->trans('Day') : $outputLangs->trans('Days'));
+		} else {
+			$tmpArray['victim_date_employment'] = '';
+		}
 		$tmpArray['accident_date'] = dol_print_date($accident->accident_date, 'day');
 		$tmpArray['accident_hour'] = dol_print_date($accident->accident_date, 'hour');
 		$tmpArray['accident_day']  = dol_print_date($accident->accident_date, '%A');

@@ -70,6 +70,7 @@ $document   = new AccidentInvestigationDocument($db);
 $project    = new Project($db);
 $task       = new Task($db);
 $signatory  = new SaturneSignature($db, $object->module, $object->element);
+$victim     = new User($db);
 
 $numRefConf = strtoupper($task->element) . '_ADDON';
 
@@ -121,6 +122,12 @@ if (empty($reshook)) {
 				$backtopage = dol_buildpath('/digiriskdolibarr/view/accident_investigation/accident_investigation_card.php', 1) . '?id=' . ((!empty($id) && $id > 0) ? $id : '__ID__');
 			}
 		}
+	}
+
+	$taskExist = $task->fetch($object->fk_task);
+	if ($taskExist <= 0) {
+		$object->fk_task = 0;
+		$object->setValueFrom('fk_task', $object->fk_task, '', '', '', '', $user);
 	}
 
 	if ($action == 'confirm_set_validate') {
@@ -293,6 +300,8 @@ if ($action == 'create') {
 	print $form->buttonsSaveCancel('Update');
 } else if ($id > 0 || (!empty($ref) && empty($action))) {
 	$object->fetch($id);
+	$accident->fetch($object->fk_accident);
+	$victim->fetch($accident->fk_user_victim);
 
 	saturne_get_fiche_head($object, 'accidentinvestigation', $title);
 	saturne_banner_tab($object);
@@ -315,13 +324,17 @@ if ($action == 'create') {
 	if (($action == 'set_archive' && (empty($conf->use_javascript_ajax) || !empty($conf->dol_use_jmobile))) || (!empty($conf->use_javascript_ajax) && empty($conf->dol_use_jmobile))) {
 		$formConfirm .= $form->formconfirm($_SERVER['PHP_SELF'] . '?id=' . $object->id, $langs->trans('ArchiveObject', $langs->transnoentities('The' . ucfirst($object->element))), $langs->trans('ConfirmArchiveObject', $langs->transnoentities('The' . ucfirst($object->element))), 'confirm_archive', '', 'yes', 'actionButtonArchive', 350, 600);
 	}
+	// Clone confirmation
+	if (($action == 'clone' && (empty($conf->use_javascript_ajax) || !empty($conf->dol_use_jmobile))) || (!empty($conf->use_javascript_ajax) && empty($conf->dol_use_jmobile))) {
+		$formConfirm .= $form->formconfirm($_SERVER['PHP_SELF'] . '?id=' . $object->id, $langs->trans('CloneObject', $langs->transnoentities('The' . ucfirst($object->element))), $langs->trans('ConfirmCloneObject', $langs->transnoentities('The' . ucfirst($object->element))), 'confirm_clone', '', 'yes', 'actionButtonClone', 350, 600);
+	}
 	// Delete confirmation
 	if ($action == 'delete') {
-		$formConfirm = $form->formconfirm($_SERVER['PHP_SELF'] . '?id=' . $object->id, $langs->trans('DeleteObject', $langs->transnoentities('The' . ucfirst($object->element))), $langs->trans('ConfirmDeleteObject', $langs->transnoentities('The' . ucfirst($object->element))), 'confirm_delete', '', 'yes', 1);
+		$formConfirm .= $form->formconfirm($_SERVER['PHP_SELF'] . '?id=' . $object->id, $langs->trans('DeleteObject', $langs->transnoentities('The' . ucfirst($object->element))), $langs->trans('ConfirmDeleteObject', $langs->transnoentities('The' . ucfirst($object->element))), 'confirm_delete', '', 'yes', 1);
 	}
 	// Remove file confirmation
 	if ($action == 'removefile') {
-		$formConfirm = $form->formconfirm($_SERVER['PHP_SELF'] . '?id=' . $object->id . '&file=' . GETPOST('file') . '&entity=' . $conf->entity, $langs->trans('RemoveFileObject'), $langs->trans('ConfirmRemoveFileObject', GETPOST('file')), 'remove_file', '', 'yes', 1, 350, 600);
+		$formConfirm .= $form->formconfirm($_SERVER['PHP_SELF'] . '?id=' . $object->id . '&file=' . GETPOST('file') . '&entity=' . $conf->entity, $langs->trans('RemoveFileObject'), $langs->trans('ConfirmRemoveFileObject', GETPOST('file')), 'remove_file', '', 'yes', 1, 350, 600);
 	}
 
 	// Call Hook formConfirm.
@@ -342,9 +355,11 @@ if ($action == 'create') {
 
 	require_once DOL_DOCUMENT_ROOT . '/core/tpl/commonfields_view.tpl.php';
 
-	print '<tr class="linked-medias causality_tree question-table"><td class=""><label for="causality_tree">' . $langs->trans("CausalityTree") . '</label></td><td class="linked-medias-list">';
+	print '<td class="titlefield">' . $langs->trans("UserVictim") . '</td>';
+	print '<td>' . $victim->getNomUrl(1) . '</td>';
+	print '<tr class="linked-medias causality_tree"> <td class=""><label for="causality_tree">' . $langs->trans("CausalityTree") . '</label></td>';
+	print '<td class="linked-medias-list">';
 	$pathPhotos = $conf->digiriskdolibarr->multidir_output[$conf->entity] . '/accident_investigation/'. $object->ref . '/causality_tree/';
-	$fileArray  = dol_dir_list($pathPhotos, 'files');
 	?>
 	<span class="add-medias" <?php echo ($object->status < AccidentInvestigation::STATUS_LOCKED && empty($object->causality_tree)) ? '' : 'style="display:none"' ?>>
 		<input hidden multiple class="fast-upload" id="fast-upload-photo-default" type="file" name="userfile[]" capture="environment" accept="image/*">
@@ -361,7 +376,7 @@ if ($action == 'create') {
 	</span>
 	<?php
 	$relativepath = 'digiriskdolibarr/medias/thumbs';
-	print saturne_show_medias_linked('digiriskdolibarr', $pathPhotos, 'small', 1, 0, 0, 0, 50, 50, 0, 0, 0, 'accident_investigation/'. $object->ref . '/causality_tree/', $object, 'causality_tree', $object->status < AccidentInvestigation::STATUS_LOCKED, $permissiontodelete && $object->status < AccidentInvestigation::STATUS_LOCKED);
+	print saturne_show_medias_linked('digiriskdolibarr', $pathPhotos, 'small', 1, 0, 0, 0, 50, 50, 0, 0, 0, 'accident_investigation/'. $object->ref . '/causality_tree/', $object, 'causality_tree', 0, $permissiontodelete && $object->status < AccidentInvestigation::STATUS_LOCKED);
 	print '</td></tr>';
 
 	print '</table></div>';
@@ -424,7 +439,7 @@ if ($action == 'create') {
 
 		// Clone.
 		$displayButton = $onPhone ? '<i class="fas fa-clone fa-2x"></i>' : '<i class="fas fa-clone"></i>' . ' ' . $langs->trans('ToClone');
-		print '<span class="butAction" id="actionButtonClone">' . $displayButton . '</span>';
+		print '<span class="butAction" id="actionButtonClone" href="' . $_SERVER['PHP_SELF'] . '?id=' . $object->id . '&action=clone' . '">' . $displayButton . '</span>';
 
 		// Delete (need delete permission, or if draft, just need create/modify permission).
 		$displayButton = $onPhone ? '<i class="fas fa-trash fa-2x"></i>' : '<i class="fas fa-trash"></i>' . ' ' . $langs->trans('Delete');
