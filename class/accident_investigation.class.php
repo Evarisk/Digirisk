@@ -255,6 +255,27 @@ class AccidentInvestigation extends SaturneObject
 	}
 
 	/**
+	 * Create object into database.
+	 *
+	 * @param  User $user      User that creates.
+	 * @param  bool $notrigger false = launch triggers after, true = disable triggers.
+	 * @return int             0 < if KO, ID of created object if OK.
+	 */
+	public function create(User $user, bool $notrigger = false): int
+	{
+		global $moduleNameLowerCase;
+
+		$signatory = new SaturneSignature($this->db, $moduleNameLowerCase, $this->element);
+
+		$result = $this->createCommon($user, $notrigger);
+		if ($result > 0) {
+			$signatory->setSignatory($result, $this->element, 'user', [$user->id], 'Investigator', 1);
+		}
+
+		return $result;
+	}
+
+	/**
 	 * Write information of trigger description
 	 *
 	 * @param  Object $object Object calling the trigger
