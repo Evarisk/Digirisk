@@ -126,8 +126,7 @@ if (empty($reshook)) {
 
 	$taskExist = $task->fetch($object->fk_task);
 	if ($taskExist <= 0) {
-		$object->fk_task = 0;
-		$object->setValueFrom('fk_task', $object->fk_task, '', '', '', '', $user);
+		$object->setValueFrom('fk_task', 0, '', '', '', '', $user);
 	}
 
 	if ($action == 'confirm_set_validate') {
@@ -138,12 +137,11 @@ if (empty($reshook)) {
 
 			if ($object->fk_task <= 0 || empty($object->fk_task)) {
 				$accident->fetch($object->fk_accident);
-
-				$task->fk_project = $accident->fk_project;
-
-				$task->ref        = $modTask->getNextValue(0, $task);
-				$task->label      = $accident->ref . ' - ' . $accident->label;
-				$result           = $task->create($user);
+				$task->fk_project                           = $accident->fk_project;
+				$task->ref                                  = $modTask->getNextValue(0, $task);
+				$task->label                                = $accident->ref . ' - ' . $accident->label;
+				$task->array_options['options_fk_accident'] = $accident->id;
+				$result                                     = $task->create($user);
 
 				if ($result > 0) {
 					$object->fk_task = $result;
@@ -175,39 +173,6 @@ if (empty($reshook)) {
 		}
 		header('Location: ' . $_SERVER["PHP_SELF"] . '?id=' . $id);
 		exit();
-	}
-
-	if ($action == 'confirm_setdraft') {
-		if ($object->fk_task > 0) {
-			$actionTask           = saturne_fetch_all_object_type('SaturneTask', '', '', 2, 0, ['customsql' => 'fk_task_parent = ' . $object->fk_task]);
-			$curativeActionTask   = array_shift($actionTask);
-			$preventiveActionTask = array_pop($actionTask);
-			$resOne               = $curativeActionTask->delete($user);
-			$resTwo               = $preventiveActionTask->delete($user);
-
-			if ($resOne > 0 && $resTwo > 0) {
-				setEventMessages('AccidentInvestigationTaskDeleted', []);
-
-				$task->fetch($object->fk_task);
-				$result = $task->delete($user);
-
-				if ($result > 0) {
-					$object->fk_task = 0;
-					$object->setValueFrom('fk_task', $object->fk_task, '', '', '', '', $user);
-					$result = $object->setDraft($user);
-				}
-			} else {
-				setEventMessages($task->error, [], 'errors');
-			}
-		} else {
-			$result = $object->setDraft($user);
-		}
-
-		if ($result > 0) {
-			setEventMessages('AccidentInvestigationReOpened', []);
-		} else {
-			setEventMessages($object->error, [], 'errors');
-		}
 	}
 
 	// Actions cancel, add, update, update_extras, confirm_validate, confirm_delete, confirm_deleteline, confirm_clone, confirm_close, confirm_setdraft, confirm_reopen

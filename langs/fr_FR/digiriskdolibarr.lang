@@ -749,6 +749,7 @@ AccidentInvestigationReOpened = L'enquête accident a été rouverte
 AccidentInvestigationTaskCreated = Les tâches de l'enquête accident ont été crées
 AccidentInvestigationTaskDeleted = Les tâches de l'enquête accident ont été supprimées
 CausalityTree = Arbre des causes
+TaskWillBeCreatedAfterValidation = Les tâches seront créées après validation de l'enquête accident
 
 # AccidentTooltip - Tooltip des accidents
 VictimActivityTooltip = Précisez l’activité ou la tâche de la victime au moment de l’accident, c’est-à-dire ce que faisait la victime
