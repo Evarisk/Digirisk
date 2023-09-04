@@ -234,16 +234,10 @@ class doc_accidentinvestigationdocument_odt extends SaturneDocumentModel
 		$tmpArray['mycompany_contact'] = $conf->global->MAIN_INFO_SOCIETE_MANAGERS;
 		$tmpArray['mycompany_mail']    = $conf->global->MAIN_INFO_SOCIETE_MAIL;
 
-		$tmpArray['victim_lastname']  = dol_strtoupper($victim->lastname);
-		$tmpArray['victim_firstname'] = ucfirst($victim->firstname);
+		$tmpArray['victim_lastname']   = dol_strtoupper($victim->lastname);
+		$tmpArray['victim_firstname']  = ucfirst($victim->firstname);
+		$tmpArray['seniority_at_post'] = $object->seniority_at_post;
 
-		if ($object->seniority_at_post > 0) {
-			$daysAtPost                    = dol_time_plus_duree($now, -$object->seniority_at_post, 's');
-			$daysAtPost                    = round($daysAtPost / 60 / 60 / 24);
-			$tmpArray['seniority_at_post'] = dol_print_date($object->seniority_at_post, 'day', 'tzuser') . ' - ' . $daysAtPost . ' ' . ($daysAtPost <= 1 ? $outputLangs->trans('Day') : $outputLangs->trans('Days'));
-		} else {
-			$tmpArray['seniority_at_post'] = '';
-		}
 		if ($victim->dateemployment > 0) {
 			$daysEmployee                       = dol_time_plus_duree($now, -$victim->dateemployment, 's');
 			$daysEmployee                       = round($daysEmployee / 60 / 60 / 24);
