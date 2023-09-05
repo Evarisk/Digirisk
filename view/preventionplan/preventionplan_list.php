@@ -64,7 +64,6 @@ $page      = $page == -1 ? 0 : $page;
 $title = $langs->trans("PreventionPlan");
 
 $preventionplan    = new PreventionPlan($db);
-$signatory         = new PreventionPlanSignature($db);
 $digiriskresources = new DigiriskResources($db);
 $societe           = new Societe($db);
 $contact           = new Contact($db);

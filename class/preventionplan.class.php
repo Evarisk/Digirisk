@@ -201,10 +201,10 @@ class PreventionPlan extends SaturneObject
 	 */
 	public function createFromClone(User $user, $fromid, $options)
 	{
-		global $conf, $langs;
+		global $conf, $langs, $moduleNameLowerCase;
 		$error = 0;
 
-		$signatory         = new PreventionPlanSignature($this->db);
+		$signatory         = new SaturneSignature($this->db, $this->module, $this->element);
 		$digiriskresources = new DigiriskResources($this->db);
 		$openinghours      = new Openinghours($this->db);
 		$preventionplandet = new PreventionPlanLine($this->db);
@@ -305,7 +305,7 @@ class PreventionPlan extends SaturneObject
 				for ($i = 0; $i < $num; $i++) {
 					$line                    = $object->lines[$i];
 					if (property_exists($line, 'ref')) {
-						$line->ref = $refPreventionPlanDetMod->getNextValue($line);
+						$line->ref = $line->getNextNumRef();
 					}
 					$line->category          = empty($line->category) ? 0 : $line->category;
 					$line->fk_preventionplan = $preventionplanid;
@@ -346,9 +346,7 @@ class PreventionPlan extends SaturneObject
 	 */
 	public function setInProgress($user, $notrigger = 0)
 	{
-		global $conf;
-
-		$signatory = new PreventionPlanSignature($this->db);
+		$signatory = new SaturneSignature($this->db, $this->module, $this->element);
 		$signatory->deleteSignatoriesSignatures($this->id, 'preventionplan');
 		return $this->setStatusCommon($user, self::STATUS_DRAFT, $notrigger, 'PREVENTIONPLAN_INPROGRESS');
 	}
@@ -568,7 +566,7 @@ class PreventionPlanLine extends SaturneObject
 	 */
 	public function insert(User $user, $notrigger = false)
 	{
-		global $db, $user, $conf;
+		global $db, $user, $conf, $entity;
 
 		// Clean parameters
 		$this->description = trim($this->description);
@@ -582,14 +580,13 @@ class PreventionPlanLine extends SaturneObject
 		$sql .= ')';
 		$sql .= " VALUES (";
 		$sql .= "'" . $db->escape($this->ref) . "'" . ", ";
-		$sql .= $this->entity . ", ";
+		$sql .= $entity . ", ";
 		$sql .= "'" . $db->escape($db->idate($now)) . "'" . ", ";
 		$sql .= "'" . $db->escape($this->description) . "'" . ", ";
 		$sql .= $this->category . ", ";
 		$sql .= "'" . $db->escape($this->prevention_method) . "'" . ", ";
 		$sql .= $this->fk_preventionplan . ", ";
 		$sql .= $this->fk_element ;
-
 		$sql .= ')';
 
 		dol_syslog(get_class($this) . "::insert", LOG_DEBUG);

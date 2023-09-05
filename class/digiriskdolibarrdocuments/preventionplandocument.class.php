@@ -27,7 +27,7 @@ require_once __DIR__ . '/../../../saturne/class/saturnedocuments.class.php';
 /**
  * Class for PreventionPlanDocument
  */
-class PreventionPlanDocument extends DigiriskDocuments
+class PreventionPlanDocument extends SaturneDocuments
 {
 	/**
 	 * @var string Module name.

@@ -1188,7 +1188,7 @@ if ((empty($action) || ($action != 'create' && $action != 'edit'))) {
 		$colspan = 3;
 
 		// Lines
-		$preventionplandets = $preventionplandet->fetchAll('', '', 0, 0, array(), 'AND', GETPOST('id'));
+		$preventionplandets = $preventionplandet->fetchAll('', '', 0, 0, ['fk_preventionplan' => GETPOST('id')], 'AND');
 
 		print '<tr class="liste_titre">';
 		print '<td><span>' . $langs->trans('Ref.') . '</span></td>';
@@ -1341,7 +1341,7 @@ if ((empty($action) || ($action != 'create' && $action != 'edit'))) {
 
 			print '<tr>';
 			print '<td>';
-			print $refPreventionPlanDetMod->getNextValue($preventionplandet);
+			print $preventionplandet->getNextNumRef();
 			print '</td>';
 			print '<td>';
 			print $digiriskelement->select_digiriskelement_list('', 'fk_element', '', 0, 0, array(), 0, 0, 'minwidth100', '', false, 1);
