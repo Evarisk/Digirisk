@@ -1188,7 +1188,7 @@ if ((empty($action) || ($action != 'create' && $action != 'edit'))) {
 		$colspan = 3;
 
 		// Lines
-		$preventionplandets = $preventionplandet->fetchAll('', '', 0, 0, ['fk_preventionplan' => GETPOST('id')], 'AND');
+		$preventionplandets = $preventionplandet->fetchAll('', '', 0, 0, ['fk_preventionplan' => GETPOST('id')]);
 
 		print '<tr class="liste_titre">';
 		print '<td><span>' . $langs->trans('Ref.') . '</span></td>';

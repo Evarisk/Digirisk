@@ -101,7 +101,15 @@ class doc_preventionplandocument_odt extends SaturneDocumentModel
 		$risk = new Risk($this->db);
 
 		$preventionplanline = new PreventionPlanLine($this->db);
-		$preventionplanlines = $preventionplanline->fetchAll('', '', 0, 0, array(), 'AND', $object->id);
+		$preventionplanlines = $preventionplanline->fetchAll('', '', 0, 0, ['fk_preventionplan' => $object->id]);
+
+		try {
+			$this->setAttendantsSegment($odfHandler, $outputLangs, $moreParam);
+		} catch (OdfException $e) {
+			$this->error = $e->getMessage();
+			dol_syslog($this->error, LOG_WARNING);
+			return -1;
+		}
 
 		// Replace tags of lines.
 		try {
@@ -164,6 +172,7 @@ class doc_preventionplandocument_odt extends SaturneDocumentModel
 			dol_syslog($this->error, LOG_WARNING);
 			return -1;
 		}
+
 	}
 
 	/**
@@ -179,10 +188,14 @@ class doc_preventionplandocument_odt extends SaturneDocumentModel
 	{
 		global $conf, $moduleNameLowerCase, $langs;
 
+		$object = $moreParam['object'];
+
+		$signatory = new SaturneSignature($this->db, $moduleNameLowerCase, $object->element);
 		// Get attendants.
 		$foundTagForLines = 1;
+
 		try {
-			$listLines = $odfHandler->setSegment('attendants');
+			$listLines = $odfHandler->setSegment('intervenants');
 		} catch (OdfException $e) {
 			// We may arrive here if tags for lines not present into template.
 			$foundTagForLines = 0;
@@ -190,94 +203,87 @@ class doc_preventionplandocument_odt extends SaturneDocumentModel
 			dol_syslog($e->getMessage());
 		}
 
+		$extsocietyintervenants = $signatory->fetchSignatory('PP_EXT_SOCIETY_INTERVENANTS', $object->id, 'preventionplan');
+
+		$tempdir = $conf->digiriskdolibarr->multidir_output[$object->entity ?? 1] . '/temp/';
+
 		if ($foundTagForLines) {
-			if (!empty($moreParam['object'])) {
-				$signatory        = new SaturneSignature($this->db, $this->module, $moreParam['object']->element);
-				$signatoriesArray = $signatory->fetchSignatories($moreParam['object']->id, $moreParam['object']->element);
-				if (!empty($signatoriesArray) && is_array($signatoriesArray)) {
-					$nbAttendant = 0;
-					$tempDir     = $conf->$moduleNameLowerCase->multidir_output[$moreParam['object']->entity ?? 1] . '/temp/';
-					if (empty($moreParam['excludeAttendantsRole'])) {
-						$moreParam['excludeAttendantsRole'] = [];
+			if ( ! empty($extsocietyintervenants) && $extsocietyintervenants > 0) {
+				$k         = 3;
+				foreach ($extsocietyintervenants as $line) {
+					if ($line->status == 5) {
+						if (($moreParam['specimen'] == 0 && $object->status >= $object::STATUS_LOCKED)) {
+							$encoded_image = explode(",", $line->signature)[1];
+							$decoded_image = base64_decode($encoded_image);
+							file_put_contents($tempdir . "signature" . $k . ".png", $decoded_image);
+							$tmparray['intervenants_signature'] = $tempdir . "signature" . $k . ".png";
+						} else {
+							$tmparray['intervenants_signature'] = '';
+						}
+					} else {
+						$tmparray['intervenants_signature'] = '';
 					}
-					foreach ($signatoriesArray as $objectSignatory) {
-						if (!in_array($objectSignatory->role, $moreParam['excludeAttendantsRole'])) {
-							$tmpArray['attendant_number']    = ++$nbAttendant;
-							$tmpArray['attendant_lastname']  = strtoupper($objectSignatory->lastname);
-							$tmpArray['attendant_firstname'] = dol_strlen($objectSignatory->firstname) > 0 ? ucfirst($objectSignatory->firstname) : '';
-							switch ($objectSignatory->attendance) {
-								case 1:
-									$attendance = $outputLangs->trans('Delay');
-									break;
-								case 2:
-									$attendance = $outputLangs->trans('Absent');
-									break;
-								default:
-									$attendance = $outputLangs->transnoentities('Present');
-									break;
-							}
-							switch ($objectSignatory->element_type) {
-								case 'user':
-									$user    = new User($this->db);
-									$societe = new Societe($this->db);
-									$user->fetch($objectSignatory->element_id);
-									$tmpArray['attendant_job'] = $user->job;
-									if ($user->fk_soc > 0) {
-										$societe->fetch($user->fk_soc);
-										$tmpArray['attendant_company'] = $societe->name;
-									} else {
-										$tmpArray['attendant_company'] = $conf->global->MAIN_INFO_SOCIETE_NOM;
+					$tmparray['name']     = $line->firstname;
+					$tmparray['lastname'] = $line->lastname;
+					$tmparray['phone']    = $line->phone;
+					$tmparray['mail']     = $line->email;
+					$tmparray['status']   = $line->getLibStatut(1);
+
+					$k++;
+
+					foreach ($tmparray as $key => $value) {
+						try {
+							if ($key == 'intervenants_signature' && $line->status == 5) { // Image
+								if (file_exists($value)) {
+									$list     = getimagesize($value);
+									$newWidth = 200;
+									if ($list[0]) {
+										$ratio     = $newWidth / $list[0];
+										$newHeight = $ratio * $list[1];
+										dol_imageResizeOrCrop($value, 0, $newWidth, $newHeight);
 									}
-									break;
-								case 'socpeople':
-									$contact = new Contact($this->db);
-									$societe = new Societe($this->db);
-									$contact->fetch($objectSignatory->element_id);
-									$tmpArray['attendant_job'] = $contact->poste;
-									if ($contact->fk_soc > 0) {
-										$societe->fetch($contact->fk_soc);
-										$tmpArray['attendant_company'] = $societe->name;
-									} else {
-										$tmpArray['attendant_company'] = $conf->global->MAIN_INFO_SOCIETE_NOM;
-									}
-									break;
-								default:
-									$tmpArray['attendant_job']     = '';
-									$tmpArray['attendant_company'] = '';
-									break;
-							}
-							$tmpArray['attendant_role']           = $outputLangs->transnoentities($objectSignatory->role);
-							$tmpArray['attendant_signature_date'] = dol_print_date($objectSignatory->signature_date, 'dayhour', 'tzuser');
-							$tmpArray['attendant_attendance']     = $attendance;
-							if (dol_strlen($objectSignatory->signature) > 0 && $objectSignatory->signature != $langs->transnoentities('FileGenerated')) {
-								$confSignatureName = dol_strtoupper($this->module) . '_SHOW_SIGNATURE_SPECIMEN';
-								if ($moreParam['specimen'] == 0 || ($moreParam['specimen'] == 1 && $conf->global->$confSignatureName == 1)) {
-									$encodedImage = explode(',', $objectSignatory->signature)[1];
-									$decodedImage = base64_decode($encodedImage);
-									file_put_contents($tempDir . 'signature' . $objectSignatory->id . '.png', $decodedImage);
-									$tmpArray['attendant_signature'] = $tempDir . 'signature' . $objectSignatory->id . '.png';
+									$listLines->setImage($key, $value);
 								} else {
-									$tmpArray['attendant_signature'] = '';
+									$odfHandler->setVars($key, $langs->trans('NoData'), true, 'UTF-8');
 								}
+							} elseif (empty($value)) {  // Text
+								$listLines->setVars($key, $langs->trans('NoData'), true, 'UTF-8');
 							} else {
-								$tmpArray['attendant_signature'] = '';
+								$listLines->setVars($key, html_entity_decode($value, ENT_QUOTES | ENT_HTML5), true, 'UTF-8');
 							}
-							$this->setTmpArrayVars($tmpArray, $listLines, $outputLangs);
-							dol_delete_file($tempDir . 'signature' . $objectSignatory->id . '.png');
+						} catch (OdfException $e) {
+							dol_syslog($e->getMessage(), LOG_INFO);
+						} catch (SegmentException $e) {
+							dol_syslog($e->getMessage(), LOG_INFO);
 						}
 					}
-				} else {
-					$tmpArray['attendant_number']         = '';
-					$tmpArray['attendant_lastname']       = '';
-					$tmpArray['attendant_firstname']      = '';
-					$tmpArray['attendant_job']            = '';
-					$tmpArray['attendant_company']        = '';
-					$tmpArray['attendant_role']           = '';
-					$tmpArray['attendant_signature_date'] = '';
-					$tmpArray['attendant_attendance']     = '';
-					$tmpArray['attendant_signature']      = '';
-					$this->setTmpArrayVars($tmpArray, $listLines, $outputLangs);
+					$listLines->merge();
+
+					if (($moreParam['specimen'] == 0 && $object->status >= $object::STATUS_LOCKED)) {
+						dol_delete_file($tempdir . "signature" . $k . ".png");
+					}
 				}
+				$odfHandler->mergeSegment($listLines);
+			} else {
+				$tmparray['intervenants_signature'] = '';
+				$tmparray['name']                   = '';
+				$tmparray['lastname']               = '';
+				$tmparray['phone']                  = '';
+				$tmparray['mail']                   = '';
+				$tmparray['status']                 = '';
+
+				foreach ($tmparray as $key => $val) {
+					try {
+						if (empty($val)) {
+							$listLines->setVars($key, $langs->trans('NoData'), true, 'UTF-8');
+						} else {
+							$listLines->setVars($key, html_entity_decode($val, ENT_QUOTES | ENT_HTML5), true, 'UTF-8');
+						}
+					} catch (SegmentException $e) {
+						dol_syslog($e->getMessage(), LOG_INFO);
+					}
+				}
+				$listLines->merge();
 				$odfHandler->mergeSegment($listLines);
 			}
 		}
@@ -298,7 +304,7 @@ class doc_preventionplandocument_odt extends SaturneDocumentModel
 	 */
 	public function write_file(SaturneDocuments $objectDocument, Translate $outputLangs, string $srcTemplatePath, int $hideDetails = 0, int $hideDesc = 0, int $hideRef = 0, array $moreParam): int
 	{
-		global $conf, $langs;
+		global $conf, $langs, $moduleNameLowerCase;
 
 		$object = $moreParam['object'];
 
@@ -306,7 +312,10 @@ class doc_preventionplandocument_odt extends SaturneDocumentModel
 
 		$openinghours        = new Openinghours($this->db);
 		$preventionplanline  = new PreventionPlanLine($this->db);
-		$preventionplanlines = $preventionplanline->fetchAll('', '', 0, 0, array(), 'AND', $object->id);
+		$signatory           = new SaturneSignature($this->db, $moduleNameLowerCase, $object->element);
+
+		$preventionplanlines   = $preventionplanline->fetchAll('', '', 0, 0, ['fk_preventionplan' => $object->id]);
+		$extsocietyintervenants = $signatory->fetchSignatory('PP_EXT_SOCIETY_INTERVENANTS', $object->id, 'preventionplan');
 
 		$jsonData  = $objectDocument->PreventionPlanDocumentFillJSON();
 		$arrayData = json_decode($jsonData);
@@ -316,6 +325,12 @@ class doc_preventionplandocument_odt extends SaturneDocumentModel
 			$tmpArray['interventions_info'] = count($preventionplanlines) . ' ' . $langs->trans('PreventionPlanLine');
 		} else {
 			$tmpArray['interventions_info'] = 0;
+		}
+
+		if ( ! empty($extsocietyintervenants) && $extsocietyintervenants > 0 && is_array($extsocietyintervenants)) {
+			$tmpArray['intervenants_info'] = count($extsocietyintervenants);
+		} else {
+			$tmpArray['intervenants_info'] = 0;
 		}
 
 		$tmpArray['pompier_number']   = $arrayData['pompier_number'];
