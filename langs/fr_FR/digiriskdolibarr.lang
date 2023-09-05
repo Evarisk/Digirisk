@@ -342,18 +342,7 @@ PreventionPlanDocumentGeneratedWithDolibarr = Plan de prévention généré avec
 # Data - Donnée
 
 PreventionPlan = Plan de prévention
-PreventionPlanDocumentGenerated = Génération de Plan de Prévention
-PreventionPlanCreated = Création de Plan de Prévention
-PreventionPlanModified = Modification de Plan de Prévention
-PreventionPlanDeleted = Suppression de Plan de Prévention
-PreventionPlanInProgress = Réouverture du Plan de Prévention
-PreventionPlanPendingSignature = Mise en attente de signature du Plan de Prévention
-PreventionPlanLocked = Verrouillage du Plan de Prévention
-PreventionPlanArchived = Archivage du Plan de Prévention
-PreventionPlanSignatureAddAttendant = Ajout de participant au Plan de Prévention
-PreventionPlanSignatureDeleteAttendant = Suppression de participant au Plan de Prévention
-PreventionPlanSentByMail = Envoi par mail du Plan de Prévention
-PreventionPlanInitial = PPR
+Preventionplan = Plan de prévention
 PreventionPlanList = Liste des plans de prévention
 PreventionPlanLine = risque(s)
 PreventionPlanLineCreated = Création de risque dans Plan de Prévention
@@ -365,9 +354,12 @@ PriorVisitText = Note de l'inspection
 CSSCTIntervention = Intervention du CSSCT
 CSSCTInterventionText = Intervention du CSSCT ?
 MaitreOeuvre = Responsable de l'Entreprise Utilisatrice
+PP_MAITRE_OEUVRE = Responsable de l'Entreprise Utilisatrice
 ExtSociety = Entreprise Extérieure
 ExtSocietyResponsible = Responsable de l'Entreprise Extérieure
+PP_EXT_SOCIETY_RESPONSIBLE = Responsable de l'Entreprise Extérieure
 ExtSocietyIntervenants = Intervenants de l'Entreprise Extérieure
+PP_EXT_SOCIETY_INTERVENANTS = Intervenants de l'Entreprise Extérieure
 ExtSocietyIntervenant = Intervenant de l'Entreprise Extérieure
 ActionsDescription = Description des actions
 INRSRisk = Risque (INRS)
@@ -1467,76 +1459,6 @@ TotalProgress = Avancement réel global des tâches
 TotalBudget = Somme du budget des tâches
 TaskTimeSpentDate = Date du temps consommé
 StartDateCannotBeAfterEndDate = La date de fin ne peut pas être antérieure à la date de début
-
-
-#
-# DigiriskSignature - Signature
-#
-
-# Trigger - Déclencheur
-DigiriskSignatureSignedTrigger = Signature du participant effectuée
-DigiriskSignaturePendingSignatureTrigger = Email envoyé, en attente de la signature du participant
-DigiriskSignatureAbsentTrigger = Participant absent
-DigiriskSignatureDeletedTrigger = Participant supprimé
-
-# Data - Donnée
-SignatureResponsibles = Signature des responsables
-SignatureIntervenants = Intervenants
-Sign = Signer
-Erase = Effacer
-DisclaimerSignatureTitle = Attention
-DisclaimerSignature = Dès qu'un responsable aura signé vous ne pourrez plus créer/modifier des risques, ni modifier les responsables du plan de prévention.<br>Vous pourrez toujours rajouter des intervenants.
-Registered = Inscrit
-SignatureRequest = Demande de signature
-PendingSignature = En attente de signature
-Denied = Refusé
-Signed = Signé
-Unsigned = Non signé
-Absent = Absent
-JustifiedAbsent = Absence justifiée
-SignatureDate = Date de signature
-PublicID = ID pubic
-ActionsSignature = Actions
-SendEmail = Envoyer un email
-# WelcomeOnOnlineSignaturePage = Bienvenue sur la page de signature des documents
-ThisIsInformationOnDocumentToSign = Informations
-DigiriskSignature = Signature
-DigiriskSignatureSigned = Signature d'un participant
-DigiriskSignaturePendingSignature = Attente de signature d'un participant
-DigiriskSignatureAbsent = Absence de signature d'un participant
-DigiriskSignatureDeleted = Suppression de signature d'un participant
-SignaturePublicAccess = Une interface publique ne nécessitant aucune identification est disponible à l'url suivante
-SignatureActivatePublicInterface = Activer l'interface publique
-SignatureShowCompanyLogo = Afficher le logo de la société dans l'interface publique
-SignatureShowCompanyLogoHelp = Activez cette option pour masquer le logo de la société dans les pages de l'interface publique
-SignatureMaitreOeuvre = Responsable de l'Entreprise Utilisatrice
-SignatureResponsibleExtSociety = Responsable de l'Entreprise Extérieure
-Role = Rôle
-NewIntervenants = Ajouter un nouvel intervenant
-SignatureLink = Lien signature
-SendMailDate = Date d'envoi d'email
-DeleteAttendant = Supprimer l'intervenant
-AddAttendantMessage = Ajout de l'intervenant :
-DeleteAttendantMessage = Suppression de l'intervenant :
-SignaturePublicInterfaceForbidden = Accès interdit à l'interface publique de signature
-SignaturePublicInterface = Interface publique de signature
-Attendant = Le participant
-SetAbsentAttendant = est absent
-SendMailSignature = Email émetteur utilisé pour envoyer les liens de signature
-SignatureSuccess = Document signé avec succès
-SignatureEmailMessage = Bonjour, <br> Veuillez trouver ci-joint le lien de signature du document.<br>
-AddSignatureSuccess = Signature du document réussie
-AddSignatureSuccessText = La signature a bien été enregistrée pour le document
-SignatureSeeDocument = Voir
-ShowDocument = Voir le document
-AddAttendants = Ajouter
-NoAttendants = Pas d'intervenants liés à cet objet. Pour ajouter des intervenants, le statut doit être "En cours".
-SignatureManagement = Gestion des signatures
-HasNoEmail = n'a pas d'email
-GoToEmailSetup = Pour configurer votre serveur de mail, rendez-vous dans
-PathToEmailSetup = "Accueil -> Configuration -> Emails" </a>
-SendToNoEmail = Les destinataires n'ont pas d'email
-SocietyName = Nom de la société
 
 #
 # Ticket - Interface publique ticket

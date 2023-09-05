@@ -37,94 +37,28 @@ require_once __DIR__ . '/../../../../../class/riskanalysis/risksign.class.php';
 /**
  *	Class to build documents using ODF templates generator
  */
-class doc_preventionplandocument_odt extends ModeleODTPreventionPlanDocument
+class doc_preventionplandocument_odt extends SaturneDocumentModel
 {
-	/**
-	 * @var DoliDB Database handler.
-	 */
-	public $db;
-
-	/**
-	 * @var string Error code (or message)
-	 */
-	public $error;
-
-	/**
-	 * @var array Fullpath file
-	 */
-	public $result;
-
-	/**
-	 * @var string ODT Template Name.
-	 */
-	public $name;
-
-	/**
-	 * @var string ODT Template Description.
-	 */
-	public $description;
-
-	/**
-	 * @var string ODT Template path.
-	 */
-	public $scandir;
-
-	/**
-	 * @var string Format file.
-	 */
-	public $type;
-
-	/**
-	 * @var int Width page.
-	 */
-	public $page_largeur;
-
-	/**
-	 * @var int Height page.
-	 */
-	public $page_hauteur;
-
-	/**
-	 * @var array Format page.
-	 */
-	public $format;
-
-	/**
-	 * @var int Left margin.
-	 */
-	public $marge_gauche;
-
-	/**
-	 * @var int Right margin.
-	 */
-	public $marge_droite;
-
-	/**
-	 * @var int Top margin.
-	 */
-	public $marge_haute;
-
-	/**
-	 * @var int Bottom margin.
-	 */
-	public $marge_basse;
-
-	/**
-	 * Issuer
-	 * @var Societe
-	 */
-	public $emetteur;
-
 	/**
 	 * @var array Minimum version of PHP required by module.
 	 * e.g.: PHP ≥ 5.5 = array(5, 5)
 	 */
-	public $phpmin = array(5, 5);
+	public $phpmin = [7, 4];
 
 	/**
-	 * @var string Dolibarr version of the loaded document
+	 * @var string Dolibarr version of the loaded document.
 	 */
-	public $version = 'dolibarr';
+	public string $version = 'dolibarr';
+
+	/**
+	 * @var string Module.
+	 */
+	public string $module = 'digiriskdolibarr';
+
+	/**
+	 * @var string Document type.
+	 */
+	public string $document_type = 'preventionplandocument';
 
 	/**
 	 *	Constructor
@@ -133,92 +67,18 @@ class doc_preventionplandocument_odt extends ModeleODTPreventionPlanDocument
 	 */
 	public function __construct($db)
 	{
-		global $langs, $mysoc;
-
-		// Load translation files required by the page
-		$langs->loadLangs(array("main", "companies"));
-
-		$this->db          = $db;
-		$this->name        = $langs->trans('PreventionPlanDocumentDigiriskTemplate');
-		$this->description = $langs->trans("DocumentModelOdt");
-		$this->scandir     = 'DIGIRISKDOLIBARR_PREVENTIONPLANDOCUMENT_ADDON_ODT_PATH'; // Name of constant that is used to save list of directories to scan
-
-		// Page size for A4 format
-		$this->type         = 'odt';
-		$this->page_largeur = 0;
-		$this->page_hauteur = 0;
-		$this->format       = array($this->page_largeur, $this->page_hauteur);
-		$this->marge_gauche = 0;
-		$this->marge_droite = 0;
-		$this->marge_haute  = 0;
-		$this->marge_basse  = 0;
-
-		// emetteur
-		$this->emetteur                                                     = $mysoc;
-		if ( ! $this->emetteur->country_code) $this->emetteur->country_code = substr($langs->defaultlang, -2); // By default if not defined
+		parent::__construct($db, $this->module, $this->document_type);
 	}
 
 	/**
-	 *	Return description of a module
+	 * Return description of a module.
 	 *
-	 *	@param	Translate	$langs      Lang object to use for output
-	 *	@return string       			Description
+	 * @param  Translate $langs Lang object to use for output.
+	 * @return string           Description.
 	 */
-	public function info($langs)
+	public function info(Translate $langs): string
 	{
-		global $conf, $langs;
-
-		// Load translation files required by the page
-		$langs->loadLangs(array("errors", "companies"));
-
-		$texte  = $this->description . ".<br>\n";
-		$texte .= '<form action="' . $_SERVER["PHP_SELF"] . '" method="POST">';
-		$texte .= '<input type="hidden" name="token" value="' . newToken() . '">';
-		$texte .= '<input type="hidden" name="action" value="setModuleOptions">';
-		$texte .= '<input type="hidden" name="param1" value="DIGIRISKDOLIBARR_PREVENTIONPLANDOCUMENT_ADDON_ODT_PATH">';
-		$texte .= '<table class="nobordernopadding">';
-
-		// List of directories area
-		$texte      .= '<tr><td>';
-		$texttitle   = $langs->trans("ListOfDirectories");
-		$listofdir   = explode(',', preg_replace('/[\r\n]+/', ',', trim($conf->global->DIGIRISKDOLIBARR_PREVENTIONPLANDOCUMENT_ADDON_ODT_PATH)));
-		$listoffiles = array();
-		foreach ($listofdir as $key => $tmpdir) {
-			$tmpdir = trim($tmpdir);
-			$tmpdir = preg_replace('/DOL_DATA_ROOT/', DOL_DATA_ROOT, $tmpdir);
-			$tmpdir = preg_replace('/DOL_DOCUMENT_ROOT/', DOL_DOCUMENT_ROOT, $tmpdir);
-			if ( ! $tmpdir) {
-				unset($listofdir[$key]); continue;
-			}
-			if ( ! is_dir($tmpdir)) $texttitle .= img_warning($langs->trans("ErrorDirNotFound", $tmpdir), 0);
-			else {
-				$tmpfiles                          = dol_dir_list($tmpdir, 'files', 0, '\.(ods|odt)');
-				if (count($tmpfiles)) $listoffiles = array_merge($listoffiles, $tmpfiles);
-			}
-		}
-
-		// Scan directories
-		$nbofiles = count($listoffiles);
-		if ( ! empty($conf->global->DIGIRISKDOLIBARR_PREVENTIONPLANDOCUMENT_ADDON_ODT_PATH)) {
-			$texte .= $langs->trans("DigiriskNumberOfModelFilesFound") . ': <b>';
-			//$texte.=$nbofiles?'<a id="a_'.get_class($this).'" href="#">':'';
-			$texte .= count($listoffiles);
-			//$texte.=$nbofiles?'</a>':'';
-			$texte .= '</b>';
-		}
-
-		if ($nbofiles) {
-			$texte .= '<div id="div_' . get_class($this) . '" class="hidden">';
-			foreach ($listoffiles as $file) {
-				$texte .= $file['name'] . '<br>';
-			}
-			$texte .= '</div>';
-		}
-
-		$texte .= '</td>';
-		$texte .= '</table>';
-		$texte .= '</form>';
-
-		return $texte;
+		return parent::info($langs);
 	}
+
 }

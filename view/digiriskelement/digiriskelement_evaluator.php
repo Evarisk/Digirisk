@@ -76,7 +76,7 @@ $numberingModuleName = [
 	$evaluator->element => $conf->global->DIGIRISKDOLIBARR_EVALUATOR_ADDON,
 ];
 
-list($refEvaluatorMod) = saturne_require_objects_mod($numberingModuleName);
+list($refEvaluatorMod) = saturne_require_objects_mod($numberingModuleName, $moduleNameLowerCase);
 
 $hookmanager->initHooks(array('evaluatorcard', 'globalcard')); // Note that conf->hooks_modules contains array
 

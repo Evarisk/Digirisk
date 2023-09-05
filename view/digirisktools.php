@@ -80,7 +80,7 @@ $refRiskSignMod       = new $conf->global->DIGIRISKDOLIBARR_RISKSIGN_ADDON();
 $numberingModuleName = [
 	'project/task' => $conf->global->PROJECT_TASK_ADDON,
 ];
-list($refTaskMod)     = saturne_require_objects_mod($numberingModuleName);
+list($refTaskMod)     = saturne_require_objects_mod($numberingModuleName, $moduleNameLowerCase);
 
 $upload_dir = $conf->digiriskdolibarr->multidir_output[$conf->entity ?? 1];
 

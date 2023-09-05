@@ -76,7 +76,7 @@ $numberingModuleName = [
 	$risksign->element => $conf->global->DIGIRISKDOLIBARR_RISKSIGN_ADDON,
 ];
 
-list($refRiskSignMod) = saturne_require_objects_mod($numberingModuleName);
+list($refRiskSignMod) = saturne_require_objects_mod($numberingModuleName, $moduleNameLowerCase);
 
 $hookmanager->initHooks(array('risksigncard', 'globalcard')); // Note that conf->hooks_modules contains array
 

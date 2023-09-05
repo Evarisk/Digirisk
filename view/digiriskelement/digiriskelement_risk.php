@@ -91,7 +91,7 @@ $numberingModuleName = [
 	'project/task'       => $conf->global->PROJECT_TASK_ADDON,
 ];
 
-list($refRiskMod, $refEvaluationMod, $refProjectMod, $refTaskMod) = saturne_require_objects_mod($numberingModuleName);
+list($refRiskMod, $refEvaluationMod, $refProjectMod, $refTaskMod) = saturne_require_objects_mod($numberingModuleName, $moduleNameLowerCase);
 
 $DUProject->fetch($conf->global->DIGIRISKDOLIBARR_DU_PROJECT);
 $hookmanager->initHooks(array('riskcard', 'globalcard')); // Note that conf->hooks_modules contains array

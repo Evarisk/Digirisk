@@ -30,7 +30,7 @@ require_once __DIR__ . '/../../saturne/class/saturneobject.class.php';
 require_once __DIR__ . '/../../saturne/class/saturnesignature.class.php';
 
 require_once __DIR__ . '/../lib/digiriskdolibarr_function.lib.php';
-require_once __DIR__ . '/digirisksignature.class.php';
+require_once __DIR__ . '/digiriskdocuments.class.php';
 require_once __DIR__ . '/openinghours.class.php';
 require_once __DIR__ . '/evaluator.class.php';
 require_once __DIR__ . '/dashboarddigiriskstats.class.php';

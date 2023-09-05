@@ -566,7 +566,7 @@ if (empty($reshook)) {
 		}
 	}
 
-	// Action to set status STATUS_PENDING_SIGNATURE
+	// Action to set status STATUS_VALIDATED
 	if ($action == 'confirm_setPendingSignature') {
 		$object->fetch($id);
 		if ( ! $error) {

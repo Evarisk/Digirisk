@@ -76,7 +76,7 @@ class FirePermit extends SaturneObject
     public const STATUS_DRAFT             = 1;
     public const STATUS_IN_PROGRESS       = 1;
     public const STATUS_VALIDATED         = 2;
-    public const STATUS_PENDING_SIGNATURE = 2;
+    public const STATUS_VALIDATED = 2;
     public const STATUS_LOCKED            = 3;
     public const STATUS_ARCHIVED          = 4;
 
@@ -332,9 +332,7 @@ class FirePermit extends SaturneObject
 	 */
 	public function setPendingSignature($user, $notrigger = 0)
 	{
-		global $conf;
-
-		return $this->setStatusCommon($user, self::STATUS_PENDING_SIGNATURE, $notrigger || !$conf->global->DIGIRISKDOLIBARR_MAIN_AGENDA_ACTIONAUTO_FIREPERMIT_PENDINGSIGNATURE, 'FIREPERMIT_PENDINGSIGNATURE');
+		return $this->setStatusCommon($user, self::STATUS_VALIDATED, $notrigger, 'FIREPERMIT_PENDINGSIGNATURE');
 	}
 
 	/**
@@ -354,13 +352,13 @@ class FirePermit extends SaturneObject
 
 			$this->labelStatus[self::STATUS_DELETE]           = $langs->trans('Deleted');
 			$this->labelStatus[self::STATUS_IN_PROGRESS]       = $langs->trans('InProgress');
-			$this->labelStatus[self::STATUS_PENDING_SIGNATURE] = $langs->trans('ValidatePendingSignature');
+			$this->labelStatus[self::STATUS_VALIDATED] = $langs->trans('ValidatePendingSignature');
 			$this->labelStatus[self::STATUS_LOCKED]            = $langs->trans('Locked');
 			$this->labelStatus[self::STATUS_ARCHIVED]          = $langs->trans('Archived');
 		}
 
 		$statusType                                                = 'status' . $status;
-		if ($status == self::STATUS_PENDING_SIGNATURE) $statusType = 'status3';
+		if ($status == self::STATUS_VALIDATED) $statusType = 'status3';
 		if ($status == self::STATUS_LOCKED) $statusType            = 'status8';
 		if ($status == self::STATUS_ARCHIVED) $statusType          = 'status8';
 

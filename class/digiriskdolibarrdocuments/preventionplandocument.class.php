@@ -21,12 +21,8 @@
  * \brief       This file is a class file for PreventionPlanDocument
  */
 
-require_once DOL_DOCUMENT_ROOT.'/contact/class/contact.class.php';
-
-require_once __DIR__ . '/../digiriskdocuments.class.php';
-require_once __DIR__ . '/../digiriskresources.class.php';
-require_once __DIR__ . '/../digiriskelement.class.php';
-require_once __DIR__ . '/../openinghours.class.php';
+// Load Saturne libraries.
+require_once __DIR__ . '/../../../saturne/class/saturnedocuments.class.php';
 
 /**
  * Class for PreventionPlanDocument
@@ -34,62 +30,23 @@ require_once __DIR__ . '/../openinghours.class.php';
 class PreventionPlanDocument extends DigiriskDocuments
 {
 	/**
-	 * @var DoliDB Database handler.
+	 * @var string Module name.
 	 */
-	public $db;
+	public $module = 'digiriskdolibarr';
 
 	/**
-	 * @var string ID to identify managed object.
+	 * @var string Element type of object.
 	 */
 	public $element = 'preventionplandocument';
 
 	/**
-	 * @var int  Does this object support multicompany module ?
-	 * 0=No test on entity, 1=Test with field entity, 'field@table'=Test with link by field@table
-	 */
-	public $ismultientitymanaged = 1;
-
-	/**
-	 * @var int  Does object support extrafields ? 0=No, 1=Yes
-	 */
-	public $isextrafieldmanaged = 1;
-
-	/**
-	 * @var string String with name of icon for preventionplandocument. Must be the part after the 'object_' into object_preventionplandocument.png
-	 */
-	public $picto = 'preventionplandocument@digiriskdolibarr';
-
-	/**
-	 * Constructor
+	 * Constructor.
 	 *
-	 * @param DoliDb $db Database handler
+	 * @param DoliDb $db Database handler.
 	 */
 	public function __construct(DoliDB $db)
 	{
-		global $conf, $langs;
-
-		$this->db = $db;
-
-		if (empty($conf->global->MAIN_SHOW_TECHNICAL_ID) && isset($this->fields['rowid'])) $this->fields['rowid']['visible'] = 0;
-		if (empty($conf->multicompany->enabled) && isset($this->fields['entity'])) $this->fields['entity']['enabled'] = 0;
-
-		// Unset fields that are disabled
-		foreach ($this->fields as $key => $val) {
-			if (isset($val['enabled']) && empty($val['enabled'])) {
-				unset($this->fields[$key]);
-			}
-		}
-
-		// Translate some data of arrayofkeyval
-		if (is_object($langs)) {
-			foreach ($this->fields as $key => $val) {
-				if (is_array($val['arrayofkeyval'])) {
-					foreach ($val['arrayofkeyval'] as $key2 => $val2) {
-						$this->fields[$key]['arrayofkeyval'][$key2] = $langs->trans($val2);
-					}
-				}
-			}
-		}
+		parent::__construct($db, $this->module, $this->element);
 	}
 
 	/**
@@ -102,15 +59,15 @@ class PreventionPlanDocument extends DigiriskDocuments
 	{
 		global $conf;
 
-		$digiriskelement = new DigiriskElement($this->db);
-		$resources = new DigiriskResources($this->db);
-		$preventionplan = new PreventionPlan($this->db);
-		$signatory = new PreventionPlanSignature($this->db);
-		$societe = new Societe($this->db);
+		$digiriskelement    = new DigiriskElement($this->db);
+		$resources          = new DigiriskResources($this->db);
+		$preventionplan     = new PreventionPlan($this->db);
+		$signatory          = new SaturneSignature($this->db, $this->module, $preventionplan->element);
+		$societe            = new Societe($this->db);
 		$preventionplanline = new PreventionPlanLine($this->db);
-		$risk = new Risk($this->db);
-		$openinghours = new Openinghours($this->db);
-		$json         = array();
+		$risk               = new Risk($this->db);
+		$openinghours       = new Openinghours($this->db);
+		$json               = array();
 
 		$id = GETPOST('id');
 		if ($id > 0) {

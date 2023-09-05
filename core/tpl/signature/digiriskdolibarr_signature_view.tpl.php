@@ -1,4 +1,4 @@
-<?php if (empty($element->signature) && ($object->status == $object::STATUS_PENDING_SIGNATURE || $element->signature == $langs->transnoentities("FileGenerated")) && $element->status != $element::STATUS_ABSENT) : ?>
+<?php if (empty($element->signature) && ($object->status == $object::STATUS_VALIDATED || $element->signature == $langs->transnoentities("FileGenerated")) && $element->status != $element::STATUS_ABSENT) : ?>
 	<div class="wpeo-button button-blue wpeo-modal-event modal-signature-open modal-open" value="<?php echo $element->id ?>">
 		<span><i class="fas fa-signature"></i> <?php echo $langs->trans('Sign'); ?></span>
 	</div>

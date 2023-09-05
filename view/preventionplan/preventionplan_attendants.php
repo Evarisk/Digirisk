@@ -352,7 +352,7 @@ print dol_get_fiche_end(); ?>
 	</div>
 </div>
 <?php
-if ($object->status == $object::STATUS_PENDING_SIGNATURE && $signatory->checkSignatoriesSignatures($object->id, 'preventionplan')) {
+if ($object->status == $object::STATUS_VALIDATED && $signatory->checkSignatoriesSignatures($object->id, 'preventionplan')) {
 	print '<a class="butAction" style="width = 100%;margin-right:0" href="' . DOL_URL_ROOT . '/custom/digiriskdolibarr/view/preventionplan/preventionplan_card.php?id=' . $id . '">' . $langs->trans("GoToLockPreventionPlan") . '</a>';
 }
 

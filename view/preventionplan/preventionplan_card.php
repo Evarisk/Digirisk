@@ -21,48 +21,42 @@
  *		\brief      Page to create/edit/view preventionplan
  */
 
-// Load Dolibarr environment
-$res = 0;
-// Try main.inc.php into web root known defined into CONTEXT_DOCUMENT_ROOT (not always defined)
-if ( ! $res && ! empty($_SERVER["CONTEXT_DOCUMENT_ROOT"])) $res = @include $_SERVER["CONTEXT_DOCUMENT_ROOT"] . "/main.inc.php";
-// Try main.inc.php into web root detected using web root calculated from SCRIPT_FILENAME
-$tmp = empty($_SERVER['SCRIPT_FILENAME']) ? '' : $_SERVER['SCRIPT_FILENAME']; $tmp2 = realpath(__FILE__); $i = strlen($tmp) - 1; $j = strlen($tmp2) - 1;
-while ($i > 0 && $j > 0 && isset($tmp[$i]) && isset($tmp2[$j]) && $tmp[$i] == $tmp2[$j]) { $i--; $j--; }
-if ( ! $res && $i > 0 && file_exists(substr($tmp, 0, ($i + 1)) . "/main.inc.php")) $res          = @include substr($tmp, 0, ($i + 1)) . "/main.inc.php";
-if ( ! $res && $i > 0 && file_exists(dirname(substr($tmp, 0, ($i + 1))) . "/main.inc.php")) $res = @include dirname(substr($tmp, 0, ($i + 1))) . "/main.inc.php";
-// Try main.inc.php using relative path
-if ( ! $res && file_exists("../../main.inc.php")) $res       = @include "../../main.inc.php";
-if ( ! $res && file_exists("../../../main.inc.php")) $res    = @include "../../../main.inc.php";
-if ( ! $res && file_exists("../../../../main.inc.php")) $res = @include "../../../../main.inc.php";
-if ( ! $res) die("Include of main fails");
+// Load DigiriskDolibarr environment
+if (file_exists('../digiriskdolibarr.main.inc.php')) {
+	require_once __DIR__ . '/../digiriskdolibarr.main.inc.php';
+} elseif (file_exists('../../digiriskdolibarr.main.inc.php')) {
+	require_once __DIR__ . '/../../digiriskdolibarr.main.inc.php';
+} else {
+	die('Include of digiriskdolibarr main fails');
+}
 
 require_once DOL_DOCUMENT_ROOT . '/core/class/html.form.class.php';
 require_once DOL_DOCUMENT_ROOT .'/core/class/html.formprojet.class.php';
 require_once DOL_DOCUMENT_ROOT . '/core/class/doleditor.class.php';
 require_once DOL_DOCUMENT_ROOT . '/core/lib/images.lib.php';
 
+require_once __DIR__ . '/../../../saturne/class/saturnesignature.class.php';
 require_once __DIR__ . '/../../class/digiriskdocuments.class.php';
 require_once __DIR__ . '/../../class/digiriskelement.class.php';
 require_once __DIR__ . '/../../class/digiriskresources.class.php';
 require_once __DIR__ . '/../../class/preventionplan.class.php';
 require_once __DIR__ . '/../../class/riskanalysis/risk.class.php';
-require_once __DIR__ . '/../../class/digiriskdocuments/preventionplandocument.class.php';
+require_once __DIR__ . '/../../class/digiriskdolibarrdocuments/preventionplandocument.class.php';
 require_once __DIR__ . '/../../lib/digiriskdolibarr_function.lib.php';
 require_once __DIR__ . '/../../lib/digiriskdolibarr_preventionplan.lib.php';
-require_once __DIR__ . '/../../core/modules/digiriskdolibarr/digiriskelement/preventionplan/mod_preventionplan_standard.php';
-require_once __DIR__ . '/../../core/modules/digiriskdolibarr/digiriskelement/preventionplandet/mod_preventionplandet_standard.php';
-require_once __DIR__ . '/../../core/modules/digiriskdolibarr/digiriskdocuments/preventionplandocument/mod_preventionplandocument_standard.php';
-require_once __DIR__ . '/../../core/modules/digiriskdolibarr/digiriskdocuments/preventionplandocument/modules_preventionplandocument.php';
+require_once __DIR__ . '/../../core/modules/digiriskdolibarr/digiriskdolibarrdocuments/preventionplandocument/modules_preventionplandocument.php';
 
 global $conf, $db, $hookmanager, $langs, $user;
 
 // Load translation files required by the page
-$langs->loadLangs(array("digiriskdolibarr@digiriskdolibarr", "other"));
+saturne_load_langs(['other']);
+
 // Get parameters
 $id                  = GETPOST('id', 'int');
 $lineid              = GETPOST('lineid', 'int');
 $ref                 = GETPOST('ref', 'alpha');
 $action              = GETPOST('action', 'aZ09');
+$subaction           = GETPOST('subaction', 'aZ09');
 $confirm             = GETPOST('confirm', 'alpha');
 $cancel              = GETPOST('cancel', 'aZ09');
 $contextpage         = GETPOST('contextpage', 'aZ') ? GETPOST('contextpage', 'aZ') : 'preventionplancard'; // To manage different context of search
@@ -72,9 +66,9 @@ $fk_parent           = GETPOST('fk_parent', 'int');
 
 // Initialize technical objects
 $object                  = new PreventionPlan($db);
-$objectline              = new PreventionPlanLine($db);
-$signatory               = new PreventionPlanSignature($db);
-$preventionplandocument  = new PreventionPlanDocument($db);
+$preventionplandet       = new PreventionPlanLine($db);
+$signatory               = new SaturneSignature($db);
+$document                = new PreventionPlanDocument($db);
 $digiriskelement         = new DigiriskElement($db);
 $digiriskresources       = new DigiriskResources($db);
 $risk                    = new Risk($db);
@@ -91,9 +85,16 @@ $object->fetch($id);
 // Load resources
 $allLinks = $resources->digirisk_dolibarr_fetch_resources();
 
+$numberingModules = [
+	'digiriskelement/' . $object->element            => $conf->global->DIGIRISKDOLIBARR_PREVENTIONPLAN_ADDON,
+	'digiriskelement/' . $preventionplandet->element => $conf->global->DIGIRISKDOLIBARR_PREVENTIONPLANDET_ADDON
+];
+
+list($refPreventionPlanDetMod, $refPreventionPlanMod) = saturne_require_objects_mod($numberingModules, $moduleNameLowerCase);
+
 // Fetch optionals attributes and labels
 $extrafields->fetch_name_optionals_label($object->table_element);
-$extrafields->fetch_name_optionals_label($objectline->table_element);
+$extrafields->fetch_name_optionals_label($preventionplandet->table_element);
 
 $hookmanager->initHooks(array('preventionplancard', 'globalcard')); // Note that conf->hooks_modules contains array
 
@@ -105,10 +106,8 @@ $permissiontoread   = $user->rights->digiriskdolibarr->preventionplan->read;
 $permissiontoadd    = $user->rights->digiriskdolibarr->preventionplan->write;
 $permissiontodelete = $user->rights->digiriskdolibarr->preventionplan->delete;
 
-if ( ! $permissiontoread) accessforbidden();
+saturne_check_access($permissiontoadd);
 
-$refPreventionPlanMod    = new $conf->global->DIGIRISKDOLIBARR_PREVENTIONPLAN_ADDON($db);
-$refPreventionPlanDetMod = new  $conf->global->DIGIRISKDOLIBARR_PREVENTIONPLANDET_ADDON($db);
 
 /*
  * Actions
@@ -378,14 +377,14 @@ if (empty($reshook)) {
 		$parent_id           = GETPOST('parent_id');
 
 		// Initialize object preventionplan line
-		$objectline->date_creation     = $object->db->idate($now);
-		$objectline->ref               = $refPreventionPlanDetMod->getNextValue($objectline);
-		$objectline->entity            = $conf->entity;
-		$objectline->description       = $actions_description;
-		$objectline->category          = $risk_category_id;
-		$objectline->prevention_method = $prevention_method;
-		$objectline->fk_preventionplan = $parent_id;
-		$objectline->fk_element        = $location;
+		$preventionplandet->date_creation     = $object->db->idate($now);
+		$preventionplandet->ref               = $preventionplandet->getNextNumRef();
+		$preventionplandet->entity            = $conf->entity;
+		$preventionplandet->description       = $actions_description;
+		$preventionplandet->category          = $risk_category_id;
+		$preventionplandet->prevention_method = $prevention_method;
+		$preventionplandet->fk_preventionplan = $parent_id;
+		$preventionplandet->fk_element        = $location;
 
 		// Check parameters
 		if ($location < 1) {
@@ -399,19 +398,19 @@ if (empty($reshook)) {
 		}
 
 		if ( ! $error) {
-			$result = $objectline->insert($user, false);
+			$result = $preventionplandet->insert($user, false);
 			if ($result > 0) {
 				// Creation prevention plan line OK
-				setEventMessages($langs->trans('AddPreventionPlanLine') . ' ' . $objectline->ref . ' ' . $langs->trans('PreventionPlanMessage'), array());
-				$objectline->call_trigger('PREVENTIONPLANDET_CREATE', $user);
+				setEventMessages($langs->trans('AddPreventionPlanLine') . ' ' . $preventionplandet->ref . ' ' . $langs->trans('PreventionPlanMessage'), array());
+				$preventionplandet->call_trigger('PREVENTIONPLANDET_CREATE', $user);
 				$urltogo = str_replace('__ID__', $result, $backtopage);
 				$urltogo = preg_replace('/--IDFORBACKTOPAGE--/', $id, $urltogo); // New method to autoselect project after a New on another form object creation
 				header("Location: " . $urltogo);
 				exit;
 			} else {
 				// Creation prevention plan line KO
-				if ( ! empty($objectline->errors)) setEventMessages(null, $objectline->errors, 'errors');
-				else setEventMessages($objectline->error, null, 'errors');
+				if ( ! empty($preventionplandet->errors)) setEventMessages(null, $preventionplandet->errors, 'errors');
+				else setEventMessages($preventionplandet->error, null, 'errors');
 			}
 		}
 	}
@@ -425,14 +424,14 @@ if (empty($reshook)) {
 		$risk_category_id    = GETPOST('risk_category_id');
 		$parent_id           = GETPOST('parent_id');
 
-		$objectline->fetch($lineid);
+		$preventionplandet->fetch($lineid);
 
 		// Initialize object prevention plan line
-		$objectline->description       = $actions_description;
-		$objectline->category          = $risk_category_id;
-		$objectline->prevention_method = $prevention_method;
-		$objectline->fk_preventionplan = $parent_id;
-		$objectline->fk_element        = $location;
+		$preventionplandet->description       = $actions_description;
+		$preventionplandet->category          = $risk_category_id;
+		$preventionplandet->prevention_method = $prevention_method;
+		$preventionplandet->fk_preventionplan = $parent_id;
+		$preventionplandet->fk_element        = $location;
 
 		// Check parameters
 		if ($parent_id < 1) {
@@ -445,93 +444,42 @@ if (empty($reshook)) {
 		}
 
 		if ( ! $error) {
-			$result = $objectline->update($user, false);
+			$result = $preventionplandet->update($user, false);
 			if ($result > 0) {
 				// Update prevention plan line OK
-				setEventMessages($langs->trans('UpdatePreventionPlanLine') . ' ' . $objectline->ref . ' ' . $langs->trans('PreventionPlanMessage'), array());
+				setEventMessages($langs->trans('UpdatePreventionPlanLine') . ' ' . $preventionplandet->ref . ' ' . $langs->trans('PreventionPlanMessage'), array());
 				$urltogo = str_replace('__ID__', $result, $backtopage);
 				$urltogo = preg_replace('/--IDFORBACKTOPAGE--/', $parent_id, $urltogo); // New method to autoselect project after a New on another form object creation
 				header("Location: " . $urltogo);
 				exit;
 			} else {
 				// Update prevention plan line KO
-				if ( ! empty($objectline->errors)) setEventMessages(null, $objectline->errors, 'errors');
-				else setEventMessages($objectline->error, null, 'errors');
+				if ( ! empty($preventionplandet->errors)) setEventMessages(null, $preventionplandet->errors, 'errors');
+				else setEventMessages($preventionplandet->error, null, 'errors');
 			}
 		}
 	}
 
 	// Action to delete line
 	if ($action == 'deleteline' && $permissiontodelete) {
-		$objectline->fetch($lineid);
-		$result = $objectline->delete($user, false);
+		$preventionplandet->fetch($lineid);
+		$result = $preventionplandet->delete($user, false);
 		if ($result > 0) {
 			// Delete prevention plan line OK
-			setEventMessages($langs->trans('DeletePreventionPlanLine') . ' ' . $objectline->ref . ' ' . $langs->trans('PreventionPlanMessage'), array());
+			setEventMessages($langs->trans('DeletePreventionPlanLine') . ' ' . $preventionplandet->ref . ' ' . $langs->trans('PreventionPlanMessage'), array());
 			$urltogo = str_replace('__ID__', $result, $backtopage);
 			$urltogo = preg_replace('/--IDFORBACKTOPAGE--/', $parent_id, $urltogo); // New method to autoselect project after a New on another form object creation
 			header("Location: " . $urltogo);
 			exit;
 		} else {
 			// Delete prevention plan line KO
-			if ( ! empty($objectline->errors)) setEventMessages(null, $objectline->errors, 'errors');
-			else setEventMessages($objectline->error, null, 'errors');
+			if ( ! empty($preventionplandet->errors)) setEventMessages(null, $preventionplandet->errors, 'errors');
+			else setEventMessages($preventionplandet->error, null, 'errors');
 		}
 	}
 
-	// Action to build doc
-	if (($action == 'builddoc' || GETPOST('forcebuilddoc')) && $permissiontoadd) {
-		$outputlangs = $langs;
-		$newlang     = '';
-
-		if ($conf->global->MAIN_MULTILANGS && empty($newlang) && GETPOST('lang_id', 'aZ09')) $newlang = GETPOST('lang_id', 'aZ09');
-		if ( ! empty($newlang)) {
-			$outputlangs = new Translate("", $conf);
-			$outputlangs->setDefaultLang($newlang);
-		}
-
-		// To be sure vars is defined
-		if (empty($hidedetails)) $hidedetails = 0;
-		if (empty($hidedesc)) $hidedesc       = 0;
-		if (empty($hideref)) $hideref         = 0;
-		if (empty($moreparams)) $moreparams   = null;
-
-		$model = GETPOST('model', 'alpha');
-
-		$moreparams['object'] = $object;
-		$moreparams['user']   = $user;
-
-		$result = $preventionplandocument->generateDocument($model, $outputlangs, $hidedetails, $hidedesc, $hideref, $moreparams);
-		if ($result <= 0) {
-			setEventMessages($object->error, $object->errors, 'errors');
-			$action = '';
-		} else {
-			setEventMessages($langs->trans("FileGenerated") . ' - ' . $preventionplandocument->last_main_doc, null);
-
-			if ($object->status == $object::STATUS_LOCKED) {
-				$signatories = $signatory->fetchSignatory("", $object->id, 'preventionplan');
-				if ( ! empty($signatories) && $signatories > 0) {
-					foreach ($signatories as $arrayRole) {
-						foreach ($arrayRole as $signatory) {
-							$signatory->signature = $langs->transnoentities("FileGenerated");
-							$signatory->update($user, false);
-						}
-					}
-				}
-			}
-
-			$urltoredirect = $_SERVER['REQUEST_URI'];
-			$urltoredirect = preg_replace('/#builddoc$/', '', $urltoredirect);
-			$urltoredirect = preg_replace('/action=builddoc&?/', '', $urltoredirect); // To avoid infinite loop
-			if (preg_match('/forcebuilddoc=1/', $urltoredirect)) {
-				$urltoredirect = preg_replace('/forcebuilddoc=1&?/', '', $urltoredirect); // To avoid infinite loop
-				header('Location: ' . $urltoredirect . '#sendEmail');
-			} else {
-				header('Location: ' . $urltoredirect . '#builddoc');
-			}
-			exit;
-		}
-	}
+	// Actions builddoc, forcebuilddoc, remove_file.
+	require_once __DIR__ . '/../../../saturne/core/tpl/documents/documents_action.tpl.php';
 
 	// Action to generate pdf from odt file
 	require_once __DIR__ . '/../../core/tpl/documents/digiriskdolibarr_manual_pdf_generation_action.tpl.php';
@@ -579,7 +527,7 @@ if (empty($reshook)) {
 		}
 	}
 
-	// Action to set status STATUS_PENDING_SIGNATURE
+	// Action to set status STATUS_VALIDATED
 	if ($action == 'confirm_setPendingSignature') {
 		$object->fetch($id);
 		if ( ! $error) {
@@ -689,11 +637,9 @@ $title_create  = $langs->trans("NewPreventionPlan");
 $title_edit    = $langs->trans("ModifyPreventionPlan");
 $object->picto = 'preventionplandocument@digiriskdolibarr';
 
-$help_url = 'FR:Module_Digirisk#DigiRisk_-_Plan_de_pr.C3.A9vention';
-$morejs   = array("/digiriskdolibarr/js/digiriskdolibarr.js");
-$morecss  = array("/digiriskdolibarr/css/digiriskdolibarr.css");
+$helpUrl = 'FR:Module_Digirisk#DigiRisk_-_Plan_de_pr.C3.A9vention';
 
-llxHeader('', $title, $help_url, '', '', '', $morejs, $morecss);
+saturne_header(1, '', $title, $helpUrl);
 
 // Part to create
 if ($action == 'create') {
@@ -1039,9 +985,7 @@ if ((empty($action) || ($action != 'create' && $action != 'edit'))) {
 
 	$object->fetch_optionals();
 
-	$head = preventionplanPrepareHead($object);
-	print dol_get_fiche_head($head, 'preventionplanCard', $title, -1, "digiriskdolibarr@digiriskdolibarr");
-
+	saturne_get_fiche_head($object, 'card', $title);
 	$width = 80; $cssclass = 'photoref';
 	dol_strlen($object->label) ? $morehtmlref = '<span>' . ' - ' . $object->label . '</span>' : '';
 	$morehtmlref                             .= '<div class="refidno">';
@@ -1182,7 +1126,7 @@ if ((empty($action) || ($action != 'create' && $action != 'edit'))) {
 			print '<span class="' . (($object->status == 2 && $signatory->checkSignatoriesSignatures($object->id, 'preventionplan')) ? 'butAction' : 'butActionRefused classfortooltip') . '" id="' . (($object->status == 2 && $signatory->checkSignatoriesSignatures($object->id, 'preventionplan')) ? 'actionButtonLock' : '') . '" title="' . (($object->status == 2 && $signatory->checkSignatoriesSignatures($object->id, 'preventionplan')) ? '' : dol_escape_htmltag($langs->trans("AllSignatoriesMustHaveSigned"))) . '">' . $langs->trans("Lock") . '</span>';
 
 			$objref    = dol_sanitizeFileName($object->ref);
-			$dir_files = $preventionplandocument->element . '/' . $objref;
+			$dir_files = $document->element . '/' . $objref;
 			$filedir   = $upload_dir . '/' . $dir_files;
 
 			$filelist = dol_dir_list($filedir, 'files');
@@ -1244,7 +1188,7 @@ if ((empty($action) || ($action != 'create' && $action != 'edit'))) {
 		$colspan = 3;
 
 		// Lines
-		$objectlines = $objectline->fetchAll('', '', 0, 0, array(), 'AND', GETPOST('id'));
+		$preventionplandets = $preventionplandet->fetchAll('', '', 0, 0, array(), 'AND', GETPOST('id'));
 
 		print '<tr class="liste_titre">';
 		print '<td><span>' . $langs->trans('Ref.') . '</span></td>';
@@ -1255,9 +1199,9 @@ if ((empty($action) || ($action != 'create' && $action != 'edit'))) {
 		print '<td class="center" colspan="' . $colspan . '">' . $langs->trans('ActionsPreventionPlanRisk') . '</td>';
 		print '</tr>';
 
-		if ( ! empty($objectlines) && $objectlines > 0) {
+		if ( ! empty($preventionplandets) && $preventionplandets > 0) {
 			print '<tr>';
-			foreach ($objectlines as $key => $item) {
+			foreach ($preventionplandets as $key => $item) {
 				if ($action == 'editline' && $lineid == $key) {
 					print '<form method="POST" action="' . $_SERVER["PHP_SELF"] . '?id=' . $object->id . '">';
 					print '<input type="hidden" name="token" value="' . newToken() . '">';
@@ -1325,8 +1269,8 @@ if ((empty($action) || ($action != 'create' && $action != 'edit'))) {
 					print '</td>';
 					print '</tr>';
 
-					if (is_object($objectline)) {
-						print $objectline->showOptionals($extrafields, 'edit', array('style' => $bcnd[$var], 'colspan' => $coldisplay), '', '', 1);
+					if (is_object($preventionplandet)) {
+						print $preventionplandet->showOptionals($extrafields, 'edit', array('style' => $bcnd[$var], 'colspan' => $coldisplay), '', '', 1);
 					}
 					print '</form>';
 				} else {
@@ -1380,8 +1324,8 @@ if ((empty($action) || ($action != 'create' && $action != 'edit'))) {
 						print '</td>';
 					}
 
-					if (is_object($objectline)) {
-						print $objectline->showOptionals($extrafields, 'edit', array('style' => $bcnd[$var], 'colspan' => $coldisplay), '', '', 1);
+					if (is_object($preventionplandet)) {
+						print $preventionplandet->showOptionals($extrafields, 'edit', array('style' => $bcnd[$var], 'colspan' => $coldisplay), '', '', 1);
 					}
 					print '</tr>';
 				}
@@ -1397,7 +1341,7 @@ if ((empty($action) || ($action != 'create' && $action != 'edit'))) {
 
 			print '<tr>';
 			print '<td>';
-			print $refPreventionPlanDetMod->getNextValue($objectline);
+			print $refPreventionPlanDetMod->getNextValue($preventionplandet);
 			print '</td>';
 			print '<td>';
 			print $digiriskelement->select_digiriskelement_list('', 'fk_element', '', 0, 0, array(), 0, 0, 'minwidth100', '', false, 1);
@@ -1448,8 +1392,8 @@ if ((empty($action) || ($action != 'create' && $action != 'edit'))) {
 			print '</td>';
 			print '</tr>';
 
-			if (is_object($objectline)) {
-				print $objectline->showOptionals($extrafields, 'edit', array('style' => $bcnd[$var], 'colspan' => $coldisplay), '', '', 1);
+			if (is_object($preventionplandet)) {
+				print $preventionplandet->showOptionals($extrafields, 'edit', array('style' => $bcnd[$var], 'colspan' => $coldisplay), '', '', 1);
 			}
 			print '</form>';
 		}
@@ -1457,13 +1401,12 @@ if ((empty($action) || ($action != 'create' && $action != 'edit'))) {
 		print '</div>';
 	}
 	// Document Generation -- Génération des documents
-	$includedocgeneration = 1;
-	if ($includedocgeneration && $permissiontoadd) {
+	if ($permissiontoadd) {
 		print '<div class=""><div class="preventionplanDocument fichehalfleft">';
 
 		$objref    = dol_sanitizeFileName($object->ref);
-		$dir_files = $preventionplandocument->element . '/' . $objref;
-		$filedir   = $upload_dir . '/' . $dir_files;
+		$dirFiles  = $document->element . '/' . $objref;
+		$filedir   = $upload_dir . '/' . $dirFiles;
 		$urlsource = $_SERVER["PHP_SELF"] . '?id=' . $id;
 
 		$modulepart   = 'digiriskdolibarr:PreventionPlanDocument';
@@ -1483,7 +1426,7 @@ if ((empty($action) || ($action != 'create' && $action != 'edit'))) {
 			}
 		}
 
-		print digiriskshowdocuments($modulepart, $dir_files, $filedir, $urlsource, $genallowed, 0, $defaultmodel, 1, 0, '', $title, '', '', $preventionplandocument, 0, 'remove_file', $object->status < $object::STATUS_ARCHIVED && $filesigned == 0, $langs->trans('PreventionPlanGenerated'));
+		print saturne_show_documents($modulepart, $dirFiles, $filedir, $urlsource, $genallowed, 0, '$defaultmodel', 1, 0, 0, 0, 0, $title, 0, 0, empty($soc->default_lang) ? '' : $soc->default_lang, $object, 0, 'remove_file', (($object->status > $object::STATUS_VALIDATED) ? 1 : 0), $langs->trans('ControlMustBeValidatedToGenerated'));
 	}
 
 	if ($permissiontoadd) {
