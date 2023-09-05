@@ -109,7 +109,7 @@ class AccidentInvestigation extends SaturneObject
 	/**
 	* @var array  Array with all fields and their property. Do not use it as a static var. It may be modified by constructor.
 	*/
-	public array $fields = [
+	public $fields = [
 		'rowid'                => ['type' => 'integer',      'label' => 'TechnicalID',            'enabled' => 1, 'position' => 1,   'notnull' => 1, 'visible' => 0, 'noteditable' => 1, 'index' => 1, 'comment' => "Id"],
 		'ref'                  => ['type' => 'varchar(128)', 'label' => 'Ref',                    'enabled' => 1, 'position' => 10,  'notnull' => 1, 'visible' => 4, 'noteditable' => 1, 'default' => '(PROV)', 'index' => 1, 'searchall' => 1, 'showoncombobox' => 1, 'comment' => "Reference of object"],
 		'ref_ext'              => ['type' => 'varchar(128)', 'label' => 'RefExt',                 'enabled' => 1, 'position' => 20,  'notnull' => 0, 'visible' => 0,],
@@ -252,6 +252,33 @@ class AccidentInvestigation extends SaturneObject
 	public function __construct(DoliDB $db)
 	{
 		parent::__construct($db, $this->module, $this->element);
+	}
+
+	/**
+	 * Write information of trigger description
+	 *
+	 * @param  Object $object Object calling the trigger
+	 * @return string         Description to display in actioncomm->note_private
+	 */
+	public function getTriggerDescription(SaturneObject $object): string
+	{
+		global $langs;
+
+		$accident = new Accident($this->db);
+		$accident->fetch($object->fk_accident);
+
+		$ret   = parent::getTriggerDescription($object);
+		$ret  .= $langs->transnoentities('Accident') . ' : ' . $accident->ref . ' - ' . $accident->label . '</br>';
+		$ret  .= (!empty($object->seniority_at_post) ? $langs->transnoentities('SeniorityAtPost') . ' : ' . $object->seniority_at_post . '</br>' : '');
+		$ret  .= (!empty($object->victim_skills) ? $langs->transnoentities('VictimSkills') . ' : ' . $object->victim_skills . '</br>' : '');
+		$ret  .= (!empty($object->collective_equipment) ? $langs->transnoentities('CollectiveEquipment') . ' : ' . $object->collective_equipment . '</br>' : '');
+		$ret  .= (!empty($object->individual_equipment) ? $langs->transnoentities('IndividualEquipment') . ' : ' . $object->individual_equipment . '</br>' : '');
+		$ret  .= (!empty($object->circumstances) ? $langs->transnoentities('Circumstances') . ' : ' . $object->circumstances . '</br>' : '');
+		$ret  .= (!empty($object->causality_tree) ? $langs->transnoentities('CausalityTree') . ' : ' . $object->causality_tree . '</br>' : '');
+		$ret  .= (!empty($object->note_public) ? $langs->transnoentities('NotePublic') . ' : ' . $object->note_public . '</br>' : '');
+		$ret  .= (!empty($object->note_private) ? $langs->transnoentities('NotePrivate') . ' : ' . $object->note_private . '</br>' : '');
+
+		return $ret;
 	}
 
 	/**

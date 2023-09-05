@@ -36,7 +36,7 @@ if ( ! $res && file_exists("../../../main.inc.php")) $res    = @include "../../.
 if ( ! $res && file_exists("../../../../main.inc.php")) $res = @include "../../../../main.inc.php";
 if ( ! $res) die("Include of main fails");
 
-global $conf, $db, $langs, $user;
+global $conf, $db, $langs, $module, $user;
 
 // Libraries
 require_once DOL_DOCUMENT_ROOT.'/core/lib/admin.lib.php';
@@ -144,6 +144,29 @@ $param .= '&search_event='.urlencode($search_event);
 // Configuration header
 $head = digiriskdolibarrAdminPrepareHead();
 print dol_get_fiche_head($head, 'event', '', -1, 'digiriskdolibarr@digiriskdolibarr');
+
+print load_fiche_titre($langs->trans('ConfTrigger'), '', '');
+
+print '<table class="noborder centpercent">';
+print '<tr class="liste_titre">';
+print '<td>' . $langs->trans('Name') . '</td>';
+print '<td>' . $langs->trans('Description') . '</td>';
+print '<td class="center">' . $langs->trans('Status') . '</td>';
+print '</tr>';
+
+print '<tr class="oddeven"><td>';
+print $langs->trans('AdvancedTriggers');
+print '</td><td>';
+print $langs->trans('AdvancedTriggersDescription', ucfirst($module));
+print '</td>';
+
+print '<td class="center">';
+print ajax_constantonoff('DIGIRISKDOLIBARR_ADVANCED_TRIGGER');
+print '</td>';
+print '</tr>';
+print '</table>';
+
+print load_fiche_titre($langs->trans('ConfEventAuto'), '', '');
 
 print '<span class="opacitymedium">'.$langs->trans("DigiriskEventAutoDesc").'</span><br>';
 print "<br>\n";
