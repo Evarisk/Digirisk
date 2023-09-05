@@ -118,7 +118,7 @@ class AccidentInvestigation extends SaturneObject
 		'tms'                  => ['type' => 'timestamp',    'label' => 'DateModification',       'enabled' => 1, 'position' => 50,  'notnull' => 0, 'visible' => 0,],
 		'import_key'           => ['type' => 'varchar(14)',  'label' => 'ImportId',               'enabled' => 1, 'position' => 60,  'notnull' => 0, 'visible' => 0, 'index' => 0],
 		'status'               => ['type' => 'smallint',     'label' => 'Status',                 'enabled' => 1, 'position' => 70,  'notnull' => 1, 'visible' => 2, 'noteditable' => 1, 'default' => 0, 'index' => 0,],
-		'seniority_at_post'    => ['type' => 'integer',      'label' => 'SeniorityAtPost',        'enabled' => 1, 'position' => 80,  'notnull' => 0, 'visible' => 1,],
+		'seniority_at_post'    => ['type' => 'varchar(255)', 'label' => 'SeniorityAtPost',        'enabled' => 1, 'position' => 80,  'notnull' => 0, 'visible' => 1,],
 		'date_start'           => ['type' => 'datetime',     'label' => 'DateInvestigationStart', 'enabled' => 1, 'position' => 90,  'notnull' => 0, 'visible' => 1,],
 		'date_end'             => ['type' => 'datetime',     'label' => 'DateInvestigationEnd',   'enabled' => 1, 'position' => 100, 'notnull' => 0, 'visible' => 1,],
 		'note_public'          => ['type' => 'html',         'label' => 'NotePublic',             'enabled' => 1, 'position' => 110, 'notnull' => 0, 'visible' => -1,],
@@ -129,7 +129,7 @@ class AccidentInvestigation extends SaturneObject
 		'circumstances'        => ['type' => 'html',         'label' => 'Circumstances',          'enabled' => 1, 'position' => 160, 'notnull' => 0, 'visible' => -1,],
 		'causality_tree'       => ['type' => 'text',         'label' => 'CausalityTree',          'enabled' => 1, 'position' => 170, 'notnull' => 0, 'visible' => 0,],
 		'fk_accident'          => ['type' => 'integer:Accident:custom/digiriskdolibarr/class/accident/accident.class.php:1', 'label' => 'FkAccident', 'picto' => 'fontawesome_fa-user-injured_fas' ,'enabled' => 1, 'position' => 11, 'notnull' => 1, 'visible' => 1, 'foreignkey' => 'digiriskdolibarr_accident.rowid', 'css' => 'maxwidth300'],
-		'fk_task'              => ['type' => 'integer:Task:projet/class/task.class.php', 'label' => 'FkTask',     'picto' => 'Task', 'enabled' => 1, 'position' => 12, 'notnull' => 1, 'visible' => 4,  'noteditable' => 1, 'foreignkey' => 'projet_task.rowid'],
+		'fk_task'              => ['type' => 'integer:Task:projet/class/task.class.php', 'label' => 'FkTask',     'picto' => 'Task', 'enabled' => 1, 'position' => 12, 'notnull' => 1, 'visible' => 4,  'noteditable' => 1, 'foreignkey' => 'projet_task.rowid', 'help' => 'TaskWillBeCreatedAfterValidation'],
 		'fk_user_creat'        => ['type' => 'integer:User:user/class/user.class.php',   'label' => 'UserAuthor', 'picto' => 'user', 'enabled' => 1, 'position' => 190, 'notnull' => 1, 'visible' => 0, 'foreignkey' => 'user.rowid'],
 		'fk_user_modif'        => ['type' => 'integer:User:user/class/user.class.php',   'label' => 'UserModif',  'picto' => 'user', 'enabled' => 1, 'position' => 200, 'notnull' => 0, 'visible' => 0, 'foreignkey' => 'user.rowid'],
 	];
@@ -227,7 +227,7 @@ class AccidentInvestigation extends SaturneObject
 	/**
 	 * @var int Task ID.
 	 */
-	public int $fk_task;
+	public int $fk_task = 0;
 
 	/**
 	 * @var int|string Accident ID.
@@ -255,6 +255,27 @@ class AccidentInvestigation extends SaturneObject
 	}
 
 	/**
+	 * Create object into database.
+	 *
+	 * @param  User $user      User that creates.
+	 * @param  bool $notrigger false = launch triggers after, true = disable triggers.
+	 * @return int             0 < if KO, ID of created object if OK.
+	 */
+	public function create(User $user, bool $notrigger = false): int
+	{
+		global $moduleNameLowerCase;
+
+		$signatory = new SaturneSignature($this->db, $moduleNameLowerCase, $this->element);
+
+		$result = $this->createCommon($user, $notrigger);
+		if ($result > 0) {
+			$signatory->setSignatory($result, $this->element, 'user', [$user->id], 'Investigator', 1);
+		}
+
+		return $result;
+	}
+
+	/**
 	 * Write information of trigger description
 	 *
 	 * @param  Object $object Object calling the trigger
@@ -279,6 +300,82 @@ class AccidentInvestigation extends SaturneObject
 		$ret  .= (!empty($object->note_private) ? $langs->transnoentities('NotePrivate') . ' : ' . $object->note_private . '</br>' : '');
 
 		return $ret;
+	}
+
+	/**
+	 * Clone an object into another one.
+	 *
+	 * @param  User      $user    User that creates
+	 * @param  int       $fromID  ID of object to clone.
+	 * @return int                New object created, <0 if KO.
+	 * @throws Exception
+	 */
+	public function createFromClone(User $user, int $fromID): int
+	{
+		dol_syslog(__METHOD__, LOG_DEBUG);
+
+		$error = 0;
+
+		$object = new self($this->db);
+		$this->db->begin();
+
+		// Load source object.
+		$object->fetchCommon($fromID);
+
+		// Reset some properties.
+		unset($object->id);
+		unset($object->fk_user_creat);
+		unset($object->import_key);
+
+		// Clear fields.
+		if (property_exists($object, 'ref')) {
+			$object->ref = '';
+		}
+		if (!empty($options['fk_accident'])) {
+			if (property_exists($object, 'fk_accident')) {
+				$object->fk_accident = $options['fk_accident'];
+			}
+		}
+		if (property_exists($object, 'date_creation')) {
+			$object->date_creation = dol_now();
+		}
+		if (property_exists($object, 'status')) {
+			$object->status = self::STATUS_DRAFT;
+		}
+
+		// Create clone
+		$object->causality_tree = '';
+		$object->fk_task        = 0;
+		$object->context        = 'createfromclone';
+		$investigationId        = $object->create($user);
+
+		if ($investigationId > 0) {
+			// Load signatory from source object.
+			$signatory   = new SaturneSignature($this->db);
+			$signatories = $signatory->fetchSignatory('', $fromID, $this->element);
+			if (is_array($signatories) && !empty($signatories)) {
+				foreach ($signatories as $arrayRole) {
+					foreach ($arrayRole as $signatoryRole) {
+						$signatory->createFromClone($user, $signatoryRole->id, $investigationId);
+					}
+				}
+			}
+		} else {
+			$error++;
+			$this->error  = $object->error;
+			$this->errors = $object->errors;
+		}
+
+		unset($object->context);
+
+		// End.
+		if (!$error) {
+			$this->db->commit();
+			return $investigationId;
+		} else {
+			$this->db->rollback();
+			return -1;
+		}
 	}
 
 	/**

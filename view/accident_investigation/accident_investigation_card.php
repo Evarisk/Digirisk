@@ -69,7 +69,8 @@ $object     = new AccidentInvestigation($db);
 $document   = new AccidentInvestigationDocument($db);
 $project    = new Project($db);
 $task       = new Task($db);
-$signatory  = new SaturneSignature($db);
+$signatory  = new SaturneSignature($db, $object->module, $object->element);
+$victim     = new User($db);
 
 $numRefConf = strtoupper($task->element) . '_ADDON';
 
@@ -123,6 +124,11 @@ if (empty($reshook)) {
 		}
 	}
 
+	$taskExist = $task->fetch($object->fk_task);
+	if ($taskExist <= 0) {
+		$object->setValueFrom('fk_task', 0, '', '', '', '', $user);
+	}
+
 	if ($action == 'confirm_set_validate') {
 		$result = $object->validate($user);
 
@@ -131,12 +137,11 @@ if (empty($reshook)) {
 
 			if ($object->fk_task <= 0 || empty($object->fk_task)) {
 				$accident->fetch($object->fk_accident);
-
-				$task->fk_project = $accident->fk_project;
-
-				$task->ref        = $modTask->getNextValue(0, $task);
-				$task->label      = $accident->ref . ' - ' . $accident->label;
-				$result           = $task->create($user);
+				$task->fk_project                           = $accident->fk_project;
+				$task->ref                                  = $modTask->getNextValue(0, $task);
+				$task->label                                = $accident->ref . ' - ' . $accident->label;
+				$task->array_options['options_fk_accident'] = $accident->id;
+				$result                                     = $task->create($user);
 
 				if ($result > 0) {
 					$object->fk_task = $result;
@@ -170,37 +175,26 @@ if (empty($reshook)) {
 		exit();
 	}
 
-	if ($action == 'confirm_setdraft') {
-		if ($object->fk_task > 0) {
-			$curativeActionTask   = saturne_fetch_all_object_type('SaturneTask', '', '', 0, 0, ['customsql' => 'fk_task_parent = ' . $object->fk_task . ') AND (label LIKE "%- T1 -%"']);
-			$curativeActionTask   = array_pop($curativeActionTask);
-			$resOne = $curativeActionTask->delete($user);
-			$preventiveActionTask = saturne_fetch_all_object_type('SaturneTask', '', '', 0, 0, ['customsql' => 'fk_task_parent = ' . $object->fk_task . ') AND (label LIKE "%- T2 -%"']);
-			$preventiveActionTask = array_pop($preventiveActionTask);
-			$resTwo = $preventiveActionTask->delete($user);
-
-			if ($resOne > 0 && $resTwo > 0) {
-				setEventMessages('AccidentInvestigationTaskDeleted', []);
-
-				$task->fetch($object->fk_task);
-				$result = $task->delete($user);
-
-				if ($result > 0) {
-					$object->fk_task = 0;
-					$object->update($user);
-					$result = $object->setDraft($user);
-				}
-			} else {
-				setEventMessages($task->error, [], 'errors');
+	if ($action == 'confirm_archive') {
+		$modelList = saturne_get_list_of_models($db, 'accidentinvestigationdocument');
+		if (!empty($modelList)) {
+			asort($modelList);
+			$modelList = array_filter($modelList, 'saturne_remove_index');
+			if (is_array($modelList)) {
+				$models = array_keys($modelList);
 			}
-		} else {
-			$result = $object->setDraft($user);
 		}
 
+		$moreParams['object'] = $object;
+		$moreParams['user']   = $user;
+		$moreParams['zone']   = 'private';
+
+		$result = $document->generateDocument((!empty($models) ? $models[0] : ''), $langs, 0, 0, 0, $moreParams);
+
 		if ($result > 0) {
-			setEventMessages('AccidentInvestigationReOpened', []);
+			setEventMessages('AccidentInvestigationArchived', []);
 		} else {
-			setEventMessages($object->error, [], 'errors');
+			setEventMessages($document->error, [], 'errors');
 		}
 	}
 
@@ -219,6 +213,7 @@ if (empty($reshook)) {
 	// Actions to send emails.
 	$triggersendname = strtoupper($object->element) . '_SENTBYMAIL';
 	$autocopy        = 'MAIN_MAIL_AUTOCOPY_' . strtoupper($object->element) . '_TO';
+	$trackid         = $object->element . $object->id;
 	require_once DOL_DOCUMENT_ROOT . '/core/actions_sendmails.inc.php';
 }
 
@@ -293,6 +288,8 @@ if ($action == 'create') {
 	print $form->buttonsSaveCancel('Update');
 } else if ($id > 0 || (!empty($ref) && empty($action))) {
 	$object->fetch($id);
+	$accident->fetch($object->fk_accident);
+	$victim->fetch($accident->fk_user_victim);
 
 	saturne_get_fiche_head($object, 'accidentinvestigation', $title);
 	saturne_banner_tab($object);
@@ -301,27 +298,27 @@ if ($action == 'create') {
 
 	// Draft confirmation
 	if (($action == 'set_draft' && (empty($conf->use_javascript_ajax) || !empty($conf->dol_use_jmobile))) || (!empty($conf->use_javascript_ajax) && empty($conf->dol_use_jmobile))) {
-		$formConfirm .= $form->formconfirm($_SERVER['PHP_SELF'] . '?id=' . $object->id, $langs->trans('ReOpenObject', $langs->transnoentities('The' . ucfirst($object->element))),  $langs->trans('ConfirmReOpenObject', $langs->transnoentities('The' . ucfirst($object->element)), $langs->transnoentities('The' . ucfirst($object->element))), 'confirm_setdraft', '', 'yes', 'actionButtonInProgress', 350, 600);
+		$formConfirm .= $form->formconfirm($_SERVER['PHP_SELF'] . '?id=' . $object->id, $langs->trans('ReOpenObject', $langs->transnoentities('The' . ucfirst($object->element))),  $langs->trans('ConfirmReOpenInvestigation'), 'confirm_setdraft', '', 'yes', 'actionButtonInProgress', 350, 600);
 	}
 	// Validate confirmation
 	if (($action == 'set_validate' && (empty($conf->use_javascript_ajax) || !empty($conf->dol_use_jmobile))) || (!empty($conf->use_javascript_ajax) && empty($conf->dol_use_jmobile))) {
-		$formConfirm .= $form->formconfirm($_SERVER['PHP_SELF'] . '?id=' . $object->id, $langs->trans('ValidateObject', $langs->transnoentities('The' . ucfirst($object->element))), $langs->trans('ConfirmValidateObject', $langs->transnoentities('The' . ucfirst($object->element))), 'confirm_set_validate', '', 'yes', 'actionButtonValidate', 350, 600);
-	}
-	// Lock confirmation
-	if (($action == 'set_lock' && (empty($conf->use_javascript_ajax) || !empty($conf->dol_use_jmobile))) || (!empty($conf->use_javascript_ajax) && empty($conf->dol_use_jmobile))) {
-		$formConfirm .= $form->formconfirm($_SERVER['PHP_SELF'] . '?id=' . $object->id, $langs->trans('LockObject', $langs->transnoentities('The' . ucfirst($object->element))), $langs->trans('ConfirmLockObject', $langs->transnoentities('The' . ucfirst($object->element))), 'confirm_lock', '', 'yes', 'actionButtonLock', 350, 600);
+		$formConfirm .= $form->formconfirm($_SERVER['PHP_SELF'] . '?id=' . $object->id, $langs->trans('ValidateObject', $langs->transnoentities('The' . ucfirst($object->element))), $langs->trans('ConfirmValidateObject', $langs->transnoentities('The' . ucfirst($object->element)), $langs->transnoentities('The' . ucfirst($object->element))), 'confirm_set_validate', '', 'yes', 'actionButtonValidate', 350, 600);
 	}
 	// Archive confirmation
 	if (($action == 'set_archive' && (empty($conf->use_javascript_ajax) || !empty($conf->dol_use_jmobile))) || (!empty($conf->use_javascript_ajax) && empty($conf->dol_use_jmobile))) {
 		$formConfirm .= $form->formconfirm($_SERVER['PHP_SELF'] . '?id=' . $object->id, $langs->trans('ArchiveObject', $langs->transnoentities('The' . ucfirst($object->element))), $langs->trans('ConfirmArchiveObject', $langs->transnoentities('The' . ucfirst($object->element))), 'confirm_archive', '', 'yes', 'actionButtonArchive', 350, 600);
 	}
+	// Clone confirmation
+	if (($action == 'clone' && (empty($conf->use_javascript_ajax) || !empty($conf->dol_use_jmobile))) || (!empty($conf->use_javascript_ajax) && empty($conf->dol_use_jmobile))) {
+		$formConfirm .= $form->formconfirm($_SERVER['PHP_SELF'] . '?id=' . $object->id, $langs->trans('CloneObject', $langs->transnoentities('The' . ucfirst($object->element))), $langs->trans('ConfirmCloneObject', $langs->transnoentities('The' . ucfirst($object->element))), 'confirm_clone', '', 'yes', 'actionButtonClone', 350, 600);
+	}
 	// Delete confirmation
 	if ($action == 'delete') {
-		$formConfirm = $form->formconfirm($_SERVER['PHP_SELF'] . '?id=' . $object->id, $langs->trans('DeleteObject', $langs->transnoentities('The' . ucfirst($object->element))), $langs->trans('ConfirmDeleteObject', $langs->transnoentities('The' . ucfirst($object->element))), 'confirm_delete', '', 'yes', 1);
+		$formConfirm .= $form->formconfirm($_SERVER['PHP_SELF'] . '?id=' . $object->id, $langs->trans('DeleteObject', $langs->transnoentities('The' . ucfirst($object->element))), $langs->trans('ConfirmDeleteObject', $langs->transnoentities('The' . ucfirst($object->element))), 'confirm_delete', '', 'yes', 1);
 	}
 	// Remove file confirmation
 	if ($action == 'removefile') {
-		$formConfirm = $form->formconfirm($_SERVER['PHP_SELF'] . '?id=' . $object->id . '&file=' . GETPOST('file') . '&entity=' . $conf->entity, $langs->trans('RemoveFileObject'), $langs->trans('ConfirmRemoveFileObject', GETPOST('file')), 'remove_file', '', 'yes', 1, 350, 600);
+		$formConfirm .= $form->formconfirm($_SERVER['PHP_SELF'] . '?id=' . $object->id . '&file=' . GETPOST('file') . '&entity=' . $conf->entity, $langs->trans('RemoveFileObject'), $langs->trans('ConfirmRemoveFileObject', GETPOST('file')), 'remove_file', '', 'yes', 1, 350, 600);
 	}
 
 	// Call Hook formConfirm.
@@ -342,11 +339,13 @@ if ($action == 'create') {
 
 	require_once DOL_DOCUMENT_ROOT . '/core/tpl/commonfields_view.tpl.php';
 
-	print '<tr class="linked-medias causality_tree question-table"><td class=""><label for="causality_tree">' . $langs->trans("CausalityTree") . '</label></td><td class="linked-medias-list">';
+	print '<td class="titlefield">' . $langs->trans("UserVictim") . '</td>';
+	print '<td>' . $victim->getNomUrl(1) . '</td>';
+	print '<tr class="linked-medias causality_tree"> <td class=""><label for="causality_tree">' . $langs->trans("CausalityTree") . '</label></td>';
+	print '<td class="linked-medias-list">';
 	$pathPhotos = $conf->digiriskdolibarr->multidir_output[$conf->entity] . '/accident_investigation/'. $object->ref . '/causality_tree/';
-	$fileArray  = dol_dir_list($pathPhotos, 'files');
 	?>
-	<span class="add-medias" <?php echo ($object->status < AccidentInvestigation::STATUS_LOCKED && empty($object->causality_tree)) ? '' : 'style="display:none"' ?>>
+	<span class="add-medias" <?php echo ($object->status < AccidentInvestigation::STATUS_VALIDATED && empty($object->causality_tree)) ? '' : 'style="display:none"' ?>>
 		<input hidden multiple class="fast-upload" id="fast-upload-photo-default" type="file" name="userfile[]" capture="environment" accept="image/*">
 		<label for="fast-upload-photo-default">
 			<div class="wpeo-button button-square-50">
@@ -361,7 +360,7 @@ if ($action == 'create') {
 	</span>
 	<?php
 	$relativepath = 'digiriskdolibarr/medias/thumbs';
-	print saturne_show_medias_linked('digiriskdolibarr', $pathPhotos, 'small', 1, 0, 0, 0, 50, 50, 0, 0, 0, 'accident_investigation/'. $object->ref . '/causality_tree/', $object, 'causality_tree', $object->status < AccidentInvestigation::STATUS_LOCKED, $permissiontodelete && $object->status < AccidentInvestigation::STATUS_LOCKED);
+	print saturne_show_medias_linked('digiriskdolibarr', $pathPhotos, 'small', 1, 0, 0, 0, 50, 50, 0, 0, 0, 'accident_investigation/'. $object->ref . '/causality_tree/', $object, 'causality_tree', 0, $permissiontodelete && $object->status < AccidentInvestigation::STATUS_VALIDATED);
 	print '</td></tr>';
 
 	print '</table></div>';
@@ -387,44 +386,36 @@ if ($action == 'create') {
 			print '<span class="butActionRefused classfortooltip" title="' . dol_escape_htmltag($langs->trans('ObjectMustBeDraft', ucfirst($langs->transnoentities('The' . ucfirst($object->element))))) . '">' . $displayButton . '</span>';
 		}
 
-		// ReOpen.
-		$displayButton = $onPhone ? '<i class="fas fa-lock-open fa-2x"></i>' : '<i class="fas fa-lock-open"></i>' . ' ' . $langs->trans('ReOpenDoli');
-		if ($object->status == AccidentInvestigation::STATUS_VALIDATED) {
-			print '<span class="butAction" id="actionButtonInProgress" href="' . $_SERVER['PHP_SELF'] . '?id=' . $object->id . '&action=set_draft&token=' . newToken() . '">' . $displayButton . '</span>';
-		} else {
-			print '<span class="butActionRefused classfortooltip" title="' . dol_escape_htmltag($langs->trans('ObjectMustBeValidated', $langs->transnoentities('The' . ucfirst($object->element)))) . '">' . $displayButton . '</span>';
-		}
-
-		// Lock.
-		$displayButton = $onPhone ? '<i class="fas fa-lock fa-2x"></i>' : '<i class="fas fa-lock"></i>' . ' ' . $langs->trans('Lock');
-		if ($object->status == AccidentInvestigation::STATUS_VALIDATED) {
-			print '<span class="butAction" id="actionButtonLock" href="' . $_SERVER['PHP_SELF'] . '?id=' . $object->id . '&action=set_lock&token=' . newToken() . '">' . $displayButton . '</span>';
-		} else {
-			print '<span class="butActionRefused classfortooltip" title="' . dol_escape_htmltag($langs->trans('ObjectMustBeValidated', $langs->transnoentities('The' . ucfirst($object->element)))) . '">' . $displayButton . '</span>';
-		}
-
 		// Send email.
 		$displayButton = $onPhone ? '<i class="fas fa-paper-plane fa-2x"></i>' : '<i class="fas fa-paper-plane"></i>' . ' ' . $langs->trans('SendMail') . ' ';
-		if ($object->status == AccidentInvestigation::STATUS_LOCKED) {
+		if ($object->status == AccidentInvestigation::STATUS_VALIDATED) {
 			$fileParams    = dol_most_recent_file($upload_dir . '/' . $object->element . 'document' . '/' . $object->ref);
 			$file          = $fileParams['fullname'];
 			$forcebuilddoc = (file_exists($file) && !strstr($fileParams['name'], 'specimen')) ? 0 : 1;
 			print dolGetButtonAction($displayButton, '', 'default', $_SERVER['PHP_SELF'] . '?id=' . $object->id . '&action=presend&forcebuilddoc=' . $forcebuilddoc . '&mode=init#formmailbeforetitle');
 		} else {
-			print '<span class="butActionRefused classfortooltip" title="'.dol_escape_htmltag($langs->trans('ObjectMustBeLockedToSendEmail', ucfirst($langs->transnoentities('The' . ucfirst($object->element))))) . '">' . $displayButton . '</span>';
+			print '<span class="butActionRefused classfortooltip" title="'.dol_escape_htmltag($langs->trans('ObjectMustBeValidatedToSendEmail', ucfirst($langs->transnoentities('The' . ucfirst($object->element))))) . '">' . $displayButton . '</span>';
 		}
 
 		// Archive.
 		$displayButton = $onPhone ?  '<i class="fas fa-archive fa-2x"></i>' : '<i class="fas fa-archive"></i>' . ' ' . $langs->trans('Archive');
-		if ($object->status == AccidentInvestigation::STATUS_LOCKED) {
+		if ($object->status == AccidentInvestigation::STATUS_VALIDATED) {
 			print '<span class="butAction" id="actionButtonArchive" href="' . $_SERVER['PHP_SELF'] . '?id=' . $object->id . '&action=set_archive&token=' . newToken() . '">' . $displayButton . '</span>';
 		} else {
-			print '<span class="butActionRefused classfortooltip" title="' . dol_escape_htmltag($langs->trans('ObjectMustBeLockedToArchive', ucfirst($langs->transnoentities('The' . ucfirst($object->element))))) . '">' . $displayButton . '</span>';
+			print '<span class="butActionRefused classfortooltip" title="' . dol_escape_htmltag($langs->trans('ObjectMustBeValidatedToArchive', ucfirst($langs->transnoentities('The' . ucfirst($object->element))))) . '">' . $displayButton . '</span>';
+		}
+
+		// ReOpen.
+		$displayButton = $onPhone ? '<i class="fas fa-lock-open fa-2x"></i>' : '<i class="fas fa-lock-open"></i>' . ' ' . $langs->trans('ReOpenDoli');
+		if ($object->status == AccidentInvestigation::STATUS_ARCHIVED) {
+			print '<span class="butAction" id="actionButtonInProgress" href="' . $_SERVER['PHP_SELF'] . '?id=' . $object->id . '&action=set_draft&token=' . newToken() . '">' . $displayButton . '</span>';
+		} else {
+			print '<span class="butActionRefused classfortooltip" title="' . dol_escape_htmltag($langs->trans('ObjectMustBeArchivedToOpen', ucfirst($langs->transnoentities('The' . ucfirst($object->element))))) . '">' . $displayButton . '</span>';
 		}
 
 		// Clone.
 		$displayButton = $onPhone ? '<i class="fas fa-clone fa-2x"></i>' : '<i class="fas fa-clone"></i>' . ' ' . $langs->trans('ToClone');
-		print '<span class="butAction" id="actionButtonClone">' . $displayButton . '</span>';
+		print '<span class="butAction" id="actionButtonClone" href="' . $_SERVER['PHP_SELF'] . '?id=' . $object->id . '&action=clone' . '">' . $displayButton . '</span>';
 
 		// Delete (need delete permission, or if draft, just need create/modify permission).
 		$displayButton = $onPhone ? '<i class="fas fa-trash fa-2x"></i>' : '<i class="fas fa-trash"></i>' . ' ' . $langs->trans('Delete');
@@ -446,11 +437,11 @@ if ($action == 'create') {
 			$fileDir   = $upload_dir . '/' . $dirFiles;
 			$urlSource = $_SERVER['PHP_SELF'] . '?id=' . $object->id;
 
-			print saturne_show_documents('digiriskdolibarr:' . ucfirst('AccidentInvestigation') . 'Document', $dirFiles, $fileDir, $urlSource, $permissiontoadd, $permissiontodelete, $conf->global->DIGIRISKDOLIBARR_ACCIDENTINVESTIGATIONDOCUMENT_DEFAULT_MODEL, 1, 0, 0, 0, 0, '', '', '', $langs->defaultlang, $object, 0, 'remove_file', $object->status == AccidentInvestigation::STATUS_LOCKED && empty(dol_dir_list($fileDir)), $langs->trans('ObjectMustBeLockedToGenerate', ucfirst($langs->transnoentities('The' . ucfirst($object->element)))));
+			print saturne_show_documents('digiriskdolibarr:' . ucfirst('AccidentInvestigation') . 'Document', $dirFiles, $fileDir, $urlSource, $permissiontoadd, 0, $conf->global->DIGIRISKDOLIBARR_ACCIDENTINVESTIGATIONDOCUMENT_DEFAULT_MODEL, 1, 0, 0, 0, 0, '', '', $langs->defaultlang, '', $object, 0, 'remove_file', 0, $langs->trans('DocumentGeneratedWithArchive'));
 
 			print '</div><div class="fichehalfright">';
 
-			$moreHtmlCenter = dolGetButtonTitle($langs->trans('SeeAll'), '', 'fa fa-bars imgforviewmode', dol_buildpath('/saturne/view/saturne_agenda.php', 1) . '?id=' . $object->id . '&module_name=DoliSIRH&object_type=' . $object->element);
+			$moreHtmlCenter = dolGetButtonTitle($langs->trans('SeeAll'), '', 'fa fa-bars imgforviewmode', dol_buildpath('/saturne/view/saturne_agenda.php', 1) . '?id=' . $object->id . '&module_name=digiriskdolibarr&object_type=' . $object->element);
 
 			// List of actions on element.
 			require_once DOL_DOCUMENT_ROOT . '/core/class/html.formactions.class.php';
@@ -469,7 +460,6 @@ if ($action == 'create') {
 		$modelmail    = $object->element;
 		$defaulttopic = 'InformationMessage';
 		$diroutput    = $conf->digiriskdolibarr->dir_output;
-		$trackid      = $object->element . $object->id;
 
 		require_once DOL_DOCUMENT_ROOT.'/core/tpl/card_presend.tpl.php';
 }
