@@ -107,11 +107,6 @@ INSERT INTO `llx_c_lesion_nature` (`rowid`, `entity`, `ref`, `label`, `descripti
 INSERT INTO `llx_c_lesion_nature` (`rowid`, `entity`, `ref`, `label`, `description`, `active`) VALUES(11, 0, 'Other', 'Other', '', 1);
 INSERT INTO `llx_c_lesion_nature` (`rowid`, `entity`, `ref`, `label`, `description`, `active`) VALUES(12, 0, 'CutOff', 'CutOff', '', 1);
 
--- 9.11.0
-INSERT INTO `llx_c_firepermit_attendants_role` (`rowid`, `entity`, `ref`, `label`, `description`, `active`, `position`) VALUES(1, 0, 'InternalResponsible', 'InternalResponsible', '', 1, 1);
-INSERT INTO `llx_c_firepermit_attendants_role` (`rowid`, `entity`, `ref`, `label`, `description`, `active`, `position`) VALUES(1, 0, 'ExternalResponsible', 'ExternalResponsible', '', 1, 10);
-INSERT INTO `llx_c_firepermit_attendants_role` (`rowid`, `entity`, `ref`, `label`, `description`, `active`, `position`) VALUES(2, 0, 'Attendant', 'Attendant', '', 1, 20);
-
 INSERT INTO `llx_c_conventions_collectives` (`rowid`, `entity`, `tms`, `code`, `libelle`, `description`, `tracking`, `active`, `module`) VALUES(1, 0, '2021-01-22 09:27:09', '0003', 'Convention collective nationale des ouvriers de la navigation intérieure de marchandises', 'Convention collective nationale des ouvriers de la navigation intérieure de marchandises', '1', 1, NULL);
 INSERT INTO `llx_c_conventions_collectives` (`rowid`, `entity`, `tms`, `code`, `libelle`, `description`, `tracking`, `active`, `module`) VALUES(2, 0, '2021-01-22 09:27:09', '0016', 'Convention collective nationale des transports routiers et activités auxiliaires du transport ', 'Convention collective nationale des transports routiers et activités auxiliaires du transport ', '1', 1, NULL);
 INSERT INTO `llx_c_conventions_collectives` (`rowid`, `entity`, `tms`, `code`, `libelle`, `description`, `tracking`, `active`, `module`) VALUES(3, 0, '2021-01-22 09:27:09', '0018', 'Convention collective nationale des industries textiles ', 'Convention collective nationale des industries textiles ', '1', 1, NULL);
@@ -891,6 +886,12 @@ INSERT INTO `llx_c_conventions_collectives` (`rowid`, `entity`, `tms`, `code`, `
 INSERT INTO `llx_c_accident_investigation_attendants_role` (`rowid`, `entity`, `ref`, `label`, `description`, `active`, `position`) VALUES(1, 0, 'Witness', 'Witness', '', 1, 1);
 INSERT INTO `llx_c_accident_investigation_attendants_role` (`rowid`, `entity`, `ref`, `label`, `description`, `active`, `position`) VALUES(2, 0, 'Investigator', 'Investigator', '', 1, 10);
 INSERT INTO `llx_c_accident_investigation_attendants_role` (`rowid`, `entity`, `ref`, `label`, `description`, `active`, `position`) VALUES(3, 0, 'Rescuer', 'Rescuer', '', 1, 20);
+INSERT INTO `llx_c_preventionplan_attendants_role` (`rowid`, `entity`, `ref`, `label`, `description`, `active`, `position`) VALUES (1, 0, 'MaitreOeuvre', 'MaitreOeuvre', '', 1, 10);
+INSERT INTO `llx_c_preventionplan_attendants_role` (`rowid`, `entity`, `ref`, `label`, `description`, `active`, `position`) VALUES (2, 0, 'ExtSocietyResponsible', 'ExtSocietyResponsible', '', 1, 10);
+INSERT INTO `llx_c_preventionplan_attendants_role` (`rowid`, `entity`, `ref`, `label`, `description`, `active`, `position`) VALUES (3, 0, 'ExtSocietyIntervenants', 'ExtSocietyIntervenants', '', 1, 10);
+INSERT INTO `llx_c_firepermit_attendants_role` (`rowid`, `entity`, `ref`, `label`, `description`, `active`, `position`) VALUES(1, 0, 'InternalResponsible', 'InternalResponsible', '', 1, 1);
+INSERT INTO `llx_c_firepermit_attendants_role` (`rowid`, `entity`, `ref`, `label`, `description`, `active`, `position`) VALUES(1, 0, 'ExternalResponsible', 'ExternalResponsible', '', 1, 10);
+INSERT INTO `llx_c_firepermit_attendants_role` (`rowid`, `entity`, `ref`, `label`, `description`, `active`, `position`) VALUES(2, 0, 'Attendant', 'Attendant', '', 1, 20);
 
 INSERT INTO llx_c_digiriskdolibarr_action_trigger (elementtype, ref, label, description) VALUES ('accident_investigation@digiriskdolibarr', 'ACCIDENTINVESTIGATION_CREATE', 'AccidentInvestigationCreated', 'Executed when an accident investigation is created');
 INSERT INTO llx_c_digiriskdolibarr_action_trigger (elementtype, ref, label, description) VALUES ('accident_investigation@digiriskdolibarr', 'ACCIDENTINVESTIGATION_MODIFY', 'AccidentInvestigationModified', 'Executed when an accident investigation is modified');
