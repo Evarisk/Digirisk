@@ -149,16 +149,16 @@ class LegalDisplay extends DigiriskDocuments
 				$json['LegalDisplay']['detective_work']['openinghours'] = $langs->trans('Monday') . ' : ' . $thirdparty_openinghours->monday . "\r\n" . $langs->trans('Tuesday') . ' : ' . $thirdparty_openinghours->tuesday . "\r\n" . $langs->trans('Wednesday') . ' : ' . $thirdparty_openinghours->wednesday . "\r\n" . $langs->trans('Thursday') . ' : ' . $thirdparty_openinghours->thursday . "\r\n" . $langs->trans('Friday') . ' : ' . $thirdparty_openinghours->friday . "\r\n" . $langs->trans('Saturday') . ' : ' . $thirdparty_openinghours->saturday . "\r\n" . $langs->trans('Sunday') . ' : ' . $thirdparty_openinghours->sunday;
 			}
 
-			$labour_inspector_contact = new Contact($this->db);
-			$result = $labour_inspector_contact->fetch($digirisk_resources['LabourInspectorContact']->id[0]);
+			$labourInspectorContact = new Contact($this->db);
+			$result = $labourInspectorContact->fetch($digirisk_resources['LabourInspectorContact']->id[0]);
 
 			if ($result > 0) {
-				$json['LegalDisplay']['detective_work']['id']      = $labour_inspector_contact->id;
-				$json['LegalDisplay']['detective_work']['name']    = $labour_inspector_contact->firstname . " " . $labour_inspector_contact->lastname;
-				$json['LegalDisplay']['detective_work']['address'] = preg_replace('/\s\s+/', ' ', $labour_inspector_contact->address);
-				$json['LegalDisplay']['detective_work']['zip']     = $labour_inspector_contact->zip;
-				$json['LegalDisplay']['detective_work']['town']    = $labour_inspector_contact->town;
-				$json['LegalDisplay']['detective_work']['phone']   = $labour_inspector_contact->phone_pro;
+				$json['LegalDisplay']['detective_work']['id']      = $labourInspectorContact->id;
+				$json['LegalDisplay']['detective_work']['name']    = $labourInspectorContact->firstname . " " . $labourInspectorContact->lastname;
+				$json['LegalDisplay']['detective_work']['address'] = preg_replace('/\s\s+/', ' ', $labourInspectorContact->address);
+				$json['LegalDisplay']['detective_work']['zip']     = $labourInspectorContact->zip;
+				$json['LegalDisplay']['detective_work']['town']    = $labourInspectorContact->town;
+				$json['LegalDisplay']['detective_work']['phone']   = $labourInspectorContact->phone_pro;
 			}
 
 			$samu = new Societe($this->db);

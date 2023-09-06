@@ -121,13 +121,13 @@ class InformationsSharing extends DigiriskDocuments
 				$json['InformationsSharing']['occupational_health_service']['phone'] = $labour_doctor_contact->phone_pro;
 			}
 
-			$labour_inspector_contact = new Contact($this->db);
-			$result = $labour_inspector_contact->fetch($digirisk_resources['LabourInspectorContact']->id[0]);
+			$labourInspectorContact = new Contact($this->db);
+			$result = $labourInspectorContact->fetch($digirisk_resources['LabourInspectorContact']->id[0]);
 
 			if ($result > 0) {
-				$json['InformationsSharing']['detective_work']['id']    = $labour_inspector_contact->id;
-				$json['InformationsSharing']['detective_work']['name']  = $labour_inspector_contact->firstname . " " . $labour_inspector_contact->lastname;
-				$json['InformationsSharing']['detective_work']['phone'] = $labour_inspector_contact->phone_pro;
+				$json['InformationsSharing']['detective_work']['id']    = $labourInspectorContact->id;
+				$json['InformationsSharing']['detective_work']['name']  = $labourInspectorContact->firstname . " " . $labourInspectorContact->lastname;
+				$json['InformationsSharing']['detective_work']['phone'] = $labourInspectorContact->phone_pro;
 			}
 
 			$harassment_officer = new User($this->db);

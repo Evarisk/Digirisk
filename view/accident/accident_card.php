@@ -128,7 +128,7 @@ if (empty($reshook)) {
 		$accident_type      = GETPOST('accident_type');
 		$external_accident  = GETPOST('external_accident');
 		$accident_location  = GETPOST('accident_location');
-		$ext_society_id     = GETPOST('fk_soc');
+		$extSocietyId     = GETPOST('fk_soc');
 
 		// Initialize object accident
 		$now                       = dol_now();
@@ -148,7 +148,7 @@ if (empty($reshook)) {
 		$accident_date = dol_mktime(GETPOST('dateohour', 'int'), GETPOST('dateomin', 'int'), 0, GETPOST('dateomonth', 'int'), GETPOST('dateoday', 'int'), GETPOST('dateoyear', 'int'));
 
 		$object->accident_date = $accident_date;
-		$object->fk_soc        = $ext_society_id;
+		$object->fk_soc           = $extSocietyId;
 
 		switch ($external_accident) {
 			case 1:
@@ -165,7 +165,7 @@ if (empty($reshook)) {
 			case 2:
 				$object->fk_element  = 0;
 				$object->fk_standard = 0;
-				$object->fk_soc      = $ext_society_id;
+				$object->fk_soc      = $extSocietyId;
 				$object->accident_location = '';
 				break;
 			case 3:
@@ -266,7 +266,7 @@ if (empty($reshook)) {
 		$accident_type      = GETPOST('accident_type');
 		$external_accident  = GETPOST('external_accident');
 		$accident_location  = GETPOST('accident_location');
-		$ext_society_id     = GETPOST('fk_soc');
+		$extSocietyId     = GETPOST('fk_soc');
 
 		// Initialize object accident
 		$now                       = dol_now();
@@ -281,7 +281,7 @@ if (empty($reshook)) {
 		$accident_date = dol_mktime(GETPOST('dateohour', 'int'), GETPOST('dateomin', 'int'), 0, GETPOST('dateomonth', 'int'), GETPOST('dateoday', 'int'), GETPOST('dateoyear', 'int'));
 
 		$object->accident_date = $accident_date;
-		$object->fk_soc        = $ext_society_id;
+		$object->fk_soc           = $extSocietyId;
 
 		switch ($external_accident) {
 			case 1:
@@ -298,7 +298,7 @@ if (empty($reshook)) {
 			case 2:
 				$object->fk_element  = 0;
 				$object->fk_standard = 0;
-				$object->fk_soc      = $ext_society_id;
+				$object->fk_soc      = $extSocietyId;
 				$object->accident_location = '';
 				break;
 			case 3:

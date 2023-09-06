@@ -508,7 +508,7 @@ if ($action == 'presend' && ! empty($document)) {
 	// Fill list of recipient with email inside <>.
 	$liste = array();
 
-	$labour_inspector_contact = $allLinks['LabourInspectorContact'];
+	$labourInspectorContact = $allLinks['LabourInspectorContact'];
 
 	if ( ! empty($object->socid) && $object->socid > 0 && ! is_object($object->thirdparty) && method_exists($object, 'fetch_thirdparty')) {
 		$object->fetch_thirdparty();

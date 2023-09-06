@@ -131,8 +131,8 @@ $width = 80; $cssclass = 'photoref';
 dol_strlen($preventionplan->label) ? $morehtmlref = '<span>' . ' - ' . $preventionplan->label . '</span>' : '';
 $morehtmlref                             .= '<div class="refidno">';
 // External Society -- Société extérieure
-$ext_society  = $digiriskresources->fetchResourcesFromObject('PP_EXT_SOCIETY', $preventionplan);
-$morehtmlref .= $langs->trans('ExtSociety') . ' : ' . $ext_society->getNomUrl(1);
+$extSociety  = $digiriskresources->fetchResourcesFromObject('PP_EXT_SOCIETY', $preventionplan);
+$morehtmlref .= $langs->trans('ExtSociety') . ' : ' . $extSociety->getNomUrl(1);
 // Project
 $project->fetch($preventionplan->fk_project);
 $morehtmlref .= '<br>' . $langs->trans('Project') . ' : ' . getNomUrlProject($project, 1, 'blank', 1);

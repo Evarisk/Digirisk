@@ -133,12 +133,12 @@ if (empty($reshook)) {
 	if ($action == 'add' && $permissiontoadd) {
 		// Get parameters
 		$project                     = GETPOST('fk_project');
-		$maitre_oeuvre_id            = GETPOST('maitre_oeuvre');
+		$masterWorker_id            = GETPOST('maitre_oeuvre');
 		$extsociety_id               = GETPOST('ext_society');
 		$extresponsible_id           = GETPOST('ext_society_responsible');
 		$extintervenant_ids          = GETPOST('ext_intervenants');
 		$labour_inspector_id         = GETPOST('labour_inspector');
-		$labour_inspector_contact_id = GETPOST('labour_inspector_contact');
+		$labourInspectorContact_id = GETPOST('labour_inspector_contact');
 		$label                       = GETPOST('label');
 		$description                 = GETPOST('description');
 		$fk_preventionplan           = GETPOST('fk_preventionplan');
@@ -165,11 +165,11 @@ if (empty($reshook)) {
 		$object->fk_user_creat     = $user->id ? $user->id : 1;
 
 		// Check parameters
-		if ($maitre_oeuvre_id < 0) {
+		if ($masterWorker_id < 0) {
 			setEventMessages($langs->trans('ErrorFieldRequired', $langs->transnoentitiesnoconv('MaitreOeuvre')), null, 'errors');
 			$error++;
 		} else {
-			$usertmp->fetch($maitre_oeuvre_id);
+			$usertmp->fetch($masterWorker_id);
 		}
 
 		if ($extsociety_id < 0) {
@@ -192,12 +192,12 @@ if (empty($reshook)) {
 			$error++;
 		}
 
-		if (is_array($labour_inspector_contact_id)) {
-			if (empty(array_filter($labour_inspector_contact_id))) {
+		if (is_array($labourInspectorContact_id)) {
+			if (empty(array_filter($labourInspectorContact_id))) {
 				setEventMessages($langs->trans('ErrorFieldRequired', $langs->transnoentitiesnoconv('LabourInspector')), null, 'errors');
 				$error++;
 			}
-		} elseif (empty($labour_inspector_contact_id)) {
+		} elseif (empty($labourInspectorContact_id)) {
 			setEventMessages($langs->trans('ErrorFieldRequired', $langs->transnoentitiesnoconv('LabourInspector')), null, 'errors');
 			$error++;
 		}
@@ -212,10 +212,10 @@ if (empty($reshook)) {
 			if ($result > 0) {
 				$digiriskresources->digirisk_dolibarr_set_resources($db, $user->id, 'FP_EXT_SOCIETY', 'societe', array($extsociety_id), $conf->entity, 'firepermit', $object->id, 1);
 				$digiriskresources->digirisk_dolibarr_set_resources($db, $user->id, 'FP_LABOUR_INSPECTOR', 'societe', array($labour_inspector_id), $conf->entity, 'firepermit', $object->id, 1);
-				$digiriskresources->digirisk_dolibarr_set_resources($db, $user->id, 'FP_LABOUR_INSPECTOR_ASSIGNED', 'socpeople', array($labour_inspector_contact_id), $conf->entity, 'firepermit', $object->id, 1);
+				$digiriskresources->digirisk_dolibarr_set_resources($db, $user->id, 'FP_LABOUR_INSPECTOR_ASSIGNED', 'socpeople', array($labourInspectorContact_id), $conf->entity, 'firepermit', $object->id, 1);
 
-				if ($maitre_oeuvre_id > 0) {
-					$signatory->setSignatory($object->id, 'firepermit', 'user', array($maitre_oeuvre_id), 'FP_MAITRE_OEUVRE', 'firepermit');
+				if ($masterWorker_id > 0) {
+					$signatory->setSignatory($object->id, 'firepermit', 'user', array($masterWorker_id), 'FP_MAITRE_OEUVRE', 'firepermit');
 				}
 
 				if ($extresponsible_id > 0) {
@@ -243,12 +243,12 @@ if (empty($reshook)) {
 	if ($action == 'update' && $permissiontoadd) {
 		// Get parameters
 		$project                     = GETPOST('fk_project');
-		$maitre_oeuvre_id            = GETPOST('maitre_oeuvre');
+		$masterWorker_id            = GETPOST('maitre_oeuvre');
 		$extsociety_id               = GETPOST('ext_society');
 		$extresponsible_id           = GETPOST('ext_society_responsible');
 		$extintervenant_ids          = GETPOST('ext_intervenants');
 		$labour_inspector_id         = GETPOST('labour_inspector');
-		$labour_inspector_contact_id = GETPOST('labour_inspector_contact') ? GETPOST('labour_inspector_contact') : 0;
+		$labourInspectorContact_id = GETPOST('labour_inspector_contact') ? GETPOST('labour_inspector_contact') : 0;
 		$label                       = GETPOST('label');
 		$description                 = GETPOST('description');
 		$fk_preventionplan           = GETPOST('fk_preventionplan');
@@ -271,11 +271,11 @@ if (empty($reshook)) {
 		$object->fk_project = $project;
 
 		// Check parameters
-		if ($maitre_oeuvre_id < 0) {
+		if ($masterWorker_id < 0) {
 			setEventMessages($langs->trans('ErrorFieldRequired', $langs->transnoentitiesnoconv('MaitreOeuvre')), null, 'errors');
 			$error++;
 		} else {
-			$usertmp->fetch($maitre_oeuvre_id);
+			$usertmp->fetch($masterWorker_id);
 		}
 
 		if ($extsociety_id < 0) {
@@ -298,12 +298,12 @@ if (empty($reshook)) {
 			$error++;
 		}
 
-		if (is_array($labour_inspector_contact_id)) {
-			if (empty(array_filter($labour_inspector_contact_id))) {
+		if (is_array($labourInspectorContact_id)) {
+			if (empty(array_filter($labourInspectorContact_id))) {
 				setEventMessages($langs->trans('ErrorFieldRequired', $langs->transnoentitiesnoconv('LabourInspector')), null, 'errors');
 				$error++;
 			}
-		} elseif (empty($labour_inspector_contact_id)) {
+		} elseif (empty($labourInspectorContact_id)) {
 			setEventMessages($langs->trans('ErrorFieldRequired', $langs->transnoentitiesnoconv('LabourInspector')), null, 'errors');
 			$error++;
 		}
@@ -318,9 +318,9 @@ if (empty($reshook)) {
 			if ($result > 0) {
 				$digiriskresources->digirisk_dolibarr_set_resources($db, $user->id, 'FP_EXT_SOCIETY', 'societe', array($extsociety_id), $conf->entity, 'firepermit', $object->id, 0);
 				$digiriskresources->digirisk_dolibarr_set_resources($db, $user->id, 'FP_LABOUR_INSPECTOR', 'societe', array($labour_inspector_id), $conf->entity, 'firepermit', $object->id, 0);
-				$digiriskresources->digirisk_dolibarr_set_resources($db, $user->id, 'FP_LABOUR_INSPECTOR_ASSIGNED', 'socpeople', array($labour_inspector_contact_id), $conf->entity, 'firepermit', $object->id, 0);
+				$digiriskresources->digirisk_dolibarr_set_resources($db, $user->id, 'FP_LABOUR_INSPECTOR_ASSIGNED', 'socpeople', array($labourInspectorContact_id), $conf->entity, 'firepermit', $object->id, 0);
 
-				$signatory->setSignatory($object->id, 'firepermit', 'user', array($maitre_oeuvre_id), 'FP_MAITRE_OEUVRE');
+				$signatory->setSignatory($object->id, 'firepermit', 'user', array($masterWorker_id), 'FP_MAITRE_OEUVRE');
 				$signatory->setSignatory($object->id, 'firepermit', 'socpeople', array($extresponsible_id), 'FP_EXT_SOCIETY_RESPONSIBLE');
 
 				// Update fire permit OK
@@ -743,14 +743,14 @@ if ($action == 'create') {
 	print ' <a href="' . DOL_URL_ROOT . '/societe/card.php?action=create&backtopage=' . urlencode($_SERVER["PHP_SELF"] . '?action=create') . '" target="_blank"><span class="fa fa-plus-circle valignmiddle paddingleft" title="' . $langs->trans("AddThirdParty") . '"></span></a>';
 	print '</td></tr>';
 
-	$ext_society_responsible_id = GETPOST('ext_society_responsible');
+	$extSocietyResponsibleId = GETPOST('ext_society_responsible');
 
 	//External responsible -- Responsable de la société extérieure
 	print '<tr><td class="fieldrequired minwidth400">';
 	$htmltext = img_picto('', 'address') . ' ' . $langs->trans("ExtSocietyResponsible");
 	print $htmltext;
 	print '</td><td>';
-	print $form->selectcontacts((empty(GETPOST('ext_society', 'int')) ? -1 : GETPOST('ext_society', 'int')), $ext_society_responsible_id, 'ext_society_responsible', 1, '', '', 1, 'minwidth100imp widthcentpercentminusxx maxwidth400');
+	print $form->selectcontacts((empty(GETPOST('ext_society', 'int')) ? -1 : GETPOST('ext_society', 'int')), $extSocietyResponsibleId, 'ext_society_responsible', 1, '', '', 1, 'minwidth100imp widthcentpercentminusxx maxwidth400');
 	print '</td></tr>';
 
 	//Labour inspector Society -- Entreprise Inspecteur du travail
@@ -764,7 +764,7 @@ if ($action == 'create') {
 	print ' <a href="' . DOL_URL_ROOT . '/societe/card.php?action=create&backtopage=' . urlencode($_SERVER["PHP_SELF"] . '?action=create') . '" target="_blank"><span class="fa fa-plus-circle valignmiddle paddingleft" title="' . $langs->trans("AddThirdParty") . '"></span></a>';
 	print '<a href="' . DOL_URL_ROOT . '/custom/digiriskdolibarr/admin/securityconf.php' . '" target="_blank">' . $langs->trans("ConfigureLabourInspector") . '</a>';
 	print '</td></tr>';
-	$labour_inspector_contact_id        = (GETPOST('labour_inspector_contact') ? GETPOST('labour_inspector_contact') : ($allLinks['LabourInspectorContact']->id[0] ?: -1));
+	$labourInspectorContact_id        = (GETPOST('labour_inspector_contact') ? GETPOST('labour_inspector_contact') : ($allLinks['LabourInspectorContact']->id[0] ?: -1));
 
 	if ( ! empty($allLinks['LabourInspectorContact'])) {
 		$contact->fetch($allLinks['LabourInspectorContact']->id[0]);
@@ -775,7 +775,7 @@ if ($action == 'create') {
 	$htmltext = img_picto('', 'address') . ' ' . $langs->trans("LabourInspector");
 	print $htmltext;
 	print '</td><td>';
-	print $form->selectcontacts((GETPOST('labour_inspector') ? GETPOST('labour_inspector') : ($allLinks['LabourInspectorSociety']->id[0] ?: -1)), $labour_inspector_contact_id, 'labour_inspector_contact', 1, '', '', 1, 'minwidth100imp widthcentpercentminusxx maxwidth400');
+	print $form->selectcontacts((GETPOST('labour_inspector') ? GETPOST('labour_inspector') : ($allLinks['LabourInspectorSociety']->id[0] ?: -1)), $labourInspectorContact_id, 'labour_inspector_contact', 1, '', '', 1, 'minwidth100imp widthcentpercentminusxx maxwidth400');
 	print '</td></tr>';
 
 	//FK PREVENTION PLAN
@@ -812,8 +812,8 @@ if (($id || $ref) && $action == 'edit') {
 
 	print dol_get_fiche_head();
 
-	$object_resources   = $digiriskresources->fetchResourcesFromObject('', $object);
-	$object_signatories = $signatory->fetchSignatory('', $object->id, 'firepermit');
+	$objectResources   = $digiriskresources->fetchResourcesFromObject('', $object);
+	$objectSignatories = $signatory->fetchSignatory('', $object->id, 'firepermit');
 
 	print '<table class="border centpercent tableforfieldedit firepermit-table">' . "\n";
 
@@ -843,12 +843,12 @@ if (($id || $ref) && $action == 'edit') {
 	print '</td></tr>';
 
 	//Maitre d'oeuvre
-	$maitre_oeuvre = is_array($object_signatories['FP_MAITRE_OEUVRE']) ? array_shift($object_signatories['FP_MAITRE_OEUVRE'])->element_id : '';
-	$userlist      = $form->select_dolusers($maitre_oeuvre, '', 1, null, 0, '', '', 0, 0, 0, 'AND u.statut = 1', 0, '', 'minwidth300', 0, 1);
+	$masterWorker = is_array($objectSignatories['FP_MAITRE_OEUVRE']) ? array_shift($objectSignatories['FP_MAITRE_OEUVRE'])->element_id : '';
+	$userlist      = $form->select_dolusers($masterWorker, '', 1, null, 0, '', '', 0, 0, 0, 'AND u.statut = 1', 0, '', 'minwidth300', 0, 1);
 	print '<tr>';
 	print '<td class="fieldrequired minwidth400" style="width:10%">' . img_picto('', 'user') . ' ' . $form->editfieldkey('MaitreOeuvre', 'MaitreOeuvre_id', '', $object, 0) . '</td>';
 	print '<td>';
-	print $form->selectarray('maitre_oeuvre', $userlist, $maitre_oeuvre, 1, null, null, null, "40%", 0, 0, 0, 'minwidth300', 1);
+	print $form->selectarray('maitre_oeuvre', $userlist, $masterWorker, 1, null, null, null, "40%", 0, 0, 0, 'minwidth300', 1);
 	print ' <a href="' . DOL_URL_ROOT . '/user/card.php?action=create&backtopage=' . urlencode($_SERVER["PHP_SELF"] . '?action=create') . '" target="_blank"><span class="fa fa-plus-circle valignmiddle paddingleft" title="' . $langs->trans("AddUser") . '"></span></a>';
 	print '</td></tr>';
 
@@ -863,32 +863,32 @@ if (($id || $ref) && $action == 'edit') {
 	if ( ! empty($user->socid)) {
 		print $form->select_company($user->socid, 'ext_society', '', 1, 1, 0, $events, 0, 'minwidth300');
 	} else {
-		$ext_society_id = is_array($object_resources['FP_EXT_SOCIETY']) ? array_shift($object_resources['FP_EXT_SOCIETY'])->id : '';
-		print $form->select_company($ext_society_id, 'ext_society', '', 'SelectThirdParty', 1, 0, $events, 0, 'minwidth300');
+		$extSocietyId = is_array($objectResources['FP_EXT_SOCIETY']) ? array_shift($objectResources['FP_EXT_SOCIETY'])->id : '';
+		print $form->select_company($extSocietyId, 'ext_society', '', 'SelectThirdParty', 1, 0, $events, 0, 'minwidth300');
 	}
 	print ' <a href="' . DOL_URL_ROOT . '/societe/card.php?action=create&backtopage=' . urlencode($_SERVER["PHP_SELF"] . '?action=create') . '" target="_blank"><span class="fa fa-plus-circle valignmiddle paddingleft" title="' . $langs->trans("AddThirdParty") . '"></span></a>';
 	print '</td></tr>';
 
-	$ext_society_responsible_id = is_array($object_signatories['FP_EXT_SOCIETY_RESPONSIBLE']) ? array_shift($object_signatories['FP_EXT_SOCIETY_RESPONSIBLE'])->element_id : GETPOST('ext_society_responsible');
+	$extSocietyResponsibleId = is_array($objectSignatories['FP_EXT_SOCIETY_RESPONSIBLE']) ? array_shift($objectSignatories['FP_EXT_SOCIETY_RESPONSIBLE'])->element_id : GETPOST('ext_society_responsible');
 
-	if ($ext_society_responsible_id > 0) {
-		$contact->fetch($ext_society_responsible_id);
+	if ($extSocietyResponsibleId > 0) {
+		$contact->fetch($extSocietyResponsibleId);
 	}
 
 	//External responsible -- Responsable de la société extérieure
-	$ext_society = $digiriskresources->fetchResourcesFromObject('FP_EXT_SOCIETY', $object);
+	$extSociety = $digiriskresources->fetchResourcesFromObject('FP_EXT_SOCIETY', $object);
 	print '<tr class="oddeven"><td class="fieldrequired minwidth400">';
 	$htmltext = img_picto('', 'address') . ' ' . $langs->trans("ExtSocietyResponsible");
 	print $htmltext;
 	print '</td><td>';
-	print $form->selectcontacts($ext_society->id, dol_strlen($contact->email) ? $ext_society_responsible_id : -1, 'ext_society_responsible', '', 0, '', 1, 'minwidth100imp widthcentpercentminusxx maxwidth400');
+	print $form->selectcontacts($extSociety->id, dol_strlen($contact->email) ? $extSocietyResponsibleId : -1, 'ext_society_responsible', '', 0, '', 1, 'minwidth100imp widthcentpercentminusxx maxwidth400');
 	print '</td></tr>';
 
-	if (is_array($object_resources['FP_LABOUR_INSPECTOR']) && $object_resources['FP_LABOUR_INSPECTOR'] > 0) {
-		$labour_inspector_society = array_shift($object_resources['FP_LABOUR_INSPECTOR']);
+	if (is_array($objectResources['FP_LABOUR_INSPECTOR']) && $objectResources['FP_LABOUR_INSPECTOR'] > 0) {
+		$labourInspectorSociety = array_shift($objectResources['FP_LABOUR_INSPECTOR']);
 	}
-	if (is_array($object_resources['FP_LABOUR_INSPECTOR_ASSIGNED']) && $object_resources['FP_LABOUR_INSPECTOR_ASSIGNED'] > 0) {
-		$labour_inspector_assigned = array_shift($object_resources['FP_LABOUR_INSPECTOR_ASSIGNED']);
+	if (is_array($objectResources['FP_LABOUR_INSPECTOR_ASSIGNED']) && $objectResources['FP_LABOUR_INSPECTOR_ASSIGNED'] > 0) {
+		$labour_inspector_assigned = array_shift($objectResources['FP_LABOUR_INSPECTOR_ASSIGNED']);
 	}
 	//Labour inspector Society -- Entreprise Inspecteur du travail
 	print '<tr><td class="fieldrequired minwidth400">';
@@ -897,24 +897,24 @@ if (($id || $ref) && $action == 'edit') {
 	print '<td>';
 	$events    = array();
 	$events[1] = array('method' => 'getContacts', 'url' => dol_buildpath('/custom/digiriskdolibarr/core/ajax/contacts.php?showempty=1', 1), 'htmlname' => 'labour_inspector_contact', 'params' => array('add-customer-contact' => 'disabled'));
-	print $form->select_company($labour_inspector_society->id, 'labour_inspector', '', 'SelectThirdParty', 1, 0, $events, 0, 'minwidth300');
+	print $form->select_company($labourInspectorSociety->id, 'labour_inspector', '', 'SelectThirdParty', 1, 0, $events, 0, 'minwidth300');
 	print ' <a href="' . DOL_URL_ROOT . '/societe/card.php?action=create&backtopage=' . urlencode($_SERVER["PHP_SELF"] . '?action=create') . '" target="_blank"><span class="fa fa-plus-circle valignmiddle paddingleft" title="' . $langs->trans("AddThirdParty") . '"></span></a>';
 	print '<a href="' . DOL_URL_ROOT . '/custom/digiriskdolibarr/admin/securityconf.php' . '" target="_blank">' . $langs->trans("ConfigureLabourInspector") . '</a>';
 	print '</td></tr>';
 
-	$labour_inspector_contact           = ! empty($digiriskresources->fetchResourcesFromObject('FP_LABOUR_INSPECTOR_ASSIGNED', $object)) ? $digiriskresources->fetchResourcesFromObject('FP_LABOUR_INSPECTOR_ASSIGNED', $object) : GETPOST('labour_inspector_contact');
+	$labourInspectorContact           = ! empty($digiriskresources->fetchResourcesFromObject('FP_LABOUR_INSPECTOR_ASSIGNED', $object)) ? $digiriskresources->fetchResourcesFromObject('FP_LABOUR_INSPECTOR_ASSIGNED', $object) : GETPOST('labour_inspector_contact');
 
-	if ($labour_inspector_contact->id > 0) {
-		$contact->fetch($labour_inspector_contact->id);
+	if ($labourInspectorContact->id > 0) {
+		$contact->fetch($labourInspectorContact->id);
 	}
 
 	//Labour inspector -- Inspecteur du travail
-	$labour_inspector_society = $digiriskresources->fetchResourcesFromObject('FP_LABOUR_INSPECTOR', $object);
+	$labourInspectorSociety = $digiriskresources->fetchResourcesFromObject('FP_LABOUR_INSPECTOR', $object);
 	print '<tr><td class="fieldrequired minwidth400">';
 	$htmltext = img_picto('', 'address') . ' ' . $langs->trans("LabourInspector");
 	print $htmltext;
 	print '</td><td>';
-	print $form->selectcontacts($labour_inspector_society->id, dol_strlen($contact->email) ? $labour_inspector_contact->id : -1, 'labour_inspector_contact', '', 0, '', 1, 'minwidth100imp widthcentpercentminusxx maxwidth400');
+	print $form->selectcontacts($labourInspectorSociety->id, dol_strlen($contact->email) ? $labourInspectorContact->id : -1, 'labour_inspector_contact', '', 0, '', 1, 'minwidth100imp widthcentpercentminusxx maxwidth400');
 	print '</td></tr>';
 
 	//FK PREVENTION PLAN
@@ -996,8 +996,8 @@ if ((empty($action) || ($action != 'create' && $action != 'edit'))) {
 	dol_strlen($object->label) ? $morehtmlref = '<span>' . ' - ' . $object->label . '</span>' : '';
 	$morehtmlref                             .= '<div class="refidno">';
 	// External Society -- Société extérieure
-	$ext_society  = $digiriskresources->fetchResourcesFromObject('FP_EXT_SOCIETY', $object);
-	$morehtmlref .= $langs->trans('ExtSociety') . ' : ' . ($ext_society ? $ext_society->getNomUrl(1) : '');
+	$extSociety  = $digiriskresources->fetchResourcesFromObject('FP_EXT_SOCIETY', $object);
+	$morehtmlref .= $langs->trans('ExtSociety') . ' : ' . $extSociety->getNomUrl(1);
 	// Project
 	$project->fetch($object->fk_project);
 	$morehtmlref .= '<br>' . $langs->trans('Project') . ' : ' . getNomUrlProject($project, 1, 'blank', 1);
@@ -1069,9 +1069,9 @@ if ((empty($action) || ($action != 'create' && $action != 'edit'))) {
 	print $langs->trans("LabourInspector");
 	print '</td>';
 	print '<td>';
-	$labour_inspector_contact = $digiriskresources->fetchResourcesFromObject('FP_LABOUR_INSPECTOR_ASSIGNED', $object);
-	if ($labour_inspector_contact > 0) {
-		print $labour_inspector_contact->getNomUrl(1);
+	$labourInspectorContact = $digiriskresources->fetchResourcesFromObject('FP_LABOUR_INSPECTOR_ASSIGNED', $object);
+	if ($labourInspectorContact > 0) {
+		print $labourInspectorContact->getNomUrl(1);
 	}
 	print '</td></tr>';
 
@@ -1586,22 +1586,22 @@ if ((empty($action) || ($action != 'create' && $action != 'edit'))) {
 		// Create form for email
 		include_once DOL_DOCUMENT_ROOT . '/core/class/html.formmail.class.php';
 		$formmail      = new FormMail($db);
-		$maitre_oeuvre = $signatory->fetchSignatory('FP_MAITRE_OEUVRE', $object->id, 'firepermit');
-		$maitre_oeuvre = array_shift($maitre_oeuvre);
+		$masterWorker = $signatory->fetchSignatory('FP_MAITRE_OEUVRE', $object->id, 'firepermit');
+		$masterWorker = array_shift($masterWorker);
 
 		$formmail->param['langsmodels'] = (empty($newlang) ? $langs->defaultlang : $newlang);
 		$formmail->fromtype             = (GETPOST('fromtype') ? GETPOST('fromtype') : ( ! empty($conf->global->MAIN_MAIL_DEFAULT_FROMTYPE) ? $conf->global->MAIN_MAIL_DEFAULT_FROMTYPE : 'user'));
-		$formmail->fromid               = $maitre_oeuvre->id;
+		$formmail->fromid               = $masterWorker->id;
 		$formmail->trackid              = $trackid;
-		$formmail->fromname             = $maitre_oeuvre->firstname . ' ' . $maitre_oeuvre->lastname;
-		$formmail->frommail             = $maitre_oeuvre->email;
+		$formmail->fromname             = $masterWorker->firstname . ' ' . $masterWorker->lastname;
+		$formmail->frommail             = $masterWorker->email;
 		$formmail->fromalsorobot        = 1;
 		$formmail->withfrom             = 1;
 
 		// Fill list of recipient with email inside <>.
 		$liste = array();
 
-		$labour_inspector_contact = $digiriskresources->fetchResourcesFromObject('FP_LABOUR_INSPECTOR_ASSIGNED', $object);
+		$labourInspectorContact = $digiriskresources->fetchResourcesFromObject('FP_LABOUR_INSPECTOR_ASSIGNED', $object);
 
 		if ( ! empty($object->socid) && $object->socid > 0 && ! is_object($object->thirdparty) && method_exists($object, 'fetch_thirdparty')) {
 			$object->fetch_thirdparty();
@@ -1631,7 +1631,7 @@ if ((empty($action) || ($action != 'create' && $action != 'edit'))) {
 		}
 
 
-		$withto = array($labour_inspector_contact->id => $labour_inspector_contact->firstname . ' ' . $labour_inspector_contact->lastname . " <" . $labour_inspector_contact->email . ">");
+		$withto = array($labourInspectorContact->id => $labourInspectorContact->firstname . ' ' . $labourInspectorContact->lastname . " <" . $labourInspectorContact->email . ">");
 
 		$formmail->withto              = $withto;
 		$formmail->withtofree          = (GETPOSTISSET('sendto') ? (GETPOST('sendto', 'alphawithlgt') ? GETPOST('sendto', 'alphawithlgt') : '1') : '1');

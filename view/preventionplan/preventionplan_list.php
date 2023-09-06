@@ -498,9 +498,9 @@ while ($i < ($limit ? min($num, $limit) : $num)) {
 							print $usertmp->getNomUrl(1);
 						}
 					} elseif ($resource['label'] == 'ExtSociety') {
-						$ext_society = $digiriskresources->fetchResourcesFromObject('PP_EXT_SOCIETY', $object);
-						if ($ext_society > 0) {
-							print $ext_society->getNomUrl(1);
+						$extSociety = $digiriskresources->fetchResourcesFromObject('PP_EXT_SOCIETY', $object);
+						if ($extSociety > 0) {
+							print $extSociety->getNomUrl(1);
 						}
 					}
 					if ($resource['label'] == 'ExtSocietyResponsible') {
@@ -512,9 +512,9 @@ while ($i < ($limit ? min($num, $limit) : $num)) {
 						}
 					}
 					if ($resource['label'] == 'ExtSocietyIntervenants') {
-						$ext_society_intervenants = $signatory->fetchSignatory('PP_EXT_SOCIETY_INTERVENANTS', $object->id, 'preventionplan');
-						if (is_array($ext_society_intervenants) && ! empty($ext_society_intervenants) && $ext_society_intervenants > 0) {
-							foreach ($ext_society_intervenants as $element) {
+						$extSociety_intervenants = $signatory->fetchSignatory('PP_EXT_SOCIETY_INTERVENANTS', $object->id, 'preventionplan');
+						if (is_array($extSociety_intervenants) && ! empty($extSociety_intervenants) && $extSociety_intervenants > 0) {
+							foreach ($extSociety_intervenants as $element) {
 								if ($element > 0) {
 									$contact->fetch($element->element_id);
 									print $contact->getNomUrl(1);

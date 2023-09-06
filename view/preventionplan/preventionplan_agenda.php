@@ -141,8 +141,8 @@ if ($object->id > 0) {
 	dol_strlen($object->label) ? $morehtmlref = '<span>' . ' - ' . $object->label . '</span>' : '';
 	$morehtmlref                             .= '<div class="refidno">';
 	// External Society -- Société extérieure
-	$ext_society  = $digiriskresources->fetchResourcesFromObject('PP_EXT_SOCIETY', $object);
-	$morehtmlref .= $langs->trans('ExtSociety') . ' : ' . $ext_society->getNomUrl(1);
+	$extSociety  = $digiriskresources->fetchResourcesFromObject('PP_EXT_SOCIETY', $object);
+	$morehtmlref .= $langs->trans('ExtSociety') . ' : ' . $extSociety->getNomUrl(1);
 	// Project
 	$project->fetch($object->fk_project);
 	$morehtmlref .= '<br>' . $langs->trans('Project') . ' : ' . getNomUrlProject($project, 1, 'blank', 1);
