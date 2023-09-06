@@ -102,7 +102,7 @@ if ($taskExist <= 0) {
 if ($object->status == AccidentInvestigation::STATUS_VALIDATED) {
 	$result = $signatory->checkSignatoriesSignatures($id, $object->element);
 	if ($result > 0) {
-		$object->setStatusCommon($user, AccidentInvestigation::STATUS_SIGNED, 0, 'ACCIDENTINVESTIGATION_SIGNED');
+		$object->setLocked($user);
 	}
 }
 
@@ -199,14 +199,10 @@ if (empty($reshook)) {
 		$result = $document->generateDocument((!empty($models) ? $models[0] : ''), $langs, 0, 0, 0, $moreParams);
 
 		if ($result > 0) {
-			setEventMessages('AccidentInvestigationArchived', []);
+			setEventMessages('AccidentInvestigationClassified', []);
 		} else {
 			setEventMessages($document->error, [], 'errors');
 		}
-	}
-
-	if ($action == 'confirm_setdraft') {
-		$signatory->deleteSignatoriesSignatures($id, $object->element);
 	}
 
 	// Actions cancel, add, update, update_extras, confirm_validate, confirm_delete, confirm_deleteline, confirm_clone, confirm_close, confirm_setdraft, confirm_reopen
@@ -317,7 +313,7 @@ if ($action == 'create') {
 	}
 	// Archive confirmation
 	if (($action == 'set_archive' && (empty($conf->use_javascript_ajax) || !empty($conf->dol_use_jmobile))) || (!empty($conf->use_javascript_ajax) && empty($conf->dol_use_jmobile))) {
-		$formConfirm .= $form->formconfirm($_SERVER['PHP_SELF'] . '?id=' . $object->id, $langs->trans('ArchiveObject', $langs->transnoentities('The' . ucfirst($object->element))), $langs->trans('ConfirmArchiveObject', $langs->transnoentities('The' . ucfirst($object->element))), 'confirm_archive', '', 'yes', 'actionButtonArchive', 350, 600);
+		$formConfirm .= $form->formconfirm($_SERVER['PHP_SELF'] . '?id=' . $object->id, $langs->trans('ClassifyObject', $langs->transnoentities('The' . ucfirst($object->element))), $langs->trans('ConfirmClassifyObject', $langs->transnoentities('The' . ucfirst($object->element))), 'confirm_archive', '', 'yes', 'actionButtonArchive', 350, 600);
 	}
 	// Clone confirmation
 	if (($action == 'clone' && (empty($conf->use_javascript_ajax) || !empty($conf->dol_use_jmobile))) || (!empty($conf->use_javascript_ajax) && empty($conf->dol_use_jmobile))) {
@@ -398,7 +394,7 @@ if ($action == 'create') {
 		}
 
 		// Sign.
-		$displayButton = $onPhone ? '<i class="fas fa-file-signature fa-2x"></i>' : '<i class="fas fa-file-signature"></i>' . ' ' . $langs->trans('Sign');
+		$displayButton = $onPhone ? '<i class="fas fa-signature fa-2x"></i>' : '<i class="fas fa-signature"></i>' . ' ' . $langs->trans('Sign');
 		if ($object->status == AccidentInvestigation::STATUS_VALIDATED) {
 			print '<a class="butAction" id="actionButtonSign" href="' . dol_buildpath('/saturne/view/saturne_attendants.php', 1) . '?id=' . $object->id . '&module_name=' . $object->module . '&object_type=' . $object->element . '&attendant_table_mode=simple' . '">' . $displayButton . '</a>';
 		} else {
@@ -406,7 +402,7 @@ if ($action == 'create') {
 		}
 
 		// Send email.
-		$displayButton = $onPhone ? '<i class="fas fa-paper-plane fa-2x"></i>' : '<i class="fas fa-paper-plane"></i>' . ' ' . $langs->trans('SendMail') . ' ';
+		$displayButton = $onPhone ? '<i class="fas fa-envelope fa-2x"></i>' : '<i class="fas fa-envelope"></i>' . ' ' . $langs->trans('SendMail') . ' ';
 		if ($object->status == AccidentInvestigation::STATUS_VALIDATED) {
 			$fileParams    = dol_most_recent_file($upload_dir . '/' . $object->element . 'document' . '/' . $object->ref);
 			$file          = $fileParams['fullname'];
@@ -418,10 +414,10 @@ if ($action == 'create') {
 
 		// Classify.
 		$displayButton = $onPhone ?  '<i class="fas fa-archive fa-2x"></i>' : '<i class="fas fa-archive"></i>' . ' ' . $langs->trans('Classify');
-		if ($object->status == AccidentInvestigation::STATUS_SIGNED) {
+		if ($object->status == AccidentInvestigation::STATUS_LOCKED) {
 			print '<span class="butAction" id="actionButtonArchive" href="' . $_SERVER['PHP_SELF'] . '?id=' . $object->id . '&action=set_archive&token=' . newToken() . '">' . $displayButton . '</span>';
 		} else {
-			print '<span class="butActionRefused classfortooltip" title="' . dol_escape_htmltag($langs->trans('ObjectMustBeValidatedToArchive', ucfirst($langs->transnoentities('The' . ucfirst($object->element))))) . '">' . $displayButton . '</span>';
+			print '<span class="butActionRefused classfortooltip" title="' . dol_escape_htmltag($langs->trans('ObjectMustBeValidatedToClassify', ucfirst($langs->transnoentities('The' . ucfirst($object->element))))) . '">' . $displayButton . '</span>';
 		}
 
 		// New version.
@@ -429,7 +425,7 @@ if ($action == 'create') {
 		if ($object->status == AccidentInvestigation::STATUS_ARCHIVED) {
 			print '<span class="butAction" id="actionButtonInProgress" href="' . $_SERVER['PHP_SELF'] . '?id=' . $object->id . '&action=set_draft&token=' . newToken() . '">' . $displayButton . '</span>';
 		} else {
-			print '<span class="butActionRefused classfortooltip" title="' . dol_escape_htmltag($langs->trans('ObjectMustBeArchivedToOpen', ucfirst($langs->transnoentities('The' . ucfirst($object->element))))) . '">' . $displayButton . '</span>';
+			print '<span class="butActionRefused classfortooltip" title="' . dol_escape_htmltag($langs->trans('ObjectMustBeClassifiedToOpen', ucfirst($langs->transnoentities('The' . ucfirst($object->element))))) . '">' . $displayButton . '</span>';
 		}
 
 		// Clone.
@@ -456,7 +452,7 @@ if ($action == 'create') {
 			$fileDir   = $upload_dir . '/' . $dirFiles;
 			$urlSource = $_SERVER['PHP_SELF'] . '?id=' . $object->id;
 
-			print saturne_show_documents('digiriskdolibarr:' . ucfirst('AccidentInvestigation') . 'Document', $dirFiles, $fileDir, $urlSource, $permissiontoadd, 0, $conf->global->DIGIRISKDOLIBARR_ACCIDENTINVESTIGATIONDOCUMENT_DEFAULT_MODEL, 1, 0, 0, 0, 0, '', '', $langs->defaultlang, '', $object, 0, 'remove_file', 0, $langs->trans('DocumentGeneratedWithArchive'));
+			print saturne_show_documents('digiriskdolibarr:' . ucfirst('AccidentInvestigation') . 'Document', $dirFiles, $fileDir, $urlSource, $permissiontoadd, 0, $conf->global->DIGIRISKDOLIBARR_ACCIDENTINVESTIGATIONDOCUMENT_DEFAULT_MODEL, 1, 0, 0, 0, 0, '', '', $langs->defaultlang, '', $object, 0, 'remove_file', 0, $langs->trans('DocumentGeneratedWithClassify'));
 
 			print '</div><div class="fichehalfright">';
 

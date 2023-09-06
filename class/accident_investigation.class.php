@@ -64,7 +64,7 @@ class AccidentInvestigation extends SaturneObject
 	public const STATUS_DELETED   = -1;
 	public const STATUS_DRAFT     = 0;
 	public const STATUS_VALIDATED = 1;
-	public const STATUS_SIGNED    = 2;
+	public const STATUS_LOCKED    = 2;
 	public const STATUS_ARCHIVED  = 3;
 
 	/**
@@ -276,6 +276,27 @@ class AccidentInvestigation extends SaturneObject
 	}
 
 	/**
+	 * Set draft status.
+	 *
+	 * @param  User $user      Object user that modify.
+	 * @param  int  $notrigger 1 = Does not execute triggers, 0 = Execute triggers.
+	 * @return int             0 < if KO, > 0 if OK.
+	 * @throws Exception
+	 */
+	public function setDraft(User $user, int $notrigger = 0): int
+	{
+		// Protection
+		if ($this->status <= self::STATUS_DRAFT) {
+			return 0;
+		}
+
+		$signatory = new SaturneSignature($this->db);
+		$signatory->deleteSignatoriesSignatures($this->id, $this->element);
+
+		return $this->setStatusCommon($user, self::STATUS_DRAFT, $notrigger, 'ACCIDENT_INVESTIGATION_UNVALIDATE');
+	}
+
+	/**
 	 * Write information of trigger description
 	 *
 	 * @param  Object $object Object calling the trigger
@@ -409,14 +430,14 @@ class AccidentInvestigation extends SaturneObject
 
 			$this->labelStatus[self::STATUS_DRAFT]          = $langs->transnoentitiesnoconv('StatusDraft');
 			$this->labelStatus[self::STATUS_VALIDATED]      = $langs->transnoentitiesnoconv('Validated');
-			$this->labelStatus[self::STATUS_SIGNED]         = $langs->transnoentitiesnoconv('Signed');
-			$this->labelStatus[self::STATUS_ARCHIVED]       = $langs->transnoentitiesnoconv('Archived');
+			$this->labelStatus[self::STATUS_LOCKED]         = $langs->transnoentitiesnoconv('Locked');
+			$this->labelStatus[self::STATUS_ARCHIVED]       = $langs->transnoentitiesnoconv('Classified');
 			$this->labelStatus[self::STATUS_DELETED]        = $langs->transnoentitiesnoconv('Deleted');
 
 			$this->labelStatusShort[self::STATUS_DRAFT]     = $langs->transnoentitiesnoconv('StatusDraft');
 			$this->labelStatusShort[self::STATUS_VALIDATED] = $langs->transnoentitiesnoconv('Validated');
-			$this->labelStatusShort[self::STATUS_SIGNED]    = $langs->transnoentitiesnoconv('Signed');
-			$this->labelStatusShort[self::STATUS_ARCHIVED]  = $langs->transnoentitiesnoconv('Archived');
+			$this->labelStatusShort[self::STATUS_LOCKED]    = $langs->transnoentitiesnoconv('Locked');
+			$this->labelStatusShort[self::STATUS_ARCHIVED]  = $langs->transnoentitiesnoconv('Classified');
 			$this->labelStatusShort[self::STATUS_DELETED]   = $langs->transnoentitiesnoconv('Deleted');
 		}
 
@@ -424,7 +445,7 @@ class AccidentInvestigation extends SaturneObject
 		if ($status == self::STATUS_VALIDATED) {
 			$statusType = 'status4';
 		}
-		if ($status == self::STATUS_SIGNED) {
+		if ($status == self::STATUS_LOCKED) {
 			$statusType = 'status6';
 		}
 		if ($status == self::STATUS_ARCHIVED) {
