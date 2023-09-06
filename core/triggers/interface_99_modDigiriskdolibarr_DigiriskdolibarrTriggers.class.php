@@ -114,7 +114,7 @@ class InterfaceDigiriskdolibarrTriggers extends DolibarrTriggers
 		$active = getDolGlobalInt('DIGIRISKDOLIBARR_MAIN_AGENDA_ACTIONAUTO_' . $action);
 
 		if (!isModEnabled('digiriskdolibarr') || $active != 1) {
-			return 0; // If module is not enabled, we do nothing
+			return 0;  // If module is not enabled or trigger is deactivated, we do nothing
 		}
 
 		// Data and type of action are stored into $object and $action
