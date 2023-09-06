@@ -348,10 +348,10 @@ $moreforfilter = '';
 
 $varpage = empty($contextpage) ? $_SERVER["PHP_SELF"] : $contextpage;
 
-$arrayfields['MaitreOeuvre']           = array('label' => 'MaitreOeuvre', 'checked' => 1);
+$arrayfields['MasterWorker']    = array('label' => 'MasterWorker', 'checked' => 1);
 $arrayfields['ExtSociety']             = array('label' => 'ExtSociety', 'checked' => 1);
 $arrayfields['ExtSocietyResponsible']  = array('label' => 'ExtSocietyResponsible', 'checked' => 1);
-$arrayfields['ExtSocietyIntervenants'] = array('label' => 'ExtSocietyIntervenants', 'checked' => 1);
+$arrayfields['ExtSocietyAttendant'] = array('label' => 'ExtSocietyAttendant', 'checked' => 1);
 
 print_barre_liste($form->textwithpicto($title, $texthelp), $page, $_SERVER["PHP_SELF"], $param, $sortfield, $sortorder, $massactionbutton, $num, $nbtotalofrecords, 'digiriskdolibarr32px.png@digiriskdolibarr', 0, $newcardbutton, '', $limit, 0, 0, 1);
 
@@ -362,10 +362,10 @@ print '<div class="div-table-responsive">';
 print '<table class="tagtable nobottomiftotal liste' . ($moreforfilter ? " listwithfilterbefore" : "") . '">' . "\n";
 print '<tr class="liste_titre">';
 
-$object->fields['Custom']['PP_MAITRE_OEUVRE']            = $arrayfields['MaitreOeuvre'] ;
-$object->fields['Custom']['PP_EXT_SOCIETY']              = $arrayfields['ExtSociety'];
-$object->fields['Custom']['PP_EXT_SOCIETY_RESPONSIBLE']  = $arrayfields['ExtSocietyResponsible'];
-$object->fields['Custom']['PP_EXT_SOCIETY_INTERVENANTS'] = $arrayfields['ExtSocietyIntervenants'] ;
+$object->fields['Custom']['MasterWorker']    = $arrayfields['MasterWorker'] ;
+$object->fields['Custom']['ExtSociety']             = $arrayfields['ExtSociety'];
+$object->fields['Custom']['ExtSocietyResponsible']    = $arrayfields['ExtSocietyResponsible'];
+$object->fields['Custom']['ExtSocietyAttendant']              = $arrayfields['ExtSocietyAttendant'] ;
 
 foreach ($object->fields as $key => $val) {
 	$cssforfield                        = (empty($val['css']) ? '' : $val['css']);
@@ -412,7 +412,7 @@ foreach ($object->fields as $key => $val) {
 	$cssforfield                        = (empty($val['css']) ? '' : $val['css']);
 	if ($key == 'status') $cssforfield .= ($cssforfield ? ' ' : '') . 'center';
 	if ( ! empty($arrayfields['t.' . $key]['checked'])) {
-		if (preg_match('/MaitreOeuvre/', $arrayfields['t.' . $key]['label']) || preg_match('/ExtSociety/', $arrayfields['t.' . $key]['label']) || preg_match('/NbIntervenants/', $arrayfields['t.' . $key]['label']) || preg_match('/NbInterventions/', $arrayfields['t.' . $key]['label']) || preg_match('/Location/', $arrayfields['t.' . $key]['label'])) {
+		if (preg_match('/MasterWorker/', $arrayfields['t.' . $key]['label']) || preg_match('/ExtSociety/', $arrayfields['t.' . $key]['label']) || preg_match('/NbIntervenants/', $arrayfields['t.' . $key]['label']) || preg_match('/NbInterventions/', $arrayfields['t.' . $key]['label']) || preg_match('/Location/', $arrayfields['t.' . $key]['label'])) {
 			$disablesort = 1;
 		} else {
 			$disablesort = 0;
@@ -490,29 +490,29 @@ while ($i < ($limit ? min($num, $limit) : $num)) {
 			foreach ($val as $name => $resource) {
 				if ($resource['checked']) {
 					print '<td>';
-					if ($resource['label'] == 'MaitreOeuvre') {
-						$element = $signatory->fetchSignatory('PP_MAITRE_OEUVRE', $object->id, 'preventionplan');
+					if ($resource['label'] == 'MasterWorker') {
+						$element = $signatory->fetchSignatory('MasterWorker', $object->id, 'preventionplan');
 						if (is_array($element)) {
 							$element = array_shift($element);
 							$usertmp->fetch($element->element_id);
 							print $usertmp->getNomUrl(1);
 						}
 					} elseif ($resource['label'] == 'ExtSociety') {
-						$extSociety = $digiriskresources->fetchResourcesFromObject('PP_EXT_SOCIETY', $object);
+						$extSociety = $digiriskresources->fetchResourcesFromObject('ExtSociety', $object);
 						if ($extSociety > 0) {
 							print $extSociety->getNomUrl(1);
 						}
 					}
 					if ($resource['label'] == 'ExtSocietyResponsible') {
-						$element = $signatory->fetchSignatory('PP_EXT_SOCIETY_RESPONSIBLE', $object->id, 'preventionplan');
+						$element = $signatory->fetchSignatory('ExtSocietyResponsible', $object->id, 'preventionplan');
 						if (is_array($element)) {
 							$element = array_shift($element);
 							$contact->fetch($element->element_id);
 							print $contact->getNomUrl(1);
 						}
 					}
-					if ($resource['label'] == 'ExtSocietyIntervenants') {
-						$extSociety_intervenants = $signatory->fetchSignatory('PP_EXT_SOCIETY_INTERVENANTS', $object->id, 'preventionplan');
+					if ($resource['label'] == 'ExtSocietyAttendant') {
+						$extSociety_intervenants = $signatory->fetchSignatory('ExtSocietyAttendant', $object->id, 'preventionplan');
 						if (is_array($extSociety_intervenants) && ! empty($extSociety_intervenants) && $extSociety_intervenants > 0) {
 							foreach ($extSociety_intervenants as $element) {
 								if ($element > 0) {

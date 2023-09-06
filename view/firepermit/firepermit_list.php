@@ -303,7 +303,7 @@ $varpage = empty($contextpage) ? $_SERVER["PHP_SELF"] : $contextpage;
 $arrayfields['MaitreOeuvre']           = array('label' => 'MaitreOeuvre', 'checked' => 1);
 $arrayfields['ExtSociety']             = array('label' => 'ExtSociety', 'checked' => 1);
 $arrayfields['ExtSocietyResponsible']  = array('label' => 'ExtSocietyResponsible', 'checked' => 1);
-$arrayfields['ExtSocietyIntervenants'] = array('label' => 'ExtSocietyIntervenants', 'checked' => 1);
+$arrayfields['ExtSocietyAttendant'] = array('label' => 'ExtSocietyAttendant', 'checked' => 1);
 
 print_barre_liste($form->textwithpicto($title, $texthelp), $page, $_SERVER["PHP_SELF"], $param, $sortfield, $sortorder, $massactionbutton, $num, $nbtotalofrecords, 'digiriskdolibarr32px.png@digiriskdolibarr', 0, $newcardbutton, '', $limit, 0, 0, 1);
 
@@ -317,7 +317,7 @@ print '<tr class="liste_titre">';
 $firepermit->fields['Custom']['FP_MAITRE_OEUVRE']            = $arrayfields['MaitreOeuvre'] ;
 $firepermit->fields['Custom']['FP_EXT_SOCIETY']              = $arrayfields['ExtSociety'];
 $firepermit->fields['Custom']['FP_EXT_SOCIETY_RESPONSIBLE']  = $arrayfields['ExtSocietyResponsible'];
-$firepermit->fields['Custom']['FP_EXT_SOCIETY_INTERVENANTS'] = $arrayfields['ExtSocietyIntervenants'];
+$firepermit->fields['Custom']['FP_EXT_SOCIETY_INTERVENANTS'] = $arrayfields['ExtSocietyAttendant'];
 
 foreach ($firepermit->fields as $key => $val) {
 	$cssforfield                        = (empty($val['css']) ? '' : $val['css']);
@@ -469,7 +469,7 @@ while ($i < ($limit ? min($num, $limit) : $num)) {
 							print $contact->getNomUrl(1);
 						}
 					}
-					if ($resource['label'] == 'ExtSocietyIntervenants') {
+					if ($resource['label'] == 'ExtSocietyAttendant') {
 						$extSociety_intervenants = $signatory->fetchSignatory('FP_EXT_SOCIETY_INTERVENANTS', $firepermit->id, 'firepermit');
 						if (is_array($extSociety_intervenants) && ! empty($extSociety_intervenants) && $extSociety_intervenants > 0) {
 							foreach ($extSociety_intervenants as $element) {

@@ -93,7 +93,7 @@ class PreventionPlan extends SaturneObject
 	/**
 	 * @var string String with name of icon for digiriskelement. Must be the part after the 'object_' into object_digiriskelement.png
 	 */
-	public $picto = 'preventionplandocument@digiriskdolibarr';
+	public $picto = 'fontawesome_fa-info_fas_#d35968';
 
 	/**
 	 * @var string Label status of const.
@@ -115,33 +115,33 @@ class PreventionPlan extends SaturneObject
 	 */
 	public $lines = array();
 
-	const STATUS_DRAFT = 1;
+	const STATUS_DRAFT     = 1;
 	const STATUS_VALIDATED = 2;
-	const STATUS_LOCKED = 3;
-	const STATUS_ARCHIVED = 4;
+	const STATUS_LOCKED    = 3;
+	const STATUS_ARCHIVED  = 4;
 
 	/**
 	 * @var array  Array with all fields and their property. Do not use it as a static var. It may be modified by constructor.
 	 */
 	public $fields = array(
-		'rowid'                => array('type' => 'integer', 'label' => 'TechnicalID', 'enabled' => '1', 'position' => 1, 'notnull' => 1, 'visible' => 0, 'noteditable' => '1', 'index' => 1, 'comment' => "Id"),
-		'ref'                  => array('type' => 'varchar(128)', 'label' => 'Ref', 'enabled' => '1', 'position' => 10, 'notnull' => 1, 'visible' => 1, 'noteditable' => '1', 'index' => 1, 'searchall' => 1, 'showoncombobox' => '1', 'comment' => "Reference of object"),
-		'ref_ext'              => array('type' => 'varchar(128)', 'label' => 'RefExt', 'enabled' => '1', 'position' => 20, 'notnull' => 0, 'visible' => 0,),
-		'entity'               => array('type' => 'integer', 'label' => 'Entity', 'enabled' => '1', 'position' => 30, 'notnull' => 1, 'visible' => 0,),
-		'date_creation'        => array('type' => 'datetime', 'label' => 'DateCreation', 'enabled' => '1', 'position' => 40, 'notnull' => 1, 'visible' => 0,),
-		'tms'                  => array('type' => 'timestamp', 'label' => 'DateModification', 'enabled' => '1', 'position' => 50, 'notnull' => 0, 'visible' => 0,),
-		'status'               => array('type' => 'smallint', 'label' => 'Status', 'enabled' => '1', 'position' => 70, 'notnull' => 0, 'visible' => 1, 'index' => 0,),
-		'label'                => array('type' => 'varchar(255)', 'label' => 'Label', 'enabled' => '1', 'position' => 80, 'notnull' => 0, 'visible' => 1, 'searchall' => 1, 'css' => 'minwidth200', 'help' => "Help text", 'showoncombobox' => '1',),
-		'date_start'           => array('type' => 'datetime', 'label' => 'StartDate', 'enabled' => '1', 'position' => 100, 'notnull' => -1, 'visible' => 1,),
-		'date_end'             => array('type' => 'datetime', 'label' => 'EndDate', 'enabled' => '1', 'position' => 130, 'notnull' => -1, 'visible' => 1,),
-		'prior_visit_bool'     => array('type' => 'boolean', 'label' => 'PriorVisit', 'enabled' => '1', 'position' => 140, 'notnull' => -1, 'visible' => -1,),
-		'prior_visit_text'     => array('type' => 'text', 'label' => 'PriorVisitText', 'enabled' => '1', 'position' => 150, 'notnull' => -1, 'visible' => -1,),
-		'prior_visit_date'     => array('type' => 'datetime', 'label' => 'PriorVisitDate', 'enabled' => '1', 'position' => 200, 'notnull' => -1, 'visible' => -1,),
-		'cssct_intervention'   => array('type' => 'boolean', 'label' => 'CSSCTIntervention', 'enabled' => '1', 'position' => 160, 'notnull' => -1, 'visible' => -1,),
-		'fk_project'           => array('type' => 'integer:Project:projet/class/project.class.php', 'label' => 'Project', 'enabled' => '1', 'position' => 170, 'notnull' => 1, 'visible' => 1,),
-		'fk_user_creat'        => array('type' => 'integer:User:user/class/user.class.php', 'label' => 'UserAuthor', 'enabled' => '1', 'position' => 180, 'notnull' => 1, 'visible' => 0, 'foreignkey' => 'user.rowid',),
-		'fk_user_modif'        => array('type' => 'integer:User:user/class/user.class.php', 'label' => 'UserModif', 'enabled' => '1', 'position' => 190, 'notnull' => -1, 'visible' => 0,),
-		'last_email_sent_date' => array('type' => 'datetime', 'label' => 'LastEmailSentDate', 'enabled' => '1', 'position' => 200, 'notnull' => -1, 'visible' => -2,),
+		'rowid'                => array('type' => 'integer',                                        'label' => 'TechnicalID',       'enabled' => '1', 'position' => 1, 'notnull' => 1,    'visible' => 0, 'noteditable' => '1', 'index' => 1, 'comment' => "Id"),
+		'ref'                  => array('type' => 'varchar(128)',                                   'label' => 'Ref',               'enabled' => '1', 'position' => 10, 'notnull' => 1,   'visible' => 1, 'noteditable' => '1', 'default' => '(PROV)', 'index' => 1, 'searchall' => 1, 'showoncombobox' => '1', 'comment' => "Reference of object"),
+		'ref_ext'              => array('type' => 'varchar(128)',                                   'label' => 'RefExt',            'enabled' => '1', 'position' => 20, 'notnull' => 0,   'visible' => 0,),
+		'entity'               => array('type' => 'integer',                                        'label' => 'Entity',            'enabled' => '1', 'position' => 30, 'notnull' => 1,   'visible' => 0,),
+		'date_creation'        => array('type' => 'datetime',                                       'label' => 'DateCreation',      'enabled' => '1', 'position' => 40, 'notnull' => 1,   'visible' => 0,),
+		'tms'                  => array('type' => 'timestamp',                                      'label' => 'DateModification',  'enabled' => '1', 'position' => 50, 'notnull' => 0,   'visible' => 0,),
+		'status'               => array('type' => 'smallint',                                       'label' => 'Status',            'enabled' => '1', 'position' => 70, 'notnull' => 0,   'visible' => 1, 'index' => 0,),
+		'label'                => array('type' => 'varchar(255)',                                   'label' => 'Label',             'enabled' => '1', 'position' => 80, 'notnull' => 0,   'visible' => 1, 'searchall' => 1, 'css' => 'minwidth200', 'help' => "Help text", 'showoncombobox' => '1',),
+		'date_start'           => array('type' => 'datetime',                                       'label' => 'StartDate',         'enabled' => '1', 'position' => 100, 'notnull' => -1, 'visible' => 1,),
+		'date_end'             => array('type' => 'datetime',                                       'label' => 'EndDate',           'enabled' => '1', 'position' => 130, 'notnull' => -1, 'visible' => 1,),
+		'prior_visit_bool'     => array('type' => 'boolean',                                        'label' => 'PriorVisit',        'enabled' => '1', 'position' => 140, 'notnull' => -1, 'visible' => -1,),
+		'prior_visit_text'     => array('type' => 'text',                                           'label' => 'PriorVisitText',    'enabled' => '1', 'position' => 150, 'notnull' => -1, 'visible' => -1,),
+		'prior_visit_date'     => array('type' => 'datetime',                                       'label' => 'PriorVisitDate',    'enabled' => '1', 'position' => 200, 'notnull' => -1, 'visible' => -1,),
+		'cssct_intervention'   => array('type' => 'boolean',                                        'label' => 'CSSCTIntervention', 'enabled' => '1', 'position' => 160, 'notnull' => -1, 'visible' => -1,),
+		'fk_project'           => array('type' => 'integer:Project:projet/class/project.class.php', 'label' => 'Project',           'enabled' => '1', 'position' => 170, 'notnull' => 1,  'visible' => 1,),
+		'fk_user_creat'        => array('type' => 'integer:User:user/class/user.class.php',         'label' => 'UserAuthor',        'enabled' => '1', 'position' => 180, 'notnull' => 1,  'visible' => 0, 'foreignkey' => 'user.rowid',),
+		'fk_user_modif'        => array('type' => 'integer:User:user/class/user.class.php',         'label' => 'UserModif',         'enabled' => '1', 'position' => 190, 'notnull' => -1, 'visible' => 0,),
+		'last_email_sent_date' => array('type' => 'datetime',                                       'label' => 'LastEmailSentDate', 'enabled' => '1', 'position' => 200, 'notnull' => -1, 'visible' => -2,),
 	);
 
 	public $rowid;
@@ -201,20 +201,12 @@ class PreventionPlan extends SaturneObject
 	 */
 	public function createFromClone(User $user, $fromid, $options)
 	{
-		global $conf, $langs, $moduleNameLowerCase;
+		global $conf;
 		$error = 0;
 
 		$signatory         = new SaturneSignature($this->db, $this->module, $this->element);
 		$digiriskresources = new DigiriskResources($this->db);
 		$openinghours      = new Openinghours($this->db);
-		$preventionplandet = new PreventionPlanLine($this->db);
-
-		$numberingModules = [
-			$this->element              => $conf->global->DIGIRISKDOLIBARR_PREVENTIONPLAN_ADDON,
-			$preventionplandet->element => $conf->global->DIGIRISKDOLIBARR_PREVENTIONPLANDET_ADDON
-		];
-
-		list($refPreventionPlanDetMod, $refPreventionPlanMod) = saturne_require_objects_mod($numberingModules, $moduleNameLowerCase);
 
 		dol_syslog(__METHOD__, LOG_DEBUG);
 
@@ -236,14 +228,14 @@ class PreventionPlan extends SaturneObject
 		$openinghours->fetch(0, '', $morewhere);
 
 		// Load signatory and ressources form source object
-		$signatories = $signatory->fetchSignatory("", $fromid, 'preventionplan');
+		$signatories = $signatory->fetchSignatory("", $fromid, $object->element);
 		$resources   = $digiriskresources->fetchResourcesFromObject('', $object);
 
 		if ( ! empty($signatories) && $signatories > 0) {
 			foreach ($signatories as $arrayRole) {
 				foreach ($arrayRole as $signatoryRole) {
 					$signatoriesID[$signatoryRole->role] = $signatoryRole->id;
-					if ($signatoryRole->role == 'PP_EXT_SOCIETY_INTERVENANTS') {
+					if ($signatoryRole->role == 'ExtSocietyAttendant') {
 						$extintervenant_ids[] = $signatoryRole->id;
 					}
 				}
@@ -257,7 +249,7 @@ class PreventionPlan extends SaturneObject
 
 		// Clear fields
 		if (property_exists($object, 'ref')) {
-			$object->ref = $refPreventionPlanMod->getNextValue($object);
+			$object->ref = $object->getNextNumRef();
 		}
 		if (property_exists($object, 'label')) {
 			$object->label = $options['clone_label'];
@@ -277,22 +269,22 @@ class PreventionPlan extends SaturneObject
 		$preventionplanid                   = $object->create($user);
 
 		if ($preventionplanid > 0) {
-			$digiriskresources->digirisk_dolibarr_set_resources($this->db, $user->id, 'PP_EXT_SOCIETY', 'societe', array(array_shift($resources['PP_EXT_SOCIETY'])->id), $conf->entity, 'preventionplan', $preventionplanid, 1);
-			$digiriskresources->digirisk_dolibarr_set_resources($this->db, $user->id, 'PP_LABOUR_INSPECTOR', 'societe', array(array_shift($resources['PP_LABOUR_INSPECTOR'])->id), $conf->entity, 'preventionplan', $preventionplanid, 1);
-			$digiriskresources->digirisk_dolibarr_set_resources($this->db, $user->id, 'PP_LABOUR_INSPECTOR_ASSIGNED', 'socpeople', array(array_shift($resources['PP_LABOUR_INSPECTOR_ASSIGNED'])->id), $conf->entity, 'preventionplan', $preventionplanid, 1);
+			$digiriskresources->digirisk_dolibarr_set_resources($this->db, $user->id, 'ExtSociety', 'societe', array(array_shift($resources['ExtSociety'])->id), $conf->entity, 'preventionplan', $preventionplanid, 1);
+			$digiriskresources->digirisk_dolibarr_set_resources($this->db, $user->id, 'LabourInspector', 'societe', array(array_shift($resources['LabourInspector'])->id), $conf->entity, 'preventionplan', $preventionplanid, 1);
+			$digiriskresources->digirisk_dolibarr_set_resources($this->db, $user->id, 'LabourInspectorAssigned', 'socpeople', array(array_shift($resources['LabourInspectorAssigned'])->id), $conf->entity, 'preventionplan', $preventionplanid, 1);
 			if (!empty($signatoriesID)) {
-				$signatory->createFromClone($user, $signatoriesID['PP_MAITRE_OEUVRE'], $preventionplanid);
-				$signatory->createFromClone($user, $signatoriesID['PP_EXT_SOCIETY_RESPONSIBLE'], $preventionplanid);
+				$signatory->createFromClone($user, $signatoriesID['MasterWorker'], $preventionplanid);
+				$signatory->createFromClone($user, $signatoriesID['ExtSocietyResponsible'], $preventionplanid);
 			}
 
-			if ( ! empty($options['schedule'])) {
-				if ( ! empty($openinghours)) {
+			if (!empty($options['schedule'])) {
+				if ( !empty($openinghours)) {
 					$openinghours->element_id = $preventionplanid;
 					$openinghours->create($user);
 				}
 			}
 
-			if ( ! empty($options['attendants'])) {
+			if (!empty($options['attendants'])) {
 				if ( ! empty($extintervenant_ids) && $extintervenant_ids > 0) {
 					foreach ($extintervenant_ids as $extintervenant_id) {
 						$signatory->createFromClone($user, $extintervenant_id, $preventionplanid);
@@ -300,7 +292,7 @@ class PreventionPlan extends SaturneObject
 				}
 			}
 
-			if ( ! empty($options['preventionplan_risk'])) {
+			if (!empty($options['preventionplan_risk'])) {
 				$num = (!empty($object->lines) ? count($object->lines) : 0);
 				for ($i = 0; $i < $num; $i++) {
 					$line                    = $object->lines[$i];

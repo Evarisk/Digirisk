@@ -203,7 +203,7 @@ class doc_preventionplandocument_odt extends SaturneDocumentModel
 			dol_syslog($e->getMessage());
 		}
 
-		$extsocietyintervenants = $signatory->fetchSignatory('PP_EXT_SOCIETY_INTERVENANTS', $object->id, 'preventionplan');
+		$extsocietyintervenants = $signatory->fetchSignatory('ExtSocietyAttendant', $object->id, 'preventionplan');
 
 		$tempdir = $conf->digiriskdolibarr->multidir_output[$object->entity ?? 1] . '/temp/';
 
@@ -315,7 +315,7 @@ class doc_preventionplandocument_odt extends SaturneDocumentModel
 		$signatory           = new SaturneSignature($this->db, $moduleNameLowerCase, $object->element);
 
 		$preventionplanlines   = $preventionplanline->fetchAll('', '', 0, 0, ['fk_preventionplan' => $object->id]);
-		$extsocietyintervenants = $signatory->fetchSignatory('PP_EXT_SOCIETY_INTERVENANTS', $object->id, 'preventionplan');
+		$extsocietyintervenants = $signatory->fetchSignatory('ExtSocietyAttendant', $object->id, 'preventionplan');
 
 		$jsonData  = $objectDocument->PreventionPlanDocumentFillJSON();
 		$arrayData = json_decode($jsonData);

@@ -319,9 +319,11 @@ PreventionPlanArchivedTrigger = Plan de prévention archivé
 PreventionPlanAddAttendantTrigger = Ajout d'un participant au plan de prévention
 PreventionPlanSentByMailTrigger = Email plan de prévention envoyé
 PreventionPlanOpeningHoursCreateTrigger = Enregistrement des horaires du plan de prévention
-PP_EXT_SOCIETY_INTERVENANTSSigned = Signature de l'intervenant
-PP_EXT_SOCIETY_RESPONSIBLESigned = Signature du responsable de la société extérieure
-PP_MAITRE_OEUVRESigned = Signature du maître d'oeuvre
+AttendantSigned = Signature de l'intervenant
+ExtSocietyResponsibleSigned = Signature du responsable de la société extérieure
+MasterWorkerSigned = Signature du maître d'oeuvre
+ThePreventionplan = Le plan de prévention
+
 
 # Mod Numbering - Modèle de numérotation
 DigiriskPreventionPlanNumberingModule = Modèle de numérotation des plans de prévention de Digirisk
@@ -354,13 +356,11 @@ PriorVisitText = Note de l'inspection
 CSSCTIntervention = Intervention du CSSCT
 CSSCTInterventionText = Intervention du CSSCT ?
 MaitreOeuvre = Responsable de l'Entreprise Utilisatrice
-PP_MAITRE_OEUVRE = Responsable de l'Entreprise Utilisatrice
+MasterWorker = Responsable de l'Entreprise Utilisatrice
 ExtSociety = Entreprise Extérieure
 ExtSocietyResponsible = Responsable de l'Entreprise Extérieure
-PP_EXT_SOCIETY_RESPONSIBLE = Responsable de l'Entreprise Extérieure
-ExtSocietyIntervenants = Intervenants de l'Entreprise Extérieure
-PP_EXT_SOCIETY_INTERVENANTS = Intervenants de l'Entreprise Extérieure
-ExtSocietyIntervenant = Intervenant de l'Entreprise Extérieure
+ExtSocietyResponsible = Responsable de l'Entreprise Extérieure
+ExtSocietyAttendant = Intervenant de l'Entreprise Extérieure
 ActionsDescription = Description des actions
 INRSRisk = Risque (INRS)
 PreventionMethod = Moyens de prévention

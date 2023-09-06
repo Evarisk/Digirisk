@@ -821,9 +821,9 @@ class ActionsDigiriskdolibarr
 //            $signatory->fetchSignatory('FP_MAITRE_OEUVRE', $id, 'firepermit');
 //            $signatory->fetchSignatory('FP_EXT_SOCIETY_RESPONSIBLE', $id, 'firepermit');
 //            $signatory->fetchSignatory('FP_EXT_SOCIETY_INTERVENANTS', $id, 'firepermit');
-            $signatoriesByRole['InternalResponsible'] = $parameters['signatory']->fetchSignatory('InternalResponsible', $object->id, $object->element);
-            $signatoriesByRole['ExternalResponsible'] = $parameters['signatory']->fetchSignatory('ExternalResponsible', $object->id, $object->element);
-            $signatoriesByRole['Attendant']           = $parameters['signatory']->fetchSignatory('Attendant', $object->id, $object->element);
+            $signatoriesByRole['MasterWorker'] = $parameters['signatory']->fetchSignatory('MasterWorker', $object->id, $object->element);
+            $signatoriesByRole['ExtSocietyResponsible'] = $parameters['signatory']->fetchSignatory('ExtSocietyResponsible', $object->id, $object->element);
+            $signatoriesByRole['ExtSocietyAttendant']           = $parameters['signatory']->fetchSignatory('ExtSocietyAttendant', $object->id, $object->element);
             $this->results = $signatoriesByRole;
         }
 
