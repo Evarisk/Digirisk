@@ -839,6 +839,12 @@ class modDigiriskdolibarr extends DolibarrModules
 
 			// CONST ACCIDENT INVESTIGATION
 			$i++ => ['DIGIRISKDOLIBARR_ACCIDENTINVESTIGATION_ADDON', 'chaine', 'mod_accident_investigation_standard', '', 0, 'current'],
+			$i++ => ['DIGIRISKDOLIBARR_MAIN_AGENDA_ACTIONAUTO_ACCIDENTINVESTIGATION_CREATE', 'integer', 1, '', 0, 'current'],
+			$i++ => ['DIGIRISKDOLIBARR_MAIN_AGENDA_ACTIONAUTO_ACCIDENTINVESTIGATION_MODIFY', 'integer', 1, '', 0, 'current'],
+			$i++ => ['DIGIRISKDOLIBARR_MAIN_AGENDA_ACTIONAUTO_ACCIDENTINVESTIGATION_DELETE', 'integer', 1, '', 0, 'current'],
+			$i++ => ['DIGIRISKDOLIBARR_MAIN_AGENDA_ACTIONAUTO_ACCIDENT_INVESTIGATION_VALIDATE', 'integer', 1, '', 0, 'current'],
+			$i++ => ['DIGIRISKDOLIBARR_MAIN_AGENDA_ACTIONAUTO_ACCIDENT_INVESTIGATION_ARCHIVE', 'integer', 1, '', 0, 'current'],
+			$i++ => ['DIGIRISKDOLIBARR_MAIN_AGENDA_ACTIONAUTO_ACCIDENTINVESTIGATION_SIGNED', 'integer', 1, '', 0, 'current'],
 
 			// CONST ACCIDENT INVESTIGATION DOCUMENT
 			$i++ => ['DIGIRISKDOLIBARR_ACCIDENTINVESTIGATIONDOCUMENT_ADDON', 'chaine', 'mod_accident_investigation_document_standard', '', 0, 'current'],
@@ -891,7 +897,7 @@ class modDigiriskdolibarr extends DolibarrModules
 				'SELECT f.rowid as rowid, f.ref, f.label, f.description, f.active FROM ' . MAIN_DB_PREFIX . 'c_lesion_localization as f',
 				'SELECT f.rowid as rowid, f.ref, f.label, f.description, f.active FROM ' . MAIN_DB_PREFIX . 'c_lesion_nature as f',
 				'SELECT f.rowid as rowid, f.ref, f.label, f.description, f.position, f.active FROM ' . MAIN_DB_PREFIX . 'c_accident_investigation_attendants_role as f',
-				'SELECT f.rowid as rowid, f.code, f.label, f.description FROM ' . MAIN_DB_PREFIX . 'c_digiriskdolibarr_action_trigger as f'
+				'SELECT f.rowid as rowid, f.ref, f.label, f.description, f.position, f.active FROM ' . MAIN_DB_PREFIX . 'c_digiriskdolibarr_action_trigger as f'
 			],
 			// Sort order
 			'tabsqlsort' => [
@@ -900,7 +906,7 @@ class modDigiriskdolibarr extends DolibarrModules
 				"label ASC",
 				"label ASC",
 				"label ASC",
-				"code ASC"
+				"ref ASC"
 			],
 			// List of fields (result of select to show dictionary)
 			'tabfield' => [
@@ -909,7 +915,7 @@ class modDigiriskdolibarr extends DolibarrModules
 				"ref,label,description",
 				"ref,label,description",
 				"ref,label,description",
-				"code,label,description"
+				"ref,label,description"
 			],
 			// List of fields (list of fields to edit a record)
 			'tabfieldvalue' => [
@@ -918,7 +924,7 @@ class modDigiriskdolibarr extends DolibarrModules
 				"ref,label,description",
 				"ref,label,description",
 				"ref,label,description",
-				"code,label,description"
+				"ref,label,description"
 			],
 			// List of fields (list of fields for insert)
 			'tabfieldinsert' => [
@@ -927,7 +933,7 @@ class modDigiriskdolibarr extends DolibarrModules
 				"ref,label,description",
 				"ref,label,description",
 				"ref,label,description",
-				"code,label,description"
+				"ref,label,description"
 			],
 			// Name of columns with primary key (try to always name it 'rowid')
 			'tabrowid' => [
@@ -940,6 +946,7 @@ class modDigiriskdolibarr extends DolibarrModules
 			],
 			// Condition to show each dictionary
 			'tabcond' => [
+				$conf->digiriskdolibarr->enabled,
 				$conf->digiriskdolibarr->enabled,
 				$conf->digiriskdolibarr->enabled,
 				$conf->digiriskdolibarr->enabled,
@@ -1477,7 +1484,7 @@ class modDigiriskdolibarr extends DolibarrModules
 		$this->menu[$r++] = [
 			'fk_menu'  => 'fk_mainmenu=digiriskdolibarr,fk_leftmenu=digiriskaccident',	    // '' if this is a top menu. For left menu, use 'fk_mainmenu=xxx' or 'fk_mainmenu=xxx,fk_leftmenu=yyy' where xxx is mainmenucode and yyy is a leftmenucode
 			'type'     => 'left',			                // This is a Left menu entry
-			'titre'    => '<i class="fas fa-tasks pictofixedwidth" style="padding-right: 4px;"></i>' . $langs->transnoentities('AccidentInvestigation'),
+			'titre'    => '<i class="fas fa-search pictofixedwidth" style="padding-right: 4px;"></i>' . $langs->transnoentities('AccidentInvestigation'),
 			'mainmenu' => 'digiriskdolibarr',
 			'leftmenu' => 'digiriskaccidentinvestigation',
 			'url'      => '/digiriskdolibarr/view/accident_investigation/accident_investigation_list.php',

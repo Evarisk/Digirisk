@@ -21,20 +21,14 @@
  * \brief   Digiriskdolibarr config event auto page.
  */
 
-// Load Dolibarr environment
-$res = 0;
-// Try main.inc.php into web root known defined into CONTEXT_DOCUMENT_ROOT (not always defined)
-if ( ! $res && ! empty($_SERVER["CONTEXT_DOCUMENT_ROOT"])) $res = @include $_SERVER["CONTEXT_DOCUMENT_ROOT"] . "/main.inc.php";
-// Try main.inc.php into web root detected using web root calculated from SCRIPT_FILENAME
-$tmp = empty($_SERVER['SCRIPT_FILENAME']) ? '' : $_SERVER['SCRIPT_FILENAME']; $tmp2 = realpath(__FILE__); $i = strlen($tmp) - 1; $j = strlen($tmp2) - 1;
-while ($i > 0 && $j > 0 && isset($tmp[$i]) && isset($tmp2[$j]) && $tmp[$i] == $tmp2[$j]) { $i--; $j--; }
-if ( ! $res && $i > 0 && file_exists(substr($tmp, 0, ($i + 1)) . "/main.inc.php")) $res          = @include substr($tmp, 0, ($i + 1)) . "/main.inc.php";
-if ( ! $res && $i > 0 && file_exists(dirname(substr($tmp, 0, ($i + 1))) . "/main.inc.php")) $res = @include dirname(substr($tmp, 0, ($i + 1))) . "/main.inc.php";
-// Try main.inc.php using relative path
-if ( ! $res && file_exists("../../main.inc.php")) $res       = @include "../../main.inc.php";
-if ( ! $res && file_exists("../../../main.inc.php")) $res    = @include "../../../main.inc.php";
-if ( ! $res && file_exists("../../../../main.inc.php")) $res = @include "../../../../main.inc.php";
-if ( ! $res) die("Include of main fails");
+// Load DigiriskDolibarr environment
+if (file_exists('../../digiriskdolibarr.main.inc.php')) {
+	require_once __DIR__ . '/../../digiriskdolibarr.main.inc.php';
+} elseif (file_exists('../../../digiriskdolibarr.main.inc.php')) {
+	require_once __DIR__ . '/../../../digiriskdolibarr.main.inc.php';
+} else {
+	die('Include of digiriskdolibarr main fails');
+}
 
 global $conf, $db, $langs, $module, $user;
 
@@ -55,29 +49,7 @@ $cancel = GETPOST('cancel', 'alpha');
 $search_event = GETPOST('search_event', 'alpha');
 
 // Get list of triggers available
-$triggers = array();
-$sql = "SELECT a.rowid, a.code, a.label, a.elementtype, a.rang as position";
-$sql .= " FROM ".MAIN_DB_PREFIX."c_digiriskdolibarr_action_trigger as a";
-$sql .= " ORDER BY a.rang ASC";
-
-$resql = $db->query($sql);
-if ($resql) {
-	$num = $db->num_rows($resql);
-	$i = 0;
-	while ($i < $num) {
-		$obj = $db->fetch_object($resql);
-		$triggers[$i]['rowid']   = $obj->rowid;
-		$triggers[$i]['code'] 	 = $obj->code;
-		$triggers[$i]['element'] = $obj->elementtype;
-		$triggers[$i]['label']	 = ($langs->trans("Notify_".$obj->code) != "Notify_".$obj->code ? $langs->trans("Notify_".$obj->code) : $obj->label);
-		$triggers[$i]['position']= $obj->position;
-
-		$i++;
-	}
-	$db->free($resql);
-} else {
-	dol_print_error($db);
-}
+$triggers = saturne_fetch_dictionary('c_digiriskdolibarr_action_trigger', 'ASC', 't.rowid');
 
 /*
  *	Actions
@@ -99,9 +71,9 @@ if ($action == "save" && empty($cancel)) {
 	$db->begin();
 
 	foreach ($triggers as $trigger) {
-		$keyparam = 'DIGIRISKDOLIBARR_MAIN_AGENDA_ACTIONAUTO_'.$trigger['code'];
+		$keyparam = 'DIGIRISKDOLIBARR_MAIN_AGENDA_ACTIONAUTO_'.$trigger->ref;
 		if ($search_event === '' || preg_match('/'.preg_quote($search_event, '/').'/i', $keyparam)) {
-			$res = dolibarr_set_const($db, $keyparam, GETPOST($keyparam, 'alpha'), 'chaine', 0, '', $conf->entity);
+			$res = dolibarr_set_const($db, $keyparam, GETPOST($keyparam, 'alpha') == 'on' ? 1 : 0, 'integer', 0, '', $conf->entity);
 			if (!($res > 0)) {
 				$error++;
 			}
@@ -120,6 +92,8 @@ if ($action == "save" && empty($cancel)) {
 /*
  * View
  */
+
+$form = new Form($db);
 
 $page_name = "Event";
 $help_url  = 'FR:Module_DigiriskDolibarr';
@@ -192,12 +166,12 @@ print '</tr>'."\n";
 // Show each trigger (list is in c_digiriskdolibarr_action_trigger)
 if (!empty($triggers)) {
 	foreach ($triggers as $trigger) {
-		if ($search_event === '' || preg_match('/' . preg_quote($search_event, '/') . '/i', $trigger['code'])) {
+		if ($search_event === '' || preg_match('/' . preg_quote($search_event, '/') . '/i', $trigger->ref)) {
 			print '<tr class="oddeven">';
-			print '<td>' . $trigger['code'] . '</td>';
-			print '<td>' . $langs->trans($trigger['label']) . '</td>';
+			print '<td>' . $trigger->ref . '</td>';
+			print '<td>' . $langs->trans($trigger->label) . '</td>';
 			print '<td class="right">';
-			$key = 'DIGIRISKDOLIBARR_MAIN_AGENDA_ACTIONAUTO_' . $trigger['code'];
+			$key = 'DIGIRISKDOLIBARR_MAIN_AGENDA_ACTIONAUTO_' . $trigger->ref;
 			$value = $conf->global->$key;
 			print '<input class="oddeven" type="checkbox" name="' . $key . '"' . ((($action == 'selectall' || $value) && $action != "selectnone") ? ' checked' : '') . '>';
 			print '</td></tr>';
