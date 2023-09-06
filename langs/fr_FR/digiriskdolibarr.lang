@@ -753,6 +753,12 @@ TaskWillBeCreatedAfterValidation = Les tâches seront créées après validation
 AccidentInvestigationArchived = L'enquête accident a été archivée et le document a été généré
 DocumentGeneratedWithArchive = Le document est généré lorsque l'enquête accident est archivé
 ConfirmReOpenInvestigation = Êtes-vous sûr de vouloir rouvrir l'enquête accident ? La réouverture permet la modification de l'enquête accident et l'ajout de nouveaux participants mais <b>tous les participants et les signatures actuelles du document seront perdues. <br> Une nouvelle version du document sera généré par la suite.</b>.
+AccidentInvestigationCreated = Création d'une enquête accident
+AccidentInvestigationModified = Modifcation d'une enquête accident
+AccidentInvestigationDeleted = Suppression d'une enquête accident
+AccidentInvestigationValidate = Validation d'une enquête accident
+AccidentInvestigationArchive = Classification d'une enquête accident
+AccidentInvestigationSigned = Signature d'une enquête accident
 
 # AccidentTooltip - Tooltip des accidents
 VictimActivityTooltip = Précisez l’activité ou la tâche de la victime au moment de l’accident, c’est-à-dire ce que faisait la victime
