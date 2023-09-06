@@ -94,6 +94,18 @@ $upload_dir = $conf->digiriskdolibarr->multidir_output[$object->entity ?? 1];
 // Load object
 require_once DOL_DOCUMENT_ROOT . '/core/actions_fetchobject.inc.php'; // Must be included, not include_once.
 
+$taskExist = $task->fetch($object->fk_task);
+if ($taskExist <= 0) {
+	$object->setValueFrom('fk_task', 0, '', null, 'int', '', $user, 'ACCIDENTINVESTIGATION_MODIFY');
+}
+
+if ($object->status == AccidentInvestigation::STATUS_VALIDATED) {
+	$result = $signatory->checkSignatoriesSignatures($id, $object->element);
+	if ($result > 0) {
+		$object->setStatusCommon($user, AccidentInvestigation::STATUS_SIGNED, 0, 'ACCIDENTINVESTIGATION_SIGNED');
+	}
+}
+
 // Security check - Protection if external user
 $permissiontoread   = $user->rights->digiriskdolibarr->accident_investigation->read;
 $permissiontoadd    = $user->rights->digiriskdolibarr->accident_investigation->write;
@@ -122,11 +134,6 @@ if (empty($reshook)) {
 				$backtopage = dol_buildpath('/digiriskdolibarr/view/accident_investigation/accident_investigation_card.php', 1) . '?id=' . ((!empty($id) && $id > 0) ? $id : '__ID__');
 			}
 		}
-	}
-
-	$taskExist = $task->fetch($object->fk_task);
-	if ($taskExist <= 0) {
-		$object->setValueFrom('fk_task', 0, '', '', '', '', $user);
 	}
 
 	if ($action == 'confirm_set_validate') {
@@ -196,6 +203,10 @@ if (empty($reshook)) {
 		} else {
 			setEventMessages($document->error, [], 'errors');
 		}
+	}
+
+	if ($action == 'confirm_setdraft') {
+		$signatory->deleteSignatoriesSignatures($id, $object->element);
 	}
 
 	// Actions cancel, add, update, update_extras, confirm_validate, confirm_delete, confirm_deleteline, confirm_clone, confirm_close, confirm_setdraft, confirm_reopen
@@ -386,6 +397,14 @@ if ($action == 'create') {
 			print '<span class="butActionRefused classfortooltip" title="' . dol_escape_htmltag($langs->trans('ObjectMustBeDraft', ucfirst($langs->transnoentities('The' . ucfirst($object->element))))) . '">' . $displayButton . '</span>';
 		}
 
+		// Sign.
+		$displayButton = $onPhone ? '<i class="fas fa-file-signature fa-2x"></i>' : '<i class="fas fa-file-signature"></i>' . ' ' . $langs->trans('Sign');
+		if ($object->status == AccidentInvestigation::STATUS_VALIDATED) {
+			print '<a class="butAction" id="actionButtonSign" href="' . dol_buildpath('/saturne/view/saturne_attendants.php', 1) . '?id=' . $object->id . '&module_name=' . $object->module . '&object_type=' . $object->element . '&attendant_table_mode=simple' . '">' . $displayButton . '</a>';
+		} else {
+			print '<span class="butActionRefused classfortooltip" title="' . dol_escape_htmltag($langs->trans('ObjectMustBeValidated', ucfirst($langs->transnoentities('The' . ucfirst($object->element))))) . '">' . $displayButton . '</span>';
+		}
+
 		// Send email.
 		$displayButton = $onPhone ? '<i class="fas fa-paper-plane fa-2x"></i>' : '<i class="fas fa-paper-plane"></i>' . ' ' . $langs->trans('SendMail') . ' ';
 		if ($object->status == AccidentInvestigation::STATUS_VALIDATED) {
@@ -394,19 +413,19 @@ if ($action == 'create') {
 			$forcebuilddoc = (file_exists($file) && !strstr($fileParams['name'], 'specimen')) ? 0 : 1;
 			print dolGetButtonAction($displayButton, '', 'default', $_SERVER['PHP_SELF'] . '?id=' . $object->id . '&action=presend&forcebuilddoc=' . $forcebuilddoc . '&mode=init#formmailbeforetitle');
 		} else {
-			print '<span class="butActionRefused classfortooltip" title="'.dol_escape_htmltag($langs->trans('ObjectMustBeValidatedToSendEmail', ucfirst($langs->transnoentities('The' . ucfirst($object->element))))) . '">' . $displayButton . '</span>';
+			print '<span class="butActionRefused classfortooltip" title="' . dol_escape_htmltag($langs->trans('ObjectMustBeValidatedToSendEmail', ucfirst($langs->transnoentities('The' . ucfirst($object->element))))) . '">' . $displayButton . '</span>';
 		}
 
-		// Archive.
-		$displayButton = $onPhone ?  '<i class="fas fa-archive fa-2x"></i>' : '<i class="fas fa-archive"></i>' . ' ' . $langs->trans('Archive');
-		if ($object->status == AccidentInvestigation::STATUS_VALIDATED) {
+		// Classify.
+		$displayButton = $onPhone ?  '<i class="fas fa-archive fa-2x"></i>' : '<i class="fas fa-archive"></i>' . ' ' . $langs->trans('Classify');
+		if ($object->status == AccidentInvestigation::STATUS_SIGNED) {
 			print '<span class="butAction" id="actionButtonArchive" href="' . $_SERVER['PHP_SELF'] . '?id=' . $object->id . '&action=set_archive&token=' . newToken() . '">' . $displayButton . '</span>';
 		} else {
 			print '<span class="butActionRefused classfortooltip" title="' . dol_escape_htmltag($langs->trans('ObjectMustBeValidatedToArchive', ucfirst($langs->transnoentities('The' . ucfirst($object->element))))) . '">' . $displayButton . '</span>';
 		}
 
-		// ReOpen.
-		$displayButton = $onPhone ? '<i class="fas fa-lock-open fa-2x"></i>' : '<i class="fas fa-lock-open"></i>' . ' ' . $langs->trans('ReOpenDoli');
+		// New version.
+		$displayButton = $onPhone ? '<i class="fas fa-lock-open fa-2x"></i>' : '<i class="fas fa-code-branch"></i>' . ' ' . $langs->trans('NewVersion');
 		if ($object->status == AccidentInvestigation::STATUS_ARCHIVED) {
 			print '<span class="butAction" id="actionButtonInProgress" href="' . $_SERVER['PHP_SELF'] . '?id=' . $object->id . '&action=set_draft&token=' . newToken() . '">' . $displayButton . '</span>';
 		} else {
@@ -415,7 +434,7 @@ if ($action == 'create') {
 
 		// Clone.
 		$displayButton = $onPhone ? '<i class="fas fa-clone fa-2x"></i>' : '<i class="fas fa-clone"></i>' . ' ' . $langs->trans('ToClone');
-		print '<span class="butAction" id="actionButtonClone" href="' . $_SERVER['PHP_SELF'] . '?id=' . $object->id . '&action=clone' . '">' . $displayButton . '</span>';
+		print '<span class="butAction" id="actionButtonClone">' . $displayButton . '</span>';
 
 		// Delete (need delete permission, or if draft, just need create/modify permission).
 		$displayButton = $onPhone ? '<i class="fas fa-trash fa-2x"></i>' : '<i class="fas fa-trash"></i>' . ' ' . $langs->trans('Delete');

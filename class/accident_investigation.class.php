@@ -59,12 +59,12 @@ class AccidentInvestigation extends SaturneObject
 	/**
 	* @var string String with name of icon for digiriskelement. Must be the part after the 'object_' into object_digiriskelement.png
 	*/
-	public string $picto = 'fontawesome_fa-tasks_fas_#d35968';
+	public string $picto = 'fontawesome_fa-search_fas_#d35968';
 
 	public const STATUS_DELETED   = -1;
 	public const STATUS_DRAFT     = 0;
 	public const STATUS_VALIDATED = 1;
-	public const STATUS_LOCKED    = 2;
+	public const STATUS_SIGNED    = 2;
 	public const STATUS_ARCHIVED  = 3;
 
 	/**
@@ -283,21 +283,27 @@ class AccidentInvestigation extends SaturneObject
 	 */
 	public function getTriggerDescription(SaturneObject $object): string
 	{
+		require_once __DIR__ . '/accident.class.php';
+		require_once __DIR__ . '/../../saturne/class/task/saturnetask.class.php';
+
 		global $langs;
 
 		$accident = new Accident($this->db);
 		$accident->fetch($object->fk_accident);
+		if ($object->fk_task > 0) {
+			$task = new SaturneTask($this->db);
+			$task->fetch($object->fk_task);
+		}
 
-		$ret   = parent::getTriggerDescription($object);
-		$ret  .= $langs->transnoentities('Accident') . ' : ' . $accident->ref . ' - ' . $accident->label . '</br>';
-		$ret  .= (!empty($object->seniority_at_post) ? $langs->transnoentities('SeniorityAtPost') . ' : ' . $object->seniority_at_post . '</br>' : '');
-		$ret  .= (!empty($object->victim_skills) ? $langs->transnoentities('VictimSkills') . ' : ' . $object->victim_skills . '</br>' : '');
-		$ret  .= (!empty($object->collective_equipment) ? $langs->transnoentities('CollectiveEquipment') . ' : ' . $object->collective_equipment . '</br>' : '');
-		$ret  .= (!empty($object->individual_equipment) ? $langs->transnoentities('IndividualEquipment') . ' : ' . $object->individual_equipment . '</br>' : '');
-		$ret  .= (!empty($object->circumstances) ? $langs->transnoentities('Circumstances') . ' : ' . $object->circumstances . '</br>' : '');
-		$ret  .= (!empty($object->causality_tree) ? $langs->transnoentities('CausalityTree') . ' : ' . $object->causality_tree . '</br>' : '');
-		$ret  .= (!empty($object->note_public) ? $langs->transnoentities('NotePublic') . ' : ' . $object->note_public . '</br>' : '');
-		$ret  .= (!empty($object->note_private) ? $langs->transnoentities('NotePrivate') . ' : ' . $object->note_private . '</br>' : '');
+		$ret  = parent::getTriggerDescription($object);
+		$ret .= $langs->transnoentities('Accident') . ' : ' . $accident->ref . ' - ' . $accident->label . '</br>';
+		$ret .= ($object->fk_task > 0 ? $langs->transnoentities('Task') . ' : ' . $task->ref . ' - ' . $task->label . '</br>': '');
+		$ret .= (dol_strlen($object->seniority_at_post) > 0 ? $langs->transnoentities('SeniorityAtPost') . ' : ' . $object->seniority_at_post . '</br>' : '');
+		$ret .= (dol_strlen($object->victim_skills) > 0 ? $langs->transnoentities('VictimSkills') . ' : ' . $object->victim_skills . '</br>' : '');
+		$ret .= (dol_strlen($object->collective_equipment) > 0 ? $langs->transnoentities('CollectiveEquipment') . ' : ' . $object->collective_equipment . '</br>' : '');
+		$ret .= (dol_strlen($object->individual_equipment) > 0 ? $langs->transnoentities('IndividualEquipment') . ' : ' . $object->individual_equipment . '</br>' : '');
+		$ret .= (dol_strlen($object->circumstances) > 0 ? $langs->transnoentities('Circumstances') . ' : ' . $object->circumstances . '</br>' : '');
+		$ret .= (dol_strlen($object->causality_tree) > 0 ? $langs->transnoentities('CausalityTree') . ' : ' . $object->causality_tree . '</br>' : '');
 
 		return $ret;
 	}
@@ -403,13 +409,13 @@ class AccidentInvestigation extends SaturneObject
 
 			$this->labelStatus[self::STATUS_DRAFT]          = $langs->transnoentitiesnoconv('StatusDraft');
 			$this->labelStatus[self::STATUS_VALIDATED]      = $langs->transnoentitiesnoconv('Validated');
-			$this->labelStatus[self::STATUS_LOCKED]         = $langs->transnoentitiesnoconv('Locked');
+			$this->labelStatus[self::STATUS_SIGNED]         = $langs->transnoentitiesnoconv('Signed');
 			$this->labelStatus[self::STATUS_ARCHIVED]       = $langs->transnoentitiesnoconv('Archived');
 			$this->labelStatus[self::STATUS_DELETED]        = $langs->transnoentitiesnoconv('Deleted');
 
 			$this->labelStatusShort[self::STATUS_DRAFT]     = $langs->transnoentitiesnoconv('StatusDraft');
 			$this->labelStatusShort[self::STATUS_VALIDATED] = $langs->transnoentitiesnoconv('Validated');
-			$this->labelStatusShort[self::STATUS_LOCKED]    = $langs->transnoentitiesnoconv('Locked');
+			$this->labelStatusShort[self::STATUS_SIGNED]    = $langs->transnoentitiesnoconv('Signed');
 			$this->labelStatusShort[self::STATUS_ARCHIVED]  = $langs->transnoentitiesnoconv('Archived');
 			$this->labelStatusShort[self::STATUS_DELETED]   = $langs->transnoentitiesnoconv('Deleted');
 		}
@@ -418,7 +424,7 @@ class AccidentInvestigation extends SaturneObject
 		if ($status == self::STATUS_VALIDATED) {
 			$statusType = 'status4';
 		}
-		if ($status == self::STATUS_LOCKED) {
+		if ($status == self::STATUS_SIGNED) {
 			$statusType = 'status6';
 		}
 		if ($status == self::STATUS_ARCHIVED) {
