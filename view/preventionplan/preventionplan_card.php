@@ -30,12 +30,16 @@ if (file_exists('../digiriskdolibarr.main.inc.php')) {
 	die('Include of digiriskdolibarr main fails');
 }
 
+// Libraries
 require_once DOL_DOCUMENT_ROOT . '/core/class/html.form.class.php';
 require_once DOL_DOCUMENT_ROOT .'/core/class/html.formprojet.class.php';
 require_once DOL_DOCUMENT_ROOT . '/core/class/doleditor.class.php';
 require_once DOL_DOCUMENT_ROOT . '/core/lib/images.lib.php';
 
+// Load Saturne libraries.
 require_once __DIR__ . '/../../../saturne/class/saturnesignature.class.php';
+
+// Load DigiriskDolibarr libraries.
 require_once __DIR__ . '/../../class/digiriskdocuments.class.php';
 require_once __DIR__ . '/../../class/digiriskelement.class.php';
 require_once __DIR__ . '/../../class/digiriskresources.class.php';
@@ -46,6 +50,7 @@ require_once __DIR__ . '/../../lib/digiriskdolibarr_function.lib.php';
 require_once __DIR__ . '/../../lib/digiriskdolibarr_preventionplan.lib.php';
 require_once __DIR__ . '/../../core/modules/digiriskdolibarr/digiriskdolibarrdocuments/preventionplandocument/modules_preventionplandocument.php';
 
+// Global variables definitions
 global $conf, $db, $hookmanager, $langs, $user;
 
 // Load translation files required by the page
@@ -85,6 +90,7 @@ $object->fetch($id);
 // Load resources
 $allLinks = $resources->digirisk_dolibarr_fetch_resources();
 
+// Load numbering modules
 $numberingModules = [
 	'digiriskelement/' . $object->element            => $conf->global->DIGIRISKDOLIBARR_PREVENTIONPLAN_ADDON,
 	'digiriskelement/' . $preventionplandet->element => $conf->global->DIGIRISKDOLIBARR_PREVENTIONPLANDET_ADDON
@@ -96,18 +102,18 @@ list($refPreventionPlanDetMod, $refPreventionPlanMod) = saturne_require_objects_
 $extrafields->fetch_name_optionals_label($object->table_element);
 $extrafields->fetch_name_optionals_label($preventionplandet->table_element);
 
+// Initialize hooks
 $hookmanager->initHooks(array('preventionplancard', 'globalcard')); // Note that conf->hooks_modules contains array
 
+// Get files upload dir
 $upload_dir = $conf->digiriskdolibarr->multidir_output[isset($object->entity) ? $object->entity : 1];
 
-// Security check
-
+// Security check - Protection if external user
 $permissiontoread   = $user->rights->digiriskdolibarr->preventionplan->read;
 $permissiontoadd    = $user->rights->digiriskdolibarr->preventionplan->write;
 $permissiontodelete = $user->rights->digiriskdolibarr->preventionplan->delete;
 
 saturne_check_access($permissiontoadd);
-
 
 /*
  * Actions
