@@ -59,7 +59,7 @@ class AccidentInvestigation extends SaturneObject
 	/**
 	* @var string String with name of icon for digiriskelement. Must be the part after the 'object_' into object_digiriskelement.png
 	*/
-	public string $picto = 'fontawesome_fa-search_fas_#d35968';
+	public string $picto = 'fontawesome_fa-search_fas';
 
 	public const STATUS_DELETED   = -1;
 	public const STATUS_DRAFT     = 0;

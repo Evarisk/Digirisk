@@ -305,15 +305,33 @@ if ($action == 'create') {
 
 	// Draft confirmation
 	if (($action == 'set_draft' && (empty($conf->use_javascript_ajax) || !empty($conf->dol_use_jmobile))) || (!empty($conf->use_javascript_ajax) && empty($conf->dol_use_jmobile))) {
-		$formConfirm .= $form->formconfirm($_SERVER['PHP_SELF'] . '?id=' . $object->id, $langs->trans('ReOpenObject', $langs->transnoentities('The' . ucfirst($object->element))),  $langs->trans('ConfirmReOpenInvestigation'), 'confirm_setdraft', '', 'yes', 'actionButtonInProgress', 350, 600);
+		$img          = '<img alt="" src="./../../img/investigation_classify.png" />';
+		$formQuestion = [
+			['type' => 'other', 'name' => 'lock_validation', 'label' => '<span class="">' . img_picto('', 'info') . ' ' . $langs->trans('ConfirmReOpenInvestigation'). '</span>'],
+			['type' => 'other', 'name' => 'OK', 'label' => '', 'value' => $img, 'moreattr' => 'readonly'],
+		];
+
+		$formConfirm .= $form->formconfirm($_SERVER['PHP_SELF'] . '?id=' . $object->id, $langs->trans('ReOpenObject', $langs->transnoentities('The' . ucfirst($object->element))), '', 'confirm_setdraft', $formQuestion, 'yes', 'actionButtonInProgress', 400, 650);
 	}
 	// Validate confirmation
 	if (($action == 'set_validate' && (empty($conf->use_javascript_ajax) || !empty($conf->dol_use_jmobile))) || (!empty($conf->use_javascript_ajax) && empty($conf->dol_use_jmobile))) {
-		$formConfirm .= $form->formconfirm($_SERVER['PHP_SELF'] . '?id=' . $object->id, $langs->trans('ValidateObject', $langs->transnoentities('The' . ucfirst($object->element))), $langs->trans('ConfirmValidateObject', $langs->transnoentities('The' . ucfirst($object->element)), $langs->transnoentities('The' . ucfirst($object->element))), 'confirm_set_validate', '', 'yes', 'actionButtonValidate', 350, 600);
+		$img          = '<img alt="" src="./../../img/investigation_draft.png" />';
+		$formQuestion = [
+			['type' => 'other', 'name' => 'lock_validation', 'label' => '<span class="">' . img_picto('', 'info') . ' ' . $langs->trans('ConfirmValidateObject', $langs->transnoentities('The' . ucfirst($object->element)), $langs->transnoentities('The' . ucfirst($object->element))) . '</span>'],
+			['type' => 'other', 'name' => 'OK', 'label' => '', 'value' => $img, 'moreattr' => 'readonly'],
+		];
+
+		$formConfirm .= $form->formconfirm($_SERVER['PHP_SELF'] . '?id=' . $object->id, $langs->trans('ValidateObject', $langs->transnoentities('The' . ucfirst($object->element))), '', 'confirm_set_validate', $formQuestion, 'yes', 'actionButtonValidate', 400, 650);
 	}
 	// Archive confirmation
 	if (($action == 'set_archive' && (empty($conf->use_javascript_ajax) || !empty($conf->dol_use_jmobile))) || (!empty($conf->use_javascript_ajax) && empty($conf->dol_use_jmobile))) {
-		$formConfirm .= $form->formconfirm($_SERVER['PHP_SELF'] . '?id=' . $object->id, $langs->trans('ClassifyObject', $langs->transnoentities('The' . ucfirst($object->element))), $langs->trans('ConfirmClassifyObject', $langs->transnoentities('The' . ucfirst($object->element))), 'confirm_archive', '', 'yes', 'actionButtonArchive', 350, 600);
+		$img          = '<img alt="" src="./../../img/investigation_validate.png" />';
+		$formQuestion = [
+			['type' => 'other', 'name' => 'lock_validation', 'label' => '<span class="">' . img_picto('', 'info') . ' ' . $langs->trans('ConfirmClassifyObject', $langs->transnoentities('The' . ucfirst($object->element))). '</span>'],
+			['type' => 'other', 'name' => 'OK', 'label' => '', 'value' => $img, 'moreattr' => 'readonly'],
+		];
+
+		$formConfirm .= $form->formconfirm($_SERVER['PHP_SELF'] . '?id=' . $object->id, $langs->trans('ClassifyObject', $langs->transnoentities('The' . ucfirst($object->element))), '', 'confirm_archive', $formQuestion, 'yes', 'actionButtonArchive', 400, 650);
 	}
 	// Clone confirmation
 	if (($action == 'clone' && (empty($conf->use_javascript_ajax) || !empty($conf->dol_use_jmobile))) || (!empty($conf->use_javascript_ajax) && empty($conf->dol_use_jmobile))) {
