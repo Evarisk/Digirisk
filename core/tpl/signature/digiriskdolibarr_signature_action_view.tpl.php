@@ -30,7 +30,7 @@
 		<?php endif; ?>
 
 <?php if ($object->status == 1) : ?>
-	<?php if ($element->role == 'PP_EXT_SOCIETY_INTERVENANTS') : ?>
+	<?php if ($element->role == 'ExtSocietyAttendant') : ?>
 		<li class="dropdown-item">
 			<?php print '<form method="POST" action="' . $_SERVER["PHP_SELF"] . '">';
 			print '<input type="hidden" name="token" value="' . newToken() . '">';

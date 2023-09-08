@@ -469,12 +469,12 @@ class InterfaceDigiriskdolibarrTriggers extends DolibarrTriggers
 					foreach ($societies as $societename => $key) {
 						$actioncomm->note_private .= $langs->trans($societename) . ' : ';
 						foreach ($key as $societe) {
-							if ($societename == 'PP_LABOUR_INSPECTOR_ASSIGNED') {
+							if ($societename == 'LabourInspectorAssigned') {
 								$actioncomm->note_private .= $societe->firstname . ' ' . $societe->lastname . '<br>';
 							} else {
 								$actioncomm->note_private .= $societe->name . '<br>';
 							}
-							if ($societename == 'PP_EXT_SOCIETY') {
+							if ($societename == 'ExtSociety') {
 								$actioncomm->note_private .= $langs->trans('Address') . ' : ' . $societe->address . '<br>';
 								$actioncomm->note_private .= $langs->trans('SIRET') . ' : ' . $societe->idprof2 . '<br>';
 							}
@@ -520,12 +520,12 @@ class InterfaceDigiriskdolibarrTriggers extends DolibarrTriggers
 					foreach ($societies as $societename => $key) {
 						$actioncomm->note_private .= $langs->trans($societename) . ' : ';
 						foreach ($key as $societe) {
-							if ($societename == 'PP_LABOUR_INSPECTOR_ASSIGNED') {
+							if ($societename == 'LabourInspectorAssigned') {
 								$actioncomm->note_private .= $societe->firstname . ' ' . $societe->lastname . '<br>';
 							} else {
 								$actioncomm->note_private .= $societe->name . '<br>';
 							}
-							if ($societename == 'PP_EXT_SOCIETY') {
+							if ($societename == 'ExtSociety') {
 								$actioncomm->note_private .= $langs->trans('Address') . ' : ' . $societe->address . '<br>';
 								$actioncomm->note_private .= $langs->trans('SIRET') . ' : ' . $societe->idprof2 . '<br>';
 							}
