@@ -347,8 +347,8 @@ print '<td>' . $langs->trans("Value") . '</td>';
 print '<td>' . $langs->trans("Action") . '</td>';
 print '</tr>';
 
-print '<tr class="oddeven"><td><label for="MaitreOeuvre">' . $langs->trans("MaitreOeuvre") . '</label></td>';
-print '<td>' . $langs->trans("MaitreOeuvreDescription") . '</td>';
+print '<tr class="oddeven"><td><label for="MasterWorker">' . $langs->trans("MasterWorker") . '</label></td>';
+print '<td>' . $langs->trans("MasterWorkerDescription") . '</td>';
 $userlist = $form->select_dolusers(( ! empty($conf->global->DIGIRISKDOLIBARR_PREVENTIONPLAN_MAITRE_OEUVRE) ? $conf->global->DIGIRISKDOLIBARR_PREVENTIONPLAN_MAITRE_OEUVRE : $user->id), '', 0, null, 0, '', '', $conf->entity, 0, 0, 'AND u.statut = 1', 0, '', 'minwidth300', 0, 1);
 print '<td>';
 print $form->selectarray('maitre_oeuvre', $userlist, ( ! empty($conf->global->DIGIRISKDOLIBARR_PREVENTIONPLAN_MAITRE_OEUVRE) ? $conf->global->DIGIRISKDOLIBARR_PREVENTIONPLAN_MAITRE_OEUVRE : $user->id), $langs->trans('SelectUser'), null, null, null, "40%", 0, 0, '', 'minwidth300', 1);

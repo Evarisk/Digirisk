@@ -52,12 +52,12 @@ class PreventionPlan extends SaturneObject
 	/**
 	 * @var string[] Array of error strings
 	 */
-	public $errors = array();
+	public $errors = [];
 
 	/**
 	 * @var array Result array.
 	 */
-	public $result = array();
+	public $result = [];
 
 	/**
 	 * @var int The object identifier
@@ -108,13 +108,14 @@ class PreventionPlan extends SaturneObject
 	/**
 	 * @var array Context element object
 	 */
-	public $context = array();
+	public $context = [];
 
 	/**
 	 * @var PreventionPlanLine[]     Array of subtable lines
 	 */
-	public $lines = array();
+	public $lines = [];
 
+	const STATUS_DELETED   = 0;
 	const STATUS_DRAFT     = 1;
 	const STATUS_VALIDATED = 2;
 	const STATUS_LOCKED    = 3;
@@ -367,16 +368,16 @@ class PreventionPlan extends SaturneObject
 			global $langs;
 			$langs->load("digiriskdolibarr@digiriskdolibarr");
 
-			$this->labelStatus[self::STATUS_IN_PROGRESS]       = $langs->trans('InProgress');
-			$this->labelStatus[self::STATUS_PENDING_SIGNATURE] = $langs->trans('ValidatePendingSignature');
-			$this->labelStatus[self::STATUS_LOCKED]            = $langs->trans('Locked');
-			$this->labelStatus[self::STATUS_ARCHIVED]          = $langs->trans('Archived');
+			$this->labelStatus[self::STATUS_DRAFT]     = $langs->trans('InProgress');
+			$this->labelStatus[self::STATUS_VALIDATED] = $langs->trans('ValidatePendingSignature');
+			$this->labelStatus[self::STATUS_LOCKED]    = $langs->trans('Locked');
+			$this->labelStatus[self::STATUS_ARCHIVED]  = $langs->trans('Archived');
 		}
 
-		$statusType                                                = 'status' . $status;
+		$statusType                                        = 'status' . $status;
 		if ($status == self::STATUS_VALIDATED) $statusType = 'status3';
-		if ($status == self::STATUS_LOCKED) $statusType            = 'status8';
-		if ($status == self::STATUS_ARCHIVED) $statusType          = 'status8';
+		if ($status == self::STATUS_LOCKED) $statusType    = 'status8';
+		if ($status == self::STATUS_ARCHIVED) $statusType  = 'status8';
 
 		return dolGetStatus($this->labelStatus[$status], $this->labelStatusShort[$status], '', $statusType, $mode);
 	}
@@ -399,13 +400,13 @@ class PreventionPlan extends SaturneObject
 	 * @return array|string
 	 * @throws Exception
 	 */
-	public function select_preventionplan_list($selected = '', $htmlname = 'fk_preventionplan', $filter = '', $showempty = '1', $forcecombo = 0, $events = array(), $outputmode = 0, $limit = 0, $morecss = 'minwidth100', $moreparam = '', $multiple = false)
+	public function select_preventionplan_list($selected = '', $htmlname = 'fk_preventionplan', $filter = '', $showempty = '1', $forcecombo = 0, $events = [], $outputmode = 0, $limit = 0, $morecss = 'minwidth100', $moreparam = '', $multiple = false)
 	{
 		global $langs;
 
 		$out      = '';
 		$num      = 0;
-		$outarray = array();
+		$outarray = [];
 
 		$selected = array($selected);
 

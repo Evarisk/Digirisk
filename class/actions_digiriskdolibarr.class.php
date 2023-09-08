@@ -808,25 +808,25 @@ class ActionsDigiriskdolibarr
         return 0; // or return 1 to replace standard code.
     }
 
-    /**
-     * Overloading the saturneAttendantsRole function : replacing the parent's function with the one below.
-     *
-     * @param  array $parameters Hook metadatas (context, etc...).
-     * @return int               0 < on error, 0 on success, 1 to replace standard code.
-     */
-    public function saturneAttendantsRole(array $parameters, $object)
-    {
-        // Do something only for the current context.
-        if ($parameters['currentcontext'] == 'firepermitsignature') {
-//            $signatory->fetchSignatory('FP_MAITRE_OEUVRE', $id, 'firepermit');
-//            $signatory->fetchSignatory('FP_EXT_SOCIETY_RESPONSIBLE', $id, 'firepermit');
-//            $signatory->fetchSignatory('FP_EXT_SOCIETY_INTERVENANTS', $id, 'firepermit');
-            $signatoriesByRole['MasterWorker'] = $parameters['signatory']->fetchSignatory('MasterWorker', $object->id, $object->element);
-            $signatoriesByRole['ExtSocietyResponsible'] = $parameters['signatory']->fetchSignatory('ExtSocietyResponsible', $object->id, $object->element);
-            $signatoriesByRole['ExtSocietyAttendant']           = $parameters['signatory']->fetchSignatory('ExtSocietyAttendant', $object->id, $object->element);
-            $this->results = $signatoriesByRole;
-        }
+	/**
+	 *  Overloading the saturneAttendantsBackToCard function : replacing the parent's function with the one below.
+	 *
+	 * @param  array        $parameters Hook metadatas (context, etc...).
+	 * @param  CommonObject $object     Current object.
+	 * @return int                      0 < on error, 0 on success, 1 to replace standard code.
+	 */
+	public function saturneSchedules(array $parameters, CommonObject $object): int
+	{
+		global $moduleNameLowerCase;
 
-        return 1; // or return 1 to replace standard code.
-    }
+		// Do something only for the current context.
+		if (in_array($parameters['currentcontext'], ['preventionplanschedules'])) {
+			if ($object->status == $object::STATUS_LOCKED) {
+				return -1;
+			}
+		}
+
+		return 0; // or return 1 to replace standard code.
+	}
+
 }
