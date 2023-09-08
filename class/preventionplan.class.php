@@ -25,8 +25,11 @@ require_once DOL_DOCUMENT_ROOT . '/user/class/user.class.php';
 require_once DOL_DOCUMENT_ROOT . '/contact/class/contact.class.php';
 require_once DOL_DOCUMENT_ROOT . '/societe/class/societe.class.php';
 
-require_once __DIR__ . '/openinghours.class.php';
+// Load Saturne libraries.
 require_once __DIR__ . '/../../saturne/class/saturneobject.class.php';
+
+// Load DigiriskDolibarr libraries.
+require_once __DIR__ . '/openinghours.class.php';
 
 /**
  * Class for PreventionPlan
@@ -202,7 +205,7 @@ class PreventionPlan extends SaturneObject
 	 */
 	public function createFromClone(User $user, $fromid, $options)
 	{
-		global $conf;
+		global $conf, $moduleNameLowerCase;
 		$error = 0;
 
 		$signatory         = new SaturneSignature($this->db, $this->module, $this->element);
@@ -237,11 +240,18 @@ class PreventionPlan extends SaturneObject
 				foreach ($arrayRole as $signatoryRole) {
 					$signatoriesID[$signatoryRole->role] = $signatoryRole->id;
 					if ($signatoryRole->role == 'ExtSocietyAttendant') {
-						$extintervenant_ids[] = $signatoryRole->id;
+						$extIntervenantsIds[] = $signatoryRole->id;
 					}
 				}
 			}
 		}
+
+		// Load numbering modules
+		$numberingModules = [
+			'digiriskelement/' . $preventionplandet->element => $conf->global->DIGIRISKDOLIBARR_PREVENTIONPLANDET_ADDON,
+		];
+
+		list($refPreventionPlanDetMod) = saturne_require_objects_mod($numberingModules, $moduleNameLowerCase);
 
 		// Reset some properties
 		unset($object->id);
@@ -250,7 +260,7 @@ class PreventionPlan extends SaturneObject
 
 		// Clear fields
 		if (property_exists($object, 'ref')) {
-			$object->ref = $object->getNextNumRef();
+			$object->ref = $refPreventionPlanDetMod->getNextValue($object);
 		}
 		if (property_exists($object, 'label')) {
 			$object->label = $options['clone_label'];
@@ -286,8 +296,8 @@ class PreventionPlan extends SaturneObject
 			}
 
 			if (!empty($options['attendants'])) {
-				if ( ! empty($extintervenant_ids) && $extintervenant_ids > 0) {
-					foreach ($extintervenant_ids as $extintervenant_id) {
+				if ( ! empty($extIntervenantsIds) && $extIntervenantsIds > 0) {
+					foreach ($extIntervenantsIds as $extintervenant_id) {
 						$signatory->createFromClone($user, $extintervenant_id, $preventionplanid);
 					}
 				}
@@ -340,8 +350,8 @@ class PreventionPlan extends SaturneObject
 	public function setInProgress($user, $notrigger = 0)
 	{
 		$signatory = new SaturneSignature($this->db, $this->module, $this->element);
-		$signatory->deleteSignatoriesSignatures($this->id, 'preventionplan');
-		return $this->setStatusCommon($user, self::STATUS_DRAFT, $notrigger, 'PREVENTIONPLAN_INPROGRESS');
+		$signatory->deleteSignatoriesSignatures($this->id, $this->element);
+		return parent::setDraft($user, $notrigger);
 	}
 	/**
 	 * 	Set pending signature status
@@ -535,8 +545,8 @@ class PreventionPlanLine extends SaturneObject
 	public $tms;
 	public $category;
 	public $description;
-	public $prevention_method;
-	public $fk_preventionplan;
+	public $preventionMethod;
+	public $fkPreventionPlan;
 	public $fk_element;
 
 	/**

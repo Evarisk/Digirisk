@@ -459,9 +459,9 @@ FirePermitArchivedTrigger = Permis de feu archivé
 FirePermitAddAttendantTrigger = Ajout d'un participant au permis de feu
 FirePermitSentByMailTrigger = Email permis de feu envoyé
 FirePermitOpeningHoursCreateTrigger = Enregistrement des horaires du permis de feu
-FP_EXT_SOCIETY_INTERVENANTSSigned = Signature de l'intervenant
-FP_EXT_SOCIETY_RESPONSIBLESigned = Signature du responsable de la société extérieure
-FP_MAITRE_OEUVRESigned = Signature du maître d'oeuvre
+ExtSocietyAttendantSigned = Signature de l'intervenant
+ExtSocietyResponsibleSigned = Signature du responsable de la société extérieure
+MasterWorkerSigned = Signature du maître d'oeuvre
 
 # Mod Numbering - Modèle de numérotation
 DigiriskFirePermitNumberingModule = Modèle de numérotation des permis de feu de Digirisk

@@ -302,8 +302,8 @@ if (empty($reshook)) {
 	$mode                = 'emailfromthirdparty';
 	$trackid             = 'thi' . $object->id;
 	$labour_inspector    = $allLinks['LabourInspectorSociety'];
-	$labour_inspector_id = $allLinks['LabourInspectorSociety']->id[0];
-	$thirdparty->fetch($labour_inspector_id);
+	$labourInspectorId = $allLinks['LabourInspectorSociety']->id[0];
+	$thirdparty->fetch($labourInspectorId);
 	$object->thirdparty = $thirdparty;
 	include DOL_DOCUMENT_ROOT . '/core/actions_sendmails.inc.php';
 }
@@ -435,8 +435,8 @@ if ($action != 'edit') {
 
 // Presend form
 $labour_inspector    = $allLinks['LabourInspectorSociety'];
-$labour_inspector_id = $allLinks['LabourInspectorSociety']->id[0];
-$thirdparty->fetch($labour_inspector_id);
+$labourInspectorId = $allLinks['LabourInspectorSociety']->id[0];
+$thirdparty->fetch($labourInspectorId);
 $object->thirdparty = $thirdparty;
 
 $modelmail    = 'riskassessmentdocument';

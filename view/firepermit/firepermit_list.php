@@ -314,10 +314,10 @@ print '<div class="div-table-responsive">';
 print '<table class="tagtable nobottomiftotal liste' . ($moreforfilter ? " listwithfilterbefore" : "") . '">' . "\n";
 print '<tr class="liste_titre">';
 
-$firepermit->fields['Custom']['FP_MAITRE_OEUVRE']            = $arrayfields['MaitreOeuvre'] ;
-$firepermit->fields['Custom']['FP_EXT_SOCIETY']              = $arrayfields['ExtSociety'];
-$firepermit->fields['Custom']['FP_EXT_SOCIETY_RESPONSIBLE']  = $arrayfields['ExtSocietyResponsible'];
-$firepermit->fields['Custom']['FP_EXT_SOCIETY_INTERVENANTS'] = $arrayfields['ExtSocietyAttendant'];
+$firepermit->fields['Custom']['MasterWorker']            = $arrayfields['MaitreOeuvre'] ;
+$firepermit->fields['Custom']['ExtSociety']              = $arrayfields['ExtSociety'];
+$firepermit->fields['Custom']['ExtSocietyResponsible']  = $arrayfields['ExtSocietyResponsible'];
+$firepermit->fields['Custom']['ExtSocietyAttendant'] = $arrayfields['ExtSocietyAttendant'];
 
 foreach ($firepermit->fields as $key => $val) {
 	$cssforfield                        = (empty($val['css']) ? '' : $val['css']);
@@ -449,20 +449,20 @@ while ($i < ($limit ? min($num, $limit) : $num)) {
 				if ($resource['checked']) {
 					print '<td>';
 					if ($resource['label'] == 'MaitreOeuvre') {
-						$element = $signatory->fetchSignatory('FP_MAITRE_OEUVRE', $firepermit->id, 'firepermit');
+						$element = $signatory->fetchSignatory('MasterWorker', $firepermit->id, 'firepermit');
 						if (is_array($element)) {
 							$element = array_shift($element);
 							$usertmp->fetch($element->element_id);
 							print $usertmp->getNomUrl(1);
 						}
 					} elseif ($resource['label'] == 'ExtSociety') {
-						$extSociety = $digiriskresources->fetchResourcesFromObject('FP_EXT_SOCIETY', $firepermit);
+						$extSociety = $digiriskresources->fetchResourcesFromObject('ExtSociety', $firepermit);
 						if ($extSociety > 0) {
 							print $extSociety->getNomUrl(1);
 						}
 					}
 					if ($resource['label'] == 'ExtSocietyResponsible') {
-						$element = $signatory->fetchSignatory('FP_EXT_SOCIETY_RESPONSIBLE', $firepermit->id, 'firepermit');
+						$element = $signatory->fetchSignatory('ExtSocietyResponsible', $firepermit->id, 'firepermit');
 						if (is_array($element)) {
 							$element = array_shift($element);
 							$contact->fetch($element->element_id);
@@ -470,7 +470,7 @@ while ($i < ($limit ? min($num, $limit) : $num)) {
 						}
 					}
 					if ($resource['label'] == 'ExtSocietyAttendant') {
-						$extSociety_intervenants = $signatory->fetchSignatory('FP_EXT_SOCIETY_INTERVENANTS', $firepermit->id, 'firepermit');
+						$extSociety_intervenants = $signatory->fetchSignatory('ExtSocietyAttendant', $firepermit->id, 'firepermit');
 						if (is_array($extSociety_intervenants) && ! empty($extSociety_intervenants) && $extSociety_intervenants > 0) {
 							foreach ($extSociety_intervenants as $element) {
 								if ($element > 0) {

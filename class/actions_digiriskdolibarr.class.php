@@ -799,7 +799,7 @@ class ActionsDigiriskdolibarr
 
             $digiriskresources = new DigiriskResources($this->db);
 
-            $extSociety  = $digiriskresources->fetchResourcesFromObject('FP_EXT_SOCIETY', $object);
+            $extSociety  = $digiriskresources->fetchResourcesFromObject('ExtSociety', $object);
             $moreHtmlRef = $langs->trans('ExtSociety') . ' : ' . $extSociety->getNomUrl(1);
 
             $this->resprints = $moreHtmlRef;

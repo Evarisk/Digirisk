@@ -32,7 +32,7 @@ class FirePermitDocument extends SaturneDocuments
     /**
      * @var string Module name.
      */
-    public string $module = 'digiriskdolibarr';
+	public $module = 'digiriskdolibarr';
 
     /**
      * @var string Element type of object.
@@ -59,15 +59,10 @@ class FirePermitDocument extends SaturneDocuments
 	{
 		global $conf;
 
-        require_once DOL_DOCUMENT_ROOT.'/contact/class/contact.class.php';
-
-        require_once __DIR__ . '/../digiriskresources.class.php';
-        require_once __DIR__ . '/../openinghours.class.php';
-
 		$digiriskelement    = new DigiriskElement($this->db);
 		$resources          = new DigiriskResources($this->db);
 		$firepermit         = new FirePermit($this->db);
-		$signatory          = new FirePermitSignature($this->db);
+		$signatory          = new SaturneSignature($this->db, $this->module, $firepermit->element);
 		$societe            = new Societe($this->db);
 		$firepermitline     = new FirePermitLine($this->db);
 		$preventionplanline = new PreventionPlanLine($this->db);
@@ -83,23 +78,23 @@ class FirePermitDocument extends SaturneDocuments
 		$preventionplanlines = $preventionplanline->fetchAll('', '', 0, 0, array(), 'AND', $firepermit->fk_preventionplan);
 		$digirisk_resources  = $resources->digirisk_dolibarr_fetch_resources();
 
-		$extsociety          = $resources->fetchResourcesFromObject('FP_EXT_SOCIETY', $firepermit);
+		$extsociety          = $resources->fetchResourcesFromObject('ExtSociety', $firepermit);
 		if ($extsociety < 1) {
 			$extsociety = new stdClass();
 		}
-		$maitreoeuvre           = $signatory->fetchSignatory('FP_MAITRE_OEUVRE', $firepermit->id, 'firepermit');
+		$maitreoeuvre           = $signatory->fetchSignatory('MasterWorker', $firepermit->id, 'firepermit');
 		$maitreoeuvre           = is_array($maitreoeuvre) ? array_shift($maitreoeuvre) : $maitreoeuvre;
 
-		$extsocietyresponsible  = $signatory->fetchSignatory('FP_EXT_SOCIETY_RESPONSIBLE', $firepermit->id, 'firepermit');
+		$extsocietyresponsible  = $signatory->fetchSignatory('ExtSociety_RESPONSIBLE', $firepermit->id, 'firepermit');
 		$extsocietyresponsible  = is_array($extsocietyresponsible) ? array_shift($extsocietyresponsible) : $extsocietyresponsible;
 
-		$extsocietyintervenants = $signatory->fetchSignatory('FP_EXT_SOCIETY_INTERVENANTS', $firepermit->id, 'firepermit');
-		$labourinspector        = $resources->fetchResourcesFromObject('FP_LABOUR_INSPECTOR', $firepermit);
+		$extsocietyintervenants = $signatory->fetchSignatory('ExtSocietyAttendant', $firepermit->id, 'firepermit');
+		$labourinspector        = $resources->fetchResourcesFromObject('LabourInspector', $firepermit);
 		if ($labourinspector < 1) {
 			$labourinspector = new stdClass();
 		}
 
-		$labourinspectorcontact = $resources->fetchResourcesFromObject('FP_LABOUR_INSPECTOR_ASSIGNED', $firepermit);
+		$labourinspectorcontact = $resources->fetchResourcesFromObject('LabourInspectorAssigned', $firepermit);
 		if ($labourinspectorcontact < 1) {
 			$labourinspectorcontact = new stdClass();
 		}

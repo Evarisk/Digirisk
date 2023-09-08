@@ -443,7 +443,7 @@ class InterfaceDigiriskdolibarrTriggers extends DolibarrTriggers
 
 			case 'PREVENTIONPLAN_MODIFY' :
 				$societies         = $digiriskresources->fetchResourcesFromObject('', $object);
-				$digirisksignature = new DigiriskSignature($this->db);
+				$digirisksignature = new SaturneSignature($this->db, $object->module, $object->element);
 				$signatories       = $digirisksignature->fetchSignatories($object->id, $object->element);
 
 				$actioncomm->elementtype = 'preventionplan@digiriskdolibarr';
@@ -494,7 +494,7 @@ class InterfaceDigiriskdolibarrTriggers extends DolibarrTriggers
 
 			case 'PREVENTIONPLAN_DELETE' :
 				$societies         = $digiriskresources->fetchResourcesFromObject('', $object);
-				$digirisksignature = new DigiriskSignature($this->db);
+				$digirisksignature = new SaturneSignature($this->db, $object->module, $object->element);
 				$signatories       = $digirisksignature->fetchSignatories($object->id, $object->element);
 
 				$actioncomm->elementtype = 'preventionplan@digiriskdolibarr';
@@ -652,7 +652,7 @@ class InterfaceDigiriskdolibarrTriggers extends DolibarrTriggers
 				$preventionplan    = new PreventionPlan($this->db);
 				$preventionplan->fetch($object->fk_preventionplan);
 				$societies         = $digiriskresources->fetchResourcesFromObject('', $object);
-				$digirisksignature = new DigiriskSignature($this->db);
+				$digirisksignature = new SaturneSignature($this->db, $object->module, $object->element);
 				$signatories       = $digirisksignature->fetchSignatories($object->id, $object->element);
 
 				$actioncomm->elementtype = 'firepermit@digiriskdolibarr';
@@ -673,12 +673,12 @@ class InterfaceDigiriskdolibarrTriggers extends DolibarrTriggers
 				foreach ($societies as $societename => $key) {
 					$actioncomm->note_private .= $langs->trans($societename) . ' : ';
 					foreach ($key as $societe) {
-						if ($societename == 'FP_LABOUR_INSPECTOR_ASSIGNED') {
+						if ($societename == 'LabourInspectorAssigned') {
 							$actioncomm->note_private .= $societe->firstname . ' ' . $societe->lastname . '<br>';
 						} else {
 							$actioncomm->note_private .= $societe->name . '<br>';
 						}
-						if ($societename == 'FP_EXT_SOCIETY') {
+						if ($societename == 'ExtSociety') {
 							$actioncomm->note_private .= $langs->trans('Address') . ' : ' . $societe->address . '<br>';
 							$actioncomm->note_private .= $langs->trans('SIRET') . ' : ' . $societe->idprof2 . '<br>';
 						}
@@ -694,7 +694,7 @@ class InterfaceDigiriskdolibarrTriggers extends DolibarrTriggers
 				$preventionplan    = new PreventionPlan($this->db);
 				$preventionplan->fetch($object->fk_preventionplan);
 				$societies         = $digiriskresources->fetchResourcesFromObject('', $object);
-				$digirisksignature = new DigiriskSignature($this->db);
+				$digirisksignature = new SaturneSignature($this->db, $object->module, $object->element);
 				$signatories       = $digirisksignature->fetchSignatories($object->id, $object->element);
 
 				$actioncomm->elementtype = 'firepermit@digiriskdolibarr';
@@ -721,12 +721,12 @@ class InterfaceDigiriskdolibarrTriggers extends DolibarrTriggers
 					foreach ($societies as $societename => $key) {
 						$actioncomm->note_private .= $langs->trans($societename) . ' : ';
 						foreach ($key as $societe) {
-							if ($societename == 'FP_LABOUR_INSPECTOR_ASSIGNED') {
+							if ($societename == 'LabourInspectorAssigned') {
 								$actioncomm->note_private .= $societe->firstname . ' ' . $societe->lastname . '<br>';
 							} else {
 								$actioncomm->note_private .= $societe->name . '<br>';
 							}
-							if ($societename == 'FP_EXT_SOCIETY') {
+							if ($societename == 'ExtSociety') {
 								$actioncomm->note_private .= $langs->trans('Address') . ' : ' . $societe->address . '<br>';
 								$actioncomm->note_private .= $langs->trans('SIRET') . ' : ' . $societe->idprof2 . '<br>';
 							}
@@ -770,12 +770,12 @@ class InterfaceDigiriskdolibarrTriggers extends DolibarrTriggers
 					foreach ($societies as $societename => $key) {
 						$actioncomm->note_private .= $langs->trans($societename) . ' : ';
 						foreach ($key as $societe) {
-							if ($societename == 'FP_LABOUR_INSPECTOR_ASSIGNED') {
+							if ($societename == 'LabourInspectorAssigned') {
 								$actioncomm->note_private .= $societe->firstname . ' ' . $societe->lastname . '<br>';
 							} else {
 								$actioncomm->note_private .= $societe->name . '<br>';
 							}
-							if ($societename == 'FP_EXT_SOCIETY') {
+							if ($societename == 'ExtSociety') {
 								$actioncomm->note_private .= $langs->trans('Address') . ' : ' . $societe->address . '<br>';
 								$actioncomm->note_private .= $langs->trans('SIRET') . ' : ' . $societe->idprof2 . '<br>';
 							}

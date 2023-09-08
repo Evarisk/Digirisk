@@ -98,33 +98,32 @@ DELETE FROM llx_c_action_trigger WHERE elementtype = 'digiriskelement@digiriskdo
 DELETE FROM llx_c_action_trigger WHERE elementtype = 'digirisksignature@digiriskdolibarr';
 DELETE FROM llx_c_action_trigger WHERE elementtype = 'preventionplan@digiriskdolibarr';
 -- 9.12.0
-UPDATE llx_digiriskdolibarr_object_signature SET role = 'MasterWorker' WHERE role = 'PP_MAITRE_OEUVRE';
+UPDATE llx_digiriskdolibarr_object_signature SET role = 'MasterWorker'          WHERE role = 'PP_MAITRE_OEUVRE';
 UPDATE llx_digiriskdolibarr_object_signature SET role = 'ExtSocietyResponsible' WHERE role = 'PP_EXT_SOCIETY_RESPONSIBLE';
-UPDATE llx_digiriskdolibarr_object_signature SET role = 'ExtSocietyAttendant'           WHERE role = 'PP_EXT_SOCIETY_INTERVENANTS';
-UPDATE llx_digiriskdolibarr_object_signature SET role = 'MasterWorker' WHERE role = 'FP_MAITRE_OEUVRE';
+UPDATE llx_digiriskdolibarr_object_signature SET role = 'ExtSocietyAttendant'   WHERE role = 'PP_EXT_SOCIETY_INTERVENANTS';
+UPDATE llx_digiriskdolibarr_object_signature SET role = 'MasterWorker'          WHERE role = 'FP_MAITRE_OEUVRE';
 UPDATE llx_digiriskdolibarr_object_signature SET role = 'ExtSocietyResponsible' WHERE role = 'FP_EXT_SOCIETY_RESPONSIBLE';
-UPDATE llx_digiriskdolibarr_object_signature SET role = 'ExtSocietyAttendant'           WHERE role = 'FP_EXT_SOCIETY_INTERVENANTS';
-UPDATE llx_digiriskdolibarr_object_signature SET role = 'Responsible'         WHERE role = 'ACC_USER_EMPLOYER';
+UPDATE llx_digiriskdolibarr_object_signature SET role = 'ExtSocietyAttendant'   WHERE role = 'FP_EXT_SOCIETY_INTERVENANTS';
+UPDATE llx_digiriskdolibarr_object_signature SET role = 'Responsible'           WHERE role = 'ACC_USER_EMPLOYER';
 
-UPDATE llx_saturne_object_signature SET role = 'MasterWorker' WHERE role = 'MasterWorker';
 UPDATE llx_saturne_object_signature SET role = 'ExtSocietyResponsible' WHERE role = 'PP_EXT_SOCIETY_RESPONSIBLE';
-UPDATE llx_saturne_object_signature SET role = 'ExtSocietyAttendant'           WHERE role = 'PP_EXT_SOCIETY_INTERVENANTS';
-UPDATE llx_saturne_object_signature SET role = 'MasterWorker' WHERE role = 'FP_MAITRE_OEUVRE';
+UPDATE llx_saturne_object_signature SET role = 'ExtSocietyAttendant'   WHERE role = 'PP_EXT_SOCIETY_INTERVENANTS';
+UPDATE llx_saturne_object_signature SET role = 'MasterWorker'          WHERE role = 'FP_MAITRE_OEUVRE';
 UPDATE llx_saturne_object_signature SET role = 'ExtSocietyResponsible' WHERE role = 'FP_EXT_SOCIETY_RESPONSIBLE';
-UPDATE llx_saturne_object_signature SET role = 'ExtSocietyAttendant'           WHERE role = 'FP_EXT_SOCIETY_INTERVENANTS';
-UPDATE llx_saturne_object_signature SET role = 'Responsible'         WHERE role = 'ACC_USER_EMPLOYER';
+UPDATE llx_saturne_object_signature SET role = 'ExtSocietyAttendant'   WHERE role = 'FP_EXT_SOCIETY_INTERVENANTS';
+UPDATE llx_saturne_object_signature SET role = 'Responsible'           WHERE role = 'ACC_USER_EMPLOYER';
 
-UPDATE llx_saturne_object_signature SET role = 'MasterWorker' WHERE role = 'MaitreOeuvre';
+UPDATE llx_saturne_object_signature SET role = 'MasterWorker'          WHERE role = 'MaitreOeuvre';
 UPDATE llx_saturne_object_signature SET role = 'ExtSocietyResponsible' WHERE role = 'ExtSocietyResponsible';
-UPDATE llx_saturne_object_signature SET role = 'ExtSocietyAttendant'           WHERE role = 'Attendant';
+UPDATE llx_saturne_object_signature SET role = 'ExtSocietyAttendant'   WHERE role = 'Attendant';
 
-UPDATE llx_digiriskdolibarr_digiriskresources SET ref = 'MasterWorker' WHERE ref = 'PP_MAITRE_OEUVRE';
+UPDATE llx_digiriskdolibarr_digiriskresources SET ref = 'MasterWorker'          WHERE ref = 'PP_MAITRE_OEUVRE';
 UPDATE llx_digiriskdolibarr_digiriskresources SET ref = 'ExtSocietyResponsible' WHERE ref = 'PP_EXT_SOCIETY_RESPONSIBLE';
-UPDATE llx_digiriskdolibarr_digiriskresources SET ref = 'ExtSocietyAttendant'           WHERE ref = 'PP_EXT_SOCIETY_INTERVENANTS';
-UPDATE llx_digiriskdolibarr_digiriskresources SET ref = 'MasterWorker' WHERE ref = 'FP_MAITRE_OEUVRE';
+UPDATE llx_digiriskdolibarr_digiriskresources SET ref = 'ExtSocietyAttendant'   WHERE ref = 'PP_EXT_SOCIETY_INTERVENANTS';
+UPDATE llx_digiriskdolibarr_digiriskresources SET ref = 'MasterWorker'          WHERE ref = 'FP_MAITRE_OEUVRE';
 UPDATE llx_digiriskdolibarr_digiriskresources SET ref = 'ExtSocietyResponsible' WHERE ref = 'FP_EXT_SOCIETY_RESPONSIBLE';
-UPDATE llx_digiriskdolibarr_digiriskresources SET ref = 'ExtSocietyAttendant'           WHERE ref = 'FP_EXT_SOCIETY_INTERVENANTS';
-UPDATE llx_digiriskdolibarr_digiriskresources SET ref = 'Responsible'         WHERE ref = 'ACC_USER_EMPLOYER';
+UPDATE llx_digiriskdolibarr_digiriskresources SET ref = 'ExtSocietyAttendant'   WHERE ref = 'FP_EXT_SOCIETY_INTERVENANTS';
+UPDATE llx_digiriskdolibarr_digiriskresources SET ref = 'Responsible'           WHERE ref = 'ACC_USER_EMPLOYER';
 
 ALTER TABLE llx_c_digiriskdolibarr_action_trigger DROP COLUMN `rang`;
 ALTER TABLE llx_c_digiriskdolibarr_action_trigger ADD entity integer DEFAULT 1 AFTER rowid;

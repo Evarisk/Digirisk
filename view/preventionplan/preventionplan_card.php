@@ -70,19 +70,19 @@ $backtopageforcancel = GETPOST('backtopageforcancel', 'alpha');
 $fk_parent           = GETPOST('fk_parent', 'int');
 
 // Initialize technical objects
-$object                  = new PreventionPlan($db);
-$preventionplandet       = new PreventionPlanLine($db);
-$signatory               = new SaturneSignature($db);
-$document                = new PreventionPlanDocument($db);
-$digiriskelement         = new DigiriskElement($db);
-$digiriskresources       = new DigiriskResources($db);
-$risk                    = new Risk($db);
-$contact                 = new Contact($db);
-$usertmp                 = new User($db);
-$extrafields             = new ExtraFields($db);
-$resources               = new DigiriskResources($db);
-$thirdparty              = new Societe($db);
-$project                 = new Project($db);
+$object            = new PreventionPlan($db);
+$preventionplandet = new PreventionPlanLine($db);
+$signatory         = new SaturneSignature($db, $moduleNameLowerCase, $object->element);
+$document          = new PreventionPlanDocument($db);
+$digiriskelement   = new DigiriskElement($db);
+$digiriskresources = new DigiriskResources($db);
+$risk              = new Risk($db);
+$contact           = new Contact($db);
+$usertmp           = new User($db);
+$extrafields       = new ExtraFields($db);
+$resources         = new DigiriskResources($db);
+$thirdparty        = new Societe($db);
+$project           = new Project($db);
 
 // Load object
 $object->fetch($id);
@@ -93,10 +93,10 @@ $allLinks = $resources->digirisk_dolibarr_fetch_resources();
 // Load numbering modules
 $numberingModules = [
 	'digiriskelement/' . $object->element            => $conf->global->DIGIRISKDOLIBARR_PREVENTIONPLAN_ADDON,
-	'digiriskelement/' . $preventionplandet->element => $conf->global->DIGIRISKDOLIBARR_PREVENTIONPLANDET_ADDON
+	'digiriskelement/' . $preventionplandet->element => $conf->global->DIGIRISKDOLIBARR_PREVENTIONPLANDET_ADDON,
 ];
 
-list($refPreventionPlanDetMod, $refPreventionPlanMod) = saturne_require_objects_mod($numberingModules, $moduleNameLowerCase);
+list($refPreventionPlanMod, $refPreventionPlanDetMod) = saturne_require_objects_mod($numberingModules, $moduleNameLowerCase);
 
 // Fetch optionals attributes and labels
 $extrafields->fetch_name_optionals_label($object->table_element);
@@ -146,17 +146,17 @@ if (empty($reshook)) {
 	// Action to add record
 	if ($action == 'add' && $permissiontoadd) {
 		// Get parameters
-		$project                     = GETPOST('fk_project');
-		$masterWorker_id            = GETPOST('maitre_oeuvre');
-		$extsociety_id               = GETPOST('ext_society');
-		$extresponsible_id           = GETPOST('ext_society_responsible');
-		$extintervenant_ids          = GETPOST('ext_intervenants');
-		$labour_inspector_id         = GETPOST('labour_inspector');
-		$labourInspectorContact_id = GETPOST('labour_inspector_contact');
-		$label                       = GETPOST('label');
-		$prior_visit_bool            = GETPOST('prior_visit_bool');
-		$prior_visit_text            = GETPOST('prior_visit_text');
-		$cssct_intervention          = GETPOST('cssct_intervention');
+		$project                  = GETPOST('fk_project');
+		$masterWorkerId           = GETPOST('maitre_oeuvre');
+		$extSocietyId             = GETPOST('ext_society');
+		$extResponsibleId         = GETPOST('ext_society_responsible');
+		$extIntervenantsIds       = GETPOST('ext_intervenants');
+		$labourInspectorId        = GETPOST('labour_inspector');
+		$labourInspectorContactId = GETPOST('labour_inspector_contact');
+		$label                    = GETPOST('label');
+		$priorVisitBool           = GETPOST('prior_visit_bool');
+		$priorVisitText           = GETPOST('prior_visit_text');
+		$cssctInterventation      = GETPOST('cssct_intervention');
 
 		// Initialize object preventionplan
 		$now                   = dol_now();
@@ -175,50 +175,50 @@ if (empty($reshook)) {
 		$object->date_start = $date_start;
 		$object->date_end   = $date_end;
 
-		$object->prior_visit_bool = $prior_visit_bool;
-		if ($prior_visit_bool) {
-			$object->prior_visit_text = $prior_visit_text;
+		$object->prior_visit_bool = $priorVisitBool;
+		if ($priorVisitBool) {
+			$object->prior_visit_text = $priorVisitText;
 			$object->prior_visit_date = $prior_visit_date;
 		}
 
-		$object->cssct_intervention = $cssct_intervention;
+		$object->cssct_intervention = $cssctInterventation;
 
 		$object->fk_user_creat = $user->id ? $user->id : 1;
 
 		// Check parameters
-		if ($masterWorker_id < 0) {
+		if ($masterWorkerId < 0) {
 			setEventMessages($langs->trans('ErrorFieldRequired', $langs->transnoentitiesnoconv('MaitreOeuvre')), null, 'errors');
 			$error++;
 		} else {
-			$usertmp->fetch($masterWorker_id);
+			$usertmp->fetch($masterWorkerId);
 		}
 
-		if ($extsociety_id < 0) {
+		if ($extSocietyId < 0) {
 			setEventMessages($langs->trans('ErrorFieldRequired', $langs->transnoentitiesnoconv('ExtSociety')), null, 'errors');
 			$error++;
 		}
 
-		if (is_array($extresponsible_id)) {
-			if (empty(array_filter($extresponsible_id))) {
+		if (is_array($extResponsibleId)) {
+			if (empty(array_filter($extResponsibleId))) {
 				setEventMessages($langs->trans('ErrorFieldRequired', $langs->transnoentitiesnoconv('ExtSocietyResponsible')), null, 'errors');
 				$error++;
 			}
-		} elseif (empty($extresponsible_id)) {
+		} elseif (empty($extResponsibleId)) {
 			setEventMessages($langs->trans('ErrorFieldRequired', $langs->transnoentitiesnoconv('ExtSocietyResponsible')), null, 'errors');
 			$error++;
 		}
 
-		if ($labour_inspector_id < 0) {
+		if ($labourInspectorId < 0) {
 			setEventMessages($langs->trans('ErrorFieldRequired', $langs->transnoentitiesnoconv('LabourInspectorSociety')), null, 'errors');
 			$error++;
 		}
 
-		if (is_array($labourInspectorContact_id)) {
-			if (empty(array_filter($labourInspectorContact_id))) {
+		if (is_array($labourInspectorContactId)) {
+			if (empty(array_filter($labourInspectorContactId))) {
 				setEventMessages($langs->trans('ErrorFieldRequired', $langs->transnoentitiesnoconv('LabourInspector')), null, 'errors');
 				$error++;
 			}
-		} elseif (empty($labourInspectorContact_id)) {
+		} elseif (empty($labourInspectorContactId)) {
 			setEventMessages($langs->trans('ErrorFieldRequired', $langs->transnoentitiesnoconv('LabourInspector')), null, 'errors');
 			$error++;
 		}
@@ -227,16 +227,16 @@ if (empty($reshook)) {
 			$result = $object->create($user, true);
 			if ($result > 0) {
 				$object->setInProgress($user, true);
-				$digiriskresources->digirisk_dolibarr_set_resources($db, $user->id, 'ExtSociety', 'societe', array($extsociety_id), $conf->entity, 'preventionplan', $object->id, 1);
-				$digiriskresources->digirisk_dolibarr_set_resources($db, $user->id, 'LabourInspector', 'societe', array($labour_inspector_id), $conf->entity, 'preventionplan', $object->id, 1);
-				$digiriskresources->digirisk_dolibarr_set_resources($db, $user->id, 'LabourInspectorAssigned', 'socpeople', array($labourInspectorContact_id), $conf->entity, 'preventionplan', $object->id, 1);
+				$digiriskresources->digirisk_dolibarr_set_resources($db, $user->id, 'ExtSociety', 'societe', array($extSocietyId), $conf->entity, 'preventionplan', $object->id, 1);
+				$digiriskresources->digirisk_dolibarr_set_resources($db, $user->id, 'LabourInspector', 'societe', array($labourInspectorId), $conf->entity, 'preventionplan', $object->id, 1);
+				$digiriskresources->digirisk_dolibarr_set_resources($db, $user->id, 'LabourInspectorAssigned', 'socpeople', array($labourInspectorContactId), $conf->entity, 'preventionplan', $object->id, 1);
 
-				if ($masterWorker_id > 0) {
-					$signatory->setSignatory($object->id, 'preventionplan', 'user', array($masterWorker_id), 'MasterWorker');
+				if ($masterWorkerId > 0) {
+					$signatory->setSignatory($object->id, 'preventionplan', 'user', array($masterWorkerId), 'MasterWorker');
 				}
 
-				if ($extresponsible_id > 0) {
-					$signatory->setSignatory($object->id, 'preventionplan', 'socpeople', array($extresponsible_id), 'ExtSocietyResponsible');
+				if ($extResponsibleId > 0) {
+					$signatory->setSignatory($object->id, 'preventionplan', 'socpeople', array($extResponsibleId), 'ExtSocietyResponsible');
 				}
 				if (!empty($conf->global->DIGIRISKDOLIBARR_MAIN_AGENDA_ACTIONAUTO_PREVENTIONPLAN_CREATE)) {
 					$object->call_trigger('PREVENTIONPLAN_CREATE', $user);
@@ -259,17 +259,17 @@ if (empty($reshook)) {
 	// Action to update record
 	if ($action == 'update' && $permissiontoadd) {
 		// Get parameters
-		$project                     = GETPOST('fk_project');
-		$masterWorker_id            = GETPOST('maitre_oeuvre');
-		$extsociety_id               = GETPOST('ext_society');
-		$extresponsible_id           = GETPOST('ext_society_responsible');
-		$extintervenant_ids          = GETPOST('ext_intervenants');
-		$labour_inspector_id         = GETPOST('labour_inspector');
-		$labourInspectorContact_id = GETPOST('labour_inspector_contact') ? GETPOST('labour_inspector_contact') : 0;
-		$label                       = GETPOST('label');
-		$prior_visit_bool            = GETPOST('prior_visit_bool');
-		$prior_visit_text            = GETPOST('prior_visit_text');
-		$cssct_intervention          = GETPOST('cssct_intervention');
+		$project                  = GETPOST('fk_project');
+		$masterWorkerId           = GETPOST('maitre_oeuvre');
+		$extSocietyId             = GETPOST('ext_society');
+		$extResponsibleId         = GETPOST('ext_society_responsible');
+		$extIntervenantsIds       = GETPOST('ext_intervenants');
+		$labourInspectorId        = GETPOST('labour_inspector');
+		$labourInspectorContactId = GETPOST('labour_inspector_contact') ? GETPOST('labour_inspector_contact') : 0;
+		$label                    = GETPOST('label');
+		$priorVisitBool           = GETPOST('prior_visit_bool');
+		$priorVisitText           = GETPOST('prior_visit_text');
+		$cssctInterventation      = GETPOST('cssct_intervention');
 
 		// Initialize object preventionplan
 		$now           = dol_now();
@@ -283,51 +283,51 @@ if (empty($reshook)) {
 		$object->date_start = $date_start;
 		$object->date_end   = $date_end;
 
-		$object->prior_visit_bool = $prior_visit_bool;
-		if ($prior_visit_bool) {
-			$object->prior_visit_text = $prior_visit_text;
+		$object->prior_visit_bool = $priorVisitBool;
+		if ($priorVisitBool) {
+			$object->prior_visit_text = $priorVisitText;
 			$object->prior_visit_date = $prior_visit_date;
 		}
-		$object->cssct_intervention = $cssct_intervention;
+		$object->cssct_intervention = $cssctInterventation;
 
 		$object->fk_user_creat = $user->id ? $user->id : 1;
 
 		$object->fk_project = $project;
 
 		// Check parameters
-		if ($masterWorker_id < 0) {
+		if ($masterWorkerId < 0) {
 			setEventMessages($langs->trans('ErrorFieldRequired', $langs->transnoentitiesnoconv('MaitreOeuvre')), null, 'errors');
 			$error++;
 		} else {
-			$usertmp->fetch($masterWorker_id);
+			$usertmp->fetch($masterWorkerId);
 		}
 
-		if ($extsociety_id < 0) {
+		if ($extSocietyId < 0) {
 			setEventMessages($langs->trans('ErrorFieldRequired', $langs->transnoentitiesnoconv('ExtSociety')), null, 'errors');
 			$error++;
 		}
 
-		if (is_array($extresponsible_id)) {
-			if (empty(array_filter($extresponsible_id))) {
+		if (is_array($extResponsibleId)) {
+			if (empty(array_filter($extResponsibleId))) {
 				setEventMessages($langs->trans('ErrorFieldRequired', $langs->transnoentitiesnoconv('ExtSocietyResponsible')), null, 'errors');
 				$error++;
 			}
-		} elseif (empty($extresponsible_id)) {
+		} elseif (empty($extResponsibleId)) {
 			setEventMessages($langs->trans('ErrorFieldRequired', $langs->transnoentitiesnoconv('ExtSocietyResponsible')), null, 'errors');
 			$error++;
 		}
 
-		if ($labour_inspector_id < 0) {
+		if ($labourInspectorId < 0) {
 			setEventMessages($langs->trans('ErrorFieldRequired', $langs->transnoentitiesnoconv('LabourInspectorSociety')), null, 'errors');
 			$error++;
 		}
 
-		if (is_array($labourInspectorContact_id)) {
-			if (empty(array_filter($labourInspectorContact_id))) {
+		if (is_array($labourInspectorContactId)) {
+			if (empty(array_filter($labourInspectorContactId))) {
 				setEventMessages($langs->trans('ErrorFieldRequired', $langs->transnoentitiesnoconv('LabourInspector')), null, 'errors');
 				$error++;
 			}
-		} elseif (empty($labourInspectorContact_id)) {
+		} elseif (empty($labourInspectorContactId)) {
 			setEventMessages($langs->trans('ErrorFieldRequired', $langs->transnoentitiesnoconv('LabourInspector')), null, 'errors');
 			$error++;
 		}
@@ -335,12 +335,12 @@ if (empty($reshook)) {
 		if ( ! $error) {
 			$result = $object->update($user, false);
 			if ($result > 0) {
-				$digiriskresources->digirisk_dolibarr_set_resources($db, $user->id, 'ExtSociety', 'societe', array($extsociety_id), $conf->entity, 'preventionplan', $object->id, 0);
-				$digiriskresources->digirisk_dolibarr_set_resources($db, $user->id, 'LabourInspector', 'societe', array($labour_inspector_id), $conf->entity, 'preventionplan', $object->id, 0);
-				$digiriskresources->digirisk_dolibarr_set_resources($db, $user->id, 'LabourInspectorAssigned', 'socpeople', array($labourInspectorContact_id), $conf->entity, 'preventionplan', $object->id, 0);
+				$digiriskresources->digirisk_dolibarr_set_resources($db, $user->id, 'ExtSociety', 'societe', array($extSocietyId), $conf->entity, 'preventionplan', $object->id, 0);
+				$digiriskresources->digirisk_dolibarr_set_resources($db, $user->id, 'LabourInspector', 'societe', array($labourInspectorId), $conf->entity, 'preventionplan', $object->id, 0);
+				$digiriskresources->digirisk_dolibarr_set_resources($db, $user->id, 'LabourInspectorAssigned', 'socpeople', array($labourInspectorContactId), $conf->entity, 'preventionplan', $object->id, 0);
 
-				$signatory->setSignatory($object->id, 'preventionplan', 'user', array($masterWorker_id), 'MasterWorker');
-				$signatory->setSignatory($object->id, 'preventionplan', 'socpeople', array($extresponsible_id), 'ExtSocietyResponsible');
+				$signatory->setSignatory($object->id, 'preventionplan', 'user', array($masterWorkerId), 'MasterWorker');
+				$signatory->setSignatory($object->id, 'preventionplan', 'socpeople', array($extResponsibleId), 'ExtSocietyResponsible');
 
 				// Update prevention plan OK
 				$urltogo = str_replace('__ID__', $result, $backtopage);
@@ -376,20 +376,20 @@ if (empty($reshook)) {
 	// Action to add line
 	if ($action == 'addLine' && $permissiontoadd) {
 		// Get parameters
-		$actions_description = GETPOST('actionsdescription');
-		$prevention_method   = GETPOST('preventionmethod');
-		$location            = GETPOST('fk_element');
-		$risk_category_id    = GETPOST('risk_category_id');
-		$parent_id           = GETPOST('parent_id');
+		$actionsDescription = GETPOST('actionsdescription');
+		$preventionMethod   = GETPOST('preventionmethod');
+		$location           = GETPOST('fk_element');
+		$riskCategoryId     = GETPOST('risk_category_id');
+		$parentId           = GETPOST('parent_id');
 
 		// Initialize object preventionplan line
 		$preventionplandet->date_creation     = $object->db->idate($now);
-		$preventionplandet->ref               = $preventionplandet->getNextNumRef();
+		$preventionplandet->ref               = $refPreventionPlanDetMod->getNextValue($preventionplandet);
 		$preventionplandet->entity            = $conf->entity;
-		$preventionplandet->description       = $actions_description;
-		$preventionplandet->category          = $risk_category_id;
-		$preventionplandet->prevention_method = $prevention_method;
-		$preventionplandet->fk_preventionplan = $parent_id;
+		$preventionplandet->description       = $actionsDescription;
+		$preventionplandet->category          = $riskCategoryId;
+		$preventionplandet->prevention_method = $preventionMethod;
+		$preventionplandet->fk_preventionplan = $parentId;
 		$preventionplandet->fk_element        = $location;
 
 		// Check parameters
@@ -398,7 +398,7 @@ if (empty($reshook)) {
 			$error++;
 		}
 
-		if ($risk_category_id < 0 || $risk_category_id == 'undefined') {
+		if ($riskCategoryId < 0 || $riskCategoryId == 'undefined') {
 			setEventMessages($langs->trans('ErrorFieldRequired', $langs->transnoentitiesnoconv('INRSRisk')), null, 'errors');
 			$error++;
 		}
@@ -424,27 +424,27 @@ if (empty($reshook)) {
 	// Action to update line
 	if ($action == 'updateLine' && $permissiontoadd) {
 		// Get parameters
-		$actions_description = GETPOST('actionsdescription');
-		$prevention_method   = GETPOST('preventionmethod');
+		$actionsDescription = GETPOST('actionsdescription');
+		$preventionMethod   = GETPOST('preventionmethod');
 		$location            = GETPOST('fk_element');
-		$risk_category_id    = GETPOST('risk_category_id');
-		$parent_id           = GETPOST('parent_id');
+		$riskCategoryId    = GETPOST('risk_category_id');
+		$parentId           = GETPOST('parent_id');
 
 		$preventionplandet->fetch($lineid);
 
 		// Initialize object prevention plan line
-		$preventionplandet->description       = $actions_description;
-		$preventionplandet->category          = $risk_category_id;
-		$preventionplandet->prevention_method = $prevention_method;
-		$preventionplandet->fk_preventionplan = $parent_id;
+		$preventionplandet->description       = $actionsDescription;
+		$preventionplandet->category          = $riskCategoryId;
+		$preventionplandet->prevention_method = $preventionMethod;
+		$preventionplandet->fk_preventionplan = $parentId;
 		$preventionplandet->fk_element        = $location;
 
 		// Check parameters
-		if ($parent_id < 1) {
+		if ($parentId < 1) {
 			setEventMessages($langs->trans('ErrorFieldRequired', $langs->transnoentitiesnoconv('Location')), null, 'errors');
 			$error++;
 		}
-		if ($risk_category_id < 0) {
+		if ($riskCategoryId < 0) {
 			setEventMessages($langs->trans('ErrorFieldRequired', $langs->transnoentitiesnoconv('INRSRisk')), null, 'errors');
 			$error++;
 		}
@@ -455,7 +455,7 @@ if (empty($reshook)) {
 				// Update prevention plan line OK
 				setEventMessages($langs->trans('UpdatePreventionPlanLine') . ' ' . $preventionplandet->ref . ' ' . $langs->trans('PreventionPlanMessage'), array());
 				$urltogo = str_replace('__ID__', $result, $backtopage);
-				$urltogo = preg_replace('/--IDFORBACKTOPAGE--/', $parent_id, $urltogo); // New method to autoselect project after a New on another form object creation
+				$urltogo = preg_replace('/--IDFORBACKTOPAGE--/', $parentId, $urltogo); // New method to autoselect project after a New on another form object creation
 				header("Location: " . $urltogo);
 				exit;
 			} else {
@@ -474,7 +474,7 @@ if (empty($reshook)) {
 			// Delete prevention plan line OK
 			setEventMessages($langs->trans('DeletePreventionPlanLine') . ' ' . $preventionplandet->ref . ' ' . $langs->trans('PreventionPlanMessage'), array());
 			$urltogo = str_replace('__ID__', $result, $backtopage);
-			$urltogo = preg_replace('/--IDFORBACKTOPAGE--/', $parent_id, $urltogo); // New method to autoselect project after a New on another form object creation
+			$urltogo = preg_replace('/--IDFORBACKTOPAGE--/', $parentId, $urltogo); // New method to autoselect project after a New on another form object creation
 			header("Location: " . $urltogo);
 			exit;
 		} else {
@@ -489,30 +489,6 @@ if (empty($reshook)) {
 
 	// Action to generate pdf from odt file
 	require_once __DIR__ . '/../../core/tpl/documents/digiriskdolibarr_manual_pdf_generation_action.tpl.php';
-
-	// Delete file in doc form
-	if ($action == 'remove_file' && $permissiontodelete) {
-		if ( ! empty($upload_dir)) {
-			require_once DOL_DOCUMENT_ROOT . '/core/lib/files.lib.php';
-
-			$langs->load("other");
-			$filetodelete = GETPOST('file', 'alpha');
-			$file         = $upload_dir . '/' . $filetodelete;
-			$ret          = dol_delete_file($file, 0, 0, 0, $object);
-			if ($ret) setEventMessages($langs->trans("FileWasRemoved", $filetodelete), null, 'mesgs');
-			else setEventMessages($langs->trans("ErrorFailToDeleteFile", $filetodelete), null, 'errors');
-
-			// Make a redirect to avoid to keep the remove_file into the url that create side effects
-			$urltoredirect = $_SERVER['REQUEST_URI'];
-			$urltoredirect = preg_replace('/#builddoc$/', '', $urltoredirect);
-			$urltoredirect = preg_replace('/action=remove_file&?/', '', $urltoredirect);
-
-			header('Location: ' . $urltoredirect);
-			exit;
-		} else {
-			setEventMessages('BugFoundVarUploaddirnotDefined', null, 'errors');
-		}
-	}
 
 	// Action to set status STATUS_INPROGRESS
 	if ($action == 'confirm_setInProgress') {
@@ -617,9 +593,9 @@ if (empty($reshook)) {
 	$triggersendname     = 'PREVENTIONPLAN_SENTBYMAIL';
 	$mode                = 'emailfromthirdparty';
 	$trackid             = 'thi' . $object->id;
-	$labour_inspector    = $digiriskresources->fetchResourcesFromObject('LabourInspector', $object);
-	$labour_inspector_id = $labour_inspector->id;
-	$thirdparty->fetch($labour_inspector_id);
+	$labourInspector    = $digiriskresources->fetchResourcesFromObject('LabourInspector', $object);
+	$labourInspectorId   = $labourInspector->id;
+	$thirdparty->fetch($labourInspectorId);
 	$object->thirdparty = $thirdparty;
 
 	if ($action == 'send' && dol_strlen(GETPOST('sendto') < 1)) {
@@ -638,9 +614,9 @@ if (empty($reshook)) {
 $form        = new Form($db);
 $formproject = new FormProjets($db);
 
-$title         = $langs->trans("PreventionPlan");
-$title_create  = $langs->trans("NewPreventionPlan");
-$title_edit    = $langs->trans("ModifyPreventionPlan");
+$title       = $langs->trans("PreventionPlan");
+$titleCreate = $langs->trans("NewPreventionPlan");
+$titleEdit   = $langs->trans("ModifyPreventionPlan");
 
 $helpUrl = 'FR:Module_Digirisk#DigiRisk_-_Plan_de_pr.C3.A9vention';
 
@@ -648,7 +624,7 @@ saturne_header(1, '', $title, $helpUrl);
 
 // Part to create
 if ($action == 'create') {
-	print load_fiche_titre($title_create, '', "digiriskdolibarr32px@digiriskdolibarr");
+	print load_fiche_titre($titleCreate, '', "digiriskdolibarr32px@digiriskdolibarr");
 
 	print '<form method="POST" action="' . $_SERVER["PHP_SELF"] . '">';
 	print '<input type="hidden" name="token" value="' . newToken() . '">';
@@ -749,7 +725,7 @@ if ($action == 'create') {
 	print ' <a href="' . DOL_URL_ROOT . '/societe/card.php?action=create&backtopage=' . urlencode($_SERVER["PHP_SELF"] . '?action=create') . '" target="_blank"><span class="fa fa-plus-circle valignmiddle paddingleft" title="' . $langs->trans("AddThirdParty") . '"></span></a>';
 	print '<a href="' . DOL_URL_ROOT . '/custom/digiriskdolibarr/admin/securityconf.php' . '" target="_blank">' . $langs->trans("ConfigureLabourInspector") . '</a>';
 	print '</td></tr>';
-	$labourInspectorContact_id        = (GETPOST('labour_inspector_contact') ? GETPOST('labour_inspector_contact') : ($allLinks['LabourInspectorContact']->id[0] ?: -1));
+	$labourInspectorContactId        = (GETPOST('labour_inspector_contact') ? GETPOST('labour_inspector_contact') : ($allLinks['LabourInspectorContact']->id[0] ?: -1));
 
 	if ( ! empty($allLinks['LabourInspectorContact'])) {
 		$contact->fetch($allLinks['LabourInspectorContact']->id[0]);
@@ -760,7 +736,7 @@ if ($action == 'create') {
 	$htmltext = img_picto('', 'address') . ' ' . $langs->trans("LabourInspector");
 	print $htmltext;
 	print '</td><td>';
-	print $form->selectcontacts((GETPOST('labour_inspector') ? GETPOST('labour_inspector') : ($allLinks['LabourInspectorSociety']->id[0] ?: -1)), $labourInspectorContact_id, 'labour_inspector_contact', 1, '', '', 1, 'minwidth100imp widthcentpercentminusxx maxwidth400');
+	print $form->selectcontacts((GETPOST('labour_inspector') ? GETPOST('labour_inspector') : ($allLinks['LabourInspectorSociety']->id[0] ?: -1)), $labourInspectorContactId, 'labour_inspector_contact', 1, '', '', 1, 'minwidth100imp widthcentpercentminusxx maxwidth400');
 	print '</td></tr>';
 
 	// Other attributes
@@ -780,7 +756,7 @@ if ($action == 'create') {
 
 // Part to edit record
 if (($id || $ref) && $action == 'edit') {
-	print load_fiche_titre($title_edit, '', "digiriskdolibarr32px@digiriskdolibarr");
+	print load_fiche_titre($titleEdit, '', "digiriskdolibarr32px@digiriskdolibarr");
 
 	print '<form method="POST" action="' . $_SERVER["PHP_SELF"] . '">';
 	print '<input type="hidden" name="token" value="' . newToken() . '">';
@@ -896,7 +872,7 @@ if (($id || $ref) && $action == 'edit') {
 		$labourInspectorSociety = array_shift($objectResources['LabourInspector']);
 	}
 	if (is_array($objectResources['LabourInspectorAssigned']) && $objectResources['LabourInspectorAssigned'] > 0) {
-		$labour_inspector_assigned = array_shift($objectResources['LabourInspectorAssigned']);
+		$labourInspector_assigned = array_shift($objectResources['LabourInspectorAssigned']);
 	}
 	//Labour inspector Society -- Entreprise Inspecteur du travail
 	print '<tr><td class="fieldrequired minwidth400">';
@@ -1085,9 +1061,9 @@ if ((empty($action) || ($action != 'create' && $action != 'edit'))) {
 	print $langs->trans("LabourInspectorSociety");
 	print '</td>';
 	print '<td>';
-	$labour_inspector = $digiriskresources->fetchResourcesFromObject('LabourInspector', $object);
-	if ($labour_inspector > 0) {
-		print $labour_inspector->getNomUrl(1);
+	$labourInspector = $digiriskresources->fetchResourcesFromObject('LabourInspector', $object);
+	if ($labourInspector > 0) {
+		print $labourInspector->getNomUrl(1);
 	}
 	print '</td></tr>';
 
@@ -1112,8 +1088,8 @@ if ((empty($action) || ($action != 'create' && $action != 'edit'))) {
 	$attendants += count($signatory->fetchSignatory('ExtSocietyAttendant', $object->id, 'preventionplan'));
 	$url         = dol_buildpath('/custom/saturne/view/saturne_attendants.php?id=' . $object->id . '&module_name=DigiriskDolibarr&object_type=' . $object->element . '&document_type=PreventionPlanDocument', 3);
 	$displayButton = $onPhone ? '<i class="fas fa-plus fa-2x"></i>' : '<i class="fas fa-plus"></i> ' . $langs->trans('AddAttendants');
-	print '<a href="' . $url . '">' . $attendants;
-	print '<span class="' . ($object->status == $object::STATUS_DRAFT ? 'butAction' : 'butActionRefused classfortooltip') . '" id="actionButtonAddAttendants" title="' . dol_escape_htmltag($langs->trans("PreventionPlanMustBeInProgress")) . '" href="' . $url . '">' .  $displayButton . '</span></a>';
+	print '<a ' . ($object->status == 1 ? 'href="' .  $url . '"' : '') . '">' . $attendants;
+	print '<span class="' . ($object->status == $object::STATUS_DRAFT ? 'butAction' : 'butActionRefused classfortooltip') . '" id="actionButtonAddAttendants" title="' . dol_escape_htmltag($langs->trans("PreventionPlanMustBeInProgress")) . '">' .  $displayButton . '</span></a>';
 	print '</td></tr>';
 
 	print '</table>';
@@ -1350,7 +1326,7 @@ if ((empty($action) || ($action != 'create' && $action != 'edit'))) {
 
 			print '<tr>';
 			print '<td>';
-			print $preventionplandet->getNextNumRef();
+			print $refPreventionPlanDetMod->getNextValue($preventionplandet);
 			print '</td>';
 			print '<td>';
 			print $digiriskelement->select_digiriskelement_list('', 'fk_element', '', 0, 0, array(), 0, 0, 'minwidth100', '', false, 1);
@@ -1435,7 +1411,7 @@ if ((empty($action) || ($action != 'create' && $action != 'edit'))) {
 			}
 		}
 
-		print saturne_show_documents($modulepart, $dirFiles, $filedir, $urlsource, $genallowed, 0, '$defaultmodel', 1, 0, 0, 0, 0, $title, 0, 0, empty($soc->default_lang) ? '' : $soc->default_lang, $object, 0, 'remove_file', (($object->status > $object::STATUS_VALIDATED) ? 1 : 0), $langs->trans('ControlMustBeValidatedToGenerated'));
+		print saturne_show_documents($modulepart, $dirFiles, $filedir, $urlsource, $genallowed, 0, $defaultmodel, 1, 0, 0, 0, 0, $title, 0, 0, empty($soc->default_lang) ? '' : $soc->default_lang, $object, 0, 'remove_file', (($object->status > $object::STATUS_VALIDATED) ? 1 : 0), $langs->trans('ControlMustBeValidatedToGenerated'));
 	}
 
 	if ($permissiontoadd) {
@@ -1458,9 +1434,9 @@ if ((empty($action) || ($action != 'create' && $action != 'edit'))) {
 	print '</div></div></div>';
 
 	// Presend form
-	$labour_inspector    = $digiriskresources->fetchResourcesFromObject('LabourInspector', $object);
-	$labour_inspector_id = $labour_inspector->id;
-	$thirdparty->fetch($labour_inspector_id);
+	$labourInspector    = $digiriskresources->fetchResourcesFromObject('LabourInspector', $object);
+	$labourInspectorId = $labourInspector->id;
+	$thirdparty->fetch($labourInspectorId);
 	$object->thirdparty = $thirdparty;
 
 	$modelmail    = 'preventionplan';
