@@ -305,7 +305,7 @@ if ($action == 'create') {
 
 	// Draft confirmation
 	if (($action == 'set_draft' && (empty($conf->use_javascript_ajax) || !empty($conf->dol_use_jmobile))) || (!empty($conf->use_javascript_ajax) && empty($conf->dol_use_jmobile))) {
-		$img          = '<img alt="" src="./../../img/investigation_classify.png" />';
+		$img          = '<img alt="" src="./../../../saturne/img/object_classify.png" />';
 		$formQuestion = [
 			['type' => 'other', 'name' => 'lock_validation', 'label' => '<span class="">' . img_picto('', 'info') . ' ' . $langs->trans('ConfirmReOpenInvestigation'). '</span>'],
 			['type' => 'other', 'name' => 'OK', 'label' => '', 'value' => $img, 'moreattr' => 'readonly'],
@@ -315,7 +315,7 @@ if ($action == 'create') {
 	}
 	// Validate confirmation
 	if (($action == 'set_validate' && (empty($conf->use_javascript_ajax) || !empty($conf->dol_use_jmobile))) || (!empty($conf->use_javascript_ajax) && empty($conf->dol_use_jmobile))) {
-		$img          = '<img alt="" src="./../../img/investigation_draft.png" />';
+		$img          = '<img alt="" src="./../../saturne/img/object_draft.png" />';
 		$formQuestion = [
 			['type' => 'other', 'name' => 'lock_validation', 'label' => '<span class="">' . img_picto('', 'info') . ' ' . $langs->trans('ConfirmValidateObject', $langs->transnoentities('The' . ucfirst($object->element)), $langs->transnoentities('The' . ucfirst($object->element))) . '</span>'],
 			['type' => 'other', 'name' => 'OK', 'label' => '', 'value' => $img, 'moreattr' => 'readonly'],
@@ -325,7 +325,7 @@ if ($action == 'create') {
 	}
 	// Archive confirmation
 	if (($action == 'set_archive' && (empty($conf->use_javascript_ajax) || !empty($conf->dol_use_jmobile))) || (!empty($conf->use_javascript_ajax) && empty($conf->dol_use_jmobile))) {
-		$img          = '<img alt="" src="./../../img/investigation_validate.png" />';
+		$img          = '<img alt="" src="./../../../saturne/img/object_validate.png" />';
 		$formQuestion = [
 			['type' => 'other', 'name' => 'lock_validation', 'label' => '<span class="">' . img_picto('', 'info') . ' ' . $langs->trans('ConfirmClassifyObject', $langs->transnoentities('The' . ucfirst($object->element))). '</span>'],
 			['type' => 'other', 'name' => 'OK', 'label' => '', 'value' => $img, 'moreattr' => 'readonly'],

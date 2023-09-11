@@ -2111,6 +2111,12 @@ class InterfaceDigiriskdolibarrTriggers extends DolibarrTriggers
 				$result = $actioncomm->create($user);
 				break;
 
+			case 'ACCIDENT_INVESTIGATION_SENTBYMAIL' :
+				$actioncomm->label = $langs->trans('ObjectSentByMailTrigger');
+
+				$result = $actioncomm->create($user);
+				break;
+
 		}
 
 		if ($result < 0) {
