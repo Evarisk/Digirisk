@@ -386,7 +386,7 @@ if (empty($reshook)) {
 
 					if ( ! empty($modellist)) {
 						asort($modellist);
-						$modellist = array_filter($modellist, 'remove_index');
+						$modellist = array_filter($modellist, 'saturne_remove_index');
 						if (is_array($modellist) && count($modellist) == 1) {    // If there is only one element
 							$arraykeys                = array_keys($modellist);
 							$arrayvalues              = preg_replace('/template_/', '', array_values($modellist)[0]);

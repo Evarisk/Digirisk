@@ -57,6 +57,7 @@ saturne_load_langs(['other']);
 $id                  = GETPOST('id', 'int');
 $ref                 = GETPOST('ref', 'alpha');
 $action              = GETPOST('action', 'aZ09');
+$subaction           = GETPOST('subaction', 'aZ09');
 $confirm             = GETPOST('confirm', 'alpha');
 $cancel              = GETPOST('cancel', 'aZ09');
 $contextpage         = GETPOST('contextpage', 'aZ') ? GETPOST('contextpage', 'aZ') : 'digiriskelementcard'; // To manage different context of search
@@ -361,9 +362,9 @@ if ((empty($action) || ($action != 'edit' && $action != 'create'))) {
 	}
 	$morehtmlref .= '</div>';
 	if (isset($object->element_type)) {
-		$morehtmlleft = '<div class="floatleft inline-block valignmiddle divphotoref">' . saturne_show_medias_linked('digiriskdolibarr', $conf->digiriskdolibarr->multidir_output[$conf->entity] . '/' . $object->element_type, 'small', 5, 0, 0, 0, $height, $width, 0, 0, 0, $object->element_type, $object, 'photo', 0, 0) . '</div>';
-	} else {
-		$morehtmlleft = '<div class="floatleft inline-block valignmiddle divphotoref">' . saturne_show_medias_linked('mycompany', $conf->mycompany->dir_output . '/logos', 'small', 1, 0, 0, 0, 80, 80, 0, 0, 0, 'logos', $object, 'photo',0, 0) . '</div>';
+		$morehtmlleft = '<div class="floatleft inline-block valignmiddle divphotoref photo digirisk-element-photo-'. $object->id .'">';
+		$morehtmlleft .= saturne_show_medias_linked('digiriskdolibarr', $conf->digiriskdolibarr->multidir_output[$conf->entity] . '/' . $object->element_type . '/' . $object->ref, 'small', 1, 0, 0, 0, $height, $width, 0, 0, 0, $object->element_type . '/' . $object->ref, $object, 'photo', 0, 0, 0, 1);
+		$morehtmlleft .= '</div>';
 	}
 
 	$linkback = '<a href="' . dol_buildpath('/digiriskdolibarr/view/digiriskelement/risk_list.php', 1) . '">' . $langs->trans("BackToList") . '</a>';
@@ -378,6 +379,25 @@ if ((empty($action) || ($action != 'edit' && $action != 'create'))) {
 	print '</td>';
 	print '<td>';
 	print '<input type="checkbox" id="show_in_selectorshow_in_selector" name="show_in_selectorshow_in_selector"' . (($object->show_in_selector == 0) ?  '' : ' checked=""') . '" disabled> ';
+	print '</td></tr>';
+
+	print '<tr class="linked-medias digirisk-element-photo-'. $object->id .'"><td class=""><label for="photos">' . $langs->trans("Photo") . '</label></td><td class="linked-medias-list" style="display: flex; margin-left: 10px; height: auto;">';
+	print '<span class="add-medias" '. (($object->status != $object::STATUS_LOCKED) ? "" : "style='display:none'") . '>';
+	print '<input hidden multiple class="fast-upload" id="fast-upload-photo-default" type="file" name="userfile[]" capture="environment" accept="image/*">';
+	print '<label for="fast-upload-photo-default">';
+	print '<div class="wpeo-button button-square-50">';
+	print '<i class="fas fa-camera"></i><i class="fas fa-plus-circle button-add"></i>';
+	print '</div>';
+	print '</label>';
+	print '&nbsp';
+	print '<input type="hidden" class="favorite-photo" id="photo" name="photo" value="<?php echo $object->photo ?>"/>';
+	print '<div class="wpeo-button button-square-50 open-media-gallery add-media modal-open" value="0">';
+	print '<input type="hidden" class="modal-options" data-modal-to-open="media_gallery" data-from-id="'. $object->id .'" data-from-type="'. $object->element_type .'" data-from-subtype="photo" data-from-subdir="" data-photo-class="digirisk-element-photo-'. $object->id .'"/>';
+	print '<i class="fas fa-folder-open"></i><i class="fas fa-plus-circle button-add"></i>';
+	print '</div>';
+	print '</span>';
+	print '&nbsp';
+	print saturne_show_medias_linked('digiriskdolibarr', $conf->digiriskdolibarr->multidir_output[$conf->entity] . '/' . $object->element_type . '/' . $object->ref, 'small', 5, 0, 0, 0, 50, 50, 0, 0, 0, $object->element_type . '/'. $object->ref . '/', $object, 'photo', $object->status != $object::STATUS_LOCKED, $permissiontodelete && $object->status != $object::STATUS_LOCKED);
 	print '</td></tr>';
 
 	// Other attributes. Fields from hook formObjectOptions and Extrafields.
