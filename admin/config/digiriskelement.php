@@ -36,6 +36,8 @@ global $langs, $user, $db;
 require_once DOL_DOCUMENT_ROOT . "/core/lib/admin.lib.php";
 
 require_once __DIR__ . '/../../lib/digiriskdolibarr.lib.php';
+require_once __DIR__ . '/../../class/digiriskelement/groupment.class.php';
+require_once __DIR__ . '/../../class/digiriskelement/workunit.class.php';
 
 // Translations
 saturne_load_langs(["admin"]);
@@ -81,11 +83,6 @@ print load_fiche_titre($title, $linkback, 'digiriskdolibarr32px@digiriskdolibarr
 $head = digiriskdolibarr_admin_prepare_head();
 print dol_get_fiche_head($head, 'digiriskelement', '', -1, "digiriskdolibarr@digiriskdolibarr");
 
-$types = array(
-	'groupment' => 'Groupment',
-	'workunit' => 'WorkUnit'
-);
-
 $pictos = array(
 	'groupment' => '<span class="ref" style="font-size: 10px; color: #fff; text-transform: uppercase; font-weight: 600; display: inline-block; background: #263C5C; padding: 0.2em 0.4em; line-height: 10px !important">GP</span> ',
 	'workunit' => '<span class="ref" style="background: #0d8aff;  font-size: 10px; color: #fff; text-transform: uppercase; font-weight: 600; display: inline-block;; padding: 0.2em 0.4em; line-height: 10px !important">WU</span> '
@@ -94,95 +91,22 @@ $pictos = array(
 /*
  *  Numbering module
  */
-foreach ($types as $type => $typeWithCase) {
-	print load_fiche_titre($pictos[$type] . $langs->trans($typeWithCase . 'Management'), '', '');
-	print '<hr>';
-	print load_fiche_titre($langs->trans("Digirisk" . $typeWithCase . "NumberingModule"), '', '');
 
-	print '<table class="noborder centpercent">';
-	print '<tr class="liste_titre">';
-	print '<td>' . $langs->trans("Name") . '</td>';
-	print '<td>' . $langs->trans("Description") . '</td>';
-	print '<td class="nowrap">' . $langs->trans("Example") . '</td>';
-	print '<td class="center">' . $langs->trans("Status") . '</td>';
-	print '<td class="center">' . $langs->trans("ShortInfo") . '</td>';
-	print '</tr>';
+$objectModSubdir = 'digiriskelement';
 
-	clearstatcache();
+$object = new Groupment($db);
 
-	$dir = dol_buildpath("/custom/digiriskdolibarr/core/modules/digiriskdolibarr/digiriskelement/" . $type . "/");
-	if (is_dir($dir)) {
-		$handle = opendir($dir);
-		if (is_resource($handle)) {
-			while (($file = readdir($handle)) !== false ) {
-				if ( ! is_dir($dir . $file) || (substr($file, 0, 1) <> '.' && substr($file, 0, 3) <> 'CVS')) {
-					$filebis = $file;
+print load_fiche_titre($pictos['groupment'] . $langs->trans('GroupmentManagement'), '', '');
+print '<hr>';
 
-					$classname = preg_replace('/\.php$/', '', $file);
-					$classname = preg_replace('/\-.*$/', '', $classname);
+require __DIR__ . '/../../../saturne/core/tpl/admin/object/object_numbering_module_view.tpl.php';
 
-					if ( ! class_exists($classname) && is_readable($dir . $filebis) && (preg_match('/mod_/', $filebis) || preg_match('/mod_/', $classname)) && substr($filebis, dol_strlen($filebis) - 3, 3) == 'php') {
-						// Charging the numbering class
-						require_once $dir . $filebis;
+$object = new WorkUnit($db);
 
-						$module = new $classname($db);
+print load_fiche_titre($pictos['workunit'] . $langs->trans('WorkUnitManagement'), '', '');
+print '<hr>';
 
-						if ($module->isEnabled()) {
-							print '<tr class="oddeven"><td>';
-							print $langs->trans($module->name);
-							print "</td><td>";
-							print $module->info();
-							print '</td>';
-
-							// Show example of numbering module
-							print '<td class="nowrap">';
-							$tmp = $module->getExample();
-							if (preg_match('/^Error/', $tmp)) print '<div class="error">' . $langs->trans($tmp) . '</div>';
-							elseif ($tmp == 'NotConfigured') print $langs->trans($tmp);
-							else print $tmp;
-							print '</td>';
-
-							print '<td class="center">';
-							$typeConf = 'DIGIRISKDOLIBARR_' . strtoupper($type) . '_ADDON';
-
-							if ($conf->global->$typeConf == $file || $conf->global->$typeConf . '.php' == $file) {
-								print img_picto($langs->trans("Activated"), 'switch_on');
-							} else {
-								print '<a class="reposition" href="' . $_SERVER["PHP_SELF"] . '?action=setmod&value=' . preg_replace('/\.php$/', '', $file) . '&type=' . $type . '&scan_dir=' . $module->scandir . '&label=' . urlencode($module->name) . '&token=' . newToken() . '" alt="' . $langs->trans("Default") . '">' . img_picto($langs->trans("Disabled"), 'switch_off') . '</a>';
-							}
-							print '</td>';
-
-							// Example for listing risks action
-							$htmltooltip  = '';
-							$htmltooltip .= '' . $langs->trans("Version") . ': <b>' . $module->getVersion() . '</b><br>';
-							$nextval      = $module->getNextValue($object_document);
-							if ("$nextval" != $langs->trans("NotAvailable")) {  // Keep " on nextval
-								$htmltooltip .= $langs->trans("NextValue") . ': ';
-								if ($nextval) {
-									if (preg_match('/^Error/', $nextval) || $nextval == 'NotConfigured')
-										$nextval  = $langs->trans($nextval);
-									$htmltooltip .= $nextval . '<br>';
-								} else {
-									$htmltooltip .= $langs->trans($module->error) . '<br>';
-								}
-							}
-
-							print '<td class="center">';
-							print $form->textwithpicto('', $htmltooltip, 1, 0);
-							if ($conf->global->$typeConf . '.php' == $file) { // If module is the one used, we show existing errors
-								if ( ! empty($module->error)) dol_htmloutput_mesg($module->error, '', 'error', 1);
-							}
-							print '</td>';
-							print "</tr>";
-						}
-					}
-				}
-			}
-			closedir($handle);
-		}
-	}
-	print '</table>';
-}
+require __DIR__ . '/../../../saturne/core/tpl/admin/object/object_numbering_module_view.tpl.php';
 
 /*
  *  Deleted elements
@@ -191,27 +115,14 @@ foreach ($types as $type => $typeWithCase) {
 print load_fiche_titre('<i class="fas fa-trash"></i> ' . $langs->trans('DeletedElements'), '', '');
 print '<hr>';
 
-print load_fiche_titre($langs->trans("DeletedDigiriskElement"), '', '');
-
-print '<table class="noborder centpercent">';
-print '<tr class="liste_titre">';
-print '<td>' . $langs->trans("Name") . '</td>';
-print '<td>' . $langs->trans("Description") . '</td>';
-print '<td class="center">' . $langs->trans("Status") . '</td>';
-print '</tr>';
-
-print '<tr class="oddeven"><td>';
-print $langs->trans('DeletedDigiriskElement');
-print "</td><td>";
-print $langs->trans('ShowDeletedDigiriskElement');
-print '</td>';
-
-print '<td class="center">';
-print ajax_constantonoff('DIGIRISKDOLIBARR_SHOW_HIDDEN_DIGIRISKELEMENT');
-print '</td>';
-print '</tr>';
-
-print '</table>';
+$constArray[$moduleNameLowerCase] = [
+	'DeletedDigiriskElement' => [
+		'name'        => 'DeletedDigiriskElement',
+		'description' => 'ShowDeletedDigiriskElement',
+		'code'        => 'DIGIRISKDOLIBARR_SHOW_HIDDEN_DIGIRISKELEMENT',
+	],
+];
+require __DIR__ . '/../../../saturne/core/tpl/admin/object/object_const_view.tpl.php';
 
 // Page end
 print dol_get_fiche_end();

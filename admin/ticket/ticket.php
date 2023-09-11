@@ -54,6 +54,13 @@ $extra_fields = new ExtraFields($db);
 $category     = new Categorie($db);
 $ticket       = new Ticket($db);
 
+// Initialize view objects
+if (isModEnabled('project')) {
+	$formproject = new FormProjets($db);
+}
+$form      = new Form($db);
+$formother = new FormOther($db);
+
 // Parameters
 $action     = GETPOST('action', 'alpha');
 $backtopage = GETPOST('backtopage', 'alpha');
@@ -220,12 +227,6 @@ if ($action == 'generateQRCode') {
 /*
  * View
  */
-
-if (isModEnabled('project')) {
-	$formproject = new FormProjets($db);
-}
-$form      = new Form($db);
-$formother = new FormOther($db);
 
 $helpUrl  = 'FR:Module_Digirisk';
 $title    = $langs->transnoentities("Ticket");
