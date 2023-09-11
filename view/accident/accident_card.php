@@ -34,7 +34,6 @@ require_once DOL_DOCUMENT_ROOT . '/core/lib/date.lib.php';
 require_once DOL_DOCUMENT_ROOT . '/core/class/html.formfile.class.php';
 require_once DOL_DOCUMENT_ROOT . '/core/class/doleditor.class.php';
 
-require_once __DIR__ . '/../../class/digiriskdocuments.class.php';
 require_once __DIR__ . '/../../class/digiriskelement.class.php';
 require_once __DIR__ . '/../../class/accident.class.php';
 require_once __DIR__ . '/../../class/digiriskstandard.class.php';
@@ -46,7 +45,7 @@ require_once __DIR__ . '/../../core/modules/digiriskdolibarr/digiriskelement/acc
 global $conf, $db, $hookmanager, $langs, $mysoc, $user;
 
 // Load translation files required by the page
-saturne_load_langs(['"digiriskdolibarr@digiriskdolibarr", "other"']);
+saturne_load_langs(['other']);
 
 // Get parameters
 $id                  = GETPOST('id', 'int');
@@ -138,7 +137,7 @@ if (empty($reshook)) {
 		$object->date_creation     = $object->db->idate($now);
 		$object->tms               = $now;
 		$object->import_key        = "";
-		$object->status            = 1;
+		$object->status            = Accident::STATUS_DRAFT;
 		$object->label             = $label;
 		$object->description       = $description;
 		$object->accident_type     = $accident_type;
@@ -627,7 +626,7 @@ if (empty($reshook)) {
 	// Action to set status STATUS_LOCKED
 	if ($action == 'confirm_lock') {
 		$object->fetch($id);
-		$result = $object->setStatusCommon($user, Accident::STATUS_PENDING_SIGNATURE, false, 'ACCIDENT_LOCK');
+		$result = $object->setStatusCommon($user, Accident::STATUS_LOCKED, false, 'ACCIDENT_LOCK');
 		if ($result > 0) {
 			// Set Locked OK
 			setEventMessages($langs->trans('ObjectLockedTrigger', $langs->transnoentities(ucfirst($object->element)), $object->ref), []);
@@ -650,8 +649,14 @@ if (empty($reshook)) {
 $form     = new Form($db);
 $title    = $langs->trans("Accident");
 $helpUrl  = 'FR:Module_Digirisk#DigiRisk_-_Accident_b.C3.A9nins_et_presque_accidents';
-$morejs   = array("/digiriskdolibarr/js/digiriskdolibarr.js");
-$morecss  = array("/digiriskdolibarr/css/digiriskdolibarr.css");
+$morejs   = ["/digiriskdolibarr/js/digiriskdolibarr.js"];
+$morecss  = ["/digiriskdolibarr/css/digiriskdolibarr.css"];
+
+if ($conf->browser->layout == 'phone') {
+	$onPhone = 1;
+} else {
+	$onPhone = 0;
+}
 
 saturne_header(0,'', $title, $helpUrl, '', 0, 0, $morejs, $morecss);
 
@@ -1081,25 +1086,44 @@ if ((empty($action) || ($action != 'create' && $action != 'edit'))) {
 		if ($reshook < 0) setEventMessages($hookmanager->error, $hookmanager->errors, 'errors');
 
 		if (empty($reshook)) {
-			print '<a class="' . ($object->status == Accident::STATUS_IN_PROGRESS ? 'butAction' : 'butActionRefused classfortooltip') . '" id="actionButtonEdit" title="' . ($object->status == 1 ? '' : dol_escape_htmltag($langs->trans("AccidentMustBeInProgress"))) . '" href="' . ($object->status == 1 ? ($_SERVER["PHP_SELF"] . '?id=' . $object->id . '&action=edit') : '#') . '">' . '<i class="fas fa-edit"></i> ' . $langs->trans("Modify") . '</a>';
-			print '<a class="' . ($object->status == Accident::STATUS_IN_PROGRESS ? 'butAction' : 'butActionRefused classfortooltip') . '" id="actionButtonLock" title="' . ($object->status == 1 ? '' : dol_escape_htmltag($langs->trans("AccidentMustBeInProgress"))) . '" href="' . ($object->status == 1 ? ($_SERVER["PHP_SELF"] . '?id=' . $object->id . '&action=set_lock&token=' . newToken()) : '#') . '"><i class="fas fa-lock"></i> ' . $langs->trans("Lock") . '</a>';
-			print '<a class="' . ($object->status == Accident::STATUS_PENDING_SIGNATURE ? 'butAction' : 'butActionRefused classfortooltip') . '" id="actionButtonCreateInvestigation" title="' . ($object->status == 2 ? '' : dol_escape_htmltag($langs->trans('ObjectMustBeLocked', ucfirst($langs->transnoentities('The' . ucfirst($object->element)))))) . '" href="' . ($object->status == 2 ? (dol_buildpath('/custom/digiriskdolibarr/view/accident_investigation/accident_investigation_card.php?action=create&fk_accident=' . $id, 1)) : '#') . '"><i class="fas fa-search-plus"></i> ' . $langs->trans("AccidentInvestigation") . '</a>';
-			print '<a class="' . ($permissiontodelete ? 'butActionDelete' : 'butActionRefused classfortooltip') . '" id="actionButtonDelete" title="' . ($permissiontodelete ? '' : dol_escape_htmltag($langs->trans("PermissionDenied"))) . '" href="' . ($permissiontodelete ? ($_SERVER["PHP_SELF"] . '?id=' . $object->id . '&action=delete&token=' . newToken()) : '#') . '"><i class="fas fa-trash"></i> ' . $langs->trans("Delete") . '</a>';
+			// Edit
+			$displayButton = $onPhone ? '<i class="fas fa-edit fa-2x"></i>' : '<i class="fas fa-edit"></i>' . ' ' . $langs->trans('Modify');
+			if ($object->status == $object::STATUS_DRAFT) {
+				print '<a class="butAction" id="actionButtonEdit" href="' . $_SERVER['PHP_SELF'] . '?id=' . $object->id . '&action=edit' . '">' . $displayButton . '</a>';
+			} else {
+				print '<span class="butActionRefused classfortooltip" title="' . dol_escape_htmltag($langs->trans('ObjectMustBeDraft', ucfirst($langs->transnoentities('The' . ucfirst($object->element))))) . '">' . $displayButton . '</span>';
+			}
+
+			// Lock.
+			$displayButton = $onPhone ? '<i class="fas fa-lock fa-2x"></i>' : '<i class="fas fa-lock"></i>' . ' ' . $langs->trans('Lock');
+			if ($object->status == $object::STATUS_DRAFT) {
+				print '<a class="butAction" id="actionButtonLock" href="'. $_SERVER["PHP_SELF"] . '?id=' . $object->id . '&action=set_lock&token=' . newToken() .'">' . $displayButton . '</a>';
+			} else {
+				print '<span class="butActionRefused classfortooltip" title="' . dol_escape_htmltag($langs->trans('ObjectMustBeDraft', ucfirst($langs->transnoentities('The' . ucfirst($object->element))))) . '">' . $displayButton . '</span>';
+			}
+
+			// Create Investigation.
+			$displayButton = $onPhone ? '<i class="fas fa-search-plus fa-2x"></i>' : '<i class="fas fa-search-plus"></i> ' . $langs->trans('AccidentInvestigation');
+			if ($object->status == $object::STATUS_LOCKED) {
+				print '<a class="butAction" id="actionButtonCreateInvestigation" href="'. dol_buildpath('/custom/digiriskdolibarr/view/accident_investigation/accident_investigation_card.php?action=create&fk_accident=' . $id, 1) .'">' . $displayButton . '</a>';
+			} else {
+				print '<span class="butActionRefused classfortooltip" title="' . dol_escape_htmltag($langs->trans('ObjectMustBeLocked', ucfirst($langs->transnoentities('The' . ucfirst($object->element))))) . '">' . $displayButton . '</span>';
+			}
+
+			// Delete (need delete permission, or if draft, just need create/modify permission).
+			$displayButton = $onPhone ? '<i class="fas fa-trash fa-2x"></i>' : '<i class="fas fa-trash"></i>' . ' ' . $langs->trans('Delete');
+			print dolGetButtonAction($displayButton, '', 'delete', $_SERVER['PHP_SELF'] . '?id=' . $object->id . '&action=delete&token=' . newToken(), '', $permissiontodelete);
 		}
 		print '</div>';
 
 		// Accident Lines
 		$accidentlines = $objectline->fetchFromParent($object->id);
 
-		if (($object->status == Accident::STATUS_IN_PROGRESS) || (!empty($accidentlines))) {
+		if (($object->status == Accident::STATUS_DRAFT) || (!empty($accidentlines))) {
 			// ACCIDENT LINES
 			print '<div class="div-table-responsive-no-min" style="overflow-x: unset !important">';
 			print load_fiche_titre($langs->trans("AccidentRiskList"), '', '');
 			print '<table id="tablelines" class="noborder noshadow" width="100%">';
-
-			global $forceall, $forcetoshowtitlelines;
-
-			if (empty($forceall)) $forceall = 0;
 
 			// Define colspan for the button 'Add'
 			$colspan = 3; // Columns: total ht + col edit + col delete
@@ -1187,7 +1211,7 @@ if ((empty($action) || ($action != 'create' && $action != 'edit'))) {
 						$coldisplay += $colspan;
 
 						//Actions buttons
-						if ($object->status == 1) {
+						if ($object->status == Accident::STATUS_DRAFT) {
 							print '<td class="center">';
 							$coldisplay++;
 							print '<a href="' . $_SERVER["PHP_SELF"] . '?id=' . $id . '&amp;action=editline&amp;lineid=' . $item->id . '" style="padding-right: 20px"><i class="fas fa-pencil-alt" style="color: #666"></i></a>';
@@ -1207,7 +1231,7 @@ if ((empty($action) || ($action != 'create' && $action != 'edit'))) {
 			}
 		}
 		//action create
-		if ($object->status == 1 && $permissiontoadd && $action != 'editline') {
+		if ($object->status == Accident::STATUS_DRAFT && $permissiontoadd && $action != 'editline') {
 			print '<form method="POST" action="' . $_SERVER["PHP_SELF"] . '?id=' . $object->id . '">';
 			print '<input type="hidden" name="token" value="' . newToken() . '">';
 			print '<input type="hidden" name="action" value="addLine">';
@@ -1257,14 +1281,12 @@ if ((empty($action) || ($action != 'create' && $action != 'edit'))) {
 		print '</div><div class="">';
 	}
 
-	$morehtmlright  = '<a href="' . dol_buildpath('/digiriskdolibarr/view/accident/accident_agenda.php', 1) . '?id=' . $object->id . '">';
-	$morehtmlright .= $langs->trans("SeeAll");
-	$morehtmlright .= '</a>';
+	$moreHtmlCenter = dolGetButtonTitle($langs->trans('SeeAll'), '', 'fa fa-bars imgforviewmode', dol_buildpath('/digiriskdolibarr/view/accident/accident_agenda.php', 1) . '?id=' . $object->id);
 
-	// List of actions on element
-	include_once DOL_DOCUMENT_ROOT . '/core/class/html.formactions.class.php';
-	$formactions    = new FormActions($db);
-	$somethingshown = $formactions->showactions($object, $object->element . '@digiriskdolibarr', '', 1, '', 10, '', $morehtmlright);
+	// List of actions on element.
+	require_once DOL_DOCUMENT_ROOT . '/core/class/html.formactions.class.php';
+	$formActions = new FormActions($db);
+	$formActions->showactions($object, $object->element . '@' . $object->module, 0, 1, '', 10, '', $moreHtmlCenter);
 
 	print '</div></div></div>';
 }
