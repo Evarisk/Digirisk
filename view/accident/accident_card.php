@@ -681,7 +681,7 @@ if ($action == 'create') {
 
 	//FkElement -- Lieu de l'accident - DigiriskElement
 	print '<tr class="fk_element_field"><td class="minwidth400">' . $langs->trans("AccidentLocation") . '</td><td>';
-	print $digiriskelement->select_digiriskelement_list(( ! empty(GETPOST('fromid')) ? GETPOST('fromid') : $object->fk_element), 'fk_element', '', 0, 0, [], 0, 0, 'minwidth300', 0, false, 0);
+	print $digiriskelement->selectDigiriskElementList(( ! empty(GETPOST('fromid')) ? GETPOST('fromid') : $object->fk_element), 'fk_element', [], 0, 0, array(), 0, 0, 'minwidth300', 0, false, 0);
 	print '</td></tr>';
 
 	//FkSoc -- Lieu de l'accident - Société extérieure
@@ -787,7 +787,7 @@ if (($id || $ref) && $action == 'edit') {
 
 	//AccidentLocation -- Lieu de l'accident
 	print '<tr class="' . (($object->external_accident == 1) ? ' fk_element_field' : ' fk_element_field hidden' ) . '" style="' . (($object->external_accident == 1) ? ' ' : ' display:none') . '"><td>' . $langs->trans("AccidentLocation") . '</td><td>';
-	print $digiriskelement->select_digiriskelement_list($object->fk_element, 'fk_element', '', 0, 0, [], 0, 0, 'minwidth300', 0, false, 0);
+	print $digiriskelement->selectDigiriskElementList($object->fk_element, 'fk_element', [], 0, 0, array(), 0, 0, 'minwidth300', 0, false, 0);
 	print '</td></tr>';
 
 	//FkSoc -- Société extérieure

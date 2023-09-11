@@ -17,9 +17,9 @@
  */
 
 /**
- *  \file    core/modules/digiquali/controldocument/mod_controldocument_standard.php
- *  \ingroup digiquali
- *  \brief   File of class to manage controldocument numbering rules standard.
+ *  \file    core/modules/digiriskdolibarr/digiriskelement/mod_preventionplan_standard.php
+ *  \ingroup digiriskdolibarr
+ *  \brief   File of class to manage mod_preventionplan_standard numbering rules standard.
  */
 
 // Load Saturne libraries.

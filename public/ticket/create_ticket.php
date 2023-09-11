@@ -548,17 +548,11 @@ if ($entity > 0) {
 			if ($conf->global->DIGIRISKDOLIBARR_TICKET_DIGIRISKELEMENT_VISIBLE) {
 				$selectDigiriskElement = '</br> <span ' . (($conf->global->DIGIRISKDOLIBARR_TICKET_DIGIRISKELEMENT_REQUIRED) ? 'style="font-weight:600"' : '') . '>' . $langs->trans('Service') . (($conf->global->DIGIRISKDOLIBARR_TICKET_DIGIRISKELEMENT_REQUIRED) ? '<span style="color:red"> *</span>' : '') . '</span>';
 
-				$alldisableddigiriskelement = $digiriskelement->fetchAll('', '', 0, 0, array('customsql' => 't.show_in_selector = 0'));
-				if (is_array($alldisableddigiriskelement) && !empty($alldisableddigiriskelement)) {
-					$filter = 's.rowid NOT IN (';
-					foreach ($alldisableddigiriskelement as $disabled_digiriskelement) {
-						$filter .= $disabled_digiriskelement->id . ',';
-					}
-					$filter = substr($filter, 0, -1);
-					$filter .= ')';
+				$deletedElements = $digiriskelement->getMultiEntityTrashList();
+				if (empty($deletedElements)) {
+					$deletedElements = [0];
 				}
-
-				$selectDigiriskElement .= $digiriskelement->select_digiriskelement_list(GETPOST('options_digiriskdolibarr_ticket_service'), 'options_digiriskdolibarr_ticket_service', (!empty($filter) ? $filter : ''), $langs->trans('PleaseSelectADigiriskElement'), 0, array(), 0, 0, 'minwidth500', 0, false, 1, '', true, $conf->global->DIGIRISKDOLIBARR_TICKET_DIGIRISKELEMENT_HIDE_REF);
+				$selectDigiriskElement .= $digiriskelement->selectDigiriskElementList(GETPOST('options_digiriskdolibarr_ticket_service'), 'options_digiriskdolibarr_ticket_service',  ['customsql' => 't.rowid NOT IN (' . implode(',', $deletedElements) . ')'], $langs->trans('PleaseSelectADigiriskElement'), 0, array(), 0, 0, 'minwidth500', 0, false, 1, '', true, $conf->global->DIGIRISKDOLIBARR_TICKET_DIGIRISKELEMENT_HIDE_REF);
 				$selectDigiriskElement .= '<div><br></div>';
 				print($selectDigiriskElement);
 			}

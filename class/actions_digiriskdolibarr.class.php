@@ -171,7 +171,7 @@ class ActionsDigiriskdolibarr
 				$object->fetch(GETPOST('id'),'',GETPOST('track_id'));
 				require_once __DIR__ . '/digiriskelement.class.php';
 				$digiriskelement = new DigiriskElement($db);
-				$selectDigiriskElement = $digiriskelement->select_digiriskelement_list($object->array_options['options_digiriskdolibarr_ticket_service'], 'options_digiriskdolibarr_ticket_service', '', 1, 0, array(), 0, 0, 'minwidth100', 0, false, 1);
+				$selectDigiriskElement = $digiriskelement->selectDigiriskElementList($object->array_options['options_digiriskdolibarr_ticket_service'], 'options_digiriskdolibarr_ticket_service', [], 1, 0, array(), 0, 0, 'minwidth100', 0, false, 1);
 				?>
 				<script>
 					jQuery('#options_digiriskdolibarr_ticket_service').remove()
@@ -185,7 +185,7 @@ class ActionsDigiriskdolibarr
 				$digiriskelement = new DigiriskElement($db);
 				$selectDigiriskElement = '<tr class="valuefieldcreate ticket_extras_digiriskdolibarr_ticket_service trextrafields_collapse" data-element="extrafield" data-targetelement="ticket" data-targetid=""><td class="wordbreak">'.$langs->trans('GP/UT').'</td>';
 				$selectDigiriskElement .= '<td class="ticket_extras_digiriskdolibarr_ticket_service">';
-				$selectDigiriskElement .= $digiriskelement->select_digiriskelement_list(GETPOST('options_digiriskdolibarr_ticket_service'), 'options_digiriskdolibarr_ticket_service', '', 1, 0, array(), 0, 0, 'minwidth500', 0, false, 1);
+				$selectDigiriskElement .= $digiriskelement->selectDigiriskElementList(GETPOST('options_digiriskdolibarr_ticket_service'), 'options_digiriskdolibarr_ticket_service', [], 1, 0, array(), 0, 0, 'minwidth500', 0, false, 1);
 				$selectDigiriskElement .= '</td>';
 				$selectDigiriskElement .= '</tr>';
 				?>

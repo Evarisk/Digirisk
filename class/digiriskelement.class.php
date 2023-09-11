@@ -229,7 +229,7 @@ class DigiriskElement extends SaturneObject
 	 *
 	 * @param  string 		$selected 			Preselected type
 	 * @param  string 		$htmlname 			Name of field in form
-	 * @param  string 		$filter 			Optional filters criteras (example: 's.rowid <> x', 's.client in (1,3)')
+	 * @param  array 		$filter 			Optional filters criteras (example: 's.rowid <> x', 's.client in (1,3)')
 	 * @param  string 		$showempty 			Add an empty field (Can be '1' or text to use on empty line like 'SelectThirdParty')
 	 * @param  int 			$forcecombo 		Force to use standard HTML select component without beautification
 	 * @param  array 		$events 			Event options. Example: array(array('method'=>'getContacts', 'url'=>dol_buildpath('/core/ajax/contacts.php',1), 'htmlname'=>'contactid', 'params'=>array('add-customer-contact'=>'disabled')))
@@ -245,119 +245,22 @@ class DigiriskElement extends SaturneObject
 	 * @return string 							HTML string with
 	 * @throws Exception
 	 */
-	public function select_digiriskelement_list($selected = '', $htmlname = 'fk_element', $filter = '', $showempty = '1', $forcecombo = 0, $events = array(), $outputmode = 0, $limit = 0, $morecss = 'minwidth100', $current_element = 0, $multiple = false, $noroot = 0, $contextpage = '', $multientitymanaged = true, $hideref  = false)
+	public function selectDigiriskElementList($selected = '', $htmlname = 'fk_element', $filter = [], $showempty = '1', $forcecombo = 0, $events = array(), $outputmode = 0, $limit = 0, $morecss = 'minwidth100', $current_element = 0, $multiple = false, $noroot = 0, $contextpage = '', $multientitymanaged = true, $hideref  = false)
 	{
-		global $conf, $langs;
+		global $form;
 
-		$out      = '';
-		$outarray = array();
-
-		$selected = array($selected);
-
-		// Clean $filter that may contains sql conditions so sql code
-		/*if (function_exists('testSqlAndScriptInject')) {
-			if (testSqlAndScriptInject($filter, 3) > 0) {
-				$filter = '';
-			}
-		}*/
-
-		$deleted_elements = $this->getMultiEntityTrashList();
-
-		$sql  = "SELECT " . $this->getFieldList();
-		$sql .= " FROM " . MAIN_DB_PREFIX . "digiriskdolibarr_digiriskelement as s";
-
-		if (isset($this->ismultientitymanaged) && $this->ismultientitymanaged == 1 && $multientitymanaged) $sql .= ' WHERE entity IN (' . getEntity($this->table_element) . ')';
-		else $sql                                                                        .= ' WHERE 1 = 1';
-
-		if ($filter) $sql .= " AND (" . $filter . ")";
-		$sql .= " AND s.status > 0";
-
-		if ($current_element > 0 ) {
-			$children = $this->fetchDigiriskElementFlat($current_element);
-			if ( ! empty($children) && $children > 0) {
-				foreach ($children as $key => $value) {
-					$sql .= " AND NOT s.rowid =" . $key;
-				}
-			}
-			$sql .= " AND NOT s.rowid =" . $current_element;
+		if (dol_strlen($filter['customsql'])) {
+			$filter['customsql'] .= ' AND t.rowid != ' . ($this->id ?? 0);
 		}
-
-		if (!empty($deleted_elements) && is_array($deleted_elements)) {
-			foreach ($deleted_elements as $deleted_element) {
-				$sql .= " AND NOT s.rowid =" . $deleted_element;
+		$objectList = saturne_fetch_all_object_type('digiriskelement', '', '', $limit, 0, $filter);
+		$digiriskElementsData  = [];
+		if (is_array($objectList) && !empty($objectList)) {
+			foreach ($objectList as $digiriskElement) {
+				$digiriskElementsData[$digiriskElement->id] = ($hideref ? '' : $digiriskElement->ref . ' - ') . $digiriskElement->label;
 			}
 		}
 
-		$sql .= $this->db->order("ranks", "ASC");
-		$sql .= $this->db->plimit($limit, 0);
-
-		// Build output string
-		dol_syslog(get_class($this) . "::select_digiriskelement_list", LOG_DEBUG);
-		$resql = $this->db->query($sql);
-		$num = '';
-		if ($resql) {
-			if ( ! $forcecombo) {
-				include_once DOL_DOCUMENT_ROOT . '/core/lib/ajax.lib.php';
-				$out .= ajax_combobox($htmlname, $events, 0);
-			}
-
-			// Construct $out and $outarray
-			$out .= '<select id="' . $htmlname . '" class="flat' . ($morecss ? ' ' . $morecss : '') . '"' . ($current_element ? ' ' . $current_element : '') . ' name="' . $htmlname . ($multiple ? '[]' : '') . '" ' . ($multiple ? 'multiple' : '') . '>' . "\n";
-			$num                  = $this->db->num_rows($resql);
-			$i                    = 0;
-
-			$textifempty          = (($showempty && ! is_numeric($showempty)) ? $langs->trans($showempty) : '');
-
-			if ($showempty) $out .= '<option value="-1">' . $textifempty . '</option>' . "\n";
-
-			if ( ! $noroot) $out .= '<option value="0" selected>' . $langs->trans('Root') . ' : ' . $conf->global->MAIN_INFO_SOCIETE_NOM . '</option>';
-
-			$digiriskelementlist = $this->fetchDigiriskElementFlat(0);
-
-			if ( ! empty($digiriskelementlist) ) {
-				foreach ($digiriskelementlist as $line) {
-					$depthHyphens = '';
-					for ($k = 0; $k < $line['depth']; $k++) {
-						$depthHyphens .= '- ';
-					}
-					$depth[$line['object']->id] = $depthHyphens;
-				}
-			}
-
-			if ($num) {
-				while ($i < $num) {
-					$obj   = $this->db->fetch_object($resql);
-					if ((!empty($conf->global->DIGIRISKDOLIBARR_SHOW_SHARED_RISKS) && $contextpage == 'sharedrisk') || (!empty($conf->global->DIGIRISKDOLIBARR_SHOW_SHARED_RISKSIGNS) && $contextpage == 'sharedrisksign')) {
-						$label = $depth[$obj->rowid] . 'S'. $obj->entity . ' - ' . ($hideref ?  '' : $obj->ref . ' - ') . $obj->label;
-					} else {
-						$label = $depth[$obj->rowid] . ($hideref ?  '' : $obj->ref . ' - ') . $obj->label;
-					}
-
-					if (empty($outputmode)) {
-						if (in_array($obj->rowid, $selected)) {
-							$out .= '<option value="' . $obj->rowid . '" selected>' . $label . '</option>';
-						} else {
-							$out .= '<option value="' . $obj->rowid . '">' . $label . '</option>';
-						}
-					} else {
-						$outarray[$obj->rowid] = $label;
-					}
-
-					$i++;
-					if (($i % 10) == 0) $out .= "\n";
-				}
-			}
-			$out .= '</select>' . "\n";
-		} else {
-			dol_print_error($this->db);
-		}
-
-		$this->result = array('nbofdigiriskelement' => $num);
-
-		if ($outputmode) {
-			return $outarray;
-		}
-		return $out;
+		return $form::selectarray($htmlname, $digiriskElementsData, $selected, $showempty, 0, 0, '', 0, 0, 0, '', $morecss);
 	}
 
 	/**
@@ -441,6 +344,7 @@ class DigiriskElement extends SaturneObject
 			$ids          = [];
 			foreach($digiriskelement_trashes as $digiriskelement_trash) {
 				$recurse_tree = recurse_tree($digiriskelement_trash->id, 0, $objects);
+				$ids[$digiriskelement_trash->id] = $digiriskelement_trash->id;
 
 				array_walk_recursive($recurse_tree, function ($item) use (&$ids) {
 					if (is_object($item)) {

@@ -1201,7 +1201,7 @@ if ((empty($action) || ($action != 'create' && $action != 'edit'))) {
 					print '</td>';
 
 					print '<td>';
-					print $digiriskelement->select_digiriskelement_list($item->fk_element, 'fk_element', '', 0, 0, array(), 0, 0, 'minwidth100', 0, false, 1);
+					print $digiriskelement->selectDigiriskElementList($item->fk_element, 'fk_element', [], 0, 0, array(), 0, 0, 'minwidth100', 0, false, 1);
 					print '</td>';
 
 					$coldisplay++;
@@ -1329,7 +1329,7 @@ if ((empty($action) || ($action != 'create' && $action != 'edit'))) {
 			print $refPreventionPlanDetMod->getNextValue($preventionplandet);
 			print '</td>';
 			print '<td>';
-			print $digiriskelement->select_digiriskelement_list('', 'fk_element', '', 0, 0, array(), 0, 0, 'minwidth100', '', false, 1);
+			print $digiriskelement->selectDigiriskElementList('', 'fk_element', [], 0, 0, array(), 0, 0, 'minwidth100', '', false, 1);
 			print '</td>';
 
 			$coldisplay++;

@@ -80,6 +80,11 @@ if ($user->socid > 0) {
 	$socid = $user->socid;
 }
 
+$deletedElements = $digiriskelement->getMultiEntityTrashList();
+if (empty($deletedElements)) {
+	$deletedElements = [0];
+}
+
 $upload_dir = $conf->digiriskdolibarr->multidir_output[$conf->entity];
 $upload_dir = $upload_dir . '/ticketstats/';
 dol_mkdir($upload_dir);
@@ -259,9 +264,15 @@ print $form->select_company($socid, 'socid', '', 1, 0, 0, array(), 0, 'widthcent
 print '</td></tr>';
 // DigiriskElement
 print '<tr><td class="left">'.$form->textwithpicto($langs->trans("GP/UT"), $langs->trans("GP/UTHelp")).'</td><td class="left">';
-$digiriskelementlist = $digiriskelement->select_digiriskelement_list($digiriskelementid, 'digiriskelementid', '', 1, 0, array(), 1);
-$digiriskelementlist = $all + $digiriskelementlist;
-print $form->multiselectarray('digiriskelementlist', $digiriskelementlist, ((!empty(GETPOST('refresh', 'int'))) ? GETPOST('digiriskelementlist', 'array') : $digiriskelementlist), 0, 0, 'widthcentpercentminusx maxwidth300');
+$objectList = saturne_fetch_all_object_type('digiriskelement', '', '', 0, 0,  ['customsql' => 'rowid NOT IN (' . implode(',', $deletedElements) . ')']);
+$digiriskElementsData  = [];
+if (is_array($objectList) && !empty($objectList)) {
+	foreach ($objectList as $digiriskElement) {
+		$digiriskElementsData[$digiriskElement->id] = $digiriskElement->ref . ' - ' . $digiriskElement->label;
+	}
+}
+$digiriskElementsData = $all + $digiriskElementsData;
+print $form->multiselectarray('digiriskelementlist', $digiriskElementsData, ((!empty(GETPOST('refresh', 'int'))) ? GETPOST('digiriskelementlist', 'array') : $digiriskelementlist), 0, 0, 'widthcentpercentminusx maxwidth300');
 print '</td></tr>';
 // Category
 if (!empty($conf->category->enabled)) {

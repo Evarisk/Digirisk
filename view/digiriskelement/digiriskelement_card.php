@@ -79,7 +79,6 @@ if ( $object->element_type == 'groupment') {
 } elseif (  $object->element_type == 'workunit' ) {
 	$document = new WorkUnitDocument($db);
 }
-
 // Fetch optionals attributes and labels
 $extrafields->fetch_name_optionals_label($object->table_element);
 
@@ -188,9 +187,14 @@ if ( $object->element_type == 'groupment' ) {
 	}
 }
 
-$help_url = 'FR:Module_Digirisk#Cr.C3.A9ation_UT_et_GP';
+$deletedElements = $object->getMultiEntityTrashList();
+if (empty($deletedElements)) {
+	$deletedElements = [0];
+}
 
-digirisk_header($title, $help_url); ?>
+$helpUrl = 'FR:Module_Digirisk#Cr.C3.A9ation_UT_et_GP';
+
+digirisk_header($title, $helpUrl); ?>
 
 <div id="cardContent" value="">
 
@@ -296,7 +300,7 @@ if (($id || $ref) && $action == 'edit') {
 
 	if ($id != $conf->global->DIGIRISKDOLIBARR_DIGIRISKELEMENT_TRASH) {
 		print '<tr><td>' . $langs->trans("ParentElement") . '</td><td>';
-		print $object->select_digiriskelement_list($object->fk_parent, 'fk_parent', 'element_type="groupment" AND fk_parent != ' . $conf->global->DIGIRISKDOLIBARR_DIGIRISKELEMENT_TRASH, 0, 0, [], 0, 0, 'minwidth100', GETPOST('id'), false);
+		print $object->selectDigiriskElementList($object->fk_parent, 'fk_parent', ['customsql' => 'element_type="groupment" AND t.rowid NOT IN (' . implode(',', $deletedElements) . ')'], 0, 0, [], 0, 0, 'minwidth100', GETPOST('id'), false);
 	}
 
 	print '</td></tr>';
