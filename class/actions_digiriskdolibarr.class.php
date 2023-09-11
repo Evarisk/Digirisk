@@ -829,4 +829,84 @@ class ActionsDigiriskdolibarr
 		return 0; // or return 1 to replace standard code.
 	}
 
+
+	/**
+	 *  Overloading the saturneAttendantsBackToCard function : replacing the parent's function with the one below.
+	 *
+	 * @param  array        $parameters Hook metadatas (context, etc...).
+	 * @param  CommonObject $object     Current object.
+	 * @return int                      0 < on error, 0 on success, 1 to replace standard code.
+	 */
+	public function SaturneAdminDocumentData(array $parameters): int
+	{
+		global $moduleNameLowerCase;
+
+		$types = array(
+			'LegalDisplay' 				=> 'legaldisplay',
+			'InformationsSharing' 		=> 'informationssharing',
+			'ListingRisksAction' 		=> 'listingrisksaction',
+			'ListingRisksPhoto' 		=> 'listingrisksphoto',
+		);
+
+		$types = [
+			'LegalDisplay' => [
+				'documentType' => 'legaldisplay',
+				'picto'        => 'fontawesome_fa-file_fas_#d35968'
+			],
+			'InformationsSharing' => [
+				'documentType' => 'informationssharing',
+				'picto'        => 'fontawesome_fa-comment-dots_fas_#d35968'
+			],
+			'ListingRisksAction' => [
+				'documentType' => 'listingrisksaction',
+				'picto'        => 'fontawesome_fa-images_fas_#d35968'
+			],
+			'ListingRisksPhoto' => [
+				'documentType' => 'listingrisksphoto',
+				'picto'        => 'fontawesome_fa-file_fas_#d35968'
+			],
+			'GroupmentDocument' => [
+				'documentType' => 'groupmentdocument',
+				'picto'        => 'fontawesome_fa-info-circle_fas_#d35968'
+			],
+			'WorkUnitDocument' => [
+				'documentType' => 'workunitdocument',
+				'picto'        => 'fontawesome_fa-info-circle_fas_#d35968'
+			],
+			'RiskAssessmentDocument' => [
+				'documentType' => 'riskassessmentdocument',
+				'picto'        => 'fontawesome_fa-file-alt_fas_#d35968'
+			],
+			'PreventionPlanDocument' => [
+				'documentType' => 'preventionplandocument',
+				'picto'        => 'fontawesome_fa-info_fas_#d35968'
+			],
+			'FirePermitDocument' => [
+				'documentType' => 'firepermitdocument',
+				'picto'        => 'fontawesome_fa-fire-alt_fas_#d35968'
+			],
+			'Ticket' => [
+				'documentType' => 'ticketdocument',
+				'picto'        => 'fontawesome_fa-ticket_fas_#d35968'
+			],
+			'Project' => [
+				'documentType' => 'projectdocument',
+				'picto'        => 'fontawesome_fa-project-diagram_fas_#d35968'
+			],
+
+		];
+		$pictos = array(
+			'InformationsSharing' 		=> '<i class="fas fa-comment-dots"></i> ',
+			'ListingRisksAction' 		=> '<i class="fas fa-exclamation"></i> ',
+			'ListingRisksPhoto' 		=> '<i class="fas fa-images"></i> ',
+		);
+
+		// Do something only for the current context.
+		if (in_array($parameters['currentcontext'], ['digiriskdolibarradmindocuments'])) {
+			$this->results = $types;
+		}
+
+		return 0; // or return 1 to replace standard code.
+	}
+
 }

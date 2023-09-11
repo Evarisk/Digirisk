@@ -428,6 +428,7 @@ class modDigiriskdolibarr extends DolibarrModules
 				'thirdpartycard',
 				'contactcard',
 				'preventionplanschedules',
+				'digiriskdolibarradmindocuments',
 			],
 			'tabs' => [
 				'mycompany_admin'

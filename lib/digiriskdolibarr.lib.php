@@ -65,9 +65,9 @@ function digiriskdolibarr_admin_prepare_head()
 	$head[$h][2] = 'ticket';
 	$h++;
 
-	$head[$h][0] = dol_buildpath("/digiriskdolibarr/admin/config/digiriskdocuments.php", 1);
+	$head[$h][0] = dol_buildpath("/saturne/admin/documents.php?module_name=DigiriskDolibarr", 1);
 	$head[$h][1] = '<i class="fas fa-file-alt"></i> ' . $langs->trans("YourDocuments");
-	$head[$h][2] = 'digiriskdocuments';
+	$head[$h][2] = 'documents';
 	$h++;
 
 	$head[$h][0] = dol_buildpath("/digiriskdolibarr/admin/setup.php", 1);
