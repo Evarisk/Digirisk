@@ -187,7 +187,7 @@ if (empty($reshook)) {
 
 		// Check parameters
 		if ($masterWorkerId < 0) {
-			setEventMessages($langs->trans('ErrorFieldRequired', $langs->transnoentitiesnoconv('MaitreOeuvre')), null, 'errors');
+			setEventMessages($langs->trans('ErrorFieldRequired', $langs->transnoentitiesnoconv('MasterWorker')), null, 'errors');
 			$error++;
 		} else {
 			$usertmp->fetch($masterWorkerId);
@@ -296,7 +296,7 @@ if (empty($reshook)) {
 
 		// Check parameters
 		if ($masterWorkerId < 0) {
-			setEventMessages($langs->trans('ErrorFieldRequired', $langs->transnoentitiesnoconv('MaitreOeuvre')), null, 'errors');
+			setEventMessages($langs->trans('ErrorFieldRequired', $langs->transnoentitiesnoconv('MasterWorker')), null, 'errors');
 			$error++;
 		} else {
 			$usertmp->fetch($masterWorkerId);

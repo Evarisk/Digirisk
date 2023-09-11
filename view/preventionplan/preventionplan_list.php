@@ -147,7 +147,7 @@ foreach ($object->fields as $key => $val) {
 // Extra fields
 include DOL_DOCUMENT_ROOT . '/core/tpl/extrafields_list_array_fields.tpl.php';
 
-// Load Digipreventionplan_element object
+// Load PreventionPlan object
 include DOL_DOCUMENT_ROOT . '/core/actions_fetchobject.inc.php'; // Must be include, not include_once.
 
 $object->fields = dol_sort_array($object->fields, 'position');
@@ -203,11 +203,11 @@ if (empty($reshook)) {
 	if ( ! $error && ($massaction == 'delete' || ($action == 'delete' && $confirm == 'yes')) && $permissiontodelete) {
 		if ( ! empty($toselect)) {
 			foreach ($toselect as $toselectedid) {
-				$preventionplantodelete = $preventionplan;
-				$preventionplantodelete->fetch($toselectedid);
+				$objecttodelete = $object;
+				$objecttodelete->fetch($toselectedid);
 
-				$preventionplantodelete->status = 0;
-				$result                         = $preventionplantodelete->delete($user);
+				$objecttodelete->status = 0;
+				$result                         = $objecttodelete->delete($user);
 
 				if ($result < 0) {
 					// Delete preventionplan KO
