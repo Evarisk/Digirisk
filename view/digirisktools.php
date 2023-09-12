@@ -319,7 +319,7 @@ if (GETPOST('dataMigrationImportRiskSigns', 'alpha') && ! empty($conf->global->M
 			//RiskSign
 			foreach ($digiriskExportArray['risksigns'] as $digiriskExportRiskSign) {
 				$risksign->ref         = $refRiskSignMod->getNextValue($risksign);
-				$risksign->category    = $risksign->get_risksign_category_position_by_name($digiriskExportRiskSign['recommendation_category']['name']);
+				$risksign->category    = $risksign->getRiskSignCategoryPositionByName($digiriskExportRiskSign['recommendation_category']['name']);
 				$risksign->description = $digiriskExportRiskSign['comment']['content'];
 				$risksign->fk_element  = $digiriskElement->fetch_id_from_wp_digi_id($digiriskExportRiskSign['parent_id']);
 
@@ -465,7 +465,7 @@ if (GETPOST('dataMigrationImportGlobal', 'alpha') && ! empty($conf->global->MAIN
 			//RiskSign
 			foreach ($digiriskExportArray['risksigns'] as $digiriskExportRiskSign) {
 				$risksign->ref         = $refRiskSignMod->getNextValue($risksign);
-				$risksign->category    = $risksign->get_risksign_category_position_by_name($digiriskExportRiskSign['recommendation_category']['name']);
+				$risksign->category    = $risksign->getRiskSignCategoryPositionByName($digiriskExportRiskSign['recommendation_category']['name']);
 				$risksign->description = $digiriskExportRiskSign['comment']['content'];
 				$risksign->fk_element  = $digiriskElement->fetch_id_from_wp_digi_id($digiriskExportRiskSign['parent_id']);
 

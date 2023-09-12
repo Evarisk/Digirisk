@@ -283,9 +283,9 @@ abstract class ModeleODTDigiriskElementDocument extends SaturneDocumentModel
 									$path = DOL_DOCUMENT_ROOT . '/custom/digiriskdolibarr/img/';
 
 									$tmparray['nomElement']                = (!empty($conf->global->DIGIRISKDOLIBARR_SHOW_SHARED_RISKSIGNS) ? 'S' . $element->entity . ' - ' : '') . $element->ref . ' - ' . $element->label;
-									$tmparray['recommandationIcon']        = $path . '/' . $risksign->get_risksign_category($line);
+									$tmparray['recommandationIcon']        = $path . '/' . $risksign->getRiskSignCategory($line);
 									$tmparray['identifiantRecommandation'] = $line->ref;
-									$tmparray['recommandationName']        = (!empty($conf->global->DIGIRISKDOLIBARR_DOCUMENT_SHOW_PICTO_NAME) ? $line->get_risksign_category($line, 'name') : ' ');
+									$tmparray['recommandationName']        = (!empty($conf->global->DIGIRISKDOLIBARR_DOCUMENT_SHOW_PICTO_NAME) ? $line->getRiskSignCategory($line, 'name') : ' ');
 									$tmparray['recommandationComment']     = $line->description;
 
 									unset($tmparray['object_fields']);
