@@ -42,75 +42,30 @@ class FirePermit extends SaturneObject
 	public $module = 'digiriskdolibarr';
 
 	/**
-	 * @var DoliDB Database handler.
+	 * @var string Element type of object.
 	 */
-	public $db;
+	public $element = 'firepermit';
 
 	/**
-	 * @var string Error string
-	 * @see        $errors
+	 * @var string Name of table without prefix where object is stored. This is also the key used for extrafields management.
 	 */
-	public $error;
+	public $table_element = 'digiriskdolibarr_firepermit';
 
 	/**
-	 * @var string[] Array of error strings
+	 * @var int Does this object support multicompany module ?
+	 * 0 = No test on entity, 1 = Test with field entity, 'field@table' = Test with link by field@table.
 	 */
-	public $errors = [];
+	public $ismultientitymanaged = 1;
 
 	/**
-	 * @var array Result array.
+	 * @var int Does object support extrafields ? 0 = No, 1 = Yes.
 	 */
-	public $result = [];
-
-	/**
-	 * @var int The object identifier
-	 */
-	public $id;
-
-    /**
-     * @var string Element type of object.
-     */
-    public $element = 'firepermit';
-
-    /**
-     * @var string Name of table without prefix where object is stored. This is also the key used for extrafields management.
-     */
-    public $table_element = 'digiriskdolibarr_firepermit';
-
-    /**
-     * @var string Name of table without prefix where object is stored. This is also the key used for extrafields management.
-     */
-    public $table_element_line = 'digiriskdolibarr_firepermitdet';
-
-    /**
-     * @var int Does this object support multicompany module ?
-     * 0 = No test on entity, 1 = Test with field entity, 'field@table' = Test with link by field@table.
-     */
-    public $ismultientitymanaged = 1;
-
-    /**
-     * @var int Does object support extrafields ? 0 = No, 1 = Yes.
-     */
-    public int $isextrafieldmanaged = 1;
+	public int $isextrafieldmanaged = 1;
 
     /**
      * @var string Name of icon for firepermit. Must be a 'fa-xxx' fontawesome code (or 'fa-xxx_fa_color_size') or 'firepermit@digiriskdolibarr' if picto is file 'img/object_firepermit.png'.
      */
     public string $picto = 'fontawesome_fa-fire-alt_fas_#d35968';
-	/**
-	 * @var string Label status of const.
-	 */
-	public $labelStatus;
-
-	/**
-	 * @var string Label status short of const.
-	 */
-	public $labelStatusShort;
-
-	/**
-	 * @var array Context element object
-	 */
-	public $context = [];
 
 	const STATUS_DELETED   = 0;
 	const STATUS_DRAFT     = 1;
@@ -382,21 +337,6 @@ class FirePermitLine extends SaturneObject
 	 * @var string Module name.
 	 */
 	public $module = 'digiriskdolibarr';
-
-	/**
-	 * @var DoliDB Database handler.
-	 */
-	public $db;
-
-	/**
-	 * @var string Error string
-	 */
-	public $error;
-
-	/**
-	 * @var int The object identifier
-	 */
-	public $id;
 
 	/**
 	 * @var string ID to identify managed object
