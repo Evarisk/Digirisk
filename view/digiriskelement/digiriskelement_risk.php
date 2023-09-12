@@ -269,7 +269,7 @@ if ($sharedrisks) {
 					$importValue .= '<span>' . dol_trunc($risks->description, 32) . '</span>';
 					$importValue .= '</div>';
 
-					$importValue .= '<div class="importsharedrisk risk-evaluation-cotation"  data-scale="'. $lastEvaluation->get_evaluation_scale() .'">';
+					$importValue .= '<div class="importsharedrisk risk-evaluation-cotation"  data-scale="'. $lastEvaluation->getEvaluationScale() .'">';
 					$importValue .= '<span class="importsharedrisk-risk-assessment">' . (!empty($lastEvaluation->cotation) ? $lastEvaluation->cotation : 0) . '</span>';
 					$importValue .= '</div>';
 

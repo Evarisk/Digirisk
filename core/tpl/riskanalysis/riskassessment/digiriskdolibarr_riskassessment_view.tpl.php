@@ -114,7 +114,7 @@ if (is_array($allRiskAssessment) && !empty($allRiskAssessment)) :
 								<input type="hidden" class="labelForDelete" value="<?php echo $langs->trans('DeleteEvaluation') . ' ' . $lastEvaluation->ref . ' ?'; ?>">
 								<div class="risk-evaluation-container risk-evaluation-ref-<?php echo $lastEvaluation->id ?>" value="<?php echo $lastEvaluation->ref ?>">
 									<div class="risk-evaluation-single">
-										<div class="risk-evaluation-cotation" data-scale="<?php echo $lastEvaluation->get_evaluation_scale() ?>">
+										<div class="risk-evaluation-cotation" data-scale="<?php echo $lastEvaluation->getEvaluationScale() ?>">
 											<span><?php echo $lastEvaluation->cotation ?: 0; ?></span>
 										</div>
 										<div class="photo riskassessment-photo-<?php echo $lastEvaluation->id; ?>" style="margin:auto">
@@ -302,8 +302,8 @@ $evaluation->method = $lastEvaluation->method ?: "standard" ;
 													 data-evaluation-method="standard"
 													 data-evaluation-id="<?php echo $request; ?>"
 													 data-variable-id="<?php echo 152 + $request; ?>"
-													 data-seuil="<?php echo  $evaluation->get_evaluation_scale(); ?>"
-													 data-scale="<?php echo  $evaluation->get_evaluation_scale(); ?>"
+													 data-seuil="<?php echo  $evaluation->getEvaluationScale(); ?>"
+													 data-scale="<?php echo  $evaluation->getEvaluationScale(); ?>"
 													 class="risk-evaluation-cotation cotation"><?php echo $request; ?></div>
 											<?php endforeach;
 										endif; ?>
@@ -396,7 +396,7 @@ $evaluation->method = $lastEvaluation->method ?: "standard" ;
 						<h2><?php echo $langs->trans('LastRiskAssessment') . ' ' . $risk->ref; ?></h2>
 						<div class="risk-evaluation-single-content risk-evaluation-single-content-<?php echo $risk->id ?>">
 							<div class="risk-evaluation-single">
-								<div class="risk-evaluation-cotation risk-evaluation-list" value="<?php echo $risk->id ?>" data-scale="<?php echo $lastEvaluation->get_evaluation_scale() ?>">
+								<div class="risk-evaluation-cotation risk-evaluation-list" value="<?php echo $risk->id ?>" data-scale="<?php echo $lastEvaluation->getEvaluationScale() ?>">
 									<span><?php echo $lastEvaluation->cotation ?: 0; ?></span>
 								</div>
 								<div class="risk-evaluation-photo risk-evaluation-photo-<?php echo $lastEvaluation->id > 0 ? $lastEvaluation->id : 0 ; echo $risk->id > 0 ? ' risk-' . $risk->id : ' risk-new' ?>">

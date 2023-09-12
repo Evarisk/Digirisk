@@ -659,8 +659,8 @@ if ($action != 'list') {
 															 data-evaluation-method="standard"
 															 data-evaluation-id="<?php echo $request; ?>"
 															 data-variable-id="<?php echo 152 + $request; ?>"
-															 data-seuil="<?php echo  $evaluation->get_evaluation_scale(); ?>"
-															 data-scale="<?php echo  $evaluation->get_evaluation_scale(); ?>"
+															 data-seuil="<?php echo  $evaluation->getEvaluationScale(); ?>"
+															 data-scale="<?php echo  $evaluation->getEvaluationScale(); ?>"
 															 class="risk-evaluation-cotation cotation"><?php echo $request; ?></div>
 													<?php endforeach;
 												endif; ?>
@@ -844,8 +844,8 @@ if ($action != 'list') {
 													 data-evaluation-method="standard"
 													 data-evaluation-id="<?php echo $request; ?>"
 													 data-variable-id="<?php echo 152 + $request; ?>"
-													 data-seuil="<?php echo  $evaluation->get_evaluation_scale(); ?>"
-													 data-scale="<?php echo  $evaluation->get_evaluation_scale(); ?>"
+													 data-seuil="<?php echo  $evaluation->getEvaluationScale(); ?>"
+													 data-scale="<?php echo  $evaluation->getEvaluationScale(); ?>"
 													 class="risk-evaluation-cotation cotation"><?php echo $request; ?></div>
 											<?php endforeach;
 										endif; ?>

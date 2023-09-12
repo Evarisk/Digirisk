@@ -71,8 +71,8 @@
 														 data-evaluation-method="standard"
 														 data-evaluation-id="<?php echo $request; ?>"
 														 data-variable-id="<?php echo 152 + $request; ?>"
-														 data-seuil="<?php echo  $evaluation->get_evaluation_scale(); ?>"
-														 data-scale="<?php echo  $evaluation->get_evaluation_scale(); ?>"
+														 data-seuil="<?php echo  $evaluation->getEvaluationScale(); ?>"
+														 data-scale="<?php echo  $evaluation->getEvaluationScale(); ?>"
 														 class="risk-evaluation-cotation cotation<?php echo ($lastEvaluation->cotation == $request) ? " selected-cotation" : "" ?>"><?php echo $request; ?></div>
 												<?php endforeach;
 											endif; ?>
@@ -132,7 +132,7 @@
 						</div>
 						<div class="risk-evaluation-calculated-cotation"  style="<?php echo ($lastEvaluation->method == "advanced") ? " display:block" : " display:none" ?>">
 							<span class="title"><i class="fas fa-chart-line"></i> <?php echo $langs->trans('CalculatedEvaluation'); ?></span>
-							<div data-scale="<?php echo $lastEvaluation->get_evaluation_scale() ?>" class="risk-evaluation-cotation cotation">
+							<div data-scale="<?php echo $lastEvaluation->getEvaluationScale() ?>" class="risk-evaluation-cotation cotation">
 								<span><?php echo $lastEvaluation->cotation ?: 0 ?></span>
 							</div>
 						</div>

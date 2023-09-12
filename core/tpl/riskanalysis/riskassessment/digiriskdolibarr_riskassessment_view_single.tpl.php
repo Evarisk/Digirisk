@@ -4,7 +4,7 @@
 <div class="risk-evaluation-container risk-evaluation-container-<?php echo $lastEvaluation->id ?>" value="<?php echo $risk->id ?>">
 	<div class="risk-evaluation-single-content risk-evaluation-single-content-<?php echo $risk->id ?>">
 		<div class="risk-evaluation-single risk-evaluation-single-<?php echo $risk->id ?>">
-			<div class="risk-evaluation-cotation risk-evaluation-list modal-open" value="<?php echo $risk->id ?>" data-scale="<?php echo $lastEvaluation->get_evaluation_scale() ?>">
+			<div class="risk-evaluation-cotation risk-evaluation-list modal-open" value="<?php echo $risk->id ?>" data-scale="<?php echo $lastEvaluation->getEvaluationScale() ?>">
 				<span><?php echo $lastEvaluation->cotation ?: 0; ?></span>
 			</div>
 			<div class="photo riskassessment-photo-<?php echo $lastEvaluation->id; ?>" style="margin:auto">

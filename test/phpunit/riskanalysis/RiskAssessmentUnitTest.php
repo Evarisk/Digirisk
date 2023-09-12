@@ -359,7 +359,7 @@ class RiskAssessmentUnitTest extends PHPUnit\Framework\TestCase
 	 * @param   RiskAssessment $localobject RiskAssessment object
 	 * @return void
 	 *
-	 * @covers RiskAssessment::get_evaluation_scale
+	 * @covers RiskAssessment::getEvaluationScale
 	 *
 	 * @depends testRiskAssessmentFetch
 	 * The depends says test is run only if previous is ok
@@ -372,7 +372,7 @@ class RiskAssessmentUnitTest extends PHPUnit\Framework\TestCase
 		$langs = $this->savlangs;
 		$db    = $this->savdb;
 
-		$result = $localobject->get_evaluation_scale();
+		$result = $localobject->getEvaluationScale();
 
 		$this->assertSame(true, is_int($result));
 

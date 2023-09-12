@@ -205,7 +205,7 @@ class DigiriskDocuments extends SaturneDocuments
 						$lastEvaluation                          = $line->lastEvaluation;
 
 						if ($lastEvaluation->cotation >= 0 && !empty($lastEvaluation) && is_object($lastEvaluation)) {
-							$scale = $lastEvaluation->get_evaluation_scale();
+							$scale = $lastEvaluation->getEvaluationScale();
 
 							if ($scale == $i) {
 								$element = $activeDigiriskElements[$line->fk_element];
