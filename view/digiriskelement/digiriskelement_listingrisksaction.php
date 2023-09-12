@@ -84,6 +84,7 @@ if ($reshook < 0) setEventMessages($hookmanager->error, $hookmanager->errors, 'e
 if (empty($reshook)) {
 	$error = 0;
 
+	$previousElement = $object->element;
 	if ($object->element == 'digiriskstandard') {
 		$object->ref = '';
 	}
@@ -95,7 +96,7 @@ if (empty($reshook)) {
 
 	// Action to generate pdf from odt file
 	require_once __DIR__ . '/../../core/tpl/documents/digiriskdolibarr_manual_pdf_generation_action.tpl.php';
-	$object->element = 'digiriskstandard';
+	$object->element = $previousElement;
 }
 
 /*

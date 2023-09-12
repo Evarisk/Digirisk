@@ -28,7 +28,6 @@ require_once DOL_DOCUMENT_ROOT . '/core/lib/company.lib.php';
 require_once DOL_DOCUMENT_ROOT . '/core/lib/doc.lib.php';
 require_once __DIR__ . '/../../../../../class/riskanalysis/risk.class.php';
 require_once __DIR__ . '/../../../../../class/riskanalysis/riskassessment.class.php';
-require_once __DIR__ . '/mod_listingrisksaction_standard.php';
 require_once __DIR__ . '/modules_listingrisksaction.php';
 
 /**
