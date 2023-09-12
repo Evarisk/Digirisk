@@ -23,36 +23,39 @@
 
 require_once DOL_DOCUMENT_ROOT . '/core/class/commonobject.class.php';
 
+// Load Saturne libraries.
+require_once __DIR__ . '/../../saturne/class/saturneobject.class.php';
+
 /**
  * Class for Openinghours
  */
-class Openinghours extends CommonObject
+class Openinghours extends SaturneObject
 {
 	/**
-	 * @var DoliDB Database handler.
+	 * @var string Module name.
 	 */
-	public $db;
+	public $module = 'digiriskdolibarr';
 
 	/**
-	 * @var string ID to identify managed object.
+	 * @var string Element type of object.
 	 */
 	public $element = 'openinghours';
 
 	/**
 	 * @var string Name of table without prefix where object is stored. This is also the key used for extrafields management.
 	 */
-	public $table_element = 'element_openinghours';
+	public $table_element = 'digiriskdolibarr_openinghours';
 
 	/**
-	 * @var int  Does this object support multicompany module ?
-	 * 0=No test on entity, 1=Test with field entity, 'field@table'=Test with link by field@table
+	 * @var int Does this object support multicompany module ?
+	 * 0 = No test on entity, 1 = Test with field entity, 'field@table' = Test with link by field@table.
 	 */
 	public $ismultientitymanaged = 1;
 
 	/**
-	 * @var int  Does object support extrafields ? 0=No, 1=Yes
+	 * @var int Does object support extrafields ? 0 = No, 1 = Yes.
 	 */
-	public $isextrafieldmanaged = 1;
+	public int $isextrafieldmanaged = 1;
 
 	/**
 	 * @var string String with name of icon for openinghours. Must be the part after the 'object_' into object_openinghours.png
@@ -103,30 +106,7 @@ class Openinghours extends CommonObject
 	 */
 	public function __construct(DoliDB $db)
 	{
-		global $conf, $langs;
-
-		$this->db = $db;
-
-		if (empty($conf->global->MAIN_SHOW_TECHNICAL_ID) && isset($this->fields['rowid'])) $this->fields['rowid']['visible'] = 0;
-		if (empty($conf->multicompany->enabled) && isset($this->fields['entity'])) $this->fields['entity']['enabled']        = 0;
-
-		// Unset fields that are disabled
-		foreach ($this->fields as $key => $val) {
-			if (isset($val['enabled']) && empty($val['enabled'])) {
-				unset($this->fields[$key]);
-			}
-		}
-
-		// Translate some data of arrayofkeyval
-		if (is_object($langs)) {
-			foreach ($this->fields as $key => $val) {
-				if (is_array($val['arrayofkeyval'])) {
-					foreach ($val['arrayofkeyval'] as $key2 => $val2) {
-						$this->fields[$key]['arrayofkeyval'][$key2] = $langs->trans($val2);
-					}
-				}
-			}
-		}
+		parent::__construct($db, $this->module, $this->element);
 	}
 
 	/**
@@ -137,7 +117,7 @@ class Openinghours extends CommonObject
 	 * @return int             <0 if KO, Id of created object if OK
 	 * @throws Exception
 	 */
-	public function create(User $user, $notrigger = false)
+	public function create(User $user, $notrigger = false): int
 	{
 		global $conf;
 
@@ -152,28 +132,5 @@ class Openinghours extends CommonObject
 		$this->db->query($sql);
 
 		return $this->createCommon($user, $notrigger || !$conf->global->DIGIRISKDOLIBARR_MAIN_AGENDA_ACTIONAUTO_OPENINGHOURS_CREATE);
-	}
-
-	/**
-	 * Load object in memory from the database
-	 *
-	 * @param	int    $id				Id object
-	 * @param	string $ref				Ref
-	 * @param	string	$morewhere		More SQL filters (' AND ...')
-	 * @return 	int         			<0 if KO, 0 if not found, >0 if OK
-	 */
-	public function fetch($id, $ref = null, $morewhere = '')
-	{
-		return $this->fetchCommon($id, $ref, $morewhere);
-	}
-
-	/**
-	 *    Return label of contact status
-	 *
-	 * @return    string                Label of contact status
-	 */
-	public function getLibStatut()
-	{
-		return '';
 	}
 }
