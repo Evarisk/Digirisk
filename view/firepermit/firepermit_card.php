@@ -1143,9 +1143,9 @@ if ((empty($action) || ($action != 'create' && $action != 'edit'))) {
 					print '<td class="center">'; ?>
 					<div class="table-cell table-50 cell-risk" data-title="Risque">
 						<div class="wpeo-dropdown dropdown-large category-danger padding wpeo-tooltip-event"
-							 aria-label="<?php echo $risk->get_danger_category_name($item) ?>">
+							 aria-label="<?php echo $risk->getDangerCategoryName($item) ?>">
 							<img class="danger-category-pic hover"
-								 src="<?php echo DOL_URL_ROOT . '/custom/digiriskdolibarr/img/categorieDangers/' . $risk->get_danger_category($item) . '.png'; ?>"
+								 src="<?php echo DOL_URL_ROOT . '/custom/digiriskdolibarr/img/categorieDangers/' . $risk->getDangerCategory($item) . '.png'; ?>"
 								 alt=""/>
 						</div>
 					</div>
@@ -1251,15 +1251,15 @@ if ((empty($action) || ($action != 'create' && $action != 'edit'))) {
 							<input class="input-hidden-danger" type="hidden" name="risk_category_id"
 								   value="<?php echo $item->category ?>"/>
 							<div class="wpeo-dropdown dropdown-large category-danger padding wpeo-tooltip-event"
-								 aria-label="<?php echo $risk->get_fire_permit_danger_category_name($item) ?>">
+								 aria-label="<?php echo $risk->getFirePermitDangerCategoryName($item) ?>">
 								<img class="danger-category-pic hover"
-									 src="<?php echo DOL_URL_ROOT . '/custom/digiriskdolibarr/img/typeDeTravaux/' . $risk->get_fire_permit_danger_category($item) . '.png'; ?>"/>
+									 src="<?php echo DOL_URL_ROOT . '/custom/digiriskdolibarr/img/typeDeTravaux/' . $risk->getFirePermitDangerCategory($item) . '.png'; ?>"/>
 							</div>
 						</div>
 
 						<ul class="dropdown-content wpeo-gridlayout grid-5 grid-gap-0">
 							<?php
-							$dangerCategories = $risk->get_fire_permit_danger_categories();
+							$dangerCategories = $risk->getFirePermitDangerCategories();
 							if ( ! empty($dangerCategories)) :
 								foreach ($dangerCategories as $dangerCategory) : ?>
 									<li class="item dropdown-item wpeo-tooltip-event"
@@ -1312,9 +1312,9 @@ if ((empty($action) || ($action != 'create' && $action != 'edit'))) {
 					print '<td class="center">'; ?>
 					<div class="table-cell table-50 cell-risk" data-title="Risque">
 						<div class="wpeo-dropdown dropdown-large category-danger padding wpeo-tooltip-event"
-							 aria-label="<?php echo $risk->get_fire_permit_danger_category_name($item) ?>">
+							 aria-label="<?php echo $risk->getFirePermitDangerCategoryName($item) ?>">
 							<img class="danger-category-pic hover"
-								 src="<?php echo DOL_URL_ROOT . '/custom/digiriskdolibarr/img/typeDeTravaux/' . $risk->get_fire_permit_danger_category($item) . '.png'; ?>"
+								 src="<?php echo DOL_URL_ROOT . '/custom/digiriskdolibarr/img/typeDeTravaux/' . $risk->getFirePermitDangerCategory($item) . '.png'; ?>"
 								 alt=""/>
 						</div>
 					</div>
@@ -1383,7 +1383,7 @@ if ((empty($action) || ($action != 'create' && $action != 'edit'))) {
 				</div>
 				<ul class="dropdown-content wpeo-gridlayout grid-5 grid-gap-0">
 					<?php
-					$dangerCategories = $risk->get_fire_permit_danger_categories();
+					$dangerCategories = $risk->getFirePermitDangerCategories();
 					if ( ! empty($dangerCategories)) :
 						foreach ($dangerCategories as $dangerCategory) : ?>
 							<li class="item dropdown-item wpeo-tooltip-event" data-is-preset="<?php echo ''; ?>"

@@ -132,10 +132,10 @@ class doc_preventionplandocument_odt extends ModeleODTPreventionPlanDocument
 						$tmparray['key_unique'] = $line->ref;
 						$tmparray['unite_travail'] = $digiriskelement->ref . " - " . $digiriskelement->label;
 						$tmparray['action'] = $line->description;
-						$tmparray['risk'] = DOL_DOCUMENT_ROOT . '/custom/digiriskdolibarr/img/categorieDangers/' . $risk->get_danger_category(
+						$tmparray['risk'] = DOL_DOCUMENT_ROOT . '/custom/digiriskdolibarr/img/categorieDangers/' . $risk->getDangerCategory(
 								$line
 							) . '.png';
-						$tmparray['nomPicto'] = (!empty($conf->global->DIGIRISKDOLIBARR_DOCUMENT_SHOW_PICTO_NAME) ? $risk->get_danger_category_name(
+						$tmparray['nomPicto'] = (!empty($conf->global->DIGIRISKDOLIBARR_DOCUMENT_SHOW_PICTO_NAME) ? $risk->getDangerCategoryName(
 							$line
 						) : ' ');
 						$tmparray['prevention'] = $line->prevention_method;

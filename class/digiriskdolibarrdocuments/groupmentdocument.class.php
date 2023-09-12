@@ -21,7 +21,6 @@
  * \brief   This file is a class file for GroupmentDocument.
  */
 
-
 // Load DigiriskDolibarr libraries
 require_once __DIR__ . '/../digiriskdocuments.class.php';
 

@@ -224,8 +224,8 @@ class DigiriskDocuments extends SaturneDocuments
 								}
 
 								$tmparray['nomElement']            = $nomElement;
-								$tmparray['nomDanger']             = DOL_DOCUMENT_ROOT . '/custom/digiriskdolibarr/img/categorieDangers/' . $line->get_danger_category($line) . '.png';
-								$tmparray['nomPicto']              = (!empty($conf->global->DIGIRISKDOLIBARR_DOCUMENT_SHOW_PICTO_NAME) ? $line->get_danger_category_name($line) : ' ');
+								$tmparray['nomDanger']             = DOL_DOCUMENT_ROOT . '/custom/digiriskdolibarr/img/categorieDangers/' . $line->getDangerCategory($line) . '.png';
+								$tmparray['nomPicto']              = (!empty($conf->global->DIGIRISKDOLIBARR_DOCUMENT_SHOW_PICTO_NAME) ? $line->getDangerCategoryName($line) : ' ');
 								$tmparray['identifiantRisque']     = $line->ref . ' - ' . $lastEvaluation->ref;
 								$tmparray['quotationRisque']       = $lastEvaluation->cotation ?: 0;
 								$tmparray['descriptionRisque']     = $line->description;

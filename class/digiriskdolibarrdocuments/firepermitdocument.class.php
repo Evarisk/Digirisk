@@ -225,7 +225,7 @@ class FirePermitDocument extends DigiriskDocuments
 				$json['FirePermit']['PreventionPlan']['risk'][$line->id]['ref']               = $line->ref;
 				$json['FirePermit']['PreventionPlan']['risk'][$line->id]['unite_travail']     = $digiriskelement->ref . " - " . $digiriskelement->label;
 				$json['FirePermit']['PreventionPlan']['risk'][$line->id]['description']       = $line->description;
-				$json['FirePermit']['PreventionPlan']['risk'][$line->id]['name']              = $risk->get_danger_category_name($line);
+				$json['FirePermit']['PreventionPlan']['risk'][$line->id]['name']              = $risk->getDangerCategoryName($line);
 				$json['FirePermit']['PreventionPlan']['risk'][$line->id]['prevention_method'] = $line->prevention_method;
 			}
 		}
@@ -237,7 +237,7 @@ class FirePermitDocument extends DigiriskDocuments
 				$json['FirePermit']['risk'][$line->id]['ref']           = $line->ref;
 				$json['FirePermit']['risk'][$line->id]['unite_travail'] = $digiriskelement->ref . " - " . $digiriskelement->label;
 				$json['FirePermit']['risk'][$line->id]['description']   = $line->description;
-				$json['FirePermit']['risk'][$line->id]['name']          = $risk->get_fire_permit_danger_category_name($line);
+				$json['FirePermit']['risk'][$line->id]['name']          = $risk->getFirePermitDangerCategoryName($line);
 				$json['FirePermit']['risk'][$line->id]['used_equipment'] = $line->used_equipment;
 			}
 		}

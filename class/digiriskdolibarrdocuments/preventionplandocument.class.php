@@ -225,7 +225,7 @@ class PreventionPlanDocument extends DigiriskDocuments
 				$json['PreventionPlan']['risk'][$line->id]['ref']               = $line->ref;
 				$json['PreventionPlan']['risk'][$line->id]['unite_travail']     = $digiriskelement->ref . " - " . $digiriskelement->label;
 				$json['PreventionPlan']['risk'][$line->id]['description']       = $line->description;
-				$json['PreventionPlan']['risk'][$line->id]['name']              = $risk->get_danger_category_name($line);
+				$json['PreventionPlan']['risk'][$line->id]['name']              = $risk->getDangerCategoryName($line);
 				$json['PreventionPlan']['risk'][$line->id]['prevention_method'] = $line->prevention_method;
 			}
 		}

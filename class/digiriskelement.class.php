@@ -60,11 +60,6 @@ class DigiriskElement extends SaturneObject
      */
     public int $isextrafieldmanaged = 1;
 
-    /**
-     * @var string Name of icon for firepermit. Must be a 'fa-xxx' fontawesome code (or 'fa-xxx_fa_color_size') or 'firepermit@digiriskdolibarr' if picto is file 'img/object_firepermit.png'.
-     */
-    public string $picto = 'digiriskelement@digiriskdolibarr';
-
 	public const STATUS_DELETED   = -1;
 	public const STATUS_DRAFT     = 0;
 	public const STATUS_VALIDATED = 1;

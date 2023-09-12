@@ -219,7 +219,7 @@ if (GETPOST('dataMigrationImportRisks', 'alpha') && ! empty($conf->global->MAIN_
 			//Risk
 			foreach ($digiriskExportArray['risks'] as $digiriskExportRisk) {
 				$risk->ref        = $refRiskMod->getNextValue($risk);
-				$risk->category   = $risk->get_danger_category_position_by_name($digiriskExportRisk['danger_category']['name']);
+				$risk->category   = $risk->getDangerCategoryPositionByName($digiriskExportRisk['danger_category']['name']);
 				$risk->fk_element = $digiriskElement->fetch_id_from_wp_digi_id($digiriskExportRisk['parent_id']);
 				$risk->fk_projet  = $conf->global->DIGIRISKDOLIBARR_DU_PROJECT;
 
@@ -417,7 +417,7 @@ if (GETPOST('dataMigrationImportGlobal', 'alpha') && ! empty($conf->global->MAIN
 			//Risk
 			foreach ($digiriskExportArray['risks'] as $digiriskExportRisk) {
 				$risk->ref        = $refRiskMod->getNextValue($risk);
-				$risk->category   = $risk->get_danger_category_position_by_name($digiriskExportRisk['danger_category']['name']);
+				$risk->category   = $risk->getDangerCategoryPositionByName($digiriskExportRisk['danger_category']['name']);
 				$risk->fk_element = $digiriskElement->fetch_id_from_wp_digi_id($digiriskExportRisk['parent_id']);
 				$risk->fk_projet  = $conf->global->DIGIRISKDOLIBARR_DU_PROJECT;
 
@@ -546,7 +546,7 @@ if (GETPOST('dataMigrationExportGlobal', 'alpha') && ! empty($conf->global->MAIN
 
 					// Tasks data
 					$risk->fetch($risksingle->id);
-					$alltasks = $risk->get_related_tasks($risk);
+					$alltasks = $risk->getRelatedTasks($risk);
 					if (is_array($alltasks) && !empty($alltasks)) {
 						foreach ($alltasks as $tasksingle) {
 							$tasksExportArray['rowid']              = $tasksingle->id;
