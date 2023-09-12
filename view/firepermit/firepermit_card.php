@@ -84,6 +84,11 @@ $digiriskelement     = new DigiriskElement($db);
 $digiriskresources   = new DigiriskResources($db);
 $project             = new Project($db);
 
+$deletedElements = $digiriskelement->getMultiEntityTrashList();
+if (empty($deletedElements)) {
+	$deletedElements = [0];
+}
+
 // Load object
 $object->fetch($id);
 
@@ -176,7 +181,7 @@ if (empty($reshook)) {
 		$object->date_end   = $date_end;
 
 		$object->fk_preventionplan = $fkPreventionPlan;
-		$object->fk_user_creat     = $user->id ? $user->id : 1;
+		$object->fk_user_creat     = $user->id ?: 1;
 
 		// Check parameters
 		if ($masterWorkerId < 0) {
@@ -235,6 +240,7 @@ if (empty($reshook)) {
 				if ($extResponsibleId > 0) {
 					$signatory->setSignatory($object->id, 'firepermit', 'socpeople', array($extResponsibleId), 'ExtSocietyResponsible');
 				}
+
 				if (!empty($conf->global->DIGIRISKDOLIBARR_MAIN_AGENDA_ACTIONAUTO_FIREPERMIT_CREATE)) {
 					$object->call_trigger('FIREPERMIT_CREATE', $user);
 				}
@@ -1230,7 +1236,7 @@ if ((empty($action) || ($action != 'create' && $action != 'edit'))) {
 					print '</td>';
 
 					print '<td class="bordertop nobottom linecollocation">';
-					print $digiriskelement->selectDigiriskElementList($item->fk_element, 'fk_element', [], 0, 0, array(), 0, 0, 'minwidth100', 0, false, 1);
+					print $digiriskelement->selectDigiriskElementList($item->fk_element, 'fk_element', ['customsql' => ' t.rowid NOT IN (' . implode(',', $deletedElements) . ')'], 0, 0,[], 0, 0, 'minwidth200', 0, false, 1);
 					print '</td>';
 
 					$coldisplay++;
@@ -1357,7 +1363,7 @@ if ((empty($action) || ($action != 'create' && $action != 'edit'))) {
 			print $refFirePermitDetMod->getNextValue($objectLine);
 			print '</td>';
 			print '<td>';
-			print $digiriskelement->selectDigiriskElementList('', 'fk_element', [], 0, 0, array(), 0, 0, 'minwidth100', 0, false, 1);
+			print $digiriskelement->selectDigiriskElementList('', 'fk_element', ['customsql' => ' t.rowid NOT IN (' . implode(',', $deletedElements) . ')'], 0, 0, array(), 0, 0, 'minwidth200', 0, false, 1);
 			print '</td>';
 
 			$coldisplay++;

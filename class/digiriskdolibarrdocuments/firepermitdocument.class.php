@@ -27,7 +27,7 @@ require_once __DIR__ . '/../../../saturne/class/saturnedocuments.class.php';
 /**
  * Class for FirePermitDocument.
  */
-class FirePermitDocument extends SaturneDocuments
+class FirePermitDocument extends DigiriskDocuments
 {
     /**
      * @var string Module name.
