@@ -49,6 +49,7 @@ abstract class ModeleODTDigiriskElementDocument extends SaturneDocumentModel
 	 */
 	public function write_file(SaturneDocuments $objectDocument, Translate $outputLangs, string $srcTemplatePath, int $hideDetails = 0, int $hideDesc = 0, int $hideRef = 0, array $moreParam): int
 	{
+
 		// phpcs:enable
 		global $user, $langs, $conf, $hookmanager, $action, $mysoc, $moduleNameLowerCase;
 

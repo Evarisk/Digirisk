@@ -45,8 +45,6 @@ require_once __DIR__ . '/../../class/digiriskdolibarrdocuments/workunitdocument.
 require_once __DIR__ . '/../../class/digiriskdolibarrdocuments/riskassessmentdocument.class.php';
 require_once __DIR__ . '/../../lib/digiriskdolibarr_digiriskstandard.lib.php';
 require_once __DIR__ . '/../../lib/digiriskdolibarr_function.lib.php';
-require_once __DIR__ . '/../../core/modules/digiriskdolibarr/digiriskdocuments/riskassessmentdocument/mod_riskassessmentdocument_standard.php';
-require_once __DIR__ . '/../../core/modules/digiriskdolibarr/digiriskdocuments/riskassessmentdocument/modules_riskassessmentdocument.php';
 
 global $db, $conf, $langs, $hookmanager, $user;
 
@@ -59,7 +57,7 @@ $action = GETPOST('action', 'aZ09');
 // Initialize technical objects
 $object                 = new DigiriskStandard($db);
 $digiriskelement        = new DigiriskElement($db);
-$document = new RiskAssessmentDocument($db);
+$document               = new RiskAssessmentDocument($db);
 $digiriskresources      = new DigiriskResources($db);
 $thirdparty             = new Societe($db);
 $contact                = new Contact($db);
@@ -178,96 +176,103 @@ if (empty($reshook)) {
 
 		$moreparams['object'] = "";
 		$moreparams['user']   = $user;
+		$moreparams['objectType'] = 'riskassessment';
 
 		$result = $document->generateDocument($model, $outputlangs, $hidedetails, $hidedesc, $hideref, $moreparams);
+		if ($result > 0) {
+			//Création du dossier à zipper
+			$entity = ($conf->entity > 1) ? '/' . $conf->entity : '';
 
-		//Création du dossier à zipper
-		$entity = ($conf->entity > 1) ? '/' . $conf->entity : '';
+			$date        = dol_print_date(dol_now(), 'dayxcard');
+			$nameSociety = str_replace(' ', '_', $conf->global->MAIN_INFO_SOCIETE_NOM);
+			$nameSociety = preg_replace('/\./', '_', $conf->global->MAIN_INFO_SOCIETE_NOM);
 
-		$date        = dol_print_date(dol_now(), 'dayxcard');
-		$nameSociety = str_replace(' ', '_', $conf->global->MAIN_INFO_SOCIETE_NOM);
-		$nameSociety = preg_replace('/\./', '_', $conf->global->MAIN_INFO_SOCIETE_NOM);
+			$pathToZip = DOL_DATA_ROOT . $entity . '/digiriskdolibarr/riskassessmentdocument/' . $date . '_'. $document->ref . '_' . $nameSociety;
+			dol_mkdir($pathToZip);
 
-		$pathToZip = DOL_DATA_ROOT . $entity . '/digiriskdolibarr/riskassessmentdocument/' . $date . '_'. $document->ref . '_' . $nameSociety;
-		dol_mkdir($pathToZip);
+			// Ajout du fichier au dossier à zipper
+			$nameFile = $date . '_' . $document->ref . '_' . $nameSociety;
+			$nameFile = str_replace(' ', '_', $nameFile);
+			$nameFile = dol_sanitizeFileName($nameFile);
 
-		// Ajout du fichier au dossier à zipper
-		$nameFile = $date . '_' . $document->ref . '_' . $nameSociety;
-		$nameFile = str_replace(' ', '_', $nameFile);
-		$nameFile = dol_sanitizeFileName($nameFile);
-		copy(DOL_DATA_ROOT . $entity . '/digiriskdolibarr/riskassessmentdocument/' . $document->last_main_doc, $pathToZip . '/' . $nameFile . '.odt');
-		$pathinfo = pathinfo($document->last_main_doc);
-		if (file_exists(DOL_DATA_ROOT . $entity . '/digiriskdolibarr/riskassessmentdocument/' . $pathinfo['filename'] . '.pdf')) {
-			copy(DOL_DATA_ROOT . $entity . '/digiriskdolibarr/riskassessmentdocument/' . $pathinfo['filename'] . '.pdf', $pathToZip . '/' . $nameFile . '.pdf');
-		}
 
-		if ($conf->global->DIGIRISKDOLIBARR_GENERATE_ARCHIVE_WITH_DIGIRISKELEMENT_DOCUMENTS) {
-			$digiriskelementlist = $digiriskelement->fetchDigiriskElementFlat(0);
-
-			if ( ! empty($digiriskelementlist) ) {
-				foreach ($digiriskelementlist as $digiriskelementsingle) {
-					if ($digiriskelementsingle['object']->element_type == 'groupment') {
-						$digiriskelementdocument = new GroupmentDocument($db);
-					} elseif ($digiriskelementsingle['object']->element_type == 'workunit') {
-						$digiriskelementdocument = new WorkUnitDocument($db);
-					}
-					$subFolder = $digiriskelementdocument->element;
-
-					$moreparams['object'] = $digiriskelementsingle['object'];
-
-					$digiriskelementdocumentmodel = 'DIGIRISKDOLIBARR_' . strtoupper($digiriskelementdocument->element) . '_DEFAULT_MODEL';
-					$digiriskelementdocumentmodelpath = 'DIGIRISKDOLIBARR_' . strtoupper($digiriskelementdocument->element) . '_ADDON_ODT_PATH';
-					$digiriskelementdocumentmodelpath = preg_replace('/DOL_DOCUMENT_ROOT/', DOL_DOCUMENT_ROOT, $conf->global->$digiriskelementdocumentmodelpath);
-					$templateName = preg_replace( '/_/','.' , $conf->global->$digiriskelementdocumentmodel);
-					$digiriskelementdocumentmodelfinal = $conf->global->$digiriskelementdocumentmodel . ':' . $digiriskelementdocumentmodelpath . 'template_' . $templateName;
-
-					$digiriskelementdocument->generateDocument($digiriskelementdocumentmodelfinal, $outputlangs, $hidedetails, $hidedesc, $hideref, $moreparams);
-
-					// Ajout du fichier au dossier à zipper
-					$sourceFilePath = DOL_DATA_ROOT . $entity . '/digiriskdolibarr/' . $subFolder . '/' . $digiriskelementsingle['object']->ref . '/';
-					$nameFile       = $date . '_' . $document->ref . '_' . $digiriskelementsingle['object']->ref . '_' . $digiriskelementdocument->ref . '_' . $digiriskelementsingle['object']->label . '_' . $nameSociety;
-					$nameFile       = str_replace(' ', '_', $nameFile);
-					$nameFile       = dol_sanitizeFileName($nameFile);
-					copy($sourceFilePath . $digiriskelementdocument->last_main_doc, $pathToZip . '/' . $nameFile . '.odt');
-					$pathinfo = pathinfo($digiriskelementdocument->last_main_doc);
-					if (file_exists($sourceFilePath . $pathinfo['filename'] . '.pdf')) {
-						copy($sourceFilePath . $pathinfo['filename'] . '.pdf', $pathToZip . '/' . $nameFile . '.pdf');
-					}
-				}
-
-				// Get real path for our folder
-				$rootPath = realpath($pathToZip);
-
-				// Initialize archive object
-				$zip = new ZipArchive();
-
-				$zip->open($document->ref . '.zip', ZipArchive::CREATE | ZipArchive::OVERWRITE);
-
-				// Create recursive directory iterator
-				/** @var SplFileInfo[] $files */
-				$files = new RecursiveIteratorIterator(
-					new RecursiveDirectoryIterator($rootPath),
-					RecursiveIteratorIterator::LEAVES_ONLY
-				);
-
-				foreach ($files as $name => $file) {
-					// Skip directories (they would be added automatically)
-					if ( ! $file->isDir()) {
-						// Get real and relative path for current file
-						$filePath     = $file->getRealPath();
-						$relativePath = substr($filePath, strlen($rootPath) + 1);
-
-						// Add current file to archive
-						$zip->addFile($filePath, $relativePath);
-					}
-				}
-
-				// Zip archive will be created only after closing object
-				$zip->close();
-
-				//move archive to riskassessmentdocument folder
-				rename(DOL_DOCUMENT_ROOT . '/custom/digiriskdolibarr/view/digiriskstandard/' . $document->ref . '.zip', $pathToZip . '.zip');
+			copy(DOL_DATA_ROOT . $entity . '/digiriskdolibarr/riskassessmentdocument/' . $document->last_main_doc, $pathToZip . '/' . $nameFile . '.odt');
+			$pathinfo = pathinfo($document->last_main_doc);
+			if (file_exists(DOL_DATA_ROOT . $entity . '/digiriskdolibarr/riskassessmentdocument/' . $pathinfo['filename'] . '.pdf')) {
+				copy(DOL_DATA_ROOT . $entity . '/digiriskdolibarr/riskassessmentdocument/' . $pathinfo['filename'] . '.pdf', $pathToZip . '/' . $nameFile . '.pdf');
 			}
+
+			if ($conf->global->DIGIRISKDOLIBARR_GENERATE_ARCHIVE_WITH_DIGIRISKELEMENT_DOCUMENTS) {
+				$digiriskelementlist = $digiriskelement->fetchDigiriskElementFlat(0);
+
+				if ( ! empty($digiriskelementlist) ) {
+					foreach ($digiriskelementlist as $digiriskelementsingle) {
+						if ($digiriskelementsingle['object']->element_type == 'groupment') {
+							$digiriskelementdocument = new GroupmentDocument($db);
+						} elseif ($digiriskelementsingle['object']->element_type == 'workunit') {
+							$digiriskelementdocument = new WorkUnitDocument($db);
+						}
+						$subFolder = $digiriskelementdocument->element;
+
+						$moreparams['object']     = $digiriskelementsingle['object'];
+						$moreparams['objectType'] = $digiriskelementsingle['object']->element_type;
+
+						$digiriskelementdocumentmodel = 'DIGIRISKDOLIBARR_' . strtoupper($digiriskelementdocument->element) . '_DEFAULT_MODEL';
+						$digiriskelementdocumentmodelpath = 'DIGIRISKDOLIBARR_' . strtoupper($digiriskelementdocument->element) . '_ADDON_ODT_PATH';
+						$digiriskelementdocumentmodelpath = preg_replace('/DOL_DOCUMENT_ROOT/', DOL_DOCUMENT_ROOT, $conf->global->$digiriskelementdocumentmodelpath);
+						$templateName = preg_replace( '/_/','.' , $conf->global->$digiriskelementdocumentmodel);
+						$digiriskelementdocumentmodelfinal = $conf->global->$digiriskelementdocumentmodel . ':' . $digiriskelementdocumentmodelpath . 'template_' . $templateName;
+
+						$result = $digiriskelementdocument->generateDocument($digiriskelementdocumentmodelfinal, $outputlangs, $hidedetails, $hidedesc, $hideref, $moreparams);
+
+						// Ajout du fichier au dossier à zipper
+						$sourceFilePath = DOL_DATA_ROOT . $entity . '/digiriskdolibarr/' . $subFolder . '/' . $digiriskelementsingle['object']->ref . '/';
+						$nameFile       = $date . '_' . $document->ref . '_' . $digiriskelementsingle['object']->ref . '_' . $digiriskelementdocument->ref . '_' . $digiriskelementsingle['object']->label . '_' . $nameSociety;
+						$nameFile       = str_replace(' ', '_', $nameFile);
+						$nameFile       = dol_sanitizeFileName($nameFile);
+
+						copy($sourceFilePath . $digiriskelementdocument->last_main_doc, $pathToZip . '/' . $nameFile . '.odt');
+						$pathinfo = pathinfo($digiriskelementdocument->last_main_doc);
+						if (file_exists($sourceFilePath . $pathinfo['filename'] . '.pdf')) {
+							copy($sourceFilePath . $pathinfo['filename'] . '.pdf', $pathToZip . '/' . $nameFile . '.pdf');
+						}
+					}
+
+					// Get real path for our folder
+					$rootPath = realpath($pathToZip);
+
+					// Initialize archive object
+					$zip = new ZipArchive();
+
+					$zip->open($document->ref . '.zip', ZipArchive::CREATE | ZipArchive::OVERWRITE);
+
+					// Create recursive directory iterator
+					/** @var SplFileInfo[] $files */
+					$files = new RecursiveIteratorIterator(
+						new RecursiveDirectoryIterator($rootPath),
+						RecursiveIteratorIterator::LEAVES_ONLY
+					);
+
+					foreach ($files as $name => $file) {
+						// Skip directories (they would be added automatically)
+						if ( ! $file->isDir()) {
+							// Get real and relative path for current file
+							$filePath     = $file->getRealPath();
+							$relativePath = substr($filePath, strlen($rootPath) + 1);
+
+							// Add current file to archive
+							$zip->addFile($filePath, $relativePath);
+						}
+					}
+
+					// Zip archive will be created only after closing object
+					$zip->close();
+
+					//move archive to riskassessmentdocument folder
+					rename(DOL_DOCUMENT_ROOT . '/custom/digiriskdolibarr/view/digiriskstandard/' . $document->ref . '.zip', $pathToZip . '.zip');
+				}
+			}
+
 		}
 
 		if ($result <= 0) {

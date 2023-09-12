@@ -61,7 +61,7 @@ class doc_workunitdocument_odt extends ModeleODTWorkUnitDocument
 	/**
 	 * @var string Document type.
 	 */
-	public string $document_type = 'workunit';
+	public string $document_type = 'workunitdocument';
 
 	/**
 	 * Constructor.

@@ -84,6 +84,4 @@ class doc_groupmentdocument_odt extends ModeleODTGroupmentDocument
 	{
 		return parent::info($langs);
 	}
-
-
 }

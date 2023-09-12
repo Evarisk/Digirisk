@@ -33,7 +33,7 @@ class mod_workunitdocument_standard extends ModeleNumRefSaturne
 	/**
 	 * @var string Numbering module ref prefix.
 	 */
-	public string $prefix = 'GPD';
+	public string $prefix = 'WUD';
 
 	/**
 	 * @var string Name.
