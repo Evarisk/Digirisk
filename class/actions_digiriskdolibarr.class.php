@@ -121,9 +121,9 @@ class ActionsDigiriskdolibarr
 				print '<script src="../custom/digiriskdolibarr/js/digiriskdolibarr.js"></script>';
 
 				require_once __DIR__ . '/../lib/digiriskdolibarr_function.lib.php';
-				require_once __DIR__ . '/../class/digiriskdocuments/ticketdocument.class.php';
-				require_once __DIR__ . '/../core/modules/digiriskdolibarr/digiriskdocuments/ticketdocument/mod_ticketdocument_standard.php';
-				require_once __DIR__ . '/../core/modules/digiriskdolibarr/digiriskdocuments/ticketdocument/modules_ticketdocument.php';
+				require_once __DIR__ . '/../class/digiriskdolibarrdocuments/ticketdocument.class.php';
+				require_once __DIR__ . '/../core/modules/digiriskdolibarr/digiriskdolibarrdocuments/ticketdocument/mod_ticketdocument_standard.php';
+				require_once __DIR__ . '/../core/modules/digiriskdolibarr/digiriskdolibarrdocuments/ticketdocument/modules_ticketdocument.php';
 				global $langs, $user;
 
 				$object = new Ticket($this->db);
@@ -155,8 +155,8 @@ class ActionsDigiriskdolibarr
 					</script>
 					<?php
 				}
+				$html = saturne_show_documents($modulepart, $dir_files, $filedir, $urlsource, 1,1, '', 1, 0, 0, 0, 0, '', 0, '', empty($soc->default_lang) ? '' : $soc->default_lang, $object);
 
-				$html = digiriskshowdocuments($modulepart, $dir_files, $filedir, $urlsource, 1, 0, $defaultmodel, 1, 0, '', $title, '', '', '', 0, 'remove_file');
 				?>
 
 				<script>
@@ -444,9 +444,9 @@ class ActionsDigiriskdolibarr
 		} else if ($parameters['currentcontext'] == 'ticketcard') {
 			if ($action == 'digiriskbuilddoc') {
 				require_once __DIR__ . '/../lib/digiriskdolibarr_function.lib.php';
-				require_once __DIR__ . '/../class/digiriskdocuments/ticketdocument.class.php';
-				require_once __DIR__ . '/../core/modules/digiriskdolibarr/digiriskdocuments/ticketdocument/mod_ticketdocument_standard.php';
-				require_once __DIR__ . '/../core/modules/digiriskdolibarr/digiriskdocuments/ticketdocument/modules_ticketdocument.php';
+				require_once __DIR__ . '/../class/digiriskdolibarrdocuments/ticketdocument.class.php';
+				require_once __DIR__ . '/../core/modules/digiriskdolibarr/digiriskdolibarrdocuments/ticketdocument/mod_ticketdocument_standard.php';
+				require_once __DIR__ . '/../core/modules/digiriskdolibarr/digiriskdolibarrdocuments/ticketdocument/modules_ticketdocument.php';
 
 				global $langs, $user;
 				$ticketdocument = new TicketDocument($this->db);
@@ -467,16 +467,18 @@ class ActionsDigiriskdolibarr
 
 				$model = GETPOST('model', 'alpha');
 
-				$moreparams['object'] = $object;
-				$moreparams['user']   = $user;
+				$moreparams['object']     = $object;
+				$moreparams['user']       = $user;
+				$moreparams['objectType'] = $object->element;
 
 				$result = $ticketdocument->generateDocument($model, $outputlangs, $hidedetails, $hidedesc, $hideref, $moreparams);
+
 				if ($result <= 0) {
 					setEventMessages($object->error, $object->errors, 'errors');
 					$action = '';
 				} else {
 					if (empty($donotredirect)) {
-						setEventMessages($langs->trans("FileGenerated") . ' - ' . $ticketdocument->last_main_doc, null);
+						setEventMessages($langs->trans('FileGenerated') . ' - ' . '<a href=' . DOL_URL_ROOT . '/document.php?modulepart=digiriskdolibarr&file=ticketdocument/' . (dol_strlen($object->ref) > 0 ? $object->ref . '/' : '') . urlencode($ticketdocument->last_main_doc) . '&entity=' . $conf->entity . '"' . '>' . $ticketdocument->last_main_doc . '</a>', []);
 
 						$urltoredirect = $_SERVER['REQUEST_URI'];
 						$urltoredirect = preg_replace('/#digiriskbuilddoc$/', '', $urltoredirect);
@@ -765,7 +767,7 @@ class ActionsDigiriskdolibarr
 		if ($parameters['currentcontext'] == 'projectcard') {
 			$preventrecursivecall = 0;
 			if ($parameters['modele'] == 'orque_projectdocument') {
-				require_once __DIR__ . '/../class/digiriskdocuments/projectdocument.class.php';
+				require_once __DIR__ . '/../class/digiriskdolibarrdocuments/projectdocument.class.php';
 
 				$projectdocument = new ProjectDocument($db);
 
@@ -831,7 +833,7 @@ class ActionsDigiriskdolibarr
 
 
 	/**
-	 *  Overloading the saturneAttendantsBackToCard function : replacing the parent's function with the one below.
+	 *  Overloading the SaturneAdminDocumentData function : replacing the parent's function with the one below.
 	 *
 	 * @param  array        $parameters Hook metadatas (context, etc...).
 	 * @param  CommonObject $object     Current object.
@@ -840,13 +842,6 @@ class ActionsDigiriskdolibarr
 	public function SaturneAdminDocumentData(array $parameters): int
 	{
 		global $moduleNameLowerCase;
-
-		$types = array(
-			'LegalDisplay' 				=> 'legaldisplay',
-			'InformationsSharing' 		=> 'informationssharing',
-			'ListingRisksAction' 		=> 'listingrisksaction',
-			'ListingRisksPhoto' 		=> 'listingrisksphoto',
-		);
 
 		$types = [
 			'LegalDisplay' => [
@@ -895,11 +890,6 @@ class ActionsDigiriskdolibarr
 			],
 
 		];
-		$pictos = array(
-			'InformationsSharing' 		=> '<i class="fas fa-comment-dots"></i> ',
-			'ListingRisksAction' 		=> '<i class="fas fa-exclamation"></i> ',
-			'ListingRisksPhoto' 		=> '<i class="fas fa-images"></i> ',
-		);
 
 		// Do something only for the current context.
 		if (in_array($parameters['currentcontext'], ['digiriskdolibarradmindocuments'])) {
