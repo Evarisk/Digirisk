@@ -256,7 +256,7 @@ class pdf_orque_projectdocument
 
 			$objectDocument->last_main_doc = $filename;
 
-			$sql  = 'UPDATE ' . MAIN_DB_PREFIX . 'digiriskdolibarr_digiriskdocuments';
+			$sql  = 'UPDATE ' . MAIN_DB_PREFIX . 'saturne_object_documents';
 			$sql .= ' SET last_main_doc =' . ( ! empty($filename) ? "'" . $this->db->escape($filename) . "'" : 'null');
 			$sql .= ' WHERE rowid = ' . $objectDocument->id;
 
@@ -731,7 +731,7 @@ class pdf_orque_projectdocument
 		$pdf->SetFont('', 'B', $default_font_size + 3);
 		$pdf->SetXY($posx, $posy);
 		$pdf->SetTextColor(0, 0, 60);
-		$pdf->MultiCell(100, 4, $outputlangs->transnoentities('Project') . ' pdf_orque_projectdocument.modules.php' .$outputlangs->convToOutputCharset($object->ref), '', 'R');
+		$pdf->MultiCell(100, 4, $outputlangs->transnoentities('Project') . ' ' .$outputlangs->convToOutputCharset($object->ref), '', 'R');
 		$pdf->SetFont('', '', $default_font_size + 2);
 
 		$posy += 6;

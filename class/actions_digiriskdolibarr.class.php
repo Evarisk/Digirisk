@@ -765,24 +765,20 @@ class ActionsDigiriskdolibarr
 		global $db, $user;
 
 		if ($parameters['currentcontext'] == 'projectcard') {
-			$preventrecursivecall = 0;
 			if ($parameters['modele'] == 'orque_projectdocument') {
 				require_once __DIR__ . '/../class/digiriskdolibarrdocuments/projectdocument.class.php';
 
 				$projectdocument = new ProjectDocument($db);
 
-				$moreparams['object'] = $object;
-				$moreparams['user']   = $user;
-
-				if (!$parameters['moreparams']['preventrecursivecall']) {
+				$moreparams['object']     = $object;
+				$moreparams['user']       = $user;
+				$moreparams['objectType'] = 'project';
+				if ($object->element == 'project') {
 					$projectdocument->generateDocument($parameters['modele'], $parameters['outputlangs'], $parameters['hidedetails'], $parameters['hidedesc'], $parameters['hideref'], $moreparams, true);
-					$preventrecursivecall = 1; // Need to update this variable because between first call commonGenerateDocument hook we need to replace hook code by itself
-				} else {
-					$preventrecursivecall = 0;
 				}
 			}
 		}
-		return $preventrecursivecall; // return 0 or return 1 to replace standard code
+		return 0; // return 0 or return 1 to replace standard code
 	}
 
     /**
