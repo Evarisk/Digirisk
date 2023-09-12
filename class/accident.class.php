@@ -27,9 +27,9 @@ require_once DOL_DOCUMENT_ROOT . '/societe/class/societe.class.php';
 require_once DOL_DOCUMENT_ROOT . '/categories/class/categorie.class.php';
 
 require_once __DIR__ . '/../../saturne/class/saturneobject.class.php';
+require_once __DIR__ . '/../../saturne/class/saturnesignature.class.php';
 
 require_once __DIR__ . '/../lib/digiriskdolibarr_function.lib.php';
-require_once __DIR__ . '/digiriskdocuments.class.php';
 require_once __DIR__ . '/digirisksignature.class.php';
 require_once __DIR__ . '/openinghours.class.php';
 require_once __DIR__ . '/evaluator.class.php';
@@ -206,6 +206,83 @@ class Accident extends SaturneObject
 		return parent::__construct($db, $this->module, $this->element);
 	}
 
+
+	/**
+	 * Clone an object into another one.
+	 *
+	 * @param  User      $user    User that creates
+	 * @param  int       $fromID  ID of object to clone.
+	 * @return int                New object created, <0 if KO.
+	 * @throws Exception
+	 */
+	public function createFromClone(User $user, int $fromID): int
+	{
+		dol_syslog(__METHOD__, LOG_DEBUG);
+
+		global $conf;
+
+		$error  = 0;
+		$object = new self($this->db);
+		$this->db->begin();
+
+		// Load source object.
+		$object->fetchCommon($fromID);
+
+		// Reset some properties.
+		unset($object->id);
+		unset($object->fk_user_creat);
+		unset($object->import_key);
+
+		// Clear fields.
+		if (property_exists($object, 'ref')) {
+			$object->ref = '';
+		}
+		if (property_exists($object, 'ref_ext')) {
+			$object->ref_ext = '';
+		}
+		if (property_exists($object, 'date_creation')) {
+			$object->date_creation = dol_now();
+		}
+		if (property_exists($object, 'status')) {
+			$object->status = self::STATUS_VALIDATED;
+		}
+
+		$refAccidentMod = new $conf->global->DIGIRISKDOLIBARR_ACCIDENT_ADDON($this->db);
+		$object->ref    = $refAccidentMod->getNextValue($object);
+
+		// Create clone
+		$object->context = 'createfromclone';
+		$investigationId = $object->create($user);
+
+		if ($investigationId > 0) {
+			// Load signatory from source object.
+			$signatory   = new SaturneSignature($this->db);
+			$signatories = $signatory->fetchSignatory('', $fromID, $this->element);
+			if (is_array($signatories) && !empty($signatories)) {
+				foreach ($signatories as $arrayRole) {
+					foreach ($arrayRole as $signatoryRole) {
+						$signatory->createFromClone($user, $signatoryRole->id, $investigationId);
+					}
+				}
+			}
+		} else {
+			$error++;
+			$this->error  = $object->error;
+			$this->errors = $object->errors;
+		}
+
+		unset($object->context);
+
+		// End.
+		if (!$error) {
+			$this->db->commit();
+			return $investigationId;
+		} else {
+			$this->db->rollback();
+			return -1;
+		}
+	}
+
 	/**
 	 * Load object in memory from the database
 	 *
@@ -343,7 +420,7 @@ class Accident extends SaturneObject
 				'color' => '#e9ad4f'
 			),
 		);
-		$allaccidents = $this->fetchAll('','','','',['customsql' => ' t.status > 0 ']);
+		$allaccidents = $this->fetchAll('','',0,0,['customsql' => ' t.status > 0 ']);
 
 		if (is_array($allaccidents) && !empty($allaccidents)) {
 			$accidentworkstop = new AccidentWorkStop($this->db);
