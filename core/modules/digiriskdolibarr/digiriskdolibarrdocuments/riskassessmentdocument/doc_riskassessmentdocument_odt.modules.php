@@ -34,7 +34,6 @@ require_once __DIR__ . '/../../../../../class/evaluator.class.php';
 require_once __DIR__ . '/../../../../../class/riskanalysis/risk.class.php';
 require_once __DIR__ . '/../../../../../class/riskanalysis/riskassessment.class.php';
 require_once __DIR__ . '/../../../../../class/riskanalysis/risksign.class.php';
-require_once __DIR__ . '/mod_riskassessmentdocument_standard.php';
 require_once __DIR__ . '/modules_riskassessmentdocument.php';
 
 /**
@@ -84,7 +83,6 @@ class doc_riskassessmentdocument_odt extends ModeleODTRiskAssessmentDocument
 		return parent::info($langs);
 	}
 
-
 	/**
 	 * Function to build a document on disk.
 	 *
@@ -100,10 +98,8 @@ class doc_riskassessmentdocument_odt extends ModeleODTRiskAssessmentDocument
 	 */
 	public function write_file(SaturneDocuments $objectDocument, Translate $outputLangs, string $srcTemplatePath, int $hideDetails = 0, int $hideDesc = 0, int $hideRef = 0, array $moreParam): int
 	{
-
-
 		// phpcs:enable
-		global $user, $langs, $conf, $hookmanager, $action, $mysoc;
+		global $user, $langs, $conf, $hookmanager, $action, $mysoc, $moduleNameLowerCase;
 
 		ini_set('pcre.backtrack_limit', 10000000);
 
@@ -124,8 +120,13 @@ class doc_riskassessmentdocument_odt extends ModeleODTRiskAssessmentDocument
 
 		$outputLangs->loadLangs(array("main", "dict", "companies", "digiriskdolibarr@digiriskdolibarr"));
 
-		$mod = new $conf->global->DIGIRISKDOLIBARR_RISKASSESSMENTDOCUMENT_ADDON($this->db);
+		$numberingModules = [
+			'digiriskdolibarrdocuments/riskassessmentdocument' => $conf->global->DIGIRISKDOLIBARR_RISKASSESSMENTDOCUMENT_ADDON
+		];
+
+		list($mod) = saturne_require_objects_mod($numberingModules, $moduleNameLowerCase);
 		$ref = $mod->getNextValue($objectDocument);
+
 
 		$objectDocument->ref = $ref;
 		$id          = $objectDocument->create($user, true);

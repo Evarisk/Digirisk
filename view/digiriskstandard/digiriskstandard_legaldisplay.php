@@ -32,12 +32,14 @@ if (file_exists('../digiriskdolibarr.main.inc.php')) {
 
 require_once DOL_DOCUMENT_ROOT . '/core/lib/images.lib.php';
 require_once DOL_DOCUMENT_ROOT . '/projet/class/project.class.php';
+require_once DOL_DOCUMENT_ROOT . '/contact/class/contact.class.php';
 
 require_once __DIR__ . '/../../class/digiriskstandard.class.php';
+require_once __DIR__ . '/../../class/digiriskresources.class.php';
 require_once __DIR__ . '/../../class/digiriskdolibarrdocuments/legaldisplay.class.php';
 require_once __DIR__ . '/../../lib/digiriskdolibarr_digiriskstandard.lib.php';
 require_once __DIR__ . '/../../lib/digiriskdolibarr_function.lib.php';
-require_once __DIR__ . '/../../core/modules/digiriskdolibarr/digiriskdocuments/legaldisplay/modules_legaldisplay.php';
+require_once __DIR__ . '/../../core/modules/digiriskdolibarr/digiriskdolibarrdocuments/legaldisplay/modules_legaldisplay.php';
 
 global $db, $conf, $langs, $user, $hookmanager;
 
@@ -78,11 +80,17 @@ if ($reshook < 0) setEventMessages($hookmanager->error, $hookmanager->errors, 'e
 if (empty($reshook)) {
 	$error = 0;
 
+	$previousElement = $object->element;
+	$object->ref = '';
+	$object->element = 'legaldisplay';
+	$removeDocumentFromName = 1;
+
 	// Actions builddoc, forcebuilddoc, remove_file.
 	require_once __DIR__ . '/../../../saturne/core/tpl/documents/documents_action.tpl.php';
 
 	// Action to generate pdf from odt file
 	require_once __DIR__ . '/../../../saturne/core/tpl/documents/saturne_manual_pdf_generation_action.tpl.php';
+	$object->element = $previousElement;
 }
 
 /*

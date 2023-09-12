@@ -65,7 +65,6 @@ class doc_informationssharing_odt extends SaturneDocumentModel
 		parent::__construct($db, $this->module, $this->document_type);
 	}
 
-
 	/**
 	 * Return description of a module.
 	 *
@@ -76,7 +75,6 @@ class doc_informationssharing_odt extends SaturneDocumentModel
 	{
 		return parent::info($langs);
 	}
-
 
 	/**
 	 * Function to build a document on disk.
@@ -119,15 +117,14 @@ class doc_informationssharing_odt extends SaturneDocumentModel
 		];
 
 		list($mod) = saturne_require_objects_mod($numberingModules, $moduleNameLowerCase);
-		$ref = $mod->getNextValue($object);
+		$ref = $mod->getNextValue($objectDocument);
 
+		$objectDocument->ref = $ref;
+		$id          = $objectDocument->create($user, true);
 
-		$object->ref = $ref;
-		$id          = $object->create($user, true);
+		$objectDocument->fetch($id);
 
-		$object->fetch($id);
-
-		$dir                                             = $conf->digiriskdolibarr->multidir_output[isset($object->entity) ? $object->entity : 1] . '/informationssharing';
+		$dir                                             = $conf->digiriskdolibarr->multidir_output[isset($objectDocument->entity) ? $objectDocument->entity : 1] . '/informationssharing';
 		$objectref                                       = dol_sanitizeFileName($ref);
 		if (preg_match('/specimen/i', $objectref)) $dir .= '/specimen';
 		if ( ! file_exists($dir)) {
@@ -147,11 +144,11 @@ class doc_informationssharing_odt extends SaturneDocumentModel
 			$filename = str_replace(' ', '_', $filename);
 			$filename = dol_sanitizeFileName($filename);
 
-			$object->last_main_doc = $filename;
+			$objectDocument->last_main_doc = $filename;
 
-			$sql  = "UPDATE " . MAIN_DB_PREFIX . "digiriskdolibarr_digiriskdocuments";
+			$sql  = "UPDATE " . MAIN_DB_PREFIX . "saturne_object_document";
 			$sql .= " SET last_main_doc =" . ( ! empty($filename) ? "'" . $this->db->escape($filename) . "'" : 'null');
-			$sql .= " WHERE rowid = " . $object->id;
+			$sql .= " WHERE rowid = " . $objectDocument->id;
 
 			dol_syslog("admin.lib::Insert last main doc", LOG_DEBUG);
 			$this->db->query($sql);
@@ -161,10 +158,10 @@ class doc_informationssharing_odt extends SaturneDocumentModel
 
 			// Make substitution
 			$substitutionarray = array();
-			complete_substitutions_array($substitutionarray, $langs, $object);
+			complete_substitutions_array($substitutionarray, $langs, $objectDocument);
 			// Call the ODTSubstitution hook
-			$parameters = array('file' => $file, 'object' => $object, 'outputlangs' => $outputLangs, 'substitutionarray' => &$substitutionarray);
-			$hookmanager->executeHooks('ODTSubstitution', $parameters, $this, $action); // Note that $action and $object may have been modified by some hooks
+			$parameters = array('file' => $file, 'object' => $objectDocument, 'outputlangs' => $outputLangs, 'substitutionarray' => &$substitutionarray);
+			$hookmanager->executeHooks('ODTSubstitution', $parameters, $this, $action); // Note that $action and $objectDocument may have been modified by some hooks
 
 			// Open and load template
 			require_once ODTPHP_PATH . 'odf.php';
@@ -185,18 +182,18 @@ class doc_informationssharing_odt extends SaturneDocumentModel
 			}
 
 			// Define substitution array
-			$substitutionarray            = getCommonSubstitutionArray($outputLangs, 0, null, $object);
-			$array_object_from_properties = $this->get_substitutionarray_each_var_object($object, $outputLangs);
-			$array_object                 = $this->get_substitutionarray_object($object, $outputLangs);
+			$substitutionarray            = getCommonSubstitutionArray($outputLangs, 0, null, $objectDocument);
+			$array_object_from_properties = $this->get_substitutionarray_each_var_object($objectDocument, $outputLangs);
+			$array_object                 = $this->get_substitutionarray_object($objectDocument, $outputLangs);
 			$array_soc                    = $this->get_substitutionarray_mysoc($mysoc, $outputLangs);
 			$array_soc['mycompany_logo']  = preg_replace('/_small/', '_mini', $array_soc['mycompany_logo']);
 
 			$tmparray = array_merge($substitutionarray, $array_object_from_properties, $array_object, $array_soc);
-			complete_substitutions_array($tmparray, $outputLangs, $object);
+			complete_substitutions_array($tmparray, $outputLangs, $objectDocument);
 
 			// Call the ODTSubstitution hook
-			$parameters = array('odfHandler' => &$odfHandler, 'file' => $file, 'object' => $object, 'outputlangs' => $outputLangs, 'substitutionarray' => &$tmparray);
-			$hookmanager->executeHooks('ODTSubstitution', $parameters, $this, $action); // Note that $action and $object may have been modified by some hooks
+			$parameters = array('odfHandler' => &$odfHandler, 'file' => $file, 'object' => $objectDocument, 'outputlangs' => $outputLangs, 'substitutionarray' => &$tmparray);
+			$hookmanager->executeHooks('ODTSubstitution', $parameters, $this, $action); // Note that $action and $objectDocument may have been modified by some hooks
 
 			foreach ($tmparray as $key => $value) {
 				try {
@@ -224,8 +221,8 @@ class doc_informationssharing_odt extends SaturneDocumentModel
 			}
 
 			// Call the beforeODTSave hook
-			$parameters = array('odfHandler' => &$odfHandler, 'file' => $file, 'object' => $object, 'outputlangs' => $outputLangs, 'substitutionarray' => &$tmparray);
-			$hookmanager->executeHooks('beforeODTSave', $parameters, $this, $action); // Note that $action and $object may have been modified by some hooks
+			$parameters = array('odfHandler' => &$odfHandler, 'file' => $file, 'object' => $objectDocument, 'outputlangs' => $outputLangs, 'substitutionarray' => &$tmparray);
+			$hookmanager->executeHooks('beforeODTSave', $parameters, $this, $action); // Note that $action and $objectDocument may have been modified by some hooks
 
 			$fileInfos = pathinfo($filename);
 			$pdfName   = $fileInfos['filename'] . '.pdf';
@@ -250,8 +247,8 @@ class doc_informationssharing_odt extends SaturneDocumentModel
 				}
 			}
 
-			$parameters = array('odfHandler' => &$odfHandler, 'file' => $file, 'object' => $object, 'outputlangs' => $outputLangs, 'substitutionarray' => &$tmparray);
-			$hookmanager->executeHooks('afterODTCreation', $parameters, $this, $action); // Note that $action and $object may have been modified by some hooks
+			$parameters = array('odfHandler' => &$odfHandler, 'file' => $file, 'object' => $objectDocument, 'outputlangs' => $outputLangs, 'substitutionarray' => &$tmparray);
+			$hookmanager->executeHooks('afterODTCreation', $parameters, $this, $action); // Note that $action and $objectDocument may have been modified by some hooks
 
 //			if ( ! empty($conf->global->MAIN_UMASK))
 //				@chmod($file, octdec($conf->global->MAIN_UMASK));
