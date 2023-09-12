@@ -88,7 +88,7 @@ $project           = new Project($db);
 $object->fetch($id);
 
 // Load resources
-$allLinks = $resources->digirisk_dolibarr_fetch_resources();
+$allLinks = $resources->fetchDigiriskResources();
 
 // Load numbering modules
 $numberingModules = [
@@ -227,9 +227,9 @@ if (empty($reshook)) {
 			$result = $object->create($user, true);
 			if ($result > 0) {
 				$object->setInProgress($user, true);
-				$digiriskresources->digirisk_dolibarr_set_resources($db, $user->id, 'ExtSociety', 'societe', array($extSocietyId), $conf->entity, 'preventionplan', $object->id, 1);
-				$digiriskresources->digirisk_dolibarr_set_resources($db, $user->id, 'LabourInspector', 'societe', array($labourInspectorId), $conf->entity, 'preventionplan', $object->id, 1);
-				$digiriskresources->digirisk_dolibarr_set_resources($db, $user->id, 'LabourInspectorAssigned', 'socpeople', array($labourInspectorContactId), $conf->entity, 'preventionplan', $object->id, 1);
+				$digiriskresources->setDigiriskResources($db, $user->id, 'ExtSociety', 'societe', array($extSocietyId), $conf->entity, 'preventionplan', $object->id, 1);
+				$digiriskresources->setDigiriskResources($db, $user->id, 'LabourInspector', 'societe', array($labourInspectorId), $conf->entity, 'preventionplan', $object->id, 1);
+				$digiriskresources->setDigiriskResources($db, $user->id, 'LabourInspectorAssigned', 'socpeople', array($labourInspectorContactId), $conf->entity, 'preventionplan', $object->id, 1);
 
 				if ($masterWorkerId > 0) {
 					$signatory->setSignatory($object->id, 'preventionplan', 'user', array($masterWorkerId), 'MasterWorker');
@@ -335,9 +335,9 @@ if (empty($reshook)) {
 		if ( ! $error) {
 			$result = $object->update($user, false);
 			if ($result > 0) {
-				$digiriskresources->digirisk_dolibarr_set_resources($db, $user->id, 'ExtSociety', 'societe', array($extSocietyId), $conf->entity, 'preventionplan', $object->id, 0);
-				$digiriskresources->digirisk_dolibarr_set_resources($db, $user->id, 'LabourInspector', 'societe', array($labourInspectorId), $conf->entity, 'preventionplan', $object->id, 0);
-				$digiriskresources->digirisk_dolibarr_set_resources($db, $user->id, 'LabourInspectorAssigned', 'socpeople', array($labourInspectorContactId), $conf->entity, 'preventionplan', $object->id, 0);
+				$digiriskresources->setDigiriskResources($db, $user->id, 'ExtSociety', 'societe', array($extSocietyId), $conf->entity, 'preventionplan', $object->id, 0);
+				$digiriskresources->setDigiriskResources($db, $user->id, 'LabourInspector', 'societe', array($labourInspectorId), $conf->entity, 'preventionplan', $object->id, 0);
+				$digiriskresources->setDigiriskResources($db, $user->id, 'LabourInspectorAssigned', 'socpeople', array($labourInspectorContactId), $conf->entity, 'preventionplan', $object->id, 0);
 
 				$signatory->setSignatory($object->id, 'preventionplan', 'user', array($masterWorkerId), 'MasterWorker');
 				$signatory->setSignatory($object->id, 'preventionplan', 'socpeople', array($extResponsibleId), 'ExtSocietyResponsible');

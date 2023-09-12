@@ -76,7 +76,7 @@ class FirePermitDocument extends DigiriskDocuments
 
 		$firepermitlines     = $firepermitline->fetchAll('', '', 0, 0, array(), 'AND', GETPOST('id'));
 		$preventionplanlines = $preventionplanline->fetchAll('', '', 0, 0, array(), 'AND', $firepermit->fk_preventionplan);
-		$digirisk_resources  = $resources->digirisk_dolibarr_fetch_resources();
+		$digirisk_resources  = $resources->fetchDigiriskResources();
 
 		$extsociety          = $resources->fetchResourcesFromObject('ExtSociety', $firepermit);
 		if ($extsociety < 1) {

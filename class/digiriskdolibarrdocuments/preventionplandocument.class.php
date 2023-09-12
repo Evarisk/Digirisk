@@ -75,7 +75,7 @@ class PreventionPlanDocument extends DigiriskDocuments
 		}
 
 		$preventionplanlines = $preventionplanline->fetchAll('', '', 0, 0, array(), 'AND', GETPOST('id'));
-		$digirisk_resources = $resources->digirisk_dolibarr_fetch_resources();
+		$digirisk_resources = $resources->fetchDigiriskResources();
 
 		$extsociety = $resources->fetchResourcesFromObject('ExtSociety', $preventionplan);
 		if ($extsociety < 1) {

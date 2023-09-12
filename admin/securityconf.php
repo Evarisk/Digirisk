@@ -59,7 +59,7 @@ $societe   = new Societe($db);
 $usertmp   = new User($db);
 $resources = new DigiriskResources($db);
 
-$allLinks = $resources->digirisk_dolibarr_fetch_resources();
+$allLinks = $resources->fetchDigiriskResources();
 
 $hookmanager->initHooks(array('admincompany', 'globaladmin'));
 
@@ -82,11 +82,11 @@ if (($action == 'update' && ! GETPOST("cancel", 'alpha')) || ($action == 'update
 	$labourDoctorSocpeopleAssigned    = ! empty(GETPOST('labourdoctor_contactid', 'array')) ? GETPOST('labourdoctor_contactid', 'array') : (GETPOST('labourdoctor_contactid', 'int') > 0 ? array(GETPOST('labourdoctor_contactid', 'int')) : array());
 	$labourInspectorSocpeopleAssigned = ! empty(GETPOST('labourinspector_contactid', 'array')) ? GETPOST('labourinspector_contactid', 'array') : (GETPOST('labourinspector_contactid', 'int') > 0 ? array(GETPOST('labourinspector_contactid', 'int')) :  array());
 
-	$resources->digirisk_dolibarr_set_resources($db, $user->id,  'LabourDoctorSociety',  'societe', $labourDoctorId, $conf->entity);
-	$resources->digirisk_dolibarr_set_resources($db, $user->id,  'LabourInspectorSociety',  'societe', $labourInspectorId, $conf->entity);
+	$resources->setDigiriskResources($db, $user->id,  'LabourDoctorSociety',  'societe', $labourDoctorId, $conf->entity);
+	$resources->setDigiriskResources($db, $user->id,  'LabourInspectorSociety',  'societe', $labourInspectorId, $conf->entity);
 
-	$resources->digirisk_dolibarr_set_resources($db, $user->id,  'LabourDoctorContact',  'socpeople', $labourDoctorSocpeopleAssigned, $conf->entity);
-	$resources->digirisk_dolibarr_set_resources($db, $user->id,  'LabourInspectorContact',  'socpeople', $labourInspectorSocpeopleAssigned, $conf->entity);
+	$resources->setDigiriskResources($db, $user->id,  'LabourDoctorContact',  'socpeople', $labourDoctorSocpeopleAssigned, $conf->entity);
+	$resources->setDigiriskResources($db, $user->id,  'LabourInspectorContact',  'socpeople', $labourInspectorSocpeopleAssigned, $conf->entity);
 
 	$samuId[0]          = GETPOST('samu_socid', 'int') ? GETPOST('samu_socid', 'int') : $allLinks['SAMU']->id[0];
 	$pompiersId[0]      = GETPOST('pompiers_socid', 'int') ? GETPOST('pompiers_socid', 'int') : $allLinks['Pompiers']->id[0];
@@ -96,13 +96,13 @@ if (($action == 'update' && ! GETPOST("cancel", 'alpha')) || ($action == 'update
 	$antipoisonId[0]    = GETPOST('antipoison_socid', 'int') ? GETPOST('antipoison_socid', 'int') : $allLinks['PoisonControlCenter']->id[0];
 	$responsibleId[0]   = GETPOST('responsible_socid', 'int') ? GETPOST('responsible_socid', 'int') : $allLinks['Responsible']->id[0];
 
-	$resources->digirisk_dolibarr_set_resources($db, $user->id,  'SAMU',  'societe', $samuId, $conf->entity);
-	$resources->digirisk_dolibarr_set_resources($db, $user->id,  'Pompiers',  'societe', $pompiersId, $conf->entity);
-	$resources->digirisk_dolibarr_set_resources($db, $user->id,  'Police',  'societe', $policeId, $conf->entity);
-	$resources->digirisk_dolibarr_set_resources($db, $user->id,  'AllEmergencies',  'societe', $touteUrgenceId, $conf->entity);
-	$resources->digirisk_dolibarr_set_resources($db, $user->id,  'RightsDefender',  'societe', $defenseurId, $conf->entity);
-	$resources->digirisk_dolibarr_set_resources($db, $user->id,  'PoisonControlCenter',  'societe', $antipoisonId, $conf->entity);
-	$resources->digirisk_dolibarr_set_resources($db, $user->id,  'Responsible',  'societe', $responsibleId, $conf->entity);
+	$resources->setDigiriskResources($db, $user->id,  'SAMU',  'societe', $samuId, $conf->entity);
+	$resources->setDigiriskResources($db, $user->id,  'Pompiers',  'societe', $pompiersId, $conf->entity);
+	$resources->setDigiriskResources($db, $user->id,  'Police',  'societe', $policeId, $conf->entity);
+	$resources->setDigiriskResources($db, $user->id,  'AllEmergencies',  'societe', $touteUrgenceId, $conf->entity);
+	$resources->setDigiriskResources($db, $user->id,  'RightsDefender',  'societe', $defenseurId, $conf->entity);
+	$resources->setDigiriskResources($db, $user->id,  'PoisonControlCenter',  'societe', $antipoisonId, $conf->entity);
+	$resources->setDigiriskResources($db, $user->id,  'Responsible',  'societe', $responsibleId, $conf->entity);
 
 	dolibarr_set_const($db, "DIGIRISKDOLIBARR_LOCATION_OF_DETAILED_INSTRUCTION", GETPOST("emplacementCD", 'none'), 'chaine', 0, '', $conf->entity);
 	dolibarr_set_const($db, "DIGIRISKDOLIBARR_SOCIETY_DESCRIPTION", GETPOST("description", 'none'), 'chaine', 0, '', $conf->entity);

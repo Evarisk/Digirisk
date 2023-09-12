@@ -54,7 +54,7 @@ $error  = 0;
 // Initialize technical objects
 $resources = new DigiriskResources($db);
 
-$allLinks = $resources->digirisk_dolibarr_fetch_resources();
+$allLinks = $resources->fetchDigiriskResources();
 
 $hookmanager->initHooks(array('admincompany', 'globaladmin'));
 
@@ -91,16 +91,16 @@ if (empty($reshook)) {
 		$TitularsDP    = ! empty(GETPOST('TitularsDP', 'array')) ? GETPOST('TitularsDP', 'array') : (GETPOST('TitularsDP', 'int') > 0 ? array(GETPOST('TitularsDP', 'int')) : array());
 		$AlternatesDP  = ! empty(GETPOST('AlternatesDP', 'array')) ? GETPOST('AlternatesDP', 'array') : (GETPOST('AlternatesDP', 'int') > 0 ? array(GETPOST('AlternatesDP', 'int')) : array());
 
-		$resources->digirisk_dolibarr_set_resources($db, $user->id, 'TitularsCSE', 'societe', $CSEtitulaires, $conf->entity);
-		$resources->digirisk_dolibarr_set_resources($db, $user->id, 'AlternatesCSE', 'societe', $CSEsuppleants, $conf->entity);
-		$resources->digirisk_dolibarr_set_resources($db, $user->id, 'TitularsDP', 'societe', $TitularsDP, $conf->entity);
-		$resources->digirisk_dolibarr_set_resources($db, $user->id, 'AlternatesDP', 'societe', $AlternatesDP, $conf->entity);
+		$resources->setDigiriskResources($db, $user->id, 'TitularsCSE', 'societe', $CSEtitulaires, $conf->entity);
+		$resources->setDigiriskResources($db, $user->id, 'AlternatesCSE', 'societe', $CSEsuppleants, $conf->entity);
+		$resources->setDigiriskResources($db, $user->id, 'TitularsDP', 'societe', $TitularsDP, $conf->entity);
+		$resources->setDigiriskResources($db, $user->id, 'AlternatesDP', 'societe', $AlternatesDP, $conf->entity);
 
 		$harassmentOfficer = GETPOST('HarassmentOfficer', 'int');
 		$harassmentOfficerCSE = GETPOST('HarassmentOfficerCSE', 'int');
 
-		$resources->digirisk_dolibarr_set_resources($db, $user->id, 'HarassmentOfficer', 'user', array($harassmentOfficer), $conf->entity);
-		$resources->digirisk_dolibarr_set_resources($db, $user->id, 'HarassmentOfficerCSE', 'user', array($harassmentOfficerCSE), $conf->entity);
+		$resources->setDigiriskResources($db, $user->id, 'HarassmentOfficer', 'user', array($harassmentOfficer), $conf->entity);
+		$resources->setDigiriskResources($db, $user->id, 'HarassmentOfficerCSE', 'user', array($harassmentOfficerCSE), $conf->entity);
 
 		if ($action != 'updateedit' && ! $error) {
 			header("Location: " . $_SERVER["PHP_SELF"]);
@@ -148,7 +148,7 @@ print dol_get_fiche_head($head, 'social', '', -1, '');
 $form      = new Form($db);
 $resources = new DigiriskResources($db);
 
-$allLinks = $resources->digirisk_dolibarr_fetch_resources();
+$allLinks = $resources->fetchDigiriskResources();
 
 $electionDateCSE = $conf->global->DIGIRISKDOLIBARR_CSE_ELECTION_DATE;
 $electionDateDP  = $conf->global->DIGIRISKDOLIBARR_DP_ELECTION_DATE;

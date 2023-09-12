@@ -971,7 +971,7 @@ if ($conf->global->DIGIRISKDOLIBARR_ENCODE_BACKWARD_COMPATIBILITY == 0) {
 
 	$societe   = new Societe($db);
 	$resources = new DigiriskResources($db);
-	$rights_defenderID = $resources->digirisk_dolibarr_fetch_resource('RightsDefender');
+	$rights_defenderID = $resources->fetchDigiriskResource('RightsDefender');
 	$societe->fetch($rights_defenderID);
 	$societe->name = $langs->transnoentities('RightsDefender') . ' - ' . $conf->global->MAIN_INFO_SOCIETE_NOM;
 	$societe->update(0, $user);

@@ -68,7 +68,7 @@ $hookmanager->initHooks(array('digiriskelementriskassessmentdocument', 'globalca
 $object->fetch($conf->global->DIGIRISKDOLIBARR_ACTIVE_STANDARD);
 
 // Load resources
-$allLinks = $digiriskresources->digirisk_dolibarr_fetch_resources();
+$allLinks = $digiriskresources->fetchDigiriskResources();
 
 $upload_dir = $conf->digiriskdolibarr->multidir_output[isset($conf->entity) ? $conf->entity : 1];
 

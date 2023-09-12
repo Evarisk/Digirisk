@@ -280,9 +280,9 @@ class PreventionPlan extends SaturneObject
 		$preventionplanid                   = $object->create($user);
 
 		if ($preventionplanid > 0) {
-			$digiriskresources->digirisk_dolibarr_set_resources($this->db, $user->id, 'ExtSociety', 'societe', array(array_shift($resources['ExtSociety'])->id), $conf->entity, 'preventionplan', $preventionplanid, 1);
-			$digiriskresources->digirisk_dolibarr_set_resources($this->db, $user->id, 'LabourInspector', 'societe', array(array_shift($resources['LabourInspector'])->id), $conf->entity, 'preventionplan', $preventionplanid, 1);
-			$digiriskresources->digirisk_dolibarr_set_resources($this->db, $user->id, 'LabourInspectorAssigned', 'socpeople', array(array_shift($resources['LabourInspectorAssigned'])->id), $conf->entity, 'preventionplan', $preventionplanid, 1);
+			$digiriskresources->setDigiriskResources($this->db, $user->id, 'ExtSociety', 'societe', array(array_shift($resources['ExtSociety'])->id), $conf->entity, 'preventionplan', $preventionplanid, 1);
+			$digiriskresources->setDigiriskResources($this->db, $user->id, 'LabourInspector', 'societe', array(array_shift($resources['LabourInspector'])->id), $conf->entity, 'preventionplan', $preventionplanid, 1);
+			$digiriskresources->setDigiriskResources($this->db, $user->id, 'LabourInspectorAssigned', 'socpeople', array(array_shift($resources['LabourInspectorAssigned'])->id), $conf->entity, 'preventionplan', $preventionplanid, 1);
 			if (!empty($signatoriesID)) {
 				$signatory->createFromClone($user, $signatoriesID['MasterWorker'], $preventionplanid);
 				$signatory->createFromClone($user, $signatoriesID['ExtSocietyResponsible'], $preventionplanid);

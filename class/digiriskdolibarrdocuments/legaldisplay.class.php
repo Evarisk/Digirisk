@@ -60,7 +60,7 @@ class LegalDisplay extends DigiriskDocuments
 		global $conf, $langs;
 
 		$resources               = new DigiriskResources($this->db);
-		$digirisk_resources      = $resources->digirisk_dolibarr_fetch_resources();
+		$digirisk_resources      = $resources->fetchDigiriskResources();
 		$json                    = array();
 
 		// *** JSON FILLING ***
