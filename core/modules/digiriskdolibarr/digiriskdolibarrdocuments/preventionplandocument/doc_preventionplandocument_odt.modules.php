@@ -37,7 +37,7 @@ require_once __DIR__ . '/../../../../../class/riskanalysis/risksign.class.php';
 /**
  *	Class to build documents using ODF templates generator
  */
-class doc_preventionplandocument_odt extends SaturneDocumentModel
+class doc_preventionplandocument_odt extends ModeleODTPreventionPlanDocument
 {
 	/**
 	 * @var array Minimum version of PHP required by module.

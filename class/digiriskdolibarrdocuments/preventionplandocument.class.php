@@ -21,13 +21,13 @@
  * \brief       This file is a class file for PreventionPlanDocument
  */
 
-// Load Saturne libraries.
-require_once __DIR__ . '/../../../saturne/class/saturnedocuments.class.php';
+// Load DigiriskDolibarr libraries
+require_once __DIR__ . '/../digiriskdocuments.class.php';
 
 /**
  * Class for PreventionPlanDocument
  */
-class PreventionPlanDocument extends SaturneDocuments
+class PreventionPlanDocument extends DigiriskDocuments
 {
 	/**
 	 * @var string Module name.
