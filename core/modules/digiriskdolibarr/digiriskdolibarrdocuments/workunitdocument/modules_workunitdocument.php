@@ -22,8 +22,6 @@
  *  \brief			File that contains parent class for workunitdocuments document models
  */
 
-require_once DOL_DOCUMENT_ROOT . '/core/class/commondocgenerator.class.php';
-require_once DOL_DOCUMENT_ROOT . '/ticket/class/ticket.class.php';
 require_once __DIR__ . '/../digiriskelementdocument/modules_digiriskelementdocument.php';
 
 /**
@@ -31,20 +29,18 @@ require_once __DIR__ . '/../digiriskelementdocument/modules_digiriskelementdocum
 */
 abstract class ModeleODTWorkUnitDocument extends ModeleODTDigiriskElementDocument
 {
-
-	// phpcs:disable PEAR.NamingConventions.ValidFunctionName.ScopeNotCamelCaps
 	/**
-	 *  Return list of active generation modules
+	 * Return list of active generation modules.
 	 *
-	 *  @param	DoliDB	$db     			Database handler
-	 *  @param int $maxfilenamelength  Max length of value to show
-	 *  @return	array						List of templates
+	 * @param  DoliDB $db                Database handler.
+	 * @param  string $type              Document type.
+	 * @param  int    $maxfilenamelength Max length of value to show.
+	 *
+	 * @return array                     List of templates.
+	 * @throws Exception
 	 */
-	public static function liste_modeles($db, $maxfilenamelength = 0)
+	public static function liste_modeles(DoliDB $db, string $type, int $maxfilenamelength = 0): array
 	{
-		$type = 'workunitdocument';
-
-		require_once __DIR__ . '/../../../../../lib/digiriskdolibarr_function.lib.php';
-		return getListOfModelsDigirisk($db, $type, $maxfilenamelength);
+		return parent::liste_modeles($db, 'workunitdocument', $maxfilenamelength);
 	}
 }

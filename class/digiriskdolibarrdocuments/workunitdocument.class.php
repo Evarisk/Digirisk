@@ -21,13 +21,13 @@
  * \brief   This file is a class file for WorkUnitDocument.
  */
 
-// Load Saturne libraries.
-require_once __DIR__ . '/../../../saturne/class/saturnedocuments.class.php';
+// Load DigiriskDolibarr libraries
+require_once __DIR__ . '/../digiriskdocuments.class.php';
 
 /**
  * Class for WorkUnitDocument.
  */
-class WorkUnitDocument extends SaturneDocuments
+class WorkUnitDocument extends DigiriskDocuments
 {
     /**
      * @var string Module name.
