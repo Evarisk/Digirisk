@@ -31,31 +31,31 @@ require_once __DIR__ . '/../../../../../class/riskanalysis/risksign.class.php';
 /**
  *	Parent class for documents models
  */
-abstract class ModeleODTDigiriskElementDocument extends CommonDocGenerator
+abstract class ModeleODTDigiriskElementDocument extends SaturneDocumentModel
 {
 
 	/**
-	 *  Function to build a document on disk using the generic odt module.
+	 * Function to build a document on disk.
 	 *
-	 * @param 	DigiriskElementDocument		$object 			Object source to build document
-	 * @param 	Translate 				$outputlangs 		Lang output object
-	 * @param 	string 					$srctemplatepath 	Full path of source filename for generator using a template file
-	 * @param	int						$hidedetails		Do not show line details
-	 * @param	int						$hidedesc			Do not show desc
-	 * @param	int						$hideref			Do not show ref
-	 * @param 	DigiriskElement			$digiriskelement    Object for get DigiriskElement info
-	 * @return	int                            				1 if OK, <=0 if KO
-	 * @throws 	Exception
+	 * @param  SaturneDocuments $objectDocument  Object source to build document.
+	 * @param  Translate        $outputLangs     Lang object to use for output.
+	 * @param  string           $srcTemplatePath Full path of source filename for generator using a template file.
+	 * @param  int              $hideDetails     Do not show line details.
+	 * @param  int              $hideDesc        Do not show desc.
+	 * @param  int              $hideRef         Do not show ref.
+	 * @param  array            $moreParam       More param (Object/user/etc).
+	 * @return int                               1 if OK, <=0 if KO.
+	 * @throws Exception
 	 */
-	public function write_file($object, $outputlangs, $srctemplatepath, $hidedetails, $hidedesc, $hideref, $digiriskelement)
+	public function write_file(SaturneDocuments $objectDocument, Translate $outputLangs, string $srcTemplatePath, int $hideDetails = 0, int $hideDesc = 0, int $hideRef = 0, array $moreParam): int
 	{
 		// phpcs:enable
-		global $user, $langs, $conf, $hookmanager, $action, $mysoc;
+		global $user, $langs, $conf, $hookmanager, $action, $mysoc, $moduleNameLowerCase;
 
-		$digiriskelement = $digiriskelement['object'];
-		$type = $digiriskelement->element_type;
+		$object = $moreParam['object'];
+		$type = $object->element_type;
 
-		if (empty($srctemplatepath)) {
+		if (empty($srcTemplatePath)) {
 			dol_syslog("doc_". $type ."document_odt::write_file parameter srctemplatepath empty", LOG_WARNING);
 			return -1;
 		}
@@ -67,22 +67,26 @@ abstract class ModeleODTDigiriskElementDocument extends CommonDocGenerator
 		}
 		$hookmanager->initHooks(array('odtgeneration'));
 
-		if ( ! is_object($outputlangs)) $outputlangs = $langs;
-		$outputlangs->charset_output                 = 'UTF-8';
+		if ( ! is_object($outputLangs)) $outputLangs = $langs;
+		$outputLangs->charset_output                 = 'UTF-8';
 
-		$outputlangs->loadLangs(array("main", "dict", "companies", "digiriskdolibarr@digiriskdolibarr"));
+		$outputLangs->loadLangs(array("main", "dict", "companies", "digiriskdolibarr@digiriskdolibarr"));
 
 		$refModName = 'DIGIRISKDOLIBARR_' . strtoupper($type) . 'DOCUMENT_ADDON';
 
-		$mod = new $conf->global->$refModName($this->db);
-		$ref = $mod->getNextValue($object);
+		$numberingModules = [
+			'digiriskdolibarrdocuments/informationssharing' => $conf->global->$refModName
+		];
 
-		$object->ref = $ref;
-		$id          = $object->create($user, true, $digiriskelement);
+		list($mod) = saturne_require_objects_mod($numberingModules, $moduleNameLowerCase);
+		$ref = $mod->getNextValue($objectDocument);
 
-		$object->fetch($id);
+		$objectDocument->ref = $ref;
+		$id          = $objectDocument->create($user, true, $object);
 
-		$dir                                             = $conf->digiriskdolibarr->multidir_output[isset($object->entity) ? $object->entity : 1] . '/'. $type .'document/' . $digiriskelement->ref;
+		$objectDocument->fetch($id);
+
+		$dir                                             = $conf->digiriskdolibarr->multidir_output[isset($objectDocument->entity) ? $objectDocument->entity : 1] . '/'. $type .'document/' . $object->ref;
 		$objectref                                       = dol_sanitizeFileName($ref);
 		if (preg_match('/specimen/i', $objectref)) $dir .= '/specimen';
 
@@ -94,21 +98,21 @@ abstract class ModeleODTDigiriskElementDocument extends CommonDocGenerator
 		}
 
 		if (file_exists($dir)) {
-			$filename = preg_split('/'. $type .'document\//', $srctemplatepath);
+			$filename = preg_split('/'. $type .'document\//', $srcTemplatePath);
 			preg_replace('/template_/', '', $filename[1]);
 			$societyname = preg_replace('/\./', '_', $conf->global->MAIN_INFO_SOCIETE_NOM);
 
 			$date     = dol_print_date(dol_now(), 'dayxcard');
-			$filename = $date . '_' . $digiriskelement->ref . '_' . $objectref . '_' . $digiriskelement->label . '_' . $societyname . '.odt';
+			$filename = $date . '_' . $object->ref . '_' . $objectref . '_' . $object->label . '_' . $societyname . '.odt';
 			$filename = str_replace(' ', '_', $filename);
 			$filename = dol_sanitizeFileName($filename);
 			$filename = preg_replace('/[’‘‹›‚]/u', '', $filename);
 
-			$object->last_main_doc = $filename;
+			$objectDocument->last_main_doc = $filename;
 
 			$sql  = "UPDATE " . MAIN_DB_PREFIX . "saturne_object_documents";
 			$sql .= " SET last_main_doc =" . ( ! empty($filename) ? "'" . $this->db->escape($filename) . "'" : 'null');
-			$sql .= " WHERE rowid = " . $object->id;
+			$sql .= " WHERE rowid = " . $objectDocument->id;
 
 			dol_syslog("admin.lib::Insert last main doc", LOG_DEBUG);
 			$this->db->query($sql);
@@ -118,16 +122,16 @@ abstract class ModeleODTDigiriskElementDocument extends CommonDocGenerator
 
 			// Make substitution
 			$substitutionarray = array();
-			complete_substitutions_array($substitutionarray, $langs, $object);
+			complete_substitutions_array($substitutionarray, $langs, $objectDocument);
 			// Call the ODTSubstitution hook
-			$parameters = array('file' => $file, 'object' => $object, 'outputlangs' => $outputlangs, 'substitutionarray' => &$substitutionarray);
-			$hookmanager->executeHooks('ODTSubstitution', $parameters, $this, $action); // Note that $action and $digiriskelement may have been modified by some hooks
+			$parameters = array('file' => $file, 'object' => $objectDocument, 'outputlangs' => $outputLangs, 'substitutionarray' => &$substitutionarray);
+			$hookmanager->executeHooks('ODTSubstitution', $parameters, $this, $action); // Note that $action and $object may have been modified by some hooks
 
 			// Open and load template
 			require_once ODTPHP_PATH . 'odf.php';
 			try {
 				$odfHandler = new odf(
-					$srctemplatepath,
+					$srcTemplatePath,
 					array(
 						'PATH_TO_TMP'	  => $conf->digiriskdolibarr->dir_temp,
 						'ZIP_PROXY'		  => 'PclZipProxy', // PhpZipProxy or PclZipProxy. Got "bad compression method" error when using PhpZipProxy.
@@ -142,29 +146,29 @@ abstract class ModeleODTDigiriskElementDocument extends CommonDocGenerator
 			}
 
 			// Define substitution array
-			$substitutionarray            = getCommonSubstitutionArray($outputlangs, 0, null, $object);
-			$array_object_from_properties = $this->get_substitutionarray_each_var_object($object, $outputlangs);
-			//$array_object = $this->get_substitutionarray_object($object, $outputlangs);
-			$array_soc                   = $this->get_substitutionarray_mysoc($mysoc, $outputlangs);
+			$substitutionarray            = getCommonSubstitutionArray($outputLangs, 0, null, $objectDocument);
+			$array_object_from_properties = $this->get_substitutionarray_each_var_object($objectDocument, $outputLangs);
+			//$array_object = $this->get_substitutionarray_object($object, $outputLangs);
+			$array_soc                   = $this->get_substitutionarray_mysoc($mysoc, $outputLangs);
 			$array_soc['mycompany_logo'] = preg_replace('/_small/', '_mini', $array_soc['mycompany_logo']);
 
 			$tmparray = array_merge($substitutionarray, $array_object_from_properties, $array_soc);
-			complete_substitutions_array($tmparray, $outputlangs, $object);
+			complete_substitutions_array($tmparray, $outputLangs, $objectDocument);
 
 			if (!empty($conf->multicompany->enabled)) {
 				$tmparray['entity'] = 'S'. $conf->entity . ' - ';
 			} else {
 				$tmparray['entity'] = ' ';
 			}
-			$tmparray['nom']         = $digiriskelement->label;
-			$tmparray['reference']   = $digiriskelement->ref;
-			$tmparray['description'] = $digiriskelement->description;
+			$tmparray['nom']         = $object->label;
+			$tmparray['reference']   = $object->ref;
+			$tmparray['description'] = $object->description;
 
-			$filearray = dol_dir_list($conf->digiriskdolibarr->multidir_output[$conf->entity] . '/' . $digiriskelement->element_type . '/' . $digiriskelement->ref . '/thumbs/', "files", 0, '', '(\.odt|_preview.*\.png)$', 'position_name', 'desc', 1);
+			$filearray = dol_dir_list($conf->digiriskdolibarr->multidir_output[$conf->entity] . '/' . $object->element_type . '/' . $object->ref . '/thumbs/', "files", 0, '', '(\.odt|_preview.*\.png)$', 'position_name', 'desc', 1);
 			if (count($filearray)) {
-				if (!empty($digiriskelement->photo)) {
-					$thumb_name               = getThumbName($digiriskelement->photo);
-					$image                    = $conf->digiriskdolibarr->multidir_output[$conf->entity] . '/' . $digiriskelement->element_type . '/' . $digiriskelement->ref . '/thumbs/' . $thumb_name;
+				if (!empty($object->photo)) {
+					$thumb_name               = getThumbName($object->photo);
+					$image                    = $conf->digiriskdolibarr->multidir_output[$conf->entity] . '/' . $object->element_type . '/' . $object->ref . '/thumbs/' . $thumb_name;
 					$tmparray['photoDefault'] = $image;
 				}
 			} else {
@@ -198,14 +202,14 @@ abstract class ModeleODTDigiriskElementDocument extends CommonDocGenerator
 					$ticket    = new Ticket($this->db);
 					$category  = new Categorie($this->db);
 
-					if ( ! empty($digiriskelement) ) {
+					if ( ! empty($object) ) {
 						//Fill risks data
-						$risks = $risk->fetchRisksOrderedByCotation($digiriskelement->id, false, $conf->global->DIGIRISKDOLIBARR_SHOW_INHERITED_RISKS_IN_DOCUMENTS, $conf->global->DIGIRISKDOLIBARR_SHOW_SHARED_RISKS);
+						$risks = $risk->fetchRisksOrderedByCotation($object->id, false, $conf->global->DIGIRISKDOLIBARR_SHOW_INHERITED_RISKS_IN_DOCUMENTS, $conf->global->DIGIRISKDOLIBARR_SHOW_SHARED_RISKS);
 
-						$object->fillRiskData($odfHandler, $object, $outputlangs, $tmparray, $file, $risks, $conf->global->DIGIRISKDOLIBARR_SHOW_SHARED_RISKS);
+						$objectDocument->fillRiskData($odfHandler, $objectDocument, $outputLangs, $tmparray, $file, $risks, $conf->global->DIGIRISKDOLIBARR_SHOW_SHARED_RISKS);
 
 						//Fill evaluators data
-						$evaluators = $evaluator->fetchFromParent($digiriskelement->id);
+						$evaluators = $evaluator->fetchFromParent($object->id);
 						$listlines = $odfHandler->setSegment('utilisateursPresents');
 						if (is_array($evaluators) && !empty($evaluators)) {
 							foreach ($evaluators as $line) {
@@ -223,10 +227,10 @@ abstract class ModeleODTDigiriskElementDocument extends CommonDocGenerator
 
 								unset($tmparray['object_fields']);
 
-								complete_substitutions_array($tmparray, $outputlangs, $object, $line, "completesubstitutionarray_lines");
+								complete_substitutions_array($tmparray, $outputLangs, $objectDocument, $line, "completesubstitutionarray_lines");
 								// Call the ODTSubstitutionLine hook
-								$parameters = array('odfHandler' => &$odfHandler, 'file' => $file, 'object' => $object, 'outputlangs' => $outputlangs, 'substitutionarray' => &$tmparray, 'line' => $line);
-								$hookmanager->executeHooks('ODTSubstitutionLine', $parameters, $this, $action); // Note that $action and $object may have been modified by some hooks
+								$parameters = array('odfHandler' => &$odfHandler, 'file' => $file, 'object' => $objectDocument, 'outputlangs' => $outputLangs, 'substitutionarray' => &$tmparray, 'line' => $line);
+								$hookmanager->executeHooks('ODTSubstitutionLine', $parameters, $this, $action); // Note that $action and $objectDocument may have been modified by some hooks
 								foreach ($tmparray as $key => $val) {
 									try {
 										if (file_exists($val)) {
@@ -268,7 +272,7 @@ abstract class ModeleODTDigiriskElementDocument extends CommonDocGenerator
 						$odfHandler->mergeSegment($listlines);
 
 						//Fill risk signs data
-						$risksigns = $risksign->fetchRiskSign($digiriskelement->id, $conf->global->DIGIRISKDOLIBARR_SHOW_INHERITED_RISKSIGNS, $conf->global->DIGIRISKDOLIBARR_SHOW_SHARED_RISKSIGNS);
+						$risksigns = $risksign->fetchRiskSign($object->id, $conf->global->DIGIRISKDOLIBARR_SHOW_INHERITED_RISKSIGNS, $conf->global->DIGIRISKDOLIBARR_SHOW_SHARED_RISKSIGNS);
 						$listlines = $odfHandler->setSegment('affectedRecommandation');
 						if (is_array($risksigns) && !empty($risksigns)) {
 							foreach ($risksigns as $line) {
@@ -285,10 +289,10 @@ abstract class ModeleODTDigiriskElementDocument extends CommonDocGenerator
 
 									unset($tmparray['object_fields']);
 
-									complete_substitutions_array($tmparray, $outputlangs, $object, $line, "completesubstitutionarray_lines");
+									complete_substitutions_array($tmparray, $outputLangs, $objectDocument, $line, "completesubstitutionarray_lines");
 									// Call the ODTSubstitutionLine hook
-									$parameters = array('odfHandler' => &$odfHandler, 'file' => $file, 'object' => $object, 'outputlangs' => $outputlangs, 'substitutionarray' => &$tmparray, 'line' => $line);
-									$hookmanager->executeHooks('ODTSubstitutionLine', $parameters, $this, $action); // Note that $action and $object may have been modified by some hooks
+									$parameters = array('odfHandler' => &$odfHandler, 'file' => $file, 'object' => $objectDocument, 'outputlangs' => $outputLangs, 'substitutionarray' => &$tmparray, 'line' => $line);
+									$hookmanager->executeHooks('ODTSubstitutionLine', $parameters, $this, $action); // Note that $action and $objectDocument may have been modified by some hooks
 									foreach ($tmparray as $key => $val) {
 										try {
 											if (file_exists($val)) {
@@ -329,7 +333,7 @@ abstract class ModeleODTDigiriskElementDocument extends CommonDocGenerator
 						$odfHandler->mergeSegment($listlines);
 
 						//Fill accidents data
-						$accidents = $accident->fetchFromParent($digiriskelement->id);
+						$accidents = $accident->fetchFromParent($object->id);
 						$listlines = $odfHandler->setSegment('affectedAccident');
 						if (is_array($accidents) && !empty($accidents)) {
 							foreach ($accidents as $line) {
@@ -358,10 +362,10 @@ abstract class ModeleODTDigiriskElementDocument extends CommonDocGenerator
 
 								unset($tmparray['object_fields']);
 
-								complete_substitutions_array($tmparray, $outputlangs, $object, $line, "completesubstitutionarray_lines");
+								complete_substitutions_array($tmparray, $outputLangs, $objectDocument, $line, "completesubstitutionarray_lines");
 								// Call the ODTSubstitutionLine hook
-								$parameters = array('odfHandler' => &$odfHandler, 'file' => $file, 'object' => $object, 'outputlangs' => $outputlangs, 'substitutionarray' => &$tmparray, 'line' => $line);
-								$hookmanager->executeHooks('ODTSubstitutionLine', $parameters, $this, $action); // Note that $action and $object may have been modified by some hooks
+								$parameters = array('odfHandler' => &$odfHandler, 'file' => $file, 'object' => $objectDocument, 'outputlangs' => $outputLangs, 'substitutionarray' => &$tmparray, 'line' => $line);
+								$hookmanager->executeHooks('ODTSubstitutionLine', $parameters, $this, $action); // Note that $action and $objectDocument may have been modified by some hooks
 								foreach ($tmparray as $key => $val) {
 									try {
 										if (file_exists($val)) {
@@ -402,7 +406,7 @@ abstract class ModeleODTDigiriskElementDocument extends CommonDocGenerator
 
 						//Fill tickets data
 						if (dolibarr_get_const($this->db, 'DIGIRISKDOLIBARR_TICKET_EXTRAFIELDS', 0)) {
-							$filter = array('ef.digiriskdolibarr_ticket_service' => $digiriskelement->id);
+							$filter = array('ef.digiriskdolibarr_ticket_service' => $object->id);
 							$ticket->fetchAll($user, '', '', '', 0, '', $filter);
 						}
 						$listlines = $odfHandler->setSegment('tickets');
@@ -432,10 +436,10 @@ abstract class ModeleODTDigiriskElementDocument extends CommonDocGenerator
 
 								unset($tmparray['object_fields']);
 
-								complete_substitutions_array($tmparray, $outputlangs, $object, $line, "completesubstitutionarray_lines");
+								complete_substitutions_array($tmparray, $outputLangs, $objectDocument, $line, "completesubstitutionarray_lines");
 								// Call the ODTSubstitutionLine hook
-								$parameters = array('odfHandler' => &$odfHandler, 'file' => $file, 'object' => $object, 'outputlangs' => $outputlangs, 'substitutionarray' => &$tmparray, 'line' => $line);
-								$hookmanager->executeHooks('ODTSubstitutionLine', $parameters, $this, $action); // Note that $action and $object may have been modified by some hooks
+								$parameters = array('odfHandler' => &$odfHandler, 'file' => $file, 'object' => $objectDocument, 'outputlangs' => $outputLangs, 'substitutionarray' => &$tmparray, 'line' => $line);
+								$hookmanager->executeHooks('ODTSubstitutionLine', $parameters, $this, $action); // Note that $action and $objectDocument may have been modified by some hooks
 								foreach ($tmparray as $key => $val) {
 									try {
 										if (file_exists($val)) {
@@ -484,7 +488,7 @@ abstract class ModeleODTDigiriskElementDocument extends CommonDocGenerator
 			}
 
 			// Replace labels translated
-			$tmparray = $outputlangs->get_translations_for_substitutions();
+			$tmparray = $outputLangs->get_translations_for_substitutions();
 			foreach ($tmparray as $key => $value) {
 				try {
 					$odfHandler->setVars($key, $value, true, 'UTF-8');
@@ -494,8 +498,8 @@ abstract class ModeleODTDigiriskElementDocument extends CommonDocGenerator
 			}
 
 			// Call the beforeODTSave hook
-			$parameters = array('odfHandler' => &$odfHandler, 'file' => $file, 'object' => $object, 'outputlangs' => $outputlangs, 'substitutionarray' => &$tmparray);
-			$hookmanager->executeHooks('beforeODTSave', $parameters, $this, $action); // Note that $action and $object may have been modified by some hooks
+			$parameters = array('odfHandler' => &$odfHandler, 'file' => $file, 'object' => $objectDocument, 'outputlangs' => $outputLangs, 'substitutionarray' => &$tmparray);
+			$hookmanager->executeHooks('beforeODTSave', $parameters, $this, $action); // Note that $action and $objectDocument may have been modified by some hooks
 
 			$fileInfos = pathinfo($filename);
 			$pdfName   = $fileInfos['filename'] . '.pdf';
@@ -520,8 +524,8 @@ abstract class ModeleODTDigiriskElementDocument extends CommonDocGenerator
 				}
 			}
 
-			$parameters = array('odfHandler' => &$odfHandler, 'file' => $file, 'object' => $object, 'outputlangs' => $outputlangs, 'substitutionarray' => &$tmparray);
-			$hookmanager->executeHooks('afterODTCreation', $parameters, $this, $action); // Note that $action and $object may have been modified by some hooks
+			$parameters = array('odfHandler' => &$odfHandler, 'file' => $file, 'object' => $objectDocument, 'outputlangs' => $outputLangs, 'substitutionarray' => &$tmparray);
+			$hookmanager->executeHooks('afterODTCreation', $parameters, $this, $action); // Note that $action and $objectDocument may have been modified by some hooks
 
 //			if ( ! empty($conf->global->MAIN_UMASK))
 //				@chmod($file, octdec($conf->global->MAIN_UMASK));

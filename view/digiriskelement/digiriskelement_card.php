@@ -134,9 +134,10 @@ if (empty($reshook)) {
 	if ($action == 'view' && $permissiontoadd) {
 		header('Location: ' . $backtopage);
 	}
-
+	$object->element = $object->element_type;
 	// Actions builddoc, forcebuilddoc, remove_file.
 	require_once __DIR__ . '/../../../saturne/core/tpl/documents/documents_action.tpl.php';
+	$object->element = 'digiriskelement';
 
 	// Action to generate pdf from odt file
 	require_once __DIR__ . '/../../core/tpl/documents/digiriskdolibarr_manual_pdf_generation_action.tpl.php';
@@ -385,7 +386,7 @@ if ((empty($action) || ($action != 'edit' && $action != 'create'))) {
 	print '<input type="checkbox" id="show_in_selectorshow_in_selector" name="show_in_selectorshow_in_selector"' . (($object->show_in_selector == 0) ?  '' : ' checked=""') . '" disabled> ';
 	print '</td></tr>';
 
-	print '<tr class="linked-medias digirisk-element-photo-'. $object->id .'"><td class=""><label for="photos">' . $langs->trans("Photo") . '</label></td><td class="linked-medias-list" style="display: flex; margin-left: 10px; height: auto;">';
+	print '<tr class="linked-medias digirisk-element-photo-'. $object->id .'"><td class=""><label for="photos">' . $langs->trans("Photo") . '</label></td><td class="linked-medias-list" style="display: flex; gap: 10px; height: auto;">';
 	print '<span class="add-medias" '. (($object->status != $object::STATUS_LOCKED) ? "" : "style='display:none'") . '>';
 	print '<input hidden multiple class="fast-upload" id="fast-upload-photo-default" type="file" name="userfile[]" capture="environment" accept="image/*">';
 	print '<label for="fast-upload-photo-default">';
