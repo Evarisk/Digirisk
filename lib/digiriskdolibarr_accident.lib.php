@@ -27,14 +27,14 @@
  * @param	Accident $object Accident
  * @return 	array					Array of tabs
  */
-function accidentPrepareHead($object)
+function accident_prepare_head($object)
 {
-	global $langs, $conf, $user;
+	global $langs, $user;
 
-	$langs->load("digiriskdolibarr@digiriskdolibarr");
+	saturne_load_langs();
 
 	$h    = 0;
-	$head = array();
+	$head = [];
 
 	if ($user->rights->digiriskdolibarr->accident->read) {
 		$head[$h][0] = dol_buildpath("/digiriskdolibarr/view/accident/accident_card.php", 1) . '?id=' . $object->id;
@@ -50,30 +50,9 @@ function accidentPrepareHead($object)
 		$head[$h][0] = dol_buildpath("/digiriskdolibarr/view/accident/accident_metadata_lesion.php", 1) . '?id=' . $object->id;
 		$head[$h][1] = '<i class="fas fa-info-circle"></i> ' . $langs->trans("AccidentMetaDataLesion");
 		$head[$h][2] = 'accidentMetadataLesion';
-		$h++;
-
-		$head[$h][0] = dol_buildpath("/digiriskdolibarr/view/accident/accident_attendants.php", 1) . '?id=' . $object->id;
-		$head[$h][1] = '<i class="fas fa-file-signature"></i> ' . $langs->trans("Signature");
-		$head[$h][2] = 'accidentAttendants';
-		$h++;
-
-		$head[$h][0] = dol_buildpath("/digiriskdolibarr/view/accident/accident_document.php", 1) . '?id=' . $object->id;
-		$head[$h][1] = '<i class="fas fa-file-alt"></i> ' . $langs->trans("Documents");
-		$head[$h][2] = 'accidentDocument';
-		$h++;
-
-		//      $head[$h][0] = dol_buildpath("/digiriskdolibarr/view/accident/accident_document_metadata.php", 1) . '?id=' . $object->id;
-		//      $head[$h][1] = '<i class="fas fa-file-alt"></i> ' . $langs->trans("DocumentsMetaData");
-		//      $head[$h][2] = 'accidentDocumentMetaData';
-		//      $h++;
-
-		$head[$h][0] = dol_buildpath("/digiriskdolibarr/view/accident/accident_agenda.php", 1) . '?id=' . $object->id;
-		$head[$h][1] = '<i class="fas fa-calendar"></i> ' . $langs->trans("Events");
-		$head[$h][2] = 'accidentAgenda';
-		$h++;
 	}
 
-	complete_head_from_modules($conf, $langs, $object, $head, $h, 'accident@digiriskdolibarr');
+	$moreparam['attendantTableMode'] = 'simple';
 
-	return $head;
+	return saturne_object_prepare_head($object, $head, $moreparam, true);
 }

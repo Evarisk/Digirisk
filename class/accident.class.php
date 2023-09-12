@@ -102,19 +102,10 @@ class Accident extends SaturneObject
 	 */
 	public $picto = 'accident@digiriskdolibarr';
 
-	/**
-	 * @var string Label status of const.
-	 */
-	public $labelStatus;
-
-	/**
-	 * @var string Label status short of const.
-	 */
-	public $labelStatusShort;
-
-	const STATUS_DELETED = -1;
-	const STATUS_DRAFT   = 1;
-	const STATUS_LOCKED  = 2;
+	const STATUS_DELETED   = -1;
+	const STATUS_DRAFT     = 0;
+	const STATUS_VALIDATED = 1;
+	const STATUS_LOCKED    = 2;
 
 	/**
 	 * 'type' field format:
@@ -212,46 +203,7 @@ class Accident extends SaturneObject
 	 */
 	public function __construct(DoliDB $db)
 	{
-		global $conf, $langs;
-
-		$this->db = $db;
-
-		if (empty($conf->global->MAIN_SHOW_TECHNICAL_ID) && isset($this->fields['rowid'])) $this->fields['rowid']['visible'] = 0;
-		if (empty($conf->multicompany->enabled) && isset($this->fields['entity'])) $this->fields['entity']['enabled']        = 0;
-
-		// Unset fields that are disabled
-		foreach ($this->fields as $key => $val) {
-			if (isset($val['enabled']) && empty($val['enabled'])) {
-				unset($this->fields[$key]);
-			}
-		}
-
-		// Translate some data of arrayofkeyval
-		if (is_object($langs)) {
-			foreach ($this->fields as $key => $val) {
-				if (is_array($val['arrayofkeyval'])) {
-					foreach ($val['arrayofkeyval'] as $key2 => $val2) {
-						$this->fields[$key]['arrayofkeyval'][$key2] = $langs->trans($val2);
-					}
-				}
-			}
-		}
-	}
-
-
-	/**
-	 * Create object into database
-	 *
-	 * @param  User $user      User that creates
-	 * @param  bool $notrigger false=launch triggers after, true=disable triggers
-	 * @return int             <0 if KO, Id of created object if OK
-	 */
-	public function create(User $user, bool $notrigger = false): int
-	{
-		global $conf;
-
-		$this->element = $this->element . '@digiriskdolibarr';
-		return $this->createCommon($user, $notrigger);
+		return parent::__construct($db, $this->module, $this->element);
 	}
 
 	/**
@@ -279,20 +231,27 @@ class Accident extends SaturneObject
 	{
 		if (empty($this->labelStatus) || empty($this->labelStatusShort)) {
 			global $langs;
-			$langs->load("digiriskdolibarr@digiriskdolibarr");
 
-			$this->labelStatus[self::STATUS_DRAFT]  = $langs->transnoentitiesnoconv('InProgress');
-			$this->labelStatus[self::STATUS_LOCKED] = $langs->transnoentitiesnoconv('Locked');
+			$this->labelStatus[self::STATUS_DELETED]   = $langs->transnoentitiesnoconv('Deleted');
+			$this->labelStatus[self::STATUS_VALIDATED] = $langs->transnoentitiesnoconv('StatusDraft');
+			$this->labelStatus[self::STATUS_LOCKED]    = $langs->transnoentitiesnoconv('Locked');
 
-			$this->labelStatusShort[self::STATUS_DRAFT]  = $langs->transnoentitiesnoconv('InProgress');
-			$this->labelStatusShort[self::STATUS_LOCKED] = $langs->transnoentitiesnoconv('Locked');
+			$this->labelStatusShort[self::STATUS_DELETED]   = $langs->transnoentitiesnoconv('Deleted');
+			$this->labelStatusShort[self::STATUS_VALIDATED] = $langs->transnoentitiesnoconv('InProgress');
+			$this->labelStatusShort[self::STATUS_LOCKED]    = $langs->transnoentitiesnoconv('Locked');
 
 		}
 
 		$statusType = 'status' . $status;
 
+		if ($status == self::STATUS_VALIDATED) {
+			$statusType = 'status4';
+		}
 		if ($status == self::STATUS_LOCKED) {
 			$statusType = 'status6';
+		}
+		if ($status == self::STATUS_DELETED) {
+			$statusType = 'status9';
 		}
 
 		return dolGetStatus($this->labelStatus[$status], $this->labelStatusShort[$status], '', $statusType, $mode);
@@ -586,8 +545,13 @@ class Accident extends SaturneObject
  *	Class to manage accident workstop.
  *  Saved into database table llx_digiriskdolibarr_accident_workstop
  */
-class AccidentWorkStop extends CommonObjectLine
+class AccidentWorkStop extends SaturneObject
 {
+	/**
+	 * @var string Module name.
+	 */
+	public $module = 'digiriskdolibarr';
+
 	/**
 	 * @var DoliDB Database handler.
 	 */
@@ -612,6 +576,8 @@ class AccidentWorkStop extends CommonObjectLine
 	 * @var string Name of table without prefix where object is stored
 	 */
 	public $table_element = 'digiriskdolibarr_accident_workstop';
+
+	const STATUS_DELETED = -1;
 
 	/**
 	 * @var array  Array with all fields and their property. Do not use it as a static var. It may be modified by constructor.
@@ -649,50 +615,7 @@ class AccidentWorkStop extends CommonObjectLine
 	 */
 	public function __construct(DoliDB $db)
 	{
-		global $conf;
-
-		$this->db = $db;
-
-		if (empty($conf->global->MAIN_SHOW_TECHNICAL_ID) && isset($this->fields['rowid'])) $this->fields['rowid']['visible'] = 0;
-		if (empty($conf->multicompany->enabled) && isset($this->fields['entity'])) $this->fields['entity']['enabled']        = 0;
-	}
-
-	/**
-	 *    Load invoice line from database
-	 *
-	 * @param int $rowid id of invoice line to get
-	 * @return    int                    <0 if KO, >0 if OK
-	 */
-	public function fetch($rowid)
-	{
-		global $db;
-
-		$sql  = 'SELECT t.rowid, t.ref, t.date_creation, t.status, t.workstop_days, t.date_start_workstop, t.date_end_workstop, t.declaration_link, t.fk_accident';
-		$sql .= ' FROM ' . MAIN_DB_PREFIX . 'digiriskdolibarr_accident_workstop as t';
-		$sql .= ' WHERE t.rowid = ' . $rowid;
-		$sql .= ' AND entity IN (' . getEntity($this->table_element) . ')';
-
-		$result = $db->query($sql);
-		if ($result) {
-			$objp = $db->fetch_object($result);
-
-			$this->id                  = $objp->rowid;
-			$this->ref                 = $objp->ref;
-			$this->date_creation       = $objp->date_creation;
-			$this->status              = $objp->status;
-			$this->workstop_days       = $objp->workstop_days;
-			$this->date_start_workstop = $objp->date_start_workstop;
-			$this->date_end_workstop   = $objp->date_end_workstop;
-			$this->declaration_link    = $objp->declaration_link;
-			$this->fk_accident         = $objp->fk_accident;
-
-			$db->free($result);
-
-			return 1;
-		} else {
-			$this->error = $db->lasterror();
-			return -1;
-		}
+		return parent::__construct($db, $this->module, $this->element);
 	}
 
 	/**
@@ -803,76 +726,19 @@ class AccidentWorkStop extends CommonObjectLine
 			return -2;
 		}
 	}
-
-	/**
-	 *    Update line into database
-	 *
-	 * @param string $user User object
-	 * @param bool $notrigger Disable triggers
-	 * @return        int                    <0 if KO, >0 if OK
-	 * @throws Exception
-	 */
-	public function update($user = '', $notrigger = false)
-	{
-		global $user, $db, $conf;
-
-		$db->begin();
-		$sql  = "UPDATE " . MAIN_DB_PREFIX . "digiriskdolibarr_accident_workstop SET";
-		$sql .= " ref='" . $db->escape($this->ref) . "',";
-		$sql .= " status=" . $this->status . ",";
-		$sql .= " workstop_days=" . $this->workstop_days . ",";
-		$sql .= " date_start_workstop='" . $db->escape($db->idate($this->date_start_workstop)) . "',";
-		$sql .= " date_end_workstop='" . $db->escape($db->idate($this->date_end_workstop)) . "',";
-		$sql .= " declaration_link='" . $this->declaration_link . "',";
-		$sql .= " fk_accident=" . $db->escape($this->fk_accident);
-		$sql .= " WHERE rowid = " . $this->id;
-
-		dol_syslog(get_class($this) . "::update", LOG_DEBUG);
-		$resql = $db->query($sql);
-
-		if ($resql) {
-			$db->commit();
-			// Triggers
-			if ( ! $notrigger) {
-				// Call triggers
-				if (!empty($conf->global->DIGIRISKDOLIBARR_MAIN_AGENDA_ACTIONAUTO_ACCIDENT_WORKSTOP_MODIFY)) $this->call_trigger(strtoupper(get_class($this)) . '_MODIFY', $user);
-				// End call triggers
-			}
-			return 1;
-		} else {
-			$this->error = $db->error();
-			$db->rollback();
-			return -2;
-		}
-	}
-
-	/**
-	 *    Delete line in database
-	 *
-	 * @param User $user
-	 * @param bool $notrigger
-	 * @return        int                   <0 if KO, >0 if OK
-	 * @throws Exception
-	 */
-	public function delete(User $user, $notrigger = false)
-	{
-		global $conf;
-		// Triggers
-		if ( ! $notrigger) {
-			// Call trigger
-			if (!empty($conf->global->DIGIRISKDOLIBARR_MAIN_AGENDA_ACTIONAUTO_ACCIDENT_WORKSTOP_DELETE)) $this->call_trigger(strtoupper(get_class($this)) . '_DELETE', $user);
-			// End call triggers
-		}
-		return $this->update($user, true);
-	}
 }
 
 /**
  *	Class to manage accident metadata.
  *  Saved into database table llx_digiriskdolibarr_accident_metadata
  */
-class AccidentMetaData extends CommonObject
+class AccidentMetaData extends SaturneObject
 {
+	/**
+	 * @var string Module name.
+	 */
+	public $module = 'digiriskdolibarr';
+
 	/**
 	 * @var DoliDB Database handler.
 	 */
@@ -889,8 +755,7 @@ class AccidentMetaData extends CommonObject
 	public $id;
 
 	/**
-	 * @var int  Does this object support multicompany module ?
-	 * 0=No test on entity, 1=Test with field entity, 'field@table'=Test with link by field@table
+	 * @var string ID to identify managed object.
 	 */
 	public $element = 'accidentmetadata';
 
@@ -908,7 +773,7 @@ class AccidentMetaData extends CommonObject
 	/**
 	 * @var int  Does object support extrafields ? 0=No, 1=Yes
 	 */
-	public $isextrafieldmanaged = 1;
+	public int $isextrafieldmanaged = 1;
 
 	/**
 	 * @var string String with name of icon for digiriskelement. Must be the part after the 'object_' into object_digiriskelement.png
@@ -1003,41 +868,18 @@ class AccidentMetaData extends CommonObject
 	 */
 	public function __construct(DoliDB $db)
 	{
-		global $conf, $langs;
-
-		$this->db = $db;
-
-		if (empty($conf->global->MAIN_SHOW_TECHNICAL_ID) && isset($this->fields['rowid'])) $this->fields['rowid']['visible'] = 0;
-		if (empty($conf->multicompany->enabled) && isset($this->fields['entity'])) $this->fields['entity']['enabled']        = 0;
-
-		// Unset fields that are disabled
-		foreach ($this->fields as $key => $val) {
-			if (isset($val['enabled']) && empty($val['enabled'])) {
-				unset($this->fields[$key]);
-			}
-		}
-
-		// Translate some data of arrayofkeyval
-		if (is_object($langs)) {
-			foreach ($this->fields as $key => $val) {
-				if (is_array($val['arrayofkeyval'])) {
-					foreach ($val['arrayofkeyval'] as $key2 => $val2) {
-						$this->fields[$key]['arrayofkeyval'][$key2] = $langs->trans($val2);
-					}
-				}
-			}
-		}
+		return parent::__construct($db, $this->module, $this->element);
 	}
 
 	/**
 	 * Create object into database
 	 *
-	 * @param User $user User that creates
-	 * @param bool $notrigger false=launch triggers after, true=disable triggers
+	 * @param  User $user      User that creates
+	 * @param  bool $notrigger false=launch triggers after, true=disable triggers
 	 * @return int             <0 if KO, Id of created object if OK
 	 * @throws Exception
 	 */
-	public function create(User $user, $notrigger = false)
+	public function create(User $user, bool $notrigger = false): int
 	{
 		$result = $this->createCommon($user, $notrigger);
 
@@ -1055,27 +897,19 @@ class AccidentMetaData extends CommonObject
 
 		return $result;
 	}
-
-	/**
-	 * Load object in memory from the database
-	 *
-	 * @param	int    $id				Id object
-	 * @param	string $ref				Ref
-	 * @param	string	$morewhere		More SQL filters (' AND ...')
-	 * @return 	int         			<0 if KO, 0 if not found, >0 if OK
-	 */
-	public function fetch($id, $ref = null, $morewhere = '')
-	{
-		return $this->fetchCommon($id, $ref, $morewhere);
-	}
 }
 
 /**
  *	Class to manage accident lesion.
  *  Saved into database table llx_digiriskdolibarr_accident_lesion
  */
-class AccidentLesion extends CommonObjectLine
+class AccidentLesion extends SaturneObject
 {
+	/**
+	 * @var string Module name.
+	 */
+	public $module = 'digiriskdolibarr';
+
 	/**
 	 * @var DoliDB Database handler.
 	 */
@@ -1131,47 +965,7 @@ class AccidentLesion extends CommonObjectLine
 	 */
 	public function __construct(DoliDB $db)
 	{
-		global $conf;
-
-		$this->db = $db;
-
-		if (empty($conf->global->MAIN_SHOW_TECHNICAL_ID) && isset($this->fields['rowid'])) $this->fields['rowid']['visible'] = 0;
-		if (empty($conf->multicompany->enabled) && isset($this->fields['entity'])) $this->fields['entity']['enabled']        = 0;
-	}
-
-	/**
-	 *    Load accident lesion from database
-	 *
-	 * @param int $rowid id of accident lesion to get
-	 * @return    int                    <0 if KO, >0 if OK
-	 */
-	public function fetch($rowid)
-	{
-		global $db;
-
-		$sql  = 'SELECT t.rowid, t.ref, t.date_creation, t.lesion_localization, t.lesion_nature, t.fk_accident';
-		$sql .= ' FROM ' . MAIN_DB_PREFIX . 'digiriskdolibarr_accident_lesion as t';
-		$sql .= ' WHERE t.rowid = ' . $rowid;
-		$sql .= ' AND entity IN (' . getEntity($this->table_element) . ')';
-
-		$result = $db->query($sql);
-		if ($result) {
-			$objp = $db->fetch_object($result);
-
-			$this->id                  = $objp->rowid;
-			$this->ref                 = $objp->ref;
-			$this->date_creation       = $objp->date_creation;
-			$this->lesion_localization = $objp->lesion_localization;
-			$this->lesion_nature       = $objp->lesion_nature;
-			$this->fk_accident         = $objp->fk_accident;
-
-			$db->free($result);
-
-			return 1;
-		} else {
-			$this->error = $db->lasterror();
-			return -1;
-		}
+		return parent::__construct($db, $this->module, $this->element);
 	}
 
 	/**
@@ -1275,77 +1069,6 @@ class AccidentLesion extends CommonObjectLine
 			$this->error = $db->lasterror();
 			$db->rollback();
 			return -2;
-		}
-	}
-
-	/**
-	 *    Update line into database
-	 *
-	 * @param string $user User object
-	 * @param bool $notrigger Disable triggers
-	 * @return        int                    <0 if KO, >0 if OK
-	 * @throws Exception
-	 */
-	public function update($user = '', $notrigger = false)
-	{
-		global $user, $db, $conf;
-
-		$db->begin();
-		$sql  = "UPDATE " . MAIN_DB_PREFIX . "digiriskdolibarr_accident_lesion SET";
-		$sql .= " ref='" . $db->escape($this->ref) . "',";
-		$sql .= " lesion_localization='" . $db->escape($this->lesion_localization) . "',";
-		$sql .= " lesion_nature='" . $db->escape($this->lesion_nature) . "',";
-		$sql .= " fk_accident=" . $db->escape($this->fk_accident);
-		$sql .= " WHERE rowid = " . $this->id;
-
-		dol_syslog(get_class($this) . "::update", LOG_DEBUG);
-		$resql = $db->query($sql);
-
-		if ($resql) {
-			$db->commit();
-			// Triggers
-			if ( ! $notrigger) {
-				// Call triggers
-				if (!empty($conf->global->DIGIRISKDOLIBARR_MAIN_AGENDA_ACTIONAUTO_ACCIDENT_LESION_MODIFY)) $this->call_trigger(strtoupper(get_class($this)) . '_MODIFY', $user);
-				// End call triggers
-			}
-			return 1;
-		} else {
-			$this->error = $db->error();
-			$db->rollback();
-			return -2;
-		}
-	}
-
-	/**
-	 *    Delete line in database
-	 *
-	 * @param User $user
-	 * @param bool $notrigger
-	 * @return        int                   <0 if KO, >0 if OK
-	 * @throws Exception
-	 */
-	public function delete(User $user, $notrigger = false)
-	{
-		global $user, $db, $conf;
-
-		$db->begin();
-
-		$sql = "DELETE FROM " . MAIN_DB_PREFIX . "digiriskdolibarr_accident_lesion WHERE rowid = " . $this->id;
-		dol_syslog(get_class($this) . "::delete", LOG_DEBUG);
-		if ($db->query($sql)) {
-			$db->commit();
-			// Triggers
-			if ( ! $notrigger) {
-				// Call trigger
-				if (!empty($conf->global->DIGIRISKDOLIBARR_MAIN_AGENDA_ACTIONAUTO_ACCIDENT_LESION_DELETE)) $this->call_trigger(strtoupper(get_class($this)) . '_DELETE', $user);
-				// End call triggers
-			}
-			return 1;
-		} else {
-			$this->error = $db->error() . " sql=" . $sql;
-			$db->rollback();
-			return -1;
 		}
 	}
 }

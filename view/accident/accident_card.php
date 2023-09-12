@@ -45,7 +45,7 @@ require_once __DIR__ . '/../../core/modules/digiriskdolibarr/digiriskelement/acc
 global $conf, $db, $hookmanager, $langs, $mysoc, $user;
 
 // Load translation files required by the page
-saturne_load_langs(['other']);
+saturne_load_langs();
 
 // Get parameters
 $id                  = GETPOST('id', 'int');
@@ -137,7 +137,7 @@ if (empty($reshook)) {
 		$object->date_creation     = $object->db->idate($now);
 		$object->tms               = $now;
 		$object->import_key        = "";
-		$object->status            = Accident::STATUS_DRAFT;
+		$object->status            = Accident::STATUS_VALIDATED;
 		$object->label             = $label;
 		$object->description       = $description;
 		$object->accident_type     = $accident_type;
@@ -389,24 +389,6 @@ if (empty($reshook)) {
 		}
 	}
 
-	// Action to delete record
-	if ($action == 'confirm_delete' && $permissiontodelete) {
-		$result = $object->delete($user);
-
-		if ($result < 0) {
-			// Delete accident KO
-			if (!empty($object->errors)) {
-				setEventMessages('', $object->errors, 'errors');
-			} else {
-				setEventMessages($object->error, [], 'errors');
-			}
-		}
-		// Delete accident OK
-		$urltogo = str_replace('accident_card.php', 'accident_list.php', $_SERVER["PHP_SELF"]);
-		header("Location: " . $urltogo);
-		exit;
-	}
-
 	// Action to add line
 	if ($action == 'addLine' && $permissiontoadd) {
 		// Get parameters
@@ -623,34 +605,20 @@ if (empty($reshook)) {
 		$action = '';
 	}
 
-	// Action to set status STATUS_LOCKED
-	if ($action == 'confirm_lock') {
-		$object->fetch($id);
-		$result = $object->setStatusCommon($user, Accident::STATUS_LOCKED, false, 'ACCIDENT_LOCK');
-		if ($result > 0) {
-			// Set Locked OK
-			setEventMessages($langs->trans('ObjectLockedTrigger', $langs->transnoentities(ucfirst($object->element)), $object->ref), []);
-			$urltogo = str_replace('__ID__', $result, $backtopage);
-			$urltogo = preg_replace('/--IDFORBACKTOPAGE--/', $id, $urltogo);
-			header('Location: ' . $urltogo);
-			exit;
-		} elseif (!empty($object->errors)) { // Set Locked KO.
-			setEventMessages('', $object->errors, 'errors');
-		} else {
-			setEventMessages($object->error, [], 'errors');
-		}
-	}
+	// Actions cancel, add, update, update_extras, confirm_validate, confirm_delete, confirm_deleteline, confirm_clone, confirm_close, confirm_setdraft, confirm_reopen
+	require_once DOL_DOCUMENT_ROOT . '/core/actions_addupdatedelete.inc.php';
+
+	// Action confirm_lock, confirm_archive.
+	require_once __DIR__ . '/../../../saturne/core/tpl/signature/signature_action_workflow.tpl.php';
 }
 
 /*
  * View
  */
 
-$form     = new Form($db);
-$title    = $langs->trans("Accident");
-$helpUrl  = 'FR:Module_Digirisk#DigiRisk_-_Accident_b.C3.A9nins_et_presque_accidents';
-$morejs   = ["/digiriskdolibarr/js/digiriskdolibarr.js"];
-$morecss  = ["/digiriskdolibarr/css/digiriskdolibarr.css"];
+$form    = new Form($db);
+$title   = $langs->trans("Accident");
+$helpUrl = 'FR:Module_Digirisk#DigiRisk_-_Accident_b.C3.A9nins_et_presque_accidents';
 
 if ($conf->browser->layout == 'phone') {
 	$onPhone = 1;
@@ -658,7 +626,7 @@ if ($conf->browser->layout == 'phone') {
 	$onPhone = 0;
 }
 
-saturne_header(0,'', $title, $helpUrl, '', 0, 0, $morejs, $morecss);
+saturne_header(0,'', $title, $helpUrl);
 
 // Part to create
 if ($action == 'create') {
@@ -868,36 +836,6 @@ if (($id || $ref) && $action == 'edit') {
 	print '</form>';
 }
 
-$formConfirm = '';
-
-// Confirmation to delete
-if ($action == 'delete' && $permissiontodelete) {
-	$formConfirm = $form->formconfirm($_SERVER["PHP_SELF"].'?id=' . $object->id, $langs->trans('DeleteAccident'), $langs->trans('ConfirmDeleteAccident'), 'confirm_delete', '', 0, 1);
-}
-
-// Confirmation to delete line
-if ($action == 'deleteline') {
-	$objectline->fetch($lineid);
-	$formConfirm = $form->formconfirm($_SERVER["PHP_SELF"] . '?id=' . $object->id . '&lineid=' . $lineid, $langs->trans('DeleteAccidentWorkStop'), $langs->trans('ConfirmDeleteAccidentWorkStop', $objectline->ref), 'confirm_deleteLine', '', 0, 1);
-}
-
-// Confirmation to delete
-if ($action == 'set_lock') {
-	$formConfirm = $form->formconfirm($_SERVER["PHP_SELF"].'?id=' . $object->id, $langs->trans('LockObject', $langs->transnoentities('The' . ucfirst($object->element))), $langs->trans('ConfirmLockObject', $langs->transnoentities('The' . ucfirst($object->element))), 'confirm_lock', '', 0, 1);
-}
-
-// Call Hook formConfirm.
-$parameters = ['formConfirm' => $formConfirm];
-$reshook    = $hookmanager->executeHooks('formConfirm', $parameters, $object, $action); // Note that $action and $object may have been modified by hook.
-if (empty($reshook)) {
-	$formConfirm .= $hookmanager->resPrint;
-} elseif ($reshook > 0) {
-	$formConfirm = $hookmanager->resPrint;
-}
-
-// Print form confirm
-print $formConfirm;
-
 // Part to show record
 if ((empty($action) || ($action != 'create' && $action != 'edit'))) {
 	$counter = 0;
@@ -934,10 +872,10 @@ if ((empty($action) || ($action != 'create' && $action != 'edit'))) {
 
 	// Object card
 	// ------------------------------------------------------------
-	$res = $object->fetch_optionals();
+	$object->fetch_optionals();
 
-	$head = accidentPrepareHead($object);
-	print dol_get_fiche_head($head, 'accidentCard', $title, -1, "digiriskdolibarr@digiriskdolibarr");
+	$head = accident_prepare_head($object);
+	print dol_get_fiche_head($head, 'accident', $title, -1, 'digiriskdolibarr@digiriskdolibarr');
 
 	dol_strlen($object->label) ? $morehtmlref = '<span>' . ' - ' . $object->label . '</span>' : '';
 	$morehtmlref                             .= '<div class="refidno">';
@@ -970,6 +908,37 @@ if ((empty($action) || ($action != 'create' && $action != 'edit'))) {
 	$linkback = '<a href="' . dol_buildpath('/digiriskdolibarr/view/accident/accident_list.php', 1) . '">' . $langs->trans("BackToList") . '</a>';
 
 	digirisk_banner_tab($object, 'id', $linkback, 1, 'rowid', 'ref', $morehtmlref);
+
+	$formConfirm = '';
+
+	// Confirmation to delete
+	if ($action == 'delete' && $permissiontodelete) {
+		$formConfirm = $form->formconfirm($_SERVER["PHP_SELF"].'?id=' . $object->id, $langs->trans('DeleteAccident'), $langs->trans('ConfirmDeleteAccident'), 'confirm_delete', '', 0, 1);
+	}
+
+	// Confirmation to delete line
+	if ($action == 'deleteline') {
+		$objectline->fetch($lineid);
+		$formConfirm = $form->formconfirm($_SERVER["PHP_SELF"] . '?id=' . $object->id . '&lineid=' . $lineid, $langs->trans('DeleteAccidentWorkStop'), $langs->trans('ConfirmDeleteAccidentWorkStop', $objectline->ref), 'confirm_deleteLine', '', 0, 1);
+	}
+
+	// Confirmation to delete
+	if (($action == 'lock' && (empty($conf->use_javascript_ajax) || !empty($conf->dol_use_jmobile))) || (!empty($conf->use_javascript_ajax) && empty($conf->dol_use_jmobile))) {
+		$formConfirm .= $form->formconfirm($_SERVER['PHP_SELF'] . '?id=' . $object->id, $langs->trans('LockObject', $langs->transnoentities('The' . ucfirst($object->element))), $langs->trans('ConfirmLockObject', $langs->transnoentities('The' . ucfirst($object->element))), 'confirm_lock', '', 'yes', 'actionButtonLock', 350, 600);
+	}
+
+	// Call Hook formConfirm.
+	$parameters = ['formConfirm' => $formConfirm];
+	$reshook    = $hookmanager->executeHooks('formConfirm', $parameters, $object, $action); // Note that $action and $object may have been modified by hook.
+
+	if (empty($reshook)) {
+		$formConfirm .= $hookmanager->resPrint;
+	} elseif ($reshook > 0) {
+		$formConfirm = $hookmanager->resPrint;
+	}
+
+	// Print form confirm
+	print $formConfirm;
 
 	print '<div class="div-table-responsive">';
 	print '<div class="fichecenter">';
@@ -1088,7 +1057,7 @@ if ((empty($action) || ($action != 'create' && $action != 'edit'))) {
 		if (empty($reshook)) {
 			// Edit
 			$displayButton = $onPhone ? '<i class="fas fa-edit fa-2x"></i>' : '<i class="fas fa-edit"></i>' . ' ' . $langs->trans('Modify');
-			if ($object->status == $object::STATUS_DRAFT) {
+			if ($object->status == $object::STATUS_VALIDATED) {
 				print '<a class="butAction" id="actionButtonEdit" href="' . $_SERVER['PHP_SELF'] . '?id=' . $object->id . '&action=edit' . '">' . $displayButton . '</a>';
 			} else {
 				print '<span class="butActionRefused classfortooltip" title="' . dol_escape_htmltag($langs->trans('ObjectMustBeDraft', ucfirst($langs->transnoentities('The' . ucfirst($object->element))))) . '">' . $displayButton . '</span>';
@@ -1096,10 +1065,10 @@ if ((empty($action) || ($action != 'create' && $action != 'edit'))) {
 
 			// Lock.
 			$displayButton = $onPhone ? '<i class="fas fa-lock fa-2x"></i>' : '<i class="fas fa-lock"></i>' . ' ' . $langs->trans('Lock');
-			if ($object->status == $object::STATUS_DRAFT) {
-				print '<a class="butAction" id="actionButtonLock" href="'. $_SERVER["PHP_SELF"] . '?id=' . $object->id . '&action=set_lock&token=' . newToken() .'">' . $displayButton . '</a>';
+			if ($object->status == Accident::STATUS_VALIDATED) {
+				print '<span class="butAction" id="actionButtonLock">' . $displayButton . '</span>';
 			} else {
-				print '<span class="butActionRefused classfortooltip" title="' . dol_escape_htmltag($langs->trans('ObjectMustBeDraft', ucfirst($langs->transnoentities('The' . ucfirst($object->element))))) . '">' . $displayButton . '</span>';
+				print '<span class="butActionRefused classfortooltip" title="' . dol_escape_htmltag($langs->trans('ObjectMustBeDraft')) . '">' . $displayButton . '</span>';
 			}
 
 			// Create Investigation.
@@ -1119,7 +1088,7 @@ if ((empty($action) || ($action != 'create' && $action != 'edit'))) {
 		// Accident Lines
 		$accidentlines = $objectline->fetchFromParent($object->id);
 
-		if (($object->status == Accident::STATUS_DRAFT) || (!empty($accidentlines))) {
+		if (($object->status == Accident::STATUS_VALIDATED) || (!empty($accidentlines))) {
 			// ACCIDENT LINES
 			print '<div class="div-table-responsive-no-min" style="overflow-x: unset !important">';
 			print load_fiche_titre($langs->trans("AccidentRiskList"), '', '');
@@ -1211,7 +1180,7 @@ if ((empty($action) || ($action != 'create' && $action != 'edit'))) {
 						$coldisplay += $colspan;
 
 						//Actions buttons
-						if ($object->status == Accident::STATUS_DRAFT) {
+						if ($object->status == Accident::STATUS_VALIDATED) {
 							print '<td class="center">';
 							$coldisplay++;
 							print '<a href="' . $_SERVER["PHP_SELF"] . '?id=' . $id . '&amp;action=editline&amp;lineid=' . $item->id . '" style="padding-right: 20px"><i class="fas fa-pencil-alt" style="color: #666"></i></a>';
@@ -1231,7 +1200,7 @@ if ((empty($action) || ($action != 'create' && $action != 'edit'))) {
 			}
 		}
 		//action create
-		if ($object->status == Accident::STATUS_DRAFT && $permissiontoadd && $action != 'editline') {
+		if ($object->status == Accident::STATUS_VALIDATED && $permissiontoadd && $action != 'editline') {
 			print '<form method="POST" action="' . $_SERVER["PHP_SELF"] . '?id=' . $object->id . '">';
 			print '<input type="hidden" name="token" value="' . newToken() . '">';
 			print '<input type="hidden" name="action" value="addLine">';
