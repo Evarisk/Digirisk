@@ -1204,6 +1204,7 @@ class modDigiriskdolibarr extends DolibarrModules
 		$this->rights[$r][1] = $langs->trans('DeleteAccident');
 		$this->rights[$r][4] = 'accident';
 		$this->rights[$r][5] = 'delete';
+		$r++;
 
 		/* ACCIDENT INVESTIGATION PERMISSIONS */
 		$this->rights[$r][0] = $this->numero . $r;
