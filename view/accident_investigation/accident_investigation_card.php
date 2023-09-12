@@ -305,7 +305,8 @@ if ($action == 'create') {
 
 	// Draft confirmation
 	if (($action == 'set_draft' && (empty($conf->use_javascript_ajax) || !empty($conf->dol_use_jmobile))) || (!empty($conf->use_javascript_ajax) && empty($conf->dol_use_jmobile))) {
-		$img          = img_picto('draft', './../../../saturne/img/formconfirm/object_classify.png', '', 1);
+		$imgPath      = dol_buildpath('custom/saturne/img/formconfirm/object_classify.png', 1);
+		$img          = img_picto($langs->trans('NewVersion'), $imgPath, '', 1);
 		$formQuestion = [
 			['type' => 'other', 'name' => 'lock_validation', 'label' => '<span class="">' . img_picto('', 'info') . ' ' . $langs->trans('ConfirmReOpenInvestigation'). '</span>'],
 			['type' => 'other', 'name' => 'OK', 'label' => '', 'value' => $img, 'moreattr' => 'readonly'],
@@ -315,7 +316,8 @@ if ($action == 'create') {
 	}
 	// Validate confirmation
 	if (($action == 'set_validate' && (empty($conf->use_javascript_ajax) || !empty($conf->dol_use_jmobile))) || (!empty($conf->use_javascript_ajax) && empty($conf->dol_use_jmobile))) {
-		$img          = img_picto('validate', './../../../saturne/img/formconfirm/object_draft.png', '', 1);
+		$imgPath      = dol_buildpath('custom/saturne/img/formconfirm/object_draft.png', 1);
+		$img          = img_picto($langs->trans('Validate'), $imgPath, '', 1);
 		$formQuestion = [
 			['type' => 'other', 'name' => 'lock_validation', 'label' => '<span class="">' . img_picto('', 'info') . ' ' . $langs->trans('ConfirmValidateObject', $langs->transnoentities('The' . ucfirst($object->element)), $langs->transnoentities('The' . ucfirst($object->element))) . '</span>'],
 			['type' => 'other', 'name' => 'OK', 'label' => '', 'value' => $img, 'moreattr' => 'readonly'],
@@ -325,7 +327,8 @@ if ($action == 'create') {
 	}
 	// Archive confirmation
 	if (($action == 'set_archive' && (empty($conf->use_javascript_ajax) || !empty($conf->dol_use_jmobile))) || (!empty($conf->use_javascript_ajax) && empty($conf->dol_use_jmobile))) {
-		$img          = img_picto('classify', './../../../saturne/img/formconfirm/object_validate.png', '', 1);
+		$imgPath      = dol_buildpath('custom/saturne/img/formconfirm/object_validate.png', 1);
+		$img          = img_picto($langs->trans('Classify'), $imgPath, '', 1);
 		$formQuestion = [
 			['type' => 'other', 'name' => 'lock_validation', 'label' => '<span class="">' . img_picto('', 'info') . ' ' . $langs->trans('ConfirmClassifyObject', $langs->transnoentities('The' . ucfirst($object->element))). '</span>'],
 			['type' => 'other', 'name' => 'OK', 'label' => '', 'value' => $img, 'moreattr' => 'readonly'],
