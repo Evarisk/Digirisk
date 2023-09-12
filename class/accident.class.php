@@ -310,7 +310,7 @@ class Accident extends SaturneObject
 			global $langs;
 
 			$this->labelStatus[self::STATUS_DELETED]   = $langs->transnoentitiesnoconv('Deleted');
-			$this->labelStatus[self::STATUS_VALIDATED] = $langs->transnoentitiesnoconv('StatusDraft');
+			$this->labelStatus[self::STATUS_VALIDATED] = $langs->transnoentitiesnoconv('InProgress');
 			$this->labelStatus[self::STATUS_LOCKED]    = $langs->transnoentitiesnoconv('Locked');
 
 			$this->labelStatusShort[self::STATUS_DELETED]   = $langs->transnoentitiesnoconv('Deleted');

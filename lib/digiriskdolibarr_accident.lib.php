@@ -33,15 +33,10 @@ function accident_prepare_head($object)
 
 	saturne_load_langs();
 
-	$h    = 0;
+	$h    = 1;
 	$head = [];
 
 	if ($user->rights->digiriskdolibarr->accident->read) {
-		$head[$h][0] = dol_buildpath("/digiriskdolibarr/view/accident/accident_card.php", 1) . '?id=' . $object->id;
-		$head[$h][1] = '<i class="fas fa-address-card"></i> ' . $langs->trans("Card");
-		$head[$h][2] = 'accidentCard';
-		$h++;
-
 		$head[$h][0] = dol_buildpath("/digiriskdolibarr/view/accident/accident_metadata.php", 1) . '?id=' . $object->id;
 		$head[$h][1] = '<i class="fas fa-info-circle"></i> ' . $langs->trans("AccidentMetaData");
 		$head[$h][2] = 'accidentMetadata';

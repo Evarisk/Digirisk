@@ -875,7 +875,7 @@ if ((empty($action) || ($action != 'create' && $action != 'edit'))) {
 	$object->fetch_optionals();
 
 	$head = accident_prepare_head($object);
-	print dol_get_fiche_head($head, 'accident', $title, -1, 'digiriskdolibarr@digiriskdolibarr');
+	print dol_get_fiche_head($head, 'card', $title, -1, 'digiriskdolibarr@digiriskdolibarr');
 
 	dol_strlen($object->label) ? $morehtmlref = '<span>' . ' - ' . $object->label . '</span>' : '';
 	$morehtmlref                             .= '<div class="refidno">';
@@ -927,7 +927,7 @@ if ((empty($action) || ($action != 'create' && $action != 'edit'))) {
 		$formConfirm .= $form->formconfirm($_SERVER['PHP_SELF'] . '?id=' . $object->id, $langs->trans('CloneObject', $langs->transnoentities('The' . ucfirst($object->element))), $langs->trans('ConfirmCloneObject', $langs->transnoentities('The' . ucfirst($object->element))), 'confirm_clone', '', 'yes', 'actionButtonClone', 350, 600);
 	}
 
-	// Confirmation to delete
+	// Confirmation to lock
 	if (($action == 'lock' && (empty($conf->use_javascript_ajax) || !empty($conf->dol_use_jmobile))) || (!empty($conf->use_javascript_ajax) && empty($conf->dol_use_jmobile))) {
 		$formConfirm .= $form->formconfirm($_SERVER['PHP_SELF'] . '?id=' . $object->id, $langs->trans('LockObject', $langs->transnoentities('The' . ucfirst($object->element))), $langs->trans('ConfirmLockObject', $langs->transnoentities('The' . ucfirst($object->element))), 'confirm_lock', '', 'yes', 'actionButtonLock', 350, 600);
 	}
