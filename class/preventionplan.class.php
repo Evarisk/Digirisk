@@ -42,33 +42,7 @@ class PreventionPlan extends SaturneObject
 	public $module = 'digiriskdolibarr';
 
 	/**
-	 * @var DoliDB Database handler.
-	 */
-	public $db;
-
-	/**
-	 * @var string Error string
-	 * @see        $errors
-	 */
-	public $error;
-
-	/**
-	 * @var string[] Array of error strings
-	 */
-	public $errors = [];
-
-	/**
-	 * @var array Result array.
-	 */
-	public $result = [];
-
-	/**
-	 * @var int The object identifier
-	 */
-	public $id;
-
-	/**
-	 * @var string ID to identify managed object.
+	 * @var string Element type of object.
 	 */
 	public $element = 'preventionplan';
 
@@ -78,40 +52,19 @@ class PreventionPlan extends SaturneObject
 	public $table_element = 'digiriskdolibarr_preventionplan';
 
 	/**
-	 * @var string Name of table without prefix where object is stored. This is also the key used for extrafields management.
-	 */
-	public $table_element_line = 'digiriskdolibarr_preventionplandet';
-
-	/**
-	 * @var int  Does this object support multicompany module ?
-	 * 0=No test on entity, 1=Test with field entity, 'field@table'=Test with link by field@table
+	 * @var int Does this object support multicompany module ?
+	 * 0 = No test on entity, 1 = Test with field entity, 'field@table' = Test with link by field@table.
 	 */
 	public $ismultientitymanaged = 1;
 
 	/**
-	 * @var int  Does object support extrafields ? 0=No, 1=Yes
+	 * @var int Does object support extrafields ? 0 = No, 1 = Yes.
 	 */
 	public int $isextrafieldmanaged = 1;
-
 	/**
 	 * @var string String with name of icon for digiriskelement. Must be the part after the 'object_' into object_digiriskelement.png
 	 */
 	public $picto = 'fontawesome_fa-info_fas_#d35968';
-
-	/**
-	 * @var string Label status of const.
-	 */
-	public $labelStatus;
-
-	/**
-	 * @var string Label status short of const.
-	 */
-	public $labelStatusShort;
-
-	/**
-	 * @var array Context element object
-	 */
-	public $context = [];
 
 	/**
 	 * @var PreventionPlanLine[]     Array of subtable lines
@@ -410,78 +363,23 @@ class PreventionPlan extends SaturneObject
 	 * @return array|string
 	 * @throws Exception
 	 */
-	public function select_preventionplan_list($selected = '', $htmlname = 'fk_preventionplan', $filter = '', $showempty = '1', $forcecombo = 0, $events = [], $outputmode = 0, $limit = 0, $morecss = 'minwidth100', $moreparam = '', $multiple = false)
+	public function select_preventionplan_list($selected = '', $htmlname = 'fk_preventionplan', $filter = [], $showempty = '1', $forcecombo = 0, $events = [], $outputmode = 0, $limit = 0, $morecss = 'minwidth100', $moreparam = '', $multiple = false)
 	{
-		global $langs;
+		global $form;
 
-		$out      = '';
-		$num      = 0;
-		$outarray = [];
-
-		$selected = array($selected);
-
-		// Clean $filter that may contains sql conditions so sql code
-		if (function_exists('testSqlAndScriptInject')) {
-			if (testSqlAndScriptInject($filter, 3) > 0) {
-				$filter = '';
+		if (dol_strlen($filter['customsql'])) {
+			$filter['customsql'] .= ' AND t.rowid != ' . ($this->id ?? 0);
+		}
+		$objectList = saturne_fetch_all_object_type('preventionplan', '', '', $limit, 0, $filter);
+		$preventionPlansData  = [];
+		if (is_array($objectList) && !empty($objectList)) {
+			foreach ($objectList as $preventionPlan) {
+				$preventionPlansData[$preventionPlan->id] = $preventionPlan->ref . ' - ' . $preventionPlan->label;
 			}
 		}
-		// On recherche les societes
-		$sql  = 'SELECT ';
-		$sql .= $this->getFieldList();
-		$sql .= " FROM " . MAIN_DB_PREFIX . "digiriskdolibarr_preventionplan as s";
 
-		$sql              .= " WHERE s.entity IN (" . getEntity($this->table_element) . ")";
-		if ($filter) $sql .= " AND (" . $filter . ")";
-		$sql              .= " AND status != 0";
-		$sql              .= $this->db->order("rowid", "ASC");
-		$sql              .= $this->db->plimit($limit, 0);
+		return $form::selectarray($htmlname, $preventionPlansData, $selected, $showempty, 0, 0, '', 0, 0, 0, '', $morecss);
 
-		// Build output string
-		dol_syslog(get_class($this) . "::select_preventionplan_list", LOG_DEBUG);
-		$resql = $this->db->query($sql);
-		if ($resql) {
-			if ( ! $forcecombo) {
-				include_once DOL_DOCUMENT_ROOT . '/core/lib/ajax.lib.php';
-				$out .= ajax_combobox($htmlname, $events, 0);
-			}
-
-			// Construct $out and $outarray
-			$out .= '<select id="' . $htmlname . '" class="flat' . ($morecss ? ' ' . $morecss : '') . '"' . ($moreparam ? ' ' . $moreparam : '') . ' name="' . $htmlname . ($multiple ? '[]' : '') . '" ' . ($multiple ? 'multiple' : '') . '>' . "\n";
-
-			$textifempty          = (($showempty && ! is_numeric($showempty)) ? $langs->trans($showempty) : '');
-			if ($showempty) $out .= '<option value="-1">' . $textifempty . '</option>' . "\n";
-
-			$num = $this->db->num_rows($resql);
-			$i   = 0;
-			if ($num) {
-				while ($i < $num) {
-					$obj   = $this->db->fetch_object($resql);
-					$label = $obj->ref;
-
-					if (empty($outputmode)) {
-						if (in_array($obj->rowid, $selected)) {
-							$out .= '<option value="' . $obj->rowid . '" selected>' . $label . '</option>';
-						} else {
-							$out .= '<option value="' . $obj->rowid . '">' . $label . '</option>';
-						}
-					} else {
-						array_push($outarray, array('key' => $obj->rowid, 'value' => $label, 'label' => $label));
-					}
-
-					$i++;
-					if (($i % 10) == 0) $out .= "\n";
-				}
-			}
-			$out .= '</select>' . "\n";
-		} else {
-			dol_print_error($this->db);
-		}
-
-		$this->result = array('nbofpreventionplan' => $num);
-
-		if ($outputmode) return $outarray;
-		return $out;
 	}
 }
 
