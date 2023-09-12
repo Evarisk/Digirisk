@@ -22,19 +22,21 @@
  */
 
 require_once DOL_DOCUMENT_ROOT . '/core/class/commonobject.class.php';
+// Load Saturne libraries.
+require_once __DIR__ . '/../../saturne/class/saturneobject.class.php';
 
 /**
  * Class for DigiriskStandard
  */
-class DigiriskStandard extends CommonObject
+class DigiriskStandard extends SaturneObject
 {
 	/**
-	 * @var DoliDB Database handler.
+	 * @var string Module name.
 	 */
-	public $db;
+	public $module = 'digiriskdolibarr';
 
 	/**
-	 * @var string ID to identify managed object.
+	 * @var string Element type of object.
 	 */
 	public $element = 'digiriskstandard';
 
@@ -44,15 +46,15 @@ class DigiriskStandard extends CommonObject
 	public $table_element = 'digiriskdolibarr_digiriskstandard';
 
 	/**
-	 * @var int  Does this object support multicompany module ?
-	 * 0=No test on entity, 1=Test with field entity, 'field@table'=Test with link by field@table
+	 * @var int Does this object support multicompany module ?
+	 * 0 = No test on entity, 1 = Test with field entity, 'field@table' = Test with link by field@table.
 	 */
 	public $ismultientitymanaged = 1;
 
 	/**
-	 * @var int  Does object support extrafields ? 0=No, 1=Yes
+	 * @var int Does object support extrafields ? 0 = No, 1 = Yes.
 	 */
-	public $isextrafieldmanaged = 1;
+	public int $isextrafieldmanaged = 1;
 
 	/**
 	 * @var string String with name of icon for digiriskstandard. Must be the part after the 'object_' into object_digiriskstandard.png
@@ -95,125 +97,6 @@ class DigiriskStandard extends CommonObject
 	 */
 	public function __construct(DoliDB $db)
 	{
-		global $conf, $langs;
-
-		$this->db = $db;
-
-		if (empty($conf->global->MAIN_SHOW_TECHNICAL_ID) && isset($this->fields['rowid'])) $this->fields['rowid']['visible'] = 0;
-		if (empty($conf->multicompany->enabled) && isset($this->fields['entity'])) $this->fields['entity']['enabled']        = 0;
-
-		// Unset fields that are disabled
-		foreach ($this->fields as $key => $val) {
-			if (isset($val['enabled']) && empty($val['enabled'])) {
-				unset($this->fields[$key]);
-			}
-		}
-
-		// Translate some data of arrayofkeyval
-		if (is_object($langs)) {
-			foreach ($this->fields as $key => $val) {
-				if (is_array($val['arrayofkeyval'])) {
-					foreach ($val['arrayofkeyval'] as $key2 => $val2) {
-						$this->fields[$key]['arrayofkeyval'][$key2] = $langs->trans($val2);
-					}
-				}
-			}
-		}
-	}
-
-	/**
-	 * Create object into database
-	 *
-	 * @param User $user User that creates
-	 * @param bool $notrigger false=launch triggers after, true=disable triggers
-	 * @return int             <0 if KO, Id of created object if OK
-	 */
-	public function create(User $user, $notrigger = false)
-	{
-		return $this->createCommon($user, $notrigger);
-	}
-
-	/**
-	 * Load object in memory from the database
-	 *
-	 * @param int $id Id object
-	 * @param string $ref Ref
-	 * @return int         <0 if KO, 0 if not found, >0 if OK
-	 */
-	public function fetch($id, $ref = null)
-	{
-		return $this->fetchCommon($id, $ref);
-	}
-
-	/**
-	 * 	Return clickable name (with picto eventually)
-	 *
-	 * 	@param	int		$withpicto		          0=No picto, 1=Include picto into link, 2=Only picto
-	 * 	@param	string	$option			          Variant where the link point to ('', 'nolink')
-	 * 	@param	int		$addlabel		          0=Default, 1=Add label into string, >1=Add first chars into string
-	 *  @param	string	$moreinpopup	          Text to add into popup
-	 *  @param	string	$sep			          Separator between ref and label if option addlabel is set
-	 *  @param	int   	$notooltip		          1=Disable tooltip
-	 *  @param  int     $save_lastsearch_value    -1=Auto, 0=No save of lastsearch_values when clicking, 1=Save lastsearch_values whenclicking
-	 *  @param	string	$morecss				  More css on a link
-	 * 	@return	string					          String with URL
-	 */
-	public function getNomUrl($withpicto = 0, $option = '', $addlabel = 0, $moreinpopup = '', $sep = ' - ', $notooltip = 0, $save_lastsearch_value = -1, $morecss = '')
-	{
-		global $conf, $langs, $user, $hookmanager;
-
-		if ( ! empty($conf->dol_no_mouse_hover)) $notooltip = 1; // Force disable tooltips
-
-		$result = '';
-
-		$label                          = '';
-		if ($option != 'nolink') $label = '<i class="fas fa-building"></i> <u class="paddingrightonly">' . $langs->trans('DigiriskStandard') . '</u>';
-		$label                         .= ($label ? '<br>' : '') . '<b>' . $langs->trans('Ref') . ': </b>' . $this->ref; // The space must be after the : to not being explode when showing the title in img_picto
-		$label                         .= ($label ? '<br>' : '') . '<b>' . $langs->trans('Label') . ': </b>' . $conf->global->MAIN_INFO_SOCIETE_NOM; // The space must be after the : to not being explode when showing the title in img_picto
-		if ($moreinpopup) $label       .= '<br>' . $moreinpopup;
-
-		$url = dol_buildpath('/digiriskdolibarr/view/digiriskstandard/digiriskstandard_card.php', 1) . '?id=' . $this->id;
-
-		if ($option != 'nolink') {
-			// Add param to save lastsearch_values or not
-			$add_save_lastsearch_values                                                                                      = ($save_lastsearch_value == 1 ? 1 : 0);
-			if ($save_lastsearch_value == -1 && preg_match('/list\.php/', $_SERVER["PHP_SELF"])) $add_save_lastsearch_values = 1;
-			if ($add_save_lastsearch_values) $url                                                                           .= '&save_lastsearch_values=1';
-		}
-
-		$linkclose = '';
-		if ($option == 'blank') {
-			$linkclose .= ' target=_blank';
-		}
-
-		if (empty($notooltip) && $user->rights->digiriskdolibarr->digiriskelement->read) {
-			if ( ! empty($conf->global->MAIN_OPTIMIZEFORTEXTBROWSER)) {
-				$label      = $langs->trans("ShowDigiriskStandard");
-				$linkclose .= ' alt="' . dol_escape_htmltag($label, 1) . '"';
-			}
-			$linkclose .= ' title="' . dol_escape_htmltag($label, 1) . '"';
-			$linkclose .= ' class="classfortooltip' . ($morecss ? ' ' . $morecss : '') . '"';
-		} else $linkclose = ($morecss ? ' class="' . $morecss . '"' : '');
-
-		if ($option != 'nolink') {
-			$linkstart  = '<a href="' . $url . '"';
-			$linkstart .= $linkclose . '>';
-			$linkend    = '</a>';
-		}
-
-		$result                      .= $linkstart;
-		if ($withpicto) $result      .= '<i class="fas fa-building"></i>' . ' ';
-		if ($withpicto != 2) $result .= $this->ref;
-		if ($withpicto != 2) $result .= (($addlabel && $conf->global->MAIN_INFO_SOCIETE_NOM) ? $sep . dol_trunc($conf->global->MAIN_INFO_SOCIETE_NOM, ($addlabel > 1 ? $addlabel : 0)) : '');
-		$result                      .= $linkend;
-
-		global $action;
-		$hookmanager->initHooks(array('digiriskstandardtdao'));
-		$parameters               = array('id' => $this->id, 'getnomurl' => $result);
-		$reshook                  = $hookmanager->executeHooks('getNomUrl', $parameters, $this, $action); // Note that $action and $this may have been modified by some hooks
-		if ($reshook > 0) $result = $hookmanager->resPrint;
-		else $result             .= $hookmanager->resPrint;
-
-		return $result;
+		parent::__construct($db, $this->module, $this->element);
 	}
 }

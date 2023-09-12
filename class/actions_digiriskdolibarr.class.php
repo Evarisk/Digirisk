@@ -782,7 +782,7 @@ class ActionsDigiriskdolibarr
 	}
 
     /**
-     * Overloading the saturneAttendantsRole function : replacing the parent's function with the one below.
+     * Overloading the saturneBannerTab function : replacing the parent's function with the one below.
      *
      * @param  array $parameters Hook metadatas (context, etc...).
      * @return int              0 < on error, 0 on success, 1 to replace standard code.
