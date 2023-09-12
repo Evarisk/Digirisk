@@ -289,6 +289,7 @@ class AccidentInvestigation extends SaturneObject
 		if ($this->status <= self::STATUS_DRAFT) {
 			return 0;
 		}
+		require_once __DIR__ . '/../../saturne/class/saturnesignature.class.php';
 
 		$signatory = new SaturneSignature($this->db);
 		$signatory->deleteSignatoriesSignatures($this->id, $this->element);
