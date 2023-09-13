@@ -59,7 +59,7 @@ class AccidentInvestigation extends SaturneObject
 	/**
 	* @var string String with name of icon for digiriskelement. Must be the part after the 'object_' into object_digiriskelement.png
 	*/
-	public string $picto = 'fontawesome_fa-search_fas';
+	public string $picto = 'fontawesome_fa-search_fas_#d35968';
 
 	public const STATUS_DELETED   = -1;
 	public const STATUS_DRAFT     = 0;
@@ -110,28 +110,28 @@ class AccidentInvestigation extends SaturneObject
 	* @var array  Array with all fields and their property. Do not use it as a static var. It may be modified by constructor.
 	*/
 	public $fields = [
-		'rowid'                => ['type' => 'integer',      'label' => 'TechnicalID',            'enabled' => 1, 'position' => 1,   'notnull' => 1, 'visible' => 0, 'noteditable' => 1, 'index' => 1, 'comment' => "Id"],
-		'ref'                  => ['type' => 'varchar(128)', 'label' => 'Ref',                    'enabled' => 1, 'position' => 10,  'notnull' => 1, 'visible' => 4, 'noteditable' => 1, 'default' => '(PROV)', 'index' => 1, 'searchall' => 1, 'showoncombobox' => 1, 'comment' => "Reference of object"],
-		'ref_ext'              => ['type' => 'varchar(128)', 'label' => 'RefExt',                 'enabled' => 1, 'position' => 20,  'notnull' => 0, 'visible' => 0,],
-		'entity'               => ['type' => 'integer',      'label' => 'Entity',                 'enabled' => 1, 'position' => 30,  'notnull' => 1, 'visible' => 0,],
-		'date_creation'        => ['type' => 'datetime',     'label' => 'DateCreation',           'enabled' => 1, 'position' => 40,  'notnull' => 1, 'visible' => 2,],
-		'tms'                  => ['type' => 'timestamp',    'label' => 'DateModification',       'enabled' => 1, 'position' => 50,  'notnull' => 0, 'visible' => 0,],
-		'import_key'           => ['type' => 'varchar(14)',  'label' => 'ImportId',               'enabled' => 1, 'position' => 60,  'notnull' => 0, 'visible' => 0, 'index' => 0],
-		'status'               => ['type' => 'smallint',     'label' => 'Status',                 'enabled' => 1, 'position' => 70,  'notnull' => 1, 'visible' => 2, 'noteditable' => 1, 'default' => 0, 'index' => 0,],
-		'seniority_at_post'    => ['type' => 'varchar(255)', 'label' => 'SeniorityAtPost',        'enabled' => 1, 'position' => 80,  'notnull' => 0, 'visible' => 1,],
-		'date_start'           => ['type' => 'datetime',     'label' => 'DateInvestigationStart', 'enabled' => 1, 'position' => 90,  'notnull' => 0, 'visible' => 1,],
-		'date_end'             => ['type' => 'datetime',     'label' => 'DateInvestigationEnd',   'enabled' => 1, 'position' => 100, 'notnull' => 0, 'visible' => 1,],
-		'note_public'          => ['type' => 'html',         'label' => 'NotePublic',             'enabled' => 1, 'position' => 110, 'notnull' => 0, 'visible' => -1,],
-		'note_private'         => ['type' => 'html',         'label' => 'NotePrivate',            'enabled' => 1, 'position' => 120, 'notnull' => 0, 'visible' => 0,],
-		'victim_skills'        => ['type' => 'html',         'label' => 'VictimSkills',           'enabled' => 1, 'position' => 130, 'notnull' => 0, 'visible' => -1,],
-		'collective_equipment' => ['type' => 'html',         'label' => 'CollectiveEquipment',    'enabled' => 1, 'position' => 140, 'notnull' => 0, 'visible' => -1,],
-		'individual_equipment' => ['type' => 'html',         'label' => 'IndividualEquipment',    'enabled' => 1, 'position' => 150, 'notnull' => 0, 'visible' => -1,],
-		'circumstances'        => ['type' => 'html',         'label' => 'Circumstances',          'enabled' => 1, 'position' => 160, 'notnull' => 0, 'visible' => -1,],
-		'causality_tree'       => ['type' => 'text',         'label' => 'CausalityTree',          'enabled' => 1, 'position' => 170, 'notnull' => 0, 'visible' => 0,],
-		'fk_accident'          => ['type' => 'integer:Accident:custom/digiriskdolibarr/class/accident/accident.class.php:1', 'label' => 'FkAccident', 'picto' => 'fontawesome_fa-user-injured_fas' ,'enabled' => 1, 'position' => 11, 'notnull' => 1, 'visible' => 1, 'foreignkey' => 'digiriskdolibarr_accident.rowid', 'css' => 'maxwidth300'],
-		'fk_task'              => ['type' => 'integer:Task:projet/class/task.class.php', 'label' => 'FkTask',     'picto' => 'Task', 'enabled' => 1, 'position' => 12, 'notnull' => 1, 'visible' => 4,  'noteditable' => 1, 'foreignkey' => 'projet_task.rowid', 'help' => 'TaskWillBeCreatedAfterValidation'],
-		'fk_user_creat'        => ['type' => 'integer:User:user/class/user.class.php',   'label' => 'UserAuthor', 'picto' => 'user', 'enabled' => 1, 'position' => 190, 'notnull' => 1, 'visible' => 0, 'foreignkey' => 'user.rowid'],
-		'fk_user_modif'        => ['type' => 'integer:User:user/class/user.class.php',   'label' => 'UserModif',  'picto' => 'user', 'enabled' => 1, 'position' => 200, 'notnull' => 0, 'visible' => 0, 'foreignkey' => 'user.rowid'],
+		'rowid'                 => ['type' => 'integer',      'label' => 'TechnicalID',            'enabled' => 1, 'position' => 1,   'notnull' => 1, 'visible' => 0, 'noteditable' => 1, 'index' => 1, 'comment' => "Id"],
+		'ref'                   => ['type' => 'varchar(128)', 'label' => 'Ref',                    'enabled' => 1, 'position' => 10,  'notnull' => 1, 'visible' => 4, 'noteditable' => 1, 'default' => '(PROV)', 'index' => 1, 'searchall' => 1, 'showoncombobox' => 1, 'comment' => "Reference of object"],
+		'ref_ext'               => ['type' => 'varchar(128)', 'label' => 'RefExt',                 'enabled' => 1, 'position' => 20,  'notnull' => 0, 'visible' => 0,],
+		'entity'                => ['type' => 'integer',      'label' => 'Entity',                 'enabled' => 1, 'position' => 30,  'notnull' => 1, 'visible' => 0,],
+		'date_creation'         => ['type' => 'datetime',     'label' => 'DateCreation',           'enabled' => 1, 'position' => 40,  'notnull' => 1, 'visible' => 2,],
+		'tms'                   => ['type' => 'timestamp',    'label' => 'DateModification',       'enabled' => 1, 'position' => 50,  'notnull' => 0, 'visible' => 0,],
+		'import_key'            => ['type' => 'varchar(14)',  'label' => 'ImportId',               'enabled' => 1, 'position' => 60,  'notnull' => 0, 'visible' => 0, 'index' => 0],
+		'status'                => ['type' => 'smallint',     'label' => 'Status',                 'enabled' => 1, 'position' => 70,  'notnull' => 1, 'visible' => 2, 'noteditable' => 1, 'default' => 0, 'index' => 0,],
+		'seniority_in_position' => ['type' => 'varchar(255)', 'label' => 'SeniorityInPosition',    'enabled' => 1, 'position' => 80,  'notnull' => 0, 'visible' => 1, 'css' => 'maxwidth200'],
+		'date_start'            => ['type' => 'datetime',     'label' => 'StartDate',              'enabled' => 1, 'position' => 90,  'notnull' => 0, 'visible' => 1,],
+		'date_end'              => ['type' => 'datetime',     'label' => 'EndDate',                'enabled' => 1, 'position' => 100, 'notnull' => 0, 'visible' => 1,],
+		'note_public'           => ['type' => 'html',         'label' => 'NotePublic',             'enabled' => 1, 'position' => 110, 'notnull' => 0, 'visible' => -1,],
+		'note_private'          => ['type' => 'html',         'label' => 'NotePrivate',            'enabled' => 1, 'position' => 120, 'notnull' => 0, 'visible' => 0,],
+		'victim_skills'         => ['type' => 'html',         'label' => 'VictimSkills',           'enabled' => 1, 'position' => 130, 'notnull' => 0, 'visible' => -1,],
+		'collective_equipment'  => ['type' => 'html',         'label' => 'CollectiveEquipment',    'enabled' => 1, 'position' => 140, 'notnull' => 0, 'visible' => -1,],
+		'individual_equipment'  => ['type' => 'html',         'label' => 'IndividualEquipment',    'enabled' => 1, 'position' => 150, 'notnull' => 0, 'visible' => -1,],
+		'circumstances'         => ['type' => 'html',         'label' => 'Circumstances',          'enabled' => 1, 'position' => 160, 'notnull' => 0, 'visible' => -1,],
+		'causality_tree'        => ['type' => 'text',         'label' => 'CausalityTree',          'enabled' => 1, 'position' => 170, 'notnull' => 0, 'visible' => 0,],
+		'fk_accident'           => ['type' => 'integer:Accident:custom/digiriskdolibarr/class/accident/accident.class.php:1', 'label' => 'Accident', 'picto' => 'fontawesome_fa-user-injured_fas' ,'enabled' => 1, 'position' => 11, 'notnull' => 1, 'visible' => 1, 'foreignkey' => 'digiriskdolibarr_accident.rowid', 'css' => 'maxwidth300'],
+		'fk_task'               => ['type' => 'integer:Task:projet/class/task.class.php', 'label' => 'Task',       'picto' => 'Task', 'enabled' => 1, 'position' => 12, 'notnull' => 1, 'visible' => 4,  'noteditable' => 1, 'foreignkey' => 'projet_task.rowid', 'help' => 'TaskWillBeCreatedAfterValidation'],
+		'fk_user_creat'         => ['type' => 'integer:User:user/class/user.class.php',   'label' => 'UserAuthor', 'picto' => 'user', 'enabled' => 1, 'position' => 190, 'notnull' => 1, 'visible' => 0, 'foreignkey' => 'user.rowid'],
+		'fk_user_modif'         => ['type' => 'integer:User:user/class/user.class.php',   'label' => 'UserModif',  'picto' => 'user', 'enabled' => 1, 'position' => 200, 'notnull' => 0, 'visible' => 0, 'foreignkey' => 'user.rowid'],
 	];
 
 	/**
@@ -187,7 +187,7 @@ class AccidentInvestigation extends SaturneObject
 	/**
 	 * @var int|string Seniority at post.
 	 */
-	public $seniority_at_post;
+	public $seniority_in_position;
 
 	/**
 	 * @var int|string Date investigation start.
@@ -320,7 +320,7 @@ class AccidentInvestigation extends SaturneObject
 		$ret  = parent::getTriggerDescription($object);
 		$ret .= $langs->transnoentities('Accident') . ' : ' . $accident->ref . ' - ' . $accident->label . '</br>';
 		$ret .= ($object->fk_task > 0 ? $langs->transnoentities('Task') . ' : ' . $task->ref . ' - ' . $task->label . '</br>': '');
-		$ret .= (dol_strlen($object->seniority_at_post) > 0 ? $langs->transnoentities('SeniorityAtPost') . ' : ' . $object->seniority_at_post . '</br>' : '');
+		$ret .= (dol_strlen($object->seniority_in_position) > 0 ? $langs->transnoentities('SeniorityInPosition') . ' : ' . $object->seniority_in_position . '</br>' : '');
 		$ret .= (dol_strlen($object->victim_skills) > 0 ? $langs->transnoentities('VictimSkills') . ' : ' . $object->victim_skills . '</br>' : '');
 		$ret .= (dol_strlen($object->collective_equipment) > 0 ? $langs->transnoentities('CollectiveEquipment') . ' : ' . $object->collective_equipment . '</br>' : '');
 		$ret .= (dol_strlen($object->individual_equipment) > 0 ? $langs->transnoentities('IndividualEquipment') . ' : ' . $object->individual_equipment . '</br>' : '');

@@ -1486,7 +1486,7 @@ class modDigiriskdolibarr extends DolibarrModules
 		$this->menu[$r++] = [
 			'fk_menu'  => 'fk_mainmenu=digiriskdolibarr,fk_leftmenu=digiriskaccident',	    // '' if this is a top menu. For left menu, use 'fk_mainmenu=xxx' or 'fk_mainmenu=xxx,fk_leftmenu=yyy' where xxx is mainmenucode and yyy is a leftmenucode
 			'type'     => 'left',			                // This is a Left menu entry
-			'titre'    => '<i class="fas fa-search pictofixedwidth" style="padding-right: 4px;"></i>' . $langs->transnoentities('AccidentInvestigation'),
+			'titre'    => '<i class="fas fa-search pictofixedwidth" style="padding-right: 4px;color: #d35968;"></i>' . $langs->transnoentities('AccidentInvestigation'),
 			'mainmenu' => 'digiriskdolibarr',
 			'leftmenu' => 'digiriskaccidentinvestigation',
 			'url'      => '/digiriskdolibarr/view/accident_investigation/accident_investigation_list.php',

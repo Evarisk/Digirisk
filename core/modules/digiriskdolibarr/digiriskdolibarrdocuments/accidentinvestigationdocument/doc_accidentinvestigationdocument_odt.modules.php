@@ -232,7 +232,7 @@ class doc_accidentinvestigationdocument_odt extends SaturneDocumentModel
 
 		$tmpArray['victim_lastname']   = dol_strtoupper($victim->lastname);
 		$tmpArray['victim_firstname']  = ucfirst($victim->firstname);
-		$tmpArray['seniority_at_post'] = $object->seniority_at_post;
+		$tmpArray['seniority_in_position'] = $object->seniority_in_position;
 
 		if ($victim->dateemployment > 0) {
 			$daysEmployee                       = dol_time_plus_duree($now, -$victim->dateemployment, 's');

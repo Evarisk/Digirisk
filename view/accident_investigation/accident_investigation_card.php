@@ -298,7 +298,7 @@ if ($action == 'create') {
 	$accident->fetch($object->fk_accident);
 	$victim->fetch($accident->fk_user_victim);
 
-	saturne_get_fiche_head($object, 'accidentinvestigation', $title);
+	saturne_get_fiche_head($object, 'card', $title);
 	saturne_banner_tab($object);
 
 	$formConfirm = '';
@@ -328,13 +328,13 @@ if ($action == 'create') {
 	// Archive confirmation
 	if (($action == 'set_archive' && (empty($conf->use_javascript_ajax) || !empty($conf->dol_use_jmobile))) || (!empty($conf->use_javascript_ajax) && empty($conf->dol_use_jmobile))) {
 		$imgPath      = dol_buildpath('custom/saturne/img/formconfirm/object_validate.png', 1);
-		$img          = img_picto($langs->trans('Classify'), $imgPath, '', 1);
+		$img          = img_picto($langs->trans('Versioning'), $imgPath, '', 1);
 		$formQuestion = [
-			['type' => 'other', 'name' => 'lock_validation', 'label' => '<span class="">' . img_picto('', 'info') . ' ' . $langs->trans('ConfirmClassifyObject', $langs->transnoentities('The' . ucfirst($object->element))). '</span>'],
+			['type' => 'other', 'name' => 'lock_validation', 'label' => '<span class="">' . img_picto('', 'info') . ' ' . $langs->trans('ConfirmVersionObject', $langs->transnoentities('The' . ucfirst($object->element))). '</span>'],
 			['type' => 'other', 'name' => 'OK', 'label' => '', 'value' => $img, 'moreattr' => 'readonly'],
 		];
 
-		$formConfirm .= $form->formconfirm($_SERVER['PHP_SELF'] . '?id=' . $object->id, $langs->trans('ClassifyObject', $langs->transnoentities('The' . ucfirst($object->element))), '', 'confirm_archive', $formQuestion, 'yes', 'actionButtonArchive', 400, 650);
+		$formConfirm .= $form->formconfirm($_SERVER['PHP_SELF'] . '?id=' . $object->id, $langs->trans('VersionObject', $langs->transnoentities('The' . ucfirst($object->element))), '', 'confirm_archive', $formQuestion, 'yes', 'actionButtonArchive', 400, 650);
 	}
 	// Clone confirmation
 	if (($action == 'clone' && (empty($conf->use_javascript_ajax) || !empty($conf->dol_use_jmobile))) || (!empty($conf->use_javascript_ajax) && empty($conf->dol_use_jmobile))) {
@@ -414,6 +414,14 @@ if ($action == 'create') {
 			print '<span class="butActionRefused classfortooltip" title="' . dol_escape_htmltag($langs->trans('ObjectMustBeDraft', ucfirst($langs->transnoentities('The' . ucfirst($object->element))))) . '">' . $displayButton . '</span>';
 		}
 
+		// Re-Open.
+		$displayButton = $onPhone ? '<i class="fas fa-lock-open fa-2x"></i>' : '<i class="fas fa-lock-open"></i>' . ' ' . $langs->trans('ReOpen');
+		if ($object->status == AccidentInvestigation::STATUS_VALIDATED) {
+			print '<span class="butAction" id="actionButtonInProgress" href="' . $_SERVER['PHP_SELF'] . '?id=' . $object->id . '&action=set_draft&token=' . newToken() . '">' . $displayButton . '</span>';
+		} else {
+			print '<span class="butActionRefused classfortooltip" title="' . dol_escape_htmltag($langs->trans('ObjectMustBeValidated', ucfirst($langs->transnoentities('The' . ucfirst($object->element))))) . '">' . $displayButton . '</span>';
+		}
+
 		// Sign.
 		$displayButton = $onPhone ? '<i class="fas fa-signature fa-2x"></i>' : '<i class="fas fa-signature"></i>' . ' ' . $langs->trans('Sign');
 		if ($object->status == AccidentInvestigation::STATUS_VALIDATED) {
@@ -433,20 +441,20 @@ if ($action == 'create') {
 			print '<span class="butActionRefused classfortooltip" title="' . dol_escape_htmltag($langs->trans('ObjectMustBeValidatedToSendEmail', ucfirst($langs->transnoentities('The' . ucfirst($object->element))))) . '">' . $displayButton . '</span>';
 		}
 
-		// Classify.
-		$displayButton = $onPhone ?  '<i class="fas fa-archive fa-2x"></i>' : '<i class="fas fa-archive"></i>' . ' ' . $langs->trans('Classify');
+		// Versioning.
+		$displayButton = $onPhone ?  '<i class="fas fa-file-archive fa-2x"></i>' : '<i class="fas fa-file-archive"></i>' . ' ' . $langs->trans('Versioning');
 		if ($object->status == AccidentInvestigation::STATUS_LOCKED) {
 			print '<span class="butAction" id="actionButtonArchive" href="' . $_SERVER['PHP_SELF'] . '?id=' . $object->id . '&action=set_archive&token=' . newToken() . '">' . $displayButton . '</span>';
 		} else {
-			print '<span class="butActionRefused classfortooltip" title="' . dol_escape_htmltag($langs->trans('ObjectMustBeValidatedToClassify', ucfirst($langs->transnoentities('The' . ucfirst($object->element))))) . '">' . $displayButton . '</span>';
+			print '<span class="butActionRefused classfortooltip" title="' . dol_escape_htmltag($langs->trans('ObjectMustBeValidatedToVersion', ucfirst($langs->transnoentities('The' . ucfirst($object->element))))) . '">' . $displayButton . '</span>';
 		}
 
 		// New version.
-		$displayButton = $onPhone ? '<i class="fas fa-lock-open fa-2x"></i>' : '<i class="fas fa-code-branch"></i>' . ' ' . $langs->trans('NewVersion');
+		$displayButton = $onPhone ? '<i class="fas fa-code-branch fa-2x"></i>' : '<i class="fas fa-code-branch"></i>' . ' ' . $langs->trans('NewVersion');
 		if ($object->status == AccidentInvestigation::STATUS_ARCHIVED) {
 			print '<span class="butAction" id="actionButtonInProgress" href="' . $_SERVER['PHP_SELF'] . '?id=' . $object->id . '&action=set_draft&token=' . newToken() . '">' . $displayButton . '</span>';
 		} else {
-			print '<span class="butActionRefused classfortooltip" title="' . dol_escape_htmltag($langs->trans('ObjectMustBeClassifiedToOpen', ucfirst($langs->transnoentities('The' . ucfirst($object->element))))) . '">' . $displayButton . '</span>';
+			print '<span class="butActionRefused classfortooltip" title="' . dol_escape_htmltag($langs->trans('ObjectMustBeVersionedToOpen', ucfirst($langs->transnoentities('The' . ucfirst($object->element))))) . '">' . $displayButton . '</span>';
 		}
 
 		// Clone.
@@ -473,7 +481,7 @@ if ($action == 'create') {
 			$fileDir   = $upload_dir . '/' . $dirFiles;
 			$urlSource = $_SERVER['PHP_SELF'] . '?id=' . $object->id;
 
-			print saturne_show_documents('digiriskdolibarr:' . ucfirst('AccidentInvestigation') . 'Document', $dirFiles, $fileDir, $urlSource, $permissiontoadd, 0, $conf->global->DIGIRISKDOLIBARR_ACCIDENTINVESTIGATIONDOCUMENT_DEFAULT_MODEL, 1, 0, 0, 0, 0, '', '', $langs->defaultlang, '', $object, 0, 'remove_file', 0, $langs->trans('DocumentGeneratedWithClassify'));
+			print saturne_show_documents('digiriskdolibarr:' . ucfirst('AccidentInvestigation') . 'Document', $dirFiles, $fileDir, $urlSource, $permissiontoadd, 0, $conf->global->DIGIRISKDOLIBARR_ACCIDENTINVESTIGATIONDOCUMENT_DEFAULT_MODEL, 1, 0, 0, 0, 0, '', '', $langs->defaultlang, '', $object, 0, 'remove_file', 0, $langs->trans('DocumentGeneratedWithVersioning'));
 
 			print '</div><div class="fichehalfright">';
 
