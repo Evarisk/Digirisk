@@ -417,8 +417,11 @@ if ($object->id > 0) {
 		$morehtmlref .= '<br>' . $langs->trans("ParentElement") . ' : ' . $digiriskstandard->getNomUrl(1, 'blank', 1);
 	}
 	$morehtmlref .= '</div>';
-	$morehtmlleft = '<div class="floatleft inline-block valignmiddle divphotoref">' . saturne_show_medias_linked('digiriskdolibarr', $conf->digiriskdolibarr->multidir_output[$conf->entity] . '/' . $object->element_type, 'small', 5, 0, 0, 0, $height, $width, 0, 0, 0, $object->element_type, $object, 'photo', 0, 0) . '</div>';
-	$linkback = '<a href="' . dol_buildpath('/digiriskdolibarr/view/digiriskelement/risk_list.php', 1) . '">' . $langs->trans("BackToList") . '</a>';
+	if (isset($object->element_type)) {
+		$morehtmlleft = '<div class="floatleft inline-block valignmiddle divphotoref photo digirisk-element-photo-'. $object->id .'">';
+		$morehtmlleft .= saturne_show_medias_linked('digiriskdolibarr', $conf->digiriskdolibarr->multidir_output[$conf->entity] . '/' . $object->element_type . '/' . $object->ref, 'small', 1, 0, 0, 0, $height, $width, 0, 0, 0, $object->element_type . '/' . $object->ref, $object, 'photo', 0, 0, 0, 1);
+		$morehtmlleft .= '</div>';
+	}	$linkback = '<a href="' . dol_buildpath('/digiriskdolibarr/view/digiriskelement/risk_list.php', 1) . '">' . $langs->trans("BackToList") . '</a>';
 	digirisk_banner_tab($object, 'id', $linkback, 1, 'rowid', 'ref', $morehtmlref, '', 0, $morehtmlleft);
 
 	// Buttons for actions

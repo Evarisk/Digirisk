@@ -1091,6 +1091,7 @@ DigiriskEvaluatorStandardModel = Renvoie le numéro sous la forme EVn où n est 
 
 # Data - Donnée
 Evaluator = Évaluateur
+Evaluators = Évaluateurs
 EvaluatorCreated = Création d'un évaluateur
 EvaluatorModified = Modification d'un évaluateur
 EvaluatorDeleted = Suppression d'un évaluateur
@@ -1237,6 +1238,7 @@ SharedRiskImportWithSuccess = Risque importé avec succès
 RiskDeleted = Le risque %s a été supprimé
 RiskSharedWithEntityRefLabel = Partage du risque %s avec
 RiskUnlinkedFromEntityRefLabel = Dissociation du risque %s avec
+TheDigiriskelement = l'élément Digirisk
 
 
 # Stats - Statistiques
