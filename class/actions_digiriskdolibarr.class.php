@@ -895,4 +895,27 @@ class ActionsDigiriskdolibarr
 		return 0; // or return 1 to replace standard code.
 	}
 
+	/**
+	 *  Overloading the SaturneAdminDocumentData function : replacing the parent's function with the one below.
+	 *
+	 * @param  array        $parameters Hook metadatas (context, etc...).
+	 * @param  CommonObject $object     Current object.
+	 * @return int                      0 < on error, 0 on success, 1 to replace standard code.
+	 */
+	public function SaturneAdminAdditionalConfig(array $parameters): int
+	{
+		$additionalConfig = [
+			'ShowPictoName' => 'DIGIRISKDOLIBARR_DOCUMENT_SHOW_PICTO_NAME',
+			'GenerateZipArchiveWithDigiriskElementDocuments' => 'DIGIRISKDOLIBARR_GENERATE_ARCHIVE_WITH_DIGIRISKELEMENT_DOCUMENTS'
+		];
+
+		// Do something only for the current context.
+		if (in_array($parameters['currentcontext'], ['digiriskdolibarradmindocuments'])) {
+			$this->results = $additionalConfig;
+		}
+
+		return 0; // or return 1 to replace standard code.
+	}
+
+
 }
