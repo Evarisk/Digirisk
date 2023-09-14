@@ -225,7 +225,7 @@ if (!empty($accidentlines) && $accidentlines > 0) {
 }
 $morehtmlref .= '<br>';
 
-$morehtmlleft = '<div class="floatleft inline-block valignmiddle divphotoref">' . digirisk_show_photos('digiriskdolibarr', $conf->digiriskdolibarr->multidir_output[$conf->entity] . '/' . $object->element, 'small', 5, 0, 0, 0, 80, 80, 0, 0, 0, $object->element, $object) . '</div>';
+//$morehtmlleft = '<div class="floatleft inline-block valignmiddle divphotoref">' . digirisk_show_photos('digiriskdolibarr', $conf->digiriskdolibarr->multidir_output[$conf->entity] . '/' . $object->element, 'small', 5, 0, 0, 0, 80, 80, 0, 0, 0, $object->element, $object) . '</div>';
 
 $linkback = '<a href="' . dol_buildpath('/digiriskdolibarr/view/accident/accident_list.php', 1) . '">' . $langs->trans("BackToList") . '</a>';
 
@@ -245,8 +245,6 @@ $colspan = 3; // Columns: total ht + col edit + col delete
 
 // Accident Lines
 $accidentlines = $objectline->fetchAll('', '', 0, 0, ['customsql' => 't.fk_accident = ' . $object->id]);
-$dictionaryId  = fetchDictionnary('c_lesion_localization');
-
 
 print '<tr class="liste_titre">';
 print '<td><span>' . $langs->trans('Ref.') . '</span></td>';

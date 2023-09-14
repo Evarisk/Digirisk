@@ -1802,22 +1802,22 @@ class InterfaceDigiriskdolibarrTriggers extends DolibarrTriggers
 				$useremployer = new User($this->db);
 				$useremployer->fetch($object->fk_user_employer);
 
-				$actioncomm->elementtype = 'accident@digiriskdolibarr';
 				//1 : Accident in DU / GP, 2 : Accident in society, 3 : Accident in another location
 				switch ($object->external_accident) {
 					case 1:
 						if (!empty($object->fk_standard)) {
 							$digiriskstandard->fetch($object->fk_standard);
-							$accidentLocation = $digiriskstandard->ref . " - " . $conf->global->MAIN_INFO_SOCIETE_NOM;
-						} else if (!empty($object->fk_element)) {
+							$accidentLocation = $digiriskstandard->ref . ' - ' . $conf->global->MAIN_INFO_SOCIETE_NOM;
+						} elseif (!empty($object->fk_element)) {
 							$digiriskelement->fetch($object->fk_element);
 							$actioncomm->fk_element  = $object->fk_element;
-							$accidentLocation = $digiriskelement->ref . " - " . $digiriskelement->label;
+							$accidentLocation = $digiriskelement->ref . ' - ' . $digiriskelement->label;
 						}
 						break;
 					case 2:
 						$society->fetch($object->fk_soc);
-						$accidentLocation = $society->ref . " - " . $society->label;
+						$accidentLocation = $society->ref . ' - ' . $society->label;
+						break;
 					case 3:
 						$accidentLocation = $object->accident_location;
 						break;
