@@ -92,7 +92,9 @@ $ecmdir           = new EcmDirectory($db);
 $project          = new Project($db);
 $task             = new DigiriskTask($db);
 $extrafields      = new ExtraFields($db);
+$DUProject        = new Project($db);
 
+$DUProject->fetch($conf->global->DIGIRISKDOLIBARR_DU_PROJECT);
 $hookmanager->initHooks(array('riskcard', 'globalcard')); // Note that conf->hooks_modules contains array
 
 // Fetch optionals attributes and labels

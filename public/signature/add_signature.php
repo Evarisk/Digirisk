@@ -80,8 +80,7 @@ switch ($type) {
 		break;
 	case 'accident':
 		$object         = new Accident($db);
-		$signatory      = new AccidentSignature($db);
-		//$objectdocument = new AccidentDocument($db);
+		$signatory      = new SaturneSignature($db, $object->module, $object->element);
 		break;
 }
 

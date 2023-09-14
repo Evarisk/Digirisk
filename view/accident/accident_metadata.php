@@ -21,20 +21,14 @@
  *		\brief      Page to create/edit/view accident metadata
  */
 
-// Load Dolibarr environment
-$res = 0;
-// Try main.inc.php into web root known defined into CONTEXT_DOCUMENT_ROOT (not always defined)
-if ( ! $res && ! empty($_SERVER["CONTEXT_DOCUMENT_ROOT"])) $res = @include $_SERVER["CONTEXT_DOCUMENT_ROOT"] . "/main.inc.php";
-// Try main.inc.php into web root detected using web root calculated from SCRIPT_FILENAME
-$tmp = empty($_SERVER['SCRIPT_FILENAME']) ? '' : $_SERVER['SCRIPT_FILENAME']; $tmp2 = realpath(__FILE__); $i = strlen($tmp) - 1; $j = strlen($tmp2) - 1;
-while ($i > 0 && $j > 0 && isset($tmp[$i]) && isset($tmp2[$j]) && $tmp[$i] == $tmp2[$j]) { $i--; $j--; }
-if ( ! $res && $i > 0 && file_exists(substr($tmp, 0, ($i + 1)) . "/main.inc.php")) $res          = @include substr($tmp, 0, ($i + 1)) . "/main.inc.php";
-if ( ! $res && $i > 0 && file_exists(dirname(substr($tmp, 0, ($i + 1))) . "/main.inc.php")) $res = @include dirname(substr($tmp, 0, ($i + 1))) . "/main.inc.php";
-// Try main.inc.php using relative path
-if ( ! $res && file_exists("../../main.inc.php")) $res       = @include "../../main.inc.php";
-if ( ! $res && file_exists("../../../main.inc.php")) $res    = @include "../../../main.inc.php";
-if ( ! $res && file_exists("../../../../main.inc.php")) $res = @include "../../../../main.inc.php";
-if ( ! $res) die("Include of main fails");
+// Load DigiriskDolibarr environment
+if (file_exists('../../digiriskdolibarr.main.inc.php')) {
+	require_once __DIR__ . '/../../digiriskdolibarr.main.inc.php';
+} elseif (file_exists('../../../digiriskdolibarr.main.inc.php')) {
+	require_once __DIR__ . '/../../../digiriskdolibarr.main.inc.php';
+} else {
+	die('Include of digiriskdolibarr main fails');
+}
 
 require_once DOL_DOCUMENT_ROOT . '/core/class/html.formother.class.php';
 require_once DOL_DOCUMENT_ROOT . '/core/class/doleditor.class.php';
@@ -48,7 +42,7 @@ require_once __DIR__ . '/../../core/modules/digiriskdolibarr/digiriskelement/acc
 global $conf, $db, $hookmanager, $langs, $user;
 
 // Load translation files required by the page
-$langs->loadLangs(array("digiriskdolibarr@digiriskdolibarr", "other"));
+saturne_load_langs();
 
 // Get parameters
 $id                  = GETPOST('id', 'int');
@@ -60,9 +54,12 @@ $backtopageforcancel = GETPOST('backtopageforcancel', 'alpha');
 // Initialize technical objects
 $object           = new Accident($db);
 $accidentmetadata = new AccidentMetaData($db);
+$objectline       = new AccidentWorkStop($db);
 $project          = new Project($db);
 $usertmp          = new User($db);
 $thirdparty       = new Societe($db);
+$form             = new Form($db);
+
 
 // Load object
 $object->fetch($id);
@@ -213,21 +210,15 @@ if (empty($reshook)) {
  * View
  */
 
-$form = new Form($db);
-
 $morewhere  = ' AND fk_accident = ' . $object->id;
 $morewhere .= ' AND status = 1';
 
 $accidentmetadata->fetch(0, '', $morewhere);
 
-$title         = $langs->trans("AccidentMetaData");
-$object->picto = 'accident@digiriskdolibarr';
-
+$title    = $langs->trans("AccidentMetaData");
 $help_url = 'FR:Module_Digirisk#DigiRisk_-_Accident_b.C3.A9nins_et_presque_accidents';
-$morejs   = array("/digiriskdolibarr/js/digiriskdolibarr.js");
-$morecss  = array("/digiriskdolibarr/css/digiriskdolibarr.css");
 
-llxHeader('', $title, $help_url, '', '', '', $morejs, $morecss);
+saturne_header(0, '', $title, $help_url);
 
 // Part to edit record
 if (($id || $ref) && $action == 'edit') {
@@ -495,24 +486,34 @@ if ((empty($action) || ($action != 'create' && $action != 'edit'))) {
 
 	// Object metadata
 	// ------------------------------------------------------------
-	$head = accidentPrepareHead($object);
-	print dol_get_fiche_head($head, 'accidentMetadata', $title, -1, "digiriskdolibarr@digiriskdolibarr");
-	$height                                   = 80;
-	$width                                    = 80;
-	dol_strlen($object->label) ? $morehtmlref = '<span>' . ' - ' . $object->label . '</span>' : '';
-	$morehtmlref                             .= '<div class="refidno">';
-	// Project
-	$project->fetch($object->fk_project);
-	$morehtmlref .= $langs->trans('Project') . ' : ' . getNomUrlProject($project, 1, 'blank');
-	$morehtmlref .= '</div>';
+	saturne_get_fiche_head($object, 'accidentMetadata', $title);
+
+	//Number workstop days
+	$accidentlines     = $objectline->fetchAll('', '', 0, 0, ['customsql' => 't.fk_accident = ' . $object->id . ' AND t.status >= 0']);
+	$totalworkstopdays = 0;
+
+	if (!empty($accidentlines) && $accidentlines > 0) {
+		foreach ($accidentlines as $accidentline) {
+			if ($accidentline->status > 0) {
+				$totalworkstopdays += $accidentline->workstop_days;
+			}
+		}
+		$morehtmlref      = $langs->trans('TotalWorkStopDays') . ' : ' . $totalworkstopdays;
+		$lastaccidentline = end($accidentlines);
+		$morehtmlref     .= '<br>' . $langs->trans('ReturnWorkDate') . ' : ' . dol_print_date($lastaccidentline->date_end_workstop, 'dayhour');
+	} else {
+		$morehtmlref = $langs->trans('RegisterAccident');
+	}
+	$morehtmlref .= '<br>';
+
 
 	include_once './../../core/tpl/digiriskdolibarr_configuration_gauge_view.tpl.php';
 
-	//$morehtmlleft = '<div class="floatleft inline-block valignmiddle divphotoref">' . digirisk_show_photos('digiriskdolibarr', $conf->digiriskdolibarr->multidir_output[$conf->entity] . '/' . $object->element, 'small', 5, 0, 0, 0, $height, $width, 0, 0, 0, $object->element, $object) . '</div>';
+	//$morehtmlleft = '<div class="floatleft inline-block valignmiddle divphotoref">' . digirisk_show_photos('digiriskdolibarr', $conf->digiriskdolibarr->multidir_output[$conf->entity] . '/' . $object->element, 'small', 5, 0, 0, 0, 80, 80, 0, 0, 0, $object->element, $object) . '</div>';
 
 	$linkback = '<a href="' . dol_buildpath('/digiriskdolibarr/view/accident/accident_list.php', 1) . '">' . $langs->trans("BackToList") . '</a>';
 
-	digirisk_banner_tab($object, 'id', $linkback, 1, 'rowid', 'ref', $morehtmlref);
+	saturne_banner_tab($object, 'id', $linkback, 1, 'rowid', 'ref', $morehtmlref);
 
 	print '<div class="div-table-responsive">';
 	print '<div class="fichecenter">';
