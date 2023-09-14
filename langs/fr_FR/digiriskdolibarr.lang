@@ -55,10 +55,11 @@ HowToSharedElement = Pour plus d'informations sur la configuration des élément
 HowToSharedElementLink = https://wiki.dolibarr.org/index.php?title=Module_Digirisk#Configuration
 ConfigSharedElement = Configuration des éléments partagés (risques/signalisations)
 DisabledSharedElement = Option désactivée car multi company n'est pas activé ou la configuration des éléments partagés (risques/signalisations) n'a pas été effectuée
-DigiriskEventAutoDesc = Définissez ici les événements pour lesquels Digirisk créera automatiquement une entrée dans l'agenda. Chaque évènement contient les informations relatives à l'action effectuée.
-DigiriskActionsEvents = Événements pour lesquels Digirisk doit insérer un évènement dans l'agenda en automatique.
+DigiriskEventAutoDesc = Définissez ici les événements pour lesquels Digirisk créera automatiquement une entrée dans l'agenda. Chaque événement contient les informations relatives à l'action effectuée.
+DigiriskActionsEvents = Événements pour lesquels Digirisk doit insérer un événement dans l'agenda en automatique.
 DefaultProjectContactType = Rôle par défaut attribué au projet Document Unique
 DefaultTaskContactType = Rôle par défaut attribué aux tâches du projet Document Unique
+
 
 
 #
@@ -691,7 +692,7 @@ LesionNature = Nature des lésions
 AccidentInvestigation = Enquête accident
 AccidentInvestigationLink = Lien vers l'enquête accident
 AccidentLocation = Lieu de l'accident
-DigiriskDolibarrActionTrigger = Déclencheur des évènements Digirisk
+DigiriskDolibarrActionTrigger = Déclencheur des événements Digirisk
 CollateralVictim = Victime collatérale
 FromDigirisk = De
 At = À
@@ -760,7 +761,7 @@ AccidentInvestigationValidated = Enquête accident validée
 
 # AccidentTooltip - Tooltip des accidents
 VictimActivityTooltip = Précisez l’activité ou la tâche de la victime au moment de l’accident, c’est-à-dire ce que faisait la victime
-AccidentNatureTooltip = Décrire l’évènement ayant conduit à l’accident, comment l’accident s’est produit (problème électrique, fuite de gaz, rupture de matériel, glissade, chute, effort physique, agression...), ou comment s’est blessée la victime (heurt, collision, écrasement, piqûre, noyade, contact avec une substance...)
+AccidentNatureTooltip = Décrire l’événement ayant conduit à l’accident, comment l’accident s’est produit (problème électrique, fuite de gaz, rupture de matériel, glissade, chute, effort physique, agression...), ou comment s’est blessée la victime (heurt, collision, écrasement, piqûre, noyade, contact avec une substance...)
 AccidentObjectTooltip = C’est-à-dire avec quoi s’est blessée la victime : matériau, déchet, outil (tournevis, cutter, perceuse...),machine, véhicule, chariot de manutention, substance chimique, élément de construction (porte, mur...), sol...
 AccidentNatureDoubtTooltip = Indiquez le cas échéant, les réserves motivées qui ne pourront être prises en compte que si elles portent sur les circonstances de temps et de lieu de l’accident ou sur l’existence d’une cause totalement étrangère au travail (art. R. 441-11 du Code de la sécurité sociale)
 VictimWorkHoursTooltip = Indiquez les heures de travail effectuées par votre salarié(e), ou les heures prévues, le jour de l’accident
@@ -1696,7 +1697,7 @@ TicketDocumentDigiriskTemplate = ODT par défaut des fiches de tickets
 TicketDocument = Fiche du ticket
 ticketdocument.odt = Fiche du ticket
 ticketdocument_custom.odt = Fiche personnalisée du ticket
-ticketdocument_events.odt = Fiche du ticket avec évènements
+ticketdocument_events.odt = Fiche du ticket avec événements
 TicketSuccessMessageData = Message du ticket
 TicketSuccessMessage= Message de succès du ticket
 TicketSuccessMessageSet = Le message a bien été modifié

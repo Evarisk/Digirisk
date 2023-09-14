@@ -63,7 +63,7 @@ $fromiduser          = GETPOST('fromiduser', 'int'); //element id
 
 // Initialize technical objects
 $object           = new Accident($db);
-$signatory        = new AccidentSignature($db);
+$signatory        = new SaturneSignature($db, $object->module, $object->element);
 $objectline       = new AccidentWorkStop($db);
 $contact          = new Contact($db);
 $usertmp          = new User($db);
@@ -420,7 +420,7 @@ if (empty($reshook)) {
 		}
 
 		if (!$error) {
-			$result = $objectline->insert($user, false);
+			$result = $objectline->create($user, false);
 			if ($result > 0) {
 				// Creation accident line OK
 				rename($conf->digiriskdolibarr->multidir_output[$conf->entity] . '/accident/' . $object->ref . '/workstop/temp/', $conf->digiriskdolibarr->multidir_output[$conf->entity] . '/accident/' . $object->ref . '/workstop/' . $objectline->ref);
@@ -874,16 +874,10 @@ if ((empty($action) || ($action != 'create' && $action != 'edit'))) {
 	// ------------------------------------------------------------
 	$object->fetch_optionals();
 
-	$head = accident_prepare_head($object);
-	print dol_get_fiche_head($head, 'card', $title, -1, 'digiriskdolibarr@digiriskdolibarr');
+	saturne_get_fiche_head($object, 'card', $title);
 
-	dol_strlen($object->label) ? $morehtmlref = '<span>' . ' - ' . $object->label . '</span>' : '';
-	$morehtmlref                             .= '<div class="refidno">';
-	// Project
-	$project->fetch($object->fk_project);
-	$morehtmlref .= $langs->trans('Project') . ' : ' . getNomUrlProject($project, 1, 'blank');
 	//Number workstop days
-	$accidentlines     = $objectline->fetchFromParent($object->id);
+	$accidentlines     = $objectline->fetchAll('', '', 0, 0, ['customsql' => 't.fk_accident = ' . $object->id . ' AND t.status >= 0']);
 	$totalworkstopdays = 0;
 
 	if (!empty($accidentlines) && $accidentlines > 0) {
@@ -892,22 +886,21 @@ if ((empty($action) || ($action != 'create' && $action != 'edit'))) {
 				$totalworkstopdays += $accidentline->workstop_days;
 			}
 		}
-		$morehtmlref     .= '<br>' . $langs->trans('TotalWorkStopDays') . ' : ' . $totalworkstopdays;
+		$morehtmlref      = $langs->trans('TotalWorkStopDays') . ' : ' . $totalworkstopdays;
 		$lastaccidentline = end($accidentlines);
 		$morehtmlref     .= '<br>' . $langs->trans('ReturnWorkDate') . ' : ' . dol_print_date($lastaccidentline->date_end_workstop, 'dayhour');
 	} else {
-		$morehtmlref .= '<br>' . $langs->trans('RegisterAccident');
+		$morehtmlref = $langs->trans('RegisterAccident');
 	}
-
-	$morehtmlref .= '</div>';
+	$morehtmlref .= '<br>';
 
 	include_once './../../core/tpl/digiriskdolibarr_configuration_gauge_view.tpl.php';
 
-	$morehtmlleft = '<div class="floatleft inline-block valignmiddle divphotoref">' . digirisk_show_photos('digiriskdolibarr', $conf->digiriskdolibarr->multidir_output[$conf->entity] . '/' . $object->element, 'small', 5, 0, 0, 0, 80, 80, 0, 0, 0, $object->element, $object) . '</div>';
+	//$morehtmlleft = '<div class="floatleft inline-block valignmiddle divphotoref">' . digirisk_show_photos('digiriskdolibarr', $conf->digiriskdolibarr->multidir_output[$conf->entity] . '/' . $object->element, 'small', 5, 0, 0, 0, 80, 80, 0, 0, 0, $object->element, $object) . '</div>';
 
 	$linkback = '<a href="' . dol_buildpath('/digiriskdolibarr/view/accident/accident_list.php', 1) . '">' . $langs->trans("BackToList") . '</a>';
 
-	digirisk_banner_tab($object, 'id', $linkback, 1, 'rowid', 'ref', $morehtmlref);
+	saturne_banner_tab($object, 'id', $linkback, 1, 'rowid', 'ref', $morehtmlref);
 
 	$formConfirm = '';
 
@@ -1095,7 +1088,7 @@ if ((empty($action) || ($action != 'create' && $action != 'edit'))) {
 		print '</div>';
 
 		// Accident Lines
-		$accidentlines = $objectline->fetchFromParent($object->id);
+		$accidentlines = $objectline->fetchAll('', '', 0, 0, ['customsql' => 't.fk_accident = ' . $object->id . ' AND t.status >= 0']);
 
 		if (($object->status == Accident::STATUS_VALIDATED) || (!empty($accidentlines))) {
 			// ACCIDENT LINES

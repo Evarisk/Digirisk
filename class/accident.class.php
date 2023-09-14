@@ -100,7 +100,7 @@ class Accident extends SaturneObject
 	/**
 	 * @var string String with name of icon for digiriskelement. Must be the part after the 'object_' into object_digiriskelement.png
 	 */
-	public $picto = 'accident@digiriskdolibarr';
+	public $picto = 'fontawesome_fa-user-injured_fas_#d35968';
 
 	const STATUS_DELETED   = -1;
 	const STATUS_DRAFT     = 0;
@@ -425,7 +425,7 @@ class Accident extends SaturneObject
 		if (is_array($allaccidents) && !empty($allaccidents)) {
 			$accidentworkstop = new AccidentWorkStop($this->db);
 			foreach ($allaccidents as $accident) {
-				$allaccidentworkstop = $accidentworkstop->fetchFromParent($accident->id);
+				$allaccidentworkstop = $accidentworkstop->fetchAll('', '', 0, 0, ['customsql' => 't.fk_accident = ' . $accident->id]);
 				if (is_array($allaccidentworkstop) && !empty($allaccidentworkstop)) {
 					$nbaccidents += 1;
 				} else {
@@ -453,7 +453,7 @@ class Accident extends SaturneObject
 		if (is_array($allaccidents) && !empty($allaccidents)) {
 			$accidentworkstop = new AccidentWorkStop($this->db);
 			foreach ($allaccidents as $accident) {
-				$allaccidentworkstop = $accidentworkstop->fetchFromParent($accident->id);
+				$allaccidentworkstop = $accidentworkstop->fetchAll('', '', 0, 0, ['customsql' => 't.fk_accident = ' . $accident->id]);;
 				if (is_array($allaccidentworkstop) && !empty($allaccidentworkstop)) {
 					foreach ($allaccidentworkstop as $accidentworkstop) {
 						if ($accidentworkstop->id > 0) {
@@ -654,6 +654,11 @@ class AccidentWorkStop extends SaturneObject
 	 */
 	public $table_element = 'digiriskdolibarr_accident_workstop';
 
+	/**
+	 * @var string String with name of icon for digiriskelement. Must be the part after the 'object_' into object_digiriskelement.png
+	 */
+	public $picto = 'fontawesome_fa-user-injured_fas_#d35968';
+
 	const STATUS_DELETED = -1;
 
 	/**
@@ -693,115 +698,6 @@ class AccidentWorkStop extends SaturneObject
 	public function __construct(DoliDB $db)
 	{
 		return parent::__construct($db, $this->module, $this->element);
-	}
-
-	/**
-	 *    Load accident line line from database
-	 *
-	 * @param int $parent_id
-	 * @param int $limit
-	 * @return array|int  <0 if KO, >0 if OK
-	 */
-	public function fetchFromParent($parent_id = 0, $limit = 0)
-	{
-		global $db;
-		$sql  = 'SELECT t.rowid, t.ref, t.date_creation, t.status, t.workstop_days, t.date_start_workstop, t.date_end_workstop, t.declaration_link';
-		$sql .= ' FROM ' . MAIN_DB_PREFIX . 'digiriskdolibarr_accident_workstop as t';
-		if ($parent_id > 0) {
-			$sql .= ' WHERE t.fk_accident = ' . $parent_id;
-		} else {
-			$sql .= ' WHERE 1=1';
-		}
-		$sql .= ' AND entity IN (' . getEntity($this->table_element) . ')';
-
-		$result = $db->query($sql);
-
-		if ($result) {
-			$num = $db->num_rows($result);
-
-			$i = 0;
-			$records = [];
-			while ($i < ($limit ? min($limit, $num) : $num)) {
-				$obj = $db->fetch_object($result);
-
-				$record = new self($db);
-
-				$record->id                  = $obj->rowid;
-				$record->ref                 = $obj->ref;
-				$record->date_creation       = $obj->date_creation;
-				$record->status              = $obj->status;
-				$record->workstop_days       = $obj->workstop_days;
-				$record->date_start_workstop = $obj->date_start_workstop;
-				$record->date_end_workstop   = $obj->date_end_workstop;
-				$record->declaration_link    = $obj->declaration_link;
-				$record->fk_accident         = $obj->fk_accident;
-
-				$records[$record->id] = $record;
-
-				$i++;
-			}
-
-			$db->free($result);
-
-			return $records;
-		} else {
-			$this->error = $db->lasterror();
-			return -1;
-		}
-	}
-
-	/**
-	 *    Insert line into database
-	 *
-	 * @param User $user
-	 * @param bool $notrigger 1 no triggers
-	 * @return        int                                         <0 if KO, >0 if OK
-	 * @throws Exception
-	 */
-	public function insert(User $user, $notrigger = false)
-	{
-		global $db, $user, $conf;
-
-		$db->begin();
-		$now = dol_now();
-
-		// Insertion dans base de la ligne
-		$sql  = 'INSERT INTO ' . MAIN_DB_PREFIX . 'digiriskdolibarr_accident_workstop';
-		$sql .= ' (ref, entity, date_creation, status, workstop_days, date_start_workstop, date_end_workstop, declaration_link, fk_accident';
-		$sql .= ')';
-		$sql .= " VALUES (";
-		$sql .= "'" . $db->escape($this->ref) . "'" . ", ";
-		$sql .= $this->entity . ", ";
-		$sql .= "'" . $db->escape($db->idate($now)) . "'" . ", ";
-		$sql .= $this->status . ", ";
-		$sql .= $this->workstop_days . ", ";
-		$sql .= "'" . $db->escape($db->idate($this->date_start_workstop)) . "'" . ", ";
-		$sql .= "'" . $db->escape($db->idate($this->date_end_workstop)) . "'" . ", ";
-		$sql .= "'" . $this->declaration_link . "'" . ", ";
-		$sql .= $this->fk_accident;
-
-		$sql .= ')';
-
-		dol_syslog(get_class($this) . "::insert", LOG_DEBUG);
-		$resql = $db->query($sql);
-
-		if ($resql) {
-			$this->id    = $db->last_insert_id(MAIN_DB_PREFIX . 'accident_workstop');
-			$this->rowid = $this->id; // For backward compatibility
-
-			$db->commit();
-			// Triggers
-			if ( ! $notrigger) {
-				// Call triggers
-				if (!empty($conf->global->DIGIRISKDOLIBARR_MAIN_AGENDA_ACTIONAUTO_ACCIDENT_WORKSTOP_CREATE)) $this->call_trigger(strtoupper(get_class($this)) . '_CREATE', $user);
-				// End call triggers
-			}
-			return $this->id;
-		} else {
-			$this->error = $db->lasterror();
-			$db->rollback();
-			return -2;
-		}
 	}
 }
 
@@ -855,7 +751,8 @@ class AccidentMetaData extends SaturneObject
 	/**
 	 * @var string String with name of icon for digiriskelement. Must be the part after the 'object_' into object_digiriskelement.png
 	 */
-	public $picto = 'accident@digiriskdolibarr';
+	public $picto = 'fontawesome_fa-user-injured_fas_#d35968';
+
 
 	/**
 	 * @var array  Array with all fields and their property. Do not use it as a static var. It may be modified by constructor.
@@ -1013,6 +910,11 @@ class AccidentLesion extends SaturneObject
 	public $table_element = 'digiriskdolibarr_accident_lesion';
 
 	/**
+	 * @var string String with name of icon for digiriskelement. Must be the part after the 'object_' into object_digiriskelement.png
+	 */
+	public $picto = 'fontawesome_fa-user-injured_fas_#d35968';
+
+	/**
 	 * @var array  Array with all fields and their property. Do not use it as a static var. It may be modified by constructor.
 	 */
 	public $fields = [
@@ -1043,248 +945,5 @@ class AccidentLesion extends SaturneObject
 	public function __construct(DoliDB $db)
 	{
 		return parent::__construct($db, $this->module, $this->element);
-	}
-
-	/**
-	 *  Load accident lesion from database
-	 *
-	 * 	@param  int       $parent_id
-	 *	@param  int       $limit
-	 * 	@return array|int             <0 if KO, >0 if OK
-	 */
-	public function fetchFromParent($parent_id = 0, $limit = 0)
-	{
-		global $db;
-		$sql  = 'SELECT t.rowid, t.ref, t.date_creation, t.lesion_localization, t.lesion_nature';
-		$sql .= ' FROM ' . MAIN_DB_PREFIX . 'digiriskdolibarr_accident_lesion as t';
-		if ($parent_id > 0) {
-			$sql .= ' WHERE t.fk_accident = ' . $parent_id;
-		} else {
-			$sql .= ' WHERE 1=1';
-		}
-		$sql .= ' AND entity IN (' . getEntity($this->table_element) . ')';
-
-		$result = $db->query($sql);
-
-		if ($result) {
-			$num = $db->num_rows($result);
-
-			$i = 0;
-			$records = [];
-			while ($i < ($limit ? min($limit, $num) : $num)) {
-				$obj = $db->fetch_object($result);
-
-				$record = new self($db);
-
-				$record->id                  = $obj->rowid;
-				$record->ref                 = $obj->ref;
-				$record->date_creation       = $obj->date_creation;
-				$record->lesion_localization = $obj->lesion_localization;
-				$record->lesion_nature       = $obj->lesion_nature;
-				$record->fk_accident         = $obj->fk_accident;
-
-				$records[$record->id] = $record;
-
-				$i++;
-			}
-
-
-			$db->free($result);
-
-			return $records;
-		} else {
-			$this->error = $db->lasterror();
-			return -1;
-		}
-	}
-
-	/**
-	 *    Insert line into database
-	 *
-	 * @param User $user
-	 * @param bool $notrigger 1 no triggers
-	 * @return        int                                         <0 if KO, >0 if OK
-	 * @throws Exception
-	 */
-	public function insert(User $user, $notrigger = false)
-	{
-		global $db, $user, $conf;
-
-		$db->begin();
-		$now = dol_now();
-
-		// Insertion dans base de la line
-		$sql  = 'INSERT INTO ' . MAIN_DB_PREFIX . 'digiriskdolibarr_accident_lesion';
-		$sql .= ' (ref, entity, date_creation, lesion_localization, lesion_nature, fk_accident';
-		$sql .= ')';
-		$sql .= " VALUES (";
-		$sql .= "'" . $db->escape($this->ref) . "'" . ", ";
-		$sql .= $this->entity . ", ";
-		$sql .= "'" . $db->escape($db->idate($now)) . "'" . ", ";
-		$sql .= "'" . $db->escape($this->lesion_localization) . "'" . ", ";
-		$sql .= "'" . $db->escape($this->lesion_nature) . "'" . ", ";
-		$sql .= $this->fk_accident;
-
-		$sql .= ')';
-
-		dol_syslog(get_class($this) . "::insert", LOG_DEBUG);
-		$resql = $db->query($sql);
-
-		if ($resql) {
-			$this->id    = $db->last_insert_id(MAIN_DB_PREFIX . 'accident_lesion');
-			$this->rowid = $this->id; // For backward compatibility
-
-			$db->commit();
-			// Triggers
-			if ( ! $notrigger) {
-				// Call triggers
-				if (!empty($conf->global->DIGIRISKDOLIBARR_MAIN_AGENDA_ACTIONAUTO_ACCIDENT_LESION_CREATE)) $this->call_trigger(strtoupper(get_class($this)) . '_CREATE', $user);
-				// End call triggers
-			}
-			return $this->id;
-		} else {
-			$this->error = $db->lasterror();
-			$db->rollback();
-			return -2;
-		}
-	}
-}
-
-/**
- *	Class to manage accident signature.
- *  Saved into database table llx_digiriskdolibarr_object_signature
- */
-class AccidentSignature extends DigiriskSignature
-{
-	/**
-	 * @var DoliDB Database handler.
-	 */
-	public $db;
-
-	/**
-	 * @var string[] Array of error strings
-	 */
-	public $errors = [];
-
-	/**
-	 * @var string Name of table without prefix where object is stored. This is also the key used for extrafields management.
-	 */
-
-	public $object_type = 'accident';
-
-	/**
-	 * Constructor
-	 *
-	 * @param DoliDb $db Database handler
-	 */
-	public function __construct(DoliDB $db)
-	{
-		global $conf, $langs;
-
-		$this->db = $db;
-
-		if (empty($conf->global->MAIN_SHOW_TECHNICAL_ID) && isset($this->fields['rowid'])) $this->fields['rowid']['visible'] = 0;
-		if (empty($conf->multicompany->enabled) && isset($this->fields['entity'])) $this->fields['entity']['enabled']        = 0;
-
-		// Unset fields that are disabled
-		foreach ($this->fields as $key => $val) {
-			if (isset($val['enabled']) && empty($val['enabled'])) {
-				unset($this->fields[$key]);
-			}
-		}
-
-		// Translate some data of arrayofkeyval
-		if (is_object($langs)) {
-			foreach ($this->fields as $key => $val) {
-				if (is_array($val['arrayofkeyval'])) {
-					foreach ($val['arrayofkeyval'] as $key2 => $val2) {
-						$this->fields[$key]['arrayofkeyval'][$key2] = $langs->trans($val2);
-					}
-				}
-			}
-		}
-	}
-
-	/**
-	 * Load list of objects in memory from the database.
-	 *
-	 * @param string $sortorder Sort Order
-	 * @param string $sortfield Sort field
-	 * @param int $limit limit
-	 * @param int $offset Offset
-	 * @param array $filter Filter array. Example array('field'=>'valueforlike', 'customurl'=>...)
-	 * @param string $filtermode Filter mode (AND or OR)
-	 * @param string $old_table_element
-	 * @return array|int                 int <0 if KO, array of pages if OK
-	 * @throws Exception
-	 */
-	public function fetchAll($sortorder = '', $sortfield = '', $limit = 0, $offset = 0, array $filter = [], $filtermode = 'AND', $old_table_element = '')
-	{
-		dol_syslog(__METHOD__, LOG_DEBUG);
-
-		$records = [];
-		$sql     = 'SELECT ';
-		$sql    .= $this->getFieldList();
-		if (dol_strlen($old_table_element)) {
-			$sql .= ' FROM ' . MAIN_DB_PREFIX . $old_table_element;
-		} else {
-			$sql .= ' FROM ' . MAIN_DB_PREFIX . $this->table_element;
-		}
-		if (isset($this->ismultientitymanaged) && $this->ismultientitymanaged == 1) $sql .= ' WHERE entity IN (' . getEntity($this->table_element) . ')';
-		else $sql                                                                        .= ' WHERE 1 = 1';
-		$sql                                                                             .= ' AND object_type = "' . $this->object_type . '"';
-
-		// Manage filter
-		$sqlwhere = [];
-		if (count($filter) > 0) {
-			foreach ($filter as $key => $value) {
-				if ($key == 'rowid') {
-					$sqlwhere[] = $key . '=' . $value;
-				} elseif (in_array($this->fields[$key]['type'], array('date', 'datetime', 'timestamp'))) {
-					$sqlwhere[] = $key . ' = \'' . $this->db->idate($value) . '\'';
-				} elseif ($key == 'customsql') {
-					$sqlwhere[] = $value;
-				} elseif (strpos($value, '%') === false) {
-					$sqlwhere[] = $key . ' IN (' . $this->db->sanitize($this->db->escape($value)) . ')';
-				} else {
-					$sqlwhere[] = $key . ' LIKE \'%' . $this->db->escape($value) . '%\'';
-				}
-			}
-		}
-		if (count($sqlwhere) > 0) {
-			$sql .= ' AND (' . implode(' ' . $filtermode . ' ', $sqlwhere) . ')';
-		}
-
-		if ( ! empty($sortfield)) {
-			$sql .= $this->db->order($sortfield, $sortorder);
-		}
-		if ( ! empty($limit)) {
-			$sql .= ' ' . $this->db->plimit($limit, $offset);
-		}
-
-		$resql = $this->db->query($sql);
-
-		if ($resql) {
-			$num = $this->db->num_rows($resql);
-			$i   = 0;
-			while ($i < ($limit ? min($limit, $num) : $num)) {
-				$obj = $this->db->fetch_object($resql);
-
-				$record = new self($this->db);
-				$record->setVarsFromFetchObj($obj);
-
-				$records[$record->id] = $record;
-
-				$i++;
-			}
-			$this->db->free($resql);
-
-			return $records;
-		} else {
-			$this->errors[] = 'Error ' . $this->db->lasterror();
-			dol_syslog(__METHOD__ . ' ' . join(',', $this->errors), LOG_ERR);
-
-			return -1;
-		}
 	}
 }

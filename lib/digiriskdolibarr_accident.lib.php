@@ -25,7 +25,7 @@
  * Prepare array of tabs for Accident
  *
  * @param	Accident $object Accident
- * @return 	array					Array of tabs
+ * @return 	array			 Array of tabs
  */
 function accident_prepare_head($object)
 {
@@ -49,5 +49,5 @@ function accident_prepare_head($object)
 
 	$moreparam['attendantTableMode'] = 'simple';
 
-	return saturne_object_prepare_head($object, $head, $moreparam, true);
+	return saturne_object_prepare_head($object, $head, $moreparam);
 }

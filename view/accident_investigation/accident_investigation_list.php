@@ -78,7 +78,7 @@ $pagenext = $page + 1;
 // Initialize technical objects
 $object     = new AccidentInvestigation($db);
 $accident   = new Accident($db);
-$signatory  = new AccidentSignature($db);
+$signatory  = new SaturneSignature($db, $object->module, $object->element);
 $objectline = new AccidentWorkStop($db);
 
 $form             = new Form($db);
