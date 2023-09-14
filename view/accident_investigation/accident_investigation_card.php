@@ -192,10 +192,11 @@ if (empty($reshook)) {
 			}
 		}
 
-		$moreParams['object'] = $object;
-		$moreParams['user']   = $user;
-		$moreParams['zone']   = 'private';
-
+		$moreParams['object']   = $object;
+		$moreParams['user']     = $user;
+		$moreParams['zone']     = 'private';
+		$constName              = get_class($object) . '::STATUS_LOCKED';
+		$moreParams['specimen'] = defined($constName) && $object->status < $object::STATUS_LOCKED;
 		$result = $document->generateDocument((!empty($models) ? $models[0] : ''), $langs, 0, 0, 0, $moreParams);
 
 		if ($result > 0) {
@@ -303,8 +304,12 @@ if ($action == 'create') {
 
 	$formConfirm = '';
 
-	// Draft confirmation
+	// Draft confirmation.
 	if (($action == 'set_draft' && (empty($conf->use_javascript_ajax) || !empty($conf->dol_use_jmobile))) || (!empty($conf->use_javascript_ajax) && empty($conf->dol_use_jmobile))) {
+		$formConfirm .= $form->formconfirm($_SERVER['PHP_SELF'] . '?id=' . $object->id, $langs->trans('ReOpenObject', $langs->transnoentities('The' . ucfirst($object->element))), $langs->trans('ConfirmReOpenObject', $langs->transnoentities('The' . ucfirst($object->element)), $langs->transnoentities('The' . ucfirst($object->element))), 'confirm_setdraft', '', 'yes', 'actionButtonInProgress', 350, 600);
+	}
+	// New version confirmation
+	if (($action == 'set_new_version' && (empty($conf->use_javascript_ajax) || !empty($conf->dol_use_jmobile))) || (!empty($conf->use_javascript_ajax) && empty($conf->dol_use_jmobile))) {
 		$imgPath      = dol_buildpath('custom/saturne/img/formconfirm/object_classify.png', 1);
 		$img          = img_picto($langs->trans('NewVersion'), $imgPath, '', 1);
 		$formQuestion = [
@@ -312,7 +317,7 @@ if ($action == 'create') {
 			['type' => 'other', 'name' => 'OK', 'label' => '', 'value' => $img, 'moreattr' => 'readonly'],
 		];
 
-		$formConfirm .= $form->formconfirm($_SERVER['PHP_SELF'] . '?id=' . $object->id, $langs->trans('ReOpenObject', $langs->transnoentities('The' . ucfirst($object->element))), '', 'confirm_setdraft', $formQuestion, 'yes', 'actionButtonInProgress', 400, 650);
+		$formConfirm .= $form->formconfirm($_SERVER['PHP_SELF'] . '?id=' . $object->id, $langs->trans('NewVersionObject', $langs->transnoentities('The' . ucfirst($object->element))), '', 'confirm_setdraft', $formQuestion, 'yes', 'actionButtonNewVersion', 400, 650);
 	}
 	// Validate confirmation
 	if (($action == 'set_validate' && (empty($conf->use_javascript_ajax) || !empty($conf->dol_use_jmobile))) || (!empty($conf->use_javascript_ajax) && empty($conf->dol_use_jmobile))) {
@@ -452,7 +457,7 @@ if ($action == 'create') {
 		// New version.
 		$displayButton = $onPhone ? '<i class="fas fa-code-branch fa-2x"></i>' : '<i class="fas fa-code-branch"></i>' . ' ' . $langs->trans('NewVersion');
 		if ($object->status == AccidentInvestigation::STATUS_ARCHIVED) {
-			print '<span class="butAction" id="actionButtonInProgress" href="' . $_SERVER['PHP_SELF'] . '?id=' . $object->id . '&action=set_draft&token=' . newToken() . '">' . $displayButton . '</span>';
+			print '<span class="butAction" id="actionButtonNewVersion" href="' . $_SERVER['PHP_SELF'] . '?id=' . $object->id . '&action=set_new_version&token=' . newToken() . '">' . $displayButton . '</span>';
 		} else {
 			print '<span class="butActionRefused classfortooltip" title="' . dol_escape_htmltag($langs->trans('ObjectMustBeVersionedToOpen', ucfirst($langs->transnoentities('The' . ucfirst($object->element))))) . '">' . $displayButton . '</span>';
 		}
