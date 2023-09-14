@@ -42,7 +42,7 @@ require_once __DIR__ . '/../../core/modules/digiriskdolibarr/digiriskelement/acc
 global $conf, $db, $hookmanager, $langs, $user;
 
 // Load translation files required by the page
-$langs->loadLangs(array("digiriskdolibarr@digiriskdolibarr", "other"));
+saturne_load_langs();
 
 // Get parameters
 $id                  = GETPOST('id', 'int');
@@ -53,9 +53,10 @@ $backtopage          = GETPOST('backtopage', 'alpha');
 $backtopageforcancel = GETPOST('backtopageforcancel', 'alpha');
 
 // Initialize technical objects
-$object               = new Accident($db);
-$objectline           = new AccidentLesion($db);
-$project              = new Project($db);
+$object     = new Accident($db);
+$objectline = new AccidentLesion($db);
+$project    = new Project($db);
+$form       = new Form($db);
 
 // Load object
 $object->fetch($id);
@@ -127,7 +128,7 @@ if (empty($reshook)) {
 		}
 
 		if ( ! $error) {
-			$result = $objectline->insert($user, false);
+			$result = $objectline->create($user, false);
 			if ($result > 0) {
 				// Creation accident lesion OK
 				setEventMessages($langs->trans('AddAccidentLesion') . ' ' . $object->ref, array());
@@ -197,35 +198,38 @@ if (empty($reshook)) {
  * View
  */
 
-$form = new Form($db);
-
-$title         = $langs->trans("AccidentMetaDataLesion");
-$object->picto = 'accident@digiriskdolibarr';
-
+$title    = $langs->trans("AccidentMetaDataLesion");
 $help_url = 'FR:Module_Digirisk#DigiRisk_-_Accident_b.C3.A9nins_et_presque_accidents';
-$morejs   = array("/digiriskdolibarr/js/digiriskdolibarr.js");
-$morecss  = array("/digiriskdolibarr/css/digiriskdolibarr.css");
 
-llxHeader('', $title, $help_url, '', '', '', $morejs, $morecss);
+saturne_header(0, '', $title, $help_url);
 
-// Object metadata lesion
+// Object metadata
 // ------------------------------------------------------------
-$head = accident_prepare_head($object);
-print dol_get_fiche_head($head, 'accidentMetadataLesion', $title, -1, "digiriskdolibarr@digiriskdolibarr");
-$height                                   = 80;
-$width                                    = 80;
-dol_strlen($object->label) ? $morehtmlref = '<span>' . ' - ' . $object->label . '</span>' : '';
-$morehtmlref                             .= '<div class="refidno">';
-// Project
-$project->fetch($object->fk_project);
-$morehtmlref .= $langs->trans('Project') . ' : ' . getNomUrlProject($project, 1, 'blank');
-$morehtmlref .= '</div>';
+saturne_get_fiche_head($object, 'accidentMetadataLesion', $title);
 
-//$morehtmlleft = '<div class="floatleft inline-block valignmiddle divphotoref">' . digirisk_show_photos('digiriskdolibarr', $conf->digiriskdolibarr->multidir_output[$conf->entity] . '/' . $object->element, 'small', 5, 0, 0, 0, $height, $width, 0, 0, 0, $object->element, $object) . '</div>';
+//Number workstop days
+$accidentlines     = $objectline->fetchAll('', '', 0, 0, ['customsql' => 't.fk_accident = ' . $object->id . ' AND t.status >= 0']);
+$totalworkstopdays = 0;
+
+if (!empty($accidentlines) && $accidentlines > 0) {
+	foreach ($accidentlines as $accidentline) {
+		if ($accidentline->status > 0) {
+			$totalworkstopdays += $accidentline->workstop_days;
+		}
+	}
+	$morehtmlref      = $langs->trans('TotalWorkStopDays') . ' : ' . $totalworkstopdays;
+	$lastaccidentline = end($accidentlines);
+	$morehtmlref     .= '<br>' . $langs->trans('ReturnWorkDate') . ' : ' . dol_print_date($lastaccidentline->date_end_workstop, 'dayhour');
+} else {
+	$morehtmlref = $langs->trans('RegisterAccident');
+}
+$morehtmlref .= '<br>';
+
+$morehtmlleft = '<div class="floatleft inline-block valignmiddle divphotoref">' . digirisk_show_photos('digiriskdolibarr', $conf->digiriskdolibarr->multidir_output[$conf->entity] . '/' . $object->element, 'small', 5, 0, 0, 0, 80, 80, 0, 0, 0, $object->element, $object) . '</div>';
 
 $linkback = '<a href="' . dol_buildpath('/digiriskdolibarr/view/accident/accident_list.php', 1) . '">' . $langs->trans("BackToList") . '</a>';
 
-digirisk_banner_tab($object, 'id', $linkback, 1, 'rowid', 'ref', $morehtmlref);
+saturne_banner_tab($object, 'id', $linkback, 1, 'rowid', 'ref', $morehtmlref);
 
 // ACCIDENT LESION
 print '<div class="div-table-responsive-no-min" style="overflow-x: unset !important">';
@@ -240,7 +244,7 @@ if (empty($forceall)) $forceall = 0;
 $colspan = 3; // Columns: total ht + col edit + col delete
 
 // Accident Lines
-$accidentlines = $objectline->fetchFromParent($object->id);
+$accidentlines = $objectline->fetchAll('', '', 0, 0, ['customsql' => 't.fk_accident = ' . $object->id . ' AND t.status >= 0']);
 
 print '<tr class="liste_titre">';
 print '<td><span>' . $langs->trans('Ref.') . '</span></td>';
@@ -249,7 +253,7 @@ print '<td>' . $langs->trans('LesionNature') . '</td>';
 print '<td class="center" colspan="' . $colspan . '">' . $langs->trans('ActionsLine') . '</td>';
 print '</tr>';
 
-if ( ! empty($accidentlines) && $accidentlines > 0) {
+if (!empty($accidentlines) && $accidentlines > 0) {
 	foreach ($accidentlines as $key => $item) {
 		if ($action == 'editline' && $lineid == $key) {
 			print '<form method="POST" action="' . $_SERVER["PHP_SELF"] . '?id=' . $object->id . '">';

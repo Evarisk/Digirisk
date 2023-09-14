@@ -351,7 +351,7 @@ class AccidentInvestigation extends SaturneObject
 
 		if ($investigationId > 0) {
 			// Load signatory from source object.
-			$signatory   = new SaturneSignature($this->db);
+			$signatory   = new SaturneSignature($this->db, $this->module, $this->element);
 			$signatories = $signatory->fetchSignatory('', $fromID, $this->element);
 			if (is_array($signatories) && !empty($signatories)) {
 				foreach ($signatories as $arrayRole) {
