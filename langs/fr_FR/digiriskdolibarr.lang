@@ -725,6 +725,35 @@ NbPresquAccidents = Nombre de presqu'accidents
 NbAccidentInvestigations = Nombre d'enquête accidents
 NbWorkedHours = Nombre d\'heures travaillées
 ConfirmDeleteAccident = Êtes-vous sûr de vouloir supprimer l'accident ?
+AccidentInvestigation = Enquête accident
+Accident_investigation = Enquête accident
+AccidentInvestigationDocument = Document d'enquête accident
+accidentinvestigationdocument.odt = Enquête accident
+NewAccidentInvestigation = Nouvelle enquête accident
+UpdateAccidentInvestigation = Modifier une enquête accident
+AccidentInvestigationList = Liste des enquêtes accidents
+TheAccident_investigation = l'enquête accident
+SeniorityInPosition = Ancienneté dans le poste
+VictimSkills = Compétences de l'accidenté
+CollectiveEquipment = Équipement de protection collective (EPC)
+IndividualEquipment = Équipement de protection individuelle (EPI)
+Circumstances = Circonstances
+CurativeAction = Actions curatives
+PreventiveAction = Actions préventives
+CausalityTree = Arbre des causes
+AccidentInvestigationTaskCreated = Les tâches de l'enquête accident ont été crées
+AccidentInvestigationTaskDeleted = Les tâches de l'enquête accident ont été supprimées
+TaskWillBeCreatedAfterValidation = Les tâches seront créées après validation de l'enquête accident
+AccidentInvestigationClassified = L'enquête accident a été classifié et le document a été généré
+DocumentGeneratedWithVersioning = Le document est généré lorsque l'enquête accident est versionnée
+NewVersionObject = Nouvelle version de %s
+ConfirmReOpenInvestigation = Êtes-vous sûr de vouloir créer une nouvelle version de l'enquête accident ? La réouverture permet la modification de l'enquête accident et l'ajout de nouveaux participants mais <b>toutes les signatures actuelles du document seront perdues. <br> Une nouvelle version du document sera généré par la suite.</b>.
+AccidentInvestigationUnValidate = Nouvelle version d'une enquête accident
+AccidentInvestigationArchive = Classification d'une enquête accident
+AccidentInvestigationSigned = Signature d'une enquête accident
+TheAccident = l'accident
+AccidentInvestigationLock = Verrouillage d'une enquête accident
+AccidentInvestigationValidated = Enquête accident validée
 
 # AccidentTooltip - Tooltip des accidents
 VictimActivityTooltip = Précisez l’activité ou la tâche de la victime au moment de l’accident, c’est-à-dire ce que faisait la victime
@@ -775,6 +804,8 @@ UnspecifiedAndMiscellaneous = Non précisé et divers
 Other = Autres
 CutOff = Coupure
 
+Investigator = Enquêteur
+Rescuer = Secouriste
 
 
 #

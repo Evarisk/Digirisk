@@ -21,20 +21,14 @@
  *		\brief      List page for accident
  */
 
-// Load Dolibarr environment
-$res = 0;
-// Try main.inc.php into web root known defined into CONTEXT_DOCUMENT_ROOT (not always defined)
-if ( ! $res && ! empty($_SERVER["CONTEXT_DOCUMENT_ROOT"])) $res = @include $_SERVER["CONTEXT_DOCUMENT_ROOT"] . "/main.inc.php";
-// Try main.inc.php into web root detected using web root calculated from SCRIPT_FILENAME
-$tmp = empty($_SERVER['SCRIPT_FILENAME']) ? '' : $_SERVER['SCRIPT_FILENAME']; $tmp2 = realpath(__FILE__); $i = strlen($tmp) - 1; $j = strlen($tmp2) - 1;
-while ($i > 0 && $j > 0 && isset($tmp[$i]) && isset($tmp2[$j]) && $tmp[$i] == $tmp2[$j]) { $i--; $j--; }
-if ( ! $res && $i > 0 && file_exists(substr($tmp, 0, ($i + 1)) . "/main.inc.php")) $res          = @include substr($tmp, 0, ($i + 1)) . "/main.inc.php";
-if ( ! $res && $i > 0 && file_exists(dirname(substr($tmp, 0, ($i + 1))) . "/main.inc.php")) $res = @include dirname(substr($tmp, 0, ($i + 1))) . "/main.inc.php";
-// Try main.inc.php using relative path
-if ( ! $res && file_exists("../../main.inc.php")) $res       = @include "../../main.inc.php";
-if ( ! $res && file_exists("../../../main.inc.php")) $res    = @include "../../../main.inc.php";
-if ( ! $res && file_exists("../../../../main.inc.php")) $res = @include "../../../../main.inc.php";
-if ( ! $res) die("Include of main fails");
+// Load DigiriskDolibarr environment
+if (file_exists('../../digiriskdolibarr.main.inc.php')) {
+	require_once __DIR__ . '/../../digiriskdolibarr.main.inc.php';
+} elseif (file_exists('../../../digiriskdolibarr.main.inc.php')) {
+	require_once __DIR__ . '/../../../digiriskdolibarr.main.inc.php';
+} else {
+	die('Include of digiriskdolibarr main fails');
+}
 
 require_once DOL_DOCUMENT_ROOT . '/projet/class/project.class.php';
 require_once DOL_DOCUMENT_ROOT . '/core/lib/date.lib.php';
@@ -57,7 +51,7 @@ require_once __DIR__ . '/../../core/tpl/digirisk_security_checks.php';
 global $conf, $db, $hookmanager, $langs, $user;
 
 // Load translation files required by the page
-$langs->loadLangs(array('projects', 'companies', 'commercial'));
+saturne_load_langs(['projects', 'companies', 'commercial']);
 
 // Get parameters
 $action      = GETPOST('action', 'alpha');
@@ -68,8 +62,8 @@ $toselect    = GETPOST('toselect', 'array');
 $contextpage = GETPOST('contextpage', 'aZ') ? GETPOST('contextpage', 'aZ') : 'accidentlist';
 $fromid      = GETPOST('fromid');
 $limit       = GETPOST('limit', 'int') ? GETPOST('limit', 'int') : $conf->liste_limit;
-$sortfield   = GETPOST("sortfield", "alpha");
-$sortorder   = GETPOST("sortorder", 'alpha');
+$sortfield   = GETPOSTISSET("sortfield") ? GETPOST("sortfield", "aZ09comma") : 't.date_creation';
+$sortorder   = GETPOSTISSET("sortorder") ? GETPOST("sortorder", 'aZ09comma') : 'DESC';
 $fromiduser  = GETPOST('fromiduser', 'int'); //element id
 $page        = GETPOSTISSET('pageplusone') ? (GETPOST('pageplusone') - 1) : GETPOST("page", 'int');
 $page        = is_numeric($page) ? $page : 0;
@@ -87,28 +81,27 @@ $digiriskelement   = new DigiriskElement($db);
 $digiriskstandard  = new DigiriskStandard($db);
 $project           = new Project($db);
 
-if ( ! $sortfield) $sortfield = "t.ref";
-if ( ! $sortorder) $sortorder = "ASC";
-
 $offset   = $limit * $page;
 $pageprev = $page - 1;
 $pagenext = $page + 1;
 
 // Initialize array of search criterias
-$search_all = GETPOST('search_all', 'alphanohtml') ? trim(GETPOST('search_all', 'alphanohtml')) : trim(GETPOST('sall', 'alphanohtml'));
-$search     = array();
+$search_all = GETPOST('search_all') ? trim(GETPOST('search_all')) : trim(GETPOST('sall'));
+$search     = [];
 foreach ($accident->fields as $key => $val) {
 	if (GETPOST('search_' . $key, 'alpha') !== '') $search[$key] = GETPOST('search_' . $key, 'alpha');
 }
 
 // List of fields to search into when doing a "search in all"
-$fieldstosearchall = array();
+$fieldstosearchall = [];
 foreach ($accident->fields as $key => $val) {
-	if ($val['searchall']) $fieldstosearchall['t.' . $key] = $val['label'];
+	if ($val['searchall']) {
+		$fieldstosearchall['t.' . $key] = $val['label'];
+	}
 }
 
 // Definition of fields for list
-$arrayfields = array();
+$arrayfields = [];
 
 foreach ($accident->fields as $key => $val) {
 	// If $val['visible']==0, then we never show the field
@@ -124,18 +117,25 @@ $permissiontoadd    = $user->rights->digiriskdolibarr->accident->write;
 $permissiontodelete = $user->rights->digiriskdolibarr->accident->delete;
 
 // Security check
-if ( ! $permissiontoread) accessforbidden();
+saturne_check_access($permissiontoread);
 
 /*
  * Actions
  */
 
-if (GETPOST('cancel', 'alpha')) { $action = 'list'; $massaction = ''; }
-if ( ! GETPOST('confirmmassaction', 'alpha') && $massaction != 'presend' && $massaction != 'confirm_presend' && $massaction != 'confirm_createbills') { $massaction = ''; }
+if (GETPOST('cancel', 'alpha')) {
+	$action     = 'list';
+	$massaction = '';
+}
+if (!GETPOST('confirmmassaction', 'alpha') && $massaction != 'presend' && $massaction != 'confirm_presend' && $massaction != 'confirm_createbills') {
+	$massaction = '';
+}
 
-$parameters = array('socid' => $socid);
+$parameters = ['socid' => $socid];
 $reshook    = $hookmanager->executeHooks('doActions', $parameters, $object, $action); // Note that $action and $object may have been modified by some hooks
-if ($reshook < 0) setEventMessages($hookmanager->error, $hookmanager->errors, 'errors');
+if ($reshook < 0) {
+	setEventMessages($hookmanager->error, $hookmanager->errors, 'errors');
+}
 
 if (empty($reshook)) {
 	// Selection of new fields
@@ -150,7 +150,7 @@ if (empty($reshook)) {
 		}
 
 		$toselect             = '';
-		$search_array_options = array();
+		$search_array_options = [];
 	}
 	if (GETPOST('button_removefilter_x', 'alpha') || GETPOST('button_removefilter.x', 'alpha') || GETPOST('button_removefilter', 'alpha')
 		|| GETPOST('button_search_x', 'alpha') || GETPOST('button_search.x', 'alpha') || GETPOST('button_search', 'alpha')) {
@@ -253,9 +253,9 @@ if ($fromid > 0) {
 include DOL_DOCUMENT_ROOT . '/core/tpl/extrafields_list_search_param.tpl.php';
 
 // List of mass actions available
-$arrayofmassactions                                                           = array();
+$arrayofmassactions                                                           = [];
 if ($permissiontodelete) $arrayofmassactions['predelete']                     = '<span class="fa fa-trash paddingrightonly"></span>' . $langs->trans("Delete");
-if (in_array($massaction, array('presend', 'predelete'))) $arrayofmassactions = array();
+if (in_array($massaction, array('presend', 'predelete'))) $arrayofmassactions = [];
 
 $massactionbutton = $form->selectMassAction('', $arrayofmassactions);
 
@@ -292,7 +292,7 @@ if ( ! empty($extrafields->attributes[$accident->table_element]['label'])) {
 	foreach ($extrafields->attributes[$accident->table_element]['label'] as $key => $val) $sql .= ($extrafields->attributes[$accident->table_element]['type'][$key] != 'separate' ? "ef." . $key . ' as options_' . $key . ', ' : '');
 }
 // Add fields from hooks
-$parameters = array();
+$parameters = [];
 $reshook    = $hookmanager->executeHooks('printFieldListSelect', $parameters, $accident); // Note that $action and $accidentdocument may have been modified by hook
 $sql       .= preg_replace('/^,/', '', $hookmanager->resPrint);
 $sql        = preg_replace('/,\s*$/', '', $sql);
@@ -307,6 +307,7 @@ if ($fromid > 0) {
 } elseif ($fromiduser > 0){
 	$sql .= " AND fk_user_victim = " . $fromiduser;
 }
+$sql .= ' AND status >= 0';
 
 foreach ($search as $key => $val) {
 	if ($key == 'status' && $search[$key] == -1) continue;
@@ -322,7 +323,7 @@ if ($search_all) $sql .= natural_search(array_keys($fieldstosearchall), $search_
 // Add where from extra fields
 include DOL_DOCUMENT_ROOT . '/core/tpl/extrafields_list_search_sql.tpl.php';
 // Add where from hooks
-$parameters = array();
+$parameters = [];
 $reshook    = $hookmanager->executeHooks('printFieldListWhere', $parameters, $accident); // Note that $action and $accidentdocument may have been modified by hook
 $sql       .= $hookmanager->resPrint;
 
@@ -436,7 +437,7 @@ print $hookmanager->resPrint;
 print getTitleFieldOfList($selectedfields, 0, $_SERVER["PHP_SELF"], '', '', '', '', $sortfield, $sortorder, 'center maxwidthsearch ') . "\n";
 print '</tr>' . "\n";
 
-$arrayofselected = is_array($toselect) ? $toselect : array();
+$arrayofselected = is_array($toselect) ? $toselect : [];
 
 // Loop on record
 // --------------------------------------------------------------------
@@ -444,7 +445,7 @@ $arrayofselected = is_array($toselect) ? $toselect : array();
 // contenu
 $i          = 0;
 $kCounter   = 0;
-$totalarray = array();
+$totalarray = [];
 
 while ($i < ($limit ? min($num, $limit) : $num)) {
 	$obj = $db->fetch_object($resql);
@@ -473,7 +474,7 @@ while ($i < ($limit ? min($num, $limit) : $num)) {
 				$morecssGauge     = 'center';
 				$move_title_gauge = 1;
 
-				$arrayAccident   = array();
+				$arrayAccident   = [];
 				$arrayAccident[] = $accident->ref;
 				$arrayAccident[] = $accident->label;
 				$arrayAccident[] = ( ! empty($accident->accident_type) ? $accident->accident_type : 0);

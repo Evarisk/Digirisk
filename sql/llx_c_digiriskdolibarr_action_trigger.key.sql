@@ -13,5 +13,5 @@
 -- You should have received a copy of the GNU General Public License
 -- along with this program.  If not, see https://www.gnu.org/licenses/.
 
-ALTER TABLE llx_c_digiriskdolibarr_action_trigger ADD UNIQUE INDEX uk_action_trigger_code (code);
-ALTER TABLE llx_c_digiriskdolibarr_action_trigger ADD INDEX idx_action_trigger_rang (rang);
+ALTER TABLE llx_c_digiriskdolibarr_action_trigger ADD UNIQUE INDEX uk_action_trigger_ref (ref);
+ALTER TABLE llx_c_digiriskdolibarr_action_trigger ADD INDEX idx_action_trigger_rang (position);
