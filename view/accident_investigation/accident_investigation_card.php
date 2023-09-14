@@ -203,6 +203,7 @@ if (empty($reshook)) {
 			setEventMessages('AccidentInvestigationClassified', []);
 		} else {
 			setEventMessages($document->error, [], 'errors');
+            $action = '';
 		}
 	}
 
