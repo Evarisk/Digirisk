@@ -936,4 +936,22 @@ class ActionsDigiriskdolibarr
 		return 0; // or return 1 to replace standard code.
 	}
 
+	/**
+	 *  Overloading the SaturneCustomHeaderFunction function : replacing the parent's function with the one below.
+	 *
+	 * @param  array        $parameters Hook metadatas (context, etc...).
+	 * @param  CommonObject $object     Current object.
+	 * @return int                      0 < on error, 0 on success, 1 to replace standard code.
+	 */
+	public function SaturneBannerTabCustomSubdir(array $parameters, object $object): int
+	{
+		// Do something only for the current context.
+		if (in_array($parameters['currentcontext'], ['digiriskelementview'])) {
+			require_once __DIR__ . '/../lib/digiriskdolibarr_function.lib.php';
+
+			$this->resprints = $object->element_type . '/'. $object->ref;
+			return 1;
+		}
+		return 0; // or return 1 to replace standard code.
+	}
 }

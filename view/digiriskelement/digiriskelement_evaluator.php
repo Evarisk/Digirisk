@@ -78,7 +78,7 @@ $numberingModuleName = [
 
 list($refEvaluatorMod) = saturne_require_objects_mod($numberingModuleName, $moduleNameLowerCase);
 
-$hookmanager->initHooks(array('evaluatorcard', 'globalcard')); // Note that conf->hooks_modules contains array
+$hookmanager->initHooks(array('evaluatorcard', 'digiriskelementview', 'globalcard')); // Note that conf->hooks_modules contains array
 
 // Fetch optionals attributes and labels
 $extrafields->fetch_name_optionals_label($evaluator->table_element);
@@ -291,13 +291,10 @@ if ($object->id > 0 || $fromid > 0) {
 			$morehtmlref .= '<br>' . $langs->trans("ParentElement") . ' : ' . $digiriskstandard->getNomUrl(1, 'blank', 1);
 		}
 		$morehtmlref .= '</div>';
-		if (isset($object->element_type)) {
-			$morehtmlleft = '<div class="floatleft inline-block valignmiddle divphotoref photo digirisk-element-photo-'. $object->id .'">';
-			$morehtmlleft .= saturne_show_medias_linked('digiriskdolibarr', $conf->digiriskdolibarr->multidir_output[$conf->entity] . '/' . $object->element_type . '/' . $object->ref, 'small', 1, 0, 0, 0, $height, $width, 0, 0, 0, $object->element_type . '/' . $object->ref, $object, 'photo', 0, 0, 0, 1);
-			$morehtmlleft .= '</div>';
-		}
+
 		$linkback = '<a href="' . dol_buildpath('/digiriskdolibarr/view/digiriskelement/risk_list.php', 1) . '">' . $langs->trans("BackToList") . '</a>';
-		digirisk_banner_tab($object, 'id', $linkback, 1, 'rowid', 'ref', $morehtmlref, '', 0, $morehtmlleft);
+
+		saturne_banner_tab($object,'ref','', 1, 'ref', 'ref', $morehtmlref, true);
 	} else {
 		$linkback = '<a href="' . DOL_URL_ROOT . '/user/list.php?restore_lastsearch_values=1">' . $langs->trans("BackToList") . '</a>';
 
