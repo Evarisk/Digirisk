@@ -2116,7 +2116,7 @@ class modDigiriskdolibarr extends DolibarrModules
 			dolibarr_set_const($this->db, 'DIGIRISKDOLIBARR_DEFAULT_PROJECT_CONTACT_TYPE', $projectTypeId, 'integer', 0, '', $conf->entity);
 
 			$task       = new Task($this->db);
-			$taskTypeId = array_key_first($task->liste_type_contact('internal', 'position', 0, 1, 'PROJECTCONTRIBUTOR'));
+			$taskTypeId = array_key_first($task->liste_type_contact('internal', 'position', 0, 1, 'TASKCONTRIBUTOR'));
 			dolibarr_set_const($this->db, 'DIGIRISKDOLIBARR_DEFAULT_TASK_CONTACT_TYPE', $taskTypeId, 'integer', 0, '', $conf->entity);
 		}
 
