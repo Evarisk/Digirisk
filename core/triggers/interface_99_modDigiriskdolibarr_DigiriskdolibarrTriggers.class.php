@@ -2093,14 +2093,26 @@ class InterfaceDigiriskdolibarrTriggers extends DolibarrTriggers
 				$result = $actioncomm->create($user);
 				break;
 
-			case 'ACCIDENTINVESTIGATION_ARCHIVE' :
+			case 'ACCIDENT_INVESTIGATION_UNVALIDATE' :
+				$actioncomm->label = $langs->trans('ObjectUnValidateTrigger', $langs->transnoentities(ucfirst($object->element)), $object->ref);
+
+				$result = $actioncomm->create($user);
+				break;
+
+			case 'ACCIDENT_INVESTIGATION_ARCHIVE' :
 				$actioncomm->label = $langs->trans('ObjectArchivedTrigger', $langs->transnoentities(ucfirst($object->element)), $object->ref);
 
 				$result = $actioncomm->create($user);
 				break;
 
-			case 'ACCIDENTINVESTIGATION_SIGNED' :
-				$actioncomm->label = $langs->trans('ObjectSignedTrigger', $langs->transnoentities(ucfirst($object->element)), $object->ref);
+			case 'ACCIDENT_INVESTIGATION_LOCK' :
+				$actioncomm->label = $langs->trans('ObjectLockedTrigger', $langs->transnoentities(ucfirst($object->element)), $object->ref);
+
+				$result = $actioncomm->create($user);
+				break;
+
+			case 'ACCIDENT_INVESTIGATION_SENTBYMAIL' :
+				$actioncomm->label = $langs->trans('ObjectSentByMailTrigger');
 
 				$result = $actioncomm->create($user);
 				break;

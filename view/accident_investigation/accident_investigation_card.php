@@ -94,6 +94,18 @@ $upload_dir = $conf->digiriskdolibarr->multidir_output[$object->entity ?? 1];
 // Load object
 require_once DOL_DOCUMENT_ROOT . '/core/actions_fetchobject.inc.php'; // Must be included, not include_once.
 
+$taskExist = $task->fetch($object->fk_task);
+if ($taskExist <= 0) {
+	$object->setValueFrom('fk_task', 0, '', null, 'int', '', $user, 'ACCIDENTINVESTIGATION_MODIFY');
+}
+
+if ($object->status == AccidentInvestigation::STATUS_VALIDATED) {
+	$result = $signatory->checkSignatoriesSignatures($id, $object->element);
+	if ($result > 0) {
+		$object->setLocked($user);
+	}
+}
+
 // Security check - Protection if external user
 $permissiontoread   = $user->rights->digiriskdolibarr->accident_investigation->read;
 $permissiontoadd    = $user->rights->digiriskdolibarr->accident_investigation->write;
@@ -122,11 +134,6 @@ if (empty($reshook)) {
 				$backtopage = dol_buildpath('/digiriskdolibarr/view/accident_investigation/accident_investigation_card.php', 1) . '?id=' . ((!empty($id) && $id > 0) ? $id : '__ID__');
 			}
 		}
-	}
-
-	$taskExist = $task->fetch($object->fk_task);
-	if ($taskExist <= 0) {
-		$object->setValueFrom('fk_task', 0, '', '', '', '', $user);
 	}
 
 	if ($action == 'confirm_set_validate') {
@@ -185,14 +192,15 @@ if (empty($reshook)) {
 			}
 		}
 
-		$moreParams['object'] = $object;
-		$moreParams['user']   = $user;
-		$moreParams['zone']   = 'private';
-
+		$moreParams['object']   = $object;
+		$moreParams['user']     = $user;
+		$moreParams['zone']     = 'private';
+		$constName              = get_class($object) . '::STATUS_LOCKED';
+		$moreParams['specimen'] = defined($constName) && $object->status < $object::STATUS_LOCKED;
 		$result = $document->generateDocument((!empty($models) ? $models[0] : ''), $langs, 0, 0, 0, $moreParams);
 
 		if ($result > 0) {
-			setEventMessages('AccidentInvestigationArchived', []);
+			setEventMessages('AccidentInvestigationClassified', []);
 		} else {
 			setEventMessages($document->error, [], 'errors');
 		}
@@ -291,22 +299,47 @@ if ($action == 'create') {
 	$accident->fetch($object->fk_accident);
 	$victim->fetch($accident->fk_user_victim);
 
-	saturne_get_fiche_head($object, 'accidentinvestigation', $title);
+	saturne_get_fiche_head($object, 'card', $title);
 	saturne_banner_tab($object);
 
 	$formConfirm = '';
 
-	// Draft confirmation
+	// Draft confirmation.
 	if (($action == 'set_draft' && (empty($conf->use_javascript_ajax) || !empty($conf->dol_use_jmobile))) || (!empty($conf->use_javascript_ajax) && empty($conf->dol_use_jmobile))) {
-		$formConfirm .= $form->formconfirm($_SERVER['PHP_SELF'] . '?id=' . $object->id, $langs->trans('ReOpenObject', $langs->transnoentities('The' . ucfirst($object->element))),  $langs->trans('ConfirmReOpenInvestigation'), 'confirm_setdraft', '', 'yes', 'actionButtonInProgress', 350, 600);
+		$formConfirm .= $form->formconfirm($_SERVER['PHP_SELF'] . '?id=' . $object->id, $langs->trans('ReOpenObject', $langs->transnoentities('The' . ucfirst($object->element))), $langs->trans('ConfirmReOpenObject', $langs->transnoentities('The' . ucfirst($object->element)), $langs->transnoentities('The' . ucfirst($object->element))), 'confirm_setdraft', '', 'yes', 'actionButtonInProgress', 350, 600);
+	}
+	// New version confirmation
+	if (($action == 'set_new_version' && (empty($conf->use_javascript_ajax) || !empty($conf->dol_use_jmobile))) || (!empty($conf->use_javascript_ajax) && empty($conf->dol_use_jmobile))) {
+		$imgPath      = dol_buildpath('custom/saturne/img/formconfirm/object_classify.png', 1);
+		$img          = img_picto($langs->trans('NewVersion'), $imgPath, '', 1);
+		$formQuestion = [
+			['type' => 'other', 'name' => 'lock_validation', 'label' => '<span class="">' . img_picto('', 'info') . ' ' . $langs->trans('ConfirmReOpenInvestigation'). '</span>'],
+			['type' => 'other', 'name' => 'OK', 'label' => '', 'value' => $img, 'moreattr' => 'readonly'],
+		];
+
+		$formConfirm .= $form->formconfirm($_SERVER['PHP_SELF'] . '?id=' . $object->id, $langs->trans('NewVersionObject', $langs->transnoentities('The' . ucfirst($object->element))), '', 'confirm_setdraft', $formQuestion, 'yes', 'actionButtonNewVersion', 400, 650);
 	}
 	// Validate confirmation
 	if (($action == 'set_validate' && (empty($conf->use_javascript_ajax) || !empty($conf->dol_use_jmobile))) || (!empty($conf->use_javascript_ajax) && empty($conf->dol_use_jmobile))) {
-		$formConfirm .= $form->formconfirm($_SERVER['PHP_SELF'] . '?id=' . $object->id, $langs->trans('ValidateObject', $langs->transnoentities('The' . ucfirst($object->element))), $langs->trans('ConfirmValidateObject', $langs->transnoentities('The' . ucfirst($object->element)), $langs->transnoentities('The' . ucfirst($object->element))), 'confirm_set_validate', '', 'yes', 'actionButtonValidate', 350, 600);
+		$imgPath      = dol_buildpath('custom/saturne/img/formconfirm/object_draft.png', 1);
+		$img          = img_picto($langs->trans('Validate'), $imgPath, '', 1);
+		$formQuestion = [
+			['type' => 'other', 'name' => 'lock_validation', 'label' => '<span class="">' . img_picto('', 'info') . ' ' . $langs->trans('ConfirmValidateObject', $langs->transnoentities('The' . ucfirst($object->element)), $langs->transnoentities('The' . ucfirst($object->element))) . '</span>'],
+			['type' => 'other', 'name' => 'OK', 'label' => '', 'value' => $img, 'moreattr' => 'readonly'],
+		];
+
+		$formConfirm .= $form->formconfirm($_SERVER['PHP_SELF'] . '?id=' . $object->id, $langs->trans('ValidateObject', $langs->transnoentities('The' . ucfirst($object->element))), '', 'confirm_set_validate', $formQuestion, 'yes', 'actionButtonValidate', 400, 650);
 	}
 	// Archive confirmation
 	if (($action == 'set_archive' && (empty($conf->use_javascript_ajax) || !empty($conf->dol_use_jmobile))) || (!empty($conf->use_javascript_ajax) && empty($conf->dol_use_jmobile))) {
-		$formConfirm .= $form->formconfirm($_SERVER['PHP_SELF'] . '?id=' . $object->id, $langs->trans('ArchiveObject', $langs->transnoentities('The' . ucfirst($object->element))), $langs->trans('ConfirmArchiveObject', $langs->transnoentities('The' . ucfirst($object->element))), 'confirm_archive', '', 'yes', 'actionButtonArchive', 350, 600);
+		$imgPath      = dol_buildpath('custom/saturne/img/formconfirm/object_validate.png', 1);
+		$img          = img_picto($langs->trans('Versioning'), $imgPath, '', 1);
+		$formQuestion = [
+			['type' => 'other', 'name' => 'lock_validation', 'label' => '<span class="">' . img_picto('', 'info') . ' ' . $langs->trans('ConfirmVersionObject', $langs->transnoentities('The' . ucfirst($object->element))). '</span>'],
+			['type' => 'other', 'name' => 'OK', 'label' => '', 'value' => $img, 'moreattr' => 'readonly'],
+		];
+
+		$formConfirm .= $form->formconfirm($_SERVER['PHP_SELF'] . '?id=' . $object->id, $langs->trans('VersionObject', $langs->transnoentities('The' . ucfirst($object->element))), '', 'confirm_archive', $formQuestion, 'yes', 'actionButtonArchive', 400, 650);
 	}
 	// Clone confirmation
 	if (($action == 'clone' && (empty($conf->use_javascript_ajax) || !empty($conf->dol_use_jmobile))) || (!empty($conf->use_javascript_ajax) && empty($conf->dol_use_jmobile))) {
@@ -386,36 +419,52 @@ if ($action == 'create') {
 			print '<span class="butActionRefused classfortooltip" title="' . dol_escape_htmltag($langs->trans('ObjectMustBeDraft', ucfirst($langs->transnoentities('The' . ucfirst($object->element))))) . '">' . $displayButton . '</span>';
 		}
 
+		// Re-Open.
+		$displayButton = $onPhone ? '<i class="fas fa-lock-open fa-2x"></i>' : '<i class="fas fa-lock-open"></i>' . ' ' . $langs->trans('ReOpenDoli');
+		if ($object->status == AccidentInvestigation::STATUS_VALIDATED) {
+			print '<span class="butAction" id="actionButtonInProgress" href="' . $_SERVER['PHP_SELF'] . '?id=' . $object->id . '&action=set_draft&token=' . newToken() . '">' . $displayButton . '</span>';
+		} else {
+			print '<span class="butActionRefused classfortooltip" title="' . dol_escape_htmltag($langs->trans('ObjectMustBeValidated', ucfirst($langs->transnoentities('The' . ucfirst($object->element))))) . '">' . $displayButton . '</span>';
+		}
+
+		// Sign.
+		$displayButton = $onPhone ? '<i class="fas fa-signature fa-2x"></i>' : '<i class="fas fa-signature"></i>' . ' ' . $langs->trans('Sign');
+		if ($object->status == AccidentInvestigation::STATUS_VALIDATED) {
+			print '<a class="butAction" id="actionButtonSign" href="' . dol_buildpath('/saturne/view/saturne_attendants.php', 1) . '?id=' . $object->id . '&module_name=' . $object->module . '&object_type=' . $object->element . '&attendant_table_mode=simple' . '">' . $displayButton . '</a>';
+		} else {
+			print '<span class="butActionRefused classfortooltip" title="' . dol_escape_htmltag($langs->trans('ObjectMustBeValidated', ucfirst($langs->transnoentities('The' . ucfirst($object->element))))) . '">' . $displayButton . '</span>';
+		}
+
 		// Send email.
-		$displayButton = $onPhone ? '<i class="fas fa-paper-plane fa-2x"></i>' : '<i class="fas fa-paper-plane"></i>' . ' ' . $langs->trans('SendMail') . ' ';
+		$displayButton = $onPhone ? '<i class="fas fa-envelope fa-2x"></i>' : '<i class="fas fa-envelope"></i>' . ' ' . $langs->trans('SendMail') . ' ';
 		if ($object->status == AccidentInvestigation::STATUS_VALIDATED) {
 			$fileParams    = dol_most_recent_file($upload_dir . '/' . $object->element . 'document' . '/' . $object->ref);
 			$file          = $fileParams['fullname'];
 			$forcebuilddoc = (file_exists($file) && !strstr($fileParams['name'], 'specimen')) ? 0 : 1;
 			print dolGetButtonAction($displayButton, '', 'default', $_SERVER['PHP_SELF'] . '?id=' . $object->id . '&action=presend&forcebuilddoc=' . $forcebuilddoc . '&mode=init#formmailbeforetitle');
 		} else {
-			print '<span class="butActionRefused classfortooltip" title="'.dol_escape_htmltag($langs->trans('ObjectMustBeValidatedToSendEmail', ucfirst($langs->transnoentities('The' . ucfirst($object->element))))) . '">' . $displayButton . '</span>';
+			print '<span class="butActionRefused classfortooltip" title="' . dol_escape_htmltag($langs->trans('ObjectMustBeValidatedToSendEmail', ucfirst($langs->transnoentities('The' . ucfirst($object->element))))) . '">' . $displayButton . '</span>';
 		}
 
-		// Archive.
-		$displayButton = $onPhone ?  '<i class="fas fa-archive fa-2x"></i>' : '<i class="fas fa-archive"></i>' . ' ' . $langs->trans('Archive');
-		if ($object->status == AccidentInvestigation::STATUS_VALIDATED) {
+		// Versioning.
+		$displayButton = $onPhone ?  '<i class="fas fa-file-archive fa-2x"></i>' : '<i class="fas fa-file-archive"></i>' . ' ' . $langs->trans('Versioning');
+		if ($object->status == AccidentInvestigation::STATUS_LOCKED) {
 			print '<span class="butAction" id="actionButtonArchive" href="' . $_SERVER['PHP_SELF'] . '?id=' . $object->id . '&action=set_archive&token=' . newToken() . '">' . $displayButton . '</span>';
 		} else {
-			print '<span class="butActionRefused classfortooltip" title="' . dol_escape_htmltag($langs->trans('ObjectMustBeValidatedToArchive', ucfirst($langs->transnoentities('The' . ucfirst($object->element))))) . '">' . $displayButton . '</span>';
+			print '<span class="butActionRefused classfortooltip" title="' . dol_escape_htmltag($langs->trans('ObjectMustBeValidatedToVersion', ucfirst($langs->transnoentities('The' . ucfirst($object->element))))) . '">' . $displayButton . '</span>';
 		}
 
-		// ReOpen.
-		$displayButton = $onPhone ? '<i class="fas fa-lock-open fa-2x"></i>' : '<i class="fas fa-lock-open"></i>' . ' ' . $langs->trans('ReOpenDoli');
+		// New version.
+		$displayButton = $onPhone ? '<i class="fas fa-code-branch fa-2x"></i>' : '<i class="fas fa-code-branch"></i>' . ' ' . $langs->trans('NewVersion');
 		if ($object->status == AccidentInvestigation::STATUS_ARCHIVED) {
-			print '<span class="butAction" id="actionButtonInProgress" href="' . $_SERVER['PHP_SELF'] . '?id=' . $object->id . '&action=set_draft&token=' . newToken() . '">' . $displayButton . '</span>';
+			print '<span class="butAction" id="actionButtonNewVersion" href="' . $_SERVER['PHP_SELF'] . '?id=' . $object->id . '&action=set_new_version&token=' . newToken() . '">' . $displayButton . '</span>';
 		} else {
-			print '<span class="butActionRefused classfortooltip" title="' . dol_escape_htmltag($langs->trans('ObjectMustBeArchivedToOpen', ucfirst($langs->transnoentities('The' . ucfirst($object->element))))) . '">' . $displayButton . '</span>';
+			print '<span class="butActionRefused classfortooltip" title="' . dol_escape_htmltag($langs->trans('ObjectMustBeVersionedToOpen', ucfirst($langs->transnoentities('The' . ucfirst($object->element))))) . '">' . $displayButton . '</span>';
 		}
 
 		// Clone.
 		$displayButton = $onPhone ? '<i class="fas fa-clone fa-2x"></i>' : '<i class="fas fa-clone"></i>' . ' ' . $langs->trans('ToClone');
-		print '<span class="butAction" id="actionButtonClone" href="' . $_SERVER['PHP_SELF'] . '?id=' . $object->id . '&action=clone' . '">' . $displayButton . '</span>';
+		print '<span class="butAction" id="actionButtonClone">' . $displayButton . '</span>';
 
 		// Delete (need delete permission, or if draft, just need create/modify permission).
 		$displayButton = $onPhone ? '<i class="fas fa-trash fa-2x"></i>' : '<i class="fas fa-trash"></i>' . ' ' . $langs->trans('Delete');
@@ -437,7 +486,7 @@ if ($action == 'create') {
 			$fileDir   = $upload_dir . '/' . $dirFiles;
 			$urlSource = $_SERVER['PHP_SELF'] . '?id=' . $object->id;
 
-			print saturne_show_documents('digiriskdolibarr:' . ucfirst('AccidentInvestigation') . 'Document', $dirFiles, $fileDir, $urlSource, $permissiontoadd, 0, $conf->global->DIGIRISKDOLIBARR_ACCIDENTINVESTIGATIONDOCUMENT_DEFAULT_MODEL, 1, 0, 0, 0, 0, '', '', $langs->defaultlang, '', $object, 0, 'remove_file', 0, $langs->trans('DocumentGeneratedWithArchive'));
+			print saturne_show_documents('digiriskdolibarr:' . ucfirst('AccidentInvestigation') . 'Document', $dirFiles, $fileDir, $urlSource, $permissiontoadd, 0, $conf->global->DIGIRISKDOLIBARR_ACCIDENTINVESTIGATIONDOCUMENT_DEFAULT_MODEL, 1, 0, 0, 0, 0, '', '', $langs->defaultlang, '', $object, 0, 'remove_file', 0, $langs->trans('DocumentGeneratedWithVersioning'));
 
 			print '</div><div class="fichehalfright">';
 
