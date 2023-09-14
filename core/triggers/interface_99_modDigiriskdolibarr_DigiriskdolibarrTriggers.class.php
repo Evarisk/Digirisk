@@ -1763,24 +1763,17 @@ class InterfaceDigiriskdolibarrTriggers extends DolibarrTriggers
 				switch ($object->external_accident) {
 					case 1:
 						if (!empty($object->fk_standard)) {
-							$actioncomm->elementtype = 'digiriskstandard@digiriskdolibarr';
 							$digiriskstandard->fetch($object->fk_standard);
-							$actioncomm->fk_element  = $object->fk_standard;
 							$accidentLocation = $digiriskstandard->ref . " - " . $conf->global->MAIN_INFO_SOCIETE_NOM;
 						} else if (!empty($object->fk_element)) {
-							$actioncomm->elementtype = 'digiriskelement@digiriskdolibarr';
 							$digiriskelement->fetch($object->fk_element);
-							$actioncomm->fk_element  = $object->fk_element;
 							$accidentLocation = $digiriskelement->ref . " - " . $digiriskelement->label;
 						}
 						break;
 					case 2:
-						$actioncomm->elementtype = 'accident@digiriskdolibarr';
 						$society->fetch($object->fk_soc);
-						$actioncomm->fk_element  = $object->fk_soc;
 						$accidentLocation = $society->ref . " - " . $society->label;
 					case 3:
-						$actioncomm->elementtype = 'accident@digiriskdolibarr';
 						$accidentLocation = $object->accident_location;
 						break;
 				}
@@ -1809,28 +1802,23 @@ class InterfaceDigiriskdolibarrTriggers extends DolibarrTriggers
 				$useremployer = new User($this->db);
 				$useremployer->fetch($object->fk_user_employer);
 
+				$actioncomm->elementtype = 'accident@digiriskdolibarr';
 				//1 : Accident in DU / GP, 2 : Accident in society, 3 : Accident in another location
 				switch ($object->external_accident) {
 					case 1:
 						if (!empty($object->fk_standard)) {
-							$actioncomm->elementtype = 'digiriskstandard@digiriskdolibarr';
 							$digiriskstandard->fetch($object->fk_standard);
-							$actioncomm->fk_element  = $object->fk_standard;
 							$accidentLocation = $digiriskstandard->ref . " - " . $conf->global->MAIN_INFO_SOCIETE_NOM;
 						} else if (!empty($object->fk_element)) {
-							$actioncomm->elementtype = 'digiriskelement@digiriskdolibarr';
 							$digiriskelement->fetch($object->fk_element);
 							$actioncomm->fk_element  = $object->fk_element;
 							$accidentLocation = $digiriskelement->ref . " - " . $digiriskelement->label;
 						}
 						break;
 					case 2:
-						$actioncomm->elementtype = 'accident@digiriskdolibarr';
 						$society->fetch($object->fk_soc);
-						$actioncomm->fk_element  = $object->fk_soc;
 						$accidentLocation = $society->ref . " - " . $society->label;
 					case 3:
-						$actioncomm->elementtype = 'accident@digiriskdolibarr';
 						$accidentLocation = $object->accident_location;
 						break;
 				}
@@ -1865,24 +1853,17 @@ class InterfaceDigiriskdolibarrTriggers extends DolibarrTriggers
 				switch ($object->external_accident) {
 					case 1:
 						if (!empty($object->fk_standard)) {
-							$actioncomm->elementtype = 'digiriskstandard@digiriskdolibarr';
 							$digiriskstandard->fetch($object->fk_standard);
-							$actioncomm->fk_element  = $object->fk_standard;
 							$accidentLocation = $digiriskstandard->ref . " - " . $conf->global->MAIN_INFO_SOCIETE_NOM;
 						} else if (!empty($object->fk_element)) {
-							$actioncomm->elementtype = 'digiriskelement@digiriskdolibarr';
 							$digiriskelement->fetch($object->fk_element);
-							$actioncomm->fk_element  = $object->fk_element;
 							$accidentLocation = $digiriskelement->ref . " - " . $digiriskelement->label;
 						}
 						break;
 					case 2:
-						$actioncomm->elementtype = 'accident@digiriskdolibarr';
 						$society->fetch($object->fk_soc);
-						$actioncomm->fk_element  = $object->fk_soc;
 						$accidentLocation = $society->ref . " - " . $society->label;
 					case 3:
-						$actioncomm->elementtype = 'accident@digiriskdolibarr';
 						$accidentLocation = $object->accident_location;
 						break;
 				}

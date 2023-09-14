@@ -425,7 +425,7 @@ class Accident extends SaturneObject
 		if (is_array($allaccidents) && !empty($allaccidents)) {
 			$accidentworkstop = new AccidentWorkStop($this->db);
 			foreach ($allaccidents as $accident) {
-				$allaccidentworkstop = $accidentworkstop->fetchFromParent($accident->id);
+				$allaccidentworkstop = $accidentworkstop->fetchAll('', '', 0, 0, ['customsql' => 't.fk_accident = ' . $accident->id]);
 				if (is_array($allaccidentworkstop) && !empty($allaccidentworkstop)) {
 					$nbaccidents += 1;
 				} else {
@@ -453,7 +453,7 @@ class Accident extends SaturneObject
 		if (is_array($allaccidents) && !empty($allaccidents)) {
 			$accidentworkstop = new AccidentWorkStop($this->db);
 			foreach ($allaccidents as $accident) {
-				$allaccidentworkstop = $accidentworkstop->fetchFromParent($accident->id);
+				$allaccidentworkstop = $accidentworkstop->fetchAll('', '', 0, 0, ['customsql' => 't.fk_accident = ' . $accident->id]);;
 				if (is_array($allaccidentworkstop) && !empty($allaccidentworkstop)) {
 					foreach ($allaccidentworkstop as $accidentworkstop) {
 						if ($accidentworkstop->id > 0) {

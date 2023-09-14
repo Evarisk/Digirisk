@@ -203,12 +203,12 @@ $help_url = 'FR:Module_Digirisk#DigiRisk_-_Accident_b.C3.A9nins_et_presque_accid
 
 saturne_header(0, '', $title, $help_url);
 
-// Object metadata
+// Object metadata lesion
 // ------------------------------------------------------------
 saturne_get_fiche_head($object, 'accidentMetadataLesion', $title);
 
 //Number workstop days
-$accidentlines     = $objectline->fetchAll('', '', 0, 0, ['customsql' => 't.fk_accident = ' . $object->id . ' AND t.status >= 0']);
+$accidentlines     = $objectline->fetchAll('', '', 0, 0, ['customsql' => 't.fk_accident = ' . $object->id]);
 $totalworkstopdays = 0;
 
 if (!empty($accidentlines) && $accidentlines > 0) {
@@ -244,7 +244,9 @@ if (empty($forceall)) $forceall = 0;
 $colspan = 3; // Columns: total ht + col edit + col delete
 
 // Accident Lines
-$accidentlines = $objectline->fetchAll('', '', 0, 0, ['customsql' => 't.fk_accident = ' . $object->id . ' AND t.status >= 0']);
+$accidentlines = $objectline->fetchAll('', '', 0, 0, ['customsql' => 't.fk_accident = ' . $object->id]);
+$dictionaryId  = fetchDictionnary('c_lesion_localization');
+
 
 print '<tr class="liste_titre">';
 print '<td><span>' . $langs->trans('Ref.') . '</span></td>';
