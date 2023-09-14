@@ -429,6 +429,8 @@ class modDigiriskdolibarr extends DolibarrModules
 				'contactcard',
 				'preventionplanschedules',
 				'digiriskdolibarradmindocuments',
+				'digiriskelementdocument',
+				'digiriskelementagenda'
 			],
 			'tabs' => [
 				'mycompany_admin'
