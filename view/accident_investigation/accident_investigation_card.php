@@ -310,36 +310,36 @@ if ($action == 'create') {
 	}
 	// New version confirmation
 	if (($action == 'set_new_version' && (empty($conf->use_javascript_ajax) || !empty($conf->dol_use_jmobile))) || (!empty($conf->use_javascript_ajax) && empty($conf->dol_use_jmobile))) {
-		$imgPath      = dol_buildpath('custom/saturne/img/formconfirm/object_classify.png', 1);
+		$imgPath      = dol_buildpath('custom/saturne/img/formconfirm/object_version_versioning.png', 1);
 		$img          = img_picto($langs->trans('NewVersion'), $imgPath, '', 1);
 		$formQuestion = [
 			['type' => 'other', 'name' => 'lock_validation', 'label' => '<span class="">' . img_picto('', 'info') . ' ' . $langs->trans('ConfirmReOpenInvestigation'). '</span>'],
 			['type' => 'other', 'name' => 'OK', 'label' => '', 'value' => $img, 'moreattr' => 'readonly'],
 		];
 
-		$formConfirm .= $form->formconfirm($_SERVER['PHP_SELF'] . '?id=' . $object->id, $langs->trans('NewVersionObject', $langs->transnoentities('The' . ucfirst($object->element))), '', 'confirm_setdraft', $formQuestion, 'yes', 'actionButtonNewVersion', 400, 650);
+		$formConfirm .= $form->formconfirm($_SERVER['PHP_SELF'] . '?id=' . $object->id, $langs->trans('NewVersionObject', $langs->transnoentities('The' . ucfirst($object->element))), '', 'confirm_setdraft', $formQuestion, 'yes', 'actionButtonNewVersion', 650, 600);
 	}
 	// Validate confirmation
 	if (($action == 'set_validate' && (empty($conf->use_javascript_ajax) || !empty($conf->dol_use_jmobile))) || (!empty($conf->use_javascript_ajax) && empty($conf->dol_use_jmobile))) {
-		$imgPath      = dol_buildpath('custom/saturne/img/formconfirm/object_draft.png', 1);
+		$imgPath      = dol_buildpath('custom/saturne/img/formconfirm/object_version_draft.png', 1);
 		$img          = img_picto($langs->trans('Validate'), $imgPath, '', 1);
 		$formQuestion = [
 			['type' => 'other', 'name' => 'lock_validation', 'label' => '<span class="">' . img_picto('', 'info') . ' ' . $langs->trans('ConfirmValidateObject', $langs->transnoentities('The' . ucfirst($object->element)), $langs->transnoentities('The' . ucfirst($object->element))) . '</span>'],
 			['type' => 'other', 'name' => 'OK', 'label' => '', 'value' => $img, 'moreattr' => 'readonly'],
 		];
 
-		$formConfirm .= $form->formconfirm($_SERVER['PHP_SELF'] . '?id=' . $object->id, $langs->trans('ValidateObject', $langs->transnoentities('The' . ucfirst($object->element))), '', 'confirm_set_validate', $formQuestion, 'yes', 'actionButtonValidate', 400, 650);
+		$formConfirm .= $form->formconfirm($_SERVER['PHP_SELF'] . '?id=' . $object->id, $langs->trans('ValidateObject', $langs->transnoentities('The' . ucfirst($object->element))), '', 'confirm_set_validate', $formQuestion, 'yes', 'actionButtonValidate', 650, 600);
 	}
 	// Archive confirmation
 	if (($action == 'set_archive' && (empty($conf->use_javascript_ajax) || !empty($conf->dol_use_jmobile))) || (!empty($conf->use_javascript_ajax) && empty($conf->dol_use_jmobile))) {
-		$imgPath      = dol_buildpath('custom/saturne/img/formconfirm/object_validate.png', 1);
+		$imgPath      = dol_buildpath('custom/saturne/img/formconfirm/object_version_validate.png', 1);
 		$img          = img_picto($langs->trans('Versioning'), $imgPath, '', 1);
 		$formQuestion = [
 			['type' => 'other', 'name' => 'lock_validation', 'label' => '<span class="">' . img_picto('', 'info') . ' ' . $langs->trans('ConfirmVersionObject', $langs->transnoentities('The' . ucfirst($object->element))). '</span>'],
 			['type' => 'other', 'name' => 'OK', 'label' => '', 'value' => $img, 'moreattr' => 'readonly'],
 		];
 
-		$formConfirm .= $form->formconfirm($_SERVER['PHP_SELF'] . '?id=' . $object->id, $langs->trans('VersionObject', $langs->transnoentities('The' . ucfirst($object->element))), '', 'confirm_archive', $formQuestion, 'yes', 'actionButtonArchive', 400, 650);
+		$formConfirm .= $form->formconfirm($_SERVER['PHP_SELF'] . '?id=' . $object->id, $langs->trans('VersionObject', $langs->transnoentities('The' . ucfirst($object->element))), '', 'confirm_archive', $formQuestion, 'yes', 'actionButtonArchive', 650, 600);
 	}
 	// Clone confirmation
 	if (($action == 'clone' && (empty($conf->use_javascript_ajax) || !empty($conf->dol_use_jmobile))) || (!empty($conf->use_javascript_ajax) && empty($conf->dol_use_jmobile))) {
