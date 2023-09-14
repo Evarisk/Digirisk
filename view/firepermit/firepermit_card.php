@@ -405,7 +405,7 @@ if (empty($reshook)) {
 		}
 
 		if ( ! $error) {
-			$result = $objectLine->insert($user, false);
+			$result = $objectLine->create($user, false);
 			if ($result > 0) {
 				// Creation fire permit line OK
 				setEventMessages($langs->trans('AddFirePermitLine') . ' ' . $objectLine->ref . ' ' . $langs->trans('FirePermitMessage'), array());

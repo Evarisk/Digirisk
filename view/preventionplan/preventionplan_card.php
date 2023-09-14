@@ -87,6 +87,11 @@ $project           = new Project($db);
 // Load object
 $object->fetch($id);
 
+$deletedElements = $digiriskelement->getMultiEntityTrashList();
+if (empty($deletedElements)) {
+	$deletedElements = [0];
+}
+
 // Load resources
 $allLinks = $resources->fetchDigiriskResources();
 
@@ -404,7 +409,7 @@ if (empty($reshook)) {
 		}
 
 		if ( ! $error) {
-			$result = $preventionplandet->insert($user, false);
+			$result = $preventionplandet->create($user, false);
 			if ($result > 0) {
 				// Creation prevention plan line OK
 				setEventMessages($langs->trans('AddPreventionPlanLine') . ' ' . $preventionplandet->ref . ' ' . $langs->trans('PreventionPlanMessage'), array());
@@ -1201,7 +1206,7 @@ if ((empty($action) || ($action != 'create' && $action != 'edit'))) {
 					print '</td>';
 
 					print '<td>';
-					print $digiriskelement->selectDigiriskElementList($item->fk_element, 'fk_element', [], 0, 0, array(), 0, 0, 'minwidth100', 0, false, 1);
+					print $digiriskelement->selectDigiriskElementList($item->fk_element, 'fk_element', ['customsql' => ' t.rowid NOT IN (' . implode(',', $deletedElements) . ')'], 0, 0, array(), 0, 0, 'minwidth100', 0, false, 1);
 					print '</td>';
 
 					$coldisplay++;
@@ -1329,7 +1334,7 @@ if ((empty($action) || ($action != 'create' && $action != 'edit'))) {
 			print $refPreventionPlanDetMod->getNextValue($preventionplandet);
 			print '</td>';
 			print '<td>';
-			print $digiriskelement->selectDigiriskElementList('', 'fk_element', [], 0, 0, array(), 0, 0, 'minwidth100', '', false, 1);
+			print $digiriskelement->selectDigiriskElementList('', 'fk_element', ['customsql' => ' t.rowid NOT IN (' . implode(',', $deletedElements) . ')'], 0, 0, array(), 0, 0, 'minwidth100', '', false, 1);
 			print '</td>';
 
 			$coldisplay++;

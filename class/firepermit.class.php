@@ -306,7 +306,7 @@ class FirePermit extends SaturneObject
 	 *  @param  int		$mode          0=long label, 1=short label, 2=Picto + short label, 3=Picto, 4=Picto + long label, 5=Short label + Picto, 6=Long label + Picto
 	 *  @return string 			       Label of status
 	 */
-	public function LibStatut($status, $mode = 0)
+	public function LibStatut($status, $mode = 0): string
 	{
 		if (empty($this->labelStatus) || empty($this->labelStatusShort)) {
 			global $langs;
@@ -385,60 +385,5 @@ class FirePermitLine extends SaturneObject
 	public function __construct(DoliDB $db)
 	{
 		parent::__construct($db, $this->module, $this->element);
-	}
-
-	/**
-	 *    Insert line into database
-	 *
-	 * @param User $user
-	 * @param bool $notrigger 1 no triggers
-	 * @return        int                                         <0 if KO, >0 if OK
-	 * @throws Exception
-	 */
-	public function insert(User $user, $notrigger = false)
-	{
-		global $db, $user, $conf, $entity;
-
-		// Clean parameters
-		$this->description = trim($this->description);
-
-		$db->begin();
-		$now = dol_now();
-
-		// Insertion dans base de la ligne
-		$sql  = 'INSERT INTO ' . MAIN_DB_PREFIX . 'digiriskdolibarr_firepermitdet';
-		$sql .= ' (ref, entity, date_creation, description, category, used_equipment, fk_firepermit, fk_element';
-		$sql .= ')';
-		$sql .= " VALUES (";
-		$sql .= "'" . $db->escape($this->ref) . "'" . ", ";
-		$sql .= $entity . ", ";
-		$sql .= "'" . $db->escape($db->idate($now)) . "'" . ", ";
-		$sql .= "'" . $db->escape($this->description) . "'" . ", ";
-		$sql .= $this->category . ", ";
-		$sql .= "'" . $db->escape($this->used_equipment) . "'" . ", ";
-		$sql .= $this->fk_firepermit . ", ";
-		$sql .= $this->fk_element ;
-		$sql .= ')';
-
-		dol_syslog(get_class($this) . "::insert", LOG_DEBUG);
-		$resql = $db->query($sql);
-
-		if ($resql) {
-			$this->id    = $db->last_insert_id(MAIN_DB_PREFIX . 'preventionplandet');
-			$this->rowid = $this->id; // For backward compatibility
-
-			$db->commit();
-			// Triggers
-			if ( ! $notrigger) {
-				// Call triggers
-				if (!empty($conf->global->DIGIRISKDOLIBARR_MAIN_AGENDA_ACTIONAUTO_PREVENTIONPLANLINE_CREATE)) $this->call_trigger(strtoupper(get_class($this)) . '_CREATE', $user);
-				// End call triggers
-			}
-			return $this->id;
-		} else {
-			$this->error = $db->lasterror();
-			$db->rollback();
-			return -2;
-		}
 	}
 }
