@@ -1416,6 +1416,7 @@ class InterfaceDigiriskdolibarrTriggers extends DolibarrTriggers
 
 			case 'TASK_MODIFY' :
 				if (!empty($object->array_options['options_fk_risk'])) {
+					require_once __DIR__ . '/../../class/riskanalysis/risk.class.php';
 					$langs->load("projects");
 
 					$risk = new Risk($this->db);
