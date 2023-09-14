@@ -843,8 +843,9 @@ class modDigiriskdolibarr extends DolibarrModules
 			$i++ => ['DIGIRISKDOLIBARR_MAIN_AGENDA_ACTIONAUTO_ACCIDENTINVESTIGATION_MODIFY', 'integer', 1, '', 0, 'current'],
 			$i++ => ['DIGIRISKDOLIBARR_MAIN_AGENDA_ACTIONAUTO_ACCIDENTINVESTIGATION_DELETE', 'integer', 1, '', 0, 'current'],
 			$i++ => ['DIGIRISKDOLIBARR_MAIN_AGENDA_ACTIONAUTO_ACCIDENT_INVESTIGATION_VALIDATE', 'integer', 1, '', 0, 'current'],
+			$i++ => ['DIGIRISKDOLIBARR_MAIN_AGENDA_ACTIONAUTO_ACCIDENT_INVESTIGATION_UNVALIDATE', 'integer', 1, '', 0, 'current'],
 			$i++ => ['DIGIRISKDOLIBARR_MAIN_AGENDA_ACTIONAUTO_ACCIDENT_INVESTIGATION_ARCHIVE', 'integer', 1, '', 0, 'current'],
-			$i++ => ['DIGIRISKDOLIBARR_MAIN_AGENDA_ACTIONAUTO_ACCIDENTINVESTIGATION_SIGNED', 'integer', 1, '', 0, 'current'],
+			$i++ => ['DIGIRISKDOLIBARR_MAIN_AGENDA_ACTIONAUTO_ACCIDENT_INVESTIGATION_LOCK', 'integer', 1, '', 0, 'current'],
 
 			// CONST ACCIDENT INVESTIGATION DOCUMENT
 			$i++ => ['DIGIRISKDOLIBARR_ACCIDENTINVESTIGATIONDOCUMENT_ADDON', 'chaine', 'mod_accident_investigation_document_standard', '', 0, 'current'],
@@ -2114,6 +2115,19 @@ class modDigiriskdolibarr extends DolibarrModules
 			}
 
 			dolibarr_set_const($this->db, 'DIGIRISKDOLIBARR_TRIGGERS_UPDATED', 1, 'integer', 0, '', $conf->entity);
+		}
+
+		if (empty($conf->global->DIGIRISKDOLIBARR_DEFAULT_TASK_CONTACT_TYPE) && empty($conf->global->DIGIRISKDOLIBARR_DEFAULT_PROJECT_CONTACT_TYPE)) {
+			require_once DOL_DOCUMENT_ROOT . '/projet/class/project.class.php';
+			require_once DOL_DOCUMENT_ROOT . '/projet/class/task.class.php';
+
+			$project       = new Project($this->db);
+			$projectTypeId = array_key_first($project->liste_type_contact('internal', 'position', 0, 1, 'PROJECTCONTRIBUTOR'));
+			dolibarr_set_const($this->db, 'DIGIRISKDOLIBARR_DEFAULT_PROJECT_CONTACT_TYPE', $projectTypeId, 'integer', 0, '', $conf->entity);
+
+			$task       = new Task($this->db);
+			$taskTypeId = array_key_first($task->liste_type_contact('internal', 'position', 0, 1, 'TASKCONTRIBUTOR'));
+			dolibarr_set_const($this->db, 'DIGIRISKDOLIBARR_DEFAULT_TASK_CONTACT_TYPE', $taskTypeId, 'integer', 0, '', $conf->entity);
 		}
 
 		$params = [

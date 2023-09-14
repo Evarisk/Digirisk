@@ -23,8 +23,6 @@ if ( ! $error && $action == 'add' && $permissiontoadd) {
 		$result = $risk->create($user);
 
 		if ($result > 0) {
-			$lastRiskAdded = $risk->ref;
-
 			$evaluationComment  = $data['comment'];
 			$riskAssessmentDate = $data['date'];
 
@@ -119,7 +117,13 @@ if ( ! $error && $action == 'add' && $permissiontoadd) {
 					$result3 = $task->create($user, true);
 
 					if ($result3 > 0) {
-						if (!empty($conf->global->DIGIRISKDOLIBARR_MAIN_AGENDA_ACTIONAUTO_TASK_CREATE)) $task->call_trigger('TASK_CREATE', $user);
+						if (!empty($conf->global->DIGIRISKDOLIBARR_MAIN_AGENDA_ACTIONAUTO_TASK_CREATE)) {
+							$task->call_trigger('TASK_CREATE', $user);
+						}
+
+						$DUProject->add_contact($user->id, $conf->global->DIGIRISKDOLIBARR_DEFAULT_PROJECT_CONTACT_TYPE, 'internal');
+						$task->add_contact($user->id, $conf->global->DIGIRISKDOLIBARR_DEFAULT_TASK_CONTACT_TYPE, 'internal');
+
 						// Creation risk + evaluation + task OK
 						$urltogo = str_replace('__ID__', $result3, $backtopage);
 						$urltogo = preg_replace('/--IDFORBACKTOPAGE--/', $id, $urltogo); // New method to autoselect project after a New on another form object creation

@@ -59,7 +59,7 @@ class AccidentInvestigation extends SaturneObject
 	/**
 	* @var string String with name of icon for digiriskelement. Must be the part after the 'object_' into object_digiriskelement.png
 	*/
-	public string $picto = 'fontawesome_fa-tasks_fas_#d35968';
+	public string $picto = 'fontawesome_fa-search_fas_#d35968';
 
 	public const STATUS_DELETED   = -1;
 	public const STATUS_DRAFT     = 0;
@@ -110,28 +110,28 @@ class AccidentInvestigation extends SaturneObject
 	* @var array  Array with all fields and their property. Do not use it as a static var. It may be modified by constructor.
 	*/
 	public $fields = [
-		'rowid'                => ['type' => 'integer',      'label' => 'TechnicalID',            'enabled' => 1, 'position' => 1,   'notnull' => 1, 'visible' => 0, 'noteditable' => 1, 'index' => 1, 'comment' => "Id"],
-		'ref'                  => ['type' => 'varchar(128)', 'label' => 'Ref',                    'enabled' => 1, 'position' => 10,  'notnull' => 1, 'visible' => 4, 'noteditable' => 1, 'default' => '(PROV)', 'index' => 1, 'searchall' => 1, 'showoncombobox' => 1, 'comment' => "Reference of object"],
-		'ref_ext'              => ['type' => 'varchar(128)', 'label' => 'RefExt',                 'enabled' => 1, 'position' => 20,  'notnull' => 0, 'visible' => 0,],
-		'entity'               => ['type' => 'integer',      'label' => 'Entity',                 'enabled' => 1, 'position' => 30,  'notnull' => 1, 'visible' => 0,],
-		'date_creation'        => ['type' => 'datetime',     'label' => 'DateCreation',           'enabled' => 1, 'position' => 40,  'notnull' => 1, 'visible' => 2,],
-		'tms'                  => ['type' => 'timestamp',    'label' => 'DateModification',       'enabled' => 1, 'position' => 50,  'notnull' => 0, 'visible' => 0,],
-		'import_key'           => ['type' => 'varchar(14)',  'label' => 'ImportId',               'enabled' => 1, 'position' => 60,  'notnull' => 0, 'visible' => 0, 'index' => 0],
-		'status'               => ['type' => 'smallint',     'label' => 'Status',                 'enabled' => 1, 'position' => 70,  'notnull' => 1, 'visible' => 2, 'noteditable' => 1, 'default' => 0, 'index' => 0,],
-		'seniority_at_post'    => ['type' => 'varchar(255)', 'label' => 'SeniorityAtPost',        'enabled' => 1, 'position' => 80,  'notnull' => 0, 'visible' => 1,],
-		'date_start'           => ['type' => 'datetime',     'label' => 'DateInvestigationStart', 'enabled' => 1, 'position' => 90,  'notnull' => 0, 'visible' => 1,],
-		'date_end'             => ['type' => 'datetime',     'label' => 'DateInvestigationEnd',   'enabled' => 1, 'position' => 100, 'notnull' => 0, 'visible' => 1,],
-		'note_public'          => ['type' => 'html',         'label' => 'NotePublic',             'enabled' => 1, 'position' => 110, 'notnull' => 0, 'visible' => -1,],
-		'note_private'         => ['type' => 'html',         'label' => 'NotePrivate',            'enabled' => 1, 'position' => 120, 'notnull' => 0, 'visible' => 0,],
-		'victim_skills'        => ['type' => 'html',         'label' => 'VictimSkills',           'enabled' => 1, 'position' => 130, 'notnull' => 0, 'visible' => -1,],
-		'collective_equipment' => ['type' => 'html',         'label' => 'CollectiveEquipment',    'enabled' => 1, 'position' => 140, 'notnull' => 0, 'visible' => -1,],
-		'individual_equipment' => ['type' => 'html',         'label' => 'IndividualEquipment',    'enabled' => 1, 'position' => 150, 'notnull' => 0, 'visible' => -1,],
-		'circumstances'        => ['type' => 'html',         'label' => 'Circumstances',          'enabled' => 1, 'position' => 160, 'notnull' => 0, 'visible' => -1,],
-		'causality_tree'       => ['type' => 'text',         'label' => 'CausalityTree',          'enabled' => 1, 'position' => 170, 'notnull' => 0, 'visible' => 0,],
-		'fk_accident'          => ['type' => 'integer:Accident:custom/digiriskdolibarr/class/accident/accident.class.php:1', 'label' => 'FkAccident', 'picto' => 'fontawesome_fa-user-injured_fas' ,'enabled' => 1, 'position' => 11, 'notnull' => 1, 'visible' => 1, 'foreignkey' => 'digiriskdolibarr_accident.rowid', 'css' => 'maxwidth300'],
-		'fk_task'              => ['type' => 'integer:Task:projet/class/task.class.php', 'label' => 'FkTask',     'picto' => 'Task', 'enabled' => 1, 'position' => 12, 'notnull' => 1, 'visible' => 4,  'noteditable' => 1, 'foreignkey' => 'projet_task.rowid', 'help' => 'TaskWillBeCreatedAfterValidation'],
-		'fk_user_creat'        => ['type' => 'integer:User:user/class/user.class.php',   'label' => 'UserAuthor', 'picto' => 'user', 'enabled' => 1, 'position' => 190, 'notnull' => 1, 'visible' => 0, 'foreignkey' => 'user.rowid'],
-		'fk_user_modif'        => ['type' => 'integer:User:user/class/user.class.php',   'label' => 'UserModif',  'picto' => 'user', 'enabled' => 1, 'position' => 200, 'notnull' => 0, 'visible' => 0, 'foreignkey' => 'user.rowid'],
+		'rowid'                 => ['type' => 'integer',      'label' => 'TechnicalID',            'enabled' => 1, 'position' => 1,   'notnull' => 1, 'visible' => 0, 'noteditable' => 1, 'index' => 1, 'comment' => "Id"],
+		'ref'                   => ['type' => 'varchar(128)', 'label' => 'Ref',                    'enabled' => 1, 'position' => 10,  'notnull' => 1, 'visible' => 4, 'noteditable' => 1, 'default' => '(PROV)', 'index' => 1, 'searchall' => 1, 'showoncombobox' => 1, 'comment' => "Reference of object"],
+		'ref_ext'               => ['type' => 'varchar(128)', 'label' => 'RefExt',                 'enabled' => 1, 'position' => 20,  'notnull' => 0, 'visible' => 0,],
+		'entity'                => ['type' => 'integer',      'label' => 'Entity',                 'enabled' => 1, 'position' => 30,  'notnull' => 1, 'visible' => 0,],
+		'date_creation'         => ['type' => 'datetime',     'label' => 'DateCreation',           'enabled' => 1, 'position' => 40,  'notnull' => 1, 'visible' => 2,],
+		'tms'                   => ['type' => 'timestamp',    'label' => 'DateModification',       'enabled' => 1, 'position' => 50,  'notnull' => 0, 'visible' => 0,],
+		'import_key'            => ['type' => 'varchar(14)',  'label' => 'ImportId',               'enabled' => 1, 'position' => 60,  'notnull' => 0, 'visible' => 0, 'index' => 0],
+		'status'                => ['type' => 'smallint',     'label' => 'Status',                 'enabled' => 1, 'position' => 70,  'notnull' => 1, 'visible' => 2, 'noteditable' => 1, 'default' => 0, 'index' => 0,],
+		'seniority_in_position' => ['type' => 'varchar(255)', 'label' => 'SeniorityInPosition',    'enabled' => 1, 'position' => 80,  'notnull' => 0, 'visible' => 1, 'css' => 'maxwidth200'],
+		'date_start'            => ['type' => 'datetime',     'label' => 'StartDate',              'enabled' => 1, 'position' => 90,  'notnull' => 0, 'visible' => 1,],
+		'date_end'              => ['type' => 'datetime',     'label' => 'EndDate',                'enabled' => 1, 'position' => 100, 'notnull' => 0, 'visible' => 1,],
+		'note_public'           => ['type' => 'html',         'label' => 'NotePublic',             'enabled' => 1, 'position' => 110, 'notnull' => 0, 'visible' => -1,],
+		'note_private'          => ['type' => 'html',         'label' => 'NotePrivate',            'enabled' => 1, 'position' => 120, 'notnull' => 0, 'visible' => 0,],
+		'victim_skills'         => ['type' => 'html',         'label' => 'VictimSkills',           'enabled' => 1, 'position' => 130, 'notnull' => 0, 'visible' => -1,],
+		'collective_equipment'  => ['type' => 'html',         'label' => 'CollectiveEquipment',    'enabled' => 1, 'position' => 140, 'notnull' => 0, 'visible' => -1,],
+		'individual_equipment'  => ['type' => 'html',         'label' => 'IndividualEquipment',    'enabled' => 1, 'position' => 150, 'notnull' => 0, 'visible' => -1,],
+		'circumstances'         => ['type' => 'html',         'label' => 'Circumstances',          'enabled' => 1, 'position' => 160, 'notnull' => 0, 'visible' => -1,],
+		'causality_tree'        => ['type' => 'text',         'label' => 'CausalityTree',          'enabled' => 1, 'position' => 170, 'notnull' => 0, 'visible' => 0,],
+		'fk_accident'           => ['type' => 'integer:Accident:digiriskdolibarr/class/accident/accident.class.php', 'label' => 'Accident', 'picto' => 'fontawesome_fa-user-injured_fas' ,'enabled' => 1, 'position' => 11, 'notnull' => 1, 'visible' => 1, 'foreignkey' => 'digiriskdolibarr_accident.rowid', 'css' => 'maxwidth300'],
+		'fk_task'               => ['type' => 'integer:Task:projet/class/task.class.php', 'label' => 'Task',       'picto' => 'Task', 'enabled' => 1, 'position' => 12, 'notnull' => 1, 'visible' => 4,  'noteditable' => 1, 'foreignkey' => 'projet_task.rowid', 'help' => 'TaskWillBeCreatedAfterValidation'],
+		'fk_user_creat'         => ['type' => 'integer:User:user/class/user.class.php',   'label' => 'UserAuthor', 'picto' => 'user', 'enabled' => 1, 'position' => 190, 'notnull' => 1, 'visible' => 0, 'foreignkey' => 'user.rowid'],
+		'fk_user_modif'         => ['type' => 'integer:User:user/class/user.class.php',   'label' => 'UserModif',  'picto' => 'user', 'enabled' => 1, 'position' => 200, 'notnull' => 0, 'visible' => 0, 'foreignkey' => 'user.rowid'],
 	];
 
 	/**
@@ -187,7 +187,7 @@ class AccidentInvestigation extends SaturneObject
 	/**
 	 * @var int|string Seniority at post.
 	 */
-	public $seniority_at_post;
+	public $seniority_in_position;
 
 	/**
 	 * @var int|string Date investigation start.
@@ -276,6 +276,28 @@ class AccidentInvestigation extends SaturneObject
 	}
 
 	/**
+	 * Set draft status.
+	 *
+	 * @param  User $user      Object user that modify.
+	 * @param  int  $notrigger 1 = Does not execute triggers, 0 = Execute triggers.
+	 * @return int             0 < if KO, > 0 if OK.
+	 * @throws Exception
+	 */
+	public function setDraft(User $user, int $notrigger = 0): int
+	{
+		// Protection
+		if ($this->status <= self::STATUS_DRAFT) {
+			return 0;
+		}
+		require_once __DIR__ . '/../../saturne/class/saturnesignature.class.php';
+
+		$signatory = new SaturneSignature($this->db);
+		$signatory->deleteSignatoriesSignatures($this->id, $this->element);
+
+		return $this->setStatusCommon($user, self::STATUS_DRAFT, $notrigger, 'ACCIDENT_INVESTIGATION_UNVALIDATE');
+	}
+
+	/**
 	 * Write information of trigger description
 	 *
 	 * @param  Object $object Object calling the trigger
@@ -283,21 +305,27 @@ class AccidentInvestigation extends SaturneObject
 	 */
 	public function getTriggerDescription(SaturneObject $object): string
 	{
+		require_once __DIR__ . '/accident.class.php';
+		require_once __DIR__ . '/../../saturne/class/task/saturnetask.class.php';
+
 		global $langs;
 
 		$accident = new Accident($this->db);
 		$accident->fetch($object->fk_accident);
+		if ($object->fk_task > 0) {
+			$task = new SaturneTask($this->db);
+			$task->fetch($object->fk_task);
+		}
 
-		$ret   = parent::getTriggerDescription($object);
-		$ret  .= $langs->transnoentities('Accident') . ' : ' . $accident->ref . ' - ' . $accident->label . '</br>';
-		$ret  .= (!empty($object->seniority_at_post) ? $langs->transnoentities('SeniorityAtPost') . ' : ' . $object->seniority_at_post . '</br>' : '');
-		$ret  .= (!empty($object->victim_skills) ? $langs->transnoentities('VictimSkills') . ' : ' . $object->victim_skills . '</br>' : '');
-		$ret  .= (!empty($object->collective_equipment) ? $langs->transnoentities('CollectiveEquipment') . ' : ' . $object->collective_equipment . '</br>' : '');
-		$ret  .= (!empty($object->individual_equipment) ? $langs->transnoentities('IndividualEquipment') . ' : ' . $object->individual_equipment . '</br>' : '');
-		$ret  .= (!empty($object->circumstances) ? $langs->transnoentities('Circumstances') . ' : ' . $object->circumstances . '</br>' : '');
-		$ret  .= (!empty($object->causality_tree) ? $langs->transnoentities('CausalityTree') . ' : ' . $object->causality_tree . '</br>' : '');
-		$ret  .= (!empty($object->note_public) ? $langs->transnoentities('NotePublic') . ' : ' . $object->note_public . '</br>' : '');
-		$ret  .= (!empty($object->note_private) ? $langs->transnoentities('NotePrivate') . ' : ' . $object->note_private . '</br>' : '');
+		$ret  = parent::getTriggerDescription($object);
+		$ret .= $langs->transnoentities('Accident') . ' : ' . $accident->ref . ' - ' . $accident->label . '</br>';
+		$ret .= ($object->fk_task > 0 ? $langs->transnoentities('Task') . ' : ' . $task->ref . ' - ' . $task->label . '</br>': '');
+		$ret .= (dol_strlen($object->seniority_in_position) > 0 ? $langs->transnoentities('SeniorityInPosition') . ' : ' . $object->seniority_in_position . '</br>' : '');
+		$ret .= (dol_strlen($object->victim_skills) > 0 ? $langs->transnoentities('VictimSkills') . ' : ' . $object->victim_skills . '</br>' : '');
+		$ret .= (dol_strlen($object->collective_equipment) > 0 ? $langs->transnoentities('CollectiveEquipment') . ' : ' . $object->collective_equipment . '</br>' : '');
+		$ret .= (dol_strlen($object->individual_equipment) > 0 ? $langs->transnoentities('IndividualEquipment') . ' : ' . $object->individual_equipment . '</br>' : '');
+		$ret .= (dol_strlen($object->circumstances) > 0 ? $langs->transnoentities('Circumstances') . ' : ' . $object->circumstances . '</br>' : '');
+		$ret .= (dol_strlen($object->causality_tree) > 0 ? $langs->transnoentities('CausalityTree') . ' : ' . $object->causality_tree . '</br>' : '');
 
 		return $ret;
 	}
@@ -404,13 +432,13 @@ class AccidentInvestigation extends SaturneObject
 			$this->labelStatus[self::STATUS_DRAFT]          = $langs->transnoentitiesnoconv('StatusDraft');
 			$this->labelStatus[self::STATUS_VALIDATED]      = $langs->transnoentitiesnoconv('Validated');
 			$this->labelStatus[self::STATUS_LOCKED]         = $langs->transnoentitiesnoconv('Locked');
-			$this->labelStatus[self::STATUS_ARCHIVED]       = $langs->transnoentitiesnoconv('Archived');
+			$this->labelStatus[self::STATUS_ARCHIVED]       = $langs->transnoentitiesnoconv('Classified');
 			$this->labelStatus[self::STATUS_DELETED]        = $langs->transnoentitiesnoconv('Deleted');
 
 			$this->labelStatusShort[self::STATUS_DRAFT]     = $langs->transnoentitiesnoconv('StatusDraft');
 			$this->labelStatusShort[self::STATUS_VALIDATED] = $langs->transnoentitiesnoconv('Validated');
 			$this->labelStatusShort[self::STATUS_LOCKED]    = $langs->transnoentitiesnoconv('Locked');
-			$this->labelStatusShort[self::STATUS_ARCHIVED]  = $langs->transnoentitiesnoconv('Archived');
+			$this->labelStatusShort[self::STATUS_ARCHIVED]  = $langs->transnoentitiesnoconv('Classified');
 			$this->labelStatusShort[self::STATUS_DELETED]   = $langs->transnoentitiesnoconv('Deleted');
 		}
 
