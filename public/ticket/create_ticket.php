@@ -64,6 +64,8 @@ require_once DOL_DOCUMENT_ROOT . '/core/modules/ticket/mod_ticket_simple.php';
 require_once '../../lib/digiriskdolibarr_function.lib.php';
 require_once '../../class/digiriskelement.class.php';
 
+require_once __DIR__ . '/../../../saturne/lib/object.lib.php';
+
 global $conf, $db, $hookmanager, $langs, $mc, $user;
 
 // Load translation files required by the page
@@ -86,9 +88,14 @@ $object          = new Ticket($db);
 $formfile        = new FormFile($db);
 $extrafields     = new ExtraFields($db);
 $category        = new Categorie($db);
-$modTicket       = new mod_ticket_simple();
 $digiriskelement = new DigiriskElement($db);
 
+$numRefConf = strtoupper($object->element) . '_ADDON';
+
+$numberingModuleName = [
+	$object->element => $conf->global->$numRefConf,
+];
+list($modTicket) = saturne_require_objects_mod($numberingModuleName);
 
 $extrafields->fetch_name_optionals_label($object->table_element);
 
