@@ -63,7 +63,7 @@ $thirdparty             = new Societe($db);
 $contact                = new Contact($db);
 $project                = new Project($db);
 
-$hookmanager->initHooks(array('digiriskelementriskassessmentdocument', 'globalcard')); // Note that conf->hooks_modules contains array
+$hookmanager->initHooks(array('digiriskelementriskassessmentdocument', 'digiriskstandardview', 'globalcard')); // Note that conf->hooks_modules contains array
 
 $object->fetch($conf->global->DIGIRISKDOLIBARR_ACTIVE_STANDARD);
 
@@ -336,9 +336,10 @@ $morehtmlref = '<div class="refidno">';
 $project->fetch($conf->global->DIGIRISKDOLIBARR_DU_PROJECT);
 $morehtmlref .= $langs->trans('Project') . ' : ' . getNomUrlProject($project, 1, 'blank', 1);
 $morehtmlref .= '</div>';
-$morehtmlleft = '<div class="floatleft inline-block valignmiddle divphotoref">' . saturne_show_medias_linked('mycompany', $conf->mycompany->dir_output . '/logos', 'small', 1, 0, 0, 0, 80, 80, 0, 0, 0, 'logos', $object, 'photo',0, 0) . '</div>';
 
-digirisk_banner_tab($object, '', '', 0, '', '', $morehtmlref, '', '', $morehtmlleft);
+$moduleNameLowerCase = 'mycompany';
+saturne_banner_tab($object,'ref','', 1, 'ref', 'ref', $morehtmlref, true);
+$moduleNameLowerCase = 'digiriskdolibarr';
 
 print '<form method="POST" action="' . $_SERVER["PHP_SELF"] . '" name="edit" enctype="multipart/form-data">';
 print '<input type="hidden" name="token" value="' . newToken() . '">';

@@ -80,7 +80,7 @@ $project     = new Project($db);
 
 $object->fetch($conf->global->DIGIRISKDOLIBARR_ACTIVE_STANDARD);
 
-$hookmanager->initHooks(array('digiriskstandardagenda', 'globalcard'));
+$hookmanager->initHooks(array('digiriskstandardagenda', 'digiriskstandardview', 'globalcard'));
 
 // Fetch optionals attributes and labels
 $extrafields->fetch_name_optionals_label($object->table_element);
@@ -137,9 +137,10 @@ if ($object->id > 0) {
 	$project->fetch($conf->global->DIGIRISKDOLIBARR_DU_PROJECT);
 	$morehtmlref .= $langs->trans('Project') . ' : ' . getNomUrlProject($project, 1, 'blank', 1);
 	$morehtmlref .= '</div>';
-	$morehtmlleft = '<div class="floatleft inline-block valignmiddle divphotoref">' . saturne_show_medias_linked('mycompany', $conf->mycompany->dir_output . '/logos', 'small', 1, 0, 0, 0, 80, 80, 0, 0, 0, 'logos', $object, 'photo',0, 0) . '</div>';
 
-	digirisk_banner_tab($object, '', '', 0, '', '', $morehtmlref, '', '', $morehtmlleft);
+	$moduleNameLowerCase = 'mycompany';
+	saturne_banner_tab($object,'ref','', 1, 'ref', 'ref', $morehtmlref, true);
+	$moduleNameLowerCase = 'digiriskdolibarr';
 
 	print '<div class="fichecenter">';
 	print '</div>';

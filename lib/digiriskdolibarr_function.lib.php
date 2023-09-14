@@ -367,35 +367,6 @@ function display_recurse_tree_organization($digiriskElementTree, $i = 1)
 }
 
 /**
- *  Show tab footer of a card.
- *  Note: $object->next_prev_filter can be set to restrict select to find next or previous record by $form->showrefnav.
- *
- *  @param	Object	$object			Object to show
- *  @param	string	$paramid   		Name of parameter to use to name the id into the URL next/previous link
- *  @param	string	$morehtml  		More html content to output just before the nav bar
- *  @param	int		$shownav	  	Show Condition (navigation is shown if value is 1)
- *  @param	string	$fieldid   		Nom du champ en base a utiliser pour select next et previous (we make the select max and min on this field). Use 'none' for no prev/next search.
- *  @param	string	$fieldref   	Nom du champ objet ref (object->ref) a utiliser pour select next et previous
- *  @param	string	$morehtmlref  	More html to show after ref
- *  @param	string	$moreparam  	More param to add in nav link url.
- *	@param	int		$nodbprefix		Do not include DB prefix to forge table name
- *	@param	string	$morehtmlleft	More html code to show before ref
- *	@param	string	$morehtmlstatus	More html code to show under navigation arrows
- *  @param  int     $onlybanner     Put this to 1, if the card will contains only a banner (this add css 'arearefnobottom' on div)
- *	@param	string	$morehtmlright	More html code to show before navigation arrows
- *  @return	void
- */
-function digirisk_banner_tab($object, $paramid, $morehtml = '', $shownav = 1, $fieldid = 'rowid', $fieldref = 'ref', $morehtmlref = '', $moreparam = '', $nodbprefix = 0, $morehtmlleft = '', $morehtmlstatus = '', $onlybanner = 0, $morehtmlright = '')
-{
-	global $form;
-
-	print '<div class="' . ($onlybanner ? 'arearefnobottom ' : 'arearef ') . 'heightref valignmiddle centpercent">';
-	print $form->showrefnav($object, $paramid, $morehtml, $shownav, $fieldid, $fieldref, $morehtmlref, $moreparam, $nodbprefix, $morehtmlleft, $morehtmlstatus, $morehtmlright);
-	print '</div>';
-	print '<div class="underbanner clearboth"></div>';
-}
-
-/**
 *  Return a link to the user card (with optionaly the picto)
 *  Use this->id,this->lastname, this->firstname
 *

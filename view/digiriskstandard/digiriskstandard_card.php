@@ -39,7 +39,7 @@ require_once __DIR__ . '/../../lib/digiriskdolibarr_digiriskstandard.lib.php';
 require_once __DIR__ . '/../../lib/digiriskdolibarr_function.lib.php';
 require_once __DIR__ . '/../../class/dashboarddigiriskstats.class.php';
 
-global $db, $conf, $langs, $user,  $maxwidthmini, $maxheightmini, $maxwidthsmall,$maxheightsmall;
+global $db, $conf, $langs, $user, $hookmanager, $maxwidthmini, $maxheightmini, $maxwidthsmall,$maxheightsmall;
 
 // Load translation files required by the page
 saturne_load_langs();
@@ -53,6 +53,8 @@ $stats   = new DashboardDigiriskStats($db);
 $project = new Project($db);
 
 $object->fetch($conf->global->DIGIRISKDOLIBARR_ACTIVE_STANDARD);
+
+$hookmanager->initHooks(array('digiriskelementcard', 'digiriskstandardview', 'globalcard')); // Note that conf->hooks_modules contains array
 
 // Security check - Protection if external user
 $permissiontoread = $user->rights->digiriskdolibarr->riskassessmentdocument->read;
@@ -114,9 +116,10 @@ if ((empty($action) || ($action != 'edit' && $action != 'create'))) {
 	$project->fetch($conf->global->DIGIRISKDOLIBARR_DU_PROJECT);
 	$morehtmlref .= $langs->trans('Project') . ' : ' . getNomUrlProject($project, 1, 'blank', 1);
 	$morehtmlref .= '</div>';
-	$morehtmlleft = '<div class="floatleft inline-block valignmiddle divphotoref">' . saturne_show_medias_linked('mycompany', $conf->mycompany->dir_output . '/logos', 'small', 1, 0, 0, 0, 80, 80, 0, 0, 0, 'logos', $object, 'photo',0, 0) . '</div>';
 
-	digirisk_banner_tab($object, '', '', 0, '', '', $morehtmlref, '', '', $morehtmlleft);
+	$moduleNameLowerCase = 'mycompany';
+	saturne_banner_tab($object,'ref','', 1, 'ref', 'ref', $morehtmlref, true);
+	$moduleNameLowerCase = 'digiriskdolibarr';
 
 	print '<div class="fichecenter">';
 	print '<br>';

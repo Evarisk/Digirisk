@@ -52,7 +52,7 @@ $type   = GETPOST('type', 'aZ09');
 
 // Initialize technical objects
 $document = new ListingRisksPhoto($db);
-$hookmanager->initHooks(array('digiriskelementlistingrisksphoto', 'digiriskelementview', 'globalcard')); // Note that conf->hooks_modules contains array
+$hookmanager->initHooks(array('digiriskelementlistingrisksphoto', 'digiriskelementview', 'digiriskstandardview', 'globalcard')); // Note that conf->hooks_modules contains array
 
 if ($type != 'standard') {
 	$object = new DigiriskElement($db);
@@ -147,8 +147,10 @@ if ($type != 'standard') {
 	$project->fetch($conf->global->DIGIRISKDOLIBARR_DU_PROJECT);
 	$morehtmlref .= $langs->trans('Project') . ' : ' . getNomUrlProject($project, 1, 'blank', 1);
 	$morehtmlref .= '</div>';
-	$morehtmlleft = '<div class="floatleft inline-block valignmiddle divphotoref">' . saturne_show_medias_linked('mycompany', $conf->mycompany->dir_output . '/logos', 'small', 1, 0, 0, 0, 80, 80, 0, 0, 0, 'logos', $object, 'photo',0, 0) . '</div>';
-	digirisk_banner_tab($object, '', '', 0, '', '', $morehtmlref, '', '', $morehtmlleft);
+
+	$moduleNameLowerCase = 'mycompany';
+	saturne_banner_tab($object,'ref','', 1, 'ref', 'ref', $morehtmlref, true);
+	$moduleNameLowerCase = 'digiriskdolibarr';
 }
 
 unset($object->fields['element_type']);
