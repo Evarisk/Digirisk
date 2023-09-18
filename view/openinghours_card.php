@@ -34,7 +34,6 @@ require_once DOL_DOCUMENT_ROOT . '/core/lib/company.lib.php';
 require_once DOL_DOCUMENT_ROOT . '/core/lib/images.lib.php';
 
 require_once __DIR__ . '/../class/openinghours.class.php';
-require_once __DIR__ . '/../core/tpl/digirisk_security_checks.php';
 
 global $db, $conf, $langs, $user, $hookmanager;
 

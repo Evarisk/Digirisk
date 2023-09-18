@@ -42,7 +42,6 @@ require_once DOL_DOCUMENT_ROOT . '/core/class/html.formactions.class.php';
 require_once DOL_DOCUMENT_ROOT . '/core/class/html.form.class.php';
 
 require_once __DIR__ . '/../class/digiriskresources.class.php';
-require_once __DIR__ . '/../core/tpl/digirisk_security_checks.php';
 
 // Translations
 saturne_load_langs(["admin", "companies"]);

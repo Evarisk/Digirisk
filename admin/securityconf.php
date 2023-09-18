@@ -44,7 +44,6 @@ require_once DOL_DOCUMENT_ROOT . '/contact/class/contact.class.php';
 require_once DOL_DOCUMENT_ROOT . '/user/class/user.class.php';
 
 require_once __DIR__ . '/../class/digiriskresources.class.php';
-require_once __DIR__ . '/../core/tpl/digirisk_security_checks.php';
 
 // Translations
 saturne_load_langs(["admin", "companies"]);

@@ -39,7 +39,6 @@ require_once DOL_DOCUMENT_ROOT . '/projet/class/project.class.php';
 require_once DOL_DOCUMENT_ROOT . '/societe/class/societe.class.php';
 
 require_once __DIR__ . '/../lib/digiriskdolibarr.lib.php';
-require_once __DIR__ . '/../core/tpl/digirisk_security_checks.php';
 
 // Translations
 saturne_load_langs(["admin"]);

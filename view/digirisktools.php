@@ -49,7 +49,6 @@ require_once __DIR__ . '/../core/modules/digiriskdolibarr/digiriskelement/workun
 require_once __DIR__ . '/../core/modules/digiriskdolibarr/riskanalysis/risk/mod_risk_standard.php';
 require_once __DIR__ . '/../core/modules/digiriskdolibarr/riskanalysis/riskassessment/mod_riskassessment_standard.php';
 require_once __DIR__ . '/../core/modules/digiriskdolibarr/riskanalysis/risksign/mod_risksign_standard.php';
-require_once __DIR__ . '/../core/tpl/digirisk_security_checks.php';
 
 // Load translation files required by the page
 saturne_load_langs();
