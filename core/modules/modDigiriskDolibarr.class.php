@@ -382,7 +382,7 @@ class modDigiriskdolibarr extends DolibarrModules
 		$this->editor_url      = 'https://evarisk.com';
 		$this->version         = '9.12.0';
 		$this->const_name      = 'MAIN_MODULE_' . strtoupper($this->name);
-		$this->picto           = 'digiriskdolibarr@digiriskdolibarr';
+		$this->picto           = 'digiriskdolibarr_color@digiriskdolibarr';
 
 		$this->module_parts = [
 			// Set this to 1 if module has its own trigger directory (core/triggers)
@@ -983,255 +983,257 @@ class modDigiriskdolibarr extends DolibarrModules
 		$r            = 0;
 
 		/* module PERMISSIONS */
-		$this->rights[$r][0] = $this->numero . $r;
-		$this->rights[$r][1] = $langs->trans('LireDigirisk');
+		$this->rights[$r][0] = $this->numero . sprintf('%02d', $r + 1);
+		$this->rights[$r][1] = $langs->trans('LireModule', 'DigiriskDolibarr');
 		$this->rights[$r][4] = 'lire';
-		//$this->rights[$r][5] = 1;
+		$this->rights[$r][5] = 1;
 		$r++;
-		$this->rights[$r][0] = $this->numero . $r;
-		$this->rights[$r][1] = $langs->trans('ReadDigirisk');
+
+		$this->rights[$r][0] = $this->numero . sprintf('%02d', $r + 1);
+		$this->rights[$r][1] = $langs->trans('ReadModule', 'DigiriskDolibarr');
 		$this->rights[$r][4] = 'read';
-		//$this->rights[$r][5] = 1;
+		$this->rights[$r][5] = 1;
 		$r++;
 
 		/* RISK ASSESSMENT DOCUMENT PERMISSIONS */
-		$this->rights[$r][0] = $this->numero . $r;
-		$this->rights[$r][1] = $langs->trans('ReadRiskAssessmentDocument');
-		$this->rights[$r][4] = 'riskassessmentdocument';
-		$this->rights[$r][5] = 'read';
+		$this->rights[$r][0] = $this->numero . sprintf('%02d', $r + 1); // Permission id (must not be already used)
+		$this->rights[$r][1] = $langs->transnoentities('ReadObjects',$langs->transnoentities('RiskAssessmentDocumentsMin')); // Permission label
+		$this->rights[$r][4] = 'riskassessmentdocument'; // In php code, permission will be checked by test if ($user->rights->digiriskdolibarr->level1->level2)
+		$this->rights[$r][5] = 'read'; // In php code, permission will be checked by test if ($user->rights->digiriskdolibarr->level1->level2)
 		$r++;
-		$this->rights[$r][0] = $this->numero . $r;
-		$this->rights[$r][1] = $langs->transnoentities('CreateRiskAssessmentDocument');
-		$this->rights[$r][4] = 'riskassessmentdocument';
-		$this->rights[$r][5] = 'write';
+		$this->rights[$r][0] = $this->numero . sprintf('%02d', $r + 1); // Permission id (must not be already used)
+		$this->rights[$r][1] = $langs->transnoentities('CreateObjects', $langs->transnoentities('RiskAssessmentDocumentsMin')); // Permission label
+		$this->rights[$r][4] = 'riskassessmentdocument'; // In php code, permission will be checked by test if ($user->rights->digiriskdolibarr->level1->level2)
+		$this->rights[$r][5] = 'write'; // In php code, permission will be checked by test if ($user->rights->digiriskdolibarr->level1->level2)
 		$r++;
-		$this->rights[$r][0] = $this->numero . $r;
-		$this->rights[$r][1] = $langs->trans('DeleteRiskAssessmentDocument');
-		$this->rights[$r][4] = 'riskassessmentdocument';
-		$this->rights[$r][5] = 'delete';
+		$this->rights[$r][0] = $this->numero . sprintf('%02d', $r + 1); // Permission id (must not be already used)
+		$this->rights[$r][1] = $langs->transnoentities('DeleteObjects', $langs->transnoentities('RiskAssessmentDocumentsMin')); // Permission label
+		$this->rights[$r][4] = 'riskassessmentdocument'; // In php code, permission will be checked by test if ($user->rights->digiriskdolibarr->level1->level2)
+		$this->rights[$r][5] = 'delete'; // In php code, permission will be checked by test if ($user->rights->digiriskdolibarr->level1->level2)
 		$r++;
 
 		/* LEGAL DISPLAY PERMISSIONS */
-		$this->rights[$r][0] = $this->numero . $r;
-		$this->rights[$r][1] = $langs->transnoentities('ReadLegalDisplay');
-		$this->rights[$r][4] = 'legaldisplay';
-		$this->rights[$r][5] = 'read';
+		$this->rights[$r][0] = $this->numero . sprintf('%02d', $r + 1); // Permission id (must not be already used)
+		$this->rights[$r][1] = $langs->transnoentities('ReadObjects',$langs->transnoentities('LegalDisplaysMin')); // Permission label
+		$this->rights[$r][4] = 'legaldisplay'; // In php code, permission will be checked by test if ($user->rights->digiriskdolibarr->level1->level2)
+		$this->rights[$r][5] = 'read'; // In php code, permission will be checked by test if ($user->rights->digiriskdolibarr->level1->level2)
 		$r++;
-		$this->rights[$r][0] = $this->numero . $r;
-		$this->rights[$r][1] = $langs->transnoentities('CreateLegalDisplay');
-		$this->rights[$r][4] = 'legaldisplay';
-		$this->rights[$r][5] = 'write';
+		$this->rights[$r][0] = $this->numero . sprintf('%02d', $r + 1); // Permission id (must not be already used)
+		$this->rights[$r][1] = $langs->transnoentities('CreateObjects', $langs->transnoentities('LegalDisplaysMin')); // Permission label
+		$this->rights[$r][4] = 'legaldisplay'; // In php code, permission will be checked by test if ($user->rights->digiriskdolibarr->level1->level2)
+		$this->rights[$r][5] = 'write'; // In php code, permission will be checked by test if ($user->rights->digiriskdolibarr->level1->level2)
 		$r++;
-		$this->rights[$r][0] = $this->numero . $r;
-		$this->rights[$r][1] = $langs->transnoentities('DeleteLegalDisplay');
-		$this->rights[$r][4] = 'legaldisplay';
-		$this->rights[$r][5] = 'delete';
+		$this->rights[$r][0] = $this->numero . sprintf('%02d', $r + 1); // Permission id (must not be already used)
+		$this->rights[$r][1] = $langs->transnoentities('DeleteObjects', $langs->transnoentities('LegalDisplaysMin')); // Permission label
+		$this->rights[$r][4] = 'legaldisplay'; // In php code, permission will be checked by test if ($user->rights->digiriskdolibarr->level1->level2)
+		$this->rights[$r][5] = 'delete'; // In php code, permission will be checked by test if ($user->rights->digiriskdolibarr->level1->level2)
 		$r++;
 
 		/* INFORMATIONS SHARING PERMISSIONS */
-		$this->rights[$r][0] = $this->numero . $r;
-		$this->rights[$r][1] = $langs->trans('ReadInformationsSharing');
-		$this->rights[$r][4] = 'informationssharing';
-		$this->rights[$r][5] = 'read';
+		$this->rights[$r][0] = $this->numero . sprintf('%02d', $r + 1); // Permission id (must not be already used)
+		$this->rights[$r][1] = $langs->transnoentities('ReadObjects',$langs->transnoentities('InformationsSharingsMin')); // Permission label
+		$this->rights[$r][4] = 'informationssharing'; // In php code, permission will be checked by test if ($user->rights->digiriskdolibarr->level1->level2)
+		$this->rights[$r][5] = 'read'; // In php code, permission will be checked by test if ($user->rights->digiriskdolibarr->level1->level2)
 		$r++;
-		$this->rights[$r][0] = $this->numero . $r;
-		$this->rights[$r][1] = $langs->transnoentities('CreateInformationsSharing');
-		$this->rights[$r][4] = 'informationssharing';
-		$this->rights[$r][5] = 'write';
+		$this->rights[$r][0] = $this->numero . sprintf('%02d', $r + 1); // Permission id (must not be already used)
+		$this->rights[$r][1] = $langs->transnoentities('CreateObjects', $langs->transnoentities('InformationsSharingsMin')); // Permission label
+		$this->rights[$r][4] = 'informationssharing'; // In php code, permission will be checked by test if ($user->rights->digiriskdolibarr->level1->level2)
+		$this->rights[$r][5] = 'write'; // In php code, permission will be checked by test if ($user->rights->digiriskdolibarr->level1->level2)
 		$r++;
-		$this->rights[$r][0] = $this->numero . $r;
-		$this->rights[$r][1] = $langs->trans('DeleteInformationsSharing');
-		$this->rights[$r][4] = 'informationssharing';
-		$this->rights[$r][5] = 'delete';
+		$this->rights[$r][0] = $this->numero . sprintf('%02d', $r + 1); // Permission id (must not be already used)
+		$this->rights[$r][1] = $langs->transnoentities('DeleteObjects', $langs->transnoentities('InformationsSharingsMin')); // Permission label
+		$this->rights[$r][4] = 'informationssharing'; // In php code, permission will be checked by test if ($user->rights->digiriskdolibarr->level1->level2)
+		$this->rights[$r][5] = 'delete'; // In php code, permission will be checked by test if ($user->rights->digiriskdolibarr->level1->level2)
 		$r++;
 
 		/* FIRE PERMIT PERMISSIONS */
-		$this->rights[$r][0] = $this->numero . $r;
-		$this->rights[$r][1] = $langs->trans('ReadFirePermit');
-		$this->rights[$r][4] = 'firepermit';
-		$this->rights[$r][5] = 'read';
+		$this->rights[$r][0] = $this->numero . sprintf('%02d', $r + 1); // Permission id (must not be already used)
+		$this->rights[$r][1] = $langs->transnoentities('ReadObjects',$langs->transnoentities('FirePermitsMin')); // Permission label
+		$this->rights[$r][4] = 'firepermit'; // In php code, permission will be checked by test if ($user->rights->digiriskdolibarr->level1->level2)
+		$this->rights[$r][5] = 'read'; // In php code, permission will be checked by test if ($user->rights->digiriskdolibarr->level1->level2)
 		$r++;
-		$this->rights[$r][0] = $this->numero . $r;
-		$this->rights[$r][1] = $langs->transnoentities('CreateFirePermit');
-		$this->rights[$r][4] = 'firepermit';
-		$this->rights[$r][5] = 'write';
+		$this->rights[$r][0] = $this->numero . sprintf('%02d', $r + 1); // Permission id (must not be already used)
+		$this->rights[$r][1] = $langs->transnoentities('CreateObjects', $langs->transnoentities('FirePermitsMin')); // Permission label
+		$this->rights[$r][4] = 'firepermit'; // In php code, permission will be checked by test if ($user->rights->digiriskdolibarr->level1->level2)
+		$this->rights[$r][5] = 'write'; // In php code, permission will be checked by test if ($user->rights->digiriskdolibarr->level1->level2)
 		$r++;
-		$this->rights[$r][0] = $this->numero . $r;
-		$this->rights[$r][1] = $langs->trans('DeleteFirePermit');
-		$this->rights[$r][4] = 'firepermit';
-		$this->rights[$r][5] = 'delete';
+		$this->rights[$r][0] = $this->numero . sprintf('%02d', $r + 1); // Permission id (must not be already used)
+		$this->rights[$r][1] = $langs->transnoentities('DeleteObjects', $langs->transnoentities('FirePermitsMin')); // Permission label
+		$this->rights[$r][4] = 'firepermit'; // In php code, permission will be checked by test if ($user->rights->digiriskdolibarr->level1->level2)
+		$this->rights[$r][5] = 'delete'; // In php code, permission will be checked by test if ($user->rights->digiriskdolibarr->level1->level2)
 		$r++;
 
 		/* PREVENTION PLAN PERMISSIONS */
-		$this->rights[$r][0] = $this->numero . $r;
-		$this->rights[$r][1] = $langs->transnoentities('ReadPreventionPlan');
-		$this->rights[$r][4] = 'preventionplan';
-		$this->rights[$r][5] = 'read';
+		$this->rights[$r][0] = $this->numero . sprintf('%02d', $r + 1); // Permission id (must not be already used)
+		$this->rights[$r][1] = $langs->transnoentities('ReadObjects',$langs->transnoentities('PreventionPlansMin')); // Permission label
+		$this->rights[$r][4] = 'preventionplan'; // In php code, permission will be checked by test if ($user->rights->digiriskdolibarr->level1->level2)
+		$this->rights[$r][5] = 'read'; // In php code, permission will be checked by test if ($user->rights->digiriskdolibarr->level1->level2)
 		$r++;
-		$this->rights[$r][0] = $this->numero . $r;
-		$this->rights[$r][1] = $langs->transnoentities('CreatePreventionPlan');
-		$this->rights[$r][4] = 'preventionplan';
-		$this->rights[$r][5] = 'write';
+		$this->rights[$r][0] = $this->numero . sprintf('%02d', $r + 1); // Permission id (must not be already used)
+		$this->rights[$r][1] = $langs->transnoentities('CreateObjects', $langs->transnoentities('PreventionPlansMin')); // Permission label
+		$this->rights[$r][4] = 'preventionplan'; // In php code, permission will be checked by test if ($user->rights->digiriskdolibarr->level1->level2)
+		$this->rights[$r][5] = 'write'; // In php code, permission will be checked by test if ($user->rights->digiriskdolibarr->level1->level2)
 		$r++;
-		$this->rights[$r][0] = $this->numero . $r;
-		$this->rights[$r][1] = $langs->transnoentities('DeletePreventionPlan');
-		$this->rights[$r][4] = 'preventionplan';
-		$this->rights[$r][5] = 'delete';
+		$this->rights[$r][0] = $this->numero . sprintf('%02d', $r + 1); // Permission id (must not be already used)
+		$this->rights[$r][1] = $langs->transnoentities('DeleteObjects', $langs->transnoentities('PreventionPlansMin')); // Permission label
+		$this->rights[$r][4] = 'preventionplan'; // In php code, permission will be checked by test if ($user->rights->digiriskdolibarr->level1->level2)
+		$this->rights[$r][5] = 'delete'; // In php code, permission will be checked by test if ($user->rights->digiriskdolibarr->level1->level2)
 		$r++;
 
 		/* GP/UT ORGANISATION PERMISSIONS */
-		$this->rights[$r][0] = $this->numero . $r;
-		$this->rights[$r][1] = $langs->transnoentities('ReadDigiriskElement');
-		$this->rights[$r][4] = 'digiriskelement';
-		$this->rights[$r][5] = 'read';
+		$this->rights[$r][0] = $this->numero . sprintf('%02d', $r + 1); // Permission id (must not be already used)
+		$this->rights[$r][1] = $langs->transnoentities('ReadObjects',$langs->transnoentities('DigiriskElementsMin')); // Permission label
+		$this->rights[$r][4] = 'digiriskelement'; // In php code, permission will be checked by test if ($user->rights->digiriskdolibarr->level1->level2)
+		$this->rights[$r][5] = 'read'; // In php code, permission will be checked by test if ($user->rights->digiriskdolibarr->level1->level2)
 		$r++;
-		$this->rights[$r][0] = $this->numero . $r;
-		$this->rights[$r][1] = $langs->transnoentities('CreateDigiriskElement');
-		$this->rights[$r][4] = 'digiriskelement';
-		$this->rights[$r][5] = 'write';
+		$this->rights[$r][0] = $this->numero . sprintf('%02d', $r + 1); // Permission id (must not be already used)
+		$this->rights[$r][1] = $langs->transnoentities('CreateObjects', $langs->transnoentities('DigiriskElementsMin')); // Permission label
+		$this->rights[$r][4] = 'digiriskelement'; // In php code, permission will be checked by test if ($user->rights->digiriskdolibarr->level1->level2)
+		$this->rights[$r][5] = 'write'; // In php code, permission will be checked by test if ($user->rights->digiriskdolibarr->level1->level2)
 		$r++;
-		$this->rights[$r][0] = $this->numero . $r;
-		$this->rights[$r][1] = $langs->transnoentities('DeleteDigiriskElement');
-		$this->rights[$r][4] = 'digiriskelement';
-		$this->rights[$r][5] = 'delete';
+		$this->rights[$r][0] = $this->numero . sprintf('%02d', $r + 1); // Permission id (must not be already used)
+		$this->rights[$r][1] = $langs->transnoentities('DeleteObjects', $langs->transnoentities('DigiriskElementsMin')); // Permission label
+		$this->rights[$r][4] = 'digiriskelement'; // In php code, permission will be checked by test if ($user->rights->digiriskdolibarr->level1->level2)
+		$this->rights[$r][5] = 'delete'; // In php code, permission will be checked by test if ($user->rights->digiriskdolibarr->level1->level2)
 		$r++;
 
 		/* RISKS PERMISSIONS */
-		$this->rights[$r][0] = $this->numero . $r;
-		$this->rights[$r][1] = $langs->trans('ReadDigiriskRisk');
-		$this->rights[$r][4] = 'risk';
-		$this->rights[$r][5] = 'read';
+		$this->rights[$r][0] = $this->numero . sprintf('%02d', $r + 1); // Permission id (must not be already used)
+		$this->rights[$r][1] = $langs->transnoentities('ReadObjects',$langs->transnoentities('RisksMin')); // Permission label
+		$this->rights[$r][4] = 'risk'; // In php code, permission will be checked by test if ($user->rights->digiriskdolibarr->level1->level2)
+		$this->rights[$r][5] = 'read'; // In php code, permission will be checked by test if ($user->rights->digiriskdolibarr->level1->level2)
 		$r++;
-		$this->rights[$r][0] = $this->numero . $r;
-		$this->rights[$r][1] = $langs->transnoentities('CreateDigiriskRisk');
-		$this->rights[$r][4] = 'risk';
-		$this->rights[$r][5] = 'write';
+		$this->rights[$r][0] = $this->numero . sprintf('%02d', $r + 1); // Permission id (must not be already used)
+		$this->rights[$r][1] = $langs->transnoentities('CreateObjects', $langs->transnoentities('RisksMin')); // Permission label
+		$this->rights[$r][4] = 'risk'; // In php code, permission will be checked by test if ($user->rights->digiriskdolibarr->level1->level2)
+		$this->rights[$r][5] = 'write'; // In php code, permission will be checked by test if ($user->rights->digiriskdolibarr->level1->level2)
 		$r++;
-		$this->rights[$r][0] = $this->numero . $r;
-		$this->rights[$r][1] = $langs->trans('DeleteDigiriskRisk');
-		$this->rights[$r][4] = 'risk';
-		$this->rights[$r][5] = 'delete';
+		$this->rights[$r][0] = $this->numero . sprintf('%02d', $r + 1); // Permission id (must not be already used)
+		$this->rights[$r][1] = $langs->transnoentities('DeleteObjects', $langs->transnoentities('RisksMin')); // Permission label
+		$this->rights[$r][4] = 'risk'; // In php code, permission will be checked by test if ($user->rights->digiriskdolibarr->level1->level2)
+		$this->rights[$r][5] = 'delete'; // In php code, permission will be checked by test if ($user->rights->digiriskdolibarr->level1->level2)
 		$r++;
 
 		/* LISTING RISKS ACTION PERMISSIONS */
-		$this->rights[$r][0] = $this->numero . $r;
-		$this->rights[$r][1] = $langs->trans('ReadListingRisksAction');
-		$this->rights[$r][4] = 'listingrisksaction';
-		$this->rights[$r][5] = 'read';
+		$this->rights[$r][0] = $this->numero . sprintf('%02d', $r + 1); // Permission id (must not be already used)
+		$this->rights[$r][1] = $langs->transnoentities('ReadObjects',$langs->transnoentities('ListingRisksActionsMin')); // Permission label
+		$this->rights[$r][4] = 'listingrisksaction'; // In php code, permission will be checked by test if ($user->rights->digiriskdolibarr->level1->level2)
+		$this->rights[$r][5] = 'read'; // In php code, permission will be checked by test if ($user->rights->digiriskdolibarr->level1->level2)
 		$r++;
-		$this->rights[$r][0] = $this->numero . $r;
-		$this->rights[$r][1] = $langs->transnoentities('CreateListingRisksAction');
-		$this->rights[$r][4] = 'listingrisksaction';
-		$this->rights[$r][5] = 'write';
+		$this->rights[$r][0] = $this->numero . sprintf('%02d', $r + 1); // Permission id (must not be already used)
+		$this->rights[$r][1] = $langs->transnoentities('CreateObjects', $langs->transnoentities('ListingRisksActionsMin')); // Permission label
+		$this->rights[$r][4] = 'listingrisksaction'; // In php code, permission will be checked by test if ($user->rights->digiriskdolibarr->level1->level2)
+		$this->rights[$r][5] = 'write'; // In php code, permission will be checked by test if ($user->rights->digiriskdolibarr->level1->level2)
 		$r++;
-		$this->rights[$r][0] = $this->numero . $r;
-		$this->rights[$r][1] = $langs->trans('DeleteListingRisksAction');
-		$this->rights[$r][4] = 'listingrisksaction';
-		$this->rights[$r][5] = 'delete';
+		$this->rights[$r][0] = $this->numero . sprintf('%02d', $r + 1); // Permission id (must not be already used)
+		$this->rights[$r][1] = $langs->transnoentities('DeleteObjects', $langs->transnoentities('ListingRisksActionsMin')); // Permission label
+		$this->rights[$r][4] = 'listingrisksaction'; // In php code, permission will be checked by test if ($user->rights->digiriskdolibarr->level1->level2)
+		$this->rights[$r][5] = 'delete'; // In php code, permission will be checked by test if ($user->rights->digiriskdolibarr->level1->level2)
 		$r++;
 
 		/* LISTING RISKS PHOTO PERMISSIONS */
-		$this->rights[$r][0] = $this->numero . $r;
-		$this->rights[$r][1] = $langs->trans('ReadListingRisksPhoto');
-		$this->rights[$r][4] = 'listingrisksphoto';
-		$this->rights[$r][5] = 'read';
+		$this->rights[$r][0] = $this->numero . sprintf('%02d', $r + 1); // Permission id (must not be already used)
+		$this->rights[$r][1] = $langs->transnoentities('ReadObjects',$langs->transnoentities('ListingRisksPhotosMin')); // Permission label
+		$this->rights[$r][4] = 'listingrisksphoto'; // In php code, permission will be checked by test if ($user->rights->digiriskdolibarr->level1->level2)
+		$this->rights[$r][5] = 'read'; // In php code, permission will be checked by test if ($user->rights->digiriskdolibarr->level1->level2)
 		$r++;
-		$this->rights[$r][0] = $this->numero . $r;
-		$this->rights[$r][1] = $langs->transnoentities('CreateListingRisksPhoto');
-		$this->rights[$r][4] = 'listingrisksphoto';
-		$this->rights[$r][5] = 'write';
+		$this->rights[$r][0] = $this->numero . sprintf('%02d', $r + 1); // Permission id (must not be already used)
+		$this->rights[$r][1] = $langs->transnoentities('CreateObjects', $langs->transnoentities('ListingRisksPhotosMin')); // Permission label
+		$this->rights[$r][4] = 'listingrisksphoto'; // In php code, permission will be checked by test if ($user->rights->digiriskdolibarr->level1->level2)
+		$this->rights[$r][5] = 'write'; // In php code, permission will be checked by test if ($user->rights->digiriskdolibarr->level1->level2)
 		$r++;
-		$this->rights[$r][0] = $this->numero . $r;
-		$this->rights[$r][1] = $langs->trans('DeleteListingRisksPhoto');
-		$this->rights[$r][4] = 'listingrisksphoto';
-		$this->rights[$r][5] = 'delete';
+		$this->rights[$r][0] = $this->numero . sprintf('%02d', $r + 1); // Permission id (must not be already used)
+		$this->rights[$r][1] = $langs->transnoentities('DeleteObjects', $langs->transnoentities('ListingRisksPhotosMin')); // Permission label
+		$this->rights[$r][4] = 'listingrisksphoto'; // In php code, permission will be checked by test if ($user->rights->digiriskdolibarr->level1->level2)
+		$this->rights[$r][5] = 'delete'; // In php code, permission will be checked by test if ($user->rights->digiriskdolibarr->level1->level2)
 		$r++;
 
 		/* RISK SIGN PERMISSIONS */
-		$this->rights[$r][0] = $this->numero . $r;
-		$this->rights[$r][1] = $langs->trans('ReadDigiriskRiskSign');
-		$this->rights[$r][4] = 'risksign';
-		$this->rights[$r][5] = 'read';
+		$this->rights[$r][0] = $this->numero . sprintf('%02d', $r + 1); // Permission id (must not be already used)
+		$this->rights[$r][1] = $langs->transnoentities('ReadObjects',$langs->transnoentities('RiskSignsMin')); // Permission label
+		$this->rights[$r][4] = 'risksign'; // In php code, permission will be checked by test if ($user->rights->digiriskdolibarr->level1->level2)
+		$this->rights[$r][5] = 'read'; // In php code, permission will be checked by test if ($user->rights->digiriskdolibarr->level1->level2)
 		$r++;
-		$this->rights[$r][0] = $this->numero . $r;
-		$this->rights[$r][1] = $langs->transnoentities('CreateDigiriskRiskSign');
-		$this->rights[$r][4] = 'risksign';
-		$this->rights[$r][5] = 'write';
+		$this->rights[$r][0] = $this->numero . sprintf('%02d', $r + 1); // Permission id (must not be already used)
+		$this->rights[$r][1] = $langs->transnoentities('CreateObjects', $langs->transnoentities('RiskSignsMin')); // Permission label
+		$this->rights[$r][4] = 'risksign'; // In php code, permission will be checked by test if ($user->rights->digiriskdolibarr->level1->level2)
+		$this->rights[$r][5] = 'write'; // In php code, permission will be checked by test if ($user->rights->digiriskdolibarr->level1->level2)
 		$r++;
-		$this->rights[$r][0] = $this->numero . $r;
-		$this->rights[$r][1] = $langs->trans('DeleteDigiriskRiskSign');
-		$this->rights[$r][4] = 'risksign';
-		$this->rights[$r][5] = 'delete';
+		$this->rights[$r][0] = $this->numero . sprintf('%02d', $r + 1); // Permission id (must not be already used)
+		$this->rights[$r][1] = $langs->transnoentities('DeleteObjects', $langs->transnoentities('RiskSignsMin')); // Permission label
+		$this->rights[$r][4] = 'risksign'; // In php code, permission will be checked by test if ($user->rights->digiriskdolibarr->level1->level2)
+		$this->rights[$r][5] = 'delete'; // In php code, permission will be checked by test if ($user->rights->digiriskdolibarr->level1->level2)
 		$r++;
 
 		/* EVALUATOR PERMISSIONS */
-		$this->rights[$r][0] = $this->numero . $r;
-		$this->rights[$r][1] = $langs->transnoentities('ReadEvaluator');
-		$this->rights[$r][4] = 'evaluator';
-		$this->rights[$r][5] = 'read';
+		$this->rights[$r][0] = $this->numero . sprintf('%02d', $r + 1); // Permission id (must not be already used)
+		$this->rights[$r][1] = $langs->transnoentities('ReadObjects',$langs->transnoentities('EvaluatorsMin')); // Permission label
+		$this->rights[$r][4] = 'evaluator'; // In php code, permission will be checked by test if ($user->rights->digiriskdolibarr->level1->level2)
+		$this->rights[$r][5] = 'read'; // In php code, permission will be checked by test if ($user->rights->digiriskdolibarr->level1->level2)
 		$r++;
-		$this->rights[$r][0] = $this->numero . $r;
-		$this->rights[$r][1] = $langs->transnoentities('CreateEvaluator');
-		$this->rights[$r][4] = 'evaluator';
-		$this->rights[$r][5] = 'write';
+		$this->rights[$r][0] = $this->numero . sprintf('%02d', $r + 1); // Permission id (must not be already used)
+		$this->rights[$r][1] = $langs->transnoentities('CreateObjects', $langs->transnoentities('EvaluatorsMin')); // Permission label
+		$this->rights[$r][4] = 'evaluator'; // In php code, permission will be checked by test if ($user->rights->digiriskdolibarr->level1->level2)
+		$this->rights[$r][5] = 'write'; // In php code, permission will be checked by test if ($user->rights->digiriskdolibarr->level1->level2)
 		$r++;
-		$this->rights[$r][0] = $this->numero . $r;
-		$this->rights[$r][1] = $langs->transnoentities('DeleteEvaluator');
-		$this->rights[$r][4] = 'evaluator';
-		$this->rights[$r][5] = 'delete';
+		$this->rights[$r][0] = $this->numero . sprintf('%02d', $r + 1); // Permission id (must not be already used)
+		$this->rights[$r][1] = $langs->transnoentities('DeleteObjects', $langs->transnoentities('EvaluatorsMin')); // Permission label
+		$this->rights[$r][4] = 'evaluator'; // In php code, permission will be checked by test if ($user->rights->digiriskdolibarr->level1->level2)
+		$this->rights[$r][5] = 'delete'; // In php code, permission will be checked by test if ($user->rights->digiriskdolibarr->level1->level2)
+		$r++;
+
+		/* ACCIDENT PERMISSIONS */
+		$this->rights[$r][0] = $this->numero . sprintf('%02d', $r + 1); // Permission id (must not be already used)
+		$this->rights[$r][1] = $langs->transnoentities('ReadObjects',$langs->transnoentities('AccidentsMin')); // Permission label
+		$this->rights[$r][4] = 'accident'; // In php code, permission will be checked by test if ($user->rights->digiriskdolibarr->level1->level2)
+		$this->rights[$r][5] = 'read'; // In php code, permission will be checked by test if ($user->rights->digiriskdolibarr->level1->level2)
+		$r++;
+		$this->rights[$r][0] = $this->numero . sprintf('%02d', $r + 1); // Permission id (must not be already used)
+		$this->rights[$r][1] = $langs->transnoentities('CreateObjects', $langs->transnoentities('AccidentsMin')); // Permission label
+		$this->rights[$r][4] = 'accident'; // In php code, permission will be checked by test if ($user->rights->digiriskdolibarr->level1->level2)
+		$this->rights[$r][5] = 'write'; // In php code, permission will be checked by test if ($user->rights->digiriskdolibarr->level1->level2)
+		$r++;
+		$this->rights[$r][0] = $this->numero . sprintf('%02d', $r + 1); // Permission id (must not be already used)
+		$this->rights[$r][1] = $langs->transnoentities('DeleteObjects', $langs->transnoentities('AccidentsMin')); // Permission label
+		$this->rights[$r][4] = 'accident'; // In php code, permission will be checked by test if ($user->rights->digiriskdolibarr->level1->level2)
+		$this->rights[$r][5] = 'delete'; // In php code, permission will be checked by test if ($user->rights->digiriskdolibarr->level1->level2)
+		$r++;
+
+		/* ACCIDENT INVESTIGATION PERMISSIONS */
+		$this->rights[$r][0] = $this->numero . sprintf('%02d', $r + 1); // Permission id (must not be already used)
+		$this->rights[$r][1] = $langs->transnoentities('ReadObjects',$langs->transnoentities('AccidentInvestigationsMin')); // Permission label
+		$this->rights[$r][4] = 'accident_investigation'; // In php code, permission will be checked by test if ($user->rights->digiriskdolibarr->level1->level2)
+		$this->rights[$r][5] = 'read'; // In php code, permission will be checked by test if ($user->rights->digiriskdolibarr->level1->level2)
+		$r++;
+		$this->rights[$r][0] = $this->numero . sprintf('%02d', $r + 1); // Permission id (must not be already used)
+		$this->rights[$r][1] = $langs->transnoentities('CreateObjects', $langs->transnoentities('AccidentInvestigationsMin')); // Permission label
+		$this->rights[$r][4] = 'accident_investigation'; // In php code, permission will be checked by test if ($user->rights->digiriskdolibarr->level1->level2)
+		$this->rights[$r][5] = 'write'; // In php code, permission will be checked by test if ($user->rights->digiriskdolibarr->level1->level2)
+		$r++;
+		$this->rights[$r][0] = $this->numero . sprintf('%02d', $r + 1); // Permission id (must not be already used)
+		$this->rights[$r][1] = $langs->transnoentities('DeleteObjects', $langs->transnoentities('AccidentInvestigationsMin')); // Permission label
+		$this->rights[$r][4] = 'accident_investigation'; // In php code, permission will be checked by test if ($user->rights->digiriskdolibarr->level1->level2)
+		$this->rights[$r][5] = 'delete'; // In php code, permission will be checked by test if ($user->rights->digiriskdolibarr->level1->level2)
 		$r++;
 
 		/* ADMINPAGE PANEL ACCESS PERMISSIONS */
-		$this->rights[$r][0] = $this->numero . $r;
-		$this->rights[$r][1] = $langs->transnoentities('ReadAdminPage');
+		$this->rights[$r][0] = $this->numero . sprintf('%02d', $r + 1);
+		$this->rights[$r][1] = $langs->transnoentities('ReadAdminPage', 'DigiriskDolibarr');
 		$this->rights[$r][4] = 'adminpage';
 		$this->rights[$r][5] = 'read';
 		$r++;
 
 		/* API PERMISSIONS */
-		$this->rights[$r][0] = $this->numero . $r;
+		$this->rights[$r][0] = $this->numero . sprintf('%02d', $r + 1);
 		$this->rights[$r][1] = $langs->transnoentities('GetAPI');
 		$this->rights[$r][4] = 'api';
 		$this->rights[$r][5] = 'read';
 		$r++;
-		$this->rights[$r][0] = $this->numero . $r;
+		$this->rights[$r][0] = $this->numero . sprintf('%02d', $r + 1);
 		$this->rights[$r][1] = $langs->transnoentities('PostAPI');
 		$this->rights[$r][4] = 'api';
 		$this->rights[$r][5] = 'write';
 		$r++;
-
-		/* ACCIDENT PERMISSIONS */
-		$this->rights[$r][0] = $this->numero . $r;
-		$this->rights[$r][1] = $langs->trans('ReadAccident');
-		$this->rights[$r][4] = 'accident';
-		$this->rights[$r][5] = 'read';
-		$r++;
-		$this->rights[$r][0] = $this->numero . $r;
-		$this->rights[$r][1] = $langs->transnoentities('CreateAccident');
-		$this->rights[$r][4] = 'accident';
-		$this->rights[$r][5] = 'write';
-		$r++;
-		$this->rights[$r][0] = $this->numero . $r;
-		$this->rights[$r][1] = $langs->trans('DeleteAccident');
-		$this->rights[$r][4] = 'accident';
-		$this->rights[$r][5] = 'delete';
-		$r++;
-
-		/* ACCIDENT INVESTIGATION PERMISSIONS */
-		$this->rights[$r][0] = $this->numero . $r;
-		$this->rights[$r][1] = $langs->trans('ReadAccidentInvestigation');
-		$this->rights[$r][4] = 'accident_investigation';
-		$this->rights[$r][5] = 'read';
-		$r++;
-		$this->rights[$r][0] = $this->numero . $r;
-		$this->rights[$r][1] = $langs->transnoentities('CreateAccidentInvestigation');
-		$this->rights[$r][4] = 'accident_investigation';
-		$this->rights[$r][5] = 'write';
-		$r++;
-		$this->rights[$r][0] = $this->numero . $r;
-		$this->rights[$r][1] = $langs->trans('DeleteAccidentInvestigation');
-		$this->rights[$r][4] = 'accident_investigation';
-		$this->rights[$r][5] = 'delete';
 
 		// Main menu entries to add
 		$this->menu       = [];

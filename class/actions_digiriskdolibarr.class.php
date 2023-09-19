@@ -878,11 +878,11 @@ class ActionsDigiriskdolibarr
 			],
 			'Ticket' => [
 				'documentType' => 'ticketdocument',
-				'picto'        => 'fontawesome_fa-ticket_fas_#d35968'
+				'picto'        => 'ticket'
 			],
 			'Project' => [
 				'documentType' => 'projectdocument',
-				'picto'        => 'fontawesome_fa-project-diagram_fas_#d35968'
+				'picto'        => 'project'
 			],
 
 		];

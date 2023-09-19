@@ -48,7 +48,6 @@ require_once DOL_DOCUMENT_ROOT . '/includes/parsedown/Parsedown.php';
 
 require_once __DIR__ . '/core/modules/modDigiriskDolibarr.class.php';
 require_once __DIR__ . '/class/dashboarddigiriskstats.class.php';
-require_once __DIR__ . '/core/tpl/digirisk_security_checks.php';
 
 // Load translation files required by the page
 $langs->loadLangs(array("digiriskdolibarr@digiriskdolibarr"));

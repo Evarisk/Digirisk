@@ -1216,7 +1216,7 @@ if ((empty($action) || ($action != 'create' && $action != 'edit'))) {
 		print '<td>' . $langs->trans('Location') . '</td>';
 		print '<td>' . $form->textwithpicto($langs->trans('ActionsDescription'), $langs->trans("ActionsDescriptionTooltip")) . '</td>';
 		print '<td class="center">' . $form->textwithpicto($langs->trans('INRSRisk'), $langs->trans('INRSRiskTooltip')) . '</td>';
-		print '<td>' . $form->textwithpicto($langs->trans('UsedMaterial'), $langs->trans('UsedMaterialTooltip')) . '</td>';
+		print '<td>' . $form->textwithpicto($langs->trans('UsedEquipment'), $langs->trans('UsedMaterialTooltip')) . '</td>';
 		print '<td class="center" colspan="' . $colspan . '">' . $langs->trans('ActionsFirePermitRisk') . '</td>';
 		print '</tr>';
 

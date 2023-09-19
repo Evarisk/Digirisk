@@ -920,7 +920,7 @@ $formconfirm = '';
 // SetLocked confirmation
 if (($action == 'setLocked' && (empty($conf->use_javascript_ajax) || ! empty($conf->dol_use_jmobile)))		// Output when action = clone if jmobile or no js
 	|| ( ! empty($conf->use_javascript_ajax) && empty($conf->dol_use_jmobile))) {							// Always output when not jmobile nor js
-	$formconfirm .= $form->formconfirm($_SERVER["PHP_SELF"] . '?id=' . $object->id, $langs->trans('LockPreventionPlan'), $langs->trans('ConfirmLockPreventionPlan', $object->ref), 'confirm_setLocked', '', 'yes', 'actionButtonLock', 350, 600);
+	$formconfirm .= $form->formconfirm($_SERVER["PHP_SELF"] . '?id=' . $object->id, $langs->trans('LockObject', $langs->transnoentities('The' . $object->element)), $langs->trans('ConfirmLockObject', $langs->transnoentities('The' . $object->element)), 'confirm_setLocked', '', 'yes', 'actionButtonLock', 350, 600);
 }
 
 // setPendingSignature confirmation

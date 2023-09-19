@@ -39,7 +39,7 @@ function preventionplan_prepare_head(PreventionPlan $object): array
     $head = [];
 
     $head[1][0] = dol_buildpath("/saturne/view/saturne_schedules.php", 1) . '?id=' . $object->id . '&element_type=preventionplan&module_name=DigiriskDolibarr';
-    $head[1][1] = '<i class="fas fa-calendar-times"></i> ' . $langs->trans("Schedule");
+    $head[1][1] = '<i class="fas fa-calendar-times"></i> ' . $langs->trans("Schedules");
     $head[1][2] = 'schedules';
 
     $moreParams['documentType'] = 'PreventionPlanDocument';
