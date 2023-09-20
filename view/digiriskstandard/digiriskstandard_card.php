@@ -35,9 +35,9 @@ require_once DOL_DOCUMENT_ROOT . '/core/lib/functions2.lib.php';
 require_once DOL_DOCUMENT_ROOT . '/projet/class/project.class.php';
 
 require_once __DIR__ . '/../../class/digiriskstandard.class.php';
+require_once __DIR__ . '/../../class/digiriskdolibarrdashboard.class.php';
 require_once __DIR__ . '/../../lib/digiriskdolibarr_digiriskstandard.lib.php';
 require_once __DIR__ . '/../../lib/digiriskdolibarr_function.lib.php';
-require_once __DIR__ . '/../../class/dashboarddigiriskstats.class.php';
 
 global $db, $conf, $langs, $user, $hookmanager, $maxwidthmini, $maxheightmini, $maxwidthsmall,$maxheightsmall;
 
@@ -48,9 +48,9 @@ saturne_load_langs();
 $action = GETPOST('action', 'alpha');
 
 // Initialize technical objects
-$object  = new DigiriskStandard($db);
-$stats   = new DashboardDigiriskStats($db);
-$project = new Project($db);
+$object    = new DigiriskStandard($db);
+$project   = new Project($db);
+$dashboard = new SaturneDashboard($db, $moduleNameLowerCase);
 
 $object->fetch($conf->global->DIGIRISKDOLIBARR_ACTIVE_STANDARD);
 
@@ -124,7 +124,11 @@ if ((empty($action) || ($action != 'edit' && $action != 'create'))) {
 	print '<div class="fichecenter">';
 	print '<br>';
 
-	$stats->show_dashboard(1,1,1,0);
+	$moreParams = [
+		'loadAccident' => 0
+	];
+
+	$dashboard->show_dashboard($moreParams);
 
 	print '<div class="fichecenter">';
 

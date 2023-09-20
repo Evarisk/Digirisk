@@ -550,7 +550,8 @@ class Risk extends SaturneObject
 
 		$riskassessment = new RiskAssessment($this->db);
 		$array['title'] = $langs->transnoentities('RisksRepartition');
-		$array['picto'] = '<i class="fas fa-exclamation-triangle"></i>';
+		$array['picto'] = $this->picto;
+		$array['width']   = '100%';
 		$array['labels'] = array(
 			1 => array(
 				'label' => $langs->transnoentities('GreyRisk'),

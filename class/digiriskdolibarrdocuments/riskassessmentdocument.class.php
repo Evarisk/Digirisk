@@ -24,7 +24,6 @@
 require_once DOL_DOCUMENT_ROOT . '/core/lib/date.lib.php';
 
 require_once __DIR__ . '/../digiriskdocuments.class.php';
-require_once __DIR__ . '/../dashboarddigiriskstats.class.php';
 
 /**
  * Class for RiskAssessmentDocument
@@ -121,12 +120,10 @@ class RiskAssessmentDocument extends DigiriskDocuments
 		}
 
 		$array['widgets'] = array(
-			DashboardDigiriskStats::DASHBOARD_RISKASSESSMENTDOCUMENT => array(
-				'label'      => array($langs->transnoentities("LastGenerateDate"), $langs->transnoentities("NextGenerateDate"), $langs->transnoentities("NbDaysBeforeNextGenerateDate"), $langs->transnoentities("NbDaysAfterNextGenerateDate")),
-				'content'    => array($arrayLastGenerateDate['lastgeneratedate'], $arrayNextGenerateDate['nextgeneratedate'], $arrayNbDaysBeforeNextGenerateDate['nbdaysbeforenextgeneratedate'], $arrayNbDaysAfterNextGenerateDate['nbdaysafternextgeneratedate']),
-				'picto'      => 'fas fa-info-circle',
-				'widgetName' => $langs->transnoentities('RiskAssessmentDocument')
-			),
+			'label'      => array($langs->transnoentities("LastGenerateDate"), $langs->transnoentities("NextGenerateDate"), $langs->transnoentities("NbDaysBeforeNextGenerateDate"), $langs->transnoentities("NbDaysAfterNextGenerateDate")),
+			'content'    => array($arrayLastGenerateDate['lastgeneratedate'], $arrayNextGenerateDate['nextgeneratedate'], $arrayNbDaysBeforeNextGenerateDate['nbdaysbeforenextgeneratedate'], $arrayNbDaysAfterNextGenerateDate['nbdaysafternextgeneratedate']),
+			'picto'      => 'fas fa-info-circle',
+			'widgetName' => $langs->transnoentities('RiskAssessmentDocument')
 		);
 
 		return $array;

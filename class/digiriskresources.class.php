@@ -23,7 +23,6 @@
 
 require_once DOL_DOCUMENT_ROOT.'/core/class/commonobject.class.php';
 
-require_once __DIR__ . '/dashboarddigiriskstats.class.php';
 
 // Load Saturne libraries.
 require_once __DIR__ . '/../../saturne/class/saturneobject.class.php';
@@ -329,7 +328,7 @@ class DigiriskResources extends SaturneObject
 		$arraySiretNumber  = $this->getSiretNumber();
 
 		$array['widgets'] = array(
-			DashboardDigiriskStats::DASHBOARD_DIGIRISKRESOURCES => array(
+			DigiriskDolibarrDashboard::DASHBOARD_DIGIRISKRESOURCES => array(
 				'label'      => array($langs->transnoentities("SiretNumber")),
 				'content'    => array($arraySiretNumber['siretnumber']),
 				'picto'      => 'fas fa-building',

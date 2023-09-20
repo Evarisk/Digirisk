@@ -24,7 +24,6 @@
 // Load Saturne libraries.
 require_once __DIR__ . '/../../saturne/class/saturneobject.class.php';
 
-require_once __DIR__ . '/dashboarddigiriskstats.class.php';
 
 /**
  * Class for Evaluator.
@@ -137,7 +136,7 @@ class Evaluator extends SaturneObject
 		$arrayNbEmployees         = $this->getNbEmployees();
 
 		$array['widgets'] = array(
-			DashboardDigiriskStats::DASHBOARD_EVALUATOR => array(
+			DigiriskDolibarrDashboard::DASHBOARD_EVALUATOR => array(
 				'label'      => array($langs->transnoentities("NbEmployeesInvolved"), $langs->transnoentities("NbEmployees")),
 				'content'    => array($arrayNbEmployeesInvolved['nbemployeesinvolved'], $arrayNbEmployees['nbemployees']),
 				'tooltip'    => array($langs->transnoentities("NbEmployeesInvolvedTooltip"), (($conf->global->DIGIRISKDOLIBARR_NB_EMPLOYEES > 0 && $conf->global->DIGIRISKDOLIBARR_MANUAL_INPUT_NB_EMPLOYEES) ? $langs->transnoentities("NbEmployeesConfTooltip") : $langs->transnoentities("NbEmployeesTooltip"))),
