@@ -99,10 +99,12 @@ if ( $action == "edit" && $permissiontoadd ) {
 	print '<tr>';
 	print '<td class="titlefield">' . $langs->trans("Recipient") . '</td><td colspan="2">';
 	$recipients = json_decode($conf->global->DIGIRISKDOLIBARR_RISKASSESSMENTDOCUMENT_RECIPIENT);
-	foreach ($recipients as $recipientId) {
-		$user->fetch($recipientId);
-		print $user->lastname . ' ' . $user->firstname . '<br>';
-	}
+	if (is_array($recipients) && !empty($recipients)) {
+        foreach ($recipients as $recipientId) {
+            $user->fetch($recipientId);
+            print $user->lastname . ' ' . $user->firstname . '<br>';
+        }
+    }
 	print '</td></tr>';
 
 	// Méthodologie
