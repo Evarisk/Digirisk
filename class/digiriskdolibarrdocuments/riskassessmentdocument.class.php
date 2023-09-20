@@ -82,18 +82,18 @@ class RiskAssessmentDocument extends DigiriskDocuments
 		$json['RiskAssessmentDocument']['dateGeneration'] = dol_print_date($now, '%d/%m/%Y %H:%M:%S', 'tzuser');
 
 		$userRecipient = json_decode($conf->global->DIGIRISKDOLIBARR_RISKASSESSMENTDOCUMENT_RECIPIENT);
+
+        $json['RiskAssessmentDocument']['destinataireDUER'] = '';
+        $json['RiskAssessmentDocument']['telephone'] = '';
+        $json['RiskAssessmentDocument']['portable'] = '';
 		if (is_array($userRecipient) && !empty($userRecipient)) {
 			foreach ($userRecipient as $recipientId) {
 				$user->fetch($recipientId);
 
-				$json['RiskAssessmentDocument']['destinataireDUER'] .= $user->lastname . ' ' . $user->firstname . ' - ';
-				$json['RiskAssessmentDocument']['telephone'] .= $user->office_phone . ' - ';
-				$json['RiskAssessmentDocument']['portable'] .= $user->user_mobile . ' - ';
+				$json['RiskAssessmentDocument']['destinataireDUER'] .= $user->lastname . ' ' . $user->firstname . chr(0x0A);
+				$json['RiskAssessmentDocument']['telephone'] .= $user->office_phone . chr(0x0A);
+				$json['RiskAssessmentDocument']['portable'] .= $user->user_mobile . chr(0x0A);
 			}
-		} else {
-			$json['RiskAssessmentDocument']['destinataireDUER'] = '';
-			$json['RiskAssessmentDocument']['telephone'] = '';
-			$json['RiskAssessmentDocument']['portable'] = '';
 		}
 
 		$json['RiskAssessmentDocument']['methodologie']       = $conf->global->DIGIRISKDOLIBARR_RISKASSESSMENTDOCUMENT_METHOD;
