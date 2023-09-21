@@ -46,9 +46,9 @@ class DigiriskDocuments extends SaturneDocuments
 	 *
 	 * @param DoliDb $db Database handler
 	 */
-	public function __construct(DoliDB $db)
+	public function __construct(DoliDB $db, $module, $element)
 	{
-		parent::__construct($db, $this->module, $this->element);
+		parent::__construct($db, $module, $element);
 	}
 
 	/**
@@ -81,25 +81,24 @@ class DigiriskDocuments extends SaturneDocuments
 			$this->parent_type  = 'digiriskstandard';
 		}
 
-		$this->DigiriskFillJSON($this);
+		$this->DigiriskFillJSON();
 		$this->element = $this->element . '@digiriskdolibarr';
 		return $this->createCommon($user, $notrigger);
 	}
 	/**
 	 * Function for JSON filling before saving in database
 	 *
-	 * @param $object
 	 */
-	public function DigiriskFillJSON($object) {
+	public function DigiriskFillJSON() {
 		switch ($object->element) {
 			case "legaldisplay":
-				$this->json = $this->LegalDisplayFillJSON($object);
+				$this->json = $this->LegalDisplayFillJSON();
 				break;
 			case "informationssharing":
-				$this->json = $this->InformationsSharingFillJSON($object);
+				$this->json = $this->InformationsSharingFillJSON();
 				break;
 			case "riskassessmentdocument":
-				$this->json = $this->RiskAssessmentDocumentFillJSON($object);
+				$this->json = $this->RiskAssessmentDocumentFillJSON();
 				break;
 			case "preventionplandocument":
 				$this->json = $this->PreventionPlanDocumentFillJSON();

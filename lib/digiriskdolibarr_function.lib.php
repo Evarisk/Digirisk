@@ -44,8 +44,8 @@ function digirisk_header($title = '', $helpUrl = '', $arrayofjs = [], $arrayofcs
 	require_once __DIR__ . '/../class/digiriskelement/workunit.class.php';
 
 	$numberingModules = [
-		'digiriskelement/workunit' => $conf->global->DIGIRISKDOLIBARR_WORKUNIT_ADDON,
 		'digiriskelement/groupment' => $conf->global->DIGIRISKDOLIBARR_GROUPMENT_ADDON,
+		'digiriskelement/workunit' => $conf->global->DIGIRISKDOLIBARR_WORKUNIT_ADDON,
 	];
 
 	list($modGroupment, $modWorkUnit) = saturne_require_objects_mod($numberingModules, $moduleNameLowerCase);

@@ -39,7 +39,6 @@ require_once __DIR__ . '/../../class/digiriskdolibarrdocuments/listingrisksactio
 require_once __DIR__ . '/../../lib/digiriskdolibarr_digiriskelement.lib.php';
 require_once __DIR__ . '/../../lib/digiriskdolibarr_digiriskstandard.lib.php';
 require_once __DIR__ . '/../../lib/digiriskdolibarr_function.lib.php';
-require_once __DIR__ . '/../../core/modules/digiriskdolibarr/digiriskdolibarrdocuments/listingrisksaction/modules_listingrisksaction.php';
 
 global $conf, $db, $hookmanager, $langs, $user;
 
@@ -146,7 +145,7 @@ if ($type != 'standard') {
 	$project->fetch($conf->global->DIGIRISKDOLIBARR_DU_PROJECT);
 	$morehtmlref .= $langs->trans('Project') . ' : ' . getNomUrlProject($project, 1, 'blank', 1);
 	$morehtmlref .= '</div>';
-	
+
 	$moduleNameLowerCase = 'mycompany';
 	saturne_banner_tab($object,'ref','', 1, 'ref', 'ref', $morehtmlref, true);
 	$moduleNameLowerCase = 'digiriskdolibarr';

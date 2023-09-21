@@ -39,7 +39,6 @@ require_once __DIR__ . '/../../class/digiriskdolibarrdocuments/listingrisksphoto
 require_once __DIR__ . '/../../lib/digiriskdolibarr_digiriskelement.lib.php';
 require_once __DIR__ . '/../../lib/digiriskdolibarr_digiriskstandard.lib.php';
 require_once __DIR__ . '/../../lib/digiriskdolibarr_function.lib.php';
-require_once __DIR__ . '/../../core/modules/digiriskdolibarr/digiriskdolibarrdocuments/listingrisksphoto/modules_listingrisksphoto.php';
 
 global $conf, $db, $hookmanager, $langs, $user;
 
