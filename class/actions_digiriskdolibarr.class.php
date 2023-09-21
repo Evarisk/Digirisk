@@ -71,7 +71,8 @@ class ActionsDigiriskdolibarr
 	{
 		global $conf, $db, $form, $langs;
 
-		/* print_r($parameters); print_r($object); echo "action: " . $action; */
+		require_once __DIR__ . '/../../saturne/lib/saturne_functions.lib.php';
+
 		if ($parameters['currentcontext'] == 'admincompany') {	    // do something only for the context 'somecontext1' or 'somecontext2'
 			?>
 			<script src="../custom/digiriskdolibarr/js/digiriskdolibarr.js"></script>
@@ -122,8 +123,8 @@ class ActionsDigiriskdolibarr
 
 				require_once __DIR__ . '/../lib/digiriskdolibarr_function.lib.php';
 				require_once __DIR__ . '/../class/digiriskdolibarrdocuments/ticketdocument.class.php';
-				require_once __DIR__ . '/../core/modules/digiriskdolibarr/digiriskdolibarrdocuments/ticketdocument/mod_ticketdocument_standard.php';
-				require_once __DIR__ . '/../core/modules/digiriskdolibarr/digiriskdolibarrdocuments/ticketdocument/modules_ticketdocument.php';
+				require_once __DIR__ . '/../../saturne/core/modules/saturne/modules_saturne.php';
+
 				global $langs, $user;
 
 				$object = new Ticket($this->db);
@@ -445,8 +446,6 @@ class ActionsDigiriskdolibarr
 			if ($action == 'digiriskbuilddoc') {
 				require_once __DIR__ . '/../lib/digiriskdolibarr_function.lib.php';
 				require_once __DIR__ . '/../class/digiriskdolibarrdocuments/ticketdocument.class.php';
-				require_once __DIR__ . '/../core/modules/digiriskdolibarr/digiriskdolibarrdocuments/ticketdocument/mod_ticketdocument_standard.php';
-				require_once __DIR__ . '/../core/modules/digiriskdolibarr/digiriskdolibarrdocuments/ticketdocument/modules_ticketdocument.php';
 
 				global $langs, $user;
 				$ticketdocument = new TicketDocument($this->db);
