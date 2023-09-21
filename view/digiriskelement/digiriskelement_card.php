@@ -41,12 +41,6 @@ require_once __DIR__ . '/../../class/digiriskdolibarrdocuments/groupmentdocument
 require_once __DIR__ . '/../../class/digiriskdolibarrdocuments/workunitdocument.class.php';
 require_once __DIR__ . '/../../lib/digiriskdolibarr_digiriskelement.lib.php';
 require_once __DIR__ . '/../../lib/digiriskdolibarr_function.lib.php';
-require_once __DIR__ . '/../../core/modules/digiriskdolibarr/digiriskelement/groupment/mod_groupment_standard.php';
-require_once __DIR__ . '/../../core/modules/digiriskdolibarr/digiriskelement/groupment/mod_groupment_sirius.php';
-require_once __DIR__ . '/../../core/modules/digiriskdolibarr/digiriskelement/workunit/mod_workunit_standard.php';
-require_once __DIR__ . '/../../core/modules/digiriskdolibarr/digiriskelement/workunit/mod_workunit_canopus.php';
-require_once __DIR__ . '/../../core/modules/digiriskdolibarr/digiriskdolibarrdocuments/groupmentdocument/modules_groupmentdocument.php';
-require_once __DIR__ . '/../../core/modules/digiriskdolibarr/digiriskdolibarrdocuments/workunitdocument/modules_workunitdocument.php';
 
 global $conf, $db, $hookmanager, $langs, $user;
 

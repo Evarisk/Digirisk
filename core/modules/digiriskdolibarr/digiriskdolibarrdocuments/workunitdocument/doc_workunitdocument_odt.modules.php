@@ -25,22 +25,14 @@
 require_once DOL_DOCUMENT_ROOT . '/core/lib/files.lib.php';
 require_once DOL_DOCUMENT_ROOT . '/core/lib/images.lib.php';
 require_once DOL_DOCUMENT_ROOT . '/core/lib/company.lib.php';
-require_once DOL_DOCUMENT_ROOT . '/core/lib/doc.lib.php';
-require_once __DIR__ . '/../../../../../class/evaluator.class.php';
-require_once __DIR__ . '/../../../../../class/riskanalysis/risk.class.php';
-require_once __DIR__ . '/../../../../../class/riskanalysis/riskassessment.class.php';
-require_once __DIR__ . '/../../../../../class/riskanalysis/risksign.class.php';
-require_once __DIR__ . '/../../../../../class/accident.class.php';
-require_once __DIR__ . '/mod_workunitdocument_standard.php';
-require_once __DIR__ . '/modules_workunitdocument.php';
 
-// Load saturne libraries
-require_once __DIR__ . '/../../../../../../saturne/core/modules/saturne/modules_saturne.php';
+// Load DigiriskDolibarr libraries
+require_once __DIR__ . '/../digiriskelementdocument/modules_digiriskelementdocument.php';
 
 /**
  *	Class to build documents using ODF templates generator
  */
-class doc_workunitdocument_odt extends ModeleODTWorkUnitDocument
+class doc_workunitdocument_odt extends ModeleODTDigiriskElementDocument
 {
 	/**
 	 * @var array Minimum version of PHP required by module.

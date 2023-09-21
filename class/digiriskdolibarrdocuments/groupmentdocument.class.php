@@ -46,6 +46,6 @@ class GroupmentDocument extends DigiriskDocuments
      */
     public function __construct(DoliDB $db)
     {
-        parent::__construct($db);
+        parent::__construct($db, $this->module, $this->element);
     }
 }

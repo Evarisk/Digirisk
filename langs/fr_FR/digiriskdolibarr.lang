@@ -29,27 +29,28 @@ ModuleDigiriskdolibarrDesc = Digirisk pour Dolibarr
 
 # Data - Donnée
 DigiriskdolibarrSetup       = Configuration du module Digirisk
-DigiriskdolibarrSetupPage   = Page de configuration du module Digirisk
+DigiriskdolibarrSetupPage        = Page de configuration du module Digirisk
 AgendaModuleRequired        = Pour assurer la traçabilité des actions dans Digirisk, assurez-vous que le module Agenda est bien activé
 DigiriskDolibarrDescription = Digirisk pour Dolibarr
 HowToSetupOtherModules      = Pour plus de fonctionnalités sur Digirisk, vous pouvez activer de nombreux modules (Gestion des fournisseurs, des factures, etc.) sur ce lien :
 ConfigMyModules             = Configuration des modules
-AvoidLogoProblems           = Pour éviter tout problème lié aux logos dans les documents générés, veuillez vous référer à ces conseils de paramétrages :
+AvoidLogoProblems              = Pour éviter tout problème lié aux logos dans les documents générés, veuillez vous référer à ces conseils de paramétrages :
 LogoHelpLink                = https://wiki.dolibarr.org/index.php?title=Premiers_paramétrages
 SecurityConfiguration       = Configuration des données sécurité
-SocialConfiguration         = Configuration des données sociales
-Uncompleted                 = Non complété
-DigiriskData                = Données configurables de Digirisk
+SocialConfiguration          = Configuration des données sociales
+Uncompleted                     = Non complété
+DigiriskData                 = Données configurables de Digirisk
 DigiriskManagement          = Redirection après la connexion au site
-DigiriskDescription         = Redirection sur la page de bienvenue de Digirisk par défaut au lieu de celle de Dolibarr.
-HowToSetupIHM               = Pour plus de fonctionnalités sur l'affichage de Dolibarr (Configuration de l'image de fond du Dolibarr, etc), vous pouvez vous rendre sur ce lien :
-ConfigIHM                   = Configuration de l'affichage
-ConfigDico                  = Accéder à la page de configuration des dictionnaires
+DigiriskDescription          = Redirection sur la page de bienvenue de Digirisk par défaut au lieu de celle de Dolibarr.
+HowToSetupIHM                   = Pour plus de fonctionnalités sur l'affichage de Dolibarr (Configuration de l'image de fond du Dolibarr, etc), vous pouvez vous rendre sur ce lien :
+ConfigIHM                    = Configuration de l'affichage
+ConfigDico                     = Accéder à la page de configuration des dictionnaires
 LinkedProject               = Projet lié
-DigiriskUpdate              = Mise à jour de Digirisk :
-Security                    = Sécurité
+DigiriskUpdate                  = Mise à jour de Digirisk :
+Security                       = Sécurité
 HowToSharedElement          = Pour plus d'informations sur la configuration des éléments partagés, veuillez vous rendre sur ce lien :
-HowToSharedElementLink      = https://wiki.dolibarr.org/index.php?title=Module_Digirisk#Configuration
+
+HowToSharedElementLink        = https://wiki.dolibarr.org/index.php?title=Module_Digirisk#Configuration
 ConfigSharedElement         = Configuration des éléments partagés (risques/signalisations)
 DisabledSharedElement       = Option désactivée car multi company n'est pas activé ou la configuration des éléments partagés (risques/signalisations) n'a pas été effectuée
 DigiriskEventAutoDesc       = Définissez ici les événements pour lesquels Digirisk créera automatiquement une entrée dans l'agenda. Chaque évènement contient les informations relatives à l'action effectuée.
