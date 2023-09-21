@@ -23,6 +23,7 @@
 
 // Load DigiriskDolibarr libraries
 require_once __DIR__ . '/../digiriskdocuments.class.php';
+require_once __DIR__ . '/../openinghours.class.php';
 
 /**
  * Class for LegalDisplay
@@ -52,11 +53,10 @@ class LegalDisplay extends DigiriskDocuments
 	/**
 	 * Function for JSON filling before saving in database
 	 *
-	 * @param $object
 	 * @return false|string
 	 * @throws Exception
 	 */
-	public function LegalDisplayFillJSON($object) {
+	public function LegalDisplayFillJSON() {
 		global $conf, $langs;
 
 		$resources               = new DigiriskResources($this->db);
@@ -198,9 +198,9 @@ class LegalDisplay extends DigiriskDocuments
 			$json['LegalDisplay']['rules']['location']                                                    = $conf->global->DIGIRISKDOLIBARR_RULES_LOCATION;
 			$json['LegalDisplay']['participation_agreement']['information_procedures']                    = $conf->global->DIGIRISKDOLIBARR_PARTICIPATION_AGREEMENT_INFORMATION_PROCEDURE;
 
-			$object->json = json_encode($json, JSON_UNESCAPED_UNICODE);
+			$jsonFormatted = json_encode($json, JSON_UNESCAPED_UNICODE);
 
-			return $object->json;
+			return $jsonFormatted;
 		}
 		else
 		{

@@ -28,7 +28,7 @@ if ( ! is_object($form)) $form = new Form($db);
 <?php
 
 try {
-	$document = json_decode($document->LegalDisplayFillJSON($document), false, 512, JSON_UNESCAPED_UNICODE)->LegalDisplay;
+	$document = json_decode($document->LegalDisplayFillJSON(), false, 512, JSON_UNESCAPED_UNICODE)->LegalDisplay;
 } catch (Exception $e) {
 	$document->error = $e->getMessage();
 	dol_syslog($e->getMessage(), LOG_INFO);
