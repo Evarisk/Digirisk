@@ -192,7 +192,7 @@ if ($conf->global->DIGIRISKDOLIBARR_SHOW_PATCH_NOTE) : ?>
 	</div>
 <?php endif;
 
-require_once __DIR__ . '/core/tpl/digiriskdolibarr_dashboard.tpl.php';
+require_once __DIR__ . '/core/tpl/dashboard/digiriskdolibarr_dashboard.tpl.php';
 
 // End of page
 llxFooter();

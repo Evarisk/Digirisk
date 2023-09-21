@@ -138,7 +138,7 @@ if ($object->id > 0) {
 
 	$digiriskelement = $object;
 
-	require_once __DIR__ . '/../../core/tpl/digiriskdolibarr_dashboard_ticket.tpl.php';
+	require_once __DIR__ . '/../../core/tpl/dashboard/digiriskdolibarr_dashboard_ticket.tpl.php';
 }
 
 // End of page

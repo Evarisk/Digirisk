@@ -172,7 +172,7 @@ print '<input type="hidden" name="action" value="update">'; ?>
 <h2 class="">
 	<?php echo $langs->trans('SocialConfiguration') ?>
 </h2>
-<?php include_once '../core/tpl/digiriskdolibarr_configuration_gauge_view.tpl.php'; ?>
+<?php include_once '../core/tpl/dashboard/digiriskdolibarr_configuration_gauge_view.tpl.php'; ?>
 <hr>
 <?php
 /*

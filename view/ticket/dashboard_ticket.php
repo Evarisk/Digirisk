@@ -77,7 +77,7 @@ print load_fiche_titre($langs->trans("DashBoard"), '', 'digiriskdolibarr32px.png
  * Dashboard Ticket
  */
 
-require_once __DIR__ . '/../core/tpl/digiriskdolibarr_dashboard_ticket.tpl.php';
+require_once __DIR__ . '/../core/tpl/dashboard/digiriskdolibarr_dashboard_ticket.tpl.php';
 
 // End of page
 llxFooter();

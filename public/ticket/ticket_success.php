@@ -61,11 +61,14 @@ $object = new Ticket($db);
 // Get parameters
 $track_id = GETPOST('track_id');
 
+$multiCompanyMention = (empty($conf->global->DIGIRISKDOLIBARR_TICKET_PUBLIC_INTERFACE_USE_MULTICOMPANY_CONFIG) ? '' : 'MULTICOMPANY_');
+$publicInterfaceConf = 'DIGIRISKDOLIBARR_'. $multiCompanyMention .'TICKET_ENABLE_PUBLIC_INTERFACE';
+
 /*
  * View
  */
 
-if (empty($conf->global->DIGIRISKDOLIBARR_TICKET_ENABLE_PUBLIC_INTERFACE)) {
+if (empty($conf->global->$publicInterfaceConf)) {
 	print $langs->trans('TicketPublicInterfaceForbidden');
 	exit;
 }
@@ -79,7 +82,12 @@ $object->fetch('', '', $track_id);
 
 $substitutionarray = getCommonSubstitutionArray($langs, 0, null, $object);
 complete_substitutions_array($substitutionarray, $langs, $object);
-$ticketsuccessmessage = make_substitutions($langs->transnoentities($conf->global->DIGIRISKDOLIBARR_TICKET_SUCCESS_MESSAGE), $substitutionarray);
+if (empty($multiCompanyMention)) {
+	$ticketsuccessmessage = make_substitutions($langs->transnoentities($conf->global->DIGIRISKDOLIBARR_TICKET_SUCCESS_MESSAGE), $substitutionarray);
+} else {
+	$successMessage = dolibarr_get_const($db,'DIGIRISKDOLIBARR_MULTICOMPANY_TICKET_SUCCESS_MESSAGE', 0);
+	$ticketsuccessmessage = make_substitutions($langs->transnoentities($successMessage), $substitutionarray);
+}
 
 ?>
 <div class="digirisk-signature-container" style="">
