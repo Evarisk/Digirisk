@@ -52,11 +52,10 @@ class InformationsSharing extends DigiriskDocuments
 	/**
 	 * Function for JSON filling before saving in database
 	 *
-	 * @param $object
 	 * @return false|string
 	 * @throws Exception
 	 */
-	public function InformationsSharingFillJSON($object)
+	public function InformationsSharingFillJSON()
 	{
 		global $conf;
 
@@ -154,8 +153,8 @@ class InformationsSharing extends DigiriskDocuments
 				}
 			}
 
-			$object->json = json_encode($json, JSON_UNESCAPED_UNICODE);
-			return $object->json;
+			$json = json_encode($json, JSON_UNESCAPED_UNICODE);
+			return $json;
 		}
 		else {
 			return -1;

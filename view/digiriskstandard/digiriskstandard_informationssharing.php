@@ -39,7 +39,6 @@ require_once __DIR__ . '/../../class/digiriskresources.class.php';
 require_once __DIR__ . '/../../class/digiriskdolibarrdocuments/informationssharing.class.php';
 require_once __DIR__ . '/../../lib/digiriskdolibarr_digiriskstandard.lib.php';
 require_once __DIR__ . '/../../lib/digiriskdolibarr_function.lib.php';
-require_once __DIR__ . '/../../core/modules/digiriskdolibarr/digiriskdolibarrdocuments/informationssharing/modules_informationssharing.php';
 
 global $db, $conf, $langs, $hookmanager, $user;
 
