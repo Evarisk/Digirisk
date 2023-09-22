@@ -84,10 +84,10 @@ $extrafields      = new ExtraFields($db);
 $DUProject        = new Project($db);
 
 $numberingModuleName = [
-	$risk->element       => $conf->global->DIGIRISKDOLIBARR_RISK_ADDON,
-	$evaluation->element => $conf->global->DIGIRISKDOLIBARR_RISKASSESSMENT_ADDON,
-	$project->element    => $conf->global->PROJECT_ADDON,
-	'project/task'       => $conf->global->PROJECT_TASK_ADDON,
+	'riskanalysis/' . $risk->element       => $conf->global->DIGIRISKDOLIBARR_RISK_ADDON,
+	'riskanalysis/' . $evaluation->element => $conf->global->DIGIRISKDOLIBARR_RISKASSESSMENT_ADDON,
+	$project->element                      => $conf->global->PROJECT_ADDON,
+	'project/task'                         => $conf->global->PROJECT_TASK_ADDON,
 ];
 
 list($refRiskMod, $refEvaluationMod, $refProjectMod, $refTaskMod) = saturne_require_objects_mod($numberingModuleName, $moduleNameLowerCase);
