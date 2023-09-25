@@ -73,7 +73,7 @@ class doc_preventionplandocument_odt extends ModeleODTPreventionPlanDocument
 	/**
 	 * Return description of a module.
 	 *
-	 * @param  Translate $langs Lang object to use for output.
+	 * @param  Translate $langs Lang object to use f or output.
 	 * @return string           Description.
 	 */
 	public function info(Translate $langs): string
@@ -129,38 +129,18 @@ class doc_preventionplandocument_odt extends ModeleODTPreventionPlanDocument
 					foreach ($preventionplanlines as $line) {
 						$digiriskelement->fetch($line->fk_element);
 
-						$tmparray['key_unique'] = $line->ref;
-						$tmparray['unite_travail'] = $digiriskelement->ref . " - " . $digiriskelement->label;
-						$tmparray['action'] = $line->description;
-						$tmparray['risk'] = DOL_DOCUMENT_ROOT . '/custom/digiriskdolibarr/img/categorieDangers/' . $risk->getDangerCategory(
+						$tmpArray['key_unique'] = $line->ref;
+						$tmpArray['unite_travail'] = $digiriskelement->ref . " - " . $digiriskelement->label;
+						$tmpArray['action'] = $line->description;
+						$tmpArray['risk_photo'] = DOL_DOCUMENT_ROOT . '/custom/digiriskdolibarr/img/categorieDangers/' . $risk->getDangerCategory(
 								$line
 							) . '.png';
-						$tmparray['nomPicto'] = (!empty($conf->global->DIGIRISKDOLIBARR_DOCUMENT_SHOW_PICTO_NAME) ? $risk->getDangerCategoryName(
+						$tmpArray['nomPicto'] = (!empty($conf->global->DIGIRISKDOLIBARR_DOCUMENT_SHOW_PICTO_NAME) ? $risk->getDangerCategoryName(
 							$line
 						) : ' ');
-						$tmparray['prevention'] = $line->prevention_method;
+						$tmpArray['prevention'] = $line->prevention_method;
 
-						foreach ($tmparray as $key => $val) {
-							try {
-								if ($key == 'risk') {
-									$listLines->setImage($key, $val);
-								} elseif (empty($val)) {
-									$listLines->setVars($key, $langs->trans('NoData'), true, 'UTF-8');
-								} else {
-									$listLines->setVars(
-										$key,
-										html_entity_decode($val, ENT_QUOTES | ENT_HTML5),
-										true,
-										'UTF-8'
-									);
-								}
-							} catch (OdfException $e) {
-								dol_syslog($e->getMessage(), LOG_INFO);
-							} catch (SegmentException $e) {
-								dol_syslog($e->getMessage(), LOG_INFO);
-							}
-						}
-						$listLines->merge();
+						$this->setTmpArrayVars($tmpArray, $listLines, $outputLangs);
 					}
 				}
 				$odfHandler->mergeSegment($listLines);
@@ -216,48 +196,23 @@ class doc_preventionplandocument_odt extends ModeleODTPreventionPlanDocument
 							$encoded_image = explode(",", $line->signature)[1];
 							$decoded_image = base64_decode($encoded_image);
 							file_put_contents($tempdir . "signature" . $k . ".png", $decoded_image);
-							$tmparray['intervenants_signature'] = $tempdir . "signature" . $k . ".png";
+							$tmpArray['intervenants_signature'] = $tempdir . "signature" . $k . ".png";
 						} else {
-							$tmparray['intervenants_signature'] = '';
+							$tmpArray['intervenants_signature'] = '';
 						}
 					} else {
-						$tmparray['intervenants_signature'] = '';
+						$tmpArray['intervenants_signature'] = '';
 					}
-					$tmparray['name']     = $line->firstname;
-					$tmparray['lastname'] = $line->lastname;
-					$tmparray['phone']    = $line->phone;
-					$tmparray['mail']     = $line->email;
-					$tmparray['status']   = $line->getLibStatut(1);
+					$tmpArray['name']     = $line->firstname;
+					$tmpArray['lastname'] = $line->lastname;
+					$tmpArray['phone']    = $line->phone;
+					$tmpArray['mail']     = $line->email;
+					$tmpArray['status']   = $line->getLibStatut(1);
 
 					$k++;
 
-					foreach ($tmparray as $key => $value) {
-						try {
-							if ($key == 'intervenants_signature' && $line->status == 5) { // Image
-								if (file_exists($value)) {
-									$list     = getimagesize($value);
-									$newWidth = 200;
-									if ($list[0]) {
-										$ratio     = $newWidth / $list[0];
-										$newHeight = $ratio * $list[1];
-										dol_imageResizeOrCrop($value, 0, $newWidth, $newHeight);
-									}
-									$listLines->setImage($key, $value);
-								} else {
-									$odfHandler->setVars($key, $langs->trans('NoData'), true, 'UTF-8');
-								}
-							} elseif (empty($value)) {  // Text
-								$listLines->setVars($key, $langs->trans('NoData'), true, 'UTF-8');
-							} else {
-								$listLines->setVars($key, html_entity_decode($value, ENT_QUOTES | ENT_HTML5), true, 'UTF-8');
-							}
-						} catch (OdfException $e) {
-							dol_syslog($e->getMessage(), LOG_INFO);
-						} catch (SegmentException $e) {
-							dol_syslog($e->getMessage(), LOG_INFO);
-						}
-					}
-					$listLines->merge();
+					$this->setTmpArrayVars($tmpArray, $listLines, $outputLangs);
+
 
 					if (($moreParam['specimen'] == 0 && $object->status >= $object::STATUS_LOCKED)) {
 						dol_delete_file($tempdir . "signature" . $k . ".png");
@@ -265,14 +220,14 @@ class doc_preventionplandocument_odt extends ModeleODTPreventionPlanDocument
 				}
 				$odfHandler->mergeSegment($listLines);
 			} else {
-				$tmparray['intervenants_signature'] = '';
-				$tmparray['name']                   = '';
-				$tmparray['lastname']               = '';
-				$tmparray['phone']                  = '';
-				$tmparray['mail']                   = '';
-				$tmparray['status']                 = '';
+				$tmpArray['intervenants_signature'] = '';
+				$tmpArray['name']                   = '';
+				$tmpArray['lastname']               = '';
+				$tmpArray['phone']                  = '';
+				$tmpArray['mail']                   = '';
+				$tmpArray['status']                 = '';
 
-				foreach ($tmparray as $key => $val) {
+				foreach ($tmpArray as $key => $val) {
 					try {
 						if (empty($val)) {
 							$listLines->setVars($key, $langs->trans('NoData'), true, 'UTF-8');

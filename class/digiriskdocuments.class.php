@@ -356,9 +356,6 @@ class DigiriskDocuments extends SaturneDocuments
 											if (file_exists($val)) {
 												$listlines->setImage($key, $val);
 											} else {
-
-
-
 												$listlines->setVars($key, $langs->trans('NoData'), true, 'UTF-8');
 											}
 										} elseif ($key == 'nomDanger') {
