@@ -135,7 +135,7 @@ class DigiriskElement extends SaturneObject
             $numberingModules = [
               'digiriskelement/' . $this->element_type => $objectMod
             ];
-            list($refDigiriskElementMod) = saturne_require_objects_mod($numberingModules);
+            list($refDigiriskElementMod) = saturne_require_objects_mod($numberingModules, 'digiriskdolibarr');
 
 			$ref = $refDigiriskElementMod->getNextNumRef();
 			$this->ref = $ref;
