@@ -489,7 +489,7 @@ if (empty($reshook)) {
 	require_once __DIR__ . '/../../../saturne/core/tpl/documents/documents_action.tpl.php';
 
 	// Action to generate pdf from odt file
-	require_once __DIR__ . '/../../core/tpl/documents/digiriskdolibarr_manual_pdf_generation_action.tpl.php';
+	require_once __DIR__ . '/../../../saturne/core/tpl/documents/saturne_manual_pdf_generation_action.tpl.php';
 
 	// Action to set status STATUS_INPROGRESS
 	if ($action == 'confirm_setInProgress') {
