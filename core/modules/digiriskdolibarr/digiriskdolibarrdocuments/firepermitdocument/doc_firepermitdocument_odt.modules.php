@@ -381,6 +381,38 @@ class doc_firepermitdocument_odt extends SaturneDocumentModel
 		$tmpArray['dimanche_matinF'] = $opening_hours_sunday[0];
 		$tmpArray['dimanche_apremF'] = $opening_hours_sunday[1];
 
+		$saturneSchedules = new SaturneSchedules($this->db);
+		
+		$morewherePreventionPlan  = ' AND element_id = ' . $preventionplan->id;
+		$morewherePreventionPlan .= ' AND element_type = ' . "'" . $preventionplan->element . "'";
+		$morewherePreventionPlan .= ' AND status = 1';
+
+		$saturneSchedules->fetch(0, '', $morewherePreventionPlan);
+
+		$opening_hours_monday    = explode(' ', $saturneSchedules->monday);
+		$opening_hours_tuesday   = explode(' ', $saturneSchedules->tuesday);
+		$opening_hours_wednesday = explode(' ', $saturneSchedules->wednesday);
+		$opening_hours_thursday  = explode(' ', $saturneSchedules->thursday);
+		$opening_hours_friday    = explode(' ', $saturneSchedules->friday);
+		$opening_hours_saturday  = explode(' ', $saturneSchedules->saturday);
+		$opening_hours_sunday    = explode(' ', $saturneSchedules->sunday);
+
+		$tmpArray['lundi_matin']    = $opening_hours_monday[0];
+		$tmpArray['lundi_aprem']    = $opening_hours_monday[1];
+		$tmpArray['mardi_matin']    = $opening_hours_tuesday[0];
+		$tmpArray['mardi_aprem']    = $opening_hours_tuesday[1];
+		$tmpArray['mercredi_matin'] = $opening_hours_wednesday[0];
+		$tmpArray['mercredi_aprem'] = $opening_hours_wednesday[1];
+		$tmpArray['jeudi_matin']    = $opening_hours_thursday[0];
+		$tmpArray['jeudi_aprem']    = $opening_hours_thursday[1];
+		$tmpArray['vendredi_matin'] = $opening_hours_friday[0];
+		$tmpArray['vendredi_aprem'] = $opening_hours_friday[1];
+		$tmpArray['samedi_matin']   = $opening_hours_saturday[0];
+		$tmpArray['samedi_aprem']   = $opening_hours_saturday[1];
+		$tmpArray['dimanche_matin'] = $opening_hours_sunday[0];
+		$tmpArray['dimanche_aprem'] = $opening_hours_sunday[1];
+
+
 		//Informations entreprise extérieure
 		$extsociety = $arrayData['society_outside'];
 
