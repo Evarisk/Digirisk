@@ -819,7 +819,7 @@ class ActionsDigiriskdolibarr
 		// Do something only for the current context.
 		if (in_array($parameters['currentcontext'], ['preventionplanschedules', 'firepermitschedules'])) {
 			if ($object->status == $object::STATUS_LOCKED) {
-				return -1;
+				return 0;
 			}
 		}
 

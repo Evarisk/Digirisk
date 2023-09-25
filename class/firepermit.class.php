@@ -29,7 +29,6 @@ require_once DOL_DOCUMENT_ROOT . '/societe/class/societe.class.php';
 require_once __DIR__ . '/../../saturne/class/saturneobject.class.php';
 
 // Load DigiriskDolibarr libraries.
-require_once __DIR__ . '/openinghours.class.php';
 
 /**
  * Class for FirePermit.
@@ -141,7 +140,7 @@ class FirePermit extends SaturneObject
 
 		$signatory         = new SaturneSignature($this->db, $this->module, $this->element);
 		$digiriskresources = new DigiriskResources($this->db);
-		$openinghours      = new Openinghours($this->db);
+		$saturneSchedules      = new SaturneSchedules($this->db);
 
 		dol_syslog(__METHOD__, LOG_DEBUG);
 
@@ -160,7 +159,7 @@ class FirePermit extends SaturneObject
 		$morewhere .= ' AND element_type = ' . "'" . $object->element . "'";
 		$morewhere .= ' AND status = 1';
 
-		$openinghours->fetch(0, '', $morewhere);
+		$saturneSchedules->fetch(0, '', $morewhere);
 
 		// Load signatory and ressources form source object
 		$signatories = $signatory->fetchSignatory("", $fromid, 'firepermit');
@@ -220,9 +219,9 @@ class FirePermit extends SaturneObject
 			}
 
 			if ( ! empty($options['schedule'])) {
-				if ( ! empty($openinghours)) {
-					$openinghours->element_id = $firepermtid;
-					$openinghours->create($user);
+				if ( ! empty($saturneSchedules)) {
+					$saturneSchedules->element_id = $firepermtid;
+					$saturneSchedules->create($user);
 				}
 			}
 

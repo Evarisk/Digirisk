@@ -28,8 +28,6 @@ require_once DOL_DOCUMENT_ROOT . '/societe/class/societe.class.php';
 // Load Saturne libraries.
 require_once __DIR__ . '/../../saturne/class/saturneobject.class.php';
 
-// Load DigiriskDolibarr libraries.
-require_once __DIR__ . '/openinghours.class.php';
 
 /**
  * Class for PreventionPlan

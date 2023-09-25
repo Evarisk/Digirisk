@@ -1040,38 +1040,6 @@ class InterfaceDigiriskdolibarrTriggers extends DolibarrTriggers
 				}
 				break;
 
-			case 'OPENINGHOURS_CREATE' :
-				if ($object->element_type == 'societe') {
-					$actioncomm->socid = $object->element_id;
-				} else {
-					$actioncomm->elementtype = $object->element_type . '@digiriskdolibarr';
-				}
-				if ($object->element_type == 'preventionplan') {
-					$actioncomm->label = $langs->transnoentities('PreventionPlanOpeningHoursCreateTrigger');
-					$elementParent = new PreventionPlan($this->db);
-					$elementParent->fetch($object->element_id);
-				} elseif ($object->element_type == 'firepermit') {
-					$actioncomm->label = $langs->transnoentities('FirePermitOpeningHoursCreateTrigger');
-					$elementParent = new FirePermit($this->db);
-					$elementParent->fetch($object->element_id);
-				}
-				$actioncomm->note_private .= $langs->trans('Entity') . ' : ' . $conf->entity . '<br>';
-				$actioncomm->note_private .= $langs->trans('Ref') . ' : ' . $elementParent->ref . (!empty($elementparent->label) ? ' ' . $elementparent->label : '') . '<br>';
-				$actioncomm->note_private .= $langs->trans('ElementType') . ' : ' . $object->element_type . '<br>';
-				$actioncomm->note_private .= $langs->trans('Monday') . ' : ' . (!empty($object->monday) ? $object->monday : 'N/A') . '<br>';
-				$actioncomm->note_private .= $langs->trans('Tuesday') . ' : ' . (!empty($object->tuesday) ? $object->tuesday : 'N/A') . '<br>';
-				$actioncomm->note_private .= $langs->trans('Wednesday') . ' : ' . (!empty($object->wednesday) ? $object->wednesday : 'N/A') . '<br>';
-				$actioncomm->note_private .= $langs->trans('Thursday') . ' : ' . (!empty($object->thursday) ? $object->thursday : 'N/A') . '<br>';
-				$actioncomm->note_private .= $langs->trans('Friday') . ' : ' . (!empty($object->friday) ? $object->friday : 'N/A') . '<br>';
-				$actioncomm->note_private .= $langs->trans('Saturday') . ' : ' . (!empty($object->saturday) ? $object->saturday : 'N/A') . '<br>';
-				$actioncomm->note_private .= $langs->trans('Sunday') . ' : ' . (!empty($object->sunday) ? $object->sunday : 'N/A') . '<br>';
-				$actioncomm->note_private .= $langs->trans('DateCreation') . ' : ' . dol_print_date($now, 'dayhoursec', 'tzuser') . '<br>';
-				$actioncomm->note_private .= $langs->trans('Status') . ' : ' . $object->status . '<br>';
-				$actioncomm->fk_element  = $object->element_id;
-
-				$result = $actioncomm->create($user);
-				break;
-
 			case 'RISK_CREATE' :
 				$project = new Project($this->db);
 				$digiriskelement->fetch($object->fk_element);

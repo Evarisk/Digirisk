@@ -23,7 +23,6 @@
 
 // Load DigiriskDolibarr libraries
 require_once __DIR__ . '/../digiriskdocuments.class.php';
-require_once __DIR__ . '/../openinghours.class.php';
 
 /**
  * Class for LegalDisplay

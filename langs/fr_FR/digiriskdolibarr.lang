@@ -119,22 +119,6 @@ LabourInspectorSociety   = Tiers Inspecteur du travail
 LabourInspectorAssigned  = Inspecteur du travail
 
 #
-# Horaires d'ouverture
-#
-
-# Data - Donnée
-OpeningHours           = Horaires
-OpeningHoursCreated    = Création d'heure d'ouverture
-ThirdPartyOpeningHours = Horaires du tiers
-
-ExceptionsToWorkingHours   = Dérogations aux horaires de travail
-PermanentDerogation        = Dérogation permanente
-PermanentDerogationValue   = Non
-OccasionalDerogation       = Dérogation occasionnelle
-OccasionalDerogationValue  = Oui
-ThirdPartyOpeningHoursSave = Les horaires d'ouverture du tiers ont bien été enregistrés
-
-#
 # DigriskDocuments - Documents Digirisk
 #
 
