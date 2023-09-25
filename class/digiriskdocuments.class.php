@@ -85,6 +85,7 @@ class DigiriskDocuments extends SaturneDocuments
 		$this->element = $this->element . '@digiriskdolibarr';
 		return $this->createCommon($user, $notrigger);
 	}
+
 	/**
 	 * Function for JSON filling before saving in database
 	 *

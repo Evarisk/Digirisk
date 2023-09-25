@@ -174,11 +174,15 @@ if (empty($reshook)) {
 
 		$model = GETPOST('model', 'alpha');
 
-		$moreparams['object'] = "";
+		$previousRef = $object->ref;
+		$object->ref = '';
+		$moreparams['object'] = $object;
 		$moreparams['user']   = $user;
 		$moreparams['objectType'] = 'riskassessment';
 
 		$result = $document->generateDocument($model, $outputlangs, $hidedetails, $hidedesc, $hideref, $moreparams);
+
+		$object->ref = $previousRef;
 		if ($result > 0) {
 			//Création du dossier à zipper
 			$entity = ($conf->entity > 1) ? '/' . $conf->entity : '';
