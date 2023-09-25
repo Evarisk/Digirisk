@@ -105,7 +105,7 @@ if (($action == 'update' && ! GETPOST("cancel", 'alpha')) || ($action == 'update
 if (isModEnabled('project')) {
 	$formproject = new FormProjets($db);
 }
-
+$formcompany = new FormCompany($db);
 $helpUrl  = 'FR:Module_Digirisk#L.27onglet_Analyse_des_risques';
 $title    = $langs->trans("RiskAssessmentDocument");
 
