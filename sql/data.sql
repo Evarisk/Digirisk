@@ -39,7 +39,6 @@ INSERT INTO llx_c_digiriskdolibarr_action_trigger (elementtype, code, label, des
 INSERT INTO llx_c_digiriskdolibarr_action_trigger (elementtype, code, label, description) VALUES ('digirisksignature@digiriskdolibarr', 'DIGIRISKSIGNATURE_PENDING_SIGNATURE', 'DigiriskSignaturePendingSignature', 'Executed when a digirisk element is pending signature');
 INSERT INTO llx_c_digiriskdolibarr_action_trigger (elementtype, code, label, description) VALUES ('digirisksignature@digiriskdolibarr', 'DIGIRISKSIGNATURE_ABSENT', 'DigiriskSignatureAbsent', 'Executed when an attendant is absent to sign a digirisk element');
 INSERT INTO llx_c_digiriskdolibarr_action_trigger (elementtype, code, label, description) VALUES ('digirisksignature@digiriskdolibarr', 'DIGIRISKSIGNATURE_DELETED', 'DigiriskSignatureDeleted', 'Executed when an attendant is deleted from a digirisk element');
-INSERT INTO llx_c_digiriskdolibarr_action_trigger (elementtype, code, label, description) VALUES ('openinghours@digiriskdolibarr', 'OPENINGHOURS_CREATE', 'OpeningHoursCreated', 'Executed when an opening hour is created');
 INSERT INTO llx_c_digiriskdolibarr_action_trigger (elementtype, code, label, description) VALUES ('risk@digiriskdolibarr', 'RISK_CREATE', 'RiskCreated', 'Executed when a risk is created');
 INSERT INTO llx_c_digiriskdolibarr_action_trigger (elementtype, code, label, description) VALUES ('risk@digiriskdolibarr', 'RISK_MODIFY', 'RiskModified', 'Executed when a risk is modified');
 INSERT INTO llx_c_digiriskdolibarr_action_trigger (elementtype, code, label, description) VALUES ('risk@digiriskdolibarr', 'RISK_DELETE', 'RiskDeleted', 'Executed when a risk is deleted');
@@ -882,9 +881,18 @@ INSERT INTO `llx_c_conventions_collectives` (`rowid`, `entity`, `tms`, `code`, `
 INSERT INTO `llx_c_conventions_collectives` (`rowid`, `entity`, `tms`, `code`, `libelle`, `description`, `tracking`, `active`, `module`) VALUES(773, 0, '2021-01-22 09:27:09', '9998', 'Convention non encore en vigueur ', 'Convention non encore en vigueur ', '1', 1, NULL);
 INSERT INTO `llx_c_conventions_collectives` (`rowid`, `entity`, `tms`, `code`, `libelle`, `description`, `tracking`, `active`, `module`) VALUES(774, 0, '2021-01-22 09:27:09', '9999', 'Sans convention collectives', 'Sans convention collectives', '1', 1, NULL);
 
+-- 9.12.0
 INSERT INTO `llx_c_accident_investigation_attendants_role` (`rowid`, `entity`, `ref`, `label`, `description`, `active`, `position`) VALUES(1, 0, 'Witness', 'Witness', '', 1, 1);
 INSERT INTO `llx_c_accident_investigation_attendants_role` (`rowid`, `entity`, `ref`, `label`, `description`, `active`, `position`) VALUES(2, 0, 'Investigator', 'Investigator', '', 1, 10);
 INSERT INTO `llx_c_accident_investigation_attendants_role` (`rowid`, `entity`, `ref`, `label`, `description`, `active`, `position`) VALUES(3, 0, 'Rescuer', 'Rescuer', '', 1, 20);
+
+INSERT INTO `llx_c_preventionplan_attendants_role` (`rowid`, `entity`, `ref`, `label`, `description`, `active`, `position`) VALUES (1, 0, 'MasterWorker', 'MasterWorker', '', 1, 1);
+INSERT INTO `llx_c_preventionplan_attendants_role` (`rowid`, `entity`, `ref`, `label`, `description`, `active`, `position`) VALUES (2, 0, 'ExtSocietyResponsible', 'ExtSocietyResponsible', '', 1, 10);
+INSERT INTO `llx_c_preventionplan_attendants_role` (`rowid`, `entity`, `ref`, `label`, `description`, `active`, `position`) VALUES (3, 0, 'ExtSocietyAttendant', 'ExtSocietyAttendant', '', 1, 20);
+
+INSERT INTO `llx_c_firepermit_attendants_role` (`rowid`, `entity`, `ref`, `label`, `description`, `active`, `position`) VALUES(1, 0, 'MasterWorker', 'MasterWorker', '', 1, 1);
+INSERT INTO `llx_c_firepermit_attendants_role` (`rowid`, `entity`, `ref`, `label`, `description`, `active`, `position`) VALUES(2, 0, 'ExtSocietyResponsible', 'ExtSocietyResponsible', '', 1, 10);
+INSERT INTO `llx_c_firepermit_attendants_role` (`rowid`, `entity`, `ref`, `label`, `description`, `active`, `position`) VALUES(3, 0, 'ExtSocietyAttendant', 'ExtSocietyAttendant', '', 1, 20);
 
 INSERT INTO llx_c_digiriskdolibarr_action_trigger (elementtype, ref, label, description) VALUES ('accident_investigation@digiriskdolibarr', 'ACCIDENTINVESTIGATION_CREATE', 'AccidentInvestigationCreated', 'Executed when an accident investigation is created');
 INSERT INTO llx_c_digiriskdolibarr_action_trigger (elementtype, ref, label, description) VALUES ('accident_investigation@digiriskdolibarr', 'ACCIDENTINVESTIGATION_MODIFY', 'AccidentInvestigationModified', 'Executed when an accident investigation is modified');
@@ -893,3 +901,4 @@ INSERT INTO llx_c_digiriskdolibarr_action_trigger (elementtype, ref, label, desc
 INSERT INTO llx_c_digiriskdolibarr_action_trigger (elementtype, ref, label, description) VALUES ('accident_investigation@digiriskdolibarr', 'ACCIDENT_INVESTIGATION_UNVALIDATE', 'AccidentInvestigationUnValidate', 'Executed when an accident investigation is re-opened');
 INSERT INTO llx_c_digiriskdolibarr_action_trigger (elementtype, ref, label, description) VALUES ('accident_investigation@digiriskdolibarr', 'ACCIDENT_INVESTIGATION_ARCHIVE', 'AccidentInvestigationArchive', 'Executed when an accident investigation is archived');
 INSERT INTO llx_c_digiriskdolibarr_action_trigger (elementtype, ref, label, description) VALUES ('accident_investigation@digiriskdolibarr', 'ACCIDENT_INVESTIGATION_LOCK', 'AccidentInvestigationLock', 'Executed when an accident investigation is signed');
+

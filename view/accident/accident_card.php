@@ -1,5 +1,5 @@
 <?php
-/* Copyright (C) 2021 EOXIA <dev@eoxia.com>
+/* Copyright (C) 2021-2023 EVARISK <technique@evarisk.com>
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -33,14 +33,13 @@ if (file_exists('../../digiriskdolibarr.main.inc.php')) {
 require_once DOL_DOCUMENT_ROOT . '/core/lib/date.lib.php';
 require_once DOL_DOCUMENT_ROOT . '/core/class/html.formfile.class.php';
 require_once DOL_DOCUMENT_ROOT . '/core/class/doleditor.class.php';
+require_once DOL_DOCUMENT_ROOT . '/projet/class/project.class.php';
 
 require_once __DIR__ . '/../../class/digiriskelement.class.php';
 require_once __DIR__ . '/../../class/accident.class.php';
 require_once __DIR__ . '/../../class/digiriskstandard.class.php';
 require_once __DIR__ . '/../../lib/digiriskdolibarr_function.lib.php';
 require_once __DIR__ . '/../../lib/digiriskdolibarr_accident.lib.php';
-require_once __DIR__ . '/../../core/modules/digiriskdolibarr/digiriskelement/accident/mod_accident_standard.php';
-require_once __DIR__ . '/../../core/modules/digiriskdolibarr/digiriskelement/accident_workstop/mod_accident_workstop_standard.php';
 
 global $conf, $db, $hookmanager, $langs, $mysoc, $user;
 
@@ -76,6 +75,19 @@ $project          = new Project($db);
 // Load object
 $object->fetch($id);
 
+$deletedElements = $digiriskelement->getMultiEntityTrashList();
+if (empty($deletedElements)) {
+    $deletedElements = [0];
+}
+
+// Load numbering modules
+$numberingModules = [
+    'digiriskelement/' . $object->element     => $conf->global->DIGIRISKDOLIBARR_ACCIDENT_ADDON,
+    'digiriskelement/' . $objectline->element => $conf->global->DIGIRISKDOLIBARR_ACCIDENT_WORKSTOP_ADDON,
+];
+
+list($refAccidentMod, $refAccidentWorkStopMod) = saturne_require_objects_mod($numberingModules, $moduleNameLowerCase);
+
 $hookmanager->initHooks(['accidentcard', 'globalcard']); // Note that conf->hooks_modules contains array
 
 $upload_dir = $conf->digiriskdolibarr->multidir_output[$conf->entity];
@@ -85,9 +97,6 @@ $permissiontoread   = $user->rights->digiriskdolibarr->accident_investigation->r
 $permissiontoadd    = $user->rights->digiriskdolibarr->accident_investigation->write;
 $permissiontodelete = $user->rights->digiriskdolibarr->accident_investigation->delete;
 saturne_check_access($permissiontoread);
-
-$refAccidentMod         = new $conf->global->DIGIRISKDOLIBARR_ACCIDENT_ADDON($db);
-$refAccidentWorkStopMod = new $conf->global->DIGIRISKDOLIBARR_ACCIDENT_WORKSTOP_ADDON($db);
 
 /*
  * Actions
@@ -128,7 +137,7 @@ if (empty($reshook)) {
 		$accident_type      = GETPOST('accident_type');
 		$external_accident  = GETPOST('external_accident');
 		$accident_location  = GETPOST('accident_location');
-		$ext_society_id     = GETPOST('fk_soc');
+		$extSocietyId     = GETPOST('fk_soc');
 
 		// Initialize object accident
 		$now                       = dol_now();
@@ -148,7 +157,7 @@ if (empty($reshook)) {
 		$accident_date = dol_mktime(GETPOST('dateohour', 'int'), GETPOST('dateomin', 'int'), 0, GETPOST('dateomonth', 'int'), GETPOST('dateoday', 'int'), GETPOST('dateoyear', 'int'));
 
 		$object->accident_date = $accident_date;
-		$object->fk_soc        = $ext_society_id;
+		$object->fk_soc           = $extSocietyId;
 
 		switch ($external_accident) {
 			case 1:
@@ -165,7 +174,7 @@ if (empty($reshook)) {
 			case 2:
 				$object->fk_element  = 0;
 				$object->fk_standard = 0;
-				$object->fk_soc      = $ext_society_id;
+				$object->fk_soc      = $extSocietyId;
 				$object->accident_location = '';
 				break;
 			case 3:
@@ -266,7 +275,7 @@ if (empty($reshook)) {
 		$accident_type      = GETPOST('accident_type');
 		$external_accident  = GETPOST('external_accident');
 		$accident_location  = GETPOST('accident_location');
-		$ext_society_id     = GETPOST('fk_soc');
+		$extSocietyId     = GETPOST('fk_soc');
 
 		// Initialize object accident
 		$now                       = dol_now();
@@ -281,7 +290,7 @@ if (empty($reshook)) {
 		$accident_date = dol_mktime(GETPOST('dateohour', 'int'), GETPOST('dateomin', 'int'), 0, GETPOST('dateomonth', 'int'), GETPOST('dateoday', 'int'), GETPOST('dateoyear', 'int'));
 
 		$object->accident_date = $accident_date;
-		$object->fk_soc        = $ext_society_id;
+		$object->fk_soc           = $extSocietyId;
 
 		switch ($external_accident) {
 			case 1:
@@ -298,7 +307,7 @@ if (empty($reshook)) {
 			case 2:
 				$object->fk_element  = 0;
 				$object->fk_standard = 0;
-				$object->fk_soc      = $ext_society_id;
+				$object->fk_soc      = $extSocietyId;
 				$object->accident_location = '';
 				break;
 			case 3:
@@ -681,7 +690,7 @@ if ($action == 'create') {
 
 	//FkElement -- Lieu de l'accident - DigiriskElement
 	print '<tr class="fk_element_field"><td class="minwidth400">' . $langs->trans("AccidentLocation") . '</td><td>';
-	print $digiriskelement->select_digiriskelement_list(( ! empty(GETPOST('fromid')) ? GETPOST('fromid') : $object->fk_element), 'fk_element', '', 0, 0, [], 0, 0, 'minwidth300', 0, false, 0);
+	print $digiriskelement->selectDigiriskElementList(( ! empty(GETPOST('fromid')) ? GETPOST('fromid') : $object->fk_element), 'fk_element', ['customsql' => ' t.rowid NOT IN (' . implode(',', $deletedElements) . ')'], 0, 0, array(), 0, 0, 'minwidth300');
 	print '</td></tr>';
 
 	//FkSoc -- Lieu de l'accident - Société extérieure
@@ -787,7 +796,7 @@ if (($id || $ref) && $action == 'edit') {
 
 	//AccidentLocation -- Lieu de l'accident
 	print '<tr class="' . (($object->external_accident == 1) ? ' fk_element_field' : ' fk_element_field hidden' ) . '" style="' . (($object->external_accident == 1) ? ' ' : ' display:none') . '"><td>' . $langs->trans("AccidentLocation") . '</td><td>';
-	print $digiriskelement->select_digiriskelement_list($object->fk_element, 'fk_element', '', 0, 0, [], 0, 0, 'minwidth300', 0, false, 0);
+	print $digiriskelement->selectDigiriskElementList($object->fk_element, 'fk_element', [], 0, 0, array(), 0, 0, 'minwidth300', 0, false, 0);
 	print '</td></tr>';
 
 	//FkSoc -- Société extérieure

@@ -1,5 +1,5 @@
 <?php
-/* Copyright (C) 2021 EOXIA <dev@eoxia.com>
+/* Copyright (C) 2021-2023 EVARISK <technique@evarisk.com>
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -337,7 +337,7 @@ class RiskUnitTest extends PHPUnit\Framework\TestCase
 	 *
 	 * @return void
 	 *
-	 * @covers Risk::get_danger_categories
+	 * @covers Risk::getDangerCategories
 	 *
 	 */
 	public function testRiskGetDangerCategories() : void
@@ -349,7 +349,7 @@ class RiskUnitTest extends PHPUnit\Framework\TestCase
 		$db    = $this->savdb;
 
 		$localobject     = new Risk($this->savdb);
-		$localobjectList = $localobject->get_danger_categories();
+		$localobjectList = $localobject->getDangerCategories();
 
 		$this->assertSame(true, is_array($localobjectList));
 		print __METHOD__ . " ok";
@@ -362,7 +362,7 @@ class RiskUnitTest extends PHPUnit\Framework\TestCase
 	 * @param   Risk $localobject Risk object
 	 * @return  void
 	 *
-	 * @covers  Risk::get_danger_category
+	 * @covers  Risk::getDangerCategory
 	 *
 	 * @depends testRiskFetch
 	 * The depends says test is run only if previous is ok
@@ -375,7 +375,7 @@ class RiskUnitTest extends PHPUnit\Framework\TestCase
 		$langs = $this->savlangs;
 		$db    = $this->savdb;
 
-		$result = $localobject->get_danger_category($localobject);
+		$result = $localobject->getDangerCategory($localobject);
 
 		$this->assertSame(true, is_string($result));
 
@@ -388,7 +388,7 @@ class RiskUnitTest extends PHPUnit\Framework\TestCase
 	 * @param   Risk $localobject Risk object
 	 * @return  string
 	 *
-	 * @covers  Risk::get_danger_category_name
+	 * @covers  Risk::getDangerCategoryName
 	 *
 	 * @depends testRiskFetch
 	 * The depends says test is run only if previous is ok
@@ -401,7 +401,7 @@ class RiskUnitTest extends PHPUnit\Framework\TestCase
 		$langs = $this->savlangs;
 		$db    = $this->savdb;
 
-		$result = $localobject->get_danger_category_name($localobject);
+		$result = $localobject->getDangerCategoryName($localobject);
 
 		$this->assertSame(true, is_string($result));
 
@@ -415,7 +415,7 @@ class RiskUnitTest extends PHPUnit\Framework\TestCase
 	 * @param   Risk $localobject Risk object
 	 * @return  void
 	 *
-	 * @covers  Risk::get_danger_category_position_by_name
+	 * @covers  Risk::getDangerCategoryPositionByName
 	 *
 	 * @depends testRiskFetch
 	 * @depends testRiskGetDangerCategoryName
@@ -429,7 +429,7 @@ class RiskUnitTest extends PHPUnit\Framework\TestCase
 		$langs = $this->savlangs;
 		$db    = $this->savdb;
 
-		$result = $localobject->get_danger_category_position_by_name($name);
+		$result = $localobject->getDangerCategoryPositionByName($name);
 
 		$this->assertSame(true, is_int($result));
 
@@ -441,7 +441,7 @@ class RiskUnitTest extends PHPUnit\Framework\TestCase
 	 *
 	 * @return void
 	 *
-	 * @covers Risk::get_fire_permit_danger_categories
+	 * @covers Risk::getFirePermitDangerCategories
 	 *
 	 */
 	public function testRiskGetFirePermitDangerCategories() : void
@@ -453,7 +453,7 @@ class RiskUnitTest extends PHPUnit\Framework\TestCase
 		$db    = $this->savdb;
 
 		$localobject     = new Risk($this->savdb);
-		$localobjectList = $localobject->get_fire_permit_danger_categories();
+		$localobjectList = $localobject->getFirePermitDangerCategories();
 
 		$this->assertSame(true, is_array($localobjectList));
 		print __METHOD__ . " ok";
@@ -466,7 +466,7 @@ class RiskUnitTest extends PHPUnit\Framework\TestCase
 	 * @param   Risk $localobject Risk object
 	 * @return  void
 	 *
-	 * @covers  Risk::get_fire_permit_danger_category
+	 * @covers  Risk::getFirePermitDangerCategory
 	 *
 	 * @depends testRiskFetch
 	 * The depends says test is run only if previous is ok
@@ -479,7 +479,7 @@ class RiskUnitTest extends PHPUnit\Framework\TestCase
 		$langs = $this->savlangs;
 		$db    = $this->savdb;
 
-		$result = $localobject->get_fire_permit_danger_category($localobject);
+		$result = $localobject->getFirePermitDangerCategory($localobject);
 
 		$this->assertSame(true, is_string($result));
 
@@ -492,7 +492,7 @@ class RiskUnitTest extends PHPUnit\Framework\TestCase
 	 * @param   Risk $localobject Risk object
 	 * @return  string
 	 *
-	 * @covers  Risk::get_fire_permit_danger_category_name
+	 * @covers  Risk::getFirePermitDangerCategoryName
 	 *
 	 * @depends testRiskFetch
 	 * The depends says test is run only if previous is ok
@@ -505,7 +505,7 @@ class RiskUnitTest extends PHPUnit\Framework\TestCase
 		$langs = $this->savlangs;
 		$db    = $this->savdb;
 
-		$result = $localobject->get_fire_permit_danger_category_name($localobject);
+		$result = $localobject->getFirePermitDangerCategoryName($localobject);
 
 		$this->assertSame(true, is_string($result));
 
@@ -518,7 +518,7 @@ class RiskUnitTest extends PHPUnit\Framework\TestCase
 	 *
 	 * @return  void
 	 *
-	 * @covers  Risk::get_related_tasks
+	 * @covers  Risk::getRelatedTasks
 	 *
 	 * @depends testRiskFetch
 	 * The depends says test is run only if previous is ok
@@ -531,7 +531,7 @@ class RiskUnitTest extends PHPUnit\Framework\TestCase
 		$langs = $this->savlangs;
 		$db    = $this->savdb;
 
-		$localobjectList = $localobject->get_related_tasks($localobject);
+		$localobjectList = $localobject->getRelatedTasks($localobject);
 
 		if (empty($localobjectList)) {
 			$this->assertEquals($localobjectList, array());

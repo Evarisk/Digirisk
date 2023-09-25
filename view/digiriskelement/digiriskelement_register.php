@@ -1,5 +1,5 @@
 <?php
-/* Copyright (C) 2021 EOXIA <dev@eoxia.com>
+/* Copyright (C) 2021-2023 EVARISK <technique@evarisk.com>
  *
  * This program is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -21,20 +21,14 @@
  *  \brief      Page of DigiriskElement dashboard ticket
  */
 
-// Load Dolibarr environment
-$res = 0;
-// Try main.inc.php into web root known defined into CONTEXT_DOCUMENT_ROOT (not always defined)
-if ( ! $res && ! empty($_SERVER["CONTEXT_DOCUMENT_ROOT"])) $res = @include $_SERVER["CONTEXT_DOCUMENT_ROOT"] . "/main.inc.php";
-// Try main.inc.php into web root detected using web root calculated from SCRIPT_FILENAME
-$tmp = empty($_SERVER['SCRIPT_FILENAME']) ? '' : $_SERVER['SCRIPT_FILENAME']; $tmp2 = realpath(__FILE__); $i = strlen($tmp) - 1; $j = strlen($tmp2) - 1;
-while ($i > 0 && $j > 0 && isset($tmp[$i]) && isset($tmp2[$j]) && $tmp[$i] == $tmp2[$j]) { $i--; $j--; }
-if ( ! $res && $i > 0 && file_exists(substr($tmp, 0, ($i + 1)) . "/main.inc.php")) $res          = @include substr($tmp, 0, ($i + 1)) . "/main.inc.php";
-if ( ! $res && $i > 0 && file_exists(dirname(substr($tmp, 0, ($i + 1))) . "/main.inc.php")) $res = @include dirname(substr($tmp, 0, ($i + 1))) . "/main.inc.php";
-// Try main.inc.php using relative path
-if ( ! $res && file_exists("../../main.inc.php")) $res       = @include "../../main.inc.php";
-if ( ! $res && file_exists("../../../main.inc.php")) $res    = @include "../../../main.inc.php";
-if ( ! $res && file_exists("../../../../main.inc.php")) $res = @include "../../../../main.inc.php";
-if ( ! $res) die("Include of main fails");
+// Load DigiriskDolibarr environment
+if (file_exists('../digiriskdolibarr.main.inc.php')) {
+	require_once __DIR__ . '/../digiriskdolibarr.main.inc.php';
+} elseif (file_exists('../../digiriskdolibarr.main.inc.php')) {
+	require_once __DIR__ . '/../../digiriskdolibarr.main.inc.php';
+} else {
+	die('Include of digiriskdolibarr main fails');
+}
 
 require_once DOL_DOCUMENT_ROOT . '/core/lib/functions2.lib.php';
 require_once DOL_DOCUMENT_ROOT . '/categories/class/categorie.class.php';
@@ -48,7 +42,7 @@ require_once __DIR__ . '/../../lib/digiriskdolibarr_function.lib.php';
 global $conf, $db, $hookmanager, $langs, $user;
 
 // Load translation files required by the page
-$langs->loadLangs(array("digiriskdolibarr@digiriskdolibarr", "other"));
+saturne_load_langs(['other']);
 
 // Get parameters
 $id         = GETPOST('id', 'int');
@@ -63,7 +57,7 @@ $extrafields      = new ExtraFields($db);
 $digiriskstandard = new DigiriskStandard($db);
 $project          = new Project($db);
 
-$hookmanager->initHooks(array('digiriskelementregister', 'globalcard')); // Note that conf->hooks_modules contains array
+$hookmanager->initHooks(array('digiriskelementregister', 'digiriskelementview', 'globalcard')); // Note that conf->hooks_modules contains array
 // Fetch optionals attributes and labels
 $extrafields->fetch_name_optionals_label($object->table_element);
 
@@ -72,14 +66,12 @@ include DOL_DOCUMENT_ROOT . '/core/actions_fetchobject.inc.php'; // Must be incl
 if ($id > 0 || ! empty($ref)) $upload_dir = $conf->digiriskdolibarr->multidir_output[$object->entity] . "/" . $object->id;
 
 //Security check
-require_once __DIR__ . '/../../core/tpl/digirisk_security_checks.php';
-
 $permissiontoread   = $user->rights->digiriskdolibarr->digiriskelement->read;
 $permissiontoadd    = $user->rights->digiriskdolibarr->digiriskelement->write;
 $permissiontodelete = $user->rights->digiriskdolibarr->digiriskelement->delete;
 $upload_dir = $conf->categorie->multidir_output[$conf->entity];
 
-if ( ! $permissiontoread) accessforbidden();
+saturne_check_access($permissiontoread);
 
 /*
  *  Actions
@@ -95,17 +87,13 @@ if ($reshook < 0) setEventMessages($hookmanager->error, $hookmanager->errors, 'e
 
 if ($object->id > 0) {
 	$title    = $langs->trans("Register");
-	$help_url = 'FR:Module_Digirisk#Le_tableau_de_bord_et_indicateurs';
-	$morejs   = array("/digiriskdolibarr/js/digiriskdolibarr.js");
-	$morecss  = array("/digiriskdolibarr/css/digiriskdolibarr.css");
+	$helpUrl  = 'FR:Module_Digirisk#Le_tableau_de_bord_et_indicateurs';
 
-	digiriskHeader($title, $help_url, $morejs, $morecss);
+	digirisk_header($title, $helpUrl);
 
 	print '<div id="cardContent" value="">';
 
-	$head = digiriskelementPrepareHead($object);
-
-	print dol_get_fiche_head($head, 'elementRegister', $title, -1, "digiriskdolibarr@digiriskdolibarr");
+	saturne_get_fiche_head($object, 'elementRegister', $title);
 
 	// Object card
 	// ------------------------------------------------------------
@@ -129,10 +117,10 @@ if ($object->id > 0) {
 	$width        = 80;
 	$height       = 80;
 	$cssclass     = 'photoref';
-	$morehtmlleft = '<div class="floatleft inline-block valignmiddle divphotoref">' . digirisk_show_photos('digiriskdolibarr', $conf->digiriskdolibarr->multidir_output[$conf->entity] . '/' . $object->element_type, 'small', 5, 0, 0, 0, $height, $width, 0, 0, 0, $object->element_type, $object) . '</div>';
 
 	$linkback = '<a href="' . dol_buildpath('/digiriskdolibarr/view/digiriskelement/risk_list.php', 1) . '">' . $langs->trans("BackToList") . '</a>';
-	digirisk_banner_tab($object, 'id', $linkback, 1, 'rowid', 'ref', $morehtmlref, '', 0, $morehtmlleft);
+
+	saturne_banner_tab($object,'ref','', 1, 'ref', 'ref', $morehtmlref, true);
 
 	print load_fiche_titre($langs->trans("DashBoard"), '', 'digiriskdolibarr32px.png@digiriskdolibarr');
 

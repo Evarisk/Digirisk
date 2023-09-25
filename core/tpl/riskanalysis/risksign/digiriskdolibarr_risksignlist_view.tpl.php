@@ -1,7 +1,7 @@
 <?php
 $selectedfields_label = 'risksignlist_selectedfields';
 // Selection of new fields
-require './../../class/actions_changeselectedfields.php';
+require __DIR__ . '/../../../../class/actions_changeselectedfields.php';
 
 print '<div class="fichecenter risksignlist wpeo-wrap">';
 print '<form method="POST" id="searchFormListRiskSigns" action="' . $_SERVER["PHP_SELF"] . (($contextpage != 'risksignlist') ? '?id=' . $object->id : '') . '">' . "\n";
@@ -16,51 +16,51 @@ print '<input type="hidden" name="contextpage" value="' . $contextpage . '">';
 
 // NOTICES FOR ACTIONS
 ?>
-	<!--	RISK SIGN-->
-	<div class="messageSuccessRiskSignCreate notice hidden">
-		<div class="wpeo-notice notice-success risksign-create-success-notice">
-			<div class="notice-content">
-				<div class="notice-title"><?php echo $langs->trans('RiskSignWellCreated') ?></div>
-				<div class="notice-subtitle"><?php echo $langs->trans('TheRiskSign') . ' ' . $refRiskSignMod->getLastValue($risksign) . ' ' . $langs->trans('HasBeenCreatedF') ?></div>
-			</div>
-			<div class="notice-close"><i class="fas fa-times"></i></div>
+<!--	RISK SIGN-->
+<div class="messageSuccessRiskSignCreate notice hidden">
+	<div class="wpeo-notice notice-success risksign-create-success-notice">
+		<div class="notice-content">
+			<div class="notice-title"><?php echo $langs->trans('RiskSignWellCreated') ?></div>
+			<div class="notice-subtitle"><?php echo $langs->trans('TheRiskSign') . ' ' . $refRiskSignMod->getLastValue($risksign) . ' ' . $langs->trans('HasBeenCreatedF') ?></div>
 		</div>
+		<div class="notice-close"><i class="fas fa-times"></i></div>
 	</div>
-	<div class="messageErrorRiskSignCreate notice hidden">
-		<div class="wpeo-notice notice-warning risksign-create-error-notice">
-			<div class="notice-content">
-				<div class="notice-title"><?php echo $langs->trans('RiskSignNotCreated') ?></div>
-				<div class="notice-subtitle"><?php echo $langs->trans('TheRiskSign') . ' ' . $refRiskSignMod->getLastValue($risksign) . ' ' . $langs->trans('HasNotBeenCreatedF') ?></div>
-			</div>
-			<div class="notice-close"><i class="fas fa-times"></i></div>
+</div>
+<div class="messageErrorRiskSignCreate notice hidden">
+	<div class="wpeo-notice notice-warning risksign-create-error-notice">
+		<div class="notice-content">
+			<div class="notice-title"><?php echo $langs->trans('RiskSignNotCreated') ?></div>
+			<div class="notice-subtitle"><?php echo $langs->trans('TheRiskSign') . ' ' . $refRiskSignMod->getLastValue($risksign) . ' ' . $langs->trans('HasNotBeenCreatedF') ?></div>
 		</div>
+		<div class="notice-close"><i class="fas fa-times"></i></div>
 	</div>
-	<div class="messageSuccessRiskSignEdit notice hidden">
-		<input type="hidden" class="valueForEditRiskSign1" value="<?php echo $langs->trans('TheRiskSign') . ' ' ?>">
-		<input type="hidden" class="valueForEditRiskSign2" value="<?php echo ' ' . $langs->trans('HasBeenEditedF') ?>">
-		<div class="wpeo-notice notice-success risksign-edit-success-notice">
-			<div class="notice-content">
-				<div class="notice-title"><?php echo $langs->trans('RiskSignWellEdited') ?></div>
-				<div class="notice-subtitle">
-					<span class="text"></span>
-				</div>
+</div>
+<div class="messageSuccessRiskSignEdit notice hidden">
+	<input type="hidden" class="valueForEditRiskSign1" value="<?php echo $langs->trans('TheRiskSign') . ' ' ?>">
+	<input type="hidden" class="valueForEditRiskSign2" value="<?php echo ' ' . $langs->trans('HasBeenEditedF') ?>">
+	<div class="wpeo-notice notice-success risksign-edit-success-notice">
+		<div class="notice-content">
+			<div class="notice-title"><?php echo $langs->trans('RiskSignWellEdited') ?></div>
+			<div class="notice-subtitle">
+				<span class="text"></span>
 			</div>
-			<div class="notice-close"><i class="fas fa-times"></i></div>
 		</div>
+		<div class="notice-close"><i class="fas fa-times"></i></div>
 	</div>
-	<div class="messageErrorRiskSignEdit notice hidden">
-		<input type="hidden" class="valueForEditRiskSign1" value="<?php echo $langs->trans('TheRiskSign') . ' ' ?>">
-		<input type="hidden" class="valueForEditRiskSign2" value="<?php echo ' ' . $langs->trans('HasNotBeenEditedF') ?>">
-		<div class="wpeo-notice notice-warning risksign-edit-error-notice">
-			<div class="notice-content">
-				<div class="notice-title"><?php echo $langs->trans('RiskSignNotEdited') ?></div>
-				<div class="notice-subtitle">
-					<span class="text"></span>
-				</div>
+</div>
+<div class="messageErrorRiskSignEdit notice hidden">
+	<input type="hidden" class="valueForEditRiskSign1" value="<?php echo $langs->trans('TheRiskSign') . ' ' ?>">
+	<input type="hidden" class="valueForEditRiskSign2" value="<?php echo ' ' . $langs->trans('HasNotBeenEditedF') ?>">
+	<div class="wpeo-notice notice-warning risksign-edit-error-notice">
+		<div class="notice-content">
+			<div class="notice-title"><?php echo $langs->trans('RiskSignNotEdited') ?></div>
+			<div class="notice-subtitle">
+				<span class="text"></span>
 			</div>
-			<div class="notice-close"><i class="fas fa-times"></i></div>
 		</div>
+		<div class="notice-close"><i class="fas fa-times"></i></div>
 	</div>
+</div>
 <?php
 // Build and execute select
 // --------------------------------------------------------------------
@@ -157,7 +157,10 @@ if ($action != 'list') {
 
 	<!-- BUTTON MODAL RISKSIGN ADD -->
 <?php if ($permissiontoadd) {
-	$newcardbutton = '<div class="risksign-add wpeo-button button-square-40 button-blue modal-open" value="' . $object->id . '"><i class="fas fa-map-signs button-icon"></i><i class="fas fa-plus-circle button-add animated"></i></div>';
+	$newcardbutton = '<div class="risksign-add wpeo-button button-square-40 button-blue modal-open" value="' . $object->id . '">';
+	$newcardbutton .= '<i class="fas fa-map-signs button-icon"></i><i class="fas fa-plus-circle button-add animated"></i>';
+	$newcardbutton .= '	<input type="hidden" class="modal-options" data-modal-to-open="risksign_add'. $object->id .'" data-from-id="'. $object->id .'" data-from-type="digiriskelement" data-from-subtype="photo" data-from-subdir="photos"/>';
+	$newcardbutton .= '</div>';
 } else {
 	$newcardbutton = '<div class="wpeo-button button-square-40 button-grey" value="' . $object->id . '"><i class="fas fa-map-signs button-icon wpeo-tooltip-event" aria-label="' . $langs->trans('PermissionDenied') . '"></i><i class="fas fa-plus-circle button-add animated"></i></div>';
 } ?>
@@ -184,7 +187,7 @@ if ($action != 'list') {
 							</div>
 							<ul class="dropdown-content wpeo-gridlayout grid-5 grid-gap-0">
 								<?php
-								$risksignCategories = $risksign->get_risksign_categories();
+								$risksignCategories = $risksign->getRiskSignCategories();
 								if ( ! empty($risksignCategories) ) :
 									foreach ($risksignCategories as $risksignCategory) : ?>
 										<li class="item dropdown-item wpeo-tooltip-event" data-is-preset="<?php echo ''; ?>" data-id="<?php echo $risksignCategory['position'] ?>" aria-label="<?php echo $risksignCategory["name"] ?>">
@@ -267,13 +270,13 @@ foreach ($risksign->fields as $key => $val) {
 						<img class="danger-category-pic wpeo-tooltip-event hidden" src="" aria-label=""/>
 					</div>
 				<?php else : ?>
-					<div class="dropdown-toggle dropdown-add-button wpeo-tooltip-event" aria-label="<?php echo (empty(dol_escape_htmltag($search[$key]))) ? $risksign->get_risksign_category_name($risksign) : $risksign->get_risksign_category_name_by_position($search[$key]); ?>">
-						<img class="danger-category-pic tooltip hover" src="<?php echo DOL_URL_ROOT . '/custom/digiriskdolibarr/img/' . ((empty(dol_escape_htmltag($search[$key]))) ? $risksign->get_risksign_category($risksign) : $risksign->get_risksign_category_by_position($search[$key])) ?>" />
+					<div class="dropdown-toggle dropdown-add-button wpeo-tooltip-event" aria-label="<?php echo (empty(dol_escape_htmltag($search[$key]))) ? $risksign->getRiskSignCategoryName($risksign) : $risksign->getRiskSignCategoryNameByPosition($search[$key]); ?>">
+						<img class="danger-category-pic tooltip hover" src="<?php echo DOL_URL_ROOT . '/custom/digiriskdolibarr/img/' . ((empty(dol_escape_htmltag($search[$key]))) ? $risksign->getRiskSignCategory($risksign) : $risksign->getRiskSignCategoryByPosition($search[$key])) ?>" />
 					</div>
 				<?php endif; ?>
 				<ul class="dropdown-content wpeo-gridlayout grid-5 grid-gap-0">
 					<?php
-					$risksignCategories = $risksign->get_risksign_categories();
+					$risksignCategories = $risksign->getRiskSignCategories();
 					if ( ! empty($risksignCategories) ) :
 						foreach ($risksignCategories as $risksignCategory) : ?>
 							<li class="item dropdown-item wpeo-tooltip-event classfortooltip" data-is-preset="<?php echo ''; ?>" data-id="<?php echo $risksignCategory['position'] ?>" aria-label="<?php echo $risksignCategory['name'] ?>">
@@ -353,8 +356,8 @@ while ($i < ($limit ? min($num, $limit) : $num)) {
 			if ($key == 'status') print $risksign->getLibStatut(5);
 			elseif ($key == 'category') { ?>
 				<div class="table-cell table-50 cell-risksign-category">
-					<div class="wpeo-dropdown dropdown-large risksign-category-danger padding wpeo-tooltip-event" aria-label="<?php echo $risksign->get_risksign_category_name($risksign); ?>">
-						<img class="danger-category-pic hover" src="<?php echo DOL_URL_ROOT . '/custom/digiriskdolibarr/img/' . $risksign->get_risksign_category($risksign) ?>"/>
+					<div class="wpeo-dropdown dropdown-large risksign-category-danger padding wpeo-tooltip-event" aria-label="<?php echo $risksign->getRiskSignCategoryName($risksign); ?>">
+						<img class="danger-category-pic hover" src="<?php echo DOL_URL_ROOT . '/custom/digiriskdolibarr/img/' . $risksign->getRiskSignCategory($risksign) ?>"/>
 					</div>
 				</div>
 				<?php
@@ -382,12 +385,12 @@ while ($i < ($limit ? min($num, $limit) : $num)) {
 									<span class="title"><?php echo $langs->trans('RiskSign'); ?></span>
 									<input class="input-hidden-danger" type="hidden" name="risksign_category_id" value=<?php echo $risksign->category ?> />
 									<div class="wpeo-dropdown dropdown-large dropdown-grid risksign-category-danger padding">
-										<div class="dropdown-toggle dropdown-add-button button-cotation wpeo-tooltip-event" aria-label="<?php echo $risksign->get_risksign_category_name($risksign); ?>">
-											<img class="danger-category-pic hover" src="<?php echo DOL_URL_ROOT . '/custom/digiriskdolibarr/img/' . $risksign->get_risksign_category($risksign) ?>"/>
+										<div class="dropdown-toggle dropdown-add-button button-cotation wpeo-tooltip-event" aria-label="<?php echo $risksign->getRiskSignCategoryName($risksign); ?>">
+											<img class="danger-category-pic hover" src="<?php echo DOL_URL_ROOT . '/custom/digiriskdolibarr/img/' . $risksign->getRiskSignCategory($risksign) ?>"/>
 										</div>
 										<ul class="dropdown-content wpeo-gridlayout grid-5 grid-gap-0">
 											<?php
-											$risksignCategories = $risksign->get_risksign_categories();
+											$risksignCategories = $risksign->getRiskSignCategories();
 											if ( ! empty($risksignCategories) ) :
 												foreach ($risksignCategories as $risksignCategory) : ?>
 													<li class="item dropdown-item wpeo-tooltip-event" data-is-preset="<?php echo ''; ?>" data-id="<?php echo $risksignCategory['position'] ?>" aria-label="<?php echo $risksignCategory['name'] ?>">

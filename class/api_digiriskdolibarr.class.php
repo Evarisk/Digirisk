@@ -1,5 +1,5 @@
 <?php
-/* Copyright (C) 2021 EOXIA <dev@eoxia.com>
+/* Copyright (C) 2021-2023 EVARISK <technique@evarisk.com>
  *
  * This program is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -27,7 +27,7 @@ require_once __DIR__ . '/../core/modules/modDigiriskDolibarr.class.php';
 
 require_once __DIR__ . '/riskanalysis/risk.class.php';
 require_once __DIR__ . '/digirisktask.class.php';
-require_once __DIR__ . '/digiriskdocuments/riskassessmentdocument.class.php';
+require_once __DIR__ . '/digiriskdolibarrdocuments/riskassessmentdocument.class.php';
 require_once __DIR__ . '/accident.class.php';
 require_once __DIR__ . '/digiriskresources.class.php';
 require_once __DIR__ . '/evaluator.class.php';

@@ -1,5 +1,5 @@
 <?php
-/* Copyright (C) 2021 EOXIA <dev@eoxia.com>
+/* Copyright (C) 2021-2023 EVARISK <technique@evarisk.com>
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -21,48 +21,45 @@
  *		\brief      Page to create/edit/view firepermit
  */
 
-// Load Dolibarr environment
-$res = 0;
-// Try main.inc.php into web root known defined into CONTEXT_DOCUMENT_ROOT (not always defined)
-if ( ! $res && ! empty($_SERVER["CONTEXT_DOCUMENT_ROOT"])) $res = @include $_SERVER["CONTEXT_DOCUMENT_ROOT"] . "/main.inc.php";
-// Try main.inc.php into web root detected using web root calculated from SCRIPT_FILENAME
-$tmp = empty($_SERVER['SCRIPT_FILENAME']) ? '' : $_SERVER['SCRIPT_FILENAME']; $tmp2 = realpath(__FILE__); $i = strlen($tmp) - 1; $j = strlen($tmp2) - 1;
-while ($i > 0 && $j > 0 && isset($tmp[$i]) && isset($tmp2[$j]) && $tmp[$i] == $tmp2[$j]) { $i--; $j--; }
-if ( ! $res && $i > 0 && file_exists(substr($tmp, 0, ($i + 1)) . "/main.inc.php")) $res          = @include substr($tmp, 0, ($i + 1)) . "/main.inc.php";
-if ( ! $res && $i > 0 && file_exists(dirname(substr($tmp, 0, ($i + 1))) . "/main.inc.php")) $res = @include dirname(substr($tmp, 0, ($i + 1))) . "/main.inc.php";
-// Try main.inc.php using relative path
-if ( ! $res && file_exists("../../main.inc.php")) $res       = @include "../../main.inc.php";
-if ( ! $res && file_exists("../../../main.inc.php")) $res    = @include "../../../main.inc.php";
-if ( ! $res && file_exists("../../../../main.inc.php")) $res = @include "../../../../main.inc.php";
-if ( ! $res) die("Include of main fails");
+// Load DigiriskDolibarr environment
+if (file_exists('../digiriskdolibarr.main.inc.php')) {
+	require_once __DIR__ . '/../digiriskdolibarr.main.inc.php';
+} elseif (file_exists('../../digiriskdolibarr.main.inc.php')) {
+	require_once __DIR__ . '/../../digiriskdolibarr.main.inc.php';
+} else {
+	die('Include of digiriskdolibarr main fails');
+}
 
+// Libraries
 require_once DOL_DOCUMENT_ROOT . '/core/class/html.formfile.class.php';
 require_once DOL_DOCUMENT_ROOT .'/core/class/html.formprojet.class.php';
 
+// Load Saturne libraries.
+require_once __DIR__ . '/../../../saturne/class/saturnesignature.class.php';
+
+// Load DigiriskDolibarr libraries.
 require_once __DIR__ . '/../../class/digiriskdocuments.class.php';
 require_once __DIR__ . '/../../class/digiriskelement.class.php';
 require_once __DIR__ . '/../../class/digiriskresources.class.php';
 require_once __DIR__ . '/../../class/firepermit.class.php';
 require_once __DIR__ . '/../../class/preventionplan.class.php';
 require_once __DIR__ . '/../../class/riskanalysis/risk.class.php';
-require_once __DIR__ . '/../../class/digiriskdocuments/firepermitdocument.class.php';
+require_once __DIR__ . '/../../class/digiriskdolibarrdocuments/firepermitdocument.class.php';
 require_once __DIR__ . '/../../lib/digiriskdolibarr_function.lib.php';
 require_once __DIR__ . '/../../lib/digiriskdolibarr_firepermit.lib.php';
-require_once __DIR__ . '/../../core/modules/digiriskdolibarr/digiriskelement/firepermit/mod_firepermit_standard.php';
-require_once __DIR__ . '/../../core/modules/digiriskdolibarr/digiriskelement/firepermitdet/mod_firepermitdet_standard.php';
-require_once __DIR__ . '/../../core/modules/digiriskdolibarr/digiriskdocuments/firepermitdocument/mod_firepermitdocument_standard.php';
-require_once __DIR__ . '/../../core/modules/digiriskdolibarr/digiriskdocuments/firepermitdocument/modules_firepermitdocument.php';
 
+// Global variables definitions
 global $conf, $db, $hookmanager, $langs, $user;
 
 // Load translation files required by the page
-$langs->loadLangs(array("digiriskdolibarr@digiriskdolibarr", "other"));
+saturne_load_langs(['other', 'mails']);
 
 // Get parameters
 $id                  = GETPOST('id', 'int');
 $lineid              = GETPOST('lineid', 'int');
 $ref                 = GETPOST('ref', 'alpha');
 $action              = GETPOST('action', 'aZ09');
+$subaction           = GETPOST('subaction', 'aZ09');
 $confirm             = GETPOST('confirm', 'alpha');
 $cancel              = GETPOST('cancel', 'aZ09');
 $contextpage         = GETPOST('contextpage', 'aZ') ? GETPOST('contextpage', 'aZ') : 'firepermitcard'; // To manage different context of search
@@ -74,9 +71,9 @@ $fk_parent           = GETPOST('fk_parent', 'int');
 $object              = new FirePermit($db);
 $preventionplan      = new PreventionPlan($db);
 $preventionplanline  = new PreventionPlanLine($db);
-$signatory           = new FirePermitSignature($db);
-$objectline          = new FirePermitLine($db);
-$firepermitdocument  = new FirePermitDocument($db);
+$signatory           = new SaturneSignature($db, $moduleNameLowerCase, $object->element);
+$objectLine          = new FirePermitLine($db);
+$document  = new FirePermitDocument($db);
 $risk                = new Risk($db);
 $contact             = new Contact($db);
 $usertmp             = new User($db);
@@ -86,27 +83,41 @@ $digiriskelement     = new DigiriskElement($db);
 $digiriskresources   = new DigiriskResources($db);
 $project             = new Project($db);
 
+$deletedElements = $digiriskelement->getMultiEntityTrashList();
+if (empty($deletedElements)) {
+	$deletedElements = [0];
+}
+
 // Load object
 $object->fetch($id);
 
 // Load resources
-$allLinks = $digiriskresources->digirisk_dolibarr_fetch_resources();
+$allLinks = $digiriskresources->fetchDigiriskResources();
 
+// Load numbering modules
+$numberingModules = [
+	'digiriskelement/' . $object->element     => $conf->global->DIGIRISKDOLIBARR_FIREPERMIT_ADDON,
+	'digiriskelement/' . $objectLine->element => $conf->global->DIGIRISKDOLIBARR_FIREPERMITDET_ADDON,
+];
+
+list($refFirePermitMod, $refFirePermitDetMod) = saturne_require_objects_mod($numberingModules, $moduleNameLowerCase);
+
+// Fetch optionals attributes and labels
+$extrafields->fetch_name_optionals_label($object->table_element);
+$extrafields->fetch_name_optionals_label($objectLine->table_element);
+
+// Initialize hooks
 $hookmanager->initHooks(array('firepermitcard', 'globalcard')); // Note that conf->hooks_modules contains array
 
+// Get files upload dir
 $upload_dir = $conf->digiriskdolibarr->multidir_output[isset($object->entity) ? $object->entity : 1];
 
-// Security check
-require_once __DIR__ . '/../../core/tpl/digirisk_security_checks.php';
-
+// Security check - Protection if external user
 $permissiontoread   = $user->rights->digiriskdolibarr->firepermit->read;
 $permissiontoadd    = $user->rights->digiriskdolibarr->firepermit->write;
 $permissiontodelete = $user->rights->digiriskdolibarr->firepermit->delete;
 
-if ( ! $permissiontoread) accessforbidden();
-
-$refFirePermitMod    = new $conf->global->DIGIRISKDOLIBARR_FIREPERMIT_ADDON($db);
-$refFirePermitDetMod = new $conf->global->DIGIRISKDOLIBARR_FIREPERMITDET_ADDON($db);
+saturne_check_access($permissiontoadd);
 
 /*
  * Actions
@@ -139,16 +150,16 @@ if (empty($reshook)) {
 	// Action to add record
 	if ($action == 'add' && $permissiontoadd) {
 		// Get parameters
-		$project                     = GETPOST('fk_project');
-		$maitre_oeuvre_id            = GETPOST('maitre_oeuvre');
-		$extsociety_id               = GETPOST('ext_society');
-		$extresponsible_id           = GETPOST('ext_society_responsible');
-		$extintervenant_ids          = GETPOST('ext_intervenants');
-		$labour_inspector_id         = GETPOST('labour_inspector');
-		$labour_inspector_contact_id = GETPOST('labour_inspector_contact');
-		$label                       = GETPOST('label');
-		$description                 = GETPOST('description');
-		$fk_preventionplan           = GETPOST('fk_preventionplan');
+		$project                  = GETPOST('fk_project');
+		$masterWorkerId           = GETPOST('maitre_oeuvre');
+		$extSocietyId             = GETPOST('ext_society');
+		$extResponsibleId         = GETPOST('ext_society_responsible');
+		$extIntervenantsIds       = GETPOST('ext_intervenants');
+		$labourInspectorId        = GETPOST('labour_inspector');
+		$labourInspectorContactId = GETPOST('labour_inspector_contact');
+		$label                    = GETPOST('label');
+		$description              = GETPOST('description');
+		$fkPreventionPlan         = GETPOST('fk_preventionplan');
 
 		// Initialize object firepermit
 		$now                   = dol_now();
@@ -168,48 +179,48 @@ if (empty($reshook)) {
 		$object->date_start = $date_start;
 		$object->date_end   = $date_end;
 
-		$object->fk_preventionplan = $fk_preventionplan;
-		$object->fk_user_creat     = $user->id ? $user->id : 1;
+		$object->fk_preventionplan = $fkPreventionPlan;
+		$object->fk_user_creat     = $user->id ?: 1;
 
 		// Check parameters
-		if ($maitre_oeuvre_id < 0) {
-			setEventMessages($langs->trans('ErrorFieldRequired', $langs->transnoentitiesnoconv('MaitreOeuvre')), null, 'errors');
+		if ($masterWorkerId < 0) {
+			setEventMessages($langs->trans('ErrorFieldRequired', $langs->transnoentitiesnoconv('MasterWorker')), null, 'errors');
 			$error++;
 		} else {
-			$usertmp->fetch($maitre_oeuvre_id);
+			$usertmp->fetch($masterWorkerId);
 		}
 
-		if ($extsociety_id < 0) {
+		if ($extSocietyId < 0) {
 			setEventMessages($langs->trans('ErrorFieldRequired', $langs->transnoentitiesnoconv('ExtSociety')), null, 'errors');
 			$error++;
 		}
 
-		if (is_array($extresponsible_id)) {
-			if (empty(array_filter($extresponsible_id))) {
+		if (is_array($extResponsibleId)) {
+			if (empty(array_filter($extResponsibleId))) {
 				setEventMessages($langs->trans('ErrorFieldRequired', $langs->transnoentitiesnoconv('ExtSocietyResponsible')), null, 'errors');
 				$error++;
 			}
-		} elseif (empty($extresponsible_id)) {
+		} elseif (empty($extResponsibleId)) {
 			setEventMessages($langs->trans('ErrorFieldRequired', $langs->transnoentitiesnoconv('ExtSocietyResponsible')), null, 'errors');
 			$error++;
 		}
 
-		if ($labour_inspector_id < 0) {
+		if ($labourInspectorId < 0) {
 			setEventMessages($langs->trans('ErrorFieldRequired', $langs->transnoentitiesnoconv('LabourInspectorSociety')), null, 'errors');
 			$error++;
 		}
 
-		if (is_array($labour_inspector_contact_id)) {
-			if (empty(array_filter($labour_inspector_contact_id))) {
+		if (is_array($labourInspectorContactId)) {
+			if (empty(array_filter($labourInspectorContactId))) {
 				setEventMessages($langs->trans('ErrorFieldRequired', $langs->transnoentitiesnoconv('LabourInspector')), null, 'errors');
 				$error++;
 			}
-		} elseif (empty($labour_inspector_contact_id)) {
+		} elseif (empty($labourInspectorContactId)) {
 			setEventMessages($langs->trans('ErrorFieldRequired', $langs->transnoentitiesnoconv('LabourInspector')), null, 'errors');
 			$error++;
 		}
 
-		if ($fk_preventionplan < 0) {
+		if ($fkPreventionPlan < 0) {
 			setEventMessages($langs->trans('ErrorFieldRequired', $langs->transnoentitiesnoconv('PreventionPlanLinked')), null, 'errors');
 			$error++;
 		}
@@ -217,17 +228,18 @@ if (empty($reshook)) {
 		if ( ! $error) {
 			$result = $object->create($user, true);
 			if ($result > 0) {
-				$digiriskresources->digirisk_dolibarr_set_resources($db, $user->id, 'FP_EXT_SOCIETY', 'societe', array($extsociety_id), $conf->entity, 'firepermit', $object->id, 1);
-				$digiriskresources->digirisk_dolibarr_set_resources($db, $user->id, 'FP_LABOUR_INSPECTOR', 'societe', array($labour_inspector_id), $conf->entity, 'firepermit', $object->id, 1);
-				$digiriskresources->digirisk_dolibarr_set_resources($db, $user->id, 'FP_LABOUR_INSPECTOR_ASSIGNED', 'socpeople', array($labour_inspector_contact_id), $conf->entity, 'firepermit', $object->id, 1);
+				$digiriskresources->setDigiriskResources($db, $user->id, 'ExtSociety', 'societe', array($extSocietyId), $conf->entity, 'firepermit', $object->id, 1);
+				$digiriskresources->setDigiriskResources($db, $user->id, 'LabourInspector', 'societe', array($labourInspectorId), $conf->entity, 'firepermit', $object->id, 1);
+				$digiriskresources->setDigiriskResources($db, $user->id, 'LabourInspectorAssigned', 'socpeople', array($labourInspectorContactId), $conf->entity, 'firepermit', $object->id, 1);
 
-				if ($maitre_oeuvre_id > 0) {
-					$signatory->setSignatory($object->id, 'firepermit', 'user', array($maitre_oeuvre_id), 'FP_MAITRE_OEUVRE', 'firepermit');
+				if ($masterWorkerId > 0) {
+					$signatory->setSignatory($object->id, 'firepermit', 'user', array($masterWorkerId), 'MasterWorker');
 				}
 
-				if ($extresponsible_id > 0) {
-					$signatory->setSignatory($object->id, 'firepermit', 'socpeople', array($extresponsible_id), 'FP_EXT_SOCIETY_RESPONSIBLE', 'firepermit');
+				if ($extResponsibleId > 0) {
+					$signatory->setSignatory($object->id, 'firepermit', 'socpeople', array($extResponsibleId), 'ExtSocietyResponsible');
 				}
+
 				if (!empty($conf->global->DIGIRISKDOLIBARR_MAIN_AGENDA_ACTIONAUTO_FIREPERMIT_CREATE)) {
 					$object->call_trigger('FIREPERMIT_CREATE', $user);
 				}
@@ -250,15 +262,15 @@ if (empty($reshook)) {
 	if ($action == 'update' && $permissiontoadd) {
 		// Get parameters
 		$project                     = GETPOST('fk_project');
-		$maitre_oeuvre_id            = GETPOST('maitre_oeuvre');
-		$extsociety_id               = GETPOST('ext_society');
-		$extresponsible_id           = GETPOST('ext_society_responsible');
-		$extintervenant_ids          = GETPOST('ext_intervenants');
-		$labour_inspector_id         = GETPOST('labour_inspector');
-		$labour_inspector_contact_id = GETPOST('labour_inspector_contact') ? GETPOST('labour_inspector_contact') : 0;
+		$masterWorkerId            = GETPOST('maitre_oeuvre');
+		$extSocietyId               = GETPOST('ext_society');
+		$extResponsibleId           = GETPOST('ext_society_responsible');
+		$extIntervenantsIds          = GETPOST('ext_intervenants');
+		$labourInspectorId         = GETPOST('labour_inspector');
+		$labourInspectorContactId = GETPOST('labour_inspector_contact') ? GETPOST('labour_inspector_contact') : 0;
 		$label                       = GETPOST('label');
 		$description                 = GETPOST('description');
-		$fk_preventionplan           = GETPOST('fk_preventionplan');
+		$fkPreventionPlan           = GETPOST('fk_preventionplan');
 
 		// Initialize object fire permit
 		$now           = dol_now();
@@ -272,50 +284,50 @@ if (empty($reshook)) {
 		$object->date_start  = $date_start;
 		$object->date_end    = $date_end;
 
-		$object->fk_preventionplan = $fk_preventionplan;
-		$object->fk_user_creat     = $user->id ? $user->id : 1;
+		$object->fk_preventionplan = $fkPreventionPlan;
+		$object->fk_user_creat     = $user->id ?: 1;
 
 		$object->fk_project = $project;
 
 		// Check parameters
-		if ($maitre_oeuvre_id < 0) {
-			setEventMessages($langs->trans('ErrorFieldRequired', $langs->transnoentitiesnoconv('MaitreOeuvre')), null, 'errors');
+		if ($masterWorkerId < 0) {
+			setEventMessages($langs->trans('ErrorFieldRequired', $langs->transnoentitiesnoconv('MasterWorker')), null, 'errors');
 			$error++;
 		} else {
-			$usertmp->fetch($maitre_oeuvre_id);
+			$usertmp->fetch($masterWorkerId);
 		}
 
-		if ($extsociety_id < 0) {
+		if ($extSocietyId < 0) {
 			setEventMessages($langs->trans('ErrorFieldRequired', $langs->transnoentitiesnoconv('ExtSociety')), null, 'errors');
 			$error++;
 		}
 
-		if (is_array($extresponsible_id)) {
-			if (empty(array_filter($extresponsible_id))) {
+		if (is_array($extResponsibleId)) {
+			if (empty(array_filter($extResponsibleId))) {
 				setEventMessages($langs->trans('ErrorFieldRequired', $langs->transnoentitiesnoconv('ExtSocietyResponsible')), null, 'errors');
 				$error++;
 			}
-		} elseif (empty($extresponsible_id)) {
+		} elseif (empty($extResponsibleId)) {
 			setEventMessages($langs->trans('ErrorFieldRequired', $langs->transnoentitiesnoconv('ExtSocietyResponsible')), null, 'errors');
 			$error++;
 		}
 
-		if ($labour_inspector_id < 0) {
+		if ($labourInspectorId < 0) {
 			setEventMessages($langs->trans('ErrorFieldRequired', $langs->transnoentitiesnoconv('LabourInspectorSociety')), null, 'errors');
 			$error++;
 		}
 
-		if (is_array($labour_inspector_contact_id)) {
-			if (empty(array_filter($labour_inspector_contact_id))) {
+		if (is_array($labourInspectorContactId)) {
+			if (empty(array_filter($labourInspectorContactId))) {
 				setEventMessages($langs->trans('ErrorFieldRequired', $langs->transnoentitiesnoconv('LabourInspector')), null, 'errors');
 				$error++;
 			}
-		} elseif (empty($labour_inspector_contact_id)) {
+		} elseif (empty($labourInspectorContactId)) {
 			setEventMessages($langs->trans('ErrorFieldRequired', $langs->transnoentitiesnoconv('LabourInspector')), null, 'errors');
 			$error++;
 		}
 
-		if ($fk_preventionplan < 0) {
+		if ($fkPreventionPlan < 0) {
 			setEventMessages($langs->trans('ErrorFieldRequired', $langs->transnoentitiesnoconv('PreventionPlanLinked')), null, 'errors');
 			$error++;
 		}
@@ -323,12 +335,12 @@ if (empty($reshook)) {
 		if ( ! $error) {
 			$result = $object->update($user, false);
 			if ($result > 0) {
-				$digiriskresources->digirisk_dolibarr_set_resources($db, $user->id, 'FP_EXT_SOCIETY', 'societe', array($extsociety_id), $conf->entity, 'firepermit', $object->id, 0);
-				$digiriskresources->digirisk_dolibarr_set_resources($db, $user->id, 'FP_LABOUR_INSPECTOR', 'societe', array($labour_inspector_id), $conf->entity, 'firepermit', $object->id, 0);
-				$digiriskresources->digirisk_dolibarr_set_resources($db, $user->id, 'FP_LABOUR_INSPECTOR_ASSIGNED', 'socpeople', array($labour_inspector_contact_id), $conf->entity, 'firepermit', $object->id, 0);
+				$digiriskresources->setDigiriskResources($db, $user->id, 'ExtSociety', 'societe', array($extSocietyId), $conf->entity, 'firepermit', $object->id, 0);
+				$digiriskresources->setDigiriskResources($db, $user->id, 'LabourInspector', 'societe', array($labourInspectorId), $conf->entity, 'firepermit', $object->id, 0);
+				$digiriskresources->setDigiriskResources($db, $user->id, 'LabourInspectorAssigned', 'socpeople', array($labourInspectorContactId), $conf->entity, 'firepermit', $object->id, 0);
 
-				$signatory->setSignatory($object->id, 'firepermit', 'user', array($maitre_oeuvre_id), 'FP_MAITRE_OEUVRE');
-				$signatory->setSignatory($object->id, 'firepermit', 'socpeople', array($extresponsible_id), 'FP_EXT_SOCIETY_RESPONSIBLE');
+				$signatory->setSignatory($object->id, 'firepermit', 'user', array($masterWorkerId), 'MasterWorker');
+				$signatory->setSignatory($object->id, 'firepermit', 'socpeople', array($extResponsibleId), 'ExtSocietyResponsible');
 
 				// Update fire permit OK
 				$urltogo = str_replace('__ID__', $result, $backtopage);
@@ -364,47 +376,47 @@ if (empty($reshook)) {
 	// Action to add line
 	if ($action == 'addLine' && $permissiontoadd) {
 		// Get parameters
-		$actions_description = GETPOST('actionsdescription');
-		$used_equipment       = GETPOST('used_equipment');
-		$location            = GETPOST('fk_element');
-		$risk_category_id    = GETPOST('risk_category_id');
-		$parent_id           = GETPOST('parent_id');
+		$actionsDescription = GETPOST('actionsdescription');
+		$usedEquipment      = GETPOST('used_equipment');
+		$location           = GETPOST('fk_element');
+		$riskCategoryId     = GETPOST('risk_category_id');
+		$parentId           = GETPOST('parent_id');
 
 		// Initialize object firepermit line
-		$objectline->date_creation = $object->db->idate($now);
-		$objectline->ref           = $refFirePermitDetMod->getNextValue($objectline);
-		$objectline->entity        = $conf->entity;
-		$objectline->description   = $actions_description;
-		$objectline->category      = $risk_category_id;
-		$objectline->used_equipment = $used_equipment;
-		$objectline->fk_firepermit = $parent_id;
-		$objectline->fk_element    = $location;
+		$objectLine->date_creation  = $object->db->idate($now);
+		$objectLine->ref            = $refFirePermitDetMod->getNextValue($objectLine);
+		$objectLine->entity         = $conf->entity;
+		$objectLine->description    = $actionsDescription;
+		$objectLine->category       = $riskCategoryId;
+		$objectLine->used_equipment = $usedEquipment;
+		$objectLine->fk_firepermit  = $parentId;
+		$objectLine->fk_element     = $location;
 
 		// Check parameters
-		if ($parent_id < 1) {
+		if ($parentId < 1) {
 			setEventMessages($langs->trans('ErrorFieldRequired', $langs->transnoentitiesnoconv('Location')), null, 'errors');
 			$error++;
 		}
 
-		if ($risk_category_id < 0 || $risk_category_id == 'undefined') {
+		if ($riskCategoryId < 0 || $riskCategoryId == 'undefined') {
 			setEventMessages($langs->trans('ErrorFieldRequired', $langs->transnoentitiesnoconv('INRSRisk')), null, 'errors');
 			$error++;
 		}
 
 		if ( ! $error) {
-			$result = $objectline->insert($user, false);
+			$result = $objectLine->create($user, false);
 			if ($result > 0) {
 				// Creation fire permit line OK
-				setEventMessages($langs->trans('AddFirePermitLine') . ' ' . $objectline->ref . ' ' . $langs->trans('FirePermitMessage'), array());
-				$objectline->call_trigger('FIREPERMITDET_CREATE', $user);
+				setEventMessages($langs->trans('AddFirePermitLine') . ' ' . $objectLine->ref . ' ' . $langs->trans('FirePermitMessage'), array());
+				$objectLine->call_trigger('FIREPERMITDET_CREATE', $user);
 				$urltogo = str_replace('__ID__', $result, $backtopage);
 				$urltogo = preg_replace('/--IDFORBACKTOPAGE--/', $id, $urltogo); // New method to autoselect project after a New on another form object creation
 				header("Location: " . $urltogo);
 				exit;
 			} else {
 				// Creation fire permit line KO
-				if ( ! empty($objectline->errors)) setEventMessages(null, $objectline->errors, 'errors');
-				else setEventMessages($objectline->error, null, 'errors');
+				if ( ! empty($objectLine->errors)) setEventMessages(null, $objectLine->errors, 'errors');
+				else setEventMessages($objectLine->error, null, 'errors');
 			}
 		}
 	}
@@ -412,38 +424,38 @@ if (empty($reshook)) {
 	// Action to update line
 	if ($action == 'updateLine' && $permissiontoadd) {
 		// Get parameters
-		$actions_description = GETPOST('actionsdescription');
-		$used_equipment       = GETPOST('used_equipment');
-		$location            = GETPOST('fk_element');
-		$risk_category_id    = GETPOST('risk_category_id');
-		$parent_id           = GETPOST('parent_id');
+		$actionsDescription = GETPOST('actionsdescription');
+		$usedEquipment      = GETPOST('used_equipment');
+		$location           = GETPOST('fk_element');
+		$riskCategoryId     = GETPOST('risk_category_id');
+		$parentId           = GETPOST('parent_id');
 
-		$objectline->fetch($lineid);
+		$objectLine->fetch($lineid);
 
 		// Initialize object fire permit line
-		$objectline->description   = $actions_description;
-		$objectline->category      = $risk_category_id;
-		$objectline->used_equipment = $used_equipment;
-		$objectline->fk_firepermit = $parent_id;
-		$objectline->fk_element    = $location;
+		$objectLine->description    = $actionsDescription;
+		$objectLine->category       = $riskCategoryId;
+		$objectLine->used_equipment = $usedEquipment;
+		$objectLine->fk_firepermit  = $parentId;
+		$objectLine->fk_element     = $location;
 
 		// Check parameters
-		if ($parent_id < 1) {
+		if ($parentId < 1) {
 			setEventMessages($langs->trans('ErrorFieldRequired', $langs->transnoentitiesnoconv('Location')), null, 'errors');
 			$error++;
 		}
-		if ($risk_category_id < 0) {
+		if ($riskCategoryId < 0) {
 			setEventMessages($langs->trans('ErrorFieldRequired', $langs->transnoentitiesnoconv('INRSRisk')), null, 'errors');
 			$error++;
 		}
 
 		if ( ! $error) {
-			$result = $objectline->update($user, false);
+			$result = $objectLine->update($user, false);
 			if ($result > 0) {
 				// Update fire permit line OK
-				setEventMessages($langs->trans('UpdateFirePermitLine') . ' ' . $objectline->ref . ' ' . $langs->trans('FirePermitMessage'), array());
+				setEventMessages($langs->trans('UpdateFirePermitLine') . ' ' . $objectLine->ref . ' ' . $langs->trans('FirePermitMessage'), array());
 				$urltogo = str_replace('__ID__', $result, $backtopage);
-				$urltogo = preg_replace('/--IDFORBACKTOPAGE--/', $parent_id, $urltogo); // New method to autoselect project after a New on another form object creation
+				$urltogo = preg_replace('/--IDFORBACKTOPAGE--/', $parentId, $urltogo); // New method to autoselect project after a New on another form object creation
 				header("Location: " . $urltogo);
 				exit;
 			} else {
@@ -456,13 +468,13 @@ if (empty($reshook)) {
 
 	// Action to delete line
 	if ($action == 'deleteline' && $permissiontodelete) {
-		$objectline->fetch($lineid);
-		$result = $objectline->delete($user, false);
+		$objectLine->fetch($lineid);
+		$result = $objectLine->delete($user, false);
 		if ($result > 0) {
 			// Deletion fire permit line OK
-			setEventMessages($langs->trans('DeleteFirePermitLine') . ' ' . $objectline->ref . ' ' . $langs->trans('FirePermitMessage'), array());
+			setEventMessages($langs->trans('DeleteFirePermitLine') . ' ' . $objectLine->ref . ' ' . $langs->trans('FirePermitMessage'), array());
 			$urltogo = str_replace('__ID__', $result, $backtopage);
-			$urltogo = preg_replace('/--IDFORBACKTOPAGE--/', $parent_id, $urltogo); // New method to autoselect project after a New on another form object creation
+			$urltogo = preg_replace('/--IDFORBACKTOPAGE--/', $parentId, $urltogo); // New method to autoselect project after a New on another form object creation
 			header("Location: " . $urltogo);
 			exit;
 		} else {
@@ -472,87 +484,12 @@ if (empty($reshook)) {
 		}
 	}
 
-	// Action to build doc
-	if (($action == 'builddoc' || GETPOST('forcebuilddoc')) && $permissiontoadd) {
-		$outputlangs = $langs;
-		$newlang     = '';
 
-		if ($conf->global->MAIN_MULTILANGS && empty($newlang) && GETPOST('lang_id', 'aZ09')) $newlang = GETPOST('lang_id', 'aZ09');
-		if ( ! empty($newlang)) {
-			$outputlangs = new Translate("", $conf);
-			$outputlangs->setDefaultLang($newlang);
-		}
-
-		// To be sure vars is defined
-		if (empty($hidedetails)) $hidedetails = 0;
-		if (empty($hidedesc)) $hidedesc       = 0;
-		if (empty($hideref)) $hideref         = 0;
-		if (empty($moreparams)) $moreparams   = null;
-
-		$model = GETPOST('model', 'alpha');
-
-		$moreparams['object'] = $object;
-		$moreparams['user']   = $user;
-
-		$result = $firepermitdocument->generateDocument($model, $outputlangs, $hidedetails, $hidedesc, $hideref, $moreparams);
-		if ($result <= 0) {
-			setEventMessages($object->error, $object->errors, 'errors');
-			$action = '';
-		} else {
-			setEventMessages($langs->trans("FileGenerated") . ' - ' . $firepermitdocument->last_main_doc, null);
-
-			if ($object->status == $object::STATUS_LOCKED) {
-				$signatories = $signatory->fetchSignatory("", $object->id, 'firepermit');
-				if (!empty($signatories) && $signatories > 0) {
-					foreach ($signatories as $arrayRole) {
-						foreach ($arrayRole as $signatory) {
-							$signatory->signature = $langs->transnoentities("FileGenerated");
-							$signatory->update($user, false);
-						}
-					}
-				}
-			}
-
-			$urltoredirect = $_SERVER['REQUEST_URI'];
-			$urltoredirect = preg_replace('/#builddoc$/', '', $urltoredirect);
-			$urltoredirect = preg_replace('/action=builddoc&?/', '', $urltoredirect); // To avoid infinite loop
-			if (preg_match('/forcebuilddoc=1/', $urltoredirect)) {
-				$urltoredirect = preg_replace('/forcebuilddoc=1&?/', '', $urltoredirect); // To avoid infinite loop
-				header('Location: ' . $urltoredirect . '#sendEmail');
-			} else {
-				header('Location: ' . $urltoredirect . '#builddoc');
-			}
-			exit;
-		}
-	}
+	// Actions builddoc, forcebuilddoc, remove_file.
+	require_once __DIR__ . '/../../../saturne/core/tpl/documents/documents_action.tpl.php';
 
 	// Action to generate pdf from odt file
-	require_once __DIR__ . '/../../core/tpl/documents/digiriskdolibarr_manual_pdf_generation_action.tpl.php';
-
-
-	// Delete file in doc form
-	if ($action == 'remove_file' && $permissiontodelete) {
-		if ( ! empty($upload_dir)) {
-			require_once DOL_DOCUMENT_ROOT . '/core/lib/files.lib.php';
-
-			$langs->load("other");
-			$filetodelete = GETPOST('file', 'alpha');
-			$file         = $upload_dir . '/' . $filetodelete;
-			$ret          = dol_delete_file($file, 0, 0, 0, $object);
-			if ($ret) setEventMessages($langs->trans("FileWasRemoved", $filetodelete), null, 'mesgs');
-			else setEventMessages($langs->trans("ErrorFailToDeleteFile", $filetodelete), null, 'errors');
-
-			// Make a redirect to avoid to keep the remove_file into the url that create side effects
-			$urltoredirect = $_SERVER['REQUEST_URI'];
-			$urltoredirect = preg_replace('/#builddoc$/', '', $urltoredirect);
-			$urltoredirect = preg_replace('/action=remove_file&?/', '', $urltoredirect);
-
-			header('Location: ' . $urltoredirect);
-			exit;
-		} else {
-			setEventMessages('BugFoundVarUploaddirnotDefined', null, 'errors');
-		}
-	}
+	require_once __DIR__ . '/../../../saturne/core/tpl/documents/saturne_manual_pdf_generation_action.tpl.php';
 
 	// Action to set status STATUS_INPROGRESS
 	if ($action == 'confirm_setInProgress') {
@@ -573,7 +510,7 @@ if (empty($reshook)) {
 		}
 	}
 
-	// Action to set status STATUS_PENDING_SIGNATURE
+	// Action to set status STATUS_VALIDATED
 	if ($action == 'confirm_setPendingSignature') {
 		$object->fetch($id);
 		if ( ! $error) {
@@ -657,9 +594,9 @@ if (empty($reshook)) {
 	$triggersendname     = 'FIREPERMIT_SENTBYMAIL';
 	$mode                = 'emailfromthirdparty';
 	$trackid             = 'thi' . $object->id;
-	$labour_inspector    = $digiriskresources->fetchResourcesFromObject('FP_LABOUR_INSPECTOR', $object);
-	$labour_inspector_id = $labour_inspector->id;
-	$thirdparty->fetch($labour_inspector_id);
+	$labourInspector    = $digiriskresources->fetchResourcesFromObject('LabourInspector', $object);
+	$labourInspectorId = $labourInspector->id;
+	$thirdparty->fetch($labourInspectorId);
 	$object->thirdparty = $thirdparty;
 
 	if ($action == 'send' && dol_strlen(GETPOST('sendto') < 1)) {
@@ -678,20 +615,17 @@ if (empty($reshook)) {
 $form        = new Form($db);
 $formproject = new FormProjets($db);
 
-$title         = $langs->trans("FirePermit");
-$title_create  = $langs->trans("NewFirePermit");
-$title_edit    = $langs->trans("ModifyFirePermit");
-$object->picto = 'firepermitdocument@digiriskdolibarr';
+$title       = $langs->trans("FirePermit");
+$titleCreate = $langs->trans("NewFirePermit");
+$titleEdit   = $langs->trans("ModifyFirePermit");
 
-$help_url = 'FR:Module_Digirisk#DigiRisk_-_Permis_de_feu';
-$morejs   = array("/digiriskdolibarr/js/digiriskdolibarr.js");
-$morecss  = array("/digiriskdolibarr/css/digiriskdolibarr.css");
+$helpUrl = 'FR:Module_Digirisk#DigiRisk_-_Permis_de_feu';
 
-llxHeader('', $title, $help_url, '', '', '', $morejs, $morecss);
+saturne_header(1, '', $title, $helpUrl);
 
 // Part to create
 if ($action == 'create') {
-	print load_fiche_titre($title_create, '', "digiriskdolibarr32px@digiriskdolibarr");
+	print load_fiche_titre($titleCreate, '', "digiriskdolibarr32px@digiriskdolibarr");
 
 	print '<form method="POST" action="' . $_SERVER["PHP_SELF"] . '">';
 	print '<input type="hidden" name="token" value="' . newToken() . '">';
@@ -728,7 +662,7 @@ if ($action == 'create') {
 	if ($conf->global->DIGIRISKDOLIBARR_FIREPERMIT_MAITRE_OEUVRE < 0 || empty($conf->global->DIGIRISKDOLIBARR_FIREPERMIT_MAITRE_OEUVRE)) {
 		$userlist = $form->select_dolusers(( ! empty(GETPOST('maitre_oeuvre')) ? GETPOST('maitre_oeuvre') : $user->id), '', 0, null, 0, '', '', $conf->entity, 0, 0, 'AND u.statut = 1', 0, '', 'minwidth300', 0, 1);
 		print '<tr>';
-		print '<td class="fieldrequired minwidth400" style="width:10%">' . img_picto('', 'user') . ' ' . $form->editfieldkey('MaitreOeuvre', 'MaitreOeuvre_id', '', $object, 0) . '</td>';
+		print '<td class="fieldrequired minwidth400" style="width:10%">' . img_picto('', 'user') . ' ' . $form->editfieldkey('MasterWorker', 'MaitreOeuvre_id', '', $object, 0) . '</td>';
 		print '<td>';
 		print $form->selectarray('maitre_oeuvre', $userlist, ( ! empty(GETPOST('maitre_oeuvre')) ? GETPOST('maitre_oeuvre') : $user->id), $langs->trans('SelectUser'), null, null, null, "40%", 0, 0, '', 'minwidth300', 1);
 		print ' <a href="' . DOL_URL_ROOT . '/user/card.php?action=create&backtopage=' . urlencode($_SERVER["PHP_SELF"] . '?action=create') . '" target="_blank"><span class="fa fa-plus-circle valignmiddle paddingleft" title="' . $langs->trans("AddUser") . '"></span></a>';
@@ -736,7 +670,7 @@ if ($action == 'create') {
 	} else {
 		$usertmp->fetch($conf->global->DIGIRISKDOLIBARR_FIREPERMIT_MAITRE_OEUVRE);
 		print '<tr>';
-		print '<td class="fieldrequired minwidth400" style="width:10%">' . img_picto('', 'user') . ' ' . $form->editfieldkey('MaitreOeuvre', 'MaitreOeuvre_id', '', $object, 0) . '</td>';
+		print '<td class="fieldrequired minwidth400" style="width:10%">' . img_picto('', 'user') . ' ' . $form->editfieldkey('MasterWorker', 'MaitreOeuvre_id', '', $object, 0) . '</td>';
 		print '<td>' . $usertmp->getNomUrl(1) . '</td>';
 		print '<input type="hidden" name="maitre_oeuvre" value="' . $conf->global->DIGIRISKDOLIBARR_FIREPERMIT_MAITRE_OEUVRE . '">';
 		print '</td></tr>';
@@ -746,18 +680,18 @@ if ($action == 'create') {
 	print '<tr><td class="fieldrequired minwidth400">' . img_picto('', 'building') . ' ' . $langs->trans("ExtSociety") . '</td><td>';
 	$events    = array();
 	$events[1] = array('method' => 'getContacts', 'url' => dol_buildpath('/custom/digiriskdolibarr/core/ajax/contacts.php?showempty=1', 1), 'htmlname' => 'ext_society_responsible', 'params' => array('add-customer-contact' => 'disabled'));
-	print $form->select_company(GETPOST('ext_society'), 'ext_society', '', 'SelectThirdParty', 1, 0, $events, 0, 'minwidth300');
+	print $form->select_company(GETPOST('ext_society'), 'ext_society', '', 'SelectThirdParty', 1, 0, $events, 0, 'maxwidth400');
 	print ' <a href="' . DOL_URL_ROOT . '/societe/card.php?action=create&backtopage=' . urlencode($_SERVER["PHP_SELF"] . '?action=create') . '" target="_blank"><span class="fa fa-plus-circle valignmiddle paddingleft" title="' . $langs->trans("AddThirdParty") . '"></span></a>';
 	print '</td></tr>';
 
-	$ext_society_responsible_id = GETPOST('ext_society_responsible');
+	$extSocietyResponsibleId = GETPOST('ext_society_responsible');
 
 	//External responsible -- Responsable de la société extérieure
 	print '<tr><td class="fieldrequired minwidth400">';
 	$htmltext = img_picto('', 'address') . ' ' . $langs->trans("ExtSocietyResponsible");
 	print $htmltext;
 	print '</td><td>';
-	print $form->selectcontacts((empty(GETPOST('ext_society', 'int')) ? -1 : GETPOST('ext_society', 'int')), $ext_society_responsible_id, 'ext_society_responsible', 1, '', '', 1, 'minwidth100imp widthcentpercentminusxx maxwidth400');
+	print $form->selectcontacts((empty(GETPOST('ext_society', 'int')) ? -1 : GETPOST('ext_society', 'int')), $extSocietyResponsibleId, 'ext_society_responsible', 1, '', '', 1, 'minwidth100imp widthcentpercentminusxx maxwidth400');
 	print '</td></tr>';
 
 	//Labour inspector Society -- Entreprise Inspecteur du travail
@@ -767,11 +701,11 @@ if ($action == 'create') {
 	print '<td>';
 	$events    = array();
 	$events[1] = array('method' => 'getContacts', 'url' => dol_buildpath('/custom/digiriskdolibarr/core/ajax/contacts.php?showempty=1', 1), 'htmlname' => 'labour_inspector_contact', 'params' => array('add-customer-contact' => 'disabled'));
-	print $form->select_company((GETPOST('labour_inspector') ? GETPOST('labour_inspector') : ($allLinks['LabourInspectorSociety']->id[0] ?: 0)), 'labour_inspector', '', 'SelectThirdParty', 1, 0, $events, 0, 'minwidth300');
+	print $form->select_company((GETPOST('labour_inspector') ? GETPOST('labour_inspector') : ($allLinks['LabourInspectorSociety']->id[0] ?: 0)), 'labour_inspector', '', 'SelectThirdParty', 1, 0, $events, 0, 'maxwidth400');
 	print ' <a href="' . DOL_URL_ROOT . '/societe/card.php?action=create&backtopage=' . urlencode($_SERVER["PHP_SELF"] . '?action=create') . '" target="_blank"><span class="fa fa-plus-circle valignmiddle paddingleft" title="' . $langs->trans("AddThirdParty") . '"></span></a>';
 	print '<a href="' . DOL_URL_ROOT . '/custom/digiriskdolibarr/admin/securityconf.php' . '" target="_blank">' . $langs->trans("ConfigureLabourInspector") . '</a>';
 	print '</td></tr>';
-	$labour_inspector_contact_id        = (GETPOST('labour_inspector_contact') ? GETPOST('labour_inspector_contact') : ($allLinks['LabourInspectorContact']->id[0] ?: -1));
+	$labourInspectorContactId = (GETPOST('labour_inspector_contact') ? GETPOST('labour_inspector_contact') : ($allLinks['LabourInspectorContact']->id[0] ?: -1));
 
 	if ( ! empty($allLinks['LabourInspectorContact'])) {
 		$contact->fetch($allLinks['LabourInspectorContact']->id[0]);
@@ -782,7 +716,7 @@ if ($action == 'create') {
 	$htmltext = img_picto('', 'address') . ' ' . $langs->trans("LabourInspector");
 	print $htmltext;
 	print '</td><td>';
-	print $form->selectcontacts((GETPOST('labour_inspector') ? GETPOST('labour_inspector') : ($allLinks['LabourInspectorSociety']->id[0] ?: -1)), $labour_inspector_contact_id, 'labour_inspector_contact', 1, '', '', 1, 'minwidth100imp widthcentpercentminusxx maxwidth400');
+	print $form->selectcontacts((GETPOST('labour_inspector') ? GETPOST('labour_inspector') : ($allLinks['LabourInspectorSociety']->id[0] ?: -1)), $labourInspectorContactId, 'labour_inspector_contact', 1, '', '', 1, 'minwidth100imp widthcentpercentminusxx maxwidth400');
 	print '</td></tr>';
 
 	//FK PREVENTION PLAN
@@ -808,7 +742,7 @@ if ($action == 'create') {
 
 // Part to edit record
 if (($id || $ref) && $action == 'edit') {
-	print load_fiche_titre($title_edit, '', "digiriskdolibarr32px@digiriskdolibarr");
+	print load_fiche_titre($titleEdit, '', "digiriskdolibarr32px@digiriskdolibarr");
 
 	print '<form method="POST" action="' . $_SERVER["PHP_SELF"] . '">';
 	print '<input type="hidden" name="token" value="' . newToken() . '">';
@@ -819,8 +753,8 @@ if (($id || $ref) && $action == 'edit') {
 
 	print dol_get_fiche_head();
 
-	$object_resources   = $digiriskresources->fetchResourcesFromObject('', $object);
-	$object_signatories = $signatory->fetchSignatory('', $object->id, 'firepermit');
+	$objectResources   = $digiriskresources->fetchResourcesFromObject('', $object);
+	$objectSignatories = $signatory->fetchSignatory('', $object->id, 'firepermit');
 
 	print '<table class="border centpercent tableforfieldedit firepermit-table">' . "\n";
 
@@ -850,12 +784,12 @@ if (($id || $ref) && $action == 'edit') {
 	print '</td></tr>';
 
 	//Maitre d'oeuvre
-	$maitre_oeuvre = is_array($object_signatories['FP_MAITRE_OEUVRE']) ? array_shift($object_signatories['FP_MAITRE_OEUVRE'])->element_id : '';
-	$userlist      = $form->select_dolusers($maitre_oeuvre, '', 1, null, 0, '', '', 0, 0, 0, 'AND u.statut = 1', 0, '', 'minwidth300', 0, 1);
+	$masterWorker = is_array($objectSignatories['MasterWorker']) ? array_shift($objectSignatories['MasterWorker'])->element_id : '';
+	$userlist     = $form->select_dolusers($masterWorker, '', 1, null, 0, '', '', 0, 0, 0, 'AND u.statut = 1', 0, '', 'minwidth300', 0, 1);
 	print '<tr>';
-	print '<td class="fieldrequired minwidth400" style="width:10%">' . img_picto('', 'user') . ' ' . $form->editfieldkey('MaitreOeuvre', 'MaitreOeuvre_id', '', $object, 0) . '</td>';
+	print '<td class="fieldrequired minwidth400" style="width:10%">' . img_picto('', 'user') . ' ' . $form->editfieldkey('MasterWorker', 'MaitreOeuvre_id', '', $object, 0) . '</td>';
 	print '<td>';
-	print $form->selectarray('maitre_oeuvre', $userlist, $maitre_oeuvre, 1, null, null, null, "40%", 0, 0, 0, 'minwidth300', 1);
+	print $form->selectarray('maitre_oeuvre', $userlist, $masterWorker, 1, null, null, null, "40%", 0, 0, 0, 'minwidth300', 1);
 	print ' <a href="' . DOL_URL_ROOT . '/user/card.php?action=create&backtopage=' . urlencode($_SERVER["PHP_SELF"] . '?action=create') . '" target="_blank"><span class="fa fa-plus-circle valignmiddle paddingleft" title="' . $langs->trans("AddUser") . '"></span></a>';
 	print '</td></tr>';
 
@@ -870,32 +804,32 @@ if (($id || $ref) && $action == 'edit') {
 	if ( ! empty($user->socid)) {
 		print $form->select_company($user->socid, 'ext_society', '', 1, 1, 0, $events, 0, 'minwidth300');
 	} else {
-		$ext_society_id = is_array($object_resources['FP_EXT_SOCIETY']) ? array_shift($object_resources['FP_EXT_SOCIETY'])->id : '';
-		print $form->select_company($ext_society_id, 'ext_society', '', 'SelectThirdParty', 1, 0, $events, 0, 'minwidth300');
+		$extSocietyId = is_array($objectResources['ExtSociety']) ? array_shift($objectResources['ExtSociety'])->id : '';
+		print $form->select_company($extSocietyId, 'ext_society', '', 'SelectThirdParty', 1, 0, $events, 0, 'minwidth300');
 	}
 	print ' <a href="' . DOL_URL_ROOT . '/societe/card.php?action=create&backtopage=' . urlencode($_SERVER["PHP_SELF"] . '?action=create') . '" target="_blank"><span class="fa fa-plus-circle valignmiddle paddingleft" title="' . $langs->trans("AddThirdParty") . '"></span></a>';
 	print '</td></tr>';
 
-	$ext_society_responsible_id = is_array($object_signatories['FP_EXT_SOCIETY_RESPONSIBLE']) ? array_shift($object_signatories['FP_EXT_SOCIETY_RESPONSIBLE'])->element_id : GETPOST('ext_society_responsible');
+	$extSocietyResponsibleId = is_array($objectSignatories['ExtSocietyResponsible']) ? array_shift($objectSignatories['ExtSocietyResponsible'])->element_id : GETPOST('ext_society_responsible');
 
-	if ($ext_society_responsible_id > 0) {
-		$contact->fetch($ext_society_responsible_id);
+	if ($extSocietyResponsibleId > 0) {
+		$contact->fetch($extSocietyResponsibleId);
 	}
 
 	//External responsible -- Responsable de la société extérieure
-	$ext_society = $digiriskresources->fetchResourcesFromObject('FP_EXT_SOCIETY', $object);
+	$extSociety = $digiriskresources->fetchResourcesFromObject('ExtSociety', $object);
 	print '<tr class="oddeven"><td class="fieldrequired minwidth400">';
 	$htmltext = img_picto('', 'address') . ' ' . $langs->trans("ExtSocietyResponsible");
 	print $htmltext;
 	print '</td><td>';
-	print $form->selectcontacts($ext_society->id, dol_strlen($contact->email) ? $ext_society_responsible_id : -1, 'ext_society_responsible', '', 0, '', 1, 'minwidth100imp widthcentpercentminusxx maxwidth400');
+	print $form->selectcontacts($extSociety->id, dol_strlen($contact->email) ? $extSocietyResponsibleId : -1, 'ext_society_responsible', '', 0, '', 1, 'minwidth100imp widthcentpercentminusxx maxwidth400');
 	print '</td></tr>';
 
-	if (is_array($object_resources['FP_LABOUR_INSPECTOR']) && $object_resources['FP_LABOUR_INSPECTOR'] > 0) {
-		$labour_inspector_society = array_shift($object_resources['FP_LABOUR_INSPECTOR']);
+	if (is_array($objectResources['LabourInspector']) && $objectResources['LabourInspector'] > 0) {
+		$labourInspectorSociety = array_shift($objectResources['LabourInspector']);
 	}
-	if (is_array($object_resources['FP_LABOUR_INSPECTOR_ASSIGNED']) && $object_resources['FP_LABOUR_INSPECTOR_ASSIGNED'] > 0) {
-		$labour_inspector_assigned = array_shift($object_resources['FP_LABOUR_INSPECTOR_ASSIGNED']);
+	if (is_array($objectResources['LabourInspectorAssigned']) && $objectResources['LabourInspectorAssigned'] > 0) {
+		$labourInspector_assigned = array_shift($objectResources['LabourInspectorAssigned']);
 	}
 	//Labour inspector Society -- Entreprise Inspecteur du travail
 	print '<tr><td class="fieldrequired minwidth400">';
@@ -904,24 +838,24 @@ if (($id || $ref) && $action == 'edit') {
 	print '<td>';
 	$events    = array();
 	$events[1] = array('method' => 'getContacts', 'url' => dol_buildpath('/custom/digiriskdolibarr/core/ajax/contacts.php?showempty=1', 1), 'htmlname' => 'labour_inspector_contact', 'params' => array('add-customer-contact' => 'disabled'));
-	print $form->select_company($labour_inspector_society->id, 'labour_inspector', '', 'SelectThirdParty', 1, 0, $events, 0, 'minwidth300');
+	print $form->select_company($labourInspectorSociety->id, 'labour_inspector', '', 'SelectThirdParty', 1, 0, $events, 0, 'minwidth300');
 	print ' <a href="' . DOL_URL_ROOT . '/societe/card.php?action=create&backtopage=' . urlencode($_SERVER["PHP_SELF"] . '?action=create') . '" target="_blank"><span class="fa fa-plus-circle valignmiddle paddingleft" title="' . $langs->trans("AddThirdParty") . '"></span></a>';
 	print '<a href="' . DOL_URL_ROOT . '/custom/digiriskdolibarr/admin/securityconf.php' . '" target="_blank">' . $langs->trans("ConfigureLabourInspector") . '</a>';
 	print '</td></tr>';
 
-	$labour_inspector_contact           = ! empty($digiriskresources->fetchResourcesFromObject('FP_LABOUR_INSPECTOR_ASSIGNED', $object)) ? $digiriskresources->fetchResourcesFromObject('FP_LABOUR_INSPECTOR_ASSIGNED', $object) : GETPOST('labour_inspector_contact');
+	$labourInspectorContact = ! empty($digiriskresources->fetchResourcesFromObject('LabourInspectorAssigned', $object)) ? $digiriskresources->fetchResourcesFromObject('LabourInspectorAssigned', $object) : GETPOST('labour_inspector_contact');
 
-	if ($labour_inspector_contact->id > 0) {
-		$contact->fetch($labour_inspector_contact->id);
+	if ($labourInspectorContact->id > 0) {
+		$contact->fetch($labourInspectorContact->id);
 	}
 
 	//Labour inspector -- Inspecteur du travail
-	$labour_inspector_society = $digiriskresources->fetchResourcesFromObject('FP_LABOUR_INSPECTOR', $object);
+	$labourInspectorSociety = $digiriskresources->fetchResourcesFromObject('LabourInspector', $object);
 	print '<tr><td class="fieldrequired minwidth400">';
 	$htmltext = img_picto('', 'address') . ' ' . $langs->trans("LabourInspector");
 	print $htmltext;
 	print '</td><td>';
-	print $form->selectcontacts($labour_inspector_society->id, dol_strlen($contact->email) ? $labour_inspector_contact->id : -1, 'labour_inspector_contact', '', 0, '', 1, 'minwidth100imp widthcentpercentminusxx maxwidth400');
+	print $form->selectcontacts($labourInspectorSociety->id, dol_strlen($contact->email) ? $labourInspectorContact->id : -1, 'labour_inspector_contact', '', 0, '', 1, 'minwidth100imp widthcentpercentminusxx maxwidth400');
 	print '</td></tr>';
 
 	//FK PREVENTION PLAN
@@ -997,22 +931,18 @@ if ((empty($action) || ($action != 'create' && $action != 'edit'))) {
 	// ------------------------------------------------------------
 	$res = $object->fetch_optionals();
 
-	$head = firepermitPrepareHead($object);
-	print dol_get_fiche_head($head, 'firepermitCard', $title, -1, "digiriskdolibarr@digiriskdolibarr");
+	saturne_get_fiche_head($object, 'card', $title);
 
 	dol_strlen($object->label) ? $morehtmlref = '<span>' . ' - ' . $object->label . '</span>' : '';
 	$morehtmlref                             .= '<div class="refidno">';
 	// External Society -- Société extérieure
-	$ext_society  = $digiriskresources->fetchResourcesFromObject('FP_EXT_SOCIETY', $object);
-	$morehtmlref .= $langs->trans('ExtSociety') . ' : ' . ($ext_society ? $ext_society->getNomUrl(1) : '');
-	// Project
-	$project->fetch($object->fk_project);
-	$morehtmlref .= '<br>' . $langs->trans('Project') . ' : ' . getNomUrlProject($project, 1, 'blank', 1);
+	$extSociety  = $digiriskresources->fetchResourcesFromObject('ExtSociety', $object);
+	$morehtmlref .= $langs->trans('ExtSociety') . ' : ' . $extSociety->getNomUrl(1);
 	$morehtmlref .= '</div>';
 
 	$linkback = '<a href="' . dol_buildpath('/digiriskdolibarr/view/firepermit/firepermit_list.php', 1) . '">' . $langs->trans("BackToList") . '</a>';
 
-	digirisk_banner_tab($object, 'id', $linkback, 1, 'rowid', 'ref', $morehtmlref, '', 0, '', $object->getLibStatut(5));
+	saturne_banner_tab($object, 'id', $linkback, 1, 'rowid', 'ref', $morehtmlref);
 
 	print '<div class="div-table-responsive">';
 	print '<div class="fichecenter">';
@@ -1065,9 +995,9 @@ if ((empty($action) || ($action != 'create' && $action != 'edit'))) {
 	print $langs->trans("LabourInspectorSociety");
 	print '</td>';
 	print '<td>';
-	$labour_inspector = $digiriskresources->fetchResourcesFromObject('FP_LABOUR_INSPECTOR', $object);
-	if ($labour_inspector > 0) {
-		print $labour_inspector->getNomUrl(1);
+	$labourInspector = $digiriskresources->fetchResourcesFromObject('LabourInspector', $object);
+	if ($labourInspector > 0) {
+		print $labourInspector->getNomUrl(1);
 	}
 	print '</td></tr>';
 
@@ -1076,9 +1006,9 @@ if ((empty($action) || ($action != 'create' && $action != 'edit'))) {
 	print $langs->trans("LabourInspector");
 	print '</td>';
 	print '<td>';
-	$labour_inspector_contact = $digiriskresources->fetchResourcesFromObject('FP_LABOUR_INSPECTOR_ASSIGNED', $object);
-	if ($labour_inspector_contact > 0) {
-		print $labour_inspector_contact->getNomUrl(1);
+	$labourInspectorContact = $digiriskresources->fetchResourcesFromObject('LabourInspectorAssigned', $object);
+	if ($labourInspectorContact > 0) {
+		print $labourInspectorContact->getNomUrl(1);
 	}
 	print '</td></tr>';
 
@@ -1087,12 +1017,13 @@ if ((empty($action) || ($action != 'create' && $action != 'edit'))) {
 	print $langs->trans("Attendants");
 	print '</td>';
 	print '<td>';
-	$attendants  = count($signatory->fetchSignatory('FP_MAITRE_OEUVRE', $object->id, 'firepermit'));
-	$attendants += count($signatory->fetchSignatory('FP_EXT_SOCIETY_RESPONSIBLE', $object->id, 'firepermit'));
-	$attendants += count($signatory->fetchSignatory('FP_EXT_SOCIETY_INTERVENANTS', $object->id, 'firepermit'));
-	$url         = dol_buildpath('/custom/digiriskdolibarr/view/firepermit/firepermit_attendants.php?id=' . $object->id, 3);
-	print '<a href="' . $url . '">' . $attendants . '</a>';
-	print '<a class="' . ($object->status == 1 ? 'butAction' : 'butActionRefused classfortooltip') . '" id="actionButtonAddAttendants" title="' . dol_escape_htmltag($langs->trans("FirePermitMustBeInProgress")) . '" href="' . $url . '">' . $langs->trans('AddAttendants') . '</a>';
+	$attendants  = count($signatory->fetchSignatory('MasterWorker', $object->id, 'firepermit'));
+	$attendants += count($signatory->fetchSignatory('ExtSocietyResponsible', $object->id, 'firepermit'));
+	$attendants += count($signatory->fetchSignatory('ExtSocietyAttendant', $object->id, 'firepermit'));
+	$url         = dol_buildpath('/custom/saturne/view/saturne_attendants.php?id=' . $object->id . '&module_name=DigiriskDolibarr&object_type=' . $object->element . '&document_type=FirePermitDocument', 3);
+	$displayButton = $onPhone ? '<i class="fas fa-plus fa-2x"></i>' : '<i class="fas fa-plus"></i> ' . $langs->trans('AddAttendants');
+	print '<a ' . ($object->status == 1 ? 'href="' .  $url . '"' : '') . '">' . $attendants;
+	print '<span class="' . ($object->status == $object::STATUS_DRAFT ? 'butAction' : 'butActionRefused classfortooltip') . '" id="actionButtonAddAttendants" title="' . dol_escape_htmltag($langs->trans("FirePermitMustBeInProgress")) . '">' .  $displayButton . '</span></a>';
 	print '</td></tr>';
 
 	print '</table>';
@@ -1108,61 +1039,61 @@ if ((empty($action) || ($action != 'create' && $action != 'edit'))) {
 		$reshook    = $hookmanager->executeHooks('addMoreActionsButtons', $parameters, $object, $action); // Note that $action and $object may have been modified by hook
 		if ($reshook < 0) setEventMessages($hookmanager->error, $hookmanager->errors, 'errors');
 
-		if (empty($reshook)) {
-			print '<a class="' . ($object->status == 1 ? 'butAction' : 'butActionRefused classfortooltip') . '" id="actionButtonEdit" title="' . ($object->status == 1 ? '' : dol_escape_htmltag($langs->trans("FirePermitMustBeInProgress"))) . '" href="' . ($object->status == 1 ? ($_SERVER["PHP_SELF"] . '?id=' . $object->id . '&action=edit') : '#') . '">' . $langs->trans("Modify") . '</a>';
-			print '<span class="' . ($object->status == 1 ? 'butAction' : 'butActionRefused classfortooltip') . '" id="' . ($object->status == 1 ? 'actionButtonPendingSignature' : '') . '" title="' . ($object->status == 1 ? '' : dol_escape_htmltag($langs->trans("FirePermitMustBeInProgressToValidate"))) . '" href="' . ($object->status == 1 ? ($_SERVER["PHP_SELF"] . '?id=' . $object->id . '&action=setPendingSignature') : '#') . '">' . $langs->trans("Validate") . '</span>';
-			print '<span class="' . ($object->status == 2 ? 'butAction' : 'butActionRefused classfortooltip') . '" id="' . ($object->status == 2 ? 'actionButtonInProgress' : '') . '" title="' . ($object->status == 2 ? '' : dol_escape_htmltag($langs->trans("FirePermitMustBeValidated"))) . '" href="' . ($object->status == 2 ? ($_SERVER["PHP_SELF"] . '?id=' . $object->id . '&action=setInProgress') : '#') . '">' . $langs->trans("ReOpenDigi") . '</span>';
-			print '<a class="' . (($object->status == 2 && ! $signatory->checkSignatoriesSignatures($object->id, 'firepermit')) ? 'butAction' : 'butActionRefused classfortooltip') . '" id="actionButtonSign" title="' . (($object->status == 2 && ! $signatory->checkSignatoriesSignatures($object->id, 'firepermit')) ? '' : dol_escape_htmltag($langs->trans("FirePermitMustBeValidatedToSign"))) . '" href="' . (($object->status == 2 && ! $signatory->checkSignatoriesSignatures($object->id, 'firepermit')) ? $url : '#') . '">' . $langs->trans("Sign") . '</a>';
-			print '<span class="' . (($object->status == 2 && $signatory->checkSignatoriesSignatures($object->id, 'firepermit')) ? 'butAction' : 'butActionRefused classfortooltip') . '" id="' . (($object->status == 2 && $signatory->checkSignatoriesSignatures($object->id, 'firepermit')) ? 'actionButtonLock' : '') . '" title="' . (($object->status == 2 && $signatory->checkSignatoriesSignatures($object->id, 'firepermit')) ? '' : dol_escape_htmltag($langs->trans("AllSignatoriesMustHaveSigned"))) . '">' . $langs->trans("Lock") . '</span>';
-
-			$objref    = dol_sanitizeFileName($object->ref);
-			$dir_files = $firepermitdocument->element . '/' . $objref;
-			$filedir   = $upload_dir . '/' . $dir_files;
-
-			$filelist = dol_dir_list($filedir, 'files');
-			if (!empty($filelist) && is_array($filelist)) {
-				foreach ($filelist as $file) {
-					if (preg_match('/sign/', $file['name'])) {
-						$filesigned = 1;
-					}
-				}
-			}
-
-			if ($filesigned == 0) {
-				$modellist = getListOfModelsDigirisk($db, 'firepermitdocument');
-				if (!empty($modellist)) {
-					asort($modellist);
-					$modellist = array_filter($modellist, 'remove_index');
-					if (is_array($modellist)) {
-						foreach ($modellist as $key => $modellistsingle) {
-							$arrayvalues = preg_replace('/template_/', '', $modellistsingle);
-							$modellist[$key] = $langs->trans($arrayvalues);
-							$constforval = 'DIGIRISKDOLIBARR_FIREPERMITDOCUMENT_DEFAULT_MODEL';
-							$defaultmodel = preg_replace('/_odt/', '.odt', $conf->global->$constforval);
-							if ('template_' . $defaultmodel == $modellistsingle) {
-								$modelselected = $key;
-							}
-						}
-					}
-				}
-				print '<a class="' . ($object->status == 3 ? 'butAction' : 'butActionRefused classfortooltip') . '" id="actionButtonSign" title="' . dol_escape_htmltag($langs->trans("FirePermitMustBeLockedToSendEmail")) . '" href="' . ($object->status == 3 ? ($_SERVER['PHP_SELF'] . '?id=' . $object->id . '&action=presend&forcebuilddoc=1&model='.$modelselected.'&mode=init&sendto=' . $allLinks['LabourInspectorSociety']->id[0]) : '#') . '">' . $langs->trans('SendMail') . '</a>';
+		if (empty($reshook) && $permissiontoadd) {
+			// Modify
+			$displayButton = $onPhone ? '<i class="fas fa-edit fa-2x"></i>' : '<i class="fas fa-edit"></i>' . ' ' . $langs->trans('Modify');
+			if ($object->status == $object::STATUS_DRAFT) {
+				print '<a class="butAction" id="actionButtonEdit" href="' . $_SERVER['PHP_SELF'] . '?id=' . $object->id . '&action=edit&token=' . newToken() . '">' . $displayButton . '</a>';
 			} else {
-				print '<a class="' . ($object->status == 3 ? 'butAction' : 'butActionRefused classfortooltip') . '" id="actionButtonSign" title="' . dol_escape_htmltag($langs->trans("FirePermitMustBeLockedToSendEmail")) . '" href="' . ($object->status == 3 ? ($_SERVER['PHP_SELF'] . '?id=' . $object->id . '&action=presend&mode=init&sendto=' . $allLinks['LabourInspectorSociety']->id[0].'#sendEmail') : '#') . '">' . $langs->trans('SendMail') . '</a>';
+				print '<span class="butActionRefused classfortooltip" title="' . dol_escape_htmltag($langs->trans('PreventionPlanMustBeInProgress')) . '">' . $displayButton . '</span>';
 			}
 
-			print '<a class="' . ($object->status == 3 ? 'butAction' : 'butActionRefused classfortooltip') . '" id="actionButtonArchive" title="' . ($object->status == 3 ? '' : dol_escape_htmltag($langs->trans("FirePermitMustBeLocked"))) . '" href="' . ($object->status == 3 ? ($_SERVER["PHP_SELF"] . '?id=' . $object->id . '&action=setArchived') : '#') . '">' . $langs->trans("Archive") . '</a>';
-			print '<span class="butAction" id="actionButtonClone" title="" href="' . $_SERVER["PHP_SELF"] . '?id=' . $object->id . '&action=clone' . '">' . $langs->trans("ToClone") . '</span>';
-			// Delete button (need delete permission)
-			if ($permissiontodelete) {
-				print '<a class="' . ($object->status != 0 ? 'butActionDelete' : 'butActionRefused classfortooltip') . '" id="actionButtonDelete" title="' . ($object->status != 0 ? '' : dol_escape_htmltag($langs->trans("FirePermitAlreadyDeleted"))) . '" href="' . ($object->status != 0 ? ($_SERVER["PHP_SELF"] . '?id=' . $object->id . '&action=delete') : '#') . '">' . $langs->trans("Delete") . '</a>';
+			// Validate
+			$displayButton = $onPhone ? '<i class="fas fa-check fa-2x"></i>' : '<i class="fas fa-check"></i>' . ' ' . $langs->trans('Validate');
+			if ($object->status == $object::STATUS_DRAFT) {
+				print '<a class="butAction" id="actionButtonPendingSignature">' . $displayButton . '</a>';
+			} else {
+				print '<span class="butActionRefused classfortooltip" title="' . dol_escape_htmltag($langs->trans('PreventionPlanMustBeInProgressToValidate')) . '">' . $displayButton . '</span>';
 			}
 
-			$langs->load("mails");
-			if ($object->date_end == dol_now()) {
-				$object->setArchived($user, false);
+			// ReOpen
+			$displayButton = $onPhone ? '<i class="fas fa-lock-open fa-2x"></i>' : '<i class="fas fa-lock-open"></i>' . ' ' . $langs->trans('ReOpenDoli');
+			if ($object->status == $object::STATUS_VALIDATED) {
+				print '<span class="butAction" id="actionButtonInProgress">' . $displayButton . '</span>';
+			} else {
+				print '<span class="butActionRefused classfortooltip" title="' . dol_escape_htmltag($langs->trans('PreventionPlanMustBeValidated')) . '">' . $displayButton . '</span>';
 			}
+
+			// Sign
+			$displayButton = $onPhone ? '<i class="fas fa-signature fa-2x"></i>' : '<i class="fas fa-signature"></i>' . ' ' . $langs->trans('Sign');
+			if ($object->status == $object::STATUS_VALIDATED && !$signatory->checkSignatoriesSignatures($object->id, $object->element)) {
+				print '<a class="butAction" id="actionButtonSign" href="' . dol_buildpath('/custom/saturne/view/saturne_attendants.php?id=' . $object->id . '&module_name=DigiriskDolibarr&object_type=' . $object->element . '&document_type=PreventionPlanDocument', 3) . '">' . $displayButton . '</a>';
+			} else {
+				print '<span class="butActionRefused classfortooltip" title="' . dol_escape_htmltag($langs->trans('ObjectMustBeValidatedToSign', ucfirst($langs->transnoentities('The' . ucfirst($object->element))))) . '">' . $displayButton . '</span>';
+			}
+
+			// Lock
+			$displayButton = $onPhone ? '<i class="fas fa-lock fa-2x"></i>' : '<i class="fas fa-lock"></i>' . ' ' . $langs->trans('Lock');
+			if ($object->status == $object::STATUS_VALIDATED && $signatory->checkSignatoriesSignatures($object->id, $object->element)) {
+				print '<span class="butAction" id="actionButtonLock">' . $displayButton . '</span>';
+			} else {
+				print '<span class="butActionRefused classfortooltip" title="' . dol_escape_htmltag($langs->trans('AllSignatoriesMustHaveSigned')) . '">' . $displayButton . '</span>';
+			}
+
+			// Archive
+			$displayButton = $onPhone ?  '<i class="fas fa-archive fa-2x"></i>' : '<i class="fas fa-archive"></i>' . ' ' . $langs->trans('Archive');
+			if ($object->status == $object::STATUS_LOCKED) {
+				print '<a class="butAction" href="' . $_SERVER['PHP_SELF'] . '?id=' . $object->id . '&action=setArchived&token=' . newToken() . '">' . $displayButton . '</a>';
+			} else {
+				print '<span class="butActionRefused classfortooltip" title="' . dol_escape_htmltag($langs->trans('ObjectMustBeLockedToArchive', ucfirst($langs->transnoentities('The' . ucfirst($object->element))))) . '">' . $displayButton . '</span>';
+			}
+
+			// Clone
+			$displayButton = $onPhone ? '<i class="fas fa-clone fa-2x"></i>' : '<i class="fas fa-clone"></i>' . ' ' . $langs->trans('ToClone');
+			print '<span class="butAction" id="actionButtonClone">' . $displayButton . '</span>';
 		}
 		print '</div>';
+
 
 		// PREVENTIONPLAN LINES
 		print '<div class="div-table-responsive-no-min" style="overflow-x: unset !important">';
@@ -1177,7 +1108,7 @@ if ((empty($action) || ($action != 'create' && $action != 'edit'))) {
 		$colspan = 3; // Columns: total ht + col edit + col delete
 
 		// Linked prevention plan Lines
-		$preventionplanlines = $preventionplanline->fetchAll('', '', 0, 0, array(), 'AND', $object->fk_preventionplan);
+		$preventionplanlines = $preventionplanline->fetchAll('', '', 0, 0, ['fk_preventionplan' => $object->fk_preventionplan], 'AND');
 
 		print '<tr class="liste_titre">';
 		print '<td><span>' . $langs->trans('Ref.') . '</span></td>';
@@ -1211,9 +1142,9 @@ if ((empty($action) || ($action != 'create' && $action != 'edit'))) {
 					print '<td class="center">'; ?>
 					<div class="table-cell table-50 cell-risk" data-title="Risque">
 						<div class="wpeo-dropdown dropdown-large category-danger padding wpeo-tooltip-event"
-							 aria-label="<?php echo $risk->get_danger_category_name($item) ?>">
+							 aria-label="<?php echo $risk->getDangerCategoryName($item) ?>">
 							<img class="danger-category-pic hover"
-								 src="<?php echo DOL_URL_ROOT . '/custom/digiriskdolibarr/img/categorieDangers/' . $risk->get_danger_category($item) . '.png'; ?>"
+								 src="<?php echo DOL_URL_ROOT . '/custom/digiriskdolibarr/img/categorieDangers/' . $risk->getDangerCategory($item) . '.png'; ?>"
 								 alt=""/>
 						</div>
 					</div>
@@ -1231,8 +1162,8 @@ if ((empty($action) || ($action != 'create' && $action != 'edit'))) {
 					print '-';
 					print '</td>';
 
-//					if (is_object($objectline)) {
-//						print $objectline->showOptionals($extrafields, 'edit', array('style' => $bcnd[$var], 'colspan' => $coldisplay), '', '', 1);
+//					if (is_object($objectLine)) {
+//						print $objectLine->showOptionals($extrafields, 'edit', array('style' => $bcnd[$var], 'colspan' => $coldisplay), '', '', 1);
 //					}
 					print '</tr>';
 				}
@@ -1277,14 +1208,14 @@ if ((empty($action) || ($action != 'create' && $action != 'edit'))) {
 		$colspan = 3; // Columns: total ht + col edit + col delete
 
 		// Fire permit Lines
-		$firepermitlines = $objectline->fetchAll('', '', 0, 0, array(), 'AND', $object->id);
+		$firepermitlines = $objectLine->fetchAll('', '', 0, 0, ['fk_firepermit' => $object->id], 'AND');
 
 		print '<tr class="liste_titre">';
 		print '<td><span>' . $langs->trans('Ref.') . '</span></td>';
 		print '<td>' . $langs->trans('Location') . '</td>';
 		print '<td>' . $form->textwithpicto($langs->trans('ActionsDescription'), $langs->trans("ActionsDescriptionTooltip")) . '</td>';
 		print '<td class="center">' . $form->textwithpicto($langs->trans('INRSRisk'), $langs->trans('INRSRiskTooltip')) . '</td>';
-		print '<td>' . $form->textwithpicto($langs->trans('UsedMaterial'), $langs->trans('UsedMaterialTooltip')) . '</td>';
+		print '<td>' . $form->textwithpicto($langs->trans('UsedEquipment'), $langs->trans('UsedMaterialTooltip')) . '</td>';
 		print '<td class="center" colspan="' . $colspan . '">' . $langs->trans('ActionsFirePermitRisk') . '</td>';
 		print '</tr>';
 
@@ -1304,7 +1235,7 @@ if ((empty($action) || ($action != 'create' && $action != 'edit'))) {
 					print '</td>';
 
 					print '<td class="bordertop nobottom linecollocation">';
-					print $digiriskelement->select_digiriskelement_list($item->fk_element, 'fk_element', '', 0, 0, array(), 0, 0, 'minwidth100', 0, false, 1);
+					print $digiriskelement->selectDigiriskElementList($item->fk_element, 'fk_element', ['customsql' => ' t.rowid NOT IN (' . implode(',', $deletedElements) . ')'], 0, 0,[], 0, 0, 'minwidth200', 0, false, 1);
 					print '</td>';
 
 					$coldisplay++;
@@ -1319,15 +1250,15 @@ if ((empty($action) || ($action != 'create' && $action != 'edit'))) {
 							<input class="input-hidden-danger" type="hidden" name="risk_category_id"
 								   value="<?php echo $item->category ?>"/>
 							<div class="wpeo-dropdown dropdown-large category-danger padding wpeo-tooltip-event"
-								 aria-label="<?php echo $risk->get_fire_permit_danger_category_name($item) ?>">
+								 aria-label="<?php echo $risk->getFirePermitDangerCategoryName($item) ?>">
 								<img class="danger-category-pic hover"
-									 src="<?php echo DOL_URL_ROOT . '/custom/digiriskdolibarr/img/typeDeTravaux/' . $risk->get_fire_permit_danger_category($item) . '.png'; ?>"/>
+									 src="<?php echo DOL_URL_ROOT . '/custom/digiriskdolibarr/img/typeDeTravaux/' . $risk->getFirePermitDangerCategory($item) . '.png'; ?>"/>
 							</div>
 						</div>
 
 						<ul class="dropdown-content wpeo-gridlayout grid-5 grid-gap-0">
 							<?php
-							$dangerCategories = $risk->get_fire_permit_danger_categories();
+							$dangerCategories = $risk->getFirePermitDangerCategories();
 							if ( ! empty($dangerCategories)) :
 								foreach ($dangerCategories as $dangerCategory) : ?>
 									<li class="item dropdown-item wpeo-tooltip-event"
@@ -1357,8 +1288,8 @@ if ((empty($action) || ($action != 'create' && $action != 'edit'))) {
 					print '</td>';
 					print '</tr>';
 
-//					if (is_object($objectline)) {
-//						print $objectline->showOptionals($extrafields, 'edit', array('style' => $bcnd[$var], 'colspan' => $coldisplay), '', '', 1);
+//					if (is_object($objectLine)) {
+//						print $objectLine->showOptionals($extrafields, 'edit', array('style' => $bcnd[$var], 'colspan' => $coldisplay), '', '', 1);
 //					}
 					print '</form>';
 				} else {
@@ -1380,9 +1311,9 @@ if ((empty($action) || ($action != 'create' && $action != 'edit'))) {
 					print '<td class="center">'; ?>
 					<div class="table-cell table-50 cell-risk" data-title="Risque">
 						<div class="wpeo-dropdown dropdown-large category-danger padding wpeo-tooltip-event"
-							 aria-label="<?php echo $risk->get_fire_permit_danger_category_name($item) ?>">
+							 aria-label="<?php echo $risk->getFirePermitDangerCategoryName($item) ?>">
 							<img class="danger-category-pic hover"
-								 src="<?php echo DOL_URL_ROOT . '/custom/digiriskdolibarr/img/typeDeTravaux/' . $risk->get_fire_permit_danger_category($item) . '.png'; ?>"
+								 src="<?php echo DOL_URL_ROOT . '/custom/digiriskdolibarr/img/typeDeTravaux/' . $risk->getFirePermitDangerCategory($item) . '.png'; ?>"
 								 alt=""/>
 						</div>
 					</div>
@@ -1411,8 +1342,8 @@ if ((empty($action) || ($action != 'create' && $action != 'edit'))) {
 						print '</td>';
 					}
 
-//					if (is_object($objectline)) {
-//						print $objectline->showOptionals($extrafields, 'edit', array('style' => $bcnd[$var], 'colspan' => $coldisplay), '', '', 1);
+//					if (is_object($objectLine)) {
+//						print $objectLine->showOptionals($extrafields, 'edit', array('style' => $bcnd[$var], 'colspan' => $coldisplay), '', '', 1);
 //					}
 					print '</tr>';
 				}
@@ -1428,10 +1359,10 @@ if ((empty($action) || ($action != 'create' && $action != 'edit'))) {
 
 			print '<tr>';
 			print '<td>';
-			print $refFirePermitDetMod->getNextValue($objectline);
+			print $refFirePermitDetMod->getNextValue($objectLine);
 			print '</td>';
 			print '<td>';
-			print $digiriskelement->select_digiriskelement_list('', 'fk_element', '', 0, 0, array(), 0, 0, 'minwidth100', 0, false, 1);
+			print $digiriskelement->selectDigiriskElementList('', 'fk_element', ['customsql' => ' t.rowid NOT IN (' . implode(',', $deletedElements) . ')'], 0, 0, array(), 0, 0, 'minwidth200', 0, false, 1);
 			print '</td>';
 
 			$coldisplay++;
@@ -1451,7 +1382,7 @@ if ((empty($action) || ($action != 'create' && $action != 'edit'))) {
 				</div>
 				<ul class="dropdown-content wpeo-gridlayout grid-5 grid-gap-0">
 					<?php
-					$dangerCategories = $risk->get_fire_permit_danger_categories();
+					$dangerCategories = $risk->getFirePermitDangerCategories();
 					if ( ! empty($dangerCategories)) :
 						foreach ($dangerCategories as $dangerCategory) : ?>
 							<li class="item dropdown-item wpeo-tooltip-event" data-is-preset="<?php echo ''; ?>"
@@ -1479,8 +1410,8 @@ if ((empty($action) || ($action != 'create' && $action != 'edit'))) {
 			print '</td>';
 			print '</tr>';
 
-			if (is_object($objectline)) {
-				//              print $objectline->showOptionals($extrafields, 'edit', array('style' => $bcnd[$var], 'colspan' => $coldisplay), '', '', 1);
+			if (is_object($objectLine)) {
+				//              print $objectLine->showOptionals($extrafields, 'edit', array('style' => $bcnd[$var], 'colspan' => $coldisplay), '', '', 1);
 			}
 			print '</form>';
 		}
@@ -1493,8 +1424,8 @@ if ((empty($action) || ($action != 'create' && $action != 'edit'))) {
 		print '<div class="fichecenter"><div class="firepermitDocument fichehalfleft">';
 
 		$objref    = dol_sanitizeFileName($object->ref);
-		$dir_files = $firepermitdocument->element . '/' . $objref;
-		$filedir   = $upload_dir . '/' . $dir_files;
+		$dirFiles = $document->element . '/' . $objref;
+		$filedir   = $upload_dir . '/' . $dirFiles;
 		$urlsource = $_SERVER["PHP_SELF"] . '?id=' . $id;
 
 		$modulepart   = 'digiriskdolibarr:FirePermitDocument';
@@ -1514,7 +1445,7 @@ if ((empty($action) || ($action != 'create' && $action != 'edit'))) {
 			}
 		}
 
-		print digiriskshowdocuments($modulepart, $dir_files, $filedir, $urlsource, $genallowed, 0, $defaultmodel, 1, 0, '', $title, '', '', $firepermitdocument, 0, 'remove_file', $object->status < $object::STATUS_ARCHIVED && $filesigned == 0, $langs->trans('FirePermitGenerated'));
+		print saturne_show_documents($modulepart, $dirFiles, $filedir, $urlsource, $genallowed, 0, $defaultmodel, 1, 0, 0, 0, 0, $title, 0, 0, empty($soc->default_lang) ? '' : $soc->default_lang, $object, 0, 'remove_file', (($object->status > $object::STATUS_VALIDATED) ? 1 : 0), $langs->trans('ControlMustBeValidatedToGenerated'));
 	}
 
 	if ($permissiontoadd) {
@@ -1537,9 +1468,9 @@ if ((empty($action) || ($action != 'create' && $action != 'edit'))) {
 	print '</div></div></div>';
 
 	// Presend form
-	$labour_inspector    = $digiriskresources->fetchResourcesFromObject('FP_LABOUR_INSPECTOR', $object);
-	$labour_inspector_id = $labour_inspector->id;
-	$thirdparty->fetch($labour_inspector_id);
+	$labourInspector   = $digiriskresources->fetchResourcesFromObject('LabourInspector', $object);
+	$labourInspectorId = $labourInspector->id;
+	$thirdparty->fetch($labourInspectorId);
 	$object->thirdparty = $thirdparty;
 
 	$modelmail    = 'firepermit';
@@ -1593,22 +1524,22 @@ if ((empty($action) || ($action != 'create' && $action != 'edit'))) {
 		// Create form for email
 		include_once DOL_DOCUMENT_ROOT . '/core/class/html.formmail.class.php';
 		$formmail      = new FormMail($db);
-		$maitre_oeuvre = $signatory->fetchSignatory('FP_MAITRE_OEUVRE', $object->id, 'firepermit');
-		$maitre_oeuvre = array_shift($maitre_oeuvre);
+		$masterWorker = $signatory->fetchSignatory('MasterWorker', $object->id, 'firepermit');
+		$masterWorker = array_shift($masterWorker);
 
 		$formmail->param['langsmodels'] = (empty($newlang) ? $langs->defaultlang : $newlang);
 		$formmail->fromtype             = (GETPOST('fromtype') ? GETPOST('fromtype') : ( ! empty($conf->global->MAIN_MAIL_DEFAULT_FROMTYPE) ? $conf->global->MAIN_MAIL_DEFAULT_FROMTYPE : 'user'));
-		$formmail->fromid               = $maitre_oeuvre->id;
+		$formmail->fromid               = $masterWorker->id;
 		$formmail->trackid              = $trackid;
-		$formmail->fromname             = $maitre_oeuvre->firstname . ' ' . $maitre_oeuvre->lastname;
-		$formmail->frommail             = $maitre_oeuvre->email;
+		$formmail->fromname             = $masterWorker->firstname . ' ' . $masterWorker->lastname;
+		$formmail->frommail             = $masterWorker->email;
 		$formmail->fromalsorobot        = 1;
 		$formmail->withfrom             = 1;
 
 		// Fill list of recipient with email inside <>.
 		$liste = array();
 
-		$labour_inspector_contact = $digiriskresources->fetchResourcesFromObject('FP_LABOUR_INSPECTOR_ASSIGNED', $object);
+		$labourInspectorContact = $digiriskresources->fetchResourcesFromObject('LabourInspectorAssigned', $object);
 
 		if ( ! empty($object->socid) && $object->socid > 0 && ! is_object($object->thirdparty) && method_exists($object, 'fetch_thirdparty')) {
 			$object->fetch_thirdparty();
@@ -1638,7 +1569,7 @@ if ((empty($action) || ($action != 'create' && $action != 'edit'))) {
 		}
 
 
-		$withto = array($labour_inspector_contact->id => $labour_inspector_contact->firstname . ' ' . $labour_inspector_contact->lastname . " <" . $labour_inspector_contact->email . ">");
+		$withto = array($labourInspectorContact->id => $labourInspectorContact->firstname . ' ' . $labourInspectorContact->lastname . " <" . $labourInspectorContact->email . ">");
 
 		$formmail->withto              = $withto;
 		$formmail->withtofree          = (GETPOSTISSET('sendto') ? (GETPOST('sendto', 'alphawithlgt') ? GETPOST('sendto', 'alphawithlgt') : '1') : '1');

@@ -1,5 +1,5 @@
 <?php
-/* Copyright (C) 2021 EOXIA <dev@eoxia.com>
+/* Copyright (C) 2021-2023 EVARISK <technique@evarisk.com>
  *
  * This program is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -21,19 +21,14 @@
  *		\brief      Page to view Users
  */
 
-// Load Dolibarr environment
-$res = 0;
-// Try main.inc.php into web root known defined into CONTEXT_DOCUMENT_ROOT (not always defined)
-if ( ! $res && ! empty($_SERVER["CONTEXT_DOCUMENT_ROOT"])) $res = @include $_SERVER["CONTEXT_DOCUMENT_ROOT"] . "/main.inc.php";
-// Try main.inc.php into web root detected using web root calculated from SCRIPT_FILENAME
-$tmp = empty($_SERVER['SCRIPT_FILENAME']) ? '' : $_SERVER['SCRIPT_FILENAME']; $tmp2 = realpath(__FILE__); $i = strlen($tmp) - 1; $j = strlen($tmp2) - 1;
-while ($i > 0 && $j > 0 && isset($tmp[$i]) && isset($tmp2[$j]) && $tmp[$i] == $tmp2[$j]) { $i--; $j--; }
-if ( ! $res && $i > 0 && file_exists(substr($tmp, 0, ($i + 1)) . "/main.inc.php")) $res          = @include substr($tmp, 0, ($i + 1)) . "/main.inc.php";
-if ( ! $res && $i > 0 && file_exists(dirname(substr($tmp, 0, ($i + 1))) . "/main.inc.php")) $res = @include dirname(substr($tmp, 0, ($i + 1))) . "/main.inc.php";
-// Try main.inc.php using relative path
-if ( ! $res && file_exists("../../main.inc.php")) $res    = @include "../../main.inc.php";
-if ( ! $res && file_exists("../../../main.inc.php")) $res = @include "../../../main.inc.php";
-if ( ! $res) die("Include of main fails");
+// Load DigiriskDolibarr environment
+if (file_exists('../digiriskdolibarr.main.inc.php')) {
+	require_once __DIR__ . '/../digiriskdolibarr.main.inc.php';
+} elseif (file_exists('../../digiriskdolibarr.main.inc.php')) {
+	require_once __DIR__ . '/../../digiriskdolibarr.main.inc.php';
+} else {
+	die('Include of digiriskdolibarr main fails');
+}
 
 // Libraries
 require_once DOL_DOCUMENT_ROOT . '/core/lib/images.lib.php';
@@ -42,13 +37,12 @@ require_once DOL_DOCUMENT_ROOT . '/core/class/html.formother.class.php';
 require_once DOL_DOCUMENT_ROOT . '/categories/class/categorie.class.php';
 
 require_once __DIR__ . '/../lib/digiriskdolibarr_function.lib.php';
-require_once __DIR__ . '/../core/tpl/digirisk_security_checks.php';
 
 // Global variables definitions
 global $conf, $db, $hookmanager, $langs, $user;
 
 // Load translation files required by page
-$langs->loadLangs(array('users', 'companies', 'hrm'));
+saturne_load_langs(['users', 'companies', 'hrm']);
 
 // Get parameters
 $action      = GETPOST('action', 'aZ09');
@@ -81,18 +75,11 @@ $usergroupstatic = new UserGroup($db);
 $hookmanager->initHooks(array('digiriskuserlist', 'globalcard')); // Note that conf->hooks_modules contains array
 
 // Define value to know what current user can do on users
-$canadduser      = ( ! empty($user->admin) || $user->rights->user->user->creer);
-$permissiontoadd = $user->rights->digiriskdolibarr->adminpage->read;
+$permissiontoadd  = ( ! empty($user->admin) || $user->rights->user->user->creer);
+$permissiontoread = $user->rights->digiriskdolibarr->adminpage->read;
 
-if ( ! $user->rights->user->user->lire && ! $user->admin) {
-	accessforbidden();
-}
-
-// Security check (for external users)
-$socid = 0;
-if ($user->socid > 0) {
-	$socid = $user->socid;
-}
+// Security check - Protection if external user
+saturne_check_access($permissiontoadd);
 
 // fetch optionals attributes and labels
 $extrafields->fetch_name_optionals_label($object->table_element);
@@ -208,7 +195,7 @@ if (empty($reshook)) {
 	}
 }
 // Action Add user
-if ($action == 'add' && $canadduser && $permissiontoadd) {
+if ($action == 'add' && $permissiontoadd) {
 	$error = 0;
 
 	if ( ! $_POST["lastname"]) {
@@ -312,7 +299,6 @@ $form      = new Form($db);
 $formother = new FormOther($db);
 
 $user2 = new User($db);
-
 
 $sql  = "SELECT DISTINCT u.rowid, u.lastname, u.firstname, u.admin, u.fk_soc, u.login, u.email, u.job, u.api_key, u.accountancy_code, u.gender, u.employee, u.photo,";
 $sql .= " u.datelastlogin, u.datepreviouslogin,";
@@ -575,7 +561,6 @@ print '</td>';
 
 print "</tr>\n";
 
-
 print '<tr class="liste_titre">';
 if ( ! empty($arrayfields['u.login']['checked']))          print_liste_field_titre("Login", $_SERVER['PHP_SELF'], "u.login", $param, "", "", $sortfield, $sortorder);
 if ( ! empty($arrayfields['u.lastname']['checked']))       print_liste_field_titre("Lastname", $_SERVER['PHP_SELF'], "u.lastname", $param, "", "", $sortfield, $sortorder);
@@ -603,8 +588,6 @@ if ( ! empty($arrayfields['u.tms']['checked']))    print_liste_field_titre("Date
 if ( ! empty($arrayfields['u.statut']['checked'])) print_liste_field_titre("Status", $_SERVER["PHP_SELF"], "u.statut", "", $param, '', $sortfield, $sortorder, 'center ');
 print_liste_field_titre($selectedfields, $_SERVER["PHP_SELF"], "", '', '', '', $sortfield, $sortorder, 'center maxwidthsearch ');
 print "</tr>\n";
-
-
 
 $i          = 0;
 $totalarray = array();
@@ -804,7 +787,7 @@ print "</table>";
 
 print "</form>\n";
 
-if ($canadduser && (empty($conf->global->MULTICOMPANY_TRANSVERSE_MODE) || $conf->entity == 1)) {
+if ($permissiontoadd && (empty($conf->global->MULTICOMPANY_TRANSVERSE_MODE) || $conf->entity == 1)) {
 	print '<form action="' . $_SERVER['PHP_SELF'] . '" method="POST" name="createuser">';
 	print '<input type="hidden" name="token" value="' . newToken() . '">';
 	print '<input type="hidden" name="action" value="add">';

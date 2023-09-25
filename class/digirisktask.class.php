@@ -1,5 +1,5 @@
 <?php
-/* Copyright (C) 2022 EOXIA <dev@eoxia.com>
+/* Copyright (C) 2022 EOXIA <technique@evarisk.com>
  *
  * This program is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -67,37 +67,38 @@ class DigiriskTask extends Task
 		global $conf, $langs;
 
 		$array['title'] = $langs->transnoentities('TasksRepartition');
-		$array['picto'] = '<i class="fas fa-tasks"></i>';
+		$array['picto'] = $this->picto;
+		$array['dataset'] = 1;
 		$array['labels'] = array(
-			'taskat0percent' => array(
+			0 => array(
 				'label' => $langs->transnoentities('TaskAt0Percent') . ' %',
 				'color' => '#e05353'
 			),
-			'taskinprogress' => array(
+			1 => array(
 				'label' => $langs->transnoentities('TaskInProgress'),
 				'color' => '#e9ad4f'
 			),
-			'taskat100percent' => array(
+			2 => array(
 				'label' => $langs->transnoentities('TaskAt100Percent') . ' %',
 				'color' => '#47e58e'
 			),
 		);
 		$taskarray = $this->getTasksArray(0, 0, $conf->global->DIGIRISKDOLIBARR_DU_PROJECT);
+		$array['data'][0]   = 0;
+		$array['data'][1]   = 0;
+		$array['data'][2]   = 0;
 		if (is_array($taskarray) && !empty($taskarray)) {
 			foreach ($taskarray as $tasksingle) {
 				if ($tasksingle->progress == 0) {
-					$array['data']['taskat0percent'] = $array['data']['taskat0percent'] + 1;
+					$array['data'][0] = $array['data'][0] + 1;
 				} elseif ($tasksingle->progress > 0 && $tasksingle->progress < 100) {
-					$array['data']['taskinprogress'] = $array['data']['taskinprogress'] + 1;
+					$array['data'][1] = $array['data'][1] + 1;
 				} else {
-					$array['data']['taskat100percent'] = $array['data']['taskat100percent'] + 1;
+					$array['data'][2] = $array['data'][2] + 1;
 				}
 			}
-		} else {
-			$array['data']['taskat0percent']   = 0;
-			$array['data']['taskinprogress']   = 0;
-			$array['data']['taskat100percent'] = 0;
 		}
+
 		return $array;
 	}
 

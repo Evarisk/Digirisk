@@ -261,7 +261,7 @@ foreach ($risksign->fields as $key => $val) {
 		} elseif ($key == 'entity') {
 			print select_entity_list($search['entity'], 'search_entity', 'e.rowid NOT IN (' . $conf->entity . ')');
 		} elseif ($key == 'fk_element') {
-			print $digiriskelement->select_digiriskelement_list($search['fk_element_shared'], 'search_fk_element_shared', 's.entity NOT IN (' . $conf->entity . ')', 1, 0, array(), 0, 0, 'minwidth100', 0, false, 1, $contextpage, false);
+			print $digiriskelement->selectDigiriskElementList($search['fk_element_shared'], 'search_fk_element_shared', ['customsql' => 's.entity NOT IN (' . $conf->entity . ')'], 1, 0, array(), 0, 0, 'minwidth100', 0, false, 1, $contextpage, false);
 		} elseif ($key == 'category') { ?>
 			<div class="wpeo-dropdown dropdown-large dropdown-grid category-danger padding" style="position: inherit">
 				<input class="input-hidden-danger" type="hidden" name="<?php echo 'search_' . $key ?>" value="<?php echo dol_escape_htmltag($search[$key]) ?>" />
@@ -271,13 +271,13 @@ foreach ($risksign->fields as $key => $val) {
 						<img class="danger-category-pic wpeo-tooltip-event hidden" src="" aria-label=""/>
 					</div>
 				<?php else : ?>
-					<div class="dropdown-toggle dropdown-add-button wpeo-tooltip-event" aria-label="<?php echo (empty(dol_escape_htmltag($search[$key]))) ? $risksign->get_risksign_category_name($risksign) : $risksign->get_risksign_category_name_by_position($search[$key]); ?>">
-						<img class="danger-category-pic tooltip hover" src="<?php echo DOL_URL_ROOT . '/custom/digiriskdolibarr/img/' . ((empty(dol_escape_htmltag($search[$key]))) ? $risksign->get_risksign_category($risksign) : $risksign->get_risksign_category_by_position($search[$key])) ?>" />
+					<div class="dropdown-toggle dropdown-add-button wpeo-tooltip-event" aria-label="<?php echo (empty(dol_escape_htmltag($search[$key]))) ? $risksign->getRiskSignCategoryName($risksign) : $risksign->getRiskSignCategoryNameByPosition($search[$key]); ?>">
+						<img class="danger-category-pic tooltip hover" src="<?php echo DOL_URL_ROOT . '/custom/digiriskdolibarr/img/' . ((empty(dol_escape_htmltag($search[$key]))) ? $risksign->getRiskSignCategory($risksign) : $risksign->getRiskSignCategoryByPosition($search[$key])) ?>" />
 					</div>
 				<?php endif; ?>
 				<ul class="dropdown-content wpeo-gridlayout grid-5 grid-gap-0">
 					<?php
-					$risksignCategories = $risksign->get_risksign_categories();
+					$risksignCategories = $risksign->getRiskSignCategories();
 					if ( ! empty($risksignCategories) ) :
 						foreach ($risksignCategories as $risksignCategory) : ?>
 							<li class="item dropdown-item wpeo-tooltip-event classfortooltip" data-is-preset="<?php echo ''; ?>" data-id="<?php echo $risksignCategory['position'] ?>" aria-label="<?php echo $risksignCategory['name'] ?>">
@@ -366,8 +366,8 @@ while ($i < ($limit ? min($num, $limit) : $num)) {
 				}
 			} elseif ($key == 'category') { ?>
 				<div class="table-cell table-50 cell-risksign-category">
-					<div class="wpeo-dropdown dropdown-large risksign-category-danger padding wpeo-tooltip-event" aria-label="<?php echo $risksign->get_risksign_category_name($risksign); ?>">
-						<img class="danger-category-pic hover" src="<?php echo DOL_URL_ROOT . '/custom/digiriskdolibarr/img/' . $risksign->get_risksign_category($risksign) ?>"/>
+					<div class="wpeo-dropdown dropdown-large risksign-category-danger padding wpeo-tooltip-event" aria-label="<?php echo $risksign->getRiskSignCategoryName($risksign); ?>">
+						<img class="danger-category-pic hover" src="<?php echo DOL_URL_ROOT . '/custom/digiriskdolibarr/img/' . $risksign->getRiskSignCategory($risksign) ?>"/>
 					</div>
 				</div>
 				<?php

@@ -1,5 +1,5 @@
 <?php
-/* Copyright (C) 2021 EOXIA <dev@eoxia.com>
+/* Copyright (C) 2021-2023 EVARISK <technique@evarisk.com>
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -21,20 +21,14 @@
  *     \brief       Page to public interface of module DigiriskDolibarr for ticket
  */
 
-// Load Dolibarr environment
-$res = 0;
-// Try main.inc.php into web root known defined into CONTEXT_DOCUMENT_ROOT (not always defined)
-if (! empty($_SERVER["CONTEXT_DOCUMENT_ROOT"])) $res = @include $_SERVER["CONTEXT_DOCUMENT_ROOT"] . "/main.inc.php";
-// Try main.inc.php into web root detected using web root calculated from SCRIPT_FILENAME
-$tmp = empty($_SERVER['SCRIPT_FILENAME']) ? '' : $_SERVER['SCRIPT_FILENAME']; $tmp2 = realpath(__FILE__); $i = strlen($tmp) - 1; $j = strlen($tmp2) - 1;
-while ($i > 0 && $j > 0 && isset($tmp[$i]) && isset($tmp2[$j]) && $tmp[$i] == $tmp2[$j]) { $i--; $j--; }
-if ( ! $res && $i > 0 && file_exists(substr($tmp, 0, ($i + 1)) . "/main.inc.php")) $res          = @include substr($tmp, 0, ($i + 1)) . "/main.inc.php";
-if ( ! $res && $i > 0 && file_exists(dirname(substr($tmp, 0, ($i + 1))) . "/main.inc.php")) $res = @include dirname(substr($tmp, 0, ($i + 1))) . "/main.inc.php";
-// Try main.inc.php using relative path
-if ( ! $res && file_exists("../../main.inc.php")) $res       = @include "../../main.inc.php";
-if ( ! $res && file_exists("../../../main.inc.php")) $res    = @include "../../../main.inc.php";
-if ( ! $res && file_exists("../../../../main.inc.php")) $res = @include "../../../../main.inc.php";
-if ( ! $res) die("Include of main fails");
+// Load DigiriskDolibarr environment
+if (file_exists('../digiriskdolibarr.main.inc.php')) {
+	require_once __DIR__ . '/../digiriskdolibarr.main.inc.php';
+} elseif (file_exists('../../digiriskdolibarr.main.inc.php')) {
+	require_once __DIR__ . '/../../digiriskdolibarr.main.inc.php';
+} else {
+	die('Include of digiriskdolibarr main fails');
+}
 
 global $conf, $db, $langs, $user;
 
@@ -49,25 +43,32 @@ include_once DOL_DOCUMENT_ROOT . '/ticket/class/ticket.class.php';
 require_once DOL_DOCUMENT_ROOT . "/core/class/html.formprojet.class.php";
 require_once DOL_DOCUMENT_ROOT . '/core/class/doleditor.class.php';
 
-require_once '../../lib/digiriskdolibarr.lib.php';
-require_once '../../lib/digiriskdolibarr_ticket.lib.php';
-require_once __DIR__ . '/../../core/tpl/digirisk_security_checks.php';
+require_once __DIR__ . '/../../lib/digiriskdolibarr.lib.php';
+require_once __DIR__ . '/../../lib/digiriskdolibarr_ticket.lib.php';
 
 // Translations
-$langs->loadLangs(array("admin", "digiriskdolibarr@digiriskdolibarr"));
+saturne_load_langs(["admin"]);
 
 // Initialize technical objects
 $extra_fields = new ExtraFields($db);
 $category     = new Categorie($db);
 $ticket       = new Ticket($db);
 
-// Access control
-if ( ! $user->admin) accessforbidden();
+// Initialize view objects
+if (isModEnabled('project')) {
+	$formproject = new FormProjets($db);
+}
+$form      = new Form($db);
+$formother = new FormOther($db);
 
 // Parameters
 $action     = GETPOST('action', 'alpha');
 $backtopage = GETPOST('backtopage', 'alpha');
 $value      = GETPOST('value', 'alpha');
+
+// Security check - Protection if external user
+$permissiontoread = $user->rights->digiriskdolibarr->adminpage->read;
+saturne_check_access($permissiontoread);
 
 /*
  * Actions
@@ -92,13 +93,6 @@ if ($action == 'setPublicInterface') {
 	setEventMessages($langs->transnoentities('TicketPublicInterfaceEnabled'), array());
 }
 
-if ($action == 'setMultiEntitySelector') {
-	if (GETPOST('value')) dolibarr_set_const($db, 'DIGIRISKDOLIBARR_SHOW_MULTI_ENTITY_SELECTOR_ON_TICKET_PUBLIC_INTERFACE', 1, 'integer', 0, '', 0);
-	else dolibarr_set_const($db, 'DIGIRISKDOLIBARR_SHOW_MULTI_ENTITY_SELECTOR_ON_TICKET_PUBLIC_INTERFACE', 0, 'integer', 0, '', 0);
-//	setEventMessages($langs->transnoentities('TicketPublicInterfaceEnabled'), array());
-}
-
-
 if ($action == 'setEmails') {
 	dolibarr_set_const($db, 'DIGIRISKDOLIBARR_TICKET_SUBMITTED_SEND_MAIL_TO', GETPOST('emails'), 'integer', 0, '', $conf->entity);
 	setEventMessages($langs->transnoentities('EmailsToNotifySet'), array());
@@ -118,10 +112,11 @@ if ($action == 'generateExtrafields') {
 	}
 	dolibarr_set_const($db, 'DIGIRISKDOLIBARR_TICKET_EXTRAFIELDS', 1, 'integer', 0, '', 0);
 }
-$upload_dir = $conf->categorie->multidir_output[$conf->entity?:1];
-global $maxwidthmini, $maxheightmini, $maxwidthsmall, $maxheightsmall;
 
 if ($action == 'generateCategories') {
+	global $maxwidthmini, $maxheightmini, $maxwidthsmall, $maxheightsmall;
+
+	$upload_dir = $conf->categorie->multidir_output[$conf->entity?:1];
 
 	$result = createTicketCategory($langs->transnoentities('Register'), '', '', 1, 'ticket');
 	dolibarr_set_const($db, 'DIGIRISKDOLIBARR_TICKET_MAIN_CATEGORY', $result, 'integer', 0, '', $conf->entity);
@@ -233,15 +228,10 @@ if ($action == 'generateQRCode') {
  * View
  */
 
-if ( ! empty($conf->projet->enabled)) { $formproject = new FormProjets($db); }
-$form      = new Form($db);
-$formother = new FormOther($db);
-
-$help_url = 'FR:Module_Digirisk';
+$helpUrl  = 'FR:Module_Digirisk';
 $title    = $langs->transnoentities("Ticket");
-$morecss  = array("/digiriskdolibarr/css/digiriskdolibarr.css");
 
-llxHeader('', $title, $help_url, '', '', '', '', $morecss);
+saturne_header(0,'', $title, $helpUrl);
 
 // Subheader
 $linkback = '<a href="' . ($backtopage ?: DOL_URL_ROOT . '/admin/modules.php?restore_lastsearch_values=1') . '">' . $langs->transnoentities("BackToModuleList") . '</a>';
@@ -249,7 +239,7 @@ $linkback = '<a href="' . ($backtopage ?: DOL_URL_ROOT . '/admin/modules.php?res
 print load_fiche_titre($title, $linkback, 'digiriskdolibarr32px@digiriskdolibarr');
 
 // Configuration header
-$head = digiriskdolibarrAdminPrepareHead();
+$head = digiriskdolibarr_admin_prepare_head();
 
 print dol_get_fiche_head($head, 'ticket', '', -1, "digiriskdolibarr@digiriskdolibarr");
 print load_fiche_titre('<i class="fa fa-ticket"></i> ' . $langs->transnoentities("TicketManagement"), '', '');
@@ -258,7 +248,7 @@ print load_fiche_titre($langs->transnoentities("PublicInterface"), '', '');
 
 print '<span class="opacitymedium">' . $langs->transnoentities("DigiriskTicketPublicAccess") . '</span> : <a class="wordbreak" href="' . dol_buildpath('/custom/digiriskdolibarr/public/ticket/create_ticket.php?entity=' . $conf->entity, 1) . '" target="_blank" >' . dol_buildpath('/custom/digiriskdolibarr/public/ticket/create_ticket.php?entity=' . $conf->entity, 2) . '</a>';
 
-if ($conf->multicompany->enabled) {
+if (isModEnabled('multicompany')) {
 	print load_fiche_titre($langs->transnoentities("MultiEntityPublicInterface"), '', '');
 
 	print '<span class="opacitymedium">' . $langs->transnoentities("DigiriskTicketPublicAccess") . '</span> : <a class="wordbreak" href="' . dol_buildpath('/custom/digiriskdolibarr/public/ticket/create_ticket.php', 1) . '" target="_blank" >' . dol_buildpath('/custom/digiriskdolibarr/public/ticket/create_ticket.php', 2) . '</a>';
@@ -266,23 +256,23 @@ if ($conf->multicompany->enabled) {
 
 print dol_get_fiche_end();
 
-$enabledisablehtml = $langs->transnoentities("TicketActivatePublicInterface") . ' ';
+$enableDisableHtml = $langs->transnoentities("TicketActivatePublicInterface") . ' ';
 if (empty($conf->global->DIGIRISKDOLIBARR_TICKET_ENABLE_PUBLIC_INTERFACE)) {
 	// Button off, click to enable
-	$enabledisablehtml .= '<a class="reposition valignmiddle" href="' . $_SERVER["PHP_SELF"] . '?action=setPublicInterface&token=' . newToken() . '&value=1">';
-	$enabledisablehtml .= img_picto($langs->transnoentities("Disabled"), 'switch_off');
+	$enableDisableHtml .= '<a class="reposition valignmiddle" href="' . $_SERVER["PHP_SELF"] . '?action=setPublicInterface&token=' . newToken() . '&value=1">';
+	$enableDisableHtml .= img_picto($langs->transnoentities("Disabled"), 'switch_off');
 } else {
 	// Button on, click to disable
-	$enabledisablehtml .= '<a class="reposition valignmiddle" href="' . $_SERVER["PHP_SELF"] . '?action=setPublicInterface&token=' . newToken() . '&value=0">';
-	$enabledisablehtml .= img_picto($langs->transnoentities("Activated"), 'switch_on');
+	$enableDisableHtml .= '<a class="reposition valignmiddle" href="' . $_SERVER["PHP_SELF"] . '?action=setPublicInterface&token=' . newToken() . '&value=0">';
+	$enableDisableHtml .= img_picto($langs->transnoentities("Activated"), 'switch_on');
 }
-$enabledisablehtml .= '</a>';
-print $enabledisablehtml;
+$enableDisableHtml .= '</a>';
+print $enableDisableHtml;
 print '<input type="hidden" id="DIGIRISKDOLIBARR_TICKET_ENABLE_PUBLIC_INTERFACE" name="DIGIRISKDOLIBARR_TICKET_ENABLE_PUBLIC_INTERFACE" value="' . (empty($conf->global->DIGIRISKDOLIBARR_TICKET_ENABLE_PUBLIC_INTERFACE) ? 0 : 1) . '">';
 
 print '<br><br>';
 
-if ( ! empty($conf->global->DIGIRISKDOLIBARR_TICKET_ENABLE_PUBLIC_INTERFACE)) {
+if ($conf->global->DIGIRISKDOLIBARR_TICKET_ENABLE_PUBLIC_INTERFACE == 1) {
 	print '<div class="div-table-responsive-no-min">';
 	print '<table class="noborder centpercent">';
 	print '<tr class="liste_titre">';
@@ -318,19 +308,11 @@ if ( ! empty($conf->global->DIGIRISKDOLIBARR_TICKET_ENABLE_PUBLIC_INTERFACE)) {
 	print '</td>';
 	print '</tr>';
 
-	if ($conf->multicompany->enabled) {
+	if (isModEnabled('multicompany')) {
 		//Page de sélection de l'entité
 		print '<tr class="oddeven"><td>' . $langs->transnoentities("ShowSelectorOnTicketPublicInterface") . '</td>';
 		print '<td class="center">';
-		if (empty($conf->global->DIGIRISKDOLIBARR_SHOW_MULTI_ENTITY_SELECTOR_ON_TICKET_PUBLIC_INTERFACE)) {
-			// Button off, click to enable
-			print '<a class="reposition valignmiddle" href="' . $_SERVER["PHP_SELF"] . '?action=setMultiEntitySelector&token=' . newToken() . '&value=1">';
-			print img_picto($langs->transnoentities("Disabled"), 'switch_off');
-		} else {
-			// Button on, click to disable
-			print '<a class="reposition valignmiddle" href="' . $_SERVER["PHP_SELF"] . '?action=setMultiEntitySelector&token=' . newToken() . '&value=0">';
-			print img_picto($langs->transnoentities("Activated"), 'switch_on');
-		}
+		print ajax_constantonoff('DIGIRISKDOLIBARR_SHOW_MULTI_ENTITY_SELECTOR_ON_TICKET_PUBLIC_INTERFACE');
 		print '</a>';
 		print '</td>';
 		print '<td class="center">';
@@ -342,7 +324,7 @@ if ( ! empty($conf->global->DIGIRISKDOLIBARR_TICKET_ENABLE_PUBLIC_INTERFACE)) {
 		print '</tr>';
 	}
 
-	//Envoi d'emails automatiques
+	//Envoi d'emails automatique
 	print '<tr class="oddeven"><td>' . $langs->transnoentities("SendEmailOnTicketSubmit") . '</td>';
 	print '<td class="center">';
 	print ajax_constantonoff('DIGIRISKDOLIBARR_SEND_EMAIL_ON_TICKET_SUBMIT');
@@ -532,29 +514,29 @@ if ( ! empty($conf->global->DIGIRISKDOLIBARR_TICKET_ENABLE_PUBLIC_INTERFACE)) {
 	print '</div>';
 
 	// Project
-	print load_fiche_titre($langs->transnoentities("LinkedProject"), '', '');
+	if (isModEnabled('project')) {
+		print load_fiche_titre($langs->transnoentities("LinkedProject"), '', '');
 
-	print '<form method="POST" action="' . $_SERVER["PHP_SELF"] . '" name="project_form">';
-	print '<input type="hidden" name="token" value="' . newToken() . '">';
-	print '<input type="hidden" name="action" value="update">';
-	print '<table class="noborder centpercent editmode">';
-	print '<tr class="liste_titre">';
-	print '<td>' . $langs->transnoentities("Name") . '</td>';
-	print '<td>' . $langs->transnoentities("SelectProject") . '</td>';
-	print '<td>' . $langs->transnoentities("Action") . '</td>';
-	print '</tr>';
+		print '<form method="POST" action="' . $_SERVER["PHP_SELF"] . '" name="project_form">';
+		print '<input type="hidden" name="token" value="' . newToken() . '">';
+		print '<input type="hidden" name="action" value="update">';
+		print '<table class="noborder centpercent editmode">';
+		print '<tr class="liste_titre">';
+		print '<td>' . $langs->transnoentities("Name") . '</td>';
+		print '<td>' . $langs->transnoentities("SelectProject") . '</td>';
+		print '<td>' . $langs->transnoentities("Action") . '</td>';
+		print '</tr>';
 
-	if ( ! empty($conf->projet->enabled)) {
 		$langs->load("projects");
 		print '<tr class="oddeven"><td><label for="TSProject">' . $langs->transnoentities("TSProject") . '</label></td><td>';
 		$numprojet = $formproject->select_projects(0,  $conf->global->DIGIRISKDOLIBARR_TICKET_PROJECT, 'TSProject', 0, 0, 0, 0, 0, 0, 0, '', 0, 0, 'maxwidth500');
 		print ' <a href="' . DOL_URL_ROOT . '/projet/card.php?&action=create&status=1&backtopage=' . urlencode($_SERVER["PHP_SELF"] . '?action=create') . '"><span class="fa fa-plus-circle valignmiddle" title="' . $langs->transnoentities("AddProject") . '"></span></a>';
 		print '<td><input type="submit" class="button" name="save" value="' . $langs->transnoentities("Save") . '">';
 		print '</td></tr>';
-	}
 
-	print '</table>';
-	print '</form>';
+		print '</table>';
+		print '</form>';
+	}
 
 	print load_fiche_titre($langs->transnoentities("TicketCategories"), '', '', 0, 'TicketCategories');
 
@@ -630,7 +612,6 @@ if ( ! empty($conf->global->DIGIRISKDOLIBARR_TICKET_ENABLE_PUBLIC_INTERFACE)) {
 	print '</form>';
 
 	//Set child category label
-
 	print '<form method="POST" action="' . $_SERVER["PHP_SELF"] . '">';
 	print '<input type="hidden" name="token" value="' . newToken() . '">';
 	print '<input type="hidden" name="action" value="setChildCategoryLabel">';
@@ -717,7 +698,7 @@ if ( ! empty($conf->global->DIGIRISKDOLIBARR_TICKET_ENABLE_PUBLIC_INTERFACE)) {
 
 	print '<tr class="oddeven"><td>' . $langs->transnoentities("GenerateQRCode") . '</td>';
 
-	$targetPath = $qrCodePath;
+	$targetPath  = $qrCodePath;
 	$urlToEncode = DOL_MAIN_URL_ROOT . '/custom/digiriskdolibarr/public/ticket/create_ticket.php?entity=' . $conf->entity;
 
 	print '<input hidden name="targetPath" value="'. $targetPath .'">';
@@ -742,7 +723,7 @@ if ( ! empty($conf->global->DIGIRISKDOLIBARR_TICKET_ENABLE_PUBLIC_INTERFACE)) {
 	print '</tr>';
 	print '</form>';
 
-	if ($conf->multicompany->enabled) {
+	if (isModEnabled('multicompany')) {
 
 		// Multi Entity QR Code generation
 		print load_fiche_titre($langs->transnoentities("MultiCompanyQRCodeGeneration"), '', '');

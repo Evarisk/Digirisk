@@ -1,5 +1,5 @@
 <?php
-/* Copyright (C) 2021 EOXIA <dev@eoxia.com>
+/* Copyright (C) 2021-2023 EVARISK <technique@evarisk.com>
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -27,11 +27,11 @@
  * @param	DigiriskStandard	$object		DigiriskStandard
  * @return 	array					Array of tabs
  */
-function digiriskstandardPrepareHead($object)
+function digiriskstandard_prepare_head($object)
 {
 	global $langs, $conf, $user;
 
-	$langs->load("digiriskdolibarr@digiriskdolibarr");
+	saturne_load_langs();
 
 	$h    = 0;
 	$head = array();

@@ -1,5 +1,5 @@
 <?php
-/* Copyright (C) 2021 EOXIA <dev@eoxia.com>
+/* Copyright (C) 2021-2023 EVARISK <technique@evarisk.com>
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -359,7 +359,7 @@ class RiskAssessmentUnitTest extends PHPUnit\Framework\TestCase
 	 * @param   RiskAssessment $localobject RiskAssessment object
 	 * @return void
 	 *
-	 * @covers RiskAssessment::get_evaluation_scale
+	 * @covers RiskAssessment::getEvaluationScale
 	 *
 	 * @depends testRiskAssessmentFetch
 	 * The depends says test is run only if previous is ok
@@ -372,7 +372,7 @@ class RiskAssessmentUnitTest extends PHPUnit\Framework\TestCase
 		$langs = $this->savlangs;
 		$db    = $this->savdb;
 
-		$result = $localobject->get_evaluation_scale();
+		$result = $localobject->getEvaluationScale();
 
 		$this->assertSame(true, is_int($result));
 

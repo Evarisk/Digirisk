@@ -1,5 +1,5 @@
 <?php
-/* Copyright (C) 2021 EOXIA <dev@eoxia.com>
+/* Copyright (C) 2021-2023 EVARISK <technique@evarisk.com>
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -37,7 +37,7 @@ require_once DOL_DOCUMENT_ROOT . '/projet/class/project.class.php';
 require_once __DIR__ . '/../../class/accident.class.php';
 require_once __DIR__ . '/../../lib/digiriskdolibarr_function.lib.php';
 require_once __DIR__ . '/../../lib/digiriskdolibarr_accident.lib.php';
-require_once __DIR__ . '/../../core/modules/digiriskdolibarr/digiriskelement/accident_lesion/mod_accident_lesion_standard.php';
+require_once __DIR__ . '/../../core/modules/digiriskdolibarr/digiriskelement/accidentlesion/mod_accident_lesion_standard.php';
 
 global $conf, $db, $hookmanager, $langs, $user;
 
@@ -64,7 +64,6 @@ $object->fetch($id);
 $hookmanager->initHooks(array('accidentmetadatalesion', 'globalcard')); // Note that conf->hooks_modules contains array
 
 // Security check
-require_once __DIR__ . '/../../core/tpl/digirisk_security_checks.php';
 
 $permissiontoread   = $user->rights->digiriskdolibarr->accident->read;
 $permissiontoadd    = $user->rights->digiriskdolibarr->accident->write;

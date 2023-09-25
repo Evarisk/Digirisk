@@ -1,6 +1,6 @@
 <?php
 
-/* Copyright (C) 2021 EOXIA <dev@eoxia.com>
+/* Copyright (C) 2021-2023 EVARISK <technique@evarisk.com>
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -116,6 +116,11 @@ if ($conf->global->DIGIRISKDOLIBARR_DU_PROJECT > 0 && $conf->global->DIGIRISKDOL
 }
 
 if ( $conf->global->DIGIRISKDOLIBARR_DU_PROJECT == 0 || $project->statut == 2 ) {
+    $numberingModules = [
+        'project' => $conf->global->PROJECT_ADDON
+    ];
+
+    list ($projectRef) = saturne_require_objects_mod($numberingModules, $moduleNameLowerCase);
 	$project->ref         = $projectRef->getNextValue($third_party, $project);
 	$project->title       = $langs->trans('RiskAssessmentDocument') . ' - ' . $conf->global->MAIN_INFO_SOCIETE_NOM;
 	$project->description = $langs->trans('RiskAssessmentDocumentDescription');
@@ -971,7 +976,7 @@ if ($conf->global->DIGIRISKDOLIBARR_ENCODE_BACKWARD_COMPATIBILITY == 0) {
 
 	$societe   = new Societe($db);
 	$resources = new DigiriskResources($db);
-	$rights_defenderID = $resources->digirisk_dolibarr_fetch_resource('RightsDefender');
+	$rights_defenderID = $resources->fetchDigiriskResource('RightsDefender');
 	$societe->fetch($rights_defenderID);
 	$societe->name = $langs->transnoentities('RightsDefender') . ' - ' . $conf->global->MAIN_INFO_SOCIETE_NOM;
 	$societe->update(0, $user);

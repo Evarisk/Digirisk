@@ -1,5 +1,5 @@
 <?php
-/* Copyright (C) 2021 EOXIA <dev@eoxia.com>
+/* Copyright (C) 2021-2023 EVARISK <technique@evarisk.com>
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -270,7 +270,7 @@ class DigiriskResourcesUnitTest extends PHPUnit\Framework\TestCase
 	/**
 	 * testDigiriskResourcesDigiriskDolibarrSetResources
 	 *
-	 * @covers DigiriskResources::digirisk_dolibarr_set_resources
+	 * @covers DigiriskResources::setDigiriskResources
 	 *
 	 * @return string $ref ref digirisk resource
 	 * @throws Exception
@@ -293,7 +293,7 @@ class DigiriskResourcesUnitTest extends PHPUnit\Framework\TestCase
 		$localobject->object_id    = 0;
 		$localobject->fk_user_creat = $user->id ? $user->id : 1;
 
-		$result = $localobject->digirisk_dolibarr_set_resources($db, $localobject->fk_user_creat, $localobject->ref, $localobject->element_type, array($localobject->element_id), $localobject->entity, $localobject->object_type, $localobject->object_id, 0);
+		$result = $localobject->setDigiriskResources($db, $localobject->fk_user_creat, $localobject->ref, $localobject->element_type, array($localobject->element_id), $localobject->entity, $localobject->object_type, $localobject->object_id, 0);
 
 		$this->assertLessThan($result, 0);
 
@@ -307,7 +307,7 @@ class DigiriskResourcesUnitTest extends PHPUnit\Framework\TestCase
 	 * @param   string            $ref         ref digirisk resource
 	 * @return  DigiriskResources $localobject Digirisk resources object
 	 *
-	 * @covers  DigiriskResources::digirisk_dolibarr_fetch_resource
+	 * @covers  DigiriskResources::fetchDigiriskResource
 	 *
 	 * @depends testDigiriskResourcesDigiriskDolibarrSetResources
 	 * The depends says test is run only if previous is ok
@@ -322,7 +322,7 @@ class DigiriskResourcesUnitTest extends PHPUnit\Framework\TestCase
 
 		$localobject = new DigiriskResources($this->savdb);
 
-		$result = $localobject->digirisk_dolibarr_fetch_resource($ref);
+		$result = $localobject->fetchDigiriskResource($ref);
 
 		$this->assertLessThan($result, 0);
 
@@ -361,7 +361,7 @@ class DigiriskResourcesUnitTest extends PHPUnit\Framework\TestCase
 	 *
 	 * @return void
 	 *
-	 * @covers DigiriskResources::digirisk_dolibarr_fetch_resources
+	 * @covers DigiriskResources::fetchDigiriskResources
 	 *
 	 * @throws Exception
 	 */
@@ -374,7 +374,7 @@ class DigiriskResourcesUnitTest extends PHPUnit\Framework\TestCase
 		$db = $this->savdb;
 
 		$localobject = new DigiriskResources($this->savdb);
-		$localobjectList = $localobject->digirisk_dolibarr_fetch_resources();
+		$localobjectList = $localobject->fetchDigiriskResources();
 
 		$this->assertSame(true, is_array($localobjectList));
 		print __METHOD__ . " ok";

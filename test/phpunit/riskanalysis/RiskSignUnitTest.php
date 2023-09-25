@@ -1,5 +1,5 @@
 <?php
-/* Copyright (C) 2021 EOXIA <dev@eoxia.com>
+/* Copyright (C) 2021-2023 EVARISK <technique@evarisk.com>
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -334,7 +334,7 @@ class RiskSignUnitTest extends PHPUnit\Framework\TestCase
 	 *
 	 * @return void
 	 *
-	 * @covers RiskSign::get_risksign_categories
+	 * @covers RiskSign::getRiskSignCategories
 	 *
 	 */
 	public function testRiskSignGetRiskSignCategories() : void
@@ -346,7 +346,7 @@ class RiskSignUnitTest extends PHPUnit\Framework\TestCase
 		$db    = $this->savdb;
 
 		$localobject     = new RiskSign($this->savdb);
-		$localobjectList = $localobject->get_risksign_categories();
+		$localobjectList = $localobject->getRiskSignCategories();
 
 		$this->assertSame(true, is_array($localobjectList));
 		print __METHOD__ . " ok";
@@ -359,7 +359,7 @@ class RiskSignUnitTest extends PHPUnit\Framework\TestCase
 	 * @param   RiskSign $localobject RiskSign object
 	 * @return  void
 	 *
-	 * @covers  RiskSign::get_risksign_category
+	 * @covers  RiskSign::getRiskSignCategory
 	 *
 	 * @depends testRiskSignFetch
 	 * The depends says test is run only if previous is ok
@@ -372,7 +372,7 @@ class RiskSignUnitTest extends PHPUnit\Framework\TestCase
 		$langs = $this->savlangs;
 		$db    = $this->savdb;
 
-		$result = $localobject->get_risksign_category($localobject);
+		$result = $localobject->getRiskSignCategory($localobject);
 
 		$this->assertSame(true, is_string($result));
 
@@ -385,7 +385,7 @@ class RiskSignUnitTest extends PHPUnit\Framework\TestCase
 	 * @param   RiskSign $localobject RiskSign object
 	 * @return  string
 	 *
-	 * @covers  RiskSign::get_risksign_category_name
+	 * @covers  RiskSign::getRiskSignCategoryName
 	 *
 	 * @depends testRiskSignFetch
 	 * The depends says test is run only if previous is ok
@@ -398,7 +398,7 @@ class RiskSignUnitTest extends PHPUnit\Framework\TestCase
 		$langs = $this->savlangs;
 		$db    = $this->savdb;
 
-		$result = $localobject->get_risksign_category_name($localobject);
+		$result = $localobject->getRiskSignCategoryName($localobject);
 
 		$this->assertSame(true, is_string($result));
 

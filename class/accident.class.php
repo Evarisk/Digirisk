@@ -1,5 +1,5 @@
 <?php
-/* Copyright (C) 2021 EOXIA <dev@eoxia.com>
+/* Copyright (C) 2021-2023 EVARISK <technique@evarisk.com>
  *
  * This program is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -30,10 +30,8 @@ require_once __DIR__ . '/../../saturne/class/saturneobject.class.php';
 require_once __DIR__ . '/../../saturne/class/saturnesignature.class.php';
 
 require_once __DIR__ . '/../lib/digiriskdolibarr_function.lib.php';
-require_once __DIR__ . '/digirisksignature.class.php';
-require_once __DIR__ . '/openinghours.class.php';
+require_once __DIR__ . '/digiriskdocuments.class.php';
 require_once __DIR__ . '/evaluator.class.php';
-require_once __DIR__ . '/dashboarddigiriskstats.class.php';
 
 /**
  * Class for Accident
@@ -356,13 +354,13 @@ class Accident extends SaturneObject
 		$arrayGravityRate              = $this->getGravityRate();
 
 		$array['widgets'] = [
-			DashboardDigiriskStats::DASHBOARD_ACCIDENT => [
+			DigiriskDolibarrDashboard::DASHBOARD_ACCIDENT => [
 				'label'      => [$langs->transnoentities("DayWithoutAccident"), $langs->transnoentities("WorkStopDays"), $langs->transnoentities("NbAccidentsByEmployees"), $langs->transnoentities("NbPresquAccidents"), $langs->transnoentities("NbAccidentInvestigations")],
 				'content'    => [$arrayNbDaysWithoutAccident['daywithoutaccident'], $arrayNbWorkstopDays['nbworkstopdays'], $arrayNbAccidentsByEmployees['nbaccidentsbyemployees'], $arrayNbPresquAccidents['nbpresquaccidents'], $arrayNbAccidentInvestigations['nbaccidentinvestigations']],
 				'picto'      => 'fas fa-user-injured',
 				'widgetName' => $langs->transnoentities('Accident')
 			],
-			DashboardDigiriskStats::DASHBOARD_ACCIDENT_INDICATOR_RATE => [
+			DigiriskDolibarrDashboard::DASHBOARD_ACCIDENT_INDICATOR_RATE => [
 				'label'      => [$langs->transnoentities("FrequencyIndex"), $langs->transnoentities("FrequencyRate"), $langs->transnoentities("GravityRate")],
 				'content'    => [$arrayFrequencyIndex['frequencyindex'], $arrayFrequencyRate['frequencyrate'], $arrayGravityRate['gravityrate']],
 				'tooltip'    => [
@@ -374,6 +372,8 @@ class Accident extends SaturneObject
 				'widgetName' => $langs->transnoentities('AccidentRateIndicator')
 			]
 		];
+
+		$array['dataset'] = 2;
 
 		$array['graphs'] = $arrayNbAccidents;
 

@@ -1,5 +1,5 @@
 <?php
-/* Copyright (C) 2022 EOXIA <dev@eoxia.com>
+/* Copyright (C) 2022 EOXIA <technique@evarisk.com>
  *
  * This program is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -49,7 +49,6 @@ if (!empty($conf->category->enabled)) {
 require_once __DIR__ . '/../../lib/digiriskdolibarr_ticket.lib.php';
 require_once __DIR__ . '/../../class/ticketdigiriskstats.class.php';
 require_once __DIR__ . '/../../class/digiriskelement.class.php';
-require_once __DIR__ . '/../../core/tpl/digirisk_security_checks.php';
 
 $WIDTH  = DolGraph::getDefaultGraphSizeForStats('width');
 $HEIGHT = DolGraph::getDefaultGraphSizeForStats('height');
@@ -79,6 +78,11 @@ $digiriskelement = new DigiriskElement($db);
 if ($user->socid > 0) {
 	$action = '';
 	$socid = $user->socid;
+}
+
+$deletedElements = $digiriskelement->getMultiEntityTrashList();
+if (empty($deletedElements)) {
+	$deletedElements = [0];
 }
 
 $upload_dir = $conf->digiriskdolibarr->multidir_output[$conf->entity];
@@ -260,9 +264,15 @@ print $form->select_company($socid, 'socid', '', 1, 0, 0, array(), 0, 'widthcent
 print '</td></tr>';
 // DigiriskElement
 print '<tr><td class="left">'.$form->textwithpicto($langs->trans("GP/UT"), $langs->trans("GP/UTHelp")).'</td><td class="left">';
-$digiriskelementlist = $digiriskelement->select_digiriskelement_list($digiriskelementid, 'digiriskelementid', '', 1, 0, array(), 1);
-$digiriskelementlist = $all + $digiriskelementlist;
-print $form->multiselectarray('digiriskelementlist', $digiriskelementlist, ((!empty(GETPOST('refresh', 'int'))) ? GETPOST('digiriskelementlist', 'array') : $digiriskelementlist), 0, 0, 'widthcentpercentminusx maxwidth300');
+$objectList = saturne_fetch_all_object_type('digiriskelement', '', '', 0, 0,  ['customsql' => 'rowid NOT IN (' . implode(',', $deletedElements) . ')']);
+$digiriskElementsData  = [];
+if (is_array($objectList) && !empty($objectList)) {
+	foreach ($objectList as $digiriskElement) {
+		$digiriskElementsData[$digiriskElement->id] = $digiriskElement->ref . ' - ' . $digiriskElement->label;
+	}
+}
+$digiriskElementsData = $all + $digiriskElementsData;
+print $form->multiselectarray('digiriskelementlist', $digiriskElementsData, ((!empty(GETPOST('refresh', 'int'))) ? GETPOST('digiriskelementlist', 'array') : $digiriskelementlist), 0, 0, 'widthcentpercentminusx maxwidth300');
 print '</td></tr>';
 // Category
 if (!empty($conf->category->enabled)) {
