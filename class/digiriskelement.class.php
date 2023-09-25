@@ -130,7 +130,8 @@ class DigiriskElement extends SaturneObject
 	{
 		global $conf;
 		if (empty($this->ref)) {
-            $digiriskElement = new $this->element_type;
+            $elementType = $this->element_type;
+            $digiriskElement = new $elementType($this->db);
 			$ref = $digiriskElement->getNextNumRef();
 			$this->ref = $ref;
 		}
