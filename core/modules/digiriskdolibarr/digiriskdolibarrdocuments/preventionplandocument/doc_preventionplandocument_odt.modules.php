@@ -27,8 +27,9 @@ require_once DOL_DOCUMENT_ROOT . '/core/lib/images.lib.php';
 require_once DOL_DOCUMENT_ROOT . '/core/lib/company.lib.php';
 require_once DOL_DOCUMENT_ROOT . '/core/lib/doc.lib.php';
 
-require_once __DIR__ . '/modules_preventionplandocument.php';
-require_once __DIR__ . '/mod_preventionplandocument_standard.php';
+// Load Saturne libraries.
+require_once __DIR__ . '/../../../../../../saturne/core/modules/saturne/modules_saturne.php';
+
 require_once __DIR__ . '/../../../../../class/evaluator.class.php';
 require_once __DIR__ . '/../../../../../class/riskanalysis/risk.class.php';
 require_once __DIR__ . '/../../../../../class/riskanalysis/riskassessment.class.php';
@@ -37,7 +38,7 @@ require_once __DIR__ . '/../../../../../class/riskanalysis/risksign.class.php';
 /**
  *	Class to build documents using ODF templates generator
  */
-class doc_preventionplandocument_odt extends ModeleODTPreventionPlanDocument
+class doc_preventionplandocument_odt extends SaturneDocumentModel
 {
 	/**
 	 * @var array Minimum version of PHP required by module.
@@ -263,17 +264,21 @@ class doc_preventionplandocument_odt extends ModeleODTPreventionPlanDocument
 
 		$object = $moreParam['object'];
 
-		complete_substitutions_array($tmpArray, $langs, $object);
-
 		$openinghours        = new Openinghours($this->db);
 		$preventionplanline  = new PreventionPlanLine($this->db);
 		$signatory           = new SaturneSignature($this->db, $moduleNameLowerCase, $object->element);
 
 		$preventionplanlines   = $preventionplanline->fetchAll('', '', 0, 0, ['fk_preventionplan' => $object->id]);
-		$extsocietyintervenants = $signatory->fetchSignatory('ExtSocietyAttendant', $object->id, 'preventionplan');
 
-		$jsonData  = $objectDocument->PreventionPlanDocumentFillJSON();
-		$arrayData = json_decode($jsonData);
+		$tmpArray = [];
+
+		$objectDocument->DigiriskFillJSON();
+
+		$objectDocument->element = $objectDocument->element . '@digiriskdolibarr';
+		complete_substitutions_array($tmpArray, $outputLangs, $objectDocument);
+		$objectDocument->element = $objectDocument->element;
+
+		$arrayData = json_decode($objectDocument->json);
 		$arrayData = (array) $arrayData->PreventionPlan;
 
 		if (is_array($preventionplanlines) && !empty($preventionplanlines)) {
@@ -394,6 +399,10 @@ class doc_preventionplandocument_odt extends ModeleODTPreventionPlanDocument
 		}
 
 		$moreParam['tmparray'] = $tmpArray;
+
+		$moreParam['tmparray']         = $tmpArray;
+		$moreParam['subDir']           = 'digiriskdolibarrdocuments/';
+		$moreParam['hideTemplateName'] = 1;
 
 		return parent::write_file($objectDocument, $outputLangs, $srcTemplatePath, $hideDetails, $hideDesc, $hideRef, $moreParam);
 	}

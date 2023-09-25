@@ -78,6 +78,7 @@ class PreventionPlanDocument extends DigiriskDocuments
 		$digirisk_resources = $resources->fetchDigiriskResources();
 
 		$extsociety = $resources->fetchResourcesFromObject('ExtSociety', $preventionplan);
+
 		if ($extsociety < 1) {
 			$extsociety = new stdClass();
 		}
@@ -229,6 +230,9 @@ class PreventionPlanDocument extends DigiriskDocuments
 				$json['PreventionPlan']['risk'][$line->id]['prevention_method'] = $line->prevention_method;
 			}
 		}
-		return json_encode($json, JSON_UNESCAPED_UNICODE);
+
+		$jsonFormatted = json_encode($json, JSON_UNESCAPED_UNICODE);
+
+		return $jsonFormatted;
 	}
 }

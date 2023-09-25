@@ -56,7 +56,7 @@ class RiskAssessmentDocument extends DigiriskDocuments
 	 * @param $object
 	 * @return false|string
 	 */
-	public function RiskAssessmentDocumentFillJSON($object)
+	public function RiskAssessmentDocumentFillJSON()
 	{
 		global $conf;
 
@@ -93,9 +93,9 @@ class RiskAssessmentDocument extends DigiriskDocuments
 		$json['RiskAssessmentDocument']['sources']            = $conf->global->DIGIRISKDOLIBARR_RISKASSESSMENTDOCUMENT_SOURCES;
 		$json['RiskAssessmentDocument']['remarqueImportante'] = $conf->global->DIGIRISKDOLIBARR_RISKASSESSMENTDOCUMENT_IMPORTANT_NOTES;
 
-		$object->json = json_encode($json, JSON_UNESCAPED_UNICODE);
+		$jsonFormatted = json_encode($json, JSON_UNESCAPED_UNICODE);
 
-		return $object->json;
+		return $jsonFormatted;
 	}
 
 	/**

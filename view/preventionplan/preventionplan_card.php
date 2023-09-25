@@ -48,7 +48,6 @@ require_once __DIR__ . '/../../class/riskanalysis/risk.class.php';
 require_once __DIR__ . '/../../class/digiriskdolibarrdocuments/preventionplandocument.class.php';
 require_once __DIR__ . '/../../lib/digiriskdolibarr_function.lib.php';
 require_once __DIR__ . '/../../lib/digiriskdolibarr_preventionplan.lib.php';
-require_once __DIR__ . '/../../core/modules/digiriskdolibarr/digiriskdolibarrdocuments/preventionplandocument/modules_preventionplandocument.php';
 
 // Global variables definitions
 global $conf, $db, $hookmanager, $langs, $user;
