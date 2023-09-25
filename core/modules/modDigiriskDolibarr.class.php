@@ -858,8 +858,8 @@ class modDigiriskdolibarr extends DolibarrModules
 
 		// Array to add new pages in new tabs
 		$this->tabs = [];
-		$pictopath = dol_buildpath('/custom/digiriskdolibarr/img/digiriskdolibarr32px.png', 1);
-		$pictoDigirisk = img_picto('', $pictopath, '', 1, 0, 0, '', 'pictoDigirisk');
+		$pictopath = dol_buildpath('/custom/digiriskdolibarr/img/digiriskdolibarr_color.png', 1);
+		$pictoDigirisk = img_picto('', $pictopath, '', 1, 0, 0, '', 'pictoModule');
 		$this->tabs[] = ['data' => 'mycompany_admin:+security:'. $pictoDigirisk . $langs->trans('Security').':digiriskdolibarr@digiriskdolibarr:1:/custom/digiriskdolibarr/admin/securityconf.php'];  			// To add a new tab identified by code tabname1
 		$this->tabs[] = ['data' => 'mycompany_admin:+social:'. $pictoDigirisk .$langs->trans('Social').':digiriskdolibarr@digiriskdolibarr:1:/custom/digiriskdolibarr/admin/socialconf.php'];  					// To add a new tab identified by code tabname1
 		$this->tabs[] = ['data' => 'thirdparty:+openinghours:'. $pictoDigirisk .$langs->trans('Schedules').':digiriskdolibarr@digiriskdolibarr:1:/custom/saturne/view/saturne_schedules.php?id=__ID__&element_type=societe&module_name=societe']; // To add a new tab identified by code tabname1
