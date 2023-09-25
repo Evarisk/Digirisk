@@ -27,8 +27,9 @@ require_once DOL_DOCUMENT_ROOT . '/core/lib/images.lib.php';
 require_once DOL_DOCUMENT_ROOT . '/core/lib/company.lib.php';
 require_once DOL_DOCUMENT_ROOT . '/core/lib/doc.lib.php';
 
-require_once __DIR__ . '/modules_firepermitdocument.php';
-require_once __DIR__ . '/mod_firepermitdocument_standard.php';
+// Load Saturne libraries.
+require_once __DIR__ . '/../../../../../../saturne/core/modules/saturne/modules_saturne.php';
+
 require_once __DIR__ . '/../../../../../class/evaluator.class.php';
 require_once __DIR__ . '/../../../../../class/riskanalysis/risk.class.php';
 require_once __DIR__ . '/../../../../../class/riskanalysis/riskassessment.class.php';
@@ -39,7 +40,6 @@ require_once __DIR__ . '/../../../../../class/riskanalysis/risksign.class.php';
  */
 class doc_firepermitdocument_odt extends SaturneDocumentModel
 {
-
 	/**
 	 * @var array Minimum version of PHP required by module.
 	 * e.g.: PHP ≥ 5.5 = array(5, 5)
@@ -61,8 +61,6 @@ class doc_firepermitdocument_odt extends SaturneDocumentModel
 	 */
 	public string $document_type = 'firepermitdocument';
 
-
-
 	/**
 	 *	Constructor
 	 *
@@ -76,14 +74,13 @@ class doc_firepermitdocument_odt extends SaturneDocumentModel
 	/**
 	 * Return description of a module.
 	 *
-	 * @param  Translate $langs Lang object to use for output.
+	 * @param  Translate $langs Lang object to use f or output.
 	 * @return string           Description.
 	 */
 	public function info(Translate $langs): string
 	{
 		return parent::info($langs);
 	}
-
 
 	/**
 	 * Fill all odt tags for segments lines.
@@ -104,8 +101,11 @@ class doc_firepermitdocument_odt extends SaturneDocumentModel
 		$digiriskelement = new DigiriskElement($this->db);
 		$risk = new Risk($this->db);
 
-		$preventionplanline = new PreventionPlanLine($this->db);
-		$preventionplanlines = $preventionplanline->fetchAll('', '', 0, 0, ['fk_preventionplan' => $object->id]);
+		$firepermitline = new FirePermitLine($this->db);
+		$firepermitlines = $firepermitline->fetchAll('', '', 0, 0, ['fk_firepermit' => $object->id]);
+
+		$preventionplanline = new PreventionPLanLine($this->db);
+		$preventionplanlines = $preventionplanline->fetchAll('', '', 0, 0, ['fk_preventionplan' => $object->fk_preventionplan]);
 
 		try {
 			$this->setAttendantsSegment($odfHandler, $outputLangs, $moreParam);
@@ -133,52 +133,62 @@ class doc_firepermitdocument_odt extends SaturneDocumentModel
 					foreach ($preventionplanlines as $line) {
 						$digiriskelement->fetch($line->fk_element);
 
-						$tmparray['key_unique'] = $line->ref;
-						$tmparray['unite_travail'] = $digiriskelement->ref . " - " . $digiriskelement->label;
-						$tmparray['action'] = $line->description;
-						$tmparray['risk'] = DOL_DOCUMENT_ROOT . '/custom/digiriskdolibarr/img/categorieDangers/' . $risk->getDangerCategory(
+						$tmpArray['key_unique'] = $line->ref;
+						$tmpArray['unite_travail'] = $digiriskelement->ref . " - " . $digiriskelement->label;
+						$tmpArray['action'] = $line->description;
+						$tmpArray['risk_photo'] = DOL_DOCUMENT_ROOT . '/custom/digiriskdolibarr/img/categorieDangers/' . $risk->getDangerCategory(
 								$line
 							) . '.png';
-						$tmparray['nomPicto'] = (!empty($conf->global->DIGIRISKDOLIBARR_DOCUMENT_SHOW_PICTO_NAME) ? $risk->getDangerCategoryName(
+						$tmpArray['nomPicto'] = (!empty($conf->global->DIGIRISKDOLIBARR_DOCUMENT_SHOW_PICTO_NAME) ? $risk->getDangerCategoryName(
 							$line
 						) : ' ');
-						$tmparray['prevention'] = $line->prevention_method;
+						$tmpArray['prevention'] = $line->prevention_method;
 
-						foreach ($tmparray as $key => $val) {
-							try {
-								if ($key == 'risk') {
-									$listLines->setImage($key, $val);
-								} elseif (empty($val)) {
-									$listLines->setVars($key, $langs->trans('NoData'), true, 'UTF-8');
-								} else {
-									$listLines->setVars(
-										$key,
-										html_entity_decode($val, ENT_QUOTES | ENT_HTML5),
-										true,
-										'UTF-8'
-									);
-								}
-							} catch (OdfException $e) {
-								dol_syslog($e->getMessage(), LOG_INFO);
-							} catch (SegmentException $e) {
-								dol_syslog($e->getMessage(), LOG_INFO);
-							}
-						}
-						$listLines->merge();
+						$this->setTmpArrayVars($tmpArray, $listLines, $outputLangs);
 					}
 				}
 				$odfHandler->mergeSegment($listLines);
 			}
 
-			return 0;
-		} catch (OdfException $e) {
+			// Get attendants role controller.
+			$foundTagForLines = 1;
+			try {
+				$listLines = $odfHandler->setSegment('interventions_FP');
+			} catch (OdfException $e) {
+				// We may arrive here if tags for lines not present into template.
+				$foundTagForLines = 0;
+				$listLines = '';
+				dol_syslog($e->getMessage());
+			}
+
+			if ($foundTagForLines) {
+				if (is_array($firepermitlines) && !empty($firepermitlines)) {
+					foreach ($firepermitlines as $line) {
+						$digiriskelement->fetch($line->fk_element);
+
+						$tmpArray['key_unique'] = $line->ref;
+						$tmpArray['unite_travail'] = $digiriskelement->ref . " - " . $digiriskelement->label;
+						$tmpArray['action'] = $line->description;
+						$tmpArray['type_de_travaux_photo'] = DOL_DOCUMENT_ROOT . '/custom/digiriskdolibarr/img/categorieDangers/' . $risk->getDangerCategory(
+								$line
+							) . '.png';
+						$tmpArray['nomPicto'] = (!empty($conf->global->DIGIRISKDOLIBARR_DOCUMENT_SHOW_PICTO_NAME) ? $risk->getDangerCategoryName(
+							$line
+						) : ' ');
+						$tmpArray['materiel'] = $line->used_equipment;
+
+						$this->setTmpArrayVars($tmpArray, $listLines, $outputLangs);
+					}
+				}
+				$odfHandler->mergeSegment($listLines);
+			}
+		}  catch (OdfException $e) {
 			$this->error = $e->getMessage();
 			dol_syslog($this->error, LOG_WARNING);
 			return -1;
 		}
-
+		return 0;
 	}
-
 	/**
 	 * Set attendants segment.
 	 *
@@ -207,7 +217,7 @@ class doc_firepermitdocument_odt extends SaturneDocumentModel
 			dol_syslog($e->getMessage());
 		}
 
-		$extsocietyintervenants = $signatory->fetchSignatory('ExtSocietyAttendant', $object->id, 'preventionplan');
+		$extsocietyintervenants = $signatory->fetchSignatory('ExtSocietyAttendant', $object->id, 'firepermit');
 
 		$tempdir = $conf->digiriskdolibarr->multidir_output[$object->entity ?? 1] . '/temp/';
 
@@ -220,48 +230,23 @@ class doc_firepermitdocument_odt extends SaturneDocumentModel
 							$encoded_image = explode(",", $line->signature)[1];
 							$decoded_image = base64_decode($encoded_image);
 							file_put_contents($tempdir . "signature" . $k . ".png", $decoded_image);
-							$tmparray['intervenants_signature'] = $tempdir . "signature" . $k . ".png";
+							$tmpArray['intervenants_signature'] = $tempdir . "signature" . $k . ".png";
 						} else {
-							$tmparray['intervenants_signature'] = '';
+							$tmpArray['intervenants_signature'] = '';
 						}
 					} else {
-						$tmparray['intervenants_signature'] = '';
+						$tmpArray['intervenants_signature'] = '';
 					}
-					$tmparray['name']     = $line->firstname;
-					$tmparray['lastname'] = $line->lastname;
-					$tmparray['phone']    = $line->phone;
-					$tmparray['mail']     = $line->email;
-					$tmparray['status']   = $line->getLibStatut(1);
+					$tmpArray['name']     = $line->firstname;
+					$tmpArray['lastname'] = $line->lastname;
+					$tmpArray['phone']    = $line->phone;
+					$tmpArray['mail']     = $line->email;
+					$tmpArray['status']   = $line->getLibStatut(1);
 
 					$k++;
 
-					foreach ($tmparray as $key => $value) {
-						try {
-							if ($key == 'intervenants_signature' && $line->status == 5) { // Image
-								if (file_exists($value)) {
-									$list     = getimagesize($value);
-									$newWidth = 200;
-									if ($list[0]) {
-										$ratio     = $newWidth / $list[0];
-										$newHeight = $ratio * $list[1];
-										dol_imageResizeOrCrop($value, 0, $newWidth, $newHeight);
-									}
-									$listLines->setImage($key, $value);
-								} else {
-									$odfHandler->setVars($key, $langs->trans('NoData'), true, 'UTF-8');
-								}
-							} elseif (empty($value)) {  // Text
-								$listLines->setVars($key, $langs->trans('NoData'), true, 'UTF-8');
-							} else {
-								$listLines->setVars($key, html_entity_decode($value, ENT_QUOTES | ENT_HTML5), true, 'UTF-8');
-							}
-						} catch (OdfException $e) {
-							dol_syslog($e->getMessage(), LOG_INFO);
-						} catch (SegmentException $e) {
-							dol_syslog($e->getMessage(), LOG_INFO);
-						}
-					}
-					$listLines->merge();
+					$this->setTmpArrayVars($tmpArray, $listLines, $outputLangs);
+
 
 					if (($moreParam['specimen'] == 0 && $object->status >= $object::STATUS_LOCKED)) {
 						dol_delete_file($tempdir . "signature" . $k . ".png");
@@ -269,14 +254,14 @@ class doc_firepermitdocument_odt extends SaturneDocumentModel
 				}
 				$odfHandler->mergeSegment($listLines);
 			} else {
-				$tmparray['intervenants_signature'] = '';
-				$tmparray['name']                   = '';
-				$tmparray['lastname']               = '';
-				$tmparray['phone']                  = '';
-				$tmparray['mail']                   = '';
-				$tmparray['status']                 = '';
+				$tmpArray['intervenants_signature'] = '';
+				$tmpArray['name']                   = '';
+				$tmpArray['lastname']               = '';
+				$tmpArray['phone']                  = '';
+				$tmpArray['mail']                   = '';
+				$tmpArray['status']                 = '';
 
-				foreach ($tmparray as $key => $val) {
+				foreach ($tmpArray as $key => $val) {
 					try {
 						if (empty($val)) {
 							$listLines->setVars($key, $langs->trans('NoData'), true, 'UTF-8');
@@ -312,22 +297,27 @@ class doc_firepermitdocument_odt extends SaturneDocumentModel
 
 		$object = $moreParam['object'];
 
-		complete_substitutions_array($tmpArray, $langs, $object);
-
 		$openinghours        = new Openinghours($this->db);
-		$preventionplanline  = new PreventionPlanLine($this->db);
-		$firePermitLine      = new FirePermitLine($this->db);
-		$signatory           = new SaturneSignature($this->db, $moduleNameLowerCase, $object->element);
+		$firepermitline  = new FirePermitLine($this->db);
+		$preventionplan = new PreventionPlan($this->db);
 
-		$preventionplanlines   = $preventionplanline->fetchAll('', '', 0, 0, ['fk_preventionplan' => $object->id]);
-		$extsocietyintervenants = $signatory->fetchSignatory('ExtSocietyAttendant', $object->id, 'preventionplan');
+		$preventionplan->fetch($object->fk_preventionplan);
 
-		$jsonData  = $objectDocument->FirePermitDocumentFillJSON();
-		$arrayData = json_decode($jsonData);
-		$arrayData = (array) $arrayData->PreventionPlan;
+		$firepermitlines   = $firepermitline->fetchAll('', '', 0, 0, ['fk_firepermit' => $object->id]);
 
-		if (is_array($preventionplanlines) && !empty($preventionplanlines)) {
-			$tmpArray['interventions_info'] = count($preventionplanlines) . ' ' . $langs->trans('PreventionPlanLine');
+		$tmpArray = [];
+
+		$objectDocument->DigiriskFillJSON();
+
+		$objectDocument->element = $objectDocument->element . '@digiriskdolibarr';
+		complete_substitutions_array($tmpArray, $outputLangs, $objectDocument);
+		$objectDocument->element = $objectDocument->element;
+
+		$arrayData = json_decode($objectDocument->json);
+		$arrayData = (array) $arrayData->FirePermit;
+
+		if (is_array($firepermitlines) && !empty($firepermitlines)) {
+			$tmpArray['interventions_info'] = count($firepermitlines) . ' ' . $langs->trans('FirePermitLine');
 		} else {
 			$tmpArray['interventions_info'] = 0;
 		}
@@ -347,20 +337,26 @@ class doc_firepermitdocument_odt extends SaturneDocumentModel
 		$tmpArray['consigne_generale']              = $arrayData['consigne_generale'];
 		$tmpArray['premiers_secours']               = $arrayData['premiers_secours'];
 
-		$tmpArray['titre_prevention']             = $object->ref;
-		$tmpArray['raison_du_plan_de_prevention'] = $object->label;
+		$tmpArray['titre_permis_feu']             = $object->ref;
+		$tmpArray['raison_du_permis_feu']         = $object->label;
+		$tmpArray['titre_plan_prevention']             = $object->ref;
+		$tmpArray['raison_plan_prevention'] = $object->label;
 
 		$tmpArray['prior_visit_date'] = dol_print_date($object->prior_visit_date, 'dayhoursec');
 		$tmpArray['prior_visit_text'] = $object->prior_visit_text;
 
-		$tmpArray['date_start_intervention_PPP'] = dol_print_date($object->date_start, 'dayhoursec');
-		$tmpArray['date_end_intervention_PPP']   = dol_print_date($object->date_end, 'dayhoursec');
+		$tmpArray['date_start_intervention_PPP'] = dol_print_date($preventionplan->date_start, 'dayhoursec');
+		$tmpArray['date_end_intervention_PPP']   = dol_print_date($preventionplan->date_end, 'dayhoursec');
+
+		$tmpArray['date_start_intervention_FP'] = dol_print_date($object->date_start, 'dayhoursec');
+		$tmpArray['date_end_intervention_FP']   = dol_print_date($object->date_end, 'dayhoursec');
 
 		$morewhere  = ' AND element_id = ' . $object->id;
 		$morewhere .= ' AND element_type = ' . "'" . $object->element . "'";
 		$morewhere .= ' AND status = 1';
 
 		$openinghours->fetch(0, '', $morewhere);
+		echo '<pre>'; print_r( $morewhere ); echo '</pre>'; exit;
 
 		$opening_hours_monday    = explode(' ', $openinghours->monday);
 		$opening_hours_tuesday   = explode(' ', $openinghours->tuesday);
@@ -370,20 +366,20 @@ class doc_firepermitdocument_odt extends SaturneDocumentModel
 		$opening_hours_saturday  = explode(' ', $openinghours->saturday);
 		$opening_hours_sunday    = explode(' ', $openinghours->sunday);
 
-		$tmpArray['lundi_matin']    = $opening_hours_monday[0];
-		$tmpArray['lundi_aprem']    = $opening_hours_monday[1];
-		$tmpArray['mardi_matin']    = $opening_hours_tuesday[0];
-		$tmpArray['mardi_aprem']    = $opening_hours_tuesday[1];
-		$tmpArray['mercredi_matin'] = $opening_hours_wednesday[0];
-		$tmpArray['mercredi_aprem'] = $opening_hours_wednesday[1];
-		$tmpArray['jeudi_matin']    = $opening_hours_thursday[0];
-		$tmpArray['jeudi_aprem']    = $opening_hours_thursday[1];
-		$tmpArray['vendredi_matin'] = $opening_hours_friday[0];
-		$tmpArray['vendredi_aprem'] = $opening_hours_friday[1];
-		$tmpArray['samedi_matin']   = $opening_hours_saturday[0];
-		$tmpArray['samedi_aprem']   = $opening_hours_saturday[1];
-		$tmpArray['dimanche_matin'] = $opening_hours_sunday[0];
-		$tmpArray['dimanche_aprem'] = $opening_hours_sunday[1];
+		$tmpArray['lundi_matinF']    = $opening_hours_monday[0];
+		$tmpArray['lundi_apremF']    = $opening_hours_monday[1];
+		$tmpArray['mardi_matinF']    = $opening_hours_tuesday[0];
+		$tmpArray['mardi_apremF']    = $opening_hours_tuesday[1];
+		$tmpArray['mercredi_matinF'] = $opening_hours_wednesday[0];
+		$tmpArray['mercredi_apremF'] = $opening_hours_wednesday[1];
+		$tmpArray['jeudi_matinF']    = $opening_hours_thursday[0];
+		$tmpArray['jeudi_apremF']    = $opening_hours_thursday[1];
+		$tmpArray['vendredi_matinF'] = $opening_hours_friday[0];
+		$tmpArray['vendredi_apremF'] = $opening_hours_friday[1];
+		$tmpArray['samedi_matinF']   = $opening_hours_saturday[0];
+		$tmpArray['samedi_apremF']   = $opening_hours_saturday[1];
+		$tmpArray['dimanche_matinF'] = $opening_hours_sunday[0];
+		$tmpArray['dimanche_apremF'] = $opening_hours_sunday[1];
 
 		//Informations entreprise extérieure
 		$extsociety = $arrayData['society_outside'];
@@ -444,6 +440,10 @@ class doc_firepermitdocument_odt extends SaturneDocumentModel
 		}
 
 		$moreParam['tmparray'] = $tmpArray;
+
+		$moreParam['tmparray']         = $tmpArray;
+		$moreParam['subDir']           = 'digiriskdolibarrdocuments/';
+		$moreParam['hideTemplateName'] = 1;
 
 		return parent::write_file($objectDocument, $outputLangs, $srcTemplatePath, $hideDetails, $hideDesc, $hideRef, $moreParam);
 	}

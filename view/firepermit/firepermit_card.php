@@ -47,7 +47,6 @@ require_once __DIR__ . '/../../class/riskanalysis/risk.class.php';
 require_once __DIR__ . '/../../class/digiriskdolibarrdocuments/firepermitdocument.class.php';
 require_once __DIR__ . '/../../lib/digiriskdolibarr_function.lib.php';
 require_once __DIR__ . '/../../lib/digiriskdolibarr_firepermit.lib.php';
-require_once __DIR__ . '/../../core/modules/digiriskdolibarr/digiriskdolibarrdocuments/firepermitdocument/modules_firepermitdocument.php';
 
 // Global variables definitions
 global $conf, $db, $hookmanager, $langs, $user;

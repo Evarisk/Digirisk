@@ -85,7 +85,7 @@ class FirePermitDocument extends DigiriskDocuments
 		$maitreoeuvre           = $signatory->fetchSignatory('MasterWorker', $firepermit->id, 'firepermit');
 		$maitreoeuvre           = is_array($maitreoeuvre) ? array_shift($maitreoeuvre) : $maitreoeuvre;
 
-		$extsocietyresponsible  = $signatory->fetchSignatory('ExtSociety_RESPONSIBLE', $firepermit->id, 'firepermit');
+		$extsocietyresponsible  = $signatory->fetchSignatory('ExtSocietyResponsible', $firepermit->id, 'firepermit');
 		$extsocietyresponsible  = is_array($extsocietyresponsible) ? array_shift($extsocietyresponsible) : $extsocietyresponsible;
 
 		$extsocietyintervenants = $signatory->fetchSignatory('ExtSocietyAttendant', $firepermit->id, 'firepermit');
