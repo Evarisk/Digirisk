@@ -60,54 +60,54 @@ class DigiriskElement extends SaturneObject
      */
     public int $isextrafieldmanaged = 1;
 
-	public const STATUS_DELETED   = -1;
-	public const STATUS_DRAFT     = 0;
-	public const STATUS_VALIDATED = 1;
-	public const STATUS_LOCKED    = 2;
-	public const STATUS_ARCHIVED  = 3;
+    public const STATUS_DELETED   = -1;
+    public const STATUS_DRAFT     = 0;
+    public const STATUS_VALIDATED = 1;
+    public const STATUS_LOCKED    = 2;
+    public const STATUS_ARCHIVED  = 3;
 
     /**
      * @var array  Array with all fields and their property. Do not use it as a static var. It may be modified by constructor.
      */
-	public array $fields = [
-		'rowid'            => ['type' => 'integer', 'label' => 'TechnicalID', 'enabled' => '1', 'position' => 1, 'notnull' => 1, 'visible' => 0, 'noteditable' => '1', 'index' => 1, 'comment' => "Id"],
-		'ref'              => ['type' => 'varchar(128)', 'label' => 'Ref', 'enabled' => '1', 'position' => 10, 'notnull' => 1, 'visible' => 1, 'noteditable' => '1', 'default' => '(PROV)', 'index' => 1, 'searchall' => 1, 'showoncombobox' => '1', 'comment' => "Reference of object"],
-		'ref_ext'          => ['type' => 'varchar(128)', 'label' => 'RefExt', 'enabled' => '1', 'position' => 20, 'notnull' => 0, 'visible' => 0,],
-		'entity'           => ['type' => 'integer', 'label' => 'Entity', 'enabled' => '1', 'position' => 30, 'notnull' => 1, 'visible' => -1,],
-		'date_creation'    => ['type' => 'datetime', 'label' => 'DateCreation', 'enabled' => '1', 'position' => 40, 'notnull' => 1, 'visible' => -2,],
-		'tms'              => ['type' => 'timestamp', 'label' => 'DateModification', 'enabled' => '1', 'position' => 50, 'notnull' => 0, 'visible' => -2,],
-		'import_key'       => ['type' => 'integer', 'label' => 'ImportId', 'enabled' => '1', 'position' => 60, 'notnull' => 1, 'visible' => -2,],
-		'status'           => ['type' => 'smallint', 'label' => 'Status', 'enabled' => '1', 'position' => 70, 'notnull' => 1, 'default' => 1, 'visible' => 1, 'index' => 1,],
-		'label'            => ['type' => 'varchar(255)', 'label' => 'Label', 'enabled' => '1', 'position' => 80, 'notnull' => 1, 'visible' => 1, 'searchall' => 1, 'css' => 'minwidth400', 'help' => "Help text", 'showoncombobox' => '1',],
-		'description'      => ['type' => 'textarea', 'label' => 'Description', 'enabled' => '1', 'position' => 90, 'notnull' => 0, 'visible' => 3,],
-		'element_type'     => ['type' => 'varchar(50)', 'label' => 'ElementType', 'enabled' => '1', 'position' => 100, 'notnull' => -1, 'visible' => 1,],
-		'photo'            => ['type' => 'varchar(255)', 'label' => 'Photo', 'enabled' => '1', 'position' => 105, 'notnull' => -1, 'visible' => -2,],
-		'show_in_selector' => ['type' => 'boolean', 'label' => 'ShowInSelectOnPublicTicketInterface', 'enabled' => '1', 'position' => 106, 'notnull' => 1, 'visible' => 1, 'default' => 1,],
-		'fk_user_creat'    => ['type' => 'integer:User:user/class/user.class.php', 'label' => 'UserAuthor', 'enabled' => '1', 'position' => 110, 'notnull' => 1, 'visible' => -2, 'foreignkey' => 'user.rowid',],
-		'fk_user_modif'    => ['type' => 'integer:User:user/class/user.class.php', 'label' => 'UserModif', 'enabled' => '1', 'position' => 120, 'notnull' => -1, 'visible' => -2,],
-		'fk_parent'        => ['type' => 'integer', 'label' => 'ParentElement', 'enabled' => '1', 'position' => 130, 'notnull' => 1, 'visible' => 1, 'default' => 0,],
-		'fk_standard'      => ['type' => 'integer', 'label' => 'Standard', 'enabled' => '1', 'position' => 140, 'notnull' => 1, 'visible' => 0, 'default' => 1,],
-		'ranks'            => ['type' => 'integer', 'label' => 'Order', 'enabled' => '1', 'position' => 150, 'notnull' => 1, 'visible' => 0],
+    public array $fields = [
+        'rowid'            => ['type' => 'integer', 'label' => 'TechnicalID', 'enabled' => '1', 'position' => 1, 'notnull' => 1, 'visible' => 0, 'noteditable' => '1', 'index' => 1, 'comment' => "Id"],
+        'ref'              => ['type' => 'varchar(128)', 'label' => 'Ref', 'enabled' => '1', 'position' => 10, 'notnull' => 1, 'visible' => 1, 'noteditable' => '1', 'default' => '(PROV)', 'index' => 1, 'searchall' => 1, 'showoncombobox' => '1', 'comment' => "Reference of object"],
+        'ref_ext'          => ['type' => 'varchar(128)', 'label' => 'RefExt', 'enabled' => '1', 'position' => 20, 'notnull' => 0, 'visible' => 0,],
+        'entity'           => ['type' => 'integer', 'label' => 'Entity', 'enabled' => '1', 'position' => 30, 'notnull' => 1, 'visible' => -1,],
+        'date_creation'    => ['type' => 'datetime', 'label' => 'DateCreation', 'enabled' => '1', 'position' => 40, 'notnull' => 1, 'visible' => -2,],
+        'tms'              => ['type' => 'timestamp', 'label' => 'DateModification', 'enabled' => '1', 'position' => 50, 'notnull' => 0, 'visible' => -2,],
+        'import_key'       => ['type' => 'integer', 'label' => 'ImportId', 'enabled' => '1', 'position' => 60, 'notnull' => 1, 'visible' => -2,],
+        'status'           => ['type' => 'smallint', 'label' => 'Status', 'enabled' => '1', 'position' => 70, 'notnull' => 1, 'default' => 1, 'visible' => 1, 'index' => 1,],
+        'label'            => ['type' => 'varchar(255)', 'label' => 'Label', 'enabled' => '1', 'position' => 80, 'notnull' => 1, 'visible' => 1, 'searchall' => 1, 'css' => 'minwidth400', 'help' => "Help text", 'showoncombobox' => '1',],
+        'description'      => ['type' => 'textarea', 'label' => 'Description', 'enabled' => '1', 'position' => 90, 'notnull' => 0, 'visible' => 3,],
+        'element_type'     => ['type' => 'varchar(50)', 'label' => 'ElementType', 'enabled' => '1', 'position' => 100, 'notnull' => -1, 'visible' => 1,],
+        'photo'            => ['type' => 'varchar(255)', 'label' => 'Photo', 'enabled' => '1', 'position' => 105, 'notnull' => -1, 'visible' => -2,],
+        'show_in_selector' => ['type' => 'boolean', 'label' => 'ShowInSelectOnPublicTicketInterface', 'enabled' => '1', 'position' => 106, 'notnull' => 1, 'visible' => 1, 'default' => 1,],
+        'fk_user_creat'    => ['type' => 'integer:User:user/class/user.class.php', 'label' => 'UserAuthor', 'enabled' => '1', 'position' => 110, 'notnull' => 1, 'visible' => -2, 'foreignkey' => 'user.rowid',],
+        'fk_user_modif'    => ['type' => 'integer:User:user/class/user.class.php', 'label' => 'UserModif', 'enabled' => '1', 'position' => 120, 'notnull' => -1, 'visible' => -2,],
+        'fk_parent'        => ['type' => 'integer', 'label' => 'ParentElement', 'enabled' => '1', 'position' => 130, 'notnull' => 1, 'visible' => 1, 'default' => 0,],
+        'fk_standard'      => ['type' => 'integer', 'label' => 'Standard', 'enabled' => '1', 'position' => 140, 'notnull' => 1, 'visible' => 0, 'default' => 1,],
+        'ranks'            => ['type' => 'integer', 'label' => 'Order', 'enabled' => '1', 'position' => 150, 'notnull' => 1, 'visible' => 0],
     ];
 
-	public $rowid;
-	public $ref;
-	public $ref_ext;
-	public $entity;
-	public $date_creation;
-	public $tms;
-	public $import_key;
-	public $status;
-	public $label;
-	public $description;
-	public $element_type;
-	public $photo;
-	public $show_in_selector;
-	public $fk_user_creat;
-	public $fk_user_modif;
-	public $fk_parent;
-	public $fk_standard;
-	public $ranks;
+    public $rowid;
+    public $ref;
+    public $ref_ext;
+    public $entity;
+    public $date_creation;
+    public $tms;
+    public $import_key;
+    public $status;
+    public $label;
+    public $description;
+    public $element_type;
+    public $photo;
+    public $show_in_selector;
+    public $fk_user_creat;
+    public $fk_user_modif;
+    public $fk_parent;
+    public $fk_standard;
+    public $ranks;
 
     /**
      * Constructor.
@@ -127,59 +127,64 @@ class DigiriskElement extends SaturneObject
      * @return int             0 < if KO, ID of created object if OK.
      */
     public function create(User $user, bool $notrigger = false): int
-	{
-		global $conf;
-		if (empty($this->ref)) {
-            $elementType = $this->element_type;
-            $digiriskElement = new $elementType($this->db);
-			$ref = $digiriskElement->getNextNumRef();
-			$this->ref = $ref;
-		}
-		$this->element     = $this->element_type . '@digiriskdolibarr';
-		$this->fk_standard = $conf->global->DIGIRISKDOLIBARR_ACTIVE_STANDARD;
-		$this->status      = 1;
+    {
+        global $conf;
+        if (empty($this->ref)) {
+            $type           = 'DIGIRISKDOLIBARR_' . strtoupper($this->element_type) . '_ADDON';
+            $objectMod = $conf->global->$type;
+            $numberingModules = [
+                'digiriskelement/' . $this->element_type => $objectMod
+            ];
+            list($refDigiriskElementMod) = saturne_require_objects_mod($numberingModules, 'digiriskdolibarr');
 
-		return $this->createCommon($user, $notrigger);
-	}
+            $ref = $refDigiriskElementMod->getNextValue($this);
+            $this->ref = $ref;
+        }
+        $this->element     = $this->element_type . '@digiriskdolibarr';
+        $this->fk_standard = $conf->global->DIGIRISKDOLIBARR_ACTIVE_STANDARD;
+        $this->status      = 1;
 
-	/**
-	 * Load ordered flat list of DigiriskElement in memory from the database
-	 *
-	 * @param int $parent_id Id parent object
-	 * @return array         <0 if KO, 0 if not found, >0 if OK
-	 * @throws Exception
-	 */
-	public function fetchDigiriskElementFlat($parent_id)
-	{
-		$object  = new DigiriskElement($this->db);
-		$objects = $object->fetchAll('',  '',  0,  0, array('customsql' => 'status > 0' ));
+        return $this->createCommon($user, $notrigger);
+    }
 
-		if (is_array($objects)) {
-			$elements = recurse_tree($parent_id, 0, $objects);
-			$digiriskelementlist = array();
-			if ($elements > 0 && ! empty($elements)) {
-				// Super function iterations flat.
-				$it = new RecursiveIteratorIterator(new RecursiveArrayIterator($elements));
-				$element = array();
-				foreach ($it as $key => $v) {
-					$element[$key][$v] = $v;
-				}
-				$children_id = array_shift($element);
+    /**
+     * Load ordered flat list of DigiriskElement in memory from the database
+     *
+     * @param int $parent_id Id parent object
+     * @return array         <0 if KO, 0 if not found, >0 if OK
+     * @throws Exception
+     */
+    public function fetchDigiriskElementFlat($parent_id)
+    {
+        $object  = new DigiriskElement($this->db);
+        $objects = $object->fetchAll('',  '',  0,  0, array('customsql' => 'status > 0' ));
 
-				if ( ! empty($children_id)) {
-					foreach ($children_id as $id) {
-						$object = $objects[$id];
-						$depth = 'depth' . $id;
-						$digiriskelementlist[$id]['object'] = $object;
-						$digiriskelementlist[$id]['depth']  = array_shift($element[$depth]);
-					}
-				}
-			}
-			return $digiriskelementlist;
-		} else {
-			return array();
-		}
-	}
+        if (is_array($objects)) {
+            $elements = recurse_tree($parent_id, 0, $objects);
+            $digiriskelementlist = array();
+            if ($elements > 0 && ! empty($elements)) {
+                // Super function iterations flat.
+                $it = new RecursiveIteratorIterator(new RecursiveArrayIterator($elements));
+                $element = array();
+                foreach ($it as $key => $v) {
+                    $element[$key][$v] = $v;
+                }
+                $children_id = array_shift($element);
+
+                if ( ! empty($children_id)) {
+                    foreach ($children_id as $id) {
+                        $object = $objects[$id];
+                        $depth = 'depth' . $id;
+                        $digiriskelementlist[$id]['object'] = $object;
+                        $digiriskelementlist[$id]['depth']  = array_shift($element[$depth]);
+                    }
+                }
+            }
+            return $digiriskelementlist;
+        } else {
+            return array();
+        }
+    }
 
     /**
      * Delete object in database.
@@ -190,236 +195,236 @@ class DigiriskElement extends SaturneObject
      * @return int              0 < if KO, > 0 if OK.
      */
     public function delete(User $user, bool $notrigger = false, bool $softDelete = true): int
-	{
-		global $conf;
+    {
+        global $conf;
 
-		$this->fk_parent = $conf->global->DIGIRISKDOLIBARR_DIGIRISKELEMENT_TRASH;
+        $this->fk_parent = $conf->global->DIGIRISKDOLIBARR_DIGIRISKELEMENT_TRASH;
 
-		$result = $this->update($user, true);
-		if ($result > 0 && !empty($conf->global->DIGIRISKDOLIBARR_MAIN_AGENDA_ACTIONAUTO_DIGIRISKELEMENT_DELETE)) {
-			$this->call_trigger('DIGIRISKELEMENT_DELETE', $user);
-		}
+        $result = $this->update($user, true);
+        if ($result > 0 && !empty($conf->global->DIGIRISKDOLIBARR_MAIN_AGENDA_ACTIONAUTO_DIGIRISKELEMENT_DELETE)) {
+            $this->call_trigger('DIGIRISKELEMENT_DELETE', $user);
+        }
 
-		return $result;
-	}
+        return $result;
+    }
 
-	/**
-	 * Sets object to supplied categories.
-	 *
-	 * Deletes object from existing categories not supplied.
-	 * Adds it to non-existing supplied categories.
-	 * Existing categories are left untouched.
-	 *
-	 * @param  int[]|int $categories Category or categories IDs.
-	 * @return float|int
-	 */
-	public function setCategories($categories)
-	{
-		return 1;
-	}
+    /**
+     * Sets object to supplied categories.
+     *
+     * Deletes object from existing categories not supplied.
+     * Adds it to non-existing supplied categories.
+     * Existing categories are left untouched.
+     *
+     * @param  int[]|int $categories Category or categories IDs.
+     * @return float|int
+     */
+    public function setCategories($categories)
+    {
+        return 1;
+    }
 
-	/**
-	 *  Output html form to select a digirisk element.
-	 *
-	 * @param  string 		$selected 			Preselected type
-	 * @param  string 		$htmlname 			Name of field in form
-	 * @param  array 		$filter 			Optional filters criteras (example: 's.rowid <> x', 's.client in (1,3)')
-	 * @param  string 		$showempty 			Add an empty field (Can be '1' or text to use on empty line like 'SelectThirdParty')
-	 * @param  int 			$forcecombo 		Force to use standard HTML select component without beautification
-	 * @param  array 		$events 			Event options. Example: array(array('method'=>'getContacts', 'url'=>dol_buildpath('/core/ajax/contacts.php',1), 'htmlname'=>'contactid', 'params'=>array('add-customer-contact'=>'disabled')))
-	 * @param  int 			$outputmode 		0=HTML select string, 1=Array
-	 * @param  int 			$limit 				Limit number of answers
-	 * @param  string 		$morecss 			Add more css styles to the SELECT component
-	 * @param  int	 		$current_element 	id of current digiriskelement
-	 * @param  bool 		$multiple 			add [] in the name of element and add 'multiple' attribut
-	 * @param  int 			$noroot  			Don't show root element
-	 * @param  string 		$contextpage 		Context page
-	 * @param  bool 		$multientitymanaged Multi entity filter
-	 * @param  bool 		$hideref 			Hide ref
-	 * @return string 							HTML string with
-	 * @throws Exception
-	 */
-	public function selectDigiriskElementList($selected = '', $htmlname = 'fk_element', $filter = [], $showempty = '1', $forcecombo = 0, $events = array(), $outputmode = 0, $limit = 0, $morecss = 'minwidth100', $current_element = 0, $multiple = false, $noroot = 0, $contextpage = '', $multientitymanaged = true, $hideref  = false)
-	{
-		global $form;
+    /**
+     *  Output html form to select a digirisk element.
+     *
+     * @param  string 		$selected 			Preselected type
+     * @param  string 		$htmlname 			Name of field in form
+     * @param  array 		$filter 			Optional filters criteras (example: 's.rowid <> x', 's.client in (1,3)')
+     * @param  string 		$showempty 			Add an empty field (Can be '1' or text to use on empty line like 'SelectThirdParty')
+     * @param  int 			$forcecombo 		Force to use standard HTML select component without beautification
+     * @param  array 		$events 			Event options. Example: array(array('method'=>'getContacts', 'url'=>dol_buildpath('/core/ajax/contacts.php',1), 'htmlname'=>'contactid', 'params'=>array('add-customer-contact'=>'disabled')))
+     * @param  int 			$outputmode 		0=HTML select string, 1=Array
+     * @param  int 			$limit 				Limit number of answers
+     * @param  string 		$morecss 			Add more css styles to the SELECT component
+     * @param  int	 		$current_element 	id of current digiriskelement
+     * @param  bool 		$multiple 			add [] in the name of element and add 'multiple' attribut
+     * @param  int 			$noroot  			Don't show root element
+     * @param  string 		$contextpage 		Context page
+     * @param  bool 		$multientitymanaged Multi entity filter
+     * @param  bool 		$hideref 			Hide ref
+     * @return string 							HTML string with
+     * @throws Exception
+     */
+    public function selectDigiriskElementList($selected = '', $htmlname = 'fk_element', $filter = [], $showempty = '1', $forcecombo = 0, $events = array(), $outputmode = 0, $limit = 0, $morecss = 'minwidth100', $current_element = 0, $multiple = false, $noroot = 0, $contextpage = '', $multientitymanaged = true, $hideref  = false)
+    {
+        global $form;
 
-		if (dol_strlen($filter['customsql'])) {
-			$filter['customsql'] .= ' AND t.rowid != ' . ($this->id ?? 0);
-		}
-		$objectList = saturne_fetch_all_object_type('digiriskelement', '', '', $limit, 0, $filter);
-		$digiriskElementsData  = [];
-		if (is_array($objectList) && !empty($objectList)) {
-			foreach ($objectList as $digiriskElement) {
-				$digiriskElementsData[$digiriskElement->id] = ($hideref ? '' : $digiriskElement->ref . ' - ') . $digiriskElement->label;
-			}
-		}
+        if (dol_strlen($filter['customsql'])) {
+            $filter['customsql'] .= ' AND t.rowid != ' . ($this->id ?? 0);
+        }
+        $objectList = saturne_fetch_all_object_type('digiriskelement', '', '', $limit, 0, $filter);
+        $digiriskElementsData  = [];
+        if (is_array($objectList) && !empty($objectList)) {
+            foreach ($objectList as $digiriskElement) {
+                $digiriskElementsData[$digiriskElement->id] = ($hideref ? '' : $digiriskElement->ref . ' - ') . $digiriskElement->label;
+            }
+        }
 
-		return $form::selectarray($htmlname, $digiriskElementsData, $selected, $showempty, 0, 0, '', 0, 0, 0, '', $morecss);
-	}
+        return $form::selectarray($htmlname, $digiriskElementsData, $selected, $showempty, 0, 0, '', 0, 0, 0, '', $morecss);
+    }
 
-	/**
-	 * Return fk_object from wp_digi_id extrafields
-	 *
-	 * @param $wp_digi_id
-	 * @return array|int                 int <0 if KO, array of pages if OK
-	 * @throws Exception
-	 */
-	public function fetch_id_from_wp_digi_id($wp_digi_id)
-	{
-		global $conf;
+    /**
+     * Return fk_object from wp_digi_id extrafields
+     *
+     * @param $wp_digi_id
+     * @return array|int                 int <0 if KO, array of pages if OK
+     * @throws Exception
+     */
+    public function fetch_id_from_wp_digi_id($wp_digi_id)
+    {
+        global $conf;
 
-		dol_syslog(__METHOD__, LOG_DEBUG);
+        dol_syslog(__METHOD__, LOG_DEBUG);
 
-		$sql  = 'SELECT ';
-		$sql .= ' *';
-		$sql .= ' FROM ' . MAIN_DB_PREFIX . $this->table_element . '_extrafields as t';
-		$sql .= ' WHERE wp_digi_id =' . $wp_digi_id;
-		$sql .= ' AND entity =' . $conf->entity;
+        $sql  = 'SELECT ';
+        $sql .= ' *';
+        $sql .= ' FROM ' . MAIN_DB_PREFIX . $this->table_element . '_extrafields as t';
+        $sql .= ' WHERE wp_digi_id =' . $wp_digi_id;
+        $sql .= ' AND entity =' . $conf->entity;
 
-		$resql = $this->db->query($sql);
+        $resql = $this->db->query($sql);
 
-		if ($resql) {
-			$num = $this->db->num_rows($resql);
-			$i   = 0;
-			$obj = new stdClass();
-			while ($i < $num) {
-				$obj = $this->db->fetch_object($resql);
-				$i++;
-			}
-			$this->db->free($resql);
+        if ($resql) {
+            $num = $this->db->num_rows($resql);
+            $i   = 0;
+            $obj = new stdClass();
+            while ($i < $num) {
+                $obj = $this->db->fetch_object($resql);
+                $i++;
+            }
+            $this->db->free($resql);
 
-			return $obj->fk_object;
-		} else {
-			$this->errors[] = 'Error ' . $this->db->lasterror();
-			dol_syslog(__METHOD__ . ' ' . join(',', $this->errors), LOG_ERR);
-			return -1;
-		}
-	}
+            return $obj->fk_object;
+        } else {
+            $this->errors[] = 'Error ' . $this->db->lasterror();
+            dol_syslog(__METHOD__ . ' ' . join(',', $this->errors), LOG_ERR);
+            return -1;
+        }
+    }
 
-	/**
-	 *  Return list of deleted elements
-	 *
-	 * 	@return    array  Array with ids
-	 * 	@throws Exception
-	 */
-	public function getTrashList()
-	{
-		global $conf;
-		$objects = $this->fetchAll('',  'ranks');
-		if (is_array($objects)) {
-			$recurse_tree = recurse_tree($conf->global->DIGIRISKDOLIBARR_DIGIRISKELEMENT_TRASH, 0, $objects);
-			$ids          = [];
+    /**
+     *  Return list of deleted elements
+     *
+     * 	@return    array  Array with ids
+     * 	@throws Exception
+     */
+    public function getTrashList()
+    {
+        global $conf;
+        $objects = $this->fetchAll('',  'ranks');
+        if (is_array($objects)) {
+            $recurse_tree = recurse_tree($conf->global->DIGIRISKDOLIBARR_DIGIRISKELEMENT_TRASH, 0, $objects);
+            $ids          = [];
 
-			array_walk_recursive($recurse_tree, function ($item) use (&$ids) {
-				if (is_object($item)) {
-					$ids[$item->id] = $item->id;
-				}
-			}, $ids);
+            array_walk_recursive($recurse_tree, function ($item) use (&$ids) {
+                if (is_object($item)) {
+                    $ids[$item->id] = $item->id;
+                }
+            }, $ids);
 
-			return $ids;
-		} else {
-			return array();
-		}
-	}
+            return $ids;
+        } else {
+            return array();
+        }
+    }
 
-	/**
-	 *  Return list of deleted elements for all entities
-	 *
-	 * 	@return    array  Array with ids
-	 * 	@throws Exception
-	 */
-	public function getMultiEntityTrashList()
-	{
-		$this->ismultientitymanaged = 0;
-		$objects = $this->fetchAll('',  'ranks', 0,0, array('customsql' => ' status > 0'));
-		$digiriskelement_trashes = $this->fetchAll('',  'ranks', 0,0, array('customsql' => ' status = 0'));
-		$this->ismultientitymanaged = 1;
-		if (is_array($digiriskelement_trashes) && !empty($digiriskelement_trashes)) {
-			$ids          = [];
-			foreach($digiriskelement_trashes as $digiriskelement_trash) {
-				$recurse_tree = recurse_tree($digiriskelement_trash->id, 0, $objects);
-				$ids[$digiriskelement_trash->id] = $digiriskelement_trash->id;
+    /**
+     *  Return list of deleted elements for all entities
+     *
+     * 	@return    array  Array with ids
+     * 	@throws Exception
+     */
+    public function getMultiEntityTrashList()
+    {
+        $this->ismultientitymanaged = 0;
+        $objects = $this->fetchAll('',  'ranks', 0,0, array('customsql' => ' status > 0'));
+        $digiriskelement_trashes = $this->fetchAll('',  'ranks', 0,0, array('customsql' => ' status = 0'));
+        $this->ismultientitymanaged = 1;
+        if (is_array($digiriskelement_trashes) && !empty($digiriskelement_trashes)) {
+            $ids          = [];
+            foreach($digiriskelement_trashes as $digiriskelement_trash) {
+                $recurse_tree = recurse_tree($digiriskelement_trash->id, 0, $objects);
+                $ids[$digiriskelement_trash->id] = $digiriskelement_trash->id;
 
-				array_walk_recursive($recurse_tree, function ($item) use (&$ids) {
-					if (is_object($item)) {
-						$ids[$item->id] = $item->id;
-					}
-				}, $ids);
-			}
-			return $ids;
-		} else {
-			return array();
-		}
-	}
+                array_walk_recursive($recurse_tree, function ($item) use (&$ids) {
+                    if (is_object($item)) {
+                        $ids[$item->id] = $item->id;
+                    }
+                }, $ids);
+            }
+            return $ids;
+        } else {
+            return array();
+        }
+    }
 
-	/**
-	 *  Return list of parent ids for an element
-	 *
-	 * 	@return    array  Array with ids
-	 * 	@throws Exception
-	 */
-	public function getBranch($parent_id)
-	{
-		$object = new self($this->db);
-		$object->fetch($parent_id);
-		$branch_ids = array($parent_id);
+    /**
+     *  Return list of parent ids for an element
+     *
+     * 	@return    array  Array with ids
+     * 	@throws Exception
+     */
+    public function getBranch($parent_id)
+    {
+        $object = new self($this->db);
+        $object->fetch($parent_id);
+        $branch_ids = array($parent_id);
 
-		while ($object->fk_parent > 0) {
-			$branch_ids[] = $object->fk_parent;
-			$object->fetch($object->fk_parent);
-		}
-		return $branch_ids;
-	}
+        while ($object->fk_parent > 0) {
+            $branch_ids[] = $object->fk_parent;
+            $object->fetch($object->fk_parent);
+        }
+        return $branch_ids;
+    }
 
-	/**
-	 *  Return list of non deleted digirisk elements
-	 *
-	 * 	@return    array  Array with ids
-	 * 	@throws Exception
-	 */
-	public function getActiveDigiriskElements($allEntities = 0)
-	{
-		global $conf;
-		$object = new self($this->db);
-		if ($allEntities == 1) {
-			$object->ismultientitymanaged = 0;
-		}
-		$objects = $object->fetchAll('',  '',  0,  0, array('customsql' => 'status > 0'));
+    /**
+     *  Return list of non deleted digirisk elements
+     *
+     * 	@return    array  Array with ids
+     * 	@throws Exception
+     */
+    public function getActiveDigiriskElements($allEntities = 0)
+    {
+        global $conf;
+        $object = new self($this->db);
+        if ($allEntities == 1) {
+            $object->ismultientitymanaged = 0;
+        }
+        $objects = $object->fetchAll('',  '',  0,  0, array('customsql' => 'status > 0'));
 
-		$trashList = $object->getMultiEntityTrashList();
-		if (!empty($trashList) && is_array($trashList)) {
-			foreach($trashList as $trash_element_id) {
-				unset($objects[$trash_element_id]);
-			}
-		}
+        $trashList = $object->getMultiEntityTrashList();
+        if (!empty($trashList) && is_array($trashList)) {
+            foreach($trashList as $trash_element_id) {
+                unset($objects[$trash_element_id]);
+            }
+        }
 
-		return $objects;
-	}
+        return $objects;
+    }
 
-	/**
-	 * Return the status.
-	 *
-	 * @param  int    $status ID status.
-	 * @param  int    $mode   0 = long label, 1 = short label, 2 = Picto + short label, 3 = Picto, 4 = Picto + long label, 5 = Short label + Picto, 6 = Long label + Picto.
-	 * @return string         Label of status.
-	 */
-	public function LibStatut(int $status, int $mode = 0): string
-	{
-		if (empty($this->labelStatus) || empty($this->labelStatusShort)) {
-			global $langs;
+    /**
+     * Return the status.
+     *
+     * @param  int    $status ID status.
+     * @param  int    $mode   0 = long label, 1 = short label, 2 = Picto + short label, 3 = Picto, 4 = Picto + long label, 5 = Short label + Picto, 6 = Long label + Picto.
+     * @return string         Label of status.
+     */
+    public function LibStatut(int $status, int $mode = 0): string
+    {
+        if (empty($this->labelStatus) || empty($this->labelStatusShort)) {
+            global $langs;
 
-			$this->labelStatus[self::STATUS_DRAFT]          = $langs->transnoentitiesnoconv('StatusDraft');
-			$this->labelStatus[self::STATUS_VALIDATED]      = $langs->transnoentitiesnoconv('Validated');
+            $this->labelStatus[self::STATUS_DRAFT]          = $langs->transnoentitiesnoconv('StatusDraft');
+            $this->labelStatus[self::STATUS_VALIDATED]      = $langs->transnoentitiesnoconv('Validated');
 
-			$this->labelStatusShort[self::STATUS_DRAFT]     = $langs->transnoentitiesnoconv('StatusDraft');
-			$this->labelStatusShort[self::STATUS_VALIDATED] = $langs->transnoentitiesnoconv('Validated');
-		}
+            $this->labelStatusShort[self::STATUS_DRAFT]     = $langs->transnoentitiesnoconv('StatusDraft');
+            $this->labelStatusShort[self::STATUS_VALIDATED] = $langs->transnoentitiesnoconv('Validated');
+        }
 
-		$statusType = 'status' . $status;
-		if ($status == self::STATUS_VALIDATED) {
-			$statusType = 'status4';
-		}
+        $statusType = 'status' . $status;
+        if ($status == self::STATUS_VALIDATED) {
+            $statusType = 'status4';
+        }
 
-		return dolGetStatus($this->labelStatus[$status], $this->labelStatusShort[$status], '', $statusType, $mode);
-	}
+        return dolGetStatus($this->labelStatus[$status], $this->labelStatusShort[$status], '', $statusType, $mode);
+    }
 }
