@@ -36,6 +36,8 @@ require_once DOL_DOCUMENT_ROOT . '/core/lib/images.lib.php';
 
 require_once __DIR__ . '/../../class/digiriskdocuments.class.php';
 require_once __DIR__ . '/../../class/digiriskelement.class.php';
+require_once __DIR__ . '/../../class/digiriskelement/groupment.class.php';
+require_once __DIR__ . '/../../class/digiriskelement/workunit.class.php';
 require_once __DIR__ . '/../../class/digiriskstandard.class.php';
 require_once __DIR__ . '/../../class/digiriskdolibarrdocuments/groupmentdocument.class.php';
 require_once __DIR__ . '/../../class/digiriskdolibarrdocuments/workunitdocument.class.php';
