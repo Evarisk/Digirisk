@@ -116,6 +116,11 @@ if ($conf->global->DIGIRISKDOLIBARR_DU_PROJECT > 0 && $conf->global->DIGIRISKDOL
 }
 
 if ( $conf->global->DIGIRISKDOLIBARR_DU_PROJECT == 0 || $project->statut == 2 ) {
+    $numberingModules = [
+        'project' => $conf->global->PROJECT_ADDON
+    ];
+
+    list ($projectRef) = saturne_require_objects_mod($numberingModules, $moduleNameLowerCase);
 	$project->ref         = $projectRef->getNextValue($third_party, $project);
 	$project->title       = $langs->trans('RiskAssessmentDocument') . ' - ' . $conf->global->MAIN_INFO_SOCIETE_NOM;
 	$project->description = $langs->trans('RiskAssessmentDocumentDescription');
