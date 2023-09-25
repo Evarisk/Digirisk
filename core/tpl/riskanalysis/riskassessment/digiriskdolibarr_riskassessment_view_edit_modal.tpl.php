@@ -1,5 +1,3 @@
-<?php require __DIR__ . '/digiriskdolibarr_riskassessment_view_medias_modal.tpl.php'; ?>
-
 <!-- RISK EVALUATION EDIT MODAL START-->
 <div class="risk-evaluation-edit-modal" value="<?php echo $lastEvaluation->id ?>">
 	<div class="wpeo-modal modal-risk" id="risk_evaluation_edit<?php echo $lastEvaluation->id ?>" value="<?php echo $risk->id ?>">

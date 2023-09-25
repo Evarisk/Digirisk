@@ -32,6 +32,7 @@ if (file_exists('../digiriskdolibarr.main.inc.php')) {
 
 global $conf, $db, $hookmanager, $langs, $user;
 
+// Load Dolibarr libraries
 require_once DOL_DOCUMENT_ROOT . '/core/lib/images.lib.php';
 require_once DOL_DOCUMENT_ROOT . '/core/lib/files.lib.php';
 require_once DOL_DOCUMENT_ROOT . '/core/lib/date.lib.php';
@@ -40,6 +41,7 @@ require_once DOL_DOCUMENT_ROOT . '/core/class/html.form.class.php';
 require_once DOL_DOCUMENT_ROOT . '/ecm/class/ecmdirectory.class.php';
 require_once DOL_DOCUMENT_ROOT . '/projet/class/project.class.php';
 
+// Load DigiriskDolibarr libraries
 require_once __DIR__ . '/../../class/digiriskelement.class.php';
 require_once __DIR__ . '/../../class/digiriskstandard.class.php';
 require_once __DIR__ . '/../../class/digiriskelement.class.php';

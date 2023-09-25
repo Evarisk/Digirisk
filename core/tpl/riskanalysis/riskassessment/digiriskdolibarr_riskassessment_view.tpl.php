@@ -399,13 +399,10 @@ $evaluation->method = $lastEvaluation->method ?: "standard" ;
 								<div class="risk-evaluation-cotation risk-evaluation-list" value="<?php echo $risk->id ?>" data-scale="<?php echo $lastEvaluation->getEvaluationScale() ?>">
 									<span><?php echo $lastEvaluation->cotation ?: 0; ?></span>
 								</div>
-								<div class="risk-evaluation-photo risk-evaluation-photo-<?php echo $lastEvaluation->id > 0 ? $lastEvaluation->id : 0 ; echo $risk->id > 0 ? ' risk-' . $risk->id : ' risk-new' ?>">
-									<?php
-									$riskAssessment = $lastEvaluation;
-									$view = 1;
-									include DOL_DOCUMENT_ROOT . '/custom/digiriskdolibarr/core/tpl/medias/digiriskdolibarr_photo_view.tpl.php';
-									$view = 0;
-									?>
+								<div class="photo riskassessment-photo-<?php echo $lastEvaluation->id > 0 ? $lastEvaluation->id : 0 ; echo $risk->id > 0 ? ' risk-' . $risk->id : ' risk-new' ?>">
+                                    <?php
+                                        print saturne_show_medias_linked('digiriskdolibarr', $conf->digiriskdolibarr->multidir_output[$conf->entity] . '/riskassessment/' . $lastEvaluation->ref, 'small', 1, 0, 0, 0, 50, 50, 0, 0, 0, '/riskassessment/' . $lastEvaluation->ref . '/', $lastEvaluation, 'photo', 0, 0, 0, 1);
+								    ?>
 								</div>
 								<div class="risk-evaluation-content">
 									<div class="risk-evaluation-data">
