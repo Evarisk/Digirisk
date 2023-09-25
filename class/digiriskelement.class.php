@@ -130,14 +130,8 @@ class DigiriskElement extends SaturneObject
 	{
 		global $conf;
 		if (empty($this->ref)) {
-			$type           = 'DIGIRISKDOLIBARR_' . strtoupper($this->element_type) . '_ADDON';
-			$objectMod = $conf->global->$type;
-            $numberingModules = [
-              'digiriskelement/' . $this->element_type => $objectMod
-            ];
-            list($refDigiriskElementMod) = saturne_require_objects_mod($numberingModules, 'digiriskdolibarr');
-
-			$ref = $refDigiriskElementMod->getNextNumRef();
+            $digiriskElement = new $this->element_type;
+			$ref = $digiriskElement->getNextNumRef();
 			$this->ref = $ref;
 		}
 		$this->element     = $this->element_type . '@digiriskdolibarr';
