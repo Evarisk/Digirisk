@@ -161,7 +161,7 @@ class PreventionPlan extends SaturneObject
 
 		$signatory         = new SaturneSignature($this->db, $this->module, $this->element);
 		$digiriskresources = new DigiriskResources($this->db);
-		$openinghours      = new Openinghours($this->db);
+		$saturneSchedules      = new SaturneSchedules($this->db);
 
 		dol_syslog(__METHOD__, LOG_DEBUG);
 
@@ -180,7 +180,7 @@ class PreventionPlan extends SaturneObject
 		$morewhere .= ' AND element_type = ' . "'" . $object->element . "'";
 		$morewhere .= ' AND status = 1';
 
-		$openinghours->fetch(0, '', $morewhere);
+		$saturneSchedules->fetch(0, '', $morewhere);
 
 		// Load signatory and ressources form source object
 		$signatories = $signatory->fetchSignatory("", $fromid, $object->element);
@@ -240,9 +240,9 @@ class PreventionPlan extends SaturneObject
 			}
 
 			if (!empty($options['schedule'])) {
-				if ( !empty($openinghours)) {
-					$openinghours->element_id = $preventionplanid;
-					$openinghours->create($user);
+				if ( !empty($saturneSchedules)) {
+					$saturneSchedules->element_id = $preventionplanid;
+					$saturneSchedules->create($user);
 				}
 			}
 

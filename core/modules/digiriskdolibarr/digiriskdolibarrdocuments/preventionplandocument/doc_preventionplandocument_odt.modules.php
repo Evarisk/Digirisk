@@ -29,6 +29,7 @@ require_once DOL_DOCUMENT_ROOT . '/core/lib/doc.lib.php';
 
 // Load Saturne libraries.
 require_once __DIR__ . '/../../../../../../saturne/core/modules/saturne/modules_saturne.php';
+require_once __DIR__ . '/../../../../../../saturne/class/saturneschedules.class.php';
 
 require_once __DIR__ . '/../../../../../class/evaluator.class.php';
 require_once __DIR__ . '/../../../../../class/riskanalysis/risk.class.php';
@@ -264,7 +265,7 @@ class doc_preventionplandocument_odt extends SaturneDocumentModel
 
 		$object = $moreParam['object'];
 
-		$openinghours        = new Openinghours($this->db);
+		$saturneSchedules        = new SaturneSchedules($this->db);
 		$preventionplanline  = new PreventionPlanLine($this->db);
 		$signatory           = new SaturneSignature($this->db, $moduleNameLowerCase, $object->element);
 
@@ -315,15 +316,15 @@ class doc_preventionplandocument_odt extends SaturneDocumentModel
 		$morewhere .= ' AND element_type = ' . "'" . $object->element . "'";
 		$morewhere .= ' AND status = 1';
 
-		$openinghours->fetch(0, '', $morewhere);
+		$saturneSchedules->fetch(0, '', $morewhere);
 
-		$opening_hours_monday    = explode(' ', $openinghours->monday);
-		$opening_hours_tuesday   = explode(' ', $openinghours->tuesday);
-		$opening_hours_wednesday = explode(' ', $openinghours->wednesday);
-		$opening_hours_thursday  = explode(' ', $openinghours->thursday);
-		$opening_hours_friday    = explode(' ', $openinghours->friday);
-		$opening_hours_saturday  = explode(' ', $openinghours->saturday);
-		$opening_hours_sunday    = explode(' ', $openinghours->sunday);
+		$opening_hours_monday    = explode(' ', $saturneSchedules->monday);
+		$opening_hours_tuesday   = explode(' ', $saturneSchedules->tuesday);
+		$opening_hours_wednesday = explode(' ', $saturneSchedules->wednesday);
+		$opening_hours_thursday  = explode(' ', $saturneSchedules->thursday);
+		$opening_hours_friday    = explode(' ', $saturneSchedules->friday);
+		$opening_hours_saturday  = explode(' ', $saturneSchedules->saturday);
+		$opening_hours_sunday    = explode(' ', $saturneSchedules->sunday);
 
 		$tmpArray['lundi_matin']    = $opening_hours_monday[0];
 		$tmpArray['lundi_aprem']    = $opening_hours_monday[1];

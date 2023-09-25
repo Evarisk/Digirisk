@@ -28,6 +28,7 @@ require_once DOL_DOCUMENT_ROOT . '/core/lib/doc.lib.php';
 
 // Load saturne libraries
 require_once __DIR__ . '/../../../../../../saturne/core/modules/saturne/modules_saturne.php';
+require_once __DIR__ . '/../../../../../../saturne/class/saturneschedules.class.php';
 
 /**
  *	Class to build documents using ODF templates generator
