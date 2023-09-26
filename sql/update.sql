@@ -97,6 +97,7 @@ DELETE FROM llx_c_action_trigger WHERE elementtype = 'listingrisksaction@digiris
 DELETE FROM llx_c_action_trigger WHERE elementtype = 'digiriskelement@digiriskdolibarr';
 DELETE FROM llx_c_action_trigger WHERE elementtype = 'digirisksignature@digiriskdolibarr';
 DELETE FROM llx_c_action_trigger WHERE elementtype = 'preventionplan@digiriskdolibarr';
+
 -- 9.12.0
 UPDATE llx_digiriskdolibarr_object_signature SET role = 'MasterWorker'          WHERE role = 'PP_MAITRE_OEUVRE';
 UPDATE llx_digiriskdolibarr_object_signature SET role = 'ExtSocietyResponsible' WHERE role = 'PP_EXT_SOCIETY_RESPONSIBLE';
@@ -147,3 +148,38 @@ ALTER TABLE llx_c_digiriskdolibarr_action_trigger ADD position integer DEFAULT 0
 ALTER TABLE llx_c_digiriskdolibarr_action_trigger CHANGE `code` `ref` varchar(64) NOT NULL;
 ALTER TABLE `llx_digiriskdolibarr_object_signature` ADD module_name VARCHAR(128) NULL AFTER element_type;
 
+-- 9.13.0
+
+ALTER TABLE llx_digiriskdolibarr_accident CHANGE `tms` `tms` timestamp DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP
+ALTER TABLE llx_digiriskdolibarr_accident_investigation CHANGE `tms` `tms` timestamp DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP
+ALTER TABLE llx_digiriskdolibarr_accident_extrafields CHANGE `tms` `tms` timestamp DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP
+ALTER TABLE llx_digiriskdolibarr_accident_lesion CHANGE `tms` `tms` timestamp DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP
+ALTER TABLE llx_digiriskdolibarr_accident_workstop CHANGE `tms` `tms` timestamp DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP
+ALTER TABLE llx_digiriskdolibarr_accident_workstop_extrafields CHANGE `tms` `tms` timestamp DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP
+ALTER TABLE llx_digiriskdolibarr_accident_metadata CHANGE `tms` `tms` timestamp DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP
+
+ALTER TABLE llx_digiriskdolibarr_digiriskelement CHANGE `tms` `tms` timestamp DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP
+ALTER TABLE llx_digiriskdolibarr_digiriskelement_extrafields CHANGE `tms` `tms` timestamp DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP
+
+ALTER TABLE llx_digiriskdolibarr_firepermit CHANGE `tms` `tms` timestamp DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP
+ALTER TABLE llx_digiriskdolibarr_firepermit_extrafields CHANGE `tms` `tms` timestamp DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP
+ALTER TABLE llx_digiriskdolibarr_firepermitdet CHANGE `tms` `tms` timestamp DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP
+ALTER TABLE llx_digiriskdolibarr_firepermitdet_extrafields CHANGE `tms` `tms` timestamp DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP
+
+ALTER TABLE llx_digiriskdolibarr_preventionplan CHANGE `tms` `tms` timestamp DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP
+ALTER TABLE llx_digiriskdolibarr_preventionplan_extrafields CHANGE `tms` `tms` timestamp DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP
+ALTER TABLE llx_digiriskdolibarr_preventionplandet CHANGE `tms` `tms` timestamp DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP
+ALTER TABLE llx_digiriskdolibarr_preventionplandet_extrafields CHANGE `tms` `tms` timestamp DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP
+
+ALTER TABLE llx_digiriskdolibarr_risk CHANGE `tms` `tms` timestamp DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP
+ALTER TABLE llx_digiriskdolibarr_risk_extrafields CHANGE `tms` `tms` timestamp DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP
+ALTER TABLE llx_digiriskdolibarr_riskassessment CHANGE `tms` `tms` timestamp DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP
+ALTER TABLE llx_digiriskdolibarr_riskassessment_extrafields CHANGE `tms` `tms` timestamp DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP
+ALTER TABLE llx_digiriskdolibarr_risksign CHANGE `tms` `tms` timestamp DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP
+ALTER TABLE llx_digiriskdolibarr_risksign_extrafields CHANGE `tms` `tms` timestamp DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP
+
+ALTER TABLE llx_digiriskdolibarr_digiriskresources CHANGE `tms` `tms` timestamp DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP
+ALTER TABLE llx_digiriskdolibarr_digiriskstandard CHANGE `tms` `tms` timestamp DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP
+ALTER TABLE llx_digiriskdolibarr_digiriskstandard_extrafields CHANGE `tms` `tms` timestamp DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP
+ALTER TABLE llx_digiriskdolibarr_evaluator CHANGE `tms` `tms` timestamp DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP
+ALTER TABLE llx_digiriskdolibarr_evaluator_extrafields CHANGE `tms` `tms` timestamp DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP

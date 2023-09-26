@@ -19,7 +19,7 @@ CREATE TABLE llx_digiriskdolibarr_preventionplandet(
 	ref_ext           varchar(128),
 	entity            integer DEFAULT 1 NOT NULL,
 	date_creation     datetime NOT NULL,
-	tms               timestamp,
+	tms               timestamp DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
 	description       text,
 	category          varchar(255),
 	prevention_method text,

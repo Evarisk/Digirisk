@@ -19,7 +19,7 @@ CREATE TABLE llx_digiriskdolibarr_riskassessment(
 	ref_ext             varchar(128),
 	entity              integer DEFAULT 1 NOT NULL,
 	date_creation       datetime NOT NULL,
-	tms                 timestamp,
+	tms                 timestamp DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
 	import_key          varchar(14),
 	status              integer,
 	method              varchar(50),

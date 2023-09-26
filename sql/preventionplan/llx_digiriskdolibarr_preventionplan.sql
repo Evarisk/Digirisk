@@ -19,10 +19,10 @@ CREATE TABLE llx_digiriskdolibarr_preventionplan(
 	ref_ext              varchar(128),
 	entity               integer DEFAULT 1 NOT NULL,
 	date_creation        datetime NOT NULL,
-	tms                  timestamp,
+	tms                  timestamp DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
 	status               smallint,
 	label                varchar(255) NOT NULL,
-    date_start           datetime NOT NULL,
+  date_start           datetime NOT NULL,
 	date_end             datetime,
 	prior_visit_bool     boolean,
 	prior_visit_date     datetime,
@@ -30,6 +30,6 @@ CREATE TABLE llx_digiriskdolibarr_preventionplan(
 	cssct_intervention   boolean,
 	fk_project           integer,
 	fk_user_creat        integer NOT NULL,
-    fk_user_modif        integer,
-    last_email_sent_date datetime DEFAULT NULL
+  fk_user_modif        integer,
+  last_email_sent_date datetime DEFAULT NULL
 ) ENGINE=innodb;
