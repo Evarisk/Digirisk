@@ -113,6 +113,7 @@ if (($action == 'update' && ! GETPOST("cancel", 'alpha')) || ($action == 'update
 	dolibarr_set_const($db, "DIGIRISKDOLIBARR_COLLECTIVE_AGREEMENT_LOCATION", GETPOST("emplacementCC", 'none'), 'chaine', 0, '', $conf->entity);
 
 	if ($action != 'updateedit' && ! $error) {
+        setEventMessages($langs->trans('SetupSaved'), '');
 		header("Location: " . $_SERVER["PHP_SELF"]);
 		exit;
 	}
@@ -440,7 +441,7 @@ if ($responsibleResources->ref == 'Responsible' && $responsibleResources->id[0] 
 
 	// * Phone number - Numéro de téléphone *
 
-	print '<tr class="oddeven"><td><label for="name">' . $langs->trans("Phone") . '</label></td><td>';
+	print '<tr class="oddeven"><td><label for="name">' . $langs->trans("PhoneMobile") . '</label></td><td>';
 
 	if ($usertmp->office_phone > 0) {
 		print $usertmp->office_phone;
