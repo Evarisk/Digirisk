@@ -604,44 +604,6 @@ function show_category_image($object, $upload_dir, $noprint = 0)
 }
 
 /**
-* Show header for public page signature
-*
-* @param  string $title       Title
-* @param  string $head        Head array
-* @param  int    $disablejs   More content into html header
-* @param  int    $disablehead More content into html header
-* @param  array  $arrayofjs   Array of complementary js files
-* @param  array  $arrayofcss  Array of complementary css files
-* @return void
-*/
-function llxHeaderSignature($title, $head = "", $disablejs = 0, $disablehead = 0, $arrayofjs = array(), $arrayofcss = array())
-{
-	global $conf, $mysoc;
-
-	top_htmlhead($head, $title, $disablejs, $disablehead, $arrayofjs, $arrayofcss, 0, 1); // Show html headers
-
-	if ( ! empty($conf->global->DIGIRISKDOLIBARR_SIGNATURE_SHOW_COMPANY_LOGO)) {
-		// Define logo and logosmall
-		$logosmall = $mysoc->logo_small;
-		$logo      = $mysoc->logo;
-		// Define urllogo
-		$urllogo = '';
-		if ( ! empty($logosmall) && is_readable($conf->mycompany->dir_output . '/logos/thumbs/' . $logosmall)) {
-			$urllogo = DOL_URL_ROOT . '/viewimage.php?modulepart=mycompany&amp;entity=' . $conf->entity . '&amp;file=' . urlencode('logos/thumbs/' . $logosmall);
-		} elseif ( ! empty($logo) && is_readable($conf->mycompany->dir_output . '/logos/' . $logo)) {
-			$urllogo = DOL_URL_ROOT . '/viewimage.php?modulepart=mycompany&amp;entity=' . $conf->entity . '&amp;file=' . urlencode('logos/' . $logo);
-		}
-		// Output html code for logo
-		if ($urllogo) {
-			print '<div class="center signature-logo">';
-			print '<img src="' . $urllogo . '">';
-			print '</div>';
-		}
-		print '<div class="underbanner clearboth"></div>';
-	}
-}
-
-/**
 * Show header for public page ticket
 *
 * @param  string $title       Title
@@ -652,7 +614,7 @@ function llxHeaderSignature($title, $head = "", $disablejs = 0, $disablehead = 0
 * @param  array  $arrayofcss  Array of complementary css files
 * @return void
 */
-function llxHeaderTicketDigirisk($title, $head = "", $disablejs = 0, $disablehead = 0,$arrayofjs = array(), $arrayofcss = array())
+function digiriskdolibarr_ticket_header($title, $head = "", $disablejs = 0, $disablehead = 0,$arrayofjs = array(), $arrayofcss = array())
 {
 	global $conf, $mysoc;
 
