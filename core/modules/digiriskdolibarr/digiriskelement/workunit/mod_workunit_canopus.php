@@ -1,8 +1,5 @@
 <?php
-/* Copyright (C) 2003-2007 Rodolphe Quiedeville        <rodolphe@quiedeville.org>
- * Copyright (C) 2004-2010 Laurent Destailleur         <eldy@users.sourceforge.net>
- * Copyright (C) 2005-2007 Regis Houssin               <regis.houssin@inodbox.com>
- * Copyright (C) 2008      Raphael Bertrand (Resultic) <raphael.bertrand@resultic.fr>
+/* Copyright (C) 2021-2023 EVARISK <technique@evarisk.com>
  *
  * This program is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -25,46 +22,38 @@
  * \brief      File that contains the numbering module rules Canopus
  */
 
-require_once __DIR__ . '/../modules_digiriskelement.php';
+// Load Saturne libraries.
+require_once __DIR__ . '/../../../../../../saturne/core/modules/saturne/modules_saturne.php';
 
 /**
  * Class of file that contains the numbering module rules Canopus
  */
-class mod_workunit_canopus extends ModeleNumRefDigiriskElement
+class mod_workunit_canopus extends ModeleNumRefSaturne
 {
-	/**
-	 * Dolibarr version of the loaded document
-	 * @var string
-	 */
-	public $version = 'dolibarr'; // 'development', 'experimental', 'dolibarr'
-
-	/**
-	 * @var string Error code (or message)
-	 */
-	public $error = '';
-
-	/**
-	 * @var string Nom du modele
-	 * @deprecated
-	 * @see $name
-	 */
-	public $nom = 'Canopus';
 
 	/**
 	 * @var string model name
 	 */
-	public $name = 'Canopus';
+	public string $name = 'Canopus';
 
-	public $prefix = "";
-
-
-
+    public function __construct()
+    {
+        global $conf;
+        $refMod = $conf->global->DIGIRISKDOLIBARR_WORKUNIT_CANOPUS_ADDON;
+        $refModSplitted = preg_split('/\{/', $refMod);
+        if (is_array($refModSplitted) && !empty($refModSplitted)) {
+            $suffix = preg_replace('/\}/', '', $refModSplitted[1]);
+            $suffix++;
+            $this->prefix = $refModSplitted[0];
+            $this->suffix = $suffix;
+        }
+    }
 	/**
 	 *  Return description of module
 	 *
 	 *  @return     string      Texte descripif
 	 */
-	public function info()
+	public function info(): string
 	{
 
 		global $conf, $langs, $db;
@@ -98,59 +87,5 @@ class mod_workunit_canopus extends ModeleNumRefDigiriskElement
 		$texte .= '</form>';
 
 		return $texte;
-	}
-
-	/**
-	 *  Return an example of numbering
-	 *
-	 *  @return     string      Example
-	 */
-	public function getExample()
-	{
-		global $conf, $langs, $mysoc;
-
-		$old_code_client = $mysoc->code_client;
-		$old_code_type = $mysoc->typent_code;
-		$mysoc->code_client = 'CCCCCCCCCC';
-		$mysoc->typent_code = 'TTTTTTTTTT';
-		$numExample = $this->getNextValue($mysoc, '');
-		$mysoc->code_client = $old_code_client;
-		$mysoc->typent_code = $old_code_type;
-
-		if (!$numExample) {
-			$numExample = 'NotConfigured';
-		}
-		return $numExample;
-	}
-
-	/**
-	 *  Return next value
-	 *
-	 *  @param	Societe		$objsoc     Object third party
-	 * 	@param	Propal		$digiriskelement		Object commercial proposal
-	 *  @return string      			Value if OK, 0 if KO
-	 */
-	public function getNextValue($digiriskelement)
-	{
-		global $db, $conf;
-
-		require_once DOL_DOCUMENT_ROOT.'/core/lib/functions2.lib.php';
-
-		// On defini critere recherche compteur
-		$mask = $conf->global->DIGIRISKDOLIBARR_WORKUNIT_CANOPUS_ADDON;
-
-		if (!$mask) {
-			$this->error = 'NotConfigured';
-			return 0;
-		}
-
-		// Get entities
-		$entity = getEntity('digiriskdolibarr_digiriskelement', 1, $digiriskelement);
-
-		$date = $digiriskelement->date;
-
-		$numFinal = get_next_value($db, $mask, 'digiriskdolibarr_digiriskelement', 'ref', '', $objsoc, $date, 'next', false, null, $entity);
-
-		return  $numFinal;
 	}
 }

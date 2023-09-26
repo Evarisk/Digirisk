@@ -1,8 +1,5 @@
 <?php
-/* Copyright (C) 2003-2007 Rodolphe Quiedeville        <rodolphe@quiedeville.org>
- * Copyright (C) 2004-2010 Laurent Destailleur         <eldy@users.sourceforge.net>
- * Copyright (C) 2005-2007 Regis Houssin               <regis.houssin@inodbox.com>
- * Copyright (C) 2008      Raphael Bertrand (Resultic) <raphael.bertrand@resultic.fr>
+/* Copyright (C) 2021-2023 EVARISK <technique@evarisk.com>
  *
  * This program is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -19,138 +16,77 @@
  * or see https://www.gnu.org/
  */
 
+
 /**
  * \file       htdocs/custom/digiriskdolibarr/core/modules/digiriskdolibarr/digiriskelement/mod_groupment_sirius.php
  * \ingroup    digiriskelement
  * \brief      File that contains the numbering module rules Sirius
  */
 
-require_once __DIR__ . '/../modules_digiriskelement.php';
+// Load Saturne libraries.
+require_once __DIR__ . '/../../../../../../saturne/core/modules/saturne/modules_saturne.php';
 
 /**
  * Class of file that contains the numbering module rules Sirius
  */
-class mod_groupment_sirius extends ModeleNumRefDigiriskElement
+class mod_groupment_sirius extends ModeleNumRefSaturne
 {
-	/**
-	 * Dolibarr version of the loaded document
-	 * @var string
-	 */
-	public $version = 'dolibarr'; // 'development', 'experimental', 'dolibarr'
 
-	/**
-	 * @var string Error code (or message)
-	 */
-	public $error = '';
+    /**
+     * @var string model name
+     */
+    public string $name = 'Sirius';
 
-	/**
-	 * @var string Nom du modele
-	 * @deprecated
-	 * @see $name
-	 */
-	public $nom = 'Sirius';
+    public function __construct()
+    {
+        global $conf;
+        $refMod = $conf->global->DIGIRISKDOLIBARR_WORKUNIT_SIRIUS_ADDON;
+        $refModSplitted = preg_split('/\{/', $refMod);
+        if (is_array($refModSplitted) && !empty($refModSplitted)) {
+            $suffix = preg_replace('/\}/', '', $refModSplitted[1]);
+            $suffix++;
+            $this->prefix = $refModSplitted[0];
+            $this->suffix = $suffix;
+        }
+    }
+    /**
+     *  Return description of module
+     *
+     *  @return     string      Texte descripif
+     */
+    public function info(): string
+    {
 
-	/**
-	 * @var string model name
-	 */
-	public $name = 'Sirius';
+        global $conf, $langs, $db;
 
-	public $prefix = "";
+        $langs->load("bills");
 
+        $form = new Form($db);
 
+        $texte = $langs->trans('GenericNumRefModelDesc')."<br>\n";
+        $texte .= '<form action="'.$_SERVER["PHP_SELF"].'" method="POST">';
+        $texte .= '<input type="hidden" name="token" value="'.newToken().'">';
+        $texte .= '<input type="hidden" name="action" value="updateMask">';
+        $texte .= '<input type="hidden" name="mask" value="DIGIRISKDOLIBARR_WORKUNIT_SIRIUS_ADDON">';
+        $texte .= '<table class="nobordernopadding" width="100%">';
 
-	/**
-	 *  Return description of module
-	 *
-	 *  @return     string      Texte descripif
-	 */
-	public function info()
-	{
+        $tooltip = $langs->trans("GenericMaskCodes", $langs->transnoentities("DigiriskElement"), $langs->transnoentities("DigiriskElement"));
+        $tooltip .= $langs->trans("GenericMaskCodes2");
+        $tooltip .= $langs->trans("GenericMaskCodes3");
+        $tooltip .= $langs->trans("GenericMaskCodes4a", $langs->transnoentities("DigiriskElement"), $langs->transnoentities("DigiriskElement"));
+        $tooltip .= $langs->trans("GenericMaskCodes5");
 
-		global $conf, $langs, $db;
+        // Parametrage du prefix
+        $texte .= '<tr><td>'.$langs->trans("Mask").':</td>';
+        $texte .= '<td class="right">'.$form->textwithpicto('<input type="text" class="flat minwidth175" name="addon_value" value="'.$conf->global->DIGIRISKDOLIBARR_WORKUNIT_SIRIUS_ADDON.'">', $tooltip, 1, 1).'</td>';
 
-		$langs->load("bills");
+        $texte .= '<td class="left" rowspan="2">&nbsp; <input type="submit" class="button button-edit" name="Button"value="'.$langs->trans("Modify").'"></td>';
 
-		$form = new Form($db);
+        $texte .= '</tr>';
 
-		$texte = $langs->trans('GenericNumRefModelDesc')."<br>\n";
-		$texte .= '<form action="'.$_SERVER["PHP_SELF"].'" method="POST">';
-		$texte .= '<input type="hidden" name="token" value="'.newToken().'">';
-		$texte .= '<input type="hidden" name="action" value="updateMask">';
-		$texte .= '<input type="hidden" name="mask" value="DIGIRISKDOLIBARR_GROUPMENT_SIRIUS_ADDON">';
-		$texte .= '<table class="nobordernopadding" width="100%">';
+        $texte .= '</table>';
+        $texte .= '</form>';
 
-		$tooltip = $langs->trans("GenericMaskCodes", $langs->transnoentities("DigiriskElement"), $langs->transnoentities("DigiriskElement"));
-		$tooltip .= $langs->trans("GenericMaskCodes2");
-		$tooltip .= $langs->trans("GenericMaskCodes3");
-		$tooltip .= $langs->trans("GenericMaskCodes4a", $langs->transnoentities("DigiriskElement"), $langs->transnoentities("DigiriskElement"));
-		$tooltip .= $langs->trans("GenericMaskCodes5");
-
-		// Parametrage du prefix
-		$texte .= '<tr><td>'.$langs->trans("Mask").':</td>';
-		$texte .= '<td class="right">'.$form->textwithpicto('<input type="text" class="flat minwidth175" name="addon_value" value="'.$conf->global->DIGIRISKDOLIBARR_GROUPMENT_SIRIUS_ADDON.'">', $tooltip, 1, 1).'</td>';
-
-		$texte .= '<td class="left" rowspan="2">&nbsp; <input type="submit" class="button button-edit" name="Button"value="'.$langs->trans("Modify").'"></td>';
-
-		$texte .= '</tr>';
-
-		$texte .= '</table>';
-		$texte .= '</form>';
-
-		return $texte;
-	}
-
-	/**
-	 *  Return an example of numbering
-	 *
-	 *  @return     string      Example
-	 */
-	public function getExample()
-	{
-		global $conf, $langs, $mysoc;
-
-		$old_code_client = $mysoc->code_client;
-		$old_code_type = $mysoc->typent_code;
-		$mysoc->code_client = 'CCCCCCCCCC';
-		$mysoc->typent_code = 'TTTTTTTTTT';
-		$numExample = $this->getNextValue($mysoc, '');
-		$mysoc->code_client = $old_code_client;
-		$mysoc->typent_code = $old_code_type;
-
-		if (!$numExample) {
-			$numExample = 'NotConfigured';
-		}
-		return $numExample;
-	}
-
-	/**
-	 *  Return next value
-	 *
-	 *  @param	Societe		$objsoc     Object third party
-	 * 	@param	Propal		$digiriskelement		Object commercial proposal
-	 *  @return string      			Value if OK, 0 if KO
-	 */
-	public function getNextValue($digiriskelement)
-	{
-		global $db, $conf;
-
-		require_once DOL_DOCUMENT_ROOT.'/core/lib/functions2.lib.php';
-
-		// On defini critere recherche compteur
-		$mask = $conf->global->DIGIRISKDOLIBARR_GROUPMENT_SIRIUS_ADDON;
-
-		if (!$mask) {
-			$this->error = 'NotConfigured';
-			return 0;
-		}
-
-		// Get entities
-		$entity = getEntity('digiriskdolibarr_digiriskelement', 1, $digiriskelement);
-
-		$date = $digiriskelement->date;
-
-		$numFinal = get_next_value($db, $mask, 'digiriskdolibarr_digiriskelement', 'ref', '', $objsoc, $date, 'next', false, null, $entity);
-
-		return  $numFinal;
-	}
+        return $texte;
+    }
 }

@@ -54,10 +54,12 @@ saturne_check_access($permissiontoread);
  */
 
 if (GETPOST('action') == 'setmod') {
-	if (GETPOST('type') == 'groupment') {
-		dolibarr_set_const($db, "DIGIRISKDOLIBARR_GROUPMENT_ADDON", GETPOST('value'), 'chaine', 0, '', $conf->entity);
-	} else if (GETPOST('type') == 'workunit') {
-		dolibarr_set_const($db, "DIGIRISKDOLIBARR_WORKUNIT_ADDON", GETPOST('value'), 'chaine', 0, '', $conf->entity);
+    $value = GETPOST('value');
+
+	if (preg_match('/groupment/', $value)) {
+		dolibarr_set_const($db, "DIGIRISKDOLIBARR_GROUPMENT_ADDON", $value, 'chaine', 0, '', $conf->entity);
+	} else if (preg_match('/workunit/', $value)) {
+		dolibarr_set_const($db, "DIGIRISKDOLIBARR_WORKUNIT_ADDON", $value, 'chaine', 0, '', $conf->entity);
 	}
 }
 
