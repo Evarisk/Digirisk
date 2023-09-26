@@ -55,12 +55,10 @@ saturne_check_access($permissiontoread);
 
 if (GETPOST('action') == 'setmod') {
     $value = GETPOST('value');
+    $valueArray = explode('_', $value);
+    $objectType = $valueArray[1];
 
-	if (preg_match('/groupment/', $value)) {
-		dolibarr_set_const($db, "DIGIRISKDOLIBARR_GROUPMENT_ADDON", $value, 'chaine', 0, '', $conf->entity);
-	} else if (preg_match('/workunit/', $value)) {
-		dolibarr_set_const($db, "DIGIRISKDOLIBARR_WORKUNIT_ADDON", $value, 'chaine', 0, '', $conf->entity);
-	}
+    dolibarr_set_const($db, 'DIGIRISKDOLIBARR_'. strtoupper($objectType) .'_ADDON', $value, 'chaine', 0, '', $conf->entity);
 }
 
 if (GETPOST('action') == 'updateMask') {

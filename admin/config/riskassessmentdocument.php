@@ -73,11 +73,10 @@ if (GETPOST('action') == 'updateMask') {
 
 if (GETPOST('action') == 'setmod') {
     $value = GETPOST('value');
+    $valueArray = explode('_', $value);
+    $objectType = $valueArray[1];
 
-
-    if (preg_match('/riskassessment/', $value)) {
-        dolibarr_set_const($db, "DIGIRISKDOLIBARR_RISKASSESSMENT_ADDON", $value, 'chaine', 0, '', $conf->entity);
-    }
+    dolibarr_set_const($db, 'DIGIRISKDOLIBARR_'. strtoupper($objectType) .'_ADDON', $value, 'chaine', 0, '', $conf->entity);
 }
 
 if (($action == 'update' && ! GETPOST("cancel", 'alpha')) || ($action == 'updateedit')) {

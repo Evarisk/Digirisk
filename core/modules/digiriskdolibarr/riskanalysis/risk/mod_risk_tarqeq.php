@@ -20,27 +20,27 @@
 /**
  * \file       htdocs/custom/digiriskdolibarr/core/modules/digiriskdolibarr/digiriskelement/mod_groupment_sirius.php
  * \ingroup    digiriskelement
- * \brief      File that contains the numbering module rules Sirius
+ * \brief      File that contains the numbering module rules Tarqeq
  */
 
 // Load Saturne libraries.
 require_once __DIR__ . '/../../../../../../saturne/core/modules/saturne/modules_saturne.php';
 
 /**
- * Class of file that contains the numbering module rules Sirius
+ * Class of file that contains the numbering module rules Tarqeq
  */
-class mod_groupment_sirius extends ModeleNumRefSaturne
+class mod_risk_tarqeq extends ModeleNumRefSaturne
 {
 
     /**
      * @var string model name
      */
-    public string $name = 'Sirius';
+    public string $name = 'Tarqeq';
 
     public function __construct()
     {
         global $conf;
-        $refMod = $conf->global->DIGIRISKDOLIBARR_GROUPMENT_SIRIUS_ADDON;
+        $refMod = $conf->global->DIGIRISKDOLIBARR_RISK_TARQEQ_ADDON;
         if (dol_strlen($refMod)) {
             $refModSplitted = preg_split('/\{/', $refMod);
             if (is_array($refModSplitted) && !empty($refModSplitted)) {
@@ -68,7 +68,7 @@ class mod_groupment_sirius extends ModeleNumRefSaturne
         $texte .= '<form action="'.$_SERVER["PHP_SELF"].'" method="POST">';
         $texte .= '<input type="hidden" name="token" value="'.newToken().'">';
         $texte .= '<input type="hidden" name="action" value="updateMask">';
-        $texte .= '<input type="hidden" name="mask" value="DIGIRISKDOLIBARR_GROUPMENT_SIRIUS_ADDON">';
+        $texte .= '<input type="hidden" name="mask" value="DIGIRISKDOLIBARR_RISK_TARQEQ_ADDON">';
         $texte .= '<table class="nobordernopadding" width="100%">';
 
         $tooltip = $langs->trans("GenericMaskCodes", $langs->transnoentities("DigiriskElement"), $langs->transnoentities("DigiriskElement"));
@@ -79,7 +79,7 @@ class mod_groupment_sirius extends ModeleNumRefSaturne
 
         // Parametrage du prefix
         $texte .= '<tr><td>'.$langs->trans("Mask").':</td>';
-        $texte .= '<td class="right">'.$form->textwithpicto('<input type="text" class="flat minwidth175" name="addon_value" value="'.$conf->global->DIGIRISKDOLIBARR_GROUPMENT_SIRIUS_ADDON.'">', $tooltip, 1, 1).'</td>';
+        $texte .= '<td class="right">'.$form->textwithpicto('<input type="text" class="flat minwidth175" name="addon_value" value="'.$conf->global->DIGIRISKDOLIBARR_RISK_TARQEQ_ADDON.'">', $tooltip, 1, 1).'</td>';
 
         $texte .= '<td class="left" rowspan="2">&nbsp; <input type="submit" class="button button-edit" name="Button"value="'.$langs->trans("Modify").'"></td>';
 

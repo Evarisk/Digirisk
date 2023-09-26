@@ -39,12 +39,11 @@ class mod_workunit_canopus extends ModeleNumRefSaturne
     public function __construct()
     {
         global $conf;
-        $refMod = $conf->global->DIGIRISKDOLIBARR_RISKASSESSMENT_JARNSAXA_ADDON;
+        $refMod = $conf->global->DIGIRISKDOLIBARR_WORKUNIT_CANOPUS_ADDON;
         if (dol_strlen($refMod)) {
             $refModSplitted = preg_split('/\{/', $refMod);
             if (is_array($refModSplitted) && !empty($refModSplitted)) {
                 $suffix = preg_replace('/\}/', '', $refModSplitted[1]);
-                $suffix++;
                 $this->prefix = $refModSplitted[0];
                 $this->suffix = $suffix;
             }

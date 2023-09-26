@@ -45,7 +45,6 @@ class mod_riskassessment_jarnsaxa extends ModeleNumRefSaturne
             $refModSplitted = preg_split('/\{/', $refMod);
             if (is_array($refModSplitted) && !empty($refModSplitted)) {
                 $suffix = preg_replace('/\}/', '', $refModSplitted[1]);
-                $suffix++;
                 $this->prefix = $refModSplitted[0];
                 $this->suffix = $suffix;
             }
