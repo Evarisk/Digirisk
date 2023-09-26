@@ -228,15 +228,15 @@ if ($action == 'generateQRCode') {
  * View
  */
 
+$title    = $langs->transnoentities("ModuleSetup", $moduleName);
 $helpUrl  = 'FR:Module_Digirisk';
-$title    = $langs->transnoentities("Ticket");
 
 saturne_header(0,'', $title, $helpUrl);
 
 // Subheader
 $linkback = '<a href="' . ($backtopage ?: DOL_URL_ROOT . '/admin/modules.php?restore_lastsearch_values=1') . '">' . $langs->transnoentities("BackToModuleList") . '</a>';
 
-print load_fiche_titre($title, $linkback, 'digiriskdolibarr32px@digiriskdolibarr');
+print load_fiche_titre($title, $linkback, 'title_setup');
 
 // Configuration header
 $head = digiriskdolibarr_admin_prepare_head();
