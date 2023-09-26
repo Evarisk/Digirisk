@@ -73,7 +73,7 @@ $usertmp          = new User($db);
 $project          = new Project($db);
 
 $numberingModuleName = [
-	$evaluator->element => $conf->global->DIGIRISKDOLIBARR_EVALUATOR_ADDON,
+	'digiriskelement/' . $evaluator->element => $conf->global->DIGIRISKDOLIBARR_EVALUATOR_ADDON,
 ];
 
 list($refEvaluatorMod) = saturne_require_objects_mod($numberingModuleName, $moduleNameLowerCase);

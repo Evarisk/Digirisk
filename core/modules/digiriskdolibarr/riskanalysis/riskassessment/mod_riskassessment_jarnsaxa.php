@@ -18,7 +18,7 @@
 
 
 /**
- * \file       htdocs/custom/digiriskdolibarr/core/modules/digiriskdolibarr/digiriskelement/mod_groupment_sirius.php
+ * \file       htdocs/custom/digiriskdolibarr/core/modules/digiriskdolibarr/riskanalysis/mod_riskassessment_jarnsaxa.php
  * \ingroup    digiriskelement
  * \brief      File that contains the numbering module rules Jarnsaxa
  */
