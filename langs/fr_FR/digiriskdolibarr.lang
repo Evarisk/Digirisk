@@ -56,6 +56,7 @@ DisabledSharedElement       = Option désactivée car multi company n'est pas ac
 DigiriskEventAutoDesc       = Définissez ici les événements pour lesquels Digirisk créera automatiquement une entrée dans l'agenda. Chaque évènement contient les informations relatives à l'action effectuée.
 DigiriskActionsEvents       = Événements pour lesquels Digirisk doit insérer un évènement dans l'agenda en automatique.
 DigiriskDolibarr            = Digirisk
+Create                      = Créer
 
 
 #
