@@ -441,7 +441,7 @@ if ($responsibleResources->ref == 'Responsible' && $responsibleResources->id[0] 
 
 	// * Phone number - Numéro de téléphone *
 
-	print '<tr class="oddeven"><td><label for="name">' . $langs->trans("PhonePro") . '</label></td><td>';
+	print '<tr class="oddeven"><td><label for="name">' . $langs->trans("PhoneMobile") . '</label></td><td>';
 
 	if ($usertmp->office_phone > 0) {
 		print $usertmp->office_phone;
