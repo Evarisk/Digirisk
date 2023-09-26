@@ -148,9 +148,10 @@ if (empty($reshook)) {
 				$task->ref                                  = $modTask->getNextValue(0, $task);
 				$task->label                                = $accident->ref . ' - ' . $accident->label;
 				$task->array_options['options_fk_accident'] = $accident->id;
-				$result                                     = $task->create($user);
+                $result                                     = $task->create($user);
+                $task->add_contact($user->id, 'TASKEXECUTIVE', 'internal');
 
-				if ($result > 0) {
+                if ($result > 0) {
 					$object->fk_task = $result;
 					$object->update($user, true);
 
@@ -159,15 +160,21 @@ if (empty($reshook)) {
 					$task->label          = $accident->ref . ' - T1 - ' . $langs->trans('CurativeAction');
 					$task->fk_task_parent = $result;
 					$resOne               = $task->create($user);
+                    $getNomResOne         = $task->getNomUrl(1, '', 'task', 1);
 
-					$task->fk_project     = $accident->fk_project;
+                    $task->fk_project     = $accident->fk_project;
 					$task->ref            = $modTask->getNextValue(0, $task);
 					$task->label          = $accident->ref . ' - T2 - ' . $langs->trans('PreventiveAction');
 					$task->fk_task_parent = $result;
 					$resTwo               = $task->create($user);
+                    $getNomResTwo         = $task->getNomUrl(1, '', 'task', 1);
 
 					if ($resOne > 0 && $resTwo > 0) {
 						setEventMessages('AccidentInvestigationTaskCreated', []);
+                        $task->fetch($result);
+                        $description  = $langs->trans('Accident') . ' : ' . $accident->getNomUrl(1, '', 0, '', -1, 1) . '</br>' . $langs->trans('AccidentInvestigation') . ' : ' . $object->getNomUrl(1, '', 0, '', -1, 1) . '</br>';
+                        $description .= $getNomResOne . '</br>' . $getNomResTwo;
+                        $task->setValueFrom('description', $description);
 					} else {
 						setEventMessages($task->error, [], 'errors');
 					}
@@ -210,7 +217,10 @@ if (empty($reshook)) {
 	// Actions cancel, add, update, update_extras, confirm_validate, confirm_delete, confirm_deleteline, confirm_clone, confirm_close, confirm_setdraft, confirm_reopen
 	require_once DOL_DOCUMENT_ROOT . '/core/actions_addupdatedelete.inc.php';
 
-	// Actions builddoc, forcebuilddoc, remove_file.
+    // Actions save_project.
+    require_once __DIR__ . '/../../../saturne/core/tpl/actions/banner_actions.tpl.php';
+
+    // Actions builddoc, forcebuilddoc, remove_file.
 	require_once __DIR__ . '/../../../saturne/core/tpl/documents/documents_action.tpl.php';
 
 	// Action to generate pdf from odt file.
@@ -376,7 +386,7 @@ if ($action == 'create') {
 	print '<td class="titlefield">' . $langs->trans("UserVictim") . '</td>';
 	print '<td>' . $victim->getNomUrl(1) . '</td>';
 	print '<tr class="linked-medias causality_tree"> <td class=""><label for="causality_tree">' . $langs->trans("CausalityTree") . '</label></td>';
-	print '<td class="linked-medias-list">';
+	print '<td class="linked-medias-list" style="display: flex; gap: 10px; height: auto;">';
 	$pathPhotos = $conf->digiriskdolibarr->multidir_output[$conf->entity] . '/accident_investigation/'. $object->ref . '/causality_tree/';
 	?>
 	<span class="add-medias" <?php echo ($object->status < AccidentInvestigation::STATUS_VALIDATED && empty($object->causality_tree)) ? '' : 'style="display:none"' ?>>
