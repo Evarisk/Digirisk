@@ -118,6 +118,9 @@ LabourInspector          = Inspecteur du travail
 LabourInspectorSociety   = Tiers Inspecteur du travail
 LabourInspectorAssigned  = Inspecteur du travail
 
+SocieteSchedules = Horaires de la société
+
+
 #
 # DigriskDocuments - Documents Digirisk
 #
@@ -202,6 +205,12 @@ ChooseBoxToAdd                 = Ajouter le widget au tableau de bord...
 ActionOnUser                   = Utilisateur concerné
 HarassmentOfficer              = Responsable harcèlement
 HarassmentOfficerCSE           = Responsable harcèlement CSE
+ExceptionsToWorkingHours       = Dérogations aux horaires de travail
+PermanentDerogation            = Dérogation permanente
+PermanentDerogationValue       = Non
+OccasionalDerogation           = Dérogation occasionnelle
+OccasionalDerogationValue      = Oui
+
 
 #
 # PreventionPlan - Plan de prévention
@@ -762,7 +771,7 @@ AddEvaluatorButton           = Ajouter l'évaluateur
 EvaluatorConfig              = Configuration des données des évaluateurs
 DeleteEvaluatorMessage       = Suppression de l'évaluateur
 DigiriskEvaluatorData        = Données configurables des évaluateurs
-EvaluatorDuration            = Durée de l'évalution par l'évaluateur
+EvaluatorDuration            = Durée de l'évaluation par l'évaluateur
 EvaluatorDurationDescription = Le temps que met l'évaluateur à réaliser son évaluation des risques
 NbEmployeesInvolved          = Nombre de salariés impliqués
 NbEmployees                  = Nombre de salariés
@@ -860,7 +869,8 @@ RiskDeleted                    = Le risque %s a été supprimé
 RiskSharedWithEntityRefLabel   = Partage du risque %s avec
 RiskUnlinkedFromEntityRefLabel = Dissociation du risque %s avec
 TheDigiriskelement             = l'élément Digirisk
-
+DefaultProjectContactType      = Rôle par défaut attribué au projet Document Unique
+DefaultTaskContactType         = Rôle par défaut attribué aux tâches du projet Document Unique
 
 # Stats - Statistiques
 GreyRisk   = Risque faible
@@ -1154,7 +1164,7 @@ MultiEntityTicketPublicInterfaceQRCode   = QR Code de l'interface publique des t
 PublicInterfaceConfiguration             = Champs visibles / requis de l'interface publique
 TicketDigiriskElementRequired            = GP/UT obligatoire pour créer un ticket
 TicketDigiriskElementRequiredHelp        = Activer cette option pour rendre obligatoire la selection d'un GP/UT pour créer un ticket dans l'interface publique
-TicketDigiriskElementHideRef             = Cacher la référence des GP/UT dans l'interface publique
+TicketDigiriskElementHideRef             = Cacher la référence des GP/UT dans le sélecteur de service l'interface publique
 TicketDigiriskElementHideRefHelp         = Activer cette option pour rendre cacher la référence d'un GP/UT dans l'interface publique
 TicketDigiriskElementVisible             = Afficher le champ GP/UT pour créer un ticket
 TicketDigiriskElementVisibleHelp         = Activer cette option pour afficher le champ GP/UT dans l'interface publique et le rendre obligatoire si nécessaire
