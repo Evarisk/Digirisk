@@ -188,7 +188,8 @@ $constArray[$moduleNameLowerCase] = [
 	'ShowSharedRisks' => [
 		'name'        => 'ShowSharedRisks',
 		'description' => $langs->trans('ShowSharedRisksDescription') . (!$areRisksSharable ? '<br>' . img_picto('danger', 'fa-exclamation-triangle') . $langs->trans('DisabledSharedElement') : ''),
-		'code'        => ($areRisksSharable ? 'DIGIRISKDOLIBARR_SHOW_SHARED_RISKS' : ''),
+		'code'        => 'DIGIRISKDOLIBARR_SHOW_SHARED_RISKS',
+        'disabled'    => !$areRisksSharable
 	],
 ];
 
@@ -375,8 +376,10 @@ $constArray[$moduleNameLowerCase] = [
 	'ShowSharedRiskSigns' => [
 		'name'        => 'ShowSharedRiskSigns',
 		'description' => $langs->trans('ShowSharedRiskSignsDescription') . (!$areRisksSharable ? '<br>' . img_picto('danger', 'fa-exclamation-triangle') . $langs->trans('DisabledSharedElement') : ''),
-		'code'        => ($areRisksSharable ? 'DIGIRISKDOLIBARR_SHOW_SHARED_RISKSIGNS' : ''),
-	],
+		'code'        => 'DIGIRISKDOLIBARR_SHOW_SHARED_RISKSIGNS',
+        'disabled'    => !$areRisksSignsSharable
+
+    ],
 ];
 require __DIR__ . '/../../../saturne/core/tpl/admin/object/object_const_view.tpl.php';
 
