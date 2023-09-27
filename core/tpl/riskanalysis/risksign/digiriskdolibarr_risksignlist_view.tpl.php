@@ -82,6 +82,7 @@ if (is_array($extrafields->attributes[$risksign->table_element]['label']) && cou
 if ($risksign->ismultientitymanaged == 1) $sql                                                                                                        .= " WHERE t.entity IN (" . getEntity($risksign->element) . ")";
 else $sql                                                                                                                                             .= " WHERE 1 = 1";
 $sql                                                                                                                                                  .= " AND fk_element = " . $id;
+$sql                                                                                                                                                  .= " AND status > " . $risksign::STATUS_DELETED;
 
 foreach ($search as $key => $val) {
 	if ($key == 'status' && $search[$key] == -1) continue;

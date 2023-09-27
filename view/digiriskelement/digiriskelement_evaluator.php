@@ -357,6 +357,7 @@ if ($object->id > 0 || $fromid > 0) {
 	if (is_array($extrafields->attributes[$evaluator->table_element]['label']) && count($extrafields->attributes[$evaluator->table_element]['label'])) $sql .= " LEFT JOIN " . MAIN_DB_PREFIX . $evaluator->table_element . "_extrafields as ef on (t.rowid = ef.fk_object)";
 	if ($evaluator->ismultientitymanaged == 1) $sql                                                                                                         .= " WHERE t.entity IN (" . getEntity($evaluator->element) . ")";
 	else $sql                                                                                                                                               .= " WHERE 1 = 1";
+    $sql                                                                                                                                                    .= " AND status > " . $evaluator::STATUS_DELETED;
 	if (empty($fromid)) {
 		$sql .= " AND fk_parent = " . $id;
 	} else {
