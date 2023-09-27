@@ -42,13 +42,6 @@ require_once __DIR__ . '/../class/digiriskelement/workunit.class.php';
 require_once __DIR__ . '/../class/riskanalysis/risk.class.php';
 require_once __DIR__ . '/../class/riskanalysis/riskassessment.class.php';
 require_once __DIR__ . '/../class/riskanalysis/risksign.class.php';
-require_once __DIR__ . '/../core/modules/digiriskdolibarr/digiriskelement/groupment/mod_groupment_standard.php';
-require_once __DIR__ . '/../core/modules/digiriskdolibarr/digiriskelement/groupment/mod_groupment_sirius.php';
-require_once __DIR__ . '/../core/modules/digiriskdolibarr/digiriskelement/workunit/mod_workunit_standard.php';
-require_once __DIR__ . '/../core/modules/digiriskdolibarr/digiriskelement/workunit/mod_workunit_canopus.php';
-require_once __DIR__ . '/../core/modules/digiriskdolibarr/riskanalysis/risk/mod_risk_standard.php';
-require_once __DIR__ . '/../core/modules/digiriskdolibarr/riskanalysis/riskassessment/mod_riskassessment_standard.php';
-require_once __DIR__ . '/../core/modules/digiriskdolibarr/riskanalysis/risksign/mod_risksign_standard.php';
 
 // Load translation files required by the page
 saturne_load_langs();
@@ -70,11 +63,16 @@ $riskAssessment       = new RiskAssessment($db);
 $risksign             = new RiskSign($db);
 $task                 = new DigiriskTask($db);
 $extrafields          = new ExtraFields($db);
-$refGroupmentMod      = new $conf->global->DIGIRISKDOLIBARR_GROUPMENT_ADDON();
-$refWorkUnitMod       = new $conf->global->DIGIRISKDOLIBARR_WORKUNIT_ADDON();
-$refRiskMod           = new $conf->global->DIGIRISKDOLIBARR_RISK_ADDON();
-$refRiskAssessmentMod = new $conf->global->DIGIRISKDOLIBARR_RISKASSESSMENT_ADDON();
-$refRiskSignMod       = new $conf->global->DIGIRISKDOLIBARR_RISKSIGN_ADDON();
+
+$numberingModules = [
+    'digiriskelement/groupment'   => $conf->global->DIGIRISKDOLIBARR_GROUPMENT_ADDON,
+    'digiriskelement/workunit'    => $conf->global->DIGIRISKDOLIBARR_WORKUNIT_ADDON,
+    'riskanalysis/risk'           => $conf->global->DIGIRISKDOLIBARR_RISK_ADDON,
+    'riskanalysis/riskassessment' => $conf->global->DIGIRISKDOLIBARR_RISKASSESSMENT_ADDON,
+    'riskanalysis/risksign'       => $conf->global->DIGIRISKDOLIBARR_RISKSIGN_ADDON
+];
+
+list ($refGroupmentMod, $refWorkUnitMod, $refRiskMod, $refRiskAssessmentMod, $refRiskSignMod) = saturne_require_objects_mod($numberingModules, $moduleNameLowerCase);
 
 $numberingModuleName = [
 	'project/task' => $conf->global->PROJECT_TASK_ADDON,

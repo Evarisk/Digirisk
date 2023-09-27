@@ -169,12 +169,10 @@ if ( $object->element_type == 'groupment' ) {
 	$title         = $langs->trans("Groupment");
 	$titleCreate   = $langs->trans("NewGroupment");
 	$titleEdit     = $langs->trans("ModifyGroupment");
-	$object->picto = 'groupment@digiriskdolibarr';
 } elseif ( $object->element_type == 'workunit' ) {
 	$title         = $langs->trans("WorkUnit");
 	$titleCreate   = $langs->trans("NewWorkUnit");
 	$titleEdit     = $langs->trans("ModifyWorkUnit");
-	$object->picto = 'workunit@digiriskdolibarr';
 } else {
 	$element_type = GETPOST('element_type', 'alpha');
 	if ( $element_type == 'groupment' ) {
@@ -198,7 +196,7 @@ digirisk_header($title, $helpUrl); ?>
 <?php // Part to create
 if ($action == 'create') {
 	$object->fetch($fkParent);
-	print load_fiche_titre($title, '', "digiriskdolibarr32px@digiriskdolibarr");
+	print load_fiche_titre($title, '', $object->picto);
 
 	print '<form method="POST" action="' . $_SERVER["PHP_SELF"] . '">';
 	print '<input type="hidden" name="token" value="' . newToken() . '">';
@@ -262,7 +260,7 @@ if ($action == 'create') {
 
 // Part to edit record
 if (($id || $ref) && $action == 'edit') {
-	print load_fiche_titre($titleEdit, '', "digiriskdolibarr32px@digiriskdolibarr");
+	print load_fiche_titre($titleEdit, '', $object->picto);
 
 	print '<form method="POST" action="' . $_SERVER["PHP_SELF"] . '">';
 	print '<input type="hidden" name="token" value="' . newToken() . '">';

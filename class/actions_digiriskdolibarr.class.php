@@ -138,7 +138,7 @@ class ActionsDigiriskdolibarr
 
 				$modulepart   = 'digiriskdolibarr:TicketDocument';
 				$defaultmodel = $conf->global->DIGIRISKDOLIBARR_TICKET_DEFAULT_MODEL;
-				$pictopath = dol_buildpath('/digiriskdolibarr/img/digiriskdolibarr32px.png', 1);
+				$pictopath = dol_buildpath('/digiriskdolibarr/img/digiriskdolibarr_color.png', 1);
 				$pictoDigirisk = img_picto('', $pictopath, '', 1, 0, 0, '', 'pictoDigirisk');
 				$title        = $pictoDigirisk . $langs->trans('TicketDocument');
 

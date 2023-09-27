@@ -45,6 +45,11 @@ class DigiriskElement extends SaturneObject
     public $element = 'digiriskelement';
 
     /**
+     * @var string String with name of icon for digiriskelement.
+     */
+    public string $picto = 'fontawesome_fa-network-wired_fas_#d35968';
+
+    /**
      * @var string Name of table without prefix where object is stored. This is also the key used for extrafields management.
      */
     public $table_element = 'digiriskdolibarr_digiriskelement';
