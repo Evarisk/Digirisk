@@ -124,7 +124,7 @@ if ($object->id > 0) {
 
 	saturne_banner_tab($object,'ref','', 1, 'ref', 'ref', $morehtmlref, true);
 
-	print load_fiche_titre($langs->trans("DashBoard"), '', $ticket->picto);
+	print load_fiche_titre($langs->trans("DashBoard"), '', 'digiriskdolibarr_color.png@digiriskdolibarr');
 
 	$digiriskelement = $object;
 
