@@ -64,13 +64,13 @@ $backtopage          = GETPOST('backtopage', 'alpha');
 $backtopageforcancel = GETPOST('backtopageforcancel', 'alpha');
 
 // Initialize technical objects
-$accident   = new Accident($db);
-$object     = new AccidentInvestigation($db);
-$document   = new AccidentInvestigationDocument($db);
-$project    = new Project($db);
-$task       = new Task($db);
-$signatory  = new SaturneSignature($db, $object->module, $object->element);
-$victim     = new User($db);
+$accident  = new Accident($db);
+$object    = new AccidentInvestigation($db);
+$document  = new AccidentInvestigationDocument($db);
+$project   = new Project($db);
+$task      = new Task($db);
+$signatory = new SaturneSignature($db, $object->module, $object->element);
+$victim    = new User($db);
 
 $numRefConf = strtoupper($task->element) . '_ADDON';
 
@@ -448,7 +448,7 @@ if ($action == 'create') {
 
 		// Send email.
 		$displayButton = $onPhone ? '<i class="fas fa-envelope fa-2x"></i>' : '<i class="fas fa-envelope"></i>' . ' ' . $langs->trans('SendMail') . ' ';
-		if ($object->status == AccidentInvestigation::STATUS_VALIDATED) {
+		if ($object->status >= AccidentInvestigation::STATUS_VALIDATED) {
 			$fileParams    = dol_most_recent_file($upload_dir . '/' . $object->element . 'document' . '/' . $object->ref);
 			$file          = $fileParams['fullname'];
 			$forcebuilddoc = (file_exists($file) && !strstr($fileParams['name'], 'specimen')) ? 0 : 1;
