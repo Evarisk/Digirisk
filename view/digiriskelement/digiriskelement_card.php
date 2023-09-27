@@ -75,6 +75,7 @@ if ( $object->element_type == 'groupment') {
 } elseif (  $object->element_type == 'workunit' ) {
 	$document = new WorkUnitDocument($db);
 }
+
 // Fetch optionals attributes and labels
 $extrafields->fetch_name_optionals_label($object->table_element);
 
