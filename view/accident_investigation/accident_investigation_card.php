@@ -493,7 +493,7 @@ if ($action == 'create') {
 			print '<div class="fichecenter"><div class="fichehalfleft">';
 			// Documents.
 			$objRef    = dol_sanitizeFileName($object->ref);
-			$dirFiles  = $object->element . 'document/' . $objRef;
+			$dirFiles  = 'accidentinvestigationdocument/' . $objRef;
 			$fileDir   = $upload_dir . '/' . $dirFiles;
 			$urlSource = $_SERVER['PHP_SELF'] . '?id=' . $object->id;
 

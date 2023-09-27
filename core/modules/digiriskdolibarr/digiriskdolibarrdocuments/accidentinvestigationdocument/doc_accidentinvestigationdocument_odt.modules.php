@@ -194,6 +194,7 @@ class doc_accidentinvestigationdocument_odt extends SaturneDocumentModel
 	{
         require_once DOL_DOCUMENT_ROOT . '/core/lib/date.lib.php';
         require_once __DIR__ . '/../../../../../class/accident.class.php';
+        require_once __DIR__ . '/../../../../../class/digiriskelement.class.php';
         require_once __DIR__ . '/../../../../../../saturne/class/task/saturnetask.class.php';
 
 		global $conf;
@@ -232,8 +233,8 @@ class doc_accidentinvestigationdocument_odt extends SaturneDocumentModel
 			$tmpArray['attendants_number'] = '0 ';
 		}
 
-		$tmpArray['victim_lastname']   = dol_strtoupper($victim->lastname);
-		$tmpArray['victim_firstname']  = ucfirst($victim->firstname);
+		$tmpArray['victim_lastname']       = dol_strtoupper($victim->lastname);
+		$tmpArray['victim_firstname']      = ucfirst($victim->firstname);
 		$tmpArray['seniority_in_position'] = $object->seniority_in_position;
 
 		if ($victim->dateemployment > 0) {
