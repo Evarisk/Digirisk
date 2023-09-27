@@ -409,7 +409,7 @@ class Accident extends SaturneObject
 
 		// Number accidents
 		$array['title'] = $langs->transnoentities('AccidentRepartition');
-		$array['picto'] = '<i class="fas fa-user-injured"></i>';
+		$array['picto'] = $this->picto;
 		$array['labels'] = array(
 			'accidents' => array(
 				'label' => $langs->transnoentities('AccidentWithDIAT'),
@@ -616,6 +616,39 @@ class Accident extends SaturneObject
 		}
 		return $array;
 	}
+
+    /**
+     * Get more html ref on object.
+     * @param  int        $id Id of the accident to retrieve the info from
+     *
+     * @return string
+     * @throws Exception
+     */
+    public function getMoreHtmlRef(int $id) : string
+    {
+        global $langs;
+
+        $workstopLine      = new AccidentWorkStop($this->db);
+        $accidentLines     = $workstopLine->fetchAll('', '', 0, 0, ['customsql' => 't.fk_accident = ' . $id . ' AND t.status >= 0']);
+        $totalWorkStopDays = 0;
+        $moreHtmlRef       = '';
+
+        if (!empty($accidentLines) && $accidentLines > 0) {
+            foreach ($accidentLines as $accidentLine) {
+                if ($accidentLine->status > 0) {
+                    $totalWorkStopDays += $accidentLine->workstop_days;
+                }
+            }
+            $moreHtmlRef      = $langs->trans('TotalWorkStopDays') . ' : ' . $totalWorkStopDays;
+            $lastaccidentline = end($accidentLines);
+            $moreHtmlRef     .= '<br>' . $langs->trans('ReturnWorkDate') . ' : ' . dol_print_date($lastaccidentline->date_end_workstop, 'dayhour');
+        } else {
+            $moreHtmlRef = $langs->trans('RegisterAccident');
+        }
+        $moreHtmlRef .= '<br>';
+
+        return $moreHtmlRef;
+    }
 }
 
 /**
@@ -909,12 +942,19 @@ class AccidentLesion extends SaturneObject
 	 */
 	public $table_element = 'digiriskdolibarr_accident_lesion';
 
+    /**
+     * @var int  Does object support extrafields ? 0=No, 1=Yes
+     */
+    public int $isextrafieldmanaged = 0;
+
 	/**
 	 * @var string String with name of icon for digiriskelement. Must be the part after the 'object_' into object_digiriskelement.png
 	 */
 	public $picto = 'fontawesome_fa-user-injured_fas_#d35968';
 
-	/**
+    const STATUS_DELETED   = -1;
+
+    /**
 	 * @var array  Array with all fields and their property. Do not use it as a static var. It may be modified by constructor.
 	 */
 	public $fields = [

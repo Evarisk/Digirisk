@@ -34,6 +34,7 @@ require_once DOL_DOCUMENT_ROOT . '/core/lib/date.lib.php';
 require_once DOL_DOCUMENT_ROOT . '/core/class/html.formfile.class.php';
 require_once DOL_DOCUMENT_ROOT . '/core/class/doleditor.class.php';
 require_once DOL_DOCUMENT_ROOT . '/projet/class/project.class.php';
+require_once DOL_DOCUMENT_ROOT . '/core/lib/images.lib.php';
 
 require_once __DIR__ . '/../../class/digiriskelement.class.php';
 require_once __DIR__ . '/../../class/accident.class.php';
@@ -137,11 +138,11 @@ if (empty($reshook)) {
 		$accident_type      = GETPOST('accident_type');
 		$external_accident  = GETPOST('external_accident');
 		$accident_location  = GETPOST('accident_location');
-		$extSocietyId     = GETPOST('fk_soc');
+		$extSocietyId       = GETPOST('fk_soc');
 
 		// Initialize object accident
 		$now                       = dol_now();
-		$object->ref               = $refAccidentMod->getNextValue($object);
+		$object->ref               = $object->getNextNumRef();
 		$object->ref_ext           = 'digirisk_' . $object->ref;
 		$object->date_creation     = $object->db->idate($now);
 		$object->tms               = $now;
@@ -200,41 +201,71 @@ if (empty($reshook)) {
 		}
 
 		// Submit file
-		if (!empty($conf->global->MAIN_UPLOAD_DOC)) {
-			if (!empty($_FILES) && ! empty($_FILES['userfile']['name'][0])) {
-				if (is_array($_FILES['userfile']['tmp_name'])) {
-					$userfiles = $_FILES['userfile']['tmp_name'];
-				} else {
-					$userfiles = array($_FILES['userfile']['tmp_name']);
-				}
+        $relativepath = '/accident/tmp/ACC0/photos';
+        $upload_dir   = $conf->digiriskdolibarr->multidir_output[$conf->entity] . '/' . $relativepath;
+        if (!$error && !empty($conf->global->MAIN_UPLOAD_DOC)) {
+            // Define relativepath and upload_dir
+            if (is_array($_FILES['userfile']['tmp_name'])) {
+                $userfiles = $_FILES['userfile']['tmp_name'];
+            } else {
+                $userfiles = [$_FILES['userfile']['tmp_name']];
+            }
 
-				foreach ($userfiles as $key => $userfile) {
-					if (empty($_FILES['userfile']['tmp_name'][$key])) {
-						$error++;
-						if ($_FILES['userfile']['error'][$key] == 1 || $_FILES['userfile']['error'][$key] == 2) {
-							setEventMessages($langs->trans('ErrorFileSizeTooLarge'), [], 'errors');
-						}
-					}
-				}
+            foreach ($userfiles as $key => $userfile) {
+                if (empty($_FILES['userfile']['tmp_name'][$key])) {
+                    if ($_FILES['userfile']['error'][$key] == 1 || $_FILES['userfile']['error'][$key] == 2) {
+                        setEventMessages($langs->trans('ErrorFileSizeTooLarge'), null, 'errors');
+                    }
+                    if ($_FILES['userfile']['error'][$key] == 4) {
+                        $error++;
+                    }
+                }
+            }
 
-				$filedir = $upload_dir . '/accident/' . $object->ref;
+            if (!$error) {
+                dol_add_file_process($upload_dir, 0, 1, 'userfile', '', null, '', 0);
+                $imgThumbMini   = vignette($upload_dir, $conf->global->DIGIQUALI_MEDIA_MAX_WIDTH_MINI, $conf->global->DIGIQUALI_MEDIA_MAX_HEIGHT_MINI, '_mini');
+                $imgThumbSmall  = vignette($upload_dir, $conf->global->DIGIQUALI_MEDIA_MAX_WIDTH_SMALL, $conf->global->DIGIQUALI_MEDIA_MAX_HEIGHT_SMALL, '_small');
+                $imgThumbMedium = vignette($upload_dir, $conf->global->DIGIQUALI_MEDIA_MAX_WIDTH_MEDIUM, $conf->global->DIGIQUALI_MEDIA_MAX_HEIGHT_MEDIUM, '_medium');
+                $imgThumbLarge  = vignette($upload_dir, $conf->global->DIGIQUALI_MEDIA_MAX_WIDTH_LARGE, $conf->global->DIGIQUALI_MEDIA_MAX_HEIGHT_LARGE, '_large');
+            }
+            $error = 0;
+        }
 
-				if (!file_exists($filedir)) {
-					if (dol_mkdir($filedir) < 0) {
-						$object->error = $langs->transnoentities("ErrorCanNotCreateDir", $filedir);
-						$error++;
-					}
-				}
+        $photoList = dol_dir_list($upload_dir, 'files');
+        if (is_array($photoList) && !empty($photoList)) {
+            foreach ($photoList as $photo) {
+                $pathToQuestionPhoto = $conf->digiriskdolibarr->multidir_output[$conf->entity] . '/accident/' . $object->ref;
 
-				if (!$error) {
-					dol_mkdir($filedir);
-					if (!empty($filedir)) {
-						$result        = digirisk_dol_add_file_process($filedir, 0, 1, 'userfile', '', null, '', 1, $object);
-						$object->photo = $_FILES['userfile']['name'][0];
-					}
-				}
-			}
-		}
+                if (!is_dir($pathToQuestionPhoto)) {
+                    mkdir($pathToQuestionPhoto);
+                }
+                $pathToQuestionPhotoType = $conf->digiriskdolibarr->multidir_output[$conf->entity] . '/accident/' . $object->ref . '/photos';
+                if (!is_dir($pathToQuestionPhotoType)) {
+                    mkdir($pathToQuestionPhotoType);
+                }
+
+                copy($photo['fullname'], $pathToQuestionPhotoType . '/' . $photo['name']);
+
+                $destfull = $pathToQuestionPhotoType . '/' . $photo['name'];
+
+                if (empty($object->photo)) {
+                    $object->photo = $photo['name'];
+                }
+
+                $imgThumbMini   = vignette($destfull, $conf->global->DIGIQUALI_MEDIA_MAX_WIDTH_MINI, $conf->global->DIGIQUALI_MEDIA_MAX_HEIGHT_MINI, '_mini');
+                $imgThumbSmall  = vignette($destfull, $conf->global->DIGIQUALI_MEDIA_MAX_WIDTH_SMALL, $conf->global->DIGIQUALI_MEDIA_MAX_HEIGHT_SMALL, '_small');
+                $imgThumbMedium = vignette($destfull, $conf->global->DIGIQUALI_MEDIA_MAX_WIDTH_MEDIUM, $conf->global->DIGIQUALI_MEDIA_MAX_HEIGHT_MEDIUM, '_medium');
+                $imgThumbLarge  = vignette($destfull, $conf->global->DIGIQUALI_MEDIA_MAX_WIDTH_LARGE, $conf->global->DIGIQUALI_MEDIA_MAX_HEIGHT_LARGE, '_large');
+                unlink($photo['fullname']);
+            }
+        }
+        $filesThumbs = dol_dir_list($upload_dir . '/thumbs/');
+        if (is_array($filesThumbs) && !empty($filesThumbs)) {
+            foreach ($filesThumbs as $fileThumb) {
+                unlink($fileThumb['fullname']);
+            }
+        }
 
 		if (!$error) {
 			$result = $object->create($user, false);
@@ -275,7 +306,7 @@ if (empty($reshook)) {
 		$accident_type      = GETPOST('accident_type');
 		$external_accident  = GETPOST('external_accident');
 		$accident_location  = GETPOST('accident_location');
-		$extSocietyId     = GETPOST('fk_soc');
+		$extSocietyId       = GETPOST('fk_soc');
 
 		// Initialize object accident
 		$now                       = dol_now();
@@ -410,7 +441,7 @@ if (empty($reshook)) {
 		$now                          = dol_now();
 		$objectline->date_creation    = $object->db->idate($now);
 		$objectline->status           = 1;
-		$objectline->ref              = $refAccidentWorkStopMod->getNextValue($objectline);
+		$objectline->ref              = $objectline->getNextNumRef();;
 		$objectline->entity           = $conf->entity;
 		$objectline->workstop_days    = $workstop_days;
 		$objectline->declaration_link = $declaration_link;
@@ -619,6 +650,9 @@ if (empty($reshook)) {
 
 	// Action confirm_lock, confirm_archive.
 	require_once __DIR__ . '/../../../saturne/core/tpl/signature/signature_action_workflow.tpl.php';
+
+    // Actions set_thirdparty, set_project
+    require_once __DIR__ . '/../../../saturne/core/tpl/actions/banner_actions.tpl.php';
 }
 
 /*
@@ -635,11 +669,11 @@ if ($conf->browser->layout == 'phone') {
 	$onPhone = 0;
 }
 
-saturne_header(0,'', $title, $helpUrl);
+saturne_header(1,'', $title, $helpUrl);
 
 // Part to create
 if ($action == 'create') {
-	print load_fiche_titre($langs->trans("NewAccident"), '', "digiriskdolibarr32px@digiriskdolibarr");
+	print load_fiche_titre($langs->trans("NewAccident"), '', $object->picto);
 
 	print '<form method="POST" action="' . $_SERVER["PHP_SELF"] . '" enctype="multipart/form-data">';
 	print '<input type="hidden" name="token" value="' . newToken() . '">';
@@ -690,7 +724,7 @@ if ($action == 'create') {
 
 	//FkElement -- Lieu de l'accident - DigiriskElement
 	print '<tr class="fk_element_field"><td class="minwidth400">' . $langs->trans("AccidentLocation") . '</td><td>';
-	print $digiriskelement->selectDigiriskElementList(( ! empty(GETPOST('fromid')) ? GETPOST('fromid') : $object->fk_element), 'fk_element', ['customsql' => ' t.rowid NOT IN (' . implode(',', $deletedElements) . ')'], 0, 0, array(), 0, 0, 'minwidth300');
+	print $digiriskelement->selectDigiriskElementList((!empty(GETPOST('fromid')) ? GETPOST('fromid') : $object->fk_element), 'fk_element', ['customsql' => ' t.rowid NOT IN (' . implode(',', $deletedElements) . ')'], 0, 0, [], 0, 0, 'minwidth300');
 	print '</td></tr>';
 
 	//FkSoc -- Lieu de l'accident - Société extérieure
@@ -722,9 +756,25 @@ if ($action == 'create') {
 	$doleditor->Create();
 	print '</td></tr>';
 
-	print '<tr><td class="titlefield">' . $form->editfieldkey($langs->trans("Photo"), 'Photo', '', $object, 0) . '</td><td>';
-	print '<input class="flat" type="file" name="userfile[]" id="Photo" />';
-	print '</td></tr>';
+    print '<tr class="linked-medias photo"> <td class=""><label for="photo">' . $langs->trans("Photos") . '</label></td>';
+    print '<td class="linked-medias-list" style="display: flex; gap: 10px; height: auto;">';
+    $pathPhotos = $conf->digiriskdolibarr->multidir_output[$conf->entity] . '/accident/tmp/ACC0/photos';
+    ?>
+    <input hidden multiple class="fast-upload" id="fast-upload-photo-default" type="file" name="userfile[]" capture="environment" accept="image/*">
+    <label for="fast-upload-photo-default">
+        <div class="wpeo-button button-square-50">
+            <i class="fas fa-camera"></i><i class="fas fa-plus-circle button-add"></i>
+        </div>
+    </label>
+    <input type="hidden" class="favorite-photo" id="photo" name="photo" value="<?php echo GETPOST('favorite_photo') ?>"/>
+    <div class="wpeo-button button-square-50 open-media-gallery add-media modal-open" value="0">
+        <input type="hidden" class="modal-options" data-modal-to-open="media_gallery" data-from-id="0" data-from-type="accident" data-from-subtype="photo" data-from-subdir="photos"/>
+        <i class="fas fa-folder-open"></i><i class="fas fa-plus-circle button-add"></i>
+    </div>
+    <?php
+    $relativepath = 'digiriskdolibarr/medias/thumbs';
+    print saturne_show_medias_linked('digiriskdolibarr', $pathPhotos, 'small', 0, 0, 0, 0, 50, 50, 0, 0, 0, '/accident/tmp/ACC0/photos', $object, 'photo', $permissiontoadd, $permissiontodelete);
+    print '</td></tr>';
 
 	// Other attributes
 	//  include DOL_DOCUMENT_ROOT.'/core/tpl/extrafields_add.tpl.php';
@@ -743,7 +793,7 @@ if ($action == 'create') {
 
 // Part to edit record
 if (($id || $ref) && $action == 'edit') {
-	print load_fiche_titre($langs->trans("ModifyAccident"), '', "digiriskdolibarr32px@digiriskdolibarr");
+	print load_fiche_titre($langs->trans("ModifyAccident"), '', $object->picto);
 
 	print '<form method="POST" action="' . $_SERVER["PHP_SELF"] . '" enctype="multipart/form-data">';
 	print '<input type="hidden" name="token" value="' . newToken() . '">';
@@ -796,8 +846,8 @@ if (($id || $ref) && $action == 'edit') {
 
 	//AccidentLocation -- Lieu de l'accident
 	print '<tr class="' . (($object->external_accident == 1) ? ' fk_element_field' : ' fk_element_field hidden' ) . '" style="' . (($object->external_accident == 1) ? ' ' : ' display:none') . '"><td>' . $langs->trans("AccidentLocation") . '</td><td>';
-	print $digiriskelement->selectDigiriskElementList($object->fk_element, 'fk_element', [], 0, 0, array(), 0, 0, 'minwidth300', 0, false, 0);
-	print '</td></tr>';
+    print $digiriskelement->selectDigiriskElementList($object->fk_element, 'fk_element', ['customsql' => ' t.rowid NOT IN (' . implode(',', $deletedElements) . ')'], 0, 0, [], 0, 0, 'minwidth300');
+    print '</td></tr>';
 
 	//FkSoc -- Société extérieure
 	print '<tr class="' . (($object->external_accident == 2) ? ' fk_soc_field' : ' fk_soc_field hidden' ) . '" style="' . (($object->external_accident == 2) ? ' ' : ' display:none') . '"><td class="minwidth400">' . $langs->trans("AccidentLocation") . '</td>';
@@ -828,9 +878,27 @@ if (($id || $ref) && $action == 'edit') {
 	$doleditor->Create();
 	print '</td></tr>';
 
-	print '<tr><td class="titlefield">' . $form->editfieldkey($langs->trans("Photo"), 'Photo', '', $object, 0) . '</td><td>';
-	print '<input class="flat" type="file" name="userfile[]" id="Photo" />';
-	print '</td></tr>';
+    print '<tr class="linked-medias photo"> <td class=""><label for="photo">' . $langs->trans("Photos") . '</label></td>';
+    print '<td class="linked-medias-list" style="display: flex; gap: 10px; height: auto;">';
+    $pathPhotos = $conf->digiriskdolibarr->multidir_output[$conf->entity] . '/accident/' . $object->ref . '/photos';
+    ?>
+    <span class="add-medias" <?php echo ($object->status <= Accident::STATUS_VALIDATED) ? '' : 'style="display:none"' ?>>
+		<input hidden multiple class="fast-upload" id="fast-upload-photo-default" type="file" name="userfile[]" capture="environment" accept="image/*">
+		<label for="fast-upload-photo-default">
+			<div class="wpeo-button button-square-50">
+				<i class="fas fa-camera"></i><i class="fas fa-plus-circle button-add"></i>
+			</div>
+		</label>
+		<input type="hidden" class="favorite-photo" id="photo" name="photo" value="<?php echo (dol_strlen($object->photo) > 0 ? $object->photo : GETPOST('favorite_photo')) ?>"/>
+		<div class="wpeo-button button-square-50 open-media-gallery add-media modal-open" value="0">
+			<input type="hidden" class="modal-options" data-modal-to-open="media_gallery" data-from-id="<?php echo $object->id?>" data-from-type="accident" data-from-subtype="photo" data-from-subdir="photos"/>
+			<i class="fas fa-folder-open"></i><i class="fas fa-plus-circle button-add"></i>
+		</div>
+	</span>
+    <?php
+    $relativepath = 'digiriskdolibarr/medias/thumbs';
+    print saturne_show_medias_linked('digiriskdolibarr', $pathPhotos, 'small', 0, 0, 0, 0, 50, 50, 0, 0, 0, 'accident/'. $object->ref . '/photos/', $object, 'photo', $permissiontoadd, $permissiontodelete && $object->status <= Accident::STATUS_VALIDATED);
+    print '</td></tr>';
 
 	// Other attributes
 	include DOL_DOCUMENT_ROOT . '/core/tpl/extrafields_add.tpl.php';
@@ -886,30 +954,13 @@ if ((empty($action) || ($action != 'create' && $action != 'edit'))) {
 	saturne_get_fiche_head($object, 'card', $title);
 
 	//Number workstop days
-	$accidentlines     = $objectline->fetchAll('', '', 0, 0, ['customsql' => 't.fk_accident = ' . $object->id . ' AND t.status >= 0']);
-	$totalworkstopdays = 0;
-
-	if (!empty($accidentlines) && $accidentlines > 0) {
-		foreach ($accidentlines as $accidentline) {
-			if ($accidentline->status > 0) {
-				$totalworkstopdays += $accidentline->workstop_days;
-			}
-		}
-		$morehtmlref      = $langs->trans('TotalWorkStopDays') . ' : ' . $totalworkstopdays;
-		$lastaccidentline = end($accidentlines);
-		$morehtmlref     .= '<br>' . $langs->trans('ReturnWorkDate') . ' : ' . dol_print_date($lastaccidentline->date_end_workstop, 'dayhour');
-	} else {
-		$morehtmlref = $langs->trans('RegisterAccident');
-	}
-	$morehtmlref .= '<br>';
+    $moreHtmlRef = $object->getMoreHtmlRef($object->id);
 
 	include_once './../../core/tpl/digiriskdolibarr_configuration_gauge_view.tpl.php';
 
-	//$morehtmlleft = '<div class="floatleft inline-block valignmiddle divphotoref">' . digirisk_show_photos('digiriskdolibarr', $conf->digiriskdolibarr->multidir_output[$conf->entity] . '/' . $object->element, 'small', 5, 0, 0, 0, 80, 80, 0, 0, 0, $object->element, $object) . '</div>';
-
 	$linkback = '<a href="' . dol_buildpath('/digiriskdolibarr/view/accident/accident_list.php', 1) . '">' . $langs->trans("BackToList") . '</a>';
 
-	saturne_banner_tab($object, 'id', $linkback, 1, 'rowid', 'ref', $morehtmlref);
+	saturne_banner_tab($object, 'id', $linkback, 1, 'rowid', 'ref', $moreHtmlRef, dol_strlen($object->photo) > 0);
 
 	$formConfirm = '';
 
@@ -1024,10 +1075,10 @@ if ((empty($action) || ($action != 'create' && $action != 'edit'))) {
 		case 1:
 			if ($object->fk_standard > 0) {
 				$digiriskstandard->fetch($conf->global->DIGIRISKDOLIBARR_ACTIVE_STANDARD);
-				print $digiriskstandard->getNomUrl(1, 'blank', 1);
+				print $digiriskstandard->getNomUrl(1, 'blank', 1, '', -1, 1);
 			} else if ($object->fk_element > 0) {
 				$digiriskelement->fetch($object->fk_element);
-				print $digiriskelement->getNomUrl(1, 'blank', 1);
+				print $digiriskelement->getNomUrl(1, 'blank', 1, '', -1, 1);
 			}
 			break;
 		case 2:
@@ -1075,7 +1126,7 @@ if ((empty($action) || ($action != 'create' && $action != 'edit'))) {
 			if ($object->status == Accident::STATUS_VALIDATED) {
 				print '<span class="butAction" id="actionButtonLock">' . $displayButton . '</span>';
 			} else {
-				print '<span class="butActionRefused classfortooltip" title="' . dol_escape_htmltag($langs->trans('ObjectMustBeDraft')) . '">' . $displayButton . '</span>';
+				print '<span class="butActionRefused classfortooltip" title="' . dol_escape_htmltag($langs->trans('ObjectMustBeDraft', ucfirst($langs->transnoentities('The' . ucfirst($object->element))))) . '">' . $displayButton . '</span>';
 			}
 
 			// Create Investigation.
@@ -1220,7 +1271,7 @@ if ((empty($action) || ($action != 'create' && $action != 'edit'))) {
 
 			print '<tr>';
 			print '<td>';
-			print $refAccidentWorkStopMod->getNextValue($objectline);
+			print $objectline->getNextNumRef();
 			print '</td>';
 
 			$coldisplay++;
@@ -1261,7 +1312,7 @@ if ((empty($action) || ($action != 'create' && $action != 'edit'))) {
 		print '</div><div class="">';
 	}
 
-	$moreHtmlCenter = dolGetButtonTitle($langs->trans('SeeAll'), '', 'fa fa-bars imgforviewmode', dol_buildpath('/digiriskdolibarr/view/accident/accident_agenda.php', 1) . '?id=' . $object->id);
+    $moreHtmlCenter = dolGetButtonTitle($langs->trans('SeeAll'), '', 'fa fa-bars imgforviewmode', dol_buildpath('/saturne/view/saturne_agenda.php', 1) . '?id=' . $object->id . '&module_name=digiriskdolibarr&object_type=' . $object->element);
 
 	// List of actions on element.
 	require_once DOL_DOCUMENT_ROOT . '/core/class/html.formactions.class.php';

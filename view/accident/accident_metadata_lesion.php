@@ -55,6 +55,7 @@ $backtopageforcancel = GETPOST('backtopageforcancel', 'alpha');
 // Initialize technical objects
 $object     = new Accident($db);
 $objectline = new AccidentLesion($db);
+$workstop   = new AccidentWorkStop($db);
 $project    = new Project($db);
 $form       = new Form($db);
 
@@ -108,8 +109,8 @@ if (empty($reshook)) {
 
 		// Initialize object accident line
 		$now                             = dol_now();
-		$objectline->date_creation       = $object->db->idate($now);
-		$objectline->ref                 = $refAccidentLesionMod->getNextValue($objectline);
+        $objectline->ref                 = $objectline->getNextNumRef();
+        $objectline->date_creation       = $object->db->idate($now);
 		$objectline->entity              = $conf->entity;
 		$objectline->lesion_localization = $lesion_localization;
 		$objectline->lesion_nature       = $lesion_nature;
@@ -177,7 +178,7 @@ if (empty($reshook)) {
 	// Action to delete line
 	if ($action == 'deleteline' && $permissiontodelete) {
 		$objectline->fetch($lineid);
-		$result = $objectline->delete($user, false);
+		$result = $objectline->delete($user, false, false);
 		if ($result > 0) {
 			// Deletion accident lesion OK
 			setEventMessages($langs->trans('DeleteAccidentLesion') . ' ' . $object->ref, array());
@@ -187,10 +188,16 @@ if (empty($reshook)) {
 			exit;
 		} else {
 			// Deletion accident lesion KO
-			if ( ! empty($object->errors)) setEventMessages(null, $object->errors, 'errors');
-			else setEventMessages($object->error, null, 'errors');
+			if (!empty($object->errors)) {
+                setEventMessages('', $object->errors, 'errors');
+            } else {
+                setEventMessages($object->error, [], 'errors');
+            }
 		}
 	}
+
+    // Actions set_thirdparty, set_project
+    require_once __DIR__ . '/../../../saturne/core/tpl/actions/banner_actions.tpl.php';
 }
 
 /*
@@ -207,28 +214,11 @@ saturne_header(0, '', $title, $help_url);
 saturne_get_fiche_head($object, 'accidentMetadataLesion', $title);
 
 //Number workstop days
-$accidentlines     = $objectline->fetchAll('', '', 0, 0, ['customsql' => 't.fk_accident = ' . $object->id]);
-$totalworkstopdays = 0;
-
-if (!empty($accidentlines) && $accidentlines > 0) {
-	foreach ($accidentlines as $accidentline) {
-		if ($accidentline->status > 0) {
-			$totalworkstopdays += $accidentline->workstop_days;
-		}
-	}
-	$morehtmlref      = $langs->trans('TotalWorkStopDays') . ' : ' . $totalworkstopdays;
-	$lastaccidentline = end($accidentlines);
-	$morehtmlref     .= '<br>' . $langs->trans('ReturnWorkDate') . ' : ' . dol_print_date($lastaccidentline->date_end_workstop, 'dayhour');
-} else {
-	$morehtmlref = $langs->trans('RegisterAccident');
-}
-$morehtmlref .= '<br>';
-
-//$morehtmlleft = '<div class="floatleft inline-block valignmiddle divphotoref">' . digirisk_show_photos('digiriskdolibarr', $conf->digiriskdolibarr->multidir_output[$conf->entity] . '/' . $object->element, 'small', 5, 0, 0, 0, 80, 80, 0, 0, 0, $object->element, $object) . '</div>';
+$moreHtmlRef = $object->getMoreHtmlRef($object->id);
 
 $linkback = '<a href="' . dol_buildpath('/digiriskdolibarr/view/accident/accident_list.php', 1) . '">' . $langs->trans("BackToList") . '</a>';
 
-saturne_banner_tab($object, 'id', $linkback, 1, 'rowid', 'ref', $morehtmlref);
+saturne_banner_tab($object, 'id', $linkback, 1, 'rowid', 'ref', $moreHtmlRef, dol_strlen($object->photo) > 0);
 
 // ACCIDENT LESION
 print '<div class="div-table-responsive-no-min" style="overflow-x: unset !important">';
@@ -311,7 +301,7 @@ if (!empty($accidentlines) && $accidentlines > 0) {
 				print '<td class="center">';
 				$coldisplay++;
 				print '<a href="' . $_SERVER["PHP_SELF"] . '?id=' . $id . '&amp;action=editline&amp;lineid=' . $item->id . '" style="padding-right: 20px"><i class="fas fa-pencil-alt" style="color: #666"></i></a>';
-				print '<a href="' . $_SERVER["PHP_SELF"] . '?id=' . $id . '&amp;action=deleteline&amp;lineid=' . $item->id . '">';
+				print '<a href="' . $_SERVER["PHP_SELF"] . '?id=' . $id . '&amp;action=deleteline&amp;lineid=' . $item->id . '&token='. newToken(). '">';
 				print img_delete();
 				print '</a>';
 				print '</td>';
@@ -335,7 +325,7 @@ if ($object->status == 1 && $permissiontoadd) {
 
 	print '<tr>';
 	print '<td>';
-	print $refAccidentLesionMod->getNextValue($objectline);
+	print $objectline->getNextNumRef();
 	print '</td>';
 
 	$coldisplay++;

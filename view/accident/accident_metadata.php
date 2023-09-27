@@ -203,6 +203,9 @@ if (empty($reshook)) {
 			$action = 'edit';
 		}
 	}
+
+    // Actions set_thirdparty, set_project
+    require_once __DIR__ . '/../../../saturne/core/tpl/actions/banner_actions.tpl.php';
 }
 
 /*
@@ -488,31 +491,13 @@ if ((empty($action) || ($action != 'create' && $action != 'edit'))) {
 	saturne_get_fiche_head($object, 'accidentMetadata', $title);
 
 	//Number workstop days
-	$accidentlines     = $objectline->fetchAll('', '', 0, 0, ['customsql' => 't.fk_accident = ' . $object->id . ' AND t.status >= 0']);
-	$totalworkstopdays = 0;
-
-	if (!empty($accidentlines) && $accidentlines > 0) {
-		foreach ($accidentlines as $accidentline) {
-			if ($accidentline->status > 0) {
-				$totalworkstopdays += $accidentline->workstop_days;
-			}
-		}
-		$morehtmlref      = $langs->trans('TotalWorkStopDays') . ' : ' . $totalworkstopdays;
-		$lastaccidentline = end($accidentlines);
-		$morehtmlref     .= '<br>' . $langs->trans('ReturnWorkDate') . ' : ' . dol_print_date($lastaccidentline->date_end_workstop, 'dayhour');
-	} else {
-		$morehtmlref = $langs->trans('RegisterAccident');
-	}
-	$morehtmlref .= '<br>';
-
+    $moreHtmlRef = $object->getMoreHtmlRef($object->id);
 
 	include_once './../../core/tpl/digiriskdolibarr_configuration_gauge_view.tpl.php';
 
-	//$morehtmlleft = '<div class="floatleft inline-block valignmiddle divphotoref">' . digirisk_show_photos('digiriskdolibarr', $conf->digiriskdolibarr->multidir_output[$conf->entity] . '/' . $object->element, 'small', 5, 0, 0, 0, 80, 80, 0, 0, 0, $object->element, $object) . '</div>';
-
 	$linkback = '<a href="' . dol_buildpath('/digiriskdolibarr/view/accident/accident_list.php', 1) . '">' . $langs->trans("BackToList") . '</a>';
 
-	saturne_banner_tab($object, 'id', $linkback, 1, 'rowid', 'ref', $morehtmlref);
+	saturne_banner_tab($object, 'id', $linkback, 1, 'rowid', 'ref', $moreHtmlRef, dol_strlen($object->photo) > 0);
 
 	print '<div class="div-table-responsive">';
 	print '<div class="fichecenter">';
