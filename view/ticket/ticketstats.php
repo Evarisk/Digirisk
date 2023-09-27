@@ -1,5 +1,5 @@
 <?php
-/* Copyright (C) 2022 EOXIA <technique@evarisk.com>
+/* Copyright (C) 2021-2023 EVARISK <technique@evarisk.com>
  *
  * This program is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -21,20 +21,14 @@
  *		\brief      Page with tickets statistics
  */
 
-// Load Dolibarr environment
-$res = 0;
-// Try main.inc.php into web root known defined into CONTEXT_DOCUMENT_ROOT (not always defined)
-if ( ! $res && ! empty($_SERVER["CONTEXT_DOCUMENT_ROOT"])) $res = @include $_SERVER["CONTEXT_DOCUMENT_ROOT"] . "/main.inc.php";
-// Try main.inc.php into web root detected using web root calculated from SCRIPT_FILENAME
-$tmp = empty($_SERVER['SCRIPT_FILENAME']) ? '' : $_SERVER['SCRIPT_FILENAME']; $tmp2 = realpath(__FILE__); $i = strlen($tmp) - 1; $j = strlen($tmp2) - 1;
-while ($i > 0 && $j > 0 && isset($tmp[$i]) && isset($tmp2[$j]) && $tmp[$i] == $tmp2[$j]) { $i--; $j--; }
-if ( ! $res && $i > 0 && file_exists(substr($tmp, 0, ($i + 1)) . "/main.inc.php")) $res          = @include substr($tmp, 0, ($i + 1)) . "/main.inc.php";
-if ( ! $res && $i > 0 && file_exists(dirname(substr($tmp, 0, ($i + 1))) . "/main.inc.php")) $res = @include dirname(substr($tmp, 0, ($i + 1))) . "/main.inc.php";
-// Try main.inc.php using relative path
-if ( ! $res && file_exists("../../main.inc.php")) $res    = @include "../../main.inc.php";
-if ( ! $res && file_exists("../../../main.inc.php")) $res = @include "../../../main.inc.php";
-if ( ! $res && file_exists("../../../../main.inc.php")) $res = @include "../../../../main.inc.php";
-if ( ! $res) die("Include of main fails");
+// Load DigiriskDolibarr environment
+if (file_exists('../digiriskdolibarr.main.inc.php')) {
+    require_once __DIR__ . '/../digiriskdolibarr.main.inc.php';
+} elseif (file_exists('../../digiriskdolibarr.main.inc.php')) {
+    require_once __DIR__ . '/../../digiriskdolibarr.main.inc.php';
+} else {
+    die('Include of digiriskdolibarr main fails');
+}
 
 // Global variables definitions
 global $conf, $db, $langs, $user;
@@ -54,11 +48,7 @@ $WIDTH  = DolGraph::getDefaultGraphSizeForStats('width');
 $HEIGHT = DolGraph::getDefaultGraphSizeForStats('height');
 
 // Load translation files required by the page
-$langs->loadLangs(array('orders', 'companies', 'other', 'tickets', 'categories'));
-
-if (!$user->rights->ticket->read) {
-	accessforbidden();
-}
+saturne_load_langs(['orders', 'companies', 'other', 'tickets', 'categories']);
 
 $action              = GETPOST('action', 'aZ09');
 $object_status       = GETPOST('object_status', 'array');
@@ -73,12 +63,6 @@ $digiriskelementlist = GETPOST('digiriskelementlist', 'array');
 // Initialize technical objects
 $object          = new Ticket($db);
 $digiriskelement = new DigiriskElement($db);
-
-// Security check
-if ($user->socid > 0) {
-	$action = '';
-	$socid = $user->socid;
-}
 
 $deletedElements = $digiriskelement->getMultiEntityTrashList();
 if (empty($deletedElements)) {
@@ -98,6 +82,11 @@ $startyear = strftime("%Y", !empty($date_start) ? $date_start : dol_now());
 $endyear   = strftime("%Y", !empty($date_end) ? $date_end : dol_now() + 1);
 $datestart = dol_print_date((!empty($date_start) ? $date_start : dol_now()), 'dayxcard');
 $dateend   = dol_print_date((!empty($date_end) ? $date_end : dol_now()), 'dayxcard');
+
+//Security check
+$permissiontoread   = $user->rights->ticket->read;
+
+saturne_check_access($permissiontoread);
 
 /*
  * Action
