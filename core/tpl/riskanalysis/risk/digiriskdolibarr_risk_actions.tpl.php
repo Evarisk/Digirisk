@@ -177,15 +177,16 @@ if ( ! $error && $action == 'saveRisk' && $permissiontoadd) {
 
 if ( ! $error && ($massaction == 'delete' || ($action == 'delete' && $confirm == 'yes')) && $permissiontodelete) {
 	if ( ! empty($toselect)) {
+
 		foreach ($toselect as $toselectedid) {
-			$ListEvaluations = $evaluation->fetchFromParent($toselectedid, 0);
+			$riskAssessmentList = $evaluation->fetchFromParent($toselectedid, 0);
 			$risk->fetch($toselectedid);
 
-			if ( ! empty($ListEvaluations) && $ListEvaluations > 0) {
-				foreach ($ListEvaluations as $lastEvaluation) {
-					$pathToEvaluationPhoto = DOL_DATA_ROOT . '/digiriskdolibarr/riskassessment/' . $lastEvaluation->ref;
+			if (is_array($riskAssessmentList) && ! empty($riskAssessmentList)) {
+				foreach ($riskAssessmentList as $riskRiskAssessment) {
+					$pathToEvaluationPhoto = DOL_DATA_ROOT . '/digiriskdolibarr/riskassessment/' . $riskRiskAssessment->ref;
 
-					if ( file_exists($pathToEvaluationPhoto) && ! (empty($lastEvaluation->ref))) {
+					if ( file_exists($pathToEvaluationPhoto) && ! (empty($riskRiskAssessment->ref))) {
 						$files = dol_dir_list($pathToEvaluationPhoto);
 						if ( ! empty($files)) {
 							foreach ($files as $file) {
@@ -204,14 +205,13 @@ if ( ! $error && ($massaction == 'delete' || ($action == 'delete' && $confirm ==
 						dol_delete_dir($pathToEvaluationPhoto . '/thumbs');
 						dol_delete_dir($pathToEvaluationPhoto);
 
-						$lastEvaluation->delete($user, true);
-					}
-				}
+                    }
+                    $riskRiskAssessment->delete($user, true);
+                }
 			}
+            $result = $risk->delete($user);
 
-			$result = $risk->delete($user);
-
-			if ($result > 0) {
+            if ($result > 0) {
 				setEventMessages($langs->trans('RiskDeleted', $risk->ref), null);
 			} else {
 				// Delete risk KO

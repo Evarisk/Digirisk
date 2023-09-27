@@ -58,10 +58,12 @@ class RiskAssessment extends SaturneObject
 	 * @var int Does object support extrafields ? 0 = No, 1 = Yes.
 	 */
 	public int $isextrafieldmanaged = 1;
-	/**
-	 * @var string String with name of icon for riskassessment. Must be the part after the 'object_' into object_riskassessment.png
-	 */
-	public $picto = 'riskassessment@digiriskdolibarr';
+
+    public const STATUS_DELETED   = -1;
+    public const STATUS_DRAFT     = 0;
+    public const STATUS_VALIDATED = 1;
+    public const STATUS_LOCKED    = 2;
+    public const STATUS_ARCHIVED  = 3;
 
 	/**
 	 * @var array  Array with all fields and their property. Do not use it as a static var. It may be modified by constructor.
