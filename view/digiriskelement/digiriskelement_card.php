@@ -363,6 +363,7 @@ if ((empty($action) || ($action != 'edit' && $action != 'create'))) {
 	$morehtmlref .= '</div>';
 
 	$linkback = '<a href="' . dol_buildpath('/digiriskdolibarr/view/digiriskelement/risk_list.php', 1) . '">' . $langs->trans("BackToList") . '</a>';
+    $object->fetch($id);
 
 	saturne_banner_tab($object,'ref','', 1, 'ref', 'ref', $morehtmlref, true);
 
@@ -393,7 +394,7 @@ if ((empty($action) || ($action != 'edit' && $action != 'create'))) {
 	print '</div>';
 	print '</span>';
 	print '&nbsp';
-	print saturne_show_medias_linked('digiriskdolibarr', $conf->digiriskdolibarr->multidir_output[$conf->entity] . '/' . $object->element_type . '/' . $object->ref, 'small', 5, 0, 0, 0, 50, 50, 0, 0, 0, $object->element_type . '/'. $object->ref . '/', $object, 'photo', $object->status != $object::STATUS_LOCKED, $permissiontodelete && $object->status != $object::STATUS_LOCKED);
+    print saturne_show_medias_linked('digiriskdolibarr', $conf->digiriskdolibarr->multidir_output[$conf->entity] . '/' . $object->element_type . '/' . $object->ref, 'small', 5, 0, 0, 0, 50, 50, 0, 0, 0, $object->element_type . '/'. $object->ref . '/', $object, 'photo', $object->status != $object::STATUS_LOCKED, $permissiontodelete && $object->status != $object::STATUS_LOCKED);
 	print '</td></tr>';
 
 	// Other attributes. Fields from hook formObjectOptions and Extrafields.

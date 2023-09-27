@@ -95,7 +95,7 @@ $numberingModuleName = [
 list($refRiskMod, $refEvaluationMod, $refProjectMod, $refTaskMod) = saturne_require_objects_mod($numberingModuleName, $moduleNameLowerCase);
 
 $DUProject->fetch($conf->global->DIGIRISKDOLIBARR_DU_PROJECT);
-$hookmanager->initHooks(array('riskcard', 'globalcard')); // Note that conf->hooks_modules contains array
+$hookmanager->initHooks(array('riskcard', 'digiriskelementview', 'globalcard')); // Note that conf->hooks_modules contains array
 
 // Fetch optionals attributes and labels
 $extrafields->fetch_name_optionals_label($risk->table_element);
