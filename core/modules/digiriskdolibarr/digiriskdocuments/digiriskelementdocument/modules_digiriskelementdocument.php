@@ -343,7 +343,7 @@ abstract class ModeleODTDigiriskElementDocument extends CommonDocGenerator
 								$tmparray['AccidentName']        = $line->label;
 
 								$accidentWorkStop = new AccidentWorkStop($this->db);
-								$allAccidentWorkStop = $accidentWorkStop->fetchFromParent($line->id);
+								$allAccidentWorkStop = $accidentWorkStop->fetch($line->id);
 								if (!empty($allAccidentWorkStop) && is_array($allAccidentWorkStop)) {
 									foreach ($allAccidentWorkStop as $accidentWorkStopsingle) {
 										$nbAccidentWorkStop += $accidentWorkStopsingle->workstop_days;
