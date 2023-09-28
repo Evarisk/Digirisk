@@ -53,8 +53,8 @@ HowToSharedElement          = Pour plus d'informations sur la configuration des 
 HowToSharedElementLink        = https://wiki.dolibarr.org/index.php?title=Module_Digirisk#Configuration
 ConfigSharedElement         = Configuration des éléments partagés (risques/signalisations)
 DisabledSharedElement       = Option désactivée car multi company n'est pas activé ou la configuration des éléments partagés (risques/signalisations) n'a pas été effectuée
-DigiriskEventAutoDesc       = Définissez ici les événements pour lesquels Digirisk créera automatiquement une entrée dans l'agenda. Chaque évènement contient les informations relatives à l'action effectuée.
-DigiriskActionsEvents       = Événements pour lesquels Digirisk doit insérer un évènement dans l'agenda en automatique.
+DigiriskEventAutoDesc       = Définissez ici les événements pour lesquels Digirisk créera automatiquement une entrée dans l'agenda. Chaque événement contient les informations relatives à l'action effectuée.
+DigiriskActionsEvents       = Événements pour lesquels Digirisk doit insérer un événement dans l'agenda en automatique.
 
 
 
@@ -457,7 +457,7 @@ LesionNature                      = Nature des lésions
 AccidentInvestigation             = Enquête accident
 AccidentInvestigationLink         = Lien vers l'enquête accident
 AccidentLocation                  = Lieu de l'accident
-DigiriskDolibarrActionTrigger     = Déclencheur des évènements Digirisk
+DigiriskDolibarrActionTrigger     = Déclencheur des événements Digirisk
 CollateralVictim                  = Victime collatérale
 FromDigirisk                      = De
 At                                = À
@@ -494,29 +494,27 @@ NbPresquAccidents                 = Nombre de presqu'accidents
 NbAccidentInvestigations          = Nombre d'enquête accidents
 NbWorkedHours                     = Nombre d\'heures travaillées
 ConfirmDeleteAccident             = Êtes-vous sûr de vouloir supprimer l'accident ?
-AccidentInvestigation             = Enquête Accident
-Accident_investigation            = Enquête Accident
+TheAccident                       = l'accident
+AccidentInvestigation             = Enquête accident
+Accident_investigation            = Enquête accident
 AccidentInvestigationDocument     = Document d'enquête accident
 accidentinvestigationdocument.odt = Enquête accident
-NewAccidentInvestigation          = Nouvelle Enquête Accident
-UpdateAccidentInvestigation       = Modifier une Enquête Accident
-AccidentInvestigationList         = Liste des Enquêtes Accidents
+NewAccidentInvestigation          = Nouvelle enquête accident
+UpdateAccidentInvestigation       = Modifier une enquête accident
+AccidentInvestigationList         = Liste des enquêtes accidents
 TheAccident_investigation         = l'enquête accident
-FkAccident                        = Réf. Accident
-FkTask                            = Réf. Tâche
-SeniorityAtPost                   = Ancienneté dans le poste
-DateInvestigationStart            = Date de début de l'enquête accident
-DateInvestigationEnd              = Date de fin de l'enquête accident
+SeniorityInPosition               = Ancienneté au poste
 VictimSkills                      = Compétences de l'accidenté
-CollectiveEquipment               = Équipement de protection collective (EPC)
-IndividualEquipment               = Équipement de protection individuelle (EPI)
+CollectiveEquipment               = Équipement de Protection Collective (EPC)
+IndividualEquipment               = Équipement de Protection Individuelle (EPI)
 Circumstances                     = Circonstances
 CurativeAction                    = Actions curatives
 PreventiveAction                  = Actions préventives
 AccidentInvestigationValidated    = L'enquête accident a été validée
 AccidentInvestigationReOpened     = L'enquête accident a été rouverte
-AccidentInvestigationTaskCreated  = Les tâches de l'enquête accident ont été crées
+AccidentInvestigationTaskCreated  = Les tâches de l'enquête accident ont été créées
 AccidentInvestigationTaskDeleted  = Les tâches de l'enquête accident ont été supprimées
+AccidentInvestigationClassified   = L'enquête accident a été versionné et le document généré
 CausalityTree                     = Arbre des causes
 TaskWillBeCreatedAfterValidation  = Les tâches seront créées après validation de l'enquête accident
 AccidentInvestigationArchived     = L'enquête accident a été archivée et le document a été généré
@@ -531,7 +529,7 @@ AccidentInvestigationSigned       = Signature d'une enquête accident
 
 # AccidentTooltip - Tooltip des accidents
 VictimActivityTooltip              = Précisez l’activité ou la tâche de la victime au moment de l’accident, c’est-à-dire ce que faisait la victime
-AccidentNatureTooltip              = Décrire l’évènement ayant conduit à l’accident, comment l’accident s’est produit (problème électrique, fuite de gaz, rupture de matériel, glissade, chute, effort physique, agression...), ou comment s’est blessée la victime (heurt, collision, écrasement, piqûre, noyade, contact avec une substance...)
+AccidentNatureTooltip              = Décrire l’événement ayant conduit à l’accident, comment l’accident s’est produit (problème électrique, fuite de gaz, rupture de matériel, glissade, chute, effort physique, agression...), ou comment s’est blessée la victime (heurt, collision, écrasement, piqûre, noyade, contact avec une substance...)
 AccidentObjectTooltip              = C’est-à-dire avec quoi s’est blessée la victime : matériau, déchet, outil (tournevis, cutter, perceuse...),machine, véhicule, chariot de manutention, substance chimique, élément de construction (porte, mur...), sol...
 AccidentNatureDoubtTooltip         = Indiquez le cas échéant, les réserves motivées qui ne pourront être prises en compte que si elles portent sur les circonstances de temps et de lieu de l’accident ou sur l’existence d’une cause totalement étrangère au travail (art. R. 441-11 du Code de la sécurité sociale)
 VictimWorkHoursTooltip             = Indiquez les heures de travail effectuées par votre salarié(e), ou les heures prévues, le jour de l’accident
@@ -542,6 +540,7 @@ FrequencyIndexTooltip              = Nombre d'accidents par salarié x 1 000
 FrequencyRateTooltip               = Nombre d'accidents par heures travaillées x 1 000 000
 GravityRateTooltip                 = Nombre de jours d'arrêt de travail par heures travaillées x 1 000
 NbWorkedHoursTooltip               = Le nombre d'heures travaillées a été saisi manuellement
+DocumentGeneratedWithVersioning    = Document généré lors du versionnage
 
 # Dictionnary - Dictionnaire
 UsualWorkplace                  = Lieu de travail habituel
@@ -1202,7 +1201,7 @@ TicketPublicInterfaceOtherName = Interface de gestion des registres SST et DGI
 TicketDocument            = Fiche du ticket
 ticketdocument.odt        = Fiche du ticket
 ticketdocument_custom.odt = Fiche personnalisée du ticket
-ticketdocument_events.odt = Fiche du ticket avec évènements
+ticketdocument_events.odt = Fiche du ticket avec événements
 TicketSuccessMessageData  = Message du ticket
 TicketSuccessMessage      = Message de succès du ticket
 TicketSuccessMessageSet   = Le message a bien été modifié
