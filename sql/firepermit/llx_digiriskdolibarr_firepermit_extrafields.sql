@@ -15,7 +15,7 @@
 
 create table llx_digiriskdolibarr_firepermit_extrafields(
     rowid      integer AUTO_INCREMENT PRIMARY KEY,
-    tms        timestamp,
+    tms        timestamp DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
     import_key varchar(14),
     fk_object  integer NOT NULL
 ) ENGINE=innodb;

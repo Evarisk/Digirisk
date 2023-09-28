@@ -15,7 +15,7 @@
 
 create table llx_digiriskdolibarr_digiriskelement_extrafields(
     rowid      integer AUTO_INCREMENT PRIMARY KEY,
-    tms        timestamp,
+    tms        timestamp DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
 --     entity     integer DEFAULT 1 NOT NULL,
     import_key varchar(14),
     fk_object  integer NOT NULL

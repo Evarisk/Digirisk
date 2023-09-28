@@ -18,7 +18,7 @@ CREATE TABLE llx_digiriskdolibarr_accident_lesion(
 	ref                 varchar(128) NOT NULL,
 	entity              integer DEFAULT 1 NOT NULL,
 	date_creation       datetime NOT NULL,
-	tms                 timestamp,
+	tms                 timestamp DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
 	lesion_localization text,
 	lesion_nature       text,
 	fk_accident         integer NOT NULL

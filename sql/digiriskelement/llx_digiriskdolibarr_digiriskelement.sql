@@ -19,17 +19,17 @@ CREATE TABLE llx_digiriskdolibarr_digiriskelement(
 	ref_ext          varchar(128),
 	entity           integer DEFAULT 1 NOT NULL,
 	date_creation    datetime NOT NULL,
-	tms              timestamp,
+	tms              timestamp DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
 	import_key       integer DEFAULT NULL,
 	status           smallint DEFAULT 1,
 	label            varchar(255) NOT NULL,
 	description      text,
 	element_type     varchar(50),
-    photo            varchar(255),
-    show_in_selector boolean DEFAULT TRUE NOT NULL,
-    fk_user_creat    integer NOT NULL,
+  photo            varchar(255),
+  show_in_selector boolean DEFAULT TRUE NOT NULL,
+  fk_user_creat    integer NOT NULL,
 	fk_user_modif    integer,
 	fk_parent        integer DEFAULT 0 NOT NULL,
-    fk_standard      integer DEFAULT 1 NOT NULL,
-    `ranks`          integer
+  fk_standard      integer DEFAULT 1 NOT NULL,
+  `ranks`          integer
 ) ENGINE=innodb;

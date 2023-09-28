@@ -21,7 +21,7 @@ CREATE TABLE llx_digiriskdolibarr_accident_investigation(
     ref_ext               varchar(128),
     entity                integer DEFAULT 1 NOT NULL,
     date_creation         datetime NOT NULL,
-    tms                   timestamp,
+    tms                   timestamp DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
     import_key            varchar(14),
     status                smallint,
     note_public           text,
@@ -36,6 +36,7 @@ CREATE TABLE llx_digiriskdolibarr_accident_investigation(
     causality_tree        text,
     fk_accident           integer NOT NULL,
     fk_task               integer,
+    fk_project            integer,
     fk_user_creat         integer NOT NULL,
     fk_user_modif         integer
 ) ENGINE=innodb;
