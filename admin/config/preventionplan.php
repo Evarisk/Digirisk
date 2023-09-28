@@ -132,7 +132,7 @@ print load_fiche_titre($title, $linkback, 'title_setup');
 
 // Configuration header
 $head = digiriskdolibarr_admin_prepare_head();
-print dol_get_fiche_head($head, 'preventionplan', '', -1, "digiriskdolibarr@digiriskdolibarr");
+print dol_get_fiche_head($head, 'preventionplan', $title, -1, "digiriskdolibarr_color@digiriskdolibarr");
 
 print load_fiche_titre('<i class="fas fa-info"></i> ' . $langs->trans("PreventionPlanManagement"), '', '');
 print '<hr>';

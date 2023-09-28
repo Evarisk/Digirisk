@@ -131,7 +131,7 @@ print load_fiche_titre($title, $linkback, 'title_setup');
 
 // Configuration header
 $head = digiriskdolibarr_admin_prepare_head();
-print dol_get_fiche_head($head, 'firepermit', '', -1, "digiriskdolibarr@digiriskdolibarr");
+print dol_get_fiche_head($head, 'firepermit', $title, -1, "digiriskdolibarr_color@digiriskdolibarr");
 
 print load_fiche_titre('<i class="fas fa-fire-alt"></i> ' . $langs->trans("FirePermitManagement"), '', '');
 print '<hr>';

@@ -129,7 +129,7 @@ print load_fiche_titre($title, $linkback, 'title_setup');
 
 // Configuration header
 $head = digiriskdolibarr_admin_prepare_head();
-print dol_get_fiche_head($head, 'riskassessmentdocument', '', -1, "digiriskdolibarr@digiriskdolibarr");
+print dol_get_fiche_head($head, 'riskassessmentdocument', $title, -1, "digiriskdolibarr_color@digiriskdolibarr");
 
 
 // Risks
