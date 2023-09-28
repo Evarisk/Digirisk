@@ -185,3 +185,7 @@ ALTER TABLE llx_digiriskdolibarr_evaluator CHANGE `tms` `tms` timestamp DEFAULT 
 ALTER TABLE llx_digiriskdolibarr_evaluator_extrafields CHANGE `tms` `tms` timestamp DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP;
 
 ALTER TABLE llx_digiriskdolibarr_accident_investigation ADD fk_project integer NULL AFTER fk_task;
+
+ALTER TABLE llx_c_relative_location ADD position integer DEFAULT 0 AFTER active;
+ALTER TABLE llx_c_lesion_localization ADD position integer DEFAULT 0 AFTER active;
+ALTER TABLE llx_c_lesion_nature ADD position integer DEFAULT 0 AFTER active;

@@ -239,7 +239,7 @@ if (($id || $ref) && $action == 'edit') {
 
 	//RelativeLocation
 	print '<tr><td class="minwidth400">' . $langs->trans("RelativeLocation") . '</td><td>';
-	print digirisk_select_dictionary('relative_location', 'c_relative_location', 'label', 'label', $accidentmetadata->relative_location, 1);
+	print saturne_select_dictionary('relative_location', 'c_relative_location', 'label', 'label', $accidentmetadata->relative_location ?? '', 1);
 	print '<a href="' . DOL_URL_ROOT . '/admin/dict.php?mainmenu=home" target="_blank" class="wpeo-tooltip-event" aria-label="' . $langs->trans('ConfigDico') . '">' . ' ' . img_picto('', 'globe') . '</a>';
 	print '</td></tr>';
 
@@ -511,7 +511,9 @@ if ((empty($action) || ($action != 'create' && $action != 'edit'))) {
 	//Relative location
 	if ($object->relative_location < 0) {
 		$object->relative_location = '';
-	}
+	} else {
+        $object->relative_location = $langs->trans($object->relative_location);
+    }
 
 	//Accident Noticed
 	if (empty($object->accident_noticed) || $object->accident_noticed < 0) {
