@@ -514,6 +514,7 @@ AccidentInvestigationValidated    = L'enquête accident a été validée
 AccidentInvestigationReOpened     = L'enquête accident a été rouverte
 AccidentInvestigationTaskCreated  = Les tâches de l'enquête accident ont été créées
 AccidentInvestigationTaskDeleted  = Les tâches de l'enquête accident ont été supprimées
+AccidentInvestigationClassified   = L'enquête accident a été versionné et le document généré
 CausalityTree                     = Arbre des causes
 TaskWillBeCreatedAfterValidation  = Les tâches seront créées après validation de l'enquête accident
 AccidentInvestigationArchived     = L'enquête accident a été archivée et le document a été généré
