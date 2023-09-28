@@ -40,6 +40,8 @@ require_once __DIR__ . '/../../class/digiriskdolibarrdocuments/legaldisplay.clas
 require_once __DIR__ . '/../../lib/digiriskdolibarr_digiriskstandard.lib.php';
 require_once __DIR__ . '/../../lib/digiriskdolibarr_function.lib.php';
 
+require_once __DIR__ . '/../../../saturne/class/saturneschedules.class.php';
+
 global $db, $conf, $langs, $user, $hookmanager;
 
 // Load translation files required by the page
