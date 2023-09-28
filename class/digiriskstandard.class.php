@@ -90,8 +90,6 @@ class DigiriskStandard extends SaturneObject
 	public $fk_user_creat;
 	public $fk_user_modif;
 
-    const STATUS_LOCKED = 2;
-
 	/**
 	 * Constructor
 	 *
