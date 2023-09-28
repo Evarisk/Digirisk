@@ -394,7 +394,7 @@ if ($entity > 0) {
 
 	print '<div class="ticketpublicarea digirisk-page-container">';
 
-	print load_fiche_titre($langs->trans("CreateTicket"), '', "digiriskdolibarr32px@digiriskdolibarr");
+	print load_fiche_titre($langs->trans("CreateTicket"), '', "digiriskdolibarr_color@digiriskdolibarr");
 
 	print '<form method="POST" action="' . $_SERVER["PHP_SELF"] . '" id="sendTicketForm">';
 	print '<input type="hidden" name="token" value="' . newToken() . '">';
