@@ -430,7 +430,9 @@ class modDigiriskdolibarr extends DolibarrModules
 				'preventionplanschedules',
 				'firepermitschedules',
 				'digiriskdolibarradmindocuments',
-				'digiriskelementview',
+                'digiriskelementview',
+                'digiriskelementdocument',
+                'digiriskelementagenda',
 				'digiriskstandardview'
 			],
 			'tabs' => [

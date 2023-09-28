@@ -458,4 +458,39 @@ class DigiriskElement extends SaturneObject
 
         return $pictos;
     }
+
+    /**
+     * Return banner tab content.
+     *
+     * @return string         Picto html tags array.
+     */
+    public function getBannerTabContent(): array
+    {
+        global $conf, $db, $langs;
+
+        require_once __DIR__ . '/digiriskstandard.class.php';
+
+        $digiriskstandard = new DigiriskStandard($db);
+
+        dol_strlen($this->label) ? $morehtmlref = ' - ' . $this->label : '';
+
+        // ParentElement
+        $parent_element = new self($db);
+        $result         = $parent_element->fetch($this->fk_parent);
+        if ($result > 0) {
+            $morehtmlref .= '<br>' . $langs->trans("Description") . ' : ' . $this->description;
+            $morehtmlref .= '<br>' . $langs->trans("ParentElement") . ' : ' . $parent_element->getNomUrl(1, 'blank', 1);
+        } else {
+            $digiriskstandard->fetch($conf->global->DIGIRISKDOLIBARR_ACTIVE_STANDARD);
+            $morehtmlref .= '<br>' . $langs->trans("Description") . ' : ' . $this->description;
+            $morehtmlref .= '<br>' . $langs->trans("ParentElement") . ' : ' . $digiriskstandard->getNomUrl(1, 'blank', 1);
+        }
+        $morehtmlref .= '<br>';
+        $linkback = '<a href="' . dol_buildpath('/digiriskdolibarr/view/digiriskelement/risk_list.php', 1) . '">' . $langs->trans("BackToList") . '</a>';
+        $this->fetch($this->id);
+        $this->fk_project = $conf->global->DIGIRISKDOLIBARR_DU_PROJECT;
+        $moreParams['project']['disable_edit'] = 1;
+
+        return [$morehtmlref, $moreParams];
+    }
 }
