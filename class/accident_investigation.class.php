@@ -129,10 +129,10 @@ class AccidentInvestigation extends SaturneObject
 		'circumstances'         => ['type' => 'html',         'label' => 'Circumstances',          'enabled' => 1, 'position' => 160, 'notnull' => 0, 'visible' => -1,],
 		'causality_tree'        => ['type' => 'text',         'label' => 'CausalityTree',          'enabled' => 1, 'position' => 170, 'notnull' => 0, 'visible' => 0,],
 		'fk_accident'           => ['type' => 'integer:Accident:digiriskdolibarr/class/accident/accident.class.php', 'label' => 'Accident', 'picto' => 'fontawesome_fa-user-injured_fas' ,'enabled' => 1, 'position' => 11, 'notnull' => 1, 'visible' => 1, 'foreignkey' => 'digiriskdolibarr_accident.rowid', 'css' => 'maxwidth300'],
-        'fk_task'               => ['type' => 'integer:Task:projet/class/task.class.php',    'label' => 'Task',       'picto' => 'Task',    'enabled' => 1, 'position' => 12, 'notnull' => 1, 'visible' => 5,  'noteditable' => 1, 'foreignkey' => 'projet_task.rowid', 'help' => 'TaskWillBeCreatedAfterValidation'],
-        'fk_project'            => ['type' => 'integer:Task:projet/class/project.class.php', 'label' => 'Project',    'picto' => 'Project', 'enabled' => 1, 'position' => 13, 'notnull' => 1, 'visible' => 0,  'noteditable' => 1,],
-		'fk_user_creat'         => ['type' => 'integer:User:user/class/user.class.php',      'label' => 'UserAuthor', 'picto' => 'user',    'enabled' => 1, 'position' => 190, 'notnull' => 1, 'visible' => 0, 'foreignkey' => 'user.rowid'],
-		'fk_user_modif'         => ['type' => 'integer:User:user/class/user.class.php',      'label' => 'UserModif',  'picto' => 'user',    'enabled' => 1, 'position' => 200, 'notnull' => 0, 'visible' => 0, 'foreignkey' => 'user.rowid'],
+        'fk_task'               => ['type' => 'integer:Task:projet/class/task.class.php',       'label' => 'Task',       'picto' => 'task',    'enabled' => 1, 'position' => 12,  'notnull' => 1, 'visible' => 5,  'noteditable' => 1, 'foreignkey' => 'projet_task.rowid', 'help' => 'TaskWillBeCreatedAfterValidation'],
+        'fk_project'            => ['type' => 'integer:Project:projet/class/project.class.php', 'label' => 'Project',    'picto' => 'project', 'enabled' => 1, 'position' => 13,  'notnull' => 1, 'visible' => 0,],
+		'fk_user_creat'         => ['type' => 'integer:User:user/class/user.class.php',         'label' => 'UserAuthor', 'picto' => 'user',    'enabled' => 1, 'position' => 190, 'notnull' => 1, 'visible' => 0, 'foreignkey' => 'user.rowid'],
+		'fk_user_modif'         => ['type' => 'integer:User:user/class/user.class.php',         'label' => 'UserModif',  'picto' => 'user',    'enabled' => 1, 'position' => 200, 'notnull' => 0, 'visible' => 0, 'foreignkey' => 'user.rowid'],
 	];
 
 	/**
@@ -231,7 +231,7 @@ class AccidentInvestigation extends SaturneObject
 	public int $fk_task = 0;
 
     /**
-     * @var int Task ID.
+     * @var int Project ID.
      */
     public $fk_project;
 
