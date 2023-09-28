@@ -94,23 +94,16 @@ $upload_dir = $conf->digiriskdolibarr->multidir_output[$object->entity ?? 1];
 // Load object
 require_once DOL_DOCUMENT_ROOT . '/core/actions_fetchobject.inc.php'; // Must be included, not include_once.
 
-$taskExist = $task->fetch($object->fk_task);
-if ($taskExist <= 0) {
-	$object->setValueFrom('fk_task', 0, '', null, 'int', '', $user, 'ACCIDENTINVESTIGATION_MODIFY');
-}
-
-if ($object->status == AccidentInvestigation::STATUS_VALIDATED) {
-	$result = $signatory->checkSignatoriesSignatures($id, $object->element);
-	if ($result > 0) {
-		$object->setLocked($user);
-	}
-}
-
 // Security check - Protection if external user
 $permissiontoread   = $user->rights->digiriskdolibarr->accident_investigation->read;
 $permissiontoadd    = $user->rights->digiriskdolibarr->accident_investigation->write;
 $permissiontodelete = $user->rights->digiriskdolibarr->accident_investigation->delete;
 saturne_check_access($permissiontoread);
+
+$taskExist = $task->fetch($object->fk_task);
+if ($taskExist <= 0) {
+    $object->setValueFrom('fk_task', 0, '', null, 'int', '', $user, 'ACCIDENTINVESTIGATION_MODIFY');
+}
 
 /*
 *  Actions
@@ -412,11 +405,12 @@ if ($action == 'create') {
 	print '<div class="clearboth"></div>';
 
 	if ($action != 'presend') {
+        $allSigned = $signatory->checkSignatoriesSignatures($id, $object->element);
 		print '<div class="tabsAction">';
 
 		// Edit
 		$displayButton = $onPhone ? '<i class="fas fa-edit fa-2x"></i>' : '<i class="fas fa-edit"></i>' . ' ' . $langs->trans('Modify');
-		if ($object->status == $object::STATUS_DRAFT) {
+		if ($object->status == AccidentInvestigation::STATUS_DRAFT) {
 			print '<a class="butAction" id="actionButtonEdit" href="' . $_SERVER['PHP_SELF'] . '?id=' . $object->id . '&action=edit' . '">' . $displayButton . '</a>';
 		} else {
 			print '<span class="butActionRefused classfortooltip" title="' . dol_escape_htmltag($langs->trans('ObjectMustBeDraft', ucfirst($langs->transnoentities('The' . ucfirst($object->element))))) . '">' . $displayButton . '</span>';
@@ -432,7 +426,7 @@ if ($action == 'create') {
 
 		// Re-Open.
 		$displayButton = $onPhone ? '<i class="fas fa-lock-open fa-2x"></i>' : '<i class="fas fa-lock-open"></i>' . ' ' . $langs->trans('ReOpenDoli');
-		if ($object->status == AccidentInvestigation::STATUS_VALIDATED) {
+		if ($object->status == AccidentInvestigation::STATUS_VALIDATED && !$allSigned) {
 			print '<span class="butAction" id="actionButtonInProgress" href="' . $_SERVER['PHP_SELF'] . '?id=' . $object->id . '&action=set_draft&token=' . newToken() . '">' . $displayButton . '</span>';
 		} else {
 			print '<span class="butActionRefused classfortooltip" title="' . dol_escape_htmltag($langs->trans('ObjectMustBeValidated', ucfirst($langs->transnoentities('The' . ucfirst($object->element))))) . '">' . $displayButton . '</span>';
@@ -440,7 +434,7 @@ if ($action == 'create') {
 
 		// Sign.
 		$displayButton = $onPhone ? '<i class="fas fa-signature fa-2x"></i>' : '<i class="fas fa-signature"></i>' . ' ' . $langs->trans('Sign');
-		if ($object->status == AccidentInvestigation::STATUS_VALIDATED) {
+		if ($object->status == AccidentInvestigation::STATUS_VALIDATED && !$allSigned) {
 			print '<a class="butAction" id="actionButtonSign" href="' . dol_buildpath('/saturne/view/saturne_attendants.php', 1) . '?id=' . $object->id . '&module_name=' . $object->module . '&object_type=' . $object->element . '&attendant_table_mode=simple' . '">' . $displayButton . '</a>';
 		} else {
 			print '<span class="butActionRefused classfortooltip" title="' . dol_escape_htmltag($langs->trans('ObjectMustBeValidated', ucfirst($langs->transnoentities('The' . ucfirst($object->element))))) . '">' . $displayButton . '</span>';
@@ -459,7 +453,7 @@ if ($action == 'create') {
 
 		// Versioning.
 		$displayButton = $onPhone ?  '<i class="fas fa-file-archive fa-2x"></i>' : '<i class="fas fa-file-archive"></i>' . ' ' . $langs->trans('Versioning');
-		if ($object->status == AccidentInvestigation::STATUS_LOCKED) {
+		if ($object->status == AccidentInvestigation::STATUS_VALIDATED && $allSigned) {
 			print '<span class="butAction" id="actionButtonArchive" href="' . $_SERVER['PHP_SELF'] . '?id=' . $object->id . '&action=set_archive&token=' . newToken() . '">' . $displayButton . '</span>';
 		} else {
 			print '<span class="butActionRefused classfortooltip" title="' . dol_escape_htmltag($langs->trans('ObjectMustBeValidatedToVersion', ucfirst($langs->transnoentities('The' . ucfirst($object->element))))) . '">' . $displayButton . '</span>';

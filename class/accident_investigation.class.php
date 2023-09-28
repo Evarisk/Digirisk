@@ -61,11 +61,12 @@ class AccidentInvestigation extends SaturneObject
 	*/
 	public string $picto = 'fontawesome_fa-search_fas_#d35968';
 
-	public const STATUS_DELETED   = -1;
-	public const STATUS_DRAFT     = 0;
-	public const STATUS_VALIDATED = 1;
-	public const STATUS_LOCKED    = 2;
-	public const STATUS_ARCHIVED  = 3;
+	public const STATUS_DELETED    = -1;
+	public const STATUS_DRAFT      = 0;
+	public const STATUS_VALIDATED  = 1;
+    public const STATUS_LOCKED     = 2;
+    public const STATUS_CLASSIFIED = 3;
+	public const STATUS_ARCHIVED   = 3;
 
 	/**
 	 * 'type' field format:
@@ -436,27 +437,22 @@ class AccidentInvestigation extends SaturneObject
 		if (empty($this->labelStatus) || empty($this->labelStatusShort)) {
 			global $langs;
 
-			$this->labelStatus[self::STATUS_DRAFT]          = $langs->transnoentitiesnoconv('StatusDraft');
-			$this->labelStatus[self::STATUS_VALIDATED]      = $langs->transnoentitiesnoconv('Validated');
-			$this->labelStatus[self::STATUS_LOCKED]         = $langs->transnoentitiesnoconv('Locked');
-			$this->labelStatus[self::STATUS_ARCHIVED]       = $langs->transnoentitiesnoconv('Classified');
-			$this->labelStatus[self::STATUS_DELETED]        = $langs->transnoentitiesnoconv('Deleted');
+			$this->labelStatus[self::STATUS_DRAFT]      = $langs->transnoentitiesnoconv('StatusDraft');
+			$this->labelStatus[self::STATUS_VALIDATED]  = $langs->transnoentitiesnoconv('Validated');
+			$this->labelStatus[self::STATUS_CLASSIFIED] = $langs->transnoentitiesnoconv('Classified');
+			$this->labelStatus[self::STATUS_DELETED]    = $langs->transnoentitiesnoconv('Deleted');
 
-			$this->labelStatusShort[self::STATUS_DRAFT]     = $langs->transnoentitiesnoconv('StatusDraft');
-			$this->labelStatusShort[self::STATUS_VALIDATED] = $langs->transnoentitiesnoconv('Validated');
-			$this->labelStatusShort[self::STATUS_LOCKED]    = $langs->transnoentitiesnoconv('Locked');
-			$this->labelStatusShort[self::STATUS_ARCHIVED]  = $langs->transnoentitiesnoconv('Classified');
-			$this->labelStatusShort[self::STATUS_DELETED]   = $langs->transnoentitiesnoconv('Deleted');
+			$this->labelStatusShort[self::STATUS_DRAFT]      = $langs->transnoentitiesnoconv('StatusDraft');
+			$this->labelStatusShort[self::STATUS_VALIDATED]  = $langs->transnoentitiesnoconv('Validated');
+			$this->labelStatusShort[self::STATUS_CLASSIFIED] = $langs->transnoentitiesnoconv('Classified');
+			$this->labelStatusShort[self::STATUS_DELETED]    = $langs->transnoentitiesnoconv('Deleted');
 		}
 
 		$statusType = 'status' . $status;
 		if ($status == self::STATUS_VALIDATED) {
 			$statusType = 'status4';
 		}
-		if ($status == self::STATUS_LOCKED) {
-			$statusType = 'status6';
-		}
-		if ($status == self::STATUS_ARCHIVED) {
+		if ($status == self::STATUS_CLASSIFIED) {
 			$statusType = 'status8';
 		}
 		if ($status == self::STATUS_DELETED) {
