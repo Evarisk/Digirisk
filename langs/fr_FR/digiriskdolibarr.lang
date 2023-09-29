@@ -526,6 +526,11 @@ AccidentInvestigationDeleted      = Suppression d'une enquête accident
 AccidentInvestigationValidate     = Validation d'une enquête accident
 AccidentInvestigationArchive      = Classification d'une enquête accident
 AccidentInvestigationSigned       = Signature d'une enquête accident
+CloneWorkStop                     = Cloner les arrêts de travail ?
+CloneMetadata                     = Cloner les données complémentaires ?
+CloneLesion                       = Cloner les données complémentaires des lésions ?
+ClonePhotos                       = Cloner les photos ?
+CloneFrom                         = Clone de
 
 # AccidentTooltip - Tooltip des accidents
 VictimActivityTooltip              = Précisez l’activité ou la tâche de la victime au moment de l’accident, c’est-à-dire ce que faisait la victime

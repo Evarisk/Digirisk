@@ -645,6 +645,24 @@ if (empty($reshook)) {
 		$action = '';
 	}
 
+    // Action clone object
+    if ($action == 'confirm_clone' && $confirm == 'yes') {
+        $options['workstop'] = GETPOST('clone_workstop');
+        $options['lesion']   = GETPOST('clone_lesion');
+        $options['metadata'] = GETPOST('clone_metadata');
+        $options['photos']   = GETPOST('clone_photos');
+        if ($object->id > 0) {
+            $result = $object->createFromClone($user, $object->id, $options);
+            if ($result > 0) {
+                header("Location: " . $_SERVER['PHP_SELF'] . '?id=' . $result);
+                exit();
+            } else {
+                setEventMessages($object->error, $object->errors, 'errors');
+                $action = '';
+            }
+        }
+    }
+
 	// Actions cancel, add, update, update_extras, confirm_validate, confirm_delete, confirm_deleteline, confirm_clone, confirm_close, confirm_setdraft, confirm_reopen
 	require_once DOL_DOCUMENT_ROOT . '/core/actions_addupdatedelete.inc.php';
 
@@ -958,9 +976,7 @@ if ((empty($action) || ($action != 'create' && $action != 'edit'))) {
 
 	include_once './../../core/tpl/digiriskdolibarr_configuration_gauge_view.tpl.php';
 
-	$linkback = '<a href="' . dol_buildpath('/digiriskdolibarr/view/accident/accident_list.php', 1) . '">' . $langs->trans("BackToList") . '</a>';
-
-	saturne_banner_tab($object, 'id', $linkback, 1, 'rowid', 'ref', $moreHtmlRef, dol_strlen($object->photo) > 0);
+	saturne_banner_tab($object, 'id', '', 1, 'rowid', 'ref', $moreHtmlRef, dol_strlen($object->photo) > 0);
 
 	$formConfirm = '';
 
@@ -977,7 +993,14 @@ if ((empty($action) || ($action != 'create' && $action != 'edit'))) {
 
 	// Clone confirmation
 	if (($action == 'clone' && (empty($conf->use_javascript_ajax) || !empty($conf->dol_use_jmobile))) || (!empty($conf->use_javascript_ajax) && empty($conf->dol_use_jmobile))) {
-		$formConfirm .= $form->formconfirm($_SERVER['PHP_SELF'] . '?id=' . $object->id, $langs->trans('CloneObject', $langs->transnoentities('The' . ucfirst($object->element))), $langs->trans('ConfirmCloneObject', $langs->transnoentities('The' . ucfirst($object->element))), 'confirm_clone', '', 'yes', 'actionButtonClone', 350, 600);
+        $formQuestionClone = [
+            ['type' => 'checkbox', 'name' => 'clone_workstop', 'label' => $langs->trans('CloneWorkStop'), 'value' => 1],
+            ['type' => 'checkbox', 'name' => 'clone_metadata', 'label' => $langs->trans('CloneMetadata'), 'value' => 1],
+            ['type' => 'checkbox', 'name' => 'clone_lesion',   'label' => $langs->trans('CloneLesion'),   'value' => 1],
+            ['type' => 'checkbox', 'name' => 'clone_photos',   'label' => $langs->trans('ClonePhotos'),   'value' => 1]
+        ];
+
+        $formConfirm .= $form->formconfirm($_SERVER['PHP_SELF'] . '?id=' . $object->id, $langs->trans('CloneObject', $langs->transnoentities('The' . ucfirst($object->element))), $langs->trans('ConfirmCloneObject', $langs->transnoentities('The' . ucfirst($object->element))), 'confirm_clone', $formQuestionClone, 'yes', 'actionButtonClone', 350, 600);
 	}
 
 	// Confirmation to lock
