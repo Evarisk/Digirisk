@@ -58,10 +58,8 @@ class RiskAssessmentDocument extends DigiriskDocuments
 	 */
 	public function RiskAssessmentDocumentFillJSON()
 	{
-		global $conf;
+		global $conf, $user;
 
-		$user = new User($this->db);
-		$user->fetch($this->fk_user_creat);
 		$json = array();
 
 		if (!isset($conf->global->DIGIRISKDOLIBARR_RISKASSESSMENTDOCUMENT_AUDIT_START_DATE) || dol_strlen($conf->global->DIGIRISKDOLIBARR_RISKASSESSMENTDOCUMENT_AUDIT_START_DATE) < 1) {
