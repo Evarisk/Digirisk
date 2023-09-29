@@ -143,7 +143,6 @@ class InterfaceDigiriskdolibarrTriggers extends DolibarrTriggers
 		if (getDolGlobalInt('DIGIRISKDOLIBARR_ADVANCED_TRIGGER') && !empty($object->fields)) {
 			$actioncomm->note_private = method_exists($object, 'getTriggerDescription') ? $object->getTriggerDescription($object) : '';
 		}
-echo '<pre>'; print_r( $action ); echo '</pre>';
 
 		switch ($action) {
             case 'RISKASSESSMENTDOCUMENT_GENERATE' :
@@ -156,9 +155,7 @@ echo '<pre>'; print_r( $action ); echo '</pre>';
 				$actioncomm->label         = $langs->trans('ObjectGenerateTrigger', $langs->transnoentities(ucfirst($object->element)), $object->ref);
 				$actioncomm->note_private .= $langs->trans('ElementType') . ' : ' . $object->parent_type . '</br>';
 				$actioncomm->note_private .= $langs->trans('ParentElement') . ' : ' . $digiriskstandard->ref . ' ' . $digiriskstandard->label . '</br>';
-				$actioncomm->note_private .= $langs->trans('TechnicalID') . ' : ' . $object->id . '<br>';
 				$actioncomm->note_private .= $langs->trans('LastMainDoc') . ' : ' . $object->last_main_doc . '<br>';
-				$actioncomm->note_private .= $langs->trans('Status') . ' : ' . $object->status . '<br>';
 				$actioncomm->fk_element    = $object->parent_id;
 
 				$result = $actioncomm->create($user);
@@ -237,9 +234,7 @@ echo '<pre>'; print_r( $action ); echo '</pre>';
 				$actioncomm->label         = $langs->trans('ObjectGenerateTrigger', $langs->transnoentities(ucfirst($object->element)), $object->ref);
 				$actioncomm->note_private .= $langs->trans('ElementType') . ' : ' . $object->parent_type . '</br>';
 				$actioncomm->note_private .= $langs->trans('ParentElement') . ' : ' . $preventionplan->ref . ' ' . $preventionplan->label . '</br>';
-				$actioncomm->note_private .= $langs->trans('TechnicalID') . ' : ' . $object->id . '<br>';
 				$actioncomm->note_private .= $langs->trans('LastMainDoc') . ' : ' . $object->last_main_doc . '<br>';
-				$actioncomm->note_private .= $langs->trans('Status') . ' : ' . $object->status . '<br>';
 				$actioncomm->fk_element    = $object->parent_id;
 
 				$result = $actioncomm->create($user);
@@ -255,9 +250,7 @@ echo '<pre>'; print_r( $action ); echo '</pre>';
 				$actioncomm->label         = $langs->trans('ObjectGenerateTrigger', $langs->transnoentities(ucfirst($object->element)), $object->ref);
 				$actioncomm->note_private .= $langs->trans('ElementType') . ' : ' . $object->parent_type . '</br>';
 				$actioncomm->note_private .= $langs->trans('ParentElement') . ' : ' . $firepermit->ref . ' ' . $firepermit->label . '</br>';
-				$actioncomm->note_private .= $langs->trans('TechnicalID') . ' : ' . $object->id . '<br>';
 				$actioncomm->note_private .= $langs->trans('LastMainDoc') . ' : ' . $object->last_main_doc . '<br>';
-				$actioncomm->note_private .= $langs->trans('Status') . ' : ' . $object->status . '<br>';
 				$actioncomm->fk_element    = $object->parent_id;
 
 				$result = $actioncomm->create($user);
@@ -273,9 +266,7 @@ echo '<pre>'; print_r( $action ); echo '</pre>';
 				$actioncomm->label         = $langs->trans('ObjectGenerateTrigger', $langs->transnoentities(ucfirst($object->element)), $object->ref);
 				$actioncomm->note_private .= $langs->trans('ElementType') . ' : ' . $object->parent_type . '</br>';
 				$actioncomm->note_private .= $langs->trans('ParentElement') . ' : ' . $digiriskelement->ref . ' ' . $digiriskelement->label . '</br>';
-				$actioncomm->note_private .= $langs->trans('TechnicalID') . ' : ' . $object->id . '<br>';
 				$actioncomm->note_private .= $langs->trans('LastMainDoc') . ' : ' . $object->last_main_doc . '<br>';
-				$actioncomm->note_private .= $langs->trans('Status') . ' : ' . $object->status . '<br>';
 				$actioncomm->fk_element    = $object->parent_id;
 
 				$result = $actioncomm->create($user);
@@ -299,9 +290,7 @@ echo '<pre>'; print_r( $action ); echo '</pre>';
 				$actioncomm->label         = $langs->trans('ObjectGenerateTrigger', $langs->transnoentities(ucfirst($object->element)), $object->ref);
 				$actioncomm->note_private .= $langs->trans('ElementType') . ' : ' . $object->parent_type . '</br>';
 				$actioncomm->note_private .= $langs->trans('ParentElement') . ' : ' . $parentelement->ref . ' ' . $parentelement->label . '</br>';
-				$actioncomm->note_private .= $langs->trans('TechnicalID') . ' : ' . $object->id . '<br>';
 				$actioncomm->note_private .= $langs->trans('LastMainDoc') . ' : ' . $object->last_main_doc . '<br>';
-				$actioncomm->note_private .= $langs->trans('Status') . ' : ' . $object->status . '<br>';
 				$actioncomm->fk_element    = $object->parent_id;
 
 				$result = $actioncomm->create($user);
@@ -320,104 +309,39 @@ echo '<pre>'; print_r( $action ); echo '</pre>';
 
 				$actioncomm->label       = $langs->transnoentities('ObjectCreateTrigger', $langs->transnoentities(ucfirst($object->element)), $object->ref);
 				$actioncomm->note_private .= $langs->trans('Standard') . ' : ' . $digiriskstandard->ref . ' - ' . $conf->global->MAIN_INFO_SOCIETE_NOM . '<br/>';
-				$actioncomm->note_private .= $langs->trans('TechnicalID') . ' : ' . $object->id . '<br>';
 				$actioncomm->note_private .= $langs->trans('Photo') . ' : ' . (!empty($object->photo) ? $object->photo : 'N/A') . '<br>';
 				$actioncomm->note_private .= $langs->trans('ElementType') . ' : ' . $langs->trans($object->element_type) . '<br>';
-				$actioncomm->note_private .= $langs->trans('Status') . ' : 1' . '<br>';
 				($object->ranks != 0 ? $actioncomm->note_private .= $langs->trans('Order') . ' : ' . $object->ranks . '<br>' : '');
 				$actioncomm->note_private .= $langs->trans('ShowInSelectOnPublicTicketInterface') . ' : ' . ($object->show_in_selector ? $langs->trans('Yes') : $langs->trans('No')) . '<br>';
 
 				$result = $actioncomm->create($user);
 				break;
 
+            case 'ACCIDENTINVESTIGATION_CREATE' :
+            case 'FIREPERMIT_CREATE' :
+            case 'PREVENTIONPLAN_CREATE' :
+                $actioncomm->label = $langs->trans('ObjectCreateTrigger', $langs->transnoentities(ucfirst($object->element)), $object->ref);
+
+                $result = $actioncomm->create($user);
+                break;
+
+            case 'ACCIDENTINVESTIGATION_MODIFY' :
+            case 'FIREPERMIT_MODIFY' :
 			case 'PREVENTIONPLAN_MODIFY' :
-				$societies         = $digiriskresources->fetchResourcesFromObject('', $object);
-				$digirisksignature = new SaturneSignature($this->db, $object->module, $object->element);
-				$signatories       = $digirisksignature->fetchSignatories($object->id, $object->element);
-
-				$actioncomm->label         = $langs->trans('ObjectModifyTrigger', $langs->transnoentities(ucfirst($object->element)), $object->ref);
-				$actioncomm->note_private .= $langs->trans('TechnicalID') . ' : ' . $object->id . '<br>';
-				$actioncomm->note_private .= $langs->trans('StartDate') . ' : ' . dol_print_date($object->date_start, 'dayhoursec') . '<br>';
-				$actioncomm->note_private .= $langs->trans('EndDate') . ' : ' . dol_print_date($object->date_end, 'dayhoursec') . '<br>';
-				if (is_array($signatories) && !empty($signatories)) {
-					$check = 0;
-					foreach($signatories as $signatory) {
-						$check++;
-						$actioncomm->note_private .= $langs->trans($signatory->role) . ' : ' . $signatory->firstname . ' ' . $signatory->lastname . '<br>';
-						if ($check == 2) break;
-					}
-				}
-				if ($societies) {
-					foreach ($societies as $societename => $key) {
-						$actioncomm->note_private .= $langs->trans($societename) . ' : ';
-						foreach ($key as $societe) {
-							if ($societename == 'LabourInspectorAssigned') {
-								$actioncomm->note_private .= $societe->firstname . ' ' . $societe->lastname . '<br>';
-							} else {
-								$actioncomm->note_private .= $societe->name . '<br>';
-							}
-							if ($societename == 'ExtSociety') {
-								$actioncomm->note_private .= $langs->trans('Address') . ' : ' . $societe->address . '<br>';
-								$actioncomm->note_private .= $langs->trans('SIRET') . ' : ' . $societe->idprof2 . '<br>';
-							}
-						}
-					}
-				}
-				$actioncomm->note_private .= $langs->trans('CSSCTIntervention') . ' : ' . ($object->cssct_intervention ? $langs->trans("Yes") : $langs->trans("No")) . '<br>';
-				$actioncomm->note_private .= $langs->trans('PriorVisit') . ' : ' . ($object->prior_visit_bool ? $langs->trans("Yes") : $langs->trans("No")) . '<br>';
-				if ($object->prior_visit_bool) {
-					$actioncomm->note_private .= $langs->trans('PriorVisitText') . ' : ' . (!empty($object->prior_visit_text) ? $object->prior_visit_text : 'N/A') . '</br>';
-					$actioncomm->note_private .= $langs->trans('PriorVisitDate') . ' : ' . dol_print_date($object->prior_visit_date, 'dayhoursec') . '<br>';
-				}
-				$actioncomm->note_private .= $langs->trans('Status') . ' : ' . $object->status . '<br>';
+				$actioncomm->label = $langs->trans('ObjectModifyTrigger', $langs->transnoentities(ucfirst($object->element)), $object->ref);
 
 				$result = $actioncomm->create($user);
 				break;
 
+            case 'ACCIDENTINVESTIGATION_DELETE' :
+            case 'FIREPERMIT_DELETE' :
 			case 'PREVENTIONPLAN_DELETE' :
-				$societies         = $digiriskresources->fetchResourcesFromObject('', $object);
-				$digirisksignature = new SaturneSignature($this->db, $object->module, $object->element);
-				$signatories       = $digirisksignature->fetchSignatories($object->id, $object->element);
-
-				$actioncomm->label         = $langs->trans('ObjectDeleteTrigger', $langs->transnoentities(ucfirst($object->element)), $object->ref);
-				$actioncomm->note_private .= $langs->trans('TechnicalID') . ' : ' . $object->id . '<br>';
-				$actioncomm->note_private .= $langs->trans('StartDate') . ' : ' . dol_print_date($object->date_start, 'dayhoursec') . '<br>';
-				$actioncomm->note_private .= $langs->trans('EndDate') . ' : ' . dol_print_date($object->date_end, 'dayhoursec') . '<br>';
-				if (is_array($signatories) && !empty($signatories)) {
-					$check = 0;
-					foreach($signatories as $signatory) {
-						$check++;
-						$actioncomm->note_private .= $langs->trans($signatory->role) . ' : ' . $signatory->firstname . ' ' . $signatory->lastname . '<br>';
-						if ($check == 2) break;
-					}
-				}
-				if ($societies) {
-					foreach ($societies as $societename => $key) {
-						$actioncomm->note_private .= $langs->trans($societename) . ' : ';
-						foreach ($key as $societe) {
-							if ($societename == 'LabourInspectorAssigned') {
-								$actioncomm->note_private .= $societe->firstname . ' ' . $societe->lastname . '<br>';
-							} else {
-								$actioncomm->note_private .= $societe->name . '<br>';
-							}
-							if ($societename == 'ExtSociety') {
-								$actioncomm->note_private .= $langs->trans('Address') . ' : ' . $societe->address . '<br>';
-								$actioncomm->note_private .= $langs->trans('SIRET') . ' : ' . $societe->idprof2 . '<br>';
-							}
-						}
-					}
-				}
-				$actioncomm->note_private .= $langs->trans('CSSCTIntervention') . ' : ' . ($object->cssct_intervention ? $langs->trans("Yes") : $langs->trans("No")) . '<br>';
-				$actioncomm->note_private .= $langs->trans('PriorVisit') . ' : ' . ($object->prior_visit_bool ? $langs->trans("Yes") : $langs->trans("No")) . '<br>';
-				if ($object->prior_visit_bool) {
-					$actioncomm->note_private .= $langs->trans('PriorVisitText') . ' : ' . (!empty($object->prior_visit_text) ? $object->prior_visit_text : 'N/A') . '</br>';
-					$actioncomm->note_private .= $langs->trans('PriorVisitDate') . ' : ' . dol_print_date($object->prior_visit_date, 'dayhoursec') . '<br>';
-				}
-				$actioncomm->note_private .= $langs->trans('Status') . ' : ' . $object->status . '<br>';
+				$actioncomm->label = $langs->trans('ObjectDeleteTrigger', $langs->transnoentities(ucfirst($object->element)), $object->ref);
 
 				$result = $actioncomm->create($user);
 				break;
 
+            case 'ACCIDENT_INVESTIGATION_VALIDATE' :
             case 'FIREPERMIT_PENDINGSIGNATURE' :
 			case 'PREVENTIONPLAN_PENDINGSIGNATURE' :
 				$actioncomm->label = $langs->transnoentities('ObjectValidateTrigger', $langs->transnoentities(ucfirst($object->element)), $object->ref);
@@ -457,7 +381,6 @@ echo '<pre>'; print_r( $action ); echo '</pre>';
 
 				$actioncomm->label         = $langs->trans('ObjectCreateTrigger', $langs->transnoentities(ucfirst($object->element)), $object->ref);
 				$actioncomm->note_private .= $langs->trans('ParentElement') . ' : ' . $digiriskelement->ref . " - " . $digiriskelement->label . '<br>';
-				$actioncomm->note_private .= $langs->trans('TechnicalID') . ' : ' . $object->id . '<br>';
 				$actioncomm->note_private .= $langs->trans('INRSRisk') . ' : ' .  $risk->getDangerCategoryName($object) . '<br>';
 				$actioncomm->note_private .= $langs->trans('PreventionMethod') . ' : ' . (!empty($object->prevention_method) ? $object->prevention_method : 'N/A') . '<br>';
 				$actioncomm->fk_element    = $object->fk_preventionplan;
@@ -473,7 +396,6 @@ echo '<pre>'; print_r( $action ); echo '</pre>';
 
 				$actioncomm->label         = $langs->trans('ObjectModifyTrigger', $langs->transnoentities(ucfirst($object->element)), $object->ref);
 				$actioncomm->note_private .= $langs->trans('ParentElement') . ' : ' . $digiriskelement->ref . " - " . $digiriskelement->label . '<br>';
-				$actioncomm->note_private .= $langs->trans('TechnicalID') . ' : ' . $object->id . '<br>';
 				$actioncomm->note_private .= $langs->trans('INRSRisk') . ' : ' .  $risk->getDangerCategoryName($object) . '<br>';
 				$actioncomm->note_private .= $langs->trans('PreventionMethod') . ' : ' . (!empty($object->prevention_method) ? $object->prevention_method : 'N/A') . '<br>';
 				$actioncomm->fk_element    = $object->fk_preventionplan;
@@ -489,7 +411,6 @@ echo '<pre>'; print_r( $action ); echo '</pre>';
 
 				$actioncomm->label         = $langs->trans('ObjectDeleteTrigger', $langs->transnoentities(ucfirst($object->element)), $object->ref);
 				$actioncomm->note_private .= $langs->trans('ParentElement') . ' : ' . $digiriskelement->ref . " - " . $digiriskelement->label . '<br>';
-				$actioncomm->note_private .= $langs->trans('TechnicalID') . ' : ' . $object->id . '<br>';
 				$actioncomm->note_private .= $langs->trans('INRSRisk') . ' : ' .  $risk->getDangerCategoryName($object) . '<br>';
 				$actioncomm->note_private .= $langs->trans('PreventionMethod') . ' : ' . (!empty($object->prevention_method) ? $object->prevention_method : 'N/A') . '<br>';
 				$actioncomm->fk_element    = $object->fk_preventionplan;
@@ -506,126 +427,6 @@ echo '<pre>'; print_r( $action ); echo '</pre>';
 				$object->update($user, true);
 				break;
 
-			case 'FIREPERMIT_CREATE' :
-				$preventionplan    = new PreventionPlan($this->db);
-				$preventionplan->fetch($object->fk_preventionplan);
-				$societies         = $digiriskresources->fetchResourcesFromObject('', $object);
-				$digirisksignature = new SaturneSignature($this->db, $object->module, $object->element);
-				$signatories       = $digirisksignature->fetchSignatories($object->id, $object->element);
-
-				$actioncomm->label         = $langs->trans('ObjectCreateTrigger', $langs->transnoentities(ucfirst($object->element)), $object->ref);
-				$actioncomm->note_private .= $langs->trans('TechnicalID') . ' : ' . $object->id . '<br>';
-				$actioncomm->note_private .= $langs->trans('StartDate') . ' : ' . dol_print_date($object->date_start, 'dayhoursec') . '<br>';
-				$actioncomm->note_private .= $langs->trans('EndDate') . ' : ' . dol_print_date($object->date_end, 'dayhoursec') . '<br>';
-				if (is_array($signatories) && !empty($signatories)) {
-					foreach($signatories as $signatory) {
-						$actioncomm->note_private .= $langs->trans($signatory->role) . ' : ' . $signatory->firstname . ' ' . $signatory->lastname . '<br>';
-					}
-				}
-				foreach ($societies as $societename => $key) {
-					$actioncomm->note_private .= $langs->trans($societename) . ' : ';
-					foreach ($key as $societe) {
-						if ($societename == 'LabourInspectorAssigned') {
-							$actioncomm->note_private .= $societe->firstname . ' ' . $societe->lastname . '<br>';
-						} else {
-							$actioncomm->note_private .= $societe->name . '<br>';
-						}
-						if ($societename == 'ExtSociety') {
-							$actioncomm->note_private .= $langs->trans('Address') . ' : ' . $societe->address . '<br>';
-							$actioncomm->note_private .= $langs->trans('SIRET') . ' : ' . $societe->idprof2 . '<br>';
-						}
-					}
-				}
-				$actioncomm->note_private .= $langs->trans('PreventionPlan') . ' : ' . $preventionplan->ref . (!empty($preventionplan->label) ? ' ' . $preventionplan->label : '') . '<br>';
-				$actioncomm->note_private .= $langs->trans('Status') . ' : ' . $object->status . '<br>';
-
-				$result = $actioncomm->create($user);
-				break;
-
-			case 'FIREPERMIT_MODIFY' :
-				$preventionplan    = new PreventionPlan($this->db);
-				$preventionplan->fetch($object->fk_preventionplan);
-				$societies         = $digiriskresources->fetchResourcesFromObject('', $object);
-				$digirisksignature = new SaturneSignature($this->db, $object->module, $object->element);
-				$signatories       = $digirisksignature->fetchSignatories($object->id, $object->element);
-
-				$actioncomm->label         = $langs->trans('ObjectModifyTrigger', $langs->transnoentities(ucfirst($object->element)), $object->ref);
-				$actioncomm->note_private .= $langs->trans('TechnicalID') . ' : ' . $object->id . '<br>';
-				$actioncomm->note_private .= $langs->trans('StartDate') . ' : ' . dol_print_date($object->date_start, 'dayhoursec') . '<br>';
-				$actioncomm->note_private .= $langs->trans('EndDate') . ' : ' . dol_print_date($object->date_end, 'dayhoursec') . '<br>';
-
-				if (is_array($signatories) && !empty($signatories)) {
-					$check = 0;
-					foreach($signatories as $signatory) {
-						$check++;
-						$actioncomm->note_private .= $langs->trans($signatory->role) . ' : ' . $signatory->firstname . ' ' . $signatory->lastname . '<br>';
-						if ($check == 2) break;
-					}
-				}
-				if ($societies) {
-					foreach ($societies as $societename => $key) {
-						$actioncomm->note_private .= $langs->trans($societename) . ' : ';
-						foreach ($key as $societe) {
-							if ($societename == 'LabourInspectorAssigned') {
-								$actioncomm->note_private .= $societe->firstname . ' ' . $societe->lastname . '<br>';
-							} else {
-								$actioncomm->note_private .= $societe->name . '<br>';
-							}
-							if ($societename == 'ExtSociety') {
-								$actioncomm->note_private .= $langs->trans('Address') . ' : ' . $societe->address . '<br>';
-								$actioncomm->note_private .= $langs->trans('SIRET') . ' : ' . $societe->idprof2 . '<br>';
-							}
-						}
-					}
-				}
-				$actioncomm->note_private .= $langs->trans('PreventionPlan') . ' : ' . $preventionplan->ref . (!empty($preventionplan->label) ? ' ' . $preventionplan->label : '') . '<br>';
-				$actioncomm->note_private .= $langs->trans('Status') . ' : ' . $object->status . '<br>';
-
-				$result = $actioncomm->create($user);
-				break;
-
-			case 'FIREPERMIT_DELETE' :
-				$preventionplan    = new PreventionPlan($this->db);
-				$preventionplan->fetch($object->fk_preventionplan);
-				$societies         = $digiriskresources->fetchResourcesFromObject('', $object);
-				$digirisksignature = new DigiriskSignature($this->db);
-				$signatories       = $digirisksignature->fetchSignatories($object->id, $object->element);
-
-				$actioncomm->label         = $langs->trans('ObjectDeleteTrigger', $langs->transnoentities(ucfirst($object->element)), $object->ref);
-				$actioncomm->note_private .= $langs->trans('TechnicalID') . ' : ' . $object->id . '<br>';
-				$actioncomm->note_private .= $langs->trans('StartDate') . ' : ' . dol_print_date($object->date_start, 'dayhoursec') . '<br>';
-				$actioncomm->note_private .= $langs->trans('EndDate') . ' : ' . dol_print_date($object->date_end, 'dayhoursec') . '<br>';
-
-				if (is_array($signatories) && !empty($signatories)) {
-					$check = 0;
-					foreach($signatories as $signatory) {
-						$check++;
-						$actioncomm->note_private .= $langs->trans($signatory->role) . ' : ' . $signatory->firstname . ' ' . $signatory->lastname . '<br>';
-						if ($check == 2) break;
-					}
-				}
-				if ($societies) {
-					foreach ($societies as $societename => $key) {
-						$actioncomm->note_private .= $langs->trans($societename) . ' : ';
-						foreach ($key as $societe) {
-							if ($societename == 'LabourInspectorAssigned') {
-								$actioncomm->note_private .= $societe->firstname . ' ' . $societe->lastname . '<br>';
-							} else {
-								$actioncomm->note_private .= $societe->name . '<br>';
-							}
-							if ($societename == 'ExtSociety') {
-								$actioncomm->note_private .= $langs->trans('Address') . ' : ' . $societe->address . '<br>';
-								$actioncomm->note_private .= $langs->trans('SIRET') . ' : ' . $societe->idprof2 . '<br>';
-							}
-						}
-					}
-				}
-				$actioncomm->note_private .= $langs->trans('PreventionPlan') . ' : ' . $preventionplan->ref . (!empty($preventionplan->label) ? ' ' . $preventionplan->label : '') . '<br>';
-				$actioncomm->note_private .= $langs->trans('Status') . ' : ' . $object->status . '<br>';
-
-				$result = $actioncomm->create($user);
-				break;
-
 			case 'FIREPERMITLINE_CREATE' :
 				$risk = new Risk($this->db);
 				$digiriskelement->fetch($object->fk_element);
@@ -634,7 +435,6 @@ echo '<pre>'; print_r( $action ); echo '</pre>';
 
 				$actioncomm->label         = $langs->trans('ObjectCreateTrigger', $langs->transnoentities(ucfirst($object->element)), $object->ref);
 				$actioncomm->note_private .= $langs->trans('ParentElement') . ' : ' . $digiriskelement->ref . " - " . $digiriskelement->label . '<br>';
-				$actioncomm->note_private .= $langs->trans('TechnicalID') . ' : ' . $object->id . '<br>';
 				$actioncomm->note_private .= $langs->trans('INRSRisk') . ' : ' .  $risk->getFirePermitDangerCategoryName($object) . '<br>';
 				$actioncomm->note_private .= $langs->trans('UsedEquipment') . ' : ' . (!empty($object->used_equipment) ? $object->used_equipment : 'N/A') . '<br>';
 				$actioncomm->fk_element    = $object->fk_firepermit;
@@ -650,7 +450,6 @@ echo '<pre>'; print_r( $action ); echo '</pre>';
 
 				$actioncomm->label         = $langs->trans('ObjectModifyTrigger', $langs->transnoentities(ucfirst($object->element)), $object->ref);
 				$actioncomm->note_private .= $langs->trans('ParentElement') . ' : ' . $digiriskelement->ref . " - " . $digiriskelement->label . '<br>';
-				$actioncomm->note_private .= $langs->trans('TechnicalID') . ' : ' . $object->id . '<br>';
 				$actioncomm->note_private .= $langs->trans('INRSRisk') . ' : ' .  $risk->getFirePermitDangerCategoryName($object) . '<br>';
 				$actioncomm->note_private .= $langs->trans('UsedEquipment') . ' : ' . (!empty($object->used_equipment) ? $object->used_equipment : 'N/A') . '<br>';
 				$actioncomm->fk_element    = $object->fk_firepermit;
@@ -666,7 +465,6 @@ echo '<pre>'; print_r( $action ); echo '</pre>';
 
 				$actioncomm->label         = $langs->trans('ObjectDeleteTrigger', $langs->transnoentities(ucfirst($object->element)), $object->ref);
 				$actioncomm->note_private .= $langs->trans('ParentElement') . ' : ' . $digiriskelement->ref . " - " . $digiriskelement->label . '<br>';
-				$actioncomm->note_private .= $langs->trans('TechnicalID') . ' : ' . $object->id . '<br>';
 				$actioncomm->note_private .= $langs->trans('INRSRisk') . ' : ' .  $risk->getFirePermitDangerCategoryName($object) . '<br>';
 				$actioncomm->note_private .= $langs->trans('UsedEquipment') . ' : ' . (!empty($object->used_equipment) ? $object->used_equipment : 'N/A') . '<br>';
 				$actioncomm->fk_element    = $object->fk_firepermit;
@@ -831,9 +629,7 @@ echo '<pre>'; print_r( $action ); echo '</pre>';
 
 				$actioncomm->label         = $langs->trans('ObjectCreateTrigger', $langs->transnoentities(ucfirst($object->element)), $object->ref);
 				$actioncomm->note_private .= $langs->trans('ParentElement') . ' : ' . $digiriskelement->ref . " - " . $digiriskelement->label . '<br>';
-				$actioncomm->note_private .= $langs->trans('TechnicalID') . ' : ' . $object->id . '<br>';
 				$actioncomm->note_private .= $langs->trans('RiskCategory') . ' : ' . $object->getDangerCategoryName($object) . '<br>';
-				$actioncomm->note_private .= $langs->trans('Status') . ' : ' . $object->status . '<br>';
 				$actioncomm->fk_element    = $object->fk_element;
 				$result = $actioncomm->create($user);
 				break;
@@ -846,9 +642,7 @@ echo '<pre>'; print_r( $action ); echo '</pre>';
 
 				$actioncomm->label         = $langs->trans('ObjectModifyTrigger', $langs->transnoentities(ucfirst($object->element)), $object->ref);
 				$actioncomm->note_private .= $langs->trans('ParentElement') . ' : ' . $digiriskelement->ref . " - " . $digiriskelement->label . '<br>';
-				$actioncomm->note_private .= $langs->trans('TechnicalID') . ' : ' . $object->id . '<br>';
 				$actioncomm->note_private .= $langs->trans('RiskCategory') . ' : ' . $object->getDangerCategoryName($object) . '<br>';
-				$actioncomm->note_private .= $langs->trans('Status') . ' : ' . $object->status . '<br>';
 				$actioncomm->fk_element    = $object->fk_element;
 
 				$result = $actioncomm->create($user);
@@ -862,9 +656,7 @@ echo '<pre>'; print_r( $action ); echo '</pre>';
 
 				$actioncomm->label         = $langs->trans('ObjectDeleteTrigger', $langs->transnoentities(ucfirst($object->element)), $object->ref);
 				$actioncomm->note_private .= $langs->trans('ParentElement') . ' : ' . $digiriskelement->ref . " - " . $digiriskelement->label . '<br>';
-				$actioncomm->note_private .= $langs->trans('TechnicalID') . ' : ' . $object->id . '<br>';
 				$actioncomm->note_private .= $langs->trans('RiskCategory') . ' : ' . $object->getDangerCategoryName($object) . '<br>';
-				$actioncomm->note_private .= $langs->trans('Status') . ' : ' . $object->status . '<br>';
 				$actioncomm->fk_element    = $object->fk_element;
 
 				$result = $actioncomm->create($user);
@@ -881,9 +673,7 @@ echo '<pre>'; print_r( $action ); echo '</pre>';
 				$actioncomm->note_private .= $langs->trans('RiskSharedWithEntityRefLabel', $object->ref) . ' S' . $conf->entity . ' ' . $digiriskelement->ref . " - " . $digiriskelement->label . '<br>';
 				$digiriskelement->fetch($object->fk_element);
 				$actioncomm->note_private .= $langs->trans('ParentElement') . ' : ' . $digiriskelement->ref . " - " . $digiriskelement->label . '<br>';
-				$actioncomm->note_private .= $langs->trans('TechnicalID') . ' : ' . $object->id . '<br>';
 				$actioncomm->note_private .= $langs->trans('RiskCategory') . ' : ' . $object->getDangerCategoryName($object) . '<br>';
-				$actioncomm->note_private .= $langs->trans('Status') . ' : ' . $object->status . '<br>';
 				$actioncomm->fk_element    = $object->applied_on;
 
 				$result = $actioncomm->create($user);
@@ -900,9 +690,7 @@ echo '<pre>'; print_r( $action ); echo '</pre>';
 				$actioncomm->note_private .= $langs->trans('RiskUnlinkedFromEntityRefLabel', $object->ref) . ' S' . $conf->entity . ' ' . $digiriskelement->ref . " - " . $digiriskelement->label . '<br>';
 				$digiriskelement->fetch($object->fk_element);
 				$actioncomm->note_private .= $langs->trans('ParentElement') . ' : ' . $digiriskelement->ref . " - " . $digiriskelement->label . '<br>';
-				$actioncomm->note_private .= $langs->trans('TechnicalID') . ' : ' . $object->id . '<br>';
 				$actioncomm->note_private .= $langs->trans('RiskCategory') . ' : ' . $object->getDangerCategoryName($object) . '<br>';
-				$actioncomm->note_private .= $langs->trans('Status') . ' : ' . $object->status . '<br>';
 				$actioncomm->fk_element    = $object->applied_on;
 
 				$result = $actioncomm->create($user);
@@ -932,7 +720,6 @@ echo '<pre>'; print_r( $action ); echo '</pre>';
 					$actioncomm->elementtype = 'digiriskelement@digiriskdolibarr';
 
 					$actioncomm->label         = $langs->trans('ObjectCreateTrigger', $langs->transnoentities(ucfirst($object->element)), $object->ref);
-					$actioncomm->note_private .= $langs->trans('TechnicalID') . ' : ' . $object->id . '<br>';
 					$actioncomm->note_private .= $langs->trans($label_progress) . ' : ' . $task_progress . '%' . '<br>';
 					$actioncomm->fk_element    = $risk->fk_element;
 
@@ -965,7 +752,6 @@ echo '<pre>'; print_r( $action ); echo '</pre>';
 					$actioncomm->elementtype = 'digiriskelement@digiriskdolibarr';
 
 					$actioncomm->label         = $langs->trans('ObjectModifyTrigger', $langs->transnoentities(ucfirst($object->element)), $object->ref);
-					$actioncomm->note_private .= $langs->trans('TechnicalID') . ' : ' . $object->id . '<br>';
 					$actioncomm->note_private .= $langs->trans($label_progress) . ' : ' . $task_progress . '%' . '<br>';
 					$actioncomm->fk_element    = $risk->fk_element;
 
@@ -996,7 +782,6 @@ echo '<pre>'; print_r( $action ); echo '</pre>';
 
 					$actioncomm->elementtype   = 'digiriskelement@digiriskdolibarr';
 					$actioncomm->label         = $langs->trans('ObjectDeleteTrigger', $langs->transnoentities(ucfirst($object->element)), $object->ref);
-					$actioncomm->note_private .= $langs->trans('TechnicalID') . ' : ' . $object->id . '<br>';
 					$actioncomm->note_private .= $langs->trans($label_progress) . ' : ' . $task_progress . '%' . '<br>';
 					$actioncomm->fk_element    = $risk->fk_element;
 
@@ -1014,11 +799,9 @@ echo '<pre>'; print_r( $action ); echo '</pre>';
 
 				$actioncomm->label         = $langs->trans('ObjectCreateTrigger', $langs->transnoentities(ucfirst($object->element)), $object->ref);
 				$actioncomm->note_private .= $langs->trans('ParentRisk') . ' : ' . $risk->ref . '<br>';
-				$actioncomm->note_private .= $langs->trans('TechnicalID') . ' : ' . $object->id . '<br>';
 				$actioncomm->note_private .= $langs->trans('Comment') . ' : ' . (!empty($object->comment) ? $object->comment : 'N/A') . '<br>';
 				((!empty($object->date_riskassessment) && $conf->global->DIGIRISKDOLIBARR_SHOW_RISKASSESSMENT_DATE) ? $actioncomm->note_private .= $langs->trans('RiskAssessmentDate') . ' : ' . dol_print_date($object->date_riskassessment, 'day') . '<br>' : '');
 				$actioncomm->note_private .= $langs->trans('Photo') . ' : ' . (!empty($object->photo) ? $object->photo : 'N/A') . '<br>';
-				$actioncomm->note_private .= $langs->trans('Status') . ' : ' . $object->status . '<br>';
 				if ($object->method == 'advanced') {
 					$actioncomm->note_private .= $langs->trans('Evaluation') . ' : ' . $object->cotation . '<br>';
 					$actioncomm->note_private .= $langs->trans('Gravity') . ' : ' . $object->gravite . '<br>';
@@ -1042,11 +825,9 @@ echo '<pre>'; print_r( $action ); echo '</pre>';
 
 				$actioncomm->label         = $langs->trans('ObjectModifyTrigger', $langs->transnoentities(ucfirst($object->element)), $object->ref);
 				$actioncomm->note_private .= $langs->trans('ParentRisk') . ' : ' . $risk->ref . '<br>';
-				$actioncomm->note_private .= $langs->trans('TechnicalID') . ' : ' . $object->id . '<br>';
 				$actioncomm->note_private .= $langs->trans('Comment') . ' : ' . (!empty($object->comment) ? $object->comment : 'N/A') . '<br>';
 				((!empty($object->date_riskassessment) && $conf->global->DIGIRISKDOLIBARR_SHOW_RISKASSESSMENT_DATE) ? $actioncomm->note_private .= $langs->trans('RiskAssessmentDate') . ' : ' . dol_print_date($object->date_riskassessment, 'day') . '<br>' : '');
 				$actioncomm->note_private .= $langs->trans('Photo') . ' : ' . (!empty($object->photo) ? $object->photo : 'N/A') . '<br>';
-				$actioncomm->note_private .= $langs->trans('Status') . ' : ' . $object->status . '<br>';
 				if ($object->method == 'advanced') {
 					$actioncomm->note_private .= $langs->trans('Evaluation') . ' : ' . $object->cotation . '<br>';
 					$actioncomm->note_private .= $langs->trans('Gravity') . ' : ' . $object->gravite . '<br>';
@@ -1070,11 +851,9 @@ echo '<pre>'; print_r( $action ); echo '</pre>';
 
 				$actioncomm->label         = $langs->trans('ObjectDeleteTrigger', $langs->transnoentities(ucfirst($object->element)), $object->ref);
 				$actioncomm->note_private .= $langs->trans('ParentRisk') . ' : ' . $risk->ref . '<br>';
-				$actioncomm->note_private .= $langs->trans('TechnicalID') . ' : ' . $object->id . '<br>';
 				$actioncomm->note_private .= $langs->trans('Comment') . ' : ' . (!empty($object->comment) ? $object->comment : 'N/A') . '<br>';
 				((!empty($object->date_riskassessment) && $conf->global->DIGIRISKDOLIBARR_SHOW_RISKASSESSMENT_DATE) ? $actioncomm->note_private .= $langs->trans('RiskAssessmentDate') . ' : ' . dol_print_date($object->date_riskassessment, 'day') . '<br>' : '');
 				$actioncomm->note_private .= $langs->trans('Photo') . ' : ' . (!empty($object->photo) ? $object->photo : 'N/A') . '<br>';
-				$actioncomm->note_private .= $langs->trans('Status') . ' : ' . $object->status . '<br>';
 				if ($object->method == 'advanced') {
 					$actioncomm->note_private .= $langs->trans('Evaluation') . ' : ' . $object->cotation . '<br>';
 					$actioncomm->note_private .= $langs->trans('Gravity') . ' : ' . $object->gravite . '<br>';
@@ -1098,7 +877,6 @@ echo '<pre>'; print_r( $action ); echo '</pre>';
 
 				$actioncomm->label         = $langs->trans('ObjectCreateTrigger', $langs->transnoentities(ucfirst($object->element)), $object->ref);
 				$actioncomm->note_private .= $langs->trans('ParentElement') . ' : ' . $digiriskelement->ref . " - " . $digiriskelement->label . '<br>';
-				$actioncomm->note_private .= $langs->trans('TechnicalID') . ' : ' . $object->id . '<br>';
 				$actioncomm->note_private .= $langs->trans('UserAssigned') . ' : ' . $userstat->firstname . " " . $userstat->lastname . '<br>';
 				$actioncomm->note_private .= $langs->trans('PostOrFunction') . ' : ' . (!empty($object->job) ? $object->job : 'N/A') . '<br>';
 				$actioncomm->note_private .= $langs->trans('AssignmentDate') . ' : ' . dol_print_date($now, 'dayhoursec', 'tzuser') . '<br>';
@@ -1118,7 +896,6 @@ echo '<pre>'; print_r( $action ); echo '</pre>';
 
 				$actioncomm->label         = $langs->trans('ObjectModifyTrigger', $langs->transnoentities(ucfirst($object->element)), $object->ref);
 				$actioncomm->note_private .= $langs->trans('ParentElement') . ' : ' . $digiriskelement->ref . " - " . $digiriskelement->label . '<br>';
-				$actioncomm->note_private .= $langs->trans('TechnicalID') . ' : ' . $object->id . '<br>';
 				$actioncomm->note_private .= $langs->trans('UserAssigned') . ' : ' . $userstat->firstname . " " . $userstat->lastname . '<br>';
 				$actioncomm->note_private .= $langs->trans('PostOrFunction') . ' : ' . (!empty($object->job) ? $object->job : 'N/A') . '<br>';
 				$actioncomm->note_private .= $langs->trans('AssignmentDate') . ' : ' . dol_print_date($object->date_creation, 'dayhoursec', 'tzuser') . '<br>';
@@ -1138,7 +915,6 @@ echo '<pre>'; print_r( $action ); echo '</pre>';
 
 				$actioncomm->label         = $langs->trans('ObjectDeleteTrigger', $langs->transnoentities(ucfirst($object->element)), $object->ref);
 				$actioncomm->note_private .= $langs->trans('ParentElement') . ' : ' . $digiriskelement->ref . " - " . $digiriskelement->label . '<br>';
-				$actioncomm->note_private .= $langs->trans('TechnicalID') . ' : ' . $object->id . '<br>';
 				$actioncomm->note_private .= $langs->trans('UserAssigned') . ' : ' . $userstat->firstname . " " . $userstat->lastname . '<br>';
 				$actioncomm->note_private .= $langs->trans('PostOrFunction') . ' : ' . (!empty($object->job) ? $object->job : 'N/A') . '<br>';
 				$actioncomm->note_private .= $langs->trans('AssignmentDate') . ' : ' . dol_print_date($object->date_creation, 'dayhoursec', 'tzuser') . '<br>';
@@ -1155,9 +931,7 @@ echo '<pre>'; print_r( $action ); echo '</pre>';
 
 				$actioncomm->label         = $langs->trans('ObjectCreateTrigger', $langs->transnoentities(ucfirst($object->element)), $object->ref);
 				$actioncomm->note_private .= $langs->trans('ParentElement') . ' : ' . $digiriskelement->ref . " - " . $digiriskelement->label . '<br>';
-				$actioncomm->note_private .= $langs->trans('TechnicalID') . ' : ' . $object->id . '<br>';
 				$actioncomm->note_private .= $langs->trans('RiskCategory') . ' : ' . $object->getRiskSignCategoryName($object) . '<br>';
-				$actioncomm->note_private .= $langs->trans('Status') . ' : ' . $object->status . '<br>';
 				$actioncomm->fk_element    = $object->fk_element;
 
 				$result = $actioncomm->create($user);
@@ -1170,9 +944,7 @@ echo '<pre>'; print_r( $action ); echo '</pre>';
 
 				$actioncomm->label         = $langs->trans('ObjectModifyTrigger', $langs->transnoentities(ucfirst($object->element)), $object->ref);
 				$actioncomm->note_private .= $langs->trans('ParentElement') . ' : ' . $digiriskelement->ref . " - " . $digiriskelement->label . '<br>';
-				$actioncomm->note_private .= $langs->trans('TechnicalID') . ' : ' . $object->id . '<br>';
 				$actioncomm->note_private .= $langs->trans('RiskCategory') . ' : ' . $object->getRiskSignCategoryName($object) . '<br>';
-				$actioncomm->note_private .= $langs->trans('Status') . ' : ' . $object->status . '<br>';
 				$actioncomm->fk_element    = $object->fk_element;
 
 				$result = $actioncomm->create($user);
@@ -1185,9 +957,7 @@ echo '<pre>'; print_r( $action ); echo '</pre>';
 
 				$actioncomm->label         = $langs->trans('ObjectDeleteTrigger', $langs->transnoentities(ucfirst($object->element)), $object->ref);
 				$actioncomm->note_private .= $langs->trans('ParentElement') . ' : ' . $digiriskelement->ref . " - " . $digiriskelement->label . '<br>';
-				$actioncomm->note_private .= $langs->trans('TechnicalID') . ' : ' . $object->id . '<br>';
 				$actioncomm->note_private .= $langs->trans('RiskCategory') . ' : ' . $object->getRiskSignCategoryName($object) . '<br>';
-				$actioncomm->note_private .= $langs->trans('Status') . ' : ' . $object->status . '<br>';
 				$actioncomm->fk_element    = $object->fk_element;
 
 				$result = $actioncomm->create($user);
@@ -1201,9 +971,7 @@ echo '<pre>'; print_r( $action ); echo '</pre>';
 				$actioncomm->note_private .= $langs->trans('RiskSignSharedWithEntityRefLabel', $object->ref) . ' S' . $conf->entity . ' ' . $digiriskelement->ref . " - " . $digiriskelement->label . '<br>';
 				$digiriskelement->fetch($object->fk_element);
 				$actioncomm->note_private .= $langs->trans('ParentElement') . ' : ' . $digiriskelement->ref . " - " . $digiriskelement->label . '<br>';
-				$actioncomm->note_private .= $langs->trans('TechnicalID') . ' : ' . $object->id . '<br>';
 				$actioncomm->note_private .= $langs->trans('RiskCategory') . ' : ' . $object->getRiskSignCategoryName($object) . '<br>';
-				$actioncomm->note_private .= $langs->trans('Status') . ' : ' . $object->status . '<br>';
 				$actioncomm->fk_element    = $object->applied_on;
 
 				$result = $actioncomm->create($user);
@@ -1217,9 +985,7 @@ echo '<pre>'; print_r( $action ); echo '</pre>';
 				$actioncomm->note_private .= $langs->trans('RiskSignUnlinkedFromEntityRefLabel', $object->ref) . ' S' . $conf->entity . ' ' . $digiriskelement->ref . " - " . $digiriskelement->label . '<br>';
 				$digiriskelement->fetch($object->fk_element);
 				$actioncomm->note_private .= $langs->trans('ParentElement') . ' : ' . $digiriskelement->ref . " - " . $digiriskelement->label . '<br>';
-				$actioncomm->note_private .= $langs->trans('TechnicalID') . ' : ' . $object->id . '<br>';
 				$actioncomm->note_private .= $langs->trans('RiskCategory') . ' : ' . $object->getRiskSignCategoryName($object) . '<br>';
-				$actioncomm->note_private .= $langs->trans('Status') . ' : ' . $object->status . '<br>';
 				$actioncomm->fk_element    = $object->applied_on;
 
 				$result = $actioncomm->create($user);
@@ -1252,13 +1018,11 @@ echo '<pre>'; print_r( $action ); echo '</pre>';
 				}
 
 				$actioncomm->label         = $langs->trans('ObjectCreateTrigger', $langs->transnoentities(ucfirst($object->element)), $object->ref);
-				$actioncomm->note_private .= $langs->trans('TechnicalID') . ' : ' . $object->id . '<br>';
 				$actioncomm->note_private .= $langs->trans('UserVictim') . ' : ' . $uservictim->firstname . $uservictim->lastname . '<br>';
 				$actioncomm->note_private .= $langs->trans('UserEmployer') . ' : ' . $useremployer->firstname . $useremployer->lastname . '<br>';
 				$actioncomm->note_private .= $langs->trans('AccidentLocation') . ' : ' . $accidentLocation  . '<br>';
 				$actioncomm->note_private .= $langs->trans('AccidentType') . ' : ' . ($object->accident_type ? $langs->trans('CommutingAccident') : $langs->trans('WorkAccidentStatement')) . '<br>';
 				$actioncomm->note_private .= $langs->trans('AccidentDate') . ' : ' . dol_print_date($object->accident_date, 'dayhoursec') . '<br>';
-				$actioncomm->note_private .= $langs->trans('Status') . ' : ' . $object->status . '<br>';
 
 				$result = $actioncomm->create($user);
 				break;
@@ -1292,13 +1056,11 @@ echo '<pre>'; print_r( $action ); echo '</pre>';
 				}
 
 				$actioncomm->label         = $langs->trans('ObjectModifyTrigger', $langs->transnoentities(ucfirst($object->element)), $object->ref);
-				$actioncomm->note_private .= $langs->trans('TechnicalID') . ' : ' . $object->id . '<br>';
 				$actioncomm->note_private .= $langs->trans('UserVictim') . ' : ' . $uservictim->firstname . $uservictim->lastname . '<br>';
 				$actioncomm->note_private .= $langs->trans('UserEmployer') . ' : ' . $useremployer->firstname . $useremployer->lastname . '<br>';
 				$actioncomm->note_private .= $langs->trans('AccidentLocation') . ' : ' . $accidentLocation  . '<br>';
 				$actioncomm->note_private .= $langs->trans('AccidentType') . ' : ' . ($object->accident_type ? $langs->trans('CommutingAccident') : $langs->trans('WorkAccidentStatement')) . '<br>';
 				$actioncomm->note_private .= $langs->trans('AccidentDate') . ' : ' . dol_print_date($object->accident_date, 'dayhoursec') . '<br>';
-				$actioncomm->note_private .= $langs->trans('Status') . ' : ' . $object->status . '<br>';
 
 				$result = $actioncomm->create($user);
 				break;
@@ -1330,13 +1092,11 @@ echo '<pre>'; print_r( $action ); echo '</pre>';
 				}
 
 				$actioncomm->label         = $langs->trans('ObjectDeleteTrigger', $langs->transnoentities(ucfirst($object->element)), $object->ref);
-				$actioncomm->note_private .= $langs->trans('TechnicalID') . ' : ' . $object->id . '<br>';
 				$actioncomm->note_private .= $langs->trans('UserVictim') . ' : ' . $uservictim->firstname . $uservictim->lastname . '<br>';
 				$actioncomm->note_private .= $langs->trans('UserEmployer') . ' : ' . $useremployer->firstname . $useremployer->lastname . '<br>';
 				$actioncomm->note_private .= $langs->trans('AccidentLocation') . ' : ' . $accidentLocation  . '<br>';
 				$actioncomm->note_private .= $langs->trans('AccidentType') . ' : ' . ($object->accident_type ? $langs->trans('CommutingAccident') : $langs->trans('WorkAccidentStatement')) . '<br>';
 				$actioncomm->note_private .= $langs->trans('AccidentDate') . ' : ' . dol_print_date($object->accident_date, 'dayhoursec') . '<br>';
-				$actioncomm->note_private .= $langs->trans('Status') . ' : ' . $object->status . '<br>';
 
 				$result = $actioncomm->create($user);
 				break;
@@ -1345,12 +1105,10 @@ echo '<pre>'; print_r( $action ); echo '</pre>';
 				$actioncomm->elementtype = 'accident@digiriskdolibarr';
 
 				$actioncomm->label         = $langs->trans('ObjectCreateTrigger', $langs->transnoentities(ucfirst($object->element)), $object->ref);
-				$actioncomm->note_private .= $langs->trans('TechnicalID') . ' : ' . $object->id . '<br>';
 				$actioncomm->note_private .= $langs->trans('WorkStopDays') . ' : ' . $object->workstop_days . '<br>';
 				$actioncomm->note_private .= $langs->trans('WorkStopDocument') . ' : ' . (!empty($object->declaration_link) ? $object->declaration_link : 'N/A') . '<br>';
 				$actioncomm->note_private .= $langs->trans('DateStartWorkStop') . ' : ' . dol_print_date($object->date_start_workstop, 'dayhoursec') . '<br>';
 				$actioncomm->note_private .= $langs->trans('DateEndWorkStop') . ' : ' . dol_print_date($object->date_end_workstop, 'dayhoursec') . '<br>';
-				$actioncomm->note_private .= $langs->trans('Status') . ' : ' . $object->status . '<br>';
 				$actioncomm->fk_element    = $object->fk_accident;
 
 				$result = $actioncomm->create($user);
@@ -1360,12 +1118,10 @@ echo '<pre>'; print_r( $action ); echo '</pre>';
 				$actioncomm->elementtype = 'accident@digiriskdolibarr';
 
 				$actioncomm->label         = $langs->trans('ObjectModifyTrigger', $langs->transnoentities(ucfirst($object->element)), $object->ref);
-				$actioncomm->note_private .= $langs->trans('TechnicalID') . ' : ' . $object->id . '<br>';
 				$actioncomm->note_private .= $langs->trans('WorkStopDays') . ' : ' . $object->workstop_days . '<br>';
 				$actioncomm->note_private .= $langs->trans('WorkStopDocument') . ' : ' . (!empty($object->declaration_link) ? $object->declaration_link : 'N/A') . '<br>';
 				$actioncomm->note_private .= $langs->trans('DateStartWorkStop') . ' : ' . dol_print_date($object->date_start_workstop, 'dayhoursec') . '<br>';
 				$actioncomm->note_private .= $langs->trans('DateEndWorkStop') . ' : ' . dol_print_date($object->date_end_workstop, 'dayhoursec') . '<br>';
-				$actioncomm->note_private .= $langs->trans('Status') . ' : ' . $object->status . '<br>';
 				$actioncomm->fk_element    = $object->fk_accident;
 
 				$result = $actioncomm->create($user);
@@ -1375,12 +1131,10 @@ echo '<pre>'; print_r( $action ); echo '</pre>';
 				$actioncomm->elementtype = 'accident@digiriskdolibarr';
 
 				$actioncomm->label         = $langs->trans('ObjectDeleteTrigger', $langs->transnoentities(ucfirst($object->element)), $object->ref);
-				$actioncomm->note_private .= $langs->trans('TechnicalID') . ' : ' . $object->id . '<br>';
 				$actioncomm->note_private .= $langs->trans('WorkStopDays') . ' : ' . $object->workstop_days . '<br>';
 				$actioncomm->note_private .= $langs->trans('WorkStopDocument') . ' : ' . (!empty($object->declaration_link) ? $object->declaration_link : 'N/A') . '<br>';
 				$actioncomm->note_private .= $langs->trans('DateStartWorkStop') . ' : ' . dol_print_date($object->date_start_workstop, 'dayhoursec') . '<br>';
 				$actioncomm->note_private .= $langs->trans('DateEndWorkStop') . ' : ' . dol_print_date($object->date_end_workstop, 'dayhoursec') . '<br>';
-				$actioncomm->note_private .= $langs->trans('Status') . ' : ' . $object->status . '<br>';
 				$actioncomm->fk_element    = $object->fk_accident;
 
 				$result = $actioncomm->create($user);
@@ -1390,7 +1144,6 @@ echo '<pre>'; print_r( $action ); echo '</pre>';
 				$actioncomm->elementtype = 'accident@digiriskdolibarr';
 
 				$actioncomm->label         = $langs->trans('ObjectCreateTrigger', $langs->transnoentities(ucfirst($object->element)), $object->ref);
-				$actioncomm->note_private .= $langs->trans('TechnicalID') . ' : ' . $object->id . '<br>';
 				$actioncomm->note_private .= $langs->trans('LesionLocalization') . ' : ' . $object->lesion_localization . '<br>';
 				$actioncomm->note_private .= $langs->trans('LesionNature') . ' : ' . $object->lesion_nature . '<br>';
 				$actioncomm->fk_element    = $object->fk_accident;
@@ -1402,7 +1155,6 @@ echo '<pre>'; print_r( $action ); echo '</pre>';
 				$actioncomm->elementtype = 'accident@digiriskdolibarr';
 
 				$actioncomm->label         = $langs->trans('ObjectModifyTrigger', $langs->transnoentities(ucfirst($object->element)), $object->ref);
-				$actioncomm->note_private .= $langs->trans('TechnicalID') . ' : ' . $object->id . '<br>';
 				$actioncomm->note_private .= $langs->trans('LesionLocalization') . ' : ' . $object->lesion_localization . '<br>';
 				$actioncomm->note_private .= $langs->trans('LesionNature') . ' : ' . $object->lesion_nature . '<br>';
 				$actioncomm->fk_element    = $object->fk_accident;
@@ -1414,7 +1166,6 @@ echo '<pre>'; print_r( $action ); echo '</pre>';
 				$actioncomm->elementtype = 'accident@digiriskdolibarr';
 
 				$actioncomm->label         = $langs->trans('ObjectDeleteTrigger', $langs->transnoentities(ucfirst($object->element)), $object->ref);
-				$actioncomm->note_private .= $langs->trans('TechnicalID') . ' : ' . $object->id . '<br>';
 				$actioncomm->note_private .= $langs->trans('LesionLocalization') . ' : ' . $object->lesion_localization . '<br>';
 				$actioncomm->note_private .= $langs->trans('LesionNature') . ' : ' . $object->lesion_nature . '<br>';
 				$actioncomm->fk_element    = $object->fk_accident;
@@ -1436,7 +1187,6 @@ echo '<pre>'; print_r( $action ); echo '</pre>';
 
 				$actioncomm->label         = $langs->trans('ObjectCreateTrigger', $langs->transnoentities(ucfirst($object->element)), $object->ref);
 				$actioncomm->note_private .= $langs->trans('ParentElement') . ' : ' . $object->ref . ' - ' . $object->label . '<br>';
-				$actioncomm->note_private .= $langs->trans('TechnicalID') . ' : ' . $object->timespent_id . '<br>';
 				$actioncomm->note_private .= $langs->trans('TaskTimeSpentDate') . ' : ' . dol_print_date($object->timespent_datehour, 'dayhoursec') . '<br>';
 				$actioncomm->note_private .= $langs->trans('TaskTimeSpentDuration') . ' : ' .  convertSecondToTime($object->timespent_duration * 60, 'allhourmin') . '<br>';
 				$actioncomm->fk_element    = $object->fk_element;
@@ -1450,7 +1200,6 @@ echo '<pre>'; print_r( $action ); echo '</pre>';
 
 				$actioncomm->label         = $langs->trans('ObjectModifyTrigger', $langs->transnoentities(ucfirst($object->element)), $object->ref);
 				$actioncomm->note_private .= $langs->trans('ParentElement') . ' : ' . $object->ref . ' - ' . $object->label . '<br>';
-				$actioncomm->note_private .= $langs->trans('TechnicalID') . ' : ' . $object->timespent_id . '<br>';
 				$actioncomm->note_private .= $langs->trans('TaskTimeSpentDate') . ' : ' . dol_print_date($object->timespent_datehour, 'dayhoursec') . '<br>';
 				$actioncomm->note_private .= $langs->trans('TaskTimeSpentDuration') . ' : ' .  convertSecondToTime($object->timespent_duration * 60, 'allhourmin') . '<br>';
 				$actioncomm->fk_element    = $object->fk_element;
@@ -1464,7 +1213,6 @@ echo '<pre>'; print_r( $action ); echo '</pre>';
 
 				$actioncomm->label         = $langs->trans('ObjectDeleteTrigger', $langs->transnoentities(ucfirst($object->element)), $object->ref);
 				$actioncomm->note_private .= $langs->trans('ParentElement') . ' : ' . $object->ref . ' - ' . $object->label . '<br>';
-				$actioncomm->note_private .= $langs->trans('TechnicalID') . ' : ' . $object->timespent_id . '<br>';
 				$actioncomm->note_private .= $langs->trans('TaskTimeSpentDate') . ' : ' . dol_print_date($object->timespent_datehour, 'dayhoursec') . '<br>';
 				$actioncomm->note_private .= $langs->trans('TaskTimeSpentDuration') . ' : ' .  convertSecondToTime($object->timespent_duration * 60, 'allhourmin') . '<br>';
 				$actioncomm->fk_element    = $object->fk_element;
@@ -1472,28 +1220,6 @@ echo '<pre>'; print_r( $action ); echo '</pre>';
 
 				$result = $actioncomm->create($user);
 				break;
-
-			case 'ACCIDENTINVESTIGATION_CREATE' :
-				$actioncomm->label = $langs->trans('ObjectCreateTrigger', $langs->transnoentities(ucfirst($object->element)), $object->ref);
-				$result = $actioncomm->create($user);
-				break;
-
-			case 'ACCIDENTINVESTIGATION_MODIFY' :
-				$actioncomm->label = $langs->trans('ObjectModifyTrigger', $langs->transnoentities(ucfirst($object->element)), $object->ref);
-				$result = $actioncomm->create($user);
-				break;
-
-			case 'ACCIDENTINVESTIGATION_DELETE' :
-				$actioncomm->label = $langs->trans('ObjectDeleteTrigger', $langs->transnoentities(ucfirst($object->element)), $object->ref);
-
-				$result = $actioncomm->create($user);
-				break;
-
-            case 'ACCIDENT_INVESTIGATION_VALIDATE' :
-                $actioncomm->label = $langs->trans('ObjectValidateTrigger', $langs->transnoentities(ucfirst($object->element)), $object->ref);
-
-                $result = $actioncomm->create($user);
-                break;
 
 			case 'ACCIDENT_INVESTIGATION_SENTBYMAIL' :
 				$actioncomm->label = $langs->trans('ObjectSentByMailTrigger');

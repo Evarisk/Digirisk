@@ -379,6 +379,59 @@ class PreventionPlan extends SaturneObject
 		return $form::selectarray($htmlname, $preventionPlansData, $selected, $showempty, 0, 0, '', 0, 0, 0, '', $morecss);
 
 	}
+
+    /**
+     * Write information of trigger description
+     *
+     * @param  Object $object Object calling the trigger
+     * @return string         Description to display in actioncomm->note_private
+     */
+    public function getTriggerDescription(SaturneObject $object): string
+    {
+        global $langs;
+
+        require_once __DIR__ . '/digiriskresources.class.php';
+        require_once __DIR__ . '/../../saturne/class/saturnesignature.class.php';
+
+        $digiriskResources = new DigiriskResources($this->db);
+        $saturneSignature  = new SaturneSignature($this->db, $object->module, $object->element);
+        $societies         = $digiriskResources->fetchResourcesFromObject('', $object);
+        $signatories       = $saturneSignature->fetchSignatories($object->id, $object->element);
+
+        $ret  = parent::getTriggerDescription($object);
+
+        $ret .= (dol_strlen($object->date_start) > 0 ? $langs->transnoentities('StartDate') . ' : ' . dol_print_date($object->date_start, 'dayhoursec') . '<br>' : '');
+        $ret .= (dol_strlen($object->date_end) > 0 ? $langs->transnoentities('EndDate') . ' : ' . dol_print_date($object->date_end, 'dayhoursec') . '<br>' : '');
+        if (is_array($signatories) && !empty($signatories)) {
+            foreach($signatories as $signatory) {
+                $ret .= $langs->transnoentities($signatory->role) . ' : ' . $signatory->firstname . ' ' . $signatory->lastname . '<br>';
+            }
+        }
+        if (is_array($societies) && !empty($societies)) {
+            foreach ($societies as $societename => $key) {
+                $ret .= $langs->transnoentities($societename) . ' : ';
+                foreach ($key as $societe) {
+                    if ($societename == 'LabourInspectorAssigned') {
+                        $ret .= $societe->firstname . ' ' . $societe->lastname . '<br>';
+                    } else {
+                        $ret .= $societe->name . '<br>';
+                    }
+                    if ($societename == 'ExtSociety') {
+                        $ret .= (dol_strlen($societe->address) > 0 ? $langs->transnoentities('Address') . ' : ' . $societe->address . '<br>' : '');
+                        $ret .= (dol_strlen($societe->idprof2) > 0 ? $langs->transnoentities('SIRET') . ' : ' . $societe->idprof2 . '<br>' : '');
+                    }
+                }
+            }
+        }
+        $ret .= $langs->transnoentities('CSSCTIntervention') . ' : ' . ($object->cssct_intervention ? $langs->transnoentities("Yes") : $langs->transnoentities("No")) . '<br>';
+        $ret .= $langs->transnoentities('PriorVisit') . ' : ' . ($object->prior_visit_bool ? $langs->transnoentities("Yes") : $langs->transnoentities("No")) . '<br>';
+        if ($object->prior_visit_bool) {
+            $ret .= $langs->transnoentities('PriorVisitText') . ' : ' . (!empty($object->prior_visit_text) ? $object->prior_visit_text : 'N/A') . '</br>';
+            $ret .= (dol_strlen($object->prior_visit_date) > 0 ? $langs->transnoentities('PriorVisitDate') . ' : ' . dol_print_date($object->prior_visit_date, 'dayhoursec') . '<br>' : '');
+        }
+
+        return $ret;
+    }
 }
 
 /**
