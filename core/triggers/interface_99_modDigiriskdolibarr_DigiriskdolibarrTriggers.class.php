@@ -317,6 +317,7 @@ class InterfaceDigiriskdolibarrTriggers extends DolibarrTriggers
 				$result = $actioncomm->create($user);
 				break;
 
+            case 'ACCIDENT_CREATE' :
             case 'ACCIDENTINVESTIGATION_CREATE' :
             case 'FIREPERMIT_CREATE' :
             case 'PREVENTIONPLAN_CREATE' :
@@ -325,6 +326,7 @@ class InterfaceDigiriskdolibarrTriggers extends DolibarrTriggers
                 $result = $actioncomm->create($user);
                 break;
 
+            case 'ACCIDENT_MODIFY' :
             case 'ACCIDENTINVESTIGATION_MODIFY' :
             case 'FIREPERMIT_MODIFY' :
 			case 'PREVENTIONPLAN_MODIFY' :
@@ -333,6 +335,7 @@ class InterfaceDigiriskdolibarrTriggers extends DolibarrTriggers
 				$result = $actioncomm->create($user);
 				break;
 
+            case 'ACCIDENT_DELETE' :
             case 'ACCIDENTINVESTIGATION_DELETE' :
             case 'FIREPERMIT_DELETE' :
 			case 'PREVENTIONPLAN_DELETE' :
@@ -991,193 +994,34 @@ class InterfaceDigiriskdolibarrTriggers extends DolibarrTriggers
 				$result = $actioncomm->create($user);
 				break;
 
-			case 'ACCIDENT_CREATE' :
-				$society      = new Societe($this->db);
-				$uservictim   = new User($this->db);
-				$uservictim->fetch($object->fk_user_victim);
-				$useremployer = new User($this->db);
-				$useremployer->fetch($object->fk_user_employer);
 
-				//1 : Accident in DU / GP, 2 : Accident in society, 3 : Accident in another location
-				switch ($object->external_accident) {
-					case 1:
-						if (!empty($object->fk_standard)) {
-							$digiriskstandard->fetch($object->fk_standard);
-							$accidentLocation = $digiriskstandard->ref . " - " . $conf->global->MAIN_INFO_SOCIETE_NOM;
-						} else if (!empty($object->fk_element)) {
-							$digiriskelement->fetch($object->fk_element);
-							$accidentLocation = $digiriskelement->ref . " - " . $digiriskelement->label;
-						}
-						break;
-					case 2:
-						$society->fetch($object->fk_soc);
-						$accidentLocation = $society->ref . " - " . $society->label;
-					case 3:
-						$accidentLocation = $object->accident_location;
-						break;
-				}
-
-				$actioncomm->label         = $langs->trans('ObjectCreateTrigger', $langs->transnoentities(ucfirst($object->element)), $object->ref);
-				$actioncomm->note_private .= $langs->trans('UserVictim') . ' : ' . $uservictim->firstname . $uservictim->lastname . '<br>';
-				$actioncomm->note_private .= $langs->trans('UserEmployer') . ' : ' . $useremployer->firstname . $useremployer->lastname . '<br>';
-				$actioncomm->note_private .= $langs->trans('AccidentLocation') . ' : ' . $accidentLocation  . '<br>';
-				$actioncomm->note_private .= $langs->trans('AccidentType') . ' : ' . ($object->accident_type ? $langs->trans('CommutingAccident') : $langs->trans('WorkAccidentStatement')) . '<br>';
-				$actioncomm->note_private .= $langs->trans('AccidentDate') . ' : ' . dol_print_date($object->accident_date, 'dayhoursec') . '<br>';
-
-				$result = $actioncomm->create($user);
-				break;
-
-			case 'ACCIDENT_MODIFY' :
-				$society      = new Societe($this->db);
-				$uservictim   = new User($this->db);
-				$uservictim->fetch($object->fk_user_victim);
-				$useremployer = new User($this->db);
-				$useremployer->fetch($object->fk_user_employer);
-
-				//1 : Accident in DU / GP, 2 : Accident in society, 3 : Accident in another location
-				switch ($object->external_accident) {
-					case 1:
-						if (!empty($object->fk_standard)) {
-							$digiriskstandard->fetch($object->fk_standard);
-							$accidentLocation = $digiriskstandard->ref . ' - ' . $conf->global->MAIN_INFO_SOCIETE_NOM;
-						} elseif (!empty($object->fk_element)) {
-							$digiriskelement->fetch($object->fk_element);
-							$actioncomm->fk_element  = $object->fk_element;
-							$accidentLocation = $digiriskelement->ref . ' - ' . $digiriskelement->label;
-						}
-						break;
-					case 2:
-						$society->fetch($object->fk_soc);
-						$accidentLocation = $society->ref . ' - ' . $society->label;
-						break;
-					case 3:
-						$accidentLocation = $object->accident_location;
-						break;
-				}
-
-				$actioncomm->label         = $langs->trans('ObjectModifyTrigger', $langs->transnoentities(ucfirst($object->element)), $object->ref);
-				$actioncomm->note_private .= $langs->trans('UserVictim') . ' : ' . $uservictim->firstname . $uservictim->lastname . '<br>';
-				$actioncomm->note_private .= $langs->trans('UserEmployer') . ' : ' . $useremployer->firstname . $useremployer->lastname . '<br>';
-				$actioncomm->note_private .= $langs->trans('AccidentLocation') . ' : ' . $accidentLocation  . '<br>';
-				$actioncomm->note_private .= $langs->trans('AccidentType') . ' : ' . ($object->accident_type ? $langs->trans('CommutingAccident') : $langs->trans('WorkAccidentStatement')) . '<br>';
-				$actioncomm->note_private .= $langs->trans('AccidentDate') . ' : ' . dol_print_date($object->accident_date, 'dayhoursec') . '<br>';
-
-				$result = $actioncomm->create($user);
-				break;
-
-			case 'ACCIDENT_DELETE' :
-				$society      = new Societe($this->db);
-				$uservictim   = new User($this->db);
-				$uservictim->fetch($object->fk_user_victim);
-				$useremployer = new User($this->db);
-				$useremployer->fetch($object->fk_user_employer);
-
-				//1 : Accident in DU / GP, 2 : Accident in society, 3 : Accident in another location
-				switch ($object->external_accident) {
-					case 1:
-						if (!empty($object->fk_standard)) {
-							$digiriskstandard->fetch($object->fk_standard);
-							$accidentLocation = $digiriskstandard->ref . " - " . $conf->global->MAIN_INFO_SOCIETE_NOM;
-						} else if (!empty($object->fk_element)) {
-							$digiriskelement->fetch($object->fk_element);
-							$accidentLocation = $digiriskelement->ref . " - " . $digiriskelement->label;
-						}
-						break;
-					case 2:
-						$society->fetch($object->fk_soc);
-						$accidentLocation = $society->ref . " - " . $society->label;
-					case 3:
-						$accidentLocation = $object->accident_location;
-						break;
-				}
-
-				$actioncomm->label         = $langs->trans('ObjectDeleteTrigger', $langs->transnoentities(ucfirst($object->element)), $object->ref);
-				$actioncomm->note_private .= $langs->trans('UserVictim') . ' : ' . $uservictim->firstname . $uservictim->lastname . '<br>';
-				$actioncomm->note_private .= $langs->trans('UserEmployer') . ' : ' . $useremployer->firstname . $useremployer->lastname . '<br>';
-				$actioncomm->note_private .= $langs->trans('AccidentLocation') . ' : ' . $accidentLocation  . '<br>';
-				$actioncomm->note_private .= $langs->trans('AccidentType') . ' : ' . ($object->accident_type ? $langs->trans('CommutingAccident') : $langs->trans('WorkAccidentStatement')) . '<br>';
-				$actioncomm->note_private .= $langs->trans('AccidentDate') . ' : ' . dol_print_date($object->accident_date, 'dayhoursec') . '<br>';
-
-				$result = $actioncomm->create($user);
-				break;
-
+            case 'ACCIDENTMETADATA_CREATE' :
+            case 'ACCIDENTLESION_CREATE' :
 			case 'ACCIDENTWORKSTOP_CREATE' :
 				$actioncomm->elementtype = 'accident@digiriskdolibarr';
 
 				$actioncomm->label         = $langs->trans('ObjectCreateTrigger', $langs->transnoentities(ucfirst($object->element)), $object->ref);
-				$actioncomm->note_private .= $langs->trans('WorkStopDays') . ' : ' . $object->workstop_days . '<br>';
-				$actioncomm->note_private .= $langs->trans('WorkStopDocument') . ' : ' . (!empty($object->declaration_link) ? $object->declaration_link : 'N/A') . '<br>';
-				$actioncomm->note_private .= $langs->trans('DateStartWorkStop') . ' : ' . dol_print_date($object->date_start_workstop, 'dayhoursec') . '<br>';
-				$actioncomm->note_private .= $langs->trans('DateEndWorkStop') . ' : ' . dol_print_date($object->date_end_workstop, 'dayhoursec') . '<br>';
 				$actioncomm->fk_element    = $object->fk_accident;
 
 				$result = $actioncomm->create($user);
 				break;
 
+            case 'ACCIDENTLESION_MODIFY' :
 			case 'ACCIDENTWORKSTOP_MODIFY' :
 				$actioncomm->elementtype = 'accident@digiriskdolibarr';
 
 				$actioncomm->label         = $langs->trans('ObjectModifyTrigger', $langs->transnoentities(ucfirst($object->element)), $object->ref);
-				$actioncomm->note_private .= $langs->trans('WorkStopDays') . ' : ' . $object->workstop_days . '<br>';
-				$actioncomm->note_private .= $langs->trans('WorkStopDocument') . ' : ' . (!empty($object->declaration_link) ? $object->declaration_link : 'N/A') . '<br>';
-				$actioncomm->note_private .= $langs->trans('DateStartWorkStop') . ' : ' . dol_print_date($object->date_start_workstop, 'dayhoursec') . '<br>';
-				$actioncomm->note_private .= $langs->trans('DateEndWorkStop') . ' : ' . dol_print_date($object->date_end_workstop, 'dayhoursec') . '<br>';
 				$actioncomm->fk_element    = $object->fk_accident;
 
 				$result = $actioncomm->create($user);
 				break;
 
+            case 'ACCIDENTLESION_DELETE' :
 			case 'ACCIDENTWORKSTOP_DELETE' :
 				$actioncomm->elementtype = 'accident@digiriskdolibarr';
 
 				$actioncomm->label         = $langs->trans('ObjectDeleteTrigger', $langs->transnoentities(ucfirst($object->element)), $object->ref);
-				$actioncomm->note_private .= $langs->trans('WorkStopDays') . ' : ' . $object->workstop_days . '<br>';
-				$actioncomm->note_private .= $langs->trans('WorkStopDocument') . ' : ' . (!empty($object->declaration_link) ? $object->declaration_link : 'N/A') . '<br>';
-				$actioncomm->note_private .= $langs->trans('DateStartWorkStop') . ' : ' . dol_print_date($object->date_start_workstop, 'dayhoursec') . '<br>';
-				$actioncomm->note_private .= $langs->trans('DateEndWorkStop') . ' : ' . dol_print_date($object->date_end_workstop, 'dayhoursec') . '<br>';
 				$actioncomm->fk_element    = $object->fk_accident;
-
-				$result = $actioncomm->create($user);
-				break;
-
-			case 'ACCIDENTLESION_CREATE' :
-				$actioncomm->elementtype = 'accident@digiriskdolibarr';
-
-				$actioncomm->label         = $langs->trans('ObjectCreateTrigger', $langs->transnoentities(ucfirst($object->element)), $object->ref);
-				$actioncomm->note_private .= $langs->trans('LesionLocalization') . ' : ' . $object->lesion_localization . '<br>';
-				$actioncomm->note_private .= $langs->trans('LesionNature') . ' : ' . $object->lesion_nature . '<br>';
-				$actioncomm->fk_element    = $object->fk_accident;
-
-				$result = $actioncomm->create($user);
-				break;
-
-			case 'ACCIDENTLESION_MODIFY' :
-				$actioncomm->elementtype = 'accident@digiriskdolibarr';
-
-				$actioncomm->label         = $langs->trans('ObjectModifyTrigger', $langs->transnoentities(ucfirst($object->element)), $object->ref);
-				$actioncomm->note_private .= $langs->trans('LesionLocalization') . ' : ' . $object->lesion_localization . '<br>';
-				$actioncomm->note_private .= $langs->trans('LesionNature') . ' : ' . $object->lesion_nature . '<br>';
-				$actioncomm->fk_element    = $object->fk_accident;
-
-				$result = $actioncomm->create($user);
-				break;
-
-			case 'ACCIDENTLESION_DELETE' :
-				$actioncomm->elementtype = 'accident@digiriskdolibarr';
-
-				$actioncomm->label         = $langs->trans('ObjectDeleteTrigger', $langs->transnoentities(ucfirst($object->element)), $object->ref);
-				$actioncomm->note_private .= $langs->trans('LesionLocalization') . ' : ' . $object->lesion_localization . '<br>';
-				$actioncomm->note_private .= $langs->trans('LesionNature') . ' : ' . $object->lesion_nature . '<br>';
-				$actioncomm->fk_element    = $object->fk_accident;
-
-				$result = $actioncomm->create($user);
-				break;
-
-			case 'ACCIDENTMETADATA_CREATE' :
-				$actioncomm->elementtype = 'accident@digiriskdolibarr';
-
-				$actioncomm->label      = $langs->trans('ObjectCreateTrigger', $langs->transnoentities(ucfirst($object->element)), $object->ref);
-				$actioncomm->fk_element = $object->fk_accident;
 
 				$result = $actioncomm->create($user);
 				break;
