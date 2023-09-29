@@ -40,9 +40,14 @@ window.digiriskdolibarr.form.event = function() {
  * @return {void}
  */
 window.digiriskdolibarr.form.searchForm = function(event) {
-	event.preventDefault()
+  event.preventDefault()
 
-	let formId = $(this).closest('form').attr('id');
+  let removeFilter = 0
+  if ($(event.originalEvent.submitter).hasClass('button_removefilter')) {
+    removeFilter = 1
+  }
+
+  let formId = $(this).closest('form').attr('id');
 
 	var searchFormListRisks = document.getElementById(formId);
 	var formData            = new FormData(searchFormListRisks);
@@ -63,14 +68,22 @@ window.digiriskdolibarr.form.searchForm = function(event) {
 		'confirm',
 		'cancel',
 		'pageplusone',
-		'backtopage'
-	]
+    'backtopage',
+    'button_removefilter_x',
+    'button_removefilter',
+    'button_removefilter.x'
+  ]
 
-	for (const pair of formData.entries()) {
-		if (dataToSend.includes(pair[0]) || pair[0].match(/search_/)) {
-			newFormData.append(pair[0], pair[1])
-		}
-	}
+  if (!removeFilter) {
+    for (const pair of formData.entries()) {
+      if (dataToSend.includes(pair[0]) || pair[0].match(/search_/)) {
+        newFormData.append(pair[0], pair[1])
+      }
+    }
+  } else {
+    newFormData.append('button_removefilter_x', 'x');
+    newFormData.append('token', formData.entries()['token']);
+  }
 
 	window.saturne.loader.display($('#' + formId));
 
@@ -81,7 +94,7 @@ window.digiriskdolibarr.form.searchForm = function(event) {
 		processData: false,
 		contentType: false,
 		success: function (resp) {
-			$('.wpeo-loader').removeClass('wpeo-loader');
+      window.saturne.loader.remove($('#' + formId));
 			$('#' + formId).replaceWith($(resp).find('#' + formId))
 		},
 	});
