@@ -35,15 +35,11 @@ require_once DOL_DOCUMENT_ROOT . '/core/lib/date.lib.php';
 require_once DOL_DOCUMENT_ROOT . '/core/lib/usergroups.lib.php';
 require_once DOL_DOCUMENT_ROOT . '/core/class/html.formother.class.php';
 require_once DOL_DOCUMENT_ROOT . '/user/class/user.class.php';
-require_once DOL_DOCUMENT_ROOT . '/contact/class/contact.class.php';
-require_once DOL_DOCUMENT_ROOT . '/societe/class/societe.class.php';
 require_once DOL_DOCUMENT_ROOT . '/projet/class/project.class.php';
 
 require_once __DIR__ . '/../../class/accident.class.php';
 require_once __DIR__ . '/../../class/digiriskelement.class.php';
 require_once __DIR__ . '/../../class/digiriskstandard.class.php';
-require_once __DIR__ . '/../../class/preventionplan.class.php';
-require_once __DIR__ . '/../../class/digiriskresources.class.php';
 require_once __DIR__ . '/../../lib/digiriskdolibarr_function.lib.php';
 require_once __DIR__ . '/../../lib/digiriskdolibarr_digiriskelement.lib.php';
 
@@ -69,16 +65,12 @@ $page        = is_numeric($page) ? $page : 0;
 $page        = $page == -1 ? 0 : $page;
 
 // Initialize technical objects
-$accident          = new Accident($db);
-$preventionplan    = new PreventionPlan($db);
-$societe           = new Societe($db);
-$contact           = new Contact($db);
-$usertmp           = new User($db);
-$thirdparty        = new Societe($db);
-$digiriskresources = new DigiriskResources($db);
-$digiriskelement   = new DigiriskElement($db);
-$digiriskstandard  = new DigiriskStandard($db);
-$project           = new Project($db);
+$accident         = new Accident($db);
+$usertmp          = new User($db);
+$thirdparty       = new Societe($db);
+$digiriskelement  = new DigiriskElement($db);
+$digiriskstandard = new DigiriskStandard($db);
+$project          = new Project($db);
 
 $offset   = $limit * $page;
 $pageprev = $page - 1;
@@ -130,7 +122,7 @@ if (!GETPOST('confirmmassaction', 'alpha') && $massaction != 'presend' && $massa
 	$massaction = '';
 }
 
-$parameters = ['socid' => $socid];
+$parameters = ['id' => $fromid];
 $reshook    = $hookmanager->executeHooks('doActions', $parameters, $object, $action); // Note that $action and $object may have been modified by some hooks
 if ($reshook < 0) {
 	setEventMessages($hookmanager->error, $hookmanager->errors, 'errors');
@@ -192,30 +184,19 @@ $formother = new FormOther($db);
 $title    = $langs->trans("AccidentList");
 $help_url = 'FR:Module_Digirisk#DigiRisk_-_Accident_b.C3.A9nins_et_presque_accidents';
 
-$morejs  = array("/digiriskdolibarr/js/digiriskdolibarr.js");
-$morecss = array("/digiriskdolibarr/css/digiriskdolibarr.css");
-
-if ($fromid > 0)  {
-	digiriskHeader($title, $help_url, $morejs, $morecss);
-} else {
-	llxHeader('', $title, $help_url, '', 0, 0, $morejs, $morecss);
-}
+saturne_header(0, '', $title, $help_url);
 
 if ($fromid > 0) {
 	$objectlinked = $digiriskelement;
 	$objectlinked->fetch($fromid);
-	$head = digiriskelementPrepareHead($objectlinked);
-	print dol_get_fiche_head($head, 'elementAccidents', $langs->trans("Accident"), -1, "digiriskdolibarr@digiriskdolibarr");
+    saturne_get_fiche_head($objectlinked,'elementAccidents', $langs->trans('Accident'));
 } elseif ($fromiduser > 0) {
 	$userObject = new User($db);
-	$prehead = 'user_prepare_head';
 	$userObject->fetch($fromiduser, '', '', 1);
 	$userObject->getrights();
-	$head = $prehead($userObject);
-	print dol_get_fiche_head($head, 'accidents', $langs->trans('Accidents'), -1, "user");
+    saturne_get_fiche_head($userObject, 'accidents', $langs->trans('Accidents'));
 } elseif ($accident->id > 0) {
-	$head = digiriskelementPrepareHead($object);
-	print dol_get_fiche_head($head, 'elementAccidents', $langs->trans("Accident"), -1, "digiriskdolibarr@digiriskdolibarr");
+    saturne_get_fiche_head($object,'elementAccidents', $langs->trans('Accident'));
 }
 
 // Object card
@@ -240,9 +221,7 @@ if ($fromid > 0) {
 		$morehtmlref .= '<br>' . $langs->trans("ParentElement") . ' : ' . $digiriskstandard->getNomUrl(1, 'blank', 1);
 	}
 	$morehtmlref .= '</div>';
-	$morehtmlleft = '<div class="floatleft inline-block valignmiddle divphotoref">' . digirisk_show_photos('digiriskdolibarr', $conf->digiriskdolibarr->multidir_output[$conf->entity] . '/' . $objectlinked->element_type, 'small', 5, 0, 0, 0, $height, $width, 0, 0, 0, $objectlinked->element_type, $objectlinked) . '</div>';
-	$linkback = '<a href="' . dol_buildpath('/digiriskdolibarr/view/digiriskelement/risk_list.php', 1) . '">' . $langs->trans("BackToList") . '</a>';
-	digirisk_banner_tab($objectlinked, 'fromid', $linkback, 1, 'rowid', 'ref', $morehtmlref, '', 0, $morehtmlleft);
+    saturne_banner_tab($objectlinked, 'fromid', '', 1, 'rowid', 'ref', $morehtmlref, (dol_strlen($objectlinked->photo) > 0));
 } elseif ($fromiduser > 0) {
 	$linkback = '<a href="' . DOL_URL_ROOT . '/user/list.php?restore_lastsearch_values=1">' . $langs->trans("BackToList") . '</a>';
 	dol_banner_tab($userObject, 'fromiduser', $linkback, $user->rights->user->user->lire || $user->admin);
@@ -252,9 +231,13 @@ if ($fromid > 0) {
 include DOL_DOCUMENT_ROOT . '/core/tpl/extrafields_list_search_param.tpl.php';
 
 // List of mass actions available
-$arrayofmassactions                                                           = [];
-if ($permissiontodelete) $arrayofmassactions['predelete']                     = '<span class="fa fa-trash paddingrightonly"></span>' . $langs->trans("Delete");
-if (in_array($massaction, array('presend', 'predelete'))) $arrayofmassactions = [];
+$arrayofmassactions = [];
+if ($permissiontodelete) {
+    $arrayofmassactions['predelete'] = '<span class="fa fa-trash paddingrightonly"></span>' . $langs->trans("Delete");
+}
+if (in_array($massaction, ['presend', 'predelete'])) {
+    $arrayofmassactions = [];
+}
 
 $massactionbutton = $form->selectMassAction('', $arrayofmassactions);
 
@@ -268,13 +251,11 @@ if ($fromiduser > 0) {
 }
 
 print '<form method="POST" id="searchFormList" action="' . $_SERVER["PHP_SELF"] . (!empty($fromiduser) ? '?fromid=' . $fromiduser : '') .'">';
-if ($optioncss != '') print '<input type="hidden" name="optioncss" value="' . $optioncss . '">';
 print '<input type="hidden" name="token" value="' . newToken() . '">';
 print '<input type="hidden" name="formfilteraction" id="formfilteraction" value="list">';
 print '<input type="hidden" name="action" value="list">';
 print '<input type="hidden" name="sortfield" value="' . $sortfield . '">';
 print '<input type="hidden" name="sortorder" value="' . $sortorder . '">';
-print '<input type="hidden" name="type" value="' . $type . '">';
 print '<input type="hidden" name="contextpage" value="' . $contextpage . '">';
 
 include DOL_DOCUMENT_ROOT . '/core/tpl/massactions_pre.tpl.php';
