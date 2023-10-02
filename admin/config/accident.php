@@ -37,6 +37,7 @@ require_once DOL_DOCUMENT_ROOT . "/core/class/html.formprojet.class.php";
 require_once DOL_DOCUMENT_ROOT . "/core/lib/admin.lib.php";
 
 require_once __DIR__ . '/../../lib/digiriskdolibarr.lib.php';
+require_once __DIR__ . '/../../class/accident.class.php';
 
 // Translations
 saturne_load_langs(["admin"]);
@@ -50,7 +51,10 @@ $type  = 'accident';
 $error = 0;
 
 // Initialize technical objects
-$usertmp = new User($db);
+$usertmp  = new User($db);
+$accident = new Accident($db);
+$workstop = new AccidentWorkStop($db);
+$lesion   = new AccidentLesion($db);
 
 // Security check - Protection if external user
 $permissiontoread = $user->rights->digiriskdolibarr->adminpage->read;
@@ -189,7 +193,7 @@ if (is_dir($dir)) {
 						// Example for listing risks action
 						$htmltooltip  = '';
 						$htmltooltip .= '' . $langs->trans("Version") . ': <b>' . $module->getVersion() . '</b><br>';
-						$nextval      = $module->getNextValue($object_document);
+						$nextval      = $module->getNextValue($accident);
 						if ("$nextval" != $langs->trans("NotAvailable")) {  // Keep " on nextval
 							$htmltooltip .= $langs->trans("NextValue") . ': ';
 							if ($nextval) {
@@ -234,10 +238,11 @@ print '<td class="center">' . $langs->trans("ShortInfo") . '</td>';
 print '</tr>';
 
 clearstatcache();
-$dir = dol_buildpath("/custom/digiriskdolibarr/core/modules/digiriskdolibarr/digiriskelement/accident_workstop/");
+$dir = dol_buildpath("/custom/digiriskdolibarr/core/modules/digiriskdolibarr/digiriskelement/accidentworkstop/");
+
 if (is_dir($dir)) {
-	$handle = opendir($dir);
-	if (is_resource($handle)) {
+    $handle = opendir($dir);
+    if (is_resource($handle)) {
 		while (($file = readdir($handle)) !== false ) {
 			if ( ! is_dir($dir . $file) || (substr($file, 0, 1) <> '.' && substr($file, 0, 3) <> 'CVS')) {
 				$filebis = $file;
@@ -277,7 +282,7 @@ if (is_dir($dir)) {
 						// Example for listing risks action
 						$htmltooltip  = '';
 						$htmltooltip .= '' . $langs->trans("Version") . ': <b>' . $module->getVersion() . '</b><br>';
-						$nextval      = $module->getNextValue($object_document);
+						$nextval      = $module->getNextValue($workstop);
 						if ("$nextval" != $langs->trans("NotAvailable")) {  // Keep " on nextval
 							$htmltooltip .= $langs->trans("NextValue") . ': ';
 							if ($nextval) {
@@ -322,7 +327,7 @@ print '<td class="center">' . $langs->trans("ShortInfo") . '</td>';
 print '</tr>';
 
 clearstatcache();
-$dir = dol_buildpath("/custom/digiriskdolibarr/core/modules/digiriskdolibarr/digiriskelement/accident_lesion/");
+$dir = dol_buildpath("/custom/digiriskdolibarr/core/modules/digiriskdolibarr/digiriskelement/accidentlesion/");
 if (is_dir($dir)) {
 	$handle = opendir($dir);
 	if (is_resource($handle)) {
@@ -365,7 +370,7 @@ if (is_dir($dir)) {
 						// Example for listing risks action
 						$htmltooltip  = '';
 						$htmltooltip .= '' . $langs->trans("Version") . ': <b>' . $module->getVersion() . '</b><br>';
-						$nextval      = $module->getNextValue($object_document);
+						$nextval      = $module->getNextValue($lesion);
 						if ("$nextval" != $langs->trans("NotAvailable")) {  // Keep " on nextval
 							$htmltooltip .= $langs->trans("NextValue") . ': ';
 							if ($nextval) {

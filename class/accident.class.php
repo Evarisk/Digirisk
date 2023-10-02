@@ -32,6 +32,7 @@ require_once __DIR__ . '/../../saturne/class/saturnesignature.class.php';
 require_once __DIR__ . '/../lib/digiriskdolibarr_function.lib.php';
 require_once __DIR__ . '/digiriskdocuments.class.php';
 require_once __DIR__ . '/evaluator.class.php';
+require_once __DIR__ . '/../core/modules/digiriskdolibarr/digiriskelement/accidentlesion/mod_accident_lesion_standard.php';
 
 /**
  * Class for Accident
@@ -210,14 +211,15 @@ class Accident extends SaturneObject
 	 *
 	 * @param  User      $user    User that creates
 	 * @param  int       $fromID  ID of object to clone.
+     * @param  array     $options Options array.
 	 * @return int                New object created, <0 if KO.
 	 * @throws Exception
 	 */
-	public function createFromClone(User $user, int $fromID): int
+	public function createFromClone(User $user, int $fromID, array $options): int
 	{
 		dol_syslog(__METHOD__, LOG_DEBUG);
 
-		global $conf;
+		global $conf, $langs;
 
 		$error  = 0;
 		$object = new self($this->db);
@@ -225,6 +227,8 @@ class Accident extends SaturneObject
 
 		// Load source object.
 		$object->fetchCommon($fromID);
+        $objectRef = $object->ref;
+        $objectId  = $object->id;
 
 		// Reset some properties.
 		unset($object->id);
@@ -244,25 +248,57 @@ class Accident extends SaturneObject
 		if (property_exists($object, 'status')) {
 			$object->status = self::STATUS_VALIDATED;
 		}
+        if (empty($options['photos'])) {
+            $object->photo = '';
+        }
 
-		$refAccidentMod = new $conf->global->DIGIRISKDOLIBARR_ACCIDENT_ADDON($this->db);
-		$object->ref    = $refAccidentMod->getNextValue($object);
+        // Create clone
+        $object->ref     = $object->getNextNumRef();
+        $object->label   = $langs->trans('CloneFrom') . ' ' . $object->label;
+        $object->context = 'createfromclone';
+		$accidentId      = $object->create($user);
 
-		// Create clone
-		$object->context = 'createfromclone';
-		$investigationId = $object->create($user);
+		if ($accidentId > 0) {
+            // Add Photos.
+            if (!empty($options['photos'])) {
+                $dir  = $conf->digiriskdolibarr->multidir_output[$conf->entity] . '/accident';
+                $path = $dir . '/' . $objectRef . '/photos';
+                dol_mkdir($dir . '/' . $object->ref . '/photos');
+                dolCopyDir($path,$dir . '/' . $object->ref . '/photos', 0, 1);
+            }
+            if (!empty($options['workstop'])) {
+                $workstop = new AccidentWorkStop($this->db);
+                $workstops = $workstop->fetchAll('', '', 0, 0, ['customsql' => 't.fk_accident = ' . $objectId . ' AND t.status >= 0']);
 
-		if ($investigationId > 0) {
-			// Load signatory from source object.
-			$signatory   = new SaturneSignature($this->db);
-			$signatories = $signatory->fetchSignatory('', $fromID, $this->element);
-			if (is_array($signatories) && !empty($signatories)) {
-				foreach ($signatories as $arrayRole) {
-					foreach ($arrayRole as $signatoryRole) {
-						$signatory->createFromClone($user, $signatoryRole->id, $investigationId);
-					}
-				}
-			}
+                if (is_array($workstops) && !empty($workstops)) {
+                    foreach($workstops as $objectLine) {
+                        $objectLine->fk_accident = $accidentId;
+                        $objectLine->ref         = $objectLine->getNextNumRef();
+                        $objectLine->context     = 'createfromclone';
+                        $objectLine->create($user);
+                    }
+                }
+            }
+            if (!empty($options['lesion'])) {
+                $lesion = new AccidentLesion($this->db);
+                $lesions = $lesion->fetchAll('', '', 0, 0, ['customsql' => 't.fk_accident = ' . $objectId]);
+
+                if (is_array($lesions) && !empty($lesions)) {
+                    foreach($lesions as $objectLine) {
+                        $objectLine->fk_accident = $accidentId;
+                        $objectLine->ref         = $objectLine->getNextNumRef();
+                        $objectLine->context     = 'createfromclone';
+                        $objectLine->create($user);
+                    }
+                }
+            }
+            if (!empty($options['metadata'])) {
+                $metadata = new AccidentMetaData($this->db);
+                $metadata->fetch(0, '', ' AND t.fk_accident =' . $objectId . ' AND t.status = 1');
+                $metadata->fk_accident = $accidentId;
+                $metadata->context     = 'createfromclone';
+                $metadata->create($user);
+            }
 		} else {
 			$error++;
 			$this->error  = $object->error;
@@ -274,7 +310,7 @@ class Accident extends SaturneObject
 		// End.
 		if (!$error) {
 			$this->db->commit();
-			return $investigationId;
+			return $accidentId;
 		} else {
 			$this->db->rollback();
 			return -1;
@@ -409,7 +445,7 @@ class Accident extends SaturneObject
 
 		// Number accidents
 		$array['title'] = $langs->transnoentities('AccidentRepartition');
-		$array['picto'] = '<i class="fas fa-user-injured"></i>';
+		$array['picto'] = $this->picto;
 		$array['labels'] = array(
 			'accidents' => array(
 				'label' => $langs->transnoentities('AccidentWithDIAT'),
@@ -616,6 +652,39 @@ class Accident extends SaturneObject
 		}
 		return $array;
 	}
+
+    /**
+     * Get more html ref on object.
+     * @param  int        $id Id of the accident to retrieve the info from
+     *
+     * @return string
+     * @throws Exception
+     */
+    public function getMoreHtmlRef(int $id) : string
+    {
+        global $langs;
+
+        $workstopLine      = new AccidentWorkStop($this->db);
+        $accidentLines     = $workstopLine->fetchAll('', '', 0, 0, ['customsql' => 't.fk_accident = ' . $id . ' AND t.status >= 0']);
+        $totalWorkStopDays = 0;
+        $moreHtmlRef       = '';
+
+        if (!empty($accidentLines) && $accidentLines > 0) {
+            foreach ($accidentLines as $accidentLine) {
+                if ($accidentLine->status > 0) {
+                    $totalWorkStopDays += $accidentLine->workstop_days;
+                }
+            }
+            $moreHtmlRef      = $langs->trans('TotalWorkStopDays') . ' : ' . $totalWorkStopDays;
+            $lastaccidentline = end($accidentLines);
+            $moreHtmlRef     .= '<br>' . $langs->trans('ReturnWorkDate') . ' : ' . dol_print_date($lastaccidentline->date_end_workstop, 'dayhour');
+        } else {
+            $moreHtmlRef = $langs->trans('RegisterAccident');
+        }
+        $moreHtmlRef .= '<br>';
+
+        return $moreHtmlRef;
+    }
 }
 
 /**
@@ -909,12 +978,19 @@ class AccidentLesion extends SaturneObject
 	 */
 	public $table_element = 'digiriskdolibarr_accident_lesion';
 
+    /**
+     * @var int  Does object support extrafields ? 0=No, 1=Yes
+     */
+    public int $isextrafieldmanaged = 0;
+
 	/**
 	 * @var string String with name of icon for digiriskelement. Must be the part after the 'object_' into object_digiriskelement.png
 	 */
 	public $picto = 'fontawesome_fa-user-injured_fas_#d35968';
 
-	/**
+    const STATUS_DELETED   = -1;
+
+    /**
 	 * @var array  Array with all fields and their property. Do not use it as a static var. It may be modified by constructor.
 	 */
 	public $fields = [
