@@ -16,30 +16,31 @@
  * or see https://www.gnu.org/
  */
 
+
 /**
- * \file       htdocs/custom/digiriskdolibarr/core/modules/digiriskdolibarr/digiriskelement/mod_workunit_canopus.php
+ * \file       htdocs/custom/digiriskdolibarr/core/modules/digiriskdolibarr/riskanalysis/mod_risk_tarqeq.php
  * \ingroup    digiriskelement
- * \brief      File that contains the numbering module rules Canopus
+ * \brief      File that contains the numbering module rules Tarqeq
  */
 
 // Load Saturne libraries.
 require_once __DIR__ . '/../../../../../../saturne/core/modules/saturne/modules_saturne.php';
 
 /**
- * Class of file that contains the numbering module rules Canopus
+ * Class of file that contains the numbering module rules Tarqeq
  */
-class mod_workunit_canopus extends CustomModeleNumRefSaturne
+class mod_risk_tarqeq extends CustomModeleNumRefSaturne
 {
 
-	/**
-	 * @var string model name
-	 */
-	public string $name = 'Canopus';
+    /**
+     * @var string model name
+     */
+    public string $name = 'Tarqeq';
 
     public function __construct()
     {
         global $conf;
-        $refMod = $conf->global->DIGIRISKDOLIBARR_WORKUNIT_CANOPUS_ADDON;
+        $refMod = $conf->global->DIGIRISKDOLIBARR_RISK_TARQEQ_ADDON;
         if (dol_strlen($refMod)) {
             $refModSplitted = preg_split('/\{/', $refMod);
             if (is_array($refModSplitted) && !empty($refModSplitted)) {

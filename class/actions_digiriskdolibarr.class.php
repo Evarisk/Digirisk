@@ -80,8 +80,8 @@ class ActionsDigiriskdolibarr
 			if ($conf->global->MAIN_INFO_SOCIETE_COUNTRY == '1:FR:France') {
 				require_once __DIR__ . '/../lib/digiriskdolibarr_function.lib.php';
 				$form      = new Form($db);
-				$pictopath = dol_buildpath('/digiriskdolibarr/img/digiriskdolibarr32px.png', 1);
-				$pictoDigirisk = img_picto('', $pictopath, '', 1, 0, 0, '', 'pictoDigirisk');
+                $pictopath = dol_buildpath('/custom/digiriskdolibarr/img/digiriskdolibarr_color.png', 1);
+                $pictoDigirisk = img_picto('', $pictopath, '', 1, 0, 0, '', 'pictoModule');
 				$idcc_form = digirisk_select_dictionary('DIGIRISKDOLIBARR_COLLECTIVE_AGREEMENT_TITLE', 'c_conventions_collectives', 'code', 'libelle', $conf->global->DIGIRISKDOLIBARR_COLLECTIVE_AGREEMENT_TITLE, 1, '', '', 'minwidth100');
 				$pee_input = '<input type="checkbox" name="DIGIRISKDOLIBARR_PEE_ENABLED" '. ($conf->global->DIGIRISKDOLIBARR_PEE_ENABLED ? 'checked' : '') .'>';
 				$perco_input = '<input type="checkbox" name="DIGIRISKDOLIBARR_PERCO_ENABLED" '. ($conf->global->DIGIRISKDOLIBARR_PERCO_ENABLED ? 'checked' : '') .'>';
@@ -138,7 +138,7 @@ class ActionsDigiriskdolibarr
 
 				$modulepart   = 'digiriskdolibarr:TicketDocument';
 				$defaultmodel = $conf->global->DIGIRISKDOLIBARR_TICKET_DEFAULT_MODEL;
-				$pictopath = dol_buildpath('/digiriskdolibarr/img/digiriskdolibarr32px.png', 1);
+				$pictopath = dol_buildpath('/digiriskdolibarr/img/digiriskdolibarr_color.png', 1);
 				$pictoDigirisk = img_picto('', $pictopath, '', 1, 0, 0, '', 'pictoDigirisk');
 				$title        = $pictoDigirisk . $langs->trans('TicketDocument');
 
@@ -219,7 +219,7 @@ class ActionsDigiriskdolibarr
 					<?php
 				}
 			}
-		} else if (in_array($parameters['currentcontext'], array('projectcard', 'projectcontactcard', 'projecttaskscard', 'projecttasktime', 'projectOverview', 'projecttaskscard', 'tasklist'))) {
+		} else if (in_array($parameters['currentcontext'], array('projectcard', 'projectcontactcard', 'projecttaskscard', 'projecttaskcard', 'projecttasktime', 'projectOverview', 'projecttaskscard', 'tasklist'))) {
 			if ((GETPOST('action') == '' || empty(GETPOST('action')) || GETPOST('action') != 'edit')) {
 				require_once DOL_DOCUMENT_ROOT.'/projet/class/project.class.php';
 				require_once DOL_DOCUMENT_ROOT.'/projet/class/task.class.php';
@@ -253,24 +253,35 @@ class ActionsDigiriskdolibarr
 					$firepermit->fetch($firepermit_id);
 					$accident->fetch($accident_id);
 
+                    $pictoDigirisk = img_picto('', 'digiriskdolibarr_color@digiriskdolibarr', 'class="pictofixedwidth"');
+
+                    ?>
+                    <script>
+                        jQuery('.project_task_extras_fk_risk').closest('tr').find('.titlefield td').prepend(<?php echo json_encode($pictoDigirisk); ?>)
+                        jQuery('.project_task_extras_fk_preventionplan').closest('tr').find('.titlefield td').prepend(<?php echo json_encode($pictoDigirisk); ?>)
+                        jQuery('.project_task_extras_fk_firepermit').closest('tr').find('.titlefield td').prepend(<?php echo json_encode($pictoDigirisk); ?>)
+                        jQuery('.project_task_extras_fk_accident').closest('tr').find('.titlefield td').prepend(<?php echo json_encode($pictoDigirisk); ?>)
+                    </script>
+
+                        <?php
 					if (!empty($risk_id) && $risk_id > 0) { ?>
 						<script>
-							jQuery('.project_task_extras_fk_risk').html(<?php echo json_encode($risk->getNomUrl(1, 'blank')) ?>);
+                            jQuery('.project_task_extras_fk_risk').html(<?php echo json_encode($risk->getNomUrl(1, 'blank')) ?>);
 						</script>
 					<?php }
 					if (!empty($preventionplan_id) && $preventionplan_id > 0) { ?>
 						<script>
-							jQuery('.project_task_extras_fk_preventionplan').html(<?php echo json_encode($preventionplan->getNomUrl(1, 'blank')) ?>);
+                            jQuery('.project_task_extras_fk_preventionplan').html(<?php echo json_encode($preventionplan->getNomUrl(1, 'blank')) ?>);
 						</script>
 					<?php }
 					if (!empty($firepermit_id) && $firepermit_id > 0) { ?>
 						<script>
-							jQuery('.project_task_extras_fk_firepermit').html(<?php echo json_encode($firepermit->getNomUrl(1)) ?>);
+                            jQuery('.project_task_extras_fk_firepermit').html(<?php echo json_encode($firepermit->getNomUrl(1)) ?>);
 						</script>
 					<?php }
 					if (!empty($accident_id) && $accident_id > 0) { ?>
 						<script>
-							jQuery('.project_task_extras_fk_accident').html(<?php echo json_encode($accident->getNomUrl(1)) ?>);
+                            jQuery('.project_task_extras_fk_accident').html(<?php echo json_encode($accident->getNomUrl(1)) ?>);
 						</script>
 					<?php }
 				}
@@ -788,7 +799,7 @@ class ActionsDigiriskdolibarr
      */
     public function saturneBannerTab(array $parameters, $object)
     {
-        global $langs;
+        global $conf, $langs;
 
         // Do something only for the current context.
         if ($parameters['currentcontext'] == 'firepermitsignature') {
@@ -801,8 +812,16 @@ class ActionsDigiriskdolibarr
 
             $this->resprints = $moreHtmlRef;
         }
+        if (in_array($parameters['currentcontext'], ['digiriskelementdocument', 'digiriskelementagenda'])) {
+            list($moreHtmlRef, $moreParams) = $object->getBannerTabContent();
+            $object->fk_project = $conf->global->DIGIRISKDOLIBARR_DU_PROJECT;
 
-        return 0; // or return 1 to replace standard code.
+
+            $this->results = [$moreHtmlRef, $moreParams];
+
+        }
+
+            return 0; // or return 1 to replace standard code.
     }
 
 	/**
@@ -895,13 +914,13 @@ class ActionsDigiriskdolibarr
 	}
 
 	/**
-	 *  Overloading the SaturneAdminAdditionalConfig function : replacing the parent's function with the one below.
+	 *  Overloading the saturneAdminAdditionalConfig function : replacing the parent's function with the one below.
 	 *
 	 * @param  array        $parameters Hook metadatas (context, etc...).
 	 * @param  CommonObject $object     Current object.
 	 * @return int                      0 < on error, 0 on success, 1 to replace standard code.
 	 */
-	public function SaturneAdminAdditionalConfig(array $parameters): int
+	public function saturneAdminAdditionalConfig(array $parameters): int
 	{
 		$additionalConfig = [
 			'ShowPictoName' => 'DIGIRISKDOLIBARR_DOCUMENT_SHOW_PICTO_NAME',
@@ -917,15 +936,16 @@ class ActionsDigiriskdolibarr
 	}
 
 	/**
-	 *  Overloading the SaturneCustomHeaderFunction function : replacing the parent's function with the one below.
+	 *  Overloading the saturneCustomHeaderFunction function : replacing the parent's function with the one below.
 	 *
 	 * @param  array        $parameters Hook metadatas (context, etc...).
 	 * @param  CommonObject $object     Current object.
 	 * @return int                      0 < on error, 0 on success, 1 to replace standard code.
 	 */
-	public function SaturneCustomHeaderFunction(array $parameters, object $object): int
+	public function saturneCustomHeaderFunction(array $parameters, object $object): int
 	{
 		// Do something only for the current context.
+
 		if (in_array($parameters['currentcontext'], ['digiriskelementdocument', 'digiriskelementagenda'])) {
 			require_once __DIR__ . '/../lib/digiriskdolibarr_function.lib.php';
 
@@ -936,45 +956,26 @@ class ActionsDigiriskdolibarr
 	}
 
 	/**
-	 *  Overloading the SaturneBannerTabCustomSubdir function : replacing the parent's function with the one below.
+	 *  Overloading the saturneBannerTabCustomSubdir function : replacing the parent's function with the one below.
 	 *
 	 * @param  array        $parameters Hook metadatas (context, etc...).
 	 * @param  CommonObject $object     Current object.
 	 * @return int                      0 < on error, 0 on success, 1 to replace standard code.
 	 */
-	public function SaturneBannerTabCustomSubdir(array $parameters, object $object): int
+	public function saturneBannerTabCustomSubdir(array $parameters, object $object): int
 	{
+        global $conf;
+
 		// Do something only for the current context.
 		if (in_array($parameters['currentcontext'], ['digiriskelementview', 'digiriskstandardview'])) {
 			require_once __DIR__ . '/../lib/digiriskdolibarr_function.lib.php';
 			if ($object->element == 'digiriskelement') {
-				$this->resprints = $object->element_type . '/'. $object->ref;
+				$this->results = ['subdir' => $object->element_type . '/'. $object->ref];
 			} else if ($object->element == 'digiriskstandard') {
-				$this->resprints = 'logos';
+				$this->results = ['dir' => $conf->mycompany->dir_output, 'subdir' => 'logos'];
 			}
 
 			return 1;
-		}
-		return 0; // or return 1 to replace standard code.
-	}
-
-	/**
-	 *  Overloading the SaturneBannerTabCustomDir function : replacing the parent's function with the one below.
-	 *
-	 * @param  array        $parameters Hook metadatas (context, etc...).
-	 * @param  CommonObject $object     Current object.
-	 * @return int                      0 < on error, 0 on success, 1 to replace standard code.
-	 */
-	public function SaturneBannerTabCustomDir(array $parameters, object $object): int
-	{
-		global $conf;
-		// Do something only for the current context.
-		if (in_array($parameters['currentcontext'], ['digiriskstandardview', 'digiriskelementview'])) {
-			if ($object->element == 'digiriskstandard') {
-				$this->resprints = $conf->mycompany->dir_output;
-				return 1;
-
-			}
 		}
 		return 0; // or return 1 to replace standard code.
 	}

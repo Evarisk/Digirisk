@@ -93,7 +93,7 @@ class doc_informationssharing_odt extends SaturneDocumentModel
 	{
 		$tmpArray = [];
 
-		$objectDocument->json = $objectDocument->DigiriskFillJSON();
+        $objectDocument->DigiriskFillJSON();
 
 		$objectDocument->element = $objectDocument->element . '@digiriskdolibarr';
 		complete_substitutions_array($tmpArray, $outputLangs, $objectDocument);

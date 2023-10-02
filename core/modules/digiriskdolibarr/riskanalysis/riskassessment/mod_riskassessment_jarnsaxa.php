@@ -16,30 +16,31 @@
  * or see https://www.gnu.org/
  */
 
+
 /**
- * \file       htdocs/custom/digiriskdolibarr/core/modules/digiriskdolibarr/digiriskelement/mod_workunit_canopus.php
+ * \file       htdocs/custom/digiriskdolibarr/core/modules/digiriskdolibarr/riskanalysis/mod_riskassessment_jarnsaxa.php
  * \ingroup    digiriskelement
- * \brief      File that contains the numbering module rules Canopus
+ * \brief      File that contains the numbering module rules Jarnsaxa
  */
 
 // Load Saturne libraries.
 require_once __DIR__ . '/../../../../../../saturne/core/modules/saturne/modules_saturne.php';
 
 /**
- * Class of file that contains the numbering module rules Canopus
+ * Class of file that contains the numbering module rules Jarnsaxa
  */
-class mod_workunit_canopus extends CustomModeleNumRefSaturne
+class mod_riskassessment_jarnsaxa extends CustomModeleNumRefSaturne
 {
 
-	/**
-	 * @var string model name
-	 */
-	public string $name = 'Canopus';
+    /**
+     * @var string model name
+     */
+    public string $name = 'Jarnsaxa';
 
     public function __construct()
     {
         global $conf;
-        $refMod = $conf->global->DIGIRISKDOLIBARR_WORKUNIT_CANOPUS_ADDON;
+        $refMod = $conf->global->DIGIRISKDOLIBARR_RISKASSESSMENT_JARNSAXA_ADDON;
         if (dol_strlen($refMod)) {
             $refModSplitted = preg_split('/\{/', $refMod);
             if (is_array($refModSplitted) && !empty($refModSplitted)) {

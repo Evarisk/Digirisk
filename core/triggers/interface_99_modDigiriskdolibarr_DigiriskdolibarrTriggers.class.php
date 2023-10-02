@@ -111,7 +111,7 @@ class InterfaceDigiriskdolibarrTriggers extends DolibarrTriggers
 	 */
 	public function runTrigger($action, $object, User $user, Translate $langs, Conf $conf)
 	{
-		$active = getDolGlobalInt('DIGIRISKDOLIBARR_MAIN_AGENDA_ACTIONAUTO_' . $action);
+        $active = getDolGlobalInt('DIGIRISKDOLIBARR_MAIN_AGENDA_ACTIONAUTO_' . $action);
 
 		if (!isModEnabled('digiriskdolibarr') || $active != 1) {
 			return 0;  // If module is not enabled or trigger is deactivated, we do nothing
@@ -424,7 +424,7 @@ class InterfaceDigiriskdolibarrTriggers extends DolibarrTriggers
 				$actioncomm->elementtype = 'digiriskelement@digiriskdolibarr';
 				$actioncomm->elementid   = $object->id;
 
-				$actioncomm->label         = $langs->trans('ObjectCreateTrigger', $langs->transnoentities(ucfirst($object->element_type)), $object->ref);
+				$actioncomm->label       = $langs->transnoentities('ObjectCreateTrigger', $langs->transnoentities(ucfirst($object->element)), $object->ref);
 				$actioncomm->note_private .= $langs->trans('Standard') . ' : ' . $digiriskstandard->ref . ' - ' . $conf->global->MAIN_INFO_SOCIETE_NOM . '<br/>';
 				$actioncomm->note_private .= $langs->trans('Ref') . ' : ' . $object->ref . '<br/>';
 				$actioncomm->note_private .= $langs->trans('Label') . ' : ' . $object->label . '<br/>';

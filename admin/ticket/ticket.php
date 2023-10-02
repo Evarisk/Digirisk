@@ -88,9 +88,13 @@ if (($action == 'update' && ! GETPOST("cancel", 'alpha')) || ($action == 'update
 }
 
 if ($action == 'setPublicInterface') {
-	if (GETPOST('value')) dolibarr_set_const($db, 'DIGIRISKDOLIBARR_TICKET_ENABLE_PUBLIC_INTERFACE', 1, 'integer', 0, '', $conf->entity);
-	else dolibarr_set_const($db, 'DIGIRISKDOLIBARR_TICKET_ENABLE_PUBLIC_INTERFACE', 0, 'integer', 0, '', $conf->entity);
-	setEventMessages($langs->transnoentities('TicketPublicInterfaceEnabled'), array());
+	if (GETPOST('value')) {
+        dolibarr_set_const($db, 'DIGIRISKDOLIBARR_TICKET_ENABLE_PUBLIC_INTERFACE', 1, 'integer', 0, '', $conf->entity);
+        setEventMessages($langs->transnoentities('TicketPublicInterfaceEnabled'), array());
+    } else {
+        dolibarr_set_const($db, 'DIGIRISKDOLIBARR_TICKET_ENABLE_PUBLIC_INTERFACE', 0, 'integer', 0, '', $conf->entity);
+        setEventMessages($langs->transnoentities('TicketPublicInterfaceDisabled'), array(), 'errors');
+    }
 }
 
 if ($action == 'setEmails') {
@@ -228,20 +232,21 @@ if ($action == 'generateQRCode') {
  * View
  */
 
+$title    = $langs->transnoentities("ModuleSetup", $moduleName);
 $helpUrl  = 'FR:Module_Digirisk';
-$title    = $langs->transnoentities("Ticket");
 
 saturne_header(0,'', $title, $helpUrl);
 
 // Subheader
 $linkback = '<a href="' . ($backtopage ?: DOL_URL_ROOT . '/admin/modules.php?restore_lastsearch_values=1') . '">' . $langs->transnoentities("BackToModuleList") . '</a>';
 
-print load_fiche_titre($title, $linkback, 'digiriskdolibarr32px@digiriskdolibarr');
+print load_fiche_titre($title, $linkback, 'title_setup');
 
 // Configuration header
 $head = digiriskdolibarr_admin_prepare_head();
 
-print dol_get_fiche_head($head, 'ticket', '', -1, "digiriskdolibarr@digiriskdolibarr");
+print dol_get_fiche_head($head, 'ticket', $title, -1, "digiriskdolibarr_color@digiriskdolibarr");
+
 print load_fiche_titre('<i class="fa fa-ticket"></i> ' . $langs->transnoentities("TicketManagement"), '', '');
 print '<hr>';
 print load_fiche_titre($langs->transnoentities("PublicInterface"), '', '');
@@ -312,7 +317,7 @@ if ($conf->global->DIGIRISKDOLIBARR_TICKET_ENABLE_PUBLIC_INTERFACE == 1) {
 		//Page de sélection de l'entité
 		print '<tr class="oddeven"><td>' . $langs->transnoentities("ShowSelectorOnTicketPublicInterface") . '</td>';
 		print '<td class="center">';
-		print ajax_constantonoff('DIGIRISKDOLIBARR_SHOW_MULTI_ENTITY_SELECTOR_ON_TICKET_PUBLIC_INTERFACE');
+		print ajax_constantonoff('DIGIRISKDOLIBARR_SHOW_MULTI_ENTITY_SELECTOR_ON_TICKET_PUBLIC_INTERFACE', [], 0);
 		print '</a>';
 		print '</td>';
 		print '<td class="center">';

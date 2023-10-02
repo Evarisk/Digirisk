@@ -53,9 +53,10 @@ HowToSharedElement          = Pour plus d'informations sur la configuration des 
 HowToSharedElementLink        = https://wiki.dolibarr.org/index.php?title=Module_Digirisk#Configuration
 ConfigSharedElement         = Configuration des éléments partagés (risques/signalisations)
 DisabledSharedElement       = Option désactivée car multi company n'est pas activé ou la configuration des éléments partagés (risques/signalisations) n'a pas été effectuée
-DigiriskEventAutoDesc       = Définissez ici les événements pour lesquels Digirisk créera automatiquement une entrée dans l'agenda. Chaque événement contient les informations relatives à l'action effectuée.
-DigiriskActionsEvents       = Événements pour lesquels Digirisk doit insérer un événement dans l'agenda en automatique.
-
+DigiriskEventAutoDesc       = Définissez ici les événements pour lesquels Digirisk créera automatiquement une entrée dans l'agenda. Chaque évènement contient les informations relatives à l'action effectuée.
+DigiriskActionsEvents       = Événements pour lesquels Digirisk doit insérer un évènement dans l'agenda en automatique.
+DigiriskDolibarr            = Digirisk
+Create                      = Créer
 
 
 #
@@ -117,6 +118,9 @@ LabourInspectorLastName  = travail
 LabourInspector          = Inspecteur du travail
 LabourInspectorSociety   = Tiers Inspecteur du travail
 LabourInspectorAssigned  = Inspecteur du travail
+
+SocieteSchedules = Horaires de la société
+
 
 #
 # DigriskDocuments - Documents Digirisk
@@ -202,6 +206,12 @@ ChooseBoxToAdd                 = Ajouter le widget au tableau de bord...
 ActionOnUser                   = Utilisateur concerné
 HarassmentOfficer              = Responsable harcèlement
 HarassmentOfficerCSE           = Responsable harcèlement CSE
+ExceptionsToWorkingHours       = Dérogations aux horaires de travail
+PermanentDerogation            = Dérogation permanente
+PermanentDerogationValue       = Non
+OccasionalDerogation           = Dérogation occasionnelle
+OccasionalDerogationValue      = Oui
+
 
 #
 # PreventionPlan - Plan de prévention
@@ -644,6 +654,7 @@ RiskAssessmentDocumentSources                             = La sensibilisation d
 RiskAssessmentDocumentImportantNote                       = Notes importantes :<br />Vous pouvez lire la documentation de DigiRisk ici<br /><a href="https://wiki.dolibarr.org/index.php?title=Module_Digirisk" target="_blank">https://wiki.dolibarr.org/index.php?title=Module_Digirisk</a><br />Vous pouvez suivre le projet ici :<br /><a href="https://github.com/Evarisk/Digirisk/projects?type=classic" target="_blank">https://github.com/Evarisk/Digirisk/projects?type=classic</a><br />Reporter un bug ici<br /><a href="https://github.com/Evarisk/Digirisk/issues" target="_blank">https://github.com/Evarisk/Digirisk/issues</a>
 GenerateZipArchiveWithDigiriskElementDocuments            = Génération d'une archive ZIP avec le Document Unique
 GenerateZipArchiveWithDigiriskElementDocumentsDescription = Génération automatique d'une archive ZIP contenant le Document Unique et toutes les fiches de poste lors de la génération du Document Unique
+RiskAssessmentDocumentDescription                         = Plan d'action Document Unique
 
 # Boxes - Widget
 LastGenerateDate             = DU généré le
@@ -715,6 +726,7 @@ PleaseSelectADigiriskElement        = Sélectionner un groupement ou une unité 
 Registers                           = Registres
 ShowInSelectOnPublicTicketInterface = Doit apparaître dans la liste des éléments de l'interface publique des tickets
 Organization                        = Organisation GP/UT
+YouDontHaveOrganization             = Vous n'avez pas créé de groupements ou d'unités de travail, veuillez vous rendre dans "Document Unique" afin d'en créer.
 
 
 #
@@ -767,7 +779,7 @@ AddEvaluatorButton           = Ajouter l'évaluateur
 EvaluatorConfig              = Configuration des données des évaluateurs
 DeleteEvaluatorMessage       = Suppression de l'évaluateur
 DigiriskEvaluatorData        = Données configurables des évaluateurs
-EvaluatorDuration            = Durée de l'évalution par l'évaluateur
+EvaluatorDuration            = Durée de l'évaluation par l'évaluateur
 EvaluatorDurationDescription = Le temps que met l'évaluateur à réaliser son évaluation des risques
 NbEmployeesInvolved          = Nombre de salariés impliqués
 NbEmployees                  = Nombre de salariés
@@ -865,7 +877,8 @@ RiskDeleted                    = Le risque %s a été supprimé
 RiskSharedWithEntityRefLabel   = Partage du risque %s avec
 RiskUnlinkedFromEntityRefLabel = Dissociation du risque %s avec
 TheDigiriskelement             = l'élément Digirisk
-
+DefaultProjectContactType      = Rôle par défaut attribué au projet Document Unique
+DefaultTaskContactType         = Rôle par défaut attribué aux tâches du projet Document Unique
 
 # Stats - Statistiques
 GreyRisk   = Risque faible
@@ -1118,6 +1131,7 @@ MainCategory                             = Choix de la catégorie principale
 ParentCategoryLabel                      = Titre de la catégorie parent
 ChildCategoryLabel                       = Titre de la catégorie enfant
 TicketPublicInterfaceEnabled             = L'interface publique des tickets a été activée
+TicketPublicInterfaceDisabled            = L'interface publique des tickets a été désactivée
 TicketPublicInterface                    = Interface publique
 EmailsToNotifySet                        = Les adresses e-mail à notifier ont bien été enregistrées
 MainCategorySet                          = La catégorie principale a été définie
@@ -1158,7 +1172,7 @@ MultiEntityTicketPublicInterfaceQRCode   = QR Code de l'interface publique des t
 PublicInterfaceConfiguration             = Champs visibles / requis de l'interface publique
 TicketDigiriskElementRequired            = GP/UT obligatoire pour créer un ticket
 TicketDigiriskElementRequiredHelp        = Activer cette option pour rendre obligatoire la selection d'un GP/UT pour créer un ticket dans l'interface publique
-TicketDigiriskElementHideRef             = Cacher la référence des GP/UT dans l'interface publique
+TicketDigiriskElementHideRef             = Cacher la référence des GP/UT dans le sélecteur de service l'interface publique
 TicketDigiriskElementHideRefHelp         = Activer cette option pour rendre cacher la référence d'un GP/UT dans l'interface publique
 TicketDigiriskElementVisible             = Afficher le champ GP/UT pour créer un ticket
 TicketDigiriskElementVisibleHelp         = Activer cette option pour afficher le champ GP/UT dans l'interface publique et le rendre obligatoire si nécessaire

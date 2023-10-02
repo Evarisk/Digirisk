@@ -33,7 +33,7 @@ class mod_firepermitdet_standard extends ModeleNumRefSaturne
 	/**
 	 * @var string Numbering module ref prefix.
 	 */
-	public string $prefix = 'PPR';
+	public string $prefix = 'FPR';
 
 	/**
 	 * @var string Name.

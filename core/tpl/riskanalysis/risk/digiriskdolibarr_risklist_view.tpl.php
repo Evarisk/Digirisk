@@ -123,7 +123,6 @@
 		<div class="notice-close"><i class="fas fa-times"></i></div>
 	</div>
 </div>
-
 <div class="messageSuccessRiskEdit notice hidden">
 	<div class="wpeo-notice notice-success risk-edit-success-notice">
 		<input type="hidden" class="valueForEditRisk1" value="<?php echo $langs->trans('TheRisk') . ' ' ?>">
@@ -290,7 +289,6 @@
 		<div class="notice-close"><i class="fas fa-times"></i></div>
 	</div>
 </div>
-
 
 <?php
 
@@ -982,7 +980,7 @@ if ($action != 'list') {
 <?php endif; ?>
 <?php $title = $langs->trans('DigiriskElementRisksList');
 print '<div class="div-title-and-table-responsive">';
-print_barre_liste($title, $page, $_SERVER["PHP_SELF"], $param, $sortfield, $sortorder, $massactionbutton, $num, $nbtotalofrecords, 'digiriskdolibarr32px.png@digiriskdolibarr', 0, $newcardbutton, '', $limit, 0, 0, 1);
+print_barre_liste($title, $page, $_SERVER["PHP_SELF"], $param, $sortfield, $sortorder, $massactionbutton, $num, $nbtotalofrecords, $risk->picto, 0, $newcardbutton, '', $limit, 0, 0, 1);
 
 include DOL_DOCUMENT_ROOT . '/core/tpl/massactions_pre.tpl.php';
 

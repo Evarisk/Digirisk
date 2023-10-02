@@ -215,7 +215,7 @@ class pdf_orque_projectdocument
 	 *	@return	int         						1 if OK, <=0 if KO
 	 * 	@throws Exception
 	 */
-	public function write_file(ProjectDocument $objectDocument, Translate $outputlangs, string $srctemplatepath, int $hidedetails, int $hidedesc, int $hideref, array $moreparams): int
+	public function write_file(ProjectDocument $objectDocument, Translate $outputlangs, array $moreparams): int
 	{
 		global $conf, $hookmanager, $langs, $user;
 
@@ -243,7 +243,7 @@ class pdf_orque_projectdocument
 
 			$objectref = dol_sanitizeFileName($object->ref);
 			$dir = $conf->projet->dir_output;
-			if (!preg_match('/specimen/i', $objectref)) {
+            if ($objectDocument->specimen == 0) {
 				$dir .= '/' . $objectref;
 			}
 			$societyname = preg_replace('/\./', '_', $conf->global->MAIN_INFO_SOCIETE_NOM);
@@ -263,7 +263,11 @@ class pdf_orque_projectdocument
 			dol_syslog('admin.lib::Insert last main doc', LOG_DEBUG);
 			$this->db->query($sql);
 
-			$file = $dir . '/' . $filename;
+            if ($objectDocument->specimen == 1) {
+                $filename = 'SPECIMEN.pdf';
+            }
+            $file = $dir . '/' . $filename;
+
 			if (!file_exists($dir)) {
 				if (dol_mkdir($dir) < 0) {
 					$this->error = $langs->transnoentities('ErrorCanNotCreateDir', $dir);

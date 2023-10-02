@@ -391,8 +391,8 @@ if (empty($reshook)) {
 					print '<a class="butAction" id="actionButtonSendMail" href="' . $_SERVER['PHP_SELF'] . '?id=' . $object->id . '&action=presend&mode=init&sendto=' . $allLinks['LabourInspectorSociety']->id[0] . '#sendEmail' . '">' . $langs->trans('SendMail') . '</a>';
 				} else {
 					// Model
-					$class     = 'ModeleODTRiskAssessmentDocument';
-					$modellist = call_user_func($class . '::liste_modeles', $db, 100);
+					$class     = 'SaturneDocumentModel';
+					$modellist = call_user_func($class . '::liste_modeles', $db, 'riskassessmentdocument');
 
 					if ( ! empty($modellist)) {
 						asort($modellist);
@@ -499,7 +499,7 @@ if ($action == 'presend' && ! empty($document)) {
 		$topicmail = $outputlangs->trans($defaulttopic, '__REF__ (__REFCLIENT__)');
 	}
 
-	print load_fiche_titre($langs->trans($titreform), '', 'digiriskdolibarr32px@digiriskdolibarr', '', 'sendEmail');
+	print load_fiche_titre($langs->trans($titreform), '', 'digiriskdolibarr_color@digiriskdolibarr', '', 'sendEmail');
 
 	print dol_get_fiche_head('');
 

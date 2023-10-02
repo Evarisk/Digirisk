@@ -82,6 +82,7 @@ if (is_array($extrafields->attributes[$risksign->table_element]['label']) && cou
 if ($risksign->ismultientitymanaged == 1) $sql                                                                                                        .= " WHERE t.entity IN (" . getEntity($risksign->element) . ")";
 else $sql                                                                                                                                             .= " WHERE 1 = 1";
 $sql                                                                                                                                                  .= " AND fk_element = " . $id;
+$sql                                                                                                                                                  .= " AND status > " . $risksign::STATUS_DELETED;
 
 foreach ($search as $key => $val) {
 	if ($key == 'status' && $search[$key] == -1) continue;
@@ -221,7 +222,7 @@ if ($action != 'list') {
 </div>
 
 <?php $title = $langs->trans('DigiriskElementRiskSignList');
-print_barre_liste($title, $page, $_SERVER["PHP_SELF"], $param, $sortfield, $sortorder, $massactionbutton, $num, $nbtotalofrecords, 'digiriskdolibarr32px.png@digiriskdolibarr', 0, $newcardbutton, '', $limit, 0, 0, 1);
+print_barre_liste($title, $page, $_SERVER["PHP_SELF"], $param, $sortfield, $sortorder, $massactionbutton, $num, $nbtotalofrecords, 'digiriskdolibarr_color.png@digiriskdolibarr', 0, $newcardbutton, '', $limit, 0, 0, 1);
 
 include DOL_DOCUMENT_ROOT . '/core/tpl/massactions_pre.tpl.php';
 

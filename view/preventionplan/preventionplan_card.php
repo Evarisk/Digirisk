@@ -628,7 +628,7 @@ saturne_header(1, '', $title, $helpUrl);
 
 // Part to create
 if ($action == 'create') {
-	print load_fiche_titre($titleCreate, '', "digiriskdolibarr32px@digiriskdolibarr");
+	print load_fiche_titre($titleCreate, '', $object->picto);
 
 	print '<form method="POST" action="' . $_SERVER["PHP_SELF"] . '">';
 	print '<input type="hidden" name="token" value="' . newToken() . '">';
@@ -760,7 +760,7 @@ if ($action == 'create') {
 
 // Part to edit record
 if (($id || $ref) && $action == 'edit') {
-	print load_fiche_titre($titleEdit, '', "digiriskdolibarr32px@digiriskdolibarr");
+	print load_fiche_titre($titleEdit, '', $object->picto);
 
 	print '<form method="POST" action="' . $_SERVER["PHP_SELF"] . '">';
 	print '<input type="hidden" name="token" value="' . newToken() . '">';
@@ -1487,7 +1487,7 @@ if ((empty($action) || ($action != 'create' && $action != 'edit'))) {
 			$topicmail = $outputlangs->trans($defaulttopic, '__REF__ (__REFCLIENT__)');
 		}
 
-		print load_fiche_titre($langs->trans($titreform), '', 'digiriskdolibarr32px@digiriskdolibarr', '', 'formmailbeforetitle');
+		print load_fiche_titre($langs->trans($titreform), '', $object->picto, '', 'formmailbeforetitle');
 
 		print dol_get_fiche_head('');
 
