@@ -85,7 +85,22 @@ if (($action == 'update' && ! GETPOST("cancel", 'alpha')) || ($action == 'update
 	$evaluatorDuration     = GETPOST('EvaluatorDuration', 'alpha');
 	$taskTimeSpentDuration = GETPOST('TaskTimeSpentDuration', 'alpha');
 
-	dolibarr_set_const($db, "DIGIRISKDOLIBARR_DU_PROJECT", $DUProject[0], 'integer', 0, '', $conf->entity);
+    if ($DUProject[0] > 0 && $DUProject[0] != $conf->global->DIGIRISKDOLIBARR_DU_PROJECT) {
+        dolibarr_set_const($db, "DIGIRISKDOLIBARR_DU_PROJECT", $DUProject[0], 'integer', 0, '', $conf->entity);
+
+        $url = '/projet/tasks.php?id=' . $DUProject[0];
+
+        $sql = "UPDATE ".MAIN_DB_PREFIX."menu SET";
+        $sql .= " url='".$db->escape($url)."'";
+        $sql .= " WHERE leftmenu='digiriskactionplan'";
+        $sql .= " AND entity=" . $conf->entity;
+
+        $resql = $db->query($sql);
+        if (!$resql) {
+            $error = "Error ".$db->lasterror();
+            return -1;
+        }
+    }
 
 	if (!empty($evaluatorDuration) || $evaluatorDuration === '0') {
 		dolibarr_set_const($db, "DIGIRISKDOLIBARR_EVALUATOR_DURATION", $evaluatorDuration, 'integer', 0, '', $conf->entity);
