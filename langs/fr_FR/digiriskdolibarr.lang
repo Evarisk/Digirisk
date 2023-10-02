@@ -349,6 +349,8 @@ UsedEquipment                                     = Matériel utilisé
 ErrorThirdPartyHasAtLeastOneChildOfTypeFirePermit = Le tiers est lié à au moins un enfant de type Permis de Feu :
 ErrorContactHasAtLeastOneChildOfTypeFirePermit    = Le contact est lié à au moins un enfant de type Permis de Feu :
 ConfirmDeleteFirePermit                           = Êtes-vous sûr de vouloir supprimer ce permis de feu ?
+TheFirepermit                                     = Le permis de feu
+FirepermitSchedules                               = Horaires du permis de feu
 
 # Email - Mail
 FirePermitLabel   = Récapitulatif du permis de feu

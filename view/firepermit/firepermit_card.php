@@ -49,7 +49,7 @@ require_once __DIR__ . '/../../lib/digiriskdolibarr_function.lib.php';
 require_once __DIR__ . '/../../lib/digiriskdolibarr_firepermit.lib.php';
 
 // Global variables definitions
-global $conf, $db, $hookmanager, $langs, $user;
+global $conf, $db, $hookmanager, $langs, $moduleNameLowerCase, $user;
 
 // Load translation files required by the page
 saturne_load_langs(['other', 'mails']);
@@ -163,7 +163,7 @@ if (empty($reshook)) {
 
 		// Initialize object firepermit
 		$now                   = dol_now();
-		$object->ref           = $refFirePermitMod->getNextValue($object);
+		$object->ref           = $object->getNextNumRef();
 		$object->ref_ext       = 'digirisk_' . $object->ref;
 		$object->date_creation = $object->db->idate($now);
 		$object->tms           = $now;
@@ -364,8 +364,11 @@ if (empty($reshook)) {
 
 		if ($result < 0) {
 			// Delete accident KO
-			if (!empty($accident->errors)) setEventMessages(null, $accident->errors, 'errors');
-			else setEventMessages($accident->error, null, 'errors');
+			if (!empty($object->errors)) {
+                setEventMessages(null, $object->errors, 'errors');
+            } else {
+                setEventMessages($object->error, null, 'errors');
+            }
 		}
 		// Delete accident OK
 		$urltogo = str_replace('firepermit_card.php', 'firepermit_list.php', $_SERVER["PHP_SELF"]);
@@ -384,7 +387,7 @@ if (empty($reshook)) {
 
 		// Initialize object firepermit line
 		$objectLine->date_creation  = $object->db->idate($now);
-		$objectLine->ref            = $refFirePermitDetMod->getNextValue($objectLine);
+		$objectLine->ref            = $objectLine->getNextNumRef();
 		$objectLine->entity         = $conf->entity;
 		$objectLine->description    = $actionsDescription;
 		$objectLine->category       = $riskCategoryId;
@@ -469,7 +472,7 @@ if (empty($reshook)) {
 	// Action to delete line
 	if ($action == 'deleteline' && $permissiontodelete) {
 		$objectLine->fetch($lineid);
-		$result = $objectLine->delete($user, false);
+		$result = $objectLine->delete($user, false, false);
 		if ($result > 0) {
 			// Deletion fire permit line OK
 			setEventMessages($langs->trans('DeleteFirePermitLine') . ' ' . $objectLine->ref . ' ' . $langs->trans('FirePermitMessage'), array());
@@ -479,8 +482,11 @@ if (empty($reshook)) {
 			exit;
 		} else {
 			// Deletion fire permit line KO
-			if ( ! empty($object->errors)) setEventMessages(null, $object->errors, 'errors');
-			else setEventMessages($object->error, null, 'errors');
+			if (!empty($objectLine->errors)) {
+                setEventMessages(null, $objectLine->errors, 'errors');
+            } else {
+                setEventMessages($objectLine->error, null, 'errors');
+            }
 		}
 	}
 
@@ -594,10 +600,10 @@ if (empty($reshook)) {
 	$triggersendname     = 'FIREPERMIT_SENTBYMAIL';
 	$mode                = 'emailfromthirdparty';
 	$trackid             = 'thi' . $object->id;
-	$labourInspector    = $digiriskresources->fetchResourcesFromObject('LabourInspector', $object);
-	$labourInspectorId = $labourInspector->id;
+	$labourInspector     = $digiriskresources->fetchResourcesFromObject('LabourInspector', $object);
+	$labourInspectorId   = $labourInspector->id;
 	$thirdparty->fetch($labourInspectorId);
-	$object->thirdparty = $thirdparty;
+	$object->thirdparty  = $thirdparty;
 
 	if ($action == 'send' && dol_strlen(GETPOST('sendto') < 1)) {
 		setEventMessages($langs->trans("SendToNoEmail"), null, 'errors');
@@ -606,6 +612,9 @@ if (empty($reshook)) {
 	}
 
 	include DOL_DOCUMENT_ROOT . '/core/actions_sendmails.inc.php';
+
+    // Actions set_thirdparty, set_project
+    require_once __DIR__ . '/../../../saturne/core/tpl/actions/banner_actions.tpl.php';
 }
 
 /*
@@ -925,6 +934,12 @@ elseif ($reshook > 0) $formconfirm = $hookmanager->resPrint;
 // Print form confirm
 print $formconfirm;
 
+if ($conf->browser->layout == 'phone') {
+    $onPhone = 1;
+} else {
+    $onPhone = 0;
+}
+
 // Part to show record
 if ((empty($action) || ($action != 'create' && $action != 'edit'))) {
 	// Object card
@@ -933,16 +948,13 @@ if ((empty($action) || ($action != 'create' && $action != 'edit'))) {
 
 	saturne_get_fiche_head($object, 'card', $title);
 
-	dol_strlen($object->label) ? $morehtmlref = '<span>' . ' - ' . $object->label . '</span>' : '';
-	$morehtmlref                             .= '<div class="refidno">';
+	$morehtmlref = '<div class="refidno">';
 	// External Society -- Société extérieure
 	$extSociety  = $digiriskresources->fetchResourcesFromObject('ExtSociety', $object);
 	$morehtmlref .= $langs->trans('ExtSociety') . ' : ' . $extSociety->getNomUrl(1);
 	$morehtmlref .= '</div>';
 
-	$linkback = '<a href="' . dol_buildpath('/digiriskdolibarr/view/firepermit/firepermit_list.php', 1) . '">' . $langs->trans("BackToList") . '</a>';
-
-	saturne_banner_tab($object, 'id', $linkback, 1, 'rowid', 'ref', $morehtmlref);
+	saturne_banner_tab($object, 'id', '', 1, 'rowid', 'ref', $morehtmlref);
 
 	print '<div class="div-table-responsive">';
 	print '<div class="fichecenter">';
@@ -1094,121 +1106,16 @@ if ((empty($action) || ($action != 'create' && $action != 'edit'))) {
 		}
 		print '</div>';
 
-
-		// PREVENTIONPLAN LINES
-		print '<div class="div-table-responsive-no-min" style="overflow-x: unset !important">';
-		print load_fiche_titre($langs->trans("PreventionPlanRiskList"), '', '');
-		print '<table id="tablelinespreventionplan" class="noborder noshadow" width="100%">';
-
-		global $forceall, $forcetoshowtitlelines;
-
-		if (empty($forceall)) $forceall = 0;
-
-		// Define colspan for the button 'Add'
-		$colspan = 3; // Columns: total ht + col edit + col delete
-
-		// Linked prevention plan Lines
-		$preventionplanlines = $preventionplanline->fetchAll('', '', 0, 0, ['fk_preventionplan' => $object->fk_preventionplan], 'AND');
-
-		print '<tr class="liste_titre">';
-		print '<td><span>' . $langs->trans('Ref.') . '</span></td>';
-		print '<td>' . $langs->trans('Location') . '</td>';
-		print '<td>' . $form->textwithpicto($langs->trans('ActionsDescription'), $langs->trans("ActionsDescriptionTooltip")) . '</td>';
-		print '<td class="center">' . $form->textwithpicto($langs->trans('INRSRisk'), $langs->trans('INRSRiskTooltip')) . '</td>';
-		print '<td>' . $form->textwithpicto($langs->trans('PreventionMethod'), $langs->trans('PreventionMethodTooltip')) . '</td>';
-		print '<td class="center" colspan="' . $colspan . '">' . $langs->trans('ActionsPreventionPlanRisk') . '</td>';
-		print '</tr>';
-
-		if ($object->fk_preventionplan > 0) {
-			if ( ! empty($preventionplanlines) && $preventionplanlines > 0) {
-				print '<tr>';
-				foreach ($preventionplanlines as $key => $item) {
-					print '<tr>';
-					print '<td>';
-					print $item->ref;
-					print '</td>';
-
-					print '<td>';
-					$digiriskelement->fetch($item->fk_element);
-					print $digiriskelement->getNomUrl(1, 'blank', 1);
-					print '</td>';
-
-					$coldisplay++;
-					print '<td>';
-					print $item->description;
-					print '</td>';
-
-					$coldisplay++;
-					print '<td class="center">'; ?>
-					<div class="table-cell table-50 cell-risk" data-title="Risque">
-						<div class="wpeo-dropdown dropdown-large category-danger padding wpeo-tooltip-event"
-							 aria-label="<?php echo $risk->getDangerCategoryName($item) ?>">
-							<img class="danger-category-pic hover"
-								 src="<?php echo DOL_URL_ROOT . '/custom/digiriskdolibarr/img/categorieDangers/' . $risk->getDangerCategory($item) . '.png'; ?>"
-								 alt=""/>
-						</div>
-					</div>
-					<?php
-					print '</td>';
-
-					$coldisplay++;
-					print '<td>';
-					print $item->prevention_method;
-					print '</td>';
-
-					$coldisplay += $colspan;
-
-					print '<td class="center">';
-					print '-';
-					print '</td>';
-
-//					if (is_object($objectLine)) {
-//						print $objectLine->showOptionals($extrafields, 'edit', array('style' => $bcnd[$var], 'colspan' => $coldisplay), '', '', 1);
-//					}
-					print '</tr>';
-				}
-				print '</tr>';
-			} else {
-				print '<tr>';
-				print '<td>';
-				print $langs->trans('NoPreventionPlanRisk');
-				print '</td>';
-				print '<td></td>';
-				print '<td></td>';
-				print '<td></td>';
-				print '<td></td>';
-				print '<td></td>';
-				print '</tr>';
-			}
-		} else {
-			print '<tr>';
-			print '<td>';
-			print $langs->trans('NoPreventionPlanLinked');
-			print '</td>';
-			print '<td></td>';
-			print '<td></td>';
-			print '<td></td>';
-			print '<td></td>';
-			print '<td></td>';
-			print '</tr>';
-		}
-
-		print '</table></div>';
-
 		// FIREPERMIT LINES
 		print '<div class="div-table-responsive-no-min" style="overflow-x: unset !important">';
 		print load_fiche_titre($langs->trans("FirePermitRiskList"), '', '');
 		print '<table id="tablelines" class="noborder noshadow" width="100%">';
 
-		global $forceall, $forcetoshowtitlelines;
-
-		if (empty($forceall)) $forceall = 0;
-
 		// Define colspan for the button 'Add'
 		$colspan = 3; // Columns: total ht + col edit + col delete
 
 		// Fire permit Lines
-		$firepermitlines = $objectLine->fetchAll('', '', 0, 0, ['fk_firepermit' => $object->id], 'AND');
+		$firepermitlines = $objectLine->fetchAll('', '', 0, 0, ['fk_firepermit' => $object->id]);
 
 		print '<tr class="liste_titre">';
 		print '<td><span>' . $langs->trans('Ref.') . '</span></td>';
@@ -1234,7 +1141,7 @@ if ((empty($action) || ($action != 'create' && $action != 'edit'))) {
 					print $item->ref;
 					print '</td>';
 
-					print '<td class="bordertop nobottom linecollocation">';
+                    print '<td class="bordertop nobottom linecollocation">';
 					print $digiriskelement->selectDigiriskElementList($item->fk_element, 'fk_element', ['customsql' => ' t.rowid NOT IN (' . implode(',', $deletedElements) . ')'], 0, 0,[], 0, 0, 'minwidth200', 0, false, 1);
 					print '</td>';
 
@@ -1332,7 +1239,7 @@ if ((empty($action) || ($action != 'create' && $action != 'edit'))) {
 						print '<td class="center">';
 						$coldisplay++;
 						print '<a href="' . $_SERVER["PHP_SELF"] . '?id=' . $id . '&amp;action=editline&amp;lineid=' . $item->id . '" style="padding-right: 20px"><i class="fas fa-pencil-alt" style="color: #666"></i></a>';
-						print '<a href="' . $_SERVER["PHP_SELF"] . '?id=' . $id . '&amp;action=deleteline&amp;lineid=' . $item->id . '">';
+						print '<a href="' . $_SERVER["PHP_SELF"] . '?id=' . $id . '&amp;action=deleteline&amp;lineid=' . $item->id . '&token=' . newToken() . '">';
 						print img_delete();
 						print '</a>';
 						print '</td>';
@@ -1359,7 +1266,7 @@ if ((empty($action) || ($action != 'create' && $action != 'edit'))) {
 
 			print '<tr>';
 			print '<td>';
-			print $refFirePermitDetMod->getNextValue($objectLine);
+			print $objectLine->getNextNumRef();
 			print '</td>';
 			print '<td>';
 			print $digiriskelement->selectDigiriskElementList('', 'fk_element', ['customsql' => ' t.rowid NOT IN (' . implode(',', $deletedElements) . ')'], 0, 0, array(), 0, 0, 'minwidth200', 0, false, 1);
@@ -1418,54 +1325,32 @@ if ((empty($action) || ($action != 'create' && $action != 'edit'))) {
 		print '</table>';
 		print '</div>';
 	}
-	// Document Generation -- Génération des documents
-	$includedocgeneration = 1;
-	if ($includedocgeneration) {
-		print '<div class="fichecenter"><div class="firepermitDocument fichehalfleft">';
+    if ($action != 'presend') {
+        print '<div class="fichecenter"><div class="fichehalfleft">';
+        // Documents.
+        $objRef    = dol_sanitizeFileName($object->ref);
+        $dirFiles  = $object->element . 'document/' . $objRef;
+        $fileDir   = $upload_dir . '/' . $dirFiles;
+        $urlSource = $_SERVER['PHP_SELF'] . '?id=' . $object->id;
 
-		$objref    = dol_sanitizeFileName($object->ref);
-		$dirFiles = $document->element . '/' . $objref;
-		$filedir   = $upload_dir . '/' . $dirFiles;
-		$urlsource = $_SERVER["PHP_SELF"] . '?id=' . $id;
+        print saturne_show_documents('digiriskdolibarr:' . ucfirst('FirePermit') . 'Document', $dirFiles, $fileDir, $urlSource, $permissiontoadd, 0, $conf->global->DIGIRISKDOLIBARR_FIREPERMITDOCUMENT_DEFAULT_MODEL, 1, 0, 0, 0, 0, '', '', $langs->defaultlang, '', $object, 0, 'remove_file', $object->status >= $object::STATUS_VALIDATED, $langs->trans('ObjectMustBeValidatedToGenerate',  ucfirst($langs->transnoentities('The' . ucfirst($object->element)))));
 
-		$modulepart   = 'digiriskdolibarr:FirePermitDocument';
-		$defaultmodel = $conf->global->DIGIRISKDOLIBARR_FIREPERMITDOCUMENT_DEFAULT_MODEL;
-		$title        = $langs->trans('FirePermitDocument');
+        print '</div><div class="fichehalfright">';
 
-		if ($permissiontoadd || $permissiontoread) {
-			$genallowed = 1;
-		}
+        $moreHtmlCenter = dolGetButtonTitle($langs->trans('SeeAll'), '', 'fa fa-bars imgforviewmode', dol_buildpath('/saturne/view/saturne_agenda.php', 1) . '?id=' . $object->id . '&module_name=digiriskdolibarr&object_type=' . $object->element);
 
-		$filelist = dol_dir_list($filedir, 'files');
-		if (!empty($filelist) && is_array($filelist)) {
-			foreach ($filelist as $file) {
-				if (preg_match('/sign/', $file['name'])) {
-					$filesigned = 1;
-				}
-			}
-		}
+        // List of actions on element.
+        require_once DOL_DOCUMENT_ROOT . '/core/class/html.formactions.class.php';
+        $formActions = new FormActions($db);
+        $formActions->showactions($object, $object->element . '@' . $object->module, 0, 1, '', 10, '', $moreHtmlCenter);
 
-		print saturne_show_documents($modulepart, $dirFiles, $filedir, $urlsource, $genallowed, 0, $defaultmodel, 1, 0, 0, 0, 0, $title, 0, 0, empty($soc->default_lang) ? '' : $soc->default_lang, $object, 0, 'remove_file', (($object->status > $object::STATUS_VALIDATED) ? 1 : 0), $langs->trans('ControlMustBeValidatedToGenerated'));
-	}
+        print '</div></div>';
+    }
 
-	if ($permissiontoadd) {
-		print '</div><div class="fichehalfright">';
-	} else {
-		print '</div><div class="">';
-	}
-
-	$MAXEVENT = 10;
-
-	$morehtmlright  = '<a href="' . dol_buildpath('/digiriskdolibarr/view/firepermit/firepermit_agenda.php', 1) . '?id=' . $object->id . '">';
-	$morehtmlright .= $langs->trans("SeeAll");
-	$morehtmlright .= '</a>';
-
-	// List of actions on element
-	include_once DOL_DOCUMENT_ROOT . '/core/class/html.formactions.class.php';
-	$formactions    = new FormActions($db);
-	$somethingshown = $formactions->showactions($object, $object->element . '@digiriskdolibarr', '', 1, '', $MAXEVENT, '', $morehtmlright);
-
-	print '</div></div></div>';
+    //Select mail models is same action as presend.
+    if (GETPOST('modelselected')) {
+        $action = 'presend';
+    }
 
 	// Presend form
 	$labourInspector   = $digiriskresources->fetchResourcesFromObject('LabourInspector', $object);

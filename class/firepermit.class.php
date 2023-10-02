@@ -178,7 +178,7 @@ class FirePermit extends SaturneObject
 
 		// Load numbering modules
 		$numberingModules = [
-			'digiriskelement/' . $objectLine->element => $conf->global->DIGIRISKDOLIBARR_FIREPERMITDET_ADDON,
+			'digiriskelement/' . $this->element => $conf->global->DIGIRISKDOLIBARR_FIREPERMITDET_ADDON,
 		];
 
 		list($refFirePermitDetMod) = saturne_require_objects_mod($numberingModules, $moduleNameLowerCase);
@@ -279,8 +279,6 @@ class FirePermit extends SaturneObject
 	 */
 	public function setInProgress($user, $notrigger = 0)
 	{
-		global $conf;
-
 		$signatory = new SaturneSignature($this->db, $this->module, $this->element);
 		$signatory->deleteSignatoriesSignatures($this->id, $this->element);
 		return parent::setDraft($user, $notrigger);
