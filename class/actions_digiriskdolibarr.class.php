@@ -906,13 +906,13 @@ class ActionsDigiriskdolibarr
 	}
 
 	/**
-	 *  Overloading the SaturneAdminAdditionalConfig function : replacing the parent's function with the one below.
+	 *  Overloading the saturneAdminAdditionalConfig function : replacing the parent's function with the one below.
 	 *
 	 * @param  array        $parameters Hook metadatas (context, etc...).
 	 * @param  CommonObject $object     Current object.
 	 * @return int                      0 < on error, 0 on success, 1 to replace standard code.
 	 */
-	public function SaturneAdminAdditionalConfig(array $parameters): int
+	public function saturneAdminAdditionalConfig(array $parameters): int
 	{
 		$additionalConfig = [
 			'ShowPictoName' => 'DIGIRISKDOLIBARR_DOCUMENT_SHOW_PICTO_NAME',
@@ -928,13 +928,13 @@ class ActionsDigiriskdolibarr
 	}
 
 	/**
-	 *  Overloading the SaturneCustomHeaderFunction function : replacing the parent's function with the one below.
+	 *  Overloading the saturneCustomHeaderFunction function : replacing the parent's function with the one below.
 	 *
 	 * @param  array        $parameters Hook metadatas (context, etc...).
 	 * @param  CommonObject $object     Current object.
 	 * @return int                      0 < on error, 0 on success, 1 to replace standard code.
 	 */
-	public function SaturneCustomHeaderFunction(array $parameters, object $object): int
+	public function saturneCustomHeaderFunction(array $parameters, object $object): int
 	{
 		// Do something only for the current context.
 		if (in_array($parameters['currentcontext'], ['digiriskelementdocument', 'digiriskelementagenda'])) {
@@ -947,45 +947,26 @@ class ActionsDigiriskdolibarr
 	}
 
 	/**
-	 *  Overloading the SaturneBannerTabCustomSubdir function : replacing the parent's function with the one below.
+	 *  Overloading the saturneBannerTabCustomSubdir function : replacing the parent's function with the one below.
 	 *
 	 * @param  array        $parameters Hook metadatas (context, etc...).
 	 * @param  CommonObject $object     Current object.
 	 * @return int                      0 < on error, 0 on success, 1 to replace standard code.
 	 */
-	public function SaturneBannerTabCustomSubdir(array $parameters, object $object): int
+	public function saturneBannerTabCustomSubdir(array $parameters, object $object): int
 	{
+        global $conf;
+
 		// Do something only for the current context.
 		if (in_array($parameters['currentcontext'], ['digiriskelementview', 'digiriskstandardview'])) {
 			require_once __DIR__ . '/../lib/digiriskdolibarr_function.lib.php';
 			if ($object->element == 'digiriskelement') {
-				$this->resprints = $object->element_type . '/'. $object->ref;
+				$this->results = ['subdir' => $object->element_type . '/'. $object->ref];
 			} else if ($object->element == 'digiriskstandard') {
-				$this->resprints = 'logos';
+				$this->results = ['dir' => $conf->mycompany->dir_output, 'subdir' => 'logos'];
 			}
 
 			return 1;
-		}
-		return 0; // or return 1 to replace standard code.
-	}
-
-	/**
-	 *  Overloading the SaturneBannerTabCustomDir function : replacing the parent's function with the one below.
-	 *
-	 * @param  array        $parameters Hook metadatas (context, etc...).
-	 * @param  CommonObject $object     Current object.
-	 * @return int                      0 < on error, 0 on success, 1 to replace standard code.
-	 */
-	public function SaturneBannerTabCustomDir(array $parameters, object $object): int
-	{
-		global $conf;
-		// Do something only for the current context.
-		if (in_array($parameters['currentcontext'], ['digiriskstandardview', 'digiriskelementview'])) {
-			if ($object->element == 'digiriskstandard') {
-				$this->resprints = $conf->mycompany->dir_output;
-				return 1;
-
-			}
 		}
 		return 0; // or return 1 to replace standard code.
 	}
