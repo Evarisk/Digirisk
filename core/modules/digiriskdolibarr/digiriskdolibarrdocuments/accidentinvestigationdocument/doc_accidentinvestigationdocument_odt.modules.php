@@ -152,10 +152,11 @@ class doc_accidentinvestigationdocument_odt extends SaturneDocumentModel
 	public function fillTagsLines(Odf $odfHandler, Translate $outputLangs, array $moreParam): int
 	{
 		require_once __DIR__ . '/../../../../../class/digiriskdocuments.class.php';
+        require_once __DIR__ . '/../../../../../class/riskanalysis/risk.class.php';
 
 		global $conf;
 
-		$digiriskDocument = new DigiriskDocuments($this->db);
+		$digiriskDocument = new DigiriskDocuments($this->db, $this->module, 'accidentinvestigationdocument');
 		$risk             = new Risk($this->db);
 		// Replace tags of lines.
 		try {
@@ -191,8 +192,10 @@ class doc_accidentinvestigationdocument_odt extends SaturneDocumentModel
 	 */
 	public function write_file(SaturneDocuments $objectDocument, Translate $outputLangs, string $srcTemplatePath, int $hideDetails = 0, int $hideDesc = 0, int $hideRef = 0, array $moreParam): int
 	{
-		require_once __DIR__ . '/../../../../../../saturne/class/task/saturnetask.class.php';
-		require_once __DIR__ . '/../../../../../class/accident.class.php';
+        require_once DOL_DOCUMENT_ROOT . '/core/lib/date.lib.php';
+        require_once __DIR__ . '/../../../../../class/accident.class.php';
+        require_once __DIR__ . '/../../../../../class/digiriskelement.class.php';
+        require_once __DIR__ . '/../../../../../../saturne/class/task/saturnetask.class.php';
 
 		global $conf;
 
@@ -230,8 +233,8 @@ class doc_accidentinvestigationdocument_odt extends SaturneDocumentModel
 			$tmpArray['attendants_number'] = '0 ';
 		}
 
-		$tmpArray['victim_lastname']   = dol_strtoupper($victim->lastname);
-		$tmpArray['victim_firstname']  = ucfirst($victim->firstname);
+		$tmpArray['victim_lastname']       = dol_strtoupper($victim->lastname);
+		$tmpArray['victim_firstname']      = ucfirst($victim->firstname);
 		$tmpArray['seniority_in_position'] = $object->seniority_in_position;
 
 		if ($victim->dateemployment > 0) {

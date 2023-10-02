@@ -64,13 +64,13 @@ $backtopage          = GETPOST('backtopage', 'alpha');
 $backtopageforcancel = GETPOST('backtopageforcancel', 'alpha');
 
 // Initialize technical objects
-$accident   = new Accident($db);
-$object     = new AccidentInvestigation($db);
-$document   = new AccidentInvestigationDocument($db);
-$project    = new Project($db);
-$task       = new Task($db);
-$signatory  = new SaturneSignature($db, $object->module, $object->element);
-$victim     = new User($db);
+$accident  = new Accident($db);
+$object    = new AccidentInvestigation($db);
+$document  = new AccidentInvestigationDocument($db);
+$project   = new Project($db);
+$task      = new Task($db);
+$signatory = new SaturneSignature($db, $object->module, $object->element);
+$victim    = new User($db);
 
 $numRefConf = strtoupper($task->element) . '_ADDON';
 
@@ -94,23 +94,16 @@ $upload_dir = $conf->digiriskdolibarr->multidir_output[$object->entity ?? 1];
 // Load object
 require_once DOL_DOCUMENT_ROOT . '/core/actions_fetchobject.inc.php'; // Must be included, not include_once.
 
-$taskExist = $task->fetch($object->fk_task);
-if ($taskExist <= 0) {
-	$object->setValueFrom('fk_task', 0, '', null, 'int', '', $user, 'ACCIDENTINVESTIGATION_MODIFY');
-}
-
-if ($object->status == AccidentInvestigation::STATUS_VALIDATED) {
-	$result = $signatory->checkSignatoriesSignatures($id, $object->element);
-	if ($result > 0) {
-		$object->setLocked($user);
-	}
-}
-
 // Security check - Protection if external user
 $permissiontoread   = $user->rights->digiriskdolibarr->accident_investigation->read;
 $permissiontoadd    = $user->rights->digiriskdolibarr->accident_investigation->write;
 $permissiontodelete = $user->rights->digiriskdolibarr->accident_investigation->delete;
 saturne_check_access($permissiontoread);
+
+$taskExist = $task->fetch($object->fk_task);
+if ($taskExist <= 0) {
+    $object->setValueFrom('fk_task', 0, '', null, 'int', '', $user, 'ACCIDENTINVESTIGATION_MODIFY');
+}
 
 /*
 *  Actions
@@ -148,9 +141,10 @@ if (empty($reshook)) {
 				$task->ref                                  = $modTask->getNextValue(0, $task);
 				$task->label                                = $accident->ref . ' - ' . $accident->label;
 				$task->array_options['options_fk_accident'] = $accident->id;
-				$result                                     = $task->create($user);
+                $result                                     = $task->create($user);
+                $task->add_contact($user->id, 'TASKEXECUTIVE', 'internal');
 
-				if ($result > 0) {
+                if ($result > 0) {
 					$object->fk_task = $result;
 					$object->update($user, true);
 
@@ -159,15 +153,21 @@ if (empty($reshook)) {
 					$task->label          = $accident->ref . ' - T1 - ' . $langs->trans('CurativeAction');
 					$task->fk_task_parent = $result;
 					$resOne               = $task->create($user);
+                    $getNomResOne         = $task->getNomUrl(1, '', 'task', 1);
 
-					$task->fk_project     = $accident->fk_project;
+                    $task->fk_project     = $accident->fk_project;
 					$task->ref            = $modTask->getNextValue(0, $task);
 					$task->label          = $accident->ref . ' - T2 - ' . $langs->trans('PreventiveAction');
 					$task->fk_task_parent = $result;
 					$resTwo               = $task->create($user);
+                    $getNomResTwo         = $task->getNomUrl(1, '', 'task', 1);
 
 					if ($resOne > 0 && $resTwo > 0) {
 						setEventMessages('AccidentInvestigationTaskCreated', []);
+                        $task->fetch($result);
+                        $description  = $langs->trans('Accident') . ' : ' . $accident->getNomUrl(1, '', 0, '', -1, 1) . '</br>' . $langs->trans('AccidentInvestigation') . ' : ' . $object->getNomUrl(1, '', 0, '', -1, 1) . '</br>';
+                        $description .= $getNomResOne . '</br>' . $getNomResTwo;
+                        $task->setValueFrom('description', $description);
 					} else {
 						setEventMessages($task->error, [], 'errors');
 					}
@@ -203,13 +203,17 @@ if (empty($reshook)) {
 			setEventMessages('AccidentInvestigationClassified', []);
 		} else {
 			setEventMessages($document->error, [], 'errors');
+            $action = '';
 		}
 	}
 
 	// Actions cancel, add, update, update_extras, confirm_validate, confirm_delete, confirm_deleteline, confirm_clone, confirm_close, confirm_setdraft, confirm_reopen
 	require_once DOL_DOCUMENT_ROOT . '/core/actions_addupdatedelete.inc.php';
 
-	// Actions builddoc, forcebuilddoc, remove_file.
+    // Actions save_project.
+    require_once __DIR__ . '/../../../saturne/core/tpl/actions/banner_actions.tpl.php';
+
+    // Actions builddoc, forcebuilddoc, remove_file.
 	require_once __DIR__ . '/../../../saturne/core/tpl/documents/documents_action.tpl.php';
 
 	// Action to generate pdf from odt file.
@@ -375,7 +379,7 @@ if ($action == 'create') {
 	print '<td class="titlefield">' . $langs->trans("UserVictim") . '</td>';
 	print '<td>' . $victim->getNomUrl(1) . '</td>';
 	print '<tr class="linked-medias causality_tree"> <td class=""><label for="causality_tree">' . $langs->trans("CausalityTree") . '</label></td>';
-	print '<td class="linked-medias-list">';
+	print '<td class="linked-medias-list" style="display: flex; gap: 10px; height: auto;">';
 	$pathPhotos = $conf->digiriskdolibarr->multidir_output[$conf->entity] . '/accident_investigation/'. $object->ref . '/causality_tree/';
 	?>
 	<span class="add-medias" <?php echo ($object->status < AccidentInvestigation::STATUS_VALIDATED && empty($object->causality_tree)) ? '' : 'style="display:none"' ?>>
@@ -401,11 +405,12 @@ if ($action == 'create') {
 	print '<div class="clearboth"></div>';
 
 	if ($action != 'presend') {
+        $allSigned = $signatory->checkSignatoriesSignatures($id, $object->element);
 		print '<div class="tabsAction">';
 
 		// Edit
 		$displayButton = $onPhone ? '<i class="fas fa-edit fa-2x"></i>' : '<i class="fas fa-edit"></i>' . ' ' . $langs->trans('Modify');
-		if ($object->status == $object::STATUS_DRAFT) {
+		if ($object->status == AccidentInvestigation::STATUS_DRAFT) {
 			print '<a class="butAction" id="actionButtonEdit" href="' . $_SERVER['PHP_SELF'] . '?id=' . $object->id . '&action=edit' . '">' . $displayButton . '</a>';
 		} else {
 			print '<span class="butActionRefused classfortooltip" title="' . dol_escape_htmltag($langs->trans('ObjectMustBeDraft', ucfirst($langs->transnoentities('The' . ucfirst($object->element))))) . '">' . $displayButton . '</span>';
@@ -421,7 +426,7 @@ if ($action == 'create') {
 
 		// Re-Open.
 		$displayButton = $onPhone ? '<i class="fas fa-lock-open fa-2x"></i>' : '<i class="fas fa-lock-open"></i>' . ' ' . $langs->trans('ReOpenDoli');
-		if ($object->status == AccidentInvestigation::STATUS_VALIDATED) {
+		if ($object->status == AccidentInvestigation::STATUS_VALIDATED && !$allSigned) {
 			print '<span class="butAction" id="actionButtonInProgress" href="' . $_SERVER['PHP_SELF'] . '?id=' . $object->id . '&action=set_draft&token=' . newToken() . '">' . $displayButton . '</span>';
 		} else {
 			print '<span class="butActionRefused classfortooltip" title="' . dol_escape_htmltag($langs->trans('ObjectMustBeValidated', ucfirst($langs->transnoentities('The' . ucfirst($object->element))))) . '">' . $displayButton . '</span>';
@@ -429,7 +434,7 @@ if ($action == 'create') {
 
 		// Sign.
 		$displayButton = $onPhone ? '<i class="fas fa-signature fa-2x"></i>' : '<i class="fas fa-signature"></i>' . ' ' . $langs->trans('Sign');
-		if ($object->status == AccidentInvestigation::STATUS_VALIDATED) {
+		if ($object->status == AccidentInvestigation::STATUS_VALIDATED && !$allSigned) {
 			print '<a class="butAction" id="actionButtonSign" href="' . dol_buildpath('/saturne/view/saturne_attendants.php', 1) . '?id=' . $object->id . '&module_name=' . $object->module . '&object_type=' . $object->element . '&attendant_table_mode=simple' . '">' . $displayButton . '</a>';
 		} else {
 			print '<span class="butActionRefused classfortooltip" title="' . dol_escape_htmltag($langs->trans('ObjectMustBeValidated', ucfirst($langs->transnoentities('The' . ucfirst($object->element))))) . '">' . $displayButton . '</span>';
@@ -437,7 +442,7 @@ if ($action == 'create') {
 
 		// Send email.
 		$displayButton = $onPhone ? '<i class="fas fa-envelope fa-2x"></i>' : '<i class="fas fa-envelope"></i>' . ' ' . $langs->trans('SendMail') . ' ';
-		if ($object->status == AccidentInvestigation::STATUS_VALIDATED) {
+		if ($object->status >= AccidentInvestigation::STATUS_VALIDATED) {
 			$fileParams    = dol_most_recent_file($upload_dir . '/' . $object->element . 'document' . '/' . $object->ref);
 			$file          = $fileParams['fullname'];
 			$forcebuilddoc = (file_exists($file) && !strstr($fileParams['name'], 'specimen')) ? 0 : 1;
@@ -448,7 +453,7 @@ if ($action == 'create') {
 
 		// Versioning.
 		$displayButton = $onPhone ?  '<i class="fas fa-file-archive fa-2x"></i>' : '<i class="fas fa-file-archive"></i>' . ' ' . $langs->trans('Versioning');
-		if ($object->status == AccidentInvestigation::STATUS_LOCKED) {
+		if ($object->status == AccidentInvestigation::STATUS_VALIDATED && $allSigned) {
 			print '<span class="butAction" id="actionButtonArchive" href="' . $_SERVER['PHP_SELF'] . '?id=' . $object->id . '&action=set_archive&token=' . newToken() . '">' . $displayButton . '</span>';
 		} else {
 			print '<span class="butActionRefused classfortooltip" title="' . dol_escape_htmltag($langs->trans('ObjectMustBeValidatedToVersion', ucfirst($langs->transnoentities('The' . ucfirst($object->element))))) . '">' . $displayButton . '</span>';
@@ -482,7 +487,7 @@ if ($action == 'create') {
 			print '<div class="fichecenter"><div class="fichehalfleft">';
 			// Documents.
 			$objRef    = dol_sanitizeFileName($object->ref);
-			$dirFiles  = $object->element . 'document/' . $objRef;
+			$dirFiles  = 'accidentinvestigationdocument/' . $objRef;
 			$fileDir   = $upload_dir . '/' . $dirFiles;
 			$urlSource = $_SERVER['PHP_SELF'] . '?id=' . $object->id;
 

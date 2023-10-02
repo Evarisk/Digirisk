@@ -32,6 +32,7 @@ if (file_exists('../../digiriskdolibarr.main.inc.php')) {
 
 // Load Dolibarr libraries
 require_once DOL_DOCUMENT_ROOT . '/core/class/html.formfile.class.php';
+require_once DOL_DOCUMENT_ROOT . '/projet/class/project.class.php';
 
 // Load DigiriskDolibarr librairies
 require_once __DIR__ . '/../../class/accident.class.php';

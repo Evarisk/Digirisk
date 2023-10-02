@@ -61,11 +61,12 @@ class AccidentInvestigation extends SaturneObject
 	*/
 	public string $picto = 'fontawesome_fa-search_fas_#d35968';
 
-	public const STATUS_DELETED   = -1;
-	public const STATUS_DRAFT     = 0;
-	public const STATUS_VALIDATED = 1;
-	public const STATUS_LOCKED    = 2;
-	public const STATUS_ARCHIVED  = 3;
+	public const STATUS_DELETED    = -1;
+	public const STATUS_DRAFT      = 0;
+	public const STATUS_VALIDATED  = 1;
+    public const STATUS_LOCKED     = 2;
+    public const STATUS_CLASSIFIED = 3;
+	public const STATUS_ARCHIVED   = 3;
 
 	/**
 	 * 'type' field format:
@@ -129,9 +130,10 @@ class AccidentInvestigation extends SaturneObject
 		'circumstances'         => ['type' => 'html',         'label' => 'Circumstances',          'enabled' => 1, 'position' => 160, 'notnull' => 0, 'visible' => -1,],
 		'causality_tree'        => ['type' => 'text',         'label' => 'CausalityTree',          'enabled' => 1, 'position' => 170, 'notnull' => 0, 'visible' => 0,],
 		'fk_accident'           => ['type' => 'integer:Accident:digiriskdolibarr/class/accident/accident.class.php', 'label' => 'Accident', 'picto' => 'fontawesome_fa-user-injured_fas' ,'enabled' => 1, 'position' => 11, 'notnull' => 1, 'visible' => 1, 'foreignkey' => 'digiriskdolibarr_accident.rowid', 'css' => 'maxwidth300'],
-		'fk_task'               => ['type' => 'integer:Task:projet/class/task.class.php', 'label' => 'Task',       'picto' => 'Task', 'enabled' => 1, 'position' => 12, 'notnull' => 1, 'visible' => 4,  'noteditable' => 1, 'foreignkey' => 'projet_task.rowid', 'help' => 'TaskWillBeCreatedAfterValidation'],
-		'fk_user_creat'         => ['type' => 'integer:User:user/class/user.class.php',   'label' => 'UserAuthor', 'picto' => 'user', 'enabled' => 1, 'position' => 190, 'notnull' => 1, 'visible' => 0, 'foreignkey' => 'user.rowid'],
-		'fk_user_modif'         => ['type' => 'integer:User:user/class/user.class.php',   'label' => 'UserModif',  'picto' => 'user', 'enabled' => 1, 'position' => 200, 'notnull' => 0, 'visible' => 0, 'foreignkey' => 'user.rowid'],
+        'fk_task'               => ['type' => 'integer:Task:projet/class/task.class.php',       'label' => 'Task',       'picto' => 'task',    'enabled' => 1, 'position' => 12,  'notnull' => 1, 'visible' => 5,  'noteditable' => 1, 'foreignkey' => 'projet_task.rowid', 'help' => 'TaskWillBeCreatedAfterValidation'],
+        'fk_project'            => ['type' => 'integer:Project:projet/class/project.class.php', 'label' => 'Project',    'picto' => 'project', 'enabled' => 1, 'position' => 13,  'notnull' => 1, 'visible' => 0,],
+		'fk_user_creat'         => ['type' => 'integer:User:user/class/user.class.php',         'label' => 'UserAuthor', 'picto' => 'user',    'enabled' => 1, 'position' => 190, 'notnull' => 1, 'visible' => 0, 'foreignkey' => 'user.rowid'],
+		'fk_user_modif'         => ['type' => 'integer:User:user/class/user.class.php',         'label' => 'UserModif',  'picto' => 'user',    'enabled' => 1, 'position' => 200, 'notnull' => 0, 'visible' => 0, 'foreignkey' => 'user.rowid'],
 	];
 
 	/**
@@ -229,6 +231,11 @@ class AccidentInvestigation extends SaturneObject
 	 */
 	public int $fk_task = 0;
 
+    /**
+     * @var int Project ID.
+     */
+    public $fk_project;
+
 	/**
 	 * @var int|string Accident ID.
 	 */
@@ -267,7 +274,8 @@ class AccidentInvestigation extends SaturneObject
 
 		$signatory = new SaturneSignature($this->db, $moduleNameLowerCase, $this->element);
 
-		$result = $this->createCommon($user, $notrigger);
+        $this->fk_project = getDolGlobalInt('DIGIRISKDOLIBARR_ACCIDENT_PROJECT');
+		$result           = $this->createCommon($user, $notrigger);
 		if ($result > 0) {
 			$signatory->setSignatory($result, $this->element, 'user', [$user->id], 'Investigator', 1);
 		}
@@ -429,27 +437,22 @@ class AccidentInvestigation extends SaturneObject
 		if (empty($this->labelStatus) || empty($this->labelStatusShort)) {
 			global $langs;
 
-			$this->labelStatus[self::STATUS_DRAFT]          = $langs->transnoentitiesnoconv('StatusDraft');
-			$this->labelStatus[self::STATUS_VALIDATED]      = $langs->transnoentitiesnoconv('Validated');
-			$this->labelStatus[self::STATUS_LOCKED]         = $langs->transnoentitiesnoconv('Locked');
-			$this->labelStatus[self::STATUS_ARCHIVED]       = $langs->transnoentitiesnoconv('Classified');
-			$this->labelStatus[self::STATUS_DELETED]        = $langs->transnoentitiesnoconv('Deleted');
+			$this->labelStatus[self::STATUS_DRAFT]      = $langs->transnoentitiesnoconv('StatusDraft');
+			$this->labelStatus[self::STATUS_VALIDATED]  = $langs->transnoentitiesnoconv('Validated');
+			$this->labelStatus[self::STATUS_CLASSIFIED] = $langs->transnoentitiesnoconv('Classified');
+			$this->labelStatus[self::STATUS_DELETED]    = $langs->transnoentitiesnoconv('Deleted');
 
-			$this->labelStatusShort[self::STATUS_DRAFT]     = $langs->transnoentitiesnoconv('StatusDraft');
-			$this->labelStatusShort[self::STATUS_VALIDATED] = $langs->transnoentitiesnoconv('Validated');
-			$this->labelStatusShort[self::STATUS_LOCKED]    = $langs->transnoentitiesnoconv('Locked');
-			$this->labelStatusShort[self::STATUS_ARCHIVED]  = $langs->transnoentitiesnoconv('Classified');
-			$this->labelStatusShort[self::STATUS_DELETED]   = $langs->transnoentitiesnoconv('Deleted');
+			$this->labelStatusShort[self::STATUS_DRAFT]      = $langs->transnoentitiesnoconv('StatusDraft');
+			$this->labelStatusShort[self::STATUS_VALIDATED]  = $langs->transnoentitiesnoconv('Validated');
+			$this->labelStatusShort[self::STATUS_CLASSIFIED] = $langs->transnoentitiesnoconv('Classified');
+			$this->labelStatusShort[self::STATUS_DELETED]    = $langs->transnoentitiesnoconv('Deleted');
 		}
 
 		$statusType = 'status' . $status;
 		if ($status == self::STATUS_VALIDATED) {
 			$statusType = 'status4';
 		}
-		if ($status == self::STATUS_LOCKED) {
-			$statusType = 'status6';
-		}
-		if ($status == self::STATUS_ARCHIVED) {
+		if ($status == self::STATUS_CLASSIFIED) {
 			$statusType = 'status8';
 		}
 		if ($status == self::STATUS_DELETED) {
