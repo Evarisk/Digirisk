@@ -103,7 +103,7 @@ if ($action == 'setMediaInfos') {
  * View
  */
 
-$title    = $langs->trans("DigiriskdolibarrSetup");
+$title    = $langs->trans("ModuleSetup", $moduleName);
 $helpUrl  = 'FR:Module_Digirisk#Configuration';
 
 saturne_header(0,'', $title, $helpUrl);
@@ -111,11 +111,11 @@ saturne_header(0,'', $title, $helpUrl);
 // Subheader
 $linkback = '<a href="' . ($backtopage ?: DOL_URL_ROOT . '/admin/modules.php?restore_lastsearch_values=1') . '">' . $langs->trans("BackToModuleList") . '</a>';
 
-print load_fiche_titre($langs->trans($title), $linkback, 'digiriskdolibarr32px@digiriskdolibarr');
+print load_fiche_titre($langs->trans($title), $linkback, 'title_setup');
 
 // Configuration header
 $head = digiriskdolibarr_admin_prepare_head();
-print dol_get_fiche_head($head, 'settings', '', -1, "digiriskdolibarr@digiriskdolibarr");
+print dol_get_fiche_head($head, 'settings', $title, -1, "digiriskdolibarr_color@digiriskdolibarr");
 
 print '<div style="text-indent: 3em"><br>' . '<i class="fas fa-2x fa-calendar-alt" style="padding: 10px"></i>   ' . $langs->trans("AgendaModuleRequired") . '<br></div>';
 print '<div style="text-indent: 3em"><br>' . '<i class="fas fa-2x fa-tools" style="padding: 10px"></i>  ' . $langs->trans("HowToSetupOtherModules") . '  ' . '<a href=' . '"../../../admin/modules.php">' . $langs->trans('ConfigMyModules') . '</a>' . '<br></div>';
@@ -139,11 +139,7 @@ print $langs->trans('DigiriskDescription');
 print '</td>';
 
 print '<td class="center">';
-if ($conf->global->DIGIRISKDOLIBARR_REDIRECT_AFTER_CONNECTION) {
-	print '<a class="reposition" href="' . $_SERVER["PHP_SELF"] . '?action=setredirectafterconnection&value=0" alt="' . $langs->trans("Default") . '">' . img_picto($langs->trans("Activated"), 'switch_on') . '</a>';
-} else {
-	print '<a class="reposition" href="' . $_SERVER["PHP_SELF"] . '?action=setredirectafterconnection&value=1" alt="' . $langs->trans("Default") . '">' . img_picto($langs->trans("Disabled"), 'switch_off') . '</a>';
-}
+print ajax_constantonoff('DIGIRISKDOLIBARR_REDIRECT_AFTER_CONNECTION');
 print '</td>';
 print '</tr>';
 

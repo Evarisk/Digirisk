@@ -114,18 +114,18 @@ if (isModEnabled('project')) {
 
 $form = new Form($db);
 
+$title    = $langs->trans("ModuleSetup", $moduleName);
 $helpUrl = 'FR:Module_Digirisk';
-$title    = $langs->trans("Accident");
 
 saturne_header(0,'', $title, $helpUrl);
 
 // Subheader
 $linkback = '<a href="' . ($backtopage ?: DOL_URL_ROOT . '/admin/modules.php?restore_lastsearch_values=1') . '">' . $langs->trans("BackToModuleList") . '</a>';
-print load_fiche_titre($title, $linkback, 'digiriskdolibarr32px@digiriskdolibarr');
+print load_fiche_titre($title, $linkback, 'title_setup');
 
 // Configuration header
 $head = digiriskdolibarr_admin_prepare_head();
-print dol_get_fiche_head($head, 'accident', '', -1, "digiriskdolibarr@digiriskdolibarr");
+print dol_get_fiche_head($head, 'accident', $title, -1, "digiriskdolibarr_color@digiriskdolibarr");
 
 print load_fiche_titre('<i class="fas fa-user-injured"></i> ' . $langs->trans("AccidentManagement"), '', '');
 print '<hr>';

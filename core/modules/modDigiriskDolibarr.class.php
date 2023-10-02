@@ -848,7 +848,8 @@ class modDigiriskdolibarr extends DolibarrModules
 			$i++ => ['DIGIRISKDOLIBARR_ACCIDENTINVESTIGATIONDOCUMENT_ADDON', 'chaine', 'mod_accident_investigation_document_standard', '', 0, 'current'],
 			$i++ => ['DIGIRISKDOLIBARR_ACCIDENTINVESTIGATIONDOCUMENT_ADDON_ODT_PATH','chaine', 'DOL_DOCUMENT_ROOT/custom/digiriskdolibarr/documents/doctemplates/accidentinvestigationdocument/', '', 0, 'current'],
 			$i++ => ['DIGIRISKDOLIBARR_ACCIDENTINVESTIGATIONDOCUMENT_CUSTOM_ADDON_ODT_PATH', 'chaine', 'DOL_DATA_ROOT' . (($conf->entity == 1 ) ? '/' : '/' . $conf->entity . '/') . 'ecm/digiriskdolibarr/accidentinvestigationdocument/', '', 0, 'current'],
-			$i   => ['DIGIRISKDOLIBARR_ACCIDENTINVESTIGATIONDOCUMENT_DEFAULT_MODEL', 'chaine', 'template_accidentinvestigationdocument_odt', '', 0, 'current']
+            $i++ => ['DIGIRISKDOLIBARR_ACCIDENTINVESTIGATIONDOCUMENT_DEFAULT_MODEL', 'chaine', 'template_accidentinvestigationdocument_odt', '', 0, 'current'],
+            $i   => ['DIGIRISKDOLIBARR_CUSTOM_NUM_REF_SET', 'integer', 0, '', 0, 'current'],
 		];
 
 		if ( ! isset($conf->digiriskdolibarr) || ! isset($conf->digiriskdolibarr->enabled) ) {
@@ -862,7 +863,7 @@ class modDigiriskdolibarr extends DolibarrModules
 		$pictoDigirisk = img_picto('', $pictopath, '', 1, 0, 0, '', 'pictoModule');
 		$this->tabs[] = ['data' => 'mycompany_admin:+security:'. $pictoDigirisk . $langs->trans('Security').':digiriskdolibarr@digiriskdolibarr:1:/custom/digiriskdolibarr/admin/securityconf.php'];  			// To add a new tab identified by code tabname1
 		$this->tabs[] = ['data' => 'mycompany_admin:+social:'. $pictoDigirisk .$langs->trans('Social').':digiriskdolibarr@digiriskdolibarr:1:/custom/digiriskdolibarr/admin/socialconf.php'];  					// To add a new tab identified by code tabname1
-		$this->tabs[] = ['data' => 'thirdparty:+openinghours:'. $pictoDigirisk .$langs->trans('Schedules').':digiriskdolibarr@digiriskdolibarr:1:/custom/saturne/view/saturne_schedules.php?id=__ID__&element_type=societe&module_name=societe']; // To add a new tab identified by code tabname1
+		$this->tabs[] = ['data' => 'thirdparty:+schedules:'. $pictoDigirisk .$langs->trans('Schedules').':digiriskdolibarr@digiriskdolibarr:1:/custom/saturne/view/saturne_schedules.php?id=__ID__&element_type=societe&module_name=societe']; // To add a new tab identified by code tabname1
 		$this->tabs[] = ['data' => 'user:+participation:'. $pictoDigirisk .$langs->trans('GP/UTParticipation').':digiriskdolibarr@digiriskdolibarr:1:/custom/digiriskdolibarr/view/digiriskelement/digiriskelement_evaluator.php?fromid=__ID__']; // To add a new tab identified by code tabname1
 		$this->tabs[] = ['data' => 'user:+accidents:'. $pictoDigirisk .$langs->trans('Accidents').':digiriskdolibarr@digiriskdolibarr:1:/custom/digiriskdolibarr/view/accident/accident_list.php?fromiduser=__ID__']; // To add a new tab identified by code tabname1
 
@@ -1594,7 +1595,8 @@ class modDigiriskdolibarr extends DolibarrModules
 		delDocumentModel('listingrisksphoto_odt', 'listingrisksphoto');
 		delDocumentModel('riskassessmentdocument_odt', 'riskassessmentdocument');
 		delDocumentModel('ticketdocument_odt', 'ticketdocument');
-		delDocumentModel('orque_projectdocument', 'project');
+        delDocumentModel('orque_projectdocument', 'project');
+        delDocumentModel('orque_projectdocument', 'projectdocument');
 		delDocumentModel('accidentinvestigationdocument_odt', 'accidentinvestigationdocument');
 
 		addDocumentModel('informationssharing_odt', 'informationssharing', 'ODT templates', 'DIGIRISKDOLIBARR_INFORMATIONSSHARING_ADDON_ODT_PATH');
@@ -1608,7 +1610,7 @@ class modDigiriskdolibarr extends DolibarrModules
 		addDocumentModel('listingrisksphoto_odt', 'listingrisksphoto', 'ODT templates', 'DIGIRISKDOLIBARR_LISTINGRISKSPHOTO_ADDON_ODT_PATH');
 		addDocumentModel('riskassessmentdocument_odt', 'riskassessmentdocument', 'ODT templates', 'DIGIRISKDOLIBARR_RISKASSESSMENTDOCUMENT_ADDON_ODT_PATH');
 		addDocumentModel('ticketdocument_odt', 'ticketdocument', 'ODT templates', 'DIGIRISKDOLIBARR_TICKETDOCUMENT_ADDON_ODT_PATH');
-		addDocumentModel('orque_projectdocument', 'project', 'orque');
+		addDocumentModel('orque_projectdocument', 'projectdocument', 'orque');
 		addDocumentModel('accidentinvestigationdocument_odt', 'accidentinvestigationdocument', 'ODT templates', 'DIGIRISKDOLIBARR_ACCIDENTINVESTIGATIONDOCUMENT_ADDON_ODT_PATH');
 
 		if ( $conf->global->DIGIRISKDOLIBARR_DIGIRISKELEMENT_TRASH == 0 ) {
@@ -2144,6 +2146,30 @@ class modDigiriskdolibarr extends DolibarrModules
 		$externalmodule = !empty($conf->global->MULTICOMPANY_EXTERNAL_MODULES_SHARING) ? array_merge($externalmodule, $params) : $params;
 		$jsonformat = json_encode($externalmodule);
 		dolibarr_set_const($this->db, "MULTICOMPANY_EXTERNAL_MODULES_SHARING", $jsonformat, 'json', 0, '', 0);
+
+        //BACKWARD NUM REF
+        if ($conf->global->DIGIRISKDOLIBARR_CUSTOM_NUM_REF_SET == 0) {
+            $objectTypeAndMod = [
+                'Risk' => ['tarqeq', 'RK{0}'],
+                'RiskAssessment' => ['jarnsaxa', 'RA{0}'],
+                'RiskSign' => ['greip', 'RS{0}'],
+                'Evaluator' => ['bebhionn', 'EV{0}'],
+                'Groupment' => ['sirius', 'GP{0}'],
+                'WorkUnit' => ['canopus', 'WU{0}'],
+            ];
+
+            foreach($objectTypeAndMod as $type => $mod) {
+                $confNumRef = 'DIGIRISKDOLIBARR_' . strtoupper($type) . '_' . strtoupper($mod[0]) . '_ADDON';
+                $confObjectRef = 'DIGIRISKDOLIBARR_' . strtoupper($type) . '_ADDON';
+                $prefix = $mod[1];
+
+               dolibarr_set_const($this->db, $confNumRef, $prefix, 'chaine', 0, '', $conf->entity);
+               dolibarr_set_const($this->db, $confObjectRef, 'mod_'. strtolower($type) .'_' . $mod[0], 'chaine', 0, '', $conf->entity);
+
+            }
+            dolibarr_set_const($this->db, 'DIGIRISKDOLIBARR_CUSTOM_NUM_REF_SET', 1, 'integer', 0, '', $conf->entity);
+        }
+
 		return $this->_init($sql, $options);
 	}
 

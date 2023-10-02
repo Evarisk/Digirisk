@@ -123,7 +123,6 @@
 		<div class="notice-close"><i class="fas fa-times"></i></div>
 	</div>
 </div>
-
 <div class="messageSuccessRiskEdit notice hidden">
 	<div class="wpeo-notice notice-success risk-edit-success-notice">
 		<input type="hidden" class="valueForEditRisk1" value="<?php echo $langs->trans('TheRisk') . ' ' ?>">
@@ -290,7 +289,6 @@
 		<div class="notice-close"><i class="fas fa-times"></i></div>
 	</div>
 </div>
-
 
 <?php
 

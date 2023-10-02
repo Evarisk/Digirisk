@@ -73,7 +73,7 @@ $extrafields      = new ExtraFields($db);
 $project          = new Project($db);
 
 $numberingModuleName = [
-	$risksign->element => $conf->global->DIGIRISKDOLIBARR_RISKSIGN_ADDON,
+	'riskanalysis/' . $risksign->element => $conf->global->DIGIRISKDOLIBARR_RISKSIGN_ADDON,
 ];
 
 list($refRiskSignMod) = saturne_require_objects_mod($numberingModuleName, $moduleNameLowerCase);

@@ -296,7 +296,7 @@ class DigiriskResources extends SaturneObject
 	{
 		$resources = new DigiriskResources($this->db);
 
-		$links = $resources->fetchAll();
+		$links = $resources->fetchAll('', '', 0,0,['customsql' => ' status = 1']);
 
 		$allLinks = array();
 		if (!empty ($links) && $links > 0) {

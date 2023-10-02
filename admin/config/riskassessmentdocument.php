@@ -67,13 +67,40 @@ saturne_check_access($permissiontoread);
  * Actions
  */
 
+if (GETPOST('action') == 'updateMask') {
+    dolibarr_set_const($db, GETPOST('mask'), GETPOST('addon_value'), 'chaine', 0, '', $conf->entity);
+}
+
+if (GETPOST('action') == 'setmod') {
+    $value = GETPOST('value');
+    $valueArray = explode('_', $value);
+    $objectType = $valueArray[1];
+
+    dolibarr_set_const($db, 'DIGIRISKDOLIBARR_'. strtoupper($objectType) .'_ADDON', $value, 'chaine', 0, '', $conf->entity);
+}
+
 if (($action == 'update' && ! GETPOST("cancel", 'alpha')) || ($action == 'updateedit')) {
 	$DUProject             = GETPOST('DUProject', 'none');
 	$DUProject             = preg_split('/_/', $DUProject);
 	$evaluatorDuration     = GETPOST('EvaluatorDuration', 'alpha');
 	$taskTimeSpentDuration = GETPOST('TaskTimeSpentDuration', 'alpha');
 
-	dolibarr_set_const($db, "DIGIRISKDOLIBARR_DU_PROJECT", $DUProject[0], 'integer', 0, '', $conf->entity);
+    if ($DUProject[0] > 0 && $DUProject[0] != $conf->global->DIGIRISKDOLIBARR_DU_PROJECT) {
+        dolibarr_set_const($db, "DIGIRISKDOLIBARR_DU_PROJECT", $DUProject[0], 'integer', 0, '', $conf->entity);
+
+        $url = '/projet/tasks.php?id=' . $DUProject[0];
+
+        $sql = "UPDATE ".MAIN_DB_PREFIX."menu SET";
+        $sql .= " url='".$db->escape($url)."'";
+        $sql .= " WHERE leftmenu='digiriskactionplan'";
+        $sql .= " AND entity=" . $conf->entity;
+
+        $resql = $db->query($sql);
+        if (!$resql) {
+            $error = "Error ".$db->lasterror();
+            return -1;
+        }
+    }
 
 	if (!empty($evaluatorDuration) || $evaluatorDuration === '0') {
 		dolibarr_set_const($db, "DIGIRISKDOLIBARR_EVALUATOR_DURATION", $evaluatorDuration, 'integer', 0, '', $conf->entity);
@@ -106,18 +133,18 @@ if (isModEnabled('project')) {
 	$formproject = new FormProjets($db);
 }
 $formcompany = new FormCompany($db);
+$title    = $langs->trans("ModuleSetup", $moduleName);
 $helpUrl  = 'FR:Module_Digirisk#L.27onglet_Analyse_des_risques';
-$title    = $langs->trans("RiskAssessmentDocument");
 
 saturne_header(0,'', $title, $helpUrl);
 
 // Subheader
 $linkback = '<a href="' . ($backtopage ?: DOL_URL_ROOT . '/admin/modules.php?restore_lastsearch_values=1') . '">' . $langs->trans("BackToModuleList") . '</a>';
-print load_fiche_titre($title, $linkback, 'digiriskdolibarr32px@digiriskdolibarr');
+print load_fiche_titre($title, $linkback, 'title_setup');
 
 // Configuration header
 $head = digiriskdolibarr_admin_prepare_head();
-print dol_get_fiche_head($head, 'riskassessmentdocument', '', -1, "digiriskdolibarr@digiriskdolibarr");
+print dol_get_fiche_head($head, 'riskassessmentdocument', $title, -1, "digiriskdolibarr_color@digiriskdolibarr");
 
 
 // Risks
@@ -176,7 +203,8 @@ $constArray[$moduleNameLowerCase] = [
 	'ShowSharedRisks' => [
 		'name'        => 'ShowSharedRisks',
 		'description' => $langs->trans('ShowSharedRisksDescription') . (!$areRisksSharable ? '<br>' . img_picto('danger', 'fa-exclamation-triangle') . $langs->trans('DisabledSharedElement') : ''),
-		'code'        => ($areRisksSharable ? 'DIGIRISKDOLIBARR_SHOW_SHARED_RISKS' : ''),
+		'code'        => 'DIGIRISKDOLIBARR_SHOW_SHARED_RISKS',
+        'disabled'    => !$areRisksSharable
 	],
 ];
 
@@ -363,8 +391,10 @@ $constArray[$moduleNameLowerCase] = [
 	'ShowSharedRiskSigns' => [
 		'name'        => 'ShowSharedRiskSigns',
 		'description' => $langs->trans('ShowSharedRiskSignsDescription') . (!$areRisksSharable ? '<br>' . img_picto('danger', 'fa-exclamation-triangle') . $langs->trans('DisabledSharedElement') : ''),
-		'code'        => ($areRisksSharable ? 'DIGIRISKDOLIBARR_SHOW_SHARED_RISKSIGNS' : ''),
-	],
+		'code'        => 'DIGIRISKDOLIBARR_SHOW_SHARED_RISKSIGNS',
+        'disabled'    => !$areRisksSignsSharable
+
+    ],
 ];
 require __DIR__ . '/../../../saturne/core/tpl/admin/object/object_const_view.tpl.php';
 
