@@ -1595,7 +1595,8 @@ class modDigiriskdolibarr extends DolibarrModules
 		delDocumentModel('listingrisksphoto_odt', 'listingrisksphoto');
 		delDocumentModel('riskassessmentdocument_odt', 'riskassessmentdocument');
 		delDocumentModel('ticketdocument_odt', 'ticketdocument');
-		delDocumentModel('orque_projectdocument', 'project');
+        delDocumentModel('orque_projectdocument', 'project');
+        delDocumentModel('orque_projectdocument', 'projectdocument');
 		delDocumentModel('accidentinvestigationdocument_odt', 'accidentinvestigationdocument');
 
 		addDocumentModel('informationssharing_odt', 'informationssharing', 'ODT templates', 'DIGIRISKDOLIBARR_INFORMATIONSSHARING_ADDON_ODT_PATH');
@@ -1609,7 +1610,7 @@ class modDigiriskdolibarr extends DolibarrModules
 		addDocumentModel('listingrisksphoto_odt', 'listingrisksphoto', 'ODT templates', 'DIGIRISKDOLIBARR_LISTINGRISKSPHOTO_ADDON_ODT_PATH');
 		addDocumentModel('riskassessmentdocument_odt', 'riskassessmentdocument', 'ODT templates', 'DIGIRISKDOLIBARR_RISKASSESSMENTDOCUMENT_ADDON_ODT_PATH');
 		addDocumentModel('ticketdocument_odt', 'ticketdocument', 'ODT templates', 'DIGIRISKDOLIBARR_TICKETDOCUMENT_ADDON_ODT_PATH');
-		addDocumentModel('orque_projectdocument', 'project', 'orque');
+		addDocumentModel('orque_projectdocument', 'projectdocument', 'orque');
 		addDocumentModel('accidentinvestigationdocument_odt', 'accidentinvestigationdocument', 'ODT templates', 'DIGIRISKDOLIBARR_ACCIDENTINVESTIGATIONDOCUMENT_ADDON_ODT_PATH');
 
 		if ( $conf->global->DIGIRISKDOLIBARR_DIGIRISKELEMENT_TRASH == 0 ) {
