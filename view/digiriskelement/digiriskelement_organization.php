@@ -133,103 +133,109 @@ if (is_array($objects)) {
 } else {
 	$results = array();
 }
+
+
+if (!empty($results)) :
 ?>
+    <script>
+        $(document).ready(function() {
+            let organizationEdited = 0
 
-<script>
-	$(document).ready(function() {
-		let organizationEdited = 0
+            calcWidth($('#title0'));
 
-		calcWidth($('#title0'));
+            window.onresize = function(event) {
+                //method to execute one time after a timer
+            };
 
-		window.onresize = function(event) {
-			//method to execute one time after a timer
-		};
+            //recursively calculate the Width all titles
+            function calcWidth(obj){
 
-		//recursively calculate the Width all titles
-		function calcWidth(obj){
+                var titles =
+                    $(obj).siblings('.space').children('.route').children('.title');
 
-			var titles =
-				$(obj).siblings('.space').children('.route').children('.title');
+                $(titles).each(function(index, element){
+                    var pTitleWidth = parseInt($(obj).css('width'));
+                    var leftOffset = parseInt($(obj).siblings('.space').css('margin-left'));
 
-			$(titles).each(function(index, element){
-				var pTitleWidth = parseInt($(obj).css('width'));
-				var leftOffset = parseInt($(obj).siblings('.space').css('margin-left'));
+                    var newWidth = pTitleWidth - leftOffset;
 
-				var newWidth = pTitleWidth - leftOffset;
+                    if ($(obj).attr('id') == 'title0'){
+                        console.log("called");
 
-				if ($(obj).attr('id') == 'title0'){
-					console.log("called");
+                        newWidth = newWidth - 10;
+                    }
 
-					newWidth = newWidth - 10;
-				}
+                    $(element).css({
+                        'width': newWidth,
+                    })
 
-				$(element).css({
-					'width': newWidth,
-				})
+                    calcWidth(element);
+                });
 
-				calcWidth(element);
-			});
+            }
 
-		}
+            $('.space').sortable({
+                connectWith:'.space:not("'+'.workunit'+'")',
+                tolerance:'intersect',
+                over:function(event,ui){
+                    $('.save-organization').removeClass('button-disable')
+                    $('.save-organization').attr('style','z-index:1050')
+                    $('.save-organization .fas').attr('style','display:none')
+                },
+                receive:function(event, ui){
+                    organizationEdited++
+                    if (organizationEdited == 1) {
+                        $('a').click(function(e) {
+                            if (confirm("Modifications non enregistrées") == false) {
+                                e.preventDefault();
+                            }
+                        })
+                    }
+                    calcWidth($(this).siblings('.title'));
+                },
 
-		$('.space').sortable({
-			connectWith:'.space:not("'+'.workunit'+'")',
-			tolerance:'intersect',
-			over:function(event,ui){
-				$('.save-organization').removeClass('button-disable')
-				$('.save-organization').attr('style','z-index:1050')
-				$('.save-organization .fas').attr('style','display:none')
-			},
-			receive:function(event, ui){
-				organizationEdited++
-				if (organizationEdited == 1) {
-					$('a').click(function(e) {
-						if (confirm("Modifications non enregistrées") == false) {
-							e.preventDefault();
-						}
-					})
-				}
-				calcWidth($(this).siblings('.title'));
-			},
+            });
 
-		});
+            $('.space').disableSelection();
 
-		$('.space').disableSelection();
-
-	})
-</script>
-<div class="messageSuccessOrganizationSaved notice hidden">
-	<div class="wpeo-notice notice-success organization-saved-success-notice">
-		<div class="notice-content">
-			<div class="notice-title"><?php echo $langs->trans('OrganizationSaved') ?></div>
-			<div class="notice-subtitle">
-				<span class="text"></span>
-			</div>
-		</div>
-		<div class="notice-close"><i class="fas fa-times"></i></div>
-	</div>
-</div>
-<div class="messageErrorOrganizationSaved notice hidden">
-	<div class="wpeo-notice notice-error organization-saved-error-notice">
-		<div class="notice-content">
-			<div class="notice-title"><?php echo $langs->trans('OrganizationNotSaved') ?></div>
-			<div class="notice-subtitle">
-				<span class="text"></span>
-			</div>
-		</div>
-		<div class="notice-close"><i class="fas fa-times"></i></div>
-	</div>
-</div>
-<div class='container'>
-	<input type="hidden" name="token" value="<?php echo newToken() ?>">
-	<h3 class='title' id='title0'><?php echo $conf->global->MAIN_INFO_SOCIETE_NOM ?></h3>
-	<ul class='space space-0 first-space ui-sortable' id='space0' value="0">
-		<?php display_recurse_tree_organization($results) ?>
-	</ul>
-</div>
+        })
+    </script>
+    <div class="messageSuccessOrganizationSaved notice hidden">
+        <div class="wpeo-notice notice-success organization-saved-success-notice">
+            <div class="notice-content">
+                <div class="notice-title"><?php echo $langs->trans('OrganizationSaved') ?></div>
+                <div class="notice-subtitle">
+                    <span class="text"></span>
+                </div>
+            </div>
+            <div class="notice-close"><i class="fas fa-times"></i></div>
+        </div>
+    </div>
+    <div class="messageErrorOrganizationSaved notice hidden">
+        <div class="wpeo-notice notice-error organization-saved-error-notice">
+            <div class="notice-content">
+                <div class="notice-title"><?php echo $langs->trans('OrganizationNotSaved') ?></div>
+                <div class="notice-subtitle">
+                    <span class="text"></span>
+                </div>
+            </div>
+            <div class="notice-close"><i class="fas fa-times"></i></div>
+        </div>
+    </div>
+    <div class='container'>
+        <input type="hidden" name="token" value="<?php echo newToken() ?>">
+        <h3 class='title' id='title0'><?php echo $conf->global->MAIN_INFO_SOCIETE_NOM ?></h3>
+        <ul class='space space-0 first-space ui-sortable' id='space0' value="0">
+            <?php display_recurse_tree_organization($results) ?>
+        </ul>
+    </div>
 <?php
 print '<hr>';
 print '<button class="save-organization wpeo-button button-disable" style="">' . $langs->trans('Save') . '  <i style="display:none" class="fas fa-times"></i><i style="display:none" class="fas fa-check"></i></button>';
+
+else :
+print $langs->trans('YouDontHaveOrganization');
+endif;
 
 // End of page
 llxFooter();

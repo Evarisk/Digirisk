@@ -136,7 +136,7 @@ window.digiriskdolibarr.ticket.tmpStockFile = function( ) {
 		formData.append('files[]', file)
 	}
 	var ticket_id      = $('#ticket_id').val()
-	let querySeparator = window.saturne.toolbox.getQuerySeparator()
+	let querySeparator = window.saturne.toolbox.getQuerySeparator(document.URL)
 
 	window.saturne.loader.display($('.files-uploaded'));
 
@@ -160,7 +160,7 @@ window.digiriskdolibarr.ticket.removeFile = function( event ) {
 	let filetodelete   = $(this).attr('value');
 	filetodelete       = filetodelete.replace('_mini', '')
 	let ticket_id      = $('#ticket_id').val()
-	let querySeparator = window.saturne.toolbox.getQuerySeparator()
+	let querySeparator = window.saturne.toolbox.getQuerySeparator(document.URL)
 
 	fetch(document.URL + querySeparator + 'action=removefile&filetodelete='+filetodelete+'&ticket_id='+ticket_id, {
 		method: 'POST',
@@ -183,7 +183,7 @@ window.digiriskdolibarr.ticket.addDashBoardTicketInfo = function() {
 	let selectTitle       = $('#select2-boxcombo-container').attr('title')
 	let digiriskelementID = selectTitle.split(' : ')[0];
 	let catID             = selectTitle.split(' : ')[2];
-	let querySeparator    = window.saturne.toolbox.getQuerySeparator()
+	let querySeparator    = window.saturne.toolbox.getQuerySeparator(document.URL)
 
 	$.ajax({
 		url: document.URL + querySeparator + 'action=adddashboardinfo&token='+token,
@@ -216,7 +216,7 @@ window.digiriskdolibarr.ticket.closeDashBoardTicketInfo = function() {
 	let box               = $(this);
 	let digiriskelementID = box.attr('data-digiriskelementid');
 	let catID             = box.attr('data-catid');
-	let querySeparator    = window.saturne.toolbox.getQuerySeparator()
+	let querySeparator    = window.saturne.toolbox.getQuerySeparator(document.URL)
 
 	$.ajax({
 		url: document.URL + querySeparator + 'action=closedashboardinfo&token='+token,
