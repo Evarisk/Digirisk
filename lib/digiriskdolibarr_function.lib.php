@@ -209,8 +209,8 @@ function display_recurse_tree($digiriskElementTree)
 	global $conf, $langs, $user, $moduleNameLowerCase;
 
 	$numberingModules = [
-		'digiriskelement/workunit' => $conf->global->DIGIRISKDOLIBARR_WORKUNIT_ADDON,
 		'digiriskelement/groupment' => $conf->global->DIGIRISKDOLIBARR_GROUPMENT_ADDON,
+		'digiriskelement/workunit' => $conf->global->DIGIRISKDOLIBARR_WORKUNIT_ADDON,
 	];
 
 	list($modGroupment, $modWorkUnit) = saturne_require_objects_mod($numberingModules, $moduleNameLowerCase);
@@ -231,58 +231,10 @@ function display_recurse_tree($digiriskElementTree)
 					<div class="spacer"></div>
 					<?php }
 					print '<span class="open-media-gallery add-media modal-open photo digirisk-element-photo-'. $element['object']->id .'" value="0">';
-					print '<input type="hidden" class="modal-options" data-modal-to-open="media_gallery" data-from-id="'. $element['object']->id .'" data-from-type="'. $element['object']->element_type .'" data-from-subtype="'. $element['object']->element_type .'" data-from-subdir="" data-photo-class="digirisk-element-photo-'. $element['object']->id .'"/>';
+					print '<input type="hidden" class="modal-options" data-modal-to-open="media_gallery" data-from-id="'. $element['object']->id .'" data-from-type="'. $element['object']->element_type .'" data-from-subtype="photo" data-from-subdir="" data-photo-class="digirisk-element-photo-'. $element['object']->id .'"/>';
 					print saturne_show_medias_linked('digiriskdolibarr', $conf->digiriskdolibarr->multidir_output[$conf->entity] . '/' . $element['object']->element_type . '/' . $element['object']->ref, 'small', 1, 0, 0, 0, 50, 50, 1, 0, 0, $element['object']->element_type . '/' . $element['object']->ref, $element['object'], 'photo', 0, 0, 0, 1);
 					print '</span>';
 					?>
-					<div class="digirisk-element-medias-modal" style="z-index:1500" value="<?php echo $element['object']->id ?>">
-							<div class="wpeo-modal"  id="digirisk_element_medias_modal_<?php echo $element['object']->id ?>" value="<?php echo $element['object']->id ?>" style="z-index: 1005 !important">
-								<div class="modal-container wpeo-modal-event">
-									<!-- Modal-Header -->
-									<div class="modal-header">
-										<h2 class="modal-title"><?php echo $langs->trans('DigiriskElementMedias') . ' ' . $element['object']->ref ?></h2>
-										<div class="wpeo-button open-media-gallery add-media modal-open" value="<?php echo $element['object']->id ?>">
-											<input type="hidden" class="type-from" value="digiriskelement"/>
-											<span><i class="fas fa-camera"></i>  <?php echo $langs->trans('AddMedia') ?></span>
-										</div>
-										<div class="modal-close"><i class="fas fa-times"></i></div>
-									</div>
-									<!-- Modal Content-->
-									<div class="modal-content" id="#modalContent<?php echo $element['object']->id ?>">
-										<div class="messageSuccessSavePhoto notice hidden">
-											<div class="wpeo-notice notice-success save-photo-success-notice">
-												<div class="notice-content">
-													<div class="notice-title"><?php echo $langs->trans('PhotoWellSaved') ?></div>
-												</div>
-												<div class="notice-close"><i class="fas fa-times"></i></div>
-											</div>
-										</div>
-										<div class="messageErrorSavePhoto notice hidden">
-											<div class="wpeo-notice notice-warning save-photo-error-notice">
-												<div class="notice-content">
-													<div class="notice-title"><?php echo $langs->trans('PhotoNotSaved') ?></div>
-												</div>
-												<div class="notice-close"><i class="fas fa-times"></i></div>
-											</div>
-										</div>
-										<div class="risk-evaluation-container">
-											<div class="risk-evaluation-header">
-											</div>
-											<div class="element-linked-medias element-linked-medias-<?php echo $element['object']->id ?> digirisk-element modal-media-linked">
-												<div class="medias"><i class="fas fa-picture-o"></i><?php echo $langs->trans('Medias'); ?></div>
-												<?php print saturne_show_medias_linked('digiriskdolibarr', $conf->digiriskdolibarr->multidir_output[$conf->entity] . '/' . $element['object']->element_type . '/', 'small', 0, 0, 0, 0, 150, 150, 1, 0, 0, $element['object']->element_type, $element['object']); ?>
-											</div>
-										</div>
-									</div>
-									<!-- Modal-Footer -->
-									<div class="modal-footer">
-										<div class="wpeo-button modal-close button-blue">
-											<i class="fas fa-times"></i> <?php echo $langs->trans('CloseModal'); ?>
-										</div>
-									</div>
-								</div>
-							</div>
-						</div>
 					<div class="title" id="scores" value="<?php echo $element['object']->id ?>">
 						<?php
 						if ($user->rights->digiriskdolibarr->risk->read) : ?>

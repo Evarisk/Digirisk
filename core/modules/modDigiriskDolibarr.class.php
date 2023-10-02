@@ -430,7 +430,9 @@ class modDigiriskdolibarr extends DolibarrModules
 				'preventionplanschedules',
 				'firepermitschedules',
 				'digiriskdolibarradmindocuments',
-				'digiriskelementview',
+                'digiriskelementview',
+                'digiriskelementdocument',
+                'digiriskelementagenda',
 				'digiriskstandardview'
 			],
 			'tabs' => [
@@ -605,10 +607,12 @@ class modDigiriskdolibarr extends DolibarrModules
 			$i++ => array('DIGIRISKDOLIBARR_FIREPERMITDOCUMENT_DEFAULT_MODEL', 'chaine', 'firepermitdocument_odt', '', 0, 'current'),
 
 			//CONST DIGIRISKELEMENT
-			140 => array('DIGIRISKDOLIBARR_DIGIRISKELEMENT_MEDIAS_BACKWARD_COMPATIBILITY', 'integer', 0, '', 0, 'current'),
-			141 => array('DIGIRISKDOLIBARR_DIGIRISKELEMENT_TRASH', 'integer', 0, '', 0, 'current'),
-			142 => array('DIGIRISKDOLIBARR_DIGIRISKELEMENT_TRASH_UPDATED', 'integer', 0, '', 0, 'current'),
-			143 => array('DIGIRISKDOLIBARR_SHOW_HIDDEN_DIGIRISKELEMENT', 'integer', 0, '', 0, 'current'),
+			$i++ => array('DIGIRISKDOLIBARR_DIGIRISKELEMENT_MEDIAS_BACKWARD_COMPATIBILITY', 'integer', 0, '', 0, 'current'),
+			$i++ => array('DIGIRISKDOLIBARR_DIGIRISKELEMENT_TRASH', 'integer', 0, '', 0, 'current'),
+			$i++ => array('DIGIRISKDOLIBARR_DIGIRISKELEMENT_TRASH_UPDATED', 'integer', 0, '', 0, 'current'),
+			$i++ => array('DIGIRISKDOLIBARR_SHOW_HIDDEN_DIGIRISKELEMENT', 'integer', 0, '', 0, 'current'),
+            $i++ => ['DIGIRISKDOLIBARR_MAIN_AGENDA_ACTIONAUTO_DIGIRISKSIGNATURE_PENDING_SIGNATURE', 'integer', 1, '', 0, 'current'],
+            $i++ => ['DIGIRISKDOLIBARR_MAIN_AGENDA_ACTIONAUTO_DIGIRISKELEMENT_CREATE', 'integer', 1, '', 0, 'current'],
 
 			// CONST GROUPMENT
 			$i++ => ['DIGIRISKDOLIBARR_GROUPMENT_ADDON', 'chaine', 'mod_groupment_standard', '', 0, 'current'],

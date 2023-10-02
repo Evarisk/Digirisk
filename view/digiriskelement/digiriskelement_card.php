@@ -75,6 +75,7 @@ if ( $object->element_type == 'groupment') {
 } elseif (  $object->element_type == 'workunit' ) {
 	$document = new WorkUnitDocument($db);
 }
+
 // Fetch optionals attributes and labels
 $extrafields->fetch_name_optionals_label($object->table_element);
 
@@ -340,30 +341,9 @@ if ((empty($action) || ($action != 'edit' && $action != 'create'))) {
 
 	// Object card
 	// ------------------------------------------------------------
-	$width = 80; $height = 80; $cssclass = 'photoref';
-	dol_strlen($object->label) ? $morehtmlref = ' - ' . $object->label : '';
+    list($morehtmlref, $moreParams) = $object->getBannerTabContent();
 
-	// Project
-	$morehtmlref = '<div class="refidno">';
-	$project->fetch($conf->global->DIGIRISKDOLIBARR_DU_PROJECT);
-	$morehtmlref .= $langs->trans('Project') . ' : ' . getNomUrlProject($project, 1, 'blank', 1);
-
-	// ParentElement
-	$parent_element = new DigiriskElement($db);
-	$result         = $parent_element->fetch($object->fk_parent);
-	if ($result > 0) {
-		$morehtmlref .= '<br>' . $langs->trans("Description") . ' : ' . $object->description;
-		$morehtmlref .= '<br>' . $langs->trans("ParentElement") . ' : ' . $parent_element->getNomUrl(1, 'blank', 1);
-	} else {
-		$digiriskstandard->fetch($conf->global->DIGIRISKDOLIBARR_ACTIVE_STANDARD);
-		$morehtmlref .= '<br>' . $langs->trans("Description") . ' : ' . $object->description;
-		$morehtmlref .= '<br>' . $langs->trans("ParentElement") . ' : ' . $digiriskstandard->getNomUrl(1, 'blank', 1);
-	}
-	$morehtmlref .= '</div>';
-
-	$linkback = '<a href="' . dol_buildpath('/digiriskdolibarr/view/digiriskelement/risk_list.php', 1) . '">' . $langs->trans("BackToList") . '</a>';
-
-	saturne_banner_tab($object,'ref','', 1, 'ref', 'ref', $morehtmlref, true);
+	saturne_banner_tab($object,'ref','', 1, 'ref', 'ref', $morehtmlref, true, $moreParams);
 
 	print '<div class="fichecenter">';
 	print '<div class="fichehalfleft">';
@@ -392,7 +372,7 @@ if ((empty($action) || ($action != 'edit' && $action != 'create'))) {
 	print '</div>';
 	print '</span>';
 	print '&nbsp';
-	print saturne_show_medias_linked('digiriskdolibarr', $conf->digiriskdolibarr->multidir_output[$conf->entity] . '/' . $object->element_type . '/' . $object->ref, 'small', 5, 0, 0, 0, 50, 50, 0, 0, 0, $object->element_type . '/'. $object->ref . '/', $object, 'photo', $object->status != $object::STATUS_LOCKED, $permissiontodelete && $object->status != $object::STATUS_LOCKED);
+    print saturne_show_medias_linked('digiriskdolibarr', $conf->digiriskdolibarr->multidir_output[$conf->entity] . '/' . $object->element_type . '/' . $object->ref, 'small', 5, 0, 0, 0, 50, 50, 0, 0, 0, $object->element_type . '/'. $object->ref . '/', $object, 'photo', $object->status != $object::STATUS_LOCKED, $permissiontodelete && $object->status != $object::STATUS_LOCKED);
 	print '</td></tr>';
 
 	// Other attributes. Fields from hook formObjectOptions and Extrafields.

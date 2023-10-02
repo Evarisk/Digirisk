@@ -398,29 +398,9 @@ if ($object->id > 0) {
 	saturne_get_fiche_head($object, 'elementRiskSign', $title);
 	// Object card
 	// ------------------------------------------------------------
-	$height = 80;
-	$width = 80;
-	dol_strlen($object->label) ? $morehtmlref = ' - ' . $object->label : '';
-	// Project
-	$morehtmlref = '<div class="refidno">';
-	$project->fetch($conf->global->DIGIRISKDOLIBARR_DU_PROJECT);
-	$morehtmlref .= $langs->trans('Project') . ' : ' . getNomUrlProject($project, 1, 'blank', 1);
-	// ParentElement
-	$parent_element = new DigiriskElement($db);
-	$result = $parent_element->fetch($object->fk_parent);
-	if ($result > 0) {
-		$morehtmlref .= '<br>' . $langs->trans("Description") . ' : ' . $object->description;
-		$morehtmlref .= '<br>' . $langs->trans("ParentElement") . ' : ' . $parent_element->getNomUrl(1, 'blank', 1);
-	} else {
-		$digiriskstandard->fetch($conf->global->DIGIRISKDOLIBARR_ACTIVE_STANDARD);
-		$morehtmlref .= '<br>' . $langs->trans("Description") . ' : ' . $object->description;
-		$morehtmlref .= '<br>' . $langs->trans("ParentElement") . ' : ' . $digiriskstandard->getNomUrl(1, 'blank', 1);
-	}
-	$morehtmlref .= '</div>';
+    list($morehtmlref, $moreParams) = $object->getBannerTabContent();
 
-	$linkback = '<a href="' . dol_buildpath('/digiriskdolibarr/view/digiriskelement/risk_list.php', 1) . '">' . $langs->trans("BackToList") . '</a>';
-
-	saturne_banner_tab($object,'ref','', 1, 'ref', 'ref', $morehtmlref, true);
+    saturne_banner_tab($object,'ref','', 1, 'ref', 'ref', $morehtmlref, true, $moreParams);
 
 	// Buttons for actions
 	print '<div class="tabsAction" >';

@@ -36,11 +36,15 @@ global $langs, $user, $db;
 require_once DOL_DOCUMENT_ROOT . "/core/lib/admin.lib.php";
 
 require_once __DIR__ . '/../../lib/digiriskdolibarr.lib.php';
-require_once __DIR__ . '/../../class/digiriskelement/groupment.class.php';
+require_once __DIR__ . '/../../class/digiriskelement.class.php';
 require_once __DIR__ . '/../../class/digiriskelement/workunit.class.php';
+require_once __DIR__ . '/../../class/digiriskelement/groupment.class.php';
 
 // Translations
 saturne_load_langs(["admin"]);
+
+// Technical objects
+$digiriskelement = new DigiriskElement($db);
 
 // Parameters
 $backtopage = GETPOST('backtopage', 'alpha');
@@ -83,10 +87,7 @@ print load_fiche_titre($title, $linkback, 'title_setup');
 $head = digiriskdolibarr_admin_prepare_head();
 print dol_get_fiche_head($head, 'digiriskelement', $title, -1, "digiriskdolibarr_color@digiriskdolibarr");
 
-$pictos = array(
-	'groupment' => '<span class="ref" style="font-size: 10px; color: #fff; text-transform: uppercase; font-weight: 600; display: inline-block; background: #263C5C; padding: 0.2em 0.4em; line-height: 10px !important">GP</span> ',
-	'workunit' => '<span class="ref" style="background: #0d8aff;  font-size: 10px; color: #fff; text-transform: uppercase; font-weight: 600; display: inline-block;; padding: 0.2em 0.4em; line-height: 10px !important">WU</span> '
-);
+$pictos = $digiriskelement->getPicto();
 
 /*
  *  Numbering module

@@ -62,6 +62,12 @@ class Risk extends SaturneObject
 	 */
 	public int $isextrafieldmanaged = 1;
 
+    public const STATUS_DELETED   = -1;
+    public const STATUS_DRAFT     = 0;
+    public const STATUS_VALIDATED = 1;
+    public const STATUS_LOCKED    = 2;
+    public const STATUS_ARCHIVED  = 3;
+
 	/**
 	 * @var string String with name of icon for risk. Must be the part after the 'object_' into object_risk.png
 	 */

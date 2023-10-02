@@ -799,7 +799,7 @@ class ActionsDigiriskdolibarr
      */
     public function saturneBannerTab(array $parameters, $object)
     {
-        global $langs;
+        global $conf, $langs;
 
         // Do something only for the current context.
         if ($parameters['currentcontext'] == 'firepermitsignature') {
@@ -812,8 +812,16 @@ class ActionsDigiriskdolibarr
 
             $this->resprints = $moreHtmlRef;
         }
+        if (in_array($parameters['currentcontext'], ['digiriskelementdocument', 'digiriskelementagenda'])) {
+            list($moreHtmlRef, $moreParams) = $object->getBannerTabContent();
+            $object->fk_project = $conf->global->DIGIRISKDOLIBARR_DU_PROJECT;
 
-        return 0; // or return 1 to replace standard code.
+
+            $this->results = [$moreHtmlRef, $moreParams];
+
+        }
+
+            return 0; // or return 1 to replace standard code.
     }
 
 	/**
@@ -937,6 +945,7 @@ class ActionsDigiriskdolibarr
 	public function saturneCustomHeaderFunction(array $parameters, object $object): int
 	{
 		// Do something only for the current context.
+
 		if (in_array($parameters['currentcontext'], ['digiriskelementdocument', 'digiriskelementagenda'])) {
 			require_once __DIR__ . '/../lib/digiriskdolibarr_function.lib.php';
 

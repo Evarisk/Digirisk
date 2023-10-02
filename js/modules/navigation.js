@@ -152,6 +152,9 @@ window.digiriskdolibarr.navigation.redirect = function( event ) {
 
 	//get ID from div selected in left menu
 	history.pushState({ path:  document.URL}, '', this.href);
+
+  window.saturne.loader.display($('#cardContent'))
+
 	//change URL without refresh
 	if (!id) {
 		URLToGo = document.URL.split('?id=')[0];
@@ -164,6 +167,7 @@ window.digiriskdolibarr.navigation.redirect = function( event ) {
 	$.ajax({
 		url: URLToGo,
 		success: function( resp ) {
+      window.saturne.loader.remove($('#cardContent'))
 			$('#cardContent').html($(resp).find('#cardContent'))
 		},
 	});
