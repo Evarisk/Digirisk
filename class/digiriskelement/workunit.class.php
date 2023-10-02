@@ -33,8 +33,4 @@ class WorkUnit extends DigiriskElement
 	 */
 	public $element = 'workunit';
 
-	/**
-	 * @var string String with name of icon for workunit. Must be the part after the 'object_' into object_workunit.png
-	 */
-	public string $picto = 'workunit@digiriskdolibarr';
 }

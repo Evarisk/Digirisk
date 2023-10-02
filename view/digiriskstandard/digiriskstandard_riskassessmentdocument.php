@@ -499,7 +499,7 @@ if ($action == 'presend' && ! empty($document)) {
 		$topicmail = $outputlangs->trans($defaulttopic, '__REF__ (__REFCLIENT__)');
 	}
 
-	print load_fiche_titre($langs->trans($titreform), '', 'digiriskdolibarr32px@digiriskdolibarr', '', 'sendEmail');
+	print load_fiche_titre($langs->trans($titreform), '', 'digiriskdolibarr_color@digiriskdolibarr', '', 'sendEmail');
 
 	print dol_get_fiche_head('');
 

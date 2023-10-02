@@ -221,7 +221,7 @@ saturne_header(0, '', $title, $help_url);
 
 // Part to edit record
 if (($id || $ref) && $action == 'edit') {
-	print load_fiche_titre($title, '', "digiriskdolibarr32px@digiriskdolibarr");
+	print load_fiche_titre($title, '', "digiriskdolibarr_color@digiriskdolibarr");
 
 	print '<form method="POST" action="' . $_SERVER["PHP_SELF"] . '">';
 	print '<input type="hidden" name="token" value="' . newToken() . '">';

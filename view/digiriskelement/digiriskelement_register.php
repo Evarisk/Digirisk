@@ -33,6 +33,7 @@ if (file_exists('../digiriskdolibarr.main.inc.php')) {
 require_once DOL_DOCUMENT_ROOT . '/core/lib/functions2.lib.php';
 require_once DOL_DOCUMENT_ROOT . '/categories/class/categorie.class.php';
 require_once DOL_DOCUMENT_ROOT . '/projet/class/project.class.php';
+require_once DOL_DOCUMENT_ROOT . '/ticket/class/ticket.class.php';
 
 require_once __DIR__ . '/../../class/digiriskelement.class.php';
 require_once __DIR__ . '/../../class/digiriskstandard.class.php';
@@ -56,6 +57,7 @@ $object           = new DigiriskElement($db);
 $extrafields      = new ExtraFields($db);
 $digiriskstandard = new DigiriskStandard($db);
 $project          = new Project($db);
+$ticket           = new Ticket($db);
 
 $hookmanager->initHooks(array('digiriskelementregister', 'digiriskelementview', 'globalcard')); // Note that conf->hooks_modules contains array
 // Fetch optionals attributes and labels
@@ -122,7 +124,7 @@ if ($object->id > 0) {
 
 	saturne_banner_tab($object,'ref','', 1, 'ref', 'ref', $morehtmlref, true);
 
-	print load_fiche_titre($langs->trans("DashBoard"), '', 'digiriskdolibarr32px.png@digiriskdolibarr');
+	print load_fiche_titre($langs->trans("DashBoard"), '', $ticket->picto);
 
 	$digiriskelement = $object;
 

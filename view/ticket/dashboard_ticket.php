@@ -70,7 +70,7 @@ $morecss  = array("/digiriskdolibarr/css/digiriskdolibarr.css");
 
 llxHeader("", $langs->trans("DashBoard"), $help_url, '', '', '', $morejs, $morecss);
 
-print load_fiche_titre($langs->trans("DashBoard"), '', 'digiriskdolibarr32px.png@digiriskdolibarr');
+print load_fiche_titre($langs->trans("DashBoard"), '', 'digiriskdolibarr_color.png@digiriskdolibarr');
 
 /*
  * Dashboard Ticket

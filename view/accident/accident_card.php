@@ -639,7 +639,7 @@ saturne_header(0,'', $title, $helpUrl);
 
 // Part to create
 if ($action == 'create') {
-	print load_fiche_titre($langs->trans("NewAccident"), '', "digiriskdolibarr32px@digiriskdolibarr");
+	print load_fiche_titre($langs->trans("NewAccident"), '', "digiriskdolibarr_color@digiriskdolibarr");
 
 	print '<form method="POST" action="' . $_SERVER["PHP_SELF"] . '" enctype="multipart/form-data">';
 	print '<input type="hidden" name="token" value="' . newToken() . '">';
@@ -743,7 +743,7 @@ if ($action == 'create') {
 
 // Part to edit record
 if (($id || $ref) && $action == 'edit') {
-	print load_fiche_titre($langs->trans("ModifyAccident"), '', "digiriskdolibarr32px@digiriskdolibarr");
+	print load_fiche_titre($langs->trans("ModifyAccident"), '', "digiriskdolibarr_color@digiriskdolibarr");
 
 	print '<form method="POST" action="' . $_SERVER["PHP_SELF"] . '" enctype="multipart/form-data">';
 	print '<input type="hidden" name="token" value="' . newToken() . '">';
