@@ -507,4 +507,30 @@ class PreventionPlanLine extends SaturneObject
 	{
 		parent::__construct($db, $this->module, $this->element);
 	}
+
+    /**
+     * Write information of trigger description
+     *
+     * @param  Object $object Object calling the trigger
+     * @return string         Description to display in actioncomm->note_private
+     */
+    public function getTriggerDescription(SaturneObject $object): string
+    {
+        global $langs;
+
+        require_once __DIR__ . '/digiriskelement.class.php';
+        require_once __DIR__ . '/riskanalysis/risk.class.php';
+
+        $ret = parent::getTriggerDescription($object);
+
+        $risk            = new Risk($this->db);
+        $digiriskelement = new DigiriskElement($this->db);
+        $digiriskelement->fetch($object->fk_element);
+
+        $ret .= $langs->trans('ParentElement') . ' : ' . $digiriskelement->ref . " - " . $digiriskelement->label . '<br>';
+        $ret .= $langs->trans('INRSRisk') . ' : ' .  $risk->getDangerCategoryName($object) . '<br>';
+        $ret .= $langs->trans('PreventionMethod') . ' : ' . (!empty($object->prevention_method) ? $object->prevention_method : 'N/A') . '<br>';
+
+        return $ret;
+    }
 }
