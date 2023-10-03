@@ -273,7 +273,7 @@ class Accident extends SaturneObject
             }
             if (!empty($options['workstop'])) {
                 $accidentWorkstop = new AccidentWorkStop($this->db);
-                $workstops        = $accidentWorkstop->fetchAll('', '', 0, 0, ['customsql' => 't.fk_accident = ' . $objectId . ' AND t.status >= 0']);
+                $workstops        = $accidentWorkstop->fetchFromParent($objectId);
 
                 if (is_array($workstops) && !empty($workstops)) {
                     foreach($workstops as $workstop) {
@@ -669,7 +669,7 @@ class Accident extends SaturneObject
         global $langs;
 
         $workstopLine      = new AccidentWorkStop($this->db);
-        $accidentLines     = $workstopLine->fetchAll('', '', 0, 0, ['customsql' => 't.fk_accident = ' . $this->id . ' AND t.status >= 0']);
+        $accidentLines     = $workstopLine->fetchFromParent($this->id);
         $totalWorkStopDays = 0;
         $moreHtmlRef       = '';
 

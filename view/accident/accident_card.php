@@ -1163,9 +1163,9 @@ if ((empty($action) || ($action != 'create' && $action != 'edit'))) {
 		print '</div>';
 
 		// Accident Lines
-		$accidentlines = $objectline->fetchAll('', '', 0, 0, ['customsql' => 't.fk_accident = ' . $object->id . ' AND t.status >= 0']);
+		$accidentWorkstops = $objectline->fetchFromParent($object->id);
 
-		if (($object->status == Accident::STATUS_VALIDATED) || (!empty($accidentlines))) {
+		if (($object->status == Accident::STATUS_VALIDATED) || (!empty($accidentWorkstops))) {
 			// ACCIDENT LINES
 			print '<div class="div-table-responsive-no-min" style="overflow-x: unset !important">';
 			print load_fiche_titre($langs->trans("AccidentRiskList"), '', '');
@@ -1184,8 +1184,8 @@ if ((empty($action) || ($action != 'create' && $action != 'edit'))) {
 			print '<td class="center" colspan="' . $colspan . '">' . $langs->trans('ActionsLine') . '</td>';
 			print '</tr>';
 
-			if ( ! empty($accidentlines) && $accidentlines > 0) {
-				foreach ($accidentlines as $key => $item) {
+			if ( ! empty($accidentWorkstops) && $accidentWorkstops > 0) {
+				foreach ($accidentWorkstops as $key => $item) {
 					//action edit
 					if (($action == 'editline' || $subaction == 'editline') && $lineid == $key) {
 						print '<form method="POST" action="' . $_SERVER["PHP_SELF"] . '?id=' . $object->id . '">';
