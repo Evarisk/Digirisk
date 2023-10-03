@@ -18,6 +18,10 @@
 
 require_once DOL_DOCUMENT_ROOT . '/core/lib/date.lib.php';
 
+require_once DOL_DOCUMENT_ROOT . '/user/class/usergroup.class.php';
+
+$userGroup = new UserGroup($db);
+
 //Set multi entity sharing
 
 $params = array(
@@ -329,295 +333,181 @@ if (!dolibarr_get_const($db, 'DIGIRISKDOLIBARR_USERAPI_SET', 0)) {
 	dolibarr_set_const($db, 'DIGIRISKDOLIBARR_USERAPI_SET', $user_id, 'integer', 0, '', 0);
 }
 
-if ( $conf->global->DIGIRISKDOLIBARR_READERGROUP_SET == 0 ) {
-	require_once DOL_DOCUMENT_ROOT . '/user/class/usergroup.class.php';
+if (getDolGlobalInt('DIGIRISKDOLIBARR_READERGROUP_SET') == 0) {
+    $userGroup->entity = $conf->entity;
+    $userGroup->name   = $conf->global->MAIN_INFO_SOCIETE_NOM . ' - ' . $langs->trans('DigiriskReaderGroup');
+    $userGroup->note   = $langs->trans('DigiriskReaderGroupDescription');
 
-	$usergroup         = new UserGroup($db);
-	$usergroup->entity = $conf->entity;
-	$usergroup->name   = $conf->global->MAIN_INFO_SOCIETE_NOM . ' - ' . $langs->trans('DigiriskReaderGroup');
-	$usergroup->note   = $langs->trans('DigiriskReaderGroupDescription');
+    $userGroupID = $userGroup->create($user);
 
-	$usergroup_id = $usergroup->create($user);
-	if ($usergroup_id > 0) {
-		$usergroup->fetch($usergroup_id);
-		//Rights digiriskdolibarr
-		$usergroup->addrights(4363020); //DigiriskDolibarr read
-		$usergroup->addrights(4363021); //DigiriskDolibarr lire
-		$usergroup->addrights(4363022); //RiskAssessmentDocument Read
-		$usergroup->addrights(4363025); //LegalDisplay Read
-		$usergroup->addrights(4363028); //InformationsSharing Read
-		$usergroup->addrights(43630211); //FirePermit Read
-		$usergroup->addrights(43630214); //Prevention Plan Read
-		$usergroup->addrights(43630217); //DigiriskElement Read
-		$usergroup->addrights(43630220); //Risk Read
-		$usergroup->addrights(43630223); //ListingRisksAction Read
-		$usergroup->addrights(43630226); //ListingRisksPhoto Read
-		$usergroup->addrights(43630229); //RiskSign Read
-		$usergroup->addrights(43630232); //Evaluator Read
-		$usergroup->addrights(43630238); //Accident Read
-		$usergroup->addrights('', 'produit', 'lire');
-		$usergroup->addrights('', 'societe', 'lire');
-		$usergroup->addrights('', 'ecm', 'read');
-		$usergroup->addrights('', 'ticket', 'read');
-		$usergroup->addrights('', 'agenda', 'myactions');
-	}
-	dolibarr_set_const($db, 'DIGIRISKDOLIBARR_READERGROUP_SET', $usergroup_id, 'integer', 0, '', $conf->entity);
+    dolibarr_set_const($db, 'DIGIRISKDOLIBARR_READERGROUP_SET', $userGroupID, 'integer', 0, '', $conf->entity);
 }
 
-if ( $conf->global->DIGIRISKDOLIBARR_READERGROUP_UPDATED == 0 ) {
-	require_once DOL_DOCUMENT_ROOT . '/user/class/usergroup.class.php';
+if (getDolGlobalInt('DIGIRISKDOLIBARR_READERGROUP_UPDATED') >= 0 && getDolGlobalInt('DIGIRISKDOLIBARR_READERGROUP_UPDATED') < 3) {
+    $userGroupID = getDolGlobalInt('DIGIRISKDOLIBARR_READERGROUP_SET');
+    if ($userGroupID > 0) {
+        $userGroup->fetch($userGroupID);
+        switch (getDolGlobalInt('DIGIRISKDOLIBARR_READERGROUP_UPDATED')) {
+            case 0 :
+            case 2 :
+                $userGroup->addrights('', 'digiriskdolibarr', 'lire'); // DigiriskDolibarr lire
+                $userGroup->addrights('', 'digiriskdolibarr', 'read'); // DigiriskDolibarr read
 
-	$usergroup = new UserGroup($db);
-	$usergroup_id = $conf->global->DIGIRISKDOLIBARR_READERGROUP_SET;
-	if ($usergroup_id > 0) {
-		$usergroup->fetch($usergroup_id);
-		$usergroup->name = $conf->global->MAIN_INFO_SOCIETE_NOM . ' - ' . $langs->trans('DigiriskReaderGroup');
-		$usergroup->note = $langs->trans('DigiriskReaderGroupDescription');
-		$usergroup->update($user);
-	}
-	dolibarr_set_const($db, 'DIGIRISKDOLIBARR_READERGROUP_UPDATED', 1, 'integer', 0, '', $conf->entity);
+                $userGroup->addrights(43630203, 'digiriskdolibarr'); // RiskAssessmentDocument read
+                $userGroup->addrights(43630206, 'digiriskdolibarr'); // LegalDisplay read
+                $userGroup->addrights(43630209, 'digiriskdolibarr'); // InformationsSharing read
+                $userGroup->addrights(43630212, 'digiriskdolibarr'); // FirePermit read
+                $userGroup->addrights(43630215, 'digiriskdolibarr'); // Prevention plan read
+                $userGroup->addrights(43630218, 'digiriskdolibarr'); // DigiriskElement read
+                $userGroup->addrights(43630221, 'digiriskdolibarr'); // Risk read
+                $userGroup->addrights(43630224, 'digiriskdolibarr'); // ListingRisksAction read
+                $userGroup->addrights(43630227, 'digiriskdolibarr'); // ListingRisksPhoto read
+                $userGroup->addrights(43630230, 'digiriskdolibarr'); // RiskSign read
+                $userGroup->addrights(43630233, 'digiriskdolibarr'); // Evaluator read
+                $userGroup->addrights(43630236, 'digiriskdolibarr'); // Accident read
+                $userGroup->addrights(43630239, 'digiriskdolibarr'); // AccidentInvestigation read
+
+                $userGroup->addrights('', 'saturne', 'lire');
+                $userGroup->addrights('', 'saturne', 'read');
+
+                $userGroup->addrights('', 'agenda', 'myactions');
+                $userGroup->addrights('', 'categorie', 'lire');
+                $userGroup->addrights('', 'ecm', 'read');
+                $userGroup->addrights('', 'projet', 'lire');
+                $userGroup->addrights('', 'societe', 'lire');
+                $userGroup->addrights('', 'societe', 'lire');
+                $userGroup->addrights(281, 'societe');                   // Societe contact lire
+                $userGroup->addrights('', 'ticket', 'read');
+
+                $readerGroupConf = 3;
+                break;
+            case 1 :
+                $userGroup->name = $conf->global->MAIN_INFO_SOCIETE_NOM . ' - ' . $langs->trans('DigiriskReaderGroup');
+                $userGroup->note = $langs->trans('DigiriskReaderGroupDescription');
+                $userGroup->update($user);
+
+                $readerGroupConf = 2;
+                break;
+        }
+        dolibarr_set_const($db, 'DIGIRISKDOLIBARR_READERGROUP_UPDATED', $readerGroupConf ?? 0, 'integer', 0, '', $conf->entity);
+    }
 }
 
-if ( $conf->global->DIGIRISKDOLIBARR_READERGROUP_UPDATED == 1 ) {
-	require_once DOL_DOCUMENT_ROOT . '/user/class/usergroup.class.php';
+if (getDolGlobalInt('DIGIRISKDOLIBARR_USERGROUP_SET') == 0) {
+    $userGroup->entity = $conf->entity;
+    $userGroup->name   = $conf->global->MAIN_INFO_SOCIETE_NOM . ' - ' . $langs->trans('DigiriskUserGroup');
+    $userGroup->note   = $langs->trans('DigiriskUserGroupDescription');
 
-	$usergroup = new UserGroup($db);
-	$usergroup_id = $conf->global->DIGIRISKDOLIBARR_READERGROUP_SET;
-	if ($usergroup_id > 0) {
-		$usergroup->fetch($usergroup_id);
-		//Rights digiriskdolibarr
-		$usergroup->addrights(43630238); //Accident Read
-	}
-	dolibarr_set_const($db, 'DIGIRISKDOLIBARR_READERGROUP_UPDATED', 2, 'integer', 0, '', $conf->entity);
+    $userGroupID = $userGroup->create($user);
+
+    dolibarr_set_const($db, 'DIGIRISKDOLIBARR_USERGROUP_SET', $userGroupID, 'integer', 0, '', $conf->entity);
 }
 
-if ( $conf->global->DIGIRISKDOLIBARR_USERGROUP_SET == 0 ) {
-	require_once DOL_DOCUMENT_ROOT . '/user/class/usergroup.class.php';
+if (getDolGlobalInt('DIGIRISKDOLIBARR_USERGROUP_UPDATED') >= 0 && getDolGlobalInt('DIGIRISKDOLIBARR_USERGROUP_UPDATED') < 4) {
+    $userGroupID = getDolGlobalInt('DIGIRISKDOLIBARR_USERGROUP_SET');
+    if ($userGroupID > 0) {
+        $userGroup->fetch($userGroupID);
+        switch (getDolGlobalInt('DIGIRISKDOLIBARR_USERGROUP_UPDATED')) {
+            case 0 :
+            case 2 :
+            case 3 :
+                $userGroup->addrights('', 'digiriskdolibarr', 'lire'); // DigiriskDolibarr lire
+                $userGroup->addrights('', 'digiriskdolibarr', 'read'); // DigiriskDolibarr read
 
-	$usergroup         = new UserGroup($db);
-	$usergroup->entity = $conf->entity;
-	$usergroup->name   = $conf->global->MAIN_INFO_SOCIETE_NOM . ' - ' . $langs->trans('DigiriskUserGroup');
-	$usergroup->note   = $langs->trans('DigiriskUserGroupDescription');
+                $userGroup->addrights(43630203, 'digiriskdolibarr'); // RiskAssessmentDocument read
+                $userGroup->addrights(43630204, 'digiriskdolibarr'); // RiskAssessmentDocument create
+                $userGroup->addrights(43630206, 'digiriskdolibarr'); // LegalDisplay read
+                $userGroup->addrights(43630207, 'digiriskdolibarr'); // LegalDisplay create
+                $userGroup->addrights(43630209, 'digiriskdolibarr'); // InformationsSharing read
+                $userGroup->addrights(43630210, 'digiriskdolibarr'); // InformationsSharing create
+                $userGroup->addrights(43630212, 'digiriskdolibarr'); // FirePermit read
+                $userGroup->addrights(43630213, 'digiriskdolibarr'); // FirePermit create
+                $userGroup->addrights(43630215, 'digiriskdolibarr'); // Prevention plan read
+                $userGroup->addrights(43630216, 'digiriskdolibarr'); // Prevention Plan create
+                $userGroup->addrights(43630218, 'digiriskdolibarr'); // DigiriskElement read
+                $userGroup->addrights(43630219, 'digiriskdolibarr'); // DigiriskElement create
+                $userGroup->addrights(43630221, 'digiriskdolibarr'); // Risk read
+                $userGroup->addrights(43630222, 'digiriskdolibarr'); // Risk create
+                $userGroup->addrights(43630224, 'digiriskdolibarr'); // ListingRisksAction read
+                $userGroup->addrights(43630225, 'digiriskdolibarr'); // ListingRisksAction create
+                $userGroup->addrights(43630227, 'digiriskdolibarr'); // ListingRisksPhoto read
+                $userGroup->addrights(43630228, 'digiriskdolibarr'); // ListingRisksPhoto create
+                $userGroup->addrights(43630230, 'digiriskdolibarr'); // RiskSign read
+                $userGroup->addrights(43630231, 'digiriskdolibarr'); // RiskSign create
+                $userGroup->addrights(43630233, 'digiriskdolibarr'); // Evaluator read
+                $userGroup->addrights(43630234, 'digiriskdolibarr'); // Evaluator create
+                $userGroup->addrights(43630236, 'digiriskdolibarr'); // Accident read
+                $userGroup->addrights(43630237, 'digiriskdolibarr'); // Accident create
+                $userGroup->addrights(43630239, 'digiriskdolibarr'); // AccidentInvestigation read
+                $userGroup->addrights(43630240, 'digiriskdolibarr'); // AccidentInvestigation create
 
-	$usergroup_id = $usergroup->create($user);
-	if ($usergroup_id > 0) {
-		$usergroup->fetch($usergroup_id);
-		//Rights digiriskdolibarr
-		$usergroup->addrights(4363020); //DigiriskDolibarr read
-		$usergroup->addrights(4363021); //DigiriskDolibarr lire
-		$usergroup->addrights(4363022); //RiskAssessmentDocument Read
-		$usergroup->addrights(4363023); //RiskAssessmentDocument Create
-		$usergroup->addrights(4363025); //LegalDisplay Read
-		$usergroup->addrights(4363026); //LegalDisplay Create
-		$usergroup->addrights(4363028); //InformationsSharing Read
-		$usergroup->addrights(4363029); //InformationsSharing Create
-		$usergroup->addrights(43630211); //FirePermit Read
-		$usergroup->addrights(43630212); //FirePermit Create
-		$usergroup->addrights(43630214); //Prevention Plan Read
-		$usergroup->addrights(43630215); //Prevention Plan Create
-		$usergroup->addrights(43630217); //DigiriskElement Read
-		$usergroup->addrights(43630218); //DigiriskElement Create
-		$usergroup->addrights(43630220); //Risk Read
-		$usergroup->addrights(43630221); //Risk Create
-		$usergroup->addrights(43630223); //ListingRisksAction Read
-		$usergroup->addrights(43630224); //ListingRisksAction Create
-		$usergroup->addrights(43630226); //ListingRisksPhoto Read
-		$usergroup->addrights(43630227); //ListingRisksPhoto Create
-		$usergroup->addrights(43630229); //RiskSign Read
-		$usergroup->addrights(43630230); //RiskSign Create
-		$usergroup->addrights(43630232); //Evaluator Read
-		$usergroup->addrights(43630233); //Evaluator Create
-		$usergroup->addrights(43630238); //Accident Read
-		$usergroup->addrights(43630239); //Accident Create
-		$usergroup->addrights('', 'produit', 'lire');
-		$usergroup->addrights('', 'produit', 'creer');
-		$usergroup->addrights('', 'societe', 'lire');
-		$usergroup->addrights('', 'societe', 'creer');
-		$usergroup->addrights('', 'ecm', 'read');
-		$usergroup->addrights('', 'ecm', 'upload');
-		$usergroup->addrights('', 'ticket', 'read');
-		$usergroup->addrights('', 'ticket', 'write');
-		$usergroup->addrights('', 'agenda', 'myactions');
-	}
+                $userGroup->addrights('', 'saturne', 'lire');
+                $userGroup->addrights('', 'saturne', 'read');
 
-	dolibarr_set_const($db, 'DIGIRISKDOLIBARR_USERGROUP_SET', $usergroup_id, 'integer', 0, '', $conf->entity);
+                $userGroup->addrights('', 'agenda', 'myactions');
+                $userGroup->addrights('', 'categorie', 'lire');
+                $userGroup->addrights('', 'categorie', 'creer');
+                $userGroup->addrights('', 'ecm', 'read');
+                $userGroup->addrights('', 'ecm', 'upload');
+                $userGroup->addrights('', 'export');
+                $userGroup->addrights('', 'projet', 'lire');
+                $userGroup->addrights('', 'projet', 'creer');
+                $userGroup->addrights('', 'societe', 'lire');
+                $userGroup->addrights('', 'societe', 'creer');
+                $userGroup->addrights(281, 'societe');                   // Societe contact lire
+                $userGroup->addrights(282, 'societe');                   // Societe contact creer
+                $userGroup->addrights('', 'ticket', 'read');
+                $userGroup->addrights('', 'ticket', 'write');
+                $userGroup->addrights(342, 'user');                      // User self creer
+                $userGroup->addrights(343, 'user');                      // User self password
+
+                $userGroupConf = 4;
+                break;
+            case 1 :
+                $userGroup->name = $conf->global->MAIN_INFO_SOCIETE_NOM . ' - ' . $langs->trans('DigiriskUserGroup');
+                $userGroup->note = $langs->trans('DigiriskUserGroupDescription');
+                $userGroup->update($user);
+
+                $userGroupConf = 2;
+                break;
+        }
+        dolibarr_set_const($db, 'DIGIRISKDOLIBARR_USERGROUP_UPDATED', $userGroupConf ?? 0, 'integer', 0, '', $conf->entity);
+    }
 }
 
-if ( $conf->global->DIGIRISKDOLIBARR_USERGROUP_UPDATED == 0 ) {
-	require_once DOL_DOCUMENT_ROOT . '/user/class/usergroup.class.php';
+if (getDolGlobalInt('DIGIRISKDOLIBARR_ADMINUSERGROUP_SET') == 0) {
+    $userGroup->entity = $conf->entity;
+    $userGroup->name   = $conf->global->MAIN_INFO_SOCIETE_NOM . ' - ' . $langs->trans('DigiriskAdminUserGroup');
+    $userGroup->note   = $langs->trans('DigiriskAdminUserGroupDescription');
 
-	$usergroup = new UserGroup($db);
-	$usergroup_id = $conf->global->DIGIRISKDOLIBARR_USERGROUP_SET;
-	if ($usergroup_id > 0) {
-		$usergroup->fetch($usergroup_id);
-		//Rights digiriskdolibarr
-		$usergroup->addrights(4363020); //DigiriskDolibarr read
-		$usergroup->addrights(4363021); //DigiriskDolibarr lire
-		$usergroup->addrights(4363022); //RiskAssessmentDocument Read
-		$usergroup->addrights(4363023); //RiskAssessmentDocument Create
-		$usergroup->addrights(4363025); //LegalDisplay Read
-		$usergroup->addrights(4363026); //LegalDisplay Create
-		$usergroup->addrights(4363028); //InformationsSharing Read
-		$usergroup->addrights(4363029); //InformationsSharing Create
-		$usergroup->addrights(43630211); //FirePermit Read
-		$usergroup->addrights(43630212); //FirePermit Create
-		$usergroup->addrights(43630214); //Prevention Plan Read
-		$usergroup->addrights(43630215); //Prevention Plan Create
-		$usergroup->addrights(43630217); //DigiriskElement Read
-		$usergroup->addrights(43630218); //DigiriskElement Create
-		$usergroup->addrights(43630220); //Risk Read
-		$usergroup->addrights(43630221); //Risk Create
-		$usergroup->addrights(43630223); //ListingRisksAction Read
-		$usergroup->addrights(43630224); //ListingRisksAction Create
-		$usergroup->addrights(43630226); //ListingRisksPhoto Read
-		$usergroup->addrights(43630227); //ListingRisksPhoto Create
-		$usergroup->addrights(43630229); //RiskSign Read
-		$usergroup->addrights(43630230); //RiskSign Create
-		$usergroup->addrights(43630232); //Evaluator Read
-		$usergroup->addrights(43630233); //Evaluator Create
-		$usergroup->addrights(43630238); //Accident Read
-		$usergroup->addrights(43630239); //Accident Create
-		$usergroup->addrights('', 'produit', 'lire');
-		$usergroup->addrights('', 'produit', 'creer');
-		$usergroup->addrights('', 'societe', 'lire');
-		$usergroup->addrights('', 'societe', 'creer');
-		$usergroup->addrights('', 'ecm', 'read');
-		$usergroup->addrights('', 'ecm', 'upload');
-		$usergroup->addrights('', 'ticket', 'read');
-		$usergroup->addrights('', 'ticket', 'write');
-		$usergroup->addrights('', 'agenda', 'myactions');
-	}
+    $userGroupID = $userGroup->create($user);
 
-	dolibarr_set_const($db, 'DIGIRISKDOLIBARR_USERGROUP_UPDATED', 1, 'integer', 0, '', $conf->entity);
+    dolibarr_set_const($db, 'DIGIRISKDOLIBARR_ADMINUSERGROUP_SET', $userGroupID, 'integer', 0, '', $conf->entity);
 }
 
-if ( $conf->global->DIGIRISKDOLIBARR_USERGROUP_UPDATED == 1 ) {
-	require_once DOL_DOCUMENT_ROOT . '/user/class/usergroup.class.php';
+if (getDolGlobalInt('DIGIRISKDOLIBARR_ADMINUSERGROUP_UPDATED') >= 0 && getDolGlobalInt('DIGIRISKDOLIBARR_ADMINUSERGROUP_UPDATED') < 5) {
+    $userGroupID = getDolGlobalInt('DIGIRISKDOLIBARR_ADMINUSERGROUP_SET');
+    if ($userGroupID > 0) {
+        $userGroup->fetch($userGroupID);
+        switch (getDolGlobalInt('DIGIRISKDOLIBARR_ADMINUSERGROUP_UPDATED')) {
+            case 0 :
+            case 2 :
+            case 3 :
+            case 4 :
+                $userGroup->addrights('', 'allmodules');
 
-	$usergroup = new UserGroup($db);
-	$usergroup_id = $conf->global->DIGIRISKDOLIBARR_USERGROUP_SET;
-	if ($usergroup_id > 0) {
-		$usergroup->fetch($usergroup_id);
-		$usergroup->name = $conf->global->MAIN_INFO_SOCIETE_NOM . ' - ' . $langs->trans('DigiriskUserGroup');
-		$usergroup->note = $langs->trans('DigiriskUserGroupDescription');
-		$usergroup->update($user);
-	}
-	dolibarr_set_const($db, 'DIGIRISKDOLIBARR_USERGROUP_UPDATED', 2, 'integer', 0, '', $conf->entity);
-}
+                $adminUserGroupConf = 5;
+                break;
+            case 1:
+                $userGroup->name = $conf->global->MAIN_INFO_SOCIETE_NOM . ' - ' . $langs->trans('DigiriskAdminUserGroup');
+                $userGroup->note = $langs->trans('DigiriskAdminUserGroupDescription');
+                $userGroup->update($user);
 
-if ( $conf->global->DIGIRISKDOLIBARR_USERGROUP_UPDATED == 2 ) {
-	require_once DOL_DOCUMENT_ROOT . '/user/class/usergroup.class.php';
-
-	$usergroup = new UserGroup($db);
-	$usergroup_id = $conf->global->DIGIRISKDOLIBARR_USERGROUP_SET;
-	if ($usergroup_id > 0) {
-		$usergroup->fetch($usergroup_id);
-		$usergroup->name = $conf->global->MAIN_INFO_SOCIETE_NOM . ' - ' . $langs->trans('DigiriskUserGroup');
-		$usergroup->note = $langs->trans('DigiriskUserGroupDescription');
-		$usergroup->update($user);
-
-		$usergroup->addrights(43630238); //Accident Read
-		$usergroup->addrights(43630239); //Accident Create
-	}
-	dolibarr_set_const($db, 'DIGIRISKDOLIBARR_USERGROUP_UPDATED', 3, 'integer', 0, '', $conf->entity);
-}
-
-if ( $conf->global->DIGIRISKDOLIBARR_ADMINUSERGROUP_SET == 0 ) {
-	require_once DOL_DOCUMENT_ROOT . '/user/class/usergroup.class.php';
-
-	$usergroup         = new UserGroup($db);
-	$usergroup->entity = $conf->entity;
-	$usergroup->name   = $conf->global->MAIN_INFO_SOCIETE_NOM . ' - ' . $langs->trans('DigiriskAdminUserGroup');
-	$usergroup->note   = $langs->trans('DigiriskAdminUserGroupDescription');
-
-	$usergroup_id = $usergroup->create($user);
-	if ($usergroup_id > 0) {
-		$usergroup->fetch($usergroup_id);
-		//Rights digiriskdolibarr
-		$usergroup->addrights(4363020); //DigiriskDolibarr read
-		$usergroup->addrights(4363021); //DigiriskDolibarr lire
-		$usergroup->addrights('', 'digiriskdolibarr', 'riskassessmentdocument'); //RiskAssessmentDocument
-		$usergroup->addrights('', 'digiriskdolibarr', 'legaldisplay');           //LegalDisplay
-		$usergroup->addrights('', 'digiriskdolibarr', 'informationssharing');    //InformationsSharing
-		$usergroup->addrights('', 'digiriskdolibarr', 'firepermit');             //FirePermit
-		$usergroup->addrights('', 'digiriskdolibarr', 'preventionplan');         //Prevention Plan
-		$usergroup->addrights('', 'digiriskdolibarr', 'digiriskelement');        //DigiriskElement
-		$usergroup->addrights('', 'digiriskdolibarr', 'risk');                   //Risk
-		$usergroup->addrights('', 'digiriskdolibarr', 'listingrisksaction');     //ListingRisksAction
-		$usergroup->addrights('', 'digiriskdolibarr', 'listingrisksphoto');      //ListingRisksPhoto
-		$usergroup->addrights('', 'digiriskdolibarr', 'risksign');               //RiskSign
-		$usergroup->addrights('', 'digiriskdolibarr', 'evaluator');              //Evaluator
-		$usergroup->addrights('', 'digiriskdolibarr', 'api');                    //API
-		$usergroup->addrights('', 'digiriskdolibarr', 'adminpage');              //AdminPage
-		$usergroup->addrights('', 'digiriskdolibarr', 'accident'); 			  //Accident
-		$usergroup->addrights('', 'societe');
-		$usergroup->addrights('', 'ecm');
-		$usergroup->addrights('', 'ticket');
-		$usergroup->addrights('', 'agenda');
-		$usergroup->addrights('', 'projet');
-	}
-
-	dolibarr_set_const($db, 'DIGIRISKDOLIBARR_ADMINUSERGROUP_SET', $usergroup_id, 'integer', 0, '', $conf->entity);
-}
-
-if ( $conf->global->DIGIRISKDOLIBARR_ADMINUSERGROUP_UPDATED == 0 ) {
-	require_once DOL_DOCUMENT_ROOT . '/user/class/usergroup.class.php';
-
-	$usergroup = new UserGroup($db);
-	$usergroup_id = $conf->global->DIGIRISKDOLIBARR_ADMINUSERGROUP_SET;
-	if ($usergroup_id > 0) {
-		$usergroup->fetch($usergroup_id);
-		//Rights digiriskdolibarr
-		$usergroup->addrights('', 'societe');
-		$usergroup->addrights('', 'ecm');
-		$usergroup->addrights('', 'ticket');
-		$usergroup->addrights('', 'agenda');
-		$usergroup->addrights('', 'projet');
-	}
-
-	dolibarr_set_const($db, 'DIGIRISKDOLIBARR_ADMINUSERGROUP_UPDATED', 1, 'integer', 0, '', $conf->entity);
-}
-
-if ( $conf->global->DIGIRISKDOLIBARR_ADMINUSERGROUP_UPDATED == 1 ) {
-	require_once DOL_DOCUMENT_ROOT . '/user/class/usergroup.class.php';
-
-	$usergroup = new UserGroup($db);
-	$usergroup_id = $conf->global->DIGIRISKDOLIBARR_ADMINUSERGROUP_SET;
-	if ($usergroup_id > 0) {
-		$usergroup->fetch($usergroup_id);
-		$usergroup->name = $conf->global->MAIN_INFO_SOCIETE_NOM . ' - ' . $langs->trans('DigiriskAdminUserGroup');
-		$usergroup->note = $langs->trans('DigiriskAdminUserGroupDescription');
-		$usergroup->update($user);
-	}
-	dolibarr_set_const($db, 'DIGIRISKDOLIBARR_ADMINUSERGROUP_UPDATED', 2, 'integer', 0, '', $conf->entity);
-}
-
-if ( $conf->global->DIGIRISKDOLIBARR_ADMINUSERGROUP_UPDATED == 2 ) {
-	require_once DOL_DOCUMENT_ROOT . '/user/class/usergroup.class.php';
-
-	$usergroup = new UserGroup($db);
-	$usergroup_id = $conf->global->DIGIRISKDOLIBARR_ADMINUSERGROUP_SET;
-	if ($usergroup_id > 0) {
-		$usergroup->fetch($usergroup_id);
-		//Rights digiriskdolibarr
-		$usergroup->addrights('', 'digiriskdolibarr', 'accident'); //Accident
-	}
-
-	dolibarr_set_const($db, 'DIGIRISKDOLIBARR_ADMINUSERGROUP_UPDATED', 3, 'integer', 0, '', $conf->entity);
-}
-
-if ( $conf->global->DIGIRISKDOLIBARR_ADMINUSERGROUP_UPDATED == 3 ) {
-	require_once DOL_DOCUMENT_ROOT . '/user/class/usergroup.class.php';
-
-	$usergroup = new UserGroup($db);
-	$usergroup_id = $conf->global->DIGIRISKDOLIBARR_ADMINUSERGROUP_SET;
-
-	if ($usergroup_id > 0) {
-		$usergroup->fetch($usergroup_id);
-		$usergroup->addrights('', 'projet');
-	}
-
-	dolibarr_set_const($db, 'DIGIRISKDOLIBARR_ADMINUSERGROUP_UPDATED', 4, 'integer', 0, '', $conf->entity);
+                $adminUserGroupConf = 2;
+                break;
+        }
+        dolibarr_set_const($db, 'DIGIRISKDOLIBARR_ADMINUSERGROUP_UPDATED', $adminUserGroupConf ?? 0, 'integer', 0, '', $conf->entity);
+    }
 }
 
 if ($conf->global->DIGIRISKDOLIBARR_DIGIRISKELEMENT_TRASH_UPDATED == 0) {
