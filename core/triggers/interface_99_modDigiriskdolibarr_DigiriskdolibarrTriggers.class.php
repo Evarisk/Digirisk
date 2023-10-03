@@ -101,20 +101,23 @@ class InterfaceDigiriskdolibarrTriggers extends DolibarrTriggers
 	 * All functions "runTrigger" are triggered if file
 	 * is inside directory core/triggers
 	 *
-	 * @param string $action Event action code
+	 * @param string       $action Event action code
 	 * @param CommonObject $object Object
-	 * @param User $user Object user
-	 * @param Translate $langs Object langs
-	 * @param Conf $conf Object conf
-	 * @return int                    <0 if KO, 0 if no triggered ran, >0 if OK
+	 * @param User         $user   Object user
+	 * @param Translate    $langs  Object langs
+	 * @param Conf         $conf   Object conf
+	 * @return int                 <0 if KO, 0 if no triggered ran, >0 if OK
 	 * @throws Exception
 	 */
 	public function runTrigger($action, $object, User $user, Translate $langs, Conf $conf)
 	{
 		$active = 1; //getDolGlobalInt('DIGIRISKDOLIBARR_MAIN_AGENDA_ACTIONAUTO_' . $action);
 
-		if (!isModEnabled('digiriskdolibarr') || $active != 1) {
-			return 0;  // If module is not enabled or trigger is deactivated, we do nothing
+		if (!isModEnabled('digiriskdolibarr') || !$active) {
+            $allowedTriggers = ['COMPANY_DELETE', 'CONTACT_DELETE', 'TICKET_CREATE'];
+            if (!in_array($action, $allowedTriggers)) {
+                return 0;  // If module is not enabled or trigger is deactivated, we do nothing
+            }
 		}
 
 		// Data and type of action are stored into $object and $action
