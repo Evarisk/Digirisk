@@ -42,7 +42,7 @@ require_once __DIR__ . '/../../class/digiriskstandard.class.php';
 require_once __DIR__ . '/../../lib/digiriskdolibarr_function.lib.php';
 require_once __DIR__ . '/../../lib/digiriskdolibarr_accident.lib.php';
 
-global $conf, $db, $hookmanager, $langs, $mysoc, $user;
+global $conf, $db, $hookmanager, $langs, $moduleNameLowerCase, $mysoc, $user;
 
 // Load translation files required by the page
 saturne_load_langs();
@@ -60,7 +60,10 @@ $backtopage          = GETPOST('backtopage', 'alpha');
 $backtopageforcancel = GETPOST('backtopageforcancel', 'alpha');
 $fk_parent           = GETPOST('fk_parent', 'int');
 $fromiduser          = GETPOST('fromiduser', 'int'); //element id
-
+$accident_type       = GETPOST('accident_type');
+$external_accident   = GETPOST('external_accident');
+$accident_location   = GETPOST('accident_location');
+$fk_soc              = GETPOST('fk_soc');
 // Initialize technical objects
 $object           = new Accident($db);
 $signatory        = new SaturneSignature($db, $object->module, $object->element);
@@ -75,6 +78,9 @@ $project          = new Project($db);
 
 // Load object
 $object->fetch($id);
+if ($id > 0 && $object->external_accident != 2) {
+    unset($object->fk_soc);
+}
 
 $deletedElements = $digiriskelement->getMultiEntityTrashList();
 if (empty($deletedElements)) {
@@ -114,8 +120,11 @@ if (empty($reshook)) {
 
 	if (empty($backtopage) || ($cancel && empty($id))) {
 		if (empty($backtopage) || ($cancel && strpos($backtopage, '__ID__'))) {
-			if (empty($object->id) && (($action != 'add' && $action != 'create') || $cancel)) $backtopage = $backurlforlist;
-			else $backtopage                                                                              = dol_buildpath('/digiriskdolibarr/view/accident/accident_card.php', 1) . '?id=' . ($object->id > 0 ? $object->id : '__ID__');
+			if (empty($object->id) && (($action != 'add' && $action != 'create') || $cancel)) {
+                $backtopage = $backurlforlist;
+            } else {
+                $backtopage = dol_buildpath('/digiriskdolibarr/view/accident/accident_card.php', 1) . '?id=' . ($object->id > 0 ? $object->id : '__ID__');
+            }
 		}
 	}
 
@@ -732,33 +741,33 @@ if ($action == 'create') {
 
 	//AccidentType
 	print '<tr><td class="minwidth400">' . $langs->trans("AccidentType") . '</td><td>';
-	print $form->selectarray('accident_type', array('0' => $langs->trans('WorkAccidentStatement'), '1' => $langs->trans('CommutingAccident')), '', 0, 0, 0, '', 0, 0, 0, '', 'minwidth300', 1);
+	print $form->selectarray('accident_type', array('0' => $langs->trans('WorkAccidentStatement'), '1' => $langs->trans('CommutingAccident')), $accident_type, 0, 0, 0, '', 0, 0, 0, '', 'minwidth300', 1);
 	print '</td></tr>';
 
 	//ExternalAccident
 	print '<tr><td class="minwidth400">' . $langs->trans("ExternalAccident") . '</td><td>';
-	print $form->selectarray('external_accident', array('1' => $langs->trans('No'), '2' => $langs->trans('Yes'), '3' => $langs->trans('Other')), '', 0, 0, 0, '', 0, 0, 0, '', 'minwidth300', 1);
+	print $form->selectarray('external_accident', array('1' => $langs->trans('No'), '2' => $langs->trans('Yes'), '3' => $langs->trans('Other')), $external_accident, 0, 0, 0, '', 0, 0, 0, '', 'minwidth300', 1);
 	print '</td></tr>';
 
 	//FkElement -- Lieu de l'accident - DigiriskElement
-	print '<tr class="fk_element_field"><td class="minwidth400">' . $langs->trans("AccidentLocation") . '</td><td>';
+	print '<tr class="fk_element_field"'. (GETPOST('external_accident') < 2 ? '' : 'style="display:none"') . '><td class="minwidth400">' . $langs->trans("AccidentLocation") . '</td><td>';
 	print $digiriskelement->selectDigiriskElementList((!empty(GETPOST('fromid')) ? GETPOST('fromid') : $object->fk_element), 'fk_element', ['customsql' => ' t.rowid NOT IN (' . implode(',', $deletedElements) . ')'], 0, 0, [], 0, 0, 'minwidth300');
 	print '</td></tr>';
 
 	//FkSoc -- Lieu de l'accident - Société extérieure
-	print '<tr class="fk_soc_field hidden"' . (GETPOST('fk_soc') > 0 ? '' : 'style="display:none"') . '><td class="minwidth400">' . $langs->trans("AccidentLocation") . '</td>';
+	print '<tr class="fk_soc_field"' . (GETPOST('external_accident') == 2 ? '' : 'style="display:none"') . '><td class="minwidth400">' . $langs->trans("AccidentLocation") . '</td>';
 	print '<td>';
 	//For external user force the company to user company
-	if ( ! empty($user->socid)) {
+	if (!empty($user->socid)) {
 		print $form->select_company($user->socid, 'fk_soc', '', 1, 1, 0, '', 0, 'minwidth300');
 	} else {
-		print $form->select_company('', 'fk_soc', '', 'SelectThirdParty', 1, 0, '', 0, 'minwidth300');
+		print $form->select_company($fk_soc, 'fk_soc', '', 'SelectThirdParty', 1, 0, '', 0, 'minwidth300');
 	}
 	print ' <a href="' . DOL_URL_ROOT . '/societe/card.php?action=create&backtopage=' . urlencode($_SERVER["PHP_SELF"] . '?action=create') . '" target="_blank"><span class="fa fa-plus-circle valignmiddle paddingleft" title="' . $langs->trans("AddThirdParty") . '"></span></a>';
 	print '</td></tr>';
 
 	//AccidentLocation -- lieu de l'accident
-	print '<tr class="accident_location_field hidden" ' . (GETPOST('accident_location') ? '' : 'style="display:none"') . '><td class="minwidth400">' . $langs->trans("AccidentLocation") . '</td><td>';
+	print '<tr class="accident_location_field" ' . (GETPOST('external_accident') == 3 ? '' : 'style="display:none"') . '><td class="minwidth400">' . $langs->trans("AccidentLocation") . '</td><td>';
 	$doleditor = new DolEditor('accident_location', GETPOST('accident_location'), '', 90, 'dolibarr_details', '', false, true, $conf->global->FCKEDITOR_ENABLE_SOCIETE, ROWS_3, '90%');
 	$doleditor->Create();
 	print '</td></tr>';
@@ -971,12 +980,13 @@ if ((empty($action) || ($action != 'create' && $action != 'edit'))) {
 
 	saturne_get_fiche_head($object, 'card', $title);
 
-	//Number workstop days
-    $moreHtmlRef = $object->getMoreHtmlRef($object->id);
-
 	include_once './../../core/tpl/digiriskdolibarr_configuration_gauge_view.tpl.php';
 
-	saturne_banner_tab($object, 'id', '', 1, 'rowid', 'ref', $moreHtmlRef, dol_strlen($object->photo) > 0);
+    // Object card
+    // ------------------------------------------------------------
+    list($moreHtmlRef, $moreParams) = $object->getBannerTabContent();
+
+	saturne_banner_tab($object, 'id', '', 1, 'rowid', 'ref', $moreHtmlRef, dol_strlen($object->photo) > 0, $moreParams);
 
 	$formConfirm = '';
 

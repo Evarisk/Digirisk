@@ -47,6 +47,7 @@ saturne_load_langs();
 // Get parameters
 $id                  = GETPOST('id', 'int');
 $action              = GETPOST('action', 'aZ09');
+$cancel              = GETPOST('cancel', 'aZ09');
 $contextpage         = GETPOST('contextpage', 'aZ') ? GETPOST('contextpage', 'aZ') : 'accidentmetadata'; // To manage different context of search
 $backtopage          = GETPOST('backtopage', 'alpha');
 $backtopageforcancel = GETPOST('backtopageforcancel', 'alpha');
@@ -63,8 +64,12 @@ $form             = new Form($db);
 
 // Load object
 $object->fetch($id);
+if ($id > 0 && $object->external_accident != 2) {
+    unset($object->fields['fk_soc']);
+    unset($object->fk_soc);
+}
 
-$hookmanager->initHooks(array('accidentmetadata', 'globalcard')); // Note that conf->hooks_modules contains array
+$hookmanager->initHooks(['accidentmetadata', 'globalcard']); // Note that conf->hooks_modules contains array
 
 // Security check
 
@@ -72,7 +77,7 @@ $permissiontoread   = $user->rights->digiriskdolibarr->accident->read;
 $permissiontoadd    = $user->rights->digiriskdolibarr->accident->write;
 $permissiontodelete = $user->rights->digiriskdolibarr->accident->delete;
 
-if ( ! $permissiontoread) accessforbidden();
+saturne_check_access($permissiontoread);
 
 /*
  * Actions
@@ -87,8 +92,11 @@ if (empty($reshook)) {
 
 	if (empty($backtopage) || ($cancel && empty($id))) {
 		if (empty($backtopage) || ($cancel && strpos($backtopage, '__ID__'))) {
-			if (empty($object->id) && (($action != 'add' && $action != 'create') || $cancel)) $backtopage = $backurlforlist;
-			else $backtopage                                                                              = dol_buildpath('/digiriskdolibarr/view/accident/accident_metadata.php', 1) . '?id=' . ($object->id > 0 ? $object->id : '__ID__');
+			if (empty($object->id) && (($action != 'add' && $action != 'create') || $cancel)) {
+                $backtopage = $backurlforlist;
+            } else {
+                $backtopage = dol_buildpath('/digiriskdolibarr/view/accident/accident_metadata.php', 1) . '?id=' . ($object->id > 0 ? $object->id : '__ID__');
+            }
 		}
 	}
 
@@ -185,19 +193,22 @@ if (empty($reshook)) {
 		$accidentmetadata->fk_soc_responsible_insurance_society = $fk_soc_responsible_insurance_society;
 		$accidentmetadata->fk_accident                          = $fk_accident;
 
-		if ( ! $error) {
-			$result = $accidentmetadata->create($user, false);
+		if (!$error) {
+			$result = $accidentmetadata->create($user);
 			if ($result > 0) {
 				// Update Accident metadata OK
-				setEventMessages($langs->trans('AccidentMetaDataSave'), null, 'mesgs');
+				setEventMessages($langs->trans('AccidentMetaDataSave'), []);
 				$urltogo = str_replace('__ID__', $result, $backtopage);
 				$urltogo = preg_replace('/--IDFORBACKTOPAGE--/', $id, $urltogo); // New method to autoselect project after a New on another form object creation
 				header("Location: " . $urltogo);
 				exit;
 			} else {
 				// Update Accident metadata KO
-				if ( ! empty($accidentmetadata->errors)) setEventMessages(null, $accidentmetadata->errors, 'errors');
-				else setEventMessages($accidentmetadata->error, null, 'errors');
+				if ( ! empty($accidentmetadata->errors)) {
+                    setEventMessages(null, $accidentmetadata->errors, 'errors');
+                } else {
+                    setEventMessages($accidentmetadata->error, [], 'errors');
+                }
 			}
 		} else {
 			$action = 'edit';
@@ -212,10 +223,7 @@ if (empty($reshook)) {
  * View
  */
 
-$morewhere  = ' AND fk_accident = ' . $object->id;
-$morewhere .= ' AND status = 1';
-
-$accidentmetadata->fetch(0, '', $morewhere);
+$accidentmetadata->fetch(0, '', ' AND fk_accident = ' . $object->id . ' AND status = 1');
 
 $title    = $langs->trans("AccidentMetaData");
 $help_url = 'FR:Module_Digirisk#DigiRisk_-_Accident_b.C3.A9nins_et_presque_accidents';
@@ -223,7 +231,7 @@ $help_url = 'FR:Module_Digirisk#DigiRisk_-_Accident_b.C3.A9nins_et_presque_accid
 saturne_header(0, '', $title, $help_url);
 
 // Part to edit record
-if (($id || $ref) && $action == 'edit') {
+if ($id && $action == 'edit') {
 	print load_fiche_titre($title, '', "digiriskdolibarr_color@digiriskdolibarr");
 
 	print '<form method="POST" action="' . $_SERVER["PHP_SELF"] . '">';
@@ -490,14 +498,13 @@ if ((empty($action) || ($action != 'create' && $action != 'edit'))) {
 	// ------------------------------------------------------------
 	saturne_get_fiche_head($object, 'accidentMetadata', $title);
 
-	//Number workstop days
-    $moreHtmlRef = $object->getMoreHtmlRef($object->id);
-
 	include_once './../../core/tpl/digiriskdolibarr_configuration_gauge_view.tpl.php';
 
-	$linkback = '<a href="' . dol_buildpath('/digiriskdolibarr/view/accident/accident_list.php', 1) . '">' . $langs->trans("BackToList") . '</a>';
+    // Object card
+    // ------------------------------------------------------------
+    list($moreHtmlRef, $moreParams) = $object->getBannerTabContent();
 
-	saturne_banner_tab($object, 'id', $linkback, 1, 'rowid', 'ref', $moreHtmlRef, dol_strlen($object->photo) > 0);
+    saturne_banner_tab($object, 'id', '', 1, 'rowid', 'ref', $moreHtmlRef, dol_strlen($object->photo) > 0, $moreParams);
 
 	print '<div class="div-table-responsive">';
 	print '<div class="fichecenter">';
@@ -509,10 +516,10 @@ if ((empty($action) || ($action != 'create' && $action != 'edit'))) {
 	$object = $accidentmetadata;
 
 	//Relative location
-	if ($object->relative_location < 0) {
-		$object->relative_location = '';
-	} else {
+	if (dol_strlen($object->relative_location) > 0 && $object->relative_location != '-1') {
         $object->relative_location = $langs->trans($object->relative_location);
+	} else {
+        $object->relative_location = '';
     }
 
 	//Accident Noticed

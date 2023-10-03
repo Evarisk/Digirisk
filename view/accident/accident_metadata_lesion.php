@@ -37,7 +37,6 @@ require_once DOL_DOCUMENT_ROOT . '/projet/class/project.class.php';
 require_once __DIR__ . '/../../class/accident.class.php';
 require_once __DIR__ . '/../../lib/digiriskdolibarr_function.lib.php';
 require_once __DIR__ . '/../../lib/digiriskdolibarr_accident.lib.php';
-require_once __DIR__ . '/../../core/modules/digiriskdolibarr/digiriskelement/accidentlesion/mod_accident_lesion_standard.php';
 
 global $conf, $db, $hookmanager, $langs, $user;
 
@@ -48,6 +47,7 @@ saturne_load_langs();
 $id                  = GETPOST('id', 'int');
 $lineid              = GETPOST('lineid', 'int');
 $action              = GETPOST('action', 'aZ09');
+$cancel              = GETPOST('cancel', 'aZ09');
 $contextpage         = GETPOST('contextpage', 'aZ') ? GETPOST('contextpage', 'aZ') : 'accidentmetadata'; // To manage different context of search
 $backtopage          = GETPOST('backtopage', 'alpha');
 $backtopageforcancel = GETPOST('backtopageforcancel', 'alpha');
@@ -61,8 +61,12 @@ $form       = new Form($db);
 
 // Load object
 $object->fetch($id);
+if ($id > 0 && $object->external_accident != 2) {
+    unset($object->fields['fk_soc']);
+    unset($object->fk_soc);
+}
 
-$hookmanager->initHooks(array('accidentmetadatalesion', 'globalcard')); // Note that conf->hooks_modules contains array
+$hookmanager->initHooks(['accidentmetadatalesion', 'globalcard']); // Note that conf->hooks_modules contains array
 
 // Security check
 
@@ -70,9 +74,7 @@ $permissiontoread   = $user->rights->digiriskdolibarr->accident->read;
 $permissiontoadd    = $user->rights->digiriskdolibarr->accident->write;
 $permissiontodelete = $user->rights->digiriskdolibarr->accident->delete;
 
-if ( ! $permissiontoread) accessforbidden();
-
-$refAccidentLesionMod = new $conf->global->DIGIRISKDOLIBARR_ACCIDENT_LESION_ADDON($db);
+saturne_check_access($permissiontoread);
 
 /*
  * Actions
@@ -106,6 +108,7 @@ if (empty($reshook)) {
 		$lesion_localization = GETPOST('lesion_localization');
 		$lesion_nature       = GETPOST('lesion_nature');
 		$parent_id           = GETPOST('parent_id');
+        $error               = 0;
 
 		// Initialize object accident line
 		$now                             = dol_now();
@@ -213,12 +216,11 @@ saturne_header(0, '', $title, $help_url);
 // ------------------------------------------------------------
 saturne_get_fiche_head($object, 'accidentMetadataLesion', $title);
 
-//Number workstop days
-$moreHtmlRef = $object->getMoreHtmlRef($object->id);
+// Object card
+// ------------------------------------------------------------
+list($moreHtmlRef, $moreParams) = $object->getBannerTabContent();
 
-$linkback = '<a href="' . dol_buildpath('/digiriskdolibarr/view/accident/accident_list.php', 1) . '">' . $langs->trans("BackToList") . '</a>';
-
-saturne_banner_tab($object, 'id', $linkback, 1, 'rowid', 'ref', $moreHtmlRef, dol_strlen($object->photo) > 0);
+saturne_banner_tab($object, 'id', '', 1, 'rowid', 'ref', $moreHtmlRef, dol_strlen($object->photo) > 0, $moreParams);
 
 // ACCIDENT LESION
 print '<div class="div-table-responsive-no-min" style="overflow-x: unset !important">';
