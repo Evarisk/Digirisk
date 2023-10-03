@@ -784,26 +784,6 @@ if ($action == 'create') {
 	$doleditor->Create();
 	print '</td></tr>';
 
-    print '<tr class="linked-medias photo"> <td class=""><label for="photo">' . $langs->trans("Photos") . '</label></td>';
-    print '<td class="linked-medias-list" style="display: flex; gap: 10px; height: auto;">';
-    $pathPhotos = $conf->digiriskdolibarr->multidir_output[$conf->entity] . '/accident/tmp/ACC0/photos';
-    ?>
-    <input hidden multiple class="fast-upload" id="fast-upload-photo-default" type="file" name="userfile[]" capture="environment" accept="image/*">
-    <label for="fast-upload-photo-default">
-        <div class="wpeo-button button-square-50">
-            <i class="fas fa-camera"></i><i class="fas fa-plus-circle button-add"></i>
-        </div>
-    </label>
-    <input type="hidden" class="favorite-photo" id="photo" name="photo" value="<?php echo GETPOST('favorite_photo') ?>"/>
-    <div class="wpeo-button button-square-50 open-media-gallery add-media modal-open" value="0">
-        <input type="hidden" class="modal-options" data-modal-to-open="media_gallery" data-from-id="0" data-from-type="accident" data-from-subtype="photo" data-from-subdir="photos"/>
-        <i class="fas fa-folder-open"></i><i class="fas fa-plus-circle button-add"></i>
-    </div>
-    <?php
-    $relativepath = 'digiriskdolibarr/medias/thumbs';
-    print saturne_show_medias_linked('digiriskdolibarr', $pathPhotos, 'small', 0, 0, 0, 0, 50, 50, 0, 0, 0, '/accident/tmp/ACC0/photos', $object, 'photo', $permissiontoadd, $permissiontodelete);
-    print '</td></tr>';
-
 	// Other attributes
 	//  include DOL_DOCUMENT_ROOT.'/core/tpl/extrafields_add.tpl.php';
 
@@ -905,28 +885,6 @@ if (($id || $ref) && $action == 'edit') {
 	$doleditor = new DolEditor('description', $object->description, '', 90, 'dolibarr_details', '', false, true, $conf->global->FCKEDITOR_ENABLE_SOCIETE, ROWS_3, '90%');
 	$doleditor->Create();
 	print '</td></tr>';
-
-    print '<tr class="linked-medias photo"> <td class=""><label for="photo">' . $langs->trans("Photos") . '</label></td>';
-    print '<td class="linked-medias-list" style="display: flex; gap: 10px; height: auto;">';
-    $pathPhotos = $conf->digiriskdolibarr->multidir_output[$conf->entity] . '/accident/' . $object->ref . '/photos';
-    ?>
-    <span class="add-medias" <?php echo ($object->status <= Accident::STATUS_VALIDATED) ? '' : 'style="display:none"' ?>>
-		<input hidden multiple class="fast-upload" id="fast-upload-photo-default" type="file" name="userfile[]" capture="environment" accept="image/*">
-		<label for="fast-upload-photo-default">
-			<div class="wpeo-button button-square-50">
-				<i class="fas fa-camera"></i><i class="fas fa-plus-circle button-add"></i>
-			</div>
-		</label>
-		<input type="hidden" class="favorite-photo" id="photo" name="photo" value="<?php echo (dol_strlen($object->photo) > 0 ? $object->photo : GETPOST('favorite_photo')) ?>"/>
-		<div class="wpeo-button button-square-50 open-media-gallery add-media modal-open" value="0">
-			<input type="hidden" class="modal-options" data-modal-to-open="media_gallery" data-from-id="<?php echo $object->id?>" data-from-type="accident" data-from-subtype="photo" data-from-subdir="photos"/>
-			<i class="fas fa-folder-open"></i><i class="fas fa-plus-circle button-add"></i>
-		</div>
-	</span>
-    <?php
-    $relativepath = 'digiriskdolibarr/medias/thumbs';
-    print saturne_show_medias_linked('digiriskdolibarr', $pathPhotos, 'small', 0, 0, 0, 0, 50, 50, 0, 0, 0, 'accident/'. $object->ref . '/photos/', $object, 'photo', $permissiontoadd, $permissiontodelete && $object->status <= Accident::STATUS_VALIDATED);
-    print '</td></tr>';
 
 	// Other attributes
 	include DOL_DOCUMENT_ROOT . '/core/tpl/extrafields_add.tpl.php';
@@ -1133,6 +1091,28 @@ if ((empty($action) || ($action != 'create' && $action != 'edit'))) {
 	print '<td>';
 	print $object->description;
 	print '</td></tr>';
+
+    print '<tr class="linked-medias photo"> <td class=""><label for="photo">' . $langs->trans("Photos") . '</label></td>';
+    print '<td class="linked-medias-list" style="display: flex; gap: 10px; height: auto;">';
+    $pathPhotos = $conf->digiriskdolibarr->multidir_output[$conf->entity] . '/accident/' . $object->ref . '/photos';
+    ?>
+    <span class="add-medias" <?php echo ($object->status <= Accident::STATUS_VALIDATED) ? '' : 'style="display:none"' ?>>
+		<input hidden multiple class="fast-upload" id="fast-upload-photo-default" type="file" name="userfile[]" capture="environment" accept="image/*">
+		<label for="fast-upload-photo-default">
+			<div class="wpeo-button button-square-50">
+				<i class="fas fa-camera"></i><i class="fas fa-plus-circle button-add"></i>
+			</div>
+		</label>
+		<input type="hidden" class="favorite-photo" id="photo" name="photo" value="<?php echo (dol_strlen($object->photo) > 0 ? $object->photo : GETPOST('favorite_photo')) ?>"/>
+		<div class="wpeo-button button-square-50 open-media-gallery add-media modal-open" value="0">
+			<input type="hidden" class="modal-options" data-modal-to-open="media_gallery" data-from-id="<?php echo $object->id?>" data-from-type="accident" data-from-subtype="photo" data-from-subdir="photos"/>
+			<i class="fas fa-folder-open"></i><i class="fas fa-plus-circle button-add"></i>
+		</div>
+	</span>
+    <?php
+    $relativepath = 'digiriskdolibarr/medias/thumbs';
+    print saturne_show_medias_linked('digiriskdolibarr', $pathPhotos, 'small', 0, 0, 0, 0, 50, 50, 0, 0, 0, 'accident/'. $object->ref . '/photos/', $object, 'photo', $permissiontoadd, $permissiontodelete && $object->status <= Accident::STATUS_VALIDATED);
+    print '</td></tr>';
 
 	print '</table>';
 	print '</div>';
