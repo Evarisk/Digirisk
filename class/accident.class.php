@@ -466,7 +466,7 @@ class Accident extends SaturneObject
 		if (is_array($allaccidents) && !empty($allaccidents)) {
 			$accidentworkstop = new AccidentWorkStop($this->db);
 			foreach ($allaccidents as $accident) {
-				$allaccidentworkstop = $accidentworkstop->fetchAll('', '', 0, 0, ['customsql' => 't.fk_accident = ' . $accident->id]);
+				$allaccidentworkstop = $accidentworkstop->fetchFromParent($accident->id);
 				if (is_array($allaccidentworkstop) && !empty($allaccidentworkstop)) {
 					$nbaccidents += 1;
 				} else {
@@ -494,7 +494,7 @@ class Accident extends SaturneObject
 		if (is_array($allaccidents) && !empty($allaccidents)) {
 			$accidentworkstop = new AccidentWorkStop($this->db);
 			foreach ($allaccidents as $accident) {
-				$allaccidentworkstop = $accidentworkstop->fetchAll('', '', 0, 0, ['customsql' => 't.fk_accident = ' . $accident->id]);;
+				$allaccidentworkstop = $accidentworkstop->fetchFromParent($accident->id);
 				if (is_array($allaccidentworkstop) && !empty($allaccidentworkstop)) {
 					foreach ($allaccidentworkstop as $accidentworkstop) {
 						if ($accidentworkstop->id > 0) {
@@ -773,6 +773,20 @@ class AccidentWorkStop extends SaturneObject
 	{
 		return parent::__construct($db, $this->module, $this->element);
 	}
+
+    /**
+     * Load object in memory from the database
+     *
+     * @param  int       $parent_id Id parent object
+     * @return array|int            <0 if KO, 0 if not found, >0 if OK
+     * @throws Exception
+     */
+    public function fetchFromParent(int $parent_id)
+    {
+        $filter = ['customsql' => 'fk_accident =' . $this->db->escape($parent_id) . ' AND t.status >= 0'];
+
+        return $this->fetchAll('', '', 0, 0, $filter);
+    }
 }
 
 /**
