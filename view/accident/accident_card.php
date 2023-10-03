@@ -656,6 +656,7 @@ if (empty($reshook)) {
 
     // Action clone object
     if ($action == 'confirm_clone' && $confirm == 'yes') {
+        $options['label']    = GETPOST('clone_label');
         $options['workstop'] = GETPOST('clone_workstop');
         $options['lesion']   = GETPOST('clone_lesion');
         $options['metadata'] = GETPOST('clone_metadata');
@@ -1004,6 +1005,7 @@ if ((empty($action) || ($action != 'create' && $action != 'edit'))) {
 	// Clone confirmation
 	if (($action == 'clone' && (empty($conf->use_javascript_ajax) || !empty($conf->dol_use_jmobile))) || (!empty($conf->use_javascript_ajax) && empty($conf->dol_use_jmobile))) {
         $formQuestionClone = [
+            ['type' => 'text',     'name' => 'clone_label',    'label' => $langs->trans('NewLabelForClone', $langs->transnoentities('The' . ucfirst($object->element))), 'value' => $langs->trans('CopyOf') . ' ' . $object->ref, 'size' => 24],
             ['type' => 'checkbox', 'name' => 'clone_workstop', 'label' => $langs->trans('CloneWorkStop'), 'value' => 1],
             ['type' => 'checkbox', 'name' => 'clone_metadata', 'label' => $langs->trans('CloneMetadata'), 'value' => 1],
             ['type' => 'checkbox', 'name' => 'clone_lesion',   'label' => $langs->trans('CloneLesion'),   'value' => 1],

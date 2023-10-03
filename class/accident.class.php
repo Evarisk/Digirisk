@@ -237,8 +237,15 @@ class Accident extends SaturneObject
 
 		// Clear fields.
 		if (property_exists($object, 'ref')) {
-			$object->ref = '';
-		}
+            $object->ref = $object->getNextNumRef();
+        }
+        if (!empty($options['label'])) {
+            if (property_exists($object, 'label')) {
+                $object->label = $options['label'];
+            }
+        } else {
+            $object->label = $langs->trans('CloneFrom') . ' ' . $objectRef;
+        }
 		if (property_exists($object, 'ref_ext')) {
 			$object->ref_ext = '';
 		}
@@ -253,8 +260,6 @@ class Accident extends SaturneObject
         }
 
         // Create clone
-        $object->ref     = $object->getNextNumRef();
-        $object->label   = $langs->trans('CloneFrom') . ' ' . $object->label;
         $object->context = 'createfromclone';
 		$accidentId      = $object->create($user);
 
