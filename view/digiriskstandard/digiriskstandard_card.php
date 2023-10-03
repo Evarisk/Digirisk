@@ -34,12 +34,16 @@ require_once DOL_DOCUMENT_ROOT . '/core/lib/images.lib.php';
 require_once DOL_DOCUMENT_ROOT . '/core/lib/functions2.lib.php';
 require_once DOL_DOCUMENT_ROOT . '/projet/class/project.class.php';
 
+// Load Saturne libraries
+require_once __DIR__ . '/../../../saturne/class/saturnedashboard.class.php';
+
 require_once __DIR__ . '/../../class/digiriskstandard.class.php';
 require_once __DIR__ . '/../../class/digiriskdolibarrdashboard.class.php';
 require_once __DIR__ . '/../../lib/digiriskdolibarr_digiriskstandard.lib.php';
 require_once __DIR__ . '/../../lib/digiriskdolibarr_function.lib.php';
 
-global $db, $conf, $langs, $user, $hookmanager, $maxwidthmini, $maxheightmini, $maxwidthsmall,$maxheightsmall;
+// Global variables definitions
+global $conf, $db, $hookmanager, $moduleNameLowerCase, $moduleNameUpperCase, $langs, $user;
 
 // Load translation files required by the page
 saturne_load_langs();
@@ -65,32 +69,22 @@ saturne_check_access($permissiontoread);
  *  Actions
 */
 
-if ($action == 'adddashboardinfo') {
-	$data = json_decode(file_get_contents('php://input'), true);
+if ($action == 'adddashboardinfo' || $action == 'closedashboardinfo') {
+    $data                = json_decode(file_get_contents('php://input'), true);
+    $dashboardWidgetName = $data['dashboardWidgetName'];
+    $confName            = $moduleNameUpperCase . '_DISABLED_DASHBOARD_INFO';
+    $visible             = json_decode($user->conf->$confName);
 
-	$dashboardWidgetName = $data['dashboardWidgetName'];
+    if ($action == 'adddashboardinfo') {
+        unset($visible->$dashboardWidgetName);
+    } else {
+        $visible->$dashboardWidgetName = 0;
+    }
 
-	$visible = json_decode($user->conf->DIGIRISKDOLIBARR_DISABLED_DASHBOARD_INFO);
-	unset($visible->$dashboardWidgetName);
+    $tabParam[$confName] = json_encode($visible);
 
-	$tabparam['DIGIRISKDOLIBARR_DISABLED_DASHBOARD_INFO'] = json_encode($visible);
-
-	dol_set_user_param($db, $conf, $user, $tabparam);
-	$action = '';
-}
-
-if ($action == 'closedashboardinfo') {
-	$data = json_decode(file_get_contents('php://input'), true);
-
-	$dashboardWidgetName = $data['dashboardWidgetName'];
-
-	$visible = json_decode($user->conf->DIGIRISKDOLIBARR_DISABLED_DASHBOARD_INFO);
-	$visible->$dashboardWidgetName = 0;
-
-	$tabparam['DIGIRISKDOLIBARR_DISABLED_DASHBOARD_INFO'] = json_encode($visible);
-
-	dol_set_user_param($db, $conf, $user, $tabparam);
-	$action = '';
+    dol_set_user_param($db, $conf, $user, $tabParam);
+    $action = '';
 }
 
 /*

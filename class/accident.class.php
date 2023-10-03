@@ -368,53 +368,51 @@ class Accident extends SaturneObject
 		return dolGetStatus($this->labelStatus[$status], $this->labelStatusShort[$status], '', $statusType, $mode);
 	}
 
-	/**
-	 * Load dashboard info accident
-	 *
-	 * @return array
-	 * @throws Exception
-	 */
-	public function load_dashboard()
-	{
-		global $conf, $langs;
+    /**
+     * Load dashboard info accident
+     *
+     * @return array
+     * @throws Exception
+     */
+    public function load_dashboard(): array
+    {
+        global $conf, $langs;
 
-		$arrayNbDaysWithoutAccident    = $this->getNbDaysWithoutAccident();
-		$arrayNbAccidents              = $this->getNbAccidents();
-		$arrayNbWorkstopDays           = $this->getNbWorkstopDays();
-		$arrayNbAccidentsByEmployees   = $this->getNbAccidentsByEmployees();
-		$arrayNbPresquAccidents        = $this->getNbPresquAccidents();
-		$arrayNbAccidentInvestigations = $this->getNbAccidentInvestigations();
-		$arrayFrequencyIndex           = $this->getFrequencyIndex();
-		$arrayFrequencyRate            = $this->getFrequencyRate();
-		//$arrayGravityIndex           = $this->getGravityIndex();
-		$arrayGravityRate              = $this->getGravityRate();
+        $arrayNbDaysWithoutAccident    = $this->getNbDaysWithoutAccident();
+        $arrayNbAccidents              = $this->getNbAccidents();
+        $arrayNbWorkstopDays           = $this->getNbWorkstopDays();
+        $arrayNbAccidentsByEmployees   = $this->getNbAccidentsByEmployees();
+        $arrayNbPresquAccidents        = $this->getNbPresquAccidents();
+        $arrayNbAccidentInvestigations = $this->getNbAccidentInvestigations();
+        $arrayFrequencyIndex           = $this->getFrequencyIndex();
+        $arrayFrequencyRate            = $this->getFrequencyRate();
+        //$arrayGravityIndex           = $this->getGravityIndex();
+        $arrayGravityRate              = $this->getGravityRate();
 
-		$array['widgets'] = [
-			DigiriskDolibarrDashboard::DASHBOARD_ACCIDENT => [
-				'label'      => [$langs->transnoentities("DayWithoutAccident"), $langs->transnoentities("WorkStopDays"), $langs->transnoentities("NbAccidentsByEmployees"), $langs->transnoentities("NbPresquAccidents"), $langs->transnoentities("NbAccidentInvestigations")],
-				'content'    => [$arrayNbDaysWithoutAccident['daywithoutaccident'], $arrayNbWorkstopDays['nbworkstopdays'], $arrayNbAccidentsByEmployees['nbaccidentsbyemployees'], $arrayNbPresquAccidents['nbpresquaccidents'], $arrayNbAccidentInvestigations['nbaccidentinvestigations']],
-				'picto'      => 'fas fa-user-injured',
-				'widgetName' => $langs->transnoentities('Accident')
-			],
-			DigiriskDolibarrDashboard::DASHBOARD_ACCIDENT_INDICATOR_RATE => [
-				'label'      => [$langs->transnoentities("FrequencyIndex"), $langs->transnoentities("FrequencyRate"), $langs->transnoentities("GravityRate")],
-				'content'    => [$arrayFrequencyIndex['frequencyindex'], $arrayFrequencyRate['frequencyrate'], $arrayGravityRate['gravityrate']],
-				'tooltip'    => [
-					(($conf->global->DIGIRISKDOLIBARR_NB_EMPLOYEES > 0 && $conf->global->DIGIRISKDOLIBARR_MANUAL_INPUT_NB_EMPLOYEES) ? $langs->transnoentities("FrequencyIndexTooltip") . '<br>' . $langs->transnoentities("NbEmployeesConfTooltip") : $langs->transnoentities("FrequencyIndexTooltip")),
-					(($conf->global->DIGIRISKDOLIBARR_NB_WORKED_HOURS > 0 && $conf->global->DIGIRISKDOLIBARR_MANUAL_INPUT_NB_WORKED_HOURS) ? $langs->transnoentities("FrequencyRateTooltip") . '<br>' . $langs->transnoentities("NbWorkedHoursTooltip") : $langs->transnoentities("FrequencyRateTooltip")),
-					(($conf->global->DIGIRISKDOLIBARR_NB_WORKED_HOURS > 0 && $conf->global->DIGIRISKDOLIBARR_MANUAL_INPUT_NB_WORKED_HOURS) ? $langs->transnoentities("GravityRateTooltip") . '<br>' . $langs->transnoentities("NbWorkedHoursTooltip") : $langs->transnoentities("GravityRateTooltip"))
-				],
-				'picto'      => 'fas fa-chart-bar',
-				'widgetName' => $langs->transnoentities('AccidentRateIndicator')
-			]
-		];
+        $array['widgets'] = [
+            'accident' => [
+                'label'      => [$langs->transnoentities('DayWithoutAccident') ?? '', $langs->transnoentities('WorkStopDays') ?? '', $langs->transnoentities('NbAccidentsByEmployees') ?? '', $langs->transnoentities('NbPresquAccidents') ?? '', $langs->transnoentities('NbAccidentInvestigations') ?? ''],
+                'content'    => [$arrayNbDaysWithoutAccident['daywithoutaccident'] ?? 0, $arrayNbWorkstopDays['nbworkstopdays'] ?? 0, $arrayNbAccidentsByEmployees['nbaccidentsbyemployees'] ?? 0, $arrayNbPresquAccidents['nbpresquaccidents'] ?? 0, $arrayNbAccidentInvestigations['nbaccidentinvestigations'] ?? 0],
+                'picto'      => 'fas fa-user-injured',
+                'widgetName' => $langs->transnoentities('Accident')
+            ],
+            'accidentrateindicator' => [
+                'label'      => [$langs->transnoentities('FrequencyIndex') ?? '', $langs->transnoentities('FrequencyRate') ?? '', $langs->transnoentities('GravityRate') ?? ''],
+                'content'    => [$arrayFrequencyIndex['frequencyindex'] ?? 0, $arrayFrequencyRate['frequencyrate'] ?? 0, $arrayGravityRate['gravityrate'] ?? 0],
+                'tooltip'    => [
+                    (($conf->global->DIGIRISKDOLIBARR_NB_EMPLOYEES > 0 && $conf->global->DIGIRISKDOLIBARR_MANUAL_INPUT_NB_EMPLOYEES) ? $langs->transnoentities('FrequencyIndexTooltip') . '<br>' . $langs->transnoentities('NbEmployeesConfTooltip') : $langs->transnoentities('FrequencyIndexTooltip')),
+                    (($conf->global->DIGIRISKDOLIBARR_NB_WORKED_HOURS > 0 && $conf->global->DIGIRISKDOLIBARR_MANUAL_INPUT_NB_WORKED_HOURS) ? $langs->transnoentities('FrequencyRateTooltip') . '<br>' . $langs->transnoentities('NbWorkedHoursTooltip') : $langs->transnoentities('FrequencyRateTooltip')),
+                    (($conf->global->DIGIRISKDOLIBARR_NB_WORKED_HOURS > 0 && $conf->global->DIGIRISKDOLIBARR_MANUAL_INPUT_NB_WORKED_HOURS) ? $langs->transnoentities('GravityRateTooltip') . '<br>' . $langs->transnoentities('NbWorkedHoursTooltip') : $langs->transnoentities('GravityRateTooltip'))
+                ],
+                'picto'      => 'fas fa-chart-bar',
+                'widgetName' => $langs->transnoentities('AccidentRateIndicator')
+            ]
+        ];
 
-		$array['dataset'] = 2;
+        $array['graphs'] = [$arrayNbAccidents];
 
-		$array['graphs'] = $arrayNbAccidents;
-
-		return $array;
-	}
+        return $array;
+    }
 
 	/**
 	 * Get number days without accident.
@@ -434,48 +432,59 @@ class Accident extends SaturneObject
 		return $array;
 	}
 
-	/**
-	 * Get number accidents.
-	 *
-	 * @return array
-	 * @throws Exception
-	 */
-	public function getNbAccidents() {
-		global $langs;
+    /**
+     * Get number accidents
+     *
+     * @return array
+     * @throws Exception
+     */
+    public function getNbAccidents(): array
+    {
+        global $langs;
 
-		// Number accidents
-		$array['title'] = $langs->transnoentities('AccidentRepartition');
-		$array['picto'] = $this->picto;
-		$array['labels'] = array(
-			'accidents' => array(
-				'label' => $langs->transnoentities('AccidentWithDIAT'),
-				'color' => '#e05353'
-			),
-			'accidentswithoutDIAT' => array(
-				'label' => $langs->transnoentities('AccidentWithoutDIAT'),
-				'color' => '#e9ad4f'
-			),
-		);
-		$allaccidents = $this->fetchAll('','',0,0,['customsql' => ' t.status > 0 ']);
+        // Graph Title parameters
+        $array['title'] = $langs->transnoentities('AccidentRepartition');
+        $array['picto'] = $this->picto;
 
-		if (is_array($allaccidents) && !empty($allaccidents)) {
-			$accidentworkstop = new AccidentWorkStop($this->db);
-			foreach ($allaccidents as $accident) {
-				$allaccidentworkstop = $accidentworkstop->fetchAll('', '', 0, 0, ['customsql' => 't.fk_accident = ' . $accident->id]);
-				if (is_array($allaccidentworkstop) && !empty($allaccidentworkstop)) {
-					$nbaccidents += 1;
-				} else {
-					$nbaccidentswithoutDIAT += 1;
-				}
-			}
-			$array['data']['accidents'] = $nbaccidents;
-			$array['data']['accidentswithoutDIAT'] = $nbaccidentswithoutDIAT;
-		} else {
-			$array['data']['accidents'] = 0;
-			$array['data']['accidentswithoutDIAT'] = 0;
-		}
-		return $array;
-	}
+        // Graph parameters
+        $array['width']   = '100%';
+        $array['height']  = 400;
+        $array['type']    = 'pie';
+        $array['dataset'] = 1;
+
+        $array['labels'] = [
+            'accidents' => [
+                'label' => $langs->transnoentities('AccidentWithDIAT'),
+                'color' => '#e05353'
+            ],
+            'accidentswithoutDIAT' => [
+                'label' => $langs->transnoentities('AccidentWithoutDIAT'),
+                'color' => '#e9ad4f'
+            ],
+        ];
+
+        $nbAccidents            = 0;
+        $nbAccidentsWithoutDIAT = 0;
+        $accidents              = $this->fetchAll('','',0,0,['customsql' => ' t.status > 0 ']);
+        if (is_array($accidents) && !empty($accidents)) {
+            $accidentWorkStop = new AccidentWorkStop($this->db);
+            foreach ($accidents as $accident) {
+                $accidentWorkStops = $accidentWorkStop->fetchAll('', '', 0, 0, ['customsql' => 't.fk_accident = ' . $accident->id]);
+                if (is_array($accidentWorkStops) && !empty($accidentWorkStops)) {
+                    $nbAccidents += 1;
+                } else {
+                    $nbAccidentsWithoutDIAT += 1;
+                }
+            }
+            $array['data']['accidents'] = $nbAccidents;
+            $array['data']['accidentswithoutDIAT'] = $nbAccidentsWithoutDIAT;
+        } else {
+            $array['data']['accidents'] = 0;
+            $array['data']['accidentswithoutDIAT'] = 0;
+        }
+
+        return $array;
+    }
 
 	/**
 	 * Get number workstop days.
