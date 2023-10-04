@@ -111,7 +111,8 @@ class InterfaceDigiriskdolibarrTriggers extends DolibarrTriggers
 	 */
 	public function runTrigger($action, $object, User $user, Translate $langs, Conf $conf)
 	{
-		$active = 1; //getDolGlobalInt('DIGIRISKDOLIBARR_MAIN_AGENDA_ACTIONAUTO_' . $action);
+        $action = str_replace('@DIGIRISKDOLIBARR', '', $action);
+		$active = getDolGlobalInt('DIGIRISKDOLIBARR_MAIN_AGENDA_ACTIONAUTO_' . $action);
 
 		if (!isModEnabled('digiriskdolibarr') || !$active) {
             $allowedTriggers = ['COMPANY_DELETE', 'CONTACT_DELETE', 'TICKET_CREATE'];
@@ -135,7 +136,7 @@ class InterfaceDigiriskdolibarrTriggers extends DolibarrTriggers
 		$digiriskresources = new DigiriskResources($this->db);
 		$digiriskelement   = new DigiriskElement($this->db);
 
-		$actioncomm->elementtype = $object->element . '@digiriskdolibarr';
+		$actioncomm->elementtype = $object->element;
 		$actioncomm->type_code   = 'AC_OTH_AUTO';
 		$actioncomm->code        = 'AC_' . $action;
 		$actioncomm->datep       = $now;
@@ -143,27 +144,12 @@ class InterfaceDigiriskdolibarrTriggers extends DolibarrTriggers
 		$actioncomm->userownerid = $user->id;
 		$actioncomm->percentage  = -1;
 
+        // Trigger descriptions are handled by class function getTriggerDescription
 		if (getDolGlobalInt('DIGIRISKDOLIBARR_ADVANCED_TRIGGER') && !empty($object->fields)) {
 			$actioncomm->note_private = method_exists($object, 'getTriggerDescription') ? $object->getTriggerDescription($object) : '';
 		}
 
 		switch ($action) {
-            case 'RISKASSESSMENTDOCUMENT_GENERATE' :
-            case 'LEGALDISPLAY_GENERATE' :
-            case 'INFORMATIONSSHARING_GENERATE' :
-                $digiriskstandard->fetch($object->parent_id);
-				$actioncomm->elementtype = $object->parent_type . '@digiriskdolibarr';
-				$actioncomm->elementid   = $object->parent_id;
-
-				$actioncomm->label         = $langs->trans('ObjectGenerateTrigger', $langs->transnoentities(ucfirst($object->element)), $object->ref);
-				$actioncomm->note_private .= $langs->trans('ElementType') . ' : ' . $object->parent_type . '</br>';
-				$actioncomm->note_private .= $langs->trans('ParentElement') . ' : ' . $digiriskstandard->ref . ' ' . $digiriskstandard->label . '</br>';
-				$actioncomm->note_private .= $langs->trans('LastMainDoc') . ' : ' . $object->last_main_doc . '<br>';
-				$actioncomm->fk_element    = $object->parent_id;
-
-				$result = $actioncomm->create($user);
-				break;
-
 			case 'COMPANY_DELETE' :
 				require_once __DIR__ . '/../../class/preventionplan.class.php';
 				require_once __DIR__ . '/../../class/firepermit.class.php';
@@ -227,76 +213,22 @@ class InterfaceDigiriskdolibarrTriggers extends DolibarrTriggers
 				}
 				break;
 
+            case 'RISKASSESSMENTDOCUMENT_GENERATE' :
+            case 'LEGALDISPLAY_GENERATE' :
+            case 'INFORMATIONSSHARING_GENERATE' :
+            case 'FIREPERMITDOCUMENT_GENERATE' :
 			case 'PREVENTIONPLANDOCUMENT_GENERATE' :
-				$preventionplan = new PreventionPlan($this->db);
-				$preventionplan->fetch($object->parent_id);
-
-				$actioncomm->elementtype = $object->parent_type . '@digiriskdolibarr';
-				$actioncomm->elementid   = $object->parent_id;
-
-				$actioncomm->label         = $langs->trans('ObjectGenerateTrigger', $langs->transnoentities(ucfirst($object->element)), $object->ref);
-				$actioncomm->note_private .= $langs->trans('ElementType') . ' : ' . $object->parent_type . '</br>';
-				$actioncomm->note_private .= $langs->trans('ParentElement') . ' : ' . $preventionplan->ref . ' ' . $preventionplan->label . '</br>';
-				$actioncomm->note_private .= $langs->trans('LastMainDoc') . ' : ' . $object->last_main_doc . '<br>';
-				$actioncomm->fk_element    = $object->parent_id;
-
-				$result = $actioncomm->create($user);
-				break;
-
-			case 'FIREPERMITDOCUMENT_GENERATE' :
-				$firepermit = new FirePermit($this->db);
-				$firepermit->fetch($object->parent_id);
-
-				$actioncomm->elementtype = $object->parent_type . '@digiriskdolibarr';
-				$actioncomm->elementid   = $object->parent_id;
-
-				$actioncomm->label         = $langs->trans('ObjectGenerateTrigger', $langs->transnoentities(ucfirst($object->element)), $object->ref);
-				$actioncomm->note_private .= $langs->trans('ElementType') . ' : ' . $object->parent_type . '</br>';
-				$actioncomm->note_private .= $langs->trans('ParentElement') . ' : ' . $firepermit->ref . ' ' . $firepermit->label . '</br>';
-				$actioncomm->note_private .= $langs->trans('LastMainDoc') . ' : ' . $object->last_main_doc . '<br>';
-				$actioncomm->fk_element    = $object->parent_id;
-
-				$result = $actioncomm->create($user);
-				break;
-
+            case 'LISTINGRISKSACTION_GENERATE' :
+            case 'LISTINGRISKSPHOTO_GENERATE' :
             case 'WORKUNITDOCUMENT_GENERATE' :
 			case 'GROUPMENTDOCUMENT_GENERATE' :
-				$digiriskelement->fetch($object->parent_id);
+                $actioncomm->elementtype = $object->parent_type . '@digiriskdolibarr';
 
-				$actioncomm->elementtype = 'digiriskelement@digiriskdolibarr';
-				$actioncomm->elementid   = $object->parent_id;
+                $actioncomm->label       = $langs->trans('ObjectGenerateTrigger', $langs->transnoentities(ucfirst(get_class($object))), $object->ref);
+                $actioncomm->elementid   = $object->parent_id;
+                $actioncomm->fk_element  = $object->parent_id;
 
-				$actioncomm->label         = $langs->trans('ObjectGenerateTrigger', $langs->transnoentities(ucfirst($object->element)), $object->ref);
-				$actioncomm->note_private .= $langs->trans('ElementType') . ' : ' . $object->parent_type . '</br>';
-				$actioncomm->note_private .= $langs->trans('ParentElement') . ' : ' . $digiriskelement->ref . ' ' . $digiriskelement->label . '</br>';
-				$actioncomm->note_private .= $langs->trans('LastMainDoc') . ' : ' . $object->last_main_doc . '<br>';
-				$actioncomm->fk_element    = $object->parent_id;
-
-				$result = $actioncomm->create($user);
-				break;
-
-            case 'LISTINGRISKSACTION_GENERATE' :
-			case 'LISTINGRISKSPHOTO_GENERATE' :
-
-				if ($object->parent_type == 'digiriskstandard') {
-					$actioncomm->elementtype = 'digiriskstandard@digiriskdolibarr';
-					$parentelement = new DigiriskStandard($this->db);
-					$parentelement->fetch($object->parent_id);
-				} else {
-					$actioncomm->elementtype = 'digiriskelement@digiriskdolibarr';
-					$parentelement = new DigiriskElement($this->db);
-					$parentelement->fetch($object->parent_id);
-				}
-
-				$actioncomm->elementid = $object->parent_id;
-
-				$actioncomm->label         = $langs->trans('ObjectGenerateTrigger', $langs->transnoentities(ucfirst($object->element)), $object->ref);
-				$actioncomm->note_private .= $langs->trans('ElementType') . ' : ' . $object->parent_type . '</br>';
-				$actioncomm->note_private .= $langs->trans('ParentElement') . ' : ' . $parentelement->ref . ' ' . $parentelement->label . '</br>';
-				$actioncomm->note_private .= $langs->trans('LastMainDoc') . ' : ' . $object->last_main_doc . '<br>';
-				$actioncomm->fk_element    = $object->parent_id;
-
-				$result = $actioncomm->create($user);
+                $result = $actioncomm->create($user);
 				break;
 
 			case 'DIGIRISKELEMENT_CREATE' :
@@ -594,7 +526,7 @@ class InterfaceDigiriskdolibarrTriggers extends DolibarrTriggers
 			case 'RISK_CREATE' :
 				$actioncomm->elementtype = 'digiriskelement@digiriskdolibarr';
 
-				$actioncomm->label      = $langs->trans('ObjectCreateTrigger', $langs->transnoentities(ucfirst($object->element)), $object->ref);
+				$actioncomm->label      = $langs->trans('ObjectCreateTrigger', $langs->transnoentities(get_class($object)), $object->ref);
 				$actioncomm->fk_element = $object->fk_element;
 
 				$result = $actioncomm->create($user);
@@ -604,7 +536,7 @@ class InterfaceDigiriskdolibarrTriggers extends DolibarrTriggers
 			case 'RISK_MODIFY' :
 				$actioncomm->elementtype = 'digiriskelement@digiriskdolibarr';
 
-				$actioncomm->label      = $langs->trans('ObjectModifyTrigger', $langs->transnoentities(ucfirst($object->element)), $object->ref);
+				$actioncomm->label      = $langs->trans('ObjectModifyTrigger', $langs->transnoentities(get_class($object)), $object->ref);
 				$actioncomm->fk_element = $object->fk_element;
 
 				$result = $actioncomm->create($user);
@@ -614,7 +546,7 @@ class InterfaceDigiriskdolibarrTriggers extends DolibarrTriggers
 			case 'RISK_DELETE' :
 				$actioncomm->elementtype = 'digiriskelement@digiriskdolibarr';
 
-				$actioncomm->label      = $langs->trans('ObjectDeleteTrigger', $langs->transnoentities(ucfirst($object->element)), $object->ref);
+				$actioncomm->label      = $langs->trans('ObjectDeleteTrigger', $langs->transnoentities(get_class($object)), $object->ref);
 				$actioncomm->fk_element = $object->fk_element;
 
 				$result = $actioncomm->create($user);
@@ -624,7 +556,7 @@ class InterfaceDigiriskdolibarrTriggers extends DolibarrTriggers
 			case 'RISK_IMPORT' :
                 $actioncomm->elementtype = 'digiriskelement@digiriskdolibarr';
 
-                $actioncomm->label      = $langs->transnoentities('ObjectImportTrigger', $langs->transnoentities(ucfirst($object->element)), $object->ref);
+                $actioncomm->label      = $langs->transnoentities('ObjectImportTrigger', $langs->transnoentities(get_class($object)), $object->ref);
 				$actioncomm->fk_element = $object->applied_on;
 
 				$result = $actioncomm->create($user);
@@ -634,7 +566,7 @@ class InterfaceDigiriskdolibarrTriggers extends DolibarrTriggers
 			case 'RISK_UNLINK' :
                 $actioncomm->elementtype = 'digiriskelement@digiriskdolibarr';
 
-                $actioncomm->label      = $langs->transnoentities('ObjectUnlinkTrigger', $langs->transnoentities(ucfirst($object->element)), $object->ref);
+                $actioncomm->label      = $langs->transnoentities('ObjectUnlinkTrigger', $langs->transnoentities(get_class($object)), $object->ref);
 				$actioncomm->fk_element = $object->applied_on;
 
 				$result = $actioncomm->create($user);

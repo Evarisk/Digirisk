@@ -205,7 +205,7 @@ class Evaluator extends SaturneObject
     {
         global $langs;
 
-        require_once __DIR__ . '/../digiriskelement.class.php';
+        require_once __DIR__ . '/digiriskelement.class.php';
 
         $ret = parent::getTriggerDescription($object);
 
