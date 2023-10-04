@@ -843,10 +843,10 @@ class modDigiriskdolibarr extends DolibarrModules
 			$i++ => ['DIGIRISKDOLIBARR_MAIN_AGENDA_ACTIONAUTO_ACCIDENTINVESTIGATION_CREATE', 'integer', 1, '', 0, 'current'],
 			$i++ => ['DIGIRISKDOLIBARR_MAIN_AGENDA_ACTIONAUTO_ACCIDENTINVESTIGATION_MODIFY', 'integer', 1, '', 0, 'current'],
 			$i++ => ['DIGIRISKDOLIBARR_MAIN_AGENDA_ACTIONAUTO_ACCIDENTINVESTIGATION_DELETE', 'integer', 1, '', 0, 'current'],
-			$i++ => ['DIGIRISKDOLIBARR_MAIN_AGENDA_ACTIONAUTO_ACCIDENT_INVESTIGATION_VALIDATE', 'integer', 1, '', 0, 'current'],
-			$i++ => ['DIGIRISKDOLIBARR_MAIN_AGENDA_ACTIONAUTO_ACCIDENT_INVESTIGATION_UNVALIDATE', 'integer', 1, '', 0, 'current'],
-			$i++ => ['DIGIRISKDOLIBARR_MAIN_AGENDA_ACTIONAUTO_ACCIDENT_INVESTIGATION_ARCHIVE', 'integer', 1, '', 0, 'current'],
-			$i++ => ['DIGIRISKDOLIBARR_MAIN_AGENDA_ACTIONAUTO_ACCIDENT_INVESTIGATION_LOCK', 'integer', 1, '', 0, 'current'],
+			$i++ => ['DIGIRISKDOLIBARR_MAIN_AGENDA_ACTIONAUTO_ACCIDENTINVESTIGATION_VALIDATE', 'integer', 1, '', 0, 'current'],
+			$i++ => ['DIGIRISKDOLIBARR_MAIN_AGENDA_ACTIONAUTO_ACCIDENTINVESTIGATION_UNVALIDATE', 'integer', 1, '', 0, 'current'],
+			$i++ => ['DIGIRISKDOLIBARR_MAIN_AGENDA_ACTIONAUTO_ACCIDENTINVESTIGATION_ARCHIVE', 'integer', 1, '', 0, 'current'],
+			$i++ => ['DIGIRISKDOLIBARR_MAIN_AGENDA_ACTIONAUTO_ACCIDENTINVESTIGATION_LOCK', 'integer', 1, '', 0, 'current'],
 
 			// CONST ACCIDENT INVESTIGATION DOCUMENT
 			$i++ => ['DIGIRISKDOLIBARR_ACCIDENTINVESTIGATIONDOCUMENT_ADDON', 'chaine', 'mod_accident_investigation_document_standard', '', 0, 'current'],
@@ -882,7 +882,7 @@ class modDigiriskdolibarr extends DolibarrModules
 				MAIN_DB_PREFIX . "c_lesion_localization",
 				MAIN_DB_PREFIX . "c_lesion_nature",
 				MAIN_DB_PREFIX . "c_digiriskdolibarr_action_trigger",
-				MAIN_DB_PREFIX . "c_accident_investigation_attendants_role",
+				MAIN_DB_PREFIX . "c_accidentinvestigation_attendants_role",
 				MAIN_DB_PREFIX . "c_preventionplan_attendant_role"
 			],
 
@@ -903,7 +903,7 @@ class modDigiriskdolibarr extends DolibarrModules
 				'SELECT f.rowid as rowid, f.ref, f.label, f.description, f.position, f.active FROM ' . MAIN_DB_PREFIX . 'c_lesion_localization as f',
 				'SELECT f.rowid as rowid, f.ref, f.label, f.description, f.position, f.active FROM ' . MAIN_DB_PREFIX . 'c_lesion_nature as f',
 				'SELECT f.rowid as rowid, f.ref, f.label, f.description, f.position, f.active FROM ' . MAIN_DB_PREFIX . 'c_digiriskdolibarr_action_trigger as f',
-				'SELECT f.rowid as rowid, f.ref, f.label, f.description, f.position, f.active FROM ' . MAIN_DB_PREFIX . 'c_accident_investigation_attendants_role as f',
+				'SELECT f.rowid as rowid, f.ref, f.label, f.description, f.position, f.active FROM ' . MAIN_DB_PREFIX . 'c_accidentinvestigation_attendants_role as f',
 				'SELECT f.rowid as rowid, f.ref, f.label, f.description, f.active FROM ' . MAIN_DB_PREFIX . 'c_lesion_nature as f'
 			],
 
@@ -1207,17 +1207,17 @@ class modDigiriskdolibarr extends DolibarrModules
 		/* ACCIDENT INVESTIGATION PERMISSIONS */
 		$this->rights[$r][0] = $this->numero . sprintf('%02d', $r + 1); // Permission id (must not be already used)
 		$this->rights[$r][1] = $langs->transnoentities('ReadObjects',$langs->transnoentities('AccidentInvestigationsMin')); // Permission label
-		$this->rights[$r][4] = 'accident_investigation'; // In php code, permission will be checked by test if ($user->rights->digiriskdolibarr->level1->level2)
+		$this->rights[$r][4] = 'accidentinvestigation'; // In php code, permission will be checked by test if ($user->rights->digiriskdolibarr->level1->level2)
 		$this->rights[$r][5] = 'read'; // In php code, permission will be checked by test if ($user->rights->digiriskdolibarr->level1->level2)
 		$r++;
 		$this->rights[$r][0] = $this->numero . sprintf('%02d', $r + 1); // Permission id (must not be already used)
 		$this->rights[$r][1] = $langs->transnoentities('CreateObjects', $langs->transnoentities('AccidentInvestigationsMin')); // Permission label
-		$this->rights[$r][4] = 'accident_investigation'; // In php code, permission will be checked by test if ($user->rights->digiriskdolibarr->level1->level2)
+		$this->rights[$r][4] = 'accidentinvestigation'; // In php code, permission will be checked by test if ($user->rights->digiriskdolibarr->level1->level2)
 		$this->rights[$r][5] = 'write'; // In php code, permission will be checked by test if ($user->rights->digiriskdolibarr->level1->level2)
 		$r++;
 		$this->rights[$r][0] = $this->numero . sprintf('%02d', $r + 1); // Permission id (must not be already used)
 		$this->rights[$r][1] = $langs->transnoentities('DeleteObjects', $langs->transnoentities('AccidentInvestigationsMin')); // Permission label
-		$this->rights[$r][4] = 'accident_investigation'; // In php code, permission will be checked by test if ($user->rights->digiriskdolibarr->level1->level2)
+		$this->rights[$r][4] = 'accidentinvestigation'; // In php code, permission will be checked by test if ($user->rights->digiriskdolibarr->level1->level2)
 		$this->rights[$r][5] = 'delete'; // In php code, permission will be checked by test if ($user->rights->digiriskdolibarr->level1->level2)
 		$r++;
 
@@ -1362,11 +1362,11 @@ class modDigiriskdolibarr extends DolibarrModules
 			'titre'    => '<i class="fas fa-search pictofixedwidth" style="padding-right: 4px;"></i>' . $langs->transnoentities('AccidentInvestigation'),
 			'mainmenu' => 'digiriskdolibarr',
 			'leftmenu' => 'digiriskaccidentinvestigation',
-			'url'      => '/digiriskdolibarr/view/accident_investigation/accident_investigation_list.php',
+			'url'      => '/digiriskdolibarr/view/accidentinvestigation/accidentinvestigation_list.php',
 			'langs'    => 'digiriskdolibarr@digiriskdolibarr',	        // Lang file to use (without .lang) by module. File must be in langs/code_CODE/ directory.
 			'position' => 100 + $r,
 			'enabled'  => '$conf->digiriskdolibarr->enabled && $conf->saturne->enabled',  // Define condition to show or hide menu entry. Use '$conf->digiriskdolibarr->enabled' if entry must be visible if module is enabled. Use '$leftmenu==\'system\'' to show if leftmenu system is selected.
-			'perms'    => '$user->rights->digiriskdolibarr->lire && $user->rights->digiriskdolibarr->accident_investigation->read', // Use 'perms'=>'$user->rights->digiriskdolibarr->level1->level2' if you want your menu with a permission rules
+			'perms'    => '$user->rights->digiriskdolibarr->lire && $user->rights->digiriskdolibarr->accidentinvestigation->read', // Use 'perms'=>'$user->rights->digiriskdolibarr->level1->level2' if you want your menu with a permission rules
 			'target'   => '',
 			'user'     => 0,				                // 0=Menu for internal users, 1=external users, 2=both
 		];

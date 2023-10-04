@@ -94,9 +94,9 @@ $hookmanager->initHooks(['accidentcard', 'globalcard']); // Note that conf->hook
 $upload_dir = $conf->digiriskdolibarr->multidir_output[$conf->entity];
 
 // Security check - Protection if external user
-$permissiontoread   = $user->rights->digiriskdolibarr->accident_investigation->read;
-$permissiontoadd    = $user->rights->digiriskdolibarr->accident_investigation->write;
-$permissiontodelete = $user->rights->digiriskdolibarr->accident_investigation->delete;
+$permissiontoread   = $user->rights->digiriskdolibarr->accidentinvestigation->read;
+$permissiontoadd    = $user->rights->digiriskdolibarr->accidentinvestigation->write;
+$permissiontodelete = $user->rights->digiriskdolibarr->accidentinvestigation->delete;
 saturne_check_access($permissiontoread);
 
 /*
@@ -1155,7 +1155,7 @@ if ((empty($action) || ($action != 'create' && $action != 'edit'))) {
 			// Create Investigation.
 			$displayButton = $onPhone ? '<i class="fas fa-search-plus fa-2x"></i>' : '<i class="fas fa-search-plus"></i> ' . $langs->trans('AccidentInvestigation');
 			if ($object->status == $object::STATUS_LOCKED) {
-				print '<a class="butAction" id="actionButtonCreateInvestigation" href="'. dol_buildpath('/custom/digiriskdolibarr/view/accident_investigation/accident_investigation_card.php?action=create&fk_accident=' . $id, 1) .'">' . $displayButton . '</a>';
+				print '<a class="butAction" id="actionButtonCreateInvestigation" href="'. dol_buildpath('/custom/digiriskdolibarr/view/accidentinvestigation/accidentinvestigation_card.php?action=create&fk_accident=' . $id, 1) .'">' . $displayButton . '</a>';
 			} else {
 				print '<span class="butActionRefused classfortooltip" title="' . dol_escape_htmltag($langs->trans('ObjectMustBeLocked', ucfirst($langs->transnoentities('The' . ucfirst($object->element))))) . '">' . $displayButton . '</span>';
 			}
