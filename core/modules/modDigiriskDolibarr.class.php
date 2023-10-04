@@ -871,105 +871,112 @@ class modDigiriskdolibarr extends DolibarrModules
 		$this->tabs[] = ['data' => 'user:+participation:'. $pictoDigirisk .$langs->trans('GP/UTParticipation').':digiriskdolibarr@digiriskdolibarr:1:/custom/digiriskdolibarr/view/digiriskelement/digiriskelement_evaluator.php?fromid=__ID__']; // To add a new tab identified by code tabname1
 		$this->tabs[] = ['data' => 'user:+accidents:'. $pictoDigirisk .$langs->trans('Accidents').':digiriskdolibarr@digiriskdolibarr:1:/custom/digiriskdolibarr/view/accident/accident_list.php?fromiduser=__ID__']; // To add a new tab identified by code tabname1
 
-		// To remove an existing tab identified by code tabname
-		// Dictionaries
-		$this->dictionaries = [
-			'langs' => 'digiriskdolibarr@digiriskdolibarr',
-			// List of tables we want to see into dictonnary editor
-			'tabname' => [
-				MAIN_DB_PREFIX . "c_conventions_collectives",
-				MAIN_DB_PREFIX . "c_relative_location",
-				MAIN_DB_PREFIX . "c_lesion_localization",
-				MAIN_DB_PREFIX . "c_lesion_nature",
-				MAIN_DB_PREFIX . "c_digiriskdolibarr_action_trigger",
-				MAIN_DB_PREFIX . "c_accidentinvestigation_attendants_role",
-				MAIN_DB_PREFIX . "c_preventionplan_attendant_role"
-			],
-
-			// Label of tables
-			'tablib' => [
-				"CollectiveAgreement",
-				"RelativeLocation",
-				"LesionLocalization",
-				"LesionNature",
-				"DigiriskDolibarrActionTrigger",
-				"AccidentInvestigation",
-				"PreventionPlanRole"
-			],
-			// Request to select fields
-			'tabsql' => [
-				'SELECT f.rowid as rowid, f.code, f.libelle, f.active FROM ' . MAIN_DB_PREFIX . 'c_conventions_collectives as f',
-				'SELECT f.rowid as rowid, f.ref, f.label, f.description, f.position, f.active FROM ' . MAIN_DB_PREFIX . 'c_relative_location as f',
-				'SELECT f.rowid as rowid, f.ref, f.label, f.description, f.position, f.active FROM ' . MAIN_DB_PREFIX . 'c_lesion_localization as f',
-				'SELECT f.rowid as rowid, f.ref, f.label, f.description, f.position, f.active FROM ' . MAIN_DB_PREFIX . 'c_lesion_nature as f',
-				'SELECT f.rowid as rowid, f.ref, f.label, f.description, f.position, f.active FROM ' . MAIN_DB_PREFIX . 'c_digiriskdolibarr_action_trigger as f',
-				'SELECT f.rowid as rowid, f.ref, f.label, f.description, f.position, f.active FROM ' . MAIN_DB_PREFIX . 'c_accidentinvestigation_attendants_role as f',
-				'SELECT f.rowid as rowid, f.ref, f.label, f.description, f.active FROM ' . MAIN_DB_PREFIX . 'c_lesion_nature as f'
-			],
-
-			// Sort order
-			'tabsqlsort' => [
-				"code ASC",
-				"label ASC",
-				"label ASC",
-				"label ASC",
-				"ref ASC",
-				"label ASC",
-				'position ASC'
-			],
-
-			// List of fields (result of select to show dictionary)
-			'tabfield' => [
-				"code,libelle",
-				"ref,label,description",
-				"ref,label,description",
-				"ref,label,description",
-				"ref,label,description",
-				"ref,label,description",
-				"ref,label,description"
-			],
-			// List of fields (list of fields to edit a record)
-			'tabfieldvalue' => [
-				"code,libelle",
-				"ref,label,description",
-				"ref,label,description",
-				"ref,label,description",
-				"ref,label,description",
-				"ref,label,description",
-				'ref,label,description,position'
-			],
-			// List of fields (list of fields for insert)
-			'tabfieldinsert' => [
-				"code,libelle",
-				"ref,label,description",
-				"ref,label,description",
-				"ref,label,description",
-				"ref,label,description",
-				"ref,label,description",
-				'ref,label,description,position'
-			],
-
-			// Name of columns with primary key (try to always name it 'rowid')
-			'tabrowid' => [
-				"rowid",
-				"rowid",
-				"rowid",
-				"rowid",
-				"rowid",
-				"rowid",
-				"rowid"
-			],
-			// Condition to show each dictionary
-			'tabcond' => [
-				$conf->digiriskdolibarr->enabled,
-				$conf->digiriskdolibarr->enabled,
-				$conf->digiriskdolibarr->enabled,
-				$conf->digiriskdolibarr->enabled,
-				$conf->digiriskdolibarr->enabled,
-				$conf->digiriskdolibarr->enabled,
-				$conf->digiriskdolibarr->enabled
-			]
-		];
+        // Dictionaries
+        $this->dictionaries = [
+            'langs' => 'digiriskdolibarr@digiriskdolibarr',
+            // List of tables we want to see into dictionary editor
+            'tabname' => [
+                MAIN_DB_PREFIX . 'c_conventions_collectives',
+                MAIN_DB_PREFIX . 'c_relative_location',
+                MAIN_DB_PREFIX . 'c_lesion_localization',
+                MAIN_DB_PREFIX . 'c_lesion_nature',
+                MAIN_DB_PREFIX . 'c_digiriskdolibarr_action_trigger',
+                MAIN_DB_PREFIX . 'c_accidentinvestigation_attendants_role',
+                MAIN_DB_PREFIX . 'c_preventionplan_attendants_role',
+                MAIN_DB_PREFIX . 'c_firepermit_attendants_role'
+            ],
+            // Label of tables
+            'tablib' => [
+                'CollectiveAgreement',
+                'RelativeLocation',
+                'LesionLocalization',
+                'LesionNature',
+                'DigiriskDolibarrActionTrigger',
+                'AccidentInvestigationRole',
+                'PreventionPlanRole',
+                'FirePermitRole'
+            ],
+            // Request to select fields
+            'tabsql' => [
+                'SELECT f.rowid as rowid, f.code, f.libelle, f.active FROM ' . MAIN_DB_PREFIX . 'c_conventions_collectives as f',
+                'SELECT f.rowid as rowid, f.ref, f.label, f.description, f.position, f.active FROM ' . MAIN_DB_PREFIX . 'c_relative_location as f',
+                'SELECT f.rowid as rowid, f.ref, f.label, f.description, f.position, f.active FROM ' . MAIN_DB_PREFIX . 'c_lesion_localization as f',
+                'SELECT f.rowid as rowid, f.ref, f.label, f.description, f.position, f.active FROM ' . MAIN_DB_PREFIX . 'c_lesion_nature as f',
+                'SELECT f.rowid as rowid, f.elementtype, f.ref, f.label, f.description, f.position, f.active FROM ' . MAIN_DB_PREFIX . 'c_digiriskdolibarr_action_trigger as f',
+                'SELECT f.rowid as rowid, f.ref, f.label, f.description, f.position, f.active FROM ' . MAIN_DB_PREFIX . 'c_accidentinvestigation_attendants_role as f',
+                'SELECT f.rowid as rowid, f.ref, f.label, f.description, f.position, f.active FROM ' . MAIN_DB_PREFIX . 'c_preventionplan_attendants_role as f',
+                'SELECT f.rowid as rowid, f.ref, f.label, f.description, f.position, f.active FROM ' . MAIN_DB_PREFIX . 'c_firepermit_attendants_role as f'
+            ],
+            // Sort order
+            'tabsqlsort' => [
+                'code ASC',
+                'position ASC',
+                'position ASC',
+                'position ASC',
+                'position ASC',
+                'position ASC',
+                'position ASC',
+                'position ASC'
+            ],
+            // List of fields (result of select to show dictionary)
+            'tabfield' => [
+                'code,libelle',
+                'ref,label,description,position',
+                'ref,label,description,position',
+                'ref,label,description,position',
+                'elementtype,ref,label,description,position',
+                'ref,label,description,position',
+                'ref,label,description,position',
+                'ref,label,description,position',
+                'ref,label,description,position'
+            ],
+            // List of fields (list of fields to edit a record)
+            'tabfieldvalue' => [
+                'code,libelle',
+                'ref,label,description,position',
+                'ref,label,description,position',
+                'ref,label,description,position',
+                'elementtype,ref,label,description,position',
+                'ref,label,description,position',
+                'ref,label,description,position',
+                'ref,label,description,position',
+                'ref,label,description,position'
+            ],
+            // List of fields (list of fields for insert)
+            'tabfieldinsert' => [
+                'code,libelle',
+                'ref,label,description,position',
+                'ref,label,description,position',
+                'ref,label,description,position',
+                'elementtype,ref,label,description,position',
+                'ref,label,description,position',
+                'ref,label,description,position',
+                'ref,label,description,position',
+                'ref,label,description,position'
+            ],
+            // Name of columns with primary key (try to always name it 'rowid')
+            'tabrowid' => [
+                'rowid',
+                'rowid',
+                'rowid',
+                'rowid',
+                'rowid',
+                'rowid',
+                'rowid',
+                'rowid'
+            ],
+            // Condition to show each dictionary
+            'tabcond' => [
+                $conf->digiriskdolibarr->enabled,
+                $conf->digiriskdolibarr->enabled,
+                $conf->digiriskdolibarr->enabled,
+                $conf->digiriskdolibarr->enabled,
+                $conf->digiriskdolibarr->enabled,
+                $conf->digiriskdolibarr->enabled,
+                $conf->digiriskdolibarr->enabled,
+                $conf->digiriskdolibarr->enabled
+            ]
+        ];
 
 		// Boxes/Widgets
 		$this->boxes = [

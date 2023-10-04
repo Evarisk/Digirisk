@@ -145,7 +145,7 @@ ALTER TABLE llx_c_digiriskdolibarr_action_trigger DROP COLUMN `rang`;
 ALTER TABLE llx_c_digiriskdolibarr_action_trigger ADD entity integer DEFAULT 1 AFTER rowid;
 ALTER TABLE llx_c_digiriskdolibarr_action_trigger ADD active tinyint(4) DEFAULT 1 AFTER description;
 ALTER TABLE llx_c_digiriskdolibarr_action_trigger ADD position integer DEFAULT 0 AFTER description;
-ALTER TABLE llx_c_digiriskdolibarr_action_trigger CHANGE `code` `ref` varchar(64) NOT NULL;
+ALTER TABLE llx_c_digiriskdolibarr_action_trigger CHANGE `code` `ref` varchar(128) NOT NULL;
 ALTER TABLE `llx_digiriskdolibarr_object_signature` ADD module_name VARCHAR(128) NULL AFTER element_type;
 
 -- 9.13.0
