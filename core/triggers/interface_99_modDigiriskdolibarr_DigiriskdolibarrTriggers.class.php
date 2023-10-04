@@ -347,7 +347,7 @@ class InterfaceDigiriskdolibarrTriggers extends DolibarrTriggers
 				$result = $actioncomm->create($user);
 				break;
 
-            case 'ACCIDENT_INVESTIGATION_VALIDATE' :
+            case 'ACCIDENTINVESTIGATION_VALIDATE' :
             case 'FIREPERMIT_PENDINGSIGNATURE' :
 			case 'PREVENTIONPLAN_PENDINGSIGNATURE' :
 				$actioncomm->label = $langs->transnoentities('ObjectValidateTrigger', $langs->transnoentities(ucfirst($object->element)), $object->ref);
@@ -355,7 +355,7 @@ class InterfaceDigiriskdolibarrTriggers extends DolibarrTriggers
 				$result = $actioncomm->create($user);
 				break;
 
-            case 'ACCIDENT_INVESTIGATION_LOCK' :
+            case 'ACCIDENTINVESTIGATION_LOCK' :
             case 'FIREPERMIT_LOCK' :
 			case 'PREVENTIONPLAN_LOCK' :
 				$actioncomm->label = $langs->trans('ObjectLockedTrigger', $langs->transnoentities(ucfirst($object->element)), $object->ref);
@@ -363,7 +363,7 @@ class InterfaceDigiriskdolibarrTriggers extends DolibarrTriggers
 				$result = $actioncomm->create($user);
 				break;
 
-            case 'ACCIDENT_INVESTIGATION_ARCHIVE' :
+            case 'ACCIDENTINVESTIGATION_ARCHIVE' :
             case 'FIREPERMIT_ARCHIVE' :
 			case 'PREVENTIONPLAN_ARCHIVE' :
 				$actioncomm->label = $langs->trans('ObjectArchivedTrigger', $langs->transnoentities(ucfirst($object->element)), $object->ref);
@@ -371,7 +371,7 @@ class InterfaceDigiriskdolibarrTriggers extends DolibarrTriggers
 				$result = $actioncomm->create($user);
 				break;
 
-            case 'ACCIDENT_INVESTIGATION_UNVALIDATE' :
+            case 'ACCIDENTINVESTIGATION_UNVALIDATE' :
             case 'FIREPERMIT_UNVALIDATE' :
             case 'PREVENTIONPLAN_UNVALIDATE' :
                 $actioncomm->label = $langs->trans('ObjectUnValidateTrigger', $langs->transnoentities(ucfirst($object->element)), $object->ref);
@@ -868,7 +868,7 @@ class InterfaceDigiriskdolibarrTriggers extends DolibarrTriggers
 				$result = $actioncomm->create($user);
 				break;
 
-			case 'ACCIDENT_INVESTIGATION_SENTBYMAIL' :
+			case 'ACCIDENTINVESTIGATION_SENTBYMAIL' :
 				$actioncomm->label = $langs->trans('ObjectSentByMailTrigger');
 
 				$result = $actioncomm->create($user);
