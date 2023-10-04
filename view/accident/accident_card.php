@@ -94,9 +94,9 @@ $hookmanager->initHooks(['accidentcard', 'globalcard']); // Note that conf->hook
 $upload_dir = $conf->digiriskdolibarr->multidir_output[$conf->entity];
 
 // Security check - Protection if external user
-$permissiontoread   = $user->rights->digiriskdolibarr->accidentinvestigation->read;
-$permissiontoadd    = $user->rights->digiriskdolibarr->accidentinvestigation->write;
-$permissiontodelete = $user->rights->digiriskdolibarr->accidentinvestigation->delete;
+$permissiontoread   = $user->rights->digiriskdolibarr->accident->read;
+$permissiontoadd    = $user->rights->digiriskdolibarr->accident->write;
+$permissiontodelete = $user->rights->digiriskdolibarr->accident->delete;
 saturne_check_access($permissiontoread);
 
 /*
