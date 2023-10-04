@@ -380,8 +380,8 @@ if ($action == 'create') {
 
 	print '<td class="titlefield">' . $langs->trans("UserVictim") . '</td>';
 	print '<td>' . $victim->getNomUrl(1) . '</td>';
-	print '<tr class="linked-medias causality_tree"> <td class=""><label for="causality_tree">' . $langs->trans("CausalityTree") . '</label></td>';
-	print '<td class="linked-medias-list" style="display: flex; gap: 10px; height: auto;">';
+	print '<tr class="linked-medias causality_tree gallery-table"> <td class=""><label for="causality_tree">' . $langs->trans("CausalityTree") . '</label></td>';
+	print '<td class="linked-medias-list">';
 	$pathPhotos = $conf->digiriskdolibarr->multidir_output[$conf->entity] . '/accidentinvestigation/'. $object->ref . '/causality_tree/';
 	?>
 	<span class="add-medias" <?php echo ($object->status < AccidentInvestigation::STATUS_VALIDATED && empty($object->causality_tree)) ? '' : 'style="display:none"' ?>>
@@ -445,10 +445,7 @@ if ($action == 'create') {
 		// Send email.
 		$displayButton = $onPhone ? '<i class="fas fa-envelope fa-2x"></i>' : '<i class="fas fa-envelope"></i>' . ' ' . $langs->trans('SendMail') . ' ';
 		if ($object->status >= AccidentInvestigation::STATUS_VALIDATED) {
-			$fileParams    = dol_most_recent_file($upload_dir . '/' . $object->element . 'document' . '/' . $object->ref);
-			$file          = $fileParams['fullname'];
-			$forcebuilddoc = (file_exists($file) && !strstr($fileParams['name'], 'specimen')) ? 0 : 1;
-			print dolGetButtonAction($displayButton, '', 'default', $_SERVER['PHP_SELF'] . '?id=' . $object->id . '&action=presend&forcebuilddoc=' . $forcebuilddoc . '&mode=init#formmailbeforetitle');
+			print dolGetButtonAction($displayButton, '', 'default', $_SERVER['PHP_SELF'] . '?id=' . $object->id . '&action=presend&mode=init#formmailbeforetitle');
 		} else {
 			print '<span class="butActionRefused classfortooltip" title="' . dol_escape_htmltag($langs->trans('ObjectMustBeValidatedToSendEmail', ucfirst($langs->transnoentities('The' . ucfirst($object->element))))) . '">' . $displayButton . '</span>';
 		}
