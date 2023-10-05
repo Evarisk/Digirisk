@@ -14,15 +14,16 @@
 -- along with this program.  If not, see https://www.gnu.org/licenses/.
 
 CREATE TABLE llx_digiriskdolibarr_firepermitdet(
-	rowid             integer AUTO_INCREMENT PRIMARY KEY NOT NULL,
-	ref               varchar(128) NOT NULL,
-	ref_ext           varchar(128),
-	entity            integer DEFAULT 1 NOT NULL,
-	date_creation     datetime NOT NULL,
-	tms               timestamp DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
-	description       text,
-	category          varchar(255),
-	used_equipment    text,
-	fk_firepermit     integer NOT NULL,
-	fk_element        integer NOT NULL
+  rowid          integer AUTO_INCREMENT PRIMARY KEY NOT NULL,
+  ref            varchar(128) NOT NULL,
+  ref_ext        varchar(128),
+  entity         integer DEFAULT 1 NOT NULL,
+  date_creation  datetime NOT NULL,
+  tms            timestamp DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+  status         integer NOT NULL,
+  description    text,
+  category       varchar(255),
+  used_equipment text,
+  fk_firepermit  integer NOT NULL,
+  fk_element     integer NOT NULL
 ) ENGINE=innodb;

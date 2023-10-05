@@ -195,3 +195,10 @@ ALTER TABLE llx_digiriskdolibarr_preventionplan CHANGE `date_start` `date_start`
 ALTER TABLE llx_digiriskdolibarr_preventionplan CHANGE `fk_project` `fk_project` INT(11) NOT NULL;
 ALTER TABLE llx_digiriskdolibarr_preventionplan DROP COLUMN `last_email_sent_date`;
 ALTER TABLE llx_digiriskdolibarr_preventionplandet ADD status INTEGER NOT NULL AFTER tms;
+
+-- ALTER TABLE llx_digiriskdolibarr_firepermit CHANGE `status` `status` INT(11) NOT NULL;
+ALTER TABLE llx_digiriskdolibarr_firepermit CHANGE `date_start` `date_start` DATETIME NULL;
+ALTER TABLE llx_digiriskdolibarr_firepermit CHANGE `fk_project` `fk_project` INT(11) NOT NULL;
+ALTER TABLE llx_digiriskdolibarr_firepermit CHANGE `fk_preventionplan` `fk_preventionplan` INT(11) NOT NULL;
+ALTER TABLE llx_digiriskdolibarr_firepermit DROP COLUMN `last_email_sent_date`;
+ALTER TABLE llx_digiriskdolibarr_firepermitdet ADD status INTEGER NOT NULL AFTER tms;

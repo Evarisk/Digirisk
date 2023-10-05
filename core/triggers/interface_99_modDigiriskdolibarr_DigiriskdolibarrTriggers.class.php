@@ -665,25 +665,25 @@ class InterfaceDigiriskdolibarrTriggers extends DolibarrTriggers
 				$actioncomm->note_private .= $langs->trans('DateCreation') . ' : ' . dol_print_date($object->date_creation, 'dayhoursec', 'tzuser') . '<br>';
 				$actioncomm->note_private .= $langs->trans('StartDate') . ' : ' . dol_print_date($object->date_start, 'dayhoursec') . '<br>';
 				$actioncomm->note_private .= $langs->trans('EndDate') . ' : ' . dol_print_date($object->date_end, 'dayhoursec') . '<br>';
-				if (is_array($signatories) && !empty($signatories)) {
-					foreach($signatories as $signatory) {
-						$actioncomm->note_private .= $langs->trans($signatory->role) . ' : ' . $signatory->firstname . ' ' . $signatory->lastname . '<br>';
-					}
-				}
-				foreach ($societies as $societename => $key) {
-					$actioncomm->note_private .= $langs->trans($societename) . ' : ';
-					foreach ($key as $societe) {
-						if ($societename == 'LabourInspectorAssigned') {
-							$actioncomm->note_private .= $societe->firstname . ' ' . $societe->lastname . '<br>';
-						} else {
-							$actioncomm->note_private .= $societe->name . '<br>';
-						}
-						if ($societename == 'ExtSociety') {
-							$actioncomm->note_private .= $langs->trans('Address') . ' : ' . $societe->address . '<br>';
-							$actioncomm->note_private .= $langs->trans('SIRET') . ' : ' . $societe->idprof2 . '<br>';
-						}
-					}
-				}
+//				if (is_array($signatories) && !empty($signatories)) {
+//					foreach($signatories as $signatory) {
+//						$actioncomm->note_private .= $langs->trans($signatory->role) . ' : ' . $signatory->firstname . ' ' . $signatory->lastname . '<br>';
+//					}
+//				}
+//				foreach ($societies as $societename => $key) {
+//					$actioncomm->note_private .= $langs->trans($societename) . ' : ';
+//					foreach ($key as $societe) {
+//						if ($societename == 'LabourInspectorAssigned') {
+//							$actioncomm->note_private .= $societe->firstname . ' ' . $societe->lastname . '<br>';
+//						} else {
+//							$actioncomm->note_private .= $societe->name . '<br>';
+//						}
+//						if ($societename == 'ExtSociety') {
+//							$actioncomm->note_private .= $langs->trans('Address') . ' : ' . $societe->address . '<br>';
+//							$actioncomm->note_private .= $langs->trans('SIRET') . ' : ' . $societe->idprof2 . '<br>';
+//						}
+//					}
+//				}
 				$actioncomm->note_private .= $langs->trans('PreventionPlan') . ' : ' . $preventionplan->ref . (!empty($preventionplan->label) ? ' ' . $preventionplan->label : '') . '<br>';
 				$actioncomm->note_private .= $langs->trans('Status') . ' : ' . $object->status . '<br>';
 
