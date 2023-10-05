@@ -170,6 +170,7 @@ if (empty($reshook)) {
 		$object->tms           = $now;
 		$object->import_key    = "";
 		$object->label         = $label;
+		$object->status        = PreventionPlan::STATUS_DRAFT;
 		$object->fk_project    = $project;
 
 		$date_start       = dol_mktime(GETPOST('dateohour', 'int'), GETPOST('dateomin', 'int'), 0, GETPOST('dateomonth', 'int'), GETPOST('dateoday', 'int'), GETPOST('dateoyear', 'int'));
@@ -390,6 +391,7 @@ if (empty($reshook)) {
 		$preventionplandet->date_creation     = $object->db->idate($now);
 		$preventionplandet->ref               = $refPreventionPlanDetMod->getNextValue($preventionplandet);
 		$preventionplandet->entity            = $conf->entity;
+		$preventionplandet->status            = PreventionPlanLine::STATUS_VALIDATED;
 		$preventionplandet->description       = $actionsDescription;
 		$preventionplandet->category          = $riskCategoryId;
 		$preventionplandet->prevention_method = $preventionMethod;
@@ -473,7 +475,7 @@ if (empty($reshook)) {
 	// Action to delete line
 	if ($action == 'deleteline' && $permissiontodelete) {
 		$preventionplandet->fetch($lineid);
-		$result = $preventionplandet->delete($user, false);
+		$result = $preventionplandet->delete($user, false, false);
 		if ($result > 0) {
 			// Delete prevention plan line OK
 			setEventMessages($langs->trans('DeletePreventionPlanLine') . ' ' . $preventionplandet->ref . ' ' . $langs->trans('PreventionPlanMessage'), array());
@@ -487,6 +489,9 @@ if (empty($reshook)) {
 			else setEventMessages($preventionplandet->error, null, 'errors');
 		}
 	}
+
+    // Actions set_thirdparty, set_project
+    require_once __DIR__ . '/../../../saturne/core/tpl/actions/banner_actions.tpl.php';
 
 	// Actions builddoc, forcebuilddoc, remove_file.
 	require_once __DIR__ . '/../../../saturne/core/tpl/documents/documents_action.tpl.php';
@@ -642,13 +647,13 @@ if ($action == 'create') {
 	print '<table class="border centpercent tableforfieldcreate preventionplan-table">';
 
 	//Project -- projet
-	print '<tr><td class="fieldrequired minwidth400">' . img_picto('', 'project') . ' ' . $langs->trans("Project") . '</td><td>';
-	print $formproject->select_projects(-1, $conf->global->DIGIRISKDOLIBARR_PREVENTIONPLAN_PROJECT, 'fk_project', 16, 0, 0);
+	print '<tr><td class="fieldrequired">' . img_picto('', 'project') . ' ' . $langs->trans("Project") . '</td><td>';
+	print $formproject->select_projects(-1, $conf->global->DIGIRISKDOLIBARR_PREVENTIONPLAN_PROJECT, 'fk_project', 0, 0, 0, 0, 0, 0, 0, '', 0, 0, 'minwidth100imp widthcentpercentminusxx maxwidth400');
 	print '</td></tr>';
 
 	//Label -- Libellé
 	print '<tr><td class="minwidth400">' . $langs->trans("Label") . '</td><td>';
-	print '<input class="flat" type="text" size="36" name="label" id="label" value="' . GETPOST('label') . '">';
+	print '<input class="flat minwidth100imp widthcentpercentminusxx maxwidth400" type="text" size="36" name="label" id="label" value="' . GETPOST('label') . '">';
 	print '</td></tr>';
 
 	//Start Date -- Date début
@@ -663,11 +668,11 @@ if ($action == 'create') {
 
 	//Maitre d'oeuvre
 	if ($conf->global->DIGIRISKDOLIBARR_PREVENTIONPLAN_MAITRE_OEUVRE < 0 || empty($conf->global->DIGIRISKDOLIBARR_PREVENTIONPLAN_MAITRE_OEUVRE)) {
-		$userlist = $form->select_dolusers(( ! empty(GETPOST('maitre_oeuvre')) ? GETPOST('maitre_oeuvre') : $user->id), '', 0, null, 0, '', '', $conf->entity, 0, 0, 'AND u.statut = 1', 0, '', 'minwidth300', 0, 1);
+		$userlist = $form->select_dolusers(( ! empty(GETPOST('maitre_oeuvre')) ? GETPOST('maitre_oeuvre') : $user->id), '', 0, null, 0, '', '', $conf->entity, 0, 0, 'AND u.statut = 1', 0, '', 'minwidth100imp widthcentpercentminusxx maxwidth400', 0, 1);
 		print '<tr>';
 		print '<td class="fieldrequired minwidth400" style="width:10%">' . img_picto('', 'user') . ' ' . $form->editfieldkey('MasterWorker', 'MasterWorker_id', '', $object, 0) . '</td>';
 		print '<td>';
-		print $form->selectarray('maitre_oeuvre', $userlist, ( ! empty(GETPOST('maitre_oeuvre')) ? GETPOST('maitre_oeuvre') : $user->id), $langs->trans('SelectUser'), null, null, null, "40%", 0, 0, '', 'minwidth300', 1);
+		print $form->selectarray('maitre_oeuvre', $userlist, ( ! empty(GETPOST('maitre_oeuvre')) ? GETPOST('maitre_oeuvre') : $user->id), $langs->trans('SelectUser'), null, null, null, "40%", 0, 0, '', 'minwidth100imp widthcentpercentminusxx maxwidth400', 1);
 		print ' <a href="' . DOL_URL_ROOT . '/user/card.php?action=create&backtopage=' . urlencode($_SERVER["PHP_SELF"] . '?action=create') . '" target="_blank"><span class="fa fa-plus-circle valignmiddle paddingleft" title="' . $langs->trans("AddUser") . '"></span></a>';
 		print '</td></tr>';
 	} else {
@@ -683,7 +688,7 @@ if ($action == 'create') {
 	print '<tr><td class="fieldrequired minwidth400">' . img_picto('', 'building') . ' ' . $langs->trans("ExtSociety") . '</td><td>';
 	$events    = array();
 	$events[1] = array('method' => 'getContacts', 'url' => dol_buildpath('/custom/digiriskdolibarr/core/ajax/contacts.php?showempty=1', 1), 'htmlname' => 'ext_society_responsible', 'params' => array('add-customer-contact' => 'disabled'));
-	print $form->select_company(GETPOST('ext_society'), 'ext_society', '', 'SelectThirdParty', 1, 0, $events, 0, 'maxwidth400');
+	print $form->select_company(GETPOST('ext_society'), 'ext_society', '', 'SelectThirdParty', 1, 0, $events, 0, 'minwidth100imp widthcentpercentminusxx maxwidth400');
 	print ' <a href="' . DOL_URL_ROOT . '/societe/card.php?action=create&backtopage=' . urlencode($_SERVER["PHP_SELF"] . '?action=create') . '" target="_blank"><span class="fa fa-plus-circle valignmiddle paddingleft" title="' . $langs->trans("AddThirdParty") . '"></span></a>';
 	print '</td></tr>';
 	$extSocietyResponsibleId = GETPOST('ext_society_responsible');
@@ -725,7 +730,7 @@ if ($action == 'create') {
 	print '<td>';
 	$events    = array();
 	$events[1] = array('method' => 'getContacts', 'url' => dol_buildpath('/custom/digiriskdolibarr/core/ajax/contacts.php?showempty=1', 1), 'htmlname' => 'labour_inspector_contact', 'params' => array('add-customer-contact' => 'disabled'));
-	print $form->select_company((GETPOST('labour_inspector') ? GETPOST('labour_inspector') : ($allLinks['LabourInspectorSociety']->id[0] ?: 0)), 'labour_inspector', '', 'SelectThirdParty', 1, 0, $events, 0, 'maxwidth400');
+	print $form->select_company((GETPOST('labour_inspector') ? GETPOST('labour_inspector') : ($allLinks['LabourInspectorSociety']->id[0] ?: 0)), 'labour_inspector', '', 'SelectThirdParty', 1, 0, $events, 0, 'minwidth100imp widthcentpercentminusxx maxwidth400');
 	print ' <a href="' . DOL_URL_ROOT . '/societe/card.php?action=create&backtopage=' . urlencode($_SERVER["PHP_SELF"] . '?action=create') . '" target="_blank"><span class="fa fa-plus-circle valignmiddle paddingleft" title="' . $langs->trans("AddThirdParty") . '"></span></a>';
 	print '<a href="' . DOL_URL_ROOT . '/custom/digiriskdolibarr/admin/securityconf.php' . '" target="_blank">' . $langs->trans("ConfigureLabourInspector") . '</a>';
 	print '</td></tr>';
@@ -783,12 +788,12 @@ if (($id || $ref) && $action == 'edit') {
 
 	//Project -- projet
 	print '<tr><td class="fieldrequired minwidth400">' . img_picto('', 'project') . ' ' . $langs->trans("Project") . '</td><td>';
-	print $formproject->select_projects(-1, $object->fk_project, 'fk_project', 16, 0, 0);
+	print $formproject->select_projects(-1, $object->fk_project, 'fk_project', 0, 0, 0, 0, 0, 0, 0, '', 0, 0, 'minwidth100imp widthcentpercentminusxx maxwidth400');
 	print '</td></tr>';
 
 	//Label -- Libellé
 	print '<tr><td class="minwidth400">' . $langs->trans("Label") . '</td><td>';
-	print '<input class="flat" type="text" size="36" name="label" id="label" value="' . $object->label . '">';
+	print '<input class="flat minwidth100imp widthcentpercentminusxx maxwidth400" type="text" size="36" name="label" id="label" value="' . $object->label . '">';
 	print '</td></tr>';
 
 	//Start Date -- Date début
@@ -803,11 +808,11 @@ if (($id || $ref) && $action == 'edit') {
 
 	//Maitre d'oeuvre
 	$masterWorker  = is_array($objectSignatories['MasterWorker']) ? array_shift($objectSignatories['MasterWorker'])->element_id : '';
-	$userlist      = $form->select_dolusers($masterWorker, '', 1, null, 0, '', '', 0, 0, 0, 'AND u.statut = 1', 0, '', 'minwidth300', 0, 1);
+	$userlist      = $form->select_dolusers($masterWorker, '', 1, null, 0, '', '', 0, 0, 0, 'AND u.statut = 1', 0, '', 'minwidth100imp widthcentpercentminusxx maxwidth400', 0, 1);
 	print '<tr>';
 	print '<td class="fieldrequired minwidth400" style="width:10%">' . img_picto('', 'user') . ' ' . $form->editfieldkey('MasterWorker', 'MasterWorker_id', '', $object, 0) . '</td>';
 	print '<td>';
-	print $form->selectarray('maitre_oeuvre', $userlist, $masterWorker, 1, null, null, null, "40%", 0, 0, 0, 'minwidth300', 1);
+	print $form->selectarray('maitre_oeuvre', $userlist, $masterWorker, 1, null, null, null, "40%", 0, 0, 0, 'minwidth100imp widthcentpercentminusxx maxwidth400', 1);
 	print ' <a href="' . DOL_URL_ROOT . '/user/card.php?action=create&backtopage=' . urlencode($_SERVER["PHP_SELF"] . '?action=create') . '" target="_blank"><span class="fa fa-plus-circle valignmiddle paddingleft" title="' . $langs->trans("AddUser") . '"></span></a>';
 	print '</td></tr>';
 
@@ -820,10 +825,10 @@ if (($id || $ref) && $action == 'edit') {
 	$events[1] = array('method' => 'getContacts', 'url' => dol_buildpath('/custom/digiriskdolibarr/core/ajax/contacts.php?showempty=1', 1), 'htmlname' => 'ext_society_responsible', 'params' => array('add-customer-contact' => 'disabled'));
 	//For external user force the company to user company
 	if ( ! empty($user->socid)) {
-		print $form->select_company($user->socid, 'ext_society', '', 1, 1, 0, $events, 0, 'minwidth300');
+		print $form->select_company($user->socid, 'ext_society', '', 1, 1, 0, $events, 0, 'minwidth100imp widthcentpercentminusxx maxwidth400');
 	} else {
 		$extSocietyId = is_array($objectResources['ExtSociety']) ? array_shift($objectResources['ExtSociety'])->id : '';
-		print $form->select_company($extSocietyId, 'ext_society', '', 'SelectThirdParty', 1, 0, $events, 0, 'minwidth300');
+		print $form->select_company($extSocietyId, 'ext_society', '', 'SelectThirdParty', 1, 0, $events, 0, 'minwidth100imp widthcentpercentminusxx maxwidth400');
 	}
 	print ' <a href="' . DOL_URL_ROOT . '/societe/card.php?action=create&backtopage=' . urlencode($_SERVER["PHP_SELF"] . '?action=create') . '" target="_blank"><span class="fa fa-plus-circle valignmiddle paddingleft" title="' . $langs->trans("AddThirdParty") . '"></span></a>';
 	print '</td></tr>';
@@ -885,7 +890,7 @@ if (($id || $ref) && $action == 'edit') {
 	print '<td>';
 	$events    = array();
 	$events[1] = array('method' => 'getContacts', 'url' => dol_buildpath('/custom/digiriskdolibarr/core/ajax/contacts.php?showempty=1', 1), 'htmlname' => 'labour_inspector_contact', 'params' => array('add-customer-contact' => 'disabled'));
-	print $form->select_company($labourInspectorSociety->id, 'labour_inspector', '', 'SelectThirdParty', 1, 0, $events, 0, 'minwidth300');
+	print $form->select_company($labourInspectorSociety->id, 'labour_inspector', '', 'SelectThirdParty', 1, 0, $events, 0, 'minwidth100imp widthcentpercentminusxx maxwidth400');
 	print ' <a href="' . DOL_URL_ROOT . '/societe/card.php?action=create&backtopage=' . urlencode($_SERVER["PHP_SELF"] . '?action=create') . '" target="_blank"><span class="fa fa-plus-circle valignmiddle paddingleft" title="' . $langs->trans("AddThirdParty") . '"></span></a>';
 	print '<a href="' . DOL_URL_ROOT . '/custom/digiriskdolibarr/admin/securityconf.php' . '" target="_blank">' . $langs->trans("ConfigureLabourInspector") . '</a>';
 	print '</td></tr>';
@@ -971,19 +976,10 @@ if ((empty($action) || ($action != 'create' && $action != 'edit'))) {
 	$object->fetch_optionals();
 
 	saturne_get_fiche_head($object, 'card', $title);
-	$width = 80;
-	$cssclass = 'photoref';
-	dol_strlen($object->label) ? $morehtmlref = '<span>' . ' - ' . $object->label . '</span>' : '';
-	$morehtmlref                             .= '<div class="refidno">';
-	// External Society -- Société extérieure
-	$extSociety  = $digiriskresources->fetchResourcesFromObject('ExtSociety', $object);
-	$morehtmlref .= $langs->trans('ExtSociety') . ' : ' . $extSociety->getNomUrl(1);
-	// Project
-	$morehtmlref .= '</div>';
 
-	//$morehtmlleft = '<div class="floatleft inline-block valignmiddle divphotoref">'.digirisk_show_photos('digiriskdolibarr', $conf->digiriskdolibarr->multidir_output[$entity].'/'.$object->element_type, 'small', 5, 0, 0, 0, $width,0, 0, 0, 0, $object->element_type, $object).'</div>';
-
-	$linkback = '<a href="' . dol_buildpath('/digiriskdolibarr/view/preventionplan/preventionplan_list.php', 1) . '">' . $langs->trans("BackToList") . '</a>';
+    // External Society -- Société extérieure
+    $extSociety  = $digiriskresources->fetchResourcesFromObject('ExtSociety', $object);
+    $moreHtmlRef = $langs->trans('ExtSociety') . ' : ' . $extSociety->getNomUrl(1) . '<br>';
 
 	if ($conf->browser->layout == 'phone') {
 		$onPhone = 1;
@@ -991,7 +987,7 @@ if ((empty($action) || ($action != 'create' && $action != 'edit'))) {
 		$onPhone = 0;
 	}
 
-	saturne_banner_tab($object, 'id', $linkback, 1, 'rowid', 'ref', $morehtmlref);
+	saturne_banner_tab($object, 'id', '', 1, 'rowid', 'ref', $moreHtmlRef);
 
 	print '<div class="div-table-responsive">';
 	print '<div class="fichecenter">';
@@ -1150,6 +1146,21 @@ if ((empty($action) || ($action != 'create' && $action != 'edit'))) {
 				print '<span class="butActionRefused classfortooltip" title="' . dol_escape_htmltag($langs->trans('AllSignatoriesMustHaveSigned')) . '">' . $displayButton . '</span>';
 			}
 
+            // Send email
+            $displayButton = $onPhone ? '<i class="fas fa-envelope fa-2x"></i>' : '<i class="fas fa-envelope"></i>' . ' ' . $langs->trans('SendMail') . ' ';
+            if ($object->status == PreventionPlan::STATUS_LOCKED) {
+                $fileParams = dol_most_recent_file($upload_dir . '/' . $object->element . 'document' . '/' . $object->ref);
+                $file       = $fileParams['fullname'];
+                if (file_exists($file) && !strstr($fileParams['name'], 'specimen')) {
+                    $forcebuilddoc = 0;
+                } else {
+                    $forcebuilddoc = 1;
+                }
+                print dolGetButtonAction($displayButton, '', 'default', $_SERVER['PHP_SELF'] . '?id=' . $object->id . '&action=presend&forcebuilddoc=' . $forcebuilddoc . '&mode=init#formmailbeforetitle');
+            } else {
+                print '<span class="butActionRefused classfortooltip" title="'.dol_escape_htmltag($langs->trans('ObjectMustBeLockedToSendEmail', ucfirst($langs->transnoentities('The' . ucfirst($object->element))))) . '">' . $displayButton . '</span>';
+            }
+
 			// Archive
 			$displayButton = $onPhone ?  '<i class="fas fa-archive fa-2x"></i>' : '<i class="fas fa-archive"></i>' . ' ' . $langs->trans('Archive');
 			if ($object->status == $object::STATUS_LOCKED) {
@@ -1302,8 +1313,8 @@ if ((empty($action) || ($action != 'create' && $action != 'edit'))) {
 					if ($object->status == 1) {
 						print '<td class="center">';
 						$coldisplay++;
-						print '<a href="' . $_SERVER["PHP_SELF"] . '?id=' . $id . '&amp;action=editline&amp;lineid=' . $item->id . '" style="padding-right: 20px"><i class="fas fa-pencil-alt" style="color: #666"></i></a>';
-						print '<a href="' . $_SERVER["PHP_SELF"] . '?id=' . $id . '&amp;action=deleteline&amp;lineid=' . $item->id . '">';
+						print '<a href="' . $_SERVER["PHP_SELF"] . '?id=' . $id . '&action=editline&lineid=' . $item->id . '" style="padding-right: 20px"><i class="fas fa-pencil-alt" style="color: #666"></i></a>';
+						print '<a href="' . $_SERVER["PHP_SELF"] . '?id=' . $id . '&action=deleteline&lineid=' . $item->id . '&token=' . newToken() . '">';
 						print img_delete();
 						print '</a>';
 						print '</td>';
@@ -1415,7 +1426,7 @@ if ((empty($action) || ($action != 'create' && $action != 'edit'))) {
 			}
 		}
 
-		print saturne_show_documents($modulepart, $dirFiles, $filedir, $urlsource, $genallowed, 0, $defaultmodel, 1, 0, 0, 0, 0, $title, 0, 0, empty($soc->default_lang) ? '' : $soc->default_lang, $object, 0, 'remove_file', (($object->status > $object::STATUS_VALIDATED) ? 1 : 0), $langs->trans('ControlMustBeValidatedToGenerated'));
+		print saturne_show_documents($modulepart, $dirFiles, $filedir, $urlsource, $genallowed, 0, $defaultmodel, 1, 0, 0, 0, 0, $title, 0, 0, empty($soc->default_lang) ? '' : $soc->default_lang, $object, 0, 'remove_file', (($object->status > $object::STATUS_VALIDATED) ? 1 : 0), $langs->trans('ObjectMustBeLockedToGenerate', ucfirst($langs->transnoentities('The' . ucfirst($object->element)))));
 	}
 
 	if ($permissiontoadd) {
@@ -1424,16 +1435,12 @@ if ((empty($action) || ($action != 'create' && $action != 'edit'))) {
 		print '</div><div class="">';
 	}
 
-	$MAXEVENT = 10;
+    $moreHtmlCenter = dolGetButtonTitle($langs->trans('SeeAll'), '', 'fa fa-bars imgforviewmode', dol_buildpath('/saturne/view/saturne_agenda.php', 1) . '?id=' . $object->id . '&module_name=DigiriskDolibarr&object_type=' . $object->element);
 
-	$morehtmlright  = '<a href="' . dol_buildpath('/digiriskdolibarr/view/preventionplan/preventionplan_agenda.php', 1) . '?id=' . $object->id . '">';
-	$morehtmlright .= $langs->trans("SeeAll");
-	$morehtmlright .= '</a>';
-
-	// List of actions on element
-	include_once DOL_DOCUMENT_ROOT . '/core/class/html.formactions.class.php';
-	$formactions    = new FormActions($db);
-	$somethingshown = $formactions->showactions($object, $object->element . '@digiriskdolibarr', '', 1, '', $MAXEVENT, '', $morehtmlright);
+    // List of actions on element
+    require_once DOL_DOCUMENT_ROOT . '/core/class/html.formactions.class.php';
+    $formActions = new FormActions($db);
+    $formActions->showactions($object, $object->element . '@' . $object->module, 0, 1, '', 10, '', $moreHtmlCenter);
 
 	print '</div></div></div>';
 

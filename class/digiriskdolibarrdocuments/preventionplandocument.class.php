@@ -16,13 +16,14 @@
  */
 
 /**
- * \file        class/digiriskdocuments/preventionplandocument.class.php
- * \ingroup     digiriskdolibarr
- * \brief       This file is a class file for PreventionPlanDocument
+ * \file    class/digiriskdolibarrdocuments/preventionplandocument.class.php
+ * \ingroup digiriskdolibarr
+ * \brief   This file is a class file for PreventionPlanDocument
  */
 
 // Load DigiriskDolibarr libraries
 require_once __DIR__ . '/../digiriskdocuments.class.php';
+require_once __DIR__ . '/../digiriskresources.class.php';
 
 /**
  * Class for PreventionPlanDocument
@@ -72,7 +73,11 @@ class PreventionPlanDocument extends DigiriskDocuments
 		$id = GETPOST('id');
 		if ($id > 0) {
 			$preventionplan->fetch($id);
-		}
+		} else {
+            $track_id = GETPOST('track_id', 'alpha');
+            $signatory->fetch(0, '', ' AND signature_url =' . "'" . $track_id . "'");
+            $preventionplan->fetch($signatory->fk_object);
+        }
 
 		$preventionplanlines = $preventionplanline->fetchAll('', '', 0, 0, array(), 'AND', GETPOST('id'));
 		$digirisk_resources = $resources->fetchDigiriskResources();
