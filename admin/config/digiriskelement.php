@@ -30,7 +30,7 @@ if (file_exists('../digiriskdolibarr.main.inc.php')) {
 	die('Include of digiriskdolibarr main fails');
 }
 
-global $langs, $user, $db;
+global $conf, $db, $langs, $moduleNameLowerCase, $user;
 
 // Libraries
 require_once DOL_DOCUMENT_ROOT . "/core/lib/admin.lib.php";

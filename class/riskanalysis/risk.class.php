@@ -516,20 +516,20 @@ class Risk extends SaturneObject
 		}
 	}
 
-	/**
-	 * Load dashboard info risk, get number risks by cotation.
-	 *
-	 * @return array
-	 * @throws Exception
-	 */
-	public function load_dashboard()
-	{
-		$arrayRisksByCotation = $this->getRisksByCotation();
+    /**
+     * Load dashboard info risk
+     *
+     * @return array
+     * @throws Exception
+     */
+    public function load_dashboard(): array
+    {
+        $arrayRisksByCotation = $this->getRisksByCotation();
 
-		$array['graphs'] = $arrayRisksByCotation;
+        $array['graphs'] = [$arrayRisksByCotation];
 
-		return $array;
-	}
+        return $array;
+    }
 
 	/**
 	 * Return the status.
@@ -543,43 +543,76 @@ class Risk extends SaturneObject
 		return 0;
 	}
 
-	/**
-	 * Get risks by cotation.
-	 *
-	 * @return array
-	 * @throws Exception
-	 */
-	public function getRisksByCotation()
-	{
-		// Risks by cotation
-		global $langs;
+    /**
+     * Get risks by cotation
+     *
+     * @return array
+     * @throws Exception
+     */
+    public function getRisksByCotation(): array
+    {
+        global $langs;
 
-		$riskassessment = new RiskAssessment($this->db);
-		$array['title'] = $langs->transnoentities('RisksRepartition');
-		$array['picto'] = $this->picto;
-		$array['width']   = '100%';
-		$array['labels'] = array(
-			1 => array(
-				'label' => $langs->transnoentities('GreyRisk'),
-				'color' => '#ececec'
-			),
-			2 => array(
-				'label' => $langs->transnoentities('OrangeRisk'),
-				'color' => '#e9ad4f'
-			),
-			3 => array(
-				'label' => $langs->transnoentities('RedRisk'),
-				'color' => 'e05353'
-			),
-			4 => array(
-				'label' => $langs->transnoentities('BlackRisk'),
-				'color' => '#2b2b2b'
-			),
-		);
+        $riskAssessment = new RiskAssessment($this->db);
 
-		$riskAssessmentList = $riskassessment->fetchAll('', '', 0, 0, ['customsql' => 'status = 1']);
-		$array['data']      = $riskassessment->getRiskAssessmentCategoriesNumber($riskAssessmentList);
+        // Graph Title parameters
+        $array['title'] = $langs->transnoentities('RisksRepartition');
+        $array['picto'] = $this->picto;
 
-		return $array;
-	}
+        // Graph parameters
+        $array['width']   = '100%';
+        $array['height']  = 400;
+        $array['type']    = 'pie';
+        $array['dataset'] = 1;
+
+        $array['labels'] = [
+            1 => [
+                'label' => $langs->transnoentities('GreyRisk'),
+                'color' => '#ececec'
+            ],
+            2 => [
+                'label' => $langs->transnoentities('OrangeRisk'),
+                'color' => '#e9ad4f'
+            ],
+            3 => [
+                'label' => $langs->transnoentities('RedRisk'),
+                'color' => 'e05353'
+            ],
+            4 => [
+                'label' => $langs->transnoentities('BlackRisk'),
+                'color' => '#2b2b2b'
+            ]
+        ];
+
+        $riskAssessmentList = $riskAssessment->fetchAll('', '', 0, 0, ['customsql' => 'status = 1']);
+        $array['data']      = $riskAssessment->getRiskAssessmentCategoriesNumber($riskAssessmentList);
+
+        return $array;
+	  }
+
+    /**
+     * Write information of trigger description
+     *
+     * @param  Object $object Object calling the trigger
+     * @return string         Description to display in actioncomm->note_private
+     */
+    public function getTriggerDescription(SaturneObject $object): string
+    {
+        global $conf, $langs;
+
+        $ret = parent::getTriggerDescription($object);
+
+        $digiriskelement = new DigiriskElement($this->db);
+        $digiriskelement->fetch($object->fk_element);
+
+        $ret .= $langs->trans('ParentElement') . ' : ' . $digiriskelement->ref . " - " . $digiriskelement->label . '<br>';
+        $ret .= $langs->trans('RiskCategory') . ' : ' . $object->getDangerCategoryName($object) . '<br>';
+
+        if (dol_strlen($object->applied_on) > 0) {
+            $digiriskelement->fetch($object->applied_on);
+            $ret .= $langs->trans('RiskSharedWithEntityRefLabel', $object->ref) . ' S' . $conf->entity . ' ' . $digiriskelement->ref . " - " . $digiriskelement->label . '<br>';
+        }
+
+        return $ret;
+    }
 }

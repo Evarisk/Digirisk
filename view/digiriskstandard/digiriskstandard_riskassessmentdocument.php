@@ -141,8 +141,9 @@ if (empty($reshook)) {
 				}
 
 				if ( ! $error) {
-					$filedir = $upload_dir . '/riskassessmentdocument/';
-					if ( ! empty($filedir)) {
+					$filedir = $upload_dir . '/riskassessmentdocument/siteplans/';
+                    array_map('unlink', array_filter((array) glob($filedir . '*')));
+                    if ( ! empty($filedir)) {
 						$result = digirisk_dol_add_file_process($filedir, 0, 1, 'userfile', '', null, '', 1, $object);
 					}
 				}
