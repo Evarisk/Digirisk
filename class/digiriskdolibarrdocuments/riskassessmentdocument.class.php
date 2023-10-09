@@ -96,36 +96,38 @@ class RiskAssessmentDocument extends DigiriskDocuments
 		return $jsonFormatted;
 	}
 
-	/**
-	 * Load dashboard info riskassessmentdocument
-	 *
-	 * @return array
-	 * @throws Exception
-	 */
-	public function load_dashboard()
-	{
-		global $langs;
+    /**
+     * Load dashboard info riskassessmentdocument
+     *
+     * @return array
+     * @throws Exception
+     */
+    public function load_dashboard(): array
+    {
+        global $langs;
 
-		$arrayLastGenerateDate   = $this->getLastGenerateDate();
-		$arrayNextGenerateDate   = $this->getNextGenerateDate();
-		$arrayNbDaysBeforeNextGenerateDate = $this->getNbDaysBeforeNextGenerateDate();
+        $arrayLastGenerateDate             = $this->getLastGenerateDate();
+        $arrayNextGenerateDate             = $this->getNextGenerateDate();
+        $arrayNbDaysBeforeNextGenerateDate = $this->getNbDaysBeforeNextGenerateDate();
 
-		if (empty($arrayNbDaysBeforeNextGenerateDate['nbdaysbeforenextgeneratedate'])) {
-			$arrayNbDaysAfterNextGenerateDate = $this->getNbDaysAfterNextGenerateDate();
-			$arrayNbDaysBeforeNextGenerateDate = array('nbdaysbeforenextgeneratedate' => 'N/A');
-		} else {
-			$arrayNbDaysAfterNextGenerateDate = array('nbdaysafternextgeneratedate' => 'N/A');
-		}
+        if (empty($arrayNbDaysBeforeNextGenerateDate['nbdaysbeforenextgeneratedate'])) {
+            $arrayNbDaysAfterNextGenerateDate = $this->getNbDaysAfterNextGenerateDate();
+            $arrayNbDaysBeforeNextGenerateDate = ['nbdaysbeforenextgeneratedate' => 'N/A'];
+        } else {
+            $arrayNbDaysAfterNextGenerateDate = ['nbdaysafternextgeneratedate' => 'N/A'];
+        }
 
-		$array['widgets'] = array(
-			'label'      => array($langs->transnoentities("LastGenerateDate"), $langs->transnoentities("NextGenerateDate"), $langs->transnoentities("NbDaysBeforeNextGenerateDate"), $langs->transnoentities("NbDaysAfterNextGenerateDate")),
-			'content'    => array($arrayLastGenerateDate['lastgeneratedate'], $arrayNextGenerateDate['nextgeneratedate'], $arrayNbDaysBeforeNextGenerateDate['nbdaysbeforenextgeneratedate'], $arrayNbDaysAfterNextGenerateDate['nbdaysafternextgeneratedate']),
-			'picto'      => 'fas fa-info-circle',
-			'widgetName' => $langs->transnoentities('RiskAssessmentDocument')
-		);
+        $array['widgets'] = [
+            'riskassessmentdocument' => [
+                'label'      => [$langs->transnoentities('LastGenerateDate') ?? '', $langs->transnoentities('NextGenerateDate') ?? '', $langs->transnoentities('NbDaysBeforeNextGenerateDate') ?? '', $langs->transnoentities('NbDaysAfterNextGenerateDate') ?? ''],
+                'content'    => [$arrayLastGenerateDate['lastgeneratedate'] ?? 0, $arrayNextGenerateDate['nextgeneratedate'] ?? 0, $arrayNbDaysBeforeNextGenerateDate['nbdaysbeforenextgeneratedate'] ?? 0, $arrayNbDaysAfterNextGenerateDate['nbdaysafternextgeneratedate'] ?? 0],
+                'picto'      => 'fas fa-info-circle',
+                'widgetName' => $langs->transnoentities('RiskAssessmentDocument')
+            ]
+        ];
 
-		return $array;
-	}
+        return $array;
+    }
 
 	/**
 	 * Get last riskassessmentdocument generate date.

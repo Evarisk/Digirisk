@@ -315,29 +315,29 @@ class DigiriskResources extends SaturneObject
 		return $allLinks;
 	}
 
-	/**
-	 * Load dashboard info digirisk resources
-	 *
-	 * @return array
-	 * @throws Exception
-	 */
-	public function load_dashboard()
-	{
-		global $langs;
+    /**
+     * Load dashboard info digirisk resources
+     *
+     * @return array
+     * @throws Exception
+     */
+    public function load_dashboard(): array
+    {
+        global $langs;
 
-		$arraySiretNumber  = $this->getSiretNumber();
+        $arraySiretNumber = $this->getSiretNumber();
 
-		$array['widgets'] = array(
-			DigiriskDolibarrDashboard::DASHBOARD_DIGIRISKRESOURCES => array(
-				'label'      => array($langs->transnoentities("SiretNumber")),
-				'content'    => array($arraySiretNumber['siretnumber']),
-				'picto'      => 'fas fa-building',
-				'widgetName' => $langs->transnoentities('Society')
-			)
-		);
+        $array['widgets'] = [
+            'society' => [
+                'label'      => [$langs->transnoentities('SiretNumber') ?? ''],
+                'content'    => [$arraySiretNumber['siretnumber'] ?? 0],
+                'picto'      => 'fas fa-building',
+                'widgetName' => $langs->transnoentities('Society')
+            ]
+        ];
 
-		return $array;
-	}
+        return $array;
+    }
 
 	/**
 	 * Get siret number.

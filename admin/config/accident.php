@@ -38,6 +38,7 @@ require_once DOL_DOCUMENT_ROOT . "/core/lib/admin.lib.php";
 
 require_once __DIR__ . '/../../lib/digiriskdolibarr.lib.php';
 require_once __DIR__ . '/../../class/accident.class.php';
+require_once __DIR__ . '/../../class/accidentinvestigation.class.php';
 
 // Translations
 saturne_load_langs(["admin"]);
@@ -46,9 +47,6 @@ saturne_load_langs(["admin"]);
 $action     = GETPOST('action', 'alpha');
 $backtopage = GETPOST('backtopage', 'alpha');
 $value      = GETPOST('value', 'alpha');
-
-$type  = 'accident';
-$error = 0;
 
 // Initialize technical objects
 $usertmp  = new User($db);
@@ -64,13 +62,15 @@ saturne_check_access($permissiontoread);
  * Actions
  */
 
+$error = 0;
+
 if (($action == 'update' && ! GETPOST("cancel", 'alpha')) || ($action == 'updateedit')) {
 	$ACCProject = GETPOST('ACCProject', 'none');
 	$ACCProject = preg_split('/_/', $ACCProject);
 
 	dolibarr_set_const($db, "DIGIRISKDOLIBARR_ACCIDENT_PROJECT", $ACCProject[0], 'integer', 0, '', $conf->entity);
 
-	if ($action != 'updateedit' && ! $error) {
+	if ($action != 'updateedit') {
 		header("Location: " . $_SERVER["PHP_SELF"]);
 		exit;
 	}
@@ -84,9 +84,11 @@ if ($action == 'updateMask') {
 		$res = dolibarr_set_const($db, $accidentMaskConst, $accidentMask, 'chaine', 0, '', $conf->entity);
 	}
 
-	if ( ! $res > 0) $error++;
+	if (!$res > 0) {
+        $error++;
+    }
 
-	if ( ! $error) {
+	if (!$error) {
 		setEventMessages($langs->trans("SetupSaved"), null);
 	} else {
 		setEventMessages($langs->trans("Error"), null, 'errors');
@@ -94,17 +96,17 @@ if ($action == 'updateMask') {
 }
 
 if ($action == 'setmod') {
-	$constforval = 'DIGIRISKDOLIBARR_' . strtoupper($type) . "_ADDON";
+	$constforval = 'DIGIRISKDOLIBARR_ACCIDENT_ADDON';
 	dolibarr_set_const($db, $constforval, $value, 'chaine', 0, '', $conf->entity);
 }
 
 if ($action == 'setmodAccidentWorkStop') {
-	$constforval = 'DIGIRISKDOLIBARR_' . strtoupper('accident_workstop') . "_ADDON";
+	$constforval = 'DIGIRISKDOLIBARR_ACCIDENT_WORKSTOP_ADDON';
 	dolibarr_set_const($db, $constforval, $value, 'chaine', 0, '', $conf->entity);
 }
 
 if ($action == 'setmodAccidentLesion') {
-	$constforval = 'DIGIRISKDOLIBARR_' . strtoupper('accident_lesion') . "_ADDON";
+	$constforval = 'DIGIRISKDOLIBARR_ACCIDENT_LESION_ADDON';
 	dolibarr_set_const($db, $constforval, $value, 'chaine', 0, '', $conf->entity);
 }
 
@@ -131,273 +133,49 @@ print load_fiche_titre($title, $linkback, 'title_setup');
 $head = digiriskdolibarr_admin_prepare_head();
 print dol_get_fiche_head($head, 'accident', $title, -1, "digiriskdolibarr_color@digiriskdolibarr");
 
-print load_fiche_titre('<i class="fas fa-user-injured"></i> ' . $langs->trans("AccidentManagement"), '', '');
-print '<hr>';
-
 /*
  *  Numbering module
  */
 
-print load_fiche_titre($langs->trans("DigiriskAccidentNumberingModule"), '', '');
+print load_fiche_titre('<i class="fas fa-user-injured"></i> ' . $langs->trans("AccidentManagement"), '', '');
 
-print '<table class="noborder centpercent">';
-print '<tr class="liste_titre">';
-print '<td>' . $langs->trans("Name") . '</td>';
-print '<td>' . $langs->trans("Description") . '</td>';
-print '<td class="nowrap">' . $langs->trans("Example") . '</td>';
-print '<td class="center">' . $langs->trans("Status") . '</td>';
-print '<td class="center">' . $langs->trans("ShortInfo") . '</td>';
-print '</tr>';
+print '<hr>';
 
-clearstatcache();
-$dir = dol_buildpath("/custom/digiriskdolibarr/core/modules/digiriskdolibarr/digiriskelement/" . $type . "/");
-if (is_dir($dir)) {
-	$handle = opendir($dir);
-	if (is_resource($handle)) {
-		while (($file = readdir($handle)) !== false ) {
-			if ( ! is_dir($dir . $file) || (substr($file, 0, 1) <> '.' && substr($file, 0, 3) <> 'CVS')) {
-				$filebis = $file;
+$object = new Accident($db);
 
-				$classname = preg_replace('/\.php$/', '', $file);
-				$classname = preg_replace('/\-.*$/', '', $classname);
+$objectModSubdir = 'digiriskelement';
 
-				if ( ! class_exists($classname) && is_readable($dir . $filebis) && (preg_match('/mod_/', $filebis) || preg_match('/mod_/', $classname)) && substr($filebis, dol_strlen($filebis) - 3, 3) == 'php') {
-					// Charging the numbering class
-					require_once $dir . $filebis;
+require __DIR__ . '/../../../saturne/core/tpl/admin/object/object_numbering_module_view.tpl.php';
 
-					$module = new $classname($db);
+print load_fiche_titre('<i class="fas fa-user-injured"></i> ' . $langs->trans("AccidentWorkstopManagement"), '', '');
 
-					if ($module->isEnabled()) {
-						print '<tr class="oddeven"><td>';
-						print $langs->trans($module->name);
-						print "</td><td>";
-						print $module->info();
-						print '</td>';
+print '<hr>';
 
-						// Show example of numbering module
-						print '<td class="nowrap">';
-						$tmp = $module->getExample();
-						if (preg_match('/^Error/', $tmp)) print '<div class="error">' . $langs->trans($tmp) . '</div>';
-						elseif ($tmp == 'NotConfigured') print $langs->trans($tmp);
-						else print $tmp;
-						print '</td>';
+$object = new AccidentWorkStop($db);
 
-						print '<td class="center">';
-						if ($conf->global->DIGIRISKDOLIBARR_ACCIDENT_ADDON == $file || $conf->global->DIGIRISKDOLIBARR_ACCIDENT_ADDON . '.php' == $file) {
-							print img_picto($langs->trans("Activated"), 'switch_on');
-						} else {
-							print '<a class="reposition" href="' . $_SERVER["PHP_SELF"] . '?action=setmod&value=' . preg_replace('/\.php$/', '', $file) . '&scan_dir=' . $module->scandir . '&label=' . urlencode($module->name) . '&token=' . newToken() . '" alt="' . $langs->trans("Default") . '">' . img_picto($langs->trans("Disabled"), 'switch_off') . '</a>';
-						}
-						print '</td>';
+$objectModSubdir = 'digiriskelement';
 
-						// Example for listing risks action
-						$htmltooltip  = '';
-						$htmltooltip .= '' . $langs->trans("Version") . ': <b>' . $module->getVersion() . '</b><br>';
-						$nextval      = $module->getNextValue($accident);
-						if ("$nextval" != $langs->trans("NotAvailable")) {  // Keep " on nextval
-							$htmltooltip .= $langs->trans("NextValue") . ': ';
-							if ($nextval) {
-								if (preg_match('/^Error/', $nextval) || $nextval == 'NotConfigured')
-									$nextval  = $langs->trans($nextval);
-								$htmltooltip .= $nextval . '<br>';
-							} else {
-								$htmltooltip .= $langs->trans($module->error) . '<br>';
-							}
-						}
+require __DIR__ . '/../../../saturne/core/tpl/admin/object/object_numbering_module_view.tpl.php';
 
-						print '<td class="center">';
-						print $form->textwithpicto('', $htmltooltip, 1, 0);
-						if ($conf->global->DIGIRISKDOLIBARR_ACCIDENT_ADDON . '.php' == $file) { // If module is the one used, we show existing errors
-							if ( ! empty($module->error)) dol_htmloutput_mesg($module->error, '', 'error', 1);
-						}
-						print '</td>';
-						print "</tr>";
-					}
-				}
-			}
-		}
-		closedir($handle);
-	}
-}
+print load_fiche_titre('<i class="fas fa-user-injured"></i> ' . $langs->trans("AccidentLesionManagement"), '', '');
 
-print '</table>';
+print '<hr>';
 
-/*
- *  Numbering module Accident WorkStop
- */
+$object = new AccidentLesion($db);
 
-print load_fiche_titre($langs->trans("DigiriskAccidentWorkStopNumberingModule"), '', '');
+$objectModSubdir = 'digiriskelement';
 
-print '<table class="noborder centpercent">';
-print '<tr class="liste_titre">';
-print '<td>' . $langs->trans("Name") . '</td>';
-print '<td>' . $langs->trans("Description") . '</td>';
-print '<td class="nowrap">' . $langs->trans("Example") . '</td>';
-print '<td class="center">' . $langs->trans("Status") . '</td>';
-print '<td class="center">' . $langs->trans("ShortInfo") . '</td>';
-print '</tr>';
+require __DIR__ . '/../../../saturne/core/tpl/admin/object/object_numbering_module_view.tpl.php';
 
-clearstatcache();
-$dir = dol_buildpath("/custom/digiriskdolibarr/core/modules/digiriskdolibarr/digiriskelement/accidentworkstop/");
+print load_fiche_titre('<i class="fas fa-user-injured"></i> ' . $langs->trans("AccidentInvestigationManagement"), '', '');
 
-if (is_dir($dir)) {
-    $handle = opendir($dir);
-    if (is_resource($handle)) {
-		while (($file = readdir($handle)) !== false ) {
-			if ( ! is_dir($dir . $file) || (substr($file, 0, 1) <> '.' && substr($file, 0, 3) <> 'CVS')) {
-				$filebis = $file;
+print '<hr>';
 
-				$classname = preg_replace('/\.php$/', '', $file);
-				$classname = preg_replace('/\-.*$/', '', $classname);
+$object = new AccidentInvestigation($db);
 
-				if ( ! class_exists($classname) && is_readable($dir . $filebis) && (preg_match('/mod_/', $filebis) || preg_match('/mod_/', $classname)) && substr($filebis, dol_strlen($filebis) - 3, 3) == 'php') {
-					// Charging the numbering class
-					require_once $dir . $filebis;
+$objectModSubdir = 'digiriskelement';
 
-					$module = new $classname($db);
-
-					if ($module->isEnabled()) {
-						print '<tr class="oddeven"><td>';
-						print $langs->trans($module->name);
-						print "</td><td>";
-						print $module->info();
-						print '</td>';
-
-						// Show example of numbering module
-						print '<td class="nowrap">';
-						$tmp = $module->getExample();
-						if (preg_match('/^Error/', $tmp)) print '<div class="error">' . $langs->trans($tmp) . '</div>';
-						elseif ($tmp == 'NotConfigured') print $langs->trans($tmp);
-						else print $tmp;
-						print '</td>';
-
-						print '<td class="center">';
-						if ($conf->global->DIGIRISKDOLIBARR_ACCIDENT_WORKSTOP_ADDON == $file || $conf->global->DIGIRISKDOLIBARR_ACCIDENT_WORKSTOP_ADDON . '.php' == $file) {
-							print img_picto($langs->trans("Activated"), 'switch_on');
-						} else {
-							print '<a class="reposition" href="' . $_SERVER["PHP_SELF"] . '?action=setmodAccidentWorkStop&value=' . preg_replace('/\.php$/', '', $file) . '&scan_dir=' . $module->scandir . '&label=' . urlencode($module->name) . '&token=' . newToken() . '" alt="' . $langs->trans("Default") . '">' . img_picto($langs->trans("Disabled"), 'switch_off') . '</a>';
-						}
-						print '</td>';
-
-						// Example for listing risks action
-						$htmltooltip  = '';
-						$htmltooltip .= '' . $langs->trans("Version") . ': <b>' . $module->getVersion() . '</b><br>';
-						$nextval      = $module->getNextValue($workstop);
-						if ("$nextval" != $langs->trans("NotAvailable")) {  // Keep " on nextval
-							$htmltooltip .= $langs->trans("NextValue") . ': ';
-							if ($nextval) {
-								if (preg_match('/^Error/', $nextval) || $nextval == 'NotConfigured')
-									$nextval  = $langs->trans($nextval);
-								$htmltooltip .= $nextval . '<br>';
-							} else {
-								$htmltooltip .= $langs->trans($module->error) . '<br>';
-							}
-						}
-
-						print '<td class="center">';
-						print $form->textwithpicto('', $htmltooltip, 1, 0);
-						if ($conf->global->DIGIRISKDOLIBARR_ACCIDENT_WORKSTOP_ADDON . '.php' == $file) {  // If module is the one used, we show existing errors
-							if ( ! empty($module->error)) dol_htmloutput_mesg($module->error, '', 'error', 1);
-						}
-						print '</td>';
-						print "</tr>";
-					}
-				}
-			}
-		}
-		closedir($handle);
-	}
-}
-
-print '</table>';
-
-/*
- *  Numbering module Accident Lesion
- */
-
-print load_fiche_titre($langs->trans("DigiriskAccidentLesionNumberingModule"), '', '');
-
-print '<table class="noborder centpercent">';
-print '<tr class="liste_titre">';
-print '<td>' . $langs->trans("Name") . '</td>';
-print '<td>' . $langs->trans("Description") . '</td>';
-print '<td class="nowrap">' . $langs->trans("Example") . '</td>';
-print '<td class="center">' . $langs->trans("Status") . '</td>';
-print '<td class="center">' . $langs->trans("ShortInfo") . '</td>';
-print '</tr>';
-
-clearstatcache();
-$dir = dol_buildpath("/custom/digiriskdolibarr/core/modules/digiriskdolibarr/digiriskelement/accidentlesion/");
-if (is_dir($dir)) {
-	$handle = opendir($dir);
-	if (is_resource($handle)) {
-		while (($file = readdir($handle)) !== false ) {
-			if ( ! is_dir($dir . $file) || (substr($file, 0, 1) <> '.' && substr($file, 0, 3) <> 'CVS')) {
-				$filebis = $file;
-
-				$classname = preg_replace('/\.php$/', '', $file);
-				$classname = preg_replace('/\-.*$/', '', $classname);
-
-				if ( ! class_exists($classname) && is_readable($dir . $filebis) && (preg_match('/mod_/', $filebis) || preg_match('/mod_/', $classname)) && substr($filebis, dol_strlen($filebis) - 3, 3) == 'php') {
-					// Charging the numbering class
-					require_once $dir . $filebis;
-
-					$module = new $classname($db);
-
-					if ($module->isEnabled()) {
-						print '<tr class="oddeven"><td>';
-						print $langs->trans($module->name);
-						print "</td><td>";
-						print $module->info();
-						print '</td>';
-
-						// Show example of numbering module
-						print '<td class="nowrap">';
-						$tmp = $module->getExample();
-						if (preg_match('/^Error/', $tmp)) print '<div class="error">' . $langs->trans($tmp) . '</div>';
-						elseif ($tmp == 'NotConfigured') print $langs->trans($tmp);
-						else print $tmp;
-						print '</td>';
-
-						print '<td class="center">';
-						if ($conf->global->DIGIRISKDOLIBARR_ACCIDENT_LESION_ADDON == $file || $conf->global->DIGIRISKDOLIBARR_ACCIDENT_LESION_ADDON . '.php' == $file) {
-							print img_picto($langs->trans("Activated"), 'switch_on');
-						} else {
-							print '<a class="reposition" href="' . $_SERVER["PHP_SELF"] . '?action=setmodAccidentLesion&value=' . preg_replace('/\.php$/', '', $file) . '&scan_dir=' . $module->scandir . '&label=' . urlencode($module->name) . '&token=' . newToken() . '" alt="' . $langs->trans("Default") . '">' . img_picto($langs->trans("Disabled"), 'switch_off') . '</a>';
-						}
-						print '</td>';
-
-						// Example for listing risks action
-						$htmltooltip  = '';
-						$htmltooltip .= '' . $langs->trans("Version") . ': <b>' . $module->getVersion() . '</b><br>';
-						$nextval      = $module->getNextValue($lesion);
-						if ("$nextval" != $langs->trans("NotAvailable")) {  // Keep " on nextval
-							$htmltooltip .= $langs->trans("NextValue") . ': ';
-							if ($nextval) {
-								if (preg_match('/^Error/', $nextval) || $nextval == 'NotConfigured')
-									$nextval  = $langs->trans($nextval);
-								$htmltooltip .= $nextval . '<br>';
-							} else {
-								$htmltooltip .= $langs->trans($module->error) . '<br>';
-							}
-						}
-
-						print '<td class="center">';
-						print $form->textwithpicto('', $htmltooltip, 1, 0);
-						if ($conf->global->DIGIRISKDOLIBARR_ACCIDENT_LESION_ADDON . '.php' == $file) {  // If module is the one used, we show existing errors
-							if ( ! empty($module->error)) dol_htmloutput_mesg($module->error, '', 'error', 1);
-						}
-						print '</td>';
-						print "</tr>";
-					}
-				}
-			}
-		}
-		closedir($handle);
-	}
-}
-
-print '</table>';
+require __DIR__ . '/../../../saturne/core/tpl/admin/object/object_numbering_module_view.tpl.php';
 
 // Project
 if (isModEnabled('project')) {

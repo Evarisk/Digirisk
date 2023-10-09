@@ -127,32 +127,31 @@ class Evaluator extends SaturneObject
 		return $this->fetchAll('', '', 0, 0, $filter, 'AND');
 	}
 
-	/**
-	 * Load dashboard info evaluator.
-	 * - get number employees involved
-	 *
-	 * @return array
-	 * @throws Exception
-	 */
-	public function load_dashboard()
-	{
-		global $conf, $langs;
+    /**
+     * Load dashboard info evaluator
+     *
+     * @return array
+     * @throws Exception
+     */
+    public function load_dashboard(): array
+    {
+        global $conf, $langs;
 
-		$arrayNbEmployeesInvolved = $this->getNbEmployeesInvolved();
-		$arrayNbEmployees         = $this->getNbEmployees();
+        $arrayNbEmployeesInvolved = $this->getNbEmployeesInvolved();
+        $arrayNbEmployees         = $this->getNbEmployees();
 
-		$array['widgets'] = array(
-			DigiriskDolibarrDashboard::DASHBOARD_EVALUATOR => array(
-				'label'      => array($langs->transnoentities("NbEmployeesInvolved"), $langs->transnoentities("NbEmployees")),
-				'content'    => array($arrayNbEmployeesInvolved['nbemployeesinvolved'], $arrayNbEmployees['nbemployees']),
-				'tooltip'    => array($langs->transnoentities("NbEmployeesInvolvedTooltip"), (($conf->global->DIGIRISKDOLIBARR_NB_EMPLOYEES > 0 && $conf->global->DIGIRISKDOLIBARR_MANUAL_INPUT_NB_EMPLOYEES) ? $langs->transnoentities("NbEmployeesConfTooltip") : $langs->transnoentities("NbEmployeesTooltip"))),
-				'picto'      => 'fas fa-user-check',
-				'widgetName' => $langs->transnoentities('Evaluator')
-			)
-		);
+        $array['widgets'] = [
+            'evaluator' => [
+                'label'      => [$langs->transnoentities('NbEmployeesInvolved') ?? '', $langs->transnoentities('NbEmployees') ?? ''],
+                'content'    => [$arrayNbEmployeesInvolved['nbemployeesinvolved'] ?? 0, $arrayNbEmployees['nbemployees'] ?? 0],
+                'tooltip'    => [$langs->transnoentities('NbEmployeesInvolvedTooltip'), (($conf->global->DIGIRISKDOLIBARR_NB_EMPLOYEES > 0 && $conf->global->DIGIRISKDOLIBARR_MANUAL_INPUT_NB_EMPLOYEES) ? $langs->transnoentities('NbEmployeesConfTooltip') : $langs->transnoentities('NbEmployeesTooltip'))],
+                'picto'      => 'fas fa-user-check',
+                'widgetName' => $langs->transnoentities('Evaluator')
+            ]
+        ];
 
-		return $array;
-	}
+        return $array;
+    }
 
 	/**
 	 * Get number employees involved.
@@ -194,4 +193,35 @@ class Evaluator extends SaturneObject
 		}
 		return $array;
 	}
+
+    /**
+     * Write information of trigger description
+     *
+     * @param  Object $object Object calling the trigger
+     * @return string         Description to display in actioncomm->note_private
+     */
+    public function getTriggerDescription(SaturneObject $object): string
+    {
+        global $langs;
+
+        require_once __DIR__ . '/digiriskelement.class.php';
+
+        $ret = parent::getTriggerDescription($object);
+
+        $now             = dol_now();
+        $userstat        = new User($this->db);
+        $digiriskelement = new DigiriskElement($this->db);
+
+        $digiriskelement->fetch($object->fk_parent);
+        $userstat->fetch($object->fk_user);
+        $langs->load('companies');
+
+        $ret .= $langs->trans('ParentElement') . ' : ' . $digiriskelement->ref . " - " . $digiriskelement->label . '<br>';
+        $ret .= $langs->trans('UserAssigned') . ' : ' . $userstat->firstname . " " . $userstat->lastname . '<br>';
+        $ret .= $langs->trans('PostOrFunction') . ' : ' . (!empty($object->job) ? $object->job : 'N/A') . '<br>';
+        $ret .= $langs->trans('AssignmentDate') . ' : ' . dol_print_date($now, 'dayhoursec', 'tzuser') . '<br>';
+        $ret .= $langs->trans('EvaluationDuration') . ' : ' . convertSecondToTime($object->duration * 60, 'allhourmin') . ' min' . '<br>';
+
+        return $ret;
+    }
 }

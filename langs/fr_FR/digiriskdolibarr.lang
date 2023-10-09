@@ -421,6 +421,9 @@ UpdateAccidentLesion              = Mise à jour d'une lésion sur l'accident
 DeleteAccidentLesion              = Suppression d'une lésion sur l'accident
 AccidentDescription               = Projet des accidents
 AccidentManagement                = Gestion des accidents
+AccidentWorkstopManagement        = Gestion des arrêts de travail
+AccidentLesionManagement          = Gestion des lésions
+AccidentInvestigationManagement   = Gestion des enquêtes accident
 ACCProject                        = Projet lié aux accidents
 UserVictim                        = Victime de l'accident
 AccidentType                      = Type de l'accident
@@ -512,7 +515,7 @@ accidentinvestigationdocument.odt = Enquête accident
 NewAccidentInvestigation          = Nouvelle enquête accident
 UpdateAccidentInvestigation       = Modifier une enquête accident
 AccidentInvestigationList         = Liste des enquêtes accidents
-TheAccident_investigation         = l'enquête accident
+TheAccidentinvestigation          = l'enquête accident
 SeniorityInPosition               = Ancienneté au poste
 VictimSkills                      = Compétences de l'accidenté
 CollectiveEquipment               = Équipement de Protection Collective (EPC)
@@ -726,7 +729,7 @@ PleaseSelectADigiriskElement        = Sélectionner un groupement ou une unité 
 Registers                           = Registres
 ShowInSelectOnPublicTicketInterface = Doit apparaître dans la liste des éléments de l'interface publique des tickets
 Organization                        = Organisation GP/UT
-YouDontHaveOrganization             = Vous n'avez pas créé de groupements ou d'unités de travail, veuillez vous rendre dans "Document Unique" afin d'en créer.
+YouDontHaveOrganization             = Vous n'avez pas créé de groupements ou d'unités de travail, veuillez vous rendre dans "Document Unique" ou cliquez <b> ici </b> afin d'en créer.
 
 
 #
