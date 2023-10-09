@@ -270,4 +270,35 @@ class RiskAssessment extends SaturneObject
 
 		return $scaleCounter;
 	}
+
+    /**
+     * Write information of trigger description
+     *
+     * @param  Object $object Object calling the trigger
+     * @return string         Description to display in actioncomm->note_private
+     */
+    public function getTriggerDescription(SaturneObject $object): string
+    {
+        global $conf, $langs;
+
+        $risk = new Risk($this->db);
+        $risk->fetch($object->fk_risk);
+
+        $ret = parent::getTriggerDescription($object);
+
+        $ret .= $langs->trans('ParentRisk') . ' : ' . $risk->ref . '<br>';
+        $ret .= $langs->trans('Comment') . ' : ' . (!empty($object->comment) ? $object->comment : 'N/A') . '<br>';
+        $ret .= ((!empty($object->date_riskassessment) && $conf->global->DIGIRISKDOLIBARR_SHOW_RISKASSESSMENT_DATE) ? $langs->trans('RiskAssessmentDate') . ' : ' . dol_print_date($object->date_riskassessment, 'day') . '<br>' : '');
+        $ret .= $langs->trans('Photo') . ' : ' . (!empty($object->photo) ? $object->photo : 'N/A') . '<br>';
+        if ($object->method == 'advanced') {
+            $ret .= $langs->trans('Evaluation') . ' : ' . $object->cotation . '<br>';
+            $ret .= $langs->trans('Gravity') . ' : ' . $object->gravite . '<br>';
+            $ret .= $langs->trans('Protection') . ' : ' . $object->protection . '<br>';
+            $ret .= $langs->trans('Occurrence') . ' : ' . $object->occurrence . '<br>';
+            $ret .= $langs->trans('Formation') . ' : ' . $object->formation . '<br>';
+            $ret .= $langs->trans('Exposition') . ' : ' . $object->exposition . '<br>';
+        }
+
+        return $ret;
+    }
 }

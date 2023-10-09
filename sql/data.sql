@@ -901,4 +901,9 @@ INSERT INTO llx_c_digiriskdolibarr_action_trigger (elementtype, ref, label, desc
 INSERT INTO llx_c_digiriskdolibarr_action_trigger (elementtype, ref, label, description) VALUES ('accident_investigation@digiriskdolibarr', 'ACCIDENT_INVESTIGATION_UNVALIDATE', 'AccidentInvestigationUnValidate', 'Executed when an accident investigation is re-opened');
 INSERT INTO llx_c_digiriskdolibarr_action_trigger (elementtype, ref, label, description) VALUES ('accident_investigation@digiriskdolibarr', 'ACCIDENT_INVESTIGATION_ARCHIVE', 'AccidentInvestigationArchive', 'Executed when an accident investigation is archived');
 INSERT INTO llx_c_digiriskdolibarr_action_trigger (elementtype, ref, label, description) VALUES ('accident_investigation@digiriskdolibarr', 'ACCIDENT_INVESTIGATION_LOCK', 'AccidentInvestigationLock', 'Executed when an accident investigation is signed');
+INSERT INTO llx_c_digiriskdolibarr_action_trigger (elementtype, ref, label, description) VALUES ('accident_investigation@digiriskdolibarr', 'ACCIDENT_INVESTIGATION_SENTBYMAIL', 'AccidentInvestigationSentByMail', 'Executed when an accident investigation is sent by mail');
+INSERT INTO llx_c_digiriskdolibarr_action_trigger (elementtype, ref, label, description) VALUES ('risk@digiriskdolibarr', 'RISK_IMPORT', 'RiskImport', 'Executed when a risk is imported');
+INSERT INTO llx_c_digiriskdolibarr_action_trigger (elementtype, ref, label, description) VALUES ('risk@digiriskdolibarr', 'RISK_UNLINK', 'RiskUnlink', 'Executed when a risk is unlinked');
+INSERT INTO llx_c_digiriskdolibarr_action_trigger (elementtype, ref, label, description) VALUES ('risk@digiriskdolibarr', 'RISKSIGN_IMPORT', 'RiskSignImport', 'Executed when a risk sign is imported');
+INSERT INTO llx_c_digiriskdolibarr_action_trigger (elementtype, ref, label, description) VALUES ('risk@digiriskdolibarr', 'RISKSIGN_UNLINK', 'RiskSignUnlink', 'Executed when a risk sign is unlinked');
 

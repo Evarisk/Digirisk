@@ -131,7 +131,7 @@ class RiskSign extends SaturneObject
 	 */
 	public function getRiskSignCategories()
 	{
-		$json_categories     = file_get_contents(DOL_DOCUMENT_ROOT . '/custom/digiriskdolibarr/js/json/signalisationCategories.json');
+		$json_categories = file_get_contents(DOL_DOCUMENT_ROOT . '/custom/digiriskdolibarr/js/json/signalisationCategories.json');
 		return json_decode($json_categories, true);
 	}
 
@@ -309,4 +309,34 @@ class RiskSign extends SaturneObject
 			return -1;
 		}
 	}
+
+    /**
+     * Write information of trigger description
+     *
+     * @param  Object $object Object calling the trigger
+     * @return string         Description to display in actioncomm->note_private
+     */
+    public function getTriggerDescription(SaturneObject $object): string
+    {
+        global $conf, $langs;
+
+        require_once __DIR__ . '/../digiriskelement.class.php';
+        require_once __DIR__ . '/risk.class.php';
+
+        $ret = parent::getTriggerDescription($object);
+
+        $digiriskelement = new DigiriskElement($this->db);
+        $risk            = new Risk($this->db);
+        $digiriskelement->fetch($object->fk_element);
+
+        $ret .= $langs->trans('ParentElement') . ' : ' . $digiriskelement->ref . " - " . $digiriskelement->label . '<br>';
+        $ret .= $langs->trans('RiskCategory') . ' : ' . $risk->getDangerCategoryName($object) . '<br>';
+
+        if (dol_strlen($object->applied_on) > 0) {
+            $digiriskelement->fetch($object->applied_on);
+            $ret .= $langs->trans('RiskSignSharedWithEntityRefLabel', $object->ref) . ' S' . $conf->entity . ' ' . $digiriskelement->ref . " - " . $digiriskelement->label . '<br>';
+        }
+
+        return $ret;
+    }
 }

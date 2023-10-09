@@ -131,10 +131,8 @@ if (empty($reshook)) {
 	if ($action == 'view' && $permissiontoadd) {
 		header('Location: ' . $backtopage);
 	}
-	$object->element = $object->element_type;
 	// Actions builddoc, forcebuilddoc, remove_file.
 	require_once __DIR__ . '/../../../saturne/core/tpl/documents/documents_action.tpl.php';
-	$object->element = 'digiriskelement';
 
 	// Action to generate pdf from odt file
     require_once __DIR__ . '/../../../saturne/core/tpl/documents/saturne_manual_pdf_generation_action.tpl.php';
