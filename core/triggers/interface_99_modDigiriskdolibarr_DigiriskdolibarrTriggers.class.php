@@ -136,7 +136,7 @@ class InterfaceDigiriskdolibarrTriggers extends DolibarrTriggers
 		$digiriskresources = new DigiriskResources($this->db);
 		$digiriskelement   = new DigiriskElement($this->db);
 
-		$actioncomm->elementtype = $object->element;
+		$actioncomm->elementtype = $object->element . '@digiriskdolibarr';
 		$actioncomm->type_code   = 'AC_OTH_AUTO';
 		$actioncomm->code        = 'AC_' . $action;
 		$actioncomm->datep       = $now;
