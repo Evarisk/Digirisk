@@ -81,21 +81,7 @@ if ( $action == "edit" && $permissiontoadd ) {
 	print '<tr>';
 	print '<td class="titlefield">' . $form->editfieldkey($langs->trans("SitePlans"), 'SitePlans', '', $object, 0) . '</td>';
 	print '<td>';
-	$filearray = dol_dir_list($conf->digiriskdolibarr->multidir_output[$conf->entity] . '/riskassessmentdocument/', "files", 0, '', '(\.odt|\.zip)', 'date', 'asc', 1);
-	if (count($filearray)) : ?>
-		<?php
-		$file = array_shift($filearray);
-		$thumb_name               = getThumbName($file['name']);
-		?>
-		<span class="">
-				<?php print '<img class="" src="' . DOL_URL_ROOT . '/viewimage.php?modulepart=digiriskdolibarr&entity=' . $conf->entity . '&file=' . urlencode('/riskassessmentdocument/thumbs/' . $thumb_name) . '" >'; ?>
-		</span>
-	<?php else : ?>
-		<?php $nophoto = DOL_URL_ROOT . '/public/theme/common/nophoto.png'; ?>
-		<span class="">
-			<img class="" alt="No photo" src="<?php echo $nophoto ?>">
-		</span>
-	<?php endif;
+    print saturne_show_medias_linked('digiriskdolibarr', $conf->digiriskdolibarr->multidir_output[$conf->entity] . '/riskassessmentdocument/siteplans', 'small', '', 0, 0, 0, 200, 200, 0, 0, 0, 'riskassessmentdocument/siteplans', null, '', 0, 0);
 	print '<input class="flat" type="file" name="userfile[]" id="SitePlans" />';
 	print '</td></tr>';
 } else {
@@ -141,22 +127,8 @@ if ( $action == "edit" && $permissiontoadd ) {
 	print '<tr>';
 	print '<td class="titlefield">' . $langs->trans("SitePlans") . '</td>';
 	print '<td>';
-	$filearray = dol_dir_list($conf->digiriskdolibarr->multidir_output[$conf->entity] . '/riskassessmentdocument/', "files", 0, '', '(\.odt|\.zip)', 'date', 'asc', 1);
-	if (count($filearray)) : ?>
-		<?php
-		$file = array_shift($filearray);
-		$thumb_name               = getThumbName($file['name']);
-		?>
-		<span class="">
-			<?php print '<img class="" src="' . DOL_URL_ROOT . '/viewimage.php?modulepart=digiriskdolibarr&entity=' . $conf->entity . '&file=' . urlencode('/riskassessmentdocument/thumbs/' . $thumb_name) . '" >'; ?>
-		</span>
-	<?php else : ?>
-		<?php $nophoto = DOL_URL_ROOT . '/public/theme/common/nophoto.png'; ?>
-		<span class="">
-			<img class="" alt="No photo" src="<?php echo $nophoto ?>">
-		</span>
-	<?php endif; ?>
-	<?php print '</td></tr>';
+    print saturne_show_medias_linked('digiriskdolibarr', $conf->digiriskdolibarr->multidir_output[$conf->entity] . '/riskassessmentdocument/siteplans', 'small', '', 0, 0, 0, 200, 200, 0, 0, 0, 'riskassessmentdocument/siteplans', null, '', 0, 0);
+    print '</td></tr>';
 }
 
 ?>
