@@ -38,6 +38,7 @@ require_once DOL_DOCUMENT_ROOT . "/core/lib/admin.lib.php";
 
 require_once __DIR__ . '/../../lib/digiriskdolibarr.lib.php';
 require_once __DIR__ . '/../../class/accident.class.php';
+require_once __DIR__ . '/../../class/accident_investigation.class.php';
 
 // Translations
 saturne_load_langs(["admin"]);
@@ -159,6 +160,16 @@ print '<hr>';
 print load_fiche_titre('<i class="fas fa-user-injured"></i> ' . $langs->trans("AccidentLesionManagement"), '', '');
 
 $object = new AccidentLesion($db);
+
+$objectModSubdir = 'digiriskelement';
+
+require __DIR__ . '/../../../saturne/core/tpl/admin/object/object_numbering_module_view.tpl.php';
+
+print '<hr>';
+
+print load_fiche_titre('<i class="fas fa-user-injured"></i> ' . $langs->trans("AccidentInvestigationManagement"), '', '');
+
+$object = new AccidentInvestigation($db);
 
 $objectModSubdir = 'digiriskelement';
 
