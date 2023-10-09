@@ -211,15 +211,15 @@ class pdf_orque_projectdocument
 	 * 	@param	int				$hidedetails		Do not show line details
 	 * 	@param	int				$hidedesc			Do not show desc
 	 * 	@param	int				$hideref			Do not show ref
-	 * 	@param	array			$moreparams			Array to provide more information
+	 * 	@param	array			$moreParams			Array to provide more information
 	 *	@return	int         						1 if OK, <=0 if KO
 	 * 	@throws Exception
 	 */
-	public function write_file(ProjectDocument $objectDocument, Translate $outputlangs, array $moreparams): int
+	public function write_file(	SaturneDocuments $objectDocument, Translate $outputLangs, string $srcTemplatePath, int $hideDetails = 0, int $hideDesc = 0, int $hideRef = 0, array $moreParams): int
 	{
 		global $conf, $hookmanager, $langs, $user;
 
-		$object = $moreparams['object'];
+		$object = $moreParams['object'];
 
 		if (!is_object($outputlangs)) {
 			$outputlangs = $langs;

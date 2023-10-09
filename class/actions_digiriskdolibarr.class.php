@@ -903,7 +903,8 @@ class ActionsDigiriskdolibarr
 				'picto'        => 'ticket'
 			],
 			'Project' => [
-				'documentType' => 'projectdocument',
+				'documentType' => 'project',
+                'className'    => 'projectdocument',
 				'picto'        => 'project'
 			],
 
