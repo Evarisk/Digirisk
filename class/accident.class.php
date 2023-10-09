@@ -825,6 +825,7 @@ class AccidentWorkStop extends SaturneObject
 		return parent::__construct($db, $this->module, $this->element);
 	}
 
+    /*
      * Load object in memory from the database
      *
      * @param  int       $parent_id Id parent object
@@ -837,7 +838,8 @@ class AccidentWorkStop extends SaturneObject
 
         return $this->fetchAll('', '', 0, 0, $filter);
     }
-  
+
+    /*
      * Write information of trigger description
      *
      * @param  Object $object Object calling the trigger
