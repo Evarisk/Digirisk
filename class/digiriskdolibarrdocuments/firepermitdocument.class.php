@@ -24,6 +24,10 @@
 // Load Saturne libraries.
 require_once __DIR__ . '/../../../saturne/class/saturnedocuments.class.php';
 
+// Load DigiriskDolibarr libraries
+require_once __DIR__ . '/../digiriskdocuments.class.php';
+require_once __DIR__ . '/../digiriskresources.class.php';
+
 /**
  * Class for FirePermitDocument.
  */
@@ -72,7 +76,11 @@ class FirePermitDocument extends DigiriskDocuments
 		$id = GETPOST('id');
 		if ($id > 0) {
 			$firepermit->fetch($id);
-		}
+		} else {
+            $track_id = GETPOST('track_id', 'alpha');
+            $signatory->fetch(0, '', ' AND signature_url =' . "'" . $track_id . "'");
+            $firepermit->fetch($signatory->fk_object);
+        }
 
 		$firepermitlines     = $firepermitline->fetchAll('', '', 0, 0, array(), 'AND', GETPOST('id'));
 		$preventionplanlines = $preventionplanline->fetchAll('', '', 0, 0, array(), 'AND', $firepermit->fk_preventionplan);

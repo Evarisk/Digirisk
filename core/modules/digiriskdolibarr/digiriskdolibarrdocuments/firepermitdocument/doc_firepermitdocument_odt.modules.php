@@ -35,6 +35,7 @@ require_once __DIR__ . '/../../../../../class/evaluator.class.php';
 require_once __DIR__ . '/../../../../../class/riskanalysis/risk.class.php';
 require_once __DIR__ . '/../../../../../class/riskanalysis/riskassessment.class.php';
 require_once __DIR__ . '/../../../../../class/riskanalysis/risksign.class.php';
+require_once __DIR__ . '/../../../../../class/preventionplan.class.php';
 
 /**
  *	Class to build documents using ODF templates generator
@@ -137,12 +138,8 @@ class doc_firepermitdocument_odt extends SaturneDocumentModel
 						$tmpArray['key_unique'] = $line->ref;
 						$tmpArray['unite_travail'] = $digiriskelement->ref . " - " . $digiriskelement->label;
 						$tmpArray['action'] = $line->description;
-						$tmpArray['risk_photo'] = DOL_DOCUMENT_ROOT . '/custom/digiriskdolibarr/img/categorieDangers/' . $risk->getDangerCategory(
-								$line
-							) . '.png';
-						$tmpArray['nomPicto'] = (!empty($conf->global->DIGIRISKDOLIBARR_DOCUMENT_SHOW_PICTO_NAME) ? $risk->getDangerCategoryName(
-							$line
-						) : ' ');
+						$tmpArray['risk_photo'] = DOL_DOCUMENT_ROOT . '/custom/digiriskdolibarr/img/categorieDangers/' . $risk->getDangerCategory($line) . '.png';
+						$tmpArray['nomPicto'] = (!empty($conf->global->DIGIRISKDOLIBARR_DOCUMENT_SHOW_PICTO_NAME) ? $risk->getDangerCategoryName($line) : ' ');
 						$tmpArray['prevention'] = $line->prevention_method;
 
 						$this->setTmpArrayVars($tmpArray, $listLines, $outputLangs);
@@ -170,12 +167,8 @@ class doc_firepermitdocument_odt extends SaturneDocumentModel
 						$tmpArray['key_unique'] = $line->ref;
 						$tmpArray['unite_travail'] = $digiriskelement->ref . " - " . $digiriskelement->label;
 						$tmpArray['action'] = $line->description;
-						$tmpArray['type_de_travaux_photo'] = DOL_DOCUMENT_ROOT . '/custom/digiriskdolibarr/img/categorieDangers/' . $risk->getDangerCategory(
-								$line
-							) . '.png';
-						$tmpArray['nomPicto'] = (!empty($conf->global->DIGIRISKDOLIBARR_DOCUMENT_SHOW_PICTO_NAME) ? $risk->getDangerCategoryName(
-							$line
-						) : ' ');
+						$tmpArray['type_de_travaux_photo'] = DOL_DOCUMENT_ROOT . '/custom/digiriskdolibarr/img/typeDeTravaux/' . $risk->getFirePermitDangerCategory($line) . '.png';
+						$tmpArray['nomPictoT'] = (!empty($conf->global->DIGIRISKDOLIBARR_DOCUMENT_SHOW_PICTO_NAME) ? $risk->getFirePermitDangerCategoryName($line) : ' ');
 						$tmpArray['materiel'] = $line->used_equipment;
 
 						$this->setTmpArrayVars($tmpArray, $listLines, $outputLangs);
@@ -279,205 +272,212 @@ class doc_firepermitdocument_odt extends SaturneDocumentModel
 		}
 	}
 
-	/**
-	 * Function to build a document on disk.
-	 *
-	 * @param  SaturneDocuments $objectDocument  Object source to build document.
-	 * @param  Translate        $outputLangs     Lang object to use for output.
-	 * @param  string           $srcTemplatePath Full path of source filename for generator using a template file.
-	 * @param  int              $hideDetails     Do not show line details.
-	 * @param  int              $hideDesc        Do not show desc.
-	 * @param  int              $hideRef         Do not show ref.
-	 * @param  array            $moreParam       More param (Object/user/etc).
-	 * @return int                               1 if OK, <=0 if KO.
-	 * @throws Exception
-	 */
-	public function write_file(SaturneDocuments $objectDocument, Translate $outputLangs, string $srcTemplatePath, int $hideDetails = 0, int $hideDesc = 0, int $hideRef = 0, array $moreParam): int
-	{
-		global $conf, $langs, $moduleNameLowerCase;
+    /**
+     * Function to build a document on disk
+     *
+     * @param  SaturneDocuments $objectDocument  Object source to build document
+     * @param  Translate        $outputLangs     Lang object to use for output
+     * @param  string           $srcTemplatePath Full path of source filename for generator using a template file
+     * @param  int              $hideDetails     Do not show line details
+     * @param  int              $hideDesc        Do not show desc
+     * @param  int              $hideRef         Do not show ref
+     * @param  array            $moreParam       More param (Object/user/etc)
+     * @return int                               1 if OK, <=0 if KO
+     * @throws Exception
+     */
+    public function write_file(SaturneDocuments $objectDocument, Translate $outputLangs, string $srcTemplatePath, int $hideDetails = 0, int $hideDesc = 0, int $hideRef = 0, array $moreParam): int
+    {
+        global $conf, $langs;
 
-		$object = $moreParam['object'];
+        $object = $moreParam['object'];
 
-		$saturneSchedules        = new SaturneSchedules($this->db);
-		$firepermitline  = new FirePermitLine($this->db);
-		$preventionplan = new PreventionPlan($this->db);
+        $saturneSchedules = new SaturneSchedules($this->db);
+        $preventionPlan   = new PreventionPlan($this->db);
 
-		$preventionplan->fetch($object->fk_preventionplan);
+        $preventionPlan->fetch($object->fk_preventionplan);
 
-		$firepermitlines   = $firepermitline->fetchAll('', '', 0, 0, ['fk_firepermit' => $object->id]);
+        $tmpArray = [];
 
-		$tmpArray = [];
+        $objectDocument->DigiriskFillJSON();
 
-		$objectDocument->DigiriskFillJSON();
+        $objectDocument->element = $objectDocument->element . '@digiriskdolibarr';
+        complete_substitutions_array($tmpArray, $outputLangs, $objectDocument);
+        $objectDocument->element = $objectDocument->element;
 
-		$objectDocument->element = $objectDocument->element . '@digiriskdolibarr';
-		complete_substitutions_array($tmpArray, $outputLangs, $objectDocument);
-		$objectDocument->element = $objectDocument->element;
+        $arrayData = json_decode($objectDocument->json);
+        $arrayData = (array) $arrayData->FirePermit;
 
-		$arrayData = json_decode($objectDocument->json);
-		$arrayData = (array) $arrayData->FirePermit;
+        $tmpArray['titre_permis_feu']     = $object->ref;
+        $tmpArray['raison_du_permis_feu'] = $object->label;
 
-		if (is_array($firepermitlines) && !empty($firepermitlines)) {
-			$tmpArray['interventions_info'] = count($firepermitlines) . ' ' . $langs->trans('FirePermitLine');
-		} else {
-			$tmpArray['interventions_info'] = 0;
-		}
+        $tmpArray['pompier_number']   = $arrayData['pompier_number'];
+        $tmpArray['samu_number']      = $arrayData['samu_number'];
+        $tmpArray['emergency_number'] = $arrayData['emergency_number'];
+        $tmpArray['police_number']    = $arrayData['police_number'];
 
-		if ( ! empty($extsocietyintervenants) && $extsocietyintervenants > 0 && is_array($extsocietyintervenants)) {
-			$tmpArray['intervenants_info'] = count($extsocietyintervenants);
-		} else {
-			$tmpArray['intervenants_info'] = 0;
-		}
+        $tmpArray['moyen_generaux_mis_disposition'] = $arrayData['moyen_generaux_mis_disposition'];
+        $tmpArray['consigne_generale']              = $arrayData['consigne_generale'];
+        $tmpArray['premiers_secours']               = $arrayData['premiers_secours'];
 
-		$tmpArray['pompier_number']   = $arrayData['pompier_number'];
-		$tmpArray['samu_number']      = $arrayData['samu_number'];
-		$tmpArray['emergency_number'] = $arrayData['emergency_number'];
-		$tmpArray['police_number']    = $arrayData['police_number'];
+        $tmpArray['titre_plan_prevention']       = $preventionPlan->ref;
+        $tmpArray['raison_plan_prevention']      = $preventionPlan->label;
+        $tmpArray['date_start_intervention_PPP'] = dol_print_date($preventionPlan->date_start, 'dayhour');
+        $tmpArray['date_end_intervention_PPP']   = dol_print_date($preventionPlan->date_end, 'dayhour');
 
-		$tmpArray['moyen_generaux_mis_disposition'] = $arrayData['moyen_generaux_mis_disposition'];
-		$tmpArray['consigne_generale']              = $arrayData['consigne_generale'];
-		$tmpArray['premiers_secours']               = $arrayData['premiers_secours'];
+        $moreWhere  = ' AND element_id = ' . $preventionPlan->id;
+        $moreWhere .= ' AND element_type = ' . "'" . $preventionPlan->element . "'";
+        $moreWhere .= ' AND status = 1';
 
-		$tmpArray['titre_permis_feu']             = $object->ref;
-		$tmpArray['raison_du_permis_feu']         = $object->label;
-		$tmpArray['titre_plan_prevention']             = $object->ref;
-		$tmpArray['raison_plan_prevention'] = $object->label;
+        $saturneSchedules->fetch(0, '', $moreWhere);
 
-		$tmpArray['prior_visit_date'] = dol_print_date($object->prior_visit_date, 'dayhoursec');
-		$tmpArray['prior_visit_text'] = $object->prior_visit_text;
+        $opening_hours_monday    = explode(' ', $saturneSchedules->monday);
+        $opening_hours_tuesday   = explode(' ', $saturneSchedules->tuesday);
+        $opening_hours_wednesday = explode(' ', $saturneSchedules->wednesday);
+        $opening_hours_thursday  = explode(' ', $saturneSchedules->thursday);
+        $opening_hours_friday    = explode(' ', $saturneSchedules->friday);
+        $opening_hours_saturday  = explode(' ', $saturneSchedules->saturday);
+        $opening_hours_sunday    = explode(' ', $saturneSchedules->sunday);
 
-		$tmpArray['date_start_intervention_PPP'] = dol_print_date($preventionplan->date_start, 'dayhoursec');
-		$tmpArray['date_end_intervention_PPP']   = dol_print_date($preventionplan->date_end, 'dayhoursec');
+        $tmpArray['lundi_matin']    = $opening_hours_monday[0];
+        $tmpArray['lundi_aprem']    = $opening_hours_monday[1];
+        $tmpArray['mardi_matin']    = $opening_hours_tuesday[0];
+        $tmpArray['mardi_aprem']    = $opening_hours_tuesday[1];
+        $tmpArray['mercredi_matin'] = $opening_hours_wednesday[0];
+        $tmpArray['mercredi_aprem'] = $opening_hours_wednesday[1];
+        $tmpArray['jeudi_matin']    = $opening_hours_thursday[0];
+        $tmpArray['jeudi_aprem']    = $opening_hours_thursday[1];
+        $tmpArray['vendredi_matin'] = $opening_hours_friday[0];
+        $tmpArray['vendredi_aprem'] = $opening_hours_friday[1];
+        $tmpArray['samedi_matin']   = $opening_hours_saturday[0];
+        $tmpArray['samedi_aprem']   = $opening_hours_saturday[1];
+        $tmpArray['dimanche_matin'] = $opening_hours_sunday[0];
+        $tmpArray['dimanche_aprem'] = $opening_hours_sunday[1];
 
-		$tmpArray['date_start_intervention_FP'] = dol_print_date($object->date_start, 'dayhoursec');
-		$tmpArray['date_end_intervention_FP']   = dol_print_date($object->date_end, 'dayhoursec');
+        if (is_array($preventionPlan->lines) && !empty($preventionPlan->lines)) {
+            $tmpArray['interventions_info'] = count($preventionPlan->lines) . ' ' . $langs->trans('PreventionPlanLine');
+        } else {
+            $tmpArray['interventions_info'] = 0;
+        }
 
-		$morewhere  = ' AND element_id = ' . $object->id;
-		$morewhere .= ' AND element_type = ' . "'" . $object->element . "'";
-		$morewhere .= ' AND status = 1';
+        $tmpArray['date_start_intervention_FP'] = dol_print_date($object->date_start, 'dayhour');
+        $tmpArray['date_end_intervention_FP']   = dol_print_date($object->date_end, 'dayhour');
 
-		$saturneSchedules->fetch(0, '', $morewhere);
+        if (is_array($object->lines) && !empty($object->lines)) {
+            $tmpArray['interventions_info_FP'] = count($object->lines) . ' ' . $langs->trans('FirePermitLine');
+        } else {
+            $tmpArray['interventions_info_FP'] = 0;
+        }
 
-		$opening_hours_monday    = explode(' ', $saturneSchedules->monday);
-		$opening_hours_tuesday   = explode(' ', $saturneSchedules->tuesday);
-		$opening_hours_wednesday = explode(' ', $saturneSchedules->wednesday);
-		$opening_hours_thursday  = explode(' ', $saturneSchedules->thursday);
-		$opening_hours_friday    = explode(' ', $saturneSchedules->friday);
-		$opening_hours_saturday  = explode(' ', $saturneSchedules->saturday);
-		$opening_hours_sunday    = explode(' ', $saturneSchedules->sunday);
+        $moreWhere  = ' AND element_id = ' . $object->id;
+        $moreWhere .= ' AND element_type = ' . "'" . $object->element . "'";
+        $moreWhere .= ' AND status = 1';
 
-		$tmpArray['lundi_matinF']    = $opening_hours_monday[0];
-		$tmpArray['lundi_apremF']    = $opening_hours_monday[1];
-		$tmpArray['mardi_matinF']    = $opening_hours_tuesday[0];
-		$tmpArray['mardi_apremF']    = $opening_hours_tuesday[1];
-		$tmpArray['mercredi_matinF'] = $opening_hours_wednesday[0];
-		$tmpArray['mercredi_apremF'] = $opening_hours_wednesday[1];
-		$tmpArray['jeudi_matinF']    = $opening_hours_thursday[0];
-		$tmpArray['jeudi_apremF']    = $opening_hours_thursday[1];
-		$tmpArray['vendredi_matinF'] = $opening_hours_friday[0];
-		$tmpArray['vendredi_apremF'] = $opening_hours_friday[1];
-		$tmpArray['samedi_matinF']   = $opening_hours_saturday[0];
-		$tmpArray['samedi_apremF']   = $opening_hours_saturday[1];
-		$tmpArray['dimanche_matinF'] = $opening_hours_sunday[0];
-		$tmpArray['dimanche_apremF'] = $opening_hours_sunday[1];
+        $saturneSchedules->fetch(0, '', $moreWhere);
 
-		$saturneSchedules = new SaturneSchedules($this->db);
-		
-		$morewherePreventionPlan  = ' AND element_id = ' . $preventionplan->id;
-		$morewherePreventionPlan .= ' AND element_type = ' . "'" . $preventionplan->element . "'";
-		$morewherePreventionPlan .= ' AND status = 1';
+        $opening_hours_monday    = explode(' ', $saturneSchedules->monday);
+        $opening_hours_tuesday   = explode(' ', $saturneSchedules->tuesday);
+        $opening_hours_wednesday = explode(' ', $saturneSchedules->wednesday);
+        $opening_hours_thursday  = explode(' ', $saturneSchedules->thursday);
+        $opening_hours_friday    = explode(' ', $saturneSchedules->friday);
+        $opening_hours_saturday  = explode(' ', $saturneSchedules->saturday);
+        $opening_hours_sunday    = explode(' ', $saturneSchedules->sunday);
 
-		$saturneSchedules->fetch(0, '', $morewherePreventionPlan);
+        $tmpArray['lundi_matinF']    = $opening_hours_monday[0];
+        $tmpArray['lundi_apremF']    = $opening_hours_monday[1];
+        $tmpArray['mardi_matinF']    = $opening_hours_tuesday[0];
+        $tmpArray['mardi_apremF']    = $opening_hours_tuesday[1];
+        $tmpArray['mercredi_matinF'] = $opening_hours_wednesday[0];
+        $tmpArray['mercredi_apremF'] = $opening_hours_wednesday[1];
+        $tmpArray['jeudi_matinF']    = $opening_hours_thursday[0];
+        $tmpArray['jeudi_apremF']    = $opening_hours_thursday[1];
+        $tmpArray['vendredi_matinF'] = $opening_hours_friday[0];
+        $tmpArray['vendredi_apremF'] = $opening_hours_friday[1];
+        $tmpArray['samedi_matinF']   = $opening_hours_saturday[0];
+        $tmpArray['samedi_apremF']   = $opening_hours_saturday[1];
+        $tmpArray['dimanche_matinF'] = $opening_hours_sunday[0];
+        $tmpArray['dimanche_apremF'] = $opening_hours_sunday[1];
 
-		$opening_hours_monday    = explode(' ', $saturneSchedules->monday);
-		$opening_hours_tuesday   = explode(' ', $saturneSchedules->tuesday);
-		$opening_hours_wednesday = explode(' ', $saturneSchedules->wednesday);
-		$opening_hours_thursday  = explode(' ', $saturneSchedules->thursday);
-		$opening_hours_friday    = explode(' ', $saturneSchedules->friday);
-		$opening_hours_saturday  = explode(' ', $saturneSchedules->saturday);
-		$opening_hours_sunday    = explode(' ', $saturneSchedules->sunday);
+        // Information external society
+        $extSociety = $arrayData['society_outside'];
+        if (!empty($extSociety) && $extSociety > 0) {
+            $tmpArray['society_title']    = $extSociety->name;
+            $tmpArray['society_siret_id'] = $extSociety->idprof2;
+            $tmpArray['society_address']  = $extSociety->address;
+            $tmpArray['society_postcode'] = $extSociety->zip;
+            $tmpArray['society_town']     = $extSociety->town;
+        }
 
-		$tmpArray['lundi_matin']    = $opening_hours_monday[0];
-		$tmpArray['lundi_aprem']    = $opening_hours_monday[1];
-		$tmpArray['mardi_matin']    = $opening_hours_tuesday[0];
-		$tmpArray['mardi_aprem']    = $opening_hours_tuesday[1];
-		$tmpArray['mercredi_matin'] = $opening_hours_wednesday[0];
-		$tmpArray['mercredi_aprem'] = $opening_hours_wednesday[1];
-		$tmpArray['jeudi_matin']    = $opening_hours_thursday[0];
-		$tmpArray['jeudi_aprem']    = $opening_hours_thursday[1];
-		$tmpArray['vendredi_matin'] = $opening_hours_friday[0];
-		$tmpArray['vendredi_aprem'] = $opening_hours_friday[1];
-		$tmpArray['samedi_matin']   = $opening_hours_saturday[0];
-		$tmpArray['samedi_aprem']   = $opening_hours_saturday[1];
-		$tmpArray['dimanche_matin'] = $opening_hours_sunday[0];
-		$tmpArray['dimanche_aprem'] = $opening_hours_sunday[1];
+        $extSocietyIntervenants = (array) $arrayData['intervenant_exterieur'];
+        if (!empty($extSocietyIntervenants)) {
+            $tmpArray['intervenants_info'] = count($extSocietyIntervenants);
+        } else {
+            $tmpArray['intervenants_info'] = 0;
+        }
 
+        $tempDir = $conf->digiriskdolibarr->multidir_output[$object->entity ?? 1] . '/temp/';
 
-		//Informations entreprise extérieure
-		$extsociety = $arrayData['society_outside'];
+        // MasterWorker
+        $masterWorker = $arrayData['maitre_oeuvre'];
+        if (!empty($masterWorker) && $masterWorker > 0) {
+            $tmpArray['maitre_oeuvre_lname']          = strtoupper($masterWorker->lastname);
+            $tmpArray['maitre_oeuvre_fname']          = ucfirst($masterWorker->firstname);
+            $tmpArray['maitre_oeuvre_email']          = $masterWorker->email;
+            $tmpArray['maitre_oeuvre_phone']          = $masterWorker->phone;
+            $tmpArray['maitre_oeuvre_signature_date'] = dol_print_date($masterWorker->signature_date, 'dayhour', 'tzuser');
+        } else {
+            $tmpArray['maitre_oeuvre_lname']          = '';
+            $tmpArray['maitre_oeuvre_fname']          = '';
+            $tmpArray['maitre_oeuvre_email']          = '';
+            $tmpArray['maitre_oeuvre_phone']          = '';
+            $tmpArray['maitre_oeuvre_signature_date'] = '';
+        }
 
-		if ( ! empty($extsociety) && $extsociety > 0) {
-			$tmpArray['society_title']    = $extsociety->name;
-			$tmpArray['society_siret_id'] = $extsociety->idprof2;
-			$tmpArray['society_address']  = $extsociety->address;
-			$tmpArray['society_postcode'] = $extsociety->zip;
-			$tmpArray['society_town']     = $extsociety->town;
-		}
+        if (dol_strlen($masterWorker->signature) > 0 && $masterWorker->signature != $langs->transnoentities('FileGenerated')) {
+            if ($moreParam['specimen'] == 0 || ($moreParam['specimen'] == 1 && $conf->global->DIGIRISKDOLIBARR_SHOW_SIGNATURE_SPECIMEN == 1)) {
+                $encodedImage = explode(',', $masterWorker->signature)[1];
+                $decodedImage = base64_decode($encodedImage);
+                file_put_contents($tempDir . 'signature.png', $decodedImage);
+                $tmpArray['maitre_oeuvre_signature'] = $tempDir . 'signature.png';
+            } else {
+                $tmpArray['maitre_oeuvre_signature'] = '';
+            }
+        } else {
+            $tmpArray['maitre_oeuvre_signature'] = '';
+        }
 
-		if ( ! empty($extsocietyintervenants) && $extsocietyintervenants > 0 && is_array($extsocietyintervenants)) {
-			$tmpArray['intervenants_info'] = count($extsocietyintervenants);
-		} else {
-			$tmpArray['intervenants_info'] = 0;
-		}
+        // External society responsible
+        $extSocietyResponsible = $arrayData['responsable_exterieur'];
+        if (!empty($extSocietyResponsible) && $extSocietyResponsible > 0) {
+            $tmpArray['intervenant_exterieur_lname']          = strtoupper($extSocietyResponsible->lastname);
+            $tmpArray['intervenant_exterieur_fname']          = ucfirst($extSocietyResponsible->firstname);
+            $tmpArray['intervenant_exterieur_email']          = $extSocietyResponsible->email;
+            $tmpArray['intervenant_exterieur_phone']          = $extSocietyResponsible->phone;
+            $tmpArray['intervenant_exterieur_signature_date'] = dol_print_date($extSocietyResponsible->signature_date, 'dayhour', 'tzuser');
+        } else {
+            $tmpArray['intervenant_exterieur_lname']          = '';
+            $tmpArray['intervenant_exterieur_fname']          = '';
+            $tmpArray['intervenant_exterieur_email']          = '';
+            $tmpArray['intervenant_exterieur_phone']          = '';
+            $tmpArray['intervenant_exterieur_signature_date'] = '';
+        }
 
-		$tempdir = $conf->digiriskdolibarr->multidir_output[isset($object->entity) ? $object->entity : 1] . '/temp/';
+        if (dol_strlen($extSocietyResponsible->signature) > 0 && $extSocietyResponsible->signature != $langs->transnoentities('FileGenerated')) {
+            if ($moreParam['specimen'] == 0 || ($moreParam['specimen'] == 1 && $conf->global->DIGIRISKDOLIBARR_SHOW_SIGNATURE_SPECIMEN == 1)) {
+                $encodedImage = explode(',', $extSocietyResponsible->signature)[1];
+                $decodedImage = base64_decode($encodedImage);
+                file_put_contents($tempDir . 'signature2.png', $decodedImage);
+                $tmpArray['intervenant_exterieur_signature'] = $tempDir . 'signature2.png';
+            } else {
+                $tmpArray['intervenant_exterieur_signature'] = '';
+            }
+        } else {
+            $tmpArray['intervenant_exterieur_signature'] = '';
+        }
 
-		$maitreoeuvre = $arrayData['maitre_oeuvre'];
+        $moreParam['tmparray']         = $tmpArray;
+        $moreParam['subDir']           = 'digiriskdolibarrdocuments/';
+        $moreParam['hideTemplateName'] = 1;
 
-		//Signatures
-		if ( ! empty($maitreoeuvre) && $maitreoeuvre > 0) {
-			$tmpArray['maitre_oeuvre_lname'] = $maitreoeuvre->lastname;
-			$tmpArray['maitre_oeuvre_fname'] = $maitreoeuvre->firstname;
-			$tmpArray['maitre_oeuvre_email'] = $maitreoeuvre->email;
-			$tmpArray['maitre_oeuvre_phone'] = $maitreoeuvre->phone;
-
-			$tmpArray['maitre_oeuvre_signature_date'] = dol_print_date($maitreoeuvre->signature_date, 'dayhoursec');
-			if ((!preg_match('/specimen/i', $tempfilepath[1]) && $object->status >= $object::STATUS_LOCKED)) {
-				$encoded_image = explode(",", $maitreoeuvre->signature)[1];
-				$decoded_image = base64_decode($encoded_image);
-				file_put_contents($tempdir . "signature.png", $decoded_image);
-				$tmpArray['maitre_oeuvre_signature'] = $tempdir . "signature.png";
-			} else {
-				$tmpArray['maitre_oeuvre_signature'] = '';
-			}
-		}
-
-		$extsocietyresponsible = $arrayData['responsable_exterieur'];
-
-		if ( ! empty($extsocietyresponsible) && $extsocietyresponsible > 0) {
-			$tmpArray['intervenant_exterieur_lname'] = $extsocietyresponsible->lastname;
-			$tmpArray['intervenant_exterieur_fname'] = $extsocietyresponsible->firstname;
-			$tmpArray['intervenant_exterieur_email'] = $extsocietyresponsible->email;
-			$tmpArray['intervenant_exterieur_phone'] = $extsocietyresponsible->phone;
-
-			$tmpArray['intervenant_exterieur_signature_date'] = dol_print_date($extsocietyresponsible->signature_date, 'dayhoursec');
-			if ((!preg_match('/specimen/i', $tempfilepath[1]) && $object->status >= $object::STATUS_LOCKED)) {
-				$encoded_image = explode(",", $extsocietyresponsible->signature)[1];
-				$decoded_image = base64_decode($encoded_image);
-				file_put_contents($tempdir . "signature2.png", $decoded_image);
-				$tmpArray['intervenant_exterieur_signature'] = $tempdir . "signature2.png";
-			} else {
-				$tmpArray['intervenant_exterieur_signature'] = '';
-			}
-		}
-
-		$moreParam['tmparray'] = $tmpArray;
-
-		$moreParam['tmparray']         = $tmpArray;
-		$moreParam['subDir']           = 'digiriskdolibarrdocuments/';
-		$moreParam['hideTemplateName'] = 1;
-
-		return parent::write_file($objectDocument, $outputLangs, $srcTemplatePath, $hideDetails, $hideDesc, $hideRef, $moreParam);
-	}
-
+        return parent::write_file($objectDocument, $outputLangs, $srcTemplatePath, $hideDetails, $hideDesc, $hideRef, $moreParam);
+    }
 }
