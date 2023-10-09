@@ -238,12 +238,18 @@ class InterfaceDigiriskdolibarrTriggers extends DolibarrTriggers
 					$digiriskelement->fetch($object->fk_parent);
 					$actioncomm->note_private .= $langs->trans('ParentElement') . ' : ' .  $digiriskelement->ref . ' - ' . $digiriskelement->label . '<br/>';
 				}
+                $object->fetch($object->id);
 
 				$actioncomm->elementtype = 'digiriskelement@digiriskdolibarr';
 				$actioncomm->elementid   = $object->id;
 
-				$actioncomm->label       = $langs->transnoentities('ObjectCreateTrigger', $langs->transnoentities(ucfirst($object->element)), $object->ref);
-				$actioncomm->note_private .= $langs->trans('Standard') . ' : ' . $digiriskstandard->ref . ' - ' . $conf->global->MAIN_INFO_SOCIETE_NOM . '<br/>';
+        $actioncomm->label         = $langs->transnoentities('ObjectCreateTrigger', $langs->transnoentities(ucfirst($object->element_type)), $object->ref);
+        $actioncomm->note_private .= $langs->trans('Standard') . ' : ' . $digiriskstandard->ref . ' - ' . $conf->global->MAIN_INFO_SOCIETE_NOM . '<br/>';
+				$actioncomm->note_private .= $langs->trans('Ref') . ' : ' . $object->ref . '<br/>';
+				$actioncomm->note_private .= $langs->trans('Label') . ' : ' . $object->label . '<br/>';
+				$actioncomm->note_private .= $langs->trans('Entity') . ' : ' . $conf->entity . '<br>';
+				$actioncomm->note_private .= $langs->trans('TechnicalID') . ' : ' . $object->id . '<br>';
+				$actioncomm->note_private .= $langs->trans('Description') . ' : ' . (!empty($object->description) ? $object->description : 'N/A') . '<br>';
 				$actioncomm->note_private .= $langs->trans('Photo') . ' : ' . (!empty($object->photo) ? $object->photo : 'N/A') . '<br>';
 				$actioncomm->note_private .= $langs->trans('ElementType') . ' : ' . $langs->trans($object->element_type) . '<br>';
 				($object->ranks != 0 ? $actioncomm->note_private .= $langs->trans('Order') . ' : ' . $object->ranks . '<br>' : '');
