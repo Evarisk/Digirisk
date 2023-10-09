@@ -74,7 +74,7 @@ class DigiriskElement extends SaturneObject
     /**
      * @var array  Array with all fields and their property. Do not use it as a static var. It may be modified by constructor.
      */
-    public array $fields = [
+    public $fields = [
         'rowid'            => ['type' => 'integer', 'label' => 'TechnicalID', 'enabled' => '1', 'position' => 1, 'notnull' => 1, 'visible' => 0, 'noteditable' => '1', 'index' => 1, 'comment' => "Id"],
         'ref'              => ['type' => 'varchar(128)', 'label' => 'Ref', 'enabled' => '1', 'position' => 10, 'notnull' => 1, 'visible' => 1, 'noteditable' => '1', 'default' => '(PROV)', 'index' => 1, 'searchall' => 1, 'showoncombobox' => '1', 'comment' => "Reference of object"],
         'ref_ext'          => ['type' => 'varchar(128)', 'label' => 'RefExt', 'enabled' => '1', 'position' => 20, 'notnull' => 0, 'visible' => 0,],
@@ -462,7 +462,7 @@ class DigiriskElement extends SaturneObject
     /**
      * Return banner tab content.
      *
-     * @return string         Picto html tags array.
+     * @return array
      */
     public function getBannerTabContent(): array
     {

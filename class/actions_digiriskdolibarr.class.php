@@ -815,10 +815,14 @@ class ActionsDigiriskdolibarr
         if (in_array($parameters['currentcontext'], ['digiriskelementdocument', 'digiriskelementagenda'])) {
             list($moreHtmlRef, $moreParams) = $object->getBannerTabContent();
             $object->fk_project = $conf->global->DIGIRISKDOLIBARR_DU_PROJECT;
-
-
             $this->results = [$moreHtmlRef, $moreParams];
-
+        }
+        if (in_array($parameters['currentcontext'], ['accidentdocument', 'accidentagenda'])) {
+            list($moreHtmlRef, $moreParams) = $object->getBannerTabContent();
+            if ($id > 0 && $object->external_accident != 2) {
+                unset($object->fk_soc);
+            }
+            $this->results = [$moreHtmlRef, $moreParams];
         }
 
             return 0; // or return 1 to replace standard code.

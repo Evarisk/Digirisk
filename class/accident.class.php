@@ -237,8 +237,15 @@ class Accident extends SaturneObject
 
 		// Clear fields.
 		if (property_exists($object, 'ref')) {
-			$object->ref = '';
-		}
+            $object->ref = $object->getNextNumRef();
+        }
+        if (!empty($options['label'])) {
+            if (property_exists($object, 'label')) {
+                $object->label = $options['label'];
+            }
+        } else {
+            $object->label = $langs->trans('CloneFrom') . ' ' . $objectRef;
+        }
 		if (property_exists($object, 'ref_ext')) {
 			$object->ref_ext = '';
 		}
@@ -253,8 +260,6 @@ class Accident extends SaturneObject
         }
 
         // Create clone
-        $object->ref     = $object->getNextNumRef();
-        $object->label   = $langs->trans('CloneFrom') . ' ' . $object->label;
         $object->context = 'createfromclone';
 		$accidentId      = $object->create($user);
 
@@ -267,37 +272,37 @@ class Accident extends SaturneObject
                 dolCopyDir($path,$dir . '/' . $object->ref . '/photos', 0, 1);
             }
             if (!empty($options['workstop'])) {
-                $workstop = new AccidentWorkStop($this->db);
-                $workstops = $workstop->fetchAll('', '', 0, 0, ['customsql' => 't.fk_accident = ' . $objectId . ' AND t.status >= 0']);
+                $accidentWorkstop = new AccidentWorkStop($this->db);
+                $workstops        = $accidentWorkstop->fetchFromParent($objectId);
 
                 if (is_array($workstops) && !empty($workstops)) {
-                    foreach($workstops as $objectLine) {
-                        $objectLine->fk_accident = $accidentId;
-                        $objectLine->ref         = $objectLine->getNextNumRef();
-                        $objectLine->context     = 'createfromclone';
-                        $objectLine->create($user);
+                    foreach($workstops as $workstop) {
+                        $workstop->fk_accident = $accidentId;
+                        $workstop->ref         = $accidentWorkstop->getNextNumRef();
+                        $workstop->context     = 'createfromclone';
+                        $workstop->create($user);
                     }
                 }
             }
             if (!empty($options['lesion'])) {
-                $lesion = new AccidentLesion($this->db);
-                $lesions = $lesion->fetchAll('', '', 0, 0, ['customsql' => 't.fk_accident = ' . $objectId]);
+                $accidentLesion = new AccidentLesion($this->db);
+                $lesions        = $accidentLesion->fetchAll('', '', 0, 0, ['customsql' => 't.fk_accident = ' . $objectId]);
 
                 if (is_array($lesions) && !empty($lesions)) {
-                    foreach($lesions as $objectLine) {
-                        $objectLine->fk_accident = $accidentId;
-                        $objectLine->ref         = $objectLine->getNextNumRef();
-                        $objectLine->context     = 'createfromclone';
-                        $objectLine->create($user);
+                    foreach($lesions as $lesion) {
+                        $lesion->fk_accident = $accidentId;
+                        $lesion->ref         = $lesion->getNextNumRef();
+                        $lesion->context     = 'createfromclone';
+                        $lesion->create($user);
                     }
                 }
             }
             if (!empty($options['metadata'])) {
-                $metadata = new AccidentMetaData($this->db);
-                $metadata->fetch(0, '', ' AND t.fk_accident =' . $objectId . ' AND t.status = 1');
-                $metadata->fk_accident = $accidentId;
-                $metadata->context     = 'createfromclone';
-                $metadata->create($user);
+                $accidentMetadata = new AccidentMetaData($this->db);
+                $accidentMetadata->fetch(0, '', ' AND t.fk_accident =' . $objectId . ' AND t.status = 1');
+                $accidentMetadata->fk_accident = $accidentId;
+                $accidentMetadata->context     = 'createfromclone';
+                $accidentMetadata->create($user);
             }
 		} else {
 			$error++;
@@ -461,7 +466,7 @@ class Accident extends SaturneObject
 		if (is_array($allaccidents) && !empty($allaccidents)) {
 			$accidentworkstop = new AccidentWorkStop($this->db);
 			foreach ($allaccidents as $accident) {
-				$allaccidentworkstop = $accidentworkstop->fetchAll('', '', 0, 0, ['customsql' => 't.fk_accident = ' . $accident->id]);
+				$allaccidentworkstop = $accidentworkstop->fetchFromParent($accident->id);
 				if (is_array($allaccidentworkstop) && !empty($allaccidentworkstop)) {
 					$nbaccidents += 1;
 				} else {
@@ -489,7 +494,7 @@ class Accident extends SaturneObject
 		if (is_array($allaccidents) && !empty($allaccidents)) {
 			$accidentworkstop = new AccidentWorkStop($this->db);
 			foreach ($allaccidents as $accident) {
-				$allaccidentworkstop = $accidentworkstop->fetchAll('', '', 0, 0, ['customsql' => 't.fk_accident = ' . $accident->id]);;
+				$allaccidentworkstop = $accidentworkstop->fetchFromParent($accident->id);
 				if (is_array($allaccidentworkstop) && !empty($allaccidentworkstop)) {
 					foreach ($allaccidentworkstop as $accidentworkstop) {
 						if ($accidentworkstop->id > 0) {
@@ -706,18 +711,16 @@ class Accident extends SaturneObject
     }
 
     /**
-     * Get more html ref on object.
-     * @param  int        $id Id of the accident to retrieve the info from
-     *
-     * @return string
+     * Return banner tab content.
+     * @return array
      * @throws Exception
      */
-    public function getMoreHtmlRef(int $id) : string
+    public function getBannerTabContent() : array
     {
         global $langs;
 
         $workstopLine      = new AccidentWorkStop($this->db);
-        $accidentLines     = $workstopLine->fetchAll('', '', 0, 0, ['customsql' => 't.fk_accident = ' . $id . ' AND t.status >= 0']);
+        $accidentLines     = $workstopLine->fetchFromParent($this->id);
         $totalWorkStopDays = 0;
         $moreHtmlRef       = '';
 
@@ -734,8 +737,9 @@ class Accident extends SaturneObject
             $moreHtmlRef = $langs->trans('RegisterAccident');
         }
         $moreHtmlRef .= '<br>';
+        $moreParams = [];
 
-        return $moreHtmlRef;
+        return [$moreHtmlRef, $moreParams];
     }
 }
 
@@ -821,7 +825,21 @@ class AccidentWorkStop extends SaturneObject
 		return parent::__construct($db, $this->module, $this->element);
 	}
 
-    /**
+    /*
+     * Load object in memory from the database
+     *
+     * @param  int       $parent_id Id parent object
+     * @return array|int            <0 if KO, 0 if not found, >0 if OK
+     * @throws Exception
+     */
+    public function fetchFromParent(int $parent_id)
+    {
+        $filter = ['customsql' => 'fk_accident =' . $this->db->escape($parent_id) . ' AND t.status >= 0'];
+
+        return $this->fetchAll('', '', 0, 0, $filter);
+    }
+
+    /*
      * Write information of trigger description
      *
      * @param  Object $object Object calling the trigger

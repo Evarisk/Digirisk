@@ -189,3 +189,8 @@ ALTER TABLE llx_digiriskdolibarr_accident_investigation ADD fk_project integer N
 ALTER TABLE llx_c_relative_location ADD position integer DEFAULT 0 AFTER active;
 ALTER TABLE llx_c_lesion_localization ADD position integer DEFAULT 0 AFTER active;
 ALTER TABLE llx_c_lesion_nature ADD position integer DEFAULT 0 AFTER active;
+
+ALTER TABLE llx_c_accident_investigation_attendants_role RENAME TO llx_c_accidentinvestigation_attendants_role;
+ALTER TABLE llx_categorie_accident_investigation RENAME TO llx_categorie_accidentinvestigation;
+ALTER TABLE llx_categorie_accidentinvestigation CHANGE `fk_accident_investigation` `fk_accidentinvestigation`;
+DELETE FROM llx_c_digiriskdolibarr_action_trigger WHERE elementtype = 'accident_investigation@digiriskdolibarr';

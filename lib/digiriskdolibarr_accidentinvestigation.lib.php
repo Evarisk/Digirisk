@@ -16,7 +16,7 @@
  */
 
 /**
- * \file    lib/digiriskdolibarr_accident_investigation.lib.php
+ * \file    lib/digiriskdolibarr_accidentinvestigation.lib.php
  * \ingroup digiriskdolibarr
  * \brief   Library files with common functions for Accident investigation
  */
@@ -28,7 +28,7 @@
  * @return array                         Array of tabs
  * @throws Exception
  */
-function accident_investigation_prepare_head(AccidentInvestigation $object): array
+function accidentinvestigation_prepare_head(AccidentInvestigation $object): array
 {
 	$moreparam['attendantTableMode'] = 'simple';
 
