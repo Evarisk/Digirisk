@@ -60,8 +60,6 @@ class DigiriskDocuments extends SaturneDocuments
 	 */
 	public function create(User $user, bool $notrigger = false, object $parentObject = null): int
 	{
-		global $conf;
-
 		$now = dol_now();
 
 		$this->ref_ext       = 'digirisk_' . $this->ref;
@@ -72,17 +70,10 @@ class DigiriskDocuments extends SaturneDocuments
 		$this->type          = $this->element;
 		$this->module_name   = $this->module;
 		$this->fk_user_creat = $user->id ?: 1;
-
-		if ($parentObject->id > 0) {
-			$this->parent_id     = $parentObject->id;
-			$this->parent_type   = $parentObject->element_type ?: $parentObject->element;
-		} else {
-			$this->parent_id    = $conf->global->DIGIRISKDOLIBARR_ACTIVE_STANDARD;
-			$this->parent_type  = 'digiriskstandard';
-		}
+        $this->parent_id     = $parentObject->id;
+        $this->parent_type   = $parentObject->element;
 
 		$this->DigiriskFillJSON();
-		$this->element = $this->element . '@digiriskdolibarr';
 		return $this->createCommon($user, $notrigger);
 	}
 
@@ -408,4 +399,28 @@ class DigiriskDocuments extends SaturneDocuments
 		}
 
 	}
+
+    /**
+     * Write information of trigger description
+     *
+     * @param  Object $object Object calling the trigger
+     * @return string         Description to display in actioncomm->note_private
+     */
+    public function getTriggerDescription(SaturneObject $object): string
+    {
+        global $langs;
+
+        $className = $object->parent_type;
+        require_once __DIR__ . '/' . $className .'.class.php';
+        $parentElement = new $className($this->db);
+        $parentElement->fetch($object->parent_id);
+
+        $ret  = parent::getTriggerDescription($object);
+
+        $ret .= $langs->transnoentities('ElementType') . ' : ' . $object->parent_type . '</br>';
+        $ret .= $langs->transnoentities('ParentElement') . ' : ' . $parentElement->ref . ' ' . $parentElement->label . '</br>';
+        $ret .= $langs->transnoentities('LastMainDoc') . ' : ' . $object->last_main_doc . '<br>';
+
+        return $ret;
+    }
 }
