@@ -512,7 +512,7 @@ accidentinvestigationdocument.odt = Enquête accident
 NewAccidentInvestigation          = Nouvelle enquête accident
 UpdateAccidentInvestigation       = Modifier une enquête accident
 AccidentInvestigationList         = Liste des enquêtes accidents
-TheAccident_investigation         = l'enquête accident
+TheAccidentinvestigation          = l'enquête accident
 SeniorityInPosition               = Ancienneté au poste
 VictimSkills                      = Compétences de l'accidenté
 CollectiveEquipment               = Équipement de Protection Collective (EPC)
@@ -726,7 +726,7 @@ PleaseSelectADigiriskElement        = Sélectionner un groupement ou une unité 
 Registers                           = Registres
 ShowInSelectOnPublicTicketInterface = Doit apparaître dans la liste des éléments de l'interface publique des tickets
 Organization                        = Organisation GP/UT
-YouDontHaveOrganization             = Vous n'avez pas créé de groupements ou d'unités de travail, veuillez vous rendre dans "Document Unique" afin d'en créer.
+YouDontHaveOrganization             = Vous n'avez pas créé de groupements ou d'unités de travail, veuillez vous rendre dans "Document Unique" ou cliquez <b> ici </b> afin d'en créer.
 
 
 #

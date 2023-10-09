@@ -74,7 +74,7 @@ class DigiriskElement extends SaturneObject
     /**
      * @var array  Array with all fields and their property. Do not use it as a static var. It may be modified by constructor.
      */
-    public array $fields = [
+    public $fields = [
         'rowid'            => ['type' => 'integer', 'label' => 'TechnicalID', 'enabled' => '1', 'position' => 1, 'notnull' => 1, 'visible' => 0, 'noteditable' => '1', 'index' => 1, 'comment' => "Id"],
         'ref'              => ['type' => 'varchar(128)', 'label' => 'Ref', 'enabled' => '1', 'position' => 10, 'notnull' => 1, 'visible' => 1, 'noteditable' => '1', 'default' => '(PROV)', 'index' => 1, 'searchall' => 1, 'showoncombobox' => '1', 'comment' => "Reference of object"],
         'ref_ext'          => ['type' => 'varchar(128)', 'label' => 'RefExt', 'enabled' => '1', 'position' => 20, 'notnull' => 0, 'visible' => 0,],
@@ -462,7 +462,7 @@ class DigiriskElement extends SaturneObject
     /**
      * Return banner tab content.
      *
-     * @return string         Picto html tags array.
+     * @return array
      */
     public function getBannerTabContent(): array
     {
@@ -472,21 +472,18 @@ class DigiriskElement extends SaturneObject
 
         $digiriskstandard = new DigiriskStandard($db);
 
-        dol_strlen($this->label) ? $morehtmlref = ' - ' . $this->label : '';
-
         // ParentElement
         $parent_element = new self($db);
         $result         = $parent_element->fetch($this->fk_parent);
         if ($result > 0) {
-            $morehtmlref .= '<br>' . $langs->trans("Description") . ' : ' . $this->description;
+            $morehtmlref .= $langs->trans("Description") . ' : ' . $this->description;
             $morehtmlref .= '<br>' . $langs->trans("ParentElement") . ' : ' . $parent_element->getNomUrl(1, 'blank', 1);
         } else {
             $digiriskstandard->fetch($conf->global->DIGIRISKDOLIBARR_ACTIVE_STANDARD);
-            $morehtmlref .= '<br>' . $langs->trans("Description") . ' : ' . $this->description;
+            $morehtmlref .= $langs->trans("Description") . ' : ' . $this->description;
             $morehtmlref .= '<br>' . $langs->trans("ParentElement") . ' : ' . $digiriskstandard->getNomUrl(1, 'blank', 1);
         }
         $morehtmlref .= '<br>';
-        $linkback = '<a href="' . dol_buildpath('/digiriskdolibarr/view/digiriskelement/risk_list.php', 1) . '">' . $langs->trans("BackToList") . '</a>';
         $this->fetch($this->id);
         $this->fk_project = $conf->global->DIGIRISKDOLIBARR_DU_PROJECT;
         $moreParams['project']['disable_edit'] = 1;

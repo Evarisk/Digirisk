@@ -13,8 +13,12 @@
 -- You should have received a copy of the GNU General Public License
 -- along with this program.  If not, see https://www.gnu.org/licenses/.
 
-CREATE TABLE llx_categorie_accident_investigation(
-    fk_categorie              integer NOT NULL,
-    fk_accident_investigation integer NOT NULL,
-    import_key                varchar(14)
+CREATE TABLE llx_c_accidentinvestigation_attendants_role(
+    rowid       integer AUTO_INCREMENT PRIMARY KEY NOT NULL,
+    entity      integer default 1,
+    ref         varchar(128),
+    label       varchar(255),
+    description text,
+    active      tinyint(4) DEFAULT 1,
+    position    integer DEFAULT 0
 ) ENGINE=innodb;

@@ -588,5 +588,31 @@ class Risk extends SaturneObject
         $array['data']      = $riskAssessment->getRiskAssessmentCategoriesNumber($riskAssessmentList);
 
         return $array;
+	  }
+
+    /**
+     * Write information of trigger description
+     *
+     * @param  Object $object Object calling the trigger
+     * @return string         Description to display in actioncomm->note_private
+     */
+    public function getTriggerDescription(SaturneObject $object): string
+    {
+        global $conf, $langs;
+
+        $ret = parent::getTriggerDescription($object);
+
+        $digiriskelement = new DigiriskElement($this->db);
+        $digiriskelement->fetch($object->fk_element);
+
+        $ret .= $langs->trans('ParentElement') . ' : ' . $digiriskelement->ref . " - " . $digiriskelement->label . '<br>';
+        $ret .= $langs->trans('RiskCategory') . ' : ' . $object->getDangerCategoryName($object) . '<br>';
+
+        if (dol_strlen($object->applied_on) > 0) {
+            $digiriskelement->fetch($object->applied_on);
+            $ret .= $langs->trans('RiskSharedWithEntityRefLabel', $object->ref) . ' S' . $conf->entity . ' ' . $digiriskelement->ref . " - " . $digiriskelement->label . '<br>';
+        }
+
+        return $ret;
     }
 }

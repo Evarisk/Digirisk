@@ -159,7 +159,7 @@ abstract class ModeleODTDigiriskElementDocument extends SaturneDocumentModel
 							$tmpArray['AccidentName']        = $line->label;
 
 							$accidentWorkStop    = new AccidentWorkStop($this->db);
-                            $allaccidentworkstop = $accidentWorkStop->fetchAll('', '', 0, 0, ['customsql' => 't.fk_accident = ' . $line->id]);
+                            $allaccidentworkstop = $accidentWorkStop->fetchFromParent($line->id);
 							if (!empty($allAccidentWorkStop) && is_array($allAccidentWorkStop)) {
 								foreach ($allAccidentWorkStop as $accidentWorkStopsingle) {
 									$nbAccidentWorkStop += $accidentWorkStopsingle->workstop_days;

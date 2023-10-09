@@ -359,8 +359,6 @@ if (is_array($user->users) && !empty($user->users)) {
 	$sql .= ' AND u.rowid NOT IN (' . $userIds . ')';
 }
 
-$sql .= ' GROUP BY u.rowid';
-
 // Add where from extra fields
 include DOL_DOCUMENT_ROOT . '/core/tpl/extrafields_list_search_sql.tpl.php';
 // Add where from hooks
