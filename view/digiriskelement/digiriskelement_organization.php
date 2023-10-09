@@ -234,7 +234,14 @@ print '<hr>';
 print '<button class="save-organization wpeo-button button-disable" style="">' . $langs->trans('Save') . '  <i style="display:none" class="fas fa-times"></i><i style="display:none" class="fas fa-check"></i></button>';
 
 else :
-print $langs->trans('YouDontHaveOrganization');
+		print '<div class="wpeo-notice notice-warning notice-red">';
+		print '<div class="notice-content">';
+		print '<a href="' . dol_buildpath('/custom/digiriskdolibarr/view/digiriskstandard/digiriskstandard_card.php?id=' . $conf->global->DIGIRISKDOLIBARR_ACTIVE_STANDARD, 2) . '">' . '<b><div class="notice-subtitle">'.$langs->trans("YouDontHaveOrganization") . '</b></a>';
+		print '</div>';
+		print '</div>';
+		print '</div>';
+?>
+<?php
 endif;
 
 // End of page
