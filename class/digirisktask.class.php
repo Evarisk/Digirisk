@@ -40,67 +40,74 @@ class DigiriskTask extends Task
 		$this->db = $db;
 	}
 
-	/**
-	 * Load dashboard info task
-	 *
-	 * @return array|int
-	 * @throws Exception
-	 */
-	public function load_dashboard()
-	{
-		$arrayTasksByProgress = $this->getTasksByProgress();
+    /**
+     * Load dashboard info task
+     *
+     * @return array
+     * @throws Exception
+     */
+    public function load_dashboard(): array
+    {
+        $arrayTasksByProgress = $this->getTasksByProgress();
 
-		$array['graphs'] = $arrayTasksByProgress;
+        $array['graphs'] = [$arrayTasksByProgress];
 
-		return $array;
-	}
+        return $array;
+    }
 
-	/**
-	 * Get tasks by progress.
-	 *
-	 * @return array
-	 * @throws Exception
-	 */
-	public function getTasksByProgress()
-	{
-		// Tasks by progress
-		global $conf, $langs;
+    /**
+     * Get tasks by progress
+     *
+     * @return array
+     * @throws Exception
+     */
+    public function getTasksByProgress(): array
+    {
+        global $conf, $langs;
 
+        // Graph Title parameters
 		$array['title'] = $langs->transnoentities('TasksRepartition');
 		$array['picto'] = $this->picto;
-		$array['dataset'] = 1;
-		$array['labels'] = array(
-			0 => array(
-				'label' => $langs->transnoentities('TaskAt0Percent') . ' %',
-				'color' => '#e05353'
-			),
-			1 => array(
-				'label' => $langs->transnoentities('TaskInProgress'),
-				'color' => '#e9ad4f'
-			),
-			2 => array(
-				'label' => $langs->transnoentities('TaskAt100Percent') . ' %',
-				'color' => '#47e58e'
-			),
-		);
-		$taskarray = $this->getTasksArray(0, 0, $conf->global->DIGIRISKDOLIBARR_DU_PROJECT);
-		$array['data'][0]   = 0;
-		$array['data'][1]   = 0;
-		$array['data'][2]   = 0;
-		if (is_array($taskarray) && !empty($taskarray)) {
-			foreach ($taskarray as $tasksingle) {
-				if ($tasksingle->progress == 0) {
-					$array['data'][0] = $array['data'][0] + 1;
-				} elseif ($tasksingle->progress > 0 && $tasksingle->progress < 100) {
-					$array['data'][1] = $array['data'][1] + 1;
-				} else {
-					$array['data'][2] = $array['data'][2] + 1;
-				}
-			}
-		}
 
-		return $array;
-	}
+        // Graph parameters
+        $array['width']   = '100%';
+        $array['height']  = 400;
+        $array['type']    = 'pie';
+        $array['dataset'] = 1;
+
+        $array['labels'] = [
+            0 => [
+                'label' => $langs->transnoentities('TaskAt0Percent') . ' %',
+                'color' => '#e05353'
+            ],
+            1 => [
+                'label' => $langs->transnoentities('TaskInProgress'),
+                'color' => '#e9ad4f'
+            ],
+            2 => [
+                'label' => $langs->transnoentities('TaskAt100Percent') . ' %',
+                'color' => '#47e58e'
+            ]
+        ];
+
+        $array['data'][0] = 0;
+        $array['data'][1] = 0;
+        $array['data'][2] = 0;
+        $tasks            = $this->getTasksArray(0, 0, $conf->global->DIGIRISKDOLIBARR_DU_PROJECT);
+        if (is_array($tasks) && !empty($tasks)) {
+            foreach ($tasks as $task) {
+                if ($task->progress == 0) {
+                    $array['data'][0] = $array['data'][0] + 1;
+                } elseif ($task->progress > 0 && $task->progress < 100) {
+                    $array['data'][1] = $array['data'][1] + 1;
+                } else {
+                    $array['data'][2] = $array['data'][2] + 1;
+                }
+            }
+        }
+
+        return $array;
+    }
 
 	/**
 	 * get task progress css class.
