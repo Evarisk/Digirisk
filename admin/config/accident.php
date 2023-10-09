@@ -38,7 +38,7 @@ require_once DOL_DOCUMENT_ROOT . "/core/lib/admin.lib.php";
 
 require_once __DIR__ . '/../../lib/digiriskdolibarr.lib.php';
 require_once __DIR__ . '/../../class/accident.class.php';
-require_once __DIR__ . '/../../class/accident_investigation.class.php';
+require_once __DIR__ . '/../../class/accidentinvestigation.class.php';
 
 // Translations
 saturne_load_langs(["admin"]);
@@ -139,15 +139,17 @@ print dol_get_fiche_head($head, 'accident', $title, -1, "digiriskdolibarr_color@
 
 print load_fiche_titre('<i class="fas fa-user-injured"></i> ' . $langs->trans("AccidentManagement"), '', '');
 
+print '<hr>';
+
 $object = new Accident($db);
 
 $objectModSubdir = 'digiriskelement';
 
 require __DIR__ . '/../../../saturne/core/tpl/admin/object/object_numbering_module_view.tpl.php';
 
-print '<hr>';
-
 print load_fiche_titre('<i class="fas fa-user-injured"></i> ' . $langs->trans("AccidentWorkstopManagement"), '', '');
+
+print '<hr>';
 
 $object = new AccidentWorkStop($db);
 
@@ -155,9 +157,9 @@ $objectModSubdir = 'digiriskelement';
 
 require __DIR__ . '/../../../saturne/core/tpl/admin/object/object_numbering_module_view.tpl.php';
 
-print '<hr>';
-
 print load_fiche_titre('<i class="fas fa-user-injured"></i> ' . $langs->trans("AccidentLesionManagement"), '', '');
+
+print '<hr>';
 
 $object = new AccidentLesion($db);
 
@@ -165,17 +167,15 @@ $objectModSubdir = 'digiriskelement';
 
 require __DIR__ . '/../../../saturne/core/tpl/admin/object/object_numbering_module_view.tpl.php';
 
-print '<hr>';
-
 print load_fiche_titre('<i class="fas fa-user-injured"></i> ' . $langs->trans("AccidentInvestigationManagement"), '', '');
+
+print '<hr>';
 
 $object = new AccidentInvestigation($db);
 
 $objectModSubdir = 'digiriskelement';
 
 require __DIR__ . '/../../../saturne/core/tpl/admin/object/object_numbering_module_view.tpl.php';
-
-print '<hr>';
 
 // Project
 if (isModEnabled('project')) {
