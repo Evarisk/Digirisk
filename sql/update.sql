@@ -190,6 +190,12 @@ ALTER TABLE llx_c_relative_location ADD position integer DEFAULT 0 AFTER active;
 ALTER TABLE llx_c_lesion_localization ADD position integer DEFAULT 0 AFTER active;
 ALTER TABLE llx_c_lesion_nature ADD position integer DEFAULT 0 AFTER active;
 
+-- ALTER TABLE llx_digiriskdolibarr_preventionplan CHANGE `status` `status` INT(11) NOT NULL;
+ALTER TABLE llx_digiriskdolibarr_preventionplan CHANGE `date_start` `date_start` DATETIME NULL;
+ALTER TABLE llx_digiriskdolibarr_preventionplan CHANGE `fk_project` `fk_project` INT(11) NOT NULL;
+ALTER TABLE llx_digiriskdolibarr_preventionplan DROP COLUMN `last_email_sent_date`;
+ALTER TABLE llx_digiriskdolibarr_preventionplandet ADD status INTEGER NOT NULL AFTER tms;
+
 ALTER TABLE llx_c_accident_investigation_attendants_role RENAME TO llx_c_accidentinvestigation_attendants_role;
 ALTER TABLE llx_categorie_accident_investigation RENAME TO llx_categorie_accidentinvestigation;
 ALTER TABLE llx_categorie_accidentinvestigation CHANGE `fk_accident_investigation` `fk_accidentinvestigation`;

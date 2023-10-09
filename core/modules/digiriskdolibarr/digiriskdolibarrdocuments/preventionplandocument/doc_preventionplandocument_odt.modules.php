@@ -369,7 +369,7 @@ class doc_preventionplandocument_odt extends SaturneDocumentModel
 			$tmpArray['maitre_oeuvre_email'] = $maitreoeuvre->email;
 			$tmpArray['maitre_oeuvre_phone'] = $maitreoeuvre->phone;
 
-			$tmpArray['maitre_oeuvre_signature_date'] = dol_print_date($maitreoeuvre->signature_date, 'dayhoursec');
+			$tmpArray['maitre_oeuvre_signature_date'] = dol_print_date($maitreoeuvre->signature_date, 'dayhour', 'tzuser');
 			if ((!preg_match('/specimen/i', $tempfilepath[1]) && $object->status >= $object::STATUS_LOCKED)) {
 				$encoded_image = explode(",", $maitreoeuvre->signature)[1];
 				$decoded_image = base64_decode($encoded_image);
@@ -388,7 +388,7 @@ class doc_preventionplandocument_odt extends SaturneDocumentModel
 			$tmpArray['intervenant_exterieur_email'] = $extsocietyresponsible->email;
 			$tmpArray['intervenant_exterieur_phone'] = $extsocietyresponsible->phone;
 
-			$tmpArray['intervenant_exterieur_signature_date'] = dol_print_date($extsocietyresponsible->signature_date, 'dayhoursec');
+			$tmpArray['intervenant_exterieur_signature_date'] = dol_print_date($extsocietyresponsible->signature_date, 'dayhour', 'tzuser');
 			if ((!preg_match('/specimen/i', $tempfilepath[1]) && $object->status >= $object::STATUS_LOCKED)) {
 				$encoded_image = explode(",", $extsocietyresponsible->signature)[1];
 				$decoded_image = base64_decode($encoded_image);
