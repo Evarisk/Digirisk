@@ -32,7 +32,7 @@ require_once __DIR__ . '/../../saturne/class/saturnesignature.class.php';
 require_once __DIR__ . '/../lib/digiriskdolibarr_function.lib.php';
 require_once __DIR__ . '/digiriskdocuments.class.php';
 require_once __DIR__ . '/evaluator.class.php';
-require_once __DIR__ . '/../core/modules/digiriskdolibarr/digiriskelement/accidentlesion/mod_accident_lesion_standard.php';
+require_once __DIR__ . '/../core/modules/digiriskdolibarr/digiriskelement/accidentlesion/mod_accidentlesion_standard.php';
 
 /**
  * Class for Accident
@@ -490,7 +490,7 @@ class Accident extends SaturneObject
 
         return $array;
     }
-  
+
 	/**
 	 * Get number workstop days.
 	 *
@@ -781,7 +781,7 @@ class AccidentWorkStop extends SaturneObject
 	/**
 	 * @var string ID to identify managed object
 	 */
-	public $element = 'accident_workstop';
+	public $element = 'accidentworkstop';
 
 	/**
 	 * @var string Name of table without prefix where object is stored
@@ -1069,7 +1069,7 @@ class AccidentLesion extends SaturneObject
 	/**
 	 * @var string ID to identify managed object
 	 */
-	public $element = 'accident_lesion';
+	public $element = 'accidentlesion';
 
 	/**
 	 * @var string Name of table without prefix where object is stored

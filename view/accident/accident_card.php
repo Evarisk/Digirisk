@@ -90,7 +90,7 @@ if (empty($deletedElements)) {
 // Load numbering modules
 $numberingModules = [
     'digiriskelement/' . $object->element     => $conf->global->DIGIRISKDOLIBARR_ACCIDENT_ADDON,
-    'digiriskelement/' . $objectline->element => $conf->global->DIGIRISKDOLIBARR_ACCIDENT_WORKSTOP_ADDON,
+    'digiriskelement/' . $objectline->element => $conf->global->DIGIRISKDOLIBARR_ACCIDENTWORKSTOP_ADDON,
 ];
 
 list($refAccidentMod, $refAccidentWorkStopMod) = saturne_require_objects_mod($numberingModules, $moduleNameLowerCase);
@@ -372,53 +372,16 @@ if (empty($reshook)) {
 			$error++;
 		}
 
-		// Submit file
-		if (!empty($conf->global->MAIN_UPLOAD_DOC)) {
-			if (!empty($_FILES) && !empty($_FILES['userfile']['name'][0])) {
-				if (is_array($_FILES['userfile']['tmp_name'])) {
-					$userfiles = $_FILES['userfile']['tmp_name'];
-				} else {
-					$userfiles = array($_FILES['userfile']['tmp_name']);
-				}
-
-				foreach ($userfiles as $key => $userfile) {
-					if (empty($_FILES['userfile']['tmp_name'][$key])) {
-						$error++;
-						if ($_FILES['userfile']['error'][$key] == 1 || $_FILES['userfile']['error'][$key] == 2) {
-							setEventMessages($langs->trans('ErrorFileSizeTooLarge'), [], 'errors');
-						}
-					}
-				}
-
-				$filedir = $upload_dir . '/accident/' . $object->ref;
-
-				if (!file_exists($filedir)) {
-					if (dol_mkdir($filedir) < 0) {
-						$object->error = $langs->transnoentities("ErrorCanNotCreateDir", $filedir);
-						$error++;
-					}
-				}
-
-				if (!$error) {
-					dol_mkdir($filedir);
-					if (!empty($filedir)) {
-						$result        = digirisk_dol_add_file_process($filedir, 0, 1, 'userfile', '', null, '', 1, $object);
-						$object->photo = $_FILES['userfile']['name'][0];
-					}
-				}
-			}
-		}
-
 		if (!$error) {
 			$result = $object->update($user);
 			if ($result > 0) {
-				if (empty($object->fk_user_employer)) {
-					$usertmp->fetch('', $mysoc->managers, $mysoc->id, 0, $conf->entity);
-				} else {
-					$usertmp->fetch($object->fk_user_employer);
-				}
-				$signatory->deleteSignatoriesSignatures($object->id, 'accident');
-				$signatory->setSignatory($object->id, 'accident', 'user', array($usertmp->id), 'ACC_USER_EMPLOYER');
+//				if (empty($object->fk_user_employer)) {
+//					$usertmp->fetch('', $mysoc->managers, $mysoc->id, 0, $conf->entity);
+//				} else {
+//					$usertmp->fetch($object->fk_user_employer);
+//				}
+//				$signatory->deleteSignatoriesSignatures($object->id, 'accident');
+//				$signatory->setSignatory($object->id, 'accident', 'user', array($usertmp->id), 'ACC_USER_EMPLOYER');
 
 				// Update Accident OK
 				$urltogo = str_replace('__ID__', $result, $backtopage);
@@ -448,9 +411,9 @@ if (empty($reshook)) {
 
 		// Initialize object accident line
 		$now                          = dol_now();
-		$objectline->date_creation    = $object->db->idate($now);
+        $objectline->ref              = $objectline->getNextNumRef();
+        $objectline->date_creation    = $object->db->idate($now);
 		$objectline->status           = 1;
-		$objectline->ref              = $objectline->getNextNumRef();;
 		$objectline->entity           = $conf->entity;
 		$objectline->workstop_days    = $workstop_days;
 		$objectline->declaration_link = $declaration_link;
