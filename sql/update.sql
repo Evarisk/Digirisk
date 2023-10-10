@@ -207,3 +207,9 @@ ALTER TABLE llx_c_accident_investigation_attendants_role RENAME TO llx_c_acciden
 ALTER TABLE llx_categorie_accident_investigation RENAME TO llx_categorie_accidentinvestigation;
 ALTER TABLE llx_categorie_accidentinvestigation CHANGE `fk_accident_investigation` `fk_accidentinvestigation`;
 DELETE FROM llx_c_digiriskdolibarr_action_trigger WHERE elementtype = 'accident_investigation@digiriskdolibarr';
+DELETE FROM llx_c_digiriskdolibarr_action_trigger WHERE ref = 'ACCIDENT_WORKSTOP_CREATE';
+DELETE FROM llx_c_digiriskdolibarr_action_trigger WHERE ref = 'ACCIDENT_WORKSTOP_MODIFY';
+DELETE FROM llx_c_digiriskdolibarr_action_trigger WHERE ref = 'ACCIDENT_WORKSTOP_DELETE';
+DELETE FROM llx_c_digiriskdolibarr_action_trigger WHERE ref = 'ACCIDENT_LESION_CREATE';
+DELETE FROM llx_c_digiriskdolibarr_action_trigger WHERE ref = 'ACCIDENT_LESION_MODIFY';
+DELETE FROM llx_c_digiriskdolibarr_action_trigger WHERE ref = 'ACCIDENT_LESION_DELETE';
