@@ -174,7 +174,7 @@ print '<hr>';
 
 $object = new AccidentInvestigation($db);
 
-$objectModSubdir = 'digiriskelement';
+$objectModSubdir = '';
 
 require __DIR__ . '/../../../saturne/core/tpl/admin/object/object_numbering_module_view.tpl.php';
 
