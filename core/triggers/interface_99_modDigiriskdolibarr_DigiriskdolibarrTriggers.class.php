@@ -144,12 +144,13 @@ class InterfaceDigiriskdolibarrTriggers extends DolibarrTriggers
 		$actioncomm->userownerid = $user->id;
 		$actioncomm->percentage  = -1;
 
+        $object->fetch($object->id);
         // Trigger descriptions are handled by class function getTriggerDescription
 		if (getDolGlobalInt('DIGIRISKDOLIBARR_ADVANCED_TRIGGER') && !empty($object->fields)) {
-			$actioncomm->note_private = method_exists($object, 'getTriggerDescription') ? $object->getTriggerDescription($object) : '';
+            $actioncomm->note_private = method_exists($object, 'getTriggerDescription') ? $object->getTriggerDescription($object) : '';
 		}
 
-		switch ($action) {
+        switch ($action) {
 			case 'COMPANY_DELETE' :
 				require_once __DIR__ . '/../../class/preventionplan.class.php';
 				require_once __DIR__ . '/../../class/firepermit.class.php';
@@ -186,8 +187,8 @@ class InterfaceDigiriskdolibarrTriggers extends DolibarrTriggers
 				require_once __DIR__ . '/../../class/firepermit.class.php';
 				require_once __DIR__ . '/../../class/digiriskresources.class.php';
 
-				$preventionplan 	  = new PreventionPlan($this->db);
-				$firepermit 		  = new FirePermit($this->db);
+				$preventionplan       = new PreventionPlan($this->db);
+				$firepermit           = new FirePermit($this->db);
 				$alldigiriskresources = $digiriskresources->fetchAll('', '', 0, 0, array('customsql' => 't.element_id = ' . $object->fk_soc . ' AND t.element_type = "societe"'));
 
 				if (is_array($alldigiriskresources) && !empty($alldigiriskresources)) {
@@ -232,31 +233,31 @@ class InterfaceDigiriskdolibarrTriggers extends DolibarrTriggers
 				break;
 
 			case 'DIGIRISKELEMENT_CREATE' :
-				$digiriskstandard->fetch($object->fk_standard);
-
-				if (!empty($object->fk_parent)) {
-					$digiriskelement->fetch($object->fk_parent);
-					$actioncomm->note_private .= $langs->trans('ParentElement') . ' : ' .  $digiriskelement->ref . ' - ' . $digiriskelement->label . '<br/>';
-				}
-                $object->fetch($object->id);
-
 				$actioncomm->elementtype = 'digiriskelement@digiriskdolibarr';
-				$actioncomm->elementid   = $object->id;
+                $actioncomm->elementid   = $object->id;
 
-        $actioncomm->label         = $langs->transnoentities('ObjectCreateTrigger', $langs->transnoentities(ucfirst($object->element_type)), $object->ref);
-        $actioncomm->note_private .= $langs->trans('Standard') . ' : ' . $digiriskstandard->ref . ' - ' . $conf->global->MAIN_INFO_SOCIETE_NOM . '<br/>';
-				$actioncomm->note_private .= $langs->trans('Ref') . ' : ' . $object->ref . '<br/>';
-				$actioncomm->note_private .= $langs->trans('Label') . ' : ' . $object->label . '<br/>';
-				$actioncomm->note_private .= $langs->trans('Entity') . ' : ' . $conf->entity . '<br>';
-				$actioncomm->note_private .= $langs->trans('TechnicalID') . ' : ' . $object->id . '<br>';
-				$actioncomm->note_private .= $langs->trans('Description') . ' : ' . (!empty($object->description) ? $object->description : 'N/A') . '<br>';
-				$actioncomm->note_private .= $langs->trans('Photo') . ' : ' . (!empty($object->photo) ? $object->photo : 'N/A') . '<br>';
-				$actioncomm->note_private .= $langs->trans('ElementType') . ' : ' . $langs->trans($object->element_type) . '<br>';
-				($object->ranks != 0 ? $actioncomm->note_private .= $langs->trans('Order') . ' : ' . $object->ranks . '<br>' : '');
-				$actioncomm->note_private .= $langs->trans('ShowInSelectOnPublicTicketInterface') . ' : ' . ($object->show_in_selector ? $langs->trans('Yes') : $langs->trans('No')) . '<br>';
+                $actioncomm->label = $langs->transnoentities('ObjectCreateTrigger', $langs->transnoentities(ucfirst($object->element_type)), $object->ref);
 
-				$result = $actioncomm->create($user);
+                $result = $actioncomm->create($user);
 				break;
+
+            case 'DIGIRISKELEMENT_MODIFY' :
+                $actioncomm->elementtype = 'digiriskelement@digiriskdolibarr';
+                $actioncomm->elementid   = $object->id;
+
+                $actioncomm->label = $langs->transnoentities('ObjectModifyTrigger', $langs->transnoentities(ucfirst($object->element_type)), $object->ref);
+
+                $result = $actioncomm->create($user);
+                break;
+
+            case 'DIGIRISKELEMENT_DELETE' :
+                $actioncomm->elementtype = 'digiriskelement@digiriskdolibarr';
+                $actioncomm->elementid   = $object->id;
+
+                $actioncomm->label = $langs->transnoentities('ObjectDeleteTrigger', $langs->transnoentities(ucfirst($object->element_type)), $object->ref);
+
+                $result = $actioncomm->create($user);
+                break;
 
             case 'ACCIDENT_CREATE' :
             case 'ACCIDENTINVESTIGATION_CREATE' :
