@@ -139,11 +139,12 @@ if (empty($reshook)) {
 
 			if ($object->fk_task <= 0 || empty($object->fk_task)) {
 				$accident->fetch($object->fk_accident);
-				$task->fk_project                           = $accident->fk_project;
-				$task->ref                                  = $modTask->getNextValue(0, $task);
-				$task->label                                = $accident->ref . ' - ' . $accident->label;
-				$task->array_options['options_fk_accident'] = $accident->id;
-                $result                                     = $task->create($user);
+				$task->fk_project                                        = $accident->fk_project;
+				$task->ref                                               = $modTask->getNextValue(0, $task);
+				$task->label                                             = $accident->ref . ' - ' . $accident->label;
+                $task->array_options['options_fk_accident']              = $accident->id;
+                $task->array_options['options_fk_accidentinvestigation'] = $object->id;
+                $result                                                  = $task->create($user);
                 $task->add_contact($user->id, 'TASKEXECUTIVE', 'internal');
 
                 if ($result > 0) {
@@ -167,8 +168,7 @@ if (empty($reshook)) {
 					if ($resOne > 0 && $resTwo > 0) {
 						setEventMessages('AccidentInvestigationTaskCreated', []);
                         $task->fetch($result);
-                        $description  = $langs->trans('Accident') . ' : ' . $accident->getNomUrl(1, '', 0, '', -1, 1) . '</br>' . $langs->trans('AccidentInvestigation') . ' : ' . $object->getNomUrl(1, '', 0, '', -1, 1) . '</br>';
-                        $description .= $getNomResOne . '</br>' . $getNomResTwo;
+                        $description = $getNomResOne . '</br>' . $getNomResTwo;
                         $task->setValueFrom('description', $description);
 					} else {
 						setEventMessages($task->error, [], 'errors');

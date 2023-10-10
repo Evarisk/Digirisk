@@ -23,7 +23,7 @@
  */
 
 // Load Saturne libraries.
-require_once __DIR__ . '/../../../../../../saturne/core/modules/saturne/modules_saturne.php';
+require_once __DIR__ . '/../../../../../saturne/core/modules/saturne/modules_saturne.php';
 
 /**
  *	Class to manage accident investigation numbering rules standard.
