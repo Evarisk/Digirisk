@@ -1,5 +1,5 @@
 <?php
-/* Copyright (C) 2021-2023 EVARISK <technique@evarisk.com>
+/* Copyright (C) 2023 EVARISK <technique@evarisk.com>
  *
  * This program is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -17,26 +17,26 @@
  */
 
 /**
- *  \file    core/modules/digiriskdolibarr/digiriskelement/mod_accident_lesion_standard.php
+ *  \file    core/modules/digiriskdolibarr/address/mod_accidentinvestigation_standard.php
  *  \ingroup digiriskdolibarr
- *  \brief   File of class to manage mod_accident_lesion_standard numbering rules standard.
+ *  \brief   File of class to manage accident investigation numbering rules standard.
  */
 
 // Load Saturne libraries.
 require_once __DIR__ . '/../../../../../../saturne/core/modules/saturne/modules_saturne.php';
 
 /**
- *	Class to manage controldocument numbering rules standard.
+ *	Class to manage accident investigation numbering rules standard.
  */
-class mod_accident_lesion_standard extends ModeleNumRefSaturne
+class mod_accidentinvestigation_standard extends ModeleNumRefSaturne
 {
-	/**
-	 * @var string Numbering module ref prefix.
-	 */
-	public string $prefix = 'ACCL';
+    /**
+     * @var string Numbering module ref prefix.
+     */
+    public string $prefix = 'AI';
 
-	/**
-	 * @var string Name.
-	 */
-	public string $name = 'Albiorix';
+    /**
+     * @var string Name.
+     */
+    public string $name = 'Bebhionn';
 }

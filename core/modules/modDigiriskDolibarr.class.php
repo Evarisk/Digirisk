@@ -790,14 +790,14 @@ class modDigiriskdolibarr extends DolibarrModules
 			$i++ => ['DIGIRISKDOLIBARR_ACCIDENT_PROJECT', 'integer', 0, '', 0, 'current'],
 
 			// CONST ACCIDENT LINE
-			$i++ => ['DIGIRISKDOLIBARR_MAIN_AGENDA_ACTIONAUTO_ACCIDENT_WORKSTOP_CREATE', 'integer', 1, '', 0, 'current'],
-			$i++ => ['DIGIRISKDOLIBARR_MAIN_AGENDA_ACTIONAUTO_ACCIDENT_WORKSTOP_MODIFY', 'integer', 1, '', 0, 'current'],
-			$i++ => ['DIGIRISKDOLIBARR_MAIN_AGENDA_ACTIONAUTO_ACCIDENT_WORKSTOP_DELETE', 'integer', 1, '', 0, 'current'],
-			$i++ => ['DIGIRISKDOLIBARR_MAIN_AGENDA_ACTIONAUTO_ACCIDENT_LESION_CREATE', 'integer', 1, '', 0, 'current'],
-			$i++ => ['DIGIRISKDOLIBARR_MAIN_AGENDA_ACTIONAUTO_ACCIDENT_LESION_MODIFY', 'integer', 1, '', 0, 'current'],
-			$i++ => ['DIGIRISKDOLIBARR_MAIN_AGENDA_ACTIONAUTO_ACCIDENT_LESION_DELETE', 'integer', 1, '', 0, 'current'],
-			$i++ => ['DIGIRISKDOLIBARR_ACCIDENT_WORKSTOP_ADDON', 'chaine', 'mod_accident_workstop_standard', '', 0, 'current'],
-			$i++ => ['DIGIRISKDOLIBARR_ACCIDENT_LESION_ADDON', 'chaine', 'mod_accident_lesion_standard', '', 0, 'current'],
+			$i++ => ['DIGIRISKDOLIBARR_MAIN_AGENDA_ACTIONAUTO_ACCIDENTWORKSTOP_CREATE', 'integer', 1, '', 0, 'current'],
+			$i++ => ['DIGIRISKDOLIBARR_MAIN_AGENDA_ACTIONAUTO_ACCIDENTWORKSTOP_MODIFY', 'integer', 1, '', 0, 'current'],
+			$i++ => ['DIGIRISKDOLIBARR_MAIN_AGENDA_ACTIONAUTO_ACCIDENTWORKSTOP_DELETE', 'integer', 1, '', 0, 'current'],
+			$i++ => ['DIGIRISKDOLIBARR_MAIN_AGENDA_ACTIONAUTO_ACCIDENTLESION_CREATE', 'integer', 1, '', 0, 'current'],
+			$i++ => ['DIGIRISKDOLIBARR_MAIN_AGENDA_ACTIONAUTO_ACCIDENTLESION_MODIFY', 'integer', 1, '', 0, 'current'],
+			$i++ => ['DIGIRISKDOLIBARR_MAIN_AGENDA_ACTIONAUTO_ACCIDENTLESION_DELETE', 'integer', 1, '', 0, 'current'],
+			$i++ => ['DIGIRISKDOLIBARR_ACCIDENTWORKSTOP_ADDON', 'chaine', 'mod_accidentworkstop_standard', '', 0, 'current'],
+			$i++ => ['DIGIRISKDOLIBARR_ACCIDENTLESION_ADDON', 'chaine', 'mod_accidentlesion_standard', '', 0, 'current'],
 
 			// CONST TICKET DOCUMENT
 			$i++ => ['DIGIRISKDOLIBARR_TICKETDOCUMENT_ADDON_ODT_PATH', 'chaine', 'DOL_DOCUMENT_ROOT/custom/digiriskdolibarr/documents/doctemplates/ticketdocument/', '', 0, 'current'],
@@ -838,7 +838,7 @@ class modDigiriskdolibarr extends DolibarrModules
 			$i++ => ['DIGIRISKDOLIBARR_MANUAL_PDF_GENERATION', 'integer', 0, '', 0, 'current'],
 
 			// CONST ACCIDENT INVESTIGATION
-			$i++ => ['DIGIRISKDOLIBARR_ACCIDENTINVESTIGATION_ADDON', 'chaine', 'mod_accident_investigation_standard', '', 0, 'current'],
+			$i++ => ['DIGIRISKDOLIBARR_ACCIDENTINVESTIGATION_ADDON', 'chaine', 'mod_accidentinvestigation_standard', '', 0, 'current'],
 			$i++ => ['DIGIRISKDOLIBARR_MAIN_AGENDA_ACTIONAUTO_ACCIDENTINVESTIGATION_CREATE', 'integer', 1, '', 0, 'current'],
 			$i++ => ['DIGIRISKDOLIBARR_MAIN_AGENDA_ACTIONAUTO_ACCIDENTINVESTIGATION_MODIFY', 'integer', 1, '', 0, 'current'],
 			$i++ => ['DIGIRISKDOLIBARR_MAIN_AGENDA_ACTIONAUTO_ACCIDENTINVESTIGATION_DELETE', 'integer', 1, '', 0, 'current'],
