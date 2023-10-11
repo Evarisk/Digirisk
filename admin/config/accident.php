@@ -96,18 +96,19 @@ if ($action == 'updateMask') {
 }
 
 if ($action == 'setmod') {
-	$constforval = 'DIGIRISKDOLIBARR_ACCIDENT_ADDON';
-	dolibarr_set_const($db, $constforval, $value, 'chaine', 0, '', $conf->entity);
-}
+    if (preg_match('_accidentinvestigation_', $value)) {
+        $constforval = 'DIGIRISKDOLIBARR_ACCIDENTINVESTIGATION_ADDON';
+    } else if (preg_match('_accidentworkstop_', $value)) {
+        $constforval = 'DIGIRISKDOLIBARR_ACCIDENTWORKSTOP_ADDON';
+    } else if (preg_match('_accidentlesion_', $value)) {
+        $constforval = 'DIGIRISKDOLIBARR_ACCIDENTLESION_ADDON';
+    } else if (preg_match('_accident_', $value)) {
+        $constforval = 'DIGIRISKDOLIBARR_ACCIDENT_ADDON';
+    } else {
+        $constforval = '';
+    }
 
-if ($action == 'setmodAccidentWorkStop') {
-	$constforval = 'DIGIRISKDOLIBARR_ACCIDENT_WORKSTOP_ADDON';
-	dolibarr_set_const($db, $constforval, $value, 'chaine', 0, '', $conf->entity);
-}
-
-if ($action == 'setmodAccidentLesion') {
-	$constforval = 'DIGIRISKDOLIBARR_ACCIDENT_LESION_ADDON';
-	dolibarr_set_const($db, $constforval, $value, 'chaine', 0, '', $conf->entity);
+    dolibarr_set_const($db, $constforval, $value, 'chaine', 0, '', $conf->entity);
 }
 
 /*
@@ -173,7 +174,7 @@ print '<hr>';
 
 $object = new AccidentInvestigation($db);
 
-$objectModSubdir = 'digiriskelement';
+$objectModSubdir = '';
 
 require __DIR__ . '/../../../saturne/core/tpl/admin/object/object_numbering_module_view.tpl.php';
 

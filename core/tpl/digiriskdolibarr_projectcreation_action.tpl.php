@@ -777,8 +777,8 @@ if ($conf->global->DIGIRISKDOLIBARR_CONF_BACKWARD_COMPATIBILITY == 0) {
 
 	// CONST ACCIDENT LINE
 	dolibarr_set_const($db, 'MAIN_AGENDA_ACTIONAUTO_ACCIDENT_WORKSTOP_CREATE', 1, 'integer', 0, '', $conf->entity);
-	dolibarr_set_const($db, 'DIGIRISKDOLIBARR_ACCIDENT_WORKSTOP_ADDON', 'mod_accident_workstop_standard', 'chaine', 0, '', $conf->entity);
-	dolibarr_set_const($db, 'DIGIRISKDOLIBARR_ACCIDENT_LESION_ADDON', 'mod_accident_lesion_standard', 'chaine', 0, '', $conf->entity);
+	dolibarr_set_const($db, 'DIGIRISKDOLIBARR_ACCIDENTWORKSTOP_ADDON', 'mod_accidentworkstop_standard', 'chaine', 0, '', $conf->entity);
+	dolibarr_set_const($db, 'DIGIRISKDOLIBARR_ACCIDENTLESION_ADDON', 'mod_accidentlesion_standard', 'chaine', 0, '', $conf->entity);
 
 	// GENERAL CONSTS
 	dolibarr_set_const($db, 'MAIN_USE_EXIF_ROTATION', 1, 'integer', 0, '', $conf->entity);

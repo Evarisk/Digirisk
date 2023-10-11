@@ -17,9 +17,9 @@
  */
 
 /**
- *  \file    core/modules/digiriskdolibarr/digiriskelement/mod_accident_workstop_standard.php
+ *  \file    core/modules/digiriskdolibarr/digiriskelement/mod_accidentworkstop_standard.php
  *  \ingroup digiriskdolibarr
- *  \brief   File of class to manage mod_accident_workstop_standard numbering rules standard.
+ *  \brief   File of class to manage mod_accidentworkstop_standard numbering rules standard.
  */
 
 // Load Saturne libraries.
@@ -28,7 +28,7 @@ require_once __DIR__ . '/../../../../../../saturne/core/modules/saturne/modules_
 /**
  *	Class to manage controldocument numbering rules standard.
  */
-class mod_accident_workstop_standard extends ModeleNumRefSaturne
+class mod_accidentworkstop_standard extends ModeleNumRefSaturne
 {
 	/**
 	 * @var string Numbering module ref prefix.
