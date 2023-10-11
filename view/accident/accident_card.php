@@ -209,73 +209,6 @@ if (empty($reshook)) {
 			$error++;
 		}
 
-		// Submit file
-        $relativepath = '/accident/tmp/ACC0/photos';
-        $upload_dir   = $conf->digiriskdolibarr->multidir_output[$conf->entity] . '/' . $relativepath;
-        if (!$error && !empty($conf->global->MAIN_UPLOAD_DOC)) {
-            // Define relativepath and upload_dir
-            if (is_array($_FILES['userfile']['tmp_name'])) {
-                $userfiles = $_FILES['userfile']['tmp_name'];
-            } else {
-                $userfiles = [$_FILES['userfile']['tmp_name']];
-            }
-
-            foreach ($userfiles as $key => $userfile) {
-                if (empty($_FILES['userfile']['tmp_name'][$key])) {
-                    if ($_FILES['userfile']['error'][$key] == 1 || $_FILES['userfile']['error'][$key] == 2) {
-                        setEventMessages($langs->trans('ErrorFileSizeTooLarge'), null, 'errors');
-                    }
-                    if ($_FILES['userfile']['error'][$key] == 4) {
-                        $error++;
-                    }
-                }
-            }
-
-            if (!$error) {
-                dol_add_file_process($upload_dir, 0, 1, 'userfile', '', null, '', 0);
-                $imgThumbMini   = vignette($upload_dir, $conf->global->DIGIQUALI_MEDIA_MAX_WIDTH_MINI, $conf->global->DIGIQUALI_MEDIA_MAX_HEIGHT_MINI, '_mini');
-                $imgThumbSmall  = vignette($upload_dir, $conf->global->DIGIQUALI_MEDIA_MAX_WIDTH_SMALL, $conf->global->DIGIQUALI_MEDIA_MAX_HEIGHT_SMALL, '_small');
-                $imgThumbMedium = vignette($upload_dir, $conf->global->DIGIQUALI_MEDIA_MAX_WIDTH_MEDIUM, $conf->global->DIGIQUALI_MEDIA_MAX_HEIGHT_MEDIUM, '_medium');
-                $imgThumbLarge  = vignette($upload_dir, $conf->global->DIGIQUALI_MEDIA_MAX_WIDTH_LARGE, $conf->global->DIGIQUALI_MEDIA_MAX_HEIGHT_LARGE, '_large');
-            }
-            $error = 0;
-        }
-
-        $photoList = dol_dir_list($upload_dir, 'files');
-        if (is_array($photoList) && !empty($photoList)) {
-            foreach ($photoList as $photo) {
-                $pathToQuestionPhoto = $conf->digiriskdolibarr->multidir_output[$conf->entity] . '/accident/' . $object->ref;
-
-                if (!is_dir($pathToQuestionPhoto)) {
-                    mkdir($pathToQuestionPhoto);
-                }
-                $pathToQuestionPhotoType = $conf->digiriskdolibarr->multidir_output[$conf->entity] . '/accident/' . $object->ref . '/photos';
-                if (!is_dir($pathToQuestionPhotoType)) {
-                    mkdir($pathToQuestionPhotoType);
-                }
-
-                copy($photo['fullname'], $pathToQuestionPhotoType . '/' . $photo['name']);
-
-                $destfull = $pathToQuestionPhotoType . '/' . $photo['name'];
-
-                if (empty($object->photo)) {
-                    $object->photo = $photo['name'];
-                }
-
-                $imgThumbMini   = vignette($destfull, $conf->global->DIGIQUALI_MEDIA_MAX_WIDTH_MINI, $conf->global->DIGIQUALI_MEDIA_MAX_HEIGHT_MINI, '_mini');
-                $imgThumbSmall  = vignette($destfull, $conf->global->DIGIQUALI_MEDIA_MAX_WIDTH_SMALL, $conf->global->DIGIQUALI_MEDIA_MAX_HEIGHT_SMALL, '_small');
-                $imgThumbMedium = vignette($destfull, $conf->global->DIGIQUALI_MEDIA_MAX_WIDTH_MEDIUM, $conf->global->DIGIQUALI_MEDIA_MAX_HEIGHT_MEDIUM, '_medium');
-                $imgThumbLarge  = vignette($destfull, $conf->global->DIGIQUALI_MEDIA_MAX_WIDTH_LARGE, $conf->global->DIGIQUALI_MEDIA_MAX_HEIGHT_LARGE, '_large');
-                unlink($photo['fullname']);
-            }
-        }
-        $filesThumbs = dol_dir_list($upload_dir . '/thumbs/');
-        if (is_array($filesThumbs) && !empty($filesThumbs)) {
-            foreach ($filesThumbs as $fileThumb) {
-                unlink($fileThumb['fullname']);
-            }
-        }
-
 		if (!$error) {
 			$result = $object->create($user, false);
 			if ($result > 0) {
@@ -908,6 +841,7 @@ if ((empty($action) || ($action != 'create' && $action != 'edit'))) {
     // ------------------------------------------------------------
     list($moreHtmlRef, $moreParams) = $object->getBannerTabContent();
 
+    $object->fetch($id);
 	saturne_banner_tab($object, 'id', '', 1, 'rowid', 'ref', $moreHtmlRef, dol_strlen($object->photo) > 0, $moreParams);
 
 	$formConfirm = '';
