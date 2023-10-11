@@ -364,7 +364,7 @@ print '<table class="tagtable nobottomiftotal liste' . ($moreforfilter ? " listw
 print '<tr class="liste_titre">';
 
 // We manually add progress field here because it is a redundant information that doesn't need to be stored in db
-$accident->fields['progress'] = ['type' => '', 'label' => 'Progress', 'enabled' => '1', 'position' => 70, 'notnull' => 0, 'visible' => 2, 'index' => 0,];
+$accident->fields['progress'] = ['type' => 'integer:', 'label' => 'Progress', 'enabled' => '1', 'position' => 70, 'notnull' => 0, 'visible' => 2, 'index' => 0,];
 $arrayfields['t.progress']    = ['label' => 'Progress', 'checked' => 1, 'enabled' => 0, 'position' => 70, 'disablesort' => 1];
 
 foreach ($accident->fields as $key => $val) {
