@@ -69,19 +69,20 @@ $backtopageforcancel = GETPOST('backtopageforcancel', 'alpha');
 $fk_parent           = GETPOST('fk_parent', 'int');
 
 // Initialize technical objects
-$object            = new PreventionPlan($db);
-$preventionplandet = new PreventionPlanLine($db);
-$signatory         = new SaturneSignature($db, $moduleNameLowerCase, $object->element);
-$document          = new PreventionPlanDocument($db);
-$digiriskelement   = new DigiriskElement($db);
-$digiriskresources = new DigiriskResources($db);
-$risk              = new Risk($db);
-$contact           = new Contact($db);
-$usertmp           = new User($db);
-$extrafields       = new ExtraFields($db);
-$resources         = new DigiriskResources($db);
-$thirdparty        = new Societe($db);
-$project           = new Project($db);
+$object             = new PreventionPlan($db);
+$preventionplandet  = new PreventionPlanLine($db);
+$signatory          = new SaturneSignature($db, $moduleNameLowerCase, $object->element);
+$document           = new PreventionPlanDocument($db);
+$digiriskelement    = new DigiriskElement($db);
+$digiriskelementtmp = new DigiriskElement($db);
+$digiriskresources  = new DigiriskResources($db);
+$risk               = new Risk($db);
+$contact            = new Contact($db);
+$usertmp            = new User($db);
+$extrafields        = new ExtraFields($db);
+$resources          = new DigiriskResources($db);
+$thirdparty         = new Societe($db);
+$project            = new Project($db);
 
 // Load object
 $object->fetch($id);
@@ -1216,7 +1217,7 @@ if ((empty($action) || ($action != 'create' && $action != 'edit'))) {
 					print '</td>';
 
 					print '<td>';
-					print $digiriskelement->selectDigiriskElementList($item->fk_element, 'fk_element', ['customsql' => ' t.rowid NOT IN (' . implode(',', $deletedElements) . ')'], 0, 0, array(), 0, 0, 'minwidth100', 0, false, 1);
+					print $digiriskelementtmp->selectDigiriskElementList($item->fk_element, 'fk_element', ['customsql' => ' t.rowid NOT IN (' . implode(',', $deletedElements) . ')'], 0, 0, array(), 0, 0, 'minwidth100', 0, false, 1);
 					print '</td>';
 
 					$coldisplay++;
@@ -1344,7 +1345,7 @@ if ((empty($action) || ($action != 'create' && $action != 'edit'))) {
 			print $refPreventionPlanDetMod->getNextValue($preventionplandet);
 			print '</td>';
 			print '<td>';
-			print $digiriskelement->selectDigiriskElementList('', 'fk_element', ['customsql' => ' t.rowid NOT IN (' . implode(',', $deletedElements) . ')'], 0, 0, array(), 0, 0, 'minwidth100', '', false, 1);
+			print $digiriskelementtmp->selectDigiriskElementList('', 'fk_element', ['customsql' => ' t.rowid NOT IN (' . implode(',', $deletedElements) . ')'], 0, 0, array(), 0, 0, 'minwidth100', '', false, 1);
 			print '</td>';
 
 			$coldisplay++;
