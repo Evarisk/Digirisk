@@ -220,3 +220,7 @@ DELETE FROM llx_c_digiriskdolibarr_action_trigger WHERE ref = 'DIGIRISKSIGNATURE
 DELETE FROM llx_c_digiriskdolibarr_action_trigger WHERE ref = 'DIGIRISKSIGNATURE_ABSENT';
 DELETE FROM llx_c_digiriskdolibarr_action_trigger WHERE ref = 'DIGIRISKSIGNATURE_DELETED';
 DELETE FROM llx_c_digiriskdolibarr_action_trigger WHERE ref = 'OPENINGHOURS_CREATE';
+DELETE FROM llx_c_digiriskdolibarr_action_trigger WHERE ref = 'ACCIDENT_INVESTIGATION_VALIDATE';
+DELETE FROM llx_c_digiriskdolibarr_action_trigger WHERE ref = 'ACCIDENT_INVESTIGATION_UNVALIDATE';
+DELETE FROM llx_c_digiriskdolibarr_action_trigger WHERE ref = 'ACCIDENT_INVESTIGATION_ARCHIVE';
+DELETE FROM llx_c_digiriskdolibarr_action_trigger WHERE ref = 'ACCIDENT_INVESTIGATION_LOCK';
