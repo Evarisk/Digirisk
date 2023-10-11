@@ -338,7 +338,7 @@ if (!empty($related_tasks) && $related_tasks > 0) {
 							<div class="riskassessment-task-data" value="<?php echo $related_task->id ?>">
 								<span class="riskassessment-task-reference" value="<?php echo $related_task->ref ?>"><?php echo $related_task->getNomUrlTask(0, 'withproject'); ?></span>
 								<span class="riskassessment-task-author">
-									<?php $userAuthor = $usersList[$related_task->fk_user_creat?:$user->id];
+									<?php $userAuthor = $usersList[$related_task->fk_user_creat > 0 ? $related_task->fk_user_creat : $user->id];
 									echo getNomUrlUser($userAuthor); ?>
 								</span>
 								<span class="riskassessment-task-date">

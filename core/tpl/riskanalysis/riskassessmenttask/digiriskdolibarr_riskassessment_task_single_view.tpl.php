@@ -6,7 +6,7 @@
 				<div class="riskassessment-task-data">
 					<span class="riskassessment-task-reference" value="<?php echo $related_task->ref ?>"><?php echo $related_task->getNomUrlTask(0, 'withproject'); ?></span>
 					<span class="riskassessment-task-author">
-						<?php $userAuthor = $usersList[$related_task->timespent_fk_user?:$user->id];
+						<?php $userAuthor = $usersList[$related_task->fk_user_creat?:$user->id];
 						echo getNomUrlUser($userAuthor); ?>
 					</span>
 					<span class="riskassessment-task-date">
