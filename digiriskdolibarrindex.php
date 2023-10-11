@@ -30,4 +30,6 @@ if (file_exists('digiriskdolibarr.main.inc.php')) {
 	die('Include of digiriskdolibarr main fails');
 }
 
+require_once __DIR__ . '/core/tpl/digiriskdolibarr_projectcreation_action.tpl.php';
+
 require_once __DIR__ . '/../saturne/core/tpl/index/index_view.tpl.php';
