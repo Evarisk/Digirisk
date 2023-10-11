@@ -367,8 +367,8 @@ window.digiriskdolibarr.riskassessmenttask.createRiskAssessmentTaskTimeSpent = f
 			textToShow += taskRef
 			textToShow += actionContainerSuccess.find('.valueForCreateTaskTimeSpent2').val()
 
-			$('.riskassessment-task-timespent-container').find('.riskassessment-task-timespent-list-'+taskID).html($(resp).find('.riskassessment-task-timespent-container').find('.riskassessment-task-timespent-list-'+taskID))
-			$('.riskassessment-task-container-'+taskID).closest('.riskassessment-tasks').html($(resp).find('.riskassessment-task-container-'+taskID).closest('.riskassessment-tasks'))
+			$('.riskassessment-task-timespent-container').find('.riskassessment-task-timespent-list-'+taskID).replaceWith($(resp).find('.riskassessment-task-timespent-container').find('.riskassessment-task-timespent-list-'+taskID))
+			$('.riskassessment-task-container-'+taskID).closest('.riskassessment-tasks').replaceWith($(resp).find('.riskassessment-task-container-'+taskID).closest('.riskassessment-tasks'))
 			$('.loader-spin').remove();
 			$('.wpeo-loader').removeClass('wpeo-loader')
 
