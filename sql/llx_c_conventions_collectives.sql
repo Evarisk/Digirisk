@@ -14,13 +14,13 @@
 -- along with this program.  If not, see https://www.gnu.org/licenses/.
 
 CREATE TABLE llx_c_conventions_collectives(
-	rowid       integer AUTO_INCREMENT PRIMARY KEY NOT NULL,
-	entity      integer default 1,
-	tms         timestamp,
-	code        varchar(128),
-	libelle     varchar(512),
-	description text,
-	tracking    varchar(128) DEFAULT NULL,
-	active      tinyint(4) DEFAULT 0,
-	module      varchar(32) DEFAULT NULL
-);
+  rowid       integer AUTO_INCREMENT PRIMARY KEY NOT NULL,
+  entity      integer default 1,
+  tms         timestamp,
+  code        varchar(128),
+  libelle     varchar(512),
+  description text,
+  tracking    varchar(128) DEFAULT NULL,
+  active      tinyint(4) DEFAULT 0,
+  module      varchar(32) DEFAULT NULL
+) ENGINE=innodb;
