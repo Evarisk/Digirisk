@@ -145,9 +145,9 @@ class InterfaceDigiriskdolibarrTriggers extends DolibarrTriggers
 		$actioncomm->percentage  = -1;
 
         // Trigger descriptions are handled by class function getTriggerDescription
-		if (getDolGlobalInt('DIGIRISKDOLIBARR_ADVANCED_TRIGGER') && !empty($object->fields)) {
-            if (method_exists($object, 'getTriggerDescription')) {
-                $object->fetch($object->id);
+        if (method_exists($object, 'getTriggerDescription')) {
+            $object->fetch($object->id);
+		    if (getDolGlobalInt('DIGIRISKDOLIBARR_ADVANCED_TRIGGER') && !empty($object->fields)) {
                 $actioncomm->note_private = $object->getTriggerDescription($object);
             }
 		}
