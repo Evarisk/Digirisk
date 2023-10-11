@@ -48,7 +48,7 @@ $searchEvent = GETPOST('search_event', 'alpha');
 $backtopage  = GETPOST('backtopage', 'alpha');
 
 // Get list of triggers available
-$triggers = saturne_fetch_dictionary('c_digiriskdolibarr_action_trigger', 'ASC', 't.rowid');
+$triggers = saturne_fetch_dictionary('c_digiriskdolibarr_action_trigger');
 
 /*
  *	Actions
