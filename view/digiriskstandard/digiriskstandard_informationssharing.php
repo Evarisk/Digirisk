@@ -77,6 +77,7 @@ if ($reshook < 0) setEventMessages($hookmanager->error, $hookmanager->errors, 'e
 
 if (empty($reshook)) {
 	$error = 0;
+    $previousRef = $object->ref;
     $object->ref = '';
     $removeDocumentFromName = 1;
 
@@ -85,6 +86,8 @@ if (empty($reshook)) {
 
 	// Action to generate pdf from odt file
 	require_once __DIR__ . '/../../../saturne/core/tpl/documents/saturne_manual_pdf_generation_action.tpl.php';
+
+    $object->ref = $previousRef;
 }
 
 /*
