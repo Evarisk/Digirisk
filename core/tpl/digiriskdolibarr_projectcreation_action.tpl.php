@@ -165,26 +165,6 @@ if ( $conf->global->DIGIRISKDOLIBARR_DU_PROJECT == 0 || $project->statut == 2 ) 
 	header("Location: " . $_SERVER['PHP_SELF']);
 }
 
-if ($conf->global->DIGIRISKDOLIBARR_DIGIRISKSTANDARD_MENU_UPDATED == 0) {
-
-	$url = '/digiriskdolibarr/view/digiriskstandard/digiriskstandard_card.php?id=' . $conf->global->DIGIRISKDOLIBARR_ACTIVE_STANDARD;
-
-	$sql = "UPDATE ".MAIN_DB_PREFIX."menu SET";
-	$sql .= " url='".$db->escape($url)."'";
-	$sql .= " WHERE leftmenu='digiriskstandard'";
-	$sql .= " AND entity=" . $conf->entity;
-	$resql = $db->query($sql);
-	if (!$resql) {
-		$error = "Error ".$db->lasterror();
-		return -1;
-	}
-
-	dolibarr_set_const($db, 'DIGIRISKDOLIBARR_DIGIRISKSTANDARD_MENU_UPDATED', 1, 'integer', 0, '', $conf->entity);
-
-	header("Location: " . $_SERVER['PHP_SELF']);
-
-}
-
 if ($conf->global->DIGIRISKDOLIBARR_PREVENTIONPLAN_PROJECT > 0 && $conf->global->DIGIRISKDOLIBARR_PREVENTIONPLAN_PROJECT_BACKWARD_COMPATIBILITY == 0 ) {
 	$project->fetch($conf->global->DIGIRISKDOLIBARR_PREVENTIONPLAN_PROJECT);
 	//Backward compatibility
