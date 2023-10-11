@@ -73,7 +73,7 @@ $preventionplan      = new PreventionPlan($db);
 $preventionplanline  = new PreventionPlanLine($db);
 $signatory           = new SaturneSignature($db, $moduleNameLowerCase, $object->element);
 $objectLine          = new FirePermitLine($db);
-$document  = new FirePermitDocument($db);
+$document            = new FirePermitDocument($db);
 $risk                = new Risk($db);
 $contact             = new Contact($db);
 $usertmp             = new User($db);
@@ -117,7 +117,7 @@ $permissiontoread   = $user->rights->digiriskdolibarr->firepermit->read;
 $permissiontoadd    = $user->rights->digiriskdolibarr->firepermit->write;
 $permissiontodelete = $user->rights->digiriskdolibarr->firepermit->delete;
 
-saturne_check_access($permissiontoadd);
+saturne_check_access($permissiontoadd, $object);
 
 /*
  * Actions

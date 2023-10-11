@@ -137,7 +137,7 @@ $permissiontoadd    = $user->rights->digiriskdolibarr->evaluator->write;
 $permissiontodelete = $user->rights->digiriskdolibarr->evaluator->delete;
 
 // Security check
-saturne_check_access($permissiontoread);
+saturne_check_access($permissiontoread, $object);
 
 /*
  * Actions

@@ -70,7 +70,7 @@ $permissiontoread   = $user->rights->digiriskdolibarr->listingrisksphoto->read;
 $permissiontoadd    = $user->rights->digiriskdolibarr->listingrisksphoto->write;
 $permissiontodelete = $user->rights->digiriskdolibarr->listingrisksphoto->delete;
 
-saturne_check_access($permissiontoread);
+saturne_check_access($permissiontoread, $object);
 
 /*
  * Actions

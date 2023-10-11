@@ -129,7 +129,7 @@ $permissiontoread   = $user->rights->digiriskdolibarr->risksign->read;
 $permissiontoadd    = $user->rights->digiriskdolibarr->risksign->write;
 $permissiontodelete = $user->rights->digiriskdolibarr->risksign->delete;
 
-saturne_check_access($permissiontoread);
+saturne_check_access($permissiontoread, $object);
 
 /*
  * Actions
