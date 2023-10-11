@@ -73,13 +73,14 @@ $preventionplan      = new PreventionPlan($db);
 $preventionplanline  = new PreventionPlanLine($db);
 $signatory           = new SaturneSignature($db, $moduleNameLowerCase, $object->element);
 $objectLine          = new FirePermitLine($db);
-$document  = new FirePermitDocument($db);
+$document            = new FirePermitDocument($db);
 $risk                = new Risk($db);
 $contact             = new Contact($db);
 $usertmp             = new User($db);
 $thirdparty          = new Societe($db);
 $extrafields         = new ExtraFields($db);
 $digiriskelement     = new DigiriskElement($db);
+$digiriskelementtmp  = new DigiriskElement($db);
 $digiriskresources   = new DigiriskResources($db);
 $project             = new Project($db);
 
@@ -1249,7 +1250,7 @@ if ((empty($action) || ($action != 'create' && $action != 'edit'))) {
 					print '</td>';
 
 					print '<td class="bordertop nobottom linecollocation">';
-					print $digiriskelement->selectDigiriskElementList($item->fk_element, 'fk_element', ['customsql' => ' t.rowid NOT IN (' . implode(',', $deletedElements) . ')'], 0, 0,[], 0, 0, 'minwidth200', 0, false, 1);
+					print $digiriskelementtmp->selectDigiriskElementList($item->fk_element, 'fk_element', ['customsql' => ' t.rowid NOT IN (' . implode(',', $deletedElements) . ')'], 0, 0,[], 0, 0, 'minwidth200', 0, false, 1);
 					print '</td>';
 
 					$coldisplay++;
@@ -1376,7 +1377,7 @@ if ((empty($action) || ($action != 'create' && $action != 'edit'))) {
 			print $refFirePermitDetMod->getNextValue($objectLine);
 			print '</td>';
 			print '<td>';
-			print $digiriskelement->selectDigiriskElementList('', 'fk_element', ['customsql' => ' t.rowid NOT IN (' . implode(',', $deletedElements) . ')'], 0, 0, array(), 0, 0, 'minwidth200', 0, false, 1);
+			print $digiriskelementtmp->selectDigiriskElementList('', 'fk_element', ['customsql' => ' t.rowid NOT IN (' . implode(',', $deletedElements) . ')'], 0, 0, array(), 0, 0, 'minwidth200', 0, false, 1);
 			print '</td>';
 
 			$coldisplay++;
