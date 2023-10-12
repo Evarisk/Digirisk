@@ -845,7 +845,7 @@ class modDigiriskdolibarr extends DolibarrModules
             $i++ => ['DIGIRISKDOLIBARR_MAIN_AGENDA_ACTIONAUTO_ACCIDENTINVESTIGATION_SENTBYMAIL', 'integer', 1, '', 0, 'current'],
 
 			// CONST ACCIDENT INVESTIGATION DOCUMENT
-			$i++ => ['DIGIRISKDOLIBARR_ACCIDENTINVESTIGATIONDOCUMENT_ADDON', 'chaine', 'mod_accident_investigation_document_standard', '', 0, 'current'],
+			$i++ => ['DIGIRISKDOLIBARR_ACCIDENTINVESTIGATIONDOCUMENT_ADDON', 'chaine', 'mod_accidentinvestigationdocument_standard', '', 0, 'current'],
 			$i++ => ['DIGIRISKDOLIBARR_ACCIDENTINVESTIGATIONDOCUMENT_ADDON_ODT_PATH','chaine', 'DOL_DOCUMENT_ROOT/custom/digiriskdolibarr/documents/doctemplates/accidentinvestigationdocument/', '', 0, 'current'],
 			$i++ => ['DIGIRISKDOLIBARR_ACCIDENTINVESTIGATIONDOCUMENT_CUSTOM_ADDON_ODT_PATH', 'chaine', 'DOL_DATA_ROOT' . (($conf->entity == 1 ) ? '/' : '/' . $conf->entity . '/') . 'ecm/digiriskdolibarr/accidentinvestigationdocument/', '', 0, 'current'],
             $i++ => ['DIGIRISKDOLIBARR_ACCIDENTINVESTIGATIONDOCUMENT_DEFAULT_MODEL', 'chaine', 'template_accidentinvestigationdocument_odt', '', 0, 'current'],
@@ -2176,6 +2176,18 @@ class modDigiriskdolibarr extends DolibarrModules
 
             }
             dolibarr_set_const($this->db, 'DIGIRISKDOLIBARR_CUSTOM_NUM_REF_SET', 1, 'integer', 0, '', $conf->entity);
+        }
+
+        $documentsPath = DOL_DATA_ROOT . ($conf->entity > 1 ? '/' . $conf->entity : '');
+        $mediaPath     =  $documentsPath . '/digiriskdolibarr';
+
+        if (is_dir($mediaPath . '/accident_investigation')) {
+            chmod($mediaPath . '/accident_investigation', 0755);
+            rename($mediaPath . '/accident_investigation', $mediaPath . '/accidentinvestigation');
+        }
+        if (is_dir($mediaPath . '/accident_investigationdocument')) {
+            chmod($mediaPath . '/accident_investigationdocument', 0755);
+            rename($mediaPath . '/accident_investigationdocument', $mediaPath . '/accidentinvestigationdocument');
         }
 
 		return $this->_init($sql, $options);
