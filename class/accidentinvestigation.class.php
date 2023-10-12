@@ -118,7 +118,7 @@ class AccidentInvestigation extends SaturneObject
 		'date_creation'         => ['type' => 'datetime',     'label' => 'DateCreation',           'enabled' => 1, 'position' => 40,  'notnull' => 1, 'visible' => 2,],
 		'tms'                   => ['type' => 'timestamp',    'label' => 'DateModification',       'enabled' => 1, 'position' => 50,  'notnull' => 0, 'visible' => 0,],
 		'import_key'            => ['type' => 'varchar(14)',  'label' => 'ImportId',               'enabled' => 1, 'position' => 60,  'notnull' => 0, 'visible' => 0, 'index' => 0],
-		'status'                => ['type' => 'smallint',     'label' => 'Status',                 'enabled' => 1, 'position' => 70,  'notnull' => 1, 'visible' => 2, 'noteditable' => 1, 'default' => 0, 'index' => 0,],
+		'status'                => ['type' => 'smallint',     'label' => 'Status',                 'enabled' => 1, 'position' => 70,  'notnull' => 1, 'visible' => 2, 'noteditable' => 1, 'default' => 0, 'index' => 0, 'arrayofkeyval' => [0 => 'InProgress', 1 => 'Validated', 3 => 'Classified']],
 		'seniority_in_position' => ['type' => 'varchar(255)', 'label' => 'SeniorityInPosition',    'enabled' => 1, 'position' => 80,  'notnull' => 0, 'visible' => 1, 'css' => 'maxwidth200'],
 		'date_start'            => ['type' => 'datetime',     'label' => 'StartDate',              'enabled' => 1, 'position' => 90,  'notnull' => 0, 'visible' => 1,],
 		'date_end'              => ['type' => 'datetime',     'label' => 'EndDate',                'enabled' => 1, 'position' => 100, 'notnull' => 0, 'visible' => 1,],

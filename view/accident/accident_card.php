@@ -889,7 +889,6 @@ if ((empty($action) || ($action != 'create' && $action != 'edit'))) {
 	// Print form confirm
 	print $formConfirm;
 
-	print '<div class="div-table-responsive">';
 	print '<div class="fichecenter">';
 	print '<div class="fichehalfleft">';
 	print '<table class="border centpercent tableforfield">';
@@ -1012,11 +1011,9 @@ if ((empty($action) || ($action != 'create' && $action != 'edit'))) {
     print saturne_show_medias_linked('digiriskdolibarr', $pathPhotos, 'small', 0, 0, 0, 0, 50, 50, 0, 0, 0, 'accident/'. $object->ref . '/photos/', $object, 'photo', $permissiontoadd, $permissiontodelete && $object->status <= Accident::STATUS_VALIDATED);
     print '</td></tr>';
 
-	print '</table>';
-	print '</div>';
-	print '</div>';
-
-	print dol_get_fiche_end();
+    print '</table></div>';
+    print '<div class="clearboth"></div>';
+    print dol_get_fiche_end();
 
 	if ($object->id > 0) {
 		// Buttons for actions
