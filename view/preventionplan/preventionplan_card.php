@@ -118,7 +118,7 @@ $permissiontoread   = $user->rights->digiriskdolibarr->preventionplan->read;
 $permissiontoadd    = $user->rights->digiriskdolibarr->preventionplan->write;
 $permissiontodelete = $user->rights->digiriskdolibarr->preventionplan->delete;
 
-saturne_check_access($permissiontoadd);
+saturne_check_access($permissiontoadd, $object);
 
 /*
  * Actions

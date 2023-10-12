@@ -103,7 +103,8 @@ $upload_dir = $conf->digiriskdolibarr->multidir_output[$conf->entity];
 $permissiontoread   = $user->rights->digiriskdolibarr->accident->read;
 $permissiontoadd    = $user->rights->digiriskdolibarr->accident->write;
 $permissiontodelete = $user->rights->digiriskdolibarr->accident->delete;
-saturne_check_access($permissiontoread);
+
+saturne_check_access($permissiontoread, $object);
 
 /*
  * Actions

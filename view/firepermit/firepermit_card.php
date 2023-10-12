@@ -118,7 +118,7 @@ $permissiontoread   = $user->rights->digiriskdolibarr->firepermit->read;
 $permissiontoadd    = $user->rights->digiriskdolibarr->firepermit->write;
 $permissiontodelete = $user->rights->digiriskdolibarr->firepermit->delete;
 
-saturne_check_access($permissiontoadd);
+saturne_check_access($permissiontoadd, $object);
 
 /*
  * Actions

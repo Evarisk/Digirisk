@@ -98,7 +98,8 @@ require_once DOL_DOCUMENT_ROOT . '/core/actions_fetchobject.inc.php'; // Must be
 $permissiontoread   = $user->rights->digiriskdolibarr->accidentinvestigation->read;
 $permissiontoadd    = $user->rights->digiriskdolibarr->accidentinvestigation->write;
 $permissiontodelete = $user->rights->digiriskdolibarr->accidentinvestigation->delete;
-saturne_check_access($permissiontoread);
+
+saturne_check_access($permissiontoread, $object);
 
 if ($id > 0) {
     $taskExist = $task->fetch($object->fk_task);
