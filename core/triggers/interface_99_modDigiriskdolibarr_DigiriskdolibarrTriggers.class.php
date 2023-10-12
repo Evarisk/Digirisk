@@ -222,7 +222,7 @@ class InterfaceDigiriskdolibarrTriggers extends DolibarrTriggers
             case 'LISTINGRISKSPHOTO_GENERATE' :
             case 'WORKUNITDOCUMENT_GENERATE' :
 			case 'GROUPMENTDOCUMENT_GENERATE' :
-                if ($object->parent_type == 'groupment' ||$object->parent_type == 'workunit' || preg_match('/listingrisks/', $object->parent_type)) {
+                if ($object->parent_type == 'groupment' || $object->parent_type == 'workunit' || preg_match('/listingrisks/', $object->parent_type)) {
                     $object->parent_type = 'digiriskelement';
                 }
 
