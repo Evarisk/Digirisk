@@ -31,12 +31,8 @@ window.digiriskdolibarr.navigation.init = function() {
 window.digiriskdolibarr.navigation.event = function() {
 	// Main Menu Digirisk Society
 	$( document ).on( 'click', '.toggle-unit', window.digiriskdolibarr.navigation.switchToggle );
-	$( document ).on( 'click', '#newGroupment', window.digiriskdolibarr.navigation.switchToggle );
-	$( document ).on( 'click', '#newWorkunit', window.digiriskdolibarr.navigation.switchToggle );
 	$( document ).on( 'click', '.digirisk-wrap .navigation-container .toolbar div', window.digiriskdolibarr.navigation.toggleAll );
 	$( document ).on( 'click', '#slider', window.digiriskdolibarr.navigation.setUnitActive );
-	$( document ).on( 'click', '#newGroupment', window.digiriskdolibarr.navigation.redirect );
-	$( document ).on( 'click', '#newWorkunit', window.digiriskdolibarr.navigation.redirect );
 	$( document ).on( 'click', '.side-nav-responsive', window.digiriskdolibarr.navigation.toggleMobileNav );
 	$( document ).on( 'click', '.save-organization', window.digiriskdolibarr.navigation.saveOrganization );
 };
@@ -51,7 +47,6 @@ window.digiriskdolibarr.navigation.event = function() {
  * @return {void}
  */
 window.digiriskdolibarr.navigation.switchToggle = function( event ) {
-	event.preventDefault();
 
 	var MENU = localStorage.menu
 	if (MENU == null || MENU == '') {
@@ -134,44 +129,6 @@ window.digiriskdolibarr.navigation.setUnitActive = function( event ) {
 	$( this ).closest( '.unit' ).addClass( 'active' );
 	$( this ).closest( '.unit' ).attr( 'value', id );
 
-};
-
-/**
- * Redirection sur l'élément courant.
- *
- * @since   1.0.0
- * @version 1.0.0
- *
- * @param  {MouseEvent} event Les attributs lors du clic.
- * @return {booleen}
- */
-window.digiriskdolibarr.navigation.redirect = function( event ) {
-	var URLToGo = '';
-	var params  = new window.URLSearchParams(window.location.search);
-	var id      = $(params.get('id'))
-
-	//get ID from div selected in left menu
-	history.pushState({ path:  document.URL}, '', this.href);
-
-  window.saturne.loader.display($('#cardContent'))
-
-	//change URL without refresh
-	if (!id) {
-		URLToGo = document.URL.split('?id=')[0];
-	} else {
-		URLToGo = document.URL;
-	}
-	$( this ).closest( '.side-nav' ).find( '#id-left' ).removeClass( 'active' );
-
-	//empty and fill object card
-	$.ajax({
-		url: URLToGo,
-		success: function( resp ) {
-      window.saturne.loader.remove($('#cardContent'))
-			$('#cardContent').html($(resp).find('#cardContent'))
-		},
-	});
-	return false;
 };
 
 /**
