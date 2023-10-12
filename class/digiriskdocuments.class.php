@@ -411,7 +411,11 @@ class DigiriskDocuments extends SaturneDocuments
         global $langs;
 
         $className = $object->parent_type;
-        require_once __DIR__ . '/' . $className .'.class.php';
+        if (file_exists( __DIR__ . '/digiriskelement/' . $className .'.class.php')) {
+            require_once __DIR__ . '/digiriskelement/' . $className .'.class.php';
+        } else {
+            require_once __DIR__ . '/' . $className .'.class.php';
+        }
         $parentElement = new $className($this->db);
         $parentElement->fetch($object->parent_id);
 
