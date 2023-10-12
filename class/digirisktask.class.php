@@ -328,7 +328,7 @@ class DigiriskTask extends Task
 			$sql .= " DISTINCT"; // We may get several time the same record if user has several roles on same project/task
 		}
 		$sql .= " p.rowid as projectid, p.ref, p.title as plabel, p.public, p.fk_statut as projectstatus, p.usage_bill_time,";
-		$sql .= " t.rowid as taskid, t.ref as taskref, t.label, t.description, t.fk_task_parent, t.duration_effective, t.progress, t.fk_statut as status,";
+		$sql .= " t.rowid as taskid, t.ref as taskref, t.label, t.description, t.fk_user_creat, t.fk_task_parent, t.duration_effective, t.progress, t.fk_statut as status,";
 		$sql .= " t.dateo as date_start, t.datee as date_end, t.planned_workload, t.rang, t.datec as date_c, ";
 		$sql .= " t.description, ";
 		$sql .= " t.budget_amount, ";
@@ -503,7 +503,8 @@ class DigiriskTask extends Task
 					$tasks[$obj->taskid]->fk_parent = $obj->fk_task_parent; // deprecated
 					$tasks[$obj->taskid]->fk_task_parent = $obj->fk_task_parent;
 					$tasks[$obj->taskid]->duration		= $obj->duration_effective;
-					$tasks[$obj->taskid]->planned_workload = $obj->planned_workload;
+                    $tasks[$obj->taskid]->planned_workload = $obj->planned_workload;
+                    $tasks[$obj->taskid]->fk_user_creat = $obj->fk_user_creat;
 
 					if ($includebilltime) {
 						$tasks[$obj->taskid]->tobill = $obj->tobill;
