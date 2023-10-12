@@ -224,3 +224,6 @@ DELETE FROM llx_c_digiriskdolibarr_action_trigger WHERE ref = 'ACCIDENT_INVESTIG
 DELETE FROM llx_c_digiriskdolibarr_action_trigger WHERE ref = 'ACCIDENT_INVESTIGATION_UNVALIDATE';
 DELETE FROM llx_c_digiriskdolibarr_action_trigger WHERE ref = 'ACCIDENT_INVESTIGATION_ARCHIVE';
 DELETE FROM llx_c_digiriskdolibarr_action_trigger WHERE ref = 'ACCIDENT_INVESTIGATION_LOCK';
+
+UPDATE `llx_const` SET `value` = 'mod_accidentinvestigation_standard' WHERE `llx_const`.`name` = 'DIGIRISKDOLIBARR_ACCIDENTINVESTIGATION_ADDON';
+UPDATE `llx_const` SET `value` = 'mod_accidentinvestigationdocument_standard' WHERE `llx_const`.`name` = 'DIGIRISKDOLIBARR_ACCIDENTINVESTIGATIONDOCUMENT_ADDON';
