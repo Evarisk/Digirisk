@@ -67,8 +67,8 @@ class DigiriskElement extends SaturneObject
 
     public const STATUS_DELETED   = -1;
     public const STATUS_DRAFT     = 0;
+    public const STATUS_LOCKED    = 0;
     public const STATUS_VALIDATED = 1;
-    public const STATUS_LOCKED    = 2;
     public const STATUS_ARCHIVED  = 3;
 
     /**
