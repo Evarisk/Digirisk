@@ -314,10 +314,11 @@ PreventionPlanSentByMail       = Envoi par email du plan de prévention
 #
 
 # Right - Droit
-FirePermitMin = permis de feu
+FirePermitMin  = permis de feu
+FirePermitsMin = permis de feu
 
 # Data - Donnée
-NewFirePermit Nouveau permis de feu
+NewFirePermit                                     = Nouveau permis de feu
 ModifyFirePermit                                  = Modifier le permis de feu
 FirePermitList                                    = Liste des permis de feu
 FirePermit                                        = Permis de feu
@@ -526,6 +527,7 @@ GravityRate                       = Taux de gravité
 AccidentRateIndicator             = Taux et indice des indicateurs de performance des accidents
 NbPresquAccidents                 = Nombre de presqu'accidents
 NbAccidentInvestigations          = Nombre d'enquête accidents
+AccidentInvestigationsMin         = enquêtes accident
 NbWorkedHours                     = Nombre d\'heures travaillées
 ConfirmDeleteAccident             = Êtes-vous sûr de vouloir supprimer l'accident ?
 TheAccident                       = l'accident
