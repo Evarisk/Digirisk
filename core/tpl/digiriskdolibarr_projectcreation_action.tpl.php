@@ -17,6 +17,7 @@
  */
 
 require_once DOL_DOCUMENT_ROOT . '/core/lib/date.lib.php';
+require_once DOL_DOCUMENT_ROOT . '/core/lib/admin.lib.php';
 
 require_once DOL_DOCUMENT_ROOT . '/user/class/usergroup.class.php';
 
@@ -163,26 +164,6 @@ if ( $conf->global->DIGIRISKDOLIBARR_DU_PROJECT == 0 || $project->statut == 2 ) 
 		return -1;
 	}
 	header("Location: " . $_SERVER['PHP_SELF']);
-}
-
-if ($conf->global->DIGIRISKDOLIBARR_DIGIRISKSTANDARD_MENU_UPDATED == 0) {
-
-	$url = '/digiriskdolibarr/view/digiriskstandard/digiriskstandard_card.php?id=' . $conf->global->DIGIRISKDOLIBARR_ACTIVE_STANDARD;
-
-	$sql = "UPDATE ".MAIN_DB_PREFIX."menu SET";
-	$sql .= " url='".$db->escape($url)."'";
-	$sql .= " WHERE leftmenu='digiriskstandard'";
-	$sql .= " AND entity=" . $conf->entity;
-	$resql = $db->query($sql);
-	if (!$resql) {
-		$error = "Error ".$db->lasterror();
-		return -1;
-	}
-
-	dolibarr_set_const($db, 'DIGIRISKDOLIBARR_DIGIRISKSTANDARD_MENU_UPDATED', 1, 'integer', 0, '', $conf->entity);
-
-	header("Location: " . $_SERVER['PHP_SELF']);
-
 }
 
 if ($conf->global->DIGIRISKDOLIBARR_PREVENTIONPLAN_PROJECT > 0 && $conf->global->DIGIRISKDOLIBARR_PREVENTIONPLAN_PROJECT_BACKWARD_COMPATIBILITY == 0 ) {
@@ -777,8 +758,8 @@ if ($conf->global->DIGIRISKDOLIBARR_CONF_BACKWARD_COMPATIBILITY == 0) {
 
 	// CONST ACCIDENT LINE
 	dolibarr_set_const($db, 'MAIN_AGENDA_ACTIONAUTO_ACCIDENT_WORKSTOP_CREATE', 1, 'integer', 0, '', $conf->entity);
-	dolibarr_set_const($db, 'DIGIRISKDOLIBARR_ACCIDENT_WORKSTOP_ADDON', 'mod_accident_workstop_standard', 'chaine', 0, '', $conf->entity);
-	dolibarr_set_const($db, 'DIGIRISKDOLIBARR_ACCIDENT_LESION_ADDON', 'mod_accident_lesion_standard', 'chaine', 0, '', $conf->entity);
+	dolibarr_set_const($db, 'DIGIRISKDOLIBARR_ACCIDENTWORKSTOP_ADDON', 'mod_accidentworkstop_standard', 'chaine', 0, '', $conf->entity);
+	dolibarr_set_const($db, 'DIGIRISKDOLIBARR_ACCIDENTLESION_ADDON', 'mod_accidentlesion_standard', 'chaine', 0, '', $conf->entity);
 
 	// GENERAL CONSTS
 	dolibarr_set_const($db, 'MAIN_USE_EXIF_ROTATION', 1, 'integer', 0, '', $conf->entity);

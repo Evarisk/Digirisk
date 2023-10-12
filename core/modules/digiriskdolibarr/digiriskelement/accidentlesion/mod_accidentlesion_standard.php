@@ -17,9 +17,9 @@
  */
 
 /**
- *  \file    core/modules/digiriskdolibarr/digiriskelement/mod_accident_lesion_standard.php
+ *  \file    core/modules/digiriskdolibarr/digiriskelement/mod_accidentlesion_standard.php
  *  \ingroup digiriskdolibarr
- *  \brief   File of class to manage mod_accident_lesion_standard numbering rules standard.
+ *  \brief   File of class to manage mod_accidentlesion_standard numbering rules standard.
  */
 
 // Load Saturne libraries.
@@ -28,7 +28,7 @@ require_once __DIR__ . '/../../../../../../saturne/core/modules/saturne/modules_
 /**
  *	Class to manage controldocument numbering rules standard.
  */
-class mod_accident_lesion_standard extends ModeleNumRefSaturne
+class mod_accidentlesion_standard extends ModeleNumRefSaturne
 {
 	/**
 	 * @var string Numbering module ref prefix.

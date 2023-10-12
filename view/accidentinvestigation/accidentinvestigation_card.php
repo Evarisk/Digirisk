@@ -98,7 +98,8 @@ require_once DOL_DOCUMENT_ROOT . '/core/actions_fetchobject.inc.php'; // Must be
 $permissiontoread   = $user->rights->digiriskdolibarr->accidentinvestigation->read;
 $permissiontoadd    = $user->rights->digiriskdolibarr->accidentinvestigation->write;
 $permissiontodelete = $user->rights->digiriskdolibarr->accidentinvestigation->delete;
-saturne_check_access($permissiontoread);
+
+saturne_check_access($permissiontoread, $object);
 
 if ($id > 0) {
     $taskExist = $task->fetch($object->fk_task);
@@ -139,11 +140,12 @@ if (empty($reshook)) {
 
 			if ($object->fk_task <= 0 || empty($object->fk_task)) {
 				$accident->fetch($object->fk_accident);
-				$task->fk_project                           = $accident->fk_project;
-				$task->ref                                  = $modTask->getNextValue(0, $task);
-				$task->label                                = $accident->ref . ' - ' . $accident->label;
-				$task->array_options['options_fk_accident'] = $accident->id;
-                $result                                     = $task->create($user);
+				$task->fk_project                                        = $accident->fk_project;
+				$task->ref                                               = $modTask->getNextValue(0, $task);
+				$task->label                                             = $accident->ref . ' - ' . $accident->label;
+                $task->array_options['options_fk_accident']              = $accident->id;
+                $task->array_options['options_fk_accidentinvestigation'] = $object->id;
+                $result                                                  = $task->create($user);
                 $task->add_contact($user->id, 'TASKEXECUTIVE', 'internal');
 
                 if ($result > 0) {
@@ -167,8 +169,7 @@ if (empty($reshook)) {
 					if ($resOne > 0 && $resTwo > 0) {
 						setEventMessages('AccidentInvestigationTaskCreated', []);
                         $task->fetch($result);
-                        $description  = $langs->trans('Accident') . ' : ' . $accident->getNomUrl(1, '', 0, '', -1, 1) . '</br>' . $langs->trans('AccidentInvestigation') . ' : ' . $object->getNomUrl(1, '', 0, '', -1, 1) . '</br>';
-                        $description .= $getNomResOne . '</br>' . $getNomResTwo;
+                        $description = $getNomResOne . '</br>' . $getNomResTwo;
                         $task->setValueFrom('description', $description);
 					} else {
 						setEventMessages($task->error, [], 'errors');
@@ -463,7 +464,7 @@ if ($action == 'create') {
 		if ($object->status == AccidentInvestigation::STATUS_ARCHIVED) {
 			print '<span class="butAction" id="actionButtonNewVersion" href="' . $_SERVER['PHP_SELF'] . '?id=' . $object->id . '&action=set_new_version&token=' . newToken() . '">' . $displayButton . '</span>';
 		} else {
-			print '<span class="butActionRefused classfortooltip" title="' . dol_escape_htmltag($langs->trans('ObjectMustBeVersionedToOpen', ucfirst($langs->transnoentities('The' . ucfirst($object->element))))) . '">' . $displayButton . '</span>';
+			print '<span class="butActionRefused classfortooltip" title="' . dol_escape_htmltag($langs->trans('ObjectMustBeClassifiedToOpen', ucfirst($langs->transnoentities('The' . ucfirst($object->element))))) . '">' . $displayButton . '</span>';
 		}
 
 		// Clone.

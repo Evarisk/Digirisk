@@ -64,7 +64,7 @@ $hookmanager->initHooks(array('digiriskelementcard', 'globalcard')); // Note tha
 //Security check
 $permissiontoread = $user->rights->digiriskdolibarr->digiriskelement->read;
 
-saturne_check_access($permissiontoread);
+saturne_check_access($permissiontoread, $object);
 
 /*
  * Actions

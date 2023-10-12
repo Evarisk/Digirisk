@@ -574,7 +574,6 @@ class modDigiriskdolibarr extends DolibarrModules
 			$i++ => ['DIGIRISKDOLIBARR_MAIN_AGENDA_ACTIONAUTO_PREVENTIONPLAN_LOCKED', 'integer', 1, '', 0, 'current'],
 			$i++ => ['DIGIRISKDOLIBARR_MAIN_AGENDA_ACTIONAUTO_PREVENTIONPLAN_ARCHIVED', 'integer', 1, '', 0, 'current'],
 			$i++ => ['DIGIRISKDOLIBARR_MAIN_AGENDA_ACTIONAUTO_PREVENTIONPLAN_SENTBYMAIL', 'integer', 1, '', 0, 'current'],
-			$i++ => ['DIGIRISKDOLIBARR_MAIN_AGENDA_ACTIONAUTO_PREVENTIONPLANSIGNATURE_ADDATTENDANT', 'integer', 1, '', 0, 'current'],
 			$i++ => ['DIGIRISKDOLIBARR_PREVENTIONPLAN_ADDON', 'chaine', 'mod_preventionplan_standard', '', 0, 'current'],
 			$i++ => ['DIGIRISKDOLIBARR_PREVENTIONPLAN_PROJECT', 'integer', 0, '', 0, 'current'],
 			$i++ => ['DIGIRISKDOLIBARR_PREVENTIONPLAN_MAITRE_OEUVRE', 'integer', 0, '', 0, 'current'],
@@ -790,14 +789,14 @@ class modDigiriskdolibarr extends DolibarrModules
 			$i++ => ['DIGIRISKDOLIBARR_ACCIDENT_PROJECT', 'integer', 0, '', 0, 'current'],
 
 			// CONST ACCIDENT LINE
-			$i++ => ['DIGIRISKDOLIBARR_MAIN_AGENDA_ACTIONAUTO_ACCIDENT_WORKSTOP_CREATE', 'integer', 1, '', 0, 'current'],
-			$i++ => ['DIGIRISKDOLIBARR_MAIN_AGENDA_ACTIONAUTO_ACCIDENT_WORKSTOP_MODIFY', 'integer', 1, '', 0, 'current'],
-			$i++ => ['DIGIRISKDOLIBARR_MAIN_AGENDA_ACTIONAUTO_ACCIDENT_WORKSTOP_DELETE', 'integer', 1, '', 0, 'current'],
-			$i++ => ['DIGIRISKDOLIBARR_MAIN_AGENDA_ACTIONAUTO_ACCIDENT_LESION_CREATE', 'integer', 1, '', 0, 'current'],
-			$i++ => ['DIGIRISKDOLIBARR_MAIN_AGENDA_ACTIONAUTO_ACCIDENT_LESION_MODIFY', 'integer', 1, '', 0, 'current'],
-			$i++ => ['DIGIRISKDOLIBARR_MAIN_AGENDA_ACTIONAUTO_ACCIDENT_LESION_DELETE', 'integer', 1, '', 0, 'current'],
-			$i++ => ['DIGIRISKDOLIBARR_ACCIDENT_WORKSTOP_ADDON', 'chaine', 'mod_accident_workstop_standard', '', 0, 'current'],
-			$i++ => ['DIGIRISKDOLIBARR_ACCIDENT_LESION_ADDON', 'chaine', 'mod_accident_lesion_standard', '', 0, 'current'],
+			$i++ => ['DIGIRISKDOLIBARR_MAIN_AGENDA_ACTIONAUTO_ACCIDENTWORKSTOP_CREATE', 'integer', 1, '', 0, 'current'],
+			$i++ => ['DIGIRISKDOLIBARR_MAIN_AGENDA_ACTIONAUTO_ACCIDENTWORKSTOP_MODIFY', 'integer', 1, '', 0, 'current'],
+			$i++ => ['DIGIRISKDOLIBARR_MAIN_AGENDA_ACTIONAUTO_ACCIDENTWORKSTOP_DELETE', 'integer', 1, '', 0, 'current'],
+			$i++ => ['DIGIRISKDOLIBARR_MAIN_AGENDA_ACTIONAUTO_ACCIDENTLESION_CREATE', 'integer', 1, '', 0, 'current'],
+			$i++ => ['DIGIRISKDOLIBARR_MAIN_AGENDA_ACTIONAUTO_ACCIDENTLESION_MODIFY', 'integer', 1, '', 0, 'current'],
+			$i++ => ['DIGIRISKDOLIBARR_MAIN_AGENDA_ACTIONAUTO_ACCIDENTLESION_DELETE', 'integer', 1, '', 0, 'current'],
+			$i++ => ['DIGIRISKDOLIBARR_ACCIDENTWORKSTOP_ADDON', 'chaine', 'mod_accidentworkstop_standard', '', 0, 'current'],
+			$i++ => ['DIGIRISKDOLIBARR_ACCIDENTLESION_ADDON', 'chaine', 'mod_accidentlesion_standard', '', 0, 'current'],
 
 			// CONST TICKET DOCUMENT
 			$i++ => ['DIGIRISKDOLIBARR_TICKETDOCUMENT_ADDON_ODT_PATH', 'chaine', 'DOL_DOCUMENT_ROOT/custom/digiriskdolibarr/documents/doctemplates/ticketdocument/', '', 0, 'current'],
@@ -812,9 +811,6 @@ class modDigiriskdolibarr extends DolibarrModules
 			$i++ => ['MAIN_ODT_AS_PDF', 'chaine', 'libreoffice', '', 0, 'current'],
 			$i++ => ['MAIN_USE_EXIF_ROTATION', 'integer', 1, '', 0, 'current'],
 			$i++ => ['MAIN_EXTRAFIELDS_USE_SELECT2', 'integer', 1, '', 0, 'current'],
-
-			// MENU
-			$i++ => ['DIGIRISKDOLIBARR_DIGIRISKSTANDARD_MENU_UPDATED', 'integer', 0, '', 0, 'current'],
 
 			// CONST TOOLS
 			$i++ => ['DIGIRISKDOLIBARR_TOOLS_ADVANCED_IMPORT', 'integer', 0, '', 0, 'current'],
@@ -838,7 +834,7 @@ class modDigiriskdolibarr extends DolibarrModules
 			$i++ => ['DIGIRISKDOLIBARR_MANUAL_PDF_GENERATION', 'integer', 0, '', 0, 'current'],
 
 			// CONST ACCIDENT INVESTIGATION
-			$i++ => ['DIGIRISKDOLIBARR_ACCIDENTINVESTIGATION_ADDON', 'chaine', 'mod_accident_investigation_standard', '', 0, 'current'],
+			$i++ => ['DIGIRISKDOLIBARR_ACCIDENTINVESTIGATION_ADDON', 'chaine', 'mod_accidentinvestigation_standard', '', 0, 'current'],
 			$i++ => ['DIGIRISKDOLIBARR_MAIN_AGENDA_ACTIONAUTO_ACCIDENTINVESTIGATION_CREATE', 'integer', 1, '', 0, 'current'],
 			$i++ => ['DIGIRISKDOLIBARR_MAIN_AGENDA_ACTIONAUTO_ACCIDENTINVESTIGATION_MODIFY', 'integer', 1, '', 0, 'current'],
 			$i++ => ['DIGIRISKDOLIBARR_MAIN_AGENDA_ACTIONAUTO_ACCIDENTINVESTIGATION_DELETE', 'integer', 1, '', 0, 'current'],
@@ -871,105 +867,112 @@ class modDigiriskdolibarr extends DolibarrModules
 		$this->tabs[] = ['data' => 'user:+participation:'. $pictoDigirisk .$langs->trans('GP/UTParticipation').':digiriskdolibarr@digiriskdolibarr:1:/custom/digiriskdolibarr/view/digiriskelement/digiriskelement_evaluator.php?fromid=__ID__']; // To add a new tab identified by code tabname1
 		$this->tabs[] = ['data' => 'user:+accidents:'. $pictoDigirisk .$langs->trans('Accidents').':digiriskdolibarr@digiriskdolibarr:1:/custom/digiriskdolibarr/view/accident/accident_list.php?fromiduser=__ID__']; // To add a new tab identified by code tabname1
 
-		// To remove an existing tab identified by code tabname
-		// Dictionaries
-		$this->dictionaries = [
-			'langs' => 'digiriskdolibarr@digiriskdolibarr',
-			// List of tables we want to see into dictonnary editor
-			'tabname' => [
-				MAIN_DB_PREFIX . "c_conventions_collectives",
-				MAIN_DB_PREFIX . "c_relative_location",
-				MAIN_DB_PREFIX . "c_lesion_localization",
-				MAIN_DB_PREFIX . "c_lesion_nature",
-				MAIN_DB_PREFIX . "c_digiriskdolibarr_action_trigger",
-				MAIN_DB_PREFIX . "c_accidentinvestigation_attendants_role",
-				MAIN_DB_PREFIX . "c_preventionplan_attendant_role"
-			],
-
-			// Label of tables
-			'tablib' => [
-				"CollectiveAgreement",
-				"RelativeLocation",
-				"LesionLocalization",
-				"LesionNature",
-				"DigiriskDolibarrActionTrigger",
-				"AccidentInvestigation",
-				"PreventionPlanRole"
-			],
-			// Request to select fields
-			'tabsql' => [
-				'SELECT f.rowid as rowid, f.code, f.libelle, f.active FROM ' . MAIN_DB_PREFIX . 'c_conventions_collectives as f',
-				'SELECT f.rowid as rowid, f.ref, f.label, f.description, f.position, f.active FROM ' . MAIN_DB_PREFIX . 'c_relative_location as f',
-				'SELECT f.rowid as rowid, f.ref, f.label, f.description, f.position, f.active FROM ' . MAIN_DB_PREFIX . 'c_lesion_localization as f',
-				'SELECT f.rowid as rowid, f.ref, f.label, f.description, f.position, f.active FROM ' . MAIN_DB_PREFIX . 'c_lesion_nature as f',
-				'SELECT f.rowid as rowid, f.ref, f.label, f.description, f.position, f.active FROM ' . MAIN_DB_PREFIX . 'c_digiriskdolibarr_action_trigger as f',
-				'SELECT f.rowid as rowid, f.ref, f.label, f.description, f.position, f.active FROM ' . MAIN_DB_PREFIX . 'c_accidentinvestigation_attendants_role as f',
-				'SELECT f.rowid as rowid, f.ref, f.label, f.description, f.active FROM ' . MAIN_DB_PREFIX . 'c_lesion_nature as f'
-			],
-
-			// Sort order
-			'tabsqlsort' => [
-				"code ASC",
-				"label ASC",
-				"label ASC",
-				"label ASC",
-				"ref ASC",
-				"label ASC",
-				'position ASC'
-			],
-
-			// List of fields (result of select to show dictionary)
-			'tabfield' => [
-				"code,libelle",
-				"ref,label,description",
-				"ref,label,description",
-				"ref,label,description",
-				"ref,label,description",
-				"ref,label,description",
-				"ref,label,description"
-			],
-			// List of fields (list of fields to edit a record)
-			'tabfieldvalue' => [
-				"code,libelle",
-				"ref,label,description",
-				"ref,label,description",
-				"ref,label,description",
-				"ref,label,description",
-				"ref,label,description",
-				'ref,label,description,position'
-			],
-			// List of fields (list of fields for insert)
-			'tabfieldinsert' => [
-				"code,libelle",
-				"ref,label,description",
-				"ref,label,description",
-				"ref,label,description",
-				"ref,label,description",
-				"ref,label,description",
-				'ref,label,description,position'
-			],
-
-			// Name of columns with primary key (try to always name it 'rowid')
-			'tabrowid' => [
-				"rowid",
-				"rowid",
-				"rowid",
-				"rowid",
-				"rowid",
-				"rowid",
-				"rowid"
-			],
-			// Condition to show each dictionary
-			'tabcond' => [
-				$conf->digiriskdolibarr->enabled,
-				$conf->digiriskdolibarr->enabled,
-				$conf->digiriskdolibarr->enabled,
-				$conf->digiriskdolibarr->enabled,
-				$conf->digiriskdolibarr->enabled,
-				$conf->digiriskdolibarr->enabled,
-				$conf->digiriskdolibarr->enabled
-			]
-		];
+        // Dictionaries
+        $this->dictionaries = [
+            'langs' => 'digiriskdolibarr@digiriskdolibarr',
+            // List of tables we want to see into dictionary editor
+            'tabname' => [
+                MAIN_DB_PREFIX . 'c_conventions_collectives',
+                MAIN_DB_PREFIX . 'c_relative_location',
+                MAIN_DB_PREFIX . 'c_lesion_localization',
+                MAIN_DB_PREFIX . 'c_lesion_nature',
+                MAIN_DB_PREFIX . 'c_digiriskdolibarr_action_trigger',
+                MAIN_DB_PREFIX . 'c_accidentinvestigation_attendants_role',
+                MAIN_DB_PREFIX . 'c_preventionplan_attendants_role',
+                MAIN_DB_PREFIX . 'c_firepermit_attendants_role'
+            ],
+            // Label of tables
+            'tablib' => [
+                'CollectiveAgreement',
+                'RelativeLocation',
+                'LesionLocalization',
+                'LesionNature',
+                'DigiriskDolibarrActionTrigger',
+                'AccidentInvestigationRole',
+                'PreventionPlanRole',
+                'FirePermitRole'
+            ],
+            // Request to select fields
+            'tabsql' => [
+                'SELECT f.rowid as rowid, f.code, f.libelle, f.active FROM ' . MAIN_DB_PREFIX . 'c_conventions_collectives as f',
+                'SELECT f.rowid as rowid, f.ref, f.label, f.description, f.position, f.active FROM ' . MAIN_DB_PREFIX . 'c_relative_location as f',
+                'SELECT f.rowid as rowid, f.ref, f.label, f.description, f.position, f.active FROM ' . MAIN_DB_PREFIX . 'c_lesion_localization as f',
+                'SELECT f.rowid as rowid, f.ref, f.label, f.description, f.position, f.active FROM ' . MAIN_DB_PREFIX . 'c_lesion_nature as f',
+                'SELECT f.rowid as rowid, f.elementtype, f.ref, f.label, f.description, f.position, f.active FROM ' . MAIN_DB_PREFIX . 'c_digiriskdolibarr_action_trigger as f',
+                'SELECT f.rowid as rowid, f.ref, f.label, f.description, f.position, f.active FROM ' . MAIN_DB_PREFIX . 'c_accidentinvestigation_attendants_role as f',
+                'SELECT f.rowid as rowid, f.ref, f.label, f.description, f.position, f.active FROM ' . MAIN_DB_PREFIX . 'c_preventionplan_attendants_role as f',
+                'SELECT f.rowid as rowid, f.ref, f.label, f.description, f.position, f.active FROM ' . MAIN_DB_PREFIX . 'c_firepermit_attendants_role as f'
+            ],
+            // Sort order
+            'tabsqlsort' => [
+                'code ASC',
+                'position ASC',
+                'position ASC',
+                'position ASC',
+                'position ASC',
+                'position ASC',
+                'position ASC',
+                'position ASC'
+            ],
+            // List of fields (result of select to show dictionary)
+            'tabfield' => [
+                'code,libelle',
+                'ref,label,description,position',
+                'ref,label,description,position',
+                'ref,label,description,position',
+                'elementtype,ref,label,description,position',
+                'ref,label,description,position',
+                'ref,label,description,position',
+                'ref,label,description,position',
+                'ref,label,description,position'
+            ],
+            // List of fields (list of fields to edit a record)
+            'tabfieldvalue' => [
+                'code,libelle',
+                'ref,label,description,position',
+                'ref,label,description,position',
+                'ref,label,description,position',
+                'elementtype,ref,label,description,position',
+                'ref,label,description,position',
+                'ref,label,description,position',
+                'ref,label,description,position',
+                'ref,label,description,position'
+            ],
+            // List of fields (list of fields for insert)
+            'tabfieldinsert' => [
+                'code,libelle',
+                'ref,label,description,position',
+                'ref,label,description,position',
+                'ref,label,description,position',
+                'elementtype,ref,label,description,position',
+                'ref,label,description,position',
+                'ref,label,description,position',
+                'ref,label,description,position',
+                'ref,label,description,position'
+            ],
+            // Name of columns with primary key (try to always name it 'rowid')
+            'tabrowid' => [
+                'rowid',
+                'rowid',
+                'rowid',
+                'rowid',
+                'rowid',
+                'rowid',
+                'rowid',
+                'rowid'
+            ],
+            // Condition to show each dictionary
+            'tabcond' => [
+                $conf->digiriskdolibarr->enabled,
+                $conf->digiriskdolibarr->enabled,
+                $conf->digiriskdolibarr->enabled,
+                $conf->digiriskdolibarr->enabled,
+                $conf->digiriskdolibarr->enabled,
+                $conf->digiriskdolibarr->enabled,
+                $conf->digiriskdolibarr->enabled,
+                $conf->digiriskdolibarr->enabled
+            ]
+        ];
 
 		// Boxes/Widgets
 		$this->boxes = [
@@ -1283,7 +1286,7 @@ class modDigiriskdolibarr extends DolibarrModules
 			'prefix'   => '<i class="fas fa-exclamation-triangle pictofixedwidth"></i>',
 			'mainmenu' => 'digiriskdolibarr',
 			'leftmenu' => 'digiriskstandard',
-			'url'      => '/digiriskdolibarr/view/digiriskstandard/digiriskstandard_card.php?id=' . $conf->global->DIGIRISKDOLIBARR_ACTIVE_STANDARD,
+			'url'      => '/digiriskdolibarr/view/digiriskstandard/digiriskstandard_card.php',
 			'langs'    => 'digiriskdolibarr@digiriskdolibarr',	        // Lang file to use (without .lang) by module. File must be in langs/code_CODE/ directory.
 			'position' => 100 + $r,
 			'enabled'  => '$conf->digiriskdolibarr->enabled',  // Define condition to show or hide menu entry. Use '$conf->digiriskdolibarr->enabled' if entry must be visible if module is enabled. Use '$leftmenu==\'system\'' to show if leftmenu system is selected.
@@ -1885,6 +1888,8 @@ class modDigiriskdolibarr extends DolibarrModules
 		$extra_fields->addExtraField('fk_firepermit', $langs->transnoentities("FirePermitLinked"), 'sellist', 1030, '', 'projet_task', 0, 0, '', 'a:1:{s:7:"options";a:1:{s:56:"digiriskdolibarr_firepermit:ref:rowid::entity = $ENTITY$";N;}}', '', '', 1);
 		$extra_fields->update('fk_accident', $langs->transnoentities("AccidentLinked"), 'sellist', '', 'projet_task', 0, 0, 1040, 'a:1:{s:7:"options";a:1:{s:54:"digiriskdolibarr_accident:ref:rowid::entity = $ENTITY$";N;}}', '', '', 1);
 		$extra_fields->addExtraField('fk_accident', $langs->transnoentities("AccidentLinked"), 'sellist', 1040, '', 'projet_task', 0, 0, '', 'a:1:{s:7:"options";a:1:{s:54:"digiriskdolibarr_accident:ref:rowid::entity = $ENTITY$";N;}}', '', '', 1);
+        $extra_fields->update('fk_accidentinvestigation', $langs->transnoentities("AccidentInvestigationLinked"), 'sellist', '', 'projet_task', 0, 0, 1050, 'a:1:{s:7:"options";a:1:{s:68:"digiriskdolibarr_acciden_investigationt:ref:rowid::entity = $ENTITY$";N;}}', '', '', 1);
+        $extra_fields->addExtraField('fk_accidentinvestigation', $langs->transnoentities("AccidentInvestigationLinked"), 'sellist', 1050, '', 'projet_task', 0, 0, '', 'a:1:{s:7:"options";a:1:{s:68:"digiriskdolibarr_acciden_investigationt:ref:rowid::entity = $ENTITY$";N;}}', '', '', 1);
 
 		if (!$conf->global->DIGIRISKDOLIBARR_TICKET_EXTRAFIELDS_BACKWARD_COMPATIBILITY && (dolibarr_get_const($this->db, 'DIGIRISKDOLIBARR_TICKET_EXTRAFIELDS', 0) || dolibarr_get_const($this->db, 'DIGIRISKDOLIBARR_TICKET_EXTRAFIELDS', $conf->entity))) {
 			if ($conf->multicompany->enabled) {

@@ -182,21 +182,23 @@ $form      = new Form($db);
 $formother = new FormOther($db);
 
 $title    = $langs->trans("AccidentList");
-$help_url = 'FR:Module_Digirisk#DigiRisk_-_Accident_b.C3.A9nins_et_presque_accidents';
-
-saturne_header(0, '', $title, $help_url);
+$helpUrl = 'FR:Module_Digirisk#DigiRisk_-_Accident_b.C3.A9nins_et_presque_accidents';
 
 if ($fromid > 0) {
-	$objectlinked = $digiriskelement;
+    digirisk_header($title, $helpUrl);
+    $objectlinked = $digiriskelement;
 	$objectlinked->fetch($fromid);
     saturne_get_fiche_head($objectlinked,'elementAccidents', $langs->trans('Accident'));
-} elseif ($fromiduser > 0) {
-	$userObject = new User($db);
-	$userObject->fetch($fromiduser, '', '', 1);
-	$userObject->getrights();
-    saturne_get_fiche_head($userObject, 'accidents', $langs->trans('Accidents'));
-} elseif ($accident->id > 0) {
-    saturne_get_fiche_head($object,'elementAccidents', $langs->trans('Accident'));
+} else {
+    saturne_header(0, '', $title, $helpUrl);
+    if ($fromiduser > 0) {
+        $userObject = new User($db);
+        $userObject->fetch($fromiduser, '', '', 1);
+        $userObject->getrights();
+        saturne_get_fiche_head($userObject, 'accidents', $langs->trans('Accidents'));
+    } elseif ($accident->id > 0) {
+        saturne_get_fiche_head($object,'elementAccidents', $langs->trans('Accident'));
+    }
 }
 
 // Object card
@@ -361,9 +363,13 @@ print '<div class="div-table-responsive">';
 print '<table class="tagtable nobottomiftotal liste' . ($moreforfilter ? " listwithfilterbefore" : "") . '">' . "\n";
 print '<tr class="liste_titre">';
 
+// We manually add progress field here because it is a redundant information that doesn't need to be stored in db
+$accident->fields['progress'] = ['type' => 'integer:', 'label' => 'Progress', 'enabled' => '1', 'position' => 70, 'notnull' => 0, 'visible' => 2, 'index' => 0,];
+$arrayfields['t.progress']    = ['label' => 'Progress', 'checked' => 1, 'enabled' => 0, 'position' => 70, 'disablesort' => 1];
+
 foreach ($accident->fields as $key => $val) {
 	$cssforfield                        = (empty($val['css']) ? '' : $val['css']);
-	if ($key == 'status') $cssforfield .= ($cssforfield ? ' ' : '') . 'center';
+    if ($key == 'status') $cssforfield .= ($cssforfield ? ' ' : '') . 'center';
 	if ( ! empty($arrayfields['t.' . $key]['checked'])) {
 		print '<td class="liste_titre' . ($cssforfield ? ' ' . $cssforfield : '') . '">';
 
@@ -398,8 +404,11 @@ print '</tr>' . "\n";
 print '<tr class="liste_titre">';
 
 foreach ($accident->fields as $key => $val) {
-	$cssforfield                        = (empty($val['css']) ? '' : $val['css']);
-	if ($key == 'status') $cssforfield .= ($cssforfield ? ' ' : '') . 'center';
+    $disablesort = !empty($arrayfields['t.' . $key]['disablesort']);
+	$cssforfield = (empty($val['css']) ? '' : $val['css']);
+	if ($key == 'status') {
+        $cssforfield .= ($cssforfield ? ' ' : '') . 'center';
+    }
 	if ( ! empty($arrayfields['t.' . $key]['checked'])) {
 		print getTitleFieldOfList($arrayfields['t.' . $key]['label'], 0, $_SERVER['PHP_SELF'], 't.' . $key, '', $param, ($cssforfield ? 'class="' . $cssforfield . '"' : ''), $sortfield, $sortorder, ($cssforfield ? $cssforfield . ' ' : ''), $disablesort) . "\n";
 	}
@@ -443,11 +452,14 @@ while ($i < ($limit ? min($num, $limit) : $num)) {
 	foreach ($accident->fields as $key => $val) {
 		$cssforfield                                 = (empty($val['css']) ? '' : $val['css']);
 		if ($key == 'status') $cssforfield          .= ($cssforfield ? ' ' : '') . 'center';
-		elseif ($key == 'ref') $cssforfield         .= ($cssforfield ? ' ' : '') . 'nowrap';
+        elseif ($key == 'progress') $cssforfield    .= ($cssforfield ? ' ' : '') . 'center';
+        elseif ($key == 'ref') $cssforfield         .= ($cssforfield ? ' ' : '') . 'nowrap';
 		elseif ($key == 'description') $cssforfield .= ($cssforfield ? ' ' : '') . 'accidentdocument-description';
-		if ( ! empty($arrayfields['t.' . $key]['checked'])) {
+
+        if (!empty($arrayfields['t.' . $key]['checked'])) {
 			print '<td' . ($cssforfield ? ' class="' . $cssforfield . '"' : '') . ' style="width:2%">';
-			if ($key == 'status') {
+
+			if ($key == 'progress') {
 				$counter = 0;
 				$kCounter++;
 
@@ -489,7 +501,9 @@ while ($i < ($limit ? min($num, $limit) : $num)) {
 					<div class="progress-bar progress-bar-consumed" style="width:  <?php echo $advancement ?>%; background-color: forestgreen" title="0%"></div>
 				</div>
 				<?php
-			} elseif ($key == 'ref') {
+			} else if ($key == 'status') {
+                print $accident->getLibStatut(5);
+            } elseif ($key == 'ref') {
 				print '<i class="fas fa-user-injured"></i>  ' . $accident->getNomUrl();
 			} elseif ($key == 'fk_user_employer') {
 				$usertmp->fetch($accident->fk_user_employer);
@@ -535,7 +549,7 @@ while ($i < ($limit ? min($num, $limit) : $num)) {
 				if ( ! $i) $totalarray['pos'][$totalarray['nbfield']] = 't.' . $key;
 				$totalarray['val']['t.' . $key]                      += $accident->$key;
 			}
-		}
+        }
 	}
 	// Action column
 	print '<td class="nowrap center">';

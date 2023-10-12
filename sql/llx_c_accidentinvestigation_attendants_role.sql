@@ -1,4 +1,4 @@
--- Copyright (C) 2022 EOXIA <dev@eoxia.com>
+-- Copyright (C) 2021-2023 EVARISK <technique@evarisk.com>
 --
 -- This program is free software: you can redistribute it and/or modify
 -- it under the terms of the GNU General Public License as published by
@@ -13,5 +13,12 @@
 -- You should have received a copy of the GNU General Public License
 -- along with this program.  If not, see https://www.gnu.org/licenses/.
 
-ALTER TABLE llx_c_digiriskdolibarr_action_trigger ADD UNIQUE INDEX uk_action_trigger_ref (ref);
-ALTER TABLE llx_c_digiriskdolibarr_action_trigger ADD INDEX idx_action_trigger_rang (position);
+CREATE TABLE llx_c_accidentinvestigation_attendants_role(
+  rowid       integer AUTO_INCREMENT PRIMARY KEY NOT NULL,
+  entity      integer default 1,
+  ref         varchar(128),
+  label       varchar(255),
+  description text,
+  active      tinyint(4) DEFAULT 1,
+  position    integer DEFAULT 0
+) ENGINE=innodb;

@@ -37,7 +37,6 @@ require_once DOL_DOCUMENT_ROOT . '/projet/class/project.class.php';
 require_once __DIR__ . '/../../class/accident.class.php';
 require_once __DIR__ . '/../../lib/digiriskdolibarr_function.lib.php';
 require_once __DIR__ . '/../../lib/digiriskdolibarr_accident.lib.php';
-require_once __DIR__ . '/../../core/modules/digiriskdolibarr/digiriskelement/accidentlesion/mod_accident_lesion_standard.php';
 
 global $conf, $db, $hookmanager, $langs, $user;
 
@@ -77,7 +76,7 @@ $permissiontoread   = $user->rights->digiriskdolibarr->accident->read;
 $permissiontoadd    = $user->rights->digiriskdolibarr->accident->write;
 $permissiontodelete = $user->rights->digiriskdolibarr->accident->delete;
 
-saturne_check_access($permissiontoread);
+saturne_check_access($permissiontoread, $object);
 
 /*
  * Actions
