@@ -227,8 +227,11 @@ class PreventionPlan extends SaturneObject
             }
 
             if (!empty($options['preventionplan_risk'])) {
-                if (is_array($object->lines) && !empty($object->lines)) {
-                    foreach ($object->lines as $line) {
+                $preventionplandet  = new PreventionPlanLine($this->db);
+                $preventionplandets = $preventionplandet->fetchAll('', '', 0, 0, ['fk_preventionplan' => $fromID]);
+
+                if (is_array($preventionplandets) && !empty($preventionplandets)) {
+                    foreach ($preventionplandets as $line) {
                         $line->ref               = $refPreventionPlanDetMod->getNextValue($line);
                         $line->fk_preventionplan = $preventionPlanID;
                         $line->create($user, 1);

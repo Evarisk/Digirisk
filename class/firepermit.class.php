@@ -224,8 +224,11 @@ class FirePermit extends SaturneObject
             }
 
             if (!empty($options['firepermit_risk'])) {
-                if (is_array($object->lines) && !empty($object->lines)) {
-                    foreach ($object->lines as $line) {
+                $firepermitdet  = new PreventionPlanLine($this->db);
+                $firepermitdets = $firepermitdet->fetchAll('', '', 0, 0, ['fk_firepermit' => $fromID]);
+
+                if (is_array($firepermitdets) && !empty($firepermitdets)) {
+                    foreach ($firepermitdets as $line) {
                         $line->ref           = $refFirePermitDetMod->getNextValue($line);
                         $line->fk_firepermit = $firePermitID;
                         $line->create($user, 1);
