@@ -48,7 +48,7 @@ $searchEvent = GETPOST('search_event', 'alpha');
 $backtopage  = GETPOST('backtopage', 'alpha');
 
 // Get list of triggers available
-$triggers = saturne_fetch_dictionary('c_digiriskdolibarr_action_trigger', 'ASC', 't.rowid');
+$triggers = saturne_fetch_dictionary('c_digiriskdolibarr_action_trigger');
 
 /*
  *	Actions
@@ -135,7 +135,7 @@ print '</table>';
 print load_fiche_titre($langs->trans('ConfEventAuto'), '', '');
 
 print '<span class="opacitymedium">'.$langs->trans("DigiriskEventAutoDesc").'</span><br>';
-print "<br>\n";
+print '<br>';
 
 print '<div class="div-table-responsive">';
 print '<table class="noborder centpercent">';
@@ -148,15 +148,11 @@ $searchpicto = $form->showFilterButtons();
 print $searchpicto;
 print '</td>';
 print '</tr>';
-print '</tr>'.'\n';
-
-$param = '';
-$param .= '&search_event='.urlencode($searchEvent);
 
 print '<tr class="liste_titre">';
 print '<th class="liste_titre" colspan="2">'.$langs->trans("DigiriskActionsEvents").'</th>';
-print '<th class="liste_titre"><a href="'.$_SERVER["PHP_SELF"].'?action=selectall'.($param ? $param : '').'">'.$langs->trans("All").'</a>/<a href="'.$_SERVER["PHP_SELF"].'?action=selectnone'.($param ? $param : '').'">'.$langs->trans("None").'</a></th>';
-print '</tr>'.'\n';
+print '<th class="liste_titre"><a href="'.$_SERVER["PHP_SELF"].'?action=selectall&search_event='. urlencode($searchEvent) . '">'.$langs->trans("All").'</a>/<a href="'.$_SERVER["PHP_SELF"].'?action=selectnone'.($param ? $param : '').'">'.$langs->trans("None").'</a></th>';
+print '</tr>';
 
 // Show each trigger (list is in c_digiriskdolibarr_action_trigger)
 if (!empty($triggers)) {

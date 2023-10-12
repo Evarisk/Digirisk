@@ -490,4 +490,38 @@ class DigiriskElement extends SaturneObject
 
         return [$morehtmlref, $moreParams];
     }
+
+    /**
+     * Write information of trigger description
+     *
+     * @param  Object $object Object calling the trigger
+     * @return string         Description to display in actioncomm->note_private
+     */
+    public function getTriggerDescription(SaturneObject $object): string
+    {
+        global $conf, $langs;
+
+        require_once __DIR__ . '/digiriskstandard.class.php';
+        require_once __DIR__ . '/../../saturne/class/task/saturnetask.class.php';
+
+        $digiriskStandard = new DigiriskStandard($this->db);
+        $digiriskStandard->fetch($object->fk_standard);
+
+        $ret = parent::getTriggerDescription($object);
+
+        if (!empty($object->fk_parent)) {
+            require_once __DIR__ . '/digiriskelement.class.php';
+            $digiriskElement = new DigiriskElement($this->db);
+            $digiriskElement->fetch($object->fk_parent);
+            $ret .= $langs->trans('ParentElement') . ' : ' .  $digiriskElement->ref . ' - ' . $digiriskElement->label . '<br/>';
+        }
+
+        $ret .= $langs->trans('Standard') . ' : ' . $digiriskStandard->ref . ' - ' . $conf->global->MAIN_INFO_SOCIETE_NOM . '<br/>';
+        $ret .= $langs->trans('Photo') . ' : ' . (!empty($object->photo) ? $object->photo : 'N/A') . '<br>';
+        $ret .= $langs->trans('ElementType') . ' : ' . $langs->trans($object->element_type) . '<br>';
+        ($object->ranks != 0 ? $ret .= $langs->trans('Order') . ' : ' . $object->ranks . '<br>' : '');
+        $ret .= $langs->trans('ShowInSelectOnPublicTicketInterface') . ' : ' . ($object->show_in_selector ? $langs->trans('Yes') : $langs->trans('No')) . '<br>';
+
+        return $ret;
+    }
 }

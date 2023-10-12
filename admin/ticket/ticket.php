@@ -361,122 +361,124 @@ if ($conf->global->DIGIRISKDOLIBARR_TICKET_ENABLE_PUBLIC_INTERFACE == 1) {
 	print '</tr>';
 	print '</form>';
 
-	print load_fiche_titre($langs->transnoentities("PublicInterfaceConfiguration"), '', '');
+    if (getDolGlobalInt('DIGIRISKDOLIBARR_TICKET_EXTRAFIELDS') > 0) {
+        print load_fiche_titre($langs->transnoentities("PublicInterfaceConfiguration"), '', '');
 
-	print '<div class="div-table-responsive-no-min">';
-	print '<table class="noborder centpercent">';
-	print '<tr class="liste_titre">';
-	print '<td>' . $langs->transnoentities("Parameters") . '</td>';
-	print '<td class="center">' . $langs->transnoentities("Visible") . '</td>';
-	print '<td class="center">' . $langs->transnoentities("Required") . '</td>';
-	print '<td class="center">' . $langs->transnoentities("ShortInfo") . '</td>';
-	print '</tr>';
+        print '<div class="div-table-responsive-no-min">';
+        print '<table class="noborder centpercent">';
+        print '<tr class="liste_titre">';
+        print '<td>' . $langs->transnoentities("Parameters") . '</td>';
+        print '<td class="center">' . $langs->transnoentities("Visible") . '</td>';
+        print '<td class="center">' . $langs->transnoentities("Required") . '</td>';
+        print '<td class="center">' . $langs->transnoentities("ShortInfo") . '</td>';
+        print '</tr>';
 
-	// Photo visible
-	print '<tr class="oddeven"><td>' . $langs->transnoentities("TicketPhotoVisible") . '</td>';
-	print '<td class="center">';
-	print ajax_constantonoff('DIGIRISKDOLIBARR_TICKET_PHOTO_VISIBLE');
-	print '</td>';
-	print '<td class="center">';
-	print '';
-	print '</td>';
-	print '<td class="center">';
-	print $form->textwithpicto('', $langs->transnoentities("TicketPhotoVisibleHelp"));
-	print '</td>';
-	print '</tr>';
+        // Photo visible
+        print '<tr class="oddeven"><td>' . $langs->transnoentities("TicketPhotoVisible") . '</td>';
+        print '<td class="center">';
+        print ajax_constantonoff('DIGIRISKDOLIBARR_TICKET_PHOTO_VISIBLE');
+        print '</td>';
+        print '<td class="center">';
+        print '';
+        print '</td>';
+        print '<td class="center">';
+        print $form->textwithpicto('', $langs->transnoentities("TicketPhotoVisibleHelp"));
+        print '</td>';
+        print '</tr>';
 
-	// GP/UT Visible and Required
-	print '<tr class="oddeven"><td>' . $langs->transnoentities("TicketDigiriskElementVisible") . '</td>';
-	print '<td class="center">';
-	print ajax_constantonoff('DIGIRISKDOLIBARR_TICKET_DIGIRISKELEMENT_VISIBLE');
-	print '</td>';
-	print '<td class="center">';
-	print ajax_constantonoff('DIGIRISKDOLIBARR_TICKET_DIGIRISKELEMENT_REQUIRED');
-	print '</td>';
-	print '<td class="center">';
-	print $form->textwithpicto('', $langs->transnoentities("TicketDigiriskElementVisibleHelp"));
-	print '</td>';
-	print '</tr>';
+        // GP/UT Visible and Required
+        print '<tr class="oddeven"><td>' . $langs->transnoentities("TicketDigiriskElementVisible") . '</td>';
+        print '<td class="center">';
+        print ajax_constantonoff('DIGIRISKDOLIBARR_TICKET_DIGIRISKELEMENT_VISIBLE');
+        print '</td>';
+        print '<td class="center">';
+        print ajax_constantonoff('DIGIRISKDOLIBARR_TICKET_DIGIRISKELEMENT_REQUIRED');
+        print '</td>';
+        print '<td class="center">';
+        print $form->textwithpicto('', $langs->transnoentities("TicketDigiriskElementVisibleHelp"));
+        print '</td>';
+        print '</tr>';
 
-	// Email Visible and Required
-	print '<tr class="oddeven"><td>' . $langs->transnoentities("TicketEmailVisible") . '</td>';
-	print '<td class="center">';
-	print ajax_constantonoff('DIGIRISKDOLIBARR_TICKET_EMAIL_VISIBLE');
-	print '</td>';
-	print '<td class="center">';
-	print ajax_constantonoff('DIGIRISKDOLIBARR_TICKET_EMAIL_REQUIRED');
-	print '</td>';
-	print '<td class="center">';
-	print $form->textwithpicto('', $langs->transnoentities("TicketEmailVisibleHelp"));
-	print '</td>';
-	print '</tr>';
+        // Email Visible and Required
+        print '<tr class="oddeven"><td>' . $langs->transnoentities("TicketEmailVisible") . '</td>';
+        print '<td class="center">';
+        print ajax_constantonoff('DIGIRISKDOLIBARR_TICKET_EMAIL_VISIBLE');
+        print '</td>';
+        print '<td class="center">';
+        print ajax_constantonoff('DIGIRISKDOLIBARR_TICKET_EMAIL_REQUIRED');
+        print '</td>';
+        print '<td class="center">';
+        print $form->textwithpicto('', $langs->transnoentities("TicketEmailVisibleHelp"));
+        print '</td>';
+        print '</tr>';
 
-	// Firstname Visible and Required
-	print '<tr class="oddeven"><td>' . $langs->transnoentities("TicketFirstNameVisible") . '</td>';
-	print '<td class="center">';
-	print ajax_constantonoff('DIGIRISKDOLIBARR_TICKET_FIRSTNAME_VISIBLE');
-	print '</td>';
-	print '<td class="center">';
-	print ajax_constantonoff('DIGIRISKDOLIBARR_TICKET_FIRSTNAME_REQUIRED');
-	print '</td>';
-	print '<td class="center">';
-	print $form->textwithpicto('', $langs->transnoentities("TicketFirstNameVisibleHelp"));
-	print '</td>';
-	print '</tr>';
+        // Firstname Visible and Required
+        print '<tr class="oddeven"><td>' . $langs->transnoentities("TicketFirstNameVisible") . '</td>';
+        print '<td class="center">';
+        print ajax_constantonoff('DIGIRISKDOLIBARR_TICKET_FIRSTNAME_VISIBLE');
+        print '</td>';
+        print '<td class="center">';
+        print ajax_constantonoff('DIGIRISKDOLIBARR_TICKET_FIRSTNAME_REQUIRED');
+        print '</td>';
+        print '<td class="center">';
+        print $form->textwithpicto('', $langs->transnoentities("TicketFirstNameVisibleHelp"));
+        print '</td>';
+        print '</tr>';
 
-	// Lastname Visible and Required
-	print '<tr class="oddeven"><td>' . $langs->transnoentities("TicketLastNameVisible") . '</td>';
-	print '<td class="center">';
-	print ajax_constantonoff('DIGIRISKDOLIBARR_TICKET_LASTNAME_VISIBLE');
-	print '</td>';
-	print '<td class="center">';
-	print ajax_constantonoff('DIGIRISKDOLIBARR_TICKET_LASTNAME_REQUIRED');
-	print '</td>';
-	print '<td class="center">';
-	print $form->textwithpicto('', $langs->transnoentities("TicketLastNameVisibleHelp"));
-	print '</td>';
-	print '</tr>';
+        // Lastname Visible and Required
+        print '<tr class="oddeven"><td>' . $langs->transnoentities("TicketLastNameVisible") . '</td>';
+        print '<td class="center">';
+        print ajax_constantonoff('DIGIRISKDOLIBARR_TICKET_LASTNAME_VISIBLE');
+        print '</td>';
+        print '<td class="center">';
+        print ajax_constantonoff('DIGIRISKDOLIBARR_TICKET_LASTNAME_REQUIRED');
+        print '</td>';
+        print '<td class="center">';
+        print $form->textwithpicto('', $langs->transnoentities("TicketLastNameVisibleHelp"));
+        print '</td>';
+        print '</tr>';
 
-	// Phone Visible and Required
-	print '<tr class="oddeven"><td>' . $langs->transnoentities("TicketPhoneVisible") . '</td>';
-	print '<td class="center">';
-	print ajax_constantonoff('DIGIRISKDOLIBARR_TICKET_PHONE_VISIBLE');
-	print '</td>';
-	print '<td class="center">';
-	print ajax_constantonoff('DIGIRISKDOLIBARR_TICKET_PHONE_REQUIRED');
-	print '</td>';
-	print '<td class="center">';
-	print $form->textwithpicto('', $langs->transnoentities("TicketPhoneVisibleHelp"));
-	print '</td>';
-	print '</tr>';
+        // Phone Visible and Required
+        print '<tr class="oddeven"><td>' . $langs->transnoentities("TicketPhoneVisible") . '</td>';
+        print '<td class="center">';
+        print ajax_constantonoff('DIGIRISKDOLIBARR_TICKET_PHONE_VISIBLE');
+        print '</td>';
+        print '<td class="center">';
+        print ajax_constantonoff('DIGIRISKDOLIBARR_TICKET_PHONE_REQUIRED');
+        print '</td>';
+        print '<td class="center">';
+        print $form->textwithpicto('', $langs->transnoentities("TicketPhoneVisibleHelp"));
+        print '</td>';
+        print '</tr>';
 
-	// Location Visible and Required
-	print '<tr class="oddeven"><td>' . $langs->transnoentities("TicketLocationVisible") . '</td>';
-	print '<td class="center">';
-	print ajax_constantonoff('DIGIRISKDOLIBARR_TICKET_LOCATION_VISIBLE');
-	print '</td>';
-	print '<td class="center">';
-	print ajax_constantonoff('DIGIRISKDOLIBARR_TICKET_LOCATION_REQUIRED');
-	print '</td>';
-	print '<td class="center">';
-	print $form->textwithpicto('', $langs->transnoentities("TicketLocationVisibleHelp"));
-	print '</td>';
-	print '</tr>';
+        // Location Visible and Required
+        print '<tr class="oddeven"><td>' . $langs->transnoentities("TicketLocationVisible") . '</td>';
+        print '<td class="center">';
+        print ajax_constantonoff('DIGIRISKDOLIBARR_TICKET_LOCATION_VISIBLE');
+        print '</td>';
+        print '<td class="center">';
+        print ajax_constantonoff('DIGIRISKDOLIBARR_TICKET_LOCATION_REQUIRED');
+        print '</td>';
+        print '<td class="center">';
+        print $form->textwithpicto('', $langs->transnoentities("TicketLocationVisibleHelp"));
+        print '</td>';
+        print '</tr>';
 
-	// Date Visible and Required
-	print '<tr class="oddeven"><td>' . $langs->transnoentities("TicketDateVisible") . '</td>';
-	print '<td class="center">';
-	print ajax_constantonoff('DIGIRISKDOLIBARR_TICKET_DATE_VISIBLE');
-	print '</td>';
-	print '<td class="center">';
-	print ajax_constantonoff('DIGIRISKDOLIBARR_TICKET_DATE_REQUIRED');
-	print '</td>';
-	print '<td class="center">';
-	print $form->textwithpicto('', $langs->transnoentities("TicketDateVisibleHelp"));
-	print '</td>';
-	print '</tr>';
+        // Date Visible and Required
+        print '<tr class="oddeven"><td>' . $langs->transnoentities("TicketDateVisible") . '</td>';
+        print '<td class="center">';
+        print ajax_constantonoff('DIGIRISKDOLIBARR_TICKET_DATE_VISIBLE');
+        print '</td>';
+        print '<td class="center">';
+        print ajax_constantonoff('DIGIRISKDOLIBARR_TICKET_DATE_REQUIRED');
+        print '</td>';
+        print '<td class="center">';
+        print $form->textwithpicto('', $langs->transnoentities("TicketDateVisibleHelp"));
+        print '</td>';
+        print '</tr>';
 
-	print '</table>';
+        print '</table>';
+    }
 
 	print load_fiche_titre($langs->transnoentities("TicketSuccessMessageData"), '', '');
 

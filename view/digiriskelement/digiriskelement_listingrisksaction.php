@@ -70,7 +70,7 @@ $permissiontoread   = $user->rights->digiriskdolibarr->listingrisksaction->read;
 $permissiontoadd    = $user->rights->digiriskdolibarr->listingrisksaction->write;
 $permissiontodelete = $user->rights->digiriskdolibarr->listingrisksaction->delete;
 
-saturne_check_access($permissiontoread);
+saturne_check_access($permissiontoread, $object);
 
 /*
  * Actions
@@ -83,6 +83,7 @@ if ($reshook < 0) setEventMessages($hookmanager->error, $hookmanager->errors, 'e
 if (empty($reshook)) {
 	$error = 0;
 	if ($object->element == 'digiriskstandard') {
+        $previousRef = $object->ref;
 		$object->ref = '';
 	} else {
         $object->element = 'listingrisksaction';
@@ -97,6 +98,9 @@ if (empty($reshook)) {
 
     if ($object->element == 'listingrisksaction') {
         $object->element = 'digiriskelement';
+    }
+    if ($object->element == 'digiriskstandard') {
+        $object->ref = $previousRef;
     }
 }
 

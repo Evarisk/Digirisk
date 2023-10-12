@@ -70,7 +70,7 @@ $permissiontoread   = $user->rights->digiriskdolibarr->listingrisksphoto->read;
 $permissiontoadd    = $user->rights->digiriskdolibarr->listingrisksphoto->write;
 $permissiontodelete = $user->rights->digiriskdolibarr->listingrisksphoto->delete;
 
-saturne_check_access($permissiontoread);
+saturne_check_access($permissiontoread, $object);
 
 /*
  * Actions
@@ -81,14 +81,14 @@ $reshook    = $hookmanager->executeHooks('doActions', $parameters, $object, $act
 if ($reshook < 0) setEventMessages($hookmanager->error, $hookmanager->errors, 'errors');
 
 if (empty($reshook)) {
-	$error = 0;
+    $error = 0;
     if ($object->element == 'digiriskstandard') {
+        $previousRef = $object->ref;
         $object->ref = '';
     } else {
         $object->element = 'listingrisksphoto';
     }
     $removeDocumentFromName = 1;
-
 
     // Actions builddoc, forcebuilddoc, remove_file.
     require_once __DIR__ . '/../../../saturne/core/tpl/documents/documents_action.tpl.php';
@@ -98,6 +98,9 @@ if (empty($reshook)) {
 
     if ($object->element == 'listingrisksphoto') {
         $object->element = 'digiriskelement';
+    }
+    if ($object->element == 'digiriskstandard') {
+        $object->ref = $previousRef;
     }
 }
 

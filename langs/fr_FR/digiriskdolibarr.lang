@@ -147,6 +147,7 @@ LegalDisplaysMin = Affichages Légaux
 LegalDisplay             = Affichage légal
 HowToSetDataLegalDisplay = Pour configurer les données sur l'affichage légal, aller dans Accueil - Configuration - Société/Organisation - Sécurité
 
+LegalDisplayDocumentGenerated       = Génération de l'affichage légal
 LabourDoctor                        = Médecin du travail
 LabourInspector                     = Inspecteur du travail
 FireBrigade                         = Pompiers
@@ -224,8 +225,9 @@ PreventionPlansMin = plans de prévention
 
 PreventionPlan                                        = Plan de prévention
 Preventionplan                                        = Plan de prévention
-Thepreventionplan                                     = le plan de prévention
+ThePreventionplan                                     = le plan de prévention
 PreventionPlanDocument                                = Plan de prévention
+PreventionPlanDocumentGenerated                       = Génération du plan de prévention
 PreventionPlanList                                    = Liste des plans de prévention
 PreventionPlanLine                                    = risque(s)
 PreventionPlanLineCreated                             = Création de risque dans Plan de Prévention
@@ -246,7 +248,7 @@ ExtSocietyAttendant                                   = Intervenant de l'Entrepr
 ActionsDescription                                    = Description des actions
 INRSRisk                                              = Risque (INRS)
 PreventionMethod                                      = Moyens de prévention
-PreventionPlanSchedule                                = Horaires du plan de prévention
+PreventionplanSchedules                               = Horaires du plan de prévention
 Attendants                                            = Participants
 ModifyPreventionPlan                                  = Modifier le plan de prévention
 ActionsDescriptionTooltip                             = Description des actions réalisées par l'intervenant
@@ -266,6 +268,8 @@ PriorVisitDate                                        = Date de l'inspection com
 AddPreventionPlanLine                                 = Ajout du risque
 UpdatePreventionPlanLine                              = Mise à jour du risque
 DeletePreventionPlanLine                              = Suppression du risque
+PreventionPlanDet                                     = Risque du plan de prévention
+Preventionplandet                                     = Risque du plan de prévention
 PreventionPlanMessage                                 = au plan de prévention
 PreventionPlanMustBeValidated                         = Le plan de prévention doit être validé pour le rouvrir
 PreventionPlanMustBeInProgress                        = Le plan de prévention doit être en cours pour accéder à cette fonctionnalité
@@ -288,11 +292,22 @@ preventionplandocument_custom.odt                     = Plan de prévention pers
 ErrorThirdPartyHasAtLeastOneChildOfTypePreventionPlan = Le tiers est lié à au moins un enfant de type Plan de Prévention :
 ErrorContactHasAtLeastOneChildOfTypePreventionPlan    = Le contact est lié à au moins un enfant de type Plan de Prévention :
 ConfirmDeletePreventionPlan                           = Êtes-vous sûr de vouloir supprimer ce plan de prévention ?
+PreventionPlanRole                                    = Les rôles du plan de prévention
 
 # Email - Mail
 PreventionPlanLabel   = Récapitulatif du plan de prévention
 PreventionPlanSubject = Email plan de prévention
 PreventionPlanContent = Veuillez trouver ci-joint le document ODT du plan de prévention.
+
+# Triggers - Triggers
+PreventionPlanCreated          = Création de plan de prévention
+PreventionPlanModified         = Modification de plan de prévention
+PreventionPlanDeleted          = Suppression de plan de prévention
+PreventionPlanInProgress       = Réouverture du plan de prévention
+PreventionPlanPendingSignature = Mise en attente de signature du plan de prévention
+PreventionPlanLocked           = Verrouillage du plan de prévention
+PreventionPlanArchived         = Archivage du plan de prévention
+PreventionPlanSentByMail       = Envoi par email du plan de prévention
 
 #
 # FirePermit - Permis de feu
@@ -307,6 +322,7 @@ ModifyFirePermit                                  = Modifier le permis de feu
 FirePermitList                                    = Liste des permis de feu
 FirePermit                                        = Permis de feu
 Firepermit                                        = Permis de feu
+TheFirepermit                                     = le permis de feu
 FirePermitDocument                                = Permis de feu
 FirePermitDocumentGenerated                       = Génération de Permis de Feu
 FirePermitCreated                                 = Création de Permis de Feu
@@ -319,6 +335,8 @@ FirePermitArchived                                = Archivage du Permis de Feu
 FirePermitSignatureAddAttendant                   = Ajout de participant au Permis de Feu
 FirePermitSentByMail                              = Envoi par mail du Permis de Feu
 FirePermitLine                                    = risque(s)
+FirePermitDet                                     = Risque du permis de feu
+Firepermitdet                                     = Risque du permis de feu
 FirePermitLineCreated                             = Création de risque dans Permis de Feu
 FirePermitLineModified                            = Modification de risque dans Permis de Feu
 FirePermitLineDeleted                             = Suppression de risque dans Permis de Feu
@@ -349,6 +367,8 @@ UsedEquipment                                     = Matériel utilisé
 ErrorThirdPartyHasAtLeastOneChildOfTypeFirePermit = Le tiers est lié à au moins un enfant de type Permis de Feu :
 ErrorContactHasAtLeastOneChildOfTypeFirePermit    = Le contact est lié à au moins un enfant de type Permis de Feu :
 ConfirmDeleteFirePermit                           = Êtes-vous sûr de vouloir supprimer ce permis de feu ?
+FirePermitRole                                    = Les rôles du permis de feu
+FirepermitSchedules                               = Horaires du permis de feu
 
 # Email - Mail
 FirePermitLabel   = Récapitulatif du permis de feu
@@ -468,6 +488,7 @@ FkSocResponsibleInsuranceSociety  = Société d’assurance du tiers
 LesionLocalization                = Siège des lésions
 LesionNature                      = Nature des lésions
 AccidentInvestigation             = Enquête accident
+Accidentinvestigation             = Enquête accident
 AccidentInvestigationLink         = Lien vers l'enquête accident
 AccidentLocation                  = Lieu de l'accident
 DigiriskDolibarrActionTrigger     = Déclencheur des événements Digirisk
@@ -527,17 +548,18 @@ AccidentInvestigationValidated    = L'enquête accident a été validée
 AccidentInvestigationReOpened     = L'enquête accident a été rouverte
 AccidentInvestigationTaskCreated  = Les tâches de l'enquête accident ont été créées
 AccidentInvestigationTaskDeleted  = Les tâches de l'enquête accident ont été supprimées
-AccidentInvestigationClassified   = L'enquête accident a été versionné et le document généré
+AccidentInvestigationClassified   = L'enquête accident a été versionnée et le document généré
 CausalityTree                     = Arbre des causes
 TaskWillBeCreatedAfterValidation  = Les tâches seront créées après validation de l'enquête accident
-AccidentInvestigationArchived     = L'enquête accident a été archivée et le document a été généré
 DocumentGeneratedWithArchive      = Le document est généré lorsque l'enquête accident est archivé
 ConfirmReOpenInvestigation        = Êtes-vous sûr de vouloir rouvrir l'enquête accident ? La réouverture permet la modification de l'enquête accident et l'ajout de nouveaux participants mais <b>tous les participants et les signatures actuelles du document seront perdues. <br> Une nouvelle version du document sera généré par la suite.</b>.
 AccidentInvestigationCreated      = Création d'une enquête accident
 AccidentInvestigationModified     = Modifcation d'une enquête accident
 AccidentInvestigationDeleted      = Suppression d'une enquête accident
 AccidentInvestigationValidate     = Validation d'une enquête accident
+AccidentInvestigationUnValidate   = Réouverture d'une enquête accident
 AccidentInvestigationArchive      = Classification d'une enquête accident
+AccidentInvestigationLock         = Verrouillage de l'enquête accident
 AccidentInvestigationSigned       = Signature d'une enquête accident
 CloneWorkStop                     = Cloner les arrêts de travail ?
 CloneMetadata                     = Cloner les données complémentaires ?
@@ -545,6 +567,7 @@ CloneLesion                       = Cloner les données complémentaires des lé
 ClonePhotos                       = Cloner les photos ?
 CloneFrom                         = Clone de
 AccidentInvestigationLinked       = Enquête accident liée
+AccidentInvestigationRole         = Les rôles de l'enquête accident
 
 # AccidentTooltip - Tooltip des accidents
 VictimActivityTooltip              = Précisez l’activité ou la tâche de la victime au moment de l’accident, c’est-à-dire ce que faisait la victime
@@ -641,6 +664,7 @@ RiskAssessmentDocumentsMin = Documents Uniques
 # Data - Donnée
 RiskAssessmentDocument = Document unique
 
+RiskAssessmentDocumentGenerated                           = Génération du Document Unique
 AuditStartDate                                            = Date de début d'audit
 AuditEndDate                                              = Date de fin d'audit
 Recipient                                                 = Destinataire
@@ -877,6 +901,8 @@ RisksRepartition               = Répartition des risques par évaluation
 ShowRiskOrigin                 = Afficher la provenance du risque
 ShowRiskOriginDescription      = Afficher la provenance des risques dans les documents (Fiche UT, Fiche GP, Document Unique, Listings de risques, etc.)
 SharedRiskImportWithSuccess    = Risque importé avec succès
+RiskImport                     = Import de risques
+RiskUnlink                     = Suppression du risque partagé
 RiskDeleted                    = Le risque %s a été supprimé
 RiskSharedWithEntityRefLabel   = Partage du risque %s avec
 RiskUnlinkedFromEntityRefLabel = Dissociation du risque %s avec
@@ -969,6 +995,8 @@ RiskSignNotEdited                  = Erreur lors de l'édition de la signalisati
 RiskSignWellDeleted                = Signalisation supprimée
 RiskSignNotDeleted                 = Erreur lors de la suppression de la signalisation
 RiskSignCategory                   = Catégorie
+RiskSignImport                     = Import de signalisations
+RiskSignUnlink                     = Suppression de la signalisation partagée
 AddRiskSignTitle                   = Ajout d'une signalisation
 AddRiskSignButton                  = Ajouter la signalisation
 EditRiskSign                       = Édition d'une signalisation
