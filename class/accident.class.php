@@ -445,17 +445,18 @@ class Accident extends SaturneObject
      */
     public function getNbAccidents(): array
     {
-        global $langs;
+        global $conf, $langs;
 
         // Graph Title parameters
         $array['title'] = $langs->transnoentities('AccidentRepartition');
         $array['picto'] = $this->picto;
 
         // Graph parameters
-        $array['width']   = '100%';
-        $array['height']  = 400;
-        $array['type']    = 'pie';
-        $array['dataset'] = 1;
+        $array['width']      = '100%';
+        $array['height']     = 400;
+        $array['type']       = 'pie';
+        $array['showlegend'] = $conf->browser->layout == 'phone' ? 1 : 2;
+        $array['dataset']    = 1;
 
         $array['labels'] = [
             'accidents' => [

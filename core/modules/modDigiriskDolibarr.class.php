@@ -2158,12 +2158,20 @@ class modDigiriskdolibarr extends DolibarrModules
         //BACKWARD NUM REF
         if ($conf->global->DIGIRISKDOLIBARR_CUSTOM_NUM_REF_SET == 0) {
             $objectTypeAndMod = [
-                'Risk' => ['tarqeq', 'RK{0}'],
-                'RiskAssessment' => ['jarnsaxa', 'RA{0}'],
-                'RiskSign' => ['greip', 'RS{0}'],
-                'Evaluator' => ['bebhionn', 'EV{0}'],
-                'Groupment' => ['sirius', 'GP{0}'],
-                'WorkUnit' => ['canopus', 'WU{0}'],
+                'Risk'                  => ['tarqeq', 'RK{0}'],
+                'RiskAssessment'        => ['jarnsaxa', 'RA{0}'],
+                'RiskSign'              => ['greip', 'RS{0}'],
+                'Evaluator'             => ['bebhionn', 'EV{0}'],
+                'Groupment'             => ['sirius', 'GP{0}'],
+                'WorkUnit'              => ['canopus', 'WU{0}'],
+                'Accident'              => ['curtiss', 'ACC{0}'],
+                'AccidentLesion'        => ['wright', 'ACCL{0}'],
+                'AccidentWorkStop'      => ['richthofen', 'ACCW{0}'],
+                'AccidentInvestigation' => ['peggy', 'AI{0}'],
+                'PreventionPlan'        => ['hinkler', 'PP{0}'],
+                'PreventionPlanDet'     => ['alvaldi', 'PPR{0}'],
+                'FirePermit'            => ['bleriot', 'FP{0}'],
+                'FirePermitDet'         => ['earhart', 'FPR{0}'],
             ];
 
             foreach($objectTypeAndMod as $type => $mod) {
