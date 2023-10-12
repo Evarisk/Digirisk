@@ -253,37 +253,40 @@ abstract class ModeleODTDigiriskElementDocument extends SaturneDocumentModel
 		return 0;
 	}
 
-	/**
-	 * Function to build a document on disk.
-	 *
-	 * @param  SaturneDocuments $objectDocument  Object source to build document.
-	 * @param  Translate        $outputLangs     Lang object to use for output.
-	 * @param  string           $srcTemplatePath Full path of source filename for generator using a template file.
-	 * @param  int              $hideDetails     Do not show line details.
-	 * @param  int              $hideDesc        Do not show desc.
-	 * @param  int              $hideRef         Do not show ref.
-	 * @param  array            $moreParam       More param (Object/user/etc).
-	 * @return int                               1 if OK, <=0 if KO.
-	 * @throws Exception
-	 */
+    /**
+     * Function to build a document on disk
+     *
+     * @param  SaturneDocuments $objectDocument  Object source to build document
+     * @param  Translate        $outputLangs     Lang object to use for output
+     * @param  string           $srcTemplatePath Full path of source filename for generator using a template file
+     * @param  int              $hideDetails     Do not show line details
+     * @param  int              $hideDesc        Do not show desc
+     * @param  int              $hideRef         Do not show ref
+     * @param  array            $moreParam       More param (Object/user/etc)
+     * @return int                               1 if OK, <=0 if KO
+     * @throws Exception
+     */
+    public function write_file(SaturneDocuments $objectDocument, Translate $outputLangs, string $srcTemplatePath, int $hideDetails = 0, int $hideDesc = 0, int $hideRef = 0, array $moreParam): int
+    {
+        global $conf;
 
-	public function write_file(SaturneDocuments $objectDocument, Translate $outputLangs, string $srcTemplatePath, int $hideDetails = 0, int $hideDesc = 0, int $hideRef = 0, array $moreParam): int
-	{
-		$tmpArray = [];
+        $object = $moreParam['object'];
 
-		$moreParam['tmparray'] = $tmpArray;
-		$moreParam['objectDocument'] = $objectDocument;
-		$moreParam['subDir'] = 'digiriskdolibarrdocuments/';
-		$moreParam['hideTemplateName'] = 1;
+        if (!empty($object->photo)) {
+            $path              = $conf->digiriskdolibarr->multidir_output[$conf->entity] . '/' . $object->element_type . '/' . $object->ref;
+            $fileSmall         = saturne_get_thumb_name($object->photo);
+            $image             = $path . '/thumbs/' . $fileSmall;
+            $tmpArray['photo'] = $image;
+        } else {
+            $noPhoto           = '/public/theme/common/nophoto.png';
+            $tmpArray['photo'] = DOL_DOCUMENT_ROOT . $noPhoto;
+        }
 
-		return parent::write_file(
-			$objectDocument,
-			$outputLangs,
-			$srcTemplatePath,
-			$hideDetails,
-			$hideDesc,
-			$hideRef,
-			$moreParam
-		);
-	}
+        $moreParam['tmparray']         = $tmpArray;
+        $moreParam['objectDocument']   = $objectDocument;
+        $moreParam['subDir']           = 'digiriskdolibarrdocuments/';
+        $moreParam['hideTemplateName'] = 1;
+
+        return parent::write_file($objectDocument, $outputLangs, $srcTemplatePath, $hideDetails, $hideDesc, $hideRef, $moreParam);
+    }
 }

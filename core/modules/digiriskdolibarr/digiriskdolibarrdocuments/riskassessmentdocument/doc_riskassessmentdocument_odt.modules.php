@@ -100,7 +100,7 @@ class doc_riskassessmentdocument_odt extends SaturneDocumentModel
 	 */
 	public function fillTagsLines(Odf $odfHandler, Translate $outputLangs, array $moreParam): int
 	{
-		global $conf, $hookmanager;
+		global $conf, $user;
 
 		$objectDocument = $moreParam['objectDocument'];
 
@@ -130,12 +130,6 @@ class doc_riskassessmentdocument_odt extends SaturneDocumentModel
 						}
 						$tmpArray['nomElement'] = $depthHyphens . (!empty($conf->global->DIGIRISKDOLIBARR_SHOW_SHARED_RISKS) ? 'S' . $line['object']->entity . ' - ' : '') . $line['object']->ref . ' ' . $line['object']->label;
 
-						unset($tmpArray['object_fields']);
-
-						complete_substitutions_array($tmpArray, $outputLangs, $objectDocument, $line['object'], "completesubstitutionarray_lines");
-						// Call the ODTSubstitutionLine hook
-						$parameters = array('odfHandler' => &$odfHandler, 'file' => $file, 'object' => $objectDocument, 'outputlangs' => $outputLangs, 'substitutionarray' => &$tmpArray, 'line' => $line['object']);
-						$hookmanager->executeHooks('ODTSubstitutionLine', $parameters, $this, $action); // Note that $action and $objectDocument may have been modified by some hooks
 						$this->setTmpArrayVars($tmpArray, $listLines, $outputLangs);
 					}
 					$odfHandler->mergeSegment($listLines);
@@ -182,11 +176,6 @@ class doc_riskassessmentdocument_odt extends SaturneDocumentModel
 					//use arsort to sort array according to value
 					arsort($cotationarray);
 
-					complete_substitutions_array($tmpArray, $outputLangs, $objectDocument, $line, "completesubstitutionarray_lines");
-
-					// Call the ODTSubstitutionLine hook
-					$parameters = array('odfHandler' => &$odfHandler, 'file' => $file, 'object' => $objectDocument, 'outputlangs' => $outputLangs, 'substitutionarray' => &$tmpArray, 'line' => $line);
-					$hookmanager->executeHooks('ODTSubstitutionLine', $parameters, $this, $action); // Note that $action and $objectDocument may have been modified by some hooks
 					foreach ($cotationarray as $key => $val) {
 						try {
 							$listLines->setVars('nomElement', html_entity_decode($key, ENT_QUOTES | ENT_HTML5), true, 'UTF-8');
@@ -209,10 +198,10 @@ class doc_riskassessmentdocument_odt extends SaturneDocumentModel
 
 				//Fill tickets data
 				$filter = array('t.fk_project' => $conf->global->DIGIRISKDOLIBARR_TICKET_PROJECT);
-				$ticket->fetchAll($user, '', '', '', 0, '', $filter);
+                $tickets = saturne_fetch_all_object_type('Ticket', '', '', 0, 0,  $filter);
 				$listLines = $odfHandler->setSegment('tickets');
-				if (is_array($ticket->lines) && !empty($ticket->lines)) {
-					foreach ($ticket->lines as $line) {
+				if (is_array($tickets) && !empty($tickets)) {
+					foreach ($tickets as $line) {
 						$tmpArray['refticket']     = $line->ref;
 
 						$categories = $category->containing($line->id, Categorie::TYPE_TICKET);
@@ -240,23 +229,17 @@ class doc_riskassessmentdocument_odt extends SaturneDocumentModel
 
 						$tmpArray['status'] = $tickettmp->getLibStatut();
 
-						unset($tmpArray['object_fields']);
-
-						complete_substitutions_array($tmpArray, $outputLangs, $objectDocument, $line, "completesubstitutionarray_lines");
-						// Call the ODTSubstitutionLine hook
-						$parameters = array('odfHandler' => &$odfHandler, 'file' => $file, 'object' => $objectDocument, 'outputlangs' => $outputLangs, 'substitutionarray' => &$tmpArray, 'line' => $line);
-						$hookmanager->executeHooks('ODTSubstitutionLine', $parameters, $this, $action); // Note that $action and $objectDocument may have been modified by some hooks
 						$this->setTmpArrayVars($tmpArray, $listLines, $outputLangs);
 					}
 				} else {
-					$tmpArray['refticket']                 = $outputLangs->trans('NoData');
-					$tmpArray['categories']                = $outputLangs->trans('NoData');
-					$tmpArray['creation_date']             = $outputLangs->trans('NoData');
-					$tmpArray['subject']                   = $outputLangs->trans('NoData');
-					$tmpArray['message']                   = $outputLangs->trans('NoData');
-					$tmpArray['progress']                  = $outputLangs->trans('NoData');
-					$tmpArray['digiriskelement_ref_label'] = $outputLangs->trans('NoData');
-					$tmpArray['status']                    = $outputLangs->trans('NoData');
+					$tmpArray['refticket']                 = '';
+					$tmpArray['categories']                = '';
+					$tmpArray['creation_date']             = '';
+					$tmpArray['subject']                   = '';
+					$tmpArray['message']                   = '';
+					$tmpArray['progress']                  = '';
+					$tmpArray['digiriskelement_ref_label'] = '';
+					$tmpArray['status']                    = '';
 					$this->setTmpArrayVars($tmpArray, $listLines, $outputLangs);
 				}
 				$odfHandler->mergeSegment($listLines);
@@ -270,50 +253,44 @@ class doc_riskassessmentdocument_odt extends SaturneDocumentModel
 		return 0;
 	}
 
-	/**
-	 * Function to build a document on disk.
-	 *
-	 * @param SaturneDocuments $objectDocument Object source to build document.
-	 * @param Translate $outputLangs Lang object to use for output.
-	 * @param string $srcTemplatePath Full path of source filename for generator using a template file.
-	 * @param int $hideDetails Do not show line details.
-	 * @param int $hideDesc Do not show desc.
-	 * @param int $hideRef Do not show ref.
-	 * @param array $moreParam More param (Object/user/etc).
-	 * @return int                               1 if OK, <=0 if KO.
-	 * @throws Exception
-	 */
-	public function write_file(
-		SaturneDocuments $objectDocument,
-		Translate $outputLangs,
-		string $srcTemplatePath,
-		int $hideDetails = 0,
-		int $hideDesc = 0,
-		int $hideRef = 0,
-		array $moreParam
-	): int {
+    /**
+     * Function to build a document on disk
+     *
+     * @param  SaturneDocuments $objectDocument  Object source to build document
+     * @param  Translate        $outputLangs     Lang object to use for output
+     * @param  string           $srcTemplatePath Full path of source filename for generator using a template file
+     * @param  int              $hideDetails     Do not show line details
+     * @param  int              $hideDesc        Do not show desc
+     * @param  int              $hideRef         Do not show ref
+     * @param  array            $moreParam       More param (Object/user/etc)
+     * @return int                               1 if OK, <=0 if KO
+     * @throws Exception
+     */
+    public function write_file(SaturneDocuments $objectDocument, Translate $outputLangs, string $srcTemplatePath, int $hideDetails = 0, int $hideDesc = 0, int $hideRef = 0, array $moreParam): int
+    {
+        global $conf;
 
-		$tmpArray = [];
+        $fileArray = dol_dir_list($conf->digiriskdolibarr->multidir_output[$conf->entity] . '/' . $objectDocument->element . '/siteplans', 'files', 0, '', '(\.odt|\.zip)', 'date', 'asc', 1);
+        if (is_array($fileArray) && !empty($fileArray)) {
+            $sitePlans                    = array_shift($fileArray);
+            $thumb_name                   = saturne_get_thumb_name($sitePlans['name']);
+            $tmpArray['photo_site_plans'] = $sitePlans['path'] . '/thumbs/' . $thumb_name;
+        } else {
+            $noPhoto                      = '/public/theme/common/nophoto.png';
+            $tmpArray['photo_site_plans'] = DOL_DOCUMENT_ROOT . $noPhoto;
+        }
 
-		$objectDocument->DigiriskFillJSON();
+        $objectDocument->DigiriskFillJSON();
 
-		$objectDocument->element = $objectDocument->element . '@digiriskdolibarr';
-		complete_substitutions_array($tmpArray, $outputLangs, $objectDocument);
-		$objectDocument->element = $objectDocument->element;
+        $objectDocument->element = $objectDocument->element . '@digiriskdolibarr';
+        complete_substitutions_array($tmpArray, $outputLangs, $objectDocument);
+        $objectDocument->element = $objectDocument->element;
 
-		$moreParam['tmparray']         = $tmpArray;
-		$moreParam['objectDocument']   = $objectDocument;
-		$moreParam['subDir']           = 'digiriskdolibarrdocuments/';
-		$moreParam['hideTemplateName'] = 1;
+        $moreParam['tmparray']         = $tmpArray;
+        $moreParam['objectDocument']   = $objectDocument;
+        $moreParam['subDir']           = 'digiriskdolibarrdocuments/';
+        $moreParam['hideTemplateName'] = 1;
 
-		return parent::write_file(
-			$objectDocument,
-			$outputLangs,
-			$srcTemplatePath,
-			$hideDetails,
-			$hideDesc,
-			$hideRef,
-			$moreParam
-		);
-	}
+        return parent::write_file($objectDocument, $outputLangs, $srcTemplatePath, $hideDetails, $hideDesc, $hideRef, $moreParam);
+    }
 }
