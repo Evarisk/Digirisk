@@ -225,7 +225,7 @@ PreventionPlansMin = plans de prévention
 
 PreventionPlan                                        = Plan de prévention
 Preventionplan                                        = Plan de prévention
-Thepreventionplan                                     = le plan de prévention
+ThePreventionplan                                     = le plan de prévention
 PreventionPlanDocument                                = Plan de prévention
 PreventionPlanDocumentGenerated                       = Génération du plan de prévention
 PreventionPlanList                                    = Liste des plans de prévention
@@ -248,7 +248,7 @@ ExtSocietyAttendant                                   = Intervenant de l'Entrepr
 ActionsDescription                                    = Description des actions
 INRSRisk                                              = Risque (INRS)
 PreventionMethod                                      = Moyens de prévention
-PreventionPlanSchedule                                = Horaires du plan de prévention
+PreventionplanSchedules                               = Horaires du plan de prévention
 Attendants                                            = Participants
 ModifyPreventionPlan                                  = Modifier le plan de prévention
 ActionsDescriptionTooltip                             = Description des actions réalisées par l'intervenant
@@ -292,6 +292,7 @@ preventionplandocument_custom.odt                     = Plan de prévention pers
 ErrorThirdPartyHasAtLeastOneChildOfTypePreventionPlan = Le tiers est lié à au moins un enfant de type Plan de Prévention :
 ErrorContactHasAtLeastOneChildOfTypePreventionPlan    = Le contact est lié à au moins un enfant de type Plan de Prévention :
 ConfirmDeletePreventionPlan                           = Êtes-vous sûr de vouloir supprimer ce plan de prévention ?
+PreventionPlanRole                                    = Les rôles du plan de prévention
 
 # Email - Mail
 PreventionPlanLabel   = Récapitulatif du plan de prévention
@@ -321,6 +322,7 @@ ModifyFirePermit                                  = Modifier le permis de feu
 FirePermitList                                    = Liste des permis de feu
 FirePermit                                        = Permis de feu
 Firepermit                                        = Permis de feu
+TheFirepermit                                     = le permis de feu
 FirePermitDocument                                = Permis de feu
 FirePermitDocumentGenerated                       = Génération de Permis de Feu
 FirePermitCreated                                 = Création de Permis de Feu
@@ -365,6 +367,8 @@ UsedEquipment                                     = Matériel utilisé
 ErrorThirdPartyHasAtLeastOneChildOfTypeFirePermit = Le tiers est lié à au moins un enfant de type Permis de Feu :
 ErrorContactHasAtLeastOneChildOfTypeFirePermit    = Le contact est lié à au moins un enfant de type Permis de Feu :
 ConfirmDeleteFirePermit                           = Êtes-vous sûr de vouloir supprimer ce permis de feu ?
+FirePermitRole                                    = Les rôles du permis de feu
+FirepermitSchedules                               = Horaires du permis de feu
 
 # Email - Mail
 FirePermitLabel   = Récapitulatif du permis de feu
@@ -563,6 +567,7 @@ CloneLesion                       = Cloner les données complémentaires des lé
 ClonePhotos                       = Cloner les photos ?
 CloneFrom                         = Clone de
 AccidentInvestigationLinked       = Enquête accident liée
+AccidentInvestigationRole         = Les rôles de l'enquête accident
 
 # AccidentTooltip - Tooltip des accidents
 VictimActivityTooltip              = Précisez l’activité ou la tâche de la victime au moment de l’accident, c’est-à-dire ce que faisait la victime
