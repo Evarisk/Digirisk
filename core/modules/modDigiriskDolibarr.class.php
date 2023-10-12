@@ -2180,15 +2180,14 @@ class modDigiriskdolibarr extends DolibarrModules
 
         $documentsPath = DOL_DATA_ROOT . ($conf->entity > 1 ? '/' . $conf->entity : '');
         $mediaPath     =  $documentsPath . '/digiriskdolibarr';
-        $ecmPath       =  $documentsPath . '/ecm/digiriskdolibarr';
 
         if (is_dir($mediaPath . '/accident_investigation')) {
             chmod($mediaPath . '/accident_investigation', 0755);
             rename($mediaPath . '/accident_investigation', $mediaPath . '/accidentinvestigation');
         }
-        if (is_dir($ecmPath . '/accident_investigationdocument')) {
-            chmod($ecmPath . '/accident_investigationdocument', 0755);
-            rename($ecmPath . '/accident_investigationdocument', $ecmPath . '/accidentinvestigationdocument');
+        if (is_dir($mediaPath . '/accident_investigationdocument')) {
+            chmod($mediaPath . '/accident_investigationdocument', 0755);
+            rename($mediaPath . '/accident_investigationdocument', $mediaPath . '/accidentinvestigationdocument');
         }
 
 		return $this->_init($sql, $options);

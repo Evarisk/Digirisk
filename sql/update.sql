@@ -227,3 +227,7 @@ DELETE FROM llx_c_digiriskdolibarr_action_trigger WHERE ref = 'ACCIDENT_INVESTIG
 
 UPDATE `llx_const` SET `value` = 'mod_accidentinvestigation_standard' WHERE `llx_const`.`name` = 'DIGIRISKDOLIBARR_ACCIDENTINVESTIGATION_ADDON';
 UPDATE `llx_const` SET `value` = 'mod_accidentinvestigationdocument_standard' WHERE `llx_const`.`name` = 'DIGIRISKDOLIBARR_ACCIDENTINVESTIGATIONDOCUMENT_ADDON';
+INSERT INTO llx_c_accidentinvestigation_attendants_role SELECT * FROM llx_c_accident_investigation_attendants_role;
+INSERT INTO llx_categorie_accidentinvestigation SELECT * FROM llx_categorie_accident_investigation;
+DROP TABLE llx_c_accident_investigation_attendants_role;
+DROP TABLE llx_categorie_accident_investigation;
