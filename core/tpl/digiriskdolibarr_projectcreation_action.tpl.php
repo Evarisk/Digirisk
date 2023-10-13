@@ -334,19 +334,20 @@ if (getDolGlobalInt('DIGIRISKDOLIBARR_READERGROUP_UPDATED') >= 0 && getDolGlobal
                 $userGroup->addrights('', 'digiriskdolibarr', 'lire'); // DigiriskDolibarr lire
                 $userGroup->addrights('', 'digiriskdolibarr', 'read'); // DigiriskDolibarr read
 
-                $userGroup->addrights(43630203, 'digiriskdolibarr'); // RiskAssessmentDocument read
-                $userGroup->addrights(43630206, 'digiriskdolibarr'); // LegalDisplay read
-                $userGroup->addrights(43630209, 'digiriskdolibarr'); // InformationsSharing read
-                $userGroup->addrights(43630212, 'digiriskdolibarr'); // FirePermit read
-                $userGroup->addrights(43630215, 'digiriskdolibarr'); // Prevention plan read
-                $userGroup->addrights(43630218, 'digiriskdolibarr'); // DigiriskElement read
-                $userGroup->addrights(43630221, 'digiriskdolibarr'); // Risk read
-                $userGroup->addrights(43630224, 'digiriskdolibarr'); // ListingRisksAction read
-                $userGroup->addrights(43630227, 'digiriskdolibarr'); // ListingRisksPhoto read
-                $userGroup->addrights(43630230, 'digiriskdolibarr'); // RiskSign read
-                $userGroup->addrights(43630233, 'digiriskdolibarr'); // Evaluator read
-                $userGroup->addrights(43630236, 'digiriskdolibarr'); // Accident read
-                $userGroup->addrights(43630239, 'digiriskdolibarr'); // AccidentInvestigation read
+                $userGroup->addrights(43630203, 'digiriskdolibarr'); // DigiriskStandard read
+                $userGroup->addrights(43630204, 'digiriskdolibarr'); // RiskAssessmentDocument read
+                $userGroup->addrights(43630207, 'digiriskdolibarr'); // LegalDisplay read
+                $userGroup->addrights(43630210, 'digiriskdolibarr'); // InformationsSharing read
+                $userGroup->addrights(43630213, 'digiriskdolibarr'); // FirePermit read
+                $userGroup->addrights(43630216, 'digiriskdolibarr'); // Prevention plan read
+                $userGroup->addrights(43630219, 'digiriskdolibarr'); // DigiriskElement read
+                $userGroup->addrights(43630222, 'digiriskdolibarr'); // Risk read
+                $userGroup->addrights(43630225, 'digiriskdolibarr'); // ListingRisksAction read
+                $userGroup->addrights(43630228, 'digiriskdolibarr'); // ListingRisksPhoto read
+                $userGroup->addrights(43630231, 'digiriskdolibarr'); // RiskSign read
+                $userGroup->addrights(43630234, 'digiriskdolibarr'); // Evaluator read
+                $userGroup->addrights(43630237, 'digiriskdolibarr'); // Accident read
+                $userGroup->addrights(43630240, 'digiriskdolibarr'); // AccidentInvestigation read
 
                 $userGroup->addrights('', 'saturne', 'lire');
                 $userGroup->addrights('', 'saturne', 'read');
@@ -395,32 +396,33 @@ if (getDolGlobalInt('DIGIRISKDOLIBARR_USERGROUP_UPDATED') >= 0 && getDolGlobalIn
                 $userGroup->addrights('', 'digiriskdolibarr', 'lire'); // DigiriskDolibarr lire
                 $userGroup->addrights('', 'digiriskdolibarr', 'read'); // DigiriskDolibarr read
 
-                $userGroup->addrights(43630203, 'digiriskdolibarr'); // RiskAssessmentDocument read
-                $userGroup->addrights(43630204, 'digiriskdolibarr'); // RiskAssessmentDocument create
-                $userGroup->addrights(43630206, 'digiriskdolibarr'); // LegalDisplay read
-                $userGroup->addrights(43630207, 'digiriskdolibarr'); // LegalDisplay create
-                $userGroup->addrights(43630209, 'digiriskdolibarr'); // InformationsSharing read
-                $userGroup->addrights(43630210, 'digiriskdolibarr'); // InformationsSharing create
-                $userGroup->addrights(43630212, 'digiriskdolibarr'); // FirePermit read
-                $userGroup->addrights(43630213, 'digiriskdolibarr'); // FirePermit create
-                $userGroup->addrights(43630215, 'digiriskdolibarr'); // Prevention plan read
-                $userGroup->addrights(43630216, 'digiriskdolibarr'); // Prevention Plan create
-                $userGroup->addrights(43630218, 'digiriskdolibarr'); // DigiriskElement read
-                $userGroup->addrights(43630219, 'digiriskdolibarr'); // DigiriskElement create
-                $userGroup->addrights(43630221, 'digiriskdolibarr'); // Risk read
-                $userGroup->addrights(43630222, 'digiriskdolibarr'); // Risk create
-                $userGroup->addrights(43630224, 'digiriskdolibarr'); // ListingRisksAction read
-                $userGroup->addrights(43630225, 'digiriskdolibarr'); // ListingRisksAction create
-                $userGroup->addrights(43630227, 'digiriskdolibarr'); // ListingRisksPhoto read
-                $userGroup->addrights(43630228, 'digiriskdolibarr'); // ListingRisksPhoto create
-                $userGroup->addrights(43630230, 'digiriskdolibarr'); // RiskSign read
-                $userGroup->addrights(43630231, 'digiriskdolibarr'); // RiskSign create
-                $userGroup->addrights(43630233, 'digiriskdolibarr'); // Evaluator read
-                $userGroup->addrights(43630234, 'digiriskdolibarr'); // Evaluator create
-                $userGroup->addrights(43630236, 'digiriskdolibarr'); // Accident read
-                $userGroup->addrights(43630237, 'digiriskdolibarr'); // Accident create
-                $userGroup->addrights(43630239, 'digiriskdolibarr'); // AccidentInvestigation read
-                $userGroup->addrights(43630240, 'digiriskdolibarr'); // AccidentInvestigation create
+                $userGroup->addrights(43630203, 'digiriskdolibarr'); // DigiriskStandard read
+                $userGroup->addrights(43630204, 'digiriskdolibarr'); // RiskAssessmentDocument read
+                $userGroup->addrights(43630205, 'digiriskdolibarr'); // RiskAssessmentDocument create
+                $userGroup->addrights(43630207, 'digiriskdolibarr'); // LegalDisplay read
+                $userGroup->addrights(43630208, 'digiriskdolibarr'); // LegalDisplay create
+                $userGroup->addrights(43630210, 'digiriskdolibarr'); // InformationsSharing read
+                $userGroup->addrights(43630211, 'digiriskdolibarr'); // InformationsSharing create
+                $userGroup->addrights(43630213, 'digiriskdolibarr'); // FirePermit read
+                $userGroup->addrights(43630214, 'digiriskdolibarr'); // FirePermit create
+                $userGroup->addrights(43630216, 'digiriskdolibarr'); // Prevention plan read
+                $userGroup->addrights(43630217, 'digiriskdolibarr'); // Prevention Plan create
+                $userGroup->addrights(43630219, 'digiriskdolibarr'); // DigiriskElement read
+                $userGroup->addrights(43630220, 'digiriskdolibarr'); // DigiriskElement create
+                $userGroup->addrights(43630222, 'digiriskdolibarr'); // Risk read
+                $userGroup->addrights(43630223, 'digiriskdolibarr'); // Risk create
+                $userGroup->addrights(43630225, 'digiriskdolibarr'); // ListingRisksAction read
+                $userGroup->addrights(43630226, 'digiriskdolibarr'); // ListingRisksAction create
+                $userGroup->addrights(43630228, 'digiriskdolibarr'); // ListingRisksPhoto read
+                $userGroup->addrights(43630229, 'digiriskdolibarr'); // ListingRisksPhoto create
+                $userGroup->addrights(43630231, 'digiriskdolibarr'); // RiskSign read
+                $userGroup->addrights(43630232, 'digiriskdolibarr'); // RiskSign create
+                $userGroup->addrights(43630234, 'digiriskdolibarr'); // Evaluator read
+                $userGroup->addrights(43630235, 'digiriskdolibarr'); // Evaluator create
+                $userGroup->addrights(43630237, 'digiriskdolibarr'); // Accident read
+                $userGroup->addrights(43630238, 'digiriskdolibarr'); // Accident create
+                $userGroup->addrights(43630240, 'digiriskdolibarr'); // AccidentInvestigation read
+                $userGroup->addrights(43630241, 'digiriskdolibarr'); // AccidentInvestigation create
 
                 $userGroup->addrights('', 'saturne', 'lire');
                 $userGroup->addrights('', 'saturne', 'read');

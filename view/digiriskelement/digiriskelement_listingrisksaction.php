@@ -66,10 +66,9 @@ $project          = new Project($db);
 $upload_dir = $conf->digiriskdolibarr->multidir_output[isset($conf->entity) ? $conf->entity : 1];
 
 // Security check
-$permissiontoread   = $user->rights->digiriskdolibarr->listingrisksaction->read;
+$permissiontoread   = $user->rights->digiriskdolibarr->digiriskstandard->read && $user->rights->digiriskdolibarr->listingrisksaction->read;
 $permissiontoadd    = $user->rights->digiriskdolibarr->listingrisksaction->write;
 $permissiontodelete = $user->rights->digiriskdolibarr->listingrisksaction->delete;
-
 saturne_check_access($permissiontoread, $object);
 
 /*
@@ -136,7 +135,7 @@ if ($type != 'standard') {
 	$morehtmlref .= '</div>';
 
 	$moduleNameLowerCase = 'mycompany';
-	saturne_banner_tab($object,'ref','', 1, 'ref', 'ref', $morehtmlref, true);
+	saturne_banner_tab($object,'ref','none', 1, 'ref', 'ref', $morehtmlref, true);
 	$moduleNameLowerCase = 'digiriskdolibarr';
 }
 

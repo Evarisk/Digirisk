@@ -73,11 +73,10 @@ $allLinks = $digiriskresources->fetchDigiriskResources();
 $upload_dir = $conf->digiriskdolibarr->multidir_output[isset($conf->entity) ? $conf->entity : 1];
 
 // Security check - Protection if external user
-$permissiontoread   = $user->rights->digiriskdolibarr->riskassessmentdocument->read;
+$permissiontoread   = $user->rights->digiriskdolibarr->digiriskstandard->read && $user->rights->digiriskdolibarr->riskassessmentdocument->read;
 $permissiontoadd    = $user->rights->digiriskdolibarr->riskassessmentdocument->write;
 $permissiontodelete = $user->rights->digiriskdolibarr->riskassessmentdocument->delete;
 $permtoupload       = $user->rights->ecm->upload;
-
 saturne_check_access($permissiontoread);
 
 /*
@@ -343,7 +342,7 @@ $morehtmlref .= $langs->trans('Project') . ' : ' . getNomUrlProject($project, 1,
 $morehtmlref .= '</div>';
 
 $moduleNameLowerCase = 'mycompany';
-saturne_banner_tab($object,'ref','', 1, 'ref', 'ref', $morehtmlref, true);
+saturne_banner_tab($object,'ref','none', 1, 'ref', 'ref', $morehtmlref, true);
 $moduleNameLowerCase = 'digiriskdolibarr';
 
 print '<form method="POST" action="' . $_SERVER["PHP_SELF"] . '" name="edit" enctype="multipart/form-data">';
