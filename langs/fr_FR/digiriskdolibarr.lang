@@ -821,6 +821,9 @@ NbEmployeesConfTooltip       = Le nombre de salariés a été saisi manuellement
 
 # Data - Donnée
 DigiriskStandardInformation = Information
+Digiriskstandard            = Standard Digirisk
+DigiriskStandardMin         = les standards Digirisk
+TheDigiriskstandard         = le standard Digirisk
 
 
 #

@@ -435,7 +435,8 @@ class modDigiriskdolibarr extends DolibarrModules
                 'digiriskelementagenda',
 				'digiriskstandardview',
                 'accidentdocument',
-                'accidentagenda'
+                'accidentagenda',
+                'digiriskstandardagenda'
 			],
 			'tabs' => [
 				'mycompany_admin'
