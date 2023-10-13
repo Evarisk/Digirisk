@@ -32,4 +32,6 @@ if (file_exists('digiriskdolibarr.main.inc.php')) {
 
 require_once __DIR__ . '/core/tpl/digiriskdolibarr_projectcreation_action.tpl.php';
 
+$moreParams['specialModuleNameLowerCase'] = 'digirisk';
+
 require_once __DIR__ . '/../saturne/core/tpl/index/index_view.tpl.php';
