@@ -40,6 +40,11 @@ class RiskAssessmentDocument extends DigiriskDocuments
 	 */
 	public $element = 'riskassessmentdocument';
 
+    /**
+     * @var string Name of icon for riskassessmentdocument. Must be a 'fa-xxx' fontawesome code (or 'fa-xxx_fa_color_size') or 'riskassessmentdocument@digiriskdolibarr' if picto is file 'img/object_riskassessmentdocument.png'
+     */
+    public string $picto = 'fontawesome_fa-file-alt_fas_#d35968';
+
 	/**
 	 * Constructor.
 	 *

@@ -99,4 +99,17 @@ class DigiriskStandard extends SaturneObject
 	{
 		parent::__construct($db, $this->module, $this->element);
 	}
+
+    /**
+     * Return banner tab content
+     *
+     * @return array
+     */
+    public function getBannerTabContent() : array
+    {
+        $moreHtmlRef            = '';
+        $moreParams['moreHtml'] = 'none';
+
+        return [$moreHtmlRef, $moreParams];
+    }
 }
