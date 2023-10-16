@@ -469,12 +469,14 @@ if ($action == 'presend') {
 
 	$object->fetch_projet();
 
-	if (!in_array($object->element, array('societe', 'user', 'member'))) {
-		include_once DOL_DOCUMENT_ROOT . '/core/lib/files.lib.php';
-		$fileparams   = dol_dir_list($diroutput, 'files', 0, '');
-        $lastFileKey  = is_array($fileparams) && !empty($fileparams) ? count($fileparams) - 2 : 0;
-        $filevalue[0] = $fileparams[$lastFileKey]['fullname'] ?? 0;
-	}
+    if (!in_array($object->element, array('societe', 'user', 'member'))) {
+        include_once DOL_DOCUMENT_ROOT . '/core/lib/files.lib.php';
+        $fileparams = dol_dir_list($diroutput, 'files', 0, '', [], 'date', 'SORT_DESC');
+        preg_match('#_(.*)_#U', $fileparams[0]['name'], $lastRef);
+        foreach ($fileparams as $fileparam) {
+            preg_match('/' . $lastRef[0] . '/', $fileparam['name']) ? $filevalue[] = $fileparam['fullname'] : 0;
+        }
+    }
 
 	// Define output language
 	$outputlangs = $langs;

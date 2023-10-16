@@ -154,6 +154,7 @@ class PreventionPlan extends SaturneObject
 
         // Load source object
         $object->fetch($fromID);
+        $preventionplandets = $object->lines;
 
         // Load signatory and ressources form source object
         $signatories = $signatory->fetchSignatory('', $fromID, $object->element);
@@ -227,9 +228,6 @@ class PreventionPlan extends SaturneObject
             }
 
             if (!empty($options['preventionplan_risk'])) {
-                $preventionplandet  = new PreventionPlanLine($this->db);
-                $preventionplandets = $preventionplandet->fetchAll('', '', 0, 0, ['fk_preventionplan' => $fromID]);
-
                 if (is_array($preventionplandets) && !empty($preventionplandets)) {
                     foreach ($preventionplandets as $line) {
                         $line->ref               = $refPreventionPlanDetMod->getNextValue($line);

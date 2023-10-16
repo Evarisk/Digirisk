@@ -151,6 +151,7 @@ class FirePermit extends SaturneObject
 
         // Load source object
         $object->fetch($fromID);
+        $firepermitdets = $object->lines;
 
         // Load signatory and ressources form source object
         $signatories = $signatory->fetchSignatory('', $fromID, $object->element);
@@ -224,9 +225,6 @@ class FirePermit extends SaturneObject
             }
 
             if (!empty($options['firepermit_risk'])) {
-                $firepermitdet  = new PreventionPlanLine($this->db);
-                $firepermitdets = $firepermitdet->fetchAll('', '', 0, 0, ['fk_firepermit' => $fromID]);
-
                 if (is_array($firepermitdets) && !empty($firepermitdets)) {
                     foreach ($firepermitdets as $line) {
                         $line->ref           = $refFirePermitDetMod->getNextValue($line);
