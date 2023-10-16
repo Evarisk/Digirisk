@@ -89,7 +89,7 @@ if (empty($action) && empty($id) && empty($ref)) {
 	$action = 'view';
 }
 
-$upload_dir = $conf->digiriskdolibarr->multidir_output[$object->entity ?? 1];
+$upload_dir = $conf->digiriskdolibarr->multidir_output[$conf->entity ?? 1];
 
 // Load object
 require_once DOL_DOCUMENT_ROOT . '/core/actions_fetchobject.inc.php'; // Must be included, not include_once.
@@ -198,8 +198,7 @@ if (empty($reshook)) {
 		$moreParams['object']   = $object;
 		$moreParams['user']     = $user;
 		$moreParams['zone']     = 'private';
-		$constName              = get_class($object) . '::STATUS_LOCKED';
-		$moreParams['specimen'] = defined($constName) && $object->status < $object::STATUS_LOCKED;
+		$moreParams['specimen'] = 0;
 		$result = $document->generateDocument((!empty($models) ? $models[0] : ''), $langs, 0, 0, 0, $moreParams);
 
 		if ($result > 0) {
