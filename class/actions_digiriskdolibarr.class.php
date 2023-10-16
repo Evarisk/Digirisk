@@ -271,7 +271,7 @@ class ActionsDigiriskdolibarr
                         <?php
 					if (!empty($risk_id) && $risk_id > 0) { ?>
 						<script>
-                            jQuery('.project_task_extras_fk_risk').html(<?php echo json_encode($risk->getNomUrl(1, 'blank')) ?>);
+                            jQuery('.project_task_extras_fk_risk').html(<?php echo json_encode($risk->getNomUrl(1, 'nolink')) ?>);
 						</script>
 					<?php }
 					if (!empty($preventionplan_id) && $preventionplan_id > 0) { ?>
@@ -316,7 +316,7 @@ class ActionsDigiriskdolibarr
 							if ($parameters['currentcontext'] == 'projecttaskscard') {
 								if (!empty($risk_id) && $risk_id > 0) { ?>
 									<script>
-										jQuery('.div-table-responsive').find('tr[id="row-' + <?php echo $tasksingle->id; ?> +'"]').find('td[data-key="projet_task.fk_risk"]').html(<?php echo json_encode($risk->getNomUrl(1, 'blank')) ?>);
+										jQuery('.div-table-responsive').find('tr[id="row-' + <?php echo $tasksingle->id; ?> +'"]').find('td[data-key="projet_task.fk_risk"]').html(<?php echo json_encode($risk->getNomUrl(1, 'nolink')) ?>);
 									</script>
 								<?php }
 								if (!empty($preventionplan_id) && $preventionplan_id > 0) { ?>
@@ -343,7 +343,7 @@ class ActionsDigiriskdolibarr
 							if ($parameters['currentcontext'] == 'tasklist') {
 								if (!empty($risk_id) && $risk_id > 0) { ?>
 									<script>
-										jQuery('.div-table-responsive').find('tr[data-rowid="' + <?php echo $tasksingle->id; ?> +'"]').find('td[data-key="projet_task.fk_risk"]').html(<?php echo json_encode($risk->getNomUrl(1, 'blank')) ?>);
+										jQuery('.div-table-responsive').find('tr[data-rowid="' + <?php echo $tasksingle->id; ?> +'"]').find('td[data-key="projet_task.fk_risk"]').html(<?php echo json_encode($risk->getNomUrl(1, 'nolink')) ?>);
 									</script>
 								<?php }
 								if (!empty($preventionplan_id) && $preventionplan_id > 0) { ?>

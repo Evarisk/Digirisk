@@ -329,16 +329,16 @@ class RiskAssessmentUnitTest extends PHPUnit\Framework\TestCase
 	}
 
 	/**
-	 * testRiskAssessmentUpdateEvaluationStatus
+	 * testRiskAssessmentUpdatePreviousRiskAssessmentStatus
 	 *
 	 * @return void
 	 *
-	 * @covers RiskAssessment::updateEvaluationStatus
+	 * @covers RiskAssessment::updatePreviousRiskAssessmentStatus
 	 *
 	 * @depends testRiskAssessmentUpdate
 	 * The depends says test is run only if previous is ok
 	 */
-	public function testRiskAssessmentUpdateEvaluationStatus($localobject) : void
+	public function testRiskAssessmentUpdatePreviousRiskAssessmentStatus($localobject) : void
 	{
 		global $conf, $user, $langs, $db;
 		$conf  = $this->savconf;
@@ -346,7 +346,7 @@ class RiskAssessmentUnitTest extends PHPUnit\Framework\TestCase
 		$langs = $this->savlangs;
 		$db    = $this->savdb;
 
-		$result = $localobject->updateEvaluationStatus($user, $localobject->fk_risk);
+		$result = $localobject->UpdatePreviousRiskAssessmentStatus($user, $localobject->fk_risk);
 
 		$this->assertLessThan($result, 0);
 
