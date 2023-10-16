@@ -18,11 +18,11 @@
 /**
  * \file    lib/digiriskdolibarr_accidentinvestigation.lib.php
  * \ingroup digiriskdolibarr
- * \brief   Library files with common functions for Accident investigation
+ * \brief   Library files with common functions for accident investigation
  */
 
 /**
- * Prepare array of tabs for Accident investigation
+ * Prepare accident investigation pages header
  *
  * @param  AccidentInvestigation $object Accident investigation
  * @return array                         Array of tabs
@@ -30,9 +30,9 @@
  */
 function accidentinvestigation_prepare_head(AccidentInvestigation $object): array
 {
-	$moreparam['attendantTableMode'] = 'simple';
+    $moreParams['attendantTableMode'] = 'simple';
 
-	return saturne_object_prepare_head($object, [], $moreparam, true);
+    return saturne_object_prepare_head($object, [], $moreParams, true);
 }
 
 /**

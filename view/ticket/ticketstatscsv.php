@@ -113,7 +113,7 @@ llxHeader('', $title, $help_url, '', '', '', $morejs, $morecss);
 
 print load_fiche_titre($title, '', 'ticket');
 
-$head = ticketPrepareHead();
+$head = ticket_prepare_head();
 print dol_get_fiche_head($head, 'exportcsv', $langs->trans("ExportCSV"), -1);
 
 print '<div class="fichecenter"><div class="fichehalfleft">';

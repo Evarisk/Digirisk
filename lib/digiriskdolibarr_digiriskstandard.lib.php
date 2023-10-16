@@ -18,70 +18,76 @@
 /**
  * \file    lib/digiriskdolibarr_digiriskstandard.lib.php
  * \ingroup digiriskdolibarr
- * \brief   Library files with common functions for DigiriskStandard
+ * \brief   Library files with common functions for digirisk standard
  */
 
 /**
- * Prepare array of tabs for DigiriskStandard
+ * Prepare digirisk standard pages header
  *
- * @param	DigiriskStandard	$object		DigiriskStandard
- * @return 	array					Array of tabs
+ * @param  DigiriskStandard $object Digirisk standard
+ * @return array            $head   Array of tabs
+ * @throws Exception
  */
-function digiriskstandard_prepare_head($object)
+function digiriskstandard_prepare_head(DigiriskStandard $object): array
 {
-	global $langs, $conf, $user;
+    // Global variables definitions
+    global $conf, $langs, $user;
 
-	saturne_load_langs();
+    // Load translation files required by the page
+    saturne_load_langs();
 
-	$h    = 0;
-	$head = array();
+    // Initialize values
+    $h    = 0;
+    $head = [];
 
-	$head[$h][0] = dol_buildpath("/digiriskdolibarr/view/digiriskstandard/digiriskstandard_card.php", 1);
-	$head[$h][1] = '<i class="fas fa-info-circle"></i> ' . $langs->trans("Informations");
-	$head[$h][2] = 'standardCard';
-	$h++;
+    $head[$h][0] = dol_buildpath('/digiriskdolibarr/view/digiriskstandard/digiriskstandard_card.php', 1);
+    $head[$h][1] = $conf->browser->layout != 'phone' ? '<i class="fas fa-info-circle pictofixedwidth"></i>' . $langs->trans('Informations') : '<i class="fas fa-info-circle"></i>';
+    $head[$h][2] = 'standardCard';
+    $h++;
 
-	if ($user->rights->digiriskdolibarr->legaldisplay->read) {
-		$head[$h][0] = dol_buildpath("/digiriskdolibarr/view/digiriskstandard/digiriskstandard_legaldisplay.php", 1);
-		$head[$h][1] = '<i class="fas fa-file"></i> ' . $langs->trans("LegalDisplay");
-		$head[$h][2] = 'standardLegalDisplay';
-		$h++;
-	}
+    if ($user->rights->digiriskdolibarr->legaldisplay->read) {
+        $head[$h][0] = dol_buildpath("/digiriskdolibarr/view/digiriskstandard/digiriskstandard_legaldisplay.php", 1);
+        $head[$h][1] = $conf->browser->layout != 'phone' ? '<i class="fas fa-file pictofixedwidth"></i>' . $langs->trans('LegalDisplay') : '<i class="fas fa-file"></i>';
+        $head[$h][2] = 'standardLegalDisplay';
+        $h++;
+    }
 
-	if ($user->rights->digiriskdolibarr->informationssharing->read) {
-		$head[$h][0] = dol_buildpath("/digiriskdolibarr/view/digiriskstandard/digiriskstandard_informationssharing.php", 1);
-		$head[$h][1] = '<i class="fas fa-comment-dots"></i> ' . $langs->trans("InformationsSharing");
-		$head[$h][2] = 'standardInformationsSharing';
-		$h++;
-	}
+    if ($user->rights->digiriskdolibarr->informationssharing->read) {
+        $head[$h][0] = dol_buildpath('/digiriskdolibarr/view/digiriskstandard/digiriskstandard_informationssharing.php', 1);
+        $head[$h][1] = $conf->browser->layout != 'phone' ? '<i class="fas fa-comment-dots pictofixedwidth"></i>' . $langs->trans('InformationsSharing') : '<i class="fas fa-comment-dots"></i>';
+        $head[$h][2] = 'standardInformationsSharing';
+        $h++;
+    }
 
-	if ($user->rights->digiriskdolibarr->listingrisksaction->read) {
-		$head[$h][0] = dol_buildpath("/digiriskdolibarr/view/digiriskelement/digiriskelement_listingrisksaction.php", 1) . '?type=standard';
-		$head[$h][1] = '<i class="fas fa-exclamation"></i> ' . $langs->trans("ListingRisksAction");
-		$head[$h][2] = 'elementListingRisksAction';
-		$h++;
-	}
+    if ($user->rights->digiriskdolibarr->listingrisksaction->read) {
+        $head[$h][0] = dol_buildpath('/digiriskdolibarr/view/digiriskelement/digiriskelement_listingrisksaction.php', 1) . '?type=standard';
+        $head[$h][1] = $conf->browser->layout != 'phone' ? '<i class="fas fa-exclamation pictofixedwidth"></i>' . $langs->trans('ListingRisksAction') : '<i class="fas fa-exclamation"></i>';
+        $head[$h][2] = 'elementListingRisksAction';
+        $h++;
+    }
 
-	if ($user->rights->digiriskdolibarr->listingrisksphoto->read) {
-		$head[$h][0] = dol_buildpath("/digiriskdolibarr/view/digiriskelement/digiriskelement_listingrisksphoto.php", 1) . '?type=standard';
-		$head[$h][1] = '<i class="fas fa-images"></i> ' . $langs->trans("ListingRisksPhoto");
-		$head[$h][2] = 'elementListingRisksPhoto';
-		$h++;
-	}
+    if ($user->rights->digiriskdolibarr->listingrisksphoto->read) {
+        $head[$h][0] = dol_buildpath('/digiriskdolibarr/view/digiriskelement/digiriskelement_listingrisksphoto.php', 1) . '?type=standard';
+        $head[$h][1] = $conf->browser->layout != 'phone' ? '<i class="fas fa-images pictofixedwidth"></i>' . $langs->trans('ListingRisksPhoto') : '<i class="fas fa-images"></i>';
+        $head[$h][2] = 'elementListingRisksPhoto';
+        $h++;
+    }
 
-	if ($user->rights->digiriskdolibarr->riskassessmentdocument->read) {
-		$head[$h][0] = dol_buildpath("/digiriskdolibarr/view/digiriskstandard/digiriskstandard_riskassessmentdocument.php", 1);
-		$head[$h][1] = '<i class="fas fa-file-alt"></i> ' . $langs->trans("RiskAssessmentDocument");
-		$head[$h][2] = 'standardRiskAssessmentDocument';
-		$h++;
-	}
+    if ($user->rights->digiriskdolibarr->riskassessmentdocument->read) {
+        $head[$h][0] = dol_buildpath('/digiriskdolibarr/view/digiriskstandard/digiriskstandard_riskassessmentdocument.php', 1);
+        $head[$h][1] = $conf->browser->layout != 'phone' ? '<i class="fas fa-file-alt pictofixedwidth"></i>' . $langs->trans("RiskAssessmentDocument") : '<i class="fas fa-file-alt"></i>';
+        $head[$h][2] = 'standardRiskAssessmentDocument';
+        $h++;
+    }
 
-	$head[$h][0] = dol_buildpath("/digiriskdolibarr/view/digiriskstandard/digiriskstandard_agenda.php", 1);
-	$head[$h][1] = '<i class="fas fa-calendar"></i> ' . $langs->trans("Events");
-	$head[$h][2] = 'standardAgenda';
-	$h++;
+    $head[$h][0] = dol_buildpath('/digiriskdolibarr/view/digiriskstandard/digiriskstandard_agenda.php', 1);
+    $head[$h][1] = $conf->browser->layout != 'phone' ? '<i class="fas fa-calendar-alt pictofixedwidth"></i>' . $langs->trans('Events') : '<i class="fas fa-calendar-alt"></i>';
+    $head[$h][2] = 'standardAgenda';
+    $h++;
 
-	complete_head_from_modules($conf, $langs, $object, $head, $h, 'digiriskstandard@digiriskdolibarr');
+    complete_head_from_modules($conf, $langs, $object, $head, $h, 'digiriskstandard@digiriskdolibarr');
 
-	return $head;
+    complete_head_from_modules($conf, $langs, $object, $head, $h, 'digiriskstandard@digiriskdolibarr', 'remove');
+
+    return $head;
 }

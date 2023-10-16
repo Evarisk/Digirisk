@@ -551,7 +551,7 @@ class Risk extends SaturneObject
      */
     public function getRisksByCotation(): array
     {
-        global $langs;
+        global $conf, $langs;
 
         $riskAssessment = new RiskAssessment($this->db);
 
@@ -560,10 +560,11 @@ class Risk extends SaturneObject
         $array['picto'] = $this->picto;
 
         // Graph parameters
-        $array['width']   = '100%';
-        $array['height']  = 400;
-        $array['type']    = 'pie';
-        $array['dataset'] = 1;
+        $array['width']      = '100%';
+        $array['height']     = 400;
+        $array['type']       = 'pie';
+        $array['showlegend'] = $conf->browser->layout == 'phone' ? 1 : 2;
+        $array['dataset']    = 1;
 
         $array['labels'] = [
             1 => [

@@ -1784,51 +1784,34 @@ class modDigiriskdolibarr extends DolibarrModules
 			dolibarr_set_const($this->db, 'DIGIRISKDOLIBARR_THIRDPARTY_SET', 3, 'integer', 0, '', $conf->entity);
 		}
 
-		if ( $conf->global->DIGIRISKDOLIBARR_CONTACTS_SET == 0 ) {
-			require_once DOL_DOCUMENT_ROOT . '/contact/class/contact.class.php';
-			require_once __DIR__ . '/../../class/digiriskresources.class.php';
+        if (getDolGlobalInt('DIGIRISKDOLIBARR_CONTACTS_SET') == 0) {
+            require_once DOL_DOCUMENT_ROOT . '/contact/class/contact.class.php';
+            require_once __DIR__ . '/../../class/digiriskresources.class.php';
 
-			$contact   = new Contact($this->db);
-			$resources = new DigiriskResources($this->db);
+            $contact   = new Contact($this->db);
+            $resources = new DigiriskResources($this->db);
 
-			$allLinks  = $resources->fetchDigiriskResource('LabourDoctorSociety');
+            $allLinks  = $resources->fetchDigiriskResource('LabourDoctorSociety');
 
-			$labour_doctor            = $contact;
-			$labour_doctor->socid     = $allLinks;
-			$labour_doctor->firstname = $langs->transnoentities('LabourDoctorFirstName');
-			$labour_doctor->lastname  = $langs->trans('LabourDoctorLastName');
-			$labour_doctorID          = $labour_doctor->create($user);
+            $labourDoctor            = $contact;
+            $labourDoctor->socid     = $allLinks;
+            $labourDoctor->firstname = $langs->transnoentities('LabourDoctorFirstName');
+            $labourDoctor->lastname  = $langs->trans('LabourDoctorLastName');
+            $labourDoctorID          = $labourDoctor->create($user);
 
-			$allLinks  = $resources->fetchDigiriskResource('LabourInspectorSociety');
+            $allLinks = $resources->fetchDigiriskResource('LabourInspectorSociety');
 
-			$labour_inspector            = $contact;
-			$labour_inspector->socid     = $allLinks;
-			$labour_inspector->firstname = $langs->trans('LabourInspectorFirstName');
-			$labour_inspector->lastname  = $langs->trans('LabourInspectorLastName');
-			$labour_inspectorID          = $labour_inspector->create($user);
+            $labourInspector            = $contact;
+            $labourInspector->socid     = $allLinks;
+            $labourInspector->firstname = $langs->trans('LabourInspectorFirstName');
+            $labourInspector->lastname  = $langs->trans('LabourInspectorLastName');
+            $labourInspectorID          = $labourInspector->create($user);
 
-			$resources->setDigiriskResources($this->db, 1, 'LabourDoctorContact', 'socpeople', [$labour_doctorID], $conf->entity);
-			$resources->setDigiriskResources($this->db, 1, 'LabourInspectorContact', 'socpeople', [$labour_inspectorID], $conf->entity);
+            $resources->setDigiriskResources($this->db, 1, 'LabourDoctorContact', 'socpeople', [$labourDoctorID], $conf->entity);
+            $resources->setDigiriskResources($this->db, 1, 'LabourInspectorContact', 'socpeople', [$labourInspectorID], $conf->entity);
 
-			dolibarr_set_const($this->db, 'DIGIRISKDOLIBARR_CONTACTS_SET', 2, 'integer', 0, '', $conf->entity);
-		} elseif ($conf->global->DIGIRISKDOLIBARR_CONTACTS_SET == 2) {
-			require_once DOL_DOCUMENT_ROOT . '/contact/class/contact.class.php';
-			require_once __DIR__ . '/../../class/digiriskresources.class.php';
-
-			$contact   = new Contact($this->db);
-			$resources = new DigiriskResources($this->db);
-			$allLinks  = $resources->fetchDigiriskResource('LabourDoctorSociety');
-
-			$labour_doctor            = $contact;
-			$labour_doctor->socid     = $allLinks;
-			$labour_doctor->firstname = $langs->transnoentities('LabourDoctorFirstName');
-			$labour_doctor->lastname  = $langs->trans('LabourDoctorLastName');
-			$labour_doctorID          = $labour_doctor->create($user);
-
-			$resources->setDigiriskResources($this->db, 1, 'LabourDoctorContact', 'socpeople', [$labour_doctorID], $conf->entity);
-
-			dolibarr_set_const($this->db, 'DIGIRISKDOLIBARR_CONTACTS_SET', 3, 'integer', 0, '', $conf->entity);
-		}
+            dolibarr_set_const($this->db, 'DIGIRISKDOLIBARR_CONTACTS_SET', 1, 'integer', 0, '', $conf->entity);
+        }
 
 		if ( $conf->global->DIGIRISKDOLIBARR_THIRDPARTY_UPDATED == 0 ) {
 			require_once DOL_DOCUMENT_ROOT . '/societe/class/societe.class.php';
@@ -2158,12 +2141,20 @@ class modDigiriskdolibarr extends DolibarrModules
         //BACKWARD NUM REF
         if ($conf->global->DIGIRISKDOLIBARR_CUSTOM_NUM_REF_SET == 0) {
             $objectTypeAndMod = [
-                'Risk' => ['tarqeq', 'RK{0}'],
-                'RiskAssessment' => ['jarnsaxa', 'RA{0}'],
-                'RiskSign' => ['greip', 'RS{0}'],
-                'Evaluator' => ['bebhionn', 'EV{0}'],
-                'Groupment' => ['sirius', 'GP{0}'],
-                'WorkUnit' => ['canopus', 'WU{0}'],
+                'Risk'                  => ['tarqeq', 'RK{0}'],
+                'RiskAssessment'        => ['jarnsaxa', 'RA{0}'],
+                'RiskSign'              => ['greip', 'RS{0}'],
+                'Evaluator'             => ['bebhionn', 'EV{0}'],
+                'Groupment'             => ['sirius', 'GP{0}'],
+                'WorkUnit'              => ['canopus', 'WU{0}'],
+                'Accident'              => ['curtiss', 'ACC{0}'],
+                'AccidentLesion'        => ['wright', 'ACCL{0}'],
+                'AccidentWorkStop'      => ['richthofen', 'ACCW{0}'],
+                'AccidentInvestigation' => ['peggy', 'AI{0}'],
+                'PreventionPlan'        => ['hinkler', 'PP{0}'],
+                'PreventionPlanDet'     => ['alvaldi', 'PPR{0}'],
+                'FirePermit'            => ['bleriot', 'FP{0}'],
+                'FirePermitDet'         => ['earhart', 'FPR{0}'],
             ];
 
             foreach($objectTypeAndMod as $type => $mod) {
