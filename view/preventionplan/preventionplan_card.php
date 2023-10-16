@@ -600,19 +600,12 @@ if (empty($reshook)) {
 	}
 
 	// Actions to send emails
-	$triggersendname     = 'PREVENTIONPLAN_SENTBYMAIL';
-	$mode                = 'emailfromthirdparty';
-	$trackid             = 'thi' . $object->id;
+	$triggersendname    = 'PREVENTIONPLAN_SENTBYMAIL';
+	$trackid            = 'preventionplan' . $object->id;
 	$labourInspector    = $digiriskresources->fetchResourcesFromObject('LabourInspector', $object);
-	$labourInspectorId   = $labourInspector->id;
+	$labourInspectorId  = $labourInspector->id;
 	$thirdparty->fetch($labourInspectorId);
 	$object->thirdparty = $thirdparty;
-
-	if ($action == 'send' && dol_strlen(GETPOST('sendto') < 1)) {
-		setEventMessages($langs->trans("SendToNoEmail"), null, 'errors');
-		header("Location: " . $_SERVER['PHP_SELF'] . '?id=' . $id);
-		exit();
-	}
 
 	include DOL_DOCUMENT_ROOT . '/core/actions_sendmails.inc.php';
 }
@@ -925,7 +918,7 @@ $formconfirm = '';
 // SetLocked confirmation
 if (($action == 'setLocked' && (empty($conf->use_javascript_ajax) || ! empty($conf->dol_use_jmobile)))		// Output when action = clone if jmobile or no js
 	|| ( ! empty($conf->use_javascript_ajax) && empty($conf->dol_use_jmobile))) {							// Always output when not jmobile nor js
-	$formconfirm .= $form->formconfirm($_SERVER["PHP_SELF"] . '?id=' . $object->id, $langs->trans('LockObject', $langs->transnoentities('The' . $object->element)), $langs->trans('ConfirmLockObject', $langs->transnoentities('The' . $object->element)), 'confirm_setLocked', '', 'yes', 'actionButtonLock', 350, 600);
+    $formconfirm .= $form->formconfirm($_SERVER["PHP_SELF"] . '?id=' . $object->id, $langs->trans('LockObject', $langs->transnoentities('The' . ucfirst($object->element))), $langs->trans('ConfirmLockObject', $langs->transnoentities('The' . ucfirst($object->element))), 'confirm_setLocked', '', 'yes', 'actionButtonLock', 350, 600);
 }
 
 // setPendingSignature confirmation
@@ -1455,7 +1448,7 @@ if ((empty($action) || ($action != 'create' && $action != 'edit'))) {
 	$defaulttopic = 'Information';
 	$diroutput    = $conf->digiriskdolibarr->multidir_output[$conf->entity] . '/' . $object->element . 'document';
 	$ref          = $object->ref . '/';
-	$trackid      = 'thi' . $object->id;
+	$trackid      = 'preventionplan' . $object->id;
 
 	if ($action == 'presend') {
 		$langs->load("mails");

@@ -53,6 +53,7 @@ saturne_load_langs(['other']);
 
 // Get parameters
 $action = GETPOST('action', 'aZ09');
+$id     = GETPOST('id', 'integer');
 
 // Initialize technical objects
 $object                 = new DigiriskStandard($db);
@@ -309,7 +310,7 @@ if (empty($reshook)) {
 	// Actions to send emails
 	$triggersendname     = 'RISKASSESSMENTDOCUMENT_SENTBYMAIL';
 	$mode                = 'emailfromthirdparty';
-	$trackid             = 'thi' . $object->id;
+	$trackid             = 'riskassessment' . $object->id;
 	$labour_inspector    = $allLinks['LabourInspectorSociety'];
 	$labourInspectorId = $allLinks['LabourInspectorSociety']->id[0];
 	$thirdparty->fetch($labourInspectorId);
@@ -453,27 +454,29 @@ $modelmail    = 'riskassessmentdocument';
 $defaulttopic = 'Information';
 $diroutput    = $upload_dir . '/riskassessmentdocument';
 $filter       = array('customsql' => "t.type='riskassessmentdocument'");
-$document     = $document->fetchAll('desc', 't.rowid', 1, 0, $filter, 'AND');
-if ( ! empty($document) && is_array($document)) {
-	$document = array_shift($document);
-	$ref                    = dol_sanitizeFileName($document->ref);
-}
-$trackid = 'thi' . $object->id;
+$document     = $document->fetchAll('desc', 't.rowid', 1, 0, $filter);
 
-if ($action == 'presend' && ! empty($document)) {
+if (!empty($document) && is_array($document)) {
+	$document = array_shift($document);
+	$ref      = dol_sanitizeFileName($document->ref);
+}
+$trackid = 'riskassessment' . $object->id;
+
+if ($action == 'presend') {
 	$langs->load("mails");
 
 	$titreform = 'SendMail';
 
 	$object->fetch_projet();
 
-	if ( ! in_array($object->element, array('societe', 'user', 'member'))) {
-		include_once DOL_DOCUMENT_ROOT . '/core/lib/files.lib.php';
-		$fileparams = dol_dir_list($diroutput, 'files', 0, '');
-		foreach ($fileparams as $fileparam) {
-			preg_match('/' . $ref . '/', $fileparam['name']) ? $filevalue[] = $fileparam['fullname'] : 0;
-		}
-	}
+    if (!in_array($object->element, array('societe', 'user', 'member'))) {
+        include_once DOL_DOCUMENT_ROOT . '/core/lib/files.lib.php';
+        $fileparams = dol_dir_list($diroutput, 'files', 0, '', [], 'date', 'SORT_DESC');
+        $lastRef    = pathinfo($fileparams[0]['name']);
+        foreach ($fileparams as $fileparam) {
+            preg_match('/' . $lastRef['filename'] . '/', $fileparam['name']) ? $filevalue[] = $fileparam['fullname'] : 0;
+        }
+    }
 
 	// Define output language
 	$outputlangs = $langs;
