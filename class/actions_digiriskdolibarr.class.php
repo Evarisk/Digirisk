@@ -814,40 +814,45 @@ class ActionsDigiriskdolibarr
 	}
 
     /**
-     * Overloading the saturneBannerTab function : replacing the parent's function with the one below.
+     * Overloading the saturneBannerTab function : replacing the parent's function with the one below
      *
-     * @param  array $parameters Hook metadatas (context, etc...).
-     * @return int              0 < on error, 0 on success, 1 to replace standard code.
+     * @param  array  $parameters Hook metadatas (context, etc...)
+     * @param  object $object     Current object
+     * @return int                0 < on error, 0 on success, 1 to replace standard code
      */
-    public function saturneBannerTab(array $parameters, $object)
+    public function saturneBannerTab(array $parameters, object $object): int
     {
         global $conf, $langs;
 
-        // Do something only for the current context.
         if ($parameters['currentcontext'] == 'firepermitsignature') {
             require_once __DIR__ . '/../class/digiriskresources.class.php';
 
-            $digiriskresources = new DigiriskResources($this->db);
+            $digiriskResources = new DigiriskResources($this->db);
 
-            $extSociety  = $digiriskresources->fetchResourcesFromObject('ExtSociety', $object);
+            $extSociety  = $digiriskResources->fetchResourcesFromObject('ExtSociety', $object);
             $moreHtmlRef = $langs->trans('ExtSociety') . ' : ' . $extSociety->getNomUrl(1);
 
             $this->resprints = $moreHtmlRef;
         }
-        if (in_array($parameters['currentcontext'], ['digiriskelementdocument', 'digiriskelementagenda'])) {
+        if (in_array($parameters['currentcontext'], ['digiriskelementdocument', 'digiriskelementagenda', 'accidentdocument', 'accidentagenda', 'digiriskstandardagenda'])) {
             list($moreHtmlRef, $moreParams) = $object->getBannerTabContent();
-            $object->fk_project = $conf->global->DIGIRISKDOLIBARR_DU_PROJECT;
-            $this->results = [$moreHtmlRef, $moreParams];
-        }
-        if (in_array($parameters['currentcontext'], ['accidentdocument', 'accidentagenda'])) {
-            list($moreHtmlRef, $moreParams) = $object->getBannerTabContent();
-            if ($id > 0 && $object->external_accident != 2) {
-                unset($object->fk_soc);
+            switch ($parameters['currentcontext']) {
+                case 'digiriskelementdocument' :
+                case 'digiriskelementagenda' :
+                case 'digiriskstandardagenda' :
+                    $object->fk_project = $conf->global->DIGIRISKDOLIBARR_DU_PROJECT;
+                    break;
+                case 'accidentdocument' :
+                case 'accidentagenda' :
+                    if ($object->id > 0 && $object->external_accident != 2) {
+                        unset($object->fk_soc);
+                    }
+                    break;
             }
             $this->results = [$moreHtmlRef, $moreParams];
         }
 
-            return 0; // or return 1 to replace standard code.
+        return 0; // or return 1 to replace standard code
     }
 
 	/**
@@ -973,7 +978,7 @@ class ActionsDigiriskdolibarr
 	{
 		// Do something only for the current context.
 
-		if (in_array($parameters['currentcontext'], ['digiriskelementdocument', 'digiriskelementagenda'])) {
+		if (in_array($parameters['currentcontext'], ['digiriskelementdocument', 'digiriskelementagenda', 'digiriskstandardagenda'])) {
 			require_once __DIR__ . '/../lib/digiriskdolibarr_function.lib.php';
 
 			$this->resprints = 'digirisk_header';
@@ -994,12 +999,12 @@ class ActionsDigiriskdolibarr
         global $conf;
 
 		// Do something only for the current context.
-		if (in_array($parameters['currentcontext'], ['digiriskelementview', 'digiriskstandardview'])) {
+		if (in_array($parameters['currentcontext'], ['digiriskelementview', 'digiriskstandardview', 'digiriskstandardagenda'])) {
 			require_once __DIR__ . '/../lib/digiriskdolibarr_function.lib.php';
 			if ($object->element == 'digiriskelement') {
 				$this->results = ['subdir' => $object->element_type . '/'. $object->ref];
-			} else if ($object->element == 'digiriskstandard') {
-				$this->results = ['dir' => $conf->mycompany->dir_output, 'subdir' => 'logos'];
+			} elseif ($object->element == 'digiriskstandard') {
+				$this->results = ['modulepart' => 'mycompany', 'dir' => $conf->mycompany->dir_output, 'subdir' => 'logos'];
 			}
 
 			return 1;

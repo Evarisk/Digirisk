@@ -88,7 +88,7 @@ class InformationsSharing extends DigiriskDocuments
 			if ($result > 0) {
 				$json['InformationsSharing']['harassment_officer']['id']    = $harassment_officer->id;
 				$json['InformationsSharing']['harassment_officer']['name']  = $harassment_officer->getFullName($langs);
-				$json['InformationsSharing']['harassment_officer']['phone'] = $harassment_officer->phone_pro;
+				$json['InformationsSharing']['harassment_officer']['phone'] = $harassment_officer->office_phone;
 			}
 
 			$harassment_officer_cse = new User($this->db);
@@ -97,7 +97,7 @@ class InformationsSharing extends DigiriskDocuments
 			if ($result > 0) {
 				$json['InformationsSharing']['harassment_officer_cse']['id']    = $harassment_officer_cse->id;
 				$json['InformationsSharing']['harassment_officer_cse']['name']  = $harassment_officer_cse->getFullName($langs);
-				$json['InformationsSharing']['harassment_officer_cse']['phone'] = $harassment_officer_cse->phone_pro;
+				$json['InformationsSharing']['harassment_officer_cse']['phone'] = $harassment_officer_cse->office_phone;
 			}
 
 			$json['InformationsSharing']['delegues_du_personnels_date']    	  = (dol_strlen($conf->global->DIGIRISKDOLIBARR_DP_ELECTION_DATE) > 0 && $conf->global->DIGIRISKDOLIBARR_DP_ELECTION_DATE != '--' ? $conf->global->DIGIRISKDOLIBARR_DP_ELECTION_DATE : '');

@@ -64,10 +64,9 @@ $object->fetch($conf->global->DIGIRISKDOLIBARR_ACTIVE_STANDARD);
 $upload_dir = $conf->digiriskdolibarr->multidir_output[$conf->entity ?? 1];
 
 // Security check - Protection if external user
-$permissiontoread   = $user->rights->digiriskdolibarr->legaldisplay->read;
+$permissiontoread   = $user->rights->digiriskdolibarr->digiriskstandard->read && $user->rights->digiriskdolibarr->legaldisplay->read;
 $permissiontoadd    = $user->rights->digiriskdolibarr->legaldisplay->write;
 $permissiontodelete = $user->rights->digiriskdolibarr->legaldisplay->delete;
-
 saturne_check_access($permissiontoread);
 
 /*
@@ -118,7 +117,7 @@ $morehtmlref .= $langs->trans('Project') . ' : ' . getNomUrlProject($project, 1,
 $morehtmlref .= '</div>';
 
 $moduleNameLowerCase = 'mycompany';
-saturne_banner_tab($object,'ref','', 1, 'ref', 'ref', $morehtmlref, true);
+saturne_banner_tab($object,'ref','none', 1, 'ref', 'ref', $morehtmlref, true);
 $moduleNameLowerCase = 'digiriskdolibarr';
 
 print '<a href="../../admin/securityconf.php" target="_blank">' . $langs->trans('ConfigureSecurityAndSocialData') . ' <i class="fas fa-external-link-alt"></i></a>';

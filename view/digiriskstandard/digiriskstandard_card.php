@@ -61,8 +61,7 @@ $object->fetch($conf->global->DIGIRISKDOLIBARR_ACTIVE_STANDARD);
 $hookmanager->initHooks(array('digiriskelementcard', 'digiriskstandardview', 'globalcard')); // Note that conf->hooks_modules contains array
 
 // Security check - Protection if external user
-$permissiontoread = $user->rights->digiriskdolibarr->riskassessmentdocument->read;
-
+$permissiontoread = $user->rights->digiriskdolibarr->digiriskstandard->read && $user->rights->digiriskdolibarr->riskassessmentdocument->read;
 saturne_check_access($permissiontoread);
 
 /*
@@ -112,7 +111,7 @@ if ((empty($action) || ($action != 'edit' && $action != 'create'))) {
 	$morehtmlref .= '</div>';
 
 	$moduleNameLowerCase = 'mycompany';
-	saturne_banner_tab($object,'ref','', 1, 'ref', 'ref', $morehtmlref, true);
+	saturne_banner_tab($object,'ref','none', 1, 'ref', 'ref', $morehtmlref, true);
 	$moduleNameLowerCase = 'digiriskdolibarr';
 
 	print '<div class="fichecenter">';

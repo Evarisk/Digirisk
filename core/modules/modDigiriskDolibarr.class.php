@@ -435,7 +435,8 @@ class modDigiriskdolibarr extends DolibarrModules
                 'digiriskelementagenda',
 				'digiriskstandardview',
                 'accidentdocument',
-                'accidentagenda'
+                'accidentagenda',
+                'digiriskstandardagenda'
 			],
 			'tabs' => [
 				'mycompany_admin'
@@ -1002,6 +1003,13 @@ class modDigiriskdolibarr extends DolibarrModules
 		$this->rights[$r][4] = 'read';
 		$this->rights[$r][5] = 1;
 		$r++;
+
+        /* DIGIRISK STANDARD PERMISSIONS */
+        $this->rights[$r][0] = $this->numero . sprintf('%02d', $r + 1); // Permission id (must not be already used)
+        $this->rights[$r][1] = $langs->transnoentities('ReadObjects',$langs->transnoentities('DigiriskStandardMin')); // Permission label
+        $this->rights[$r][4] = 'digiriskstandard'; // In php code, permission will be checked by test if ($user->rights->digiriskdolibarr->level1->level2)
+        $this->rights[$r][5] = 'read'; // In php code, permission will be checked by test if ($user->rights->digiriskdolibarr->level1->level2)
+        $r++;
 
 		/* RISK ASSESSMENT DOCUMENT PERMISSIONS */
 		$this->rights[$r][0] = $this->numero . sprintf('%02d', $r + 1); // Permission id (must not be already used)
