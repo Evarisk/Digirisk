@@ -50,6 +50,7 @@ saturne_load_langs(['projects', 'companies', 'commercial']);
 
 // Get parameters
 $action      = GETPOST('action', 'alpha');
+$subaction   = GETPOST('subaction', 'aZ09');
 $massaction  = GETPOST('massaction', 'alpha');
 $show_files  = GETPOST('show_files', 'int');
 $confirm     = GETPOST('confirm', 'alpha');
