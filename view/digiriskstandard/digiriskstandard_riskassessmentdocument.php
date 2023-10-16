@@ -472,9 +472,9 @@ if ($action == 'presend') {
     if (!in_array($object->element, array('societe', 'user', 'member'))) {
         include_once DOL_DOCUMENT_ROOT . '/core/lib/files.lib.php';
         $fileparams = dol_dir_list($diroutput, 'files', 0, '', [], 'date', 'SORT_DESC');
-        preg_match('#_(.*)_#U', $fileparams[0]['name'], $lastRef);
+        $lastRef    = pathinfo($fileparams[0]['name']);
         foreach ($fileparams as $fileparam) {
-            preg_match('/' . $lastRef[0] . '/', $fileparam['name']) ? $filevalue[] = $fileparam['fullname'] : 0;
+            preg_match('/' . $lastRef['filename'] . '/', $fileparam['name']) ? $filevalue[] = $fileparam['fullname'] : 0;
         }
     }
 
