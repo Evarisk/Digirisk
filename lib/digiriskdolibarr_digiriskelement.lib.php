@@ -37,7 +37,7 @@ function digiriskelement_prepare_head(DigiriskElement $object)
     saturne_load_langs();
 
     // Initialize values
-    $h    = 0;
+    $h    = 1;
     $head = [];
 
     if ($object->id > 0) {
