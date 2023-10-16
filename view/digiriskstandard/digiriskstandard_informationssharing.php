@@ -46,7 +46,8 @@ global $db, $conf, $langs, $hookmanager, $user;
 saturne_load_langs(['other']);
 
 // Get parameters
-$action = GETPOST('action', 'aZ09');
+$action    = GETPOST('action', 'aZ09');
+$subaction = GETPOST('subaction', 'aZ09');
 
 // Initialize technical objects
 $object   = new DigiriskStandard($db);

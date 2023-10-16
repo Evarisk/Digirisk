@@ -45,9 +45,10 @@ global $conf, $db, $hookmanager, $langs, $user;
 // Load translation files required by the page
 saturne_load_langs(['other']);
 // Get parameters
-$id     = GETPOST('id', 'int');
-$action = GETPOST('action', 'aZ09');
-$type   = GETPOST('type', 'aZ09');
+$id        = GETPOST('id', 'int');
+$action    = GETPOST('action', 'aZ09');
+$subaction = GETPOST('subaction', 'aZ09');
+$type      = GETPOST('type', 'aZ09');
 
 // Initialize technical objects
 $document = new ListingRisksAction($db);

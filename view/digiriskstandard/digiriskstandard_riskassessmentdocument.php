@@ -52,17 +52,18 @@ global $db, $conf, $langs, $hookmanager, $user;
 saturne_load_langs(['other']);
 
 // Get parameters
-$action = GETPOST('action', 'aZ09');
-$id     = GETPOST('id', 'integer');
+$action    = GETPOST('action', 'aZ09');
+$subaction = GETPOST('subaction', 'aZ09');
+$id        = GETPOST('id', 'integer');
 
 // Initialize technical objects
-$object                 = new DigiriskStandard($db);
-$digiriskelement        = new DigiriskElement($db);
-$document               = new RiskAssessmentDocument($db);
-$digiriskresources      = new DigiriskResources($db);
-$thirdparty             = new Societe($db);
-$contact                = new Contact($db);
-$project                = new Project($db);
+$object            = new DigiriskStandard($db);
+$digiriskelement   = new DigiriskElement($db);
+$document          = new RiskAssessmentDocument($db);
+$digiriskresources = new DigiriskResources($db);
+$thirdparty        = new Societe($db);
+$contact           = new Contact($db);
+$project           = new Project($db);
 
 $hookmanager->initHooks(array('digiriskelementriskassessmentdocument', 'digiriskstandardview', 'globalcard')); // Note that conf->hooks_modules contains array
 
@@ -71,7 +72,7 @@ $object->fetch($conf->global->DIGIRISKDOLIBARR_ACTIVE_STANDARD);
 // Load resources
 $allLinks = $digiriskresources->fetchDigiriskResources();
 
-$upload_dir = $conf->digiriskdolibarr->multidir_output[isset($conf->entity) ? $conf->entity : 1];
+$upload_dir = $conf->digiriskdolibarr->multidir_output[$conf->entity ?? 1];
 
 // Security check - Protection if external user
 $permissiontoread   = $user->rights->digiriskdolibarr->digiriskstandard->read && $user->rights->digiriskdolibarr->riskassessmentdocument->read;

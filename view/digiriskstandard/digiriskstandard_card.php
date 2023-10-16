@@ -49,7 +49,8 @@ global $conf, $db, $hookmanager, $moduleNameLowerCase, $moduleNameUpperCase, $la
 saturne_load_langs();
 
 // Get parameters
-$action = GETPOST('action', 'alpha');
+$action    = GETPOST('action', 'alpha');
+$subaction = GETPOST('subaction', 'alpha');
 
 // Initialize technical objects
 $object    = new DigiriskStandard($db);

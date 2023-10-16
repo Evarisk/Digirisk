@@ -49,6 +49,7 @@ saturne_load_langs(['other']);
 $id         = GETPOST('id', 'int');
 $ref        = GETPOST('ref', 'alpha');
 $action     = GETPOST('action', 'alpha');
+$subaction  = GETPOST('subaction', 'aZ09');
 $cancel     = GETPOST('cancel', 'aZ09');
 $backtopage = GETPOST('backtopage', 'alpha');
 

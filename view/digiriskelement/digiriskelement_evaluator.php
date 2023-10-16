@@ -50,6 +50,7 @@ saturne_load_langs(['other']);
 // Get parameters
 $id          = GETPOST('id', 'int');
 $action      = GETPOST('action', 'aZ09');
+$subaction   = GETPOST('subaction', 'aZ09');
 $massaction  = GETPOST('massaction', 'alpha'); // The bulk action (combo box choice into lists)
 $confirm     = GETPOST('confirm', 'alpha');
 $cancel      = GETPOST('cancel', 'aZ09');
