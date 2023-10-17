@@ -191,7 +191,7 @@ class doc_preventionplandocument_odt extends SaturneDocumentModel
 
 		if ($foundTagForLines) {
 			if ( ! empty($extsocietyintervenants) && $extsocietyintervenants > 0) {
-				$k         = 3;
+				$k = 3;
 				foreach ($extsocietyintervenants as $line) {
 					if ($line->status == 5) {
 						if (($moreParam['specimen'] == 0 && $object->status >= $object::STATUS_LOCKED)) {
@@ -200,10 +200,10 @@ class doc_preventionplandocument_odt extends SaturneDocumentModel
 							file_put_contents($tempdir . "signature" . $k . ".png", $decoded_image);
 							$tmpArray['intervenants_signature'] = $tempdir . "signature" . $k . ".png";
 						} else {
-							$tmpArray['intervenants_signature'] = '';
+							$tmpArray['intervenants_signature'] = $langs->transnoentities('Absent');
 						}
 					} else {
-						$tmpArray['intervenants_signature'] = '';
+						$tmpArray['intervenants_signature'] = $langs->transnoentities('Absent');
 					}
 					$tmpArray['name']     = $line->firstname;
 					$tmpArray['lastname'] = $line->lastname;
@@ -214,7 +214,6 @@ class doc_preventionplandocument_odt extends SaturneDocumentModel
 					$k++;
 
 					$this->setTmpArrayVars($tmpArray, $listLines, $outputLangs);
-
 
 					if (($moreParam['specimen'] == 0 && $object->status >= $object::STATUS_LOCKED)) {
 						dol_delete_file($tempdir . "signature" . $k . ".png");
@@ -373,10 +372,10 @@ class doc_preventionplandocument_odt extends SaturneDocumentModel
                 file_put_contents($tempDir . 'signature.png', $decodedImage);
                 $tmpArray['maitre_oeuvre_signature'] = $tempDir . 'signature.png';
             } else {
-                $tmpArray['maitre_oeuvre_signature'] = '';
+                $tmpArray['maitre_oeuvre_signature'] = $langs->transnoentities('Absent');
             }
         } else {
-            $tmpArray['maitre_oeuvre_signature'] = '';
+            $tmpArray['maitre_oeuvre_signature'] = $langs->transnoentities('Absent');
         }
 
         // External society responsible
@@ -402,10 +401,10 @@ class doc_preventionplandocument_odt extends SaturneDocumentModel
                 file_put_contents($tempDir . 'signature2.png', $decodedImage);
                 $tmpArray['intervenant_exterieur_signature'] = $tempDir . 'signature2.png';
             } else {
-                $tmpArray['intervenant_exterieur_signature'] = '';
+                $tmpArray['intervenant_exterieur_signature'] = $langs->transnoentities('Absent');
             }
         } else {
-            $tmpArray['intervenant_exterieur_signature'] = '';
+            $tmpArray['intervenant_exterieur_signature'] = $langs->transnoentities('Absent');
         }
 
         $moreParam['tmparray']         = $tmpArray;
