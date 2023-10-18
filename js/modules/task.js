@@ -535,7 +535,7 @@ window.digiriskdolibarr.riskassessmenttask.saveRiskAssessmentTaskTimeSpent = fun
 window.digiriskdolibarr.riskassessmenttask.checkTaskProgress = function ( event ) {
 	let token = window.saturne.toolbox.getToken()
 
-	let elementRiskAssessmentTask = $(this).closest('.riskassessment-task-container');
+	let elementRiskAssessmentTask = $(this).closest('.risk-row').find('.riskassessment-task-container');
 	let RiskAssessmentTaskId = elementRiskAssessmentTask.find('.riskassessment-task-single-content').attr('value');
 	let riskId = $(this).closest('.riskassessment-tasks').attr('value');
 	let textToShow = '';
