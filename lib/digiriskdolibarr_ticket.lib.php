@@ -68,7 +68,7 @@ function createTicketCategory($label, $description, $color, $visible, $type, $fk
  *
  * @return array $head   Array of tabs
  */
-function ticket_prepare_head(): array
+function ticketstats_prepare_head(): array
 {
     // Global variables definitions
     global $conf, $langs, $user;
