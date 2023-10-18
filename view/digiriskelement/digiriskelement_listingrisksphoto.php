@@ -127,7 +127,7 @@ saturne_get_fiche_head($object, 'elementListingRisksPhoto', $title);
 if ($type != 'standard') {
     list($morehtmlref, $moreParams) = $object->getBannerTabContent();
 
-    saturne_banner_tab($object,'ref','', 1, 'ref', 'ref', $morehtmlref, true, $moreParams);
+    saturne_banner_tab($object,'ref','none', 0, 'ref', 'ref', $morehtmlref, true, $moreParams);
 } else {
     // Project
     $morehtmlref = '<div class="refidno">';
@@ -136,7 +136,7 @@ if ($type != 'standard') {
     $morehtmlref .= '</div>';
 
     $moduleNameLowerCase = 'mycompany';
-    saturne_banner_tab($object,'ref','none', 1, 'ref', 'ref', $morehtmlref, true);
+    saturne_banner_tab($object,'ref','none', 0, 'ref', 'ref', $morehtmlref, true);
     $moduleNameLowerCase = 'digiriskdolibarr';
 }
 

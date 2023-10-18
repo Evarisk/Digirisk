@@ -112,7 +112,7 @@ if ((empty($action) || ($action != 'edit' && $action != 'create'))) {
 	$morehtmlref .= '</div>';
 
 	$moduleNameLowerCase = 'mycompany';
-	saturne_banner_tab($object,'ref','none', 1, 'ref', 'ref', $morehtmlref, true);
+	saturne_banner_tab($object,'ref','none', 0, 'ref', 'ref', $morehtmlref, true);
 	$moduleNameLowerCase = 'digiriskdolibarr';
 
 	print '<div class="fichecenter">';
