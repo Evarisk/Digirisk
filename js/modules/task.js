@@ -248,12 +248,12 @@ window.digiriskdolibarr.riskassessmenttask.saveRiskAssessmentTask = function ( e
 		taskProgress = 1;
 	}
 
-	let dateStart = elementRiskAssessmentTask.find('#RiskassessmentTaskDateStart' + editedRiskAssessmentTaskId).val();
-	let hourStart = elementRiskAssessmentTask.find('#RiskassessmentTaskDateStart' + editedRiskAssessmentTaskId + 'hour').val();
-	let minStart  = elementRiskAssessmentTask.find('#RiskassessmentTaskDateStart' + editedRiskAssessmentTaskId + 'min').val();
-	let dateEnd   = elementRiskAssessmentTask.find('#RiskassessmentTaskDateEnd' + editedRiskAssessmentTaskId).val();
-	let hourEnd   = elementRiskAssessmentTask.find('#RiskassessmentTaskDateEnd' + editedRiskAssessmentTaskId + 'hour').val();
-	let minEnd    = elementRiskAssessmentTask.find('#RiskassessmentTaskDateEnd' + editedRiskAssessmentTaskId + 'min').val();
+	let dateStart = elementRiskAssessmentTask.find('#RiskassessmentTaskDateStartEdit' + editedRiskAssessmentTaskId).val();
+	let hourStart = elementRiskAssessmentTask.find('#RiskassessmentTaskDateStartEdit' + editedRiskAssessmentTaskId + 'hour').val();
+	let minStart  = elementRiskAssessmentTask.find('#RiskassessmentTaskDateStartEdit' + editedRiskAssessmentTaskId + 'min').val();
+	let dateEnd   = elementRiskAssessmentTask.find('#RiskassessmentTaskDateEndEdit' + editedRiskAssessmentTaskId).val();
+	let hourEnd   = elementRiskAssessmentTask.find('#RiskassessmentTaskDateEndEdit' + editedRiskAssessmentTaskId + 'hour').val();
+	let minEnd    = elementRiskAssessmentTask.find('#RiskassessmentTaskDateEndEdit' + editedRiskAssessmentTaskId + 'min').val();
 	let budget    = elementRiskAssessmentTask.find('.riskassessment-task-budget'  + editedRiskAssessmentTaskId).val()
 
 	window.saturne.loader.display($(this));
