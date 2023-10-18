@@ -102,7 +102,7 @@ if ($object->id > 0) {
 	// ------------------------------------------------------------
     list($morehtmlref, $moreParams) = $object->getBannerTabContent();
 
-    saturne_banner_tab($object,'ref','', 1, 'ref', 'ref', $morehtmlref, true, $moreParams);
+    saturne_banner_tab($object,'ref','none', 0, 'ref', 'ref', $morehtmlref, true, $moreParams);
 
 	print load_fiche_titre($langs->trans("DashBoard"), '', 'digiriskdolibarr_color.png@digiriskdolibarr');
 

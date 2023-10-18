@@ -217,14 +217,14 @@ if ($fromid > 0) {
 	$result = $parent_element->fetch($objectlinked->fk_parent);
 	if ($result > 0) {
 		$morehtmlref .= '<br>' . $langs->trans("Description") . ' : ' . $objectlinked->description;
-		$morehtmlref .= '<br>' . $langs->trans("ParentElement") . ' : ' . $parent_element->getNomUrl(1, 'blank', 1);
+		$morehtmlref .= '<br>' . $langs->trans("ParentElement") . ' : ' . $parent_element->getNomUrl(1, 'blank', 0, '', -1, 1);
 	} else {
 		$digiriskstandard->fetch($conf->global->DIGIRISKDOLIBARR_ACTIVE_STANDARD);
 		$morehtmlref .= '<br>' . $langs->trans("Description") . ' : ' . $objectlinked->description;
-		$morehtmlref .= '<br>' . $langs->trans("ParentElement") . ' : ' . $digiriskstandard->getNomUrl(1, 'blank', 1);
+		$morehtmlref .= '<br>' . $langs->trans("ParentElement") . ' : ' . $digiriskstandard->getNomUrl(1, 'blank', 0, '', -1, 1);
 	}
 	$morehtmlref .= '</div>';
-    saturne_banner_tab($objectlinked, 'fromid', '', 1, 'rowid', 'ref', $morehtmlref, (dol_strlen($objectlinked->photo) > 0));
+    saturne_banner_tab($objectlinked, 'fromid', 'none', 0, 'rowid', 'ref', $morehtmlref, (dol_strlen($objectlinked->photo) > 0));
 } elseif ($fromiduser > 0) {
 	$linkback = '<a href="' . DOL_URL_ROOT . '/user/list.php?restore_lastsearch_values=1">' . $langs->trans("BackToList") . '</a>';
 	dol_banner_tab($userObject, 'fromiduser', $linkback, $user->rights->user->user->lire || $user->admin);
@@ -527,10 +527,10 @@ while ($i < ($limit ? min($num, $limit) : $num)) {
 					case 1:
 						if ($accident->fk_standard > 0) {
 							$digiriskstandard->fetch($conf->global->DIGIRISKDOLIBARR_ACTIVE_STANDARD);
-							print $digiriskstandard->getNomUrl(1, 'blank', 1);
+							print $digiriskstandard->getNomUrl(1, 'blank', 0, '', -1, 1);
 						} else if ($accident->fk_element > 0) {
 							$digiriskelement->fetch($accident->fk_element);
-							print $digiriskelement->getNomUrl(1, 'blank', 1);
+							print $digiriskelement->getNomUrl(1, 'blank', 0, '', -1, 1);
 						}
 						break;
 					case 2:

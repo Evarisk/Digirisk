@@ -965,10 +965,10 @@ if ((empty($action) || ($action != 'create' && $action != 'edit'))) {
 		case 1:
 			if ($object->fk_standard > 0) {
 				$digiriskstandard->fetch($conf->global->DIGIRISKDOLIBARR_ACTIVE_STANDARD);
-				print $digiriskstandard->getNomUrl(1, 'blank', 1, '', -1, 1);
+				print $digiriskstandard->getNomUrl(1, 'blank', 0, '', -1, 1);
 			} else if ($object->fk_element > 0) {
 				$digiriskelement->fetch($object->fk_element);
-				print $digiriskelement->getNomUrl(1, 'blank', 1, '', -1, 1);
+				print $digiriskelement->getNomUrl(1, 'blank', 0, '', -1, 1);
 			}
 			break;
 		case 2:
