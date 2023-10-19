@@ -397,10 +397,10 @@ if ( ! $error && $action == 'addRiskAssessmentTask' && $permissiontoadd) {
 
 	$extrafields->fetch_name_optionals_label($task->table_element);
 
-	$task->ref                              = $refTaskMod->getNextValue('', $task);
-	$task->label                            = $tasktitle;
-	$task->fk_project                       = $conf->global->DIGIRISKDOLIBARR_DU_PROJECT;
-	$task->date_c                           = dol_now();
+	$task->ref        = $refTaskMod->getNextValue('', $task);
+	$task->label      = $tasktitle;
+	$task->fk_project = $conf->global->DIGIRISKDOLIBARR_DU_PROJECT;
+	$task->date_c     = dol_now();
 	if (!empty($dateStart)) {
 		$task->date_start = strtotime(preg_replace('/\//', '-', $dateStart));
 		$task->date_start = dol_time_plus_duree($task->date_start, $hourStart, 'h');
@@ -463,7 +463,7 @@ if ( ! $error && $action == 'saveRiskAssessmentTask' && $permissiontoadd) {
 		$task->date_end = dol_time_plus_duree($task->date_end, $hourEnd, 'h');
 		$task->date_end = dol_time_plus_duree($task->date_end, $minEnd, 'i');
 	}
-	$task->budget_amount = $budget;
+	$task->budget_amount = is_int($budget) ? $budget : ($task->budget ?? 0);
 
 	if ($taskProgress == 1) {
 		$task->progress = 100;

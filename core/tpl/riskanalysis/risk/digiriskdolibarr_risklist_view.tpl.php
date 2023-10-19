@@ -106,7 +106,7 @@
 		<div class="notice-content">
 			<div class="notice-title"><?php echo $langs->trans('RiskWellCreated') ?></div>
 			<div class="notice-subtitle">
-				<a href="#<?php echo $refRiskMod->getLastValue($evaluation) ?>">
+				<a href="#<?php echo $refRiskMod->getLastValue($risk) ?>">
 					<?php echo $langs->trans('TheRisk') . ' <strong><u> ' . $refRiskMod->getLastValue($risk) . ' </u></strong> ' . $langs->trans('HasBeenCreatedM') ?>
 				</a>
 			</div>
