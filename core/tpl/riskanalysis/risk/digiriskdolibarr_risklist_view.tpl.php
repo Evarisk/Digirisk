@@ -1176,13 +1176,13 @@ while ($i < ($limit ? min($num, $limit) : $num)) {
 					<!-- BUTTON MODAL RISK EDIT -->
 					<?php if ($permissiontoadd) : ?>
 						<div><?php
-							echo $risk->getNomUrl(1, 'blank'); ?>
+							echo $risk->getNomUrl(1, 'nolink'); ?>
 							<i class="risk-edit wpeo-tooltip-event modal-open fas fa-pencil-alt" aria-label="<?php echo $langs->trans('EditRisk'); ?>" value="<?php echo $risk->id; ?>" id="<?php echo $risk->ref; ?>">
 								<input type="hidden" class="modal-options" data-modal-to-open="risk_edit<?php echo $risk->id ?>" data-from-id="<?php echo $risk->id ?>" data-from-type="risk" data-from-subtype="" data-from-subdir=""/>
 							</i>
 						</div>
 					<?php else : ?>
-						<div class="risk-edit-no-perm" value="<?php echo $risk->id ?>"><?php echo $risk->getNomUrl(1, 'blank'); ?></div>
+						<div class="risk-edit-no-perm" value="<?php echo $risk->id ?>"><?php echo $risk->getNomUrl(1, 'nolink'); ?></div>
 					<?php endif; ?>
 					<!-- RISK EDIT MODAL -->
 					<div id="risk_edit<?php echo $risk->id ?>" class="wpeo-modal modal-risk-<?php echo $risk->id ?>">

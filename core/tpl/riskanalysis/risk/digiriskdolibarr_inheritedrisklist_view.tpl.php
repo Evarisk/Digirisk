@@ -497,7 +497,7 @@
 					</div>
 					<?php
 				} elseif ($key == 'ref') {
-					print $risk->getNomUrl(1, 'blank');
+					print $risk->getNomUrl(1, 'nolink');
 				} elseif ($key == 'description') {
 					if ($conf->global->DIGIRISKDOLIBARR_RISK_DESCRIPTION == 0 ) {
 						print $langs->trans('RiskDescriptionNotActivated');
