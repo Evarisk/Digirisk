@@ -256,7 +256,8 @@ class DigiriskElement extends SaturneObject
         if (dol_strlen($filter['customsql'])) {
             $filter['customsql'] .= ' AND t.rowid != ' . ($this->id ?? 0);
         }
-        $objectList = saturne_fetch_all_object_type('digiriskelement', '', '', $limit, 0, $filter);
+
+        $objectList = saturne_fetch_all_object_type('digiriskelement', '', '', $limit, 0, $filter, 'AND', false, $multientitymanaged);
         $digiriskElementsData  = [];
         if (is_array($objectList) && !empty($objectList)) {
             foreach ($objectList as $digiriskElement) {

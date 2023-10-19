@@ -280,7 +280,7 @@ while ($i < ($limit ? min($num, $limit) : $num)) {
 				<?php $parent_element = new DigiriskElement($db);
 				$result               = $parent_element->fetch($risksign->fk_element);
 				if ($result > 0) {
-					print $parent_element->getNomUrl(1, 'blank');
+					print $parent_element->getNomUrl(1, 'blank', 0, '', -1, 1);
 				}
 			} elseif ($key == 'category') { ?>
 				<div class="table-cell table-50 cell-risksign-category">

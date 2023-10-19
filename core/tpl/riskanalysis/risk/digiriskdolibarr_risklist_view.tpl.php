@@ -305,6 +305,8 @@ $DUProject                   = new Project($db);
 $DUProject->fetch($conf->global->DIGIRISKDOLIBARR_DU_PROJECT);
 $extrafields->fetch_name_optionals_label($digiriskTask->table_element);
 
+$riskAssessment->ismultientitymanaged = 0;
+
 $activeDigiriskElementList = $digiriskelement->getActiveDigiriskElements();
 $riskAssessmentList        = $riskAssessment->fetchAll();
 $riskAssessmentNextValue   = $refEvaluationMod->getNextValue($evaluation);
@@ -314,10 +316,17 @@ $usertmp->fetchAll();
 $usersList                 = $usertmp->users;
 $timeSpentSortedByTasks    = $digiriskTask->fetchAllTimeSpentAllUser('AND ptt.fk_task > 0', 'task_datehour', 'DESC', 1);
 
+$riskAssessment->ismultientitymanaged = 1;
+
 if (is_array($riskAssessmentList) && !empty($riskAssessmentList)) {
 	foreach ($riskAssessmentList as $riskAssessmentSingle) {
 		$riskAssessmentsOrderedByRisk[$riskAssessmentSingle->fk_risk][$riskAssessmentSingle->id] = $riskAssessmentSingle;
 	}
+}
+
+$deletedElements = $digiriskelement->getMultiEntityTrashList();
+if (empty($deletedElements)) {
+    $deletedElements = [0];
 }
 
 // Build and execute select
@@ -1043,7 +1052,7 @@ foreach ($risk->fields as $key => $val) {
 		elseif (strpos($val['type'], 'integer:') === 0) {
 			print $risk->showInputField($val, $key, $search[$key], '', '', 'search_', 'maxwidth150', 1);
 		} elseif ($key == 'fk_element') {
-			print $digiriskelement->selectDigiriskElementList($search['fk_element'], 'search_fk_element', [], 1, 0, array(), 0, 0, 'minwidth100', 0, false, 1);
+			print $digiriskelement->selectDigiriskElementList($search['fk_element'], 'search_fk_element', ['customsql' => 'rowid NOT IN (' . implode(',', $deletedElements) . ')'], 1, 0, [], 0, 0, 'minwidth100', 0, false, 1);
 		} elseif ($key == 'category') { ?>
 			<div class="wpeo-dropdown dropdown-large dropdown-grid category-danger padding" style="position: inherit">
 				<input class="input-hidden-danger" type="hidden" name="<?php echo 'search_' . $key ?>" value="<?php echo dol_escape_htmltag($search[$key]) ?>" />
@@ -1161,7 +1170,7 @@ while ($i < ($limit ? min($num, $limit) : $num)) {
 			if ($key == 'status') print $risk->getLibStatut(5);
 			elseif ($key == 'fk_element') {
 				if (is_object($activeDigiriskElementList[$risk->fk_element])) {
-					print $activeDigiriskElementList[$risk->fk_element]->getNomUrl(1, 'blank', 1);
+					print $activeDigiriskElementList[$risk->fk_element]->getNomUrl(1, 'blank', 0, '', -1, 1);
 				}
 			} elseif ($key == 'category') { ?>
 				<div class="table-cell table-50 cell-risk" data-title="Risque">
@@ -1176,13 +1185,13 @@ while ($i < ($limit ? min($num, $limit) : $num)) {
 					<!-- BUTTON MODAL RISK EDIT -->
 					<?php if ($permissiontoadd) : ?>
 						<div><?php
-							echo $risk->getNomUrl(1, 'blank'); ?>
+							echo $risk->getNomUrl(1, 'nolink'); ?>
 							<i class="risk-edit wpeo-tooltip-event modal-open fas fa-pencil-alt" aria-label="<?php echo $langs->trans('EditRisk'); ?>" value="<?php echo $risk->id; ?>" id="<?php echo $risk->ref; ?>">
 								<input type="hidden" class="modal-options" data-modal-to-open="risk_edit<?php echo $risk->id ?>" data-from-id="<?php echo $risk->id ?>" data-from-type="risk" data-from-subtype="" data-from-subdir=""/>
 							</i>
 						</div>
 					<?php else : ?>
-						<div class="risk-edit-no-perm" value="<?php echo $risk->id ?>"><?php echo $risk->getNomUrl(1, 'blank'); ?></div>
+						<div class="risk-edit-no-perm" value="<?php echo $risk->id ?>"><?php echo $risk->getNomUrl(1, 'nolink'); ?></div>
 					<?php endif; ?>
 					<!-- RISK EDIT MODAL -->
 					<div id="risk_edit<?php echo $risk->id ?>" class="wpeo-modal modal-risk-<?php echo $risk->id ?>">

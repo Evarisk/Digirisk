@@ -221,7 +221,9 @@ if ($sharedrisks) {
 			'text' => '<i class="fas fa-circle-info"></i>' . $langs->trans("ConfirmImportSharedRisks"),
 		);
 
-		$riskAssessmentList = $evaluation->fetchAll('', '', 0, 0, array(), 'AND', 1);
+        $evaluation->ismultientitymanaged = 0;
+		$riskAssessmentList = $evaluation->fetchAll('', '', 0, 0, array('customsql' => ' entity NOT IN (' . $conf->entity . ')'), 'AND', 1);
+        $evaluation->ismultientitymanaged = 1;
 
 		if (is_array($riskAssessmentList) && !empty($riskAssessmentList)) {
 			foreach ($riskAssessmentList as $riskAssessmentSingle) {
@@ -336,7 +338,7 @@ if ($object->id > 0) {
 	// ------------------------------------------------------------
     list($morehtmlref, $moreParams) = $object->getBannerTabContent();
 
-    saturne_banner_tab($object,'ref','', 1, 'ref', 'ref', $morehtmlref, true, $moreParams);
+    saturne_banner_tab($object,'ref','none', 0, 'ref', 'ref', $morehtmlref, true, $moreParams);
 
 	// Buttons for actions
 	print '<div class="tabsAction" >';

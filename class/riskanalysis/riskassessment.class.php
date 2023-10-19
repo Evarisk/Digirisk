@@ -59,6 +59,11 @@ class RiskAssessment extends SaturneObject
 	 */
 	public int $isextrafieldmanaged = 1;
 
+    /**
+     * @var string Name of icon for riskassessment. Must be a 'fa-xxx' fontawesome code (or 'fa-xxx_fa_color_size') or 'riskassessment@digiriskdolibarr' if picto is file 'img/object_riskassessment.png'
+     */
+    public string $picto = 'fontawesome_fa-chart-line_fas_#d35968';
+
     public const STATUS_DELETED   = -1;
     public const STATUS_DRAFT     = 0;
     public const STATUS_VALIDATED = 1;
@@ -167,43 +172,22 @@ class RiskAssessment extends SaturneObject
 		return $this->fetchAll($desc, 'rowid', 0, 0, $filter, 'AND', 1);
 	}
 
-
-	/**
-	 * Update risk assessment status into database
-	 *
-	 * @param User $user User that modifies
-	 * @param $risk_id
-	 * @return int             <0 if KO, >0 if OK
-	 * @throws Exception
-	 */
-	public function updateEvaluationStatus(User $user, $risk_id)
-	{
-		dol_syslog(__METHOD__, LOG_DEBUG);
-		$sql                                                                              = 'SELECT ';
-		$sql                                                                             .= $this->getFieldList();
-		$sql                                                                             .= ' FROM ' . MAIN_DB_PREFIX . $this->table_element . ' as t';
-		if (isset($this->ismultientitymanaged) && $this->ismultientitymanaged == 1) $sql .= ' WHERE t.entity IN (' . getEntity($this->table_element) . ')';
-		else $sql                                                                        .= ' WHERE 1 = 1';
-		$sql                                                                             .= ' AND fk_risk = ' . $risk_id;
-		$sql                                                                             .= ' ORDER BY t.rowid DESC';
-		$sql                                                                             .= ' LIMIT 1';
-
-		$resql = $this->db->query($sql);
-
-		if ($resql) {
-			$evaluation = new RiskAssessment($this->db);
-			$obj        = $this->db->fetch_object($resql);
-			$this->db->free($resql);
-			$evaluation->fetch($obj->rowid);
-			$evaluation->status = 1;
-			return $evaluation->update($user);
-		} else {
-			$this->errors[] = 'Error ' . $this->db->lasterror();
-			dol_syslog(__METHOD__ . ' ' . join(',', $this->errors), LOG_ERR);
-
-			return -1;
-		}
-	}
+    /**
+     * Update risk assessment status into database
+     *
+     * @param  User      $user   User that modifies
+     * @param  int       $riskID Risk id
+     * @throws Exception
+     */
+    public function updatePreviousRiskAssessmentStatus(User $user, int $riskID)
+    {
+        $riskAssessments = $this->fetchAll('DESC', 'rowid', 1, 0, ['customsql' => 'fk_risk = ' . $riskID . ' AND status = 0']);
+        if (is_array($riskAssessments) && !empty($riskAssessments)) {
+            foreach ($riskAssessments as $riskAssessment) {
+                $riskAssessment->setValueFrom('status', 1, '', '', 'int', '', $user);
+            }
+        }
+    }
 
 	/**
 	 * Return scale level for risk assessment

@@ -118,7 +118,7 @@ $morehtmlref .= $langs->trans('Project') . ' : ' . getNomUrlProject($project, 1,
 $morehtmlref .= '</div>';
 
 $moduleNameLowerCase = 'mycompany';
-saturne_banner_tab($object,'ref','none', 1, 'ref', 'ref', $morehtmlref, true);
+saturne_banner_tab($object,'ref','none', 0, 'ref', 'ref', $morehtmlref, true);
 $moduleNameLowerCase = 'digiriskdolibarr';
 
 print '<a href="../../admin/securityconf.php" target="_blank">' . $langs->trans('ConfigureSecurityAndSocialData') . ' <i class="fas fa-external-link-alt"></i></a>';

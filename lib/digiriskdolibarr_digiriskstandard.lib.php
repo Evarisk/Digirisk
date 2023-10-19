@@ -80,7 +80,7 @@ function digiriskstandard_prepare_head(DigiriskStandard $object): array
         $h++;
     }
 
-    $head[$h][0] = dol_buildpath('/saturne/view/saturne_agenda.php', 1) . '?id=' . $object->id . '&module_name=DigiriskDolibarr&object_type=digiriskstandard&handle_photo=true';
+    $head[$h][0] = dol_buildpath('/saturne/view/saturne_agenda.php', 1) . '?id=' . $object->id . '&module_name=DigiriskDolibarr&object_type=digiriskstandard&show_nav=0&handle_photo=true';
     $head[$h][1] = $conf->browser->layout != 'phone' ? '<i class="fas fa-calendar-alt pictofixedwidth"></i>' . $langs->trans('Events') : '<i class="fas fa-calendar-alt"></i>';
     $head[$h][2] = 'agenda';
     $h++;
