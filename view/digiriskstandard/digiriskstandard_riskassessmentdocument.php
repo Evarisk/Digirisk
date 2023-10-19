@@ -191,7 +191,8 @@ if (empty($reshook)) {
 
 			$date        = dol_print_date(dol_now(), 'dayxcard');
 			$nameSociety = str_replace(' ', '_', $conf->global->MAIN_INFO_SOCIETE_NOM);
-			$nameSociety = preg_replace('/\./', '_', $conf->global->MAIN_INFO_SOCIETE_NOM);
+			$nameSociety = preg_replace('/\./', '_', $nameSociety);
+            $nameSociety = dol_sanitizeFileName($nameSociety);
 
 			$pathToZip = DOL_DATA_ROOT . $entity . '/digiriskdolibarr/riskassessmentdocument/' . $date . '_'. $document->ref . '_' . $nameSociety;
 			dol_mkdir($pathToZip);
@@ -472,8 +473,8 @@ if ($action == 'presend') {
 
     if (!in_array($object->element, array('societe', 'user', 'member'))) {
         include_once DOL_DOCUMENT_ROOT . '/core/lib/files.lib.php';
-        $fileparams = dol_dir_list($diroutput, 'files', 0, '', [], 'date', 'SORT_DESC');
-        $lastRef    = pathinfo($fileparams[0]['name']);
+        $fileparams       = dol_dir_list($diroutput, 'files', 0, '', [], 'date', 'SORT_DESC');
+        $lastRef          = pathinfo($fileparams[0]['name']);
         foreach ($fileparams as $fileparam) {
             preg_match('/' . $lastRef['filename'] . '/', $fileparam['name']) ? $filevalue[] = $fileparam['fullname'] : 0;
         }
