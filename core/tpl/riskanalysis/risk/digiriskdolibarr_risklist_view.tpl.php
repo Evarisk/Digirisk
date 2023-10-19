@@ -305,6 +305,8 @@ $DUProject                   = new Project($db);
 $DUProject->fetch($conf->global->DIGIRISKDOLIBARR_DU_PROJECT);
 $extrafields->fetch_name_optionals_label($digiriskTask->table_element);
 
+$riskAssessment->ismultientitymanaged = 0;
+
 $activeDigiriskElementList = $digiriskelement->getActiveDigiriskElements();
 $riskAssessmentList        = $riskAssessment->fetchAll();
 $riskAssessmentNextValue   = $refEvaluationMod->getNextValue($evaluation);
@@ -313,6 +315,8 @@ $taskNextValue             = $refTaskMod->getNextValue('', $task);
 $usertmp->fetchAll();
 $usersList                 = $usertmp->users;
 $timeSpentSortedByTasks    = $digiriskTask->fetchAllTimeSpentAllUser('AND ptt.fk_task > 0', 'task_datehour', 'DESC', 1);
+
+$riskAssessment->ismultientitymanaged = 1;
 
 if (is_array($riskAssessmentList) && !empty($riskAssessmentList)) {
 	foreach ($riskAssessmentList as $riskAssessmentSingle) {
