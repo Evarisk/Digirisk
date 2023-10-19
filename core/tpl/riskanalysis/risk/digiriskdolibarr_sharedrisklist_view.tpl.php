@@ -415,7 +415,6 @@ foreach ($risk->fields as $key => $val) {
 		} elseif ($key == 'entity') {
 			print select_entity_list($search['entity'], 'search_entity', 'e.rowid NOT IN (' . $conf->entity . ')');
 		} elseif ($key == 'fk_element') {
-            $digiriskelement->ismultientitymanaged = 0;
 			print $digiriskelement->selectDigiriskElementList($search['fk_element'], 'search_fk_element_sharedrisk', ['customsql' => 'entity NOT IN (' . $conf->entity . ') AND rowid NOT IN (' . implode(',', $deletedElements) . ')'], 1, 0, array(), 0, 0, 'minwidth100', 0, false, 1, $contextpage, false);
 		}  elseif ($key == 'applied_on') {
 //				print $digiriskelement->select_digiriskelement_list($search['search_applied_on_sharedrisk'], 'search_applied_on_sharedrisk', '', 1, 0, array(), 0, 0, 'minwidth100', 0, false, 1, $contextpage);
