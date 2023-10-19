@@ -925,6 +925,10 @@ class ActionsDigiriskdolibarr
 				'documentType' => 'firepermitdocument',
 				'picto'        => 'fontawesome_fa-fire-alt_fas_#d35968'
 			],
+            'AccidentInvestigationDocument' => [
+                'documentType' => 'accidentinvestigationdocument',
+                'picto'        => 'fontawesome_fa-search_fas_#d35968'
+            ],
 			'Ticket' => [
 				'documentType' => 'ticketdocument',
 				'picto'        => 'ticket'
