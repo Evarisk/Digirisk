@@ -148,7 +148,7 @@ class ActionsDigiriskdolibarr
 					require_once __DIR__ . '/digiriskelement.class.php';
 					$digiriskelement = new DigiriskElement($db);
 					$digiriskelement->fetch($object->array_options['options_digiriskdolibarr_ticket_service']);
-					$selectDictionnary = $digiriskelement->getNomUrl(1, 'blank', 1);
+					$selectDictionnary = $digiriskelement->getNomUrl(1, 'blank', 0, '', -1, 1);
 					?>
 					<script>
 					jQuery('.ticket_extras_digiriskdolibarr_ticket_service').html('')
@@ -840,7 +840,8 @@ class ActionsDigiriskdolibarr
                 case 'digiriskelementdocument' :
                 case 'digiriskelementagenda' :
                 case 'digiriskstandardagenda' :
-                    $object->fk_project = $conf->global->DIGIRISKDOLIBARR_DU_PROJECT;
+                    $moreParams['moreHtml'] = 'none';
+                    $object->fk_project     = $conf->global->DIGIRISKDOLIBARR_DU_PROJECT;
                     break;
                 case 'accidentdocument' :
                 case 'accidentagenda' :

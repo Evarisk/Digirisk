@@ -545,7 +545,7 @@ while ($i < ($limit ? min($num, $limit) : $num)) {
 			} elseif ($key == 'fk_element') { ?>
 				<?php
 				if (is_object($alldigiriskelement[$risk->fk_element])) {
-					print $alldigiriskelement[$risk->fk_element]->getNomUrl(1, 'nolink', 1);
+					print $alldigiriskelement[$risk->fk_element]->getNomUrl(1, 'nolink', 0, '', -1, 1);
 				}
 			} elseif ($key == 'category') { ?>
 				<div class="table-cell table-50 cell-risk" data-title="Risque">

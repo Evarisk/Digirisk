@@ -1275,7 +1275,7 @@ if ((empty($action) || ($action != 'create' && $action != 'edit'))) {
 
 					print '<td>';
 					$digiriskelement->fetch($item->fk_element);
-					print $digiriskelement->getNomUrl(1, 'blank', 1);
+					print $digiriskelement->getNomUrl(1, 'blank', 0, '', -1, 1);
 					print '</td>';
 
 					$coldisplay++;

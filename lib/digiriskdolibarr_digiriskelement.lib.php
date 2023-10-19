@@ -88,8 +88,10 @@ function digiriskelement_prepare_head(DigiriskElement $object)
         $head[$h][0] = dol_buildpath('/digiriskdolibarr/view/digiriskelement/digiriskelement_register.php', 1) . '?id=' . $object->id;
         $head[$h][1] = $conf->browser->layout != 'phone' ? '<i class="fa fa-ticket pictofixedwidth"></i>' . $langs->trans('Registers') : '<i class="fas fa-ticket"></i>';
         $head[$h][2] = 'elementRegister';
-
     }
 
-    return saturne_object_prepare_head($object, $head, []);
+    $moreParams['showNav']     = 0;
+    $moreParams['handlePhoto'] = 'true';
+
+    return saturne_object_prepare_head($object, $head, $moreParams);
 }
