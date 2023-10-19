@@ -117,7 +117,7 @@ llxHeader('', $title, $help_url);
 
 print load_fiche_titre($title, '', 'ticket');
 
-$head = ticket_prepare_head();
+$head = ticketstats_prepare_head();
 print dol_get_fiche_head($head, 'byyear', $langs->trans("TicketStatistics"), -1);
 
 $stats = new TicketDigiriskStats($db, $socid, ($userid > 0 ? $userid: 0), ($userassignid > 0 ? $userassignid: 0), ($digiriskelementid > 0 ? $digiriskelementid : 0), ($categticketid > 0 ? $categticketid: 0));
