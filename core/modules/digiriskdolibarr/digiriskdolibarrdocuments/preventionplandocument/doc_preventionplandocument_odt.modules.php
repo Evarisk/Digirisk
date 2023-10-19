@@ -200,9 +200,11 @@ class doc_preventionplandocument_odt extends SaturneDocumentModel
 							file_put_contents($tempdir . "signature" . $k . ".png", $decoded_image);
 							$tmpArray['intervenants_signature'] = $tempdir . "signature" . $k . ".png";
 						} else {
-							$tmpArray['intervenants_signature'] = '';
-						}
-					} else {
+                            $tmpArray['intervenants_signature'] = '';
+                        }
+					} elseif ($line->attendance == $line::ATTENDANCE_ABSENT) {
+                        $tmpArray['intervenants_signature'] = $langs->trans('Absent');
+                    }  else {
 						$tmpArray['intervenants_signature'] = '';
 					}
 					$tmpArray['name']     = $line->firstname;
@@ -266,6 +268,7 @@ class doc_preventionplandocument_odt extends SaturneDocumentModel
         $object = $moreParam['object'];
 
         $saturneSchedules = new SaturneSchedules($this->db);
+        $signatory        = new SaturneSignature($this->db);
 
         $tmpArray = [];
 
@@ -357,7 +360,7 @@ class doc_preventionplandocument_odt extends SaturneDocumentModel
             $tmpArray['maitre_oeuvre_fname']          = ucfirst($masterWorker->firstname);
             $tmpArray['maitre_oeuvre_email']          = $masterWorker->email;
             $tmpArray['maitre_oeuvre_phone']          = $masterWorker->phone;
-            $tmpArray['maitre_oeuvre_signature_date'] = dol_print_date($masterWorker->signature_date, 'dayhour', 'tzuser');
+            $tmpArray['maitre_oeuvre_signature_date'] = dol_print_date($masterWorker->signature_date > 0 ? $masterWorker->signature_date : dol_now(), 'dayhour', 'tzuser');
         } else {
             $tmpArray['maitre_oeuvre_lname']          = '';
             $tmpArray['maitre_oeuvre_fname']          = '';
@@ -375,7 +378,9 @@ class doc_preventionplandocument_odt extends SaturneDocumentModel
             } else {
                 $tmpArray['maitre_oeuvre_signature'] = '';
             }
-        } else {
+        } elseif ($masterWorker->attendance == $signatory::ATTENDANCE_ABSENT) {
+            $tmpArray['maitre_oeuvre_signature'] = $langs->trans('Absent');
+        }  else {
             $tmpArray['maitre_oeuvre_signature'] = '';
         }
 
@@ -386,7 +391,7 @@ class doc_preventionplandocument_odt extends SaturneDocumentModel
             $tmpArray['intervenant_exterieur_fname']          = ucfirst($extSocietyResponsible->firstname);
             $tmpArray['intervenant_exterieur_email']          = $extSocietyResponsible->email;
             $tmpArray['intervenant_exterieur_phone']          = $extSocietyResponsible->phone;
-            $tmpArray['intervenant_exterieur_signature_date'] = dol_print_date($extSocietyResponsible->signature_date, 'dayhour', 'tzuser');
+            $tmpArray['intervenant_exterieur_signature_date'] = dol_print_date($extSocietyResponsible->signature_date > 0 ? $extSocietyResponsible->signature_date : dol_now(), 'dayhour', 'tzuser');
         } else {
             $tmpArray['intervenant_exterieur_lname']          = '';
             $tmpArray['intervenant_exterieur_fname']          = '';
@@ -404,7 +409,9 @@ class doc_preventionplandocument_odt extends SaturneDocumentModel
             } else {
                 $tmpArray['intervenant_exterieur_signature'] = '';
             }
-        } else {
+        } elseif ($extSocietyResponsible->attendance == $signatory::ATTENDANCE_ABSENT) {
+            $tmpArray['intervenant_exterieur_signature'] = $langs->trans('Absent');
+        }  else {
             $tmpArray['intervenant_exterieur_signature'] = '';
         }
 
