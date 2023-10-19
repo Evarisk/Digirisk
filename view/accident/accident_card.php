@@ -218,7 +218,7 @@ if (empty($reshook)) {
 				} else {
 					$usertmp->fetch($object->fk_user_employer);
 				}
-				$signatory->setSignatory($object->id, 'accident', 'user', array($usertmp->id), 'ACC_USER_EMPLOYER');
+				$signatory->setSignatory($object->id, 'accident', 'user', array($usertmp->id), 'Responsible');
 
 				// Creation Accident OK
 				$urltogo = str_replace('__ID__', $result, $backtopage);
