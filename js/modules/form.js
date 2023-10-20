@@ -28,8 +28,8 @@ window.digiriskdolibarr.form.init = function() {
  * @return {void}
  */
 window.digiriskdolibarr.form.event = function() {
-	$( document ).on( 'submit', '#searchFormListRisks, #searchFormInheritedListRisks, #searchFormSharedListRisks', window.digiriskdolibarr.form.searchForm );
-};
+	$( document ).on( 'submit', '#searchFormListRisks, #searchFormInheritedListRisks, #searchFormSharedListRisks, #searchFormListRiskSigns, #searchFormEvaluator', window.digiriskdolibarr.form.searchForm );
+}; 
 
 /**
  * Enlève les valeurs d'input vides d'un formulaire.
