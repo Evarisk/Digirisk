@@ -1009,7 +1009,7 @@ class ActionsDigiriskdolibarr
 			if ($object->element == 'digiriskelement') {
 				$this->results = ['subdir' => $object->element_type . '/'. $object->ref];
 			} elseif ($object->element == 'digiriskstandard') {
-				$this->results = ['modulepart' => 'mycompany', 'dir' => $conf->mycompany->dir_output, 'subdir' => 'logos'];
+				$this->results = ['modulepart' => 'mycompany', 'dir' => $conf->mycompany->dir_output, 'subdir' => 'logos', 'photoLimit' => 1];
 			}
 
 			return 1;
