@@ -287,7 +287,7 @@ if ($object->id > 0 || $fromid > 0) {
 	}
 
 	print '<div class="fichecenter evaluatorlist wpeo-wrap">';
-	print '<form method="POST" id="searchFormList" action="' . $_SERVER["PHP_SELF"] . (empty($fromid) ? '?id=' . $object->id : '?fromid=' . $fromid) . '" name="evaluator_form"">' . "\n";
+	print '<form method="POST" id="searchFormEvaluator" action="' . $_SERVER["PHP_SELF"] . (empty($fromid) ? '?id=' . $object->id : '?fromid=' . $fromid) . '" name="evaluator_form"">' . "\n";
 	print '<input type="hidden" name="token" value="' . newToken() . '">';
 	print '<input type="hidden" name="formfilteraction" id="formfilteraction" value="list">';
 	print '<input type="hidden" name="action" value="list">';
