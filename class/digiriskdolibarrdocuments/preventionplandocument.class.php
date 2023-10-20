@@ -126,7 +126,8 @@ class PreventionPlanDocument extends DigiriskDocuments
 			$json['PreventionPlan']['maitre_oeuvre']['lastname']       = $maitreoeuvre->lastname;
 			$json['PreventionPlan']['maitre_oeuvre']['email']          = $maitreoeuvre->email;
 			$json['PreventionPlan']['maitre_oeuvre']['signature']      = $maitreoeuvre->signature;
-			$json['PreventionPlan']['maitre_oeuvre']['signature_date'] = $maitreoeuvre->signature_date;
+            $json['PreventionPlan']['maitre_oeuvre']['signature_date'] = $maitreoeuvre->signature_date;
+            $json['PreventionPlan']['maitre_oeuvre']['attendance']     = $maitreoeuvre->attendance;
 		}
 
 		if ($extsociety->id > 0) {
@@ -148,7 +149,8 @@ class PreventionPlanDocument extends DigiriskDocuments
 			$json['PreventionPlan']['responsable_exterieur']['email']          = $extsocietyresponsible->email;
 			$json['PreventionPlan']['responsable_exterieur']['signature']      = $extsocietyresponsible->signature;
 			$json['PreventionPlan']['responsable_exterieur']['signature_date'] = $extsocietyresponsible->signature_date;
-		}
+            $json['PreventionPlan']['responsable_exterieur']['attendance']     = $maitreoeuvre->attendance;
+        }
 
 		if (!empty ($extsocietyintervenants) && $extsocietyintervenants > 0) {
 			foreach ($extsocietyintervenants as $extsocietyintervenant) {

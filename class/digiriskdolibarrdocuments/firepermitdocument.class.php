@@ -131,7 +131,8 @@ class FirePermitDocument extends DigiriskDocuments
 			$json['FirePermit']['maitre_oeuvre']['lastname']       = $maitreoeuvre->lastname;
 			$json['FirePermit']['maitre_oeuvre']['email']          = $maitreoeuvre->email;
 			$json['FirePermit']['maitre_oeuvre']['signature']      = $maitreoeuvre->signature;
-			$json['FirePermit']['maitre_oeuvre']['signature_date'] = $maitreoeuvre->signature_date;
+            $json['FirePermit']['maitre_oeuvre']['signature_date'] = $maitreoeuvre->signature_date;
+            $json['FirePermit']['maitre_oeuvre']['attendance']     = $maitreoeuvre->attendance;
 		}
 
 		if (is_object($extsociety) && $extsociety->id > 0) {
@@ -158,12 +159,13 @@ class FirePermitDocument extends DigiriskDocuments
 		if (!empty ($extsocietyintervenants) && $extsocietyintervenants > 0) {
 			foreach ($extsocietyintervenants as $extsocietyintervenant) {
 				$json['FirePermit']['intervenant_exterieur'] = array();
-				$json['FirePermit']['intervenant_exterieur'][$extsocietyintervenant->id]['firstname'] = $extsocietyintervenant->firstname;
-				$json['FirePermit']['intervenant_exterieur'][$extsocietyintervenant->id]['lastname'] = $extsocietyintervenant->lastname;
-				$json['FirePermit']['intervenant_exterieur'][$extsocietyintervenant->id]['phone'] = $extsocietyintervenant->phone;
-				$json['FirePermit']['intervenant_exterieur'][$extsocietyintervenant->id]['email'] = $extsocietyintervenant->email;
-				$json['FirePermit']['intervenant_exterieur'][$extsocietyintervenant->id]['signature'] = $extsocietyintervenant->signature;
-				$json['FirePermit']['intervenant_exterieur'][$extsocietyintervenant->id]['signature_date'] = $extsocietyintervenant->signature_date;
+				$json['FirePermit']['intervenant_exterieur'][$extsocietyintervenant->id]['firstname']      = $extsocietyintervenant->firstname;
+				$json['FirePermit']['intervenant_exterieur'][$extsocietyintervenant->id]['lastname']       = $extsocietyintervenant->lastname;
+				$json['FirePermit']['intervenant_exterieur'][$extsocietyintervenant->id]['phone']          = $extsocietyintervenant->phone;
+				$json['FirePermit']['intervenant_exterieur'][$extsocietyintervenant->id]['email']          = $extsocietyintervenant->email;
+				$json['FirePermit']['intervenant_exterieur'][$extsocietyintervenant->id]['signature']      = $extsocietyintervenant->signature;
+                $json['FirePermit']['intervenant_exterieur'][$extsocietyintervenant->id]['signature_date'] = $extsocietyintervenant->signature_date;
+                $json['FirePermit']['intervenant_exterieur'][$extsocietyintervenant->id]['attendance']     = $extsocietyintervenant->attendance;
 			}
 		}
 
