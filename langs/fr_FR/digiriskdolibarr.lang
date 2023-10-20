@@ -1105,7 +1105,6 @@ TotalProgress                         = Avancement réel global des tâches
 TotalBudget                           = Somme du budget des tâches
 TaskTimeSpentDate                     = Date du temps consommé
 StartDateCannotBeAfterEndDate         = La date de fin ne peut pas être antérieure à la date de début
-Project_task                          = Tâche
 
 #
 # Ticket - Interface publique ticket
