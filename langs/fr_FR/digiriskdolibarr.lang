@@ -74,6 +74,7 @@ LireDigirisk                 = Consulter le tableau de bord Digirisk
 ReadDigirisk                 = Consulter le tableau de bord Digirisk (read)
 YouDontHaveTheRightToSeeThis = Vous n'avez pas le droit de voir les groupements et unités de travail
 CanNotDoThis                 = Vous n'avez pas le droit de faire cela
+EnableDigiriskdolibarr       = Veuillez activer le module DigiriskDolibarr pour accéder à cette page
 
 # Data - Donnée
 DigiriskMenu          = Ajoutez des informations sur votre société/organisation. Cliquez sur le bouton "Enregistrer" en bas de page pour sauvegarder
@@ -427,12 +428,14 @@ AccidentLine                      = risque(s)
 AccidentDate                      = Date de l'accident
 AccidentSchedule                  = Horaires du permis de feu
 AccidentRiskList                  = Liste d'informations complémentaires sur l'accident
+Accidentworkstop                  = Arrêt de travail
 AccidentWorkStopCreated           = Création d'un arrêt de travail
 AccidentWorkStopModified          = Modification d'un arrêt de travail
 AccidentWorkStopDeleted           = Suppression d'un arrêt de travail
 AddAccidentWorkStop               = Ajout d'un arrêt de travail sur l'accident
 UpdateAccidentWorkStop            = Mise à jour d'un arrêt de travail sur l'accident
 DeleteAccidentWorkStop            = Suppression d'un arrêt de travail sur l'accident
+Accidentlesion                    = Lésion
 AccidentLesionCreated             = Création d'une lésion
 AccidentLesionModified            = Modification d'une lésion
 AccidentLesionDeleted             = Suppression d'une lésion
@@ -778,6 +781,7 @@ ShowDeletedDigiriskElement = Afficher les groupements / unités de travail qui s
 
 # Data - Donnée
 WorkUnit           = Unité de travail
+Workunit           = Unité de travail
 WorkUnitManagement = Gestion des données des unités de travail
 NewWorkUnit        = Nouvelle unité de travail
 ModifyWorkUnit     = Modifier unité de travail
@@ -888,6 +892,9 @@ DigiriskElementSharedRisksList           = Liste des risques partagés
 ImportSharedRisks                        = Importer des risques partagés
 AlreadyImported                          = Déja importé
 ShowSharedRisks                          = Risques partagés
+ShareRisk                                = Activer le partage des risques
+RISKSharing                              = Partage des risques
+RISKSharingDescription                   = Sélection des entités qui partageront leurs risques avec cette entité.
 ShowSharedRisksDescription               = Afficher les risques partagés dans les documents et les listings
 UnlinkSharedRisk                         = Délier le risque partagé
 RiskWellUnlinkShared                     = Risque délié
@@ -927,6 +934,7 @@ BlackRisk  = Risque inacceptable
 
 # Data - Donnée
 RiskAssessment                          = Évaluation
+Riskassessment                          = Évaluation
 RiskAssessments                         = Évaluations
 RiskAssessmentCreated                   = Création d'une évaluation
 RiskAssessmentModified                  = Modification d'une évaluation

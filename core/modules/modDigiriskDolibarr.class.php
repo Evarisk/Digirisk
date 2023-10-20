@@ -2159,6 +2159,19 @@ class modDigiriskdolibarr extends DolibarrModules
                 'PreventionPlanDet'     => ['alvaldi', 'PPR{0}'],
                 'FirePermit'            => ['bleriot', 'FP{0}'],
                 'FirePermitDet'         => ['earhart', 'FPR{0}'],
+
+                'LegalDisplay'                  => ['gerd', 'LD{0}'],
+                'InformationsSharing'           => ['gridr', 'IS{0}'],
+                'ListingRisksAction'            => ['gunnlod', 'RLA{0}'],
+                'ListingRisksPhoto'             => ['fornjot', 'RLP{0}'],
+                'GroupmentDocument'             => ['mundilfari', 'GPD{0}'],
+                'WorkUnitDocument'              => ['hati', 'WUD{0}'],
+                'RiskAssessmentDocument'        => ['eggther', 'DU{0}'],
+                'PreventionPlanDocument'        => ['bestla', 'PPD{0}'],
+                'FirePermitDocument'            => ['greip', 'FPD{0}'],
+                'AccidentInvestigationDocument' => ['siarnaq', 'AID{0}'],
+                'TicketDocument'                => ['geirrod', 'TD{0}'],
+                'ProjectDocument'               => ['angrboda', 'PJD{0}'],
             ];
 
             foreach($objectTypeAndMod as $type => $mod) {

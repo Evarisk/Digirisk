@@ -184,7 +184,7 @@ if ( ! $error && ($massaction == 'delete' || ($action == 'delete' && $confirm ==
 
 			if (is_array($riskAssessmentList) && ! empty($riskAssessmentList)) {
 				foreach ($riskAssessmentList as $riskRiskAssessment) {
-					$pathToEvaluationPhoto = DOL_DATA_ROOT . '/digiriskdolibarr/riskassessment/' . $riskRiskAssessment->ref;
+					$pathToEvaluationPhoto = $conf->digiriskdolibarr->multidir_output[$conf->entity] . '/riskassessment/' . $riskRiskAssessment->ref;
 
 					if ( file_exists($pathToEvaluationPhoto) && ! (empty($riskRiskAssessment->ref))) {
 						$files = dol_dir_list($pathToEvaluationPhoto);
@@ -357,47 +357,29 @@ if ( ! $error && $action == 'saveEvaluation' && $permissiontoadd) {
 }
 
 if ( ! $error && $action == "deleteEvaluation" && $permissiontodelete) {
-	$evaluationId = GETPOST('deletedEvaluationId');
+    $evaluationId = GETPOST('deletedEvaluationId');
 
-	$evaluation->fetch($evaluationId);
+    $evaluation->fetch($evaluationId);
 
-	$pathToEvaluationPhoto = DOL_DATA_ROOT . '/digiriskdolibarr/riskassessment/' . $evaluation->ref;
-	$files                 = dol_dir_list($pathToEvaluationPhoto);
-	foreach ($files as $file) {
-		if (is_file($file['fullname'])) {
-			unlink($file['fullname']);
-		}
-	}
+    $pathToEvaluationPhoto = $conf->digiriskdolibarr->multidir_output[$conf->entity] . '/riskassessment/' . $evaluation->ref;
+    dol_delete_dir_recursive($pathToEvaluationPhoto);
 
-	$files = dol_dir_list($pathToEvaluationPhoto . '/thumbs');
-	foreach ($files as $file) {
-		unlink($file['fullname']);
-	}
+    $previousEvaluation = $evaluation;
+    $result             = $evaluation->delete($user, false, false);
 
-	if (is_dir($pathToEvaluationPhoto . '/thumbs')) {
-		dol_delete_dir($pathToEvaluationPhoto . '/thumbs');
-	}
-
-	if (is_dir($pathToEvaluationPhoto)) {
-
-		dol_delete_dir($pathToEvaluationPhoto);
-	}
-
-	$previousEvaluation = $evaluation;
-	$result             = $evaluation->delete($user);
-
-	if ($result > 0) {
-		$previousEvaluation->updateEvaluationStatus($user, $evaluation->fk_risk);
-		// Delete evaluation OK
-		$urltogo = str_replace('__ID__', $result, $backtopage);
-		$urltogo = preg_replace('/--IDFORBACKTOPAGE--/', $id, $urltogo); // New method to autoselect project after a New on another form object creation
-		header("Location: " . $urltogo);
-		exit;
-	} else {
-		// Delete evaluation KO
-		if ( ! empty($evaluation->errors)) setEventMessages(null, $evaluation->errors, 'errors');
-		else setEventMessages($evaluation->error, null, 'errors');
-	}
+    if ($result > 0) {
+        $previousEvaluation->updatePreviousRiskAssessmentStatus($user, $evaluation->fk_risk);
+        // Delete evaluation OK
+        $urltogo = str_replace('__ID__', $result, $backtopage);
+        $urltogo = preg_replace('/--IDFORBACKTOPAGE--/', $id, $urltogo); // New method to autoselect project after a New on another form object creation
+        header("Location: " . $urltogo);
+        exit;
+    } elseif (!empty($evaluation->errors)) {
+        // Delete evaluation KO
+        setEventMessages('', $evaluation->errors, 'errors');
+    } else {
+        setEventMessages($evaluation->error, [], 'errors');
+    }
 }
 
 if ( ! $error && $action == 'addRiskAssessmentTask' && $permissiontoadd) {
@@ -415,10 +397,10 @@ if ( ! $error && $action == 'addRiskAssessmentTask' && $permissiontoadd) {
 
 	$extrafields->fetch_name_optionals_label($task->table_element);
 
-	$task->ref                              = $refTaskMod->getNextValue('', $task);
-	$task->label                            = $tasktitle;
-	$task->fk_project                       = $conf->global->DIGIRISKDOLIBARR_DU_PROJECT;
-	$task->date_c                           = dol_now();
+	$task->ref        = $refTaskMod->getNextValue('', $task);
+	$task->label      = $tasktitle;
+	$task->fk_project = $conf->global->DIGIRISKDOLIBARR_DU_PROJECT;
+	$task->date_c     = dol_now();
 	if (!empty($dateStart)) {
 		$task->date_start = strtotime(preg_replace('/\//', '-', $dateStart));
 		$task->date_start = dol_time_plus_duree($task->date_start, $hourStart, 'h');
@@ -481,7 +463,7 @@ if ( ! $error && $action == 'saveRiskAssessmentTask' && $permissiontoadd) {
 		$task->date_end = dol_time_plus_duree($task->date_end, $hourEnd, 'h');
 		$task->date_end = dol_time_plus_duree($task->date_end, $minEnd, 'i');
 	}
-	$task->budget_amount = $budget;
+	$task->budget_amount = is_int($budget) ? $budget : ($task->budget ?? 0);
 
 	if ($taskProgress == 1) {
 		$task->progress = 100;
@@ -670,7 +652,7 @@ if ($action == 'confirm_import_shared_risks' && $confirm == 'yes') {
 
 		if ($options['import_shared_risks'][$risks->id] == 'on') {
 			if ($object->id > 0) {
-				$object->element = 'digiriskdolibarr_' . $digiriskelementtmp->element;
+				$object->element = $digiriskelementtmp->element;
 				$result = $object->add_object_linked('digiriskdolibarr_' . $risk->element, $risks->id);
 				if ($result > 0) {
 					$risks->applied_on = $object->id;

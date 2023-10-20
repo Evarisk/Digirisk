@@ -415,7 +415,7 @@ foreach ($risk->fields as $key => $val) {
 		} elseif ($key == 'entity') {
 			print select_entity_list($search['entity'], 'search_entity', 'e.rowid NOT IN (' . $conf->entity . ')');
 		} elseif ($key == 'fk_element') {
-			print $digiriskelement->selectDigiriskElementList($search['fk_element'], 'search_fk_element_sharedrisk', ['customsql' => 's.entity NOT IN (' . $conf->entity . ')'], 1, 0, array(), 0, 0, 'minwidth100', 0, false, 1, $contextpage, false);
+			print $digiriskelement->selectDigiriskElementList($search['fk_element'], 'search_fk_element_sharedrisk', ['customsql' => 'entity NOT IN (' . $conf->entity . ') AND rowid NOT IN (' . implode(',', $deletedElements) . ')'], 1, 0, array(), 0, 0, 'minwidth100', 0, false, 1, $contextpage, false);
 		}  elseif ($key == 'applied_on') {
 //				print $digiriskelement->select_digiriskelement_list($search['search_applied_on_sharedrisk'], 'search_applied_on_sharedrisk', '', 1, 0, array(), 0, 0, 'minwidth100', 0, false, 1, $contextpage);
 		} elseif ($key == 'category') { ?>
@@ -545,7 +545,7 @@ while ($i < ($limit ? min($num, $limit) : $num)) {
 			} elseif ($key == 'fk_element') { ?>
 				<?php
 				if (is_object($alldigiriskelement[$risk->fk_element])) {
-					print $alldigiriskelement[$risk->fk_element]->getNomUrl(1, 'nolink', 1);
+					print $alldigiriskelement[$risk->fk_element]->getNomUrl(1, 'nolink', 0, '', -1, 1);
 				}
 			} elseif ($key == 'category') { ?>
 				<div class="table-cell table-50 cell-risk" data-title="Risque">

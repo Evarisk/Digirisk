@@ -148,7 +148,7 @@ class ActionsDigiriskdolibarr
 					require_once __DIR__ . '/digiriskelement.class.php';
 					$digiriskelement = new DigiriskElement($db);
 					$digiriskelement->fetch($object->array_options['options_digiriskdolibarr_ticket_service']);
-					$selectDictionnary = $digiriskelement->getNomUrl(1, 'blank', 1);
+					$selectDictionnary = $digiriskelement->getNomUrl(1, 'blank', 0, '', -1, 1);
 					?>
 					<script>
 					jQuery('.ticket_extras_digiriskdolibarr_ticket_service').html('')
@@ -271,7 +271,7 @@ class ActionsDigiriskdolibarr
                         <?php
 					if (!empty($risk_id) && $risk_id > 0) { ?>
 						<script>
-                            jQuery('.project_task_extras_fk_risk').html(<?php echo json_encode($risk->getNomUrl(1, 'blank')) ?>);
+                            jQuery('.project_task_extras_fk_risk').html(<?php echo json_encode($risk->getNomUrl(1, 'nolink')) ?>);
 						</script>
 					<?php }
 					if (!empty($preventionplan_id) && $preventionplan_id > 0) { ?>
@@ -316,7 +316,7 @@ class ActionsDigiriskdolibarr
 							if ($parameters['currentcontext'] == 'projecttaskscard') {
 								if (!empty($risk_id) && $risk_id > 0) { ?>
 									<script>
-										jQuery('.div-table-responsive').find('tr[id="row-' + <?php echo $tasksingle->id; ?> +'"]').find('td[data-key="projet_task.fk_risk"]').html(<?php echo json_encode($risk->getNomUrl(1, 'blank')) ?>);
+										jQuery('.div-table-responsive').find('tr[id="row-' + <?php echo $tasksingle->id; ?> +'"]').find('td[data-key="projet_task.fk_risk"]').html(<?php echo json_encode($risk->getNomUrl(1, 'nolink')) ?>);
 									</script>
 								<?php }
 								if (!empty($preventionplan_id) && $preventionplan_id > 0) { ?>
@@ -343,7 +343,7 @@ class ActionsDigiriskdolibarr
 							if ($parameters['currentcontext'] == 'tasklist') {
 								if (!empty($risk_id) && $risk_id > 0) { ?>
 									<script>
-										jQuery('.div-table-responsive').find('tr[data-rowid="' + <?php echo $tasksingle->id; ?> +'"]').find('td[data-key="projet_task.fk_risk"]').html(<?php echo json_encode($risk->getNomUrl(1, 'blank')) ?>);
+										jQuery('.div-table-responsive').find('tr[data-rowid="' + <?php echo $tasksingle->id; ?> +'"]').find('td[data-key="projet_task.fk_risk"]').html(<?php echo json_encode($risk->getNomUrl(1, 'nolink')) ?>);
 									</script>
 								<?php }
 								if (!empty($preventionplan_id) && $preventionplan_id > 0) { ?>
@@ -840,7 +840,8 @@ class ActionsDigiriskdolibarr
                 case 'digiriskelementdocument' :
                 case 'digiriskelementagenda' :
                 case 'digiriskstandardagenda' :
-                    $object->fk_project = $conf->global->DIGIRISKDOLIBARR_DU_PROJECT;
+                    $moreParams['moreHtml'] = 'none';
+                    $object->fk_project     = $conf->global->DIGIRISKDOLIBARR_DU_PROJECT;
                     break;
                 case 'accidentdocument' :
                 case 'accidentagenda' :
@@ -925,6 +926,10 @@ class ActionsDigiriskdolibarr
 				'documentType' => 'firepermitdocument',
 				'picto'        => 'fontawesome_fa-fire-alt_fas_#d35968'
 			],
+            'AccidentInvestigationDocument' => [
+                'documentType' => 'accidentinvestigationdocument',
+                'picto'        => 'fontawesome_fa-search_fas_#d35968'
+            ],
 			'Ticket' => [
 				'documentType' => 'ticketdocument',
 				'picto'        => 'ticket'

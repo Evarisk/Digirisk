@@ -43,7 +43,8 @@ window.digiriskdolibarr.form.searchForm = function(event) {
   event.preventDefault()
 
   let removeFilter = 0
-  if ($(event.originalEvent.submitter).hasClass('button_removefilter')) {
+
+  if (event.originalEvent !== undefined && $(event.originalEvent.submitter).hasClass('button_removefilter')) {
     removeFilter = 1
   }
 

@@ -226,9 +226,9 @@ if ($action == 'create') {
 	print '<input hidden class="flat" type="text" size="36" name="parent" id="parent">';
 	if (empty($fkParent)) {
 		$digiriskstandard->fetch($conf->global->DIGIRISKDOLIBARR_ACTIVE_STANDARD);
-		print $digiriskstandard->getNomUrl(1, 'blank', 1);
+		print $digiriskstandard->getNomUrl(1, 'blank', 0, '', -1, 1);
 	} else {
-		print $object->getNomUrl(1, 'blank', 1);
+		print $object->getNomUrl(1, 'blank', 0, '', -1, 1);
 	}
 	print '</td></tr>';
 
@@ -346,7 +346,7 @@ if ((empty($action) || ($action != 'edit' && $action != 'create'))) {
 	// ------------------------------------------------------------
     list($morehtmlref, $moreParams) = $object->getBannerTabContent();
 
-	saturne_banner_tab($object,'ref','', 1, 'ref', 'ref', $morehtmlref, true, $moreParams);
+	saturne_banner_tab($object,'ref','none', 0, 'ref', 'ref', $morehtmlref, true, $moreParams);
 
 	print '<div class="fichecenter">';
 	print '<div class="fichehalfleft">';

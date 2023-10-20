@@ -275,7 +275,7 @@ if ($object->id > 0 || $fromid > 0) {
 	if (empty($fromid)) {
         list($morehtmlref, $moreParams) = $object->getBannerTabContent();
 
-        saturne_banner_tab($object,'ref','', 1, 'ref', 'ref', $morehtmlref, true, $moreParams);
+        saturne_banner_tab($object,'ref','none', 0, 'ref', 'ref', $morehtmlref, true, $moreParams);
 	} else {
 		$linkback = '<a href="' . DOL_URL_ROOT . '/user/list.php?restore_lastsearch_values=1">' . $langs->trans("BackToList") . '</a>';
 
@@ -617,7 +617,7 @@ if ($object->id > 0 || $fromid > 0) {
 					print '<td>' . $user->getNomUrl(1);
 				} elseif ($key == 'fk_parent') {
 					$object->fetch($evaluator->fk_parent);
-					print '<td>' . $object->getNomUrl(1, 'blank');
+					print '<td>' . $object->getNomUrl(1, 'blank', 0, '', -1, 1);
 				} else {
 					print '<td>' . $evaluator->$key;
 				}
