@@ -280,8 +280,8 @@ class doc_riskassessmentdocument_odt extends SaturneDocumentModel
             $tmpArray['photo_site_plans'] = DOL_DOCUMENT_ROOT . $noPhoto;
         }
 
-        $arraySoc                   = $this->get_substitutionarray_mysoc($mysoc, $outputLangs);
-        $tmpArray['mycompany_logo_fullsize'] = preg_replace('/_small/', '', $arraySoc['mycompany_logo']);
+        $arraySoc                             = $this->get_substitutionarray_mysoc($mysoc, $outputLangs);
+        $tmpArray['mycompany_photo_fullsize'] = $arraySoc['mycompany_logo'];
 
         $objectDocument->DigiriskFillJSON();
 
