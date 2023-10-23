@@ -268,7 +268,7 @@ class doc_riskassessmentdocument_odt extends SaturneDocumentModel
      */
     public function write_file(SaturneDocuments $objectDocument, Translate $outputLangs, string $srcTemplatePath, int $hideDetails = 0, int $hideDesc = 0, int $hideRef = 0, array $moreParam): int
     {
-        global $conf;
+        global $conf, $mysoc;
 
         $fileArray = dol_dir_list($conf->digiriskdolibarr->multidir_output[$conf->entity] . '/' . $objectDocument->element . '/siteplans', 'files', 0, '', '(\.odt|\.zip)', 'date', 'asc', 1);
         if (is_array($fileArray) && !empty($fileArray)) {
@@ -279,6 +279,9 @@ class doc_riskassessmentdocument_odt extends SaturneDocumentModel
             $noPhoto                      = '/public/theme/common/nophoto.png';
             $tmpArray['photo_site_plans'] = DOL_DOCUMENT_ROOT . $noPhoto;
         }
+
+        $arraySoc                   = $this->get_substitutionarray_mysoc($mysoc, $outputLangs);
+        $tmpArray['mycompany_logo_fullsize'] = preg_replace('/_small/', '', $arraySoc['mycompany_logo']);
 
         $objectDocument->DigiriskFillJSON();
 
