@@ -39,7 +39,7 @@
 		$taskNextValue             = $refTaskMod->getNextValue('', $task);
 		$usertmp->fetchAll();
 		$usersList                 = $usertmp->users;
-		$timeSpentSortedByTasks    = $digiriskTask->fetchAllTimeSpentAllUser('AND ptt.fk_task > 0', 'task_datehour', 'DESC', 1);
+		$timeSpentSortedByTasks    = $digiriskTask->fetchAllTimeSpentAllUsers('AND fk_element > 0', 'element_datehour', 'DESC', 1);
 
 		if (is_array($riskAssessmentList) && !empty($riskAssessmentList)) {
 			foreach ($riskAssessmentList as $riskAssessmentSingle) {

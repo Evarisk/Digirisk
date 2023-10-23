@@ -59,6 +59,8 @@ class DigiriskDolibarrDashboard
      */
     public function load_dashboard(array $moreParams = []): array
     {
+        global $conf;
+
         $loadRiskAssessmentDocument = array_key_exists('loadRiskAssessmentDocument', $moreParams) ? $moreParams['loadRiskAssessmentDocument'] : 1;
         $loadAccident               = array_key_exists('loadAccident', $moreParams) ? $moreParams['loadAccident'] : 1;
         $loadEvaluator              = array_key_exists('loadEvaluator', $moreParams) ? $moreParams['loadEvaluator'] : 1;
@@ -78,7 +80,7 @@ class DigiriskDolibarrDashboard
         $dashboardData['evaluator']              = ($loadEvaluator) ? $evaluator->load_dashboard() : [];
         $dashboardData['digiriskresources']      = ($loadDigiriskResources) ? $digiriskResources->load_dashboard() : [];
         $dashboardData['risk']                   = ($loadRisk) ? $risk->load_dashboard() : [];
-        $dashboardData['task']                   = ($loadTask) ? $digiriskTask->load_dashboard() : [];
+        $dashboardData['task']                   = ($loadTask) ? $digiriskTask->load_dashboard($conf->global->DIGIRISKDOLIBARR_DU_PROJECT) : [];
 
         return $dashboardData;
     }
