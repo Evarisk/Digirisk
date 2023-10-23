@@ -77,6 +77,8 @@ $offset   = $limit * $page;
 $pageprev = $page - 1;
 $pagenext = $page + 1;
 
+$hookmanager->initHooks(['digiriskelementview', 'accidentlist']); // Note that conf->hooks_modules contains array
+
 // Initialize array of search criterias
 $search_all = GETPOST('search_all') ? trim(GETPOST('search_all')) : trim(GETPOST('sall'));
 $search     = [];

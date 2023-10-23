@@ -1004,7 +1004,7 @@ class ActionsDigiriskdolibarr
         global $conf;
 
 		// Do something only for the current context.
-		if (in_array($parameters['currentcontext'], ['digiriskelementview', 'digiriskstandardview', 'digiriskstandardagenda'])) {
+		if (in_array($parameters['currentcontext'], ['digiriskelementview', 'digiriskstandardview', 'digiriskstandardagenda', 'digiriskelementagenda', 'digiriskelementdocument'])) {
 			require_once __DIR__ . '/../lib/digiriskdolibarr_function.lib.php';
 			if ($object->element == 'digiriskelement') {
 				$this->results = ['subdir' => $object->element_type . '/'. $object->ref];
