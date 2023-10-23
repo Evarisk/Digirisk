@@ -213,12 +213,13 @@ if (empty($reshook)) {
 		if (!$error) {
 			$result = $object->create($user, false);
 			if ($result > 0) {
-				if (empty($object->fk_user_employer)) {
-					$usertmp->fetch('', $mysoc->managers, $mysoc->id, 0, $conf->entity);
-				} else {
-					$usertmp->fetch($object->fk_user_employer);
-				}
-				$signatory->setSignatory($object->id, 'accident', 'user', array($usertmp->id), 'Responsible');
+                // Removed while accidents have no document or attendants page
+//				if (empty($object->fk_user_employer)) {
+//					$usertmp->fetch('', $mysoc->managers, $mysoc->id, 0, $conf->entity);
+//				} else {
+//					$usertmp->fetch($object->fk_user_employer);
+//				}
+//				$signatory->setSignatory($object->id, 'accident', 'user', array($usertmp->id), 'Responsible');
 
 				// Creation Accident OK
 				$urltogo = str_replace('__ID__', $result, $backtopage);
