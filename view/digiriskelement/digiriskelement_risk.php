@@ -81,7 +81,7 @@ $risk             = new Risk($db);
 $evaluation       = new RiskAssessment($db);
 $ecmdir           = new EcmDirectory($db);
 $project          = new Project($db);
-$task             = new DigiriskTask($db);
+$task             = new SaturneTask($db);
 $extrafields      = new ExtraFields($db);
 $DUProject        = new Project($db);
 

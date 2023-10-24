@@ -61,7 +61,7 @@ $workUnit             = new WorkUnit($db);
 $risk                 = new Risk($db);
 $riskAssessment       = new RiskAssessment($db);
 $risksign             = new RiskSign($db);
-$task                 = new DigiriskTask($db);
+$task                 = new SaturneTask($db);
 $extrafields          = new ExtraFields($db);
 
 $numberingModules = [

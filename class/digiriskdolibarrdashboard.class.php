@@ -27,7 +27,7 @@ require_once __DIR__ . '/accident.class.php';
 require_once __DIR__ . '/evaluator.class.php';
 require_once __DIR__ . '/digiriskresources.class.php';
 require_once __DIR__ . '/riskanalysis/risk.class.php';
-require_once __DIR__ . '/digirisktask.class.php';
+require_once __DIR__ . '/../../saturne/class/task/saturnetask.class.php';
 
 /**
  * Class for DigiriskDolibarrDashboard
@@ -73,7 +73,7 @@ class DigiriskDolibarrDashboard
         $evaluator              = new Evaluator($this->db);
         $digiriskResources      = new DigiriskResources($this->db);
         $risk                   = new Risk($this->db);
-        $digiriskTask           = new DigiriskTask($this->db);
+        $digiriskTask           = new SaturneTask($this->db);
 
         $dashboardData['riskassessmentdocument'] = ($loadRiskAssessmentDocument) ? $riskAssessmentDocument->load_dashboard() : [];
         $dashboardData['accident']               = ($loadAccident) ? $accident->load_dashboard() : [];

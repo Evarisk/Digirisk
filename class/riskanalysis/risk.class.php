@@ -25,7 +25,7 @@ require_once DOL_DOCUMENT_ROOT . '/core/class/commonobject.class.php';
 
 require_once __DIR__ . '/../../lib/digiriskdolibarr_function.lib.php';
 require_once __DIR__ . '/../digiriskelement.class.php';
-require_once __DIR__ . '/../digirisktask.class.php';
+require_once __DIR__ . '/../../../saturne/class/task/saturnetask.class.php';
 require_once __DIR__ . '/riskassessment.class.php';
 
 // Load Saturne libraries.
@@ -465,7 +465,7 @@ class Risk extends SaturneObject
 			$records = array();
 			while ($i < $num) {
 				$obj = $this->db->fetch_object($resql);
-				$record = new DigiriskTask($this->db);
+				$record = new SaturneTask($this->db);
 				$record->fetch($obj->fk_object);
 				$records[$record->id] = $record;
 				$i++;
@@ -491,8 +491,7 @@ class Risk extends SaturneObject
 	public function getTasksWithFkRisk()
 	{
 		$sql = "SELECT * FROM " . MAIN_DB_PREFIX . 'projet_task_extrafields' . ' WHERE fk_risk > 0';
-		$digiriskTask = new DigiriskTask($this->db);
-		$tasksList = $digiriskTask->fetchAll();
+		$tasksList = saturne_fetch_all_object_type('SaturneTask');
 
 		$resql = $this->db->query($sql);
 

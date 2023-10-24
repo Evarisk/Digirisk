@@ -52,7 +52,7 @@
 
 $digiriskelement                = new DigiriskElement($db);
 $riskAssessment                 = new RiskAssessment($db);
-$digiriskTask                   = new DigiriskTask($db);
+$digiriskTask                   = new SaturneTask($db);
 $extrafields                    = new Extrafields($db);
 $usertmp                        = new User($db);
 $project                        = new Project($db);

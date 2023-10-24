@@ -26,7 +26,7 @@ use Luracast\Restler\RestException;
 require_once __DIR__ . '/../core/modules/modDigiriskDolibarr.class.php';
 
 require_once __DIR__ . '/riskanalysis/risk.class.php';
-require_once __DIR__ . '/digirisktask.class.php';
+require_once __DIR__ . '/../../saturne/class/task/saturnetask.class.php';
 require_once __DIR__ . '/digiriskdolibarrdocuments/riskassessmentdocument.class.php';
 require_once __DIR__ . '/accident.class.php';
 require_once __DIR__ . '/digiriskresources.class.php';
@@ -267,7 +267,7 @@ class DigiriskDolibarr extends DolibarrApi
 
 		$this->setConfEntity($entity);
 
-		$digirisktask = new DigiriskTask($this->db);
+		$digirisktask = new SaturneTask($this->db);
 		return $digirisktask->load_dashboard();
 	}
 
@@ -445,7 +445,7 @@ class DigiriskDolibarr extends DolibarrApi
 
 		$this->setConfEntity($entity);
 
-		$digirisktask = new DigiriskTask($this->db);
+		$digirisktask = new SaturneTask($this->db);
 		return $digirisktask->getTasksByProgress()['data'];
 	}
 

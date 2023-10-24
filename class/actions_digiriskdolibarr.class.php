@@ -232,7 +232,7 @@ class ActionsDigiriskdolibarr
 
 				global $user;
 
-				$task                  = new DigiriskTask($db);
+				$task                  = new SaturneTask($db);
 				$risk                  = new Risk($db);
 				$preventionplan        = new PreventionPlan($db);
 				$firepermit            = new FirePermit($db);
