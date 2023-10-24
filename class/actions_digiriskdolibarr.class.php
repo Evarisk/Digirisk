@@ -232,7 +232,7 @@ class ActionsDigiriskdolibarr
 
 				global $user;
 
-				$task                  = new DigiriskTask($db);
+				$task                  = new SaturneTask($db);
 				$risk                  = new Risk($db);
 				$preventionplan        = new PreventionPlan($db);
 				$firepermit            = new FirePermit($db);
@@ -382,7 +382,7 @@ class ActionsDigiriskdolibarr
 						$nbtasks = count($alltasks);
 						foreach ($alltasks as $tasksignle) {
 							$filter = ' AND ptt.fk_task = ' . $tasksignle->id;
-							$alltimespent = $task->fetchAllTimeSpentAllUser($filter);
+							$alltimespent = $task->fetchAllTimeSpentAllUsers($filter);
 							foreach ($alltimespent as $timespent) {
 								$totatconsumedtimeamount += convertSecondToTime($timespent->timespent_duration, 'allhourmin') * $timespent->timespent_thm;
 							}

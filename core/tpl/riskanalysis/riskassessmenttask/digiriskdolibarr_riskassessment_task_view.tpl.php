@@ -330,13 +330,13 @@ if (!empty($related_tasks) && $related_tasks > 0) {
 					<div class="modal-container wpeo-modal-event">
 						<!-- Modal-Header -->
 						<div class="modal-header">
-							<h2 class="modal-title"><?php echo $langs->trans('TaskEdit') . ' ' . $related_task->getNomUrlTask(0) ?></h2>
+							<h2 class="modal-title"><?php echo $langs->trans('TaskEdit') . ' ' . $related_task->getNomUrl(0) ?></h2>
 							<div class="modal-close"><i class="fas fa-times"></i></div>
 						</div>
 						<!-- Modal-Content -->
 						<div class="modal-content riskassessment-task-content">
 							<div class="riskassessment-task-data" value="<?php echo $related_task->id ?>">
-								<span class="riskassessment-task-reference" value="<?php echo $related_task->ref ?>"><?php echo $related_task->getNomUrlTask(0, 'withproject'); ?></span>
+								<span class="riskassessment-task-reference" value="<?php echo $related_task->ref ?>"><?php echo $related_task->getNomUrl(0, 'withproject'); ?></span>
 								<span class="riskassessment-task-author">
 									<?php $userAuthor = $usersList[$related_task->fk_user_creat > 0 ? $related_task->fk_user_creat : $user->id];
 									echo getNomUrlUser($userAuthor); ?>
@@ -551,7 +551,7 @@ if (!empty($related_tasks) && $related_tasks > 0) {
 						<div class="modal-container wpeo-modal-event">
 							<!-- Modal-Header -->
 							<div class="modal-header">
-								<h2 class="modal-title"><?php echo $langs->trans('TaskTimeSpentEdit') . ' ' . $related_task->getNomUrlTask(0, 'withproject') ?></h2>
+								<h2 class="modal-title"><?php echo $langs->trans('TaskTimeSpentEdit') . ' ' . $related_task->getNomUrl(0, 'withproject') ?></h2>
 								<div class="modal-close"><i class="fas fa-times"></i></div>
 							</div>
 							<!-- Modal EDIT RISK ASSESSMENT TASK Content-->
