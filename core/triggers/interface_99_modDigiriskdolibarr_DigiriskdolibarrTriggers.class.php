@@ -610,7 +610,7 @@ class InterfaceDigiriskdolibarrTriggers extends DolibarrTriggers
 
 					$actioncomm->elementtype = 'digiriskelement@digiriskdolibarr';
 
-					$actioncomm->label         = $langs->trans('ObjectCreateTrigger', $langs->transnoentities(ucfirst($object->element)), $object->ref);
+					$actioncomm->label         = $langs->trans('ObjectCreateTrigger', $langs->transnoentities('Task'), $object->ref);
 					$actioncomm->note_private .= $langs->trans($label_progress) . ' : ' . $task_progress . '%' . '<br>';
 					$actioncomm->fk_element    = $risk->fk_element;
 
@@ -642,7 +642,7 @@ class InterfaceDigiriskdolibarrTriggers extends DolibarrTriggers
 
 					$actioncomm->elementtype = 'digiriskelement@digiriskdolibarr';
 
-					$actioncomm->label         = $langs->trans('ObjectModifyTrigger', $langs->transnoentities(ucfirst($object->element)), $object->ref);
+					$actioncomm->label         = $langs->trans('ObjectModifyTrigger', $langs->transnoentities('Task'), $object->ref);
 					$actioncomm->note_private .= $langs->trans($label_progress) . ' : ' . $task_progress . '%' . '<br>';
 					$actioncomm->fk_element    = $risk->fk_element;
 
@@ -672,7 +672,7 @@ class InterfaceDigiriskdolibarrTriggers extends DolibarrTriggers
 					}
 
 					$actioncomm->elementtype   = 'digiriskelement@digiriskdolibarr';
-					$actioncomm->label         = $langs->trans('ObjectDeleteTrigger', $langs->transnoentities(ucfirst($object->element)), $object->ref);
+					$actioncomm->label         = $langs->trans('ObjectDeleteTrigger', $langs->transnoentities('Task'), $object->ref);
 					$actioncomm->note_private .= $langs->trans($label_progress) . ' : ' . $task_progress . '%' . '<br>';
 					$actioncomm->fk_element    = $risk->fk_element;
 
