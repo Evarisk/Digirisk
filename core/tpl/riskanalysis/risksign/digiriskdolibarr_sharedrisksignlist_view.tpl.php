@@ -275,7 +275,7 @@ foreach ($risksign->fields as $key => $val) {
 						<img class="danger-category-pic tooltip hover" src="<?php echo DOL_URL_ROOT . '/custom/digiriskdolibarr/img/' . ((empty(dol_escape_htmltag($search[$key]))) ? $risksign->getRiskSignCategory($risksign) : $risksign->getRiskSignCategoryByPosition($search[$key])) ?>" />
 					</div>
 				<?php endif; ?>
-				<ul class="dropdown-content wpeo-gridlayout grid-5 grid-gap-0">
+				<ul class="saturne-dropdown-content wpeo-gridlayout grid-5 grid-gap-0">
 					<?php
 					$risksignCategories = $risksign->getRiskSignCategories();
 					if ( ! empty($risksignCategories) ) :

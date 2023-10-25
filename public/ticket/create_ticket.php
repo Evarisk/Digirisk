@@ -411,7 +411,7 @@ if ($entity > 0) {
 	print '<div class="centpercent tableforimgfields form-registre">' . "\n";
 
 	if (empty($conf->global->DIGIRISKDOLIBARR_TICKET_CATEGORIES_CREATED)) : ?>
-		<div class="wpeo-notice notice-info">
+		<div class="wpeo-notice notice-error">
 			<div class="notice-content">
 				<div class="notice-title"><strong><?php echo $langs->trans("TicketCategoriesNotCreated"); ?></strong></div>
 				<div class="notice-subtitle"><strong><?php echo $langs->trans("HowToSetupTicketCategories") . '  ' ?><a href="../../admin/ticket/ticket.php#TicketCategories"><?php echo $langs->trans('ConfigTicketCategories'); ?></a></strong></div>
