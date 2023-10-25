@@ -273,13 +273,13 @@ class DigiriskDocuments extends SaturneDocuments
 														(($related_task->ref) ? $tmparray['actionPreventionCompleted'] .= $langs->trans('Ref') . ' : ' . $related_task->ref . "\n" : '');
 														(($responsible) ? $tmparray['actionPreventionCompleted'] .= $langs->trans('Responsible') . ' : ' . $responsible . "\n" : '');
 														$tmparray['actionPreventionCompleted'] .= $langs->trans('DateStart') . ' : ';
-														if ($conf->global->DIGIRISKDOLIBARR_SHOW_TASK_START_DATE && !empty($related_task->date_start)) {
-															$tmparray['actionPreventionCompleted'] .= dol_print_date(($related_task->date_start), 'dayreduceformat');
+														if ($conf->global->DIGIRISKDOLIBARR_SHOW_TASK_START_DATE && !empty($related_task->dateo)) {
+															$tmparray['actionPreventionCompleted'] .= dol_print_date(($related_task->dateo), 'dayreduceformat');
 														} else {
-															$tmparray['actionPreventionCompleted'] .= dol_print_date(($related_task->date_c), 'dayreduceformat');
+															$tmparray['actionPreventionCompleted'] .= dol_print_date(($related_task->datec), 'dayreduceformat');
 														}
-														if ($conf->global->DIGIRISKDOLIBARR_SHOW_TASK_END_DATE && !empty($related_task->date_end)) {
-															$tmparray['actionPreventionCompleted'] .= "\n" . $langs->transnoentities('Deadline') . ' : ' . dol_print_date($related_task->date_end, 'dayreduceformat') . "\n";
+														if ($conf->global->DIGIRISKDOLIBARR_SHOW_TASK_END_DATE && !empty($related_task->datee)) {
+															$tmparray['actionPreventionCompleted'] .= "\n" . $langs->transnoentities('Deadline') . ' : ' . dol_print_date($related_task->datee, 'dayreduceformat') . "\n";
 														} else {
 															$tmparray['actionPreventionCompleted'] .= ' - ' . $langs->transnoentities('Deadline') . ' : ' . $langs->trans('NoData') . "\n";
 														}
@@ -295,13 +295,13 @@ class DigiriskDocuments extends SaturneDocuments
 													(($related_task->ref) ? $tmparray['actionPreventionUncompleted'] .= $langs->trans('Ref') . ' : ' . $related_task->ref . "\n" : '');
 													(($responsible) ? $tmparray['actionPreventionUncompleted'] .= $langs->trans('Responsible') . ' : ' . $responsible . "\n" : '');
 													$tmparray['actionPreventionUncompleted'] .= $langs->trans('DateStart') . ' : ';
-													if ($conf->global->DIGIRISKDOLIBARR_SHOW_TASK_START_DATE && !empty($related_task->date_start)) {
-														$tmparray['actionPreventionUncompleted'] .= dol_print_date(($related_task->date_start), 'dayreduceformat');
+													if ($conf->global->DIGIRISKDOLIBARR_SHOW_TASK_START_DATE && !empty($related_task->dateo)) {
+														$tmparray['actionPreventionUncompleted'] .= dol_print_date(($related_task->dateo), 'dayreduceformat');
 													} else {
-														$tmparray['actionPreventionUncompleted'] .= dol_print_date(($related_task->date_c), 'dayreduceformat');
+														$tmparray['actionPreventionUncompleted'] .= dol_print_date(($related_task->datec), 'dayreduceformat');
 													}
-													if ($conf->global->DIGIRISKDOLIBARR_SHOW_TASK_END_DATE && !empty($related_task->date_end)) {
-														$tmparray['actionPreventionUncompleted'] .= "\n" . $langs->transnoentities('Deadline') . ' : ' . dol_print_date($related_task->date_end, 'dayreduceformat') . "\n";
+													if ($conf->global->DIGIRISKDOLIBARR_SHOW_TASK_END_DATE && !empty($related_task->datee)) {
+														$tmparray['actionPreventionUncompleted'] .= "\n" . $langs->transnoentities('Deadline') . ' : ' . dol_print_date($related_task->datee, 'dayreduceformat') . "\n";
 													} else {
 														$tmparray['actionPreventionUncompleted'] .= ' - ' . $langs->transnoentities('Deadline') . ' : ' . $langs->trans('NoData') . "\n";
 													}

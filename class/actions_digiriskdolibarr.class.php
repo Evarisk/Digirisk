@@ -381,7 +381,7 @@ class ActionsDigiriskdolibarr
 					if (is_array($alltasks) && !empty($alltasks)) {
 						$nbtasks = count($alltasks);
 						foreach ($alltasks as $tasksignle) {
-							$filter = ' AND ptt.fk_task = ' . $tasksignle->id;
+							$filter = ' AND fk_element = ' . $tasksignle->id;
 							$alltimespent = $task->fetchAllTimeSpentAllUsers($filter);
 							foreach ($alltimespent as $timespent) {
 								$totatconsumedtimeamount += convertSecondToTime($timespent->timespent_duration, 'allhourmin') * $timespent->timespent_thm;
@@ -403,11 +403,11 @@ class ActionsDigiriskdolibarr
 					$outTotalprogress = '<tr><td>' . $langs->trans('TotalProgress') . '</td><td>' . (($totalprogress) ? price2num($totalprogress/$nbtasks, 2) . ' %' : '0 %') . '</td></tr>';
 					$outTotaltasksbudget = '<tr><td>' . $langs->trans('TotalBudget') . '</td><td>' . price($totaltasksbudget, 0, $langs, 1, -1, 2, $conf->currency) . '</td></tr>'; ?>
 					<script>
-						jQuery('.fichecenter .fichehalfright .tableforfield tbody tr:last-child').after(<?php echo json_encode($outTotatconsumedtime) ?>);
-						jQuery('.fichecenter .fichehalfright .tableforfield tbody tr:last-child').after(<?php echo json_encode($outTotatconsumedtimeamount) ?>);
-						jQuery('.fichecenter .fichehalfright .tableforfield tbody tr:last-child').after(<?php echo json_encode($outNbtasks) ?>);
-						jQuery('.fichecenter .fichehalfright .tableforfield tbody tr:last-child').after(<?php echo json_encode($outTotalprogress) ?>);
-						jQuery('.fichecenter .fichehalfright .tableforfield tbody tr:last-child').after(<?php echo json_encode($outTotaltasksbudget) ?>);
+						jQuery('.fichecenter .fichehalfright .tableforfield tbody tr:last-child').first().after(<?php echo json_encode($outTotatconsumedtime) ?>);
+						jQuery('.fichecenter .fichehalfright .tableforfield tbody tr:last-child').first().after(<?php echo json_encode($outTotatconsumedtimeamount) ?>);
+						jQuery('.fichecenter .fichehalfright .tableforfield tbody tr:last-child').first().after(<?php echo json_encode($outNbtasks) ?>);
+						jQuery('.fichecenter .fichehalfright .tableforfield tbody tr:last-child').first().after(<?php echo json_encode($outTotalprogress) ?>);
+						jQuery('.fichecenter .fichehalfright .tableforfield tbody tr:last-child').first().after(<?php echo json_encode($outTotaltasksbudget) ?>);
 					</script>
 					<?php
 				}
