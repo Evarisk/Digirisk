@@ -400,7 +400,7 @@ if ( ! $error && $action == 'addRiskAssessmentTask' && $permissiontoadd) {
 	$task->ref        = $refTaskMod->getNextValue('', $task);
 	$task->label      = $tasktitle;
 	$task->fk_project = $conf->global->DIGIRISKDOLIBARR_DU_PROJECT;
-	$task->date_c     = dol_now();
+	$task->datec     = dol_now();
 	if (!empty($dateStart)) {
 		$task->date_start = strtotime(preg_replace('/\//', '-', $dateStart));
 		$task->date_start = dol_time_plus_duree($task->date_start, $hourStart, 'h');

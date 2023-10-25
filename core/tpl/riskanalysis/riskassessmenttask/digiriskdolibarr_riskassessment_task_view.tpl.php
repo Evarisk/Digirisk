@@ -342,7 +342,7 @@ if (!empty($related_tasks) && $related_tasks > 0) {
 									echo getNomUrlUser($userAuthor); ?>
 								</span>
 								<span class="riskassessment-task-date">
-									<i class="fas fa-calendar-alt"></i> <?php echo date('d/m/Y', (($conf->global->DIGIRISKDOLIBARR_SHOW_TASK_START_DATE && ( ! empty($related_task->date_start))) ? $related_task->date_start : $related_task->date_c)) . (($conf->global->DIGIRISKDOLIBARR_SHOW_TASK_END_DATE && ( ! empty($related_task->date_end))) ? ' - ' . date('d/m/Y', $related_task->date_end) : ''); ?>
+									<i class="fas fa-calendar-alt"></i> <?php echo date('d/m/Y', (($conf->global->DIGIRISKDOLIBARR_SHOW_TASK_START_DATE && ( ! empty($related_task->dateo))) ? $related_task->dateo : $related_task->datec)) . (($conf->global->DIGIRISKDOLIBARR_SHOW_TASK_END_DATE && ( ! empty($related_task->datee))) ? ' - ' . date('d/m/Y', $related_task->datee) : ''); ?>
 								</span>
 								<span class="riskassessment-total-task-timespent riskassessment-total-task-timespent-<?php echo $related_task->id ?>">
 									<?php
@@ -372,11 +372,11 @@ if (!empty($related_tasks) && $related_tasks > 0) {
 								<div class="riskassessment-task-date wpeo-gridlayout grid-3">
 									<div>
 										<span class="title"><?php echo $langs->trans('DateStart'); ?></span>
-										<?php print $form->selectDate($related_task->date_start ?: -1, 'RiskassessmentTaskDateStartEdit'.$related_task->id, 1, 1, 0, '', 1, 1); ?>
+										<?php print $form->selectDate($related_task->dateo ?: -1, 'RiskassessmentTaskDateStartEdit'.$related_task->id, 1, 1, 0, '', 1, 1); ?>
 									</div>
 									<div>
 										<span class="title"><?php echo $langs->trans('Deadline'); ?></span>
-										<?php print $form->selectDate($related_task->date_end ?: -1,'RiskassessmentTaskDateEndEdit'.$related_task->id, 1, 1, 0, '', 1, 1); ?>
+										<?php print $form->selectDate($related_task->datee ?: -1,'RiskassessmentTaskDateEndEdit'.$related_task->id, 1, 1, 0, '', 1, 1); ?>
 									</div>
 									<div class="riskassessment-task-budget">
 										<span class="title"><?php echo $langs->trans('Budget'); ?></span>
