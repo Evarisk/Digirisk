@@ -1231,7 +1231,7 @@ if ((empty($action) || ($action != 'create' && $action != 'edit'))) {
 							</div>
 						</div>
 
-						<ul class="dropdown-content wpeo-gridlayout grid-5 grid-gap-0">
+						<ul class="saturne-dropdown-content wpeo-gridlayout grid-5 grid-gap-0">
 							<?php
 							$dangerCategories = $risk->getDangerCategories();
 							if ( ! empty($dangerCategories)) :
@@ -1356,7 +1356,7 @@ if ((empty($action) || ($action != 'create' && $action != 'edit'))) {
 						class="fas fa-plus-circle button-add"></i></span>
 					<img class="danger-category-pic wpeo-tooltip-event hidden" src="" aria-label=""/>
 				</div>
-				<ul class="dropdown-content wpeo-gridlayout grid-5 grid-gap-0">
+				<ul class="saturne-dropdown-content wpeo-gridlayout grid-5 grid-gap-0">
 					<?php
 					$dangerCategories = $risk->getDangerCategories();
 					if ( ! empty($dangerCategories)) :

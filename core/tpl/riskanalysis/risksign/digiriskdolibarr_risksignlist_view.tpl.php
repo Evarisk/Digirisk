@@ -186,7 +186,7 @@ if ($action != 'list') {
 								<span class="wpeo-button button-square-50 button-grey"><i class="fas fa-map-signs button-icon"></i><i class="fas fa-plus-circle button-add"></i></span>
 								<img class="danger-category-pic wpeo-tooltip-event hidden" src=""  aria-label=""/>
 							</div>
-							<ul class="dropdown-content wpeo-gridlayout grid-5 grid-gap-0">
+							<ul class="saturne-dropdown-content wpeo-gridlayout grid-5 grid-gap-0">
 								<?php
 								$risksignCategories = $risksign->getRiskSignCategories();
 								if ( ! empty($risksignCategories) ) :
@@ -275,7 +275,7 @@ foreach ($risksign->fields as $key => $val) {
 						<img class="danger-category-pic tooltip hover" src="<?php echo DOL_URL_ROOT . '/custom/digiriskdolibarr/img/' . ((empty(dol_escape_htmltag($search[$key]))) ? $risksign->getRiskSignCategory($risksign) : $risksign->getRiskSignCategoryByPosition($search[$key])) ?>" />
 					</div>
 				<?php endif; ?>
-				<ul class="dropdown-content wpeo-gridlayout grid-5 grid-gap-0">
+				<ul class="saturne-dropdown-content wpeo-gridlayout grid-5 grid-gap-0">
 					<?php
 					$risksignCategories = $risksign->getRiskSignCategories();
 					if ( ! empty($risksignCategories) ) :
@@ -393,7 +393,7 @@ while ($i < ($limit ? min($num, $limit) : $num)) {
 										<div class="dropdown-toggle dropdown-add-button button-cotation wpeo-tooltip-event" aria-label="<?php echo $risksign->getRiskSignCategoryName($risksign); ?>">
 											<img class="danger-category-pic hover" src="<?php echo DOL_URL_ROOT . '/custom/digiriskdolibarr/img/' . $risksign->getRiskSignCategory($risksign) ?>"/>
 										</div>
-										<ul class="dropdown-content wpeo-gridlayout grid-5 grid-gap-0">
+										<ul class="saturne-dropdown-content wpeo-gridlayout grid-5 grid-gap-0">
 											<?php
 											$risksignCategories = $risksign->getRiskSignCategories();
 											if ( ! empty($risksignCategories) ) :
