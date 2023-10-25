@@ -227,7 +227,7 @@ class DigiriskDocuments extends SaturneDocuments
 									foreach ($related_tasks as $related_task) {
 										if(is_object($related_task)) {
 											if (!empty($conf->global->DIGIRISKDOLIBARR_SHOW_SHARED_RISKS)) {
-												$project->fetch($related_task->fk_project);
+												$project->fetch($related_task->fk_projet);
 												if ($project->entity != $conf->entity) {
 													$result = !empty($conf->mc->sharings['project']) ? in_array($project->entity, $conf->mc->sharings['project']) : 0;
 												} else {
