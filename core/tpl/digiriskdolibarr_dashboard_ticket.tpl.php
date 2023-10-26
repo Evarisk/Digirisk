@@ -71,7 +71,8 @@ if (empty($conf->global->MAIN_DISABLE_WORKBOARD)) {
 		foreach ($allCategories as $category) {
 			$arrayCats[$category->label] = array(
 				'id' => $category->id,
-				'name' => $category->label,
+                'name' => $category->label,
+                'color' => $category->color,
 				'photo' => show_category_image($category, $upload_dir, 1)
 			);
 		}
@@ -137,11 +138,13 @@ if (empty($conf->global->MAIN_DISABLE_WORKBOARD)) {
 		// Show dashboard
 		if (!empty($dashboardlines)) {
 			$openedDashBoard = '';
+            $prevColor = '';
 			foreach ($dashboardlines['ticket'][$digiriskelement->id] as $key => $board) {
+                $prevColor = $board->color ?: $prevColor;
 				if ($board->visible) {
 					$openedDashBoard .= '<div class="box-flex-item"><div class="box-flex-item-with-margin">';
 					$openedDashBoard .= '<div class="info-box info-box-sm">';
-					$openedDashBoard .= '<span class="info-box-icon bg-infobox-ticket">';
+					$openedDashBoard .= '<span class="info-box-icon bg-infobox-ticket" style="background-color: #'. $prevColor .' !important">';
 					$openedDashBoard .= ($board->img) ?: '<i class="fa fa-dol-ticket"></i>';
 					$openedDashBoard .= '</span>';
 					$openedDashBoard .= '<div class="info-box-content">';
