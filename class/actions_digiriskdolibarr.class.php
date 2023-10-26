@@ -1016,4 +1016,19 @@ class ActionsDigiriskdolibarr
 		}
 		return 0; // or return 1 to replace standard code.
 	}
+
+    /**
+     * Add new actions buttons on CommonObject
+     *
+     * @param   CommonObject  $object  The object to process (third party and product object)
+     */
+    public function addMoreActionsButtons($parameters, &$object, &$action)
+    {
+        global $langs, $user;
+
+        if ($parameters['currentcontext'] == 'ticketcard') {
+            print dolGetButtonAction('', img_picto('NewAccident', 'fa-user-injured') . ' ' . $langs->trans('NewAccident'), 'default', dol_buildpath('/digiriskdolibarr/view/accident/accident_card.php?action=create&fk_ticket=' . $object->id, 1), '', $user->rights->digiriskdolibarr->accident->write);
+        }
+
+    }
 }
