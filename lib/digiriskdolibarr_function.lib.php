@@ -2073,6 +2073,7 @@ function load_board($user, $cat, $digiriskelement)
 	if ($allObjects > 0) {
 		$response = new WorkboardResponse();
 		$response->id = $cat['id'];
+		$response->color = $cat['color'];
 		$response->img = $cat['photo'];
 		$response->label = $cat['name'] . ' : ';
 		$response->url = DOL_URL_ROOT . '/ticket/list.php?search_options_digiriskdolibarr_ticket_service='.$digiriskelement->id.'&search_category_ticket_list='.$cat['id'];
