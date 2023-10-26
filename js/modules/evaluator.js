@@ -127,8 +127,8 @@ window.digiriskdolibarr.evaluator.createEvaluator = function ( event ) {
 		processData: false,
 		contentType: false,
 		success: function ( resp ) {
-			$('.fichecenter').html($(resp).find('#searchFormList'))
-
+			$('.fichecenter').html($(resp).find('#searchFormEvaluator'))
+ 
 			let actionContainerSuccess = $('.messageSuccessEvaluatorCreate');
 
 			actionContainerSuccess.find($(resp).find('.evaluator-create-success-notice'))
