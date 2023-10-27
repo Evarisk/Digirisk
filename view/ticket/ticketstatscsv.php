@@ -1,5 +1,5 @@
 <?php
-/* Copyright (C) 2022 EOXIA <dev@eoxia.com>
+/* Copyright (C) 2022 EOXIA <technique@evarisk.com>
  *
  * This program is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -44,7 +44,6 @@ include_once DOL_DOCUMENT_ROOT . '/core/lib/files.lib.php';
 
 require_once __DIR__ . '/../../lib/digiriskdolibarr_ticket.lib.php';
 require_once __DIR__ . '/../../class/ticketdigiriskstats.class.php';
-require_once __DIR__ . '/../../core/tpl/digirisk_security_checks.php';
 
 // Load translation files required by the page
 $langs->loadLangs(array('other'));
@@ -114,7 +113,7 @@ llxHeader('', $title, $help_url, '', '', '', $morejs, $morecss);
 
 print load_fiche_titre($title, '', 'ticket');
 
-$head = ticketPrepareHead();
+$head = ticketstats_prepare_head();
 print dol_get_fiche_head($head, 'exportcsv', $langs->trans("ExportCSV"), -1);
 
 print '<div class="fichecenter"><div class="fichehalfleft">';

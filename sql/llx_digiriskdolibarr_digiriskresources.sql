@@ -1,4 +1,4 @@
--- Copyright (C) 2021 EOXIA <dev@eoxia.com>
+-- Copyright (C) 2021-2023 EVARISK <technique@evarisk.com>
 --
 -- This program is free software: you can redistribute it and/or modify
 -- it under the terms of the GNU General Public License as published by
@@ -19,9 +19,9 @@ CREATE TABLE llx_digiriskdolibarr_digiriskresources(
 	ref_ext       varchar(128),
 	entity        integer DEFAULT 1 NOT NULL,
 	date_creation datetime NOT NULL,
-	tms           timestamp,
+	tms           timestamp DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
 	status        smallint,
-    element_type  varchar(50),
+  element_type  varchar(50),
 	element_id    integer NOT NULL,
 	object_type   varchar(50),
 	object_id     integer DEFAULT NULL,

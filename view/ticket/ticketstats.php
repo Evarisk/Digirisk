@@ -1,5 +1,5 @@
 <?php
-/* Copyright (C) 2022 EOXIA <dev@eoxia.com>
+/* Copyright (C) 2021-2023 EVARISK <technique@evarisk.com>
  *
  * This program is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -21,20 +21,14 @@
  *		\brief      Page with tickets statistics
  */
 
-// Load Dolibarr environment
-$res = 0;
-// Try main.inc.php into web root known defined into CONTEXT_DOCUMENT_ROOT (not always defined)
-if ( ! $res && ! empty($_SERVER["CONTEXT_DOCUMENT_ROOT"])) $res = @include $_SERVER["CONTEXT_DOCUMENT_ROOT"] . "/main.inc.php";
-// Try main.inc.php into web root detected using web root calculated from SCRIPT_FILENAME
-$tmp = empty($_SERVER['SCRIPT_FILENAME']) ? '' : $_SERVER['SCRIPT_FILENAME']; $tmp2 = realpath(__FILE__); $i = strlen($tmp) - 1; $j = strlen($tmp2) - 1;
-while ($i > 0 && $j > 0 && isset($tmp[$i]) && isset($tmp2[$j]) && $tmp[$i] == $tmp2[$j]) { $i--; $j--; }
-if ( ! $res && $i > 0 && file_exists(substr($tmp, 0, ($i + 1)) . "/main.inc.php")) $res          = @include substr($tmp, 0, ($i + 1)) . "/main.inc.php";
-if ( ! $res && $i > 0 && file_exists(dirname(substr($tmp, 0, ($i + 1))) . "/main.inc.php")) $res = @include dirname(substr($tmp, 0, ($i + 1))) . "/main.inc.php";
-// Try main.inc.php using relative path
-if ( ! $res && file_exists("../../main.inc.php")) $res    = @include "../../main.inc.php";
-if ( ! $res && file_exists("../../../main.inc.php")) $res = @include "../../../main.inc.php";
-if ( ! $res && file_exists("../../../../main.inc.php")) $res = @include "../../../../main.inc.php";
-if ( ! $res) die("Include of main fails");
+// Load DigiriskDolibarr environment
+if (file_exists('../digiriskdolibarr.main.inc.php')) {
+    require_once __DIR__ . '/../digiriskdolibarr.main.inc.php';
+} elseif (file_exists('../../digiriskdolibarr.main.inc.php')) {
+    require_once __DIR__ . '/../../digiriskdolibarr.main.inc.php';
+} else {
+    die('Include of digiriskdolibarr main fails');
+}
 
 // Global variables definitions
 global $conf, $db, $langs, $user;
@@ -49,17 +43,12 @@ if (!empty($conf->category->enabled)) {
 require_once __DIR__ . '/../../lib/digiriskdolibarr_ticket.lib.php';
 require_once __DIR__ . '/../../class/ticketdigiriskstats.class.php';
 require_once __DIR__ . '/../../class/digiriskelement.class.php';
-require_once __DIR__ . '/../../core/tpl/digirisk_security_checks.php';
 
 $WIDTH  = DolGraph::getDefaultGraphSizeForStats('width');
 $HEIGHT = DolGraph::getDefaultGraphSizeForStats('height');
 
 // Load translation files required by the page
-$langs->loadLangs(array('orders', 'companies', 'other', 'tickets', 'categories'));
-
-if (!$user->rights->ticket->read) {
-	accessforbidden();
-}
+saturne_load_langs(['orders', 'companies', 'other', 'tickets', 'categories']);
 
 $action              = GETPOST('action', 'aZ09');
 $object_status       = GETPOST('object_status', 'array');
@@ -75,10 +64,9 @@ $digiriskelementlist = GETPOST('digiriskelementlist', 'array');
 $object          = new Ticket($db);
 $digiriskelement = new DigiriskElement($db);
 
-// Security check
-if ($user->socid > 0) {
-	$action = '';
-	$socid = $user->socid;
+$deletedElements = $digiriskelement->getMultiEntityTrashList();
+if (empty($deletedElements)) {
+	$deletedElements = [0];
 }
 
 $upload_dir = $conf->digiriskdolibarr->multidir_output[$conf->entity];
@@ -94,6 +82,11 @@ $startyear = strftime("%Y", !empty($date_start) ? $date_start : dol_now());
 $endyear   = strftime("%Y", !empty($date_end) ? $date_end : dol_now() + 1);
 $datestart = dol_print_date((!empty($date_start) ? $date_start : dol_now()), 'dayxcard');
 $dateend   = dol_print_date((!empty($date_end) ? $date_end : dol_now()), 'dayxcard');
+
+//Security check
+$permissiontoread   = $user->rights->ticket->read;
+
+saturne_check_access($permissiontoread);
 
 /*
  * Action
@@ -124,7 +117,7 @@ llxHeader('', $title, $help_url);
 
 print load_fiche_titre($title, '', 'ticket');
 
-$head = ticketPrepareHead();
+$head = ticketstats_prepare_head();
 print dol_get_fiche_head($head, 'byyear', $langs->trans("TicketStatistics"), -1);
 
 $stats = new TicketDigiriskStats($db, $socid, ($userid > 0 ? $userid: 0), ($userassignid > 0 ? $userassignid: 0), ($digiriskelementid > 0 ? $digiriskelementid : 0), ($categticketid > 0 ? $categticketid: 0));
@@ -260,9 +253,15 @@ print $form->select_company($socid, 'socid', '', 1, 0, 0, array(), 0, 'widthcent
 print '</td></tr>';
 // DigiriskElement
 print '<tr><td class="left">'.$form->textwithpicto($langs->trans("GP/UT"), $langs->trans("GP/UTHelp")).'</td><td class="left">';
-$digiriskelementlist = $digiriskelement->select_digiriskelement_list($digiriskelementid, 'digiriskelementid', '', 1, 0, array(), 1);
-$digiriskelementlist = $all + $digiriskelementlist;
-print $form->multiselectarray('digiriskelementlist', $digiriskelementlist, ((!empty(GETPOST('refresh', 'int'))) ? GETPOST('digiriskelementlist', 'array') : $digiriskelementlist), 0, 0, 'widthcentpercentminusx maxwidth300');
+$objectList = saturne_fetch_all_object_type('digiriskelement', '', '', 0, 0,  ['customsql' => 'rowid NOT IN (' . implode(',', $deletedElements) . ')']);
+$digiriskElementsData  = [];
+if (is_array($objectList) && !empty($objectList)) {
+	foreach ($objectList as $digiriskElement) {
+		$digiriskElementsData[$digiriskElement->id] = $digiriskElement->ref . ' - ' . $digiriskElement->label;
+	}
+}
+$digiriskElementsData = $all + $digiriskElementsData;
+print $form->multiselectarray('digiriskelementlist', $digiriskElementsData, ((!empty(GETPOST('refresh', 'int'))) ? GETPOST('digiriskelementlist', 'array') : $digiriskelementlist), 0, 0, 'widthcentpercentminusx maxwidth300');
 print '</td></tr>';
 // Category
 if (!empty($conf->category->enabled)) {

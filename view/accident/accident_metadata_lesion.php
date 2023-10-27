@@ -1,5 +1,5 @@
 <?php
-/* Copyright (C) 2021 EOXIA <dev@eoxia.com>
+/* Copyright (C) 2021-2023 EVARISK <technique@evarisk.com>
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -37,7 +37,6 @@ require_once DOL_DOCUMENT_ROOT . '/projet/class/project.class.php';
 require_once __DIR__ . '/../../class/accident.class.php';
 require_once __DIR__ . '/../../lib/digiriskdolibarr_function.lib.php';
 require_once __DIR__ . '/../../lib/digiriskdolibarr_accident.lib.php';
-require_once __DIR__ . '/../../core/modules/digiriskdolibarr/digiriskelement/accident_lesion/mod_accident_lesion_standard.php';
 
 global $conf, $db, $hookmanager, $langs, $user;
 
@@ -48,6 +47,7 @@ saturne_load_langs();
 $id                  = GETPOST('id', 'int');
 $lineid              = GETPOST('lineid', 'int');
 $action              = GETPOST('action', 'aZ09');
+$cancel              = GETPOST('cancel', 'aZ09');
 $contextpage         = GETPOST('contextpage', 'aZ') ? GETPOST('contextpage', 'aZ') : 'accidentmetadata'; // To manage different context of search
 $backtopage          = GETPOST('backtopage', 'alpha');
 $backtopageforcancel = GETPOST('backtopageforcancel', 'alpha');
@@ -55,24 +55,26 @@ $backtopageforcancel = GETPOST('backtopageforcancel', 'alpha');
 // Initialize technical objects
 $object     = new Accident($db);
 $objectline = new AccidentLesion($db);
+$workstop   = new AccidentWorkStop($db);
 $project    = new Project($db);
 $form       = new Form($db);
 
 // Load object
 $object->fetch($id);
+if ($id > 0 && $object->external_accident != 2) {
+    unset($object->fields['fk_soc']);
+    unset($object->fk_soc);
+}
 
-$hookmanager->initHooks(array('accidentmetadatalesion', 'globalcard')); // Note that conf->hooks_modules contains array
+$hookmanager->initHooks(['accidentmetadatalesion', 'globalcard']); // Note that conf->hooks_modules contains array
 
 // Security check
-require_once __DIR__ . '/../../core/tpl/digirisk_security_checks.php';
 
 $permissiontoread   = $user->rights->digiriskdolibarr->accident->read;
 $permissiontoadd    = $user->rights->digiriskdolibarr->accident->write;
 $permissiontodelete = $user->rights->digiriskdolibarr->accident->delete;
 
-if ( ! $permissiontoread) accessforbidden();
-
-$refAccidentLesionMod = new $conf->global->DIGIRISKDOLIBARR_ACCIDENT_LESION_ADDON($db);
+saturne_check_access($permissiontoread, $object);
 
 /*
  * Actions
@@ -106,11 +108,12 @@ if (empty($reshook)) {
 		$lesion_localization = GETPOST('lesion_localization');
 		$lesion_nature       = GETPOST('lesion_nature');
 		$parent_id           = GETPOST('parent_id');
+        $error               = 0;
 
 		// Initialize object accident line
 		$now                             = dol_now();
-		$objectline->date_creation       = $object->db->idate($now);
-		$objectline->ref                 = $refAccidentLesionMod->getNextValue($objectline);
+        $objectline->ref                 = $objectline->getNextNumRef();
+        $objectline->date_creation       = $object->db->idate($now);
 		$objectline->entity              = $conf->entity;
 		$objectline->lesion_localization = $lesion_localization;
 		$objectline->lesion_nature       = $lesion_nature;
@@ -178,7 +181,7 @@ if (empty($reshook)) {
 	// Action to delete line
 	if ($action == 'deleteline' && $permissiontodelete) {
 		$objectline->fetch($lineid);
-		$result = $objectline->delete($user, false);
+		$result = $objectline->delete($user, false, false);
 		if ($result > 0) {
 			// Deletion accident lesion OK
 			setEventMessages($langs->trans('DeleteAccidentLesion') . ' ' . $object->ref, array());
@@ -188,10 +191,16 @@ if (empty($reshook)) {
 			exit;
 		} else {
 			// Deletion accident lesion KO
-			if ( ! empty($object->errors)) setEventMessages(null, $object->errors, 'errors');
-			else setEventMessages($object->error, null, 'errors');
+			if (!empty($object->errors)) {
+                setEventMessages('', $object->errors, 'errors');
+            } else {
+                setEventMessages($object->error, [], 'errors');
+            }
 		}
 	}
+
+    // Actions set_thirdparty, set_project
+    require_once __DIR__ . '/../../../saturne/core/tpl/actions/banner_actions.tpl.php';
 }
 
 /*
@@ -207,29 +216,11 @@ saturne_header(0, '', $title, $help_url);
 // ------------------------------------------------------------
 saturne_get_fiche_head($object, 'accidentMetadataLesion', $title);
 
-//Number workstop days
-$accidentlines     = $objectline->fetchAll('', '', 0, 0, ['customsql' => 't.fk_accident = ' . $object->id]);
-$totalworkstopdays = 0;
+// Object card
+// ------------------------------------------------------------
+list($moreHtmlRef, $moreParams) = $object->getBannerTabContent();
 
-if (!empty($accidentlines) && $accidentlines > 0) {
-	foreach ($accidentlines as $accidentline) {
-		if ($accidentline->status > 0) {
-			$totalworkstopdays += $accidentline->workstop_days;
-		}
-	}
-	$morehtmlref      = $langs->trans('TotalWorkStopDays') . ' : ' . $totalworkstopdays;
-	$lastaccidentline = end($accidentlines);
-	$morehtmlref     .= '<br>' . $langs->trans('ReturnWorkDate') . ' : ' . dol_print_date($lastaccidentline->date_end_workstop, 'dayhour');
-} else {
-	$morehtmlref = $langs->trans('RegisterAccident');
-}
-$morehtmlref .= '<br>';
-
-//$morehtmlleft = '<div class="floatleft inline-block valignmiddle divphotoref">' . digirisk_show_photos('digiriskdolibarr', $conf->digiriskdolibarr->multidir_output[$conf->entity] . '/' . $object->element, 'small', 5, 0, 0, 0, 80, 80, 0, 0, 0, $object->element, $object) . '</div>';
-
-$linkback = '<a href="' . dol_buildpath('/digiriskdolibarr/view/accident/accident_list.php', 1) . '">' . $langs->trans("BackToList") . '</a>';
-
-saturne_banner_tab($object, 'id', $linkback, 1, 'rowid', 'ref', $morehtmlref);
+saturne_banner_tab($object, 'id', '', 1, 'rowid', 'ref', $moreHtmlRef, dol_strlen($object->photo) > 0, $moreParams);
 
 // ACCIDENT LESION
 print '<div class="div-table-responsive-no-min" style="overflow-x: unset !important">';
@@ -271,14 +262,14 @@ if (!empty($accidentlines) && $accidentlines > 0) {
 			$coldisplay++;
 			//LesionLocalization -- Siège des lésions
 			print '<td>';
-			print digirisk_select_dictionary('lesion_localization', 'c_lesion_localization', 'label', 'label', $item->lesion_localization, 1);
+            print saturne_select_dictionary('lesion_localization', 'c_lesion_localization', 'label', 'label', $item->lesion_localization);
 			print '<a href="' . DOL_URL_ROOT . '/admin/dict.php?mainmenu=home" target="_blank" class="wpeo-tooltip-event" aria-label="' . $langs->trans('ConfigDico') . '">' . ' ' . img_picto('', 'globe') . '</a>';
 			print '</td>';
 
 			$coldisplay++;
 			//LesionNature -- Nature des lésions
 			print '<td>';
-			print digirisk_select_dictionary('lesion_nature', 'c_lesion_nature', 'label', 'label', $item->lesion_nature, 1);
+			print saturne_select_dictionary('lesion_nature', 'c_lesion_nature', 'label', 'label', $item->lesion_nature);
 			print '<a href="' . DOL_URL_ROOT . '/admin/dict.php?mainmenu=home" target="_blank" class="wpeo-tooltip-event" aria-label="' . $langs->trans('ConfigDico') . '">' . ' ' . img_picto('', 'globe') . '</a>';
 			print '</td>';
 
@@ -312,7 +303,7 @@ if (!empty($accidentlines) && $accidentlines > 0) {
 				print '<td class="center">';
 				$coldisplay++;
 				print '<a href="' . $_SERVER["PHP_SELF"] . '?id=' . $id . '&amp;action=editline&amp;lineid=' . $item->id . '" style="padding-right: 20px"><i class="fas fa-pencil-alt" style="color: #666"></i></a>';
-				print '<a href="' . $_SERVER["PHP_SELF"] . '?id=' . $id . '&amp;action=deleteline&amp;lineid=' . $item->id . '">';
+				print '<a href="' . $_SERVER["PHP_SELF"] . '?id=' . $id . '&amp;action=deleteline&amp;lineid=' . $item->id . '&token='. newToken(). '">';
 				print img_delete();
 				print '</a>';
 				print '</td>';
@@ -336,20 +327,20 @@ if ($object->status == 1 && $permissiontoadd) {
 
 	print '<tr>';
 	print '<td>';
-	print $refAccidentLesionMod->getNextValue($objectline);
+	print $objectline->getNextNumRef();
 	print '</td>';
 
 	$coldisplay++;
 	//LesionLocalization -- Siège des lésions
 	print '<td>';
-	print digirisk_select_dictionary('lesion_localization', 'c_lesion_localization', 'label', 'label', '', 1);
+	print saturne_select_dictionary('lesion_localization', 'c_lesion_localization', 'label');
 	print '<a href="' . DOL_URL_ROOT . '/admin/dict.php?mainmenu=home" target="_blank" class="wpeo-tooltip-event" aria-label="' . $langs->trans('ConfigDico') . '">' . ' ' . img_picto('', 'globe') . '</a>';
 	print '</td>';
 
 	$coldisplay++;
 	//LesionNature -- Nature des lésions
 	print '<td>';
-	print digirisk_select_dictionary('lesion_nature', 'c_lesion_nature', 'label', 'label', '', 1);
+	print saturne_select_dictionary('lesion_nature', 'c_lesion_nature', 'label');
 	print '<a href="' . DOL_URL_ROOT . '/admin/dict.php?mainmenu=home" target="_blank" class="wpeo-tooltip-event" aria-label="' . $langs->trans('ConfigDico') . '">' . ' ' . img_picto('', 'globe') . '</a>';
 	print '</td>';
 

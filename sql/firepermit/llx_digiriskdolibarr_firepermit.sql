@@ -1,4 +1,4 @@
--- Copyright (C) 2021 EOXIA <dev@eoxia.com>
+-- Copyright (C) 2021-2023 EVARISK <technique@evarisk.com>
 --
 -- This program is free software: you can redistribute it and/or modify
 -- it under the terms of the GNU General Public License as published by
@@ -14,19 +14,18 @@
 -- along with this program.  If not, see https://www.gnu.org/licenses/.
 
 CREATE TABLE llx_digiriskdolibarr_firepermit(
-	rowid                integer AUTO_INCREMENT PRIMARY KEY NOT NULL,
-	ref                  varchar(128) NOT NULL,
-	ref_ext              varchar(128),
-	entity               integer DEFAULT 1 NOT NULL,
-	date_creation        datetime NOT NULL,
-	tms                  timestamp,
-	status               smallint,
-	label                varchar(255) NOT NULL,
-    date_start           datetime NOT NULL,
-	date_end             datetime,
-	last_email_sent_date datetime DEFAULT NULL,
-    fk_project           integer,
-	fk_user_creat        integer NOT NULL,
-	fk_user_modif        integer,
-	fk_preventionplan    integer
+  rowid             integer AUTO_INCREMENT PRIMARY KEY NOT NULL,
+  ref               varchar(128) NOT NULL,
+  ref_ext           varchar(128),
+  entity            integer DEFAULT 1 NOT NULL,
+  date_creation     datetime NOT NULL,
+  tms               timestamp DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+  status            integer NOT NULL,
+  label             varchar(255) NOT NULL,
+  date_start        datetime,
+  date_end          datetime,
+  fk_user_creat     integer NOT NULL,
+  fk_user_modif     integer,
+  fk_project        integer NOT NULL,
+  fk_preventionplan integer NOT NULL
 ) ENGINE=innodb;

@@ -1,5 +1,5 @@
 <?php
-/* Copyright (C) 2021 EOXIA <dev@eoxia.com>
+/* Copyright (C) 2021-2023 EVARISK <technique@evarisk.com>
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -21,20 +21,14 @@
  *		\brief      Page to create/edit/view digiriskelement
  */
 
-// Load Dolibarr environment
-$res = 0;
-// Try main.inc.php into web root known defined into CONTEXT_DOCUMENT_ROOT (not always defined)
-if ( ! $res && ! empty($_SERVER["CONTEXT_DOCUMENT_ROOT"])) $res = @include $_SERVER["CONTEXT_DOCUMENT_ROOT"] . "/main.inc.php";
-// Try main.inc.php into web root detected using web root calculated from SCRIPT_FILENAME
-$tmp = empty($_SERVER['SCRIPT_FILENAME']) ? '' : $_SERVER['SCRIPT_FILENAME']; $tmp2 = realpath(__FILE__); $i = strlen($tmp) - 1; $j = strlen($tmp2) - 1;
-while ($i > 0 && $j > 0 && isset($tmp[$i]) && isset($tmp2[$j]) && $tmp[$i] == $tmp2[$j]) { $i--; $j--; }
-if ( ! $res && $i > 0 && file_exists(substr($tmp, 0, ($i + 1)) . "/main.inc.php")) $res          = @include substr($tmp, 0, ($i + 1)) . "/main.inc.php";
-if ( ! $res && $i > 0 && file_exists(dirname(substr($tmp, 0, ($i + 1))) . "/main.inc.php")) $res = @include dirname(substr($tmp, 0, ($i + 1))) . "/main.inc.php";
-// Try main.inc.php using relative path
-if ( ! $res && file_exists("../../main.inc.php")) $res       = @include "../../main.inc.php";
-if ( ! $res && file_exists("../../../main.inc.php")) $res    = @include "../../../main.inc.php";
-if ( ! $res && file_exists("../../../../main.inc.php")) $res = @include "../../../../main.inc.php";
-if ( ! $res) die("Include of main fails");
+// Load DigiriskDolibarr environment
+if (file_exists('../digiriskdolibarr.main.inc.php')) {
+	require_once __DIR__ . '/../digiriskdolibarr.main.inc.php';
+} elseif (file_exists('../../digiriskdolibarr.main.inc.php')) {
+	require_once __DIR__ . '/../../digiriskdolibarr.main.inc.php';
+} else {
+	die('Include of digiriskdolibarr main fails');
+}
 
 require_once DOL_DOCUMENT_ROOT . '/core/class/html.formfile.class.php';
 require_once DOL_DOCUMENT_ROOT . '/projet/class/project.class.php';
@@ -42,34 +36,31 @@ require_once DOL_DOCUMENT_ROOT . '/core/lib/images.lib.php';
 
 require_once __DIR__ . '/../../class/digiriskdocuments.class.php';
 require_once __DIR__ . '/../../class/digiriskelement.class.php';
+require_once __DIR__ . '/../../class/digiriskelement/groupment.class.php';
+require_once __DIR__ . '/../../class/digiriskelement/workunit.class.php';
 require_once __DIR__ . '/../../class/digiriskstandard.class.php';
-require_once __DIR__ . '/../../class/digiriskdocuments/groupmentdocument.class.php';
-require_once __DIR__ . '/../../class/digiriskdocuments/workunitdocument.class.php';
+require_once __DIR__ . '/../../class/digiriskdolibarrdocuments/groupmentdocument.class.php';
+require_once __DIR__ . '/../../class/digiriskdolibarrdocuments/workunitdocument.class.php';
 require_once __DIR__ . '/../../lib/digiriskdolibarr_digiriskelement.lib.php';
 require_once __DIR__ . '/../../lib/digiriskdolibarr_function.lib.php';
-require_once __DIR__ . '/../../core/modules/digiriskdolibarr/digiriskelement/groupment/mod_groupment_standard.php';
-require_once __DIR__ . '/../../core/modules/digiriskdolibarr/digiriskelement/groupment/mod_groupment_sirius.php';
-require_once __DIR__ . '/../../core/modules/digiriskdolibarr/digiriskelement/workunit/mod_workunit_standard.php';
-require_once __DIR__ . '/../../core/modules/digiriskdolibarr/digiriskelement/workunit/mod_workunit_canopus.php';
-require_once __DIR__ . '/../../core/modules/digiriskdolibarr/digiriskdocuments/groupmentdocument/modules_groupmentdocument.php';
-require_once __DIR__ . '/../../core/modules/digiriskdolibarr/digiriskdocuments/workunitdocument/modules_workunitdocument.php';
 
 global $conf, $db, $hookmanager, $langs, $user;
 
 // Load translation files required by the page
-$langs->loadLangs(array("digiriskdolibarr@digiriskdolibarr", "other"));
+saturne_load_langs(['other']);
 
 // Get parameters
 $id                  = GETPOST('id', 'int');
 $ref                 = GETPOST('ref', 'alpha');
 $action              = GETPOST('action', 'aZ09');
+$subaction           = GETPOST('subaction', 'aZ09');
 $confirm             = GETPOST('confirm', 'alpha');
 $cancel              = GETPOST('cancel', 'aZ09');
 $contextpage         = GETPOST('contextpage', 'aZ') ? GETPOST('contextpage', 'aZ') : 'digiriskelementcard'; // To manage different context of search
 $backtopage          = GETPOST('backtopage', 'alpha');
 $backtopageforcancel = GETPOST('backtopageforcancel', 'alpha');
 $element_type        = GETPOST('element_type', 'alpha');
-$fk_parent           = GETPOST('fk_parent', 'int');
+$fkParent            = GETPOST('fk_parent', 'int');
 
 // Initialize technical objects
 $object           = new DigiriskElement($db);
@@ -80,32 +71,30 @@ $project          = new Project($db);
 $object->fetch($id);
 
 if ( $object->element_type == 'groupment') {
-	$digiriskelementdocument = new GroupmentDocument($db);
+	$document = new GroupmentDocument($db);
 } elseif (  $object->element_type == 'workunit' ) {
-	$digiriskelementdocument = new WorkUnitDocument($db);
+	$document = new WorkUnitDocument($db);
 }
 
 // Fetch optionals attributes and labels
 $extrafields->fetch_name_optionals_label($object->table_element);
 
-$hookmanager->initHooks(array('digiriskelementcard', 'globalcard')); // Note that conf->hooks_modules contains array
+$hookmanager->initHooks(array('digiriskelementcard', 'digiriskelementview','globalcard')); // Note that conf->hooks_modules contains array
 
 $upload_dir = $conf->digiriskdolibarr->multidir_output[isset($object->entity) ? $object->entity : 1];
 
-//Security check
-require_once __DIR__ . '/../../core/tpl/digirisk_security_checks.php';
-
+// Security check - Protection if external user
 $permissiontoread   = $user->rights->digiriskdolibarr->digiriskelement->read;
 $permissiontoadd    = $user->rights->digiriskdolibarr->digiriskelement->write;
 $permissiontodelete = $user->rights->digiriskdolibarr->digiriskelement->delete;
 
-if ( ! $permissiontoread) accessforbidden();
+saturne_check_access($permissiontoread, $object);
 
 /*
  * Actions
  */
 
-$parameters = array();
+$parameters = [];
 $reshook    = $hookmanager->executeHooks('doActions', $parameters, $object, $action); // Note that $action and $object may have been modified by some hooks
 if ($reshook < 0) setEventMessages($hookmanager->error, $hookmanager->errors, 'errors');
 
@@ -143,69 +132,15 @@ if (empty($reshook)) {
 		header('Location: ' . $backtopage);
 	}
 
-	// Action to build doc
-	if ($action == 'builddoc' && $permissiontoadd) {
-		$outputlangs = $langs;
-		$newlang     = '';
+    $object->element = $object->element_type;
 
-		if ($conf->global->MAIN_MULTILANGS && empty($newlang) && GETPOST('lang_id', 'aZ09')) $newlang = GETPOST('lang_id', 'aZ09');
-		if ( ! empty($newlang)) {
-			$outputlangs = new Translate("", $conf);
-			$outputlangs->setDefaultLang($newlang);
-		}
-
-		// To be sure vars is defined
-		if (empty($hidedetails)) $hidedetails = 0;
-		if (empty($hidedesc)) $hidedesc       = 0;
-		if (empty($hideref)) $hideref         = 0;
-		if (empty($moreparams)) $moreparams   = null;
-
-		$model = GETPOST('model', 'alpha');
-
-		$moreparams['object'] = $object;
-		$moreparams['user']   = $user;
-
-		$result = $digiriskelementdocument->generateDocument($model, $outputlangs, $hidedetails, $hidedesc, $hideref, $moreparams);
-		if ($result <= 0) {
-			setEventMessages($object->error, $object->errors, 'errors');
-			$action = '';
-		} else {
-			if (empty($donotredirect)) {
-				setEventMessages($langs->trans("FileGenerated") . ' - ' . $digiriskelementdocument->last_main_doc, null);
-				$urltoredirect = $_SERVER['REQUEST_URI'];
-				$urltoredirect = preg_replace('/#builddoc$/', '', $urltoredirect);
-				$urltoredirect = preg_replace('/action=builddoc&?/', '', $urltoredirect); // To avoid infinite loop
-				header('Location: ' . $urltoredirect . '#builddoc');
-				exit;
-			}
-		}
-	}
+	// Actions builddoc, forcebuilddoc, remove_file.
+	require_once __DIR__ . '/../../../saturne/core/tpl/documents/documents_action.tpl.php';
 
 	// Action to generate pdf from odt file
-	require_once __DIR__ . '/../../core/tpl/documents/digiriskdolibarr_manual_pdf_generation_action.tpl.php';
-	// Delete file in doc form
-	if ($action == 'remove_file' && $permissiontodelete) {
-		if ( ! empty($upload_dir)) {
-			require_once DOL_DOCUMENT_ROOT . '/core/lib/files.lib.php';
+    require_once __DIR__ . '/../../../saturne/core/tpl/documents/saturne_manual_pdf_generation_action.tpl.php';
 
-			$langs->load("other");
-			$filetodelete = GETPOST('file', 'alpha');
-			$file         = $upload_dir . '/' . $filetodelete;
-			$ret          = dol_delete_file($file, 0, 0, 0, $object);
-			if ($ret) setEventMessages($langs->trans("FileWasRemoved", $filetodelete), null, 'mesgs');
-			else setEventMessages($langs->trans("ErrorFailToDeleteFile", $filetodelete), null, 'errors');
-
-			// Make a redirect to avoid to keep the remove_file into the url that create side effects
-			$urltoredirect = $_SERVER['REQUEST_URI'];
-			$urltoredirect = preg_replace('/#builddoc$/', '', $urltoredirect);
-			$urltoredirect = preg_replace('/action=remove_file&?/', '', $urltoredirect);
-
-			header('Location: ' . $urltoredirect);
-			exit;
-		} else {
-			setEventMessages('BugFoundVarUploaddirnotDefined', null, 'errors');
-		}
-	}
+    $object->element = 'digiriskelement';
 
 	if ($action == 'confirm_delete' && GETPOST("confirm") == "yes") {
 		$object->fetch($id);
@@ -227,7 +162,6 @@ if (empty($reshook)) {
  */
 
 $form        = new Form($db);
-$emptyobject = new stdClass();
 $formconfirm = '';
 
 $parameters                        = array('formConfirm' => $formconfirm, 'object' => $object);
@@ -235,38 +169,38 @@ $reshook                           = $hookmanager->executeHooks('formConfirm', $
 if (empty($reshook)) $formconfirm .= $hookmanager->resPrint;
 elseif ($reshook > 0) $formconfirm = $hookmanager->resPrint;
 
-
 if ( $object->element_type == 'groupment' ) {
 	$title         = $langs->trans("Groupment");
-	$title_create  = $langs->trans("NewGroupment");
-	$title_edit    = $langs->trans("ModifyGroupment");
-	$object->picto = 'groupment@digiriskdolibarr';
+	$titleCreate   = $langs->trans("NewGroupment");
+	$titleEdit     = $langs->trans("ModifyGroupment");
 } elseif ( $object->element_type == 'workunit' ) {
 	$title         = $langs->trans("WorkUnit");
-	$title_create  = $langs->trans("NewWorkUnit");
-	$title_edit    = $langs->trans("ModifyWorkUnit");
-	$object->picto = 'workunit@digiriskdolibarr';
+	$titleCreate   = $langs->trans("NewWorkUnit");
+	$titleEdit     = $langs->trans("ModifyWorkUnit");
 } else {
 	$element_type = GETPOST('element_type', 'alpha');
 	if ( $element_type == 'groupment' ) {
-		$title_create = $langs->trans("NewGroupment");
+		$title = $langs->trans("NewGroupment");
 	} else {
-		$title_create = $langs->trans("NewWorkUnit");
+		$title = $langs->trans("NewWorkUnit");
 	}
 }
 
-$help_url = 'FR:Module_Digirisk#Cr.C3.A9ation_UT_et_GP';
-$morejs   = array("/digiriskdolibarr/js/digiriskdolibarr.js");
-$morecss  = array("/digiriskdolibarr/css/digiriskdolibarr.css");
+$deletedElements = $object->getMultiEntityTrashList();
+if (empty($deletedElements)) {
+	$deletedElements = [0];
+}
 
-digiriskHeader($title, $help_url, $morejs, $morecss); ?>
+$helpUrl = 'FR:Module_Digirisk#Cr.C3.A9ation_UT_et_GP';
 
-	<div id="cardContent" value="">
+digirisk_header($title, $helpUrl); ?>
+
+<div id="cardContent" value="">
 
 <?php // Part to create
 if ($action == 'create') {
-	$object->fetch($fk_parent);
-	print load_fiche_titre($title_create, '', "digiriskdolibarr32px@digiriskdolibarr");
+	$object->fetch($fkParent);
+	print load_fiche_titre($title, '', $object->picto);
 
 	print '<form method="POST" action="' . $_SERVER["PHP_SELF"] . '">';
 	print '<input type="hidden" name="token" value="' . newToken() . '">';
@@ -275,7 +209,7 @@ if ($action == 'create') {
 
 	if ($backtopageforcancel) print '<input type="hidden" name="backtopageforcancel" value="' . $backtopageforcancel . '">';
 
-	print dol_get_fiche_head(array(), '');
+	print dol_get_fiche_head();
 
 	unset($object->fields['ref']);
 	unset($object->fields['status']);
@@ -290,11 +224,11 @@ if ($action == 'create') {
 
 	print '<tr><td class="fieldrequired">' . $langs->trans("ParentElement") . '</td><td>';
 	print '<input hidden class="flat" type="text" size="36" name="parent" id="parent">';
-	if (empty($fk_parent)) {
+	if (empty($fkParent)) {
 		$digiriskstandard->fetch($conf->global->DIGIRISKDOLIBARR_ACTIVE_STANDARD);
-		print $digiriskstandard->getNomUrl(1, 'blank', 1);
+		print $digiriskstandard->getNomUrl(1, 'blank', 0, '', -1, 1);
 	} else {
-		print $object->getNomUrl(1, 'blank', 1);
+		print $object->getNomUrl(1, 'blank', 0, '', -1, 1);
 	}
 	print '</td></tr>';
 
@@ -306,7 +240,7 @@ if ($action == 'create') {
 	print '</td></tr>';
 
 	print '<input hidden class="flat" type="text" size="36" name="element_type" value="' . $element_type . '">';
-	print '<input hidden class="flat" type="text" size="36" name="fk_parent" value="' . $fk_parent . '">';
+	print '<input hidden class="flat" type="text" size="36" name="fk_parent" value="' . $fkParent . '">';
 
 	print '<tr><td>' . $langs->trans("ShowInSelectOnPublicTicketInterface") . '</td><td>';
 	print '<input type="checkbox" id="show_in_selector" name="show_in_selector" checked="checked">';
@@ -330,7 +264,7 @@ if ($action == 'create') {
 
 // Part to edit record
 if (($id || $ref) && $action == 'edit') {
-	print load_fiche_titre($title_edit, '', "digiriskdolibarr32px@digiriskdolibarr");
+	print load_fiche_titre($titleEdit, '', $object->picto);
 
 	print '<form method="POST" action="' . $_SERVER["PHP_SELF"] . '">';
 	print '<input type="hidden" name="token" value="' . newToken() . '">';
@@ -365,7 +299,7 @@ if (($id || $ref) && $action == 'edit') {
 
 	if ($id != $conf->global->DIGIRISKDOLIBARR_DIGIRISKELEMENT_TRASH) {
 		print '<tr><td>' . $langs->trans("ParentElement") . '</td><td>';
-		print $object->select_digiriskelement_list($object->fk_parent, 'fk_parent', 'element_type="groupment" AND fk_parent != ' . $conf->global->DIGIRISKDOLIBARR_DIGIRISKELEMENT_TRASH, 0, 0, array(), 0, 0, 'minwidth100', GETPOST('id'), false);
+		print $object->selectDigiriskElementList($object->fk_parent, 'fk_parent', ['customsql' => 'element_type="groupment" AND t.rowid NOT IN (' . implode(',', $deletedElements) . ')'], 0, 0, [], 0, 0, 'minwidth100', GETPOST('id'), false);
 	}
 
 	print '</td></tr>';
@@ -393,52 +327,26 @@ if ((empty($action) || ($action != 'edit' && $action != 'create'))) {
 	$formconfirm = '';
 	// Confirmation to delete
 	if ($action == 'delete') {
-		$formconfirm = $form->formconfirm($_SERVER["PHP_SELF"] . '?id=' . $object->id, $langs->trans('DeleteDigiriskElement'), $langs->trans('ConfirmDeleteObject'), 'confirm_delete', '', 0, 1);
+		$formconfirm = $form->formconfirm($_SERVER["PHP_SELF"] . '?id=' . $object->id, $langs->trans('DeleteObject', $langs->transnoentities('The' . ucfirst($object->element))), $langs->trans('ConfirmDeleteObject'), 'confirm_delete', '', 0, 1);
 	}
 
 
 	print $formconfirm;
 	$res = $object->fetch_optionals();
 
-	$head = digiriskelementPrepareHead($object);
+	saturne_get_fiche_head($object, 'card', $title);
 
-	print dol_get_fiche_head($head, 'elementCard', $title, -1, "digiriskdolibarr@digiriskdolibarr");
+	$trashList = $object->fetchDigiriskElementFlat($conf->global->DIGIRISKDOLIBARR_DIGIRISKELEMENT_TRASH);
 
-	$trash_list = $object->fetchDigiriskElementFlat($conf->global->DIGIRISKDOLIBARR_DIGIRISKELEMENT_TRASH);
-
-	if ($trash_list < 0 || empty($trash_list)) {
-		$trash_list = array();
+	if ($trashList < 0 || empty($trashList)) {
+		$trashList = [];
 	}
 
 	// Object card
 	// ------------------------------------------------------------
-	$width = 80; $height = 80; $cssclass = 'photoref';
+    list($morehtmlref, $moreParams) = $object->getBannerTabContent();
 
-	dol_strlen($object->label) ? $morehtmlref = ' - ' . $object->label : '';
-	// Project
-	$morehtmlref = '<div class="refidno">';
-	$project->fetch($conf->global->DIGIRISKDOLIBARR_DU_PROJECT);
-	$morehtmlref .= $langs->trans('Project') . ' : ' . getNomUrlProject($project, 1, 'blank', 1);
-	// ParentElement
-	$parent_element = new DigiriskElement($db);
-	$result         = $parent_element->fetch($object->fk_parent);
-	if ($result > 0) {
-		$morehtmlref .= '<br>' . $langs->trans("Description") . ' : ' . $object->description;
-		$morehtmlref .= '<br>' . $langs->trans("ParentElement") . ' : ' . $parent_element->getNomUrl(1, 'blank', 1);
-	} else {
-		$digiriskstandard->fetch($conf->global->DIGIRISKDOLIBARR_ACTIVE_STANDARD);
-		$morehtmlref .= '<br>' . $langs->trans("Description") . ' : ' . $object->description;
-		$morehtmlref .= '<br>' . $langs->trans("ParentElement") . ' : ' . $digiriskstandard->getNomUrl(1, 'blank', 1);
-	}
-	$morehtmlref .= '</div>';
-	if (isset($object->element_type)) {
-		$morehtmlleft = '<div class="floatleft inline-block valignmiddle divphotoref">' . digirisk_show_photos('digiriskdolibarr', $conf->digiriskdolibarr->multidir_output[$conf->entity] . '/' . $object->element_type, 'small', 5, 0, 0, 0, $height, $width, 0, 0, 0, $object->element_type, $object) . '</div>';
-	} else {
-		$morehtmlleft = '<div class="floatleft inline-block valignmiddle divphotoref">' . digirisk_show_photos('mycompany', $conf->mycompany->dir_output . '/logos', 'small', 5, 0, 0, 0, $height, $width, 0, 0, 0, 'logos', $emptyobject) . '</div>';
-	}
-
-	$linkback = '<a href="' . dol_buildpath('/digiriskdolibarr/view/digiriskelement/risk_list.php', 1) . '">' . $langs->trans("BackToList") . '</a>';
-	digirisk_banner_tab($object, 'id', $linkback, 1, 'rowid', 'ref', $morehtmlref, '', 0, $morehtmlleft);
+	saturne_banner_tab($object,'ref','none', 0, 'ref', 'ref', $morehtmlref, true, $moreParams);
 
 	print '<div class="fichecenter">';
 	print '<div class="fichehalfleft">';
@@ -451,8 +359,24 @@ if ((empty($action) || ($action != 'edit' && $action != 'create'))) {
 	print '<input type="checkbox" id="show_in_selectorshow_in_selector" name="show_in_selectorshow_in_selector"' . (($object->show_in_selector == 0) ?  '' : ' checked=""') . '" disabled> ';
 	print '</td></tr>';
 
-	//Show common fields
-	//  include DOL_DOCUMENT_ROOT.'/core/tpl/commonfields_view.tpl.php';
+	print '<tr class="linked-medias digirisk-element-photo-'. $object->id .'"><td class=""><label for="photos">' . $langs->trans("Photo") . '</label></td><td class="linked-medias-list" style="display: flex; gap: 10px; height: auto;">';
+	print '<span class="add-medias" '. (($object->status != $object::STATUS_LOCKED) ? "" : "style='display:none'") . '>';
+	print '<input hidden multiple class="fast-upload" id="fast-upload-photo-default" type="file" name="userfile[]" capture="environment" accept="image/*">';
+	print '<label for="fast-upload-photo-default">';
+	print '<div class="wpeo-button button-square-50">';
+	print '<i class="fas fa-camera"></i><i class="fas fa-plus-circle button-add"></i>';
+	print '</div>';
+	print '</label>';
+	print '&nbsp';
+	print '<input type="hidden" class="favorite-photo" id="photo" name="photo" value="<?php echo $object->photo ?>"/>';
+	print '<div class="wpeo-button button-square-50 open-media-gallery add-media modal-open" value="0">';
+	print '<input type="hidden" class="modal-options" data-modal-to-open="media_gallery" data-from-id="'. $object->id .'" data-from-type="'. $object->element_type .'" data-from-subtype="photo" data-from-subdir="" data-photo-class="digirisk-element-photo-'. $object->id .'"/>';
+	print '<i class="fas fa-folder-open"></i><i class="fas fa-plus-circle button-add"></i>';
+	print '</div>';
+	print '</span>';
+	print '&nbsp';
+    print saturne_show_medias_linked('digiriskdolibarr', $conf->digiriskdolibarr->multidir_output[$conf->entity] . '/' . $object->element_type . '/' . $object->ref, 'small', 5, 0, 0, 0, 50, 50, 0, 0, 0, $object->element_type . '/'. $object->ref . '/', $object, 'photo', $object->status != $object::STATUS_LOCKED, $permissiontodelete && $object->status != $object::STATUS_LOCKED);
+	print '</td></tr>';
 
 	// Other attributes. Fields from hook formObjectOptions and Extrafields.
 	include DOL_DOCUMENT_ROOT . '/core/tpl/extrafields_view.tpl.php';
@@ -467,7 +391,7 @@ if ((empty($action) || ($action != 'edit' && $action != 'create'))) {
 	if ($object->id > 0) {
 		// Buttons for actions
 		print '<div class="tabsAction" >' . "\n";
-		$parameters = array();
+		$parameters = [];
 		$reshook    = $hookmanager->executeHooks('addMoreActionsButtons', $parameters, $object, $action); // Note that $action and $object may have been modified by hook
 		if ($reshook < 0) setEventMessages($hookmanager->error, $hookmanager->errors, 'errors');
 
@@ -479,7 +403,7 @@ if ((empty($action) || ($action != 'edit' && $action != 'create'))) {
 				print '<a class="butActionRefused classfortooltip" href="#" title="' . dol_escape_htmltag($langs->trans("NotEnoughPermissions")) . '">' . $langs->trans('Modify') . '</a>' . "\n";
 			}
 
-			if ($permissiontodelete && ! array_key_exists($object->id, $trash_list) && $object->id != $conf->global->DIGIRISKDOLIBARR_DIGIRISKELEMENT_TRASH) {
+			if ($permissiontodelete && ! array_key_exists($object->id, $trashList) && $object->id != $conf->global->DIGIRISKDOLIBARR_DIGIRISKELEMENT_TRASH) {
 				print '<a class="butActionDelete" href="' . $_SERVER["PHP_SELF"] . '?id=' . $object->id . '&action=delete&token='.newToken().'">' . $langs->trans("Delete") . '</a>';
 			} else {
 				print '<a class="butActionRefused classfortooltip" href="#" title="' . $langs->trans("CanNotDoThis") . '">' . $langs->trans('Delete') . '</a>';
@@ -488,31 +412,28 @@ if ((empty($action) || ($action != 'edit' && $action != 'create'))) {
 		print '</div>' . "\n";
 
 		// Document Generation -- Génération des documents
-		$includedocgeneration = 1;
-		if ($includedocgeneration) {
-			print '<div class="fichecenter"><div class="fichehalfleft elementDocument">';
+		print '<div class="fichecenter"><div class="fichehalfleft elementDocument">';
 
-			$objref    = dol_sanitizeFileName($object->ref);
-			$dir_files = $digiriskelementdocument->element . '/' . $objref;
-			$filedir   = $upload_dir . '/' . $dir_files;
-			$urlsource = $_SERVER["PHP_SELF"] . '?id=' . $id;
+		$objref    = dol_sanitizeFileName($object->ref);
+		$dirFiles  = $document->element . '/' . $objref;
+		$filedir   = $upload_dir . '/' . $dirFiles;
+		$urlsource = $_SERVER["PHP_SELF"] . '?id=' . $id;
 
-			if ($digiriskelementdocument->element == 'groupmentdocument') {
-				$modulepart   = 'digiriskdolibarr:GroupmentDocument';
-				$defaultmodel = $conf->global->DIGIRISKDOLIBARR_GROUPMENTDOCUMENT_DEFAULT_MODEL;
-				$title        = $langs->trans('GroupmentDocument');
-			} elseif ($digiriskelementdocument->element == 'workunitdocument') {
-				$modulepart   = 'digiriskdolibarr:WorkUnitDocument';
-				$defaultmodel = $conf->global->DIGIRISKDOLIBARR_WORKUNITDOCUMENT_DEFAULT_MODEL;
-				$title        = $langs->trans('WorkUnitDocument');
-			}
-
-			if ($permissiontoadd || $permissiontoread) {
-				$genallowed = 1;
-			}
-
-			print digiriskshowdocuments($modulepart, $dir_files, $filedir, $urlsource, $genallowed, $permissiontodelete, $defaultmodel, 1, 0, '', $title, '', '', $digiriskelementdocument);
+		if ($document->element == 'groupmentdocument') {
+			$modulepart   = 'digiriskdolibarr:GroupmentDocument';
+			$defaultmodel = $conf->global->DIGIRISKDOLIBARR_GROUPMENTDOCUMENT_DEFAULT_MODEL;
+			$title        = $langs->trans('GroupmentDocument');
+		} elseif ($document->element == 'workunitdocument') {
+			$modulepart   = 'digiriskdolibarr:WorkUnitDocument';
+			$defaultmodel = $conf->global->DIGIRISKDOLIBARR_WORKUNITDOCUMENT_DEFAULT_MODEL;
+			$title        = $langs->trans('WorkUnitDocument');
 		}
+
+		if ($permissiontoadd || $permissiontoread) {
+			$genallowed = 1;
+		}
+
+		print saturne_show_documents($modulepart, $dirFiles, $filedir, $urlsource, 1,1, '', 1, 0, 0, 0, 0, '', 0, '', empty($soc->default_lang) ? '' : $soc->default_lang, $object);
 
 
 		print '</div><div class="fichehalfright">';

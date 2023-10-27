@@ -4,13 +4,13 @@
 		<div class="riskassessment-task-single riskassessment-task-single-<?php echo $related_task->id ?> wpeo-table table-row">
 			<div class="riskassessment-task-content table-cell">
 				<div class="riskassessment-task-data">
-					<span class="riskassessment-task-reference" value="<?php echo $related_task->ref ?>"><?php echo $related_task->getNomUrlTask(0, 'withproject'); ?></span>
+					<span class="riskassessment-task-reference" value="<?php echo $related_task->ref ?>"><?php echo $related_task->getNomUrl(0, 'withproject'); ?></span>
 					<span class="riskassessment-task-author">
-						<?php $userAuthor = $usersList[$related_task->timespent_fk_user?:$user->id];
+						<?php $userAuthor = $usersList[$related_task->fk_user_creat?:$user->id];
 						echo getNomUrlUser($userAuthor); ?>
 					</span>
 					<span class="riskassessment-task-date">
-						<i class="fas fa-calendar-alt"></i> <?php echo date('d/m/Y', (($conf->global->DIGIRISKDOLIBARR_SHOW_TASK_START_DATE && ( ! empty($related_task->date_start))) ? $related_task->date_start : $related_task->date_c)) . (($conf->global->DIGIRISKDOLIBARR_SHOW_TASK_END_DATE && ( ! empty($related_task->date_end))) ? ' - ' . date('d/m/Y', $related_task->date_end) : ''); ?>
+						<i class="fas fa-calendar-alt"></i> <?php echo date('d/m/Y', (($conf->global->DIGIRISKDOLIBARR_SHOW_TASK_START_DATE && ( ! empty($related_task->dateo))) ? $related_task->dateo : $related_task->datec)) . (($conf->global->DIGIRISKDOLIBARR_SHOW_TASK_END_DATE && ( ! empty($related_task->datee))) ? ' - ' . date('d/m/Y', $related_task->datee) : ''); ?>
 					</span>
 					<span class="riskassessment-task-timespent  riskassessment-total-task-timespent-<?php echo $related_task->id ?>">
 						<?php $allTimeSpentArray = $timeSpentSortedByTasks[$related_task->id];
@@ -41,7 +41,8 @@
 			<?php if ($contextpage != 'sharedrisk' && $contextpage != 'inheritedrisk') : ?>
 				<div class="table-cell riskassessment-task-actions wpeo-gridlayout grid-2 grid-gap-0">
 					<?php if ($permissiontoadd) : ?>
-						<div class="riskassessment-task-edit wpeo-button button-square-40 button-transparent modal-open" value="<?php echo $related_task->id ?>">
+						<div class="wpeo-button button-square-40 button-transparent modal-open" value="<?php echo $related_task->id ?>">
+							<input type="hidden" class="modal-options" data-modal-to-open="risk_assessment_task_edit<?php echo $related_task->id; ?>" data-from-id="<?php echo $related_task->id; ?>" data-from-type="riskassessmenttask" data-from-subtype="photo" data-from-subdir="" data-photo-class="riskassessment-from-riskassessment-create-<?php echo $risk->id; ?>"/>
 							<i class="fas fa-pencil-alt button-icon"></i>
 						</div>
 					<?php else : ?>

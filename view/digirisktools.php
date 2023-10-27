@@ -1,5 +1,5 @@
 <?php
-/* Copyright (C) 2021 EOXIA <dev@eoxia.com>
+/* Copyright (C) 2021-2023 EVARISK <technique@evarisk.com>
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -21,27 +21,19 @@
  *	\brief      Tools page of digiriskdolibarr top menu
  */
 
-// Load Dolibarr environment
-$res = 0;
-// Try main.inc.php into web root known defined into CONTEXT_DOCUMENT_ROOT (not always defined)
-if ( ! $res && ! empty($_SERVER["CONTEXT_DOCUMENT_ROOT"])) $res = @include $_SERVER["CONTEXT_DOCUMENT_ROOT"] . "/main.inc.php";
-// Try main.inc.php into web root detected using web root calculated from SCRIPT_FILENAME
-$tmp = empty($_SERVER['SCRIPT_FILENAME']) ? '' : $_SERVER['SCRIPT_FILENAME']; $tmp2 = realpath(__FILE__); $i = strlen($tmp) - 1; $j = strlen($tmp2) - 1;
-while ($i > 0 && $j > 0 && isset($tmp[$i]) && isset($tmp2[$j]) && $tmp[$i] == $tmp2[$j]) { $i--; $j--; }
-if ( ! $res && $i > 0 && file_exists(substr($tmp, 0, ($i + 1)) . "/main.inc.php")) $res          = @include substr($tmp, 0, ($i + 1)) . "/main.inc.php";
-if ( ! $res && $i > 0 && file_exists(dirname(substr($tmp, 0, ($i + 1))) . "/main.inc.php")) $res = @include dirname(substr($tmp, 0, ($i + 1))) . "/main.inc.php";
-// Try main.inc.php using relative path
-if ( ! $res && file_exists("../../main.inc.php")) $res    = @include "../../main.inc.php";
-if ( ! $res && file_exists("../../../main.inc.php")) $res = @include "../../../main.inc.php";
-if ( ! $res) die("Include of main fails");
+// Load DigiriskDolibarr environment
+if (file_exists('../digiriskdolibarr.main.inc.php')) {
+	require_once __DIR__ . '/../digiriskdolibarr.main.inc.php';
+} elseif (file_exists('../../digiriskdolibarr.main.inc.php')) {
+	require_once __DIR__ . '/../../digiriskdolibarr.main.inc.php';
+} else {
+	die('Include of digiriskdolibarr main fails');
+}
 
 global $conf, $db, $langs, $user;
 
-$taskRefClass = $conf->global->PROJECT_TASK_ADDON;
-
 require_once DOL_DOCUMENT_ROOT . '/core/lib/admin.lib.php';
 require_once DOL_DOCUMENT_ROOT . '/core/lib/images.lib.php';
-require_once DOL_DOCUMENT_ROOT . '/core/modules/project/task/' . $taskRefClass . '.php';
 
 require_once __DIR__ . '/../class/digiriskstandard.class.php';
 require_once __DIR__ . '/../class/digiriskelement.class.php';
@@ -50,17 +42,9 @@ require_once __DIR__ . '/../class/digiriskelement/workunit.class.php';
 require_once __DIR__ . '/../class/riskanalysis/risk.class.php';
 require_once __DIR__ . '/../class/riskanalysis/riskassessment.class.php';
 require_once __DIR__ . '/../class/riskanalysis/risksign.class.php';
-require_once __DIR__ . '/../core/modules/digiriskdolibarr/digiriskelement/groupment/mod_groupment_standard.php';
-require_once __DIR__ . '/../core/modules/digiriskdolibarr/digiriskelement/groupment/mod_groupment_sirius.php';
-require_once __DIR__ . '/../core/modules/digiriskdolibarr/digiriskelement/workunit/mod_workunit_standard.php';
-require_once __DIR__ . '/../core/modules/digiriskdolibarr/digiriskelement/workunit/mod_workunit_canopus.php';
-require_once __DIR__ . '/../core/modules/digiriskdolibarr/riskanalysis/risk/mod_risk_standard.php';
-require_once __DIR__ . '/../core/modules/digiriskdolibarr/riskanalysis/riskassessment/mod_riskassessment_standard.php';
-require_once __DIR__ . '/../core/modules/digiriskdolibarr/riskanalysis/risksign/mod_risksign_standard.php';
-require_once __DIR__ . '/../core/tpl/digirisk_security_checks.php';
 
 // Load translation files required by the page
-$langs->loadLangs(array("digiriskdolibarr@digiriskdolibarr"));
+saturne_load_langs();
 
 // Parameters
 $action     = GETPOST('action', 'alpha');
@@ -77,22 +61,31 @@ $workUnit             = new WorkUnit($db);
 $risk                 = new Risk($db);
 $riskAssessment       = new RiskAssessment($db);
 $risksign             = new RiskSign($db);
-$task                 = new DigiriskTask($db);
+$task                 = new SaturneTask($db);
 $extrafields          = new ExtraFields($db);
-$refGroupmentMod      = new $conf->global->DIGIRISKDOLIBARR_GROUPMENT_ADDON();
-$refWorkUnitMod       = new $conf->global->DIGIRISKDOLIBARR_WORKUNIT_ADDON();
-$refRiskMod           = new $conf->global->DIGIRISKDOLIBARR_RISK_ADDON();
-$refRiskAssessmentMod = new $conf->global->DIGIRISKDOLIBARR_RISKASSESSMENT_ADDON();
-$refRiskSignMod       = new $conf->global->DIGIRISKDOLIBARR_RISKSIGN_ADDON();
-$refTaskMod           = new $taskRefClass();
 
-$upload_dir = $conf->digiriskdolibarr->multidir_output[isset($conf->entity) ? $conf->entity : 1];
+$numberingModules = [
+    'digiriskelement/groupment'   => $conf->global->DIGIRISKDOLIBARR_GROUPMENT_ADDON,
+    'digiriskelement/workunit'    => $conf->global->DIGIRISKDOLIBARR_WORKUNIT_ADDON,
+    'riskanalysis/risk'           => $conf->global->DIGIRISKDOLIBARR_RISK_ADDON,
+    'riskanalysis/riskassessment' => $conf->global->DIGIRISKDOLIBARR_RISKASSESSMENT_ADDON,
+    'riskanalysis/risksign'       => $conf->global->DIGIRISKDOLIBARR_RISKSIGN_ADDON
+];
 
-// Security check
+list ($refGroupmentMod, $refWorkUnitMod, $refRiskMod, $refRiskAssessmentMod, $refRiskSignMod) = saturne_require_objects_mod($numberingModules, $moduleNameLowerCase);
+
+$numberingModuleName = [
+	'project/task' => $conf->global->PROJECT_TASK_ADDON,
+];
+list($refTaskMod)     = saturne_require_objects_mod($numberingModuleName, $moduleNameLowerCase);
+
+$upload_dir = $conf->digiriskdolibarr->multidir_output[$conf->entity ?? 1];
+
+// Security check - Protection if external user
 $permissiontoread = $user->rights->digiriskdolibarr->adminpage->read;
 $permtoupload     = $user->rights->ecm->upload;
 
-if ( ! $user->rights->digiriskdolibarr->adminpage->read) accessforbidden();
+saturne_check_access($permissiontoread);
 
 /*
  * Actions
@@ -223,7 +216,7 @@ if (GETPOST('dataMigrationImportRisks', 'alpha') && ! empty($conf->global->MAIN_
 			//Risk
 			foreach ($digiriskExportArray['risks'] as $digiriskExportRisk) {
 				$risk->ref        = $refRiskMod->getNextValue($risk);
-				$risk->category   = $risk->get_danger_category_position_by_name($digiriskExportRisk['danger_category']['name']);
+				$risk->category   = $risk->getDangerCategoryPositionByName($digiriskExportRisk['danger_category']['name']);
 				$risk->fk_element = $digiriskElement->fetch_id_from_wp_digi_id($digiriskExportRisk['parent_id']);
 				$risk->fk_projet  = $conf->global->DIGIRISKDOLIBARR_DU_PROJECT;
 
@@ -323,7 +316,7 @@ if (GETPOST('dataMigrationImportRiskSigns', 'alpha') && ! empty($conf->global->M
 			//RiskSign
 			foreach ($digiriskExportArray['risksigns'] as $digiriskExportRiskSign) {
 				$risksign->ref         = $refRiskSignMod->getNextValue($risksign);
-				$risksign->category    = $risksign->get_risksign_category_position_by_name($digiriskExportRiskSign['recommendation_category']['name']);
+				$risksign->category    = $risksign->getRiskSignCategoryPositionByName($digiriskExportRiskSign['recommendation_category']['name']);
 				$risksign->description = $digiriskExportRiskSign['comment']['content'];
 				$risksign->fk_element  = $digiriskElement->fetch_id_from_wp_digi_id($digiriskExportRiskSign['parent_id']);
 
@@ -421,7 +414,7 @@ if (GETPOST('dataMigrationImportGlobal', 'alpha') && ! empty($conf->global->MAIN
 			//Risk
 			foreach ($digiriskExportArray['risks'] as $digiriskExportRisk) {
 				$risk->ref        = $refRiskMod->getNextValue($risk);
-				$risk->category   = $risk->get_danger_category_position_by_name($digiriskExportRisk['danger_category']['name']);
+				$risk->category   = $risk->getDangerCategoryPositionByName($digiriskExportRisk['danger_category']['name']);
 				$risk->fk_element = $digiriskElement->fetch_id_from_wp_digi_id($digiriskExportRisk['parent_id']);
 				$risk->fk_projet  = $conf->global->DIGIRISKDOLIBARR_DU_PROJECT;
 
@@ -469,7 +462,7 @@ if (GETPOST('dataMigrationImportGlobal', 'alpha') && ! empty($conf->global->MAIN
 			//RiskSign
 			foreach ($digiriskExportArray['risksigns'] as $digiriskExportRiskSign) {
 				$risksign->ref         = $refRiskSignMod->getNextValue($risksign);
-				$risksign->category    = $risksign->get_risksign_category_position_by_name($digiriskExportRiskSign['recommendation_category']['name']);
+				$risksign->category    = $risksign->getRiskSignCategoryPositionByName($digiriskExportRiskSign['recommendation_category']['name']);
 				$risksign->description = $digiriskExportRiskSign['comment']['content'];
 				$risksign->fk_element  = $digiriskElement->fetch_id_from_wp_digi_id($digiriskExportRiskSign['parent_id']);
 
@@ -550,7 +543,7 @@ if (GETPOST('dataMigrationExportGlobal', 'alpha') && ! empty($conf->global->MAIN
 
 					// Tasks data
 					$risk->fetch($risksingle->id);
-					$alltasks = $risk->get_related_tasks($risk);
+					$alltasks = $risk->getRelatedTasks($risk);
 					if (is_array($alltasks) && !empty($alltasks)) {
 						foreach ($alltasks as $tasksingle) {
 							$tasksExportArray['rowid']              = $tasksingle->id;
@@ -793,13 +786,12 @@ if (GETPOST('dataMigrationImportGlobalDolibarr', 'alpha') && ! empty($conf->glob
  * View
  */
 
-$help_url = 'FR:Module_Digirisk#Import.2Fexport_de_donn.C3.A9es';
-$morejs   = array("/digiriskdolibarr/js/digiriskdolibarr.js");
-$morecss  = array("/digiriskdolibarr/css/digiriskdolibarr.css");
+$title   = $langs->trans("Tools");
+$helpUrl = 'FR:Module_Digirisk#Import.2Fexport_de_donn.C3.A9es';
 
-llxHeader("", $langs->trans("Tools"), $help_url, '', '', '', $morejs, $morecss);
+saturne_header(0,"", $title, $helpUrl);
 
-print load_fiche_titre($langs->trans("Tools"), '', 'wrench');
+print load_fiche_titre($title, '', 'wrench');
 
 if ($user->rights->digiriskdolibarr->adminpage->read) {
 	if ($conf->global->DIGIRISKDOLIBARR_TOOLS_TREE_ALREADY_IMPORTED == 1) : ?>

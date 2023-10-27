@@ -1,5 +1,5 @@
 <?php
-/* Copyright (C) 2021 EOXIA <dev@eoxia.com>
+/* Copyright (C) 2021-2023 EVARISK <technique@evarisk.com>
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -21,45 +21,38 @@
  *		\brief      Page to view listingrisksaction
  */
 
-// Load Dolibarr environment
-$res = 0;
-// Try main.inc.php into web root known defined into CONTEXT_DOCUMENT_ROOT (not always defined)
-if ( ! $res && ! empty($_SERVER["CONTEXT_DOCUMENT_ROOT"])) $res = @include $_SERVER["CONTEXT_DOCUMENT_ROOT"] . "/main.inc.php";
-// Try main.inc.php into web root detected using web root calculated from SCRIPT_FILENAME
-$tmp = empty($_SERVER['SCRIPT_FILENAME']) ? '' : $_SERVER['SCRIPT_FILENAME']; $tmp2 = realpath(__FILE__); $i = strlen($tmp) - 1; $j = strlen($tmp2) - 1;
-while ($i > 0 && $j > 0 && isset($tmp[$i]) && isset($tmp2[$j]) && $tmp[$i] == $tmp2[$j]) { $i--; $j--; }
-if ( ! $res && $i > 0 && file_exists(substr($tmp, 0, ($i + 1)) . "/main.inc.php")) $res          = @include substr($tmp, 0, ($i + 1)) . "/main.inc.php";
-if ( ! $res && $i > 0 && file_exists(dirname(substr($tmp, 0, ($i + 1))) . "/main.inc.php")) $res = @include dirname(substr($tmp, 0, ($i + 1))) . "/main.inc.php";
-// Try main.inc.php using relative path
-if ( ! $res && file_exists("../../main.inc.php")) $res       = @include "../../main.inc.php";
-if ( ! $res && file_exists("../../../main.inc.php")) $res    = @include "../../../main.inc.php";
-if ( ! $res && file_exists("../../../../main.inc.php")) $res = @include "../../../../main.inc.php";
-if ( ! $res) die("Include of main fails");
+// Load DigiriskDolibarr environment
+if (file_exists('../digiriskdolibarr.main.inc.php')) {
+	require_once __DIR__ . '/../digiriskdolibarr.main.inc.php';
+} elseif (file_exists('../../digiriskdolibarr.main.inc.php')) {
+	require_once __DIR__ . '/../../digiriskdolibarr.main.inc.php';
+} else {
+	die('Include of digiriskdolibarr main fails');
+}
 
 require_once DOL_DOCUMENT_ROOT . '/core/lib/images.lib.php';
 require_once DOL_DOCUMENT_ROOT . '/projet/class/project.class.php';
 
 require_once __DIR__ . '/../../class/digiriskelement.class.php';
 require_once __DIR__ . '/../../class/digiriskstandard.class.php';
-require_once __DIR__ . '/../../class/digiriskdocuments/listingrisksaction.class.php';
-require_once './../../lib/digiriskdolibarr_digiriskelement.lib.php';
-require_once './../../lib/digiriskdolibarr_digiriskstandard.lib.php';
-require_once './../../lib/digiriskdolibarr_function.lib.php';
-require_once './../../core/modules/digiriskdolibarr/digiriskdocuments/listingrisksaction/modules_listingrisksaction.php';
+require_once __DIR__ . '/../../class/digiriskdolibarrdocuments/listingrisksaction.class.php';
+require_once __DIR__ . '/../../lib/digiriskdolibarr_digiriskelement.lib.php';
+require_once __DIR__ . '/../../lib/digiriskdolibarr_digiriskstandard.lib.php';
+require_once __DIR__ . '/../../lib/digiriskdolibarr_function.lib.php';
 
 global $conf, $db, $hookmanager, $langs, $user;
 
 // Load translation files required by the page
-$langs->loadLangs(array("digiriskdolibarr@digiriskdolibarr", "other"));
-
+saturne_load_langs(['other']);
 // Get parameters
-$id     = GETPOST('id', 'int');
-$action = GETPOST('action', 'aZ09');
-$type   = GETPOST('type', 'aZ09');
+$id        = GETPOST('id', 'int');
+$action    = GETPOST('action', 'aZ09');
+$subaction = GETPOST('subaction', 'aZ09');
+$type      = GETPOST('type', 'aZ09');
 
 // Initialize technical objects
-$listingrisksaction = new ListingRisksAction($db);
-$hookmanager->initHooks(array('digiriskelementlistingrisksaction', 'globalcard')); // Note that conf->hooks_modules contains array
+$document = new ListingRisksAction($db);
+$hookmanager->initHooks(array('digiriskelementlistingrisksaction', 'digiriskelementview', 'digiriskstandardview', 'globalcard')); // Note that conf->hooks_modules contains array
 
 if ($type != 'standard') {
 	$object = new DigiriskElement($db);
@@ -71,16 +64,13 @@ if ($type != 'standard') {
 $digiriskstandard = new DigiriskStandard($db);
 $project          = new Project($db);
 
-$upload_dir         = $conf->digiriskdolibarr->multidir_output[isset($conf->entity) ? $conf->entity : 1];
+$upload_dir = $conf->digiriskdolibarr->multidir_output[isset($conf->entity) ? $conf->entity : 1];
 
 // Security check
-require_once __DIR__ . '/../../core/tpl/digirisk_security_checks.php';
-
-$permissiontoread   = $user->rights->digiriskdolibarr->listingrisksaction->read;
+$permissiontoread   = $user->rights->digiriskdolibarr->digiriskstandard->read && $user->rights->digiriskdolibarr->listingrisksaction->read;
 $permissiontoadd    = $user->rights->digiriskdolibarr->listingrisksaction->write;
 $permissiontodelete = $user->rights->digiriskdolibarr->listingrisksaction->delete;
-
-if ( ! $permissiontoread) accessforbidden();
+saturne_check_access($permissiontoread, $object);
 
 /*
  * Actions
@@ -92,79 +82,26 @@ if ($reshook < 0) setEventMessages($hookmanager->error, $hookmanager->errors, 'e
 
 if (empty($reshook)) {
 	$error = 0;
-
-	// Action to build doc
-	if ($action == 'builddoc' && $permissiontoadd) {
-		$outputlangs = $langs;
-		$newlang     = '';
-
-		if ($conf->global->MAIN_MULTILANGS && empty($newlang) && GETPOST('lang_id', 'aZ09')) $newlang = GETPOST('lang_id', 'aZ09');
-		if ( ! empty($newlang)) {
-			$outputlangs = new Translate("", $conf);
-			$outputlangs->setDefaultLang($newlang);
-		}
-
-		// To be sure vars is defined
-		if (empty($hidedetails)) $hidedetails = 0;
-		if (empty($hidedesc)) $hidedesc       = 0;
-		if (empty($hideref)) $hideref         = 0;
-		if (empty($moreparams)) $moreparams   = null;
-
-		$model = GETPOST('model', 'alpha');
-
-		if ( $type != 'standard' ) {
-			$moreparams['object'] = $object;
-			$moreparams['user']   = $user;
-		} else {
-			$moreparams['object'] = "";
-			$moreparams['user']   = $user;
-		}
-
-		$result = $listingrisksaction->generateDocument($model, $outputlangs, $hidedetails, $hidedesc, $hideref, $moreparams);
-		if ($result <= 0) {
-			setEventMessages($object->error, $object->errors, 'errors');
-			$action = '';
-		} else {
-			if (empty($donotredirect)) {
-				setEventMessages($langs->trans("FileGenerated") . ' - ' . $listingrisksaction->last_main_doc, null);
-
-				$urltoredirect = $_SERVER['REQUEST_URI'];
-				$urltoredirect = preg_replace('/#builddoc$/', '', $urltoredirect);
-				$urltoredirect = preg_replace('/action=builddoc&?/', '', $urltoredirect); // To avoid infinite loop
-
-				header('Location: ' . $urltoredirect . '#builddoc');
-				exit;
-			}
-		}
-	}
-
-	// Action to generate pdf from odt file
-	require_once __DIR__ . '/../../core/tpl/documents/digiriskdolibarr_manual_pdf_generation_action.tpl.php';
-
-}
-
-// Delete file in doc form
-if ($action == 'remove_file' && $permissiontodelete) {
-	if ( ! empty($upload_dir)) {
-		require_once DOL_DOCUMENT_ROOT . '/core/lib/files.lib.php';
-
-		$langs->load("other");
-		$filetodelete = GETPOST('file', 'alpha');
-		$file         = $upload_dir . '/' . $filetodelete;
-		$ret          = dol_delete_file($file, 0, 0, 0, $object);
-		if ($ret) setEventMessages($langs->trans("FileWasRemoved", $filetodelete), null, 'mesgs');
-		else setEventMessages($langs->trans("ErrorFailToDeleteFile", $filetodelete), null, 'errors');
-
-		// Make a redirect to avoid to keep the remove_file into the url that create side effects
-		$urltoredirect = $_SERVER['REQUEST_URI'];
-		$urltoredirect = preg_replace('/#builddoc$/', '', $urltoredirect);
-		$urltoredirect = preg_replace('/action=remove_file&?/', '', $urltoredirect);
-
-		header('Location: ' . $urltoredirect);
-		exit;
+	if ($object->element == 'digiriskstandard') {
+        $previousRef = $object->ref;
+		$object->ref = '';
 	} else {
-		setEventMessages('BugFoundVarUploaddirnotDefined', null, 'errors');
-	}
+        $object->element = 'listingrisksaction';
+    }
+	$removeDocumentFromName = 1;
+
+    // Actions builddoc, forcebuilddoc, remove_file.
+    require_once __DIR__ . '/../../../saturne/core/tpl/documents/documents_action.tpl.php';
+
+    // Action to generate pdf from odt file
+    require_once __DIR__ . '/../../../saturne/core/tpl/documents/saturne_manual_pdf_generation_action.tpl.php';
+
+    if ($object->element == 'listingrisksaction') {
+        $object->element = 'digiriskelement';
+    }
+    if ($object->element == 'digiriskstandard') {
+        $object->ref = $previousRef;
+    }
 }
 
 /*
@@ -174,56 +111,33 @@ if ($action == 'remove_file' && $permissiontodelete) {
 $emptyobject = new stdClass();
 
 $title    = $langs->trans('ListingRisksAction');
-$help_url = 'FR:Module_Digirisk#Impression_des_listings_de_risques';
-$morejs   = array("/digiriskdolibarr/js/digiriskdolibarr.js");
-$morecss  = array("/digiriskdolibarr/css/digiriskdolibarr.css");
+$helpUrl  = 'FR:Module_Digirisk#Impression_des_listings_de_risques';
 
-digiriskHeader($title, $help_url, $morejs, $morecss); ?>
+digirisk_header($title, $helpUrl); ?>
 
 <div id="cardContent" value="">
 
 <?php $res = $object->fetch_optionals();
 
-if ($type == 'standard') {
-	$head = digiriskstandardPrepareHead($object);
-} else {
-	$head = digiriskelementPrepareHead($object);
-}
-
 // Part to show record
-print dol_get_fiche_head($head, 'elementListingRisksAction', $title, -1, "digiriskdolibarr@digiriskdolibarr");
+saturne_get_fiche_head($object, 'elementListingRisksAction', $title);
 
 // Object card
 // ------------------------------------------------------------
 if ($type != 'standard') {
-	dol_strlen($object->label) ? $morehtmlref = ' - ' . $object->label : '';
-	// Project
-	$morehtmlref = '<div class="refidno">';
-	$project->fetch($conf->global->DIGIRISKDOLIBARR_DU_PROJECT);
-	$morehtmlref .= $langs->trans('Project') . ' : ' . getNomUrlProject($project, 1, 'blank', 1);
-	// ParentElement
-	$parent_element = new DigiriskElement($db);
-	$result         = $parent_element->fetch($object->fk_parent);
-	if ($result > 0) {
-		$morehtmlref .= '<br>' . $langs->trans("Description") . ' : ' . $object->description;
-		$morehtmlref .= '<br>' . $langs->trans("ParentElement") . ' : ' . $parent_element->getNomUrl(1, 'blank', 1);
-	} else {
-		$digiriskstandard->fetch($conf->global->DIGIRISKDOLIBARR_ACTIVE_STANDARD);
-		$morehtmlref .= '<br>' . $langs->trans("Description") . ' : ' . $object->description;
-		$morehtmlref .= '<br>' . $langs->trans("ParentElement") . ' : ' . $digiriskstandard->getNomUrl(1, 'blank', 1);
-	}
-	$morehtmlref .= '</div>';
-	$morehtmlleft = '<div class="floatleft inline-block valignmiddle divphotoref">' . digirisk_show_photos('digiriskdolibarr', $conf->digiriskdolibarr->multidir_output[$conf->entity] . '/' . $object->element_type, 'small', 5, 0, 0, 0, 80, 80, 0, 0, 0, $object->element_type, $object) . '</div>';
-	$linkback = '<a href="' . dol_buildpath('/digiriskdolibarr/view/digiriskelement/risk_list.php', 1) . '">' . $langs->trans("BackToList") . '</a>';
-	digirisk_banner_tab($object, 'id', $linkback, 1, 'rowid', 'ref', $morehtmlref, '', 0, $morehtmlleft);
+    list($morehtmlref, $moreParams) = $object->getBannerTabContent();
+
+    saturne_banner_tab($object,'ref','none', 0, 'ref', 'ref', $morehtmlref, true, $moreParams);
 } else {
 	// Project
 	$morehtmlref = '<div class="refidno">';
 	$project->fetch($conf->global->DIGIRISKDOLIBARR_DU_PROJECT);
 	$morehtmlref .= $langs->trans('Project') . ' : ' . getNomUrlProject($project, 1, 'blank', 1);
 	$morehtmlref .= '</div>';
-	$morehtmlleft = '<div class="floatleft inline-block valignmiddle divphotoref">' . digirisk_show_photos('mycompany', $conf->mycompany->dir_output . '/logos', 'small', 1, 0, 0, 0, 80, 80, 0, 0, 0, 'logos', $emptyobject) . '</div>';
-	digirisk_banner_tab($object, '', '', 0, '', '', $morehtmlref, '', '', $morehtmlleft);
+
+	$moduleNameLowerCase = 'mycompany';
+	saturne_banner_tab($object,'ref','none', 0, 'ref', 'ref', $morehtmlref, true);
+	$moduleNameLowerCase = 'digiriskdolibarr';
 }
 
 unset($object->fields['element_type']);
@@ -250,27 +164,24 @@ print '</div>';
 print dol_get_fiche_end();
 
 // Document Generation -- Génération des documents
-$includedocgeneration = 1;
-if ($includedocgeneration) {
-	if ($type != 'standard') {
-		$objref    = dol_sanitizeFileName($object->ref);
-		$dir_files = 'listingrisksaction/' . $objref;
-		$filedir   = $upload_dir . '/' . $dir_files;
-		$urlsource = $_SERVER["PHP_SELF"] . '?id=' . $object->id;
-	} else {
-		$dir_files = 'listingrisksaction';
-		$filedir   = $upload_dir . '/' . $dir_files;
-		$urlsource = $_SERVER["PHP_SELF"] . '?id=' . $object->id . '&type=standard';
-	}
-
-	$modulepart = 'digiriskdolibarr:ListingRisksAction';
-
-	if ($permissiontoadd || $permissiontoread) {
-		$genallowed = 1;
-	}
-
-	print digiriskshowdocuments($modulepart, $dir_files, $filedir, $urlsource, $genallowed, $permissiontodelete, $conf->global->DIGIRISKDOLIBARR_LISTINGRISKSACTION_DEFAULT_MODEL, 1, 0, '', $langs->trans('ListingRisksAction'), '', '', $listingrisksaction);
+if ($type != 'standard') {
+	$objref    = dol_sanitizeFileName($object->ref);
+	$dirFiles  = 'listingrisksaction/' . $objref;
+	$filedir   = $upload_dir . '/' . $dirFiles;
+	$urlsource = $_SERVER["PHP_SELF"] . '?id=' . $object->id;
+} else {
+	$dirFiles  = 'listingrisksaction';
+	$filedir   = $upload_dir . '/' . $dirFiles;
+	$urlsource = $_SERVER["PHP_SELF"] . '?id=' . $object->id . '&type=standard';
 }
+
+$modulepart = 'digiriskdolibarr:ListingRisksAction';
+
+if ($permissiontoadd || $permissiontoread) {
+	$genallowed = 1;
+}
+
+print saturne_show_documents($modulepart, $dirFiles, $filedir, $urlsource, 1,1, '', 1, 0, 0, 0, 0, '', 0, '', empty($soc->default_lang) ? '' : $soc->default_lang, $object);
 
 // End of page
 llxFooter();

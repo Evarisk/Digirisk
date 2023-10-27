@@ -1,5 +1,5 @@
 <?php
-/* Copyright (C) 2021 EOXIA <dev@eoxia.com>
+/* Copyright (C) 2021-2023 EVARISK <technique@evarisk.com>
  *
  * This program is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -73,7 +73,7 @@ if (empty($conf->global->DIGIRISKDOLIBARR_TICKET_ENABLE_PUBLIC_INTERFACE)) {
 $morejs  = array("/digiriskdolibarr/js/ticket-pad.min.js", "/digiriskdolibarr/js/digiriskdolibarr.js");
 $morecss = array("/digiriskdolibarr/css/digiriskdolibarr.css");
 
-llxHeaderTicketDigirisk($langs->trans("CreateTicket"), "", 0, 0, $morejs, $morecss);
+digiriskdolibarr_ticket_header($langs->trans("CreateTicket"), "", 0, 0, $morejs, $morecss);
 
 $object->fetch('', '', $track_id);
 

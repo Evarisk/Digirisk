@@ -17,7 +17,7 @@
  */
 
 /**
- *  \file    core/modules/digiriskdolibarr/address/mod_accident_investigation_document_standard.php
+ *  \file    core/modules/digiriskdolibarr/address/mod_accidentinvestigationdocument_standard.php
  *  \ingroup digiriskdolibarr
  *  \brief   File of class to manage accident investigation document numbering rules standard.
  */
@@ -28,7 +28,7 @@ require_once __DIR__ . '/../../../../../../saturne/core/modules/saturne/modules_
 /**
  *	Class to manage accident investigation document numbering rules standard.
  */
-class mod_accident_investigation_document_standard extends ModeleNumRefSaturne
+class mod_accidentinvestigationdocument_standard extends ModeleNumRefSaturne
 {
 	/**
 	 * @var string Numbering module ref prefix.

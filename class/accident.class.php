@@ -1,5 +1,5 @@
 <?php
-/* Copyright (C) 2021 EOXIA <dev@eoxia.com>
+/* Copyright (C) 2021-2023 EVARISK <technique@evarisk.com>
  *
  * This program is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -30,10 +30,9 @@ require_once __DIR__ . '/../../saturne/class/saturneobject.class.php';
 require_once __DIR__ . '/../../saturne/class/saturnesignature.class.php';
 
 require_once __DIR__ . '/../lib/digiriskdolibarr_function.lib.php';
-require_once __DIR__ . '/digirisksignature.class.php';
-require_once __DIR__ . '/openinghours.class.php';
+require_once __DIR__ . '/digiriskdocuments.class.php';
 require_once __DIR__ . '/evaluator.class.php';
-require_once __DIR__ . '/dashboarddigiriskstats.class.php';
+require_once __DIR__ . '/../core/modules/digiriskdolibarr/digiriskelement/accidentlesion/mod_accidentlesion_standard.php';
 
 /**
  * Class for Accident
@@ -156,7 +155,7 @@ class Accident extends SaturneObject
 		'entity'            => ['type' => 'integer',      'label' => 'Entity',           'enabled' => '1', 'position' => 30, 'notnull' => 1, 'visible' => 0,],
 		'date_creation'     => ['type' => 'datetime',     'label' => 'DateCreation',     'enabled' => '1', 'position' => 40, 'notnull' => 1, 'visible' => 2,],
 		'tms'               => ['type' => 'timestamp',    'label' => 'DateModification', 'enabled' => '1', 'position' => 50, 'notnull' => 0, 'visible' => 0,],
-		'status'            => ['type' => 'smallint',     'label' => 'Status',           'enabled' => '1', 'position' => 70, 'notnull' => 0, 'visible' => 2, 'index' => 0,],
+		'status'            => ['type' => 'smallint',     'label' => 'Status',           'enabled' => '1', 'position' => 70, 'notnull' => 1, 'visible' => 2, 'index' => 0, 'arrayofkeyval' => [1 => 'InProgress', 2 => 'Locked']],
 		'label'             => ['type' => 'varchar(255)', 'label' => 'Label',            'enabled' => '1', 'position' => 80, 'notnull' => 0, 'visible' => 1, 'searchall' => 1, 'css' => 'minwidth200', 'help' => "Help text", 'showoncombobox' => '1',],
 		'fk_user_victim'    => ['type' => 'integer:User:user/class/user.class.php', 'label' => 'UserVictim',   'enabled' => '1', 'position' => 81, 'notnull' => -1, 'visible' => 1,],
 		'fk_user_employer'  => ['type' => 'integer:User:user/class/user.class.php', 'label' => 'UserEmployer', 'enabled' => '1', 'position' => 82, 'notnull' => -1, 'visible' => 1,],
@@ -212,14 +211,15 @@ class Accident extends SaturneObject
 	 *
 	 * @param  User      $user    User that creates
 	 * @param  int       $fromID  ID of object to clone.
+     * @param  array     $options Options array.
 	 * @return int                New object created, <0 if KO.
 	 * @throws Exception
 	 */
-	public function createFromClone(User $user, int $fromID): int
+	public function createFromClone(User $user, int $fromID, array $options): int
 	{
 		dol_syslog(__METHOD__, LOG_DEBUG);
 
-		global $conf;
+		global $conf, $langs;
 
 		$error  = 0;
 		$object = new self($this->db);
@@ -227,6 +227,8 @@ class Accident extends SaturneObject
 
 		// Load source object.
 		$object->fetchCommon($fromID);
+        $objectRef = $object->ref;
+        $objectId  = $object->id;
 
 		// Reset some properties.
 		unset($object->id);
@@ -235,8 +237,15 @@ class Accident extends SaturneObject
 
 		// Clear fields.
 		if (property_exists($object, 'ref')) {
-			$object->ref = '';
-		}
+            $object->ref = $object->getNextNumRef();
+        }
+        if (!empty($options['label'])) {
+            if (property_exists($object, 'label')) {
+                $object->label = $options['label'];
+            }
+        } else {
+            $object->label = $langs->trans('CloneFrom') . ' ' . $objectRef;
+        }
 		if (property_exists($object, 'ref_ext')) {
 			$object->ref_ext = '';
 		}
@@ -246,25 +255,55 @@ class Accident extends SaturneObject
 		if (property_exists($object, 'status')) {
 			$object->status = self::STATUS_VALIDATED;
 		}
+        if (empty($options['photos'])) {
+            $object->photo = '';
+        }
 
-		$refAccidentMod = new $conf->global->DIGIRISKDOLIBARR_ACCIDENT_ADDON($this->db);
-		$object->ref    = $refAccidentMod->getNextValue($object);
+        // Create clone
+        $object->context = 'createfromclone';
+		$accidentId      = $object->create($user);
 
-		// Create clone
-		$object->context = 'createfromclone';
-		$investigationId = $object->create($user);
+		if ($accidentId > 0) {
+            // Add Photos.
+            if (!empty($options['photos'])) {
+                $dir  = $conf->digiriskdolibarr->multidir_output[$conf->entity] . '/accident';
+                $path = $dir . '/' . $objectRef . '/photos';
+                dol_mkdir($dir . '/' . $object->ref . '/photos');
+                dolCopyDir($path,$dir . '/' . $object->ref . '/photos', 0, 1);
+            }
+            if (!empty($options['workstop'])) {
+                $accidentWorkstop = new AccidentWorkStop($this->db);
+                $workstops        = $accidentWorkstop->fetchFromParent($objectId);
 
-		if ($investigationId > 0) {
-			// Load signatory from source object.
-			$signatory   = new SaturneSignature($this->db);
-			$signatories = $signatory->fetchSignatory('', $fromID, $this->element);
-			if (is_array($signatories) && !empty($signatories)) {
-				foreach ($signatories as $arrayRole) {
-					foreach ($arrayRole as $signatoryRole) {
-						$signatory->createFromClone($user, $signatoryRole->id, $investigationId);
-					}
-				}
-			}
+                if (is_array($workstops) && !empty($workstops)) {
+                    foreach($workstops as $workstop) {
+                        $workstop->fk_accident = $accidentId;
+                        $workstop->ref         = $accidentWorkstop->getNextNumRef();
+                        $workstop->context     = 'createfromclone';
+                        $workstop->create($user);
+                    }
+                }
+            }
+            if (!empty($options['lesion'])) {
+                $accidentLesion = new AccidentLesion($this->db);
+                $lesions        = $accidentLesion->fetchAll('', '', 0, 0, ['customsql' => 't.fk_accident = ' . $objectId]);
+
+                if (is_array($lesions) && !empty($lesions)) {
+                    foreach($lesions as $lesion) {
+                        $lesion->fk_accident = $accidentId;
+                        $lesion->ref         = $lesion->getNextNumRef();
+                        $lesion->context     = 'createfromclone';
+                        $lesion->create($user);
+                    }
+                }
+            }
+            if (!empty($options['metadata'])) {
+                $accidentMetadata = new AccidentMetaData($this->db);
+                $accidentMetadata->fetch(0, '', ' AND t.fk_accident =' . $objectId . ' AND t.status = 1');
+                $accidentMetadata->fk_accident = $accidentId;
+                $accidentMetadata->context     = 'createfromclone';
+                $accidentMetadata->create($user);
+            }
 		} else {
 			$error++;
 			$this->error  = $object->error;
@@ -276,7 +315,7 @@ class Accident extends SaturneObject
 		// End.
 		if (!$error) {
 			$this->db->commit();
-			return $investigationId;
+			return $accidentId;
 		} else {
 			$this->db->rollback();
 			return -1;
@@ -334,51 +373,51 @@ class Accident extends SaturneObject
 		return dolGetStatus($this->labelStatus[$status], $this->labelStatusShort[$status], '', $statusType, $mode);
 	}
 
-	/**
-	 * Load dashboard info accident
-	 *
-	 * @return array
-	 * @throws Exception
-	 */
-	public function load_dashboard()
-	{
-		global $conf, $langs;
+    /**
+     * Load dashboard info accident
+     *
+     * @return array
+     * @throws Exception
+     */
+    public function load_dashboard(): array
+    {
+        global $conf, $langs;
 
-		$arrayNbDaysWithoutAccident    = $this->getNbDaysWithoutAccident();
-		$arrayNbAccidents              = $this->getNbAccidents();
-		$arrayNbWorkstopDays           = $this->getNbWorkstopDays();
-		$arrayNbAccidentsByEmployees   = $this->getNbAccidentsByEmployees();
-		$arrayNbPresquAccidents        = $this->getNbPresquAccidents();
-		$arrayNbAccidentInvestigations = $this->getNbAccidentInvestigations();
-		$arrayFrequencyIndex           = $this->getFrequencyIndex();
-		$arrayFrequencyRate            = $this->getFrequencyRate();
-		//$arrayGravityIndex           = $this->getGravityIndex();
-		$arrayGravityRate              = $this->getGravityRate();
+        $arrayNbDaysWithoutAccident    = $this->getNbDaysWithoutAccident();
+        $arrayNbAccidents              = $this->getNbAccidents();
+        $arrayNbWorkstopDays           = $this->getNbWorkstopDays();
+        $arrayNbAccidentsByEmployees   = $this->getNbAccidentsByEmployees();
+        $arrayNbPresquAccidents        = $this->getNbPresquAccidents();
+        $arrayNbAccidentInvestigations = $this->getNbAccidentInvestigations();
+        $arrayFrequencyIndex           = $this->getFrequencyIndex();
+        $arrayFrequencyRate            = $this->getFrequencyRate();
+        //$arrayGravityIndex           = $this->getGravityIndex();
+        $arrayGravityRate              = $this->getGravityRate();
 
-		$array['widgets'] = [
-			DashboardDigiriskStats::DASHBOARD_ACCIDENT => [
-				'label'      => [$langs->transnoentities("DayWithoutAccident"), $langs->transnoentities("WorkStopDays"), $langs->transnoentities("NbAccidentsByEmployees"), $langs->transnoentities("NbPresquAccidents"), $langs->transnoentities("NbAccidentInvestigations")],
-				'content'    => [$arrayNbDaysWithoutAccident['daywithoutaccident'], $arrayNbWorkstopDays['nbworkstopdays'], $arrayNbAccidentsByEmployees['nbaccidentsbyemployees'], $arrayNbPresquAccidents['nbpresquaccidents'], $arrayNbAccidentInvestigations['nbaccidentinvestigations']],
-				'picto'      => 'fas fa-user-injured',
-				'widgetName' => $langs->transnoentities('Accident')
-			],
-			DashboardDigiriskStats::DASHBOARD_ACCIDENT_INDICATOR_RATE => [
-				'label'      => [$langs->transnoentities("FrequencyIndex"), $langs->transnoentities("FrequencyRate"), $langs->transnoentities("GravityRate")],
-				'content'    => [$arrayFrequencyIndex['frequencyindex'], $arrayFrequencyRate['frequencyrate'], $arrayGravityRate['gravityrate']],
-				'tooltip'    => [
-					(($conf->global->DIGIRISKDOLIBARR_NB_EMPLOYEES > 0 && $conf->global->DIGIRISKDOLIBARR_MANUAL_INPUT_NB_EMPLOYEES) ? $langs->transnoentities("FrequencyIndexTooltip") . '<br>' . $langs->transnoentities("NbEmployeesConfTooltip") : $langs->transnoentities("FrequencyIndexTooltip")),
-					(($conf->global->DIGIRISKDOLIBARR_NB_WORKED_HOURS > 0 && $conf->global->DIGIRISKDOLIBARR_MANUAL_INPUT_NB_WORKED_HOURS) ? $langs->transnoentities("FrequencyRateTooltip") . '<br>' . $langs->transnoentities("NbWorkedHoursTooltip") : $langs->transnoentities("FrequencyRateTooltip")),
-					(($conf->global->DIGIRISKDOLIBARR_NB_WORKED_HOURS > 0 && $conf->global->DIGIRISKDOLIBARR_MANUAL_INPUT_NB_WORKED_HOURS) ? $langs->transnoentities("GravityRateTooltip") . '<br>' . $langs->transnoentities("NbWorkedHoursTooltip") : $langs->transnoentities("GravityRateTooltip"))
-				],
-				'picto'      => 'fas fa-chart-bar',
-				'widgetName' => $langs->transnoentities('AccidentRateIndicator')
-			]
-		];
+        $array['widgets'] = [
+            'accident' => [
+                'label'      => [$langs->transnoentities('DayWithoutAccident') ?? '', $langs->transnoentities('WorkStopDays') ?? '', $langs->transnoentities('NbAccidentsByEmployees') ?? '', $langs->transnoentities('NbPresquAccidents') ?? '', $langs->transnoentities('NbAccidentInvestigations') ?? ''],
+                'content'    => [$arrayNbDaysWithoutAccident['daywithoutaccident'] ?? 0, $arrayNbWorkstopDays['nbworkstopdays'] ?? 0, $arrayNbAccidentsByEmployees['nbaccidentsbyemployees'] ?? 0, $arrayNbPresquAccidents['nbpresquaccidents'] ?? 0, $arrayNbAccidentInvestigations['nbaccidentinvestigations'] ?? 0],
+                'picto'      => 'fas fa-user-injured',
+                'widgetName' => $langs->transnoentities('Accident')
+            ],
+            'accidentrateindicator' => [
+                'label'      => [$langs->transnoentities('FrequencyIndex') ?? '', $langs->transnoentities('FrequencyRate') ?? '', $langs->transnoentities('GravityRate') ?? ''],
+                'content'    => [$arrayFrequencyIndex['frequencyindex'] ?? 0, $arrayFrequencyRate['frequencyrate'] ?? 0, $arrayGravityRate['gravityrate'] ?? 0],
+                'tooltip'    => [
+                    (($conf->global->DIGIRISKDOLIBARR_NB_EMPLOYEES > 0 && $conf->global->DIGIRISKDOLIBARR_MANUAL_INPUT_NB_EMPLOYEES) ? $langs->transnoentities('FrequencyIndexTooltip') . '<br>' . $langs->transnoentities('NbEmployeesConfTooltip') : $langs->transnoentities('FrequencyIndexTooltip')),
+                    (($conf->global->DIGIRISKDOLIBARR_NB_WORKED_HOURS > 0 && $conf->global->DIGIRISKDOLIBARR_MANUAL_INPUT_NB_WORKED_HOURS) ? $langs->transnoentities('FrequencyRateTooltip') . '<br>' . $langs->transnoentities('NbWorkedHoursTooltip') : $langs->transnoentities('FrequencyRateTooltip')),
+                    (($conf->global->DIGIRISKDOLIBARR_NB_WORKED_HOURS > 0 && $conf->global->DIGIRISKDOLIBARR_MANUAL_INPUT_NB_WORKED_HOURS) ? $langs->transnoentities('GravityRateTooltip') . '<br>' . $langs->transnoentities('NbWorkedHoursTooltip') : $langs->transnoentities('GravityRateTooltip'))
+                ],
+                'picto'      => 'fas fa-chart-bar',
+                'widgetName' => $langs->transnoentities('AccidentRateIndicator')
+            ]
+        ];
 
-		$array['graphs'] = $arrayNbAccidents;
+        $array['graphs'] = [$arrayNbAccidents];
 
-		return $array;
-	}
+        return $array;
+    }
 
 	/**
 	 * Get number days without accident.
@@ -398,48 +437,60 @@ class Accident extends SaturneObject
 		return $array;
 	}
 
-	/**
-	 * Get number accidents.
-	 *
-	 * @return array
-	 * @throws Exception
-	 */
-	public function getNbAccidents() {
-		global $langs;
+    /**
+     * Get number accidents
+     *
+     * @return array
+     * @throws Exception
+     */
+    public function getNbAccidents(): array
+    {
+        global $conf, $langs;
 
-		// Number accidents
-		$array['title'] = $langs->transnoentities('AccidentRepartition');
-		$array['picto'] = '<i class="fas fa-user-injured"></i>';
-		$array['labels'] = array(
-			'accidents' => array(
-				'label' => $langs->transnoentities('AccidentWithDIAT'),
-				'color' => '#e05353'
-			),
-			'accidentswithoutDIAT' => array(
-				'label' => $langs->transnoentities('AccidentWithoutDIAT'),
-				'color' => '#e9ad4f'
-			),
-		);
-		$allaccidents = $this->fetchAll('','',0,0,['customsql' => ' t.status > 0 ']);
+        // Graph Title parameters
+        $array['title'] = $langs->transnoentities('AccidentRepartition');
+        $array['picto'] = $this->picto;
 
-		if (is_array($allaccidents) && !empty($allaccidents)) {
-			$accidentworkstop = new AccidentWorkStop($this->db);
-			foreach ($allaccidents as $accident) {
-				$allaccidentworkstop = $accidentworkstop->fetchAll('', '', 0, 0, ['customsql' => 't.fk_accident = ' . $accident->id]);
-				if (is_array($allaccidentworkstop) && !empty($allaccidentworkstop)) {
-					$nbaccidents += 1;
-				} else {
-					$nbaccidentswithoutDIAT += 1;
-				}
-			}
-			$array['data']['accidents'] = $nbaccidents;
-			$array['data']['accidentswithoutDIAT'] = $nbaccidentswithoutDIAT;
-		} else {
-			$array['data']['accidents'] = 0;
-			$array['data']['accidentswithoutDIAT'] = 0;
-		}
-		return $array;
-	}
+        // Graph parameters
+        $array['width']      = '100%';
+        $array['height']     = 400;
+        $array['type']       = 'pie';
+        $array['showlegend'] = $conf->browser->layout == 'phone' ? 1 : 2;
+        $array['dataset']    = 1;
+
+        $array['labels'] = [
+            'accidents' => [
+                'label' => $langs->transnoentities('AccidentWithDIAT'),
+                'color' => '#e05353'
+            ],
+            'accidentswithoutDIAT' => [
+                'label' => $langs->transnoentities('AccidentWithoutDIAT'),
+                'color' => '#e9ad4f'
+            ],
+        ];
+
+        $nbAccidents            = 0;
+        $nbAccidentsWithoutDIAT = 0;
+        $accidents              = $this->fetchAll('','',0,0,['customsql' => ' t.status > 0 ']);
+        if (is_array($accidents) && !empty($accidents)) {
+            $accidentWorkStop = new AccidentWorkStop($this->db);
+            foreach ($accidents as $accident) {
+                $accidentWorkStops = $accidentWorkStop->fetchFromParent($accident->id);
+                if (is_array($accidentWorkStops) && !empty($accidentWorkStops)) {
+                    $nbAccidents += 1;
+                } else {
+                    $nbAccidentsWithoutDIAT += 1;
+                }
+            }
+            $array['data']['accidents'] = $nbAccidents;
+            $array['data']['accidentswithoutDIAT'] = $nbAccidentsWithoutDIAT;
+        } else {
+            $array['data']['accidents'] = 0;
+            $array['data']['accidentswithoutDIAT'] = 0;
+        }
+
+        return $array;
+    }
 
 	/**
 	 * Get number workstop days.
@@ -453,7 +504,7 @@ class Accident extends SaturneObject
 		if (is_array($allaccidents) && !empty($allaccidents)) {
 			$accidentworkstop = new AccidentWorkStop($this->db);
 			foreach ($allaccidents as $accident) {
-				$allaccidentworkstop = $accidentworkstop->fetchAll('', '', 0, 0, ['customsql' => 't.fk_accident = ' . $accident->id]);;
+				$allaccidentworkstop = $accidentworkstop->fetchFromParent($accident->id);
 				if (is_array($allaccidentworkstop) && !empty($allaccidentworkstop)) {
 					foreach ($allaccidentworkstop as $accidentworkstop) {
 						if ($accidentworkstop->id > 0) {
@@ -616,6 +667,90 @@ class Accident extends SaturneObject
 		}
 		return $array;
 	}
+
+    /**
+     * Write information of trigger description
+     *
+     * @param  Object $object Object calling the trigger
+     * @return string         Description to display in actioncomm->note_private
+     */
+    public function getTriggerDescription(SaturneObject $object): string
+    {
+        global $conf, $langs;
+
+        require_once DOL_DOCUMENT_ROOT . '/user/class/user.class.php';
+
+        $userVictim       = new User($this->db);
+        $userEmployer     = new User($this->db);
+        $userVictim->fetch($object->fk_user_victim);
+        $userEmployer->fetch($object->fk_user_employer);
+
+        //1 : Accident in DU / GP, 2 : Accident in society, 3 : Accident in another location
+        switch ($object->external_accident) {
+            case 1:
+                if (!empty($object->fk_standard)) {
+                    require_once __DIR__ . '/digiriskstandard.class.php';
+                    $digiriskStandard = new DigiriskStandard($this->db);
+                    $digiriskStandard->fetch($object->fk_standard);
+                    $accidentLocation = $digiriskStandard->ref . " - " . $conf->global->MAIN_INFO_SOCIETE_NOM;
+                } else if (!empty($object->fk_element)) {
+                    require_once __DIR__ . '/digiriskelement.class.php';
+                    $digiriskElement  = new DigiriskElement($this->db);
+                    $digiriskElement->fetch($object->fk_element);
+                    $accidentLocation = $digiriskElement->ref . " - " . $digiriskElement->label;
+                }
+                break;
+            case 2:
+                require_once DOL_DOCUMENT_ROOT . '/societe/class/societe.class.php';
+                $society          = new Societe($this->db);
+                $society->fetch($object->fk_soc);
+                $accidentLocation = $society->ref . " - " . $society->label;
+            case 3:
+                $accidentLocation = (dol_strlen($object->accident_location) > 0 ? $object->accident_location : $langs->trans('NoData'));
+                break;
+        }
+
+        $ret  = parent::getTriggerDescription($object);
+        $ret .= $langs->trans('UserVictim') . ' : ' . $userVictim->firstname . $userVictim->lastname . '<br>';
+        $ret .= $langs->trans('UserEmployer') . ' : ' . $userEmployer->firstname . $userEmployer->lastname . '<br>';
+        $ret .= $langs->trans('AccidentLocation') . ' : ' . $accidentLocation  . '<br>';
+        $ret .= $langs->trans('AccidentType') . ' : ' . ($object->accident_type ? $langs->trans('CommutingAccident') : $langs->trans('WorkAccidentStatement')) . '<br>';
+        $ret .= (dol_strlen($object->accident_date) > 0 ? $langs->trans('AccidentDate') . ' : ' . dol_print_date($object->accident_date, 'dayhoursec') . '<br>' : '');
+
+        return $ret;
+    }
+
+    /**
+     * Return banner tab content.
+     * @return array
+     * @throws Exception
+     */
+    public function getBannerTabContent() : array
+    {
+        global $langs;
+
+        $workstopLine      = new AccidentWorkStop($this->db);
+        $accidentLines     = $workstopLine->fetchFromParent($this->id);
+        $totalWorkStopDays = 0;
+        $moreHtmlRef       = '';
+
+        if (!empty($accidentLines) && $accidentLines > 0) {
+            foreach ($accidentLines as $accidentLine) {
+                if ($accidentLine->status > 0) {
+                    $totalWorkStopDays += $accidentLine->workstop_days;
+                }
+            }
+            $moreHtmlRef      = $langs->trans('TotalWorkStopDays') . ' : ' . $totalWorkStopDays;
+            $lastaccidentline = end($accidentLines);
+            $moreHtmlRef     .= '<br>' . $langs->trans('ReturnWorkDate') . ' : ' . dol_print_date($lastaccidentline->date_end_workstop, 'dayhour');
+        } else {
+            $moreHtmlRef = $langs->trans('RegisterAccident');
+        }
+        $moreHtmlRef .= '<br>';
+        $moreParams = [];
+
+        return [$moreHtmlRef, $moreParams];
+    }
 }
 
 /**
@@ -647,7 +782,7 @@ class AccidentWorkStop extends SaturneObject
 	/**
 	 * @var string ID to identify managed object
 	 */
-	public $element = 'accident_workstop';
+	public $element = 'accidentworkstop';
 
 	/**
 	 * @var string Name of table without prefix where object is stored
@@ -699,6 +834,39 @@ class AccidentWorkStop extends SaturneObject
 	{
 		return parent::__construct($db, $this->module, $this->element);
 	}
+
+    /*
+     * Load object in memory from the database
+     *
+     * @param  int       $parent_id Id parent object
+     * @return array|int            <0 if KO, 0 if not found, >0 if OK
+     * @throws Exception
+     */
+    public function fetchFromParent(int $parent_id)
+    {
+        $filter = ['customsql' => 'fk_accident =' . $this->db->escape($parent_id) . ' AND t.status >= 0'];
+
+        return $this->fetchAll('', '', 0, 0, $filter);
+    }
+
+    /*
+     * Write information of trigger description
+     *
+     * @param  Object $object Object calling the trigger
+     * @return string         Description to display in actioncomm->note_private
+     */
+    public function getTriggerDescription(SaturneObject $object): string
+    {
+        global $langs;
+
+        $ret  = parent::getTriggerDescription($object);
+        $ret .= $langs->transnoentities('WorkStopDays') . ' : ' . $object->workstop_days . '<br>';
+        $ret .= $langs->transnoentities('WorkStopDocument') . ' : ' . (!empty($object->declaration_link) ? $object->declaration_link : 'N/A') . '<br>';
+        $ret .= (dol_strlen($object->date_start_workstop) > 0 ? $langs->transnoentities('DateStartWorkStop') . ' : ' . dol_print_date($object->date_start_workstop, 'dayhoursec') . '<br>' : '');
+        $ret .= (dol_strlen($object->date_end_workstop) > 0 ? $langs->transnoentities('DateEndWorkStop') . ' : ' . dol_print_date($object->date_end_workstop, 'dayhoursec') . '<br>' : '');
+
+        return $ret;
+    }
 }
 
 /**
@@ -902,19 +1070,26 @@ class AccidentLesion extends SaturneObject
 	/**
 	 * @var string ID to identify managed object
 	 */
-	public $element = 'accident_lesion';
+	public $element = 'accidentlesion';
 
 	/**
 	 * @var string Name of table without prefix where object is stored
 	 */
 	public $table_element = 'digiriskdolibarr_accident_lesion';
 
+    /**
+     * @var int  Does object support extrafields ? 0=No, 1=Yes
+     */
+    public int $isextrafieldmanaged = 0;
+
 	/**
 	 * @var string String with name of icon for digiriskelement. Must be the part after the 'object_' into object_digiriskelement.png
 	 */
 	public $picto = 'fontawesome_fa-user-injured_fas_#d35968';
 
-	/**
+    const STATUS_DELETED   = -1;
+
+    /**
 	 * @var array  Array with all fields and their property. Do not use it as a static var. It may be modified by constructor.
 	 */
 	public $fields = [
@@ -946,4 +1121,21 @@ class AccidentLesion extends SaturneObject
 	{
 		return parent::__construct($db, $this->module, $this->element);
 	}
+
+    /**
+     * Write information of trigger description
+     *
+     * @param  Object $object Object calling the trigger
+     * @return string         Description to display in actioncomm->note_private
+     */
+    public function getTriggerDescription(SaturneObject $object): string
+    {
+        global $langs;
+
+        $ret  = parent::getTriggerDescription($object);
+        $ret .= $langs->transnoentities('LesionLocalization') . ' : ' . $object->lesion_localization . '<br>';
+        $ret .= $langs->transnoentities('LesionNature') . ' : ' . $object->lesion_nature . '<br>';
+
+        return $ret;
+    }
 }

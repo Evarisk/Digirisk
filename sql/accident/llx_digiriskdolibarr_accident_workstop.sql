@@ -1,4 +1,4 @@
--- Copyright (C) 2021 EOXIA <dev@eoxia.com>
+-- Copyright (C) 2021-2023 EVARISK <technique@evarisk.com>
 --
 -- This program is free software: you can redistribute it and/or modify
 -- it under the terms of the GNU General Public License as published by
@@ -18,11 +18,11 @@ CREATE TABLE llx_digiriskdolibarr_accident_workstop(
 	ref                 varchar(128) NOT NULL,
 	entity              integer DEFAULT 1 NOT NULL,
 	date_creation       datetime NOT NULL,
-	tms                 timestamp,
-    status              smallint,
+	tms                 timestamp DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+  status              smallint,
 	workstop_days       integer,
 	date_start_workstop datetime,
-    date_end_workstop   datetime,
-    declaration_link    text,
+  date_end_workstop   datetime,
+  declaration_link    text,
 	fk_accident         integer NOT NULL
 ) ENGINE=innodb;

@@ -78,7 +78,7 @@ if (empty($conf->global->MAIN_DISABLE_WORKBOARD)) {
 	} else {
 		print '<div class="wpeo-notice notice-info">';
 		print '<div class="notice-content">';
-		print '<div class="notice-subtitle"><strong>'.$langs->trans("HowToSetupTicketCategories") . '  ' . '<a href=' . '"../admin/ticket/ticket.php#TicketCategories">' . $langs->trans('ConfigTicketCategories') . '</a></strong></div>';
+		print '<div class="notice-subtitle"><strong>'.$langs->trans("HowToSetupTicketCategories") . '  ' . '<a href=' . '"' . DOL_URL_ROOT . '/custom/digiriskdolibarr/admin/ticket/ticket.php#TicketCategories">' . $langs->trans('ConfigTicketCategories') . '</a></strong></div>';
 		print '</div>';
 		print '</div>';
 		exit;

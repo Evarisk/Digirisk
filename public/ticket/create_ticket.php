@@ -1,5 +1,5 @@
 <?php
-/* Copyright (C) 2021 EOXIA <dev@eoxia.com>
+/* Copyright (C) 2021-2023 EVARISK <technique@evarisk.com>
  *
  * This program is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -30,21 +30,14 @@ if ( ! defined('NOCSRFCHECK'))    define("NOCSRFCHECK", 1); // We accept to go o
 if ( ! defined('NOIPCHECK'))      define('NOIPCHECK', '1'); // Do not check IP defined into conf $dolibarr_main_restrict_ip
 if ( ! defined('NOBROWSERNOTIF')) define('NOBROWSERNOTIF', '1');
 
-// Load Dolibarr environment
-$res = 0;
-// Try main.inc.php into web root known defined into CONTEXT_DOCUMENT_ROOT (not always defined)
-if ( ! $res && ! empty($_SERVER["CONTEXT_DOCUMENT_ROOT"])) $res = @include $_SERVER["CONTEXT_DOCUMENT_ROOT"] . "/main.inc.php";
-// Try main.inc.php into web root detected using web root calculated from SCRIPT_FILENAME
-$tmp = empty($_SERVER['SCRIPT_FILENAME']) ? '' : $_SERVER['SCRIPT_FILENAME']; $tmp2 = realpath(__FILE__); $i = strlen($tmp) - 1; $j = strlen($tmp2) - 1;
-while ($i > 0 && $j > 0 && isset($tmp[$i]) && isset($tmp2[$j]) && $tmp[$i] == $tmp2[$j]) { $i--; $j--; }
-if ( ! $res && $i > 0 && file_exists(substr($tmp, 0, ($i + 1)) . "/main.inc.php")) $res          = @include substr($tmp, 0, ($i + 1)) . "/main.inc.php";
-if ( ! $res && $i > 0 && file_exists(dirname(substr($tmp, 0, ($i + 1))) . "/main.inc.php")) $res = @include dirname(substr($tmp, 0, ($i + 1))) . "/main.inc.php";
-// Try main.inc.php using relative path
-if ( ! $res && file_exists("../../main.inc.php")) $res          = @include "../../main.inc.php";
-if ( ! $res && file_exists("../../../main.inc.php")) $res       = @include "../../../main.inc.php";
-if ( ! $res && file_exists("../../../../main.inc.php")) $res    = @include "../../../../main.inc.php";
-if ( ! $res && file_exists("../../../../../main.inc.php")) $res = @include "../../../../../main.inc.php";
-if ( ! $res) die("Include of main fails");
+// Load DigiriskDolibarr environment
+if (file_exists('../digiriskdolibarr.main.inc.php')) {
+    require_once __DIR__ . '/../digiriskdolibarr.main.inc.php';
+} elseif (file_exists('../../digiriskdolibarr.main.inc.php')) {
+    require_once __DIR__ . '/../../digiriskdolibarr.main.inc.php';
+} else {
+    die('Include of digiriskdolibarr main fails');
+}
 
 require_once DOL_DOCUMENT_ROOT . '/ticket/class/actions_ticket.class.php';
 require_once DOL_DOCUMENT_ROOT . '/core/class/html.formticket.class.php';
@@ -61,24 +54,24 @@ require_once DOL_DOCUMENT_ROOT . '/core/class/doleditor.class.php';
 require_once DOL_DOCUMENT_ROOT . '/categories/class/categorie.class.php';
 require_once DOL_DOCUMENT_ROOT . '/core/modules/ticket/mod_ticket_simple.php';
 
-require_once '../../lib/digiriskdolibarr_function.lib.php';
-require_once '../../class/digiriskelement.class.php';
+require_once __DIR__ . '/../../lib/digiriskdolibarr_function.lib.php';
+require_once __DIR__ . '/../../class/digiriskelement.class.php';
 
-require_once __DIR__ . '/../../../saturne/lib/object.lib.php';
+require_once __DIR__ . '/../../../saturne/lib/saturne_functions.lib.php';
 
 global $conf, $db, $hookmanager, $langs, $mc, $user;
 
 // Load translation files required by the page
-$langs->loadLangs(array('companies', 'other', 'mails', 'ticket', 'digiriskdolibarr@digiriskdolibarr'));
+saturne_load_langs(['companies', 'other', 'mails', 'ticket']);
 
 // Get parameters
-$id            = GETPOST('id', 'int');
-$msg_id        = GETPOST('msg_id', 'int');
-$action        = GETPOST('action', 'aZ09');
-$ticket_tmp_id = GETPOST('ticket_id');
+$id          = GETPOST('id', 'int');
+$msg_id      = GETPOST('msg_id', 'int');
+$action      = GETPOST('action', 'aZ09');
+$ticketTmpId = GETPOST('ticket_id');
 
-if ( ! dol_strlen($ticket_tmp_id)) {
-	$ticket_tmp_id = generate_random_id(16);
+if ( ! dol_strlen($ticketTmpId)) {
+	$ticketTmpId = generate_random_id(16);
 }
 
 // Initialize technical object to manage hooks of page. Note that conf->hooks_modules contains array of hook context
@@ -129,7 +122,7 @@ if ($action == 'add') {
 	$parentCategory = GETPOST('parentCategory');
 	$subCategory    = GETPOST('subCategory');
 	$message        = GETPOST('message');
-	$ticket_tmp_id  = GETPOST('ticket_id');
+	$ticketTmpId  = GETPOST('ticket_id');
 
 	// Check parameters
 	if (empty($parentCategory)) {
@@ -263,8 +256,8 @@ if ($action == 'add') {
 
 			//Add files linked
 			$ticket_upload_dir = $conf->digiriskdolibarr->multidir_output[isset($conf->entity) ? $conf->entity : 1] . '/temp';
-			$fileList          = dol_dir_list($ticket_upload_dir . '/ticket/' . $ticket_tmp_id . '/');
-			$thumbsList        = dol_dir_list($ticket_upload_dir . '/ticket/' . $ticket_tmp_id . '/thumbs/');
+			$fileList          = dol_dir_list($ticket_upload_dir . '/ticket/' . $ticketTmpId . '/');
+			$thumbsList        = dol_dir_list($ticket_upload_dir . '/ticket/' . $ticketTmpId . '/thumbs/');
 			$ticketDirPath     = $conf->ticket->multidir_output[isset($conf->entity) ? $conf->entity : 1] . '/';
 			$fullTicketPath    = $ticketDirPath . $object->ref . '/';
 			$thumbsTicketPath  = $ticketDirPath . $object->ref . '/thumbs/';
@@ -298,7 +291,7 @@ if ($action == 'add') {
 			}
 
 			// Creation OK
-			dol_delete_dir_recursive($ticket_upload_dir . '/ticket/' . $ticket_tmp_id . '/');
+			dol_delete_dir_recursive($ticket_upload_dir . '/ticket/' . $ticketTmpId . '/');
 			$urltogo = $_SERVER['PHP_SELF'] . '/../ticket_success.php?track_id=' . $track_id;
 			setEventMessages($langs->trans("TicketSent", ''), null);
 			header("Location: " . $urltogo);
@@ -318,7 +311,7 @@ if ($action == 'sendfile') {
 	if ( ! is_dir($ticket_upload_dir . '/ticket')) {
 		dol_mkdir($ticket_upload_dir . '/ticket');
 	}
-	$fullTicketTmpPath = $ticket_upload_dir . '/ticket/' . $ticket_tmp_id . '/';
+	$fullTicketTmpPath = $ticket_upload_dir . '/ticket/' . $ticketTmpId . '/';
 	dol_mkdir($fullTicketTmpPath);
 
 	for ($k = 0; $k < count($_FILES['files']['name']); $k++) {
@@ -359,7 +352,7 @@ if ($action == 'removefile') {
 
 	$ticket_upload_dir = $conf->digiriskdolibarr->multidir_output[isset($conf->entity) ? $conf->entity : 1] . '/temp';
 	//Add files linked
-	$ticket_upload_dir = $conf->digiriskdolibarr->multidir_output[isset($conf->entity) ? $conf->entity : 1] . '/temp/ticket/' . $ticket_tmp_id . '/';
+	$ticket_upload_dir = $conf->digiriskdolibarr->multidir_output[isset($conf->entity) ? $conf->entity : 1] . '/temp/ticket/' . $ticketTmpId . '/';
 	$fileList          = dol_dir_list($ticket_upload_dir);
 
 	if (is_file($ticket_upload_dir . $filetodelete)) {
@@ -387,10 +380,10 @@ if ($action == 'removefile') {
 $form       = new Form($db);
 $formticket = new FormTicket($db);
 
-$arrayofjs  = array("/digiriskdolibarr/js/digiriskdolibarr.js");
-$arrayofcss = array('/opensurvey/css/style.css', '/ticket/css/styles.css.php', "/digiriskdolibarr/css/digiriskdolibarr.css");
+$arrayofjs  = array("/digiriskdolibarr/js/digiriskdolibarr.min.js", "/saturne/js/saturne.min.js");
+$arrayofcss = array('/opensurvey/css/style.css', '/ticket/css/styles.css.php', "/digiriskdolibarr/css/digiriskdolibarr.css",  "/saturne/css/saturne.css");
 
-llxHeaderTicketDigirisk($langs->trans("CreateTicket"), "", 0, 0, $arrayofjs, $arrayofcss);
+digiriskdolibarr_ticket_header($langs->trans("CreateTicket"), "", 0, 0, $arrayofjs, $arrayofcss);
 
 if ($entity > 0) {
 	if ( ! $conf->global->DIGIRISKDOLIBARR_TICKET_ENABLE_PUBLIC_INTERFACE) {
@@ -401,7 +394,7 @@ if ($entity > 0) {
 
 	print '<div class="ticketpublicarea digirisk-page-container">';
 
-	print load_fiche_titre($langs->trans("CreateTicket"), '', "digiriskdolibarr32px@digiriskdolibarr");
+	print load_fiche_titre($langs->trans("CreateTicket"), '', "digiriskdolibarr_color@digiriskdolibarr");
 
 	print '<form method="POST" action="' . $_SERVER["PHP_SELF"] . '" id="sendTicketForm">';
 	print '<input type="hidden" name="token" value="' . newToken() . '">';
@@ -409,7 +402,7 @@ if ($entity > 0) {
 	print '<input type="hidden" name="entity" value="'. $entity .'">';
 	print '<input type="hidden" id="parentCategory" name="parentCategory" value="' . GETPOST('parentCategory') . '">';
 	print '<input type="hidden" id="subCategory" name="subCategory" value="' . GETPOST('subCategory') . '">';
-	print '<input type="hidden" id="ticket_id" name="ticket_id" value="' . $ticket_tmp_id . '">';
+	print '<input type="hidden" id="ticket_id" name="ticket_id" value="' . $ticketTmpId . '">';
 	print '<input type="hidden" name="id" value="' . $object->id . '">';
 
 	print dol_get_fiche_head(array(), '0', '', 1);
@@ -418,7 +411,7 @@ if ($entity > 0) {
 	print '<div class="centpercent tableforimgfields form-registre">' . "\n";
 
 	if (empty($conf->global->DIGIRISKDOLIBARR_TICKET_CATEGORIES_CREATED)) : ?>
-		<div class="wpeo-notice notice-info">
+		<div class="wpeo-notice notice-error">
 			<div class="notice-content">
 				<div class="notice-title"><strong><?php echo $langs->trans("TicketCategoriesNotCreated"); ?></strong></div>
 				<div class="notice-subtitle"><strong><?php echo $langs->trans("HowToSetupTicketCategories") . '  ' ?><a href="../../admin/ticket/ticket.php#TicketCategories"><?php echo $langs->trans('ConfigTicketCategories'); ?></a></strong></div>
@@ -498,13 +491,13 @@ if ($entity > 0) {
 					<label class="wpeo-button button-blue" for="sendfile">
 						<i class="fas fa-image button-icon"></i>
 						<span class="button-label"><?php print $langs->trans('AddDocument'); ?></span>
-						<input type="file" name="userfile[]" multiple="multiple" id="sendfile" onchange="window.eoxiaJS.ticket.tmpStockFile()"  style="display: none"/>
+						<input type="file" name="userfile[]" multiple="multiple" id="sendfile" onchange="window.digiriskdolibarr.ticket.tmpStockFile()"  style="display: none"/>
 					</label>
 				</div>
 
 				<div id="sendFileForm">
 					<div id="fileLinkedTable" class="tableforinputfields">
-						<?php $fileLinkedList = dol_dir_list($conf->digiriskdolibarr->multidir_output[isset($conf->entity) ? $conf->entity : 1] . '/temp/ticket/' . $ticket_tmp_id . '/thumbs/'); ?>
+						<?php $fileLinkedList = dol_dir_list($conf->digiriskdolibarr->multidir_output[isset($conf->entity) ? $conf->entity : 1] . '/temp/ticket/' . $ticketTmpId . '/thumbs/'); ?>
 						<div class="wpeo-table table-flex table-3 files-uploaded">
 							<?php
 							if ( ! empty($fileLinkedList)) {
@@ -512,7 +505,7 @@ if ($entity > 0) {
 									if (preg_match('/mini/', $fileLinked['name'])) { ?>
 										<div class="table-row">
 											<div class="table-cell table-50 table-padding-0">
-												<?php print '<img class="photo"  width="' . $maxHeight . '" src="' . DOL_URL_ROOT . '/viewimage.php?modulepart=digiriskdolibarr&entity=' . $conf->entity . '&file=' . urlencode('/temp/ticket/' . $ticket_tmp_id . '/thumbs/' . $fileLinked['name']) . '" title="' . dol_escape_htmltag($alt) . '">'; ?>
+												<?php print '<img class="photo"  width="' . $maxHeight . '" src="' . DOL_URL_ROOT . '/viewimage.php?modulepart=digiriskdolibarr&entity=' . $conf->entity . '&file=' . urlencode('/temp/ticket/' . $ticketTmpId . '/thumbs/' . $fileLinked['name']) . '" title="' . dol_escape_htmltag($alt) . '">'; ?>
 											</div>
 											<div class="table-cell">
 												<?php print preg_replace('/_mini/', '', $fileLinked['name']); ?>
@@ -548,17 +541,11 @@ if ($entity > 0) {
 			if ($conf->global->DIGIRISKDOLIBARR_TICKET_DIGIRISKELEMENT_VISIBLE) {
 				$selectDigiriskElement = '</br> <span ' . (($conf->global->DIGIRISKDOLIBARR_TICKET_DIGIRISKELEMENT_REQUIRED) ? 'style="font-weight:600"' : '') . '>' . $langs->trans('Service') . (($conf->global->DIGIRISKDOLIBARR_TICKET_DIGIRISKELEMENT_REQUIRED) ? '<span style="color:red"> *</span>' : '') . '</span>';
 
-				$alldisableddigiriskelement = $digiriskelement->fetchAll('', '', 0, 0, array('customsql' => 't.show_in_selector = 0'));
-				if (is_array($alldisableddigiriskelement) && !empty($alldisableddigiriskelement)) {
-					$filter = 's.rowid NOT IN (';
-					foreach ($alldisableddigiriskelement as $disabled_digiriskelement) {
-						$filter .= $disabled_digiriskelement->id . ',';
-					}
-					$filter = substr($filter, 0, -1);
-					$filter .= ')';
+				$deletedElements = $digiriskelement->getMultiEntityTrashList();
+				if (empty($deletedElements)) {
+					$deletedElements = [0];
 				}
-
-				$selectDigiriskElement .= $digiriskelement->select_digiriskelement_list(GETPOST('options_digiriskdolibarr_ticket_service'), 'options_digiriskdolibarr_ticket_service', (!empty($filter) ? $filter : ''), $langs->trans('PleaseSelectADigiriskElement'), 0, array(), 0, 0, 'minwidth500', 0, false, 1, '', true, $conf->global->DIGIRISKDOLIBARR_TICKET_DIGIRISKELEMENT_HIDE_REF);
+				$selectDigiriskElement .= $digiriskelement->selectDigiriskElementList(GETPOST('options_digiriskdolibarr_ticket_service'), 'options_digiriskdolibarr_ticket_service',  ['customsql' => 't.rowid NOT IN (' . implode(',', $deletedElements) . ') AND t.show_in_selector = 1'], $langs->trans('PleaseSelectADigiriskElement'), 0, array(), 0, 0, 'minwidth500', 0, false, 1, '', true, $conf->global->DIGIRISKDOLIBARR_TICKET_DIGIRISKELEMENT_HIDE_REF);
 				$selectDigiriskElement .= '<div><br></div>';
 				print($selectDigiriskElement);
 			}

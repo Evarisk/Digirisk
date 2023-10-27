@@ -1,4 +1,4 @@
--- Copyright (C) 2021 EOXIA <dev@eoxia.com>
+-- Copyright (C) 2021-2023 EVARISK <technique@evarisk.com>
 --
 -- This program is free software: you can redistribute it and/or modify
 -- it under the terms of the GNU General Public License as published by
@@ -19,21 +19,21 @@ CREATE TABLE llx_digiriskdolibarr_accident(
 	ref_ext           varchar(128),
 	entity            integer DEFAULT 1 NOT NULL,
 	date_creation     datetime NOT NULL,
-	tms               timestamp,
+	tms               timestamp DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
 	status            smallint,
 	label             varchar(255) NOT NULL,
-    accident_date     datetime NOT NULL,
+  accident_date     datetime NOT NULL,
 	description       text,
 	photo             text,
 	accident_type     text,
-    external_accident smallint DEFAULT 1,
-    accident_location text,
+  external_accident smallint DEFAULT 1,
+  accident_location text,
 	fk_project        integer,
 	fk_user_creat     integer NOT NULL,
 	fk_user_modif     integer,
-    fk_element        integer,
-    fk_standard       integer,
-    fk_soc            integer,
+  fk_element        integer,
+  fk_standard       integer,
+  fk_soc            integer,
 	fk_user_victim    integer,
 	fk_user_employer  integer
 ) ENGINE=innodb;

@@ -1,5 +1,5 @@
 <?php
-/* Copyright (C) 2021 EOXIA <dev@eoxia.com>
+/* Copyright (C) 2021-2023 EVARISK <technique@evarisk.com>
  *
  * This program is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -21,35 +21,27 @@
  *		\brief      List page for risk
  */
 
-// Load Dolibarr environment
-$res = 0;
-// Try main.inc.php into web root known defined into CONTEXT_DOCUMENT_ROOT (not always defined)
-if ( ! $res && ! empty($_SERVER["CONTEXT_DOCUMENT_ROOT"])) $res = @include $_SERVER["CONTEXT_DOCUMENT_ROOT"] . "/main.inc.php";
-// Try main.inc.php into web root detected using web root calculated from SCRIPT_FILENAME
-$tmp = empty($_SERVER['SCRIPT_FILENAME']) ? '' : $_SERVER['SCRIPT_FILENAME']; $tmp2 = realpath(__FILE__); $i = strlen($tmp) - 1; $j = strlen($tmp2) - 1;
-while ($i > 0 && $j > 0 && isset($tmp[$i]) && isset($tmp2[$j]) && $tmp[$i] == $tmp2[$j]) { $i--; $j--; }
-if ( ! $res && $i > 0 && file_exists(substr($tmp, 0, ($i + 1)) . "/main.inc.php")) $res          = @include substr($tmp, 0, ($i + 1)) . "/main.inc.php";
-if ( ! $res && $i > 0 && file_exists(dirname(substr($tmp, 0, ($i + 1))) . "/main.inc.php")) $res = @include dirname(substr($tmp, 0, ($i + 1))) . "/main.inc.php";
-// Try main.inc.php using relative path
-if ( ! $res && file_exists("../../main.inc.php")) $res       = @include "../../main.inc.php";
-if ( ! $res && file_exists("../../../main.inc.php")) $res    = @include "../../../main.inc.php";
-if ( ! $res && file_exists("../../../../main.inc.php")) $res = @include "../../../../main.inc.php";
-if ( ! $res) die("Include of main fails");
+// Load DigiriskDolibarr environment
+if (file_exists('../digiriskdolibarr.main.inc.php')) {
+    require_once __DIR__ . '/../digiriskdolibarr.main.inc.php';
+} elseif (file_exists('../../digiriskdolibarr.main.inc.php')) {
+    require_once __DIR__ . '/../../digiriskdolibarr.main.inc.php';
+} else {
+    die('Include of digiriskdolibarr main fails');
+}
 
 global $langs, $user, $conf, $db, $hookmanager;
 
-$projectRefClass = $conf->global->PROJECT_ADDON;
-$taskRefClass    = $conf->global->PROJECT_TASK_ADDON;
 
+// Load Dolibarr libraries
 require_once DOL_DOCUMENT_ROOT . '/core/lib/images.lib.php';
 require_once DOL_DOCUMENT_ROOT . '/core/lib/files.lib.php';
 require_once DOL_DOCUMENT_ROOT . '/core/lib/date.lib.php';
 require_once DOL_DOCUMENT_ROOT . '/core/class/html.form.class.php';
 require_once DOL_DOCUMENT_ROOT . '/ecm/class/ecmdirectory.class.php';
 require_once DOL_DOCUMENT_ROOT . '/projet/class/project.class.php';
-require_once DOL_DOCUMENT_ROOT . '/core/modules/project/' . $projectRefClass . '.php';
-require_once DOL_DOCUMENT_ROOT . '/core/modules/project/task/' . $taskRefClass . '.php';
 
+// Load DigiriskDolibarr libraries
 require_once './../../class/digiriskelement.class.php';
 require_once './../../class/digiriskstandard.class.php';
 require_once './../../class/riskanalysis/risk.class.php';
@@ -59,16 +51,14 @@ require_once './../../core/modules/digiriskdolibarr/riskanalysis/risk/mod_risk_s
 require_once './../../core/modules/digiriskdolibarr/riskanalysis/riskassessment/mod_riskassessment_standard.php';
 require_once './../../lib/digiriskdolibarr_digiriskstandard.lib.php';
 require_once './../../lib/digiriskdolibarr_function.lib.php';
-require_once __DIR__ . '/../../core/tpl/digirisk_security_checks.php';
-
-$permtoupload = $user->rights->ecm->upload;
 
 // Load translation files required by the page
-$langs->loadLangs(array("digiriskdolibarr@digiriskdolibarr", "other"));
+saturne_load_langs(['other']);
 
 // Get parameters
 $id          = GETPOST('id', 'int');
 $action      = GETPOST('action', 'aZ09');
+$subaction   = GETPOST('subaction', 'aZ09');
 $massaction  = GETPOST('massaction', 'alpha'); // The bulk action (combo box choice into lists)
 $confirm     = GETPOST('confirm', 'alpha');
 $cancel      = GETPOST('cancel', 'aZ09');
@@ -88,12 +78,17 @@ $risk             = new Risk($db);
 $evaluation       = new RiskAssessment($db);
 $ecmdir           = new EcmDirectory($db);
 $project          = new Project($db);
-$task             = new DigiriskTask($db);
+$task             = new SaturneTask($db);
 $extrafields      = new ExtraFields($db);
-$refRiskMod       = new $conf->global->DIGIRISKDOLIBARR_RISK_ADDON();
-$refEvaluationMod = new $conf->global->DIGIRISKDOLIBARR_RISKASSESSMENT_ADDON();
-$refProjectMod    = new $projectRefClass();
-$refTaskMod       = new $taskRefClass();
+
+$numberingModuleName = [
+    'riskanalysis/' . $risk->element       => $conf->global->DIGIRISKDOLIBARR_RISK_ADDON,
+    'riskanalysis/' . $evaluation->element => $conf->global->DIGIRISKDOLIBARR_RISKASSESSMENT_ADDON,
+    $project->element                      => $conf->global->PROJECT_ADDON,
+    'project/task'                         => $conf->global->PROJECT_TASK_ADDON,
+];
+
+list($refRiskMod, $refEvaluationMod, $refProjectMod, $refTaskMod) = saturne_require_objects_mod($numberingModuleName, $moduleNameLowerCase);
 
 $object->fetch($conf->global->DIGIRISKDOLIBARR_ACTIVE_STANDARD);
 $hookmanager->initHooks(array('risklist', 'globalcard')); // Note that conf->hooks_modules contains array
@@ -154,7 +149,7 @@ $permissiontoadd    = $user->rights->digiriskdolibarr->risk->write;
 $permissiontodelete = $user->rights->digiriskdolibarr->risk->delete;
 
 // Security check
-if ( ! $permissiontoread) accessforbidden();
+saturne_check_access($permissiontoread);
 
 /*
  * Actions
@@ -200,16 +195,13 @@ if (empty($reshook)) {
 $form = new Form($db);
 
 $title    = $langs->trans("RiskList");
-$help_url = 'FR:Module_Digirisk#.C3.89valuation_des_Risques';
-$morejs   = array("/digiriskdolibarr/js/digiriskdolibarr.js");
-$morecss  = array("/digiriskdolibarr/css/digiriskdolibarr.css");
+$helpUrl = 'FR:Module_Digirisk#.C3.89valuation_des_Risques';
 
-llxHeader('', $title, $help_url, '', '', '', $morejs, $morecss);
+saturne_header(1,'', $title, $helpUrl);
 
 // Object card
 // ------------------------------------------------------------
 $allRisks = 1;
-require_once './../../core/tpl/medias/digiriskdolibarr_medias_gallery_modal.tpl.php';
 if (!empty($conf->global->DIGIRISKDOLIBARR_SHOW_RISKS)) {
 	$contextpage = 'risklist';
 	require_once './../../core/tpl/riskanalysis/risk/digiriskdolibarr_risklist_view.tpl.php';
