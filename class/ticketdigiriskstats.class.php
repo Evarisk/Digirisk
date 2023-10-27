@@ -161,6 +161,8 @@ class TicketDigiriskStats extends DigiriskStats
 	 * @throws Exception
 	 */
 	public function getNbTicketByDigiriskElementAndTicketTags($date_start = 0, $date_end = 0) {
+        global $conf, $langs;
+
 		$digiriskelement = new DigiriskElement($this->db);
 		$categorie       = new Categorie($this->db);
 
@@ -172,11 +174,12 @@ class TicketDigiriskStats extends DigiriskStats
 		}
 
 		$digiriskelementlist = dol_sort_array($digiriskelementlist, 'ranks');
+        $mainCategoryObject = $categorie->rechercher($conf->global->DIGIRISKDOLIBARR_TICKET_MAIN_CATEGORY, '', 'ticket', true);
+        $allCategories = $mainCategoryObject[0]->get_filles();
 
-		$allCategories = $categorie->get_all_categories('ticket');
 		if (is_array($allCategories) && !empty($allCategories)) {
 			foreach ($allCategories as $category) {
-				$arrayCats[$category->label] = array(
+				$arrayCats[$category->id] = array(
 					'id' => $category->id,
 					'name' => $category->label
 				);
@@ -189,25 +192,68 @@ class TicketDigiriskStats extends DigiriskStats
 					$filter = ' AND datec BETWEEN ' . "'" .dol_print_date($date_start, 'dayrfc') . "'" . ' AND ' . "'" . dol_print_date($date_end, 'dayrfc'). "'";
 				}
 				foreach ($digiriskelementlist as $digiriskelement) {
-					foreach ($arrayCats as $key => $cat) {
-						$nbticket = 0;
+                    $totalTicketsOnDigiriskElement = 0;
+
+                    foreach ($arrayCats as $key => $cat) {
+                        $nbticket = 0;
 						$categorie->fetch($cat['id']);
-						$alltickets = getObjectsInCategDigirisk($categorie, 'ticket', 0, 0, 0, '', 'ASC', $filter);
-						if (is_array($alltickets) && !empty($alltickets)) {
-							foreach ($alltickets as $ticket) {
-								if (!empty($ticket->array_options['options_digiriskdolibarr_ticket_service']) && $ticket->array_options['options_digiriskdolibarr_ticket_service'] == $digiriskelement->id && $ticket->fk_statut != 9) {
-									$nbticket++;
-								}
-							}
-						}
-						$array[$digiriskelement->ref . ' - ' . $digiriskelement->label][html_entity_decode($key, ENT_QUOTES | ENT_HTML5)] = $nbticket;
-					}
-				}
+
+                        $alltickets = getObjectsInCategDigirisk($categorie, 'ticket', 0, 0, 0, '', 'ASC', $filter);
+                        if (is_array($alltickets) && !empty($alltickets)) {
+                            foreach ($alltickets as $ticket) {
+                                if (!empty($ticket->array_options['options_digiriskdolibarr_ticket_service']) && $ticket->array_options['options_digiriskdolibarr_ticket_service'] == $digiriskelement->id && $ticket->fk_statut != 9) {
+                                    $nbticket++;
+                                    $totalTicketsOnDigiriskElement++;
+                                }
+                            }
+                        }
+                        $array[$digiriskelement->ref . ' - ' . $digiriskelement->label][html_entity_decode($key, ENT_QUOTES | ENT_HTML5)] = $nbticket;
+                        $childrenCategories = $categorie->get_filles();
+                        if (is_array($childrenCategories) && !empty($childrenCategories)) {
+
+                            foreach($childrenCategories as $childCategory) {
+                                $alltickets = getObjectsInCategDigirisk($childCategory, 'ticket', 0, 0, 0, '', 'ASC', $filter);
+                                $ticketCounter = 0;
+                                if (is_array($alltickets) && !empty($alltickets)) {
+                                    $ticketCounter = count($alltickets);
+                                }
+                                $array[$digiriskelement->ref . ' - ' . $digiriskelement->label][html_entity_decode($childCategory->id, ENT_QUOTES | ENT_HTML5)] = $ticketCounter;
+
+                            }
+                        }
+                    }
+
+                    $array[$digiriskelement->ref . ' - ' . $digiriskelement->label][$langs->trans('Total')] = $totalTicketsOnDigiriskElement;
+                }
 			}
-		}
+            foreach ($arrayCats as $key => $cat) {
+                $totalTicketsOnCategory = 0;
+
+                $categorie->fetch($cat['id']);
+
+                $alltickets = getObjectsInCategDigirisk($categorie, 'ticket', 0, 0, 0, '', 'ASC', $filter);
+                if (is_array($alltickets) && !empty($alltickets)) {
+                    $totalTicketsOnCategory = count($alltickets);
+                }
+                $array[$langs->trans('Total')][html_entity_decode($key, ENT_QUOTES | ENT_HTML5)] = $totalTicketsOnCategory;
+
+                $childrenCategories = $categorie->get_filles();
+                if (is_array($childrenCategories) && !empty($childrenCategories)) {
+                    foreach($childrenCategories as $childCategory) {
+                        $totalTicketsOnChildCategory = 0;
+
+                        $alltickets = getObjectsInCategDigirisk($childCategory, 'ticket', 0, 0, 0, '', 'ASC', $filter);
+                        if (is_array($alltickets) && !empty($alltickets)) {
+                            $totalTicketsOnChildCategory = count($alltickets);
+                        }
+                        $array[$langs->trans('Total')][html_entity_decode($childCategory->id, ENT_QUOTES | ENT_HTML5)] = $totalTicketsOnChildCategory;
+                    }
+                }
+            }
+        }
 
 		if (!empty($array)) {
-			return $array;
+			return [$array, $allCategories];
 		} else {
 			return -1;
 		}
