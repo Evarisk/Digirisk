@@ -199,6 +199,7 @@ class TicketDigiriskStats extends DigiriskStats
 						$categorie->fetch($cat['id']);
 
                         $alltickets = getObjectsInCategDigirisk($categorie, 'ticket', 0, 0, 0, '', 'ASC', $filter);
+
                         if (is_array($alltickets) && !empty($alltickets)) {
                             foreach ($alltickets as $ticket) {
                                 if (!empty($ticket->array_options['options_digiriskdolibarr_ticket_service']) && $ticket->array_options['options_digiriskdolibarr_ticket_service'] == $digiriskelement->id && $ticket->fk_statut != 9) {
@@ -215,7 +216,11 @@ class TicketDigiriskStats extends DigiriskStats
                                 $alltickets = getObjectsInCategDigirisk($childCategory, 'ticket', 0, 0, 0, '', 'ASC', $filter);
                                 $ticketCounter = 0;
                                 if (is_array($alltickets) && !empty($alltickets)) {
-                                    $ticketCounter = count($alltickets);
+                                    foreach ($alltickets as $ticket) {
+                                        if (!empty($ticket->array_options['options_digiriskdolibarr_ticket_service']) && $ticket->array_options['options_digiriskdolibarr_ticket_service'] == $digiriskelement->id && $ticket->fk_statut != 9) {
+                                            $ticketCounter++;
+                                        }
+                                    }
                                 }
                                 $array[$digiriskelement->ref . ' - ' . $digiriskelement->label][html_entity_decode($childCategory->id, ENT_QUOTES | ENT_HTML5)] = $ticketCounter;
 
@@ -240,6 +245,7 @@ class TicketDigiriskStats extends DigiriskStats
                 $childrenCategories = $categorie->get_filles();
                 if (is_array($childrenCategories) && !empty($childrenCategories)) {
                     foreach($childrenCategories as $childCategory) {
+
                         $totalTicketsOnChildCategory = 0;
 
                         $alltickets = getObjectsInCategDigirisk($childCategory, 'ticket', 0, 0, 0, '', 'ASC', $filter);
