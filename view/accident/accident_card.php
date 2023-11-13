@@ -690,7 +690,7 @@ if ($action == 'create') {
 
     //Fk Ticket -- Fk Ticket
     print '<tr class="content_field"><td><label for="content">' . $langs->trans("FkTicket") . '</label></td><td>';
-    print $form->selectTicketsList(GETPOST('fk_ticket'), 'fk_ticket', '', 20, '', 1, 0, '1', 0, 'minwidth300');
+    print $form->selectTicketsList(GETPOST('fk_ticket'), 'fk_ticket', '', 0, '', 1, 0, '1', 0, 'minwidth300');
     print '</td></tr>';
 
 	// Other attributes
@@ -797,7 +797,7 @@ if (($id || $ref) && $action == 'edit') {
 
     //Fk Ticket -- Fk Ticket
     print '<tr class="content_field"><td><label for="content">' . $langs->trans("FkTicket") . '</label></td><td>';
-    print $form->selectTicketsList($object->fk_ticket ?: GETPOST('fk_ticket'), 'fk_ticket', '', 20, '', 1, 0, '1', 0, 'minwidth300');
+    print $form->selectTicketsList($object->fk_ticket ?: GETPOST('fk_ticket'), 'fk_ticket', '', 0, '', 1, 0, '1', 0, 'minwidth300');
     print '</td></tr>';
 
 	// Other attributes
