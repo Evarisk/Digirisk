@@ -73,25 +73,13 @@ if ($action == 'generate_csv') {
 
 	$fp = fopen($upload_dir . $filename, 'w');
 
-	list($data, $allCategories) = $stats->getNbTicketByDigiriskElementAndTicketTags((!empty($daterange) ? $date_start : 0), (!empty($daterange) ? $date_end : 0));
+	list($data, $ticketCategoriesCounter) = $stats->getNbTicketByDigiriskElementAndTicketTags((!empty($daterange) ? $date_start : 0), (!empty($daterange) ? $date_end : 0));
 
     fputcsv($fp, [$langs->transnoentities('ConcernedTimePeriod') . ' : ' . dol_print_date($date_start) . ' ' . $langs->trans('To') . ' ' . dol_print_date($date_end)]);
 
     fputcsv($fp, []);
     fputcsv($fp, []);
     fputcsv($fp, []);
-
-    $ticketCategoriesCounter = [];
-    if (is_array($allCategories) && !empty($allCategories)) {
-        foreach ($allCategories as $ticketCategory) {
-            $objectsInCateg = $ticketCategory->getObjectsInCateg('ticket');
-            if (is_array($objectsInCateg) && !empty($objectsInCateg)) {
-                if ($ticketCategory->fk_parent == $conf->global->DIGIRISKDOLIBARR_TICKET_MAIN_CATEGORY) {
-                    $ticketCategoriesCounter[$langs->trans('Register') . ' ' . $ticketCategory->label] = count($objectsInCateg);
-                }
-            }
-        }
-    }
 
     if (is_array($ticketCategoriesCounter) && !empty($ticketCategoriesCounter)) {
         foreach($ticketCategoriesCounter as $ticketCategoryName => $ticketCategoryCounter) {
@@ -103,16 +91,21 @@ if ($action == 'generate_csv') {
     fputcsv($fp, []);
     fputcsv($fp, []);
 
-
     if (is_array($data) && !empty($data)) {
 
 		// Loop through file pointer and a line
-		$arrayCat = array_keys(reset($data));
-        foreach($arrayCat as  $categoryId) {
-            $categorie->fetch($categoryId);
-            $arrayCatWithLabels[$categoryId] = $categorie->label;
+		$arrayCat = array_keys($data['labels']);
+
+        foreach($arrayCat as $categoryId) {
+            if (is_int($categoryId)) {
+                $categorie->fetch($categoryId);
+                $arrayCatWithLabels[$categoryId] = $categorie->label;
+            } else {
+                $arrayCatWithLabels[$categoryId] = $categoryId;
+            }
         }
-        $arrayCatWithLabels[$langs->trans('Total')] = $langs->trans('Total');
+
+        unset($data['labels']);
 
 		array_unshift($arrayCatWithLabels, $langs->trans('GP/UT'));
 		fputcsv($fp, $arrayCatWithLabels);
