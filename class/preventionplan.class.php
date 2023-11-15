@@ -290,14 +290,16 @@ class PreventionPlan extends SaturneObject
 			global $langs;
 			$langs->load("digiriskdolibarr@digiriskdolibarr");
 
-			$this->labelStatus[self::STATUS_DRAFT]     = $langs->trans('InProgress');
+            $this->labelStatus[self::STATUS_DELETED]   = $langs->transnoentitiesnoconv('Deleted');
+            $this->labelStatus[self::STATUS_DRAFT]     = $langs->trans('InProgress');
 			$this->labelStatus[self::STATUS_VALIDATED] = $langs->trans('ValidatePendingSignature');
 			$this->labelStatus[self::STATUS_LOCKED]    = $langs->trans('Locked');
 			$this->labelStatus[self::STATUS_ARCHIVED]  = $langs->trans('Archived');
 		}
 
 		$statusType                                        = 'status' . $status;
-		if ($status == self::STATUS_VALIDATED) $statusType = 'status3';
+        if ($status == self::STATUS_DELETED) $statusType   = 'status9';
+        if ($status == self::STATUS_VALIDATED) $statusType = 'status3';
 		if ($status == self::STATUS_LOCKED) $statusType    = 'status8';
 		if ($status == self::STATUS_ARCHIVED) $statusType  = 'status8';
 
