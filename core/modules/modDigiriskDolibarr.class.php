@@ -436,7 +436,9 @@ class modDigiriskdolibarr extends DolibarrModules
 				'digiriskstandardview',
                 'accidentdocument',
                 'accidentagenda',
-                'digiriskstandardagenda'
+                'digiriskstandardagenda',
+                'category',
+                'categoryindex'
 			],
 			'tabs' => [
 				'mycompany_admin'
@@ -1377,6 +1379,21 @@ class modDigiriskdolibarr extends DolibarrModules
 			'target'   => '',
 			'user'     => 0,				                // 0=Menu for internal users, 1=external users, 2=both
 		];
+
+        $this->menu[$r++] = [
+            'fk_menu'  => 'fk_mainmenu=digiriskdolibarr,fk_leftmenu=digiriskaccident',
+            'type'     => 'left',
+            'titre'    => '<i class="fas fa-tags pictofixedwidth" style="padding-right: 4px;"></i>' . $langs->transnoentities('Categories'),
+            'mainmenu' => 'digiriskdolibarr',
+            'leftmenu' => 'digiriskdolibarr_accidenttags',
+            'url'      => '/categories/index.php?type=accident',
+            'langs'    => 'digiriskdolibarr@digiriskdolibarr',
+            'position' => 1000 + $r,
+            'enabled'  => '$conf->digiriskdolibarr->enabled && $conf->categorie->enabled && $user->rights->digiriskdolibarr->accident->read',
+            'perms'    => '$user->rights->digiriskdolibarr->accident->read',
+            'target'   => '',
+            'user'     => 0,
+        ];
 
 		$this->menu[$r++] = [
 			'fk_menu' => 'fk_mainmenu=digiriskdolibarr',	    // '' if this is a top menu. For left menu, use 'fk_mainmenu=xxx' or 'fk_mainmenu=xxx,fk_leftmenu=yyy' where xxx is mainmenucode and yyy is a leftmenucode

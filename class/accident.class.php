@@ -304,6 +304,18 @@ class Accident extends SaturneObject
                 $accidentMetadata->context     = 'createfromclone';
                 $accidentMetadata->create($user);
             }
+            if (!empty($options['categories'])) {
+                $cat        = new Categorie($this->db);
+                $categories = $cat->containing($objectId, 'accident');
+                if (is_array($categories) && !empty($categories)) {
+                    $categoryIds = [];
+                    foreach ($categories as $cat) {
+                        $categoryIds[] = $cat->id;
+                    }
+                    $object->fetch($accidentId);
+                    $object->setCategories($categoryIds);
+                }
+            }
 		} else {
 			$error++;
 			$this->error  = $object->error;
