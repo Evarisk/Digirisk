@@ -140,8 +140,8 @@
                             <table class="add-medias">
                                 <tr>
                                     <td>
-                                        <input hidden multiple class="fast-upload" id="fast-upload-photo-default" type="file" name="userfile[]" capture="environment" accept="image/*">
-                                        <label for="fast-upload-photo-default">
+                                        <input hidden multiple class="fast-upload" id="fast-upload-photo-riskassessment-photo-<?php echo $lastEvaluation->id; ?>" type="file" name="userfile[]" capture="environment" accept="image/*">
+                                        <label for="fast-upload-photo-riskassessment-photo-<?php echo $lastEvaluation->id; ?>">
                                             <div class="wpeo-button <?php echo ($onPhone ? 'button-square-40' : 'button-square-50'); ?>">
                                                 <i class="fas fa-camera"></i><i class="fas fa-plus-circle button-add"></i>
                                             </div>
