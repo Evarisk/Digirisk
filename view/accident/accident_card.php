@@ -68,6 +68,7 @@ $fk_soc              = GETPOST('fk_soc');
 $object           = new Accident($db);
 $signatory        = new SaturneSignature($db, $object->module, $object->element);
 $objectline       = new AccidentWorkStop($db);
+$accidentLesion   = new AccidentLesion($db);
 $contact          = new Contact($db);
 $usertmp          = new User($db);
 $thirdparty       = new Societe($db);
@@ -574,7 +575,9 @@ if (empty($reshook)) {
 	// Actions cancel, add, update, update_extras, confirm_validate, confirm_delete, confirm_deleteline, confirm_clone, confirm_close, confirm_setdraft, confirm_reopen
 	require_once DOL_DOCUMENT_ROOT . '/core/actions_addupdatedelete.inc.php';
 
-	// Action confirm_lock, confirm_archive.
+    include_once __DIR__ . '/../../core/tpl/accident/digiriskdolibarr_accident_lesion_actions.tpl.php';
+
+    // Action confirm_lock, confirm_archive.
 	require_once __DIR__ . '/../../../saturne/core/tpl/signature/signature_action_workflow.tpl.php';
 
     // Actions set_thirdparty, set_project
@@ -823,7 +826,10 @@ if ((empty($action) || ($action != 'create' && $action != 'edit'))) {
 	}
 	$arrayAccident[] = $object->fk_user_victim;
 
-	$maxnumber = count($arrayAccident);
+    $accidentLesions = $accidentLesion->fetchAll('', '', 0, 0, ['customsql' => 't.fk_accident = ' . $object->id]);
+    $arrayAccident[] = (is_array($accidentLesions) && !empty($accidentLesions)) ? count($accidentLesions) : '';
+
+    $maxnumber = count($arrayAccident);
 
 	foreach ($arrayAccident as $arrayAccidentData) {
 		if (dol_strlen($arrayAccidentData) > 0 ) {
@@ -1058,7 +1064,10 @@ if ((empty($action) || ($action != 'create' && $action != 'edit'))) {
 		}
 		print '</div>';
 
-		// Accident Lines
+        // Accident lesions
+        include_once __DIR__ . '/../../core/tpl/accident/digiriskdolibarr_accident_lesion.tpl.php';
+
+        // Accident Lines
 		$accidentWorkstops = $objectline->fetchFromParent($object->id);
 
 		if (($object->status == Accident::STATUS_VALIDATED) || (!empty($accidentWorkstops))) {
