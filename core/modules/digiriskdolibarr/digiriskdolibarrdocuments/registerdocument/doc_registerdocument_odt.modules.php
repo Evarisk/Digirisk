@@ -93,7 +93,8 @@ class doc_registerdocument_odt extends SaturneDocumentModel
 	{
 		$tmpArray = [];
 
-        $objectDocument->DigiriskFillJSON();
+        $ticket   = new Ticket($this->db);
+        $accident = new Accident($this->db);
 
 		$objectDocument->element = $objectDocument->element . '@digiriskdolibarr';
 		complete_substitutions_array($tmpArray, $outputLangs, $objectDocument);
@@ -103,6 +104,44 @@ class doc_registerdocument_odt extends SaturneDocumentModel
 		$moreParam['subDir']           = 'digiriskdolibarrdocuments/';
 		$moreParam['hideTemplateName'] = 1;
 
-		return parent::write_file($objectDocument, $outputLangs, $srcTemplatePath, $hideDetails, $hideDesc, $hideRef, $moreParam);
+        $tmpArray['company_nb_employees'] = ;
+        $tmpArray['total_page_nb'] = 6;
+        //foreach
+//            $tmpArray['caregiver_id'] = ;
+//            $tmpArray['caregiver_lastname'] = ;
+//            $tmpArray['caregiver_firstname'] = ;
+//            $tmpArray['caregiver_qualification'] = ;
+//            $tmpArray['caregiver_signature'] = ;
+        //foreach
+    //        $tmpArray['register_controller_id'] = ;
+    //        $tmpArray['register_controller_lastname'] = ;
+    //        $tmpArray['register_controller_firstname'] = ;
+    //        $tmpArray['register_controller_society'] = ;
+    //        $tmpArray['register_controller_date'] = ;
+    //        $tmpArray['register_controller_signature'] = ;
+    //        $tmpArray['register_controller_note'] = ;
+
+        $accidentList = $accident->fetchAll('', '', 0, 0, ['customsql' => 'fk_ticket > 0']);
+
+        if (is_array($accidentList) && !empty($accidentList)) {
+            // foreach
+//            $tmpArray['register_name'] = ;
+//            $tmpArray['register_date'] = ;
+//            $tmpArray['register_fullname'] = ;
+//            $tmpArray['register_datehour'] = ;
+//            $tmpArray['register_location'] = ;
+//            $tmpArray['register_circumstances'] = ;
+//            $tmpArray['register_lesion_location'] = ;
+//            $tmpArray['register_lesion_nature'] = ;
+//            $tmpArray['register_witnesses_data'] = ;
+//            $tmpArray['register_external_society_implied'] = ;
+//            $tmpArray['register_caregiver_fullname'] = ;
+//            $tmpArray['register_victim_signature'] = ;
+//            $tmpArray['register_note'] = ;
+        }
+
+
+
+        return parent::write_file($objectDocument, $outputLangs, $srcTemplatePath, $hideDetails, $hideDesc, $hideRef, $moreParam);
 	}
 }
