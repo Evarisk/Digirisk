@@ -1278,6 +1278,11 @@ TicketSuccessMessageSet   = Le message a bien été modifié
 DigiriskTemplateDocumentProject = Modèle de documents des fiches de projets de Digirisk
 DocumentModelOrque              = Modèles de document de rapport prévisionnel sur les tâches de projets
 
+# Register Document
+
+RegisterDocument     = Registre des accidents bénins
+RegisterDocumentsMin = registres des accidents bénins
+registerdocument.odt = Registre des accidents bénins
 
 #
 # Tools - Outils
