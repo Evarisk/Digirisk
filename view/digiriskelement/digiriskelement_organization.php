@@ -1,5 +1,5 @@
 <?php
-/* Copyright (C) 2021 EOXIA <dev@eoxia.com>
+/* Copyright (C) 2021-2023 EVARISK <technique@evarisk.com>
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -21,33 +21,25 @@
  *		\brief      Page to organize arborescence
  */
 
-// Load Dolibarr environment
-$res = 0;
-// Try main.inc.php into web root known defined into CONTEXT_DOCUMENT_ROOT (not always defined)
-if ( ! $res && ! empty($_SERVER["CONTEXT_DOCUMENT_ROOT"])) $res = @include $_SERVER["CONTEXT_DOCUMENT_ROOT"] . "/main.inc.php";
-// Try main.inc.php into web root detected using web root calculated from SCRIPT_FILENAME
-$tmp = empty($_SERVER['SCRIPT_FILENAME']) ? '' : $_SERVER['SCRIPT_FILENAME']; $tmp2 = realpath(__FILE__); $i = strlen($tmp) - 1; $j = strlen($tmp2) - 1;
-while ($i > 0 && $j > 0 && isset($tmp[$i]) && isset($tmp2[$j]) && $tmp[$i] == $tmp2[$j]) { $i--; $j--; }
-if ( ! $res && $i > 0 && file_exists(substr($tmp, 0, ($i + 1)) . "/main.inc.php")) $res          = @include substr($tmp, 0, ($i + 1)) . "/main.inc.php";
-if ( ! $res && $i > 0 && file_exists(dirname(substr($tmp, 0, ($i + 1))) . "/main.inc.php")) $res = @include dirname(substr($tmp, 0, ($i + 1))) . "/main.inc.php";
-// Try main.inc.php using relative path
-if ( ! $res && file_exists("../../main.inc.php")) $res       = @include "../../main.inc.php";
-if ( ! $res && file_exists("../../../main.inc.php")) $res    = @include "../../../main.inc.php";
-if ( ! $res && file_exists("../../../../main.inc.php")) $res = @include "../../../../main.inc.php";
-if ( ! $res) die("Include of main fails");
+// Load DigiriskDolibarr environment
+if (file_exists('../digiriskdolibarr.main.inc.php')) {
+	require_once __DIR__ . '/../digiriskdolibarr.main.inc.php';
+} elseif (file_exists('../../digiriskdolibarr.main.inc.php')) {
+	require_once __DIR__ . '/../../digiriskdolibarr.main.inc.php';
+} else {
+	die('Include of digiriskdolibarr main fails');
+}
 
 require_once DOL_DOCUMENT_ROOT . '/core/class/html.formfile.class.php';
 require_once DOL_DOCUMENT_ROOT . '/core/lib/images.lib.php';
 
-require_once './../../class/digiriskelement.class.php';
-require_once './../../lib/digiriskdolibarr_function.lib.php';
-require_once __DIR__ . '/../../core/tpl/digirisk_security_checks.php';
+require_once __DIR__ . '/../../class/digiriskelement.class.php';
+require_once __DIR__ . '/../../lib/digiriskdolibarr_function.lib.php';
 
 global $conf, $db, $hookmanager, $langs, $user;
 
 // Load translation files required by the page
-$langs->loadLangs(array("digiriskdolibarr@digiriskdolibarr", "other"));
-
+saturne_load_langs(['other']);
 // Get parameters
 $id                  = GETPOST('id', 'int');
 $ref                 = GETPOST('ref', 'alpha');
@@ -72,7 +64,7 @@ $hookmanager->initHooks(array('digiriskelementcard', 'globalcard')); // Note tha
 //Security check
 $permissiontoread = $user->rights->digiriskdolibarr->digiriskelement->read;
 
-if ( ! $permissiontoread) accessforbidden();
+saturne_check_access($permissiontoread, $object);
 
 /*
  * Actions
@@ -96,17 +88,17 @@ if (empty($reshook)) {
 
 	if ($action == 'saveOrganization') {
 		$ids              = GETPOST('ids');
-		$parent_ids       = GETPOST('parent_ids');
-		$array_ids        = preg_split('/,/', $ids);
-		$array_parent_ids = preg_split('/,/', $parent_ids);
+		$parentIds        = GETPOST('parent_ids');
+		$arrayIds         = preg_split('/,/', $ids);
+		$arrayParentIds   = preg_split('/,/', $parentIds);
 		$i                = 0;
 
-		if ( ! empty($array_ids) && $array_ids > 0) {
-			foreach ($array_ids as $id) {
+		if ( ! empty($arrayIds) && $arrayIds > 0) {
+			foreach ($arrayIds as $id) {
 				$digiriskelement = new DigiriskElement($db);
 				$digiriskelement->fetch((int) $id);
 				$digiriskelement->ranks     = $i + 1;
-				$digiriskelement->fk_parent = $array_parent_ids[$i];
+				$digiriskelement->fk_parent = $arrayParentIds[$i];
 
 				$digiriskelement->update($user);
 				$i++;
@@ -120,7 +112,6 @@ if (empty($reshook)) {
  */
 
 $form        = new Form($db);
-$emptyobject = new stdClass();
 $formconfirm = '';
 
 $parameters                        = array('formConfirm' => $formconfirm, 'object' => $object);
@@ -128,13 +119,10 @@ $reshook                           = $hookmanager->executeHooks('formConfirm', $
 if (empty($reshook)) $formconfirm .= $hookmanager->resPrint;
 elseif ($reshook > 0) $formconfirm = $hookmanager->resPrint;
 
-
-$help_url = 'FR:Module_DigiriskDolibarr';
+$helpUrl  = 'FR:Module_Digirisk';
 $title    = $langs->trans('DigiriskElementOrganization');
-$morejs   = array("/digiriskdolibarr/js/digiriskdolibarr.js");
-$morecss  = array("/digiriskdolibarr/css/digiriskdolibarr.css");
 
-llxHeader('', $title, $help_url, '', '', '', $morejs, $morecss);
+saturne_header(0, '', $title, $helpUrl);
 
 ?>
 <div id="cardContent" value="">
@@ -145,103 +133,116 @@ if (is_array($objects)) {
 } else {
 	$results = array();
 }
+
+
+if (!empty($results)) :
 ?>
+    <script>
+        $(document).ready(function() {
+            let organizationEdited = 0
 
-<script>
-	$(document).ready(function() {
-		let organizationEdited = 0
+            calcWidth($('#title0'));
 
-		calcWidth($('#title0'));
+            window.onresize = function(event) {
+                //method to execute one time after a timer
+            };
 
-		window.onresize = function(event) {
-			//method to execute one time after a timer
-		};
+            //recursively calculate the Width all titles
+            function calcWidth(obj){
 
-		//recursively calculate the Width all titles
-		function calcWidth(obj){
+                var titles =
+                    $(obj).siblings('.space').children('.route').children('.title');
 
-			var titles =
-				$(obj).siblings('.space').children('.route').children('.title');
+                $(titles).each(function(index, element){
+                    var pTitleWidth = parseInt($(obj).css('width'));
+                    var leftOffset = parseInt($(obj).siblings('.space').css('margin-left'));
 
-			$(titles).each(function(index, element){
-				var pTitleWidth = parseInt($(obj).css('width'));
-				var leftOffset = parseInt($(obj).siblings('.space').css('margin-left'));
+                    var newWidth = pTitleWidth - leftOffset;
 
-				var newWidth = pTitleWidth - leftOffset;
+                    if ($(obj).attr('id') == 'title0'){
+                        console.log("called");
 
-				if ($(obj).attr('id') == 'title0'){
-					console.log("called");
+                        newWidth = newWidth - 10;
+                    }
 
-					newWidth = newWidth - 10;
-				}
+                    $(element).css({
+                        'width': newWidth,
+                    })
 
-				$(element).css({
-					'width': newWidth,
-				})
+                    calcWidth(element);
+                });
 
-				calcWidth(element);
-			});
+            }
 
-		}
+            $('.space').sortable({
+                connectWith:'.space:not("'+'.workunit'+'")',
+                tolerance:'intersect',
+                over:function(event,ui){
+                    $('.save-organization').removeClass('button-disable')
+                    $('.save-organization').attr('style','z-index:1050')
+                    $('.save-organization .fas').attr('style','display:none')
+                },
+                receive:function(event, ui){
+                    organizationEdited++
+                    if (organizationEdited == 1) {
+                        $('a').click(function(e) {
+                            if (confirm("Modifications non enregistrées") == false) {
+                                e.preventDefault();
+                            }
+                        })
+                    }
+                    calcWidth($(this).siblings('.title'));
+                },
 
-		$('.space').sortable({
-			connectWith:'.space:not("'+'.workunit'+'")',
-			tolerance:'intersect',
-			over:function(event,ui){
-				$('.save-organization').removeClass('button-disable')
-				$('.save-organization').attr('style','z-index:1050')
-				$('.save-organization .fas').attr('style','display:none')
-			},
-			receive:function(event, ui){
-				organizationEdited++
-				if (organizationEdited == 1) {
-					$('a').click(function(e) {
-						if (confirm("Modifications non enregistrées") == false) {
-							e.preventDefault();
-						}
-					})
-				}
-				calcWidth($(this).siblings('.title'));
-			},
+            });
 
-		});
+            $('.space').disableSelection();
 
-		$('.space').disableSelection();
-
-	})
-</script>
-<div class="messageSuccessOrganizationSaved notice hidden">
-	<div class="wpeo-notice notice-success organization-saved-success-notice">
-		<div class="notice-content">
-			<div class="notice-title"><?php echo $langs->trans('OrganizationSaved') ?></div>
-			<div class="notice-subtitle">
-				<span class="text"></span>
-			</div>
-		</div>
-		<div class="notice-close"><i class="fas fa-times"></i></div>
-	</div>
-</div>
-<div class="messageErrorOrganizationSaved notice hidden">
-	<div class="wpeo-notice notice-error organization-saved-error-notice">
-		<div class="notice-content">
-			<div class="notice-title"><?php echo $langs->trans('OrganizationNotSaved') ?></div>
-			<div class="notice-subtitle">
-				<span class="text"></span>
-			</div>
-		</div>
-		<div class="notice-close"><i class="fas fa-times"></i></div>
-	</div>
-</div>
-<div class='container'>
-	<input type="hidden" name="token" value="<?php echo newToken() ?>">
-	<h3 class='title' id='title0'><?php echo $conf->global->MAIN_INFO_SOCIETE_NOM ?></h3>
-	<ul class='space space-0 first-space ui-sortable' id='space0' value="0">
-		<?php display_recurse_tree_organization($results) ?>
-	</ul>
-</div>
+        })
+    </script>
+    <div class="messageSuccessOrganizationSaved notice hidden">
+        <div class="wpeo-notice notice-success organization-saved-success-notice">
+            <div class="notice-content">
+                <div class="notice-title"><?php echo $langs->trans('OrganizationSaved') ?></div>
+                <div class="notice-subtitle">
+                    <span class="text"></span>
+                </div>
+            </div>
+            <div class="notice-close"><i class="fas fa-times"></i></div>
+        </div>
+    </div>
+    <div class="messageErrorOrganizationSaved notice hidden">
+        <div class="wpeo-notice notice-error organization-saved-error-notice">
+            <div class="notice-content">
+                <div class="notice-title"><?php echo $langs->trans('OrganizationNotSaved') ?></div>
+                <div class="notice-subtitle">
+                    <span class="text"></span>
+                </div>
+            </div>
+            <div class="notice-close"><i class="fas fa-times"></i></div>
+        </div>
+    </div>
+    <div class='container'>
+        <input type="hidden" name="token" value="<?php echo newToken() ?>">
+        <h3 class='title' id='title0'><?php echo $conf->global->MAIN_INFO_SOCIETE_NOM ?></h3>
+        <ul class='space space-0 first-space ui-sortable' id='space0' value="0">
+            <?php display_recurse_tree_organization($results) ?>
+        </ul>
+    </div>
 <?php
 print '<hr>';
 print '<button class="save-organization wpeo-button button-disable" style="">' . $langs->trans('Save') . '  <i style="display:none" class="fas fa-times"></i><i style="display:none" class="fas fa-check"></i></button>';
+
+else :
+		print '<div class="wpeo-notice notice-warning notice-red">';
+		print '<div class="notice-content">';
+		print '<a href="' . dol_buildpath('/custom/digiriskdolibarr/view/digiriskstandard/digiriskstandard_card.php?id=' . $conf->global->DIGIRISKDOLIBARR_ACTIVE_STANDARD, 2) . '">' . '<b><div class="notice-subtitle">'.$langs->trans("YouDontHaveOrganization") . '</b></a>';
+		print '</div>';
+		print '</div>';
+		print '</div>';
+?>
+<?php
+endif;
 
 // End of page
 llxFooter();

@@ -1,24 +1,29 @@
-# DigiriskDolibarr sur [DOLIBARR ERP CRM](https://www.dolibarr.org)
+# DigiriskDolibarr sur [DOLIBARR ERP CRM](https://dolibarr.org)
 
 ## Informations
 
 - Numéro du module : 436302
-- Version : 9.10.0
-- Dernière mise à jour :  04/04/2023
-- Éditeur : [Evarisk](https://www.evarisk.com)
-- Compatibilité : Dolibarr 16.0.0 - 16.0.5
+- Dernière mise à jour : 24/10/2023
+- Éditeur : [Evarisk](https://evarisk.com)
 - Thème : Eldy Menu
 - Licence : GPLv3
 - Disponible sur : Windows - MacOS - Linux
 
+### Version
+
+- Version : 9.13.0
+- PHP : 7.4.33
+- Compatibilité : Dolibarr 16.0.0 - 18.0.1
+- Saturne Framework : 1.2.0
+
 ## Liens
 
-- Support & Assistance : [Forum www.dolibarr.fr](https://www.dolibarr.fr) / Par mail à technique@evarisk.com
-- Demo : [Demo Digirisk](https://www.demodoli.digirisk.com) - ID: demo - Password: demo
+- Support & Assistance : [Forum dolibarr.fr](https://dolibarr.fr) / Par mail à technique@evarisk.com
+- Demo : [Demo Digirisk](https://demodoli.digirisk.com) - ID: demo - Password: demo
 - Documentation : [Wiki Digirisk](https://wiki.dolibarr.org/index.php/Module_DigiriskDolibarr)
 - Projet GitHub : [Projet Digirisk](https://github.com/Evarisk/Digirisk/projects?type=classic)
-- Forum : [Forum Digirisk](https://www.dolibarr.fr/forum/t/module-digirisk-document-unique/37119)
-- D'autres modules développés par Evarisk disponibles sur [Dolistore.com](https://www.dolistore.com)
+- Forum : [Forum Digirisk](https://dolibarr.fr/forum/t/module-digirisk-document-unique/37119)
+- D'autres modules développés par Evarisk disponibles sur [Dolistore.com](https://dolistore.com)
 
 ## Fonctionnalités
 
@@ -41,5 +46,6 @@ Gérez les risques de votre entreprise et créez votre Document Unique en toute 
 
 - Dans le dossier "dolibarr/htdocs/custom" copier la ligne suivante :
 ```
-git clone https://github.com/Evarisk/digiriskdolibarr.git digiriskdolibarr
+git clone -b main https://github.com/Evarisk/Digirisk.git digiriskdolibarr
 ```
+- Activer le module dans la liste des Modules/Applications installés

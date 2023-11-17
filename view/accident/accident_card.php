@@ -1,5 +1,5 @@
 <?php
-/* Copyright (C) 2021 EOXIA <dev@eoxia.com>
+/* Copyright (C) 2021-2023 EVARISK <technique@evarisk.com>
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -21,41 +21,31 @@
  *		\brief      Page to create/edit/view accident
  */
 
-// Load Dolibarr environment
-$res = 0;
-// Try main.inc.php into web root known defined into CONTEXT_DOCUMENT_ROOT (not always defined)
-if ( ! $res && ! empty($_SERVER["CONTEXT_DOCUMENT_ROOT"])) $res = @include $_SERVER["CONTEXT_DOCUMENT_ROOT"] . "/main.inc.php";
-// Try main.inc.php into web root detected using web root calculated from SCRIPT_FILENAME
-$tmp = empty($_SERVER['SCRIPT_FILENAME']) ? '' : $_SERVER['SCRIPT_FILENAME']; $tmp2 = realpath(__FILE__); $i = strlen($tmp) - 1; $j = strlen($tmp2) - 1;
-while ($i > 0 && $j > 0 && isset($tmp[$i]) && isset($tmp2[$j]) && $tmp[$i] == $tmp2[$j]) { $i--; $j--; }
-if ( ! $res && $i > 0 && file_exists(substr($tmp, 0, ($i + 1)) . "/main.inc.php")) $res          = @include substr($tmp, 0, ($i + 1)) . "/main.inc.php";
-if ( ! $res && $i > 0 && file_exists(dirname(substr($tmp, 0, ($i + 1))) . "/main.inc.php")) $res = @include dirname(substr($tmp, 0, ($i + 1))) . "/main.inc.php";
-// Try main.inc.php using relative path
-if ( ! $res && file_exists("../../main.inc.php")) $res       = @include "../../main.inc.php";
-if ( ! $res && file_exists("../../../main.inc.php")) $res    = @include "../../../main.inc.php";
-if ( ! $res && file_exists("../../../../main.inc.php")) $res = @include "../../../../main.inc.php";
-if ( ! $res) die("Include of main fails");
+// Load DigiriskDolibarr environment
+if (file_exists('../../digiriskdolibarr.main.inc.php')) {
+	require_once __DIR__ . '/../../digiriskdolibarr.main.inc.php';
+} elseif (file_exists('../../../digiriskdolibarr.main.inc.php')) {
+	require_once __DIR__ . '/../../../digiriskdolibarr.main.inc.php';
+} else {
+	die('Include of digiriskdolibarr main fails');
+}
 
 require_once DOL_DOCUMENT_ROOT . '/core/lib/date.lib.php';
 require_once DOL_DOCUMENT_ROOT . '/core/class/html.formfile.class.php';
 require_once DOL_DOCUMENT_ROOT . '/core/class/doleditor.class.php';
+require_once DOL_DOCUMENT_ROOT . '/projet/class/project.class.php';
+require_once DOL_DOCUMENT_ROOT . '/core/lib/images.lib.php';
 
-require_once __DIR__ . '/../../class/digiriskdocuments.class.php';
 require_once __DIR__ . '/../../class/digiriskelement.class.php';
 require_once __DIR__ . '/../../class/accident.class.php';
 require_once __DIR__ . '/../../class/digiriskstandard.class.php';
-//require_once __DIR__ . '/../../class/digiriskdocuments/accidentdocument.class.php';
 require_once __DIR__ . '/../../lib/digiriskdolibarr_function.lib.php';
 require_once __DIR__ . '/../../lib/digiriskdolibarr_accident.lib.php';
-require_once __DIR__ . '/../../core/modules/digiriskdolibarr/digiriskelement/accident/mod_accident_standard.php';
-require_once __DIR__ . '/../../core/modules/digiriskdolibarr/digiriskelement/accident_workstop/mod_accident_workstop_standard.php';
-//require_once __DIR__ . '/../../core/modules/digiriskdolibarr/digiriskdocuments/accidentdocument/mod_accidentdocument_standard.php';
-//require_once __DIR__ . '/../../core/modules/digiriskdolibarr/digiriskdocuments/accidentdocument/modules_accidentdocument.php';
 
-global $conf, $db, $hookmanager, $langs, $mysoc, $user;
+global $conf, $db, $hookmanager, $langs, $moduleNameLowerCase, $mysoc, $user;
 
 // Load translation files required by the page
-$langs->loadLangs(array("digiriskdolibarr@digiriskdolibarr", "other"));
+saturne_load_langs();
 
 // Get parameters
 $id                  = GETPOST('id', 'int');
@@ -70,44 +60,57 @@ $backtopage          = GETPOST('backtopage', 'alpha');
 $backtopageforcancel = GETPOST('backtopageforcancel', 'alpha');
 $fk_parent           = GETPOST('fk_parent', 'int');
 $fromiduser          = GETPOST('fromiduser', 'int'); //element id
-
+$accident_type       = GETPOST('accident_type');
+$external_accident   = GETPOST('external_accident');
+$accident_location   = GETPOST('accident_location');
+$fk_soc              = GETPOST('fk_soc');
 // Initialize technical objects
-$object     = new Accident($db);
-$signatory  = new AccidentSignature($db);
-$objectline = new AccidentWorkStop($db);
-//$accidentdocument     = new AccidentDocument($db);
-$contact                = new Contact($db);
-$usertmp                = new User($db);
-$thirdparty             = new Societe($db);
-$extrafields            = new ExtraFields($db);
-$digiriskelement        = new DigiriskElement($db);
-$digiriskstandard       = new DigiriskStandard($db);
-$project                = new Project($db);
+$object           = new Accident($db);
+$signatory        = new SaturneSignature($db, $object->module, $object->element);
+$objectline       = new AccidentWorkStop($db);
+$contact          = new Contact($db);
+$usertmp          = new User($db);
+$thirdparty       = new Societe($db);
+$extrafields      = new ExtraFields($db);
+$digiriskelement  = new DigiriskElement($db);
+$digiriskstandard = new DigiriskStandard($db);
+$project          = new Project($db);
 
 // Load object
 $object->fetch($id);
+if ($id > 0 && $object->external_accident != 2) {
+    unset($object->fk_soc);
+}
 
-$hookmanager->initHooks(array('accidentcard', 'globalcard')); // Note that conf->hooks_modules contains array
+$deletedElements = $digiriskelement->getMultiEntityTrashList();
+if (empty($deletedElements)) {
+    $deletedElements = [0];
+}
+
+// Load numbering modules
+$numberingModules = [
+    'digiriskelement/' . $object->element     => $conf->global->DIGIRISKDOLIBARR_ACCIDENT_ADDON,
+    'digiriskelement/' . $objectline->element => $conf->global->DIGIRISKDOLIBARR_ACCIDENTWORKSTOP_ADDON,
+];
+
+list($refAccidentMod, $refAccidentWorkStopMod) = saturne_require_objects_mod($numberingModules, $moduleNameLowerCase);
+
+$hookmanager->initHooks(['accidentcard', 'globalcard']); // Note that conf->hooks_modules contains array
 
 $upload_dir = $conf->digiriskdolibarr->multidir_output[$conf->entity];
 
-// Security check
-require_once __DIR__ . '/../../core/tpl/digirisk_security_checks.php';
-
+// Security check - Protection if external user
 $permissiontoread   = $user->rights->digiriskdolibarr->accident->read;
 $permissiontoadd    = $user->rights->digiriskdolibarr->accident->write;
 $permissiontodelete = $user->rights->digiriskdolibarr->accident->delete;
 
-if ( ! $permissiontoread) accessforbidden();
-
-$refAccidentMod         = new $conf->global->DIGIRISKDOLIBARR_ACCIDENT_ADDON($db);
-$refAccidentWorkStopMod = new $conf->global->DIGIRISKDOLIBARR_ACCIDENT_WORKSTOP_ADDON($db);
+saturne_check_access($permissiontoread, $object);
 
 /*
  * Actions
  */
 
-$parameters = array();
+$parameters = [];
 $reshook    = $hookmanager->executeHooks('doActions', $parameters, $object, $action); // Note that $action and $object may have been modified by some hooks
 if ($reshook < 0) setEventMessages($hookmanager->error, $hookmanager->errors, 'errors');
 
@@ -118,8 +121,11 @@ if (empty($reshook)) {
 
 	if (empty($backtopage) || ($cancel && empty($id))) {
 		if (empty($backtopage) || ($cancel && strpos($backtopage, '__ID__'))) {
-			if (empty($object->id) && (($action != 'add' && $action != 'create') || $cancel)) $backtopage = $backurlforlist;
-			else $backtopage                                                                              = dol_buildpath('/digiriskdolibarr/view/accident/accident_card.php', 1) . '?id=' . ($object->id > 0 ? $object->id : '__ID__');
+			if (empty($object->id) && (($action != 'add' && $action != 'create') || $cancel)) {
+                $backtopage = $backurlforlist;
+            } else {
+                $backtopage = dol_buildpath('/digiriskdolibarr/view/accident/accident_card.php', 1) . '?id=' . ($object->id > 0 ? $object->id : '__ID__');
+            }
 		}
 	}
 
@@ -142,16 +148,16 @@ if (empty($reshook)) {
 		$accident_type      = GETPOST('accident_type');
 		$external_accident  = GETPOST('external_accident');
 		$accident_location  = GETPOST('accident_location');
-		$ext_society_id     = GETPOST('fk_soc');
+		$extSocietyId       = GETPOST('fk_soc');
 
 		// Initialize object accident
 		$now                       = dol_now();
-		$object->ref               = $refAccidentMod->getNextValue($object);
+		$object->ref               = $object->getNextNumRef();
 		$object->ref_ext           = 'digirisk_' . $object->ref;
 		$object->date_creation     = $object->db->idate($now);
 		$object->tms               = $now;
 		$object->import_key        = "";
-		$object->status            = 1;
+		$object->status            = Accident::STATUS_VALIDATED;
 		$object->label             = $label;
 		$object->description       = $description;
 		$object->accident_type     = $accident_type;
@@ -162,7 +168,7 @@ if (empty($reshook)) {
 		$accident_date = dol_mktime(GETPOST('dateohour', 'int'), GETPOST('dateomin', 'int'), 0, GETPOST('dateomonth', 'int'), GETPOST('dateoday', 'int'), GETPOST('dateoyear', 'int'));
 
 		$object->accident_date = $accident_date;
-		$object->fk_soc           = $ext_society_id;
+		$object->fk_soc           = $extSocietyId;
 
 		switch ($external_accident) {
 			case 1:
@@ -171,15 +177,15 @@ if (empty($reshook)) {
 					$object->fk_element  = 0;
 					$object->fk_soc      = 0;
 				} else if ($digiriskelement_id > 0) {
-					$object->fk_element = $digiriskelement_id;
+					$object->fk_element  = $digiriskelement_id;
 					$object->fk_standard = 0;
-					$object->fk_soc = 0;
+					$object->fk_soc      = 0;
 				}
 					break;
 			case 2:
 				$object->fk_element  = 0;
 				$object->fk_standard = 0;
-				$object->fk_soc      = $ext_society_id;
+				$object->fk_soc      = $extSocietyId;
 				$object->accident_location = '';
 				break;
 			case 3:
@@ -195,58 +201,25 @@ if (empty($reshook)) {
 
 		// Check parameters
 		if ($user_victim_id < 0) {
-			setEventMessages($langs->trans('ErrorFieldRequired', $langs->transnoentitiesnoconv('UserVictim')), null, 'errors');
+			setEventMessages($langs->trans('ErrorFieldRequired', $langs->transnoentitiesnoconv('UserVictim')), [], 'errors');
 			$error++;
 		}
 
 		if ($user_employer_id < 0) {
-			setEventMessages($langs->trans('ErrorFieldRequired', $langs->transnoentitiesnoconv('UserEmployer')), null, 'errors');
+			setEventMessages($langs->trans('ErrorFieldRequired', $langs->transnoentitiesnoconv('UserEmployer')), [], 'errors');
 			$error++;
 		}
 
-		// Submit file
-		if ( ! empty($conf->global->MAIN_UPLOAD_DOC)) {
-			if ( ! empty($_FILES) && ! empty($_FILES['userfile']['name'][0])) {
-				if (is_array($_FILES['userfile']['tmp_name'])) $userfiles = $_FILES['userfile']['tmp_name'];
-				else $userfiles                                           = array($_FILES['userfile']['tmp_name']);
-
-				foreach ($userfiles as $key => $userfile) {
-					if (empty($_FILES['userfile']['tmp_name'][$key])) {
-						$error++;
-						if ($_FILES['userfile']['error'][$key] == 1 || $_FILES['userfile']['error'][$key] == 2) {
-							setEventMessages($langs->trans('ErrorFileSizeTooLarge'), null, 'errors');
-						}
-					}
-				}
-
-				$filedir = $upload_dir . '/accident/' . $object->ref;
-
-				if ( ! file_exists($filedir)) {
-					if (dol_mkdir($filedir) < 0) {
-						$object->error = $langs->transnoentities("ErrorCanNotCreateDir", $filedir);
-						$error++;
-					}
-				}
-
-				if ( ! $error) {
-					dol_mkdir($filedir);
-					if ( ! empty($filedir)) {
-						$result        = digirisk_dol_add_file_process($filedir, 0, 1, 'userfile', '', null, '', 1, $object);
-						$object->photo = $_FILES['userfile']['name'][0];
-					}
-				}
-			}
-		}
-
-		if ( ! $error) {
+		if (!$error) {
 			$result = $object->create($user, false);
 			if ($result > 0) {
-				if (empty($object->fk_user_employer)) {
-					$usertmp->fetch('', $mysoc->managers, $mysoc->id, 0, $conf->entity);
-				} else {
-					$usertmp->fetch($object->fk_user_employer);
-				}
-				$signatory->setSignatory($object->id, 'accident', 'user', array($usertmp->id), 'ACC_USER_EMPLOYER');
+                // Removed while accidents have no document or attendants page
+//				if (empty($object->fk_user_employer)) {
+//					$usertmp->fetch('', $mysoc->managers, $mysoc->id, 0, $conf->entity);
+//				} else {
+//					$usertmp->fetch($object->fk_user_employer);
+//				}
+//				$signatory->setSignatory($object->id, 'accident', 'user', array($usertmp->id), 'Responsible');
 
 				// Creation Accident OK
 				$urltogo = str_replace('__ID__', $result, $backtopage);
@@ -255,8 +228,11 @@ if (empty($reshook)) {
 				exit;
 			} else {
 				// Creation Accident KO
-				if ( ! empty($object->errors)) setEventMessages(null, $object->errors, 'errors');
-				else setEventMessages($object->error, null, 'errors');
+				if (!empty($object->errors)) {
+					setEventMessages('', $object->errors, 'errors');
+				} else {
+					setEventMessages($object->error, [], 'errors');
+				}
 			}
 		} else {
 			$action = 'create';
@@ -274,7 +250,7 @@ if (empty($reshook)) {
 		$accident_type      = GETPOST('accident_type');
 		$external_accident  = GETPOST('external_accident');
 		$accident_location  = GETPOST('accident_location');
-		$ext_society_id     = GETPOST('fk_soc');
+		$extSocietyId       = GETPOST('fk_soc');
 
 		// Initialize object accident
 		$now                       = dol_now();
@@ -289,7 +265,7 @@ if (empty($reshook)) {
 		$accident_date = dol_mktime(GETPOST('dateohour', 'int'), GETPOST('dateomin', 'int'), 0, GETPOST('dateomonth', 'int'), GETPOST('dateoday', 'int'), GETPOST('dateoyear', 'int'));
 
 		$object->accident_date = $accident_date;
-		$object->fk_soc           = $ext_society_id;
+		$object->fk_soc           = $extSocietyId;
 
 		switch ($external_accident) {
 			case 1:
@@ -298,15 +274,15 @@ if (empty($reshook)) {
 					$object->fk_element  = 0;
 					$object->fk_soc      = 0;
 				} else if ($digiriskelement_id > 0) {
-					$object->fk_element = $digiriskelement_id;
+					$object->fk_element  = $digiriskelement_id;
 					$object->fk_standard = 0;
-					$object->fk_soc = 0;
+					$object->fk_soc      = 0;
 				}
 				break;
 			case 2:
 				$object->fk_element  = 0;
 				$object->fk_standard = 0;
-				$object->fk_soc      = $ext_society_id;
+				$object->fk_soc      = $extSocietyId;
 				$object->accident_location = '';
 				break;
 			case 3:
@@ -318,63 +294,29 @@ if (empty($reshook)) {
 		}
 		$object->fk_user_victim   = $user_victim_id;
 		$object->fk_user_employer = $user_employer_id;
-		$object->fk_user_creat    = $user->id ? $user->id : 1;
+		$object->fk_user_creat    = $user->id > 0 ? $user->id : 1;
 
 		// Check parameters
 		if ($user_victim_id < 0) {
-			setEventMessages($langs->trans('ErrorFieldRequired', $langs->transnoentitiesnoconv('UserVictim')), null, 'errors');
+			setEventMessages($langs->trans('ErrorFieldRequired', $langs->transnoentitiesnoconv('UserVictim')), [], 'errors');
 			$error++;
 		}
 
 		if ($user_employer_id < 0) {
-			setEventMessages($langs->trans('ErrorFieldRequired', $langs->transnoentitiesnoconv('UserEmployer')), null, 'errors');
+			setEventMessages($langs->trans('ErrorFieldRequired', $langs->transnoentitiesnoconv('UserEmployer')), [], 'errors');
 			$error++;
 		}
 
-		// Submit file
-		if ( ! empty($conf->global->MAIN_UPLOAD_DOC)) {
-			if ( ! empty($_FILES) && ! empty($_FILES['userfile']['name'][0])) {
-				if (is_array($_FILES['userfile']['tmp_name'])) $userfiles = $_FILES['userfile']['tmp_name'];
-				else $userfiles                                           = array($_FILES['userfile']['tmp_name']);
-
-				foreach ($userfiles as $key => $userfile) {
-					if (empty($_FILES['userfile']['tmp_name'][$key])) {
-						$error++;
-						if ($_FILES['userfile']['error'][$key] == 1 || $_FILES['userfile']['error'][$key] == 2) {
-							setEventMessages($langs->trans('ErrorFileSizeTooLarge'), null, 'errors');
-						}
-					}
-				}
-
-				$filedir = $upload_dir . '/accident/' . $object->ref;
-
-				if ( ! file_exists($filedir)) {
-					if (dol_mkdir($filedir) < 0) {
-						$object->error = $langs->transnoentities("ErrorCanNotCreateDir", $filedir);
-						$error++;
-					}
-				}
-
-				if ( ! $error) {
-					dol_mkdir($filedir);
-					if ( ! empty($filedir)) {
-						$result        = digirisk_dol_add_file_process($filedir, 0, 1, 'userfile', '', null, '', 1, $object);
-						$object->photo = $_FILES['userfile']['name'][0];
-					}
-				}
-			}
-		}
-
-		if ( ! $error) {
-			$result = $object->update($user, false);
+		if (!$error) {
+			$result = $object->update($user);
 			if ($result > 0) {
-				if (empty($object->fk_user_employer)) {
-					$usertmp->fetch('', $mysoc->managers, $mysoc->id, 0, $conf->entity);
-				} else {
-					$usertmp->fetch($object->fk_user_employer);
-				}
-				$signatory->deleteSignatoriesSignatures($object->id, 'accident');
-				$signatory->setSignatory($object->id, 'accident', 'user', array($usertmp->id), 'ACC_USER_EMPLOYER');
+//				if (empty($object->fk_user_employer)) {
+//					$usertmp->fetch('', $mysoc->managers, $mysoc->id, 0, $conf->entity);
+//				} else {
+//					$usertmp->fetch($object->fk_user_employer);
+//				}
+//				$signatory->deleteSignatoriesSignatures($object->id, 'accident');
+//				$signatory->setSignatory($object->id, 'accident', 'user', array($usertmp->id), 'ACC_USER_EMPLOYER');
 
 				// Update Accident OK
 				$urltogo = str_replace('__ID__', $result, $backtopage);
@@ -383,8 +325,11 @@ if (empty($reshook)) {
 				exit;
 			} else {
 				// Update Accident KO
-				if ( ! empty($object->errors)) setEventMessages(null, $object->errors, 'errors');
-				else setEventMessages($object->error, null, 'errors');
+				if ( ! empty($object->errors)) {
+					setEventMessages('', $object->errors, 'errors');
+				} else {
+					setEventMessages($object->error, [], 'errors');
+				}
 			}
 		} else {
 			$action = 'edit';
@@ -400,13 +345,13 @@ if (empty($reshook)) {
 
 
 		// Initialize object accident line
-		$now                             = dol_now();
-		$objectline->date_creation       = $object->db->idate($now);
-		$objectline->status              = 1;
-		$objectline->ref                 = $refAccidentWorkStopMod->getNextValue($objectline);
-		$objectline->entity              = $conf->entity;
-		$objectline->workstop_days       = $workstop_days;
-		$objectline->declaration_link    = $declaration_link;
+		$now                          = dol_now();
+        $objectline->ref              = $objectline->getNextNumRef();
+        $objectline->date_creation    = $object->db->idate($now);
+		$objectline->status           = 1;
+		$objectline->entity           = $conf->entity;
+		$objectline->workstop_days    = $workstop_days;
+		$objectline->declaration_link = $declaration_link;
 
 		$date_start_workstop = dol_mktime(GETPOST('datestarthour', 'int'), GETPOST('datestartmin', 'int'), 0, GETPOST('datestartmonth', 'int'), GETPOST('datestartday', 'int'), GETPOST('datestartyear', 'int'));
 		$date_end_workstop   = dol_mktime(GETPOST('dateendhour', 'int'), GETPOST('dateendmin', 'int'), 0, GETPOST('dateendmonth', 'int'), GETPOST('dateendday', 'int'), GETPOST('dateendyear', 'int'));
@@ -416,26 +361,29 @@ if (empty($reshook)) {
 		$objectline->fk_accident         = $parent_id;
 
 		// Check parameters
-		if (empty($workstop_days)) {
+		if ($workstop_days <= 0) {
 			setEventMessages($langs->trans('ErrorFieldNotEmpty', $langs->transnoentitiesnoconv('WorkStopDays')), null, 'errors');
 			$error++;
 		}
 
-		if ( ! $error) {
-			$result = $objectline->insert($user, false);
+		if (!$error) {
+			$result = $objectline->create($user, false);
 			if ($result > 0) {
 				// Creation accident line OK
 				rename($conf->digiriskdolibarr->multidir_output[$conf->entity] . '/accident/' . $object->ref . '/workstop/temp/', $conf->digiriskdolibarr->multidir_output[$conf->entity] . '/accident/' . $object->ref . '/workstop/' . $objectline->ref);
 
-				setEventMessages($langs->trans('AddAccidentWorkStop') . ' ' . $object->ref, array());
+				setEventMessages($langs->trans('AddAccidentWorkStop') . ' ' . $object->ref, []);
 				$urltogo = str_replace('__ID__', $result, $backtopage);
 				$urltogo = preg_replace('/--IDFORBACKTOPAGE--/', $id, $urltogo); // New method to autoselect project after a New on another form object creation
 				header("Location: " . $urltogo);
 				exit;
 			} else {
 				// Creation accident line KO
-				if ( ! empty($objectline->errors)) setEventMessages(null, $objectline->errors, 'errors');
-				else setEventMessages($objectline->error, null, 'errors');
+				if (!empty($objectline->errors)) {
+					setEventMessages('', $objectline->errors, 'errors');
+				} else {
+					setEventMessages($objectline->error, [], 'errors');
+				}
 			}
 		}
 	}
@@ -450,7 +398,7 @@ if (empty($reshook)) {
 		$objectline->fetch($lineid);
 
 		// Initialize object accident line
-		$objectline->workstop_days       = $workstop_days;
+		$objectline->workstop_days = $workstop_days;
 
 		$date_start_workstop = dol_mktime(GETPOST('datestarthour', 'int'), GETPOST('datestartmin', 'int'), 0, GETPOST('datestartmonth', 'int'), GETPOST('datestartday', 'int'), GETPOST('datestartyear', 'int'));
 		$date_end_workstop   = dol_mktime(GETPOST('dateendhour', 'int'), GETPOST('dateendmin', 'int'), 0, GETPOST('dateendmonth', 'int'), GETPOST('dateendday', 'int'), GETPOST('dateendyear', 'int'));
@@ -461,26 +409,29 @@ if (empty($reshook)) {
 		$objectline->declaration_link    = $declaration_link;
 
 		// Check parameters
-		if (empty($workstop_days)) {
-			setEventMessages($langs->trans('ErrorFieldNotEmpty', $langs->transnoentitiesnoconv('WorkStopDays')), null, 'errors');
+		if ($workstop_days <= 0) {
+			setEventMessages($langs->trans('ErrorFieldNotEmpty', $langs->transnoentitiesnoconv('WorkStopDays')), [], 'errors');
 			header("Location: " . $_SERVER['PHP_SELF'] . '?id=' . $id . '&action=editline&lineid=' .  $lineid);
 			exit;
 			$error++;
 		}
 
-		if ( ! $error) {
+		if (!$error) {
 			$result = $objectline->update($user, false);
 			if ($result > 0) {
 				// Update accident line OK
-				setEventMessages($langs->trans('UpdateAccidentWorkStop') . ' ' . $object->ref, array());
+				setEventMessages($langs->trans('UpdateAccidentWorkStop') . ' ' . $object->ref, []);
 				$urltogo = str_replace('__ID__', $result, $backtopage);
 				$urltogo = preg_replace('/--IDFORBACKTOPAGE--/', $parent_id, $urltogo); // New method to autoselect project after a New on another form object creation
 				header("Location: " . $urltogo);
 				exit;
 			} else {
 				// Update accident line KO
-				if ( ! empty($object->errors)) setEventMessages(null, $object->errors, 'errors');
-				else setEventMessages($object->error, null, 'errors');
+				if (!empty($object->errors)) {
+					setEventMessages('', $object->errors, 'errors');
+				} else {
+					setEventMessages($object->error, [], 'errors');
+				}
 			}
 		}
 	}
@@ -494,29 +445,32 @@ if (empty($reshook)) {
 		$pathPhoto = $upload_dir . '/accident/' . $object->ref . '/workstop/' . $objectline->ref;
 		$filedir   = $upload_dir . '/accident/' . $object->ref . '/archive/workstop/';
 
-		if ( ! file_exists($filedir)) {
+		if (!file_exists($filedir)) {
 			if (dol_mkdir($filedir) < 0) {
 				$object->error = $langs->transnoentities("ErrorCanNotCreateDir", $filedir);
 				$error++;
 			}
 		}
 
-		if ( ! $error) {
+		if (!$error) {
 			rename($pathPhoto, $filedir . $objectline->ref);
 			$result = $objectline->delete($user, false);
 		}
 
 		if ($result > 0) {
 			// Deletion accident line OK
-			setEventMessages($langs->trans('DeleteAccidentWorkStop') . ' ' . $object->ref, array());
+			setEventMessages($langs->trans('DeleteAccidentWorkStop') . ' ' . $object->ref, []);
 			$urltogo = str_replace('__ID__', $result, $backtopage);
 			$urltogo = preg_replace('/--IDFORBACKTOPAGE--/', $parent_id, $urltogo); // New method to autoselect project after a New on another form object creation
 			header("Location: " . $urltogo);
 			exit;
 		} else {
 			// Deletion accident line KO
-			if ( ! empty($object->errors)) setEventMessages(null, $object->errors, 'errors');
-			else setEventMessages($object->error, null, 'errors');
+			if (!empty($object->errors)) {
+				setEventMessages('', $object->errors, 'errors');
+			} else {
+				setEventMessages($object->error, [], 'errors');
+			}
 		}
 	}
 
@@ -532,30 +486,34 @@ if (empty($reshook)) {
 		}
 		$object->fetch($id);
 
-		if ( ! empty($_FILES) && ! empty($_FILES['files']['name'][0])) {
-			if (is_array($_FILES['files']['tmp_name'])) $filess = $_FILES['files']['tmp_name'];
-			else $filess                                        = array($_FILES['files']['tmp_name']);
+		if (!empty($_FILES) && ! empty($_FILES['files']['name'][0])) {
+			if (is_array($_FILES['files']['tmp_name'])) {
+				$files = $_FILES['files']['tmp_name'];
+			}
+			else {
+				$files = array($_FILES['files']['tmp_name']);
+			}
 
-			foreach ($filess as $key => $files) {
+			foreach ($files as $key => $file) {
 				if (empty($_FILES['files']['tmp_name'][$key])) {
 					$error++;
 					if ($_FILES['files']['error'][$key] == 1 || $_FILES['files']['error'][$key] == 2) {
-						setEventMessages($langs->trans('ErrorFileSizeTooLarge'), null, 'errors');
+						setEventMessages($langs->trans('ErrorFileSizeTooLarge'), [], 'errors');
 					}
 				}
 			}
 
-			$filedir = $conf->digiriskdolibarr->multidir_output[isset($object->entity) ? $object->entity : 1] . '/accident/' . $object->ref . '/workstop/' . $folder;
-			if ( ! file_exists($filedir)) {
+			$filedir = $conf->digiriskdolibarr->multidir_output[$object->entity ?? 1] . '/accident/' . $object->ref . '/workstop/' . $folder;
+			if (!file_exists($filedir)) {
 				if (dol_mkdir($filedir) < 0) {
 					$object->error = $langs->transnoentities("ErrorCanNotCreateDir", $filedir);
 					$error++;
 				}
 			}
 
-			if ( ! $error) {
+			if (!$error) {
 				dol_mkdir($filedir);
-				if ( ! empty($filedir)) {
+				if (!empty($filedir)) {
 					$result = digirisk_dol_add_file_process($filedir, 0, 1, 'files', '', null, '', 1, $object);
 				}
 			}
@@ -593,28 +551,55 @@ if (empty($reshook)) {
 
 		$action = '';
 	}
+
+    // Action clone object
+    if ($action == 'confirm_clone' && $confirm == 'yes') {
+        $options['label']    = GETPOST('clone_label');
+        $options['workstop'] = GETPOST('clone_workstop');
+        $options['lesion']   = GETPOST('clone_lesion');
+        $options['metadata'] = GETPOST('clone_metadata');
+        $options['photos']   = GETPOST('clone_photos');
+        if ($object->id > 0) {
+            $result = $object->createFromClone($user, $object->id, $options);
+            if ($result > 0) {
+                header("Location: " . $_SERVER['PHP_SELF'] . '?id=' . $result);
+                exit();
+            } else {
+                setEventMessages($object->error, $object->errors, 'errors');
+                $action = '';
+            }
+        }
+    }
+
+	// Actions cancel, add, update, update_extras, confirm_validate, confirm_delete, confirm_deleteline, confirm_clone, confirm_close, confirm_setdraft, confirm_reopen
+	require_once DOL_DOCUMENT_ROOT . '/core/actions_addupdatedelete.inc.php';
+
+	// Action confirm_lock, confirm_archive.
+	require_once __DIR__ . '/../../../saturne/core/tpl/signature/signature_action_workflow.tpl.php';
+
+    // Actions set_thirdparty, set_project
+    require_once __DIR__ . '/../../../saturne/core/tpl/actions/banner_actions.tpl.php';
 }
 
 /*
  * View
  */
 
-$form = new Form($db);
+$form    = new Form($db);
+$title   = $langs->trans("Accident");
+$helpUrl = 'FR:Module_Digirisk#DigiRisk_-_Accident_b.C3.A9nins_et_presque_accidents';
 
-$title         = $langs->trans("Accident");
-$title_create  = $langs->trans("NewAccident");
-$title_edit    = $langs->trans("ModifyAccident");
-$object->picto = 'accident@digiriskdolibarr';
+if ($conf->browser->layout == 'phone') {
+	$onPhone = 1;
+} else {
+	$onPhone = 0;
+}
 
-$help_url = 'FR:Module_DigiriskDolibarr';
-$morejs   = array("/digiriskdolibarr/js/digiriskdolibarr.js");
-$morecss  = array("/digiriskdolibarr/css/digiriskdolibarr.css");
-
-llxHeader('', $title, $help_url, '', '', '', $morejs, $morecss);
+saturne_header(1,'', $title, $helpUrl);
 
 // Part to create
 if ($action == 'create') {
-	print load_fiche_titre($title_create, '', "digiriskdolibarr32px@digiriskdolibarr");
+	print load_fiche_titre($langs->trans("NewAccident"), '', $object->picto);
 
 	print '<form method="POST" action="' . $_SERVER["PHP_SELF"] . '" enctype="multipart/form-data">';
 	print '<input type="hidden" name="token" value="' . newToken() . '">';
@@ -655,33 +640,33 @@ if ($action == 'create') {
 
 	//AccidentType
 	print '<tr><td class="minwidth400">' . $langs->trans("AccidentType") . '</td><td>';
-	print $form->selectarray('accident_type', array('0' => $langs->trans('WorkAccidentStatement'), '1' => $langs->trans('CommutingAccident')), '', 0, 0, 0, '', 0, 0, 0, '', 'minwidth300', 1);
+	print $form->selectarray('accident_type', array('0' => $langs->trans('WorkAccidentStatement'), '1' => $langs->trans('CommutingAccident')), $accident_type, 0, 0, 0, '', 0, 0, 0, '', 'minwidth300', 1);
 	print '</td></tr>';
 
 	//ExternalAccident
 	print '<tr><td class="minwidth400">' . $langs->trans("ExternalAccident") . '</td><td>';
-	print $form->selectarray('external_accident', array('1' => $langs->trans('No'), '2' => $langs->trans('Yes'), '3' => $langs->trans('Other')), '', 0, 0, 0, '', 0, 0, 0, '', 'minwidth300', 1);
+	print $form->selectarray('external_accident', array('1' => $langs->trans('No'), '2' => $langs->trans('Yes'), '3' => $langs->trans('Other')), $external_accident, 0, 0, 0, '', 0, 0, 0, '', 'minwidth300', 1);
 	print '</td></tr>';
 
 	//FkElement -- Lieu de l'accident - DigiriskElement
-	print '<tr class="fk_element_field"><td class="minwidth400">' . $langs->trans("AccidentLocation") . '</td><td>';
-	print $digiriskelement->select_digiriskelement_list(( ! empty(GETPOST('fromid')) ? GETPOST('fromid') : $object->fk_element), 'fk_element', '', 0, 0, array(), 0, 0, 'minwidth300', 0, false, 0);
+	print '<tr class="fk_element_field"'. (GETPOST('external_accident') < 2 ? '' : 'style="display:none"') . '><td class="minwidth400">' . $langs->trans("AccidentLocation") . '</td><td>';
+	print $digiriskelement->selectDigiriskElementList((!empty(GETPOST('fromid')) ? GETPOST('fromid') : $object->fk_element), 'fk_element', ['customsql' => ' t.rowid NOT IN (' . implode(',', $deletedElements) . ')'], 0, 0, [], 0, 0, 'minwidth300');
 	print '</td></tr>';
 
 	//FkSoc -- Lieu de l'accident - Société extérieure
-	print '<tr class="fk_soc_field hidden"' . (GETPOST('fk_soc') > 0 ? '' : 'style="display:none"') . '><td class="minwidth400">' . $langs->trans("AccidentLocation") . '</td>';
+	print '<tr class="fk_soc_field"' . (GETPOST('external_accident') == 2 ? '' : 'style="display:none"') . '><td class="minwidth400">' . $langs->trans("AccidentLocation") . '</td>';
 	print '<td>';
 	//For external user force the company to user company
-	if ( ! empty($user->socid)) {
+	if (!empty($user->socid)) {
 		print $form->select_company($user->socid, 'fk_soc', '', 1, 1, 0, '', 0, 'minwidth300');
 	} else {
-		print $form->select_company('', 'fk_soc', '', 'SelectThirdParty', 1, 0, '', 0, 'minwidth300');
+		print $form->select_company($fk_soc, 'fk_soc', '', 'SelectThirdParty', 1, 0, '', 0, 'minwidth300');
 	}
 	print ' <a href="' . DOL_URL_ROOT . '/societe/card.php?action=create&backtopage=' . urlencode($_SERVER["PHP_SELF"] . '?action=create') . '" target="_blank"><span class="fa fa-plus-circle valignmiddle paddingleft" title="' . $langs->trans("AddThirdParty") . '"></span></a>';
 	print '</td></tr>';
 
 	//AccidentLocation -- lieu de l'accident
-	print '<tr class="accident_location_field hidden" ' . (GETPOST('accident_location') ? '' : 'style="display:none"') . '><td class="minwidth400">' . $langs->trans("AccidentLocation") . '</td><td>';
+	print '<tr class="accident_location_field" ' . (GETPOST('external_accident') == 3 ? '' : 'style="display:none"') . '><td class="minwidth400">' . $langs->trans("AccidentLocation") . '</td><td>';
 	$doleditor = new DolEditor('accident_location', GETPOST('accident_location'), '', 90, 'dolibarr_details', '', false, true, $conf->global->FCKEDITOR_ENABLE_SOCIETE, ROWS_3, '90%');
 	$doleditor->Create();
 	print '</td></tr>';
@@ -695,10 +680,6 @@ if ($action == 'create') {
 	print '<tr class="content_field"><td><label for="content">' . $langs->trans("Description") . '</label></td><td>';
 	$doleditor = new DolEditor('description', GETPOST('description'), '', 90, 'dolibarr_details', '', false, true, $conf->global->FCKEDITOR_ENABLE_SOCIETE, ROWS_3, '90%');
 	$doleditor->Create();
-	print '</td></tr>';
-
-	print '<tr><td class="titlefield">' . $form->editfieldkey($langs->trans("Photo"), 'Photo', '', $object, 0) . '</td><td>';
-	print '<input class="flat" type="file" name="userfile[]" id="Photo" />';
 	print '</td></tr>';
 
 	// Other attributes
@@ -718,7 +699,7 @@ if ($action == 'create') {
 
 // Part to edit record
 if (($id || $ref) && $action == 'edit') {
-	print load_fiche_titre($title_edit, '', "digiriskdolibarr32px@digiriskdolibarr");
+	print load_fiche_titre($langs->trans("ModifyAccident"), '', $object->picto);
 
 	print '<form method="POST" action="' . $_SERVER["PHP_SELF"] . '" enctype="multipart/form-data">';
 	print '<input type="hidden" name="token" value="' . newToken() . '">';
@@ -771,8 +752,8 @@ if (($id || $ref) && $action == 'edit') {
 
 	//AccidentLocation -- Lieu de l'accident
 	print '<tr class="' . (($object->external_accident == 1) ? ' fk_element_field' : ' fk_element_field hidden' ) . '" style="' . (($object->external_accident == 1) ? ' ' : ' display:none') . '"><td>' . $langs->trans("AccidentLocation") . '</td><td>';
-	print $digiriskelement->select_digiriskelement_list($object->fk_element, 'fk_element', '', 0, 0, array(), 0, 0, 'minwidth300', 0, false, 0);
-	print '</td></tr>';
+    print $digiriskelement->selectDigiriskElementList($object->fk_element, 'fk_element', ['customsql' => ' t.rowid NOT IN (' . implode(',', $deletedElements) . ')'], 0, 0, [], 0, 0, 'minwidth300');
+    print '</td></tr>';
 
 	//FkSoc -- Société extérieure
 	print '<tr class="' . (($object->external_accident == 2) ? ' fk_soc_field' : ' fk_soc_field hidden' ) . '" style="' . (($object->external_accident == 2) ? ' ' : ' display:none') . '"><td class="minwidth400">' . $langs->trans("AccidentLocation") . '</td>';
@@ -803,10 +784,6 @@ if (($id || $ref) && $action == 'edit') {
 	$doleditor->Create();
 	print '</td></tr>';
 
-	print '<tr><td class="titlefield">' . $form->editfieldkey($langs->trans("Photo"), 'Photo', '', $object, 0) . '</td><td>';
-	print '<input class="flat" type="file" name="userfile[]" id="Photo" />';
-	print '</td></tr>';
-
 	// Other attributes
 	include DOL_DOCUMENT_ROOT . '/core/tpl/extrafields_add.tpl.php';
 	print '</table>';
@@ -820,22 +797,6 @@ if (($id || $ref) && $action == 'edit') {
 	print '</form>';
 }
 
-$formconfirm = '';
-// Confirmation to delete
-if ($action == 'deleteline') {
-	$objectline->fetch($lineid);
-	$formconfirm = $form->formconfirm($_SERVER["PHP_SELF"] . '?id=' . $object->id . '&lineid=' . $lineid, $langs->trans('DeleteAccidentWorkStop'), $langs->trans('ConfirmDeleteAccidentWorkStop', $objectline->ref), 'confirm_deleteLine', '', 0, 1);
-}
-
-// Call Hook formConfirm
-$parameters                        = array('formConfirm' => $formconfirm, 'object' => $object);
-$reshook                           = $hookmanager->executeHooks('formConfirm', $parameters, $object, $action); // Note that $action and $object may have been modified by hook
-if (empty($reshook)) $formconfirm .= $hookmanager->resPrint;
-elseif ($reshook > 0) $formconfirm = $hookmanager->resPrint;
-
-// Print form confirm
-print $formconfirm;
-
 // Part to show record
 if ((empty($action) || ($action != 'create' && $action != 'edit'))) {
 	$counter = 0;
@@ -843,10 +804,10 @@ if ((empty($action) || ($action != 'create' && $action != 'edit'))) {
 	$morecssGauge     = 'inline-block floatright';
 	$move_title_gauge = 1;
 
-	$arrayAccident   = array();
+	$arrayAccident   = [];
 	$arrayAccident[] = $object->ref;
 	$arrayAccident[] = $object->label;
-	$arrayAccident[] = ( ! empty($object->accident_type) ? $object->accident_type : 0);
+	$arrayAccident[] = (!empty($object->accident_type) ? $object->accident_type : 0);
 	$arrayAccident[] = $object->accident_date;
 	$arrayAccident[] = $object->description;
 	switch ($object->external_accident) {
@@ -872,48 +833,63 @@ if ((empty($action) || ($action != 'create' && $action != 'edit'))) {
 
 	// Object card
 	// ------------------------------------------------------------
-	$res = $object->fetch_optionals();
+	$object->fetch_optionals();
 
-	$head = accidentPrepareHead($object);
-	print dol_get_fiche_head($head, 'accidentCard', $title, -1, "digiriskdolibarr@digiriskdolibarr");
-
-	$height                                   = 80;
-	$width                                    = 80;
-	dol_strlen($object->label) ? $morehtmlref = '<span>' . ' - ' . $object->label . '</span>' : '';
-	$morehtmlref                             .= '<div class="refidno">';
-	// Project
-	$project->fetch($object->fk_project);
-	$morehtmlref .= $langs->trans('Project') . ' : ' . getNomUrlProject($project, 1, 'blank');
-	//Number workstop days
-	$accidentlines     = $objectline->fetchFromParent($object->id);
-	$totalworkstopdays = 0;
-
-	if ( ! empty($accidentlines) && $accidentlines > 0) {
-		foreach ($accidentlines as $accidentline) {
-			if ($accidentline->status > 0) {
-				$totalworkstopdays += $accidentline->workstop_days;
-			}
-		}
-		$morehtmlref .= '<br>' . $langs->trans('TotalWorkStopDays') . ' : ' . $totalworkstopdays;
-
-		$lastaccidentline = end($accidentlines);
-
-		$morehtmlref .= '<br>' . $langs->trans('ReturnWorkDate') . ' : ' . dol_print_date($lastaccidentline->date_end_workstop, 'dayhour');
-	} else {
-		$morehtmlref .= '<br>' . $langs->trans('RegisterAccident');
-	}
-
-	$morehtmlref .= '</div>';
+	saturne_get_fiche_head($object, 'card', $title);
 
 	include_once './../../core/tpl/digiriskdolibarr_configuration_gauge_view.tpl.php';
 
-	$morehtmlleft = '<div class="floatleft inline-block valignmiddle divphotoref">' . digirisk_show_photos('digiriskdolibarr', $conf->digiriskdolibarr->multidir_output[$conf->entity] . '/' . $object->element, 'small', 5, 0, 0, 0, $height, $width, 0, 0, 0, $object->element, $object) . '</div>';
+    // Object card
+    // ------------------------------------------------------------
+    list($moreHtmlRef, $moreParams) = $object->getBannerTabContent();
 
-	$linkback = '<a href="' . dol_buildpath('/digiriskdolibarr/view/accident/accident_list.php', 1) . '">' . $langs->trans("BackToList") . '</a>';
+    $object->fetch($id);
+	saturne_banner_tab($object, 'id', '', 1, 'rowid', 'ref', $moreHtmlRef, dol_strlen($object->photo) > 0, $moreParams);
 
-	digirisk_banner_tab($object, 'id', $linkback, 1, 'rowid', 'ref', $morehtmlref);
+	$formConfirm = '';
 
-	print '<div class="div-table-responsive">';
+	// Confirmation to delete
+	if ($action == 'delete' && $permissiontodelete) {
+		$formConfirm = $form->formconfirm($_SERVER["PHP_SELF"].'?id=' . $object->id, $langs->trans('DeleteAccident'), $langs->trans('ConfirmDeleteAccident'), 'confirm_delete', '', 0, 1);
+	}
+
+	// Confirmation to delete line
+	if ($action == 'deleteline') {
+		$objectline->fetch($lineid);
+		$formConfirm = $form->formconfirm($_SERVER["PHP_SELF"] . '?id=' . $object->id . '&lineid=' . $lineid, $langs->trans('DeleteAccidentWorkStop'), $langs->trans('ConfirmDeleteAccidentWorkStop', $objectline->ref), 'confirm_deleteLine', '', 0, 1);
+	}
+
+	// Clone confirmation
+	if (($action == 'clone' && (empty($conf->use_javascript_ajax) || !empty($conf->dol_use_jmobile))) || (!empty($conf->use_javascript_ajax) && empty($conf->dol_use_jmobile))) {
+        $formQuestionClone = [
+            ['type' => 'text',     'name' => 'clone_label',    'label' => $langs->trans('NewLabelForClone', $langs->transnoentities('The' . ucfirst($object->element))), 'value' => $langs->trans('CopyOf') . ' ' . $object->ref, 'size' => 24],
+            ['type' => 'checkbox', 'name' => 'clone_workstop', 'label' => $langs->trans('CloneWorkStop'), 'value' => 1],
+            ['type' => 'checkbox', 'name' => 'clone_metadata', 'label' => $langs->trans('CloneMetadata'), 'value' => 1],
+            ['type' => 'checkbox', 'name' => 'clone_lesion',   'label' => $langs->trans('CloneLesion'),   'value' => 1],
+            ['type' => 'checkbox', 'name' => 'clone_photos',   'label' => $langs->trans('ClonePhotos'),   'value' => 1]
+        ];
+
+        $formConfirm .= $form->formconfirm($_SERVER['PHP_SELF'] . '?id=' . $object->id, $langs->trans('CloneObject', $langs->transnoentities('The' . ucfirst($object->element))), $langs->trans('ConfirmCloneObject', $langs->transnoentities('The' . ucfirst($object->element))), 'confirm_clone', $formQuestionClone, 'yes', 'actionButtonClone', 350, 600);
+	}
+
+	// Confirmation to lock
+	if (($action == 'lock' && (empty($conf->use_javascript_ajax) || !empty($conf->dol_use_jmobile))) || (!empty($conf->use_javascript_ajax) && empty($conf->dol_use_jmobile))) {
+		$formConfirm .= $form->formconfirm($_SERVER['PHP_SELF'] . '?id=' . $object->id, $langs->trans('LockObject', $langs->transnoentities('The' . ucfirst($object->element))), $langs->trans('ConfirmLockObject', $langs->transnoentities('The' . ucfirst($object->element))), 'confirm_lock', '', 'yes', 'actionButtonLock', 350, 600);
+	}
+
+	// Call Hook formConfirm.
+	$parameters = ['formConfirm' => $formConfirm];
+	$reshook    = $hookmanager->executeHooks('formConfirm', $parameters, $object, $action); // Note that $action and $object may have been modified by hook.
+
+	if (empty($reshook)) {
+		$formConfirm .= $hookmanager->resPrint;
+	} elseif ($reshook > 0) {
+		$formConfirm = $hookmanager->resPrint;
+	}
+
+	// Print form confirm
+	print $formConfirm;
+
 	print '<div class="fichecenter">';
 	print '<div class="fichehalfleft">';
 	print '<table class="border centpercent tableforfield">';
@@ -990,10 +966,10 @@ if ((empty($action) || ($action != 'create' && $action != 'edit'))) {
 		case 1:
 			if ($object->fk_standard > 0) {
 				$digiriskstandard->fetch($conf->global->DIGIRISKDOLIBARR_ACTIVE_STANDARD);
-				print $digiriskstandard->getNomUrl(1, 'blank', 1);
+				print $digiriskstandard->getNomUrl(1, 'blank', 0, '', -1, 1);
 			} else if ($object->fk_element > 0) {
 				$digiriskelement->fetch($object->fk_element);
-				print $digiriskelement->getNomUrl(1, 'blank', 1);
+				print $digiriskelement->getNomUrl(1, 'blank', 0, '', -1, 1);
 			}
 			break;
 		case 2:
@@ -1014,142 +990,190 @@ if ((empty($action) || ($action != 'create' && $action != 'edit'))) {
 	print $object->description;
 	print '</td></tr>';
 
-	print '</table>';
-	print '</div>';
-	print '</div>';
+    print '<tr class="linked-medias photo gallery-table"> <td class=""><label for="photo">' . $langs->trans("Photos") . '</label></td>';
+    print '<td class="linked-medias-list">';
+    $pathPhotos = $conf->digiriskdolibarr->multidir_output[$conf->entity] . '/accident/' . $object->ref . '/photos';
+    ?>
+    <span class="add-medias" <?php echo ($object->status <= Accident::STATUS_VALIDATED) ? '' : 'style="display:none"' ?>>
+		<input hidden multiple class="fast-upload" id="fast-upload-photo-default" type="file" name="userfile[]" capture="environment" accept="image/*">
+		<label for="fast-upload-photo-default">
+			<div class="wpeo-button button-square-50">
+				<i class="fas fa-camera"></i><i class="fas fa-plus-circle button-add"></i>
+			</div>
+		</label>
+		<input type="hidden" class="favorite-photo" id="photo" name="photo" value="<?php echo $object->photo ?>"/>
+		<div class="wpeo-button <?php echo ($onPhone ? 'button-square-40' : 'button-square-50'); ?> 'open-media-gallery add-media modal-open" value="0">
+			<input type="hidden" class="modal-options" data-modal-to-open="media_gallery" data-from-id="<?php echo $object->id?>" data-from-type="accident" data-from-subtype="photo" data-from-subdir="photos"/>
+			<i class="fas fa-folder-open"></i><i class="fas fa-plus-circle button-add"></i>
+		</div>
+	</span>
+    <?php
+    $relativepath = 'digiriskdolibarr/medias/thumbs';
+    print saturne_show_medias_linked('digiriskdolibarr', $pathPhotos, 'small', 0, 0, 0, 0, 50, 50, 0, 0, 0, 'accident/'. $object->ref . '/photos/', $object, 'photo', $permissiontoadd, $permissiontodelete && $object->status <= Accident::STATUS_VALIDATED);
+    print '</td></tr>';
 
-	print dol_get_fiche_end();
+    print '</table></div>';
+    print '<div class="clearboth"></div>';
+    print dol_get_fiche_end();
 
 	if ($object->id > 0) {
 		// Buttons for actions
 		print '<div class="tabsAction" >';
-		$parameters = array();
+		$parameters = [];
 		$reshook    = $hookmanager->executeHooks('addMoreActionsButtons', $parameters, $object, $action); // Note that $action and $object may have been modified by hook
 		if ($reshook < 0) setEventMessages($hookmanager->error, $hookmanager->errors, 'errors');
 
 		if (empty($reshook)) {
-			print '<a class="' . ($object->status == 1 ? 'butAction' : 'butActionRefused classfortooltip') . '" id="actionButtonEdit" title="' . ($object->status == 1 ? '' : dol_escape_htmltag($langs->trans("AccidentMustBeInProgress"))) . '" href="' . ($object->status == 1 ? ($_SERVER["PHP_SELF"] . '?id=' . $object->id . '&action=edit') : '#') . '">' . $langs->trans("Modify") . '</a>';
+			// Edit
+			$displayButton = $onPhone ? '<i class="fas fa-edit fa-2x"></i>' : '<i class="fas fa-edit"></i>' . ' ' . $langs->trans('Modify');
+			if ($object->status == $object::STATUS_VALIDATED) {
+				print '<a class="butAction" id="actionButtonEdit" href="' . $_SERVER['PHP_SELF'] . '?id=' . $object->id . '&action=edit' . '">' . $displayButton . '</a>';
+			} else {
+				print '<span class="butActionRefused classfortooltip" title="' . dol_escape_htmltag($langs->trans('ObjectMustBeDraft', ucfirst($langs->transnoentities('The' . ucfirst($object->element))))) . '">' . $displayButton . '</span>';
+			}
+
+			// Lock.
+			$displayButton = $onPhone ? '<i class="fas fa-lock fa-2x"></i>' : '<i class="fas fa-lock"></i>' . ' ' . $langs->trans('Lock');
+			if ($object->status == Accident::STATUS_VALIDATED) {
+				print '<span class="butAction" id="actionButtonLock">' . $displayButton . '</span>';
+			} else {
+				print '<span class="butActionRefused classfortooltip" title="' . dol_escape_htmltag($langs->trans('ObjectMustBeDraft', ucfirst($langs->transnoentities('The' . ucfirst($object->element))))) . '">' . $displayButton . '</span>';
+			}
+
+			// Create Investigation.
+			$displayButton = $onPhone ? '<i class="fas fa-search-plus fa-2x"></i>' : '<i class="fas fa-search-plus"></i> ' . $langs->trans('AccidentInvestigation');
+			if ($object->status == $object::STATUS_LOCKED) {
+				print '<a class="butAction" id="actionButtonCreateInvestigation" href="'. dol_buildpath('/custom/digiriskdolibarr/view/accidentinvestigation/accidentinvestigation_card.php?action=create&fk_accident=' . $id, 1) .'">' . $displayButton . '</a>';
+			} else {
+				print '<span class="butActionRefused classfortooltip" title="' . dol_escape_htmltag($langs->trans('ObjectMustBeLocked', ucfirst($langs->transnoentities('The' . ucfirst($object->element))))) . '">' . $displayButton . '</span>';
+			}
+
+			// Clone.
+			$displayButton = $onPhone ? '<i class="fas fa-clone fa-2x"></i>' : '<i class="fas fa-clone"></i>' . ' ' . $langs->trans('ToClone');
+			print '<span class="butAction" id="actionButtonClone" href="' . $_SERVER['PHP_SELF'] . '?id=' . $object->id . '&action=clone' . '">' . $displayButton . '</span>';
+
+			// Delete (need delete permission, or if draft, just need create/modify permission).
+			$displayButton = $onPhone ? '<i class="fas fa-trash fa-2x"></i>' : '<i class="fas fa-trash"></i>' . ' ' . $langs->trans('Delete');
+			print dolGetButtonAction($displayButton, '', 'delete', $_SERVER['PHP_SELF'] . '?id=' . $object->id . '&action=delete&token=' . newToken(), '', $permissiontodelete);
 		}
 		print '</div>';
 
-		// ACCIDENT LINES
-		print '<div class="div-table-responsive-no-min" style="overflow-x: unset !important">';
-		print load_fiche_titre($langs->trans("AccidentRiskList"), '', '');
-		print '<table id="tablelines" class="noborder noshadow" width="100%">';
-
-		global $forceall, $forcetoshowtitlelines;
-
-		if (empty($forceall)) $forceall = 0;
-
-		// Define colspan for the button 'Add'
-		$colspan = 3; // Columns: total ht + col edit + col delete
-		$img_extensions = array('png', 'jpg', 'jpeg');
-
 		// Accident Lines
-		$accidentlines = $objectline->fetchFromParent($object->id);
+		$accidentWorkstops = $objectline->fetchFromParent($object->id);
 
-		print '<tr class="liste_titre">';
-		print '<td><span>' . $langs->trans('Ref.') . '</span></td>';
-		print '<td>' . '<b>' . $langs->trans('WorkStopDays') . '</b><span style="color:red"> *</span>' . '</td>';
-		print '<td>' . $langs->trans('DateStartWorkStop') . '</td>';
-		print '<td>' . $langs->trans('DateEndWorkStop') . '</td>';
-		print '<td>' . $langs->trans('WorkStopDocument') . '</td>';
-		print '<td class="center" colspan="' . $colspan . '">' . $langs->trans('ActionsLine') . '</td>';
-		print '</tr>';
+		if (($object->status == Accident::STATUS_VALIDATED) || (!empty($accidentWorkstops))) {
+			// ACCIDENT LINES
+			print '<div class="div-table-responsive-no-min" style="overflow-x: unset !important">';
+			print load_fiche_titre($langs->trans("AccidentRiskList"), '', '');
+			print '<table id="tablelines" class="noborder noshadow" width="100%">';
 
-		if ( ! empty($accidentlines) && $accidentlines > 0) {
-			foreach ($accidentlines as $key => $item) {
-				//action edit
-				if (($action == 'editline' || $subaction == 'editline') && $lineid == $key) {
-					print '<form method="POST" action="' . $_SERVER["PHP_SELF"] . '?id=' . $object->id . '">';
-					print '<input type="hidden" name="token" value="' . newToken() . '">';
-					print '<input type="hidden" name="action" value="updateLine">';
-					print '<input type="hidden" name="backtopage" value="' . $backtopage . '">';
-					print '<input type="hidden" name="lineid" value="' . $item->id . '">';
-					print '<input type="hidden" name="parent_id" value="' . $object->id . '">';
+			// Define colspan for the button 'Add'
+			$colspan = 3; // Columns: total ht + col edit + col delete
+			$img_extensions = ['png', 'jpg', 'jpeg'];
 
-					print '<tr>';
-					print '<td>';
-					print $item->ref;
-					print '</td>';
-
-					$coldisplay++;
-					print '<td>';
-					print '<input type="number" name="workstop_days" class="minwidth150" value="' . $item->workstop_days . '">';
-					print '</td>';
-
-					$coldisplay++;
-					print '<td>';
-					print $form->selectDate($item->date_start_workstop, 'datestart', 1, 1, 0, '', 1);
-					print '</td>';
-
-					$coldisplay++;
-					print '<td>';
-					print $form->selectDate($item->date_end_workstop, 'dateend', 1, 1, 0, '', 1);
-					print '</td>';
-
-					$coldisplay++;
-					print '<td>';
-					print '<input name="declarationLink" value="'. (GETPOST('declarationLink') ?: $item->declaration_link) .'">';
-					print '</td>';
-
-					$coldisplay += $colspan;
-					print '<td class="center" colspan="' . $colspan . '">';
-					print '<input type="submit" class="button" value="' . $langs->trans('Save') . '" name="updateLine" id="updateLine">';
-					print ' &nbsp; <input type="submit" id ="cancelLine" class="button" name="cancelLine" value="' . $langs->trans("Cancel") . '">';
-					print '</td>';
-					print '</tr>';
-					print '</form>';
-				//action view
-				} elseif ($item->status == 1) {
-					print '<td>';
-					print $item->ref;
-					print '</td>';
-
-					$coldisplay++;
-					print '<td>';
-					print $item->workstop_days;
-					print '</td>';
-
-					$coldisplay++;
-					print '<td>';
-					print dol_print_date($item->date_start_workstop, 'dayhour');
-					print '</td>';
-
-					$coldisplay++;
-					print '<td>';
-					print dol_print_date($item->date_end_workstop, 'dayhour');
-					print '</td>';
-
-					$coldisplay++;
-					print '<td>';
-					$is_link = dol_is_url($item->declaration_link);
-					print ($is_link ? '<a target="_blank" href="'. $item->declaration_link .'">' : '') . $item->declaration_link . ($is_link ? '</a>' : '') ;
-					print '</td>';
-
-					$coldisplay += $colspan;
-
-					//Actions buttons
-					if ($object->status == 1) {
-						print '<td class="center">';
-						$coldisplay++;
-						print '<a href="' . $_SERVER["PHP_SELF"] . '?id=' . $id . '&amp;action=editline&amp;lineid=' . $item->id . '" style="padding-right: 20px"><i class="fas fa-pencil-alt" style="color: #666"></i></a>';
-						print '<a href="' . $_SERVER["PHP_SELF"] . '?id=' . $id . '&amp;action=deleteline&amp;lineid=' . $item->id . '">';
-						print img_delete();
-						print '</a>';
-						print '</td>';
-					} else {
-						print '<td class="center">';
-						print '-';
-						print '</td>';
-					}
-					print '</tr>';
-				}
-			}
+			print '<tr class="liste_titre">';
+			print '<td><span>' . $langs->trans('Ref.') . '</span></td>';
+			print '<td>' . '<b>' . $langs->trans('WorkStopDays') . '</b><span style="color:red"> *</span>' . '</td>';
+			print '<td>' . $langs->trans('DateStartWorkStop') . '</td>';
+			print '<td>' . $langs->trans('DateEndWorkStop') . '</td>';
+			print '<td>' . $langs->trans('WorkStopDocument') . '</td>';
+			print '<td class="center" colspan="' . $colspan . '">' . $langs->trans('ActionsLine') . '</td>';
 			print '</tr>';
+
+			if ( ! empty($accidentWorkstops) && $accidentWorkstops > 0) {
+				foreach ($accidentWorkstops as $key => $item) {
+					//action edit
+					if (($action == 'editline' || $subaction == 'editline') && $lineid == $key) {
+						print '<form method="POST" action="' . $_SERVER["PHP_SELF"] . '?id=' . $object->id . '">';
+						print '<input type="hidden" name="token" value="' . newToken() . '">';
+						print '<input type="hidden" name="action" value="updateLine">';
+						print '<input type="hidden" name="backtopage" value="' . $backtopage . '">';
+						print '<input type="hidden" name="lineid" value="' . $item->id . '">';
+						print '<input type="hidden" name="parent_id" value="' . $object->id . '">';
+
+						print '<tr>';
+						print '<td>';
+						print $item->ref;
+						print '</td>';
+
+						$coldisplay++;
+						print '<td>';
+						print '<input type="number" name="workstop_days" class="minwidth150" value="' . $item->workstop_days . '">';
+						print '</td>';
+
+						$coldisplay++;
+						print '<td>';
+						print $form->selectDate($item->date_start_workstop, 'datestart', 1, 1, 0, '', 1);
+						print '</td>';
+
+						$coldisplay++;
+						print '<td>';
+						print $form->selectDate($item->date_end_workstop, 'dateend', 1, 1, 0, '', 1);
+						print '</td>';
+
+						$coldisplay++;
+						print '<td>';
+						print '<input name="declarationLink" value="'. (GETPOST('declarationLink') ?: $item->declaration_link) .'">';
+						print '</td>';
+
+						$coldisplay += $colspan;
+						print '<td class="center" colspan="' . $colspan . '">';
+						print '<input type="submit" class="button" value="' . $langs->trans('Save') . '" name="updateLine" id="updateLine">';
+						print ' &nbsp; <input type="submit" id ="cancelLine" class="button" name="cancelLine" value="' . $langs->trans("Cancel") . '">';
+						print '</td>';
+						print '</tr>';
+						print '</form>';
+					//action view
+					} elseif ($item->status == 1) {
+						print '<td>';
+						print $item->ref;
+						print '</td>';
+
+						$coldisplay++;
+						print '<td>';
+						print $item->workstop_days;
+						print '</td>';
+
+						$coldisplay++;
+						print '<td>';
+						print dol_print_date($item->date_start_workstop, 'dayhour');
+						print '</td>';
+
+						$coldisplay++;
+						print '<td>';
+						print dol_print_date($item->date_end_workstop, 'dayhour');
+						print '</td>';
+
+						$coldisplay++;
+						print '<td>';
+						$is_link = dol_is_url($item->declaration_link);
+						print ($is_link ? '<a target="_blank" href="'. $item->declaration_link .'">' : '') . $item->declaration_link . ($is_link ? '</a>' : '') ;
+						print '</td>';
+
+						$coldisplay += $colspan;
+
+						//Actions buttons
+						if ($object->status == Accident::STATUS_VALIDATED) {
+							print '<td class="center">';
+							$coldisplay++;
+							print '<a href="' . $_SERVER["PHP_SELF"] . '?id=' . $id . '&amp;action=editline&amp;lineid=' . $item->id . '" style="padding-right: 20px"><i class="fas fa-pencil-alt" style="color: #666"></i></a>';
+							print '<a href="' . $_SERVER["PHP_SELF"] . '?id=' . $id . '&amp;action=deleteline&amp;lineid=' . $item->id . '&amp;token=' . newToken() . '">';
+							print img_delete();
+							print '</a>';
+							print '</td>';
+						} else {
+							print '<td class="center">';
+							print '-';
+							print '</td>';
+						}
+						print '</tr>';
+					}
+				}
+				print '</tr>';
+			}
 		}
 		//action create
-		if ($object->status == 1 && $permissiontoadd && $action != 'editline') {
+		if ($object->status == Accident::STATUS_VALIDATED && $permissiontoadd && $action != 'editline') {
 			print '<form method="POST" action="' . $_SERVER["PHP_SELF"] . '?id=' . $object->id . '">';
 			print '<input type="hidden" name="token" value="' . newToken() . '">';
 			print '<input type="hidden" name="action" value="addLine">';
@@ -1158,7 +1182,7 @@ if ((empty($action) || ($action != 'create' && $action != 'edit'))) {
 
 			print '<tr>';
 			print '<td>';
-			print $refAccidentWorkStopMod->getNextValue($objectline);
+			print $objectline->getNextNumRef();
 			print '</td>';
 
 			$coldisplay++;
@@ -1192,26 +1216,6 @@ if ((empty($action) || ($action != 'create' && $action != 'edit'))) {
 		print '</table>';
 		print '</div>';
 	}
-	// Document Generation -- Génération des documents
-	$includedocgeneration = 0;
-	if ($includedocgeneration) {
-		print '<div class="fichecenter"><div class="accidentDocument fichehalfleft">';
-
-		$objref    = dol_sanitizeFileName($object->ref);
-		$dir_files = $accidentdocument->element . '/' . $objref;
-		$filedir   = $upload_dir . '/' . $dir_files;
-		$urlsource = $_SERVER["PHP_SELF"] . '?id=' . $id;
-
-		$modulepart   = 'digiriskdolibarr:AccidentDocument';
-		$defaultmodel = $conf->global->DIGIRISKDOLIBARR_ACCIDENTDOCUMENT_DEFAULT_MODEL;
-		$title        = $langs->trans('AccidentDocument');
-
-		if ($permissiontoadd || $permissiontoread) {
-			$genallowed = 1;
-		}
-
-		print digiriskshowdocuments($modulepart, $dir_files, $filedir, $urlsource, $genallowed, $permissiontodelete, $defaultmodel, 1, 0, '', $title, '', '', $accidentdocument, 0, 'remove_file', $object->status == 3 ? true : false, $langs->trans('AccidentMustBeLocked'));
-	}
 
 	if ($permissiontoadd) {
 		print '</div><div class="fichehalfright">';
@@ -1219,16 +1223,12 @@ if ((empty($action) || ($action != 'create' && $action != 'edit'))) {
 		print '</div><div class="">';
 	}
 
-	$MAXEVENT = 10;
+    $moreHtmlCenter = dolGetButtonTitle($langs->trans('SeeAll'), '', 'fa fa-bars imgforviewmode', dol_buildpath('/saturne/view/saturne_agenda.php', 1) . '?id=' . $object->id . '&module_name=digiriskdolibarr&object_type=' . $object->element);
 
-	$morehtmlright  = '<a href="' . dol_buildpath('/digiriskdolibarr/view/accident/accident_agenda.php', 1) . '?id=' . $object->id . '">';
-	$morehtmlright .= $langs->trans("SeeAll");
-	$morehtmlright .= '</a>';
-
-	// List of actions on element
-	include_once DOL_DOCUMENT_ROOT . '/core/class/html.formactions.class.php';
-	$formactions    = new FormActions($db);
-	$somethingshown = $formactions->showactions($object, $object->element . '@digiriskdolibarr', '', 1, '', $MAXEVENT, '', $morehtmlright);
+	// List of actions on element.
+	require_once DOL_DOCUMENT_ROOT . '/core/class/html.formactions.class.php';
+	$formActions = new FormActions($db);
+	$formActions->showactions($object, $object->element . '@' . $object->module, 0, 1, '', 10, '', $moreHtmlCenter);
 
 	print '</div></div></div>';
 }

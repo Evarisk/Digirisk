@@ -1,5 +1,5 @@
 <?php
-/* Copyright (C) 2021 EOXIA <dev@eoxia.com>
+/* Copyright (C) 2021-2023 EVARISK <technique@evarisk.com>
  *
  * This program is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -25,43 +25,22 @@ require_once DOL_DOCUMENT_ROOT . '/user/class/user.class.php';
 require_once DOL_DOCUMENT_ROOT . '/contact/class/contact.class.php';
 require_once DOL_DOCUMENT_ROOT . '/societe/class/societe.class.php';
 
-require_once __DIR__ . '/digiriskdocuments.class.php';
-require_once __DIR__ . '/digirisksignature.class.php';
-require_once __DIR__ . '/openinghours.class.php';
+// Load Saturne libraries.
+require_once __DIR__ . '/../../saturne/class/saturneobject.class.php';
+require_once __DIR__ . '/../../saturne/class/saturneschedules.class.php';
 
 /**
  * Class for PreventionPlan
  */
-class PreventionPlan extends CommonObject
+class PreventionPlan extends SaturneObject
 {
 	/**
-	 * @var DoliDB Database handler.
+	 * @var string Module name.
 	 */
-	public $db;
+	public $module = 'digiriskdolibarr';
 
 	/**
-	 * @var string Error string
-	 * @see        $errors
-	 */
-	public $error;
-
-	/**
-	 * @var string[] Array of error strings
-	 */
-	public $errors = array();
-
-	/**
-	 * @var array Result array.
-	 */
-	public $result = array();
-
-	/**
-	 * @var int The object identifier
-	 */
-	public $id;
-
-	/**
-	 * @var string ID to identify managed object.
+	 * @var string Element type of object.
 	 */
 	public $element = 'preventionplan';
 
@@ -71,74 +50,53 @@ class PreventionPlan extends CommonObject
 	public $table_element = 'digiriskdolibarr_preventionplan';
 
 	/**
-	 * @var string Name of table without prefix where object is stored. This is also the key used for extrafields management.
-	 */
-	public $table_element_line = 'digiriskdolibarr_preventionplandet';
-
-	/**
-	 * @var int  Does this object support multicompany module ?
-	 * 0=No test on entity, 1=Test with field entity, 'field@table'=Test with link by field@table
+	 * @var int Does this object support multicompany module ?
+	 * 0 = No test on entity, 1 = Test with field entity, 'field@table' = Test with link by field@table.
 	 */
 	public $ismultientitymanaged = 1;
 
 	/**
-	 * @var int  Does object support extrafields ? 0=No, 1=Yes
+	 * @var int Does object support extrafields ? 0 = No, 1 = Yes.
 	 */
-	public $isextrafieldmanaged = 1;
-
+	public int $isextrafieldmanaged = 1;
 	/**
 	 * @var string String with name of icon for digiriskelement. Must be the part after the 'object_' into object_digiriskelement.png
 	 */
-	public $picto = 'preventionplandocument@digiriskdolibarr';
-
-	/**
-	 * @var string Label status of const.
-	 */
-	public $labelStatus;
-
-	/**
-	 * @var string Label status short of const.
-	 */
-	public $labelStatusShort;
-
-	/**
-	 * @var array Context element object
-	 */
-	public $context = array();
+	public $picto = 'fontawesome_fa-info_fas_#d35968';
 
 	/**
 	 * @var PreventionPlanLine[]     Array of subtable lines
 	 */
-	public $lines = array();
+	public $lines = [];
 
-	const STATUS_IN_PROGRESS = 1;
-	const STATUS_PENDING_SIGNATURE = 2;
-	const STATUS_LOCKED = 3;
-	const STATUS_ARCHIVED = 4;
+    const STATUS_DELETED   = -1;
+	const STATUS_DRAFT     = 1;
+	const STATUS_VALIDATED = 2;
+	const STATUS_LOCKED    = 3;
+	const STATUS_ARCHIVED  = 4;
 
-	/**
-	 * @var array  Array with all fields and their property. Do not use it as a static var. It may be modified by constructor.
-	 */
-	public $fields = array(
-		'rowid'                => array('type' => 'integer', 'label' => 'TechnicalID', 'enabled' => '1', 'position' => 1, 'notnull' => 1, 'visible' => 0, 'noteditable' => '1', 'index' => 1, 'comment' => "Id"),
-		'ref'                  => array('type' => 'varchar(128)', 'label' => 'Ref', 'enabled' => '1', 'position' => 10, 'notnull' => 1, 'visible' => 1, 'noteditable' => '1', 'default' => '(PROV)', 'index' => 1, 'searchall' => 1, 'showoncombobox' => '1', 'comment' => "Reference of object"),
-		'ref_ext'              => array('type' => 'varchar(128)', 'label' => 'RefExt', 'enabled' => '1', 'position' => 20, 'notnull' => 0, 'visible' => 0,),
-		'entity'               => array('type' => 'integer', 'label' => 'Entity', 'enabled' => '1', 'position' => 30, 'notnull' => 1, 'visible' => 0,),
-		'date_creation'        => array('type' => 'datetime', 'label' => 'DateCreation', 'enabled' => '1', 'position' => 40, 'notnull' => 1, 'visible' => 0,),
-		'tms'                  => array('type' => 'timestamp', 'label' => 'DateModification', 'enabled' => '1', 'position' => 50, 'notnull' => 0, 'visible' => 0,),
-		'status'               => array('type' => 'smallint', 'label' => 'Status', 'enabled' => '1', 'position' => 70, 'notnull' => 0, 'visible' => 1, 'index' => 0,),
-		'label'                => array('type' => 'varchar(255)', 'label' => 'Label', 'enabled' => '1', 'position' => 80, 'notnull' => 0, 'visible' => 1, 'searchall' => 1, 'css' => 'minwidth200', 'help' => "Help text", 'showoncombobox' => '1',),
-		'date_start'           => array('type' => 'datetime', 'label' => 'StartDate', 'enabled' => '1', 'position' => 100, 'notnull' => -1, 'visible' => 1,),
-		'date_end'             => array('type' => 'datetime', 'label' => 'EndDate', 'enabled' => '1', 'position' => 130, 'notnull' => -1, 'visible' => 1,),
-		'prior_visit_bool'     => array('type' => 'boolean', 'label' => 'PriorVisit', 'enabled' => '1', 'position' => 140, 'notnull' => -1, 'visible' => -1,),
-		'prior_visit_text'     => array('type' => 'text', 'label' => 'PriorVisitText', 'enabled' => '1', 'position' => 150, 'notnull' => -1, 'visible' => -1,),
-		'prior_visit_date'     => array('type' => 'datetime', 'label' => 'PriorVisitDate', 'enabled' => '1', 'position' => 200, 'notnull' => -1, 'visible' => -1,),
-		'cssct_intervention'   => array('type' => 'boolean', 'label' => 'CSSCTIntervention', 'enabled' => '1', 'position' => 160, 'notnull' => -1, 'visible' => -1,),
-		'fk_project'           => array('type' => 'integer:Project:projet/class/project.class.php', 'label' => 'Project', 'enabled' => '1', 'position' => 170, 'notnull' => 1, 'visible' => 1,),
-		'fk_user_creat'        => array('type' => 'integer:User:user/class/user.class.php', 'label' => 'UserAuthor', 'enabled' => '1', 'position' => 180, 'notnull' => 1, 'visible' => 0, 'foreignkey' => 'user.rowid',),
-		'fk_user_modif'        => array('type' => 'integer:User:user/class/user.class.php', 'label' => 'UserModif', 'enabled' => '1', 'position' => 190, 'notnull' => -1, 'visible' => 0,),
-		'last_email_sent_date' => array('type' => 'datetime', 'label' => 'LastEmailSentDate', 'enabled' => '1', 'position' => 200, 'notnull' => -1, 'visible' => -2,),
-	);
+    /**
+     * @var array Array with all fields and their property. Do not use it as a static var. It may be modified by constructor
+     */
+    public $fields = [
+        'rowid'                => ['type' => 'integer',      'label' => 'TechnicalID',       'enabled' => 1, 'position' => 1,   'notnull' => 1, 'visible' => 0, 'noteditable' => 1, 'index' => 1, 'comment' => 'Id'],
+        'ref'                  => ['type' => 'varchar(128)', 'label' => 'Ref',               'enabled' => 1, 'position' => 10,  'notnull' => 1, 'visible' => 4, 'noteditable' => 1, 'default' => '(PROV)', 'index' =>1, 'searchall' => 1, 'showoncombobox' => 1, 'validate' => 1, 'comment' => 'Reference of object'],
+        'ref_ext'              => ['type' => 'varchar(128)', 'label' => 'RefExt',            'enabled' => 1, 'position' => 20,  'notnull' => 0, 'visible' => 0],
+        'entity'               => ['type' => 'integer',      'label' => 'Entity',            'enabled' => 1, 'position' => 30,  'notnull' => 1, 'visible' => 0, 'index' => 1],
+        'date_creation'        => ['type' => 'datetime',     'label' => 'DateCreation',      'enabled' => 1, 'position' => 40,  'notnull' => 1, 'visible' => 0],
+        'tms'                  => ['type' => 'timestamp',    'label' => 'DateModification',  'enabled' => 1, 'position' => 50,  'notnull' => 0, 'visible' => 0],
+        'status'               => ['type' => 'smallint',     'label' => 'Status',            'enabled' => 1, 'position' => 180, 'notnull' => 1, 'visible' => 2, 'default' => 0, 'index' => 1, 'arrayofkeyval' => [1 => 'InProgress', 2 => 'ValidatePendingSignature', 3 => 'Locked', 4 => 'Archived']],
+        'label'                => ['type' => 'varchar(255)', 'label' => 'Label',             'enabled' => 1, 'position' => 60,  'notnull' => 1, 'visible' => 1, 'searchall' => 1, 'css' => 'minwidth300', 'cssview' => 'wordbreak', 'showoncombobox' => 2, 'validate' => 1, 'autofocusoncreate' => 1],
+        'date_start'           => ['type' => 'date',         'label' => 'DateStart',         'enabled' => 1, 'position' => 70,  'notnull' => 0, 'visible' => 1],
+        'date_end'             => ['type' => 'date',         'label' => 'DateEnd',           'enabled' => 1, 'position' => 80,  'notnull' => 0, 'visible' => 1],
+        'prior_visit_bool'     => ['type' => 'boolean',      'label' => 'PriorVisit',        'enabled' => 1, 'position' => 90,  'notnull' => 0, 'visible' => 3],
+        'prior_visit_text'     => ['type' => 'text',         'label' => 'PriorVisitText',    'enabled' => 1, 'position' => 100, 'notnull' => 0, 'visible' => 3],
+        'prior_visit_date'     => ['type' => 'datetime',     'label' => 'PriorVisitDate',    'enabled' => 1, 'position' => 110, 'notnull' => 0, 'visible' => 3],
+        'cssct_intervention'   => ['type' => 'boolean',      'label' => 'CSSCTIntervention', 'enabled' => 1, 'position' => 120, 'notnull' => 0, 'visible' => 3],
+        'fk_user_creat'        => ['type' => 'integer:User:user/class/user.class.php',           'label' => 'UserAuthor', 'picto' => 'user',    'enabled' => 1,                         'position' => 140, 'notnull' => 1, 'visible' => 0, 'foreignkey' => 'user.rowid'],
+        'fk_user_modif'        => ['type' => 'integer:User:user/class/user.class.php',           'label' => 'UserModif',  'picto' => 'user',    'enabled' => 1,                         'position' => 150, 'notnull' => 0, 'visible' => 0, 'foreignkey' => 'user.rowid'],
+        'fk_project'           => ['type' => 'integer:Project:projet/class/project.class.php:1', 'label' => 'Project',    'picto' => 'project', 'enabled' => '$conf->project->enabled', 'position' => 85,  'notnull' => 1, 'visible' => 1, 'index' => 1, 'css' => 'maxwidth500 widthcentpercentminusxx', 'validate' => 1, 'foreignkey' => 'projet.rowid'],
+    ];
 
 	public $rowid;
 	public $ref;
@@ -157,7 +115,11 @@ class PreventionPlan extends CommonObject
 	public $fk_project;
 	public $fk_user_creat;
 	public $fk_user_modif;
-	public $last_email_sent_date;
+
+    /**
+     * @var string Name of subtable line
+     */
+    public $table_element_line = 'digiriskdolibarr_preventionplandet';
 
 	/**
 	 * Constructor
@@ -166,353 +128,128 @@ class PreventionPlan extends CommonObject
 	 */
 	public function __construct(DoliDB $db)
 	{
-		global $conf, $langs;
-
-		$this->db = $db;
-
-		if (empty($conf->global->MAIN_SHOW_TECHNICAL_ID) && isset($this->fields['rowid'])) $this->fields['rowid']['visible'] = 0;
-		if (empty($conf->multicompany->enabled) && isset($this->fields['entity'])) $this->fields['entity']['enabled']        = 0;
-
-		// Unset fields that are disabled
-		foreach ($this->fields as $key => $val) {
-			if (isset($val['enabled']) && empty($val['enabled'])) {
-				unset($this->fields[$key]);
-			}
-		}
-
-		// Translate some data of arrayofkeyval
-		if (is_object($langs)) {
-			foreach ($this->fields as $key => $val) {
-				if (is_array($val['arrayofkeyval'])) {
-					foreach ($val['arrayofkeyval'] as $key2 => $val2) {
-						$this->fields[$key]['arrayofkeyval'][$key2] = $langs->trans($val2);
-					}
-				}
-			}
-		}
+		parent::__construct($db, $this->module, $this->element);
 	}
 
+    /**
+     * Clone an object into another one.
+     *
+     * @param  User      $user    User that creates
+     * @param  int       $fromID  ID of object to clone
+     * @param  array     $options Options array
+     * @return int                New object created, <0 if KO
+     * @throws Exception
+     */
+    public function createFromClone(User $user, int $fromID, array $options): int
+    {
+        global $conf, $moduleNameLowerCase;
 
-	/**
-	 * Create object into database
-	 *
-	 * @param  User $user      User that creates
-	 * @param  bool $notrigger false=launch triggers after, true=disable triggers
-	 * @return int             <0 if KO, Id of created object if OK
-	 */
-	public function create(User $user, $notrigger = false)
-	{
-		$this->element = $this->element . '@digiriskdolibarr';
-		return $this->createCommon($user, $notrigger);
-	}
+        dol_syslog(__METHOD__, LOG_DEBUG);
 
-	/**
-	 * Clone an object into another one
-	 *
-	 * @param User $user User that creates
-	 * @param int $fromid Id of object to clone
-	 * @param $options
-	 * @return    mixed                New object created, <0 if KO
-	 * @throws Exception
-	 */
-	public function createFromClone(User $user, $fromid, $options)
-	{
-		global $conf, $langs;
-		$error = 0;
+        $object            = new self($this->db);
+        $signatory         = new SaturneSignature($this->db, $this->module, $this->element);
+        $digiriskResources = new DigiriskResources($this->db);
 
-		$signatory         = new PreventionPlanSignature($this->db);
-		$digiriskresources = new DigiriskResources($this->db);
-		$openinghours      = new Openinghours($this->db);
+        $this->db->begin();
 
-		$refPreventionPlanMod    = new $conf->global->DIGIRISKDOLIBARR_PREVENTIONPLAN_ADDON($this->db);
-		$refPreventionPlanDetMod = new  $conf->global->DIGIRISKDOLIBARR_PREVENTIONPLANDET_ADDON($this->db);
+        // Load source object
+        $object->fetch($fromID);
+        $preventionplandets = $object->lines;
 
-		dol_syslog(__METHOD__, LOG_DEBUG);
+        // Load signatory and ressources form source object
+        $signatories = $signatory->fetchSignatory('', $fromID, $object->element);
+        $resources   = $digiriskResources->fetchResourcesFromObject('', $object);
 
-		$object = new self($this->db);
+        if (!empty($signatories) && $signatories > 0) {
+            foreach ($signatories as $arrayRole) {
+                foreach ($arrayRole as $signatoryRole) {
+                    $signatoriesID[$signatoryRole->role] = $signatoryRole->id;
+                    if ($signatoryRole->role == 'ExtSocietyAttendant') {
+                        $extIntervenantsIds[] = $signatoryRole->id;
+                    }
+                }
+            }
+        }
 
-		$this->db->begin();
+        // Load numbering modules
+        $numberingModules = [
+            'digiriskelement/preventionplan'    => $conf->global->DIGIRISKDOLIBARR_PREVENTIONPLAN_ADDON,
+            'digiriskelement/preventionplandet' => $conf->global->DIGIRISKDOLIBARR_PREVENTIONPLANDET_ADDON,
+        ];
 
-		// Load source object
-		$result = $object->fetchCommon($fromid);
-		if ($result > 0 && ! empty($object->table_element_line)) {
-			$object->fetchLines();
-		}
+        list($refPreventionPlanMod, $refPreventionPlanDetMod) = saturne_require_objects_mod($numberingModules, $moduleNameLowerCase);
 
-		// Load openinghours form source object
-		$morewhere  = ' AND element_id = ' . $object->id;
-		$morewhere .= ' AND element_type = ' . "'" . $object->element . "'";
-		$morewhere .= ' AND status = 1';
+        // Reset some properties
+        unset($object->id);
+        unset($object->fk_user_creat);
+        unset($object->import_key);
 
-		$openinghours->fetch(0, '', $morewhere);
+        // Clear fields
+        $object->ref           = $refPreventionPlanMod->getNextValue($object);
+        $object->label         = $options['clone_label'];
+        $object->date_creation = dol_now();
+        $object->status        = self::STATUS_DRAFT;
 
-		// Load signatory and ressources form source object
-		$signatories = $signatory->fetchSignatory("", $fromid, 'preventionplan');
-		$resources   = $digiriskresources->fetchResourcesFromObject('', $object);
+        // Create clone
+        $object->context['createfromclone'] = 'createfromclone';
+        $preventionPlanID                   = $object->create($user);
 
-		if ( ! empty($signatories) && $signatories > 0) {
-			foreach ($signatories as $arrayRole) {
-				foreach ($arrayRole as $signatoryRole) {
-					$signatoriesID[$signatoryRole->role] = $signatoryRole->id;
-					if ($signatoryRole->role == 'PP_EXT_SOCIETY_INTERVENANTS') {
-						$extintervenant_ids[] = $signatoryRole->id;
-					}
-				}
-			}
-		}
+        if ($preventionPlanID > 0) {
+            $digiriskResources->setDigiriskResources($this->db, $user->id, 'ExtSociety', 'societe', [array_shift($resources['ExtSociety'])->id], $conf->entity, 'preventionplan', $preventionPlanID, 1);
+            $digiriskResources->setDigiriskResources($this->db, $user->id, 'LabourInspector', 'societe', [array_shift($resources['LabourInspector'])->id], $conf->entity, 'preventionplan', $preventionPlanID, 1);
+            $digiriskResources->setDigiriskResources($this->db, $user->id, 'LabourInspectorAssigned', 'socpeople', [array_shift($resources['LabourInspectorAssigned'])->id], $conf->entity, 'preventionplan', $preventionPlanID, 1);
+            if (!empty($signatoriesID)) {
+                $signatory->createFromClone($user, $signatoriesID['MasterWorker'], $preventionPlanID);
+                $signatory->createFromClone($user, $signatoriesID['ExtSocietyResponsible'], $preventionPlanID);
+            }
 
-		// Reset some properties
-		unset($object->id);
-		unset($object->fk_user_creat);
-		unset($object->import_key);
+            if (!empty($options['schedule'])) {
+                $saturneSchedules = new SaturneSchedules($this->db);
 
-		// Clear fields
-		if (property_exists($object, 'ref')) {
-			$object->ref = $refPreventionPlanMod->getNextValue($object);
-		}
-		if (property_exists($object, 'label')) {
-			$object->label = $options['clone_label'];
-		}
-		if (property_exists($object, 'ref_ext')) {
-			$object->ref_ext = 'digirisk_' . $object->ref;
-		}
-		if (property_exists($object, 'date_creation')) {
-			$object->date_creation = dol_now();
-		}
-		if (property_exists($object, 'status')) {
-			$object->status = 1;
-		}
+                // Load openinghours form source object
+                $moreWhere  = ' AND element_id = ' . $fromID;
+                $moreWhere .= ' AND element_type = ' . "'" . $object->element . "'";
+                $moreWhere .= ' AND status = 1';
 
-		// Create clone
-		$object->context['createfromclone'] = 'createfromclone';
-		$preventionplanid                   = $object->create($user);
+                $saturneSchedules->fetch(0, '', $moreWhere);
+                if (!empty($saturneSchedules)) {
+                    $saturneSchedules->element_type = 'preventionplan';
+                    $saturneSchedules->element_id   = $preventionPlanID;
+                    $saturneSchedules->create($user);
+                }
+            }
 
-		if ($preventionplanid > 0) {
-			$digiriskresources->digirisk_dolibarr_set_resources($this->db, $user->id, 'PP_EXT_SOCIETY', 'societe', array(array_shift($resources['PP_EXT_SOCIETY'])->id), $conf->entity, 'preventionplan', $preventionplanid, 1);
-			$digiriskresources->digirisk_dolibarr_set_resources($this->db, $user->id, 'PP_LABOUR_INSPECTOR', 'societe', array(array_shift($resources['PP_LABOUR_INSPECTOR'])->id), $conf->entity, 'preventionplan', $preventionplanid, 1);
-			$digiriskresources->digirisk_dolibarr_set_resources($this->db, $user->id, 'PP_LABOUR_INSPECTOR_ASSIGNED', 'socpeople', array(array_shift($resources['PP_LABOUR_INSPECTOR_ASSIGNED'])->id), $conf->entity, 'preventionplan', $preventionplanid, 1);
-			if (!empty($signatoriesID)) {
-				$signatory->createFromClone($user, $signatoriesID['PP_MAITRE_OEUVRE'], $preventionplanid);
-				$signatory->createFromClone($user, $signatoriesID['PP_EXT_SOCIETY_RESPONSIBLE'], $preventionplanid);
-			}
+            if (!empty($options['attendants'])) {
+                if (!empty($extIntervenantsIds) && $extIntervenantsIds > 0) {
+                    foreach ($extIntervenantsIds as $extIntervenantID) {
+                        $signatory->createFromClone($user, $extIntervenantID, $preventionPlanID);
+                    }
+                }
+            }
 
-			if ( ! empty($options['schedule'])) {
-				if ( ! empty($openinghours)) {
-					$openinghours->element_id = $preventionplanid;
-					$openinghours->create($user);
-				}
-			}
+            if (!empty($options['preventionplan_risk'])) {
+                if (is_array($preventionplandets) && !empty($preventionplandets)) {
+                    foreach ($preventionplandets as $line) {
+                        $line->ref               = $refPreventionPlanDetMod->getNextValue($line);
+                        $line->fk_preventionplan = $preventionPlanID;
+                        $line->create($user, 1);
+                    }
+                }
+            }
+        } else {
+            $this->error  = $object->error;
+            $this->errors = $object->errors;
+        }
 
-			if ( ! empty($options['attendants'])) {
-				if ( ! empty($extintervenant_ids) && $extintervenant_ids > 0) {
-					foreach ($extintervenant_ids as $extintervenant_id) {
-						$signatory->createFromClone($user, $extintervenant_id, $preventionplanid);
-					}
-				}
-			}
-
-			if ( ! empty($options['preventionplan_risk'])) {
-				$num = (!empty($object->lines) ? count($object->lines) : 0);
-				for ($i = 0; $i < $num; $i++) {
-					$line                    = $object->lines[$i];
-					if (property_exists($line, 'ref')) {
-						$line->ref = $refPreventionPlanDetMod->getNextValue($line);
-					}
-					$line->category          = empty($line->category) ? 0 : $line->category;
-					$line->fk_preventionplan = $preventionplanid;
-
-					$result = $line->insert($user, 1);
-					if ($result < 0) {
-						$this->error = $this->db->lasterror();
-						$this->db->rollback();
-						return -1;
-					}
-				}
-			}
-		} else {
-			$error++;
-			$this->error  = $object->error;
-			$this->errors = $object->errors;
-		}
-
-		unset($object->context['createfromclone']);
-
-		// End
-		if ( ! $error) {
-			$this->db->commit();
-			return $preventionplanid;
-		} else {
-			$this->db->rollback();
-			return -1;
-		}
-	}
-
-	/**
-	 * Load object in memory from the database
-	 *
-	 * @param int    $id   Id object
-	 * @param string $ref  Ref
-	 * @return int         <0 if KO, 0 if not found, >0 if OK
-	 */
-	public function fetch($id, $ref = null)
-	{
-		return $this->fetchCommon($id, $ref);
-	}
-
-	/**
-	 * Load object lines in memory from the database
-	 *
-	 * @return int         <0 if KO, 0 if not found, >0 if OK
-	 */
-	public function fetchLines()
-	{
-		$this->lines = array();
-
-		return $this->fetchLinesCommon();
-	}
-
-	/**
-	 * Load list of objects in memory from the database.
-	 *
-	 * @param string $sortorder Sort Order
-	 * @param string $sortfield Sort field
-	 * @param int $limit limit
-	 * @param int $offset Offset
-	 * @param array $filter Filter array. Example array('field'=>'valueforlike', 'customurl'=>...)
-	 * @param string $filtermode Filter mode (AND or OR)
-	 * @return array|int                 int <0 if KO, array of pages if OK
-	 * @throws Exception
-	 */
-	public function fetchAll($sortorder = '', $sortfield = '', $limit = 0, $offset = 0, array $filter = array(), $filtermode = 'AND')
-	{
-		dol_syslog(__METHOD__, LOG_DEBUG);
-
-		$records = array();
-
-		$sql                                                                              = 'SELECT ';
-		$sql                                                                             .= $this->getFieldList();
-		$sql                                                                             .= ' FROM ' . MAIN_DB_PREFIX . $this->table_element . ' as t';
-		if (isset($this->ismultientitymanaged) && $this->ismultientitymanaged == 1) $sql .= ' WHERE t.entity IN (' . getEntity($this->table_element) . ')';
-		else $sql                                                                        .= ' WHERE 1 = 1';
-		// Manage filter
-		$sqlwhere = array();
-		if (count($filter) > 0) {
-			foreach ($filter as $key => $value) {
-				if ($key == 't.rowid') {
-					$sqlwhere[] = $key . '=' . $value;
-				} elseif (strpos($key, 'date') !== false) {
-					$sqlwhere[] = $key . ' = \'' . $this->db->idate($value) . '\'';
-				} elseif ($key == 'customsql') {
-					$sqlwhere[] = $value;
-				} else {
-					$sqlwhere[] = $key . ' LIKE \'%' . $this->db->escape($value) . '%\'';
-				}
-			}
-		}
-		if (count($sqlwhere) > 0) {
-			$sql .= ' AND (' . implode(' ' . $filtermode . ' ', $sqlwhere) . ')';
-		}
-
-		if ( ! empty($sortfield)) {
-			$sql .= $this->db->order($sortfield, $sortorder);
-		}
-		if ( ! empty($limit)) {
-			$sql .= ' ' . $this->db->plimit($limit, $offset);
-		}
-		$resql = $this->db->query($sql);
-		if ($resql) {
-			$num = $this->db->num_rows($resql);
-			$i   = 0;
-			while ($i < ($limit ? min($limit, $num) : $num)) {
-				$obj = $this->db->fetch_object($resql);
-
-				$record = new self($this->db);
-				$record->setVarsFromFetchObj($obj);
-
-				$records[$record->id] = $record;
-
-				$i++;
-			}
-			$this->db->free($resql);
-
-			return $records;
-		} else {
-			$this->errors[] = 'Error ' . $this->db->lasterror();
-			dol_syslog(__METHOD__ . ' ' . join(',', $this->errors), LOG_ERR);
-
-			return -1;
-		}
-	}
-
-	/**
-	 * Update object into database
-	 *
-	 * @param  User $user      User that modifies
-	 * @param  bool $notrigger false=launch triggers after, true=disable triggers
-	 * @return int             <0 if KO, >0 if OK
-	 */
-	public function update(User $user, $notrigger = false)
-	{
-		return $this->updateCommon($user, $notrigger);
-	}
-
-	/**
-	 * Delete object in database
-	 *
-	 * @param User $user       User that deletes
-	 * @param bool $notrigger  false=launch triggers after, true=disable triggers
-	 * @return int             <0 if KO, >0 if OK
-	 */
-	public function delete(User $user, $notrigger = false)
-	{
-		return $this->deleteCommon($user, $notrigger);
-	}
-
-	/**
-	 *	Load the info information in the object
-	 *
-	 *	@param  int		$id       Id of object
-	 *	@return	void
-	 */
-	public function info($id)
-	{
-		$sql    = 'SELECT rowid, date_creation as datec, tms as datem,';
-		$sql   .= ' fk_user_creat, fk_user_modif';
-		$sql   .= ' FROM ' . MAIN_DB_PREFIX . $this->table_element . ' as t';
-		$sql   .= ' WHERE t.rowid = ' . $id;
-		$result = $this->db->query($sql);
-		if ($result) {
-			if ($this->db->num_rows($result)) {
-				$obj      = $this->db->fetch_object($result);
-				$this->id = $obj->rowid;
-//				if ($obj->fk_user_author) {
-//					$cuser = new User($this->db);
-//					$cuser->fetch($obj->fk_user_author);
-//					$this->user_creation = $cuser;
-//				}
-//
-//				if ($obj->fk_user_valid) {
-//					$vuser = new User($this->db);
-//					$vuser->fetch($obj->fk_user_valid);
-//					$this->user_validation = $vuser;
-//				}
-//
-//				if ($obj->fk_user_cloture) {
-//					$cluser = new User($this->db);
-//					$cluser->fetch($obj->fk_user_cloture);
-//					$this->user_cloture = $cluser;
-//				}
-
-				$this->date_creation     = $this->db->jdate($obj->date_creation);
-//				$this->date_modification = $this->db->jdate($obj->datem);
-//				$this->date_validation   = $this->db->jdate($obj->datev);
-			}
-
-			$this->db->free($result);
-		} else {
-			dol_print_error($this->db);
-		}
-	}
+        // End
+        if (!$this->error) {
+            $this->db->commit();
+            return $preventionPlanID;
+        } else {
+            $this->db->rollback();
+            return -1;
+        }
+    }
 
 	/**
 	 * 	Set in progress status
@@ -524,9 +261,9 @@ class PreventionPlan extends CommonObject
 	 */
 	public function setInProgress($user, $notrigger = 0)
 	{
-		$signatory = new PreventionPlanSignature($this->db);
-		$signatory->deleteSignatoriesSignatures($this->id, 'preventionplan');
-		return $this->setStatusCommon($user, self::STATUS_IN_PROGRESS, $notrigger, 'PREVENTIONPLAN_INPROGRESS');
+		$signatory = new SaturneSignature($this->db, $this->module, $this->element);
+		$signatory->deleteSignatoriesSignatures($this->id, $this->element);
+		return parent::setDraft($user, $notrigger);
 	}
 	/**
 	 * 	Set pending signature status
@@ -537,42 +274,7 @@ class PreventionPlan extends CommonObject
 	 */
 	public function setPendingSignature($user, $notrigger = 0)
 	{
-		return $this->setStatusCommon($user, self::STATUS_PENDING_SIGNATURE, $notrigger, 'PREVENTIONPLAN_PENDINGSIGNATURE');
-	}
-
-	/**
-	 *	Set lock status
-	 *
-	 *	@param	User	$user			Object user that modify
-	 *  @param	int		$notrigger		1=Does not execute triggers, 0=Execute triggers
-	 *	@return	int						<0 if KO, >0 if OK
-	 */
-	public function setLocked($user, $notrigger = 0)
-	{
-		return $this->setStatusCommon($user, self::STATUS_LOCKED, $notrigger, 'PREVENTIONPLAN_LOCKED');
-	}
-
-	/**
-	 *	Set close status
-	 *
-	 *	@param	User	$user			Object user that modify
-	 *  @param	int		$notrigger		1=Does not execute triggers, 0=Execute triggers
-	 *	@return	int						<0 if KO, >0 if OK
-	 */
-	public function setArchived($user, $notrigger = 0)
-	{
-		return $this->setStatusCommon($user, self::STATUS_ARCHIVED, $notrigger, 'PREVENTIONPLAN_ARCHIVED');
-	}
-
-	/**
-	 *  Return the label of the status
-	 *
-	 *  @param  int		$mode          0=long label, 1=short label, 2=Picto + short label, 3=Picto, 4=Picto + long label, 5=Short label + Picto, 6=Long label + Picto
-	 *  @return	string 			       Label of status
-	 */
-	public function getLibStatut($mode = 0)
-	{
-		return $this->LibStatut($this->status, $mode);
+		return $this->setStatusCommon($user, self::STATUS_VALIDATED, $notrigger, 'PREVENTIONPLAN_PENDINGSIGNATURE');
 	}
 
 	/**
@@ -582,87 +284,24 @@ class PreventionPlan extends CommonObject
 	 *  @param  int		$mode          0=long label, 1=short label, 2=Picto + short label, 3=Picto, 4=Picto + long label, 5=Short label + Picto, 6=Long label + Picto
 	 *  @return string 			       Label of status
 	 */
-	public function LibStatut($status, $mode = 0)
+	public function LibStatut($status, $mode = 0): string
 	{
 		if (empty($this->labelStatus) || empty($this->labelStatusShort)) {
 			global $langs;
 			$langs->load("digiriskdolibarr@digiriskdolibarr");
 
-			$this->labelStatus[self::STATUS_IN_PROGRESS]       = $langs->trans('InProgress');
-			$this->labelStatus[self::STATUS_PENDING_SIGNATURE] = $langs->trans('ValidatePendingSignature');
-			$this->labelStatus[self::STATUS_LOCKED]            = $langs->trans('Locked');
-			$this->labelStatus[self::STATUS_ARCHIVED]          = $langs->trans('Archived');
+			$this->labelStatus[self::STATUS_DRAFT]     = $langs->trans('InProgress');
+			$this->labelStatus[self::STATUS_VALIDATED] = $langs->trans('ValidatePendingSignature');
+			$this->labelStatus[self::STATUS_LOCKED]    = $langs->trans('Locked');
+			$this->labelStatus[self::STATUS_ARCHIVED]  = $langs->trans('Archived');
 		}
 
-		$statusType                                                = 'status' . $status;
-		if ($status == self::STATUS_PENDING_SIGNATURE) $statusType = 'status3';
-		if ($status == self::STATUS_LOCKED) $statusType            = 'status8';
-		if ($status == self::STATUS_ARCHIVED) $statusType          = 'status8';
+		$statusType                                        = 'status' . $status;
+		if ($status == self::STATUS_VALIDATED) $statusType = 'status3';
+		if ($status == self::STATUS_LOCKED) $statusType    = 'status8';
+		if ($status == self::STATUS_ARCHIVED) $statusType  = 'status8';
 
 		return dolGetStatus($this->labelStatus[$status], $this->labelStatusShort[$status], '', $statusType, $mode);
-	}
-
-	/**
-	 *        Return a link on thirdparty (with picto)
-	 *
-	 * @param int $withpicto Add picto into link (0=No picto, 1=Include picto with link, 2=Picto only)
-	 * @param string $option Target of link ('', 'customer', 'prospect', 'supplier', 'project')
-	 * @param int $maxlen Max length of name
-	 * @param int $notooltip 1=Disable tooltip
-	 * @return    string                              String with URL
-	 */
-	public function getNomUrl($withpicto = 0, $option = '', $maxlen = 0, $notooltip = 0)
-	{
-		global $conf, $langs, $hookmanager;
-
-		if ( ! empty($conf->dol_no_mouse_hover)) $notooltip = 1; // Force disable tooltips
-
-		$name   = $this->ref;
-		$result = ''; $label = '';
-
-		if ( ! empty($this->logo) && class_exists('Form')) {
-			$label .= '<div class="photointooltip">';
-			$label .= Form::showphoto('societe', $this, 0, 40, 0, '', 'mini', 0); // Important, we must force height so image will have height tags and if image is inside a tooltip, the tooltip manager can calculate height and position correctly the tooltip.
-			$label .= '</div><div style="clear: both;"></div>';
-		}
-
-		$label .= '<div class="centpercent">';
-
-		// By default
-		$label    .= '<u>' . $langs->trans("PreventionPlan") . '</u>';
-		$linkstart = '<a href="' . DOL_URL_ROOT . '/custom/digiriskdolibarr/view/preventionplan/preventionplan_card.php?id=' . $this->id;
-
-		if ( ! empty($this->ref)) {
-			$label .= '<br><b>' . $langs->trans('Ref') . ':</b> ' . $this->ref;
-		}
-
-		$label .= '</div>';
-
-		$linkstart .= '"';
-
-		$linkclose = '';
-		if ($option == 'blank') {
-			$linkclose .= ' target=_blank';
-		}
-		if (empty($notooltip)) {
-			if ( ! empty($conf->global->MAIN_OPTIMIZEFORTEXTBROWSER)) {
-				$label      = $langs->trans("ShowCompany");
-				$linkclose .= ' alt="' . dol_escape_htmltag($label, 1) . '"';
-			}
-			$linkclose .= ' title="' . dol_escape_htmltag($label, 1) . '"';
-			$linkclose .= ' class="classfortooltip refurl"';
-		}
-		$linkstart .= $linkclose . '>';
-		$linkend    = '</a>';
-
-		$result                      .= $linkstart;
-		if ($withpicto) $result      .= '<i class="fas fa-info"></i>' . ' ';
-		if ($withpicto != 2) $result .= ($maxlen ? dol_trunc($name, $maxlen) : $name);
-		$result                      .= $linkend;
-
-		 $result .= $hookmanager->resPrint;
-
-		return $result;
 	}
 
 	/**
@@ -683,87 +322,90 @@ class PreventionPlan extends CommonObject
 	 * @return array|string
 	 * @throws Exception
 	 */
-	public function select_preventionplan_list($selected = '', $htmlname = 'fk_preventionplan', $filter = '', $showempty = '1', $forcecombo = 0, $events = array(), $outputmode = 0, $limit = 0, $morecss = 'minwidth100', $moreparam = '', $multiple = false)
+	public function select_preventionplan_list($selected = '', $htmlname = 'fk_preventionplan', $filter = [], $showempty = '1', $forcecombo = 0, $events = [], $outputmode = 0, $limit = 0, $morecss = 'minwidth100', $moreparam = '', $multiple = false)
 	{
-		global $langs;
+		global $form;
 
-		$out      = '';
-		$num      = 0;
-		$outarray = array();
-
-		$selected = array($selected);
-
-		// Clean $filter that may contains sql conditions so sql code
-		if (function_exists('testSqlAndScriptInject')) {
-			if (testSqlAndScriptInject($filter, 3) > 0) {
-				$filter = '';
+		if (dol_strlen($filter['customsql'])) {
+			$filter['customsql'] .= ' AND t.rowid != ' . ($this->id ?? 0);
+		}
+		$objectList = saturne_fetch_all_object_type('preventionplan', '', '', $limit, 0, $filter);
+		$preventionPlansData  = [];
+		if (is_array($objectList) && !empty($objectList)) {
+			foreach ($objectList as $preventionPlan) {
+				$preventionPlansData[$preventionPlan->id] = $preventionPlan->ref . ' - ' . $preventionPlan->label;
 			}
 		}
-		// On recherche les societes
-		$sql  = 'SELECT ';
-		$sql .= $this->getFieldList();
-		$sql .= " FROM " . MAIN_DB_PREFIX . "digiriskdolibarr_preventionplan as s";
 
-		$sql              .= " WHERE s.entity IN (" . getEntity($this->table_element) . ")";
-		if ($filter) $sql .= " AND (" . $filter . ")";
-		$sql              .= " AND status != 0";
-		$sql              .= $this->db->order("rowid", "ASC");
-		$sql              .= $this->db->plimit($limit, 0);
+		return $form::selectarray($htmlname, $preventionPlansData, $selected, $showempty, 0, 0, '', 0, 0, 0, '', $morecss);
 
-		// Build output string
-		dol_syslog(get_class($this) . "::select_preventionplan_list", LOG_DEBUG);
-		$resql = $this->db->query($sql);
-		if ($resql) {
-			if ( ! $forcecombo) {
-				include_once DOL_DOCUMENT_ROOT . '/core/lib/ajax.lib.php';
-				$out .= ajax_combobox($htmlname, $events, 0);
-			}
-
-			// Construct $out and $outarray
-			$out .= '<select id="' . $htmlname . '" class="flat' . ($morecss ? ' ' . $morecss : '') . '"' . ($moreparam ? ' ' . $moreparam : '') . ' name="' . $htmlname . ($multiple ? '[]' : '') . '" ' . ($multiple ? 'multiple' : '') . '>' . "\n";
-
-			$textifempty          = (($showempty && ! is_numeric($showempty)) ? $langs->trans($showempty) : '');
-			if ($showempty) $out .= '<option value="-1">' . $textifempty . '</option>' . "\n";
-
-			$num = $this->db->num_rows($resql);
-			$i   = 0;
-			if ($num) {
-				while ($i < $num) {
-					$obj   = $this->db->fetch_object($resql);
-					$label = $obj->ref;
-
-					if (empty($outputmode)) {
-						if (in_array($obj->rowid, $selected)) {
-							$out .= '<option value="' . $obj->rowid . '" selected>' . $label . '</option>';
-						} else {
-							$out .= '<option value="' . $obj->rowid . '">' . $label . '</option>';
-						}
-					} else {
-						array_push($outarray, array('key' => $obj->rowid, 'value' => $label, 'label' => $label));
-					}
-
-					$i++;
-					if (($i % 10) == 0) $out .= "\n";
-				}
-			}
-			$out .= '</select>' . "\n";
-		} else {
-			dol_print_error($this->db);
-		}
-
-		$this->result = array('nbofpreventionplan' => $num);
-
-		if ($outputmode) return $outarray;
-		return $out;
 	}
+
+    /**
+     * Write information of trigger description
+     *
+     * @param  Object $object Object calling the trigger
+     * @return string         Description to display in actioncomm->note_private
+     */
+    public function getTriggerDescription(SaturneObject $object): string
+    {
+        global $langs;
+
+        require_once __DIR__ . '/digiriskresources.class.php';
+        require_once __DIR__ . '/../../saturne/class/saturnesignature.class.php';
+
+        $digiriskResources = new DigiriskResources($this->db);
+        $saturneSignature  = new SaturneSignature($this->db, $object->module, $object->element);
+        $societies         = $digiriskResources->fetchResourcesFromObject('', $object);
+        $signatories       = $saturneSignature->fetchSignatories($object->id, $object->element);
+
+        $ret  = parent::getTriggerDescription($object);
+
+        $ret .= (dol_strlen($object->date_start) > 0 ? $langs->transnoentities('StartDate') . ' : ' . dol_print_date($object->date_start, 'dayhoursec') . '<br>' : '');
+        $ret .= (dol_strlen($object->date_end) > 0 ? $langs->transnoentities('EndDate') . ' : ' . dol_print_date($object->date_end, 'dayhoursec') . '<br>' : '');
+        if (is_array($signatories) && !empty($signatories)) {
+            foreach($signatories as $signatory) {
+                $ret .= $langs->transnoentities($signatory->role) . ' : ' . $signatory->firstname . ' ' . $signatory->lastname . '<br>';
+            }
+        }
+        if (is_array($societies) && !empty($societies)) {
+            foreach ($societies as $societename => $key) {
+                $ret .= $langs->transnoentities($societename) . ' : ';
+                foreach ($key as $societe) {
+                    if ($societename == 'LabourInspectorAssigned') {
+                        $ret .= $societe->firstname . ' ' . $societe->lastname . '<br>';
+                    } else {
+                        $ret .= $societe->name . '<br>';
+                    }
+                    if ($societename == 'ExtSociety') {
+                        $ret .= (dol_strlen($societe->address) > 0 ? $langs->transnoentities('Address') . ' : ' . $societe->address . '<br>' : '');
+                        $ret .= (dol_strlen($societe->idprof2) > 0 ? $langs->transnoentities('SIRET') . ' : ' . $societe->idprof2 . '<br>' : '');
+                    }
+                }
+            }
+        }
+        $ret .= $langs->transnoentities('CSSCTIntervention') . ' : ' . ($object->cssct_intervention ? $langs->transnoentities("Yes") : $langs->transnoentities("No")) . '<br>';
+        $ret .= $langs->transnoentities('PriorVisit') . ' : ' . ($object->prior_visit_bool ? $langs->transnoentities("Yes") : $langs->transnoentities("No")) . '<br>';
+        if ($object->prior_visit_bool) {
+            $ret .= $langs->transnoentities('PriorVisitText') . ' : ' . (!empty($object->prior_visit_text) ? $object->prior_visit_text : 'N/A') . '</br>';
+            $ret .= (dol_strlen($object->prior_visit_date) > 0 ? $langs->transnoentities('PriorVisitDate') . ' : ' . dol_print_date($object->prior_visit_date, 'dayhoursec') . '<br>' : '');
+        }
+
+        return $ret;
+    }
 }
 
 /**
  *	Class to manage invoice lines.
  *  Saved into database table llx_preventionplandet
  */
-class PreventionPlanLine extends CommonObjectLine
+class PreventionPlanLine extends SaturneObject
 {
+	/**
+	 * @var string Module name.
+	 */
+	public $module = 'digiriskdolibarr';
+
 	/**
 	 * @var DoliDB Database handler.
 	 */
@@ -789,32 +431,37 @@ class PreventionPlanLine extends CommonObjectLine
 	 */
 	public $table_element = 'digiriskdolibarr_preventionplandet';
 
+    const STATUS_DELETED   = -1;
+    const STATUS_VALIDATED = 1;
+
 	/**
 	 * @var array  Array with all fields and their property. Do not use it as a static var. It may be modified by constructor.
 	 */
-	public $fields = array(
-		'rowid'             => array('type' => 'integer', 'label' => 'TechnicalID', 'enabled' => '1', 'position' => 1, 'notnull' => 1, 'visible' => 0, 'noteditable' => '1', 'index' => 1, 'comment' => "Id"),
-		'ref'               => array('type' => 'varchar(128)', 'label' => 'Ref', 'enabled' => '1', 'position' => 10, 'notnull' => 1, 'visible' => 1, 'noteditable' => '1', 'default' => '(PROV)', 'index' => 1, 'searchall' => 1, 'showoncombobox' => '1', 'comment' => "Reference of object"),
-		'ref_ext'           => array('type' => 'varchar(128)', 'label' => 'RefExt', 'enabled' => '1', 'position' => 20, 'notnull' => 0, 'visible' => 0,),
-		'entity'            => array('type' => 'integer', 'label' => 'Entity', 'enabled' => '1', 'position' => 30, 'notnull' => 1, 'visible' => 0,),
-		'date_creation'     => array('type' => 'datetime', 'label' => 'DateCreation', 'enabled' => '1', 'position' => 40, 'notnull' => 1, 'visible' => 0,),
-		'tms'               => array('type' => 'timestamp', 'label' => 'DateModification', 'enabled' => '1', 'position' => 50, 'notnull' => 0, 'visible' => 0,),
-		'category'          => array('type' => 'integer', 'label' => 'PriorVisit', 'enabled' => '1', 'position' => 60, 'notnull' => -1, 'visible' => -1,),
-		'description'       => array('type' => 'text', 'label' => 'Description', 'enabled' => '1', 'position' => 70, 'notnull' => -1, 'visible' => -1,),
-		'prevention_method' => array('type' => 'text', 'label' => 'PreventionMethod', 'enabled' => '1', 'position' => 80, 'notnull' => -1, 'visible' => -1,),
-		'fk_preventionplan' => array('type' => 'integer', 'label' => 'FkPreventionPlan', 'enabled' => '1', 'position' => 90, 'notnull' => 1, 'visible' => 0,),
-		'fk_element'        => array('type' => 'integer', 'label' => 'FkElement', 'enabled' => '1', 'position' => 100, 'notnull' => 1, 'visible' => 0,),
-	);
+	public $fields = [
+        'rowid'             => ['type' => 'integer',      'label' => 'TechnicalID',       'enabled' => 1, 'position' => 1,   'notnull' => 1, 'visible' => 0, 'noteditable' => 1, 'index' => 1, 'comment' => 'Id'],
+        'ref'               => ['type' => 'varchar(128)', 'label' => 'Ref',               'enabled' => 1, 'position' => 10,  'notnull' => 1, 'visible' => 4, 'noteditable' => 1, 'default' => '(PROV)', 'index' =>1, 'searchall' => 1, 'showoncombobox' => 1, 'validate' => 1, 'comment' => 'Reference of object'],
+        'ref_ext'           => ['type' => 'varchar(128)', 'label' => 'RefExt',            'enabled' => 1, 'position' => 20,  'notnull' => 0, 'visible' => 0],
+        'entity'            => ['type' => 'integer',      'label' => 'Entity',            'enabled' => 1, 'position' => 30,  'notnull' => 1, 'visible' => 0, 'index' => 1],
+        'date_creation'     => ['type' => 'datetime',     'label' => 'DateCreation',      'enabled' => 1, 'position' => 40,  'notnull' => 1, 'visible' => 0],
+        'tms'               => ['type' => 'timestamp',    'label' => 'DateModification',  'enabled' => 1, 'position' => 50,  'notnull' => 0, 'visible' => 0],
+        'status'            => ['type' => 'smallint',     'label' => 'Status',            'enabled' => 1, 'position' => 110, 'notnull' => 1, 'visible' => 0, 'default' => 0, 'index' => 1],
+        'category'          => ['type' => 'integer', 'label' => 'INRSRisk', 'enabled' => '1', 'position' => 60, 'notnull' => -1, 'visible' => -1,],
+        'description'       => ['type' => 'text', 'label' => 'Description', 'enabled' => '1', 'position' => 70, 'notnull' => -1, 'visible' => -1,],
+        'prevention_method' => ['type' => 'text', 'label' => 'PreventionMethod', 'enabled' => '1', 'position' => 80, 'notnull' => -1, 'visible' => -1,],
+        'fk_preventionplan' => ['type' => 'integer', 'label' => 'FkPreventionPlan', 'enabled' => '1', 'position' => 90, 'notnull' => 1, 'visible' => 0,],
+        'fk_element'        => ['type' => 'integer', 'label' => 'FkElement', 'enabled' => '1', 'position' => 100, 'notnull' => 1, 'visible' => 0,],
+    ];
 
 	public $rowid;
 	public $ref;
 	public $ref_ext;
 	public $date_creation;
 	public $tms;
+    public $status;
 	public $category;
 	public $description;
-	public $prevention_method;
-	public $fk_preventionplan;
+	public $preventionMethod;
+	public $fkPreventionPlan;
 	public $fk_element;
 
 	/**
@@ -824,351 +471,32 @@ class PreventionPlanLine extends CommonObjectLine
 	 */
 	public function __construct(DoliDB $db)
 	{
-		global $conf;
-
-		$this->db = $db;
-
-		if (empty($conf->global->MAIN_SHOW_TECHNICAL_ID) && isset($this->fields['rowid'])) $this->fields['rowid']['visible'] = 0;
-		if (empty($conf->multicompany->enabled) && isset($this->fields['entity'])) $this->fields['entity']['enabled']        = 0;
+		parent::__construct($db, $this->module, $this->element);
 	}
 
-	/**
-	 *	Load prevention plan line from database
-	 *
-	 *	@param	int		$rowid      id of invoice line to get
-	 *	@return	int					<0 if KO, >0 if OK
-	 */
-	public function fetch($rowid)
-	{
-		global $db;
+    /**
+     * Write information of trigger description
+     *
+     * @param  Object $object Object calling the trigger
+     * @return string         Description to display in actioncomm->note_private
+     */
+    public function getTriggerDescription(SaturneObject $object): string
+    {
+        global $langs;
 
-		$sql  = 'SELECT  t.rowid, t.ref, t.date_creation, t.description, t.category, t.prevention_method, t.fk_preventionplan, t.fk_element ';
-		$sql .= ' FROM ' . MAIN_DB_PREFIX . 'digiriskdolibarr_preventionplandet as t';
-		$sql .= ' WHERE t.rowid = ' . $rowid;
-		$sql .= ' AND entity IN (' . getEntity($this->table_element) . ')';
+        require_once __DIR__ . '/digiriskelement.class.php';
+        require_once __DIR__ . '/riskanalysis/risk.class.php';
 
-		$result = $db->query($sql);
-		if ($result) {
-			$objp = $db->fetch_object($result);
+        $ret = parent::getTriggerDescription($object);
 
-			$this->id                = $objp->rowid;
-			$this->ref               = $objp->ref;
-			$this->date_creation     = $objp->date_creation;
-			$this->description       = $objp->description;
-			$this->category          = $objp->category;
-			$this->prevention_method = $objp->prevention_method;
-			$this->fk_preventionplan = $objp->fk_preventionplan;
-			$this->fk_element        = $objp->fk_element;
+        $risk            = new Risk($this->db);
+        $digiriskelement = new DigiriskElement($this->db);
+        $digiriskelement->fetch($object->fk_element);
 
-			$db->free($result);
+        $ret .= $langs->trans('ParentElement') . ' : ' . $digiriskelement->ref . " - " . $digiriskelement->label . '<br>';
+        $ret .= $langs->trans('INRSRisk') . ' : ' .  $risk->getDangerCategoryName($object) . '<br>';
+        $ret .= $langs->trans('PreventionMethod') . ' : ' . (!empty($object->prevention_method) ? $object->prevention_method : 'N/A') . '<br>';
 
-			return $this->id;
-		} else {
-			$this->error = $db->lasterror();
-			return -1;
-		}
-	}
-
-	/**
-	 * Load preventionplan line line from database
-	 *
-	 * @param string $sortorder Sort Order
-	 * @param string $sortfield Sort field
-	 * @param int $limit offset limit
-	 * @param int $offset offset limit
-	 * @param array $filter filter array
-	 * @param string $filtermode filter mode (AND or OR)
-	 * @param int $parent_id
-	 * @return array|int
-	 */
-	public function fetchAll($sortorder = '', $sortfield = '', $limit = 0, $offset = 0, array $filter = array(), $filtermode = 'AND', $parent_id = 0)
-	{
-		global $db;
-		$sql  = 'SELECT  t.rowid, t.ref, t.date_creation, t.description, t.category, t.prevention_method, t.fk_element';
-		$sql .= ' FROM ' . MAIN_DB_PREFIX . 'digiriskdolibarr_preventionplandet as t';
-		if ($parent_id > 0) {
-			$sql .= ' WHERE t.fk_preventionplan = ' . $parent_id;
-		} else {
-			$sql .= ' WHERE 1=1';
-		}
-		$sql .= ' AND entity IN (' . getEntity($this->table_element) . ')';
-
-
-		$result = $db->query($sql);
-
-		if ($result) {
-			$num = $db->num_rows($result);
-
-			$i = 0;
-			$records = array();
-			while ($i < ($limit ? min($limit, $num) : $num)) {
-				$obj = $db->fetch_object($result);
-
-				$record = new self($db);
-
-				$record->id                = $obj->rowid;
-				$record->ref               = $obj->ref;
-				$record->date_creation     = $obj->date_creation;
-				$record->description       = $obj->description;
-				$record->category          = $obj->category;
-				$record->prevention_method = $obj->prevention_method;
-				$record->fk_preventionplan = $obj->fk_preventionplan;
-				$record->fk_element        = $obj->fk_element;
-
-				$records[$record->id] = $record;
-
-				$i++;
-			}
-
-			$db->free($result);
-
-			return $records;
-		} else {
-			$this->error = $db->lasterror();
-			return -1;
-		}
-	}
-
-	/**
-	 *    Insert line into database
-	 *
-	 * @param User $user
-	 * @param bool $notrigger 1 no triggers
-	 * @return        int                                         <0 if KO, >0 if OK
-	 * @throws Exception
-	 */
-	public function insert(User $user, $notrigger = false)
-	{
-		global $db, $user;
-
-		// Clean parameters
-		$this->description = trim($this->description);
-
-		$db->begin();
-		$now = dol_now();
-
-		// Insertion dans base de la ligne
-		$sql  = 'INSERT INTO ' . MAIN_DB_PREFIX . 'digiriskdolibarr_preventionplandet';
-		$sql .= ' (ref, entity, date_creation, description, category, prevention_method, fk_preventionplan, fk_element';
-		$sql .= ')';
-		$sql .= " VALUES (";
-		$sql .= "'" . $db->escape($this->ref) . "'" . ", ";
-		$sql .= $this->entity . ", ";
-		$sql .= "'" . $db->escape($db->idate($now)) . "'" . ", ";
-		$sql .= "'" . $db->escape($this->description) . "'" . ", ";
-		$sql .= $this->category . ", ";
-		$sql .= "'" . $db->escape($this->prevention_method) . "'" . ", ";
-		$sql .= $this->fk_preventionplan . ", ";
-		$sql .= $this->fk_element ;
-
-		$sql .= ')';
-
-		dol_syslog(get_class($this) . "::insert", LOG_DEBUG);
-		$resql = $db->query($sql);
-
-		if ($resql) {
-			$this->id    = $db->last_insert_id(MAIN_DB_PREFIX . 'preventionplandet');
-			$this->rowid = $this->id; // For backward compatibility
-
-			$db->commit();
-			// Triggers
-			if ( ! $notrigger) {
-				// Call triggers
-				$this->call_trigger(strtoupper(get_class($this)) . '_CREATE', $user);
-				// End call triggers
-			}
-			return $this->id;
-		} else {
-			$this->error = $db->lasterror();
-			$db->rollback();
-			return -2;
-		}
-	}
-
-	/**
-	 *    Update line into database
-	 *
-	 * @param User $user User object
-	 * @param bool $notrigger Disable triggers
-	 * @return        int                    <0 if KO, >0 if OK
-	 * @throws Exception
-	 */
-	public function update(User $user, $notrigger = false)
-	{
-		global $user, $db;
-
-		// Clean parameters
-		$this->description = trim($this->description);
-
-		$db->begin();
-
-		$sql  = "UPDATE " . MAIN_DB_PREFIX . "digiriskdolibarr_preventionplandet SET";
-		$sql .= " ref='" . $db->escape($this->ref) . "',";
-		$sql .= " description='" . $db->escape($this->description) . "',";
-		$sql .= " category=" . $db->escape($this->category) . ",";
-		$sql .= " prevention_method='" . $db->escape($this->prevention_method) . "'" . ",";
-		$sql .= " fk_preventionplan=" . $db->escape($this->fk_preventionplan) . ",";
-		$sql .= " fk_element=" . $db->escape($this->fk_element);
-
-		$sql .= " WHERE rowid = " . $this->id;
-
-		dol_syslog(get_class($this) . "::update", LOG_DEBUG);
-		$resql = $db->query($sql);
-
-		if ($resql) {
-			$db->commit();
-			// Triggers
-			if ( ! $notrigger) {
-				// Call triggers
-				$this->call_trigger(strtoupper(get_class($this)) . '_MODIFY', $user);
-				// End call triggers
-			}
-			return $this->id;
-		} else {
-			$this->error = $db->error();
-			$db->rollback();
-			return -2;
-		}
-	}
-
-	/**
-	 *    Delete line in database
-	 *
-	 * @param User $user
-	 * @param bool $notrigger
-	 * @return        int                   <0 if KO, >0 if OK
-	 * @throws Exception
-	 */
-	public function delete(User $user, $notrigger = false)
-	{
-		global $user, $db;
-
-		$db->begin();
-
-		$sql = "DELETE FROM " . MAIN_DB_PREFIX . "digiriskdolibarr_preventionplandet WHERE rowid = " . $this->id;
-		dol_syslog(get_class($this) . "::delete", LOG_DEBUG);
-		if ($db->query($sql)) {
-			$db->commit();
-			// Triggers
-			if ( ! $notrigger) {
-				// Call trigger
-				$this->call_trigger(strtoupper(get_class($this)) . '_DELETE', $user);
-				// End call triggers
-			}
-			return 1;
-		} else {
-			$this->error = $db->error() . " sql=" . $sql;
-			$db->rollback();
-			return -1;
-		}
-	}
-}
-
-/**
- * Class PreventionPlanSignature
- */
-class PreventionPlanSignature extends DigiriskSignature
-{
-	/**
-	 * @var string Name of table without prefix where object is stored. This is also the key used for extrafields management.
-	 */
-
-	public $object_type = 'preventionplan';
-
-	/**
-	 * @var array Context element object
-	 */
-	public $context = array();
-
-	/**
-	 * Constructor
-	 *
-	 * @param DoliDb $db Database handler
-	 */
-	public function __construct(DoliDB $db)
-	{
-		global $conf, $langs;
-
-		$this->db = $db;
-
-		if (empty($conf->global->MAIN_SHOW_TECHNICAL_ID) && isset($this->fields['rowid'])) $this->fields['rowid']['visible'] = 0;
-		if (empty($conf->multicompany->enabled) && isset($this->fields['entity'])) $this->fields['entity']['enabled']        = 0;
-
-		// Unset fields that are disabled
-		foreach ($this->fields as $key => $val) {
-			if (isset($val['enabled']) && empty($val['enabled'])) {
-				unset($this->fields[$key]);
-			}
-		}
-
-		// Translate some data of arrayofkeyval
-		if (is_object($langs)) {
-			foreach ($this->fields as $key => $val) {
-				if (is_array($val['arrayofkeyval'])) {
-					foreach ($val['arrayofkeyval'] as $key2 => $val2) {
-						$this->fields[$key]['arrayofkeyval'][$key2] = $langs->trans($val2);
-					}
-				}
-			}
-		}
-	}
-
-	/**
-	 * Clone an object into another one
-	 *
-	 * @param User $user User that creates
-	 * @param int $fromid Id of object to clone
-	 * @param $preventionplanid
-	 * @return    mixed                New object created, <0 if KO
-	 * @throws Exception
-	 */
-	public function createFromClone(User $user, $fromid, $preventionplanid)
-	{
-		$error = 0;
-
-		dol_syslog(__METHOD__, LOG_DEBUG);
-
-		$object = new self($this->db);
-
-		$this->db->begin();
-
-		// Load source object
-		$object->fetchCommon($fromid);
-
-		// Reset some properties
-		unset($object->id);
-		unset($object->fk_user_creat);
-		unset($object->import_key);
-		unset($object->signature);
-		unset($object->signature_date);
-		unset($object->last_email_sent_date);
-
-		// Clear fields
-		if (property_exists($object, 'date_creation')) {
-			$object->date_creation = dol_now();
-		}
-		if (property_exists($object, 'fk_object')) {
-			$object->fk_object = $preventionplanid;
-		}
-		if (property_exists($object, 'status')) {
-			$object->status = 1;
-		}
-		if (property_exists($object, 'signature_url')) {
-			$object->signature_url = generate_random_id(16);
-		}
-
-		// Create clone
-		$object->context['createfromclone'] = 'createfromclone';
-		$result                             = $object->createCommon($user);
-		unset($object->context['createfromclone']);
-
-		// End
-		if ( ! $error) {
-			$this->db->commit();
-			return $result;
-		} else {
-			$this->db->rollback();
-			return -1;
-		}
-	}
+        return $ret;
+    }
 }

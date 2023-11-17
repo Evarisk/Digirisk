@@ -1,5 +1,5 @@
 <?php
-/* Copyright (C) 2021 EOXIA <dev@eoxia.com>
+/* Copyright (C) 2021-2023 EVARISK <technique@evarisk.com>
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -21,20 +21,15 @@
  *		\brief      Page to view riskassessmentdocument
  */
 
-// Load Dolibarr environment
-$res = 0;
-// Try main.inc.php into web root known defined into CONTEXT_DOCUMENT_ROOT (not always defined)
-if ( ! $res && ! empty($_SERVER["CONTEXT_DOCUMENT_ROOT"])) $res = @include $_SERVER["CONTEXT_DOCUMENT_ROOT"] . "/main.inc.php";
-// Try main.inc.php into web root detected using web root calculated from SCRIPT_FILENAME
-$tmp = empty($_SERVER['SCRIPT_FILENAME']) ? '' : $_SERVER['SCRIPT_FILENAME']; $tmp2 = realpath(__FILE__); $i = strlen($tmp) - 1; $j = strlen($tmp2) - 1;
-while ($i > 0 && $j > 0 && isset($tmp[$i]) && isset($tmp2[$j]) && $tmp[$i] == $tmp2[$j]) { $i--; $j--; }
-if ( ! $res && $i > 0 && file_exists(substr($tmp, 0, ($i + 1)) . "/main.inc.php")) $res          = @include substr($tmp, 0, ($i + 1)) . "/main.inc.php";
-if ( ! $res && $i > 0 && file_exists(dirname(substr($tmp, 0, ($i + 1))) . "/main.inc.php")) $res = @include dirname(substr($tmp, 0, ($i + 1))) . "/main.inc.php";
-// Try main.inc.php using relative path
-if ( ! $res && file_exists("../../main.inc.php")) $res       = @include "../../main.inc.php";
-if ( ! $res && file_exists("../../../main.inc.php")) $res    = @include "../../../main.inc.php";
-if ( ! $res && file_exists("../../../../main.inc.php")) $res = @include "../../../../main.inc.php";
-if ( ! $res) die("Include of main fails");
+
+// Load DigiriskDolibarr environment
+if (file_exists('../digiriskdolibarr.main.inc.php')) {
+	require_once __DIR__ . '/../digiriskdolibarr.main.inc.php';
+} elseif (file_exists('../../digiriskdolibarr.main.inc.php')) {
+	require_once __DIR__ . '/../../digiriskdolibarr.main.inc.php';
+} else {
+	die('Include of digiriskdolibarr main fails');
+}
 
 require_once DOL_DOCUMENT_ROOT . '/core/lib/admin.lib.php';
 require_once DOL_DOCUMENT_ROOT . '/core/class/doleditor.class.php';
@@ -42,52 +37,49 @@ require_once DOL_DOCUMENT_ROOT . '/contact/class/contact.class.php';
 require_once DOL_DOCUMENT_ROOT . '/core/lib/images.lib.php';
 require_once DOL_DOCUMENT_ROOT . '/projet/class/project.class.php';
 
-require_once './../../class/digiriskresources.class.php';
-require_once './../../class/digiriskstandard.class.php';
-require_once './../../class/digiriskelement.class.php';
-require_once './../../class/digiriskdocuments/groupmentdocument.class.php';
-require_once './../../class/digiriskdocuments/workunitdocument.class.php';
-require_once './../../class/digiriskdocuments/riskassessmentdocument.class.php';
-require_once './../../lib/digiriskdolibarr_digiriskstandard.lib.php';
-require_once './../../lib/digiriskdolibarr_function.lib.php';
-require_once './../../core/modules/digiriskdolibarr/digiriskdocuments/riskassessmentdocument/mod_riskassessmentdocument_standard.php';
-require_once './../../core/modules/digiriskdolibarr/digiriskdocuments/riskassessmentdocument/modules_riskassessmentdocument.php';
+require_once __DIR__ . '/../../class/digiriskresources.class.php';
+require_once __DIR__ . '/../../class/digiriskstandard.class.php';
+require_once __DIR__ . '/../../class/digiriskelement.class.php';
+require_once __DIR__ . '/../../class/digiriskdolibarrdocuments/groupmentdocument.class.php';
+require_once __DIR__ . '/../../class/digiriskdolibarrdocuments/workunitdocument.class.php';
+require_once __DIR__ . '/../../class/digiriskdolibarrdocuments/riskassessmentdocument.class.php';
+require_once __DIR__ . '/../../lib/digiriskdolibarr_digiriskstandard.lib.php';
+require_once __DIR__ . '/../../lib/digiriskdolibarr_function.lib.php';
 
 global $db, $conf, $langs, $hookmanager, $user;
 
 // Load translation files required by the page
-$langs->loadLangs(array("digiriskdolibarr@digiriskdolibarr", "other"));
+saturne_load_langs(['other']);
 
 // Get parameters
-$action = GETPOST('action', 'aZ09');
+$action    = GETPOST('action', 'aZ09');
+$subaction = GETPOST('subaction', 'aZ09');
+$id        = GETPOST('id', 'integer');
 
 // Initialize technical objects
-$object                 = new DigiriskStandard($db);
-$digiriskelement        = new DigiriskElement($db);
-$riskassessmentdocument = new RiskAssessmentDocument($db);
-$digiriskresources      = new DigiriskResources($db);
-$thirdparty             = new Societe($db);
-$contact                = new Contact($db);
-$project                = new Project($db);
+$object            = new DigiriskStandard($db);
+$digiriskelement   = new DigiriskElement($db);
+$document          = new RiskAssessmentDocument($db);
+$digiriskresources = new DigiriskResources($db);
+$thirdparty        = new Societe($db);
+$contact           = new Contact($db);
+$project           = new Project($db);
 
-$hookmanager->initHooks(array('digiriskelementriskassessmentdocument', 'globalcard')); // Note that conf->hooks_modules contains array
+$hookmanager->initHooks(array('digiriskelementriskassessmentdocument', 'digiriskstandardview', 'globalcard')); // Note that conf->hooks_modules contains array
 
 $object->fetch($conf->global->DIGIRISKDOLIBARR_ACTIVE_STANDARD);
 
 // Load resources
-$allLinks = $digiriskresources->digirisk_dolibarr_fetch_resources();
+$allLinks = $digiriskresources->fetchDigiriskResources();
 
-$upload_dir = $conf->digiriskdolibarr->multidir_output[isset($conf->entity) ? $conf->entity : 1];
+$upload_dir = $conf->digiriskdolibarr->multidir_output[$conf->entity ?? 1];
 
-//Security check
-require_once __DIR__ . '/../../core/tpl/digirisk_security_checks.php';
-
-$permissiontoread   = $user->rights->digiriskdolibarr->riskassessmentdocument->read;
+// Security check - Protection if external user
+$permissiontoread   = $user->rights->digiriskdolibarr->digiriskstandard->read && $user->rights->digiriskdolibarr->riskassessmentdocument->read;
 $permissiontoadd    = $user->rights->digiriskdolibarr->riskassessmentdocument->write;
 $permissiontodelete = $user->rights->digiriskdolibarr->riskassessmentdocument->delete;
 $permtoupload       = $user->rights->ecm->upload;
-
-if ( ! $permissiontoread) accessforbidden();
+saturne_check_access($permissiontoread);
 
 /*
  * Actions
@@ -150,8 +142,9 @@ if (empty($reshook)) {
 				}
 
 				if ( ! $error) {
-					$filedir = $upload_dir . '/riskassessmentdocument/';
-					if ( ! empty($filedir)) {
+					$filedir = $upload_dir . '/riskassessmentdocument/siteplans/';
+                    array_map('unlink', array_filter((array) glob($filedir . '*')));
+                    if ( ! empty($filedir)) {
 						$result = digirisk_dol_add_file_process($filedir, 0, 1, 'userfile', '', null, '', 1, $object);
 					}
 				}
@@ -183,98 +176,110 @@ if (empty($reshook)) {
 
 		$model = GETPOST('model', 'alpha');
 
-		$moreparams['object'] = "";
+		$previousRef = $object->ref;
+		$object->ref = '';
+		$moreparams['object'] = $object;
 		$moreparams['user']   = $user;
+		$moreparams['objectType'] = 'riskassessment';
 
-		$result = $riskassessmentdocument->generateDocument($model, $outputlangs, $hidedetails, $hidedesc, $hideref, $moreparams);
+		$result = $document->generateDocument($model, $outputlangs, $hidedetails, $hidedesc, $hideref, $moreparams);
 
-		//Création du dossier à zipper
-		$entity = ($conf->entity > 1) ? '/' . $conf->entity : '';
+		$object->ref = $previousRef;
+		if ($result > 0) {
+			//Création du dossier à zipper
+			$entity = ($conf->entity > 1) ? '/' . $conf->entity : '';
 
-		$date        = dol_print_date(dol_now(), 'dayxcard');
-		$nameSociety = str_replace(' ', '_', $conf->global->MAIN_INFO_SOCIETE_NOM);
-		$nameSociety = preg_replace('/\./', '_', $conf->global->MAIN_INFO_SOCIETE_NOM);
+			$date        = dol_print_date(dol_now(), 'dayxcard');
+			$nameSociety = str_replace(' ', '_', $conf->global->MAIN_INFO_SOCIETE_NOM);
+			$nameSociety = preg_replace('/\./', '_', $nameSociety);
+            $nameSociety = dol_sanitizeFileName($nameSociety);
 
-		$pathToZip = DOL_DATA_ROOT . $entity . '/digiriskdolibarr/riskassessmentdocument/' . $date . '_'. $riskassessmentdocument->ref . '_' . $nameSociety;
-		dol_mkdir($pathToZip);
+			$pathToZip = DOL_DATA_ROOT . $entity . '/digiriskdolibarr/riskassessmentdocument/' . $date . '_'. $document->ref . '_' . $nameSociety;
+			dol_mkdir($pathToZip);
 
-		// Ajout du fichier au dossier à zipper
-		$nameFile = $date . '_' . $riskassessmentdocument->ref . '_' . $nameSociety;
-		$nameFile = str_replace(' ', '_', $nameFile);
-		$nameFile = dol_sanitizeFileName($nameFile);
-		copy(DOL_DATA_ROOT . $entity . '/digiriskdolibarr/riskassessmentdocument/' . $riskassessmentdocument->last_main_doc, $pathToZip . '/' . $nameFile . '.odt');
-		$pathinfo = pathinfo($riskassessmentdocument->last_main_doc);
-		if (file_exists(DOL_DATA_ROOT . $entity . '/digiriskdolibarr/riskassessmentdocument/' . $pathinfo['filename'] . '.pdf')) {
-			copy(DOL_DATA_ROOT . $entity . '/digiriskdolibarr/riskassessmentdocument/' . $pathinfo['filename'] . '.pdf', $pathToZip . '/' . $nameFile . '.pdf');
-		}
+			// Ajout du fichier au dossier à zipper
+			$nameFile = $date . '_' . $document->ref . '_' . $nameSociety;
+			$nameFile = str_replace(' ', '_', $nameFile);
+			$nameFile = dol_sanitizeFileName($nameFile);
 
-		if ($conf->global->DIGIRISKDOLIBARR_GENERATE_ARCHIVE_WITH_DIGIRISKELEMENT_DOCUMENTS) {
-			$digiriskelementlist = $digiriskelement->fetchDigiriskElementFlat(0);
 
-			if ( ! empty($digiriskelementlist) ) {
-				foreach ($digiriskelementlist as $digiriskelementsingle) {
-					if ($digiriskelementsingle['object']->element_type == 'groupment') {
-						$digiriskelementdocument = new GroupmentDocument($db);
-					} elseif ($digiriskelementsingle['object']->element_type == 'workunit') {
-						$digiriskelementdocument = new WorkUnitDocument($db);
-					}
-					$subFolder = $digiriskelementdocument->element;
-
-					$moreparams['object'] = $digiriskelementsingle['object'];
-
-					$digiriskelementdocumentmodel = 'DIGIRISKDOLIBARR_' . strtoupper($digiriskelementdocument->element) . '_DEFAULT_MODEL';
-					$digiriskelementdocumentmodelpath = 'DIGIRISKDOLIBARR_' . strtoupper($digiriskelementdocument->element) . '_ADDON_ODT_PATH';
-					$digiriskelementdocumentmodelpath = preg_replace('/DOL_DOCUMENT_ROOT/', DOL_DOCUMENT_ROOT, $conf->global->$digiriskelementdocumentmodelpath);
-					$templateName = preg_replace( '/_/','.' , $conf->global->$digiriskelementdocumentmodel);
-					$digiriskelementdocumentmodelfinal = $conf->global->$digiriskelementdocumentmodel . ':' . $digiriskelementdocumentmodelpath . 'template_' . $templateName;
-
-					$digiriskelementdocument->generateDocument($digiriskelementdocumentmodelfinal, $outputlangs, $hidedetails, $hidedesc, $hideref, $moreparams);
-
-					// Ajout du fichier au dossier à zipper
-					$sourceFilePath = DOL_DATA_ROOT . $entity . '/digiriskdolibarr/' . $subFolder . '/' . $digiriskelementsingle['object']->ref . '/';
-					$nameFile       = $date . '_' . $riskassessmentdocument->ref . '_' . $digiriskelementsingle['object']->ref . '_' . $digiriskelementdocument->ref . '_' . $digiriskelementsingle['object']->label . '_' . $nameSociety;
-					$nameFile       = str_replace(' ', '_', $nameFile);
-					$nameFile       = dol_sanitizeFileName($nameFile);
-					copy($sourceFilePath . $digiriskelementdocument->last_main_doc, $pathToZip . '/' . $nameFile . '.odt');
-					$pathinfo = pathinfo($digiriskelementdocument->last_main_doc);
-					if (file_exists($sourceFilePath . $pathinfo['filename'] . '.pdf')) {
-						copy($sourceFilePath . $pathinfo['filename'] . '.pdf', $pathToZip . '/' . $nameFile . '.pdf');
-					}
-				}
-
-				// Get real path for our folder
-				$rootPath = realpath($pathToZip);
-
-				// Initialize archive object
-				$zip = new ZipArchive();
-
-				$zip->open($riskassessmentdocument->ref . '.zip', ZipArchive::CREATE | ZipArchive::OVERWRITE);
-
-				// Create recursive directory iterator
-				/** @var SplFileInfo[] $files */
-				$files = new RecursiveIteratorIterator(
-					new RecursiveDirectoryIterator($rootPath),
-					RecursiveIteratorIterator::LEAVES_ONLY
-				);
-
-				foreach ($files as $name => $file) {
-					// Skip directories (they would be added automatically)
-					if ( ! $file->isDir()) {
-						// Get real and relative path for current file
-						$filePath     = $file->getRealPath();
-						$relativePath = substr($filePath, strlen($rootPath) + 1);
-
-						// Add current file to archive
-						$zip->addFile($filePath, $relativePath);
-					}
-				}
-
-				// Zip archive will be created only after closing object
-				$zip->close();
-
-				//move archive to riskassessmentdocument folder
-				rename(DOL_DOCUMENT_ROOT . '/custom/digiriskdolibarr/view/digiriskstandard/' . $riskassessmentdocument->ref . '.zip', $pathToZip . '.zip');
+			copy(DOL_DATA_ROOT . $entity . '/digiriskdolibarr/riskassessmentdocument/' . $document->last_main_doc, $pathToZip . '/' . $nameFile . '.odt');
+			$pathinfo = pathinfo($document->last_main_doc);
+			if (file_exists(DOL_DATA_ROOT . $entity . '/digiriskdolibarr/riskassessmentdocument/' . $pathinfo['filename'] . '.pdf')) {
+				copy(DOL_DATA_ROOT . $entity . '/digiriskdolibarr/riskassessmentdocument/' . $pathinfo['filename'] . '.pdf', $pathToZip . '/' . $nameFile . '.pdf');
 			}
+
+			if ($conf->global->DIGIRISKDOLIBARR_GENERATE_ARCHIVE_WITH_DIGIRISKELEMENT_DOCUMENTS) {
+				$digiriskelementlist = $digiriskelement->fetchDigiriskElementFlat(0);
+
+				if ( ! empty($digiriskelementlist) ) {
+					foreach ($digiriskelementlist as $digiriskelementsingle) {
+						if ($digiriskelementsingle['object']->element_type == 'groupment') {
+							$digiriskelementdocument = new GroupmentDocument($db);
+						} elseif ($digiriskelementsingle['object']->element_type == 'workunit') {
+							$digiriskelementdocument = new WorkUnitDocument($db);
+						}
+						$subFolder = $digiriskelementdocument->element;
+
+						$moreparams['object']     = $digiriskelementsingle['object'];
+						$moreparams['objectType'] = $digiriskelementsingle['object']->element_type;
+
+						$digiriskelementdocumentmodel = 'DIGIRISKDOLIBARR_' . strtoupper($digiriskelementdocument->element) . '_DEFAULT_MODEL';
+						$digiriskelementdocumentmodelpath = 'DIGIRISKDOLIBARR_' . strtoupper($digiriskelementdocument->element) . '_ADDON_ODT_PATH';
+						$digiriskelementdocumentmodelpath = preg_replace('/DOL_DOCUMENT_ROOT/', DOL_DOCUMENT_ROOT, $conf->global->$digiriskelementdocumentmodelpath);
+						$templateName = preg_replace( '/_/','.' , $conf->global->$digiriskelementdocumentmodel);
+						$digiriskelementdocumentmodelfinal = $conf->global->$digiriskelementdocumentmodel . ':' . $digiriskelementdocumentmodelpath . 'template_' . $templateName;
+
+						$result = $digiriskelementdocument->generateDocument($digiriskelementdocumentmodelfinal, $outputlangs, $hidedetails, $hidedesc, $hideref, $moreparams);
+
+						// Ajout du fichier au dossier à zipper
+						$sourceFilePath = DOL_DATA_ROOT . $entity . '/digiriskdolibarr/' . $subFolder . '/' . $digiriskelementsingle['object']->ref . '/';
+						$nameFile       = $date . '_' . $document->ref . '_' . $digiriskelementsingle['object']->ref . '_' . $digiriskelementdocument->ref . '_' . $digiriskelementsingle['object']->label . '_' . $nameSociety;
+						$nameFile       = str_replace(' ', '_', $nameFile);
+						$nameFile       = dol_sanitizeFileName($nameFile);
+
+						copy($sourceFilePath . $digiriskelementdocument->last_main_doc, $pathToZip . '/' . $nameFile . '.odt');
+						$pathinfo = pathinfo($digiriskelementdocument->last_main_doc);
+						if (file_exists($sourceFilePath . $pathinfo['filename'] . '.pdf')) {
+							copy($sourceFilePath . $pathinfo['filename'] . '.pdf', $pathToZip . '/' . $nameFile . '.pdf');
+						}
+					}
+
+					// Get real path for our folder
+					$rootPath = realpath($pathToZip);
+
+					// Initialize archive object
+					$zip = new ZipArchive();
+
+					$zip->open($document->ref . '.zip', ZipArchive::CREATE | ZipArchive::OVERWRITE);
+
+					// Create recursive directory iterator
+					/** @var SplFileInfo[] $files */
+					$files = new RecursiveIteratorIterator(
+						new RecursiveDirectoryIterator($rootPath),
+						RecursiveIteratorIterator::LEAVES_ONLY
+					);
+
+					foreach ($files as $name => $file) {
+						// Skip directories (they would be added automatically)
+						if ( ! $file->isDir()) {
+							// Get real and relative path for current file
+							$filePath     = $file->getRealPath();
+							$relativePath = substr($filePath, strlen($rootPath) + 1);
+
+							// Add current file to archive
+							$zip->addFile($filePath, $relativePath);
+						}
+					}
+
+					// Zip archive will be created only after closing object
+					$zip->close();
+
+					//move archive to riskassessmentdocument folder
+					rename(DOL_DOCUMENT_ROOT . '/custom/digiriskdolibarr/view/digiriskstandard/' . $document->ref . '.zip', $pathToZip . '.zip');
+				}
+			}
+
 		}
 
 		if ($result <= 0) {
@@ -282,7 +287,7 @@ if (empty($reshook)) {
 			$action = '';
 		} else {
 			if (empty($donotredirect)) {
-				setEventMessages($langs->trans("FileGenerated") . ' - ' . $riskassessmentdocument->last_main_doc, null);
+				setEventMessages($langs->trans("FileGenerated") . ' - ' . $document->last_main_doc, null);
 
 				$urltoredirect = $_SERVER['REQUEST_URI'];
 				$urltoredirect = preg_replace('/#builddoc$/', '', $urltoredirect);
@@ -298,41 +303,19 @@ if (empty($reshook)) {
 		}
 	}
 
+	// Actions builddoc, forcebuilddoc, remove_file.
+	require_once __DIR__ . '/../../../saturne/core/tpl/documents/documents_action.tpl.php';
+
 	// Action to generate pdf from odt file
-	require_once __DIR__ . '/../../core/tpl/documents/digiriskdolibarr_manual_pdf_generation_action.tpl.php';
-
-
-	// Delete file in doc form
-	if ($action == 'remove_file' && $permissiontodelete) {
-		if ( ! empty($upload_dir)) {
-			require_once DOL_DOCUMENT_ROOT . '/core/lib/files.lib.php';
-
-			$langs->load("other");
-			$filetodelete = GETPOST('file', 'alpha');
-			$file         = $upload_dir . '/' . $filetodelete;
-			$ret          = dol_delete_file($file, 0, 0, 0, $object);
-			if ($ret) setEventMessages($langs->trans("FileWasRemoved", $filetodelete), null, 'mesgs');
-			else setEventMessages($langs->trans("ErrorFailToDeleteFile", $filetodelete), null, 'errors');
-
-			// Make a redirect to avoid to keep the remove_file into the url that create side effects
-			$urltoredirect = $_SERVER['REQUEST_URI'];
-			$urltoredirect = preg_replace('/#builddoc$/', '', $urltoredirect);
-			$urltoredirect = preg_replace('/action=remove_file&?/', '', $urltoredirect);
-
-			header('Location: ' . $urltoredirect);
-			exit;
-		} else {
-			setEventMessages('BugFoundVarUploaddirnotDefined', null, 'errors');
-		}
-	}
+	require_once __DIR__ . '/../../../saturne/core/tpl/documents/saturne_manual_pdf_generation_action.tpl.php';
 
 	// Actions to send emails
 	$triggersendname     = 'RISKASSESSMENTDOCUMENT_SENTBYMAIL';
 	$mode                = 'emailfromthirdparty';
-	$trackid             = 'thi' . $object->id;
+	$trackid             = 'riskassessment' . $object->id;
 	$labour_inspector    = $allLinks['LabourInspectorSociety'];
-	$labour_inspector_id = $allLinks['LabourInspectorSociety']->id[0];
-	$thirdparty->fetch($labour_inspector_id);
+	$labourInspectorId = $allLinks['LabourInspectorSociety']->id[0];
+	$thirdparty->fetch($labourInspectorId);
 	$object->thirdparty = $thirdparty;
 	include DOL_DOCUMENT_ROOT . '/core/actions_sendmails.inc.php';
 }
@@ -341,22 +324,17 @@ if (empty($reshook)) {
  * View
  */
 
-$emptyobject = new stdClass();
-
 $title    = $langs->trans('RiskAssessmentDocument');
-$help_url = 'FR:Module_DigiriskDolibarr#Document_unique_2';
-$morejs   = array("/digiriskdolibarr/js/digiriskdolibarr.js");
-$morecss  = array("/digiriskdolibarr/css/digiriskdolibarr.css");
+$help_url = 'FR:Module_Digirisk#Impression_du_Document_Unique';
 
-digiriskHeader($title, $help_url, $morejs, $morecss); ?>
+digirisk_header($title, $help_url); ?>
 
 <div id="cardContent" value="">
 
 <?php // Part to show record
 $res  = $object->fetch_optionals();
-$head = digiriskstandardPrepareHead($object);
 
-print dol_get_fiche_head($head, 'standardRiskAssessmentDocument', $title, -1, "digiriskdolibarr@digiriskdolibarr");
+saturne_get_fiche_head($object, 'standardRiskAssessmentDocument', $title);
 
 // Object card
 // ------------------------------------------------------------
@@ -365,9 +343,10 @@ $morehtmlref = '<div class="refidno">';
 $project->fetch($conf->global->DIGIRISKDOLIBARR_DU_PROJECT);
 $morehtmlref .= $langs->trans('Project') . ' : ' . getNomUrlProject($project, 1, 'blank', 1);
 $morehtmlref .= '</div>';
-$morehtmlleft = '<div class="floatleft inline-block valignmiddle divphotoref">' . digirisk_show_photos('mycompany', $conf->mycompany->dir_output . '/logos', 'small', 1, 0, 0, 0, 80, 80, 0, 0, 0, 'logos', $emptyobject) . '</div>';
 
-digirisk_banner_tab($object, '', '', 0, '', '', $morehtmlref, '', '', $morehtmlleft);
+$moduleNameLowerCase = 'mycompany';
+saturne_banner_tab($object,'ref','none', 0, 'ref', 'ref', $morehtmlref, true);
+$moduleNameLowerCase = 'digiriskdolibarr';
 
 print '<form method="POST" action="' . $_SERVER["PHP_SELF"] . '" name="edit" enctype="multipart/form-data">';
 print '<input type="hidden" name="token" value="' . newToken() . '">';
@@ -379,7 +358,7 @@ print '<div class="fichecenter">';
 print '<table class="border centpercent tableforfield">' . "\n";
 
 //JSON Decode and show fields
-require_once './../../core/tpl/digiriskdocuments/digiriskdolibarr_riskassessmentdocumentfields_view.tpl.php';
+require_once __DIR__ . '/../../core/tpl/digiriskdocuments/digiriskdolibarr_riskassessmentdocumentfields_view.tpl.php';
 
 print '</table>';
 print '</div>';
@@ -415,12 +394,12 @@ if (empty($reshook)) {
 					print '<a class="butAction" id="actionButtonSendMail" href="' . $_SERVER['PHP_SELF'] . '?id=' . $object->id . '&action=presend&mode=init&sendto=' . $allLinks['LabourInspectorSociety']->id[0] . '#sendEmail' . '">' . $langs->trans('SendMail') . '</a>';
 				} else {
 					// Model
-					$class     = 'ModeleODTRiskAssessmentDocument';
-					$modellist = call_user_func($class . '::liste_modeles', $db, 100);
+					$class     = 'SaturneDocumentModel';
+					$modellist = call_user_func($class . '::liste_modeles', $db, 'riskassessmentdocument');
 
 					if ( ! empty($modellist)) {
 						asort($modellist);
-						$modellist = array_filter($modellist, 'remove_index');
+						$modellist = array_filter($modellist, 'saturne_remove_index');
 						if (is_array($modellist) && count($modellist) == 1) {    // If there is only one element
 							$arraykeys                = array_keys($modellist);
 							$arrayvalues              = preg_replace('/template_/', '', array_values($modellist)[0]);
@@ -454,10 +433,9 @@ print '</form>';
 print dol_get_fiche_end();
 
 // Document Generation -- Génération des documents
-$includedocgeneration = 1;
-if ($includedocgeneration && $action != 'edit') {
-	$dir_files  = 'riskassessmentdocument';
-	$filedir    = $upload_dir . '/' . $dir_files;
+if ($action != 'edit') {
+	$dirFiles   = 'riskassessmentdocument';
+	$filedir    = $upload_dir . '/' . $dirFiles;
 	$urlsource  = $_SERVER["PHP_SELF"];
 	$modulepart = 'digiriskdolibarr:RiskAssessmentDocument';
 
@@ -465,40 +443,42 @@ if ($includedocgeneration && $action != 'edit') {
 		$genallowed = 1;
 	}
 
-	print digiriskshowdocuments($modulepart, $dir_files, $filedir, $urlsource, $genallowed, $permissiontodelete, $conf->global->DIGIRISKDOLIBARR_RISKASSESSMENTDOCUMENT_DEFAULT_MODEL, 1, 0, '', $langs->trans('RiskAssessmentDocument'), '', '', $riskassessmentdocument, 0, 'remove_file');
+	print saturne_show_documents($modulepart, $dirFiles, $filedir, $urlsource, 1,1, '', 1, 0, 0, 0, 0, '', 0, '', empty($soc->default_lang) ? '' : $soc->default_lang, $object);
 }
 
 // Presend form
 $labour_inspector    = $allLinks['LabourInspectorSociety'];
-$labour_inspector_id = $allLinks['LabourInspectorSociety']->id[0];
-$thirdparty->fetch($labour_inspector_id);
+$labourInspectorId = $allLinks['LabourInspectorSociety']->id[0];
+$thirdparty->fetch($labourInspectorId);
 $object->thirdparty = $thirdparty;
 
-$modelmail              = 'riskassessmentdocument';
-$defaulttopic           = 'Information';
-$diroutput              = $upload_dir . '/riskassessmentdocument';
-$filter                 = array('customsql' => "t.type='riskassessmentdocument'");
-$riskassessmentdocument = $riskassessmentdocument->fetchAll('desc', 't.rowid', 1, 0, $filter, 'AND');
-if ( ! empty($riskassessmentdocument) && is_array($riskassessmentdocument)) {
-	$riskassessmentdocument = array_shift($riskassessmentdocument);
-	$ref                    = dol_sanitizeFileName($riskassessmentdocument->ref);
-}
-$trackid = 'thi' . $object->id;
+$modelmail    = 'riskassessmentdocument';
+$defaulttopic = 'Information';
+$diroutput    = $upload_dir . '/riskassessmentdocument';
+$filter       = array('customsql' => "t.type='riskassessmentdocument'");
+$document     = $document->fetchAll('desc', 't.rowid', 1, 0, $filter);
 
-if ($action == 'presend' && ! empty($riskassessmentdocument)) {
+if (!empty($document) && is_array($document)) {
+	$document = array_shift($document);
+	$ref      = dol_sanitizeFileName($document->ref);
+}
+$trackid = 'riskassessment' . $object->id;
+
+if ($action == 'presend') {
 	$langs->load("mails");
 
 	$titreform = 'SendMail';
 
 	$object->fetch_projet();
 
-	if ( ! in_array($object->element, array('societe', 'user', 'member'))) {
-		include_once DOL_DOCUMENT_ROOT . '/core/lib/files.lib.php';
-		$fileparams = dol_dir_list($diroutput, 'files', 0, '');
-		foreach ($fileparams as $fileparam) {
-			preg_match('/' . $ref . '/', $fileparam['name']) ? $filevalue[] = $fileparam['fullname'] : 0;
-		}
-	}
+    if (!in_array($object->element, array('societe', 'user', 'member'))) {
+        include_once DOL_DOCUMENT_ROOT . '/core/lib/files.lib.php';
+        $fileparams       = dol_dir_list($diroutput, 'files', 0, '', [], 'date', 'SORT_DESC');
+        $lastRef          = pathinfo($fileparams[0]['name']);
+        foreach ($fileparams as $fileparam) {
+            preg_match('/' . $lastRef['filename'] . '/', $fileparam['name']) ? $filevalue[] = $fileparam['fullname'] : 0;
+        }
+    }
 
 	// Define output language
 	$outputlangs = $langs;
@@ -524,7 +504,7 @@ if ($action == 'presend' && ! empty($riskassessmentdocument)) {
 		$topicmail = $outputlangs->trans($defaulttopic, '__REF__ (__REFCLIENT__)');
 	}
 
-	print load_fiche_titre($langs->trans($titreform), '', 'digiriskdolibarr32px@digiriskdolibarr', '', 'sendEmail');
+	print load_fiche_titre($langs->trans($titreform), '', 'digiriskdolibarr_color@digiriskdolibarr', '', 'sendEmail');
 
 	print dol_get_fiche_head('');
 
@@ -543,7 +523,7 @@ if ($action == 'presend' && ! empty($riskassessmentdocument)) {
 	// Fill list of recipient with email inside <>.
 	$liste = array();
 
-	$labour_inspector_contact = $allLinks['LabourInspectorContact'];
+	$labourInspectorContact = $allLinks['LabourInspectorContact'];
 
 	if ( ! empty($object->socid) && $object->socid > 0 && ! is_object($object->thirdparty) && method_exists($object, 'fetch_thirdparty')) {
 		$object->fetch_thirdparty();

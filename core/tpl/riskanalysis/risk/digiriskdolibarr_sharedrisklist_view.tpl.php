@@ -52,14 +52,14 @@
 
 $digiriskelement                = new DigiriskElement($db);
 $riskAssessment                 = new RiskAssessment($db);
-$digiriskTask                   = new DigiriskTask($db);
+$digiriskTask                   = new SaturneTask($db);
 $extrafields                    = new Extrafields($db);
 $usertmp                        = new User($db);
 $project                        = new Project($db);
 $DUProject                      = new Project($db);
 
 $advanced_method_cotation_json  = file_get_contents(DOL_DOCUMENT_ROOT . '/custom/digiriskdolibarr/js/json/default.json');
-$advanced_method_cotation_array = json_decode($advanced_method_cotation_json, true);
+$advancedCotationMethodArray = json_decode($advanced_method_cotation_json, true);
 
 $alldigiriskelement = $digiriskelement->getActiveDigiriskElements(1);
 $digiriskElementsOfEntity = $digiriskelement->getActiveDigiriskElements();
@@ -73,7 +73,7 @@ $riskAssessmentTaskList    = $risk->getTasksWithFkRisk();
 $taskNextValue             = $refTaskMod->getNextValue('', $task);
 $usertmp->fetchAll();
 $usersList                 = $usertmp->users;
-$timeSpentSortedByTasks    = $digiriskTask->fetchAllTimeSpentAllUser('AND ptt.fk_task > 0', 'task_datehour', 'DESC', 1);
+$timeSpentSortedByTasks    = $digiriskTask->fetchAllTimeSpentAllUsers('AND fk_element > 0', 'element_datehour', 'DESC', 1);
 
 if (is_array($riskAssessmentList) && !empty($riskAssessmentList)) {
 	foreach ($riskAssessmentList as $riskAssessmentSingle) {
@@ -328,7 +328,7 @@ if ($action != 'list') {
 } ?>
 
 <?php $title = $langs->trans('DigiriskElementSharedRisksList');
-print_barre_liste($title, $page, $_SERVER["PHP_SELF"], $param, $sortfield, $sortorder, $massactionbutton, $num, $nbtotalofrecords, 'digiriskdolibarr32px.png@digiriskdolibarr', 0, '', '', $limit, 0, 0, 1);
+print_barre_liste($title, $page, $_SERVER["PHP_SELF"], $param, $sortfield, $sortorder, $massactionbutton, $num, $nbtotalofrecords, 'digiriskdolibarr_color.png@digiriskdolibarr', 0, '', '', $limit, 0, 0, 1);
 
 include DOL_DOCUMENT_ROOT . '/core/tpl/massactions_pre.tpl.php';
 
@@ -415,7 +415,7 @@ foreach ($risk->fields as $key => $val) {
 		} elseif ($key == 'entity') {
 			print select_entity_list($search['entity'], 'search_entity', 'e.rowid NOT IN (' . $conf->entity . ')');
 		} elseif ($key == 'fk_element') {
-			print $digiriskelement->select_digiriskelement_list($search['fk_element'], 'search_fk_element_sharedrisk', 's.entity NOT IN (' . $conf->entity . ')', 1, 0, array(), 0, 0, 'minwidth100', 0, false, 1, $contextpage, false);
+			print $digiriskelement->selectDigiriskElementList($search['fk_element'], 'search_fk_element_sharedrisk', ['customsql' => 'entity NOT IN (' . $conf->entity . ') AND rowid NOT IN (' . implode(',', $deletedElements) . ')'], 1, 0, array(), 0, 0, 'minwidth100', 0, false, 1, $contextpage, false);
 		}  elseif ($key == 'applied_on') {
 //				print $digiriskelement->select_digiriskelement_list($search['search_applied_on_sharedrisk'], 'search_applied_on_sharedrisk', '', 1, 0, array(), 0, 0, 'minwidth100', 0, false, 1, $contextpage);
 		} elseif ($key == 'category') { ?>
@@ -427,13 +427,13 @@ foreach ($risk->fields as $key => $val) {
 						<img class="danger-category-pic wpeo-tooltip-event hidden" src="" aria-label=""/>
 					</div>
 				<?php else : ?>
-					<div class="dropdown-toggle dropdown-add-button button-cotation wpeo-tooltip-event" aria-label="<?php echo (empty(dol_escape_htmltag($search[$key]))) ? $risk->get_danger_category_name($risk) : $risk->get_danger_category_name_by_position($search[$key]); ?>">
-						<img class="danger-category-pic tooltip hover" src="<?php echo DOL_URL_ROOT . '/custom/digiriskdolibarr/img/categorieDangers/' . ((empty(dol_escape_htmltag($search[$key]))) ? $risk->get_danger_category($risk) : $risk->get_danger_category_by_position($search[$key])) . '.png'?>" />
+					<div class="dropdown-toggle dropdown-add-button button-cotation wpeo-tooltip-event" aria-label="<?php echo (empty(dol_escape_htmltag($search[$key]))) ? $risk->getDangerCategoryName($risk) : $risk->getDangerCategoryNameByPosition($search[$key]); ?>">
+						<img class="danger-category-pic tooltip hover" src="<?php echo DOL_URL_ROOT . '/custom/digiriskdolibarr/img/categorieDangers/' . ((empty(dol_escape_htmltag($search[$key]))) ? $risk->getDangerCategory($risk) : $risk->getDangerCategoryByPosition($search[$key])) . '.png'?>" />
 					</div>
 				<?php endif; ?>
-				<ul class="dropdown-content wpeo-gridlayout grid-5 grid-gap-0">
+				<ul class="saturne-dropdown-content wpeo-gridlayout grid-5 grid-gap-0">
 					<?php
-					$dangerCategories = $risk->get_danger_categories();
+					$dangerCategories = $risk->getDangerCategories();
 					if ( ! empty($dangerCategories) ) :
 						foreach ($dangerCategories as $dangerCategory) : ?>
 							<li class="item dropdown-item wpeo-tooltip-event classfortooltip" data-is-preset="<?php echo ''; ?>" data-id="<?php echo $dangerCategory['position'] ?>" aria-label="<?php echo $dangerCategory['name'] ?>">
@@ -545,12 +545,12 @@ while ($i < ($limit ? min($num, $limit) : $num)) {
 			} elseif ($key == 'fk_element') { ?>
 				<?php
 				if (is_object($alldigiriskelement[$risk->fk_element])) {
-					print $alldigiriskelement[$risk->fk_element]->getNomUrl(1, 'nolink', 1);
+					print $alldigiriskelement[$risk->fk_element]->getNomUrl(1, 'nolink', 0, '', -1, 1);
 				}
 			} elseif ($key == 'category') { ?>
 				<div class="table-cell table-50 cell-risk" data-title="Risque">
-					<div class="wpeo-dropdown dropdown-large category-danger padding wpeo-tooltip-event" aria-label="<?php echo $risk->get_danger_category_name($risk) ?>">
-						<img class="danger-category-pic hover" src="<?php echo DOL_URL_ROOT . '/custom/digiriskdolibarr/img/categorieDangers/' . $risk->get_danger_category($risk) . '.png' ; ?>"/>
+					<div class="wpeo-dropdown dropdown-large category-danger padding wpeo-tooltip-event" aria-label="<?php echo $risk->getDangerCategoryName($risk) ?>">
+						<img class="danger-category-pic hover" src="<?php echo DOL_URL_ROOT . '/custom/digiriskdolibarr/img/categorieDangers/' . $risk->getDangerCategory($risk) . '.png' ; ?>"/>
 					</div>
 				</div>
 				<?php

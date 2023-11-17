@@ -1,13 +1,3 @@
-UPDATE llx_c_action_trigger SET elementtype = 'informationssharing@digiriskdolibarr'    WHERE elementtype = 'informationssharing';
-UPDATE llx_c_action_trigger SET elementtype = 'legaldisplay@digiriskdolibarr'           WHERE elementtype = 'legaldisplay';
-UPDATE llx_c_action_trigger SET elementtype = 'preventionplandocument@digiriskdolibarr' WHERE elementtype = 'preventionplandocument';
-UPDATE llx_c_action_trigger SET elementtype = 'firepermitdocument@digiriskdolibarr'     WHERE elementtype = 'firepermitdocument';
-UPDATE llx_c_action_trigger SET elementtype = 'groupmentdocument@digiriskdolibarr'      WHERE elementtype = 'groupmentdocument';
-UPDATE llx_c_action_trigger SET elementtype = 'workunitdocument@digiriskdolibarr'       WHERE elementtype = 'workunitdocument';
-UPDATE llx_c_action_trigger SET elementtype = 'listingrisksphoto@digiriskdolibarr'      WHERE elementtype = 'listingrisksphoto';
-UPDATE llx_c_action_trigger SET elementtype = 'listingrisksaction@digiriskdolibarr'     WHERE elementtype = 'listingrisksaction';
-UPDATE llx_c_action_trigger SET elementtype = 'riskassessmentdocument@digiriskdolibarr' WHERE elementtype = 'riskassessmentdocument';
-
 UPDATE llx_extrafields SET type='sellist', param = 'a:1:{s:7:"options";a:1:{s:25:"digiriskdolibarr_risk:ref";N;}}', list='1' WHERE label='fk_risk';
 
 -- 8.1.0
@@ -87,4 +77,161 @@ ALTER TABLE llx_digiriskdolibarr_digiriskelement ADD show_in_selector BOOLEAN NO
 ALTER TABLE llx_digiriskdolibarr_accident_workstop ADD declaration_link text AFTER date_end_workstop;
 
 -- 9.8.1
-UPDATE llx_c_email_templates SET content = '__(QHSEService)__<br>__MYCOMPANY_NAME__<br>\r\n__MYCOMPANY_FULLADDRESS__<br>\r\n__MYCOMPANY_EMAIL__' WHERE label = '(TicketCreationSubject)'
+UPDATE llx_c_email_templates SET content = '__(QHSEService)__<br>__MYCOMPANY_NAME__<br>\r\n__MYCOMPANY_FULLADDRESS__<br>\r\n__MYCOMPANY_EMAIL__' WHERE label = '(TicketCreationSubject)';
+
+-- 9.11.0
+UPDATE llx_digiriskdolibarr_risk SET category = 20 WHERE category = 18;
+UPDATE llx_digiriskdolibarr_risk SET category = 21 WHERE category = 19;
+
+-- 9.11.1
+ALTER TABLE llx_digiriskdolibarr_firepermitdet CHANGE  `use_equipment` `used_equipment` text;
+DELETE FROM llx_c_action_trigger WHERE elementtype = 'informationssharing@digiriskdolibarr';
+DELETE FROM llx_c_action_trigger WHERE elementtype = 'preventionplandocument@digiriskdolibarr';
+DELETE FROM llx_c_action_trigger WHERE elementtype = 'legaldisplay@digiriskdolibarr';
+DELETE FROM llx_c_action_trigger WHERE elementtype = 'groupmentdocument@digiriskdolibarr';
+DELETE FROM llx_c_action_trigger WHERE elementtype = 'workunitdocument@digiriskdolibarr';
+DELETE FROM llx_c_action_trigger WHERE elementtype = 'firepermitdocument@digiriskdolibarr';
+DELETE FROM llx_c_action_trigger WHERE elementtype = 'listingrisksphoto@digiriskdolibarr';
+DELETE FROM llx_c_action_trigger WHERE elementtype = 'riskassessmentdocument@digiriskdolibarr';
+DELETE FROM llx_c_action_trigger WHERE elementtype = 'listingrisksaction@digiriskdolibarr';
+DELETE FROM llx_c_action_trigger WHERE elementtype = 'digiriskelement@digiriskdolibarr';
+DELETE FROM llx_c_action_trigger WHERE elementtype = 'digirisksignature@digiriskdolibarr';
+DELETE FROM llx_c_action_trigger WHERE elementtype = 'preventionplan@digiriskdolibarr';
+
+-- 9.12.0
+UPDATE llx_digiriskdolibarr_object_signature SET role = 'MasterWorker'          WHERE role = 'PP_MAITRE_OEUVRE';
+UPDATE llx_digiriskdolibarr_object_signature SET role = 'ExtSocietyResponsible' WHERE role = 'PP_EXT_SOCIETY_RESPONSIBLE';
+UPDATE llx_digiriskdolibarr_object_signature SET role = 'ExtSocietyAttendant'   WHERE role = 'PP_EXT_SOCIETY_INTERVENANTS';
+UPDATE llx_digiriskdolibarr_object_signature SET role = 'MasterWorker'          WHERE role = 'FP_MAITRE_OEUVRE';
+UPDATE llx_digiriskdolibarr_object_signature SET role = 'ExtSocietyResponsible' WHERE role = 'FP_EXT_SOCIETY_RESPONSIBLE';
+UPDATE llx_digiriskdolibarr_object_signature SET role = 'ExtSocietyAttendant'   WHERE role = 'FP_EXT_SOCIETY_INTERVENANTS';
+UPDATE llx_digiriskdolibarr_object_signature SET role = 'Responsible'           WHERE role = 'ACC_USER_EMPLOYER';
+
+UPDATE `llx_digiriskdolibarr_object_signature` SET module_name = 'digiriskdolibarr';
+INSERT INTO `llx_saturne_object_signature` (entity, date_creation, tms, import_key, status, role, firstname, lastname, email, phone, society_name, signature_date, signature_location, signature_comment, element_id, element_type, module_name, signature, stamp, last_email_sent_date, signature_url, transaction_url, object_type, fk_object)
+SELECT entity, date_creation, tms, import_key, status, role, firstname, lastname, email, phone, society_name, signature_date, signature_location, signature_comment, element_id, element_type, module_name, signature, stamp, last_email_sent_date, signature_url, transaction_url, object_type, fk_object FROM `llx_digiriskdolibarr_object_signature`;
+DROP TABLE `llx_digiriskdolibarr_object_signature`;
+
+UPDATE llx_saturne_object_signature SET role = 'ExtSocietyResponsible' WHERE role = 'PP_EXT_SOCIETY_RESPONSIBLE';
+UPDATE llx_saturne_object_signature SET role = 'ExtSocietyAttendant'   WHERE role = 'PP_EXT_SOCIETY_INTERVENANTS';
+UPDATE llx_saturne_object_signature SET role = 'MasterWorker'          WHERE role = 'PP_MAITRE_OEUVRE';
+UPDATE llx_saturne_object_signature SET role = 'MasterWorker'          WHERE role = 'FP_MAITRE_OEUVRE';
+UPDATE llx_saturne_object_signature SET role = 'ExtSocietyResponsible' WHERE role = 'FP_EXT_SOCIETY_RESPONSIBLE';
+UPDATE llx_saturne_object_signature SET role = 'ExtSocietyAttendant'   WHERE role = 'FP_EXT_SOCIETY_INTERVENANTS';
+UPDATE llx_saturne_object_signature SET role = 'Responsible'           WHERE role = 'ACC_USER_EMPLOYER';
+
+UPDATE llx_saturne_object_signature SET role = 'MasterWorker'          WHERE role = 'MaitreOeuvre';
+UPDATE llx_saturne_object_signature SET role = 'ExtSocietyResponsible' WHERE role = 'ExternalResponsible';
+UPDATE llx_saturne_object_signature SET role = 'ExtSocietyAttendant'   WHERE role = 'Attendant';
+
+UPDATE FROM llx_c_firepermit_attendants_role SET role = 'MasterWorker' WHERE ref = "InternalResponsible";
+UPDATE FROM llx_c_firepermit_attendants_role SET role = 'ExtSocietyAttendant' WHERE ref = "Attendant";
+
+UPDATE llx_digiriskdolibarr_digiriskresources SET ref = 'MasterWorker'            WHERE ref = 'PP_MAITRE_OEUVRE';
+UPDATE llx_digiriskdolibarr_digiriskresources SET ref = 'ExtSocietyResponsible'   WHERE ref = 'PP_EXT_SOCIETY_RESPONSIBLE';
+UPDATE llx_digiriskdolibarr_digiriskresources SET ref = 'ExtSocietyAttendant'     WHERE ref = 'PP_EXT_SOCIETY_INTERVENANTS';
+UPDATE llx_digiriskdolibarr_digiriskresources SET ref = 'MasterWorker'            WHERE ref = 'FP_MAITRE_OEUVRE';
+UPDATE llx_digiriskdolibarr_digiriskresources SET ref = 'ExtSocietyResponsible'   WHERE ref = 'FP_EXT_SOCIETY_RESPONSIBLE';
+UPDATE llx_digiriskdolibarr_digiriskresources SET ref = 'ExtSocietyAttendant'     WHERE ref = 'FP_EXT_SOCIETY_INTERVENANTS';
+UPDATE llx_digiriskdolibarr_digiriskresources SET ref = 'Responsible'             WHERE ref = 'ACC_USER_EMPLOYER';
+UPDATE llx_digiriskdolibarr_digiriskresources SET ref = 'ExtSociety'              WHERE ref = 'PP_EXT_SOCIETY';
+UPDATE llx_digiriskdolibarr_digiriskresources SET ref = 'LabourInspector'         WHERE ref = 'PP_LABOUR_INSPECTOR';
+UPDATE llx_digiriskdolibarr_digiriskresources SET ref = 'LabourInspectorAssigned' WHERE ref = 'PP_LABOUR_INSPECTOR_ASSIGNED';
+UPDATE llx_digiriskdolibarr_digiriskresources SET ref = 'ExtSociety'              WHERE ref = 'FP_EXT_SOCIETY';
+UPDATE llx_digiriskdolibarr_digiriskresources SET ref = 'LabourInspector'         WHERE ref = 'FP_LABOUR_INSPECTOR';
+UPDATE llx_digiriskdolibarr_digiriskresources SET ref = 'LabourInspectorAssigned' WHERE ref = 'FP_LABOUR_INSPECTOR_ASSIGNED';
+
+ALTER TABLE llx_c_digiriskdolibarr_action_trigger DROP COLUMN `rang`;
+ALTER TABLE llx_c_digiriskdolibarr_action_trigger ADD entity integer DEFAULT 1 AFTER rowid;
+ALTER TABLE llx_c_digiriskdolibarr_action_trigger ADD active tinyint(4) DEFAULT 1 AFTER description;
+ALTER TABLE llx_c_digiriskdolibarr_action_trigger ADD position integer DEFAULT 0 AFTER description;
+ALTER TABLE llx_c_digiriskdolibarr_action_trigger CHANGE `code` `ref` varchar(128) NOT NULL;
+ALTER TABLE `llx_digiriskdolibarr_object_signature` ADD module_name VARCHAR(128) NULL AFTER element_type;
+
+-- 9.13.0
+
+ALTER TABLE llx_digiriskdolibarr_accident CHANGE `tms` `tms` timestamp DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP;
+ALTER TABLE llx_digiriskdolibarr_accident_investigation CHANGE `tms` `tms` timestamp DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP;
+ALTER TABLE llx_digiriskdolibarr_accident_extrafields CHANGE `tms` `tms` timestamp DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP;
+ALTER TABLE llx_digiriskdolibarr_accident_lesion CHANGE `tms` `tms` timestamp DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP;
+ALTER TABLE llx_digiriskdolibarr_accident_workstop CHANGE `tms` `tms` timestamp DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP;
+ALTER TABLE llx_digiriskdolibarr_accident_workstop_extrafields CHANGE `tms` `tms` timestamp DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP;
+ALTER TABLE llx_digiriskdolibarr_accident_metadata CHANGE `tms` `tms` timestamp DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP;
+
+ALTER TABLE llx_digiriskdolibarr_digiriskelement CHANGE `tms` `tms` timestamp DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP;
+ALTER TABLE llx_digiriskdolibarr_digiriskelement_extrafields CHANGE `tms` `tms` timestamp DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP;
+
+ALTER TABLE llx_digiriskdolibarr_firepermit CHANGE `tms` `tms` timestamp DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP;
+ALTER TABLE llx_digiriskdolibarr_firepermit_extrafields CHANGE `tms` `tms` timestamp DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP;
+ALTER TABLE llx_digiriskdolibarr_firepermitdet CHANGE `tms` `tms` timestamp DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP;
+ALTER TABLE llx_digiriskdolibarr_firepermitdet_extrafields CHANGE `tms` `tms` timestamp DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP;
+
+ALTER TABLE llx_digiriskdolibarr_preventionplan CHANGE `tms` `tms` timestamp DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP;
+ALTER TABLE llx_digiriskdolibarr_preventionplan_extrafields CHANGE `tms` `tms` timestamp DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP;
+ALTER TABLE llx_digiriskdolibarr_preventionplandet CHANGE `tms` `tms` timestamp DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP;
+ALTER TABLE llx_digiriskdolibarr_preventionplandet_extrafields CHANGE `tms` `tms` timestamp DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP;
+
+ALTER TABLE llx_digiriskdolibarr_risk CHANGE `tms` `tms` timestamp DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP;
+ALTER TABLE llx_digiriskdolibarr_risk_extrafields CHANGE `tms` `tms` timestamp DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP;
+ALTER TABLE llx_digiriskdolibarr_riskassessment CHANGE `tms` `tms` timestamp DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP;
+ALTER TABLE llx_digiriskdolibarr_riskassessment_extrafields CHANGE `tms` `tms` timestamp DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP;
+ALTER TABLE llx_digiriskdolibarr_risksign CHANGE `tms` `tms` timestamp DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP;
+ALTER TABLE llx_digiriskdolibarr_risksign_extrafields CHANGE `tms` `tms` timestamp DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP;
+
+ALTER TABLE llx_digiriskdolibarr_digiriskresources CHANGE `tms` `tms` timestamp DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP;
+ALTER TABLE llx_digiriskdolibarr_digiriskstandard CHANGE `tms` `tms` timestamp DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP;
+ALTER TABLE llx_digiriskdolibarr_digiriskstandard_extrafields CHANGE `tms` `tms` timestamp DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP;
+ALTER TABLE llx_digiriskdolibarr_evaluator CHANGE `tms` `tms` timestamp DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP;
+ALTER TABLE llx_digiriskdolibarr_evaluator_extrafields CHANGE `tms` `tms` timestamp DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP;
+
+ALTER TABLE llx_digiriskdolibarr_accident_investigation ADD fk_project integer NULL AFTER fk_task;
+
+ALTER TABLE llx_c_relative_location ADD position integer DEFAULT 0 AFTER active;
+ALTER TABLE llx_c_lesion_localization ADD position integer DEFAULT 0 AFTER active;
+ALTER TABLE llx_c_lesion_nature ADD position integer DEFAULT 0 AFTER active;
+
+-- ALTER TABLE llx_digiriskdolibarr_preventionplan CHANGE `status` `status` INT(11) NOT NULL;
+ALTER TABLE llx_digiriskdolibarr_preventionplan CHANGE `date_start` `date_start` DATETIME NULL;
+ALTER TABLE llx_digiriskdolibarr_preventionplan CHANGE `fk_project` `fk_project` INT(11) NOT NULL;
+ALTER TABLE llx_digiriskdolibarr_preventionplan DROP COLUMN `last_email_sent_date`;
+ALTER TABLE llx_digiriskdolibarr_preventionplandet ADD status INTEGER NOT NULL AFTER tms;
+
+-- ALTER TABLE llx_digiriskdolibarr_firepermit CHANGE `status` `status` INT(11) NOT NULL;
+ALTER TABLE llx_digiriskdolibarr_firepermit CHANGE `date_start` `date_start` DATETIME NULL;
+ALTER TABLE llx_digiriskdolibarr_firepermit CHANGE `fk_project` `fk_project` INT(11) NOT NULL;
+ALTER TABLE llx_digiriskdolibarr_firepermit CHANGE `fk_preventionplan` `fk_preventionplan` INT(11) NOT NULL;
+ALTER TABLE llx_digiriskdolibarr_firepermit DROP COLUMN `last_email_sent_date`;
+ALTER TABLE llx_digiriskdolibarr_firepermitdet ADD status INTEGER NOT NULL AFTER tms;
+
+ALTER TABLE llx_c_accident_investigation_attendants_role RENAME TO llx_c_accidentinvestigation_attendants_role;
+ALTER TABLE llx_categorie_accident_investigation RENAME TO llx_categorie_accidentinvestigation;
+ALTER TABLE llx_categorie_accidentinvestigation CHANGE `fk_accident_investigation` `fk_accidentinvestigation`;
+DELETE FROM llx_c_digiriskdolibarr_action_trigger WHERE elementtype = 'accident_investigation@digiriskdolibarr';
+DELETE FROM llx_c_digiriskdolibarr_action_trigger WHERE ref = 'ACCIDENT_WORKSTOP_CREATE';
+DELETE FROM llx_c_digiriskdolibarr_action_trigger WHERE ref = 'ACCIDENT_WORKSTOP_MODIFY';
+DELETE FROM llx_c_digiriskdolibarr_action_trigger WHERE ref = 'ACCIDENT_WORKSTOP_DELETE';
+DELETE FROM llx_c_digiriskdolibarr_action_trigger WHERE ref = 'ACCIDENT_LESION_CREATE';
+DELETE FROM llx_c_digiriskdolibarr_action_trigger WHERE ref = 'ACCIDENT_LESION_MODIFY';
+DELETE FROM llx_c_digiriskdolibarr_action_trigger WHERE ref = 'ACCIDENT_LESION_DELETE';
+DELETE FROM llx_c_digiriskdolibarr_action_trigger WHERE ref = 'PREVENTIONPLANSIGNATURE_ADDATTENDANT';
+DELETE FROM llx_c_digiriskdolibarr_action_trigger WHERE ref = 'FIREPERMITSIGNATURE_ADDATTENDANT';
+DELETE FROM llx_c_digiriskdolibarr_action_trigger WHERE ref = 'PREVENTIONPLAN_LOCKED';
+DELETE FROM llx_c_digiriskdolibarr_action_trigger WHERE ref = 'PREVENTIONPLAN_ARCHIVED';
+DELETE FROM llx_c_digiriskdolibarr_action_trigger WHERE ref = 'FIREPERMIT_LOCKED';
+DELETE FROM llx_c_digiriskdolibarr_action_trigger WHERE ref = 'FIREPERMIT_ARCHIVED';
+DELETE FROM llx_c_digiriskdolibarr_action_trigger WHERE ref = 'DIGIRISKSIGNATURE_SIGNED';
+DELETE FROM llx_c_digiriskdolibarr_action_trigger WHERE ref = 'DIGIRISKSIGNATURE_PENDING_SIGNATURE';
+DELETE FROM llx_c_digiriskdolibarr_action_trigger WHERE ref = 'DIGIRISKSIGNATURE_ABSENT';
+DELETE FROM llx_c_digiriskdolibarr_action_trigger WHERE ref = 'DIGIRISKSIGNATURE_DELETED';
+DELETE FROM llx_c_digiriskdolibarr_action_trigger WHERE ref = 'OPENINGHOURS_CREATE';
+DELETE FROM llx_c_digiriskdolibarr_action_trigger WHERE ref = 'ACCIDENT_INVESTIGATION_VALIDATE';
+DELETE FROM llx_c_digiriskdolibarr_action_trigger WHERE ref = 'ACCIDENT_INVESTIGATION_UNVALIDATE';
+DELETE FROM llx_c_digiriskdolibarr_action_trigger WHERE ref = 'ACCIDENT_INVESTIGATION_ARCHIVE';
+DELETE FROM llx_c_digiriskdolibarr_action_trigger WHERE ref = 'ACCIDENT_INVESTIGATION_LOCK';
+
+UPDATE `llx_const` SET `value` = 'mod_accidentinvestigation_standard' WHERE `llx_const`.`name` = 'DIGIRISKDOLIBARR_ACCIDENTINVESTIGATION_ADDON';
+UPDATE `llx_const` SET `value` = 'mod_accidentinvestigationdocument_standard' WHERE `llx_const`.`name` = 'DIGIRISKDOLIBARR_ACCIDENTINVESTIGATIONDOCUMENT_ADDON';
+INSERT INTO llx_c_accidentinvestigation_attendants_role SELECT * FROM llx_c_accident_investigation_attendants_role;
+INSERT INTO llx_categorie_accidentinvestigation SELECT * FROM llx_categorie_accident_investigation;
+DROP TABLE llx_c_accident_investigation_attendants_role;
+DROP TABLE llx_categorie_accident_investigation;

@@ -1,5 +1,5 @@
 <?php
-/* Copyright (C) 2021 EOXIA <dev@eoxia.com>
+/* Copyright (C) 2021-2023 EVARISK <technique@evarisk.com>
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -97,9 +97,6 @@ class AllTests
 
 		require_once dirname(__FILE__) . '/PreventionPlanUnitTest.php';
 		$suite->addTestSuite('PreventionPlanUnitTest');
-
-		require_once dirname(__FILE__) . '/OpeninghoursUnitTest.php';
-		$suite->addTestSuite('OpeninghoursUnitTest');
 
 		require_once dirname(__FILE__) . '/FirePermitUnitTest.php';
 		$suite->addTestSuite('FirePermitUnitTest');

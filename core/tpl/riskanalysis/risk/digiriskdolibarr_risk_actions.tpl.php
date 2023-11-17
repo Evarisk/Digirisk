@@ -23,8 +23,6 @@ if ( ! $error && $action == 'add' && $permissiontoadd) {
 		$result = $risk->create($user);
 
 		if ($result > 0) {
-			$lastRiskAdded = $risk->ref;
-
 			$evaluationComment  = $data['comment'];
 			$riskAssessmentDate = $data['date'];
 
@@ -51,7 +49,7 @@ if ( ! $error && $action == 'add' && $permissiontoadd) {
 				$evaluation->exposition = $exposition;
 			}
 
-			$pathToTmpPhoto = $conf->digiriskdolibarr->multidir_output[$conf->entity] . '/riskassessment/tmp/RK0/';
+			$pathToTmpPhoto = $conf->digiriskdolibarr->multidir_output[$conf->entity] . '/riskassessment/tmp/RA0/';
 			$files          = dol_dir_list($pathToTmpPhoto);
 
 			if ( ! empty($files)) {
@@ -83,7 +81,7 @@ if ( ! $error && $action == 'add' && $permissiontoadd) {
 				}
 			}
 
-			$result2 = $evaluation->create($user, true);
+			$result2 = $evaluation->create($user, false);
 
 			if ($result2 > 0) {
 				$tasktitle = $data['task'];
@@ -119,6 +117,13 @@ if ( ! $error && $action == 'add' && $permissiontoadd) {
 					$result3 = $task->create($user, true);
 
 					if ($result3 > 0) {
+						if (!empty($conf->global->DIGIRISKDOLIBARR_MAIN_AGENDA_ACTIONAUTO_TASK_CREATE)) {
+							$task->call_trigger('TASK_CREATE', $user);
+						}
+
+						$DUProject->add_contact($user->id, $conf->global->DIGIRISKDOLIBARR_DEFAULT_PROJECT_CONTACT_TYPE, 'internal');
+						$task->add_contact($user->id, $conf->global->DIGIRISKDOLIBARR_DEFAULT_TASK_CONTACT_TYPE, 'internal');
+
 						// Creation risk + evaluation + task OK
 						$urltogo = str_replace('__ID__', $result3, $backtopage);
 						$urltogo = preg_replace('/--IDFORBACKTOPAGE--/', $id, $urltogo); // New method to autoselect project after a New on another form object creation
@@ -172,15 +177,16 @@ if ( ! $error && $action == 'saveRisk' && $permissiontoadd) {
 
 if ( ! $error && ($massaction == 'delete' || ($action == 'delete' && $confirm == 'yes')) && $permissiontodelete) {
 	if ( ! empty($toselect)) {
+
 		foreach ($toselect as $toselectedid) {
-			$ListEvaluations = $evaluation->fetchFromParent($toselectedid, 0);
+			$riskAssessmentList = $evaluation->fetchFromParent($toselectedid, 0);
 			$risk->fetch($toselectedid);
 
-			if ( ! empty($ListEvaluations) && $ListEvaluations > 0) {
-				foreach ($ListEvaluations as $lastEvaluation) {
-					$pathToEvaluationPhoto = DOL_DATA_ROOT . '/digiriskdolibarr/riskassessment/' . $lastEvaluation->ref;
+			if (is_array($riskAssessmentList) && ! empty($riskAssessmentList)) {
+				foreach ($riskAssessmentList as $riskRiskAssessment) {
+					$pathToEvaluationPhoto = $conf->digiriskdolibarr->multidir_output[$conf->entity] . '/riskassessment/' . $riskRiskAssessment->ref;
 
-					if ( file_exists($pathToEvaluationPhoto) && ! (empty($lastEvaluation->ref))) {
+					if ( file_exists($pathToEvaluationPhoto) && ! (empty($riskRiskAssessment->ref))) {
 						$files = dol_dir_list($pathToEvaluationPhoto);
 						if ( ! empty($files)) {
 							foreach ($files as $file) {
@@ -199,14 +205,13 @@ if ( ! $error && ($massaction == 'delete' || ($action == 'delete' && $confirm ==
 						dol_delete_dir($pathToEvaluationPhoto . '/thumbs');
 						dol_delete_dir($pathToEvaluationPhoto);
 
-						$lastEvaluation->delete($user, true);
-					}
-				}
+                    }
+                    $riskRiskAssessment->delete($user, true);
+                }
 			}
+            $result = $risk->delete($user);
 
-			$result = $risk->delete($user);
-
-			if ($result > 0) {
+            if ($result > 0) {
 				setEventMessages($langs->trans('RiskDeleted', $risk->ref), null);
 			} else {
 				// Delete risk KO
@@ -260,7 +265,7 @@ if ( ! $error && $action == 'addEvaluation' && $permissiontoadd) {
 		$evaluation->exposition = $exposition;
 	}
 
-	$pathToTmpPhoto = $conf->digiriskdolibarr->multidir_output[$conf->entity] . '/riskassessment/tmp/' . $risktmp->ref;
+	$pathToTmpPhoto = $conf->digiriskdolibarr->multidir_output[$conf->entity] . '/riskassessment/tmp/RA0/' . $risktmp->ref;
 	$files          = dol_dir_list($pathToTmpPhoto);
 
 	if ( ! empty($files)) {
@@ -352,47 +357,29 @@ if ( ! $error && $action == 'saveEvaluation' && $permissiontoadd) {
 }
 
 if ( ! $error && $action == "deleteEvaluation" && $permissiontodelete) {
-	$evaluation_id = GETPOST('deletedEvaluationId');
+    $evaluationId = GETPOST('deletedEvaluationId');
 
-	$evaluation->fetch($evaluation_id);
+    $evaluation->fetch($evaluationId);
 
-	$pathToEvaluationPhoto = DOL_DATA_ROOT . '/digiriskdolibarr/riskassessment/' . $evaluation->ref;
-	$files                 = dol_dir_list($pathToEvaluationPhoto);
-	foreach ($files as $file) {
-		if (is_file($file['fullname'])) {
-			unlink($file['fullname']);
-		}
-	}
+    $pathToEvaluationPhoto = $conf->digiriskdolibarr->multidir_output[$conf->entity] . '/riskassessment/' . $evaluation->ref;
+    dol_delete_dir_recursive($pathToEvaluationPhoto);
 
-	$files = dol_dir_list($pathToEvaluationPhoto . '/thumbs');
-	foreach ($files as $file) {
-		unlink($file['fullname']);
-	}
+    $previousEvaluation = $evaluation;
+    $result             = $evaluation->delete($user, false, false);
 
-	if (is_dir($pathToEvaluationPhoto . '/thumbs')) {
-		dol_delete_dir($pathToEvaluationPhoto . '/thumbs');
-	}
-
-	if (is_dir($pathToEvaluationPhoto)) {
-
-		dol_delete_dir($pathToEvaluationPhoto);
-	}
-
-	$previousEvaluation = $evaluation;
-	$result             = $evaluation->delete($user);
-
-	if ($result > 0) {
-		$previousEvaluation->updateEvaluationStatus($user, $evaluation->fk_risk);
-		// Delete evaluation OK
-		$urltogo = str_replace('__ID__', $result, $backtopage);
-		$urltogo = preg_replace('/--IDFORBACKTOPAGE--/', $id, $urltogo); // New method to autoselect project after a New on another form object creation
-		header("Location: " . $urltogo);
-		exit;
-	} else {
-		// Delete evaluation KO
-		if ( ! empty($evaluation->errors)) setEventMessages(null, $evaluation->errors, 'errors');
-		else setEventMessages($evaluation->error, null, 'errors');
-	}
+    if ($result > 0) {
+        $previousEvaluation->updatePreviousRiskAssessmentStatus($user, $evaluation->fk_risk);
+        // Delete evaluation OK
+        $urltogo = str_replace('__ID__', $result, $backtopage);
+        $urltogo = preg_replace('/--IDFORBACKTOPAGE--/', $id, $urltogo); // New method to autoselect project after a New on another form object creation
+        header("Location: " . $urltogo);
+        exit;
+    } elseif (!empty($evaluation->errors)) {
+        // Delete evaluation KO
+        setEventMessages('', $evaluation->errors, 'errors');
+    } else {
+        setEventMessages($evaluation->error, [], 'errors');
+    }
 }
 
 if ( ! $error && $action == 'addRiskAssessmentTask' && $permissiontoadd) {
@@ -410,10 +397,10 @@ if ( ! $error && $action == 'addRiskAssessmentTask' && $permissiontoadd) {
 
 	$extrafields->fetch_name_optionals_label($task->table_element);
 
-	$task->ref                              = $refTaskMod->getNextValue('', $task);
-	$task->label                            = $tasktitle;
-	$task->fk_project                       = $conf->global->DIGIRISKDOLIBARR_DU_PROJECT;
-	$task->date_c                           = dol_now();
+	$task->ref        = $refTaskMod->getNextValue('', $task);
+	$task->label      = $tasktitle;
+	$task->fk_project = $conf->global->DIGIRISKDOLIBARR_DU_PROJECT;
+	$task->datec     = dol_now();
 	if (!empty($dateStart)) {
 		$task->date_start = strtotime(preg_replace('/\//', '-', $dateStart));
 		$task->date_start = dol_time_plus_duree($task->date_start, $hourStart, 'h');
@@ -433,6 +420,7 @@ if ( ! $error && $action == 'addRiskAssessmentTask' && $permissiontoadd) {
 	$result = $task->create($user, true);
 
 	if ($result > 0) {
+		if (!empty($conf->global->DIGIRISKDOLIBARR_MAIN_AGENDA_ACTIONAUTO_TASK_CREATE)) $task->call_trigger('TASK_CREATE', $user);
 		// Creation task OK
 		$urltogo = str_replace('__ID__', $result, $backtopage);
 		$urltogo = preg_replace('/--IDFORBACKTOPAGE--/', $id, $urltogo); // New method to autoselect project after a New on another form object creation
@@ -475,7 +463,7 @@ if ( ! $error && $action == 'saveRiskAssessmentTask' && $permissiontoadd) {
 		$task->date_end = dol_time_plus_duree($task->date_end, $hourEnd, 'h');
 		$task->date_end = dol_time_plus_duree($task->date_end, $minEnd, 'i');
 	}
-	$task->budget_amount = $budget;
+	$task->budget_amount = is_int($budget) ? $budget : ($task->budget ?? 0);
 
 	if ($taskProgress == 1) {
 		$task->progress = 100;
@@ -483,7 +471,7 @@ if ( ! $error && $action == 'saveRiskAssessmentTask' && $permissiontoadd) {
 		$task->progress = 0;
 	}
 
-	$result = $task->update($user, true);
+	$result = $task->update($user, empty($conf->global->DIGIRISKDOLIBARR_MAIN_AGENDA_ACTIONAUTO_TASK_MODIFY));
 
 	if ($result > 0) {
 		// Update task OK
@@ -503,7 +491,7 @@ if ( ! $error && $action == "deleteRiskAssessmentTask" && $permissiontodelete) {
 
 	$task->fetch($deleteRiskAssessmentTaskId);
 
-	$result = $task->delete($user, true);
+	$result = $task->delete($user, empty($conf->global->DIGIRISKDOLIBARR_MAIN_AGENDA_ACTIONAUTO_TASK_DELETE));
 
 	if ($result > 0) {
 		// Delete task OK
@@ -541,7 +529,7 @@ if ( ! $error && $action == 'addRiskAssessmentTaskTimeSpent' && $permissiontoadd
 	$task->timespent_duration = $duration * 60;
 	$task->timespent_fk_user  = $user->id;
 
-	$result = $task->addTimeSpent($user, false);
+	$result = $task->addTimeSpent($user, empty($conf->global->DIGIRISKDOLIBARR_MAIN_AGENDA_ACTIONAUTO_TASK_TIMESPENT_CREATE));
 
 	if ($result > 0) {
 		// Creation task time spent OK
@@ -559,6 +547,7 @@ if ( ! $error && $action == 'addRiskAssessmentTaskTimeSpent' && $permissiontoadd
 if ( ! $error && $action == 'saveRiskAssessmentTaskTimeSpent' && $permissiontoadd) {
 	$data = json_decode(file_get_contents('php://input'), true);
 
+	$taskID 					   = $data['taskID'];
 	$riskAssessmentTaskTimeSpentID = $data['riskAssessmentTaskTimeSpentID'];
 	$date                          = $data['date'];
 	$hour                          = $data['hour'];
@@ -567,6 +556,7 @@ if ( ! $error && $action == 'saveRiskAssessmentTaskTimeSpent' && $permissiontoad
 	$duration                      = $data['duration'];
 
 	$task->fetchTimeSpent($riskAssessmentTaskTimeSpentID);
+	$task->fetch($taskID);
 
 	if (!empty($date)) {
 		$task->timespent_datehour = strtotime(preg_replace('/\//', '-', $date));
@@ -576,7 +566,7 @@ if ( ! $error && $action == 'saveRiskAssessmentTaskTimeSpent' && $permissiontoad
 	$task->timespent_note     =  $comment;
 	$task->timespent_duration = $duration * 60;
 
-	$result = $task->updateTimeSpent($user, false);
+	$result = $task->updateTimeSpent($user, empty($conf->global->DIGIRISKDOLIBARR_MAIN_AGENDA_ACTIONAUTO_TASK_TIMESPENT_MODIFY));
 
 	if ($result > 0) {
 		// Update task time spent OK
@@ -595,6 +585,7 @@ if ( ! $error && $action == "deleteRiskAssessmentTaskTimeSpent" && $permissionto
 	$deleteRiskAssessmentTaskTimeSpentId = GETPOST('deletedRiskAssessmentTaskTimeSpentId');
 
 	$task->fetchTimeSpent($deleteRiskAssessmentTaskTimeSpentId);
+	$task->fetch($task->id);
 
 	$result = $task->delTimeSpent($user, false);
 
@@ -625,7 +616,7 @@ if ( ! $error && $action == 'checkTaskProgress' && $permissiontoadd) {
 		$task->progress = 0;
 	}
 
-	$result = $task->update($user, true);
+	$result = $task->update($user, empty($conf->global->DIGIRISKDOLIBARR_MAIN_AGENDA_ACTIONAUTO_TASK_TIMESPENT_DELETE));
 
 	if ($result > 0) {
 		// Update task OK
@@ -638,124 +629,6 @@ if ( ! $error && $action == 'checkTaskProgress' && $permissiontoadd) {
 		if ( ! empty($task->errors)) setEventMessages(null, $task->errors, 'errors');
 		else setEventMessages($task->error, null, 'errors');
 	}
-}
-
-if ( ! $error && $action == "addFiles" && $permissiontodelete) {
-	$data = json_decode(file_get_contents('php://input'), true);
-
-	$riskassessment_id = $data['riskassessment_id'];
-	$risk_id           = $data['risk_id'];
-	$filenames         = $data['filenames'];
-	$riskassessment    = new RiskAssessment($db);
-	$risktmp           = new Risk($db);
-	$risktmp->fetch($risk_id);
-	$riskassessment->fetch($riskassessment_id);
-	if (dol_strlen($riskassessment->ref) > 0) {
-		$pathToEvaluationPhoto = $conf->digiriskdolibarr->multidir_output[$conf->entity] . '/riskassessment/' . $riskassessment->ref;
-	} else {
-		$pathToEvaluationPhoto = $conf->digiriskdolibarr->multidir_output[$conf->entity] . '/riskassessment/tmp/' . ( dol_strlen($risktmp->ref) > 0 ? $risktmp->ref : 'RK0');
-	}
-	$filenames = preg_split('/vVv/', $filenames);
-	array_pop($filenames);
-
-	if ( ! (empty($filenames))) {
-		if ( ! is_dir($conf->digiriskdolibarr->multidir_output[$conf->entity] . '/riskassessment/tmp/')) {
-			dol_mkdir($conf->digiriskdolibarr->multidir_output[$conf->entity] . '/riskassessment/tmp/');
-		}
-		$riskassessment->photo = $filenames[0];
-
-		foreach ($filenames as $filename) {
-			$entity = ($conf->entity > 1) ? '/' . $conf->entity : '';
-
-
-			if (is_file($conf->ecm->multidir_output[$conf->entity] . '/digiriskdolibarr/medias/' . $filename)) {
-				$pathToECMPhoto = $conf->ecm->multidir_output[$conf->entity] . '/digiriskdolibarr/medias/' . $filename;
-
-				if ( ! is_dir($pathToEvaluationPhoto)) {
-					mkdir($pathToEvaluationPhoto);
-				}
-				copy($pathToECMPhoto, $pathToEvaluationPhoto . '/' . $filename);
-
-				global $maxwidthmini, $maxheightmini, $maxwidthsmall,$maxheightsmall ;
-				$destfull = $pathToEvaluationPhoto . '/' . $filename;
-
-				// Create thumbs
-				$imgThumbLarge = vignette($destfull, $conf->global->DIGIRISKDOLIBARR_MEDIA_MAX_WIDTH_LARGE, $conf->global->DIGIRISKDOLIBARR_MEDIA_MAX_HEIGHT_LARGE, '_large', 50, "thumbs");
-				$imgThumbMedium = vignette($destfull, $conf->global->DIGIRISKDOLIBARR_MEDIA_MAX_WIDTH_MEDIUM, $conf->global->DIGIRISKDOLIBARR_MEDIA_MAX_HEIGHT_MEDIUM, '_medium', 50, "thumbs");
-				$imgThumbSmall = vignette($destfull, $maxwidthsmall, $maxheightsmall, '_small', 50, "thumbs");
-				// Create mini thumbs for image (Ratio is near 16/9)
-				$imgThumbMini = vignette($destfull, $maxwidthmini, $maxheightmini, '_mini', 50, "thumbs");
-			}
-		}
-		$riskassessment->update($user, true);
-	}
-}
-
-if ( ! $error && $action == "unlinkFile" && $permissiontodelete) {
-	$data = json_decode(file_get_contents('php://input'), true);
-
-	$riskassessment_id = $data['riskassessment_id'];
-	$risk_id           = $data['risk_id'];
-	$filename          = $data['filename'];
-
-	$riskassessment = new RiskAssessment($db);
-	$riskassessment->fetch($riskassessment_id);
-	$risktmp = new Risk($db);
-	$risktmp->fetch($risk_id);
-
-	//edit evaluation
-	if ($riskassessment->id > 0) {
-		$pathToEvaluationPhoto = $conf->digiriskdolibarr->multidir_output[$conf->entity] . '/riskassessment/' . $riskassessment->ref;
-	} elseif ($risk_id > 0) {
-		//create evaluation
-		$pathToEvaluationPhoto = $conf->digiriskdolibarr->multidir_output[$conf->entity] . '/riskassessment/tmp/' . $risktmp->ref;
-	} elseif ($risk_id == 'new') {
-		//create risk
-		$pathToEvaluationPhoto = $conf->digiriskdolibarr->multidir_output[$conf->entity] . '/riskassessment/tmp/RK0';
-	}
-
-	//Delete file
-	if (file_exists($pathToEvaluationPhoto . '/' . $filename)) {
-		unlink($pathToEvaluationPhoto . '/' . $filename);
-	}
-
-	//Delete file thumbs
-	$thumbs_names = getAllThumbsNames($filename);
-	if (!empty($thumbs_names)) {
-		foreach($thumbs_names as $thumb_name) {
-			$thumb_fullname  = $pathToEvaluationPhoto . '/thumbs/' . $thumb_name;
-			if (file_exists($thumb_fullname)) {
-				unlink($thumb_fullname);
-			}
-		}
-	}
-
-	if ($riskassessment->photo == $filename) {
-		$riskassessment->photo = '';
-		$riskassessment->update($user, true);
-	}
-	$urltogo = str_replace('__ID__', $id, $backtopage);
-	$urltogo = preg_replace('/--IDFORBACKTOPAGE--/', $id, $urltogo); // New method to autoselect project after a New on another form object creation
-	header("Location: " . $urltogo);
-	exit;
-}
-
-if ( ! $error && $action == "addToFavorite" && $permissiontodelete) {
-	$data = json_decode(file_get_contents('php://input'), true);
-
-	$riskassessment_id = $data['riskassessment_id'];
-	$filename          = $data['filename'];
-
-	$riskassessment = new RiskAssessment($db);
-	$riskassessment->fetch($riskassessment_id);
-	$pathToEvaluationPhoto = $conf->digiriskdolibarr->multidir_output[$conf->entity] . '/riskassessment/' . $riskassessment->ref;
-	$riskassessment->photo = $filename;
-	$riskassessment->update($user, true);
-
-	$urltogo = str_replace('__ID__', $riskassessment_id, $backtopage);
-	$urltogo = preg_replace('/--IDFORBACKTOPAGE--/', $id, $urltogo); // New method to autoselect project after a New on another form object creation
-	header("Location: " . $urltogo);
-	exit;
 }
 
 // Action import shared risks
@@ -779,10 +652,12 @@ if ($action == 'confirm_import_shared_risks' && $confirm == 'yes') {
 
 		if ($options['import_shared_risks'][$risks->id] == 'on') {
 			if ($object->id > 0) {
-				$object->element = 'digiriskdolibarr_' . $digiriskelementtmp->element;
+				$object->element = $digiriskelementtmp->element;
 				$result = $object->add_object_linked('digiriskdolibarr_' . $risk->element, $risks->id);
 				if ($result > 0) {
-					setEventMessages($langs->trans('SharedRiskImportWithSuccess'), array());
+					$risks->applied_on = $object->id;
+					$risks->call_trigger('RISK_IMPORT', $user);
+					continue;
 				} else {
 					setEventMessages($object->error, $object->errors, 'errors');
 					$action = '';
@@ -812,6 +687,8 @@ if (! $error && $action == 'unlinkSharedRisk' && $permissiontodelete) {
 
 	if ($result > 0) {
 		// Unlink shared risk OK
+		$risk->applied_on = $object->id;
+		$risk->call_trigger('RISK_UNLINK', $user);
 		$urltogo = str_replace('__ID__', $object->id, $backtopage);
 		$urltogo = preg_replace('/--IDFORBACKTOPAGE--/', $id, $urltogo); // New method to autoselect project after a New on another form object creation
 		header("Location: " . $urltogo);

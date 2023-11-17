@@ -1,5 +1,5 @@
 <?php
-/* Copyright (C) 2021 EOXIA <dev@eoxia.com>
+/* Copyright (C) 2021-2023 EVARISK <technique@evarisk.com>
  *
  * This program is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -72,7 +72,7 @@ class InterfaceDigiriskdolibarrTriggers extends DolibarrTriggers
 		$this->name        = preg_replace('/^Interface/i', '', get_class($this));
 		$this->family      = "demo";
 		$this->description = "Digiriskdolibarr triggers.";
-		$this->version     = '9.10.0';
+		$this->version     = '9.13.0';
 		$this->picto       = 'digiriskdolibarr@digiriskdolibarr';
 	}
 
@@ -101,728 +101,292 @@ class InterfaceDigiriskdolibarrTriggers extends DolibarrTriggers
 	 * All functions "runTrigger" are triggered if file
 	 * is inside directory core/triggers
 	 *
-	 * @param string $action Event action code
+	 * @param string       $action Event action code
 	 * @param CommonObject $object Object
-	 * @param User $user Object user
-	 * @param Translate $langs Object langs
-	 * @param Conf $conf Object conf
-	 * @return int                    <0 if KO, 0 if no triggered ran, >0 if OK
+	 * @param User         $user   Object user
+	 * @param Translate    $langs  Object langs
+	 * @param Conf         $conf   Object conf
+	 * @return int                 <0 if KO, 0 if no triggered ran, >0 if OK
 	 * @throws Exception
 	 */
 	public function runTrigger($action, $object, User $user, Translate $langs, Conf $conf)
 	{
-		if (empty($conf->digiriskdolibarr->enabled)) return 0; // If module is not enabled, we do nothing
+        $action = str_replace('@DIGIRISKDOLIBARR', '', $action);
+		$active = getDolGlobalInt('DIGIRISKDOLIBARR_MAIN_AGENDA_ACTIONAUTO_' . $action);
+
+		if (!isModEnabled('digiriskdolibarr') || !$active) {
+            $allowedTriggers = ['COMPANY_DELETE', 'CONTACT_DELETE', 'TICKET_CREATE'];
+            if (!in_array($action, $allowedTriggers)) {
+                return 0;  // If module is not enabled or trigger is deactivated, we do nothing
+            }
+		}
 
 		// Data and type of action are stored into $object and $action
+		dol_syslog("Trigger '" . $this->name . "' for action '$action' launched by " . __FILE__ . '. id=' . $object->id);
 
-		switch ($action) {
-			case 'INFORMATIONSSHARING_GENERATE' :
-				dol_syslog("Trigger '" . $this->name . "' for action '$action' launched by " . __FILE__ . ". id=" . $object->id);
-				require_once DOL_DOCUMENT_ROOT . '/comm/action/class/actioncomm.class.php';
-				$now        = dol_now();
-				$actioncomm = new ActionComm($this->db);
+		require_once DOL_DOCUMENT_ROOT . '/comm/action/class/actioncomm.class.php';
+        require_once DOL_DOCUMENT_ROOT . '/core/lib/date.lib.php';
+        require_once __DIR__ . '/../../class/digiriskresources.class.php';
+		require_once __DIR__ . '/../../class/digiriskelement.class.php';
+		require_once __DIR__ . '/../../class/digiriskstandard.class.php';
 
-				$actioncomm->elementtype = $object->parent_type . '@digiriskdolibarr';
-				$actioncomm->elementid   = $object->parent_id;
-				$actioncomm->code        = 'AC_INFORMATIONSSHARING_GENERATE';
-				$actioncomm->type_code   = 'AC_OTH_AUTO';
-				$actioncomm->label       = $langs->trans('InformationsSharingGeneratedWithDolibarr');
-				$actioncomm->datep       = $now;
-				$actioncomm->fk_element  = $object->parent_id;
-				$actioncomm->userownerid = $user->id;
-				$actioncomm->percentage  = -1;
+		$now               = dol_now();
+		$actioncomm        = new ActionComm($this->db);
+		$digiriskstandard  = new DigiriskStandard($this->db);
+		$digiriskresources = new DigiriskResources($this->db);
+		$digiriskelement   = new DigiriskElement($this->db);
 
-				$actioncomm->create($user);
+		$actioncomm->elementtype = $object->element . '@digiriskdolibarr';
+		$actioncomm->type_code   = 'AC_OTH_AUTO';
+		$actioncomm->code        = 'AC_' . $action;
+		$actioncomm->datep       = $now;
+		$actioncomm->fk_element  = $object->id;
+		$actioncomm->userownerid = $user->id;
+		$actioncomm->percentage  = -1;
+
+        // Trigger descriptions are handled by class function getTriggerDescription
+        if (method_exists($object, 'getTriggerDescription')) {
+            if (strstr($action, '_CREATE')) {
+                $object->fetch($object->id);
+            }
+		    if (getDolGlobalInt('DIGIRISKDOLIBARR_ADVANCED_TRIGGER') && !empty($object->fields)) {
+                $actioncomm->note_private = $object->getTriggerDescription($object);
+            }
+		}
+
+        switch ($action) {
+			case 'COMPANY_DELETE' :
+				require_once __DIR__ . '/../../class/preventionplan.class.php';
+				require_once __DIR__ . '/../../class/firepermit.class.php';
+
+				$preventionplan       = new PreventionPlan($this->db);
+				$firepermit           = new FirePermit($this->db);
+				$alldigiriskresources = $digiriskresources->fetchAll('', '', 0, 0, array('customsql' => 't.element_id = ' . $object->id . ' AND t.element_type = "societe"'));
+
+				if (is_array($alldigiriskresources) && !empty($alldigiriskresources)) {
+					$i = 0;
+					foreach ($alldigiriskresources as $digiriskresourcesingle) {
+						if ($digiriskresourcesingle->object_type == 'preventionplan') {
+							$preventionplan->fetch($digiriskresourcesingle->object_id);
+							if ($preventionplan->status > 0) {
+								$error[++$i] = $langs->trans('ErrorThirdPartyHasAtLeastOneChildOfTypePreventionPlan') . ' ' . $preventionplan->getNomUrl();
+							}
+						} else if ($digiriskresourcesingle->object_type == 'firepermit') {
+							$firepermit->fetch($digiriskresourcesingle->object_id);
+							if ($firepermit->status > 0) {
+								$error[++$i] = $langs->trans('ErrorThirdPartyHasAtLeastOneChildOfTypeFirePermit') . ' ' . $firepermit->getNomUrl();
+							}
+						}
+					}
+					if (!empty($error)) {
+						$error[++$i] = $langs->trans('ErrorRecordHasChildren');
+						$object->errors = $error;
+						return -1;
+					}
+				}
 				break;
 
-			case 'LEGALDISPLAY_GENERATE' :
-				dol_syslog("Trigger '" . $this->name . "' for action '$action' launched by " . __FILE__ . ". id=" . $object->id);
-				require_once DOL_DOCUMENT_ROOT . '/comm/action/class/actioncomm.class.php';
-				$now        = dol_now();
-				$actioncomm = new ActionComm($this->db);
+			case 'CONTACT_DELETE' :
+				require_once __DIR__ . '/../../class/preventionplan.class.php';
+				require_once __DIR__ . '/../../class/firepermit.class.php';
+				require_once __DIR__ . '/../../class/digiriskresources.class.php';
 
-				$actioncomm->elementtype = $object->parent_type . '@digiriskdolibarr';
-				$actioncomm->elementid   = $object->parent_id;
-				$actioncomm->code        = 'AC_LEGALDISPLAY_GENERATE';
-				$actioncomm->type_code   = 'AC_OTH_AUTO';
-				$actioncomm->label       = $langs->trans('LegalDisplayGeneratedWithDolibarr');
-				$actioncomm->datep       = $now;
-				$actioncomm->fk_element  = $object->parent_id;
-				$actioncomm->userownerid = $user->id;
-				$actioncomm->percentage  = -1;
+				$preventionplan       = new PreventionPlan($this->db);
+				$firepermit           = new FirePermit($this->db);
+				$alldigiriskresources = $digiriskresources->fetchAll('', '', 0, 0, array('customsql' => 't.element_id = ' . $object->fk_soc . ' AND t.element_type = "societe"'));
 
-				$actioncomm->create($user);
+				if (is_array($alldigiriskresources) && !empty($alldigiriskresources)) {
+					foreach ($alldigiriskresources as $digiriskresourcesingle) {
+						$i = 0;
+						if ($digiriskresourcesingle->object_type == 'preventionplan') {
+							$preventionplan->fetch($digiriskresourcesingle->object_id);
+							if ($preventionplan->status > 0) {
+								$error[++$i] = $langs->trans('ErrorContactHasAtLeastOneChildOfTypePreventionPlan') . ' ' . $preventionplan->getNomUrl();
+							}
+						} else if ($digiriskresourcesingle->object_type == 'firepermit') {
+							$firepermit->fetch($digiriskresourcesingle->object_id);
+							if ($firepermit->status > 0) {
+								$error[++$i] = $langs->trans('ErrorContactHasAtLeastOneChildOfTypeFirePermit') . ' ' . $firepermit->getNomUrl();
+							}
+						}
+					}
+					if (!empty($error)) {
+						$error[++$i] = $langs->trans('ErrorRecordHasChildren');
+						$object->errors = $error;
+						return -1;
+					}
+				}
 				break;
 
+            case 'RISKASSESSMENTDOCUMENT_GENERATE' :
+            case 'LEGALDISPLAY_GENERATE' :
+            case 'INFORMATIONSSHARING_GENERATE' :
+            case 'FIREPERMITDOCUMENT_GENERATE' :
 			case 'PREVENTIONPLANDOCUMENT_GENERATE' :
-				dol_syslog("Trigger '" . $this->name . "' for action '$action' launched by " . __FILE__ . ". id=" . $object->id);
-				require_once DOL_DOCUMENT_ROOT . '/comm/action/class/actioncomm.class.php';
-				$now        = dol_now();
-				$actioncomm = new ActionComm($this->db);
-
-				$actioncomm->elementtype = $object->parent_type . '@digiriskdolibarr';
-				$actioncomm->elementid   = $object->parent_id;
-
-				$actioncomm->code        = 'AC_PREVENTIONPLANDOCUMENT_GENERATE';
-				$actioncomm->type_code   = 'AC_OTH_AUTO';
-				$actioncomm->label       = $langs->trans('PreventionPlanDocumentGeneratedWithDolibarr');
-				$actioncomm->datep       = $now;
-				$actioncomm->fk_element  = $object->parent_id;
-				$actioncomm->userownerid = $user->id;
-				$actioncomm->percentage  = -1;
-
-				$actioncomm->create($user);
-				break;
-
-			case 'FIREPERMITDOCUMENT_GENERATE' :
-				dol_syslog("Trigger '" . $this->name . "' for action '$action' launched by " . __FILE__ . ". id=" . $object->id);
-				require_once DOL_DOCUMENT_ROOT . '/comm/action/class/actioncomm.class.php';
-				$now        = dol_now();
-				$actioncomm = new ActionComm($this->db);
-
-				$actioncomm->elementtype = $object->parent_type . '@digiriskdolibarr';
-				$actioncomm->elementid   = $object->parent_id;
-
-				$actioncomm->code        = 'AC_FIREPERMITDOCUMENT_GENERATE';
-				$actioncomm->type_code   = 'AC_OTH_AUTO';
-				$actioncomm->label       = $langs->transnoentities('FirePermitDocumentGeneratedWithDolibarr');
-				$actioncomm->datep       = $now;
-				$actioncomm->fk_element  = $object->parent_id;
-				$actioncomm->userownerid = $user->id;
-				$actioncomm->percentage  = -1;
-
-				$actioncomm->create($user);
-				break;
-
+            case 'LISTINGRISKSACTION_GENERATE' :
+            case 'LISTINGRISKSPHOTO_GENERATE' :
+            case 'WORKUNITDOCUMENT_GENERATE' :
 			case 'GROUPMENTDOCUMENT_GENERATE' :
-				dol_syslog("Trigger '" . $this->name . "' for action '$action' launched by " . __FILE__ . ". id=" . $object->id);
-				require_once DOL_DOCUMENT_ROOT . '/comm/action/class/actioncomm.class.php';
-				$now        = dol_now();
-				$actioncomm = new ActionComm($this->db);
+                if ($object->parent_type == 'groupment' || $object->parent_type == 'workunit' || preg_match('/listingrisks/', $object->parent_type)) {
+                    $object->parent_type = 'digiriskelement';
+                }
 
-				$actioncomm->elementtype = 'digiriskelement@digiriskdolibarr';
-				$actioncomm->elementid   = $object->parent_id;
-				$actioncomm->code        = 'AC_GROUPMENTDOCUMENT_GENERATE';
-				$actioncomm->type_code   = 'AC_OTH_AUTO';
-				$actioncomm->label       = $langs->transnoentities('GroupmentDocumentGeneratedWithDolibarr');
-				$actioncomm->datep       = $now;
-				$actioncomm->fk_element  = $object->parent_id;
-				$actioncomm->userownerid = $user->id;
-				$actioncomm->percentage  = -1;
+                $actioncomm->elementtype = $object->parent_type . '@digiriskdolibarr';
 
-				$actioncomm->create($user);
-				break;
+                $actioncomm->label       = $langs->trans('ObjectGenerateTrigger', $langs->transnoentities(ucfirst(get_class($object))), $object->ref);
+                $actioncomm->elementid   = $object->parent_id;
+                $actioncomm->fk_element  = $object->parent_id;
 
-			case 'WORKUNITDOCUMENT_GENERATE' :
-				dol_syslog("Trigger '" . $this->name . "' for action '$action' launched by " . __FILE__ . ". id=" . $object->id);
-				require_once DOL_DOCUMENT_ROOT . '/comm/action/class/actioncomm.class.php';
-				$now        = dol_now();
-				$actioncomm = new ActionComm($this->db);
-
-				$actioncomm->elementtype = 'digiriskelement@digiriskdolibarr';
-				$actioncomm->elementid   = $object->parent_id;
-				$actioncomm->code        = 'AC_WORKUNITDOCUMENT_GENERATE';
-				$actioncomm->type_code   = 'AC_OTH_AUTO';
-				$actioncomm->label       = $langs->transnoentities('WorkUnitDocumentGeneratedWithDolibarr');
-				$actioncomm->datep       = $now;
-				$actioncomm->fk_element  = $object->parent_id;
-				$actioncomm->userownerid = $user->id;
-				$actioncomm->percentage  = -1;
-
-				$actioncomm->create($user);
-				break;
-
-			case 'LISTINGRISKSPHOTO_GENERATE' :
-				dol_syslog("Trigger '" . $this->name . "' for action '$action' launched by " . __FILE__ . ". id=" . $object->id);
-				require_once DOL_DOCUMENT_ROOT . '/comm/action/class/actioncomm.class.php';
-				$now                     = dol_now();
-				$actioncomm              = new ActionComm($this->db);
-				$type                    = $object->parent_type == 'digiriskstandard' ? 'digiriskstandard' : 'digiriskelement';
-				$actioncomm->elementtype = $type;
-				$actioncomm->elementid   = $object->parent_id;
-				$actioncomm->code        = 'AC_LISTINGRISKSPHOTO_GENERATE';
-				$actioncomm->type_code   = 'AC_OTH_AUTO';
-				$actioncomm->label       = $langs->transnoentities('ListingRisksPhotoGeneratedWithDolibarr');
-				$actioncomm->datep       = $now;
-				$actioncomm->fk_element  = $object->parent_id;
-				$actioncomm->userownerid = $user->id;
-				$actioncomm->percentage  = -1;
-
-				$actioncomm->create($user);
-				break;
-
-			case 'LISTINGRISKSACTION_GENERATE' :
-				dol_syslog("Trigger '" . $this->name . "' for action '$action' launched by " . __FILE__ . ". id=" . $object->id);
-				require_once DOL_DOCUMENT_ROOT . '/comm/action/class/actioncomm.class.php';
-				$now        = dol_now();
-				$actioncomm = new ActionComm($this->db);
-
-				$type                    = $object->parent_type == 'digiriskstandard' ? 'digiriskstandard' : 'digiriskelement';
-				$actioncomm->elementtype = $type;
-				$actioncomm->elementid   = $object->parent_id;
-				$actioncomm->code        = 'AC_LISTINGRISKSACTION_GENERATE';
-				$actioncomm->type_code   = 'AC_OTH_AUTO';
-				$actioncomm->label       = $langs->transnoentities('ListingRisksActionGeneratedWithDolibarr');
-				$actioncomm->datep       = $now;
-				$actioncomm->fk_element  = $object->parent_id;
-				$actioncomm->userownerid = $user->id;
-				$actioncomm->percentage  = -1;
-
-				$actioncomm->create($user);
-				break;
-
-			case 'RISKASSESSMENTDOCUMENT_GENERATE' :
-				dol_syslog("Trigger '" . $this->name . "' for action '$action' launched by " . __FILE__ . ". id=" . $object->id);
-				require_once DOL_DOCUMENT_ROOT . '/comm/action/class/actioncomm.class.php';
-				$now        = dol_now();
-				$actioncomm = new ActionComm($this->db);
-
-				$actioncomm->elementtype = $object->parent_type . '@digiriskdolibarr';
-				$actioncomm->elementid   = $object->parent_id;
-				$actioncomm->code        = 'AC_RISKASSESSMENTDOCUMENT_GENERATE';
-				$actioncomm->type_code   = 'AC_OTH_AUTO';
-				$actioncomm->label       = $langs->transnoentities('RiskAssessmentDocumentGeneratedWithDolibarr');
-				$actioncomm->datep       = $now;
-				$actioncomm->fk_element  = $object->parent_id;
-				$actioncomm->userownerid = $user->id;
-				$actioncomm->percentage  = -1;
-
-				$actioncomm->create($user);
+                $result = $actioncomm->create($user);
 				break;
 
 			case 'DIGIRISKELEMENT_CREATE' :
-				dol_syslog("Trigger '" . $this->name . "' for action '$action' launched by " . __FILE__ . ". id=" . $object->id);
-				require_once DOL_DOCUMENT_ROOT . '/comm/action/class/actioncomm.class.php';
-				$now        = dol_now();
-				$actioncomm = new ActionComm($this->db);
-
 				$actioncomm->elementtype = 'digiriskelement@digiriskdolibarr';
-				$actioncomm->elementid   = $object->id;
-				$actioncomm->code        = 'AC_DIGIRISKELEMENT_CREATE';
-				$actioncomm->type_code   = 'AC_OTH_AUTO';
-				$actioncomm->label       = $langs->transnoentities($object->element_type . 'CreatedWithDolibarr');
-				$actioncomm->datep       = $now;
-				$actioncomm->fk_element  = $object->id;
-				$actioncomm->userownerid = $user->id;
-				$actioncomm->percentage  = -1;
+                $actioncomm->elementid   = $object->id;
 
-				$actioncomm->create($user);
+                $actioncomm->label = $langs->transnoentities('ObjectCreateTrigger', $langs->transnoentities(ucfirst($object->element_type)), $object->ref);
+
+                $result = $actioncomm->create($user);
 				break;
 
-			case 'SIGNATURE_GENERATE' :
-				dol_syslog("Trigger '" . $this->name . "' for action '$action' launched by " . __FILE__ . ". id=" . $object->id);
-				require_once DOL_DOCUMENT_ROOT . '/comm/action/class/actioncomm.class.php';
-				$now        = dol_now();
-				$actioncomm = new ActionComm($this->db);
+            case 'DIGIRISKELEMENT_MODIFY' :
+                $actioncomm->elementtype = 'digiriskelement@digiriskdolibarr';
+                $actioncomm->elementid   = $object->id;
 
-				$actioncomm->elementtype = 'digirisksignature@digiriskdolibarr';
-				$actioncomm->elementid   = $object->fk_preventionplan;
+                $actioncomm->label = $langs->transnoentities('ObjectModifyTrigger', $langs->transnoentities(ucfirst($object->element_type)), $object->ref);
 
-				$actioncomm->code        = 'AC_SIGNATURE_GENERATE';
-				$actioncomm->type_code   = 'AC_OTH_AUTO';
-				$actioncomm->label       = $langs->transnoentities('SignatureGeneratedWithDolibarr');
-				$actioncomm->datep       = $now;
-				$actioncomm->fk_element  = $object->fk_preventionplan;
-				$actioncomm->userownerid = $user->id;
-				$actioncomm->percentage  = -1;
+                $result = $actioncomm->create($user);
+                break;
 
-				$actioncomm->create($user);
-				break;
+            case 'DIGIRISKELEMENT_DELETE' :
+                $actioncomm->elementtype = 'digiriskelement@digiriskdolibarr';
+                $actioncomm->elementid   = $object->id;
 
+                $actioncomm->label = $langs->transnoentities('ObjectDeleteTrigger', $langs->transnoentities(ucfirst($object->element_type)), $object->ref);
+
+                $result = $actioncomm->create($user);
+                break;
+
+            case 'ACCIDENT_CREATE' :
+            case 'ACCIDENTINVESTIGATION_CREATE' :
+            case 'FIREPERMIT_CREATE' :
+            case 'PREVENTIONPLAN_CREATE' :
+                $actioncomm->label = $langs->trans('ObjectCreateTrigger', $langs->transnoentities(ucfirst($object->element)), $object->ref);
+
+                $result = $actioncomm->create($user);
+                break;
+
+            case 'ACCIDENT_MODIFY' :
+            case 'ACCIDENTINVESTIGATION_MODIFY' :
+            case 'FIREPERMIT_MODIFY' :
 			case 'PREVENTIONPLAN_MODIFY' :
+				$actioncomm->label = $langs->trans('ObjectModifyTrigger', $langs->transnoentities(ucfirst($object->element)), $object->ref);
 
-				dol_syslog("Trigger '" . $this->name . "' for action '$action' launched by " . __FILE__ . ". id=" . $object->id);
-				require_once DOL_DOCUMENT_ROOT . '/comm/action/class/actioncomm.class.php';
-				$now        = dol_now();
-				$actioncomm = new ActionComm($this->db);
-
-				$actioncomm->elementtype = 'preventionplan@digiriskdolibarr';
-				$actioncomm->code        = 'AC_PREVENTIONPLAN_MODIFY';
-				$actioncomm->type_code   = 'AC_OTH_AUTO';
-				$actioncomm->label       = $langs->transnoentities('PreventionPlanModifyTrigger');
-				$actioncomm->datep       = $now;
-				$actioncomm->fk_element  = $object->id;
-				$actioncomm->userownerid = $user->id;
-				$actioncomm->percentage  = -1;
-
-				$actioncomm->create($user);
+				$result = $actioncomm->create($user);
 				break;
 
-			case 'PREVENTIONPLAN_INPROGRESS' :
+            case 'ACCIDENT_DELETE' :
+            case 'ACCIDENTINVESTIGATION_DELETE' :
+            case 'FIREPERMIT_DELETE' :
+			case 'PREVENTIONPLAN_DELETE' :
+				$actioncomm->label = $langs->trans('ObjectDeleteTrigger', $langs->transnoentities(ucfirst($object->element)), $object->ref);
 
-				dol_syslog("Trigger '" . $this->name . "' for action '$action' launched by " . __FILE__ . ". id=" . $object->id);
-				require_once DOL_DOCUMENT_ROOT . '/comm/action/class/actioncomm.class.php';
-				$now        = dol_now();
-				$actioncomm = new ActionComm($this->db);
-
-				$actioncomm->elementtype = 'preventionplan@digiriskdolibarr';
-				$actioncomm->code        = 'AC_PREVENTIONPLAN_INPROGRESS';
-				$actioncomm->type_code   = 'AC_OTH_AUTO';
-				$actioncomm->label       = $langs->transnoentities('PreventionPlanInprogressTrigger');
-				$actioncomm->datep       = $now;
-				$actioncomm->fk_element  = $object->id;
-				$actioncomm->userownerid = $user->id;
-				$actioncomm->percentage  = -1;
-
-				$actioncomm->create($user);
+				$result = $actioncomm->create($user);
 				break;
 
+            case 'ACCIDENTINVESTIGATION_VALIDATE' :
+            case 'FIREPERMIT_PENDINGSIGNATURE' :
 			case 'PREVENTIONPLAN_PENDINGSIGNATURE' :
-				dol_syslog("Trigger '" . $this->name . "' for action '$action' launched by " . __FILE__ . ". id=" . $object->id);
-				require_once DOL_DOCUMENT_ROOT . '/comm/action/class/actioncomm.class.php';
-				$now        = dol_now();
-				$actioncomm = new ActionComm($this->db);
+				$actioncomm->label = $langs->transnoentities('ObjectValidateTrigger', $langs->transnoentities(ucfirst($object->element)), $object->ref);
 
-				$actioncomm->elementtype = 'preventionplan@digiriskdolibarr';
-				$actioncomm->code        = 'AC_PREVENTIONPLAN_PENDINGSIGNATURE';
-				$actioncomm->type_code   = 'AC_OTH_AUTO';
-				$actioncomm->label       = $langs->transnoentities('PreventionPlanPendingSignatureTrigger');
-				$actioncomm->datep       = $now;
-				$actioncomm->fk_element  = $object->id;
-				$actioncomm->userownerid = $user->id;
-				$actioncomm->percentage  = -1;
-
-				$actioncomm->create($user);
+				$result = $actioncomm->create($user);
 				break;
 
-			case 'PREVENTIONPLAN_LOCKED' :
+            case 'ACCIDENTINVESTIGATION_LOCK' :
+            case 'FIREPERMIT_LOCK' :
+			case 'PREVENTIONPLAN_LOCK' :
+				$actioncomm->label = $langs->trans('ObjectLockedTrigger', $langs->transnoentities(ucfirst($object->element)), $object->ref);
 
-				dol_syslog("Trigger '" . $this->name . "' for action '$action' launched by " . __FILE__ . ". id=" . $object->id);
-				require_once DOL_DOCUMENT_ROOT . '/comm/action/class/actioncomm.class.php';
-				$now        = dol_now();
-				$actioncomm = new ActionComm($this->db);
-
-				$actioncomm->elementtype = 'preventionplan@digiriskdolibarr';
-				$actioncomm->code        = 'AC_PREVENTIONPLAN_LOCKED';
-				$actioncomm->type_code   = 'AC_OTH_AUTO';
-				$actioncomm->label       = $langs->transnoentities('PreventionPlanLockTrigger');
-				$actioncomm->datep       = $now;
-				$actioncomm->fk_element  = $object->id;
-				$actioncomm->userownerid = $user->id;
-				$actioncomm->percentage  = -1;
-
-				$actioncomm->create($user);
+				$result = $actioncomm->create($user);
 				break;
 
-			case 'PREVENTIONPLAN_ARCHIVED' :
+            case 'ACCIDENTINVESTIGATION_ARCHIVE' :
+            case 'FIREPERMIT_ARCHIVE' :
+			case 'PREVENTIONPLAN_ARCHIVE' :
+				$actioncomm->label = $langs->trans('ObjectArchivedTrigger', $langs->transnoentities(ucfirst($object->element)), $object->ref);
 
-				dol_syslog("Trigger '" . $this->name . "' for action '$action' launched by " . __FILE__ . ". id=" . $object->id);
-				require_once DOL_DOCUMENT_ROOT . '/comm/action/class/actioncomm.class.php';
-				$now        = dol_now();
-				$actioncomm = new ActionComm($this->db);
-
-				$actioncomm->elementtype = 'preventionplan@digiriskdolibarr';
-				$actioncomm->code        = 'AC_PREVENTIONPLAN_ARCHIVED';
-				$actioncomm->type_code   = 'AC_OTH_AUTO';
-				$actioncomm->label       = $langs->transnoentities('PreventionPlanArchivedTrigger');
-				$actioncomm->datep       = $now;
-				$actioncomm->fk_element  = $object->id;
-				$actioncomm->userownerid = $user->id;
-				$actioncomm->percentage  = -1;
-
-				$actioncomm->create($user);
+				$result = $actioncomm->create($user);
 				break;
+
+            case 'ACCIDENTINVESTIGATION_UNVALIDATE' :
+            case 'FIREPERMIT_UNVALIDATE' :
+            case 'PREVENTIONPLAN_UNVALIDATE' :
+                $actioncomm->label = $langs->trans('ObjectUnValidateTrigger', $langs->transnoentities(ucfirst($object->element)), $object->ref);
+
+                $result = $actioncomm->create($user);
+                break;
 
 			case 'PREVENTIONPLANLINE_CREATE' :
-
-				dol_syslog("Trigger '" . $this->name . "' for action '$action' launched by " . __FILE__ . ". id=" . $object->id);
-				require_once DOL_DOCUMENT_ROOT . '/comm/action/class/actioncomm.class.php';
-				$now        = dol_now();
-				$actioncomm = new ActionComm($this->db);
-
 				$actioncomm->elementtype = 'preventionplan@digiriskdolibarr';
-				$actioncomm->code        = 'AC_PREVENTIONPLANLINE_CREATE';
-				$actioncomm->type_code   = 'AC_OTH_AUTO';
-				$actioncomm->label       = $langs->transnoentities('PreventionPlanLineCreateTrigger');
-				$actioncomm->datep       = $now;
-				$actioncomm->fk_element  = $object->fk_preventionplan;
-				$actioncomm->userownerid = $user->id;
-				$actioncomm->percentage  = -1;
 
-				$actioncomm->create($user);
+				$actioncomm->label      = $langs->trans('ObjectCreateTrigger', $langs->transnoentities(ucfirst($object->element)), $object->ref);
+				$actioncomm->fk_element = $object->fk_preventionplan;
+
+				$result = $actioncomm->create($user);
 				break;
 
 			case 'PREVENTIONPLANLINE_MODIFY' :
-
-				dol_syslog("Trigger '" . $this->name . "' for action '$action' launched by " . __FILE__ . ". id=" . $object->id);
-				require_once DOL_DOCUMENT_ROOT . '/comm/action/class/actioncomm.class.php';
-				$now        = dol_now();
-				$actioncomm = new ActionComm($this->db);
-
 				$actioncomm->elementtype = 'preventionplan@digiriskdolibarr';
-				$actioncomm->code        = 'AC_PREVENTIONPLANLINE_MODIFY';
-				$actioncomm->type_code   = 'AC_OTH_AUTO';
-				$actioncomm->label       = $langs->transnoentities('PreventionPlanLineModifyTrigger');
-				$actioncomm->datep       = $now;
-				$actioncomm->fk_element  = $object->fk_preventionplan;
-				$actioncomm->userownerid = $user->id;
-				$actioncomm->percentage  = -1;
 
-				$actioncomm->create($user);
+				$actioncomm->label      = $langs->trans('ObjectModifyTrigger', $langs->transnoentities(ucfirst($object->element)), $object->ref);
+				$actioncomm->fk_element = $object->fk_preventionplan;
+
+				$result = $actioncomm->create($user);
 				break;
 
 			case 'PREVENTIONPLANLINE_DELETE' :
-
-				dol_syslog("Trigger '" . $this->name . "' for action '$action' launched by " . __FILE__ . ". id=" . $object->id);
-				require_once DOL_DOCUMENT_ROOT . '/comm/action/class/actioncomm.class.php';
-				$now        = dol_now();
-				$actioncomm = new ActionComm($this->db);
-
 				$actioncomm->elementtype = 'preventionplan@digiriskdolibarr';
-				$actioncomm->code        = 'AC_PREVENTIONPLANLINE_DELETE';
-				$actioncomm->type_code   = 'AC_OTH_AUTO';
-				$actioncomm->label       = $langs->transnoentities('PreventionPlanLineDeleteTrigger');
-				$actioncomm->datep       = $now;
-				$actioncomm->fk_element  = $object->fk_preventionplan;
-				$actioncomm->userownerid = $user->id;
-				$actioncomm->percentage  = -1;
 
-				$actioncomm->create($user);
+				$actioncomm->label      = $langs->trans('ObjectDeleteTrigger', $langs->transnoentities(ucfirst($object->element)), $object->ref);
+				$actioncomm->fk_element = $object->fk_preventionplan;
+
+				$result = $actioncomm->create($user);
 				break;
 
-			case 'PREVENTIONPLANSIGNATURE_ADDATTENDANT' :
-
-				dol_syslog("Trigger '" . $this->name . "' for action '$action' launched by " . __FILE__ . ". id=" . $object->id);
-				require_once DOL_DOCUMENT_ROOT . '/comm/action/class/actioncomm.class.php';
-				$now        = dol_now();
-				$actioncomm = new ActionComm($this->db);
-
-				$actioncomm->elementtype       = 'preventionplan@digiriskdolibarr';
-				$actioncomm->code              = 'AC_PREVENTIONPLANSIGNATURE_ADDATTENDANT';
-				$actioncomm->type_code         = 'AC_OTH_AUTO';
-				$actioncomm->label             = $langs->transnoentities('PreventionPlanAddAttendantTrigger');
-				$actioncomm->datep             = $now;
-				$actioncomm->fk_element        = $object->fk_object;
-				$actioncomm->socpeopleassigned = array($object->element_id => $object->element_id);
-				$actioncomm->userownerid       = $user->id;
-				$actioncomm->percentage        = -1;
-
-				$actioncomm->create($user);
-				break;
-
+            case 'FIREPERMIT_SENTBYMAIL' :
 			case 'PREVENTIONPLAN_SENTBYMAIL' :
-				dol_syslog("Trigger '" . $this->name . "' for action '$action' launched by " . __FILE__ . ". id=" . $object->id);
-				require_once DOL_DOCUMENT_ROOT . '/comm/action/class/actioncomm.class.php';
-				$now        = dol_now();
-				$actioncomm = new ActionComm($this->db);
+				$actioncomm->label = $langs->transnoentities('ObjectSentByMailTrigger');
 
-				$actioncomm->elementtype = 'preventionplan@digiriskdolibarr';
-				$actioncomm->code        = 'AC_PREVENTIONPLAN_SENTBYMAIL';
-				$actioncomm->type_code   = 'AC_OTH_AUTO';
-				$actioncomm->label       = $langs->transnoentities('PreventionPlanSentByMailTrigger');
-				$actioncomm->datep       = $now;
-				$actioncomm->fk_element  = $object->id;
-				$actioncomm->userownerid = $user->id;
-				$actioncomm->percentage  = -1;
-
-				$actioncomm->create($user);
-				$object->last_email_sent_date = dol_now('tzuser');
+				$result = $actioncomm->create($user);
+				$object->last_email_sent_date = $now;
 				$object->update($user, true);
-				break;
-
-			case 'FIREPERMIT_MODIFY' :
-
-				dol_syslog("Trigger '" . $this->name . "' for action '$action' launched by " . __FILE__ . ". id=" . $object->id);
-				require_once DOL_DOCUMENT_ROOT . '/comm/action/class/actioncomm.class.php';
-				$now        = dol_now();
-				$actioncomm = new ActionComm($this->db);
-
-				$actioncomm->elementtype = 'firepermit@digiriskdolibarr';
-				$actioncomm->code        = 'AC_FIREPERMIT_MODIFY';
-				$actioncomm->type_code   = 'AC_OTH_AUTO';
-				$actioncomm->label       = $langs->transnoentities('FirePermitModifyTrigger');
-				$actioncomm->datep       = $now;
-				$actioncomm->fk_element  = $object->id;
-				$actioncomm->userownerid = $user->id;
-				$actioncomm->percentage  = -1;
-
-				$actioncomm->create($user);
-				break;
-
-			case 'FIREPERMIT_INPROGRESS' :
-
-				dol_syslog("Trigger '" . $this->name . "' for action '$action' launched by " . __FILE__ . ". id=" . $object->id);
-				require_once DOL_DOCUMENT_ROOT . '/comm/action/class/actioncomm.class.php';
-				$now        = dol_now();
-				$actioncomm = new ActionComm($this->db);
-
-				$actioncomm->elementtype = 'firepermit@digiriskdolibarr';
-				$actioncomm->code        = 'AC_FIREPERMIT_INPROGRESS';
-				$actioncomm->type_code   = 'AC_OTH_AUTO';
-				$actioncomm->label       = $langs->transnoentities('FirePermitInProgressTrigger');
-				$actioncomm->datep       = $now;
-				$actioncomm->fk_element  = $object->id;
-				$actioncomm->userownerid = $user->id;
-				$actioncomm->percentage  = -1;
-
-				$actioncomm->create($user);
-				break;
-
-			case 'FIREPERMIT_PENDINGSIGNATURE' :
-				dol_syslog("Trigger '" . $this->name . "' for action '$action' launched by " . __FILE__ . ". id=" . $object->id);
-				require_once DOL_DOCUMENT_ROOT . '/comm/action/class/actioncomm.class.php';
-				$now        = dol_now();
-				$actioncomm = new ActionComm($this->db);
-
-				$actioncomm->elementtype = 'firepermit@digiriskdolibarr';
-				$actioncomm->code        = 'AC_FIREPERMIT_PENDINGSIGNATURE';
-				$actioncomm->type_code   = 'AC_OTH_AUTO';
-				$actioncomm->label       = $langs->transnoentities('FirePermitPendingSignatureTrigger');
-				$actioncomm->datep       = $now;
-				$actioncomm->fk_element  = $object->id;
-				$actioncomm->userownerid = $user->id;
-				$actioncomm->percentage  = -1;
-
-				$actioncomm->create($user);
-				break;
-
-			case 'FIREPERMIT_LOCKED' :
-
-				dol_syslog("Trigger '" . $this->name . "' for action '$action' launched by " . __FILE__ . ". id=" . $object->id);
-				require_once DOL_DOCUMENT_ROOT . '/comm/action/class/actioncomm.class.php';
-				$now        = dol_now();
-				$actioncomm = new ActionComm($this->db);
-
-				$actioncomm->elementtype = 'firepermit@digiriskdolibarr';
-				$actioncomm->code        = 'AC_FIREPERMIT_LOCKED';
-				$actioncomm->type_code   = 'AC_OTH_AUTO';
-				$actioncomm->label       = $langs->transnoentities('FirePermitLockTrigger');
-				$actioncomm->datep       = $now;
-				$actioncomm->fk_element  = $object->id;
-				$actioncomm->userownerid = $user->id;
-				$actioncomm->percentage  = -1;
-
-				$actioncomm->create($user);
-				break;
-
-			case 'FIREPERMIT_ARCHIVED' :
-
-				dol_syslog("Trigger '" . $this->name . "' for action '$action' launched by " . __FILE__ . ". id=" . $object->id);
-				require_once DOL_DOCUMENT_ROOT . '/comm/action/class/actioncomm.class.php';
-				$now        = dol_now();
-				$actioncomm = new ActionComm($this->db);
-
-				$actioncomm->elementtype = 'firepermit@digiriskdolibarr';
-				$actioncomm->code        = 'AC_FIREPERMIT_ARCHIVED';
-				$actioncomm->type_code   = 'AC_OTH_AUTO';
-				$actioncomm->label       = $langs->transnoentities('FirePermitArchivedTrigger');
-				$actioncomm->datep       = $now;
-				$actioncomm->fk_element  = $object->id;
-				$actioncomm->userownerid = $user->id;
-				$actioncomm->percentage  = -1;
-
-				$actioncomm->create($user);
 				break;
 
 			case 'FIREPERMITLINE_CREATE' :
-
-				dol_syslog("Trigger '" . $this->name . "' for action '$action' launched by " . __FILE__ . ". id=" . $object->id);
-				require_once DOL_DOCUMENT_ROOT . '/comm/action/class/actioncomm.class.php';
-				$now        = dol_now();
-				$actioncomm = new ActionComm($this->db);
-
 				$actioncomm->elementtype = 'firepermit@digiriskdolibarr';
-				$actioncomm->code        = 'AC_FIREPERMITLINE_CREATE';
-				$actioncomm->type_code   = 'AC_OTH_AUTO';
-				$actioncomm->label       = $langs->transnoentities('FirePermitLineCreateTrigger');
-				$actioncomm->datep       = $now;
-				$actioncomm->fk_element  = $object->fk_firepermit;
-				$actioncomm->userownerid = $user->id;
-				$actioncomm->percentage  = -1;
 
-				$actioncomm->create($user);
+				$actioncomm->label      = $langs->trans('ObjectCreateTrigger', $langs->transnoentities(ucfirst($object->element)), $object->ref);
+				$actioncomm->fk_element = $object->fk_firepermit;
+
+				$result = $actioncomm->create($user);
 				break;
 
 			case 'FIREPERMITLINE_MODIFY' :
-
-				dol_syslog("Trigger '" . $this->name . "' for action '$action' launched by " . __FILE__ . ". id=" . $object->id);
-				require_once DOL_DOCUMENT_ROOT . '/comm/action/class/actioncomm.class.php';
-				$now        = dol_now();
-				$actioncomm = new ActionComm($this->db);
-
 				$actioncomm->elementtype = 'firepermit@digiriskdolibarr';
-				$actioncomm->code        = 'AC_FIREPERMITLINE_MODIFY';
-				$actioncomm->type_code   = 'AC_OTH_AUTO';
-				$actioncomm->label       = $langs->transnoentities('FirePermitLineModifyTrigger');
-				$actioncomm->datep       = $now;
-				$actioncomm->fk_element  = $object->fk_firepermit;
-				$actioncomm->userownerid = $user->id;
-				$actioncomm->percentage  = -1;
 
-				$actioncomm->create($user);
+				$actioncomm->label      = $langs->trans('ObjectModifyTrigger', $langs->transnoentities(ucfirst($object->element)), $object->ref);
+				$actioncomm->fk_element = $object->fk_firepermit;
+
+				$result = $actioncomm->create($user);
 				break;
 
 			case 'FIREPERMITLINE_DELETE' :
-
-				dol_syslog("Trigger '" . $this->name . "' for action '$action' launched by " . __FILE__ . ". id=" . $object->id);
-				require_once DOL_DOCUMENT_ROOT . '/comm/action/class/actioncomm.class.php';
-				$now        = dol_now();
-				$actioncomm = new ActionComm($this->db);
-
 				$actioncomm->elementtype = 'firepermit@digiriskdolibarr';
-				$actioncomm->code        = 'AC_FIREPERMITLINE_DELETE';
-				$actioncomm->type_code   = 'AC_OTH_AUTO';
-				$actioncomm->label       = $langs->transnoentities('FirePermitLineDeleteTrigger');
-				$actioncomm->datep       = $now;
-				$actioncomm->fk_element  = $object->fk_firepermit;
-				$actioncomm->userownerid = $user->id;
-				$actioncomm->percentage  = -1;
 
-				$actioncomm->create($user);
-				break;
+				$actioncomm->label      = $langs->trans('ObjectDeleteTrigger', $langs->transnoentities(ucfirst($object->element)), $object->ref);
+				$actioncomm->fk_element = $object->fk_firepermit;
 
-			case 'FIREPERMITSIGNATURE_ADDATTENDANT' :
-
-				dol_syslog("Trigger '" . $this->name . "' for action '$action' launched by " . __FILE__ . ". id=" . $object->id);
-				require_once DOL_DOCUMENT_ROOT . '/comm/action/class/actioncomm.class.php';
-				$now        = dol_now();
-				$actioncomm = new ActionComm($this->db);
-
-				$actioncomm->elementtype       = 'firepermit@digiriskdolibarr';
-				$actioncomm->code              = 'AC_FIREPERMITSIGNATURE_ADDATTENDANT';
-				$actioncomm->type_code         = 'AC_OTH_AUTO';
-				$actioncomm->label             = $langs->transnoentities('FirePermitAddAttendantTrigger');
-				$actioncomm->datep             = $now;
-				$actioncomm->fk_element        = $object->fk_object;
-				$actioncomm->socpeopleassigned = array($object->element_id => $object->element_id);
-				$actioncomm->userownerid       = $user->id;
-				$actioncomm->percentage        = -1;
-
-				$actioncomm->create($user);
-				break;
-
-			case 'FIREPERMIT_SENTBYMAIL' :
-				dol_syslog("Trigger '" . $this->name . "' for action '$action' launched by " . __FILE__ . ". id=" . $object->id);
-				require_once DOL_DOCUMENT_ROOT . '/comm/action/class/actioncomm.class.php';
-				$now        = dol_now();
-				$actioncomm = new ActionComm($this->db);
-
-				$actioncomm->elementtype = 'firepermit@digiriskdolibarr';
-				$actioncomm->code        = 'AC_FIREPERMIT_SENTBYMAIL';
-				$actioncomm->type_code   = 'AC_OTH_AUTO';
-				$actioncomm->label       = $langs->transnoentities('FirePermitSentByMailTrigger');
-				$actioncomm->datep       = $now;
-				$actioncomm->fk_element  = $object->id;
-				$actioncomm->userownerid = $user->id;
-				$actioncomm->percentage  = -1;
-
-				$actioncomm->create($user);
-				$object->last_email_sent_date = dol_now('tzuser');
-				$object->update($user, true);
-				break;
-
-			case 'DIGIRISKSIGNATURE_SIGNED' :
-
-				dol_syslog("Trigger '" . $this->name . "' for action '$action' launched by " . __FILE__ . ". id=" . $object->id);
-				require_once DOL_DOCUMENT_ROOT . '/comm/action/class/actioncomm.class.php';
-				$now = dol_now();
-
-				if ($object->element_type == 'socpeople') {
-					$people = new Contact($this->db);
-				} elseif ($object->element_type == 'user') {
-					$people = new User($this->db);
-				}
-
-				$actioncomm = new ActionComm($this->db);
-
-				$actioncomm->elementtype = $object->object_type . '@digiriskdolibarr';
-				$actioncomm->code        = 'AC_DIGIRISKSIGNATURE_SIGNED';
-				$actioncomm->type_code   = 'AC_OTH_AUTO';
-
-				if (!empty($people)) {
-					$people->fetch($object->element_id);
-					$actioncomm->label = $langs->transnoentities($object->role . 'Signed') . ' : ' . $people->firstname . ' ' . $people->lastname;
-				} else {
-					$actioncomm->label = $langs->transnoentities($object->role . 'Signed');
-				}
-
-				$actioncomm->datep       = $now;
-				$actioncomm->fk_element  = $object->fk_object;
-				if ($object->element_type == 'socpeople') {
-					$actioncomm->socpeopleassigned = array($object->element_id => $object->element_id);
-				}
-				$actioncomm->userownerid = $user->id;
-				$actioncomm->percentage  = -1;
-
-				$actioncomm->create($user);
-				break;
-
-			case 'DIGIRISKSIGNATURE_PENDING_SIGNATURE' :
-
-				dol_syslog("Trigger '" . $this->name . "' for action '$action' launched by " . __FILE__ . ". id=" . $object->id);
-				require_once DOL_DOCUMENT_ROOT . '/comm/action/class/actioncomm.class.php';
-				$now        = dol_now();
-				$actioncomm = new ActionComm($this->db);
-
-				$object_type = $object->table_element;
-				$object_type = preg_replace('/digiriskdolibarr_/', '', $object_type);
-				$object_type = preg_replace('/_signature/', '', $object_type);
-
-				$actioncomm->elementtype       = $object_type . '@digiriskdolibarr';
-				$actioncomm->code              = 'AC_DIGIRISKSIGNATURE_PENDING_SIGNATURE';
-				$actioncomm->type_code         = 'AC_OTH_AUTO';
-				$actioncomm->label             = $langs->transnoentities('DigiriskSignaturePendingSignatureTrigger');
-				$actioncomm->datep             = $now;
-				$actioncomm->fk_element        = $object->fk_object;
-				if ($object->element_type == 'socpeople') {
-					$actioncomm->socpeopleassigned = array($object->element_id => $object->element_id);
-				}
-				$actioncomm->userownerid       = $user->id;
-				$actioncomm->percentage        = -1;
-
-				$actioncomm->create($user);
-				break;
-
-			case 'DIGIRISKSIGNATURE_ABSENT' :
-
-				dol_syslog("Trigger '" . $this->name . "' for action '$action' launched by " . __FILE__ . ". id=" . $object->id);
-				require_once DOL_DOCUMENT_ROOT . '/comm/action/class/actioncomm.class.php';
-				$now        = dol_now();
-				$actioncomm = new ActionComm($this->db);
-
-				$object_type = $object->table_element;
-				$object_type = preg_replace('/digiriskdolibarr_/', '', $object_type);
-				$object_type = preg_replace('/_signature/', '', $object_type);
-
-				$actioncomm->elementtype       = $object_type . '@digiriskdolibarr';
-				$actioncomm->code              = 'AC_DIGIRISKSIGNATURE_ABSENT';
-				$actioncomm->type_code         = 'AC_OTH_AUTO';
-				$actioncomm->label             = $langs->transnoentities('DigiriskSignatureAbsentTrigger');
-				$actioncomm->datep             = $now;
-				$actioncomm->fk_element        = $object->fk_object;
-				if ($object->element_type == 'socpeople') {
-					$actioncomm->socpeopleassigned = array($object->element_id => $object->element_id);
-				}
-				$actioncomm->userownerid       = $user->id;
-				$actioncomm->percentage        = -1;
-
-				$actioncomm->create($user);
-				break;
-
-			case 'DIGIRISKSIGNATURE_DELETED' :
-
-				dol_syslog("Trigger '" . $this->name . "' for action '$action' launched by " . __FILE__ . ". id=" . $object->id);
-				require_once DOL_DOCUMENT_ROOT . '/comm/action/class/actioncomm.class.php';
-				$now        = dol_now();
-				$actioncomm = new ActionComm($this->db);
-
-				$object_type = $object->table_element;
-				$object_type = preg_replace('/digiriskdolibarr_/', '', $object_type);
-				$object_type = preg_replace('/_signature/', '', $object_type);
-
-				$actioncomm->elementtype       = $object_type . '@digiriskdolibarr';
-				$actioncomm->code              = 'AC_DIGIRISKSIGNATURE_DELETED';
-				$actioncomm->type_code         = 'AC_OTH_AUTO';
-				$actioncomm->label             = $langs->transnoentities('DigiriskSignatureDeletedTrigger');
-				$actioncomm->datep             = $now;
-				$actioncomm->fk_element        = $object->fk_object;
-				if ($object->element_type == 'socpeople') {
-					$actioncomm->socpeopleassigned = array($object->element_id => $object->element_id);
-				}
-				$actioncomm->userownerid       = $user->id;
-				$actioncomm->percentage        = -1;
-
-				$actioncomm->create($user);
+				$result = $actioncomm->create($user);
 				break;
 
 			case 'TICKET_CREATE' :
@@ -830,11 +394,9 @@ class InterfaceDigiriskdolibarrTriggers extends DolibarrTriggers
 					// envoi du mail avec les infos de l'objet aux adresses mail configurées
 					// envoi du mail avec une trad puis avec un model
 
-					require_once __DIR__ . '/../../class/digiriskelement.class.php';
-
 					$error = 0;
 					$formmail        = new FormMail($this->db);
-					$digiriskelement = new DigiriskElement($this->db);
+
 
 					$arraydefaultmessage = $formmail->getEMailTemplate($this->db, 'ticket_send', $user, $langs); // If $model_id is empty, preselect the first one
 
@@ -896,21 +458,11 @@ class InterfaceDigiriskdolibarrTriggers extends DolibarrTriggers
 										$mesg .= '</div>';
 										setEventMessages($mesg, null, 'warnings');
 									} else {
-										dol_syslog("Trigger '" . $this->name . "' for action '$action' launched by " . __FILE__ . ". id=" . $object->id);
-										require_once DOL_DOCUMENT_ROOT . '/comm/action/class/actioncomm.class.php';
-										$now        = dol_now();
-										$actioncomm = new ActionComm($this->db);
-										$actioncomm->elementtype = 'ticket';
-										$actioncomm->code      = 'AC_TICKET_CREATION_MAIL_SENT';
-										$actioncomm->type_code = 'AC_OTH_AUTO';
-										$actioncomm->label = $langs->transnoentities('TicketCreationMailWellSent');
-										$actioncomm->note = $langs->transnoentities('TicketCreationMailSent', $sendto);
-										$actioncomm->datep       = $now;
-										$actioncomm->fk_element  = $object->id;
-										$actioncomm->userownerid = $user->id;
-										$actioncomm->percentage  = -1;
+										$actioncomm->elementtype  = 'ticket';
+										$actioncomm->label        = $langs->transnoentities('TicketCreationMailWellSent');
+										$actioncomm->note_private = $langs->transnoentities('TicketCreationMailSent', $sendto);
 
-										$actioncomm->create($user);
+										$result = $actioncomm->create($user);
 										break;
 									}
 								} else {
@@ -957,20 +509,12 @@ class InterfaceDigiriskdolibarrTriggers extends DolibarrTriggers
 													$mesg .= '</div>';
 													setEventMessages($mesg, null, 'warnings');
 												} else {
-													dol_syslog("Trigger '" . $this->name . "' for action '$action' launched by " . __FILE__ . ". id=" . $object->id);
-													require_once DOL_DOCUMENT_ROOT . '/comm/action/class/actioncomm.class.php';
-													$now        = dol_now();
-													$actioncomm = new ActionComm($this->db);
-													$actioncomm->elementtype = 'ticket';
-													$actioncomm->code      = 'AC_TICKET_CREATION_MAIL_SENT';
-													$actioncomm->type_code = 'AC_OTH_AUTO';
-													$actioncomm->label = $langs->transnoentities('TicketCreationMailWellSent');
-													$actioncomm->note = $langs->transnoentities('TicketCreationMailSent', $sendto);
-													$actioncomm->datep       = $now;
-													$actioncomm->fk_element  = $object->id;
-													$actioncomm->userownerid = $user->id;
-													$actioncomm->percentage  = -1;
-													$actioncomm->create($user);
+													$actioncomm->elementtype  = 'ticket';
+													$actioncomm->label        = $langs->transnoentities('TicketCreationMailWellSent');
+													$actioncomm->note_private = $langs->transnoentities('TicketCreationMailSent', $sendto);
+
+													$result = $actioncomm->create($user);
+													break;
 												}
 											} else {
 												setEventMessages($langs->trans('ErrorSetupEmail'), '', 'errors');
@@ -993,552 +537,296 @@ class InterfaceDigiriskdolibarrTriggers extends DolibarrTriggers
 				}
 				break;
 
-			case 'OPENINGHOURS_CREATE' :
-
-				dol_syslog("Trigger '" . $this->name . "' for action '$action' launched by " . __FILE__ . ". id=" . $object->id);
-				require_once DOL_DOCUMENT_ROOT . '/comm/action/class/actioncomm.class.php';
-				$now        = dol_now();
-				$actioncomm = new ActionComm($this->db);
-				if ($object->element_type == 'societe') {
-					$actioncomm->socid = $object->element_id;
-				} else {
-					$actioncomm->elementtype = $object->element_type . '@digiriskdolibarr';
-				}
-				$actioncomm->code      = 'AC_OPENINGHOURS_CREATE';
-				$actioncomm->type_code = 'AC_OTH_AUTO';
-				if ($object->element_type == 'preventionplan') {
-					$actioncomm->label = $langs->transnoentities('PreventionPlanOpeningHoursCreateTrigger');
-				} elseif ($object->element_type == 'firepermit') {
-					$actioncomm->label = $langs->transnoentities('FirePermitOpeningHoursCreateTrigger');
-				}
-				$actioncomm->datep       = $now;
-				$actioncomm->fk_element  = $object->element_id;
-				$actioncomm->userownerid = $user->id;
-				$actioncomm->percentage  = -1;
-
-				$actioncomm->create($user);
-				break;
-
+            case 'RISKSIGN_CREATE' :
 			case 'RISK_CREATE' :
-
-				dol_syslog("Trigger '" . $this->name . "' for action '$action' launched by " . __FILE__ . ". id=" . $object->id);
-				require_once DOL_DOCUMENT_ROOT . '/comm/action/class/actioncomm.class.php';
-				require_once __DIR__ . '/../../class/digiriskelement.class.php';
-				$now             = dol_now();
-				$actioncomm      = new ActionComm($this->db);
-				$digiriskelement = new DigiriskElement($this->db);
-				$digiriskelement->fetch($object->fk_element);
-
 				$actioncomm->elementtype = 'digiriskelement@digiriskdolibarr';
-				$actioncomm->code        = 'AC_RISK_CREATE';
-				$actioncomm->type_code   = 'AC_OTH_AUTO';
-				$actioncomm->label       = $langs->transnoentities('RiskCreateTrigger');
-				$actioncomm->datep       = $now;
-				$actioncomm->fk_element  = $object->fk_element;
-				$actioncomm->userownerid = $user->id;
-				$actioncomm->percentage  = -1;
 
-				$actioncomm->create($user);
+				$actioncomm->label      = $langs->trans('ObjectCreateTrigger', $langs->transnoentities(get_class($object)), $object->ref);
+				$actioncomm->fk_element = $object->fk_element;
+
+				$result = $actioncomm->create($user);
 				break;
 
+            case 'RISKSIGN_MODIFY' :
 			case 'RISK_MODIFY' :
-
-				dol_syslog("Trigger '" . $this->name . "' for action '$action' launched by " . __FILE__ . ". id=" . $object->id);
-				require_once DOL_DOCUMENT_ROOT . '/comm/action/class/actioncomm.class.php';
-				require_once __DIR__ . '/../../class/digiriskelement.class.php';
-				$now             = dol_now();
-				$actioncomm      = new ActionComm($this->db);
-				$digiriskelement = new DigiriskElement($this->db);
-				$digiriskelement->fetch($object->fk_element);
-
 				$actioncomm->elementtype = 'digiriskelement@digiriskdolibarr';
-				$actioncomm->code        = 'AC_RISK_MODIFY';
-				$actioncomm->type_code   = 'AC_OTH_AUTO';
-				$actioncomm->label       = $langs->transnoentities('RiskModifyTrigger');
-				$actioncomm->datep       = $now;
-				$actioncomm->fk_element  = $object->fk_element;
-				$actioncomm->userownerid = $user->id;
-				$actioncomm->percentage  = -1;
 
-				$actioncomm->create($user);
+				$actioncomm->label      = $langs->trans('ObjectModifyTrigger', $langs->transnoentities(get_class($object)), $object->ref);
+				$actioncomm->fk_element = $object->fk_element;
+
+				$result = $actioncomm->create($user);
 				break;
 
+            case 'RISKSIGN_DELETE' :
 			case 'RISK_DELETE' :
-
-				dol_syslog("Trigger '" . $this->name . "' for action '$action' launched by " . __FILE__ . ". id=" . $object->id);
-				require_once DOL_DOCUMENT_ROOT . '/comm/action/class/actioncomm.class.php';
-				require_once __DIR__ . '/../../class/digiriskelement.class.php';
-				$now             = dol_now();
-				$actioncomm      = new ActionComm($this->db);
-				$digiriskelement = new DigiriskElement($this->db);
-				$digiriskelement->fetch($object->fk_element);
-
 				$actioncomm->elementtype = 'digiriskelement@digiriskdolibarr';
-				$actioncomm->code        = 'AC_RISK_DELETE';
-				$actioncomm->type_code   = 'AC_OTH_AUTO';
-				$actioncomm->label       = $langs->transnoentities('RiskDeleteTrigger');
-				$actioncomm->datep       = $now;
-				$actioncomm->fk_element  = $object->fk_element;
-				$actioncomm->userownerid = $user->id;
-				$actioncomm->percentage  = -1;
 
-				$actioncomm->create($user);
+				$actioncomm->label      = $langs->trans('ObjectDeleteTrigger', $langs->transnoentities(get_class($object)), $object->ref);
+				$actioncomm->fk_element = $object->fk_element;
+
+				$result = $actioncomm->create($user);
+				break;
+
+            case 'RISKSIGN_IMPORT':
+			case 'RISK_IMPORT' :
+                $actioncomm->elementtype = 'digiriskelement@digiriskdolibarr';
+
+                $actioncomm->label      = $langs->transnoentities('ObjectImportTrigger', $langs->transnoentities(get_class($object)), $object->ref);
+				$actioncomm->fk_element = $object->applied_on;
+
+				$result = $actioncomm->create($user);
+				break;
+
+            case 'RISKSIGN_UNLINK':
+			case 'RISK_UNLINK' :
+                $actioncomm->elementtype = 'digiriskelement@digiriskdolibarr';
+
+                $actioncomm->label      = $langs->transnoentities('ObjectUnlinkTrigger', $langs->transnoentities(get_class($object)), $object->ref);
+				$actioncomm->fk_element = $object->applied_on;
+
+				$result = $actioncomm->create($user);
+				break;
+
+			case 'TASK_CREATE' :
+				if (!empty($object->array_options['options_fk_risk'])) {
+					$langs->load("projects");
+
+					$risk = new Risk($this->db);
+					$digiriskelement->fetch($object->fk_element);
+					$risk->fetch($object->array_options['options_fk_risk']);
+
+					if ($conf->global->DIGIRISKDOLIBARR_SHOW_TASK_CALCULATED_PROGRESS) {
+						$timeSpent = $object->getSummaryOfTimeSpent();
+						$label_progress = 'ProgressDeclared';
+						if ($timeSpent['total_duration'] > 0 && !empty($object->planned_workload)) {
+							$task_progress = round($timeSpent['total_duration'] / $object->planned_workload * 100, 2);
+						} else {
+							$task_progress = 0;
+						}
+					} else {
+						(!empty($object->progress) ? $task_progress = $object->progress : $task_progress = 0);
+						$label_progress = 'ProgressCalculated';
+					}
+
+					$actioncomm->elementtype = 'digiriskelement@digiriskdolibarr';
+
+					$actioncomm->label         = $langs->trans('ObjectCreateTrigger', $langs->transnoentities('Task'), $object->ref);
+					$actioncomm->note_private .= $langs->trans($label_progress) . ' : ' . $task_progress . '%' . '<br>';
+					$actioncomm->fk_element    = $risk->fk_element;
+
+					$result = $actioncomm->create($user);
+				}
+				break;
+
+			case 'TASK_MODIFY' :
+				if (!empty($object->array_options['options_fk_risk'])) {
+					require_once __DIR__ . '/../../class/riskanalysis/risk.class.php';
+					$langs->load("projects");
+
+					$risk = new Risk($this->db);
+					$digiriskelement->fetch($object->fk_element);
+					$risk->fetch($object->array_options['options_fk_risk']);
+
+					if ($conf->global->DIGIRISKDOLIBARR_SHOW_TASK_CALCULATED_PROGRESS) {
+						$timeSpent = $object->getSummaryOfTimeSpent();
+						$label_progress = 'ProgressDeclared';
+						if ($timeSpent['total_duration'] > 0 && !empty($object->planned_workload)) {
+							$task_progress = round($timeSpent['total_duration'] / $object->planned_workload * 100, 2);
+						} else {
+							$task_progress = 0;
+						}
+					} else {
+						(!empty($object->progress) ? $task_progress = $object->progress : $task_progress = 0);
+						$label_progress = 'ProgressCalculated';
+					}
+
+					$actioncomm->elementtype = 'digiriskelement@digiriskdolibarr';
+
+					$actioncomm->label         = $langs->trans('ObjectModifyTrigger', $langs->transnoentities('Task'), $object->ref);
+					$actioncomm->note_private .= $langs->trans($label_progress) . ' : ' . $task_progress . '%' . '<br>';
+					$actioncomm->fk_element    = $risk->fk_element;
+
+					$result = $actioncomm->create($user);
+				}
+				break;
+
+			case 'TASK_DELETE' :
+				if ($object->array_options['options_fk_risk'] != 0) {
+					$langs->load("projects");
+
+					$risk = new Risk($this->db);
+					$digiriskelement->fetch($object->fk_element);
+					$risk->fetch($object->array_options['options_fk_risk']);
+
+					if ($conf->global->DIGIRISKDOLIBARR_SHOW_TASK_CALCULATED_PROGRESS) {
+						$timeSpent = $object->getSummaryOfTimeSpent();
+						$label_progress = 'ProgressDeclared';
+						if ($timeSpent['total_duration'] > 0 && !empty($object->planned_workload)) {
+							$task_progress = round($timeSpent['total_duration'] / $object->planned_workload * 100, 2);
+						} else {
+							$task_progress = 0;
+						}
+					} else {
+						(!empty($object->progress) ? $task_progress = $object->progress : $task_progress = 0);
+						$label_progress = 'ProgressCalculated';
+					}
+
+					$actioncomm->elementtype   = 'digiriskelement@digiriskdolibarr';
+					$actioncomm->label         = $langs->trans('ObjectDeleteTrigger', $langs->transnoentities('Task'), $object->ref);
+					$actioncomm->note_private .= $langs->trans($label_progress) . ' : ' . $task_progress . '%' . '<br>';
+					$actioncomm->fk_element    = $risk->fk_element;
+
+					$result = $actioncomm->create($user);
+				}
 				break;
 
 			case 'RISKASSESSMENT_CREATE' :
-
-				dol_syslog("Trigger '" . $this->name . "' for action '$action' launched by " . __FILE__ . ". id=" . $object->id);
-				require_once DOL_DOCUMENT_ROOT . '/comm/action/class/actioncomm.class.php';
 				require_once __DIR__ . '/../../class/riskanalysis/risk.class.php';
-				require_once __DIR__ . '/../../class/digiriskelement.class.php';
-				$now             = dol_now();
-				$actioncomm      = new ActionComm($this->db);
-				$risk            = new Risk($this->db);
-				$digiriskelement = new DigiriskElement($this->db);
+				$risk = new Risk($this->db);
 				$risk->fetch($object->fk_risk);
-				$digiriskelement->fetch($risk->fk_element);
 
 				$actioncomm->elementtype = 'digiriskelement@digiriskdolibarr';
-				$actioncomm->code        = 'AC_RISKASSESSMENT_CREATE';
-				$actioncomm->type_code   = 'AC_OTH_AUTO';
-				$actioncomm->label       = $langs->transnoentities('RiskAssessmentCreateTrigger');
-				$actioncomm->datep       = $now;
-				$actioncomm->fk_element  = $risk->fk_element;
-				$actioncomm->userownerid = $user->id;
-				$actioncomm->percentage  = -1;
 
-				$actioncomm->create($user);
+				$actioncomm->label      = $langs->trans('ObjectCreateTrigger', $langs->transnoentities(ucfirst($object->element)), $object->ref);
+				$actioncomm->fk_element = $risk->fk_element;
+
+				$result = $actioncomm->create($user);
 				break;
 
 			case 'RISKASSESSMENT_MODIFY' :
-
-				dol_syslog("Trigger '" . $this->name . "' for action '$action' launched by " . __FILE__ . ". id=" . $object->id);
-				require_once DOL_DOCUMENT_ROOT . '/comm/action/class/actioncomm.class.php';
 				require_once __DIR__ . '/../../class/riskanalysis/risk.class.php';
-				require_once __DIR__ . '/../../class/digiriskelement.class.php';
-				$now             = dol_now();
-				$actioncomm      = new ActionComm($this->db);
-				$risk            = new Risk($this->db);
-				$digiriskelement = new DigiriskElement($this->db);
+				$risk = new Risk($this->db);
 				$risk->fetch($object->fk_risk);
-				$digiriskelement->fetch($risk->fk_element);
 
 				$actioncomm->elementtype = 'digiriskelement@digiriskdolibarr';
-				$actioncomm->code        = 'AC_RISKASSESSMENT_MODIFY';
-				$actioncomm->type_code   = 'AC_OTH_AUTO';
-				$actioncomm->label       = $langs->transnoentities('RiskAssessmentModifyTrigger');
-				$actioncomm->datep       = $now;
-				$actioncomm->fk_element  = $risk->fk_element;
-				$actioncomm->userownerid = $user->id;
-				$actioncomm->percentage  = -1;
 
-				$actioncomm->create($user);
+				$actioncomm->label      = $langs->trans('ObjectModifyTrigger', $langs->transnoentities(ucfirst($object->element)), $object->ref);
+				$actioncomm->fk_element = $risk->fk_element;
+
+				$result = $actioncomm->create($user);
 				break;
 
 			case 'RISKASSESSMENT_DELETE' :
-
-				dol_syslog("Trigger '" . $this->name . "' for action '$action' launched by " . __FILE__ . ". id=" . $object->id);
-				require_once DOL_DOCUMENT_ROOT . '/comm/action/class/actioncomm.class.php';
 				require_once __DIR__ . '/../../class/riskanalysis/risk.class.php';
-				require_once __DIR__ . '/../../class/digiriskelement.class.php';
-				$now             = dol_now();
-				$actioncomm      = new ActionComm($this->db);
-				$risk            = new Risk($this->db);
-				$digiriskelement = new DigiriskElement($this->db);
+				$risk = new Risk($this->db);
 				$risk->fetch($object->fk_risk);
-				$digiriskelement->fetch($risk->fk_element);
 
 				$actioncomm->elementtype = 'digiriskelement@digiriskdolibarr';
-				$actioncomm->code        = 'AC_RISKASSESSMENT_DELETE';
-				$actioncomm->type_code   = 'AC_OTH_AUTO';
-				$actioncomm->label       = $langs->transnoentities('RiskAssessmentDeleteTrigger');
-				$actioncomm->datep       = $now;
-				$actioncomm->fk_element  = $risk->fk_element;
-				$actioncomm->userownerid = $user->id;
-				$actioncomm->percentage  = -1;
 
-				$actioncomm->create($user);
+				$actioncomm->label      = $langs->trans('ObjectDeleteTrigger', $langs->transnoentities(ucfirst($object->element)), $object->ref);
+				$actioncomm->fk_element = $risk->fk_element;
+
+				$result = $actioncomm->create($user);
 				break;
 
 			case 'EVALUATOR_CREATE' :
-
-				dol_syslog("Trigger '" . $this->name . "' for action '$action' launched by " . __FILE__ . ". id=" . $object->id);
-				require_once DOL_DOCUMENT_ROOT . '/comm/action/class/actioncomm.class.php';
-				require_once __DIR__ . '/../../class/digiriskelement.class.php';
-				$now             = dol_now();
-				$actioncomm      = new ActionComm($this->db);
-				$digiriskelement = new DigiriskElement($this->db);
-				$digiriskelement->fetch($object->fk_parent);
-
 				$actioncomm->elementtype = 'digiriskelement@digiriskdolibarr';
-				$actioncomm->code        = 'AC_EVALUATOR_CREATE';
-				$actioncomm->type_code   = 'AC_OTH_AUTO';
-				$actioncomm->label       = $langs->transnoentities('EvaluatorCreateTrigger');
-				$actioncomm->datep       = $now;
-				$actioncomm->fk_element  = $object->fk_parent;
-				$actioncomm->userownerid = $user->id;
-				$actioncomm->percentage  = -1;
 
-				$actioncomm->create($user);
+				$actioncomm->label      = $langs->trans('ObjectCreateTrigger', $langs->transnoentities(ucfirst($object->element)), $object->ref);
+                $actioncomm->fk_element = $object->fk_parent;
+
+				$result = $actioncomm->create($user);
 				break;
 
 			case 'EVALUATOR_MODIFY' :
-
-				dol_syslog("Trigger '" . $this->name . "' for action '$action' launched by " . __FILE__ . ". id=" . $object->id);
-				require_once DOL_DOCUMENT_ROOT . '/comm/action/class/actioncomm.class.php';
-				require_once __DIR__ . '/../../class/digiriskelement.class.php';
-				$now             = dol_now();
-				$actioncomm      = new ActionComm($this->db);
-				$digiriskelement = new DigiriskElement($this->db);
-				$digiriskelement->fetch($object->fk_parent);
-
 				$actioncomm->elementtype = 'digiriskelement@digiriskdolibarr';
-				$actioncomm->code        = 'AC_EVALUATOR_MODIFY';
-				$actioncomm->type_code   = 'AC_OTH_AUTO';
-				$actioncomm->label       = $langs->transnoentities('EvaluatorModifyTrigger');
-				$actioncomm->datep       = $now;
-				$actioncomm->fk_element  = $object->fk_parent;
-				$actioncomm->userownerid = $user->id;
-				$actioncomm->percentage  = -1;
 
-				$actioncomm->create($user);
+				$actioncomm->label      = $langs->trans('ObjectModifyTrigger', $langs->transnoentities(ucfirst($object->element)), $object->ref);
+                $actioncomm->fk_element = $object->fk_parent;
+
+				$result = $actioncomm->create($user);
 				break;
 
 			case 'EVALUATOR_DELETE' :
-
-				dol_syslog("Trigger '" . $this->name . "' for action '$action' launched by " . __FILE__ . ". id=" . $object->id);
-				require_once DOL_DOCUMENT_ROOT . '/comm/action/class/actioncomm.class.php';
-				require_once __DIR__ . '/../../class/digiriskelement.class.php';
-				$now             = dol_now();
-				$actioncomm      = new ActionComm($this->db);
-				$digiriskelement = new DigiriskElement($this->db);
-				$digiriskelement->fetch($object->fk_parent);
-
 				$actioncomm->elementtype = 'digiriskelement@digiriskdolibarr';
-				$actioncomm->code        = 'AC_EVALUATOR_DELETE';
-				$actioncomm->type_code   = 'AC_OTH_AUTO';
-				$actioncomm->label       = $langs->transnoentities('EvaluatorDeleteTrigger');
-				$actioncomm->datep       = $now;
-				$actioncomm->fk_element  = $object->fk_parent;
-				$actioncomm->userownerid = $user->id;
-				$actioncomm->percentage  = -1;
 
-				$actioncomm->create($user);
+				$actioncomm->label      = $langs->trans('ObjectDeleteTrigger', $langs->transnoentities(ucfirst($object->element)), $object->ref);
+				$actioncomm->fk_element = $object->fk_parent;
+
+				$result = $actioncomm->create($user);
 				break;
 
-			case 'RISKSIGN_CREATE' :
-
-				dol_syslog("Trigger '" . $this->name . "' for action '$action' launched by " . __FILE__ . ". id=" . $object->id);
-				require_once DOL_DOCUMENT_ROOT . '/comm/action/class/actioncomm.class.php';
-				require_once __DIR__ . '/../../class/digiriskelement.class.php';
-				$now             = dol_now();
-				$actioncomm      = new ActionComm($this->db);
-				$digiriskelement = new DigiriskElement($this->db);
-				$digiriskelement->fetch($object->fk_element);
-
-				$actioncomm->elementtype = 'digiriskelement@digiriskdolibarr';
-				$actioncomm->code        = 'AC_RISKSIGN_CREATE';
-				$actioncomm->type_code   = 'AC_OTH_AUTO';
-				$actioncomm->label       = $langs->transnoentities('RiskSignCreateTrigger');
-				$actioncomm->datep       = $now;
-				$actioncomm->fk_element  = $object->fk_element;
-				$actioncomm->userownerid = $user->id;
-				$actioncomm->percentage  = -1;
-
-				$actioncomm->create($user);
-				break;
-
-			case 'RISKSIGN_MODIFY' :
-
-				dol_syslog("Trigger '" . $this->name . "' for action '$action' launched by " . __FILE__ . ". id=" . $object->id);
-				require_once DOL_DOCUMENT_ROOT . '/comm/action/class/actioncomm.class.php';
-				require_once __DIR__ . '/../../class/digiriskelement.class.php';
-				$now             = dol_now();
-				$actioncomm      = new ActionComm($this->db);
-				$digiriskelement = new DigiriskElement($this->db);
-				$digiriskelement->fetch($object->fk_element);
-
-				$actioncomm->elementtype = 'digiriskelement@digiriskdolibarr';
-				$actioncomm->code        = 'AC_RISKSIGN_MODIFY';
-				$actioncomm->type_code   = 'AC_OTH_AUTO';
-				$actioncomm->label       = $langs->transnoentities('RiskSignModifyTrigger');
-				$actioncomm->datep       = $now;
-				$actioncomm->fk_element  = $object->fk_element;
-				$actioncomm->userownerid = $user->id;
-				$actioncomm->percentage  = -1;
-
-				$actioncomm->create($user);
-				break;
-
-			case 'RISKSIGN_DELETE' :
-
-				dol_syslog("Trigger '" . $this->name . "' for action '$action' launched by " . __FILE__ . ". id=" . $object->id);
-				require_once DOL_DOCUMENT_ROOT . '/comm/action/class/actioncomm.class.php';
-				require_once __DIR__ . '/../../class/digiriskelement.class.php';
-				$now             = dol_now();
-				$actioncomm      = new ActionComm($this->db);
-				$digiriskelement = new DigiriskElement($this->db);
-				$digiriskelement->fetch($object->fk_element);
-
-				$actioncomm->elementtype = 'digiriskelement@digiriskdolibarr';
-				$actioncomm->code        = 'AC_RISKSIGN_DELETE';
-				$actioncomm->type_code   = 'AC_OTH_AUTO';
-				$actioncomm->label       = $langs->transnoentities('RiskSignDeleteTrigger');
-				$actioncomm->datep       = $now;
-				$actioncomm->fk_element  = $object->fk_element;
-				$actioncomm->userownerid = $user->id;
-				$actioncomm->percentage  = -1;
-
-				$actioncomm->create($user);
-				break;
-
-			case 'ACCIDENT_MODIFY' :
-
-				dol_syslog("Trigger '" . $this->name . "' for action '$action' launched by " . __FILE__ . ". id=" . $object->id);
-				require_once DOL_DOCUMENT_ROOT . '/comm/action/class/actioncomm.class.php';
-				require_once __DIR__ . '/../../class/digiriskelement.class.php';
-				$now        = dol_now();
-				$actioncomm = new ActionComm($this->db);
-
-				$actioncomm->elementtype = 'accident@digiriskdolibarr';
-				$actioncomm->code        = 'AC_ACCIDENT_MODIFY';
-				$actioncomm->type_code   = 'AC_OTH_AUTO';
-				$actioncomm->label       = $langs->transnoentities('AccidentModifyTrigger');
-				$actioncomm->datep       = $now;
-				$actioncomm->fk_element  = $object->id;
-				$actioncomm->userownerid = $user->id;
-				$actioncomm->percentage  = -1;
-
-				$actioncomm->create($user);
-				break;
-
-			case 'ACCIDENT_DELETE' :
-
-				dol_syslog("Trigger '" . $this->name . "' for action '$action' launched by " . __FILE__ . ". id=" . $object->id);
-				require_once DOL_DOCUMENT_ROOT . '/comm/action/class/actioncomm.class.php';
-				require_once __DIR__ . '/../../class/digiriskelement.class.php';
-				$now             = dol_now();
-				$actioncomm      = new ActionComm($this->db);
-				$digiriskelement = new DigiriskElement($this->db);
-				$digiriskelement->fetch($object->fk_element);
-
-				$actioncomm->elementtype = 'accident@digiriskdolibarr';
-				$actioncomm->code        = 'AC_ACCIDENT_DELETE';
-				$actioncomm->type_code   = 'AC_OTH_AUTO';
-				$actioncomm->label       = $langs->transnoentities('AccidentDeleteTrigger');
-				$actioncomm->datep       = $now;
-				$actioncomm->fk_element  = $object->id;
-				$actioncomm->userownerid = $user->id;
-				$actioncomm->percentage  = -1;
-
-				$actioncomm->create($user);
-				break;
-
+            case 'ACCIDENTMETADATA_CREATE' :
+            case 'ACCIDENTLESION_CREATE' :
 			case 'ACCIDENTWORKSTOP_CREATE' :
-
-				dol_syslog("Trigger '" . $this->name . "' for action '$action' launched by " . __FILE__ . ". id=" . $object->id);
-				require_once DOL_DOCUMENT_ROOT . '/comm/action/class/actioncomm.class.php';
-				$now        = dol_now();
-				$actioncomm = new ActionComm($this->db);
-
 				$actioncomm->elementtype = 'accident@digiriskdolibarr';
-				$actioncomm->code        = 'AC_ACCIDENTWORKSTOP_CREATE';
-				$actioncomm->type_code   = 'AC_OTH_AUTO';
-				$actioncomm->label       = $langs->transnoentities('AccidentWorkStopCreateTrigger');
-				$actioncomm->datep       = $now;
-				$actioncomm->fk_element  = $object->fk_accident;
-				$actioncomm->userownerid = $user->id;
-				$actioncomm->percentage  = -1;
 
-				$actioncomm->create($user);
+				$actioncomm->label      = $langs->trans('ObjectCreateTrigger', $langs->transnoentities(ucfirst($object->element)), $object->ref);
+				$actioncomm->fk_element = $object->fk_accident;
+				$result = $actioncomm->create($user);
 				break;
 
+            case 'ACCIDENTLESION_MODIFY' :
 			case 'ACCIDENTWORKSTOP_MODIFY' :
-
-				dol_syslog("Trigger '" . $this->name . "' for action '$action' launched by " . __FILE__ . ". id=" . $object->id);
-				require_once DOL_DOCUMENT_ROOT . '/comm/action/class/actioncomm.class.php';
-				$now        = dol_now();
-				$actioncomm = new ActionComm($this->db);
-
 				$actioncomm->elementtype = 'accident@digiriskdolibarr';
-				$actioncomm->code        = 'AC_ACCIDENTWORKSTOP_MODIFY';
-				$actioncomm->type_code   = 'AC_OTH_AUTO';
-				$actioncomm->label       = $langs->transnoentities('AccidentWorkStopModifyTrigger');
-				$actioncomm->datep       = $now;
-				$actioncomm->fk_element  = $object->fk_accident;
-				$actioncomm->userownerid = $user->id;
-				$actioncomm->percentage  = -1;
 
-				$actioncomm->create($user);
+				$actioncomm->label      = $langs->trans('ObjectModifyTrigger', $langs->transnoentities(ucfirst($object->element)), $object->ref);
+				$actioncomm->fk_element = $object->fk_accident;
+
+				$result = $actioncomm->create($user);
 				break;
 
+            case 'ACCIDENTLESION_DELETE' :
 			case 'ACCIDENTWORKSTOP_DELETE' :
-
-				dol_syslog("Trigger '" . $this->name . "' for action '$action' launched by " . __FILE__ . ". id=" . $object->id);
-				require_once DOL_DOCUMENT_ROOT . '/comm/action/class/actioncomm.class.php';
-				$now        = dol_now();
-				$actioncomm = new ActionComm($this->db);
-
 				$actioncomm->elementtype = 'accident@digiriskdolibarr';
-				$actioncomm->code        = 'AC_ACCIDENTWORKSTOP_DELETE';
-				$actioncomm->type_code   = 'AC_OTH_AUTO';
-				$actioncomm->label       = $langs->transnoentities('AccidentWorkStopDeleteTrigger');
-				$actioncomm->datep       = $now;
-				$actioncomm->fk_element  = $object->fk_accident;
-				$actioncomm->userownerid = $user->id;
-				$actioncomm->percentage  = -1;
 
-				$actioncomm->create($user);
-				break;
+				$actioncomm->label      = $langs->trans('ObjectDeleteTrigger', $langs->transnoentities(ucfirst($object->element)), $object->ref);
+				$actioncomm->fk_element = $object->fk_accident;
 
-			case 'ACCIDENTLESION_CREATE' :
-
-				dol_syslog("Trigger '" . $this->name . "' for action '$action' launched by " . __FILE__ . ". id=" . $object->id);
-				require_once DOL_DOCUMENT_ROOT . '/comm/action/class/actioncomm.class.php';
-				$now        = dol_now();
-				$actioncomm = new ActionComm($this->db);
-
-				$actioncomm->elementtype = 'accident@digiriskdolibarr';
-				$actioncomm->code        = 'AC_ACCIDENTLESION_CREATE';
-				$actioncomm->type_code   = 'AC_OTH_AUTO';
-				$actioncomm->label       = $langs->transnoentities('AccidentLesionCreateTrigger');
-				$actioncomm->datep       = $now;
-				$actioncomm->fk_element  = $object->fk_accident;
-				$actioncomm->userownerid = $user->id;
-				$actioncomm->percentage  = -1;
-
-				$actioncomm->create($user);
-				break;
-
-			case 'ACCIDENTLESION_MODIFY' :
-
-				dol_syslog("Trigger '" . $this->name . "' for action '$action' launched by " . __FILE__ . ". id=" . $object->id);
-				require_once DOL_DOCUMENT_ROOT . '/comm/action/class/actioncomm.class.php';
-				$now        = dol_now();
-				$actioncomm = new ActionComm($this->db);
-
-				$actioncomm->elementtype = 'accident@digiriskdolibarr';
-				$actioncomm->code        = 'AC_ACCIDENTLESION_MODIFY';
-				$actioncomm->type_code   = 'AC_OTH_AUTO';
-				$actioncomm->label       = $langs->transnoentities('AccidentLesionModifyTrigger');
-				$actioncomm->datep       = $now;
-				$actioncomm->fk_element  = $object->fk_accident;
-				$actioncomm->userownerid = $user->id;
-				$actioncomm->percentage  = -1;
-
-				$actioncomm->create($user);
-				break;
-
-			case 'ACCIDENTLESION_DELETE' :
-
-				dol_syslog("Trigger '" . $this->name . "' for action '$action' launched by " . __FILE__ . ". id=" . $object->id);
-				require_once DOL_DOCUMENT_ROOT . '/comm/action/class/actioncomm.class.php';
-				$now        = dol_now();
-				$actioncomm = new ActionComm($this->db);
-
-				$actioncomm->elementtype = 'accident@digiriskdolibarr';
-				$actioncomm->code        = 'AC_ACCIDENTLESION_DELETE';
-				$actioncomm->type_code   = 'AC_OTH_AUTO';
-				$actioncomm->label       = $langs->transnoentities('AccidentLesionDeleteTrigger');
-				$actioncomm->datep       = $now;
-				$actioncomm->fk_element  = $object->fk_accident;
-				$actioncomm->userownerid = $user->id;
-				$actioncomm->percentage  = -1;
-
-				$actioncomm->create($user);
-				break;
-
-			case 'ACCIDENTMETADATA_CREATE' :
-
-				dol_syslog("Trigger '" . $this->name . "' for action '$action' launched by " . __FILE__ . ". id=" . $object->id);
-				require_once DOL_DOCUMENT_ROOT . '/comm/action/class/actioncomm.class.php';
-				require_once __DIR__ . '/../../class/digiriskelement.class.php';
-				$now        = dol_now();
-				$actioncomm = new ActionComm($this->db);
-
-				$actioncomm->elementtype = 'accident@digiriskdolibarr';
-				$actioncomm->code        = 'AC_ACCIDENTMETADATA_CREATE';
-				$actioncomm->type_code   = 'AC_OTH_AUTO';
-				$actioncomm->label       = $langs->transnoentities('AccidentMetaDataCreateTrigger');
-				$actioncomm->datep       = $now;
-				$actioncomm->fk_element  = $object->fk_accident;
-				$actioncomm->userownerid = $user->id;
-				$actioncomm->percentage  = -1;
-
-				$actioncomm->create($user);
+				$result = $actioncomm->create($user);
 				break;
 
 			case 'TASK_TIMESPENT_CREATE' :
-
-				dol_syslog("Trigger '" . $this->name . "' for action '$action' launched by " . __FILE__ . ". id=" . $object->id);
-				require_once DOL_DOCUMENT_ROOT . '/comm/action/class/actioncomm.class.php';
-				require_once __DIR__ . '/../../class/digiriskelement.class.php';
-				$now        = dol_now();
-				$actioncomm = new ActionComm($this->db);
-
 				$actioncomm->elementtype = 'task';
-				$actioncomm->code        = 'AC_TASK_TIMESPENT_CREATE';
-				$actioncomm->type_code   = 'AC_OTH_AUTO';
-				$actioncomm->label       = $langs->transnoentities('TaskTimeSpentCreateTrigger');
-				$actioncomm->datep       = $now;
-				$actioncomm->fk_element  = $object->id;
-				$actioncomm->userownerid = $user->id;
-				$actioncomm->fk_project  = $object->fk_project;
-				$actioncomm->percentage  = -1;
 
-				$actioncomm->create($user);
+				$actioncomm->label         = $langs->trans('ObjectCreateTrigger', $langs->transnoentities(ucfirst($object->element)), $object->ref);
+				$actioncomm->note_private .= $langs->trans('ParentElement') . ' : ' . $object->ref . ' - ' . $object->label . '<br>';
+				$actioncomm->note_private .= $langs->trans('TaskTimeSpentDate') . ' : ' . dol_print_date($object->timespent_datehour, 'dayhoursec') . '<br>';
+				$actioncomm->note_private .= $langs->trans('TaskTimeSpentDuration') . ' : ' .  convertSecondToTime($object->timespent_duration * 60, 'allhourmin') . '<br>';
+				$actioncomm->fk_element    = $object->fk_element;
+				$actioncomm->fk_project    = $object->fk_project;
+
+				$result = $actioncomm->create($user);
 				break;
 
 			case 'TASK_TIMESPENT_MODIFY' :
-
-				dol_syslog("Trigger '" . $this->name . "' for action '$action' launched by " . __FILE__ . ". id=" . $object->id);
-				require_once DOL_DOCUMENT_ROOT . '/comm/action/class/actioncomm.class.php';
-				require_once __DIR__ . '/../../class/digiriskelement.class.php';
-				$now        = dol_now();
-				$actioncomm = new ActionComm($this->db);
-
 				$actioncomm->elementtype = 'task';
-				$actioncomm->code        = 'AC_TASK_TIMESPENT_MODIFY';
-				$actioncomm->type_code   = 'AC_OTH_AUTO';
-				$actioncomm->label       = $langs->transnoentities('TaskTimeSpentModifyTrigger');
-				$actioncomm->datep       = $now;
-				$actioncomm->fk_element  = $object->id;
-				$actioncomm->userownerid = $user->id;
-				$actioncomm->fk_project  = $object->fk_project;
-				$actioncomm->percentage  = -1;
 
-				$actioncomm->create($user);
+				$actioncomm->label         = $langs->trans('ObjectModifyTrigger', $langs->transnoentities(ucfirst($object->element)), $object->ref);
+				$actioncomm->note_private .= $langs->trans('ParentElement') . ' : ' . $object->ref . ' - ' . $object->label . '<br>';
+				$actioncomm->note_private .= $langs->trans('TaskTimeSpentDate') . ' : ' . dol_print_date($object->timespent_datehour, 'dayhoursec') . '<br>';
+				$actioncomm->note_private .= $langs->trans('TaskTimeSpentDuration') . ' : ' .  convertSecondToTime($object->timespent_duration * 60, 'allhourmin') . '<br>';
+				$actioncomm->fk_element    = $object->fk_element;
+				$actioncomm->fk_project    = $object->fk_project;
+
+				$result = $actioncomm->create($user);
 				break;
 
 			case 'TASK_TIMESPENT_DELETE' :
-
-				dol_syslog("Trigger '" . $this->name . "' for action '$action' launched by " . __FILE__ . ". id=" . $object->id);
-				require_once DOL_DOCUMENT_ROOT . '/comm/action/class/actioncomm.class.php';
-				require_once __DIR__ . '/../../class/digiriskelement.class.php';
-				$now             = dol_now();
-				$actioncomm      = new ActionComm($this->db);
-				$digiriskelement = new DigiriskElement($this->db);
-				$digiriskelement->fetch($object->fk_element);
-
 				$actioncomm->elementtype = 'task';
-				$actioncomm->code        = 'AC_TASK_TIMESPENT_DELETE';
-				$actioncomm->type_code   = 'AC_OTH_AUTO';
-				$actioncomm->label       = $langs->transnoentities('TaskTimeSpentDeleteTrigger');
-				$actioncomm->datep       = $now;
-				$actioncomm->fk_element  = $object->id;
-				$actioncomm->userownerid = $user->id;
-				$actioncomm->fk_project  = $object->fk_project;
-				$actioncomm->percentage  = -1;
 
-				$actioncomm->create($user);
+				$actioncomm->label         = $langs->trans('ObjectDeleteTrigger', $langs->transnoentities(ucfirst($object->element)), $object->ref);
+				$actioncomm->note_private .= $langs->trans('ParentElement') . ' : ' . $object->ref . ' - ' . $object->label . '<br>';
+				$actioncomm->note_private .= $langs->trans('TaskTimeSpentDate') . ' : ' . dol_print_date($object->timespent_datehour, 'dayhoursec') . '<br>';
+				$actioncomm->note_private .= $langs->trans('TaskTimeSpentDuration') . ' : ' .  convertSecondToTime($object->timespent_duration * 60, 'allhourmin') . '<br>';
+				$actioncomm->fk_element    = $object->fk_element;
+				$actioncomm->fk_project    = $object->fk_project;
+
+				$result = $actioncomm->create($user);
 				break;
 
-			default:
-				dol_syslog("Trigger '" . $this->name . "' for action '$action' launched by " . __FILE__ . ". id=" . $object->id);
+			case 'ACCIDENTINVESTIGATION_SENTBYMAIL' :
+				$actioncomm->label = $langs->trans('ObjectSentByMailTrigger');
+
+				$result = $actioncomm->create($user);
 				break;
+
 		}
 
-
+		if ($result < 0) {
+			$object->errors = array_merge($object->error, $actioncomm->errors);
+			return $result;
+		}
 		return 0;
 	}
 }

@@ -1,5 +1,5 @@
 <?php
-/* Copyright (C) 2021 EOXIA <dev@eoxia.com>
+/* Copyright (C) 2021-2023 EVARISK <technique@evarisk.com>
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -21,20 +21,14 @@
  * \brief   Digiriskdolibarr setup page.
  */
 
-// Load Dolibarr environment
-$res = 0;
-// Try main.inc.php into web root known defined into CONTEXT_DOCUMENT_ROOT (not always defined)
-if ( ! $res && ! empty($_SERVER["CONTEXT_DOCUMENT_ROOT"])) $res = @include $_SERVER["CONTEXT_DOCUMENT_ROOT"] . "/main.inc.php";
-// Try main.inc.php into web root detected using web root calculated from SCRIPT_FILENAME
-$tmp = empty($_SERVER['SCRIPT_FILENAME']) ? '' : $_SERVER['SCRIPT_FILENAME']; $tmp2 = realpath(__FILE__); $i = strlen($tmp) - 1; $j = strlen($tmp2) - 1;
-while ($i > 0 && $j > 0 && isset($tmp[$i]) && isset($tmp2[$j]) && $tmp[$i] == $tmp2[$j]) { $i--; $j--; }
-if ( ! $res && $i > 0 && file_exists(substr($tmp, 0, ($i + 1)) . "/main.inc.php")) $res          = @include substr($tmp, 0, ($i + 1)) . "/main.inc.php";
-if ( ! $res && $i > 0 && file_exists(dirname(substr($tmp, 0, ($i + 1))) . "/main.inc.php")) $res = @include dirname(substr($tmp, 0, ($i + 1))) . "/main.inc.php";
-// Try main.inc.php using relative path
-if ( ! $res && file_exists("../../main.inc.php")) $res       = @include "../../main.inc.php";
-if ( ! $res && file_exists("../../../main.inc.php")) $res    = @include "../../../main.inc.php";
-if ( ! $res && file_exists("../../../../main.inc.php")) $res = @include "../../../../main.inc.php";
-if ( ! $res) die("Include of main fails");
+// Load DigiriskDolibarr environment
+if (file_exists('../digiriskdolibarr.main.inc.php')) {
+	require_once __DIR__ . '/../digiriskdolibarr.main.inc.php';
+} elseif (file_exists('../../digiriskdolibarr.main.inc.php')) {
+	require_once __DIR__ . '/../../digiriskdolibarr.main.inc.php';
+} else {
+	die('Include of digiriskdolibarr main fails');
+}
 
 global $conf, $db, $langs, $user;
 
@@ -43,29 +37,25 @@ require_once DOL_DOCUMENT_ROOT . "/core/lib/admin.lib.php";
 require_once DOL_DOCUMENT_ROOT . "/core/lib/files.lib.php";
 require_once DOL_DOCUMENT_ROOT . '/projet/class/project.class.php';
 require_once DOL_DOCUMENT_ROOT . '/societe/class/societe.class.php';
-require_once DOL_DOCUMENT_ROOT . '/core/modules/project/mod_project_simple.php';
 
-require_once '../lib/digiriskdolibarr.lib.php';
-require_once __DIR__ . '/../core/tpl/digirisk_security_checks.php';
+require_once __DIR__ . '/../lib/digiriskdolibarr.lib.php';
 
 // Translations
-$langs->loadLangs(array("admin", "digiriskdolibarr@digiriskdolibarr"));
+saturne_load_langs(["admin"]);
 
 // Initialize technical objects
 $project     = new Project($db);
 $third_party = new Societe($db);
-$projectRef  = new $conf->global->PROJECT_ADDON();
+$form        = new Form($db);
 
 // Parameters
 $action     = GETPOST('action', 'alpha');
 $backtopage = GETPOST('backtopage', 'alpha');
 $value      = GETPOST('value', 'alpha');
 
-// Access control
-if ( ! $user->admin) accessforbidden();
-
-// Parameters
-$backtopage = GETPOST('backtopage', 'alpha');
+// Security check - Protection if external user
+$permissiontoread = $user->rights->digiriskdolibarr->adminpage->read;
+saturne_check_access($permissiontoread);
 
 /*
  * Actions
@@ -74,27 +64,38 @@ $backtopage = GETPOST('backtopage', 'alpha');
 require_once '../core/tpl/digiriskdolibarr_projectcreation_action.tpl.php';
 
 if ($action == 'setredirectafterconnection') {
-	$constforval = 'DIGIRISKDOLIBARR_REDIRECT_AFTER_CONNECTION';
-	dolibarr_set_const($db, $constforval, $value, 'integer', 0, '', $conf->entity);
+	$constForVal = 'DIGIRISKDOLIBARR_REDIRECT_AFTER_CONNECTION';
+	dolibarr_set_const($db, $constForVal, $value, 'integer', 0, '', $conf->entity);
 }
 
-if ($action == 'setMediaDimension') {
-	$MediaMaxWidthMedium = GETPOST('MediaMaxWidthMedium', 'alpha');
-	$MediaMaxHeightMedium = GETPOST('MediaMaxHeightMedium', 'alpha');
-	$MediaMaxWidthLarge = GETPOST('MediaMaxWidthLarge', 'alpha');
-	$MediaMaxHeightLarge = GETPOST('MediaMaxHeightLarge', 'alpha');
+if ($action == 'setMediaInfos') {
+	$error = 0;
+	$mediasMax['DIGIRISKDOLIBARR_MEDIA_MAX_WIDTH_MINI']         = GETPOST('MediaMaxWidthMini', 'alpha');
+	$mediasMax['DIGIRISKDOLIBARR_MEDIA_MAX_HEIGHT_MINI']        = GETPOST('MediaMaxHeightMini', 'alpha');
+	$mediasMax['DIGIRISKDOLIBARR_MEDIA_MAX_WIDTH_SMALL']        = GETPOST('MediaMaxWidthSmall', 'alpha');
+	$mediasMax['DIGIRISKDOLIBARR_MEDIA_MAX_HEIGHT_SMALL']       = GETPOST('MediaMaxHeightSmall', 'alpha');
+	$mediasMax['DIGIRISKDOLIBARR_MEDIA_MAX_WIDTH_MEDIUM']       = GETPOST('MediaMaxWidthMedium', 'alpha');
+	$mediasMax['DIGIRISKDOLIBARR_MEDIA_MAX_HEIGHT_MEDIUM']      = GETPOST('MediaMaxHeightMedium', 'alpha');
+	$mediasMax['DIGIRISKDOLIBARR_MEDIA_MAX_WIDTH_LARGE']        = GETPOST('MediaMaxWidthLarge', 'alpha');
+	$mediasMax['DIGIRISKDOLIBARR_MEDIA_MAX_HEIGHT_LARGE']       = GETPOST('MediaMaxHeightLarge', 'alpha');
+	$mediasMax['DIGIRISKDOLIBARR_DISPLAY_NUMBER_MEDIA_GALLERY'] = GETPOST('DisplayNumberMediaGallery', 'alpha');
 
-	if (!empty($MediaMaxWidthMedium) || $MediaMaxWidthMedium === '0') {
-		dolibarr_set_const($db, "DIGIRISKDOLIBARR_MEDIA_MAX_WIDTH_MEDIUM", $MediaMaxWidthMedium, 'integer', 0, '', $conf->entity);
+	foreach($mediasMax as $constName => $valueMax) {
+		if (empty($valueMax)) {
+			setEventMessages('MediaDimensionEmptyError', [], 'errors');
+			$error++;
+			break;
+		} else if ($valueMax < 0) {
+			setEventMessages('MediaDimensionNegativeError', [], 'errors');
+			$error++;
+			break;
+		} else {
+			dolibarr_set_const($db, $constName, $valueMax, 'integer', 0, '', $conf->entity);
+		}
 	}
-	if (!empty($MediaMaxHeightMedium) || $MediaMaxHeightMedium === '0') {
-		dolibarr_set_const($db, "DIGIRISKDOLIBARR_MEDIA_MAX_HEIGHT_MEDIUM", $MediaMaxHeightMedium, 'integer', 0, '', $conf->entity);
-	}
-	if (!empty($MediaMaxWidthLarge) || $MediaMaxWidthLarge === '0') {
-		dolibarr_set_const($db, "DIGIRISKDOLIBARR_MEDIA_MAX_WIDTH_LARGE", $MediaMaxWidthLarge, 'integer', 0, '', $conf->entity);
-	}
-	if (!empty($MediaMaxHeightLarge) || $MediaMaxHeightLarge === '0') {
-		dolibarr_set_const($db, "DIGIRISKDOLIBARR_MEDIA_MAX_HEIGHT_LARGE", $MediaMaxHeightLarge, 'integer', 0, '', $conf->entity);
+
+	if (empty($error)) {
+		setEventMessages('MediaDimensionSetWithSuccess', []);
 	}
 }
 
@@ -102,22 +103,19 @@ if ($action == 'setMediaDimension') {
  * View
  */
 
-$page_name = "DigiriskdolibarrSetup";
-$help_url  = 'FR:Module_DigiriskDolibarr#Configuration';
+$title    = $langs->trans("ModuleSetup", $moduleName);
+$helpUrl  = 'FR:Module_Digirisk#Configuration';
 
-$morejs  = array("/digiriskdolibarr/js/digiriskdolibarr.js");
-$morecss = array("/digiriskdolibarr/css/digiriskdolibarr.css");
-
-llxHeader('', $langs->trans($page_name), $help_url, '', '', '', $morejs, $morecss);
+saturne_header(0,'', $title, $helpUrl);
 
 // Subheader
-$linkback = '<a href="' . ($backtopage ? $backtopage : DOL_URL_ROOT . '/admin/modules.php?restore_lastsearch_values=1') . '">' . $langs->trans("BackToModuleList") . '</a>';
+$linkback = '<a href="' . ($backtopage ?: DOL_URL_ROOT . '/admin/modules.php?restore_lastsearch_values=1') . '">' . $langs->trans("BackToModuleList") . '</a>';
 
-print load_fiche_titre($langs->trans($page_name), $linkback, 'digiriskdolibarr32px@digiriskdolibarr');
+print load_fiche_titre($langs->trans($title), $linkback, 'title_setup');
 
 // Configuration header
-$head = digiriskdolibarrAdminPrepareHead();
-print dol_get_fiche_head($head, 'settings', '', -1, "digiriskdolibarr@digiriskdolibarr");
+$head = digiriskdolibarr_admin_prepare_head();
+print dol_get_fiche_head($head, 'settings', $title, -1, "digiriskdolibarr_color@digiriskdolibarr");
 
 print '<div style="text-indent: 3em"><br>' . '<i class="fas fa-2x fa-calendar-alt" style="padding: 10px"></i>   ' . $langs->trans("AgendaModuleRequired") . '<br></div>';
 print '<div style="text-indent: 3em"><br>' . '<i class="fas fa-2x fa-tools" style="padding: 10px"></i>  ' . $langs->trans("HowToSetupOtherModules") . '  ' . '<a href=' . '"../../../admin/modules.php">' . $langs->trans('ConfigMyModules') . '</a>' . '<br></div>';
@@ -141,11 +139,7 @@ print $langs->trans('DigiriskDescription');
 print '</td>';
 
 print '<td class="center">';
-if ($conf->global->DIGIRISKDOLIBARR_REDIRECT_AFTER_CONNECTION) {
-	print '<a class="reposition" href="' . $_SERVER["PHP_SELF"] . '?action=setredirectafterconnection&value=0" alt="' . $langs->trans("Default") . '">' . img_picto($langs->trans("Activated"), 'switch_on') . '</a>';
-} else {
-	print '<a class="reposition" href="' . $_SERVER["PHP_SELF"] . '?action=setredirectafterconnection&value=1" alt="' . $langs->trans("Default") . '">' . img_picto($langs->trans("Disabled"), 'switch_off') . '</a>';
-}
+print ajax_constantonoff('DIGIRISKDOLIBARR_REDIRECT_AFTER_CONNECTION');
 print '</td>';
 print '</tr>';
 
@@ -196,42 +190,63 @@ print '</table>';
 
 print load_fiche_titre($langs->trans("MediaData"), '', '');
 
-print '<form method="POST" action="' . $_SERVER["PHP_SELF"] . '" name="media_data">';
+print '<form method="POST" action="' . $_SERVER['PHP_SELF'] . '" name="media_data">';
 print '<input type="hidden" name="token" value="' . newToken() . '">';
-print '<input type="hidden" name="action" value="setMediaDimension">';
+print '<input type="hidden" name="action" value="setMediaInfos">';
 print '<table class="noborder centpercent editmode">';
 print '<tr class="liste_titre">';
-print '<td>' . $langs->trans("Name") . '</td>';
-print '<td>' . $langs->trans("Description") . '</td>';
-print '<td>' . $langs->trans("Value") . '</td>';
-print '<td>' . $langs->trans("Action") . '</td>';
+print '<td>' . $langs->trans('Name') . '</td>';
+print '<td>' . $langs->trans('Description') . '</td>';
+print '<td>' . $langs->trans('Value') . '</td>';
 print '</tr>';
 
-print '<tr class="oddeven"><td><label for="MediaMaxWidthMedium">' . $langs->trans("MediaMaxWidthMedium") . '</label></td>';
-print '<td>' . $langs->trans("MediaMaxWidthMediumDescription") . '</td>';
+print '<tr class="oddeven"><td><label for="MediaMaxWidthMini">' . $langs->trans('MediaMaxWidthMini') . '</label></td>';
+print '<td>' . $langs->trans('MediaMaxWidthMiniDescription') . '</td>';
+print '<td><input type="number" name="MediaMaxWidthMini" value="' . $conf->global->DIGIRISKDOLIBARR_MEDIA_MAX_WIDTH_MINI . '"></td>';
+print '</td></tr>';
+
+print '<tr class="oddeven"><td><label for="MediaMaxHeightMini">' . $langs->trans('MediaMaxHeightMini') . '</label></td>';
+print '<td>' . $langs->trans('MediaMaxHeightMiniDescription') . '</td>';
+print '<td><input type="number" name="MediaMaxHeightMini" value="' . $conf->global->DIGIRISKDOLIBARR_MEDIA_MAX_HEIGHT_MINI . '"></td>';
+print '</td></tr>';
+
+print '<tr class="oddeven"><td><label for="MediaMaxWidthSmall">' . $langs->trans('MediaMaxWidthSmall') . '</label></td>';
+print '<td>' . $langs->trans('MediaMaxWidthSmallDescription') . '</td>';
+print '<td><input type="number" name="MediaMaxWidthSmall" value="' . $conf->global->DIGIRISKDOLIBARR_MEDIA_MAX_WIDTH_SMALL . '"></td>';
+print '</td></tr>';
+
+print '<tr class="oddeven"><td><label for="MediaMaxHeightSmall">' . $langs->trans('MediaMaxHeightSmall') . '</label></td>';
+print '<td>' . $langs->trans('MediaMaxHeightSmallDescription') . '</td>';
+print '<td><input type="number" name="MediaMaxHeightSmall" value="' . $conf->global->DIGIRISKDOLIBARR_MEDIA_MAX_HEIGHT_SMALL . '"></td>';
+print '</td></tr>';
+
+print '<tr class="oddeven"><td><label for="MediaMaxWidthMedium">' . $langs->trans('MediaMaxWidthMedium') . '</label></td>';
+print '<td>' . $langs->trans('MediaMaxWidthMediumDescription') . '</td>';
 print '<td><input type="number" name="MediaMaxWidthMedium" value="' . $conf->global->DIGIRISKDOLIBARR_MEDIA_MAX_WIDTH_MEDIUM . '"></td>';
-print '<td><input type="submit" class="button" name="save" value="' . $langs->trans("Save") . '">';
 print '</td></tr>';
 
-print '<tr class="oddeven"><td><label for="MediaMaxHeightMedium">' . $langs->trans("MediaMaxHeightMedium") . '</label></td>';
-print '<td>' . $langs->trans("MediaMaxHeightMediumDescription") . '</td>';
+print '<tr class="oddeven"><td><label for="MediaMaxHeightMedium">' . $langs->trans('MediaMaxHeightMedium') . '</label></td>';
+print '<td>' . $langs->trans('MediaMaxHeightMediumDescription') . '</td>';
 print '<td><input type="number" name="MediaMaxHeightMedium" value="' . $conf->global->DIGIRISKDOLIBARR_MEDIA_MAX_HEIGHT_MEDIUM . '"></td>';
-print '<td><input type="submit" class="button" name="save" value="' . $langs->trans("Save") . '">';
 print '</td></tr>';
 
-print '<tr class="oddeven"><td><label for="MediaMaxWidthLarge">' . $langs->trans("MediaMaxWidthLarge") . '</label></td>';
-print '<td>' . $langs->trans("MediaMaxWidthLargeDescription") . '</td>';
+print '<tr class="oddeven"><td><label for="MediaMaxWidthLarge">' . $langs->trans('MediaMaxWidthLarge') . '</label></td>';
+print '<td>' . $langs->trans('MediaMaxWidthLargeDescription') . '</td>';
 print '<td><input type="number" name="MediaMaxWidthLarge" value="' . $conf->global->DIGIRISKDOLIBARR_MEDIA_MAX_WIDTH_LARGE . '"></td>';
-print '<td><input type="submit" class="button" name="save" value="' . $langs->trans("Save") . '">';
 print '</td></tr>';
 
-print '<tr class="oddeven"><td><label for="MediaMaxHeightLarge">' . $langs->trans("MediaMaxHeightLarge") . '</label></td>';
-print '<td>' . $langs->trans("MediaMaxHeightLargeDescription") . '</td>';
+print '<tr class="oddeven"><td><label for="MediaMaxHeightLarge">' . $langs->trans('MediaMaxHeightLarge') . '</label></td>';
+print '<td>' . $langs->trans('MediaMaxHeightLargeDescription') . '</td>';
 print '<td><input type="number" name="MediaMaxHeightLarge" value="' . $conf->global->DIGIRISKDOLIBARR_MEDIA_MAX_HEIGHT_LARGE . '"></td>';
-print '<td><input type="submit" class="button" name="save" value="' . $langs->trans("Save") . '">';
+print '</td></tr>';
+
+print '<tr class="oddeven"><td><label for="DisplayNumberMediaGallery">' . $langs->trans('DisplayNumberMediaGallery') . '</label></td>';
+print '<td>' . $langs->trans('DisplayNumberMediaGalleryDescription') . '</td>';
+print '<td><input type="number" name="DisplayNumberMediaGallery" value="' . $conf->global->DIGIRISKDOLIBARR_DISPLAY_NUMBER_MEDIA_GALLERY . '"></td>';
 print '</td></tr>';
 
 print '</table>';
+print $form->buttonsSaveCancel('Save', '');
 print '</form>';
 
 // Page end

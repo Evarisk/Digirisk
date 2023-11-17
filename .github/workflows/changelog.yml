@@ -3,7 +3,7 @@ name: 'Generate Auto Changelog'
 on:
     push:
         branches:
-            - master
+            - main
 jobs:
     master:
         name: 'build'

@@ -1,5 +1,5 @@
 <?php
-/* Copyright (C) 2021 EOXIA <dev@eoxia.com>
+/* Copyright (C) 2021-2023 EVARISK <technique@evarisk.com>
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -18,62 +18,40 @@
 /**
  * \file    lib/digiriskdolibarr_accident.lib.php
  * \ingroup digiriskdolibarr
- * \brief   Library files with common functions for Accident
+ * \brief   Library files with common functions for accident
  */
 
 /**
- * Prepare array of tabs for Accident
+ * Prepare accident pages header
  *
- * @param	Accident $object Accident
- * @return 	array					Array of tabs
+ * @param  Accident  $object Accident
+ * @return array     $head   Array of tabs
+ * @throws Exception
  */
-function accidentPrepareHead($object)
+function accident_prepare_head(Accident $object): array
 {
-	global $langs, $conf, $user;
+    // Global variables definitions
+    global $conf, $langs, $user;
 
-	$langs->load("digiriskdolibarr@digiriskdolibarr");
+    // Load translation files required by the page
+    saturne_load_langs();
 
-	$h    = 0;
-	$head = array();
+    // Initialize values
+    $h    = 1;
+    $head = [];
 
-	if ($user->rights->digiriskdolibarr->accident->read) {
-		$head[$h][0] = dol_buildpath("/digiriskdolibarr/view/accident/accident_card.php", 1) . '?id=' . $object->id;
-		$head[$h][1] = '<i class="fas fa-address-card"></i> ' . $langs->trans("Card");
-		$head[$h][2] = 'accidentCard';
-		$h++;
+    if ($user->rights->digiriskdolibarr->accident->read) {
+        $head[$h][0] = dol_buildpath('/digiriskdolibarr/view/accident/accident_metadata.php', 1) . '?id=' . $object->id;
+        $head[$h][1] = $conf->browser->layout != 'phone' ? '<i class="fas fa-info-circle pictofixedwidth"></i>' . $langs->trans('AccidentMetaData') : '<i class="fas fa-info-circle"></i>';
+        $head[$h][2] = 'accidentMetadata';
+        $h++;
 
-		$head[$h][0] = dol_buildpath("/digiriskdolibarr/view/accident/accident_metadata.php", 1) . '?id=' . $object->id;
-		$head[$h][1] = '<i class="fas fa-info-circle"></i> ' . $langs->trans("AccidentMetaData");
-		$head[$h][2] = 'accidentMetadata';
-		$h++;
+        $head[$h][0] = dol_buildpath('/digiriskdolibarr/view/accident/accident_metadata_lesion.php', 1) . '?id=' . $object->id;
+        $head[$h][1] = $conf->browser->layout != 'phone' ? '<i class="fas fa-info-circle pictofixedwidth"></i>' . $langs->trans('AccidentMetaDataLesion') : '<i class="fas fa-info-circle"></i>';
+        $head[$h][2] = 'accidentMetadataLesion';
+    }
 
-		$head[$h][0] = dol_buildpath("/digiriskdolibarr/view/accident/accident_metadata_lesion.php", 1) . '?id=' . $object->id;
-		$head[$h][1] = '<i class="fas fa-info-circle"></i> ' . $langs->trans("AccidentMetaDataLesion");
-		$head[$h][2] = 'accidentMetadataLesion';
-		$h++;
+    $moreParams['attendantTableMode'] = 'simple';
 
-		$head[$h][0] = dol_buildpath("/digiriskdolibarr/view/accident/accident_attendants.php", 1) . '?id=' . $object->id;
-		$head[$h][1] = '<i class="fas fa-file-signature"></i> ' . $langs->trans("Signature");
-		$head[$h][2] = 'accidentAttendants';
-		$h++;
-
-		$head[$h][0] = dol_buildpath("/digiriskdolibarr/view/accident/accident_document.php", 1) . '?id=' . $object->id;
-		$head[$h][1] = '<i class="fas fa-file-alt"></i> ' . $langs->trans("Documents");
-		$head[$h][2] = 'accidentDocument';
-		$h++;
-
-		//      $head[$h][0] = dol_buildpath("/digiriskdolibarr/view/accident/accident_document_metadata.php", 1) . '?id=' . $object->id;
-		//      $head[$h][1] = '<i class="fas fa-file-alt"></i> ' . $langs->trans("DocumentsMetaData");
-		//      $head[$h][2] = 'accidentDocumentMetaData';
-		//      $h++;
-
-		$head[$h][0] = dol_buildpath("/digiriskdolibarr/view/accident/accident_agenda.php", 1) . '?id=' . $object->id;
-		$head[$h][1] = '<i class="fas fa-calendar"></i> ' . $langs->trans("Events");
-		$head[$h][2] = 'accidentAgenda';
-		$h++;
-	}
-
-	complete_head_from_modules($conf, $langs, $object, $head, $h, 'accident@digiriskdolibarr');
-
-	return $head;
+    return saturne_object_prepare_head($object, $head, $moreParams);
 }
