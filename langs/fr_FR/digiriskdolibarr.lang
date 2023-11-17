@@ -398,6 +398,9 @@ AccidentLesionCreateTrigger   = Lésion %s ajoutée à l'accident
 AccidentLesionModifyTrigger   = Lésion %s modifiée sur l'accident
 AccidentLesionDeleteTrigger   = Lésion %s supprimée de l'accident
 ACC_USER_EMPLOYERSigned       = Signature du reponsable de l'entreprise
+VictimAndCaregivers           = Victime et donneur de soins
+Victim                        = Victime
+Caregiver                     = Donneur de soins
 
 # Mod Numbering - Modèle de numérotation
 DigiriskAccidentNumberingModule         = Modèle de numérotation des accidents de Digirisk

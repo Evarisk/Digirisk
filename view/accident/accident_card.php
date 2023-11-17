@@ -158,7 +158,7 @@ if (empty($reshook)) {
 		$object->date_creation     = $object->db->idate($now);
 		$object->tms               = $now;
 		$object->import_key        = "";
-		$object->status            = Accident::STATUS_VALIDATED;
+		$object->status            = Accident::STATUS_DRAFT;
 		$object->label             = $label;
 		$object->description       = $description;
 		$object->accident_type     = $accident_type;
@@ -214,13 +214,8 @@ if (empty($reshook)) {
 		if (!$error) {
 			$result = $object->create($user, false);
 			if ($result > 0) {
-                // Removed while accidents have no document or attendants page
-//				if (empty($object->fk_user_employer)) {
-//					$usertmp->fetch('', $mysoc->managers, $mysoc->id, 0, $conf->entity);
-//				} else {
-//					$usertmp->fetch($object->fk_user_employer);
-//				}
-//				$signatory->setSignatory($object->id, 'accident', 'user', array($usertmp->id), 'Responsible');
+                $usertmp->fetch($object->fk_user_victim);
+				$signatory->setSignatory($object->id, 'accident', 'user', array($usertmp->id), 'Victim');
 
 				// Creation Accident OK
 				$urltogo = str_replace('__ID__', $result, $backtopage);
@@ -475,7 +470,29 @@ if (empty($reshook)) {
 		}
 	}
 
-	// Add file in accident workstop
+    // Action to set status STATUS_REOPENED
+    if ($action == 'confirm_setReopened') {
+        $object->fetch($id);
+        if ( ! $error) {
+            $result = $object->setDraft($user, false);
+            if ($result > 0) {
+                $object->verdict = null;
+                $result = $object->update($user);
+                // Set reopened OK
+                $urltogo = str_replace('__ID__', $result, $backtopage);
+                $urltogo = preg_replace('/--IDFORBACKTOPAGE--/', $id, $urltogo); // New method to autoselect project after a New on another form object creation
+                header('Location: ' . $urltogo);
+                exit;
+            } else {
+                // Set reopened KO
+                if ( ! empty($object->errors)) setEventMessages(null, $object->errors, 'errors');
+                else setEventMessages($object->error, null, 'errors');
+            }
+        }
+    }
+
+
+    // Add file in accident workstop
 	if ($action == 'sendfile') {
 		include_once DOL_DOCUMENT_ROOT . '/core/lib/files.lib.php';
 		$objectlineid = GETPOST('objectlineid');
@@ -878,6 +895,18 @@ if ((empty($action) || ($action != 'create' && $action != 'edit'))) {
         $formConfirm .= $form->formconfirm($_SERVER['PHP_SELF'] . '?id=' . $object->id, $langs->trans('CloneObject', $langs->transnoentities('The' . ucfirst($object->element))), $langs->trans('ConfirmCloneObject', $langs->transnoentities('The' . ucfirst($object->element))), 'confirm_clone', $formQuestionClone, 'yes', 'actionButtonClone', 350, 600);
 	}
 
+    // SetValidated confirmation
+    if (($action == 'setValidated' && (empty($conf->use_javascript_ajax) || !empty($conf->dol_use_jmobile))) || (!empty($conf->use_javascript_ajax) && empty($conf->dol_use_jmobile))) {
+        $questionConfirmInfo = '<b>' . $langs->trans('ConfirmValidateObject', $langs->trans('TheAccident')) . '</b>';
+        $formConfirm .= $form->formconfirm($_SERVER['PHP_SELF'] . '?id=' . $object->id, $langs->trans('ValidateObject', $langs->trans('TheAccident')), $questionConfirmInfo, 'confirm_validate', '', 'yes', 'actionButtonValidate', 250);
+    }
+
+    // SetReOpen confirmation
+    if (($action == 'setReOpen' && (empty($conf->use_javascript_ajax) || !empty($conf->dol_use_jmobile))) || (!empty($conf->use_javascript_ajax) && empty($conf->dol_use_jmobile))) {
+        $questionConfirmInfo = '<b>' . $langs->trans('ConfirmReOpenObject', $langs->trans('TheAccident')) . '</b>';
+        $formConfirm .= $form->formconfirm($_SERVER['PHP_SELF'] . '?id=' . $object->id, $langs->trans('ValidateObject', $langs->trans('TheAccident')), $questionConfirmInfo, 'confirm_setReopened', '', 'yes', 'actionButtonReOpen', 250);
+    }
+
 	// Confirmation to lock
 	if (($action == 'lock' && (empty($conf->use_javascript_ajax) || !empty($conf->dol_use_jmobile))) || (!empty($conf->use_javascript_ajax) && empty($conf->dol_use_jmobile))) {
 		$formConfirm .= $form->formconfirm($_SERVER['PHP_SELF'] . '?id=' . $object->id, $langs->trans('LockObject', $langs->transnoentities('The' . ucfirst($object->element))), $langs->trans('ConfirmLockObject', $langs->transnoentities('The' . ucfirst($object->element))), 'confirm_lock', '', 'yes', 'actionButtonLock', 350, 600);
@@ -1000,7 +1029,7 @@ if ((empty($action) || ($action != 'create' && $action != 'edit'))) {
     print '<td class="linked-medias-list">';
     $pathPhotos = $conf->digiriskdolibarr->multidir_output[$conf->entity] . '/accident/' . $object->ref . '/photos';
     ?>
-    <span class="add-medias" <?php echo ($object->status <= Accident::STATUS_VALIDATED) ? '' : 'style="display:none"' ?>>
+    <span class="add-medias" <?php echo ($object->status <= Accident::STATUS_DRAFT) ? '' : 'style="display:none"' ?>>
 		<input hidden multiple class="fast-upload" id="fast-upload-photo-default" type="file" name="userfile[]" capture="environment" accept="image/*">
 		<label for="fast-upload-photo-default">
 			<div class="wpeo-button button-square-50">
@@ -1015,7 +1044,7 @@ if ((empty($action) || ($action != 'create' && $action != 'edit'))) {
 	</span>
     <?php
     $relativepath = 'digiriskdolibarr/medias/thumbs';
-    print saturne_show_medias_linked('digiriskdolibarr', $pathPhotos, 'small', 0, 0, 0, 0, 50, 50, 0, 0, 0, 'accident/'. $object->ref . '/photos/', $object, 'photo', $permissiontoadd, $permissiontodelete && $object->status <= Accident::STATUS_VALIDATED);
+    print saturne_show_medias_linked('digiriskdolibarr', $pathPhotos, 'small', 0, 0, 0, 0, 50, 50, 0, 0, 0, 'accident/'. $object->ref . '/photos/', $object, 'photo', $permissiontoadd, $permissiontodelete && $object->status <= Accident::STATUS_DRAFT);
     print '</td></tr>';
 
     print '</table></div>';
@@ -1032,11 +1061,27 @@ if ((empty($action) || ($action != 'create' && $action != 'edit'))) {
 		if (empty($reshook)) {
 			// Edit
 			$displayButton = $onPhone ? '<i class="fas fa-edit fa-2x"></i>' : '<i class="fas fa-edit"></i>' . ' ' . $langs->trans('Modify');
-			if ($object->status == $object::STATUS_VALIDATED) {
+			if ($object->status == $object::STATUS_DRAFT) {
 				print '<a class="butAction" id="actionButtonEdit" href="' . $_SERVER['PHP_SELF'] . '?id=' . $object->id . '&action=edit' . '">' . $displayButton . '</a>';
 			} else {
 				print '<span class="butActionRefused classfortooltip" title="' . dol_escape_htmltag($langs->trans('ObjectMustBeDraft', ucfirst($langs->transnoentities('The' . ucfirst($object->element))))) . '">' . $displayButton . '</span>';
 			}
+
+            // Validate
+            $displayButton = $onPhone ? '<i class="fas fa-check fa-2x"></i>' : '<i class="fas fa-check"></i>' . ' ' . $langs->trans('Validate');
+            if ($object->status == $object::STATUS_DRAFT) {
+                print '<span class="validateButton butAction" id="actionButtonValidate">' . $displayButton . '</span>';
+            } else {
+                print '<span class="butActionRefused classfortooltip" title="' . dol_escape_htmltag($langs->trans('ControlMustBeDraft')) . '">' . $displayButton . '</span>';
+            }
+
+            // ReOpen
+            $displayButton = $onPhone ? '<i class="fas fa-lock-open fa-2x"></i>' : '<i class="fas fa-lock-open"></i>' . ' ' . $langs->trans('ReOpenDoli');
+            if ($object->status == $object::STATUS_VALIDATED) {
+                print '<span class="butAction" id="actionButtonReOpen">' . $displayButton . '</span>';
+            } else {
+                print '<span class="butActionRefused classfortooltip" title="' . dol_escape_htmltag($langs->trans('AccidentMustBeValidated')) . '">' . $displayButton . '</span>';
+            }
 
 			// Lock.
 			$displayButton = $onPhone ? '<i class="fas fa-lock fa-2x"></i>' : '<i class="fas fa-lock"></i>' . ' ' . $langs->trans('Lock');
@@ -1070,7 +1115,7 @@ if ((empty($action) || ($action != 'create' && $action != 'edit'))) {
         // Accident Lines
 		$accidentWorkstops = $objectline->fetchFromParent($object->id);
 
-		if (($object->status == Accident::STATUS_VALIDATED) || (!empty($accidentWorkstops))) {
+		if (($object->status == Accident::STATUS_DRAFT) || (!empty($accidentWorkstops))) {
 			// ACCIDENT LINES
 			print '<div class="div-table-responsive-no-min" style="overflow-x: unset !important">';
 			print load_fiche_titre($langs->trans("AccidentRiskList"), '', '');
@@ -1162,7 +1207,7 @@ if ((empty($action) || ($action != 'create' && $action != 'edit'))) {
 						$coldisplay += $colspan;
 
 						//Actions buttons
-						if ($object->status == Accident::STATUS_VALIDATED) {
+						if ($object->status == Accident::STATUS_DRAFT) {
 							print '<td class="center">';
 							$coldisplay++;
 							print '<a href="' . $_SERVER["PHP_SELF"] . '?id=' . $id . '&amp;action=editline&amp;lineid=' . $item->id . '" style="padding-right: 20px"><i class="fas fa-pencil-alt" style="color: #666"></i></a>';
@@ -1182,7 +1227,7 @@ if ((empty($action) || ($action != 'create' && $action != 'edit'))) {
 			}
 		}
 		//action create
-		if ($object->status == Accident::STATUS_VALIDATED && $permissiontoadd && $action != 'editline') {
+		if ($object->status == Accident::STATUS_DRAFT && $permissiontoadd && $action != 'editline') {
 			print '<form method="POST" action="' . $_SERVER["PHP_SELF"] . '?id=' . $object->id . '">';
 			print '<input type="hidden" name="token" value="' . newToken() . '">';
 			print '<input type="hidden" name="action" value="addLine">';

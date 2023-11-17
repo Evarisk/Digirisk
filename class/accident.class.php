@@ -253,7 +253,7 @@ class Accident extends SaturneObject
 			$object->date_creation = dol_now();
 		}
 		if (property_exists($object, 'status')) {
-			$object->status = self::STATUS_VALIDATED;
+			$object->status = self::STATUS_DRAFT;
 		}
         if (empty($options['photos'])) {
             $object->photo = '';
@@ -349,17 +349,21 @@ class Accident extends SaturneObject
 			global $langs;
 
 			$this->labelStatus[self::STATUS_DELETED]   = $langs->transnoentitiesnoconv('Deleted');
-			$this->labelStatus[self::STATUS_VALIDATED] = $langs->transnoentitiesnoconv('InProgress');
+            $this->labelStatus[self::STATUS_DRAFT]     = $langs->transnoentitiesnoconv('Draft');
+            $this->labelStatus[self::STATUS_VALIDATED] = $langs->transnoentitiesnoconv('InProgress');
 			$this->labelStatus[self::STATUS_LOCKED]    = $langs->transnoentitiesnoconv('Locked');
 
 			$this->labelStatusShort[self::STATUS_DELETED]   = $langs->transnoentitiesnoconv('Deleted');
-			$this->labelStatusShort[self::STATUS_VALIDATED] = $langs->transnoentitiesnoconv('InProgress');
+            $this->labelStatusShort[self::STATUS_DRAFT]     = $langs->transnoentitiesnoconv('Draft');
+            $this->labelStatusShort[self::STATUS_VALIDATED] = $langs->transnoentitiesnoconv('InProgress');
 			$this->labelStatusShort[self::STATUS_LOCKED]    = $langs->transnoentitiesnoconv('Locked');
 
 		}
 
 		$statusType = 'status' . $status;
-
+        if ($status == self::STATUS_DRAFT) {
+            $statusType = 'status3';
+        }
 		if ($status == self::STATUS_VALIDATED) {
 			$statusType = 'status4';
 		}
