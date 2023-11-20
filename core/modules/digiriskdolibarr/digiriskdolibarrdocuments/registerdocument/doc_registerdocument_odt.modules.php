@@ -25,9 +25,16 @@
 require_once DOL_DOCUMENT_ROOT . '/core/lib/files.lib.php';
 require_once DOL_DOCUMENT_ROOT . '/core/lib/company.lib.php';
 require_once DOL_DOCUMENT_ROOT . '/core/lib/doc.lib.php';
+require_once DOL_DOCUMENT_ROOT . '/ticket/class/ticket.class.php';
+
+// Load DigiriskDolibarr libraries
+require_once __DIR__ . '/../../../../../class/accident.class.php';
+require_once __DIR__ . '/../../../../../class/evaluator.class.php';
+require_once __DIR__ . '/../../../../../class/digiriskelement.class.php';
 
 // Load saturne libraries
 require_once __DIR__ . '/../../../../../../saturne/core/modules/saturne/modules_saturne.php';
+require_once __DIR__ . '/../../../../../../saturne/class/saturnesignature.class.php';
 
 /**
  *	Class to build documents using ODF templates generator
@@ -76,6 +83,186 @@ class doc_registerdocument_odt extends SaturneDocumentModel
 		return parent::info($langs);
 	}
 
+
+    /**
+     * Fill all odt tags for segments lines.
+     *
+     * @param  Odf       $odfHandler  Object builder odf library.
+     * @param  Translate $outputLangs Lang object to use for output.
+     * @param  array     $moreParam   More param (Object/user/etc).
+     *
+     * @return int                    1 if OK, <=0 if KO.
+     * @throws Exception
+     */
+    public function fillTagsLines(Odf $odfHandler, Translate $outputLangs, array $moreParam): int
+    {
+        global $conf, $moduleNameLowerCase, $langs;
+
+        $ticket           = new Ticket($this->db);
+        $accident         = new Accident($this->db);
+        $digiriskElement  = new DigiriskElement($this->db);
+        $accidentLesion   = new AccidentLesion($this->db);
+        $accidentMetaData = new AccidentMetaData($this->db);
+        $userTmp          = new User($this->db);
+        $thirdparty       = new Societe($this->db);
+        $signatory        = new SaturneSignature($this->db);
+
+        // Replace tags of lines.
+        try {
+            $accidentList = $accident->fetchAll('', '', 0, 0, ['customsql' => 'fk_ticket > 0']);
+            $tempDir     = $conf->$moduleNameLowerCase->multidir_output[$conf->entity ?? 1] . '/temp/';
+
+            // Get register first tab data.
+            $foundTagForLines = 1;
+            try {
+                $listLines = $odfHandler->setSegment('registers');
+            } catch (OdfException $e) {
+                // We may arrive here if tags for lines not present into template.
+                $foundTagForLines = 0;
+                $listLines = '';
+                dol_syslog($e->getMessage());
+            }
+
+            if ($foundTagForLines) {
+                if (is_array($accidentList) && !empty($accidentList)) {
+                    foreach($accidentList as $accidentSingle) {
+                        $ticket->fetch($accidentSingle->fk_ticket);
+                        $digiriskElement->fetch($ticket->array_options['options_digiriskdolibarr_ticket_service']);
+                        $accidentLesions       = $accidentLesion->fetchAll('', '', 0, 0, ['customsql' => 't.fk_accident = ' . $accidentSingle->id]);
+                        $accidentMetaData->fetch(0, '', ' AND fk_accident = ' . $accidentSingle->id . ' AND status = 1');
+                        $userTmp->fetch($accidentMetaData->fk_user_witness);
+                        $thirdparty->fetch($accidentMetaData->fk_soc_responsible);
+
+                        $tmpArray['register_name'] = $ticket->ref;
+                        $tmpArray['register_date'] = dol_print_date($ticket->datec, 'day');
+                        $tmpArray['register_fullname'] = $ticket->array_options['options_digiriskdolibarr_ticket_lastname'] . ' ' . $ticket->array_options['options_digiriskdolibarr_ticket_firstname'];
+                        $tmpArray['register_datehour'] = dol_print_date($ticket->array_options['options_digiriskdolibarr_ticket_date'], 'day');
+                        $tmpArray['register_location'] = $digiriskElement->ref . ' ' . $digiriskElement->label;
+                        $tmpArray['register_circumstances'] = $accidentSingle->description;
+
+                        $lesionNatures = '';
+                        $lesionLocation = '';
+                        if (is_array($accidentLesions) && !empty($accidentLesions)) {
+                            foreach ($accidentLesions as $accidentLinkedLesion) {
+                                $lesionNatures .= $langs->trans($accidentLinkedLesion->lesion_nature) . ' ,';
+                                $lesionLocation .= $langs->trans($accidentLinkedLesion->lesion_localization) . ' ,';
+                            }
+                        }
+                        $tmpArray['register_lesion_location'] = rtrim($lesionLocation, ',');
+                        $tmpArray['register_lesion_nature'] = rtrim($lesionNatures, ',');
+
+                        $this->setTmpArrayVars($tmpArray, $listLines, $outputLangs);
+
+                    }
+                }
+                $odfHandler->mergeSegment($listLines);
+            }
+
+            // Get register second tab data.
+            try {
+                $listLines = $odfHandler->setSegment('registers2');
+            } catch (OdfException $e) {
+                // We may arrive here if tags for lines not present into template.
+                $foundTagForLines = 0;
+                $listLines = '';
+                dol_syslog($e->getMessage());
+            }
+
+            if ($foundTagForLines) {
+                if (is_array($accidentList) && !empty($accidentList)) {
+                    foreach ($accidentList as $accidentSingle) {
+                        $ticket->fetch($accidentSingle->fk_ticket);
+                        $digiriskElement->fetch($ticket->array_options['options_digiriskdolibarr_ticket_service']);
+                        $accidentAttendants = $signatory->fetchSignatory('', $accidentSingle->id, 'accident');
+                        $accidentMetaData->fetch(
+                            0,
+                            '',
+                            ' AND fk_accident = ' . $accidentSingle->id . ' AND status = 1'
+                        );
+                        $userTmp->fetch($accidentMetaData->fk_user_witness);
+                        $thirdparty->fetch($accidentMetaData->fk_soc_responsible);
+
+                        $victimArray = $accidentAttendants['Victim'];
+                        $careGiverArray = $accidentAttendants['Caregiver'];
+
+                        if (is_array($victimArray) && !empty($victimArray)) {
+                            $victimData = array_shift($victimArray);
+                            $encodedImage = explode(',', $victimData->signature)[1];
+                            $decodedImage = base64_decode($encodedImage);
+                            file_put_contents($tempDir . 'signature' . $victimData->id . '.png', $decodedImage);
+                            $tmpArray['register_victim_signature'] = $tempDir . 'signature' . $victimData->id . '.png';
+                        } else {
+                            $tmpArray['register_victim_signature'] = '';
+                        }
+                        if (is_array($careGiverArray) && !empty($careGiverArray)) {
+                            $careGiverData = array_shift($careGiverArray);
+                            $tmpArray['register_caregiver_fullname'] = $careGiverData->getFullName($langs);
+                            $encodedImage = explode(',', $careGiverData->signature)[1];
+                            $decodedImage = base64_decode($encodedImage);
+                            file_put_contents($tempDir . 'signature' . $careGiverData->id . '.png', $decodedImage);
+                            $tmpArray['register_caregiver_signature'] = $tempDir . 'signature' . $careGiverData->id . '.png';
+                        } else {
+                            $tmpArray['register_caregiver_fullname'] = '';
+                            $tmpArray['register_caregiver_signature'] = '';
+                        }
+
+                        $tmpArray['register_witnesses_data'] = $userTmp->getFullName($langs);
+                        $tmpArray['register_external_society_implied'] = $thirdparty->getFullName($langs);
+
+                        $tmpArray['register_note'] = $ticket->note_public;
+
+                        $this->setTmpArrayVars($tmpArray, $listLines, $outputLangs);
+                    }
+                }
+                $odfHandler->mergeSegment($listLines);
+            }
+
+            // Get register second tab data.
+            try {
+                $listLines = $odfHandler->setSegment('caregivers');
+            } catch (OdfException $e) {
+                // We may arrive here if tags for lines not present into template.
+                $foundTagForLines = 0;
+                $listLines = '';
+                dol_syslog($e->getMessage());
+            }
+
+            if ($foundTagForLines) {
+                if (is_array($accidentList) && !empty($accidentList)) {
+                    foreach($accidentList as $accidentSingle) {
+                        $accidentCaregivers = $signatory->fetchSignatory('Caregiver', $accidentSingle->id, 'accident');
+                        if (is_array($accidentCaregivers) && !empty($accidentCaregivers)) {
+                            foreach($accidentCaregivers as $accidentCaregiver) {
+                                $tmpArray['caregiver_id'] = $accidentCaregiver->id;
+                                $tmpArray['caregiver_lastname'] = $accidentCaregiver->lastname;
+                                $tmpArray['caregiver_firstname'] = $accidentCaregiver->firstname;
+                                if ($accidentCaregiver->object_type == 'user') {
+                                    $userTmp->fetch($accidentCaregiver->fk_object);
+                                    $tmpArray['caregiver_qualification'] = $userTmp->job;
+                                } else {
+                                    $tmpArray['caregiver_qualification'] = '';
+                                }
+                                $encodedImage = explode(',', $accidentCaregiver->signature)[1];
+                                $decodedImage = base64_decode($encodedImage);
+                                file_put_contents($tempDir . 'signature' . $accidentCaregiver->id . '.png', $decodedImage);
+                                $tmpArray['caregiver_signature'] = $tempDir . 'signature' . $accidentCaregiver->id . '.png';
+
+                                $this->setTmpArrayVars($tmpArray, $listLines, $outputLangs);
+                            }
+                        }
+                    }
+                }
+                $odfHandler->mergeSegment($listLines);
+            }
+
+        } catch (OdfException $e) {
+            $this->error = $e->getMessage();
+            dol_syslog($this->error, LOG_WARNING);
+            return -1;
+        }
+        return 0;
+    }
+
 	/**
 	 * Function to build a document on disk.
 	 *
@@ -91,10 +278,12 @@ class doc_registerdocument_odt extends SaturneDocumentModel
 	 */
 	public function write_file(SaturneDocuments $objectDocument, Translate $outputLangs, string $srcTemplatePath, int $hideDetails = 0, int $hideDesc = 0, int $hideRef = 0, array $moreParam): int
 	{
-		$tmpArray = [];
+        global $langs;
 
-        $ticket   = new Ticket($this->db);
-        $accident = new Accident($this->db);
+        $evaluator = new Evaluator($this->db);
+
+		$tmpArray = [];
+        $tmpArray['register_name'] = $langs->trans('RegisterDocument');
 
 		$objectDocument->element = $objectDocument->element . '@digiriskdolibarr';
 		complete_substitutions_array($tmpArray, $outputLangs, $objectDocument);
@@ -104,43 +293,20 @@ class doc_registerdocument_odt extends SaturneDocumentModel
 		$moreParam['subDir']           = 'digiriskdolibarrdocuments/';
 		$moreParam['hideTemplateName'] = 1;
 
-        $tmpArray['company_nb_employees'] = ;
+        $arrayNbEmployees = $evaluator->getNbEmployees();
+
+        $tmpArray['company_nb_employees'] = array_shift($arrayNbEmployees);
         $tmpArray['total_page_nb'] = 6;
-        //foreach
-//            $tmpArray['caregiver_id'] = ;
-//            $tmpArray['caregiver_lastname'] = ;
-//            $tmpArray['caregiver_firstname'] = ;
-//            $tmpArray['caregiver_qualification'] = ;
-//            $tmpArray['caregiver_signature'] = ;
-        //foreach
-    //        $tmpArray['register_controller_id'] = ;
-    //        $tmpArray['register_controller_lastname'] = ;
-    //        $tmpArray['register_controller_firstname'] = ;
-    //        $tmpArray['register_controller_society'] = ;
-    //        $tmpArray['register_controller_date'] = ;
-    //        $tmpArray['register_controller_signature'] = ;
-    //        $tmpArray['register_controller_note'] = ;
 
-        $accidentList = $accident->fetchAll('', '', 0, 0, ['customsql' => 'fk_ticket > 0']);
+        $tmpArray['register_controller_id'] = '';
+        $tmpArray['register_controller_lastname'] = '';
+        $tmpArray['register_controller_firstname'] = '';
+        $tmpArray['register_controller_society'] = '';
+        $tmpArray['register_controller_date'] = '';
+        $tmpArray['register_controller_signature'] = '';
+        $tmpArray['register_controller_note'] = '';
 
-        if (is_array($accidentList) && !empty($accidentList)) {
-            // foreach
-//            $tmpArray['register_name'] = ;
-//            $tmpArray['register_date'] = ;
-//            $tmpArray['register_fullname'] = ;
-//            $tmpArray['register_datehour'] = ;
-//            $tmpArray['register_location'] = ;
-//            $tmpArray['register_circumstances'] = ;
-//            $tmpArray['register_lesion_location'] = ;
-//            $tmpArray['register_lesion_nature'] = ;
-//            $tmpArray['register_witnesses_data'] = ;
-//            $tmpArray['register_external_society_implied'] = ;
-//            $tmpArray['register_caregiver_fullname'] = ;
-//            $tmpArray['register_victim_signature'] = ;
-//            $tmpArray['register_note'] = ;
-        }
-
-
+        $moreParam['tmparray'] = $tmpArray;
 
         return parent::write_file($objectDocument, $outputLangs, $srcTemplatePath, $hideDetails, $hideDesc, $hideRef, $moreParam);
 	}
