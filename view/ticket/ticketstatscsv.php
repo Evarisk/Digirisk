@@ -21,20 +21,14 @@
  *		\brief      Page with tickets statistics CSV
  */
 
-// Load Dolibarr environment
-$res = 0;
-// Try main.inc.php into web root known defined into CONTEXT_DOCUMENT_ROOT (not always defined)
-if ( ! $res && ! empty($_SERVER["CONTEXT_DOCUMENT_ROOT"])) $res = @include $_SERVER["CONTEXT_DOCUMENT_ROOT"] . "/main.inc.php";
-// Try main.inc.php into web root detected using web root calculated from SCRIPT_FILENAME
-$tmp = empty($_SERVER['SCRIPT_FILENAME']) ? '' : $_SERVER['SCRIPT_FILENAME']; $tmp2 = realpath(__FILE__); $i = strlen($tmp) - 1; $j = strlen($tmp2) - 1;
-while ($i > 0 && $j > 0 && isset($tmp[$i]) && isset($tmp2[$j]) && $tmp[$i] == $tmp2[$j]) { $i--; $j--; }
-if ( ! $res && $i > 0 && file_exists(substr($tmp, 0, ($i + 1)) . "/main.inc.php")) $res          = @include substr($tmp, 0, ($i + 1)) . "/main.inc.php";
-if ( ! $res && $i > 0 && file_exists(dirname(substr($tmp, 0, ($i + 1))) . "/main.inc.php")) $res = @include dirname(substr($tmp, 0, ($i + 1))) . "/main.inc.php";
-// Try main.inc.php using relative path
-if ( ! $res && file_exists("../../main.inc.php")) $res    = @include "../../main.inc.php";
-if ( ! $res && file_exists("../../../main.inc.php")) $res = @include "../../../main.inc.php";
-if ( ! $res && file_exists("../../../../main.inc.php")) $res = @include "../../../../main.inc.php";
-if ( ! $res) die("Include of main fails");
+// Load DigiriskDolibarr environment
+if (file_exists('../../digiriskdolibarr.main.inc.php')) {
+    require_once __DIR__ . '/../../digiriskdolibarr.main.inc.php';
+} elseif (file_exists('../../../digiriskdolibarr.main.inc.php')) {
+    require_once __DIR__ . '/../../../digiriskdolibarr.main.inc.php';
+} else {
+    die('Include of digiriskdolibarr main fails');
+}
 
 // Global variables definitions
 global $conf, $db, $langs, $user;
@@ -46,7 +40,7 @@ require_once __DIR__ . '/../../lib/digiriskdolibarr_ticket.lib.php';
 require_once __DIR__ . '/../../class/ticketdigiriskstats.class.php';
 
 // Load translation files required by the page
-$langs->loadLangs(array('other'));
+saturne_load_langs();
 
 // Get parameters
 $action = GETPOST('action', 'aZ09');
@@ -55,19 +49,20 @@ $action = GETPOST('action', 'aZ09');
 $stats = new TicketDigiriskStats($db);
 
 // Security check
-if (!$user->rights->ticket->read) {
-	accessforbidden();
-}
+$permissiontoread = $user->rights->ticket->read;
 
 $upload_dir = $conf->digiriskdolibarr->multidir_output[$conf->entity];
 $upload_dir = $upload_dir . '/ticketstats/';
 dol_mkdir($upload_dir);
+
+saturne_check_access($permissiontoread);
 
 /*
  * Action
  */
 
 if ($action == 'generate_csv') {
+    $categorie = new Categorie($db);
 	// Open a file in write mode ('w')
 	$now = dol_now();
 	$filename = dol_print_date($now, 'dayxcard') . '_ticketstats.csv';
@@ -78,18 +73,49 @@ if ($action == 'generate_csv') {
 
 	$fp = fopen($upload_dir . $filename, 'w');
 
-	$data = $stats->getNbTicketByDigiriskElementAndTicketTags((!empty($daterange) ? $date_start : 0), (!empty($daterange) ? $date_end : 0));
-	if (is_array($data) && !empty($data)) {
+	list($data, $ticketCategoriesCounter) = $stats->getNbTicketByDigiriskElementAndTicketTags((!empty($daterange) ? $date_start : 0), (!empty($daterange) ? $date_end : 0));
+
+    fputcsv($fp, [$langs->transnoentities('ConcernedTimePeriod') . ' : ' . dol_print_date($date_start) . ' ' . $langs->trans('To') . ' ' . dol_print_date($date_end)]);
+
+    fputcsv($fp, []);
+    fputcsv($fp, []);
+    fputcsv($fp, []);
+
+    if (is_array($ticketCategoriesCounter) && !empty($ticketCategoriesCounter)) {
+        foreach($ticketCategoriesCounter as $ticketCategoryName => $ticketCategoryCounter) {
+            fputcsv($fp, [$ticketCategoryName => $ticketCategoryName . ' : ' . $ticketCategoryCounter]);
+        }
+    }
+
+    fputcsv($fp, []);
+    fputcsv($fp, []);
+    fputcsv($fp, []);
+
+    if (is_array($data) && !empty($data)) {
+
 		// Loop through file pointer and a line
-		$arrayCat = array_keys(reset($data));
-		array_unshift($arrayCat, $langs->trans('GP/UT'));
-		fputcsv($fp, $arrayCat);
+		$arrayCat = array_keys($data['labels']);
+
+        foreach($arrayCat as $categoryId) {
+            if (is_int($categoryId)) {
+                $categorie->fetch($categoryId);
+                $arrayCatWithLabels[$categoryId] = $categorie->label;
+            } else {
+                $arrayCatWithLabels[$categoryId] = $categoryId;
+            }
+        }
+
+        unset($data['labels']);
+
+		array_unshift($arrayCatWithLabels, $langs->trans('GP/UT'));
+		fputcsv($fp, $arrayCatWithLabels);
 		$i = 0;
 		foreach ($data as $row) {
 			array_unshift($row, array_keys($data)[$i]);
 			fputcsv($fp, $row);
 			$i++;
 		}
+
 		fclose($fp);
 		setEventMessages($langs->trans('SuccessGenerateCSV', $filename), null);
 	} else {

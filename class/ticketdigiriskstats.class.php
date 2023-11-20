@@ -27,6 +27,7 @@ require_once DOL_DOCUMENT_ROOT . '/categories/class/categorie.class.php';
 
 require_once __DIR__ . '/digiriskstats.php';
 require_once __DIR__ . '/digiriskelement.class.php';
+require_once __DIR__ . '/accident.class.php';
 
 /**
  *	Class to manage stats for tickets
@@ -151,66 +152,146 @@ class TicketDigiriskStats extends DigiriskStats
 		return $this->_getAllByYear($sql);
 	}
 
-	/**
-	 * Return nb ticket by GP/UT and Ticket tags
-	 *
-	 * @param  int		$date_start		Timestamp date start
-	 * @param  int		$date_end		Timestamp date end
-	 *
-	 * @return array                    Array of values
-	 * @throws Exception
-	 */
-	public function getNbTicketByDigiriskElementAndTicketTags($date_start = 0, $date_end = 0) {
-		$digiriskelement = new DigiriskElement($this->db);
-		$categorie       = new Categorie($this->db);
+    /**
+     * Return nb ticket by GP/UT and Ticket tags
+     *
+     * @param  int		$date_start		Timestamp date start
+     * @param  int		$date_end		Timestamp date end
+     *
+     * @return array                    Array of values
+     * @throws Exception
+     */
+    public function getNbTicketByDigiriskElementAndTicketTags($date_start = 0, $date_end = 0) {
+        global $conf, $langs;
 
-		$digiriskelement_flatlist = $digiriskelement->fetchDigiriskElementFlat(0);
-		if (is_array($digiriskelement_flatlist) && !empty($digiriskelement_flatlist)) {
-			foreach ($digiriskelement_flatlist as $digiriskelementobject) {
-				$digiriskelementlist[$digiriskelementobject['object']->id] = $digiriskelementobject['object'];
-			}
-		}
+        $digiriskelement  = new DigiriskElement($this->db);
+        $categorie        = new Categorie($this->db);
+        $accident         = new Accident($this->db);
+        $accidentWorkStop = new AccidentWorkStop($this->db);
+        $ticket           = new Ticket($this->db);
 
-		$digiriskelementlist = dol_sort_array($digiriskelementlist, 'ranks');
+        $digiriskelement_flatlist = $digiriskelement->fetchDigiriskElementFlat(0);
+        if (is_array($digiriskelement_flatlist) && !empty($digiriskelement_flatlist)) {
+            foreach ($digiriskelement_flatlist as $digiriskelementobject) {
+                $digiriskelementlist[$digiriskelementobject['object']->id] = $digiriskelementobject['object'];
+            }
+        }
 
-		$allCategories = $categorie->get_all_categories('ticket');
-		if (is_array($allCategories) && !empty($allCategories)) {
-			foreach ($allCategories as $category) {
-				$arrayCats[$category->label] = array(
-					'id' => $category->id,
-					'name' => $category->label
-				);
-			}
-		}
+        $digiriskelementlist = dol_sort_array($digiriskelementlist, 'ranks');
+        $mainCategoryObject = $categorie->rechercher($conf->global->DIGIRISKDOLIBARR_TICKET_MAIN_CATEGORY, '', 'ticket', true);
+        $allCategories = $mainCategoryObject[0]->get_filles();
 
-		if (is_array($digiriskelementlist) && !empty($digiriskelementlist)) {
-			if (is_array($arrayCats) && !empty($arrayCats)) {
-				if ($date_start > 0 && $date_end > 0) {
-					$filter = ' AND datec BETWEEN ' . "'" .dol_print_date($date_start, 'dayrfc') . "'" . ' AND ' . "'" . dol_print_date($date_end, 'dayrfc'). "'";
-				}
-				foreach ($digiriskelementlist as $digiriskelement) {
-					foreach ($arrayCats as $key => $cat) {
-						$nbticket = 0;
-						$categorie->fetch($cat['id']);
-						$alltickets = getObjectsInCategDigirisk($categorie, 'ticket', 0, 0, 0, '', 'ASC', $filter);
-						if (is_array($alltickets) && !empty($alltickets)) {
-							foreach ($alltickets as $ticket) {
-								if (!empty($ticket->array_options['options_digiriskdolibarr_ticket_service']) && $ticket->array_options['options_digiriskdolibarr_ticket_service'] == $digiriskelement->id && $ticket->fk_statut != 9) {
-									$nbticket++;
-								}
-							}
-						}
-						$array[$digiriskelement->ref . ' - ' . $digiriskelement->label][html_entity_decode($key, ENT_QUOTES | ENT_HTML5)] = $nbticket;
-					}
-				}
-			}
-		}
+        $arrayReturn = [];
+        $ticketCategoriesCounter = [];
 
-		if (!empty($array)) {
-			return $array;
-		} else {
-			return -1;
-		}
-	}
+        //Creating columns labels
+        if (is_array($allCategories) && !empty($allCategories)) {
+            // Main categories
+            foreach($allCategories as $category) {
+                $labelsArray['labels'][$category->id] = $category->label;
+
+                $categorie->fetch($category->id);
+                $alltickets[$category->id] = getObjectsInCategDigirisk($categorie, 'ticket', 0, 0, 0, '', 'ASC', $filter);
+
+                if (is_array($alltickets[$category->id]) && !empty($alltickets[$category->id])) {
+                    $ticketCategoriesCounter[$langs->trans('Register') . ' ' . $category->label] = count($alltickets[$category->id]);
+                }
+
+
+                $mainCategoriesIds[$category->id] = $category->id;
+                $childrenCategories = $category->get_filles();
+
+
+                // Children categories
+                if (is_array($childrenCategories) && !empty($childrenCategories)) {
+                    foreach($childrenCategories as $childCategory) {
+                        $labelsArray['labels'][$childCategory->id] = $childCategory->label;
+
+                        $categorie->fetch($childCategory->id);
+                        $alltickets[$childCategory->id] = getObjectsInCategDigirisk($categorie, 'ticket', 0, 0, 0, '', 'ASC', $filter);
+
+                        // Categories sub ranges
+                        if ($childCategory->label == $langs->trans('AccidentWithDIAT')) {
+                            $accidentWorkStopTimeRangesJson = $conf->global->DIGIRISKDOLIBARR_TICKET_STATISTICS_ACCIDENT_TIME_RANGE;
+                            $accidentWorkStopTimeRanges     = json_decode($accidentWorkStopTimeRangesJson, true);
+                            if (is_array($accidentWorkStopTimeRanges) && !empty($accidentWorkStopTimeRanges)) {
+                                foreach($accidentWorkStopTimeRanges as $accidentWorkStopTimeRangeLabel => $accidentWorkStopTimeRange) {
+                                    $labelsArray['labels'][$accidentWorkStopTimeRangeLabel] = $accidentWorkStopTimeRange;
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+            $labelsArray['labels']['Total'] = $langs->trans('Total');
+        }
+
+        $allAccidentsWithFkTicket = $accident->fetchAll('', '', 0, 0, ['customsql' => 'fk_ticket > 0']);
+
+        if (is_array($digiriskelementlist) && !empty($digiriskelementlist)) {
+            foreach($digiriskelementlist as $digiriskelement) {
+                $arrayKey = $digiriskelement->ref . ' - ' . $digiriskelement->label;
+                if (is_array($labelsArray['labels']) && !empty($labelsArray['labels'])) {
+                    foreach($labelsArray['labels'] as $categoryId => $categoryLabel) {
+                        $arrayReturn[$arrayKey][$categoryId] = 0;
+
+                        if (is_int($categoryId)) {
+                            if (is_array($alltickets[$categoryId]) && !empty($alltickets[$categoryId])) {
+                                foreach($alltickets[$categoryId] as $ticketsWithThisCategory) {
+                                    if ($ticketsWithThisCategory->array_options['options_digiriskdolibarr_ticket_service'] == $digiriskelement->id) {
+                                        $arrayReturn[$arrayKey][$categoryId] += 1;
+                                    }
+                                }
+                            }
+                        } else if (strstr($categoryLabel, ':')) {
+                            $accidentWorkStopTimeRangeDetails = explode(':', $categoryLabel);
+                            $constraintMultiplicator          = $accidentWorkStopTimeRangeDetails[2] == 'days' ? 1 : ($accidentWorkStopTimeRangeDetails[2] == 'years' ? 365 : 21);
+                            $constraintInDays                 = $accidentWorkStopTimeRangeDetails[1];
+                            $constraintComparator             = $accidentWorkStopTimeRangeDetails[0] == 'less' ? '<' : '>';
+
+                            // Find accidents with filter and add it to counter
+                            if (is_array($allAccidentsWithFkTicket) && !empty($allAccidentsWithFkTicket)) {
+                                foreach($allAccidentsWithFkTicket as $accidentWithFkTicket) {
+                                    $ticket->fetch($accidentWithFkTicket->fk_ticket);
+                                    if ($ticket->array_options['options_digiriskdolibarr_ticket_service'] == $digiriskelement->id) {
+                                        $accidentWorkStopList = $accidentWorkStop->fetchFromParent($accidentWithFkTicket->id);
+                                        $accidentWorkStopDaysCounter = 0;
+                                        if (is_array($accidentWorkStopList) && !empty($accidentWorkStopList)) {
+                                            foreach ($accidentWorkStopList as $accidentWorkStop) {
+                                                $accidentWorkStopDaysCounter += $accidentWorkStop->workstop_days;
+                                            }
+                                        }
+                                        $condition = "\$result = \$accidentWorkStopDaysCounter $constraintComparator \$constraintInDays*$constraintMultiplicator;";
+                                        eval($condition);
+
+                                        if ($result) {
+                                            $arrayReturn[$arrayKey][$categoryId] += 1;
+                                        }
+                                    }
+                                }
+                            }
+                        }
+                    }
+                }
+                // Total for given digirisk element
+                foreach($arrayReturn[$arrayKey] as $digiriskElementCategoryId => $digiriskElementCategoriesCounter) {
+                    if (in_array($digiriskElementCategoryId, $mainCategoriesIds)) {
+                        $arrayReturn[$arrayKey]['Total'] += $digiriskElementCategoriesCounter;
+                    }
+                }
+            }
+        }
+
+        foreach($arrayReturn as $data) {
+            foreach($data as $categoryId => $categoryCounter) {
+                $totalArray['Total'][$categoryId] += $categoryCounter;
+            }
+        }
+
+        // Array replace instead of array merge to avoid losing keys
+        $arrayReturn = array_replace($labelsArray, $arrayReturn, $totalArray);
+
+        return [$arrayReturn, $ticketCategoriesCounter];
+    }
 }
 

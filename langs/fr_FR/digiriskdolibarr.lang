@@ -1240,20 +1240,34 @@ TicketLocationVisibleHelp                = Activer cette option pour afficher le
 TicketDateVisible                        = Afficher le champ Date pour créer un ticket
 TicketDateVisibleHelp                    = Activer cette option pour afficher le champ Date dans l'interface publique et le rendre obligatoire si nécessaire
 QRCodeGenerated                          = QRCode généré
+FkTicket                                 = Ticket lié
+
 
 # Stats - Statistiques
-TicketStatistics   = Statistiques des tickets
-ExportCSV          = Export CSV
-GenerateCSV        = Générer le fichier CSV
-SuccessGenerateCSV = Fichier CSV %s généré avec succès
-ErrorMissingData   = Erreur : impossible de générer le fichier CSV, les données envoyées au fichier sont incorrecte. <br> Veuillez vérifier que vous avez bien des GP/UT assignés à des tickets.
-CSVFileExport      = Export des registres au format CSV associé à des GP/UT
-ThirdPartyHelp     = Si le filtre "Tiers" est vide, aucun tiers n'est utilisé pour la recherche
-GP/UTHelp          = Par défaut, le filtre prend toutes les GP/UT
-CategoryTicketHelp = Par défaut, le filtre prend toutes les catégories
-CreatedByHelp      = Si le filtre "Créer par" est vide, aucun utilisateur n'est utilisé pour la recherche
-AssignedToHelp     = Si le filtre "Assigné à" est vide, aucun utilisateur n'est utilisé pour la recherche
-StatusHelp         = Par défaut, le filtre prend tous les états<br>
+TicketStatistics    = Statistiques des tickets
+ExportCSV           = Export CSV
+GenerateCSV         = Générer le fichier CSV
+SuccessGenerateCSV  = Fichier CSV %s généré avec succès
+ErrorMissingData    = Erreur : impossible de générer le fichier CSV, les données envoyées au fichier sont incorrecte. <br> Veuillez vérifier que vous avez bien des GP/UT assignés à des tickets.
+CSVFileExport       = Export des registres au format CSV associé à des GP/UT
+ThirdPartyHelp      = Si le filtre "Tiers" est vide, aucun tiers n'est utilisé pour la recherche
+GP/UTHelp           = Par défaut, le filtre prend toutes les GP/UT
+CategoryTicketHelp  = Par défaut, le filtre prend toutes les catégories
+CreatedByHelp       = Si le filtre "Créer par" est vide, aucun utilisateur n'est utilisé pour la recherche
+AssignedToHelp      = Si le filtre "Assigné à" est vide, aucun utilisateur n'est utilisé pour la recherche
+StatusHelp          = Par défaut, le filtre prend tous les états<br>
+ConcernedTimePeriod = Période prise en compte
+LessThan            = Moins de
+MoreThan            = Plus de
+Comparator          = Comparateur
+RangeNumber         = Quantité
+TimeRange           = Unité de temps
+RangeLabel          = Nom de la contrainte
+Inferior            = Inférieur à
+Superior            = Supérieur à
+TimeRangeAdded      = Contrainte ajoutée
+TimeRangeDeleted    = Contrainte supprimée
+
 
 # Email - Email
 The                            = Le
