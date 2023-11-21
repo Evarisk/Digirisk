@@ -521,6 +521,7 @@ DateEndWorkStop                   = Date de fin d'arrêt de travail
 ReturnWorkDate                    = Date de reprise d'activité
 DayWithoutAccident                = Jours sans accident(s)
 AccidentRepartition               = Répartition des accidents par type
+AccidentByYear                    = Répartition des accidents par année
 NbAccidentsByEmployees            = Nombre d'accidents par salarié
 FrequencyIndex                    = Indice de fréquence
 FrequencyRate                     = Taux de fréquence
