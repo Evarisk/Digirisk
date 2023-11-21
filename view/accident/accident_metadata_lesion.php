@@ -38,7 +38,7 @@ require_once __DIR__ . '/../../class/accident.class.php';
 require_once __DIR__ . '/../../lib/digiriskdolibarr_function.lib.php';
 require_once __DIR__ . '/../../lib/digiriskdolibarr_accident.lib.php';
 
-global $conf, $db, $hookmanager, $langs, $user;
+global $conf, $db, $hookmanager, $langs, $moduleNameLowerCase, $user;
 
 // Load translation files required by the page
 saturne_load_langs();
@@ -65,6 +65,12 @@ if ($id > 0 && $object->external_accident != 2) {
     unset($object->fields['fk_soc']);
     unset($object->fk_soc);
 }
+
+// Load numbering modules
+$numberingModules = [
+    'digiriskelement/' . $objectline->element => $conf->global->DIGIRISKDOLIBARR_ACCIDENTLESION_ADDON,
+];
+list($refAccidentMod, $refAccidentWorkStopMod) = saturne_require_objects_mod($numberingModules, $moduleNameLowerCase);
 
 $hookmanager->initHooks(['accidentmetadatalesion', 'globalcard']); // Note that conf->hooks_modules contains array
 
