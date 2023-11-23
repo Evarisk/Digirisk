@@ -571,14 +571,14 @@ class ActionsDigiriskdolibarr
 		$value = array();
 
 		/* print_r($parameters); print_r($object); echo "action: " . $action; */
-		if ($parameters['currentcontext'] == 'emailtemplates') {	    // do something only for the context 'somecontext1' or 'somecontext2'
-			if (isModEnabled('digiriskdolibarr') && $user->rights->digiriskdolibarr->preventionplan->read) {
+		if (isModEnabled('digiriskdolibarr') && $parameters['currentcontext'] == 'emailtemplates') {	    // do something only for the context 'somecontext1' or 'somecontext2'
+			if ($user->hasRight('digiriskdolibarr', 'preventionplan', 'read')) {
 				$value['preventionplan'] = '<i class="fas fa-info"></i>  ' . dol_escape_htmltag($langs->trans('PreventionPlan'));
 			}
-			if (isModEnabled('digiriskdolibarr') && $user->rights->digiriskdolibarr->firepermit->read) {
+			if ($user->hasRight('digiriskdolibarr', 'firepermit', 'read')) {
 				$value['firepermit'] = '<i class="fas fa-fire-alt"></i>  ' . dol_escape_htmltag($langs->trans('FirePermit'));
 			}
-			if (isModEnabled('digiriskdolibarr') && $user->rights->digiriskdolibarr->riskassessmentdocument->read) {
+			if ($user->hasRight('digiriskdolibarr', 'riskassessmentdocument', 'read')) {
 				$value['riskassessmentdocument'] = '<i class="fas fa-exclamation-triangle"></i>  ' . dol_escape_htmltag($langs->trans('RiskAssessmentDocument'));
 			}
 		}
