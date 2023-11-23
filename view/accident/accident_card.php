@@ -913,7 +913,7 @@ if ((empty($action) || ($action != 'create' && $action != 'edit'))) {
 
     // SetValidated confirmation
     if (($action == 'setValidated' && (empty($conf->use_javascript_ajax) || !empty($conf->dol_use_jmobile))) || (!empty($conf->use_javascript_ajax) && empty($conf->dol_use_jmobile))) {
-        $questionConfirmInfo = '<b>' . $langs->trans('ConfirmValidateObject', $langs->trans('TheAccident'), $langs->trans('LesionsOrWorkStop')) . '</b>';
+        $questionConfirmInfo = '<b>' . $langs->trans('ConfirmValidateObject', $langs->trans('TheAccident'), $langs->transnoentities('LesionsOrWorkStop')) . '</b>';
         $formConfirm .= $form->formconfirm($_SERVER['PHP_SELF'] . '?id=' . $object->id, $langs->trans('ValidateObject', $langs->trans('TheAccident')), $questionConfirmInfo, 'confirm_validate', '', 'yes', 'actionButtonValidate', 250);
     }
 

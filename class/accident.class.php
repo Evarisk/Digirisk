@@ -362,19 +362,16 @@ class Accident extends SaturneObject
 
 		}
 
-		$statusType = 'status' . $status;
-        if ($status == self::STATUS_DRAFT) {
-            $statusType = 'status3';
+        $statusType = 'status' . $status;
+        if ($status == self::STATUS_VALIDATED) {
+            $statusType = 'status4';
         }
-		if ($status == self::STATUS_VALIDATED) {
-			$statusType = 'status4';
-		}
-		if ($status == self::STATUS_LOCKED) {
-			$statusType = 'status6';
-		}
-		if ($status == self::STATUS_DELETED) {
-			$statusType = 'status9';
-		}
+        if ($status == self::STATUS_LOCKED) {
+            $statusType = 'status6';
+        }
+        if ($status == self::STATUS_DELETED) {
+            $statusType = 'status9';
+        }
 
 		return dolGetStatus($this->labelStatus[$status], $this->labelStatusShort[$status], '', $statusType, $mode);
 	}
