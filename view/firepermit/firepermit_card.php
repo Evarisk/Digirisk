@@ -690,7 +690,7 @@ if ($action == 'create') {
 	print $htmltext;
 	print '</td><td>';
 	print $form->selectcontacts((empty(GETPOST('ext_society', 'int')) ? -1 : GETPOST('ext_society', 'int')), $extSocietyResponsibleId, 'ext_society_responsible', 1, '', '', 1, 'minwidth100imp widthcentpercentminusxx maxwidth400');
-	print ' <a href="' . DOL_URL_ROOT . '/contact/card.php?action=create' . (empty(GETPOST('ext_society', 'int')) ? '' : '&socid=' . GETPOST('ext_society', 'int')) .'&backtopage=' . urlencode($_SERVER["PHP_SELF"] . '?action=create&ext_society='. (empty(GETPOST('ext_society', 'int')) ? '' : GETPOST('ext_society', 'int'))) . '" target="_blank"><span class="fa fa-plus-circle valignmiddle paddingleft" title="' . $langs->trans("AddContact") . '"></span></a>';
+	print '<a href="' . DOL_URL_ROOT . '/contact/card.php?action=create' . (empty(GETPOST('ext_society', 'int')) ? '' : '&socid=' . GETPOST('ext_society', 'int')) .'&backtopage=' . urlencode($_SERVER["PHP_SELF"] . '?action=create&ext_society='. (empty(GETPOST('ext_society', 'int')) ? '' : GETPOST('ext_society', 'int'))) . '"><span class="fa fa-plus-circle valignmiddle paddingleft" title="' . $langs->trans("AddContact") . '"></span></a>';
 	print '</td></tr>';
 
 	//Labour inspector Society -- Entreprise Inspecteur du travail
