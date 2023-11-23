@@ -513,21 +513,21 @@ class Accident extends SaturneObject
         $array['width']      = '100%';
         $array['height']     = 400;
         $array['type']       = 'bar';
-        $array['showlegend'] = $conf->browser->layout == 'phone' ? 1 : 2;
+        $array['showlegend'] = 1;
         $array['dataset']    = 3;
 
         $array['labels'] = [
-            'currentyear' => [
-                'label' => date('Y'),
-                'color' => '#e05353'
+            'pastlastyear' => [
+                'label' => date("Y",strtotime("-2 year")),
+                'color' => '#9567aa'
             ],
             'lastyear' => [
                 'label' => date("Y",strtotime("-1 year")),
-                'color' => '#e9ad4f'
+                'color' => '#4f9ebe'
             ],
-            'pastlastyear' => [
-                'label' => date("Y",strtotime("-2 year")),
-                'color' => '#0000FF'
+            'currentyear' => [
+                'label' => date('Y'),
+                'color' => '#fac461'
             ],
         ];
 
@@ -548,7 +548,7 @@ class Accident extends SaturneObject
             $month = $langs->transnoentitiesnoconv('MonthShort'.sprintf("%02d", $i));
             $arrayAccidents[$i - 1] = array($month);
             for ($j = 0; $j < 3; $j++) {
-                $arrayAccidents[$i - 1][date('Y') - $j] = 0;
+                $arrayAccidents[$i - 1][date('Y') - 2 + $j] = 0;
             }
         }
 
