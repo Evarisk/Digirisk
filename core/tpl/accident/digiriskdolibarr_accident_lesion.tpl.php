@@ -95,7 +95,7 @@ if (!empty($accidentlines) && $accidentlines > 0) {
     }
     print '</tr>';
 }
-if ($object->status == 1 && $permissiontoadd) {
+if ($object->status == $object::STATUS_DRAFT && $permissiontoadd) {
     print '<form method="POST" action="' . $_SERVER["PHP_SELF"] . '?id=' . $object->id . '">';
     print '<input type="hidden" name="token" value="' . newToken() . '">';
     print '<input type="hidden" name="action" value="addLesion">';

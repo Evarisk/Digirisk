@@ -913,7 +913,7 @@ if ((empty($action) || ($action != 'create' && $action != 'edit'))) {
 
     // SetValidated confirmation
     if (($action == 'setValidated' && (empty($conf->use_javascript_ajax) || !empty($conf->dol_use_jmobile))) || (!empty($conf->use_javascript_ajax) && empty($conf->dol_use_jmobile))) {
-        $questionConfirmInfo = '<b>' . $langs->trans('ConfirmValidateObject', $langs->trans('TheAccident')) . '</b>';
+        $questionConfirmInfo = '<b>' . $langs->trans('ConfirmValidateObject', $langs->trans('TheAccident'), $langs->trans('LesionsOrWorkStop')) . '</b>';
         $formConfirm .= $form->formconfirm($_SERVER['PHP_SELF'] . '?id=' . $object->id, $langs->trans('ValidateObject', $langs->trans('TheAccident')), $questionConfirmInfo, 'confirm_validate', '', 'yes', 'actionButtonValidate', 250);
     }
 
@@ -1142,117 +1142,115 @@ if ((empty($action) || ($action != 'create' && $action != 'edit'))) {
         // Accident Lines
 		$accidentWorkstops = $objectline->fetchFromParent($object->id);
 
-		if (($object->status == Accident::STATUS_DRAFT) || (!empty($accidentWorkstops))) {
-			// ACCIDENT LINES
-			print '<div class="div-table-responsive-no-min" style="overflow-x: unset !important">';
-			print load_fiche_titre($langs->trans("AccidentRiskList"), '', '');
-			print '<table id="tablelines" class="noborder noshadow" width="100%">';
+        // ACCIDENT LINES
+        print '<div class="div-table-responsive-no-min" style="overflow-x: unset !important">';
+        print load_fiche_titre($langs->trans("AccidentRiskList"), '', '');
+        print '<table id="tablelines" class="noborder noshadow" width="100%">';
 
-			// Define colspan for the button 'Add'
-			$colspan = 3; // Columns: total ht + col edit + col delete
-			$img_extensions = ['png', 'jpg', 'jpeg'];
+        // Define colspan for the button 'Add'
+        $colspan = 3; // Columns: total ht + col edit + col delete
+        $img_extensions = ['png', 'jpg', 'jpeg'];
 
-			print '<tr class="liste_titre">';
-			print '<td><span>' . $langs->trans('Ref.') . '</span></td>';
-			print '<td>' . '<b>' . $langs->trans('WorkStopDays') . '</b><span style="color:red"> *</span>' . '</td>';
-			print '<td>' . $langs->trans('DateStartWorkStop') . '</td>';
-			print '<td>' . $langs->trans('DateEndWorkStop') . '</td>';
-			print '<td>' . $langs->trans('WorkStopDocument') . '</td>';
-			print '<td class="center" colspan="' . $colspan . '">' . $langs->trans('ActionsLine') . '</td>';
-			print '</tr>';
+        print '<tr class="liste_titre">';
+        print '<td><span>' . $langs->trans('Ref.') . '</span></td>';
+        print '<td>' . '<b>' . $langs->trans('WorkStopDays') . '</b><span style="color:red"> *</span>' . '</td>';
+        print '<td>' . $langs->trans('DateStartWorkStop') . '</td>';
+        print '<td>' . $langs->trans('DateEndWorkStop') . '</td>';
+        print '<td>' . $langs->trans('WorkStopDocument') . '</td>';
+        print '<td class="center" colspan="' . $colspan . '">' . $langs->trans('ActionsLine') . '</td>';
+        print '</tr>';
 
-			if ( ! empty($accidentWorkstops) && $accidentWorkstops > 0) {
-				foreach ($accidentWorkstops as $key => $item) {
-					//action edit
-					if (($action == 'editline' || $subaction == 'editline') && $lineid == $key) {
-						print '<form method="POST" action="' . $_SERVER["PHP_SELF"] . '?id=' . $object->id . '">';
-						print '<input type="hidden" name="token" value="' . newToken() . '">';
-						print '<input type="hidden" name="action" value="updateLine">';
-						print '<input type="hidden" name="backtopage" value="' . $backtopage . '">';
-						print '<input type="hidden" name="lineid" value="' . $item->id . '">';
-						print '<input type="hidden" name="parent_id" value="' . $object->id . '">';
+        if ( ! empty($accidentWorkstops) && $accidentWorkstops > 0) {
+            foreach ($accidentWorkstops as $key => $item) {
+                //action edit
+                if (($action == 'editline' || $subaction == 'editline') && $lineid == $key) {
+                    print '<form method="POST" action="' . $_SERVER["PHP_SELF"] . '?id=' . $object->id . '">';
+                    print '<input type="hidden" name="token" value="' . newToken() . '">';
+                    print '<input type="hidden" name="action" value="updateLine">';
+                    print '<input type="hidden" name="backtopage" value="' . $backtopage . '">';
+                    print '<input type="hidden" name="lineid" value="' . $item->id . '">';
+                    print '<input type="hidden" name="parent_id" value="' . $object->id . '">';
 
-						print '<tr>';
-						print '<td>';
-						print $item->ref;
-						print '</td>';
+                    print '<tr>';
+                    print '<td>';
+                    print $item->ref;
+                    print '</td>';
 
-						$coldisplay++;
-						print '<td>';
-						print '<input type="number" name="workstop_days" class="minwidth150" value="' . $item->workstop_days . '">';
-						print '</td>';
+                    $coldisplay++;
+                    print '<td>';
+                    print '<input type="number" name="workstop_days" class="minwidth150" value="' . $item->workstop_days . '">';
+                    print '</td>';
 
-						$coldisplay++;
-						print '<td>';
-						print $form->selectDate($item->date_start_workstop, 'datestart', 1, 1, 0, '', 1);
-						print '</td>';
+                    $coldisplay++;
+                    print '<td>';
+                    print $form->selectDate($item->date_start_workstop, 'datestart', 1, 1, 0, '', 1);
+                    print '</td>';
 
-						$coldisplay++;
-						print '<td>';
-						print $form->selectDate($item->date_end_workstop, 'dateend', 1, 1, 0, '', 1);
-						print '</td>';
+                    $coldisplay++;
+                    print '<td>';
+                    print $form->selectDate($item->date_end_workstop, 'dateend', 1, 1, 0, '', 1);
+                    print '</td>';
 
-						$coldisplay++;
-						print '<td>';
-						print '<input name="declarationLink" value="'. (GETPOST('declarationLink') ?: $item->declaration_link) .'">';
-						print '</td>';
+                    $coldisplay++;
+                    print '<td>';
+                    print '<input name="declarationLink" value="'. (GETPOST('declarationLink') ?: $item->declaration_link) .'">';
+                    print '</td>';
 
-						$coldisplay += $colspan;
-						print '<td class="center" colspan="' . $colspan . '">';
-						print '<input type="submit" class="button" value="' . $langs->trans('Save') . '" name="updateLine" id="updateLine">';
-						print ' &nbsp; <input type="submit" id ="cancelLine" class="button" name="cancelLine" value="' . $langs->trans("Cancel") . '">';
-						print '</td>';
-						print '</tr>';
-						print '</form>';
-					//action view
-					} elseif ($item->status == 1) {
-						print '<td>';
-						print $item->ref;
-						print '</td>';
+                    $coldisplay += $colspan;
+                    print '<td class="center" colspan="' . $colspan . '">';
+                    print '<input type="submit" class="button" value="' . $langs->trans('Save') . '" name="updateLine" id="updateLine">';
+                    print ' &nbsp; <input type="submit" id ="cancelLine" class="button" name="cancelLine" value="' . $langs->trans("Cancel") . '">';
+                    print '</td>';
+                    print '</tr>';
+                    print '</form>';
+                //action view
+                } elseif ($item->status == 1) {
+                    print '<td>';
+                    print $item->ref;
+                    print '</td>';
 
-						$coldisplay++;
-						print '<td>';
-						print $item->workstop_days;
-						print '</td>';
+                    $coldisplay++;
+                    print '<td>';
+                    print $item->workstop_days;
+                    print '</td>';
 
-						$coldisplay++;
-						print '<td>';
-						print dol_print_date($item->date_start_workstop, 'dayhour');
-						print '</td>';
+                    $coldisplay++;
+                    print '<td>';
+                    print dol_print_date($item->date_start_workstop, 'dayhour');
+                    print '</td>';
 
-						$coldisplay++;
-						print '<td>';
-						print dol_print_date($item->date_end_workstop, 'dayhour');
-						print '</td>';
+                    $coldisplay++;
+                    print '<td>';
+                    print dol_print_date($item->date_end_workstop, 'dayhour');
+                    print '</td>';
 
-						$coldisplay++;
-						print '<td>';
-						$is_link = dol_is_url($item->declaration_link);
-						print ($is_link ? '<a target="_blank" href="'. $item->declaration_link .'">' : '') . $item->declaration_link . ($is_link ? '</a>' : '') ;
-						print '</td>';
+                    $coldisplay++;
+                    print '<td>';
+                    $is_link = dol_is_url($item->declaration_link);
+                    print ($is_link ? '<a target="_blank" href="'. $item->declaration_link .'">' : '') . $item->declaration_link . ($is_link ? '</a>' : '') ;
+                    print '</td>';
 
-						$coldisplay += $colspan;
+                    $coldisplay += $colspan;
 
-						//Actions buttons
-						if ($object->status == Accident::STATUS_DRAFT) {
-							print '<td class="center">';
-							$coldisplay++;
-							print '<a href="' . $_SERVER["PHP_SELF"] . '?id=' . $id . '&amp;action=editline&amp;lineid=' . $item->id . '" style="padding-right: 20px"><i class="fas fa-pencil-alt" style="color: #666"></i></a>';
-							print '<a href="' . $_SERVER["PHP_SELF"] . '?id=' . $id . '&amp;action=deleteline&amp;lineid=' . $item->id . '&amp;token=' . newToken() . '">';
-							print img_delete();
-							print '</a>';
-							print '</td>';
-						} else {
-							print '<td class="center">';
-							print '-';
-							print '</td>';
-						}
-						print '</tr>';
-					}
-				}
-				print '</tr>';
-			}
-		}
+                    //Actions buttons
+                    if ($object->status == Accident::STATUS_DRAFT) {
+                        print '<td class="center">';
+                        $coldisplay++;
+                        print '<a href="' . $_SERVER["PHP_SELF"] . '?id=' . $id . '&amp;action=editline&amp;lineid=' . $item->id . '" style="padding-right: 20px"><i class="fas fa-pencil-alt" style="color: #666"></i></a>';
+                        print '<a href="' . $_SERVER["PHP_SELF"] . '?id=' . $id . '&amp;action=deleteline&amp;lineid=' . $item->id . '&amp;token=' . newToken() . '">';
+                        print img_delete();
+                        print '</a>';
+                        print '</td>';
+                    } else {
+                        print '<td class="center">';
+                        print '-';
+                        print '</td>';
+                    }
+                    print '</tr>';
+                }
+            }
+            print '</tr>';
+        }
 		//action create
 		if ($object->status == Accident::STATUS_DRAFT && $permissiontoadd && $action != 'editline') {
 			print '<form method="POST" action="' . $_SERVER["PHP_SELF"] . '?id=' . $object->id . '">';
