@@ -238,3 +238,4 @@ DROP TABLE llx_categorie_accident_investigation;
 
 -- 9.14.0
 ALTER TABLE llx_digiriskdolibarr_accident ADD fk_ticket integer;
+ALTER TABLE llx_digiriskdolibarr_accident DROP COLUMN fk_user_victim;

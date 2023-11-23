@@ -172,6 +172,7 @@ class doc_registerdocument_odt extends SaturneDocumentModel
                 if (is_array($accidentList) && !empty($accidentList)) {
                     foreach ($accidentList as $accidentSingle) {
                         $ticket->fetch($accidentSingle->fk_ticket);
+                        $tmpArray['register_name'] = $ticket->ref;
                         $digiriskElement->fetch($ticket->array_options['options_digiriskdolibarr_ticket_service']);
                         $accidentAttendants = $signatory->fetchSignatory('', $accidentSingle->id, 'accident');
                         $accidentMetaData->fetch(

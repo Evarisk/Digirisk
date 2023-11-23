@@ -201,7 +201,6 @@ if (empty($reshook)) {
 				break;
 		}
 		$object->fk_user_employer = $user_employer_id;
-		$object->fk_user_victim   = $user_victim_id;
 		$object->fk_user_creat    = $user->id ?: 1;
 
 		// Check parameters
@@ -218,7 +217,7 @@ if (empty($reshook)) {
 		if (!$error) {
 			$result = $object->create($user, false);
 			if ($result > 0) {
-                $usertmp->fetch($object->fk_user_victim);
+                $usertmp->fetch($user_victim_id);
 				$signatory->setSignatory($object->id, 'accident', 'user', array($usertmp->id), 'Victim');
 
 				// Creation Accident OK
@@ -242,7 +241,6 @@ if (empty($reshook)) {
 	// Action to update record
 	if ($action == 'update' && $permissiontoadd) {
 		// Get parameters
-		$user_victim_id     = GETPOST('fk_user_victim');
 		$user_employer_id   = GETPOST('fk_user_employer');
 		$digiriskelement_id = GETPOST('fk_element');
 		$label              = GETPOST('label');
@@ -294,15 +292,8 @@ if (empty($reshook)) {
 				$object->accident_location = $accident_location;
 				break;
 		}
-		$object->fk_user_victim   = $user_victim_id;
 		$object->fk_user_employer = $user_employer_id;
 		$object->fk_user_creat    = $user->id > 0 ? $user->id : 1;
-
-		// Check parameters
-		if ($user_victim_id < 0) {
-			setEventMessages($langs->trans('ErrorFieldRequired', $langs->transnoentitiesnoconv('UserVictim')), [], 'errors');
-			$error++;
-		}
 
 		if ($user_employer_id < 0) {
 			setEventMessages($langs->trans('ErrorFieldRequired', $langs->transnoentitiesnoconv('UserEmployer')), [], 'errors');
@@ -762,15 +753,6 @@ if (($id || $ref) && $action == 'edit') {
 	print ' <a href="' . DOL_URL_ROOT . '/user/card.php?action=create&backtopage=' . urlencode($_SERVER["PHP_SELF"] . '?action=create') . '" target="_blank"><span class="fa fa-plus-circle valignmiddle paddingleft" title="' . $langs->trans("AddUser") . '"></span></a>';
 	print '</td></tr>';
 
-	//User Victim -- Utilisateur victime de l'accient
-	$userlist = $form->select_dolusers(( ! empty($object->fk_user_victim) ? $object->fk_user_victim : $user->id), '', 0, null, 0, '', '', $conf->entity, 0, 0, 'AND u.statut = 1', 0, '', 'minwidth300', 0, 1);
-	print '<tr>';
-	print '<td class="fieldrequired minwidth400" style="width:10%">' . img_picto('', 'user') . ' ' . $form->editfieldkey('UserVictim', 'UserVictim_id', '', $object, 0) . '</td>';
-	print '<td>';
-	print $form->selectarray('fk_user_victim', $userlist, ( ! empty($object->fk_user_victim) ? $object->fk_user_victim : $user->id), $langs->trans('SelectUser'), null, null, null, "40%", 0, 0, '', 'minwidth300', 1);
-	print ' <a href="' . DOL_URL_ROOT . '/user/card.php?action=create&backtopage=' . urlencode($_SERVER["PHP_SELF"] . '?action=create') . '" target="_blank"><span class="fa fa-plus-circle valignmiddle paddingleft" title="' . $langs->trans("AddUser") . '"></span></a>';
-	print '</td></tr>';
-
 	//AccidentType
 	print '<tr><td class="minwidth400">' . $langs->trans("AccidentType") . '</td><td>';
 	print $form->selectarray('accident_type', array('0' => $langs->trans('WorkAccidentStatement'), '1' => $langs->trans('CommutingAccident')), $object->accident_type, 0, 0, 0, '', 0, 0, 0, '', 'minwidth300', 1);
@@ -837,6 +819,8 @@ if (($id || $ref) && $action == 'edit') {
 if ((empty($action) || ($action != 'create' && $action != 'edit'))) {
 	$counter = 0;
 
+    $userVictim = $object->getUserVictim();
+
 	$morecssGauge     = 'inline-block floatright';
 	$move_title_gauge = 1;
 
@@ -857,7 +841,7 @@ if ((empty($action) || ($action != 'create' && $action != 'edit'))) {
 			$arrayAccident[] = $object->accident_location;
 			break;
 	}
-	$arrayAccident[] = $object->fk_user_victim;
+	$arrayAccident[] = $userVictim->id;
 
     $accidentLesions = $accidentLesion->fetchAll('', '', 0, 0, ['customsql' => 't.fk_accident = ' . $object->id]);
     $arrayAccident[] = (is_array($accidentLesions) && !empty($accidentLesions)) ? count($accidentLesions) : '';
@@ -955,7 +939,6 @@ if ((empty($action) || ($action != 'create' && $action != 'edit'))) {
 	unset($object->fields['accident_location']);
 	unset($object->fields['fk_soc']);
 	unset($object->fields['fk_user_employer']);
-	unset($object->fields['fk_user_victim']);
 	unset($object->fields['fk_element']);
 
 	//Label -- Libellé
@@ -982,10 +965,7 @@ if ((empty($action) || ($action != 'create' && $action != 'edit'))) {
 	print $form->textwithpicto($langs->trans("UserVictim"), $langs->trans("GaugeCounter"), 1, 'info');
 	print '</td>';
 	print '<td>';
-	$usertmp->fetch($object->fk_user_victim);
-	if ($usertmp > 0) {
-		print $usertmp->getNomUrl(1);
-	}
+    print $userVictim->getNomUrl(1);
 	print '</td></tr>';
 
 	//Accident type -- Type de l'accident
