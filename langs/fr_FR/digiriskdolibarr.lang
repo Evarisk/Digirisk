@@ -569,6 +569,7 @@ CloneWorkStop                     = Cloner les arrêts de travail ?
 CloneMetadata                     = Cloner les données complémentaires ?
 CloneLesion                       = Cloner les données complémentaires des lésions ?
 ClonePhotos                       = Cloner les photos ?
+CloneCategories                   = Cloner les tags/catégories ?
 CloneFrom                         = Clone de
 AccidentInvestigationLinked       = Enquête accident liée
 AccidentInvestigationRole         = Les rôles de l'enquête accident

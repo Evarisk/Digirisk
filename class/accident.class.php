@@ -312,7 +312,6 @@ class Accident extends SaturneObject
                     foreach ($categories as $cat) {
                         $categoryIds[] = $cat->id;
                     }
-                    $object->fetch($accidentId);
                     $object->setCategories($categoryIds);
                 }
             }
