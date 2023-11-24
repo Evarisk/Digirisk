@@ -112,6 +112,15 @@ class doc_registerdocument_odt extends SaturneDocumentModel
             $accidentList = $accident->fetchAll('', '', 0, 0, ['customsql' => 'fk_ticket > 0']);
             $tempDir     = $conf->$moduleNameLowerCase->multidir_output[$conf->entity ?? 1] . '/temp/';
 
+            $accidentTicketIds = '';
+
+            if (is_array($accidentList) && !empty($accidentList)) {
+                foreach ($accidentList as $accidentSingle) {
+                    $accidentTicketIds .= $accidentSingle->fk_ticket . ', ';
+                }
+                $accidentTicketIds = rtrim($accidentTicketIds, ', ');
+            }
+
             // Get register first tab data.
             $foundTagForLines = 1;
             try {
@@ -256,6 +265,56 @@ class doc_registerdocument_odt extends SaturneDocumentModel
                 $odfHandler->mergeSegment($listLines);
             }
 
+            // Get register controllers.
+            try {
+                $listLines = $odfHandler->setSegment('controllers');
+            } catch (OdfException $e) {
+                // We may arrive here if tags for lines not present into template.
+                $foundTagForLines = 0;
+                $listLines = '';
+                dol_syslog($e->getMessage());
+            }
+
+            if ($foundTagForLines) {
+                if (isModEnabled('digiquali')) {
+                    require_once __DIR__ . '/../../../../../../digiquali/class/control.class.php';
+                    $control = new Control($this->db);
+                    $ticketControls = $control->fetchAllWithLeftJoin('DESC','t.control_date', 0,0, ['customsql' => 't.rowid = je.fk_target AND t.status = ' . $control::STATUS_LOCKED], 'AND', true, 'LEFT JOIN '. MAIN_DB_PREFIX .'element_element as je on je.sourcetype = "ticket" AND je.fk_source IN ('. $accidentTicketIds .') AND je.targettype = "digiquali_control" AND je.fk_target = t.rowid' );
+
+                    if (is_array($ticketControls) && !empty($ticketControls)) {
+                        foreach($ticketControls as $ticketControl) {
+                            $ticketController = $signatory->fetchSignatory('Controller', $ticketControl->id, 'control');
+
+                            if (is_array($ticketController) && !empty($ticketController)) {
+                                $ticketController = array_shift($ticketController);
+                                $tmpArray['register_controller_id'] = $ticketController->id;
+                                $tmpArray['register_controller_lastname'] = $ticketController->lastname;
+                                $tmpArray['register_controller_firstname'] = $ticketController->firstname;
+                                $tmpArray['register_controller_society'] = $conf->global->MAIN_INFO_SOCIETE_NOM;
+                                $tmpArray['register_controller_date'] = dol_print_date($ticketControl->control_date);
+                                $encodedImage = explode(',', $ticketController->signature)[1];
+                                $decodedImage = base64_decode($encodedImage);
+                                file_put_contents($tempDir . 'signature' . $ticketController->id . '.png', $decodedImage);
+                                $tmpArray['register_controller_signature'] = $tempDir . 'signature' . $ticketController->id . '.png';
+
+                                $tmpArray['register_controller_note'] = $ticketControl->note_public;
+
+                                $this->setTmpArrayVars($tmpArray, $listLines, $outputLangs);
+                            }
+                        }
+                    } else {
+                        $tmpArray['register_controller_id'] = '';
+                        $tmpArray['register_controller_lastname'] = '';
+                        $tmpArray['register_controller_firstname'] = '';
+                        $tmpArray['register_controller_society'] = '';
+                        $tmpArray['register_controller_date'] = '';
+                        $tmpArray['register_controller_signature'] = '';
+                        $tmpArray['register_controller_note'] = '';
+                    }
+                }
+                $odfHandler->mergeSegment($listLines);
+            }
+
         } catch (OdfException $e) {
             $this->error = $e->getMessage();
             dol_syslog($this->error, LOG_WARNING);
@@ -298,14 +357,6 @@ class doc_registerdocument_odt extends SaturneDocumentModel
 
         $tmpArray['company_nb_employees'] = array_shift($arrayNbEmployees);
         $tmpArray['total_page_nb'] = 6;
-
-        $tmpArray['register_controller_id'] = '';
-        $tmpArray['register_controller_lastname'] = '';
-        $tmpArray['register_controller_firstname'] = '';
-        $tmpArray['register_controller_society'] = '';
-        $tmpArray['register_controller_date'] = '';
-        $tmpArray['register_controller_signature'] = '';
-        $tmpArray['register_controller_note'] = '';
 
         $moreParam['tmparray'] = $tmpArray;
 
