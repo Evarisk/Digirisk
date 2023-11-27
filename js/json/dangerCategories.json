@@ -107,5 +107,10 @@
     "name": "Risques autres",
     "thumbnail_name": "autre_PictoCategorie_v2",
     "position": 21
+  },
+  {
+    "name": "Risques liés aux pratiques addictives",
+    "thumbnail_name": "pratiques_addictives_PictoCategorie_v2",
+    "position": 22
   }
 ]
