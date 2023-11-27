@@ -60,20 +60,20 @@
 									<div class="cotation-standard" style="<?php echo ($lastEvaluation->method == "standard") ? " display:block" : " display:none" ?>">
 										<span class="title"><i class="fas fa-chart-line"></i><?php echo ' ' . $langs->trans('RiskAssessment'); ?></span>
 										<div class="cotation-listing wpeo-gridlayout grid-4 grid-gap-0">
-											<?php
-											$defaultCotation = array(0, 48, 51, 100);
-											if ( ! empty($defaultCotation)) :
-												foreach ($defaultCotation as $request) :
-													$evaluation->cotation = $request; ?>
-													<div data-id="<?php echo 0; ?>"
-														 data-evaluation-method="standard"
-														 data-evaluation-id="<?php echo $request; ?>"
-														 data-variable-id="<?php echo 152 + $request; ?>"
-														 data-seuil="<?php echo  $evaluation->getEvaluationScale(); ?>"
-														 data-scale="<?php echo  $evaluation->getEvaluationScale(); ?>"
-														 class="risk-evaluation-cotation cotation<?php echo ($lastEvaluation->cotation == $request) ? " selected-cotation" : "" ?>"><?php echo $request; ?></div>
-												<?php endforeach;
-											endif; ?>
+                                            <?php
+                                            $defaultCotation = array(0 => '0-47', 48 => '48-50', 51 => '51-80', 100 => '81-100');
+                                            if ( ! empty($defaultCotation)) :
+                                                foreach ($defaultCotation as $cotation => $shownCotation) :
+                                                    $evaluation->cotation = $cotation; ?>
+                                                    <div data-id="<?php echo 0; ?>"
+                                                         data-evaluation-method="standard"
+                                                         data-evaluation-id="<?php echo $cotation; ?>"
+                                                         data-variable-id="<?php echo 152 + $cotation; ?>"
+                                                         data-seuil="<?php echo  $evaluation->getEvaluationScale(); ?>"
+                                                         data-scale="<?php echo  $evaluation->getEvaluationScale(); ?>"
+                                                         class="risk-evaluation-cotation cotation<?php echo ($lastEvaluation->cotation == $cotation) ? " selected-cotation" : "" ?>"><?php echo $shownCotation; ?></div>
+                                                <?php endforeach;
+                                            endif; ?>
 										</div>
 									</div>
 								<?php endif; ?>

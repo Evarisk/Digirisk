@@ -89,8 +89,9 @@ window.digiriskdolibarr.evaluation.selectSeuil = function( event ) {
 	var elementParent = $(this).closest('.modal-container')
 	var seuil         = element.data( 'seuil' );
 	var variableID    = element.data( 'variable-id' );
+  var cotationValue = element.data( 'evaluation-id');
 
-	element.closest('.cotation-container').find('.risk-evaluation-seuil').val($( this ).text());
+	element.closest('.cotation-container').find('.risk-evaluation-seuil').val(cotationValue);
 	element.closest('.cotation-container').find('.selected-cotation').removeClass('selected-cotation')
 	element.addClass('selected-cotation')
 
