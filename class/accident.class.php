@@ -537,7 +537,7 @@ class Accident extends SaturneObject
 
         if (is_array($accidentList) && !empty($accidentList)) {
             foreach($accidentList as $accident) {
-                $accidentDate = getdate($accident->date_creation);
+                $accidentDate = getdate($accident->accident_date);
                 $yearKey = $accidentDate['year'];
                 $monthKey = $accidentDate['mon'];
                 $accidentsByYear[$yearKey][$monthKey - 1] += 1;
