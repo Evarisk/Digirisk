@@ -99,18 +99,18 @@
     "position": 19
   },
   {
+    "name": "Risques liés aux pratiques addictives",
+    "thumbnail_name": "pratiques_addictives_PictoCategorie_v2",
+    "position": 20
+  },
+  {
     "name": "Risques liés à l'amiante",
     "thumbnail_name": "amiante_v2",
-    "position": 20
+    "position": 21
   },
   {
     "name": "Risques autres",
     "thumbnail_name": "autre_PictoCategorie_v2",
-    "position": 21
-  },
-  {
-    "name": "Risques liés aux pratiques addictives",
-    "thumbnail_name": "pratiques_addictives_PictoCategorie_v2",
     "position": 22
   }
 ]
