@@ -402,43 +402,47 @@ class ActionsDigiriskdolibarr
 					}
 				}
 
-				if (in_array($parameters['currentcontext'], array('projectcard', 'projectcontactcard', 'projecttaskscard', 'projecttasktime', 'projectOverview'))) {
-					if ($parameters['currentcontext'] == 'projecttasktime') {
-						$project->fetch(GETPOST('projectid'), GETPOST('project_ref'));
-					} else {
-						$project->fetch(GETPOST('id'), GETPOST('ref'));
+				if (in_array($parameters['currentcontext'], ['projectcard', 'projectcontactcard', 'projecttaskcard', 'projecttaskscard', 'projecttasktime', 'projectOverview'])) {
+					if (GETPOSTISSET('projectid') || GETPOSTISSET('project_ref')) {
+                        $project->fetch( GETPOST('projectid'), GETPOST('project_ref'));
+                        $projectId = $project->id;
+                    } else if (in_array($parameters['currentcontext'], ['projectcard', 'projectcontactcard', 'projecttaskscard'])) {
+                        $projectId = GETPOST('id');
+                    } else {
+                        $task->fetch(GETPOST('id'));
+                        $projectId = $task->fk_project;
 					}
-					$alltasks = $task->getTasksArray(null, null, $project->id, 0, 0, '', '-1', '', 0, 0, $extrafields);
-					if (is_array($alltasks) && !empty($alltasks)) {
-						$nbtasks = count($alltasks);
-						foreach ($alltasks as $tasksignle) {
-							$filter = ' AND fk_element = ' . $tasksignle->id;
-							$alltimespent = $task->fetchAllTimeSpentAllUsers($filter);
-							foreach ($alltimespent as $timespent) {
-								$totatconsumedtimeamount += convertSecondToTime($timespent->timespent_duration, 'allhourmin') * $timespent->timespent_thm;
+					$allTasks = $task->getTasksArray(null, null, $projectId, 0, 0, '', '-1', '', 0, 0, $extrafields);
+                    if (is_array($allTasks) && !empty($allTasks)) {
+						$nbTasks = count($allTasks);
+						foreach ($allTasks as $taskSingle) {
+							$filter       = ' AND fk_element = ' . $taskSingle->id;
+							$allTimespent = $task->fetchAllTimeSpentAllUsers($filter);
+							foreach ($allTimespent as $timespent) {
+								$totatConsumedTimeAmount += convertSecondToTime($timespent->timespent_duration, 'allhourmin') * $timespent->timespent_thm;
 							}
-							$totatconsumedtime += $tasksignle->duration;
-							$totalprogress += $tasksignle->progress;
-							$totaltasksbudget += $tasksignle->budget_amount;
+							$totalConsumedTime += $taskSingle->duration;
+							$totalProgress     += $taskSingle->progress;
+							$totalTasksBudget  += $taskSingle->budget_amount;
 						}
 					} else {
-						$totatconsumedtime = 0;
-						$totatconsumedtimeamount = 0;
-						$nbtasks = 0;
-						$totalprogress = 0;
-						$totaltasksbudget = 0;
+						$totalConsumedTime       = 0;
+						$totatConsumedTimeAmount = 0;
+						$nbTasks                 = 0;
+						$totalProgress           = 0;
+						$totalTasksBudget        = 0;
 					}
-					$outTotatconsumedtime = '<tr><td>' . $langs->trans('TotalConsumedTime') . '</td><td>' . convertSecondToTime($totatconsumedtime, 'allhourmin') . '</td></tr>';
-					$outTotatconsumedtimeamount = '<tr><td>' . $langs->trans('TotalConsumedTimeAmount') . '</td><td>' . price($totatconsumedtimeamount, 0, $langs, 1, -1, 2, $conf->currency) . '</td></tr>';
-					$outNbtasks = '<tr><td>' . $langs->trans('NbTasks') . '</td><td>' . $nbtasks . '</td></tr>';
-					$outTotalprogress = '<tr><td>' . $langs->trans('TotalProgress') . '</td><td>' . (($totalprogress) ? price2num($totalprogress/$nbtasks, 2) . ' %' : '0 %') . '</td></tr>';
-					$outTotaltasksbudget = '<tr><td>' . $langs->trans('TotalBudget') . '</td><td>' . price($totaltasksbudget, 0, $langs, 1, -1, 2, $conf->currency) . '</td></tr>'; ?>
+					$outTotatConsumedTime       = '<tr><td>' . $langs->trans('TotalConsumedTime') . '</td><td>' . convertSecondToTime($totalConsumedTime, 'allhourmin') . '</td></tr>';
+					$outTotatConsumedTimeAmount = '<tr><td>' . $langs->trans('TotalConsumedTimeAmount') . '</td><td>' . price($totatConsumedTimeAmount, 0, $langs, 1, -1, 2, $conf->currency) . '</td></tr>';
+					$outNbtasks                 = '<tr><td>' . $langs->trans('NbTasks') . '</td><td>' . $nbTasks . '</td></tr>';
+					$outTotalProgress           = '<tr><td>' . $langs->trans('TotalProgress') . '</td><td>' . (($totalProgress) ? price2num($totalProgress/$nbTasks, 2) . ' %' : '0 %') . '</td></tr>';
+					$outTotalTasksBudget        = '<tr><td>' . $langs->trans('TotalBudget') . '</td><td>' . price($totalTasksBudget, 0, $langs, 1, -1, 2, $conf->currency) . '</td></tr>'; ?>
 					<script>
-						jQuery('.fichecenter .fichehalfright .tableforfield tbody tr:last-child').first().after(<?php echo json_encode($outTotatconsumedtime) ?>);
-						jQuery('.fichecenter .fichehalfright .tableforfield tbody tr:last-child').first().after(<?php echo json_encode($outTotatconsumedtimeamount) ?>);
+						jQuery('.fichecenter .fichehalfright .tableforfield tbody tr:last-child').first().after(<?php echo json_encode($outTotatConsumedTime) ?>);
+						jQuery('.fichecenter .fichehalfright .tableforfield tbody tr:last-child').first().after(<?php echo json_encode($outTotatConsumedTimeAmount) ?>);
 						jQuery('.fichecenter .fichehalfright .tableforfield tbody tr:last-child').first().after(<?php echo json_encode($outNbtasks) ?>);
-						jQuery('.fichecenter .fichehalfright .tableforfield tbody tr:last-child').first().after(<?php echo json_encode($outTotalprogress) ?>);
-						jQuery('.fichecenter .fichehalfright .tableforfield tbody tr:last-child').first().after(<?php echo json_encode($outTotaltasksbudget) ?>);
+						jQuery('.fichecenter .fichehalfright .tableforfield tbody tr:last-child').first().after(<?php echo json_encode($outTotalProgress) ?>);
+						jQuery('.fichecenter .fichehalfright .tableforfield tbody tr:last-child').first().after(<?php echo json_encode($outTotalTasksBudget) ?>);
 					</script>
 					<?php
 				}
