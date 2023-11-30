@@ -1,7 +1,7 @@
 <!-- RISK EVALUATION SINGLE START -->
 <?php if ($showSingle > 0) : ?>
 
-<div class="risk-evaluation-container risk-evaluation-container-<?php echo $lastEvaluation->id ?>" value="<?php echo $risk->id ?>">
+<div class="risk-evaluation-container risk-evaluation-container-<?php echo $lastEvaluation->id ?> maxwidth400" value="<?php echo $risk->id ?>">
 	<div class="risk-evaluation-single-content risk-evaluation-single-content-<?php echo $risk->id ?>">
 		<div class="risk-evaluation-single risk-evaluation-single-<?php echo $risk->id ?>">
 			<div class="risk-evaluation-cotation risk-evaluation-list modal-open" value="<?php echo $risk->id ?>" data-scale="<?php echo $lastEvaluation->getEvaluationScale() ?>">
@@ -24,7 +24,7 @@
 						echo getNomUrlUser($userAuthor); ?>
 					</span>
 				</div>
-				<div class="risk-evaluation-comment">
+				<div class="risk-evaluation-comment wordbreak">
 					<?php print nl2br(dol_trunc($lastEvaluation->comment, 120)); ?>
 				</div>
 			</div>

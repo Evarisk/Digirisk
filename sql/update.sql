@@ -239,3 +239,4 @@ DROP TABLE llx_categorie_accident_investigation;
 -- 9.14.0
 UPDATE llx_digiriskdolibarr_risk SET category = 21 WHERE category = 20;
 UPDATE llx_digiriskdolibarr_risk SET category = 22 WHERE category = 21;
+ALTER TABLE llx_digiriskdolibarr_accident ADD fk_ticket integer;

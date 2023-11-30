@@ -65,7 +65,6 @@ class AccidentInvestigation extends SaturneObject
 	public const STATUS_DRAFT      = 0;
 	public const STATUS_VALIDATED  = 1;
     public const STATUS_LOCKED     = 2;
-    public const STATUS_CLASSIFIED = 3;
 	public const STATUS_ARCHIVED   = 3;
 
 	/**
@@ -118,7 +117,7 @@ class AccidentInvestigation extends SaturneObject
 		'date_creation'         => ['type' => 'datetime',     'label' => 'DateCreation',           'enabled' => 1, 'position' => 40,  'notnull' => 1, 'visible' => 2,],
 		'tms'                   => ['type' => 'timestamp',    'label' => 'DateModification',       'enabled' => 1, 'position' => 50,  'notnull' => 0, 'visible' => 0,],
 		'import_key'            => ['type' => 'varchar(14)',  'label' => 'ImportId',               'enabled' => 1, 'position' => 60,  'notnull' => 0, 'visible' => 0, 'index' => 0],
-		'status'                => ['type' => 'smallint',     'label' => 'Status',                 'enabled' => 1, 'position' => 70,  'notnull' => 1, 'visible' => 2, 'noteditable' => 1, 'default' => 0, 'index' => 0, 'arrayofkeyval' => [0 => 'InProgress', 1 => 'Validated', 3 => 'Classified']],
+		'status'                => ['type' => 'smallint',     'label' => 'Status',                 'enabled' => 1, 'position' => 70,  'notnull' => 1, 'visible' => 2, 'noteditable' => 1, 'default' => 0, 'index' => 0, 'arrayofkeyval' => [0 => 'InProgress', 1 => 'Validated', 2 => 'Locked', 3 => 'Archived']],
 		'seniority_in_position' => ['type' => 'varchar(255)', 'label' => 'SeniorityInPosition',    'enabled' => 1, 'position' => 80,  'notnull' => 0, 'visible' => 1, 'css' => 'maxwidth200'],
 		'date_start'            => ['type' => 'datetime',     'label' => 'StartDate',              'enabled' => 1, 'position' => 90,  'notnull' => 0, 'visible' => 1,],
 		'date_end'              => ['type' => 'datetime',     'label' => 'EndDate',                'enabled' => 1, 'position' => 100, 'notnull' => 0, 'visible' => 1,],
@@ -437,24 +436,29 @@ class AccidentInvestigation extends SaturneObject
 		if (empty($this->labelStatus) || empty($this->labelStatusShort)) {
 			global $langs;
 
-			$this->labelStatus[self::STATUS_DRAFT]      = $langs->transnoentitiesnoconv('StatusDraft');
-			$this->labelStatus[self::STATUS_VALIDATED]  = $langs->transnoentitiesnoconv('Validated');
-			$this->labelStatus[self::STATUS_CLASSIFIED] = $langs->transnoentitiesnoconv('Classified');
-			$this->labelStatus[self::STATUS_DELETED]    = $langs->transnoentitiesnoconv('Deleted');
+			$this->labelStatus[self::STATUS_DRAFT]     = $langs->transnoentitiesnoconv('StatusDraft');
+            $this->labelStatus[self::STATUS_VALIDATED] = $langs->transnoentitiesnoconv('Validated');
+            $this->labelStatus[self::STATUS_LOCKED]    = $langs->transnoentitiesnoconv('Locked');
+			$this->labelStatus[self::STATUS_ARCHIVED]  = $langs->transnoentitiesnoconv('Archived');
+			$this->labelStatus[self::STATUS_DELETED]   = $langs->transnoentitiesnoconv('Deleted');
 
-			$this->labelStatusShort[self::STATUS_DRAFT]      = $langs->transnoentitiesnoconv('StatusDraft');
-			$this->labelStatusShort[self::STATUS_VALIDATED]  = $langs->transnoentitiesnoconv('Validated');
-			$this->labelStatusShort[self::STATUS_CLASSIFIED] = $langs->transnoentitiesnoconv('Classified');
-			$this->labelStatusShort[self::STATUS_DELETED]    = $langs->transnoentitiesnoconv('Deleted');
+			$this->labelStatusShort[self::STATUS_DRAFT]     = $langs->transnoentitiesnoconv('StatusDraft');
+            $this->labelStatusShort[self::STATUS_VALIDATED] = $langs->transnoentitiesnoconv('Validated');
+            $this->labelStatusShort[self::STATUS_LOCKED]    = $langs->transnoentitiesnoconv('Locked');
+			$this->labelStatusShort[self::STATUS_ARCHIVED]  = $langs->transnoentitiesnoconv('Archived');
+			$this->labelStatusShort[self::STATUS_DELETED]   = $langs->transnoentitiesnoconv('Deleted');
 		}
 
 		$statusType = 'status' . $status;
 		if ($status == self::STATUS_VALIDATED) {
 			$statusType = 'status4';
 		}
-		if ($status == self::STATUS_CLASSIFIED) {
-			$statusType = 'status8';
-		}
+        if ($status == self::STATUS_LOCKED) {
+            $statusType = 'status6';
+        }
+        if ($status == self::STATUS_ARCHIVED) {
+            $statusType = 'status8';
+        }
 		if ($status == self::STATUS_DELETED) {
 			$statusType = 'status9';
 		}
