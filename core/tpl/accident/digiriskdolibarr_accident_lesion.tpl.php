@@ -76,7 +76,7 @@ if (!empty($accidentlines) && $accidentlines > 0) {
             $coldisplay += $colspan;
 
             //Actions buttons
-            if ($object->status == 1) {
+            if ($object->status == $object::STATUS_DRAFT) {
                 print '<td class="center">';
                 $coldisplay++;
                 print '<a href="' . $_SERVER["PHP_SELF"] . '?id=' . $id . '&amp;action=editLesion&amp;lineid=' . $item->id . '" style="padding-right: 20px"><i class="fas fa-pencil-alt" style="color: #666"></i></a>';
