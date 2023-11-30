@@ -32,6 +32,7 @@ require_once DOL_DOCUMENT_ROOT . '/categories/class/categorie.class.php';
 require_once __DIR__ . '/../../../../../class/digiriskelement.class.php';
 
 // Load saturne libraries
+require_once __DIR__ . '/../../../../../../saturne/lib/medias.lib.php';
 require_once __DIR__ . '/../../../../../../saturne/core/modules/saturne/modules_saturne.php';
 
 /**
@@ -138,124 +139,104 @@ class doc_ticketdocument_odt extends SaturneDocumentModel
 		return 0;
 	}
 
-	/**
-	 * Function to build a document on disk.
-	 *
-	 * @param SaturneDocuments $objectDocument Object source to build document.
-	 * @param Translate $outputLangs Lang object to use for output.
-	 * @param string $srcTemplatePath Full path of source filename for generator using a template file.
-	 * @param int $hideDetails Do not show line details.
-	 * @param int $hideDesc Do not show desc.
-	 * @param int $hideRef Do not show ref.
-	 * @param array $moreParam More param (Object/user/etc).
-	 * @return int                               1 if OK, <=0 if KO.
-	 * @throws Exception
-	 */
-	public function write_file(SaturneDocuments $objectDocument, Translate $outputLangs, string $srcTemplatePath, int $hideDetails = 0,	int $hideDesc = 0, int $hideRef = 0, array $moreParam): int {
+    /**
+     * Function to build a document on disk
+     *
+     * @param  SaturneDocuments $objectDocument  Object source to build document
+     * @param  Translate        $outputLangs     Lang object to use for output
+     * @param  string           $srcTemplatePath Full path of source filename for generator using a template file
+     * @param  int              $hideDetails     Do not show line details
+     * @param  int              $hideDesc        Do not show desc
+     * @param  int              $hideRef         Do not show ref
+     * @param  array            $moreParam       More param (Object/user/etc)
+     * @return int                               1 if OK, <=0 if KO
+     * @throws Exception
+     */
+    public function write_file(SaturneDocuments $objectDocument, Translate $outputLangs, string $srcTemplatePath, int $hideDetails = 0, int $hideDesc = 0, int $hideRef = 0, array $moreParam): int
+    {
+        global $conf;
 
-		$ticket = $moreParam['object'];
+        $object = $moreParam['object'];
 
-		$ticket->fetch_optionals();
-		$digiriskelement = new DigiriskElement($this->db);
+        $object->fetch_optionals();
 
-		$tmpArray['ref'] = $ticket->ref;
-		$tmpArray['lastname'] = $ticket->array_options['options_digiriskdolibarr_ticket_lastname'];
-		$tmpArray['firstname'] = $ticket->array_options['options_digiriskdolibarr_ticket_firstname'];
-		$tmpArray['phone_number'] = $ticket->array_options['options_digiriskdolibarr_ticket_phone'];
-		if ($ticket->array_options['options_digiriskdolibarr_ticket_service'] > 0) {
-			$digiriskelement->fetch($ticket->array_options['options_digiriskdolibarr_ticket_service']);
-			$tmpArray['service'] = $digiriskelement->ref . ' - ' . $digiriskelement->label;
-		} else {
-			$tmpArray['service'] = '';
-		}
-		$tmpArray['location'] = $ticket->array_options['options_digiriskdolibarr_ticket_location'];
-		$tmpArray['declaration_date'] = dol_print_date(
-			$ticket->array_options['options_digiriskdolibarr_ticket_date'],
-			'dayhoursec',
-			'tzuser'
-		);
-		$tmpArray['creation_date'] = dol_print_date($ticket->date_creation, 'dayhoursec', 'tzuser');
-		$tmpArray['close_date'] = dol_print_date($ticket->date_close, 'dayhoursec', 'tzuser');
-		$tmpArray['progress'] = !empty($ticket->progress) ? $ticket->progress . ' %' : '0 %';
+        $digiriskElement = new DigiriskElement($this->db);
+        $category        = new Categorie($this->db);
+        $userTmp         = new User($this->db);
 
-		$category = new Categorie($this->db);
-		$categories = $category->containing($ticket->id, Categorie::TYPE_TICKET);
-		if (!empty($categories)) {
-			foreach ($categories as $cat) {
-				$allcategories[] = $cat->label;
-			}
-			$tmpArray['categories'] = implode(', ', $allcategories);
-		} else {
-			$tmpArray['categories'] = '';
-		}
+        $tmpArray['ref']          = $object->ref;
+        $tmpArray['lastname']     = $object->array_options['options_digiriskdolibarr_ticket_lastname'];
+        $tmpArray['firstname']    = $object->array_options['options_digiriskdolibarr_ticket_firstname'];
+        $tmpArray['phone_number'] = $object->array_options['options_digiriskdolibarr_ticket_phone'];
+        if ($object->array_options['options_digiriskdolibarr_ticket_service'] > 0) {
+            $digiriskElement->fetch($object->array_options['options_digiriskdolibarr_ticket_service']);
+            $tmpArray['service'] = $digiriskElement->ref . ' - ' . $digiriskElement->label;
+        } else {
+            $tmpArray['service'] = '';
+        }
+        $tmpArray['location']         = $object->array_options['options_digiriskdolibarr_ticket_location'];
+        $tmpArray['declaration_date'] = dol_print_date($object->array_options['options_digiriskdolibarr_ticket_date'],'dayhoursec','tzuser');
+        $tmpArray['creation_date']    = dol_print_date($object->date_creation, 'dayhoursec', 'tzuser');
+        $tmpArray['close_date']       = dol_print_date($object->date_close, 'dayhoursec', 'tzuser');
+        $tmpArray['progress']         = !empty($object->progress) ? $object->progress . ' %' : '0 %';
 
-		$tmpArray['status'] = $ticket->getLibStatut();
+        $categories = $category->containing($object->id, Categorie::TYPE_TICKET);
+        if (!empty($categories)) {
+            foreach ($categories as $cat) {
+                $allCategories[] = $cat->label;
+            }
+            $tmpArray['categories'] = implode(', ', $allCategories);
+        } else {
+            $tmpArray['categories'] = '';
+        }
 
-		$user = new User($this->db);
-		$user->fetch($ticket->fk_user_assign);
-		$tmpArray['assigned_to'] = $user->firstname . ' ' . $user->lastname;
+        $tmpArray['status'] = $object->getLibStatut();
 
+        $userTmp->fetch($object->fk_user_assign);
+        $tmpArray['assigned_to'] = ucfirst($userTmp->firstname) . ' ' . strtoupper($userTmp->lastname);
 
-		require_once DOL_DOCUMENT_ROOT . '/ecm/class/ecmfiles.class.php';
+        $photoPath = $conf->ticket->multidir_output[$conf->entity] . '/' . $object->ref;
+        $fileArray = dol_dir_list($photoPath, 'files', 0, '', '(\.odt|_preview.*\.png|\.pdf)$', 'date', 'desc', 1);
+        if (count($fileArray) && !empty($fileArray)) {
+            $fileArray         = dol_sort_array($fileArray, 'position');
+            $thumbName         = saturne_get_thumb_name($fileArray[0]['name']);
+            $tmpArray['photo'] = $photoPath . '/thumbs/' . $thumbName;
+        } else {
+            $noPhoto           = '/public/theme/common/nophoto.png';
+            $tmpArray['photo'] = DOL_DOCUMENT_ROOT . $noPhoto;
+        }
 
-		$photo_path = $conf->ticket->multidir_output[$conf->entity] . '/' . $ticket->ref;
-		$filearray = dol_dir_list($photo_path, "files", 0, '', '(\.odt|_preview.*\.png|\.pdf)$', 'date', 'desc', 1);
-		if ($photo_path) {
-			$relativedir = preg_replace('/^'.preg_quote(DOL_DATA_ROOT, '/').'/', '', $photo_path);
-			$relativedir = preg_replace('/^[\\/]/', '', $relativedir);
-		}
+        $tmpArray['subject']         = $object->subject;
+        $tmpArray['message']         = dol_htmlentitiesbr_decode(strip_tags($object->message, '<br>'));
+        $tmpArray['generation_date'] = dol_print_date(dol_now(), 'dayhoursec', 'tzuser');
 
-		if (count($filearray)) {
-			$filearray = dol_sort_array($filearray, 'position');
-			$thumb_name = getThumbName($filearray[0]['name']);
-			$tmpArray['photo'] = $photo_path . '/thumbs/' . $thumb_name;
-		} else {
-			$nophoto = '/public/theme/common/nophoto.png';
-			$tmpArray['photo'] = DOL_DOCUMENT_ROOT . $nophoto;
-		}
+        $contactListExternal = $object->liste_contact(-1, 'external');
+        $contactListInternal = $object->liste_contact(-1, 'internal');
 
-		$tmpArray['subject'] = $ticket->subject;
-		$tmpArray['message'] = dol_htmlentitiesbr_decode(strip_tags($ticket->message, '<br>'));
-		$tmpArray['generation_date'] = dol_print_date(dol_now(), 'dayhoursec', 'tzuser');
+        $contactList = [];
+        if (!empty($contactListExternal) && is_array($contactListExternal)) {
+            $contactList = array_merge($contactList, $contactListExternal);
+        }
+        if (!empty($contactListInternal) && is_array($contactListInternal)) {
+            $contactList = array_merge($contactList, $contactListInternal);
+        }
+        if (!empty($contactList) && is_array($contactList)) {
+            foreach ($contactList as $contact) {
+                $tmpArray['contacts'] .= ucfirst($contact['firstname']) . ' ' . strtoupper($contact['lastname']) . ', ';
+            }
+        } else {
+            $tmpArray['contacts'] = '';
+        }
 
-		$contactlistexternal = $ticket->liste_contact(-1, 'external');
-		$contactlistinternal = $ticket->liste_contact(-1, 'internal');
+        $moreParam['tmparray']         = $tmpArray;
+        $moreParam['objectDocument']   = $objectDocument;
+        $moreParam['subDir']           = 'digiriskdolibarrdocuments/';
+        $moreParam['hideTemplateName'] = 1;
 
-		$contactlist = array();
+        if (preg_match('/event/', $srcTemplatePath)) {
+            $moreParam['additionalName'] = '_events';
+        }
 
-		if (!empty($contactlistexternal) && is_array($contactlistexternal)) {
-			$contactlist = array_merge($contactlist, $contactlistexternal);
-		}
-
-		if (!empty($contactlistinternal) && is_array($contactlistinternal)) {
-			$contactlist = array_merge($contactlist, $contactlistinternal);
-		}
-
-		if (!empty($contactlist) && is_array($contactlist)) {
-			foreach ($contactlist as $contact) {
-				$tmpArray['contacts'] .= $contact['firstname'] . ' ' . $contact['lastname'] . ', ';
-			}
-		} else {
-			$tmpArray['contacts'] = '';
-		}
-
-		$moreParam['tmparray']         = $tmpArray;
-		$moreParam['objectDocument']   = $objectDocument;
-		$moreParam['subDir']           = 'digiriskdolibarrdocuments/';
-		$moreParam['hideTemplateName'] = 1;
-
-		if (preg_match('/event/', $srcTemplatePath)) {
-			$moreParam['additionalName'] = '_events';
-		}
-
-		return parent::write_file(
-			$objectDocument,
-			$outputLangs,
-			$srcTemplatePath,
-			$hideDetails,
-			$hideDesc,
-			$hideRef,
-			$moreParam
-		);
-	}
+        return parent::write_file($objectDocument, $outputLangs, $srcTemplatePath, $hideDetails, $hideDesc, $hideRef, $moreParam);
+    }
 }
