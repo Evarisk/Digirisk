@@ -523,6 +523,7 @@ AccidentMetaDataLesion            = Données complémentaires des lésions
 TotalWorkStopDays                 = Nombre total de jours d'arrêt de travail
 RegisterAccident                  = Accident bénin
 AccidentLinked                    = Accident lié
+AccidentsLinked                   = Accident(s) lié(s)
 GaugeCounter                      = Ce champ est utilisé dans le compteur de la jauge
 DateStartWorkStop                 = Date de début d'arrêt de travail
 DateEndWorkStop                   = Date de fin d'arrêt de travail
