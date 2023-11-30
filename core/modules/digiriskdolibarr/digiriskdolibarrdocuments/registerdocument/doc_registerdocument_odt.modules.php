@@ -372,7 +372,6 @@ class doc_registerdocument_odt extends SaturneDocumentModel
         $arrayNbEmployees = $evaluator->getNbEmployees();
 
         $tmpArray['company_nb_employees'] = array_shift($arrayNbEmployees);
-        $tmpArray['total_page_nb'] = 6;
 
         $moreParam['tmparray'] = $tmpArray;
 
