@@ -241,6 +241,7 @@ class doc_registerdocument_odt extends SaturneDocumentModel
                 if (is_array($accidentList) && !empty($accidentList)) {
                     foreach($accidentList as $accidentSingle) {
                         $accidentCaregivers = $signatory->fetchSignatory('Caregiver', $accidentSingle->id, 'accident');
+
                         if (is_array($accidentCaregivers) && !empty($accidentCaregivers)) {
                             foreach($accidentCaregivers as $accidentCaregiver) {
                                 $tmpArray['caregiver_id'] = $accidentCaregiver->id;
@@ -259,8 +260,22 @@ class doc_registerdocument_odt extends SaturneDocumentModel
 
                                 $this->setTmpArrayVars($tmpArray, $listLines, $outputLangs);
                             }
+                        } else {
+                            $tmpArray['caregiver_id'] = '';
+                            $tmpArray['caregiver_lastname'] = '';
+                            $tmpArray['caregiver_firstname'] = '';
+                            $tmpArray['caregiver_qualification'] = '';
+                            $tmpArray['caregiver_signature'] = '';
+                            $this->setTmpArrayVars($tmpArray, $listLines, $outputLangs);
                         }
                     }
+                } else {
+                    $tmpArray['caregiver_id'] = '';
+                    $tmpArray['caregiver_lastname'] = '';
+                    $tmpArray['caregiver_firstname'] = '';
+                    $tmpArray['caregiver_qualification'] = '';
+                    $tmpArray['caregiver_signature'] = '';
+                    $this->setTmpArrayVars($tmpArray, $listLines, $outputLangs);
                 }
                 $odfHandler->mergeSegment($listLines);
             }
@@ -310,6 +325,7 @@ class doc_registerdocument_odt extends SaturneDocumentModel
                         $tmpArray['register_controller_date'] = '';
                         $tmpArray['register_controller_signature'] = '';
                         $tmpArray['register_controller_note'] = '';
+                        $this->setTmpArrayVars($tmpArray, $listLines, $outputLangs);
                     }
                 }
                 $odfHandler->mergeSegment($listLines);
