@@ -31,6 +31,7 @@ require_once __DIR__ . '/../../saturne/class/saturnesignature.class.php';
 
 require_once __DIR__ . '/../lib/digiriskdolibarr_function.lib.php';
 require_once __DIR__ . '/digiriskdocuments.class.php';
+require_once __DIR__ . '/digiriskdolibarrdashboard.class.php';
 require_once __DIR__ . '/evaluator.class.php';
 require_once __DIR__ . '/../core/modules/digiriskdolibarr/digiriskelement/accidentlesion/mod_accidentlesion_standard.php';
 
@@ -401,6 +402,7 @@ class Accident extends SaturneObject
 
         $arrayNbDaysWithoutAccident    = $this->getNbDaysWithoutAccident();
         $arrayNbAccidents              = $this->getNbAccidents();
+        $arrayNbAccidentsLast3Years    = $this->getNbAccidentsLast3years();
         $arrayNbWorkstopDays           = $this->getNbWorkstopDays();
         $arrayNbAccidentsByEmployees   = $this->getNbAccidentsByEmployees();
         $arrayNbPresquAccidents        = $this->getNbPresquAccidents();
@@ -430,7 +432,7 @@ class Accident extends SaturneObject
             ]
         ];
 
-        $array['graphs'] = [$arrayNbAccidents];
+        $array['graphs'] = [$arrayNbAccidents, $arrayNbAccidentsLast3Years];
 
         return $array;
     }
@@ -503,6 +505,78 @@ class Accident extends SaturneObject
         } else {
             $array['data']['accidents'] = 0;
             $array['data']['accidentswithoutDIAT'] = 0;
+        }
+
+        return $array;
+    }
+
+
+    /**
+     * Get number accidents for last 3 years
+     *
+     * @return array
+     * @throws Exception
+     */
+    public function getNbAccidentsLast3years(): array
+    {
+        global $langs;
+
+        // Graph Title parameters
+        $array['title'] = $langs->transnoentities('AccidentByYear');
+        $array['picto'] = $this->picto;
+
+        // Graph parameters
+        $array['width']      = '100%';
+        $array['height']     = 400;
+        $array['type']       = 'bar';
+        $array['showlegend'] = 1;
+        $array['dataset']    = 3;
+
+        $array['labels'] = [
+            'pastlastyear' => [
+                'label' => date("Y",strtotime("-2 year")),
+                'color' => '#9567aa'
+            ],
+            'lastyear' => [
+                'label' => date("Y",strtotime("-1 year")),
+                'color' => '#4f9ebe'
+            ],
+            'currentyear' => [
+                'label' => date('Y'),
+                'color' => '#fac461'
+            ],
+        ];
+
+        $arrayAccidents = [];
+
+        $accidentList = $this->fetchAll();
+
+        if (is_array($accidentList) && !empty($accidentList)) {
+            foreach($accidentList as $accident) {
+                $accidentDate = getdate($accident->accident_date);
+                $yearKey = $accidentDate['year'];
+                $monthKey = $accidentDate['mon'];
+                $accidentsByYear[$yearKey][$monthKey - 1] += 1;
+            }
+        }
+
+        for ($i = 1; $i < 13; $i++) {
+            $month = $langs->transnoentitiesnoconv('MonthShort'.sprintf("%02d", $i));
+            $arrayAccidents[$i - 1] = array($month);
+            for ($j = 0; $j < 3; $j++) {
+                $arrayAccidents[$i - 1][date('Y') - 2 + $j] = 0;
+            }
+        }
+
+
+        foreach($accidentsByYear as $year => $accidentByYear) {
+            foreach($accidentByYear as $month => $accidentByMonth) {
+                $arrayAccidents[$month][$year] = $accidentByMonth;
+            }
+        }
+
+        foreach($arrayAccidents as $arrayAccident) {
+            $array['data'][] = array_values($arrayAccident);
         }
 
         return $array;
