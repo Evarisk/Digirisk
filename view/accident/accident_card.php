@@ -36,6 +36,7 @@ require_once DOL_DOCUMENT_ROOT . '/core/class/doleditor.class.php';
 require_once DOL_DOCUMENT_ROOT . '/projet/class/project.class.php';
 require_once DOL_DOCUMENT_ROOT . '/ticket/class/ticket.class.php';
 require_once DOL_DOCUMENT_ROOT . '/core/lib/images.lib.php';
+require_once DOL_DOCUMENT_ROOT.'/categories/class/categorie.class.php';
 
 require_once __DIR__ . '/../../class/digiriskelement.class.php';
 require_once __DIR__ . '/../../class/accident.class.php';
@@ -217,6 +218,9 @@ if (empty($reshook)) {
 		if (!$error) {
 			$result = $object->create($user, false);
 			if ($result > 0) {
+                $categories = GETPOST('categories', 'array');
+                $object->setCategories($categories);
+
                 // Removed while accidents have no document or attendants page
 //				if (empty($object->fk_user_employer)) {
 //					$usertmp->fetch('', $mysoc->managers, $mysoc->id, 0, $conf->entity);
@@ -312,6 +316,13 @@ if (empty($reshook)) {
 			setEventMessages($langs->trans('ErrorFieldRequired', $langs->transnoentitiesnoconv('UserEmployer')), [], 'errors');
 			$error++;
 		}
+
+        if (isModEnabled('categorie')) {
+            $categories = GETPOST('categories', 'array');
+            if (method_exists($object, 'setCategories')) {
+                $object->setCategories($categories);
+            }
+        }
 
 		if (!$error) {
 			$result = $object->update($user);
@@ -560,11 +571,12 @@ if (empty($reshook)) {
 
     // Action clone object
     if ($action == 'confirm_clone' && $confirm == 'yes') {
-        $options['label']    = GETPOST('clone_label');
-        $options['workstop'] = GETPOST('clone_workstop');
-        $options['lesion']   = GETPOST('clone_lesion');
-        $options['metadata'] = GETPOST('clone_metadata');
-        $options['photos']   = GETPOST('clone_photos');
+        $options['label']      = GETPOST('clone_label');
+        $options['workstop']   = GETPOST('clone_workstop');
+        $options['lesion']     = GETPOST('clone_lesion');
+        $options['metadata']   = GETPOST('clone_metadata');
+        $options['photos']     = GETPOST('clone_photos');
+        $options['categories'] = GETPOST('clone_categories');
         if ($object->id > 0) {
             $result = $object->createFromClone($user, $object->id, $options);
             if ($result > 0) {
@@ -687,11 +699,20 @@ if ($action == 'create') {
 	$doleditor = new DolEditor('description', GETPOST('description'), '', 90, 'dolibarr_details', '', false, true, $conf->global->FCKEDITOR_ENABLE_SOCIETE, ROWS_3, '90%');
 	$doleditor->Create();
 	print '</td></tr>';
-
-    //Fk Ticket -- Fk Ticket
-    print '<tr class="content_field"><td><label for="content">' . $langs->trans("FkTicket") . '</label></td><td>';
-    print $form->selectTicketsList(GETPOST('fk_ticket'), 'fk_ticket', '', 0, '', 1, 0, '1', 0, 'minwidth300');
-    print '</td></tr>';
+  
+  //Fk Ticket -- Fk Ticket
+  print '<tr class="content_field"><td><label for="content">' . $langs->trans("FkTicket") . '</label></td><td>';
+  print $form->selectTicketsList(GETPOST('fk_ticket'), 'fk_ticket', '', 0, '', 1, 0, '1', 0, 'minwidth300');
+  print '</td></tr>';
+  
+  // Categories
+  if (!empty($conf->categorie->enabled)) {
+      print '<tr><td>'.$langs->trans("Categories").'</td><td>';
+      $categoryArborescence = $form->select_all_categories('accident', '', 'parent', 64, 0, 1);
+      print img_picto('', 'category', 'class="pictofixedwidth"').$form->multiselectarray('categories', $categoryArborescence, GETPOST('categories', 'array'), '', 0, 'quatrevingtpercent maxwidth300 widthcentpercentminusx');
+      print '<a class="butActionNew" href="' . DOL_URL_ROOT . '/categories/index.php?type=accident&backtopage=' . urlencode($_SERVER['PHP_SELF'] . '?action=create') . '" target="_blank"><span class="fa fa-plus-circle valignmiddle paddingleft" title="' . $langs->trans('AddCategories') . '"></span></a>';
+      print "</td></tr>";
+  }
 
 	// Other attributes
 	//  include DOL_DOCUMENT_ROOT.'/core/tpl/extrafields_add.tpl.php';
@@ -795,10 +816,27 @@ if (($id || $ref) && $action == 'edit') {
 	$doleditor->Create();
 	print '</td></tr>';
 
-    //Fk Ticket -- Fk Ticket
-    print '<tr class="content_field"><td><label for="content">' . $langs->trans("FkTicket") . '</label></td><td>';
-    print $form->selectTicketsList($object->fk_ticket ?: GETPOST('fk_ticket'), 'fk_ticket', '', 0, '', 1, 0, '1', 0, 'minwidth300');
-    print '</td></tr>';
+  //Fk Ticket -- Fk Ticket
+  print '<tr class="content_field"><td><label for="content">' . $langs->trans("FkTicket") . '</label></td><td>';
+  print $form->selectTicketsList($object->fk_ticket ?: GETPOST('fk_ticket'), 'fk_ticket', '', 0, '', 1, 0, '1', 0, 'minwidth300');
+  print '</td></tr>';
+  
+  // Tags-Categories
+  if ($conf->categorie->enabled) {
+      print '<tr><td>'.$langs->trans("Categories").'</td><td>';
+      $categoryArborescence = $form->select_all_categories('accident', '', 'parent', 64, 0, 1);
+      $c = new Categorie($db);
+      $cats = $c->containing($object->id, 'accident');
+      $arrayselected = array();
+      if (is_array($cats)) {
+          foreach ($cats as $cat) {
+              $arrayselected[] = $cat->id;
+          }
+      }
+      print img_picto('', 'category', 'class="pictofixedwidth"').$form->multiselectarray('categories', $categoryArborescence, $arrayselected, '', 0, 'maxwidth500 widthcentpercentminusx');
+      print '<a class="butActionNew" href="' . DOL_URL_ROOT . '/categories/index.php?type=accident&backtopage=' . urlencode($_SERVER['PHP_SELF'] . '?action=create') . '" target="_blank"><span class="fa fa-plus-circle valignmiddle paddingleft" title="' . $langs->trans('AddCategories') . '"></span></a>';
+      print "</td></tr>";
+  }
 
 	// Other attributes
 	include DOL_DOCUMENT_ROOT . '/core/tpl/extrafields_add.tpl.php';
@@ -878,11 +916,12 @@ if ((empty($action) || ($action != 'create' && $action != 'edit'))) {
 	// Clone confirmation
 	if (($action == 'clone' && (empty($conf->use_javascript_ajax) || !empty($conf->dol_use_jmobile))) || (!empty($conf->use_javascript_ajax) && empty($conf->dol_use_jmobile))) {
         $formQuestionClone = [
-            ['type' => 'text',     'name' => 'clone_label',    'label' => $langs->trans('NewLabelForClone', $langs->transnoentities('The' . ucfirst($object->element))), 'value' => $langs->trans('CopyOf') . ' ' . $object->ref, 'size' => 24],
-            ['type' => 'checkbox', 'name' => 'clone_workstop', 'label' => $langs->trans('CloneWorkStop'), 'value' => 1],
-            ['type' => 'checkbox', 'name' => 'clone_metadata', 'label' => $langs->trans('CloneMetadata'), 'value' => 1],
-            ['type' => 'checkbox', 'name' => 'clone_lesion',   'label' => $langs->trans('CloneLesion'),   'value' => 1],
-            ['type' => 'checkbox', 'name' => 'clone_photos',   'label' => $langs->trans('ClonePhotos'),   'value' => 1]
+            ['type' => 'text',     'name' => 'clone_label',      'label' => $langs->trans('NewLabelForClone', $langs->transnoentities('The' . ucfirst($object->element))), 'value' => $langs->trans('CopyOf') . ' ' . $object->ref, 'size' => 24],
+            ['type' => 'checkbox', 'name' => 'clone_workstop',   'label' => $langs->trans('CloneWorkStop'),   'value' => 1],
+            ['type' => 'checkbox', 'name' => 'clone_metadata',   'label' => $langs->trans('CloneMetadata'),   'value' => 1],
+            ['type' => 'checkbox', 'name' => 'clone_lesion',     'label' => $langs->trans('CloneLesion'),     'value' => 1],
+            ['type' => 'checkbox', 'name' => 'clone_photos',     'label' => $langs->trans('ClonePhotos'),     'value' => 1],
+            ['type' => 'checkbox', 'name' => 'clone_categories', 'label' => $langs->trans('CloneCategories'), 'value' => 1]
         ];
 
         $formConfirm .= $form->formconfirm($_SERVER['PHP_SELF'] . '?id=' . $object->id, $langs->trans('CloneObject', $langs->transnoentities('The' . ucfirst($object->element))), $langs->trans('ConfirmCloneObject', $langs->transnoentities('The' . ucfirst($object->element))), 'confirm_clone', $formQuestionClone, 'yes', 'actionButtonClone', 350, 600);
@@ -1038,6 +1077,13 @@ if ((empty($action) || ($action != 'create' && $action != 'edit'))) {
     $relativepath = 'digiriskdolibarr/medias/thumbs';
     print saturne_show_medias_linked('digiriskdolibarr', $pathPhotos, 'small', 0, 0, 0, 0, 50, 50, 0, 0, 0, 'accident/'. $object->ref . '/photos/', $object, 'photo', $permissiontoadd, $permissiontodelete && $object->status <= Accident::STATUS_VALIDATED);
     print '</td></tr>';
+
+    // Categories
+    if ($conf->categorie->enabled) {
+        print '<tr><td class="valignmiddle">'.$langs->trans("Categories").'</td><td>';
+        print $form->showCategories($object->id, 'accident', 1);
+        print "</td></tr>";
+    }
 
     print '</table></div>';
     print '<div class="clearboth"></div>';

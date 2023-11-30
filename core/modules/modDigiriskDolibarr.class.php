@@ -436,7 +436,9 @@ class modDigiriskdolibarr extends DolibarrModules
 				'digiriskstandardview',
                 'accidentdocument',
                 'accidentagenda',
-                'digiriskstandardagenda'
+                'digiriskstandardagenda',
+                'category',
+                'categoryindex'
 			],
 			'tabs' => [
 				'mycompany_admin'
@@ -1364,20 +1366,35 @@ class modDigiriskdolibarr extends DolibarrModules
 			'user'     => 0,				                // 0=Menu for internal users, 1=external users, 2=both
 		];
 
-		$this->menu[$r++] = [
-			'fk_menu'  => 'fk_mainmenu=digiriskdolibarr,fk_leftmenu=digiriskaccident',	    // '' if this is a top menu. For left menu, use 'fk_mainmenu=xxx' or 'fk_mainmenu=xxx,fk_leftmenu=yyy' where xxx is mainmenucode and yyy is a leftmenucode
-			'type'     => 'left',			                // This is a Left menu entry
-			'titre'    => '<i class="fas fa-search pictofixedwidth" style="padding-right: 4px;"></i>' . $langs->transnoentities('AccidentInvestigation'),
-			'mainmenu' => 'digiriskdolibarr',
-			'leftmenu' => 'digiriskaccidentinvestigation',
-			'url'      => '/digiriskdolibarr/view/accidentinvestigation/accidentinvestigation_list.php',
-			'langs'    => 'digiriskdolibarr@digiriskdolibarr',	        // Lang file to use (without .lang) by module. File must be in langs/code_CODE/ directory.
-			'position' => 100 + $r,
-			'enabled'  => '$conf->digiriskdolibarr->enabled && $conf->saturne->enabled',  // Define condition to show or hide menu entry. Use '$conf->digiriskdolibarr->enabled' if entry must be visible if module is enabled. Use '$leftmenu==\'system\'' to show if leftmenu system is selected.
-			'perms'    => '$user->rights->digiriskdolibarr->lire && $user->rights->digiriskdolibarr->accidentinvestigation->read', // Use 'perms'=>'$user->rights->digiriskdolibarr->level1->level2' if you want your menu with a permission rules
-			'target'   => '',
-			'user'     => 0,				                // 0=Menu for internal users, 1=external users, 2=both
-		];
+        $this->menu[$r++] = [
+            'fk_menu'  => 'fk_mainmenu=digiriskdolibarr,fk_leftmenu=digiriskaccident',
+            'type'     => 'left',
+            'titre'    => '<i class="fas fa-tags pictofixedwidth" style="padding-right: 4px;"></i>' . $langs->transnoentities('Categories'),
+            'mainmenu' => 'digiriskdolibarr',
+            'leftmenu' => 'digiriskdolibarr_accidenttags',
+            'url'      => '/categories/index.php?type=accident',
+            'langs'    => 'digiriskdolibarr@digiriskdolibarr',
+            'position' => 100 + $r,
+            'enabled'  => '$conf->digiriskdolibarr->enabled && $conf->categorie->enabled && $user->rights->digiriskdolibarr->accident->read',
+            'perms'    => '$user->rights->digiriskdolibarr->accident->read',
+            'target'   => '',
+            'user'     => 0,
+        ];
+
+        $this->menu[$r++] = [
+            'fk_menu'  => 'fk_mainmenu=digiriskdolibarr',	    // '' if this is a top menu. For left menu, use 'fk_mainmenu=xxx' or 'fk_mainmenu=xxx,fk_leftmenu=yyy' where xxx is mainmenucode and yyy is a leftmenucode
+            'type'     => 'left',			                // This is a Left menu entry
+            'titre'    => '<i class="fas fa-search pictofixedwidth"></i>' . $langs->transnoentities('AccidentInvestigation'),
+            'mainmenu' => 'digiriskdolibarr',
+            'leftmenu' => 'digiriskaccidentinvestigation',
+            'url'      => '/digiriskdolibarr/view/accidentinvestigation/accidentinvestigation_list.php',
+            'langs'    => 'digiriskdolibarr@digiriskdolibarr',	        // Lang file to use (without .lang) by module. File must be in langs/code_CODE/ directory.
+            'position' => 100 + $r,
+            'enabled'  => '$conf->digiriskdolibarr->enabled && $conf->saturne->enabled',  // Define condition to show or hide menu entry. Use '$conf->digiriskdolibarr->enabled' if entry must be visible if module is enabled. Use '$leftmenu==\'system\'' to show if leftmenu system is selected.
+            'perms'    => '$user->rights->digiriskdolibarr->lire && $user->rights->digiriskdolibarr->accidentinvestigation->read', // Use 'perms'=>'$user->rights->digiriskdolibarr->level1->level2' if you want your menu with a permission rules
+            'target'   => '',
+            'user'     => 0,				                // 0=Menu for internal users, 1=external users, 2=both
+        ];
 
 		$this->menu[$r++] = [
 			'fk_menu' => 'fk_mainmenu=digiriskdolibarr',	    // '' if this is a top menu. For left menu, use 'fk_mainmenu=xxx' or 'fk_mainmenu=xxx,fk_leftmenu=yyy' where xxx is mainmenucode and yyy is a leftmenucode
