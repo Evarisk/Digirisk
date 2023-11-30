@@ -406,7 +406,7 @@ if ($conf->global->DIGIRISKDOLIBARR_TICKET_ENABLE_PUBLIC_INTERFACE == 1) {
 	print '</tr>';
 	print '</form>';
 
-    if (getDolGlobalInt('DIGIRISKDOLIBARR_TICKET_EXTRAFIELDS') > 0) {
+    if (dolibarr_get_const($db, 'DIGIRISKDOLIBARR_TICKET_EXTRAFIELDS', 0)) {
         print load_fiche_titre($langs->transnoentities("PublicInterfaceConfiguration"), '', '');
 
         print '<div class="div-table-responsive-no-min">';
