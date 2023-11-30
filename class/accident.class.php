@@ -202,6 +202,10 @@ class Accident extends SaturneObject
 	 */
 	public function __construct(DoliDB $db)
 	{
+        //Transform fk_user_victim into victim signatory for every accidents (backward compatibility)
+        if (empty(getDolGlobalInt("DIGIRISKDOLIBARR_ACCIDENT_REMOVE_FK_USER_VICTIM"))) {
+            $this->fields['fk_user_victim'] = ['type' => 'integer:User:user/class/user.class.php', 'label' => 'UserVictim',   'enabled' => '1', 'position' => 81, 'notnull' => -1, 'visible' => 1,];
+        }
 		return parent::__construct($db, $this->module, $this->element);
 	}
 
