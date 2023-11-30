@@ -246,9 +246,9 @@ $sql        = preg_replace('/,\s*$/', '', $sql);
 $sql       .= " FROM " . MAIN_DB_PREFIX . $object->table_element . " as t";
 
 if (is_array($extrafields->attributes[$object->table_element]['label']) && count($extrafields->attributes[$object->table_element]['label'])) $sql .= " LEFT JOIN " . MAIN_DB_PREFIX . $object->table_element . "_extrafields as ef on (t.rowid = ef.fk_object)";
-if ($object->ismultientitymanaged == 1) $sql                                                                                                          .= " WHERE t.entity IN (" . getEntity($object->element) . ")";
-else $sql                                                                                                                                                 .= " WHERE 1 = 1";
-$sql                                                                                                                                                      .= ' AND status != 0';
+if ($object->ismultientitymanaged == 1) $sql                                                                                                      .= " WHERE t.entity IN (" . getEntity($object->element) . ")";
+else $sql                                                                                                                                         .= " WHERE 1 = 1";
+$sql                                                                                                                                              .= ' AND status != -1';
 
 
 foreach ($search as $key => $val) {
