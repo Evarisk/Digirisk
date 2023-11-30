@@ -195,6 +195,27 @@ class ActionsDigiriskdolibarr
 					jQuery('.fichehalfleft .div-table-responsive-no-min').append(<?php echo json_encode($html) ; ?>)
 				</script>
 				<?php
+
+                require_once __DIR__ . '/accident.class.php';
+                $accident           = new Accident($db);
+                $linkedAccidents    = $accident->fetchAll('', '', 0, 0, ['customsql' => 't.fk_ticket = ' . $object->id]);
+                $linkedAccidentList = '';
+                if (is_array($linkedAccidents) && !empty($linkedAccidents)) {
+                    foreach ($linkedAccidents as $linkedAccident) {
+                        $linkedAccidentList .= $linkedAccident->getNomUrl(1) . '</br>';
+                    }
+                }
+
+                $fieldLinkedAccidents  = '<tr class="trextrafields_collapse_2"><td class="titlefield">'.$langs->trans('AccidentsLinked').'</td>';
+                $fieldLinkedAccidents .= '<td id="ticket_extras_digiriskdolibarr_ticket_accident_'. $object->id .'" class="valuefield ticket_extras_digiriskdolibarr_ticket_accident wordbreak">';
+                $fieldLinkedAccidents .= $linkedAccidentList;
+                $fieldLinkedAccidents .= '</td>';
+                $fieldLinkedAccidents .= '</tr>';
+                ?>
+                <script>
+                    jQuery('table.border.tableforfield.centpercent').first().append(<?php echo json_encode($fieldLinkedAccidents) ; ?>)
+                </script>
+                <?php
 			}
 			if (GETPOST('action') == 'edit_extras' && GETPOST('attribute') == 'digiriskdolibarr_ticket_service') {
 				require_once __DIR__ . '/../lib/digiriskdolibarr_function.lib.php';
