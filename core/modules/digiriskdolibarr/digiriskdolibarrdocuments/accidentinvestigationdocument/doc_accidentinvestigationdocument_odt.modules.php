@@ -202,13 +202,12 @@ class doc_accidentinvestigationdocument_odt extends SaturneDocumentModel
 		$object           = $moreParam['object'];
 		$accident         = new Accident($this->db);
 		$accidentMetadata = new AccidentMetaData($this->db);
-		$victim           = new User($this->db);
 		$signatory        = new SaturneSignature($this->db, $this->module, $object->element);
 		$now              = dol_now();
 
 		$accident->fetch($object->fk_accident);
 		$accidentMetadata->fetch(0, '', 'AND status = 1 AND fk_accident = ' . $accident->id);
-		$victim->fetch($accident->fk_user_victim);
+        $victim = $accident->getUserVictim();
 
 		$actionTask           = saturne_fetch_all_object_type('SaturneTask', '', '', 2, 0, ['customsql' => 'fk_task_parent = ' . $object->fk_task]);
 		$curativeActionTask   = array_shift($actionTask);
