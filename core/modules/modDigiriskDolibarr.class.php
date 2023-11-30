@@ -1595,14 +1595,15 @@ class modDigiriskdolibarr extends DolibarrModules
 
 		$langs->load("digiriskdolibarr@digiriskdolibarr");
 
-        if ($conf->global->DIGIRISKDOLIBARR_ACCIDENT_REMOVE_FK_USER_VICTIM == 0) {
+        if (empty($conf->global->DIGIRISKDOLIBARR_ACCIDENT_REMOVE_FK_USER_VICTIM)) {
+
             require_once __DIR__ . '/../../class/accident.class.php';
             require_once __DIR__ . '/../../../saturne/class/saturnesignature.class.php';
 
-            $accident = new Accident($this->db);
+            $accident  = new Accident($this->db);
             $signatory = new SaturneSignature($this->db);
 
-            $accidentList = $accident->fetchAll('','',0,0,['customsql' => 'fk_user_victim > 0']);
+            $accidentList = $accident->fetchAll('','',0,0, ['customsql' => 'fk_user_victim > 0']);
 
             if (is_array($accidentList) && !empty($accidentList)) {
                 foreach($accidentList as $accidentSingle) {
