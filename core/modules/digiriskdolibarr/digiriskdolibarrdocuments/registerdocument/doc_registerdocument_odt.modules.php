@@ -361,10 +361,6 @@ class doc_registerdocument_odt extends SaturneDocumentModel
 		$tmpArray = [];
         $tmpArray['register_name'] = $langs->trans('RegisterDocument');
 
-		$objectDocument->element = $objectDocument->element . '@digiriskdolibarr';
-		complete_substitutions_array($tmpArray, $outputLangs, $objectDocument);
-		$objectDocument->element = $objectDocument->element;
-
 		$moreParam['tmparray']         = $tmpArray;
 		$moreParam['subDir']           = 'digiriskdolibarrdocuments/';
 		$moreParam['hideTemplateName'] = 1;
