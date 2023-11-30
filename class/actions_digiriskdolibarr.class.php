@@ -200,8 +200,10 @@ class ActionsDigiriskdolibarr
                 $accident           = new Accident($db);
                 $linkedAccidents    = $accident->fetchAll('', '', 0, 0, ['customsql' => 't.fk_ticket = ' . $object->id]);
                 $linkedAccidentList = '';
-                foreach($linkedAccidents as $linkedAccident) {
-                    $linkedAccidentList .= $linkedAccident->getNomUrl(1) . '</br>';
+                if (is_array($linkedAccidents) && !empty($linkedAccidents)) {
+                    foreach ($linkedAccidents as $linkedAccident) {
+                        $linkedAccidentList .= $linkedAccident->getNomUrl(1) . '</br>';
+                    }
                 }
 
                 $fieldLinkedAccidents  = '<tr class="trextrafields_collapse_2"><td class="titlefield">'.$langs->trans('AccidentsLinked').'</td>';
@@ -211,7 +213,7 @@ class ActionsDigiriskdolibarr
                 $fieldLinkedAccidents .= '</tr>';
                 ?>
                 <script>
-                    jQuery('td.ticket_extras_digiriskdolibarr_ticket_date').parent(2).after(<?php echo json_encode($fieldLinkedAccidents) ; ?>)
+                    jQuery('table.border.tableforfield.centpercent').first().append(<?php echo json_encode($fieldLinkedAccidents) ; ?>)
                 </script>
                 <?php
 			}
