@@ -92,11 +92,12 @@ if (empty($deletedElements)) {
 
 // Load numbering modules
 $numberingModules = [
-    'digiriskelement/' . $object->element     => $conf->global->DIGIRISKDOLIBARR_ACCIDENT_ADDON,
-    'digiriskelement/' . $objectline->element => $conf->global->DIGIRISKDOLIBARR_ACCIDENTWORKSTOP_ADDON,
+    'digiriskelement/' . $object->element         => $conf->global->DIGIRISKDOLIBARR_ACCIDENT_ADDON,
+    'digiriskelement/' . $objectline->element     => $conf->global->DIGIRISKDOLIBARR_ACCIDENTWORKSTOP_ADDON,
+    'digiriskelement/' . $accidentLesion->element => $conf->global->DIGIRISKDOLIBARR_ACCIDENTLESION_ADDON,
 ];
 
-list($refAccidentMod, $refAccidentWorkStopMod) = saturne_require_objects_mod($numberingModules, $moduleNameLowerCase);
+list($refAccidentMod, $refAccidentWorkStopMod, $refAccidentLesion) = saturne_require_objects_mod($numberingModules, $moduleNameLowerCase);
 
 $hookmanager->initHooks(['accidentcard', 'globalcard']); // Note that conf->hooks_modules contains array
 
