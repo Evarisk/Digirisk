@@ -670,7 +670,7 @@ class pdf_orque_projectdocument
 		$pdf->MultiCell($this->posxlabel - $this->posxriskassessment, 3, $outputlangs->transnoentities('RiskAssessment'), '', 'L');
 
 		$pdf->SetXY($this->posxlabel, $tab_top + 1);
-		$pdf->MultiCell($this->posxbudget - $this->posxlabel, 3, $outputlangs->transnoentities('Description'), 0, 'L');
+		$pdf->MultiCell($this->posxbudget - $this->posxlabel, 3, $outputlangs->transnoentities('Label'), 0, 'L');
 
 		$pdf->SetXY($this->posxbudget, $tab_top + 1);
 		$pdf->MultiCell($this->posxworkload - $this->posxbudget, 3, $outputlangs->transnoentities('Budget'), 0, 'R');

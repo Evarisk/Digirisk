@@ -850,7 +850,7 @@ class modDigiriskdolibarr extends DolibarrModules
             $i   => ['DIGIRISKDOLIBARR_CUSTOM_NUM_REF_SET', 'integer', 0, '', 0, 'current'],
 		];
 
-		if ( ! isset($conf->digiriskdolibarr) || ! isset($conf->digiriskdolibarr->enabled) ) {
+		if (!isModEnabled('digiriskdolibarr')) {
 			$conf->digiriskdolibarr          = new stdClass();
 			$conf->digiriskdolibarr->enabled = 0;
 		}
