@@ -729,7 +729,8 @@ class modDigiriskdolibarr extends DolibarrModules
 			$i++ => ['DIGIRISKDOLIBARR_TICKET_LOCATION_VISIBLE', 'integer', 1, '', 0, 'current'],
 			$i++ => ['DIGIRISKDOLIBARR_TICKET_LOCATION_REQUIRED', 'integer', 0, '', 0, 'current'],
 			$i++ => ['DIGIRISKDOLIBARR_TICKET_DATE_VISIBLE', 'integer', 1, '', 0, 'current'],
-			$i++ => ['DIGIRISKDOLIBARR_TICKET_DATE_REQUIRED', 'integer', 1, '', 0, 'current'],
+            $i++ => ['DIGIRISKDOLIBARR_TICKET_DATE_REQUIRED', 'integer', 1, '', 0, 'current'],
+            $i++ => ['DIGIRISKDOLIBARR_TICKET_STATISTICS_ACCIDENT_TIME_RANGE', 'chaine', '{"'. $langs->transnoentities("WithoutWorkStop") .'":"less:1:days", "'.  $langs->transnoentities("LessThanFourDays") .'":"less:4:days","'.  $langs->transnoentities("LessThanTwentyOneDays") .'":"less:21:days","'.  $langs->transnoentities("LessThanThreeMonth") .'":"less:3:months","'.  $langs->transnoentities("LessThanSixMonths") .'":"less:6:months","'.  $langs->transnoentities("LongTimeWorkStop") .'":"more:6:months"}', '', 0, 'current'],
 
 			// CONST MODULE
 			$i++ => ['DIGIRISKDOLIBARR_SUBPERMCATEGORY_FOR_DOCUMENTS', 'integer', 1, '', 0, 'current'],

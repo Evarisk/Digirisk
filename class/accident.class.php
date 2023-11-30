@@ -169,8 +169,9 @@ class Accident extends SaturneObject
 		'photo'             => ['type' => 'text',         'label' => 'Photo',            'enabled' => '1', 'position' => 120, 'notnull' => -1, 'visible' => 3,],
 		'external_accident' => ['type' => 'smallint',     'label' => 'ExternalAccident', 'enabled' => '1', 'position' => 130, 'notnull' => -1, 'visible' => 3, 'arrayofkeyval' => ['1' => 'No', '2' => 'Yes', '3' => 'Other'],],
 		'fk_project'        => ['type' => 'integer',      'label' => 'FKProject',        'enabled' => '1', 'position' => 140, 'notnull' => 1, 'visible' => 0,],
-		'fk_user_creat'     => ['type' => 'integer:User:user/class/user.class.php', 'label' => 'UserAuthor', 'enabled' => '1', 'position' => 150, 'notnull' => 1,  'visible' => 0, 'foreignkey' => 'user.rowid',],
-		'fk_user_modif'     => ['type' => 'integer:User:user/class/user.class.php', 'label' => 'UserModif',  'enabled' => '1', 'position' => 160, 'notnull' => -1, 'visible' => 0,],
+        'fk_ticket'         => ['type' => 'integer:Ticket:ticket/class/ticket.class.php', 'label' => 'FkTicket',  'enabled' => '1', 'position' => 145, 'notnull' => -1, 'visible' => 1,],
+        'fk_user_creat'     => ['type' => 'integer:User:user/class/user.class.php', 'label' => 'UserAuthor', 'enabled' => '1', 'position' => 150, 'notnull' => 1,  'visible' => 0, 'foreignkey' => 'user.rowid',],
+        'fk_user_modif'     => ['type' => 'integer:User:user/class/user.class.php', 'label' => 'UserModif',  'enabled' => '1', 'position' => 160, 'notnull' => -1, 'visible' => 0,],
 	];
 
 	public $rowid;
@@ -190,7 +191,8 @@ class Accident extends SaturneObject
 	public $fk_user_creat;
 	public $fk_user_modif;
 	public $fk_element;
-	public $fk_standard;
+    public $fk_standard;
+    public $fk_ticket;
 	public $fk_soc;
 	public $fk_user_victim;
 	public $fk_user_employer;

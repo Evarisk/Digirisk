@@ -34,6 +34,7 @@ require_once DOL_DOCUMENT_ROOT . '/core/lib/date.lib.php';
 require_once DOL_DOCUMENT_ROOT . '/core/class/html.formfile.class.php';
 require_once DOL_DOCUMENT_ROOT . '/core/class/doleditor.class.php';
 require_once DOL_DOCUMENT_ROOT . '/projet/class/project.class.php';
+require_once DOL_DOCUMENT_ROOT . '/ticket/class/ticket.class.php';
 require_once DOL_DOCUMENT_ROOT . '/core/lib/images.lib.php';
 
 require_once __DIR__ . '/../../class/digiriskelement.class.php';
@@ -75,6 +76,7 @@ $extrafields      = new ExtraFields($db);
 $digiriskelement  = new DigiriskElement($db);
 $digiriskstandard = new DigiriskStandard($db);
 $project          = new Project($db);
+$ticket           = new Ticket($db);
 
 // Load object
 $object->fetch($id);
@@ -148,9 +150,10 @@ if (empty($reshook)) {
 		$accident_type      = GETPOST('accident_type');
 		$external_accident  = GETPOST('external_accident');
 		$accident_location  = GETPOST('accident_location');
-		$extSocietyId       = GETPOST('fk_soc');
+        $extSocietyId       = GETPOST('fk_soc');
+        $fkTicket           = GETPOST('fk_ticket');
 
-		// Initialize object accident
+        // Initialize object accident
 		$now                       = dol_now();
 		$object->ref               = $object->getNextNumRef();
 		$object->ref_ext           = 'digirisk_' . $object->ref;
@@ -163,7 +166,8 @@ if (empty($reshook)) {
 		$object->accident_type     = $accident_type;
 		$object->external_accident = $external_accident;
 		$object->accident_location = $accident_location;
-		$object->fk_project        = $conf->global->DIGIRISKDOLIBARR_ACCIDENT_PROJECT;
+        $object->fk_project        = $conf->global->DIGIRISKDOLIBARR_ACCIDENT_PROJECT;
+        $object->fk_ticket         = $fkTicket;
 
 		$accident_date = dol_mktime(GETPOST('dateohour', 'int'), GETPOST('dateomin', 'int'), 0, GETPOST('dateomonth', 'int'), GETPOST('dateoday', 'int'), GETPOST('dateoyear', 'int'));
 
@@ -250,7 +254,8 @@ if (empty($reshook)) {
 		$accident_type      = GETPOST('accident_type');
 		$external_accident  = GETPOST('external_accident');
 		$accident_location  = GETPOST('accident_location');
-		$extSocietyId       = GETPOST('fk_soc');
+        $extSocietyId       = GETPOST('fk_soc');
+        $fkTicket           = GETPOST('fk_ticket');
 
 		// Initialize object accident
 		$now                       = dol_now();
@@ -260,7 +265,8 @@ if (empty($reshook)) {
 		$object->accident_type     = $accident_type;
 		$object->external_accident = $external_accident;
 		$object->accident_location = $accident_location;
-		$object->fk_project        = $conf->global->DIGIRISKDOLIBARR_ACCIDENT_PROJECT;
+        $object->fk_project        = $conf->global->DIGIRISKDOLIBARR_ACCIDENT_PROJECT;
+        $object->fk_ticket         = $fkTicket;
 
 		$accident_date = dol_mktime(GETPOST('dateohour', 'int'), GETPOST('dateomin', 'int'), 0, GETPOST('dateomonth', 'int'), GETPOST('dateoday', 'int'), GETPOST('dateoyear', 'int'));
 
@@ -649,12 +655,12 @@ if ($action == 'create') {
 	print '</td></tr>';
 
 	//FkElement -- Lieu de l'accident - DigiriskElement
-	print '<tr class="fk_element_field"'. (GETPOST('external_accident') < 2 ? '' : 'style="display:none"') . '><td class="minwidth400">' . $langs->trans("AccidentLocation") . '</td><td>';
+	print '<tr class="fk_element_field"'. (GETPOST('external_accident') < 2 ? '' : 'style="display:none"') . '><td class="minwidth300">' . $langs->trans("AccidentLocation") . '</td><td>';
 	print $digiriskelement->selectDigiriskElementList((!empty(GETPOST('fromid')) ? GETPOST('fromid') : $object->fk_element), 'fk_element', ['customsql' => ' t.rowid NOT IN (' . implode(',', $deletedElements) . ')'], 0, 0, [], 0, 0, 'minwidth300');
 	print '</td></tr>';
 
 	//FkSoc -- Lieu de l'accident - Société extérieure
-	print '<tr class="fk_soc_field"' . (GETPOST('external_accident') == 2 ? '' : 'style="display:none"') . '><td class="minwidth400">' . $langs->trans("AccidentLocation") . '</td>';
+	print '<tr class="fk_soc_field"' . (GETPOST('external_accident') == 2 ? '' : 'style="display:none"') . '><td class="minwidth300">' . $langs->trans("AccidentLocation") . '</td>';
 	print '<td>';
 	//For external user force the company to user company
 	if (!empty($user->socid)) {
@@ -666,13 +672,13 @@ if ($action == 'create') {
 	print '</td></tr>';
 
 	//AccidentLocation -- lieu de l'accident
-	print '<tr class="accident_location_field" ' . (GETPOST('external_accident') == 3 ? '' : 'style="display:none"') . '><td class="minwidth400">' . $langs->trans("AccidentLocation") . '</td><td>';
+	print '<tr class="accident_location_field" ' . (GETPOST('external_accident') == 3 ? '' : 'style="display:none"') . '><td class="minwidth300">' . $langs->trans("AccidentLocation") . '</td><td>';
 	$doleditor = new DolEditor('accident_location', GETPOST('accident_location'), '', 90, 'dolibarr_details', '', false, true, $conf->global->FCKEDITOR_ENABLE_SOCIETE, ROWS_3, '90%');
 	$doleditor->Create();
 	print '</td></tr>';
 
 	//Accident Date -- Date de l'accident
-	print '<tr><td class="minwidth400"><label for="accident_date">' . $langs->trans("AccidentDate") . '</label></td><td>';
+	print '<tr><td class="minwidth300"><label for="accident_date">' . $langs->trans("AccidentDate") . '</label></td><td>';
 	print $form->selectDate(GETPOST('dateo') ? dol_mktime(GETPOST('dateohour', 'int'),GETPOST('dateomin', 'int'),0,GETPOST('dateomonth', 'int'), GETPOST('dateoday', 'int'), GETPOST('dateoyear', 'int')) : dol_now('tzuser'), 'dateo', 1, 1, 0, '', 1);
 	print '</td></tr>';
 
@@ -681,6 +687,11 @@ if ($action == 'create') {
 	$doleditor = new DolEditor('description', GETPOST('description'), '', 90, 'dolibarr_details', '', false, true, $conf->global->FCKEDITOR_ENABLE_SOCIETE, ROWS_3, '90%');
 	$doleditor->Create();
 	print '</td></tr>';
+
+    //Fk Ticket -- Fk Ticket
+    print '<tr class="content_field"><td><label for="content">' . $langs->trans("FkTicket") . '</label></td><td>';
+    print $form->selectTicketsList(GETPOST('fk_ticket'), 'fk_ticket', '', 0, '', 1, 0, '1', 0, 'minwidth300');
+    print '</td></tr>';
 
 	// Other attributes
 	//  include DOL_DOCUMENT_ROOT.'/core/tpl/extrafields_add.tpl.php';
@@ -783,6 +794,11 @@ if (($id || $ref) && $action == 'edit') {
 	$doleditor = new DolEditor('description', $object->description, '', 90, 'dolibarr_details', '', false, true, $conf->global->FCKEDITOR_ENABLE_SOCIETE, ROWS_3, '90%');
 	$doleditor->Create();
 	print '</td></tr>';
+
+    //Fk Ticket -- Fk Ticket
+    print '<tr class="content_field"><td><label for="content">' . $langs->trans("FkTicket") . '</label></td><td>';
+    print $form->selectTicketsList($object->fk_ticket ?: GETPOST('fk_ticket'), 'fk_ticket', '', 0, '', 1, 0, '1', 0, 'minwidth300');
+    print '</td></tr>';
 
 	// Other attributes
 	include DOL_DOCUMENT_ROOT . '/core/tpl/extrafields_add.tpl.php';
@@ -989,6 +1005,17 @@ if ((empty($action) || ($action != 'create' && $action != 'edit'))) {
 	print '<td>';
 	print $object->description;
 	print '</td></tr>';
+
+    //Fk Ticket -- Fk Ticket
+    print '<tr><td class="titlefield">';
+    print $langs->trans('FkTicket');
+    print '</td>';
+    print '<td>';
+    if ($object->fk_ticket > 0) {
+        $ticket->fetch($object->fk_ticket);
+        print $ticket->getNomUrl(1);
+    }
+    print '</td></tr>';
 
     print '<tr class="linked-medias photo gallery-table"> <td class=""><label for="photo">' . $langs->trans("Photos") . '</label></td>';
     print '<td class="linked-medias-list">';
