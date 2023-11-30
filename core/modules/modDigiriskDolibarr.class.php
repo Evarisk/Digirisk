@@ -826,7 +826,6 @@ class modDigiriskdolibarr extends DolibarrModules
 
 			// CONST DIGIRISK DOCUMENTS
 			$i++ => ['DIGIRISKDOLIBARR_DOCUMENT_SHOW_PICTO_NAME', 'integer', 0, '', 0, 'current'],
-			$i++ => ['DIGIRISKDOLIBARR_DOCUMENT_SHOW_PICTO_NAME', 'integer', 0, '', 0, 'current'],
 			$i++ => ['DIGIRISKDOLIBARR_AUTOMATIC_PDF_GENERATION', 'integer', 0, '', 0, 'current'],
 			$i++ => ['DIGIRISKDOLIBARR_MANUAL_PDF_GENERATION', 'integer', 0, '', 0, 'current'],
 
