@@ -228,6 +228,51 @@ if ($action == 'generateQRCode') {
 	setEventMessages($langs->transnoentities('QRCodeGenerated'), array());
 }
 
+if ($action == 'createTimeRange') {
+    $comparatorPost  = GETPOST('comparator');
+    $rangeNumberPost = GETPOST('range_value');
+    $timeRangePost   = GETPOST('time_range');
+    $constraintLabel = GETPOST('range_label');
+
+    if (empty($rangeNumberPost)) {
+        setEventMessage($langs->trans('MissingRangeValue'), 'errors');
+        header("Location: " . $_SERVER["PHP_SELF"]);
+        exit;
+    }
+    if (dol_strlen($constraintLabel) == 0) {
+        $constraintLabel = $langs->trans($langs->transnoentities(ucfirst($comparatorPost) . 'Than') . ' ' . $rangeNumberPost . ' ' . $langs->transnoentities(ucfirst($timeRangePost)));
+    }
+
+    $accidentWorkStopTimeRangesJson = $conf->global->DIGIRISKDOLIBARR_TICKET_STATISTICS_ACCIDENT_TIME_RANGE;
+    $accidentWorkStopTimeRanges     = json_decode($accidentWorkStopTimeRangesJson, true);
+    $accidentWorkStopTimeRanges[$constraintLabel]  = $comparatorPost . ':' . $rangeNumberPost . ':' . $timeRangePost;
+
+    $newTimeRangeJson = json_encode($accidentWorkStopTimeRanges);
+
+    dolibarr_set_const($db, 'DIGIRISKDOLIBARR_TICKET_STATISTICS_ACCIDENT_TIME_RANGE', $newTimeRangeJson, 'chaine', 0, '', $conf->entity);
+
+    setEventMessages($langs->transnoentities('TimeRangeAdded'), array());
+
+    header("Location: " . $_SERVER["PHP_SELF"]);
+    exit;
+}
+
+if ($action == 'deleteTimeRange') {
+    $constraintLabel = GETPOST('value');
+    $accidentWorkStopTimeRangesJson = $conf->global->DIGIRISKDOLIBARR_TICKET_STATISTICS_ACCIDENT_TIME_RANGE;
+    $accidentWorkStopTimeRanges     = json_decode($accidentWorkStopTimeRangesJson, true);
+    unset($accidentWorkStopTimeRanges[$constraintLabel]);
+
+    $newTimeRangeJson = json_encode($accidentWorkStopTimeRanges);
+
+    dolibarr_set_const($db, 'DIGIRISKDOLIBARR_TICKET_STATISTICS_ACCIDENT_TIME_RANGE', $newTimeRangeJson, 'chaine', 0, '', $conf->entity);
+
+    setEventMessages($langs->transnoentities('TimeRangeDeleted'), array());
+
+    header("Location: " . $_SERVER["PHP_SELF"]);
+    exit;
+}
+
 /*
  * View
  */
@@ -791,6 +836,87 @@ if ($conf->global->DIGIRISKDOLIBARR_TICKET_ENABLE_PUBLIC_INTERFACE == 1) {
 	print '</div>';
 	print '<span class="opacitymedium">' . $langs->transnoentities("TicketPublicInterfaceConfigDocumentation") . '</span> : <a href="https://wiki.dolibarr.org/index.php?title=Module_Digirisk#DigiRisk_-_Registre_de_s.C3.A9curit.C3.A9_et_Tickets" target="_blank" >' . $langs->transnoentities('DigiriskDocumentation') . '</a>';
 }
+
+print load_fiche_titre($langs->transnoentities("TicketStatistics"), '', '');
+
+$comparators = [
+    'less' => $langs->trans('Inferior'),
+    'more' => $langs->trans('Superior')
+];
+$range = [
+    'days' => $langs->trans('Days'),
+    'weeks' => $langs->trans('Weeks'),
+    'months' => $langs->trans('Months'),
+    'years' => $langs->trans('Years')
+];
+
+$accidentWorkStopTimeRangesJson = $conf->global->DIGIRISKDOLIBARR_TICKET_STATISTICS_ACCIDENT_TIME_RANGE;
+$accidentWorkStopTimeRanges     = json_decode($accidentWorkStopTimeRangesJson, true);
+
+print '<div class="div-table-responsive-no-min">';
+print '<table class="noborder centpercent">';
+print '<tr class="liste_titre">';
+print '<td>' . $langs->transnoentities("RangeLabel") . '</td>';
+print '<td>' . $langs->transnoentities("Comparator") . '</td>';
+print '<td>' . $langs->transnoentities("RangeNumber") . '</td>';
+print '<td>' . $langs->transnoentities("TimeRange") . '</td>';
+print '<td>' . $langs->transnoentities("Action") . '</td>';
+print '</tr>';
+
+// Existing constraints
+if (is_array($accidentWorkStopTimeRanges) && !empty($accidentWorkStopTimeRanges)) {
+    foreach ($accidentWorkStopTimeRanges as $rangeName => $rangeConstraint) {
+        if (strstr($rangeConstraint, ':')) {
+            $rangeConstraintDetails = explode(':', $rangeConstraint);
+            $rangeComparator        = $rangeConstraintDetails[0] == 'less' ? $langs->trans('LessThan') : $langs->trans('MoreThan');
+            $rangeNumber            = $rangeConstraintDetails[1];
+            $rangeUnit              = $langs->trans(ucfirst($rangeConstraintDetails[2]));
+        }
+        print '<tr>';
+        print '<td>';
+        print $rangeName;
+        print '</td>';
+        print '<td>';
+        print $rangeComparator;
+        print '</td>';
+        print '<td>';
+        print $rangeNumber;
+        print '</td>';
+        print '<td>';
+        print $rangeUnit;
+        print '</td>';
+        print '<td>';
+        print '<a href="'. $_SERVER['PHP_SELF'] . '?action=deleteTimeRange&value=' . $rangeName.'" class="wpeo-button button-grey">';
+        print '<i class="fas fa-trash"></i>';
+        print '</a>';
+        print '</td>';
+    }
+}
+
+// Add new constraint
+print '<form method="POST" action="' . $_SERVER["PHP_SELF"] . '">';
+print '<input type="hidden" name="token" value="' . newToken() . '">';
+print '<input type="hidden" name="action" value="createTimeRange">';
+print '<input type="hidden" name="backtopage" value="' . $backtopage . '">';
+print '<tr>';
+print '<td>';
+print '<input type="text" name="range_label" />';
+print '</td>';
+print '<td>';
+print $form::selectarray('comparator', $comparators);
+print '</td>';
+print '<td>';
+print '<input type="number" min="0" name="range_value" />';
+print '</td>';
+print '<td>';
+print $form::selectarray('time_range', $range);
+print '</td>';
+print '<td>';
+print '<button type="submit" class="wpeo-button button-blue"><i class="fas fa-plus"></i></button>';
+print '</td>';
+print '</td>';
+print '</tr>';
+print '</form>';
 
 // End of page
 llxFooter();

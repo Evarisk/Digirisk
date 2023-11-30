@@ -478,6 +478,11 @@ RegisterDate                      = Date d'inscription au registre d'accidents d
 RegisterNumber                    = Numéro d'inscription au registre d'accidents du travail bénins
 Consequence                       = Conséquences
 WithoutWorkStop                   = Sans arrêt de travail
+LessThanFourDays                  = Moins de 4 jours
+LessThanTwentyOneDays             = Moins de 21 jours
+LessThanThreeMonth                = Moins de 3 mois
+LessThanSixMonths                 = Moins de 6 mois
+LongTimeWorkStop                  = Plus de 6 mois
 WithWorkStop                      = Avec arrêt de travail
 Fatal                             = Décès
 PoliceReport                      = Rapport de police
@@ -552,17 +557,13 @@ AccidentInvestigationValidated    = L'enquête accident a été validée
 AccidentInvestigationReOpened     = L'enquête accident a été rouverte
 AccidentInvestigationTaskCreated  = Les tâches de l'enquête accident ont été créées
 AccidentInvestigationTaskDeleted  = Les tâches de l'enquête accident ont été supprimées
-AccidentInvestigationClassified   = L'enquête accident a été versionnée et le document généré
 CausalityTree                     = Arbre des causes
 TaskWillBeCreatedAfterValidation  = Les tâches seront créées après validation de l'enquête accident
-DocumentGeneratedWithArchive      = Le document est généré lorsque l'enquête accident est archivé
-ConfirmReOpenInvestigation        = Êtes-vous sûr de vouloir rouvrir l'enquête accident ? La réouverture permet la modification de l'enquête accident et l'ajout de nouveaux participants mais <b>tous les participants et les signatures actuelles du document seront perdues. <br> Une nouvelle version du document sera généré par la suite.</b>.
 AccidentInvestigationCreated      = Création d'une enquête accident
 AccidentInvestigationModified     = Modifcation d'une enquête accident
 AccidentInvestigationDeleted      = Suppression d'une enquête accident
 AccidentInvestigationValidate     = Validation d'une enquête accident
 AccidentInvestigationUnValidate   = Réouverture d'une enquête accident
-AccidentInvestigationArchive      = Classification d'une enquête accident
 AccidentInvestigationLock         = Verrouillage de l'enquête accident
 AccidentInvestigationSigned       = Signature d'une enquête accident
 CloneWorkStop                     = Cloner les arrêts de travail ?
@@ -572,6 +573,8 @@ ClonePhotos                       = Cloner les photos ?
 CloneFrom                         = Clone de
 AccidentInvestigationLinked       = Enquête accident liée
 AccidentInvestigationRole         = Les rôles de l'enquête accident
+AccidentsCategoriesArea           =	Espace des tags/catégories des accidents
+AddAccidentIntoCategory           = Assigner cette catégorie à l'accident
 
 # AccidentTooltip - Tooltip des accidents
 VictimActivityTooltip              = Précisez l’activité ou la tâche de la victime au moment de l’accident, c’est-à-dire ce que faisait la victime
@@ -1237,20 +1240,34 @@ TicketLocationVisibleHelp                = Activer cette option pour afficher le
 TicketDateVisible                        = Afficher le champ Date pour créer un ticket
 TicketDateVisibleHelp                    = Activer cette option pour afficher le champ Date dans l'interface publique et le rendre obligatoire si nécessaire
 QRCodeGenerated                          = QRCode généré
+FkTicket                                 = Ticket lié
+
 
 # Stats - Statistiques
-TicketStatistics   = Statistiques des tickets
-ExportCSV          = Export CSV
-GenerateCSV        = Générer le fichier CSV
-SuccessGenerateCSV = Fichier CSV %s généré avec succès
-ErrorMissingData   = Erreur : impossible de générer le fichier CSV, les données envoyées au fichier sont incorrecte. <br> Veuillez vérifier que vous avez bien des GP/UT assignés à des tickets.
-CSVFileExport      = Export des registres au format CSV associé à des GP/UT
-ThirdPartyHelp     = Si le filtre "Tiers" est vide, aucun tiers n'est utilisé pour la recherche
-GP/UTHelp          = Par défaut, le filtre prend toutes les GP/UT
-CategoryTicketHelp = Par défaut, le filtre prend toutes les catégories
-CreatedByHelp      = Si le filtre "Créer par" est vide, aucun utilisateur n'est utilisé pour la recherche
-AssignedToHelp     = Si le filtre "Assigné à" est vide, aucun utilisateur n'est utilisé pour la recherche
-StatusHelp         = Par défaut, le filtre prend tous les états<br>
+TicketStatistics    = Statistiques des tickets
+ExportCSV           = Export CSV
+GenerateCSV         = Générer le fichier CSV
+SuccessGenerateCSV  = Fichier CSV %s généré avec succès
+ErrorMissingData    = Erreur : impossible de générer le fichier CSV, les données envoyées au fichier sont incorrecte. <br> Veuillez vérifier que vous avez bien des GP/UT assignés à des tickets.
+CSVFileExport       = Export des registres au format CSV associé à des GP/UT
+ThirdPartyHelp      = Si le filtre "Tiers" est vide, aucun tiers n'est utilisé pour la recherche
+GP/UTHelp           = Par défaut, le filtre prend toutes les GP/UT
+CategoryTicketHelp  = Par défaut, le filtre prend toutes les catégories
+CreatedByHelp       = Si le filtre "Créer par" est vide, aucun utilisateur n'est utilisé pour la recherche
+AssignedToHelp      = Si le filtre "Assigné à" est vide, aucun utilisateur n'est utilisé pour la recherche
+StatusHelp          = Par défaut, le filtre prend tous les états<br>
+ConcernedTimePeriod = Période prise en compte
+LessThan            = Moins de
+MoreThan            = Plus de
+Comparator          = Comparateur
+RangeNumber         = Quantité
+TimeRange           = Unité de temps
+RangeLabel          = Nom de la contrainte
+Inferior            = Inférieur à
+Superior            = Supérieur à
+TimeRangeAdded      = Contrainte ajoutée
+TimeRangeDeleted    = Contrainte supprimée
+
 
 # Email - Email
 The                            = Le

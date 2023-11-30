@@ -465,8 +465,6 @@ class InterfaceDigiriskdolibarrTriggers extends DolibarrTriggers
 										$result = $actioncomm->create($user);
 										break;
 									}
-								} else {
-									setEventMessages($langs->trans('ErrorSetupEmail'), '', 'errors');
 								}
 							} else {
 								$langs->load("errors");
@@ -516,8 +514,6 @@ class InterfaceDigiriskdolibarrTriggers extends DolibarrTriggers
 													$result = $actioncomm->create($user);
 													break;
 												}
-											} else {
-												setEventMessages($langs->trans('ErrorSetupEmail'), '', 'errors');
 											}
 										}
 									} else {
