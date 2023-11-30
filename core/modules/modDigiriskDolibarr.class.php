@@ -774,22 +774,6 @@ class modDigiriskdolibarr extends DolibarrModules
 			$i++ => ['DIGIRISKDOLIBARR_MANUAL_INPUT_NB_WORKED_HOURS', 'integer', 0, '', 0, 'current'],
 			$i++ => ['DIGIRISKDOLIBARR_SHOW_PATCH_NOTE', 'integer', 1, '', 0, 'current'],
 
-			//CONST TICKET & REGISTERS
-			$i++ => ['DIGIRISKDOLIBARR_TICKET_EXTRAFIELDS', 'integer', 0, '', 0, 0],
-			$i++ => ['DIGIRISKDOLIBARR_TICKET_CATEGORIES_CREATED', 'integer', 0, '', 0, 'current'],
-			$i++ => ['DIGIRISKDOLIBARR_TICKET_ENABLE_PUBLIC_INTERFACE', 'integer', 1, '', 0, 'current'],
-			$i++ => ['DIGIRISKDOLIBARR_TICKET_SHOW_COMPANY_LOGO', 'integer', 1, '', 0, 'current'],
-			$i++ => ['DIGIRISKDOLIBARR_TICKET_SUBMITTED_SEND_MAIL_TO', 'chaine', '', '', 0, 'current'],
-			$i++ => ['DIGIRISKDOLIBARR_TICKET_PARENT_CATEGORY', 'integer', 0, '', 0, 'current'],
-			$i++ => ['DIGIRISKDOLIBARR_TICKET_MAIN_CATEGORY', 'integer', 0, '', 0, 'current'],
-			$i++ => ['DIGIRISKDOLIBARR_TICKET_PARENT_CATEGORY_LABEL', 'chaine', $langs->trans('Registre'), '', 0, 'current'],
-			$i++ => ['DIGIRISKDOLIBARR_TICKET_CHILD_CATEGORY_LABEL', 'chaine', $langs->trans('Pertinence'), '', 0, 'current'],
-			$i++ => ['DIGIRISKDOLIBARR_TICKET_PROJECT', 'integer', 0, '', 0, 'current'],
-			$i++ => ['DIGIRISKDOLIBARR_TICKET_SUCCESS_MESSAGE', 'chaine', $langs->trans('YouMustNotifyYourHierarchy'), '', 0, 'current'],
-			$i++ => ['DIGIRISKDOLIBARR_TICKET_EMAIL_REQUIRED', 'integer', 0, '', 0, 'current'],
-			$i++ => ['DIGIRISKDOLIBARR_SHOW_MULTI_ENTITY_SELECTOR_ON_TICKET_PUBLIC_INTERFACE', 'integer', 0, '', 0, 'current'],
-			$i++ => ['DIGIRISKDOLIBARR_TICKET_DIGIRISKELEMENT_REQUIRED', 'integer', 1, '', 0, 'current'],
-
 			// CONST ACCIDENT
 			$i++ => ['DIGIRISKDOLIBARR_MAIN_AGENDA_ACTIONAUTO_ACCIDENT_CREATE', 'integer', 1, '', 0, 'current'],
 			$i++ => ['DIGIRISKDOLIBARR_MAIN_AGENDA_ACTIONAUTO_ACCIDENT_MODIFY', 'integer', 1, '', 0, 'current'],
