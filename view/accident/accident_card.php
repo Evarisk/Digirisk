@@ -586,6 +586,7 @@ if (empty($reshook)) {
         $options['metadata']   = GETPOST('clone_metadata');
         $options['photos']     = GETPOST('clone_photos');
         $options['categories'] = GETPOST('clone_categories');
+        $options['attendants'] = GETPOST('clone_attendants');
         if ($object->id > 0) {
             $result = $object->createFromClone($user, $object->id, $options);
             if ($result > 0) {
@@ -710,12 +711,12 @@ if ($action == 'create') {
 	$doleditor = new DolEditor('description', GETPOST('description'), '', 90, 'dolibarr_details', '', false, true, $conf->global->FCKEDITOR_ENABLE_SOCIETE, ROWS_3, '90%');
 	$doleditor->Create();
 	print '</td></tr>';
-  
+
   //Fk Ticket -- Fk Ticket
   print '<tr class="content_field"><td><label for="content">' . $langs->trans("FkTicket") . '</label></td><td>';
   print $form->selectTicketsList(GETPOST('fk_ticket'), 'fk_ticket', '', 0, '', 1, 0, '1', 0, 'minwidth300');
   print '</td></tr>';
-  
+
   // Categories
   if (!empty($conf->categorie->enabled)) {
       print '<tr><td>'.$langs->trans("Categories").'</td><td>';
@@ -822,7 +823,7 @@ if (($id || $ref) && $action == 'edit') {
   print '<tr class="content_field"><td><label for="content">' . $langs->trans("FkTicket") . '</label></td><td>';
   print $form->selectTicketsList($object->fk_ticket ?: GETPOST('fk_ticket'), 'fk_ticket', '', 0, '', 1, 0, '1', 0, 'minwidth300');
   print '</td></tr>';
-  
+
   // Tags-Categories
   if ($conf->categorie->enabled) {
       print '<tr><td>'.$langs->trans("Categories").'</td><td>';
@@ -928,7 +929,8 @@ if ((empty($action) || ($action != 'create' && $action != 'edit'))) {
             ['type' => 'checkbox', 'name' => 'clone_metadata',   'label' => $langs->trans('CloneMetadata'),   'value' => 1],
             ['type' => 'checkbox', 'name' => 'clone_lesion',     'label' => $langs->trans('CloneLesion'),     'value' => 1],
             ['type' => 'checkbox', 'name' => 'clone_photos',     'label' => $langs->trans('ClonePhotos'),     'value' => 1],
-            ['type' => 'checkbox', 'name' => 'clone_categories', 'label' => $langs->trans('CloneCategories'), 'value' => 1]
+            ['type' => 'checkbox', 'name' => 'clone_categories', 'label' => $langs->trans('CloneCategories'), 'value' => 1],
+            ['type' => 'checkbox', 'name' => 'clone_attendants', 'label' => $langs->trans('CloneAttendants'), 'value' => 1]
         ];
 
         $formConfirm .= $form->formconfirm($_SERVER['PHP_SELF'] . '?id=' . $object->id, $langs->trans('CloneObject', $langs->transnoentities('The' . ucfirst($object->element))), $langs->trans('ConfirmCloneObject', $langs->transnoentities('The' . ucfirst($object->element))), 'confirm_clone', $formQuestionClone, 'yes', 'actionButtonClone', 350, 600);
@@ -1112,7 +1114,9 @@ if ((empty($action) || ($action != 'create' && $action != 'edit'))) {
 		if ($reshook < 0) setEventMessages($hookmanager->error, $hookmanager->errors, 'errors');
 
 		if (empty($reshook)) {
-			// Edit
+            $allSigned = $signatory->checkSignatoriesSignatures($id, $object->element);
+
+            // Edit
 			$displayButton = $onPhone ? '<i class="fas fa-edit fa-2x"></i>' : '<i class="fas fa-edit"></i>' . ' ' . $langs->trans('Modify');
 			if ($object->status == $object::STATUS_DRAFT) {
 				print '<a class="butAction" id="actionButtonEdit" href="' . $_SERVER['PHP_SELF'] . '?id=' . $object->id . '&action=edit' . '">' . $displayButton . '</a>';
@@ -1136,9 +1140,17 @@ if ((empty($action) || ($action != 'create' && $action != 'edit'))) {
                 print '<span class="butActionRefused classfortooltip" title="' . dol_escape_htmltag($langs->trans('ObjectMustBeValidated', ucfirst($langs->transnoentities('The' . ucfirst($object->element))))) . '">' . $displayButton . '</span>';
             }
 
+            // Sign.
+            $displayButton = $onPhone ? '<i class="fas fa-signature fa-2x"></i>' : '<i class="fas fa-signature"></i>' . ' ' . $langs->trans('Sign');
+            if ($object->status == Accident::STATUS_VALIDATED && !$allSigned) {
+                print '<a class="butAction" id="actionButtonSign" href="' . dol_buildpath('/saturne/view/saturne_attendants.php', 1) . '?id=' . $object->id . '&module_name=' . $object->module . '&object_type=' . $object->element . '&attendant_table_mode=simple' . '">' . $displayButton . '</a>';
+            } else {
+                print '<span class="butActionRefused classfortooltip" title="' . dol_escape_htmltag($langs->trans('ObjectMustBeValidated', ucfirst($langs->transnoentities('The' . ucfirst($object->element))))) . '">' . $displayButton . '</span>';
+            }
+
 			// Lock.
 			$displayButton = $onPhone ? '<i class="fas fa-lock fa-2x"></i>' : '<i class="fas fa-lock"></i>' . ' ' . $langs->trans('Lock');
-			if ($object->status == Accident::STATUS_VALIDATED) {
+			if ($object->status == Accident::STATUS_VALIDATED && $allSigned) {
 				print '<span class="butAction" id="actionButtonLock">' . $displayButton . '</span>';
 			} else {
 				print '<span class="butActionRefused classfortooltip" title="' . dol_escape_htmltag($langs->trans('ObjectMustBeDraft', ucfirst($langs->transnoentities('The' . ucfirst($object->element))))) . '">' . $displayButton . '</span>';
