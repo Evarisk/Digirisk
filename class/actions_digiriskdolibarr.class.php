@@ -61,6 +61,37 @@ class ActionsDigiriskdolibarr
 		$this->db = $db;
 	}
 
+    /**
+     * Overloading the constructCategory function : replacing the parent's function with the one below
+     *
+     * @param   array           $parameters     Hook metadatas (context, etc...)
+     * @param   CommonObject    $object         The object to process (an invoice if you are in invoice module, a propale in propale's module, etc...)
+     * @return  int                             0 < on error, 0 on success, 1 to replace standard code
+     */
+    public function constructCategory($parameters, &$object)
+    {
+        $error = 0; // Error counter
+
+        if (($parameters['currentcontext'] == 'category')) {
+            $tags = [
+                'accident' => [
+                    'id'        => 436302001,
+                    'code'      => 'accident',
+                    'obj_class' => 'Accident',
+                    'obj_table' => 'digiriskdolibarr_accident',
+                ],
+            ];
+        }
+
+        if (!$error) {
+            $this->results = $tags;
+            return 0; // or return 1 to replace standard code
+        } else {
+            $this->errors[] = 'Error message';
+            return -1;
+        }
+    }
+
 	/**
 	 * Overloading the printCommonFooter function : replacing the parent's function with the one below
 	 *
@@ -371,43 +402,47 @@ class ActionsDigiriskdolibarr
 					}
 				}
 
-				if (in_array($parameters['currentcontext'], array('projectcard', 'projectcontactcard', 'projecttaskscard', 'projecttasktime', 'projectOverview'))) {
-					if ($parameters['currentcontext'] == 'projecttasktime') {
-						$project->fetch(GETPOST('projectid'), GETPOST('project_ref'));
-					} else {
-						$project->fetch(GETPOST('id'), GETPOST('ref'));
+				if (in_array($parameters['currentcontext'], ['projectcard', 'projectcontactcard', 'projecttaskcard', 'projecttaskscard', 'projecttasktime', 'projectOverview'])) {
+					if (GETPOSTISSET('projectid') || GETPOSTISSET('project_ref')) {
+                        $project->fetch( GETPOST('projectid'), GETPOST('project_ref'));
+                        $projectId = $project->id;
+                    } else if (in_array($parameters['currentcontext'], ['projectcard', 'projectcontactcard', 'projecttaskscard'])) {
+                        $projectId = GETPOST('id');
+                    } else {
+                        $task->fetch(GETPOST('id'));
+                        $projectId = $task->fk_project;
 					}
-					$alltasks = $task->getTasksArray(null, null, $project->id, 0, 0, '', '-1', '', 0, 0, $extrafields);
-					if (is_array($alltasks) && !empty($alltasks)) {
-						$nbtasks = count($alltasks);
-						foreach ($alltasks as $tasksignle) {
-							$filter = ' AND fk_element = ' . $tasksignle->id;
-							$alltimespent = $task->fetchAllTimeSpentAllUsers($filter);
-							foreach ($alltimespent as $timespent) {
-								$totatconsumedtimeamount += convertSecondToTime($timespent->timespent_duration, 'allhourmin') * $timespent->timespent_thm;
+					$allTasks = $task->getTasksArray(null, null, $projectId, 0, 0, '', '-1', '', 0, 0, $extrafields);
+                    if (is_array($allTasks) && !empty($allTasks)) {
+						$nbTasks = count($allTasks);
+						foreach ($allTasks as $taskSingle) {
+							$filter       = ' AND fk_element = ' . $taskSingle->id;
+							$allTimespent = $task->fetchAllTimeSpentAllUsers($filter);
+							foreach ($allTimespent as $timespent) {
+								$totatConsumedTimeAmount += convertSecondToTime($timespent->timespent_duration, 'allhourmin') * $timespent->timespent_thm;
 							}
-							$totatconsumedtime += $tasksignle->duration;
-							$totalprogress += $tasksignle->progress;
-							$totaltasksbudget += $tasksignle->budget_amount;
+							$totalConsumedTime += $taskSingle->duration;
+							$totalProgress     += $taskSingle->progress;
+							$totalTasksBudget  += $taskSingle->budget_amount;
 						}
 					} else {
-						$totatconsumedtime = 0;
-						$totatconsumedtimeamount = 0;
-						$nbtasks = 0;
-						$totalprogress = 0;
-						$totaltasksbudget = 0;
+						$totalConsumedTime       = 0;
+						$totatConsumedTimeAmount = 0;
+						$nbTasks                 = 0;
+						$totalProgress           = 0;
+						$totalTasksBudget        = 0;
 					}
-					$outTotatconsumedtime = '<tr><td>' . $langs->trans('TotalConsumedTime') . '</td><td>' . convertSecondToTime($totatconsumedtime, 'allhourmin') . '</td></tr>';
-					$outTotatconsumedtimeamount = '<tr><td>' . $langs->trans('TotalConsumedTimeAmount') . '</td><td>' . price($totatconsumedtimeamount, 0, $langs, 1, -1, 2, $conf->currency) . '</td></tr>';
-					$outNbtasks = '<tr><td>' . $langs->trans('NbTasks') . '</td><td>' . $nbtasks . '</td></tr>';
-					$outTotalprogress = '<tr><td>' . $langs->trans('TotalProgress') . '</td><td>' . (($totalprogress) ? price2num($totalprogress/$nbtasks, 2) . ' %' : '0 %') . '</td></tr>';
-					$outTotaltasksbudget = '<tr><td>' . $langs->trans('TotalBudget') . '</td><td>' . price($totaltasksbudget, 0, $langs, 1, -1, 2, $conf->currency) . '</td></tr>'; ?>
+					$outTotatConsumedTime       = '<tr><td>' . $langs->trans('TotalConsumedTime') . '</td><td>' . convertSecondToTime($totalConsumedTime, 'allhourmin') . '</td></tr>';
+					$outTotatConsumedTimeAmount = '<tr><td>' . $langs->trans('TotalConsumedTimeAmount') . '</td><td>' . price($totatConsumedTimeAmount, 0, $langs, 1, -1, 2, $conf->currency) . '</td></tr>';
+					$outNbtasks                 = '<tr><td>' . $langs->trans('NbTasks') . '</td><td>' . $nbTasks . '</td></tr>';
+					$outTotalProgress           = '<tr><td>' . $langs->trans('TotalProgress') . '</td><td>' . (($totalProgress) ? price2num($totalProgress/$nbTasks, 2) . ' %' : '0 %') . '</td></tr>';
+					$outTotalTasksBudget        = '<tr><td>' . $langs->trans('TotalBudget') . '</td><td>' . price($totalTasksBudget, 0, $langs, 1, -1, 2, $conf->currency) . '</td></tr>'; ?>
 					<script>
-						jQuery('.fichecenter .fichehalfright .tableforfield tbody tr:last-child').first().after(<?php echo json_encode($outTotatconsumedtime) ?>);
-						jQuery('.fichecenter .fichehalfright .tableforfield tbody tr:last-child').first().after(<?php echo json_encode($outTotatconsumedtimeamount) ?>);
+						jQuery('.fichecenter .fichehalfright .tableforfield tbody tr:last-child').first().after(<?php echo json_encode($outTotatConsumedTime) ?>);
+						jQuery('.fichecenter .fichehalfright .tableforfield tbody tr:last-child').first().after(<?php echo json_encode($outTotatConsumedTimeAmount) ?>);
 						jQuery('.fichecenter .fichehalfright .tableforfield tbody tr:last-child').first().after(<?php echo json_encode($outNbtasks) ?>);
-						jQuery('.fichecenter .fichehalfright .tableforfield tbody tr:last-child').first().after(<?php echo json_encode($outTotalprogress) ?>);
-						jQuery('.fichecenter .fichehalfright .tableforfield tbody tr:last-child').first().after(<?php echo json_encode($outTotaltasksbudget) ?>);
+						jQuery('.fichecenter .fichehalfright .tableforfield tbody tr:last-child').first().after(<?php echo json_encode($outTotalProgress) ?>);
+						jQuery('.fichecenter .fichehalfright .tableforfield tbody tr:last-child').first().after(<?php echo json_encode($outTotalTasksBudget) ?>);
 					</script>
 					<?php
 				}
@@ -438,7 +473,101 @@ class ActionsDigiriskdolibarr
 				</script>
 				<?php
 			}
-		}
+		} elseif (preg_match('/categoryindex/', $parameters['context'])) {	    // do something only for the context 'somecontext1' or 'somecontext2'
+            print '<script src="../custom/digiriskdolibarr/js/digiriskdolibarr.js"></script>';
+        } elseif (preg_match('/categorycard/', $parameters['context']) && preg_match('/viewcat.php/', $_SERVER["PHP_SELF"])) {
+            global $user;
+            $id = GETPOST('id');
+            $type = GETPOST('type');
+
+            // Load variable for pagination
+            $limit = GETPOST('limit', 'int') ?GETPOST('limit', 'int') : $conf->liste_limit;
+            $sortfield = GETPOST('sortfield', 'aZ09comma');
+            $sortorder = GETPOST('sortorder', 'aZ09comma');
+            $page = GETPOSTISSET('pageplusone') ? (GETPOST('pageplusone') - 1) : GETPOST("page", 'int');
+            if (empty($page) || $page == -1) {
+                $page = 0;
+            }     // If $page is not defined, or '' or -1 or if we click on clear filters or if we select empty mass action
+            $offset = $limit * $page;
+
+            if ($type == 'accident') {
+                require_once __DIR__ . '/' . $type . '.class.php';
+
+                $classname = ucfirst($type);
+                $object = new $classname($this->db);
+
+                $arrayObjects = $object->fetchAll();
+                if (is_array($arrayObjects) && !empty($arrayObjects)) {
+                    foreach ($arrayObjects as $objectsingle) {
+                        $array[$objectsingle->id] = $objectsingle->ref;
+                    }
+                }
+
+                $category = new Categorie($this->db);
+                $category->fetch($id);
+                $objectsInCateg = $category->getObjectsInCateg($type, 0, $limit, $offset);
+
+                $out = '<br>';
+
+                $out .= '<form method="post" action="' . $_SERVER["PHP_SELF"] . '?id=' . $id . '&type=' . $type . '">';
+                $out .= '<input type="hidden" name="token" value="'.newToken().'">';
+                $out .= '<input type="hidden" name="action" value="addintocategory">';
+
+                $out .= '<table class="noborder centpercent">';
+                $out .= '<tr class="liste_titre"><td>';
+                $out .= $langs->trans("Add". ucfirst($type) . "IntoCategory") . ' ';
+                $out .= $form->selectarray('element_id', $array, '', 1);
+                $out .= '<input type="submit" class="button buttongen" value="'.$langs->trans("ClassifyInCategory").'"></td>';
+                $out .= '</tr>';
+                $out .= '</table>';
+                $out .= '</form>';
+
+                $out .= '<br>';
+
+                //$param = '&limit=' . $limit . '&id=' . $id . '&type=' . $type;
+                //$num = count($objectsInCateg);
+                //print_barre_liste($langs->trans(ucfirst($type)), $page, $_SERVER["PHP_SELF"], $param, '', '', '', $num, '', 'object_'.$type.'@digiquali', 0, '', '', $limit);
+
+                $out .= load_fiche_titre($langs->transnoentities($classname), '', 'object_' . $object->picto);
+                $out .= '<table class="noborder centpercent">';
+                $out .= '<tr class="liste_titre"><td colspan="3">'.$langs->trans("Ref").'</td></tr>';
+
+                if (is_array($objectsInCateg) && !empty($objectsInCateg)) {
+                    // Form to add record into a category
+                    if (count($objectsInCateg) > 0) {
+                        $i = 0;
+                        foreach ($objectsInCateg as $element) {
+                            $i++;
+                            if ($i > $limit) break;
+
+                            $out .= '<tr class="oddeven">';
+                            $out .= '<td class="nowrap" valign="top">';
+                            $out .= $element->getNomUrl(1);
+                            $out .= '</td>';
+                            // Link to delete from category
+                            $out .= '<td class="right">';
+                            if ($user->rights->categorie->creer) {
+                                $out .= '<a href="' . $_SERVER["PHP_SELF"] . '?action=delintocategory&id=' . $id . '&type=' . $type . '&element_id=' . $element->id . '&token=' . newToken() . '">';
+                                $out .= $langs->trans("DeleteFromCat");
+                                $out .= img_picto($langs->trans("DeleteFromCat"), 'unlink', '', false, 0, 0, '', 'paddingleft');
+                                $out .= '</a>';
+                            }
+                            $out .= '</td>';
+                            $out .= '</tr>';
+                        }
+                    } else {
+                        $out .= '<tr class="oddeven"><td colspan="2" class="opacitymedium">'.$langs->trans("ThisCategoryHasNoItems").'</td></tr>';
+                    }
+                }
+
+                $out .= '</table>';
+            } ?>
+
+            <script>
+                jQuery('.fichecenter').last().after(<?php echo json_encode($out) ; ?>)
+            </script>
+            <?php
+        }
 
 		if (true) {
 			$this->results   = array('myreturn' => 999);
@@ -460,8 +589,9 @@ class ActionsDigiriskdolibarr
 	 */
 	public function doActions($parameters, $object, $action)
 	{
-		global $db, $conf;
+		global $conf, $db;
 
+        $error = 0;
 		/* print_r($parameters); print_r($object); echo "action: " . $action; */
 		if ($parameters['currentcontext'] == 'admincompany') {	    // do something only for the context 'somecontext1' or 'somecontext2'
 			if ($action == 'update') {
@@ -546,15 +676,47 @@ class ActionsDigiriskdolibarr
 					}
 				}
 			}
-		}
+		} elseif (preg_match('/categorycard/', $parameters['context'])) {
+            global $langs, $user;
+            $id = GETPOST('id');
+            $elementId = GETPOST('element_id');
+            $type = GETPOST('type');
+            if ($id > 0 && $elementId > 0 && ($type == 'accident' && $user->rights->digiriskdolibarr->$type->write)) {
 
+                require_once __DIR__ . '/' . $type . '.class.php';
+                $classname = ucfirst($type);
+                $newobject = new $classname($this->db);
+
+                $newobject->fetch($elementId);
+
+                if (GETPOST('action') == 'addintocategory') {
+                    $result = $object->add_type($newobject, $type);
+                    if ($result >= 0) {
+                        setEventMessages($langs->trans("WasAddedSuccessfully", $newobject->ref), array());
+
+                    } else {
+                        if ($object->error == 'DB_ERROR_RECORD_ALREADY_EXISTS') {
+                            setEventMessages($langs->trans("ObjectAlreadyLinkedToCategory"), array(), 'warnings');
+                        } else {
+                            setEventMessages($object->error, $object->errors, 'errors');
+                        }
+                    }
+                } elseif (GETPOST('action') == 'delintocategory') {
+                    $result = $object->del_type($newobject, $type);
+                    if ($result < 0) {
+                        dol_print_error('', $object->error);
+                    }
+                    $action = '';
+                }
+            }
+        }
 		if (!$error) {
 			$this->results   = array('myreturn' => 999);
 			$this->resprints = 'A text to show';
 			return 0; // or return 1 to replace standard code
 		} else {
-			$this->errors = $errors;
-			return -1;
+            $this->errors[] = 'Error message';
+            return -1;
 		}
 	}
 
@@ -571,14 +733,14 @@ class ActionsDigiriskdolibarr
 		$value = array();
 
 		/* print_r($parameters); print_r($object); echo "action: " . $action; */
-		if ($parameters['currentcontext'] == 'emailtemplates') {	    // do something only for the context 'somecontext1' or 'somecontext2'
-			if ($conf->digiriskdolibarr->enabled && $user->rights->digiriskdolibarr->preventionplan->read) {
+		if (isModEnabled('digiriskdolibarr') && $parameters['currentcontext'] == 'emailtemplates') {	    // do something only for the context 'somecontext1' or 'somecontext2'
+			if ($user->hasRight('digiriskdolibarr', 'preventionplan', 'read')) {
 				$value['preventionplan'] = '<i class="fas fa-info"></i>  ' . dol_escape_htmltag($langs->trans('PreventionPlan'));
 			}
-			if ($conf->digiriskdolibarr->enabled && $user->rights->digiriskdolibarr->firepermit->read) {
+			if ($user->hasRight('digiriskdolibarr', 'firepermit', 'read')) {
 				$value['firepermit'] = '<i class="fas fa-fire-alt"></i>  ' . dol_escape_htmltag($langs->trans('FirePermit'));
 			}
-			if ($conf->digiriskdolibarr->enabled && $user->rights->digiriskdolibarr->riskassessmentdocument->read) {
+			if ($user->hasRight('digiriskdolibarr', 'riskassessmentdocument', 'read')) {
 				$value['riskassessmentdocument'] = '<i class="fas fa-exclamation-triangle"></i>  ' . dol_escape_htmltag($langs->trans('RiskAssessmentDocument'));
 			}
 		}

@@ -491,7 +491,7 @@ class Risk extends SaturneObject
 	public function getTasksWithFkRisk()
 	{
 		$sql = "SELECT * FROM " . MAIN_DB_PREFIX . 'projet_task_extrafields' . ' WHERE fk_risk > 0';
-		$tasksList = saturne_fetch_all_object_type('SaturneTask');
+		$tasksList = saturne_fetch_all_object_type('SaturneTask', '', '', 0, 0, [], 'AND', false, false);
 
 		$resql = $this->db->query($sql);
 

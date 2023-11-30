@@ -690,6 +690,7 @@ if ($action == 'create') {
 	print $htmltext;
 	print '</td><td>';
 	print $form->selectcontacts((empty(GETPOST('ext_society', 'int')) ? -1 : GETPOST('ext_society', 'int')), $extSocietyResponsibleId, 'ext_society_responsible', 1, '', '', 1, 'minwidth100imp widthcentpercentminusxx maxwidth400');
+	print '<a href="' . DOL_URL_ROOT . '/contact/card.php?action=create' . (empty(GETPOST('ext_society', 'int')) ? '' : '&socid=' . GETPOST('ext_society', 'int')) .'&backtopage=' . urlencode($_SERVER["PHP_SELF"] . '?action=create&ext_society='. (empty(GETPOST('ext_society', 'int')) ? '' : GETPOST('ext_society', 'int'))) . '" target="_blank"><span class="fa fa-plus-circle valignmiddle paddingleft" title="' . $langs->trans("AddContact") . '"></span></a>';
 	print '</td></tr>';
 
 	//Labour inspector Society -- Entreprise Inspecteur du travail
@@ -821,7 +822,8 @@ if (($id || $ref) && $action == 'edit') {
 	print $htmltext;
 	print '</td><td>';
 	print $form->selectcontacts($extSociety->id, dol_strlen($contact->email) ? $extSocietyResponsibleId : -1, 'ext_society_responsible', '', 0, '', 1, 'minwidth100imp widthcentpercentminusxx maxwidth400');
-	print '</td></tr>';
+    print '<a href="' . DOL_URL_ROOT . '/contact/card.php?action=create' . (empty($extSociety->id) ? '' : '&socid=' . $extSociety->id) .'&backtopage=' . urlencode($_SERVER["PHP_SELF"] . '?action=create&ext_society='. (empty($extSociety->id) ? '' : $extSociety->id)) . '" target="_blank"><span class="fa fa-plus-circle valignmiddle paddingleft" title="' . $langs->trans("AddContact") . '"></span></a>';
+    print '</td></tr>';
 
 	if (is_array($objectResources['LabourInspector']) && $objectResources['LabourInspector'] > 0) {
 		$labourInspectorSociety = array_shift($objectResources['LabourInspector']);

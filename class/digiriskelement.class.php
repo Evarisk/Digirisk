@@ -251,14 +251,17 @@ class DigiriskElement extends SaturneObject
      */
     public function selectDigiriskElementList($selected = '', $htmlname = 'fk_element', $filter = [], $showempty = '1', $forcecombo = 0, $events = array(), $outputmode = 0, $limit = 0, $morecss = 'minwidth100', $current_element = 0, $multiple = false, $noroot = 0, $contextpage = '', $multientitymanaged = true, $hideref  = false)
     {
-        global $form;
+        global $conf, $form, $langs;
 
         if (dol_strlen($filter['customsql'])) {
             $filter['customsql'] .= ' AND t.rowid != ' . ($this->id ?? 0);
         }
 
-        $objectList = saturne_fetch_all_object_type('digiriskelement', '', '', $limit, 0, $filter, 'AND', false, $multientitymanaged);
-        $digiriskElementsData  = [];
+        $objectList           = saturne_fetch_all_object_type('digiriskelement', '', '', $limit, 0, $filter, 'AND', false, $multientitymanaged);
+        $digiriskElementsData = [];
+        if ($noroot == 0) {
+            $digiriskElementsData[0] = $langs->trans('Root') . ' : ' . $conf->global->MAIN_INFO_SOCIETE_NOM ;
+        }
         if (is_array($objectList) && !empty($objectList)) {
             foreach ($objectList as $digiriskElement) {
                 $digiriskElementsData[$digiriskElement->id] = ($hideref ? '' : $digiriskElement->ref . ' - ') . $digiriskElement->label;

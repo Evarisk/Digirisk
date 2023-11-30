@@ -240,7 +240,7 @@ if ($action == 'createTimeRange') {
         exit;
     }
     if (dol_strlen($constraintLabel) == 0) {
-        $constraintLabel = $langs->trans($langs->trans(ucfirst($comparatorPost) . 'Than') . ' ' . $rangeNumberPost . ' ' . $langs->trans(ucfirst($timeRangePost)));
+        $constraintLabel = $langs->trans($langs->transnoentities(ucfirst($comparatorPost) . 'Than') . ' ' . $rangeNumberPost . ' ' . $langs->transnoentities(ucfirst($timeRangePost)));
     }
 
     $accidentWorkStopTimeRangesJson = $conf->global->DIGIRISKDOLIBARR_TICKET_STATISTICS_ACCIDENT_TIME_RANGE;

@@ -261,6 +261,8 @@ class TicketDigiriskStats extends DigiriskStats
                                                 $accidentWorkStopDaysCounter += $accidentWorkStop->workstop_days;
                                             }
                                         }
+
+                                        // Turn constraint assertion (less:2:days) into executable logical condition
                                         $condition = "\$result = \$accidentWorkStopDaysCounter $constraintComparator \$constraintInDays*$constraintMultiplicator;";
                                         eval($condition);
 

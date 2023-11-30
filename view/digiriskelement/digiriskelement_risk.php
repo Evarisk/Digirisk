@@ -205,6 +205,12 @@ $helpUrl = 'FR:Module_Digirisk#.C3.89valuation_des_Risques';
 
 digirisk_header($title, $helpUrl);
 
+if ($conf->browser->layout == 'phone') {
+    $onPhone = 1;
+} else {
+    $onPhone = 0;
+}
+
 print '<div id="cardContent" value="">';
 
 if ($sharedrisks) {

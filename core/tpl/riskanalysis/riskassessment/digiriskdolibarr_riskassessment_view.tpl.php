@@ -1,8 +1,13 @@
 <?php
 $allRiskAssessment = $riskAssessmentsOrderedByRisk[$risk->id];
-$lastEvaluation    = array_filter($allRiskAssessment, function($lastRiskAssessment) {
+$lastRiskAssessment    = array_filter($allRiskAssessment, function($lastRiskAssessment) {
 	return $lastRiskAssessment->status == 1;
 });
+
+if (is_array($lastRiskAssessment) && !empty($lastRiskAssessment)) {
+    $lastRiskAssessment = array_shift($lastRiskAssessment);
+}
+
 if (is_array($allRiskAssessment) && !empty($allRiskAssessment)) :
 	usort($allRiskAssessment, function ($riskAssessmentComparer, $riskAssessmentCompared) {
 	return $riskAssessmentComparer->date_creation < $riskAssessmentCompared->date_creation;
@@ -229,7 +234,7 @@ else : ?>
 	</div>
 </div>
 <?php endif;
-$evaluation->method = $lastEvaluation->method ?: "standard" ;
+$evaluation->method = $lastRiskAssessment->method ?: "standard" ;
 ?>
 <!-- RISK EVALUATION ADD MODAL-->
 <div class="risk-evaluation-add-modal">
@@ -264,55 +269,51 @@ $evaluation->method = $lastEvaluation->method ?: "standard" ;
 					<div class="risk-evaluation-header">
 						<?php if ($conf->global->DIGIRISKDOLIBARR_ADVANCED_RISKASSESSMENT_METHOD) : ?>
 							<?php if ( $conf->global->DIGIRISKDOLIBARR_MULTIPLE_RISKASSESSMENT_METHOD == 1 ) : ?>
-								<div class="wpeo-button evaluation-standard select-evaluation-method<?php echo ($lastEvaluation->method == "standard") ? " selected button-blue" : " button-grey" ?> button-radius-2">
+								<div class="wpeo-button evaluation-standard select-evaluation-method<?php echo ($lastRiskAssessment->method == "standard") ? " selected button-blue" : " button-grey" ?> button-radius-2">
 									<span><?php echo $langs->trans('SimpleEvaluation') ?></span>
 								</div>
-								<div class="wpeo-button evaluation-advanced select-evaluation-method<?php echo ($lastEvaluation->method == "advanced") ? " selected button-blue" : " button-grey" ?> button-radius-2">
+								<div class="wpeo-button evaluation-advanced select-evaluation-method<?php echo ($lastRiskAssessment->method == "advanced") ? " selected button-blue" : " button-grey" ?> button-radius-2">
 									<span><?php echo $langs->trans('AdvancedEvaluation') ?></span>
 								</div>
 							<?php else : ?>
-								<div class="wpeo-button evaluation-standard select-evaluation-method<?php echo ($lastEvaluation->method == "standard") ? " selected button-blue" : " button-grey button-disable" ?> button-radius-2">
+								<div class="wpeo-button evaluation-standard select-evaluation-method<?php echo ($lastRiskAssessment->method == "standard") ? " selected button-blue" : " button-grey button-disable" ?> button-radius-2">
 									<span><?php echo $langs->trans('SimpleEvaluation') ?></span>
 								</div>
-								<div class="wpeo-button evaluation-advanced select-evaluation-method<?php echo ($lastEvaluation->method == "advanced") ? " selected button-blue" : " button-grey button-disable" ?> button-radius-2">
+								<div class="wpeo-button evaluation-advanced select-evaluation-method<?php echo ($lastRiskAssessment->method == "advanced") ? " selected button-blue" : " button-grey button-disable" ?> button-radius-2">
 									<span><?php echo $langs->trans('AdvancedEvaluation') ?></span>
 								</div>
 							<?php endif; ?>
 							<i class="fas fa-info-circle wpeo-tooltip-event" aria-label="<?php echo $langs->trans("HowToSetMultipleRiskAssessmentMethod") ?>"></i>
 						<?php endif; ?>
-						<input class="risk-evaluation-method" type="hidden" value="<?php echo ($lastEvaluation->method == "standard") ? "standard" : "advanced" ?>">
+						<input class="risk-evaluation-method" type="hidden" value="<?php echo ($lastRiskAssessment->method == "standard") ? "standard" : "advanced" ?>">
 						<input class="risk-evaluation-multiple-method" type="hidden" value="<?php echo $conf->global->DIGIRISKDOLIBARR_MULTIPLE_RISKASSESSMENT_METHOD ?>">
-						<div class="wpeo-button open-media-gallery add-media modal-open" value="0">
-								<input type="hidden" class="modal-options" data-modal-to-open="media_gallery" data-from-id="0" data-from-type="riskassessment" data-from-subtype="photo" data-from-subdir="<?php echo $risk->ref ?>" data-photo-class="riskassessment-from-riskassessment-create-<?php echo $risk->id ?>"/>
-								<span><i class="fas fa-camera"></i>  <?php echo $langs->trans('AddMedia') ?></span>
-						</div>
 					</div>
 					<div class="risk-evaluation-content-wrapper">
 						<div class="risk-evaluation-content">
 							<div class="cotation-container">
-								<div class="cotation-standard" style="<?php echo ($lastEvaluation->method !== "advanced") ? " display:block" : " display:none" ?>">
+								<div class="cotation-standard" style="<?php echo ($lastRiskAssessment->method !== "advanced") ? " display:block" : " display:none" ?>">
 									<span class="title"><i class="fas fa-chart-line"></i><?php echo ' ' . $langs->trans('RiskAssessment'); ?><required>*</required></span>
 									<div class="cotation-listing wpeo-gridlayout grid-4 grid-gap-0">
-										<?php
-										$defaultCotation = array(0, 48, 51, 100);
-										if ( ! empty($defaultCotation)) :
-											foreach ($defaultCotation as $request) :
-												$evaluation->cotation = $request; ?>
-												<div data-id="<?php echo 0; ?>"
-													 data-evaluation-method="standard"
-													 data-evaluation-id="<?php echo $request; ?>"
-													 data-variable-id="<?php echo 152 + $request; ?>"
-													 data-seuil="<?php echo  $evaluation->getEvaluationScale(); ?>"
-													 data-scale="<?php echo  $evaluation->getEvaluationScale(); ?>"
-													 class="risk-evaluation-cotation cotation"><?php echo $request; ?></div>
-											<?php endforeach;
-										endif; ?>
+                                        <?php
+                                        $defaultCotation = array(0 => '0-47', 48 => '48-50', 51 => '51-80', 100 => '81-100');
+                                        if ( ! empty($defaultCotation)) :
+                                            foreach ($defaultCotation as $cotation => $shownCotation) :
+                                                $evaluation->cotation = $cotation; ?>
+                                                <div data-id="<?php echo 0; ?>"
+                                                     data-evaluation-method="standard"
+                                                     data-evaluation-id="<?php echo $cotation; ?>"
+                                                     data-variable-id="<?php echo 152 + $cotation; ?>"
+                                                     data-seuil="<?php echo  $evaluation->getEvaluationScale(); ?>"
+                                                     data-scale="<?php echo  $evaluation->getEvaluationScale(); ?>"
+                                                     class="risk-evaluation-cotation cotation"><?php echo $shownCotation; ?></div>
+                                            <?php endforeach;
+                                        endif; ?>
 									</div>
 								</div>
 								<input class="risk-evaluation-seuil" type="hidden">
 								<?php $evaluationMethod  = $advancedCotationMethodArray[0];
 								$evaluationMethodSurvey  = $evaluationMethod['option']['variable']; ?>
-								<div class="wpeo-gridlayout cotation-advanced" style="<?php echo ($lastEvaluation->method == "advanced") ? " display:block" : " display:none" ?>">
+								<div class="wpeo-gridlayout cotation-advanced" style="<?php echo ($lastRiskAssessment->method == "advanced") ? " display:block" : " display:none" ?>">
 									<input type="hidden" class="digi-method-evaluation-id" value="<?php echo $risk->id ; ?>" />
 									<textarea style="display: none" name="evaluation_variables" class="tmp_evaluation_variable"><?php echo '{}'; ?></textarea>
 									<p><i class="fas fa-info-circle"></i> <?php echo $langs->trans('SelectEvaluation') ?></p>
@@ -348,22 +349,7 @@ $evaluation->method = $lastEvaluation->method ?: "standard" ;
 								</div>
 							</div>
 						</div>
-						<div class="photo riskassessment-from-riskassessment-create-<?php echo $risk->id ?>" style="margin: auto">
-							<?php $riskAssessment = $evaluation;
-							$data = json_decode(file_get_contents('php://input'), true);
-							if ($subaction != 'unlinkFile') {
-								$fileName =  $data['filename'];
-							}
-							if (dol_strlen($fileName) > 0) {
-								$evaluation->photo = $fileName;
-								$showOnlyFavorite = 1;
-							} else {
-								$showOnlyFavorite = 0;
-							}
-							print saturne_show_medias_linked('digiriskdolibarr', $conf->digiriskdolibarr->multidir_output[$conf->entity] . '/riskassessment/tmp/RA0/' . $risk->ref, 'small', 1, 0, 0, 0, 50, 50, 0, 0, 0, '/riskassessment/tmp/RA0/' . $risk->ref, $evaluation, 'photo', 0, 0, 0, $showOnlyFavorite);
-							?>
-						</div>
-						<div class="risk-evaluation-calculated-cotation" style="<?php echo ($lastEvaluation->method == "advanced") ? " display:block" : " display:none" ?>">
+						<div class="risk-evaluation-calculated-cotation" style="<?php echo ($lastRiskAssessment->method == "advanced") ? " display:block" : " display:none" ?>">
 							<span class="title"><i class="fas fa-chart-line"></i> <?php echo $langs->trans('CalculatedEvaluation'); ?><required>*</required></span>
 							<div data-scale="1" class="risk-evaluation-cotation cotation">
 								<span><?php echo 0 ?></span>
@@ -380,44 +366,65 @@ $evaluation->method = $lastEvaluation->method ?: "standard" ;
 							<?php print $form->selectDate('', 'RiskAssessmentDateCreate0', 0, 0, 0, '', 1, 1); ?>
 						</div>
 					<?php endif; ?>
-					<div class="linked-medias riskassessment-from-riskassessment-create-<?php echo $risk->id ?>">
-						<div class="medias"><i class="fas fa-picture-o"></i><?php echo $langs->trans('Medias'); ?></div>
-						<?php
-						$relativepath = 'digiriskdolibarr/medias/thumbs';
-						print '<div class="wpeo-grid grid-5">';
-						print saturne_show_medias_linked('digiriskdolibarr', $conf->digiriskdolibarr->multidir_output[$conf->entity] . '/riskassessment/tmp/RA0/' . $risk->ref, 'small', 0, 0, 0, 0, 150, 150, 0, 0, 0, '/riskassessment/tmp/RA0/' . $risk->ref, $evaluation);
-						print '</div>';
-						?>
-					</div>
+                    <div class="riskassessment-medias linked-medias riskassessment-from-riskassessment-create-<?php echo $risk->id ?>">
+                        <div class="element-linked-medias element-linked-medias-0 risk-<?php echo $risk->id ?>">
+                            <div class="medias section-title"><i class="fas fa-picture-o"></i><?php echo $langs->trans('Medias'); ?></div>
+                            <table class="add-medias">
+                                <tr>
+                                    <td>
+                                        <input hidden multiple class="fast-upload" id="fast-upload-photo-riskassessment-create-<?php echo $risk->id ?>" type="file" name="userfile[]" capture="environment" accept="image/*">
+                                        <label for="fast-upload-photo-riskassessment-create-<?php echo $risk->id ?>">
+                                            <div class="wpeo-button <?php echo ($onPhone ? 'button-square-40' : 'button-square-50'); ?>">
+                                                <i class="fas fa-camera"></i><i class="fas fa-plus-circle button-add"></i>
+                                            </div>
+                                        </label>
+                                        <input type="hidden" class="favorite-photo" id="photo" name="photo" value="<?php echo $object->photo ?>"/>
+                                    </td>
+                                    <td>
+                                        <div class="wpeo-button <?php echo ($onPhone ? 'button-square-40' : 'button-square-50'); ?> 'open-media-gallery add-media modal-open" value="<?php echo $lastRiskAssessment->id; ?>">
+                                            <input type="hidden" class="modal-options" data-modal-to-open="media_gallery" data-from-id="0" data-from-type="riskassessment" data-from-subtype="photo" data-from-subdir="<?php echo $risk->ref; ?>" data-photo-class="riskassessment-from-riskassessment-create-<?php echo $risk->id ?>"/>
+                                            <i class="fas fa-folder-open"></i><i class="fas fa-plus-circle button-add"></i>
+                                        </div>
+                                    </td>
+                                    <td>
+                                        <?php
+                                        $relativepath = 'digiriskdolibarr/medias/thumbs';
+                                        print saturne_show_medias_linked('digiriskdolibarr', $conf->digiriskdolibarr->multidir_output[$conf->entity] . '/riskassessment/tmp/RA0/' . $risk->ref, 'small', 0, 0, 0, 0, $onPhone ? 40 : 50, $onPhone ? 40 : 50, 1, 0, 0, '/riskassessment/tmp/RA0/' . $risk->ref);
+                                        ?>
+                                    </td>
+                                </tr>
+                            </table>
+                        </div>
+                    </div>
 				</div>
 				<!-- RISK EVALUATION SINGLE -->
-				<?php if ( ! empty($lastEvaluation) && $lastEvaluation > 0) : ?>
-					<div class="risk-evaluation-container last-risk-assessment risk-evaluation-container-<?php echo $lastEvaluation->id ?>">
+				<?php if ( ! empty($lastRiskAssessment) && $lastRiskAssessment > 0) : ?>
+					<div class="risk-evaluation-container last-risk-assessment risk-evaluation-container-<?php echo $lastRiskAssessment->id ?>">
 						<h2><?php echo $langs->trans('LastRiskAssessment') . ' ' . $risk->ref; ?></h2>
 						<div class="risk-evaluation-single-content risk-evaluation-single-content-<?php echo $risk->id ?>">
 							<div class="risk-evaluation-single">
-								<div class="risk-evaluation-cotation risk-evaluation-list" value="<?php echo $risk->id ?>" data-scale="<?php echo $lastEvaluation->getEvaluationScale() ?>">
-									<span><?php echo $lastEvaluation->cotation ?: 0; ?></span>
+								<div class="risk-evaluation-cotation risk-evaluation-list" value="<?php echo $risk->id ?>" data-scale="<?php echo $lastRiskAssessment->getEvaluationScale() ?>">
+									<span><?php echo $lastRiskAssessment->cotation ?: 0; ?></span>
 								</div>
-								<div class="photo riskassessment-photo-<?php echo $lastEvaluation->id > 0 ? $lastEvaluation->id : 0 ; echo $risk->id > 0 ? ' risk-' . $risk->id : ' risk-new' ?>">
+								<div class="photo riskassessment-photo-<?php echo $lastRiskAssessment->id > 0 ? $lastRiskAssessment->id : 0 ; echo $risk->id > 0 ? ' risk-' . $risk->id : ' risk-new' ?>">
                                     <?php
-                                        print saturne_show_medias_linked('digiriskdolibarr', $conf->digiriskdolibarr->multidir_output[$conf->entity] . '/riskassessment/' . $lastEvaluation->ref, 'small', 1, 0, 0, 0, 50, 50, 0, 0, 0, '/riskassessment/' . $lastEvaluation->ref . '/', $lastEvaluation, 'photo', 0, 0, 0, 1);
+                                        print saturne_show_medias_linked('digiriskdolibarr', $conf->digiriskdolibarr->multidir_output[$conf->entity] . '/riskassessment/' . $lastRiskAssessment->ref, 'small', 1, 0, 0, 0, 50, 50, 0, 0, 0, '/riskassessment/' . $lastRiskAssessment->ref . '/', $lastRiskAssessment, 'photo', 0, 0, 0, 1);
 								    ?>
 								</div>
 								<div class="risk-evaluation-content">
 									<div class="risk-evaluation-data">
 										<!-- BUTTON MODAL RISK EVALUATION LIST  -->
-										<span class="risk-evaluation-reference risk-evaluation-list" value="<?php echo $risk->id ?>"><?php echo $lastEvaluation->ref; ?></span>
+										<span class="risk-evaluation-reference risk-evaluation-list" value="<?php echo $risk->id ?>"><?php echo $lastRiskAssessment->ref; ?></span>
 										<span class="risk-evaluation-date">
-											<i class="fas fa-calendar-alt"></i> <?php echo date('d/m/Y', (($conf->global->DIGIRISKDOLIBARR_SHOW_RISKASSESSMENT_DATE && ( ! empty($lastEvaluation->date_riskassessment))) ? $lastEvaluation->date_riskassessment : $lastEvaluation->date_creation)); ?>
+											<i class="fas fa-calendar-alt"></i> <?php echo date('d/m/Y', (($conf->global->DIGIRISKDOLIBARR_SHOW_RISKASSESSMENT_DATE && ( ! empty($lastRiskAssessment->date_riskassessment))) ? $lastRiskAssessment->date_riskassessment : $lastRiskAssessment->date_creation)); ?>
 										</span>
 										<span class="risk-evaluation-author">
-											<?php $userAuthor = $usersList[$lastEvaluation->fk_user_creat?:$user->id];
+											<?php $userAuthor = $usersList[$lastRiskAssessment->fk_user_creat?:$user->id];
 											echo getNomUrlUser($userAuthor); ?>
 										</span>
 									</div>
 									<div class="risk-evaluation-comment">
-										<?php echo dol_trunc($lastEvaluation->comment, 120); ?>
+										<?php echo dol_trunc($lastRiskAssessment->comment, 120); ?>
 									</div>
 								</div>
 							</div>
