@@ -95,9 +95,10 @@ class doc_informationssharing_odt extends SaturneDocumentModel
 
         $objectDocument->DigiriskFillJSON();
 
-		$objectDocument->element = $objectDocument->element . '@digiriskdolibarr';
-		complete_substitutions_array($tmpArray, $outputLangs, $objectDocument);
-		$objectDocument->element = $objectDocument->element;
+        $previousObjectDocumentElement = $objectDocument->element;
+        $objectDocument->element       = $objectDocument->element . '@digiriskdolibarr';
+        complete_substitutions_array($tmpArray, $outputLangs, $objectDocument);
+        $objectDocument->element = $previousObjectDocumentElement;
 
 		$moreParam['tmparray']         = $tmpArray;
 		$moreParam['subDir']           = 'digiriskdolibarrdocuments/';

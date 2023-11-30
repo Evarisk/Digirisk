@@ -285,9 +285,10 @@ class doc_riskassessmentdocument_odt extends SaturneDocumentModel
 
         $objectDocument->DigiriskFillJSON();
 
-        $objectDocument->element = $objectDocument->element . '@digiriskdolibarr';
+        $previousObjectDocumentElement = $objectDocument->element;
+        $objectDocument->element       = $objectDocument->element . '@digiriskdolibarr';
         complete_substitutions_array($tmpArray, $outputLangs, $objectDocument);
-        $objectDocument->element = $objectDocument->element;
+        $objectDocument->element = $previousObjectDocumentElement;
 
         $moreParam['tmparray']         = $tmpArray;
         $moreParam['objectDocument']   = $objectDocument;
