@@ -401,6 +401,8 @@ if ($action == 'create') {
         $displayButton = $onPhone ?  '<i class="fas fa-lock fa-2x"></i>' : '<i class="fas fa-lock"></i>' . ' ' . $langs->trans('Lock');
         if ($object->status == AccidentInvestigation::STATUS_VALIDATED && $allSigned) {
             print '<span class="butAction" id="actionButtonLock" href="' . $_SERVER['PHP_SELF'] . '?id=' . $object->id . '&action=lock&token=' . newToken() . '">' . $displayButton . '</span>';
+        }  else if ($object->status < AccidentInvestigation::STATUS_VALIDATED) {
+            print '<span class="butActionRefused classfortooltip" title="' . dol_escape_htmltag($langs->trans('ObjectMustBeValidated', ucfirst($langs->transnoentities('The' . ucfirst($object->element))))) . '">' . $displayButton . '</span>';
         } else {
             print '<span class="butActionRefused classfortooltip" title="' . dol_escape_htmltag($langs->trans('AllSignatoriesMustHaveSigned', ucfirst($langs->transnoentities('The' . ucfirst($object->element))))) . '">' . $displayButton . '</span>';
         }
