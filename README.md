@@ -22,6 +22,7 @@
 - Demo : [Demo Digirisk](https://demodoli.digirisk.com) - ID: demo - Password: demo
 - Documentation : [Wiki Digirisk](https://wiki.dolibarr.org/index.php/Module_DigiriskDolibarr)
 - Projet GitHub : [Projet Digirisk](https://github.com/Evarisk/Digirisk/projects?type=classic)
+- Saturne Framework : [Télécharger Saturne](https://dolistore.com/fr/modules/1906-Saturne.html)
 - Forum : [Forum Digirisk](https://dolibarr.fr/forum/t/module-digirisk-document-unique/37119)
 - D'autres modules développés par Evarisk disponibles sur [Dolistore.com](https://dolistore.com)
 
@@ -47,5 +48,6 @@ Gérez les risques de votre entreprise et créez votre Document Unique en toute 
 - Dans le dossier "dolibarr/htdocs/custom" copier la ligne suivante :
 ```
 git clone -b main https://github.com/Evarisk/Digirisk.git digiriskdolibarr
+git clone -b main https://github.com/Evarisk/Saturne.git saturne
 ```
 - Activer le module dans la liste des Modules/Applications installés
