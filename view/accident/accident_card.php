@@ -70,6 +70,7 @@ $fk_soc              = GETPOST('fk_soc');
 $object           = new Accident($db);
 $signatory        = new SaturneSignature($db, $object->module, $object->element);
 $objectline       = new AccidentWorkStop($db);
+$accidentLesion   = new AccidentLesion($db);
 $contact          = new Contact($db);
 $usertmp          = new User($db);
 $thirdparty       = new Societe($db);
@@ -92,11 +93,12 @@ if (empty($deletedElements)) {
 
 // Load numbering modules
 $numberingModules = [
-    'digiriskelement/' . $object->element     => $conf->global->DIGIRISKDOLIBARR_ACCIDENT_ADDON,
-    'digiriskelement/' . $objectline->element => $conf->global->DIGIRISKDOLIBARR_ACCIDENTWORKSTOP_ADDON,
+    'digiriskelement/' . $object->element         => $conf->global->DIGIRISKDOLIBARR_ACCIDENT_ADDON,
+    'digiriskelement/' . $objectline->element     => $conf->global->DIGIRISKDOLIBARR_ACCIDENTWORKSTOP_ADDON,
+    'digiriskelement/' . $accidentLesion->element => $conf->global->DIGIRISKDOLIBARR_ACCIDENTLESION_ADDON,
 ];
 
-list($refAccidentMod, $refAccidentWorkStopMod) = saturne_require_objects_mod($numberingModules, $moduleNameLowerCase);
+list($refAccidentMod, $refAccidentWorkStopMod, $refAccidentLesion) = saturne_require_objects_mod($numberingModules, $moduleNameLowerCase);
 
 $hookmanager->initHooks(['accidentcard', 'globalcard']); // Note that conf->hooks_modules contains array
 
@@ -161,7 +163,7 @@ if (empty($reshook)) {
 		$object->date_creation     = $object->db->idate($now);
 		$object->tms               = $now;
 		$object->import_key        = "";
-		$object->status            = Accident::STATUS_VALIDATED;
+		$object->status            = Accident::STATUS_DRAFT;
 		$object->label             = $label;
 		$object->description       = $description;
 		$object->accident_type     = $accident_type;
@@ -201,7 +203,6 @@ if (empty($reshook)) {
 				break;
 		}
 		$object->fk_user_employer = $user_employer_id;
-		$object->fk_user_victim   = $user_victim_id;
 		$object->fk_user_creat    = $user->id ?: 1;
 
 		// Check parameters
@@ -218,16 +219,10 @@ if (empty($reshook)) {
 		if (!$error) {
 			$result = $object->create($user, false);
 			if ($result > 0) {
+                $usertmp->fetch($user_victim_id);
+				$signatory->setSignatory($object->id, 'accident', 'user', array($usertmp->id), 'Victim');
                 $categories = GETPOST('categories', 'array');
                 $object->setCategories($categories);
-
-                // Removed while accidents have no document or attendants page
-//				if (empty($object->fk_user_employer)) {
-//					$usertmp->fetch('', $mysoc->managers, $mysoc->id, 0, $conf->entity);
-//				} else {
-//					$usertmp->fetch($object->fk_user_employer);
-//				}
-//				$signatory->setSignatory($object->id, 'accident', 'user', array($usertmp->id), 'Responsible');
 
 				// Creation Accident OK
 				$urltogo = str_replace('__ID__', $result, $backtopage);
@@ -250,7 +245,6 @@ if (empty($reshook)) {
 	// Action to update record
 	if ($action == 'update' && $permissiontoadd) {
 		// Get parameters
-		$user_victim_id     = GETPOST('fk_user_victim');
 		$user_employer_id   = GETPOST('fk_user_employer');
 		$digiriskelement_id = GETPOST('fk_element');
 		$label              = GETPOST('label');
@@ -302,15 +296,8 @@ if (empty($reshook)) {
 				$object->accident_location = $accident_location;
 				break;
 		}
-		$object->fk_user_victim   = $user_victim_id;
 		$object->fk_user_employer = $user_employer_id;
 		$object->fk_user_creat    = $user->id > 0 ? $user->id : 1;
-
-		// Check parameters
-		if ($user_victim_id < 0) {
-			setEventMessages($langs->trans('ErrorFieldRequired', $langs->transnoentitiesnoconv('UserVictim')), [], 'errors');
-			$error++;
-		}
 
 		if ($user_employer_id < 0) {
 			setEventMessages($langs->trans('ErrorFieldRequired', $langs->transnoentitiesnoconv('UserEmployer')), [], 'errors');
@@ -491,7 +478,29 @@ if (empty($reshook)) {
 		}
 	}
 
-	// Add file in accident workstop
+    // Action to set status STATUS_REOPENED
+    if ($action == 'confirm_setReopened') {
+        $object->fetch($id);
+        if ( ! $error) {
+            $result = $object->setDraft($user, false);
+            if ($result > 0) {
+                $object->verdict = null;
+                $result = $object->update($user);
+                // Set reopened OK
+                $urltogo = str_replace('__ID__', $result, $backtopage);
+                $urltogo = preg_replace('/--IDFORBACKTOPAGE--/', $id, $urltogo); // New method to autoselect project after a New on another form object creation
+                header('Location: ' . $urltogo);
+                exit;
+            } else {
+                // Set reopened KO
+                if ( ! empty($object->errors)) setEventMessages(null, $object->errors, 'errors');
+                else setEventMessages($object->error, null, 'errors');
+            }
+        }
+    }
+
+
+    // Add file in accident workstop
 	if ($action == 'sendfile') {
 		include_once DOL_DOCUMENT_ROOT . '/core/lib/files.lib.php';
 		$objectlineid = GETPOST('objectlineid');
@@ -592,7 +601,9 @@ if (empty($reshook)) {
 	// Actions cancel, add, update, update_extras, confirm_validate, confirm_delete, confirm_deleteline, confirm_clone, confirm_close, confirm_setdraft, confirm_reopen
 	require_once DOL_DOCUMENT_ROOT . '/core/actions_addupdatedelete.inc.php';
 
-	// Action confirm_lock, confirm_archive.
+    include_once __DIR__ . '/../../core/tpl/accident/digiriskdolibarr_accident_lesion_actions.tpl.php';
+
+    // Action confirm_lock, confirm_archive.
 	require_once __DIR__ . '/../../../saturne/core/tpl/signature/signature_action_workflow.tpl.php';
 
     // Actions set_thirdparty, set_project
@@ -763,15 +774,6 @@ if (($id || $ref) && $action == 'edit') {
 	print ' <a href="' . DOL_URL_ROOT . '/user/card.php?action=create&backtopage=' . urlencode($_SERVER["PHP_SELF"] . '?action=create') . '" target="_blank"><span class="fa fa-plus-circle valignmiddle paddingleft" title="' . $langs->trans("AddUser") . '"></span></a>';
 	print '</td></tr>';
 
-	//User Victim -- Utilisateur victime de l'accient
-	$userlist = $form->select_dolusers(( ! empty($object->fk_user_victim) ? $object->fk_user_victim : $user->id), '', 0, null, 0, '', '', $conf->entity, 0, 0, 'AND u.statut = 1', 0, '', 'minwidth300', 0, 1);
-	print '<tr>';
-	print '<td class="fieldrequired minwidth400" style="width:10%">' . img_picto('', 'user') . ' ' . $form->editfieldkey('UserVictim', 'UserVictim_id', '', $object, 0) . '</td>';
-	print '<td>';
-	print $form->selectarray('fk_user_victim', $userlist, ( ! empty($object->fk_user_victim) ? $object->fk_user_victim : $user->id), $langs->trans('SelectUser'), null, null, null, "40%", 0, 0, '', 'minwidth300', 1);
-	print ' <a href="' . DOL_URL_ROOT . '/user/card.php?action=create&backtopage=' . urlencode($_SERVER["PHP_SELF"] . '?action=create') . '" target="_blank"><span class="fa fa-plus-circle valignmiddle paddingleft" title="' . $langs->trans("AddUser") . '"></span></a>';
-	print '</td></tr>';
-
 	//AccidentType
 	print '<tr><td class="minwidth400">' . $langs->trans("AccidentType") . '</td><td>';
 	print $form->selectarray('accident_type', array('0' => $langs->trans('WorkAccidentStatement'), '1' => $langs->trans('CommutingAccident')), $object->accident_type, 0, 0, 0, '', 0, 0, 0, '', 'minwidth300', 1);
@@ -855,6 +857,8 @@ if (($id || $ref) && $action == 'edit') {
 if ((empty($action) || ($action != 'create' && $action != 'edit'))) {
 	$counter = 0;
 
+    $userVictim = $object->getUserVictim();
+
 	$morecssGauge     = 'inline-block floatright';
 	$move_title_gauge = 1;
 
@@ -875,9 +879,12 @@ if ((empty($action) || ($action != 'create' && $action != 'edit'))) {
 			$arrayAccident[] = $object->accident_location;
 			break;
 	}
-	$arrayAccident[] = $object->fk_user_victim;
+	$arrayAccident[] = $userVictim->id;
 
-	$maxnumber = count($arrayAccident);
+    $accidentLesions = $accidentLesion->fetchAll('', '', 0, 0, ['customsql' => 't.fk_accident = ' . $object->id]);
+    $arrayAccident[] = (is_array($accidentLesions) && !empty($accidentLesions)) ? count($accidentLesions) : '';
+
+    $maxnumber = count($arrayAccident);
 
 	foreach ($arrayAccident as $arrayAccidentData) {
 		if (dol_strlen($arrayAccidentData) > 0 ) {
@@ -927,6 +934,18 @@ if ((empty($action) || ($action != 'create' && $action != 'edit'))) {
         $formConfirm .= $form->formconfirm($_SERVER['PHP_SELF'] . '?id=' . $object->id, $langs->trans('CloneObject', $langs->transnoentities('The' . ucfirst($object->element))), $langs->trans('ConfirmCloneObject', $langs->transnoentities('The' . ucfirst($object->element))), 'confirm_clone', $formQuestionClone, 'yes', 'actionButtonClone', 350, 600);
 	}
 
+    // SetValidated confirmation
+    if (($action == 'setValidated' && (empty($conf->use_javascript_ajax) || !empty($conf->dol_use_jmobile))) || (!empty($conf->use_javascript_ajax) && empty($conf->dol_use_jmobile))) {
+        $questionConfirmInfo =  $langs->trans('ConfirmValidateObject', $langs->trans('TheAccident'), $langs->transnoentities('LesionsOrWorkStop'));
+        $formConfirm .= $form->formconfirm($_SERVER['PHP_SELF'] . '?id=' . $object->id, $langs->trans('ValidateObject', $langs->trans('TheAccident')), $questionConfirmInfo, 'confirm_validate', '', 'yes', 'actionButtonValidate', 250);
+    }
+
+    // SetReOpen confirmation
+    if (($action == 'setReOpen' && (empty($conf->use_javascript_ajax) || !empty($conf->dol_use_jmobile))) || (!empty($conf->use_javascript_ajax) && empty($conf->dol_use_jmobile))) {
+        $questionConfirmInfo = $langs->trans('ConfirmReOpenObject', $langs->trans('TheAccident'));
+        $formConfirm .= $form->formconfirm($_SERVER['PHP_SELF'] . '?id=' . $object->id, $langs->trans('ReOpenObject', $langs->trans('TheAccident')), $questionConfirmInfo, 'confirm_setReopened', '', 'yes', 'actionButtonReOpen', 250);
+    }
+
 	// Confirmation to lock
 	if (($action == 'lock' && (empty($conf->use_javascript_ajax) || !empty($conf->dol_use_jmobile))) || (!empty($conf->use_javascript_ajax) && empty($conf->dol_use_jmobile))) {
 		$formConfirm .= $form->formconfirm($_SERVER['PHP_SELF'] . '?id=' . $object->id, $langs->trans('LockObject', $langs->transnoentities('The' . ucfirst($object->element))), $langs->trans('ConfirmLockObject', $langs->transnoentities('The' . ucfirst($object->element))), 'confirm_lock', '', 'yes', 'actionButtonLock', 350, 600);
@@ -959,7 +978,6 @@ if ((empty($action) || ($action != 'create' && $action != 'edit'))) {
 	unset($object->fields['accident_location']);
 	unset($object->fields['fk_soc']);
 	unset($object->fields['fk_user_employer']);
-	unset($object->fields['fk_user_victim']);
 	unset($object->fields['fk_element']);
 
 	//Label -- Libellé
@@ -986,10 +1004,7 @@ if ((empty($action) || ($action != 'create' && $action != 'edit'))) {
 	print $form->textwithpicto($langs->trans("UserVictim"), $langs->trans("GaugeCounter"), 1, 'info');
 	print '</td>';
 	print '<td>';
-	$usertmp->fetch($object->fk_user_victim);
-	if ($usertmp > 0) {
-		print $usertmp->getNomUrl(1);
-	}
+    print $userVictim->getNomUrl(1);
 	print '</td></tr>';
 
 	//Accident type -- Type de l'accident
@@ -1060,7 +1075,7 @@ if ((empty($action) || ($action != 'create' && $action != 'edit'))) {
     print '<td class="linked-medias-list">';
     $pathPhotos = $conf->digiriskdolibarr->multidir_output[$conf->entity] . '/accident/' . $object->ref . '/photos';
     ?>
-    <span class="add-medias" <?php echo ($object->status <= Accident::STATUS_VALIDATED) ? '' : 'style="display:none"' ?>>
+    <span class="add-medias" <?php echo ($object->status <= Accident::STATUS_DRAFT) ? '' : 'style="display:none"' ?>>
 		<input hidden multiple class="fast-upload" id="fast-upload-photo-default" type="file" name="userfile[]" capture="environment" accept="image/*">
 		<label for="fast-upload-photo-default">
 			<div class="wpeo-button button-square-50">
@@ -1075,7 +1090,7 @@ if ((empty($action) || ($action != 'create' && $action != 'edit'))) {
 	</span>
     <?php
     $relativepath = 'digiriskdolibarr/medias/thumbs';
-    print saturne_show_medias_linked('digiriskdolibarr', $pathPhotos, 'small', 0, 0, 0, 0, 50, 50, 0, 0, 0, 'accident/'. $object->ref . '/photos/', $object, 'photo', $permissiontoadd, $permissiontodelete && $object->status <= Accident::STATUS_VALIDATED);
+    print saturne_show_medias_linked('digiriskdolibarr', $pathPhotos, 'small', 0, 0, 0, 0, 50, 50, 0, 0, 0, 'accident/'. $object->ref . '/photos/', $object, 'photo', $permissiontoadd, $permissiontodelete && $object->status <= Accident::STATUS_DRAFT);
     print '</td></tr>';
 
     // Categories
@@ -1099,11 +1114,27 @@ if ((empty($action) || ($action != 'create' && $action != 'edit'))) {
 		if (empty($reshook)) {
 			// Edit
 			$displayButton = $onPhone ? '<i class="fas fa-edit fa-2x"></i>' : '<i class="fas fa-edit"></i>' . ' ' . $langs->trans('Modify');
-			if ($object->status == $object::STATUS_VALIDATED) {
+			if ($object->status == $object::STATUS_DRAFT) {
 				print '<a class="butAction" id="actionButtonEdit" href="' . $_SERVER['PHP_SELF'] . '?id=' . $object->id . '&action=edit' . '">' . $displayButton . '</a>';
 			} else {
 				print '<span class="butActionRefused classfortooltip" title="' . dol_escape_htmltag($langs->trans('ObjectMustBeDraft', ucfirst($langs->transnoentities('The' . ucfirst($object->element))))) . '">' . $displayButton . '</span>';
 			}
+
+            // Validate
+            $displayButton = $onPhone ? '<i class="fas fa-check fa-2x"></i>' : '<i class="fas fa-check"></i>' . ' ' . $langs->trans('Validate');
+            if ($object->status == $object::STATUS_DRAFT) {
+                print '<span class="validateButton butAction" id="actionButtonValidate">' . $displayButton . '</span>';
+            } else {
+                print '<span class="butActionRefused classfortooltip" title="' . dol_escape_htmltag($langs->trans('ObjectMustBeDraft', ucfirst($langs->transnoentities('The' . ucfirst($object->element))))) . '">' . $displayButton . '</span>';
+            }
+
+            // ReOpen
+            $displayButton = $onPhone ? '<i class="fas fa-lock-open fa-2x"></i>' : '<i class="fas fa-lock-open"></i>' . ' ' . $langs->trans('ReOpenDoli');
+            if ($object->status == $object::STATUS_VALIDATED) {
+                print '<span class="butAction" id="actionButtonReOpen">' . $displayButton . '</span>';
+            } else {
+                print '<span class="butActionRefused classfortooltip" title="' . dol_escape_htmltag($langs->trans('ObjectMustBeValidated', ucfirst($langs->transnoentities('The' . ucfirst($object->element))))) . '">' . $displayButton . '</span>';
+            }
 
 			// Lock.
 			$displayButton = $onPhone ? '<i class="fas fa-lock fa-2x"></i>' : '<i class="fas fa-lock"></i>' . ' ' . $langs->trans('Lock');
@@ -1131,122 +1162,123 @@ if ((empty($action) || ($action != 'create' && $action != 'edit'))) {
 		}
 		print '</div>';
 
-		// Accident Lines
+        // Accident lesions
+        include_once __DIR__ . '/../../core/tpl/accident/digiriskdolibarr_accident_lesion.tpl.php';
+
+        // Accident Lines
 		$accidentWorkstops = $objectline->fetchFromParent($object->id);
 
-		if (($object->status == Accident::STATUS_VALIDATED) || (!empty($accidentWorkstops))) {
-			// ACCIDENT LINES
-			print '<div class="div-table-responsive-no-min" style="overflow-x: unset !important">';
-			print load_fiche_titre($langs->trans("AccidentRiskList"), '', '');
-			print '<table id="tablelines" class="noborder noshadow" width="100%">';
+        // ACCIDENT LINES
+        print '<div class="div-table-responsive-no-min" style="overflow-x: unset !important">';
+        print load_fiche_titre($langs->trans("AccidentRiskList"), '', '');
+        print '<table id="tablelines" class="noborder noshadow" width="100%">';
 
-			// Define colspan for the button 'Add'
-			$colspan = 3; // Columns: total ht + col edit + col delete
-			$img_extensions = ['png', 'jpg', 'jpeg'];
+        // Define colspan for the button 'Add'
+        $colspan = 3; // Columns: total ht + col edit + col delete
+        $img_extensions = ['png', 'jpg', 'jpeg'];
 
-			print '<tr class="liste_titre">';
-			print '<td><span>' . $langs->trans('Ref.') . '</span></td>';
-			print '<td>' . '<b>' . $langs->trans('WorkStopDays') . '</b><span style="color:red"> *</span>' . '</td>';
-			print '<td>' . $langs->trans('DateStartWorkStop') . '</td>';
-			print '<td>' . $langs->trans('DateEndWorkStop') . '</td>';
-			print '<td>' . $langs->trans('WorkStopDocument') . '</td>';
-			print '<td class="center" colspan="' . $colspan . '">' . $langs->trans('ActionsLine') . '</td>';
-			print '</tr>';
+        print '<tr class="liste_titre">';
+        print '<td><span>' . $langs->trans('Ref.') . '</span></td>';
+        print '<td>' . '<b>' . $langs->trans('WorkStopDays') . '</b><span style="color:red"> *</span>' . '</td>';
+        print '<td>' . $langs->trans('DateStartWorkStop') . '</td>';
+        print '<td>' . $langs->trans('DateEndWorkStop') . '</td>';
+        print '<td>' . $langs->trans('WorkStopDocument') . '</td>';
+        print '<td class="center" colspan="' . $colspan . '">' . $langs->trans('ActionsLine') . '</td>';
+        print '</tr>';
 
-			if ( ! empty($accidentWorkstops) && $accidentWorkstops > 0) {
-				foreach ($accidentWorkstops as $key => $item) {
-					//action edit
-					if (($action == 'editline' || $subaction == 'editline') && $lineid == $key) {
-						print '<form method="POST" action="' . $_SERVER["PHP_SELF"] . '?id=' . $object->id . '">';
-						print '<input type="hidden" name="token" value="' . newToken() . '">';
-						print '<input type="hidden" name="action" value="updateLine">';
-						print '<input type="hidden" name="backtopage" value="' . $backtopage . '">';
-						print '<input type="hidden" name="lineid" value="' . $item->id . '">';
-						print '<input type="hidden" name="parent_id" value="' . $object->id . '">';
+        if ( ! empty($accidentWorkstops) && $accidentWorkstops > 0) {
+            foreach ($accidentWorkstops as $key => $item) {
+                //action edit
+                if (($action == 'editline' || $subaction == 'editline') && $lineid == $key) {
+                    print '<form method="POST" action="' . $_SERVER["PHP_SELF"] . '?id=' . $object->id . '">';
+                    print '<input type="hidden" name="token" value="' . newToken() . '">';
+                    print '<input type="hidden" name="action" value="updateLine">';
+                    print '<input type="hidden" name="backtopage" value="' . $backtopage . '">';
+                    print '<input type="hidden" name="lineid" value="' . $item->id . '">';
+                    print '<input type="hidden" name="parent_id" value="' . $object->id . '">';
 
-						print '<tr>';
-						print '<td>';
-						print $item->ref;
-						print '</td>';
+                    print '<tr>';
+                    print '<td>';
+                    print $item->ref;
+                    print '</td>';
 
-						$coldisplay++;
-						print '<td>';
-						print '<input type="number" name="workstop_days" class="minwidth150" value="' . $item->workstop_days . '">';
-						print '</td>';
+                    $coldisplay++;
+                    print '<td>';
+                    print '<input type="number" name="workstop_days" class="minwidth150" value="' . $item->workstop_days . '">';
+                    print '</td>';
 
-						$coldisplay++;
-						print '<td>';
-						print $form->selectDate($item->date_start_workstop, 'datestart', 1, 1, 0, '', 1);
-						print '</td>';
+                    $coldisplay++;
+                    print '<td>';
+                    print $form->selectDate($item->date_start_workstop, 'datestart', 1, 1, 0, '', 1);
+                    print '</td>';
 
-						$coldisplay++;
-						print '<td>';
-						print $form->selectDate($item->date_end_workstop, 'dateend', 1, 1, 0, '', 1);
-						print '</td>';
+                    $coldisplay++;
+                    print '<td>';
+                    print $form->selectDate($item->date_end_workstop, 'dateend', 1, 1, 0, '', 1);
+                    print '</td>';
 
-						$coldisplay++;
-						print '<td>';
-						print '<input name="declarationLink" value="'. (GETPOST('declarationLink') ?: $item->declaration_link) .'">';
-						print '</td>';
+                    $coldisplay++;
+                    print '<td>';
+                    print '<input name="declarationLink" value="'. (GETPOST('declarationLink') ?: $item->declaration_link) .'">';
+                    print '</td>';
 
-						$coldisplay += $colspan;
-						print '<td class="center" colspan="' . $colspan . '">';
-						print '<input type="submit" class="button" value="' . $langs->trans('Save') . '" name="updateLine" id="updateLine">';
-						print ' &nbsp; <input type="submit" id ="cancelLine" class="button" name="cancelLine" value="' . $langs->trans("Cancel") . '">';
-						print '</td>';
-						print '</tr>';
-						print '</form>';
-					//action view
-					} elseif ($item->status == 1) {
-						print '<td>';
-						print $item->ref;
-						print '</td>';
+                    $coldisplay += $colspan;
+                    print '<td class="center" colspan="' . $colspan . '">';
+                    print '<input type="submit" class="button" value="' . $langs->trans('Save') . '" name="updateLine" id="updateLine">';
+                    print ' &nbsp; <input type="submit" id ="cancelLine" class="button" name="cancelLine" value="' . $langs->trans("Cancel") . '">';
+                    print '</td>';
+                    print '</tr>';
+                    print '</form>';
+                //action view
+                } elseif ($item->status == 1) {
+                    print '<td>';
+                    print $item->ref;
+                    print '</td>';
 
-						$coldisplay++;
-						print '<td>';
-						print $item->workstop_days;
-						print '</td>';
+                    $coldisplay++;
+                    print '<td>';
+                    print $item->workstop_days;
+                    print '</td>';
 
-						$coldisplay++;
-						print '<td>';
-						print dol_print_date($item->date_start_workstop, 'dayhour');
-						print '</td>';
+                    $coldisplay++;
+                    print '<td>';
+                    print dol_print_date($item->date_start_workstop, 'dayhour');
+                    print '</td>';
 
-						$coldisplay++;
-						print '<td>';
-						print dol_print_date($item->date_end_workstop, 'dayhour');
-						print '</td>';
+                    $coldisplay++;
+                    print '<td>';
+                    print dol_print_date($item->date_end_workstop, 'dayhour');
+                    print '</td>';
 
-						$coldisplay++;
-						print '<td>';
-						$is_link = dol_is_url($item->declaration_link);
-						print ($is_link ? '<a target="_blank" href="'. $item->declaration_link .'">' : '') . $item->declaration_link . ($is_link ? '</a>' : '') ;
-						print '</td>';
+                    $coldisplay++;
+                    print '<td>';
+                    $is_link = dol_is_url($item->declaration_link);
+                    print ($is_link ? '<a target="_blank" href="'. $item->declaration_link .'">' : '') . $item->declaration_link . ($is_link ? '</a>' : '') ;
+                    print '</td>';
 
-						$coldisplay += $colspan;
+                    $coldisplay += $colspan;
 
-						//Actions buttons
-						if ($object->status == Accident::STATUS_VALIDATED) {
-							print '<td class="center">';
-							$coldisplay++;
-							print '<a href="' . $_SERVER["PHP_SELF"] . '?id=' . $id . '&amp;action=editline&amp;lineid=' . $item->id . '" style="padding-right: 20px"><i class="fas fa-pencil-alt" style="color: #666"></i></a>';
-							print '<a href="' . $_SERVER["PHP_SELF"] . '?id=' . $id . '&amp;action=deleteline&amp;lineid=' . $item->id . '&amp;token=' . newToken() . '">';
-							print img_delete();
-							print '</a>';
-							print '</td>';
-						} else {
-							print '<td class="center">';
-							print '-';
-							print '</td>';
-						}
-						print '</tr>';
-					}
-				}
-				print '</tr>';
-			}
-		}
+                    //Actions buttons
+                    if ($object->status == Accident::STATUS_DRAFT) {
+                        print '<td class="center">';
+                        $coldisplay++;
+                        print '<a href="' . $_SERVER["PHP_SELF"] . '?id=' . $id . '&amp;action=editline&amp;lineid=' . $item->id . '" style="padding-right: 20px"><i class="fas fa-pencil-alt" style="color: #666"></i></a>';
+                        print '<a href="' . $_SERVER["PHP_SELF"] . '?id=' . $id . '&amp;action=deleteline&amp;lineid=' . $item->id . '&amp;token=' . newToken() . '">';
+                        print img_delete();
+                        print '</a>';
+                        print '</td>';
+                    } else {
+                        print '<td class="center">';
+                        print '-';
+                        print '</td>';
+                    }
+                    print '</tr>';
+                }
+            }
+            print '</tr>';
+        }
 		//action create
-		if ($object->status == Accident::STATUS_VALIDATED && $permissiontoadd && $action != 'editline') {
+		if ($object->status == Accident::STATUS_DRAFT && $permissiontoadd && $action != 'editline') {
 			print '<form method="POST" action="' . $_SERVER["PHP_SELF"] . '?id=' . $object->id . '">';
 			print '<input type="hidden" name="token" value="' . newToken() . '">';
 			print '<input type="hidden" name="action" value="addLine">';

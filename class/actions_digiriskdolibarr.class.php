@@ -1060,6 +1060,10 @@ class ActionsDigiriskdolibarr
 				'documentType' => 'informationssharing',
 				'picto'        => 'fontawesome_fa-comment-dots_fas_#d35968'
 			],
+            'RegisterDocument' => [
+                'documentType' => 'registerdocument',
+                'picto'        => 'fontawesome_fa-ticket-alt_fas_#d35968'
+            ],
 			'ListingRisksAction' => [
 				'documentType' => 'listingrisksaction',
 				'picto'        => 'fontawesome_fa-images_fas_#d35968'

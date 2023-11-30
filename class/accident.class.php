@@ -157,7 +157,6 @@ class Accident extends SaturneObject
 		'tms'               => ['type' => 'timestamp',    'label' => 'DateModification', 'enabled' => '1', 'position' => 50, 'notnull' => 0, 'visible' => 0,],
 		'status'            => ['type' => 'smallint',     'label' => 'Status',           'enabled' => '1', 'position' => 70, 'notnull' => 1, 'visible' => 2, 'index' => 0, 'arrayofkeyval' => [1 => 'InProgress', 2 => 'Locked']],
 		'label'             => ['type' => 'varchar(255)', 'label' => 'Label',            'enabled' => '1', 'position' => 80, 'notnull' => 0, 'visible' => 1, 'searchall' => 1, 'css' => 'minwidth200', 'help' => "Help text", 'showoncombobox' => '1',],
-		'fk_user_victim'    => ['type' => 'integer:User:user/class/user.class.php', 'label' => 'UserVictim',   'enabled' => '1', 'position' => 81, 'notnull' => -1, 'visible' => 1,],
 		'fk_user_employer'  => ['type' => 'integer:User:user/class/user.class.php', 'label' => 'UserEmployer', 'enabled' => '1', 'position' => 82, 'notnull' => -1, 'visible' => 1,],
 		'accident_type'     => ['type' => 'text',         'label' => 'AccidentType',     'enabled' => '1', 'position' => 90, 'notnull' => -1, 'visible' => 1,  'css' => 'minwidth150',],
 		'fk_element'        => ['type' => 'integer',      'label' => 'AccidentLocation', 'enabled' => '1', 'position' => 91, 'notnull' => -1, 'visible' => 1,  'css' => 'minwidth150',],
@@ -194,7 +193,6 @@ class Accident extends SaturneObject
     public $fk_standard;
     public $fk_ticket;
 	public $fk_soc;
-	public $fk_user_victim;
 	public $fk_user_employer;
 
 	/**
@@ -255,7 +253,7 @@ class Accident extends SaturneObject
 			$object->date_creation = dol_now();
 		}
 		if (property_exists($object, 'status')) {
-			$object->status = self::STATUS_VALIDATED;
+			$object->status = self::STATUS_DRAFT;
 		}
         if (empty($options['photos'])) {
             $object->photo = '';
@@ -362,26 +360,27 @@ class Accident extends SaturneObject
 			global $langs;
 
 			$this->labelStatus[self::STATUS_DELETED]   = $langs->transnoentitiesnoconv('Deleted');
-			$this->labelStatus[self::STATUS_VALIDATED] = $langs->transnoentitiesnoconv('InProgress');
+            $this->labelStatus[self::STATUS_DRAFT]     = $langs->transnoentitiesnoconv('Draft');
+            $this->labelStatus[self::STATUS_VALIDATED] = $langs->transnoentitiesnoconv('InProgress');
 			$this->labelStatus[self::STATUS_LOCKED]    = $langs->transnoentitiesnoconv('Locked');
 
 			$this->labelStatusShort[self::STATUS_DELETED]   = $langs->transnoentitiesnoconv('Deleted');
-			$this->labelStatusShort[self::STATUS_VALIDATED] = $langs->transnoentitiesnoconv('InProgress');
+            $this->labelStatusShort[self::STATUS_DRAFT]     = $langs->transnoentitiesnoconv('Draft');
+            $this->labelStatusShort[self::STATUS_VALIDATED] = $langs->transnoentitiesnoconv('InProgress');
 			$this->labelStatusShort[self::STATUS_LOCKED]    = $langs->transnoentitiesnoconv('Locked');
 
 		}
 
-		$statusType = 'status' . $status;
-
-		if ($status == self::STATUS_VALIDATED) {
-			$statusType = 'status4';
-		}
-		if ($status == self::STATUS_LOCKED) {
-			$statusType = 'status6';
-		}
-		if ($status == self::STATUS_DELETED) {
-			$statusType = 'status9';
-		}
+        $statusType = 'status' . $status;
+        if ($status == self::STATUS_VALIDATED) {
+            $statusType = 'status4';
+        }
+        if ($status == self::STATUS_LOCKED) {
+            $statusType = 'status6';
+        }
+        if ($status == self::STATUS_DELETED) {
+            $statusType = 'status9';
+        }
 
 		return dolGetStatus($this->labelStatus[$status], $this->labelStatusShort[$status], '', $statusType, $mode);
 	}
@@ -682,6 +681,24 @@ class Accident extends SaturneObject
 	}
 
     /**
+     * Get user victim object.
+     *
+     * @return User
+     */
+    public function getUserVictim():User {
+        $user = new User($this->db);
+        $signatory = new SaturneSignature($this->db);
+
+        $victimSignatory = $signatory->fetchSignatory('Victim', $this->id, 'accident');
+
+        if (is_array($victimSignatory) && !empty($victimSignatory)) {
+            $victimSignatory = array_shift($victimSignatory);
+            $user->fetch($victimSignatory->element_id);
+        }
+        return $user;
+    }
+
+    /**
      * Write information of trigger description
      *
      * @param  Object $object Object calling the trigger
@@ -693,9 +710,9 @@ class Accident extends SaturneObject
 
         require_once DOL_DOCUMENT_ROOT . '/user/class/user.class.php';
 
-        $userVictim       = new User($this->db);
-        $userEmployer     = new User($this->db);
-        $userVictim->fetch($object->fk_user_victim);
+        $userEmployer = new User($this->db);
+        $userVictim   = $this->getUserVictim();
+
         $userEmployer->fetch($object->fk_user_employer);
 
         //1 : Accident in DU / GP, 2 : Accident in society, 3 : Accident in another location

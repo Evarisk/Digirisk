@@ -749,7 +749,7 @@ if ($conf->global->DIGIRISKDOLIBARR_CONF_BACKWARD_COMPATIBILITY == 0) {
 	dolibarr_set_const($db, 'DIGIRISKDOLIBARR_SIGNATURE_SHOW_COMPANY_LOGO', dolibarr_get_const($db,'DIGIRISKDOLIBARR_SIGNATURE_SHOW_COMPANY_LOGO'), 'integer', 0, '', $conf->entity);
 
 	//CONST TICKET & REGISTERS
-	dolibarr_set_const($db, 'DIGIRISKDOLIBARR_TICKET_EXTRAFIELDS', dolibarr_get_const($db,'DIGIRISKDOLIBARR_TICKET_EXTRAFIELDS'), 'integer', 0, '', $conf->entity);
+	dolibarr_set_const($db, 'DIGIRISKDOLIBARR_TICKET_EXTRAFIELDS', dolibarr_get_const($db,'DIGIRISKDOLIBARR_TICKET_EXTRAFIELDS'), 'integer', 0, '', 0);
 	dolibarr_set_const($db, 'DIGIRISKDOLIBARR_TICKET_CATEGORIES_CREATED', dolibarr_get_const($db,'DIGIRISKDOLIBARR_TICKET_CATEGORIES_CREATED'), 'integer', 0, '', $conf->entity);
 	dolibarr_set_const($db, 'DIGIRISKDOLIBARR_TICKET_ENABLE_PUBLIC_INTERFACE', dolibarr_get_const($db,'DIGIRISKDOLIBARR_TICKET_ENABLE_PUBLIC_INTERFACE'), 'integer', 0, '', $conf->entity);
 	dolibarr_set_const($db, 'DIGIRISKDOLIBARR_TICKET_SHOW_COMPANY_LOGO', dolibarr_get_const($db,'DIGIRISKDOLIBARR_TICKET_SHOW_COMPANY_LOGO'), 'integer', 0, '', $conf->entity);

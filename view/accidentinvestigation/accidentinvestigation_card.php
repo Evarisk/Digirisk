@@ -70,7 +70,6 @@ $document  = new AccidentInvestigationDocument($db);
 $project   = new Project($db);
 $task      = new Task($db);
 $signatory = new SaturneSignature($db, $object->module, $object->element);
-$victim    = new User($db);
 
 $numRefConf = strtoupper($task->element) . '_ADDON';
 
@@ -279,9 +278,10 @@ if ($action == 'create') {
 } else if ($id > 0 || (!empty($ref) && empty($action))) {
 	$object->fetch($id);
 	$accident->fetch($object->fk_accident);
-	$victim->fetch($accident->fk_user_victim);
 
-	saturne_get_fiche_head($object, 'card', $title);
+    $victim = $accident->getUserVictim();
+
+    saturne_get_fiche_head($object, 'card', $title);
 	saturne_banner_tab($object);
 
 	$formConfirm = '';

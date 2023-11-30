@@ -398,6 +398,9 @@ AccidentLesionCreateTrigger   = Lésion %s ajoutée à l'accident
 AccidentLesionModifyTrigger   = Lésion %s modifiée sur l'accident
 AccidentLesionDeleteTrigger   = Lésion %s supprimée de l'accident
 ACC_USER_EMPLOYERSigned       = Signature du reponsable de l'entreprise
+VictimAndCaregivers           = Victime et donneur de soins
+Victim                        = Victime
+Caregiver                     = Donneur de soins
 
 # Mod Numbering - Modèle de numérotation
 DigiriskAccidentNumberingModule         = Modèle de numérotation des accidents de Digirisk
@@ -573,6 +576,7 @@ ClonePhotos                       = Cloner les photos ?
 CloneFrom                         = Clone de
 AccidentInvestigationLinked       = Enquête accident liée
 AccidentInvestigationRole         = Les rôles de l'enquête accident
+LesionsOrWorkStop                 = lésions ou arrêts de travail
 AccidentsCategoriesArea           =	Espace des tags/catégories des accidents
 AddAccidentIntoCategory           = Assigner cette catégorie à l'accident
 
@@ -1295,6 +1299,11 @@ TicketSuccessMessageSet   = Le message a bien été modifié
 DigiriskTemplateDocumentProject = Modèle de documents des fiches de projets de Digirisk
 DocumentModelOrque              = Modèles de document de rapport prévisionnel sur les tâches de projets
 
+# Register Document
+
+RegisterDocument     = Registre des accidents bénins
+RegisterDocumentsMin = registres des accidents bénins
+registerdocument.odt = Registre des accidents bénins
 
 #
 # Tools - Outils

@@ -44,14 +44,10 @@ function accident_prepare_head(Accident $object): array
         $head[$h][0] = dol_buildpath('/digiriskdolibarr/view/accident/accident_metadata.php', 1) . '?id=' . $object->id;
         $head[$h][1] = $conf->browser->layout != 'phone' ? '<i class="fas fa-info-circle pictofixedwidth"></i>' . $langs->trans('AccidentMetaData') : '<i class="fas fa-info-circle"></i>';
         $head[$h][2] = 'accidentMetadata';
-        $h++;
-
-        $head[$h][0] = dol_buildpath('/digiriskdolibarr/view/accident/accident_metadata_lesion.php', 1) . '?id=' . $object->id;
-        $head[$h][1] = $conf->browser->layout != 'phone' ? '<i class="fas fa-info-circle pictofixedwidth"></i>' . $langs->trans('AccidentMetaDataLesion') : '<i class="fas fa-info-circle"></i>';
-        $head[$h][2] = 'accidentMetadataLesion';
     }
 
-    $moreParams['attendantTableMode'] = 'simple';
+    $moreParams['attendantTableMode'] = 'advanced';
+    $moreParams['attendantTabName'] = $langs->trans('VictimAndCaregivers');
 
-    return saturne_object_prepare_head($object, $head, $moreParams);
+    return saturne_object_prepare_head($object, $head, $moreParams, true);
 }
