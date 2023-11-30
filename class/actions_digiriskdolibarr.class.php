@@ -729,14 +729,14 @@ class ActionsDigiriskdolibarr
 		$value = array();
 
 		/* print_r($parameters); print_r($object); echo "action: " . $action; */
-		if ($parameters['currentcontext'] == 'emailtemplates') {	    // do something only for the context 'somecontext1' or 'somecontext2'
-			if ($conf->digiriskdolibarr->enabled && $user->rights->digiriskdolibarr->preventionplan->read) {
+		if (isModEnabled('digiriskdolibarr') && $parameters['currentcontext'] == 'emailtemplates') {	    // do something only for the context 'somecontext1' or 'somecontext2'
+			if ($user->hasRight('digiriskdolibarr', 'preventionplan', 'read')) {
 				$value['preventionplan'] = '<i class="fas fa-info"></i>  ' . dol_escape_htmltag($langs->trans('PreventionPlan'));
 			}
-			if ($conf->digiriskdolibarr->enabled && $user->rights->digiriskdolibarr->firepermit->read) {
+			if ($user->hasRight('digiriskdolibarr', 'firepermit', 'read')) {
 				$value['firepermit'] = '<i class="fas fa-fire-alt"></i>  ' . dol_escape_htmltag($langs->trans('FirePermit'));
 			}
-			if ($conf->digiriskdolibarr->enabled && $user->rights->digiriskdolibarr->riskassessmentdocument->read) {
+			if ($user->hasRight('digiriskdolibarr', 'riskassessmentdocument', 'read')) {
 				$value['riskassessmentdocument'] = '<i class="fas fa-exclamation-triangle"></i>  ' . dol_escape_htmltag($langs->trans('RiskAssessmentDocument'));
 			}
 		}
@@ -1174,4 +1174,19 @@ class ActionsDigiriskdolibarr
 		}
 		return 0; // or return 1 to replace standard code.
 	}
+
+    /**
+     * Add new actions buttons on CommonObject
+     *
+     * @param   CommonObject  $object  The object to process (third party and product object)
+     */
+    public function addMoreActionsButtons($parameters, &$object, &$action)
+    {
+        global $langs, $user;
+
+        if ($parameters['currentcontext'] == 'ticketcard') {
+            print dolGetButtonAction('', img_picto('NewAccident', 'fa-user-injured') . ' ' . $langs->trans('NewAccident'), 'default', dol_buildpath('/digiriskdolibarr/view/accident/accident_card.php?action=create&fk_ticket=' . $object->id, 1), '', $user->rights->digiriskdolibarr->accident->write);
+        }
+
+    }
 }

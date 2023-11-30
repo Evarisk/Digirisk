@@ -281,9 +281,9 @@ $sql        = preg_replace('/,\s*$/', '', $sql);
 $sql       .= " FROM " . MAIN_DB_PREFIX . $object->table_element . " as t";
 
 if (is_array($extrafields->attributes[$object->table_element]['label']) && count($extrafields->attributes[$object->table_element]['label'])) $sql .= " LEFT JOIN " . MAIN_DB_PREFIX . $object->table_element . "_extrafields as ef on (t.rowid = ef.fk_object)";
-if ($object->ismultientitymanaged == 1) $sql                                                                                                              .= " WHERE t.entity IN (" . getEntity($object->element) . ")";
-else $sql                                                                                                                                                         .= " WHERE 1 = 1";
-$sql                                                                                                                                                              .= ' AND status !=0';
+if ($object->ismultientitymanaged == 1) $sql                                                                                                      .= " WHERE t.entity IN (" . getEntity($object->element) . ")";
+else $sql                                                                                                                                         .= " WHERE 1 = 1";
+$sql                                                                                                                                              .= ' AND status != -1';
 
 
 foreach ($search as $key => $val) {
@@ -348,10 +348,10 @@ $moreforfilter = '';
 
 $varpage = empty($contextpage) ? $_SERVER["PHP_SELF"] : $contextpage;
 
-$arrayfields['MasterWorker']    = array('label' => 'MasterWorker', 'checked' => 1);
-$arrayfields['ExtSociety']             = array('label' => 'ExtSociety', 'checked' => 1);
-$arrayfields['ExtSocietyResponsible']  = array('label' => 'ExtSocietyResponsible', 'checked' => 1);
-$arrayfields['ExtSocietyAttendant'] = array('label' => 'ExtSocietyAttendant', 'checked' => 1);
+$arrayfields['MasterWorker']          = array('label' => 'MasterWorker', 'checked' => 1);
+$arrayfields['ExtSociety']            = array('label' => 'ExtSociety', 'checked' => 1);
+$arrayfields['ExtSocietyResponsible'] = array('label' => 'ExtSocietyResponsible', 'checked' => 1);
+$arrayfields['ExtSocietyAttendant']   = array('label' => 'ExtSocietyAttendant', 'checked' => 1);
 
 print_barre_liste($form->textwithpicto($title, $texthelp), $page, $_SERVER["PHP_SELF"], $param, $sortfield, $sortorder, $massactionbutton, $num, $nbtotalofrecords, $object->picto, 0, $newcardbutton, '', $limit, 0, 0, 1);
 
@@ -362,10 +362,10 @@ print '<div class="div-table-responsive">';
 print '<table class="tagtable nobottomiftotal liste' . ($moreforfilter ? " listwithfilterbefore" : "") . '">' . "\n";
 print '<tr class="liste_titre">';
 
-$object->fields['Custom']['MasterWorker']    = $arrayfields['MasterWorker'] ;
-$object->fields['Custom']['ExtSociety']             = $arrayfields['ExtSociety'];
-$object->fields['Custom']['ExtSocietyResponsible']    = $arrayfields['ExtSocietyResponsible'];
-$object->fields['Custom']['ExtSocietyAttendant']              = $arrayfields['ExtSocietyAttendant'] ;
+$object->fields['Custom']['MasterWorker']          = $arrayfields['MasterWorker'] ;
+$object->fields['Custom']['ExtSociety']            = $arrayfields['ExtSociety'];
+$object->fields['Custom']['ExtSocietyResponsible'] = $arrayfields['ExtSocietyResponsible'];
+$object->fields['Custom']['ExtSocietyAttendant']   = $arrayfields['ExtSocietyAttendant'] ;
 
 foreach ($object->fields as $key => $val) {
 	$cssforfield                        = (empty($val['css']) ? '' : $val['css']);
