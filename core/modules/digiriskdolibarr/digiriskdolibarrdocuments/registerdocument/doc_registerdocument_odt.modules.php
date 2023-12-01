@@ -206,7 +206,7 @@ class doc_registerdocument_odt extends SaturneDocumentModel
                         }
                         if (is_array($careGiverArray) && !empty($careGiverArray)) {
                             $careGiverData = array_shift($careGiverArray);
-                            $tmpArray['register_caregiver_fullname'] = $careGiverData->getFullName($langs);
+                            $tmpArray['register_caregiver_fullname'] = dol_strtoupper($careGiverData->lastname) . ' ' . ucfirst($careGiverData->firstname);
                             $encodedImage = explode(',', $careGiverData->signature)[1];
                             $decodedImage = base64_decode($encodedImage);
                             file_put_contents($tempDir . 'signature' . $careGiverData->id . '.png', $decodedImage);
