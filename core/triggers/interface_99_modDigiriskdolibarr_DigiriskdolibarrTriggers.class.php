@@ -114,6 +114,7 @@ class InterfaceDigiriskdolibarrTriggers extends DolibarrTriggers
         $action = str_replace('@DIGIRISKDOLIBARR', '', $action);
 		$active = getDolGlobalInt('DIGIRISKDOLIBARR_MAIN_AGENDA_ACTIONAUTO_' . $action);
 
+        // Allowed triggers are a list of trigger from other module that should activate this file
 		if (!isModEnabled('digiriskdolibarr') || !$active) {
             $allowedTriggers = ['COMPANY_DELETE', 'CONTACT_DELETE', 'TICKET_CREATE'];
             if (!in_array($action, $allowedTriggers)) {
@@ -218,6 +219,7 @@ class InterfaceDigiriskdolibarrTriggers extends DolibarrTriggers
 				}
 				break;
 
+            case 'REGISTERDOCUMENT_GENERATE':
             case 'RISKASSESSMENTDOCUMENT_GENERATE' :
             case 'LEGALDISPLAY_GENERATE' :
             case 'INFORMATIONSSHARING_GENERATE' :
