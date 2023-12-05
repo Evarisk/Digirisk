@@ -138,7 +138,7 @@ window.digiriskdolibarr.risk.createRisk = function ( event ) {
 	//Risk assessment
 	var method   = elementEvaluation.find('.risk-evaluation-header .risk-evaluation-method').val();
 	var cotation = elementEvaluation.find('.risk-evaluation-seuil').val();
-	var photo    = riskAddModal.find('.photo .media-container .file-name').val();
+	var photo    = riskAddModal.find('.photo .media-container .media-gallery-favorite.favorite .filename').val();
 	var comment  = evaluationText;
 	var date     = elementEvaluation.find('#RiskAssessmentDate').val();
 	var criteres = []

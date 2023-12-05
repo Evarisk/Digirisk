@@ -298,8 +298,15 @@ if (($id || $ref) && $action == 'edit') {
 	include DOL_DOCUMENT_ROOT . '/core/tpl/extrafields_edit.tpl.php';
 
 	if ($id != $conf->global->DIGIRISKDOLIBARR_DIGIRISKELEMENT_TRASH) {
-		print '<tr><td>' . $langs->trans("ParentElement") . '</td><td>';
-		print $object->selectDigiriskElementList($object->fk_parent, 'fk_parent', ['customsql' => 'element_type="groupment" AND t.rowid NOT IN (' . implode(',', $deletedElements) . ')'], 0, 0, [], 0, 0, 'minwidth100', GETPOST('id'), false);
+        $children         = $object->fetchDigiriskElementFlat($id);
+        $childrenElements = [];
+        if (is_array($children) && !empty($children)) {
+            foreach ($children as $key => $value) {
+                $childrenElements[$key] .= $key;
+            }
+        }
+        print '<tr><td>' . $langs->trans("ParentElement") . '</td><td>';
+		print $object->selectDigiriskElementList($object->fk_parent, 'fk_parent', ['customsql' => 'element_type="groupment" AND t.rowid NOT IN (' . implode(',', $deletedElements) . ',' . implode(',', $childrenElements) . ')'], 0, 0, [], 0, 0, 'minwidth100', GETPOST('id'));
 	}
 
 	print '</td></tr>';

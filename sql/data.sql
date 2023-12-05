@@ -899,3 +899,7 @@ INSERT INTO llx_c_digiriskdolibarr_action_trigger (entity, elementtype, ref, lab
 INSERT INTO llx_c_digiriskdolibarr_action_trigger (entity, elementtype, ref, label, description, active, position) VALUES (0, 'task@digiriskdolibarr', 'TASK_TIMESPENT_CREATE', 'TaskTimeSpentCreated', 'Executed when a task timespent is created', 1, 700);
 INSERT INTO llx_c_digiriskdolibarr_action_trigger (entity, elementtype, ref, label, description, active, position) VALUES (0, 'task@digiriskdolibarr', 'TASK_TIMESPENT_MODIFY', 'TaskTimeSpentModified', 'Executed when a task timespent is modified', 1, 710);
 INSERT INTO llx_c_digiriskdolibarr_action_trigger (entity, elementtype, ref, label, description, active, position) VALUES (0, 'task@digiriskdolibarr', 'TASK_TIMESPENT_DELETE', 'TaskTimeSpentDeleted', 'Executed when a task timespent is deleted', 1, 720);
+
+-- 9.14.0
+INSERT INTO `llx_c_accident_attendants_role` (`rowid`, `entity`, `ref`, `label`, `description`, `active`, `position`) VALUES (1, 0, 'Victim', 'Victim', '', 1, 1);
+INSERT INTO `llx_c_accident_attendants_role` (`rowid`, `entity`, `ref`, `label`, `description`, `active`, `position`) VALUES (2, 0, 'Caregiver', 'Caregiver', '', 1, 10);

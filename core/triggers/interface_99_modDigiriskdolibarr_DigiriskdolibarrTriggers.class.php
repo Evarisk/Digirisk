@@ -72,7 +72,7 @@ class InterfaceDigiriskdolibarrTriggers extends DolibarrTriggers
 		$this->name        = preg_replace('/^Interface/i', '', get_class($this));
 		$this->family      = "demo";
 		$this->description = "Digiriskdolibarr triggers.";
-		$this->version     = '9.13.0';
+		$this->version     = '9.14.0';
 		$this->picto       = 'digiriskdolibarr@digiriskdolibarr';
 	}
 
@@ -114,6 +114,7 @@ class InterfaceDigiriskdolibarrTriggers extends DolibarrTriggers
         $action = str_replace('@DIGIRISKDOLIBARR', '', $action);
 		$active = getDolGlobalInt('DIGIRISKDOLIBARR_MAIN_AGENDA_ACTIONAUTO_' . $action);
 
+        // Allowed triggers are a list of trigger from other module that should activate this file
 		if (!isModEnabled('digiriskdolibarr') || !$active) {
             $allowedTriggers = ['COMPANY_DELETE', 'CONTACT_DELETE', 'TICKET_CREATE'];
             if (!in_array($action, $allowedTriggers)) {
@@ -218,15 +219,18 @@ class InterfaceDigiriskdolibarrTriggers extends DolibarrTriggers
 				}
 				break;
 
+            case 'REGISTERDOCUMENT_GENERATE':
             case 'RISKASSESSMENTDOCUMENT_GENERATE' :
             case 'LEGALDISPLAY_GENERATE' :
             case 'INFORMATIONSSHARING_GENERATE' :
+            case 'REGISTERDOCUMENT_GENERATE' :
             case 'FIREPERMITDOCUMENT_GENERATE' :
 			case 'PREVENTIONPLANDOCUMENT_GENERATE' :
             case 'LISTINGRISKSACTION_GENERATE' :
             case 'LISTINGRISKSPHOTO_GENERATE' :
             case 'WORKUNITDOCUMENT_GENERATE' :
 			case 'GROUPMENTDOCUMENT_GENERATE' :
+
                 if ($object->parent_type == 'groupment' || $object->parent_type == 'workunit' || preg_match('/listingrisks/', $object->parent_type)) {
                     $object->parent_type = 'digiriskelement';
                 }
@@ -465,8 +469,6 @@ class InterfaceDigiriskdolibarrTriggers extends DolibarrTriggers
 										$result = $actioncomm->create($user);
 										break;
 									}
-								} else {
-									setEventMessages($langs->trans('ErrorSetupEmail'), '', 'errors');
 								}
 							} else {
 								$langs->load("errors");
@@ -516,8 +518,6 @@ class InterfaceDigiriskdolibarrTriggers extends DolibarrTriggers
 													$result = $actioncomm->create($user);
 													break;
 												}
-											} else {
-												setEventMessages($langs->trans('ErrorSetupEmail'), '', 'errors');
 											}
 										}
 									} else {

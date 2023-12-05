@@ -28,12 +28,12 @@ CREATE TABLE llx_digiriskdolibarr_accident(
 	accident_type     text,
   external_accident smallint DEFAULT 1,
   accident_location text,
-	fk_project        integer,
+  fk_project        integer,
+  fk_ticket         integer,
 	fk_user_creat     integer NOT NULL,
 	fk_user_modif     integer,
   fk_element        integer,
   fk_standard       integer,
   fk_soc            integer,
-	fk_user_victim    integer,
 	fk_user_employer  integer
 ) ENGINE=innodb;

@@ -72,6 +72,7 @@ $thirdparty       = new Societe($db);
 $digiriskelement  = new DigiriskElement($db);
 $digiriskstandard = new DigiriskStandard($db);
 $project          = new Project($db);
+$accidentLesion   = new AccidentLesion($db);
 
 $offset   = $limit * $page;
 $pageprev = $page - 1;
@@ -286,13 +287,10 @@ $sql       .= " FROM " . MAIN_DB_PREFIX . $accident->table_element . " as t";
 if (is_array($extrafields->attributes[$accident->table_element]['label']) && count($extrafields->attributes[$accident->table_element]['label'])) $sql .= " LEFT JOIN " . MAIN_DB_PREFIX . $accident->table_element . "_extrafields as ef on (t.rowid = ef.fk_object)";
 if ($accident->ismultientitymanaged == 1) $sql                                                                                                        .= " WHERE t.entity IN (" . getEntity($accident->element) . ")";
 else $sql                                                                                                                                             .= " WHERE 1 = 1";
-$sql                                                                                                                                                  .= ' AND status != 0';
+$sql                                                                                                                                                  .= ' AND status != ' . $accident::STATUS_DELETED;
 if ($fromid > 0) {
 	$sql .= ' AND fk_element =' . $fromid;
-} elseif ($fromiduser > 0){
-	$sql .= " AND fk_user_victim = " . $fromiduser;
 }
-$sql .= ' AND status >= 0';
 
 foreach ($search as $key => $val) {
 	if ($key == 'status' && $search[$key] == -1) continue;
@@ -357,6 +355,8 @@ $moreforfilter = '';
 
 $varpage = empty($contextpage) ? $_SERVER["PHP_SELF"] : $contextpage;
 
+$arrayfields['Victim'] = array('label' => 'Victim', 'checked' => 1);
+
 print_barre_liste($title, $page, $_SERVER["PHP_SELF"], $param, $sortfield, $sortorder, $massactionbutton, $num, $nbtotalofrecords, 'object_' . $accident->picto, 0, $newcardbutton, '', $limit, 0, 0, 1);
 
 $selectedfields                         = $form->multiSelectArrayWithCheckbox('selectedfields', $arrayfields, $varpage); // This also change content of $arrayfields
@@ -365,6 +365,8 @@ if ($massactionbutton) $selectedfields .= $form->showCheckAddButtons('checkforse
 print '<div class="div-table-responsive">';
 print '<table class="tagtable nobottomiftotal liste' . ($moreforfilter ? " listwithfilterbefore" : "") . '">' . "\n";
 print '<tr class="liste_titre">';
+
+$accident->fields['Custom']['Victim']    = $arrayfields['Victim'] ;
 
 // We manually add progress field here because it is a redundant information that doesn't need to be stored in db
 $accident->fields['progress'] = ['type' => 'integer:', 'label' => 'Progress', 'enabled' => '1', 'position' => 70, 'notnull' => 0, 'visible' => 2, 'index' => 0,];
@@ -378,13 +380,18 @@ foreach ($accident->fields as $key => $val) {
 
 		if (is_array($val['arrayofkeyval'])) print $form->selectarray('search_' . $key, $val['arrayofkeyval'], $search[$key], $val['notnull'], 0, 0, '', 1, 0, 0, '', 'maxwidth75');
 		elseif (strpos($val['type'], 'integer:') === 0) {
-			if ($key == 'fk_user_victim' && $fromiduser > 0) {
-				$search[$key] = $fromiduser;
-			}
 			print $accident->showInputField($val, $key, $search[$key], '', '', 'search_', 'maxwidth150', 1);
 		} elseif ( ! preg_match('/^(date|timestamp)/', $val['type'])) print '<input type="text" class="flat maxwidth75" name="search_' . $key . '" value="' . dol_escape_htmltag($search[$key]) . '">';
 		print '</td>';
 	}
+    if ($key == 'Custom') {
+        foreach ($val as $resource) {
+            if ($resource['checked']) {
+                print '<td>';
+                print '</td>';
+            }
+        }
+    }
 }
 
 // Extra fields
@@ -413,8 +420,22 @@ foreach ($accident->fields as $key => $val) {
         $cssforfield .= ($cssforfield ? ' ' : '') . 'center';
     }
 	if ( ! empty($arrayfields['t.' . $key]['checked'])) {
+        if (preg_match('/Victim/', $arrayfields['t.' . $key]['label'])) {
+            $disablesort = 1;
+        } else {
+            $disablesort = 0;
+        }
 		print getTitleFieldOfList($arrayfields['t.' . $key]['label'], 0, $_SERVER['PHP_SELF'], 't.' . $key, '', $param, ($cssforfield ? 'class="' . $cssforfield . '"' : ''), $sortfield, $sortorder, ($cssforfield ? $cssforfield . ' ' : ''), $disablesort) . "\n";
 	}
+    if ($key == 'Custom') {
+        foreach ($val as $resource) {
+            if ($resource['checked']) {
+                print '<td>';
+                print $langs->trans($resource['label']);
+                print '</td>';
+            }
+        }
+    }
 }
 
 // Extra fields
@@ -447,6 +468,7 @@ while ($i < ($limit ? min($num, $limit) : $num)) {
 
 	// Store properties in $accidentdocument
 	$accident->setVarsFromFetchObj($obj);
+    $userVictim = $accident->getUserVictim();
 
 	$json = json_decode($accident->json, false, 512, JSON_UNESCAPED_UNICODE)->Accident;
 
@@ -486,7 +508,10 @@ while ($i < ($limit ? min($num, $limit) : $num)) {
 						$arrayAccident[] = $accident->accident_location;
 						break;
 				}
-				$arrayAccident[] = $accident->fk_user_victim;
+                $arrayAccident[] = $userVictim->id;
+
+                $accidentLesions = $accidentLesion->fetchAll('', '', 0, 0, ['customsql' => 't.fk_accident = ' . $accident->id]);
+                $arrayAccident[] = (is_array($accidentLesions) && !empty($accidentLesions)) ? count($accidentLesions) : '';
 
 				$maxnumber = count($arrayAccident);
 
@@ -510,11 +535,6 @@ while ($i < ($limit ? min($num, $limit) : $num)) {
 				print '<i class="fas fa-user-injured"></i>  ' . $accident->getNomUrl();
 			} elseif ($key == 'fk_user_employer') {
 				$usertmp->fetch($accident->fk_user_employer);
-				if ($usertmp > 0) {
-					print getNomUrlUser($usertmp, 1, 'blank', 0, 0, 0, 0, '', '', -1, 0);
-				}
-			} elseif ($key == 'fk_user_victim') {
-				$usertmp->fetch($accident->fk_user_victim);
 				if ($usertmp > 0) {
 					print getNomUrlUser($usertmp, 1, 'blank', 0, 0, 0, 0, '', '', -1, 0);
 				}
@@ -553,7 +573,20 @@ while ($i < ($limit ? min($num, $limit) : $num)) {
 				$totalarray['val']['t.' . $key]                      += $accident->$key;
 			}
         }
-	}
+        if ($key == 'Custom') {
+            foreach ($val as $name => $resource) {
+                if ($resource['checked']) {
+                    print '<td>';
+
+                    if ($resource['label'] == 'Victim') {
+                        print getNomUrlUser($userVictim, 1, 'blank', 0, 0, 0, 0, '', '', -1, 0);
+                    }
+                    print '</td>';
+                }
+            }
+        }
+
+    }
 	// Action column
 	print '<td class="nowrap center">';
 	if ($massactionbutton || $massaction) {   // If we are in select mode (massactionbutton defined) or if we have already selected and sent an action ($massaction) defined

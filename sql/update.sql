@@ -235,3 +235,9 @@ INSERT INTO llx_c_accidentinvestigation_attendants_role SELECT * FROM llx_c_acci
 INSERT INTO llx_categorie_accidentinvestigation SELECT * FROM llx_categorie_accident_investigation;
 DROP TABLE llx_c_accident_investigation_attendants_role;
 DROP TABLE llx_categorie_accident_investigation;
+
+-- 9.14.0
+UPDATE llx_digiriskdolibarr_risk SET category = 21 WHERE category = 20;
+UPDATE llx_digiriskdolibarr_risk SET category = 22 WHERE category = 21;
+ALTER TABLE llx_digiriskdolibarr_accident ADD fk_ticket integer;
+ALTER TABLE llx_digiriskdolibarr_accident DROP COLUMN fk_user_victim;

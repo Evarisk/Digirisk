@@ -31,6 +31,7 @@ require_once __DIR__ . '/../../saturne/class/saturnesignature.class.php';
 
 require_once __DIR__ . '/../lib/digiriskdolibarr_function.lib.php';
 require_once __DIR__ . '/digiriskdocuments.class.php';
+require_once __DIR__ . '/digiriskdolibarrdashboard.class.php';
 require_once __DIR__ . '/evaluator.class.php';
 require_once __DIR__ . '/../core/modules/digiriskdolibarr/digiriskelement/accidentlesion/mod_accidentlesion_standard.php';
 
@@ -155,9 +156,8 @@ class Accident extends SaturneObject
 		'entity'            => ['type' => 'integer',      'label' => 'Entity',           'enabled' => '1', 'position' => 30, 'notnull' => 1, 'visible' => 0,],
 		'date_creation'     => ['type' => 'datetime',     'label' => 'DateCreation',     'enabled' => '1', 'position' => 40, 'notnull' => 1, 'visible' => 2,],
 		'tms'               => ['type' => 'timestamp',    'label' => 'DateModification', 'enabled' => '1', 'position' => 50, 'notnull' => 0, 'visible' => 0,],
-		'status'            => ['type' => 'smallint',     'label' => 'Status',           'enabled' => '1', 'position' => 70, 'notnull' => 1, 'visible' => 2, 'index' => 0, 'arrayofkeyval' => [1 => 'InProgress', 2 => 'Locked']],
+		'status'            => ['type' => 'smallint',     'label' => 'Status',           'enabled' => '1', 'position' => 70, 'notnull' => 1, 'visible' => 2, 'index' => 0, 'arrayofkeyval' => [0 => 'StatusDraft', 1 => 'Validated', 2 => 'Locked']],
 		'label'             => ['type' => 'varchar(255)', 'label' => 'Label',            'enabled' => '1', 'position' => 80, 'notnull' => 0, 'visible' => 1, 'searchall' => 1, 'css' => 'minwidth200', 'help' => "Help text", 'showoncombobox' => '1',],
-		'fk_user_victim'    => ['type' => 'integer:User:user/class/user.class.php', 'label' => 'UserVictim',   'enabled' => '1', 'position' => 81, 'notnull' => -1, 'visible' => 1,],
 		'fk_user_employer'  => ['type' => 'integer:User:user/class/user.class.php', 'label' => 'UserEmployer', 'enabled' => '1', 'position' => 82, 'notnull' => -1, 'visible' => 1,],
 		'accident_type'     => ['type' => 'text',         'label' => 'AccidentType',     'enabled' => '1', 'position' => 90, 'notnull' => -1, 'visible' => 1,  'css' => 'minwidth150',],
 		'fk_element'        => ['type' => 'integer',      'label' => 'AccidentLocation', 'enabled' => '1', 'position' => 91, 'notnull' => -1, 'visible' => 1,  'css' => 'minwidth150',],
@@ -169,8 +169,9 @@ class Accident extends SaturneObject
 		'photo'             => ['type' => 'text',         'label' => 'Photo',            'enabled' => '1', 'position' => 120, 'notnull' => -1, 'visible' => 3,],
 		'external_accident' => ['type' => 'smallint',     'label' => 'ExternalAccident', 'enabled' => '1', 'position' => 130, 'notnull' => -1, 'visible' => 3, 'arrayofkeyval' => ['1' => 'No', '2' => 'Yes', '3' => 'Other'],],
 		'fk_project'        => ['type' => 'integer',      'label' => 'FKProject',        'enabled' => '1', 'position' => 140, 'notnull' => 1, 'visible' => 0,],
-		'fk_user_creat'     => ['type' => 'integer:User:user/class/user.class.php', 'label' => 'UserAuthor', 'enabled' => '1', 'position' => 150, 'notnull' => 1,  'visible' => 0, 'foreignkey' => 'user.rowid',],
-		'fk_user_modif'     => ['type' => 'integer:User:user/class/user.class.php', 'label' => 'UserModif',  'enabled' => '1', 'position' => 160, 'notnull' => -1, 'visible' => 0,],
+        'fk_ticket'         => ['type' => 'integer:Ticket:ticket/class/ticket.class.php', 'label' => 'FkTicket',  'enabled' => '1', 'position' => 145, 'notnull' => -1, 'visible' => 1,],
+        'fk_user_creat'     => ['type' => 'integer:User:user/class/user.class.php', 'label' => 'UserAuthor', 'enabled' => '1', 'position' => 150, 'notnull' => 1,  'visible' => 0, 'foreignkey' => 'user.rowid',],
+        'fk_user_modif'     => ['type' => 'integer:User:user/class/user.class.php', 'label' => 'UserModif',  'enabled' => '1', 'position' => 160, 'notnull' => -1, 'visible' => 0,],
 	];
 
 	public $rowid;
@@ -190,9 +191,9 @@ class Accident extends SaturneObject
 	public $fk_user_creat;
 	public $fk_user_modif;
 	public $fk_element;
-	public $fk_standard;
+    public $fk_standard;
+    public $fk_ticket;
 	public $fk_soc;
-	public $fk_user_victim;
 	public $fk_user_employer;
 
 	/**
@@ -202,6 +203,10 @@ class Accident extends SaturneObject
 	 */
 	public function __construct(DoliDB $db)
 	{
+        //Transform fk_user_victim into victim signatory for every accidents (backward compatibility)
+        if (empty(getDolGlobalInt("DIGIRISKDOLIBARR_ACCIDENT_REMOVE_FK_USER_VICTIM"))) {
+            $this->fields['fk_user_victim'] = ['type' => 'integer:User:user/class/user.class.php', 'label' => 'UserVictim',   'enabled' => '1', 'position' => 81, 'notnull' => -1, 'visible' => 1,];
+        }
 		return parent::__construct($db, $this->module, $this->element);
 	}
 
@@ -253,7 +258,7 @@ class Accident extends SaturneObject
 			$object->date_creation = dol_now();
 		}
 		if (property_exists($object, 'status')) {
-			$object->status = self::STATUS_VALIDATED;
+			$object->status = self::STATUS_DRAFT;
 		}
         if (empty($options['photos'])) {
             $object->photo = '';
@@ -304,6 +309,29 @@ class Accident extends SaturneObject
                 $accidentMetadata->context     = 'createfromclone';
                 $accidentMetadata->create($user);
             }
+            if (!empty($options['categories'])) {
+                $cat        = new Categorie($this->db);
+                $categories = $cat->containing($objectId, 'accident');
+                if (is_array($categories) && !empty($categories)) {
+                    $categoryIds = [];
+                    foreach ($categories as $cat) {
+                        $categoryIds[] = $cat->id;
+                    }
+                    $object->setCategories($categoryIds);
+                }
+            }
+            if (!empty($options['attendants'])) {
+                // Load signatory from source object.
+                $signatory   = new SaturneSignature($this->db, $this->module, $this->element);
+                $signatories = $signatory->fetchSignatory('', $fromID, $this->element);
+                if (is_array($signatories) && !empty($signatories)) {
+                    foreach ($signatories as $arrayRole) {
+                        foreach ($arrayRole as $signatoryRole) {
+                            $signatory->createFromClone($user, $signatoryRole->id, $accidentId);
+                        }
+                    }
+                }
+            }
 		} else {
 			$error++;
 			$this->error  = $object->error;
@@ -349,26 +377,27 @@ class Accident extends SaturneObject
 			global $langs;
 
 			$this->labelStatus[self::STATUS_DELETED]   = $langs->transnoentitiesnoconv('Deleted');
-			$this->labelStatus[self::STATUS_VALIDATED] = $langs->transnoentitiesnoconv('InProgress');
+            $this->labelStatus[self::STATUS_DRAFT]     = $langs->transnoentitiesnoconv('StatusDraft');
+            $this->labelStatus[self::STATUS_VALIDATED] = $langs->transnoentitiesnoconv('Validated');
 			$this->labelStatus[self::STATUS_LOCKED]    = $langs->transnoentitiesnoconv('Locked');
 
 			$this->labelStatusShort[self::STATUS_DELETED]   = $langs->transnoentitiesnoconv('Deleted');
-			$this->labelStatusShort[self::STATUS_VALIDATED] = $langs->transnoentitiesnoconv('InProgress');
+            $this->labelStatusShort[self::STATUS_DRAFT]     = $langs->transnoentitiesnoconv('StatusDraft');
+            $this->labelStatusShort[self::STATUS_VALIDATED] = $langs->transnoentitiesnoconv('Validated');
 			$this->labelStatusShort[self::STATUS_LOCKED]    = $langs->transnoentitiesnoconv('Locked');
 
 		}
 
-		$statusType = 'status' . $status;
-
-		if ($status == self::STATUS_VALIDATED) {
-			$statusType = 'status4';
-		}
-		if ($status == self::STATUS_LOCKED) {
-			$statusType = 'status6';
-		}
-		if ($status == self::STATUS_DELETED) {
-			$statusType = 'status9';
-		}
+        $statusType = 'status' . $status;
+        if ($status == self::STATUS_VALIDATED) {
+            $statusType = 'status4';
+        }
+        if ($status == self::STATUS_LOCKED) {
+            $statusType = 'status6';
+        }
+        if ($status == self::STATUS_DELETED) {
+            $statusType = 'status9';
+        }
 
 		return dolGetStatus($this->labelStatus[$status], $this->labelStatusShort[$status], '', $statusType, $mode);
 	}
@@ -385,6 +414,7 @@ class Accident extends SaturneObject
 
         $arrayNbDaysWithoutAccident    = $this->getNbDaysWithoutAccident();
         $arrayNbAccidents              = $this->getNbAccidents();
+        $arrayNbAccidentsLast3Years    = $this->getNbAccidentsLast3years();
         $arrayNbWorkstopDays           = $this->getNbWorkstopDays();
         $arrayNbAccidentsByEmployees   = $this->getNbAccidentsByEmployees();
         $arrayNbPresquAccidents        = $this->getNbPresquAccidents();
@@ -414,7 +444,7 @@ class Accident extends SaturneObject
             ]
         ];
 
-        $array['graphs'] = [$arrayNbAccidents];
+        $array['graphs'] = [$arrayNbAccidents, $arrayNbAccidentsLast3Years];
 
         return $array;
     }
@@ -487,6 +517,78 @@ class Accident extends SaturneObject
         } else {
             $array['data']['accidents'] = 0;
             $array['data']['accidentswithoutDIAT'] = 0;
+        }
+
+        return $array;
+    }
+
+
+    /**
+     * Get number accidents for last 3 years
+     *
+     * @return array
+     * @throws Exception
+     */
+    public function getNbAccidentsLast3years(): array
+    {
+        global $langs;
+
+        // Graph Title parameters
+        $array['title'] = $langs->transnoentities('AccidentByYear');
+        $array['picto'] = $this->picto;
+
+        // Graph parameters
+        $array['width']      = '100%';
+        $array['height']     = 400;
+        $array['type']       = 'bar';
+        $array['showlegend'] = 1;
+        $array['dataset']    = 3;
+
+        $array['labels'] = [
+            'pastlastyear' => [
+                'label' => date("Y",strtotime("-2 year")),
+                'color' => '#9567aa'
+            ],
+            'lastyear' => [
+                'label' => date("Y",strtotime("-1 year")),
+                'color' => '#4f9ebe'
+            ],
+            'currentyear' => [
+                'label' => date('Y'),
+                'color' => '#fac461'
+            ],
+        ];
+
+        $arrayAccidents = [];
+
+        $accidentList = $this->fetchAll();
+
+        if (is_array($accidentList) && !empty($accidentList)) {
+            foreach($accidentList as $accident) {
+                $accidentDate = getdate($accident->accident_date);
+                $yearKey = $accidentDate['year'];
+                $monthKey = $accidentDate['mon'];
+                $accidentsByYear[$yearKey][$monthKey - 1] += 1;
+            }
+        }
+
+        for ($i = 1; $i < 13; $i++) {
+            $month = $langs->transnoentitiesnoconv('MonthShort'.sprintf("%02d", $i));
+            $arrayAccidents[$i - 1] = array($month);
+            for ($j = 0; $j < 3; $j++) {
+                $arrayAccidents[$i - 1][date('Y') - 2 + $j] = 0;
+            }
+        }
+
+
+        foreach($accidentsByYear as $year => $accidentByYear) {
+            foreach($accidentByYear as $month => $accidentByMonth) {
+                $arrayAccidents[$month][$year] = $accidentByMonth;
+            }
+        }
+
+        foreach($arrayAccidents as $arrayAccident) {
+            $array['data'][] = array_values($arrayAccident);
         }
 
         return $array;
@@ -669,6 +771,24 @@ class Accident extends SaturneObject
 	}
 
     /**
+     * Get user victim object.
+     *
+     * @return User
+     */
+    public function getUserVictim():User {
+        $user = new User($this->db);
+        $signatory = new SaturneSignature($this->db);
+
+        $victimSignatory = $signatory->fetchSignatory('Victim', $this->id, 'accident');
+
+        if (is_array($victimSignatory) && !empty($victimSignatory)) {
+            $victimSignatory = array_shift($victimSignatory);
+            $user->fetch($victimSignatory->element_id);
+        }
+        return $user;
+    }
+
+    /**
      * Write information of trigger description
      *
      * @param  Object $object Object calling the trigger
@@ -680,9 +800,9 @@ class Accident extends SaturneObject
 
         require_once DOL_DOCUMENT_ROOT . '/user/class/user.class.php';
 
-        $userVictim       = new User($this->db);
-        $userEmployer     = new User($this->db);
-        $userVictim->fetch($object->fk_user_victim);
+        $userEmployer = new User($this->db);
+        $userVictim   = $this->getUserVictim();
+
         $userEmployer->fetch($object->fk_user_employer);
 
         //1 : Accident in DU / GP, 2 : Accident in society, 3 : Accident in another location
