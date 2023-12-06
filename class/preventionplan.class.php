@@ -236,6 +236,18 @@ class PreventionPlan extends SaturneObject
                     }
                 }
             }
+
+            if (!empty($options['categories'])) {
+                $cat        = new Categorie($this->db);
+                $categories = $cat->containing($fromID, 'preventionplan');
+                if (is_array($categories) && !empty($categories)) {
+                    $categoryIds = [];
+                    foreach ($categories as $cat) {
+                        $categoryIds[] = $cat->id;
+                    }
+                    $object->setCategories($categoryIds);
+                }
+            }
         } else {
             $this->error  = $object->error;
             $this->errors = $object->errors;

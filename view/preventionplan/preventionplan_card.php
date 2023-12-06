@@ -35,6 +35,7 @@ require_once DOL_DOCUMENT_ROOT . '/core/class/html.form.class.php';
 require_once DOL_DOCUMENT_ROOT .'/core/class/html.formprojet.class.php';
 require_once DOL_DOCUMENT_ROOT . '/core/class/doleditor.class.php';
 require_once DOL_DOCUMENT_ROOT . '/core/lib/images.lib.php';
+require_once DOL_DOCUMENT_ROOT . '/categories/class/categorie.class.php';
 
 // Load Saturne libraries.
 require_once __DIR__ . '/../../../saturne/class/saturnesignature.class.php';
@@ -232,6 +233,12 @@ if (empty($reshook)) {
 		if ( ! $error) {
 			$result = $object->create($user, true);
 			if ($result > 0) {
+                if (isModEnabled('categorie')) {
+                    $categories = GETPOST('categories', 'array');
+                    if (method_exists($object, 'setCategories')) {
+                        $object->setCategories($categories);
+                    }
+                }
 				$object->setInProgress($user, true);
 				$digiriskresources->setDigiriskResources($db, $user->id, 'ExtSociety', 'societe', array($extSocietyId), $conf->entity, 'preventionplan', $object->id, 1);
 				$digiriskresources->setDigiriskResources($db, $user->id, 'LabourInspector', 'societe', array($labourInspectorId), $conf->entity, 'preventionplan', $object->id, 1);
@@ -341,6 +348,12 @@ if (empty($reshook)) {
 		if ( ! $error) {
 			$result = $object->update($user, false);
 			if ($result > 0) {
+                if (isModEnabled('categorie')) {
+                    $categories = GETPOST('categories', 'array');
+                    if (method_exists($object, 'setCategories')) {
+                        $object->setCategories($categories);
+                    }
+                }
 				$digiriskresources->setDigiriskResources($db, $user->id, 'ExtSociety', 'societe', array($extSocietyId), $conf->entity, 'preventionplan', $object->id, 0);
 				$digiriskresources->setDigiriskResources($db, $user->id, 'LabourInspector', 'societe', array($labourInspectorId), $conf->entity, 'preventionplan', $object->id, 0);
 				$digiriskresources->setDigiriskResources($db, $user->id, 'LabourInspectorAssigned', 'socpeople', array($labourInspectorContactId), $conf->entity, 'preventionplan', $object->id, 0);
@@ -582,6 +595,7 @@ if (empty($reshook)) {
 		$options['preventionplan_risk'] = GETPOST('clone_preventionplan_risk');
 		$options['attendants']          = GETPOST('clone_attendants');
 		$options['schedule']            = GETPOST('clone_schedule');
+        $options['categories']          = GETPOST('clone_categories');
 
 		if (1 == 0 && ! GETPOST('clone_preventionplan_risk') && ! GETPOST('clone_attendants') && ! GETPOST('clone_schedule')) {
 			setEventMessages($langs->trans("NoCloneOptionsSpecified"), null, 'errors');
@@ -743,6 +757,15 @@ if ($action == 'create') {
 	print $form->selectcontacts((GETPOST('labour_inspector') ? GETPOST('labour_inspector') : ($allLinks['LabourInspectorSociety']->id[0] ?: -1)), $labourInspectorContactId, 'labour_inspector_contact', 1, '', '', 1, 'minwidth100imp widthcentpercentminusxx maxwidth400');
 	print '</td></tr>';
 
+    // Categories
+    if (!empty($conf->categorie->enabled)) {
+        print '<tr><td>'.$langs->trans("Categories").'</td><td>';
+        $categoryArborescence = $form->select_all_categories('preventionplan', '', 'parent', 64, 0, 1);
+        print img_picto('', 'category', 'class="pictofixedwidth"').$form->multiselectarray('categories', $categoryArborescence, GETPOST('categories', 'array'), '', 0, 'minwidth100imp widthcentpercentminusxx maxwidth400');
+        print '<a class="butActionNew" href="' . DOL_URL_ROOT . '/categories/index.php?type=preventionplan&backtopage=' . urlencode($_SERVER['PHP_SELF'] . '?action=create') . '" target="_blank"><span class="fa fa-plus-circle valignmiddle paddingleft" title="' . $langs->trans('AddCategories') . '"></span></a>';
+        print "</td></tr>";
+    }
+
 	// Other attributes
 	include DOL_DOCUMENT_ROOT . '/core/tpl/extrafields_add.tpl.php';
 
@@ -902,6 +925,23 @@ if (($id || $ref) && $action == 'edit') {
 	print $form->selectcontacts($labourInspectorSociety->id, dol_strlen($contact->email) ? $labourInspectorContact->id : -1, 'labour_inspector_contact', '', 0, '', 1, 'minwidth100imp widthcentpercentminusxx maxwidth400');
 	print '</td></tr>';
 
+    // Tags-Categories
+    if ($conf->categorie->enabled) {
+        print '<tr><td>'.$langs->trans("Categories").'</td><td>';
+        $categoryArborescence = $form->select_all_categories('preventionplan', '', 'parent', 64, 0, 1);
+        $c = new Categorie($db);
+        $cats = $c->containing($object->id, 'preventionplan');
+        $arrayselected = array();
+        if (is_array($cats)) {
+            foreach ($cats as $cat) {
+                $arrayselected[] = $cat->id;
+            }
+        }
+        print img_picto('', 'category', 'class="pictofixedwidth"').$form->multiselectarray('categories', $categoryArborescence, $arrayselected, '', 0, 'minwidth100imp widthcentpercentminusxx maxwidth400');
+        print '<a class="butActionNew" href="' . DOL_URL_ROOT . '/categories/index.php?type=preventionplan&backtopage=' . urlencode($_SERVER['PHP_SELF'] . '?action=create') . '" target="_blank"><span class="fa fa-plus-circle valignmiddle paddingleft" title="' . $langs->trans('AddCategories') . '"></span></a>';
+        print "</td></tr>";
+    }
+
 	// Other attributes
 	include DOL_DOCUMENT_ROOT . '/core/tpl/extrafields_add.tpl.php';
 	print '</table>';
@@ -939,13 +979,13 @@ if (($action == 'setInProgress' && (empty($conf->use_javascript_ajax) || ! empty
 if (($action == 'clone' && (empty($conf->use_javascript_ajax) || ! empty($conf->dol_use_jmobile)))		// Output when action = clone if jmobile or no js
 	|| ( ! empty($conf->use_javascript_ajax) && empty($conf->dol_use_jmobile))) {							// Always output when not jmobile nor js
 	// Define confirmation messages
-	$formquestionclone = array(
-		'text' => $langs->trans("ConfirmClone"),
-		array('type' => 'text', 'name' => 'clone_label', 'label' => $langs->trans("NewLabelForClonePreventionPlan"), 'value' => empty($tmpcode) ? $langs->trans("CopyOf") . ' ' . $object->ref : $tmpcode, 'size' => 24),
-		array('type' => 'checkbox', 'name' => 'clone_preventionplan_risk', 'label' => $langs->trans("ClonePreventionPlanRisk"), 'value' => 1),
-		array('type' => 'checkbox', 'name' => 'clone_attendants', 'label' => $langs->trans("CloneAttendantsPreventionPlan"), 'value' => 1),
-		array('type' => 'checkbox', 'name' => 'clone_schedule', 'label' => $langs->trans("CloneSchedulePreventionPlan"), 'value' => 1),
-	);
+	$formquestionclone = ['text' => $langs->trans("ConfirmClone"),
+		['type' => 'text',     'name' => 'clone_label',               'label' => $langs->trans("NewLabelForClonePreventionPlan"), 'value' => empty($tmpcode) ? $langs->trans("CopyOf") . ' ' . $object->ref : $tmpcode, 'size' => 24],
+		['type' => 'checkbox', 'name' => 'clone_preventionplan_risk', 'label' => $langs->trans("ClonePreventionPlanRisk"),        'value' => 1],
+		['type' => 'checkbox', 'name' => 'clone_attendants',          'label' => $langs->trans("CloneAttendantsPreventionPlan"),  'value' => 1],
+		['type' => 'checkbox', 'name' => 'clone_schedule',            'label' => $langs->trans("CloneSchedulePreventionPlan"),    'value' => 1],
+        ['type' => 'checkbox', 'name' => 'clone_categories',          'label' => $langs->trans('CloneCategories'),                'value' => 1]
+	];
 
 	$formconfirm .= $form->formconfirm($_SERVER["PHP_SELF"] . '?id=' . $object->id, $langs->trans('ToClone'), $langs->trans('ConfirmClonePreventionPlan', $object->ref), 'confirm_clone', $formquestionclone, 'yes', 'actionButtonClone', 350, 600);
 }
@@ -1046,6 +1086,13 @@ if ((empty($action) || ($action != 'create' && $action != 'edit'))) {
 		print $object->prior_visit_text;
 		print '</td></tr>';
 	}
+
+    // Categories
+    if ($conf->categorie->enabled) {
+        print '<tr><td class="valignmiddle">'.$langs->trans("Categories").'</td><td>';
+        print $form->showCategories($object->id, 'preventionplan', 1);
+        print "</td></tr>";
+    }
 
 	print '</table>';
 	print '</div>';
