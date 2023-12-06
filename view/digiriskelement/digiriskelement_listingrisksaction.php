@@ -85,10 +85,7 @@ if (empty($reshook)) {
 	if ($object->element == 'digiriskstandard') {
         $previousRef = $object->ref;
 		$object->ref = '';
-	} else {
-        $object->element = 'listingrisksaction';
-    }
-	$removeDocumentFromName = 1;
+	}
 
     // Actions builddoc, forcebuilddoc, remove_file.
     require_once __DIR__ . '/../../../saturne/core/tpl/documents/documents_action.tpl.php';
@@ -96,9 +93,6 @@ if (empty($reshook)) {
     // Action to generate pdf from odt file
     require_once __DIR__ . '/../../../saturne/core/tpl/documents/saturne_manual_pdf_generation_action.tpl.php';
 
-    if ($object->element == 'listingrisksaction') {
-        $object->element = 'digiriskelement';
-    }
     if ($object->element == 'digiriskstandard') {
         $object->ref = $previousRef;
     }

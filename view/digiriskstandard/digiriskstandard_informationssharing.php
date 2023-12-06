@@ -79,7 +79,6 @@ if (empty($reshook)) {
 	$error = 0;
     $previousRef = $object->ref;
     $object->ref = '';
-    $removeDocumentFromName = 1;
 
 	// Actions builddoc, forcebuilddoc, remove_file.
 	require_once __DIR__ . '/../../../saturne/core/tpl/documents/documents_action.tpl.php';
