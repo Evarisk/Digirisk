@@ -58,12 +58,10 @@ DigiriskActionsEvents       = Événements pour lesquels Digirisk doit insérer 
 DigiriskDolibarr            = Digirisk
 Create                      = Créer
 
+# Ticket - Ticket
+MultiCompanyTicketPublicInterfaceConfig = Configuration de l'interface publique des tickets multi-société
+Subtitle                                = Sous-titre
 
-#
-# Page À propos
-#
-
-# Data - Donnée
 
 #
 # DigiriskDolibarr

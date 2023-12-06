@@ -634,8 +634,8 @@ if ($entity > 0) {
 	print '<form method="POST" action="' . $_SERVER["PHP_SELF"] .'">';
 	print '<input type="hidden" name="token" value="' . newToken() . '">';
 
-	print '<h1>' . $langs->trans('WelcomeToPublicTicketInterface') . '</h1>';
-	print '<h2>' . $langs->trans('PleaseSelectAnEntity') . '</h2>';
+	print '<h1>' . $langs->transnoentities(dolibarr_get_const($db, 'DIGIRISKDOLIBARR_TICKET_MULTI_COMPANY_PUBLIC_INTERFACE_TITLE', 0)) ?: $langs->trans('WelcomeToPublicTicketInterface') . '</h1>';
+	print '<h2>' . $langs->transnoentities(dolibarr_get_const($db, 'DIGIRISKDOLIBARR_TICKET_MULTI_COMPANY_PUBLIC_INTERFACE_SUBTITLE', 0)) ?: $langs->trans('PleaseSelectAnEntity') . '</h2>';
 
 	$multi_entity_selector = dolibarr_get_const($db, 'DIGIRISKDOLIBARR_SHOW_MULTI_ENTITY_SELECTOR_ON_TICKET_PUBLIC_INTERFACE', 0);
 	if ($multi_entity_selector) {
