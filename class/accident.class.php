@@ -106,6 +106,7 @@ class Accident extends SaturneObject
 	const STATUS_DRAFT     = 0;
 	const STATUS_VALIDATED = 1;
 	const STATUS_LOCKED    = 2;
+	const STATUS_ARCHIVED  = 3;
 
 	/**
 	 * 'type' field format:
@@ -156,7 +157,7 @@ class Accident extends SaturneObject
 		'entity'            => ['type' => 'integer',      'label' => 'Entity',           'enabled' => '1', 'position' => 30, 'notnull' => 1, 'visible' => 0,],
 		'date_creation'     => ['type' => 'datetime',     'label' => 'DateCreation',     'enabled' => '1', 'position' => 40, 'notnull' => 1, 'visible' => 2,],
 		'tms'               => ['type' => 'timestamp',    'label' => 'DateModification', 'enabled' => '1', 'position' => 50, 'notnull' => 0, 'visible' => 0,],
-		'status'            => ['type' => 'smallint',     'label' => 'Status',           'enabled' => '1', 'position' => 70, 'notnull' => 1, 'visible' => 2, 'index' => 0, 'arrayofkeyval' => [0 => 'StatusDraft', 1 => 'Validated', 2 => 'Locked']],
+		'status'            => ['type' => 'smallint',     'label' => 'Status',           'enabled' => '1', 'position' => 70, 'notnull' => 1, 'visible' => 2, 'index' => 0, 'arrayofkeyval' => [0 => 'StatusDraft', 1 => 'Validated', 2 => 'Locked', 3 => 'Archived']],
 		'label'             => ['type' => 'varchar(255)', 'label' => 'Label',            'enabled' => '1', 'position' => 80, 'notnull' => 0, 'visible' => 1, 'searchall' => 1, 'css' => 'minwidth200', 'help' => "Help text", 'showoncombobox' => '1',],
 		'fk_user_employer'  => ['type' => 'integer:User:user/class/user.class.php', 'label' => 'UserEmployer', 'enabled' => '1', 'position' => 82, 'notnull' => -1, 'visible' => 1,],
 		'accident_type'     => ['type' => 'text',         'label' => 'AccidentType',     'enabled' => '1', 'position' => 90, 'notnull' => -1, 'visible' => 1,  'css' => 'minwidth150',],
@@ -380,20 +381,21 @@ class Accident extends SaturneObject
             $this->labelStatus[self::STATUS_DRAFT]     = $langs->transnoentitiesnoconv('StatusDraft');
             $this->labelStatus[self::STATUS_VALIDATED] = $langs->transnoentitiesnoconv('Validated');
 			$this->labelStatus[self::STATUS_LOCKED]    = $langs->transnoentitiesnoconv('Locked');
+            $this->labelStatus[self::STATUS_ARCHIVED]  = $langs->transnoentitiesnoconv('Archived');
 
 			$this->labelStatusShort[self::STATUS_DELETED]   = $langs->transnoentitiesnoconv('Deleted');
             $this->labelStatusShort[self::STATUS_DRAFT]     = $langs->transnoentitiesnoconv('StatusDraft');
             $this->labelStatusShort[self::STATUS_VALIDATED] = $langs->transnoentitiesnoconv('Validated');
 			$this->labelStatusShort[self::STATUS_LOCKED]    = $langs->transnoentitiesnoconv('Locked');
-
+            $this->labelStatusShort[self::STATUS_ARCHIVED]  = $langs->transnoentitiesnoconv('Archived');
 		}
 
         $statusType = 'status' . $status;
         if ($status == self::STATUS_VALIDATED) {
             $statusType = 'status4';
         }
-        if ($status == self::STATUS_LOCKED) {
-            $statusType = 'status6';
+        if ($status == self::STATUS_LOCKED || $status == self::STATUS_ARCHIVED) {
+            $statusType = 'status8';
         }
         if ($status == self::STATUS_DELETED) {
             $statusType = 'status9';

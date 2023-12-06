@@ -1166,6 +1166,14 @@ if ((empty($action) || ($action != 'create' && $action != 'edit'))) {
 				print '<span class="butActionRefused classfortooltip" title="' . dol_escape_htmltag($langs->trans('ObjectMustBeLocked', ucfirst($langs->transnoentities('The' . ucfirst($object->element))))) . '">' . $displayButton . '</span>';
 			}
 
+            // Archive
+            $displayButton = $onPhone ?  '<i class="fas fa-archive fa-2x"></i>' : '<i class="fas fa-archive"></i>' . ' ' . $langs->trans('Archive');
+            if ($object->status == Accident::STATUS_LOCKED) {
+                print '<a class="butAction" href="' . $_SERVER['PHP_SELF'] . '?id=' . $object->id . '&action=confirm_archive&token=' . newToken() . '">' . $displayButton . '</a>';
+            } else {
+                print '<span class="butActionRefused classfortooltip" title="' . dol_escape_htmltag($langs->trans('ObjectMustBeLockedToArchive', ucfirst($langs->transnoentities('The' . ucfirst($object->element))))) . '">' . $displayButton . '</span>';
+            }
+
 			// Clone.
 			$displayButton = $onPhone ? '<i class="fas fa-clone fa-2x"></i>' : '<i class="fas fa-clone"></i>' . ' ' . $langs->trans('ToClone');
 			print '<span class="butAction" id="actionButtonClone" href="' . $_SERVER['PHP_SELF'] . '?id=' . $object->id . '&action=clone' . '">' . $displayButton . '</span>';
