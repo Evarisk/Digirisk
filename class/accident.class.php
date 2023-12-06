@@ -522,7 +522,6 @@ class Accident extends SaturneObject
         return $array;
     }
 
-
     /**
      * Get number accidents for last 3 years
      *
@@ -546,11 +545,11 @@ class Accident extends SaturneObject
 
         $array['labels'] = [
             'pastlastyear' => [
-                'label' => date("Y",strtotime("-2 year")),
+                'label' => date('Y', strtotime('-2 year')),
                 'color' => '#9567aa'
             ],
             'lastyear' => [
-                'label' => date("Y",strtotime("-1 year")),
+                'label' => date('Y', strtotime('-1 year')),
                 'color' => '#4f9ebe'
             ],
             'currentyear' => [
@@ -559,36 +558,34 @@ class Accident extends SaturneObject
             ],
         ];
 
-        $arrayAccidents = [];
-
-        $accidentList = $this->fetchAll();
-
-        if (is_array($accidentList) && !empty($accidentList)) {
-            foreach($accidentList as $accident) {
-                $accidentDate = getdate($accident->accident_date);
-                $yearKey = $accidentDate['year'];
-                $monthKey = $accidentDate['mon'];
+        $accidentsByYear = [];
+        $accidentsArray  = [];
+        $accidents       = $this->fetchAll('', '', 0, 0, ['customsql' => 't.status > 0']);
+        if (is_array($accidents) && !empty($accidents)) {
+            foreach($accidents as $accident) {
+                $accidentDate = dol_getdate($accident->accident_date);
+                $yearKey      = $accidentDate['year'];
+                $monthKey     = $accidentDate['mon'];
                 $accidentsByYear[$yearKey][$monthKey - 1] += 1;
             }
-        }
 
-        for ($i = 1; $i < 13; $i++) {
-            $month = $langs->transnoentitiesnoconv('MonthShort'.sprintf("%02d", $i));
-            $arrayAccidents[$i - 1] = array($month);
-            for ($j = 0; $j < 3; $j++) {
-                $arrayAccidents[$i - 1][date('Y') - 2 + $j] = 0;
+            for ($i = 1; $i < 13; $i++) {
+                $month = $langs->transnoentitiesnoconv('MonthShort'.sprintf('%02d', $i));
+                $accidentsArray[$i - 1] = [$month];
+                for ($j = 0; $j < 3; $j++) {
+                    $accidentsArray[$i - 1][date('Y') - 2 + $j] = 0;
+                }
             }
-        }
 
-
-        foreach($accidentsByYear as $year => $accidentByYear) {
-            foreach($accidentByYear as $month => $accidentByMonth) {
-                $arrayAccidents[$month][$year] = $accidentByMonth;
+            foreach($accidentsByYear as $year => $accidentByYear) {
+                foreach($accidentByYear as $month => $accidentByMonth) {
+                    $accidentsArray[$month][$year] = $accidentByMonth;
+                }
             }
-        }
 
-        foreach($arrayAccidents as $arrayAccident) {
-            $array['data'][] = array_values($arrayAccident);
+            foreach($accidentsArray as $accidentArray) {
+                $array['data'][] = array_values($accidentArray);
+            }
         }
 
         return $array;
