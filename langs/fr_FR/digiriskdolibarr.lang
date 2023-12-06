@@ -581,6 +581,8 @@ AccidentInvestigationRole         = Les rôles de l'enquête accident
 LesionsOrWorkStop                 = lésions ou arrêts de travail
 AccidentsCategoriesArea           =	Espace des tags/catégories des accidents
 AddAccidentIntoCategory           = Assigner cette catégorie à l'accident
+PreventionplansCategoriesArea     =	Espace des tags/catégories des plans de prévention
+AddPreventionplanIntoCategory     = Assigner cette catégorie au plan de prévention
 
 # AccidentTooltip - Tooltip des accidents
 VictimActivityTooltip              = Précisez l’activité ou la tâche de la victime au moment de l’accident, c’est-à-dire ce que faisait la victime

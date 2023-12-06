@@ -80,6 +80,12 @@ class ActionsDigiriskdolibarr
                     'obj_class' => 'Accident',
                     'obj_table' => 'digiriskdolibarr_accident',
                 ],
+                'preventionplan' => [
+                    'id'        => 436302002,
+                    'code'      => 'preventionplan',
+                    'obj_class' => 'PreventionPlan',
+                    'obj_table' => 'digiriskdolibarr_preventionplan',
+                ],
             ];
         }
 
@@ -511,7 +517,7 @@ class ActionsDigiriskdolibarr
             }     // If $page is not defined, or '' or -1 or if we click on clear filters or if we select empty mass action
             $offset = $limit * $page;
 
-            if ($type == 'accident') {
+            if ($type == 'accident' || $type == 'preventionplan') {
                 require_once __DIR__ . '/' . $type . '.class.php';
 
                 $classname = ucfirst($type);
@@ -702,7 +708,7 @@ class ActionsDigiriskdolibarr
             $id = GETPOST('id');
             $elementId = GETPOST('element_id');
             $type = GETPOST('type');
-            if ($id > 0 && $elementId > 0 && ($type == 'accident' && $user->rights->digiriskdolibarr->$type->write)) {
+            if ($id > 0 && $elementId > 0 && (($type == 'accident' || $type == 'preventionplan') && $user->rights->digiriskdolibarr->$type->write)) {
 
                 require_once __DIR__ . '/' . $type . '.class.php';
                 $classname = ucfirst($type);
