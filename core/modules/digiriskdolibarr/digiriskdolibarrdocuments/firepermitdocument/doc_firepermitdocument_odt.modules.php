@@ -483,7 +483,6 @@ class doc_firepermitdocument_odt extends SaturneDocumentModel
         }
 
         $moreParam['tmparray']         = $tmpArray;
-        $moreParam['subDir']           = 'digiriskdolibarrdocuments/';
         $moreParam['hideTemplateName'] = 1;
 
         return parent::write_file($objectDocument, $outputLangs, $srcTemplatePath, $hideDetails, $hideDesc, $hideRef, $moreParam);

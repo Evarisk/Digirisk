@@ -101,7 +101,6 @@ class doc_informationssharing_odt extends SaturneDocumentModel
         $objectDocument->element = $previousObjectDocumentElement;
 
 		$moreParam['tmparray']         = $tmpArray;
-		$moreParam['subDir']           = 'digiriskdolibarrdocuments/';
 		$moreParam['hideTemplateName'] = 1;
 
 		return parent::write_file($objectDocument, $outputLangs, $srcTemplatePath, $hideDetails, $hideDesc, $hideRef, $moreParam);

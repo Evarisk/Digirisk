@@ -362,7 +362,6 @@ class doc_registerdocument_odt extends SaturneDocumentModel
         $tmpArray['register_name'] = $langs->trans('RegisterDocument');
 
 		$moreParam['tmparray']         = $tmpArray;
-		$moreParam['subDir']           = 'digiriskdolibarrdocuments/';
 		$moreParam['hideTemplateName'] = 1;
 
         $arrayNbEmployees = $evaluator->getNbEmployees();
