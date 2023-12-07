@@ -435,7 +435,7 @@ class ActionsDigiriskdolibarr
 					}
 				}
 
-				if (in_array($parameters['currentcontext'], ['projectcard', 'projectcontactcard', 'projecttaskcard', 'projecttaskscard', 'projecttasktime', 'projectOverview', 'category'])) {
+				if (in_array($parameters['currentcontext'], ['projectcard', 'projectcontactcard', 'projecttaskcard', 'projecttaskscard', 'projecttasktime', 'projectOverview']) || ($parameters['currentcontext'] == 'category' && preg_match('/contacttpl/', $parameters['context']))) {
                     if (in_array($parameters['currentcontext'], ['projecttaskcard']) && !GETPOSTISSET('withproject')) {
                         return 0;
                     } else {
