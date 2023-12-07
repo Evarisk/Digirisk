@@ -921,7 +921,7 @@ if (is_array($accidentWorkStopTimeRanges) && !empty($accidentWorkStopTimeRanges)
         }
         print '<tr>';
         print '<td>';
-        print $rangeName;
+        print $langs->transnoentities($rangeName);
         print '</td>';
         print '<td>';
         print $rangeComparator;

@@ -283,7 +283,7 @@ class ActionsDigiriskdolibarr
 					<?php
 				}
 			}
-		} else if (in_array($parameters['currentcontext'], array('projectcard', 'projectcontactcard', 'projecttaskscard', 'projecttaskcard', 'projecttasktime', 'projectOverview', 'projecttaskscard', 'tasklist'))) {
+		} else if (in_array($parameters['currentcontext'], array('projectcard', 'projectcontactcard', 'projecttaskscard', 'projecttaskcard', 'projecttasktime', 'projectOverview', 'projecttaskscard', 'tasklist', 'category'))) {
 			if ((GETPOST('action') == '' || empty(GETPOST('action')) || GETPOST('action') != 'edit')) {
 				require_once DOL_DOCUMENT_ROOT.'/projet/class/project.class.php';
 				require_once DOL_DOCUMENT_ROOT.'/projet/class/task.class.php';
@@ -435,49 +435,52 @@ class ActionsDigiriskdolibarr
 					}
 				}
 
-				if (in_array($parameters['currentcontext'], ['projectcard', 'projectcontactcard', 'projecttaskcard', 'projecttaskscard', 'projecttasktime', 'projectOverview'])) {
-					if (GETPOSTISSET('projectid') || GETPOSTISSET('project_ref')) {
-                        $project->fetch( GETPOST('projectid'), GETPOST('project_ref'));
-                        $projectId = $project->id;
-                    } else if (in_array($parameters['currentcontext'], ['projectcard', 'projectcontactcard', 'projecttaskscard'])) {
-                        $projectId = GETPOST('id');
+				if (in_array($parameters['currentcontext'], ['projectcard', 'projectcontactcard', 'projecttaskcard', 'projecttaskscard', 'projecttasktime', 'projectOverview']) || ($parameters['currentcontext'] == 'category' && preg_match('/contacttpl/', $parameters['context']))) {
+                    if (in_array($parameters['currentcontext'], ['projecttaskcard']) && !GETPOSTISSET('withproject')) {
+                        return 0;
                     } else {
-                        $task->fetch(GETPOST('id'));
-                        $projectId = $task->fk_project;
-					}
-					$allTasks = $task->getTasksArray(null, null, $projectId, 0, 0, '', '-1', '', 0, 0, $extrafields);
-                    if (is_array($allTasks) && !empty($allTasks)) {
-						$nbTasks = count($allTasks);
-						foreach ($allTasks as $taskSingle) {
-							$filter       = ' AND fk_element = ' . $taskSingle->id;
-							$allTimespent = $task->fetchAllTimeSpentAllUsers($filter);
-							foreach ($allTimespent as $timespent) {
-								$totatConsumedTimeAmount += convertSecondToTime($timespent->timespent_duration, 'allhourmin') * $timespent->timespent_thm;
-							}
-							$totalConsumedTime += $taskSingle->duration;
-							$totalProgress     += $taskSingle->progress;
-							$totalTasksBudget  += $taskSingle->budget_amount;
-						}
-					} else {
-						$totalConsumedTime       = 0;
-						$totatConsumedTimeAmount = 0;
-						$nbTasks                 = 0;
-						$totalProgress           = 0;
-						$totalTasksBudget        = 0;
-					}
-					$outTotatConsumedTime       = '<tr><td>' . $langs->trans('TotalConsumedTime') . '</td><td>' . convertSecondToTime($totalConsumedTime, 'allhourmin') . '</td></tr>';
-					$outTotatConsumedTimeAmount = '<tr><td>' . $langs->trans('TotalConsumedTimeAmount') . '</td><td>' . price($totatConsumedTimeAmount, 0, $langs, 1, -1, 2, $conf->currency) . '</td></tr>';
-					$outNbtasks                 = '<tr><td>' . $langs->trans('NbTasks') . '</td><td>' . $nbTasks . '</td></tr>';
-					$outTotalProgress           = '<tr><td>' . $langs->trans('TotalProgress') . '</td><td>' . (($totalProgress) ? price2num($totalProgress/$nbTasks, 2) . ' %' : '0 %') . '</td></tr>';
-					$outTotalTasksBudget        = '<tr><td>' . $langs->trans('TotalBudget') . '</td><td>' . price($totalTasksBudget, 0, $langs, 1, -1, 2, $conf->currency) . '</td></tr>'; ?>
-					<script>
-						jQuery('.fichecenter .fichehalfright .tableforfield tbody tr:last-child').first().after(<?php echo json_encode($outTotatConsumedTime) ?>);
-						jQuery('.fichecenter .fichehalfright .tableforfield tbody tr:last-child').first().after(<?php echo json_encode($outTotatConsumedTimeAmount) ?>);
-						jQuery('.fichecenter .fichehalfright .tableforfield tbody tr:last-child').first().after(<?php echo json_encode($outNbtasks) ?>);
-						jQuery('.fichecenter .fichehalfright .tableforfield tbody tr:last-child').first().after(<?php echo json_encode($outTotalProgress) ?>);
-						jQuery('.fichecenter .fichehalfright .tableforfield tbody tr:last-child').first().after(<?php echo json_encode($outTotalTasksBudget) ?>);
-					</script>
-					<?php
+                        if (GETPOSTISSET('projectid') || GETPOSTISSET('project_ref')) {
+                            $project->fetch( GETPOST('projectid'), GETPOST('project_ref'));
+                            $projectId = $project->id;
+                        } else if (in_array($parameters['currentcontext'], ['projectcard', 'projectcontactcard', 'projecttaskscard'])) {
+                            $projectId = GETPOST('id');
+                        } else {
+                            $task->fetch(GETPOST('id'));
+                            $projectId = $task->fk_project;
+                        }
+                        $allTasks = $task->getTasksArray(null, null, $projectId, 0, 0, '', '-1', '', 0, 0, $extrafields);
+                        if (is_array($allTasks) && !empty($allTasks)) {
+                            $nbTasks = count($allTasks);
+                            foreach ($allTasks as $taskSingle) {
+                                $filter       = ' AND fk_element = ' . $taskSingle->id;
+                                $allTimespent = $task->fetchAllTimeSpentAllUsers($filter);
+                                foreach ($allTimespent as $timespent) {
+                                    $totatConsumedTimeAmount += convertSecondToTime($timespent->timespent_duration, 'allhourmin') * $timespent->timespent_thm;
+                                }
+                                $totalConsumedTime += $taskSingle->duration;
+                                $totalProgress     += $taskSingle->progress;
+                                $totalTasksBudget  += $taskSingle->budget_amount;
+                            }
+                        } else {
+                            $totalConsumedTime       = 0;
+                            $totatConsumedTimeAmount = 0;
+                            $nbTasks                 = 0;
+                            $totalProgress           = 0;
+                            $totalTasksBudget        = 0;
+                        }
+                        $outTotatConsumedTime       = '<tr><td>' . $langs->trans('TotalConsumedTime') . '</td><td>' . convertSecondToTime($totalConsumedTime, 'allhourmin') . '</td></tr>';
+                        $outTotatConsumedTimeAmount = '<tr><td>' . $langs->trans('TotalConsumedTimeAmount') . '</td><td>' . price($totatConsumedTimeAmount, 0, $langs, 1, -1, 2, $conf->currency) . '</td></tr>';
+                        $outNbtasks                 = '<tr><td>' . $langs->trans('NbTasks') . '</td><td>' . $nbTasks . '</td></tr>';
+                        $outTotalProgress           = '<tr><td>' . $langs->trans('TotalProgress') . '</td><td>' . (($totalProgress) ? price2num($totalProgress/$nbTasks, 2) . ' %' : '0 %') . '</td></tr>';
+                        $outTotalTasksBudget        = '<tr><td>' . $langs->trans('TotalBudget') . '</td><td>' . price($totalTasksBudget, 0, $langs, 1, -1, 2, $conf->currency) . '</td></tr>';?>
+                        <script>
+                            jQuery('.fichecenter .fichehalfright .tableforfield tbody tr:last-child').first().after(<?php echo json_encode($outTotatConsumedTime) ?>);
+                            jQuery('.fichecenter .fichehalfright .tableforfield tbody tr:last-child').first().after(<?php echo json_encode($outTotatConsumedTimeAmount) ?>);
+                            jQuery('.fichecenter .fichehalfright .tableforfield tbody tr:last-child').first().after(<?php echo json_encode($outNbtasks) ?>);
+                            jQuery('.fichecenter .fichehalfright .tableforfield tbody tr:last-child').first().after(<?php echo json_encode($outTotalProgress) ?>);
+                            jQuery('.fichecenter .fichehalfright .tableforfield tbody tr:last-child').first().after(<?php echo json_encode($outTotalTasksBudget) ?>);
+                        </script> <?php
+                    }
 				}
 			}
 		} else if ($parameters['currentcontext'] == 'publicnewticketcard') {
