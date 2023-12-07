@@ -1077,13 +1077,13 @@ class ActionsDigiriskdolibarr
 
 
 	/**
-	 *  Overloading the SaturneAdminDocumentData function : replacing the parent's function with the one below.
+	 *  Overloading the saturneAdminDocumentData function : replacing the parent's function with the one below.
 	 *
 	 * @param  array        $parameters Hook metadatas (context, etc...).
 	 * @param  CommonObject $object     Current object.
 	 * @return int                      0 < on error, 0 on success, 1 to replace standard code.
 	 */
-	public function SaturneAdminDocumentData(array $parameters): int
+	public function saturneAdminDocumentData(array $parameters): int
 	{
 		global $moduleNameLowerCase;
 
