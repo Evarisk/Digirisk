@@ -1087,13 +1087,6 @@ if ((empty($action) || ($action != 'create' && $action != 'edit'))) {
 		print '</td></tr>';
 	}
 
-    // Categories
-    if ($conf->categorie->enabled) {
-        print '<tr><td class="valignmiddle">'.$langs->trans("Categories").'</td><td>';
-        print $form->showCategories($object->id, 'preventionplan', 1);
-        print "</td></tr>";
-    }
-
 	print '</table>';
 	print '</div>';
 	print '<div class="fichehalfright">';
@@ -1134,6 +1127,13 @@ if ((empty($action) || ($action != 'create' && $action != 'edit'))) {
 	print '<a ' . ($object->status == 1 ? 'href="' .  $url . '"' : '') . '">' . $attendants;
 	print '<span class="' . ($object->status == $object::STATUS_DRAFT ? 'butAction' : 'butActionRefused classfortooltip') . '" id="actionButtonAddAttendants" title="' . dol_escape_htmltag($langs->trans("PreventionPlanMustBeInProgress")) . '">' .  $displayButton . '</span></a>';
 	print '</td></tr>';
+
+    // Categories
+    if ($conf->categorie->enabled) {
+        print '<tr><td class="valignmiddle">'.$langs->trans("Categories").'</td><td>';
+        print $form->showCategories($object->id, 'preventionplan', 1);
+        print "</td></tr>";
+    }
 
 	print '</table>';
 	print '</div>';
