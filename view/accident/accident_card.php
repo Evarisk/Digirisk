@@ -980,7 +980,8 @@ if ((empty($action) || ($action != 'create' && $action != 'edit'))) {
 	unset($object->fields['accident_location']);
 	unset($object->fields['fk_soc']);
 	unset($object->fields['fk_user_employer']);
-	unset($object->fields['fk_element']);
+    unset($object->fields['fk_element']);
+    unset($object->fields['fk_ticket']);
 
 	//Label -- Libellé
 	print '<tr><td class="titlefield">';
@@ -1062,16 +1063,11 @@ if ((empty($action) || ($action != 'create' && $action != 'edit'))) {
 	print $object->description;
 	print '</td></tr>';
 
-    //Fk Ticket -- Fk Ticket
-    print '<tr><td class="titlefield">';
-    print $langs->trans('FkTicket');
-    print '</td>';
-    print '<td>';
-    if ($object->fk_ticket > 0) {
-        $ticket->fetch($object->fk_ticket);
-        print $ticket->getNomUrl(1);
-    }
-    print '</td></tr>';
+    print '</table>';
+    print '</div>';
+    print '<div class="fichehalfright">';
+    print '<div class="underbanner clearboth"></div>';
+    print '<table class="border centpercent tableforfield">';
 
     print '<tr class="linked-medias photo gallery-table"> <td class=""><label for="photo">' . $langs->trans("Photos") . '</label></td>';
     print '<td class="linked-medias-list">';
@@ -1093,6 +1089,17 @@ if ((empty($action) || ($action != 'create' && $action != 'edit'))) {
     <?php
     $relativepath = 'digiriskdolibarr/medias/thumbs';
     print saturne_show_medias_linked('digiriskdolibarr', $pathPhotos, 'small', 0, 0, 0, 0, 50, 50, 0, 0, 0, 'accident/'. $object->ref . '/photos/', $object, 'photo', $permissiontoadd, $permissiontodelete && $object->status <= Accident::STATUS_DRAFT);
+    print '</td></tr>';
+
+    //Fk Ticket -- Fk Ticket
+    print '<tr><td class="titlefield">';
+    print $langs->trans('FkTicket');
+    print '</td>';
+    print '<td>';
+    if ($object->fk_ticket > 0) {
+        $ticket->fetch($object->fk_ticket);
+        print $ticket->getNomUrl(1);
+    }
     print '</td></tr>';
 
     // Categories
