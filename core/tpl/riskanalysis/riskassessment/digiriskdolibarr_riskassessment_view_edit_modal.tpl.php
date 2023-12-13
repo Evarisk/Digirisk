@@ -46,6 +46,8 @@
 							<?php endif; ?>
 							<i class="fas fa-info-circle wpeo-tooltip-event" aria-label="<?php echo $langs->trans("HowToSetMultipleRiskAssessmentMethod") ?>"></i>
 						<?php endif; ?>
+                        <input class="risk-evaluation-method" type="hidden" value="<?php echo ($lastEvaluation->method == "standard") ? "standard" : "advanced" ?>">
+                        <input class="risk-evaluation-multiple-method" type="hidden" value="<?php echo $conf->global->DIGIRISKDOLIBARR_MULTIPLE_RISKASSESSMENT_METHOD ?>">
 					</div>
 					<div class="risk-evaluation-content-wrapper">
 						<div class="risk-evaluation-content">
