@@ -1032,7 +1032,7 @@ class ActionsDigiriskdolibarr
 
             $this->resprints = $moreHtmlRef;
         }
-        if (in_array($parameters['currentcontext'], ['digiriskelementdocument', 'digiriskelementagenda', 'accidentdocument', 'accidentagenda', 'digiriskstandardagenda'])) {
+        if (in_array($parameters['currentcontext'], ['digiriskelementdocument', 'digiriskelementagenda', 'accidentdocument', 'accidentagenda', 'accidentsignature', 'digiriskstandardagenda'])) {
             list($moreHtmlRef, $moreParams) = $object->getBannerTabContent();
             switch ($parameters['currentcontext']) {
                 case 'digiriskelementdocument' :

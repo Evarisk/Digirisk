@@ -47,7 +47,8 @@ function accident_prepare_head(Accident $object): array
     }
 
     $moreParams['attendantTableMode'] = 'advanced';
-    $moreParams['attendantTabName'] = $langs->trans('VictimAndCaregivers');
+    $moreParams['attendantTabName']   = $langs->trans('VictimAndCaregivers');
+    $moreParams['handlePhoto']        = $object->photo;
 
     return saturne_object_prepare_head($object, $head, $moreParams, true);
 }

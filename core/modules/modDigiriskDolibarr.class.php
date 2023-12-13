@@ -436,6 +436,7 @@ class modDigiriskdolibarr extends DolibarrModules
 				'digiriskstandardview',
                 'accidentdocument',
                 'accidentagenda',
+                'accidentsignature',
                 'digiriskstandardagenda',
                 'category',
                 'categoryindex'
