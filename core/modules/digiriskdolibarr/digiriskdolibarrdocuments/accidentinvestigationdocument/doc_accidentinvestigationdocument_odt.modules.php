@@ -116,7 +116,8 @@ class doc_accidentinvestigationdocument_odt extends SaturneDocumentModel
 				foreach ($actionTasks as $actionTask) {
 					$taskExecutive = $actionTask->liste_contact(-1, 'internal', 0, 'TASKEXECUTIVE');
 
-					$tmpArray[$taskType . '_ref']         = $actionTask->ref;
+                    $tmpArray[$taskType . '_ref']         = $actionTask->ref;
+                    $tmpArray[$taskType . '_label']       = $actionTask->label;
 					$tmpArray[$taskType . '_description'] = $actionTask->description;
 
 					$delay  = $actionTask->datee > 0 ? round(($actionTask->datee - $now) / 60 / 60 / 24) : 0;
@@ -128,7 +129,8 @@ class doc_accidentinvestigationdocument_odt extends SaturneDocumentModel
 					$this->setTmpArrayVars($tmpArray, $listLines, $outputLangs);
 				}
 			} else {
-				$tmpArray[$taskType . '_ref']         = '';
+                $tmpArray[$taskType . '_ref']         = '';
+                $tmpArray[$taskType . '_label']       = '';
 				$tmpArray[$taskType . '_description'] = '';
 				$tmpArray[$taskType . '_resp']        = '';
 				$tmpArray[$taskType . '_delay']       = '';
