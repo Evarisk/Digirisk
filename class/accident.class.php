@@ -851,7 +851,6 @@ class Accident extends SaturneObject
         $workstopLine      = new AccidentWorkStop($this->db);
         $accidentLines     = $workstopLine->fetchFromParent($this->id);
         $totalWorkStopDays = 0;
-        $moreHtmlRef       = '';
 
         if (!empty($accidentLines) && $accidentLines > 0) {
             foreach ($accidentLines as $accidentLine) {

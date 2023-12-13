@@ -483,28 +483,6 @@ if (empty($reshook)) {
 		}
 	}
 
-    // Action to set status STATUS_REOPENED
-    if ($action == 'confirm_setReopened') {
-        $object->fetch($id);
-        if ( ! $error) {
-            $result = $object->setDraft($user, false);
-            if ($result > 0) {
-                $object->verdict = null;
-                $result = $object->update($user);
-                // Set reopened OK
-                $urltogo = str_replace('__ID__', $result, $backtopage);
-                $urltogo = preg_replace('/--IDFORBACKTOPAGE--/', $id, $urltogo); // New method to autoselect project after a New on another form object creation
-                header('Location: ' . $urltogo);
-                exit;
-            } else {
-                // Set reopened KO
-                if ( ! empty($object->errors)) setEventMessages(null, $object->errors, 'errors');
-                else setEventMessages($object->error, null, 'errors');
-            }
-        }
-    }
-
-
     // Add file in accident workstop
 	if ($action == 'sendfile') {
 		include_once DOL_DOCUMENT_ROOT . '/core/lib/files.lib.php';
@@ -950,7 +928,7 @@ if ((empty($action) || ($action != 'create' && $action != 'edit'))) {
     // SetReOpen confirmation
     if (($action == 'setReOpen' && (empty($conf->use_javascript_ajax) || !empty($conf->dol_use_jmobile))) || (!empty($conf->use_javascript_ajax) && empty($conf->dol_use_jmobile))) {
         $questionConfirmInfo = $langs->trans('ConfirmReOpenObject', $langs->trans('TheAccident'));
-        $formConfirm .= $form->formconfirm($_SERVER['PHP_SELF'] . '?id=' . $object->id, $langs->trans('ReOpenObject', $langs->trans('TheAccident')), $questionConfirmInfo, 'confirm_setReopened', '', 'yes', 'actionButtonReOpen', 250);
+        $formConfirm .= $form->formconfirm($_SERVER['PHP_SELF'] . '?id=' . $object->id, $langs->trans('ReOpenObject', $langs->trans('TheAccident')), $questionConfirmInfo, 'confirm_setdraft', '', 'yes', 'actionButtonReOpen', 250);
     }
 
 	// Confirmation to lock
