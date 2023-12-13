@@ -80,6 +80,11 @@ $digiriskstandard = new DigiriskStandard($db);
 $project          = new Project($db);
 $ticket           = new Ticket($db);
 
+// Load tickets for selectarray instead of using selectTicketList(deprecated)
+$tickets      = saturne_fetch_all_object_type('Ticket');
+$ticketsArray = [];
+foreach($tickets as $ticketId => $ticketValue) $ticketsArray[$ticketId] = $ticketValue->ref;
+
 // Load object
 $object->fetch($id);
 if ($id > 0 && $object->external_accident != 2) {
@@ -712,16 +717,16 @@ if ($action == 'create') {
 	$doleditor->Create();
 	print '</td></tr>';
 
-  //Fk Ticket -- Fk Ticket
-  print '<tr class="content_field"><td><label for="content">' . $langs->trans("FkTicket") . '</label></td><td>';
-  print $form->selectTicketsList(GETPOST('fk_ticket'), 'fk_ticket', '', 0, '', 1, 0, '1', 0, 'minwidth300');
-  print '</td></tr>';
+    //Fk Ticket -- Fk Ticket
+    print '<tr class="content_field"><td><label for="content">' . $langs->trans("FkTicket") . '</label></td><td>';
+    print img_picto('', 'ticket', 'class="pictofixedwidth"') . $form->selectarray('fk_ticket', $ticketsArray, 0, 1, 0, 0, 0, '', 0, 0, 0, 'minwidth300');
+    print '</td></tr>';
 
   // Categories
   if (!empty($conf->categorie->enabled)) {
       print '<tr><td>'.$langs->trans("Categories").'</td><td>';
       $categoryArborescence = $form->select_all_categories('accident', '', 'parent', 64, 0, 1);
-      print img_picto('', 'category', 'class="pictofixedwidth"').$form->multiselectarray('categories', $categoryArborescence, GETPOST('categories', 'array'), '', 0, 'quatrevingtpercent maxwidth300 widthcentpercentminusx');
+      print img_picto('', 'category', 'class="pictofixedwidth"').$form->multiselectarray('categories', $categoryArborescence, GETPOST('categories', 'array'), '', 0, 'maxwidth300 widthcentpercentminusx');
       print '<a class="butActionNew" href="' . DOL_URL_ROOT . '/categories/index.php?type=accident&backtopage=' . urlencode($_SERVER['PHP_SELF'] . '?action=create') . '" target="_blank"><span class="fa fa-plus-circle valignmiddle paddingleft" title="' . $langs->trans('AddCategories') . '"></span></a>';
       print "</td></tr>";
   }
@@ -819,10 +824,10 @@ if (($id || $ref) && $action == 'edit') {
 	$doleditor->Create();
 	print '</td></tr>';
 
-  //Fk Ticket -- Fk Ticket
-  print '<tr class="content_field"><td><label for="content">' . $langs->trans("FkTicket") . '</label></td><td>';
-  print $form->selectTicketsList($object->fk_ticket ?: GETPOST('fk_ticket'), 'fk_ticket', '', 0, '', 1, 0, '1', 0, 'minwidth300');
-  print '</td></tr>';
+    //Fk Ticket -- Fk Ticket
+    print '<tr class="content_field"><td><label for="content">' . $langs->trans("FkTicket") . '</label></td><td>';
+    print img_picto('', 'ticket', 'class="pictofixedwidth"') . $form->selectarray('fk_ticket', $ticketsArray, $object->fk_ticket, 1, 0, 0, 0, '', 0, 0, 0, 'minwidth300');
+    print '</td></tr>';
 
   // Tags-Categories
   if ($conf->categorie->enabled) {
@@ -836,7 +841,7 @@ if (($id || $ref) && $action == 'edit') {
               $arrayselected[] = $cat->id;
           }
       }
-      print img_picto('', 'category', 'class="pictofixedwidth"').$form->multiselectarray('categories', $categoryArborescence, $arrayselected, '', 0, 'maxwidth500 widthcentpercentminusx');
+      print img_picto('', 'category', 'class="pictofixedwidth"').$form->multiselectarray('categories', $categoryArborescence, $arrayselected, '', 0, 'maxwidth300 widthcentpercentminusx');
       print '<a class="butActionNew" href="' . DOL_URL_ROOT . '/categories/index.php?type=accident&backtopage=' . urlencode($_SERVER['PHP_SELF'] . '?action=create') . '" target="_blank"><span class="fa fa-plus-circle valignmiddle paddingleft" title="' . $langs->trans('AddCategories') . '"></span></a>';
       print "</td></tr>";
   }
