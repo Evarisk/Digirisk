@@ -83,7 +83,9 @@ $ticket           = new Ticket($db);
 // Load tickets for selectarray instead of using selectTicketList(deprecated)
 $tickets      = saturne_fetch_all_object_type('Ticket');
 $ticketsArray = [];
-foreach($tickets as $ticketId => $ticketValue) $ticketsArray[$ticketId] = $ticketValue->ref;
+foreach($tickets as $ticketId => $ticketValue) {
+    $ticketsArray[$ticketId] = $ticketValue->ref;
+}
 
 // Load object
 $object->fetch($id);
