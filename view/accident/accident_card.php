@@ -80,6 +80,13 @@ $digiriskstandard = new DigiriskStandard($db);
 $project          = new Project($db);
 $ticket           = new Ticket($db);
 
+// Load tickets for selectarray instead of using selectTicketList(deprecated)
+$tickets      = saturne_fetch_all_object_type('Ticket');
+$ticketsArray = [];
+foreach($tickets as $ticketId => $ticketValue) {
+    $ticketsArray[$ticketId] = $ticketValue->ref;
+}
+
 // Load object
 $object->fetch($id);
 if ($id > 0 && $object->external_accident != 2) {
@@ -478,28 +485,6 @@ if (empty($reshook)) {
 		}
 	}
 
-    // Action to set status STATUS_REOPENED
-    if ($action == 'confirm_setReopened') {
-        $object->fetch($id);
-        if ( ! $error) {
-            $result = $object->setDraft($user, false);
-            if ($result > 0) {
-                $object->verdict = null;
-                $result = $object->update($user);
-                // Set reopened OK
-                $urltogo = str_replace('__ID__', $result, $backtopage);
-                $urltogo = preg_replace('/--IDFORBACKTOPAGE--/', $id, $urltogo); // New method to autoselect project after a New on another form object creation
-                header('Location: ' . $urltogo);
-                exit;
-            } else {
-                // Set reopened KO
-                if ( ! empty($object->errors)) setEventMessages(null, $object->errors, 'errors');
-                else setEventMessages($object->error, null, 'errors');
-            }
-        }
-    }
-
-
     // Add file in accident workstop
 	if ($action == 'sendfile') {
 		include_once DOL_DOCUMENT_ROOT . '/core/lib/files.lib.php';
@@ -712,16 +697,16 @@ if ($action == 'create') {
 	$doleditor->Create();
 	print '</td></tr>';
 
-  //Fk Ticket -- Fk Ticket
-  print '<tr class="content_field"><td><label for="content">' . $langs->trans("FkTicket") . '</label></td><td>';
-  print $form->selectTicketsList(GETPOST('fk_ticket'), 'fk_ticket', '', 0, '', 1, 0, '1', 0, 'minwidth300');
-  print '</td></tr>';
+    //Fk Ticket -- Fk Ticket
+    print '<tr class="content_field"><td><label for="content">' . $langs->trans("FkTicket") . '</label></td><td>';
+    print img_picto('', 'ticket', 'class="pictofixedwidth"') . $form->selectarray('fk_ticket', $ticketsArray, 0, 1, 0, 0, 0, '', 0, 0, 0, 'minwidth300');
+    print '</td></tr>';
 
   // Categories
   if (!empty($conf->categorie->enabled)) {
       print '<tr><td>'.$langs->trans("Categories").'</td><td>';
       $categoryArborescence = $form->select_all_categories('accident', '', 'parent', 64, 0, 1);
-      print img_picto('', 'category', 'class="pictofixedwidth"').$form->multiselectarray('categories', $categoryArborescence, GETPOST('categories', 'array'), '', 0, 'quatrevingtpercent maxwidth300 widthcentpercentminusx');
+      print img_picto('', 'category', 'class="pictofixedwidth"').$form->multiselectarray('categories', $categoryArborescence, GETPOST('categories', 'array'), '', 0, 'maxwidth300 widthcentpercentminusx');
       print '<a class="butActionNew" href="' . DOL_URL_ROOT . '/categories/index.php?type=accident&backtopage=' . urlencode($_SERVER['PHP_SELF'] . '?action=create') . '" target="_blank"><span class="fa fa-plus-circle valignmiddle paddingleft" title="' . $langs->trans('AddCategories') . '"></span></a>';
       print "</td></tr>";
   }
@@ -819,10 +804,10 @@ if (($id || $ref) && $action == 'edit') {
 	$doleditor->Create();
 	print '</td></tr>';
 
-  //Fk Ticket -- Fk Ticket
-  print '<tr class="content_field"><td><label for="content">' . $langs->trans("FkTicket") . '</label></td><td>';
-  print $form->selectTicketsList($object->fk_ticket ?: GETPOST('fk_ticket'), 'fk_ticket', '', 0, '', 1, 0, '1', 0, 'minwidth300');
-  print '</td></tr>';
+    //Fk Ticket -- Fk Ticket
+    print '<tr class="content_field"><td><label for="content">' . $langs->trans("FkTicket") . '</label></td><td>';
+    print img_picto('', 'ticket', 'class="pictofixedwidth"') . $form->selectarray('fk_ticket', $ticketsArray, $object->fk_ticket, 1, 0, 0, 0, '', 0, 0, 0, 'minwidth300');
+    print '</td></tr>';
 
   // Tags-Categories
   if ($conf->categorie->enabled) {
@@ -836,7 +821,7 @@ if (($id || $ref) && $action == 'edit') {
               $arrayselected[] = $cat->id;
           }
       }
-      print img_picto('', 'category', 'class="pictofixedwidth"').$form->multiselectarray('categories', $categoryArborescence, $arrayselected, '', 0, 'maxwidth500 widthcentpercentminusx');
+      print img_picto('', 'category', 'class="pictofixedwidth"').$form->multiselectarray('categories', $categoryArborescence, $arrayselected, '', 0, 'maxwidth300 widthcentpercentminusx');
       print '<a class="butActionNew" href="' . DOL_URL_ROOT . '/categories/index.php?type=accident&backtopage=' . urlencode($_SERVER['PHP_SELF'] . '?action=create') . '" target="_blank"><span class="fa fa-plus-circle valignmiddle paddingleft" title="' . $langs->trans('AddCategories') . '"></span></a>';
       print "</td></tr>";
   }
@@ -945,7 +930,7 @@ if ((empty($action) || ($action != 'create' && $action != 'edit'))) {
     // SetReOpen confirmation
     if (($action == 'setReOpen' && (empty($conf->use_javascript_ajax) || !empty($conf->dol_use_jmobile))) || (!empty($conf->use_javascript_ajax) && empty($conf->dol_use_jmobile))) {
         $questionConfirmInfo = $langs->trans('ConfirmReOpenObject', $langs->trans('TheAccident'));
-        $formConfirm .= $form->formconfirm($_SERVER['PHP_SELF'] . '?id=' . $object->id, $langs->trans('ReOpenObject', $langs->trans('TheAccident')), $questionConfirmInfo, 'confirm_setReopened', '', 'yes', 'actionButtonReOpen', 250);
+        $formConfirm .= $form->formconfirm($_SERVER['PHP_SELF'] . '?id=' . $object->id, $langs->trans('ReOpenObject', $langs->trans('TheAccident')), $questionConfirmInfo, 'confirm_setdraft', '', 'yes', 'actionButtonReOpen', 250);
     }
 
 	// Confirmation to lock
@@ -980,7 +965,8 @@ if ((empty($action) || ($action != 'create' && $action != 'edit'))) {
 	unset($object->fields['accident_location']);
 	unset($object->fields['fk_soc']);
 	unset($object->fields['fk_user_employer']);
-	unset($object->fields['fk_element']);
+    unset($object->fields['fk_element']);
+    unset($object->fields['fk_ticket']);
 
 	//Label -- Libellé
 	print '<tr><td class="titlefield">';
@@ -1062,16 +1048,11 @@ if ((empty($action) || ($action != 'create' && $action != 'edit'))) {
 	print $object->description;
 	print '</td></tr>';
 
-    //Fk Ticket -- Fk Ticket
-    print '<tr><td class="titlefield">';
-    print $langs->trans('FkTicket');
-    print '</td>';
-    print '<td>';
-    if ($object->fk_ticket > 0) {
-        $ticket->fetch($object->fk_ticket);
-        print $ticket->getNomUrl(1);
-    }
-    print '</td></tr>';
+    print '</table>';
+    print '</div>';
+    print '<div class="fichehalfright">';
+    print '<div class="underbanner clearboth"></div>';
+    print '<table class="border centpercent tableforfield">';
 
     print '<tr class="linked-medias photo gallery-table"> <td class=""><label for="photo">' . $langs->trans("Photos") . '</label></td>';
     print '<td class="linked-medias-list">';
@@ -1093,6 +1074,17 @@ if ((empty($action) || ($action != 'create' && $action != 'edit'))) {
     <?php
     $relativepath = 'digiriskdolibarr/medias/thumbs';
     print saturne_show_medias_linked('digiriskdolibarr', $pathPhotos, 'small', 0, 0, 0, 0, 50, 50, 0, 0, 0, 'accident/'. $object->ref . '/photos/', $object, 'photo', $permissiontoadd, $permissiontodelete && $object->status <= Accident::STATUS_DRAFT);
+    print '</td></tr>';
+
+    //Fk Ticket -- Fk Ticket
+    print '<tr><td class="titlefield">';
+    print $langs->trans('FkTicket');
+    print '</td>';
+    print '<td>';
+    if ($object->fk_ticket > 0) {
+        $ticket->fetch($object->fk_ticket);
+        print $ticket->getNomUrl(1);
+    }
     print '</td></tr>';
 
     // Categories
