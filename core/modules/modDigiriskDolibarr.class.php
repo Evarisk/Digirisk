@@ -1623,6 +1623,102 @@ class modDigiriskdolibarr extends DolibarrModules
 		$this->export_sql_end[$r] .= ' LEFT JOIN '.MAIN_DB_PREFIX.'societe as s ON s.rowid = t.fk_soc';
 		$this->export_sql_end[$r] .= ' WHERE cat.entity IN ('.getEntity('category').')';
 		$this->export_sql_end[$r] .= ' AND cat.type = 12';
+
+        // Imports profiles provided by this module
+        $r = 1;
+        $this->import_code[$r]                 = $this->rights_class . '_risk_' . $r;
+        $this->import_label[$r]                = 'Risk'; // Translation key (used only if key ExportDataset_xxx_z not found)
+        $this->import_icon[$r]                 = 'fontawesome_fa-exclamation-triangle_fas_#d35968';
+        $this->import_tables_array[$r]         = ['t' => MAIN_DB_PREFIX . 'digiriskdolibarr_risk', 'extra' => MAIN_DB_PREFIX . 'digiriskdolibarr_risk_extrafields'];
+        $this->import_tables_creator_array[$r] = ['t' => 'fk_user_creat']; // Fields to store import user id
+
+        $importSample    = [];
+        $keyforclass     = 'Risk';
+        $keyforclassfile = '/digiriskdolibarr/class/riskanalysis/risk.class.php';
+        $keyforelement   = 'risk';
+
+        require DOL_DOCUMENT_ROOT . '/core/commonfieldsinimport.inc.php';
+
+        $unsetFields = ['t.rowid', 't.entity', 't.tms', 't.import_key', 't.fk_user_creat', 't.fk_user_modif'];
+        foreach ($unsetFields as $unsetField) {
+            unset($this->import_fields_array[$r][$unsetField]);
+            unset($this->import_TypeFields_array[$r][$unsetField]);
+            unset($this->import_entities_array[$r][$unsetField]);
+            unset($this->import_help_array[$r][$unsetField]);
+        }
+
+        $importExtrafieldSample = [];
+        $keyforselect           = 'risk';
+        $keyforaliasextra       = 'extra';
+        $keyforelement          = 'risk';
+
+        require DOL_DOCUMENT_ROOT . '/core/extrafieldsinimport.inc.php';
+
+        $this->import_entities_array[$r]      = ['t.fk_projet' => 'project']; // We define here only fields that use another icon that the one defined into import_icon
+        $this->import_fieldshidden_array[$r]  = ['extra.fk_object' => 'lastrowid-' . MAIN_DB_PREFIX . 'digiriskdolibarr_risk'];
+        $this->import_regex_array[$r]         = [];
+        $this->import_examplevalues_array[$r] = array_merge($importSample, $importExtrafieldSample);
+        $this->import_updatekeys_array[$r]    = ['t.ref' => 'Ref'];
+        $this->import_convertvalue_array[$r]  = [
+            't.ref' => [
+                'rule'        => 'getrefifauto',
+                'class'       => (empty($conf->global->DIGIRISKDOLIBARR_RISK_ADDON) ? 'mod_risk_standard' : $conf->global->DIGIRISKDOLIBARR_RISK_ADDON),
+                'path'        => '/core/modules/digiriskdolibarr/riskanalysis/risk/' . (empty($conf->global->DIGIRISKDOLIBARR_RISK_ADDON) ? 'mod_risk_standard' : $conf->global->DIGIRISKDOLIBARR_RISK_ADDON) . '.php',
+                'classobject' => 'Risk',
+                'pathobject'  => '/digiriskdolibarr/class/riskanalysis/risk.class.php'
+            ],
+            't.fk_projet' => [
+                'rule'    => 'fetchidfromref',
+                'file'    => '/projet/class/project.class.php',
+                'class'   => 'Project',
+                'method'  => 'fetch',
+                'element' => 'Risk'
+            ]
+        ];
+
+        $r++;
+        $this->import_code[$r]                 = $this->rights_class . '_riskassessment_' . $r;
+        $this->import_label[$r]                = 'RiskAssessment'; // Translation key (used only if key ExportDataset_xxx_z not found)
+        $this->import_icon[$r]                 = 'fontawesome_fa-chart-line_fas_#d35968';
+        $this->import_tables_array[$r]         = ['t' => MAIN_DB_PREFIX . 'digiriskdolibarr_riskassessment', 'extra' => MAIN_DB_PREFIX . 'digiriskdolibarr_riskassessment_extrafields'];
+        $this->import_tables_creator_array[$r] = ['t' => 'fk_user_creat']; // Fields to store import user id
+
+        $importSample    = [];
+        $keyforclass     = 'RiskAssessment';
+        $keyforclassfile = '/digiriskdolibarr/class/riskanalysis/riskassessment.class.php';
+        $keyforelement   = 'riskassessment';
+
+        require DOL_DOCUMENT_ROOT . '/core/commonfieldsinimport.inc.php';
+
+        $unsetFields = ['t.rowid', 't.entity', 't.tms', 't.import_key', 't.fk_user_creat', 't.fk_user_modif'];
+        foreach ($unsetFields as $unsetField) {
+            unset($this->import_fields_array[$r][$unsetField]);
+            unset($this->import_TypeFields_array[$r][$unsetField]);
+            unset($this->import_entities_array[$r][$unsetField]);
+            unset($this->import_help_array[$r][$unsetField]);
+        }
+
+        $importExtrafieldSample = [];
+        $keyforselect           = 'riskassessment';
+        $keyforaliasextra       = 'extra';
+        $keyforelement          = 'riskassessment';
+
+        require DOL_DOCUMENT_ROOT . '/core/extrafieldsinimport.inc.php';
+
+        $this->import_entities_array[$r]      = ['t.fk_risk' => 'fontawesome_fa-exclamation-triangle_fas_#d35968']; // We define here only fields that use another icon that the one defined into import_icon
+        $this->import_fieldshidden_array[$r]  = ['extra.fk_object' => 'lastrowid-' . MAIN_DB_PREFIX . 'digiriskdolibarr_riskassessment'];
+        $this->import_regex_array[$r]         = [];
+        $this->import_examplevalues_array[$r] = array_merge($importSample, $importExtrafieldSample);
+        $this->import_updatekeys_array[$r]    = ['t.ref' => 'Ref'];
+        $this->import_convertvalue_array[$r]  = [
+            't.ref' => [
+                'rule'        => 'getrefifauto',
+                'class'       => (empty($conf->global->DIGIRISKDOLIBARR_RISKASSESSMENT_ADDON) ? 'mod_riskassessment_standard' : $conf->global->DIGIRISKDOLIBARR_RISKASSESSMENT_ADDON),
+                'path'        => '/core/modules/digiriskdolibarr/riskanalysis/riskassessment/' . (empty($conf->global->DIGIRISKDOLIBARR_RISKASSESSMENT_ADDON) ? 'mod_riskassessment_standard' : $conf->global->DIGIRISKDOLIBARR_RISKASSESSMENT_ADDON) . '.php',
+                'classobject' => 'RiskAssessment',
+                'pathobject'  => '/digiriskdolibarr/class/riskanalysis/riskassessment.class.php'
+            ]
+        ];
 	}
 
 	/**
