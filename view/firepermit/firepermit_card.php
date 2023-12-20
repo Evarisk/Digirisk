@@ -1532,6 +1532,10 @@ if ((empty($action) || ($action != 'create' && $action != 'edit'))) {
 	$ref          = $object->ref . '/';
 	$trackid      = 'firepermit' . $object->id;
 
+    // Select mail models is same action as presend
+    if (GETPOST('modelselected', 'alpha')) {
+        $action = 'presend';
+    }
 	if ($action == 'presend') {
 		$langs->load("mails");
 

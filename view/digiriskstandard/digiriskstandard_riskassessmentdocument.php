@@ -464,6 +464,10 @@ if (!empty($document) && is_array($document)) {
 }
 $trackid = 'riskassessment' . $object->id;
 
+// Select mail models is same action as presend
+if (GETPOST('modelselected', 'alpha')) {
+    $action = 'presend';
+}
 if ($action == 'presend') {
 	$langs->load("mails");
 
