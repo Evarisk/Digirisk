@@ -621,38 +621,9 @@ class ActionsDigiriskdolibarr
 				}
 			}
 		} elseif (preg_match('/categorycard/', $parameters['context'])) {
-            global $langs, $user;
-            $id = GETPOST('id');
-            $elementId = GETPOST('element_id');
-            $type = GETPOST('type');
-            if ($id > 0 && $elementId > 0 && (($type == 'accident' || $type == 'preventionplan' || $type == 'firepermit') && $user->rights->digiriskdolibarr->$type->write)) {
-
-                require_once __DIR__ . '/' . $type . '.class.php';
-                $classname = ucfirst($type);
-                $newobject = new $classname($this->db);
-
-                $newobject->fetch($elementId);
-
-                if (GETPOST('action') == 'addintocategory') {
-                    $result = $object->add_type($newobject, $type);
-                    if ($result >= 0) {
-                        setEventMessages($langs->trans("WasAddedSuccessfully", $newobject->ref), array());
-
-                    } else {
-                        if ($object->error == 'DB_ERROR_RECORD_ALREADY_EXISTS') {
-                            setEventMessages($langs->trans("ObjectAlreadyLinkedToCategory"), array(), 'warnings');
-                        } else {
-                            setEventMessages($object->error, $object->errors, 'errors');
-                        }
-                    }
-                } elseif (GETPOST('action') == 'delintocategory') {
-                    $result = $object->del_type($newobject, $type);
-                    if ($result < 0) {
-                        dol_print_error('', $object->error);
-                    }
-                    $action = '';
-                }
-            }
+            require_once __DIR__ . '/../class/preventionplan.class.php';
+            require_once __DIR__ . '/../class/firepermit.class.php';
+            require_once __DIR__ . '/../class/accident.class.php';
         }
 		if (!$error) {
 			$this->results   = array('myreturn' => 999);
