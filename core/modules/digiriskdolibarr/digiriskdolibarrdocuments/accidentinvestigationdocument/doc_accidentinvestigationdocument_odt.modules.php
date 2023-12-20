@@ -92,12 +92,9 @@ class doc_accidentinvestigationdocument_odt extends SaturneDocumentModel
 	 */
 	public function setTaskSegment(Odf $odfHandler, Translate $outputLangs, array $moreParam)
 	{
-		global $langs;
-
 		// Get tasks.
 		$foundTagForLines = 1;
 		$tmpArray         = [];
-		$now              = dol_now();
 		$taskType         = $moreParam['task_type'];
 		try {
 			$listLines = $odfHandler->setSegment($taskType);
@@ -119,13 +116,9 @@ class doc_accidentinvestigationdocument_odt extends SaturneDocumentModel
                     $tmpArray[$taskType . '_ref']         = $actionTask->ref;
                     $tmpArray[$taskType . '_label']       = $actionTask->label;
 					$tmpArray[$taskType . '_description'] = $actionTask->description;
-
-					$delay  = $actionTask->datee > 0 ? round(($actionTask->datee - $now) / 60 / 60 / 24) : 0;
-					$delay .= ' ' . ($delay > 1 ? $langs->trans('Days') : $langs->trans('Day'));
-
-					$tmpArray[$taskType . '_resp']   = dol_strtoupper($taskExecutive[0]['lastname']) . ' ' . ucfirst($taskExecutive[0]['firstname']);
-					$tmpArray[$taskType . '_delay']  = $delay;
-					$tmpArray[$taskType . '_budget'] = price($actionTask->budget_amount, 0, '', 1, -1, -1, 'auto');
+					$tmpArray[$taskType . '_resp']        = dol_strtoupper($taskExecutive[0]['lastname']) . ' ' . ucfirst($taskExecutive[0]['firstname']);
+					$tmpArray[$taskType . '_end_date']    = dol_print_date($actionTask->datee, 'dayhour', 'tzuser');
+					$tmpArray[$taskType . '_budget']      = price($actionTask->budget_amount, 0, '', 1, -1, -1, 'auto');
 					$this->setTmpArrayVars($tmpArray, $listLines, $outputLangs);
 				}
 			} else {
@@ -133,7 +126,7 @@ class doc_accidentinvestigationdocument_odt extends SaturneDocumentModel
                 $tmpArray[$taskType . '_label']       = '';
 				$tmpArray[$taskType . '_description'] = '';
 				$tmpArray[$taskType . '_resp']        = '';
-				$tmpArray[$taskType . '_delay']       = '';
+				$tmpArray[$taskType . '_end_date']    = '';
 				$tmpArray[$taskType . '_budget']      = '';
 				$this->setTmpArrayVars($tmpArray, $listLines, $outputLangs);
 			}
