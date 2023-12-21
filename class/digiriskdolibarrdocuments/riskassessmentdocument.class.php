@@ -66,7 +66,7 @@ class RiskAssessmentDocument extends DigiriskDocuments
 		global $conf, $user;
 
 		$json = [];
-        $now  = dol_now();
+        $now  = dol_now(); // To change later because we have to use this->date_creation
 
 		if (!isset($conf->global->DIGIRISKDOLIBARR_RISKASSESSMENTDOCUMENT_AUDIT_START_DATE) || dol_strlen($conf->global->DIGIRISKDOLIBARR_RISKASSESSMENTDOCUMENT_AUDIT_START_DATE) < 1) {
 			dolibarr_set_const($this->db, 'DIGIRISKDOLIBARR_RISKASSESSMENTDOCUMENT_AUDIT_START_DATE', dol_now(), 'chaine', 0, '', $conf->entity);
