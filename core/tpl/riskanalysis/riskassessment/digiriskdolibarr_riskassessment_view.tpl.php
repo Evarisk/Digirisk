@@ -8,6 +8,8 @@ if (is_array($lastRiskAssessment) && !empty($lastRiskAssessment)) {
     $lastRiskAssessment = array_shift($lastRiskAssessment);
 }
 
+$defaultCotation = [0 => '0-47', 48 => '48-50', 51 => '51-80', 100 => '81-100'];
+
 if (is_array($allRiskAssessment) && !empty($allRiskAssessment)) :
 	usort($allRiskAssessment, function ($riskAssessmentComparer, $riskAssessmentCompared) {
 	return $riskAssessmentComparer->date_creation < $riskAssessmentCompared->date_creation;
@@ -120,11 +122,11 @@ if (is_array($allRiskAssessment) && !empty($allRiskAssessment)) :
 								<div class="risk-evaluation-container risk-evaluation-ref-<?php echo $lastEvaluation->id ?>" value="<?php echo $lastEvaluation->ref ?>">
 									<div class="risk-evaluation-single">
 										<div class="risk-evaluation-cotation" data-scale="<?php echo $lastEvaluation->getEvaluationScale() ?>">
-											<span><?php echo $lastEvaluation->cotation ?: 0; ?></span>
+											<span><?php echo ($lastEvaluation->method == 'standard' ? $defaultCotation[$lastEvaluation->cotation] ?: 0 : $lastEvaluation->cotation); ?></span>
 										</div>
 										<div class="photo riskassessment-photo-<?php echo $lastEvaluation->id; ?>" style="margin:auto">
 											<?php
-											print saturne_show_medias_linked('digiriskdolibarr', $conf->digiriskdolibarr->multidir_output[$conf->entity] . '/riskassessment/' . $lastEvaluation->ref, 'small', 1, 0, 0, 0, 40, 40, 0, 0, 0, '/riskassessment/' . $lastEvaluation->ref, $lastEvaluation, 'photo', 0, 0, 0, 1);
+											print saturne_show_medias_linked('digiriskdolibarr', $conf->digiriskdolibarr->multidir_output[$conf->entity] . '/riskassessment/' . $lastEvaluation->ref, 'small', 1, 0, 0, 0, 50, 50, 0, 0, 0, '/riskassessment/' . $lastEvaluation->ref, $lastEvaluation, 'photo', 0, 0, 0, 1);
 											?>
 										</div>
 										<div class="risk-evaluation-content">
@@ -295,7 +297,6 @@ $evaluation->method = $lastRiskAssessment->method ?: "standard" ;
 									<span class="title"><i class="fas fa-chart-line"></i><?php echo ' ' . $langs->trans('RiskAssessment'); ?><required>*</required></span>
 									<div class="cotation-listing wpeo-gridlayout grid-4 grid-gap-0">
                                         <?php
-                                        $defaultCotation = array(0 => '0-47', 48 => '48-50', 51 => '51-80', 100 => '81-100');
                                         if ( ! empty($defaultCotation)) :
                                             foreach ($defaultCotation as $cotation => $shownCotation) :
                                                 $evaluation->cotation = $cotation; ?>
@@ -404,7 +405,7 @@ $evaluation->method = $lastRiskAssessment->method ?: "standard" ;
 						<div class="risk-evaluation-single-content risk-evaluation-single-content-<?php echo $risk->id ?>">
 							<div class="risk-evaluation-single">
 								<div class="risk-evaluation-cotation risk-evaluation-list" value="<?php echo $risk->id ?>" data-scale="<?php echo $lastRiskAssessment->getEvaluationScale() ?>">
-									<span><?php echo $lastRiskAssessment->cotation ?: 0; ?></span>
+									<span><?php echo ($lastRiskAssessment->method == 'standard' ? $defaultCotation[$lastRiskAssessment->cotation] ?: 0 : $lastRiskAssessment->cotation); ?></span>
 								</div>
 								<div class="photo riskassessment-photo-<?php echo $lastRiskAssessment->id > 0 ? $lastRiskAssessment->id : 0 ; echo $risk->id > 0 ? ' risk-' . $risk->id : ' risk-new' ?>">
                                     <?php
