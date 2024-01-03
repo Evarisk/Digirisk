@@ -33,7 +33,7 @@ class mod_workunit_standard extends ModeleNumRefSaturne
 	/**
 	 * @var string Numbering module ref prefix.
 	 */
-	public string $prefix = 'WU';
+	public string $prefix = 'UT';
 
 	/**
 	 * @var string Name.
