@@ -230,7 +230,6 @@ class doc_ticketdocument_odt extends SaturneDocumentModel
 
         $moreParam['tmparray']         = $tmpArray;
         $moreParam['objectDocument']   = $objectDocument;
-        $moreParam['subDir']           = 'digiriskdolibarrdocuments/';
         $moreParam['hideTemplateName'] = 1;
 
         if (preg_match('/event/', $srcTemplatePath)) {

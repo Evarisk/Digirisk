@@ -273,6 +273,17 @@ if ($action == 'deleteTimeRange') {
     exit;
 }
 
+if ($action == 'set_multi_company_ticket_public_interface') {
+    $multiCompanyTicketPublicInterfaceTitle    = GETPOST('multiCompanyTicketPublicInterfaceTitle', 'none');
+    $multiCompanyTicketPublicInterfaceSubtitle = GETPOST('multiCompanyTicketPublicInterfaceSubtitle', 'none');
+    dolibarr_set_const($db, 'DIGIRISKDOLIBARR_TICKET_MULTI_COMPANY_PUBLIC_INTERFACE_TITLE', $multiCompanyTicketPublicInterfaceTitle, 'chaine', 0, '', 0);
+    dolibarr_set_const($db, 'DIGIRISKDOLIBARR_TICKET_MULTI_COMPANY_PUBLIC_INTERFACE_SUBTITLE', $multiCompanyTicketPublicInterfaceSubtitle, 'chaine', 0, '', 0);
+
+    setEventMessage('SavedConfig');
+    header('Location: ' . $_SERVER['PHP_SELF']);
+    exit;
+}
+
 /*
  * View
  */
@@ -564,6 +575,42 @@ if ($conf->global->DIGIRISKDOLIBARR_TICKET_ENABLE_PUBLIC_INTERFACE == 1) {
 	print '</table>';
 
 	print '</div>';
+
+    // Multi company ticket public interface config
+    print load_fiche_titre($langs->transnoentities('MultiCompanyTicketPublicInterfaceConfig'), '', '');
+
+    print '<form method="post" action="' . $_SERVER['PHP_SELF'] . '">';
+    print '<input type="hidden" name="token" value="' . newToken() . '">';
+    print '<input type="hidden" name="action" value="set_multi_company_ticket_public_interface">';
+
+    print '<table class="noborder centpercent">';
+    print '<tr class="liste_titre">';
+    print '<td>' . $langs->trans('Parameters') . '</td>';
+    print '<td>' . $langs->trans('Description') . '</td>';
+    print '<td class="center">' . $langs->trans('Action') . '</td>';
+    print '</tr>';
+
+    // Multi company ticket public interface title
+    $multiCompanyTicketPublicInterfaceTitle = $langs->transnoentities(getDolGlobalString('DIGIRISKDOLIBARR_TICKET_MULTI_COMPANY_PUBLIC_INTERFACE_TITLE')) ?: $langs->transnoentities('WelcomeToPublicTicketInterface');
+    print '<tr class="oddeven"><td>' . $langs->trans('Title') . '</td>';
+    print '<td>';
+    $dolEditor = new DolEditor('multiCompanyTicketPublicInterfaceTitle', $multiCompanyTicketPublicInterfaceTitle, '100%', 120, 'dolibarr_details', '', false, true, $conf->global->FCKEDITOR_ENABLE_MAIL, ROWS_2, 70);
+    $dolEditor->Create();
+    print '</td><td class="center">';
+    print $form->buttonsSaveCancel('Save', '', [], 1);
+    print '</td></tr>';
+
+    // Multi company ticket public interface subtitle
+    $multiCompanyTicketPublicInterfaceSubtitle = $langs->transnoentities(getDolGlobalString('DIGIRISKDOLIBARR_TICKET_MULTI_COMPANY_PUBLIC_INTERFACE_SUBTITLE')) ?: $langs->transnoentities('PleaseSelectAnEntity');
+    print '<tr class="oddeven"><td>' . $langs->trans('Subtitle') . '</td>';
+    print '<td>';
+    $dolEditor = new DolEditor('multiCompanyTicketPublicInterfaceSubtitle', $multiCompanyTicketPublicInterfaceSubtitle, '100%', 120, 'dolibarr_details', '', false, true, $conf->global->FCKEDITOR_ENABLE_MAIL, ROWS_2, 70);
+    $dolEditor->Create();
+    print '</td><td class="center">';
+    print $form->buttonsSaveCancel('Save', '', [], 1);
+    print '</td></tr>';
+    print '</table>';
+    print '</form>';
 
 	// Project
 	if (isModEnabled('project')) {
@@ -874,7 +921,7 @@ if (is_array($accidentWorkStopTimeRanges) && !empty($accidentWorkStopTimeRanges)
         }
         print '<tr>';
         print '<td>';
-        print $rangeName;
+        print $langs->transnoentities($rangeName);
         print '</td>';
         print '<td>';
         print $rangeComparator;

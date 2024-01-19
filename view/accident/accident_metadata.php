@@ -512,7 +512,8 @@ if ((empty($action) || ($action != 'create' && $action != 'edit'))) {
 	//Unset for order
 	unset($accidentmetadata->fields['json']);
 
-	$object = $accidentmetadata;
+    $accident = $object;
+	$object   = $accidentmetadata;
 
 	//Relative location
 	if (dol_strlen($object->relative_location) > 0 && $object->relative_location != '-1') {
@@ -588,7 +589,7 @@ if ((empty($action) || ($action != 'create' && $action != 'edit'))) {
 	$reshook    = $hookmanager->executeHooks('addMoreActionsButtons', $parameters, $object, $action); // Note that $action and $object may have been modified by hook
 	if ($reshook < 0) setEventMessages($hookmanager->error, $hookmanager->errors, 'errors');
 
-	if (empty($reshook)) {
+	if (empty($reshook) && $accident->status < Accident::STATUS_VALIDATED) {
 		print '<a class="butAction" id="actionButtonEdit" href="' . $_SERVER["PHP_SELF"] . '?id=' . $id . '&action=edit' . '">' . $langs->trans("Modify") . '</a>';
 	}
 	print '</div>';

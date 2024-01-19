@@ -72,7 +72,7 @@ class InterfaceDigiriskdolibarrTriggers extends DolibarrTriggers
 		$this->name        = preg_replace('/^Interface/i', '', get_class($this));
 		$this->family      = "demo";
 		$this->description = "Digiriskdolibarr triggers.";
-		$this->version     = '9.14.0';
+		$this->version     = '9.14.1';
 		$this->picto       = 'digiriskdolibarr@digiriskdolibarr';
 	}
 
@@ -298,6 +298,7 @@ class InterfaceDigiriskdolibarrTriggers extends DolibarrTriggers
 				$result = $actioncomm->create($user);
 				break;
 
+            case 'ACCIDENT_VALIDATE':
             case 'ACCIDENTINVESTIGATION_VALIDATE' :
             case 'FIREPERMIT_PENDINGSIGNATURE' :
 			case 'PREVENTIONPLAN_PENDINGSIGNATURE' :
@@ -306,6 +307,7 @@ class InterfaceDigiriskdolibarrTriggers extends DolibarrTriggers
 				$result = $actioncomm->create($user);
 				break;
 
+            case 'ACCIDENT_LOCK':
             case 'ACCIDENTINVESTIGATION_LOCK' :
             case 'FIREPERMIT_LOCK' :
 			case 'PREVENTIONPLAN_LOCK' :
@@ -314,6 +316,7 @@ class InterfaceDigiriskdolibarrTriggers extends DolibarrTriggers
 				$result = $actioncomm->create($user);
 				break;
 
+            case 'ACCIDENT_ARCHIVE':
             case 'ACCIDENTINVESTIGATION_ARCHIVE' :
             case 'FIREPERMIT_ARCHIVE' :
 			case 'PREVENTIONPLAN_ARCHIVE' :
@@ -322,6 +325,7 @@ class InterfaceDigiriskdolibarrTriggers extends DolibarrTriggers
 				$result = $actioncomm->create($user);
 				break;
 
+            case 'ACCIDENT_UNVALIDATE':
             case 'ACCIDENTINVESTIGATION_UNVALIDATE' :
             case 'FIREPERMIT_UNVALIDATE' :
             case 'PREVENTIONPLAN_UNVALIDATE' :

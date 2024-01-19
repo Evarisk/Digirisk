@@ -1,5 +1,6 @@
 @media ( max-width: $media__large ) {
   #id-container.page-ut-gp-list .side-nav {
+    display: inline-block;
     position: static;
     height: auto;
     padding: 0 2em;
@@ -43,7 +44,16 @@
     }
   }
 
-  #id-container.page-ut-gp-list #id-right {
-    padding-left: 0;
+}
+
+@media ( max-width: 695px ) {
+  #id-container.page-ut-gp-list {
+    margin-left: 0;
+
+
+    #id-right {
+      padding-left: 0;
+      width: 100%;
+    }
   }
 }

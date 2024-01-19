@@ -380,7 +380,7 @@ class modDigiriskdolibarr extends DolibarrModules
 		$this->descriptionlong = "Digirisk";
 		$this->editor_name     = 'Evarisk';
 		$this->editor_url      = 'https://evarisk.com';
-		$this->version         = '9.14.0';
+		$this->version         = '9.14.1';
 		$this->const_name      = 'MAIN_MODULE_' . strtoupper($this->name);
 		$this->picto           = 'digiriskdolibarr_color@digiriskdolibarr';
 
@@ -436,6 +436,7 @@ class modDigiriskdolibarr extends DolibarrModules
 				'digiriskstandardview',
                 'accidentdocument',
                 'accidentagenda',
+                'accidentsignature',
                 'digiriskstandardagenda',
                 'category',
                 'categoryindex'
@@ -476,8 +477,8 @@ class modDigiriskdolibarr extends DolibarrModules
 		$this->requiredby              = [];
 		$this->conflictwith            = [];
 		$this->langfiles               = ["digiriskdolibarr@digiriskdolibarr"];
-		$this->phpmin                  = [5, 5]; // Minimum version of PHP required by module
-		$this->need_dolibarr_version   = [13, -3]; // Minimum version of Dolibarr required by module
+		$this->phpmin                  = [7, 4]; // Minimum version of PHP required by module
+		$this->need_dolibarr_version   = [16, 0]; // Minimum version of Dolibarr required by module
 		$this->warnings_activation     = []; // Warning to show when we activate module. array('always'='text') or array('FR'='textfr','ES'='textes'...)
 		$this->warnings_activation_ext = []; // Warning to show when we activate an external module. array('always'='text') or array('FR'='textfr','ES'='textes'...)
 		//$this->automatic_activation = array('FR'=>'DigiriskDolibarrWasAutomaticallyActivatedBecauseOfYourCountryChoice');
@@ -580,7 +581,7 @@ class modDigiriskdolibarr extends DolibarrModules
 			$i++ => ['DIGIRISKDOLIBARR_MAIN_AGENDA_ACTIONAUTO_PREVENTIONPLAN_MODIFY', 'integer', 1, '', 0, 'current'],
 			$i++ => ['DIGIRISKDOLIBARR_MAIN_AGENDA_ACTIONAUTO_PREVENTIONPLAN_DELETE', 'integer', 1, '', 0, 'current'],
 			$i++ => ['DIGIRISKDOLIBARR_MAIN_AGENDA_ACTIONAUTO_PREVENTIONPLAN_PENDINGSIGNATURE', 'integer', 1, '', 0, 'current'],
-			$i++ => ['DIGIRISKDOLIBARR_MAIN_AGENDA_ACTIONAUTO_PREVENTIONPLAN_INPROGRESS', 'integer', 1, '', 0, 'current'],
+			$i++ => ['DIGIRISKDOLIBARR_MAIN_AGENDA_ACTIONAUTO_PREVENTIONPLAN_UNVALIDATE', 'integer', 1, '', 0, 'current'],
 			$i++ => ['DIGIRISKDOLIBARR_MAIN_AGENDA_ACTIONAUTO_PREVENTIONPLAN_LOCK', 'integer', 1, '', 0, 'current'],
 			$i++ => ['DIGIRISKDOLIBARR_MAIN_AGENDA_ACTIONAUTO_PREVENTIONPLAN_ARCHIVE', 'integer', 1, '', 0, 'current'],
 			$i++ => ['DIGIRISKDOLIBARR_MAIN_AGENDA_ACTIONAUTO_PREVENTIONPLAN_SENTBYMAIL', 'integer', 1, '', 0, 'current'],
@@ -601,7 +602,7 @@ class modDigiriskdolibarr extends DolibarrModules
 			$i++ => ['DIGIRISKDOLIBARR_MAIN_AGENDA_ACTIONAUTO_FIREPERMIT_MODIFY', 'integer', 1, '', 0, 'current'],
 			$i++ => ['DIGIRISKDOLIBARR_MAIN_AGENDA_ACTIONAUTO_FIREPERMIT_DELETE', 'integer', 1, '', 0, 'current'],
 			$i++ => ['DIGIRISKDOLIBARR_MAIN_AGENDA_ACTIONAUTO_FIREPERMIT_PENDINGSIGNATURE', 'integer', 1, '', 0, 'current'],
-			$i++ => ['DIGIRISKDOLIBARR_MAIN_AGENDA_ACTIONAUTO_FIREPERMIT_INPROGRESS', 'integer', 1, '', 0, 'current'],
+			$i++ => ['DIGIRISKDOLIBARR_MAIN_AGENDA_ACTIONAUTO_FIREPERMIT_UNVALIDATE', 'integer', 1, '', 0, 'current'],
 			$i++ => ['DIGIRISKDOLIBARR_MAIN_AGENDA_ACTIONAUTO_FIREPERMIT_LOCK', 'integer', 1, '', 0, 'current'],
 			$i++ => ['DIGIRISKDOLIBARR_MAIN_AGENDA_ACTIONAUTO_FIREPERMIT_ARCHIVE', 'integer', 1, '', 0, 'current'],
 			$i++ => ['DIGIRISKDOLIBARR_MAIN_AGENDA_ACTIONAUTO_FIREPERMIT_SENTBYMAIL', 'integer', 1, '', 0, 'current'],
@@ -780,6 +781,10 @@ class modDigiriskdolibarr extends DolibarrModules
 			$i++ => ['DIGIRISKDOLIBARR_MAIN_AGENDA_ACTIONAUTO_ACCIDENT_CREATE', 'integer', 1, '', 0, 'current'],
 			$i++ => ['DIGIRISKDOLIBARR_MAIN_AGENDA_ACTIONAUTO_ACCIDENT_MODIFY', 'integer', 1, '', 0, 'current'],
 			$i++ => ['DIGIRISKDOLIBARR_MAIN_AGENDA_ACTIONAUTO_ACCIDENT_DELETE', 'integer', 1, '', 0, 'current'],
+            $i++ => ['DIGIRISKDOLIBARR_MAIN_AGENDA_ACTIONAUTO_ACCIDENT_VALIDATE', 'integer', 1, '', 0, 'current'],
+            $i++ => ['DIGIRISKDOLIBARR_MAIN_AGENDA_ACTIONAUTO_ACCIDENT_UNVALIDATE', 'integer', 1, '', 0, 'current'],
+            $i++ => ['DIGIRISKDOLIBARR_MAIN_AGENDA_ACTIONAUTO_ACCIDENT_LOCK', 'integer', 1, '', 0, 'current'],
+            $i++ => ['DIGIRISKDOLIBARR_MAIN_AGENDA_ACTIONAUTO_ACCIDENT_ARCHIVE', 'integer', 1, '', 0, 'current'],
 			$i++ => ['DIGIRISKDOLIBARR_ACCIDENT_ADDON', 'chaine', 'mod_accident_standard', '', 0, 'current'],
 			$i++ => ['DIGIRISKDOLIBARR_ACCIDENT_PROJECT', 'integer', 0, '', 0, 'current'],
 
@@ -1342,6 +1347,21 @@ class modDigiriskdolibarr extends DolibarrModules
 			'user'     => 0,				                // 0=Menu for internal users, 1=external users, 2=both
 		];
 
+        $this->menu[$r++] = [
+            'fk_menu'  => 'fk_mainmenu=digiriskdolibarr,fk_leftmenu=digiriskpreventionplan',
+            'type'     => 'left',
+            'titre'    => '<i class="fas fa-tags pictofixedwidth" style="padding-right: 4px;"></i>' . $langs->transnoentities('Categories'),
+            'mainmenu' => 'digiriskdolibarr',
+            'leftmenu' => 'digiriskdolibarr_preventionplantags',
+            'url'      => '/categories/index.php?type=preventionplan',
+            'langs'    => 'digiriskdolibarr@digiriskdolibarr',
+            'position' => 100 + $r,
+            'enabled'  => '$conf->digiriskdolibarr->enabled && $conf->categorie->enabled && $user->rights->digiriskdolibarr->preventionplan->read',
+            'perms'    => '$user->rights->digiriskdolibarr->preventionplan->read',
+            'target'   => '',
+            'user'     => 0,
+        ];
+
 		$this->menu[$r++] = [
 			'fk_menu'  => 'fk_mainmenu=digiriskdolibarr',	    // '' if this is a top menu. For left menu, use 'fk_mainmenu=xxx' or 'fk_mainmenu=xxx,fk_leftmenu=yyy' where xxx is mainmenucode and yyy is a leftmenucode
 			'type'     => 'left',			                // This is a Left menu entry
@@ -1357,6 +1377,21 @@ class modDigiriskdolibarr extends DolibarrModules
 			'target'   => '',
 			'user'     => 0,				                // 0=Menu for internal users, 1=external users, 2=both
 		];
+
+        $this->menu[$r++] = [
+            'fk_menu'  => 'fk_mainmenu=digiriskdolibarr,fk_leftmenu=digiriskfirepermit',
+            'type'     => 'left',
+            'titre'    => '<i class="fas fa-tags pictofixedwidth" style="padding-right: 4px;"></i>' . $langs->transnoentities('Categories'),
+            'mainmenu' => 'digiriskdolibarr',
+            'leftmenu' => 'digiriskdolibarr_firepermittags',
+            'url'      => '/categories/index.php?type=firepermit',
+            'langs'    => 'digiriskdolibarr@digiriskdolibarr',
+            'position' => 100 + $r,
+            'enabled'  => '$conf->digiriskdolibarr->enabled && $conf->categorie->enabled && $user->rights->digiriskdolibarr->firepermit->read',
+            'perms'    => '$user->rights->digiriskdolibarr->firepermit->read',
+            'target'   => '',
+            'user'     => 0,
+        ];
 
 		$this->menu[$r++] = [
 			'fk_menu'  => 'fk_mainmenu=digiriskdolibarr',	    // '' if this is a top menu. For left menu, use 'fk_mainmenu=xxx' or 'fk_mainmenu=xxx,fk_leftmenu=yyy' where xxx is mainmenucode and yyy is a leftmenucode
@@ -1593,6 +1628,102 @@ class modDigiriskdolibarr extends DolibarrModules
 		$this->export_sql_end[$r] .= ' LEFT JOIN '.MAIN_DB_PREFIX.'societe as s ON s.rowid = t.fk_soc';
 		$this->export_sql_end[$r] .= ' WHERE cat.entity IN ('.getEntity('category').')';
 		$this->export_sql_end[$r] .= ' AND cat.type = 12';
+
+        // Imports profiles provided by this module
+        $r = 1;
+        $this->import_code[$r]                 = $this->rights_class . '_risk_' . $r;
+        $this->import_label[$r]                = 'Risk'; // Translation key (used only if key ExportDataset_xxx_z not found)
+        $this->import_icon[$r]                 = 'fontawesome_fa-exclamation-triangle_fas_#d35968';
+        $this->import_tables_array[$r]         = ['t' => MAIN_DB_PREFIX . 'digiriskdolibarr_risk', 'extra' => MAIN_DB_PREFIX . 'digiriskdolibarr_risk_extrafields'];
+        $this->import_tables_creator_array[$r] = ['t' => 'fk_user_creat']; // Fields to store import user id
+
+        $importSample    = [];
+        $keyforclass     = 'Risk';
+        $keyforclassfile = '/digiriskdolibarr/class/riskanalysis/risk.class.php';
+        $keyforelement   = 'risk';
+
+        require DOL_DOCUMENT_ROOT . '/core/commonfieldsinimport.inc.php';
+
+        $unsetFields = ['t.rowid', 't.entity', 't.tms', 't.import_key', 't.fk_user_creat', 't.fk_user_modif'];
+        foreach ($unsetFields as $unsetField) {
+            unset($this->import_fields_array[$r][$unsetField]);
+            unset($this->import_TypeFields_array[$r][$unsetField]);
+            unset($this->import_entities_array[$r][$unsetField]);
+            unset($this->import_help_array[$r][$unsetField]);
+        }
+
+        $importExtrafieldSample = [];
+        $keyforselect           = 'risk';
+        $keyforaliasextra       = 'extra';
+        $keyforelement          = 'risk';
+
+        require DOL_DOCUMENT_ROOT . '/core/extrafieldsinimport.inc.php';
+
+        $this->import_entities_array[$r]      = ['t.fk_projet' => 'project']; // We define here only fields that use another icon that the one defined into import_icon
+        $this->import_fieldshidden_array[$r]  = ['extra.fk_object' => 'lastrowid-' . MAIN_DB_PREFIX . 'digiriskdolibarr_risk'];
+        $this->import_regex_array[$r]         = [];
+        $this->import_examplevalues_array[$r] = array_merge($importSample, $importExtrafieldSample);
+        $this->import_updatekeys_array[$r]    = ['t.ref' => 'Ref'];
+        $this->import_convertvalue_array[$r]  = [
+            't.ref' => [
+                'rule'        => 'getrefifauto',
+                'class'       => (empty($conf->global->DIGIRISKDOLIBARR_RISK_ADDON) ? 'mod_risk_standard' : $conf->global->DIGIRISKDOLIBARR_RISK_ADDON),
+                'path'        => '/core/modules/digiriskdolibarr/riskanalysis/risk/' . (empty($conf->global->DIGIRISKDOLIBARR_RISK_ADDON) ? 'mod_risk_standard' : $conf->global->DIGIRISKDOLIBARR_RISK_ADDON) . '.php',
+                'classobject' => 'Risk',
+                'pathobject'  => '/digiriskdolibarr/class/riskanalysis/risk.class.php'
+            ],
+            't.fk_projet' => [
+                'rule'    => 'fetchidfromref',
+                'file'    => '/projet/class/project.class.php',
+                'class'   => 'Project',
+                'method'  => 'fetch',
+                'element' => 'Risk'
+            ]
+        ];
+
+        $r++;
+        $this->import_code[$r]                 = $this->rights_class . '_riskassessment_' . $r;
+        $this->import_label[$r]                = 'RiskAssessment'; // Translation key (used only if key ExportDataset_xxx_z not found)
+        $this->import_icon[$r]                 = 'fontawesome_fa-chart-line_fas_#d35968';
+        $this->import_tables_array[$r]         = ['t' => MAIN_DB_PREFIX . 'digiriskdolibarr_riskassessment', 'extra' => MAIN_DB_PREFIX . 'digiriskdolibarr_riskassessment_extrafields'];
+        $this->import_tables_creator_array[$r] = ['t' => 'fk_user_creat']; // Fields to store import user id
+
+        $importSample    = [];
+        $keyforclass     = 'RiskAssessment';
+        $keyforclassfile = '/digiriskdolibarr/class/riskanalysis/riskassessment.class.php';
+        $keyforelement   = 'riskassessment';
+
+        require DOL_DOCUMENT_ROOT . '/core/commonfieldsinimport.inc.php';
+
+        $unsetFields = ['t.rowid', 't.entity', 't.tms', 't.import_key', 't.fk_user_creat', 't.fk_user_modif'];
+        foreach ($unsetFields as $unsetField) {
+            unset($this->import_fields_array[$r][$unsetField]);
+            unset($this->import_TypeFields_array[$r][$unsetField]);
+            unset($this->import_entities_array[$r][$unsetField]);
+            unset($this->import_help_array[$r][$unsetField]);
+        }
+
+        $importExtrafieldSample = [];
+        $keyforselect           = 'riskassessment';
+        $keyforaliasextra       = 'extra';
+        $keyforelement          = 'riskassessment';
+
+        require DOL_DOCUMENT_ROOT . '/core/extrafieldsinimport.inc.php';
+
+        $this->import_entities_array[$r]      = ['t.fk_risk' => 'fontawesome_fa-exclamation-triangle_fas_#d35968']; // We define here only fields that use another icon that the one defined into import_icon
+        $this->import_fieldshidden_array[$r]  = ['extra.fk_object' => 'lastrowid-' . MAIN_DB_PREFIX . 'digiriskdolibarr_riskassessment'];
+        $this->import_regex_array[$r]         = [];
+        $this->import_examplevalues_array[$r] = array_merge($importSample, $importExtrafieldSample);
+        $this->import_updatekeys_array[$r]    = ['t.ref' => 'Ref'];
+        $this->import_convertvalue_array[$r]  = [
+            't.ref' => [
+                'rule'        => 'getrefifauto',
+                'class'       => (empty($conf->global->DIGIRISKDOLIBARR_RISKASSESSMENT_ADDON) ? 'mod_riskassessment_standard' : $conf->global->DIGIRISKDOLIBARR_RISKASSESSMENT_ADDON),
+                'path'        => '/core/modules/digiriskdolibarr/riskanalysis/riskassessment/' . (empty($conf->global->DIGIRISKDOLIBARR_RISKASSESSMENT_ADDON) ? 'mod_riskassessment_standard' : $conf->global->DIGIRISKDOLIBARR_RISKASSESSMENT_ADDON) . '.php',
+                'classobject' => 'RiskAssessment',
+                'pathobject'  => '/digiriskdolibarr/class/riskanalysis/riskassessment.class.php'
+            ]
+        ];
 	}
 
 	/**
@@ -1972,9 +2103,6 @@ class modDigiriskdolibarr extends DolibarrModules
 			dolibarr_set_const($this->db, 'MAIN_EXTRAFIELDS_USE_SELECT2', 1, 'integer', 0, '', $conf->entity);
 		}
 
-		dolibarr_set_const($this->db, 'DIGIRISKDOLIBARR_VERSION', $this->version, 'chaine', 0, '', $conf->entity);
-		dolibarr_set_const($this->db, 'DIGIRISKDOLIBARR_DB_VERSION', $this->version, 'chaine', 0, '', $conf->entity);
-
 		if ($conf->global->CATEGORIE_RECURSIV_ADD == 0) {
 			dolibarr_set_const($this->db, 'CATEGORIE_RECURSIV_ADD', 1, 'integer', 0, '', $conf->entity);
 		}
@@ -2196,7 +2324,7 @@ class modDigiriskdolibarr extends DolibarrModules
                 'RiskSign'              => ['greip', 'RS{0}'],
                 'Evaluator'             => ['bebhionn', 'EV{0}'],
                 'Groupment'             => ['sirius', 'GP{0}'],
-                'WorkUnit'              => ['canopus', 'WU{0}'],
+                'WorkUnit'              => ['canopus', (version_compare($conf->global->DIGIRISKDOLIBARR_VERSION, '9.14.1') >= 0  ? 'UT{0}' : 'WU{0}')],
                 'Accident'              => ['curtiss', 'ACC{0}'],
                 'AccidentLesion'        => ['wright', 'ACCL{0}'],
                 'AccidentWorkStop'      => ['richthofen', 'ACCW{0}'],
@@ -2211,7 +2339,7 @@ class modDigiriskdolibarr extends DolibarrModules
                 'ListingRisksAction'            => ['gunnlod', 'RLA{0}'],
                 'ListingRisksPhoto'             => ['fornjot', 'RLP{0}'],
                 'GroupmentDocument'             => ['mundilfari', 'GPD{0}'],
-                'WorkUnitDocument'              => ['hati', 'WUD{0}'],
+                'WorkUnitDocument'              => ['hati', (version_compare($conf->global->DIGIRISKDOLIBARR_VERSION, '9.14.1') >= 0  ? 'UTD{0}' : 'WUD{0}')],
                 'RiskAssessmentDocument'        => ['eggther', 'DU{0}'],
                 'PreventionPlanDocument'        => ['bestla', 'PPD{0}'],
                 'FirePermitDocument'            => ['greip', 'FPD{0}'],
@@ -2244,7 +2372,10 @@ class modDigiriskdolibarr extends DolibarrModules
             rename($mediaPath . '/accident_investigationdocument', $mediaPath . '/accidentinvestigationdocument');
         }
 
-		return $this->_init($sql, $options);
+        dolibarr_set_const($this->db, 'DIGIRISKDOLIBARR_VERSION', $this->version, 'chaine', 0, '', $conf->entity);
+        dolibarr_set_const($this->db, 'DIGIRISKDOLIBARR_DB_VERSION', $this->version, 'chaine', 0, '', $conf->entity);
+
+        return $this->_init($sql, $options);
 	}
 
 	/**

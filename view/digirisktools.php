@@ -130,7 +130,6 @@ if (GETPOST('dataMigrationImport', 'alpha') && ! empty($conf->global->MAIN_UPLOA
 
 			$json                = file_get_contents($filedir . $filename);
 			$digiriskExportArray = json_decode($json, true);
-			$digiriskExportArray = end($digiriskExportArray);
 
 			$it = new RecursiveIteratorIterator(new RecursiveArrayIterator($digiriskExportArray['digiriskelements']['digiriskelements']));
 			foreach ($it as $key => $v) {

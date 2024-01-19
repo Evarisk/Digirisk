@@ -241,3 +241,7 @@ UPDATE llx_digiriskdolibarr_risk SET category = 21 WHERE category = 20;
 UPDATE llx_digiriskdolibarr_risk SET category = 22 WHERE category = 21;
 ALTER TABLE llx_digiriskdolibarr_accident ADD fk_ticket integer;
 ALTER TABLE llx_digiriskdolibarr_accident DROP COLUMN fk_user_victim;
+
+-- 9.14.1
+DELETE FROM llx_c_digiriskdolibarr_action_trigger WHERE ref = 'FIREPERMIT_INPROGRESS';
+DELETE FROM llx_c_digiriskdolibarr_action_trigger WHERE ref = 'PREVENTIONPLAN_INPROGRESS';

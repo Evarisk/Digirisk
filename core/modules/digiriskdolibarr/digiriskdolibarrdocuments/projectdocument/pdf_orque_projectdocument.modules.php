@@ -30,7 +30,6 @@ require_once DOL_DOCUMENT_ROOT . '/core/lib/pdf.lib.php';
 require_once DOL_DOCUMENT_ROOT . '/core/lib/date.lib.php';
 require_once DOL_DOCUMENT_ROOT . '/core/lib/functions2.lib.php';
 
-require_once __DIR__ . '/mod_projectdocument_standard.php';
 require_once __DIR__ . '/../../../../../class/riskanalysis/risk.class.php';
 require_once __DIR__ . '/../../../../../class/riskanalysis/riskassessment.class.php';
 
@@ -234,8 +233,13 @@ class pdf_orque_projectdocument
 		$outputlangs->loadLangs(array('main', 'dict', 'companies', 'projects'));
 
 		if ($conf->projet->dir_output) {
-			$mod = new $conf->global->DIGIRISKDOLIBARR_PROJECTDOCUMENT_ADDON($this->db);
-			$ref = $mod->getNextValue($objectDocument);
+            // Load numbering modules
+            $numberingModules = [
+                'digiriskdolibarrdocuments/projectdocument' => $conf->global->DIGIRISKDOLIBARR_PROJECTDOCUMENT_ADDON,
+            ];
+            list($refProjectDocumentMod) = saturne_require_objects_mod($numberingModules, 'digiriskdolibarr');
+
+            $ref = $refProjectDocumentMod->getNextValue($objectDocument);
 
 			$objectDocument->ref = $ref;
 			$id = $objectDocument->create($user, true, $object);
