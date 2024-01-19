@@ -127,7 +127,7 @@ saturne_header(0, '', $title, $helpUrl);
 ?>
 <div id="cardContent" value="">
 <?php
-$objects = $object->fetchAll('',  'ranks',  0,  0, array('customsql' => 'status > 0'));
+$objects = $object->fetchAll('',  'ranks',  0,  0, array('customsql' => 'status > 0 AND t.entity = ' . $conf->entity));
 if (is_array($objects)) {
 	$results = recurse_tree(0, 0, $objects);
 } else {
