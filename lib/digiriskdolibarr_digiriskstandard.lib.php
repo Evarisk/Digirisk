@@ -66,17 +66,10 @@ function digiriskstandard_prepare_head(DigiriskStandard $object): array
         $h++;
     }
 
-    if ($user->rights->digiriskdolibarr->listingrisksaction->read) {
-        $head[$h][0] = dol_buildpath('/digiriskdolibarr/view/digiriskelement/digiriskelement_listingrisksaction.php', 1) . '?type=standard';
-        $head[$h][1] = $conf->browser->layout != 'phone' ? '<i class="fas fa-exclamation pictofixedwidth"></i>' . $langs->trans('ListingRisksAction') : '<i class="fas fa-exclamation"></i>';
-        $head[$h][2] = 'elementListingRisksAction';
-        $h++;
-    }
-
-    if ($user->rights->digiriskdolibarr->listingrisksphoto->read) {
-        $head[$h][0] = dol_buildpath('/digiriskdolibarr/view/digiriskelement/digiriskelement_listingrisksphoto.php', 1) . '?type=standard';
-        $head[$h][1] = $conf->browser->layout != 'phone' ? '<i class="fas fa-images pictofixedwidth"></i>' . $langs->trans('ListingRisksPhoto') : '<i class="fas fa-images"></i>';
-        $head[$h][2] = 'elementListingRisksPhoto';
+    if ($user->rights->digiriskdolibarr->listingrisksaction->read && $user->rights->digiriskdolibarr->listingrisksphoto->read  && $user->rights->digiriskdolibarr->listingrisksdocument->read) {
+        $head[$h][0] = dol_buildpath('/digiriskdolibarr/view/digiriskelement/digiriskelement_listingrisksdocument.php', 1) . '?type=standard';
+        $head[$h][1] = $conf->browser->layout != 'phone' ? '<i class="fas fa-exclamation pictofixedwidth"></i>' . $langs->trans('ListingRisksDocument') : '<i class="fas fa-exclamation"></i>';
+        $head[$h][2] = 'elementListingRisksDocument';
         $h++;
     }
 

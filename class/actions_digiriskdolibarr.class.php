@@ -979,13 +979,17 @@ class ActionsDigiriskdolibarr
                 'documentType' => 'registerdocument',
                 'picto'        => 'fontawesome_fa-ticket-alt_fas_#d35968'
             ],
+            'ListingRisksDocument' => [
+                'documentType' => 'listingrisksdocument',
+                'picto'        => 'fontawesome_fa-file_fas_#d35968'
+            ],
 			'ListingRisksAction' => [
 				'documentType' => 'listingrisksaction',
-				'picto'        => 'fontawesome_fa-images_fas_#d35968'
+				'picto'        => 'fontawesome_fa-exclamation_fas_#d35968'
 			],
 			'ListingRisksPhoto' => [
 				'documentType' => 'listingrisksphoto',
-				'picto'        => 'fontawesome_fa-file_fas_#d35968'
+				'picto'        => 'fontawesome_fa-images_fas_#d35968'
 			],
 			'GroupmentDocument' => [
 				'documentType' => 'groupmentdocument',

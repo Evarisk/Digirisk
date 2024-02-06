@@ -16,9 +16,9 @@
  */
 
 /**
- *   	\file       view/digiriskelement/digiriskelement_listingrisksphoto.php
+ *   	\file       view/digiriskelement/digiriskelement_listingrisksaction.php
  *		\ingroup    digiriskdolibarr
- *		\brief      Page to view listingrisksphoto
+ *		\brief      Page to view listingrisksaction
  */
 
 // Load DigiriskDolibarr environment
@@ -35,6 +35,8 @@ require_once DOL_DOCUMENT_ROOT . '/projet/class/project.class.php';
 
 require_once __DIR__ . '/../../class/digiriskelement.class.php';
 require_once __DIR__ . '/../../class/digiriskstandard.class.php';
+require_once __DIR__ . '/../../class/digiriskdolibarrdocuments/listingrisksaction.class.php';
+require_once __DIR__ . '/../../class/digiriskdolibarrdocuments/listingrisksdocument.class.php';
 require_once __DIR__ . '/../../class/digiriskdolibarrdocuments/listingrisksphoto.class.php';
 require_once __DIR__ . '/../../lib/digiriskdolibarr_digiriskelement.lib.php';
 require_once __DIR__ . '/../../lib/digiriskdolibarr_digiriskstandard.lib.php';
@@ -45,14 +47,15 @@ global $conf, $db, $hookmanager, $langs, $user;
 // Load translation files required by the page
 saturne_load_langs(['other']);
 // Get parameters
-$id        = GETPOST('id', 'int');
-$action    = GETPOST('action', 'aZ09');
-$subaction = GETPOST('subaction', 'aZ09');
-$type      = GETPOST('type', 'aZ09');
+$id          = GETPOST('id', 'int');
+$action      = GETPOST('action', 'aZ09');
+$subaction   = GETPOST('subaction', 'aZ09');
+$type        = GETPOST('type', 'aZ09');
+$listingType = GETPOST('listingtype', 'aZ09');
 
 // Initialize technical objects
-$document = new ListingRisksPhoto($db);
-$hookmanager->initHooks(array('digiriskelementlistingrisksphoto', 'digiriskelementview', 'digiriskstandardview', 'globalcard')); // Note that conf->hooks_modules contains array
+$document = new ListingRisksDocument($db);
+$hookmanager->initHooks(array('digiriskelementlistingrisksaction', 'digiriskelementview', 'digiriskstandardview', 'globalcard')); // Note that conf->hooks_modules contains array
 
 if ($type != 'standard') {
 	$object = new DigiriskElement($db);
@@ -67,10 +70,10 @@ $project          = new Project($db);
 $upload_dir = $conf->digiriskdolibarr->multidir_output[isset($conf->entity) ? $conf->entity : 1];
 
 // Security check
-$permissiontoread   = $user->rights->digiriskdolibarr->digiriskstandard->read && $user->rights->digiriskdolibarr->listingrisksphoto->read;
-$permissiontoadd    = $user->rights->digiriskdolibarr->listingrisksphoto->write;
-$permissiontodelete = $user->rights->digiriskdolibarr->listingrisksphoto->delete;
-saturne_check_access($permissiontoread, $object);
+$permissiontoread   = $user->rights->digiriskdolibarr->digiriskstandard->read && $user->rights->digiriskdolibarr->listingrisksaction->read;
+$permissiontoadd    = $user->rights->digiriskdolibarr->listingrisksaction->write;
+$permissiontodelete = $user->rights->digiriskdolibarr->listingrisksaction->delete;
+saturne_check_access($permissiontoadd, $object);
 
 /*
  * Actions
@@ -81,11 +84,11 @@ $reshook    = $hookmanager->executeHooks('doActions', $parameters, $object, $act
 if ($reshook < 0) setEventMessages($hookmanager->error, $hookmanager->errors, 'errors');
 
 if (empty($reshook)) {
-    $error = 0;
-    if ($object->element == 'digiriskstandard') {
+	$error = 0;
+	if ($object->element == 'digiriskstandard') {
         $previousRef = $object->ref;
-        $object->ref = '';
-    }
+		$object->ref = '';
+	}
 
     // Actions builddoc, forcebuilddoc, remove_file.
     require_once __DIR__ . '/../../../saturne/core/tpl/documents/documents_action.tpl.php';
@@ -104,17 +107,17 @@ if (empty($reshook)) {
 
 $emptyobject = new stdClass();
 
-$title    = $langs->trans('ListingRisksPhoto');
-$helpUrl  = 'FR:Module_Digirisk#Impression_des_listings_de_risques';
+$title    = $langs->trans('ListingRisksDocuments');
+$helpUrl  = 'FR:Module_Diirisk#Impression_des_listings_deg_risques';
 
 digirisk_header($title, $helpUrl); ?>
 
-	<div id="cardContent" value="">
+<div id="cardContent" value="">
 
 <?php $res = $object->fetch_optionals();
 
 // Part to show record
-saturne_get_fiche_head($object, 'elementListingRisksPhoto', $title);
+saturne_get_fiche_head($object, 'elementListingRisksAction', $title);
 
 // Object card
 // ------------------------------------------------------------
@@ -123,15 +126,15 @@ if ($type != 'standard') {
 
     saturne_banner_tab($object,'ref','none', 0, 'ref', 'ref', $morehtmlref, true, $moreParams);
 } else {
-    // Project
-    $morehtmlref = '<div class="refidno">';
-    $project->fetch($conf->global->DIGIRISKDOLIBARR_DU_PROJECT);
-    $morehtmlref .= $langs->trans('Project') . ' : ' . getNomUrlProject($project, 1, 'blank', 1);
-    $morehtmlref .= '</div>';
+	// Project
+	$morehtmlref = '<div class="refidno">';
+	$project->fetch($conf->global->DIGIRISKDOLIBARR_DU_PROJECT);
+	$morehtmlref .= $langs->trans('Project') . ' : ' . getNomUrlProject($project, 1, 'blank', 1);
+	$morehtmlref .= '</div>';
 
-    $moduleNameLowerCase = 'mycompany';
-    saturne_banner_tab($object,'ref','none', 0, 'ref', 'ref', $morehtmlref, true);
-    $moduleNameLowerCase = 'digiriskdolibarr';
+	$moduleNameLowerCase = 'mycompany';
+	saturne_banner_tab($object,'ref','none', 0, 'ref', 'ref', $morehtmlref, true);
+	$moduleNameLowerCase = 'digiriskdolibarr';
 }
 
 unset($object->fields['element_type']);
@@ -158,18 +161,19 @@ print '</div>';
 print dol_get_fiche_end();
 
 // Document Generation -- Génération des documents
+
+$urlsource = $_SERVER["PHP_SELF"] . '?id=' . $object->id;
+
 if ($type != 'standard') {
 	$objref    = dol_sanitizeFileName($object->ref);
-	$dirFiles  = 'listingrisksphoto/' . $objref;
-	$filedir   = $upload_dir . '/' . $dirFiles;
-	$urlsource = $_SERVER["PHP_SELF"] . '?id=' . $object->id;
+	$dirFiles  = ['listingrisksaction/' . $objref, 'listingrisksphoto/' . $objref];
 } else {
-	$dirFiles  = 'listingrisksphoto';
-	$filedir   = $upload_dir . '/' . $dirFiles;
-	$urlsource = $_SERVER["PHP_SELF"] . '?id=' . $object->id . '&type=standard';
+    $dirFiles  = ['listingrisksaction', 'listingrisksphoto'];
+	$urlsource .= '&type=standard';
 }
+$filedir   = [$upload_dir . '/' . $dirFiles[0], $upload_dir . '/' . $dirFiles[1]];
 
-$modulepart = 'digiriskdolibarr:ListingRisksPhoto';
+$modulepart = 'digiriskdolibarr:ListingRisksDocument';
 
 if ($permissiontoadd || $permissiontoread) {
 	$genallowed = 1;
