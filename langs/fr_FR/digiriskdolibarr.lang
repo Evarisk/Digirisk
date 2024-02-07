@@ -636,6 +636,18 @@ CutOff                      = Coupure
 Investigator = Enquêteur
 Rescuer      = Secouriste
 
+#
+# ListingRisksDocument - Listing des risques documents
+#
+
+# Right - Droit
+ListingRisksDocumentMin = listings des risques avec documents
+
+# Data - Donnée
+ListingRisksDocument            = Listing des risques avec documents
+ListingRisksDocumentGenerated   = Génération de listing des Risques avec Documents
+listingrisksdocument.odt        = Listing des risques avec documents
+listingrisksdocument_custom.odt = Listing des risques avec documents personnalisé
 
 #
 # ListingRisksPhoto - Listing des risques Photo

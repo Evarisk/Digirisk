@@ -909,3 +909,6 @@ INSERT INTO llx_c_digiriskdolibarr_action_trigger (entity, elementtype, ref, lab
 INSERT INTO llx_c_digiriskdolibarr_action_trigger (entity, elementtype, ref, label, description, active, position) VALUES (0, 'accident@digiriskdolibarr', 'ACCIDENT_UNVALIDATE', 'AccidentUnValidated', 'Executed when an accident is re-open', 1, 122);
 INSERT INTO llx_c_digiriskdolibarr_action_trigger (entity, elementtype, ref, label, description, active, position) VALUES (0, 'accident@digiriskdolibarr', 'ACCIDENT_ARCHIVE', 'AccidentArchived', 'Executed when an accident is archived', 1, 123);
 INSERT INTO llx_c_digiriskdolibarr_action_trigger (entity, elementtype, ref, label, description, active, position) VALUES (0, 'accident@digiriskdolibarr', 'ACCIDENT_LOCK', 'AccidentLocked', 'Executed when an accident is locked', 1, 124);
+
+-- 9.15.0
+INSERT INTO llx_c_digiriskdolibarr_action_trigger (entity, elementtype, ref, label, description, active, position) VALUES (0, 'listingrisksdocument@digiriskdolibarr', 'LISTINGRISKSDOCUMENT_GENERATE', 'ListingRisksDocumentGenerated', 'Executed when a listing risks document is generated', 1, 81);
