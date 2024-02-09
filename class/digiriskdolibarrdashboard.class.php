@@ -25,6 +25,7 @@
 require_once __DIR__ . '/digiriskdolibarrdocuments/riskassessmentdocument.class.php';
 require_once __DIR__ . '/accident.class.php';
 require_once __DIR__ . '/evaluator.class.php';
+require_once __DIR__ . '/digiriskdolibarrdocuments/legaldisplay.class.php';
 require_once __DIR__ . '/digiriskresources.class.php';
 require_once __DIR__ . '/riskanalysis/risk.class.php';
 require_once __DIR__ . '/../../saturne/class/task/saturnetask.class.php';
@@ -61,18 +62,20 @@ class DigiriskDolibarrDashboard
     {
         global $conf;
 
-        $loadRiskAssessmentDocument = array_key_exists('loadRiskAssessmentDocument', $moreParams) ? $moreParams['loadRiskAssessmentDocument'] : 1;
-        $loadAccident               = array_key_exists('loadAccident', $moreParams) ? $moreParams['loadAccident'] : 1;
-        $loadEvaluator              = array_key_exists('loadEvaluator', $moreParams) ? $moreParams['loadEvaluator'] : 1;
-        $loadDigiriskResources      = array_key_exists('loadDigiriskResources', $moreParams) ? $moreParams['loadDigiriskResources'] : 1;
-        $loadRisk                   = array_key_exists('loadRisk', $moreParams) ? $moreParams['loadRisk'] : 1;
-        $loadTask                   = array_key_exists('loadTask', $moreParams) ? $moreParams['loadTask'] : 1;
+        $loadRiskAssessmentDocument = array_key_exists('loadRiskAssessmentDocument', $moreParams) ? $moreParams['loadRiskAssessmentDocument'] : 0;
+        $loadAccident               = array_key_exists('loadAccident', $moreParams) ? $moreParams['loadAccident'] : 0;
+        $loadEvaluator              = array_key_exists('loadEvaluator', $moreParams) ? $moreParams['loadEvaluator'] : 0;
+        $loadDigiriskResources      = array_key_exists('loadDigiriskResources', $moreParams) ? $moreParams['loadDigiriskResources'] : 0;
+        $loadRisk                   = array_key_exists('loadRisk', $moreParams) ? $moreParams['loadRisk'] : 0;
+        $loadTask                   = array_key_exists('loadTask', $moreParams) ? $moreParams['loadTask'] : 0;
+        $loadLegalDisplay           = array_key_exists('loadLegalDisplay', $moreParams) ? $moreParams['loadLegalDisplay'] : 0;
 
         $riskAssessmentDocument = new RiskAssessmentDocument($this->db);
         $accident               = new Accident($this->db);
         $evaluator              = new Evaluator($this->db);
         $digiriskResources      = new DigiriskResources($this->db);
         $risk                   = new Risk($this->db);
+        $legalDisplay           = new LegalDisplay($this->db);
         $digiriskTask           = new SaturneTask($this->db);
 
         $dashboardData['riskassessmentdocument'] = ($loadRiskAssessmentDocument) ? $riskAssessmentDocument->load_dashboard() : [];
@@ -80,6 +83,7 @@ class DigiriskDolibarrDashboard
         $dashboardData['evaluator']              = ($loadEvaluator) ? $evaluator->load_dashboard() : [];
         $dashboardData['digiriskresources']      = ($loadDigiriskResources) ? $digiriskResources->load_dashboard() : [];
         $dashboardData['risk']                   = ($loadRisk) ? $risk->load_dashboard() : [];
+        $dashboardData['legaldisplay']           = ($loadLegalDisplay) ? $legalDisplay->load_dashboard() : [];
         $dashboardData['task']                   = ($loadTask) ? $digiriskTask->load_dashboard($conf->global->DIGIRISKDOLIBARR_DU_PROJECT) : [];
 
         return $dashboardData;

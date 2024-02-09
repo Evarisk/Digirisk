@@ -173,6 +173,7 @@ CollectiveAgreement                 = Conventions collectives
 CollectiveAgreementValue            = Disponible sur le site du gouvernement :<br /><a href="https://www.service-public.fr/particuliers/vosdroits/F78" target="_blank">https://www.service-public.fr/particuliers/vosdroits/F78</a>
 legaldisplay.odt                    = Affichage légal
 legaldisplay_custom.odt             = Affichage légal personnalisé
+DocumentCompletionRate              = Taux de remplissage du document
 
 #
 # InformationsSharing - Diffusion d'informations

@@ -1,5 +1,5 @@
 <?php
-/* Copyright (C) 2021-2023 EVARISK <technique@evarisk.com>
+/* Copyright (C) 2021-2024 EVARISK <technique@evarisk.com>
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -16,9 +16,9 @@
  */
 
 /**
- *   	\file       view/digiriskstandard/digiriskstandard_legaldisplay.php
- *		\ingroup    digiriskdolibarr
- *		\brief      Page to view legaldisplay
+ * \file    view/digiriskstandard/digiriskstandard_legaldisplay.php
+ * \ingroup digiriskdolibarr
+ * \brief  Page to view legaldisplay
  */
 
 // Load DigiriskDolibarr environment
@@ -30,60 +30,64 @@ if (file_exists('../digiriskdolibarr.main.inc.php')) {
 	die('Include of digiriskdolibarr main fails');
 }
 
-require_once DOL_DOCUMENT_ROOT . '/core/lib/images.lib.php';
+// Load Dolibarr libraries
 require_once DOL_DOCUMENT_ROOT . '/projet/class/project.class.php';
 require_once DOL_DOCUMENT_ROOT . '/contact/class/contact.class.php';
 
+// Load Saturne libraries
+require_once __DIR__ . '/../../../saturne/class/saturneschedules.class.php';
+require_once __DIR__ . '/../../../saturne/class/saturnedashboard.class.php';
+
+// Load DigiriskDolibarr libraries
 require_once __DIR__ . '/../../class/digiriskstandard.class.php';
-require_once __DIR__ . '/../../class/digiriskresources.class.php';
 require_once __DIR__ . '/../../class/digiriskdolibarrdocuments/legaldisplay.class.php';
 require_once __DIR__ . '/../../lib/digiriskdolibarr_digiriskstandard.lib.php';
 require_once __DIR__ . '/../../lib/digiriskdolibarr_function.lib.php';
 
-require_once __DIR__ . '/../../../saturne/class/saturneschedules.class.php';
-
-global $db, $conf, $langs, $user, $hookmanager;
+global $db, $conf, $langs, $moduleNameLowerCase, $user, $hookmanager;
 
 // Load translation files required by the page
-saturne_load_langs(['other']);
+saturne_load_langs();
 
 // Get parameters
 $action    = GETPOST('action', 'aZ09');
 $subaction = GETPOST('subaction', 'aZ09');
 
 // Initialize technical objects
-$object   = new DigiriskStandard($db);
-$document = new LegalDisplay($db);
-$contact  = new Contact($db);
-$usertmp  = new User($db);
-$project  = new Project($db);
+$object    = new DigiriskStandard($db);
+$document  = new LegalDisplay($db);
+$usertmp   = new User($db);
+$contact   = new Contact($db);
+$project   = new Project($db);
+$dashboard = new SaturneDashboard($db, $moduleNameLowerCase);
 
-$hookmanager->initHooks(array('digiriskelementlegaldisplay', 'digiriskstandardview', 'globalcard')); // Note that conf->hooks_modules contains array
+$hookmanager->initHooks(['digiriskelementlegaldisplay', 'digiriskstandardview', 'globalcard']); // Note that conf->hooks_modules contains array
 
 $object->fetch($conf->global->DIGIRISKDOLIBARR_ACTIVE_STANDARD);
 
 $upload_dir = $conf->digiriskdolibarr->multidir_output[$conf->entity ?? 1];
 
 // Security check - Protection if external user
-$permissiontoread   = $user->rights->digiriskdolibarr->digiriskstandard->read && $user->rights->digiriskdolibarr->legaldisplay->read;
+$permissionToRead   = $user->rights->digiriskdolibarr->digiriskstandard->read && $user->rights->digiriskdolibarr->legaldisplay->read;
 $permissiontoadd    = $user->rights->digiriskdolibarr->legaldisplay->write;
 $permissiontodelete = $user->rights->digiriskdolibarr->legaldisplay->delete;
-saturne_check_access($permissiontoread);
+saturne_check_access($permissionToRead);
 
 /*
  * Actions
  */
 
-$parameters = array();
-$reshook    = $hookmanager->executeHooks('doActions', $parameters, $object, $action); // Note that $action and $object may have been modified by some hooks
-if ($reshook < 0) setEventMessages($hookmanager->error, $hookmanager->errors, 'errors');
+$parameters = [];
+$resHook    = $hookmanager->executeHooks('doActions', $parameters, $object, $action); // Note that $action and $object may have been modified by some hooks
+if ($resHook < 0) {
+    setEventMessages($hookmanager->error, $hookmanager->errors, 'errors');
+}
 
-if (empty($reshook)) {
-    $error = 0;
+if (empty($resHook)) {
     $previousRef = $object->ref;
     $object->ref = '';
 
-    // Actions builddoc, forcebuilddoc, remove_file.
+    // Actions builddoc, forcebuilddoc, remove_file
     require_once __DIR__ . '/../../../saturne/core/tpl/documents/documents_action.tpl.php';
 
     // Action to generate pdf from odt file
@@ -99,51 +103,49 @@ if (empty($reshook)) {
 $title   = $langs->trans('LegalDisplay');
 $helpUrl = 'FR:Module_Digirisk#Soci.C3.A9t.C3.A9.2FOrganisation';
 
-digirisk_header($title, $helpUrl); ?>
-
-<div id="cardContent" value="">
-
-<?php
-$res  = $object->fetch_optionals();
+digirisk_header($title, $helpUrl);
 
 saturne_get_fiche_head($object, 'standardLegalDisplay', $title);
 
 // Object card
 // ------------------------------------------------------------
 // Project
-$morehtmlref = '<div class="refidno">';
+$moreHtmlRef = '<div class="refidno">';
 $project->fetch($conf->global->DIGIRISKDOLIBARR_DU_PROJECT);
-$morehtmlref .= $langs->trans('Project') . ' : ' . getNomUrlProject($project, 1, 'blank', 1);
-$morehtmlref .= '</div>';
+$moreHtmlRef .= $langs->trans('Project') . ' : ' . getNomUrlProject($project, 1, 'blank', 1);
+$moreHtmlRef .= '</div>';
 
 $moduleNameLowerCase = 'mycompany';
-saturne_banner_tab($object,'ref','none', 0, 'ref', 'ref', $morehtmlref, true);
+saturne_banner_tab($object,'ref','none', 0, 'ref', 'ref', $moreHtmlRef, true);
 $moduleNameLowerCase = 'digiriskdolibarr';
 
-print '<a href="../../admin/securityconf.php" target="_blank">' . $langs->trans('ConfigureSecurityAndSocialData') . ' <i class="fas fa-external-link-alt"></i></a>';
+print '<div class="valignmiddle"> <a href="../../admin/securityconf.php" target="_blank">' . $langs->trans('ConfigureSecurityAndSocialData') . ' <i class="fas fa-external-link-alt"></i></a></div>';
 print '<hr>';
 print '<div class="fichecenter">';
-print '<table class="border centpercent tableforfield">' . "\n";
+print '<div class="fichehalfleft">';
+print '<table class="border centpercent tableforfield">';
 
 //JSON Decode and show fields
 require_once __DIR__ . '/../../core/tpl/digiriskdocuments/digiriskdolibarr_legaldisplayfields_view.tpl.php';
 
 print '</table>';
 print '</div>';
+print '<div class="fichehalfright">';
+
+$moreParams = ['loadLegalDisplay' => 1];
+$dashboard->show_dashboard($moreParams);
+print '</div>';
+print '</div>';
 
 print dol_get_fiche_end();
 
 // Document Generation -- Génération des documents
 $dirFiles   = 'legaldisplay';
-$filedir    = $upload_dir . '/' . $dirFiles;
-$urlsource  = $_SERVER["PHP_SELF"];
-$modulepart = 'digiriskdolibarr:LegalDisplay';
+$fileDir    = $upload_dir . '/' . $dirFiles;
+$urlSource  = $_SERVER["PHP_SELF"];
+$modulePart = 'digiriskdolibarr:LegalDisplay';
 
-if ($permissiontoadd || $permissiontoread) {
-	$genallowed = 1;
-}
-
-print saturne_show_documents($modulepart, $dirFiles, $filedir, $urlsource, 1,1, '', 1, 0, 0, 0, 0, '', 0, '', empty($soc->default_lang) ? '' : $soc->default_lang, $object);
+print saturne_show_documents($modulePart, $dirFiles, $fileDir, $urlSource, $permissiontoadd, $permissiontodelete, '', 1, 0, 0, 0, 0, '', '', $langs->defaultlang, 0, $object);
 
 // End of page
 llxFooter();

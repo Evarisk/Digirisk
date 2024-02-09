@@ -119,7 +119,11 @@ if ((empty($action) || ($action != 'edit' && $action != 'create'))) {
 	print '<br>';
 
 	$moreParams = [
-		'loadAccident' => 0
+        'loadRiskAssessmentDocument' => 1,
+        'loadEvaluator'              => 1,
+        'loadDigiriskResources'      => 1,
+        'loadRisk'                   => 1,
+        'loadTask'                   => 1,
 	];
 
 	$dashboard->show_dashboard($moreParams);

@@ -1,5 +1,5 @@
 <?php
-/* Copyright (C) 2021-2023 EVARISK <technique@evarisk.com>
+/* Copyright (C) 2021-2024 EVARISK <technique@evarisk.com>
  *
  * This program is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -23,6 +23,7 @@
 
 // Load DigiriskDolibarr libraries
 require_once __DIR__ . '/../digiriskdocuments.class.php';
+require_once __DIR__ . '/../digiriskresources.class.php';
 
 /**
  * Class for LegalDisplay
@@ -39,6 +40,11 @@ class LegalDisplay extends DigiriskDocuments
 	 */
 	public $element = 'legaldisplay';
 
+    /**
+     * @var string String with name of icon for legaldisplay. Must be the part after the 'object_' into object_legaldisplay.png
+     */
+    public $picto = 'fontawesome_fa-file_fas_#d35968';
+
 	/**
 	 * Constructor.
 	 *
@@ -50,7 +56,7 @@ class LegalDisplay extends DigiriskDocuments
 	}
 
 	/**
-	 * Function for JSON filling before saving in database
+	 * Function for JSON filling before saving in database for documents
 	 *
 	 * @return false|string
 	 * @throws Exception
@@ -234,4 +240,91 @@ class LegalDisplay extends DigiriskDocuments
 			return '';
 		}
 	}
+
+    /**
+     * Load dashboard info
+     *
+     * @return array     $dashboardData Return all dashboardData after load info
+     * @throws Exception
+     */
+    public function load_dashboard(): array
+    {
+        $getLegalDisplayInfos = $this->getLegalDisplayInfos();
+
+        $dashboardData['graphs'] = [$getLegalDisplayInfos];
+
+        return $dashboardData;
+    }
+
+    /**
+     * Get legal display infos
+     *
+     * @return array     $array Return legal display graph infos
+     * @throws Exception
+     */
+    public function getLegalDisplayInfos(): array
+    {
+        global $langs;
+
+        // Graph Title parameters
+        $array['title'] = $langs->transnoentities('DocumentCompletionRate');
+        $array['picto'] = $this->picto;
+
+        // Graph parameters
+        $array['width']      = '100%';
+        $array['height']     = 300;
+        $array['type']       = 'pie';
+        $array['showlegend'] = 2;
+        $array['dataset']    = 1;
+
+        $legalDisplayGraphInfos = $this->getLegalDisplayNumber();
+        $array['labels'] = [
+            0 => [
+                'label' => price2num($legalDisplayGraphInfos['counter'] / $legalDisplayGraphInfos['maxNumber'] * 100, 'MT') . ' %',
+                'color' => '#0d8affcc'
+            ],
+            1 => [
+                'label' => price2num(($legalDisplayGraphInfos['maxNumber'] - $legalDisplayGraphInfos['counter']) * 100 / $legalDisplayGraphInfos['maxNumber'], 'MT') . ' %',
+                'color' => '#6c6c6c66'
+            ]
+        ];
+
+        $array['data'] = [$legalDisplayGraphInfos['counter'], $legalDisplayGraphInfos['maxNumber'] - $legalDisplayGraphInfos['counter']];
+
+        return $array;
+    }
+
+    /**
+     * Get legal display numbers
+     *
+     * @return array     $array Return counter and maxNumber
+     * @throws Exception
+     */
+    public function getLegalDisplayNumber(): array
+    {
+        global $conf;
+
+        $resources = new DigiriskResources($this->db);
+
+        $counter = 0;
+        $securityResources = ['SAMU','Pompiers','Police','AllEmergencies','RightsDefender','PoisonControlCenter', 'Responsible', 'LabourDoctorSociety', 'LabourDoctorContact', 'LabourInspectorSociety', 'LabourInspectorContact'];
+        $securityConsts    = ['DIGIRISKDOLIBARR_LOCATION_OF_DETAILED_INSTRUCTION', 'DIGIRISKDOLIBARR_SOCIETY_DESCRIPTION', 'DIGIRISKDOLIBARR_GENERAL_MEANS', 'DIGIRISKDOLIBARR_GENERAL_RULES', 'DIGIRISKDOLIBARR_FIRST_AID', 'DIGIRISKDOLIBARR_RULES_LOCATION', 'DIGIRISKDOLIBARR_DUER_LOCATION', 'DIGIRISKDOLIBARR_COLLECTIVE_AGREEMENT_LOCATION'];
+        $allLinks          = $resources->fetchDigiriskResources();
+
+        $maxNumber = count($securityResources) + count($securityConsts);
+        foreach ($securityConsts as $securityConst) {
+            if (dol_strlen($conf->global->$securityConst) > 0) {
+                $counter += 1;
+            }
+        }
+        foreach ($securityResources as $securityResource) {
+            if (!empty($allLinks[$securityResource] && $allLinks[$securityResource]->id[0] > 0)) {
+                $counter += 1;
+            }
+        }
+
+        $array = ['counter' => $counter, 'maxNumber' => $maxNumber];
+
+        return $array;
+    }
 }
