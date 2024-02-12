@@ -44,7 +44,7 @@ require_once __DIR__ . '/../../class/digiriskdolibarrdocuments/legaldisplay.clas
 require_once __DIR__ . '/../../lib/digiriskdolibarr_digiriskstandard.lib.php';
 require_once __DIR__ . '/../../lib/digiriskdolibarr_function.lib.php';
 
-global $db, $conf, $langs, $moduleNameLowerCase, $user, $hookmanager;
+global $conf, $db, $hookmanager, $langs, $moduleNameLowerCase, $user;
 
 // Load translation files required by the page
 saturne_load_langs();
@@ -121,6 +121,7 @@ $moduleNameLowerCase = 'digiriskdolibarr';
 
 print '<div class="valignmiddle"> <a href="../../admin/securityconf.php" target="_blank">' . $langs->trans('ConfigureSecurityAndSocialData') . ' <i class="fas fa-external-link-alt"></i></a></div>';
 print '<hr>';
+print '<div class="fichecenter">';
 print '<div class="fichehalfleft">';
 print '<table class="border centpercent tableforfield">';
 
@@ -133,6 +134,7 @@ print '<div class="fichehalfright">';
 
 $moreParams = ['loadLegalDisplay' => 1];
 $dashboard->show_dashboard($moreParams);
+print '</div>';
 print '</div>';
 
 print dol_get_fiche_end();

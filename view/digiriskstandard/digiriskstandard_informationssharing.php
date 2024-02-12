@@ -48,7 +48,7 @@ require_once __DIR__ . '/../../lib/digiriskdolibarr_function.lib.php';
 global $conf, $db, $hookmanager, $langs, $moduleNameLowerCase, $user;
 
 // Load translation files required by the page
-saturne_load_langs(['other']);
+saturne_load_langs();
 
 // Get parameters
 $action    = GETPOST('action', 'aZ09');
@@ -79,7 +79,9 @@ saturne_check_access($permissionToRead);
 
 $parameters = [];
 $resHook    = $hookmanager->executeHooks('doActions', $parameters, $object, $action); // Note that $action and $object may have been modified by some hooks
-if ($resHook < 0) setEventMessages($hookmanager->error, $hookmanager->errors, 'errors');
+if ($resHook < 0) {
+    setEventMessages($hookmanager->error, $hookmanager->errors, 'errors');
+}
 
 if (empty($resHook)) {
     $previousRef = $object->ref;
@@ -101,12 +103,7 @@ if (empty($resHook)) {
 $title   = $langs->trans('InformationsSharing');
 $helpUrl = 'FR:Module_Digirisk#Soci.C3.A9t.C3.A9.2FOrganisation';
 
-digirisk_header($title, $helpUrl); ?>
-
-<div id="cardContent" value="">
-
-<?php // Part to show record
-$res  = $object->fetch_optionals();
+digirisk_header($title, $helpUrl);
 
 saturne_get_fiche_head($object, 'standardInformationsSharing', $title);
 
@@ -124,6 +121,7 @@ $moduleNameLowerCase = 'digiriskdolibarr';
 
 print '<a href="../../admin/socialconf.php" target="_blank">' . $langs->trans('ConfigureSecurityAndSocialData') . ' <i class="fas fa-external-link-alt"></i></a>';
 print '<hr>';
+print '<div class="fichecenter">';
 print '<div class="fichehalfleft">';
 print '<table class="border centpercent tableforfield">' . "\n";
 
@@ -136,6 +134,7 @@ print '<div class="fichehalfright">';
 
 $moreParams = ['loadInformationsSharing' => 1];
 $dashboard->show_dashboard($moreParams);
+print '</div>';
 print '</div>';
 
 print dol_get_fiche_end();

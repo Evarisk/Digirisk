@@ -203,19 +203,19 @@ class InformationsSharing extends DigiriskDocuments
         $array['showlegend'] = 2;
         $array['dataset']    = 1;
 
-        $legalDisplayGraphInfos = $this->getInformationsSharingNumber();
+        $informationsSharingGraphInfos = $this->getInformationsSharingNumber();
         $array['labels'] = [
             0 => [
-                'label' => price2num($legalDisplayGraphInfos['counter'] / $legalDisplayGraphInfos['maxNumber'] * 100, 'MT') . ' %',
+                'label' => price2num($informationsSharingGraphInfos['counter'] / $informationsSharingGraphInfos['maxNumber'] * 100, 'MT') . ' %',
                 'color' => '#0d8affcc'
             ],
             1 => [
-                'label' => price2num(($legalDisplayGraphInfos['maxNumber'] - $legalDisplayGraphInfos['counter']) * 100 / $legalDisplayGraphInfos['maxNumber'], 'MT') . ' %',
+                'label' => price2num(($informationsSharingGraphInfos['maxNumber'] - $informationsSharingGraphInfos['counter']) * 100 / $informationsSharingGraphInfos['maxNumber'], 'MT') . ' %',
                 'color' => '#6c6c6c66'
             ]
         ];
 
-        $array['data'] = [$legalDisplayGraphInfos['counter'], $legalDisplayGraphInfos['maxNumber'] - $legalDisplayGraphInfos['counter']];
+        $array['data'] = [$informationsSharingGraphInfos['counter'], $informationsSharingGraphInfos['maxNumber'] - $informationsSharingGraphInfos['counter']];
 
         return $array;
     }
@@ -233,7 +233,7 @@ class InformationsSharing extends DigiriskDocuments
         $resources = new DigiriskResources($this->db);
 
         $counter         = 0;
-        $socialResources = ['TitularsCSE', 'AlternatesCSE', 'TitularsDP', 'AlternatesDP'];
+        $socialResources = ['TitularsCSE', 'AlternatesCSE', 'HarassmentOfficerCSE', 'TitularsDP', 'AlternatesDP', 'HarassmentOfficer'];
         $socialConsts    = ['DIGIRISKDOLIBARR_PARTICIPATION_AGREEMENT_INFORMATION_PROCEDURE', 'DIGIRISKDOLIBARR_DEROGATION_SCHEDULE_PERMANENT', 'DIGIRISKDOLIBARR_DEROGATION_SCHEDULE_OCCASIONAL', 'DIGIRISKDOLIBARR_CSE_ELECTION_DATE', 'DIGIRISKDOLIBARR_DP_ELECTION_DATE'];
         $allLinks        = $resources->fetchDigiriskResources();
         $maxNumber       = count($socialResources) + count($socialConsts);

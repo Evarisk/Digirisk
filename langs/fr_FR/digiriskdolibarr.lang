@@ -174,7 +174,6 @@ CollectiveAgreementValue            = Disponible sur le site du gouvernement :<b
 legaldisplay.odt                    = Affichage légal
 legaldisplay_custom.odt             = Affichage légal personnalisé
 DocumentCompletionRate              = Taux de remplissage du document
-InformationsSharingRate              = Taux de remplissage des informations
 
 #
 # InformationsSharing - Diffusion d'informations
@@ -212,6 +211,7 @@ PermanentDerogation            = Dérogation permanente
 PermanentDerogationValue       = Non
 OccasionalDerogation           = Dérogation occasionnelle
 OccasionalDerogationValue      = Oui
+InformationsSharingRate        = Taux de remplissage des informations
 
 
 #
