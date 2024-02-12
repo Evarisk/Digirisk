@@ -1,5 +1,5 @@
 <?php
-/* Copyright (C) 2021-2023 EVARISK <technique@evarisk.com>
+/* Copyright (C) 2021-2024 EVARISK <technique@evarisk.com>
  *
  * This program is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -23,6 +23,7 @@
 
 // Load DigiriskDolibarr libraries
 require_once __DIR__ . '/../digiriskdocuments.class.php';
+require_once __DIR__ . '/../digiriskresources.class.php';
 
 /**
  * Class for InformationsSharing
@@ -30,19 +31,24 @@ require_once __DIR__ . '/../digiriskdocuments.class.php';
 class InformationsSharing extends DigiriskDocuments
 {
 	/**
-	 * @var string Module name.
+	 * @var string Module name
 	 */
 	public $module = 'digiriskdolibarr';
 
 	/**
-	 * @var string Element type of object.
+	 * @var string Element type of object
 	 */
 	public $element = 'informationssharing';
 
+    /**
+     * @var string String with name of icon for informations sharing. Must be the part after the 'object_' into object_informations sharing.png
+     */
+    public $picto = 'fa-comment-dots_fas_#d35968';
+
 	/**
-	 * Constructor.
+	 * Constructor
 	 *
-	 * @param DoliDb $db Database handler.
+	 * @param DoliDb $db Database handler
 	 */
 	public function __construct(DoliDB $db)
 	{
@@ -160,4 +166,91 @@ class InformationsSharing extends DigiriskDocuments
 			return -1;
 		}
 	}
+
+    /**
+     * Load dashboard info
+     *
+     * @return array     $dashboardData Return all dashboardData after load info
+     * @throws Exception
+     */
+    public function load_dashboard(): array
+    {
+        $getInformationsSharingInfos = $this->getInformationsSharingInfos();
+
+        $dashboardData['graphs'] = [$getInformationsSharingInfos];
+
+        return $dashboardData;
+    }
+
+    /**
+     * Get information sharing infos
+     *
+     * @return array     $array Return information sharing graph infos
+     * @throws Exception
+     */
+    public function getInformationsSharingInfos(): array
+    {
+        global $langs;
+
+        // Graph Title parameters
+        $array['title'] = $langs->transnoentities('InformationsSharingRate');
+        $array['picto'] = $this->picto;
+
+        // Graph parameters
+        $array['width']      = '100%';
+        $array['height']     = 300;
+        $array['type']       = 'pie';
+        $array['showlegend'] = 2;
+        $array['dataset']    = 1;
+
+        $legalDisplayGraphInfos = $this->getInformationsSharingNumber();
+        $array['labels'] = [
+            0 => [
+                'label' => price2num($legalDisplayGraphInfos['counter'] / $legalDisplayGraphInfos['maxNumber'] * 100, 'MT') . ' %',
+                'color' => '#0d8affcc'
+            ],
+            1 => [
+                'label' => price2num(($legalDisplayGraphInfos['maxNumber'] - $legalDisplayGraphInfos['counter']) * 100 / $legalDisplayGraphInfos['maxNumber'], 'MT') . ' %',
+                'color' => '#6c6c6c66'
+            ]
+        ];
+
+        $array['data'] = [$legalDisplayGraphInfos['counter'], $legalDisplayGraphInfos['maxNumber'] - $legalDisplayGraphInfos['counter']];
+
+        return $array;
+    }
+
+    /**
+     * Get information sharing numbers
+     *
+     * @return array     $array Return counter and maxNumber
+     * @throws Exception
+     */
+    public function getInformationsSharingNumber(): array
+    {
+        global $conf;
+
+        $resources = new DigiriskResources($this->db);
+
+        $counter         = 0;
+        $socialResources = ['TitularsCSE', 'AlternatesCSE', 'TitularsDP', 'AlternatesDP'];
+        $socialConsts    = ['DIGIRISKDOLIBARR_PARTICIPATION_AGREEMENT_INFORMATION_PROCEDURE', 'DIGIRISKDOLIBARR_DEROGATION_SCHEDULE_PERMANENT', 'DIGIRISKDOLIBARR_DEROGATION_SCHEDULE_OCCASIONAL', 'DIGIRISKDOLIBARR_CSE_ELECTION_DATE', 'DIGIRISKDOLIBARR_DP_ELECTION_DATE'];
+        $allLinks        = $resources->fetchDigiriskResources();
+        $maxNumber       = count($socialResources) + count($socialConsts);
+
+        foreach ($socialConsts as $socialConst) {
+            if (dol_strlen($conf->global->$socialConst) > 0 && $conf->global->$socialConst != '--') {
+                $counter += 1;
+            }
+        }
+        foreach ($socialResources as $socialResource) {
+            if (!empty($allLinks[$socialResource] && $allLinks[$socialResource]->id[0] > 0)) {
+                $counter += 1;
+            }
+        }
+
+        $array = ['counter' => $counter, 'maxNumber' => $maxNumber];
+
+        return $array;
+    }
 }

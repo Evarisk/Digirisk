@@ -31,12 +31,12 @@ require_once __DIR__ . '/../digiriskresources.class.php';
 class LegalDisplay extends DigiriskDocuments
 {
 	/**
-	 * @var string Module name.
+	 * @var string Module name
 	 */
 	public $module = 'digiriskdolibarr';
 
 	/**
-	 * @var string Element type of object.
+	 * @var string Element type of object
 	 */
 	public $element = 'legaldisplay';
 
@@ -46,9 +46,9 @@ class LegalDisplay extends DigiriskDocuments
     public $picto = 'fontawesome_fa-file_fas_#d35968';
 
 	/**
-	 * Constructor.
+	 * Constructor
 	 *
-	 * @param DoliDb $db Database handler.
+	 * @param DoliDb $db Database handler
 	 */
 	public function __construct(DoliDB $db)
 	{
@@ -306,7 +306,7 @@ class LegalDisplay extends DigiriskDocuments
 
         $resources = new DigiriskResources($this->db);
 
-        $counter = 0;
+        $counter           = 0;
         $securityResources = ['SAMU','Pompiers','Police','AllEmergencies','RightsDefender','PoisonControlCenter', 'Responsible', 'LabourDoctorSociety', 'LabourDoctorContact', 'LabourInspectorSociety', 'LabourInspectorContact'];
         $securityConsts    = ['DIGIRISKDOLIBARR_LOCATION_OF_DETAILED_INSTRUCTION', 'DIGIRISKDOLIBARR_SOCIETY_DESCRIPTION', 'DIGIRISKDOLIBARR_GENERAL_MEANS', 'DIGIRISKDOLIBARR_GENERAL_RULES', 'DIGIRISKDOLIBARR_FIRST_AID', 'DIGIRISKDOLIBARR_RULES_LOCATION', 'DIGIRISKDOLIBARR_DUER_LOCATION', 'DIGIRISKDOLIBARR_COLLECTIVE_AGREEMENT_LOCATION'];
         $allLinks          = $resources->fetchDigiriskResources();

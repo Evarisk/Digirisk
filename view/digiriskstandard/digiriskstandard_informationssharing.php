@@ -1,5 +1,5 @@
 <?php
-/* Copyright (C) 2021-2023 EVARISK <technique@evarisk.com>
+/* Copyright (C) 2021-2024 EVARISK <technique@evarisk.com>
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -30,17 +30,22 @@ if (file_exists('../digiriskdolibarr.main.inc.php')) {
 	die('Include of digiriskdolibarr main fails');
 }
 
+// Load Dolibarr libraries
 require_once DOL_DOCUMENT_ROOT . '/core/lib/images.lib.php';
 require_once DOL_DOCUMENT_ROOT . '/projet/class/project.class.php';
 require_once DOL_DOCUMENT_ROOT . '/contact/class/contact.class.php';
 
+// Load Saturne libraries
+require_once __DIR__ . '/../../../saturne/class/saturnedashboard.class.php';
+
+// Load DigiriskDolibarr libraries
 require_once __DIR__ . '/../../class/digiriskstandard.class.php';
 require_once __DIR__ . '/../../class/digiriskresources.class.php';
 require_once __DIR__ . '/../../class/digiriskdolibarrdocuments/informationssharing.class.php';
 require_once __DIR__ . '/../../lib/digiriskdolibarr_digiriskstandard.lib.php';
 require_once __DIR__ . '/../../lib/digiriskdolibarr_function.lib.php';
 
-global $db, $conf, $langs, $hookmanager, $user;
+global $conf, $db, $hookmanager, $langs, $moduleNameLowerCase, $user;
 
 // Load translation files required by the page
 saturne_load_langs(['other']);
@@ -54,6 +59,7 @@ $object   = new DigiriskStandard($db);
 $document = new InformationsSharing($db);
 $contact  = new Contact($db);
 $project  = new Project($db);
+$dashboard = new SaturneDashboard($db, $moduleNameLowerCase);
 
 $hookmanager->initHooks(array('digiriskelementinformationssharing', 'digiriskstandardview', 'globalcard')); // Note that conf->hooks_modules contains array
 
@@ -62,25 +68,24 @@ $object->fetch($conf->global->DIGIRISKDOLIBARR_ACTIVE_STANDARD);
 $upload_dir = $conf->digiriskdolibarr->multidir_output[isset($conf->entity) ? $conf->entity : 1];
 
 // Security check - Protection if external user
-$permissiontoread   = $user->rights->digiriskdolibarr->digiriskstandard->read && $user->rights->digiriskdolibarr->informationssharing->read;
+$permissionToRead   = $user->rights->digiriskdolibarr->digiriskstandard->read && $user->rights->digiriskdolibarr->informationssharing->read;
 $permissiontoadd    = $user->rights->digiriskdolibarr->informationssharing->write;
 $permissiontodelete = $user->rights->digiriskdolibarr->informationssharing->delete;
-saturne_check_access($permissiontoread);
+saturne_check_access($permissionToRead);
 
 /*
  * Actions
  */
 
-$parameters = array();
-$reshook    = $hookmanager->executeHooks('doActions', $parameters, $object, $action); // Note that $action and $object may have been modified by some hooks
-if ($reshook < 0) setEventMessages($hookmanager->error, $hookmanager->errors, 'errors');
+$parameters = [];
+$resHook    = $hookmanager->executeHooks('doActions', $parameters, $object, $action); // Note that $action and $object may have been modified by some hooks
+if ($resHook < 0) setEventMessages($hookmanager->error, $hookmanager->errors, 'errors');
 
-if (empty($reshook)) {
-	$error = 0;
+if (empty($resHook)) {
     $previousRef = $object->ref;
     $object->ref = '';
 
-	// Actions builddoc, forcebuilddoc, remove_file.
+	// Actions builddoc, forcebuilddoc, remove_file
 	require_once __DIR__ . '/../../../saturne/core/tpl/documents/documents_action.tpl.php';
 
 	// Action to generate pdf from odt file
@@ -108,18 +113,18 @@ saturne_get_fiche_head($object, 'standardInformationsSharing', $title);
 // Object card
 // ------------------------------------------------------------
 // Project
-$morehtmlref = '<div class="refidno">';
+$moreHtmlRef = '<div class="refidno">';
 $project->fetch($conf->global->DIGIRISKDOLIBARR_DU_PROJECT);
-$morehtmlref .= $langs->trans('Project') . ' : ' . getNomUrlProject($project, 1, 'blank', 1);
-$morehtmlref .= '</div>';
+$moreHtmlRef .= $langs->trans('Project') . ' : ' . getNomUrlProject($project, 1, 'blank', 1);
+$moreHtmlRef .= '</div>';
 
 $moduleNameLowerCase = 'mycompany';
-saturne_banner_tab($object,'ref','none', 0, 'ref', 'ref', $morehtmlref, true);
+saturne_banner_tab($object,'ref','none', 0, 'ref', 'ref', $moreHtmlRef, true);
 $moduleNameLowerCase = 'digiriskdolibarr';
 
 print '<a href="../../admin/socialconf.php" target="_blank">' . $langs->trans('ConfigureSecurityAndSocialData') . ' <i class="fas fa-external-link-alt"></i></a>';
 print '<hr>';
-print '<div class="fichecenter">';
+print '<div class="fichehalfleft">';
 print '<table class="border centpercent tableforfield">' . "\n";
 
 //JSON Decode and show fields
@@ -127,20 +132,21 @@ require_once __DIR__ . '/../../core/tpl/digiriskdocuments/digiriskdolibarr_infor
 
 print '</table>';
 print '</div>';
+print '<div class="fichehalfright">';
+
+$moreParams = ['loadInformationsSharing' => 1];
+$dashboard->show_dashboard($moreParams);
+print '</div>';
 
 print dol_get_fiche_end();
 
 // Document Generation -- Génération des documents
 $dirFiles   = 'informationssharing';
-$filedir    = $upload_dir . '/' . $dirFiles ;
-$urlsource  = $_SERVER["PHP_SELF"];
-$modulepart = 'digiriskdolibarr:InformationsSharing';
+$fileDir    = $upload_dir . '/' . $dirFiles ;
+$urlSource  = $_SERVER["PHP_SELF"];
+$modulePart = 'digiriskdolibarr:InformationsSharing';
 
-if ($permissiontoadd || $permissiontoread) {
-	$genallowed = 1;
-}
-
-print saturne_show_documents($modulepart, $dirFiles, $filedir, $urlsource, 1,1, '', 1, 0, 0, 0, 0, '', 0, '', empty($soc->default_lang) ? '' : $soc->default_lang, $object);
+print saturne_show_documents($modulePart, $dirFiles, $fileDir, $urlSource, $permissiontoadd, $permissiontodelete, '', 1, 0, 0, 0, 0, '', '', $langs->defaultlang, 0, $object);
 
 // End of page
 llxFooter();
