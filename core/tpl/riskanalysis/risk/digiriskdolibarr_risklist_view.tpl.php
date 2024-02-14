@@ -1179,8 +1179,22 @@ while ($i < ($limit ? min($num, $limit) : $num)) {
 			if ($key == 'status') print $risk->getLibStatut(5);
 			elseif ($key == 'fk_element') {
 				if (is_object($activeDigiriskElementList[$risk->fk_element])) {
-					print $activeDigiriskElementList[$risk->fk_element]->getNomUrl(1, 'blank', 0, '', -1, 1);
-				}
+                    if (!getDolGlobalInt('DIGIRISKDOLIBARR_ALTERNATE_LIST_RISK_PARENT_VIEW')) {
+                        print $activeDigiriskElementList[$risk->fk_element]->getNomUrl(1, 'blank', 0, '', -1, 1);
+                    } else {
+                        $digiriskElementIds = $activeDigiriskElementList[$risk->fk_element]->getBranch($risk->fk_element);
+                        $count              = 0;
+
+                        if (!empty($digiriskElementIds)) {
+                            $digiriskElementIds = array_reverse($digiriskElementIds);
+
+                            foreach ($digiriskElementIds as $digiriskElementId) {
+                                $count++;
+                                print $count . str_repeat(' - ', $count) . $activeDigiriskElementList[$digiriskElementId]->getNomUrl(1, 'blank', 0, '', -1, 1) . '</br>';
+                            }
+                        }
+                    }
+                }
 			} elseif ($key == 'category') { ?>
 				<div class="table-cell table-50 cell-risk" data-title="Risque">
 					<div class="wpeo-dropdown dropdown-large category-danger padding wpeo-tooltip-event" aria-label="<?php echo $risk->getDangerCategoryName($risk) ?>">
