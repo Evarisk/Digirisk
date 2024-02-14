@@ -405,7 +405,7 @@ $risk->fields['applied_on'] = $arrayfields['r.applied_on'] ;
 $risk->fields = dol_sort_array($risk->fields, 'position');
 
 foreach ($risk->fields as $key => $val) {
-	$cssforfield                        = (empty($val['css']) ? '' : $val['css']);
+    $cssforfield                        = (empty($val['csslist']) ? (empty($val['css']) ? '' : $val['css']) : $val['csslist']);
 	if ($key == 'status') $cssforfield .= ($cssforfield ? ' ' : '') . 'center';
 	if ( ! empty($arrayfields['r.' . $key]['checked'])) {
 		print '<td class="liste_titre' . ($cssforfield ? ' ' . $cssforfield : '') . '">';
@@ -450,7 +450,7 @@ foreach ($risk->fields as $key => $val) {
 
 
 foreach ($evaluation->fields as $key => $val) {
-	$cssforfield                        = (empty($val['css']) ? '' : $val['css']);
+    $cssforfield                        = (empty($val['csslist']) ? (empty($val['css']) ? '' : $val['css']) : $val['csslist']);
 	if ($key == 'status') $cssforfield .= ($cssforfield ? ' ' : '') . 'center';
 	if ( ! empty($arrayfields['evaluation.' . $key]['checked'])) {
 		print '<td class="liste_titre' . '">';
@@ -477,7 +477,7 @@ print '</tr>' . "\n";
 // --------------------------------------------------------------------
 print '<tr class="liste_titre">';
 foreach ($risk->fields as $key => $val) {
-	$cssforfield                        = (empty($val['css']) ? '' : $val['css']);
+    $cssforfield                        = (empty($val['csslist']) ? (empty($val['css']) ? '' : $val['css']) : $val['csslist']);
 	if ($key == 'status') $cssforfield .= ($cssforfield ? ' ' : '') . 'center';
 	if ( ! empty($arrayfields['r.' . $key]['checked'])) {
 		print getTitleFieldOfList($arrayfields['r.' . $key]['label'], 0, $_SERVER['PHP_SELF'], 'r.' . $key, '', $param, ($cssforfield ? 'class="' . $cssforfield . '"' : ''), $sortfield, $sortorder, ($cssforfield ? $cssforfield . ' ' : ''), $arrayfields['r.' . $key]['disablesort']) . "\n";
@@ -531,7 +531,7 @@ while ($i < ($limit ? min($num, $limit) : $num)) {
 	$risk->fields = dol_sort_array($risk->fields, 'position');
 
 	foreach ($risk->fields as $key => $val) {
-		$cssforfield                                 = (empty($val['css']) ? '' : $val['css']);
+        $cssforfield                                 = (empty($val['csslist']) ? (empty($val['css']) ? '' : $val['css']) : $val['csslist']);
 		if ($key == 'status') $cssforfield          .= ($cssforfield ? ' ' : '') . 'center';
 		elseif ($key == 'ref') $cssforfield         .= ($cssforfield ? ' ' : '') . 'nowrap';
 		elseif ($key == 'category') $cssforfield    .= ($cssforfield ? ' ' : '') . 'risk-category';
@@ -542,12 +542,24 @@ while ($i < ($limit ? min($num, $limit) : $num)) {
 			elseif ($key == 'entity') { ?>
 				<?php
 				print getNomUrlEntity($risk, 1, 'nolink', 1);
-			} elseif ($key == 'fk_element') { ?>
-				<?php
-				if (is_object($alldigiriskelement[$risk->fk_element])) {
-					print $alldigiriskelement[$risk->fk_element]->getNomUrl(1, 'nolink', 0, '', -1, 1);
-				}
-			} elseif ($key == 'category') { ?>
+			} elseif ($key == 'fk_element') {
+                if (is_object($alldigiriskelement[$risk->fk_element])) {
+                    // Display either parent element or every parent elements of the risk according to conf
+                    if (!getDolGlobalInt('DIGIRISKDOLIBARR_RISK_LIST_PARENT_VIEW')) {
+                        print $alldigiriskelement[$risk->fk_element]->getNomUrl(1, 'blank', 0, '', -1, 1);
+                    } else {
+                        $digiriskElementIds = $alldigiriskelement[$risk->fk_element]->getBranch($risk->fk_element);
+
+                        if (!empty($digiriskElementIds)) {
+                            $digiriskElementIds = array_reverse($digiriskElementIds);
+
+                            foreach ($digiriskElementIds as $key => $digiriskElementId) {
+                                print str_repeat(' - ', $key + 1) . $alldigiriskelement[$digiriskElementId]->getNomUrl(1, 'blank', 0, '', -1, 1) . '</br>';
+                            }
+                        }
+                    }
+                }
+            } elseif ($key == 'category') { ?>
 				<div class="table-cell table-50 cell-risk" data-title="Risque">
 					<div class="wpeo-dropdown dropdown-large category-danger padding wpeo-tooltip-event" aria-label="<?php echo $risk->getDangerCategoryName($risk) ?>">
 						<img class="danger-category-pic hover" src="<?php echo DOL_URL_ROOT . '/custom/digiriskdolibarr/img/categorieDangers/' . $risk->getDangerCategory($risk) . '.png' ; ?>"/>
@@ -588,7 +600,7 @@ while ($i < ($limit ? min($num, $limit) : $num)) {
 
 	// Store properties in $lastEvaluation
 	foreach ($evaluation->fields as $key => $val) {
-		$cssforfield                              = (empty($val['css']) ? '' : $val['css']);
+        $cssforfield                              = (empty($val['csslist']) ? (empty($val['css']) ? '' : $val['css']) : $val['csslist']);
 		if ($key == 'status') $cssforfield       .= ($cssforfield ? ' ' : '') . 'center';
 		elseif ($key == 'ref') $cssforfield      .= ($cssforfield ? ' ' : '') . 'nowrap';
 		elseif ($key == 'cotation') $cssforfield .= ($cssforfield ? ' ' : '') . 'risk-evaluation-list-container-' . $risk->id;

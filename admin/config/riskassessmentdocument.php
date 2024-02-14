@@ -180,6 +180,11 @@ $constArray[$moduleNameLowerCase] = [
 		'description' => 'SortRisksListingsByEvaluationDescription',
 		'code'        => 'DIGIRISKDOLIBARR_SORT_LISTINGS_BY_COTATION',
 	],
+    'RiskListParentView' => [
+        'name'        => 'RiskListParentView',
+        'description' => 'RiskListParentViewDescription',
+        'code'        => 'DIGIRISKDOLIBARR_RISK_LIST_PARENT_VIEW',
+    ],
 	'RiskDescriptionPrefill' => [
 		'name'        => 'RiskDescriptionPrefill',
 		'description' => 'RiskDescriptionPrefillDescription',
