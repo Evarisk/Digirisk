@@ -199,18 +199,33 @@ class DigiriskDocuments extends SaturneDocuments
 							$scale = $lastEvaluation->getEvaluationScale();
 
 							if ($scale == $i) {
-								$element = $activeDigiriskElements[$line->fk_element];
+								$element        = $activeDigiriskElements[$line->fk_element];
 								$linked_element = $activeDigiriskElements[$line->appliedOn];
+                                $nomElement     = '';
+                                $dash           = getDolGlobalInt('DIGIRISKDOLIBARR_RISK_LIST_PARENT_VIEW') > 0;
+                                if (getDolGlobalInt('DIGIRISKDOLIBARR_RISK_LIST_PARENT_VIEW') > 0) {
+                                    $digiriskElementIds = $activeDigiriskElements[$line->fk_element]->getBranch($line->fk_element);
+
+                                    if (!empty($digiriskElementIds)) {
+                                        $digiriskElementIds = array_reverse($digiriskElementIds);
+                                        array_pop($digiriskElementIds);
+
+                                        foreach ($digiriskElementIds as $key => $digiriskElementId) {
+                                            $nomElement .= str_repeat(' - ', count($digiriskElementIds) + 1 - $key) . $activeDigiriskElements[$digiriskElementId]->ref . ' - ' . $activeDigiriskElements[$digiriskElementId]->label . chr(0x0A) . chr(0x0A);
+                                        }
+                                    }
+                                }
+
 								if ($conf->global->DIGIRISKDOLIBARR_SHOW_RISK_ORIGIN) {
-									$nomElement = (!empty($conf->global->DIGIRISKDOLIBARR_SHOW_SHARED_RISKS) ? 'S' . $element->entity . ' - ' : '') . $element->ref . ' - ' . $element->label;
+									$nomElement .= (!empty($conf->global->DIGIRISKDOLIBARR_SHOW_SHARED_RISKS) ? 'S' . $element->entity . ' - ' : '') . $element->ref . ' - ' . $element->label;
 									if ($line->fk_element != $line->appliedOn) {
-										$nomElement .= "\n" . $langs->trans('AppliedOn') . ' ' . $linked_element->ref . ' - ' . $linked_element->label;
+										$nomElement .= "\n" . ($dash > 0 ? ' - ' : '') . $langs->trans('AppliedOn') . ' ' . $linked_element->ref . ' - ' . $linked_element->label;
 									}
 								} else {
 									if ($linked_element->id > 0) {
-										$nomElement = "\n" . $linked_element->ref . ' - ' . $linked_element->label;
+										$nomElement .= "\n" . ($dash > 0 ? ' - ' : '') . $linked_element->ref . ' - ' . $linked_element->label;
 									} else {
-										$nomElement = "\n" . $element->ref . ' - ' . $element->label;
+										$nomElement .= "\n" . ($dash > 0 ? ' - ' : '') . $element->ref . ' - ' . $element->label;
 									}
 								}
 
