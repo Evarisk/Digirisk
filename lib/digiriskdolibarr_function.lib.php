@@ -241,14 +241,14 @@ function display_recurse_tree($digiriskElementTree)
 							<a id="slider" class="linkElement id<?php echo $element['object']->id;?>" href="<?php echo dol_buildpath('/custom/digiriskdolibarr/view/digiriskelement/digiriskelement_risk.php?id=' . $element['object']->id, 1);?>">
 								<span class="title-container">
 									<span class="ref"><?php echo $element['object']->ref; ?></span>
-									<span class="name"><?php echo $element['object']->label; ?></span>
+									<span class="name"><?php echo dol_trunc($element['object']->label, 20); ?></span>
 								</span>
 							</a>
 						<?php else : ?>
 							<a id="slider" class="linkElement id<?php echo $element['object']->id;?>" href="<?php echo dol_buildpath('/custom/digiriskdolibarr/view/digiriskelement/digiriskelement_card.php?id=' . $element['object']->id, 1);?>">
 								<span class="title-container">
 									<span class="ref"><?php echo $element['object']->ref; ?></span>
-									<span class="name"><?php echo $element['object']->label; ?></span>
+									<span class="name"><?php echo dol_trunc($element['object']->label, 20); ?></span>
 								</span>
 							</a>
 						<?php endif; ?>
