@@ -76,24 +76,7 @@ if (($action == 'update' && ! GETPOST("cancel", 'alpha')) || ($action == 'update
 	}
 }
 
-if ($action == 'updateMask') {
-	$accidentMaskConst = GETPOST('maskconstaccident', 'alpha');
-	$accidentMask      = GETPOST('maskaccident', 'alpha');
-
-	if ($accidentMaskConst) {
-		$res = dolibarr_set_const($db, $accidentMaskConst, $accidentMask, 'chaine', 0, '', $conf->entity);
-	}
-
-	if (!$res > 0) {
-        $error++;
-    }
-
-	if (!$error) {
-		setEventMessages($langs->trans("SetupSaved"), null);
-	} else {
-		setEventMessages($langs->trans("Error"), null, 'errors');
-	}
-}
+require '../../../saturne/core/tpl/actions/admin_conf_actions.tpl.php';
 
 if ($action == 'setmod') {
     if (preg_match('_accidentinvestigation_', $value)) {

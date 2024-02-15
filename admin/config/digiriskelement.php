@@ -65,9 +65,7 @@ if (GETPOST('action') == 'setmod') {
     dolibarr_set_const($db, 'DIGIRISKDOLIBARR_'. strtoupper($objectType) .'_ADDON', $value, 'chaine', 0, '', $conf->entity);
 }
 
-if (GETPOST('action') == 'updateMask') {
-	dolibarr_set_const($db, GETPOST('mask'), GETPOST('addon_value'), 'chaine', 0, '', $conf->entity);
-}
+require '../../../saturne/core/tpl/actions/admin_conf_actions.tpl.php';
 
 /*
  * View

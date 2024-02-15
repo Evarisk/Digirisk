@@ -67,9 +67,7 @@ saturne_check_access($permissiontoread);
  * Actions
  */
 
-if (GETPOST('action') == 'updateMask') {
-    dolibarr_set_const($db, GETPOST('mask'), GETPOST('addon_value'), 'chaine', 0, '', $conf->entity);
-}
+require '../../../saturne/core/tpl/actions/admin_conf_actions.tpl.php';
 
 if (GETPOST('action') == 'setmod') {
     $value = GETPOST('value');

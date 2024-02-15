@@ -81,20 +81,7 @@ if (($action == 'update' && ! GETPOST("cancel", 'alpha')) || ($action == 'update
 	}
 }
 
-if ($action == 'updateMask') {
-	$preventionPlanMaskConst = GETPOST('maskconstpreventionplan', 'alpha');
-	$preventionPlanMask      = GETPOST('maskpreventionplan', 'alpha');
-
-	if ($preventionPlanMaskConst) $res = dolibarr_set_const($db, $preventionPlanMaskConst, $preventionPlanMask, 'chaine', 0, '', $conf->entity);
-
-	if ( ! $res > 0) $error++;
-
-	if ( ! $error) {
-		setEventMessages($langs->trans("SetupSaved"), null);
-	} else {
-		setEventMessages($langs->trans("Error"), null, 'errors');
-	}
-}
+require '../../../saturne/core/tpl/actions/admin_conf_actions.tpl.php';
 
 if ($action == 'setmod') {
 	$constForVal = 'DIGIRISKDOLIBARR_' . strtoupper($type) . "_ADDON";
