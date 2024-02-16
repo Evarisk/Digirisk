@@ -79,7 +79,14 @@ class LegalDisplay extends DigiriskDocuments
 
 				$thirdparty_openinghours = new SaturneSchedules($this->db);
 				$thirdparty_openinghours->fetch(0, '', $morewhere);
-				$json['LegalDisplay']['occupational_health_service']['openinghours'] = $langs->trans('Monday') . ' : ' . $thirdparty_openinghours->monday . "\r\n" . $langs->trans('Tuesday') . ' : ' . $thirdparty_openinghours->tuesday . "\r\n" . $langs->trans('Wednesday') . ' : ' . $thirdparty_openinghours->wednesday . "\r\n" . $langs->trans('Thursday') . ' : ' . $thirdparty_openinghours->thursday . "\r\n" . $langs->trans('Friday') . ' : ' . $thirdparty_openinghours->friday . "\r\n" . $langs->trans('Saturday') . ' : ' . $thirdparty_openinghours->saturday . "\r\n" . $langs->trans('Sunday') . ' : ' . $thirdparty_openinghours->sunday;
+				$json['LegalDisplay']['occupational_health_service']['openinghours']                       = $langs->trans('Monday') . ' : ' . $thirdparty_openinghours->monday . "\r\n" . $langs->trans('Tuesday') . ' : ' . $thirdparty_openinghours->tuesday . "\r\n" . $langs->trans('Wednesday') . ' : ' . $thirdparty_openinghours->wednesday . "\r\n" . $langs->trans('Thursday') . ' : ' . $thirdparty_openinghours->thursday . "\r\n" . $langs->trans('Friday') . ' : ' . $thirdparty_openinghours->friday . "\r\n" . $langs->trans('Saturday') . ' : ' . $thirdparty_openinghours->saturday . "\r\n" . $langs->trans('Sunday') . ' : ' . $thirdparty_openinghours->sunday;
+                $json['LegalDisplay']['occupational_health_service']['opening_hours_details']['monday']    = $thirdparty_openinghours->monday;
+                $json['LegalDisplay']['occupational_health_service']['opening_hours_details']['tuesday']   = $thirdparty_openinghours->tuesday;
+                $json['LegalDisplay']['occupational_health_service']['opening_hours_details']['wednesday'] = $thirdparty_openinghours->wednesday;
+                $json['LegalDisplay']['occupational_health_service']['opening_hours_details']['thursday']  = $thirdparty_openinghours->thursday;
+                $json['LegalDisplay']['occupational_health_service']['opening_hours_details']['friday']    = $thirdparty_openinghours->friday;
+                $json['LegalDisplay']['occupational_health_service']['opening_hours_details']['saturday']  = $thirdparty_openinghours->saturday;
+                $json['LegalDisplay']['occupational_health_service']['opening_hours_details']['sunday']    = $thirdparty_openinghours->sunday;
 			}
 
 			$labour_doctor_contact = new Contact($this->db);
@@ -103,7 +110,14 @@ class LegalDisplay extends DigiriskDocuments
 				$thirdparty_openinghours = new SaturneSchedules($this->db);
 				$thirdparty_openinghours->fetch(0, '', $morewhere);
 
-				$json['LegalDisplay']['detective_work']['openinghours'] = $langs->trans('Monday') . ' : ' . $thirdparty_openinghours->monday . "\r\n" . $langs->trans('Tuesday') . ' : ' . $thirdparty_openinghours->tuesday . "\r\n" . $langs->trans('Wednesday') . ' : ' . $thirdparty_openinghours->wednesday . "\r\n" . $langs->trans('Thursday') . ' : ' . $thirdparty_openinghours->thursday . "\r\n" . $langs->trans('Friday') . ' : ' . $thirdparty_openinghours->friday . "\r\n" . $langs->trans('Saturday') . ' : ' . $thirdparty_openinghours->saturday . "\r\n" . $langs->trans('Sunday') . ' : ' . $thirdparty_openinghours->sunday;
+				$json['LegalDisplay']['detective_work']['openinghours']              = $langs->trans('Monday') . ' : ' . $thirdparty_openinghours->monday . "\r\n" . $langs->trans('Tuesday') . ' : ' . $thirdparty_openinghours->tuesday . "\r\n" . $langs->trans('Wednesday') . ' : ' . $thirdparty_openinghours->wednesday . "\r\n" . $langs->trans('Thursday') . ' : ' . $thirdparty_openinghours->thursday . "\r\n" . $langs->trans('Friday') . ' : ' . $thirdparty_openinghours->friday . "\r\n" . $langs->trans('Saturday') . ' : ' . $thirdparty_openinghours->saturday . "\r\n" . $langs->trans('Sunday') . ' : ' . $thirdparty_openinghours->sunday;
+                $json['LegalDisplay']['detective_work']['opening_hours_details']['monday']    = $thirdparty_openinghours->monday;
+                $json['LegalDisplay']['detective_work']['opening_hours_details']['tuesday']   = $thirdparty_openinghours->tuesday;
+                $json['LegalDisplay']['detective_work']['opening_hours_details']['wednesday'] = $thirdparty_openinghours->wednesday;
+                $json['LegalDisplay']['detective_work']['opening_hours_details']['thursday']  = $thirdparty_openinghours->thursday;
+                $json['LegalDisplay']['detective_work']['opening_hours_details']['friday']    = $thirdparty_openinghours->friday;
+                $json['LegalDisplay']['detective_work']['opening_hours_details']['saturday']  = $thirdparty_openinghours->saturday;
+                $json['LegalDisplay']['detective_work']['opening_hours_details']['sunday']    = $thirdparty_openinghours->sunday;
 			}
 
 			$labourInspectorContact = new Contact($this->db);
@@ -249,12 +263,10 @@ class LegalDisplay extends DigiriskDocuments
      */
     public function load_dashboard(): array
     {
-        global $db, $langs;
-
-        $document  = new LegalDisplay($db);
+        global $langs;
 
         $getLegalDisplayInfos = $this->getLegalDisplayInfos();
-        $document             = json_decode($document->LegalDisplayFillJSON(), false, 512, JSON_UNESCAPED_UNICODE)->LegalDisplay;
+        $legalDisplay         = json_decode($this->LegalDisplayFillJSON(), false, 512, JSON_UNESCAPED_UNICODE)->LegalDisplay;
 
         $dashboardData['widgets'] = [
             'labour_doctor' => [
@@ -284,11 +296,11 @@ class LegalDisplay extends DigiriskDocuments
                                     $langs->transnoentities('Schedules') ?? '',
                 ],
                 'content'    => [
-                                    $document->detective_work->name,
-                                    $document->detective_work->address,
-                                    $document->detective_work->town,
-                                    $document->detective_work->phone,
-                                    $document->detective_work->openinghours,
+                                    $legalDisplay->detective_work->name,
+                                    $legalDisplay->detective_work->address,
+                                    $legalDisplay->detective_work->town,
+                                    $legalDisplay->detective_work->phone,
+                                    $legalDisplay->detective_work->openinghours,
                 ],
                 'picto'      => 'fas fa-briefcase',
                 'widgetName' => $langs->transnoentities('Society')
@@ -304,13 +316,13 @@ class LegalDisplay extends DigiriskDocuments
                                     $langs->transnoentities('ResponsibleToNotify') ?? ''
                                 ],
                 'content'    => [
-                                    $document->emergency_service->samu,
-                                    $document->emergency_service->pompier,
-                                    $document->emergency_service->police,
-                                    $document->emergency_service->emergency,
-                                    $document->emergency_service->right_defender,
-                                    $document->emergency_service->poison_control_center,
-                                    $document->emergency_service->safety_rule
+                                    $legalDisplay->emergency_service->samu,
+                                    $legalDisplay->emergency_service->pompier,
+                                    $legalDisplay->emergency_service->police,
+                                    $legalDisplay->emergency_service->emergency,
+                                    $legalDisplay->emergency_service->right_defender,
+                                    $legalDisplay->emergency_service->poison_control_center,
+                                    $legalDisplay->emergency_service->safety_rule
                                 ],
                 'picto'      => 'fas fa-ambulance',
                 'widgetName' => $langs->transnoentities('Emergency')
