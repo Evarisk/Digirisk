@@ -81,7 +81,8 @@ if (($action == 'update' && ! GETPOST("cancel", 'alpha')) || ($action == 'update
 	}
 }
 
-require '../../../saturne/core/tpl/actions/admin_conf_actions.tpl.php';
+// Actions update_mask
+require_once __DIR__ . '/../../../saturne/core/tpl/actions/admin_conf_actions.tpl.php';
 
 if ($action == 'setmod') {
 	$constForVal = 'DIGIRISKDOLIBARR_' . strtoupper($type) . "_ADDON";

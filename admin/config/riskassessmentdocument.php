@@ -67,7 +67,8 @@ saturne_check_access($permissiontoread);
  * Actions
  */
 
-require '../../../saturne/core/tpl/actions/admin_conf_actions.tpl.php';
+// Actions update_mask
+require_once __DIR__ . '/../../../saturne/core/tpl/actions/admin_conf_actions.tpl.php';
 
 if (GETPOST('action') == 'setmod') {
     $value = GETPOST('value');

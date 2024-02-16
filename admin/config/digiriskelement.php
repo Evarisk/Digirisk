@@ -47,6 +47,7 @@ saturne_load_langs(["admin"]);
 $digiriskelement = new DigiriskElement($db);
 
 // Parameters
+$action     = GETPOST('action', 'alpha');
 $backtopage = GETPOST('backtopage', 'alpha');
 
 // Security check - Protection if external user
@@ -57,6 +58,9 @@ saturne_check_access($permissiontoread);
  * Actions
  */
 
+// Actions update_mask
+require_once __DIR__ . '/../../../saturne/core/tpl/actions/admin_conf_actions.tpl.php';
+
 if (GETPOST('action') == 'setmod') {
     $value = GETPOST('value');
     $valueArray = explode('_', $value);
@@ -64,8 +68,6 @@ if (GETPOST('action') == 'setmod') {
 
     dolibarr_set_const($db, 'DIGIRISKDOLIBARR_'. strtoupper($objectType) .'_ADDON', $value, 'chaine', 0, '', $conf->entity);
 }
-
-require '../../../saturne/core/tpl/actions/admin_conf_actions.tpl.php';
 
 /*
  * View
