@@ -249,7 +249,88 @@ class LegalDisplay extends DigiriskDocuments
      */
     public function load_dashboard(): array
     {
+        global $db, $langs;
+
+        $document  = new LegalDisplay($db);
+
         $getLegalDisplayInfos = $this->getLegalDisplayInfos();
+        $document             = json_decode($document->LegalDisplayFillJSON(), false, 512, JSON_UNESCAPED_UNICODE)->LegalDisplay;
+
+        $dashboardData['widgets'] = [
+            'labour_doctor' => [
+                'label'      => [
+                                    $langs->transnoentities('Name') ?? '',
+                                    $langs->transnoentities('Address') ?? '',
+                                    $langs->transnoentities('Town') ?? '',
+                                    $langs->transnoentities('Phone') ?? '',
+                                    $langs->transnoentities('Schedules') ?? '',
+                ],
+                'content'    => [
+                                    $document->occupational_health_service->name,
+                                    $document->occupational_health_service->address,
+                                    $document->occupational_health_service->town,
+                                    $document->occupational_health_service->phone,
+                                    $document->occupational_health_service->openinghours,
+                ],
+                'picto'      => 'fas fa-user-md',
+                'widgetName' => $langs->transnoentities('Society')
+            ],
+            'labour_inspector' => [
+                'label'      => [
+                                    $langs->transnoentities('Name') ?? '',
+                                    $langs->transnoentities('Address') ?? '',
+                                    $langs->transnoentities('Town') ?? '',
+                                    $langs->transnoentities('Phone') ?? '',
+                                    $langs->transnoentities('Schedules') ?? '',
+                ],
+                'content'    => [
+                                    $document->detective_work->name,
+                                    $document->detective_work->address,
+                                    $document->detective_work->town,
+                                    $document->detective_work->phone,
+                                    $document->detective_work->openinghours,
+                ],
+                'picto'      => 'fas fa-briefcase',
+                'widgetName' => $langs->transnoentities('Society')
+            ],
+            'emergency_calls' => [
+                'label'      => [
+                                    $langs->transnoentities('SAMU') ?? '',
+                                    $langs->transnoentities('Pompiers') ?? '',
+                                    $langs->transnoentities('Police') ?? '',
+                                    $langs->transnoentities('AllEmergencies') ?? '',
+                                    $langs->transnoentities('RightsDefender') ?? '',
+                                    $langs->transnoentities('PoisonControlCenter') ?? '',
+                                    $langs->transnoentities('ResponsibleToNotify') ?? ''
+                                ],
+                'content'    => [
+                                    $document->emergency_service->samu,
+                                    $document->emergency_service->pompier,
+                                    $document->emergency_service->police,
+                                    $document->emergency_service->emergency,
+                                    $document->emergency_service->right_defender,
+                                    $document->emergency_service->poison_control_center,
+                                    $document->emergency_service->safety_rule
+                                ],
+                'picto'      => 'fas fa-ambulance',
+                'widgetName' => $langs->transnoentities('Emergency')
+            ],
+            'working_time' => [
+                'label'      => [
+                    $langs->transnoentities('Monday') ?? '',
+                    $langs->transnoentities('Tuesday') ?? '',
+                    $langs->transnoentities('Wednesday') ?? '',
+                    $langs->transnoentities('Thursday') ?? '',
+                    $langs->transnoentities('Friday') ?? '',
+                    $langs->transnoentities('Saturday') ?? '',
+                    $langs->transnoentities('Sunday') ?? ''
+                ],
+                'content'    => [
+                ],
+                'picto'      => 'fas fa-clock',
+                'widgetName' => $langs->transnoentities('Emergency')
+            ],
+        ];
 
         $dashboardData['graphs'] = [$getLegalDisplayInfos];
 
