@@ -61,7 +61,7 @@ saturne_check_access($permissiontoread);
 // Actions update_mask
 require_once __DIR__ . '/../../../saturne/core/tpl/actions/admin_conf_actions.tpl.php';
 
-if (GETPOST('action') == 'setmod') {
+if ($action == 'setmod') {
     $value = GETPOST('value');
     $valueArray = explode('_', $value);
     $objectType = $valueArray[1];
