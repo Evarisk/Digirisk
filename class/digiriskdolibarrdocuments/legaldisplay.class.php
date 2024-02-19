@@ -110,7 +110,7 @@ class LegalDisplay extends DigiriskDocuments
 				$thirdparty_openinghours = new SaturneSchedules($this->db);
 				$thirdparty_openinghours->fetch(0, '', $morewhere);
 
-				$json['LegalDisplay']['detective_work']['openinghours']              = $langs->trans('Monday') . ' : ' . $thirdparty_openinghours->monday . "\r\n" . $langs->trans('Tuesday') . ' : ' . $thirdparty_openinghours->tuesday . "\r\n" . $langs->trans('Wednesday') . ' : ' . $thirdparty_openinghours->wednesday . "\r\n" . $langs->trans('Thursday') . ' : ' . $thirdparty_openinghours->thursday . "\r\n" . $langs->trans('Friday') . ' : ' . $thirdparty_openinghours->friday . "\r\n" . $langs->trans('Saturday') . ' : ' . $thirdparty_openinghours->saturday . "\r\n" . $langs->trans('Sunday') . ' : ' . $thirdparty_openinghours->sunday;
+				$json['LegalDisplay']['detective_work']['openinghours']                       = $langs->trans('Monday') . ' : ' . $thirdparty_openinghours->monday . "\r\n" . $langs->trans('Tuesday') . ' : ' . $thirdparty_openinghours->tuesday . "\r\n" . $langs->trans('Wednesday') . ' : ' . $thirdparty_openinghours->wednesday . "\r\n" . $langs->trans('Thursday') . ' : ' . $thirdparty_openinghours->thursday . "\r\n" . $langs->trans('Friday') . ' : ' . $thirdparty_openinghours->friday . "\r\n" . $langs->trans('Saturday') . ' : ' . $thirdparty_openinghours->saturday . "\r\n" . $langs->trans('Sunday') . ' : ' . $thirdparty_openinghours->sunday;
                 $json['LegalDisplay']['detective_work']['opening_hours_details']['monday']    = $thirdparty_openinghours->monday;
                 $json['LegalDisplay']['detective_work']['opening_hours_details']['tuesday']   = $thirdparty_openinghours->tuesday;
                 $json['LegalDisplay']['detective_work']['opening_hours_details']['wednesday'] = $thirdparty_openinghours->wednesday;
@@ -271,60 +271,118 @@ class LegalDisplay extends DigiriskDocuments
         $dashboardData['widgets'] = [
             'labour_doctor' => [
                 'label'      => [
-                                    $langs->transnoentities('Name') ?? '',
-                                    $langs->transnoentities('Address') ?? '',
-                                    $langs->transnoentities('Town') ?? '',
-                                    $langs->transnoentities('Phone') ?? '',
-                                    $langs->transnoentities('Schedules') ?? '',
+                    $langs->transnoentities('Name') ?? '',
+                    $langs->transnoentities('Address') ?? '',
+                    $langs->transnoentities('Town') ?? '',
+                    $langs->transnoentities('Phone') ?? '',
+                    $langs->transnoentities('Link') ?? '',
                 ],
                 'content'    => [
-                                    $document->occupational_health_service->name,
-                                    $document->occupational_health_service->address,
-                                    $document->occupational_health_service->town,
-                                    $document->occupational_health_service->phone,
-                                    $document->occupational_health_service->openinghours,
+                    dol_strlen($legalDisplay->occupational_health_service->name)         > 0 ? $legalDisplay->occupational_health_service->name         : $langs->trans('NoData'),
+                    dol_strlen($legalDisplay->occupational_health_service->address)      > 0 ? $legalDisplay->occupational_health_service->address      : $langs->trans('NoData'),
+                    dol_strlen($legalDisplay->occupational_health_service->town)         > 0 ? $legalDisplay->occupational_health_service->town         : $langs->trans('NoData'),
+                    dol_strlen($legalDisplay->occupational_health_service->phone)        > 0 ? $legalDisplay->occupational_health_service->phone        : $langs->trans('NoData'),
+                    '<a href="../../admin/securityconf.php" target="_blank">' . $langs->trans('ConfigureSecurityAndSocialData') . ' <i class="fas fa-external-link-alt"></i></a>',
                 ],
                 'picto'      => 'fas fa-user-md',
                 'widgetName' => $langs->transnoentities('Society')
             ],
-            'labour_inspector' => [
+            'labour_doctor_schedules' => [
                 'label'      => [
-                                    $langs->transnoentities('Name') ?? '',
-                                    $langs->transnoentities('Address') ?? '',
-                                    $langs->transnoentities('Town') ?? '',
-                                    $langs->transnoentities('Phone') ?? '',
-                                    $langs->transnoentities('Schedules') ?? '',
+                    $langs->transnoentities('Monday'),
+                    $langs->transnoentities('Tuesday'),
+                    $langs->transnoentities('Wednesday'),
+                    $langs->transnoentities('Thursday'),
+                    $langs->transnoentities('Friday'),
+                    $langs->transnoentities('Saturday'),
+                    $langs->transnoentities('Sunday'),
                 ],
                 'content'    => [
-                                    $legalDisplay->detective_work->name,
-                                    $legalDisplay->detective_work->address,
-                                    $legalDisplay->detective_work->town,
-                                    $legalDisplay->detective_work->phone,
-                                    $legalDisplay->detective_work->openinghours,
+                    dol_strlen($legalDisplay->occupational_health_service->opening_hours_details->monday)    > 0 ? $legalDisplay->occupational_health_service->opening_hours_details->monday    : $langs->trans('NoData'),
+                    dol_strlen($legalDisplay->occupational_health_service->opening_hours_details->tuesday)   > 0 ? $legalDisplay->occupational_health_service->opening_hours_details->tuesday   : $langs->trans('NoData'),
+                    dol_strlen($legalDisplay->occupational_health_service->opening_hours_details->wednesday) > 0 ? $legalDisplay->occupational_health_service->opening_hours_details->wednesday : $langs->trans('NoData'),
+                    dol_strlen($legalDisplay->occupational_health_service->opening_hours_details->thursday)  > 0 ? $legalDisplay->occupational_health_service->opening_hours_details->thursday  : $langs->trans('NoData'),
+                    dol_strlen($legalDisplay->occupational_health_service->opening_hours_details->friday)    > 0 ? $legalDisplay->occupational_health_service->opening_hours_details->friday    : $langs->trans('NoData'),
+                    dol_strlen($legalDisplay->occupational_health_service->opening_hours_details->saturday)  > 0 ? $legalDisplay->occupational_health_service->opening_hours_details->saturday  : $langs->trans('NoData'),
+                    dol_strlen($legalDisplay->occupational_health_service->opening_hours_details->sunday)    > 0 ? $legalDisplay->occupational_health_service->opening_hours_details->sunday    : $langs->trans('NoData')
+
+                ],
+                'picto'      => 'fas fa-clock',
+                'widgetName' => $langs->transnoentities('Society')
+            ],
+            'labour_inspector' => [
+                'label'      => [
+                    $langs->transnoentities('Name') ?? '',
+                    $langs->transnoentities('Address') ?? '',
+                    $langs->transnoentities('Town') ?? '',
+                    $langs->transnoentities('Phone') ?? '',
+                    $langs->transnoentities('Link') ?? '',
+                ],
+                'content'    => [
+                    dol_strlen($legalDisplay->detective_work->name)         > 0 ? $legalDisplay->detective_work->name         : $langs->trans('NoData'),
+                    dol_strlen($legalDisplay->detective_work->address)      > 0 ? $legalDisplay->detective_work->address      : $langs->trans('NoData'),
+                    dol_strlen($legalDisplay->detective_work->town)         > 0 ? $legalDisplay->detective_work->address      : $langs->trans('NoData'),
+                    dol_strlen($legalDisplay->detective_work->phone)        > 0 ? $legalDisplay->detective_work->phone        : $langs->trans('NoData'),
+                    '<a href="../../admin/securityconf.php" target="_blank">' . $langs->trans('ConfigureSecurityAndSocialData') . ' <i class="fas fa-external-link-alt"></i></a>'
                 ],
                 'picto'      => 'fas fa-briefcase',
                 'widgetName' => $langs->transnoentities('Society')
             ],
+            'detective_work_schedules' => [
+                'label'      => [
+                    $langs->transnoentities('Monday'),
+                    $langs->transnoentities('Tuesday'),
+                    $langs->transnoentities('Wednesday'),
+                    $langs->transnoentities('Thursday'),
+                    $langs->transnoentities('Friday'),
+                    $langs->transnoentities('Saturday'),
+                    $langs->transnoentities('Sunday'),
+                ],
+                'content'    => [
+                    dol_strlen($legalDisplay->detective_work->opening_hours_details->monday)    > 0 ? $legalDisplay->detective_work->opening_hours_details->monday    : $langs->trans('NoData'),
+                    dol_strlen($legalDisplay->detective_work->opening_hours_details->tuesday)   > 0 ? $legalDisplay->detective_work->opening_hours_details->tuesday   : $langs->trans('NoData'),
+                    dol_strlen($legalDisplay->detective_work->opening_hours_details->wednesday) > 0 ? $legalDisplay->detective_work->opening_hours_details->wednesday : $langs->trans('NoData'),
+                    dol_strlen($legalDisplay->detective_work->opening_hours_details->thursday)  > 0 ? $legalDisplay->detective_work->opening_hours_details->thursday  : $langs->trans('NoData'),
+                    dol_strlen($legalDisplay->detective_work->opening_hours_details->friday)    > 0 ? $legalDisplay->detective_work->opening_hours_details->friday    : $langs->trans('NoData'),
+                    dol_strlen($legalDisplay->detective_work->opening_hours_details->saturday)  > 0 ? $legalDisplay->detective_work->opening_hours_details->saturday  : $langs->trans('NoData'),
+                    dol_strlen($legalDisplay->detective_work->opening_hours_details->sunday)    > 0 ? $legalDisplay->detective_work->opening_hours_details->sunday    : $langs->trans('NoData')
+
+                ],
+                'picto'      => 'fas fa-clock',
+                'widgetName' => $langs->transnoentities('Society')
+            ],
             'emergency_calls' => [
                 'label'      => [
-                                    $langs->transnoentities('SAMU') ?? '',
-                                    $langs->transnoentities('Pompiers') ?? '',
-                                    $langs->transnoentities('Police') ?? '',
-                                    $langs->transnoentities('AllEmergencies') ?? '',
-                                    $langs->transnoentities('RightsDefender') ?? '',
-                                    $langs->transnoentities('PoisonControlCenter') ?? '',
-                                    $langs->transnoentities('ResponsibleToNotify') ?? ''
-                                ],
+                    $langs->transnoentities('SAMU') ?? '',
+                    $langs->transnoentities('Pompiers') ?? '',
+                    $langs->transnoentities('Police') ?? '',
+                    $langs->transnoentities('AllEmergencies') ?? '',
+                    $langs->transnoentities('RightsDefender') ?? '',
+                    $langs->transnoentities('PoisonControlCenter') ?? '',
+                ],
                 'content'    => [
-                                    $legalDisplay->emergency_service->samu,
-                                    $legalDisplay->emergency_service->pompier,
-                                    $legalDisplay->emergency_service->police,
-                                    $legalDisplay->emergency_service->emergency,
-                                    $legalDisplay->emergency_service->right_defender,
-                                    $legalDisplay->emergency_service->poison_control_center,
-                                    $legalDisplay->emergency_service->safety_rule
-                                ],
+                    dol_strlen($legalDisplay->emergency_service->samu)                  > 0 ? $legalDisplay->emergency_service->samu                  : $langs->trans('NoData'),
+                    dol_strlen($legalDisplay->emergency_service->pompier)               > 0 ? $legalDisplay->emergency_service->pompier               : $langs->trans('NoData'),
+                    dol_strlen($legalDisplay->emergency_service->police)                > 0 ? $legalDisplay->emergency_service->police                : $langs->trans('NoData'),
+                    dol_strlen($legalDisplay->emergency_service->emergency)             > 0 ? $legalDisplay->emergency_service->emergency             : $langs->trans('NoData'),
+                    dol_strlen($legalDisplay->emergency_service->right_defender)        > 0 ? $legalDisplay->emergency_service->right_defender        : $langs->trans('NoData'),
+                    dol_strlen($legalDisplay->emergency_service->poison_control_center) > 0 ? $legalDisplay->emergency_service->poison_control_center : $langs->trans('NoData')
+                ],
                 'picto'      => 'fas fa-ambulance',
+                'widgetName' => $langs->transnoentities('Emergency')
+            ],
+            'safety_rule' => [
+                'label'      => [
+                    $langs->transnoentities('ResponsibleToNotify') ?? '',
+                    $langs->transnoentities('Phone') ?? '',
+                    $langs->transnoentities('Location') ?? ''
+                ],
+                'content'    => [
+                    dol_strlen($legalDisplay->emergency_service->safety_rule->responsible_for_preventing) > 0 ? $legalDisplay->emergency_service->safety_rule->responsible_for_preventing : $langs->trans('NoData'),
+                    dol_strlen($legalDisplay->emergency_service->safety_rule->phone) > 0 ? $legalDisplay->emergency_service->safety_rule->phone : $langs->trans('NoData'),
+                    dol_strlen($legalDisplay->emergency_service->safety_rule->location_of_detailed_instruction) > 0 ? $legalDisplay->emergency_service->safety_rule->location_of_detailed_instruction : $langs->trans('NoData')
+                ],
+                'picto'      => 'fas fa-user-tie',
                 'widgetName' => $langs->transnoentities('Emergency')
             ],
             'working_time' => [
@@ -338,8 +396,52 @@ class LegalDisplay extends DigiriskDocuments
                     $langs->transnoentities('Sunday') ?? ''
                 ],
                 'content'    => [
+                    (dol_strlen($legalDisplay->working_hour->monday_morning)    > 0 or dol_strlen($legalDisplay->working_hour->monday_afternoon)    > 0) ? $legalDisplay->working_hour->monday_morning    . ' - ' . $legalDisplay->working_hour->monday_afternoon    : $langs->trans('NoData'),
+                    (dol_strlen($legalDisplay->working_hour->tuesday_morning)   > 0 or dol_strlen($legalDisplay->working_hour->tuesday_afternoon)   > 0) ? $legalDisplay->working_hour->tuesday_morning   . ' - ' . $legalDisplay->working_hour->tuesday_afternoon   : $langs->trans('NoData'),
+                    (dol_strlen($legalDisplay->working_hour->wednesday_morning) > 0 or dol_strlen($legalDisplay->working_hour->wednesday_afternoon) > 0) ? $legalDisplay->working_hour->wednesday_morning . ' - ' . $legalDisplay->working_hour->wednesday_afternoon : $langs->trans('NoData'),
+                    (dol_strlen($legalDisplay->working_hour->thursday_morning)  > 0 or dol_strlen($legalDisplay->working_hour->thursday_afternoon)  > 0) ? $legalDisplay->working_hour->thursday_morning  . ' - ' . $legalDisplay->working_hour->thursday_afternoon  : $langs->trans('NoData'),
+                    (dol_strlen($legalDisplay->working_hour->friday_morning)    > 0 or dol_strlen($legalDisplay->working_hour->friday_afternoon)    > 0) ? $legalDisplay->working_hour->friday_morning    . ' - ' . $legalDisplay->working_hour->friday_afternoon    : $langs->trans('NoData'),
+                    (dol_strlen($legalDisplay->working_hour->saturday_morning)  > 0 or dol_strlen($legalDisplay->working_hour->saturday_afternoon)  > 0) ? $legalDisplay->working_hour->saturday_morning  . ' - ' . $legalDisplay->working_hour->saturday_afternoon  : $langs->trans('NoData'),
+                    (dol_strlen($legalDisplay->working_hour->sunday_morning)    > 0 or dol_strlen($legalDisplay->working_hour->sunday_afternoon)    > 0) ? $legalDisplay->working_hour->sunday_morning    . ' - ' . $legalDisplay->working_hour->sunday_afternoon    : $langs->trans('NoData'),
                 ],
                 'picto'      => 'fas fa-clock',
+                'widgetName' => $langs->transnoentities('Emergency')
+            ],
+            'informations' => [
+                'label'      => [
+                    $langs->transnoentities('derogation_schedule') ?? '',
+                    $langs->transnoentities('derogation_schedule') ?? '',
+
+                ],
+                'content'    => [
+                    dol_strlen($legalDisplay->derogation_schedule->permanent) > 0 ? $legalDisplay->derogation_schedule->permanent : $langs->trans('NoData'),
+                    dol_strlen($legalDisplay->derogation_schedule->occasional) > 0 ? $legalDisplay->derogation_schedule->occasional : $langs->trans('NoData'),
+                ],
+                'picto'      => 'fas fa-info',
+                'widgetName' => $langs->transnoentities('Emergency')
+            ],
+            'DUER' => [
+                'label'      => [
+                    $langs->transnoentities('Convention') ?? '',
+                    $langs->transnoentities('Duer') ?? '',
+
+                ],
+                'content'    => [
+                    dol_strlen($legalDisplay->collective_agreement->location_and_access_terms_of_the_agreement) > 0 ? $legalDisplay->collective_agreement->location_and_access_terms_of_the_agreement : $langs->trans('NoData'),
+                    dol_strlen($legalDisplay->DUER->how_access_to_duer) > 0 ? $legalDisplay->DUER->how_access_to_duer : $langs->trans('NoData'),
+                ],
+                'picto'      => 'fas fa-info',
+                'widgetName' => $langs->transnoentities('Emergency')
+            ],
+            'participation' => [
+                'label'      => [
+                    $langs->transnoentities('participation') ?? '',
+
+                ],
+                'content'    => [
+                    dol_strlen($legalDisplay->participation_agreement->information_procedures) > 0 ? $legalDisplay->participation_agreement->information_procedures : $langs->trans('NoData')
+                ],
+                'picto'      => 'fas fa-info',
                 'widgetName' => $langs->transnoentities('Emergency')
             ],
         ];
