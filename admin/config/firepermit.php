@@ -80,20 +80,8 @@ if (($action == 'update' && ! GETPOST("cancel", 'alpha')) || ($action == 'update
 	}
 }
 
-if ($action == 'updateMask') {
-	$firePermitMaskConst = GETPOST('maskconstfirepermit', 'alpha');
-	$firePermitMask      = GETPOST('maskfirepermit', 'alpha');
-
-	if ($firePermitMaskConst) $res = dolibarr_set_const($db, $firePermitMaskConst, $firePermitMask, 'chaine', 0, '', $conf->entity);
-
-	if ( ! $res > 0) $error++;
-
-	if ( ! $error) {
-		setEventMessages($langs->trans("SetupSaved"), null);
-	} else {
-		setEventMessages($langs->trans("Error"), null, 'errors');
-	}
-}
+// Actions update_mask
+require_once __DIR__ . '/../../../saturne/core/tpl/actions/admin_conf_actions.tpl.php';
 
 if ($action == 'setmod') {
 	$constforval = 'DIGIRISKDOLIBARR_' . strtoupper($type) . "_ADDON";
