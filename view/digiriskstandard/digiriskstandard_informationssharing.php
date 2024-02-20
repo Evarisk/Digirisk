@@ -119,22 +119,9 @@ $moduleNameLowerCase = 'mycompany';
 saturne_banner_tab($object,'ref','none', 0, 'ref', 'ref', $moreHtmlRef, true);
 $moduleNameLowerCase = 'digiriskdolibarr';
 
-print '<a href="../../admin/socialconf.php" target="_blank">' . $langs->trans('ConfigureSecurityAndSocialData') . ' <i class="fas fa-external-link-alt"></i></a>';
-print '<hr>';
 print '<div class="fichecenter">';
-print '<div class="fichehalfleft">';
-print '<table class="border centpercent tableforfield">' . "\n";
-
-//JSON Decode and show fields
-require_once __DIR__ . '/../../core/tpl/digiriskdocuments/digiriskdolibarr_informationssharingfields_view.tpl.php';
-
-print '</table>';
-print '</div>';
-print '<div class="fichehalfright">';
-
 $moreParams = ['loadInformationsSharing' => 1];
 $dashboard->show_dashboard($moreParams);
-print '</div>';
 print '</div>';
 
 print dol_get_fiche_end();

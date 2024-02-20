@@ -265,25 +265,25 @@ class LegalDisplay extends DigiriskDocuments
     {
         global $langs;
 
-        $getLegalDisplayInfos = $this->getLegalDisplayInfos();
-        $legalDisplay         = json_decode($this->LegalDisplayFillJSON(), false, 512, JSON_UNESCAPED_UNICODE)->LegalDisplay;
+        $legalDisplay = json_decode($this->LegalDisplayFillJSON(), false, 512, JSON_UNESCAPED_UNICODE)->LegalDisplay;
 
         $dashboardData['widgets'] = [
             'labour_doctor' => [
                 'label'      => [
                     $langs->transnoentities('Name') ?? '',
+                    $langs->transnoentities('Zip') ?? '',
                     $langs->transnoentities('Address') ?? '',
                     $langs->transnoentities('Town') ?? '',
                     $langs->transnoentities('Phone') ?? '',
-                    $langs->transnoentities('Link') ?? '',
                 ],
                 'content'    => [
-                    dol_strlen($legalDisplay->occupational_health_service->name)         > 0 ? $legalDisplay->occupational_health_service->name         : $langs->trans('NoData'),
-                    dol_strlen($legalDisplay->occupational_health_service->address)      > 0 ? $legalDisplay->occupational_health_service->address      : $langs->trans('NoData'),
-                    dol_strlen($legalDisplay->occupational_health_service->town)         > 0 ? $legalDisplay->occupational_health_service->town         : $langs->trans('NoData'),
-                    dol_strlen($legalDisplay->occupational_health_service->phone)        > 0 ? $legalDisplay->occupational_health_service->phone        : $langs->trans('NoData'),
-                    '<a href="../../admin/securityconf.php" target="_blank">' . $langs->trans('ConfigureSecurityAndSocialData') . ' <i class="fas fa-external-link-alt"></i></a>',
+                    dol_strlen($legalDisplay->occupational_health_service->name)    > 0 ? $legalDisplay->occupational_health_service->name    : $langs->trans('NoData'),
+                    dol_strlen($legalDisplay->occupational_health_service->zip)     > 0 ? $legalDisplay->occupational_health_service->zip     : $langs->trans('NoData'),
+                    dol_strlen($legalDisplay->occupational_health_service->address) > 0 ? $legalDisplay->occupational_health_service->address : $langs->trans('NoData'),
+                    dol_strlen($legalDisplay->occupational_health_service->town)    > 0 ? $legalDisplay->occupational_health_service->town    : $langs->trans('NoData'),
+                    dol_strlen($legalDisplay->occupational_health_service->phone)   > 0 ? $legalDisplay->occupational_health_service->phone   : $langs->trans('NoData'),
                 ],
+                'link'       => '<a href="../../admin/securityconf.php" target="_blank">' . $langs->trans('ConfigureSecurityAndSocialData') . ' <i class="fas fa-external-link-alt"></i></a>',
                 'picto'      => 'fas fa-user-md',
                 'widgetName' => $langs->transnoentities('Society')
             ],
@@ -307,24 +307,27 @@ class LegalDisplay extends DigiriskDocuments
                     dol_strlen($legalDisplay->occupational_health_service->opening_hours_details->sunday)    > 0 ? $legalDisplay->occupational_health_service->opening_hours_details->sunday    : $langs->trans('NoData')
 
                 ],
+                'link'       => '<a href="' . dol_buildpath('saturne/view/saturne_schedules.php?id=' . $legalDisplay->occupational_health_service->id . '&element_type=societe&module_name=societe', 1) .'" target="_blank">' . $langs->trans('ConfigureSecurityAndSocialData') . ' <i class="fas fa-external-link-alt"></i></a>',
                 'picto'      => 'fas fa-clock',
                 'widgetName' => $langs->transnoentities('Society')
             ],
             'labour_inspector' => [
                 'label'      => [
                     $langs->transnoentities('Name') ?? '',
+                    $langs->transnoentities('Zip') ?? '',
                     $langs->transnoentities('Address') ?? '',
                     $langs->transnoentities('Town') ?? '',
                     $langs->transnoentities('Phone') ?? '',
                     $langs->transnoentities('Link') ?? '',
                 ],
                 'content'    => [
-                    dol_strlen($legalDisplay->detective_work->name)         > 0 ? $legalDisplay->detective_work->name         : $langs->trans('NoData'),
-                    dol_strlen($legalDisplay->detective_work->address)      > 0 ? $legalDisplay->detective_work->address      : $langs->trans('NoData'),
-                    dol_strlen($legalDisplay->detective_work->town)         > 0 ? $legalDisplay->detective_work->address      : $langs->trans('NoData'),
-                    dol_strlen($legalDisplay->detective_work->phone)        > 0 ? $legalDisplay->detective_work->phone        : $langs->trans('NoData'),
-                    '<a href="../../admin/securityconf.php" target="_blank">' . $langs->trans('ConfigureSecurityAndSocialData') . ' <i class="fas fa-external-link-alt"></i></a>'
+                    dol_strlen($legalDisplay->detective_work->name)    > 0 ? $legalDisplay->detective_work->name    : $langs->trans('NoData'),
+                    dol_strlen($legalDisplay->detective_work->zip)     > 0 ? $legalDisplay->detective_work->zip     : $langs->trans('NoData'),
+                    dol_strlen($legalDisplay->detective_work->address) > 0 ? $legalDisplay->detective_work->address : $langs->trans('NoData'),
+                    dol_strlen($legalDisplay->detective_work->town)    > 0 ? $legalDisplay->detective_work->address : $langs->trans('NoData'),
+                    dol_strlen($legalDisplay->detective_work->phone)   > 0 ? $legalDisplay->detective_work->phone   : $langs->trans('NoData'),
                 ],
+                'link'       => '<a href="../../admin/securityconf.php" target="_blank">' . $langs->trans('ConfigureSecurityAndSocialData') . ' <i class="fas fa-external-link-alt"></i></a>',
                 'picto'      => 'fas fa-briefcase',
                 'widgetName' => $langs->transnoentities('Society')
             ],
@@ -348,6 +351,7 @@ class LegalDisplay extends DigiriskDocuments
                     dol_strlen($legalDisplay->detective_work->opening_hours_details->sunday)    > 0 ? $legalDisplay->detective_work->opening_hours_details->sunday    : $langs->trans('NoData')
 
                 ],
+                'link'       => '<a href="' . dol_buildpath('saturne/view/saturne_schedules.php?id=' . $legalDisplay->detective_work->id . '&element_type=societe&module_name=societe', 1) .'"" target="_blank">' . $langs->trans('ConfigureSecurityAndSocialData') . ' <i class="fas fa-external-link-alt"></i></a>',
                 'picto'      => 'fas fa-clock',
                 'widgetName' => $langs->transnoentities('Society')
             ],
@@ -368,6 +372,7 @@ class LegalDisplay extends DigiriskDocuments
                     dol_strlen($legalDisplay->emergency_service->right_defender)        > 0 ? $legalDisplay->emergency_service->right_defender        : $langs->trans('NoData'),
                     dol_strlen($legalDisplay->emergency_service->poison_control_center) > 0 ? $legalDisplay->emergency_service->poison_control_center : $langs->trans('NoData')
                 ],
+                'link'       => '<a href="../../admin/securityconf.php" target="_blank">' . $langs->trans('ConfigureSecurityAndSocialData') . ' <i class="fas fa-external-link-alt"></i></a>',
                 'picto'      => 'fas fa-ambulance',
                 'widgetName' => $langs->transnoentities('Emergency')
             ],
@@ -378,10 +383,11 @@ class LegalDisplay extends DigiriskDocuments
                     $langs->transnoentities('Location') ?? ''
                 ],
                 'content'    => [
-                    dol_strlen($legalDisplay->emergency_service->safety_rule->responsible_for_preventing) > 0 ? $legalDisplay->emergency_service->safety_rule->responsible_for_preventing : $langs->trans('NoData'),
-                    dol_strlen($legalDisplay->emergency_service->safety_rule->phone) > 0 ? $legalDisplay->emergency_service->safety_rule->phone : $langs->trans('NoData'),
+                    dol_strlen($legalDisplay->emergency_service->safety_rule->responsible_for_preventing)       > 0 ? $legalDisplay->emergency_service->safety_rule->responsible_for_preventing       : $langs->trans('NoData'),
+                    dol_strlen($legalDisplay->emergency_service->safety_rule->phone)                            > 0 ? $legalDisplay->emergency_service->safety_rule->phone                            : $langs->trans('NoData'),
                     dol_strlen($legalDisplay->emergency_service->safety_rule->location_of_detailed_instruction) > 0 ? $legalDisplay->emergency_service->safety_rule->location_of_detailed_instruction : $langs->trans('NoData')
                 ],
+                'link'       => '<a href="../../admin/securityconf.php" target="_blank">' . $langs->trans('ConfigureSecurityAndSocialData') . ' <i class="fas fa-external-link-alt"></i></a>',
                 'picto'      => 'fas fa-user-tie',
                 'widgetName' => $langs->transnoentities('Emergency')
             ],
@@ -404,122 +410,31 @@ class LegalDisplay extends DigiriskDocuments
                     (dol_strlen($legalDisplay->working_hour->saturday_morning)  > 0 or dol_strlen($legalDisplay->working_hour->saturday_afternoon)  > 0) ? $legalDisplay->working_hour->saturday_morning  . ' - ' . $legalDisplay->working_hour->saturday_afternoon  : $langs->trans('NoData'),
                     (dol_strlen($legalDisplay->working_hour->sunday_morning)    > 0 or dol_strlen($legalDisplay->working_hour->sunday_afternoon)    > 0) ? $legalDisplay->working_hour->sunday_morning    . ' - ' . $legalDisplay->working_hour->sunday_afternoon    : $langs->trans('NoData'),
                 ],
+                'link'       => '<a href="' . dol_buildpath('../admin/openinghours.php', 1) .'"" target="_blank">' . $langs->trans('ConfigureSecurityAndSocialData') . ' <i class="fas fa-external-link-alt"></i></a>',
                 'picto'      => 'fas fa-clock',
                 'widgetName' => $langs->transnoentities('Emergency')
             ],
-            'informations' => [
+            'information' => [
                 'label'      => [
-                    $langs->transnoentities('derogation_schedule') ?? '',
-                    $langs->transnoentities('derogation_schedule') ?? '',
-
-                ],
-                'content'    => [
-                    dol_strlen($legalDisplay->derogation_schedule->permanent) > 0 ? $legalDisplay->derogation_schedule->permanent : $langs->trans('NoData'),
-                    dol_strlen($legalDisplay->derogation_schedule->occasional) > 0 ? $legalDisplay->derogation_schedule->occasional : $langs->trans('NoData'),
-                ],
-                'picto'      => 'fas fa-info',
-                'widgetName' => $langs->transnoentities('Emergency')
-            ],
-            'DUER' => [
-                'label'      => [
+                    $langs->transnoentities('DerogationSchedulePermanent') ?? '',
+                    $langs->transnoentities('DerogationScheduleOcassional') ?? '',
+                    $langs->transnoentities('DUER') ?? '',
+                    $langs->transnoentities('ParticipationAgreement') ?? '',
                     $langs->transnoentities('Convention') ?? '',
-                    $langs->transnoentities('Duer') ?? '',
-
                 ],
                 'content'    => [
-                    dol_strlen($legalDisplay->collective_agreement->location_and_access_terms_of_the_agreement) > 0 ? $legalDisplay->collective_agreement->location_and_access_terms_of_the_agreement : $langs->trans('NoData'),
-                    dol_strlen($legalDisplay->DUER->how_access_to_duer) > 0 ? $legalDisplay->DUER->how_access_to_duer : $langs->trans('NoData'),
+                    dol_strlen($legalDisplay->derogation_schedule->permanent)                                   > 0 ? '<i class="fas fa-check"></i>' : '<i class="fas fa-times"></i>',
+                    dol_strlen($legalDisplay->derogation_schedule->occasional)                                  > 0 ? '<i class="fas fa-check"></i>' : '<i class="fas fa-times"></i>',
+                    dol_strlen($legalDisplay->DUER->how_access_to_duer)                                         > 0 ? '<i class="fas fa-check"></i>' : '<i class="fas fa-times"></i>',
+                    dol_strlen($legalDisplay->participation_agreement->information_procedures)                  > 0 ? '<i class="fas fa-check"></i>' : '<i class="fas fa-times"></i>',
+                    dol_strlen($legalDisplay->collective_agreement->location_and_access_terms_of_the_agreement) > 0 ? '<i class="fas fa-check"></i>' : '<i class="fas fa-times"></i>',
                 ],
-                'picto'      => 'fas fa-info',
-                'widgetName' => $langs->transnoentities('Emergency')
-            ],
-            'participation' => [
-                'label'      => [
-                    $langs->transnoentities('participation') ?? '',
-
-                ],
-                'content'    => [
-                    dol_strlen($legalDisplay->participation_agreement->information_procedures) > 0 ? $legalDisplay->participation_agreement->information_procedures : $langs->trans('NoData')
-                ],
+                'link'       => '<a href="../../admin/securityconf.php" target="_blank">' . $langs->trans('ConfigureSecurityAndSocialData') . ' <i class="fas fa-external-link-alt"></i></a>',
                 'picto'      => 'fas fa-info',
                 'widgetName' => $langs->transnoentities('Emergency')
             ],
         ];
-
-        $dashboardData['graphs'] = [$getLegalDisplayInfos];
 
         return $dashboardData;
-    }
-
-    /**
-     * Get legal display infos
-     *
-     * @return array     $array Return legal display graph infos
-     * @throws Exception
-     */
-    public function getLegalDisplayInfos(): array
-    {
-        global $langs;
-
-        // Graph Title parameters
-        $array['title'] = $langs->transnoentities('DocumentCompletionRate');
-        $array['picto'] = $this->picto;
-
-        // Graph parameters
-        $array['width']      = '100%';
-        $array['height']     = 300;
-        $array['type']       = 'pie';
-        $array['showlegend'] = 2;
-        $array['dataset']    = 1;
-
-        $legalDisplayGraphInfos = $this->getLegalDisplayNumber();
-        $array['labels'] = [
-            0 => [
-                'label' => price2num($legalDisplayGraphInfos['counter'] / $legalDisplayGraphInfos['maxNumber'] * 100, 'MT') . ' %',
-                'color' => '#0d8affcc'
-            ],
-            1 => [
-                'label' => price2num(($legalDisplayGraphInfos['maxNumber'] - $legalDisplayGraphInfos['counter']) * 100 / $legalDisplayGraphInfos['maxNumber'], 'MT') . ' %',
-                'color' => '#6c6c6c66'
-            ]
-        ];
-
-        $array['data'] = [$legalDisplayGraphInfos['counter'], $legalDisplayGraphInfos['maxNumber'] - $legalDisplayGraphInfos['counter']];
-
-        return $array;
-    }
-
-    /**
-     * Get legal display numbers
-     *
-     * @return array     $array Return counter and maxNumber
-     * @throws Exception
-     */
-    public function getLegalDisplayNumber(): array
-    {
-        global $conf;
-
-        $resources = new DigiriskResources($this->db);
-
-        $counter           = 0;
-        $securityResources = ['SAMU','Pompiers','Police','AllEmergencies','RightsDefender','PoisonControlCenter', 'Responsible', 'LabourDoctorSociety', 'LabourDoctorContact', 'LabourInspectorSociety', 'LabourInspectorContact'];
-        $securityConsts    = ['DIGIRISKDOLIBARR_LOCATION_OF_DETAILED_INSTRUCTION', 'DIGIRISKDOLIBARR_SOCIETY_DESCRIPTION', 'DIGIRISKDOLIBARR_GENERAL_MEANS', 'DIGIRISKDOLIBARR_GENERAL_RULES', 'DIGIRISKDOLIBARR_FIRST_AID', 'DIGIRISKDOLIBARR_RULES_LOCATION', 'DIGIRISKDOLIBARR_DUER_LOCATION', 'DIGIRISKDOLIBARR_COLLECTIVE_AGREEMENT_LOCATION'];
-        $allLinks          = $resources->fetchDigiriskResources();
-
-        $maxNumber = count($securityResources) + count($securityConsts);
-        foreach ($securityConsts as $securityConst) {
-            if (dol_strlen($conf->global->$securityConst) > 0) {
-                $counter += 1;
-            }
-        }
-        foreach ($securityResources as $securityResource) {
-            if (!empty($allLinks[$securityResource] && $allLinks[$securityResource]->id[0] > 0)) {
-                $counter += 1;
-            }
-        }
-
-        $array = ['counter' => $counter, 'maxNumber' => $maxNumber];
-
-        return $array;
     }
 }

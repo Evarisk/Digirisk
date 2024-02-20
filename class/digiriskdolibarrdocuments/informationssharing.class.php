@@ -63,7 +63,7 @@ class InformationsSharing extends DigiriskDocuments
 	 */
 	public function InformationsSharingFillJSON()
 	{
-		global $conf;
+		global $conf, $langs;
 
 		$resources 			= new DigiriskResources($this->db);
 		$digirisk_resources = $resources->fetchDigiriskResources();
@@ -74,37 +74,41 @@ class InformationsSharing extends DigiriskDocuments
 			$labour_doctor_contact = new Contact($this->db);
 			$result = $labour_doctor_contact->fetch($digirisk_resources['LabourDoctorContact']->id[0]);
 			if ($result > 0) {
-				$json['InformationsSharing']['occupational_health_service']['id']    = $labour_doctor_contact->id;
-				$json['InformationsSharing']['occupational_health_service']['name']  = $labour_doctor_contact->firstname . " " . $labour_doctor_contact->lastname;
-				$json['InformationsSharing']['occupational_health_service']['phone'] = $labour_doctor_contact->phone_pro;
+				$json['InformationsSharing']['occupational_health_service']['id']       = $labour_doctor_contact->id;
+				$json['InformationsSharing']['occupational_health_service']['name']     = $labour_doctor_contact->firstname . " " . $labour_doctor_contact->lastname;
+				$json['InformationsSharing']['occupational_health_service']['phone']    = $labour_doctor_contact->phone_pro;
+                $json['InformationsSharing']['occupational_health_service']['fullname'] = $labour_doctor_contact->getNomUrl(1);
 			}
 
 			$labourInspectorContact = new Contact($this->db);
 			$result = $labourInspectorContact->fetch($digirisk_resources['LabourInspectorContact']->id[0]);
 
 			if ($result > 0) {
-				$json['InformationsSharing']['detective_work']['id']    = $labourInspectorContact->id;
-				$json['InformationsSharing']['detective_work']['name']  = $labourInspectorContact->firstname . " " . $labourInspectorContact->lastname;
-				$json['InformationsSharing']['detective_work']['phone'] = $labourInspectorContact->phone_pro;
+				$json['InformationsSharing']['detective_work']['id']       = $labourInspectorContact->id;
+				$json['InformationsSharing']['detective_work']['name']     = $labourInspectorContact->firstname . " " . $labourInspectorContact->lastname;
+				$json['InformationsSharing']['detective_work']['phone']    = $labourInspectorContact->phone_pro;
+                $json['InformationsSharing']['detective_work']['fullname'] = $labourInspectorContact->getNomUrl(1);
 			}
 
 			$harassment_officer = new User($this->db);
 			$result = $harassment_officer->fetch($digirisk_resources['HarassmentOfficer']->id[0]);
 
 			if ($result > 0) {
-				$json['InformationsSharing']['harassment_officer']['id']    = $harassment_officer->id;
-				$json['InformationsSharing']['harassment_officer']['name']  = $harassment_officer->getFullName($langs);
-				$json['InformationsSharing']['harassment_officer']['phone'] = $harassment_officer->office_phone;
+				$json['InformationsSharing']['harassment_officer']['id']       = $harassment_officer->id;
+				$json['InformationsSharing']['harassment_officer']['name']     = $harassment_officer->getFullName($langs);
+				$json['InformationsSharing']['harassment_officer']['phone']    = $harassment_officer->office_phone;
+                $json['InformationsSharing']['harassment_officer']['fullname'] = $harassment_officer->getNomUrl(0);
 			}
 
 			$harassment_officer_cse = new User($this->db);
 			$result = $harassment_officer_cse->fetch($digirisk_resources['HarassmentOfficerCSE']->id[0]);
 
 			if ($result > 0) {
-				$json['InformationsSharing']['harassment_officer_cse']['id']    = $harassment_officer_cse->id;
-				$json['InformationsSharing']['harassment_officer_cse']['name']  = $harassment_officer_cse->getFullName($langs);
-				$json['InformationsSharing']['harassment_officer_cse']['phone'] = $harassment_officer_cse->office_phone;
-			}
+				$json['InformationsSharing']['harassment_officer_cse']['id']       = $harassment_officer_cse->id;
+				$json['InformationsSharing']['harassment_officer_cse']['name']     = $harassment_officer_cse->getFullName($langs);
+				$json['InformationsSharing']['harassment_officer_cse']['phone']    = $harassment_officer_cse->office_phone;
+                $json['InformationsSharing']['harassment_officer_cse']['fullname'] = $harassment_officer->getNomUrl(0);
+            }
 
 			$json['InformationsSharing']['delegues_du_personnels_date']    	  = (dol_strlen($conf->global->DIGIRISKDOLIBARR_DP_ELECTION_DATE) > 0 && $conf->global->DIGIRISKDOLIBARR_DP_ELECTION_DATE != '--' ? $conf->global->DIGIRISKDOLIBARR_DP_ELECTION_DATE : '');
 			$json['InformationsSharing']['delegues_du_personnels_titulaires'] = '';
@@ -114,8 +118,8 @@ class InformationsSharing extends DigiriskDocuments
 					$dp_titulars = new User($this->db);
 					$result = $dp_titulars->fetch($dp_titular);
 					if ($result > 0) {
-						$json['InformationsSharing']['delegues_du_personnels_titulaires']  .= $dp_titulars->firstname . " " . $dp_titulars->lastname . '<br>';
-						$json['InformationsSharing']['delegues_du_personnels_titulairesFullName']  .= $dp_titulars->getNomUrl(1) . '<br>';
+						$json['InformationsSharing']['delegues_du_personnels_titulaires']  .= $dp_titulars->firstname . " " . $dp_titulars->lastname;
+						$json['InformationsSharing']['delegues_du_personnels_titulairesFullName']  .= $dp_titulars->getNomUrl(1);
 					}
 				}
 			}
@@ -127,8 +131,8 @@ class InformationsSharing extends DigiriskDocuments
 					$dp_alternates = new User($this->db);
 					$result = $dp_alternates->fetch($dp_alternate);
 					if ($result > 0) {
-						$json['InformationsSharing']['delegues_du_personnels_suppleants']  .= $dp_alternates->firstname . " " . $dp_alternates->lastname . '<br>';
-						$json['InformationsSharing']['delegues_du_personnels_suppleantsFullName']  .= $dp_alternates->getNomUrl(1) . '<br>';
+						$json['InformationsSharing']['delegues_du_personnels_suppleants']  .= $dp_alternates->firstname . " " . $dp_alternates->lastname;
+						$json['InformationsSharing']['delegues_du_personnels_suppleantsFullName']  .= $dp_alternates->getNomUrl(1);
 					}
 				}
 			}
@@ -141,8 +145,8 @@ class InformationsSharing extends DigiriskDocuments
 					$cse_titulars = new User($this->db);
 					$result = $cse_titulars->fetch($cse_titular);
 					if ($result > 0) {
-						$json['InformationsSharing']['membres_du_comite_entreprise_titulaires']  .= $cse_titulars->firstname . " " . $cse_titulars->lastname  . '<br>';
-						$json['InformationsSharing']['membres_du_comite_entreprise_titulairesFullName']  .= $cse_titulars->getNomUrl(1) . '<br>';
+						$json['InformationsSharing']['membres_du_comite_entreprise_titulaires']  .= $cse_titulars->firstname . " " . $cse_titulars->lastname;
+						$json['InformationsSharing']['membres_du_comite_entreprise_titulairesFullName']  .= $cse_titulars->getNomUrl(1);
 					}
 				}
 			}
@@ -153,8 +157,8 @@ class InformationsSharing extends DigiriskDocuments
 					$cse_alternates = new User($this->db);
 					$result = $cse_alternates->fetch($cse_alternate);
 					if ($result > 0) {
-						$json['InformationsSharing']['membres_du_comite_entreprise_suppleants']  .= $cse_alternates->firstname . " " . $cse_alternates->lastname  . '<br>';
-						$json['InformationsSharing']['membres_du_comite_entreprise_suppleantsFullName']  .= $cse_alternates->getNomUrl(1) . '<br>';
+						$json['InformationsSharing']['membres_du_comite_entreprise_suppleants']  .= $cse_alternates->firstname . " " . $cse_alternates->lastname;
+						$json['InformationsSharing']['membres_du_comite_entreprise_suppleantsFullName']  .= $cse_alternates->getNomUrl(1);
 					}
 				}
 			}
@@ -175,82 +179,93 @@ class InformationsSharing extends DigiriskDocuments
      */
     public function load_dashboard(): array
     {
-        $getInformationsSharingInfos = $this->getInformationsSharingInfos();
-
-        $dashboardData['graphs'] = [$getInformationsSharingInfos];
-
-        return $dashboardData;
-    }
-
-    /**
-     * Get information sharing infos
-     *
-     * @return array     $array Return information sharing graph infos
-     * @throws Exception
-     */
-    public function getInformationsSharingInfos(): array
-    {
         global $langs;
 
-        // Graph Title parameters
-        $array['title'] = $langs->transnoentities('InformationsSharingRate');
-        $array['picto'] = $this->picto;
+        $informationsSharing = json_decode($this->InformationsSharingFillJSON(), false, 512, JSON_UNESCAPED_UNICODE)->InformationsSharing;
 
-        // Graph parameters
-        $array['width']      = '100%';
-        $array['height']     = 300;
-        $array['type']       = 'pie';
-        $array['showlegend'] = 2;
-        $array['dataset']    = 1;
-
-        $informationsSharingGraphInfos = $this->getInformationsSharingNumber();
-        $array['labels'] = [
-            0 => [
-                'label' => price2num($informationsSharingGraphInfos['counter'] / $informationsSharingGraphInfos['maxNumber'] * 100, 'MT') . ' %',
-                'color' => '#0d8affcc'
+        $dashboardData['widgets'] = [
+            'labour_doctor' => [
+                'label'      => [
+                    $langs->transnoentities('Phone') ?? '',
+                    $langs->transnoentities('Name') ?? '',
+                ],
+                'customContent' => [
+                    0 => dol_strlen($informationsSharing->occupational_health_service->fullname) > 0 ? $informationsSharing->occupational_health_service->fullname : $langs->trans('NoData'),
+                ],
+                'content'    => [
+                    1 => dol_strlen($informationsSharing->occupational_health_service->phone) > 0 ? $informationsSharing->occupational_health_service->phone : $langs->trans('NoData'),
+                ],
+                'picto'      => 'fas fa-user-md',
+                'widgetName' => $langs->transnoentities('Society')
             ],
-            1 => [
-                'label' => price2num(($informationsSharingGraphInfos['maxNumber'] - $informationsSharingGraphInfos['counter']) * 100 / $informationsSharingGraphInfos['maxNumber'], 'MT') . ' %',
-                'color' => '#6c6c6c66'
-            ]
+            'labour_inspector' => [
+                'label'      => [
+                    $langs->transnoentities('Name') ?? '',
+                    $langs->transnoentities('Phone') ?? '',
+                ],
+                'customContent' => [
+                    0 => dol_strlen($informationsSharing->detective_work->fullname) > 0 ? $informationsSharing->detective_work->fullname : $langs->trans('NoData'),
+                ],
+                'content'    => [
+                    1 => dol_strlen($informationsSharing->detective_work->phone) > 0 ? $informationsSharing->detective_work->phone : $langs->trans('NoData')
+                ],
+                'picto'      => 'fas fa-briefcase',
+                'widgetName' => $langs->transnoentities('Society')
+            ],
+            'harassment_officer' => [
+                'label'      => [
+                    $langs->transnoentities('Name')  ?? '',
+                    $langs->transnoentities('Phone') ?? '',
+                    $langs->transnoentities('Name')  ?? '',
+                    $langs->transnoentities('Phone') ?? '',
+                ],
+                'customContent' => [
+                    0 => dol_strlen($informationsSharing->harassment_officer->fullname)     > 0 ? $informationsSharing->harassment_officer->fullname     : $langs->trans('NoData'),
+                    2 => dol_strlen($informationsSharing->harassment_officer_cse->fullname) > 0 ? $informationsSharing->harassment_officer_cse->fullname : $langs->trans('NoData'),
+                ],
+                'content'    => [
+                    1 => dol_strlen($informationsSharing->harassment_officer->phone)     > 0 ? $informationsSharing->harassment_officer->phone     : $langs->trans('NoData'),
+                    3 => dol_strlen($informationsSharing->harassment_officer_cse->phone) > 0 ? $informationsSharing->harassment_officer_cse->phone : $langs->trans('NoData'),
+                ],
+                'picto'      => 'fas fa-bullhorn',
+                'widgetName' => $langs->transnoentities('Society')
+            ],
+            'delegues_du_personnels' => [
+                'label'      => [
+                    $langs->transnoentities('Date')  ?? '',
+                    $langs->transnoentities('Titulars')  ?? '',
+                    $langs->transnoentities('Alternates') ?? '',
+
+                ],
+                'customContent' => [
+                    1 => dol_strlen($informationsSharing->delegues_du_personnels_titulairesFullName) > 0 ? $informationsSharing->delegues_du_personnels_titulairesFullName : $langs->trans('NoData'),
+                    2 => dol_strlen($informationsSharing->delegues_du_personnels_suppleantsFullName) > 0 ? $informationsSharing->delegues_du_personnels_suppleantsFullName : $langs->trans('NoData'),
+                ],
+                'content'    => [
+                    0 => dol_strlen($informationsSharing->delegues_du_personnels_date) > 0 ? $informationsSharing->delegues_du_personnels_date : $langs->trans('NoData')
+                ],
+                'picto'      => 'fas fa-users',
+                'widgetName' => $langs->transnoentities('Society')
+            ],
+            'membres_du_comite_entreprise' => [
+                'label'      => [
+                    $langs->transnoentities('Date')  ?? '',
+                    $langs->transnoentities('Titulars')  ?? '',
+                    $langs->transnoentities('Alternates') ?? '',
+
+                ],
+                'customContent' => [
+                    1 => dol_strlen($informationsSharing->membres_du_comite_entreprise_titulairesFullName) > 0 ? $informationsSharing->membres_du_comite_entreprise_titulairesFullName : $langs->trans('NoData'),
+                    2 => dol_strlen($informationsSharing->membres_du_comite_entreprise_suppleantsFullName) > 0 ? $informationsSharing->membres_du_comite_entreprise_suppleantsFullName : $langs->trans('NoData'),
+                ],
+                'content'    => [
+                    0 => dol_strlen($informationsSharing->delegues_du_personnels_date) > 0 ? $informationsSharing->delegues_du_personnels_date : $langs->trans('NoData')
+                ],
+                'picto'      => 'fas fa-user-graduate',
+                'widgetName' => $langs->transnoentities('Society')
+            ],
         ];
 
-        $array['data'] = [$informationsSharingGraphInfos['counter'], $informationsSharingGraphInfos['maxNumber'] - $informationsSharingGraphInfos['counter']];
-
-        return $array;
-    }
-
-    /**
-     * Get information sharing numbers
-     *
-     * @return array     $array Return counter and maxNumber
-     * @throws Exception
-     */
-    public function getInformationsSharingNumber(): array
-    {
-        global $conf;
-
-        $resources = new DigiriskResources($this->db);
-
-        $counter         = 0;
-        $socialResources = ['TitularsCSE', 'AlternatesCSE', 'HarassmentOfficerCSE', 'TitularsDP', 'AlternatesDP', 'HarassmentOfficer'];
-        $socialConsts    = ['DIGIRISKDOLIBARR_PARTICIPATION_AGREEMENT_INFORMATION_PROCEDURE', 'DIGIRISKDOLIBARR_DEROGATION_SCHEDULE_PERMANENT', 'DIGIRISKDOLIBARR_DEROGATION_SCHEDULE_OCCASIONAL', 'DIGIRISKDOLIBARR_CSE_ELECTION_DATE', 'DIGIRISKDOLIBARR_DP_ELECTION_DATE'];
-        $allLinks        = $resources->fetchDigiriskResources();
-        $maxNumber       = count($socialResources) + count($socialConsts);
-
-        foreach ($socialConsts as $socialConst) {
-            if (dol_strlen($conf->global->$socialConst) > 0 && $conf->global->$socialConst != '--') {
-                $counter += 1;
-            }
-        }
-        foreach ($socialResources as $socialResource) {
-            if (!empty($allLinks[$socialResource] && $allLinks[$socialResource]->id[0] > 0)) {
-                $counter += 1;
-            }
-        }
-
-        $array = ['counter' => $counter, 'maxNumber' => $maxNumber];
-
-        return $array;
+        return $dashboardData;
     }
 }
