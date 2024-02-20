@@ -1,5 +1,5 @@
 <?php
-/* Copyright (C) 2021-2023 EVARISK <technique@evarisk.com>
+/* Copyright (C) 2021-2024 EVARISK <technique@evarisk.com>
  *
  * This program is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -22,13 +22,13 @@
  * \brief      File that contains the numbering module rules Greip
  */
 
-// Load Saturne libraries.
+// Load Saturne libraries
 require_once __DIR__ . '/../../../../../../saturne/core/modules/saturne/modules_saturne.php';
 
 /**
  * Class of file that contains the numbering module rules Greip
  */
-class mod_risksign_greip extends ModeleNumRefSaturne
+class mod_risksign_greip extends CustomModeleNumRefSaturne
 {
 
 	/**
@@ -49,44 +49,4 @@ class mod_risksign_greip extends ModeleNumRefSaturne
             }
         }
     }
-	/**
-	 *  Return description of module
-	 *
-	 *  @return     string      Texte descripif
-	 */
-	public function info(): string
-	{
-
-		global $conf, $langs, $db;
-
-		$langs->load("bills");
-
-		$form = new Form($db);
-
-		$texte = $langs->trans('GenericNumRefModelDesc')."<br>\n";
-		$texte .= '<form action="'.$_SERVER["PHP_SELF"].'" method="POST">';
-		$texte .= '<input type="hidden" name="token" value="'.newToken().'">';
-		$texte .= '<input type="hidden" name="action" value="updateMask">';
-		$texte .= '<input type="hidden" name="mask" value="DIGIRISKDOLIBARR_RISKSIGN_GREIP_ADDON">';
-		$texte .= '<table class="nobordernopadding" width="100%">';
-
-		$tooltip = $langs->trans("GenericMaskCodes", $langs->transnoentities("DigiriskElement"), $langs->transnoentities("DigiriskElement"));
-		$tooltip .= $langs->trans("GenericMaskCodes2");
-		$tooltip .= $langs->trans("GenericMaskCodes3");
-		$tooltip .= $langs->trans("GenericMaskCodes4a", $langs->transnoentities("DigiriskElement"), $langs->transnoentities("DigiriskElement"));
-		$tooltip .= $langs->trans("GenericMaskCodes5");
-
-		// Parametrage du prefix
-		$texte .= '<tr><td>'.$langs->trans("Mask").':</td>';
-		$texte .= '<td class="right">'.$form->textwithpicto('<input type="text" class="flat minwidth175" name="addon_value" value="'.$conf->global->DIGIRISKDOLIBARR_RISKSIGN_GREIP_ADDON.'">', $tooltip, 1, 1).'</td>';
-
-		$texte .= '<td class="left" rowspan="2">&nbsp; <input type="submit" class="button button-edit" name="Button"value="'.$langs->trans("Modify").'"></td>';
-
-		$texte .= '</tr>';
-
-		$texte .= '</table>';
-		$texte .= '</form>';
-
-		return $texte;
-	}
 }
