@@ -122,7 +122,6 @@ $moduleNameLowerCase = 'digiriskdolibarr';
 print '<div class="fichecenter">';
 $moreParams = ['loadInformationsSharing' => 1];
 $dashboard->show_dashboard($moreParams);
-print '</div>';
 
 print dol_get_fiche_end();
 

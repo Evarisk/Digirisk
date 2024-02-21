@@ -123,7 +123,6 @@ $moduleNameLowerCase = 'digiriskdolibarr';
 print '<div class="fichecenter">';
 $moreParams = ['loadLegalDisplay' => 1];
 $dashboard->show_dashboard($moreParams);
-print '</div>';
 
 print dol_get_fiche_end();
 

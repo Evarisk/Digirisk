@@ -416,8 +416,8 @@ class LegalDisplay extends DigiriskDocuments
             ],
             'information' => [
                 'label'      => [
-                    $langs->transnoentities('DerogationSchedulePermanent') ?? '',
-                    $langs->transnoentities('DerogationScheduleOcassional') ?? '',
+                    $langs->transnoentities('PermanentDerogation') ?? '',
+                    $langs->transnoentities('OccasionalDerogation') ?? '',
                     $langs->transnoentities('DUER') ?? '',
                     $langs->transnoentities('ParticipationAgreement') ?? '',
                     $langs->transnoentities('Convention') ?? '',
