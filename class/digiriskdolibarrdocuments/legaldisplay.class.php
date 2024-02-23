@@ -92,12 +92,13 @@ class LegalDisplay extends DigiriskDocuments
 			$labour_doctor_contact = new Contact($this->db);
 			$result = $labour_doctor_contact->fetch($digirisk_resources['LabourDoctorContact']->id[0]);
 			if ($result > 0) {
-				$json['LegalDisplay']['occupational_health_service']['id']      = $labour_doctor_contact->id;
-				$json['LegalDisplay']['occupational_health_service']['name']    = $labour_doctor_contact->firstname . " " . $labour_doctor_contact->lastname;
-				$json['LegalDisplay']['occupational_health_service']['address'] = preg_replace('/\s\s+/', ' ', $labour_doctor_contact->address);
-				$json['LegalDisplay']['occupational_health_service']['zip']     = $labour_doctor_contact->zip;
-				$json['LegalDisplay']['occupational_health_service']['town']    = $labour_doctor_contact->town;
-				$json['LegalDisplay']['occupational_health_service']['phone']   = $labour_doctor_contact->phone_pro;
+				$json['LegalDisplay']['occupational_health_service']['id']       = $labour_doctor_contact->id;
+				$json['LegalDisplay']['occupational_health_service']['name']     = $labour_doctor_contact->firstname . " " . $labour_doctor_contact->lastname;
+				$json['LegalDisplay']['occupational_health_service']['address']  = preg_replace('/\s\s+/', ' ', $labour_doctor_contact->address);
+				$json['LegalDisplay']['occupational_health_service']['zip']      = $labour_doctor_contact->zip;
+				$json['LegalDisplay']['occupational_health_service']['town']     = $labour_doctor_contact->town;
+				$json['LegalDisplay']['occupational_health_service']['phone']    = $labour_doctor_contact->phone_pro;
+                $json['LegalDisplay']['occupational_health_service']['fullname'] = $labour_doctor_contact->getNomUrl(1);
 			}
 
 			$labour_inspector_societe = new Societe($this->db);
@@ -124,12 +125,13 @@ class LegalDisplay extends DigiriskDocuments
 			$result = $labourInspectorContact->fetch($digirisk_resources['LabourInspectorContact']->id[0]);
 
 			if ($result > 0) {
-				$json['LegalDisplay']['detective_work']['id']      = $labourInspectorContact->id;
-				$json['LegalDisplay']['detective_work']['name']    = $labourInspectorContact->firstname . " " . $labourInspectorContact->lastname;
-				$json['LegalDisplay']['detective_work']['address'] = preg_replace('/\s\s+/', ' ', $labourInspectorContact->address);
-				$json['LegalDisplay']['detective_work']['zip']     = $labourInspectorContact->zip;
-				$json['LegalDisplay']['detective_work']['town']    = $labourInspectorContact->town;
-				$json['LegalDisplay']['detective_work']['phone']   = $labourInspectorContact->phone_pro;
+				$json['LegalDisplay']['detective_work']['id']       = $labourInspectorContact->id;
+				$json['LegalDisplay']['detective_work']['name']     = $labourInspectorContact->firstname . " " . $labourInspectorContact->lastname;
+				$json['LegalDisplay']['detective_work']['address']  = preg_replace('/\s\s+/', ' ', $labourInspectorContact->address);
+				$json['LegalDisplay']['detective_work']['zip']      = $labourInspectorContact->zip;
+				$json['LegalDisplay']['detective_work']['town']     = $labourInspectorContact->town;
+				$json['LegalDisplay']['detective_work']['phone']    = $labourInspectorContact->phone_pro;
+                $json['LegalDisplay']['detective_work']['fullname'] = $labourInspectorContact->getNomUrl(1);
 			}
 
 			$samu = new Societe($this->db);
@@ -276,12 +278,14 @@ class LegalDisplay extends DigiriskDocuments
                     $langs->transnoentities('Town') ?? '',
                     $langs->transnoentities('Phone') ?? '',
                 ],
+                'customContent' => [
+                    0 => dol_strlen($legalDisplay->occupational_health_service->fullname) > 0 ? $legalDisplay->occupational_health_service->fullname : $langs->trans('NoData'),
+                ],
                 'content'    => [
-                    dol_strlen($legalDisplay->occupational_health_service->name)    > 0 ? $legalDisplay->occupational_health_service->name    : $langs->trans('NoData'),
-                    dol_strlen($legalDisplay->occupational_health_service->zip)     > 0 ? $legalDisplay->occupational_health_service->zip     : $langs->trans('NoData'),
-                    dol_strlen($legalDisplay->occupational_health_service->address) > 0 ? $legalDisplay->occupational_health_service->address : $langs->trans('NoData'),
-                    dol_strlen($legalDisplay->occupational_health_service->town)    > 0 ? $legalDisplay->occupational_health_service->town    : $langs->trans('NoData'),
-                    dol_strlen($legalDisplay->occupational_health_service->phone)   > 0 ? $legalDisplay->occupational_health_service->phone   : $langs->trans('NoData'),
+                    1 => dol_strlen($legalDisplay->occupational_health_service->zip)     > 0 ? $legalDisplay->occupational_health_service->zip     : $langs->trans('NoData'),
+                    2 => dol_strlen($legalDisplay->occupational_health_service->address) > 0 ? $legalDisplay->occupational_health_service->address : $langs->trans('NoData'),
+                    3 => dol_strlen($legalDisplay->occupational_health_service->town)    > 0 ? $legalDisplay->occupational_health_service->town    : $langs->trans('NoData'),
+                    4 => dol_strlen($legalDisplay->occupational_health_service->phone)   > 0 ? $legalDisplay->occupational_health_service->phone   : $langs->trans('NoData'),
                 ],
                 'link'       => '<a href="../../admin/securityconf.php" target="_blank">' . $langs->trans('ConfigureSecurityAndSocialData') . ' <i class="fas fa-external-link-alt"></i></a>',
                 'picto'      => 'fas fa-user-md',
@@ -320,12 +324,14 @@ class LegalDisplay extends DigiriskDocuments
                     $langs->transnoentities('Phone') ?? '',
                     $langs->transnoentities('Link') ?? '',
                 ],
+                'customContent' => [
+                    0 => dol_strlen($legalDisplay->detective_work->fullname) > 0 ? $legalDisplay->detective_work->fullname : $langs->trans('NoData'),
+                ],
                 'content'    => [
-                    dol_strlen($legalDisplay->detective_work->name)    > 0 ? $legalDisplay->detective_work->name    : $langs->trans('NoData'),
-                    dol_strlen($legalDisplay->detective_work->zip)     > 0 ? $legalDisplay->detective_work->zip     : $langs->trans('NoData'),
-                    dol_strlen($legalDisplay->detective_work->address) > 0 ? $legalDisplay->detective_work->address : $langs->trans('NoData'),
-                    dol_strlen($legalDisplay->detective_work->town)    > 0 ? $legalDisplay->detective_work->address : $langs->trans('NoData'),
-                    dol_strlen($legalDisplay->detective_work->phone)   > 0 ? $legalDisplay->detective_work->phone   : $langs->trans('NoData'),
+                    1 => dol_strlen($legalDisplay->detective_work->zip)     > 0 ? $legalDisplay->detective_work->zip     : $langs->trans('NoData'),
+                    2 => dol_strlen($legalDisplay->detective_work->address) > 0 ? $legalDisplay->detective_work->address : $langs->trans('NoData'),
+                    3 => dol_strlen($legalDisplay->detective_work->town)    > 0 ? $legalDisplay->detective_work->address : $langs->trans('NoData'),
+                    4 => dol_strlen($legalDisplay->detective_work->phone)   > 0 ? $legalDisplay->detective_work->phone   : $langs->trans('NoData'),
                 ],
                 'link'       => '<a href="../../admin/securityconf.php" target="_blank">' . $langs->trans('ConfigureSecurityAndSocialData') . ' <i class="fas fa-external-link-alt"></i></a>',
                 'picto'      => 'fas fa-briefcase',
