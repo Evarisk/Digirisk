@@ -183,6 +183,14 @@ class InformationsSharing extends DigiriskDocuments
 
         $informationsSharing = json_decode($this->InformationsSharingFillJSON(), false, 512, JSON_UNESCAPED_UNICODE)->InformationsSharing;
 
+        $labourDoctor = [$informationsSharing->occupational_health_service->fullname, $informationsSharing->occupational_health_service->phone];
+        $detectiveWork = [$informationsSharing->detective_work->fullname, $informationsSharing->detective_work->phone];
+        $harassmentOfficer = [$informationsSharing->harassment_officer->fullname, $informationsSharing->harassment_officer_cse->fullname, $informationsSharing->harassment_officer->phone, $informationsSharing->harassment_officer_cse->phone];
+        $deleguePersonnel = [$informationsSharing->delegues_du_personnels_titulairesFullName, $informationsSharing->delegues_du_personnels_suppleantsFullName];
+        $membreComitee = [$informationsSharing->membres_du_comite_entreprise_titulairesFullName, $informationsSharing->membres_du_comite_entreprise_suppleantsFullName, $informationsSharing->membres_du_comite_entreprise_date];
+
+        require_once __DIR__ . '/../../core/tpl/digiriskdolibarr_informationssharing_percentages.tpl.php';
+
         $dashboardData['widgets'] = [
             'labour_doctor' => [
                 'label'      => [
@@ -196,6 +204,7 @@ class InformationsSharing extends DigiriskDocuments
                     1 => dol_strlen($informationsSharing->occupational_health_service->phone) > 0 ? $informationsSharing->occupational_health_service->phone : $langs->trans('NoData'),
                 ],
                 'picto'      => 'fas fa-user-md',
+                'progressBar' => '<div class="progress-group"><div class="progress sm"><div class="progress-bar progress-info" style="width: ' . $percentageLabourDoctor . '%;" title="0%"><div class="progress-bar progress-bar-consumed" style="width: 0%;" title="0%"></div></div></div></div>',
                 'widgetName' => $langs->transnoentities('Society')
             ],
             'labour_inspector' => [
@@ -210,6 +219,7 @@ class InformationsSharing extends DigiriskDocuments
                     1 => dol_strlen($informationsSharing->detective_work->phone) > 0 ? $informationsSharing->detective_work->phone : $langs->trans('NoData')
                 ],
                 'picto'      => 'fas fa-briefcase',
+                'progressBar' => '<div class="progress-group"><div class="progress sm"><div class="progress-bar progress-info" style="width: ' . $percentageDetectiveWork . '%;" title="0%"><div class="progress-bar progress-bar-consumed" style="width: 0%;" title="0%"></div></div></div></div>',
                 'widgetName' => $langs->transnoentities('Society')
             ],
             'harassment_officer' => [
@@ -228,6 +238,7 @@ class InformationsSharing extends DigiriskDocuments
                     3 => dol_strlen($informationsSharing->harassment_officer_cse->phone) > 0 ? $informationsSharing->harassment_officer_cse->phone : $langs->trans('NoData'),
                 ],
                 'picto'      => 'fas fa-bullhorn',
+                'progressBar' => '<div class="progress-group"><div class="progress sm"><div class="progress-bar progress-info" style="width: ' . $percentageHarassmentOfficer . '%;" title="0%"><div class="progress-bar progress-bar-consumed" style="width: 0%;" title="0%"></div></div></div></div>',
                 'widgetName' => $langs->transnoentities('Society')
             ],
             'delegues_du_personnels' => [
@@ -245,6 +256,7 @@ class InformationsSharing extends DigiriskDocuments
                     0 => dol_strlen($informationsSharing->delegues_du_personnels_date) > 0 ? $informationsSharing->delegues_du_personnels_date : $langs->trans('NoData')
                 ],
                 'picto'      => 'fas fa-users',
+                'progressBar' => '<div class="progress-group"><div class="progress sm"><div class="progress-bar progress-info" style="width: ' . $percentageDeleguePersonnel . '%;" title="0%"><div class="progress-bar progress-bar-consumed" style="width: 0%;" title="0%"></div></div></div></div>',
                 'widgetName' => $langs->transnoentities('Society')
             ],
             'membres_du_comite_entreprise' => [
@@ -259,9 +271,10 @@ class InformationsSharing extends DigiriskDocuments
                     2 => dol_strlen($informationsSharing->membres_du_comite_entreprise_suppleantsFullName) > 0 ? $informationsSharing->membres_du_comite_entreprise_suppleantsFullName : $langs->trans('NoData'),
                 ],
                 'content'    => [
-                    0 => dol_strlen($informationsSharing->delegues_du_personnels_date) > 0 ? $informationsSharing->delegues_du_personnels_date : $langs->trans('NoData')
+                    0 => dol_strlen($informationsSharing->membres_du_comite_entreprise_date) > 0 ? $informationsSharing->membres_du_comite_entreprise_date : $langs->trans('NoData')
                 ],
                 'picto'      => 'fas fa-user-graduate',
+                'progressBar' => '<div class="progress-group"><div class="progress sm"><div class="progress-bar progress-info" style="width: ' . $percentageMembreComitee . '%;" title="0%"><div class="progress-bar progress-bar-consumed" style="width: 0%;" title="0%"></div></div></div></div>',
                 'widgetName' => $langs->transnoentities('Society')
             ],
         ];

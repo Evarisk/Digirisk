@@ -269,6 +269,17 @@ class LegalDisplay extends DigiriskDocuments
 
         $legalDisplay = json_decode($this->LegalDisplayFillJSON(), false, 512, JSON_UNESCAPED_UNICODE)->LegalDisplay;
 
+        $labourDoctor            = [$legalDisplay->occupational_health_service->fullname, $legalDisplay->occupational_health_service->zip, $legalDisplay->occupational_health_service->address, $legalDisplay->occupational_health_service->town, $legalDisplay->occupational_health_service->phone];
+        $labourDoctorTime        = [$legalDisplay->occupational_health_service->opening_hours_details->monday, $legalDisplay->occupational_health_service->opening_hours_details->tuesday, $legalDisplay->occupational_health_service->opening_hours_details->wednesday, $legalDisplay->occupational_health_service->opening_hours_details->thursday, $legalDisplay->occupational_health_service->opening_hours_details->friday, $legalDisplay->occupational_health_service->opening_hours_details->saturday, $legalDisplay->occupational_health_service->opening_hours_details->sunday];
+        $detectiveWork          = [$legalDisplay->detective_work->fullname, $legalDisplay->detective_work->zip, $legalDisplay->detective_work->address, $legalDisplay->detective_work->town, $legalDisplay->detective_work->phone];
+        $labourDetectiveWorkTime = [$legalDisplay->detective_work->opening_hours_details->monday, $legalDisplay->detective_work->opening_hours_details->tuesday, $legalDisplay->detective_work->opening_hours_details->wednesday, $legalDisplay->detective_work->opening_hours_details->thursday, $legalDisplay->detective_work->opening_hours_details->friday, $legalDisplay->detective_work->opening_hours_details->saturday, $legalDisplay->detective_work->opening_hours_details->sunday];
+        $emergencyService        = [$legalDisplay->emergency_service->samu, $legalDisplay->emergency_service->pompier, $legalDisplay->emergency_service->police, $legalDisplay->emergency_service->emergency, $legalDisplay->emergency_service->right_defender, $legalDisplay->emergency_service->poison_control_center];
+        $safetyRule              = [$legalDisplay->emergency_service->safety_rule->responsible_for_preventing, $legalDisplay->emergency_service->safety_rule->phone, $legalDisplay->emergency_service->safety_rule->location_of_detailed_instruction];
+        $workingHour             = [$legalDisplay->detective_work->opening_hours_details->monday, $legalDisplay->working_hour->monday_afternoon, $legalDisplay->working_hour->tuesday_morning, $legalDisplay->working_hour->tuesday_afternoon, $legalDisplay->working_hour->wednesday_morning, $legalDisplay->working_hour->wednesday_afternoon, $legalDisplay->working_hour->thursday_morning, $legalDisplay->working_hour->thursday_afternoon, $legalDisplay->working_hour->friday_morning, $legalDisplay->working_hour->friday_afternoon, $legalDisplay->working_hour->saturday_morning, $legalDisplay->working_hour->saturday_afternoon, $legalDisplay->working_hour->sunday_morning, $legalDisplay->working_hour->sunday_afternoon];
+        $parameters              = [$legalDisplay->derogation_schedule->permanent, $legalDisplay->derogation_schedule->occasional, $legalDisplay->DUER->how_access_to_duer, $legalDisplay->participation_agreement->information_procedures, $legalDisplay->collective_agreement->location_and_access_terms_of_the_agreement];
+
+        require_once __DIR__ . '/../../core/tpl/digiriskdolibarr_legaldisplay_percentages.tpl.php';
+
         $dashboardData['widgets'] = [
             'labour_doctor' => [
                 'label'      => [
@@ -287,9 +298,10 @@ class LegalDisplay extends DigiriskDocuments
                     3 => dol_strlen($legalDisplay->occupational_health_service->town)    > 0 ? $legalDisplay->occupational_health_service->town    : $langs->trans('NoData'),
                     4 => dol_strlen($legalDisplay->occupational_health_service->phone)   > 0 ? $legalDisplay->occupational_health_service->phone   : $langs->trans('NoData'),
                 ],
-                'link'       => '<a href="../../admin/securityconf.php" target="_blank">' . $langs->trans('ConfigureSecurityAndSocialData') . ' <i class="fas fa-external-link-alt"></i></a>',
-                'picto'      => 'fas fa-user-md',
-                'widgetName' => $langs->transnoentities('Society')
+                'link'        => '<a href="../../admin/securityconf.php" target="_blank">' . $langs->trans('ConfigureSecurityAndSocialData') . ' <i class="fas fa-external-link-alt"></i></a>',
+                'picto'       => 'fas fa-user-md',
+                'progressBar' => '<div class="progress-group"><div class="progress sm"><div class="progress-bar progress-info" style="width: ' . $percentageLabourDoctor . '%;" title="0%"><div class="progress-bar progress-bar-consumed" style="width: 0%;" title="0%"></div></div></div></div>',
+                'widgetName'  => $langs->transnoentities('Society')
             ],
             'labour_doctor_schedules' => [
                 'label'      => [
@@ -313,6 +325,7 @@ class LegalDisplay extends DigiriskDocuments
                 ],
                 'link'       => '<a href="' . dol_buildpath('saturne/view/saturne_schedules.php?id=' . $legalDisplay->occupational_health_service->id . '&element_type=societe&module_name=societe', 1) .'" target="_blank">' . $langs->trans('ConfigureSecurityAndSocialData') . ' <i class="fas fa-external-link-alt"></i></a>',
                 'picto'      => 'fas fa-clock',
+                'progressBar' => '<div class="progress-group"><div class="progress sm"><div class="progress-bar progress-info" style="width: ' . $percentageLabourDoctorTime . '%;" title="0%"><div class="progress-bar progress-bar-consumed" style="width: 0%;" title="0%"></div></div></div></div>',
                 'widgetName' => $langs->transnoentities('Society')
             ],
             'labour_inspector' => [
@@ -322,7 +335,6 @@ class LegalDisplay extends DigiriskDocuments
                     $langs->transnoentities('Address') ?? '',
                     $langs->transnoentities('Town') ?? '',
                     $langs->transnoentities('Phone') ?? '',
-                    $langs->transnoentities('Link') ?? '',
                 ],
                 'customContent' => [
                     0 => dol_strlen($legalDisplay->detective_work->fullname) > 0 ? $legalDisplay->detective_work->fullname : $langs->trans('NoData'),
@@ -335,6 +347,7 @@ class LegalDisplay extends DigiriskDocuments
                 ],
                 'link'       => '<a href="../../admin/securityconf.php" target="_blank">' . $langs->trans('ConfigureSecurityAndSocialData') . ' <i class="fas fa-external-link-alt"></i></a>',
                 'picto'      => 'fas fa-briefcase',
+                'progressBar' => '<div class="progress-group"><div class="progress sm"><div class="progress-bar progress-info" style="width: ' . $percentageDetectiveWork . '%;" title="0%"><div class="progress-bar progress-bar-consumed" style="width: 0%;" title="0%"></div></div></div></div>',
                 'widgetName' => $langs->transnoentities('Society')
             ],
             'detective_work_schedules' => [
@@ -359,6 +372,7 @@ class LegalDisplay extends DigiriskDocuments
                 ],
                 'link'       => '<a href="' . dol_buildpath('saturne/view/saturne_schedules.php?id=' . $legalDisplay->detective_work->id . '&element_type=societe&module_name=societe', 1) .'"" target="_blank">' . $langs->trans('ConfigureSecurityAndSocialData') . ' <i class="fas fa-external-link-alt"></i></a>',
                 'picto'      => 'fas fa-clock',
+                'progressBar' => '<div class="progress-group"><div class="progress sm"><div class="progress-bar progress-info" style="width: ' . $percentageDetectiveWorkTime . '%;" title="0%"><div class="progress-bar progress-bar-consumed" style="width: 0%;" title="0%"></div></div></div></div>',
                 'widgetName' => $langs->transnoentities('Society')
             ],
             'emergency_calls' => [
@@ -380,6 +394,7 @@ class LegalDisplay extends DigiriskDocuments
                 ],
                 'link'       => '<a href="../../admin/securityconf.php" target="_blank">' . $langs->trans('ConfigureSecurityAndSocialData') . ' <i class="fas fa-external-link-alt"></i></a>',
                 'picto'      => 'fas fa-ambulance',
+                'progressBar' => '<div class="progress-group"><div class="progress sm"><div class="progress-bar progress-info" style="width: ' . $percentageEmergencyService . '%;" title="0%"><div class="progress-bar progress-bar-consumed" style="width: 0%;" title="0%"></div></div></div></div>',
                 'widgetName' => $langs->transnoentities('Emergency')
             ],
             'safety_rule' => [
@@ -395,6 +410,7 @@ class LegalDisplay extends DigiriskDocuments
                 ],
                 'link'       => '<a href="../../admin/securityconf.php" target="_blank">' . $langs->trans('ConfigureSecurityAndSocialData') . ' <i class="fas fa-external-link-alt"></i></a>',
                 'picto'      => 'fas fa-user-tie',
+                'progressBar' => '<div class="progress-group"><div class="progress sm"><div class="progress-bar progress-info" style="width: ' . $percentageSafetyRule . '%;" title="0%"><div class="progress-bar progress-bar-consumed" style="width: 0%;" title="0%"></div></div></div></div>',
                 'widgetName' => $langs->transnoentities('Emergency')
             ],
             'working_time' => [
@@ -418,6 +434,7 @@ class LegalDisplay extends DigiriskDocuments
                 ],
                 'link'       => '<a href="' . dol_buildpath('../admin/openinghours.php', 1) .'"" target="_blank">' . $langs->trans('ConfigureSecurityAndSocialData') . ' <i class="fas fa-external-link-alt"></i></a>',
                 'picto'      => 'fas fa-clock',
+                'progressBar' => '<div class="progress-group"><div class="progress sm"><div class="progress-bar progress-info" style="width: ' . $percentageWorkingHour . '%;" title="0%"><div class="progress-bar progress-bar-consumed" style="width: 0%;" title="0%"></div></div></div></div>',
                 'widgetName' => $langs->transnoentities('Emergency')
             ],
             'information' => [
@@ -437,6 +454,7 @@ class LegalDisplay extends DigiriskDocuments
                 ],
                 'link'       => '<a href="../../admin/securityconf.php" target="_blank">' . $langs->trans('ConfigureSecurityAndSocialData') . ' <i class="fas fa-external-link-alt"></i></a>',
                 'picto'      => 'fas fa-info',
+                'progressBar' => '<div class="progress-group"><div class="progress sm"><div class="progress-bar progress-info" style="width: ' . $percentageParameters . '%;" title="0%"><div class="progress-bar progress-bar-consumed" style="width: 0%;" title="0%"></div></div></div></div>',
                 'widgetName' => $langs->transnoentities('Emergency')
             ],
         ];
