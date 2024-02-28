@@ -681,7 +681,8 @@ class modDigiriskdolibarr extends DolibarrModules
 			$i++ => ['DIGIRISKDOLIBARR_RISKASSESSMENT_ADDON', 'chaine', 'mod_riskassessment_standard', '', 0, 'current'],
 			$i++ => ['DIGIRISKDOLIBARR_MULTIPLE_RISKASSESSMENT_METHOD', 'integer', 0, '', 0, 'current'],
 			$i++ => ['DIGIRISKDOLIBARR_ADVANCED_RISKASSESSMENT_METHOD', 'integer', 0, '', 0, 'current'],
-			$i++ => ['DIGIRISKDOLIBARR_SHOW_RISKASSESSMENT_DATE', 'integer', 0, '', 0, 'current'],
+            $i++ => ['DIGIRISKDOLIBARR_SHOW_RISKASSESSMENT_DATE', 'integer', 0, '', 0, 'current'],
+            $i++ => ['DIGIRISKDOLIBARR_SHOW_DOCUMENT_RISKASSESSMENT_DATE', 'integer', 0, '', 0, 'current'],
 			$i++ => ['DIGIRISKDOLIBARR_SHOW_ALL_RISKASSESSMENTS', 'integer', 0, '', 0, 'current'],
 
 			// CONST RISK SIGN
@@ -710,8 +711,12 @@ class modDigiriskdolibarr extends DolibarrModules
 			$i++ => ['DIGIRISKDOLIBARR_SHOW_TASK_CALCULATED_PROGRESS', 'integer', 0, '', 0, 'current'],
 			$i++ => ['DIGIRISKDOLIBARR_SHOW_ALL_TASKS', 'integer', 1, '', 0, 'current'],
 			$i++ => ['DIGIRISKDOLIBARR_TASK_TIMESPENT_DURATION', 'integer', 15, '', 0, 'current'],
+            $i++ => ['DIGIRISKDOLIBARR_HIDE_TASK_REF_DOCUMENT', 'integer', 0, '', 0, 'current'],
+            $i++ => ['DIGIRISKDOLIBARR_HIDE_TASK_RESPONSIBLE_DOCUMENT', 'integer', 0, '', 0, 'current'],
+            $i++ => ['DIGIRISKDOLIBARR_HIDE_TASK_DATE_DOCUMENT', 'integer', 0, '', 0, 'current'],
+            $i++ => ['DIGIRISKDOLIBARR_HIDE_TASK_BUDGET_DOCUMENT', 'integer', 0, '', 0, 'current'],
 
-			// CONST TASK TIMESPENT
+            // CONST TASK TIMESPENT
 			$i++ => ['DIGIRISKDOLIBARR_MAIN_AGENDA_ACTIONAUTO_TASK_TIMESPENT_CREATE', 'integer', 1, '', 0, 'current'],
 			$i++ => ['DIGIRISKDOLIBARR_MAIN_AGENDA_ACTIONAUTO_TASK_TIMESPENT_MODIFY', 'integer', 1, '', 0, 'current'],
 			$i++ => ['DIGIRISKDOLIBARR_MAIN_AGENDA_ACTIONAUTO_TASK_TIMESPENT_DELETE', 'integer', 1, '', 0, 'current'],

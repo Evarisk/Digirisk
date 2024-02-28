@@ -234,16 +234,21 @@ $constArray[$moduleNameLowerCase] = [
 		'description' => 'MultipleRiskAssessmentMethodDescription',
 		'code'        => 'DIGIRISKDOLIBARR_MULTIPLE_RISKASSESSMENT_METHOD',
 	],
-	'ShowRiskAssessmentDate' => [
-		'name'        => 'ShowRiskAssessmentDate',
-		'description' => 'ShowRiskAssessmentDateDescription',
-		'code'        => 'DIGIRISKDOLIBARR_SHOW_RISKASSESSMENT_DATE',
-	],
-	'ShowAllRiskAssessments' => [
-		'name'        => 'ShowAllRiskAssessments',
-		'description' => 'ShowAllRiskAssessmentsDescription',
-		'code'        => 'DIGIRISKDOLIBARR_SHOW_ALL_RISKASSESSMENTS',
-	],
+    'ShowAllRiskAssessments' => [
+        'name'        => 'ShowAllRiskAssessments',
+        'description' => 'ShowAllRiskAssessmentsDescription',
+        'code'        => 'DIGIRISKDOLIBARR_SHOW_ALL_RISKASSESSMENTS',
+    ],
+    'ShowRiskAssessmentDate' => [
+        'name'        => 'ShowRiskAssessmentDate',
+        'description' => 'ShowRiskAssessmentDateDescription',
+        'code'        => 'DIGIRISKDOLIBARR_SHOW_RISKASSESSMENT_DATE',
+    ],
+    'ShowRiskAssessmentDateOnDocument' => [
+        'name'        => 'ShowRiskAssessmentDateOnDocument',
+        'description' => 'ShowDocumentDateDescription',
+        'code'        => 'DIGIRISKDOLIBARR_SHOW_DOCUMENT_RISKASSESSMENT_DATE',
+    ],
 ];
 
 require __DIR__ . '/../../../saturne/core/tpl/admin/object/object_const_view.tpl.php';
@@ -318,6 +323,26 @@ $constArray[$moduleNameLowerCase] = [
 		'description' => 'ShowAllTasksDescription',
 		'code'        => 'DIGIRISKDOLIBARR_SHOW_ALL_TASKS',
 	],
+    'HideRefTaskDocument' => [
+        'name'        => 'HideRefTaskDocument',
+        'description' => 'HideRefTaskDocumentDescription',
+        'code'        => 'DIGIRISKDOLIBARR_HIDE_TASK_REF_DOCUMENT',
+    ],
+    'HideResponsibleTaskDocument' => [
+        'name'        => 'HideResponsibleTaskDocument',
+        'description' => 'HideResponsibleTaskDocumentDescription',
+        'code'        => 'DIGIRISKDOLIBARR_HIDE_TASK_RESPONSIBLE_DOCUMENT',
+    ],
+    'HideDateTaskDocument' => [
+        'name'        => 'HideDateTaskDocument',
+        'description' => 'HideDateTaskDocumentDescription',
+        'code'        => 'DIGIRISKDOLIBARR_HIDE_TASK_DATE_DOCUMENT',
+    ],
+    'HideBudgetTaskDocument' => [
+        'name'        => 'HideBudgetTaskDocument',
+        'description' => 'HideBudgetTaskDocumentDescription',
+        'code'        => 'DIGIRISKDOLIBARR_HIDE_TASK_BUDGET_DOCUMENT',
+    ],
 ];
 
 require __DIR__ . '/../../../saturne/core/tpl/admin/object/object_const_view.tpl.php';
