@@ -1343,6 +1343,12 @@ DataMigrationDolibarrToDolibarr              = Migration des données de Dolibar
 # Other
 #
 
+Values = Valeurs
+CongigureDoctorData = Configuration du médecin du travail
+CongigureLabourInspectorData = Configuration de l'inspecteur du travail
+ConfigureLegalDisplay = Taux de configuration de l'affichage légal
+ConfigureInformationsSharing = Taux de configuration de la diffusion d'informations
+
 # Data - Donnée
 AT = au
 

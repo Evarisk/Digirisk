@@ -177,8 +177,43 @@ class InformationsSharing extends DigiriskDocuments
      * @return array     $dashboardData Return all dashboardData after load info
      * @throws Exception
      */
-    public function load_dashboard(): array
-    {
+    public function load_dashboard(): array {
+        global $langs;
+
+        $informationsSharing         = json_decode($this->InformationsSharingFillJSON(), false, 512, JSON_UNESCAPED_UNICODE)->InformationsSharing;
+        $getInformationsSharingInfos = $this->getInformationsSharingInfos();
+
+        $dashboardData['graphs']  = [$getInformationsSharingInfos];
+        $dashboardData['widgets'] = [
+            'information_sharing_widget' => [
+                'label' => [
+                    $langs->transnoentities('LabourDoctor') ?? '',
+                    $langs->transnoentities('LabourInspector') ?? '',
+                    $langs->transnoentities('HarassmentOfficer') ?? '',
+                    $langs->transnoentities('StaffRepresentatives') ?? '',
+                    $langs->transnoentities('ESC') ?? '',
+                ],
+                'content' => [
+                    0 => '<a href="' . dol_buildpath('societe/card.php?id=' . $legalDisplay->occupational_health_service->id . '&save_lastsearch_values=1', 1) .'" target="_blank">' . $langs->transnoentities('CongigureDoctorData') . ' <i class="fas fa-external-link-alt"></i></a>',
+                    1 => '<a href="' . dol_buildpath('societe/card.php?id=' . $legalDisplay->detective_work->id . '&save_lastsearch_values=1', 1) .'" target="_blank">' . $langs->transnoentities('CongigureLabourInspectorData') . ' <i class="fas fa-external-link-alt"></i></a>',
+                    2 => '<a href="' . dol_buildpath('/custom/digiriskdolibarr/admin/socialconf.php', 1) .'" target="_blank">' . $langs->transnoentities('SocialConfiguration') . ' <i class="fas fa-external-link-alt"></i></a>',
+                    3 => '<a href="' . dol_buildpath('/custom/digiriskdolibarr/admin/socialconf.php', 1) .'" target="_blank">' . $langs->transnoentities('SocialConfiguration') . ' <i class="fas fa-external-link-alt"></i></a>',
+                    4 => '<a href="' . dol_buildpath('/custom/digiriskdolibarr/admin/socialconf.php', 1) .'" target="_blank">' . $langs->transnoentities('SocialConfiguration') . ' <i class="fas fa-external-link-alt"></i></a>',
+                ],
+                'picto'       => 'fas fa-link',
+                'widgetName'  => $langs->transnoentities('Society')
+            ]
+        ];
+        return $dashboardData;
+    }
+
+    /**
+     * get information sharing info
+     *
+     * @return array     $array Return all graph data for dashboardData after load info
+     * @throws Exception
+     */
+    public function getInformationsSharingInfos(): array {
         global $langs;
 
         $informationsSharing = json_decode($this->InformationsSharingFillJSON(), false, 512, JSON_UNESCAPED_UNICODE)->InformationsSharing;
@@ -189,96 +224,49 @@ class InformationsSharing extends DigiriskDocuments
         $deleguePersonnel = [$informationsSharing->delegues_du_personnels_titulairesFullName, $informationsSharing->delegues_du_personnels_suppleantsFullName];
         $membreComitee = [$informationsSharing->membres_du_comite_entreprise_titulairesFullName, $informationsSharing->membres_du_comite_entreprise_suppleantsFullName, $informationsSharing->membres_du_comite_entreprise_date];
 
-        require_once __DIR__ . '/../../core/tpl/digiriskdolibarr_informationssharing_percentages.tpl.php';
+        function isGreaterThanZero($value) {
+            return dol_strlen($value) > 0;
+        }
 
-        $dashboardData['widgets'] = [
-            'labour_doctor' => [
-                'label'      => [
-                    $langs->transnoentities('Phone') ?? '',
-                    $langs->transnoentities('Name') ?? '',
-                ],
-                'customContent' => [
-                    0 => dol_strlen($informationsSharing->occupational_health_service->fullname) > 0 ? $informationsSharing->occupational_health_service->fullname : $langs->trans('NoData'),
-                ],
-                'content'    => [
-                    1 => dol_strlen($informationsSharing->occupational_health_service->phone) > 0 ? $informationsSharing->occupational_health_service->phone : $langs->trans('NoData'),
-                ],
-                'picto'      => 'fas fa-user-md',
-                'progressBar' => '<div class="progress-group"><div class="progress sm"><div class="progress-bar progress-info" style="width: ' . $percentageLabourDoctor . '%;" title="0%"><div class="progress-bar progress-bar-consumed" style="width: 0%;" title="0%"></div></div></div></div>',
-                'widgetName' => $langs->transnoentities('Society')
-            ],
-            'labour_inspector' => [
-                'label'      => [
-                    $langs->transnoentities('Name') ?? '',
-                    $langs->transnoentities('Phone') ?? '',
-                ],
-                'customContent' => [
-                    0 => dol_strlen($informationsSharing->detective_work->fullname) > 0 ? $informationsSharing->detective_work->fullname : $langs->trans('NoData'),
-                ],
-                'content'    => [
-                    1 => dol_strlen($informationsSharing->detective_work->phone) > 0 ? $informationsSharing->detective_work->phone : $langs->trans('NoData')
-                ],
-                'picto'      => 'fas fa-briefcase',
-                'progressBar' => '<div class="progress-group"><div class="progress sm"><div class="progress-bar progress-info" style="width: ' . $percentageDetectiveWork . '%;" title="0%"><div class="progress-bar progress-bar-consumed" style="width: 0%;" title="0%"></div></div></div></div>',
-                'widgetName' => $langs->transnoentities('Society')
-            ],
-            'harassment_officer' => [
-                'label'      => [
-                    $langs->transnoentities('Name')  ?? '',
-                    $langs->transnoentities('Phone') ?? '',
-                    $langs->transnoentities('Name')  ?? '',
-                    $langs->transnoentities('Phone') ?? '',
-                ],
-                'customContent' => [
-                    0 => dol_strlen($informationsSharing->harassment_officer->fullname)     > 0 ? $informationsSharing->harassment_officer->fullname     : $langs->trans('NoData'),
-                    2 => dol_strlen($informationsSharing->harassment_officer_cse->fullname) > 0 ? $informationsSharing->harassment_officer_cse->fullname : $langs->trans('NoData'),
-                ],
-                'content'    => [
-                    1 => dol_strlen($informationsSharing->harassment_officer->phone)     > 0 ? $informationsSharing->harassment_officer->phone     : $langs->trans('NoData'),
-                    3 => dol_strlen($informationsSharing->harassment_officer_cse->phone) > 0 ? $informationsSharing->harassment_officer_cse->phone : $langs->trans('NoData'),
-                ],
-                'picto'      => 'fas fa-bullhorn',
-                'progressBar' => '<div class="progress-group"><div class="progress sm"><div class="progress-bar progress-info" style="width: ' . $percentageHarassmentOfficer . '%;" title="0%"><div class="progress-bar progress-bar-consumed" style="width: 0%;" title="0%"></div></div></div></div>',
-                'widgetName' => $langs->transnoentities('Society')
-            ],
-            'delegues_du_personnels' => [
-                'label'      => [
-                    $langs->transnoentities('Date')  ?? '',
-                    $langs->transnoentities('Titulars')  ?? '',
-                    $langs->transnoentities('Alternates') ?? '',
+        // Define a function to count the number of non-empty values in an array
+        function countNonEmptyValues($array) {
+            return count(array_filter($array, 'isGreaterThanZero'));
+        }
 
-                ],
-                'customContent' => [
-                    1 => dol_strlen($informationsSharing->delegues_du_personnels_titulairesFullName) > 0 ? $informationsSharing->delegues_du_personnels_titulairesFullName : $langs->trans('NoData'),
-                    2 => dol_strlen($informationsSharing->delegues_du_personnels_suppleantsFullName) > 0 ? $informationsSharing->delegues_du_personnels_suppleantsFullName : $langs->trans('NoData'),
-                ],
-                'content'    => [
-                    0 => dol_strlen($informationsSharing->delegues_du_personnels_date) > 0 ? $informationsSharing->delegues_du_personnels_date : $langs->trans('NoData')
-                ],
-                'picto'      => 'fas fa-users',
-                'progressBar' => '<div class="progress-group"><div class="progress sm"><div class="progress-bar progress-info" style="width: ' . $percentageDeleguePersonnel . '%;" title="0%"><div class="progress-bar progress-bar-consumed" style="width: 0%;" title="0%"></div></div></div></div>',
-                'widgetName' => $langs->transnoentities('Society')
-            ],
-            'membres_du_comite_entreprise' => [
-                'label'      => [
-                    $langs->transnoentities('Date')  ?? '',
-                    $langs->transnoentities('Titulars')  ?? '',
-                    $langs->transnoentities('Alternates') ?? '',
+        $labourDoctorValue      = countNonEmptyValues($labourDoctor);
+        $detectiveWorkValue     = countNonEmptyValues($detectiveWork);
+        $harassmentOfficerValue = countNonEmptyValues($harassmentOfficer);
+        $deleguePersonnelValue  = countNonEmptyValues($deleguePersonnel);
+        $membreComiteeValue     = countNonEmptyValues($membreComitee);
 
-                ],
-                'customContent' => [
-                    1 => dol_strlen($informationsSharing->membres_du_comite_entreprise_titulairesFullName) > 0 ? $informationsSharing->membres_du_comite_entreprise_titulairesFullName : $langs->trans('NoData'),
-                    2 => dol_strlen($informationsSharing->membres_du_comite_entreprise_suppleantsFullName) > 0 ? $informationsSharing->membres_du_comite_entreprise_suppleantsFullName : $langs->trans('NoData'),
-                ],
-                'content'    => [
-                    0 => dol_strlen($informationsSharing->membres_du_comite_entreprise_date) > 0 ? $informationsSharing->membres_du_comite_entreprise_date : $langs->trans('NoData')
-                ],
-                'picto'      => 'fas fa-user-graduate',
-                'progressBar' => '<div class="progress-group"><div class="progress sm"><div class="progress-bar progress-info" style="width: ' . $percentageMembreComitee . '%;" title="0%"><div class="progress-bar progress-bar-consumed" style="width: 0%;" title="0%"></div></div></div></div>',
-                'widgetName' => $langs->transnoentities('Society')
+        $array['title'] = $langs->transnoentities('ConfigureInformationsSharing');
+        $array['picto'] = $this->picto;
+
+        // Graph parameters
+        $array['width']      = '100%';
+        $array['height']     = 300;
+        $array['type']       = 'bars';
+        $array['showlegend'] = 1;
+        $array['dataset']    = 2;
+        $array['labels']     = [
+            0 => [
+                'label' => $langs->transnoentities('Values'),
+                'color' => '#FF0059'
+            ],
+            1 => [
+                'label' => $langs->transnoentities('Total'),
+                'color' => '#00CF68'
             ],
         ];
+        $dataArray = [
+            [$langs->transnoentities('LabourDoctor'), $labourDoctorValue, count($labourDoctor)],
+            [$langs->transnoentities('LabourInspector'), $detectiveWorkValue, count($detectiveWork)],
+            [$langs->transnoentities('HarassmentOfficer'), $harassmentOfficerValue, count($harassmentOfficer)],
+            [$langs->transnoentities('StaffRepresentatives'), $deleguePersonnelValue, count($deleguePersonnel)],
+            [$langs->transnoentities('ESC'), $membreComiteeValue, count($membreComitee)]
+        ];
 
-        return $dashboardData;
+        $array['data'] = $dataArray;
+        return $array;
     }
 }

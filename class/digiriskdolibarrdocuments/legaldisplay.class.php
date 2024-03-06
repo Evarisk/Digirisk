@@ -263,7 +263,50 @@ class LegalDisplay extends DigiriskDocuments
      * @return array     $dashboardData Return all dashboardData after load info
      * @throws Exception
      */
-    public function load_dashboard(): array
+    public function load_dashboard(): array {
+        global $langs;
+
+        $legalDisplay         = json_decode($this->LegalDisplayFillJSON(), false, 512, JSON_UNESCAPED_UNICODE)->LegalDisplay;
+        $getLegalDisplayInfos = $this->getLegalDisplayInfos();
+
+        $dashboardData['graphs']  = [$getLegalDisplayInfos];
+        $dashboardData['widgets'] = [
+            'legal_display_info' => [
+                'label' => [
+                    $langs->transnoentities('LabourDoctor') ?? '',
+                    $langs->transnoentities('Schedules') ?? '',
+                    $langs->transnoentities('LabourInspector') ?? '',
+                    $langs->transnoentities('Schedules') ?? '',
+                    $langs->transnoentities('AllEmergencies') ?? '',
+                    $langs->transnoentities('SafetyInstructions') ?? '',
+                    $langs->transnoentities('OpeningHours') ?? '',
+                    $langs->transnoentities('Parameters') ?? '',
+                ],
+                'content' => [
+                    0 => '<a href="' . dol_buildpath('societe/card.php?id=' . $legalDisplay->occupational_health_service->id . '&save_lastsearch_values=1', 1) .'" target="_blank">' . $langs->transnoentities('CongigureDoctorData') . ' <i class="fas fa-external-link-alt"></i></a>',
+                    1 => '<a href="' . dol_buildpath('saturne/view/saturne_schedules.php?id=' . $legalDisplay->occupational_health_service->id . '&element_type=societe&module_name=societe', 1) .'" target="_blank">' . $langs->transnoentities('CongigureDoctorData') . ' <i class="fas fa-external-link-alt"></i></a>',
+                    2 => '<a href="' . dol_buildpath('societe/card.php?id=' . $legalDisplay->detective_work->id . '&save_lastsearch_values=1', 1) .'" target="_blank">' . $langs->transnoentities('CongigureLabourInspectorData') . ' <i class="fas fa-external-link-alt"></i></a>',
+                    3 => '<a href="' . dol_buildpath('saturne/view/saturne_schedules.php?id=' . $legalDisplay->detective_work->id . '&element_type=societe&module_name=societe', 1) .'" target="_blank">' . $langs->transnoentities('CongigureLabourInspectorData') . ' <i class="fas fa-external-link-alt"></i></a>',
+                    4 => '<a href="' . dol_buildpath('/custom/digiriskdolibarr/admin/securityconf.php', 1) .'" target="_blank">' . $langs->transnoentities('ConfigureSecurityAndSocialData') . ' <i class="fas fa-external-link-alt"></i></a>',
+                    5 => '<a href="' . dol_buildpath('/custom/digiriskdolibarr/admin/securityconf.php', 1) .'" target="_blank">' . $langs->transnoentities('ConfigureSecurityAndSocialData') . ' <i class="fas fa-external-link-alt"></i></a>',
+                    6 => '<a href="' . dol_buildpath('/admin/openinghours.php', 1) .'" target="_blank">' . $langs->transnoentities('ConfigureSecurityAndSocialData') . ' <i class="fas fa-external-link-alt"></i></a>',
+                    7 => '<a href="' . dol_buildpath('/custom/digiriskdolibarr/admin/securityconf.php', 1) .'" target="_blank">' . $langs->transnoentities('ConfigureSecurityAndSocialData') . ' <i class="fas fa-external-link-alt"></i></a>',
+
+                ],
+                'picto'       => 'fas fa-link',
+                'widgetName'  => $langs->transnoentities('Society')
+            ]
+        ];
+        return $dashboardData;
+    }
+
+    /**
+     * get legal display info
+     *
+     * @return array     $array Return all graph data for dashboardData after load info
+     * @throws Exception
+     */
+    public function getLegalDisplayInfos(): array
     {
         global $langs;
 
@@ -271,194 +314,65 @@ class LegalDisplay extends DigiriskDocuments
 
         $labourDoctor            = [$legalDisplay->occupational_health_service->fullname, $legalDisplay->occupational_health_service->zip, $legalDisplay->occupational_health_service->address, $legalDisplay->occupational_health_service->town, $legalDisplay->occupational_health_service->phone];
         $labourDoctorTime        = [$legalDisplay->occupational_health_service->opening_hours_details->monday, $legalDisplay->occupational_health_service->opening_hours_details->tuesday, $legalDisplay->occupational_health_service->opening_hours_details->wednesday, $legalDisplay->occupational_health_service->opening_hours_details->thursday, $legalDisplay->occupational_health_service->opening_hours_details->friday, $legalDisplay->occupational_health_service->opening_hours_details->saturday, $legalDisplay->occupational_health_service->opening_hours_details->sunday];
-        $detectiveWork          = [$legalDisplay->detective_work->fullname, $legalDisplay->detective_work->zip, $legalDisplay->detective_work->address, $legalDisplay->detective_work->town, $legalDisplay->detective_work->phone];
+        $detectiveWork           = [$legalDisplay->detective_work->fullname, $legalDisplay->detective_work->zip, $legalDisplay->detective_work->address, $legalDisplay->detective_work->town, $legalDisplay->detective_work->phone];
         $labourDetectiveWorkTime = [$legalDisplay->detective_work->opening_hours_details->monday, $legalDisplay->detective_work->opening_hours_details->tuesday, $legalDisplay->detective_work->opening_hours_details->wednesday, $legalDisplay->detective_work->opening_hours_details->thursday, $legalDisplay->detective_work->opening_hours_details->friday, $legalDisplay->detective_work->opening_hours_details->saturday, $legalDisplay->detective_work->opening_hours_details->sunday];
         $emergencyService        = [$legalDisplay->emergency_service->samu, $legalDisplay->emergency_service->pompier, $legalDisplay->emergency_service->police, $legalDisplay->emergency_service->emergency, $legalDisplay->emergency_service->right_defender, $legalDisplay->emergency_service->poison_control_center];
         $safetyRule              = [$legalDisplay->emergency_service->safety_rule->responsible_for_preventing, $legalDisplay->emergency_service->safety_rule->phone, $legalDisplay->emergency_service->safety_rule->location_of_detailed_instruction];
-        $workingHour             = [$legalDisplay->detective_work->opening_hours_details->monday, $legalDisplay->working_hour->monday_afternoon, $legalDisplay->working_hour->tuesday_morning, $legalDisplay->working_hour->tuesday_afternoon, $legalDisplay->working_hour->wednesday_morning, $legalDisplay->working_hour->wednesday_afternoon, $legalDisplay->working_hour->thursday_morning, $legalDisplay->working_hour->thursday_afternoon, $legalDisplay->working_hour->friday_morning, $legalDisplay->working_hour->friday_afternoon, $legalDisplay->working_hour->saturday_morning, $legalDisplay->working_hour->saturday_afternoon, $legalDisplay->working_hour->sunday_morning, $legalDisplay->working_hour->sunday_afternoon];
+        $workingHour             = [$legalDisplay->working_hour->monday_morning, $legalDisplay->working_hour->monday_afternoon, $legalDisplay->working_hour->tuesday_morning, $legalDisplay->working_hour->tuesday_afternoon, $legalDisplay->working_hour->wednesday_morning, $legalDisplay->working_hour->wednesday_afternoon, $legalDisplay->working_hour->thursday_morning, $legalDisplay->working_hour->thursday_afternoon, $legalDisplay->working_hour->friday_morning, $legalDisplay->working_hour->friday_afternoon, $legalDisplay->working_hour->saturday_morning, $legalDisplay->working_hour->saturday_afternoon, $legalDisplay->working_hour->sunday_morning, $legalDisplay->working_hour->sunday_afternoon];
         $parameters              = [$legalDisplay->derogation_schedule->permanent, $legalDisplay->derogation_schedule->occasional, $legalDisplay->DUER->how_access_to_duer, $legalDisplay->participation_agreement->information_procedures, $legalDisplay->collective_agreement->location_and_access_terms_of_the_agreement];
 
-        require_once __DIR__ . '/../../core/tpl/digiriskdolibarr_legaldisplay_percentages.tpl.php';
+        function isGreaterThanZero($value) {
+            return dol_strlen($value) > 0;
+        }
 
-        $dashboardData['widgets'] = [
-            'labour_doctor' => [
-                'label'      => [
-                    $langs->transnoentities('Name') ?? '',
-                    $langs->transnoentities('Zip') ?? '',
-                    $langs->transnoentities('Address') ?? '',
-                    $langs->transnoentities('Town') ?? '',
-                    $langs->transnoentities('Phone') ?? '',
-                ],
-                'customContent' => [
-                    0 => dol_strlen($legalDisplay->occupational_health_service->fullname) > 0 ? $legalDisplay->occupational_health_service->fullname : $langs->trans('NoData'),
-                ],
-                'content'    => [
-                    1 => dol_strlen($legalDisplay->occupational_health_service->zip)     > 0 ? $legalDisplay->occupational_health_service->zip     : $langs->trans('NoData'),
-                    2 => dol_strlen($legalDisplay->occupational_health_service->address) > 0 ? $legalDisplay->occupational_health_service->address : $langs->trans('NoData'),
-                    3 => dol_strlen($legalDisplay->occupational_health_service->town)    > 0 ? $legalDisplay->occupational_health_service->town    : $langs->trans('NoData'),
-                    4 => dol_strlen($legalDisplay->occupational_health_service->phone)   > 0 ? $legalDisplay->occupational_health_service->phone   : $langs->trans('NoData'),
-                ],
-                'link'        => '<a href="../../admin/securityconf.php" target="_blank">' . $langs->trans('ConfigureSecurityAndSocialData') . ' <i class="fas fa-external-link-alt"></i></a>',
-                'picto'       => 'fas fa-user-md',
-                'progressBar' => '<div class="progress-group"><div class="progress sm"><div class="progress-bar progress-info" style="width: ' . $percentageLabourDoctor . '%;" title="0%"><div class="progress-bar progress-bar-consumed" style="width: 0%;" title="0%"></div></div></div></div>',
-                'widgetName'  => $langs->transnoentities('Society')
-            ],
-            'labour_doctor_schedules' => [
-                'label'      => [
-                    $langs->transnoentities('Monday'),
-                    $langs->transnoentities('Tuesday'),
-                    $langs->transnoentities('Wednesday'),
-                    $langs->transnoentities('Thursday'),
-                    $langs->transnoentities('Friday'),
-                    $langs->transnoentities('Saturday'),
-                    $langs->transnoentities('Sunday'),
-                ],
-                'content'    => [
-                    dol_strlen($legalDisplay->occupational_health_service->opening_hours_details->monday)    > 0 ? $legalDisplay->occupational_health_service->opening_hours_details->monday    : $langs->trans('NoData'),
-                    dol_strlen($legalDisplay->occupational_health_service->opening_hours_details->tuesday)   > 0 ? $legalDisplay->occupational_health_service->opening_hours_details->tuesday   : $langs->trans('NoData'),
-                    dol_strlen($legalDisplay->occupational_health_service->opening_hours_details->wednesday) > 0 ? $legalDisplay->occupational_health_service->opening_hours_details->wednesday : $langs->trans('NoData'),
-                    dol_strlen($legalDisplay->occupational_health_service->opening_hours_details->thursday)  > 0 ? $legalDisplay->occupational_health_service->opening_hours_details->thursday  : $langs->trans('NoData'),
-                    dol_strlen($legalDisplay->occupational_health_service->opening_hours_details->friday)    > 0 ? $legalDisplay->occupational_health_service->opening_hours_details->friday    : $langs->trans('NoData'),
-                    dol_strlen($legalDisplay->occupational_health_service->opening_hours_details->saturday)  > 0 ? $legalDisplay->occupational_health_service->opening_hours_details->saturday  : $langs->trans('NoData'),
-                    dol_strlen($legalDisplay->occupational_health_service->opening_hours_details->sunday)    > 0 ? $legalDisplay->occupational_health_service->opening_hours_details->sunday    : $langs->trans('NoData')
+        // Define a function to count the number of non-empty values in an array
+        function countNonEmptyValues($array) {
+            return count(array_filter($array, 'isGreaterThanZero'));
+        }
 
-                ],
-                'link'       => '<a href="' . dol_buildpath('saturne/view/saturne_schedules.php?id=' . $legalDisplay->occupational_health_service->id . '&element_type=societe&module_name=societe', 1) .'" target="_blank">' . $langs->trans('ConfigureSecurityAndSocialData') . ' <i class="fas fa-external-link-alt"></i></a>',
-                'picto'      => 'fas fa-clock',
-                'progressBar' => '<div class="progress-group"><div class="progress sm"><div class="progress-bar progress-info" style="width: ' . $percentageLabourDoctorTime . '%;" title="0%"><div class="progress-bar progress-bar-consumed" style="width: 0%;" title="0%"></div></div></div></div>',
-                'widgetName' => $langs->transnoentities('Society')
-            ],
-            'labour_inspector' => [
-                'label'      => [
-                    $langs->transnoentities('Name') ?? '',
-                    $langs->transnoentities('Zip') ?? '',
-                    $langs->transnoentities('Address') ?? '',
-                    $langs->transnoentities('Town') ?? '',
-                    $langs->transnoentities('Phone') ?? '',
-                ],
-                'customContent' => [
-                    0 => dol_strlen($legalDisplay->detective_work->fullname) > 0 ? $legalDisplay->detective_work->fullname : $langs->trans('NoData'),
-                ],
-                'content'    => [
-                    1 => dol_strlen($legalDisplay->detective_work->zip)     > 0 ? $legalDisplay->detective_work->zip     : $langs->trans('NoData'),
-                    2 => dol_strlen($legalDisplay->detective_work->address) > 0 ? $legalDisplay->detective_work->address : $langs->trans('NoData'),
-                    3 => dol_strlen($legalDisplay->detective_work->town)    > 0 ? $legalDisplay->detective_work->address : $langs->trans('NoData'),
-                    4 => dol_strlen($legalDisplay->detective_work->phone)   > 0 ? $legalDisplay->detective_work->phone   : $langs->trans('NoData'),
-                ],
-                'link'       => '<a href="../../admin/securityconf.php" target="_blank">' . $langs->trans('ConfigureSecurityAndSocialData') . ' <i class="fas fa-external-link-alt"></i></a>',
-                'picto'      => 'fas fa-briefcase',
-                'progressBar' => '<div class="progress-group"><div class="progress sm"><div class="progress-bar progress-info" style="width: ' . $percentageDetectiveWork . '%;" title="0%"><div class="progress-bar progress-bar-consumed" style="width: 0%;" title="0%"></div></div></div></div>',
-                'widgetName' => $langs->transnoentities('Society')
-            ],
-            'detective_work_schedules' => [
-                'label'      => [
-                    $langs->transnoentities('Monday'),
-                    $langs->transnoentities('Tuesday'),
-                    $langs->transnoentities('Wednesday'),
-                    $langs->transnoentities('Thursday'),
-                    $langs->transnoentities('Friday'),
-                    $langs->transnoentities('Saturday'),
-                    $langs->transnoentities('Sunday'),
-                ],
-                'content'    => [
-                    dol_strlen($legalDisplay->detective_work->opening_hours_details->monday)    > 0 ? $legalDisplay->detective_work->opening_hours_details->monday    : $langs->trans('NoData'),
-                    dol_strlen($legalDisplay->detective_work->opening_hours_details->tuesday)   > 0 ? $legalDisplay->detective_work->opening_hours_details->tuesday   : $langs->trans('NoData'),
-                    dol_strlen($legalDisplay->detective_work->opening_hours_details->wednesday) > 0 ? $legalDisplay->detective_work->opening_hours_details->wednesday : $langs->trans('NoData'),
-                    dol_strlen($legalDisplay->detective_work->opening_hours_details->thursday)  > 0 ? $legalDisplay->detective_work->opening_hours_details->thursday  : $langs->trans('NoData'),
-                    dol_strlen($legalDisplay->detective_work->opening_hours_details->friday)    > 0 ? $legalDisplay->detective_work->opening_hours_details->friday    : $langs->trans('NoData'),
-                    dol_strlen($legalDisplay->detective_work->opening_hours_details->saturday)  > 0 ? $legalDisplay->detective_work->opening_hours_details->saturday  : $langs->trans('NoData'),
-                    dol_strlen($legalDisplay->detective_work->opening_hours_details->sunday)    > 0 ? $legalDisplay->detective_work->opening_hours_details->sunday    : $langs->trans('NoData')
+        $labourDoctorValue            = countNonEmptyValues($labourDoctor);
+        $labourDoctorTimeValue        = countNonEmptyValues($labourDoctorTime);
+        $detectiveWorkValue           = countNonEmptyValues($detectiveWork);
+        $labourDetectiveWorkTimeValue = countNonEmptyValues($labourDetectiveWorkTime);
+        $emergencyServiceValue        = countNonEmptyValues($emergencyService);
+        $safetyRuleValue              = countNonEmptyValues($safetyRule);
+        $workingHourValue             = countNonEmptyValues($workingHour);
+        $parametersValue              = countNonEmptyValues($parameters);
 
-                ],
-                'link'       => '<a href="' . dol_buildpath('saturne/view/saturne_schedules.php?id=' . $legalDisplay->detective_work->id . '&element_type=societe&module_name=societe', 1) .'"" target="_blank">' . $langs->trans('ConfigureSecurityAndSocialData') . ' <i class="fas fa-external-link-alt"></i></a>',
-                'picto'      => 'fas fa-clock',
-                'progressBar' => '<div class="progress-group"><div class="progress sm"><div class="progress-bar progress-info" style="width: ' . $percentageDetectiveWorkTime . '%;" title="0%"><div class="progress-bar progress-bar-consumed" style="width: 0%;" title="0%"></div></div></div></div>',
-                'widgetName' => $langs->transnoentities('Society')
+        // Graph Title parameters
+        $array['title'] = $langs->transnoentities('ConfigureLegalDisplay');
+        $array['picto'] = $this->picto;
+
+        // Graph parameters
+        $array['width']      = '100%';
+        $array['height']     = 300;
+        $array['type']       = 'bars';
+        $array['showlegend'] = 1;
+        $array['dataset']    = 2;
+
+        //$legalDisplayGraphInfos = $this->getLegalDisplayNumber();
+        $array['labels'] = [
+            0 => [
+                'label' => $langs->transnoentities('Values'),
+                'color' => '#FF0059'
             ],
-            'emergency_calls' => [
-                'label'      => [
-                    $langs->transnoentities('SAMU') ?? '',
-                    $langs->transnoentities('Pompiers') ?? '',
-                    $langs->transnoentities('Police') ?? '',
-                    $langs->transnoentities('AllEmergencies') ?? '',
-                    $langs->transnoentities('RightsDefender') ?? '',
-                    $langs->transnoentities('PoisonControlCenter') ?? '',
-                ],
-                'content'    => [
-                    dol_strlen($legalDisplay->emergency_service->samu)                  > 0 ? $legalDisplay->emergency_service->samu                  : $langs->trans('NoData'),
-                    dol_strlen($legalDisplay->emergency_service->pompier)               > 0 ? $legalDisplay->emergency_service->pompier               : $langs->trans('NoData'),
-                    dol_strlen($legalDisplay->emergency_service->police)                > 0 ? $legalDisplay->emergency_service->police                : $langs->trans('NoData'),
-                    dol_strlen($legalDisplay->emergency_service->emergency)             > 0 ? $legalDisplay->emergency_service->emergency             : $langs->trans('NoData'),
-                    dol_strlen($legalDisplay->emergency_service->right_defender)        > 0 ? $legalDisplay->emergency_service->right_defender        : $langs->trans('NoData'),
-                    dol_strlen($legalDisplay->emergency_service->poison_control_center) > 0 ? $legalDisplay->emergency_service->poison_control_center : $langs->trans('NoData')
-                ],
-                'link'       => '<a href="../../admin/securityconf.php" target="_blank">' . $langs->trans('ConfigureSecurityAndSocialData') . ' <i class="fas fa-external-link-alt"></i></a>',
-                'picto'      => 'fas fa-ambulance',
-                'progressBar' => '<div class="progress-group"><div class="progress sm"><div class="progress-bar progress-info" style="width: ' . $percentageEmergencyService . '%;" title="0%"><div class="progress-bar progress-bar-consumed" style="width: 0%;" title="0%"></div></div></div></div>',
-                'widgetName' => $langs->transnoentities('Emergency')
-            ],
-            'safety_rule' => [
-                'label'      => [
-                    $langs->transnoentities('ResponsibleToNotify') ?? '',
-                    $langs->transnoentities('Phone') ?? '',
-                    $langs->transnoentities('Location') ?? ''
-                ],
-                'content'    => [
-                    dol_strlen($legalDisplay->emergency_service->safety_rule->responsible_for_preventing)       > 0 ? $legalDisplay->emergency_service->safety_rule->responsible_for_preventing       : $langs->trans('NoData'),
-                    dol_strlen($legalDisplay->emergency_service->safety_rule->phone)                            > 0 ? $legalDisplay->emergency_service->safety_rule->phone                            : $langs->trans('NoData'),
-                    dol_strlen($legalDisplay->emergency_service->safety_rule->location_of_detailed_instruction) > 0 ? $legalDisplay->emergency_service->safety_rule->location_of_detailed_instruction : $langs->trans('NoData')
-                ],
-                'link'       => '<a href="../../admin/securityconf.php" target="_blank">' . $langs->trans('ConfigureSecurityAndSocialData') . ' <i class="fas fa-external-link-alt"></i></a>',
-                'picto'      => 'fas fa-user-tie',
-                'progressBar' => '<div class="progress-group"><div class="progress sm"><div class="progress-bar progress-info" style="width: ' . $percentageSafetyRule . '%;" title="0%"><div class="progress-bar progress-bar-consumed" style="width: 0%;" title="0%"></div></div></div></div>',
-                'widgetName' => $langs->transnoentities('Emergency')
-            ],
-            'working_time' => [
-                'label'      => [
-                    $langs->transnoentities('Monday') ?? '',
-                    $langs->transnoentities('Tuesday') ?? '',
-                    $langs->transnoentities('Wednesday') ?? '',
-                    $langs->transnoentities('Thursday') ?? '',
-                    $langs->transnoentities('Friday') ?? '',
-                    $langs->transnoentities('Saturday') ?? '',
-                    $langs->transnoentities('Sunday') ?? ''
-                ],
-                'content'    => [
-                    (dol_strlen($legalDisplay->working_hour->monday_morning)    > 0 or dol_strlen($legalDisplay->working_hour->monday_afternoon)    > 0) ? $legalDisplay->working_hour->monday_morning    . ' - ' . $legalDisplay->working_hour->monday_afternoon    : $langs->trans('NoData'),
-                    (dol_strlen($legalDisplay->working_hour->tuesday_morning)   > 0 or dol_strlen($legalDisplay->working_hour->tuesday_afternoon)   > 0) ? $legalDisplay->working_hour->tuesday_morning   . ' - ' . $legalDisplay->working_hour->tuesday_afternoon   : $langs->trans('NoData'),
-                    (dol_strlen($legalDisplay->working_hour->wednesday_morning) > 0 or dol_strlen($legalDisplay->working_hour->wednesday_afternoon) > 0) ? $legalDisplay->working_hour->wednesday_morning . ' - ' . $legalDisplay->working_hour->wednesday_afternoon : $langs->trans('NoData'),
-                    (dol_strlen($legalDisplay->working_hour->thursday_morning)  > 0 or dol_strlen($legalDisplay->working_hour->thursday_afternoon)  > 0) ? $legalDisplay->working_hour->thursday_morning  . ' - ' . $legalDisplay->working_hour->thursday_afternoon  : $langs->trans('NoData'),
-                    (dol_strlen($legalDisplay->working_hour->friday_morning)    > 0 or dol_strlen($legalDisplay->working_hour->friday_afternoon)    > 0) ? $legalDisplay->working_hour->friday_morning    . ' - ' . $legalDisplay->working_hour->friday_afternoon    : $langs->trans('NoData'),
-                    (dol_strlen($legalDisplay->working_hour->saturday_morning)  > 0 or dol_strlen($legalDisplay->working_hour->saturday_afternoon)  > 0) ? $legalDisplay->working_hour->saturday_morning  . ' - ' . $legalDisplay->working_hour->saturday_afternoon  : $langs->trans('NoData'),
-                    (dol_strlen($legalDisplay->working_hour->sunday_morning)    > 0 or dol_strlen($legalDisplay->working_hour->sunday_afternoon)    > 0) ? $legalDisplay->working_hour->sunday_morning    . ' - ' . $legalDisplay->working_hour->sunday_afternoon    : $langs->trans('NoData'),
-                ],
-                'link'       => '<a href="' . dol_buildpath('../admin/openinghours.php', 1) .'"" target="_blank">' . $langs->trans('ConfigureSecurityAndSocialData') . ' <i class="fas fa-external-link-alt"></i></a>',
-                'picto'      => 'fas fa-clock',
-                'progressBar' => '<div class="progress-group"><div class="progress sm"><div class="progress-bar progress-info" style="width: ' . $percentageWorkingHour . '%;" title="0%"><div class="progress-bar progress-bar-consumed" style="width: 0%;" title="0%"></div></div></div></div>',
-                'widgetName' => $langs->transnoentities('Emergency')
-            ],
-            'information' => [
-                'label'      => [
-                    $langs->transnoentities('PermanentDerogation') ?? '',
-                    $langs->transnoentities('OccasionalDerogation') ?? '',
-                    $langs->transnoentities('DUER') ?? '',
-                    $langs->transnoentities('ParticipationAgreement') ?? '',
-                    $langs->transnoentities('Convention') ?? '',
-                ],
-                'content'    => [
-                    dol_strlen($legalDisplay->derogation_schedule->permanent)                                   > 0 ? '<i class="fas fa-check"></i>' : '<i class="fas fa-times"></i>',
-                    dol_strlen($legalDisplay->derogation_schedule->occasional)                                  > 0 ? '<i class="fas fa-check"></i>' : '<i class="fas fa-times"></i>',
-                    dol_strlen($legalDisplay->DUER->how_access_to_duer)                                         > 0 ? '<i class="fas fa-check"></i>' : '<i class="fas fa-times"></i>',
-                    dol_strlen($legalDisplay->participation_agreement->information_procedures)                  > 0 ? '<i class="fas fa-check"></i>' : '<i class="fas fa-times"></i>',
-                    dol_strlen($legalDisplay->collective_agreement->location_and_access_terms_of_the_agreement) > 0 ? '<i class="fas fa-check"></i>' : '<i class="fas fa-times"></i>',
-                ],
-                'link'       => '<a href="../../admin/securityconf.php" target="_blank">' . $langs->trans('ConfigureSecurityAndSocialData') . ' <i class="fas fa-external-link-alt"></i></a>',
-                'picto'      => 'fas fa-info',
-                'progressBar' => '<div class="progress-group"><div class="progress sm"><div class="progress-bar progress-info" style="width: ' . $percentageParameters . '%;" title="0%"><div class="progress-bar progress-bar-consumed" style="width: 0%;" title="0%"></div></div></div></div>',
-                'widgetName' => $langs->transnoentities('Emergency')
+            1 => [
+                'label' => $langs->transnoentities('Total'),
+                'color' => '#00CF68'
             ],
         ];
+        $dataArray = [
+            [$langs->transnoentities('LabourDoctor'), $labourDoctorValue, count($labourDoctor)],
+            [$langs->transnoentities('Schedules'), $labourDoctorTimeValue, count($labourDoctorTime)],
+            [$langs->transnoentities('LabourInspector'), $detectiveWorkValue, count($detectiveWork)],
+            [$langs->transnoentities('Schedules'), $labourDetectiveWorkTimeValue, count($labourDetectiveWorkTime)],
+            [$langs->transnoentities('AllEmergencies'), $emergencyServiceValue, count($emergencyService)],
+            [$langs->transnoentities('SafetyInstructions'), $safetyRuleValue, count($safetyRule)],
+            [$langs->transnoentities('OpeningHours'), $workingHourValue, count($workingHour)],
+            [$langs->transnoentities('parameters'), $parametersValue, count($parameters)]
+        ];
 
-        return $dashboardData;
+        $array['data'] = $dataArray;
+        return $array;
     }
 }
