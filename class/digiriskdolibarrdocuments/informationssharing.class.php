@@ -251,11 +251,11 @@ class InformationsSharing extends DigiriskDocuments
         $array['labels']     = [
             0 => [
                 'label' => $langs->transnoentities('Values'),
-                'color' => '#FF0059'
+                'color' => '#00CF68'
             ],
             1 => [
                 'label' => $langs->transnoentities('Total'),
-                'color' => '#00CF68'
+                'color' => '#006400'
             ],
         ];
         $dataArray = [
