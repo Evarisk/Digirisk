@@ -140,19 +140,20 @@ class Risk extends SaturneObject
 	 * @param bool $get_children_data Get children risks data
 	 * @param bool $get_parents_data Get parents risks data
 	 * @param bool $get_shared_data Get parents risks data
+     * @param  array     $moreParam   More param (Object/user/etc)
 	 * @return array|int         <0 if KO, 0 if not found, >0 if OK
 	 * @throws Exception
 	 */
-	public function fetchRisksOrderedByCotation($parent_id, $get_children_data = false, $get_parents_data = false, $get_shared_data = false)
+	public function fetchRisksOrderedByCotation($parent_id, $get_children_data = false, $get_parents_data = false, $get_shared_data = false, $moreParam = [])
 	{
 		$object  = new DigiriskElement($this->db);
 		$objects = $object->getActiveDigiriskElements();
 
 		$risk     = new Risk($this->db);
-		$riskList = $risk->fetchAll('', '', 0, 0, array(), 'AND', $get_shared_data ? 1 : 0);
+		$riskList = $risk->fetchAll('', '', 0, 0, isset($moreParam['filter']) ? ['customsql' => $moreParam['filter']] : [], 'AND', $get_shared_data ? 1 : 0);
 
 		$riskAssessment     = new RiskAssessment($this->db);
-		$riskAssessmentList = $riskAssessment->fetchAll('', '', 0, 0, ['customsql' => 'status = 1'], 'AND', $get_shared_data ? 1 : 0);
+		$riskAssessmentList = $riskAssessment->fetchAll('', '', 0, 0, ['customsql' => 'status = 1' . $moreParam['filter']], 'AND', $get_shared_data ? 1 : 0);
 
 		if (is_array($riskAssessmentList) && !empty($riskAssessmentList)) {
 			foreach ($riskAssessmentList as $riskAssessmentSingle) {

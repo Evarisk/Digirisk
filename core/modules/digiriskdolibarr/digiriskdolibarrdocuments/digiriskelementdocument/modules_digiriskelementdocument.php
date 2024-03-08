@@ -74,7 +74,7 @@ abstract class ModeleODTDigiriskElementDocument extends SaturneDocumentModel
 
 				if ( ! empty($object) ) {
 					//Fill risks data
-					$risks = $risk->fetchRisksOrderedByCotation($object->id, false, $conf->global->DIGIRISKDOLIBARR_SHOW_INHERITED_RISKS_IN_DOCUMENTS, $conf->global->DIGIRISKDOLIBARR_SHOW_SHARED_RISKS);
+					$risks = $risk->fetchRisksOrderedByCotation($object->id, false, $conf->global->DIGIRISKDOLIBARR_SHOW_INHERITED_RISKS_IN_DOCUMENTS, $conf->global->DIGIRISKDOLIBARR_SHOW_SHARED_RISKS, $moreParam);
 
 					$objectDocument->fillRiskData($odfHandler, $objectDocument, $outputLangs, [], '', $risks, $conf->global->DIGIRISKDOLIBARR_SHOW_SHARED_RISKS);
 
@@ -282,7 +282,11 @@ abstract class ModeleODTDigiriskElementDocument extends SaturneDocumentModel
             $tmpArray['photo'] = DOL_DOCUMENT_ROOT . $noPhoto;
         }
 
-        $moreParam['tmparray']         = $tmpArray;
+        if (isset($moreParam['tmparray'])) {
+            $moreParam['tmparray'][] = $tmpArray;
+        } else {
+            $moreParam['tmparray'] = $tmpArray;
+        }
         $moreParam['objectDocument']   = $objectDocument;
         $moreParam['hideTemplateName'] = 1;
 
