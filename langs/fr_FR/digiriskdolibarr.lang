@@ -722,6 +722,19 @@ RiskAssessmentDocumentSubject = Email document unique
 RiskAssessmentDocumentContent = Veuillez trouver ci-joint le ZIP et le document ODT du document unique.
 
 
+
+#
+# AuditReportDocument - Rapport d'audit
+#
+
+# Right - Droit
+
+# Data - Donnée
+AuditReportDocument     = Rapport d'audit
+auditreportdocument.odt = Rapport d'audit
+
+
+
 #
 # GroupmentDocument - Fiche Groupement
 #
