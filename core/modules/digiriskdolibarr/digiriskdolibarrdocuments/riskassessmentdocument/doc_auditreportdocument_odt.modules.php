@@ -84,10 +84,12 @@ class doc_auditreportdocument_odt extends ModeleODTDigiriskElementDocument
      */
     public function fillTagsLines(Odf $odfHandler, Translate $outputLangs, array $moreParam): int
     {
-        $filter  = ' AND date_creation BETWEEN ' . "'"  . dol_print_date($moreParam['dateStart'], 'dayrfc') . "'" . ' AND ' . "'" . dol_print_date($moreParam['dateEnd'], 'dayrfc') . "'";
-        $filter .= ' AND tms BETWEEN ' . "'"  . dol_print_date($moreParam['dateStart'], 'dayrfc') . "'" . ' AND ' . "'" . dol_print_date($moreParam['dateEnd'], 'dayrfc') . "'";
+        if (!empty($moreParam['dateStart']) && $moreParam['dateEnd']) {
+            $filter  = 'date_creation BETWEEN ' . "'"  . dol_print_date($moreParam['dateStart'], 'dayrfc') . "'" . ' AND ' . "'" . dol_print_date($moreParam['dateEnd'], 'dayrfc') . "'";
+            $filter .= ' OR tms BETWEEN ' . "'"  . dol_print_date($moreParam['dateStart'], 'dayrfc') . "'" . ' AND ' . "'" . dol_print_date($moreParam['dateEnd'], 'dayrfc') . "'";
 
-        $moreParam['filter'] = $filter;
+            $moreParam['filter'] = $filter;
+        }
 
         return parent::fillTagsLines($odfHandler, $outputLangs, $moreParam);
     }
@@ -109,6 +111,8 @@ class doc_auditreportdocument_odt extends ModeleODTDigiriskElementDocument
     {
         global $mysoc;
 
+        $risk = new Risk($this->db);
+
         $arraySoc                             = $this->get_substitutionarray_mysoc($mysoc, $outputLangs);
         $tmpArray['mycompany_photo_fullsize'] = $arraySoc['mycompany_logo'];
 
@@ -118,6 +122,9 @@ class doc_auditreportdocument_odt extends ModeleODTDigiriskElementDocument
         $objectDocument->element       = 'riskassessmentdocument@digiriskdolibarr';
         complete_substitutions_array($tmpArray, $outputLangs, $objectDocument);
         $objectDocument->element = $previousObjectDocumentElement;
+
+        $risks = $risk->fetchRisksOrderedByCotation(0, true, getDolGlobalInt('DIGIRISKDOLIBARR_SHOW_INHERITED_RISKS_IN_DOCUMENTS'), getDolGlobalInt('DIGIRISKDOLIBARR_SHOW_SHARED_RISKS'), $moreParam);;
+        $tmpArray['nb_new_or_edit_risks'] = count($risks);
 
         $moreParam['tmparray'] = $tmpArray;
 

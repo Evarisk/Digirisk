@@ -181,6 +181,10 @@ if (empty($reshook)) {
 		$moreparams['object'] = $object;
 		$moreparams['user']   = $user;
 		$moreparams['objectType'] = 'riskassessment';
+        if (GETPOST('daterange')) {
+            $moreparams['dateStart'] = dol_mktime(0, 0, 0, GETPOST('datestartmonth', 'int'), GETPOST('datestartday', 'int'), GETPOST('datestartyear', 'int'));
+            $moreparams['dateEnd']   = dol_mktime(0, 0, 0, GETPOST('dateendmonth', 'int'), GETPOST('dateendday', 'int'), GETPOST('dateendyear', 'int'));
+        }
 
 		$result = $document->generateDocument($model, $outputlangs, $hidedetails, $hidedesc, $hideref, $moreparams);
 
@@ -440,7 +444,27 @@ if ($action != 'presend') {
     }
     $urlSource = $_SERVER['PHP_SELF'];
 
-    print saturne_show_documents('digiriskdolibarr:RiskAssessmentDocument', $dirFilesArray, $fileDirArray, $urlSource, $permissiontoadd,$permissiontodelete, '', 1, 0, 0, 0, 0, '', '', '', $langs->defaultlang, $object);
+    print load_fiche_titre($langs->trans('Config'), '', '');
+
+    print '<form method="POST" action="' . $_SERVER['PHP_SELF'] . '#builddoc" id="builddoc_form">';
+    print '<table class="noborder centpercent">';
+    print '<tr class="liste_titre">';
+    print '<td>' . $langs->trans('Parameters') . '</td>';
+    print '<td>' . $langs->trans('Value') . '</td>';
+    print '</tr>';
+
+    // DateRange -- Plage de date
+    $dateStart = getDolGlobalInt('SOCIETE_FISCAL_MONTH_START') ? dol_mktime(0, 0, 0, getDolGlobalInt('SOCIETE_FISCAL_MONTH_START'), 1, strftime("%Y", dol_now())) : dol_now();
+    print '<tr class="oddeven"><td>' . $langs->trans("DateRange") . '</td>';
+    print '<td>' . $langs->trans('From') . $form->selectDate($dateStart, 'datestart');
+    print $langs->trans('At') . $form->selectDate(dol_time_plus_duree($dateStart, 1, 'y'), 'dateend');
+    print $langs->trans('UseDateRange');
+    print '<input type="checkbox" id="daterange" name="daterange"' . (GETPOST('daterange') ? ' checked=""' : '') . '>';
+    print '</td></tr>';
+    print '</table>';
+
+    print saturne_show_documents('digiriskdolibarr:RiskAssessmentDocument', $dirFilesArray, $fileDirArray, $urlSource, $permissiontoadd,$permissiontodelete, '', 1, 0, 0, 1, 0, '', '', '', $langs->defaultlang, $object);
+    print '</form>';
 }
 
 // Presend form
