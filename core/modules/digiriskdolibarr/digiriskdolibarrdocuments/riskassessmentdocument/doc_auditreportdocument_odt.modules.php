@@ -85,10 +85,13 @@ class doc_auditreportdocument_odt extends ModeleODTDigiriskElementDocument
     public function fillTagsLines(Odf $odfHandler, Translate $outputLangs, array $moreParam): int
     {
         if (!empty($moreParam['dateStart']) && $moreParam['dateEnd']) {
-            $filter  = 'date_creation BETWEEN ' . "'"  . dol_print_date($moreParam['dateStart'], 'dayrfc') . "'" . ' AND ' . "'" . dol_print_date($moreParam['dateEnd'], 'dayrfc') . "'";
-            $filter .= ' OR tms BETWEEN ' . "'"  . dol_print_date($moreParam['dateStart'], 'dayrfc') . "'" . ' AND ' . "'" . dol_print_date($moreParam['dateEnd'], 'dayrfc') . "'";
+            $startDate      = dol_print_date($moreParam['dateStart'], 'dayrfc');
+            $endDate        = dol_print_date($moreParam['dateEnd'], 'dayrfc');
+            $filter         = " AND (t.date_creation BETWEEN '$startDate' AND '$endDate' OR t.tms BETWEEN '$startDate' AND '$endDate')";
+            $specificFilter = " AND (t.datec BETWEEN '$startDate' AND '$endDate' OR t.tms BETWEEN '$startDate' AND '$endDate')";
 
-            $moreParam['filter'] = $filter;
+            $moreParam['filter']         = $filter;
+            $moreParam['specificFilter'] = $specificFilter;
         }
 
         return parent::fillTagsLines($odfHandler, $outputLangs, $moreParam);
@@ -111,7 +114,11 @@ class doc_auditreportdocument_odt extends ModeleODTDigiriskElementDocument
     {
         global $mysoc;
 
-        $risk = new Risk($this->db);
+        $digiriskElement = new DigiriskElement($this->db);
+        $risk            = new Risk($this->db);
+        $riskSign        = new RiskSign($this->db);
+        $evaluator       = new Evaluator($this->db);
+        $accident        = new Accident($this->db);
 
         $arraySoc                             = $this->get_substitutionarray_mysoc($mysoc, $outputLangs);
         $tmpArray['mycompany_photo_fullsize'] = $arraySoc['mycompany_logo'];
@@ -123,8 +130,45 @@ class doc_auditreportdocument_odt extends ModeleODTDigiriskElementDocument
         complete_substitutions_array($tmpArray, $outputLangs, $objectDocument);
         $objectDocument->element = $previousObjectDocumentElement;
 
-        $risks = $risk->fetchRisksOrderedByCotation(0, true, getDolGlobalInt('DIGIRISKDOLIBARR_SHOW_INHERITED_RISKS_IN_DOCUMENTS'), getDolGlobalInt('DIGIRISKDOLIBARR_SHOW_SHARED_RISKS'), $moreParam);;
-        $tmpArray['nb_new_or_edit_risks'] = count($risks);
+        if (!empty($moreParam['dateStart']) && $moreParam['dateEnd']) {
+            $startDate      = dol_print_date($moreParam['dateStart'], 'dayrfc');
+            $endDate        = dol_print_date($moreParam['dateEnd'], 'dayrfc');
+            $filter         = " AND (t.date_creation BETWEEN '$startDate' AND '$endDate' OR t.tms BETWEEN '$startDate' AND '$endDate')";
+            $specificFilter = " AND (t.datec BETWEEN '$startDate' AND '$endDate' OR t.tms BETWEEN '$startDate' AND '$endDate')";
+
+            $moreParam['filter']         = $filter;
+            $moreParam['specificFilter'] = $specificFilter;
+        }
+
+        $groupments       = [];
+        $workUnits        = [];
+        $digiriskElements = $digiriskElement->getActiveDigiriskElements();
+        if (is_array($digiriskElements) && !empty($digiriskElements)) {
+            foreach ($digiriskElements as $digiriskElement) {
+                if ($digiriskElement->element_type == 'groupment') {
+                    $groupments[] = $digiriskElement;
+                } else {
+                    $workUnits[] = $digiriskElement;
+                }
+            }
+        }
+
+        $risks      = $risk->fetchRisksOrderedByCotation(0, true, getDolGlobalInt('DIGIRISKDOLIBARR_SHOW_INHERITED_RISKS_IN_DOCUMENTS'), getDolGlobalInt('DIGIRISKDOLIBARR_SHOW_SHARED_RISKS'), $moreParam);;
+        $riskSigns  = $riskSign->fetchAll('', '', 0, 0, ['customsql' => 'status = ' . RiskSign::STATUS_VALIDATED . $moreParam['filter']]);
+        $evaluators = $evaluator->fetchAll('', '', 0, 0, ['customsql' => 'status = ' . Evaluator::STATUS_VALIDATED . $moreParam['filter']]);
+        $accidents  = $accident->fetchAll('', '', 0, 0, ['customsql' => 'status >= ' . Accident::STATUS_VALIDATED . $moreParam['filter']]);
+        $tickets    = [];
+        if (dolibarr_get_const($this->db, 'DIGIRISKDOLIBARR_TICKET_EXTRAFIELDS', 0)) {
+            $tickets = saturne_fetch_all_object_type('Ticket', '', '', 0, 0,  ['customsql' => 'eft.digiriskdolibarr_ticket_service > 0' . $moreParam['specificFilter']], 'AND', true);
+        }
+
+        $tmpArray['nb_new_or_edit_groupments'] = is_array($groupments) && !empty($groupments) ? count($groupments) : '';
+        $tmpArray['nb_new_or_edit_workunits']  = is_array($workUnits) && !empty($workUnits) ? count($workUnits) : '';
+        $tmpArray['nb_new_or_edit_risks']      = is_array($risks) && !empty($risks) ? count($risks) : '';
+        $tmpArray['nb_new_or_edit_risksigns']  = is_array($riskSigns) && !empty($riskSigns) ? count($riskSigns) : '';
+        $tmpArray['nb_new_or_edit_evaluators'] = is_array($evaluators) && !empty($evaluators) ? count($evaluators) : '';
+        $tmpArray['nb_new_or_edit_accidents']  = is_array($accidents) && !empty($accidents) ? count($accidents) : '';
+        $tmpArray['nb_new_or_edit_tickets']    = is_array($tickets) && !empty($tickets) ? count($tickets) : '';
 
         $moreParam['tmparray'] = $tmpArray;
 
