@@ -727,10 +727,9 @@ RiskAssessmentDocumentContent = Veuillez trouver ci-joint le ZIP et le document 
 # AuditReportDocument - Rapport d'audit
 #
 
-# Right - Droit
-
 # Data - Donnée
 AuditReportDocument     = Rapport d'audit
+AuditReportDocumentsMin = rapports d'audit
 auditreportdocument.odt = Rapport d'audit
 
 

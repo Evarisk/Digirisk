@@ -519,7 +519,7 @@ class modDigiriskdolibarr extends DolibarrModules
             // CONST AUDIT REPORT DOCUMENT
             $i++ => ['DIGIRISKDOLIBARR_MAIN_AGENDA_ACTIONAUTO_AUDITREPORTDOCUMENT_GENERATE', 'integer', 1, '', 0, 'current'],
             $i++ => ['DIGIRISKDOLIBARR_AUDITREPORTDOCUMENT_ADDON', 'chaine', 'mod_auditreportdocument_standard', '', 0, 'current'],
-            $i++ => ['DIGIRISKDOLIBARR_AUDITREPORTDOCUMENT_ADDON_ODT_PATH', 'chaine', 'DOL_DOCUMENT_ROOT/custom/digiriskdolibarr/documents/doctemplates/riskassessmentdocument/auditreportdocument/', '', 0, 'current'],
+            $i++ => ['DIGIRISKDOLIBARR_AUDITREPORTDOCUMENT_ADDON_ODT_PATH', 'chaine', 'DOL_DOCUMENT_ROOT/custom/digiriskdolibarr/documents/doctemplates/auditreportdocument/', '', 0, 'current'],
             $i++ => ['DIGIRISKDOLIBARR_AUDITREPORTDOCUMENT_CUSTOM_ADDON_ODT_PATH', 'chaine', 'DOL_DATA_ROOT' . (($conf->entity == 1 ) ? '/' : '/' . $conf->entity . '/') . 'ecm/digiriskdolibarr/auditreportdocument/', '', 0, 'current'],
             $i++ => ['DIGIRISKDOLIBARR_AUDITREPORTDOCUMENT_DEFAULT_MODEL', 'chaine', 'auditreportdocument_odt', '', 0, 'current'],
 
@@ -1040,6 +1040,23 @@ class modDigiriskdolibarr extends DolibarrModules
 		$this->rights[$r][4] = 'riskassessmentdocument'; // In php code, permission will be checked by test if ($user->rights->digiriskdolibarr->level1->level2)
 		$this->rights[$r][5] = 'delete'; // In php code, permission will be checked by test if ($user->rights->digiriskdolibarr->level1->level2)
 		$r++;
+
+        /* AUDIT REPORT DOCUMENT PERMISSIONS */
+        $this->rights[$r][0] = $this->numero . sprintf('%02d', $r + 1); // Permission id (must not be already used)
+        $this->rights[$r][1] = $langs->transnoentities('ReadObjects', $langs->transnoentities('AuditReportDocumentsMin')); // Permission label
+        $this->rights[$r][4] = 'auditreportdocument'; // In php code, permission will be checked by test if ($user->rights->digiriskdolibarr->level1->level2)
+        $this->rights[$r][5] = 'read'; // In php code, permission will be checked by test if ($user->rights->digiriskdolibarr->level1->level2)
+        $r++;
+        $this->rights[$r][0] = $this->numero . sprintf('%02d', $r + 1); // Permission id (must not be already used)
+        $this->rights[$r][1] = $langs->transnoentities('CreateObjects', $langs->transnoentities('AuditReportDocumentsMin')); // Permission label
+        $this->rights[$r][4] = 'auditreportdocument'; // In php code, permission will be checked by test if ($user->rights->digiriskdolibarr->level1->level2)
+        $this->rights[$r][5] = 'write'; // In php code, permission will be checked by test if ($user->rights->digiriskdolibarr->level1->level2)
+        $r++;
+        $this->rights[$r][0] = $this->numero . sprintf('%02d', $r + 1); // Permission id (must not be already used)
+        $this->rights[$r][1] = $langs->transnoentities('DeleteObjects', $langs->transnoentities('AuditReportDocumentsMin')); // Permission label
+        $this->rights[$r][4] = 'auditreportdocument'; // In php code, permission will be checked by test if ($user->rights->digiriskdolibarr->level1->level2)
+        $this->rights[$r][5] = 'delete'; // In php code, permission will be checked by test if ($user->rights->digiriskdolibarr->level1->level2)
+        $r++;
 
 		/* LEGAL DISPLAY PERMISSIONS */
 		$this->rights[$r][0] = $this->numero . sprintf('%02d', $r + 1); // Permission id (must not be already used)
@@ -1817,7 +1834,7 @@ class modDigiriskdolibarr extends DolibarrModules
         delDocumentModel('listingrisksdocument_odt', 'listingrisksdocument');
         delDocumentModel('listingrisksphoto_odt', 'listingrisksdocument');
 		delDocumentModel('riskassessmentdocument_odt', 'riskassessmentdocument');
-		delDocumentModel('auditreportdocument_odt', 'riskassessmentdocument');
+		delDocumentModel('auditreportdocument_odt', 'auditreportdocument');
 		delDocumentModel('ticketdocument_odt', 'ticketdocument');
         delDocumentModel('orque_projectdocument', 'project');
         delDocumentModel('accidentinvestigationdocument_odt', 'accidentinvestigationdocument');
@@ -1834,7 +1851,7 @@ class modDigiriskdolibarr extends DolibarrModules
         addDocumentModel('listingrisksaction_odt', 'listingrisksdocument', 'ODT templates', 'DIGIRISKDOLIBARR_LISTINGRISKSACTION_ADDON_ODT_PATH');
         addDocumentModel('listingrisksphoto_odt', 'listingrisksdocument', 'ODT templates', 'DIGIRISKDOLIBARR_LISTINGRISKSPHOTO_ADDON_ODT_PATH');
 		addDocumentModel('riskassessmentdocument_odt', 'riskassessmentdocument', 'ODT templates', 'DIGIRISKDOLIBARR_RISKASSESSMENTDOCUMENT_ADDON_ODT_PATH');
-		addDocumentModel('auditreportdocument_odt', 'riskassessmentdocument', 'ODT templates', 'DIGIRISKDOLIBARR_AUDITREPORTDOCUMENT_ADDON_ODT_PATH');
+		addDocumentModel('auditreportdocument_odt', 'auditreportdocument', 'ODT templates', 'DIGIRISKDOLIBARR_AUDITREPORTDOCUMENT_ADDON_ODT_PATH');
 		addDocumentModel('ticketdocument_odt', 'ticketdocument', 'ODT templates', 'DIGIRISKDOLIBARR_TICKETDOCUMENT_ADDON_ODT_PATH');
 		addDocumentModel('orque_projectdocument', 'project', 'orque');
         addDocumentModel('accidentinvestigationdocument_odt', 'accidentinvestigationdocument', 'ODT templates', 'DIGIRISKDOLIBARR_ACCIDENTINVESTIGATIONDOCUMENT_ADDON_ODT_PATH');

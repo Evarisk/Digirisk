@@ -386,28 +386,28 @@ class DigiriskElement extends SaturneObject
     }
 
     /**
-     *  Return list of non deleted digirisk elements
+     * Return list of non deleted digirisk elements
      *
-     * 	@return    array  Array with ids
-     * 	@throws Exception
+     * @param  int       $multiEntityManagement Option for manage multi entities with WHERE
+     * @param  array     $moreParams            More params (Object/user/etc)
+     * @return array|int $digiriskElements      Int <0 if KO, array of pages if OK
+     * @throws Exception
      */
-    public function getActiveDigiriskElements($allEntities = 0)
+    public function getActiveDigiriskElements(int $multiEntityManagement = 0, array $moreParams = [])
     {
-        global $conf;
-        $object = new self($this->db);
-        if ($allEntities == 1) {
-            $object->ismultientitymanaged = 0;
+        if ($multiEntityManagement == 1) {
+            $this->ismultientitymanaged = 0;
         }
-        $objects = $object->fetchAll('',  '',  0,  0, array('customsql' => 'status > 0'));
 
-        $trashList = $object->getMultiEntityTrashList();
-        if (!empty($trashList) && is_array($trashList)) {
-            foreach($trashList as $trash_element_id) {
-                unset($objects[$trash_element_id]);
+        $digiriskElements = $this->fetchAll('',  '',  0,  0, ['customsql' => 'status = ' . self::STATUS_VALIDATED . $moreParams['filter']]);
+        $trashList        = $this->getMultiEntityTrashList();
+        if (is_array($trashList) && !empty($trashList)) {
+            foreach($trashList as $trashElementID) {
+                unset($digiriskElements[$trashElementID]);
             }
         }
 
-        return $objects;
+        return $digiriskElements;
     }
 
     /**

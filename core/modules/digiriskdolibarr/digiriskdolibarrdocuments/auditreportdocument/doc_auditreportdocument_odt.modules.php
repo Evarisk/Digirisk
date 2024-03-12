@@ -17,7 +17,7 @@
  */
 
 /**
- * \file    core/modules/digiriskdolibarr/digiriskdolibarrdocuments/riskassessmentdocument/doc_auditreportdocument_odt.modules.php
+ * \file    core/modules/digiriskdolibarr/digiriskdolibarrdocuments/auditreportdocument/doc_auditreportdocument_odt.modules.php
  * \ingroup digiriskdolibarr
  * \brief   File of class to build ODT documents for audit report document
  */
@@ -142,7 +142,7 @@ class doc_auditreportdocument_odt extends ModeleODTDigiriskElementDocument
 
         $groupments       = [];
         $workUnits        = [];
-        $digiriskElements = $digiriskElement->getActiveDigiriskElements();
+        $digiriskElements = $digiriskElement->getActiveDigiriskElements(0, $moreParam);
         if (is_array($digiriskElements) && !empty($digiriskElements)) {
             foreach ($digiriskElements as $digiriskElement) {
                 if ($digiriskElement->element_type == 'groupment') {
