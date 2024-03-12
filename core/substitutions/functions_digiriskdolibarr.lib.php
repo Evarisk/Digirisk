@@ -73,6 +73,7 @@ function digiriskdolibarr_completesubstitutionarray(&$substitutionarray, $langs,
 			$substitutionarray['lieu_modalite']                        = dol_htmlentitiesbr_decode(strip_tags($legaldisplay->collective_agreement->location_and_access_terms_of_the_agreement, '<br>'));
 			$substitutionarray['modalite_information_ap']              = dol_htmlentitiesbr_decode(strip_tags($legaldisplay->participation_agreement->information_procedures, '<br>'));
 			$substitutionarray['modalite_access']                      = dol_htmlentitiesbr_decode(strip_tags($legaldisplay->DUER->how_access_to_duer, '<br>'));
+            $substitutionarray['rules_location']                       = dol_htmlentitiesbr_decode(strip_tags($legaldisplay->rules->location, '<br>'));
 
 			$substitutionarray['lundi_matin']    = $legaldisplay->working_hour->monday_morning;
 			$substitutionarray['lundi_aprem']    = $legaldisplay->working_hour->monday_afternoon;
