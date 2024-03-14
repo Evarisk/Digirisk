@@ -93,14 +93,15 @@ if (empty($reshook)) {
 	$error = 0;
 
 	if (($action == 'update' && ! GETPOST("cancel", 'alpha')) || ($action == 'updateedit') && $permissiontoadd) {
-		$auditStartDate = GETPOST('AuditStartDate', 'none');
-		$auditEndDate   = GETPOST('AuditEndDate', 'none');
-		$recipent       = GETPOST('Recipient', 'alpha');
-		$method         = GETPOST('Method', 'none');
-		$sources        = GETPOST('Sources', 'none');
-		$importantNote  = GETPOST('ImportantNote', 'none');
+		$auditStartDate  = GETPOST('AuditStartDate', 'none');
+		$auditEndDate    = GETPOST('AuditEndDate', 'none');
+		$recipent        = GETPOST('Recipient', 'alpha');
+		$method          = GETPOST('Method', 'none');
+		$sources         = GETPOST('Sources', 'none');
+		$importantNote   = GETPOST('ImportantNote', 'none');
+        $RisksPrevention = GETPOST('RisksPrevention', 'none');
 
-		if ( strlen($auditStartDate) ) {
+        if ( strlen($auditStartDate) ) {
 			$auditStartDate = explode('/', $auditStartDate);
 			$auditStartDate = $auditStartDate[2] . '-' . $auditStartDate[1] . '-' . $auditStartDate[0];
 			dolibarr_set_const($db, "DIGIRISKDOLIBARR_RISKASSESSMENTDOCUMENT_AUDIT_START_DATE", $auditStartDate, 'date', 0, '', $conf->entity);
@@ -125,8 +126,9 @@ if (empty($reshook)) {
 		dolibarr_set_const($db, "DIGIRISKDOLIBARR_RISKASSESSMENTDOCUMENT_METHOD", $method, 'chaine', 0, '', $conf->entity);
 		dolibarr_set_const($db, "DIGIRISKDOLIBARR_RISKASSESSMENTDOCUMENT_SOURCES", $sources, 'chaine', 0, '', $conf->entity);
 		dolibarr_set_const($db, "DIGIRISKDOLIBARR_RISKASSESSMENTDOCUMENT_IMPORTANT_NOTES", $importantNote, 'chaine', 0, '', $conf->entity);
+        dolibarr_set_const($db, "DIGIRISKDOLIBARR_RISKASSESSMENTDOCUMENT_RISKS_PREVENTION", $RisksPrevention, 'chaine', 0, '', $conf->entity);
 
-		// Submit file
+        // Submit file
 		if ( ! empty($conf->global->MAIN_UPLOAD_DOC)) {
 			if ( ! empty($_FILES)) {
 				if (is_array($_FILES['userfile']['tmp_name'])) $userfiles = $_FILES['userfile']['tmp_name'];
