@@ -46,8 +46,8 @@ saturne_load_langs(["admin"]);
 $action     = GETPOST('action', 'alpha');
 $backtopage = GETPOST('backtopage', 'alpha');
 $value      = GETPOST('value', 'alpha');
+$type       = GETPOST('type');
 
-$type  = 'firepermit';
 $error = 0;
 
 // Initialize technical objects
@@ -155,7 +155,6 @@ require __DIR__ . '/../../../saturne/core/tpl/admin/object/object_numbering_modu
 $object = new FirePermitLine($db);
 
 require __DIR__ . '/../../../saturne/core/tpl/admin/object/object_numbering_module_view.tpl.php';
-
 
 print load_fiche_titre($langs->trans("FirePermitData"), '', '');
 

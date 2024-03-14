@@ -47,8 +47,8 @@ saturne_load_langs(["admin"]);
 $action     = GETPOST('action', 'alpha');
 $backtopage = GETPOST('backtopage', 'alpha');
 $value      = GETPOST('value', 'alpha');
+$type       = GETPOST('type');
 
-$type  = 'preventionplan';
 $error = 0;
 
 // Initialize technical objects
