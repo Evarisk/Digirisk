@@ -46,13 +46,6 @@ saturne_load_langs(["admin"]);
 // Parameters
 $action     = GETPOST('action', 'alpha');
 $backtopage = GETPOST('backtopage', 'alpha');
-$value      = GETPOST('value', 'alpha');
-
-// Initialize technical objects
-$usertmp  = new User($db);
-$accident = new Accident($db);
-$workstop = new AccidentWorkStop($db);
-$lesion   = new AccidentLesion($db);
 
 // Security check - Protection if external user
 $permissiontoread = $user->rights->digiriskdolibarr->adminpage->read;
@@ -76,24 +69,8 @@ if (($action == 'update' && ! GETPOST("cancel", 'alpha')) || ($action == 'update
 	}
 }
 
-// Actions update_mask
+// Actions set_mod, update_mask
 require_once __DIR__ . '/../../../saturne/core/tpl/actions/admin_conf_actions.tpl.php';
-
-if ($action == 'setmod') {
-    if (preg_match('_accidentinvestigation_', $value)) {
-        $constforval = 'DIGIRISKDOLIBARR_ACCIDENTINVESTIGATION_ADDON';
-    } else if (preg_match('_accidentworkstop_', $value)) {
-        $constforval = 'DIGIRISKDOLIBARR_ACCIDENTWORKSTOP_ADDON';
-    } else if (preg_match('_accidentlesion_', $value)) {
-        $constforval = 'DIGIRISKDOLIBARR_ACCIDENTLESION_ADDON';
-    } else if (preg_match('_accident_', $value)) {
-        $constforval = 'DIGIRISKDOLIBARR_ACCIDENT_ADDON';
-    } else {
-        $constforval = '';
-    }
-
-    dolibarr_set_const($db, $constforval, $value, 'chaine', 0, '', $conf->entity);
-}
 
 /*
  * View
@@ -147,8 +124,6 @@ print load_fiche_titre('<i class="fas fa-user-injured"></i> ' . $langs->trans("A
 print '<hr>';
 
 $object = new AccidentLesion($db);
-
-$objectModSubdir = 'digiriskelement';
 
 require __DIR__ . '/../../../saturne/core/tpl/admin/object/object_numbering_module_view.tpl.php';
 

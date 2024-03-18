@@ -46,9 +46,7 @@ saturne_load_langs(["admin"]);
 // Parameters
 $action     = GETPOST('action', 'alpha');
 $backtopage = GETPOST('backtopage', 'alpha');
-$value      = GETPOST('value', 'alpha');
 
-$type  = 'preventionplan';
 $error = 0;
 
 // Initialize technical objects
@@ -81,18 +79,8 @@ if (($action == 'update' && ! GETPOST("cancel", 'alpha')) || ($action == 'update
 	}
 }
 
-// Actions update_mask
+// Actions set_mod, update_mask
 require_once __DIR__ . '/../../../saturne/core/tpl/actions/admin_conf_actions.tpl.php';
-
-if ($action == 'setmod') {
-	$constForVal = 'DIGIRISKDOLIBARR_' . strtoupper($type) . "_ADDON";
-	dolibarr_set_const($db, $constForVal, $value, 'chaine', 0, '', $conf->entity);
-}
-
-if ($action == 'setmodPreventionPlanDet') {
-	$constForVal = 'DIGIRISKDOLIBARR_' . strtoupper('preventionplandet') . "_ADDON";
-	dolibarr_set_const($db, $constForVal, $value, 'chaine', 0, '', $conf->entity);
-}
 
 if ($action == 'setMaitreOeuvre') {
 	$masterWorkerId = GETPOST('maitre_oeuvre');
