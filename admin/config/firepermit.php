@@ -45,8 +45,6 @@ saturne_load_langs(["admin"]);
 // Parameters
 $action     = GETPOST('action', 'alpha');
 $backtopage = GETPOST('backtopage', 'alpha');
-$value      = GETPOST('value', 'alpha');
-$type       = GETPOST('type');
 
 $error = 0;
 
@@ -80,18 +78,8 @@ if (($action == 'update' && ! GETPOST("cancel", 'alpha')) || ($action == 'update
 	}
 }
 
-// Actions update_mask
+// Actions set_mod, update_mask
 require_once __DIR__ . '/../../../saturne/core/tpl/actions/admin_conf_actions.tpl.php';
-
-if ($action == 'setmod') {
-	$constforval = 'DIGIRISKDOLIBARR_' . strtoupper($type) . "_ADDON";
-	dolibarr_set_const($db, $constforval, $value, 'chaine', 0, '', $conf->entity);
-}
-
-if ($action == 'setmodFirePermitDet') {
-	$constforval = 'DIGIRISKDOLIBARR_' . strtoupper('firepermitdet') . "_ADDON";
-	dolibarr_set_const($db, $constforval, $value, 'chaine', 0, '', $conf->entity);
-}
 
 if ($action == 'setMaitreOeuvre') {
 	$masterWorkerId = GETPOST('maitre_oeuvre');
