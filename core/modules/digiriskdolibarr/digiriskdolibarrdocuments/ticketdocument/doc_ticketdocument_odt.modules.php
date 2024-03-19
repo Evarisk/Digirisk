@@ -1,5 +1,5 @@
 <?php
-/* Copyright (C) 2021-2023 EVARISK <technique@evarisk.com>
+/* Copyright (C) 2021-2024 EVARISK <technique@evarisk.com>
  *
  * This program is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -17,21 +17,19 @@
  */
 
 /**
- *	\file       core/modules/digiriskdolibarr/digiriskdocuments/ticketdocument/doc_ticketdocument_odt.modules.php
- *	\ingroup    digiriskdolibarr
- *	\brief      File of class to build ODT documents for digiriskdolibarr
+ * \file    core/modules/digiriskdolibarr/digiriskdolibarrdocuments/ticketdocument/doc_ticketdocument_odt.modules.php
+ * \ingroup digiriskdolibarr
+ * \brief   File of class to build ODT documents for digiriskdolibarr ticket document
  */
 
-require_once DOL_DOCUMENT_ROOT . '/core/lib/files.lib.php';
-require_once DOL_DOCUMENT_ROOT . '/core/lib/images.lib.php';
-require_once DOL_DOCUMENT_ROOT . '/core/lib/company.lib.php';
-require_once DOL_DOCUMENT_ROOT . '/core/lib/doc.lib.php';
+// Load Dolibarr libraries
 require_once DOL_DOCUMENT_ROOT . '/categories/class/categorie.class.php';
+require_once DOL_DOCUMENT_ROOT . '/comm/action/class/actioncomm.class.php';
 
 // Load DigiriskDolibarr libraries
 require_once __DIR__ . '/../../../../../class/digiriskelement.class.php';
 
-// Load saturne libraries
+// Load Saturne libraries
 require_once __DIR__ . '/../../../../../../saturne/lib/medias.lib.php';
 require_once __DIR__ . '/../../../../../../saturne/core/modules/saturne/modules_saturne.php';
 
@@ -40,104 +38,101 @@ require_once __DIR__ . '/../../../../../../saturne/core/modules/saturne/modules_
  */
 class doc_ticketdocument_odt extends SaturneDocumentModel
 {
-	/**
-	 * @var array Minimum version of PHP required by module.
-	 * e.g.: PHP ≥ 5.5 = array(5, 5)
-	 */
-	public $phpmin = [7, 4];
+    /**
+     * @var array Minimum version of PHP required by module
+     * e.g.: PHP ≥ 5.5 = array(5, 5)
+     */
+    public $phpmin = [7, 4];
 
-	/**
-	 * @var string Dolibarr version of the loaded document.
-	 */
-	public string $version = 'dolibarr';
+    /**
+     * @var string Dolibarr version of the loaded document
+     */
+    public $version = 'dolibarr';
 
-	/**
-	 * @var string Module.
-	 */
-	public string $module = 'digiriskdolibarr';
+    /**
+     * @var string Module
+     */
+    public string $module = 'digiriskdolibarr';
 
-	/**
-	 * @var string Document type.
-	 */
-	public string $document_type = 'ticketdocument';
+    /**
+     * @var string Document type
+     */
+    public string $document_type = 'ticketdocument';
 
-	/**
-	 *    Constructor
-	 *
-	 * @param DoliDB $db Database handler
-	 */
-	public function __construct($db)
-	{
-		parent::__construct($db, $this->module, $this->document_type);
-	}
+    /**
+     * Constructor
+     *
+     * @param DoliDB $db Database handler
+     */
+    public function __construct($db)
+    {
+        parent::__construct($db, $this->module, $this->document_type);
+    }
 
-	/**
-	 * Return description of a module.
-	 *
-	 * @param Translate $langs Lang object to use for output.
-	 * @return string           Description.
-	 */
-	public function info(Translate $langs): string
-	{
-		return parent::info($langs);
-	}
+    /**
+     * Return description of a module
+     *
+     * @param Translate $langs Lang object to use for output
+     * @return string          Description
+     */
+    public function info(Translate $langs): string
+    {
+        return parent::info($langs);
+    }
 
-	/**
-	 * Fill all odt tags for segments lines.
-	 *
-	 * @param Odf $odfHandler Object builder odf library.
-	 * @param Translate $outputLangs Lang object to use for output.
-	 * @param array $moreParam More param (Object/user/etc).
-	 *
-	 * @return int                    1 if OK, <=0 if KO.
-	 * @throws Exception
-	 */
-	public function fillTagsLines(Odf $odfHandler, Translate $outputLangs, array $moreParam): int
-	{
-		global $conf, $hookmanager;
+    /**
+     * Fill all odt tags for segments lines
+     *
+     * @param Odf       $odfHandler  Object builder odf library
+     * @param Translate $outputLangs Lang object to use for output
+     * @param array     $moreParam   More param (Object/user/etc)
+     *
+     * @return int                   1 if OK, <=0 if KO
+     * @throws Exception
+     */
+    public function fillTagsLines(Odf $odfHandler, Translate $outputLangs, array $moreParam): int
+    {
+        $object = $moreParam['object'];
 
+        $userTmp    = new User($this->db);
+        $actionComm = new ActionComm($this->db);
 
-		$object = $moreParam['object'];
+        try {
+            $foundTagForLines = 1;
+            try {
+                $listLines = $odfHandler->setSegment('events');
+            } catch (OdfException $e) {
+                // We may arrive here if tags for lines not present into template
+                $foundTagForLines = 0;
+                $listLines        = '';
+                dol_syslog($e->getMessage());
+            }
 
-		$objectDocument = $moreParam['objectDocument'];
-		$usertmp = new User($this->db);
-		try {
-			$foundtagforlines = 1;
-			try {
-				$listLines = $odfHandler->setSegment('events');
-			} catch (OdfException $e) {
-				// We may arrive here if tags for lines not present into template
-				$foundtagforlines = 0;
-				dol_syslog($e->getMessage());
-			}
+            if ($foundTagForLines) {
+                $outputLangs->load('commercial');
+                $actionComms = $actionComm->getActions('', $object->id, $object->element);
+                if (is_array($actionComms) && !empty($actionComms)) {
+                    foreach ($actionComms as $actionComm) {
+                        $userTmp->fetch($actionComm->authorid);
+                        $tmpArray['event_ref']     = $actionComm->ref;
+                        $tmpArray['user']          = dol_strtoupper($userTmp->lastname) . ' ' . ucfirst($userTmp->firstname);
+                        $tmpArray['type']          = $outputLangs->transnoentities('Action' . $actionComm->type_code);
+                        $tmpArray['title']         = $actionComm->label;
+                        $tmpArray['event_content'] = dol_htmlentitiesbr_decode(strip_tags($actionComm->note, '<br>'));
+                        $tmpArray['date']          = dol_print_date($actionComm->datec, 'dayreduceformat');
 
-			require_once DOL_DOCUMENT_ROOT . '/comm/action/class/actioncomm.class.php';
-			$actioncomm = new ActionComm($this->db);
-			$event_list = $actioncomm->getActions('',$object->id,$object->element,'');
-
-			if ($foundtagforlines) {
-				if (!empty($event_list) && $event_list > 0) {
-					foreach ($event_list as $event) {
-						$usertmp->fetch($event->authorid);
-						$tmpArray['event_ref'] = $event->ref;
-						$tmpArray['user'] = $usertmp->firstname . ' ' . $usertmp->lastname;
-						$tmpArray['type'] = $outputLangs->transnoentities('Action' . $event->type_code);
-						$tmpArray['title'] = $event->label;
-						$tmpArray['event_content'] = dol_htmlentitiesbr_decode(strip_tags($event->note, '<br>'));
-						$tmpArray['date'] = dol_print_date($event->datec, 'dayreduceformat');
-
-						$this->setTmpArrayVars($tmpArray, $listLines, $outputLangs);
-					}
-					$odfHandler->mergeSegment($listLines);
-				}
-			}
-		} catch (OdfException $e) {
-			$this->error = $e->getMessage();
-			dol_syslog($this->error, LOG_WARNING);
-			return -1;
-		}
-		return 0;
-	}
+                        $this->setTmpArrayVars($tmpArray, $listLines, $outputLangs);
+                    }
+                    $odfHandler->mergeSegment($listLines);
+                }
+            }
+        } catch (OdfException $e) {
+            $this->error = $e->getMessage();
+            dol_syslog($this->error, LOG_WARNING);
+            return -1;
+        }
+        return 0;
+    }
 
     /**
      * Function to build a document on disk
@@ -222,7 +217,7 @@ class doc_ticketdocument_odt extends SaturneDocumentModel
         }
         if (!empty($contactList) && is_array($contactList)) {
             foreach ($contactList as $contact) {
-                $tmpArray['contacts'] .= ucfirst($contact['firstname']) . ' ' . strtoupper($contact['lastname']) . ', ';
+                $tmpArray['contacts'] .= dol_strtoupper($contact['lastname']) . ' ' . ucfirst($contact['firstname']) . ', ';
             }
         } else {
             $tmpArray['contacts'] = '';
