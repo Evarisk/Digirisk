@@ -437,7 +437,7 @@ if ($action != 'presend') {
     $fileDir   = $upload_dir . '/' . $dirFiles;
     $urlSource = $_SERVER['PHP_SELF'];
 
-    print saturne_show_documents('digiriskdolibarr:RiskAssessmentDocument', $dirFiles, $fileDir, $urlSource, $permissiontoadd, $permissiontodelete, '', 1, 0, 0, 0, 0, '', '', '', $langs->defaultlang, $object);
+    print saturne_show_documents('digiriskdolibarr:RiskAssessmentDocument', $dirFiles, $fileDir, $urlSource, $permissiontoadd, $permissiontodelete, '', 1, 0, 0, 0, 0, '', '', $langs->defaultlang, '', $object);
 }
 
 // Presend form

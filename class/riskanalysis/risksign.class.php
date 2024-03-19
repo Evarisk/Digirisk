@@ -241,7 +241,7 @@ class RiskSign extends SaturneObject
 		$object   = new DigiriskElement($this->db);
 		$objects  = $object->fetchAll('',  '',  0,  0, array('customsql' => 'status > 0' ));
 		$risksign = new RiskSign($this->db);
-		$result   = $risksign->fetchAll('', '', 0, 0, ['customsql' => ($parent_id > 0 ? 'fk_element = ' . $parent_id . ' AND ' : '') . 'status = 1' . $moreParams['filter']]);
+		$result   = $risksign->fetchAll('', '', 0, 0, ['customsql' => ($parent_id > 0 ? 'fk_element = ' . $parent_id . ' AND ' : '') . 'status = ' . self::STATUS_VALIDATED . $moreParams['filter']]);
 
 		$trashList = $object->getMultiEntityTrashList();
 		if (!empty($trashList) && is_array($trashList)) {

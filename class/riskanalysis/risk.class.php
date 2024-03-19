@@ -150,10 +150,10 @@ class Risk extends SaturneObject
 		$objects = $object->getActiveDigiriskElements();
 
 		$risk     = new Risk($this->db);
-		$riskList = $risk->fetchAll('', '', 0, 0, ['customsql' => 'status = 1' . $moreParams['filter']], 'AND', $get_shared_data ? 1 : 0);
+		$riskList = $risk->fetchAll('', '', 0, 0, ['customsql' => 'status = ' . self::STATUS_VALIDATED . $moreParams['filter']], 'AND', $get_shared_data ? 1 : 0);
 
 		$riskAssessment     = new RiskAssessment($this->db);
-		$riskAssessmentList = $riskAssessment->fetchAll('', '', 0, 0, ['customsql' => 'status = 1' . $moreParams['filter']], 'AND', $get_shared_data ? 1 : 0);
+		$riskAssessmentList = $riskAssessment->fetchAll('', '', 0, 0, ['customsql' => 'status = ' . RiskAssessment::STATUS_VALIDATED . $moreParams['filter']], 'AND', $get_shared_data ? 1 : 0);
 
 		if (is_array($riskAssessmentList) && !empty($riskAssessmentList)) {
 			foreach ($riskAssessmentList as $riskAssessmentSingle) {

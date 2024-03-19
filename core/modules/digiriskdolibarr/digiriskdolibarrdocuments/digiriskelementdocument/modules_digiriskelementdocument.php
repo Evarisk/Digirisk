@@ -281,8 +281,8 @@ abstract class ModeleODTDigiriskElementDocument extends SaturneDocumentModel
             $tmpArray['photo'] = DOL_DOCUMENT_ROOT . $noPhoto;
         }
 
-        if (isset($moreParam['tmparray'])) {
-            $moreParam['tmparray'][] = $tmpArray;
+        if (isset($moreParam['tmparray']) && is_array($moreParam['tmparray'])) {
+            $moreParam['tmparray'] = array_merge($moreParam['tmparray'], $tmpArray);
         } else {
             $moreParam['tmparray'] = $tmpArray;
         }

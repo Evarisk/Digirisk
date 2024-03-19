@@ -142,7 +142,7 @@ $dirFiles  = 'auditreportdocument/' . $objRef;
 $fileDir   = $upload_dir . '/' . $dirFiles;
 $urlSource = $_SERVER['PHP_SELF'];
 
-print saturne_show_documents('digiriskdolibarr:AuditReportDocument', $dirFiles, $fileDir, $urlSource, $permissiontoadd, $permissiontodelete, '', 1, 0, 0, 1, 0, '', '', '', $langs->defaultlang, $object);
+print saturne_show_documents('digiriskdolibarr:AuditReportDocument', $dirFiles, $fileDir, $urlSource, $permissiontoadd, $permissiontodelete, '', 1, 0, 0, 1, 0, '', '', $langs->defaultlang, '', $object);
 print '</form>';
 
 // End of page
