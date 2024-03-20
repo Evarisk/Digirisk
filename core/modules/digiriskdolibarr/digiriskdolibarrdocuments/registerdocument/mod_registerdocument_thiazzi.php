@@ -17,26 +17,26 @@
  */
 
 /**
- * \file    core/modules/digiriskdolibarr/digiriskelement/preventionplandet/mod_preventionplandet_alvaldi.php
+ * \file    core/modules/digiriskdolibarr/digiriskdolibarrdocuments/registerdocument/mod_registerdocument_thiazzi.php
  * \ingroup digiriskdolibarr
- * \brief   File that contains the numbering module rules alvaldi
+ * \brief   File that contains the numbering module rules thiazzi
  */
 
 // Load Saturne libraries
 require_once __DIR__ . '/../../../../../../saturne/core/modules/saturne/modules_saturne.php';
 
 /**
- * Class of file that contains the numbering module rules alvaldi
+ * Class of file that contains the numbering module rules thiazzi
  */
-class mod_preventionplandet_alvaldi extends CustomModeleNumRefSaturne
+class mod_registerdocument_thiazzi extends CustomModeleNumRefSaturne
 {
     /**
      * @var string Model name
      */
-    public string $name = 'Alvaldi';
+    public string $name = 'Thiazzi';
 
     public function __construct()
     {
-        self::setCustomValue('digiriskdolibarr', 'preventionplandet');
+        self::setCustomValue('digiriskdolibarr', 'registerdocument');
     }
 }

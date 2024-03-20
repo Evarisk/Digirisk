@@ -1,5 +1,5 @@
 <?php
-/* Copyright (C) 2021-2024 EVARISK <technique@evarisk.com>
+/* Copyright (C) 2024 EVARISK <technique@evarisk.com>
  *
  * This program is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -13,30 +13,41 @@
  *
  * You should have received a copy of the GNU General Public License
  * along with this program. If not, see <https://www.gnu.org/licenses/>.
- * or see https://www.gnu.org/
  */
 
 /**
- * \file    core/modules/digiriskdolibarr/digiriskelement/preventionplandet/mod_preventionplandet_alvaldi.php
+ * \file    class/digiriskdolibarrdocuments/auditreportdocument.class.php
  * \ingroup digiriskdolibarr
- * \brief   File that contains the numbering module rules alvaldi
+ * \brief   This file is a class file for AuditReportDocument
  */
 
-// Load Saturne libraries
-require_once __DIR__ . '/../../../../../../saturne/core/modules/saturne/modules_saturne.php';
+
+// Load DigiriskDolibarr librairies
+require_once __DIR__ . '/../digiriskdocuments.class.php';
 
 /**
- * Class of file that contains the numbering module rules alvaldi
+ * Class for AuditReportDocument
  */
-class mod_preventionplandet_alvaldi extends CustomModeleNumRefSaturne
+
+class AuditReportDocument extends DigiriskDocuments
 {
     /**
-     * @var string Model name
+     * @var string Module name
      */
-    public string $name = 'Alvaldi';
+    public $module = 'digiriskdolibarr';
 
-    public function __construct()
+    /**
+     * @var string Element type of object
+     */
+    public $element = 'auditreportdocument';
+
+    /**
+     * Constructor
+     *
+     * @param DoliDb $db Database handler
+     */
+    public function __construct(DoliDB $db)
     {
-        self::setCustomValue('digiriskdolibarr', 'preventionplandet');
+        parent::__construct($db, $this->module, $this->element);
     }
 }

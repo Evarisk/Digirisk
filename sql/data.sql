@@ -912,3 +912,4 @@ INSERT INTO llx_c_digiriskdolibarr_action_trigger (rowid, entity, elementtype, r
 
 -- 9.15.0
 INSERT INTO llx_c_digiriskdolibarr_action_trigger (rowid, entity, elementtype, ref, label, description, active, position) VALUES (77, 0, 'listingrisksdocument@digiriskdolibarr', 'LISTINGRISKSDOCUMENT_GENERATE', 'ListingRisksDocumentGenerated', 'Executed when a listing risks document is generated', 1, 81);
+INSERT INTO llx_c_digiriskdolibarr_action_trigger (rowid, entity, elementtype, ref, label, description, active, position) VALUES (78, 0, 'auditreportdocument@digiriskdolibarr', 'AUDITREPORTDOCUMENT_GENERATE', 'AuditReportDocumentGenerated', 'Executed when a audit report document is generated', 1, 91);

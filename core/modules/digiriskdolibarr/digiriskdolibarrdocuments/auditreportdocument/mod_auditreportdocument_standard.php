@@ -1,5 +1,5 @@
 <?php
-/* Copyright (C) 2021-2024 EVARISK <technique@evarisk.com>
+/* Copyright (C) 2024 EVARISK <technique@evarisk.com>
  *
  * This program is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -17,26 +17,26 @@
  */
 
 /**
- * \file    core/modules/digiriskdolibarr/digiriskelement/preventionplandet/mod_preventionplandet_alvaldi.php
+ * \file    core/modules/digiriskdolibarr/digiriskdolibarrdocuments/mod_auditreportdocument_standard.php
  * \ingroup digiriskdolibarr
- * \brief   File that contains the numbering module rules alvaldi
+ * \brief   File of class to manage auditreportdocument numbering rules standard
  */
 
 // Load Saturne libraries
 require_once __DIR__ . '/../../../../../../saturne/core/modules/saturne/modules_saturne.php';
 
 /**
- * Class of file that contains the numbering module rules alvaldi
+ * Class to manage auditreportdocument numbering rules standard
  */
-class mod_preventionplandet_alvaldi extends CustomModeleNumRefSaturne
+class mod_auditreportdocument_standard extends ModeleNumRefSaturne
 {
     /**
-     * @var string Model name
+     * @var string Numbering module ref prefix
      */
-    public string $name = 'Alvaldi';
+    public string $prefix = 'ARD';
 
-    public function __construct()
-    {
-        self::setCustomValue('digiriskdolibarr', 'preventionplandet');
-    }
+    /**
+     * @var string Name
+     */
+    public string $name = 'Pallène';
 }
