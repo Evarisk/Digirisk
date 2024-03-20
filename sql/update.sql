@@ -245,3 +245,7 @@ ALTER TABLE llx_digiriskdolibarr_accident DROP COLUMN fk_user_victim;
 -- 9.14.1
 DELETE FROM llx_c_digiriskdolibarr_action_trigger WHERE ref = 'FIREPERMIT_INPROGRESS';
 DELETE FROM llx_c_digiriskdolibarr_action_trigger WHERE ref = 'PREVENTIONPLAN_INPROGRESS';
+
+-- 9.15.0
+-- Check if ref are duplicate and delete them
+DELETE t1 FROM llx_c_digiriskdolibarr_action_trigger t1 JOIN llx_c_digiriskdolibarr_action_trigger t2 WHERE t1.rowid > t2.rowid AND t1.ref = t2.ref;
