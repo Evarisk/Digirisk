@@ -230,7 +230,8 @@ class RiskSign extends SaturneObject
      * Load object in memory from the database
      *
      * @param  int       $parent_id        Id parent object
-     * @param  bool      $get_parents_data Get parents risks data
+     * @param  bool      $get_parents_data Get parents risks signs data
+     * @param  bool      $get_shared_data  Get shared risks signs data
      * @param  array     $moreParams       More params(Object/user/etc)
      * @return array|int                   Int <0 if KO, array of pages if OK
      * @throws Exception

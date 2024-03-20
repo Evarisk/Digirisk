@@ -116,7 +116,7 @@ abstract class ModeleODTDigiriskElementDocument extends SaturneDocumentModel
 					$odfHandler->mergeSegment($listLines);
 
 					//Fill risk signs data
-					$risksigns = $risksign->fetchRiskSign($object->element != 'digiriskstandard' ? $object->id : 0, $conf->global->DIGIRISKDOLIBARR_SHOW_INHERITED_RISKSIGNS, $conf->global->DIGIRISKDOLIBARR_SHOW_SHARED_RISKSIGNS);
+					$risksigns = $risksign->fetchRiskSign($object->element != 'digiriskstandard' ? $object->id : 0, $conf->global->DIGIRISKDOLIBARR_SHOW_INHERITED_RISKSIGNS, $conf->global->DIGIRISKDOLIBARR_SHOW_SHARED_RISKSIGNS, $moreParam);
 					$listLines = $odfHandler->setSegment('affectedRecommandation');
 					if (is_array($risksigns) && !empty($risksigns)) {
 						foreach ($risksigns as $line) {
