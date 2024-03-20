@@ -1,5 +1,5 @@
 <?php
-/* Copyright (C) 2021-2023 EVARISK <technique@evarisk.com>
+/* Copyright (C) 2021-2024 EVARISK <technique@evarisk.com>
  *
  * This program is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -37,16 +37,6 @@ class mod_ticketdocument_geirrod extends CustomModeleNumRefSaturne
 
     public function __construct()
     {
-        global $conf;
-
-        $refMod = $conf->global->DIGIRISKDOLIBARR_TICKETDOCUMENT_GEIRROD_ADDON;
-        if (dol_strlen($refMod)) {
-            $refModSplitted = preg_split('/\{/', $refMod);
-            if (is_array($refModSplitted) && !empty($refModSplitted)) {
-                $suffix       = preg_replace('/}/', '', $refModSplitted[1]);
-                $this->prefix = $refModSplitted[0];
-                $this->suffix = $suffix;
-            }
-        }
+        self::setCustomValue('digiriskdolibarr', 'ticketdocument');
     }
 }

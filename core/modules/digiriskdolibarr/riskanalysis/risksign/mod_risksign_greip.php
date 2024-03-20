@@ -17,9 +17,9 @@
  */
 
 /**
- * \file       htdocs/custom/digiriskdolibarr/core/modules/digiriskdolibarr/riskanalysis/mod_risksign_greip.php
- * \ingroup    digiriskelement
- * \brief      File that contains the numbering module rules Greip
+ * \file    core/modules/digiriskdolibarr/riskanalysis/risksign/mod_risksign_greip.php
+ * \ingroup digiriskdolibarr
+ * \brief   File that contains the numbering module rules Greip
  */
 
 // Load Saturne libraries
@@ -30,23 +30,13 @@ require_once __DIR__ . '/../../../../../../saturne/core/modules/saturne/modules_
  */
 class mod_risksign_greip extends CustomModeleNumRefSaturne
 {
-
-	/**
-	 * @var string model name
-	 */
-	public string $name = 'Greip';
+    /**
+     * @var string model name
+     */
+    public string $name = 'Greip';
 
     public function __construct()
     {
-        global $conf;
-        $refMod = $conf->global->DIGIRISKDOLIBARR_RISKSIGN_GREIP_ADDON;
-        if (dol_strlen($refMod)) {
-            $refModSplitted = preg_split('/\{/', $refMod);
-            if (is_array($refModSplitted) && !empty($refModSplitted)) {
-                $suffix = preg_replace('/\}/', '', $refModSplitted[1]);
-                $this->prefix = $refModSplitted[0];
-                $this->suffix = $suffix;
-            }
-        }
+        self::setCustomValue('digiriskdolibarr', 'riskassessment');
     }
 }

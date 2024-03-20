@@ -1,5 +1,5 @@
 <?php
-/* Copyright (C) 2021-2023 EVARISK <technique@evarisk.com>
+/* Copyright (C) 2021-2024 EVARISK <technique@evarisk.com>
  *
  * This program is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -17,12 +17,12 @@
  */
 
 /**
- * \file       htdocs/custom/digiriskdolibarr/core/modules/digiriskdolibarr/digiriskelement/mod_workunit_canopus.php
- * \ingroup    digiriskelement
- * \brief      File that contains the numbering module rules Canopus
+ * \file    core/modules/digiriskdolibarr/digiriskelement/workunit/mod_workunit_canopus.php
+ * \ingroup digiriskdolibarr
+ * \brief   File that contains the numbering module rules Canopus
  */
 
-// Load Saturne libraries.
+// Load Saturne libraries
 require_once __DIR__ . '/../../../../../../saturne/core/modules/saturne/modules_saturne.php';
 
 /**
@@ -30,23 +30,13 @@ require_once __DIR__ . '/../../../../../../saturne/core/modules/saturne/modules_
  */
 class mod_workunit_canopus extends CustomModeleNumRefSaturne
 {
-
-	/**
-	 * @var string model name
-	 */
-	public string $name = 'Canopus';
+    /**
+     * @var string model name
+     */
+    public string $name = 'Canopus';
 
     public function __construct()
     {
-        global $conf;
-        $refMod = $conf->global->DIGIRISKDOLIBARR_WORKUNIT_CANOPUS_ADDON;
-        if (dol_strlen($refMod)) {
-            $refModSplitted = preg_split('/\{/', $refMod);
-            if (is_array($refModSplitted) && !empty($refModSplitted)) {
-                $suffix = preg_replace('/\}/', '', $refModSplitted[1]);
-                $this->prefix = $refModSplitted[0];
-                $this->suffix = $suffix;
-            }
-        }
+        self::setCustomValue('digiriskdolibarr', 'workunit');
     }
 }
