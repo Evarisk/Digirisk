@@ -1,6 +1,5 @@
 <?php
-
-/* Copyright (C) 2021-2023 EVARISK <technique@evarisk.com>
+/* Copyright (C) 2021-2024 EVARISK <technique@evarisk.com>
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -16,12 +15,26 @@
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
+/**
+ * \file    core/tpl/digiriskdolibarr_projectcreation_action.tpl.php
+ * \ingroup digiriskdolibarr
+ * \brief   Template page for project creation actions
+ */
+
+/**
+ * The following vars must be defined :
+ * Global   : $conf, $db, $langs, $user
+ * Variable : $moduleNameLowerCase
+ */
+
 require_once DOL_DOCUMENT_ROOT . '/core/lib/date.lib.php';
 require_once DOL_DOCUMENT_ROOT . '/core/lib/admin.lib.php';
 
 require_once DOL_DOCUMENT_ROOT . '/projet/class/project.class.php';
 require_once DOL_DOCUMENT_ROOT . '/societe/class/societe.class.php';
 require_once DOL_DOCUMENT_ROOT . '/user/class/usergroup.class.php';
+require_once DOL_DOCUMENT_ROOT . '/user/class/user.class.php';
+require_once DOL_DOCUMENT_ROOT . '/categories/class/categorie.class.php';
 
 $userGroup   = new UserGroup($db);
 $project     = new Project($db);
@@ -105,6 +118,9 @@ if (!array_key_exists('digiriskdolibarr', $externalmodule)) {
 	dolibarr_set_const($db, "MULTICOMPANY_EXTERNAL_MODULES_SHARING", $jsonformat, 'json', 0, '', 0);
 }
 
+$numberingModules  = ['project' => $conf->global->PROJECT_ADDON];
+list ($projectRef) = saturne_require_objects_mod($numberingModules, $moduleNameLowerCase);
+
 //Check projet
 if ($conf->global->DIGIRISKDOLIBARR_DU_PROJECT > 0 && $conf->global->DIGIRISKDOLIBARR_DU_PROJECT_BACKWARD_COMPATIBILITY == 0) {
 	$project->fetch($conf->global->DIGIRISKDOLIBARR_DU_PROJECT);
@@ -115,7 +131,6 @@ if ($conf->global->DIGIRISKDOLIBARR_DU_PROJECT > 0 && $conf->global->DIGIRISKDOL
 		$project->update($user);
 	}
 
-	require_once DOL_DOCUMENT_ROOT . '/categories/class/categorie.class.php';
 	$tags = new Categorie($db);
 
 	$tags->fetch('', 'DU');
@@ -124,18 +139,13 @@ if ($conf->global->DIGIRISKDOLIBARR_DU_PROJECT > 0 && $conf->global->DIGIRISKDOL
 }
 
 if ( $conf->global->DIGIRISKDOLIBARR_DU_PROJECT == 0 || $project->statut == 2 ) {
-    $numberingModules = [
-        'project' => $conf->global->PROJECT_ADDON
-    ];
-
-    list ($projectRef) = saturne_require_objects_mod($numberingModules, $moduleNameLowerCase);
 	$project->ref         = $projectRef->getNextValue($third_party, $project);
 	$project->title       = $langs->trans('RiskAssessmentDocument') . ' - ' . $conf->global->MAIN_INFO_SOCIETE_NOM;
 	$project->description = $langs->trans('RiskAssessmentDocumentDescription');
 	$project->date_c      = dol_now();
 	$currentYear          = dol_print_date(dol_now(), '%Y');
 	$fiscalMonthStart     = $conf->global->SOCIETE_FISCAL_MONTH_START;
-	$startdate            = dol_mktime('0', '0', '0', $fiscalMonthStart ? $fiscalMonthStart : '1', '1', $currentYear);
+	$startdate            = dol_mktime('0', '0', '0', $fiscalMonthStart ?: '1', '1', $currentYear);
 	$project->date_start  = $startdate;
 
 	$project->usage_task = 1;
@@ -148,7 +158,6 @@ if ( $conf->global->DIGIRISKDOLIBARR_DU_PROJECT == 0 || $project->statut == 2 ) 
 	$project_id            = $project->create($user);
 	dolibarr_set_const($db, 'DIGIRISKDOLIBARR_DU_PROJECT', $project_id, 'integer', 0, '', $conf->entity);
 
-	require_once DOL_DOCUMENT_ROOT . '/categories/class/categorie.class.php';
 	$tags = new Categorie($db);
 
 	$tags->fetch('', 'DU');
@@ -192,7 +201,7 @@ if ( $conf->global->DIGIRISKDOLIBARR_PREVENTIONPLAN_PROJECT == 0 || $project->st
 	$project->date_c      = dol_now();
 	$currentYear          = dol_print_date(dol_now(), '%Y');
 	$fiscalMonthStart     = $conf->global->SOCIETE_FISCAL_MONTH_START;
-	$startdate            = dol_mktime('0', '0', '0', $fiscalMonthStart ? $fiscalMonthStart : '1', '1', $currentYear);
+	$startdate            = dol_mktime('0', '0', '0', $fiscalMonthStart ?: '1', '1', $currentYear);
 	$project->date_start  = $startdate;
 
 	$project->usage_task = 1;
@@ -205,7 +214,6 @@ if ( $conf->global->DIGIRISKDOLIBARR_PREVENTIONPLAN_PROJECT == 0 || $project->st
 	$project_id            = $project->create($user);
 	dolibarr_set_const($db, 'DIGIRISKDOLIBARR_PREVENTIONPLAN_PROJECT', $project_id, 'integer', 0, '', $conf->entity);
 
-	require_once DOL_DOCUMENT_ROOT . '/categories/class/categorie.class.php';
 	$tags = new Categorie($db);
 
 	$tags->fetch('', 'PP');
@@ -219,7 +227,7 @@ if ( $conf->global->DIGIRISKDOLIBARR_FIREPERMIT_PROJECT == 0 || $project->statut
 	$project->date_c      = dol_now();
 	$currentYear          = dol_print_date(dol_now(), '%Y');
 	$fiscalMonthStart     = $conf->global->SOCIETE_FISCAL_MONTH_START;
-	$startdate            = dol_mktime('0', '0', '0', $fiscalMonthStart ? $fiscalMonthStart : '1', '1', $currentYear);
+	$startdate            = dol_mktime('0', '0', '0', $fiscalMonthStart ?: '1', '1', $currentYear);
 	$project->date_start  = $startdate;
 
 	$project->usage_task = 1;
@@ -232,7 +240,6 @@ if ( $conf->global->DIGIRISKDOLIBARR_FIREPERMIT_PROJECT == 0 || $project->statut
 	$project_id            = $project->create($user);
 	dolibarr_set_const($db, 'DIGIRISKDOLIBARR_FIREPERMIT_PROJECT', $project_id, 'integer', 0, '', $conf->entity);
 
-	require_once DOL_DOCUMENT_ROOT . '/categories/class/categorie.class.php';
 	$tags = new Categorie($db);
 
 	$tags->fetch('', 'FP');
@@ -246,7 +253,7 @@ if ( $conf->global->DIGIRISKDOLIBARR_ACCIDENT_PROJECT == 0 || $project->statut =
 	$project->date_c      = dol_now();
 	$currentYear          = dol_print_date(dol_now(), '%Y');
 	$fiscalMonthStart     = $conf->global->SOCIETE_FISCAL_MONTH_START;
-	$startdate            = dol_mktime('0', '0', '0', $fiscalMonthStart ? $fiscalMonthStart : '1', '1', $currentYear);
+	$startdate            = dol_mktime('0', '0', '0', $fiscalMonthStart ?: '1', '1', $currentYear);
 	$project->date_start  = $startdate;
 
 	$project->usage_task = 1;
@@ -259,7 +266,6 @@ if ( $conf->global->DIGIRISKDOLIBARR_ACCIDENT_PROJECT == 0 || $project->statut =
 	$project_id            = $project->create($user);
 	dolibarr_set_const($db, 'DIGIRISKDOLIBARR_ACCIDENT_PROJECT', $project_id, 'integer', 0, '', $conf->entity);
 
-	require_once DOL_DOCUMENT_ROOT . '/categories/class/categorie.class.php';
 	$tags = new Categorie($db);
 
 	$tags->fetch('', 'ACC');
@@ -273,7 +279,7 @@ if ( $conf->global->DIGIRISKDOLIBARR_TICKET_PROJECT == 0 || $project->statut == 
 	$project->date_c      = dol_now();
 	$currentYear          = dol_print_date(dol_now(), '%Y');
 	$fiscalMonthStart     = $conf->global->SOCIETE_FISCAL_MONTH_START;
-	$startdate            = dol_mktime('0', '0', '0', $fiscalMonthStart ? $fiscalMonthStart : '1', '1', $currentYear);
+	$startdate            = dol_mktime('0', '0', '0', $fiscalMonthStart ?: '1', '1', $currentYear);
 	$project->date_start  = $startdate;
 
 	$project->usage_task = 1;
@@ -286,7 +292,6 @@ if ( $conf->global->DIGIRISKDOLIBARR_TICKET_PROJECT == 0 || $project->statut == 
 	$project_id            = $project->create($user);
 	dolibarr_set_const($db, 'DIGIRISKDOLIBARR_TICKET_PROJECT', $project_id, 'integer', 0, '', $conf->entity);
 
-	require_once DOL_DOCUMENT_ROOT . '/categories/class/categorie.class.php';
 	$tags = new Categorie($db);
 
 	$tags->fetch('', 'TS');
@@ -294,8 +299,6 @@ if ( $conf->global->DIGIRISKDOLIBARR_TICKET_PROJECT == 0 || $project->statut == 
 }
 
 if (!dolibarr_get_const($db, 'DIGIRISKDOLIBARR_USERAPI_SET', 0)) {
-	require_once DOL_DOCUMENT_ROOT . '/user/class/user.class.php';
-
 	$usertmp            = new User($db);
 	$usertmp->lastname  = 'API';
 	$usertmp->firstname = 'REST';
@@ -814,7 +817,6 @@ if ($conf->global->DIGIRISKDOLIBARR_ENCODE_BACKWARD_COMPATIBILITY == 0) {
 		$extrafields->update('digiriskdolibarr_ticket_phone', $langs->transnoentities("Phone"), 'phone', '', 'ticket', 0, 0, 2200, '', 1, '', 1);
 	}
 
-	require_once DOL_DOCUMENT_ROOT . '/categories/class/categorie.class.php';
 	$tags = new Categorie($db);
 
 	$tags->fetch('', $langs->trans('SST'));
@@ -892,9 +894,9 @@ if ($conf->global->DIGIRISKDOLIBARR_ENCODE_BACKWARD_COMPATIBILITY == 0) {
 		$accident->update($user);
 	}
 
-	require_once __DIR__ . '/../../class/digirisksignature.class.php';
+	require_once __DIR__ . '/../../../saturne/class/saturnesignature.class.php';
 
-	$signatory = new DigiriskSignature($db);
+	$signatory = new SaturneSignature($db, $moduleNameLowerCase);
 
 	$signatories = $signatory->fetchAll();
 	foreach ($signatories as $signatory) {
