@@ -984,6 +984,10 @@ class ActionsDigiriskdolibarr
 				'documentType' => 'riskassessmentdocument',
 				'picto'        => 'fontawesome_fa-file-alt_fas_#d35968'
 			],
+            'AuditReportDocument' => [
+                'documentType' => 'auditreportdocument',
+                'picto'        => 'fontawesome_fa-file-alt_fas_#d35968'
+            ],
 			'PreventionPlanDocument' => [
 				'documentType' => 'preventionplandocument',
 				'picto'        => 'fontawesome_fa-info_fas_#d35968'

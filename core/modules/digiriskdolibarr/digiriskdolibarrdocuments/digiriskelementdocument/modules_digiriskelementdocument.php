@@ -73,12 +73,12 @@ abstract class ModeleODTDigiriskElementDocument extends SaturneDocumentModel
 
 				if ( ! empty($object) ) {
 					//Fill risks data
-					$risks = $risk->fetchRisksOrderedByCotation($object->id, false, $conf->global->DIGIRISKDOLIBARR_SHOW_INHERITED_RISKS_IN_DOCUMENTS, $conf->global->DIGIRISKDOLIBARR_SHOW_SHARED_RISKS);
+					$risks = $risk->fetchRisksOrderedByCotation($object->element != 'digiriskstandard' ? $object->id : 0, $object->element != 'digiriskstandard' ? false : true, $conf->global->DIGIRISKDOLIBARR_SHOW_INHERITED_RISKS_IN_DOCUMENTS, $conf->global->DIGIRISKDOLIBARR_SHOW_SHARED_RISKS, $moreParam);
 
 					$objectDocument->fillRiskData($odfHandler, $objectDocument, $outputLangs, [], '', $risks, $conf->global->DIGIRISKDOLIBARR_SHOW_SHARED_RISKS);
 
 					//Fill evaluators data
-					$evaluators = $evaluator->fetchFromParent($object->id);
+					$evaluators = $evaluator->fetchAll('', '', 0, 0, ['customsql' => ($object->element != 'digiriskstandard' ? 'fk_parent = ' . $object->id . ' AND ' : '') . 'status = ' . Evaluator::STATUS_VALIDATED . $moreParam['filter']]);
 					$listLines = $odfHandler->setSegment('utilisateursPresents');
 					if (is_array($evaluators) && !empty($evaluators)) {
 						foreach ($evaluators as $line) {
@@ -115,7 +115,7 @@ abstract class ModeleODTDigiriskElementDocument extends SaturneDocumentModel
 					$odfHandler->mergeSegment($listLines);
 
 					//Fill risk signs data
-					$risksigns = $risksign->fetchRiskSign($object->id, $conf->global->DIGIRISKDOLIBARR_SHOW_INHERITED_RISKSIGNS, $conf->global->DIGIRISKDOLIBARR_SHOW_SHARED_RISKSIGNS);
+					$risksigns = $risksign->fetchRiskSign($object->element != 'digiriskstandard' ? $object->id : 0, $conf->global->DIGIRISKDOLIBARR_SHOW_INHERITED_RISKSIGNS, $conf->global->DIGIRISKDOLIBARR_SHOW_SHARED_RISKSIGNS, $moreParam);
 					$listLines = $odfHandler->setSegment('affectedRecommandation');
 					if (is_array($risksigns) && !empty($risksigns)) {
 						foreach ($risksigns as $line) {
@@ -150,7 +150,7 @@ abstract class ModeleODTDigiriskElementDocument extends SaturneDocumentModel
 					$odfHandler->mergeSegment($listLines);
 
 					//Fill accidents data
-					$accidents = $accident->fetchFromParent($object->id);
+					$accidents = $accident->fetchAll('', '', 0, 0, ['customsql' => ($object->element != 'digiriskstandard' ? 'fk_element = ' . $object->id . ' AND ' : '') . 'status >= ' . Accident::STATUS_VALIDATED . $moreParam['filter']]);
 					$listLines = $odfHandler->setSegment('affectedAccident');
 					if (is_array($accidents) && !empty($accidents)) {
 						foreach ($accidents as $line) {
@@ -184,8 +184,7 @@ abstract class ModeleODTDigiriskElementDocument extends SaturneDocumentModel
 
 					//Fill tickets data
 					if (dolibarr_get_const($this->db, 'DIGIRISKDOLIBARR_TICKET_EXTRAFIELDS', 0)) {
-						$filter  = ['eft.digiriskdolibarr_ticket_service' => $object->id];
-                        $tickets = saturne_fetch_all_object_type('Ticket', '', '', 0, 0,  $filter, 'AND', true);
+            $tickets = saturne_fetch_all_object_type('Ticket', '', '', 0, 0,  ['customsql' => 'eft.digiriskdolibarr_ticket_service > ' . ($object->element != 'digiriskstandard' ? $object->id : 0) . $moreParam['specificFilter']], 'AND', true);
 					}
 					$listLines = $odfHandler->setSegment('tickets');
 					if (is_array($tickets) && !empty($tickets)) {
@@ -281,7 +280,11 @@ abstract class ModeleODTDigiriskElementDocument extends SaturneDocumentModel
             $tmpArray['photo'] = DOL_DOCUMENT_ROOT . $noPhoto;
         }
 
-        $moreParam['tmparray']         = $tmpArray;
+        if (isset($moreParam['tmparray']) && is_array($moreParam['tmparray'])) {
+            $moreParam['tmparray'] = array_merge($moreParam['tmparray'], $tmpArray);
+        } else {
+            $moreParam['tmparray'] = $tmpArray;
+        }
         $moreParam['objectDocument']   = $objectDocument;
         $moreParam['hideTemplateName'] = 1;
 

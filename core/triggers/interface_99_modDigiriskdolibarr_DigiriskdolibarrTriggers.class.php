@@ -221,6 +221,7 @@ class InterfaceDigiriskdolibarrTriggers extends DolibarrTriggers
 
             case 'REGISTERDOCUMENT_GENERATE':
             case 'RISKASSESSMENTDOCUMENT_GENERATE' :
+            case 'AUDITREPORTDOCUMENT_GENERATE' :
             case 'LEGALDISPLAY_GENERATE' :
             case 'INFORMATIONSSHARING_GENERATE' :
             case 'REGISTERDOCUMENT_GENERATE' :
@@ -228,6 +229,7 @@ class InterfaceDigiriskdolibarrTriggers extends DolibarrTriggers
 			case 'PREVENTIONPLANDOCUMENT_GENERATE' :
             case 'LISTINGRISKSACTION_GENERATE' :
             case 'LISTINGRISKSPHOTO_GENERATE' :
+            case 'LISTINGRISKSDOCUMENT_GENERATE' :
             case 'WORKUNITDOCUMENT_GENERATE' :
 			case 'GROUPMENTDOCUMENT_GENERATE' :
 

@@ -104,7 +104,7 @@ if (empty($resHook)) {
  */
 
 $title   = $langs->trans('ListingRisksDocuments');
-$helpUrl = 'FR:Module_Diirisk#Impression_des_listings_deg_risques';
+$helpUrl = 'FR:Module_Digirisk#Impression_des_listings_de_risques';
 
 digirisk_header($title, $helpUrl);
 

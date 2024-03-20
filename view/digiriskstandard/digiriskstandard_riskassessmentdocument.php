@@ -432,18 +432,12 @@ print '</form>';
 
 print dol_get_fiche_end();
 
-// Document Generation -- Génération des documents
-if ($action != 'edit') {
-	$dirFiles   = 'riskassessmentdocument';
-	$filedir    = $upload_dir . '/' . $dirFiles;
-	$urlsource  = $_SERVER["PHP_SELF"];
-	$modulepart = 'digiriskdolibarr:RiskAssessmentDocument';
+if ($action != 'presend') {
+    $dirFiles  = 'riskassessmentdocument';
+    $fileDir   = $upload_dir . '/' . $dirFiles;
+    $urlSource = $_SERVER['PHP_SELF'];
 
-	if ($permissiontoadd || $permissiontoread) {
-		$genallowed = 1;
-	}
-
-	print saturne_show_documents($modulepart, $dirFiles, $filedir, $urlsource, 1,1, '', 1, 0, 0, 0, 0, '', 0, '', empty($soc->default_lang) ? '' : $soc->default_lang, $object);
+    print saturne_show_documents('digiriskdolibarr:RiskAssessmentDocument', $dirFiles, $fileDir, $urlSource, $permissiontoadd, $permissiontodelete, '', 1, 0, 0, 0, 0, '', '', $langs->defaultlang, '', $object);
 }
 
 // Presend form

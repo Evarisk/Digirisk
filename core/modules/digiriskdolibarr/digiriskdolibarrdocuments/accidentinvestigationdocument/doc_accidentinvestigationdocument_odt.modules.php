@@ -31,7 +31,6 @@ require_once __DIR__ . '/../../../../../../saturne/class/saturnesignature.class.
 
 // Load DigiriskDolibarr libraries.
 require_once __DIR__ . '/../../../../../class/digiriskstandard.class.php';
-require_once __DIR__ . '/modules_accidentinvestigationdocument.php';
 require_once __DIR__ . '/mod_accidentinvestigationdocument_standard.php';
 
 /**

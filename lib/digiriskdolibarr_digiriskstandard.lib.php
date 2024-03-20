@@ -80,6 +80,13 @@ function digiriskstandard_prepare_head(DigiriskStandard $object): array
         $h++;
     }
 
+    if ($user->rights->digiriskdolibarr->auditreportdocument->read) {
+        $head[$h][0] = dol_buildpath('/digiriskdolibarr/view/digiriskstandard/digiriskstandard_auditreportdocument.php', 1);
+        $head[$h][1] = $conf->browser->layout != 'phone' ? '<i class="fas fa-file-alt pictofixedwidth"></i>' . $langs->trans('AuditReportDocument') : '<i class="fas fa-file-alt"></i>';
+        $head[$h][2] = 'standardAuditReportDocument';
+        $h++;
+    }
+
     $head[$h][0] = dol_buildpath('/saturne/view/saturne_agenda.php', 1) . '?id=' . $object->id . '&module_name=DigiriskDolibarr&object_type=digiriskstandard&show_nav=0&handle_photo=true';
     $head[$h][1] = $conf->browser->layout != 'phone' ? '<i class="fas fa-calendar-alt pictofixedwidth"></i>' . $langs->trans('Events') : '<i class="fas fa-calendar-alt"></i>';
     $head[$h][2] = 'agenda';
