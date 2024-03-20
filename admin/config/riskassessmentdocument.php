@@ -179,11 +179,6 @@ $constArray[$moduleNameLowerCase] = [
 		'description' => 'SortRisksListingsByEvaluationDescription',
 		'code'        => 'DIGIRISKDOLIBARR_SORT_LISTINGS_BY_COTATION',
 	],
-    'RiskListParentView' => [
-        'name'        => 'RiskListParentView',
-        'description' => 'RiskListParentViewDescription',
-        'code'        => 'DIGIRISKDOLIBARR_RISK_LIST_PARENT_VIEW',
-    ],
 	'RiskDescriptionPrefill' => [
 		'name'        => 'RiskDescriptionPrefill',
 		'description' => 'RiskDescriptionPrefillDescription',
@@ -194,6 +189,11 @@ $constArray[$moduleNameLowerCase] = [
 		'description' => 'ShowRiskOriginDescription',
 		'code'        => 'DIGIRISKDOLIBARR_SHOW_RISK_ORIGIN',
 	],
+    'RiskListParentView' => [
+        'name'        => 'RiskListParentView',
+        'description' => 'RiskListParentViewDescription',
+        'code'        => 'DIGIRISKDOLIBARR_RISK_LIST_PARENT_VIEW',
+    ],
 	'ShowInheritedRisksInDocuments' => [
 		'name'        => 'ShowInheritedRisksInDocuments',
 		'description' => 'ShowInheritedRisksInDocumentsDescription',
