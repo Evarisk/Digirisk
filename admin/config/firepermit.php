@@ -45,9 +45,7 @@ saturne_load_langs(["admin"]);
 // Parameters
 $action     = GETPOST('action', 'alpha');
 $backtopage = GETPOST('backtopage', 'alpha');
-$value      = GETPOST('value', 'alpha');
 
-$type  = 'firepermit';
 $error = 0;
 
 // Initialize technical objects
@@ -80,18 +78,8 @@ if (($action == 'update' && ! GETPOST("cancel", 'alpha')) || ($action == 'update
 	}
 }
 
-// Actions update_mask
+// Actions set_mod, update_mask
 require_once __DIR__ . '/../../../saturne/core/tpl/actions/admin_conf_actions.tpl.php';
-
-if ($action == 'setmod') {
-	$constforval = 'DIGIRISKDOLIBARR_' . strtoupper($type) . "_ADDON";
-	dolibarr_set_const($db, $constforval, $value, 'chaine', 0, '', $conf->entity);
-}
-
-if ($action == 'setmodFirePermitDet') {
-	$constforval = 'DIGIRISKDOLIBARR_' . strtoupper('firepermitdet') . "_ADDON";
-	dolibarr_set_const($db, $constforval, $value, 'chaine', 0, '', $conf->entity);
-}
 
 if ($action == 'setMaitreOeuvre') {
 	$masterWorkerId = GETPOST('maitre_oeuvre');
@@ -155,7 +143,6 @@ require __DIR__ . '/../../../saturne/core/tpl/admin/object/object_numbering_modu
 $object = new FirePermitLine($db);
 
 require __DIR__ . '/../../../saturne/core/tpl/admin/object/object_numbering_module_view.tpl.php';
-
 
 print load_fiche_titre($langs->trans("FirePermitData"), '', '');
 

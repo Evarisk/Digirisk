@@ -1,5 +1,5 @@
 <?php
-/* Copyright (C) 2021-2023 EVARISK <technique@evarisk.com>
+/* Copyright (C) 2021-2024 EVARISK <technique@evarisk.com>
  *
  * This program is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -43,19 +43,18 @@ abstract class ModeleODTDigiriskElementDocument extends SaturneDocumentModel
 {
 
 	/**
-	 * Fill all odt tags for segments lines.
+	 * Fill all odt tags for segments lines
 	 *
-	 * @param  Odf       $odfHandler  Object builder odf library.
-	 * @param  Translate $outputLangs Lang object to use for output.
-	 * @param  array     $moreParam   More param (Object/user/etc).
+	 * @param  Odf       $odfHandler  Object builder odf library
+	 * @param  Translate $outputLangs Lang object to use for output
+	 * @param  array     $moreParam   More param (Object/user/etc)
 	 *
-	 * @return int                    1 if OK, <=0 if KO.
+	 * @return int                    1 if OK, <=0 if KO
 	 * @throws Exception
 	 */
 	public function fillTagsLines(Odf $odfHandler, Translate $outputLangs, array $moreParam): int
 	{
 		global $conf, $hookmanager;
-
 
 		$object = $moreParam['object'];
 
@@ -185,7 +184,7 @@ abstract class ModeleODTDigiriskElementDocument extends SaturneDocumentModel
 
 					//Fill tickets data
 					if (dolibarr_get_const($this->db, 'DIGIRISKDOLIBARR_TICKET_EXTRAFIELDS', 0)) {
-                        $tickets = saturne_fetch_all_object_type('Ticket', '', '', 0, 0,  ['customsql' => 'eft.digiriskdolibarr_ticket_service > ' . ($object->element != 'digiriskstandard' ? $object->id : 0) . $moreParam['specificFilter']], 'AND', true);
+            $tickets = saturne_fetch_all_object_type('Ticket', '', '', 0, 0,  ['customsql' => 'eft.digiriskdolibarr_ticket_service > ' . ($object->element != 'digiriskstandard' ? $object->id : 0) . $moreParam['specificFilter']], 'AND', true);
 					}
 					$listLines = $odfHandler->setSegment('tickets');
 					if (is_array($tickets) && !empty($tickets)) {

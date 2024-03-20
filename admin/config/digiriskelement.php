@@ -58,16 +58,8 @@ saturne_check_access($permissiontoread);
  * Actions
  */
 
-// Actions update_mask
+// Actions set_mod, update_mask
 require_once __DIR__ . '/../../../saturne/core/tpl/actions/admin_conf_actions.tpl.php';
-
-if ($action == 'setmod') {
-    $value = GETPOST('value');
-    $valueArray = explode('_', $value);
-    $objectType = $valueArray[1];
-
-    dolibarr_set_const($db, 'DIGIRISKDOLIBARR_'. strtoupper($objectType) .'_ADDON', $value, 'chaine', 0, '', $conf->entity);
-}
 
 /*
  * View
