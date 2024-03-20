@@ -1,5 +1,5 @@
 <?php
-/* Copyright (C) 2021-2023 EVARISK <technique@evarisk.com>
+/* Copyright (C) 2021-2024 EVARISK <technique@evarisk.com>
  *
  * This program is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -17,12 +17,12 @@
  */
 
 /**
- * \file       htdocs/custom/digiriskdolibarr/core/modules/digiriskdolibarr/riskanalysis/mod_evaluator_bebhionn.php
- * \ingroup    digiriskelement
- * \brief      File that contains the numbering module rules Bebhionn
+ * \file    core/modules/digiriskdolibarr/digiriskelement/evaluator/mod_evaluator_bebhionn.php
+ * \ingroup digiriskdolibarr
+ * \brief   File that contains the numbering module rules Bebhionn
  */
 
-// Load Saturne libraries.
+// Load Saturne libraries
 require_once __DIR__ . '/../../../../../../saturne/core/modules/saturne/modules_saturne.php';
 
 /**
@@ -30,23 +30,13 @@ require_once __DIR__ . '/../../../../../../saturne/core/modules/saturne/modules_
  */
 class mod_evaluator_bebhionn extends CustomModeleNumRefSaturne
 {
-
-	/**
-	 * @var string model name
-	 */
-	public string $name = 'Bebhionn';
+    /**
+     * @var string model name
+     */
+    public string $name = 'Bebhionn';
 
     public function __construct()
     {
-        global $conf;
-        $refMod = $conf->global->DIGIRISKDOLIBARR_EVALUATOR_BEBHIONN_ADDON;
-        if (dol_strlen($refMod)) {
-            $refModSplitted = preg_split('/\{/', $refMod);
-            if (is_array($refModSplitted) && !empty($refModSplitted)) {
-                $suffix = preg_replace('/\}/', '', $refModSplitted[1]);
-                $this->prefix = $refModSplitted[0];
-                $this->suffix = $suffix;
-            }
-        }
+        self::setCustomValue('digiriskdolibarr', 'evaluator');
     }
 }

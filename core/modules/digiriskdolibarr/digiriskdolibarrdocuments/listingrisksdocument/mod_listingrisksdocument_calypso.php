@@ -37,16 +37,6 @@ class mod_listingrisksdocument_calypso extends CustomModeleNumRefSaturne
 
     public function __construct()
     {
-        global $conf;
-
-        $refMod = $conf->global->DIGIRISKDOLIBARR_LISTINGRISKSDOCUMENT_CALYPSO_ADDON;
-        if (dol_strlen($refMod)) {
-            $refModSplitted = preg_split('/\{/', $refMod);
-            if (is_array($refModSplitted) && !empty($refModSplitted)) {
-                $suffix       = preg_replace('/}/', '', $refModSplitted[1]);
-                $this->prefix = $refModSplitted[0];
-                $this->suffix = $suffix;
-            }
-        }
+        self::setCustomValue('digiriskdolibarr', 'listingrisksdocument');
     }
 }
