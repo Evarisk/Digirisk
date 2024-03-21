@@ -789,7 +789,8 @@ class modDigiriskdolibarr extends DolibarrModules
 			$i++ => ['DIGIRISKDOLIBARR_MEDIA_MAX_WIDTH_SMALL', 'integer', 480, '', 0, 'current'],
 			$i++ => ['DIGIRISKDOLIBARR_MEDIA_MAX_HEIGHT_SMALL', 'integer', 270, '', 0, 'current'],
 			$i++ => ['DIGIRISKDOLIBARR_DISPLAY_NUMBER_MEDIA_GALLERY', 'integer', 8, '', 0, 'current'],
-			$i++ => ['DIGIRISKDOLIBARR_CUSTOM_DOCUMENTS_SET', 'integer', 0, '', 0, 'current'],
+            // -- Deprecated conf, was used to generate custom template, we can now download default template to customize it
+            //$i++ => ['DIGIRISKDOLIBARR_CUSTOM_DOCUMENTS_SET', 'integer', 0, '', 0, 'current'],
 			$i++ => ['DIGIRISKDOLIBARR_MANUAL_INPUT_NB_EMPLOYEES', 'integer', 0, '', 0, 'current'],
 			$i++ => ['DIGIRISKDOLIBARR_MANUAL_INPUT_NB_WORKED_HOURS', 'integer', 0, '', 0, 'current'],
 			$i++ => ['DIGIRISKDOLIBARR_SHOW_PATCH_NOTE', 'integer', 1, '', 0, 'current'],
