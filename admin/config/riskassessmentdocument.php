@@ -179,11 +179,6 @@ $constArray[$moduleNameLowerCase] = [
 		'description' => 'SortRisksListingsByEvaluationDescription',
 		'code'        => 'DIGIRISKDOLIBARR_SORT_LISTINGS_BY_COTATION',
 	],
-    'RiskListParentView' => [
-        'name'        => 'RiskListParentView',
-        'description' => 'RiskListParentViewDescription',
-        'code'        => 'DIGIRISKDOLIBARR_RISK_LIST_PARENT_VIEW',
-    ],
 	'RiskDescriptionPrefill' => [
 		'name'        => 'RiskDescriptionPrefill',
 		'description' => 'RiskDescriptionPrefillDescription',
@@ -194,6 +189,11 @@ $constArray[$moduleNameLowerCase] = [
 		'description' => 'ShowRiskOriginDescription',
 		'code'        => 'DIGIRISKDOLIBARR_SHOW_RISK_ORIGIN',
 	],
+    'RiskListParentView' => [
+        'name'        => 'RiskListParentView',
+        'description' => 'RiskListParentViewDescription',
+        'code'        => 'DIGIRISKDOLIBARR_RISK_LIST_PARENT_VIEW',
+    ],
 	'ShowInheritedRisksInDocuments' => [
 		'name'        => 'ShowInheritedRisksInDocuments',
 		'description' => 'ShowInheritedRisksInDocumentsDescription',
@@ -234,16 +234,21 @@ $constArray[$moduleNameLowerCase] = [
 		'description' => 'MultipleRiskAssessmentMethodDescription',
 		'code'        => 'DIGIRISKDOLIBARR_MULTIPLE_RISKASSESSMENT_METHOD',
 	],
-	'ShowRiskAssessmentDate' => [
-		'name'        => 'ShowRiskAssessmentDate',
-		'description' => 'ShowRiskAssessmentDateDescription',
-		'code'        => 'DIGIRISKDOLIBARR_SHOW_RISKASSESSMENT_DATE',
-	],
-	'ShowAllRiskAssessments' => [
-		'name'        => 'ShowAllRiskAssessments',
-		'description' => 'ShowAllRiskAssessmentsDescription',
-		'code'        => 'DIGIRISKDOLIBARR_SHOW_ALL_RISKASSESSMENTS',
-	],
+    'ShowAllRiskAssessments' => [
+        'name'        => 'ShowAllRiskAssessments',
+        'description' => 'ShowAllRiskAssessmentsDescription',
+        'code'        => 'DIGIRISKDOLIBARR_SHOW_ALL_RISKASSESSMENTS',
+    ],
+    'ShowRiskAssessmentDate' => [
+        'name'        => 'ShowRiskAssessmentDate',
+        'description' => 'ShowRiskAssessmentDateDescription',
+        'code'        => 'DIGIRISKDOLIBARR_SHOW_RISKASSESSMENT_DATE',
+    ],
+    'RiskAssessmentHideDateInDocument' => [
+        'name'        => 'RiskAssessmentHideDateInDocument',
+        'description' => 'RiskAssessmentHideDateInDocumentDescription',
+        'code'        => 'DIGIRISKDOLIBARR_RISKASSESSMENT_HIDE_DATE_IN_DOCUMENT',
+    ]
 ];
 
 require __DIR__ . '/../../../saturne/core/tpl/admin/object/object_const_view.tpl.php';
@@ -318,6 +323,26 @@ $constArray[$moduleNameLowerCase] = [
 		'description' => 'ShowAllTasksDescription',
 		'code'        => 'DIGIRISKDOLIBARR_SHOW_ALL_TASKS',
 	],
+    'TaskHideRefInDocument' => [
+        'name'        => 'TaskHideRefInDocument',
+        'description' => 'TaskHideRefInDocumentDescription',
+        'code'        => 'DIGIRISKDOLIBARR_TASK_HIDE_REF_IN_DOCUMENT',
+    ],
+    'TaskHideResponsibleInDocument' => [
+        'name'        => 'TaskHideResponsibleInDocument',
+        'description' => 'TaskHideResponsibleInDocumentDescription',
+        'code'        => 'DIGIRISKDOLIBARR_TASK_HIDE_RESPONSIBLE_IN_DOCUMENT',
+    ],
+    'TaskHideDateInDocument' => [
+        'name'        => 'TaskHideDateInDocument',
+        'description' => 'TaskHideDateInDocumentDescription',
+        'code'        => 'DIGIRISKDOLIBARR_TASK_HIDE_DATE_IN_DOCUMENT',
+    ],
+    'TaskHideBudgetInDocument' => [
+        'name'        => 'TaskHideBudgetInDocument',
+        'description' => 'TaskHideBudgetInDocumentDescription',
+        'code'        => 'DIGIRISKDOLIBARR_TASK_HIDE_BUDGET_IN_DOCUMENT',
+    ]
 ];
 
 require __DIR__ . '/../../../saturne/core/tpl/admin/object/object_const_view.tpl.php';

@@ -229,13 +229,19 @@ class DigiriskDocuments extends SaturneDocuments
 									}
 								}
 
-								$tmparray['nomElement']            = $nomElement;
-								$tmparray['nomDanger']             = DOL_DOCUMENT_ROOT . '/custom/digiriskdolibarr/img/categorieDangers/' . $line->getDangerCategory($line) . '.png';
-								$tmparray['nomPicto']              = (!empty($conf->global->DIGIRISKDOLIBARR_DOCUMENT_SHOW_PICTO_NAME) ? $line->getDangerCategoryName($line) : ' ');
-								$tmparray['identifiantRisque']     = $line->ref . ' - ' . $lastEvaluation->ref;
-								$tmparray['quotationRisque']       = $lastEvaluation->cotation ?: 0;
-								$tmparray['descriptionRisque']     = $line->description;
-								$tmparray['commentaireEvaluation'] = $lastEvaluation->comment ? dol_print_date((($conf->global->DIGIRISKDOLIBARR_SHOW_RISKASSESSMENT_DATE && (!empty($lastEvaluation->date_riskassessment))) ? $lastEvaluation->date_riskassessment : $lastEvaluation->date_creation), 'dayreduceformat') . ': ' . $lastEvaluation->comment : '';
+								$tmparray['nomElement']        = $nomElement;
+								$tmparray['nomDanger']         = DOL_DOCUMENT_ROOT . '/custom/digiriskdolibarr/img/categorieDangers/' . $line->getDangerCategory($line) . '.png';
+								$tmparray['nomPicto']          = (!empty($conf->global->DIGIRISKDOLIBARR_DOCUMENT_SHOW_PICTO_NAME) ? $line->getDangerCategoryName($line) : ' ');
+								$tmparray['identifiantRisque'] = $line->ref . ' - ' . $lastEvaluation->ref;
+								$tmparray['quotationRisque']   = $lastEvaluation->cotation ?: 0;
+								$tmparray['descriptionRisque'] = $line->description;
+
+                                if (!getDolGlobalInt('DIGIRISKDOLIBARR_RISKASSESSMENT_HIDE_DATE_IN_DOCUMENT') && dol_strlen($lastEvaluation->comment)) {
+                                    $tmparray['commentaireEvaluation'] = dol_print_date((getDolGlobalInt('DIGIRISKDOLIBARR_SHOW_RISKASSESSMENT_DATE') && !empty($lastEvaluation->date_riskassessment) ? $lastEvaluation->date_riskassessment : $lastEvaluation->date_creation), 'dayreduceformat') . ': ';
+                                } else {
+                                    $tmparray['commentaireEvaluation'] = '';
+                                }
+								$tmparray['commentaireEvaluation'] .= !empty($lastEvaluation->comment) ? $lastEvaluation->comment : '';
 
 								$related_tasks = $tasksSortedByRisk[$line->id];
 								if (!empty($related_tasks) && is_array($related_tasks)) {
@@ -285,21 +291,29 @@ class DigiriskDocuments extends SaturneDocuments
 
 												if ($task_progress == 100) {
 													if ($conf->global->DIGIRISKDOLIBARR_WORKUNITDOCUMENT_SHOW_TASK_DONE > 0) {
-														(($related_task->ref) ? $tmparray['actionPreventionCompleted'] .= $langs->trans('Ref') . ' : ' . $related_task->ref . "\n" : '');
-														(($responsible) ? $tmparray['actionPreventionCompleted'] .= $langs->trans('Responsible') . ' : ' . $responsible . "\n" : '');
-														$tmparray['actionPreventionCompleted'] .= $langs->trans('DateStart') . ' : ';
-														if ($conf->global->DIGIRISKDOLIBARR_SHOW_TASK_START_DATE && !empty($related_task->dateo)) {
-															$tmparray['actionPreventionCompleted'] .= dol_print_date(($related_task->dateo), 'dayreduceformat');
-														} else {
-															$tmparray['actionPreventionCompleted'] .= dol_print_date(($related_task->datec), 'dayreduceformat');
+                                                        if (!getDolGlobalInt('DIGIRISKDOLIBARR_TASK_HIDE_REF_IN_DOCUMENT')) {
+														    (($related_task->ref) ? $tmparray['actionPreventionCompleted'] .= $langs->trans('Ref') . ' : ' . $related_task->ref . "\n" : '');
+                                                        }
+                                                        if (!getDolGlobalInt('DIGIRISKDOLIBARR_TASK_HIDE_RESPONSIBLE_IN_DOCUMENT')) {
+                                                            (($responsible) ? $tmparray['actionPreventionCompleted'] .= $langs->trans('Responsible') . ' : ' . $responsible . "\n" : '');
+                                                        }
+                                                        if (!getDolGlobalInt('DIGIRISKDOLIBARR_TASK_HIDE_DATE_IN_DOCUMENT')) {
+                                                            $tmparray['actionPreventionCompleted'] .= $langs->trans('DateStart') . ' : ';
+                                                            if ($conf->global->DIGIRISKDOLIBARR_SHOW_TASK_START_DATE && !empty($related_task->dateo)) {
+                                                                $tmparray['actionPreventionCompleted'] .= dol_print_date(($related_task->dateo), 'dayreduceformat');
+                                                            } else {
+                                                                $tmparray['actionPreventionCompleted'] .= dol_print_date(($related_task->datec), 'dayreduceformat');
+                                                            }
+                                                            if ($conf->global->DIGIRISKDOLIBARR_SHOW_TASK_END_DATE && !empty($related_task->datee)) {
+                                                                $tmparray['actionPreventionCompleted'] .= "\n" . $langs->transnoentities('Deadline') . ' : ' . dol_print_date($related_task->datee, 'dayreduceformat') . "\n";
+                                                            } else {
+                                                                $tmparray['actionPreventionCompleted'] .= ' - ' . $langs->transnoentities('Deadline') . ' : ' . $langs->trans('NoData') . "\n";
+                                                            }
+                                                        }
+                                                        if (!getDolGlobalInt('DIGIRISKDOLIBARR_TASK_HIDE_BUDGET_IN_DOCUMENT')) {
+														    $tmparray['actionPreventionCompleted'] .= $langs->trans('Budget') . ' : ' . price($related_task->budget_amount, 0, $langs, 1, 0, 0, $conf->currency) . "\n";
 														}
-														if ($conf->global->DIGIRISKDOLIBARR_SHOW_TASK_END_DATE && !empty($related_task->datee)) {
-															$tmparray['actionPreventionCompleted'] .= "\n" . $langs->transnoentities('Deadline') . ' : ' . dol_print_date($related_task->datee, 'dayreduceformat') . "\n";
-														} else {
-															$tmparray['actionPreventionCompleted'] .= ' - ' . $langs->transnoentities('Deadline') . ' : ' . $langs->trans('NoData') . "\n";
-														}
-														$tmparray['actionPreventionCompleted'] .= $langs->trans('Budget') . ' : ' . price($related_task->budget_amount, 0, $langs, 1, 0, 0, $conf->currency) . "\n";
-														(($AllInitiales) ? $tmparray['actionPreventionCompleted'] .= $langs->trans('ContactsAction') . ' : ' . $AllInitiales . "\n" : '');
+                                                        (($AllInitiales) ? $tmparray['actionPreventionCompleted'] .= $langs->trans('ContactsAction') . ' : ' . $AllInitiales . "\n" : '');
 														(($related_task->label) ? $tmparray['actionPreventionCompleted'] .= $langs->trans('Label') . ' : ' . $related_task->label . "\n" : '');
 														(($related_task->description) ? $tmparray['actionPreventionCompleted'] .= $langs->trans('Description') . ' : ' . $related_task->description . "\n" : '');
 														$tmparray['actionPreventionCompleted'] .= "\n";
@@ -307,21 +321,30 @@ class DigiriskDocuments extends SaturneDocuments
 														$tmparray['actionPreventionCompleted'] = $langs->transnoentities('ActionPreventionCompletedTaskDone');
 													}
 												} else {
-													(($related_task->ref) ? $tmparray['actionPreventionUncompleted'] .= $langs->trans('Ref') . ' : ' . $related_task->ref . "\n" : '');
-													(($responsible) ? $tmparray['actionPreventionUncompleted'] .= $langs->trans('Responsible') . ' : ' . $responsible . "\n" : '');
-													$tmparray['actionPreventionUncompleted'] .= $langs->trans('DateStart') . ' : ';
-													if ($conf->global->DIGIRISKDOLIBARR_SHOW_TASK_START_DATE && !empty($related_task->dateo)) {
-														$tmparray['actionPreventionUncompleted'] .= dol_print_date(($related_task->dateo), 'dayreduceformat');
-													} else {
-														$tmparray['actionPreventionUncompleted'] .= dol_print_date(($related_task->datec), 'dayreduceformat');
+                                                    if (!getDolGlobalInt('DIGIRISKDOLIBARR_TASK_HIDE_REF_IN_DOCUMENT')) {
+                                                        (($related_task->ref) ? $tmparray['actionPreventionUncompleted'] .= $langs->trans('Ref') . ' : ' . $related_task->ref . "\n" : '');
 													}
-													if ($conf->global->DIGIRISKDOLIBARR_SHOW_TASK_END_DATE && !empty($related_task->datee)) {
-														$tmparray['actionPreventionUncompleted'] .= "\n" . $langs->transnoentities('Deadline') . ' : ' . dol_print_date($related_task->datee, 'dayreduceformat') . "\n";
-													} else {
-														$tmparray['actionPreventionUncompleted'] .= ' - ' . $langs->transnoentities('Deadline') . ' : ' . $langs->trans('NoData') . "\n";
+                                                    if (!getDolGlobalInt('DIGIRISKDOLIBARR_TASK_HIDE_RESPONSIBLE_IN_DOCUMENT')) {
+                                                        (($responsible) ? $tmparray['actionPreventionUncompleted'] .= $langs->trans('Responsible') . ' : ' . $responsible . "\n" : '');
 													}
-													$tmparray['actionPreventionUncompleted'] .= $langs->trans('Budget') . ' : ' . price($related_task->budget_amount, 0, $langs, 1, 0, 0, $conf->currency) . ' - ';
-													$tmparray['actionPreventionUncompleted'] .= $langs->trans('DigiriskProgress') . ' : ' . ($task_progress ?: 0) . ' %' . "\n";
+                                                    if (!getDolGlobalInt('DIGIRISKDOLIBARR_TASK_HIDE_DATE_IN_DOCUMENT')) {
+                                                        $tmparray['actionPreventionUncompleted'] .= $langs->trans('DateStart') . ' : ';
+                                                        if ($conf->global->DIGIRISKDOLIBARR_SHOW_TASK_START_DATE && !empty($related_task->dateo)) {
+                                                            $tmparray['actionPreventionUncompleted'] .= dol_print_date(($related_task->dateo), 'dayreduceformat');
+                                                        } else {
+                                                            $tmparray['actionPreventionUncompleted'] .= dol_print_date(($related_task->datec), 'dayreduceformat');
+                                                        }
+                                                        if ($conf->global->DIGIRISKDOLIBARR_SHOW_TASK_END_DATE && !empty($related_task->datee)) {
+                                                            $tmparray['actionPreventionUncompleted'] .= "\n" . $langs->transnoentities('Deadline') . ' : ' . dol_print_date($related_task->datee, 'dayreduceformat') . "\n";
+                                                        } else {
+                                                            $tmparray['actionPreventionUncompleted'] .= ' - ' . $langs->transnoentities('Deadline') . ' : ' . $langs->trans('NoData') . "\n";
+                                                        }
+
+                                                    }
+                                                    if (!getDolGlobalInt('DIGIRISKDOLIBARR_TASK_HIDE_BUDGET_IN_DOCUMENT')) {
+													    $tmparray['actionPreventionUncompleted'] .= $langs->trans('Budget') . ' : ' . price($related_task->budget_amount, 0, $langs, 1, 0, 0, $conf->currency) . ' - ';
+													}
+                                                    $tmparray['actionPreventionUncompleted'] .= $langs->trans('DigiriskProgress') . ' : ' . ($task_progress ?: 0) . ' %' . "\n";
 													(($AllInitiales) ? $tmparray['actionPreventionUncompleted'] .= $langs->trans('ContactsAction') . ' : ' . $AllInitiales . "\n" : '');
 													(($related_task->label) ? $tmparray['actionPreventionUncompleted'] .= $langs->trans('Label') . ' : ' . $related_task->label . "\n" : '');
 													(($related_task->description) ? $tmparray['actionPreventionUncompleted'] .= $langs->trans('Description') . ' : ' . $related_task->description . "\n" : '');
