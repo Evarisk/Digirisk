@@ -244,11 +244,11 @@ $constArray[$moduleNameLowerCase] = [
         'description' => 'ShowRiskAssessmentDateDescription',
         'code'        => 'DIGIRISKDOLIBARR_SHOW_RISKASSESSMENT_DATE',
     ],
-    'ShowRiskAssessmentDateOnDocument' => [
-        'name'        => 'ShowRiskAssessmentDateOnDocument',
-        'description' => 'ShowDocumentDateDescription',
-        'code'        => 'DIGIRISKDOLIBARR_SHOW_DOCUMENT_RISKASSESSMENT_DATE',
-    ],
+    'RiskAssessmentHideDateInDocument' => [
+        'name'        => 'RiskAssessmentHideDateInDocument',
+        'description' => 'RiskAssessmentHideDateInDocumentDescription',
+        'code'        => 'DIGIRISKDOLIBARR_RISKASSESSMENT_HIDE_DATE_IN_DOCUMENT',
+    ]
 ];
 
 require __DIR__ . '/../../../saturne/core/tpl/admin/object/object_const_view.tpl.php';
@@ -323,26 +323,26 @@ $constArray[$moduleNameLowerCase] = [
 		'description' => 'ShowAllTasksDescription',
 		'code'        => 'DIGIRISKDOLIBARR_SHOW_ALL_TASKS',
 	],
-    'HideRefTaskDocument' => [
-        'name'        => 'HideRefTaskDocument',
-        'description' => 'HideRefTaskDocumentDescription',
-        'code'        => 'DIGIRISKDOLIBARR_HIDE_TASK_REF_DOCUMENT',
+    'TaskHideRefInDocument' => [
+        'name'        => 'TaskHideRefInDocument',
+        'description' => 'TaskHideRefInDocumentDescription',
+        'code'        => 'DIGIRISKDOLIBARR_TASK_HIDE_REF_IN_DOCUMENT',
     ],
-    'HideResponsibleTaskDocument' => [
-        'name'        => 'HideResponsibleTaskDocument',
-        'description' => 'HideResponsibleTaskDocumentDescription',
-        'code'        => 'DIGIRISKDOLIBARR_HIDE_TASK_RESPONSIBLE_DOCUMENT',
+    'TaskHideResponsibleInDocument' => [
+        'name'        => 'TaskHideResponsibleInDocument',
+        'description' => 'TaskHideResponsibleInDocumentDescription',
+        'code'        => 'DIGIRISKDOLIBARR_TASK_HIDE_RESPONSIBLE_IN_DOCUMENT',
     ],
-    'HideDateTaskDocument' => [
-        'name'        => 'HideDateTaskDocument',
-        'description' => 'HideDateTaskDocumentDescription',
-        'code'        => 'DIGIRISKDOLIBARR_HIDE_TASK_DATE_DOCUMENT',
+    'TaskHideDateInDocument' => [
+        'name'        => 'TaskHideDateInDocument',
+        'description' => 'TaskHideDateInDocumentDescription',
+        'code'        => 'DIGIRISKDOLIBARR_TASK_HIDE_DATE_IN_DOCUMENT',
     ],
-    'HideBudgetTaskDocument' => [
-        'name'        => 'HideBudgetTaskDocument',
-        'description' => 'HideBudgetTaskDocumentDescription',
-        'code'        => 'DIGIRISKDOLIBARR_HIDE_TASK_BUDGET_DOCUMENT',
-    ],
+    'TaskHideBudgetInDocument' => [
+        'name'        => 'TaskHideBudgetInDocument',
+        'description' => 'TaskHideBudgetInDocumentDescription',
+        'code'        => 'DIGIRISKDOLIBARR_TASK_HIDE_BUDGET_IN_DOCUMENT',
+    ]
 ];
 
 require __DIR__ . '/../../../saturne/core/tpl/admin/object/object_const_view.tpl.php';
