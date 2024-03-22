@@ -97,8 +97,6 @@ class LegalDisplay extends DigiriskDocuments
                 $json['LegalDisplay']['occupational_health_service']['friday_afternoon']    = $labour_hours_friday[1];
                 $json['LegalDisplay']['occupational_health_service']['saturday_afternoon']  = $labour_hours_saturday[1];
                 $json['LegalDisplay']['occupational_health_service']['sunday_afternoon']    = $labour_hours_sunday[1];
-
-				$json['LegalDisplay']['occupational_health_service']['openinghours'] = $langs->trans('Monday') . ' : ' . $thirdparty_openinghours->monday . "\r\n" . $langs->trans('Tuesday') . ' : ' . $thirdparty_openinghours->tuesday . "\r\n" . $langs->trans('Wednesday') . ' : ' . $thirdparty_openinghours->wednesday . "\r\n" . $langs->trans('Thursday') . ' : ' . $thirdparty_openinghours->thursday . "\r\n" . $langs->trans('Friday') . ' : ' . $thirdparty_openinghours->friday . "\r\n" . $langs->trans('Saturday') . ' : ' . $thirdparty_openinghours->saturday . "\r\n" . $langs->trans('Sunday') . ' : ' . $thirdparty_openinghours->sunday;
 			}
 
 			$labour_doctor_contact = new Contact($this->db);
@@ -145,8 +143,6 @@ class LegalDisplay extends DigiriskDocuments
                 $json['LegalDisplay']['detective_work']['friday_afternoon']    = $detective_hours_friday[1];
                 $json['LegalDisplay']['detective_work']['saturday_afternoon']  = $detective_hours_saturday[1];
                 $json['LegalDisplay']['detective_work']['sunday_afternoon']    = $detective_hours_sunday[1];
-
-                $json['LegalDisplay']['detective_work']['openinghours'] = $langs->trans('Monday') . ' : ' . $thirdparty_openinghours->monday . "\r\n" . $langs->trans('Tuesday') . ' : ' . $thirdparty_openinghours->tuesday . "\r\n" . $langs->trans('Wednesday') . ' : ' . $thirdparty_openinghours->wednesday . "\r\n" . $langs->trans('Thursday') . ' : ' . $thirdparty_openinghours->thursday . "\r\n" . $langs->trans('Friday') . ' : ' . $thirdparty_openinghours->friday . "\r\n" . $langs->trans('Saturday') . ' : ' . $thirdparty_openinghours->saturday . "\r\n" . $langs->trans('Sunday') . ' : ' . $thirdparty_openinghours->sunday;
 			}
 
 			$labourInspectorContact = new Contact($this->db);

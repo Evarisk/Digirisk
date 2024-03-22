@@ -48,14 +48,12 @@ function digiriskdolibarr_completesubstitutionarray(&$substitutionarray, $langs,
 			$substitutionarray['service_de_sante_code_postal'] = $legaldisplay->occupational_health_service->zip;
 			$substitutionarray['service_de_sante_ville']       = $legaldisplay->occupational_health_service->town;
 			$substitutionarray['service_de_sante_telephone']   = $legaldisplay->occupational_health_service->phone;
-			$substitutionarray['service_de_sante_horaire']     = $legaldisplay->occupational_health_service->openinghours;
 
 			$substitutionarray['inspection_du_travail_nom']         = $legaldisplay->detective_work->name;
 			$substitutionarray['inspection_du_travail_adresse']     = $legaldisplay->detective_work->address;
 			$substitutionarray['inspection_du_travail_code_postal'] = $legaldisplay->detective_work->zip;
 			$substitutionarray['inspection_du_travail_ville']       = $legaldisplay->detective_work->town;
 			$substitutionarray['inspection_du_travail_telephone']   = $legaldisplay->detective_work->phone;
-			$substitutionarray['inspection_du_travail_horaire']     = $legaldisplay->detective_work->openinghours;
 
 			$substitutionarray['samu']                 = $legaldisplay->emergency_service->samu;
 			$substitutionarray['pompier']              = $legaldisplay->emergency_service->pompier;
