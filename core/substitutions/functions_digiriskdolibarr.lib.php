@@ -90,6 +90,36 @@ function digiriskdolibarr_completesubstitutionarray(&$substitutionarray, $langs,
 			$substitutionarray['dimanche_matin'] = $legaldisplay->working_hour->sunday_morning;
 			$substitutionarray['dimanche_aprem'] = $legaldisplay->working_hour->sunday_afternoon;
 
+            $substitutionarray['labour_mon_morning']   = $legaldisplay->occupational_health_service->monday_morning;
+            $substitutionarray['labour_mon_afternoon'] = $legaldisplay->occupational_health_service->monday_afternoon;
+            $substitutionarray['labour_tue_morning']   = $legaldisplay->occupational_health_service->tuesday_morning;
+            $substitutionarray['labour_tue_afternoon'] = $legaldisplay->occupational_health_service->tuesday_afternoon;
+            $substitutionarray['labour_wed_morning']   = $legaldisplay->occupational_health_service->wednesday_morning;
+            $substitutionarray['labour_wed_afternoon'] = $legaldisplay->occupational_health_service->wednesday_afternoon;
+            $substitutionarray['labour_thu_morning']   = $legaldisplay->occupational_health_service->thursday_morning;
+            $substitutionarray['labour_thu_afternoon'] = $legaldisplay->occupational_health_service->thursday_afternoon;
+            $substitutionarray['labour_fri_morning']   = $legaldisplay->occupational_health_service->friday_morning;
+            $substitutionarray['labour_fri_afternoon'] = $legaldisplay->occupational_health_service->friday_afternoon;
+            $substitutionarray['labour_sat_morning']   = $legaldisplay->occupational_health_service->saturday_morning;
+            $substitutionarray['labour_sat_afternoon'] = $legaldisplay->occupational_health_service->saturday_afternoon;
+            $substitutionarray['labour_sun_morning']   = $legaldisplay->occupational_health_service->sunday_morning;
+            $substitutionarray['labour_sun_afternoon'] = $legaldisplay->occupational_health_service->sunday_afternoon;
+
+            $substitutionarray['ins_mon_morning']   = $legaldisplay->detective_work->monday_morning;
+            $substitutionarray['ins_mon_afternoon'] = $legaldisplay->detective_work->monday_afternoon;
+            $substitutionarray['ins_tue_morning']   = $legaldisplay->detective_work->tuesday_morning;
+            $substitutionarray['ins_tue_afternoon'] = $legaldisplay->detective_work->tuesday_afternoon;
+            $substitutionarray['ins_wed_morning']   = $legaldisplay->detective_work->wednesday_morning;
+            $substitutionarray['ins_wed_afternoon'] = $legaldisplay->detective_work->wednesday_afternoon;
+            $substitutionarray['ins_thu_morning']   = $legaldisplay->detective_work->thursday_morning;
+            $substitutionarray['ins_thu_afternoon'] = $legaldisplay->detective_work->thursday_afternoon;
+            $substitutionarray['ins_fri_morning']   = $legaldisplay->detective_work->friday_morning;
+            $substitutionarray['ins_fri_afternoon'] = $legaldisplay->detective_work->friday_afternoon;
+            $substitutionarray['ins_sat_morning']   = $legaldisplay->detective_work->saturday_morning;
+            $substitutionarray['ins_sat_afternoon'] = $legaldisplay->detective_work->saturday_afternoon;
+            $substitutionarray['ins_sun_morning']   = $legaldisplay->detective_work->sunday_morning;
+            $substitutionarray['ins_sun_afternoon'] = $legaldisplay->detective_work->sunday_afternoon;
+
 			break;
 
 		case 'informationssharing@digiriskdolibarr':
