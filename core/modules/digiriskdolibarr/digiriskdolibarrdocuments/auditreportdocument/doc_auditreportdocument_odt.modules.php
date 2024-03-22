@@ -31,17 +31,6 @@ require_once __DIR__ . '/../digiriskelementdocument/modules_digiriskelementdocum
 class doc_auditreportdocument_odt extends ModeleODTDigiriskElementDocument
 {
     /**
-     * @var array Minimum version of PHP required by module
-     * e.g.: PHP ≥ 5.5 = array(5, 5)
-     */
-    public $phpmin = [7, 4];
-
-    /**
-     * @var string Dolibarr version of the loaded document
-     */
-    public $version = 'dolibarr';
-
-    /**
      * @var string Module
      */
     public string $module = 'digiriskdolibarr';
