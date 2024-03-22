@@ -64,7 +64,7 @@ function digiriskdolibarr_admin_prepare_head(): array
     $h++;
 
     $head[$h][0] = dol_buildpath('/digiriskdolibarr/admin/ticket/ticket.php', 1);
-    $head[$h][1] = $conf->browser->layout != 'phone' ? '<i class="fa fa-ticket pictofixedwidth"></i>' . $langs->trans('Tickets') : '<i class="fas fa-ticket"></i>';
+    $head[$h][1] = $conf->browser->layout != 'phone' ? '<i class="fa fa-ticket-alt pictofixedwidth"></i>' . $langs->trans('Tickets') : '<i class="fas fa-ticket-alt"></i>';
     $head[$h][2] = 'ticket';
     $h++;
 

@@ -21,7 +21,6 @@
  *       \brief      Display public form to add new ticket
  */
 
-if ( ! defined('NOREQUIREUSER'))  define('NOREQUIREUSER', '1');
 if ( ! defined('NOTOKENRENEWAL')) define('NOTOKENRENEWAL', '1');
 if ( ! defined('NOREQUIREMENU'))  define('NOREQUIREMENU', '1');
 if ( ! defined('NOREQUIREHTML'))  define('NOREQUIREHTML', '1');
@@ -49,7 +48,6 @@ require_once DOL_DOCUMENT_ROOT . '/core/lib/company.lib.php';
 require_once DOL_DOCUMENT_ROOT . '/core/lib/payments.lib.php';
 require_once DOL_DOCUMENT_ROOT . '/core/class/extrafields.class.php';
 require_once DOL_DOCUMENT_ROOT . '/core/class/html.formfile.class.php';
-require_once DOL_DOCUMENT_ROOT . '/user/class/user.class.php';
 require_once DOL_DOCUMENT_ROOT . '/core/class/doleditor.class.php';
 require_once DOL_DOCUMENT_ROOT . '/categories/class/categorie.class.php';
 require_once DOL_DOCUMENT_ROOT . '/core/modules/ticket/mod_ticket_simple.php';
