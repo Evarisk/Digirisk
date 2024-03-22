@@ -1,5 +1,5 @@
 <?php
-/* Copyright (C) 2021-2023 EVARISK <technique@evarisk.com>
+/* Copyright (C) 2021-2024 EVARISK <technique@evarisk.com>
  *
  * This program is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -23,6 +23,7 @@
 
 // Load DigiriskDolibarr libraries
 require_once __DIR__ . '/../digiriskdocuments.class.php';
+require_once __DIR__ . '/../digiriskresources.class.php';
 
 /**
  * Class for LegalDisplay
@@ -30,19 +31,24 @@ require_once __DIR__ . '/../digiriskdocuments.class.php';
 class LegalDisplay extends DigiriskDocuments
 {
 	/**
-	 * @var string Module name.
+	 * @var string Module name
 	 */
 	public $module = 'digiriskdolibarr';
 
 	/**
-	 * @var string Element type of object.
+	 * @var string Element type of object
 	 */
 	public $element = 'legaldisplay';
 
+    /**
+     * @var string String with name of icon for legaldisplay. Must be the part after the 'object_' into object_legaldisplay.png
+     */
+    public $picto = 'fontawesome_fa-file_fas_#d35968';
+
 	/**
-	 * Constructor.
+	 * Constructor
 	 *
-	 * @param DoliDb $db Database handler.
+	 * @param DoliDb $db Database handler
 	 */
 	public function __construct(DoliDB $db)
 	{
@@ -50,7 +56,7 @@ class LegalDisplay extends DigiriskDocuments
 	}
 
 	/**
-	 * Function for JSON filling before saving in database
+	 * Function for JSON filling before saving in database for documents
 	 *
 	 * @return false|string
 	 * @throws Exception
@@ -73,18 +79,26 @@ class LegalDisplay extends DigiriskDocuments
 
 				$thirdparty_openinghours = new SaturneSchedules($this->db);
 				$thirdparty_openinghours->fetch(0, '', $morewhere);
-				$json['LegalDisplay']['occupational_health_service']['openinghours'] = $langs->trans('Monday') . ' : ' . $thirdparty_openinghours->monday . "\r\n" . $langs->trans('Tuesday') . ' : ' . $thirdparty_openinghours->tuesday . "\r\n" . $langs->trans('Wednesday') . ' : ' . $thirdparty_openinghours->wednesday . "\r\n" . $langs->trans('Thursday') . ' : ' . $thirdparty_openinghours->thursday . "\r\n" . $langs->trans('Friday') . ' : ' . $thirdparty_openinghours->friday . "\r\n" . $langs->trans('Saturday') . ' : ' . $thirdparty_openinghours->saturday . "\r\n" . $langs->trans('Sunday') . ' : ' . $thirdparty_openinghours->sunday;
+				$json['LegalDisplay']['occupational_health_service']['openinghours']                       = $langs->trans('Monday') . ' : ' . $thirdparty_openinghours->monday . "\r\n" . $langs->trans('Tuesday') . ' : ' . $thirdparty_openinghours->tuesday . "\r\n" . $langs->trans('Wednesday') . ' : ' . $thirdparty_openinghours->wednesday . "\r\n" . $langs->trans('Thursday') . ' : ' . $thirdparty_openinghours->thursday . "\r\n" . $langs->trans('Friday') . ' : ' . $thirdparty_openinghours->friday . "\r\n" . $langs->trans('Saturday') . ' : ' . $thirdparty_openinghours->saturday . "\r\n" . $langs->trans('Sunday') . ' : ' . $thirdparty_openinghours->sunday;
+                $json['LegalDisplay']['occupational_health_service']['opening_hours_details']['monday']    = $thirdparty_openinghours->monday;
+                $json['LegalDisplay']['occupational_health_service']['opening_hours_details']['tuesday']   = $thirdparty_openinghours->tuesday;
+                $json['LegalDisplay']['occupational_health_service']['opening_hours_details']['wednesday'] = $thirdparty_openinghours->wednesday;
+                $json['LegalDisplay']['occupational_health_service']['opening_hours_details']['thursday']  = $thirdparty_openinghours->thursday;
+                $json['LegalDisplay']['occupational_health_service']['opening_hours_details']['friday']    = $thirdparty_openinghours->friday;
+                $json['LegalDisplay']['occupational_health_service']['opening_hours_details']['saturday']  = $thirdparty_openinghours->saturday;
+                $json['LegalDisplay']['occupational_health_service']['opening_hours_details']['sunday']    = $thirdparty_openinghours->sunday;
 			}
 
 			$labour_doctor_contact = new Contact($this->db);
 			$result = $labour_doctor_contact->fetch($digirisk_resources['LabourDoctorContact']->id[0]);
 			if ($result > 0) {
-				$json['LegalDisplay']['occupational_health_service']['id']      = $labour_doctor_contact->id;
-				$json['LegalDisplay']['occupational_health_service']['name']    = $labour_doctor_contact->firstname . " " . $labour_doctor_contact->lastname;
-				$json['LegalDisplay']['occupational_health_service']['address'] = preg_replace('/\s\s+/', ' ', $labour_doctor_contact->address);
-				$json['LegalDisplay']['occupational_health_service']['zip']     = $labour_doctor_contact->zip;
-				$json['LegalDisplay']['occupational_health_service']['town']    = $labour_doctor_contact->town;
-				$json['LegalDisplay']['occupational_health_service']['phone']   = $labour_doctor_contact->phone_pro;
+				$json['LegalDisplay']['occupational_health_service']['id']       = $labour_doctor_contact->id;
+				$json['LegalDisplay']['occupational_health_service']['name']     = $labour_doctor_contact->firstname . " " . $labour_doctor_contact->lastname;
+				$json['LegalDisplay']['occupational_health_service']['address']  = preg_replace('/\s\s+/', ' ', $labour_doctor_contact->address);
+				$json['LegalDisplay']['occupational_health_service']['zip']      = $labour_doctor_contact->zip;
+				$json['LegalDisplay']['occupational_health_service']['town']     = $labour_doctor_contact->town;
+				$json['LegalDisplay']['occupational_health_service']['phone']    = $labour_doctor_contact->phone_pro;
+                $json['LegalDisplay']['occupational_health_service']['fullname'] = $labour_doctor_contact->getNomUrl(1);
 			}
 
 			$labour_inspector_societe = new Societe($this->db);
@@ -97,19 +111,27 @@ class LegalDisplay extends DigiriskDocuments
 				$thirdparty_openinghours = new SaturneSchedules($this->db);
 				$thirdparty_openinghours->fetch(0, '', $morewhere);
 
-				$json['LegalDisplay']['detective_work']['openinghours'] = $langs->trans('Monday') . ' : ' . $thirdparty_openinghours->monday . "\r\n" . $langs->trans('Tuesday') . ' : ' . $thirdparty_openinghours->tuesday . "\r\n" . $langs->trans('Wednesday') . ' : ' . $thirdparty_openinghours->wednesday . "\r\n" . $langs->trans('Thursday') . ' : ' . $thirdparty_openinghours->thursday . "\r\n" . $langs->trans('Friday') . ' : ' . $thirdparty_openinghours->friday . "\r\n" . $langs->trans('Saturday') . ' : ' . $thirdparty_openinghours->saturday . "\r\n" . $langs->trans('Sunday') . ' : ' . $thirdparty_openinghours->sunday;
+				$json['LegalDisplay']['detective_work']['openinghours']                       = $langs->trans('Monday') . ' : ' . $thirdparty_openinghours->monday . "\r\n" . $langs->trans('Tuesday') . ' : ' . $thirdparty_openinghours->tuesday . "\r\n" . $langs->trans('Wednesday') . ' : ' . $thirdparty_openinghours->wednesday . "\r\n" . $langs->trans('Thursday') . ' : ' . $thirdparty_openinghours->thursday . "\r\n" . $langs->trans('Friday') . ' : ' . $thirdparty_openinghours->friday . "\r\n" . $langs->trans('Saturday') . ' : ' . $thirdparty_openinghours->saturday . "\r\n" . $langs->trans('Sunday') . ' : ' . $thirdparty_openinghours->sunday;
+                $json['LegalDisplay']['detective_work']['opening_hours_details']['monday']    = $thirdparty_openinghours->monday;
+                $json['LegalDisplay']['detective_work']['opening_hours_details']['tuesday']   = $thirdparty_openinghours->tuesday;
+                $json['LegalDisplay']['detective_work']['opening_hours_details']['wednesday'] = $thirdparty_openinghours->wednesday;
+                $json['LegalDisplay']['detective_work']['opening_hours_details']['thursday']  = $thirdparty_openinghours->thursday;
+                $json['LegalDisplay']['detective_work']['opening_hours_details']['friday']    = $thirdparty_openinghours->friday;
+                $json['LegalDisplay']['detective_work']['opening_hours_details']['saturday']  = $thirdparty_openinghours->saturday;
+                $json['LegalDisplay']['detective_work']['opening_hours_details']['sunday']    = $thirdparty_openinghours->sunday;
 			}
 
 			$labourInspectorContact = new Contact($this->db);
 			$result = $labourInspectorContact->fetch($digirisk_resources['LabourInspectorContact']->id[0]);
 
 			if ($result > 0) {
-				$json['LegalDisplay']['detective_work']['id']      = $labourInspectorContact->id;
-				$json['LegalDisplay']['detective_work']['name']    = $labourInspectorContact->firstname . " " . $labourInspectorContact->lastname;
-				$json['LegalDisplay']['detective_work']['address'] = preg_replace('/\s\s+/', ' ', $labourInspectorContact->address);
-				$json['LegalDisplay']['detective_work']['zip']     = $labourInspectorContact->zip;
-				$json['LegalDisplay']['detective_work']['town']    = $labourInspectorContact->town;
-				$json['LegalDisplay']['detective_work']['phone']   = $labourInspectorContact->phone_pro;
+				$json['LegalDisplay']['detective_work']['id']       = $labourInspectorContact->id;
+				$json['LegalDisplay']['detective_work']['name']     = $labourInspectorContact->firstname . " " . $labourInspectorContact->lastname;
+				$json['LegalDisplay']['detective_work']['address']  = preg_replace('/\s\s+/', ' ', $labourInspectorContact->address);
+				$json['LegalDisplay']['detective_work']['zip']      = $labourInspectorContact->zip;
+				$json['LegalDisplay']['detective_work']['town']     = $labourInspectorContact->town;
+				$json['LegalDisplay']['detective_work']['phone']    = $labourInspectorContact->phone_pro;
+                $json['LegalDisplay']['detective_work']['fullname'] = $labourInspectorContact->getNomUrl(1);
 			}
 
 			$samu = new Societe($this->db);
@@ -234,4 +256,123 @@ class LegalDisplay extends DigiriskDocuments
 			return '';
 		}
 	}
+
+    /**
+     * Load dashboard info
+     *
+     * @return array     $dashboardData Return all dashboardData after load info
+     * @throws Exception
+     */
+    public function load_dashboard(): array {
+        global $langs;
+
+        $legalDisplay         = json_decode($this->LegalDisplayFillJSON(), false, 512, JSON_UNESCAPED_UNICODE)->LegalDisplay;
+        $getLegalDisplayInfos = $this->getLegalDisplayInfos();
+
+        $dashboardData['graphs']  = [$getLegalDisplayInfos];
+        $dashboardData['widgets'] = [
+            'legal_display_info' => [
+                'label' => [
+                    $langs->transnoentities('LabourDoctor') ?? '',
+                    $langs->transnoentities('Schedules') ?? '',
+                    $langs->transnoentities('LabourInspector') ?? '',
+                    $langs->transnoentities('Schedules') ?? '',
+                    $langs->transnoentities('AllEmergencies') ?? '',
+                    $langs->transnoentities('SafetyInstructions') ?? '',
+                    $langs->transnoentities('OpeningHours') ?? '',
+                    $langs->transnoentities('Parameters') ?? '',
+                ],
+                'content' => [
+                    0 => '<a href="' . dol_buildpath('societe/card.php?id=' . $legalDisplay->occupational_health_service->id . '&save_lastsearch_values=1', 1) .'" target="_blank">' . $langs->transnoentities('CongigureDoctorData') . ' <i class="fas fa-external-link-alt"></i></a>',
+                    1 => '<a href="' . dol_buildpath('saturne/view/saturne_schedules.php?id=' . $legalDisplay->occupational_health_service->id . '&element_type=societe&module_name=societe', 1) .'" target="_blank">' . $langs->transnoentities('CongigureDoctorData') . ' <i class="fas fa-external-link-alt"></i></a>',
+                    2 => '<a href="' . dol_buildpath('societe/card.php?id=' . $legalDisplay->detective_work->id . '&save_lastsearch_values=1', 1) .'" target="_blank">' . $langs->transnoentities('CongigureLabourInspectorData') . ' <i class="fas fa-external-link-alt"></i></a>',
+                    3 => '<a href="' . dol_buildpath('saturne/view/saturne_schedules.php?id=' . $legalDisplay->detective_work->id . '&element_type=societe&module_name=societe', 1) .'" target="_blank">' . $langs->transnoentities('CongigureLabourInspectorData') . ' <i class="fas fa-external-link-alt"></i></a>',
+                    4 => '<a href="' . dol_buildpath('/custom/digiriskdolibarr/admin/securityconf.php', 1) .'" target="_blank">' . $langs->transnoentities('ConfigureSecurityAndSocialData') . ' <i class="fas fa-external-link-alt"></i></a>',
+                    5 => '<a href="' . dol_buildpath('/custom/digiriskdolibarr/admin/securityconf.php', 1) .'" target="_blank">' . $langs->transnoentities('ConfigureSecurityAndSocialData') . ' <i class="fas fa-external-link-alt"></i></a>',
+                    6 => '<a href="' . dol_buildpath('/admin/openinghours.php', 1) .'" target="_blank">' . $langs->transnoentities('ConfigureSecurityAndSocialData') . ' <i class="fas fa-external-link-alt"></i></a>',
+                    7 => '<a href="' . dol_buildpath('/custom/digiriskdolibarr/admin/securityconf.php', 1) .'" target="_blank">' . $langs->transnoentities('ConfigureSecurityAndSocialData') . ' <i class="fas fa-external-link-alt"></i></a>',
+
+                ],
+                'picto'       => 'fas fa-link',
+                'widgetName'  => $langs->transnoentities('Society')
+            ]
+        ];
+        return $dashboardData;
+    }
+
+    /**
+     * get legal display info
+     *
+     * @return array     $array Return all graph data for dashboardData after load info
+     * @throws Exception
+     */
+    public function getLegalDisplayInfos(): array
+    {
+        global $langs;
+
+        $legalDisplay = json_decode($this->LegalDisplayFillJSON(), false, 512, JSON_UNESCAPED_UNICODE)->LegalDisplay;
+
+        $labourDoctor            = [$legalDisplay->occupational_health_service->fullname, $legalDisplay->occupational_health_service->zip, $legalDisplay->occupational_health_service->address, $legalDisplay->occupational_health_service->town, $legalDisplay->occupational_health_service->phone];
+        $labourDoctorTime        = [$legalDisplay->occupational_health_service->opening_hours_details->monday, $legalDisplay->occupational_health_service->opening_hours_details->tuesday, $legalDisplay->occupational_health_service->opening_hours_details->wednesday, $legalDisplay->occupational_health_service->opening_hours_details->thursday, $legalDisplay->occupational_health_service->opening_hours_details->friday, $legalDisplay->occupational_health_service->opening_hours_details->saturday, $legalDisplay->occupational_health_service->opening_hours_details->sunday];
+        $detectiveWork           = [$legalDisplay->detective_work->fullname, $legalDisplay->detective_work->zip, $legalDisplay->detective_work->address, $legalDisplay->detective_work->town, $legalDisplay->detective_work->phone];
+        $labourDetectiveWorkTime = [$legalDisplay->detective_work->opening_hours_details->monday, $legalDisplay->detective_work->opening_hours_details->tuesday, $legalDisplay->detective_work->opening_hours_details->wednesday, $legalDisplay->detective_work->opening_hours_details->thursday, $legalDisplay->detective_work->opening_hours_details->friday, $legalDisplay->detective_work->opening_hours_details->saturday, $legalDisplay->detective_work->opening_hours_details->sunday];
+        $emergencyService        = [$legalDisplay->emergency_service->samu, $legalDisplay->emergency_service->pompier, $legalDisplay->emergency_service->police, $legalDisplay->emergency_service->emergency, $legalDisplay->emergency_service->right_defender, $legalDisplay->emergency_service->poison_control_center];
+        $safetyRule              = [$legalDisplay->emergency_service->safety_rule->responsible_for_preventing, $legalDisplay->emergency_service->safety_rule->phone, $legalDisplay->emergency_service->safety_rule->location_of_detailed_instruction];
+        $workingHour             = [$legalDisplay->working_hour->monday_morning, $legalDisplay->working_hour->monday_afternoon, $legalDisplay->working_hour->tuesday_morning, $legalDisplay->working_hour->tuesday_afternoon, $legalDisplay->working_hour->wednesday_morning, $legalDisplay->working_hour->wednesday_afternoon, $legalDisplay->working_hour->thursday_morning, $legalDisplay->working_hour->thursday_afternoon, $legalDisplay->working_hour->friday_morning, $legalDisplay->working_hour->friday_afternoon, $legalDisplay->working_hour->saturday_morning, $legalDisplay->working_hour->saturday_afternoon, $legalDisplay->working_hour->sunday_morning, $legalDisplay->working_hour->sunday_afternoon];
+        $parameters              = [$legalDisplay->derogation_schedule->permanent, $legalDisplay->derogation_schedule->occasional, $legalDisplay->DUER->how_access_to_duer, $legalDisplay->participation_agreement->information_procedures, $legalDisplay->collective_agreement->location_and_access_terms_of_the_agreement];
+
+        function isGreaterThanZero($value) {
+            return dol_strlen($value) > 0;
+        }
+
+        // Define a function to count the number of non-empty values in an array
+        function countNonEmptyValues($array) {
+            return count(array_filter($array, 'isGreaterThanZero'));
+        }
+
+        $labourDoctorValue            = countNonEmptyValues($labourDoctor);
+        $labourDoctorTimeValue        = countNonEmptyValues($labourDoctorTime);
+        $detectiveWorkValue           = countNonEmptyValues($detectiveWork);
+        $labourDetectiveWorkTimeValue = countNonEmptyValues($labourDetectiveWorkTime);
+        $emergencyServiceValue        = countNonEmptyValues($emergencyService);
+        $safetyRuleValue              = countNonEmptyValues($safetyRule);
+        $workingHourValue             = countNonEmptyValues($workingHour);
+        $parametersValue              = countNonEmptyValues($parameters);
+
+        // Graph Title parameters
+        $array['title'] = $langs->transnoentities('ConfigureLegalDisplay');
+        $array['picto'] = $this->picto;
+
+        // Graph parameters
+        $array['width']      = '100%';
+        $array['height']     = 300;
+        $array['type']       = 'bars';
+        $array['showlegend'] = 1;
+        $array['dataset']    = 2;
+
+        //$legalDisplayGraphInfos = $this->getLegalDisplayNumber();
+        $array['labels'] = [
+            0 => [
+                'label' => $langs->transnoentities('Values'),
+                'color' => '#00CF68'
+            ],
+            1 => [
+                'label' => $langs->transnoentities('Total'),
+                'color' => '#006400'
+            ],
+        ];
+        $dataArray = [
+            [$langs->transnoentities('LabourDoctor'), $labourDoctorValue, count($labourDoctor)],
+            [$langs->transnoentities('Schedules'), $labourDoctorTimeValue, count($labourDoctorTime)],
+            [$langs->transnoentities('LabourInspector'), $detectiveWorkValue, count($detectiveWork)],
+            [$langs->transnoentities('Schedules'), $labourDetectiveWorkTimeValue, count($labourDetectiveWorkTime)],
+            [$langs->transnoentities('AllEmergencies'), $emergencyServiceValue, count($emergencyService)],
+            [$langs->transnoentities('SafetyInstructions'), $safetyRuleValue, count($safetyRule)],
+            [$langs->transnoentities('OpeningHours'), $workingHourValue, count($workingHour)],
+            [$langs->transnoentities('parameters'), $parametersValue, count($parameters)]
+        ];
+
+        $array['data'] = $dataArray;
+        return $array;
+    }
 }

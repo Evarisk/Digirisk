@@ -1,5 +1,5 @@
 <?php
-/* Copyright (C) 2021-2023 EVARISK <technique@evarisk.com>
+/* Copyright (C) 2021-2024 EVARISK <technique@evarisk.com>
  *
  * This program is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -44,7 +44,7 @@ require_once DOL_DOCUMENT_ROOT . '/core/class/html.form.class.php';
 require_once __DIR__ . '/../class/digiriskresources.class.php';
 
 // Translations
-saturne_load_langs(["admin", "companies"]);
+saturne_load_langs(['admin', 'companies']);
 
 // Parameters
 $action = GETPOST('action', 'aZ09');
@@ -65,12 +65,12 @@ saturne_check_access($permissiontoread);
  * Actions
  */
 
-$parameters = array();
-$reshook    = $hookmanager->executeHooks('doActions', $parameters, $object, $action);
-if ($reshook < 0) setEventMessages($hookmanager->error, $hookmanager->errors, 'errors');
+$parameters = [];
+$resHook    = $hookmanager->executeHooks('doActions', $parameters, $object, $action);
+if ($resHook < 0) setEventMessages($hookmanager->error, $hookmanager->errors, 'errors');
 
-if (empty($reshook)) {
-	if (($action == 'update' && ! GETPOST("cancel", 'alpha')) || ($action == 'updateedit')) {
+if (empty($resHook)) {
+	if (($action == 'update' && ! GETPOST('cancel', 'alpha')) || ($action == 'updateedit')) {
 		$electionDateCSE = GETPOST('ElectionDateCSE', 'none');
 		$electionDateCSE = explode('/', $electionDateCSE);
 		$electionDateCSE = $electionDateCSE[2] . '-' . $electionDateCSE[1] . '-' . $electionDateCSE[0];
@@ -79,11 +79,11 @@ if (empty($reshook)) {
 		$electionDateDP = explode('/', $electionDateDP);
 		$electionDateDP = $electionDateDP[2] . '-' . $electionDateDP[1] . '-' . $electionDateDP[0];
 
-		dolibarr_set_const($db, "DIGIRISKDOLIBARR_PARTICIPATION_AGREEMENT_INFORMATION_PROCEDURE", GETPOST("modalites", 'none'), 'chaine', 0, '', $conf->entity);
-		dolibarr_set_const($db, "DIGIRISKDOLIBARR_DEROGATION_SCHEDULE_PERMANENT", GETPOST("permanent", 'none'), 'chaine', 0, '', $conf->entity);
-		dolibarr_set_const($db, "DIGIRISKDOLIBARR_DEROGATION_SCHEDULE_OCCASIONAL", GETPOST("occasional", 'none'), 'chaine', 0, '', $conf->entity);
-		dolibarr_set_const($db, "DIGIRISKDOLIBARR_CSE_ELECTION_DATE", $electionDateCSE, 'date', 0, '', $conf->entity);
-		dolibarr_set_const($db, "DIGIRISKDOLIBARR_DP_ELECTION_DATE", $electionDateDP, 'date', 0, '', $conf->entity);
+		dolibarr_set_const($db, 'DIGIRISKDOLIBARR_PARTICIPATION_AGREEMENT_INFORMATION_PROCEDURE', GETPOST('modalites', 'none'), 'chaine', 0, '', $conf->entity);
+		dolibarr_set_const($db, 'DIGIRISKDOLIBARR_DEROGATION_SCHEDULE_PERMANENT', GETPOST('permanent', 'none'), 'chaine', 0, '', $conf->entity);
+		dolibarr_set_const($db, 'DIGIRISKDOLIBARR_DEROGATION_SCHEDULE_OCCASIONAL', GETPOST('occasional', 'none'), 'chaine', 0, '', $conf->entity);
+		dolibarr_set_const($db, 'DIGIRISKDOLIBARR_CSE_ELECTION_DATE', $electionDateCSE, 'date', 0, '', $conf->entity);
+		dolibarr_set_const($db, 'DIGIRISKDOLIBARR_DP_ELECTION_DATE', $electionDateDP, 'date', 0, '', $conf->entity);
 
 		$CSEtitulaires = ! empty(GETPOST('TitularsCSE', 'array')) ? GETPOST('TitularsCSE', 'array') : (GETPOST('TitularsCSE', 'int') > 0 ? array(GETPOST('TitularsCSE', 'int')) : array());
 		$CSEsuppleants = ! empty(GETPOST('AlternatesCSE', 'array')) ? GETPOST('AlternatesCSE', 'array') : (GETPOST('AlternatesCSE', 'int') > 0 ? array(GETPOST('AlternatesCSE', 'int')) : array());
@@ -115,13 +115,13 @@ if (empty($reshook)) {
 $help_url = 'FR:Module_Digirisk#L.27onglet_Social';
 $title    = $langs->trans("CompanyFoundation") . ' - ' . $langs->trans("Social");
 
-$morejs  = array("/digiriskdolibarr/js/digiriskdolibarr.js");
-$morecss = array("/digiriskdolibarr/css/digiriskdolibarr.css");
+$morejs  = array('/digiriskdolibarr/js/digiriskdolibarr.js');
+$morecss = array('/digiriskdolibarr/css/digiriskdolibarr.css');
 
 $counter = 0;
 
-$socialResources = array("TitularsCSE", "AlternatesCSE", "TitularsDP", "AlternatesDP");
-$socialConsts    = array("DIGIRISKDOLIBARR_PARTICIPATION_AGREEMENT_INFORMATION_PROCEDURE", "DIGIRISKDOLIBARR_DEROGATION_SCHEDULE_PERMANENT", "DIGIRISKDOLIBARR_DEROGATION_SCHEDULE_OCCASIONAL", "DIGIRISKDOLIBARR_CSE_ELECTION_DATE", "DIGIRISKDOLIBARR_DP_ELECTION_DATE");
+$socialResources = array('TitularsCSE', 'AlternatesCSE', 'HarassmentOfficerCSE', 'TitularsDP', 'AlternatesDP', 'HarassmentOfficer');
+$socialConsts    = array('DIGIRISKDOLIBARR_PARTICIPATION_AGREEMENT_INFORMATION_PROCEDURE', 'DIGIRISKDOLIBARR_DEROGATION_SCHEDULE_PERMANENT', 'DIGIRISKDOLIBARR_DEROGATION_SCHEDULE_OCCASIONAL', 'DIGIRISKDOLIBARR_CSE_ELECTION_DATE', 'DIGIRISKDOLIBARR_DP_ELECTION_DATE');
 
 $maxnumber = count($socialResources) + count($socialConsts);
 
@@ -152,7 +152,7 @@ $allLinks = $resources->fetchDigiriskResources();
 $electionDateCSE = $conf->global->DIGIRISKDOLIBARR_CSE_ELECTION_DATE;
 $electionDateDP  = $conf->global->DIGIRISKDOLIBARR_DP_ELECTION_DATE;
 
-print '<span class="opacitymedium">' . $langs->trans("DigiriskMenu") . "</span><br>\n";
+print '<span class="opacitymedium">' . $langs->trans('DigiriskMenu') . "</span><br>\n";
 print "<br>";
 
 print '<form method="POST" action="' . $_SERVER["PHP_SELF"] . '" name="social_form">';
