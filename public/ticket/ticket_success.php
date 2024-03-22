@@ -21,7 +21,6 @@
  *       \brief      Public page to view success on ticket
  */
 
-if ( ! defined('NOREQUIREUSER'))  define('NOREQUIREUSER', '1');
 if ( ! defined('NOTOKENRENEWAL')) define('NOTOKENRENEWAL', '1');
 if ( ! defined('NOREQUIREMENU'))  define('NOREQUIREMENU', '1');
 if ( ! defined('NOREQUIREHTML'))  define('NOREQUIREHTML', '1');
@@ -47,7 +46,6 @@ if ( ! $res) die("Include of main fails");
 
 // Libraries
 require_once DOL_DOCUMENT_ROOT . '/ticket/class/ticket.class.php';
-require_once DOL_DOCUMENT_ROOT . '/user/class/user.class.php';
 require_once '../../lib/digiriskdolibarr_function.lib.php';
 
 global $db, $langs, $mysoc;
