@@ -84,6 +84,14 @@ if ( $action == "edit" && $permissiontoadd ) {
     print saturne_show_medias_linked('digiriskdolibarr', $conf->digiriskdolibarr->multidir_output[$conf->entity] . '/riskassessmentdocument/siteplans', 'small', '', 0, 0, 0, 200, 200, 0, 0, 0, 'riskassessmentdocument/siteplans', null, '', 0, 0);
 	print '<input class="flat" type="file" name="userfile[]" id="SitePlans" />';
 	print '</td></tr>';
+
+    // Prévention des risques
+    print '<tr>';
+    print '<td class="titlefield"><label for="RisksPrevention">' . $langs->trans("RisksPrevention") . '</label></td>';
+    print '<td>';
+    $doleditor = new DolEditor('RisksPrevention', $conf->global->DIGIRISKDOLIBARR_RISKASSESSMENTDOCUMENT_RISKS_PREVENTION ? $conf->global->DIGIRISKDOLIBARR_RISKASSESSMENTDOCUMENT_RISKS_PREVENTION : '', '', 90, 'dolibarr_details', '', false, true, $conf->global->FCKEDITOR_ENABLE_SOCIETE, ROWS_3, '90%');
+    $doleditor->Create();
+    print '</td></tr>';
 } else {
 	print '<tr>';
 	print '<td class="titlefield">' . $langs->trans("AuditStartDate") . '</td><td colspan="2">';
@@ -129,6 +137,14 @@ if ( $action == "edit" && $permissiontoadd ) {
 	print '<td>';
     print saturne_show_medias_linked('digiriskdolibarr', $conf->digiriskdolibarr->multidir_output[$conf->entity] . '/riskassessmentdocument/siteplans', 'small', '', 0, 0, 0, 200, 200, 0, 0, 0, 'riskassessmentdocument/siteplans', null, '', 0, 0);
     print '</td></tr>';
+
+    // Prévention des risques
+    print '<tr>';
+    print '<td class="titlefield">' . $langs->trans("RisksPrevention") . '</td>';
+    print '<td>';
+    print $conf->global->DIGIRISKDOLIBARR_RISKASSESSMENTDOCUMENT_RISKS_PREVENTION;
+    print '</td></tr>';
+
 }
 
 ?>

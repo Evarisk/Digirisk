@@ -696,6 +696,7 @@ AuditEndDate                                              = Date de fin d'audit
 Recipient                                                 = Destinataire
 ImportantNote                                             = Remarque importante
 SitePlans                                                 = Localisation des plans
+RisksPrevention                                           = Prévention des risques
 SetStartEndDateBeforeSendEmail                            = Définissez la date de début et la date de fin d'audit sur cette page pour envoyer un email
 NoSitePlans                                               = Aucun plan de la société renseigné
 riskassessmentdocument.odt                                = Document Unique
@@ -706,6 +707,7 @@ AppliedOn                                                 = Actif sur :
 RiskAssessmentDocumentMethod                              = * Étape 1 : Récupération des informations<br />- Visite des locaux<br />- Récupération des données du personnel<br /><br />* Étape 2 : Définition de la méthodologie et de document<br />- Validation des fiches d'unité de travail standard<br />- Validation de l'arborescence des unités<br /><br />* Étape 3 : Réalisation de l'étude de risques<br />- Sensibilisation des personnels aux risques et aux dangers<br />- Création des unités de travail avec le personnel et le ou les responsables<br />- Évaluations des risques par unités de travail avec le personnel<br /><br />* Étape 4<br />- Traitement et rédaction du document unique
 RiskAssessmentDocumentSources                             = La sensibilisation des risques est définie dans l'ED840 édité par L'INRS.<br />Dans ce document vous trouverez:<br />- La définition d'un risque, d'un danger et un schéma explicatif<br />- Les explications concernant les différentes méthodes d'évaluation
 RiskAssessmentDocumentImportantNote                       = Notes importantes :<br />Vous pouvez lire la documentation de DigiRisk ici<br /><a href="https://wiki.dolibarr.org/index.php?title=Module_Digirisk" target="_blank">https://wiki.dolibarr.org/index.php?title=Module_Digirisk</a><br />Vous pouvez suivre le projet ici :<br /><a href="https://github.com/Evarisk/Digirisk/projects?type=classic" target="_blank">https://github.com/Evarisk/Digirisk/projects?type=classic</a><br />Reporter un bug ici<br /><a href="https://github.com/Evarisk/Digirisk/issues" target="_blank">https://github.com/Evarisk/Digirisk/issues</a>
+RiskAssessmentDocumentRisksPrevention                     = Prévention des risques
 GenerateZipArchiveWithDigiriskElementDocuments            = Génération d'une archive ZIP avec le Document Unique
 GenerateZipArchiveWithDigiriskElementDocumentsDescription = Génération automatique d'une archive ZIP contenant le Document Unique et toutes les fiches de poste lors de la génération du Document Unique
 RiskAssessmentDocumentDescription                         = Plan d'action Document Unique
