@@ -185,7 +185,7 @@ class DigiriskDocuments extends SaturneDocuments
         $activeDigiriskElements = $digiriskelementobject->getActiveDigiriskElements($allEntities ? 1 : 0);
         $tasksSortedByRisk = $risk->getTasksWithFkRisk();
 
-        for ($i = 1; $i <= 4; $i++ ) {
+        for ($i = 4; $i >= 1; $i--) {
             $foundTagForLines = 1;
             try {
                 $listlines = $odfHandler->setSegment('risk' . $i);
@@ -199,7 +199,6 @@ class DigiriskDocuments extends SaturneDocuments
             if ($foundTagForLines) {
                 if (is_array($risks) && ! empty($risks)) {
                     foreach ($risks as $line) {
-                        $j++;
                         if ($line->fk_element > 0 && in_array($line->fk_element, array_keys($activeDigiriskElements))) {
                             $tmparray['actionPreventionUncompleted'] = "";
                             $tmparray['actionPreventionCompleted']   = "";
