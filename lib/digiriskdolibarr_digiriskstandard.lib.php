@@ -61,7 +61,7 @@ function digiriskstandard_prepare_head(DigiriskStandard $object): array
 
     if ($user->rights->ticket->read) {
         $head[$h][0] = dol_buildpath('/digiriskdolibarr/view/digiriskstandard/digiriskstandard_registerdocument.php', 1);
-        $head[$h][1] = $conf->browser->layout != 'phone' ? '<i class="fas fa-ticket-alt pictofixedwidth"></i>' . $langs->trans('RegisterDocument') : '<i class="fas fa-comment-dots"></i>';
+        $head[$h][1] = $conf->browser->layout != 'phone' ? '<i class="fas fa-ticket-alt pictofixedwidth"></i>' . $langs->trans('RegisterDocument') : '<i class="fas fa-ticket-alt"></i>';
         $head[$h][2] = 'standardRegisterDocument';
         $h++;
     }
