@@ -2417,6 +2417,7 @@ class modDigiriskdolibarr extends DolibarrModules
 
             dolibarr_set_const($this->db, 'DIGIRISKDOLIBARR_CUSTOM_NUM_REF_SET', 1, 'integer', 0, '', $conf->entity);
         } else if ($conf->global->DIGIRISKDOLIBARR_CUSTOM_NUM_REF_SET > 0 || $conf->global->DIGIRISKDOLIBARR_CUSTOM_NUM_REF_SET < 2) {
+            $objectTypeAndMod['RegisterDocument']     = ['thiazzi', 'RD{0}'];
             $objectTypeAndMod['ListingRisksDocument'] = ['calypso', 'RLD{0}'];
             $objectTypeAndMod['AuditReportDocument']  = ['lindberg', 'ARD{0}'];
             dolibarr_set_const($this->db, 'DIGIRISKDOLIBARR_CUSTOM_NUM_REF_SET', 2, 'integer', 0, '', $conf->entity);
