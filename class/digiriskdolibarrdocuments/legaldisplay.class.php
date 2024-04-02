@@ -74,29 +74,29 @@ class LegalDisplay extends DigiriskDocuments
 				$thirdparty_openinghours = new SaturneSchedules($this->db);
 				$thirdparty_openinghours->fetch(0, '', $morewhere);
 
-                $labour_hours_monday    = explode(' ', $thirdparty_openinghours->monday);
-                $labour_hours_tuesday   = explode(' ', $thirdparty_openinghours->tuesday);
-                $labour_hours_wednesday = explode(' ', $thirdparty_openinghours->wednesday);
-                $labour_hours_thursday  = explode(' ', $thirdparty_openinghours->thursday);
-                $labour_hours_friday    = explode(' ', $thirdparty_openinghours->friday);
-                $labour_hours_saturday  = explode(' ', $thirdparty_openinghours->saturday);
-                $labour_hours_sunday    = explode(' ', $thirdparty_openinghours->sunday);
+                $labourHoursMonday    = explode(' ', $thirdparty_openinghours->monday);
+                $labourHoursTuesday   = explode(' ', $thirdparty_openinghours->tuesday);
+                $labourHoursWednesday = explode(' ', $thirdparty_openinghours->wednesday);
+                $labourHoursThursday  = explode(' ', $thirdparty_openinghours->thursday);
+                $labourHoursFriday    = explode(' ', $thirdparty_openinghours->friday);
+                $labourHoursSaturday  = explode(' ', $thirdparty_openinghours->saturday);
+                $labourHoursSunday    = explode(' ', $thirdparty_openinghours->sunday);
 
-                $json['LegalDisplay']['occupational_health_service']['monday_morning']    = $labour_hours_monday[0];
-                $json['LegalDisplay']['occupational_health_service']['tuesday_morning']   = $labour_hours_tuesday[0];
-                $json['LegalDisplay']['occupational_health_service']['wednesday_morning'] = $labour_hours_wednesday[0];
-                $json['LegalDisplay']['occupational_health_service']['thursday_morning']  = $labour_hours_thursday[0];
-                $json['LegalDisplay']['occupational_health_service']['friday_morning']    = $labour_hours_friday[0];
-                $json['LegalDisplay']['occupational_health_service']['saturday_morning']  = $labour_hours_saturday[0];
-                $json['LegalDisplay']['occupational_health_service']['sunday_morning']    = $labour_hours_sunday[0];
+                $json['LegalDisplay']['occupational_health_service']['monday_morning']    = $labourHoursMonday[0];
+                $json['LegalDisplay']['occupational_health_service']['tuesday_morning']   = $labourHoursTuesday[0];
+                $json['LegalDisplay']['occupational_health_service']['wednesday_morning'] = $labourHoursWednesday[0];
+                $json['LegalDisplay']['occupational_health_service']['thursday_morning']  = $labourHoursThursday[0];
+                $json['LegalDisplay']['occupational_health_service']['friday_morning']    = $labourHoursFriday[0];
+                $json['LegalDisplay']['occupational_health_service']['saturday_morning']  = $labourHoursSaturday[0];
+                $json['LegalDisplay']['occupational_health_service']['sunday_morning']    = $labourHoursSunday[0];
 
-                $json['LegalDisplay']['occupational_health_service']['monday_afternoon']    = $labour_hours_monday[1];
-                $json['LegalDisplay']['occupational_health_service']['tuesday_afternoon']   = $labour_hours_tuesday[1];
-                $json['LegalDisplay']['occupational_health_service']['wednesday_afternoon'] = $labour_hours_wednesday[1];
-                $json['LegalDisplay']['occupational_health_service']['thursday_afternoon']  = $labour_hours_thursday[1];
-                $json['LegalDisplay']['occupational_health_service']['friday_afternoon']    = $labour_hours_friday[1];
-                $json['LegalDisplay']['occupational_health_service']['saturday_afternoon']  = $labour_hours_saturday[1];
-                $json['LegalDisplay']['occupational_health_service']['sunday_afternoon']    = $labour_hours_sunday[1];
+                $json['LegalDisplay']['occupational_health_service']['monday_afternoon']    = $labourHoursMonday[1];
+                $json['LegalDisplay']['occupational_health_service']['tuesday_afternoon']   = $labourHoursTuesday[1];
+                $json['LegalDisplay']['occupational_health_service']['wednesday_afternoon'] = $labourHoursWednesday[1];
+                $json['LegalDisplay']['occupational_health_service']['thursday_afternoon']  = $labourHoursThursday[1];
+                $json['LegalDisplay']['occupational_health_service']['friday_afternoon']    = $labourHoursFriday[1];
+                $json['LegalDisplay']['occupational_health_service']['saturday_afternoon']  = $labourHoursSaturday[1];
+                $json['LegalDisplay']['occupational_health_service']['sunday_afternoon']    = $labourHoursSunday[1];
 			}
 
 			$labour_doctor_contact = new Contact($this->db);
@@ -120,33 +120,33 @@ class LegalDisplay extends DigiriskDocuments
 				$thirdparty_openinghours = new SaturneSchedules($this->db);
 				$thirdparty_openinghours->fetch(0, '', $morewhere);
 
-                $detective_hours_monday    = explode(' ', $thirdparty_openinghours->monday);
-                $detective_hours_tuesday   = explode(' ', $thirdparty_openinghours->tuesday);
-                $detective_hours_wednesday = explode(' ', $thirdparty_openinghours->wednesday);
-                $detective_hours_thursday  = explode(' ', $thirdparty_openinghours->thursday);
-                $detective_hours_friday    = explode(' ', $thirdparty_openinghours->friday);
-                $detective_hours_saturday  = explode(' ', $thirdparty_openinghours->saturday);
-                $detective_hours_sunday    = explode(' ', $thirdparty_openinghours->sunday);
+                $detectiveHoursMonday    = explode(' ', $thirdparty_openinghours->monday);
+                $detectiveHoursTuesday   = explode(' ', $thirdparty_openinghours->tuesday);
+                $detectiveHoursWednesday = explode(' ', $thirdparty_openinghours->wednesday);
+                $detectiveHoursThursday  = explode(' ', $thirdparty_openinghours->thursday);
+                $detectiveHoursFriday    = explode(' ', $thirdparty_openinghours->friday);
+                $detectiveHoursSaturday  = explode(' ', $thirdparty_openinghours->saturday);
+                $detectiveHoursSunday    = explode(' ', $thirdparty_openinghours->sunday);
 
-                $json['LegalDisplay']['detective_work']['monday_morning']    = $detective_hours_monday[0];
-                $json['LegalDisplay']['detective_work']['tuesday_morning']   = $detective_hours_tuesday[0];
-                $json['LegalDisplay']['detective_work']['wednesday_morning'] = $detective_hours_wednesday[0];
-                $json['LegalDisplay']['detective_work']['thursday_morning']  = $detective_hours_thursday[0];
-                $json['LegalDisplay']['detective_work']['friday_morning']    = $detective_hours_friday[0];
-                $json['LegalDisplay']['detective_work']['saturday_morning']  = $detective_hours_saturday[0];
-                $json['LegalDisplay']['detective_work']['sunday_morning']    = $detective_hours_sunday[0];
+                $json['LegalDisplay']['detective_work']['monday_morning']    = $detectiveHoursMonday[0];
+                $json['LegalDisplay']['detective_work']['tuesday_morning']   = $detectiveHoursTuesday[0];
+                $json['LegalDisplay']['detective_work']['wednesday_morning'] = $detectiveHoursWednesday[0];
+                $json['LegalDisplay']['detective_work']['thursday_morning']  = $detectiveHoursThursday[0];
+                $json['LegalDisplay']['detective_work']['friday_morning']    = $detectiveHoursFriday[0];
+                $json['LegalDisplay']['detective_work']['saturday_morning']  = $detectiveHoursSaturday[0];
+                $json['LegalDisplay']['detective_work']['sunday_morning']    = $detectiveHoursSunday[0];
 
-                $json['LegalDisplay']['detective_work']['monday_afternoon']    = $detective_hours_monday[1];
-                $json['LegalDisplay']['detective_work']['tuesday_afternoon']   = $detective_hours_tuesday[1];
-                $json['LegalDisplay']['detective_work']['wednesday_afternoon'] = $detective_hours_wednesday[1];
-                $json['LegalDisplay']['detective_work']['thursday_afternoon']  = $detective_hours_thursday[1];
-                $json['LegalDisplay']['detective_work']['friday_afternoon']    = $detective_hours_friday[1];
-                $json['LegalDisplay']['detective_work']['saturday_afternoon']  = $detective_hours_saturday[1];
-                $json['LegalDisplay']['detective_work']['sunday_afternoon']    = $detective_hours_sunday[1];
+                $json['LegalDisplay']['detective_work']['monday_afternoon']    = $detectiveHoursMonday[1];
+                $json['LegalDisplay']['detective_work']['tuesday_afternoon']   = $detectiveHoursTuesday[1];
+                $json['LegalDisplay']['detective_work']['wednesday_afternoon'] = $detectiveHoursWednesday[1];
+                $json['LegalDisplay']['detective_work']['thursday_afternoon']  = $detectiveHoursThursday[1];
+                $json['LegalDisplay']['detective_work']['friday_afternoon']    = $detectiveHoursFriday[1];
+                $json['LegalDisplay']['detective_work']['saturday_afternoon']  = $detectiveHoursSaturday[1];
+                $json['LegalDisplay']['detective_work']['sunday_afternoon']    = $detectiveHoursSunday[1];
 			}
 
 			$labourInspectorContact = new Contact($this->db);
-			$result = $labourInspectorContact->fetch($digirisk_resources['LabourInspectorContact']->id[0]);
+			$result                 = $labourInspectorContact->fetch($digirisk_resources['LabourInspectorContact']->id[0]);
 
 			if ($result > 0) {
 				$json['LegalDisplay']['detective_work']['id']      = $labourInspectorContact->id;
@@ -157,7 +157,7 @@ class LegalDisplay extends DigiriskDocuments
 				$json['LegalDisplay']['detective_work']['phone']   = $labourInspectorContact->phone_pro;
 			}
 
-			$samu = new Societe($this->db);
+			$samu   = new Societe($this->db);
 			$result = $samu->fetch($digirisk_resources['SAMU']->id[0]);
 
 			if ($result > 0) {
@@ -172,28 +172,28 @@ class LegalDisplay extends DigiriskDocuments
 			}
 
 			$pompier = new Societe($this->db);
-			$result = $pompier->fetch($digirisk_resources['Pompiers']->id[0]);
+			$result  = $pompier->fetch($digirisk_resources['Pompiers']->id[0]);
 
 			if ($result > 0) {
 				$json['LegalDisplay']['emergency_service']['pompier'] = $pompier->phone;
 			}
 
 			$emergency = new Societe($this->db);
-			$result = $emergency->fetch($digirisk_resources['AllEmergencies']->id[0]);
+			$result    = $emergency->fetch($digirisk_resources['AllEmergencies']->id[0]);
 
 			if ($result > 0) {
 				$json['LegalDisplay']['emergency_service']['emergency'] = $emergency->phone;
 			}
 
 			$rights_defender = new Societe($this->db);
-			$result = $rights_defender->fetch($digirisk_resources['RightsDefender']->id[0]);
+			$result          = $rights_defender->fetch($digirisk_resources['RightsDefender']->id[0]);
 
 			if ($result > 0) {
 				$json['LegalDisplay']['emergency_service']['right_defender'] = $rights_defender->phone;
 			}
 
 			$poison_control_center = new Societe($this->db);
-			$result = $poison_control_center->fetch($digirisk_resources['PoisonControlCenter']->id[0]);
+			$result                = $poison_control_center->fetch($digirisk_resources['PoisonControlCenter']->id[0]);
 
 			if ($result > 0) {
 				$json['LegalDisplay']['emergency_service']['poison_control_center'] = $poison_control_center->phone;
