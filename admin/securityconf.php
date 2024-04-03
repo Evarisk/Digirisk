@@ -181,14 +181,24 @@ if (isModEnabled('societe')) {
 
 	$labourdDoctorSociety = $allLinks['LabourDoctorSociety'];
 
-	// * Third party concerned - Tiers concerné *
+    // * Third party concerned - Tiers concerné *
 
 	if ($labourdDoctorSociety->ref == 'LabourDoctorSociety') {
 		$events   = array();
 		$events[] = array('method' => 'getContacts', 'url' => dol_buildpath('/core/ajax/contacts.php?showempty=1', 1), 'htmlname' => 'labourdoctor_contactid', 'params' => array('add-customer-contact' => 'disabled'));
 		$societe->fetch($labourdDoctorSociety->id[0]);
 
-		print $form->select_company($labourdDoctorSociety->id[0], 'labourdoctor_socid', '', 'SelectThirdParty', 1, 0, $events, 0, 'minwidth300');
+        if ($action == 'createdoctorcontact') {
+            $lastDoctorContact   = $societe->contact_array();
+            $lastDoctorContactId = array_key_last($lastDoctorContact);
+        }
+
+        if ($action == 'createdoctorsoc') {
+            $lastSocieteCreated          = saturne_fetch_all_object_type('societe', 'DESC', 'rowid', 1);
+            $labourdDoctorSociety->id[0] = array_key_first($lastSocieteCreated);
+        }
+
+        print $form->select_company($labourdDoctorSociety->id[0], 'labourdoctor_socid', '', 'SelectThirdParty', 1, 0, $events, 0, 'minwidth300');
 	} else {
 		$events   = array();
 		$events[] = array('method' => 'getContacts', 'url' => dol_buildpath('/core/ajax/contacts.php?showempty=1', 1), 'htmlname' => 'labourdoctor_contactid', 'params' => array('add-customer-contact' => 'disabled'));
@@ -201,27 +211,31 @@ if (isModEnabled('societe')) {
 		}
 	}
 	if (!GETPOSTISSET('backtopage')) {
-        print ' <a href="' . DOL_URL_ROOT . '/societe/card.php?action=create&backtopage=' . urlencode($_SERVER["PHP_SELF"] . '?action=create') . '"><span class="fa fa-plus-circle valignmiddle paddingleft" title="' . $langs->trans("AddThirdParty") . '"></span></a>';
+        print ' <a href="' . DOL_URL_ROOT . '/societe/card.php?action=create&backtopage=' . urlencode($_SERVER["PHP_SELF"] . '?action=createdoctorsoc') . '"><span class="fa fa-plus-circle valignmiddle paddingleft" title="' . $langs->trans("AddThirdParty") . '"></span></a>';
     }
 	print '</td></tr>';
 
 	// * Related contacts - Contacts associés *
 	print '<tr class="oddeven"><td class="nowrap">' . $langs->trans("ActionOnContact") . '</td><td>';
 
-	$labourdDoctorContact 		= $allLinks['LabourDoctorContact'];
-	$labourDoctorPreselectedIds = $labourdDoctorContact->id;
+	$labourdDoctorContact       = $allLinks['LabourDoctorContact'];
+	$labourDoctorPreselectedIds = $labourdDoctorContact->id ?: [];
 
-	if ($labourdDoctorContact->id) {
-		print $form->selectcontacts(empty($labourdDoctorSociety->id[0]) ? -1 : $labourdDoctorSociety->id[0], $labourdDoctorContact->id, 'labourdoctor_contactid[]', 0, '', '', 0, 'minwidth500', false, 0, array(), false, 'multiple', 'labourdoctor_contactid');
+    if (!empty($labourdDoctorSociety)) {
+        $labourDoctorPreselectedIds = array_merge($labourDoctorPreselectedIds, [$lastDoctorContactId]);
+    }
+
+    if ($labourdDoctorContact->id) {
+		print $form->selectcontacts(empty($labourdDoctorSociety->id[0]) ? -1 : $labourdDoctorSociety->id[0], $labourDoctorPreselectedIds, 'labourdoctor_contactid[]', 0, '', '', 0, 'minwidth500', false, 0, array(), false, 'multiple', 'labourdoctor_contactid');
 	} else {
-		$labourDoctorPreselectedIds = GETPOST('labourdoctor_contactid', 'array');
+		$labourDoctorPreselectedIds = array_merge($labourDoctorPreselectedIds, GETPOST('labourdoctor_contactid', 'array'));
 		if (GETPOST('labourdoctor_contactid', 'array'))  {
             $labourDoctorPreselectedIds[GETPOST('labourdoctor_contactid', 'array')] = GETPOST('labourdoctor_contactid', 'array');
         }
-		print $form->selectcontacts(empty(GETPOST('labourdoctor_socid', 'int')) ? -1 : GETPOST('labourdoctor_socid', 'int'), $labourDoctorPreselectedIds, 'labourdoctor_contactid[]', 0, '', '', 0, 'minwidth500', false, 0, array(), false, 'multiple', 'labourdoctor_contactid');
+		print $form->selectcontacts(empty(GETPOST('labourdoctor_socid', 'int')) ? $labourdDoctorSociety->id[0] : GETPOST('labourdoctor_socid', 'int'), $labourDoctorPreselectedIds, 'labourdoctor_contactid[]', 0, '', '', 0, 'minwidth500', false, 0, array(), false, 'multiple', 'labourdoctor_contactid');
 	}
     if (!GETPOSTISSET('backtopage')) {
-        print ' <a href="' . DOL_URL_ROOT . '/contact/card.php?action=create&socid='. $labourdDoctorSociety->id[0] .'&backtopage=' . urlencode($_SERVER["PHP_SELF"] . '?action=create') . '"><span class="fa fa-plus-circle valignmiddle paddingleft" title="' . $langs->trans("AddContact") . '"></span></a>';
+        print ' <a href="' . DOL_URL_ROOT . '/contact/card.php?action=create&socid='. $labourdDoctorSociety->id[0] .'&backtopage=' . urlencode($_SERVER["PHP_SELF"] . '?action=createdoctorcontact') . '"><span class="fa fa-plus-circle valignmiddle paddingleft" title="' . $langs->trans("AddContact") . '"></span></a>';
     }
     print '</td></tr>';
 
@@ -241,6 +255,16 @@ if (isModEnabled('societe')) {
 		$events[] = array('method' => 'getContacts', 'url' => dol_buildpath('/core/ajax/contacts.php?showempty=1', 1), 'htmlname' => 'labourinspector_contactid', 'params' => array('add-customer-contact' => 'disabled'));
 		$societe->fetch($labourdInspectorSociete->id[0]);
 
+        if ($action == 'createinspectorcontact') {
+            $lastInspectorContact   = $societe->contact_array();
+            $lastInspectorContactId = array_key_last($lastInspectorContact);
+        }
+
+        if ($action == 'createinspectorsoc') {
+            $lastSocieteCreated             = saturne_fetch_all_object_type('societe', 'DESC', 'rowid', 1);
+            $labourdInspectorSociete->id[0] = array_key_first($lastSocieteCreated);
+        }
+
 		print $form->select_company($labourdInspectorSociete->id[0], 'labourinspector_socid', '', 0, 1, 0, $events, 0, 'minwidth300');
 	} else {
 		$events   = array();
@@ -253,7 +277,7 @@ if (isModEnabled('societe')) {
 		}
 	}
 	if (!GETPOSTISSET('backtopage')) {
-        print ' <a href="' . DOL_URL_ROOT . '/societe/card.php?action=create&backtopage=' . urlencode($_SERVER["PHP_SELF"] . '?action=create') . '"><span class="fa fa-plus-circle valignmiddle paddingleft" title="' . $langs->trans("AddThirdParty") . '"></span></a>';
+        print ' <a href="' . DOL_URL_ROOT . '/societe/card.php?action=create&backtopage=' . urlencode($_SERVER["PHP_SELF"] . '?action=createinspectorsoc') . '"><span class="fa fa-plus-circle valignmiddle paddingleft" title="' . $langs->trans("AddThirdParty") . '"></span></a>';
     }
 	print '</td></tr>';
 
@@ -262,19 +286,23 @@ if (isModEnabled('societe')) {
 	print '<tr class="oddeven"><td class="nowrap">' . $langs->trans("ActionOnContact") . '</td><td>';
 
 	$labourInspectorContacts       = $allLinks['LabourInspectorContact'];
-	$labourInspectorPreselectedIds = $labourInspectorContacts->id;
+	$labourInspectorPreselectedIds = $labourInspectorContacts->id ?: [];
+
+    if (!empty($labourdInspectorSociete)) {
+        $labourInspectorPreselectedIds = array_merge($labourInspectorPreselectedIds, [$lastInspectorContactId]);
+    }
 
 	if ($labourInspectorContacts->id) {
-		print $form->selectcontacts(empty($labourdInspectorSociete->id[0]) ? -1 : $labourdInspectorSociete->id[0], $labourInspectorContacts->id, 'labourinspector_contactid[]', 0, '', '', 0, 'minwidth500', false, 0, array(), false, 'multiple', 'labourinspector_contactid');
+		print $form->selectcontacts(empty($labourdInspectorSociete->id[0]) ? -1 : $labourdInspectorSociete->id[0], $labourInspectorPreselectedIds, 'labourinspector_contactid[]', 0, '', '', 0, 'minwidth500', false, 0, array(), false, 'multiple', 'labourinspector_contactid');
 	} else {
-		$labourInspectorPreselectedIds                                                                                                   = GETPOST('labourinspector_contactid', 'array');
+		$labourInspectorPreselectedIds = array_merge($labourInspectorPreselectedIds, GETPOST('labourinspector_contactid', 'array'));
 		if (GETPOST('labourinspector_contactid', 'array')) {
             $labourInspectorPreselectedIds[GETPOST('labourinspector_contactid', 'array')] = GETPOST('labourinspector_contactid', 'array');
         }
-		print $form->selectcontacts(empty(GETPOST('labourinspector_socid', 'int')) ? -1 : GETPOST('labourinspector_socid', 'int'), $labourInspectorPreselectedIds, 'labourinspector_contactid[]', 0, '', '', 0, 'minwidth500', false, 0, array(), false, 'multiple', 'labourinspector_contactid');
+		print $form->selectcontacts(empty(GETPOST('labourinspector_socid', 'int')) ? $labourdInspectorSociete->id[0] : GETPOST('labourinspector_socid', 'int'), $labourInspectorPreselectedIds, 'labourinspector_contactid[]', 0, '', '', 0, 'minwidth500', false, 0, array(), false, 'multiple', 'labourinspector_contactid');
 	}
     if (!GETPOSTISSET('backtopage')) {
-        print ' <a href="' . DOL_URL_ROOT . '/contact/card.php?action=create&socid='. $labourdInspectorSociete->id[0] .'&backtopage=' . urlencode($_SERVER["PHP_SELF"] . '?action=create') . '"><span class="fa fa-plus-circle valignmiddle paddingleft" title="' . $langs->trans("AddContact") . '"></span></a>';
+        print ' <a href="' . DOL_URL_ROOT . '/contact/card.php?action=create&socid='. $labourdInspectorSociete->id[0] .'&backtopage=' . urlencode($_SERVER["PHP_SELF"] . '?action=createinspectorcontact') . '"><span class="fa fa-plus-circle valignmiddle paddingleft" title="' . $langs->trans("AddContact") . '"></span></a>';
     }
 	print '</td></tr>';
 
