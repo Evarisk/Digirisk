@@ -82,13 +82,14 @@ class DigiriskDocuments extends SaturneDocuments
 	 *
 	 */
 	public function DigiriskFillJSON() {
-		switch ($this->element) {
+        switch ($this->element) {
 			case "legaldisplay":
 				$this->json = $this->LegalDisplayFillJSON();
 				break;
 			case "informationssharing":
 				$this->json = $this->InformationsSharingFillJSON();
 				break;
+            case "auditreportdocument":
 			case "riskassessmentdocument":
 				$this->json = $this->RiskAssessmentDocumentFillJSON();
 				break;
