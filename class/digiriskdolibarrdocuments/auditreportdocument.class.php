@@ -24,6 +24,7 @@
 
 // Load DigiriskDolibarr librairies
 require_once __DIR__ . '/../digiriskdocuments.class.php';
+require_once __DIR__ . './riskassessmentdocument.class.php';
 
 /**
  * Class for AuditReportDocument
@@ -49,5 +50,10 @@ class AuditReportDocument extends DigiriskDocuments
     public function __construct(DoliDB $db)
     {
         parent::__construct($db, $this->module, $this->element);
+    }
+
+    public function RiskAssessmentDocumentFillJSON() {
+        $riskassessmentDocument = new RiskAssessmentDocument($this->db);
+        return $riskassessmentDocument->RiskAssessmentDocumentFillJSON();
     }
 }
