@@ -90,6 +90,9 @@ class DigiriskDocuments extends SaturneDocuments
 				$this->json = $this->InformationsSharingFillJSON();
 				break;
             case "auditreportdocument":
+                $riskAssessmentDocument = new RiskAssessmentDocument($this->db);
+                $this->json = $riskAssessmentDocument->RiskAssessmentDocumentFillJSON();
+                break;
 			case "riskassessmentdocument":
 				$this->json = $this->RiskAssessmentDocumentFillJSON();
 				break;
