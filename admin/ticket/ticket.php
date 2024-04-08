@@ -303,7 +303,7 @@ $head = digiriskdolibarr_admin_prepare_head();
 
 print dol_get_fiche_head($head, 'ticket', $title, -1, "digiriskdolibarr_color@digiriskdolibarr");
 
-print load_fiche_titre('<i class="fa fa-ticket"></i> ' . $langs->transnoentities("TicketManagement"), '', '');
+print load_fiche_titre('<i class="fa fa-ticket-alt"></i> ' . $langs->transnoentities("TicketManagement"), '', '');
 print '<hr>';
 print load_fiche_titre($langs->transnoentities("PublicInterface"), '', '');
 
