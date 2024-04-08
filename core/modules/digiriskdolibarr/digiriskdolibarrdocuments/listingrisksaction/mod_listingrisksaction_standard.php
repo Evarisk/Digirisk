@@ -17,26 +17,26 @@
  */
 
 /**
- *  \file    core/modules/digiquali/controldocument/mod_controldocument_standard.php
- *  \ingroup digiquali
- *  \brief   File of class to manage controldocument numbering rules standard.
+ *  \file    core/modules/digiriskdolibarr/digiriskdolibarrdocuments/mod_listingrisksaction_standard.php
+ *  \ingroup digiriskdolibarr
+ *  \brief   File of class to manage listingrisksaction numbering rules standard
  */
 
-// Load Saturne libraries.
+// Load Saturne libraries
 require_once __DIR__ . '/../../../../../../saturne/core/modules/saturne/modules_saturne.php';
 
 /**
- *	Class to manage controldocument numbering rules standard.
+ *	Class to manage listingrisksaction numbering rules standard
  */
 class mod_listingrisksaction_standard extends ModeleNumRefSaturne
 {
 	/**
-	 * @var string Numbering module ref prefix.
+	 * @var string Numbering module ref prefix
 	 */
 	public string $prefix = 'RLA';
 
 	/**
-	 * @var string Name.
+	 * @var string Name
 	 */
 	public string $name = 'Pan';
 }

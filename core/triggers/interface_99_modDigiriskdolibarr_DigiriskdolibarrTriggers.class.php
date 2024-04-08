@@ -72,7 +72,7 @@ class InterfaceDigiriskdolibarrTriggers extends DolibarrTriggers
 		$this->name        = preg_replace('/^Interface/i', '', get_class($this));
 		$this->family      = "demo";
 		$this->description = "Digiriskdolibarr triggers.";
-		$this->version     = '9.14.1';
+		$this->version     = '9.15.0';
 		$this->picto       = 'digiriskdolibarr@digiriskdolibarr';
 	}
 
@@ -221,6 +221,7 @@ class InterfaceDigiriskdolibarrTriggers extends DolibarrTriggers
 
             case 'REGISTERDOCUMENT_GENERATE':
             case 'RISKASSESSMENTDOCUMENT_GENERATE' :
+            case 'AUDITREPORTDOCUMENT_GENERATE' :
             case 'LEGALDISPLAY_GENERATE' :
             case 'INFORMATIONSSHARING_GENERATE' :
             case 'REGISTERDOCUMENT_GENERATE' :
@@ -228,6 +229,7 @@ class InterfaceDigiriskdolibarrTriggers extends DolibarrTriggers
 			case 'PREVENTIONPLANDOCUMENT_GENERATE' :
             case 'LISTINGRISKSACTION_GENERATE' :
             case 'LISTINGRISKSPHOTO_GENERATE' :
+            case 'LISTINGRISKSDOCUMENT_GENERATE' :
             case 'WORKUNITDOCUMENT_GENERATE' :
 			case 'GROUPMENTDOCUMENT_GENERATE' :
 
@@ -593,6 +595,8 @@ class InterfaceDigiriskdolibarrTriggers extends DolibarrTriggers
 
 			case 'TASK_CREATE' :
 				if (!empty($object->array_options['options_fk_risk'])) {
+                    require_once __DIR__ . '/../../class/riskanalysis/risk.class.php';
+
 					$langs->load("projects");
 
 					$risk = new Risk($this->db);

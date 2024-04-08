@@ -226,22 +226,23 @@ class RiskSign extends SaturneObject
 		return -1;
 	}
 
-	/**
-	 * Load object in memory from the database
-	 *
-	 * @param int $parent_id Id parent object
-	 * @param bool $get_children_data Get children risks data
-	 * @param bool $get_parents_data Get parents risks data
-	 * @return array|int         <0 if KO, 0 if not found, >0 if OK
-	 * @throws Exception
-	 */
-	public function fetchRiskSign($parent_id, $get_parents_data = false, $get_shared_data = false)
+    /**
+     * Load object in memory from the database
+     *
+     * @param  int       $parent_id        Id parent object
+     * @param  bool      $get_parents_data Get parents risks signs data
+     * @param  bool      $get_shared_data  Get shared risks signs data
+     * @param  array     $moreParams       More params(Object/user/etc)
+     * @return array|int                   Int <0 if KO, array of pages if OK
+     * @throws Exception
+     */
+	public function fetchRiskSign($parent_id, $get_parents_data = false, $get_shared_data = false, $moreParams = [])
 	{
 		global $conf;
 		$object   = new DigiriskElement($this->db);
 		$objects  = $object->fetchAll('',  '',  0,  0, array('customsql' => 'status > 0' ));
 		$risksign = new RiskSign($this->db);
-		$result   = $risksign->fetchFromParent($parent_id);
+		$result   = $risksign->fetchAll('', '', 0, 0, ['customsql' => ($parent_id > 0 ? 'fk_element = ' . $parent_id . ' AND ' : '') . 'status = ' . self::STATUS_VALIDATED . $moreParams['filter']]);
 
 		$trashList = $object->getMultiEntityTrashList();
 		if (!empty($trashList) && is_array($trashList)) {

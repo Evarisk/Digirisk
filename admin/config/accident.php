@@ -46,13 +46,6 @@ saturne_load_langs(["admin"]);
 // Parameters
 $action     = GETPOST('action', 'alpha');
 $backtopage = GETPOST('backtopage', 'alpha');
-$value      = GETPOST('value', 'alpha');
-
-// Initialize technical objects
-$usertmp  = new User($db);
-$accident = new Accident($db);
-$workstop = new AccidentWorkStop($db);
-$lesion   = new AccidentLesion($db);
 
 // Security check - Protection if external user
 $permissiontoread = $user->rights->digiriskdolibarr->adminpage->read;
@@ -76,40 +69,8 @@ if (($action == 'update' && ! GETPOST("cancel", 'alpha')) || ($action == 'update
 	}
 }
 
-if ($action == 'updateMask') {
-	$accidentMaskConst = GETPOST('maskconstaccident', 'alpha');
-	$accidentMask      = GETPOST('maskaccident', 'alpha');
-
-	if ($accidentMaskConst) {
-		$res = dolibarr_set_const($db, $accidentMaskConst, $accidentMask, 'chaine', 0, '', $conf->entity);
-	}
-
-	if (!$res > 0) {
-        $error++;
-    }
-
-	if (!$error) {
-		setEventMessages($langs->trans("SetupSaved"), null);
-	} else {
-		setEventMessages($langs->trans("Error"), null, 'errors');
-	}
-}
-
-if ($action == 'setmod') {
-    if (preg_match('_accidentinvestigation_', $value)) {
-        $constforval = 'DIGIRISKDOLIBARR_ACCIDENTINVESTIGATION_ADDON';
-    } else if (preg_match('_accidentworkstop_', $value)) {
-        $constforval = 'DIGIRISKDOLIBARR_ACCIDENTWORKSTOP_ADDON';
-    } else if (preg_match('_accidentlesion_', $value)) {
-        $constforval = 'DIGIRISKDOLIBARR_ACCIDENTLESION_ADDON';
-    } else if (preg_match('_accident_', $value)) {
-        $constforval = 'DIGIRISKDOLIBARR_ACCIDENT_ADDON';
-    } else {
-        $constforval = '';
-    }
-
-    dolibarr_set_const($db, $constforval, $value, 'chaine', 0, '', $conf->entity);
-}
+// Actions set_mod, update_mask
+require_once __DIR__ . '/../../../saturne/core/tpl/actions/admin_conf_actions.tpl.php';
 
 /*
  * View
@@ -164,8 +125,6 @@ print '<hr>';
 
 $object = new AccidentLesion($db);
 
-$objectModSubdir = 'digiriskelement';
-
 require __DIR__ . '/../../../saturne/core/tpl/admin/object/object_numbering_module_view.tpl.php';
 
 print load_fiche_titre('<i class="fas fa-user-injured"></i> ' . $langs->trans("AccidentInvestigationManagement"), '', '');
@@ -194,7 +153,7 @@ if (isModEnabled('project')) {
 
 	$langs->load("projects");
 	print '<tr class="oddeven"><td><label for="ACCProject">' . $langs->trans("ACCProject") . '</label></td><td>';
-	$formproject->select_projects(0,  $conf->global->DIGIRISKDOLIBARR_ACCIDENT_PROJECT, 'ACCProject', 0, 0, 0, 0, 0, 0, 0, '', 0, 0, 'maxwidth500');
+	$formproject->select_projects(-1,  $conf->global->DIGIRISKDOLIBARR_ACCIDENT_PROJECT, 'ACCProject', 0, 0, 0, 0, 0, 0, 0, '', 0, 0, 'maxwidth500');
 	print ' <a href="' . DOL_URL_ROOT . '/projet/card.php?&action=create&status=1&backtopage=' . urlencode($_SERVER["PHP_SELF"] . '?action=create') . '"><span class="fa fa-plus-circle valignmiddle" title="' . $langs->trans("AddProject") . '"></span></a>';
 	print '<td><input type="submit" class="button" name="save" value="' . $langs->trans("Save") . '">';
 	print '</td></tr>';

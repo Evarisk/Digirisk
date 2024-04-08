@@ -45,9 +45,7 @@ saturne_load_langs(["admin"]);
 // Parameters
 $action     = GETPOST('action', 'alpha');
 $backtopage = GETPOST('backtopage', 'alpha');
-$value      = GETPOST('value', 'alpha');
 
-$type  = 'firepermit';
 $error = 0;
 
 // Initialize technical objects
@@ -80,30 +78,8 @@ if (($action == 'update' && ! GETPOST("cancel", 'alpha')) || ($action == 'update
 	}
 }
 
-if ($action == 'updateMask') {
-	$firePermitMaskConst = GETPOST('maskconstfirepermit', 'alpha');
-	$firePermitMask      = GETPOST('maskfirepermit', 'alpha');
-
-	if ($firePermitMaskConst) $res = dolibarr_set_const($db, $firePermitMaskConst, $firePermitMask, 'chaine', 0, '', $conf->entity);
-
-	if ( ! $res > 0) $error++;
-
-	if ( ! $error) {
-		setEventMessages($langs->trans("SetupSaved"), null);
-	} else {
-		setEventMessages($langs->trans("Error"), null, 'errors');
-	}
-}
-
-if ($action == 'setmod') {
-	$constforval = 'DIGIRISKDOLIBARR_' . strtoupper($type) . "_ADDON";
-	dolibarr_set_const($db, $constforval, $value, 'chaine', 0, '', $conf->entity);
-}
-
-if ($action == 'setmodFirePermitDet') {
-	$constforval = 'DIGIRISKDOLIBARR_' . strtoupper('firepermitdet') . "_ADDON";
-	dolibarr_set_const($db, $constforval, $value, 'chaine', 0, '', $conf->entity);
-}
+// Actions set_mod, update_mask
+require_once __DIR__ . '/../../../saturne/core/tpl/actions/admin_conf_actions.tpl.php';
 
 if ($action == 'setMaitreOeuvre') {
 	$masterWorkerId = GETPOST('maitre_oeuvre');
@@ -151,7 +127,7 @@ if (isModEnabled('project')) {
 
 	$langs->load("projects");
 	print '<tr class="oddeven"><td><label for="FPRProject">' . $langs->trans("FPRProject") . '</label></td><td>';
-	$formproject->select_projects(0,  $conf->global->DIGIRISKDOLIBARR_FIREPERMIT_PROJECT, 'FPRProject', 0, 0, 0, 0, 0, 0, 0, '', 0, 0, 'maxwidth500');
+	$formproject->select_projects(-1,  $conf->global->DIGIRISKDOLIBARR_FIREPERMIT_PROJECT, 'FPRProject', 0, 0, 0, 0, 0, 0, 0, '', 0, 0, 'maxwidth500');
 	print ' <a href="' . DOL_URL_ROOT . '/projet/card.php?&action=create&status=1&backtopage=' . urlencode($_SERVER["PHP_SELF"] . '?action=create') . '"><span class="fa fa-plus-circle valignmiddle" title="' . $langs->trans("AddProject") . '"></span></a>';
 	print '<td><input type="submit" class="button" name="save" value="' . $langs->trans("Save") . '">';
 	print '</td></tr>';
@@ -167,7 +143,6 @@ require __DIR__ . '/../../../saturne/core/tpl/admin/object/object_numbering_modu
 $object = new FirePermitLine($db);
 
 require __DIR__ . '/../../../saturne/core/tpl/admin/object/object_numbering_module_view.tpl.php';
-
 
 print load_fiche_titre($langs->trans("FirePermitData"), '', '');
 

@@ -48,14 +48,12 @@ function digiriskdolibarr_completesubstitutionarray(&$substitutionarray, $langs,
 			$substitutionarray['service_de_sante_code_postal'] = $legaldisplay->occupational_health_service->zip;
 			$substitutionarray['service_de_sante_ville']       = $legaldisplay->occupational_health_service->town;
 			$substitutionarray['service_de_sante_telephone']   = $legaldisplay->occupational_health_service->phone;
-			$substitutionarray['service_de_sante_horaire']     = $legaldisplay->occupational_health_service->openinghours;
 
 			$substitutionarray['inspection_du_travail_nom']         = $legaldisplay->detective_work->name;
 			$substitutionarray['inspection_du_travail_adresse']     = $legaldisplay->detective_work->address;
 			$substitutionarray['inspection_du_travail_code_postal'] = $legaldisplay->detective_work->zip;
 			$substitutionarray['inspection_du_travail_ville']       = $legaldisplay->detective_work->town;
 			$substitutionarray['inspection_du_travail_telephone']   = $legaldisplay->detective_work->phone;
-			$substitutionarray['inspection_du_travail_horaire']     = $legaldisplay->detective_work->openinghours;
 
 			$substitutionarray['samu']                 = $legaldisplay->emergency_service->samu;
 			$substitutionarray['pompier']              = $legaldisplay->emergency_service->pompier;
@@ -73,6 +71,7 @@ function digiriskdolibarr_completesubstitutionarray(&$substitutionarray, $langs,
 			$substitutionarray['lieu_modalite']                        = dol_htmlentitiesbr_decode(strip_tags($legaldisplay->collective_agreement->location_and_access_terms_of_the_agreement, '<br>'));
 			$substitutionarray['modalite_information_ap']              = dol_htmlentitiesbr_decode(strip_tags($legaldisplay->participation_agreement->information_procedures, '<br>'));
 			$substitutionarray['modalite_access']                      = dol_htmlentitiesbr_decode(strip_tags($legaldisplay->DUER->how_access_to_duer, '<br>'));
+            $substitutionarray['rules_location']                       = dol_htmlentitiesbr_decode(strip_tags($legaldisplay->rules->location, '<br>'));
 
 			$substitutionarray['lundi_matin']    = $legaldisplay->working_hour->monday_morning;
 			$substitutionarray['lundi_aprem']    = $legaldisplay->working_hour->monday_afternoon;
@@ -88,6 +87,36 @@ function digiriskdolibarr_completesubstitutionarray(&$substitutionarray, $langs,
 			$substitutionarray['samedi_aprem']   = $legaldisplay->working_hour->saturday_afternoon;
 			$substitutionarray['dimanche_matin'] = $legaldisplay->working_hour->sunday_morning;
 			$substitutionarray['dimanche_aprem'] = $legaldisplay->working_hour->sunday_afternoon;
+
+            $substitutionarray['labour_mon_morning']   = $legaldisplay->occupational_health_service->monday_morning;
+            $substitutionarray['labour_mon_afternoon'] = $legaldisplay->occupational_health_service->monday_afternoon;
+            $substitutionarray['labour_tue_morning']   = $legaldisplay->occupational_health_service->tuesday_morning;
+            $substitutionarray['labour_tue_afternoon'] = $legaldisplay->occupational_health_service->tuesday_afternoon;
+            $substitutionarray['labour_wed_morning']   = $legaldisplay->occupational_health_service->wednesday_morning;
+            $substitutionarray['labour_wed_afternoon'] = $legaldisplay->occupational_health_service->wednesday_afternoon;
+            $substitutionarray['labour_thu_morning']   = $legaldisplay->occupational_health_service->thursday_morning;
+            $substitutionarray['labour_thu_afternoon'] = $legaldisplay->occupational_health_service->thursday_afternoon;
+            $substitutionarray['labour_fri_morning']   = $legaldisplay->occupational_health_service->friday_morning;
+            $substitutionarray['labour_fri_afternoon'] = $legaldisplay->occupational_health_service->friday_afternoon;
+            $substitutionarray['labour_sat_morning']   = $legaldisplay->occupational_health_service->saturday_morning;
+            $substitutionarray['labour_sat_afternoon'] = $legaldisplay->occupational_health_service->saturday_afternoon;
+            $substitutionarray['labour_sun_morning']   = $legaldisplay->occupational_health_service->sunday_morning;
+            $substitutionarray['labour_sun_afternoon'] = $legaldisplay->occupational_health_service->sunday_afternoon;
+
+            $substitutionarray['ins_mon_morning']   = $legaldisplay->detective_work->monday_morning;
+            $substitutionarray['ins_mon_afternoon'] = $legaldisplay->detective_work->monday_afternoon;
+            $substitutionarray['ins_tue_morning']   = $legaldisplay->detective_work->tuesday_morning;
+            $substitutionarray['ins_tue_afternoon'] = $legaldisplay->detective_work->tuesday_afternoon;
+            $substitutionarray['ins_wed_morning']   = $legaldisplay->detective_work->wednesday_morning;
+            $substitutionarray['ins_wed_afternoon'] = $legaldisplay->detective_work->wednesday_afternoon;
+            $substitutionarray['ins_thu_morning']   = $legaldisplay->detective_work->thursday_morning;
+            $substitutionarray['ins_thu_afternoon'] = $legaldisplay->detective_work->thursday_afternoon;
+            $substitutionarray['ins_fri_morning']   = $legaldisplay->detective_work->friday_morning;
+            $substitutionarray['ins_fri_afternoon'] = $legaldisplay->detective_work->friday_afternoon;
+            $substitutionarray['ins_sat_morning']   = $legaldisplay->detective_work->saturday_morning;
+            $substitutionarray['ins_sat_afternoon'] = $legaldisplay->detective_work->saturday_afternoon;
+            $substitutionarray['ins_sun_morning']   = $legaldisplay->detective_work->sunday_morning;
+            $substitutionarray['ins_sun_afternoon'] = $legaldisplay->detective_work->sunday_afternoon;
 
 			break;
 
@@ -137,6 +166,7 @@ function digiriskdolibarr_completesubstitutionarray(&$substitutionarray, $langs,
 
 			break;
 
+        case 'auditreportdocument@digiriskdolibarr':
 		case 'riskassessmentdocument@digiriskdolibarr':
 
 			$riskassessmentdocument = json_decode($object->json, false, 512, JSON_UNESCAPED_UNICODE)->RiskAssessmentDocument;

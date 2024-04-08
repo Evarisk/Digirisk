@@ -104,6 +104,31 @@ class ActionsDigiriskdolibarr
         }
     }
 
+    /**
+     * Overloading the addHtmlHeader function : replacing the parent's function with the one below
+     *
+     * @param  array $parameters Hook metadata (context, etc...)
+     * @return int               0 < on error, 0 on success, 1 to replace standard code
+     */
+    public function addHtmlHeader(array $parameters): int
+    {
+        if (strpos($parameters['context'], 'ticketcard') !== false) {
+            $resourcesRequired = [
+                'css' => '/custom/saturne/css/saturne.min.css',
+                'js'  => '/custom/saturne/js/saturne.min.js'
+            ];
+
+            $out  = '<!-- Includes CSS added by module saturne -->';
+            $out .= '<link rel="stylesheet" type="text/css" href="' . dol_buildpath($resourcesRequired['css'], 1) . '">';
+            $out .= '<!-- Includes JS added by module saturne -->';
+            $out .= '<script src="' . dol_buildpath($resourcesRequired['js'], 1) . '"></script>';
+
+            $this->resprints = $out;
+        }
+
+        return 0; // or return 1 to replace standard code
+    }
+
 	/**
 	 * Overloading the printCommonFooter function : replacing the parent's function with the one below
 	 *
@@ -112,7 +137,7 @@ class ActionsDigiriskdolibarr
 	 */
 	public function printCommonFooter($parameters)
 	{
-		global $conf, $db, $form, $langs;
+		global $conf, $db, $form, $langs, $object, $user;
 
 		require_once __DIR__ . '/../../saturne/lib/saturne_functions.lib.php';
 
@@ -160,53 +185,37 @@ class ActionsDigiriskdolibarr
 				print ajax_combobox('selectDIGIRISKDOLIBARR_COLLECTIVE_AGREEMENT_TITLE');
 			}
 		} else if ($parameters['currentcontext'] == 'ticketcard') {
-			if (GETPOST('action') == 'view' || empty(GETPOST('action')) || GETPOST('action') == 'update_extras') {
-				print '<link rel="stylesheet" type="text/css" href="../custom/digiriskdolibarr/css/digiriskdolibarr.css">';
-				print '<script src="../custom/digiriskdolibarr/js/digiriskdolibarr.js"></script>';
+            if (GETPOST('action') == 'view' || empty(GETPOST('action')) || GETPOST('action') == 'update_extras') {
+                if (is_numeric($object->array_options['options_digiriskdolibarr_ticket_service']) && $object->array_options['options_digiriskdolibarr_ticket_service'] > 0) {
+                    require_once __DIR__ . '/digiriskelement.class.php';
 
-				require_once __DIR__ . '/../lib/digiriskdolibarr_function.lib.php';
-				require_once __DIR__ . '/../class/digiriskdolibarrdocuments/ticketdocument.class.php';
-				require_once __DIR__ . '/../../saturne/core/modules/saturne/modules_saturne.php';
+                    $digiriskElement = new DigiriskElement($db);
 
-				global $langs, $user;
+                    $digiriskElement->fetch($object->array_options['options_digiriskdolibarr_ticket_service']);
+                    $selectDictionnary = $digiriskElement->getNomUrl(1, 'blank', 0, '', -1, 1); ?>
 
-				$object = new Ticket($this->db);
-				$result = $object->fetch(GETPOST('id'),GETPOST('ref','alpha'),GETPOST('track_id','alpha'));
-				$upload_dir = $conf->digiriskdolibarr->multidir_output[isset($object->entity) ? $object->entity : 1];
-				$objref    = dol_sanitizeFileName($object->ref);
-				$dir_files = $object->element . 'document/' . $objref;
+                    <script>
+                        jQuery('.ticket_extras_digiriskdolibarr_ticket_service').html(<?php echo json_encode($selectDictionnary); ?>);
+                    </script>
+                    <?php
+                }
 
-				$filedir   = $upload_dir . '/' . $dir_files;
-				$urlsource = $_SERVER["PHP_SELF"] . '?id=' . $object->id;
+                $moduleNameLowerCase = 'digiriskdolibarr';
 
-				$modulepart   = 'digiriskdolibarr:TicketDocument';
-				$defaultmodel = $conf->global->DIGIRISKDOLIBARR_TICKET_DEFAULT_MODEL;
-				$pictopath = dol_buildpath('/digiriskdolibarr/img/digiriskdolibarr_color.png', 1);
-				$pictoDigirisk = img_picto('', $pictopath, '', 1, 0, 0, '', 'pictoDigirisk');
-				$title        = $pictoDigirisk . $langs->trans('TicketDocument');
+                require_once __DIR__ . '/../../saturne/lib/documents.lib.php';
 
-				require_once __DIR__ . '/../lib/digiriskdolibarr_function.lib.php';
+                $upload_dir = $conf->digiriskdolibarr->multidir_output[$object->entity ?? 1];
+                $objRef     = dol_sanitizeFileName($object->ref);
+                $dirFiles   = $object->element . 'document/' . $objRef;
+                $fileDir    = $upload_dir . '/' . $dirFiles;
+                $urlSource  = $_SERVER['PHP_SELF'] . '?id=' . $object->id;
 
-				if(is_numeric($object->array_options['options_digiriskdolibarr_ticket_service']) && $object->array_options['options_digiriskdolibarr_ticket_service'] > 0) {
-					require_once __DIR__ . '/digiriskelement.class.php';
-					$digiriskelement = new DigiriskElement($db);
-					$digiriskelement->fetch($object->array_options['options_digiriskdolibarr_ticket_service']);
-					$selectDictionnary = $digiriskelement->getNomUrl(1, 'blank', 0, '', -1, 1);
-					?>
-					<script>
-					jQuery('.ticket_extras_digiriskdolibarr_ticket_service').html('')
-					jQuery('.ticket_extras_digiriskdolibarr_ticket_service').prepend(<?php echo json_encode($selectDictionnary) ; ?>)
-					</script>
-					<?php
-				}
-				$html = saturne_show_documents($modulepart, $dir_files, $filedir, $urlsource, 1,1, '', 1, 0, 0, 0, 0, '', 0, '', empty($soc->default_lang) ? '' : $soc->default_lang, $object);
+                $out = saturne_show_documents('digiriskdolibarr:TicketDocument', $dirFiles, $fileDir, $urlSource, $user->rights->ticket->write, $user->rights->ticket->delete, getDolGlobalString('DIGIRISKDOLIBARR_TICKET_DEFAULT_MODEL'), 1, 0, 0, 0, '', '', '', '', '', $object); ?>
 
-				?>
-
-				<script>
-					jQuery('.fichehalfleft .div-table-responsive-no-min').append(<?php echo json_encode($html) ; ?>)
-				</script>
-				<?php
+                <script>
+                    jQuery('.fichehalfleft .div-table-responsive-no-min').first().append(<?php echo json_encode($out); ?>);
+                </script>
+                <?php
 
                 require_once __DIR__ . '/accident.class.php';
                 $accident           = new Accident($db);
@@ -533,7 +542,7 @@ class ActionsDigiriskdolibarr
 	 */
 	public function doActions($parameters, $object, $action)
 	{
-		global $conf, $db;
+		global $conf, $langs, $db, $user;
 
         $error = 0;
 		/* print_r($parameters); print_r($object); echo "action: " . $action; */
@@ -550,65 +559,37 @@ class ActionsDigiriskdolibarr
 				}
 			}
 		} else if ($parameters['currentcontext'] == 'ticketcard') {
-			if ($action == 'digiriskbuilddoc') {
-				require_once __DIR__ . '/../lib/digiriskdolibarr_function.lib.php';
-				require_once __DIR__ . '/../class/digiriskdolibarrdocuments/ticketdocument.class.php';
+            if ($action == 'builddoc' && preg_match('/\bticketdocument_odt\b/', GETPOST('model'))) {
+                require_once __DIR__ . '/digiriskdolibarrdocuments/ticketdocument.class.php';
 
-				global $langs, $user;
-				$ticketdocument = new TicketDocument($this->db);
-				$outputlangs = $langs;
-				$newlang     = '';
+                $document = new TicketDocument($this->db);
 
-				if ($conf->global->MAIN_MULTILANGS && empty($newlang) && GETPOST('lang_id', 'aZ09')) $newlang = GETPOST('lang_id', 'aZ09');
-				if ( ! empty($newlang)) {
-					$outputlangs = new Translate("", $conf);
-					$outputlangs->setDefaultLang($newlang);
-				}
+                $moduleNameLowerCase = 'digiriskdolibarr';
+                $permissiontoadd     = $user->rights->ticket->write;
+            }
 
-				// To be sure vars is defined
-				if (empty($hidedetails)) $hidedetails = 0;
-				if (empty($hidedesc)) $hidedesc       = 0;
-				if (empty($hideref)) $hideref         = 0;
-				if (empty($moreparams)) $moreparams   = null;
+            if ($action == 'remove_file') {
+                $upload_dir         = $conf->digiriskdolibarr->multidir_output[$conf->entity ?? 1];
+                $permissiontodelete = $user->rights->ticket->delete;
+            }
 
-				$model = GETPOST('model', 'alpha');
+            if ($action == 'pdfGeneration') {
+                $moduleName          = 'DigiriskDolibarr';
+                $moduleNameLowerCase = strtolower($moduleName);
+                $upload_dir          = $conf->digiriskdolibarr->multidir_output[$conf->entity ?? 1];
 
-				$moreparams['object']     = $object;
-				$moreparams['user']       = $user;
-				$moreparams['objectType'] = $object->element;
+                // Action to generate pdf from odt file
+                require __DIR__ . '/../../saturne/core/tpl/documents/saturne_manual_pdf_generation_action.tpl.php';
 
-				$result = $ticketdocument->generateDocument($model, $outputlangs, $hidedetails, $hidedesc, $hideref, $moreparams);
+                $urlToRedirect = $_SERVER['REQUEST_URI'];
+                $urlToRedirect = preg_replace('/#pdfGeneration$/', '', $urlToRedirect);
+                $urlToRedirect = preg_replace('/action=pdfGeneration&?/', '', $urlToRedirect); // To avoid infinite loop
 
-				if ($result <= 0) {
-					setEventMessages($object->error, $object->errors, 'errors');
-					$action = '';
-				} else {
-					if (empty($donotredirect)) {
-						setEventMessages($langs->trans('FileGenerated') . ' - ' . '<a href=' . DOL_URL_ROOT . '/document.php?modulepart=digiriskdolibarr&file=ticketdocument/' . (dol_strlen($object->ref) > 0 ? $object->ref . '/' : '') . urlencode($ticketdocument->last_main_doc) . '&entity=' . $conf->entity . '"' . '>' . $ticketdocument->last_main_doc . '</a>', []);
+                header('Location: ' . $urlToRedirect);
+                exit;
+            }
 
-						$urltoredirect = $_SERVER['REQUEST_URI'];
-						$urltoredirect = preg_replace('/#digiriskbuilddoc$/', '', $urltoredirect);
-						$urltoredirect = preg_replace('/action=digiriskbuilddoc&?/', '', $urltoredirect); // To avoid infinite loop
-
-						header('Location: ' . $urltoredirect );
-						exit;
-					}
-				}
-			}
-
-			$upload_dir = $conf->digiriskdolibarr->multidir_output[isset($conf->entity) ? $conf->entity : 1];
-
-			// Action to generate pdf from odt file
-            require_once __DIR__ . '/../../saturne/core/tpl/documents/saturne_manual_pdf_generation_action.tpl.php';
-
-			if ($action == 'pdfGeneration') {
-				$urltoredirect = $_SERVER['REQUEST_URI'];
-				$urltoredirect = preg_replace('/#pdfGeneration$/', '', $urltoredirect);
-				$urltoredirect = preg_replace('/action=pdfGeneration&?/', '', $urltoredirect); // To avoid infinite loop
-
-				header('Location: ' . $urltoredirect );
-				exit;
-			}
+            require __DIR__ . '/../../saturne/core/tpl/documents/documents_action.tpl.php';
 		} elseif (in_array($parameters['currentcontext'] , array('ticketlist', 'thirdpartyticket', 'projectticket'))) {
 			if ($action == 'list') {
 				if (GETPOST('button_removefilter_x', 'alpha') || GETPOST('button_removefilter.x', 'alpha') || GETPOST('button_removefilter', 'alpha')) {
@@ -979,13 +960,17 @@ class ActionsDigiriskdolibarr
                 'documentType' => 'registerdocument',
                 'picto'        => 'fontawesome_fa-ticket-alt_fas_#d35968'
             ],
+            'ListingRisksDocument' => [
+                'documentType' => 'listingrisksdocument',
+                'picto'        => 'fontawesome_fa-file_fas_#d35968'
+            ],
 			'ListingRisksAction' => [
 				'documentType' => 'listingrisksaction',
-				'picto'        => 'fontawesome_fa-images_fas_#d35968'
+				'picto'        => 'fontawesome_fa-exclamation_fas_#d35968'
 			],
 			'ListingRisksPhoto' => [
 				'documentType' => 'listingrisksphoto',
-				'picto'        => 'fontawesome_fa-file_fas_#d35968'
+				'picto'        => 'fontawesome_fa-images_fas_#d35968'
 			],
 			'GroupmentDocument' => [
 				'documentType' => 'groupmentdocument',
@@ -999,6 +984,10 @@ class ActionsDigiriskdolibarr
 				'documentType' => 'riskassessmentdocument',
 				'picto'        => 'fontawesome_fa-file-alt_fas_#d35968'
 			],
+            'AuditReportDocument' => [
+                'documentType' => 'auditreportdocument',
+                'picto'        => 'fontawesome_fa-file-alt_fas_#d35968'
+            ],
 			'PreventionPlanDocument' => [
 				'documentType' => 'preventionplandocument',
 				'picto'        => 'fontawesome_fa-info_fas_#d35968'

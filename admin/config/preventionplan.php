@@ -46,9 +46,7 @@ saturne_load_langs(["admin"]);
 // Parameters
 $action     = GETPOST('action', 'alpha');
 $backtopage = GETPOST('backtopage', 'alpha');
-$value      = GETPOST('value', 'alpha');
 
-$type  = 'preventionplan';
 $error = 0;
 
 // Initialize technical objects
@@ -81,30 +79,8 @@ if (($action == 'update' && ! GETPOST("cancel", 'alpha')) || ($action == 'update
 	}
 }
 
-if ($action == 'updateMask') {
-	$preventionPlanMaskConst = GETPOST('maskconstpreventionplan', 'alpha');
-	$preventionPlanMask      = GETPOST('maskpreventionplan', 'alpha');
-
-	if ($preventionPlanMaskConst) $res = dolibarr_set_const($db, $preventionPlanMaskConst, $preventionPlanMask, 'chaine', 0, '', $conf->entity);
-
-	if ( ! $res > 0) $error++;
-
-	if ( ! $error) {
-		setEventMessages($langs->trans("SetupSaved"), null);
-	} else {
-		setEventMessages($langs->trans("Error"), null, 'errors');
-	}
-}
-
-if ($action == 'setmod') {
-	$constForVal = 'DIGIRISKDOLIBARR_' . strtoupper($type) . "_ADDON";
-	dolibarr_set_const($db, $constForVal, $value, 'chaine', 0, '', $conf->entity);
-}
-
-if ($action == 'setmodPreventionPlanDet') {
-	$constForVal = 'DIGIRISKDOLIBARR_' . strtoupper('preventionplandet') . "_ADDON";
-	dolibarr_set_const($db, $constForVal, $value, 'chaine', 0, '', $conf->entity);
-}
+// Actions set_mod, update_mask
+require_once __DIR__ . '/../../../saturne/core/tpl/actions/admin_conf_actions.tpl.php';
 
 if ($action == 'setMaitreOeuvre') {
 	$masterWorkerId = GETPOST('maitre_oeuvre');
@@ -152,7 +128,7 @@ if (isModEnabled('project')) {
 
 	$langs->load("projects");
 	print '<tr class="oddeven"><td><label for="PPRProject">' . $langs->trans("PPRProject") . '</label></td><td>';
-	$formproject->select_projects(0,  $conf->global->DIGIRISKDOLIBARR_PREVENTIONPLAN_PROJECT, 'PPRProject', 0, 0, 0, 0, 0, 0, 0, '', 0, 0, 'maxwidth500');
+	$formproject->select_projects(-1,  $conf->global->DIGIRISKDOLIBARR_PREVENTIONPLAN_PROJECT, 'PPRProject', 0, 0, 0, 0, 0, 0, 0, '', 0, 0, 'maxwidth500');
 	print ' <a href="' . DOL_URL_ROOT . '/projet/card.php?&action=create&status=1&backtopage=' . urlencode($_SERVER["PHP_SELF"] . '?action=create') . '"><span class="fa fa-plus-circle valignmiddle" title="' . $langs->trans("AddProject") . '"></span></a>';
 	print '<td><input type="submit" class="button" name="save" value="' . $langs->trans("Save") . '">';
 	print '</td></tr>';

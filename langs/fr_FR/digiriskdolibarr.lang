@@ -636,6 +636,18 @@ CutOff                      = Coupure
 Investigator = Enquêteur
 Rescuer      = Secouriste
 
+#
+# ListingRisksDocument - Listing des risques documents
+#
+
+# Right - Droit
+ListingRisksDocumentMin = listings des risques avec documents
+
+# Data - Donnée
+ListingRisksDocument            = Listing des risques avec documents
+ListingRisksDocumentGenerated   = Génération de listing des Risques avec Documents
+listingrisksdocument.odt        = Listing des risques avec documents
+listingrisksdocument_custom.odt = Listing des risques avec documents personnalisé
 
 #
 # ListingRisksPhoto - Listing des risques Photo
@@ -708,6 +720,18 @@ NbDaysAfterNextGenerateDate  = Nombre de jours de retard pour la génération du
 RiskAssessmentDocumentLabel   = Récapitulatif du document unique
 RiskAssessmentDocumentSubject = Email document unique
 RiskAssessmentDocumentContent = Veuillez trouver ci-joint le ZIP et le document ODT du document unique.
+
+
+
+#
+# AuditReportDocument - Rapport d'audit
+#
+
+# Data - Donnée
+AuditReportDocument     = Rapport d'audit
+AuditReportDocumentsMin = rapports d'audit
+auditreportdocument.odt = Rapport d'audit
+
 
 
 #
@@ -916,20 +940,22 @@ ShowInheritedRisksInListings             = Risques hérités - Listings
 ShowInheritedRisksInListingsDescription  = Afficher les risques hérités dans les listings de Digirisk
 ShowInheritedRisksInDocuments            = Risques hérités - Documents
 ShowInheritedRisksInDocumentsDescription = Afficher les risques hérités dans les documents de Digirisk
-DigiriskElementInheritedRisksList Liste des risques hérités
-ConfirmImportSharedRisks       = Veuillez choisir les risques partagés à importer
-RisksRepartition               = Répartition des risques par évaluation
-ShowRiskOrigin                 = Afficher la provenance du risque
-ShowRiskOriginDescription      = Afficher la provenance des risques dans les documents (Fiche UT, Fiche GP, Document Unique, Listings de risques, etc.)
-SharedRiskImportWithSuccess    = Risque importé avec succès
-RiskImport                     = Import de risques
-RiskUnlink                     = Suppression du risque partagé
-RiskDeleted                    = Le risque %s a été supprimé
-RiskSharedWithEntityRefLabel   = Partage du risque %s avec
-RiskUnlinkedFromEntityRefLabel = Dissociation du risque %s avec
-TheDigiriskelement             = l'élément Digirisk
-DefaultProjectContactType      = Rôle par défaut attribué au projet Document Unique
-DefaultTaskContactType         = Rôle par défaut attribué aux tâches du projet Document Unique
+DigiriskElementInheritedRisksList        = Liste des risques hérités
+ConfirmImportSharedRisks                 = Veuillez choisir les risques partagés à importer
+RisksRepartition                         = Répartition des risques par évaluation
+ShowRiskOrigin                           = Afficher la provenance du risque
+ShowRiskOriginDescription                = Afficher la provenance des risques dans les documents (Document Unique, Groupement, Unités de travail, Listing des risques avec actions et avec photos etc.).
+SharedRiskImportWithSuccess              = Risque importé avec succès
+RiskImport                               = Import de risques
+RiskUnlink                               = Suppression du risque partagé
+RiskDeleted                              = Le risque %s a été supprimé
+RiskSharedWithEntityRefLabel             = Partage du risque %s avec
+RiskUnlinkedFromEntityRefLabel           = Dissociation du risque %s avec
+TheDigiriskelement                       = l'élément Digirisk
+DefaultProjectContactType                = Rôle par défaut attribué au projet Document Unique
+DefaultTaskContactType                   = Rôle par défaut attribué aux tâches du projet Document Unique
+RiskListParentView                       = Afficher tous les éléments parents
+RiskListParentViewDescription            = Afficher tous les éléments parents d'un risque dans la liste des risques
 
 # Stats - Statistiques
 GreyRisk   = Risque faible
@@ -943,51 +969,53 @@ BlackRisk  = Risque inacceptable
 #
 
 # Data - Donnée
-RiskAssessment                          = Évaluation
-Riskassessment                          = Évaluation
-RiskAssessments                         = Évaluations
-RiskAssessmentCreated                   = Création d'une évaluation
-RiskAssessmentModified                  = Modification d'une évaluation
-RiskAssessmentDeleted                   = Suppression d'une évaluation
-RiskAssessmentConfig                    = Configuration des données des évaluations
-TheRiskAssessment                       = L'évaluation
-LastRiskAssessment                      = Dernière évaluation du risque
-RiskAssessmentWellCreated               = Évaluation créée
-RiskAssessmentNotCreated                = Erreur lors de la création de l'évaluation
-RiskAssessmentWellEdited                = Évaluation éditée
-RiskAssessmentNotEdited                 = Erreur lors de l'édition de l'évaluation
-RiskAssessmentWellDeleted               = Évaluation supprimée
-RiskAssessmentNotDeleted                = Erreur lors de la suppression de l'évaluation
-EvaluationCreate                        = Ajout de l'évaluation
-EvaluationEdit                          = Édition de l'évaluation
-EvaluationMethod                        = Méthode d'évaluation
-lastEvaluationOn                        = Dernière évaluation le
-DeleteEvaluation                        = Êtes-vous sûr(e) de vouloir supprimer l'évaluation
-DigiriskRiskAssessmentData              = Données configurables des évaluations
-MultipleRiskAssessmentMethodName        = Méthodes d'évaluations
-MultipleRiskAssessmentMethodDescription = Activer le changement de méthode d'évaluation
-AdvancedRiskAssessmentMethod            = Méthode d'évaluation avancée
-AdvancedRiskAssessmentMethodDescription = Activer la méthode d'évaluation avancée
-NoRiskAssessment                        = Pas d'évaluation assignée au risque
-RiskAssessmentList                      = Liste des évaluations du risque
-EditRiskAssessment                      = Editer l'évaluation
-ShowAllRiskAssessments                  = Voir toutes les évaluations
-ShowAllRiskAssessmentsDescription       = Afficher la liste complète des évaluations des risques dans la liste des risques
-ParentRisk                              = Risque parent
-RiskAssessmentDate                      = Date de l'évaluation
-SimpleEvaluation                        = Évaluation simple
-AdvancedEvaluation                      = Évaluation avancée
-CalculatedEvaluation                    = Évaluation calculée
-SelectEvaluation                        = Sélectionnez les cases pour calculer votre évaluation
-EvaluationList                          = Liste des évaluations du risque
-HowToSetMultipleRiskAssessmentMethod    = Pour configurer l'utilisation multiple des méthodes d'évaluation, aller dans Configuration du module - Analyse des risques - Évaluation
-NoFileLinked                            = Pas de photo liée
-AddRiskAssessment                       = Ajouter une évaluation du risque
-AddRiskAssessmentTask                   = Ajouter une tâche au risque
-ListRiskAssessmentTask                  = Liste des tâches du risque
-ShowRiskAssessmentDate                  = Date des évaluations
-ShowRiskAssessmentDateDescription       = Remplace la date de création par la date de début des évaluations dans la fiche et les documents
-RiskTaskComplete                        = Tâche %s complétée
+RiskAssessment                              = Évaluation
+Riskassessment                              = Évaluation
+RiskAssessments                             = Évaluations
+RiskAssessmentCreated                       = Création d'une évaluation
+RiskAssessmentModified                      = Modification d'une évaluation
+RiskAssessmentDeleted                       = Suppression d'une évaluation
+RiskAssessmentConfig                        = Configuration des données des évaluations
+TheRiskAssessment                           = L'évaluation
+LastRiskAssessment                          = Dernière évaluation du risque
+RiskAssessmentWellCreated                   = Évaluation créée
+RiskAssessmentNotCreated                    = Erreur lors de la création de l'évaluation
+RiskAssessmentWellEdited                    = Évaluation éditée
+RiskAssessmentNotEdited                     = Erreur lors de l'édition de l'évaluation
+RiskAssessmentWellDeleted                   = Évaluation supprimée
+RiskAssessmentNotDeleted                    = Erreur lors de la suppression de l'évaluation
+EvaluationCreate                            = Ajout de l'évaluation
+EvaluationEdit                              = Édition de l'évaluation
+EvaluationMethod                            = Méthode d'évaluation
+lastEvaluationOn                            = Dernière évaluation le
+DeleteEvaluation                            = Êtes-vous sûr(e) de vouloir supprimer l'évaluation
+DigiriskRiskAssessmentData                  = Données configurables des évaluations
+MultipleRiskAssessmentMethodName            = Méthodes d'évaluations
+MultipleRiskAssessmentMethodDescription     = Activer le changement de méthode d'évaluation
+AdvancedRiskAssessmentMethod                = Méthode d'évaluation avancée
+AdvancedRiskAssessmentMethodDescription     = Activer la méthode d'évaluation avancée
+NoRiskAssessment                            = Pas d'évaluation assignée au risque
+RiskAssessmentList                          = Liste des évaluations du risque
+EditRiskAssessment                          = Editer l'évaluation
+ShowAllRiskAssessments                      = Voir toutes les évaluations
+ShowAllRiskAssessmentsDescription           = Afficher la liste complète des évaluations des risques dans la liste des risques
+ParentRisk                                  = Risque parent
+RiskAssessmentDate                          = Date de l'évaluation
+SimpleEvaluation                            = Évaluation simple
+AdvancedEvaluation                          = Évaluation avancée
+CalculatedEvaluation                        = Évaluation calculée
+SelectEvaluation                            = Sélectionnez les cases pour calculer votre évaluation
+EvaluationList                              = Liste des évaluations du risque
+HowToSetMultipleRiskAssessmentMethod        = Pour configurer l'utilisation multiple des méthodes d'évaluation, aller dans Configuration du module - Analyse des risques - Évaluation
+NoFileLinked                                = Pas de photo liée
+AddRiskAssessment                           = Ajouter une évaluation du risque
+AddRiskAssessmentTask                       = Ajouter une tâche au risque
+ListRiskAssessmentTask                      = Liste des tâches du risque
+ShowRiskAssessmentDate                      = Date des évaluations
+ShowRiskAssessmentDateDescription           = Remplace la date de création par la date de début des évaluations dans la fiche et les documents
+RiskAssessmentHideDateInDocument            = Masquer la date de l'évaluation dans les documents
+RiskAssessmentHideDateInDocumentDescription = Masquer la date de l'évaluation de la colonne "Informations sur l'évaluation" dans les documents
+RiskTaskComplete                            = Tâche %s complétée
 
 # Stats - Statistisques
 TasksRepartition = Répartition des tâches par avancement réel déclaré
@@ -1053,72 +1081,80 @@ RiskSignUnlinkedFromEntityRefLabel = Dissociation de la signalisation %s avec
 #
 
 # Data - Donnée
-ActionPlan                            = Plan d'action
-Task                                  = Tâche
-TaskCreatedEvent                      = Création d'une tâche
-TaskModifiedEvent                     = Modification d'une tâche
-TaskDeletedEvent                      = Suppression d'une tâche
-TheTask                               = La tâche
-TaskConfig                            = Configuration des données des tâches
-TaskWellCreated                       = Tâche créée
-TaskNotCreated                        = Erreur lors de la création de la tâche
-TaskWellEdited                        = Tâche éditée
-TaskNotEdited                         = Erreur lors de l'édition de la tâche
-TaskWellDeleted                       = Tâche supprimée
-TaskNotDeleted                        = Erreur lors de la suppression de la tâche
-TasksManagement                       = Gestion des tâches
-SelectProject                         = Choix du projet
-DUProject                             = Projet lié aux tâches des risques
-NoTaskLinked                          = Pas de tâche en cours
-TaskList                              = Liste des tâches du risque
-TaskCreate                            = Ajout de la tâche
-TaskEdit                              = Édition de la tâche
-HowToSetDUProject                     = Pour configurer le choix du projet, aller dans Configuration du module - Analyse des risques - Tâche
-DeleteTask                            = Êtes-vous sûr(e) de vouloir supprimer la tâche
-ListingHeaderTask                     = Liste des tâches
-ListingHeaderTaskTooltip              = Activer le partage des projets pour afficher les tâches
-TasksManagementDescription            = Activer la gestion des tâches
-TaskManagementNotActivated            = Veuillez activer la gestion des tâches dans Configuration du module / Analyse des risques / Tâche
-DigiriskProgress                      = Avancement
-ShowTaskStartDate                     = Date de début des tâches
-ShowTaskStartDateDescription          = Remplace la date de création par la date de début des tâches dans la fiche et les documents
-ShowTaskEndDate                       = Date de fin des tâches
-ShowTaskEndDateDescription            = Afficher la date de fin des tâches
-ShowTasksDone                         = Tâches complétées
-ShowTasksDoneDescription              = Afficher les tâches complétées à 100
-ShowTasksDoneDescriptionExtend        = sur les listes de risques
-ShowTaskCalculatedProgress            = Avancement de la tâche
-ShowTaskCalculatedProgressDescription = Afficher l'avancement calculé de la tâche au lieu de l'avancement déclaré
-ShowAllTasks                          = Toutes les tâches d'un risque dans les listings
-ShowAllTasksDescription               = Afficher toutes les tâches dans la liste des tâches d'un risque dans les listings
-NoTaskCompletedThere                  = Aucune tâche en cours
-NoTaskUnCompletedThere                = Aucune tâche terminée
-DeleteTaskTimeSpent                   = Êtes-vous sûr(e) de vouloir supprimer %s mins de temps consommé de la tâche
-TaskTimeSpentEdit                     = Édition du temps consommé de la tâche
-TheTaskTimeSpent                      = Le temps consommé
-TaskTimeSpentCreated                  = Création de temps consommé
-TaskTimeSpentModified                 = Modification de temps consommé
-TaskTimeSpentDeleted                  = Suppression de temps consommé
-TaskTimeSpentWellCreated              = Temps consommé créé
-TaskTimeSpentNotCreated               = Erreur lors de la création de temps consommé
-TaskTimeSpentWellEdited               = Temps consommé édité
-TaskTimeSpentNotEdited                = Erreur lors de l'édition de temps consommé
-TaskTimeSpentWellDeleted              = Temps consommé supprimé
-TaskTimeSpentNotDeleted               = Erreur lors de la suppression de temps consommé
-OnTheTask                             = sur la tâche
-TaskTimeSpentDuration                 = Durée du temps consommé
-TaskTimeSpentDurationDescription      = Le temps consommé ajouté par défaut à chaque tâche
-NoTaskShared                          = Pas de tâches partagées
-WarningTaskLabel                      = Attention vous avez dépassé le nombre de caractères maximum autorisé (255)
-ErrorRecordHasSubTasks                = La tâche a des enfants
-TotalConsumedTime                     = Total temps consommé sur le projet
-TotalConsumedTimeAmount               = Coût du temps consommé
-NbTasks                               = Nombre de tâches
-TotalProgress                         = Avancement réel global des tâches
-TotalBudget                           = Somme du budget des tâches
-TaskTimeSpentDate                     = Date du temps consommé
-StartDateCannotBeAfterEndDate         = La date de fin ne peut pas être antérieure à la date de début
-TasksFromProject                      = Les tâches affichées proviennent du projet défini comme "Projet Document Unique"
+ActionPlan                               = Plan d'action
+Task                                     = Tâche
+TaskCreatedEvent                         = Création d'une tâche
+TaskModifiedEvent                        = Modification d'une tâche
+TaskDeletedEvent                         = Suppression d'une tâche
+TheTask                                  = La tâche
+TaskConfig                               = Configuration des données des tâches
+TaskWellCreated                          = Tâche créée
+TaskNotCreated                           = Erreur lors de la création de la tâche
+TaskWellEdited                           = Tâche éditée
+TaskNotEdited                            = Erreur lors de l'édition de la tâche
+TaskWellDeleted                          = Tâche supprimée
+TaskNotDeleted                           = Erreur lors de la suppression de la tâche
+TasksManagement                          = Gestion des tâches
+SelectProject                            = Choix du projet
+DUProject                                = Projet lié aux tâches des risques
+NoTaskLinked                             = Pas de tâche en cours
+TaskList                                 = Liste des tâches du risque
+TaskCreate                               = Ajout de la tâche
+TaskEdit                                 = Édition de la tâche
+HowToSetDUProject                        = Pour configurer le choix du projet, aller dans Configuration du module - Analyse des risques - Tâche
+DeleteTask                               = Êtes-vous sûr(e) de vouloir supprimer la tâche
+ListingHeaderTask                        = Liste des tâches
+ListingHeaderTaskTooltip                 = Activer le partage des projets pour afficher les tâches
+TasksManagementDescription               = Activer la gestion des tâches
+TaskManagementNotActivated               = Veuillez activer la gestion des tâches dans Configuration du module / Analyse des risques / Tâche
+DigiriskProgress                         = Avancement
+ShowTaskStartDate                        = Date de début des tâches
+ShowTaskStartDateDescription             = Remplace la date de création par la date de début des tâches dans la fiche et les documents
+ShowTaskEndDate                          = Date de fin des tâches
+ShowTaskEndDateDescription               = Afficher la date de fin des tâches
+ShowTasksDone                            = Tâches complétées
+ShowTasksDoneDescription                 = Afficher les tâches complétées à 100
+ShowTasksDoneDescriptionExtend           = sur les listes de risques
+ShowTaskCalculatedProgress               = Avancement de la tâche
+ShowTaskCalculatedProgressDescription    = Afficher l'avancement calculé de la tâche au lieu de l'avancement déclaré
+ShowAllTasks                             = Toutes les tâches d'un risque dans les listings
+ShowAllTasksDescription                  = Afficher toutes les tâches dans la liste des tâches d'un risque dans les listings
+NoTaskCompletedThere                     = Aucune tâche en cours
+NoTaskUnCompletedThere                   = Aucune tâche terminée
+DeleteTaskTimeSpent                      = Êtes-vous sûr(e) de vouloir supprimer %s mins de temps consommé de la tâche
+TaskTimeSpentEdit                        = Édition du temps consommé de la tâche
+TheTaskTimeSpent                         = Le temps consommé
+TaskTimeSpentCreated                     = Création de temps consommé
+TaskTimeSpentModified                    = Modification de temps consommé
+TaskTimeSpentDeleted                     = Suppression de temps consommé
+TaskTimeSpentWellCreated                 = Temps consommé créé
+TaskTimeSpentNotCreated                  = Erreur lors de la création de temps consommé
+TaskTimeSpentWellEdited                  = Temps consommé édité
+TaskTimeSpentNotEdited                   = Erreur lors de l'édition de temps consommé
+TaskTimeSpentWellDeleted                 = Temps consommé supprimé
+TaskTimeSpentNotDeleted                  = Erreur lors de la suppression de temps consommé
+OnTheTask                                = sur la tâche
+TaskTimeSpentDuration                    = Durée du temps consommé
+TaskTimeSpentDurationDescription         = Le temps consommé ajouté par défaut à chaque tâche
+NoTaskShared                             = Pas de tâches partagées
+WarningTaskLabel                         = Attention vous avez dépassé le nombre de caractères maximum autorisé (255)
+ErrorRecordHasSubTasks                   = La tâche a des enfants
+TotalConsumedTime                        = Total temps consommé sur le projet
+TotalConsumedTimeAmount                  = Coût du temps consommé
+NbTasks                                  = Nombre de tâches
+TotalProgress                            = Avancement réel global des tâches
+TotalBudget                              = Somme du budget des tâches
+TaskTimeSpentDate                        = Date du temps consommé
+StartDateCannotBeAfterEndDate            = La date de fin ne peut pas être antérieure à la date de début
+TasksFromProject                         = Les tâches affichées proviennent du projet défini comme "Projet Document Unique"
+TaskHideRefInDocument                    = Masquer la référence
+TaskHideRefInDocumentDescription         = Masquer la référence de la tâche dans les documents
+TaskHideResponsibleInDocument            = Masquer le responsable
+TaskHideResponsibleInDocumentDescription = Masquer le responsable de la tâche dans les documents
+TaskHideDateInDocument                   = Masquer la date
+TaskHideDateInDocumentDescription        = Masquer la date de début et de fin de la tâche dans les documents
+TaskHideBudgetInDocument                 = Masquer le budget
+TaskHideBudgetInDocumentDescription      = Masquer le budget de la tâche dans les documents
 
 
 #

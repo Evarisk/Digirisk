@@ -28,23 +28,13 @@ require_once DOL_DOCUMENT_ROOT . '/core/lib/company.lib.php';
 
 // Load DigiriskDolibarr libraries
 require_once __DIR__ . '/../digiriskelementdocument/modules_digiriskelementdocument.php';
+require_once __DIR__ . '/../../../../../class/digiriskresources.class.php';
 
 /**
  *	Class to build documents using ODF templates generator
  */
 class doc_workunitdocument_odt extends ModeleODTDigiriskElementDocument
 {
-	/**
-	 * @var array Minimum version of PHP required by module.
-	 * e.g.: PHP ≥ 5.5 = array(5, 5)
-	 */
-	public $phpmin = [7, 4];
-
-	/**
-	 * @var string Dolibarr version of the loaded document.
-	 */
-	public string $version = 'dolibarr';
-
 	/**
 	 * @var string Module.
 	 */
@@ -75,4 +65,52 @@ class doc_workunitdocument_odt extends ModeleODTDigiriskElementDocument
 	{
 		return parent::info($langs);
 	}
+
+    /**
+     * Function to build a document on disk
+     *
+     * @param  SaturneDocuments $objectDocument  Object source to build document
+     * @param  Translate        $outputLangs     Lang object to use for output
+     * @param  string           $srcTemplatePath Full path of source filename for generator using a template file
+     * @param  int              $hideDetails     Do not show line details
+     * @param  int              $hideDesc        Do not show desc
+     * @param  int              $hideRef         Do not show ref
+     * @param  array            $moreParam       More param (Object/user/etc)
+     * @return int                               1 if OK, <=0 if KO
+     * @throws Exception
+     */
+    public function write_file(SaturneDocuments $objectDocument, Translate $outputLangs, string $srcTemplatePath, int $hideDetails = 0, int $hideDesc = 0, int $hideRef = 0, array $moreParam): int
+    {
+        global $conf;
+
+        $resources = new DigiriskResources($this->db);
+        $userTmp   = new User($this->db);
+
+        // Get QRCode to public interface
+        if (isModEnabled('multicompany')) {
+            $qrCodePath = DOL_DATA_ROOT . '/digiriskdolibarr/multicompany/ticketqrcode/';
+        } else {
+            $qrCodePath = $conf->digiriskdolibarr->multidir_output[$conf->entity ?: 1] . '/ticketqrcode/';
+        }
+        $QRCodeList = dol_dir_list($qrCodePath);
+        if (is_array($QRCodeList) && !empty($QRCodeList)) {
+            $QRCode          = array_shift($QRCodeList);
+            $QRCodeImagePath = $QRCode['fullname'];
+        } else {
+            $QRCodeImagePath = DOL_DOCUMENT_ROOT . '/public/theme/common/nophoto.png';
+        }
+
+        $allLinks             = $resources->fetchDigiriskResources();
+        $responsibleResources = $allLinks['Responsible'];
+        $userTmp->fetch($responsibleResources->id[0]);
+
+        // @todo The keyword "signature" is needed because we want the image to be cropped to fit in the table
+        $tmpArray['helpUrl']               = DOL_MAIN_URL_ROOT . '/custom/digiriskdolibarr/public/ticket/create_ticket.php';
+        $tmpArray['signatureQRCodeTicket'] = $QRCodeImagePath;
+        $tmpArray['securityResponsible']   = (!empty($userTmp) ? dol_strtoupper($userTmp->lastname) . ' ' . ucfirst($userTmp->firstname) : '');
+
+        $moreParam['tmparray'] = $tmpArray;
+
+        return parent::write_file($objectDocument, $outputLangs, $srcTemplatePath, $hideDetails, $hideDesc, $hideRef, $moreParam);
+    }
 }

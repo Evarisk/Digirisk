@@ -1,5 +1,5 @@
 <?php
-/* Copyright (C) 2021-2023 EVARISK <technique@evarisk.com>
+/* Copyright (C) 2021-2024 EVARISK <technique@evarisk.com>
  *
  * This program is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -41,217 +41,241 @@ require_once __DIR__ . '/../../../../../../saturne/core/modules/saturne/modules_
  */
 abstract class ModeleODTDigiriskElementDocument extends SaturneDocumentModel
 {
+    /**
+     * Fill all odt tags for segments lines
+     *
+     * @param  Odf       $odfHandler  Object builder odf library
+     * @param  Translate $outputLangs Lang object to use for output
+     * @param  array     $moreParam   More param (Object/user/etc)
+     *
+     * @return int                    1 if OK, <=0 if KO
+     * @throws Exception
+     */
+    public function fillTagsLines(Odf $odfHandler, Translate $outputLangs, array $moreParam): int
+    {
+        global $conf, $hookmanager;
 
-	/**
-	 * Fill all odt tags for segments lines.
-	 *
-	 * @param  Odf       $odfHandler  Object builder odf library.
-	 * @param  Translate $outputLangs Lang object to use for output.
-	 * @param  array     $moreParam   More param (Object/user/etc).
-	 *
-	 * @return int                    1 if OK, <=0 if KO.
-	 * @throws Exception
-	 */
-	public function fillTagsLines(Odf $odfHandler, Translate $outputLangs, array $moreParam): int
-	{
-		global $conf, $hookmanager;
+        $object = $moreParam['object'];
 
+        $objectDocument = $moreParam['objectDocument'];
 
-		$object = $moreParam['object'];
+        try {
+            $foundtagforlines = 1;
+            if ($foundtagforlines) {
+                $risk      = new Risk($this->db);
+                $evaluator = new Evaluator($this->db);
+                $usertmp   = new User($this->db);
+                $risksign  = new RiskSign($this->db);
+                $accident  = new Accident($this->db);
+                $ticket    = new Ticket($this->db);
+                $category  = new Categorie($this->db);
 
-		$objectDocument = $moreParam['objectDocument'];
+                if ( ! empty($object) ) {
+                    //Fill risks data
+                    $risks = $risk->fetchRisksOrderedByCotation($object->element != 'digiriskstandard' ? $object->id : 0, $object->element != 'digiriskstandard' ? false : true, $conf->global->DIGIRISKDOLIBARR_SHOW_INHERITED_RISKS_IN_DOCUMENTS, $conf->global->DIGIRISKDOLIBARR_SHOW_SHARED_RISKS, $moreParam);
 
-		try {
-			$foundtagforlines = 1;
-			if ($foundtagforlines) {
-				$risk      = new Risk($this->db);
-				$evaluator = new Evaluator($this->db);
-				$usertmp   = new User($this->db);
-				$risksign  = new RiskSign($this->db);
-				$accident  = new Accident($this->db);
-				$ticket    = new Ticket($this->db);
-				$category  = new Categorie($this->db);
+                    $objectDocument->fillRiskData($odfHandler, $objectDocument, $outputLangs, [], '', $risks, $conf->global->DIGIRISKDOLIBARR_SHOW_SHARED_RISKS);
 
-				if ( ! empty($object) ) {
-					//Fill risks data
-					$risks = $risk->fetchRisksOrderedByCotation($object->id, false, $conf->global->DIGIRISKDOLIBARR_SHOW_INHERITED_RISKS_IN_DOCUMENTS, $conf->global->DIGIRISKDOLIBARR_SHOW_SHARED_RISKS);
+                    //Fill evaluators data
+                    $foundTagForLines = 1;
+                    try {
+                        $listLines = $odfHandler->setSegment('utilisateursPresents');
+                    } catch (OdfException|OdfExceptionSegmentNotFound $e) {
+                        // We may arrive here if tags for lines not present into template
+                        $foundTagForLines = 0;
+                        $listLines        = '';
+                        dol_syslog($e->getMessage());
+                    }
 
-					$objectDocument->fillRiskData($odfHandler, $objectDocument, $outputLangs, [], '', $risks, $conf->global->DIGIRISKDOLIBARR_SHOW_SHARED_RISKS);
+                    if ($foundTagForLines) {
+                        $evaluators = $evaluator->fetchAll('', '', 0, 0, ['customsql' => ($object->element != 'digiriskstandard' ? 'fk_parent = ' . $object->id . ' AND ' : '') . 'status = ' . Evaluator::STATUS_VALIDATED . $moreParam['filter']]);
+                        if (is_array($evaluators) && !empty($evaluators)) {
+                            foreach ($evaluators as $line) {
+                                $element = new DigiriskElement($this->db);
+                                $element->fetch($line->fk_parent);
+                                $usertmp->fetch($line->fk_user);
 
-					//Fill evaluators data
-					$evaluators = $evaluator->fetchFromParent($object->id);
-					$listLines = $odfHandler->setSegment('utilisateursPresents');
-					if (is_array($evaluators) && !empty($evaluators)) {
-						foreach ($evaluators as $line) {
-							$element = new DigiriskElement($this->db);
-							$element->fetch($line->fk_parent);
-							$usertmp->fetch($line->fk_user);
+                                $tmpArray['nomElement']                 = (!empty($conf->global->DIGIRISKDOLIBARR_SHOW_SHARED_EVALUATORS) ? 'S' . $element->entity . ' - ' : '') . $element->ref . ' - ' . $element->label;
+                                $tmpArray['idUtilisateur']              = $line->ref;
+                                $tmpArray['dateAffectationUtilisateur'] = dol_print_date($line->assignment_date, '%d/%m/%Y');
+                                $tmpArray['dureeEntretien']             = $line->duration . ' min';
+                                $tmpArray['nomUtilisateur']             = $usertmp->lastname;
+                                $tmpArray['prenomUtilisateur']          = $usertmp->firstname;
+                                $tmpArray['travailUtilisateur']         = $line->job;
 
-							$tmpArray['nomElement']                 = (!empty($conf->global->DIGIRISKDOLIBARR_SHOW_SHARED_EVALUATORS) ? 'S' . $element->entity . ' - ' : '') . $element->ref . ' - ' . $element->label;
-							$tmpArray['idUtilisateur']              = $line->ref;
-							$tmpArray['dateAffectationUtilisateur'] = dol_print_date($line->assignment_date, '%d/%m/%Y');
-							$tmpArray['dureeEntretien']             = $line->duration . ' min';
-							$tmpArray['nomUtilisateur']             = $usertmp->lastname;
-							$tmpArray['prenomUtilisateur']          = $usertmp->firstname;
-							$tmpArray['travailUtilisateur']         = $line->job;
+                                complete_substitutions_array($tmpArray, $outputLangs, $objectDocument, $line, "completesubstitutionarray_lines");
+                                // Call the ODTSubstitutionLine hook
+                                $parameters = array('odfHandler' => &$odfHandler, 'file' => $file, 'object' => $objectDocument, 'outputlangs' => $outputLangs, 'substitutionarray' => &$tmpArray, 'line' => $line);
+                                $hookmanager->executeHooks('ODTSubstitutionLine', $parameters, $this, $action); // Note that $action and $objectDocument may have been modified by some hooks
+                                $this->setTmpArrayVars($tmpArray, $listLines, $outputLangs);
+                            }
+                        } else {
+                            $tmpArray['nomElement']                 = '';
+                            $tmpArray['idUtilisateur']              = '';
+                            $tmpArray['dateAffectationUtilisateur'] = '';
+                            $tmpArray['dureeEntretien']             = '';
+                            $tmpArray['nomUtilisateur']             = '';
+                            $tmpArray['prenomUtilisateur']          = '';
+                            $tmpArray['travailUtilisateur']         = '';
+                            $this->setTmpArrayVars($tmpArray, $listLines, $outputLangs);
+                        }
+                        $odfHandler->mergeSegment($listLines);
+                    }
 
-							unset($tmpArray['object_fields']);
+                    //Fill risk signs data
+                    $foundTagForLines = 1;
+                    try {
+                        $listLines = $odfHandler->setSegment('affectedRecommandation');
+                    } catch (OdfException|OdfExceptionSegmentNotFound $e) {
+                        // We may arrive here if tags for lines not present into template
+                        $foundTagForLines = 0;
+                        $listLines        = '';
+                        dol_syslog($e->getMessage());
+                    }
 
-							complete_substitutions_array($tmpArray, $outputLangs, $objectDocument, $line, "completesubstitutionarray_lines");
-							// Call the ODTSubstitutionLine hook
-							$parameters = array('odfHandler' => &$odfHandler, 'file' => $file, 'object' => $objectDocument, 'outputlangs' => $outputLangs, 'substitutionarray' => &$tmpArray, 'line' => $line);
-							$hookmanager->executeHooks('ODTSubstitutionLine', $parameters, $this, $action); // Note that $action and $objectDocument may have been modified by some hooks
-							$this->setTmpArrayVars($tmpArray, $listLines, $outputLangs);
-						}
-					} else {
-						$tmpArray['nomElement']                 = '';
-						$tmpArray['idUtilisateur']              = '';
-						$tmpArray['dateAffectationUtilisateur'] = '';
-						$tmpArray['dureeEntretien']             = '';
-						$tmpArray['nomUtilisateur']             = '';
-						$tmpArray['prenomUtilisateur']          = '';
-						$tmpArray['travailUtilisateur']         = '';
-						$this->setTmpArrayVars($tmpArray, $listLines, $outputLangs);
-					}
-					$odfHandler->mergeSegment($listLines);
+                    if ($foundTagForLines) {
+                        $risksigns = $risksign->fetchRiskSign($object->element != 'digiriskstandard' ? $object->id : 0, $conf->global->DIGIRISKDOLIBARR_SHOW_INHERITED_RISKSIGNS, $conf->global->DIGIRISKDOLIBARR_SHOW_SHARED_RISKSIGNS, $moreParam);
+                        if (is_array($risksigns) && !empty($risksigns)) {
+                            foreach ($risksigns as $line) {
+                                if ($line->id > 0) {
+                                    $element = new DigiriskElement($this->db);
+                                    $element->fetch($line->fk_element);
+                                    $path = DOL_DOCUMENT_ROOT . '/custom/digiriskdolibarr/img/';
 
-					//Fill risk signs data
-					$risksigns = $risksign->fetchRiskSign($object->id, $conf->global->DIGIRISKDOLIBARR_SHOW_INHERITED_RISKSIGNS, $conf->global->DIGIRISKDOLIBARR_SHOW_SHARED_RISKSIGNS);
-					$listLines = $odfHandler->setSegment('affectedRecommandation');
-					if (is_array($risksigns) && !empty($risksigns)) {
-						foreach ($risksigns as $line) {
-							if ($line->id > 0) {
-								$element = new DigiriskElement($this->db);
-								$element->fetch($line->fk_element);
-								$path = DOL_DOCUMENT_ROOT . '/custom/digiriskdolibarr/img/';
+                                    $tmpArray['nomElement']                = (!empty($conf->global->DIGIRISKDOLIBARR_SHOW_SHARED_RISKSIGNS) ? 'S' . $element->entity . ' - ' : '') . $element->ref . ' - ' . $element->label;
+                                    $tmpArray['recommandation_photo']        = $path . $risksign->getRiskSignCategory($line);
+                                    $tmpArray['identifiantRecommandation'] = $line->ref;
+                                    $tmpArray['recommandationName']        = (!empty($conf->global->DIGIRISKDOLIBARR_DOCUMENT_SHOW_PICTO_NAME) ? $line->getRiskSignCategory($line, 'name') : ' ');
+                                    $tmpArray['recommandationComment']     = $line->description;
 
-								$tmpArray['nomElement']                = (!empty($conf->global->DIGIRISKDOLIBARR_SHOW_SHARED_RISKSIGNS) ? 'S' . $element->entity . ' - ' : '') . $element->ref . ' - ' . $element->label;
-								$tmpArray['recommandation_photo']        = $path . $risksign->getRiskSignCategory($line);
-								$tmpArray['identifiantRecommandation'] = $line->ref;
-								$tmpArray['recommandationName']        = (!empty($conf->global->DIGIRISKDOLIBARR_DOCUMENT_SHOW_PICTO_NAME) ? $line->getRiskSignCategory($line, 'name') : ' ');
-								$tmpArray['recommandationComment']     = $line->description;
+                                    complete_substitutions_array($tmpArray, $outputLangs, $objectDocument, $line, "completesubstitutionarray_lines");
+                                    // Call the ODTSubstitutionLine hook
+                                    $parameters = array('odfHandler' => &$odfHandler, 'file' => $file, 'object' => $objectDocument, 'outputlangs' => $outputLangs, 'substitutionarray' => &$tmpArray, 'line' => $line);
+                                    $hookmanager->executeHooks('ODTSubstitutionLine', $parameters, $this, $action); // Note that $action and $objectDocument may have been modified by some hooks
+                                    $this->setTmpArrayVars($tmpArray, $listLines, $outputLangs);
+                                }
+                            }
+                        } else {
+                            $tmpArray['nomElement']                = '';
+                            $tmpArray['recommandation_photo']      = '';
+                            $tmpArray['identifiantRecommandation'] = '';
+                            $tmpArray['recommandationName']        = '';
+                            $tmpArray['recommandationComment']     = '';
+                            $this->setTmpArrayVars($tmpArray, $listLines, $outputLangs);
+                        }
+                        $odfHandler->mergeSegment($listLines);
+                    }
 
-								unset($tmpArray['object_fields']);
+                    //Fill accidents data
+                    $foundTagForLines = 1;
+                    try {
+                        $listLines = $odfHandler->setSegment('affectedAccident');
+                    } catch (OdfException|OdfExceptionSegmentNotFound $e) {
+                        // We may arrive here if tags for lines not present into template
+                        $foundTagForLines = 0;
+                        $listLines        = '';
+                        dol_syslog($e->getMessage());
+                    }
 
-								complete_substitutions_array($tmpArray, $outputLangs, $objectDocument, $line, "completesubstitutionarray_lines");
-								// Call the ODTSubstitutionLine hook
-								$parameters = array('odfHandler' => &$odfHandler, 'file' => $file, 'object' => $objectDocument, 'outputlangs' => $outputLangs, 'substitutionarray' => &$tmpArray, 'line' => $line);
-								$hookmanager->executeHooks('ODTSubstitutionLine', $parameters, $this, $action); // Note that $action and $objectDocument may have been modified by some hooks
-								$this->setTmpArrayVars($tmpArray, $listLines, $outputLangs);
-							}
-						}
-					} else {
-						$tmpArray['nomElement']                = '';
-						$tmpArray['recommandation_photo']      = '';
-						$tmpArray['identifiantRecommandation'] = '';
-						$tmpArray['recommandationName']        = '';
-						$tmpArray['recommandationComment']     = '';
-						$this->setTmpArrayVars($tmpArray, $listLines, $outputLangs);
-					}
-					$odfHandler->mergeSegment($listLines);
+                    if ($foundTagForLines) {
+                        $accidents = $accident->fetchAll('', '', 0, 0, ['customsql' => ($object->element != 'digiriskstandard' ? 'fk_element = ' . $object->id . ' AND ' : '') . 'status >= ' . Accident::STATUS_VALIDATED . $moreParam['filter']]);
+                        if (is_array($accidents) && !empty($accidents)) {
+                            foreach ($accidents as $line) {
+                                $tmpArray['identifiantAccident'] = $line->ref;
+                                $tmpArray['AccidentName']        = $line->label;
 
-					//Fill accidents data
-					$accidents = $accident->fetchFromParent($object->id);
-					$listLines = $odfHandler->setSegment('affectedAccident');
-					if (is_array($accidents) && !empty($accidents)) {
-						foreach ($accidents as $line) {
-							$tmpArray['identifiantAccident'] = $line->ref;
-							$tmpArray['AccidentName']        = $line->label;
+                                $accidentWorkStop    = new AccidentWorkStop($this->db);
+                                $allaccidentworkstop = $accidentWorkStop->fetchFromParent($line->id);
+                                if (!empty($allAccidentWorkStop) && is_array($allAccidentWorkStop)) {
+                                    foreach ($allAccidentWorkStop as $accidentWorkStopsingle) {
+                                        $nbAccidentWorkStop += $accidentWorkStopsingle->workstop_days;
+                                    }
+                                }
 
-							$accidentWorkStop    = new AccidentWorkStop($this->db);
-                            $allaccidentworkstop = $accidentWorkStop->fetchFromParent($line->id);
-							if (!empty($allAccidentWorkStop) && is_array($allAccidentWorkStop)) {
-								foreach ($allAccidentWorkStop as $accidentWorkStopsingle) {
-									$nbAccidentWorkStop += $accidentWorkStopsingle->workstop_days;
-								}
-							}
+                                $tmpArray['AccidentWorkStopDays'] = $nbAccidentWorkStop;
+                                $tmpArray['AccidentComment']     = $line->description;
 
-							$tmpArray['AccidentWorkStopDays'] = $nbAccidentWorkStop;
-							$tmpArray['AccidentComment']     = $line->description;
+                                $parameters = array('odfHandler' => &$odfHandler, 'file' => $file, 'object' => $objectDocument, 'outputlangs' => $outputLangs, 'substitutionarray' => &$tmpArray, 'line' => $line);
+                                $hookmanager->executeHooks('ODTSubstitutionLine', $parameters, $this, $action); // Note that $action and $objectDocument may have been modified by some hooks
+                                $this->setTmpArrayVars($tmpArray, $listLines, $outputLangs);
 
-							$parameters = array('odfHandler' => &$odfHandler, 'file' => $file, 'object' => $objectDocument, 'outputlangs' => $outputLangs, 'substitutionarray' => &$tmpArray, 'line' => $line);
-							$hookmanager->executeHooks('ODTSubstitutionLine', $parameters, $this, $action); // Note that $action and $objectDocument may have been modified by some hooks
-							$this->setTmpArrayVars($tmpArray, $listLines, $outputLangs);
+                            }
+                        } else {
+                            $tmpArray['identifiantAccident']  = '';
+                            $tmpArray['AccidentName']         = '';
+                            $tmpArray['AccidentWorkStopDays'] = '';
+                            $tmpArray['AccidentComment']      = '';
+                            $this->setTmpArrayVars($tmpArray, $listLines, $outputLangs);
+                        }
+                        $odfHandler->mergeSegment($listLines);
+                    }
 
-						}
-					} else {
-						$tmpArray['identifiantAccident']  = '';
-						$tmpArray['AccidentName']         = '';
-						$tmpArray['AccidentWorkStopDays'] = '';
-						$tmpArray['AccidentComment']      = '';
-						$this->setTmpArrayVars($tmpArray, $listLines, $outputLangs);
-					}
-					$odfHandler->mergeSegment($listLines);
+                    //Fill tickets data
+                    $foundTagForLines = 1;
+                    try {
+                        $listLines = $odfHandler->setSegment('tickets');
+                    } catch (OdfException|OdfExceptionSegmentNotFound $e) {
+                        // We may arrive here if tags for lines not present into template
+                        $foundTagForLines = 0;
+                        $listLines        = '';
+                        dol_syslog($e->getMessage());
+                    }
 
-					//Fill tickets data
-					if (dolibarr_get_const($this->db, 'DIGIRISKDOLIBARR_TICKET_EXTRAFIELDS', 0)) {
-						$filter = array('ef.digiriskdolibarr_ticket_service' => $object->id);
-						$ticket->fetchAll($user, '', '', '', 0, '', $filter);
-					}
-					$listLines = $odfHandler->setSegment('tickets');
-					if (is_array($ticket->lines) && !empty($ticket->lines)) {
-						foreach ($ticket->lines as $line) {
-							$tmpArray['refticket'] = $line->ref;
+                    if ($foundTagForLines) {
+                        if (dolibarr_get_const($this->db, 'DIGIRISKDOLIBARR_TICKET_EXTRAFIELDS', 0)) {
+                            $tickets = saturne_fetch_all_object_type('Ticket', '', '', 0, 0,  ['customsql' => 'eft.digiriskdolibarr_ticket_service > ' . ($object->element != 'digiriskstandard' ? $object->id : 0) . $moreParam['specificFilter']], 'AND', true);
+                        }
+                        if (is_array($tickets) && !empty($tickets)) {
+                            foreach ($tickets as $line) {
+                                $tmpArray['refticket'] = $line->ref;
 
-							$categories = $category->containing($line->id, Categorie::TYPE_TICKET);
-							if (!empty($categories)) {
-								$allcategories = [];
-								foreach ($categories as $cat) {
-									$allcategories[] = $cat->label;
-								}
-								$tmpArray['categories'] = implode(', ', $allcategories);
-							} else {
-								$tmpArray['categories'] = '';
-							}
+                                $categories = $category->containing($line->id, Categorie::TYPE_TICKET);
+                                if (!empty($categories)) {
+                                    $allcategories = [];
+                                    foreach ($categories as $cat) {
+                                        $allcategories[] = $cat->label;
+                                    }
+                                    $tmpArray['categories'] = implode(', ', $allcategories);
+                                } else {
+                                    $tmpArray['categories'] = '';
+                                }
 
-							$tmpArray['creation_date'] = dol_print_date($line->datec, 'dayhoursec', 'tzuser');
-							$tmpArray['subject']       = $line->subject;
-							$tmpArray['message']       = $line->message;
-							$tmpArray['progress']      = (($line->progress) ?: 0) . ' %';
+                                $tmpArray['creation_date'] = dol_print_date($line->datec, 'dayhoursec', 'tzuser');
+                                $tmpArray['subject']       = $line->subject;
+                                $tmpArray['message']       = $line->message;
+                                $tmpArray['progress']      = (($line->progress) ?: 0) . ' %';
 
-							$ticketmp = new Ticket($this->db);
-							$ticketmp->fetch($line->id);
-							$tmpArray['status'] = $ticketmp->getLibStatut();
+                                $ticketmp = new Ticket($this->db);
+                                $ticketmp->fetch($line->id);
+                                $tmpArray['status'] = $ticketmp->getLibStatut();
 
-							unset($tmpArray['object_fields']);
-
-							complete_substitutions_array($tmpArray, $outputLangs, $objectDocument, $line, "completesubstitutionarray_lines");
-							// Call the ODTSubstitutionLine hook
-							$parameters = array('odfHandler' => &$odfHandler, 'file' => $file, 'object' => $objectDocument, 'outputlangs' => $outputLangs, 'substitutionarray' => &$tmpArray, 'line' => $line);
-							$hookmanager->executeHooks('ODTSubstitutionLine', $parameters, $this, $action); // Note that $action and $objectDocument may have been modified by some hooks
-							$this->setTmpArrayVars($tmpArray, $listLines, $outputLangs);
-						}
-					} else {
-						$tmpArray['refticket']     = '';
-						$tmpArray['categories']    = '';
-						$tmpArray['creation_date'] = '';
-						$tmpArray['subject']       = '';
-						$tmpArray['message']       = '';
-						$tmpArray['progress']      = '';
-						$tmpArray['status']        = '';
-						foreach ($tmpArray as $key => $val) {
-							try {
-								if (empty($val)) {
-									$listLines->setVars($key, $outputLangs->trans('NoData'), true, 'UTF-8');
-								} else {
-									$listLines->setVars($key, html_entity_decode($val, ENT_QUOTES | ENT_HTML5), true, 'UTF-8');
-								}
-							} catch (SegmentException $e) {
-								dol_syslog($e->getMessage());
-							}
-						}
-						$listLines->merge();
-					}
-					$odfHandler->mergeSegment($listLines);
-				}
-			}
-		} catch (OdfException $e) {
-			$this->error = $e->getMessage();
-			dol_syslog($this->error, LOG_WARNING);
-			return -1;
-		}
-		return 0;
-	}
+                                complete_substitutions_array($tmpArray, $outputLangs, $objectDocument, $line, "completesubstitutionarray_lines");
+                                // Call the ODTSubstitutionLine hook
+                                $parameters = array('odfHandler' => &$odfHandler, 'file' => $file, 'object' => $objectDocument, 'outputlangs' => $outputLangs, 'substitutionarray' => &$tmpArray, 'line' => $line);
+                                $hookmanager->executeHooks('ODTSubstitutionLine', $parameters, $this, $action); // Note that $action and $objectDocument may have been modified by some hooks
+                                $this->setTmpArrayVars($tmpArray, $listLines, $outputLangs);
+                            }
+                        } else {
+                            $tmpArray['refticket']     = '';
+                            $tmpArray['categories']    = '';
+                            $tmpArray['creation_date'] = '';
+                            $tmpArray['subject']       = '';
+                            $tmpArray['message']       = '';
+                            $tmpArray['progress']      = '';
+                            $tmpArray['status']        = '';
+                            $this->setTmpArrayVars($tmpArray, $listLines, $outputLangs);
+                        }
+                        $odfHandler->mergeSegment($listLines);
+                    }
+                }
+            }
+        } catch (OdfException $e) {
+            $this->error = $e->getMessage();
+            dol_syslog($this->error, LOG_WARNING);
+            return -1;
+        }
+        return 0;
+    }
 
     /**
      * Function to build a document on disk
@@ -282,7 +306,11 @@ abstract class ModeleODTDigiriskElementDocument extends SaturneDocumentModel
             $tmpArray['photo'] = DOL_DOCUMENT_ROOT . $noPhoto;
         }
 
-        $moreParam['tmparray']         = $tmpArray;
+        if (isset($moreParam['tmparray']) && is_array($moreParam['tmparray'])) {
+            $moreParam['tmparray'] = array_merge($moreParam['tmparray'], $tmpArray);
+        } else {
+            $moreParam['tmparray'] = $tmpArray;
+        }
         $moreParam['objectDocument']   = $objectDocument;
         $moreParam['hideTemplateName'] = 1;
 

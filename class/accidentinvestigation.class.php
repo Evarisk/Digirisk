@@ -136,119 +136,119 @@ class AccidentInvestigation extends SaturneObject
 	];
 
 	/**
-	 * @var int ID.
+	 * @var int ID
 	 */
 	public int $rowid;
 
 	/**
-	 * @var string Ref.
+	 * @var string Ref
 	 */
 	public $ref;
 
 	/**
-	 * @var string Ref ext.
+	 * @var string Ref ext
 	 */
 	public $ref_ext;
 
 	/**
-	 * @var int Entity.
+	 * @var int Entity
 	 */
 	public $entity;
 
 	/**
-	 * @var int|string Creation date.
+	 * @var int|string Creation date
 	 */
 	public $date_creation;
 
 	/**
-	 * @var int|string Timestamp.
+	 * @var int|string Timestamp
 	 */
 	public $tms;
 
 	/**
-	 * @var string Import key.
+	 * @var string Import key
 	 */
 	public $import_key;
 
 	/**
-	 * @var int Status.
+	 * @var int Status
 	 */
 	public $status;
 
 	/**
-	 * @var string Public note.
+	 * @var string Public note
 	 */
 	public $note_public;
 
 	/**
-	 * @var string Private note.
+	 * @var string Private note
 	 */
 	public $note_private;
 
 	/**
-	 * @var int|string Seniority at post.
+	 * @var int|string Seniority at post
 	 */
 	public $seniority_in_position;
 
 	/**
-	 * @var int|string Date investigation start.
+	 * @var int|string Date investigation start
 	 */
 	public $date_start;
 
 	/**
-	 * @var int|string Date investigation end.
+	 * @var int|string Date investigation end
 	 */
 	public $date_end;
 
 	/**
-	 * @var string|null Victim skills.
+	 * @var string|null Victim skills
 	 */
 	public ?string $victim_skills = '';
 
 	/**
-	 * @var string|null Collective Equipment.
+	 * @var string|null Collective Equipment
 	 */
 	public ?string $collective_equipment = '';
 
 	/**
-	 * @var string|null Individual Equipment.
+	 * @var string|null Individual Equipment
 	 */
 	public ?string $individual_equipment = '';
 
 	/**
-	 * @var string|null Circumstances.
+	 * @var string|null Circumstances
 	 */
 	public ?string $circumstances = '';
 
 	/**
-	 * @var string|null Causality tree.
+	 * @var string|null Causality tree
 	 */
 	public ?string $causality_tree = '';
 
 	/**
-	 * @var int Task ID.
+	 * @var int|null Task ID
 	 */
-	public int $fk_task = 0;
+	public ?int $fk_task = 0;
 
     /**
-     * @var int Project ID.
+     * @var int Project ID
      */
     public $fk_project;
 
 	/**
-	 * @var int|string Accident ID.
+	 * @var int|string Accident ID
 	 */
 	public $fk_accident;
 
 	/**
-	 * @var int User ID.
+	 * @var int User ID
 	 */
-	public int $fk_user_creat;
+	public $fk_user_creat;
 
 	/**
-	 * @var int|null User ID.
+	 * @var int|null User ID
 	 */
-	public ?int $fk_user_modif;
+	public $fk_user_modif;
 
 	/**
 	* Constructor

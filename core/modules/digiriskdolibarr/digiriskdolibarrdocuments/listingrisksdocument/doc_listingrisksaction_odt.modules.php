@@ -17,7 +17,7 @@
  */
 
 /**
- *	\file       core/modules/digiriskdolibarr/digiriskdocuments/listingrisksphoto/doc_listingrisksphoto_odt.modules.php
+ *	\file       core/modules/digiriskdolibarr/digiriskdolibarrdocuments/listingrisksdocument/doc_listingrisksaction_odt.modules.php
  *	\ingroup    digiriskdolibarr
  *	\brief      File of class to build ODT documents for digiriskdolibarr
  */
@@ -35,33 +35,22 @@ require_once __DIR__ . '/../../../../../../saturne/core/modules/saturne/modules_
 /**
  *	Class to build documents using ODF templates generator
  */
-class doc_listingrisksphoto_odt extends SaturneDocumentModel
+class doc_listingrisksaction_odt extends SaturneDocumentModel
 {
 	/**
-	 * @var array Minimum version of PHP required by module.
-	 * e.g.: PHP ≥ 5.5 = array(5, 5)
-	 */
-	public $phpmin = [7, 4];
-
-	/**
-	 * @var string Dolibarr version of the loaded document.
-	 */
-	public string $version = 'dolibarr';
-
-	/**
-	 * @var string Module.
+	 * @var string Module
 	 */
 	public string $module = 'digiriskdolibarr';
 
 	/**
-	 * @var string Document type.
+	 * @var string Document type
 	 */
-	public string $document_type = 'listingrisksphoto';
+	public string $document_type = 'listingrisksaction';
 
 	/**
-	 * Constructor.
+	 * Constructor
 	 *
-	 * @param DoliDB $db Database handler.
+	 * @param DoliDB $db Database handler
 	 */
 	public function __construct(DoliDB $db)
 	{
@@ -69,10 +58,10 @@ class doc_listingrisksphoto_odt extends SaturneDocumentModel
 	}
 
 	/**
-	 * Return description of a module.
+	 * Return description of a module
 	 *
-	 * @param  Translate $langs Lang object to use for output.
-	 * @return string           Description.
+	 * @param  Translate $langs Lang object to use for output
+	 * @return string           Description
 	 */
 	public function info(Translate $langs): string
 	{
@@ -80,18 +69,18 @@ class doc_listingrisksphoto_odt extends SaturneDocumentModel
 	}
 
 	/**
-	 * Fill all odt tags for segments lines.
+	 * Fill all odt tags for segments lines
 	 *
-	 * @param  Odf       $odfHandler  Object builder odf library.
-	 * @param  Translate $outputLangs Lang object to use for output.
-	 * @param  array     $moreParam   More param (Object/user/etc).
+	 * @param  Odf       $odfHandler  Object builder odf library
+	 * @param  Translate $outputLangs Lang object to use for output
+	 * @param  array     $moreParam   More param (Object/user/etc)
 	 *
-	 * @return int                    1 if OK, <=0 if KO.
+	 * @return int                    1 if OK, <=0 if KO
 	 * @throws Exception
 	 */
 	public function fillTagsLines(Odf $odfHandler, Translate $outputLangs, array $moreParam): int
 	{
-		global $conf, $moduleNameLowerCase, $langs;
+		global $conf;
 
 		if (get_class($moreParam['object']) == 'DigiriskElement') {
 			$digiriskelement = $moreParam['object'];
