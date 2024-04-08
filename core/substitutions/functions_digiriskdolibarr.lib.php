@@ -166,6 +166,7 @@ function digiriskdolibarr_completesubstitutionarray(&$substitutionarray, $langs,
 
 			break;
 
+        case 'auditreportdocument@digiriskdolibarr':
 		case 'riskassessmentdocument@digiriskdolibarr':
 
 			$riskassessmentdocument = json_decode($object->json, false, 512, JSON_UNESCAPED_UNICODE)->RiskAssessmentDocument;

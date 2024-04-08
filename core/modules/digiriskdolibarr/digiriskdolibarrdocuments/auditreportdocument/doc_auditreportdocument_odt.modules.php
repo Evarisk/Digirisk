@@ -115,7 +115,7 @@ class doc_auditreportdocument_odt extends ModeleODTDigiriskElementDocument
         $objectDocument->DigiriskFillJSON();
 
         $previousObjectDocumentElement = $objectDocument->element;
-        $objectDocument->element       = 'riskassessmentdocument@digiriskdolibarr';
+        $objectDocument->element       = $objectDocument->element . '@digiriskdolibarr';
         complete_substitutions_array($tmpArray, $outputLangs, $objectDocument);
         $objectDocument->element = $previousObjectDocumentElement;
 
