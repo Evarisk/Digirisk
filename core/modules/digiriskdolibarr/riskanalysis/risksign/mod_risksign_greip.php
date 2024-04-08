@@ -37,6 +37,6 @@ class mod_risksign_greip extends CustomModeleNumRefSaturne
 
     public function __construct()
     {
-        self::setCustomValue('digiriskdolibarr', 'riskassessment');
+        self::setCustomValue('digiriskdolibarr', 'risksign');
     }
 }
