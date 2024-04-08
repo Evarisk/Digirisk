@@ -475,7 +475,7 @@ class modDigiriskdolibarr extends DolibarrModules
 		// Dependencies
 
 		$this->hidden                  = false;
-		$this->depends                 = ['modSaturne', 'modECM', 'modProjet', 'modSociete', 'modTicket', 'modCategorie', 'modFckeditor', 'modApi','modExport'];
+		$this->depends                 = ['modSaturne', 'modECM', 'modProjet', 'modSociete', 'modTicket', 'modCategorie', 'modFckeditor', 'modApi', 'modExport', 'modImport'];
 		$this->requiredby              = [];
 		$this->conflictwith            = [];
 		$this->langfiles               = ["digiriskdolibarr@digiriskdolibarr"];
@@ -1687,6 +1687,43 @@ class modDigiriskdolibarr extends DolibarrModules
 		$this->export_sql_end[$r] .= ' LEFT JOIN '.MAIN_DB_PREFIX.'societe as s ON s.rowid = t.fk_soc';
 		$this->export_sql_end[$r] .= ' WHERE cat.entity IN ('.getEntity('category').')';
 		$this->export_sql_end[$r] .= ' AND cat.type = 12';
+
+        $objectMetaDatas = [
+            'digiriskelement'       => ['langs' => 'DigiriskElement',       'picto' => 'fontawesome_fa-network-wired_fas_#d35968'],
+            'risk'                  => ['langs' => 'Risk',                  'picto' => 'fontawesome_fa-exclamation-triangle_fas_#d35968', 'classPath' => 'riskanalysis'],
+            'riskassessment'        => ['langs' => 'RiskAssessment',        'picto' => 'fontawesome_fa-chart-line_fas_#d35968',           'classPath' => 'riskanalysis'],
+            'evaluator'             => ['langs' => 'Evaluator',             'picto' => 'fontawesome_fa-user-check_fas_#d35968'],
+            'risksign'              => ['langs' => 'RiskSign',              'picto' => 'fontawesome_fa-map-signs_fas_#d35968',            'classPath' => 'riskanalysis'],
+            'preventionplan'        => ['langs' => 'PreventionPlan',        'picto' => 'fontawesome_fa-info_fas_#d35968'],
+            'firepermit'            => ['langs' => 'FirePermit',            'picto' => 'fontawesome_fa-fire-alt_fas_#d35968'],
+            'accident'              => ['langs' => 'Accident',              'picto' => 'fontawesome_fa-user-injured_fas_#d35968'],
+            'accidentinvestigation' => ['langs' => 'AccidentInvestigation', 'picto' => 'fontawesome_fa-search_fas_#d35968']
+        ];
+        foreach ($objectMetaDatas as $key => $objectMetaData)  {
+            $r++;
+            $this->export_code[$r]       = $this->rights_class . '_' . $key;
+            $this->export_label[$r]      = $objectMetaData['langs']; // Translation key (used only if key ExportDataset_xxx_z not found)
+            $this->export_icon[$r]       = $objectMetaData['picto'];
+            $this->export_enabled[$r]    = '!empty($conf->digiriskdolibarr->enabled)';
+            $this->export_permission[$r] = [["$this->rights_class", "$key"]];
+
+            $this->export_fields_array[$r]     = [];
+            $this->export_TypeFields_array[$r] = [];
+            $this->export_entities_array[$r]   = [];
+
+            $keyforclass     = ucfirst($key);
+            $keyforclassfile = '/' . $this->rights_class . '/class/' . $objectMetaData['classPath'] . '/' . $key . '.class.php';
+            $keyforelement   = $key;
+            $keyforalias     = 't';
+
+            require DOL_DOCUMENT_ROOT . '/core/commonfieldsinexport.inc.php';
+
+            $this->export_sql_start[$r] = 'SELECT DISTINCT ';
+
+            $this->export_sql_end[$r]  = ' FROM ' . MAIN_DB_PREFIX . $this->rights_class . '_' . $key . ' as t';
+            $this->export_sql_end[$r] .= ' WHERE 1 = 1';
+            $this->export_sql_end[$r] .= ' AND t.entity IN (' . getEntity($key) . ')';
+        }
 
         // Imports profiles provided by this module
         $r = 1;
