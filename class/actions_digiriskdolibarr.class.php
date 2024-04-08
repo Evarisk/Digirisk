@@ -213,7 +213,7 @@ class ActionsDigiriskdolibarr
                 $out = saturne_show_documents('digiriskdolibarr:TicketDocument', $dirFiles, $fileDir, $urlSource, $user->rights->ticket->write, $user->rights->ticket->delete, getDolGlobalString('DIGIRISKDOLIBARR_TICKET_DEFAULT_MODEL'), 1, 0, 0, 0, '', '', '', '', '', $object); ?>
 
                 <script>
-                    jQuery('.fichehalfleft .div-table-responsive-no-min').append(<?php echo json_encode($out); ?>)
+                    jQuery('.fichehalfleft .div-table-responsive-no-min').first().append(<?php echo json_encode($out); ?>);
                 </script>
                 <?php
 
@@ -559,7 +559,7 @@ class ActionsDigiriskdolibarr
 				}
 			}
 		} else if ($parameters['currentcontext'] == 'ticketcard') {
-            if ($action == 'builddoc' && strstr(GETPOST('model'), 'ticketdocument_odt')) {
+            if ($action == 'builddoc' && preg_match('/\bticketdocument_odt\b/', GETPOST('model'))) {
                 require_once __DIR__ . '/digiriskdolibarrdocuments/ticketdocument.class.php';
 
                 $document = new TicketDocument($this->db);
@@ -579,7 +579,7 @@ class ActionsDigiriskdolibarr
                 $upload_dir          = $conf->digiriskdolibarr->multidir_output[$conf->entity ?? 1];
 
                 // Action to generate pdf from odt file
-                require_once __DIR__ . '/../../saturne/core/tpl/documents/saturne_manual_pdf_generation_action.tpl.php';
+                require __DIR__ . '/../../saturne/core/tpl/documents/saturne_manual_pdf_generation_action.tpl.php';
 
                 $urlToRedirect = $_SERVER['REQUEST_URI'];
                 $urlToRedirect = preg_replace('/#pdfGeneration$/', '', $urlToRedirect);
@@ -589,7 +589,7 @@ class ActionsDigiriskdolibarr
                 exit;
             }
 
-            require_once __DIR__ . '/../../saturne/core/tpl/documents/documents_action.tpl.php';
+            require __DIR__ . '/../../saturne/core/tpl/documents/documents_action.tpl.php';
 		} elseif (in_array($parameters['currentcontext'] , array('ticketlist', 'thirdpartyticket', 'projectticket'))) {
 			if ($action == 'list') {
 				if (GETPOST('button_removefilter_x', 'alpha') || GETPOST('button_removefilter.x', 'alpha') || GETPOST('button_removefilter', 'alpha')) {
