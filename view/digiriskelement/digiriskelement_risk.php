@@ -40,6 +40,10 @@ require_once DOL_DOCUMENT_ROOT . '/core/lib/admin.lib.php';
 require_once DOL_DOCUMENT_ROOT . '/core/class/html.form.class.php';
 require_once DOL_DOCUMENT_ROOT . '/ecm/class/ecmdirectory.class.php';
 require_once DOL_DOCUMENT_ROOT . '/projet/class/project.class.php';
+if (isModEnabled('categorie')) {
+    require_once DOL_DOCUMENT_ROOT.'/core/class/html.formcategory.class.php';
+    require_once DOL_DOCUMENT_ROOT.'/categories/class/categorie.class.php';
+}
 
 // Load DigiriskDolibarr libraries
 require_once __DIR__ . '/../../class/digiriskelement.class.php';
@@ -72,6 +76,9 @@ $inheritedrisks = GETPOST('inheritedrisks', 'int') ? GETPOST('inheritedrisks', '
 $page           = GETPOSTISSET('pageplusone') ? (GETPOST('pageplusone') - 1) : GETPOST("page", 'int');
 $page           = is_numeric($page) ? $page : 0;
 $page           = $page == -1 ? 0 : $page;
+if (isModEnabled('categorie')) {
+    $search_category_array = GETPOST('search_category_risk_list', 'array');
+}
 
 // Initialize technical objects
 $object           = new DigiriskElement($db);

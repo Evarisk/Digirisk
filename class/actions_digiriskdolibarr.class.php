@@ -72,7 +72,7 @@ class ActionsDigiriskdolibarr
     {
         $error = 0; // Error counter
 
-        if (($parameters['currentcontext'] == 'category')) {
+        if (strpos($parameters['context'], 'category') !== false) {
             $tags = [
                 'accident' => [
                     'id'        => 436302001,
@@ -91,6 +91,12 @@ class ActionsDigiriskdolibarr
                     'code'      => 'firepermit',
                     'obj_class' => 'FirePermit',
                     'obj_table' => 'digiriskdolibarr_firepermit',
+                ],
+                'risk' => [
+                    'id'        => 436302004,
+                    'code'      => 'risk',
+                    'obj_class' => 'Risk',
+                    'obj_table' => 'digiriskdolibarr_risk',
                 ],
             ];
         }
