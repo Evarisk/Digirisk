@@ -832,6 +832,7 @@ class modDigiriskdolibarr extends DolibarrModules
 
 			// CONST PROJECT DOCUMENT
 			$i++ => ['DIGIRISKDOLIBARR_PROJECTDOCUMENT_ADDON', 'chaine', 'mod_projectdocument_standard', '', 0, 'current'],
+			$i++ => ['DIGIRISKDOLIBARR_DISPLAY_RISKASSESSMENT_COLOR_ORQUE', 'integer', 1, '', 0, 'current'],
 
 			// GENERAL CONSTS
 			$i++ => ['MAIN_ODT_AS_PDF', 'chaine', 'libreoffice', '', 0, 'current'],

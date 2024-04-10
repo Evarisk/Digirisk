@@ -126,14 +126,15 @@ SocieteSchedules = Horaires de la société
 #
 
 # Data - Donnée
-DigiriskDocuments        = Document Digirisk
-Responsible              = Responsable
-ContactsAction           = Contacts action
-PERCOTooltip             = Si votre société possède un PERCO, cochez cette case
-PEETooltip               = Si votre société possède un PEE, cochez cette case
-ShowPictoName            = Afficher le nom du pictogramme de danger
-ShowPictoNameDescription = Afficher le nom du pictogramme de danger de risque dans les documents <br> Utile si on souhaite transférer le tableau dans un tableur
-
+DigiriskDocuments              = Document Digirisk
+Responsible                    = Responsable
+ContactsAction                 = Contacts action
+PERCOTooltip                   = Si votre société possède un PERCO, cochez cette case
+PEETooltip                     = Si votre société possède un PEE, cochez cette case
+ShowPictoName                  = Afficher le nom du pictogramme de danger
+ShowPictoNameDescription       = Afficher le nom du pictogramme de danger de risque dans les documents <br> Utile si on souhaite transférer le tableau dans un tableur
+RiskAssessmentColor            = Couleur des évaluations
+RiskAssessmentColorDescription = Affiche la couleur des évaluations dans le document Orque
 
 #
 # LegalDisplay - Affichage légal

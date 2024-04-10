@@ -1031,7 +1031,8 @@ class ActionsDigiriskdolibarr
 	{
 		$additionalConfig = [
 			'ShowPictoName' => 'DIGIRISKDOLIBARR_DOCUMENT_SHOW_PICTO_NAME',
-			'GenerateZipArchiveWithDigiriskElementDocuments' => 'DIGIRISKDOLIBARR_GENERATE_ARCHIVE_WITH_DIGIRISKELEMENT_DOCUMENTS'
+            'GenerateZipArchiveWithDigiriskElementDocuments' => 'DIGIRISKDOLIBARR_GENERATE_ARCHIVE_WITH_DIGIRISKELEMENT_DOCUMENTS',
+			'RiskAssessmentColor' => 'DIGIRISKDOLIBARR_DISPLAY_RISKASSESSMENT_COLOR_ORQUE'
 		];
 
 		// Do something only for the current context.
