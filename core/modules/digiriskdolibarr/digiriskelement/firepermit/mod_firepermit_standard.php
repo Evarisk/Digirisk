@@ -1,5 +1,5 @@
 <?php
-/* Copyright (C) 2021-2023 EVARISK <technique@evarisk.com>
+/* Copyright (C) 2021-2024 EVARISK <technique@evarisk.com>
  *
  * This program is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -17,16 +17,16 @@
  */
 
 /**
- *  \file    core/modules/digiquali/controldocument/mod_controldocument_standard.php
- *  \ingroup digiquali
- *  \brief   File of class to manage controldocument numbering rules standard.
+ *  \file    core/modules/digiriskdolibarr/digiriskelement/firepermit/mod_firepermit_standard.php
+ *  \ingroup digiriskdolibarr
+ *  \brief   File of class to manage firepermit numbering rules standard.
  */
 
 // Load Saturne libraries.
 require_once __DIR__ . '/../../../../../../saturne/core/modules/saturne/modules_saturne.php';
 
 /**
- *	Class to manage controldocument numbering rules standard.
+ *	Class to manage firepermit numbering rules standard.
  */
 class mod_firepermit_standard extends ModeleNumRefSaturne
 {

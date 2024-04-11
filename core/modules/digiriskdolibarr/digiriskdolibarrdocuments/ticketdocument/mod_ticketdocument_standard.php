@@ -17,16 +17,16 @@
  */
 
 /**
- *  \file    core/modules/digiquali/controldocument/mod_controldocument_standard.php
- *  \ingroup digiquali
- *  \brief   File of class to manage controldocument numbering rules standard.
+ *  \file    core/modules/digiriskdolibarr/digiriskdolibarrdocuments/ticketdocument/mod_ticketdocument_standard.php
+ *  \ingroup digiriskdolibarr
+ *  \brief   File of class to manage ticketdocument numbering rules standard.
  */
 
 // Load Saturne libraries.
 require_once __DIR__ . '/../../../../../../saturne/core/modules/saturne/modules_saturne.php';
 
 /**
- *	Class to manage controldocument numbering rules standard.
+ *	Class to manage ticketdocument numbering rules standard.
  */
 class mod_ticketdocument_standard extends ModeleNumRefSaturne
 {

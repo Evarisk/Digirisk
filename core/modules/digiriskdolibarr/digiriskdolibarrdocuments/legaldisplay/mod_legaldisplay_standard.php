@@ -17,15 +17,15 @@
  */
 
 /**
- *	\file       core/modules/digiriskdolibarr/digiriskdocuments/informationssharing/mod_informationssharing_standard.php
+ *	\file       core/modules/digiriskdolibarr/digiriskdolibarrdocuments/legaldisplay/mod_legaldisplay_standard.php
  * \ingroup     digiriskdolibarr
- *	\brief      File containing class for informationssharing numbering module Standard
+ *	\brief      File containing class for legaldisplay numbering module Standard
  */
 
 require_once __DIR__ . '/../../../../../../saturne/core/modules/saturne/modules_saturne.php';
 
 /**
- * 	Class to manage informationssharing numbering rules Standard
+ * 	Class to manage legaldisplay numbering rules Standard
  */
 class mod_legaldisplay_standard extends ModeleNumRefSaturne
 {

@@ -1,5 +1,5 @@
 <?php
-/* Copyright (C) 2024 EVARISK <technique@evarisk.com>
+/* Copyright (C) 2021-2024 EVARISK <technique@evarisk.com>
  *
  * This program is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -17,18 +17,18 @@
  */
 
 /**
- *  \file    core/modules/digiriskdolibarr/accidentinvestigation/mod_accidentinvestigation_standard.php
+ *  \file    core/modules/digiriskdolibarr/accidentinvestigation/mod_accidentinvestigation_custom.php
  *  \ingroup digiriskdolibarr
- *  \brief   File of class to manage accident investigation numbering rules standard.
+ *  \brief   File of class to manage mod_accidentinvestigation_custom numbering rules standard.
  */
 
 // Load Saturne libraries.
 require_once __DIR__ . '/../../../../../saturne/core/modules/saturne/modules_saturne.php';
 
 /**
- *	Class to manage accident investigation numbering rules standard.
+ *	Class to manage accidentinvestigation numbering rules custom.
  */
-class mod_accidentinvestigation_standard extends ModeleNumRefSaturne
+class mod_accidentinvestigation_custom extends CustomModeleNumRefSaturne
 {
     /**
      * @var string Numbering module ref prefix.
@@ -38,5 +38,26 @@ class mod_accidentinvestigation_standard extends ModeleNumRefSaturne
     /**
      * @var string Name.
      */
-    public string $name = 'Bebhionn';
+    public string $name = 'Custom';
+
+    /**
+     *  Return description of module
+     *
+     * @param  String $mode Either "standard" for normal prefix or "custom"
+     * @return String       Descriptive text
+     */
+    public function info($mode = 'custom'): string
+    {
+        return parent::info($mode);
+    }
+
+    /**
+     *  Return next value
+     *
+     *  @return string Value if OK, 0 if KO
+     */
+    public function getNextValue(object $object): string
+    {
+        return parent::getNextCustomValue($object);
+    }
 }

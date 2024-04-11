@@ -1,5 +1,5 @@
 <?php
-/* Copyright (C) 2021-2023 EVARISK <technique@evarisk.com>
+/* Copyright (C) 2021-2024 EVARISK <technique@evarisk.com>
  *
  * This program is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -17,16 +17,16 @@
  */
 
 /**
- *  \file    core/modules/digiriskdolibarr/digiriskelement/mod_groupment_standard.php
+ *  \file    core/modules/digiriskdolibarr/riskanalysis/risk/mod_risk_standard.php
  *  \ingroup digiriskdolibarr
- *  \brief   File of class to manage mod_groupment_standard numbering rules standard.
+ *  \brief   File of class to manage mod_risk_standard numbering rules standard.
  */
 
 // Load Saturne libraries.
 require_once __DIR__ . '/../../../../../../saturne/core/modules/saturne/modules_saturne.php';
 
 /**
- *	Class to manage controldocument numbering rules standard.
+ *	Class to manage risk numbering rules standard.
  */
 class mod_risk_standard extends ModeleNumRefSaturne
 {
