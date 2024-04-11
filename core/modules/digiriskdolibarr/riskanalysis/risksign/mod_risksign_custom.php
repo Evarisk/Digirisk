@@ -38,7 +38,7 @@ class mod_risksign_custom extends CustomModeleNumRefSaturne
     /**
      * @var string Name.
      */
-    public string $name = 'Custom';
+    public string $name = 'Callisto';
 
     /**
      *  Return description of module

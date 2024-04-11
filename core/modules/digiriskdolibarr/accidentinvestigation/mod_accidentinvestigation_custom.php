@@ -38,7 +38,7 @@ class mod_accidentinvestigation_custom extends CustomModeleNumRefSaturne
     /**
      * @var string Name.
      */
-    public string $name = 'Custom';
+    public string $name = 'Atlas';
 
     /**
      *  Return description of module

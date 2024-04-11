@@ -38,7 +38,7 @@ class mod_accidentworkstop_custom extends CustomModeleNumRefSaturne
     /**
      * @var string Name.
      */
-    public string $name = 'Custom';
+    public string $name = 'Kingsford';
 
     /**
      *  Return description of module

@@ -38,7 +38,7 @@ class mod_legaldisplay_custom extends CustomModeleNumRefSaturne
     /**
      * @var string Name.
      */
-    public string $name = 'Custom';
+    public string $name = 'Anthée';
 
     /**
      *  Return description of module

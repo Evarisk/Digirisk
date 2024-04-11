@@ -38,7 +38,7 @@ class mod_firepermit_custom extends CustomModeleNumRefSaturne
     /**
      * @var string Name.
      */
-    public string $name = 'Custom';
+    public string $name = 'Santos';
 
     /**
      *  Return description of module

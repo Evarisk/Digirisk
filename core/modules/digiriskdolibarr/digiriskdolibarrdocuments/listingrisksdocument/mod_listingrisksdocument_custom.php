@@ -38,7 +38,7 @@ class mod_listingrisksdocument_custom extends CustomModeleNumRefSaturne
     /**
      * @var string Name.
      */
-    public string $name = 'Custom';
+    public string $name = 'Hypérion';
 
     /**
      *  Return description of module

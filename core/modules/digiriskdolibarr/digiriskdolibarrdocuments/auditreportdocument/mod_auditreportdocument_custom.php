@@ -38,7 +38,7 @@ class mod_auditreportdocument_custom extends CustomModeleNumRefSaturne
     /**
      * @var string Name.
      */
-    public string $name = 'Custom';
+    public string $name = 'Épiméthée';
 
     /**
      *  Return description of module

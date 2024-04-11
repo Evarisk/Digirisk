@@ -38,7 +38,7 @@ class mod_preventionplandet_custom extends CustomModeleNumRefSaturne
     /**
      * @var string Name.
      */
-    public string $name = 'Custom';
+    public string $name = 'Amalthée';
 
     /**
      *  Return description of module

@@ -38,7 +38,7 @@ class mod_riskassessment_custom extends CustomModeleNumRefSaturne
     /**
      * @var string Name.
      */
-    public string $name = 'Custom';
+    public string $name = 'Ganymède';
 
     /**
      *  Return description of module

@@ -38,7 +38,7 @@ class mod_listingrisksaction_custom extends CustomModeleNumRefSaturne
     /**
      * @var string Name.
      */
-    public string $name = 'Custom';
+    public string $name = 'Hélène';
 
     /**
      *  Return description of module

@@ -38,7 +38,7 @@ class mod_listingrisksphoto_custom extends CustomModeleNumRefSaturne
     /**
      * @var string Name.
      */
-    public string $name = 'Custom';
+    public string $name = 'Ijiraq';
 
     /**
      *  Return description of module

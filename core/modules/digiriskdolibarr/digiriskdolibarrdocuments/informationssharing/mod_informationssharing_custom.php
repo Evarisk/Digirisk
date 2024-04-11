@@ -38,7 +38,7 @@ class mod_informationssharing_custom extends CustomModeleNumRefSaturne
     /**
      * @var string Name.
      */
-    public string $name = 'Custom';
+    public string $name = 'Méthone';
 
     /**
      *  Return description of module

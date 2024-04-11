@@ -38,7 +38,7 @@ class mod_projectdocument_custom extends CustomModeleNumRefSaturne
     /**
      * @var string Name.
      */
-    public string $name = 'Custom';
+    public string $name = 'Skathi';
 
     /**
      *  Return description of module

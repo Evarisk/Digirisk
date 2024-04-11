@@ -38,7 +38,7 @@ class mod_ticketdocument_custom extends CustomModeleNumRefSaturne
     /**
      * @var string Name.
      */
-    public string $name = 'Custom';
+    public string $name = 'Kari';
 
     /**
      *  Return description of module

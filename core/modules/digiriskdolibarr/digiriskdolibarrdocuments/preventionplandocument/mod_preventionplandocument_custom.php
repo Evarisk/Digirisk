@@ -38,7 +38,7 @@ class mod_preventionplandocument_custom extends CustomModeleNumRefSaturne
     /**
      * @var string Name.
      */
-    public string $name = 'Custom';
+    public string $name = 'Phoebé';
 
     /**
      *  Return description of module

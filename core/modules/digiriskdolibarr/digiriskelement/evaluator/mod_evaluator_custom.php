@@ -38,7 +38,7 @@ class mod_evaluator_custom extends CustomModeleNumRefSaturne
     /**
      * @var string Name.
      */
-    public string $name = 'Custom';
+    public string $name = 'Post';
 
     /**
      *  Return description of module

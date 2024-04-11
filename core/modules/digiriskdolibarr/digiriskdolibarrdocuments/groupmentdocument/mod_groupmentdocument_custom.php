@@ -38,7 +38,7 @@ class mod_groupmentdocument_custom extends CustomModeleNumRefSaturne
     /**
      * @var string Name.
      */
-    public string $name = 'Custom';
+    public string $name = 'Égéon';
 
     /**
      *  Return description of module

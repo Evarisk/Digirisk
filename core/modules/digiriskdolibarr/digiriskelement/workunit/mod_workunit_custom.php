@@ -38,7 +38,7 @@ class mod_workunit_custom extends CustomModeleNumRefSaturne
     /**
      * @var string Name.
      */
-    public string $name = 'Custom';
+    public string $name = 'Thébé';
 
     /**
      *  Return description of module

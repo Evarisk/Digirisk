@@ -38,7 +38,7 @@ class mod_accident_custom extends CustomModeleNumRefSaturne
     /**
      * @var string Name.
      */
-    public string $name = 'Custom';
+    public string $name = 'Loge';
 
     /**
      *  Return description of module

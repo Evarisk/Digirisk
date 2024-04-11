@@ -38,7 +38,7 @@ class mod_accidentlesion_custom extends CustomModeleNumRefSaturne
     /**
      * @var string Name.
      */
-    public string $name = 'Custom';
+    public string $name = 'Beli';
 
     /**
      *  Return description of module
