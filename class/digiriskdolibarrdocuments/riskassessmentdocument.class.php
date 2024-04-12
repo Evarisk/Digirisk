@@ -90,7 +90,7 @@ class RiskAssessmentDocument extends DigiriskDocuments
 			foreach ($userRecipient as $recipientId) {
 				$user->fetch($recipientId);
 
-				$json['RiskAssessmentDocument']['destinataireDUER'] .= $user->lastname . ' ' . $user->firstname . chr(0x0A);
+				$json['RiskAssessmentDocument']['destinataireDUER'] .= dol_strtoupper($user->lastname) . ' ' . ucfirst($user->firstname) . chr(0x0A);
 				$json['RiskAssessmentDocument']['telephone'] .= $user->office_phone . chr(0x0A);
 				$json['RiskAssessmentDocument']['portable'] .= $user->user_mobile . chr(0x0A);
 			}

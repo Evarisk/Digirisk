@@ -102,7 +102,7 @@ if ( $action == "edit" && $permissiontoadd ) {
 	if (is_array($recipients) && !empty($recipients)) {
         foreach ($recipients as $recipientId) {
             $user->fetch($recipientId);
-            print $user->lastname . ' ' . $user->firstname . '<br>';
+            print $user->getNomUrl(1) . '<br>';
         }
     }
 	print '</td></tr>';
