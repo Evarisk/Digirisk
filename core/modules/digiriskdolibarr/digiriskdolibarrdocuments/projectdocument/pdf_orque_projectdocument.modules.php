@@ -518,7 +518,7 @@ class pdf_orque_projectdocument
 					$pdf->SetXY($this->posxrisk, $curY);
 					$pdf->MultiCell($this->posxriskassessment - $this->posxrisk, 3, $riskref, 0, 'L');
 					// Risk assessment
-					if ($conf->global->DIGIRISKDOLIBARR_DISPLAY_RISKASSESSMENT_COLOR_ORQUE) {
+					if ($conf->global->DIGIRISKDOLIBARR_PROJECTDOCUMENT_DISPLAY_RISKASSESSMENT_COLOR) {
 						if ($lastEvaluation < 47) {
 							$pdf->SetTextColor(169, 169, 169);
 						} else if ($lastEvaluation < 51) {
