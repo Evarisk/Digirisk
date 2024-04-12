@@ -739,7 +739,7 @@ if ($action != 'list') {
                             if (!empty($conf->categorie->enabled) && getDolGlobalInt('DIGIRISKDOLIBARR_CATEGORY_ON_RISK') > 0) {
                                 print '<div class="risk-categories"><span class="title">'.$langs->trans("Categories") . '</span>';
                                 $categoryArborescence = $form->select_all_categories('risk', '', 'parent', 64, 0, 1);
-                                print img_picto('', 'category', 'class="pictofixedwidth"').$form->multiselectarray('categories', $categoryArborescence, GETPOST('categories', 'array'), '', 0, 'maxwidth300');
+                                print img_picto('', 'category', 'class="pictofixedwidth"').$form->multiselectarray('categories', $categoryArborescence, GETPOST('categories', 'array'), '', 0, 'minwidth100imp widthcentpercentminusxx maxwidth400');
                                 print '<a class="butActionNew" href="' . DOL_URL_ROOT . '/categories/index.php?type=risk&backtopage=' . urlencode($_SERVER['PHP_SELF'] . '?action=create') . '" target="_blank"><span class="fa fa-plus-circle valignmiddle paddingleft" title="' . $langs->trans('AddCategories') . '"></span></a>';
                                 print "</div>";
                             }
@@ -855,7 +855,7 @@ if ($action != 'list') {
                 if (!empty($conf->categorie->enabled) && getDolGlobalInt('DIGIRISKDOLIBARR_CATEGORY_ON_RISK') > 0) {
                     print '<div class="risk-categories"><span class="title">'.$langs->trans("Categories") . '</span>';
                     $categoryArborescence = $form->select_all_categories('risk', '', 'parent', 64, 0, 1);
-                    print img_picto('', 'category', 'class="pictofixedwidth"').$form->multiselectarray('categories', $categoryArborescence, GETPOST('categories', 'array'), '', 0, 'maxwidth300');
+                    print img_picto('', 'category', 'class="pictofixedwidth"').$form->multiselectarray('categories', $categoryArborescence, GETPOST('categories', 'array'), '', 0, 'minwidth100imp widthcentpercentminusxx maxwidth400');
                     print '<a class="butActionNew" href="' . DOL_URL_ROOT . '/categories/index.php?type=risk&backtopage=' . urlencode($_SERVER['PHP_SELF'] . '?action=create') . '" target="_blank"><span class="fa fa-plus-circle valignmiddle paddingleft" title="' . $langs->trans('AddCategories') . '"></span></a>';
                     print "</div><hr>";
                 } ?>
@@ -1327,7 +1327,7 @@ while ($i < ($limit ? min($num, $limit) : $num)) {
                                             $arrayselected[] = $cat->id;
                                         }
                                     }
-                                    print img_picto('', 'category', 'class="pictofixedwidth"').$form->multiselectarray('categories_risk' . $risk->id, $categoryArborescence, $arrayselected, '', 0, 'maxwidth300');
+                                    print img_picto('', 'category', 'class="pictofixedwidth"').$form->multiselectarray('categories_risk' . $risk->id, $categoryArborescence, $arrayselected, '', 0, 'minwidth100imp widthcentpercentminusxx maxwidth400');
                                     print '<a class="butActionNew" href="' . DOL_URL_ROOT . '/categories/index.php?type=risk&backtopage=' . urlencode($_SERVER['PHP_SELF'] . '?action=create') . '" target="_blank"><span class="fa fa-plus-circle valignmiddle paddingleft" title="' . $langs->trans('AddCategories') . '"></span></a>';
                                     print '</div><hr>';
                                 } ?>
