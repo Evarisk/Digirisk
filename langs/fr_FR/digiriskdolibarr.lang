@@ -958,6 +958,8 @@ DefaultProjectContactType                = Rôle par défaut attribué au projet
 DefaultTaskContactType                   = Rôle par défaut attribué aux tâches du projet Document Unique
 RiskListParentView                       = Afficher tous les éléments parents
 RiskListParentViewDescription            = Afficher tous les éléments parents d'un risque dans la liste des risques
+CategoryOnRisk                           = Afficher les tags/catégories sur les risques
+CategoryOnRiskDescription                = Permet d'attribuer des tags/catégories aux risques et de les afficher - à minipuler avec précaution.
 
 # Stats - Statistiques
 GreyRisk   = Risque faible

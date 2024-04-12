@@ -210,6 +210,11 @@ $constArray[$moduleNameLowerCase] = [
 		'code'        => 'DIGIRISKDOLIBARR_SHOW_SHARED_RISKS',
         'disabled'    => !$areRisksSharable
 	],
+    'CategoryOnRisk' => [
+        'name'        => 'CategoryOnRisk',
+        'description' => 'CategoryOnRiskDescription',
+        'code'        => 'DIGIRISKDOLIBARR_CATEGORY_ON_RISK',
+    ],
 ];
 
 require __DIR__ . '/../../../saturne/core/tpl/admin/object/object_const_view.tpl.php';

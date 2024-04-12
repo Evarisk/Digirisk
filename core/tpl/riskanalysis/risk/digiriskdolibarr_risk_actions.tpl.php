@@ -23,7 +23,7 @@ if ( ! $error && $action == 'add' && $permissiontoadd) {
 		$result = $risk->create($user);
 
 		if ($result > 0) {
-            if (isModEnabled('categorie')) {
+            if (isModEnabled('categorie') && getDolGlobalInt('DIGIRISKDOLIBARR_CATEGORY_ON_RISK') > 0) {
                 $categories = $data['categories'];
                 if (method_exists($risk, 'setCategories')) {
                     $risk->setCategories($categories);
@@ -171,7 +171,7 @@ if ( ! $error && $action == 'saveRisk' && $permissiontoadd) {
 	$result = $risk->update($user);
 
 	if ($result > 0) {
-        if (isModEnabled('categorie')) {
+        if (isModEnabled('categorie') && getDolGlobalInt('DIGIRISKDOLIBARR_CATEGORY_ON_RISK') > 0) {
             $categories = $data['categories'];
             if (method_exists($risk, 'setCategories')) {
                 $risk->setCategories($categories);
