@@ -91,8 +91,9 @@ class doc_listingrisksenvironmentalaction_odt extends SaturneDocumentModel
         $objectDocument = $moreParam['objectDocument'];
 
         try {
+            $moreParam['filterRisk'] = ' AND t.type = "riskenvironmental"';
             $risk  = new Risk($this->db);
-            $risks = $risk->fetchRisksOrderedByCotation($digiriskelement->id > 0 ? $digiriskelement->id : 0, true, $conf->global->DIGIRISKDOLIBARR_SHOW_INHERITED_RISKS_IN_DOCUMENTS, $conf->global->DIGIRISKDOLIBARR_SHOW_SHARED_RISKS);
+            $risks = $risk->fetchRisksOrderedByCotation($digiriskelement->id > 0 ? $digiriskelement->id : 0, true, $conf->global->DIGIRISKDOLIBARR_SHOW_INHERITED_RISKS_IN_DOCUMENTS, $conf->global->DIGIRISKDOLIBARR_SHOW_SHARED_RISKS, $moreParam);
 
             $objectDocument->fillRiskData($odfHandler, $objectDocument, $outputLangs, [], '', $risks, $conf->global->DIGIRISKDOLIBARR_SHOW_SHARED_RISKS);
 
