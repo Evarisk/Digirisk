@@ -118,47 +118,47 @@
   "riskenvironmental": [
     {
       "name": "Risques liés aux émissions dans l’air",
-      "thumbnail_name": "air_PictoCategorie_v2",
+      "thumbnail_name": "Pictogrammes_environnement_rejets_air",
       "position": 1
     },
     {
       "name": "Risques liés aux rejets dans l’eau",
-      "thumbnail_name": "eau_PictoCategorie_v2",
+      "thumbnail_name": "Pictogrammes_environnement_rejets_eau",
       "position": 2
     },
     {
       "name": "Risques liés aux rejets dans le sol",
-      "thumbnail_name": "sol_PictoCategorie_v2",
+      "thumbnail_name": "Pictogrammes_environnement_rejets_sol",
       "position": 3
     },
     {
       "name": "Risques liés à l’utilisation des matières premières et des ressources naturelles",
-      "thumbnail_name": "ressources_PictoCategorie_v2",
+      "thumbnail_name": "Pictogrammes_environnement_matieres_premieres",
       "position": 4
     },
     {
       "name": "Risques liés à l’utilisation de l’énergie",
-      "thumbnail_name": "energie_PictoCategorie_v2",
+      "thumbnail_name": "Pictogrammes_environnement_utilisation_energie",
       "position": 5
     },
     {
       "name": "Risques liés à l’énergie émise",
-      "thumbnail_name": "voisinage_PictoCategorie_v2",
+      "thumbnail_name": "Pictogrammes_environnement_energie_emise",
       "position": 6
     },
     {
       "name": "Risques liés à la production de déchets et/ou de sous-produits",
-      "thumbnail_name": "dechets_PictoCategorie_v2",
+      "thumbnail_name": "Pictogrammes_environnement_production_dechets",
       "position": 7
     },
     {
       "name": "Risques liés à l’utilisation de l’espace",
-      "thumbnail_name": "dechets_PictoCategorie_v2",
+      "thumbnail_name": "Pictogrammes_environnement_utilisation_espace",
       "position": 8
     },
     {
-      "name": "Risques autres",
-      "thumbnail_name": "autre_PictoCategorie_v2",
+      "name": "Divers risques environnementaux",
+      "thumbnail_name": "Pictogrammes_environnement_divers",
       "position": 9
     }
   ]
