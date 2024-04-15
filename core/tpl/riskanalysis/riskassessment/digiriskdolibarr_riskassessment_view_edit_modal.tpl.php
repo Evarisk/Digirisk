@@ -77,7 +77,7 @@
 								<?php if ( $lastEvaluation->method == "advanced" || $conf->global->DIGIRISKDOLIBARR_MULTIPLE_RISKASSESSMENT_METHOD) : ?>
 									<?php
 									$evaluationMethod       = $advancedCotationMethodArray[0];
-									$evaluationMethodSurvey = $evaluationMethod['option']['variable'];
+									$evaluationMethodSurvey = $evaluationMethod['option'][$risk->type . '_variable'];
 									?>
 									<div class="wpeo-gridlayout cotation-advanced" style="<?php echo ($lastEvaluation->method == "advanced") ? " display:block" : " display:none" ?>">
 										<input type="hidden" class="digi-method-evaluation-id" value="<?php echo $risk->id ; ?>" />

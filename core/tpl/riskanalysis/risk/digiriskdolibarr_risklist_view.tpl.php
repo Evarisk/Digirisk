@@ -673,7 +673,7 @@ if ($action != 'list') {
 										<input class="risk-evaluation-seuil" type="hidden" value="undefined">
 										<?php
 										$evaluationMethod        = $advancedCotationMethodArray[0];
-										$evaluationMethodSurvey = $evaluationMethod['option']['variable'];
+										$evaluationMethodSurvey = $evaluationMethod['option'][$risk->type . '_variable'];
 										?>
 										<div class="wpeo-gridlayout cotation-advanced" style="display:none">
 											<input type="hidden" class="digi-method-evaluation-id" value="<?php echo $risk->id ; ?>" />
@@ -875,7 +875,7 @@ if ($action != 'list') {
 								<input class="risk-evaluation-seuil" type="hidden" value="undefined">
 								<?php
 								$evaluationMethod        = $advancedCotationMethodArray[0];
-								$evaluationMethodSurvey = $evaluationMethod['option']['variable'];
+								$evaluationMethodSurvey = $evaluationMethod['option'][$risk->type . '_variable'];
 								?>
 								<div class="wpeo-gridlayout cotation-advanced" style="display:none">
 									<input type="hidden" class="digi-method-evaluation-id" value="<?php echo $risk->id ; ?>" />
