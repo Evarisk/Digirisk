@@ -47,10 +47,10 @@ if ( $action == "edit" && $permissiontoadd ) {
 	print '</td></tr>';
 
 	// Destinataire
-
+	$userRecipient = json_decode($conf->global->DIGIRISKDOLIBARR_RISKASSESSMENTDOCUMENT_RECIPIENT);
 	print '<tr>';
 	print '<td class="titlefield"><label for="Recipient">' . $langs->trans("Recipient") . '</label></td><td colspan="2">';
-	print $form->select_dolusers($conf->global->DIGIRISKDOLIBARR_RISKASSESSMENTDOCUMENT_RECIPIENT, 'Recipient', 0, null, 0, '', '', 0, 0, 0, '', 0, '', '', 0, 0);
+	print $form->select_dolusers($userRecipient, 'Recipient', 0, null, 0, '', '', 0, 0, 0, '', 0, '', '', 0, 0, true);
 	print '</td></tr>';
 
 	// Méthodologie
@@ -98,8 +98,13 @@ if ( $action == "edit" && $permissiontoadd ) {
 	// Destinataire
 	print '<tr>';
 	print '<td class="titlefield">' . $langs->trans("Recipient") . '</td><td colspan="2">';
-	$user->fetch($conf->global->DIGIRISKDOLIBARR_RISKASSESSMENTDOCUMENT_RECIPIENT);
-	print $user->lastname . ' ' . $user->firstname;
+	$recipients = json_decode($conf->global->DIGIRISKDOLIBARR_RISKASSESSMENTDOCUMENT_RECIPIENT);
+	if (is_array($recipients) && !empty($recipients)) {
+        foreach ($recipients as $recipientId) {
+            $user->fetch($recipientId);
+            print $user->getNomUrl(1) . '<br>';
+        }
+    }
 	print '</td></tr>';
 
 	// Méthodologie
