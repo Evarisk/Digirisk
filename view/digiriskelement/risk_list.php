@@ -72,6 +72,7 @@ $toselect    = GETPOST('toselect', 'array'); // Array of ids of elements selecte
 $limit       = GETPOST('limit', 'int') ? GETPOST('limit', 'int') : $conf->liste_limit;
 $sortfield   = GETPOST('sortfield', 'alpha');
 $sortorder   = GETPOST('sortorder', 'alpha');
+$riskType    = GETPOSTISSET('type') ? GETPOST('type') : 'risk';
 $page        = GETPOSTISSET('pageplusone') ? (GETPOST('pageplusone') - 1) : GETPOST("page", 'int');
 $page        = is_numeric($page) ? $page : 0;
 $page        = $page == -1 ? 0 : $page;
