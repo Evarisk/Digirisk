@@ -369,6 +369,7 @@ if ( ! preg_match('/(evaluation)/', $sortfield)) {
 		$sql .= " AND fk_element > 0 ";
 		$sql .= " AND e.entity IN (" . $conf->entity . ") ";
 	}
+    $sql .= ' AND r.type = "' . $riskType . '"';
 
 	foreach ($search as $key => $val) {
 		if ($key == 'status' && $search[$key] == -1) continue;
@@ -459,7 +460,7 @@ if ( ! preg_match('/(evaluation)/', $sortfield)) {
 	else $sql                                                                                                                                                 .= " WHERE 1 = 1";
 	$sql                                                                                                                                                      .= " AND evaluation.status = 1";
 	if ( ! $allRisks) {
-		$sql .= " AND r.fk_element =" . $id;
+		$sql .= " AND r.fk_element = " . $id;
 	} else {
 		if (is_array($activeDigiriskElementList) && !empty($activeDigiriskElementList)) {
 			$digiriskElementSqlFilter = '(';
@@ -475,6 +476,7 @@ if ( ! preg_match('/(evaluation)/', $sortfield)) {
 		$sql .= " AND r.fk_element > 0";
 		$sql .= " AND e.entity IN (" . $conf->entity . ")";
 	}
+    $sql .= ' AND r.type = "' . $riskType . '"';
 
 	foreach ($search as $key => $val) {
 		if ($key == 'status' && $search[$key] == -1) continue;

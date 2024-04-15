@@ -964,6 +964,16 @@ RedRisk    = Risque à traiter
 BlackRisk  = Risque inacceptable
 
 
+
+#
+# RiskEnvironmentals - Risques environnementaux
+#
+
+# Data - Donnée
+RiskEnvironmentals = Risques environnementaux
+
+
+
 #
 # RiskAssessment - Évaluation
 #
