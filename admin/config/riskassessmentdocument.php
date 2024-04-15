@@ -194,6 +194,11 @@ $constArray[$moduleNameLowerCase] = [
         'description' => 'RiskListParentViewDescription',
         'code'        => 'DIGIRISKDOLIBARR_RISK_LIST_PARENT_VIEW',
     ],
+    'CategoryOnRisk' => [
+        'name'        => 'CategoryOnRisk',
+        'description' => 'CategoryOnRiskDescription',
+        'code'        => 'DIGIRISKDOLIBARR_CATEGORY_ON_RISK',
+    ],
 	'ShowInheritedRisksInDocuments' => [
 		'name'        => 'ShowInheritedRisksInDocuments',
 		'description' => 'ShowInheritedRisksInDocumentsDescription',

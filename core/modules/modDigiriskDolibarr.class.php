@@ -681,7 +681,8 @@ class modDigiriskdolibarr extends DolibarrModules
             $i++ => ['DIGIRISKDOLIBARR_RISK_LIST_PARENT_VIEW', 'integer', 0, '', 0, 'current'],
 			$i++ => ['DIGIRISKDOLIBARR_SHOW_INHERITED_RISKS_IN_DOCUMENTS', 'integer', 0, '', 0, 'current'],
 			$i++ => ['DIGIRISKDOLIBARR_SHOW_INHERITED_RISKS_IN_LISTINGS', 'integer', 0, '', 0, 'current'],
-			$i++ => ['DIGIRISKDOLIBARR_SHOW_SHARED_RISKS', 'integer', 0, '', 0, 'current'],
+            $i++ => ['DIGIRISKDOLIBARR_SHOW_SHARED_RISKS', 'integer', 0, '', 0, 'current'],
+            $i++ => ['DIGIRISKDOLIBARR_CATEGORY_ON_RISK', 'integer', 0, '', 0, 'current'],
 
 			// CONST RISK ASSESSMENT
 			$i++ => ['DIGIRISKDOLIBARR_MAIN_AGENDA_ACTIONAUTO_RISKASSESSMENT_CREATE', 'integer', 1, '', 0, 'current'],
@@ -1416,6 +1417,21 @@ class modDigiriskdolibarr extends DolibarrModules
 			'target'   => '',
 			'user'     => 0,				                // 0=Menu for internal users, 1=external users, 2=both
 		];
+
+        $this->menu[$r++] = [
+            'fk_menu'  => 'fk_mainmenu=digiriskdolibarr,fk_leftmenu=digirisklistingrisk',
+            'type'     => 'left',
+            'titre'    => '<i class="fas fa-tags pictofixedwidth" style="padding-right: 4px;"></i>' . $langs->transnoentities('Categories'),
+            'mainmenu' => 'digiriskdolibarr',
+            'leftmenu' => 'digiriskdolibarr_risktags',
+            'url'      => '/categories/index.php?type=risk',
+            'langs'    => 'digiriskdolibarr@digiriskdolibarr',
+            'position' => 100 + $r,
+            'enabled'  => '$conf->digiriskdolibarr->enabled && $conf->categorie->enabled && $user->rights->digiriskdolibarr->risk->read && $conf->global->DIGIRISKDOLIBARR_CATEGORY_ON_RISK',
+            'perms'    => '$user->rights->digiriskdolibarr->risk->read',
+            'target'   => '',
+            'user'     => 0,
+        ];
 
 		$this->menu[$r++] = [
 			'fk_menu'  => 'fk_mainmenu=digiriskdolibarr',	    // '' if this is a top menu. For left menu, use 'fk_mainmenu=xxx' or 'fk_mainmenu=xxx,fk_leftmenu=yyy' where xxx is mainmenucode and yyy is a leftmenucode

@@ -23,6 +23,13 @@ if ( ! $error && $action == 'add' && $permissiontoadd) {
 		$result = $risk->create($user);
 
 		if ($result > 0) {
+            if (isModEnabled('categorie') && getDolGlobalInt('DIGIRISKDOLIBARR_CATEGORY_ON_RISK') > 0) {
+                $categories = $data['categories'];
+                if (method_exists($risk, 'setCategories')) {
+                    $risk->setCategories($categories);
+                }
+            }
+
 			$evaluationComment  = $data['comment'];
 			$riskAssessmentDate = $data['date'];
 
@@ -164,6 +171,12 @@ if ( ! $error && $action == 'saveRisk' && $permissiontoadd) {
 	$result = $risk->update($user);
 
 	if ($result > 0) {
+        if (isModEnabled('categorie') && getDolGlobalInt('DIGIRISKDOLIBARR_CATEGORY_ON_RISK') > 0) {
+            $categories = $data['categories'];
+            if (method_exists($risk, 'setCategories')) {
+                $risk->setCategories($categories);
+            }
+        }
 		// Update risk OK
 		$urltogo = str_replace('__ID__', $result, $backtopage);
 		$urltogo = preg_replace('/--IDFORBACKTOPAGE--/', $id, $urltogo); // New method to autoselect project after a New on another form object creation

@@ -51,6 +51,10 @@ require_once './../../core/modules/digiriskdolibarr/riskanalysis/risk/mod_risk_s
 require_once './../../core/modules/digiriskdolibarr/riskanalysis/riskassessment/mod_riskassessment_standard.php';
 require_once './../../lib/digiriskdolibarr_digiriskstandard.lib.php';
 require_once './../../lib/digiriskdolibarr_function.lib.php';
+if (isModEnabled('categorie')) {
+    require_once DOL_DOCUMENT_ROOT.'/core/class/html.formcategory.class.php';
+    require_once DOL_DOCUMENT_ROOT.'/categories/class/categorie.class.php';
+}
 
 // Load translation files required by the page
 saturne_load_langs(['other']);
@@ -71,6 +75,9 @@ $sortorder   = GETPOST('sortorder', 'alpha');
 $page        = GETPOSTISSET('pageplusone') ? (GETPOST('pageplusone') - 1) : GETPOST("page", 'int');
 $page        = is_numeric($page) ? $page : 0;
 $page        = $page == -1 ? 0 : $page;
+if (isModEnabled('categorie')) {
+    $search_category_array = GETPOST('search_category_risk_list', 'array');
+}
 
 // Initialize technical objects
 $object           = new DigiriskStandard($db);
@@ -173,8 +180,9 @@ if (empty($reshook)) {
 		foreach ($evaluation->fields as $key => $val) {
 			$search[$key] = '';
 		}
-		$toselect             = '';
-		$search_array_options = array();
+		$toselect              = '';
+		$search_array_options  = [];
+        $search_category_array = [];
 	}
 	if (GETPOST('button_removefilter_x', 'alpha') || GETPOST('button_removefilter.x', 'alpha') || GETPOST('button_removefilter', 'alpha')
 		|| GETPOST('button_search_x', 'alpha') || GETPOST('button_search.x', 'alpha') || GETPOST('button_search', 'alpha')) {
