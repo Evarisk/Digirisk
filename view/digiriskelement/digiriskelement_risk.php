@@ -69,6 +69,7 @@ $sortfield      = GETPOST('sortfield', 'alpha');
 $sortorder      = GETPOST('sortorder', 'alpha');
 $sharedrisks    = GETPOST('sharedrisks', 'int') ? GETPOST('sharedrisks', 'int') : $conf->global->DIGIRISKDOLIBARR_SHOW_SHARED_RISKS;
 $inheritedrisks = GETPOST('inheritedrisks', 'int') ? GETPOST('inheritedrisks', 'int') : $conf->global->DIGIRISKDOLIBARR_SHOW_INHERITED_RISKS_IN_LISTINGS;
+$riskType       = GETPOSTISSET('type') ? GETPOST('type') : 'risk';
 $page           = GETPOSTISSET('pageplusone') ? (GETPOST('pageplusone') - 1) : GETPOST("page", 'int');
 $page           = is_numeric($page) ? $page : 0;
 $page           = $page == -1 ? 0 : $page;
@@ -84,6 +85,8 @@ $project          = new Project($db);
 $task             = new SaturneTask($db);
 $extrafields      = new ExtraFields($db);
 $DUProject        = new Project($db);
+
+$risk->type = $riskType;
 
 $numberingModuleName = [
 	'riskanalysis/' . $risk->element       => $conf->global->DIGIRISKDOLIBARR_RISK_ADDON,
@@ -338,7 +341,7 @@ if ($sharedrisks) {
 if ($object->id > 0) {
 	$res = $object->fetch_optionals();
 
-	saturne_get_fiche_head($object, 'elementRisk', $title);
+	saturne_get_fiche_head($object, 'element' . ucfirst($riskType), $title);
 
 	// Object card
 	// ------------------------------------------------------------
