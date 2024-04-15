@@ -568,7 +568,7 @@ class ActionsDigiriskdolibarr
                 $permissiontoadd     = $user->rights->ticket->write;
             }
 
-            if ($action == 'remove_file') {
+            if ($action == 'remove_file' && preg_match('/\bticketdocument\b/', GETPOST('file'))) {
                 $upload_dir         = $conf->digiriskdolibarr->multidir_output[$conf->entity ?? 1];
                 $permissiontodelete = $user->rights->ticket->delete;
             }
