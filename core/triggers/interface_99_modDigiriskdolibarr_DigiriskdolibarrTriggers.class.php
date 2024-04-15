@@ -230,6 +230,7 @@ class InterfaceDigiriskdolibarrTriggers extends DolibarrTriggers
             case 'LISTINGRISKSACTION_GENERATE' :
             case 'LISTINGRISKSPHOTO_GENERATE' :
             case 'LISTINGRISKSDOCUMENT_GENERATE' :
+            case 'LISTINGRISKSENVIRONMENTALACTION_GENERATE' :
             case 'WORKUNITDOCUMENT_GENERATE' :
 			case 'GROUPMENTDOCUMENT_GENERATE' :
 

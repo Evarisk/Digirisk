@@ -968,6 +968,10 @@ class ActionsDigiriskdolibarr
 				'documentType' => 'listingrisksaction',
 				'picto'        => 'fontawesome_fa-exclamation_fas_#d35968'
 			],
+            'ListingRisksEnvironmentalAction' => [
+                'documentType' => 'listingrisksenvironmentalaction',
+                'picto'        => 'fontawesome_fa-exclamation_fas_#d35968'
+            ],
 			'ListingRisksPhoto' => [
 				'documentType' => 'listingrisksphoto',
 				'picto'        => 'fontawesome_fa-images_fas_#d35968'
