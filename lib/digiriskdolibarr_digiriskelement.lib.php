@@ -42,9 +42,14 @@ function digiriskelement_prepare_head(DigiriskElement $object)
 
     if ($object->id > 0) {
         if ($user->rights->digiriskdolibarr->risk->read) {
-            $head[$h][0] = dol_buildpath('/digiriskdolibarr/view/digiriskelement/digiriskelement_risk.php', 1) . '?id=' . $object->id;
+            $head[$h][0] = dol_buildpath('/digiriskdolibarr/view/digiriskelement/digiriskelement_risk.php', 1) . '?id=' . $object->id . '&type=risk';
             $head[$h][1] = $conf->browser->layout != 'phone' ? '<i class="fas fa-exclamation-triangle pictofixedwidth"></i>' . $langs->trans('Risks') : '<i class="fas fa-exclamation-triangle"></i>';
             $head[$h][2] = 'elementRisk';
+            $h++;
+
+            $head[$h][0] = dol_buildpath('/digiriskdolibarr/view/digiriskelement/digiriskelement_risk.php', 1) . '?id=' . $object->id . '&type=riskenvironmental';
+            $head[$h][1] = $conf->browser->layout != 'phone' ? '<i class="fas fa-exclamation-triangle pictofixedwidth"></i>' . $langs->trans('RiskEnvironmentals') : '<i class="fas fa-exclamation-triangle"></i>';
+            $head[$h][2] = 'elementRiskenvironmental';
             $h++;
         }
 
@@ -70,7 +75,7 @@ function digiriskelement_prepare_head(DigiriskElement $object)
         }
 
         if ($object->element_type == 'groupment') {
-            if ($user->rights->digiriskdolibarr->listingrisksaction->read && $user->rights->digiriskdolibarr->listingrisksphoto->read && $user->rights->digiriskdolibarr->listingrisksdocument->read) {
+            if ($user->rights->digiriskdolibarr->listingrisksaction->read && $user->rights->digiriskdolibarr->listingrisksphoto->read && $user->rights->digiriskdolibarr->listingrisksdocument->read && $user->rights->digiriskdolibarr->listingrisksenvironmentalaction->read) {
                 $head[$h][0] = dol_buildpath('/digiriskdolibarr/view/digiriskelement/digiriskelement_listingrisksdocument.php', 1) . '?id=' . $object->id;
                 $head[$h][1] = $conf->browser->layout != 'phone' ? '<i class="fas fa-exclamation pictofixedwidth"></i>' . $langs->trans('ListingRisksDocument') : '<i class="fas fa-exclamation"></i>';
                 $head[$h][2] = 'elementListingRisksDocument';

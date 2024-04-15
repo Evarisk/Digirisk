@@ -574,7 +574,7 @@ class ActionsDigiriskdolibarr
                 $permissiontoadd     = $user->rights->ticket->write;
             }
 
-            if ($action == 'remove_file') {
+            if ($action == 'remove_file' && preg_match('/\bticketdocument\b/', GETPOST('file'))) {
                 $upload_dir         = $conf->digiriskdolibarr->multidir_output[$conf->entity ?? 1];
                 $permissiontodelete = $user->rights->ticket->delete;
             }
@@ -974,6 +974,10 @@ class ActionsDigiriskdolibarr
 				'documentType' => 'listingrisksaction',
 				'picto'        => 'fontawesome_fa-exclamation_fas_#d35968'
 			],
+            'ListingRisksEnvironmentalAction' => [
+                'documentType' => 'listingrisksenvironmentalaction',
+                'picto'        => 'fontawesome_fa-exclamation_fas_#d35968'
+            ],
 			'ListingRisksPhoto' => [
 				'documentType' => 'listingrisksphoto',
 				'picto'        => 'fontawesome_fa-images_fas_#d35968'

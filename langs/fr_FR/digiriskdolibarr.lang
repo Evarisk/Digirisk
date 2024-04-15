@@ -957,15 +957,42 @@ TheDigiriskelement                       = l'élément Digirisk
 DefaultProjectContactType                = Rôle par défaut attribué au projet Document Unique
 DefaultTaskContactType                   = Rôle par défaut attribué aux tâches du projet Document Unique
 RiskListParentView                       = Afficher tous les éléments parents
-RiskListParentViewDescription            = Afficher tous les éléments parents d'un risque dans la liste des risques
+RiskListParentViewDescription            = Afficher tous les éléments parents d'un risque dans la liste des risques et dans les documents
 CategoryOnRisk                           = Afficher les tags/catégories sur les risques
 CategoryOnRiskDescription                = Permet d'attribuer des tags/catégories aux risques et de les afficher - à manipuler avec précaution
+
+
 
 # Stats - Statistiques
 GreyRisk   = Risque faible
 OrangeRisk = Risque à planifier
 RedRisk    = Risque à traiter
 BlackRisk  = Risque inacceptable
+
+
+
+#
+# RiskEnvironmentals - Risques environnementaux
+#
+
+# Data - Donnée
+RiskEnvironmentals = Risques environnementaux
+
+
+
+#
+# ListingRisksEnvironmentalAction - Listing des risques environnementaux action
+#
+
+# Right - Droit
+ListingRisksEnvironmentalActionMin = Listing des risques environnementaux avec actions correctives
+
+# Data - Donnée
+ListingRisksEnvironmentalAction            = Listing des risques environnementaux avec actions correctives
+ListingRisksEnvironmentalActionGenerated   = Génération de listing des risques environnementaux avec actions correctives
+listingrisksenvironmentalaction.odt        = Listing des risques environnementaux avec actions correctives
+listingrisksenvironmentalaction_custom.odt = Listing des risques environnementaux avec actions correctives personnalisé
+
 
 
 #

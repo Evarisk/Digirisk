@@ -462,8 +462,9 @@ class modDigiriskdolibarr extends DolibarrModules
 			"/ecm/digiriskdolibarr/preventionplandocument",
 			"/ecm/digiriskdolibarr/groupmentdocument",
 			"/ecm/digiriskdolibarr/workunitdocument",
-            "/ecm/digiriskdolibarr/listingrisksdocument",
             "/ecm/digiriskdolibarr/listingrisksaction",
+            "/ecm/digiriskdolibarr/listingrisksdocument",
+			"/ecm/digiriskdolibarr/listingrisksenvironmentalaction",
 			"/ecm/digiriskdolibarr/listingrisksphoto",
 			"/ecm/digiriskdolibarr/ticketdocument",
 			"/ecm/digiriskdolibarr/accidentinvestigationdocument",
@@ -569,6 +570,13 @@ class modDigiriskdolibarr extends DolibarrModules
 			$i++ => ['DIGIRISKDOLIBARR_LISTINGRISKSACTION_DEFAULT_MODEL', 'chaine', 'listingrisksaction_odt', '', 0, 'current'],
 			$i++ => ['DIGIRISKDOLIBARR_LISTINGRISKSACTION_SHOW_TASK_DONE', 'integer', 1, '', 0, 'current'],
 
+            // CONST LISTING RISKS ENVIRONMENTAL ACTION
+            $i++ => ['DIGIRISKDOLIBARR_MAIN_AGENDA_ACTIONAUTO_LISTINGRISKSENVIRONMENTALACTION_GENERATE', 'integer', 1, '', 0, 'current'],
+            $i++ => ['DIGIRISKDOLIBARR_LISTINGRISKSENVIRONMENTALACTION_ADDON', 'chaine', 'mod_listingrisksenvironmentalaction_standard', '', 0, 'current'],
+            $i++ => ['DIGIRISKDOLIBARR_LISTINGRISKSENVIRONMENTALACTION_ADDON_ODT_PATH', 'chaine', 'DOL_DOCUMENT_ROOT/custom/digiriskdolibarr/documents/doctemplates/listingrisksdocument/listingrisksenvironmentalaction/', '', 0, 'current'],
+            $i++ => ['DIGIRISKDOLIBARR_LISTINGRISKSENVIRONMENTALACTION_CUSTOM_ADDON_ODT_PATH', 'chaine', 'DOL_DATA_ROOT' . (($conf->entity == 1 ) ? '/' : '/' . $conf->entity . '/') . 'ecm/digiriskdolibarr/listingrisksenvironmentalaction/', '', 0, 'current'],
+            $i++ => ['DIGIRISKDOLIBARR_LISTINGRISKSENVIRONMENTALACTION_DEFAULT_MODEL', 'chaine', 'listingrisksenvironmentalaction_odt', '', 0, 'current'],
+
 			// CONST LISTING RISKS PHOTO
 			$i++ => ['DIGIRISKDOLIBARR_MAIN_AGENDA_ACTIONAUTO_LISTINGRISKSPHOTO_GENERATE', 'integer', 1, '', 0, 'current'],
 			$i++ => ['DIGIRISKDOLIBARR_LISTINGRISKSPHOTO_ADDON', 'chaine', 'mod_listingrisksphoto_standard', '', 0, 'current'],
@@ -583,6 +591,7 @@ class modDigiriskdolibarr extends DolibarrModules
 			$i++ => ['DIGIRISKDOLIBARR_GROUPMENTDOCUMENT_CUSTOM_ADDON_ODT_PATH', 'chaine', 'DOL_DATA_ROOT' . (($conf->entity == 1 ) ? '/' : '/' . $conf->entity . '/') . 'ecm/digiriskdolibarr/groupmentdocument/', '', 0, 'current'],
 			$i++ => ['DIGIRISKDOLIBARR_GROUPMENTDOCUMENT_DEFAULT_MODEL', 'chaine', 'groupmentdocument_odt', '', 0, 'current'],
 			$i++ => ['DIGIRISKDOLIBARR_GROUPMENTDOCUMENT_SHOW_TASK_DONE', 'integer', 1, '', 0, 'current'],
+
 
 			// CONST WORKUNIT DOCUMENT
 			$i++ => ['DIGIRISKDOLIBARR_MAIN_AGENDA_ACTIONAUTO_WORKUNITDOCUMENT_GENERATE', 'integer', 1, '', 0, 'current'],
@@ -1219,7 +1228,25 @@ class modDigiriskdolibarr extends DolibarrModules
 		$this->rights[$r][5] = 'delete'; // In php code, permission will be checked by test if ($user->rights->digiriskdolibarr->level1->level2)
 		$r++;
 
-		/* LISTING RISKS PHOTO PERMISSIONS */
+        /* LISTING RISKS ENVIRONMENTAL ACTION PERMISSIONS */
+        $this->rights[$r][0] = $this->numero . sprintf('%02d', $r + 1); // Permission id (must not be already used)
+        $this->rights[$r][1] = $langs->transnoentities('ReadObjects',$langs->transnoentities('ListingRisksEnvironmentalActionMin')); // Permission label
+        $this->rights[$r][4] = 'listingrisksenvironmentalaction'; // In php code, permission will be checked by test if ($user->rights->digiriskdolibarr->level1->level2)
+        $this->rights[$r][5] = 'read'; // In php code, permission will be checked by test if ($user->rights->digiriskdolibarr->level1->level2)
+        $r++;
+        $this->rights[$r][0] = $this->numero . sprintf('%02d', $r + 1); // Permission id (must not be already used)
+        $this->rights[$r][1] = $langs->transnoentities('CreateObjects', $langs->transnoentities('ListingRisksEnvironmentalActionMin')); // Permission label
+        $this->rights[$r][4] = 'listingrisksenvironmentalaction'; // In php code, permission will be checked by test if ($user->rights->digiriskdolibarr->level1->level2)
+        $this->rights[$r][5] = 'write'; // In php code, permission will be checked by test if ($user->rights->digiriskdolibarr->level1->level2)
+        $r++;
+        $this->rights[$r][0] = $this->numero . sprintf('%02d', $r + 1); // Permission id (must not be already used)
+        $this->rights[$r][1] = $langs->transnoentities('DeleteObjects', $langs->transnoentities('ListingRisksEnvironmentalActionMin')); // Permission label
+        $this->rights[$r][4] = 'listingrisksenvironmentalaction'; // In php code, permission will be checked by test if ($user->rights->digiriskdolibarr->level1->level2)
+        $this->rights[$r][5] = 'delete'; // In php code, permission will be checked by test if ($user->rights->digiriskdolibarr->level1->level2)
+        $r++;
+
+
+        /* LISTING RISKS PHOTO PERMISSIONS */
 		$this->rights[$r][0] = $this->numero . sprintf('%02d', $r + 1); // Permission id (must not be already used)
 		$this->rights[$r][1] = $langs->transnoentities('ReadObjects',$langs->transnoentities('ListingRisksPhotosMin')); // Permission label
 		$this->rights[$r][4] = 'listingrisksphoto'; // In php code, permission will be checked by test if ($user->rights->digiriskdolibarr->level1->level2)
@@ -1893,6 +1920,7 @@ class modDigiriskdolibarr extends DolibarrModules
 		delDocumentModel('groupmentdocument_odt', 'groupmentdocument');
 		delDocumentModel('workunitdocument_odt', 'workunitdocument');
 		delDocumentModel('listingrisksaction_odt', 'listingrisksdocument');
+		delDocumentModel('listingrisksenvironmentalaction_odt', 'listingrisksdocument');
         delDocumentModel('listingrisksdocument_odt', 'listingrisksdocument');
         delDocumentModel('listingrisksphoto_odt', 'listingrisksdocument');
 		delDocumentModel('riskassessmentdocument_odt', 'riskassessmentdocument');
@@ -1911,6 +1939,7 @@ class modDigiriskdolibarr extends DolibarrModules
 		addDocumentModel('workunitdocument_odt', 'workunitdocument', 'ODT templates', 'DIGIRISKDOLIBARR_WORKUNITDOCUMENT_ADDON_ODT_PATH');
         addDocumentModel('listingrisksdocument_odt', 'listingrisksdocument', 'ODT templates', 'DIGIRISKDOLIBARR_LISTINGRISKSDOCUMENT_ADDON_ODT_PATH');
         addDocumentModel('listingrisksaction_odt', 'listingrisksdocument', 'ODT templates', 'DIGIRISKDOLIBARR_LISTINGRISKSACTION_ADDON_ODT_PATH');
+        addDocumentModel('listingrisksenvironmentalaction_odt', 'listingrisksdocument', 'ODT templates', 'DIGIRISKDOLIBARR_LISTINGRISKSENVIRONMENTALACTION_ADDON_ODT_PATH');
         addDocumentModel('listingrisksphoto_odt', 'listingrisksdocument', 'ODT templates', 'DIGIRISKDOLIBARR_LISTINGRISKSPHOTO_ADDON_ODT_PATH');
 		addDocumentModel('riskassessmentdocument_odt', 'riskassessmentdocument', 'ODT templates', 'DIGIRISKDOLIBARR_RISKASSESSMENTDOCUMENT_ADDON_ODT_PATH');
 		addDocumentModel('auditreportdocument_odt', 'auditreportdocument', 'ODT templates', 'DIGIRISKDOLIBARR_AUDITREPORTDOCUMENT_ADDON_ODT_PATH');
@@ -2469,18 +2498,19 @@ class modDigiriskdolibarr extends DolibarrModules
             ];
 
             dolibarr_set_const($this->db, 'DIGIRISKDOLIBARR_CUSTOM_NUM_REF_SET', 1, 'integer', 0, '', $conf->entity);
-        } else if ($conf->global->DIGIRISKDOLIBARR_CUSTOM_NUM_REF_SET > 0 || $conf->global->DIGIRISKDOLIBARR_CUSTOM_NUM_REF_SET < 2) {
-            $objectTypeAndMod['RegisterDocument']     = ['thiazzi', 'RD{0}'];
-            $objectTypeAndMod['ListingRisksDocument'] = ['calypso', 'RLD{0}'];
-            $objectTypeAndMod['AuditReportDocument']  = ['lindberg', 'ARD{0}'];
-            dolibarr_set_const($this->db, 'DIGIRISKDOLIBARR_CUSTOM_NUM_REF_SET', 2, 'integer', 0, '', $conf->entity);
+        } else if ($conf->global->DIGIRISKDOLIBARR_CUSTOM_NUM_REF_SET > 0 || $conf->global->DIGIRISKDOLIBARR_CUSTOM_NUM_REF_SET < 3) {
+            $objectTypeAndMod['RegisterDocument']                = ['thiazzi', 'RD{0}'];
+            $objectTypeAndMod['ListingRisksDocument']            = ['calypso', 'RLD{0}'];
+            $objectTypeAndMod['AuditReportDocument']             = ['lindberg', 'ARD{0}'];
+            $objectTypeAndMod['ListingRisksEnvironmentalAction'] = ['jocaste', 'RLE{0}'];
+            dolibarr_set_const($this->db, 'DIGIRISKDOLIBARR_CUSTOM_NUM_REF_SET', 3, 'integer', 0, '', $conf->entity);
         }
 
         if ($conf->global->DIGIRISKDOLIBARR_CUSTOM_NUM_REF_SET >= 0) {
             foreach($objectTypeAndMod as $type => $mod) {
-                $confNumRef = 'DIGIRISKDOLIBARR_' . strtoupper($type) . '_' . strtoupper($mod[0]) . '_ADDON';
+                $confNumRef    = 'DIGIRISKDOLIBARR_' . strtoupper($type) . '_' . strtoupper($mod[0]) . '_ADDON';
                 $confObjectRef = 'DIGIRISKDOLIBARR_' . strtoupper($type) . '_ADDON';
-                $prefix = $mod[1];
+                $prefix        = $mod[1];
 
                 dolibarr_set_const($this->db, $confNumRef, $prefix, 'chaine', 0, '', $conf->entity);
                 dolibarr_set_const($this->db, $confObjectRef, 'mod_'. strtolower($type) .'_' . $mod[0], 'chaine', 0, '', $conf->entity);

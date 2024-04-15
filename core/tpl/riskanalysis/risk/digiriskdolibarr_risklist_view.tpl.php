@@ -370,6 +370,7 @@ if ( ! preg_match('/(evaluation)/', $sortfield)) {
 		$sql .= " AND fk_element > 0 ";
 		$sql .= " AND e.entity IN (" . $conf->entity . ") ";
 	}
+    $sql .= ' AND r.type = "' . $riskType . '"';
 
 	foreach ($search as $key => $val) {
 		if ($key == 'status' && $search[$key] == -1) continue;
@@ -464,7 +465,7 @@ if ( ! preg_match('/(evaluation)/', $sortfield)) {
 	else $sql                                                                                                                                                 .= " WHERE 1 = 1";
 	$sql                                                                                                                                                      .= " AND evaluation.status = 1";
 	if ( ! $allRisks) {
-		$sql .= " AND r.fk_element =" . $id;
+		$sql .= " AND r.fk_element = " . $id;
 	} else {
 		if (is_array($activeDigiriskElementList) && !empty($activeDigiriskElementList)) {
 			$digiriskElementSqlFilter = '(';
@@ -480,6 +481,7 @@ if ( ! preg_match('/(evaluation)/', $sortfield)) {
 		$sql .= " AND r.fk_element > 0";
 		$sql .= " AND e.entity IN (" . $conf->entity . ")";
 	}
+    $sql .= ' AND r.type = "' . $riskType . '"';
 
 	foreach ($search as $key => $val) {
 		if ($key == 'status' && $search[$key] == -1) continue;
@@ -680,7 +682,7 @@ if ($action != 'list') {
 										<input class="risk-evaluation-seuil" type="hidden" value="undefined">
 										<?php
 										$evaluationMethod        = $advancedCotationMethodArray[0];
-										$evaluationMethodSurvey = $evaluationMethod['option']['variable'];
+										$evaluationMethodSurvey = $evaluationMethod['option'][$risk->type . '_variable'];
 										?>
 										<div class="wpeo-gridlayout cotation-advanced" style="display:none">
 											<input type="hidden" class="digi-method-evaluation-id" value="<?php echo $risk->id ; ?>" />
@@ -898,7 +900,7 @@ if ($action != 'list') {
 								<input class="risk-evaluation-seuil" type="hidden" value="undefined">
 								<?php
 								$evaluationMethod        = $advancedCotationMethodArray[0];
-								$evaluationMethodSurvey = $evaluationMethod['option']['variable'];
+								$evaluationMethodSurvey = $evaluationMethod['option'][$risk->type . '_variable'];
 								?>
 								<div class="wpeo-gridlayout cotation-advanced" style="display:none">
 									<input type="hidden" class="digi-method-evaluation-id" value="<?php echo $risk->id ; ?>" />
@@ -1221,7 +1223,7 @@ while ($i < ($limit ? min($num, $limit) : $num)) {
                             $digiriskElementIds = array_reverse($digiriskElementIds);
 
                             foreach ($digiriskElementIds as $key => $digiriskElementId) {
-                                print str_repeat(' - ', $key + 1) . $activeDigiriskElementList[$digiriskElementId]->getNomUrl(1, 'blank', 0, '', -1, 1) . '</br>';
+                                print str_repeat(' &#160', $key + 1) . '&#x21B3' . $activeDigiriskElementList[$digiriskElementId]->getNomUrl(1, 'blank', 0, '', -1, 1) . '</br>';
                             }
                         }
                     }
