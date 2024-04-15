@@ -1191,7 +1191,7 @@ while ($i < ($limit ? min($num, $limit) : $num)) {
                             $digiriskElementIds = array_reverse($digiriskElementIds);
 
                             foreach ($digiriskElementIds as $key => $digiriskElementId) {
-                                print str_repeat(' - ', $key + 1) . $activeDigiriskElementList[$digiriskElementId]->getNomUrl(1, 'blank', 0, '', -1, 1) . '</br>';
+                                print str_repeat(' &#160', $key + 1) . '&#x21B3' . $activeDigiriskElementList[$digiriskElementId]->getNomUrl(1, 'blank', 0, '', -1, 1) . '</br>';
                             }
                         }
                     }
