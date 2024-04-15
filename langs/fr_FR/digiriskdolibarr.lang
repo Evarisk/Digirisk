@@ -975,6 +975,21 @@ RiskEnvironmentals = Risques environnementaux
 
 
 #
+# ListingRisksEnvironmentalAction - Listing des risques environnementaux action
+#
+
+# Right - Droit
+ListingRisksEnvironmentalActionMin = Listing des risques environnementaux avec actions correctives
+
+# Data - Donnée
+ListingRisksEnvironmentalAction            = Listing des risques environnementaux avec actions correctives
+ListingRisksEnvironmentalActionGenerated   = Génération de listing des risques environnementaux avec actions correctives
+listingrisksenvironmentalaction.odt        = Listing des risques environnementaux avec actions correctives
+listingrisksenvironmentalaction_custom.odt = Listing des risques environnementaux avec actions correctives personnalisé
+
+
+
+#
 # RiskAssessment - Évaluation
 #
 

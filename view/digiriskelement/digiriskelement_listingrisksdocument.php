@@ -67,9 +67,9 @@ $project          = new Project($db);
 $upload_dir = $conf->digiriskdolibarr->multidir_output[isset($conf->entity) ? $conf->entity : 1];
 
 // Security check
-$permissionToRead   = $user->rights->digiriskdolibarr->digiriskstandard->read && ($user->rights->digiriskdolibarr->listingrisksdocument->read || $user->rights->digiriskdolibarr->listingrisksaction->read || $user->rights->digiriskdolibarr->listingrisksphoto->read);
-$permissiontoadd    = $user->rights->digiriskdolibarr->listingrisksdocument->write || $user->rights->digiriskdolibarr->listingrisksaction->write || $user->rights->digiriskdolibarr->listingrisksphoto->write;
-$permissiontodelete = $user->rights->digiriskdolibarr->listingrisksdocument->delete || $user->rights->digiriskdolibarr->listingrisksaction->write || $user->rights->digiriskdolibarr->listingrisksphoto->write;
+$permissionToRead   = $user->rights->digiriskdolibarr->digiriskstandard->read && ($user->rights->digiriskdolibarr->listingrisksdocument->read || $user->rights->digiriskdolibarr->listingrisksaction->read || $user->rights->digiriskdolibarr->listingrisksenvironmentalaction->read || $user->rights->digiriskdolibarr->listingrisksphoto->read);
+$permissiontoadd    = $user->rights->digiriskdolibarr->listingrisksdocument->write || $user->rights->digiriskdolibarr->listingrisksaction->write || $user->rights->digiriskdolibarr->listingrisksenvironmentalaction->write || $user->rights->digiriskdolibarr->listingrisksphoto->write;
+$permissiontodelete = $user->rights->digiriskdolibarr->listingrisksdocument->delete || $user->rights->digiriskdolibarr->listingrisksaction->delete || $user->rights->digiriskdolibarr->listingrisksenvironmentalaction->delete || $user->rights->digiriskdolibarr->listingrisksphoto->delete;
 saturne_check_access($permissionToRead, $object);
 
 /*
@@ -134,12 +134,12 @@ print dol_get_fiche_end();
 $urlSource = $_SERVER["PHP_SELF"] . '?id=' . $object->id;
 if ($type != 'standard') {
 	$objRef    = dol_sanitizeFileName($object->ref);
-	$dirFiles  = ['listingrisksaction/' . $objRef, 'listingrisksphoto/' . $objRef, 'listingrisksdocument/' . $objRef];
+	$dirFiles  = ['listingrisksaction/' . $objRef, 'listingrisksphoto/' . $objRef, 'listingrisksdocument/' . $objRef, 'listingrisksenvironmentalaction/' . $objRef];
 } else {
-    $dirFiles    = ['listingrisksaction', 'listingrisksphoto', 'listingrisksdocument'];
+    $dirFiles   = ['listingrisksaction', 'listingrisksphoto', 'listingrisksdocument', 'listingrisksenvironmentalaction'];
 	$urlSource .= '&type=standard';
 }
-$fileDir    = [$upload_dir . '/' . $dirFiles[0], $upload_dir . '/' . $dirFiles[1], $upload_dir . '/' . $dirFiles[2]];
+$fileDir    = [$upload_dir . '/' . $dirFiles[0], $upload_dir . '/' . $dirFiles[1], $upload_dir . '/' . $dirFiles[2], $upload_dir . '/' . $dirFiles[3]];
 $modulePart = 'digiriskdolibarr:ListingRisksDocument';
 
 print saturne_show_documents($modulePart, $dirFiles, $fileDir, $urlSource, $permissiontoadd, $permissiontodelete, '', 1, 0, 0, 0, 0, '', '', $langs->defaultlang, 0, $object);
