@@ -943,6 +943,7 @@ ShowInheritedRisksInDocumentsDescription = Afficher les risques hérités dans l
 DigiriskElementInheritedRisksList        = Liste des risques hérités
 ConfirmImportSharedRisks                 = Veuillez choisir les risques partagés à importer
 RisksRepartition                         = Répartition des risques par évaluation
+RisksRepartitionByDangerCategories       = Répartition par famille de risque et criticité
 ShowRiskOrigin                           = Afficher la provenance du risque
 ShowRiskOriginDescription                = Afficher la provenance des risques dans les documents (Document Unique, Groupement, Unités de travail, Listing des risques avec actions et avec photos etc.).
 SharedRiskImportWithSuccess              = Risque importé avec succès

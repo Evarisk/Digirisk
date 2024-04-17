@@ -524,9 +524,10 @@ class Risk extends SaturneObject
      */
     public function load_dashboard(): array
     {
-        $arrayRisksByCotation = $this->getRisksByCotation();
+        $arrayRisksByCotation         = $this->getRisksByCotation();
+        $arrayRisksByDangerCategories = $this->getRisksByDangerCategories();
 
-        $array['graphs'] = [$arrayRisksByCotation];
+        $array['graphs'] = [$arrayRisksByCotation, $arrayRisksByDangerCategories];
 
         return $array;
     }
@@ -565,7 +566,7 @@ class Risk extends SaturneObject
             ],
             3 => [
                 'label' => $langs->transnoentities('RedRisk'),
-                'color' => 'e05353'
+                'color' => '#e05353'
             ],
             4 => [
                 'label' => $langs->transnoentities('BlackRisk'),
@@ -577,7 +578,84 @@ class Risk extends SaturneObject
         $array['data']      = $riskAssessment->getRiskAssessmentCategoriesNumber($riskAssessmentList);
 
         return $array;
-	  }
+    }
+
+    /**
+     * Get risks by danger categories
+     *
+     * @return array
+     * @throws Exception
+     */
+    public function getRisksByDangerCategories(): array
+    {
+        global $langs;
+
+        // Graph Title parameters
+        $array['title'] = $langs->transnoentities('RisksRepartitionByDangerCategories');
+        $array['picto'] = $this->picto;
+
+        // Graph parameters
+        $array['width']      = '100%';
+        $array['height']     = 600;
+        $array['type']       = 'bar';
+        $array['showlegend'] = 1;
+        $array['dataset']    = 4;
+        $array['moreCSS']    = 'centpercentimp';
+
+        $array['labels'] = [
+            1 => [
+                'label' => $langs->transnoentities('GreyRisk'),
+                'color' => '#ececec'
+            ],
+            2 => [
+                'label' => $langs->transnoentities('OrangeRisk'),
+                'color' => '#e9ad4f'
+            ],
+            3 => [
+                'label' => $langs->transnoentities('RedRisk'),
+                'color' => '#e05353'
+            ],
+            4 => [
+                'label' => $langs->transnoentities('BlackRisk'),
+                'color' => '#2b2b2b'
+            ]
+        ];
+
+        $dangerCategories = $this->getDangerCategories();
+        foreach ($dangerCategories as $dangerCategory) {
+            $array['data'][$dangerCategory['position']][0] = $dangerCategory['name'];
+            for ($i = 1; $i <= 4; $i++) {
+                switch ($i) {
+                    case 1 :
+                        $cotationStart = '0';
+                        $cotationEnd   = '47';
+                        break;
+                    case 2 :
+                        $cotationStart = '48';
+                        $cotationEnd   = '50';
+                        break;
+                    case 3 :
+                        $cotationStart = '51';
+                        $cotationEnd   = '80';
+                        break;
+                    case 4 :
+                        $cotationStart = '81';
+                        $cotationEnd   = '100';
+                        break;
+                }
+
+                $join            = ' LEFT JOIN ' . MAIN_DB_PREFIX . $this->table_element . ' as r ON r.rowid = t.fk_risk';
+                $riskAssessments = saturne_fetch_all_object_type('RiskAssessment', '', '', 0, 0, ['customsql' => 't.status = ' . RiskAssessment::STATUS_VALIDATED . ' AND r.category = ' . $dangerCategory['position'] . ' AND t.cotation >= ' . $cotationStart . ' AND t.cotation <= ' . $cotationEnd], 'AND', false, $join);
+                if (is_array($riskAssessments) && !empty($riskAssessments)) {
+                    $array['data'][$dangerCategory['position']]['y_combined_' . $array['labels'][$i]['label']] = count($riskAssessments);
+                } else {
+                    $array['data'][$dangerCategory['position']]['y_combined_' . $array['labels'][$i]['label']] = 0;
+                }
+            }
+        }
+
+        return $array;
+    }
 
     /**
      * Write information of trigger description
