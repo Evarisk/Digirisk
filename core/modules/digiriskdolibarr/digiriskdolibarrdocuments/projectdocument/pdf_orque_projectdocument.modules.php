@@ -396,7 +396,8 @@ class pdf_orque_projectdocument
 				// Sort the info by descending order of cotation
 				$objectDoc = array();
 				for ($i = 0; $i < $nblines; $i++) {
-					$risk->fetch($object->lines[$i]->options_fk_risk);
+                    $object->lines[$i]->fetch_optionals();
+                    $risk->fetch($object->lines[$i]->array_options['options_fk_risk']);
 					$lastEvaluation = $riskassessment->fetchFromParent($risk->id, 1);
 					if ($lastEvaluation > 0 && !empty($lastEvaluation) && is_array($lastEvaluation)) {
 						$lastEvaluation = array_shift($lastEvaluation);
