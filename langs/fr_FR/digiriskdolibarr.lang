@@ -648,6 +648,7 @@ ListingRisksDocumentMin = listings des risques avec documents
 
 # Data - Donnée
 ListingRisksDocument            = Listing des risques avec documents
+listingrisksdocument            = Listing des risques avec documents
 ListingRisksDocumentGenerated   = Génération de listing des Risques avec Documents
 listingrisksdocument.odt        = Listing des risques avec documents
 listingrisksdocument_custom.odt = Listing des risques avec documents personnalisé
@@ -661,6 +662,7 @@ ListingRisksPhotosMin = listings des risques avec photos
 
 # Data - Donnée
 ListingRisksPhoto            = Listing des risques avec photos
+listingrisksphoto            = Listing des risques avec photos
 ListingRisksPhotoGenerated   = Génération de listing des Risques avec Photos
 listingrisksphoto.odt        = Listing des risques avec photos
 listingrisksphoto_custom.odt = Listing des risques avec photos personnalisé
@@ -675,6 +677,7 @@ ListingRisksActionsMin = listings des risques avec actions correctives
 
 # Data - Donnée
 ListingRisksAction                        = Listing des risques avec actions correctives
+listingrisksaction                        = Listing des risques avec actions correctives
 ListingRisksActionGenerated               = Génération de listing des Risques avec Actions Correctives
 listingrisksaction.odt                    = Listing des risques avec actions correctives
 listingrisksaction_custom.odt             = Listing des risques avec actions correctives personnalisé
@@ -696,7 +699,7 @@ RiskAssessmentDocument = Document unique
 RiskAssessmentDocumentGenerated                           = Génération du Document Unique
 AuditStartDate                                            = Date de début d'audit
 AuditEndDate                                              = Date de fin d'audit
-Recipient                                                 = Destinataire
+Recipient                                                 = Destinataire(s)
 ImportantNote                                             = Remarque importante
 SitePlans                                                 = Localisation des plans
 SetStartEndDateBeforeSendEmail                            = Définissez la date de début et la date de fin d'audit sur cette page pour envoyer un email
@@ -990,6 +993,7 @@ ListingRisksEnvironmentalActionMin = Listing des risques environnementaux avec a
 
 # Data - Donnée
 ListingRisksEnvironmentalAction            = Listing des risques environnementaux avec actions correctives
+listingrisksenvironmentalaction            = Listing des risques environnementaux avec actions correctives
 ListingRisksEnvironmentalActionGenerated   = Génération de listing des risques environnementaux avec actions correctives
 listingrisksenvironmentalaction.odt        = Listing des risques environnementaux avec actions correctives
 listingrisksenvironmentalaction_custom.odt = Listing des risques environnementaux avec actions correctives personnalisé

@@ -233,14 +233,21 @@ class InterfaceDigiriskdolibarrTriggers extends DolibarrTriggers
             case 'LISTINGRISKSENVIRONMENTALACTION_GENERATE' :
             case 'WORKUNITDOCUMENT_GENERATE' :
 			case 'GROUPMENTDOCUMENT_GENERATE' :
-
                 if ($object->parent_type == 'groupment' || $object->parent_type == 'workunit' || preg_match('/listingrisks/', $object->parent_type)) {
                     $object->parent_type = 'digiriskelement';
                 }
 
+                $label = ucfirst(get_class($object));
+                if (dol_strlen(GETPOST('model')) > 0) {
+                    $labelBeforeCheck = strstr(GETPOST('model'), '_odt:', true);
+                    if ($langs->trans($labelBeforeCheck) != $labelBeforeCheck) {
+                        $label = $labelBeforeCheck;
+                    }
+                }
+
                 $actioncomm->elementtype = $object->parent_type . '@digiriskdolibarr';
 
-                $actioncomm->label       = $langs->trans('ObjectGenerateTrigger', $langs->transnoentities(ucfirst(get_class($object))), $object->ref);
+                $actioncomm->label       = $langs->trans('ObjectGenerateTrigger', $langs->transnoentities($label), $object->ref);
                 $actioncomm->elementid   = $object->parent_id;
                 $actioncomm->fk_element  = $object->parent_id;
 
