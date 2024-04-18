@@ -616,13 +616,11 @@ class Risk extends SaturneObject
         $join             = ' LEFT JOIN ' . MAIN_DB_PREFIX . $this->table_element . ' as r ON r.rowid = t.fk_risk';
         foreach ($dangerCategories as $dangerCategory) {
             $array['data'][$dangerCategory['position']][0] = $dangerCategory['name'];
-            for ($i = 1; $i <= 4; $i++) {
-                $riskAssessments = saturne_fetch_all_object_type('RiskAssessment', '', '', 0, 0, ['customsql' => 't.status = ' . RiskAssessment::STATUS_VALIDATED . ' AND r.category = ' . $dangerCategory['position']], 'AND', false, $join);
-                if (is_array($riskAssessments) && !empty($riskAssessments)) {
-                    $array['data'][$dangerCategory['position']]['y_combined_' . $array['labels'][$i]['label']] = count($riskAssessments);
-                } else {
-                    $array['data'][$dangerCategory['position']]['y_combined_' . $array['labels'][$i]['label']] = 0;
-                }
+            $riskAssessments                               = saturne_fetch_all_object_type('RiskAssessment', '', '', 0, 0, ['customsql' => 't.status = ' . RiskAssessment::STATUS_VALIDATED . ' AND r.category = ' . $dangerCategory['position']], 'AND', false, $join);
+            if (is_array($riskAssessments) && !empty($riskAssessments)) {
+                $array['data'][$dangerCategory['position']]['y_combined_' . $array['labels'][1]['label']] = count($riskAssessments);
+            } else {
+                $array['data'][$dangerCategory['position']]['y_combined_' . $array['labels'][1]['label']] = 0;
             }
         }
 
