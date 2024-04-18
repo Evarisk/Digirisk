@@ -41,6 +41,13 @@ function digiriskelement_prepare_head(DigiriskElement $object)
     $head = [];
 
     if ($object->id > 0) {
+        if ($user->rights->digiriskdolibarr->digiriskelement->read) {
+            $head[$h][0] = dol_buildpath('/digiriskdolibarr/view/digiriskelement/digiriskelement_informations.php', 1) . '?id=' . $object->id;
+            $head[$h][1] = $conf->browser->layout != 'phone' ? '<i class="fas fa-info-circle pictofixedwidth"></i>' . $langs->trans('DigiriskStandardInformation') : '<i class="fas fa-info-circle pictofixedwidth"></i>';
+            $head[$h][2] = 'elementInformations';
+            $h++;
+        }
+
         if ($user->rights->digiriskdolibarr->risk->read) {
             $head[$h][0] = dol_buildpath('/digiriskdolibarr/view/digiriskelement/digiriskelement_risk.php', 1) . '?id=' . $object->id;
             $head[$h][1] = $conf->browser->layout != 'phone' ? '<i class="fas fa-exclamation-triangle pictofixedwidth"></i>' . $langs->trans('Risks') : '<i class="fas fa-exclamation-triangle"></i>';
