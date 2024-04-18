@@ -110,6 +110,8 @@ class Risk extends SaturneObject
 	public $lastEvaluation;
 	public $appliedOn;
 
+    private $cotations = [];
+
 	/**
 	 * Constructor.
 	 *
@@ -117,6 +119,35 @@ class Risk extends SaturneObject
 	 */
 	public function __construct(DoliDB $db)
 	{
+        global $langs;
+
+        $this->cotations = [
+            1 => [
+                'label' => $langs->transnoentities('GreyRisk'),
+                'color' => '#ececec',
+                'start' => 0,
+                'end'   => 47
+            ],
+            2 => [
+                'label' => $langs->transnoentities('OrangeRisk'),
+                'color' => '#e9ad4f',
+                'start' => 48,
+                'end'   => 50
+            ],
+            3 => [
+                'label' => $langs->transnoentities('RedRisk'),
+                'color' => '#e05353',
+                'start' => 51,
+                'end'   => 80
+            ],
+            4 => [
+                'label' => $langs->transnoentities('BlackRisk'),
+                'color' => '#2b2b2b',
+                'start' => 81,
+                'end'   => 100
+            ]
+        ];
+
 		parent::__construct($db, $this->module, $this->element);
 	}
 
@@ -524,11 +555,18 @@ class Risk extends SaturneObject
      */
     public function load_dashboard(): array
     {
-        $arrayRisksByCotation              = $this->getRisksByCotation();
-        $arrayRisksByDangerCategories      = $this->getRisksByDangerCategories();
-        $arrayTotalRisksByDangerCategories = $this->getTotalRisksByDangerCategories();
+        $urlTab = $_SERVER['PHP_SELF'];
 
-        $array['graphs'] = [$arrayRisksByCotation, $arrayRisksByDangerCategories, $arrayTotalRisksByDangerCategories];
+        $arrayRisksByCotation = $this->getRisksByCotation();
+
+        if (preg_match('/digiriskelement_informations/', $urlTab)) {
+            $arrayRisksByDangerCategories = $this->getRisksByDangerCategories('single');
+        } else {
+            $arrayRisksByDangerCategories      = $this->getRisksByDangerCategories();
+            $arrayTotalRisksByDangerCategories = $this->getTotalRisksByDangerCategories();
+        }
+
+        $array['graphs'] = [$arrayRisksByCotation, $arrayRisksByDangerCategories, $arrayTotalRisksByDangerCategories ?? []];
 
         return $array;
     }
@@ -555,25 +593,7 @@ class Risk extends SaturneObject
         $array['type']       = 'pie';
         $array['showlegend'] = $conf->browser->layout == 'phone' ? 1 : 2;
         $array['dataset']    = 1;
-
-        $array['labels'] = [
-            1 => [
-                'label' => $langs->transnoentities('GreyRisk'),
-                'color' => '#ececec'
-            ],
-            2 => [
-                'label' => $langs->transnoentities('OrangeRisk'),
-                'color' => '#e9ad4f'
-            ],
-            3 => [
-                'label' => $langs->transnoentities('RedRisk'),
-                'color' => '#e05353'
-            ],
-            4 => [
-                'label' => $langs->transnoentities('BlackRisk'),
-                'color' => '#2b2b2b'
-            ]
-        ];
+        $array['labels']     = $this->cotations;
 
         $riskAssessmentList = $riskAssessment->fetchAll('', '', 0, 0, ['customsql' => 'status = 1']);
         $array['data']      = $riskAssessment->getRiskAssessmentCategoriesNumber($riskAssessmentList);
@@ -584,12 +604,20 @@ class Risk extends SaturneObject
     /**
      * Get risks by danger categories
      *
+     * @param  String    $type Empty to get risk of every element or 'single' to get risk for the current element
+     *
      * @return array
      * @throws Exception
      */
-    public function getRisksByDangerCategories(): array
+    public function getRisksByDangerCategories($type = ''): array
     {
         global $langs;
+
+        $filter = '';
+        if ($type == 'single') {
+            $id     = GETPOST('id');
+            $filter = 'r.fk_element = ' . $id . ' AND ';
+        }
 
         // Graph Title parameters
         $array['title'] = $langs->transnoentities('RisksRepartitionByDangerCategories');
@@ -602,35 +630,16 @@ class Risk extends SaturneObject
         $array['showlegend'] = 1;
         $array['dataset']    = 4;
         $array['moreCSS']    = 'centpercentimp';
-
-        $array['labels'] = [
-            1 => [
-                'label' => $langs->transnoentities('GreyRisk'),
-                'color' => '#ececec'
-            ],
-            2 => [
-                'label' => $langs->transnoentities('OrangeRisk'),
-                'color' => '#e9ad4f'
-            ],
-            3 => [
-                'label' => $langs->transnoentities('RedRisk'),
-                'color' => '#e05353'
-            ],
-            4 => [
-                'label' => $langs->transnoentities('BlackRisk'),
-                'color' => '#2b2b2b'
-            ]
-        ];
+        $array['labels']     = $this->cotations;
 
         $dangerCategories = $this->getDangerCategories();
         $join             = ' LEFT JOIN ' . MAIN_DB_PREFIX . $this->table_element . ' as r ON r.rowid = t.fk_risk';
-        $cotations        = [1 => [0, 47], 2 => [48,50], 3 => [51,80], 4 => [81,100]];
         foreach ($dangerCategories as $dangerCategory) {
             $array['data'][$dangerCategory['position']][0] = $dangerCategory['name'];
             for ($i = 1; $i <= 4; $i++) {
-                $cotationStart   = $cotations[$i][0];
-                $cotationEnd     = $cotations[$i][1];
-                $riskAssessments = saturne_fetch_all_object_type('RiskAssessment', '', '', 0, 0, ['customsql' => 't.status = ' . RiskAssessment::STATUS_VALIDATED . ' AND r.category = ' . $dangerCategory['position'] . ' AND t.cotation >= ' . $cotationStart . ' AND t.cotation <= ' . $cotationEnd], 'AND', false, $join);
+                $cotationStart   = $this->cotations[$i]['start'];
+                $cotationEnd     = $this->cotations[$i]['end'];
+                $riskAssessments = saturne_fetch_all_object_type('RiskAssessment', '', '', 0, 0, ['customsql' => $filter . 't.status = ' . RiskAssessment::STATUS_VALIDATED . ' AND r.category = ' . $dangerCategory['position'] . ' AND t.cotation >= ' . $cotationStart . ' AND t.cotation <= ' . $cotationEnd], 'AND', false, $join);
                 if (is_array($riskAssessments) && !empty($riskAssessments)) {
                     $array['data'][$dangerCategory['position']]['y_combined_' . $array['labels'][$i]['label']] = count($riskAssessments);
                 } else {
