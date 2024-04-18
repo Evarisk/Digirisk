@@ -527,10 +527,11 @@ class Risk extends SaturneObject
      */
     public function load_dashboard(): array
     {
-        $arrayRisksByCotation         = $this->getRisksByCotation();
-        $arrayRisksByDangerCategories = $this->getRisksByDangerCategories();
+        $arrayRisksByCotation              = $this->getRisksByCotation();
+        $arrayRisksByDangerCategories      = $this->getRisksByDangerCategories();
+        $arrayTotalRisksByDangerCategories = $this->getTotalRisksByDangerCategories();
 
-        $array['graphs'] = [$arrayRisksByCotation, $arrayRisksByDangerCategories];
+        $array['graphs'] = [$arrayRisksByCotation, $arrayRisksByDangerCategories, $arrayTotalRisksByDangerCategories];
 
         return $array;
     }
@@ -633,6 +634,52 @@ class Risk extends SaturneObject
                 $cotationStart   = $cotations[$i][0];
                 $cotationEnd     = $cotations[$i][1];
                 $riskAssessments = saturne_fetch_all_object_type('RiskAssessment', '', '', 0, 0, ['customsql' => 't.status = ' . RiskAssessment::STATUS_VALIDATED . ' AND r.category = ' . $dangerCategory['position'] . ' AND t.cotation >= ' . $cotationStart . ' AND t.cotation <= ' . $cotationEnd], 'AND', false, $join);
+                if (is_array($riskAssessments) && !empty($riskAssessments)) {
+                    $array['data'][$dangerCategory['position']]['y_combined_' . $array['labels'][$i]['label']] = count($riskAssessments);
+                } else {
+                    $array['data'][$dangerCategory['position']]['y_combined_' . $array['labels'][$i]['label']] = 0;
+                }
+            }
+        }
+
+        return $array;
+    }
+
+    /**
+     * Get total risks by danger categories
+     *
+     * @return array
+     * @throws Exception
+     */
+    public function getTotalRisksByDangerCategories(): array
+    {
+        global $langs;
+
+        // Graph Title parameters
+        $array['title'] = $langs->transnoentities('TotalRisksRepartition');
+        $array['picto'] = $this->picto;
+
+        // Graph parameters
+        $array['width']      = '100%';
+        $array['height']     = 600;
+        $array['type']       = 'bar';
+        $array['showlegend'] = 0;
+        $array['dataset']    = 2;
+        $array['moreCSS']    = 'centpercentimp';
+
+        $array['labels'] = [
+            1 => [
+                'label' => $langs->transnoentities('RisksNumber'),
+                'color' => '#A1467E'
+            ]
+        ];
+
+        $dangerCategories = $this->getDangerCategories();
+        $join             = ' LEFT JOIN ' . MAIN_DB_PREFIX . $this->table_element . ' as r ON r.rowid = t.fk_risk';
+        foreach ($dangerCategories as $dangerCategory) {
+            $array['data'][$dangerCategory['position']][0] = $dangerCategory['name'];
+            for ($i = 1; $i <= 4; $i++) {
+                $riskAssessments = saturne_fetch_all_object_type('RiskAssessment', '', '', 0, 0, ['customsql' => 't.status = ' . RiskAssessment::STATUS_VALIDATED . ' AND r.category = ' . $dangerCategory['position']], 'AND', false, $join);
                 if (is_array($riskAssessments) && !empty($riskAssessments)) {
                     $array['data'][$dangerCategory['position']]['y_combined_' . $array['labels'][$i]['label']] = count($riskAssessments);
                 } else {
