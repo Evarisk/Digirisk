@@ -622,29 +622,13 @@ class Risk extends SaturneObject
         ];
 
         $dangerCategories = $this->getDangerCategories();
+        $join             = ' LEFT JOIN ' . MAIN_DB_PREFIX . $this->table_element . ' as r ON r.rowid = t.fk_risk';
+        $cotations        = [1 => [0, 47], 2 => [48,50], 3 => [51,80], 4 => [81,100]];
         foreach ($dangerCategories as $dangerCategory) {
             $array['data'][$dangerCategory['position']][0] = $dangerCategory['name'];
             for ($i = 1; $i <= 4; $i++) {
-                switch ($i) {
-                    case 1 :
-                        $cotationStart = '0';
-                        $cotationEnd   = '47';
-                        break;
-                    case 2 :
-                        $cotationStart = '48';
-                        $cotationEnd   = '50';
-                        break;
-                    case 3 :
-                        $cotationStart = '51';
-                        $cotationEnd   = '80';
-                        break;
-                    case 4 :
-                        $cotationStart = '81';
-                        $cotationEnd   = '100';
-                        break;
-                }
-
-                $join            = ' LEFT JOIN ' . MAIN_DB_PREFIX . $this->table_element . ' as r ON r.rowid = t.fk_risk';
+                $cotationStart   = $cotations[$i][0];
+                $cotationEnd     = $cotations[$i][1];
                 $riskAssessments = saturne_fetch_all_object_type('RiskAssessment', '', '', 0, 0, ['customsql' => 't.status = ' . RiskAssessment::STATUS_VALIDATED . ' AND r.category = ' . $dangerCategory['position'] . ' AND t.cotation >= ' . $cotationStart . ' AND t.cotation <= ' . $cotationEnd], 'AND', false, $join);
                 if (is_array($riskAssessments) && !empty($riskAssessments)) {
                     $array['data'][$dangerCategory['position']]['y_combined_' . $array['labels'][$i]['label']] = count($riskAssessments);
