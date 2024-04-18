@@ -17,7 +17,7 @@
  */
 
 /**
- *  \file    core/modules/digiriskdolibarr/digiriskdolibarrdocuments/mod_listingrisksenvironmentalaction_standard.php
+ *  \file    core/modules/digiriskdolibarr/digiriskdolibarrdocuments/listingrisksenvironmentalaction/mod_listingrisksenvironmentalaction_standard.php
  *  \ingroup digiriskdolibarr
  *  \brief   File of class to manage listingrisksenvironmentalaction numbering rules standard
  */

@@ -17,7 +17,7 @@
  */
 
 /**
- *	\file    core/modules/digiriskdolibarr/digiriskdolibarrdocuments/listingrisksdocument/doc_listingrisksenvironmentalaction_odt.modules.php
+ *	\file    core/modules/digiriskdolibarr/digiriskdolibarrdocuments/listingrisksenvironmentaldocument/doc_listingrisksenvironmentalaction_odt.modules.php
  *	\ingroup digiriskdolibarr
  *	\brief   File of class to build ODT documents for digiriskdolibarr
  */

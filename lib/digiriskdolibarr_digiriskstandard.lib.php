@@ -73,6 +73,13 @@ function digiriskstandard_prepare_head(DigiriskStandard $object): array
         $h++;
     }
 
+    if ($user->rights->digiriskdolibarr->listingrisksenvironmentalaction->read) {
+        $head[$h][0] = dol_buildpath('/digiriskdolibarr/view/digiriskelement/digiriskelement_environment.php', 1) . '?type=standard';
+        $head[$h][1] = $conf->browser->layout != 'phone' ? '<i class="fas fa-exclamation pictofixedwidth"></i>' . $langs->trans('Environment') : '<i class="fas fa-exclamation"></i>';
+        $head[$h][2] = 'elementEnvironment';
+        $h++;
+    }
+
     if ($user->rights->digiriskdolibarr->riskassessmentdocument->read) {
         $head[$h][0] = dol_buildpath('/digiriskdolibarr/view/digiriskstandard/digiriskstandard_riskassessmentdocument.php', 1);
         $head[$h][1] = $conf->browser->layout != 'phone' ? '<i class="fas fa-file-alt pictofixedwidth"></i>' . $langs->trans("RiskAssessmentDocument") : '<i class="fas fa-file-alt"></i>';

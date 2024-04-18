@@ -145,6 +145,7 @@ LegalDisplaysMin = Affichages Légaux
 
 # Data - Donnée
 LegalDisplay             = Affichage légal
+Legaldisplay             = Affichage légal
 HowToSetDataLegalDisplay = Pour configurer les données sur l'affichage légal, aller dans Accueil - Configuration - Société/Organisation - Sécurité
 
 LegalDisplayDocumentGenerated       = Génération de l'affichage légal
@@ -184,6 +185,7 @@ InformationsSharingsMin = Diffusions d'Informations
 
 # Data - Donnée
 InformationsSharing                  = Diffusion d'informations
+Informationssharing                  = Diffusion d'informations
 InformationsSharingDocumentGenerated = Génération de Diffusion d'Informations
 HowToSetDataInformationsSharing      = Pour configurer les données sur la diffusion d'informations, aller dans Accueil - Configuration - Société/Organisation - Social
 ConfigureSecurityAndSocialData       = Configurer les données de la société
@@ -226,6 +228,7 @@ PreventionPlan                                        = Plan de prévention
 Preventionplan                                        = Plan de prévention
 ThePreventionplan                                     = le plan de prévention
 PreventionPlanDocument                                = Plan de prévention
+Preventionplandocument                                = Plan de prévention
 PreventionPlanDocumentGenerated                       = Génération du plan de prévention
 PreventionPlanList                                    = Liste des plans de prévention
 PreventionPlanLine                                    = risque(s)
@@ -324,6 +327,7 @@ FirePermit                                        = Permis de feu
 Firepermit                                        = Permis de feu
 TheFirepermit                                     = le permis de feu
 FirePermitDocument                                = Permis de feu
+Firepermitdocument                                = Permis de feu
 FirePermitDocumentGenerated                       = Génération de Permis de Feu
 FirePermitCreated                                 = Création de Permis de Feu
 FirePermitModified                                = Modification de Permis de Feu
@@ -545,6 +549,7 @@ TheAccident                       = l'accident
 AccidentInvestigation             = Enquête accident
 Accident_investigation            = Enquête accident
 AccidentInvestigationDocument     = Document d'enquête accident
+Accidentinvestigationdocument     = Document d'enquête accident
 accidentinvestigationdocument.odt = Enquête accident
 NewAccidentInvestigation          = Nouvelle enquête accident
 UpdateAccidentInvestigation       = Modifier une enquête accident
@@ -648,6 +653,7 @@ ListingRisksDocumentMin = listings des risques avec documents
 
 # Data - Donnée
 ListingRisksDocument            = Listing des risques avec documents
+Listingrisksdocument            = Listing des risques avec documents
 ListingRisksDocumentGenerated   = Génération de listing des Risques avec Documents
 listingrisksdocument.odt        = Listing des risques avec documents
 listingrisksdocument_custom.odt = Listing des risques avec documents personnalisé
@@ -661,6 +667,7 @@ ListingRisksPhotosMin = listings des risques avec photos
 
 # Data - Donnée
 ListingRisksPhoto            = Listing des risques avec photos
+Listingrisksphoto            = Listing des risques avec photos
 ListingRisksPhotoGenerated   = Génération de listing des Risques avec Photos
 listingrisksphoto.odt        = Listing des risques avec photos
 listingrisksphoto_custom.odt = Listing des risques avec photos personnalisé
@@ -675,6 +682,7 @@ ListingRisksActionsMin = listings des risques avec actions correctives
 
 # Data - Donnée
 ListingRisksAction                        = Listing des risques avec actions correctives
+Listingrisksaction                        = Listing des risques avec actions correctives
 ListingRisksActionGenerated               = Génération de listing des Risques avec Actions Correctives
 listingrisksaction.odt                    = Listing des risques avec actions correctives
 listingrisksaction_custom.odt             = Listing des risques avec actions correctives personnalisé
@@ -691,8 +699,8 @@ ShowTaskDoneListingRisksActionDescription = Permettre d'afficher ou non les tâc
 RiskAssessmentDocumentsMin = Documents Uniques
 
 # Data - Donnée
-RiskAssessmentDocument = Document unique
-
+RiskAssessmentDocument                                    = Document unique
+Riskassessmentdocument                                    = Document unique
 RiskAssessmentDocumentGenerated                           = Génération du Document Unique
 AuditStartDate                                            = Date de début d'audit
 AuditEndDate                                              = Date de fin d'audit
@@ -732,6 +740,7 @@ RiskAssessmentDocumentContent = Veuillez trouver ci-joint le ZIP et le document 
 
 # Data - Donnée
 AuditReportDocument     = Rapport d'audit
+Auditreportdocument     = Rapport d'audit
 AuditReportDocumentsMin = rapports d'audit
 auditreportdocument.odt = Rapport d'audit
 
@@ -745,6 +754,7 @@ auditreportdocument.odt = Rapport d'audit
 
 # Data - Donnée
 GroupmentDocument                        = Fiche de Groupement
+Groupmentdocument                        = Fiche de Groupement
 GroupmentDocumentGenerated               = Génération de fiche de Groupement
 groupmentdocument.odt                    = Fiche de Groupement
 groupmentdocument_custom.odt             = Fiche de Groupement personnalisée
@@ -759,6 +769,7 @@ ShowTaskDoneGroupmentDocumentDescription = Permettre d'afficher ou non les tâch
 
 # Data - Donnée
 WorkUnitDocument                        = Fiche d'Unité de travail
+Workunitdocument                        = Fiche d'Unité de travail
 WorkUnitDocumentGenerated               = Génération de fiche d'Unité de Travail
 workunitdocument.odt                    = Fiche d'Unité de travail
 workunitdocument_custom.odt             = Fiche d'Unité de travail personnalisée
@@ -990,6 +1001,7 @@ ListingRisksEnvironmentalActionMin = Listing des risques environnementaux avec a
 
 # Data - Donnée
 ListingRisksEnvironmentalAction            = Listing des risques environnementaux avec actions correctives
+Listingrisksenvironmentalaction            = Listing des risques environnementaux avec actions correctives
 ListingRisksEnvironmentalActionGenerated   = Génération de listing des risques environnementaux avec actions correctives
 listingrisksenvironmentalaction.odt        = Listing des risques environnementaux avec actions correctives
 listingrisksenvironmentalaction_custom.odt = Listing des risques environnementaux avec actions correctives personnalisé
@@ -1356,6 +1368,7 @@ TicketPublicInterfaceOtherName = Interface de gestion des registres SST et DGI
 
 # Data - Donnée
 TicketDocument            = Fiche du ticket
+Ticketdocument            = Fiche du ticket
 ticketdocument.odt        = Fiche du ticket
 ticketdocument_custom.odt = Fiche personnalisée du ticket
 ticketdocument_events.odt = Fiche du ticket avec événements
@@ -1373,6 +1386,7 @@ DocumentModelOrque              = Modèles de document de rapport prévisionnel 
 # Register Document
 
 RegisterDocument     = Registre des accidents bénins
+Registerdocument     = Registre des accidents bénins
 RegisterDocumentsMin = registres des accidents bénins
 registerdocument.odt = Registre des accidents bénins
 
