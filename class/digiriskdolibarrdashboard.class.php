@@ -79,8 +79,8 @@ class DigiriskDolibarrDashboard
         $dashboardData['accident']               = ($loadAccident) ? $accident->load_dashboard() : [];
         $dashboardData['evaluator']              = ($loadEvaluator) ? $evaluator->load_dashboard() : [];
         $dashboardData['digiriskresources']      = ($loadDigiriskResources) ? $digiriskResources->load_dashboard() : [];
-        $dashboardData['risk']                   = ($loadRisk) ? $risk->load_dashboard() : [];
         $dashboardData['task']                   = ($loadTask) ? $digiriskTask->load_dashboard($conf->global->DIGIRISKDOLIBARR_DU_PROJECT) : [];
+        $dashboardData['risk']                   = ($loadRisk) ? $risk->load_dashboard() : [];
 
         return $dashboardData;
     }
