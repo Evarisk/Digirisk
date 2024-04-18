@@ -614,8 +614,7 @@ if ($conf->global->DIGIRISKDOLIBARR_CONF_BACKWARD_COMPATIBILITY == 0) {
 
 	// CONST LISTING RISKS ACTION
 	dolibarr_set_const($db, 'MAIN_AGENDA_ACTIONAUTO_LISTINGRISKSACTION_CREATE', 1, 'integer', 0, '', $conf->entity);
-	dolibarr_set_const($db, 'DIGIRISKDOLIBARR_LISTINGRISKSACTION_ADDON',
-        'mod_listingrisksenvironmentalaction_standard', 'chaine', 0, '', $conf->entity);
+	dolibarr_set_const($db, 'DIGIRISKDOLIBARR_LISTINGRISKSACTION_ADDON', 'mod_listingrisksenvironmentalaction_standard', 'chaine', 0, '', $conf->entity);
 	dolibarr_set_const($db, 'DIGIRISKDOLIBARR_LISTINGRISKSACTION_ADDON_ODT_PATH', 'DOL_DOCUMENT_ROOT/custom/digiriskdolibarr/documents/doctemplates/listingrisksaction/', 'chaine', 0, '', $conf->entity);
 	dolibarr_set_const($db, 'DIGIRISKDOLIBARR_LISTINGRISKSACTION_CUSTOM_ADDON_ODT_PATH', 'DOL_DATA_ROOT/ecm/digiriskdolibarr/listingrisksaction/', 'chaine', 0, '', $conf->entity);
 	dolibarr_set_const($db, 'DIGIRISKDOLIBARR_LISTINGRISKSACTION_DEFAULT_MODEL', 'listingrisksaction_odt', 'chaine', 0, '', $conf->entity);

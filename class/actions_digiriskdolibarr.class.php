@@ -216,7 +216,7 @@ class ActionsDigiriskdolibarr
                 $fileDir    = $upload_dir . '/' . $dirFiles;
                 $urlSource  = $_SERVER['PHP_SELF'] . '?id=' . $object->id;
 
-                $out = saturne_show_documents('digiriskdolibarr:TicketDocument', $dirFiles, $fileDir, $urlSource, $user->rights->ticket->write, $user->rights->ticket->delete, getDolGlobalString('DIGIRISKDOLIBARR_TICKET_DEFAULT_MODEL'), 1, 0, 0, 0, '', '', '', '', '', $object); ?>
+                $out = saturne_show_documents('digiriskdolibarr:TicketDocument', $dirFiles, $fileDir, $urlSource, $user->rights->ticket->write, $user->rights->ticket->delete, getDolGlobalString('DIGIRISKDOLIBARR_TICKETDOCUMENT_DEFAULT_MODEL'), 1, 0, 0, 0, '', '', '', '', '', $object); ?>
 
                 <script>
                     jQuery('.fichehalfleft .div-table-responsive-no-min').first().append(<?php echo json_encode($out); ?>);

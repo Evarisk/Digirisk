@@ -93,8 +93,6 @@ $task             = new SaturneTask($db);
 $extrafields      = new ExtraFields($db);
 $DUProject        = new Project($db);
 
-$risk->type = $riskType;
-
 $numberingModuleName = [
 	'riskanalysis/' . $risk->element       => $conf->global->DIGIRISKDOLIBARR_RISK_ADDON,
 	'riskanalysis/' . $evaluation->element => $conf->global->DIGIRISKDOLIBARR_RISKASSESSMENT_ADDON,
