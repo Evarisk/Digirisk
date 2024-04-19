@@ -528,4 +528,56 @@ class DigiriskElement extends SaturneObject
 
         return $ret;
     }
+
+    public function load_dashboard() : array
+    {
+        $arrayRisksByGp = $this->getRisksByGp();
+
+        $array['graphs'] = [$arrayRisksByGp];
+
+        return $array;
+    }
+
+    public function getRisksByGp(): array
+    {
+        global $conf, $langs;
+
+        $risk = new Risk($this->db);
+
+        $id = GETPOST('id');
+
+        $this->fetch($id);
+
+        // Graph Title parameters
+        $array['title'] = $langs->transnoentities('AddStatsGP', $this->ref, $this->label);
+        $array['picto'] = $this->picto;
+
+        // Graph parameters
+        $array['width']      = '100%';
+        $array['height']     = 400;
+        $array['type']       = 'pie';
+        $array['showlegend'] = $conf->browser->layout == 'phone' ? 1 : 2;
+        $array['dataset']    = 1;
+
+        $join     = ' LEFT JOIN ' . MAIN_DB_PREFIX . $risk->table_element . ' as r ON r.rowid = t.fk_risk';
+        $elements = $this->fetchAll();
+        $children = recurse_tree($id, 0, $elements);
+        array_walk_recursive($children, function ($item) use (&$ids) {
+            if (is_object($item)) {
+                $ids[$item->id] = $item->label;
+            }
+        }, $ids);
+        $ids[$id] = $this->label;
+
+        foreach ($ids as $elementId => $label) {
+            $array['labels'][$elementId] = [
+                'label' => $label,
+                'color' => '#' . randomColor()
+            ];
+            $risks                     = saturne_fetch_all_object_type('RiskAssessment', '', '', 0, 0, ['customsql' => 'r.fk_element = ' . $elementId . ' AND t.status = ' . RiskAssessment::STATUS_VALIDATED], 'AND', false, $join);
+            $array['data'][$elementId] = count($risks);
+        }
+
+        return $array;
+    }
 }

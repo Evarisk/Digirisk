@@ -67,6 +67,7 @@ class DigiriskDolibarrDashboard
         $loadDigiriskResources      = array_key_exists('loadDigiriskResources', $moreParams) ? $moreParams['loadDigiriskResources'] : 1;
         $loadRisk                   = array_key_exists('loadRisk', $moreParams) ? $moreParams['loadRisk'] : 1;
         $loadTask                   = array_key_exists('loadTask', $moreParams) ? $moreParams['loadTask'] : 1;
+        $loadDigiriskElement        = array_key_exists('DigiriskElement', $moreParams) ? $moreParams['DigiriskElement'] : 1;
 
         $riskAssessmentDocument = new RiskAssessmentDocument($this->db);
         $accident               = new Accident($this->db);
@@ -74,11 +75,13 @@ class DigiriskDolibarrDashboard
         $digiriskResources      = new DigiriskResources($this->db);
         $risk                   = new Risk($this->db);
         $digiriskTask           = new SaturneTask($this->db);
+        $digiriskElement        = new DigiriskElement($this->db);
 
         $dashboardData['riskassessmentdocument'] = ($loadRiskAssessmentDocument) ? $riskAssessmentDocument->load_dashboard() : [];
         $dashboardData['accident']               = ($loadAccident) ? $accident->load_dashboard() : [];
         $dashboardData['evaluator']              = ($loadEvaluator) ? $evaluator->load_dashboard() : [];
         $dashboardData['digiriskresources']      = ($loadDigiriskResources) ? $digiriskResources->load_dashboard() : [];
+        $dashboardData['digiriskelement']        = ($loadDigiriskElement) ? $digiriskElement->load_dashboard() : [];
         $dashboardData['task']                   = ($loadTask) ? $digiriskTask->load_dashboard($conf->global->DIGIRISKDOLIBARR_DU_PROJECT) : [];
         $dashboardData['risk']                   = ($loadRisk) ? $risk->load_dashboard() : [];
 
