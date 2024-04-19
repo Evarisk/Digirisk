@@ -540,12 +540,12 @@ class DigiriskElement extends SaturneObject
         $urlTab = $_SERVER['PHP_SELF'];
 
         if (preg_match('/digiriskelement_informations/', $urlTab)) {
-            $arrayRisksByGp = $this->getRisksByGp('single');
+            $arrayRisksByGp  = $this->getRisksByGp('single');
         } else {
-            $arrayRisksByGp = $this->getRisksByGp();
+            $arrayRisksByGp  = $this->getRisksByGp();
+            $arrayListGp     = $this->getGpList();
         }
-
-        $array['graphs'] = [$arrayRisksByGp];
+        $array['graphs'] = [$arrayRisksByGp, $arrayListGp ?? []];
 
         return $array;
     }
@@ -597,13 +597,62 @@ class DigiriskElement extends SaturneObject
 
         $i = 0;
         foreach ($ids as $elementId => $label) {
-            if (empty($elementId)) continue;
             $array['labels'][$elementId] = [
                 'label' => $label,
                 'color' => '#' . $this->getColorRange($i)
             ];
             $risks                     = saturne_fetch_all_object_type('Risk', '', '', 0, 0, ['customsql' => 't.fk_element = ' . $elementId . ' AND t.status = ' . Risk::STATUS_VALIDATED]);
             $array['data'][$elementId] = (is_array($risks) && !empty($risks) ? count($risks) : 0);
+            $i++;
+        }
+
+        return $array;
+    }
+
+    /**
+     * Get list of GP for main dashboard
+     *
+     * @return array
+     * @throws Exception
+     */
+    public function getGpList(): array
+    {
+        global $conf, $langs;
+
+        // Graph parameters
+        $array['width']      = '100%';
+        $array['height']     = 400;
+        $array['type']       = 'pie';
+        $array['showlegend'] = $conf->browser->layout == 'phone' ? 1 : 2;
+        $array['dataset']    = 1;
+        $array['picto']      = $this->picto;
+
+        $elements      = $this->getActiveDigiriskElements();
+        $parent        = recurse_tree(0, 0, $elements);
+        $totalElements = count($elements) - count($parent);
+
+        // Graph Title parameters
+        $array['title'] = $langs->transnoentities('numberOfDigiriskElementsByDigiriskElements');
+
+        foreach ($parent as $parentIds) {
+            $parentId[] = $parentIds['id'];
+            array_walk_recursive($parentIds, function ($item) use (&$ids) {
+                if (is_object($item)) {
+                    $ids[$item->id] = $item->label;
+                }
+            }, $ids);
+            $countIds[$parentIds['id']] = count($ids) - 1;
+            $ids                        = [];
+        }
+
+        $i = 0;
+        foreach ($countIds as $countId) {
+            $this->fetch($parentId[$i]);
+            $array['labels'][] = [
+                'label' => $this->label,
+                'color' => '#' . $this->getColorRange($i)
+            ];
+            $array['data'][] = $countId * 100 / $totalElements;
             $i++;
         }
 
