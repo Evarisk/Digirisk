@@ -144,8 +144,8 @@ class doc_accidentinvestigationdocument_odt extends SaturneDocumentModel
 		// Replace tags of lines.
 		try {
 			$this->setAttendantsSegment($odfHandler, $outputLangs, $moreParam);
-
-			$risks = $moreParam['gp_ut_id'] > 0 ? $risk->fetchRisksOrderedByCotation($moreParam['gp_ut_id'], true, $conf->global->DIGIRISKDOLIBARR_SHOW_INHERITED_RISKS_IN_DOCUMENTS, $conf->global->DIGIRISKDOLIBARR_SHOW_SHARED_RISKS) : [];
+            $moreParam['filterRisk'] = ' AND t.type = "risk"';
+			$risks = $moreParam['gp_ut_id'] > 0 ? $risk->fetchRisksOrderedByCotation($moreParam['gp_ut_id'], true, $conf->global->DIGIRISKDOLIBARR_SHOW_INHERITED_RISKS_IN_DOCUMENTS, $conf->global->DIGIRISKDOLIBARR_SHOW_SHARED_RISKS, $moreParam) : [];
 			$digiriskDocument->fillRiskData($odfHandler, $this, $outputLangs, [], null, $risks);
 
 			$moreParam['task_type'] = 'cur_task';
