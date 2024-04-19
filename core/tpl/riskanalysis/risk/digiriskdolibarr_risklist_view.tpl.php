@@ -1024,7 +1024,7 @@ if ($action != 'list') {
 	</div>
 	<?php endif; ?>
 <?php endif; ?>
-<?php $title = $langs->trans('DigiriskElementRisksList');
+<?php $title = $langs->trans('DigiriskElement' . ucfirst($riskType) . 'sList');
 print '<div class="div-title-and-table-responsive">';
 print_barre_liste($title, $page, $_SERVER["PHP_SELF"], $param, $sortfield, $sortorder, $massactionbutton, $num, $nbtotalofrecords, $risk->picto, 0, $newcardbutton, '', $limit, 0, 0, 1);
 
