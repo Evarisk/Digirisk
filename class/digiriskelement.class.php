@@ -529,28 +529,40 @@ class DigiriskElement extends SaturneObject
         return $ret;
     }
 
+    /**
+     * Load dashboard info risk
+     *
+     * @return array
+     * @throws Exception
+     */
     public function load_dashboard() : array
     {
-        $arrayRisksByGp = $this->getRisksByGp();
+        $urlTab = $_SERVER['PHP_SELF'];
+
+        if (preg_match('/digiriskelement_informations/', $urlTab)) {
+            $arrayRisksByGp = $this->getRisksByGp('single');
+        } else {
+            $arrayRisksByGp = $this->getRisksByGp();
+        }
 
         $array['graphs'] = [$arrayRisksByGp];
 
         return $array;
     }
 
-    public function getRisksByGp(): array
+    /**
+     * Get risks by GP
+     *
+     * @param  String    $type Empty to get risks of every element or 'single' to get risk for the current and children element
+     *
+     * @return array
+     * @throws Exception
+     */
+    public function getRisksByGp($type = ''): array
     {
         global $conf, $langs;
 
         $risk = new Risk($this->db);
-
-        $id = GETPOST('id');
-
-        $this->fetch($id);
-
-        // Graph Title parameters
-        $array['title'] = $langs->transnoentities('AddStatsGP', $this->ref, $this->label);
-        $array['picto'] = $this->picto;
 
         // Graph parameters
         $array['width']      = '100%';
@@ -560,24 +572,55 @@ class DigiriskElement extends SaturneObject
         $array['dataset']    = 1;
 
         $join     = ' LEFT JOIN ' . MAIN_DB_PREFIX . $risk->table_element . ' as r ON r.rowid = t.fk_risk';
-        $elements = $this->fetchAll();
-        $children = recurse_tree($id, 0, $elements);
+        $elements = $this->getActiveDigiriskElements();
+        if ($type == 'single') {
+            $id = GETPOST('id');
+            $this->fetch($id);
+
+            // Graph Title parameters
+            $array['title'] = $langs->transnoentities('AddStatsGP', $this->ref, $this->label);
+            $array['picto'] = $this->picto;
+
+            $children = recurse_tree($id, 0, $elements);
+            $ids[$id] = $this->label;
+        } else {
+            // Graph Title parameters
+            $array['title'] = $langs->transnoentities('AddStatsGP', 'DU', getDolGlobalString('MAIN_INFO_SOCIETE_NOM'));
+            $array['picto'] = $this->picto;
+
+            $children = $elements;
+        }
+
         array_walk_recursive($children, function ($item) use (&$ids) {
             if (is_object($item)) {
                 $ids[$item->id] = $item->label;
             }
         }, $ids);
-        $ids[$id] = $this->label;
 
+        $i = 0;
         foreach ($ids as $elementId => $label) {
+            if (empty($elementId)) continue;
             $array['labels'][$elementId] = [
                 'label' => $label,
-                'color' => '#' . randomColor()
+                'color' => '#' . $this->getColorRange($i)
             ];
-            $risks                     = saturne_fetch_all_object_type('RiskAssessment', '', '', 0, 0, ['customsql' => 'r.fk_element = ' . $elementId . ' AND t.status = ' . RiskAssessment::STATUS_VALIDATED], 'AND', false, $join);
-            $array['data'][$elementId] = count($risks);
+            $risks                     = saturne_fetch_all_object_type('Risk', '', '', 0, 0, ['customsql' => 't.fk_element = ' . $elementId . ' AND t.status = ' . RiskAssessment::STATUS_VALIDATED], 'AND', false, $join);
+            $array['data'][$elementId] = (is_array($risks) && !empty($risks) ? count($risks) : 0);
+            $i++;
         }
 
         return $array;
+    }
+
+    /**
+     * get color range for key
+     *
+     * @param  int    $key Key to find in color array
+     * @return string
+     */
+    public function getColorRange(int $key): string
+    {
+        $colorArray = ['#f44336', '#e81e63', '#9c27b0', '#673ab7', '#3f51b5', '#2196f3', '#03a9f4', '#00bcd4', '#009688', '#4caf50', '#8bc34a', '#cddc39', '#ffeb3b', '#ffc107', '#ff9800', '#ff5722', '#795548', '#9e9e9e', '#607d8b'];
+        return $colorArray[$key % count($colorArray)];
     }
 }
