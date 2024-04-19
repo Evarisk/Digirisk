@@ -67,7 +67,7 @@ class DigiriskDolibarrDashboard
         $loadDigiriskResources      = array_key_exists('loadDigiriskResources', $moreParams) ? $moreParams['loadDigiriskResources'] : 1;
         $loadRisk                   = array_key_exists('loadRisk', $moreParams) ? $moreParams['loadRisk'] : 1;
         $loadTask                   = array_key_exists('loadTask', $moreParams) ? $moreParams['loadTask'] : 1;
-        $loadDigiriskElement        = array_key_exists('DigiriskElement', $moreParams) ? $moreParams['DigiriskElement'] : 1;
+        $loadDigiriskElement        = array_key_exists('loadDigiriskElement', $moreParams) ? $moreParams['loadDigiriskElement'] : 1;
 
         $riskAssessmentDocument = new RiskAssessmentDocument($this->db);
         $accident               = new Accident($this->db);

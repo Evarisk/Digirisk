@@ -121,7 +121,8 @@ $moreParams = [
     'loadEvaluator' => 1,
     'loadDigiriskResources' => 0,
     'loadRisk' => 1,
-    'loadTask' => 0
+    'loadTask' => 0,
+    'loadDigiriskElement' => 1
 ];
 
 $dashboard->show_dashboard($moreParams);

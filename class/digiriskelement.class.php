@@ -570,8 +570,8 @@ class DigiriskElement extends SaturneObject
         $array['type']       = 'pie';
         $array['showlegend'] = $conf->browser->layout == 'phone' ? 1 : 2;
         $array['dataset']    = 1;
+        $array['picto']      = $this->picto;
 
-        $join     = ' LEFT JOIN ' . MAIN_DB_PREFIX . $risk->table_element . ' as r ON r.rowid = t.fk_risk';
         $elements = $this->getActiveDigiriskElements();
         if ($type == 'single') {
             $id = GETPOST('id');
@@ -579,14 +579,12 @@ class DigiriskElement extends SaturneObject
 
             // Graph Title parameters
             $array['title'] = $langs->transnoentities('AddStatsGP', $this->ref, $this->label);
-            $array['picto'] = $this->picto;
 
             $children = recurse_tree($id, 0, $elements);
             $ids[$id] = $this->label;
         } else {
             // Graph Title parameters
             $array['title'] = $langs->transnoentities('AddStatsGP', 'DU', getDolGlobalString('MAIN_INFO_SOCIETE_NOM'));
-            $array['picto'] = $this->picto;
 
             $children = $elements;
         }
@@ -604,7 +602,7 @@ class DigiriskElement extends SaturneObject
                 'label' => $label,
                 'color' => '#' . $this->getColorRange($i)
             ];
-            $risks                     = saturne_fetch_all_object_type('Risk', '', '', 0, 0, ['customsql' => 't.fk_element = ' . $elementId . ' AND t.status = ' . RiskAssessment::STATUS_VALIDATED], 'AND', false, $join);
+            $risks                     = saturne_fetch_all_object_type('Risk', '', '', 0, 0, ['customsql' => 't.fk_element = ' . $elementId . ' AND t.status = ' . Risk::STATUS_VALIDATED]);
             $array['data'][$elementId] = (is_array($risks) && !empty($risks) ? count($risks) : 0);
             $i++;
         }
