@@ -216,7 +216,7 @@ if ($action == 'generateQRCode') {
 
 	ob_clean();
 
-	$QR = imagecreatefrompng('https://chart.googleapis.com/chart?cht=qr&chld=H|1&chs='.$size.'&chl='.urlencode($urlToEncode));
+	$QR = imagecreatefrompng('https://quickchart.io/qr?text=' .urlencode($urlToEncode. '&size='.$size )); // chart.googleapis.com n'existe plus
 
 	if (! is_dir($targetPath)) {
 		mkdir($targetPath, 0777, true);
