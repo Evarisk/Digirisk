@@ -995,6 +995,7 @@ DigiriskElementInheritedRiskenvironmentalsList = Liste des risques hérités env
 DigiriskElementSharedRiskenvironmentalsList    = Liste des risques partagés environnementaux
 ImportSharedRiskenvironmentals                 = Importer des risques environnementaux partagés
 ConfirmImportSharedRiskenvironmentals          = Veuillez choisir les risques partagés environnementaux à importer
+EnvironmentDescription                         = Planification - Actions à mettre en œuvre face aux risques et opportunités
 
 #
 # ListingRisksEnvironmentalAction - Listing des risques environnementaux action

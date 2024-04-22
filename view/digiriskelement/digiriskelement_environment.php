@@ -121,7 +121,7 @@ if ($type != 'standard') {
 } else {
     // Project
     $moreHtmlref = '<div class="refidno">';
-    $project->fetch($conf->global->DIGIRISKDOLIBARR_DU_PROJECT);
+    $project->fetch($conf->global->DIGIRISKDOLIBARR_ENVIRONMENT_PROJECT);
     $moreHtmlref .= $langs->trans('Project') . ' : ' . getNomUrlProject($project, 1, 'blank', 1);
     $moreHtmlref .= '</div>';
     $moduleNameLowerCase = 'mycompany';

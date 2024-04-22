@@ -64,7 +64,7 @@ $advancedCotationMethodArray = json_decode($advanced_method_cotation_json, true)
 $alldigiriskelement = $digiriskelement->getActiveDigiriskElements(1);
 $digiriskElementsOfEntity = $digiriskelement->getActiveDigiriskElements();
 
-$DUProject->fetch($conf->global->DIGIRISKDOLIBARR_DU_PROJECT);
+$DUProject->fetch($riskType == 'risk' ? $conf->global->DIGIRISKDOLIBARR_DU_PROJECT : $conf->global->DIGIRISKDOLIBARR_ENVIRONMENT_PROJECT);
 $extrafields->fetch_name_optionals_label($digiriskTask->table_element);
 
 $riskAssessmentList        = $riskAssessment->fetchAll('', '', 0, 0, array(), 'AND', 1);

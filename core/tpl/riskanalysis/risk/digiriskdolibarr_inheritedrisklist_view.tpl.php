@@ -30,7 +30,7 @@
 
 		$alldigiriskelement = $digiriskelement->getActiveDigiriskElements();
 
-		$DUProject->fetch($conf->global->DIGIRISKDOLIBARR_DU_PROJECT);
+		$DUProject->fetch($riskType == 'risk' ? $conf->global->DIGIRISKDOLIBARR_DU_PROJECT : $conf->global->DIGIRISKDOLIBARR_ENVIRONMENT_PROJECT);
 		$extrafields->fetch_name_optionals_label($digiriskTask->table_element);
 
 		$riskAssessmentList        = $riskAssessment->fetchAll();
