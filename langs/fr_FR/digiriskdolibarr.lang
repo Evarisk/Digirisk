@@ -976,6 +976,7 @@ BlackRisk  = Risque inacceptable
 #
 
 # Data - Donnée
+Environment                                    = Environnement
 RiskEnvironmentals                             = Risques environnementaux
 Riskenvironmentals                             = Risques environnementaux
 DigiriskElementRiskenvironmentalsList          = Liste des risques environnementaux

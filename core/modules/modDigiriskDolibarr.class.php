@@ -1404,13 +1404,12 @@ class modDigiriskdolibarr extends DolibarrModules
 		];
 
 		$this->menu[$r++] = [
-			'fk_menu'  => 'fk_mainmenu=digiriskdolibarr',	    // '' if this is a top menu. For left menu, use 'fk_mainmenu=xxx' or 'fk_mainmenu=xxx,fk_leftmenu=yyy' where xxx is mainmenucode and yyy is a leftmenucode
+			'fk_menu'  => 'fk_mainmenu=digiriskdolibarr,fk_leftmenu=digiriskstandard',	    // '' if this is a top menu. For left menu, use 'fk_mainmenu=xxx' or 'fk_mainmenu=xxx,fk_leftmenu=yyy' where xxx is mainmenucode and yyy is a leftmenucode
 			'type'     => 'left',			                // This is a Left menu entry
-			'titre'    => $langs->trans('RiskList'),
-			'prefix'   => '<i class="fas fa-list pictofixedwidth"></i>',
+			'titre'    => '<i class="fas fa-list pictofixedwidth" style="padding-right: 4px;"></i>' . $langs->trans('RiskList'),
 			'mainmenu' => 'digiriskdolibarr',
 			'leftmenu' => 'digirisklistingrisk',
-			'url'      => '/digiriskdolibarr/view/digiriskelement/risk_list.php',
+			'url'      => '/digiriskdolibarr/view/digiriskelement/risk_list.php?type=risk',
 			'langs'    => 'digiriskdolibarr@digiriskdolibarr',	        // Lang file to use (without .lang) by module. File must be in langs/code_CODE/ directory.
 			'position' => 100 + $r,
 			'enabled'  => '$conf->digiriskdolibarr->enabled',  // Define condition to show or hide menu entry. Use '$conf->digiriskdolibarr->enabled' if entry must be visible if module is enabled. Use '$leftmenu==\'system\'' to show if leftmenu system is selected.
@@ -1432,6 +1431,37 @@ class modDigiriskdolibarr extends DolibarrModules
             'perms'    => '$user->rights->digiriskdolibarr->risk->read',
             'target'   => '',
             'user'     => 0,
+        ];
+
+        $this->menu[$r++] = [
+            'fk_menu'  => 'fk_mainmenu=digiriskdolibarr',
+            'type'     => 'left',
+            'titre'    => $langs->trans('Environment'),
+            'prefix'   => '<i class="fas fa-exclamation-triangle pictofixedwidth"></i>',
+            'mainmenu' => 'digiriskdolibarr',
+            'leftmenu' => 'digiriskstandard_riskenvironmental',
+            'url'      => '/digiriskdolibarr/view/digiriskstandard/digiriskstandard_card.php',
+            'langs'    => 'digiriskdolibarr@digiriskdolibarr',
+            'position' => 100 + $r,
+            'enabled'  => '$conf->digiriskdolibarr->enabled',
+            'perms'    => '$user->rights->digiriskdolibarr->riskassessmentdocument->read',
+            'target'   => '',
+            'user'     => 0
+        ];
+
+        $this->menu[$r++] = [
+            'fk_menu'  => 'fk_mainmenu=digiriskdolibarr,fk_leftmenu=digiriskstandard_riskenvironmental',
+            'type'     => 'left',
+            'titre'    => '<i class="fas fa-list pictofixedwidth" style="padding-right: 4px;"></i>' . $langs->trans('RiskList'),
+            'mainmenu' => 'digiriskdolibarr',
+            'leftmenu' => 'digirisklistingrisksenvironmental',
+            'url'      => '/digiriskdolibarr/view/digiriskelement/risk_list.php?type=riskenvironmental',
+            'langs'    => 'digiriskdolibarr@digiriskdolibarr',
+            'position' => 100 + $r,
+            'enabled'  => '$conf->digiriskdolibarr->enabled',
+            'perms'    => '$user->rights->digiriskdolibarr->risk->read',
+            'target'   => '',
+            'user'     => 0
         ];
 
 		$this->menu[$r++] = [
