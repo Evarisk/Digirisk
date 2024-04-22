@@ -92,6 +92,7 @@
 				$sql .= " AND fk_element > 0 ";
 				$sql .= " AND e.entity IN (" . getEntity($risk->element) . ") ";
 			}
+            $sql .= ' AND r.type = "' . $riskType . '"';
 
 			foreach ($search as $key => $val) {
 				if ($key == 'status' && $search[$key] == -1) continue;
@@ -205,6 +206,7 @@
 				$sql .= " AND r.fk_element > 0";
 				$sql .= " AND e.entity IN (" . getEntity($evaluation->element) . ")";
 			}
+            $sql .= ' AND r.type = "' . $riskType . '"';
 
 			foreach ($search as $key => $val) {
 				if ($key == 'status' && $search[$key] == -1) continue;
@@ -298,7 +300,7 @@
 		$massactionbutton = $form->selectMassAction('', $arrayofmassactions);
 	}
 
-	$title = $langs->trans('DigiriskElementInheritedRisksList');
+	$title = $langs->trans('DigiriskElementInherited' . ucfirst($riskType) . 'sList');
 	print_barre_liste($title, $page, $_SERVER["PHP_SELF"], $param, $sortfield, $sortorder, $massactionbutton, $num, $nbtotalofrecords, 'digiriskdolibarr_color.png@digiriskdolibarr', 0, '', '', $limit, 0, 0, 1);
 
 	include DOL_DOCUMENT_ROOT . '/core/tpl/massactions_pre.tpl.php';

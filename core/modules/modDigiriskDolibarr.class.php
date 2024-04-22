@@ -1779,7 +1779,6 @@ class modDigiriskdolibarr extends DolibarrModules
             $this->export_label[$r]      = $objectMetaData['langs']; // Translation key (used only if key ExportDataset_xxx_z not found)
             $this->export_icon[$r]       = $objectMetaData['picto'];
             $this->export_enabled[$r]    = '!empty($conf->digiriskdolibarr->enabled)';
-            $this->export_permission[$r] = [["$this->rights_class", "$key"]];
 
             $this->export_fields_array[$r]     = [];
             $this->export_TypeFields_array[$r] = [];
@@ -1797,6 +1796,11 @@ class modDigiriskdolibarr extends DolibarrModules
             $this->export_sql_end[$r]  = ' FROM ' . MAIN_DB_PREFIX . $this->rights_class . '_' . $key . ' as t';
             $this->export_sql_end[$r] .= ' WHERE 1 = 1';
             $this->export_sql_end[$r] .= ' AND t.entity IN (' . getEntity($key) . ')';
+
+            if ($key == 'riskassessment') {
+                $key = 'risk';
+            }
+            $this->export_permission[$r] = [["$this->rights_class", "$key"]];
         }
 
         // Imports profiles provided by this module

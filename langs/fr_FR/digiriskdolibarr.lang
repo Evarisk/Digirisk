@@ -905,7 +905,6 @@ RiskCategoryEdit                         = Catégorie de risque
 RiskCategoryEditDescription              = Activer la modification de la catégorie d'un risque existant
 HowToEditRiskCategory                    = Pour modifier la catégorie du risque, cliquez sur le picto de la catégorie
 DigiriskElementRisksList                 = Liste des risques
-DigiriskElementRisk                      = Risques
 RiskDescriptionNotEnabled                = Le champ description du risque n'est pas activé
 HowToEnableRiskDescription               = Pour activer le champ description du risque, allez dans "Configuration du module -> Document Unique"
 HowToEnableRiskCategoryEdit              = Pour activer la modification de la catégorie de risque, allez dans "Configuration du module -> Document Unique"
@@ -977,10 +976,14 @@ BlackRisk  = Risque inacceptable
 #
 
 # Data - Donnée
-Environment        = Environnement
-RiskEnvironmentals = Risques environnementaux
-
-
+Environment                                    = Environnement
+RiskEnvironmentals                             = Risques environnementaux
+Riskenvironmentals                             = Risques environnementaux
+DigiriskElementRiskenvironmentalsList          = Liste des risques environnementaux
+DigiriskElementInheritedRiskenvironmentalsList = Liste des risques hérités environnementaux
+DigiriskElementSharedRiskenvironmentalsList    = Liste des risques partagés environnementaux
+ImportSharedRiskenvironmentals                 = Importer des risques environnementaux partagés
+ConfirmImportSharedRiskenvironmentals          = Veuillez choisir les risques partagés environnementaux à importer
 
 #
 # ListingRisksEnvironmentalAction - Listing des risques environnementaux action
