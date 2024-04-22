@@ -652,8 +652,8 @@ Rescuer      = Secouriste
 ListingRisksDocumentMin = listings des risques avec documents
 
 # Data - Donnée
-ListingRisksDocument            = Listing des risques avec documents
-Listingrisksdocument            = Listing des risques avec documents
+ListingRisksDocument            = Listing risques
+Listingrisksdocument            = Listing risques
 ListingRisksDocumentGenerated   = Génération de listing des Risques avec Documents
 listingrisksdocument.odt        = Listing des risques avec documents
 listingrisksdocument_custom.odt = Listing des risques avec documents personnalisé
@@ -898,6 +898,7 @@ RisksMin = risques
 # Data - Donnée
 Risks                                    = Risques
 Risk                                     = Risque
+Riskprofessionals                        = Risques professionnels
 RiskCreated                              = Création d'un risque
 RiskModified                             = Modification d'un risque
 RiskDeleted                              = Suppression d'un risque
@@ -907,7 +908,6 @@ RiskWellCreated                          = Risque créé
 RiskNotCreated                           = Erreur lors de la création du risque
 RiskWellEdited                           = Risque édité
 RiskNotEdited                            = Erreur lors de l'édition du risque
-RiskList                                 = Listing de risques
 AddRiskTitle                             = Ajout du risque
 AddRiskButton                            = Ajouter le risque
 EditRisk                                 = Édition du risque

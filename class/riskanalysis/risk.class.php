@@ -119,6 +119,11 @@ class Risk extends SaturneObject
 	 */
 	public function __construct(DoliDB $db)
 	{
+        $riskType = GETPOST('type');
+        if ($riskType == 'riskenvironmental') {
+            $this->type  = 'riskenvironmental';
+            $this->picto = 'fontawesome_fa-leaf_fas_#d35968';
+        }
 		parent::__construct($db, $this->module, $this->element);
 	}
 
