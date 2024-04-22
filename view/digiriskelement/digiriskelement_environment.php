@@ -1,5 +1,5 @@
 <?php
-/* Copyright (C) 2021-2024 EVARISK <technique@evarisk.com>
+/* Copyright (C) 2024 EVARISK <technique@evarisk.com>
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -16,18 +16,18 @@
  */
 
 /**
- *   	\file       view/digiriskelement/digiriskelement_listingrisksdocument.php
- *		\ingroup    digiriskdolibarr
- *		\brief      Page to view listingrisksdocument
+ * \file    view/digiriskelement/digiriskelement_environment.php
+ * \ingroup digiriskdolibarr
+ * \brief   Page to view environment document
  */
 
 // Load DigiriskDolibarr environment
 if (file_exists('../digiriskdolibarr.main.inc.php')) {
-	require_once __DIR__ . '/../digiriskdolibarr.main.inc.php';
+    require_once __DIR__ . '/../digiriskdolibarr.main.inc.php';
 } elseif (file_exists('../../digiriskdolibarr.main.inc.php')) {
-	require_once __DIR__ . '/../../digiriskdolibarr.main.inc.php';
+    require_once __DIR__ . '/../../digiriskdolibarr.main.inc.php';
 } else {
-	die('Include of digiriskdolibarr main fails');
+    die('Include of digiriskdolibarr main fails');
 }
 
 require_once DOL_DOCUMENT_ROOT . '/core/lib/images.lib.php';
@@ -35,7 +35,7 @@ require_once DOL_DOCUMENT_ROOT . '/projet/class/project.class.php';
 
 require_once __DIR__ . '/../../class/digiriskelement.class.php';
 require_once __DIR__ . '/../../class/digiriskstandard.class.php';
-require_once __DIR__ . '/../../class/digiriskdolibarrdocuments/listingrisksdocument.class.php';
+require_once __DIR__ . '/../../class/digiriskdolibarrdocuments/listingrisksenvironmentaldocument.class.php';
 require_once __DIR__ . '/../../lib/digiriskdolibarr_digiriskelement.lib.php';
 require_once __DIR__ . '/../../lib/digiriskdolibarr_digiriskstandard.lib.php';
 require_once __DIR__ . '/../../lib/digiriskdolibarr_function.lib.php';
@@ -44,6 +44,7 @@ global $conf, $db, $hookmanager, $langs, $user;
 
 // Load translation files required by the page
 saturne_load_langs(['other']);
+
 // Get parameters
 $id          = GETPOST('id', 'int');
 $action      = GETPOST('action', 'aZ09');
@@ -51,15 +52,15 @@ $subaction   = GETPOST('subaction', 'aZ09');
 $type        = GETPOST('type', 'aZ09');
 
 // Initialize technical objects
-$document = new ListingRisksDocument($db);
-$hookmanager->initHooks(array('digiriskelementlistingrisksdocument', 'digiriskelementview', 'digiriskstandardview', 'globalcard')); // Note that conf->hooks_modules contains array
+$document = new ListingRisksEnvironmentalDocument($db);
+$hookmanager->initHooks(array('digiriskelementenvironment', 'digiriskelementview', 'digiriskstandardview', 'globalcard')); // Note that conf->hooks_modules contains array
 
 if ($type != 'standard') {
-	$object = new DigiriskElement($db);
-	$object->fetch($id);
+    $object = new DigiriskElement($db);
+    $object->fetch($id);
 } else {
-	$object = new DigiriskStandard($db);
-	$object->fetch($conf->global->DIGIRISKDOLIBARR_ACTIVE_STANDARD);
+    $object = new DigiriskStandard($db);
+    $object->fetch($conf->global->DIGIRISKDOLIBARR_ACTIVE_STANDARD);
 }
 $digiriskstandard = new DigiriskStandard($db);
 $project          = new Project($db);
@@ -67,9 +68,9 @@ $project          = new Project($db);
 $upload_dir = $conf->digiriskdolibarr->multidir_output[isset($conf->entity) ? $conf->entity : 1];
 
 // Security check
-$permissionToRead   = $user->rights->digiriskdolibarr->digiriskstandard->read && ($user->rights->digiriskdolibarr->listingrisksdocument->read || $user->rights->digiriskdolibarr->listingrisksaction->read || $user->rights->digiriskdolibarr->listingrisksphoto->read);
-$permissiontoadd    = $user->rights->digiriskdolibarr->listingrisksdocument->write || $user->rights->digiriskdolibarr->listingrisksaction->write ||  $user->rights->digiriskdolibarr->listingrisksphoto->write;
-$permissiontodelete = $user->rights->digiriskdolibarr->listingrisksdocument->delete || $user->rights->digiriskdolibarr->listingrisksaction->delete || $user->rights->digiriskdolibarr->listingrisksphoto->delete;
+$permissionToRead   = $user->rights->digiriskdolibarr->digiriskstandard->read && ($user->rights->digiriskdolibarr->listingrisksenvironmentalaction->read);
+$permissiontoadd    = $user->rights->digiriskdolibarr->listingrisksenvironmentalaction->write;
+$permissiontodelete = $user->rights->digiriskdolibarr->listingrisksenvironmentalaction->delete;
 saturne_check_access($permissionToRead, $object);
 
 /*
@@ -83,10 +84,10 @@ if ($resHook < 0) {
 }
 
 if (empty($resHook)) {
-	if ($object->element == 'digiriskstandard') {
+    if ($object->element == 'digiriskstandard') {
         $previousRef = $object->ref;
-		$object->ref = '';
-	}
+        $object->ref = '';
+    }
 
     // Actions builddoc, forcebuilddoc, remove_file
     require_once __DIR__ . '/../../../saturne/core/tpl/documents/documents_action.tpl.php';
@@ -103,13 +104,13 @@ if (empty($resHook)) {
  * View
  */
 
-$title   = $langs->trans('ListingRisksDocuments');
+$title   = $langs->trans('Environment');
 $helpUrl = 'FR:Module_Digirisk#Impression_des_listings_de_risques';
 
 digirisk_header($title, $helpUrl);
 
 // Part to show record
-saturne_get_fiche_head($object, 'elementListingRisksDocument', $title);
+saturne_get_fiche_head($object, 'elementEnvironment', $title);
 
 // Object card
 // ------------------------------------------------------------
@@ -118,14 +119,14 @@ if ($type != 'standard') {
 
     saturne_banner_tab($object,'ref','none', 0, 'ref', 'ref', $moreHtmlref, true, $moreParams);
 } else {
-	// Project
-	$moreHtmlref = '<div class="refidno">';
-	$project->fetch($conf->global->DIGIRISKDOLIBARR_DU_PROJECT);
-	$moreHtmlref .= $langs->trans('Project') . ' : ' . getNomUrlProject($project, 1, 'blank', 1);
-	$moreHtmlref .= '</div>';
-	$moduleNameLowerCase = 'mycompany';
-	saturne_banner_tab($object,'ref','none', 0, 'ref', 'ref', $moreHtmlref, true);
-	$moduleNameLowerCase = 'digiriskdolibarr';
+    // Project
+    $moreHtmlref = '<div class="refidno">';
+    $project->fetch($conf->global->DIGIRISKDOLIBARR_DU_PROJECT);
+    $moreHtmlref .= $langs->trans('Project') . ' : ' . getNomUrlProject($project, 1, 'blank', 1);
+    $moreHtmlref .= '</div>';
+    $moduleNameLowerCase = 'mycompany';
+    saturne_banner_tab($object,'ref','none', 0, 'ref', 'ref', $moreHtmlref, true);
+    $moduleNameLowerCase = 'digiriskdolibarr';
 }
 
 print dol_get_fiche_end();
@@ -134,13 +135,13 @@ print dol_get_fiche_end();
 $urlSource = $_SERVER["PHP_SELF"] . '?id=' . $object->id;
 if ($type != 'standard') {
 	$objRef    = dol_sanitizeFileName($object->ref);
-	$dirFiles  = ['listingrisksaction/' . $objRef, 'listingrisksphoto/' . $objRef, 'listingrisksdocument/' . $objRef];
+	$dirFiles  = ['listingrisksenvironmentalaction/' . $objRef];
 } else {
-    $dirFiles   = ['listingrisksaction', 'listingrisksphoto', 'listingrisksdocument'];
+    $dirFiles   = ['listingrisksenvironmentalaction'];
 	$urlSource .= '&type=standard';
 }
-$fileDir    = [$upload_dir . '/' . $dirFiles[0], $upload_dir . '/' . $dirFiles[1], $upload_dir . '/' . $dirFiles[2]];
-$modulePart = 'digiriskdolibarr:ListingRisksDocument';
+$fileDir    = [$upload_dir . '/' . $dirFiles[0]];
+$modulePart = 'digiriskdolibarr:ListingRisksEnvironmentalDocument';
 
 print saturne_show_documents($modulePart, $dirFiles, $fileDir, $urlSource, $permissiontoadd, $permissiontodelete, '', 1, 0, 0, 0, 0, '', '', $langs->defaultlang, 0, $object);
 

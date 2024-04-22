@@ -13,30 +13,41 @@
  *
  * You should have received a copy of the GNU General Public License
  * along with this program. If not, see <https://www.gnu.org/licenses/>.
- * or see https://www.gnu.org/
  */
 
 /**
- * \file    core/modules/digiriskdolibarr/digiriskdolibarrdocuments/listingrisksenvironmentalaction/mod_listingrisksenvironmentalaction_jocaste.php
+ * \file    class/digiriskdolibarrdocuments/listingrisksenvironmentaldocument.class.php
  * \ingroup digiriskdolibarr
- * \brief   File that contains the numbering module rules jocaste
+ * \brief   This file is a class file for ListingRisksEnvironmentalDocument
  */
 
-// Load Saturne libraries
-require_once __DIR__ . '/../../../../../../saturne/core/modules/saturne/modules_saturne.php';
+
+// Load DigiriskDolibarr librairies
+require_once __DIR__ . '/../digiriskdocuments.class.php';
 
 /**
- * Class of file that contains the numbering module rules jocaste
+ * Class for ListingRisksEnvironmentalDocument
  */
-class mod_listingrisksenvironmentalaction_jocaste extends CustomModeleNumRefSaturne
+
+class ListingRisksEnvironmentalDocument extends DigiriskDocuments
 {
     /**
-     * @var string Model name
+     * @var string Module name
      */
-    public string $name = 'Jocaste';
+    public $module = 'digiriskdolibarr';
 
-    public function __construct()
+    /**
+     * @var string Element type of object
+     */
+    public $element = 'listingrisksenvironmentaldocument';
+
+    /**
+     * Constructor
+     *
+     * @param DoliDb $db Database handler
+     */
+    public function __construct(DoliDB $db)
     {
-        self::setCustomValue('digiriskdolibarr', 'listingrisksenvironmentalaction');
+        parent::__construct($db, $this->module, $this->element);
     }
 }

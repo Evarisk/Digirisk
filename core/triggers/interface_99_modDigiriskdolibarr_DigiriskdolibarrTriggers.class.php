@@ -219,27 +219,27 @@ class InterfaceDigiriskdolibarrTriggers extends DolibarrTriggers
 				}
 				break;
 
+            case 'AUDITREPORTDOCUMENT_GENERATE' :
+            case 'ACCIDENTINVESTIGATIONDOCUMENT_GENERATE' :
+            case 'FIREPERMITDOCUMENT_GENERATE' :
+            case 'GROUPMENTDOCUMENT_GENERATE' :
+            case 'INFORMATIONSSHARING_GENERATE' :
+            case 'LEGALDISPLAY_GENERATE' :
+            case 'LISTINGRISKSACTION_GENERATE' :
+            case 'LISTINGRISKSDOCUMENT_GENERATE' :
+            case 'LISTINGRISKSPHOTO_GENERATE' :
+            case 'LISTINGRISKSENVIRONMENTALACTION_GENERATE' :
+            case 'PREVENTIONPLANDOCUMENT_GENERATE' :
             case 'REGISTERDOCUMENT_GENERATE':
             case 'RISKASSESSMENTDOCUMENT_GENERATE' :
-            case 'AUDITREPORTDOCUMENT_GENERATE' :
-            case 'LEGALDISPLAY_GENERATE' :
-            case 'INFORMATIONSSHARING_GENERATE' :
-            case 'REGISTERDOCUMENT_GENERATE' :
-            case 'FIREPERMITDOCUMENT_GENERATE' :
-			case 'PREVENTIONPLANDOCUMENT_GENERATE' :
-            case 'LISTINGRISKSACTION_GENERATE' :
-            case 'LISTINGRISKSPHOTO_GENERATE' :
-            case 'LISTINGRISKSDOCUMENT_GENERATE' :
-            case 'LISTINGRISKSENVIRONMENTALACTION_GENERATE' :
+            case 'TICKETDOCUMENT_GENERATE' :
             case 'WORKUNITDOCUMENT_GENERATE' :
-			case 'GROUPMENTDOCUMENT_GENERATE' :
 
                 if ($object->parent_type == 'groupment' || $object->parent_type == 'workunit' || preg_match('/listingrisks/', $object->parent_type)) {
                     $object->parent_type = 'digiriskelement';
                 }
 
-                $actioncomm->elementtype = $object->parent_type . '@digiriskdolibarr';
-
+                $actioncomm->elementtype = $action != 'TICKETDOCUMENT_GENERATE' ? $object->parent_type . '@digiriskdolibarr' : $object->parent_type;
                 $actioncomm->label       = $langs->trans('ObjectGenerateTrigger', $langs->transnoentities(ucfirst(get_class($object))), $object->ref);
                 $actioncomm->elementid   = $object->parent_id;
                 $actioncomm->fk_element  = $object->parent_id;
