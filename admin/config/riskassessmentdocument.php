@@ -81,6 +81,8 @@ if (GETPOST('action') == 'setmod') {
 if (($action == 'update' && ! GETPOST("cancel", 'alpha')) || ($action == 'updateedit')) {
 	$DUProject             = GETPOST('DUProject', 'none');
 	$DUProject             = preg_split('/_/', $DUProject);
+    $EnvironmentProject    = GETPOST('EnvironmentProject', 'none');
+    $EnvironmentProject    = preg_split('/_/', $EnvironmentProject);
 	$evaluatorDuration     = GETPOST('EvaluatorDuration', 'alpha');
 	$taskTimeSpentDuration = GETPOST('TaskTimeSpentDuration', 'alpha');
 
@@ -92,6 +94,23 @@ if (($action == 'update' && ! GETPOST("cancel", 'alpha')) || ($action == 'update
         $sql = "UPDATE ".MAIN_DB_PREFIX."menu SET";
         $sql .= " url='".$db->escape($url)."'";
         $sql .= " WHERE leftmenu='digiriskactionplan'";
+        $sql .= " AND entity=" . $conf->entity;
+
+        $resql = $db->query($sql);
+        if (!$resql) {
+            $error = "Error ".$db->lasterror();
+            return -1;
+        }
+    }
+
+    if ($EnvironmentProject[0] > 0 && $EnvironmentProject[0] != $conf->global->DIGIRISKDOLIBARR_ENVIRONMENT_PROJECT) {
+        dolibarr_set_const($db, "DIGIRISKDOLIBARR_ENVIRONMENT_PROJECT", $EnvironmentProject[0], 'integer', 0, '', $conf->entity);
+
+        $url = '/projet/tasks.php?id=' . $EnvironmentProject[0];
+
+        $sql = "UPDATE ".MAIN_DB_PREFIX."menu SET";
+        $sql .= " url='".$db->escape($url)."'";
+        $sql .= " WHERE leftmenu='digiriskenvironmentalactionplan'";
         $sql .= " AND entity=" . $conf->entity;
 
         $resql = $db->query($sql);
@@ -282,6 +301,12 @@ if (isModEnabled('project')) {
 	print ' <a href="' . DOL_URL_ROOT . '/projet/card.php?socid=' . $soc->id . '&action=create&status=1&backtopage=' . urlencode($_SERVER["PHP_SELF"] . '?action=create&socid=' . $soc->id) . '"><span class="fa fa-plus-circle valignmiddle" title="' . $langs->trans("AddProject") . '"></span></a>';
 	print '<td><input type="submit" class="button" name="save" value="' . $langs->trans("Save") . '">';
 	print '</td></tr>';
+
+    print '<tr class="oddeven"><td><label for="EnvironmentProject">' . $langs->trans("EnvironmentProject") . '</label></td><td>';
+    $formproject->select_projects(-1,  $conf->global->DIGIRISKDOLIBARR_ENVIRONMENT_PROJECT, 'EnvironmentProject', 0, 0, 0, 0, 0, 0, 0, '', 0, 0, 'maxwidth500');
+    print ' <a href="' . DOL_URL_ROOT . '/projet/card.php?socid=' . $soc->id . '&action=create&status=1&backtopage=' . urlencode($_SERVER["PHP_SELF"] . '?action=create&socid=' . $soc->id) . '"><span class="fa fa-plus-circle valignmiddle" title="' . $langs->trans("AddProject") . '"></span></a>';
+    print '<td><input type="submit" class="button" name="save" value="' . $langs->trans("Save") . '">';
+    print '</td></tr>';
 
 	print '<tr class="oddeven"><td><label for="projectContactType">' . $langs->trans("DefaultProjectContactType") . '</label></td><td class="maxwidth500">';
 	$formcompany->selectTypeContact($project, $conf->global->DIGIRISKDOLIBARR_DEFAULT_PROJECT_CONTACT_TYPE, 'project_contact_type', 'internal', 'position', 0, 'minwidth500');

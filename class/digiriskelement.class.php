@@ -489,7 +489,8 @@ class DigiriskElement extends SaturneObject
         }
         $morehtmlref .= '<br>';
         $this->fetch($this->id);
-        $this->fk_project = $conf->global->DIGIRISKDOLIBARR_DU_PROJECT;
+        $riskType         = GETPOST('type');
+        $this->fk_project = $riskType == 'riskenvironmental' ? $conf->global->DIGIRISKDOLIBARR_ENVIRONMENT_PROJECT : $conf->global->DIGIRISKDOLIBARR_DU_PROJECT;
         $moreParams['project']['disable_edit'] = 1;
 
         return [$morehtmlref, $moreParams];

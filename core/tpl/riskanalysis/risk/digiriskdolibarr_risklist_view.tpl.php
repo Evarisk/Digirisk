@@ -302,7 +302,7 @@ $usertmp                     = new User($db);
 $project                     = new Project($db);
 $DUProject                   = new Project($db);
 
-$DUProject->fetch($conf->global->DIGIRISKDOLIBARR_DU_PROJECT);
+$DUProject->fetch($riskType == 'risk' ? $conf->global->DIGIRISKDOLIBARR_DU_PROJECT : $conf->global->DIGIRISKDOLIBARR_ENVIRONMENT_PROJECT);
 $extrafields->fetch_name_optionals_label($digiriskTask->table_element);
 
 $riskAssessment->ismultientitymanaged = 0;

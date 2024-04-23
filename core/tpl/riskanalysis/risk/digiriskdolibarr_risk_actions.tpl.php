@@ -14,7 +14,7 @@ if ( ! $error && $action == 'add' && $permissiontoadd) {
 	}
 
 	$risk->fk_element = $fk_element ?: 0;
-	$risk->fk_projet  = $conf->global->DIGIRISKDOLIBARR_DU_PROJECT;
+	$risk->fk_projet  = $riskType == 'risk' ? $conf->global->DIGIRISKDOLIBARR_DU_PROJECT : $conf->global->DIGIRISKDOLIBARR_ENVIRONMENT_PROJECT;
 	$risk->category   = $category;
 	$risk->ref        = $refRiskMod->getNextValue($risk);
 	$risk->status     = 1;
@@ -104,7 +104,7 @@ if ( ! $error && $action == 'add' && $permissiontoadd) {
 
 					$task->ref                              = $refTaskMod->getNextValue('', $task);
 					$task->label                            = $tasktitle;
-					$task->fk_project                       = $conf->global->DIGIRISKDOLIBARR_DU_PROJECT;
+					$task->fk_project                       = $riskType == 'risk' ? $conf->global->DIGIRISKDOLIBARR_DU_PROJECT : $conf->global->DIGIRISKDOLIBARR_ENVIRONMENT_PROJECT;
 					$task->date_c                           = dol_now();
 					if (!empty($dateStart)) {
 						$task->date_start = strtotime(preg_replace('/\//', '-', $dateStart));
@@ -412,7 +412,7 @@ if ( ! $error && $action == 'addRiskAssessmentTask' && $permissiontoadd) {
 
 	$task->ref        = $refTaskMod->getNextValue('', $task);
 	$task->label      = $tasktitle;
-	$task->fk_project = $conf->global->DIGIRISKDOLIBARR_DU_PROJECT;
+	$task->fk_project = $riskType == 'risk' ? $conf->global->DIGIRISKDOLIBARR_DU_PROJECT : $conf->global->DIGIRISKDOLIBARR_ENVIRONMENT_PROJECT;
 	$task->datec     = dol_now();
 	if (!empty($dateStart)) {
 		$task->date_start = strtotime(preg_replace('/\//', '-', $dateStart));
