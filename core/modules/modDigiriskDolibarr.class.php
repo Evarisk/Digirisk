@@ -1423,7 +1423,7 @@ class modDigiriskdolibarr extends DolibarrModules
         $this->menu[$r++] = [
             'fk_menu'  => 'fk_mainmenu=digiriskdolibarr,fk_leftmenu=digiriskstandard',
             'type'     => 'left',
-            'titre'    => '<i class="fas fa-tasks pictofixedwidth" style="padding-right: 4px;"></i>' . $langs->trans('ActionPlan'),
+            'titre'    => '<i class="fas fa-tasks pictofixedwidth" style="padding-right: 4px;"></i>' . $langs->trans('PAPRIPACT'),
             'mainmenu' => 'digiriskdolibarr',
             'leftmenu' => 'digiriskactionplan',
             'url'      => '/projet/tasks.php?id=' . $conf->global->DIGIRISKDOLIBARR_DU_PROJECT,
