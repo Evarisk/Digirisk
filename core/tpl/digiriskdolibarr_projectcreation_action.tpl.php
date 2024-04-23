@@ -322,6 +322,20 @@ if ( $conf->global->DIGIRISKDOLIBARR_ENVIRONMENT_PROJECT == 0 || $project->statu
 
     $tags->fetch('', 'ENV');
     $tags->add_type($project, 'project');
+
+    $url = '/projet/tasks.php?id=' . $project_id;
+
+    $sql = "UPDATE ".MAIN_DB_PREFIX."menu SET";
+    $sql .= " url='".$db->escape($url)."'";
+    $sql .= " WHERE leftmenu='digiriskenvironmentalactionplan'";
+    $sql .= " AND entity=" . $conf->entity;
+
+    $resql = $db->query($sql);
+    if (!$resql) {
+        $error = "Error ".$db->lasterror();
+        return -1;
+    }
+    header("Location: " . $_SERVER['PHP_SELF']);
 }
 
 if (!dolibarr_get_const($db, 'DIGIRISKDOLIBARR_USERAPI_SET', 0)) {

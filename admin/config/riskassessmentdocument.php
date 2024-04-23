@@ -81,8 +81,8 @@ if (GETPOST('action') == 'setmod') {
 if (($action == 'update' && ! GETPOST("cancel", 'alpha')) || ($action == 'updateedit')) {
 	$DUProject             = GETPOST('DUProject', 'none');
 	$DUProject             = preg_split('/_/', $DUProject);
-    $EnvironmentProject             = GETPOST('EnvironmentProject', 'none');
-    $EnvironmentProject             = preg_split('/_/', $EnvironmentProject);
+    $EnvironmentProject    = GETPOST('EnvironmentProject', 'none');
+    $EnvironmentProject    = preg_split('/_/', $EnvironmentProject);
 	$evaluatorDuration     = GETPOST('EvaluatorDuration', 'alpha');
 	$taskTimeSpentDuration = GETPOST('TaskTimeSpentDuration', 'alpha');
 
