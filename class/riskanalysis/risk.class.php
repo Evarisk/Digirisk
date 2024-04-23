@@ -705,41 +705,45 @@ class Risk extends SaturneObject
      */
     public function getListOfRisksByCotation() : array
     {
-            global $langs;
+        global $langs;
 
-            // Graph Title parameters
-            $array['title'] = $langs->transnoentities('TotalRisksRepartition');
-            $array['picto'] = $this->picto;
+        // Graph Title parameters
+        $array['title'] = $langs->transnoentities('TotalRisksRepartition');
+        $array['picto'] = $this->picto;
 
-            // Graph parameters
-            $array['width']      = '100%';
-            $array['type']       = 'list';
+        // Graph parameters
+        $array['width'] = '100%';
+        $array['type']  = 'list';
 
-        $totalRisks       = count($this->fetchAll('', '', 0, 0, ['customsql' => 'status = ' . self::STATUS_VALIDATED ]));
+        $totalRisks       = count($this->fetchAll('', '', 0, 0, ['customsql' => 't.status = ' . self::STATUS_VALIDATED]));
         $dangerCategories = $this->getDangerCategories();
-        $array['labels']  = ['riskFamily' => $langs->transnoentities('RisksFamilly'), 'numberOfRisks' => (string) $totalRisks, 'percentage' => $langs->transnoentities('percentage'), 1 => $langs->transnoentities('GreyRisk'), 2 => $langs->transnoentities('OrangeRisk'), 3 => $langs->transnoentities('RedRisk'), 4 => $langs->transnoentities('BlackRisk')];
-        $arrayRisksList   = [[]];
+        $array['labels']  = ['Ref' => $langs->transnoentities('RisksFamilly'), 'numberOfRisks' => $langs->transnoentities('NumberOfRisks') . ' : ' . $totalRisks, 'percentage' => $langs->transnoentities('percentage'), 1 => $langs->transnoentities('GreyRisk'), 2 => $langs->transnoentities('OrangeRisk'), 3 => $langs->transnoentities('RedRisk'), 4 => $langs->transnoentities('BlackRisk')];
         $join             = ' LEFT JOIN ' . MAIN_DB_PREFIX . $this->table_element . ' as r ON r.rowid = t.fk_risk';
 
         if (is_array($dangerCategories) && !empty($dangerCategories)) {
             foreach ($dangerCategories as $dangerCategory) {
-                $arrayRisksList['riskFamily']['dangerName'][] = $dangerCategory['name'];
-                $allRisks = saturne_fetch_all_object_type('RiskAssessment', '', '', 0, 0, ['customsql' => 't.status = ' . RiskAssessment::STATUS_VALIDATED . ' AND r.category = ' . $dangerCategory['position']], 'AND', false, true, false, $join);
-                if (is_array($allRisks) && !empty($allRisks)) {
-                    $arrayRisksList['percentage']['risksPercentage'][] = count($allRisks) * 100 / $totalRisks;
-                    $arrayRisksList['numberOfRisks']['risks'][]        = count($allRisks);
+                $arrayRisksList[$dangerCategory['position']]['Ref']['value'] = $dangerCategory['name'];
+                $risks = $this->fetchAll('', '', 0, 0, ['customsql' => 't.status = ' . self::STATUS_VALIDATED . ' AND t.category = ' . $dangerCategory['position']]);
+                if (is_array($risks) && !empty($risks)) {
+                    $arrayRisksList[$dangerCategory['position']]['numberOfRisks']['value'] = count($risks);
+                    $arrayRisksList[$dangerCategory['position']]['percentage']['value']    = price2num((count($risks) / $totalRisks) * 100, 2) . ' %';
+                } else {
+                    $arrayRisksList[$dangerCategory['position']]['numberOfRisks']['value'] = 0;
+                    $arrayRisksList[$dangerCategory['position']]['percentage']['value']    = 0;
                 }
                 for ($i = 1; $i <= 4; $i++) {
                     $cotationStart   = $this->cotations[$i]['start'];
                     $cotationEnd     = $this->cotations[$i]['end'];
                     $riskAssessments = saturne_fetch_all_object_type('RiskAssessment', '', '', 0, 0, ['customsql' => 't.status = ' . RiskAssessment::STATUS_VALIDATED . ' AND r.category = ' . $dangerCategory['position'] . ' AND t.cotation >= ' . $cotationStart . ' AND t.cotation <= ' . $cotationEnd], 'AND', false, true, false, $join);
-                    $arrayRisksList[$i][$i][] = count($riskAssessments);
+                    $arrayRisksList[$dangerCategory['position']][$i]['value']    = is_array($riskAssessments) && !empty($riskAssessments) ? count($riskAssessments) : 0;
+                    $arrayRisksList[$dangerCategory['position']][$i]['morecss']  = 'risk-evaluation-cotation';
+                    $arrayRisksList[$dangerCategory['position']][$i]['moreattr'] = 'data-scale = ' . $i;
                 }
             }
         }
 
         $array['data'] = $arrayRisksList;
-        var_dump($array['data']);
+
         return $array;
     }
 
