@@ -192,7 +192,7 @@ if (empty($reshook)) {
 
 	$error = 0;
 
-	$backtopage = dol_buildpath('/digiriskdolibarr/view/digiriskelement/risk_list.php', 1);
+	$backtopage = dol_buildpath('/digiriskdolibarr/view/digiriskelement/risk_list.php?type=' . $riskType, 1);
 
 	require_once './../../core/tpl/riskanalysis/risk/digiriskdolibarr_risk_actions.tpl.php';
 }
