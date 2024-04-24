@@ -16,9 +16,9 @@
  */
 
 /**
- *   	\file       view/digiriskelement/digiriskelement_informations.php
- *		\ingroup    digiriskdolibarr
- *		\brief      Page to view digiriskelement informations and dashboard
+ * \file    view/digiriskelement/digiriskelement_informations.php
+ * \ingroup digiriskdolibarr
+ * \brief   Page to view digiriskelement informations and dashboard
  */
 
 // Load DigiriskDolibarr environment
@@ -34,33 +34,31 @@ if (file_exists('../digiriskdolibarr.main.inc.php')) {
 require_once __DIR__ . '/../../../saturne/class/saturnedashboard.class.php';
 
 // Load Digirisk libraries
-require_once __DIR__ . '/../../class/digiriskdolibarrdashboard.class.php';
 require_once __DIR__ . '/../../class/digiriskelement.class.php';
 require_once __DIR__ . '/../../lib/digiriskdolibarr_digiriskelement.lib.php';
 
+// Global variables definitions
 global $conf, $db, $hookmanager, $langs, $moduleNameLowerCase, $moduleNameUpperCase, $user;
 
 // Load translation files required by the page
-saturne_load_langs(['other']);
+saturne_load_langs();
 
 // Get parameters
 $id     = GETPOST('id', 'int');
 $action = GETPOST('action', 'aZ09');
 
 // Initialize technical objects
-$hookmanager->initHooks(['digiriskelementinformations', 'digiriskelementview', 'digiriskstandardview', 'globalcard']); // Note that conf->hooks_modules contains array
-
 $object    = new DigiriskElement($db);
 $dashboard = new SaturneDashboard($db, $moduleNameLowerCase);
 
-$upload_dir = $conf->digiriskdolibarr->multidir_output[$conf->entity ?? 1];
+$hookmanager->initHooks(['digiriskelementinformations', 'digiriskelementview', 'globalcard']); // Note that conf->hooks_modules contains array
+
+// Load object
+require_once DOL_DOCUMENT_ROOT . '/core/actions_fetchobject.inc.php'; // Must be included, not include_once
 
 // Security check
 $permissionToRead = $user->rights->digiriskdolibarr->digiriskelement->read;
 saturne_check_access($permissionToRead, $object);
-
-// Load object
-require_once DOL_DOCUMENT_ROOT . '/core/actions_fetchobject.inc.php'; // Must be included, not include_once
 
 /*
  * Actions
@@ -96,12 +94,10 @@ if (empty($resHook)) {
  * View
  */
 
-$title   = $langs->trans('DigiriskElementInformation');
-$helpUrl = 'FR:Module_Digirisk#DigiRisk_-_Document_Unique';
+$title   = $langs->trans('Informations');
+$helpUrl = 'FR:Module_Digirisk';
 
 digirisk_header($title, $helpUrl);
-
-print '<div id="cardContent" value="">';
 
 // Part to show record
 saturne_get_fiche_head($object, 'elementInformations', $title);
@@ -112,18 +108,9 @@ list($morehtmlref, $moreParams) = $object->getBannerTabContent();
 
 saturne_banner_tab($object,'ref','none', 0, 'ref', 'ref', $morehtmlref, true, $moreParams);
 
-print '<div class="fichecenter">';
-print '<br>';
+print '<div class="fichecenter"><br>';
 
-$moreParams = [
-    'loadAccident' => 0,
-    'loadRiskAssessmentDocument' => 0,
-    'loadEvaluator' => 1,
-    'loadDigiriskResources' => 0,
-    'loadRisk' => 1,
-    'loadTask' => 0,
-    'loadDigiriskElement' => 1
-];
+$moreParams = ['loadAccident' => 0, 'loadRiskAssessmentDocument' => 0, 'loadEvaluator' => 1, 'loadDigiriskResources' => 0, 'loadRisk' => 1, 'loadTask' => 0];
 
 $dashboard->show_dashboard($moreParams);
 
