@@ -95,7 +95,7 @@ if (empty($reshook)) {
 	if (($action == 'update' && ! GETPOST("cancel", 'alpha')) || ($action == 'updateedit') && $permissiontoadd) {
 		$auditStartDate = GETPOST('AuditStartDate', 'none');
 		$auditEndDate   = GETPOST('AuditEndDate', 'none');
-		$recipent       = GETPOST('Recipient', 'alpha');
+		$recipient       = GETPOST('Recipient', 'array');
 		$method         = GETPOST('Method', 'none');
 		$sources        = GETPOST('Sources', 'none');
 		$importantNote  = GETPOST('ImportantNote', 'none');
@@ -120,7 +120,7 @@ if (empty($reshook)) {
 			}
 		}
 
-		dolibarr_set_const($db, "DIGIRISKDOLIBARR_RISKASSESSMENTDOCUMENT_RECIPIENT", $recipent, 'integer', 0, '', $conf->entity);
+		dolibarr_set_const($db, "DIGIRISKDOLIBARR_RISKASSESSMENTDOCUMENT_RECIPIENT", json_encode($recipient), 'chaine', 0, '', $conf->entity);
 
 		dolibarr_set_const($db, "DIGIRISKDOLIBARR_RISKASSESSMENTDOCUMENT_METHOD", $method, 'chaine', 0, '', $conf->entity);
 		dolibarr_set_const($db, "DIGIRISKDOLIBARR_RISKASSESSMENTDOCUMENT_SOURCES", $sources, 'chaine', 0, '', $conf->entity);
