@@ -570,6 +570,7 @@ class Risk extends SaturneObject
 
         if (preg_match('/digiriskelement_informations/', $urlTab)) {
             $arrayRisksByDangerCategories = $this->getRisksByDangerCategories('single');
+            $arrayGetDataList             = $this->getDataList();
         } else {
             $arrayRisksByDangerCategories      = $this->getRisksByDangerCategories();
             $arrayTotalRisksByDangerCategories = $this->getTotalRisksByDangerCategories();
@@ -577,7 +578,7 @@ class Risk extends SaturneObject
         }
 
         $array['graphs'] = [$arrayRisksByCotation, $arrayRisksByDangerCategories, $arrayTotalRisksByDangerCategories ?? []];
-        $array['lists']  = [$getRiskListsByDangerCategories];
+        $array['lists']  = [$getRiskListsByDangerCategories, $arrayGetDataList];
 
         return $array;
     }
@@ -707,7 +708,7 @@ class Risk extends SaturneObject
     }
 
     /**
-     * Get risk lists by danger categories
+     * Get list of risks by danger categories
      *
      * @return array
      * @throws Exception
@@ -741,7 +742,7 @@ class Risk extends SaturneObject
 
                 $arrayRiskLists[$dangerCategory['position']]['numberOfRisks']['value']    = is_array($risks) && !empty($risks) ? count($risks) : 0;
                 $arrayRiskLists[$dangerCategory['position']]['numberOfRisks']['morecss']  = 'risk-evaluation-cotation';
-                $arrayRiskLists[$dangerCategory['position']]['numberOfRisks']['moreAttr'] = 'style="line-height: 0; border-radius: 0; background-color: #A1467EAA; color: #FFF;"';
+                $arrayRiskLists[$dangerCategory['position']]['numberOfRisks']['moreAttr'] = '"style="line-height: 0; border-radius: 0; background-color: #A1467EAA; color: #FFF;"';
                 $arrayRiskLists[$dangerCategory['position']]['percentage']['value']       = is_array($risks) && !empty($risks) ? price2num((count($risks) / count($totalRisks)) * 100, 2) . ' %' : 0;
 
                 for ($i = 1; $i <= 4; $i++) {
@@ -750,10 +751,60 @@ class Risk extends SaturneObject
                     $cotationStart   = $this->cotations[$i]['start'];
                     $cotationEnd     = $this->cotations[$i]['end'];
                     $riskAssessments = saturne_fetch_all_object_type('RiskAssessment', '', '', 0, 0, ['customsql' => 't.status = ' . RiskAssessment::STATUS_VALIDATED . ' AND r.category = ' . $dangerCategory['position'] . ' AND t.cotation >= ' . $cotationStart . ' AND t.cotation <= ' . $cotationEnd], 'AND', false, true, false, $join);
+                    $arrayRiskLists  = $this->getValueForRisks($riskAssessments, $arrayRiskLists, $dangerCategory['position'], $i);
+                }
+            }
+        }
 
-                    $arrayRiskLists[$dangerCategory['position']][$i]['value']    = is_array($riskAssessments) && !empty($riskAssessments) ? count($riskAssessments) : 0;
-                    $arrayRiskLists[$dangerCategory['position']][$i]['morecss']  = 'risk-evaluation-cotation';
-                    $arrayRiskLists[$dangerCategory['position']][$i]['moreAttr'] = 'data-scale = ' . $i . ' style="line-height: 0; border-radius: 0;"';
+        $array['data'] = $arrayRiskLists;
+
+        return $array;
+    }
+
+    /**
+     * Get list of risks by danger categories for GP
+     *
+     * @return array
+     * @throws Exception
+     */
+    public function getDataList() : array
+    {
+        global $langs;
+
+        $id     = GETPOST('id');
+        $filter = 't.fk_element = ' . $id . ' AND ';
+
+        // Graph Title parameters
+        $array['title'] = $langs->transnoentities('RiskListsByDangerCategories');
+        $array['picto'] = $this->picto;
+
+        // Graph parameters
+        $array['width'] = '100%';
+        $array['type']  = 'list';
+
+        $totalRisks = $this->fetchAll('', '', 0, 0, ['customsql' => $filter . 't.status = ' . self::STATUS_VALIDATED]);
+
+        $array['labels']['Ref']           = $langs->transnoentities('DangerCategories');
+        $array['labels']['numberOfRisks'] = $langs->transnoentities('NumberOfRisks') . ' : ' . '<span class="badge badge-info">' . (is_array($totalRisks) && !empty($totalRisks) ? count($totalRisks) : 0) . '</span>';
+        $array['labels']['percentage']    = $langs->transnoentities('Percentage');
+
+        $arrayRiskLists   = [];
+        $join             = ' LEFT JOIN ' . MAIN_DB_PREFIX . $this->table_element . ' as r ON r.rowid = t.fk_risk';
+        $dangerCategories = $this->getDangerCategories();
+        if (is_array($dangerCategories) && !empty($dangerCategories) && is_array($totalRisks) && !empty($totalRisks)) {
+            foreach ($dangerCategories as $dangerCategory) {
+                $arrayRiskLists[$dangerCategory['position']]['Ref']['value']              = $dangerCategory['name'];
+                $risks                                                                    = $this->fetchAll('', '', 0, 0, ['customsql' => $filter  .'t.status = ' . self::STATUS_VALIDATED . ' AND t.category = ' . $dangerCategory['position']]);
+                $arrayRiskLists[$dangerCategory['position']]['numberOfRisks']['value']    = is_array($risks) && !empty($risks) ? count($risks) : 0;
+                $arrayRiskLists[$dangerCategory['position']]['numberOfRisks']['morecss']  = 'risk-evaluation-cotation';
+                $arrayRiskLists[$dangerCategory['position']]['numberOfRisks']['moreAttr'] = 'style="line-height: 0; border-radius: 0; background-color: #A1467EAA; color: #FFF;"';
+                $arrayRiskLists[$dangerCategory['position']]['percentage']['value']       = is_array($risks) && !empty($risks) ? price2num((count($risks) / count($totalRisks)) * 100, 2) . ' %' : 0;
+                for ($i = 1; $i <= 4; $i++) {
+                    $array['labels'][$i] = $this->cotations[$i]['label'];
+                    $cotationStart       = $this->cotations[$i]['start'];
+                    $cotationEnd         = $this->cotations[$i]['end'];
+                    $riskAssessments     = saturne_fetch_all_object_type('RiskAssessment', '', '', 0, 0, ['customsql' =>  'r.fk_element = ' . $id . ' AND t.status = ' . RiskAssessment::STATUS_VALIDATED . ' AND r.category = ' . $dangerCategory['position'] . ' AND t.cotation >= ' . $cotationStart . ' AND t.cotation <= ' . $cotationEnd], 'AND', false, true, false, $join);
+                    $arrayRiskLists      = $this->getValueForRisks($riskAssessments, $arrayRiskLists, $dangerCategory['position'], $i);
                 }
             }
         }
@@ -787,5 +838,20 @@ class Risk extends SaturneObject
         }
 
         return $ret;
+    }
+
+    /**
+     * @param $riskAssessments
+     * @param array $arrayRiskLists
+     * @param $position
+     * @param int $i
+     * @return array
+     */
+    public function getValueForRisks($riskAssessments, array $arrayRiskLists, $position, int $i): array
+    {
+        $arrayRiskLists[$position][$i]['value'] = is_array($riskAssessments) && !empty($riskAssessments) ? count($riskAssessments) : 0;
+        $arrayRiskLists[$position][$i]['morecss'] = 'risk-evaluation-cotation';
+        $arrayRiskLists[$position][$i]['moreAttr'] = 'data-scale = ' . $i . ' style="line-height: 0; border-radius: 0;"';
+        return $arrayRiskLists;
     }
 }
