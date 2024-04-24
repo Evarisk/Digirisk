@@ -68,8 +68,15 @@ function digiriskstandard_prepare_head(DigiriskStandard $object): array
 
     if ($user->rights->digiriskdolibarr->listingrisksaction->read && $user->rights->digiriskdolibarr->listingrisksphoto->read  && $user->rights->digiriskdolibarr->listingrisksdocument->read) {
         $head[$h][0] = dol_buildpath('/digiriskdolibarr/view/digiriskelement/digiriskelement_listingrisksdocument.php', 1) . '?type=standard';
-        $head[$h][1] = $conf->browser->layout != 'phone' ? '<i class="fas fa-exclamation pictofixedwidth"></i>' . $langs->trans('ListingRisksDocument') : '<i class="fas fa-exclamation"></i>';
+        $head[$h][1] = $conf->browser->layout != 'phone' ? '<i class="fas fa-list pictofixedwidth"></i>' . $langs->trans('ListingRisksDocument') : '<i class="fas fa-list"></i>';
         $head[$h][2] = 'elementListingRisksDocument';
+        $h++;
+    }
+
+    if ($user->rights->digiriskdolibarr->listingrisksenvironmentalaction->read) {
+        $head[$h][0] = dol_buildpath('/digiriskdolibarr/view/digiriskelement/digiriskelement_environment.php', 1) . '?type=standard';
+        $head[$h][1] = $conf->browser->layout != 'phone' ? '<i class="fas fa-list pictofixedwidth"></i>' . $langs->trans('Environment') : '<i class="fas fa-list"></i>';
+        $head[$h][2] = 'elementEnvironment';
         $h++;
     }
 

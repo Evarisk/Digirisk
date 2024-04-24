@@ -302,7 +302,7 @@ $usertmp                     = new User($db);
 $project                     = new Project($db);
 $DUProject                   = new Project($db);
 
-$DUProject->fetch($conf->global->DIGIRISKDOLIBARR_DU_PROJECT);
+$DUProject->fetch($riskType == 'risk' ? $conf->global->DIGIRISKDOLIBARR_DU_PROJECT : $conf->global->DIGIRISKDOLIBARR_ENVIRONMENT_PROJECT);
 $extrafields->fetch_name_optionals_label($digiriskTask->table_element);
 
 $riskAssessment->ismultientitymanaged = 0;
@@ -348,7 +348,8 @@ if ( ! preg_match('/(evaluation)/', $sortfield)) {
 	$sql                                                                                                                                          .= " FROM " . MAIN_DB_PREFIX . $risk->table_element . " as r";
 	$sql                                                                                                                                          .= " LEFT JOIN " . MAIN_DB_PREFIX . $digiriskelement->table_element . " as e on (r.fk_element = e.rowid)";
 	if (is_array($extrafields->attributes[$risk->table_element]['label']) && count($extrafields->attributes[$risk->table_element]['label'])) $sql .= " LEFT JOIN " . MAIN_DB_PREFIX . $risk->table_element . "_extrafields as ef on (r.rowid = ef.fk_object)";
-	if ($risk->ismultientitymanaged == 1) $sql                                                                                                    .= " WHERE r.entity IN (" . getEntity($risk->element) . ")";
+    if (!empty($conf->categorie->enabled) && getDolGlobalInt('DIGIRISKDOLIBARR_CATEGORY_ON_RISK') > 0)                                  $sql .= Categorie::getFilterJoinQuery('risk', "r.rowid");
+    if ($risk->ismultientitymanaged == 1) $sql                                                                                                    .= " WHERE r.entity IN (" . getEntity($risk->element) . ")";
 	else $sql                                                                                                                                     .= " WHERE 1 = 1";
 
 	if ( ! $allRisks) {
@@ -369,6 +370,7 @@ if ( ! preg_match('/(evaluation)/', $sortfield)) {
 		$sql .= " AND fk_element > 0 ";
 		$sql .= " AND e.entity IN (" . $conf->entity . ") ";
 	}
+    $sql .= ' AND r.type = "' . $riskType . '"';
 
 	foreach ($search as $key => $val) {
 		if ($key == 'status' && $search[$key] == -1) continue;
@@ -392,6 +394,9 @@ if ( ! preg_match('/(evaluation)/', $sortfield)) {
 		}
 	}
 	if ($search_all) $sql .= natural_search(array_keys($fieldstosearchall), $search_all);
+    if (!empty($conf->categorie->enabled) && getDolGlobalInt('DIGIRISKDOLIBARR_CATEGORY_ON_RISK') > 0) {
+        $sql .= Categorie::getFilterSelectQuery('risk', 'r.rowid', $search_category_array);
+    }
 	// Add where from extra fields
 	include DOL_DOCUMENT_ROOT . '/core/tpl/extrafields_list_search_sql.tpl.php';
 	// Add where from hooks
@@ -455,11 +460,12 @@ if ( ! preg_match('/(evaluation)/', $sortfield)) {
 	$sql                                                                                                                                                      .= " LEFT JOIN " . MAIN_DB_PREFIX . $digiriskelement->table_element . " as e on (r.fk_element = e.rowid)";
 	if (is_array($extrafields->attributes[$evaluation->table_element]['label']) && count($extrafields->attributes[$evaluation->table_element]['label'])) $sql .= " LEFT JOIN " . MAIN_DB_PREFIX . $evaluation->table_element . "_extrafields as ef on (evaluation.rowid = ef.fk_object)";
 	if ($sortfield == 'evaluation.has_tasks')                                                                                                            $sql .= ' LEFT JOIN ' . MAIN_DB_PREFIX . 'projet_task_extrafields as taskextrafields ON (taskextrafields.fk_risk = r.rowid)';
-	if ($evaluation->ismultientitymanaged == 1) $sql                                                                                                          .= " WHERE evaluation.entity IN (" . getEntity($evaluation->element) . ")";
+    if (!empty($conf->categorie->enabled) && getDolGlobalInt('DIGIRISKDOLIBARR_CATEGORY_ON_RISK') > 0)                                              $sql .= Categorie::getFilterJoinQuery('risk', "r.rowid");
+    if ($evaluation->ismultientitymanaged == 1) $sql                                                                                                          .= " WHERE evaluation.entity IN (" . getEntity($evaluation->element) . ")";
 	else $sql                                                                                                                                                 .= " WHERE 1 = 1";
 	$sql                                                                                                                                                      .= " AND evaluation.status = 1";
 	if ( ! $allRisks) {
-		$sql .= " AND r.fk_element =" . $id;
+		$sql .= " AND r.fk_element = " . $id;
 	} else {
 		if (is_array($activeDigiriskElementList) && !empty($activeDigiriskElementList)) {
 			$digiriskElementSqlFilter = '(';
@@ -475,6 +481,7 @@ if ( ! preg_match('/(evaluation)/', $sortfield)) {
 		$sql .= " AND r.fk_element > 0";
 		$sql .= " AND e.entity IN (" . $conf->entity . ")";
 	}
+    $sql .= ' AND r.type = "' . $riskType . '"';
 
 	foreach ($search as $key => $val) {
 		if ($key == 'status' && $search[$key] == -1) continue;
@@ -498,6 +505,10 @@ if ( ! preg_match('/(evaluation)/', $sortfield)) {
 		}
 	}
 	if ($search_all) $sql .= natural_search(array_keys($fieldstosearchall), $search_all);
+
+    if (!empty($conf->categorie->enabled) && getDolGlobalInt('DIGIRISKDOLIBARR_CATEGORY_ON_RISK') > 0) {
+        $sql .= Categorie::getFilterSelectQuery('risk', 'r.rowid', $search_category_array);
+    }
 
 	// Add where from extra fields
 	include DOL_DOCUMENT_ROOT . '/core/tpl/extrafields_list_search_sql.tpl.php';
@@ -671,7 +682,7 @@ if ($action != 'list') {
 										<input class="risk-evaluation-seuil" type="hidden" value="undefined">
 										<?php
 										$evaluationMethod        = $advancedCotationMethodArray[0];
-										$evaluationMethodSurvey = $evaluationMethod['option']['variable'];
+										$evaluationMethodSurvey = $evaluationMethod['option'][$risk->type . '_variable'];
 										?>
 										<div class="wpeo-gridlayout cotation-advanced" style="display:none">
 											<input type="hidden" class="digi-method-evaluation-id" value="<?php echo $risk->id ; ?>" />
@@ -726,6 +737,15 @@ if ($action != 'list') {
 									<?php print $form->selectDate('', 'RiskAssessmentDate0', 0, 0, 0, '', 1, 1); ?>
 								</div>
 							<?php endif; ?>
+                            <?php
+                            if (!empty($conf->categorie->enabled) && getDolGlobalInt('DIGIRISKDOLIBARR_CATEGORY_ON_RISK') > 0) {
+                                print '<div class="risk-categories"><span class="title">'.$langs->trans("Categories") . '</span>';
+                                $categoryArborescence = $form->select_all_categories('risk', '', 'parent', 64, 0, 1);
+                                print img_picto('', 'category', 'class="pictofixedwidth"').$form->multiselectarray('categories', $categoryArborescence, GETPOST('categories', 'array'), '', 0, 'minwidth100imp widthcentpercentminusxx maxwidth400');
+                                print '<a class="butActionNew" href="' . DOL_URL_ROOT . '/categories/index.php?type=risk&backtopage=' . urlencode($_SERVER['PHP_SELF'] . '?action=create') . '" target="_blank"><span class="fa fa-plus-circle valignmiddle paddingleft" title="' . $langs->trans('AddCategories') . '"></span></a>';
+                                print "</div>";
+                            }
+                            ?>
                             <div class="riskassessment-medias linked-medias photo">
                                 <div class="element-linked-medias element-linked-medias-0 risk-new">
                                     <div class="medias section-title"><i class="fas fa-picture-o"></i><?php echo $langs->trans('Medias'); ?></div>
@@ -832,9 +852,16 @@ if ($action != 'list') {
 							<?php print '<textarea name="riskComment" rows="' . ROWS_2 . '">' . ('') . '</textarea>' . "\n"; ?>
 						</div>
 					<?php endif; ?>
-					<hr>
-				</div>
-				<div class="risk-evaluation-container standard">
+                </div>
+                <?php
+                if (!empty($conf->categorie->enabled) && getDolGlobalInt('DIGIRISKDOLIBARR_CATEGORY_ON_RISK') > 0) {
+                    print '<div class="risk-categories"><span class="title">'.$langs->trans("Categories") . '</span>';
+                    $categoryArborescence = $form->select_all_categories('risk', '', 'parent', 64, 0, 1);
+                    print img_picto('', 'category', 'class="pictofixedwidth"').$form->multiselectarray('categories', $categoryArborescence, GETPOST('categories', 'array'), '', 0, 'minwidth100imp widthcentpercentminusxx maxwidth400');
+                    print '<a class="butActionNew" href="' . DOL_URL_ROOT . '/categories/index.php?type=risk&backtopage=' . urlencode($_SERVER['PHP_SELF'] . '?action=create') . '" target="_blank"><span class="fa fa-plus-circle valignmiddle paddingleft" title="' . $langs->trans('AddCategories') . '"></span></a>';
+                    print "</div><hr>";
+                } ?>
+                <div class="risk-evaluation-container standard">
 					<span class="section-title"><?php echo ' ' . $langs->trans('RiskAssessment'); ?></span>
 					<div class="risk-evaluation-header">
 						<?php if ($conf->global->DIGIRISKDOLIBARR_ADVANCED_RISKASSESSMENT_METHOD) : ?>
@@ -873,7 +900,7 @@ if ($action != 'list') {
 								<input class="risk-evaluation-seuil" type="hidden" value="undefined">
 								<?php
 								$evaluationMethod        = $advancedCotationMethodArray[0];
-								$evaluationMethodSurvey = $evaluationMethod['option']['variable'];
+								$evaluationMethodSurvey = $evaluationMethod['option'][$risk->type . '_variable'];
 								?>
 								<div class="wpeo-gridlayout cotation-advanced" style="display:none">
 									<input type="hidden" class="digi-method-evaluation-id" value="<?php echo $risk->id ; ?>" />
@@ -928,6 +955,7 @@ if ($action != 'list') {
 							<?php print $form->selectDate('', 'RiskAssessmentDate', 0, 0, 0, '', 1, 1); ?>
 						</div>
 					<?php endif; ?>
+                    <hr>
                     <div class="riskassessment-medias linked-medias photo">
                         <div class="element-linked-medias element-linked-medias-0 risk-new">
                             <div class="medias section-title"><i class="fas fa-picture-o"></i><?php echo $langs->trans('Medias'); ?></div>
@@ -996,7 +1024,7 @@ if ($action != 'list') {
 	</div>
 	<?php endif; ?>
 <?php endif; ?>
-<?php $title = $langs->trans('DigiriskElementRisksList');
+<?php $title = $langs->trans('DigiriskElement' . ucfirst($riskType) . 'sList');
 print '<div class="div-title-and-table-responsive">';
 print_barre_liste($title, $page, $_SERVER["PHP_SELF"], $param, $sortfield, $sortorder, $massactionbutton, $num, $nbtotalofrecords, $risk->picto, 0, $newcardbutton, '', $limit, 0, 0, 1);
 
@@ -1012,6 +1040,12 @@ $parameters                          = array();
 $reshook                             = $hookmanager->executeHooks('printFieldPreListTitle', $parameters, $risk); // Note that $action and $risk may have been modified by hook
 if (empty($reshook)) $moreforfilter .= $hookmanager->resPrint;
 else $moreforfilter                  = $hookmanager->resPrint;
+
+// Filter on categories
+if (!empty($conf->categorie->enabled) && $user->rights->categorie->lire && getDolGlobalInt('DIGIRISKDOLIBARR_CATEGORY_ON_RISK') > 0) {
+    $formcategory   = new FormCategory($db);
+    $moreforfilter  = $formcategory->getFilterBox('risk', $search_category_array);
+}
 
 if ( ! empty($moreforfilter)) {
 	print '<div class="liste_titre liste_titre_bydiv centpercent">';
@@ -1189,7 +1223,7 @@ while ($i < ($limit ? min($num, $limit) : $num)) {
                             $digiriskElementIds = array_reverse($digiriskElementIds);
 
                             foreach ($digiriskElementIds as $key => $digiriskElementId) {
-                                print str_repeat(' - ', $key + 1) . $activeDigiriskElementList[$digiriskElementId]->getNomUrl(1, 'blank', 0, '', -1, 1) . '</br>';
+                                print str_repeat(' &#160', $key + 1) . '&#x21B3' . $activeDigiriskElementList[$digiriskElementId]->getNomUrl(1, 'blank', 0, '', -1, 1) . '</br>';
                             }
                         }
                     }
@@ -1282,6 +1316,23 @@ while ($i < ($limit ? min($num, $limit) : $num)) {
 										</div>
 									<?php endif; ?>
 								</div>
+                                <?php
+                                // Tags-Categories
+                                if ($conf->categorie->enabled && getDolGlobalInt('DIGIRISKDOLIBARR_CATEGORY_ON_RISK') > 0) {
+                                    print '<div class="risk-categories"><span class="title">'.$langs->trans("Categories").'</span>';
+                                    $categoryArborescence = $form->select_all_categories('risk', '', 'parent', 64, 0, 1);
+                                    $c                    = new Categorie($db);
+                                    $cats                 = $c->containing($risk->id, 'risk');
+                                    $arrayselected        = [];
+                                    if (is_array($cats)) {
+                                        foreach ($cats as $cat) {
+                                            $arrayselected[] = $cat->id;
+                                        }
+                                    }
+                                    print img_picto('', 'category', 'class="pictofixedwidth"').$form->multiselectarray('categories_risk' . $risk->id, $categoryArborescence, $arrayselected, '', 0, 'minwidth100imp widthcentpercentminusxx maxwidth400');
+                                    print '<a class="butActionNew" href="' . DOL_URL_ROOT . '/categories/index.php?type=risk&backtopage=' . urlencode($_SERVER['PHP_SELF'] . '?action=create') . '" target="_blank"><span class="fa fa-plus-circle valignmiddle paddingleft" title="' . $langs->trans('AddCategories') . '"></span></a>';
+                                    print '</div><hr>';
+                                } ?>
 								<div class="move-risk <?php echo $conf->global->DIGIRISKDOLIBARR_MOVE_RISKS ? '' : 'move-disabled'?>">
 									<span class="title"><?php echo $langs->trans('MoveRisk'); ?></span>
 									<?php if (is_object($activeDigiriskElementList[$risk->fk_element])) {

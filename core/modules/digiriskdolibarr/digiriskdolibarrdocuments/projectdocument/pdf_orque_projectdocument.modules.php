@@ -393,6 +393,31 @@ class pdf_orque_projectdocument
 				$curY = $tab_top + $heightoftitleline + 1;
 				$nexY = $tab_top + $heightoftitleline + 1;
 
+				// Sort the info by descending order of cotation
+				$objectDoc = array();
+				for ($i = 0; $i < $nblines; $i++) {
+                    $object->lines[$i]->fetch_optionals();
+                    $risk->fetch($object->lines[$i]->array_options['options_fk_risk']);
+					$lastEvaluation = $riskassessment->fetchFromParent($risk->id, 1);
+					if ($lastEvaluation > 0 && !empty($lastEvaluation) && is_array($lastEvaluation)) {
+						$lastEvaluation = array_shift($lastEvaluation);
+					}
+
+					$tmpArray = array("cotation" => empty($lastEvaluation->cotation) ? 0 : $lastEvaluation->cotation);
+					$tmpArray += array("task_ref" => $object->lines[$i]->ref);
+					$tmpArray += array("risk_ref" => $risk->ref);
+					$tmpArray += array("label" => $object->lines[$i]->label);
+					$tmpArray += array("budget" => $object->lines[$i]->budget_amount);
+					$tmpArray += array("progress" => $object->lines[$i]->progress ? $object->lines[$i]->progress . '%' : '');
+					$tmpArray += array("date_start" => $object->lines[$i]->date_start);
+					$tmpArray += array("date_end" => $object->lines[$i]->date_end);
+					$tmpArray += array("workload" =>  $object->lines[$i]->planned_workload);
+					array_push($objectDoc, $tmpArray);
+				}
+				usort($objectDoc, function($a, $b) {
+					return $b['cotation'] <=> $a['cotation'];
+				});
+
 				// Loop on each lines
 
 				for ($i = 0; $i < $nblines; $i++) {
@@ -404,22 +429,17 @@ class pdf_orque_projectdocument
 					$pdf->setPageOrientation($this->orientation, 1, $heightforfooter + $heightforfreetext + $heightforinfotot); // The only function to edit the bottom margin of current page to set it.
 					$pageposbefore = $pdf->getPage();
 
-					$risk->fetch($object->lines[$i]->options_fk_risk);
-					$lastEvaluation = $riskassessment->fetchFromParent($risk->id, 1);
-					if ($lastEvaluation > 0 && !empty($lastEvaluation) && is_array($lastEvaluation)) {
-						$lastEvaluation = array_shift($lastEvaluation);
-					}
-
 					// Description of line
-					$ref = $object->lines[$i]->ref;
-					$libelleline = $object->lines[$i]->label;
-					$riskref = $risk->ref;
-					$lastEvaluation = $lastEvaluation->cotation ?: 0;
-					$budget = price($object->lines[$i]->budget_amount, 0, $langs, 1, 0, 0, $conf->currency);
-					$progress = ($object->lines[$i]->progress ? $object->lines[$i]->progress.'%' : '');
-					$datestart = dol_print_date($object->lines[$i]->date_start, 'day');
-					$dateend = dol_print_date($object->lines[$i]->date_end, 'day');
-					$planned_workload = convertSecondToTime((int) $object->lines[$i]->planned_workload, 'allhourmin');
+					$ref = $objectDoc[$i]['task_ref'];
+					$libelleline = $objectDoc[$i]['label'];
+					$riskref = $objectDoc[$i]['risk_ref'];
+					$lastEvaluation = $objectDoc[$i]['cotation'];
+					$budget = price($objectDoc[$i]['budget'], 0, $langs, 1, 0, 0, $conf->currency);
+					$progress = $objectDoc[$i]['progress'];
+					$datestart = dol_print_date($objectDoc[$i]['date_start'], 'day');
+					$dateend = dol_print_date($objectDoc[$i]['date_end'], 'day');
+					$planned_workload = convertSecondToTime((int) $objectDoc[$i]['workload'], 'allhourmin');
+					$totalbudget += $objectDoc[$i]['budget'];
 
 					$showpricebeforepagebreak = 1;
 
@@ -518,8 +538,20 @@ class pdf_orque_projectdocument
 					$pdf->SetXY($this->posxrisk, $curY);
 					$pdf->MultiCell($this->posxriskassessment - $this->posxrisk, 3, $riskref, 0, 'L');
 					// Risk assessment
+					if ($conf->global->DIGIRISKDOLIBARR_PROJECTDOCUMENT_DISPLAY_RISKASSESSMENT_COLOR) {
+						if ($lastEvaluation < 47) {
+							$pdf->SetTextColor(169, 169, 169);
+						} else if ($lastEvaluation < 51) {
+							$pdf->SetTextColor(255, 165, 0);
+						} else if ($lastEvaluation < 80) {
+							$pdf->SetTextColor(255, 0, 0);
+						} else {
+							$pdf->SetTextColor(0, 0, 0);
+						}
+					}
 					$pdf->SetXY($this->posxriskassessment, $curY);
 					$pdf->MultiCell($this->posxlabel - $this->posxriskassessment, 3, $lastEvaluation, 0, 'C');
+					$pdf->SetTextColor(0, 0, 0);
 					// task budget
 					$pdf->SetXY($this->posxbudget, $curY);
 					$pdf->MultiCell($this->posxworkload - $this->posxbudget, 3, $budget, 0, 'R');
@@ -586,6 +618,16 @@ class pdf_orque_projectdocument
 						}
 					}
 				}
+
+				// Break line between total budget and tasks
+				$curY += 10;
+				$pdf->line($this->marge_gauche, $curY, $this->page_largeur - $this->marge_droite, $curY);
+				$curY += 5;
+				$totalbudget = price($totalbudget, 0, $langs, 1, 0, 0, $conf->currency);
+
+				// Total budget of task
+				$pdf->SetXY($this->posxref, $curY);
+				$pdf->MultiCell($this->posxbudget - $this->posxlabel, 3, $outputlangs->convToOutputCharset($langs->transnoentities('TotalBudget')) . ' : ' . $outputlangs->convToOutputCharset($totalbudget), 0, 'L');
 
 				// Show square
 				if ($pagenb == 1) {

@@ -512,6 +512,7 @@ if (GETPOST('dataMigrationExportGlobal', 'alpha') && ! empty($conf->global->MAIN
 					$risksExportArray['status']      = $risksingle->status;
 					$risksExportArray['category']    = $risksingle->category;
 					$risksExportArray['description'] = $risksingle->description;
+                    $risksExportArray['type']        = $risksingle->type;
 					$risksExportArray['fk_element']  = $risksingle->fk_element;
 					$risksExportArray['fk_projet']   = $risksingle->fk_projet;
 
@@ -682,8 +683,9 @@ if (GETPOST('dataMigrationImportGlobalDolibarr', 'alpha') && ! empty($conf->glob
 							$risk->status      = $digiriskExportRisk['status'];
 							$risk->category    = $digiriskExportRisk['category'];
 							$risk->description = $digiriskExportRisk['description'];
+                            $risk->type        = $digiriskExportRisk['type'];
 							$risk->fk_element  = $digiriskelementid;
-							$risk->fk_projet   = $conf->global->DIGIRISKDOLIBARR_DU_PROJECT;
+							$risk->fk_projet   = $digiriskExportRisk['type'] == 'risk' ? $conf->global->DIGIRISKDOLIBARR_DU_PROJECT : $conf->global->DIGIRISKDOLIBARR_ENVIRONMENT_PROJECT;
 
 							if ( ! $error) {
 								$result = $risk->create($user, true);

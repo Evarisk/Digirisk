@@ -51,31 +51,18 @@ class DigiriskDocuments extends SaturneDocuments
 		parent::__construct($db, $module, $element);
 	}
 
-	/**
-	 * Create object into database
-	 *
-	 * @param  User $user      User that creates
-	 * @param  bool $notrigger false=launch triggers after, true=disable triggers
-	 * @return int             0 < if KO, ID of created object if OK
-	 */
-	public function create(User $user, bool $notrigger = false, object $parentObject = null): int
-	{
-		$now = dol_now();
-
-		$this->ref_ext       = 'digirisk_' . $this->ref;
-		$this->date_creation = $this->db->idate($now);
-		$this->tms           = $now;
-		$this->import_key    = "";
-		$this->status        = 1;
-		$this->type          = $this->element;
-		$this->module_name   = $this->module;
-		$this->fk_user_creat = $user->id ?: 1;
-        $this->parent_id     = $parentObject->id;
-        $this->parent_type   = $parentObject->element;
-
-		$this->DigiriskFillJSON();
-		return $this->createCommon($user, $notrigger);
-	}
+    /**
+     * Create object into database
+     *
+     * @param  User $user      User that creates
+     * @param  bool $notrigger false = launch triggers after, true = disable triggers
+     * @return int             0 < if KO, ID of created object if OK
+     */
+    public function create(User $user, bool $notrigger = false, object $parentObject = null): int
+    {
+        $this->DigiriskFillJSON();
+        return parent::create($user, $notrigger, $parentObject);
+    }
 
 	/**
 	 * Function for JSON filling before saving in database
@@ -230,15 +217,15 @@ class DigiriskDocuments extends SaturneDocuments
                                     }
 
                                     if ($conf->global->DIGIRISKDOLIBARR_SHOW_RISK_ORIGIN) {
-                                        $nomElement .= (!empty($conf->global->DIGIRISKDOLIBARR_SHOW_SHARED_RISKS) ? 'S' . $element->entity . ' - ' : '') . $element->ref . ' - ' . $element->label;
+                                        $nomElement .= (!empty($conf->global->DIGIRISKDOLIBARR_SHOW_SHARED_RISKS) ? 'S' . $element->entity : '') . ' - ' . $element->ref . ' - ' . $element->label;
                                         if ($line->fk_element != $line->appliedOn) {
-                                            $nomElement .= "\n" . ($dash > 0 ? ' - ' : '') . $langs->trans('AppliedOn') . ' ' . $linked_element->ref . ' - ' . $linked_element->label;
+                                            $nomElement .= ($dash > 0 ? ' - ' : '') . $langs->trans('AppliedOn') . ' ' . $linked_element->ref . ' - ' . $linked_element->label;
                                         }
                                     } else {
                                         if ($linked_element->id > 0) {
-                                            $nomElement .= "\n" . ($dash > 0 ? ' - ' : '') . $linked_element->ref . ' - ' . $linked_element->label;
+                                            $nomElement .= ($dash > 0 ? ' - ' : '') . $linked_element->ref . ' - ' . $linked_element->label;
                                         } else {
-                                            $nomElement .= "\n" . ($dash > 0 ? ' - ' : '') . $element->ref . ' - ' . $element->label;
+                                            $nomElement .= ($dash > 0 ? ' - ' : '') . $element->ref . ' - ' . $element->label;
                                         }
                                     }
 

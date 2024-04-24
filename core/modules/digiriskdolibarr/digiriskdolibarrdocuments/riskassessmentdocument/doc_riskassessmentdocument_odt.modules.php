@@ -103,10 +103,11 @@ class doc_riskassessmentdocument_odt extends SaturneDocumentModel
 				$ticket                = new Ticket($this->db);
 				$category              = new Categorie($this->db);
 
-				$digiriskelementlist   = $digiriskelementobject->fetchDigiriskElementFlat(0);
-				$risks                 = $risk->fetchRisksOrderedByCotation(0, true, $conf->global->DIGIRISKDOLIBARR_SHOW_INHERITED_RISKS_IN_DOCUMENTS, $conf->global->DIGIRISKDOLIBARR_SHOW_SHARED_RISKS);
-				$riskAssessmentList    = $riskassessment->fetchAll('', '', 0, 0, ['customsql' => 'status = 1']);
-				$riskList              = $risk->fetchAll('', '', 0, 0, array(), 'AND', $conf->global->DIGIRISKDOLIBARR_SHOW_SHARED_RISKS);
+                $moreParam['filterRisk'] = ' AND t.type = "risk"';
+				$risks                   = $risk->fetchRisksOrderedByCotation(0, true, $conf->global->DIGIRISKDOLIBARR_SHOW_INHERITED_RISKS_IN_DOCUMENTS, $conf->global->DIGIRISKDOLIBARR_SHOW_SHARED_RISKS, $moreParam);
+				$riskAssessmentList      = $riskassessment->fetchAll('', '', 0, 0, ['customsql' => 'status = 1']);
+				$riskList                = $risk->fetchAll('', '', 0, 0, array(), 'AND', $conf->global->DIGIRISKDOLIBARR_SHOW_SHARED_RISKS);
+				$digiriskelementlist     = $digiriskelementobject->fetchDigiriskElementFlat(0);
 
 				if (is_array($digiriskelementlist) && !empty($digiriskelementlist)) {
 					$listLines = $odfHandler->setSegment('elementParHierarchie');
