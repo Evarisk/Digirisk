@@ -945,6 +945,7 @@ ConfirmImportSharedRisks                   = Veuillez choisir les risques partag
 RisksRepartition                           = Répartition des risques par évaluation
 AddStatsGP                                 = Répartition des risques: %s - %s
 TotalRisksRepartition                      = Répartition des risques par famille
+RisksFamilly                               = Famille des risques
 numberOfDigiriskElementsByDigiriskElements = Répartition des sites
 RisksRepartitionByDangerCategories         = Répartition par famille de risque et criticité
 RisksNumber                                = Nombres de risques
