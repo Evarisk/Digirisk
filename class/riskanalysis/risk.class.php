@@ -715,7 +715,7 @@ class Risk extends SaturneObject
      */
     public function getRiskListsByDangerCategories() : array
     {
-        global $langs;
+        global $conf, $langs;
 
         // Graph Title parameters
         $array['title'] = $langs->transnoentities('RiskListsByDangerCategories');
@@ -725,7 +725,7 @@ class Risk extends SaturneObject
         $array['width'] = '100%';
         $array['type']  = 'list';
 
-        $totalRisks = $this->fetchAll('', '', 0, 0, ['customsql' => 't.status = ' . self::STATUS_VALIDATED]);
+        $totalRisks = $this->fetchAll('', '', 0, 0, ['customsql' => 't.status = ' . self::STATUS_VALIDATED . ' AND t.entity = ' . $conf->entity]);
 
         $array['labels']['Ref']           = $langs->transnoentities('DangerCategories');
         $array['labels']['numberOfRisks'] = $langs->transnoentities('NumberOfRisks') . ' : ' . '<span class="badge badge-info">' . (is_array($totalRisks) && !empty($totalRisks) ? count($totalRisks) : 0) . '</span>';
@@ -738,7 +738,7 @@ class Risk extends SaturneObject
             foreach ($dangerCategories as $dangerCategory) {
                 $arrayRiskLists[$dangerCategory['position']]['Ref']['value'] = $dangerCategory['name'];
 
-                $risks = $this->fetchAll('', '', 0, 0, ['customsql' => 't.status = ' . self::STATUS_VALIDATED . ' AND t.category = ' . $dangerCategory['position']]);
+                $risks = $this->fetchAll('', '', 0, 0, ['customsql' => 't.status = ' . self::STATUS_VALIDATED . ' AND t.entity = ' . $conf->entity . ' AND t.category = ' . $dangerCategory['position']]);
 
                 $arrayRiskLists[$dangerCategory['position']]['numberOfRisks']['value']    = is_array($risks) && !empty($risks) ? count($risks) : 0;
                 $arrayRiskLists[$dangerCategory['position']]['numberOfRisks']['morecss']  = 'risk-evaluation-cotation';
