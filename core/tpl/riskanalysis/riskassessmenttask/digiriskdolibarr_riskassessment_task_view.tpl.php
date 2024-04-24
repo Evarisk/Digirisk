@@ -13,7 +13,7 @@ if (!empty($related_tasks) && $related_tasks > 0) {
 		<?php if (!empty($related_tasks) && $related_tasks > 0) : ?>
 			<?php foreach ($related_tasks as $related_task) {
 				if (!empty($conf->global->DIGIRISKDOLIBARR_SHOW_SHARED_RISKS) && $contextpage == 'sharedrisk') {
-					if ($related_task->fk_projet != $conf->global->DIGIRISKDOLIBARR_DU_PROJECT) {
+					if ($related_task->fk_projet != $conf->global->DIGIRISKDOLIBARR_DU_PROJECT && $related_task->fk_projet != $conf->global->DIGIRISKDOLIBARR_ENVIRONMENT_PROJECT) {
 						$project->fetch($related_task->fk_projet);
 					} else {
 						$project = $DUProject;

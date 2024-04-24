@@ -72,7 +72,7 @@ class ActionsDigiriskdolibarr
     {
         $error = 0; // Error counter
 
-        if (($parameters['currentcontext'] == 'category')) {
+        if (strpos($parameters['context'], 'category') !== false) {
             $tags = [
                 'accident' => [
                     'id'        => 436302001,
@@ -91,6 +91,12 @@ class ActionsDigiriskdolibarr
                     'code'      => 'firepermit',
                     'obj_class' => 'FirePermit',
                     'obj_table' => 'digiriskdolibarr_firepermit',
+                ],
+                'risk' => [
+                    'id'        => 436302004,
+                    'code'      => 'risk',
+                    'obj_class' => 'Risk',
+                    'obj_table' => 'digiriskdolibarr_risk',
                 ],
             ];
         }
@@ -210,7 +216,7 @@ class ActionsDigiriskdolibarr
                 $fileDir    = $upload_dir . '/' . $dirFiles;
                 $urlSource  = $_SERVER['PHP_SELF'] . '?id=' . $object->id;
 
-                $out = saturne_show_documents('digiriskdolibarr:TicketDocument', $dirFiles, $fileDir, $urlSource, $user->rights->ticket->write, $user->rights->ticket->delete, getDolGlobalString('DIGIRISKDOLIBARR_TICKET_DEFAULT_MODEL'), 1, 0, 0, 0, '', '', '', '', '', $object); ?>
+                $out = saturne_show_documents('digiriskdolibarr:TicketDocument', $dirFiles, $fileDir, $urlSource, $user->rights->ticket->write, $user->rights->ticket->delete, getDolGlobalString('DIGIRISKDOLIBARR_TICKETDOCUMENT_DEFAULT_MODEL'), 1, 0, 0, 0, '', '', '', '', '', $object); ?>
 
                 <script>
                     jQuery('.fichehalfleft .div-table-responsive-no-min').first().append(<?php echo json_encode($out); ?>);
@@ -568,7 +574,7 @@ class ActionsDigiriskdolibarr
                 $permissiontoadd     = $user->rights->ticket->write;
             }
 
-            if ($action == 'remove_file') {
+            if ($action == 'remove_file' && preg_match('/\bticketdocument\b/', GETPOST('file'))) {
                 $upload_dir         = $conf->digiriskdolibarr->multidir_output[$conf->entity ?? 1];
                 $permissiontodelete = $user->rights->ticket->delete;
             }
@@ -968,6 +974,10 @@ class ActionsDigiriskdolibarr
 				'documentType' => 'listingrisksaction',
 				'picto'        => 'fontawesome_fa-exclamation_fas_#d35968'
 			],
+            'ListingRisksEnvironmentalAction' => [
+                'documentType' => 'listingrisksenvironmentalaction',
+                'picto'        => 'fontawesome_fa-exclamation_fas_#d35968'
+            ],
 			'ListingRisksPhoto' => [
 				'documentType' => 'listingrisksphoto',
 				'picto'        => 'fontawesome_fa-images_fas_#d35968'
@@ -1031,7 +1041,8 @@ class ActionsDigiriskdolibarr
 	{
 		$additionalConfig = [
 			'ShowPictoName' => 'DIGIRISKDOLIBARR_DOCUMENT_SHOW_PICTO_NAME',
-			'GenerateZipArchiveWithDigiriskElementDocuments' => 'DIGIRISKDOLIBARR_GENERATE_ARCHIVE_WITH_DIGIRISKELEMENT_DOCUMENTS'
+            'GenerateZipArchiveWithDigiriskElementDocuments' => 'DIGIRISKDOLIBARR_GENERATE_ARCHIVE_WITH_DIGIRISKELEMENT_DOCUMENTS',
+			'RiskAssessmentColor' => 'DIGIRISKDOLIBARR_PROJECTDOCUMENT_DISPLAY_RISKASSESSMENT_COLOR'
 		];
 
 		// Do something only for the current context.

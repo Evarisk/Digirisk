@@ -149,6 +149,11 @@ window.digiriskdolibarr.risk.createRisk = function ( event ) {
 		}
 	})
 
+  var categories = [];
+  $(this).closest('.modal-container').find('.risk-categories').find(":selected").each(function() {
+    categories.push($(this).val());
+  });
+
 	//Task
 	var task      = taskText;
 	let dateStart = elementTask.find('#RiskassessmentTaskDateStartModalRisk').val();
@@ -181,6 +186,7 @@ window.digiriskdolibarr.risk.createRisk = function ( event ) {
 			hourEnd: hourEnd,
 			minEnd: minEnd,
 			budget: budget,
+      categories: categories,
 			criteres: {
 				gravite: criteres['gravite'] ? criteres['gravite'] : 0,
 				occurrence: criteres['occurrence'] ? criteres['occurrence'] : 0,
@@ -249,6 +255,10 @@ window.digiriskdolibarr.risk.saveRisk = function ( event ) {
 	}
 	let riskRef =  $('.risk_row_'+editedRiskId).find('.risk-container > div:nth-child(1)').text();
 
+  var categories = [];
+  $(this).closest('.modal-container').find('.risk-categories').find(":selected").each(function() {
+    categories.push($(this).val());
+  });
 
 	$.ajax({
 		url:  document.URL + '&action=saveRisk&token='+token,
@@ -258,7 +268,8 @@ window.digiriskdolibarr.risk.saveRisk = function ( event ) {
 			riskID: editedRiskId,
 			category: category,
 			comment: description,
-			newParent: newParent
+			newParent: newParent,
+      categories: categories
 		}),
 		contentType: false,
 		success: function ( resp ) {

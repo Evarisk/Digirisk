@@ -40,6 +40,10 @@ require_once DOL_DOCUMENT_ROOT . '/core/lib/admin.lib.php';
 require_once DOL_DOCUMENT_ROOT . '/core/class/html.form.class.php';
 require_once DOL_DOCUMENT_ROOT . '/ecm/class/ecmdirectory.class.php';
 require_once DOL_DOCUMENT_ROOT . '/projet/class/project.class.php';
+if (isModEnabled('categorie')) {
+    require_once DOL_DOCUMENT_ROOT.'/core/class/html.formcategory.class.php';
+    require_once DOL_DOCUMENT_ROOT.'/categories/class/categorie.class.php';
+}
 
 // Load DigiriskDolibarr libraries
 require_once __DIR__ . '/../../class/digiriskelement.class.php';
@@ -69,9 +73,13 @@ $sortfield      = GETPOST('sortfield', 'alpha');
 $sortorder      = GETPOST('sortorder', 'alpha');
 $sharedrisks    = GETPOST('sharedrisks', 'int') ? GETPOST('sharedrisks', 'int') : $conf->global->DIGIRISKDOLIBARR_SHOW_SHARED_RISKS;
 $inheritedrisks = GETPOST('inheritedrisks', 'int') ? GETPOST('inheritedrisks', 'int') : $conf->global->DIGIRISKDOLIBARR_SHOW_INHERITED_RISKS_IN_LISTINGS;
+$riskType       = GETPOSTISSET('type') ? GETPOST('type') : 'risk';
 $page           = GETPOSTISSET('pageplusone') ? (GETPOST('pageplusone') - 1) : GETPOST("page", 'int');
 $page           = is_numeric($page) ? $page : 0;
 $page           = $page == -1 ? 0 : $page;
+if (isModEnabled('categorie')) {
+    $search_category_array = GETPOST('search_category_risk_list', 'array');
+}
 
 // Initialize technical objects
 $object           = new DigiriskElement($db);
@@ -190,7 +198,7 @@ if (empty($reshook)) {
 
 	$error = 0;
 
-	$backtopage = dol_buildpath('/digiriskdolibarr/view/digiriskelement/digiriskelement_risk.php', 1) . '?id=' . ($id > 0 ? $id : '__ID__');
+	$backtopage = dol_buildpath('/digiriskdolibarr/view/digiriskelement/digiriskelement_risk.php', 1) . '?id=' . ($id > 0 ? $id : '__ID__') . '&type=' . $riskType;
 
 	require_once __DIR__ . '/../../core/tpl/riskanalysis/risk/digiriskdolibarr_risk_actions.tpl.php';
 }
@@ -200,7 +208,7 @@ if (empty($reshook)) {
  */
 
 $form    = new Form($db);
-$title   = $langs->trans("DigiriskElementRisk");
+$title   = $langs->trans(ucfirst($riskType) . 's');
 $helpUrl = 'FR:Module_Digirisk#.C3.89valuation_des_Risques';
 
 digirisk_header($title, $helpUrl);
@@ -222,9 +230,9 @@ if ($sharedrisks) {
 	if (($action == 'import_shared_risks' && (empty($conf->use_javascript_ajax) || !empty($conf->dol_use_jmobile)))        // Output when action = clone if jmobile or no js
 		|| (!empty($conf->use_javascript_ajax) && empty($conf->dol_use_jmobile))) {                            // Always output when not jmobile nor js
 
-		$allrisks = $risk->fetchAll('ASC', 'fk_element', 0, 0, array('customsql' => 'status > 0 AND entity NOT IN (' . $conf->entity . ') AND fk_element > 0'));
+		$allrisks = $risk->fetchAll('ASC', 'fk_element', 0, 0, array('customsql' => 'status > 0 AND type = "' . $riskType . '" AND entity NOT IN (' . $conf->entity . ') AND fk_element > 0'));
 		$formquestionimportsharedrisks = array(
-			'text' => '<i class="fas fa-circle-info"></i>' . $langs->trans("ConfirmImportSharedRisks"),
+			'text' => '<i class="fas fa-circle-info"></i>' . $langs->trans('ConfirmImportShared' . ucfirst($riskType) . 's'),
 		);
 
         $evaluation->ismultientitymanaged = 0;
@@ -322,7 +330,7 @@ if ($sharedrisks) {
 			}
 
 		}
-		$formconfirm .= digiriskformconfirm($_SERVER["PHP_SELF"] . '?id=' . $object->id, $langs->trans('ImportSharedRisks'), '', 'confirm_import_shared_risks', $formquestionimportsharedrisks, 'yes', 'actionButtonImportSharedRisks', 800, 800);
+		$formconfirm .= digiriskformconfirm($_SERVER["PHP_SELF"] . '?id=' . $object->id . '&type=' . $riskType, $langs->trans('ImportShared' . ucfirst($riskType) . 's'), '', 'confirm_import_shared_risks', $formquestionimportsharedrisks, 'yes', 'actionButtonImportSharedRisks', 800, 800);
 	}
 
 	// Call Hook formConfirm
@@ -338,7 +346,7 @@ if ($sharedrisks) {
 if ($object->id > 0) {
 	$res = $object->fetch_optionals();
 
-	saturne_get_fiche_head($object, 'elementRisk', $title);
+	saturne_get_fiche_head($object, 'element' . ucfirst($riskType), $title);
 
 	// Object card
 	// ------------------------------------------------------------
@@ -349,7 +357,7 @@ if ($object->id > 0) {
 	// Buttons for actions
 	print '<div class="tabsAction" >';
 	if ($permissiontoadd && !empty($conf->global->DIGIRISKDOLIBARR_SHOW_SHARED_RISKS)) {
-		print '<span class="butAction" id="actionButtonImportSharedRisks" title="" href="' . $_SERVER["PHP_SELF"] . '?id=' . $object->id . '&action=import_shared_risks' . '">' . $langs->trans("ImportSharedRisks") . '</span>';
+		print '<span class="butAction" id="actionButtonImportSharedRisks" title="" href="' . $_SERVER["PHP_SELF"] . '?id=' . $object->id . '&type=' . $riskType . '&action=import_shared_risks' . '">' . $langs->trans('ImportShared' . ucfirst($riskType) . 's') . '</span>';
 	}
 	print '</div>';
 

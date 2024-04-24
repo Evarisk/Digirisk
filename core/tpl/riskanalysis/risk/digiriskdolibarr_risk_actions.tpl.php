@@ -14,7 +14,7 @@ if ( ! $error && $action == 'add' && $permissiontoadd) {
 	}
 
 	$risk->fk_element = $fk_element ?: 0;
-	$risk->fk_projet  = $conf->global->DIGIRISKDOLIBARR_DU_PROJECT;
+	$risk->fk_projet  = $riskType == 'risk' ? $conf->global->DIGIRISKDOLIBARR_DU_PROJECT : $conf->global->DIGIRISKDOLIBARR_ENVIRONMENT_PROJECT;
 	$risk->category   = $category;
 	$risk->ref        = $refRiskMod->getNextValue($risk);
 	$risk->status     = 1;
@@ -23,6 +23,13 @@ if ( ! $error && $action == 'add' && $permissiontoadd) {
 		$result = $risk->create($user);
 
 		if ($result > 0) {
+            if (isModEnabled('categorie') && getDolGlobalInt('DIGIRISKDOLIBARR_CATEGORY_ON_RISK') > 0) {
+                $categories = $data['categories'];
+                if (method_exists($risk, 'setCategories')) {
+                    $risk->setCategories($categories);
+                }
+            }
+
 			$evaluationComment  = $data['comment'];
 			$riskAssessmentDate = $data['date'];
 
@@ -97,7 +104,7 @@ if ( ! $error && $action == 'add' && $permissiontoadd) {
 
 					$task->ref                              = $refTaskMod->getNextValue('', $task);
 					$task->label                            = $tasktitle;
-					$task->fk_project                       = $conf->global->DIGIRISKDOLIBARR_DU_PROJECT;
+					$task->fk_project                       = $riskType == 'risk' ? $conf->global->DIGIRISKDOLIBARR_DU_PROJECT : $conf->global->DIGIRISKDOLIBARR_ENVIRONMENT_PROJECT;
 					$task->date_c                           = dol_now();
 					if (!empty($dateStart)) {
 						$task->date_start = strtotime(preg_replace('/\//', '-', $dateStart));
@@ -164,6 +171,12 @@ if ( ! $error && $action == 'saveRisk' && $permissiontoadd) {
 	$result = $risk->update($user);
 
 	if ($result > 0) {
+        if (isModEnabled('categorie') && getDolGlobalInt('DIGIRISKDOLIBARR_CATEGORY_ON_RISK') > 0) {
+            $categories = $data['categories'];
+            if (method_exists($risk, 'setCategories')) {
+                $risk->setCategories($categories);
+            }
+        }
 		// Update risk OK
 		$urltogo = str_replace('__ID__', $result, $backtopage);
 		$urltogo = preg_replace('/--IDFORBACKTOPAGE--/', $id, $urltogo); // New method to autoselect project after a New on another form object creation
@@ -399,7 +412,7 @@ if ( ! $error && $action == 'addRiskAssessmentTask' && $permissiontoadd) {
 
 	$task->ref        = $refTaskMod->getNextValue('', $task);
 	$task->label      = $tasktitle;
-	$task->fk_project = $conf->global->DIGIRISKDOLIBARR_DU_PROJECT;
+	$task->fk_project = $riskType == 'risk' ? $conf->global->DIGIRISKDOLIBARR_DU_PROJECT : $conf->global->DIGIRISKDOLIBARR_ENVIRONMENT_PROJECT;
 	$task->datec     = dol_now();
 	if (!empty($dateStart)) {
 		$task->date_start = strtotime(preg_replace('/\//', '-', $dateStart));
@@ -644,7 +657,7 @@ if ($action == 'confirm_import_shared_risks' && $confirm == 'yes') {
 //
 //	$filter = rtrim($filter, ',');
 
-	$allrisks = $risk->fetchAll('', '', 0, 0, array('customsql' => 'status > 0 AND entity NOT IN (' . $conf->entity . ') AND fk_element > 0'));
+	$allrisks = $risk->fetchAll('', '', 0, 0, array('customsql' => 'status > 0 AND type = "' . $riskType . '" AND entity NOT IN (' . $conf->entity . ') AND fk_element > 0'));
 
 	foreach ($allrisks as $key => $risks) {
 		$digiriskelementtmp->fetch($risks->fk_element);

@@ -43,7 +43,7 @@
 			"768": 98,
 			"1024": 100
 		},
-		"variable": [
+		"risk_variable": [
 		{
 			"name": "Gravite",
 			"description": "0 : Pas de blessure possible 1 : Blessure légère 2 : ITT5 < jours ou effet irréversible 4 : Menace sur la vie",
@@ -224,7 +224,189 @@
 				}
 			}
 		}
-		]
+		],
+    "riskenvironmental_variable": [
+      {
+        "name": "Gravite",
+        "description": "0 : Pas d'impact possible 1 : Impact faible 2 : Impact modéré 3 : Impact important 4 : Impact majeur",
+        "option": {
+          "display_type": "slide",
+          "range": [
+            "0",
+            "4"
+          ],
+          "survey": {
+            "titre": "",
+            "request": [
+              {
+                "question": "Pas d'impact possible",
+                "seuil": "0"
+              },
+              {
+                "question": "Impact faible",
+                "seuil": "1"
+              },
+              {
+                "question": "Impact modéré",
+                "seuil": "2"
+              },
+              {
+                "question": "Impact important",
+                "seuil": "3"
+              },
+              {
+                "question": "Impact majeur",
+                "seuil": "4"
+              }
+            ]
+          }
+        }
+      },
+      {
+        "name": "Fréquence",
+        "description": "0 : Jamais en contact 1 : Evénement exceptionnel (1 fois par an) 2 Evénement peu fréquent (Plusieurs fois par an) 3 : Evénement occasionnelle (1 fois par semaine) 4 : Continu très fréquent (1 fois par jour)",
+        "option": {
+          "display_type": "slide",
+          "range": [
+            "0",
+            "4"
+          ],
+          "survey": {
+            "titre": "",
+            "request": [
+              {
+                "question": "Jamais en contact",
+                "seuil": "0"
+              },
+              {
+                "question": "Evénement exceptionnel (1 fois par an)",
+                "seuil": "1"
+              },
+              {
+                "question": "Evénement peu fréquent (Plusieurs fois par an)",
+                "seuil": "2"
+              },
+              {
+                "question": "Evénement occasionnelle (1 fois par semaine)",
+                "seuil": "3"
+              },
+              {
+                "question": "Continu très fréquent (1 fois par jour)",
+                "seuil": "4"
+              }
+            ]
+          }
+        }
+      },
+      {
+        "name": "Historique",
+        "description": "1 : Jamais arrivé 2 : Circonstances exceptionnelles 3 : S'est produit 2 sur l'an passé 4 : Se produit tous les mois",
+        "option": {
+          "display_type": "slide",
+          "range": [
+            "1",
+            "4"
+          ],
+          "survey": {
+            "titre": "",
+            "request": [
+              {
+                "question": null,
+                "seuil": null
+              },
+              {
+                "question": "Jamais arrivé",
+                "seuil": "1"
+              },
+              {
+                "question": "Circonstances exceptionnelles",
+                "seuil": "2"
+              },
+              {
+                "question": "S'est produit 2 sur l'an passé",
+                "seuil": "3"
+              },
+              {
+                "question": "Se produit tous les mois",
+                "seuil": "4"
+              }
+            ]
+          }
+        }
+      },
+      {
+        "name": "Maitrise",
+        "description": "1 : Bonne maitrise (Compétence, contrôle, procédure) 2 : Assez maitrisé (Compétence, procédure) 3 : Peu maitrisé 4 : Pas maitrisé",
+        "option": {
+          "display_type": "slide",
+          "range": [
+            "1",
+            "4"
+          ],
+          "survey": {
+            "titre": "",
+            "request": [
+              {
+                "question": null,
+                "seuil": null
+              },
+              {
+                "question": "Bonne maitrise (Compétence, contrôle, procédure)",
+                "seuil": "1"
+              },
+              {
+                "question": "Assez maitrisé (Compétence, procédure)",
+                "seuil": "2"
+              },
+              {
+                "question": "Peu maitrisé",
+                "seuil": "3"
+              },
+              {
+                "question": "Pas maitrisé",
+                "seuil": "4"
+              }
+            ]
+          }
+        }
+      },
+      {
+        "name": "Milieu",
+        "description": "1 : Sensibilité nulle 2 : Sensibilité faible 3 : Sensibilité moyenne 4 : Sensibilité forte",
+        "option": {
+          "display_type": "slide",
+          "range": [
+            "1",
+            "4"
+          ],
+          "survey": {
+            "titre": "",
+            "request": [
+              {
+                "question": null,
+                "seuil": null
+              },
+              {
+                "question": "Sensibilité nulle",
+                "seuil": "1"
+              },
+              {
+                "question": "Sensibilité faible",
+                "seuil": "2"
+              },
+              {
+                "question": "Sensibilité moyenne",
+                "seuil": "3"
+              },
+              {
+                "question": "Sensibilité forte",
+                "seuil": "4"
+              }
+            ]
+          }
+        }
+      }
+    ]
 	}
 },
 {

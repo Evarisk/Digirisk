@@ -64,7 +64,7 @@ $advancedCotationMethodArray = json_decode($advanced_method_cotation_json, true)
 $alldigiriskelement = $digiriskelement->getActiveDigiriskElements(1);
 $digiriskElementsOfEntity = $digiriskelement->getActiveDigiriskElements();
 
-$DUProject->fetch($conf->global->DIGIRISKDOLIBARR_DU_PROJECT);
+$DUProject->fetch($riskType == 'risk' ? $conf->global->DIGIRISKDOLIBARR_DU_PROJECT : $conf->global->DIGIRISKDOLIBARR_ENVIRONMENT_PROJECT);
 $extrafields->fetch_name_optionals_label($digiriskTask->table_element);
 
 $riskAssessmentList        = $riskAssessment->fetchAll('', '', 0, 0, array(), 'AND', 1);
@@ -119,6 +119,7 @@ if ( ! preg_match('/(evaluation)/', $sortfield)) {
 		}
 	}
 	$sql .= " AND el.sourcetype = 'digiriskdolibarr_risk'";
+    $sql .= ' AND r.type = "' . $riskType . '"';
 
 	foreach ($search as $key => $val) {
 		if ($key == 'status' && $search[$key] == -1) continue;
@@ -232,6 +233,7 @@ if ( ! preg_match('/(evaluation)/', $sortfield)) {
 		}
 	}
 	$sql .= " AND el.sourcetype = 'digiriskdolibarr_risk'";
+    $sql .= ' AND r.type = "' . $riskType . '"';
 
 	foreach ($search as $key => $val) {
 		if ($key == 'status' && $search[$key] == -1) continue;
@@ -327,7 +329,7 @@ if ($action != 'list') {
 	$massactionbutton = $form->selectMassAction('', $arrayofmassactions);
 } ?>
 
-<?php $title = $langs->trans('DigiriskElementSharedRisksList');
+<?php $title = $langs->trans('DigiriskElementShared' . ucfirst($riskType) . 'sList');
 print_barre_liste($title, $page, $_SERVER["PHP_SELF"], $param, $sortfield, $sortorder, $massactionbutton, $num, $nbtotalofrecords, 'digiriskdolibarr_color.png@digiriskdolibarr', 0, '', '', $limit, 0, 0, 1);
 
 include DOL_DOCUMENT_ROOT . '/core/tpl/massactions_pre.tpl.php';
@@ -554,7 +556,7 @@ while ($i < ($limit ? min($num, $limit) : $num)) {
                             $digiriskElementIds = array_reverse($digiriskElementIds);
 
                             foreach ($digiriskElementIds as $key => $digiriskElementId) {
-                                print str_repeat(' - ', $key + 1) . $alldigiriskelement[$digiriskElementId]->getNomUrl(1, 'blank', 0, '', -1, 1) . '</br>';
+                                print str_repeat(' &#160', $key + 1) . '&#x21B3' . $alldigiriskelement[$digiriskElementId]->getNomUrl(1, 'blank', 0, '', -1, 1) . '</br>';
                             }
                         }
                     }
