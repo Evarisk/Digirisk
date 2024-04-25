@@ -531,12 +531,12 @@ class DigiriskElement extends SaturneObject
     }
 
     /**
-     * Load dashboard info risk
+     * Load dashboard info digirisk element
      *
      * @return array
      * @throws Exception
      */
-    public function load_dashboard() : array
+    public function load_dashboard(): array
     {
         $urlTab = $_SERVER['PHP_SELF'];
 
@@ -544,9 +544,9 @@ class DigiriskElement extends SaturneObject
             $arrayRisksByGp  = $this->getRisksByGp('single');
         } else {
             $arrayRisksByGp  = $this->getRisksByGp();
-            $arrayListGp     = $this->getGpList();
+            $getDigiriskElementListsByDepth = $this->getDigiriskElementListsByDepth();
         }
-        $array['graphs'] = [$arrayRisksByGp, $arrayListGp ?? []];
+        $array['graphs'] = [$arrayRisksByGp, $getDigiriskElementListsByDepth ?? []];
 
         return $array;
     }
@@ -562,8 +562,6 @@ class DigiriskElement extends SaturneObject
     public function getRisksByGp($type = ''): array
     {
         global $conf, $langs;
-
-        $risk = new Risk($this->db);
 
         // Graph parameters
         $array['width']      = '100%';
@@ -600,7 +598,7 @@ class DigiriskElement extends SaturneObject
         foreach ($ids as $elementId => $label) {
             $array['labels'][$elementId] = [
                 'label' => $label,
-                'color' => $this->getColorRange($i)
+                'color' => SaturneDashboard::getColorRange($i)
             ];
             $risks                     = saturne_fetch_all_object_type('Risk', '', '', 0, 0, ['customsql' => 't.fk_element = ' . $elementId . ' AND t.status = ' . Risk::STATUS_VALIDATED]);
             $array['data'][$elementId] = (is_array($risks) && !empty($risks) ? count($risks) : 0);
@@ -611,14 +609,18 @@ class DigiriskElement extends SaturneObject
     }
 
     /**
-     * Get list of GP for main dashboard
+     * Get list of digirisk elements by depth
      *
      * @return array
      * @throws Exception
      */
-    public function getGpList(): array
+    public function getDigiriskElementListsByDepth(): array
     {
         global $conf, $langs;
+
+        // Graph Title parameters
+        $array['title'] = $langs->transnoentities('DigiriskElementsRepartitionByDepth');
+        $array['picto'] = $this->picto;
 
         // Graph parameters
         $array['width']      = '100%';
@@ -626,49 +628,24 @@ class DigiriskElement extends SaturneObject
         $array['type']       = 'pie';
         $array['showlegend'] = $conf->browser->layout == 'phone' ? 1 : 2;
         $array['dataset']    = 1;
-        $array['picto']      = $this->picto;
 
-        $elements      = $this->getActiveDigiriskElements();
-        $parent        = recurse_tree(0, 0, $elements);
-        $totalElements = count($elements) - count($parent);
-
-        // Graph Title parameters
-        $array['title'] = $langs->transnoentities('numberOfDigiriskElementsByDigiriskElements');
-
-        foreach ($parent as $parentIds) {
-            $parentId[] = $parentIds['id'];
-            array_walk_recursive($parentIds, function ($item) use (&$ids) {
-                if (is_object($item)) {
-                    $ids[$item->id] = $item->label;
+        $children         = [];
+        $digiriskElements = $this->fetchDigiriskElementFlat(0);
+        if (is_array($digiriskElements) && !empty($digiriskElements)) {
+            foreach ($digiriskElements as $digiriskElement) {
+                if ($digiriskElement['depth'] <= 1 && $digiriskElement['object']->element_type == 'groupment') {
+                    $array['labels'][$digiriskElement['object']->id] = [
+                        'label' => $digiriskElement['object']->ref . ' - ' . $digiriskElement['object']->label,
+                        'color' => SaturneDashboard::getColorRange($digiriskElement['object']->id)
+                    ];
                 }
-            }, $ids);
-            $countIds[$parentIds['id']] = count($ids) - 1;
-            $ids                        = [];
-        }
-
-        $i = 0;
-        foreach ($countIds as $countId) {
-            $this->fetch($parentId[$i]);
-            $array['labels'][] = [
-                'label' => $this->label,
-                'color' => $this->getColorRange($i)
-            ];
-            $array['data'][] = $countId * 100 / $totalElements;
-            $i++;
+                if ($digiriskElement['depth'] <= 2 && $digiriskElement['object']->fk_parent > 0) {
+                    $children[] = $digiriskElement['object']->fk_parent;
+                }
+            }
+            $array['data'] = array_count_values($children);
         }
 
         return $array;
-    }
-
-    /**
-     * get color range for key
-     *
-     * @param  int    $key Key to find in color array
-     * @return string
-     */
-    public function getColorRange(int $key): string
-    {
-        $colorArray = ['#f44336', '#e81e63', '#9c27b0', '#673ab7', '#3f51b5', '#2196f3', '#03a9f4', '#00bcd4', '#009688', '#4caf50', '#8bc34a', '#cddc39', '#ffeb3b', '#ffc107', '#ff9800', '#ff5722', '#795548', '#9e9e9e', '#607d8b'];
-        return $colorArray[$key % count($colorArray)];
     }
 }
