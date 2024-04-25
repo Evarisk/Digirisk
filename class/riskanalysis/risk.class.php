@@ -610,8 +610,8 @@ class Risk extends SaturneObject
     /**
      * Get risks by danger categories and criticality
      *
-     * @param array $dangerCategories Danger categories datas
-     * @param string $type risk type (risk, riskenvironmental or ...)
+     * @param array  $dangerCategories Danger categories datas
+     * @param string $type             Risk type (risk, riskenvironmental or ...)
      *
      * @return array
      * @throws Exception
@@ -650,8 +650,8 @@ class Risk extends SaturneObject
     /**
      * Get risks by danger categories
      *
-     * @param array $dangerCategories Danger categories datas
-     * @param string $type risk type (risk, riskenvironmental or ...)
+     * @param array  $dangerCategories Danger categories datas
+     * @param string $type             Risk type (risk, riskenvironmental or ...)
      *
      * @return array
      * @throws Exception
@@ -693,7 +693,7 @@ class Risk extends SaturneObject
      * Get list of risks by danger categories
      *
      * @param array  $dangerCategories Danger categories datas
-     * @param string $type risk type (risk, riskenvironmental or ...)
+     * @param string $type             Risk type (risk, riskenvironmental or ...)
      *
      * @return array
      * @throws Exception

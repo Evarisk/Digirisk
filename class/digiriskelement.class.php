@@ -538,30 +538,29 @@ class DigiriskElement extends SaturneObject
      */
     public function load_dashboard(): array
     {
-        $urlTab = $_SERVER['PHP_SELF'];
+        $getDigiriskElementListsByDepth = $this->getDigiriskElementListsByDepth();
+        $getRisksByDigiriskElement      = $this->getRisksByDigiriskElement();
 
-        if (preg_match('/digiriskelement_informations/', $urlTab)) {
-            $arrayRisksByGp  = $this->getRisksByGp('single');
-        } else {
-            $arrayRisksByGp  = $this->getRisksByGp();
-            $getDigiriskElementListsByDepth = $this->getDigiriskElementListsByDepth();
-        }
-        $array['graphs'] = [$arrayRisksByGp, $getDigiriskElementListsByDepth ?? []];
+        $array['graphs'] = [$getDigiriskElementListsByDepth, $getRisksByDigiriskElement];
 
         return $array;
     }
 
     /**
-     * Get risks by GP
+     * Get list of risk by digirisk element
      *
-     * @param  String    $type Empty to get risks of every element or 'single' to get risk for the current and children element
+     * @param string $riskType Risk type (risk, riskenvironmental or ...)
      *
      * @return array
      * @throws Exception
      */
-    public function getRisksByGp($type = ''): array
+    public function getRisksByDigiriskElement(string $riskType = 'risk'): array
     {
         global $conf, $langs;
+
+        // Graph Title parameters
+        $array['title'] = $langs->transnoentities('RisksRepartitionByDigiriskElement');
+        $array['picto'] = $this->picto;
 
         // Graph parameters
         $array['width']      = '100%';
@@ -569,40 +568,17 @@ class DigiriskElement extends SaturneObject
         $array['type']       = 'pie';
         $array['showlegend'] = $conf->browser->layout == 'phone' ? 1 : 2;
         $array['dataset']    = 1;
-        $array['picto']      = $this->picto;
 
-        $elements = $this->getActiveDigiriskElements();
-        if ($type == 'single') {
-            $id = GETPOST('id');
-            $this->fetch($id);
-
-            // Graph Title parameters
-            $array['title'] = $langs->transnoentities('AddStatsGP', $this->ref, $this->label);
-
-            $children = recurse_tree($id, 0, $elements);
-            $ids[$id] = $this->label;
-        } else {
-            // Graph Title parameters
-            $array['title'] = $langs->transnoentities('AddStatsGP', 'DU', getDolGlobalString('MAIN_INFO_SOCIETE_NOM'));
-
-            $children = $elements;
-        }
-
-        array_walk_recursive($children, function ($item) use (&$ids) {
-            if (is_object($item)) {
-                $ids[$item->id] = $item->label;
+        $digiriskElements = $this->fetchDigiriskElementFlat(GETPOSTISSET('id') ? GETPOST('id') : 0);
+        if (!empty($digiriskElements)) {
+            foreach ($digiriskElements as $digiriskElement) {
+                $array['labels'][$digiriskElement['object']->id] = [
+                    'label' => $digiriskElement['object']->ref . ' - ' . $digiriskElement['object']->label,
+                    'color' => SaturneDashboard::getColorRange($digiriskElement['object']->id)
+                ];
+                $risks = saturne_fetch_all_object_type('Risk', '', '', 0, 0, ['customsql' => 't.status = ' . Risk::STATUS_VALIDATED . ' AND t.entity = ' . $conf->entity . ' AND t.type = "' . $riskType . '" AND t.fk_element = ' . $digiriskElement['object']->id]);
+                $array['data'][$digiriskElement['object']->id] = is_array($risks) && !empty($risks) ? count($risks) : 0;
             }
-        }, $ids);
-
-        $i = 0;
-        foreach ($ids as $elementId => $label) {
-            $array['labels'][$elementId] = [
-                'label' => $label,
-                'color' => SaturneDashboard::getColorRange($i)
-            ];
-            $risks                     = saturne_fetch_all_object_type('Risk', '', '', 0, 0, ['customsql' => 't.fk_element = ' . $elementId . ' AND t.status = ' . Risk::STATUS_VALIDATED]);
-            $array['data'][$elementId] = (is_array($risks) && !empty($risks) ? count($risks) : 0);
-            $i++;
         }
 
         return $array;
@@ -631,7 +607,7 @@ class DigiriskElement extends SaturneObject
 
         $children         = [];
         $digiriskElements = $this->fetchDigiriskElementFlat(0);
-        if (is_array($digiriskElements) && !empty($digiriskElements)) {
+        if (!empty($digiriskElements)) {
             foreach ($digiriskElements as $digiriskElement) {
                 if ($digiriskElement['depth'] <= 1 && $digiriskElement['object']->element_type == 'groupment') {
                     $array['labels'][$digiriskElement['object']->id] = [

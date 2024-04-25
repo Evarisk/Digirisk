@@ -987,7 +987,7 @@ DigiriskElementsRepartitionByDepth               = Répartition des groupements 
 RisksRepartitionByDangerCategoriesAndCriticality = Répartition des risques par catégorie de danger et criticité
 NumberOfRisks                                    = Nombre de risques
 DangerCategories                                 = Catégories de danger
-AddStatsGP                                       = Répartition des risques: %s - %s
+RisksRepartitionByDigiriskElement                = Répartition des risques par groupement / unité de travail
 
 
 
