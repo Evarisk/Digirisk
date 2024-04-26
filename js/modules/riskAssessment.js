@@ -170,11 +170,11 @@ window.digiriskdolibarr.evaluation.createEvaluation = function ( event ) {
 			date: date,
 			riskId: riskToAssign,
 			criteres: {
-				gravite: criteres['gravite'] ? criteres['gravite'] : 0,
-				occurrence: criteres['occurrence'] ? criteres['occurrence'] : 0,
-				protection: criteres['protection'] ? criteres['protection'] : 0,
-				formation: criteres['formation'] ? criteres['formation'] : 0,
-				exposition: criteres['exposition'] ? criteres['exposition'] : 0
+        gravite: criteres['gravite'] ? criteres['gravite'] : 0,
+        occurrence: criteres['occurrence'] ? criteres['occurrence'] : (criteres['frequence'] ? criteres['frequence'] : 0),
+        protection: criteres['protection'] ? criteres['protection'] : (criteres['historique'] ? criteres['historique'] : 0),
+        formation: criteres['formation'] ? criteres['formation'] : (criteres['maitrise'] ? criteres['maitrise'] : 0),
+        exposition: criteres['exposition'] ? criteres['exposition'] : (criteres['milieu'] ? criteres['milieu'] : 0)
 			}
 		}),
 		processData: false,
@@ -341,10 +341,10 @@ window.digiriskdolibarr.evaluation.saveEvaluation = function ( event ) {
 			evaluationID: evaluationID,
 			criteres: {
 				gravite: criteres['gravite'] ? criteres['gravite'] : 0,
-				occurrence: criteres['occurrence'] ? criteres['occurrence'] : 0,
-				protection: criteres['protection'] ? criteres['protection'] : 0,
-				formation: criteres['formation'] ? criteres['formation'] : 0,
-				exposition: criteres['exposition'] ? criteres['exposition'] : 0
+				occurrence: criteres['occurrence'] ? criteres['occurrence'] : (criteres['frequence'] ? criteres['frequence'] : 0),
+				protection: criteres['protection'] ? criteres['protection'] : (criteres['historique'] ? criteres['historique'] : 0),
+				formation: criteres['formation'] ? criteres['formation'] : (criteres['maitrise'] ? criteres['maitrise'] : 0),
+				exposition: criteres['exposition'] ? criteres['exposition'] : (criteres['milieu'] ? criteres['milieu'] : 0)
 			}
 		}),
 		contentType: false,
