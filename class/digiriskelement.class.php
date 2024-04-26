@@ -641,13 +641,13 @@ class DigiriskElement extends SaturneObject
 
         if (!empty($digiriskElements)) {
             foreach ($digiriskElements as $digiriskElement) {
-                if ($digiriskElement['depth'] <= 1 && $digiriskElement['object']->element_type == 'groupment') {
+                if ($digiriskElement['depth'] <= getDolGlobalInt('DIGIRISKDOLIBARR_DIGIRISKELEMENT_DEPTH_GRAPH') && $digiriskElement['object']->element_type == 'groupment') {
                     $array['labels'][$digiriskElement['object']->id] = [
                         'label' => $digiriskElement['object']->ref . ' - ' . $digiriskElement['object']->label,
                         'color' => SaturneDashboard::getColorRange($digiriskElement['object']->id)
                     ];
                 }
-                if ($digiriskElement['depth'] <= 2 && $digiriskElement['object']->fk_parent > 0) {
+                if ($digiriskElement['depth'] <= getDolGlobalInt('DIGIRISKDOLIBARR_DIGIRISKELEMENT_DEPTH_GRAPH') + 1 && $digiriskElement['object']->fk_parent > 0) {
                     $children[] = $digiriskElement['object']->fk_parent;
                 }
             }

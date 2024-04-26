@@ -61,6 +61,17 @@ saturne_check_access($permissiontoread);
 // Actions set_mod, update_mask
 require_once __DIR__ . '/../../../saturne/core/tpl/actions/admin_conf_actions.tpl.php';
 
+if ($action == 'update') {
+    $digiriskElementDepthGraph = GETPOST('DigiriskElementDepthGraph', 'int');
+    if ($digiriskElementDepthGraph > -1) {
+        dolibarr_set_const($db, 'DIGIRISKDOLIBARR_DIGIRISKELEMENT_DEPTH_GRAPH', $digiriskElementDepthGraph, 'integer', 0, '', $conf->entity);
+    }
+
+    setEventMessage($langs->trans('SavedConfig'));
+    header('Location: ' . $_SERVER['PHP_SELF']);
+    exit;
+}
+
 /*
  * View
  */
@@ -97,9 +108,31 @@ require __DIR__ . '/../../../saturne/core/tpl/admin/object/object_numbering_modu
 $object = new WorkUnit($db);
 
 print load_fiche_titre($pictos['workunit'] . $langs->trans('WorkUnitManagement'), '', '');
-print '<hr>';
 
 require __DIR__ . '/../../../saturne/core/tpl/admin/object/object_numbering_module_view.tpl.php';
+print '<hr>';
+
+print load_fiche_titre($langs->trans('Config'), '', '');
+
+print '<form method="POST" action="' . $_SERVER["PHP_SELF"] . '">';
+print '<input type="hidden" name="token" value="' . newToken() . '">';
+print '<input type="hidden" name="action" value="update">';
+print '<table class="noborder centpercent editmode">';
+print '<tr class="liste_titre">';
+print '<td>' . $langs->trans('Name') . '</td>';
+print '<td>' . $langs->trans('Description') . '</td>';
+print '<td>' . $langs->trans('Value') . '</td>';
+print '<td>' . $langs->trans('Action') . '</td>';
+print '</tr>';
+
+print '<tr class="oddeven"><td><label for="DigiriskElementDepthGraph">' . $langs->trans("DigiriskElementDepthGraph") . '</label></td>';
+print '<td>' . $langs->trans("DigiriskElementDepthGraphDescription") . '</td>';
+print '<td><input type="number" name="DigiriskElementDepthGraph" value="' . $conf->global->DIGIRISKDOLIBARR_DIGIRISKELEMENT_DEPTH_GRAPH . '"></td>';
+print '<td><input type="submit" class="button" name="save" value="' . $langs->trans("Save") . '">';
+print '</td></tr>';
+
+print '</table>';
+print '</form>';
 
 /*
  *  Deleted elements

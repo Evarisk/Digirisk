@@ -62,6 +62,11 @@ Create                      = Créer
 MultiCompanyTicketPublicInterfaceConfig = Configuration de l'interface publique des tickets multi-société
 Subtitle                                = Sous-titre
 
+# DigiriskElement - DigiriskElement
+DigiriskElementDepthGraph            = Niveau de profondeur dans les graphiques des éléments Digirisk
+DigiriskElementDepthGraphDescription = Cette option permet de choisir le niveau de profondeur dans les graphiques des éléments Digirisk <br> Défaut : Niveau 1
+
+
 
 #
 # DigiriskDolibarr
