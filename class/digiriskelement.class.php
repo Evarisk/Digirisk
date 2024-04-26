@@ -576,6 +576,9 @@ class DigiriskElement extends SaturneObject
             $currentDigiriskElement = $this->fetchAll('', '', 0, 0, ['customsql' => 't.rowid = ' . GETPOST('id')]);
             if (is_array($currentDigiriskElement) && !empty($currentDigiriskElement)) {
                 $currentDigiriskElement = array_shift($currentDigiriskElement);
+
+                $array['title'] = $langs->transnoentities('RisksRepartitionByDigiriskElement', ': ' . $currentDigiriskElement->ref . ' - ' . $currentDigiriskElement->label);
+
                 $digiriskElement[$currentDigiriskElement->id]['object'] = $currentDigiriskElement;
                 $digiriskElements = array_merge($digiriskElement, $digiriskElements);
             }
@@ -583,9 +586,6 @@ class DigiriskElement extends SaturneObject
 
         if (!empty($digiriskElements)) {
             foreach ($digiriskElements as $digiriskElement) {
-                if ($digiriskElement['object']->id == GETPOST('id')) {
-                    $array['title'] = $langs->transnoentities('RisksRepartitionByDigiriskElement', ' : ' . $digiriskElement['object']->ref . ' - ' . $digiriskElement['object']->label);
-                }
                 $risks = saturne_fetch_all_object_type('Risk', '', '', 0, 0, ['customsql' => 't.status = ' . Risk::STATUS_VALIDATED . ' AND t.entity = ' . $conf->entity . ' AND t.type = "' . $riskType . '" AND t.fk_element = ' . $digiriskElement['object']->id]);
                 if (is_array($risks) && !empty($risks)) {
                     $array['labels'][$digiriskElement['object']->id] = [
@@ -622,7 +622,23 @@ class DigiriskElement extends SaturneObject
         $array['dataset']    = 1;
 
         $children         = [];
-        $digiriskElements = $this->fetchDigiriskElementFlat(0);
+        $digiriskElements = $this->fetchDigiriskElementFlat(GETPOSTISSET('id') ? GETPOST('id') : 0);
+
+        // Get current digirisk element and add data in $digiriskElements array
+        if (GETPOSTISSET('id')) {
+            $currentDigiriskElement = $this->fetchAll('', '', 0, 0, ['customsql' => 't.rowid = ' . GETPOST('id')]);
+            if (is_array($currentDigiriskElement) && !empty($currentDigiriskElement)) {
+                $currentDigiriskElement = array_shift($currentDigiriskElement);
+
+                $array['title'] = $langs->transnoentities('DigiriskElementsRepartitionByDepth', ': ' . $currentDigiriskElement->ref . ' - ' . $currentDigiriskElement->label);
+
+                $array['labels'][$currentDigiriskElement->id] = [
+                    'label' => $currentDigiriskElement->ref . ' - ' . $currentDigiriskElement->label,
+                    'color' => SaturneDashboard::getColorRange($currentDigiriskElement->id)
+                ];
+            }
+        }
+
         if (!empty($digiriskElements)) {
             foreach ($digiriskElements as $digiriskElement) {
                 if ($digiriskElement['depth'] <= 1 && $digiriskElement['object']->element_type == 'groupment') {
