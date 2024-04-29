@@ -1099,6 +1099,36 @@ class ActionsDigiriskdolibarr
 	}
 
     /**
+     * Overloading the extendSheetLinkableObjectsList function : replacing the parent's function with the one below
+     *
+     * @param  array $linkableObjectTypes  Array of linkable objects
+     * @return int                         0 < on error, 0 on success, 1 to replace standard code
+     */
+    public function extendSheetLinkableObjectsList(array $linkableObjectTypes): int
+    {
+        require_once __DIR__ . '/firepermit.class.php';
+        require_once __DIR__ . '/../lib/digiriskdolibarr_firepermit.lib.php';
+
+        $linkableObjectTypes['digiriskdolibarr_firepermit'] = [
+            'langs'          => 'Firepermit',
+            'langfile'       => 'digiriskdolibarr@digiriskdolibarr',
+            'picto'          => 'fontawesome_fa-fire-alt_fas_#d35968',
+            'className'      => 'FirePermit',
+            'name_field'     => 'ref',
+            'post_name'      => 'fk_firepermit',
+            'link_name'      => 'digiriskdolibarr_firepermit',
+            'tab_type'       => 'firepermit',
+            'hook_name_list' => 'firepermitlist',
+            'hook_name_card' => 'firepermitcard',
+            'create_url'     => 'custom/digiriskdolibarr/view/firepermit/firepermit_card.php?action=create',
+            'class_path'     => 'custom/digiriskdolibarr/class/firepermit.class.php'
+        ];
+        $this->results = $linkableObjectTypes;
+
+        return 1;
+    }
+
+    /**
      * Add new actions buttons on CommonObject
      *
      * @param   CommonObject  $object  The object to process (third party and product object)
