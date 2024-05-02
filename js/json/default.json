@@ -269,7 +269,7 @@
         }
       },
       {
-        "name": "Fréquence",
+        "name": "Frequence",
         "description": "0 : Jamais en contact 1 : Evénement exceptionnel (1 fois par an) 2 Evénement peu fréquent (Plusieurs fois par an) 3 : Evénement occasionnelle (1 fois par semaine) 4 : Continu très fréquent (1 fois par jour)",
         "key": 2,
         "option": {
