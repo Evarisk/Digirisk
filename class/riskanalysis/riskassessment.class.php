@@ -130,7 +130,7 @@ class RiskAssessment extends SaturneObject
 	 */
 	public function __construct(DoliDB $db)
 	{
-        $this->advancedCotation = [1 => 'gravite', 2 => 'protection', 3 => 'occurrence', 4 => 'formation', 5 => 'exposition'];
+        $this->advancedCotation = [1 => 'gravite', 2 => 'exposition', 3 => 'occurrence', 4 => 'formation', 5 => 'protection'];
 		parent::__construct($db, $this->module, $this->element);
 	}
 
