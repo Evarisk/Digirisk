@@ -96,13 +96,14 @@
 											</div>
 											<?php $l = 0;
 											foreach ($evaluationMethodSurvey as $critere) :
-												$name = strtolower($critere['name']); ?>
+												$name = strtolower($critere['name']);
+                                                $key = $lastEvaluation->advancedCotation[$critere['key']] ?>
 												<div class="table-row">
 													<div class="table-cell"><?php echo $critere['name'] ; ?></div>
 													<?php foreach ($critere['option']['survey']['request'] as $request) : ?>
 														<div class="table-cell can-select cell-<?php echo $lastEvaluation->id ? $lastEvaluation->id : 0;
 														if ( ! empty($request['seuil'])) {
-															echo $request['seuil'] == $lastEvaluation->$name ? " active" : "" ;
+															echo $request['seuil'] == $lastEvaluation->$key ? " active" : "" ;
 														} ?>"
 															 data-type="<?php echo $name ?>"
 															 data-id="<?php echo  $risk->id ? $risk->id : 0 ; ?>"
