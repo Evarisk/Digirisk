@@ -1,5 +1,5 @@
 <?php
-/* Copyright (C) 2021-2023 EVARISK <technique@evarisk.com>
+/* Copyright (C) 2021-2024 EVARISK <technique@evarisk.com>
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -66,6 +66,8 @@ $accident_type       = GETPOST('accident_type');
 $external_accident   = GETPOST('external_accident');
 $accident_location   = GETPOST('accident_location');
 $fk_soc              = GETPOST('fk_soc');
+$fkTicket            = GETPOSTISSET('fk_ticket') ? GETPOST('fk_ticket', 'int') : 0;
+
 // Initialize technical objects
 $object           = new Accident($db);
 $signatory        = new SaturneSignature($db, $object->module, $object->element);
@@ -161,7 +163,6 @@ if (empty($reshook)) {
 		$external_accident  = GETPOST('external_accident');
 		$accident_location  = GETPOST('accident_location');
         $extSocietyId       = GETPOST('fk_soc');
-        $fkTicket           = GETPOST('fk_ticket');
 
         // Initialize object accident
 		$now                       = dol_now();
@@ -260,7 +261,6 @@ if (empty($reshook)) {
 		$external_accident  = GETPOST('external_accident');
 		$accident_location  = GETPOST('accident_location');
         $extSocietyId       = GETPOST('fk_soc');
-        $fkTicket           = GETPOST('fk_ticket');
 
 		// Initialize object accident
 		$now                       = dol_now();
@@ -699,7 +699,7 @@ if ($action == 'create') {
 
     //Fk Ticket -- Fk Ticket
     print '<tr class="content_field"><td><label for="content">' . $langs->trans("FkTicket") . '</label></td><td>';
-    print img_picto('', 'ticket', 'class="pictofixedwidth"') . $form->selectarray('fk_ticket', $ticketsArray, 0, 1, 0, 0, 0, '', 0, 0, 0, 'minwidth300');
+    print img_picto('', 'ticket', 'class="pictofixedwidth"') . $form->selectarray('fk_ticket', $ticketsArray, $fkTicket, 1, 0, 0, 0, '', 0, 0, 0, 'minwidth300');
     print '</td></tr>';
 
   // Categories
