@@ -630,7 +630,7 @@ class Risk extends SaturneObject
         $array['type']       = 'bar';
         $array['showlegend'] = 1;
         $array['dataset']    = 4;
-        $array['moreCSS']    = 'centpercentimp';
+        $array['moreCSS']    = 'grid-2';
         $array['labels']     = $this->cotations;
 
         $join = ' LEFT JOIN ' . MAIN_DB_PREFIX . $this->table_element . ' as r ON r.rowid = t.fk_risk';
@@ -670,7 +670,7 @@ class Risk extends SaturneObject
         $array['type']       = 'bar';
         $array['showlegend'] = 1;
         $array['dataset']    = 2;
-        $array['moreCSS']    = 'centpercentimp';
+        $array['moreCSS']    = 'grid-2';
 
         $array['labels'] = [
             0 => [
