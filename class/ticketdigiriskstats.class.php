@@ -29,6 +29,10 @@ require_once __DIR__ . '/digiriskstats.php';
 require_once __DIR__ . '/digiriskelement.class.php';
 require_once __DIR__ . '/accident.class.php';
 
+// load saturne librairies
+
+require_once __DIR__ . '/../../saturne/class/saturnedashboard.class.php';
+
 /**
  *	Class to manage stats for tickets
  */
@@ -54,10 +58,9 @@ class TicketDigiriskStats extends DigiriskStats
 	 * 	@param 	int			$socid		          ID third party for filter. This value must be forced during the new to external user company if user is an external user.
 	 * 	@param	int			$userid    	          ID user for filter (creation user)
 	 * 	@param	int			$userassignid    	  ID user for filter (user assign)
-	 * 	@param	int			$digiriskelementid    ID digiriskelement for filter
 	 * 	@param	int			$categticketid        ID category of ticket for filter
 	 */
-	public function __construct($db, $socid = 0, $userid = 0, $userassignid = 0, $digiriskelementid = 0, $categticketid = 0)
+	public function __construct($db, $socid = 0, $userid = 0, $userassignid = 0, $categticketid = 0, $moreFrom, $moreJoin, $moreWhere)
 	{
 		$this->db = $db;
 		$this->socid = ($socid > 0 ? $socid : 0);
@@ -66,6 +69,12 @@ class TicketDigiriskStats extends DigiriskStats
 
 		$object = new Ticket($this->db);
 		$this->from = MAIN_DB_PREFIX.$object->table_element." as tk";
+        if (dol_strlen($moreFrom) > 0) {
+            $this->from .= $moreFrom;
+        }
+        if (dol_strlen($moreJoin) > 0) {
+            $this->join .= $moreJoin;
+        }
 		$this->where = "tk.fk_statut >= 0";
 		$this->where .= " AND tk.entity IN (".getEntity('ticket').")";
 		if ($this->socid) {
@@ -82,17 +91,14 @@ class TicketDigiriskStats extends DigiriskStats
 			$this->where .= " AND tk.fk_user_assign = ".((int) $userassignid);
 		}
 
-		if ($digiriskelementid) {
-			$this->join .= ' LEFT JOIN '.MAIN_DB_PREFIX.'ticket_extrafields as tkextra ON tk.rowid = tkextra.fk_object';
-			$this->join .= ' LEFT JOIN '.MAIN_DB_PREFIX.'digiriskdolibarr_digiriskelement as e ON tkextra.digiriskdolibarr_ticket_service = e.rowid';
-			$this->where .= ' AND e.rowid = '.((int) $digiriskelementid);
-		}
-
 		if ($categticketid) {
 			$this->join .= ' LEFT JOIN '.MAIN_DB_PREFIX.'categorie_ticket as ctk ON ctk.fk_ticket = tk.rowid';
 			$this->join .= ' LEFT JOIN '.MAIN_DB_PREFIX.'categorie as c ON c.rowid = ctk.fk_categorie';
 			$this->where .= ' AND c.rowid = '.((int) $categticketid);
 		}
+        if (dol_strlen($moreWhere) > 0) {
+            $this->where .= $moreWhere;
+        }
 	}
 
 	/**
@@ -295,5 +301,101 @@ class TicketDigiriskStats extends DigiriskStats
 
         return [$arrayReturn, $ticketCategoriesCounter];
     }
-}
 
+    /**
+     * Load dashboard info.
+     *
+     * @return array
+     * @throws Exception
+     */
+    public function load_dashboard(): array
+    {
+        $getTicketsByYears   = $this->getTicketsByYears();
+        $getTicketsByMonth   = $this->getTicketsByMonth();
+
+        $array['graphs'] = [$getTicketsByMonth];
+        $array['lists']  = [$getTicketsByYears];
+
+        return $array;
+    }
+
+    /**
+     * Load dashboard info.
+     *
+     * @return array
+     * @throws Exception
+     */
+    public function getTicketsByMonth(): array
+    {
+        global $conf, $langs;
+
+        $array['title']      = $langs->transnoentities('NumberOfTicketsByMonth');
+        $array['picto']      = $this->picto;
+        $array['type']       = 'graph';
+        $array['showlegend'] = 1;
+
+        $date_start = dol_mktime(0, 0, 0, GETPOST('datestartmonth', 'int'), GETPOST('datestartday', 'int'), GETPOST('datestartyear', 'int'));
+        $date_end   = dol_mktime(0, 0, 0, GETPOST('dateendmonth', 'int'), GETPOST('dateendday', 'int'), GETPOST('dateendyear', 'int'));
+        $startyear  = strftime("%Y", !empty($date_start) ? $date_start : dol_now());
+        $endyear    = strftime("%Y", !empty($date_end) ? $date_end : dol_now() + 1);
+        $legend     = [];
+
+        for ($i = $startyear; $i <= $endyear; $i++) {
+            $legend[] = $i;
+        }
+
+        $array['dataset'] = count($legend);
+
+        foreach ($legend as $key => $legendPart) {
+            $array['labels'][] = ['label' => $legendPart];
+        }
+
+        $data = $this->getNbByMonthWithPrevYear($endyear, $startyear, 0, 0, $conf->global->SOCIETE_FISCAL_MONTH_START);
+
+        if (is_array($data) && !empty($data)) {
+            foreach ($data as $val) {
+                $value[] = $val;
+            }
+        }
+
+        $array["data"] = $value;
+        return $array;
+    }
+    /**
+     * Load dashboard info.
+     *
+     * @return array
+     * @throws Exception
+     */
+    public function getTicketsByYears(): array
+    {
+        global $langs;
+
+        $array['title']  = $langs->transnoentities('Add');
+        $array['picto']  = $this->picto;
+        $array['type']   = 'list';
+        $array['labels'] = ['Year', 'Ticket', 'Percentage'];
+
+        $nowyear    = strftime("%Y", dol_now());
+        $data       = $this->getAllByYear();
+        $arrayValue = [];
+
+        if (is_array($data) && !empty($data)) {
+            foreach ($data as $val) {
+                if (empty($val['average'])) {
+                    $val['average'] = 0;
+                }
+                $arrayValue[0]['Year']['value']       = $val['year'];
+                $arrayValue[0]['Ticket']['value']     = $val['nb'];
+                $arrayValue[0]['Percentage']['value'] = $val['average'] . ' %';
+            }
+        }
+        if (!count($arrayValue)) {
+            $arrayValue[$nowyear] = $nowyear;
+        }
+
+        $array['data'] = $arrayValue;
+        return $array;
+    }
+
+}

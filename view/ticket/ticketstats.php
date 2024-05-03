@@ -40,6 +40,10 @@ if (!empty($conf->category->enabled)) {
 	require_once DOL_DOCUMENT_ROOT.'/categories/class/categorie.class.php';
 }
 
+// saturne lib
+
+require_once __DIR__ . '/../../../saturne/class/saturnedashboard.class.php';
+
 require_once __DIR__ . '/../../lib/digiriskdolibarr_ticket.lib.php';
 require_once __DIR__ . '/../../class/ticketdigiriskstats.class.php';
 require_once __DIR__ . '/../../class/digiriskelement.class.php';
@@ -62,6 +66,7 @@ $digiriskelementlist = GETPOST('digiriskelementlist', 'array');
 
 // Initialize technical objects
 $object          = new Ticket($db);
+$dashboard       = new SaturneDashboard($db, 'digiriskdolibarr');
 $digiriskelement = new DigiriskElement($db);
 
 $deletedElements = $digiriskelement->getMultiEntityTrashList();
@@ -120,15 +125,15 @@ print load_fiche_titre($title, '', 'ticket');
 $head = ticketstats_prepare_head();
 print dol_get_fiche_head($head, 'byyear', $langs->trans("TicketStatistics"), -1);
 
-$stats = new TicketDigiriskStats($db, $socid, ($userid > 0 ? $userid: 0), ($userassignid > 0 ? $userassignid: 0), ($digiriskelementid > 0 ? $digiriskelementid : 0), ($categticketid > 0 ? $categticketid: 0));
+//$stats = new TicketDigiriskStats($db, $socid, ($userid > 0 ? $userid: 0), ($userassignid > 0 ? $userassignid: 0), ($categticketid > 0 ? $categticketid: 0), $object_status[0]);
 if (is_array($object_status)) {
 	if (in_array($langs->trans('All'), $object_status)) {
 		unset($object_status[array_search($langs->trans('All'), $object_status)]);
 	} else {
 		if (!empty($object_status)) {
-			$stats->where .= ' AND tk.fk_statut IN ('.$db->sanitize(implode(',', $object_status)).')';
+			$moreWhere .= ' AND tk.fk_statut IN ('.$db->sanitize(implode(',', $object_status)).')';
 		} else if (!empty(GETPOST('refresh', 'int'))) {
-			$stats->where .= ' AND tk.fk_statut IS NULL';
+			$moreWhere .= ' AND tk.fk_statut IS NULL';
 		}
 	}
 }
@@ -137,11 +142,11 @@ if (is_array($ticketcats)) {
 		unset($ticketcats[array_search($langs->trans('All'), $ticketcats)]);
 	} else {
 		if (!empty($ticketcats)) {
-			$stats->from .= ' LEFT JOIN '.MAIN_DB_PREFIX.'categorie_ticket as cattk ON (tk.rowid = cattk.fk_ticket)';
-			$stats->where .= ' AND cattk.fk_categorie IN ('.$db->sanitize(implode(',', $ticketcats)).')';
+			$moreFrom .= ' LEFT JOIN '.MAIN_DB_PREFIX.'categorie_ticket as cattk ON (tk.rowid = cattk.fk_ticket)';
+			$moreWhere .= ' AND cattk.fk_categorie IN ('.$db->sanitize(implode(',', $ticketcats)).')';
 		} else if (!empty(GETPOST('refresh', 'int'))) {
-			$stats->from .= ' LEFT JOIN '.MAIN_DB_PREFIX.'categorie_ticket as cattk ON (tk.rowid = cattk.fk_ticket)';
-			$stats->where .= ' AND cattk.fk_categorie IS NULL';
+			$moreFrom .= ' LEFT JOIN '.MAIN_DB_PREFIX.'categorie_ticket as cattk ON (tk.rowid = cattk.fk_ticket)';
+			$moreWhere .= ' AND cattk.fk_categorie IS NULL';
 		}
 	}
 }
@@ -150,19 +155,19 @@ if (is_array($digiriskelementlist)) {
 		unset($digiriskelementlist[array_search($langs->trans('All'), $digiriskelementlist)]);
 	} else {
 		if (!empty($digiriskelementlist)) {
-			$stats->join .= ' LEFT JOIN '.MAIN_DB_PREFIX.'ticket_extrafields as tkextra ON tk.rowid = tkextra.fk_object';
-			$stats->join .= ' LEFT JOIN '.MAIN_DB_PREFIX.'digiriskdolibarr_digiriskelement as e ON tkextra.digiriskdolibarr_ticket_service = e.rowid';
-			$stats->where .= ' AND e.rowid IN ('.$db->sanitize(implode(',', $digiriskelementlist)).')';
+			$moreJoin .= ' LEFT JOIN '.MAIN_DB_PREFIX.'ticket_extrafields as tkextra ON tk.rowid = tkextra.fk_object';
+			$moreJoin .= ' LEFT JOIN '.MAIN_DB_PREFIX.'digiriskdolibarr_digiriskelement as e ON tkextra.digiriskdolibarr_ticket_service = e.rowid';
+			$moreWhere .= ' AND e.rowid IN ('.$db->sanitize(implode(',', $digiriskelementlist)).')';
 		} else if (!empty(GETPOST('refresh', 'int'))) {
-			$stats->join .= ' LEFT JOIN '.MAIN_DB_PREFIX.'ticket_extrafields as tkextra ON tk.rowid = tkextra.fk_object';
-			$stats->join .= ' LEFT JOIN '.MAIN_DB_PREFIX.'digiriskdolibarr_digiriskelement as e ON tkextra.digiriskdolibarr_ticket_service = e.rowid';
-			$stats->where .= ' AND e.rowid IS NULL';
+			$moreJoin .= ' LEFT JOIN '.MAIN_DB_PREFIX.'ticket_extrafields as tkextra ON tk.rowid = tkextra.fk_object';
+			$moreJoin .= ' LEFT JOIN '.MAIN_DB_PREFIX.'digiriskdolibarr_digiriskelement as e ON tkextra.digiriskdolibarr_ticket_service = e.rowid';
+			$moreWhere .= ' AND e.rowid IS NULL';
 		}
 	}
 }
 
 // Build graphic number of object
-$data = $stats->getNbByMonthWithPrevYear($endyear, $startyear, 0, 0, $conf->global->SOCIETE_FISCAL_MONTH_START);
+//$data = $stats->getNbByMonthWithPrevYear($endyear, $startyear, 0, 0, $conf->global->SOCIETE_FISCAL_MONTH_START);
 
 if (empty($user->rights->societe->client->voir) || $user->socid) {
 	$filenamenb = $upload_dir.'/ticketdigiriskstats-'.$user->id.'_'.$datestart.'_'.$dateend.'.png';
@@ -223,21 +228,26 @@ if (!$mesg) {
 	}, 500)
 </script>
 
+
 <?php
 // Show array
-$data = $stats->getAllByYear();
-$arrayyears = array();
-foreach ($data as $val) {
-	if (!empty($val['year'])) {
-		$arrayyears[$val['year']] = $val['year'];
-	}
-}
-if (!count($arrayyears)) {
-	$arrayyears[$nowyear] = $nowyear;
-}
+$moreParams = [
+    'loadRiskAssessmentDocument' => 0,
+    'loadAccident'               => 0,
+    'loadEvaluator'              => 0,
+    'loadDigiriskResources'      => 0,
+    'loadRisk'                   => 0,
+    'loadTask'                   => 0,
+    'socid'                      => $socid,
+    'userid'                     => $userid > 0 ? $userid: 0,
+    'userassignid'               => $userassignid > 0 ? $userassignid: 0,
+    'categticketid'              => $ticketcats[0] > 0 ? $ticketcats[0] : 0,
+    'from'                       => $moreFrom,
+    'join'                       => $moreJoin,
+    'where'                      => $moreWhere,
+];
 
 print '<div class="fichecenter"><div class="fichethirdleft">';
-
 // Show filter box
 print '<form class="ticketstats" name="stats" method="POST" action="'.$_SERVER["PHP_SELF"].'?refresh=1">';
 print '<input type="hidden" name="token" value="'.newToken().'">';
@@ -305,35 +315,35 @@ print '</form>';
 print '<br><br>';
 
 print '<div class="div-table-responsive-no-min">';
-print '<table class="noborder centpercent">';
-print '<tr class="liste_titre" height="24">';
-print '<td class="center">'.$langs->trans("Year").'</td>';
-print '<td class="right">'.$langs->trans("NbOfTickets").'</td>';
-print '<td class="right">%</td>';
-print '</tr>';
-
-$oldyear = 0;
-foreach ($data as $val) {
-	$year = $val['year'];
-	while (!empty($year) && $oldyear > $year + 1) { // If we have empty year
-		$oldyear--;
-
-		print '<tr class="oddeven" height="24">';
-		print '<td class="center"><a href="'.$_SERVER["PHP_SELF"].'?year='.$oldyear.($socid > 0 ? '&socid='.$socid : '').($userid > 0 ? '&userid='.$userid : '').'">'.$oldyear.'</a></td>';
-		print '<td class="right">0</td>';
-		print '<td class="right"></td>';
-		print '</tr>';
-	}
-
-	print '<tr class="oddeven" height="24">';
-	print '<td class="center"><a href="'.$_SERVER["PHP_SELF"].'?year='.$year.($socid > 0 ? '&socid='.$socid : '').($userid > 0 ? '&userid='.$userid : '').'">'.$year.'</a></td>';
-	print '<td class="right">'.$val['nb'].'</td>';
-	print '<td class="right" style="'.(($val['nb_diff'] >= 0) ? 'color: green;' : 'color: red;').'">'.round($val['nb_diff']).'</td>';
-	print '</tr>';
-	$oldyear = $year;
-}
-
-print '</table>';
+//print '<table class="noborder centpercent">';
+//print '<tr class="liste_titre" height="24">';
+//print '<td class="center">' . $langs->trans("Year") . '</td>';
+//print '<td class="right">' . $langs->trans("NbOfTickets") . '</td>';
+//print '<td class="right">%</td>';
+//print '</tr>';
+//
+//$oldyear = 0;
+//foreach ($data as $val) {
+//    $year = $val['year'];
+//    while (!empty($year) && $oldyear > $year + 1) { // If we have empty year
+//        $oldyear--;
+//
+//        print '<tr class="oddeven" height="24">';
+//        print '<td class="center"><a href="' . $_SERVER["PHP_SELF"] . '?year=' . $oldyear . ($socid > 0 ? '&socid=' . $socid : '') . ($userid > 0 ? '&userid=' . $userid : '') . '">' . $oldyear . '</a></td>';
+//        print '<td class="right">0</td>';
+//        print '<td class="right"></td>';
+//        print '</tr>';
+//    }
+//
+//    print '<tr class="oddeven" height="24">';
+//    print '<td class="center"><a href="' . $_SERVER["PHP_SELF"] . '?year=' . $year . ($socid > 0 ? '&socid=' . $socid : '') . ($userid > 0 ? '&userid=' . $userid : '') . '">' . $year . '</a></td>';
+//    print '<td class="right">' . $val['nb'] . '</td>';
+//    print '<td class="right" style="' . (($val['nb_diff'] >= 0) ? 'color: green;' : 'color: red;') . '">' . round($val['nb_diff']) . '</td>';
+//    print '</tr>';
+//    $oldyear = $year;
+//}
+//
+//print '</table>';
 print '</div>';
 
 // Get list of files
@@ -386,7 +396,7 @@ print '<table class="border centpercent"><tr class="pair nohover"><td class="cen
 if ($mesg) {
 	print $mesg;
 } else {
-	print $px1->show();
+    $dashboard->show_dashboard($moreParams);
 }
 print '</td></tr></table>';
 

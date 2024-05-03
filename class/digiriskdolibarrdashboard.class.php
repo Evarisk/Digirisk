@@ -1,5 +1,5 @@
 <?php
-/* Copyright (C) 2021-2023 EVARISK <technique@evarisk.com>
+/* Copyright (C) 2021-2024 EVARISK <technique@evarisk.com>
  *
  * This program is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -27,6 +27,7 @@ require_once __DIR__ . '/accident.class.php';
 require_once __DIR__ . '/evaluator.class.php';
 require_once __DIR__ . '/digiriskresources.class.php';
 require_once __DIR__ . '/riskanalysis/risk.class.php';
+require_once __DIR__ . '/ticketdigiriskstats.class.php';
 require_once __DIR__ . '/../../saturne/class/task/saturnetask.class.php';
 
 /**
@@ -68,6 +69,7 @@ class DigiriskDolibarrDashboard
         $loadRisk                   = array_key_exists('loadRisk', $moreParams) ? $moreParams['loadRisk'] : 1;
         $loadTask                   = array_key_exists('loadTask', $moreParams) ? $moreParams['loadTask'] : 1;
         $loadDigiriskElement        = array_key_exists('loadDigiriskElement', $moreParams) ? $moreParams['loadDigiriskElement'] : 1;
+        $loadTicket                 = array_key_exists('loadTicket', $moreParams) ? $moreParams['loadTicket'] : 1;
 
         $riskAssessmentDocument = new RiskAssessmentDocument($this->db);
         $accident               = new Accident($this->db);
@@ -76,6 +78,7 @@ class DigiriskDolibarrDashboard
         $risk                   = new Risk($this->db);
         $digiriskTask           = new SaturneTask($this->db);
         $digiriskElement        = new DigiriskElement($this->db);
+        $ticket                 = new TicketDigiriskStats($this->db, $moreParams['socid'], $moreParams['userid'], $moreParams['userassignid'], $moreParams['categticketid'], $moreParams['from'], $moreParams['join'], $moreParams['where']);
 
         $dashboardData['riskassessmentdocument'] = ($loadRiskAssessmentDocument) ? $riskAssessmentDocument->load_dashboard() : [];
         $dashboardData['accident']               = ($loadAccident) ? $accident->load_dashboard() : [];
@@ -84,6 +87,7 @@ class DigiriskDolibarrDashboard
         $dashboardData['digiriskelement']        = ($loadDigiriskElement) ? $digiriskElement->load_dashboard() : [];
         $dashboardData['task']                   = ($loadTask) ? $digiriskTask->load_dashboard($conf->global->DIGIRISKDOLIBARR_DU_PROJECT) : [];
         $dashboardData['risk']                   = ($loadRisk) ? $risk->load_dashboard() : [];
+        $dashboardData['ticket']                 = ($loadTicket) ? $ticket->load_dashboard() : [];
 
         return $dashboardData;
     }
