@@ -529,4 +529,131 @@ class DigiriskElement extends SaturneObject
 
         return $ret;
     }
+
+    /**
+     * Load dashboard info digirisk element
+     *
+     * @return array
+     * @throws Exception
+     */
+    public function load_dashboard(): array
+    {
+        $getDigiriskElementListsByDepth = $this->getDigiriskElementListsByDepth();
+        $getRisksByDigiriskElement      = $this->getRisksByDigiriskElement();
+
+        $array['graphs'] = [$getDigiriskElementListsByDepth, $getRisksByDigiriskElement];
+
+        return $array;
+    }
+
+    /**
+     * Get list of risk by digirisk element
+     *
+     * @param string $riskType Risk type (risk, riskenvironmental or ...)
+     *
+     * @return array
+     * @throws Exception
+     */
+    public function getRisksByDigiriskElement(string $riskType = 'risk'): array
+    {
+        global $conf, $langs;
+
+        // Graph Title parameters
+        $array['title'] = $langs->transnoentities('RisksRepartitionByDigiriskElement');
+        $array['picto'] = $this->picto;
+
+        // Graph parameters
+        $array['width']      = '100%';
+        $array['height']     = 400;
+        $array['type']       = 'pie';
+        $array['showlegend'] = $conf->browser->layout == 'phone' ? 1 : 2;
+        $array['dataset']    = 1;
+
+        $digiriskElements = $this->fetchDigiriskElementFlat(GETPOSTISSET('id') ? GETPOST('id') : 0);
+
+        // Get current digirisk element and add data in $digiriskElements array
+        if (GETPOSTISSET('id')) {
+            $currentDigiriskElement = $this->fetchAll('', '', 0, 0, ['customsql' => 't.rowid = ' . GETPOST('id')]);
+            if (is_array($currentDigiriskElement) && !empty($currentDigiriskElement)) {
+                $currentDigiriskElement = array_shift($currentDigiriskElement);
+
+                $array['title'] = $langs->transnoentities('RisksRepartitionByDigiriskElement', ': ' . $currentDigiriskElement->ref . ' - ' . $currentDigiriskElement->label);
+
+                $digiriskElement[$currentDigiriskElement->id]['object'] = $currentDigiriskElement;
+                $digiriskElements = array_merge($digiriskElement, $digiriskElements);
+            }
+        }
+
+        if (!empty($digiriskElements)) {
+            foreach ($digiriskElements as $digiriskElement) {
+                $risks = saturne_fetch_all_object_type('Risk', '', '', 0, 0, ['customsql' => 't.status = ' . Risk::STATUS_VALIDATED . ' AND t.entity = ' . $conf->entity . ' AND t.type = "' . $riskType . '" AND t.fk_element = ' . $digiriskElement['object']->id]);
+                if (is_array($risks) && !empty($risks)) {
+                    $array['labels'][$digiriskElement['object']->id] = [
+                        'label' => $digiriskElement['object']->ref . ' - ' . $digiriskElement['object']->label,
+                        'color' => SaturneDashboard::getColorRange($digiriskElement['object']->id)
+                    ];
+                    $array['data'][$digiriskElement['object']->id] = count($risks);
+                }
+            }
+        }
+
+        return $array;
+    }
+
+    /**
+     * Get list of digirisk elements by depth
+     *
+     * @return array
+     * @throws Exception
+     */
+    public function getDigiriskElementListsByDepth(): array
+    {
+        global $conf, $langs;
+
+        // Graph Title parameters
+        $array['title'] = $langs->transnoentities('DigiriskElementsRepartitionByDepth', getDolGlobalInt('DIGIRISKDOLIBARR_DIGIRISKELEMENT_DEPTH_GRAPH'));
+        $array['picto'] = $this->picto;
+
+        // Graph parameters
+        $array['width']      = '100%';
+        $array['height']     = 400;
+        $array['type']       = 'pie';
+        $array['showlegend'] = $conf->browser->layout == 'phone' ? 1 : 2;
+        $array['dataset']    = 1;
+
+        $children         = [];
+        $digiriskElements = $this->fetchDigiriskElementFlat(GETPOSTISSET('id') ? GETPOST('id') : 0);
+
+        // Get current digirisk element and add data in $digiriskElements array
+        if (GETPOSTISSET('id')) {
+            $currentDigiriskElement = $this->fetchAll('', '', 0, 0, ['customsql' => 't.rowid = ' . GETPOST('id')]);
+            if (is_array($currentDigiriskElement) && !empty($currentDigiriskElement)) {
+                $currentDigiriskElement = array_shift($currentDigiriskElement);
+
+                $array['title'] = $langs->transnoentities('DigiriskElementsRepartitionByDepth', ': ' . $currentDigiriskElement->ref . ' - ' . $currentDigiriskElement->label);
+
+                $array['labels'][$currentDigiriskElement->id] = [
+                    'label' => $currentDigiriskElement->ref . ' - ' . $currentDigiriskElement->label,
+                    'color' => SaturneDashboard::getColorRange($currentDigiriskElement->id)
+                ];
+            }
+        }
+
+        if (!empty($digiriskElements)) {
+            foreach ($digiriskElements as $digiriskElement) {
+                if ($digiriskElement['depth'] <= getDolGlobalInt('DIGIRISKDOLIBARR_DIGIRISKELEMENT_DEPTH_GRAPH') && $digiriskElement['object']->element_type == 'groupment') {
+                    $array['labels'][$digiriskElement['object']->id] = [
+                        'label' => $digiriskElement['object']->ref . ' - ' . $digiriskElement['object']->label,
+                        'color' => SaturneDashboard::getColorRange($digiriskElement['object']->id)
+                    ];
+                }
+                if ($digiriskElement['depth'] <= getDolGlobalInt('DIGIRISKDOLIBARR_DIGIRISKELEMENT_DEPTH_GRAPH') + 1 && $digiriskElement['object']->fk_parent > 0) {
+                    $children[] = $digiriskElement['object']->fk_parent;
+                }
+            }
+            $array['data'] = array_count_values($children);
+        }
+
+        return $array;
+    }
 }

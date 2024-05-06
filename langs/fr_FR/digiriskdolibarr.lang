@@ -62,6 +62,11 @@ Create                      = Créer
 MultiCompanyTicketPublicInterfaceConfig = Configuration de l'interface publique des tickets multi-société
 Subtitle                                = Sous-titre
 
+# DigiriskElement - DigiriskElement
+DigiriskElementDepthGraph            = Niveau de profondeur dans les graphiques des éléments Digirisk
+DigiriskElementDepthGraphDescription = Cette option permet de choisir le niveau de profondeur dans les graphiques des éléments Digirisk <br> Défaut : Niveau 1
+
+
 
 #
 # DigiriskDolibarr
@@ -908,6 +913,7 @@ RiskWellCreated                          = Risque créé
 RiskNotCreated                           = Erreur lors de la création du risque
 RiskWellEdited                           = Risque édité
 RiskNotEdited                            = Erreur lors de l'édition du risque
+RiskList                                 = Listing de risques
 AddRiskTitle                             = Ajout du risque
 AddRiskButton                            = Ajouter le risque
 EditRisk                                 = Édition du risque
@@ -916,6 +922,7 @@ RiskCategoryEdit                         = Catégorie de risque
 RiskCategoryEditDescription              = Activer la modification de la catégorie d'un risque existant
 HowToEditRiskCategory                    = Pour modifier la catégorie du risque, cliquez sur le picto de la catégorie
 DigiriskElementRisksList                 = Liste des risques
+DigiriskElementRisk                      = Risques
 RiskDescriptionNotEnabled                = Le champ description du risque n'est pas activé
 HowToEnableRiskDescription               = Pour activer le champ description du risque, allez dans "Configuration du module -> Document Unique"
 HowToEnableRiskCategoryEdit              = Pour activer la modification de la catégorie de risque, allez dans "Configuration du module -> Document Unique"
@@ -975,10 +982,17 @@ CategoryOnRiskDescription                = Permet d'attribuer des tags/catégori
 
 
 # Stats - Statistiques
-GreyRisk   = Risque faible
-OrangeRisk = Risque à planifier
-RedRisk    = Risque à traiter
-BlackRisk  = Risque inacceptable
+GreyRisk                                         = Risque faible
+OrangeRisk                                       = Risque à planifier
+RedRisk                                          = Risque à traiter
+BlackRisk                                        = Risque inacceptable
+RisksRepartitionByDangerCategories               = Répartition des risques par catégorie de danger
+RiskListsByDangerCategories                      = Liste des risques par catégorie de danger
+DigiriskElementsRepartitionByDepth               = Répartition de l'arborescence des groupements de niveau %s
+RisksRepartitionByDangerCategoriesAndCriticality = Répartition des risques par catégorie de danger et criticité
+NumberOfRisks                                    = Nombre de risques
+DangerCategories                                 = Catégories de danger
+RisksRepartitionByDigiriskElement                = Répartition des risques par groupement / unité de travail %s
 
 
 
