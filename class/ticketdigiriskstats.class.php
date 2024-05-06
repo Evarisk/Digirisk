@@ -60,7 +60,7 @@ class TicketDigiriskStats extends DigiriskStats
 	 * 	@param	int			$userassignid    	  ID user for filter (user assign)
 	 * 	@param	int			$categticketid        ID category of ticket for filter
 	 */
-	public function __construct($db, $socid = 0, $userid = 0, $userassignid = 0, $categticketid = 0, $moreFrom, $moreJoin, $moreWhere)
+	public function __construct($db, $socid = 0, $userid = 0, $userassignid = 0, $categticketid = 0, $moreFrom = '', $moreJoin = '', $moreWhere = '')
 	{
 		$this->db = $db;
 		$this->socid = ($socid > 0 ? $socid : 0);
@@ -303,34 +303,36 @@ class TicketDigiriskStats extends DigiriskStats
     }
 
     /**
-     * Load dashboard info.
+     * Load dashboard info ticket
      *
      * @return array
      * @throws Exception
      */
     public function load_dashboard(): array
     {
-        $getTicketsByYears   = $this->getTicketsByYears();
+        $getTicketsByYear   = $this->getTicketsByYear();
         $getTicketsByMonth   = $this->getTicketsByMonth();
 
         $array['graphs'] = [$getTicketsByMonth];
-        $array['lists']  = [$getTicketsByYears];
+        $array['lists']  = [$getTicketsByYear];
 
         return $array;
     }
 
     /**
-     * Load dashboard info.
+     * Get tickets by month
      *
-     * @return array
-     * @throws Exception
+     * @return array Graph datas (label/color/type/title/data etc..)
      */
     public function getTicketsByMonth(): array
     {
         global $conf, $langs;
 
-        $array['title']      = $langs->transnoentities('NumberOfTicketsByMonth');
-        $array['picto']      = $this->picto;
+        // Graph Title parameters
+        $array['title'] = $langs->transnoentities('NumberOfTicketsByMonth');
+        $array['picto'] = 'fontawesome_fa-ticket-alt_fas_#3bbfa8';
+
+        // Graph parameters
         $array['type']       = 'graph';
         $array['showlegend'] = 1;
 
@@ -344,58 +346,53 @@ class TicketDigiriskStats extends DigiriskStats
             $legend[] = $i;
         }
 
-        $array['dataset'] = count($legend);
+        $array['dataset'] = 3;
 
         foreach ($legend as $key => $legendPart) {
             $array['labels'][] = ['label' => $legendPart];
         }
 
-        $data = $this->getNbByMonthWithPrevYear($endyear, $startyear, 0, 0, $conf->global->SOCIETE_FISCAL_MONTH_START);
-
-        if (is_array($data) && !empty($data)) {
-            foreach ($data as $val) {
-                $value[] = $val;
+        $tickets = $this->getNbByMonthWithPrevYear($endyear, $startyear, 0, 0, $conf->global->SOCIETE_FISCAL_MONTH_START);
+        if (is_array($tickets) && !empty($tickets)) {
+            foreach ($tickets as $ticket) {
+                $value[] = $ticket;
             }
         }
 
-        $array["data"] = $value;
+        $array['data'] = $value;
+
         return $array;
     }
+
     /**
-     * Load dashboard info.
+     * Get tickets by year
      *
-     * @return array
-     * @throws Exception
+     * @return array Graph datas (label/color/type/title/data etc..)
      */
-    public function getTicketsByYears(): array
+    public function getTicketsByYear(): array
     {
         global $langs;
 
-        $array['title']  = $langs->transnoentities('Add');
-        $array['picto']  = $this->picto;
+        // Graph Title parameters
+        $array['title'] = $langs->transnoentities('NumberOfTicketsByYear');
+        $array['picto'] = 'fontawesome_fa-ticket-alt_fas_#3bbfa8';
+
+        // Graph parameters
         $array['type']   = 'list';
         $array['labels'] = ['Year', 'Ticket', 'Percentage'];
 
-        $nowyear    = strftime("%Y", dol_now());
-        $data       = $this->getAllByYear();
-        $arrayValue = [];
-
-        if (is_array($data) && !empty($data)) {
-            foreach ($data as $val) {
-                if (empty($val['average'])) {
-                    $val['average'] = 0;
-                }
-                $arrayValue[0]['Year']['value']       = $val['year'];
-                $arrayValue[0]['Ticket']['value']     = $val['nb'];
-                $arrayValue[0]['Percentage']['value'] = $val['average'] . ' %';
+        $arrayTicketByYear = [];
+        $tickets           = $this->getAllByYear();
+        if (is_array($tickets) && !empty($tickets)) {
+            foreach ($tickets as $key => $ticket) {
+                $arrayTicketByYear[$key]['Year']['value']       = $ticket['year'];
+                $arrayTicketByYear[$key]['Ticket']['value']     = $ticket['nb'];
+                $arrayTicketByYear[$key]['Percentage']['value'] = $ticket['average'] ?: 0 . ' %';
             }
         }
-        if (!count($arrayValue)) {
-            $arrayValue[$nowyear] = $nowyear;
-        }
 
-        $array['data'] = $arrayValue;
+        $array['data'] = $arrayTicketByYear;
+
         return $array;
     }
-
 }
