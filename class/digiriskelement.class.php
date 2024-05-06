@@ -611,7 +611,7 @@ class DigiriskElement extends SaturneObject
         global $conf, $langs;
 
         // Graph Title parameters
-        $array['title'] = $langs->transnoentities('DigiriskElementsRepartitionByDepth');
+        $array['title'] = $langs->transnoentities('DigiriskElementsRepartitionByDepth', getDolGlobalInt('DIGIRISKDOLIBARR_DIGIRISKELEMENT_DEPTH_GRAPH'));
         $array['picto'] = $this->picto;
 
         // Graph parameters
