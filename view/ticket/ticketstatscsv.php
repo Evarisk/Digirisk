@@ -43,7 +43,7 @@ saturne_load_langs();
 // Get parameters
 $action    = GETPOST('action', 'aZ09');
 $dateStart = dol_mktime(0, 0, 0, GETPOST('dateStartmonth', 'int'), GETPOST('dateStartday', 'int'), GETPOST('dateStartyear', 'int'));
-$dateEnd   = dol_mktime(0, 0, 0, GETPOST('dateEndmonth', 'int'), GETPOST('dateEndday', 'int'), GETPOST('dateEndyear', 'int'));
+$dateEnd   = dol_mktime(23, 59, 59, GETPOST('dateEndmonth', 'int'), GETPOST('dateEndday', 'int'), GETPOST('dateEndyear', 'int'));
 $dateRange = GETPOST('daterange');
 
 // Initialize technical objects
