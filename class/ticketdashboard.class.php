@@ -46,23 +46,23 @@ class TicketDashboard extends DigiriskDolibarrDashboard
     public string $from = '';
 
     /**
-     * @var string SQL JOIN
+     * @var string|null SQL JOIN
      */
-    public string $join = '';
+    public ?string $join = '';
 
     /**
-     * @var string SQL WHERE
+     * @var string|null SQL WHERE
      */
-    public string $where = '';
+    public ?string $where = '';
 
     /**
      * Constructor
      *
-     * @param DoliDB $db        Database handler
-     * @param string $moreJoin  More SQL JOIN
-     * @param string $moreWhere More SQL filters (' AND ...')
+     * @param DoliDB $db             Database handler
+     * @param string|null $moreJoin  More SQL JOIN
+     * @param string|null $moreWhere More SQL filters (' AND ...')
      */
-    public function __construct(DoliDB $db, string $moreJoin = '', string $moreWhere = '')
+    public function __construct(DoliDB $db, ?string $moreJoin = '', ?string $moreWhere = '')
     {
         $this->db = $db;
 

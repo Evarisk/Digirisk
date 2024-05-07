@@ -70,8 +70,8 @@ $dateStart = dol_mktime(0, 0, 0, GETPOST('dateStartmonth', 'int'), GETPOST('date
 $dateEnd   = dol_mktime(0, 0, 0, GETPOST('dateEndmonth', 'int'), GETPOST('dateEndday', 'int'), GETPOST('dateEndyear', 'int'));
 
 // Security check
-$permissiontoread = $user->rights->ticket->read;
-saturne_check_access($permissiontoread);
+$permissionToRead = $user->rights->ticket->read;
+saturne_check_access($permissionToRead);
 
 /*
  * View
