@@ -1346,8 +1346,8 @@ TicketDateVisible                        = Afficher le champ Date pour créer un
 TicketDateVisibleHelp                    = Activer cette option pour afficher le champ Date dans l'interface publique et le rendre obligatoire si nécessaire
 QRCodeGenerated                          = QRCode généré
 FkTicket                                 = Ticket lié
-PublicTicket                             = Interface publique de ticket
-TicketPublicInterfaceForbidden           = Accès interdit à l'interface publique de ticket
+PublicTicket                             = Interface publique des tickets
+TicketPublicInterfaceForbidden           = Accès interdit à l'interface publique des tickets
 
 # Stats - Statistiques
 TicketStatistics    = Statistiques des tickets

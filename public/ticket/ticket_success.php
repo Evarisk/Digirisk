@@ -96,6 +96,7 @@ $ticketSuccessMessage = make_substitutions($langs->transnoentities(getDolGlobalS
 <div class="public-card__container" data-public-interface="true">
     <div class="public-card__header">
         <div class="header-information center">
+            <div class="left"><a href="<?php echo dol_buildpath('/custom/digiriskdolibarr/public/ticket/create_ticket.php?entity=' . $conf->entity, 1); ?>" class="information-back"><i class="fas fa-sm fa-chevron-left paddingright"></i><?php echo $langs->trans('Back'); ?></a></div>
             <div class="information-title"><?php echo $langs->trans('TicketSuccess') . ' <b>' . $object->ref . '</b>'; ?></div>
             <span class="wpeo-notice notice-warning left" style="margin-left: 16%; width: 70%; border-left: solid red 6px; color: red; background: rgba(255, 0, 0, 0.05);">
                 <span class="notice-content">
