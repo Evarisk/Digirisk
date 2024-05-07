@@ -86,8 +86,6 @@ if (empty($resHook)) {
         if (GETPOST('daterange')) {
             $moreParams['dateStart'] = dol_mktime(0, 0, 0, GETPOST('datestartmonth', 'int'), GETPOST('datestartday', 'int'), GETPOST('datestartyear', 'int'));
             $moreParams['dateEnd']   = dol_mktime(0, 0, 0, GETPOST('dateendmonth', 'int'), GETPOST('dateendday', 'int'), GETPOST('dateendyear', 'int'));
-            dolibarr_set_const($document->db, 'DIGIRISKDOLIBARR_RISKASSESSMENTDOCUMENT_AUDIT_START_DATE', $moreParams['dateStart'], 'chaine', 0, '', $conf->entity);
-            dolibarr_set_const($document->db, 'DIGIRISKDOLIBARR_RISKASSESSMENTDOCUMENT_AUDIT_END_DATE', $moreParams['dateEnd'], 'chaine', 0, '', $conf->entity);
         }
     }
 
