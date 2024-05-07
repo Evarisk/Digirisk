@@ -99,12 +99,12 @@ if (is_array($digiriskElements)) {
         unset($digiriskElements[array_search($langs->trans('All'), $digiriskElements)]);
     } else {
         if (!empty($digiriskElements)) {
-            $moreJoin  .= ' LEFT JOIN ' . MAIN_DB_PREFIX . 'ticket_extrafields as eft ON t.rowid = eft.fk_object';
-            $moreJoin  .= ' LEFT JOIN ' . MAIN_DB_PREFIX . 'digiriskdolibarr_digiriskelement as e ON eft.digiriskdolibarr_ticket_service = e.rowid';
+            $moreJoin  .= ' LEFT JOIN ' . MAIN_DB_PREFIX . 'ticket_extrafields as tkextra ON t.rowid = tkextra.fk_object';
+            $moreJoin  .= ' LEFT JOIN ' . MAIN_DB_PREFIX . 'digiriskdolibarr_digiriskelement as e ON tkextra.digiriskdolibarr_ticket_service = e.rowid';
             $moreWhere .= ' AND e.rowid IN (' . $db->sanitize(implode(',', $digiriskElements)) . ')';
         } else if (!empty(GETPOST('refresh', 'int'))) {
-            $moreJoin  .= ' LEFT JOIN ' . MAIN_DB_PREFIX . 'ticket_extrafields as eft ON t.rowid = eft.fk_object';
-            $moreJoin  .= ' LEFT JOIN ' . MAIN_DB_PREFIX . 'digiriskdolibarr_digiriskelement as e ON eft.digiriskdolibarr_ticket_service = e.rowid';
+            $moreJoin  .= ' LEFT JOIN ' . MAIN_DB_PREFIX . 'ticket_extrafields as tkextra ON t.rowid = tkextra.fk_object';
+            $moreJoin  .= ' LEFT JOIN ' . MAIN_DB_PREFIX . 'digiriskdolibarr_digiriskelement as e ON tkextra.digiriskdolibarr_ticket_service = e.rowid';
             $moreWhere .= ' AND e.rowid IS NULL';
         }
     }
@@ -115,11 +115,11 @@ if (is_array($categories)) {
         unset($categories[array_search($langs->trans('All'), $categories)]);
     } else {
         if (!empty($categories)) {
-            $moreJoin  .= ' LEFT JOIN ' . MAIN_DB_PREFIX . 'categorie_ticket as cp ON (t.rowid = cp.fk_ticket)';
-            $moreWhere .= ' AND cp.fk_categorie IN (' . $db->sanitize(implode(',', $categories)) . ')';
+            $moreJoin  .= ' LEFT JOIN ' . MAIN_DB_PREFIX . 'categorie_ticket as cattk ON (t.rowid = cattk.fk_ticket)';
+            $moreWhere .= ' AND cattk.fk_categorie IN (' . $db->sanitize(implode(',', $categories)) . ')';
         } else if (!empty(GETPOST('refresh', 'int'))) {
-            $moreJoin  .= ' LEFT JOIN ' . MAIN_DB_PREFIX . 'categorie_ticket as cp ON (t.rowid = cp.fk_ticket)';
-            $moreWhere .= ' AND cp.fk_categorie IS NULL';
+            $moreJoin  .= ' LEFT JOIN ' . MAIN_DB_PREFIX . 'categorie_ticket as cattk ON (t.rowid = cattk.fk_ticket)';
+            $moreWhere .= ' AND cattk.fk_categorie IS NULL';
         }
     }
 }
@@ -142,6 +142,10 @@ if (is_array($status)) {
             $moreWhere .= ' AND t.fk_statut IS NULL';
         }
     }
+}
+
+if (!empty($dateStart) && !empty($dateEnd)) {
+    $moreWhere .= " AND t.datec BETWEEN '" . $db->idate($dateStart) . "' AND '" . $db->idate($dateEnd) . "'";
 }
 
 print '<div class="fichecenter">';
