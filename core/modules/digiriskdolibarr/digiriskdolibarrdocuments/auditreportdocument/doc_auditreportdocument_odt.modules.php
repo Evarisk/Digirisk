@@ -125,6 +125,8 @@ class doc_auditreportdocument_odt extends ModeleODTDigiriskElementDocument
             $filter         = " AND (t.date_creation BETWEEN '$startDate' AND '$endDate' OR t.tms BETWEEN '$startDate' AND '$endDate')";
             $specificFilter = " AND (t.datec BETWEEN '$startDate' AND '$endDate' OR t.tms BETWEEN '$startDate' AND '$endDate')";
 
+            $tmpArray['dateAudit'] = dol_print_date($moreParam['dateStart'], 'day') . ' - ' . dol_print_date($moreParam['dateEnd'], 'day');
+
             $moreParam['filter']               = $filter;
             $moreParam['filterRisk']           = $filter . ' AND t.type = "risk"';
             $moreParam['filterRiskAssessment'] = $filter;
