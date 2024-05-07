@@ -118,13 +118,13 @@ class TicketDashboard extends DigiriskDolibarrDashboard
     /**
      * Return nb ticket by GP/UT and Ticket tags
      *
-     * @param  int		$date_start		Timestamp date start
-     * @param  int		$date_end		Timestamp date end
-     *
-     * @return array                    Array of values
+     * @param  int       $date_start Timestamp date start
+     * @param  int       $dateEnd    Timestamp date end
+     * @return array                 Array of values
      * @throws Exception
      */
-    public function getNbTicketByDigiriskElementAndTicketTags($date_start = 0, $date_end = 0) {
+    public function getNbTicketByDigiriskElementAndTicketTags(int $dateStart, int $dateEnd): array
+    {
         global $conf, $langs;
 
         $digiriskelement  = new DigiriskElement($this->db);
@@ -133,6 +133,7 @@ class TicketDashboard extends DigiriskDolibarrDashboard
         $accidentWorkStop = new AccidentWorkStop($this->db);
         $ticket           = new Ticket($this->db);
 
+        $filter                   = " AND o.datec BETWEEN '" . $this->db->idate($dateStart) . "' AND '" . $this->db->idate($dateEnd) . "'";
         $digiriskelement_flatlist = $digiriskelement->fetchDigiriskElementFlat(0);
         if (is_array($digiriskelement_flatlist) && !empty($digiriskelement_flatlist)) {
             foreach ($digiriskelement_flatlist as $digiriskelementobject) {
