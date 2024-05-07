@@ -427,6 +427,7 @@ class TicketDigiriskStats extends DigiriskStats
         $array['dataset']    = 2;
         $array['moreCSS']    = 'grid-2';
 
+        $category        = new Categorie($this->db);
         $digiriskElement = new DigiriskElement($this->db);
 
         if (is_array($mainCategories) && !empty($mainCategories)) {

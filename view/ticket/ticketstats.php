@@ -79,7 +79,6 @@ $dateend   = dol_print_date((!empty($date_end) ? $date_end : dol_now()), 'dayxca
 
 //Security check
 $permissiontoread = $user->rights->ticket->read;
-
 saturne_check_access($permissiontoread);
 
 /*
@@ -138,7 +137,7 @@ if (is_array($digiriskelementlist)) {
 	}
 }
 
-print '<div class="fichecenter"><div class="fichehalfleft">';
+print '<div class="fichecenter">';
 
 // Show filter box
 print '<form class="ticketstats" name="stats" method="POST" action="' . $_SERVER['PHP_SELF'] . '?refresh=1">';
@@ -217,15 +216,8 @@ print '<tr><td class="center" colspan="2"><input type="submit" name="submit" cla
 print '</table>';
 print '</form>';
 
-print '</div><div class="fichehalfright">';
-
 $moreParams = [
-    'loadRiskAssessmentDocument' => 0,
-    'loadAccident'               => 0,
-    'loadEvaluator'              => 0,
-    'loadDigiriskResources'      => 0,
-    'loadRisk'                   => 0,
-    'loadTask'                   => 0,
+    'LoadTicketDigiriskStats'    => 1,
     'socid'                      => $socid,
     'userid'                     => $userid > 0 ? $userid: 0,
     'userassignid'               => $userassignid > 0 ? $userassignid: 0,
@@ -234,9 +226,10 @@ $moreParams = [
     'join'                       => $moreJoin,
     'where'                      => $moreWhere,
 ];
+
 $dashboard->show_dashboard($moreParams);
 
-print '</div></div>';
+print '</div>';
 
 print dol_get_fiche_end();
 

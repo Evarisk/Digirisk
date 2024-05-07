@@ -18,17 +18,8 @@
 /**
  * \file    class/digiriskdolibarrdashboard.class.php
  * \ingroup digiriskdolibarr
- * \brief   Class file for manage DigiriskDolibarrDashboard.
+ * \brief   Class file for manage DigiriskDolibarrDashboard
  */
-
-// Load DigiriskDolibarr libraries
-require_once __DIR__ . '/digiriskdolibarrdocuments/riskassessmentdocument.class.php';
-require_once __DIR__ . '/accident.class.php';
-require_once __DIR__ . '/evaluator.class.php';
-require_once __DIR__ . '/digiriskresources.class.php';
-require_once __DIR__ . '/riskanalysis/risk.class.php';
-require_once __DIR__ . '/ticketdigiriskstats.class.php';
-require_once __DIR__ . '/../../saturne/class/task/saturnetask.class.php';
 
 /**
  * Class for DigiriskDolibarrDashboard
@@ -51,44 +42,38 @@ class DigiriskDolibarrDashboard
     }
 
     /**
-     * Load dashboard info
+     * Load dashboard info for all digirisk dolibarr object
      *
-     * @param array      $moreParams    Parameters for load dashboard info
-     *
+     * @param  array     $moreParams    Parameters for load dashboard info
      * @return array     $dashboardData Return all dashboardData after load info
      * @throws Exception
      */
     public function load_dashboard(array $moreParams = []): array
     {
-        global $conf;
+        $dashboardDatas = [
+            ['type' => 'RiskAssessmentDocument', 'classPath' => '/digiriskdolibarrdocuments/riskassessmentdocument.class.php'],
+            ['type' => 'Accident',               'classPath' => '/accident.class.php'],
+            ['type' => 'Evaluator',              'classPath' => '/evaluator.class.php'],
+            ['type' => 'DigiriskResources',      'classPath' => '/digiriskresources.class.php'],
+            ['type' => 'DigiriskElement',        'classPath' => '/digiriskelement.class.php'],
+            ['type' => 'SaturneTask',            'classPath' => '/../../saturne/class/task/saturnetask.class.php'],
+            ['type' => 'Risk',                   'classPath' => '/riskanalysis/risk.class.php'],
+            ['type' => 'TicketDigiriskStats',    'classPath' => '/ticketdigiriskstats.class.php']
+        ];
+        foreach ($dashboardDatas as $dashboardData) {
+            require_once __DIR__ . $dashboardData['classPath'];
+            if ($dashboardData['type'] != 'TicketDigiriskStats') {
+                $className = new $dashboardData['type']($this->db);
+            } else {
+                $className = new TicketDigiriskStats($this->db, $moreParams['socid'], $moreParams['userid'], $moreParams['userassignid'], $moreParams['categticketid'], $moreParams['from'], $moreParams['join'], $moreParams['where']);
+            }
+            if ($dashboardData['type'] != 'SaturneTask') {
+                $array[$dashboardData['type']] = array_key_exists('Load' . $dashboardData['type'], $moreParams) ? $className->load_dashboard() : [];
+            } else {
+                $array[$dashboardData['type']] = array_key_exists('Load' . $dashboardData['type'], $moreParams) ? $className->load_dashboard(getDolGlobalInt('DIGIRISKDOLIBARR_DU_PROJECT')) : [];
+            }
+        }
 
-        $loadRiskAssessmentDocument = array_key_exists('loadRiskAssessmentDocument', $moreParams) ? $moreParams['loadRiskAssessmentDocument'] : 1;
-        $loadAccident               = array_key_exists('loadAccident', $moreParams) ? $moreParams['loadAccident'] : 1;
-        $loadEvaluator              = array_key_exists('loadEvaluator', $moreParams) ? $moreParams['loadEvaluator'] : 1;
-        $loadDigiriskResources      = array_key_exists('loadDigiriskResources', $moreParams) ? $moreParams['loadDigiriskResources'] : 1;
-        $loadRisk                   = array_key_exists('loadRisk', $moreParams) ? $moreParams['loadRisk'] : 1;
-        $loadTask                   = array_key_exists('loadTask', $moreParams) ? $moreParams['loadTask'] : 1;
-        $loadDigiriskElement        = array_key_exists('loadDigiriskElement', $moreParams) ? $moreParams['loadDigiriskElement'] : 1;
-        $loadTicket                 = array_key_exists('loadTicket', $moreParams) ? $moreParams['loadTicket'] : 1;
-
-        $riskAssessmentDocument = new RiskAssessmentDocument($this->db);
-        $accident               = new Accident($this->db);
-        $evaluator              = new Evaluator($this->db);
-        $digiriskResources      = new DigiriskResources($this->db);
-        $risk                   = new Risk($this->db);
-        $digiriskTask           = new SaturneTask($this->db);
-        $digiriskElement        = new DigiriskElement($this->db);
-        $ticket                 = new TicketDigiriskStats($this->db, $moreParams['socid'], $moreParams['userid'], $moreParams['userassignid'], $moreParams['categticketid'], $moreParams['from'], $moreParams['join'], $moreParams['where']);
-
-        $dashboardData['riskassessmentdocument'] = ($loadRiskAssessmentDocument) ? $riskAssessmentDocument->load_dashboard() : [];
-        $dashboardData['accident']               = ($loadAccident) ? $accident->load_dashboard() : [];
-        $dashboardData['evaluator']              = ($loadEvaluator) ? $evaluator->load_dashboard() : [];
-        $dashboardData['digiriskresources']      = ($loadDigiriskResources) ? $digiriskResources->load_dashboard() : [];
-        $dashboardData['digiriskelement']        = ($loadDigiriskElement) ? $digiriskElement->load_dashboard() : [];
-        $dashboardData['task']                   = ($loadTask) ? $digiriskTask->load_dashboard($conf->global->DIGIRISKDOLIBARR_DU_PROJECT) : [];
-        $dashboardData['risk']                   = ($loadRisk) ? $risk->load_dashboard() : [];
-        $dashboardData['ticket']                 = ($loadTicket) ? $ticket->load_dashboard() : [];
-
-        return $dashboardData;
+        return $array;
     }
 }
