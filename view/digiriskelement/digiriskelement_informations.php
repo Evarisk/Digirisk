@@ -110,10 +110,7 @@ saturne_banner_tab($object,'ref','none', 0, 'ref', 'ref', $morehtmlref, true, $m
 
 print '<div class="fichecenter"><br>';
 
-$moreParams = [
-    'LoadDigiriskElement' => 1
-];
-
+$moreParams = ['LoadDigiriskElement' => 1];
 $dashboard->show_dashboard($moreParams);
 
 print '</div>';

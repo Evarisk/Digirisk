@@ -1,5 +1,5 @@
 <?php
-/* Copyright (C) 2022 EOXIA <technique@evarisk.com>
+/* Copyright (C) 2022-2024 EVARISK <technique@evarisk.com>
  *
  * This program is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -16,40 +16,38 @@
  */
 
 /**
- *       \file       class/ticketdigiriskstats.class.php
- *       \ingroup    digiriskdolibarr
- *       \brief      Fichier de la classe de gestion des stats des tickets
+ * \file    class/ticketdashboard.class.php
+ * \ingroup digiriskdolibarr
+ * \brief   Class file for manage TicketDashboard
  */
 
-include_once DOL_DOCUMENT_ROOT.'/ticket/class/ticket.class.php';
-include_once DOL_DOCUMENT_ROOT.'/core/lib/date.lib.php';
+// load Dolibarr librairies
+require_once DOL_DOCUMENT_ROOT . '/ticket/class/ticket.class.php';
+require_once DOL_DOCUMENT_ROOT . '/core/lib/date.lib.php';
 require_once DOL_DOCUMENT_ROOT . '/categories/class/categorie.class.php';
 
+// load DigiriskDolibarr librairies
 require_once __DIR__ . '/digiriskstats.php';
 require_once __DIR__ . '/digiriskelement.class.php';
 require_once __DIR__ . '/accident.class.php';
 
-// load saturne librairies
-
-require_once __DIR__ . '/../../saturne/class/saturnedashboard.class.php';
-
 /**
- *	Class to manage stats for tickets
+ * Class to manage stats for tickets
  */
-class TicketDigiriskStats extends DigiriskStats
+class TicketDashboard extends DigiriskStats
 {
-	/**
-	 * @var string Name of table without prefix where object is stored
-	 */
-	public $table_element;
+    /**
+     * @var string Name of table without prefix where object is stored
+     */
+    public $table_element;
 
-	public $socid;
-	public $userid;
+    public $socid;
+    public $userid;
 
-	public $from;
-	public $field;
-	public $where;
-	public $join;
+    public $from;
+    public $field;
+    public $where;
+    public $join;
 
 	/**
 	 * 	Constructor
@@ -312,7 +310,7 @@ class TicketDigiriskStats extends DigiriskStats
     /**
      * Get tickets by month
      *
-     * @return array Graph datas (label/color/type/title/data etc..)
+     * @return array $array Graph datas (label/color/type/title/data etc..)
      */
     public function getTicketsByMonth(): array
     {
@@ -362,7 +360,7 @@ class TicketDigiriskStats extends DigiriskStats
      * Get tickets by main tag and digirisk element
      *
      * @param  array|int $mainCategories Int <0 if KO, array of main categories if OK
-     * @return array     Graph datas (label/color/type/title/data etc..)
+     * @return array     $array          Graph datas (label/color/type/title/data etc..)
      * @throws Exception
      */
     public function getTicketsByMainTagAndByDigiriskElement($mainCategories): array
@@ -408,7 +406,7 @@ class TicketDigiriskStats extends DigiriskStats
      * Get tickets by main sub tag and digirisk element
      *
      * @param  array|int $mainCategories Int <0 if KO, array of main categories if OK
-     * @return array                     Graph datas (label/color/type/title/data etc..)
+     * @return array     $array          Graph datas (label/color/type/title/data etc..)
      * @throws Exception
      */
     public function getTicketsByMainSubTagAndByDigiriskElement($mainCategories): array
@@ -460,7 +458,7 @@ class TicketDigiriskStats extends DigiriskStats
     /**
      * Get tickets by year
      *
-     * @return array Graph datas (label/color/type/title/data etc..)
+     * @return array $array Graph datas (label/color/type/title/data etc..)
      */
     public function getTicketsByYear(): array
     {

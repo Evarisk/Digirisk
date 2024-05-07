@@ -58,14 +58,14 @@ class DigiriskDolibarrDashboard
             ['type' => 'DigiriskElement',        'classPath' => '/digiriskelement.class.php'],
             ['type' => 'SaturneTask',            'classPath' => '/../../saturne/class/task/saturnetask.class.php'],
             ['type' => 'Risk',                   'classPath' => '/riskanalysis/risk.class.php'],
-            ['type' => 'TicketDigiriskStats',    'classPath' => '/ticketdigiriskstats.class.php']
+            ['type' => 'TicketDashboard',        'classPath' => '/ticketdashboard.class.php']
         ];
         foreach ($dashboardDatas as $dashboardData) {
             require_once __DIR__ . $dashboardData['classPath'];
-            if ($dashboardData['type'] != 'TicketDigiriskStats') {
+            if ($dashboardData['type'] != 'TicketDashboard') {
                 $className = new $dashboardData['type']($this->db);
             } else {
-                $className = new TicketDigiriskStats($this->db, $moreParams['socid'], $moreParams['userid'], $moreParams['userassignid'], $moreParams['categticketid'], $moreParams['from'], $moreParams['join'], $moreParams['where']);
+                $className = new TicketDashboard($this->db, $moreParams['socid'], $moreParams['userid'], $moreParams['userassignid'], $moreParams['categticketid'], $moreParams['from'], $moreParams['join'], $moreParams['where']);
             }
             if ($dashboardData['type'] != 'SaturneTask') {
                 $array[$dashboardData['type']] = array_key_exists('Load' . $dashboardData['type'], $moreParams) ? $className->load_dashboard() : [];

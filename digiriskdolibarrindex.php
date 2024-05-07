@@ -42,7 +42,7 @@ $moreParams = [
     'LoadDigiriskElement'        => 1,
     'LoadSaturneTask'            => 1,
     'LoadRisk'                   => 1,
-    'LoadTicketDigiriskStats'    => 1
+    'LoadTicketDashboard'        => 1
 ];
 
 require_once __DIR__ . '/../saturne/core/tpl/index/index_view.tpl.php';
