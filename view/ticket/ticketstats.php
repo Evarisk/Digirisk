@@ -97,30 +97,28 @@ if ($socid > 0) {
 if (is_array($digiriskElements)) {
     if (in_array($langs->trans('All'), $digiriskElements)) {
         unset($digiriskElements[array_search($langs->trans('All'), $digiriskElements)]);
-    } else {
-        if (!empty($digiriskElements)) {
-            $moreJoin  .= ' LEFT JOIN ' . MAIN_DB_PREFIX . 'ticket_extrafields as tkextra ON t.rowid = tkextra.fk_object';
-            $moreJoin  .= ' LEFT JOIN ' . MAIN_DB_PREFIX . 'digiriskdolibarr_digiriskelement as e ON tkextra.digiriskdolibarr_ticket_service = e.rowid';
-            $moreWhere .= ' AND e.rowid IN (' . $db->sanitize(implode(',', $digiriskElements)) . ')';
-        } else if (!empty(GETPOST('refresh', 'int'))) {
-            $moreJoin  .= ' LEFT JOIN ' . MAIN_DB_PREFIX . 'ticket_extrafields as tkextra ON t.rowid = tkextra.fk_object';
-            $moreJoin  .= ' LEFT JOIN ' . MAIN_DB_PREFIX . 'digiriskdolibarr_digiriskelement as e ON tkextra.digiriskdolibarr_ticket_service = e.rowid';
-            $moreWhere .= ' AND e.rowid IS NULL';
-        }
+    } else if (in_array('IS NULL', $digiriskElements)) {
+        unset($digiriskElements[array_search($langs->trans('None'), $digiriskElements)]);
+        $moreJoin  .= ' LEFT JOIN ' . MAIN_DB_PREFIX . 'ticket_extrafields as tkextra ON t.rowid = tkextra.fk_object';
+        $moreJoin  .= ' LEFT JOIN ' . MAIN_DB_PREFIX . 'digiriskdolibarr_digiriskelement as e ON tkextra.digiriskdolibarr_ticket_service = e.rowid';
+        $moreWhere .= ' AND e.rowid IS NULL';
+    } else if (!empty($digiriskElements)) {
+        $moreJoin  .= ' LEFT JOIN ' . MAIN_DB_PREFIX . 'ticket_extrafields as tkextra ON t.rowid = tkextra.fk_object';
+        $moreJoin  .= ' LEFT JOIN ' . MAIN_DB_PREFIX . 'digiriskdolibarr_digiriskelement as e ON tkextra.digiriskdolibarr_ticket_service = e.rowid';
+        $moreWhere .= ' AND e.rowid IN (' . $db->sanitize(implode(',', $digiriskElements)) . ')';
     }
 }
 
 if (is_array($categories)) {
     if (in_array($langs->trans('All'), $categories)) {
         unset($categories[array_search($langs->trans('All'), $categories)]);
-    } else {
-        if (!empty($categories)) {
-            $moreJoin  .= ' LEFT JOIN ' . MAIN_DB_PREFIX . 'categorie_ticket as cattk ON (t.rowid = cattk.fk_ticket)';
-            $moreWhere .= ' AND cattk.fk_categorie IN (' . $db->sanitize(implode(',', $categories)) . ')';
-        } else if (!empty(GETPOST('refresh', 'int'))) {
-            $moreJoin  .= ' LEFT JOIN ' . MAIN_DB_PREFIX . 'categorie_ticket as cattk ON (t.rowid = cattk.fk_ticket)';
-            $moreWhere .= ' AND cattk.fk_categorie IS NULL';
-        }
+    } else if (in_array('IS NULL', $categories)) {
+        unset($categories[array_search($langs->trans('None'), $categories)]);
+        $moreJoin  .= ' LEFT JOIN ' . MAIN_DB_PREFIX . 'categorie_ticket as cattk ON (t.rowid = cattk.fk_ticket)';
+        $moreWhere .= ' AND cattk.fk_categorie IS NULL';
+    } else if (!empty($categories)) {
+        $moreJoin  .= ' LEFT JOIN ' . MAIN_DB_PREFIX . 'categorie_ticket as cattk ON (t.rowid = cattk.fk_ticket)';
+        $moreWhere .= ' AND cattk.fk_categorie IN (' . $db->sanitize(implode(',', $categories)) . ')';
     }
 }
 
@@ -135,12 +133,11 @@ if ($userAssignID > 0) {
 if (is_array($status)) {
     if (in_array($langs->trans('All'), $status)) {
         unset($status[array_search($langs->trans('All'), $status)]);
-    } else {
-        if (!empty($status)) {
-            $moreWhere .= ' AND t.fk_statut IN (' . $db->sanitize(implode(',', $status)) . ')';
-        } else if (!empty(GETPOST('refresh', 'int'))) {
-            $moreWhere .= ' AND t.fk_statut IS NULL';
-        }
+    } else if (in_array('IS NULL', $status)) {
+        unset($status[array_search($langs->trans('None'), $status)]);
+        $moreWhere .= ' AND t.fk_statut IS NULL';
+    } else if (!empty($status)) {
+        $moreWhere .= ' AND t.fk_statut IN (' . $db->sanitize(implode(',', $status)) . ')';
     }
 }
 
@@ -154,7 +151,8 @@ print '<div class="fichecenter">';
 print '<form method="POST" action="' . $_SERVER['PHP_SELF'] . '?refresh=1">';
 print '<input type="hidden" name="token" value="' . newToken() . '">';
 
-$all = [$langs->trans('All') => $langs->trans('All')];
+$all  = [$langs->trans('All') => $langs->trans('All')];
+$none = ['IS NULL' => $langs->trans('None')];
 
 print '<table class="noborder centpercent">';
 print '<tr class="liste_titre"><td class="liste_titre" colspan="2">' . $langs->trans('Filter') . '</td></tr>';
@@ -167,7 +165,7 @@ print '</td></tr>';
 
 // DigiriskElement
 print '<tr><td>' . $form->textwithpicto($langs->trans('GP/UT'), $langs->trans('GP/UTHelp')) . '</td><td>';
-$digiriskElementsArray  = [];
+$digiriskElementsArray  = $none;
 $activeDigiriskElements = $digiriskElement->getActiveDigiriskElements();
 if (is_array($activeDigiriskElements) && !empty($activeDigiriskElements)) {
     foreach ($activeDigiriskElements as $digiriskElement) {
@@ -182,7 +180,7 @@ if (isModEnabled('categorie')) {
     print '<tr><td>' . $form->textwithpicto($langs->trans('Category') . ' ' . lcfirst($langs->trans('Ticket')), $langs->trans('CategoryTicketHelp')) . '</td><td>';
     $cateArbo = $form->select_all_categories(Categorie::TYPE_TICKET, null, 'parent', null, null, 1);
     print img_picto('', 'category', 'class="pictofixedwidth"');
-    print $form->multiselectarray('categories', $all + $cateArbo, (!empty(GETPOST('refresh', 'int')) ? GETPOST('categories', 'array') : $all + $cateArbo), 0, 0, 'minwidth100imp widthcentpercentminusx maxwidth300');
+    print $form->multiselectarray('categories', $all + $none + $cateArbo, (!empty(GETPOST('refresh', 'int')) ? GETPOST('categories', 'array') : $all + $none + $cateArbo), 0, 0, 'minwidth100imp widthcentpercentminusx maxwidth300');
     print '</td></tr>';
 }
 
@@ -198,7 +196,7 @@ print $form->select_dolusers($userAssignID, 'userAssignID', 1, '', 0, '', '', $c
 
 // Status
 print '<tr><td>' . $form->textwithpicto($langs->trans('Status'), $langs->trans('StatusHelp')) . '</td><td>';
-print $form->multiselectarray('status', $all + $object->statuts_short, (!empty(GETPOST('refresh', 'int')) ? GETPOST('status', 'array') : $all + $object->statuts_short), 0, 0, 'minwidth100imp widthcentpercentminusx maxwidth300', 1);
+print $form->multiselectarray('status', $all + $none + $object->statuts_short, (!empty(GETPOST('refresh', 'int')) ? GETPOST('status', 'array') : $all + $none + $object->statuts_short), 0, 0, 'minwidth100imp widthcentpercentminusx maxwidth300', 1);
 print '</td></tr>';
 
 // DateRange
