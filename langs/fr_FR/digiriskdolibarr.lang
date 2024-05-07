@@ -1228,7 +1228,6 @@ TaskHideBudgetInDocumentDescription      = Masquer le budget de la tâche dans l
 Register                                 = Registre
 Send                                     = Envoyer
 TicketSent                               = Ticket envoyé
-CreateTicket                             = Ticket
 FilesLinked                              = Photos / Pièces jointes
 AddDocument                              = Ajouter document
 LastnamePlaceholder                      = Exemple : Dupont
@@ -1347,7 +1346,8 @@ TicketDateVisible                        = Afficher le champ Date pour créer un
 TicketDateVisibleHelp                    = Activer cette option pour afficher le champ Date dans l'interface publique et le rendre obligatoire si nécessaire
 QRCodeGenerated                          = QRCode généré
 FkTicket                                 = Ticket lié
-
+PublicTicket                             = Interface publique des tickets
+TicketPublicInterfaceForbidden           = Accès interdit à l'interface publique des tickets
 
 # Stats - Statistiques
 TicketStatistics    = Statistiques des tickets
