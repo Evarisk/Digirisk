@@ -27,116 +27,93 @@ require_once DOL_DOCUMENT_ROOT . '/core/lib/date.lib.php';
 require_once DOL_DOCUMENT_ROOT . '/categories/class/categorie.class.php';
 
 // load DigiriskDolibarr librairies
-require_once __DIR__ . '/digiriskstats.php';
 require_once __DIR__ . '/digiriskelement.class.php';
 require_once __DIR__ . '/accident.class.php';
 
 /**
  * Class to manage stats for tickets
  */
-class TicketDashboard extends DigiriskStats
+class TicketDashboard extends DigiriskDolibarrDashboard
 {
     /**
-     * @var string Name of table without prefix where object is stored
+     * @var DoliDB Database handler
      */
-    public $table_element;
+    public DoliDB $db;
 
-    public $socid;
-    public $userid;
+    /**
+     * @var string SQL FROM
+     */
+    public string $from = '';
 
-    public $from;
-    public $field;
-    public $where;
-    public $join;
+    /**
+     * @var string SQL JOIN
+     */
+    public string $join = '';
 
-	/**
-	 * 	Constructor
-	 *
-	 * 	@param	DoliDB		$db			          Database handler
-	 * 	@param 	int			$socid		          ID third party for filter. This value must be forced during the new to external user company if user is an external user.
-	 * 	@param	int			$userid    	          ID user for filter (creation user)
-	 * 	@param	int			$userassignid    	  ID user for filter (user assign)
-	 * 	@param	int			$categticketid        ID category of ticket for filter
-	 */
-	public function __construct($db, $socid = 0, $userid = 0, $userassignid = 0, $categticketid = 0, $moreFrom = '', $moreJoin = '', $moreWhere = '')
-	{
-		$this->db = $db;
-		$this->socid = ($socid > 0 ? $socid : 0);
-		$this->userid = $userid;
-		$this->join = '';
+    /**
+     * @var string SQL WHERE
+     */
+    public string $where = '';
 
-		$object = new Ticket($this->db);
-		$this->from = MAIN_DB_PREFIX.$object->table_element." as tk";
-        if (dol_strlen($moreFrom) > 0) {
-            $this->from .= $moreFrom;
-        }
+    /**
+     * Constructor
+     *
+     * @param DoliDB $db        Database handler
+     * @param string $moreJoin  More SQL JOIN
+     * @param string $moreWhere More SQL filters (' AND ...')
+     */
+    public function __construct(DoliDB $db, string $moreJoin = '', string $moreWhere = '')
+    {
+        $this->db = $db;
+
+        $this->from = MAIN_DB_PREFIX . 'ticket as t';
         if (dol_strlen($moreJoin) > 0) {
             $this->join .= $moreJoin;
         }
-		$this->where = "tk.fk_statut >= 0";
-		$this->where .= " AND tk.entity IN (".getEntity('ticket').")";
-		if ($this->socid) {
-			$this->where .= " AND tk.fk_soc = ".((int) $this->socid);
-		}
-
-		if (is_array($this->userid) && count($this->userid) > 0) {
-			$this->where .= ' AND tk.fk_user_create IN ('.$this->db->sanitize(join(',', $this->userid)).')';
-		} elseif ($this->userid > 0) {
-			$this->where .= " AND tk.fk_user_create = ".((int) $this->userid);
-		}
-
-		if ($userassignid) {
-			$this->where .= " AND tk.fk_user_assign = ".((int) $userassignid);
-		}
-
-		if ($categticketid) {
-			$this->join .= ' LEFT JOIN '.MAIN_DB_PREFIX.'categorie_ticket as ctk ON ctk.fk_ticket = tk.rowid';
-			$this->join .= ' LEFT JOIN '.MAIN_DB_PREFIX.'categorie as c ON c.rowid = ctk.fk_categorie';
-			$this->where .= ' AND c.rowid = '.((int) $categticketid);
-		}
+        $this->where  = 't.fk_statut >= 0';
+        $this->where .= ' AND t.entity IN (' . getEntity('ticket') . ')';
         if (dol_strlen($moreWhere) > 0) {
             $this->where .= $moreWhere;
         }
-	}
+    }
 
-	/**
-	 * 	Return ticket number by month for a year
-	 *
-	 *	@param	int		$year		Year to scan
-	 *	@param	int		$format		0=Label of abscissa is a translated text, 1=Label of abscissa is month number, 2=Label of abscissa is first letter of month
-	 *	@return	array				Array of values
-	 */
-	public function getNbByMonth($year, $format = 0)
-	{
-		$sql = "SELECT date_format(tk.datec,'%m') as dc, COUNT(*) as nb";
-		$sql .= " FROM ".$this->from;
-		$sql .= $this->join;
-		$sql .= " WHERE tk.datec BETWEEN '".$this->db->idate(dol_get_first_day($year))."' AND '".$this->db->idate(dol_get_last_day($year))."'";
-		$sql .= " AND ".$this->where;
-		$sql .= " GROUP BY dc";
-		$sql .= $this->db->order('dc', 'DESC');
+    /**
+     * Return ticket number by month for a year
+     *
+     * @param  int       $year Year
+     * @return array           Array of values
+     * @throws Exception
+     */
+    public function getNbByMonth(int $year): array
+    {
+        $sql  = "SELECT date_format(t.datec,'%m') as dc, COUNT(*) as nb";
+        $sql .= ' FROM ' . $this->from;
+        $sql .= $this->join;
+        $sql .= " WHERE t.datec BETWEEN '" . $this->db->idate(dol_get_first_day($year)) . "' AND '" . $this->db->idate(dol_get_last_day($year)) . "'";
+        $sql .= ' AND ' . $this->where;
+        $sql .= ' GROUP BY dc';
+        $sql .= $this->db->order('dc', 'DESC');
 
-		$res = $this->_getNbByMonth($year, $sql, $format);
+        return $this->_getNbByMonth($sql);
+    }
 
-		return $res;
-	}
+    /**
+     * Return nb, total and average
+     *
+     * @return array     Array of values
+     * @throws Exception
+     */
+    public function getAllByYear()
+    {
+        $sql  = "SELECT date_format(t.datec,'%Y') as year, COUNT(*) as nb";
+        $sql .= ' FROM ' . $this->from;
+        $sql .= $this->join;
+        $sql .= ' WHERE ' . $this->where;
+        $sql .= ' GROUP BY year';
+        $sql .= $this->db->order('year', 'DESC');
 
-	/**
-	 *	Return nb, total and average
-	 *
-	 *	@return	array	Array of values
-	 */
-	public function getAllByYear()
-	{
-		$sql = "SELECT date_format(tk.datec,'%Y') as year, COUNT(*) as nb";
-		$sql .= " FROM ".$this->from;
-		$sql .= $this->join;
-		$sql .= " WHERE ".$this->where;
-		$sql .= " GROUP BY year";
-		$sql .= $this->db->order('year', 'DESC');
-
-		return $this->_getAllByYear($sql);
-	}
+        return $this->_getAllByYear($sql);
+    }
 
     /**
      * Return nb ticket by GP/UT and Ticket tags
@@ -314,7 +291,7 @@ class TicketDashboard extends DigiriskStats
      */
     public function getTicketsByMonth(): array
     {
-        global $conf, $langs;
+        global $langs;
 
         // Graph Title parameters
         $array['title'] = $langs->transnoentities('NumberOfTicketsByMonth');
@@ -328,30 +305,36 @@ class TicketDashboard extends DigiriskStats
         $array['dataset']    = 2;
         $array['moreCSS']    = 'grid-2';
 
-        $date_start = dol_mktime(0, 0, 0, GETPOST('datestartmonth', 'int'), GETPOST('datestartday', 'int'), GETPOST('datestartyear', 'int'));
-        $date_end   = dol_mktime(0, 0, 0, GETPOST('dateendmonth', 'int'), GETPOST('dateendday', 'int'), GETPOST('dateendyear', 'int'));
-        $startyear  = strftime("%Y", !empty($date_start) ? $date_start : dol_now());
-        $endyear    = strftime("%Y", !empty($date_end) ? $date_end : dol_now() + 1);
-        $legend     = [];
+        $dateStart = dol_mktime(0, 0, 0, GETPOST('dateStartmonth', 'int'), GETPOST('dateStartday', 'int'), GETPOST('dateStartyear', 'int'));
+        $dateEnd   = dol_mktime(0, 0, 0, GETPOST('dateEndmonth', 'int'), GETPOST('dateEndday', 'int'), GETPOST('dateEndyear', 'int'));
+        $startYear = !empty($dateStart) ? strftime('%Y', $dateStart) : strftime('%Y', dol_now()) - (!getDolGlobalInt('MAIN_STATS_GRAPHS_SHOW_N_YEARS') ? 2 : max(1, min(10, getDolGlobalInt('MAIN_STATS_GRAPHS_SHOW_N_YEARS'))));
+        $endYear   = strftime('%Y', !empty($dateEnd) ? $dateEnd : dol_now());
 
-        for ($i = $startyear; $i <= $endyear; $i++) {
-            $legend[] = $i;
+        $labels = [];
+        for ($i = $startYear; $i <= $endYear; $i++) {
+            $labels[] = $i;
+        }
+        foreach ($labels as $label) {
+            $array['labels'][] = ['label' => $label];
         }
 
-        $array['dataset'] = 3;
-
-        foreach ($legend as $key => $legendPart) {
-            $array['labels'][] = ['label' => $legendPart];
-        }
-
-        $tickets = $this->getNbByMonthWithPrevYear($endyear, $startyear, 0, 0, $conf->global->SOCIETE_FISCAL_MONTH_START);
+        $tickets = $this->getNbByMonthWithPrevYear($startYear, $endYear, getDolGlobalInt('SOCIETE_FISCAL_MONTH_START'));
         if (is_array($tickets) && !empty($tickets)) {
-            foreach ($tickets as $ticket) {
-                $value[] = $ticket;
+            if (!empty($dateStart) && !empty($dateEnd) && $startYear == $endYear) {
+                // Extract month values from POST parameters, assuming zero-based indexing
+                $startMonth = intval(GETPOST('dateStartmonth', 'int')) - 1;
+                $endMonth   = intval(GETPOST('dateEndmonth', 'int')) - 1;
+
+                // Iterate through $tickets and filter based on month range
+                foreach ($tickets as $key => $ticket) {
+                    if ($key >= $startMonth && $key <= $endMonth) {
+                        $array['data'][] = $ticket;
+                    }
+                }
+            } else {
+                $array['data'] = $tickets;
             }
         }
-
-        $array['data'] = $value;
 
         return $array;
     }
@@ -391,7 +374,7 @@ class TicketDashboard extends DigiriskStats
                 $digiriskElements     = $digiriskElement->getActiveDigiriskElements(0, $moreParams);
                 if (is_array($digiriskElements) && !empty($digiriskElements)) {
                     foreach ($digiriskElements as $digiriskElement) {
-                        $tickets                                = saturne_fetch_all_object_type('Ticket', '', '', 0, 0, ['customsql' => 'cp.fk_categorie = ' . $mainCategory->id  . ' AND eft.digiriskdolibarr_ticket_service = ' . $digiriskElement->id], 'AND', true, true, true);
+                        $tickets                                = saturne_fetch_all_object_type('Ticket', '', '', 0, 0, ['customsql' => 'cp.fk_categorie = ' . $mainCategory->id  . ' AND eft.digiriskdolibarr_ticket_service = ' . $digiriskElement->id . ' AND ' . $this->where], 'AND', true, true, true, $this->join);
                         $array['data'][$digiriskElement->id][0] = $digiriskElement->ref . ' - ' . $digiriskElement->label;
                         $array['data'][$digiriskElement->id][]  = is_array($tickets) && !empty($tickets) ? count($tickets) : 0;
                     }
@@ -442,7 +425,7 @@ class TicketDashboard extends DigiriskStats
                         $digiriskElements     = $digiriskElement->getActiveDigiriskElements(0, $moreParams);
                         if (is_array($digiriskElements) && !empty($digiriskElements)) {
                             foreach ($digiriskElements as $digiriskElement) {
-                                $tickets                                = saturne_fetch_all_object_type('Ticket', '', '', 0, 0, ['customsql' => 'cp.fk_categorie = ' . $mainSubCategory->id  . ' AND eft.digiriskdolibarr_ticket_service = ' . $digiriskElement->id], 'AND', true, true, true);
+                                $tickets                                = saturne_fetch_all_object_type('Ticket', '', '', 0, 0, ['customsql' => 'cp.fk_categorie = ' . $mainSubCategory->id  . ' AND eft.digiriskdolibarr_ticket_service = ' . $digiriskElement->id . ' AND ' . $this->where], 'AND', true, true, true, $this->join);
                                 $array['data'][$digiriskElement->id][0] = $digiriskElement->ref . ' - ' . $digiriskElement->label;
                                 $array['data'][$digiriskElement->id][]  = is_array($tickets) && !empty($tickets) ? count($tickets) : 0;
                             }

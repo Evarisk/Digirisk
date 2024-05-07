@@ -37,7 +37,7 @@ global $conf, $db, $langs, $user;
 include_once DOL_DOCUMENT_ROOT . '/core/lib/files.lib.php';
 
 require_once __DIR__ . '/../../lib/digiriskdolibarr_ticket.lib.php';
-require_once __DIR__ . '/../../class/ticketdigiriskstats.class.php';
+require_once __DIR__ . '/../../class/ticketdashboard.class.php';
 
 // Load translation files required by the page
 saturne_load_langs();
@@ -46,7 +46,7 @@ saturne_load_langs();
 $action = GETPOST('action', 'aZ09');
 
 // Initialize technical objects
-$stats = new TicketDigiriskStats($db);
+$stats = new TicketDashboard($db);
 
 // Security check
 $permissiontoread = $user->rights->ticket->read;

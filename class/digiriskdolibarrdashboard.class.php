@@ -65,7 +65,7 @@ class DigiriskDolibarrDashboard
             if ($dashboardData['type'] != 'TicketDashboard') {
                 $className = new $dashboardData['type']($this->db);
             } else {
-                $className = new TicketDashboard($this->db, $moreParams['socid'], $moreParams['userid'], $moreParams['userassignid'], $moreParams['categticketid'], $moreParams['from'], $moreParams['join'], $moreParams['where']);
+                $className = new TicketDashboard($this->db, $moreParams['join'], $moreParams['where']);
             }
             if ($dashboardData['type'] != 'SaturneTask') {
                 $array[$dashboardData['type']] = array_key_exists('Load' . $dashboardData['type'], $moreParams) ? $className->load_dashboard() : [];
@@ -75,5 +75,121 @@ class DigiriskDolibarrDashboard
         }
 
         return $array;
+    }
+
+    /**
+     * Return nb of elements by month for several years
+     *
+     * @param  int  $endYear    Start year
+     * @param  int  $startYear  End year
+     * @param  int  $startMonth month of the fiscal year start min 1 max 12 ; if 1 = january
+     * @return array            Array of values
+     */
+    public function getNbByMonthWithPrevYear(int $startYear, int $endYear, int $startMonth = 1)
+    {
+        if ($startYear > $endYear) {
+            return -1;
+        }
+
+        $datay = [];
+        $year  = $startYear;
+        $sm    = $startMonth - 1;
+        if ($sm != 0) {
+            $year = $year - 1;
+        }
+        while ($year <= $endYear) {
+            $datay[$year] = $this->getNbByMonth($year);
+            $year++;
+        }
+
+        $data = [];
+        for ($i = 0; $i < 12; $i++) {
+            $data[$i][] = $datay[$endYear][($i + $sm) % 12][0];
+            $year       = $startYear;
+            while ($year <= $endYear) {
+                $data[$i][] = $datay[$year][($i + $sm) % 12][1];
+                $year++;
+            }
+        }
+
+        return $data;
+    }
+
+    //@todo a bouger dans Saturne
+    /**
+     * Return nb of elements, total amount and avg amount each year
+     *
+     * @param  string    $sql    SQL request
+     * @return array     $result Array with nb, average for each year
+     * @throws Exception
+     */
+    protected function _getAllByYear(string $sql): array
+    {
+        dol_syslog(get_class($this) . '::' . __FUNCTION__, LOG_DEBUG);
+
+        $result = [];
+        $resql  = $this->db->query($sql);
+        if ($resql) {
+            $num = $this->db->num_rows($resql);
+            $i   = 0;
+            while ($i < $num) {
+                $row                = $this->db->fetch_object($resql);
+                $result[$i]['year'] = $row->year;
+                $result[$i]['nb']   = $row->nb;
+                if ($i > 0 && $row->nb > 0) {
+                    $result[$i - 1]['avg'] = ($result[$i - 1]['nb']) / $row->nb * 100;
+                }
+                $i++;
+            }
+            $this->db->free($resql);
+        } else {
+            dol_print_error($this->db);
+        }
+
+        return $result;
+    }
+
+    //@todo a bouger dans Saturne
+    /**
+     * Return number of elements per month
+     *
+     * @param  string    $sql  SQL request
+     * @return array     $data Array of nb each month
+     * @throws Exception
+     */
+    protected function _getNbByMonth(string $sql): array
+    {
+        global $langs;
+
+        dol_syslog(get_class($this) . '::' . __FUNCTION__, LOG_DEBUG);
+
+        $result = [];
+        $resql  = $this->db->query($sql);
+        if ($resql) {
+            $num = $this->db->num_rows($resql);
+            $i = 0;
+            while ($i < $num) {
+                $row        = $this->db->fetch_row($resql);
+                $j          = $row[0] * 1;
+                $result[$j] = $row[1];
+                $i++;
+            }
+            $this->db->free($resql);
+        } else {
+            dol_print_error($this->db);
+        }
+
+        $res = [];
+        for ($i = 1; $i < 13; $i++) {
+            $res[$i] = ($result[$i] ?? 0);
+        }
+
+        $data = [];
+        for ($i = 1; $i < 13; $i++) {
+            $month = $langs->transnoentitiesnoconv('MonthShort' . sprintf('%02d', $i));
+            $data[$i - 1] = array($month, $res[$i]);
+        }
+
+        return $data;
     }
 }
