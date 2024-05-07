@@ -121,37 +121,6 @@ abstract class DigiriskStats
 		return $data;
 	}
 
-	// Here we have low level of shared code called by XxxStats.class.php
-
-	// phpcs:disable PEAR.NamingConventions.ValidFunctionName.PublicUnderscore
-	/**
-	 * 	Return nb of elements by year
-	 *
-	 *	@param	string	$sql		SQL request
-	 * 	@return	array
-	 */
-	protected function _getNbByYear($sql)
-	{
-		// phpcs:enable
-		$result = array();
-
-		dol_syslog(get_class($this).'::'.__FUNCTION__."", LOG_DEBUG);
-		$resql = $this->db->query($sql);
-		if ($resql) {
-			$num = $this->db->num_rows($resql);
-			$i = 0;
-			while ($i < $num) {
-				$row = $this->db->fetch_row($resql);
-				$result[$i] = $row;
-				$i++;
-			}
-			$this->db->free($resql);
-		} else {
-			dol_print_error($this->db);
-		}
-		return $result;
-	}
-
 	// phpcs:disable PEAR.NamingConventions.ValidFunctionName.PublicUnderscore
 	/**
 	 * 	Return nb of elements, total amount and avg amount each year
@@ -172,24 +141,9 @@ abstract class DigiriskStats
 			while ($i < $num) {
 				$row = $this->db->fetch_object($resql);
 				$result[$i]['year'] = $row->year;
-				$result[$i]['nb'] = $row->nb;
+				$result[$i]['nb']   = $row->nb;
 				if ($i > 0 && $row->nb > 0) {
-					$result[$i - 1]['nb_diff'] = ($result[$i - 1]['nb'] - $row->nb) / $row->nb * 100;
-				}
-				$result[$i]['total'] = $row->total;
-				if ($i > 0 && $row->total > 0) {
-					$result[$i - 1]['total_diff'] = ($result[$i - 1]['total'] - $row->total) / $row->total * 100;
-				}
-				$result[$i]['avg'] = $row->avg;
-				if ($i > 0 && $row->avg > 0) {
-					$result[$i - 1]['avg_diff'] = ($result[$i - 1]['avg'] - $row->avg) / $row->avg * 100;
-				}
-				// For some $sql only
-				if (isset($row->weighted)) {
-					$result[$i]['weighted'] = $row->weighted;
-					if ($i > 0 && $row->weighted > 0) {
-						$result[$i - 1]['avg_weighted'] = ($result[$i - 1]['weighted'] - $row->weighted) / $row->weighted * 100;
-					}
+					$result[$i - 1]['avg'] = ($result[$i - 1]['nb']) / $row->nb * 100;
 				}
 				$i++;
 			}

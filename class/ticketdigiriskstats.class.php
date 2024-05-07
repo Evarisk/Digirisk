@@ -123,24 +123,6 @@ class TicketDigiriskStats extends DigiriskStats
 		return $res;
 	}
 
-
-	/**
-	 * 	Return ticket number per year
-	 *
-	 *	@return		array	Array with number by year
-	 */
-	public function getNbByYear()
-	{
-		$sql = "SELECT date_format(tk.datec,'%Y') as dc, COUNT(*), SUM(c.".$this->field.")";
-		$sql .= " FROM ".$this->from;
-		$sql .= $this->join;
-		$sql .= " WHERE ".$this->where;
-		$sql .= " GROUP BY dc";
-		$sql .= $this->db->order('dc', 'DESC');
-
-		return $this->_getNbByYear($sql);
-	}
-
 	/**
 	 *	Return nb, total and average
 	 *
@@ -310,12 +292,18 @@ class TicketDigiriskStats extends DigiriskStats
      */
     public function load_dashboard(): array
     {
-        $getTicketsByMonth                   = $this->getTicketsByMonth();
-        $getTicketsByTagAndByDigiriskElement = $this->getTicketsByTagAndByDigiriskElement();
-        $getTicketsByTag                     = $this->getTicketsByTag();
-        $getTicketsByYear                    = $this->getTicketsByYear();
+        $getTicketsByMonth = $this->getTicketsByMonth();
 
-        $array['graphs'] = [$getTicketsByMonth, $getTicketsByTagAndByDigiriskElement, $getTicketsByTag];
+        $category = new Categorie($this->db);
+        $category->fetch(getDolGlobalInt('DIGIRISKDOLIBARR_TICKET_MAIN_CATEGORY'));
+        $mainCategories = $category->get_filles();
+
+        $getTicketsByMainTagAndByDigiriskElement    = $this->getTicketsByMainTagAndByDigiriskElement($mainCategories);
+        $getTicketsByMainSubTagAndByDigiriskElement = $this->getTicketsByMainSubTagAndByDigiriskElement($mainCategories);
+
+        $getTicketsByYear = $this->getTicketsByYear();
+
+        $array['graphs'] = [$getTicketsByMonth, $getTicketsByMainTagAndByDigiriskElement, $getTicketsByMainSubTagAndByDigiriskElement];
         $array['lists']  = [$getTicketsByYear];
 
         return $array;
@@ -335,8 +323,12 @@ class TicketDigiriskStats extends DigiriskStats
         $array['picto'] = 'fontawesome_fa-ticket-alt_fas_#3bbfa8';
 
         // Graph parameters
+        $array['width']      = '100%';
+        $array['height']     = 300;
         $array['type']       = 'bar';
         $array['showlegend'] = 1;
+        $array['dataset']    = 2;
+        $array['moreCSS']    = 'grid-2';
 
         $date_start = dol_mktime(0, 0, 0, GETPOST('datestartmonth', 'int'), GETPOST('datestartday', 'int'), GETPOST('datestartyear', 'int'));
         $date_end   = dol_mktime(0, 0, 0, GETPOST('dateendmonth', 'int'), GETPOST('dateendday', 'int'), GETPOST('dateendyear', 'int'));
@@ -367,6 +359,104 @@ class TicketDigiriskStats extends DigiriskStats
     }
 
     /**
+     * Get tickets by main tag and digirisk element
+     *
+     * @param  array|int $mainCategories Int <0 if KO, array of main categories if OK
+     * @return array     Graph datas (label/color/type/title/data etc..)
+     * @throws Exception
+     */
+    public function getTicketsByMainTagAndByDigiriskElement($mainCategories): array
+    {
+        global $langs;
+
+        // Graph Title parameters
+        $array['title'] = $langs->transnoentities('NumberOfTicketsByMainTagAndByDigiriskElement');
+        $array['picto'] = 'fontawesome_fa-ticket-alt_fas_#3bbfa8';
+
+        // Graph parameters
+        $array['width']      = '100%';
+        $array['height']     = 400;
+        $array['type']       = 'bar';
+        $array['showlegend'] = 1;
+        $array['dataset']    = 2;
+        $array['moreCSS']    = 'grid-2';
+
+        $digiriskElement = new DigiriskElement($this->db);
+
+        if (is_array($mainCategories) && !empty($mainCategories)) {
+            foreach ($mainCategories as $mainCategory) {
+                $array['labels'][$mainCategory->id] = [
+                    'label' => $mainCategory->label,
+                    'color' => '#' . $mainCategory->color
+                ];
+                $moreParams['filter'] = ' AND t.element_type = "groupment"';
+                $digiriskElements     = $digiriskElement->getActiveDigiriskElements(0, $moreParams);
+                if (is_array($digiriskElements) && !empty($digiriskElements)) {
+                    foreach ($digiriskElements as $digiriskElement) {
+                        $tickets                                = saturne_fetch_all_object_type('Ticket', '', '', 0, 0, ['customsql' => 'cp.fk_categorie = ' . $mainCategory->id  . ' AND eft.digiriskdolibarr_ticket_service = ' . $digiriskElement->id], 'AND', true, true, true);
+                        $array['data'][$digiriskElement->id][0] = $digiriskElement->ref . ' - ' . $digiriskElement->label;
+                        $array['data'][$digiriskElement->id][]  = is_array($tickets) && !empty($tickets) ? count($tickets) : 0;
+                    }
+                }
+            }
+        }
+
+        return $array;
+    }
+
+    /**
+     * Get tickets by main sub tag and digirisk element
+     *
+     * @param  array|int $mainCategories Int <0 if KO, array of main categories if OK
+     * @return array                     Graph datas (label/color/type/title/data etc..)
+     * @throws Exception
+     */
+    public function getTicketsByMainSubTagAndByDigiriskElement($mainCategories): array
+    {
+        global $langs;
+
+        // Graph Title parameters
+        $array['title'] = $langs->transnoentities('NumberOfTicketsByMainSubTagAndByDigiriskElement');
+        $array['picto'] = 'fontawesome_fa-ticket-alt_fas_#3bbfa8';
+
+        // Graph parameters
+        $array['width']      = '100%';
+        $array['height']     = 400;
+        $array['type']       = 'bar';
+        $array['showlegend'] = 1;
+        $array['dataset']    = 2;
+        $array['moreCSS']    = 'grid-2';
+
+        $digiriskElement = new DigiriskElement($this->db);
+
+        if (is_array($mainCategories) && !empty($mainCategories)) {
+            foreach ($mainCategories as $mainCategory) {
+                $category->fetch($mainCategory->id);
+                $mainSubCategories = $category->get_filles();
+                if (is_array($mainSubCategories) && !empty($mainSubCategories)) {
+                    foreach ($mainSubCategories as $mainSubCategory) {
+                        $array['labels'][$mainSubCategory->id] = [
+                            'label' => $mainSubCategory->label,
+                            'color' => dol_strlen($mainSubCategory->color) > 0 ? '#' . $mainSubCategory->color : '',
+                        ];
+                        $moreParams['filter'] = ' AND t.element_type = "groupment"';
+                        $digiriskElements     = $digiriskElement->getActiveDigiriskElements(0, $moreParams);
+                        if (is_array($digiriskElements) && !empty($digiriskElements)) {
+                            foreach ($digiriskElements as $digiriskElement) {
+                                $tickets                                = saturne_fetch_all_object_type('Ticket', '', '', 0, 0, ['customsql' => 'cp.fk_categorie = ' . $mainSubCategory->id  . ' AND eft.digiriskdolibarr_ticket_service = ' . $digiriskElement->id], 'AND', true, true, true);
+                                $array['data'][$digiriskElement->id][0] = $digiriskElement->ref . ' - ' . $digiriskElement->label;
+                                $array['data'][$digiriskElement->id][]  = is_array($tickets) && !empty($tickets) ? count($tickets) : 0;
+                            }
+                        }
+                    }
+                }
+            }
+        }
+
+        return $array;
+    }
+
+    /**
      * Get tickets by year
      *
      * @return array Graph datas (label/color/type/title/data etc..)
@@ -387,110 +477,13 @@ class TicketDigiriskStats extends DigiriskStats
         $tickets           = $this->getAllByYear();
         if (is_array($tickets) && !empty($tickets)) {
             foreach ($tickets as $key => $ticket) {
-                $arrayTicketByYear[$key]['Year']['value']       = $ticket['year'];
+                $arrayTicketByYear[$key]['Ref']['value']        = $ticket['year'];
                 $arrayTicketByYear[$key]['Ticket']['value']     = $ticket['nb'];
-                $arrayTicketByYear[$key]['Percentage']['value'] = $ticket['average'] ?: 0 . ' %';
+                $arrayTicketByYear[$key]['Percentage']['value'] = ($ticket['avg'] ?: 0) . ' %';
             }
         }
 
         $array['data'] = $arrayTicketByYear;
-
-        return $array;
-    }
-
-    /**
-     * Get tickets by tag
-     *
-     * @return array     Graph datas (label/color/type/title/data etc..)
-     * @throws Exception
-     */
-    public function getTicketsByTagAndByDigiriskElement(): array
-    {
-        global $conf, $langs;
-
-        // Graph Title parameters
-        $array['title'] = $langs->transnoentities('NumberOfTicketsByTag');
-        $array['picto'] = 'fontawesome_fa-ticket-alt_fas_#3bbfa8';
-
-        // Graph parameters
-        $array['width']      = '100%';
-        $array['height']     = 400;
-        $array['type']       = 'bar';
-        $array['showlegend'] = 1;
-        $array['dataset']    = 2;
-        $array['moreCSS']    = 'grid-2';
-
-        $category = new Categorie($this->db);
-        $digiriskElement = new DigiriskElement($this->db);
-
-        $category->fetch($conf->global->DIGIRISKDOLIBARR_TICKET_MAIN_CATEGORY);
-        $mainCategories = $category->get_filles();
-        if (is_array($mainCategories) && !empty($mainCategories)) {
-            foreach ($mainCategories as $mainCategory) {
-                $array['labels'][$mainCategory->id] = [
-                    'label' => $mainCategory->label,
-                    'color' => '#' . $mainCategory->color
-                ];
-                $digiriskElements = $digiriskElement->fetchAll('', '', 0, 0, ['customsql' => 't.element_type = "groupment"']);
-                if (is_array($digiriskElements) && !empty($digiriskElements)) {
-                    foreach ($digiriskElements as $digiriskElement) {
-                        $tickets                                = saturne_fetch_all_object_type('Ticket', '', '', 0, 0, ['customsql' => 'cp.fk_categorie = ' . $mainCategory->id  . ' AND eft.digiriskdolibarr_ticket_service = ' . $digiriskElement->id], 'AND', true, true, true);
-                        $array['data'][$digiriskElement->id][0] = $digiriskElement->ref . ' - ' . $digiriskElement->label;
-                        $array['data'][$digiriskElement->id][]  = is_array($tickets) && !empty($tickets) ? count($tickets) : 0;
-                    }
-                }
-            }
-        }
-
-        return $array;
-    }
-
-    /**
-     * Get tickets by tag
-     *
-     * @return array     Graph datas (label/color/type/title/data etc..)
-     * @throws Exception
-     */
-    public function getTicketsByTag(): array
-    {
-        global $conf, $langs;
-
-        // Graph Title parameters
-        $array['title'] = $langs->transnoentities('NumberOfTicketsByTag');
-        $array['picto'] = 'fontawesome_fa-ticket-alt_fas_#3bbfa8';
-
-        // Graph parameters
-        $array['width']      = '100%';
-        $array['height']     = 400;
-        $array['type']       = 'bar';
-        $array['showlegend'] = 1;
-        $array['dataset']    = 2;
-        $array['moreCSS']    = 'grid-2';
-
-        $array['labels'] = [
-            0 => [
-                'label' => $langs->transnoentities('NumberOfTickets'),
-                'color' => '#A1467E'
-            ]
-        ];
-
-        $category = new Categorie($this->db);
-
-        $category->fetch($conf->global->DIGIRISKDOLIBARR_TICKET_MAIN_CATEGORY);
-        $mainCategories = $category->get_filles();
-        if (is_array($mainCategories) && !empty($mainCategories)) {
-            foreach ($mainCategories as $mainCategory) {
-                $category->fetch($mainCategory->id);
-                $mainSubCategories = $category->get_filles();
-                if (is_array($mainSubCategories) && !empty($mainSubCategories)) {
-                    foreach ($mainSubCategories as $mainSubCategory) {
-                        $tickets                                = saturne_fetch_all_object_type('Ticket', '', '', 0, 0, ['customsql' => 'cp.fk_categorie = ' . $mainSubCategory->id], 'AND', false, true, true);
-                        $array['data'][$mainSubCategory->id][0] = $mainSubCategory->label;
-                        $array['data'][$mainSubCategory->id][1] = is_array($tickets) && !empty($tickets) ? count($tickets) : 0;
-                    }
-                }
-            }
-        }
 
         return $array;
     }
