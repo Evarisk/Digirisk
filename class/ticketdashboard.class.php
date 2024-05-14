@@ -127,44 +127,42 @@ class TicketDashboard extends DigiriskDolibarrDashboard
     {
         global $conf, $langs;
 
-        $digiriskelement  = new DigiriskElement($this->db);
+        $digiriskElement  = new DigiriskElement($this->db);
         $categorie        = new Categorie($this->db);
         $accident         = new Accident($this->db);
         $accidentWorkStop = new AccidentWorkStop($this->db);
         $ticket           = new Ticket($this->db);
 
-        $filter                   = " AND o.datec BETWEEN '" . $this->db->idate($dateStart) . "' AND '" . $this->db->idate($dateEnd) . "'";
-        $digiriskelement_flatlist = $digiriskelement->fetchDigiriskElementFlat(0);
-        if (is_array($digiriskelement_flatlist) && !empty($digiriskelement_flatlist)) {
-            foreach ($digiriskelement_flatlist as $digiriskelementobject) {
-                $digiriskelementlist[$digiriskelementobject['object']->id] = $digiriskelementobject['object'];
+        $filter               = " AND o.datec BETWEEN '" . $this->db->idate($dateStart) . "' AND '" . $this->db->idate($dateEnd) . "'";
+        $digiriskElementFlats = $digiriskElement->fetchDigiriskElementFlat(0);
+        if (is_array($digiriskElementFlats) && !empty($digiriskElementFlats)) {
+            foreach ($digiriskElementFlats as $digiriskElement) {
+                $digiriskElements[$digiriskElement['object']->id] = $digiriskElement['object'];
             }
         }
 
-        $digiriskelementlist = dol_sort_array($digiriskelementlist, 'ranks');
-        $mainCategoryObject = $categorie->rechercher($conf->global->DIGIRISKDOLIBARR_TICKET_MAIN_CATEGORY, '', 'ticket', true);
-        $allCategories = $mainCategoryObject[0]->get_filles();
+        $digiriskElements   = dol_sort_array($digiriskElements, 'ranks');
+        $mainCategoryObject = $categorie->rechercher(getDolGlobalInt('DIGIRISKDOLIBARR_TICKET_MAIN_CATEGORY'), '', 'ticket', true);
+        $categories         = $mainCategoryObject[0]->get_filles();
 
-        $arrayReturn = [];
+        $arrayReturn             = [];
         $ticketCategoriesCounter = [];
 
         //Creating columns labels
-        if (is_array($allCategories) && !empty($allCategories)) {
+        if (is_array($categories) && !empty($categories)) {
             // Main categories
-            foreach($allCategories as $category) {
+            foreach($categories as $category) {
                 $labelsArray['labels'][$category->id] = $category->label;
 
                 $categorie->fetch($category->id);
-                $alltickets[$category->id] = getObjectsInCategDigirisk($categorie, 'ticket', 0, 0, 0, '', 'ASC', $filter);
+                $tickets[$category->id] = getObjectsInCategDigirisk($categorie, 'ticket', 0, 0, 0, '', 'ASC', $filter);
 
-                if (is_array($alltickets[$category->id]) && !empty($alltickets[$category->id])) {
-                    $ticketCategoriesCounter[$langs->trans('Register') . ' ' . $category->label] = count($alltickets[$category->id]);
+                if (is_array($tickets[$category->id]) && !empty($tickets[$category->id])) {
+                    $ticketCategoriesCounter[$langs->trans('Register') . ' ' . $category->label] = count($tickets[$category->id]);
                 }
-
 
                 $mainCategoriesIds[$category->id] = $category->id;
                 $childrenCategories = $category->get_filles();
-
 
                 // Children categories
                 if (is_array($childrenCategories) && !empty($childrenCategories)) {
@@ -172,7 +170,7 @@ class TicketDashboard extends DigiriskDolibarrDashboard
                         $labelsArray['labels'][$childCategory->id] = $childCategory->label;
 
                         $categorie->fetch($childCategory->id);
-                        $alltickets[$childCategory->id] = getObjectsInCategDigirisk($categorie, 'ticket', 0, 0, 0, '', 'ASC', $filter);
+                        $tickets[$childCategory->id] = getObjectsInCategDigirisk($categorie, 'ticket', 0, 0, 0, '', 'ASC', $filter);
 
                         // Categories sub ranges
                         if ($childCategory->label == $langs->trans('AccidentWithDIAT')) {
@@ -192,17 +190,17 @@ class TicketDashboard extends DigiriskDolibarrDashboard
 
         $allAccidentsWithFkTicket = $accident->fetchAll('', '', 0, 0, ['customsql' => 'fk_ticket > 0']);
 
-        if (is_array($digiriskelementlist) && !empty($digiriskelementlist)) {
-            foreach($digiriskelementlist as $digiriskelement) {
-                $arrayKey = $digiriskelement->ref . ' - ' . $digiriskelement->label;
+        if (is_array($digiriskElements) && !empty($digiriskElements)) {
+            foreach($digiriskElements as $digiriskElement) {
+                $arrayKey = $digiriskElement->ref . ' - ' . $digiriskElement->label;
                 if (is_array($labelsArray['labels']) && !empty($labelsArray['labels'])) {
                     foreach($labelsArray['labels'] as $categoryId => $categoryLabel) {
                         $arrayReturn[$arrayKey][$categoryId] = 0;
 
                         if (is_int($categoryId)) {
-                            if (is_array($alltickets[$categoryId]) && !empty($alltickets[$categoryId])) {
-                                foreach($alltickets[$categoryId] as $ticketsWithThisCategory) {
-                                    if ($ticketsWithThisCategory->array_options['options_digiriskdolibarr_ticket_service'] == $digiriskelement->id) {
+                            if (is_array($tickets[$categoryId]) && !empty($tickets[$categoryId])) {
+                                foreach($tickets[$categoryId] as $ticketsWithThisCategory) {
+                                    if ($ticketsWithThisCategory->array_options['options_digiriskdolibarr_ticket_service'] == $digiriskElement->id) {
                                         $arrayReturn[$arrayKey][$categoryId] += 1;
                                     }
                                 }
@@ -217,7 +215,7 @@ class TicketDashboard extends DigiriskDolibarrDashboard
                             if (is_array($allAccidentsWithFkTicket) && !empty($allAccidentsWithFkTicket)) {
                                 foreach($allAccidentsWithFkTicket as $accidentWithFkTicket) {
                                     $ticket->fetch($accidentWithFkTicket->fk_ticket);
-                                    if ($ticket->array_options['options_digiriskdolibarr_ticket_service'] == $digiriskelement->id) {
+                                    if ($ticket->array_options['options_digiriskdolibarr_ticket_service'] == $digiriskElement->id) {
                                         $accidentWorkStopList = $accidentWorkStop->fetchFromParent($accidentWithFkTicket->id);
                                         $accidentWorkStopDaysCounter = 0;
                                         if (is_array($accidentWorkStopList) && !empty($accidentWorkStopList)) {
@@ -454,15 +452,15 @@ class TicketDashboard extends DigiriskDolibarrDashboard
 
         // Graph parameters
         $array['type']   = 'list';
-        $array['labels'] = ['Year', 'Ticket', 'Percentage'];
+        $array['labels'] = ['Year', 'Tickets', 'Percentage'];
 
         $arrayTicketByYear = [];
         $tickets           = $this->getAllByYear();
         if (is_array($tickets) && !empty($tickets)) {
             foreach ($tickets as $key => $ticket) {
                 $arrayTicketByYear[$key]['Ref']['value']        = $ticket['year'];
-                $arrayTicketByYear[$key]['Ticket']['value']     = $ticket['nb'];
-                $arrayTicketByYear[$key]['Percentage']['value'] = ($ticket['avg'] ?: 0) . ' %';
+                $arrayTicketByYear[$key]['Tickets']['value']    = $ticket['nb'];
+                $arrayTicketByYear[$key]['Percentage']['value'] = price2num($ticket['avg'] ?: 0, 2) . ' %';
             }
         }
 

@@ -110,11 +110,9 @@ if (empty($resHook)) {
 
             array_unshift($arrayCatWithLabels, $langs->trans('GP/UT'));
             fputcsv($fp, $arrayCatWithLabels);
-            $i = 0;
-            foreach ($data as $row) {
-                array_unshift($row, array_keys($data)[$i]);
+            foreach ($data as $key => $row) {
+                array_unshift($row, $key);
                 fputcsv($fp, $row);
-                $i++;
             }
 
             fclose($fp);
