@@ -44,7 +44,7 @@ require_once __DIR__ . '/../../lib/digiriskdolibarr_ticket.lib.php';
 require_once __DIR__ . '/../../class/digiriskelement.class.php';
 
 // Global variables definitions
-global $conf, $db, $hookmanager, $langs, $user;
+global $conf, $db, $hookmanager, $langs, $moduleName, $moduleNameLowerCase, $user;
 
 // Load translation files required by the page
 saturne_load_langs();
@@ -69,9 +69,28 @@ $form = new Form($db);
 $dateStart = dol_mktime(0, 0, 0, GETPOST('dateStartmonth', 'int'), GETPOST('dateStartday', 'int'), GETPOST('dateStartyear', 'int'));
 $dateEnd   = dol_mktime(23, 59, 59, GETPOST('dateEndmonth', 'int'), GETPOST('dateEndday', 'int'), GETPOST('dateEndyear', 'int'));
 
+$upload_dir = $conf->digiriskdolibarr->multidir_output[$conf->entity ?? 1];
+
+$hookmanager->initHooks(['ticketstats', 'globalcard']); // Note that conf->hooks_modules contains array
+
 // Security check
 $permissionToRead = $user->rights->ticket->read;
 saturne_check_access($permissionToRead);
+
+/*
+ * Actions
+ */
+
+$parameters = [];
+$resHook    = $hookmanager->executeHooks('doActions', $parameters, $object, $action); // Note that $action and $object may have been modified by some hooks
+if ($resHook < 0) {
+    setEventMessages($hookmanager->error, $hookmanager->errors, 'errors');
+}
+
+if (empty($resHook)) {
+    // Actions adddashboardinfo, closedashboardinfo, generate_csv
+    require_once __DIR__ . '/../../../saturne/core/tpl/actions/dashboard_actions.tpl.php';
+}
 
 /*
  * View
