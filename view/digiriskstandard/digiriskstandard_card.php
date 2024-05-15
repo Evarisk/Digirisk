@@ -59,6 +59,8 @@ $dashboard = new SaturneDashboard($db, $moduleNameLowerCase);
 
 $object->fetch($conf->global->DIGIRISKDOLIBARR_ACTIVE_STANDARD);
 
+$upload_dir = $conf->digiriskdolibarr->multidir_output[$conf->entity ?? 1];
+
 $hookmanager->initHooks(array('digiriskelementcard', 'digiriskstandardview', 'globalcard')); // Note that conf->hooks_modules contains array
 
 // Security check - Protection if external user
@@ -69,22 +71,15 @@ saturne_check_access($permissiontoread);
  *  Actions
 */
 
-if ($action == 'adddashboardinfo' || $action == 'closedashboardinfo') {
-    $data                = json_decode(file_get_contents('php://input'), true);
-    $dashboardWidgetName = $data['dashboardWidgetName'];
-    $confName            = $moduleNameUpperCase . '_DISABLED_DASHBOARD_INFO';
-    $visible             = json_decode($user->conf->$confName);
+$parameters = [];
+$reshook    = $hookmanager->executeHooks('doActions', $parameters, $object, $action); // Note that $action and $object may have been modified by some hooks.
+if ($reshook < 0) {
+    setEventMessages($hookmanager->error, $hookmanager->errors, 'errors');
+}
 
-    if ($action == 'adddashboardinfo') {
-        unset($visible->$dashboardWidgetName);
-    } else {
-        $visible->$dashboardWidgetName = 0;
-    }
-
-    $tabParam[$confName] = json_encode($visible);
-
-    dol_set_user_param($db, $conf, $user, $tabParam);
-    $action = '';
+if (empty($reshook)) {
+    // Actions closenotice, adddashboardinfo, closedashboardinfo, generate_csv
+    require_once __DIR__ . '/../../../saturne/core/tpl/actions/dashboard_actions.tpl.php';
 }
 
 /*
