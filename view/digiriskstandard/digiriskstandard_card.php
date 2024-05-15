@@ -78,7 +78,7 @@ if ($reshook < 0) {
 }
 
 if (empty($reshook)) {
-    // Actions closenotice, adddashboardinfo, closedashboardinfo, generate_csv
+    // Actions adddashboardinfo, closedashboardinfo, generate_csv
     require_once __DIR__ . '/../../../saturne/core/tpl/actions/dashboard_actions.tpl.php';
 }
 
