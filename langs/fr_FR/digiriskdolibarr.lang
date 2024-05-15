@@ -1160,6 +1160,7 @@ TaskNotDeleted                           = Erreur lors de la suppression de la t
 TasksManagement                          = Gestion des tâches
 SelectProject                            = Choix du projet
 DUProject                                = Projet lié aux tâches des risques
+EnvironmentProject                       = Projet lié aux tâches des risques environnementaux
 NoTaskLinked                             = Pas de tâche en cours
 TaskList                                 = Liste des tâches du risque
 TaskCreate                               = Ajout de la tâche

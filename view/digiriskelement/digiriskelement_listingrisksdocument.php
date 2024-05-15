@@ -103,7 +103,7 @@ if (empty($resHook)) {
  * View
  */
 
-$title   = $langs->trans('ListingRisksDocuments');
+$title   = $langs->trans('ListingRisksDocument');
 $helpUrl = 'FR:Module_Digirisk#Impression_des_listings_de_risques';
 
 digirisk_header($title, $helpUrl);
