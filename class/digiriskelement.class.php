@@ -28,6 +28,7 @@ require_once DOL_DOCUMENT_ROOT . '/core/lib/files.lib.php';
 require_once __DIR__ . '/../../saturne/class/saturneobject.class.php';
 
 require_once __DIR__ . '/../lib/digiriskdolibarr_function.lib.php';
+require_once __DIR__ . '/riskanalysis/risk.class.php';
 
 /**
  * Class for DigiriskElement.

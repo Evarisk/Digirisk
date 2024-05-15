@@ -38,7 +38,7 @@ require_once __DIR__ . '/../../class/digiriskelement.class.php';
 require_once __DIR__ . '/../../lib/digiriskdolibarr_digiriskelement.lib.php';
 
 // Global variables definitions
-global $conf, $db, $hookmanager, $langs, $moduleNameLowerCase, $moduleNameUpperCase, $user;
+global $conf, $db, $hookmanager, $moduleNameLowerCase, $moduleNameUpperCase, $langs, $user;
 
 // Load translation files required by the page
 saturne_load_langs();
@@ -97,9 +97,10 @@ saturne_banner_tab($object,'ref','none', 0, 'ref', 'ref', $morehtmlref, true, $m
 
 print '<div class="fichecenter"><br>';
 
-$moreParams = ['loadAccident' => 0, 'loadRiskAssessmentDocument' => 0, 'loadEvaluator' => 1, 'loadDigiriskResources' => 0, 'loadRisk' => 1, 'loadTask' => 0];
-
+$moreParams = ['LoadDigiriskElement' => 1];
 $dashboard->show_dashboard($moreParams);
+
+print '</div>';
 
 print dol_get_fiche_end();
 

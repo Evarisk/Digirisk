@@ -1,5 +1,5 @@
 <?php
-/* Copyright (C) 2021-2023 EVARISK <technique@evarisk.com>
+/* Copyright (C) 2021-2024 EVARISK <technique@evarisk.com>
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -16,29 +16,29 @@
  */
 
 /**
- *   	\file       view/digiriskstandard/digiriskstandard_card.php
- *		\ingroup    digiriskdolibarr
- *		\brief      Page to create/edit/view digiriskstandard
+ * \file    view/digiriskstandard/digiriskstandard_card.php
+ * \ingroup digiriskdolibarr
+ * \brief   Page to digiriskstandard informations and dashboard
  */
 
 // Load DigiriskDolibarr environment
 if (file_exists('../digiriskdolibarr.main.inc.php')) {
-	require_once __DIR__ . '/../digiriskdolibarr.main.inc.php';
+    require_once __DIR__ . '/../digiriskdolibarr.main.inc.php';
 } elseif (file_exists('../../digiriskdolibarr.main.inc.php')) {
-	require_once __DIR__ . '/../../digiriskdolibarr.main.inc.php';
+    require_once __DIR__ . '/../../digiriskdolibarr.main.inc.php';
 } else {
-	die('Include of digiriskdolibarr main fails');
+    die('Include of digiriskdolibarr main fails');
 }
 
-require_once DOL_DOCUMENT_ROOT . '/core/lib/images.lib.php';
+// Load Dolibarr libraries
 require_once DOL_DOCUMENT_ROOT . '/core/lib/functions2.lib.php';
 require_once DOL_DOCUMENT_ROOT . '/projet/class/project.class.php';
 
 // Load Saturne libraries
 require_once __DIR__ . '/../../../saturne/class/saturnedashboard.class.php';
 
+// Load Digirisk libraries
 require_once __DIR__ . '/../../class/digiriskstandard.class.php';
-require_once __DIR__ . '/../../class/digiriskdolibarrdashboard.class.php';
 require_once __DIR__ . '/../../lib/digiriskdolibarr_digiriskstandard.lib.php';
 require_once __DIR__ . '/../../lib/digiriskdolibarr_function.lib.php';
 
@@ -57,27 +57,28 @@ $object    = new DigiriskStandard($db);
 $project   = new Project($db);
 $dashboard = new SaturneDashboard($db, $moduleNameLowerCase);
 
-$object->fetch($conf->global->DIGIRISKDOLIBARR_ACTIVE_STANDARD);
-
 $upload_dir = $conf->digiriskdolibarr->multidir_output[$conf->entity ?? 1];
 
-$hookmanager->initHooks(array('digiriskelementcard', 'digiriskstandardview', 'globalcard')); // Note that conf->hooks_modules contains array
+$hookmanager->initHooks(['digiriskstandardcard', 'digiriskstandardview', 'globalcard']); // Note that conf->hooks_modules contains array
 
-// Security check - Protection if external user
-$permissiontoread = $user->rights->digiriskdolibarr->digiriskstandard->read && $user->rights->digiriskdolibarr->riskassessmentdocument->read;
+// Load object
+$object->fetch(getDolGlobalInt('DIGIRISKDOLIBARR_ACTIVE_STANDARD'));
+
+// Security check
+$permissiontoread = $user->rights->digiriskdolibarr->digiriskstandard->read;
 saturne_check_access($permissiontoread);
 
 /*
- *  Actions
-*/
+ * Actions
+ */
 
 $parameters = [];
-$reshook    = $hookmanager->executeHooks('doActions', $parameters, $object, $action); // Note that $action and $object may have been modified by some hooks.
-if ($reshook < 0) {
+$resHook    = $hookmanager->executeHooks('doActions', $parameters, $object, $action); // Note that $action and $object may have been modified by some hooks
+if ($resHook < 0) {
     setEventMessages($hookmanager->error, $hookmanager->errors, 'errors');
 }
 
-if (empty($reshook)) {
+if (empty($resHook)) {
     // Actions adddashboardinfo, closedashboardinfo, generate_csv
     require_once __DIR__ . '/../../../saturne/core/tpl/actions/dashboard_actions.tpl.php';
 }
@@ -86,44 +87,33 @@ if (empty($reshook)) {
  * View
  */
 
-$emptyobject = new stdClass();
+$title   = $langs->trans('Informations');
+$helpUrl = 'FR:Module_Digirisk';
 
-$title    = $langs->trans("DigiriskStandardInformation");
-$helpUrl  = 'FR:Module_Digirisk#DigiRisk_-_Document_Unique';
+digirisk_header($title, $helpUrl);
 
-digirisk_header($title, $helpUrl); ?>
+// Part to show record
+saturne_get_fiche_head($object, 'standardCard', $title);
 
-<div id="cardContent" value="">
+// Object card
+// Project
+$moreHtmlRef = '<div class="refidno">';
+$project->fetch(getDolGlobalInt('DIGIRISKDOLIBARR_DU_PROJECT'));
+$moreHtmlRef .= $langs->trans('Project') . ' : ' . getNomUrlProject($project, 1, 'blank', 1);
+$moreHtmlRef .= '</div>';
 
-<?php // Part to show record
-if ((empty($action) || ($action != 'edit' && $action != 'create'))) {
-	saturne_get_fiche_head($object, 'standardCard', $title);
+$moduleNameLowerCase = 'mycompany';
+saturne_banner_tab($object,'ref','none', 0, 'ref', 'ref', $moreHtmlRef, true);
+$moduleNameLowerCase = 'digiriskdolibarr';
 
-	// Object card
-	// Project
-	$morehtmlref = '<div class="refidno">';
-	$project->fetch($conf->global->DIGIRISKDOLIBARR_DU_PROJECT);
-	$morehtmlref .= $langs->trans('Project') . ' : ' . getNomUrlProject($project, 1, 'blank', 1);
-	$morehtmlref .= '</div>';
+print '<div class="fichecenter"><br>';
 
-	$moduleNameLowerCase = 'mycompany';
-	saturne_banner_tab($object,'ref','none', 0, 'ref', 'ref', $morehtmlref, true);
-	$moduleNameLowerCase = 'digiriskdolibarr';
+$moreParams = ['LoadRiskAssessmentDocument' => 1];
+$dashboard->show_dashboard($moreParams);
 
-	print '<div class="fichecenter">';
-	print '<br>';
+print '</div>';
 
-	$moreParams = [
-		'loadAccident' => 0
-	];
-
-	$dashboard->show_dashboard($moreParams);
-
-	print '<div class="fichecenter">';
-
-	print dol_get_fiche_end();
-}
-
+print dol_get_fiche_end();
 
 // End of page
 llxFooter();
