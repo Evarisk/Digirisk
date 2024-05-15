@@ -378,6 +378,8 @@ ErrorContactHasAtLeastOneChildOfTypeFirePermit    = Le contact est lié à au mo
 ConfirmDeleteFirePermit                           = Êtes-vous sûr de vouloir supprimer ce permis de feu ?
 FirePermitRole                                    = Les rôles du permis de feu
 FirepermitSchedules                               = Horaires du permis de feu
+LinkDigiriskdolibarr_firepermit                   = Activer le lien avec les permis de feu
+LinkDigiriskdolibarr_firepermitDescription        = Permet la liaison entre les permis de feu et les modèles
 
 # Email - Mail
 FirePermitLabel   = Récapitulatif du permis de feu
