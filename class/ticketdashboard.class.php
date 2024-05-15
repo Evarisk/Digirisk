@@ -261,10 +261,11 @@ class TicketDashboard extends DigiriskDolibarrDashboard
     /**
      * Load dashboard info ticket
      *
+     * @param  array     $moreParams Parameters for load dashboard info
      * @return array
      * @throws Exception
      */
-    public function load_dashboard(): array
+    public function load_dashboard(array $moreParams = []): array
     {
         $getTicketsByMonth = $this->getTicketsByMonth();
 
