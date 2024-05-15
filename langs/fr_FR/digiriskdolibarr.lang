@@ -1374,6 +1374,10 @@ Superior            = Supérieur à
 TimeRangeAdded      = Contrainte ajoutée
 TimeRangeDeleted    = Contrainte supprimée
 
+NumberOfTicketsByMainTagAndByDigiriskElement    = Nombre de registres par catégorie et par GP
+NumberOfTicketsByMainSubTagAndByDigiriskElement = Nombre de registres par sous-catégorie et par GP
+NumberOfTicketsByYear                           = Nombre de tickets par année
+
 
 # Email - Email
 The                            = Le

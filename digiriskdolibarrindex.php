@@ -34,4 +34,15 @@ require_once __DIR__ . '/core/tpl/digiriskdolibarr_projectcreation_action.tpl.ph
 
 $moreParams['specialModuleNameLowerCase'] = 'digirisk';
 
+$moreParams = [
+    'LoadRiskAssessmentDocument' => 1,
+    'LoadAccident'               => 1,
+    'LoadEvaluator'              => 1,
+    'LoadDigiriskResources'      => 1,
+    'LoadDigiriskElement'        => 1,
+    'LoadSaturneTask'            => 1,
+    'LoadRisk'                   => 1,
+    'LoadTicketDashboard'        => 1
+];
+
 require_once __DIR__ . '/../saturne/core/tpl/index/index_view.tpl.php';
