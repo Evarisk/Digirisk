@@ -38,7 +38,7 @@ require_once __DIR__ . '/../../class/digiriskelement.class.php';
 require_once __DIR__ . '/../../lib/digiriskdolibarr_digiriskelement.lib.php';
 
 // Global variables definitions
-global $conf, $db, $hookmanager, $moduleNameLowerCase, $moduleNameUpperCase, $langs, $user;
+global $conf, $db, $hookmanager, $langs, $moduleName, $moduleNameLowerCase, $moduleNameUpperCase, $user;
 
 // Load translation files required by the page
 saturne_load_langs();
@@ -50,6 +50,8 @@ $action = GETPOST('action', 'aZ09');
 // Initialize technical objects
 $object    = new DigiriskElement($db);
 $dashboard = new SaturneDashboard($db, $moduleNameLowerCase);
+
+$upload_dir = $conf->digiriskdolibarr->multidir_output[$conf->entity ?? 1];
 
 $hookmanager->initHooks(['digiriskelementinformations', 'digiriskelementview', 'globalcard']); // Note that conf->hooks_modules contains array
 
@@ -71,23 +73,8 @@ if ($resHook < 0) {
 }
 
 if (empty($resHook)) {
-    if ($action == 'adddashboardinfo' || $action == 'closedashboardinfo') {
-        $data                = json_decode(file_get_contents('php://input'), true);
-        $dashboardWidgetName = $data['dashboardWidgetName'];
-        $confName            = $moduleNameUpperCase . '_DISABLED_DASHBOARD_INFO';
-        $visible             = json_decode($user->conf->$confName);
-
-        if ($action == 'adddashboardinfo') {
-            unset($visible->$dashboardWidgetName);
-        } else {
-            $visible->$dashboardWidgetName = 0;
-        }
-
-        $tabParam[$confName] = json_encode($visible);
-
-        dol_set_user_param($db, $conf, $user, $tabParam);
-        $action = '';
-    }
+    // Actions adddashboardinfo, closedashboardinfo, generate_csv
+    require_once __DIR__ . '/../../../saturne/core/tpl/actions/dashboard_actions.tpl.php';
 }
 
 /*
