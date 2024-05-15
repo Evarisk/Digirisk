@@ -38,7 +38,7 @@ require_once __DIR__ . '/../../class/digiriskelement.class.php';
 require_once __DIR__ . '/../../lib/digiriskdolibarr_digiriskelement.lib.php';
 
 // Global variables definitions
-global $conf, $db, $hookmanager, $moduleNameLowerCase, $moduleNameUpperCase, $langs, $user;
+global $conf, $db, $hookmanager, $langs, $moduleName, $moduleNameLowerCase, $moduleNameUpperCase, $user;
 
 // Load translation files required by the page
 saturne_load_langs();
