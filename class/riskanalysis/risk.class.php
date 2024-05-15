@@ -28,7 +28,7 @@ require_once __DIR__ . '/../digiriskelement.class.php';
 require_once __DIR__ . '/../../../saturne/class/task/saturnetask.class.php';
 require_once __DIR__ . '/riskassessment.class.php';
 
-// Load Saturne libraries.
+// Load Saturne libraries
 require_once __DIR__ . '/../../../saturne/class/saturneobject.class.php';
 
 /**
@@ -37,28 +37,28 @@ require_once __DIR__ . '/../../../saturne/class/saturneobject.class.php';
 class Risk extends SaturneObject
 {
 	/**
-	 * @var string Module name.
+	 * @var string Module name
 	 */
 	public $module = 'digiriskdolibarr';
 
 	/**
-	 * @var string Element type of object.
+	 * @var string Element type of object
 	 */
 	public $element = 'risk';
 
 	/**
-	 * @var string Name of table without prefix where object is stored. This is also the key used for extrafields management.
+	 * @var string Name of table without prefix where object is stored. This is also the key used for extrafields management
 	 */
 	public $table_element = 'digiriskdolibarr_risk';
 
 	/**
 	 * @var int Does this object support multicompany module ?
-	 * 0 = No test on entity, 1 = Test with field entity, 'field@table' = Test with link by field@table.
+	 * 0 = No test on entity, 1 = Test with field entity, 'field@table' = Test with link by field@table
 	 */
 	public $ismultientitymanaged = 1;
 
 	/**
-	 * @var int Does object support extrafields ? 0 = No, 1 = Yes.
+	 * @var int Does object support extrafields ? 0 = No, 1 = Yes
 	 */
 	public int $isextrafieldmanaged = 1;
 
@@ -74,25 +74,25 @@ class Risk extends SaturneObject
 	public $picto = 'fontawesome_fa-exclamation-triangle_fas_#d35968';
 
 	/**
-	 * @var array  Array with all fields and their property. Do not use it as a static var. It may be modified by constructor.
+	 * @var array  Array with all fields and their property. Do not use it as a static var. It may be modified by constructor
 	 */
-	public $fields = array(
-		'rowid' => array('type' => 'integer', 'label' => 'TechnicalID', 'enabled' => '1', 'position' => 10, 'notnull' => 1, 'visible' => 0, 'noteditable' => '1', 'index' => 1, 'comment' => "Id"),
-		'fk_element' => array('type' => 'integer', 'label' => 'ParentElement', 'enabled' => '1', 'position' => 9, 'notnull' => 1, 'visible' => 1, 'csslist' => 'minwidth200 maxwidth300 widthcentpercentminusxx'),
-		'ref' => array('type' => 'varchar(128)', 'label' => 'Ref', 'enabled' => '1', 'position' => 20, 'notnull' => 1, 'visible' => 4, 'noteditable' => '1', 'index' => 1, 'searchall' => 1, 'showoncombobox' => '1', 'comment' => "Reference of object"),
-		'ref_ext' => array('type' => 'varchar(128)', 'label' => 'RefExt', 'enabled' => '1', 'position' => 30, 'notnull' => 0, 'visible' => 0,),
-		'entity' => array('type' => 'integer', 'label' => 'Entity', 'enabled' => '1', 'position' => 8, 'notnull' => 1, 'visible' => 0,),
-		'date_creation' => array('type' => 'datetime', 'label' => 'DateCreation', 'enabled' => '1', 'position' => 50, 'notnull' => 1, 'visible' => 0,),
-		'tms' => array('type' => 'timestamp', 'label' => 'DateModification', 'enabled' => '1', 'position' => 60, 'notnull' => 0, 'visible' => 0,),
-		'import_key' => array('type' => 'varchar(14)', 'label' => 'ImportId', 'enabled' => '1', 'position' => 70, 'notnull' => -1, 'visible' => 0,),
-		'status' => array('type' => 'smallint', 'label' => 'Status', 'enabled' => '1', 'position' => 80, 'notnull' => 0, 'visible' => 0,),
-		'category' => array('type' => 'varchar(255)', 'label' => 'RiskCategory', 'enabled' => '1', 'position' => 21, 'notnull' => 0, 'visible' => 1,),
-		'description' => array('type' => 'text', 'label' => 'Description', 'enabled' => '1', 'position' => 23, 'notnull' => 0, 'visible' => -1,),
-		'type' => array('type' => 'varchar(255)', 'label' => 'Type', 'enabled' => '1', 'position' => 24, 'notnull' => 1, 'visible' => 0, 'default' => '(PROV)'),
-		'fk_user_creat' => array('type' => 'integer:User:user/class/user.class.php', 'label' => 'UserAuthor', 'enabled' => '1', 'position' => 110, 'notnull' => 1, 'visible' => 0, 'foreignkey' => 'user.rowid',),
-		'fk_user_modif' => array('type' => 'integer:User:user/class/user.class.php', 'label' => 'UserModif', 'enabled' => '1', 'position' => 120, 'notnull' => -1, 'visible' => 0,),
-		'fk_projet' => array('type' => 'integer:Project:projet/class/project.class.php', 'label' => 'Projet', 'enabled' => '1', 'position' => 140, 'notnull' => 1, 'visible' => 0,),
-	);
+	public $fields = [
+		'rowid'         => ['type' => 'integer', 'label' => 'TechnicalID', 'enabled' => '1', 'position' => 10, 'notnull' => 1, 'visible' => 0, 'noteditable' => '1', 'index' => 1, 'comment' => "Id"],
+		'fk_element'    => ['type' => 'integer', 'label' => 'ParentElement', 'enabled' => '1', 'position' => 9, 'notnull' => 1, 'visible' => 1, 'csslist' => 'minwidth200 maxwidth300 widthcentpercentminusxx'],
+		'ref'           => ['type' => 'varchar(128)', 'label' => 'Ref', 'enabled' => '1', 'position' => 20, 'notnull' => 1, 'visible' => 4, 'noteditable' => '1', 'index' => 1, 'searchall' => 1, 'showoncombobox' => '1', 'comment' => "Reference of object"],
+		'ref_ext'       => ['type' => 'varchar(128)', 'label' => 'RefExt', 'enabled' => '1', 'position' => 30, 'notnull' => 0, 'visible' => 0],
+		'entity'        => ['type' => 'integer', 'label' => 'Entity', 'enabled' => '1', 'position' => 8, 'notnull' => 1, 'visible' => 0],
+		'date_creation' => ['type' => 'datetime', 'label' => 'DateCreation', 'enabled' => '1', 'position' => 50, 'notnull' => 1, 'visible' => 0],
+		'tms'           => ['type' => 'timestamp', 'label' => 'DateModification', 'enabled' => '1', 'position' => 60, 'notnull' => 0, 'visible' => 0],
+		'import_key'    => ['type' => 'varchar(14)', 'label' => 'ImportId', 'enabled' => '1', 'position' => 70, 'notnull' => -1, 'visible' => 0],
+		'status'        => ['type' => 'smallint', 'label' => 'Status', 'enabled' => '1', 'position' => 80, 'notnull' => 0, 'visible' => 0],
+		'category'      => ['type' => 'varchar(255)', 'label' => 'RiskCategory', 'enabled' => '1', 'position' => 21, 'notnull' => 0, 'visible' => 1],
+		'description'   => ['type' => 'text', 'label' => 'Description', 'enabled' => '1', 'position' => 23, 'notnull' => 0, 'visible' => -1],
+		'type'          => ['type' => 'varchar(255)', 'label' => 'Type', 'enabled' => '1', 'position' => 24, 'notnull' => 1, 'visible' => 0, 'default' => '(PROV)'],
+		'fk_user_creat' => ['type' => 'integer:User:user/class/user.class.php', 'label' => 'UserAuthor', 'enabled' => '1', 'position' => 110, 'notnull' => 1, 'visible' => 0, 'foreignkey' => 'user.rowid'],
+		'fk_user_modif' => ['type' => 'integer:User:user/class/user.class.php', 'label' => 'UserModif', 'enabled' => '1', 'position' => 120, 'notnull' => -1, 'visible' => 0],
+		'fk_projet'     => ['type' => 'integer:Project:projet/class/project.class.php', 'label' => 'Projet', 'enabled' => '1', 'position' => 140, 'notnull' => 1, 'visible' => 0]
+	];
 
 	public $rowid;
 	public $ref;
@@ -115,9 +115,9 @@ class Risk extends SaturneObject
     private $cotations = [];
 
 	/**
-	 * Constructor.
+	 * Constructor
 	 *
-	 * @param DoliDb $db Database handler.
+	 * @param DoliDb $db Database handler
 	 */
 	public function __construct(DoliDB $db)
 	{
@@ -185,14 +185,18 @@ class Risk extends SaturneObject
 	 */
 	public function fetchRisksOrderedByCotation($parent_id, $get_children_data = false, $get_parents_data = false, $get_shared_data = false, $moreParams = [])
 	{
-		$object  = new DigiriskElement($this->db);
+		$object         = new DigiriskElement($this->db);
+		$risk           = new Risk($this->db);
+        $riskAssessment = new RiskAssessment($this->db);
+
 		$objects = $object->getActiveDigiriskElements();
 
-		$risk     = new Risk($this->db);
-		$riskList = $risk->fetchAll('', '', 0, 0, ['customsql' => 'status = ' . self::STATUS_VALIDATED . $moreParams['filterRisk']], 'AND', $get_shared_data ? 1 : 0);
-
-		$riskAssessment     = new RiskAssessment($this->db);
-		$riskAssessmentList = $riskAssessment->fetchAll('', '', 0, 0, ['customsql' => 'status = ' . RiskAssessment::STATUS_VALIDATED . $moreParams['filterRiskAssessment']], 'AND', $get_shared_data ? 1 : 0);
+        if ($get_shared_data) {
+            $risk->ismultientitymanaged = 0;
+            $riskAssessment->ismultientitymanaged = 0;
+        }
+		$riskList           = $risk->fetchAll('', '', 0, 0, ['customsql' => 'status = ' . self::STATUS_VALIDATED . $moreParams['filterRisk']]);
+        $riskAssessmentList = $riskAssessment->fetchAll('', '', 0, 0, ['customsql' => 'status = ' . RiskAssessment::STATUS_VALIDATED . $moreParams['filterRiskAssessment']]);
 
 		if (is_array($riskAssessmentList) && !empty($riskAssessmentList)) {
 			foreach ($riskAssessmentList as $riskAssessmentSingle) {
@@ -202,12 +206,11 @@ class Risk extends SaturneObject
 
 		if (is_array($riskList) && !empty($riskList)) {
 			foreach ($riskList as $riskSingle) {
-				$riskSingle->lastEvaluation = $riskAssessmentsOrderedByRisk[$riskSingle->id];
-				$riskSingle->appliedOn = $riskSingle->fk_element;
+				$riskSingle->lastEvaluation                               = $riskAssessmentsOrderedByRisk[$riskSingle->id];
+				$riskSingle->appliedOn                                    = $riskSingle->fk_element;
 				$risksOrderedByDigiriskElement[$riskSingle->fk_element][] = $riskSingle;
 			}
 		}
-
 		$risks = [];
 
 		//For groupment & workunit documents with given id
