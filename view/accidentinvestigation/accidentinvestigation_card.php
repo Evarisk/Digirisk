@@ -153,14 +153,14 @@ if (empty($reshook)) {
 
 					$task->fk_project     = $accident->fk_project;
 					$task->ref            = $modTask->getNextValue(0, $task);
-					$task->label          = $accident->ref . ' - T1 - ' . $langs->trans('CurativeAction');
+					$task->label          = $accident->ref . ' - T1 - ' . $langs->transnoentities('CurativeAction');
 					$task->fk_task_parent = $result;
 					$resOne               = $task->create($user);
                     $getNomResOne         = $task->getNomUrl(1, '', 'task', 1);
 
                     $task->fk_project     = $accident->fk_project;
 					$task->ref            = $modTask->getNextValue(0, $task);
-					$task->label          = $accident->ref . ' - T2 - ' . $langs->trans('PreventiveAction');
+					$task->label          = $accident->ref . ' - T2 - ' . $langs->transnoentities('PreventiveAction');
 					$task->fk_task_parent = $result;
 					$resTwo               = $task->create($user);
                     $getNomResTwo         = $task->getNomUrl(1, '', 'task', 1);
