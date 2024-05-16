@@ -325,14 +325,14 @@ class AccidentInvestigation extends SaturneObject
 		}
 
 		$ret  = parent::getTriggerDescription($object);
-		$ret .= $langs->transnoentities('Accident') . ' : ' . $accident->ref . ' - ' . $accident->label . '</br>';
-		$ret .= ($object->fk_task > 0 ? $langs->transnoentities('Task') . ' : ' . $task->ref . ' - ' . $task->label . '</br>': '');
-		$ret .= (dol_strlen($object->seniority_in_position) > 0 ? $langs->transnoentities('SeniorityInPosition') . ' : ' . $object->seniority_in_position . '</br>' : '');
-		$ret .= (dol_strlen($object->victim_skills) > 0 ? $langs->transnoentities('VictimSkills') . ' : ' . $object->victim_skills . '</br>' : '');
-		$ret .= (dol_strlen($object->collective_equipment) > 0 ? $langs->transnoentities('CollectiveEquipment') . ' : ' . $object->collective_equipment . '</br>' : '');
-		$ret .= (dol_strlen($object->individual_equipment) > 0 ? $langs->transnoentities('IndividualEquipment') . ' : ' . $object->individual_equipment . '</br>' : '');
-		$ret .= (dol_strlen($object->circumstances) > 0 ? $langs->transnoentities('Circumstances') . ' : ' . $object->circumstances . '</br>' : '');
-		$ret .= (dol_strlen($object->causality_tree) > 0 ? $langs->transnoentities('CausalityTree') . ' : ' . $object->causality_tree . '</br>' : '');
+		$ret .= $langs->transnoentities('Accident') . ' : ' . $accident->ref . ' - ' . $accident->label . '<br>';
+		$ret .= ($object->fk_task > 0 ? $langs->transnoentities('Task') . ' : ' . $task->ref . ' - ' . $task->label . '<br>': '');
+		$ret .= (dol_strlen($object->seniority_in_position) > 0 ? $langs->transnoentities('SeniorityInPosition') . ' : ' . $object->seniority_in_position . '<br>' : '');
+		$ret .= (dol_strlen($object->victim_skills) > 0 ? $langs->transnoentities('VictimSkills') . ' : ' . $object->victim_skills . '<br>' : '');
+		$ret .= (dol_strlen($object->collective_equipment) > 0 ? $langs->transnoentities('CollectiveEquipment') . ' : ' . $object->collective_equipment . '<br>' : '');
+		$ret .= (dol_strlen($object->individual_equipment) > 0 ? $langs->transnoentities('IndividualEquipment') . ' : ' . $object->individual_equipment . '<br>' : '');
+		$ret .= (dol_strlen($object->circumstances) > 0 ? $langs->transnoentities('Circumstances') . ' : ' . $object->circumstances . '<br>' : '');
+		$ret .= (dol_strlen($object->causality_tree) > 0 ? $langs->transnoentities('CausalityTree') . ' : ' . $object->causality_tree . '<br>' : '');
 
 		return $ret;
 	}

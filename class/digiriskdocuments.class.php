@@ -462,8 +462,8 @@ class DigiriskDocuments extends SaturneDocuments
 
         $ret  = parent::getTriggerDescription($object);
 
-        $ret .= $langs->transnoentities('ElementType') . ' : ' . $object->parent_type . '</br>';
-        $ret .= $langs->transnoentities('ParentElement') . ' : ' . $parentElement->ref . ' ' . $parentElement->label . '</br>';
+        $ret .= $langs->transnoentities('ElementType') . ' : ' . $object->parent_type . '<br>';
+        $ret .= $langs->transnoentities('ParentElement') . ' : ' . $parentElement->ref . ' ' . $parentElement->label . '<br>';
         $ret .= $langs->transnoentities('LastMainDoc') . ' : ' . $object->last_main_doc . '<br>';
 
         return $ret;

@@ -401,7 +401,7 @@ class PreventionPlan extends SaturneObject
         $ret .= $langs->transnoentities('CSSCTIntervention') . ' : ' . ($object->cssct_intervention ? $langs->transnoentities("Yes") : $langs->transnoentities("No")) . '<br>';
         $ret .= $langs->transnoentities('PriorVisit') . ' : ' . ($object->prior_visit_bool ? $langs->transnoentities("Yes") : $langs->transnoentities("No")) . '<br>';
         if ($object->prior_visit_bool) {
-            $ret .= $langs->transnoentities('PriorVisitText') . ' : ' . (!empty($object->prior_visit_text) ? $object->prior_visit_text : 'N/A') . '</br>';
+            $ret .= $langs->transnoentities('PriorVisitText') . ' : ' . (!empty($object->prior_visit_text) ? $object->prior_visit_text : 'N/A') . '<br>';
             $ret .= (dol_strlen($object->prior_visit_date) > 0 ? $langs->transnoentities('PriorVisitDate') . ' : ' . dol_print_date($object->prior_visit_date, 'dayhoursec') . '<br>' : '');
         }
 
