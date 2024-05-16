@@ -36,6 +36,7 @@ require_once DOL_DOCUMENT_ROOT . '/projet/class/project.class.php';
 // Load DigiriskDolibarr libraries
 require_once __DIR__ . '/../../class/digiriskstandard.class.php';
 require_once __DIR__ . '/../../class/digiriskdolibarrdocuments/auditreportdocument.class.php';
+require_once __DIR__ . '/../../class/digiriskdolibarrdocuments/riskassessmentdocument.class.php';
 require_once __DIR__ . '/../../lib/digiriskdolibarr_digiriskstandard.lib.php';
 require_once __DIR__ . '/../../lib/digiriskdolibarr_function.lib.php';
 
