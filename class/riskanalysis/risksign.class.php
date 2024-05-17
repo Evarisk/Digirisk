@@ -238,7 +238,6 @@ class RiskSign extends SaturneObject
      */
 	public function fetchRiskSign($parent_id, $get_parents_data = false, $get_shared_data = false, $moreParams = [])
 	{
-		global $conf;
 		$object   = new DigiriskElement($this->db);
 		$objects  = $object->fetchAll('',  '',  0,  0, array('customsql' => 'status > 0' ));
 		$risksign = new RiskSign($this->db);

@@ -252,3 +252,6 @@ DELETE t1 FROM llx_c_digiriskdolibarr_action_trigger t1 JOIN llx_c_digiriskdolib
 
 -- 10.0.0
 ALTER TABLE `llx_digiriskdolibarr_risk` ADD `type` VARCHAR(255) NOT NULL DEFAULT 'risk' AFTER `description`;
+
+-- 10.1.1
+UPDATE llx_element_element SET targettype = 'digiriskdolibarr_digiriskelement' WHERE targettype = 'digiriskdolibarr_digiriskdolibar' AND sourcetype = 'digiriskdolibarr_risksign';
