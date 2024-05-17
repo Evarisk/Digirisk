@@ -47,6 +47,7 @@
 		{
 			"name": "Gravite",
 			"description": "0 : Pas de blessure possible 1 : Blessure légère 2 : ITT5 < jours ou effet irréversible 4 : Menace sur la vie",
+			"key": 1,
 			"option": {
 				"display_type": "slide",
 				"range": [
@@ -83,6 +84,7 @@
 		{
 			"name": "Exposition",
 			"description": "0 : Jamais en contact 1 : Rare, 1 fois par an 2 : Inhabituelle, 1 fois par mois 3 : Occasionnelle, 1 fois par semaine 4 : Fréquente, 1 fois par jour",
+      "key": 2,
 			"option": {
 				"display_type": "slide",
 				"range": [
@@ -119,6 +121,7 @@
 		{
 			"name": "Occurrence",
 			"description": "1 : Jamais arrivé 2 : Est déjà arrivé dans des circonstances exceptionnelles 3 : D&eacute;j&agrave; produit 2 fois 4 : Se produit tous les mois",
+      "key": 3,
 			"option": {
 				"display_type": "slide",
 				"range": [
@@ -155,6 +158,7 @@
 		{
 			"name": "Formation",
 			"description": "1 : Pr&eacute;vention r&eacute;guli&egrave;re 2 : Formation individuelle obligatoire 3 : Formation obligatoire non r&eacute;alis&eacute;e 4 : Pas de formation ni de pr&eacute;vention",
+      "key": 4,
 			"option": {
 				"display_type": "slide",
 				"range": [
@@ -191,6 +195,7 @@
 		{
 			"name": "Protection",
 			"description": "1 : Intrins&egrave;que 2 : Collective 3 : Individuelle 4 : Rien",
+      "key": 5,
 			"option": {
 				"display_type": "slide",
 				"range": [
@@ -229,6 +234,7 @@
       {
         "name": "Gravite",
         "description": "0 : Pas d'impact possible 1 : Impact faible 2 : Impact modéré 3 : Impact important 4 : Impact majeur",
+        "key": 1,
         "option": {
           "display_type": "slide",
           "range": [
@@ -263,8 +269,9 @@
         }
       },
       {
-        "name": "Fréquence",
+        "name": "Frequence",
         "description": "0 : Jamais en contact 1 : Evénement exceptionnel (1 fois par an) 2 Evénement peu fréquent (Plusieurs fois par an) 3 : Evénement occasionnelle (1 fois par semaine) 4 : Continu très fréquent (1 fois par jour)",
+        "key": 2,
         "option": {
           "display_type": "slide",
           "range": [
@@ -301,6 +308,7 @@
       {
         "name": "Historique",
         "description": "1 : Jamais arrivé 2 : Circonstances exceptionnelles 3 : S'est produit 2 sur l'an passé 4 : Se produit tous les mois",
+        "key": 3,
         "option": {
           "display_type": "slide",
           "range": [
@@ -337,6 +345,7 @@
       {
         "name": "Maitrise",
         "description": "1 : Bonne maitrise (Compétence, contrôle, procédure) 2 : Assez maitrisé (Compétence, procédure) 3 : Peu maitrisé 4 : Pas maitrisé",
+        "key": 4,
         "option": {
           "display_type": "slide",
           "range": [
@@ -373,6 +382,7 @@
       {
         "name": "Milieu",
         "description": "1 : Sensibilité nulle 2 : Sensibilité faible 3 : Sensibilité moyenne 4 : Sensibilité forte",
+        "key": 5,
         "option": {
           "display_type": "slide",
           "range": [

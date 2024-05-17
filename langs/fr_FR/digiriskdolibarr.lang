@@ -62,6 +62,11 @@ Create                      = Créer
 MultiCompanyTicketPublicInterfaceConfig = Configuration de l'interface publique des tickets multi-société
 Subtitle                                = Sous-titre
 
+# DigiriskElement - DigiriskElement
+DigiriskElementDepthGraph            = Niveau de profondeur dans les graphiques des éléments Digirisk
+DigiriskElementDepthGraphDescription = Cette option permet de choisir le niveau de profondeur dans les graphiques des éléments Digirisk <br> Défaut : Niveau 1
+
+
 
 #
 # DigiriskDolibarr
@@ -373,6 +378,8 @@ ErrorContactHasAtLeastOneChildOfTypeFirePermit    = Le contact est lié à au mo
 ConfirmDeleteFirePermit                           = Êtes-vous sûr de vouloir supprimer ce permis de feu ?
 FirePermitRole                                    = Les rôles du permis de feu
 FirepermitSchedules                               = Horaires du permis de feu
+LinkDigiriskdolibarr_firepermit                   = Activer le lien avec les permis de feu
+LinkDigiriskdolibarr_firepermitDescription        = Permet la liaison entre les permis de feu et les modèles
 
 # Email - Mail
 FirePermitLabel   = Récapitulatif du permis de feu
@@ -908,6 +915,7 @@ RiskWellCreated                          = Risque créé
 RiskNotCreated                           = Erreur lors de la création du risque
 RiskWellEdited                           = Risque édité
 RiskNotEdited                            = Erreur lors de l'édition du risque
+RiskList                                 = Listing de risques
 AddRiskTitle                             = Ajout du risque
 AddRiskButton                            = Ajouter le risque
 EditRisk                                 = Édition du risque
@@ -916,6 +924,7 @@ RiskCategoryEdit                         = Catégorie de risque
 RiskCategoryEditDescription              = Activer la modification de la catégorie d'un risque existant
 HowToEditRiskCategory                    = Pour modifier la catégorie du risque, cliquez sur le picto de la catégorie
 DigiriskElementRisksList                 = Liste des risques
+DigiriskElementRisk                      = Risques
 RiskDescriptionNotEnabled                = Le champ description du risque n'est pas activé
 HowToEnableRiskDescription               = Pour activer le champ description du risque, allez dans "Configuration du module -> Document Unique"
 HowToEnableRiskCategoryEdit              = Pour activer la modification de la catégorie de risque, allez dans "Configuration du module -> Document Unique"
@@ -975,10 +984,17 @@ CategoryOnRiskDescription                = Permet d'attribuer des tags/catégori
 
 
 # Stats - Statistiques
-GreyRisk   = Risque faible
-OrangeRisk = Risque à planifier
-RedRisk    = Risque à traiter
-BlackRisk  = Risque inacceptable
+GreyRisk                                         = Risque faible
+OrangeRisk                                       = Risque à planifier
+RedRisk                                          = Risque à traiter
+BlackRisk                                        = Risque inacceptable
+RisksRepartitionByDangerCategories               = Répartition des risques par catégorie de danger
+RiskListsByDangerCategories                      = Liste des risques par catégorie de danger
+DigiriskElementsRepartitionByDepth               = Répartition de l'arborescence des groupements de niveau %s
+RisksRepartitionByDangerCategoriesAndCriticality = Répartition des risques par catégorie de danger et criticité
+NumberOfRisks                                    = Nombre de risques
+DangerCategories                                 = Catégories de danger
+RisksRepartitionByDigiriskElement                = Répartition des risques par groupement / unité de travail %s
 
 
 
@@ -1146,6 +1162,7 @@ TaskNotDeleted                           = Erreur lors de la suppression de la t
 TasksManagement                          = Gestion des tâches
 SelectProject                            = Choix du projet
 DUProject                                = Projet lié aux tâches des risques
+EnvironmentProject                       = Projet lié aux tâches des risques environnementaux
 NoTaskLinked                             = Pas de tâche en cours
 TaskList                                 = Liste des tâches du risque
 TaskCreate                               = Ajout de la tâche
@@ -1214,7 +1231,6 @@ TaskHideBudgetInDocumentDescription      = Masquer le budget de la tâche dans l
 Register                                 = Registre
 Send                                     = Envoyer
 TicketSent                               = Ticket envoyé
-CreateTicket                             = Ticket
 FilesLinked                              = Photos / Pièces jointes
 AddDocument                              = Ajouter document
 LastnamePlaceholder                      = Exemple : Dupont
@@ -1333,7 +1349,8 @@ TicketDateVisible                        = Afficher le champ Date pour créer un
 TicketDateVisibleHelp                    = Activer cette option pour afficher le champ Date dans l'interface publique et le rendre obligatoire si nécessaire
 QRCodeGenerated                          = QRCode généré
 FkTicket                                 = Ticket lié
-
+PublicTicket                             = Interface publique des tickets
+TicketPublicInterfaceForbidden           = Accès interdit à l'interface publique des tickets
 
 # Stats - Statistiques
 TicketStatistics    = Statistiques des tickets
@@ -1359,6 +1376,10 @@ Inferior            = Inférieur à
 Superior            = Supérieur à
 TimeRangeAdded      = Contrainte ajoutée
 TimeRangeDeleted    = Contrainte supprimée
+
+NumberOfTicketsByMainTagAndByDigiriskElement    = Nombre de registres par catégorie et par GP
+NumberOfTicketsByMainSubTagAndByDigiriskElement = Nombre de registres par sous-catégorie et par GP
+NumberOfTicketsByYear                           = Nombre de tickets par année
 
 
 # Email - Email
@@ -1433,7 +1454,7 @@ AT = au
 
 LabourInspectorName                 = DREETS
 UrlLabourInspector                  = https://travail-emploi.gouv.fr/ministere/organisation/article/dreets-directions-regionales-de-l-economie-de-l-emploi-du-travail-et-des
-IDCCTooltip                         = Ce champ provient du module Digirisk pour Dolibarr </br> La nomenclature des conventions collectives provient de travail-emploi.gouv.fr
+IDCCTooltip                         = Ce champ provient du module Digirisk pour Dolibarr <br> La nomenclature des conventions collectives provient de travail-emploi.gouv.fr
 NoEmailContact                      = Pas d'email sur ce contact
 AddMedia                            = Ajouter un média
 NoMediaLinked                       = Pas de média lié

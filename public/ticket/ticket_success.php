@@ -1,5 +1,5 @@
 <?php
-/* Copyright (C) 2021-2023 EVARISK <technique@evarisk.com>
+/* Copyright (C) 2021-2024 EVARISK <technique@evarisk.com>
  *
  * This program is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -16,81 +16,98 @@
  */
 
 /**
- *       \file       public/ticket/ticket_success.php
- *       \ingroup    digiriskdolibarr
- *       \brief      Public page to view success on ticket
+ * \file    public/ticket/ticket_success.php
+ * \ingroup digiriskdolibarr
+ * \brief   Public page to view success on ticket
  */
 
-if ( ! defined('NOTOKENRENEWAL')) define('NOTOKENRENEWAL', '1');
-if ( ! defined('NOREQUIREMENU'))  define('NOREQUIREMENU', '1');
-if ( ! defined('NOREQUIREHTML'))  define('NOREQUIREHTML', '1');
-if ( ! defined('NOLOGIN'))        define("NOLOGIN", 1); // This means this output page does not require to be logged.
-if ( ! defined('NOCSRFCHECK'))    define("NOCSRFCHECK", 1); // We accept to go on this page from external web site.
-if ( ! defined('NOIPCHECK'))		define('NOIPCHECK', '1'); // Do not check IP defined into conf $dolibarr_main_restrict_ip
-if ( ! defined('NOBROWSERNOTIF')) define('NOBROWSERNOTIF', '1');
+if (!defined('NOTOKENRENEWAL')) {
+    define('NOTOKENRENEWAL', 1);
+}
+if (!defined('NOREQUIREMENU')) {
+    define('NOREQUIREMENU', 1);
+}
+if (!defined('NOREQUIREHTML')) {
+    define('NOREQUIREHTML', 1);
+}
+if (!defined('NOLOGIN')) {      // This means this output page does not require to be logged
+    define('NOLOGIN', 1);
+}
+if (!defined('NOCSRFCHECK')) {  // We accept to go on this page from external website
+    define('NOCSRFCHECK', 1);
+}
+if (!defined('NOIPCHECK')) {    // Do not check IP defined into conf $dolibarr_main_restrict_ip
+    define('NOIPCHECK', 1);
+}
+if (!defined('NOBROWSERNOTIF')) {
+    define('NOBROWSERNOTIF', 1);
+}
 
-// Load Dolibarr environment
-$res = 0;
-// Try main.inc.php into web root known defined into CONTEXT_DOCUMENT_ROOT (not always defined)
-if ( ! $res && ! empty($_SERVER["CONTEXT_DOCUMENT_ROOT"])) $res = @include $_SERVER["CONTEXT_DOCUMENT_ROOT"] . "/main.inc.php";
-// Try main.inc.php into web root detected using web root calculated from SCRIPT_FILENAME
-$tmp = empty($_SERVER['SCRIPT_FILENAME']) ? '' : $_SERVER['SCRIPT_FILENAME']; $tmp2 = realpath(__FILE__); $i = strlen($tmp) - 1; $j = strlen($tmp2) - 1;
-while ($i > 0 && $j > 0 && isset($tmp[$i]) && isset($tmp2[$j]) && $tmp[$i] == $tmp2[$j]) { $i--; $j--; }
-if ( ! $res && $i > 0 && file_exists(substr($tmp, 0, ($i + 1)) . "/main.inc.php")) $res          = @include substr($tmp, 0, ($i + 1)) . "/main.inc.php";
-if ( ! $res && $i > 0 && file_exists(dirname(substr($tmp, 0, ($i + 1))) . "/main.inc.php")) $res = @include dirname(substr($tmp, 0, ($i + 1))) . "/main.inc.php";
-// Try main.inc.php using relative path
-if ( ! $res && file_exists("../../main.inc.php")) $res       = @include "../../main.inc.php";
-if ( ! $res && file_exists("../../../main.inc.php")) $res    = @include "../../../main.inc.php";
-if ( ! $res && file_exists("../../../../main.inc.php")) $res = @include "../../../../main.inc.php";
-if ( ! $res) die("Include of main fails");
+// Load DigiriskDolibarr environment
+if (file_exists('../../digiriskdolibarr.main.inc.php')) {
+    require_once __DIR__ . '/../../digiriskdolibarr.main.inc.php';
+} elseif (file_exists('../../../digiriskdolibarr.main.inc.php')) {
+    require_once __DIR__ . '/../../../digiriskdolibarr.main.inc.php';
+} else {
+    die('Include of digiriskdolibarr main fails');
+}
 
-// Libraries
+// Load Dolibarr libraries
 require_once DOL_DOCUMENT_ROOT . '/ticket/class/ticket.class.php';
-require_once '../../lib/digiriskdolibarr_function.lib.php';
 
-global $db, $langs, $mysoc;
+// Global variables definitions
+global $conf, $db, $hookmanager, $langs;
 
 // Load translation files required by the page
-$langs->loadLangs(array("digiriskdolibarr@digiriskdolibarr", "other", "errors"));
+saturne_load_langs();
+
+// Get parameters
+$trackID = GETPOST('track_id', 'alpha');
 
 // Initialize technical objects
 $object = new Ticket($db);
 
-// Get parameters
-$track_id = GETPOST('track_id');
+$hookmanager->initHooks(['publicticket', 'saturnepublicinterface']); // Note that conf->hooks_modules contains array
+
+// Load object
+$object->fetch(0, '', $trackID);
 
 /*
  * View
  */
 
-if (empty($conf->global->DIGIRISKDOLIBARR_TICKET_ENABLE_PUBLIC_INTERFACE)) {
-	print $langs->trans('TicketPublicInterfaceForbidden');
-	exit;
+$title = $langs->trans('PublicTicket');
+
+$conf->dol_hide_topmenu  = 1;
+$conf->dol_hide_leftmenu = 1;
+
+saturne_header(0,'', $title, '', '', 0, 0, [], [], '', 'page-public-card');
+
+if (!getDolGlobalInt('DIGIRISKDOLIBARR_TICKET_ENABLE_PUBLIC_INTERFACE')) {
+    print $langs->transnoentities('TicketPublicInterfaceForbidden');
+    exit;
 }
 
-$morejs  = array("/digiriskdolibarr/js/ticket-pad.min.js", "/digiriskdolibarr/js/digiriskdolibarr.js");
-$morecss = array("/digiriskdolibarr/css/digiriskdolibarr.css");
-
-digiriskdolibarr_ticket_header($langs->trans("CreateTicket"), "", 0, 0, $morejs, $morecss);
-
-$object->fetch('', '', $track_id);
-
-$substitutionarray = getCommonSubstitutionArray($langs, 0, null, $object);
-complete_substitutions_array($substitutionarray, $langs, $object);
-$ticketsuccessmessage = make_substitutions($langs->transnoentities($conf->global->DIGIRISKDOLIBARR_TICKET_SUCCESS_MESSAGE), $substitutionarray);
+$substitutionArray = getCommonSubstitutionArray($langs, 0, null, $object);
+complete_substitutions_array($substitutionArray, $langs, $object);
+$ticketSuccessMessage = make_substitutions($langs->transnoentities(getDolGlobalString('DIGIRISKDOLIBARR_TICKET_SUCCESS_MESSAGE')), $substitutionArray);
 
 ?>
-<div class="digirisk-signature-container" style="">
-	<p class="center"><?php echo $langs->trans("TicketSuccess") . ' ' ?><b><?php echo $track_id; ?> </b></p>
-	<span class="wpeo-notice notice-warning center" style="margin-left: 16%;width: 70%; border-left: solid red 6px; color: red;background: rgba(255, 0, 0, 0.05)">
-		<span class="notice-content" >
-			<span class="notice-subtitle" style="color: red"><?php echo $langs->transnoentities($ticketsuccessmessage) ?: $langs->transnoentities('YouMustNotifyYourHierarchy'); ?></span>
-		</span>
-	</span>
+<div class="public-card__container" data-public-interface="true">
+    <div class="public-card__header">
+        <div class="header-information center">
+            <div class="left"><a href="<?php echo dol_buildpath('/custom/digiriskdolibarr/public/ticket/create_ticket.php?entity=' . $conf->entity, 1); ?>" class="information-back"><i class="fas fa-sm fa-chevron-left paddingright"></i><?php echo $langs->trans('Back'); ?></a></div>
+            <div class="information-title"><?php echo $langs->trans('TicketSuccess') . ' <b>' . $object->ref . '</b>'; ?></div>
+            <span class="wpeo-notice notice-warning left" style="margin-left: 16%; width: 70%; border-left: solid red 6px; color: red; background: rgba(255, 0, 0, 0.05);">
+                <span class="notice-content">
+                    <span class="notice-subtitle" style="color: red"><?php echo $langs->transnoentities($ticketSuccessMessage) ?: $langs->transnoentities('YouMustNotifyYourHierarchy'); ?></span>
+                </span>
+            </span>
+        </div>
+    </div>
 </div>
 <?php
 
 // End of page
 llxFooter('', 'public');
 $db->close();
-

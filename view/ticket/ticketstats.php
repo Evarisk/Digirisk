@@ -1,5 +1,5 @@
 <?php
-/* Copyright (C) 2021-2023 EVARISK <technique@evarisk.com>
+/* Copyright (C) 2021-2024 EVARISK <technique@evarisk.com>
  *
  * This program is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -16,9 +16,9 @@
  */
 
 /**
- *	    \file       view/ticket/ticketstats.php
- *      \ingroup    digiriskdolibarr
- *		\brief      Page with tickets statistics
+ * \file    view/ticket/ticketstats.php
+ * \ingroup digiriskdolibarr
+ * \brief   Page with tickets statistics
  */
 
 // Load DigiriskDolibarr environment
@@ -30,368 +30,216 @@ if (file_exists('../digiriskdolibarr.main.inc.php')) {
     die('Include of digiriskdolibarr main fails');
 }
 
-// Global variables definitions
-global $conf, $db, $langs, $user;
-
-// Libraries
-require_once DOL_DOCUMENT_ROOT.'/ticket/class/ticket.class.php';
-require_once DOL_DOCUMENT_ROOT.'/core/class/dolgraph.class.php';
-if (!empty($conf->category->enabled)) {
-	require_once DOL_DOCUMENT_ROOT.'/categories/class/categorie.class.php';
+// Load Dolibarr libraries
+require_once DOL_DOCUMENT_ROOT . '/ticket/class/ticket.class.php';
+if (isModEnabled('category')) {
+    require_once DOL_DOCUMENT_ROOT . '/categories/class/categorie.class.php';
 }
 
+// Load Saturne libraries
+require_once __DIR__ . '/../../../saturne/class/saturnedashboard.class.php';
+
+// Load DigiriskDolibarr librairies
 require_once __DIR__ . '/../../lib/digiriskdolibarr_ticket.lib.php';
-require_once __DIR__ . '/../../class/ticketdigiriskstats.class.php';
 require_once __DIR__ . '/../../class/digiriskelement.class.php';
 
-$WIDTH  = DolGraph::getDefaultGraphSizeForStats('width');
-$HEIGHT = DolGraph::getDefaultGraphSizeForStats('height');
+// Global variables definitions
+global $conf, $db, $hookmanager, $langs, $moduleName, $moduleNameLowerCase, $user;
 
 // Load translation files required by the page
-saturne_load_langs(['orders', 'companies', 'other', 'tickets', 'categories']);
+saturne_load_langs();
 
-$action              = GETPOST('action', 'aZ09');
-$object_status       = GETPOST('object_status', 'array');
-$userid              = GETPOST('userid', 'int');
-$userassignid        = GETPOST('userassignid', 'int');
-$socid               = GETPOST('socid', 'int');
-$digiriskelementid   = GETPOST('digiriskelementid', 'int');
-$categticketid       = GETPOST('categticketid', 'int');
-$ticketcats          = GETPOST('ticketcats', 'array');
-$digiriskelementlist = GETPOST('digiriskelementlist', 'array');
+// Get parameters
+$socid            = GETPOST('socid', 'int');
+$digiriskElements = GETPOST('digiriskElements', 'array');
+$categories       = GETPOST('categories', 'array');
+$userID           = GETPOST('userID', 'int');
+$userAssignID     = GETPOST('userAssignID', 'int');
+$status           = GETPOST('status', 'array');
 
 // Initialize technical objects
 $object          = new Ticket($db);
-$digiriskelement = new DigiriskElement($db);
+$dashboard       = new SaturneDashboard($db, 'digiriskdolibarr');
+$digiriskElement = new DigiriskElement($db);
 
-$deletedElements = $digiriskelement->getMultiEntityTrashList();
-if (empty($deletedElements)) {
-	$deletedElements = [0];
-}
+// Initialize view objects
+$form = new Form($db);
 
-$upload_dir = $conf->digiriskdolibarr->multidir_output[$conf->entity];
-$upload_dir = $upload_dir . '/ticketstats/';
-dol_mkdir($upload_dir);
+// Get date parameters
+$dateStart = dol_mktime(0, 0, 0, GETPOST('dateStartmonth', 'int'), GETPOST('dateStartday', 'int'), GETPOST('dateStartyear', 'int'));
+$dateEnd   = dol_mktime(23, 59, 59, GETPOST('dateEndmonth', 'int'), GETPOST('dateEndday', 'int'), GETPOST('dateEndyear', 'int'));
 
-$nowyear   = strftime("%Y", dol_now());
-$year      = GETPOST('year') > 0 ? GETPOST('year', 'int') : $nowyear;
-//$startyear = $year - (empty($conf->global->MAIN_STATS_GRAPHS_SHOW_N_YEARS) ? 2 : max(1, min(10, $conf->global->MAIN_STATS_GRAPHS_SHOW_N_YEARS)));
-$date_start = dol_mktime(0, 0, 0, GETPOST('datestartmonth', 'int'), GETPOST('datestartday', 'int'), GETPOST('datestartyear', 'int'));
-$date_end   = dol_mktime(0, 0, 0, GETPOST('dateendmonth', 'int'), GETPOST('dateendday', 'int'), GETPOST('dateendyear', 'int'));
-$startyear = strftime("%Y", !empty($date_start) ? $date_start : dol_now());
-$endyear   = strftime("%Y", !empty($date_end) ? $date_end : dol_now() + 1);
-$datestart = dol_print_date((!empty($date_start) ? $date_start : dol_now()), 'dayxcard');
-$dateend   = dol_print_date((!empty($date_end) ? $date_end : dol_now()), 'dayxcard');
+$upload_dir = $conf->digiriskdolibarr->multidir_output[$conf->entity ?? 1];
 
-//Security check
-$permissiontoread   = $user->rights->ticket->read;
+$hookmanager->initHooks(['ticketstats', 'globalcard']); // Note that conf->hooks_modules contains array
 
-saturne_check_access($permissiontoread);
+// Security check
+$permissionToRead = $user->rights->ticket->read;
+saturne_check_access($permissionToRead);
 
 /*
- * Action
+ * Actions
  */
 
-if ($action == 'savegraph') {
-	$data = json_decode(file_get_contents('php://input'), true);
+$parameters = [];
+$resHook    = $hookmanager->executeHooks('doActions', $parameters, $object, $action); // Note that $action and $object may have been modified by some hooks
+if ($resHook < 0) {
+    setEventMessages($hookmanager->error, $hookmanager->errors, 'errors');
+}
 
-	$data = $data['image'];
-
-	list($type, $data) = explode(';', $data);
-	list(, $data)      = explode(',', $data);
-	$data = base64_decode($data);
-	$filenamenb = $upload_dir.'/ticketdigiriskstats.png';
-	file_put_contents($filenamenb, $data);
+if (empty($resHook)) {
+    // Actions adddashboardinfo, closedashboardinfo, generate_csv
+    require_once __DIR__ . '/../../../saturne/core/tpl/actions/dashboard_actions.tpl.php';
 }
 
 /*
  * View
  */
 
-$form   = new Form($db);
-
-$title    = $langs->trans("TicketStatistics");
+$title    = $langs->trans('TicketStatistics');
 $help_url = 'FR:Module_Digirisk#Statistiques_des_tickets';
 
-llxHeader('', $title, $help_url);
+saturne_header(0, '', $title, $help_url);
 
 print load_fiche_titre($title, '', 'ticket');
 
 $head = ticketstats_prepare_head();
-print dol_get_fiche_head($head, 'byyear', $langs->trans("TicketStatistics"), -1);
+print dol_get_fiche_head($head, 'byyear', $title, -1);
 
-$stats = new TicketDigiriskStats($db, $socid, ($userid > 0 ? $userid: 0), ($userassignid > 0 ? $userassignid: 0), ($digiriskelementid > 0 ? $digiriskelementid : 0), ($categticketid > 0 ? $categticketid: 0));
-if (is_array($object_status)) {
-	if (in_array($langs->trans('All'), $object_status)) {
-		unset($object_status[array_search($langs->trans('All'), $object_status)]);
-	} else {
-		if (!empty($object_status)) {
-			$stats->where .= ' AND tk.fk_statut IN ('.$db->sanitize(implode(',', $object_status)).')';
-		} else if (!empty(GETPOST('refresh', 'int'))) {
-			$stats->where .= ' AND tk.fk_statut IS NULL';
-		}
-	}
-}
-if (is_array($ticketcats)) {
-	if (in_array($langs->trans('All'), $ticketcats)) {
-		unset($ticketcats[array_search($langs->trans('All'), $ticketcats)]);
-	} else {
-		if (!empty($ticketcats)) {
-			$stats->from .= ' LEFT JOIN '.MAIN_DB_PREFIX.'categorie_ticket as cattk ON (tk.rowid = cattk.fk_ticket)';
-			$stats->where .= ' AND cattk.fk_categorie IN ('.$db->sanitize(implode(',', $ticketcats)).')';
-		} else if (!empty(GETPOST('refresh', 'int'))) {
-			$stats->from .= ' LEFT JOIN '.MAIN_DB_PREFIX.'categorie_ticket as cattk ON (tk.rowid = cattk.fk_ticket)';
-			$stats->where .= ' AND cattk.fk_categorie IS NULL';
-		}
-	}
-}
-if (is_array($digiriskelementlist)) {
-	if (in_array($langs->trans('All'), $digiriskelementlist)) {
-		unset($digiriskelementlist[array_search($langs->trans('All'), $digiriskelementlist)]);
-	} else {
-		if (!empty($digiriskelementlist)) {
-			$stats->join .= ' LEFT JOIN '.MAIN_DB_PREFIX.'ticket_extrafields as tkextra ON tk.rowid = tkextra.fk_object';
-			$stats->join .= ' LEFT JOIN '.MAIN_DB_PREFIX.'digiriskdolibarr_digiriskelement as e ON tkextra.digiriskdolibarr_ticket_service = e.rowid';
-			$stats->where .= ' AND e.rowid IN ('.$db->sanitize(implode(',', $digiriskelementlist)).')';
-		} else if (!empty(GETPOST('refresh', 'int'))) {
-			$stats->join .= ' LEFT JOIN '.MAIN_DB_PREFIX.'ticket_extrafields as tkextra ON tk.rowid = tkextra.fk_object';
-			$stats->join .= ' LEFT JOIN '.MAIN_DB_PREFIX.'digiriskdolibarr_digiriskelement as e ON tkextra.digiriskdolibarr_ticket_service = e.rowid';
-			$stats->where .= ' AND e.rowid IS NULL';
-		}
-	}
+$moreJoin  = '';
+$moreWhere = '';
+
+if ($socid > 0) {
+    $moreWhere .= ' AND t.fk_soc = ' . $socid;
 }
 
-// Build graphic number of object
-$data = $stats->getNbByMonthWithPrevYear($endyear, $startyear, 0, 0, $conf->global->SOCIETE_FISCAL_MONTH_START);
-
-if (empty($user->rights->societe->client->voir) || $user->socid) {
-	$filenamenb = $upload_dir.'/ticketdigiriskstats-'.$user->id.'_'.$datestart.'_'.$dateend.'.png';
-	$fileurlnb = DOL_URL_ROOT.'/viewimage.php?modulepart=ticketdigiriskstats&file=ticketdigiriskstats-'.$user->id.'_'.$datestart.'_'.$dateend.'.png';
-} else {
-	$filenamenb = $upload_dir.'/ticketdigiriskstats_'.$datestart.'_'.$dateend.'.png';
-	$fileurlnb = DOL_URL_ROOT.'/viewimage.php?modulepart=ticketdigiriskstats&file=ticketdigiriskstats_'.$datestart.'_'.$dateend.'.png';
+if (is_array($digiriskElements)) {
+    if (in_array($langs->trans('All'), $digiriskElements)) {
+        unset($digiriskElements[array_search($langs->trans('All'), $digiriskElements)]);
+    } else if (in_array('IS NULL', $digiriskElements)) {
+        unset($digiriskElements[array_search($langs->trans('None'), $digiriskElements)]);
+        $moreJoin  .= ' LEFT JOIN ' . MAIN_DB_PREFIX . 'ticket_extrafields as tkextra ON t.rowid = tkextra.fk_object';
+        $moreJoin  .= ' LEFT JOIN ' . MAIN_DB_PREFIX . 'digiriskdolibarr_digiriskelement as e ON tkextra.digiriskdolibarr_ticket_service = e.rowid';
+        $moreWhere .= ' AND e.rowid IS NULL';
+    } else if (!empty($digiriskElements)) {
+        $moreJoin  .= ' LEFT JOIN ' . MAIN_DB_PREFIX . 'ticket_extrafields as tkextra ON t.rowid = tkextra.fk_object';
+        $moreJoin  .= ' LEFT JOIN ' . MAIN_DB_PREFIX . 'digiriskdolibarr_digiriskelement as e ON tkextra.digiriskdolibarr_ticket_service = e.rowid';
+        $moreWhere .= ' AND e.rowid IN (' . $db->sanitize(implode(',', $digiriskElements)) . ')';
+    }
 }
 
-$px1 = new DolGraph();
-$mesg = $px1->isGraphKo();
-if (!$mesg) {
-	$px1->SetData($data);
-	$i = $startyear; $legend = array();
-	while ($i <= $endyear) {
-		$legend[] = $i;
-		$i++;
-	}
-	$px1->SetLegend($legend);
-	$px1->SetMaxValue($px1->GetCeilMaxValue());
-	$px1->SetMinValue(min(0, $px1->GetFloorMinValue()));
-	$px1->SetWidth($WIDTH);
-	$px1->SetHeight($HEIGHT);
-	$px1->SetYLabel($langs->trans("NbOfTicket"));
-	$px1->SetShading(3);
-	$px1->SetHorizTickIncrement(1);
-	$px1->mode = 'depth';
-	$px1->SetTitle($langs->trans("NumberOfTicketsByMonth"));
-
-	$px1->draw($filenamenb, $fileurlnb);
-} ?>
-
-<script>
-	var checkExist = setInterval(function() {
-		if ($("#canvas_ticketdigiriskstats_<?php echo $datestart . '_' . $dateend; ?>_png").length) {
-			clearInterval(checkExist);
-			var canvas = document.getElementById("canvas_ticketdigiriskstats_<?php echo $datestart . '_' . $dateend; ?>_png")
-			var image = canvas.toDataURL()
-			let querySeparator = '?'
-			document.URL.match(/\?/) ? querySeparator = '&' : 1
-
-			let token = $('.ticketstats').find('input[name="token"]').val();
-
-			$.ajax({
-				url: document.URL + querySeparator + "action=savegraph&token=" + token,
-				type: "POST",
-				processData: false,
-				contentType: 'application/octet-stream',
-				data: JSON.stringify({
-					image: image,
-				}),
-				success: function (resp) {
-				},
-				error: function (resp) {
-				}
-			});
-		}
-	}, 500)
-</script>
-
-<?php
-// Show array
-$data = $stats->getAllByYear();
-$arrayyears = array();
-foreach ($data as $val) {
-	if (!empty($val['year'])) {
-		$arrayyears[$val['year']] = $val['year'];
-	}
-}
-if (!count($arrayyears)) {
-	$arrayyears[$nowyear] = $nowyear;
+if (is_array($categories)) {
+    if (in_array($langs->trans('All'), $categories)) {
+        unset($categories[array_search($langs->trans('All'), $categories)]);
+    } else if (in_array('IS NULL', $categories)) {
+        unset($categories[array_search($langs->trans('None'), $categories)]);
+        $moreJoin  .= ' LEFT JOIN ' . MAIN_DB_PREFIX . 'categorie_ticket as cattk ON (t.rowid = cattk.fk_ticket)';
+        $moreWhere .= ' AND cattk.fk_categorie IS NULL';
+    } else if (!empty($categories)) {
+        $moreJoin  .= ' LEFT JOIN ' . MAIN_DB_PREFIX . 'categorie_ticket as cattk ON (t.rowid = cattk.fk_ticket)';
+        $moreWhere .= ' AND cattk.fk_categorie IN (' . $db->sanitize(implode(',', $categories)) . ')';
+    }
 }
 
-print '<div class="fichecenter"><div class="fichethirdleft">';
+if ($userID > 0) {
+    $moreWhere .= ' AND t.fk_user_create = ' . $userID;
+}
+
+if ($userAssignID > 0) {
+    $moreWhere .= ' AND t.fk_user_assign = ' . $userAssignID;
+}
+
+if (is_array($status)) {
+    if (in_array($langs->trans('All'), $status)) {
+        unset($status[array_search($langs->trans('All'), $status)]);
+    } else if (in_array('IS NULL', $status)) {
+        unset($status[array_search($langs->trans('None'), $status)]);
+        $moreWhere .= ' AND t.fk_statut IS NULL';
+    } else if (!empty($status)) {
+        $moreWhere .= ' AND t.fk_statut IN (' . $db->sanitize(implode(',', $status)) . ')';
+    }
+}
+
+if (!empty($dateStart) && !empty($dateEnd)) {
+    $moreWhere .= " AND t.datec BETWEEN '" . $db->idate($dateStart) . "' AND '" . $db->idate($dateEnd) . "'";
+}
+
+print '<div class="fichecenter">';
 
 // Show filter box
-print '<form class="ticketstats" name="stats" method="POST" action="'.$_SERVER["PHP_SELF"].'?refresh=1">';
-print '<input type="hidden" name="token" value="'.newToken().'">';
+print '<form method="POST" action="' . $_SERVER['PHP_SELF'] . '?refresh=1">';
+print '<input type="hidden" name="token" value="' . newToken() . '">';
 
-$all = array($langs->trans('All') => $langs->trans('All'));
+$all  = [$langs->trans('All') => $langs->trans('All')];
+$none = ['IS NULL' => $langs->trans('None')];
 
 print '<table class="noborder centpercent">';
-print '<tr class="liste_titre"><td class="liste_titre" colspan="2">'.$langs->trans("Filter").'</td></tr>';
+print '<tr class="liste_titre"><td class="liste_titre" colspan="2">' . $langs->trans('Filter') . '</td></tr>';
+
 // Company
-print '<tr><td class="left">'.$form->textwithpicto($langs->trans("ThirdParty"), $langs->trans("ThirdPartyHelp")).'</td><td class="left">';
+print '<tr><td>' . $form->textwithpicto($langs->trans('ThirdParty'), $langs->trans('ThirdPartyHelp')) . '</td><td>';
 print img_picto('', 'company', 'class="pictofixedwidth"');
-print $form->select_company($socid, 'socid', '', 1, 0, 0, array(), 0, 'widthcentpercentminusx maxwidth300');
+print $form->select_company($socid, 'socid', '', 1, 0, 0, [], 0, 'widthcentpercentminusx maxwidth300');
 print '</td></tr>';
+
 // DigiriskElement
-print '<tr><td class="left">'.$form->textwithpicto($langs->trans("GP/UT"), $langs->trans("GP/UTHelp")).'</td><td class="left">';
-$objectList = saturne_fetch_all_object_type('digiriskelement', '', '', 0, 0,  ['customsql' => 'rowid NOT IN (' . implode(',', $deletedElements) . ')']);
-$digiriskElementsData  = [];
-if (is_array($objectList) && !empty($objectList)) {
-	foreach ($objectList as $digiriskElement) {
-		$digiriskElementsData[$digiriskElement->id] = $digiriskElement->ref . ' - ' . $digiriskElement->label;
-	}
+print '<tr><td>' . $form->textwithpicto($langs->trans('GP/UT'), $langs->trans('GP/UTHelp')) . '</td><td>';
+$digiriskElementsArray  = $none;
+$activeDigiriskElements = $digiriskElement->getActiveDigiriskElements();
+if (is_array($activeDigiriskElements) && !empty($activeDigiriskElements)) {
+    foreach ($activeDigiriskElements as $digiriskElement) {
+        $digiriskElementsArray[$digiriskElement->id] = $digiriskElement->ref . ' - ' . $digiriskElement->label;
+    }
 }
-$digiriskElementsData = $all + $digiriskElementsData;
-print $form->multiselectarray('digiriskelementlist', $digiriskElementsData, ((!empty(GETPOST('refresh', 'int'))) ? GETPOST('digiriskelementlist', 'array') : $digiriskelementlist), 0, 0, 'widthcentpercentminusx maxwidth300');
+print $form->multiselectarray('digiriskElements', $all + $digiriskElementsArray, (!empty(GETPOST('refresh', 'int')) ? GETPOST('digiriskElements', 'array') : $all + $digiriskElementsArray), 0, 0, 'minwidth100imp widthcentpercentminusx maxwidth300');
 print '</td></tr>';
+
 // Category
-if (!empty($conf->category->enabled)) {
-	$cat_type = Categorie::TYPE_TICKET;
-	$cat_label = $langs->trans("Category") . ' ' .lcfirst($langs->trans("Ticket"));
-	print '<tr><td>'.$form->textwithpicto($cat_label, $langs->trans("CategoryTicketHelp")).'</td><td>';
-	$cate_arbo = $form->select_all_categories($cat_type, null, 'parent', null, null, 1);
-	print img_picto('', 'category', 'class="pictofixedwidth"');
-	$cate_arbo = $all + $cate_arbo;
-	print $form->multiselectarray('ticketcats', $cate_arbo, ((!empty(GETPOST('refresh', 'int'))) ? GETPOST('ticketcats', 'array') : $cate_arbo), 0, 0, 'widthcentpercentminusx maxwidth300');
-	print '</td></tr>';
+if (isModEnabled('categorie')) {
+    print '<tr><td>' . $form->textwithpicto($langs->trans('Category') . ' ' . lcfirst($langs->trans('Ticket')), $langs->trans('CategoryTicketHelp')) . '</td><td>';
+    $cateArbo = $form->select_all_categories(Categorie::TYPE_TICKET, null, 'parent', null, null, 1);
+    print img_picto('', 'category', 'class="pictofixedwidth"');
+    print $form->multiselectarray('categories', $all + $none + $cateArbo, (!empty(GETPOST('refresh', 'int')) ? GETPOST('categories', 'array') : $all + $none + $cateArbo), 0, 0, 'minwidth100imp widthcentpercentminusx maxwidth300');
+    print '</td></tr>';
 }
+
 // User
-print '<tr><td class="left">'.$form->textwithpicto($langs->trans("CreatedBy"), $langs->trans("CreatedByHelp")) .'</td><td class="left">';
+print '<tr><td>' . $form->textwithpicto($langs->trans('CreatedBy'), $langs->trans('CreatedByHelp')) . '</td><td>';
 print img_picto('', 'user', 'class="pictofixedwidth"');
-print $form->select_dolusers($userid, 'userid', 1, '', 0, '', '', $conf->entity, 0, 0, '', 0, '', 'widthcentpercentminusx maxwidth300');
+print $form->select_dolusers($userID, 'userID', 1, '', 0, '', '', $conf->entity, 0, 0, '', 0, '', 'widthcentpercentminusx maxwidth300');
+
 // Assign at user
-print '<tr><td class="left">'.$form->textwithpicto($langs->trans("AssignedTo"), $langs->trans("AssignedToHelp")).'</td><td class="left">';
+print '<tr><td>' . $form->textwithpicto($langs->trans('AssignedTo'), $langs->trans('AssignedToHelp')) . '</td><td>';
 print img_picto('', 'user', 'class="pictofixedwidth"');
-print $form->select_dolusers($userassignid, 'userassignid', 1, '', 0, '', '', $conf->entity, 0, 0, '', 0, '', 'widthcentpercentminusx maxwidth300');
+print $form->select_dolusers($userAssignID, 'userAssignID', 1, '', 0, '', '', $conf->entity, 0, 0, '', 0, '', 'widthcentpercentminusx maxwidth300');
+
 // Status
-print '<tr><td class="left">'.$form->textwithpicto($langs->trans("Status"), $langs->trans("StatusHelp")).'</td><td class="left">';
-$liststatus = $object->statuts_short;
-$liststatus = $all + $liststatus;
-print $form->multiselectarray('object_status', $liststatus, ((!empty(GETPOST('refresh', 'int'))) ? GETPOST('object_status', 'array') : $liststatus), 0, 0, 'widthcentpercentminusx maxwidth300', 1);
+print '<tr><td>' . $form->textwithpicto($langs->trans('Status'), $langs->trans('StatusHelp')) . '</td><td>';
+print $form->multiselectarray('status', $all + $none + $object->statuts_short, (!empty(GETPOST('refresh', 'int')) ? GETPOST('status', 'array') : $all + $none + $object->statuts_short), 0, 0, 'minwidth100imp widthcentpercentminusx maxwidth300', 1);
 print '</td></tr>';
-//DateRange -- Plage de date
-if (!empty($conf->global->SOCIETE_FISCAL_MONTH_START)) {
-	$startday = dol_mktime(0, 0, 0, $conf->global->SOCIETE_FISCAL_MONTH_START, 1, strftime("%Y", dol_now()));
-} else {
-	$startday = dol_now();
-}
-print '<tr><td class="left">' . $langs->trans("DateRange") . '</td><td class="left">';
-print $langs->trans('From') . $form->selectDate((!empty($date_start) ? $date_start : $startday), 'datestart', 0, 0, 0, '', 1);
-print $langs->trans('At') . $form->selectDate((!empty($date_end) ? $date_end : dol_time_plus_duree($startday, 1, 'y')), 'dateend', 0, 0, 0, '', 1);
+
+// DateRange
+$startYear = strftime('%Y', dol_now()) - (!getDolGlobalInt('MAIN_STATS_GRAPHS_SHOW_N_YEARS') ? 2 : max(1, min(10, getDolGlobalInt('MAIN_STATS_GRAPHS_SHOW_N_YEARS'))));
+$startDay  = dol_mktime(0, 0, 0, getDolGlobalInt('SOCIETE_FISCAL_MONTH_START'), 1, $startYear);
+print '<tr><td>' . $langs->trans('DateRange') . '</td><td>';
+print $langs->trans('From') . $form->selectDate((!empty($dateStart) ? $dateStart : $startDay), 'dateStart');
+print $langs->trans('At') . $form->selectDate((!empty($dateEnd) ? $dateEnd : dol_now()), 'dateEnd');
 print '</td></tr>';
-print '<tr><td class="center" colspan="2"><input type="submit" name="submit" class="button small" value="'.$langs->trans("Refresh").'"></td></tr>';
+
+print '<tr><td class="center" colspan="2"><input type="submit" name="submit" class="button" value="' . $langs->trans('Refresh') . '"></td></tr>';
+
 print '</table>';
 print '</form>';
 
-print '<br><br>';
+$moreParams = [
+    'LoadTicketDashboard' => 1,
+    'join'                => $moreJoin,
+    'where'               => $moreWhere
+];
 
-print '<div class="div-table-responsive-no-min">';
-print '<table class="noborder centpercent">';
-print '<tr class="liste_titre" height="24">';
-print '<td class="center">'.$langs->trans("Year").'</td>';
-print '<td class="right">'.$langs->trans("NbOfTickets").'</td>';
-print '<td class="right">%</td>';
-print '</tr>';
+$dashboard->show_dashboard($moreParams);
 
-$oldyear = 0;
-foreach ($data as $val) {
-	$year = $val['year'];
-	while (!empty($year) && $oldyear > $year + 1) { // If we have empty year
-		$oldyear--;
-
-		print '<tr class="oddeven" height="24">';
-		print '<td class="center"><a href="'.$_SERVER["PHP_SELF"].'?year='.$oldyear.($socid > 0 ? '&socid='.$socid : '').($userid > 0 ? '&userid='.$userid : '').'">'.$oldyear.'</a></td>';
-		print '<td class="right">0</td>';
-		print '<td class="right"></td>';
-		print '</tr>';
-	}
-
-	print '<tr class="oddeven" height="24">';
-	print '<td class="center"><a href="'.$_SERVER["PHP_SELF"].'?year='.$year.($socid > 0 ? '&socid='.$socid : '').($userid > 0 ? '&userid='.$userid : '').'">'.$year.'</a></td>';
-	print '<td class="right">'.$val['nb'].'</td>';
-	print '<td class="right" style="'.(($val['nb_diff'] >= 0) ? 'color: green;' : 'color: red;').'">'.round($val['nb_diff']).'</td>';
-	print '</tr>';
-	$oldyear = $year;
-}
-
-print '</table>';
 print '</div>';
-
-// Get list of files
-if ( ! empty($upload_dir)) {
-	$file_list = dol_dir_list($upload_dir, 'files', 0, '(\.png)', '', 'date', SORT_DESC, 1);
-}
-
-print load_fiche_titre($langs->trans("Documents"), '', 'digiriskdolibarr@digiriskdolibarr');
-
-// Show table
-print '<div class="div-table-responsive-no-min">';
-print '<table class="liste noborder centpercent">';
-print '<tr class="liste_titre">';
-print '<th class="liste_titre center" colspan="3"></th>';
-print '</tr>';
-
-// Get list of files
-if ( ! empty($upload_dir)) {
-	// Loop on each file found
-	if (is_array($file_list)) {
-		foreach ($file_list as $file) {
-			// Show file name with link to download
-			print '<tr class="oddeven">';
-			print '<td class="minwidth200">';
-			print '<a class="documentdownload paddingright" href="' . DOL_URL_ROOT . '/document.php?modulepart=digiriskdolibarr&file=' . urlencode('ticketstats/'.$file['name']) . '&entiy='.$conf->entity . '">';
-			print  img_mime($file["name"], $langs->trans("File") . ': ' . $file["name"]);
-			print  dol_trunc($file["name"], 150);
-			print  '</a>';
-			print  '</td>';
-
-			// Show file size
-			$size = (!empty($file['size']) ? $file['size'] : dol_filesize($upload_dir . "/" . $file["name"]));
-			print '<td class="nowrap right">' . dol_print_size($size, 1, 1) . '</td>';
-
-			// Show file date
-			$date = (!empty($file['date']) ? $file['date'] : dol_filemtime($upload_dir . "/" . $file["name"]));
-			print '<td class="nowrap right">' . dol_print_date($date, 'dayhour', 'tzuser') . '</td>';
-			print '</tr>';
-		}
-	}
-}
-
-print '</table>';
-print '</div>';
-
-print '</div><div class="fichetwothirdright">';
-
-// Show graphs
-print '<table class="border centpercent"><tr class="pair nohover"><td class="center">';
-if ($mesg) {
-	print $mesg;
-} else {
-	print $px1->show();
-}
-print '</td></tr></table>';
-
-print '</div></div>';
-print '<div style="clear:both"></div>';
 
 print dol_get_fiche_end();
 

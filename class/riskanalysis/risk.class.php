@@ -28,7 +28,7 @@ require_once __DIR__ . '/../digiriskelement.class.php';
 require_once __DIR__ . '/../../../saturne/class/task/saturnetask.class.php';
 require_once __DIR__ . '/riskassessment.class.php';
 
-// Load Saturne libraries.
+// Load Saturne libraries
 require_once __DIR__ . '/../../../saturne/class/saturneobject.class.php';
 
 /**
@@ -37,28 +37,28 @@ require_once __DIR__ . '/../../../saturne/class/saturneobject.class.php';
 class Risk extends SaturneObject
 {
 	/**
-	 * @var string Module name.
+	 * @var string Module name
 	 */
 	public $module = 'digiriskdolibarr';
 
 	/**
-	 * @var string Element type of object.
+	 * @var string Element type of object
 	 */
 	public $element = 'risk';
 
 	/**
-	 * @var string Name of table without prefix where object is stored. This is also the key used for extrafields management.
+	 * @var string Name of table without prefix where object is stored. This is also the key used for extrafields management
 	 */
 	public $table_element = 'digiriskdolibarr_risk';
 
 	/**
 	 * @var int Does this object support multicompany module ?
-	 * 0 = No test on entity, 1 = Test with field entity, 'field@table' = Test with link by field@table.
+	 * 0 = No test on entity, 1 = Test with field entity, 'field@table' = Test with link by field@table
 	 */
 	public $ismultientitymanaged = 1;
 
 	/**
-	 * @var int Does object support extrafields ? 0 = No, 1 = Yes.
+	 * @var int Does object support extrafields ? 0 = No, 1 = Yes
 	 */
 	public int $isextrafieldmanaged = 1;
 
@@ -74,25 +74,25 @@ class Risk extends SaturneObject
 	public $picto = 'fontawesome_fa-exclamation-triangle_fas_#d35968';
 
 	/**
-	 * @var array  Array with all fields and their property. Do not use it as a static var. It may be modified by constructor.
+	 * @var array  Array with all fields and their property. Do not use it as a static var. It may be modified by constructor
 	 */
-	public $fields = array(
-		'rowid' => array('type' => 'integer', 'label' => 'TechnicalID', 'enabled' => '1', 'position' => 10, 'notnull' => 1, 'visible' => 0, 'noteditable' => '1', 'index' => 1, 'comment' => "Id"),
-		'fk_element' => array('type' => 'integer', 'label' => 'ParentElement', 'enabled' => '1', 'position' => 9, 'notnull' => 1, 'visible' => 1, 'csslist' => 'minwidth200 maxwidth300 widthcentpercentminusxx'),
-		'ref' => array('type' => 'varchar(128)', 'label' => 'Ref', 'enabled' => '1', 'position' => 20, 'notnull' => 1, 'visible' => 4, 'noteditable' => '1', 'index' => 1, 'searchall' => 1, 'showoncombobox' => '1', 'comment' => "Reference of object"),
-		'ref_ext' => array('type' => 'varchar(128)', 'label' => 'RefExt', 'enabled' => '1', 'position' => 30, 'notnull' => 0, 'visible' => 0,),
-		'entity' => array('type' => 'integer', 'label' => 'Entity', 'enabled' => '1', 'position' => 8, 'notnull' => 1, 'visible' => 0,),
-		'date_creation' => array('type' => 'datetime', 'label' => 'DateCreation', 'enabled' => '1', 'position' => 50, 'notnull' => 1, 'visible' => 0,),
-		'tms' => array('type' => 'timestamp', 'label' => 'DateModification', 'enabled' => '1', 'position' => 60, 'notnull' => 0, 'visible' => 0,),
-		'import_key' => array('type' => 'varchar(14)', 'label' => 'ImportId', 'enabled' => '1', 'position' => 70, 'notnull' => -1, 'visible' => 0,),
-		'status' => array('type' => 'smallint', 'label' => 'Status', 'enabled' => '1', 'position' => 80, 'notnull' => 0, 'visible' => 0,),
-		'category' => array('type' => 'varchar(255)', 'label' => 'RiskCategory', 'enabled' => '1', 'position' => 21, 'notnull' => 0, 'visible' => 1,),
-		'description' => array('type' => 'text', 'label' => 'Description', 'enabled' => '1', 'position' => 23, 'notnull' => 0, 'visible' => -1,),
-		'type' => array('type' => 'varchar(255)', 'label' => 'Type', 'enabled' => '1', 'position' => 24, 'notnull' => 1, 'visible' => 0, 'default' => '(PROV)'),
-		'fk_user_creat' => array('type' => 'integer:User:user/class/user.class.php', 'label' => 'UserAuthor', 'enabled' => '1', 'position' => 110, 'notnull' => 1, 'visible' => 0, 'foreignkey' => 'user.rowid',),
-		'fk_user_modif' => array('type' => 'integer:User:user/class/user.class.php', 'label' => 'UserModif', 'enabled' => '1', 'position' => 120, 'notnull' => -1, 'visible' => 0,),
-		'fk_projet' => array('type' => 'integer:Project:projet/class/project.class.php', 'label' => 'Projet', 'enabled' => '1', 'position' => 140, 'notnull' => 1, 'visible' => 0,),
-	);
+	public $fields = [
+		'rowid'         => ['type' => 'integer', 'label' => 'TechnicalID', 'enabled' => '1', 'position' => 10, 'notnull' => 1, 'visible' => 0, 'noteditable' => '1', 'index' => 1, 'comment' => "Id"],
+		'fk_element'    => ['type' => 'integer', 'label' => 'ParentElement', 'enabled' => '1', 'position' => 9, 'notnull' => 1, 'visible' => 1, 'csslist' => 'minwidth200 maxwidth300 widthcentpercentminusxx'],
+		'ref'           => ['type' => 'varchar(128)', 'label' => 'Ref', 'enabled' => '1', 'position' => 20, 'notnull' => 1, 'visible' => 4, 'noteditable' => '1', 'index' => 1, 'searchall' => 1, 'showoncombobox' => '1', 'comment' => "Reference of object"],
+		'ref_ext'       => ['type' => 'varchar(128)', 'label' => 'RefExt', 'enabled' => '1', 'position' => 30, 'notnull' => 0, 'visible' => 0],
+		'entity'        => ['type' => 'integer', 'label' => 'Entity', 'enabled' => '1', 'position' => 8, 'notnull' => 1, 'visible' => 0],
+		'date_creation' => ['type' => 'datetime', 'label' => 'DateCreation', 'enabled' => '1', 'position' => 50, 'notnull' => 1, 'visible' => 0],
+		'tms'           => ['type' => 'timestamp', 'label' => 'DateModification', 'enabled' => '1', 'position' => 60, 'notnull' => 0, 'visible' => 0],
+		'import_key'    => ['type' => 'varchar(14)', 'label' => 'ImportId', 'enabled' => '1', 'position' => 70, 'notnull' => -1, 'visible' => 0],
+		'status'        => ['type' => 'smallint', 'label' => 'Status', 'enabled' => '1', 'position' => 80, 'notnull' => 0, 'visible' => 0],
+		'category'      => ['type' => 'varchar(255)', 'label' => 'RiskCategory', 'enabled' => '1', 'position' => 21, 'notnull' => 0, 'visible' => 1],
+		'description'   => ['type' => 'text', 'label' => 'Description', 'enabled' => '1', 'position' => 23, 'notnull' => 0, 'visible' => -1],
+		'type'          => ['type' => 'varchar(255)', 'label' => 'Type', 'enabled' => '1', 'position' => 24, 'notnull' => 1, 'visible' => 0, 'default' => '(PROV)'],
+		'fk_user_creat' => ['type' => 'integer:User:user/class/user.class.php', 'label' => 'UserAuthor', 'enabled' => '1', 'position' => 110, 'notnull' => 1, 'visible' => 0, 'foreignkey' => 'user.rowid'],
+		'fk_user_modif' => ['type' => 'integer:User:user/class/user.class.php', 'label' => 'UserModif', 'enabled' => '1', 'position' => 120, 'notnull' => -1, 'visible' => 0],
+		'fk_projet'     => ['type' => 'integer:Project:projet/class/project.class.php', 'label' => 'Projet', 'enabled' => '1', 'position' => 140, 'notnull' => 1, 'visible' => 0]
+	];
 
 	public $rowid;
 	public $ref;
@@ -112,18 +112,50 @@ class Risk extends SaturneObject
 	public $lastEvaluation;
 	public $appliedOn;
 
+    private $cotations = [];
+
 	/**
-	 * Constructor.
+	 * Constructor
 	 *
-	 * @param DoliDb $db Database handler.
+	 * @param DoliDb $db Database handler
 	 */
 	public function __construct(DoliDB $db)
 	{
+        global $langs;
+
+        $this->cotations = [
+            1 => [
+                'label' => $langs->transnoentities('GreyRisk'),
+                'color' => '#ececec',
+                'start' => 0,
+                'end'   => 47
+            ],
+            2 => [
+                'label' => $langs->transnoentities('OrangeRisk'),
+                'color' => '#e9ad4f',
+                'start' => 48,
+                'end'   => 50
+            ],
+            3 => [
+                'label' => $langs->transnoentities('RedRisk'),
+                'color' => '#e05353',
+                'start' => 51,
+                'end'   => 80
+            ],
+            4 => [
+                'label' => $langs->transnoentities('BlackRisk'),
+                'color' => '#2b2b2b',
+                'start' => 81,
+                'end'   => 100
+            ]
+        ];
+
         $riskType = GETPOST('type');
         if ($riskType == 'riskenvironmental') {
             $this->type  = 'riskenvironmental';
             $this->picto = 'fontawesome_fa-leaf_fas_#d35968';
         }
+
 		parent::__construct($db, $this->module, $this->element);
 	}
 
@@ -153,14 +185,18 @@ class Risk extends SaturneObject
 	 */
 	public function fetchRisksOrderedByCotation($parent_id, $get_children_data = false, $get_parents_data = false, $get_shared_data = false, $moreParams = [])
 	{
-		$object  = new DigiriskElement($this->db);
+		$object         = new DigiriskElement($this->db);
+		$risk           = new Risk($this->db);
+        $riskAssessment = new RiskAssessment($this->db);
+
 		$objects = $object->getActiveDigiriskElements();
 
-		$risk     = new Risk($this->db);
-		$riskList = $risk->fetchAll('', '', 0, 0, ['customsql' => 'status = ' . self::STATUS_VALIDATED . $moreParams['filterRisk']], 'AND', $get_shared_data ? 1 : 0);
-
-		$riskAssessment     = new RiskAssessment($this->db);
-		$riskAssessmentList = $riskAssessment->fetchAll('', '', 0, 0, ['customsql' => 'status = ' . RiskAssessment::STATUS_VALIDATED . $moreParams['filterRiskAssessment']], 'AND', $get_shared_data ? 1 : 0);
+        if ($get_shared_data) {
+            $risk->ismultientitymanaged = 0;
+            $riskAssessment->ismultientitymanaged = 0;
+        }
+		$riskList           = $risk->fetchAll('', '', 0, 0, ['customsql' => 'status = ' . self::STATUS_VALIDATED . $moreParams['filterRisk']]);
+        $riskAssessmentList = $riskAssessment->fetchAll('', '', 0, 0, ['customsql' => 'status = ' . RiskAssessment::STATUS_VALIDATED . $moreParams['filterRiskAssessment']]);
 
 		if (is_array($riskAssessmentList) && !empty($riskAssessmentList)) {
 			foreach ($riskAssessmentList as $riskAssessmentSingle) {
@@ -170,12 +206,11 @@ class Risk extends SaturneObject
 
 		if (is_array($riskList) && !empty($riskList)) {
 			foreach ($riskList as $riskSingle) {
-				$riskSingle->lastEvaluation = $riskAssessmentsOrderedByRisk[$riskSingle->id];
-				$riskSingle->appliedOn = $riskSingle->fk_element;
+				$riskSingle->lastEvaluation                               = $riskAssessmentsOrderedByRisk[$riskSingle->id];
+				$riskSingle->appliedOn                                    = $riskSingle->fk_element;
 				$risksOrderedByDigiriskElement[$riskSingle->fk_element][] = $riskSingle;
 			}
 		}
-
 		$risks = [];
 
 		//For groupment & workunit documents with given id
@@ -532,9 +567,15 @@ class Risk extends SaturneObject
      */
     public function load_dashboard(): array
     {
-        $arrayRisksByCotation = $this->getRisksByCotation();
+        $dangerCategories = $this->getDangerCategories();
 
-        $array['graphs'] = [$arrayRisksByCotation];
+        $getRisksByCotation                       = $this->getRisksByCotation();
+        $getRisksByDangerCategoriesAndCriticality = $this->getRisksByDangerCategoriesAndCriticality($dangerCategories);
+        $getRisksByDangerCategories               = $this->getRisksByDangerCategories($dangerCategories);
+        $getRiskListsByDangerCategories           = $this->getRiskListsByDangerCategories($dangerCategories);
+
+        $array['graphs'] = [$getRisksByCotation, $getRisksByDangerCategoriesAndCriticality, $getRisksByDangerCategories];
+        $array['lists']  = [$getRiskListsByDangerCategories];
 
         return $array;
     }
@@ -561,31 +602,152 @@ class Risk extends SaturneObject
         $array['type']       = 'pie';
         $array['showlegend'] = $conf->browser->layout == 'phone' ? 1 : 2;
         $array['dataset']    = 1;
-
-        $array['labels'] = [
-            1 => [
-                'label' => $langs->transnoentities('GreyRisk'),
-                'color' => '#ececec'
-            ],
-            2 => [
-                'label' => $langs->transnoentities('OrangeRisk'),
-                'color' => '#e9ad4f'
-            ],
-            3 => [
-                'label' => $langs->transnoentities('RedRisk'),
-                'color' => 'e05353'
-            ],
-            4 => [
-                'label' => $langs->transnoentities('BlackRisk'),
-                'color' => '#2b2b2b'
-            ]
-        ];
+        $array['labels']     = $this->cotations;
 
         $riskAssessmentList = $riskAssessment->fetchAll('', '', 0, 0, ['customsql' => 'status = 1']);
         $array['data']      = $riskAssessment->getRiskAssessmentCategoriesNumber($riskAssessmentList);
 
         return $array;
-	  }
+    }
+
+    /**
+     * Get risks by danger categories and criticality
+     *
+     * @param array  $dangerCategories Danger categories datas
+     * @param string $type             Risk type (risk, riskenvironmental or ...)
+     *
+     * @return array
+     * @throws Exception
+     */
+    public function getRisksByDangerCategoriesAndCriticality(array $dangerCategories, string $type = 'risk'): array
+    {
+        global $conf, $langs;
+
+        // Graph Title parameters
+        $array['title'] = $langs->transnoentities('RisksRepartitionByDangerCategoriesAndCriticality');
+        $array['picto'] = $this->picto;
+
+        // Graph parameters
+        $array['width']      = '100%';
+        $array['height']     = 600;
+        $array['type']       = 'bar';
+        $array['showlegend'] = 1;
+        $array['dataset']    = 4;
+        $array['moreCSS']    = 'grid-2';
+        $array['labels']     = $this->cotations;
+
+        $join = ' LEFT JOIN ' . MAIN_DB_PREFIX . $this->table_element . ' as r ON r.rowid = t.fk_risk';
+        foreach ($dangerCategories as $dangerCategory) {
+            $array['data'][$dangerCategory['position']][0] = $dangerCategory['name'];
+
+            $risks = $this->fetchAll('', '', 0, 0, ['customsql' => 't.status = ' . self::STATUS_VALIDATED . ' AND t.entity = ' . $conf->entity . (GETPOSTISSET('id') ? ' AND t.fk_element = ' . GETPOST('id') : '') . ' AND t.type = "' . $type . '" AND t.category = ' . $dangerCategory['position']]);
+            for ($i = 1; $i <= 4; $i++) {
+                $riskAssessments = saturne_fetch_all_object_type('RiskAssessment', '', '', 0, 0, ['customsql' => 't.status = ' . RiskAssessment::STATUS_VALIDATED . ' AND r.entity = ' . $conf->entity . (GETPOSTISSET('id') ? ' AND r.fk_element = ' . GETPOST('id') : '') . ' AND r.type = "' . $type . '" AND r.category = ' . $dangerCategory['position'] . ' AND t.cotation >= ' . $this->cotations[$i]['start'] . ' AND t.cotation <= ' . $this->cotations[$i]['end']], 'AND', false, true, false, $join);
+                $array['data'][$dangerCategory['position']]['y_combined_' . $array['labels'][$i]['label']] = ((is_array($risks) && !empty($risks) && is_array($riskAssessments) && !empty($riskAssessments)) ? count($riskAssessments) / count($risks) : 0);
+            }
+        }
+
+        return $array;
+    }
+
+    /**
+     * Get risks by danger categories
+     *
+     * @param array  $dangerCategories Danger categories datas
+     * @param string $type             Risk type (risk, riskenvironmental or ...)
+     *
+     * @return array
+     * @throws Exception
+     */
+    public function getRisksByDangerCategories(array $dangerCategories, string $type = 'risk'): array
+    {
+        global $conf, $langs;
+
+        // Graph Title parameters
+        $array['title'] = $langs->transnoentities('RisksRepartitionByDangerCategories');
+        $array['picto'] = $this->picto;
+
+        // Graph parameters
+        $array['width']      = '100%';
+        $array['height']     = 600;
+        $array['type']       = 'bar';
+        $array['showlegend'] = 1;
+        $array['dataset']    = 2;
+        $array['moreCSS']    = 'grid-2';
+
+        $array['labels'] = [
+            0 => [
+                'label' => $langs->transnoentities('NumberOfRisks'),
+                'color' => '#A1467E'
+            ]
+        ];
+
+        foreach ($dangerCategories as $dangerCategory) {
+            $risks = $this->fetchAll('', '', 0, 0, ['customsql' => 't.status = ' . self::STATUS_VALIDATED . ' AND t.entity = ' . $conf->entity . (GETPOSTISSET('id') ? ' AND t.fk_element = ' . GETPOST('id') : '') . ' AND t.type = "' . $type . '" AND t.category = ' . $dangerCategory['position']]);
+
+            $array['data'][$dangerCategory['position']][] = $dangerCategory['name'];
+            $array['data'][$dangerCategory['position']][] = (is_array($risks) && !empty($risks) ? count($risks) : 0);
+        }
+
+        return $array;
+    }
+
+    /**
+     * Get list of risks by danger categories
+     *
+     * @param array  $dangerCategories Danger categories datas
+     * @param string $type             Risk type (risk, riskenvironmental or ...)
+     *
+     * @return array
+     * @throws Exception
+     */
+    public function getRiskListsByDangerCategories(array $dangerCategories, string $type = 'risk') : array
+    {
+        global $conf, $langs;
+
+        // Graph Title parameters
+        $array['title'] = $langs->transnoentities('RiskListsByDangerCategories');
+        $array['picto'] = $this->picto;
+
+        // Graph parameters
+        $array['width'] = '100%';
+        $array['type']  = 'list';
+
+        $totalRisks = $this->fetchAll('', '', 0, 0, ['customsql' => 't.status = ' . self::STATUS_VALIDATED . ' AND t.entity = ' . $conf->entity . (GETPOSTISSET('id') ? ' AND t.fk_element = ' . GETPOST('id') : '') . ' AND t.type = "' . $type . '"']);
+
+        $array['labels']['Ref']           = $langs->transnoentities('DangerCategories');
+        $array['labels']['numberOfRisks'] = $langs->transnoentities('NumberOfRisks') . ' : ' . '<span class="badge badge-info">' . (is_array($totalRisks) && !empty($totalRisks) ? count($totalRisks) : 0) . '</span>';
+        $array['labels']['percentage']    = $langs->transnoentities('Percentage');
+
+        $arrayRiskLists = [];
+        $join           = ' LEFT JOIN ' . MAIN_DB_PREFIX . $this->table_element . ' as r ON r.rowid = t.fk_risk';
+        if (is_array($totalRisks) && !empty($totalRisks)) {
+            foreach ($dangerCategories as $dangerCategory) {
+                $arrayRiskLists[$dangerCategory['position']]['Ref']['value'] = $dangerCategory['name'];
+
+                $risks = $this->fetchAll('', '', 0, 0, ['customsql' => 't.status = ' . self::STATUS_VALIDATED . ' AND t.entity = ' . $conf->entity . (GETPOSTISSET('id') ? ' AND t.fk_element = ' . GETPOST('id') : '') . ' AND t.type = "' . $type . '" AND t.category = ' . $dangerCategory['position']]);
+
+                $arrayRiskLists[$dangerCategory['position']]['numberOfRisks']['value']    = is_array($risks) && !empty($risks) ? count($risks) : 0;
+                $arrayRiskLists[$dangerCategory['position']]['numberOfRisks']['morecss']  = 'risk-evaluation-cotation';
+                $arrayRiskLists[$dangerCategory['position']]['numberOfRisks']['moreAttr'] = 'style="line-height: 0; border-radius: 0; background-color: #A1467EAA; color: #FFF;"';
+                $arrayRiskLists[$dangerCategory['position']]['percentage']['value']       = is_array($risks) && !empty($risks) ? price2num((count($risks) / count($totalRisks)) * 100, 2) . ' %' : 0;
+
+                for ($i = 1; $i <= 4; $i++) {
+                    $array['labels'][$i] = $this->cotations[$i]['label'];
+
+                    $riskAssessments = saturne_fetch_all_object_type('RiskAssessment', '', '', 0, 0, ['customsql' => 't.status = ' . RiskAssessment::STATUS_VALIDATED . ' AND r.entity = ' . $conf->entity . (GETPOSTISSET('id') ? ' AND r.fk_element = ' . GETPOST('id') : '') . ' AND r.type = "' . $type . '" AND r.category = ' . $dangerCategory['position'] . ' AND t.cotation >= ' . $this->cotations[$i]['start'] . ' AND t.cotation <= ' . $this->cotations[$i]['end']], 'AND', false, true, false, $join);
+
+                    $arrayRiskLists[$dangerCategory['position']][$i]['value']    = is_array($riskAssessments) && !empty($riskAssessments) ? count($riskAssessments) : 0;
+                    $arrayRiskLists[$dangerCategory['position']][$i]['morecss']  = 'risk-evaluation-cotation';
+                    $arrayRiskLists[$dangerCategory['position']][$i]['moreAttr'] = 'data-scale = ' . $i . ' style="line-height: 0; border-radius: 0;"';
+                }
+            }
+        }
+
+        $array['data'] = $arrayRiskLists;
+
+        return $array;
+    }
 
     /**
      * Write information of trigger description

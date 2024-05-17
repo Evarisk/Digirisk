@@ -1,5 +1,5 @@
 <?php
-/* Copyright (C) 2021-2023 EVARISK <technique@evarisk.com>
+/* Copyright (C) 2021-2024 EVARISK <technique@evarisk.com>
  *
  * This program is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -32,12 +32,12 @@ require_once __DIR__ . '/../../saturne/class/saturnedocuments.class.php';
 class DigiriskDocuments extends SaturneDocuments
 {
 	/**
-	 * @var string Module name.
+	 * @var string Module name
 	 */
 	public $module = 'digiriskdolibarr';
 
 	/**
-	 * @var string Name of table without prefix where object is stored. This is also the key used for extrafields management.
+	 * @var string Name of table without prefix where object is stored. This is also the key used for extrafields management
 	 */
 	public $table_element = 'saturne_object_documents';
 
@@ -165,16 +165,15 @@ class DigiriskDocuments extends SaturneDocuments
     {
         global $action, $conf, $hookmanager, $langs;
 
-        $usertmp = new User($this->db);
-        $project = new Project($this->db);
-        $DUProject = new Project($this->db);
-        $risk = new Risk($this->db);
+        $usertmp               = new User($this->db);
+        $project               = new Project($this->db);
+        $DUProject             = new Project($this->db);
+        $risk                  = new Risk($this->db);
         $digiriskelementobject = new DigiriskElement($this->db);
 
         $DUProject->fetch($conf->global->DIGIRISKDOLIBARR_DU_PROJECT);
-
         $activeDigiriskElements = $digiriskelementobject->getActiveDigiriskElements($allEntities ? 1 : 0);
-        $tasksSortedByRisk = $risk->getTasksWithFkRisk();
+        $tasksSortedByRisk      = $risk->getTasksWithFkRisk();
 
         for ($i = 4; $i >= 1; $i--) {
             $foundTagForLines = 1;
@@ -462,8 +461,8 @@ class DigiriskDocuments extends SaturneDocuments
 
         $ret  = parent::getTriggerDescription($object);
 
-        $ret .= $langs->transnoentities('ElementType') . ' : ' . $object->parent_type . '</br>';
-        $ret .= $langs->transnoentities('ParentElement') . ' : ' . $parentElement->ref . ' ' . $parentElement->label . '</br>';
+        $ret .= $langs->transnoentities('ElementType') . ' : ' . $object->parent_type . '<br>';
+        $ret .= $langs->transnoentities('ParentElement') . ' : ' . $parentElement->ref . ' ' . $parentElement->label . '<br>';
         $ret .= $langs->transnoentities('LastMainDoc') . ' : ' . $object->last_main_doc . '<br>';
 
         return $ret;
