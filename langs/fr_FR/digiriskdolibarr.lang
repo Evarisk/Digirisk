@@ -1454,7 +1454,7 @@ AT = au
 
 LabourInspectorName                 = DREETS
 UrlLabourInspector                  = https://travail-emploi.gouv.fr/ministere/organisation/article/dreets-directions-regionales-de-l-economie-de-l-emploi-du-travail-et-des
-IDCCTooltip                         = Ce champ provient du module Digirisk pour Dolibarr </br> La nomenclature des conventions collectives provient de travail-emploi.gouv.fr
+IDCCTooltip                         = Ce champ provient du module Digirisk pour Dolibarr <br> La nomenclature des conventions collectives provient de travail-emploi.gouv.fr
 NoEmailContact                      = Pas d'email sur ce contact
 AddMedia                            = Ajouter un média
 NoMediaLinked                       = Pas de média lié

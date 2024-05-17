@@ -229,7 +229,7 @@ class ActionsDigiriskdolibarr
                 $linkedAccidentList = '';
                 if (is_array($linkedAccidents) && !empty($linkedAccidents)) {
                     foreach ($linkedAccidents as $linkedAccident) {
-                        $linkedAccidentList .= $linkedAccident->getNomUrl(1) . '</br>';
+                        $linkedAccidentList .= $linkedAccident->getNomUrl(1) . '<br>';
                     }
                 }
 
