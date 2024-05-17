@@ -107,7 +107,7 @@ class doc_ticketdocument_odt extends SaturneDocumentModel
                         $tmpArray['user']          = dol_strtoupper($userTmp->lastname) . ' ' . ucfirst($userTmp->firstname);
                         $tmpArray['type']          = $outputLangs->transnoentities('Action' . $actionComm->type_code);
                         $tmpArray['title']         = $actionComm->label;
-                        $tmpArray['event_content'] = dol_htmlentitiesbr_decode(str_replace('</br>', "\r\n", $actionComm->note));
+                        $tmpArray['event_content'] = dol_htmlentitiesbr_decode($actionComm->note);
                         $tmpArray['date']          = dol_print_date($actionComm->datec, 'dayreduceformat');
 
                         $this->setTmpArrayVars($tmpArray, $listLines, $outputLangs);

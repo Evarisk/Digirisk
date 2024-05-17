@@ -168,7 +168,7 @@ if (empty($reshook)) {
 					if ($resOne > 0 && $resTwo > 0) {
 						setEventMessages('AccidentInvestigationTaskCreated', []);
                         $task->fetch($result);
-                        $description = $getNomResOne . '</br>' . $getNomResTwo;
+                        $description = $getNomResOne . '<br>' . $getNomResTwo;
                         $task->setValueFrom('description', $description);
 					} else {
 						setEventMessages($task->error, [], 'errors');
@@ -243,7 +243,7 @@ if ($action == 'create') {
 	// Common attributes
 	include DOL_DOCUMENT_ROOT.'/core/tpl/commonfields_add.tpl.php';
 
-	print '</table></br>';
+	print '</table><br>';
 
 	print dol_get_fiche_end();
 
@@ -270,7 +270,7 @@ if ($action == 'create') {
 	// Common attributes
 	include DOL_DOCUMENT_ROOT . '/core/tpl/commonfields_edit.tpl.php';
 
-	print '</table></br>';
+	print '</table><br>';
 
 	print dol_get_fiche_end();
 
