@@ -18,7 +18,7 @@ if (!empty($related_tasks) && $related_tasks > 0) {
 					} else {
 						$project = $DUProject;
 					}
-					$result = !empty($conf->mc->sharings['project']) ? in_array($project->entity, $conf->mc->sharings['project']) : 0;
+					$result = !empty($mc->sharings['project']) ? in_array($project->entity, $mc->sharings['project']) : 0;
 				} else {
 					$result = 1;
 				}

@@ -30,7 +30,7 @@ if (file_exists('../digiriskdolibarr.main.inc.php')) {
     die('Include of digiriskdolibarr main fails');
 }
 
-global $langs, $user, $conf, $db, $hookmanager;
+global $conf, $db, $hookmanager, $langs, $mc, $user;
 
 
 // Load Dolibarr libraries
