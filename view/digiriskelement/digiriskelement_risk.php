@@ -298,7 +298,7 @@ if ($sharedrisks) {
 					$nophoto      = DOL_URL_ROOT.'/public/theme/common/nophoto.png';
 
 					$importValue .= '<div class="risk-evaluation-photo risk-evaluation-photo-'. ($lastEvaluation->id > 0 ? $lastEvaluation->id : 0) .  ($risk->id > 0 ? ' risk-' . $risk->id : ' risk-new') .' open-medias-linked" style="margin-right: 0.5em">';
-					$importValue .= '<span class="floatleft inline-block valignmiddle divphotoref risk-evaluation-photo-single">';
+					$importValue .= '<span class="risk-evaluation-photo-single">';
 					$importValue .= '<input class="filepath-to-riskassessment filepath-to-riskassessment-'.( $risk->id > 0 ? $risk->id : 'new') .'" type="hidden" value="'. $pathToThumb .'">';
 					$importValue .=	'<input class="filename" type="hidden" value="">';
 					if (isset($lastEvaluation->photo) && dol_strlen($lastEvaluation->photo) > 0) {
