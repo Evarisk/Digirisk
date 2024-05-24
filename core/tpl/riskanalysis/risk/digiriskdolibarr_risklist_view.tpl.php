@@ -1200,6 +1200,9 @@ while ($i < ($limit ? min($num, $limit) : $num)) {
 		$risk->setVarsFromFetchObj($obj);
 	}
 
+    // Check if category exists else continue to next iteration
+    if ($risk->category < 0) continue;
+
 	// Show here line of result
 	print '<tr class="oddeven risk-row risk_row_' . $risk->id . ' risk-row-content-' . $risk->id . '" id="risk_row_' . $risk->id . '">';
 	foreach ($risk->fields as $key => $val) {
