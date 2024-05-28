@@ -85,7 +85,7 @@ if ($action == 'setMaitreOeuvre') {
 	$masterWorkerId = GETPOST('maitre_oeuvre');
 
 	if ( ! $error) {
-		$constforval = 'DIGIRISKDOLIBARR_' . strtoupper($type) . "_MAITRE_OEUVRE";
+		$constforval = 'DIGIRISKDOLIBARR_' . strtoupper($object->element) . "_MAITRE_OEUVRE";
 		dolibarr_set_const($db, $constforval, $masterWorkerId, 'integer', 0, '', $conf->entity);
 		setEventMessages($langs->trans("SetupSaved"), null, 'mesgs');
 	}
