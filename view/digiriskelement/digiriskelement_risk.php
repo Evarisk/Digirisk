@@ -30,7 +30,7 @@ if (file_exists('../digiriskdolibarr.main.inc.php')) {
 	die('Include of digiriskdolibarr main fails');
 }
 
-global $conf, $db, $hookmanager, $langs, $user;
+global $conf, $db, $hookmanager, $langs, $mc, $user;
 
 // Load Dolibarr libraries
 require_once DOL_DOCUMENT_ROOT . '/core/lib/images.lib.php';

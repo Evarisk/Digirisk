@@ -163,7 +163,7 @@ class DigiriskDocuments extends SaturneDocuments
      */
     public function fillRiskData(Odf $odfHandler, $object, Translate $outputLangs, $tmparray, $file, $risks, $allEntities = false)
     {
-        global $action, $conf, $hookmanager, $langs;
+        global $action, $conf, $hookmanager, $langs, $mc;
 
         $usertmp               = new User($this->db);
         $project               = new Project($this->db);
@@ -249,7 +249,7 @@ class DigiriskDocuments extends SaturneDocuments
                                                 if (!empty($conf->global->DIGIRISKDOLIBARR_SHOW_SHARED_RISKS)) {
                                                     $project->fetch($related_task->fk_projet);
                                                     if ($project->entity != $conf->entity) {
-                                                        $result = !empty($conf->mc->sharings['project']) ? in_array($project->entity, $conf->mc->sharings['project']) : 0;
+                                                        $result = !empty($mc->sharings['project']) ? in_array($project->entity, $mc->sharings['project']) : 0;
                                                     } else {
                                                         $result = 1;
                                                     }
