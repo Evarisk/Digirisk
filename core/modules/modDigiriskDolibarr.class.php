@@ -439,7 +439,8 @@ class modDigiriskdolibarr extends DolibarrModules
                 'accidentsignature',
                 'digiriskstandardagenda',
                 'category',
-                'categoryindex'
+                'categoryindex',
+                'main'
 			],
 			'tabs' => [
 				'mycompany_admin'

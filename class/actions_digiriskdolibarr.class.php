@@ -132,6 +132,16 @@ class ActionsDigiriskdolibarr
             $this->resprints = $out;
         }
 
+        if (strpos($_SERVER['PHP_SELF'], 'digiriskdolibarr') !== false) {
+            ?>
+            <script>
+                $('link[rel="manifest"]').remove();
+            </script>
+            <?php
+
+            $this->resprints = '<link rel="manifest" href="' . DOL_URL_ROOT . '/custom/digiriskdolibarr/manifest.json.php' . '" />';
+        }
+
         return 0; // or return 1 to replace standard code
     }
 
