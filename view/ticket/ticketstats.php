@@ -50,6 +50,7 @@ global $conf, $db, $hookmanager, $langs, $moduleName, $moduleNameLowerCase, $use
 saturne_load_langs();
 
 // Get parameters
+$action           = GETPOST('action', 'aZ09');
 $socid            = GETPOST('socid', 'int');
 $digiriskElements = GETPOST('digiriskElements', 'array');
 $categories       = GETPOST('categories', 'array');
