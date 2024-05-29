@@ -96,8 +96,8 @@ $img->type         = 'image/png';
 $img->sizes        = '512x512';
 $manifest->icons[] = $img;
 
-$manifest->id               = dol_buildpath('/custom/digiriskdolibarr/public/create_ticket.php', 1);
-$manifest->start_url        = dol_buildpath('/custom/digiriskdolibarr/public/create_ticket.php', 1);
+$manifest->id               = dol_buildpath('/custom/digiriskdolibarr/public/ticket/create_ticket.php', 1);
+$manifest->start_url        = dol_buildpath('/custom/digiriskdolibarr/public/ticket/create_ticket.php', 1);
 $manifest->background_color = '#ffffff';
 $manifest->display          = 'standalone';
 $manifest->display_override = ['window-controls-overlay'];

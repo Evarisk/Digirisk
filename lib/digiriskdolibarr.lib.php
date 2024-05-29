@@ -73,7 +73,7 @@ function digiriskdolibarr_admin_prepare_head(): array
     $head[$h][2] = 'event';
     $h++;
 
-    $head[$h][0] = dol_buildpath('/saturne/admin/pwa.php', 1). '?module_name=DigiriskDolibarr&start_url=' . dol_buildpath('/custom/digiriskdolibarr/public/create_ticket.php', 3);
+    $head[$h][0] = dol_buildpath('/saturne/admin/pwa.php', 1). '?module_name=DigiriskDolibarr&start_url=' . dol_buildpath('/custom/digiriskdolibarr/public/ticket/create_ticket.php', 3);
     $head[$h][1] = $conf->browser->layout != 'phone' ? '<i class="fas fa-mobile pictofixedwidth"></i>' . $langs->trans('PWA') : '<i class="fas fa-mobile"></i>';
     $head[$h][2] = 'pwa';
     $h++;
