@@ -1444,6 +1444,10 @@ AdvancedImport                               = Import avancé
 AdvancedImportDescription                    = Permet d'importer chaque élément indépendamment (Arborescence, risques et signalisations)
 DataMigrationWordPressToDolibarr             = Migration des données de WordPress vers Dolibarr
 DataMigrationDolibarrToDolibarr              = Migration des données de Dolibarr vers Dolibarr
+RepairRisks                                  = Réparer les risques
+NoRiskToRepair                               = Aucun risque à réparer
+RiskSuccessfullyRepaired                     = Risques réparés avec succès
+CorruptedCategoryOnRiskList                  = Liste des risques dont la catégorie est corrompue
 
 #
 # Other

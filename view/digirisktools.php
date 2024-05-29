@@ -783,6 +783,30 @@ if (GETPOST('dataMigrationImportGlobalDolibarr', 'alpha') && ! empty($conf->glob
 	}
 }
 
+if ($action == 'repairCategory') {
+    if (is_array($_POST) && !empty($_POST)) {
+        $errors = [];
+        foreach($_POST as $key => $value) {
+            if (strstr($key, 'search_') && !empty($value) && $value >= 0 && $value <= 22) {
+                $riskId = trim($key, 'search_');
+                $risk->fetch($riskId);
+                $result = $risk->setValueFrom('category', $value);
+
+                if ($result <= 0) {
+                    $errors[] = $risk->errors;
+                }
+            }
+        }
+    }
+
+    if (!empty($errors)) {
+        setEventMessages($risk->error, $errors, 'errors');
+    } else {
+        setEventMessages($langs->trans('RiskSuccessfullyRepaired'), []);
+    }
+    $action = '';
+}
+
 /*
  * View
  */
@@ -938,7 +962,65 @@ if ($user->rights->digiriskdolibarr->adminpage->read) {
 	print '</td>';
 	print '</tr>';
 	print '</table>';
-	print '</form>';
+    print '</form>';
+
+    print load_fiche_titre($langs->trans("CorruptedCategoryOnRiskList"), '', '');
+
+    print '<form class="repair-category" name="repairCategory" id="repairCategory" action="' . $_SERVER["PHP_SELF"] . '" method="POST">';
+    print '<input type="hidden" name="token" value="' . newToken() . '">';
+    print '<input type="hidden" name="action" value="repairCategory">';
+
+    print '<table class="noborder centpercent">';
+    print '<tr class="liste_titre">';
+    print '<td class="center">' . $langs->trans('RiskCategory') . '</td>';
+    print '<td>' . $langs->trans('Risk') . '</td>';
+    print '<td>' . $langs->trans('Description') . '</td>';
+    print '<td>' . $langs->trans('DigiriskElement') . '</td>';
+    print '</tr>';
+
+    $risks = saturne_fetch_all_object_type('Risk', '', '', 0, 0, ['customsql' => 't.category NOT BETWEEN 0 AND 22']);
+
+    if (is_array($risks) && !empty($risks)) {
+        foreach ($risks as $key => $risk) {
+            $digiriskElement->fetch($risk->fk_element);
+            print '<tr class="oddeven">';
+            print '<td class="center">'
+            ?>
+                <div class="wpeo-dropdown dropdown-large dropdown-grid category-danger padding" style="position: inherit">
+                    <input class="input-hidden-danger" type="hidden" name="<?php echo 'search_' . $key ?>"/>
+                        <div class="dropdown-toggle dropdown-add-button button-cotation">
+                            <span class="wpeo-button button-square-50 button-grey"><i class="fas fa-exclamation-triangle button-icon"></i></span>
+                            <img class="danger-category-pic wpeo-tooltip-event hidden" src="" aria-label=""/>
+                        </div>
+                    <ul class="saturne-dropdown-content wpeo-gridlayout grid-5 grid-gap-0">
+                        <?php
+                        $dangerCategories = $risk->getDangerCategories();
+                        if ( ! empty($dangerCategories) ) :
+                            foreach ($dangerCategories as $dangerCategory) : ?>
+                                <li class="item dropdown-item wpeo-tooltip-event classfortooltip" data-is-preset="<?php echo ''; ?>" data-id="<?php echo $dangerCategory['position'] ?>" aria-label="<?php echo $dangerCategory['name'] ?>">
+                                    <img src="<?php echo DOL_URL_ROOT . '/custom/digiriskdolibarr/img/categorieDangers/' . $dangerCategory['thumbnail_name'] . '.png'?>" class="attachment-thumbail size-thumbnail photo photowithmargin" alt="" loading="lazy" width="48" height="48">
+                                </li>
+                            <?php endforeach;
+                        endif; ?>
+                    </ul>
+                </div>
+            <?php
+            print '</td><br>';
+            print '<td>' . $risk->getNomUrl(1) . '<br></td>';
+            print '<td>' . $risk->description . '<br></td>';
+            print '<td>' . $digiriskElement->getNomUrl(1, '', 0, '', -1, 1) . '<br></td>';
+            $button = '<input type="submit" class="wpeo-button button reposition" value="' . $langs->trans('RepairRisks') . '">';
+        }
+    } else {
+        print '<td class="opacitymedium">' . $langs->trans('NoRiskToRepair') . '</td>';
+        print '<td colspan=3></td>';
+        $button = '<div class="wpeo-button button-disable">' . $langs->trans('RepairRisks') . '</div>';
+    }
+
+    print '</tr>';
+    print '</table>';
+    print $button;
+    print '</form>';
 }
 
 // End of page
