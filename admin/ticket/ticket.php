@@ -65,6 +65,7 @@ $formother = new FormOther($db);
 $action     = GETPOST('action', 'alpha');
 $backtopage = GETPOST('backtopage', 'alpha');
 $value      = GETPOST('value', 'alpha');
+$pageY      = GETPOST('page_y', 'int');
 
 // Security check - Protection if external user
 $permissiontoread = $user->rights->digiriskdolibarr->adminpage->read;
@@ -82,7 +83,7 @@ if (($action == 'update' && ! GETPOST("cancel", 'alpha')) || ($action == 'update
 	setEventMessages($langs->transnoentities('TicketProjectUpdated'), array());
 
 	if ($action != 'updateedit') {
-		header("Location: " . $_SERVER["PHP_SELF"] . "?page_y=" . GETPOST("page_y"));
+		header('Location: ' . $_SERVER['PHP_SELF'] . '?page_y=' . $pageY);
 		exit;
 	}
 }
@@ -236,7 +237,7 @@ if ($action == 'createTimeRange') {
 
     if (empty($rangeNumberPost)) {
         setEventMessage($langs->trans('MissingRangeValue'), 'errors');
-        header("Location: " . $_SERVER["PHP_SELF"]);
+        header('Location: ' . $_SERVER['PHP_SELF'] . '?page_y=' . $pageY);
         exit;
     }
     if (dol_strlen($constraintLabel) == 0) {
@@ -253,7 +254,7 @@ if ($action == 'createTimeRange') {
 
     setEventMessages($langs->transnoentities('TimeRangeAdded'), array());
 
-    header("Location: " . $_SERVER["PHP_SELF"] . "?page_y=" . GETPOST("page_y"));
+    header('Location: ' . $_SERVER['PHP_SELF'] . '?page_y=' . $pageY);
     exit;
 }
 
@@ -269,7 +270,7 @@ if ($action == 'deleteTimeRange') {
 
     setEventMessages($langs->transnoentities('TimeRangeDeleted'), array());
 
-    header("Location: " . $_SERVER["PHP_SELF"] . "?page_y=" . GETPOST("page_y"));
+    header('Location: ' . $_SERVER['PHP_SELF'] . '?page_y=' . $pageY);
     exit;
 }
 
@@ -280,7 +281,7 @@ if ($action == 'set_multi_company_ticket_public_interface') {
     dolibarr_set_const($db, 'DIGIRISKDOLIBARR_TICKET_MULTI_COMPANY_PUBLIC_INTERFACE_SUBTITLE', $multiCompanyTicketPublicInterfaceSubtitle, 'chaine', 0, '', 0);
 
     setEventMessage('SavedConfig');
-    header('Location: ' . $_SERVER['PHP_SELF'] . '?page_y=' . GETPOST('page_y'));
+    header('Location: ' . $_SERVER['PHP_SELF'] . '?page_y=' . $pageY);
     exit;
 }
 
@@ -765,7 +766,7 @@ if ($conf->global->DIGIRISKDOLIBARR_TICKET_ENABLE_PUBLIC_INTERFACE == 1) {
 	print dolibarr_get_const($db, 'DIGIRISKDOLIBARR_TICKET_EXTRAFIELDS', 0) ? $langs->transnoentities('AlreadyGenerated') : $langs->transnoentities('NotCreated');
 	print '</td>';
 	print '<td class="center">';
-    print dolibarr_get_const($db, 'DIGIRISKDOLIBARR_TICKET_EXTRAFIELDS', 0) ? '<a type="" class=" butActionRefused" value="">'.$langs->transnoentities('Create') .'</a>' : '<input type="submit" class="button" value="'.$langs->transnoentities('Create') .'">' ;
+    print dolibarr_get_const($db, 'DIGIRISKDOLIBARR_TICKET_EXTRAFIELDS', 0) ? '<a type="" class=" butActionRefused" value="">'.$langs->transnoentities('Create') .'</a>' : '<input type="submit" class="button reposition" value="'.$langs->transnoentities('Create') .'">' ;
 	print '</td>';
 
 	print '<td class="center">';
@@ -857,7 +858,7 @@ if ($conf->global->DIGIRISKDOLIBARR_TICKET_ENABLE_PUBLIC_INTERFACE == 1) {
 		print '<input type="hidden" name="token" value="' . newToken() . '">';
 		print '<input type="hidden" name="action" value="generateQRCode">';
 		print '<input type="hidden" name="backtopage" value="' . $backtopage . '">';
-
+        print '<input type="hidden" name="page_y">';
 
 		print '<tr class="oddeven"><td>' . $langs->transnoentities("GenerateQRCode") . '</td>';
 
@@ -876,7 +877,7 @@ if ($conf->global->DIGIRISKDOLIBARR_TICKET_ENABLE_PUBLIC_INTERFACE == 1) {
 			print '<a class="clicked-photo-preview" href="'. $urladvanced .'">' . '<img width="200" src="'.DOL_URL_ROOT . '/custom/digiriskdolibarr/documents/viewimage.php?modulepart=digiriskdolibarr&entity=1&file=' . 'multicompany/ticketqrcode/' . $QRCode['name'] .'" alt="' . $langs->transnoentities("MultiEntityTicketPublicInterfaceQRCode") . '"></a>';
 			print '<a id="download" href="'.DOL_URL_ROOT . '/custom/digiriskdolibarr/documents/viewimage.php?modulepart=digiriskdolibarr&entity=1&file=' . 'multicompany/ticketqrcode/' . $QRCode['name'] .'" download="'.DOL_URL_ROOT . '/custom/digiriskdolibarr/documents/viewimage.php?modulepart=digiriskdolibarr'. '&file=' . 'multicompany/ticketqrcode/' . $QRCode['name'] .'"><i class="fas fa-download"></i></a>';
 		} else {
-			print '<input type="submit" class="button" value="'.$langs->transnoentities('Generate') .'">' ;
+			print '<input type="submit" class="button reposition" value="'.$langs->transnoentities('Generate') .'">' ;
 		}
 		print '</td>';
 
