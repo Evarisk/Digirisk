@@ -79,7 +79,7 @@ $numberingModuleName = [
 ];
 list($refTaskMod) = saturne_require_objects_mod($numberingModuleName, $moduleNameLowerCase);
 
-$upload_dir       = $conf->digiriskdolibarr->multidir_output[$conf->entity ?? 1];
+$upload_dir = $conf->digiriskdolibarr->multidir_output[$conf->entity ?? 1];
 
 $dangerCategories        = $risk->getDangerCategories();
 $risk->type              = 'riskenvironmental';
@@ -969,9 +969,9 @@ if ($user->rights->digiriskdolibarr->adminpage->read) {
 	print '</table>';
     print '</form>';
 
-    print load_fiche_titre($langs->trans("CorruptedCategoryOnRiskList"), '', '');
+    print load_fiche_titre($langs->trans('CorruptedCategoryOnRiskList'), '', '');
 
-    print '<form class="repair-category" name="repairCategory" id="repairCategory" action="' . $_SERVER["PHP_SELF"] . '" method="POST">';
+    print '<form class="repair-category" name="repairCategory" id="repairCategory" action="' . $_SERVER['PHP_SELF'] . '" method="POST">';
     print '<input type="hidden" name="token" value="' . newToken() . '">';
     print '<input type="hidden" name="action" value="repair_category">';
 
@@ -993,15 +993,15 @@ if ($user->rights->digiriskdolibarr->adminpage->read) {
             print '<td class="center">'
             ?>
                 <div class="wpeo-dropdown dropdown-large dropdown-grid category-danger padding" style="position: inherit">
-                    <input class="input-hidden-danger" type="hidden" name="<?php echo 'search_' . $key ?>"/>
+                    <input class="input-hidden-danger" type="hidden" name="<?php echo 'search_' . $key ?>" />
                         <div class="dropdown-toggle dropdown-add-button button-cotation">
                             <span class="wpeo-button button-square-50 button-grey"><i class="fas fa-exclamation-triangle button-icon"></i></span>
-                            <img class="danger-category-pic wpeo-tooltip-event hidden" src="" aria-label=""/>
+                            <img class="danger-category-pic wpeo-tooltip-event hidden" src="" aria-label="" />
                         </div>
                     <ul class="saturne-dropdown-content wpeo-gridlayout grid-5 grid-gap-0">
                         <?php
                         if ($risk->type == 'risk') {
-                            if (!empty($dangerCategories) ) :
+                            if (!empty($dangerCategories)) :
                                 foreach ($dangerCategories as $dangerCategory) : ?>
                                     <li class="item dropdown-item wpeo-tooltip-event classfortooltip" data-is-preset="<?php echo ''; ?>" data-id="<?php echo $dangerCategory['position'] ?>" aria-label="<?php echo $dangerCategory['name'] ?>">
                                         <img src="<?php echo DOL_URL_ROOT . '/custom/digiriskdolibarr/img/categorieDangers/' . $dangerCategory['thumbnail_name'] . '.png'?>" class="attachment-thumbail size-thumbnail photo photowithmargin" alt="" loading="lazy" width="48" height="48">
@@ -1009,7 +1009,7 @@ if ($user->rights->digiriskdolibarr->adminpage->read) {
                                 <?php endforeach;
                             endif;
                         } else {
-                            if (!empty($environmentalCategories) ) :
+                            if (!empty($environmentalCategories)) :
                                 foreach ($environmentalCategories as $environmentalCategory) : ?>
                                     <li class="item dropdown-item wpeo-tooltip-event classfortooltip" data-is-preset="<?php echo ''; ?>" data-id="<?php echo $environmentalCategory['position'] ?>" aria-label="<?php echo $environmentalCategory['name'] ?>">
                                         <img src="<?php echo DOL_URL_ROOT . '/custom/digiriskdolibarr/img/categorieDangers/' . $environmentalCategory['thumbnail_name'] . '.png'?>" class="attachment-thumbail size-thumbnail photo photowithmargin" alt="" loading="lazy" width="48" height="48">
@@ -1025,15 +1025,14 @@ if ($user->rights->digiriskdolibarr->adminpage->read) {
             print '<td>' . $langs->trans(ucfirst($risk->type)) . '</td>';
             print '<td>' . $risk->description . '</td>';
             print '<td>' . $digiriskElement->getNomUrl(1, '', 0, '', -1, 1) . '</td>';
-            $button = '<input type="submit" class="wpeo-button button reposition" value="' . $langs->trans('RepairRisks') . '">';
+            print '</tr>';
         }
+        $button = '<input type="submit" class="wpeo-button button reposition" value="' . $langs->trans('RepairRisks') . '">';
     } else {
-        print '<td class="opacitymedium">' . $langs->trans('NoRiskToRepair') . '</td>';
-        print '<td colspan=4></td>';
+        print '<tr class="oddeven"><td colspan="5" class="opacitymedium">' . $langs->trans('NoRiskToRepair') . '</td></tr>';
         $button = '<span class="butActionRefused">' . $langs->trans('RepairRisks') . '</span>';
     }
 
-    print '</tr>';
     print '</table>';
     print '<div class="tabsAction">';
     print $button;

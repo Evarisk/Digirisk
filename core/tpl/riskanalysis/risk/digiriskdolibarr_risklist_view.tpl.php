@@ -1027,6 +1027,16 @@ if ($action != 'list') {
 print '<div class="div-title-and-table-responsive">';
 print_barre_liste($title, $page, $_SERVER["PHP_SELF"], $param, $sortfield, $sortorder, $massactionbutton, $num, $nbtotalofrecords, $risk->picto, 0, $newcardbutton, '', $limit, 0, 0, 1);
 
+$corruptedRisks = saturne_fetch_all_object_type('Risk', '', '', 0, 0, ['customsql' => 't.category NOT BETWEEN 0 AND ' . count($dangerCategories) . ' AND t.type = "' . $riskType . '"']);
+
+if (is_array($corruptedRisks) && !empty($corruptedRisks)) {
+    print '<div class="wpeo-notice notice-warning notice-red">';
+    print '<div class="notice-content">';
+    print '<a href="' . dol_buildpath('/custom/digiriskdolibarr/view/digirisktools.php', 2) . '">' . '<div class="notice-subtitle"><b>' . $langs->trans('NumberOfRisksCorrupted', count($corruptedRisks)) . ' : ' . $langs->trans('RepairRisks') . '</b></div></a>';
+    print '</div>';
+    print '</div>';
+}
+
 include DOL_DOCUMENT_ROOT . '/core/tpl/massactions_pre.tpl.php';
 
 if ($search_all) {
@@ -1177,17 +1187,6 @@ print $hookmanager->resPrint;
 // Action column
 print getTitleFieldOfList($selectedfields, 0, $_SERVER["PHP_SELF"], '', '', '', '', $sortfield, $sortorder, 'center maxwidthsearch ') . "\n";
 print '</tr>' . "\n";
-
-$corruptedRisks = saturne_fetch_all_object_type('Risk', '', '', 0, 0, ['customsql' => 't.category NOT BETWEEN 0 AND ' . count($dangerCategories) . ' AND t.type = "' . $riskType . '"']);
-
-if (is_array($corruptedRisks) && !empty($corruptedRisks)) {
-    print '<div class="wpeo-notice notice-warning notice-red">';
-    print '<div class="notice-content">';
-    print '<a href="' . dol_buildpath('/custom/digiriskdolibarr/view/digirisktools.php', 2) . '">' . '<b><div class="notice-subtitle">'.$langs->trans('NumberOfRisksCorrupted', count($corruptedRisks)) . ' : ' . $langs->trans('RepairRisks') . '</b></a>';
-    print '</div>';
-    print '</div>';
-    print '</div>';
-}
 
 // Loop on record
 // --------------------------------------------------------------------
