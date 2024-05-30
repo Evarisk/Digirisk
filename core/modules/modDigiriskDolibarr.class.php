@@ -2030,140 +2030,81 @@ class modDigiriskdolibarr extends DolibarrModules
 			dolibarr_set_const($this->db, 'DIGIRISKDOLIBARR_ACTIVE_STANDARD', $standard_id, 'integer', 0, '', $conf->entity);
 		}
 
-		if ( $conf->global->DIGIRISKDOLIBARR_THIRDPARTY_SET == 0 ) {
-			require_once DOL_DOCUMENT_ROOT . '/societe/class/societe.class.php';
-			require_once __DIR__ . '/../../class/digiriskresources.class.php';
+        require_once DOL_DOCUMENT_ROOT . '/societe/class/societe.class.php';
+        require_once __DIR__ . '/../../class/digiriskresources.class.php';
 
-			$societe   = new Societe($this->db);
-			$resources = new DigiriskResources($this->db);
+        $societe   = new Societe($this->db);
+        $resources = new DigiriskResources($this->db);
 
-			$labour_doctor         = $societe;
-			$labour_doctor->name   = $langs->trans('LabourDoctorName') . ' - ' . $conf->global->MAIN_INFO_SOCIETE_NOM;
-			$labour_doctor->client = 0;
-			$labour_doctor->phone  = '';
-			$labour_doctor->url    = '';
-			$labour_doctorID       = $labour_doctor->create($user);
+        if (getDolGlobalInt('DIGIRISKDOLIBARR_THIRDPARTY_SET') == 0) {
+            $societe->name   = $langs->trans('SAMU') . ' - ' . $conf->global->MAIN_INFO_SOCIETE_NOM;
+            $societe->client = 0;
+            $societe->phone  = '15';
+            $societe->url    = '';
+            $samuID          = $societe->create($user);
 
-			$labour_inspector         = $societe;
-			$labour_inspector->name   = $langs->trans('LabourInspectorName') . ' - ' . $conf->global->MAIN_INFO_SOCIETE_NOM;
-			$labour_inspector->client = 0;
-			$labour_inspector->phone  = '';
-			$labour_inspector->url    = $langs->trans('UrlLabourInspector');
-			$labour_inspectorID       = $labour_inspector->create($user);
+            $societe->name   = $langs->trans('Pompiers') . ' - ' . $conf->global->MAIN_INFO_SOCIETE_NOM;
+            $societe->client = 0;
+            $societe->phone  = '18';
+            $societe->url    = '';
+            $pompiersID      = $societe->create($user);
 
-			$samu         = $societe;
-			$samu->name   = $langs->trans('SAMU') . ' - ' . $conf->global->MAIN_INFO_SOCIETE_NOM;
-			$samu->client = 0;
-			$samu->phone  = '15';
-			$samu->url    = '';
-			$samuID       = $samu->create($user);
+            $societe->name   = $langs->trans('Police') . ' - ' . $conf->global->MAIN_INFO_SOCIETE_NOM;
+            $societe->client = 0;
+            $societe->phone  = '17';
+            $societe->url    = '';
+            $policeID        = $societe->create($user);
 
-			$pompiers         = $societe;
-			$pompiers->name   = $langs->trans('Pompiers') . ' - ' . $conf->global->MAIN_INFO_SOCIETE_NOM;
-			$pompiers->client = 0;
-			$pompiers->phone  = '18';
-			$pompiers->url    = '';
-			$pompiersID       = $pompiers->create($user);
+            $societe->name   = $langs->trans('AllEmergencies') . ' - ' . $conf->global->MAIN_INFO_SOCIETE_NOM;
+            $societe->client = 0;
+            $societe->phone  = '112';
+            $societe->url    = '';
+            $emergencyID     = $societe->create($user);
 
-			$police         = $societe;
-			$police->name   = $langs->trans('Police') . ' - ' . $conf->global->MAIN_INFO_SOCIETE_NOM;
-			$police->client = 0;
-			$police->phone  = '17';
-			$police->url    = '';
-			$policeID       = $police->create($user);
+            $resources->setDigiriskResources($this->db, 1,  'Police',  'societe', [$policeID], $conf->entity);
+            $resources->setDigiriskResources($this->db, 1,  'SAMU',  'societe', [$samuID], $conf->entity);
+            $resources->setDigiriskResources($this->db, 1,  'Pompiers',  'societe', [$pompiersID], $conf->entity);
+            $resources->setDigiriskResources($this->db, 1,  'AllEmergencies',  'societe', [$emergencyID], $conf->entity);
 
-			$emergency         = $societe;
-			$emergency->name   = $langs->trans('AllEmergencies') . ' - ' . $conf->global->MAIN_INFO_SOCIETE_NOM;
-			$emergency->client = 0;
-			$emergency->phone  = '112';
-			$emergency->url    = '';
-			$emergencyID       = $emergency->create($user);
+            dolibarr_set_const($this->db, 'DIGIRISKDOLIBARR_THIRDPARTY_SET', 1, 'integer', 0, '', $conf->entity);
+        }
+        if (getDolGlobalInt('DIGIRISKDOLIBARR_THIRDPARTY_SET') == 1) {
+            //Install after 8.1.2
+            $societe->name     = $langs->trans('LabourInspectorName') . ' - ' . $conf->global->MAIN_INFO_SOCIETE_NOM;
+            $societe->client   = 0;
+            $societe->phone    = '';
+            $societe->url      = $langs->trans('UrlLabourInspector');
+            $labourInspectorID = $societe->create($user);
 
-			$rights_defender         = $societe;
-			$rights_defender->name   = $langs->trans('RightsDefender') . ' - ' . $conf->global->MAIN_INFO_SOCIETE_NOM;
-			$rights_defender->client = 0;
-			$rights_defender->phone  = '';
-			$rights_defender->url    = '';
-			$rights_defenderID       = $rights_defender->create($user);
+            $societe->name    = $langs->trans('RightsDefender') . ' - ' . $conf->global->MAIN_INFO_SOCIETE_NOM;
+            $societe->client  = 0;
+            $societe->phone   = '';
+            $societe->url     = '';
+            $rightsDefenderID = $societe->create($user);
 
-			$poison_control_center         = $societe;
-			$poison_control_center->name   = $langs->trans('PoisonControlCenter') . ' - ' . $conf->global->MAIN_INFO_SOCIETE_NOM;
-			$poison_control_center->client = 0;
-			$poison_control_center->phone  = '';
-			$poison_control_center->url    = '';
-			$poison_control_centerID       = $poison_control_center->create($user);
+            $societe->name         = $langs->trans('PoisonControlCenter') . ' - ' . $conf->global->MAIN_INFO_SOCIETE_NOM;
+            $societe->client       = 0;
+            $societe->phone        = '';
+            $societe->url          = '';
+            $poisonControlCenterID = $societe->create($user);
 
-			$resources->setDigiriskResources($this->db, 1,  'LabourDoctorSociety',  'societe', [$labour_doctorID], $conf->entity);
-			$resources->setDigiriskResources($this->db, 1,  'LabourInspectorSociety',  'societe', [$labour_inspectorID], $conf->entity);
-			$resources->setDigiriskResources($this->db, 1,  'Police',  'societe', [$policeID], $conf->entity);
-			$resources->setDigiriskResources($this->db, 1,  'SAMU',  'societe', [$samuID], $conf->entity);
-			$resources->setDigiriskResources($this->db, 1,  'Pompiers',  'societe', [$pompiersID], $conf->entity);
-			$resources->setDigiriskResources($this->db, 1,  'AllEmergencies',  'societe', [$emergencyID], $conf->entity);
-			$resources->setDigiriskResources($this->db, 1,  'RightsDefender',  'societe', [$rights_defenderID], $conf->entity);
-			$resources->setDigiriskResources($this->db, 1,  'PoisonControlCenter',  'societe', [$poison_control_centerID], $conf->entity);
+            $resources->setDigiriskResources($this->db, 1,  'LabourInspectorSociety',  'societe', [$labourInspectorID], $conf->entity);
+            $resources->setDigiriskResources($this->db, 1,  'RightsDefender',  'societe', [$rightsDefenderID], $conf->entity);
+            $resources->setDigiriskResources($this->db, 1,  'PoisonControlCenter',  'societe', [$poisonControlCenterID], $conf->entity);
 
-			dolibarr_set_const($this->db, 'DIGIRISKDOLIBARR_THIRDPARTY_SET', 3, 'integer', 0, '', $conf->entity);
-		} elseif ($conf->global->DIGIRISKDOLIBARR_THIRDPARTY_SET == 1) {
-			//Install after 8.1.2
+            dolibarr_set_const($this->db, 'DIGIRISKDOLIBARR_THIRDPARTY_SET', 2, 'integer', 0, '', $conf->entity);
+        }
+        if (getDolGlobalInt('DIGIRISKDOLIBARR_THIRDPARTY_SET') == 2) {
+            $societe->name   = $langs->trans('LabourDoctorName') . ' - ' . $conf->global->MAIN_INFO_SOCIETE_NOM;
+            $societe->client = 0;
+            $societe->phone  = '';
+            $societe->url    = '';
+            $labourDoctorID  = $societe->create($user);
 
-			require_once DOL_DOCUMENT_ROOT . '/societe/class/societe.class.php';
-			require_once __DIR__ . '/../../class/digiriskresources.class.php';
+            $resources->setDigiriskResources($this->db, 1,  'LabourDoctorSociety',  'societe', [$labourDoctorID], $conf->entity);
 
-			$societe   = new Societe($this->db);
-			$resources = new DigiriskResources($this->db);
-
-			$labour_doctor         = $societe;
-			$labour_doctor->name   = $langs->trans('LabourDoctorName') . ' - ' . $conf->global->MAIN_INFO_SOCIETE_NOM;
-			$labour_doctor->client = 0;
-			$labour_doctor->phone  = '';
-			$labour_doctor->url    = '';
-			$labour_doctorID       = $labour_doctor->create($user);
-
-			$labour_inspector         = $societe;
-			$labour_inspector->name   = $langs->trans('LabourInspectorName') . ' - ' . $conf->global->MAIN_INFO_SOCIETE_NOM;
-			$labour_inspector->client = 0;
-			$labour_inspector->phone  = '';
-			$labour_inspector->url    = $langs->trans('UrlLabourInspector');
-			$labour_inspectorID       = $labour_inspector->create($user);
-
-			$rights_defender         = $societe;
-			$rights_defender->name   = $langs->transnoentities('RightsDefender') . ' - ' . $conf->global->MAIN_INFO_SOCIETE_NOM;
-			$rights_defender->client = 0;
-			$rights_defender->phone  = '';
-			$rights_defender->url    = '';
-			$rights_defenderID       = $rights_defender->create($user);
-
-			$poison_control_center         = $societe;
-			$poison_control_center->name   = $langs->trans('PoisonControlCenter') . ' - ' . $conf->global->MAIN_INFO_SOCIETE_NOM;
-			$poison_control_center->client = 0;
-			$poison_control_center->phone  = '';
-			$poison_control_center->url    = '';
-			$poison_control_centerID       = $poison_control_center->create($user);
-
-			$resources->setDigiriskResources($this->db, 1,  'LabourDoctorSociety',  'societe', [$labour_doctorID], $conf->entity);
-			$resources->setDigiriskResources($this->db, 1,  'LabourInspectorSociety',  'societe', [$labour_inspectorID], $conf->entity);
-			$resources->setDigiriskResources($this->db, 1,  'RightsDefender',  'societe', [$rights_defenderID], $conf->entity);
-			$resources->setDigiriskResources($this->db, 1,  'PoisonControlCenter',  'societe', [$poison_control_centerID], $conf->entity);
-
-			dolibarr_set_const($this->db, 'DIGIRISKDOLIBARR_THIRDPARTY_SET', 3, 'integer', 0, '', $conf->entity);
-		} elseif ($conf->global->DIGIRISKDOLIBARR_THIRDPARTY_SET == 2) {
-			require_once DOL_DOCUMENT_ROOT . '/societe/class/societe.class.php';
-			require_once __DIR__ . '/../../class/digiriskresources.class.php';
-
-			$societe   = new Societe($this->db);
-			$resources = new DigiriskResources($this->db);
-
-			$labour_doctor         = $societe;
-			$labour_doctor->name   = $langs->trans('LabourDoctorName') . ' - ' . $conf->global->MAIN_INFO_SOCIETE_NOM;
-			$labour_doctor->client = 0;
-			$labour_doctor->phone  = '';
-			$labour_doctor->url    = '';
-			$labour_doctorID       = $labour_doctor->create($user);
-
-			$resources->setDigiriskResources($this->db, 1,  'LabourDoctorSociety',  'societe', [$labour_doctorID], $conf->entity);
-
-			dolibarr_set_const($this->db, 'DIGIRISKDOLIBARR_THIRDPARTY_SET', 3, 'integer', 0, '', $conf->entity);
-		}
+            dolibarr_set_const($this->db, 'DIGIRISKDOLIBARR_THIRDPARTY_SET', 3, 'integer', 0, '', $conf->entity);
+        }
 
         if (getDolGlobalInt('DIGIRISKDOLIBARR_CONTACTS_SET') == 0) {
             require_once DOL_DOCUMENT_ROOT . '/contact/class/contact.class.php';
@@ -2330,78 +2271,56 @@ class modDigiriskdolibarr extends DolibarrModules
 			dolibarr_set_const($this->db, 'DIGIRISKDOLIBARR_DIGIRISKELEMENT_MEDIAS_BACKWARD_COMPATIBILITY', 1, 'integer', 0, '', $conf->entity);
 		}
 
-		//Categorie
-		if ($conf->global->DIGIRISKDOLIBARR_PROJECT_TAGS_SET == 0) {
-			require_once DOL_DOCUMENT_ROOT . '/categories/class/categorie.class.php';
+        //Categorie
+        require_once DOL_DOCUMENT_ROOT . '/categories/class/categorie.class.php';
 
-			$tags = new Categorie($this->db);
+        $tags = new Categorie($this->db);
 
-			$tags->label = 'QHSE';
-			$tags->type  = 'project';
-			$tag_id      = $tags->create($user);
+        if (getDolGlobalInt('DIGIRISKDOLIBARR_PROJECT_TAGS_SET') == 0) {
+            $tags->label = 'QHSE';
+            $tags->type  = 'project';
+            $tagID       = $tags->create($user);
 
-			$tags->label     = 'DU';
-			$tags->type      = 'project';
-			$tags->fk_parent = $tag_id;
-			$tags->create($user);
+            $tags->label     = 'DU';
+            $tags->type      = 'project';
+            $tags->fk_parent = $tagID;
+            $tags->create($user);
 
-			$tags->label     = 'PP';
-			$tags->type      = 'project';
-			$tags->fk_parent = $tag_id;
-			$tags->create($user);
+            $tags->label     = 'PP';
+            $tags->type      = 'project';
+            $tags->fk_parent = $tagID;
+            $tags->create($user);
 
-			$tags->label     = 'FP';
-			$tags->type      = 'project';
-			$tags->fk_parent = $tag_id;
-			$tags->create($user);
+            $tags->label     = 'ACC';
+            $tags->type      = 'project';
+            $tags->fk_parent = $tagID;
+            $tags->create($user);
 
-			$tags->label     = 'ACC';
-			$tags->type      = 'project';
-			$tags->fk_parent = $tag_id;
-			$tags->create($user);
+            dolibarr_set_const($this->db, 'DIGIRISKDOLIBARR_PROJECT_TAGS_SET', 3, 'integer', 0, '', $conf->entity);
+        }
+        if (getDolGlobalInt('DIGIRISKDOLIBARR_PROJECT_TAGS_SET') == 1) {
+            //Install after 8.3.0
+            $tags->fetch('', 'QHSE');
 
-			$tags->label     = 'TS';
-			$tags->type      = 'project';
-			$tags->fk_parent = $tag_id;
-			$tags->create($user);
+            $tags->label     = 'FP';
+            $tags->type      = 'project';
+            $tags->fk_parent = $tags->id;
+            $tags->create($user);
 
-			dolibarr_set_const($this->db, 'DIGIRISKDOLIBARR_PROJECT_TAGS_SET', 3, 'integer', 0, '', $conf->entity);
-		} elseif ($conf->global->DIGIRISKDOLIBARR_PROJECT_TAGS_SET == 1) {
-			//Install after 8.3.0
+            dolibarr_set_const($this->db, 'DIGIRISKDOLIBARR_PROJECT_TAGS_SET', 2, 'integer', 0, '', $conf->entity);
+        }
+        if (getDolGlobalInt('DIGIRISKDOLIBARR_PROJECT_TAGS_SET') == 2) {
+            //Install after 9.3.0
+            $tags->fetch('', 'QHSE');
+            $tags->label     = 'TS';
+            $tags->type      = 'project';
+            $tags->fk_parent = $tags->id;
+            $tags->create($user);
 
-			require_once DOL_DOCUMENT_ROOT . '/categories/class/categorie.class.php';
-
-			$tags = new Categorie($this->db);
-
-			$tags->fetch('', 'QHSE');
-
-			$tags->label     = 'FP';
-			$tags->type      = 'project';
-			$tags->fk_parent = $tags->id;
-			$tags->create($user);
-
-			dolibarr_set_const($this->db, 'DIGIRISKDOLIBARR_PROJECT_TAGS_SET', 2, 'integer', 0, '', $conf->entity);
-		} elseif ($conf->global->DIGIRISKDOLIBARR_PROJECT_TAGS_SET == 2) {
-			//Install after 9.3.0
-
-			require_once DOL_DOCUMENT_ROOT . '/categories/class/categorie.class.php';
-
-			$tags = new Categorie($this->db);
-
-			$tags->fetch('', 'QHSE');
-			$tags->label     = 'TS';
-			$tags->type      = 'project';
-			$tags->fk_parent = $tags->id;
-			$tags->create($user);
-
-			dolibarr_set_const($this->db, 'DIGIRISKDOLIBARR_PROJECT_TAGS_SET', 3, 'integer', 0, '', $conf->entity);
-		} elseif ($conf->global->DIGIRISKDOLIBARR_PROJECT_TAGS_SET == 3) {
+            dolibarr_set_const($this->db, 'DIGIRISKDOLIBARR_PROJECT_TAGS_SET', 3, 'integer', 0, '', $conf->entity);
+        }
+        if (getDolGlobalInt('DIGIRISKDOLIBARR_PROJECT_TAGS_SET') == 3) {
             //Install after 10.0.0
-
-            require_once DOL_DOCUMENT_ROOT . '/categories/class/categorie.class.php';
-
-            $tags = new Categorie($this->db);
-
             $tags->fetch('', 'QHSE');
             $tags->label     = 'ENV';
             $tags->type      = 'project';
@@ -2531,7 +2450,8 @@ class modDigiriskdolibarr extends DolibarrModules
 		dolibarr_set_const($this->db, "MULTICOMPANY_EXTERNAL_MODULES_SHARING", $jsonformat, 'json', 0, '', 0);
 
         // BACKWARD NUM REF
-        if ($conf->global->DIGIRISKDOLIBARR_CUSTOM_NUM_REF_SET == 0) {
+        $objectTypeAndMod = [];
+        if (getDolGlobalInt('DIGIRISKDOLIBARR_CUSTOM_NUM_REF_SET') == 0) {
             $objectTypeAndMod = [
                 'Risk'                  => ['tarqeq', 'RK{0}'],
                 'RiskAssessment'        => ['jarnsaxa', 'RA{0}'],
@@ -2564,15 +2484,15 @@ class modDigiriskdolibarr extends DolibarrModules
             ];
 
             dolibarr_set_const($this->db, 'DIGIRISKDOLIBARR_CUSTOM_NUM_REF_SET', 1, 'integer', 0, '', $conf->entity);
-        } else if ($conf->global->DIGIRISKDOLIBARR_CUSTOM_NUM_REF_SET > 0 || $conf->global->DIGIRISKDOLIBARR_CUSTOM_NUM_REF_SET < 3) {
+        }
+        if (getDolGlobalInt('DIGIRISKDOLIBARR_CUSTOM_NUM_REF_SET') > 0 || getDolGlobalInt('DIGIRISKDOLIBARR_CUSTOM_NUM_REF_SET') < 3) {
             $objectTypeAndMod['RegisterDocument']                = ['thiazzi', 'RD{0}'];
             $objectTypeAndMod['ListingRisksDocument']            = ['calypso', 'RLD{0}'];
             $objectTypeAndMod['AuditReportDocument']             = ['lindberg', 'ARD{0}'];
             $objectTypeAndMod['ListingRisksEnvironmentalAction'] = ['jocaste', 'RLE{0}'];
             dolibarr_set_const($this->db, 'DIGIRISKDOLIBARR_CUSTOM_NUM_REF_SET', 3, 'integer', 0, '', $conf->entity);
         }
-
-        if ($conf->global->DIGIRISKDOLIBARR_CUSTOM_NUM_REF_SET >= 0) {
+        if (getDolGlobalInt('DIGIRISKDOLIBARR_CUSTOM_NUM_REF_SET') >= 0) {
             foreach($objectTypeAndMod as $type => $mod) {
                 $confNumRef    = 'DIGIRISKDOLIBARR_' . strtoupper($type) . '_' . strtoupper($mod[0]) . '_ADDON';
                 $confObjectRef = 'DIGIRISKDOLIBARR_' . strtoupper($type) . '_ADDON';
