@@ -323,13 +323,10 @@ foreach ($search as $key => $val) {
 include DOL_DOCUMENT_ROOT . '/core/tpl/extrafields_list_search_param.tpl.php';
 
 // List of mass actions available
-$arrayofmassactions = array();
+$arrayofmassactions = [];
+$massactionbutton   = $form->selectMassAction('', $arrayofmassactions);
 
-if ($action != 'list') {
-	$massactionbutton = $form->selectMassAction('', $arrayofmassactions);
-} ?>
-
-<?php $title = $langs->trans('DigiriskElementShared' . ucfirst($riskType) . 'sList');
+$title = $langs->trans('DigiriskElementShared' . ucfirst($riskType) . 'sList');
 print_barre_liste($title, $page, $_SERVER["PHP_SELF"], $param, $sortfield, $sortorder, $massactionbutton, $num, $nbtotalofrecords, 'digiriskdolibarr_color.png@digiriskdolibarr', 0, '', '', $limit, 0, 0, 1);
 
 include DOL_DOCUMENT_ROOT . '/core/tpl/massactions_pre.tpl.php';

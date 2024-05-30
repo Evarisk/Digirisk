@@ -294,11 +294,8 @@
 	include DOL_DOCUMENT_ROOT . '/core/tpl/extrafields_list_search_param.tpl.php';
 
 	// List of mass actions available
-	$arrayofmassactions = array();
-
-	if ($action != 'list') {
-		$massactionbutton = $form->selectMassAction('', $arrayofmassactions);
-	}
+	$arrayofmassactions = [];
+    $massactionbutton   = $form->selectMassAction('', $arrayofmassactions);
 
 	$title = $langs->trans('DigiriskElementInherited' . ucfirst($riskType) . 'sList');
 	print_barre_liste($title, $page, $_SERVER["PHP_SELF"], $param, $sortfield, $sortorder, $massactionbutton, $num, $nbtotalofrecords, 'digiriskdolibarr_color.png@digiriskdolibarr', 0, '', '', $limit, 0, 0, 1);

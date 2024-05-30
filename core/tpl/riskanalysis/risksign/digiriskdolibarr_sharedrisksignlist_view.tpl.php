@@ -192,11 +192,8 @@ foreach ($search as $key => $val) {
 include DOL_DOCUMENT_ROOT . '/core/tpl/extrafields_list_search_param.tpl.php';
 
 // List of mass actions available
-$arrayofmassactions                                       = array();
-
-if ($action != 'list') {
-	$massactionbutton = $form->selectMassAction('', $arrayofmassactions);
-} ?>
+$arrayofmassactions = [];
+$massactionbutton   = $form->selectMassAction('', $arrayofmassactions); ?>
 
 	<!-- BUTTON MODAL RISKSIGN ADD -->
 <?php if ($permissiontoadd) {

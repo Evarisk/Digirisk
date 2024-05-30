@@ -574,13 +574,15 @@ foreach ($search as $key => $val) {
 include DOL_DOCUMENT_ROOT . '/core/tpl/extrafields_list_search_param.tpl.php';
 
 // List of mass actions available
-$arrayofmassactions                                       = array();
-if ($permissiontodelete) $arrayofmassactions['predelete'] = '<span class="fa fa-trash paddingrightonly"></span>' . $langs->trans("Delete");
+$arrayofmassactions = [];
+if ($permissiontodelete) {
+    $arrayofmassactions['predelete'] = '<span class="fa fa-trash paddingrightonly"></span>' . $langs->trans("Delete");
+}
 
-if ($action != 'list') {
-	$massactionbutton = $form->selectMassAction('', $arrayofmassactions);
-} ?>
-<?php if ( ! $allRisks) : ?>
+$massactionbutton = $form->selectMassAction('', $arrayofmassactions);
+
+?>
+<?php if (!$allRisks) : ?>
 	<!-- BUTTON MODAL RISK ADD -->
 	<?php if ($permissiontoadd) {
 		$newcardbutton = '<div class="risk-add wpeo-button button-square-40 button-blue wpeo-tooltip-event modal-open"  aria-label="' . $langs->trans('AddRisk') . '"  value="' . $object->id . '">';
