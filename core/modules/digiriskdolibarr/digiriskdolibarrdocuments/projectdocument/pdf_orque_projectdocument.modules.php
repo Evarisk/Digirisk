@@ -443,15 +443,15 @@ class pdf_orque_projectdocument
 					$pdf->SetXY($this->posxlabel, $curY);
 					$pdf->MultiCell($this->posxbudget - $this->posxlabel, 3, $outputLangs->convToOutputCharset($libelleline), 0, 'L');
 					$pageposafter = $pdf->getPage();
-					if ($pageposafter > $pageposbefore) {	// There is a pagebreak
+					if ($pageposafter > $pageposbefore) { // There is a pagebreak
 						$pdf->rollbackTransaction(true);
 						$pageposafter = $pageposbefore;
-						//print $pageposafter.'-'.$pageposbefore;exit;
 						$pdf->setPageOrientation($this->orientation, 1, $heightforfooter); // The only function to edit the bottom margin of current page to set it.
+
 						// Label
 						$pdf->SetXY($this->posxlabel, $curY);
 						$posybefore = $pdf->GetY();
-						$pdf->MultiCell($this->posxworkload - $this->posxlabel, 3, $outputLangs->convToOutputCharset($libelleline), 0, 'L');
+						$pdf->MultiCell($this->posxbudget - $this->posxlabel, 3, $outputLangs->convToOutputCharset($libelleline), 0, 'L');
 						$pageposafter = $pdf->getPage();
 						$posyafter = $pdf->GetY();
 						if ($posyafter > ($this->page_hauteur - ($heightforfooter + $heightforfreetext + $heightforinfotot))) {	// There is no space left for total+free text
@@ -504,12 +504,10 @@ class pdf_orque_projectdocument
 								$posyafter = $pdf->GetY();
 							}
 						}
-						//var_dump($i.' '.$posybefore.' '.$posyafter.' '.($this->page_hauteur -  ($heightforfooter + $heightforfreetext + $heightforinfotot)).' '.$showpricebeforepagebreak);
-					} else // No pagebreak
-					{
-						$pdf->commitTransaction();
+					} else {
+                        // No pagebreak
+                        $pdf->commitTransaction();
 					}
-					$posYAfterDescription = $pdf->GetY();
 
 					$nexY = $pdf->GetY();
 					$pageposafter = $pdf->getPage();
@@ -519,7 +517,6 @@ class pdf_orque_projectdocument
 
 					// We suppose that a too long description is moved completely on next page
 					if ($pageposafter > $pageposbefore && empty($showpricebeforepagebreak)) {
-						//var_dump($pageposbefore.'-'.$pageposafter.'-'.$showpricebeforepagebreak);
 						$pdf->setPage($pageposafter);
 						$curY = $tab_top_newpage + $heightoftitleline + 1;
 					}
