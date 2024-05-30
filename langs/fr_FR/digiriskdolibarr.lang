@@ -1004,6 +1004,7 @@ RisksRepartitionByDigiriskElement                = Répartition des risques par 
 
 # Data - Donnée
 Environment                                    = Environnement
+Riskenvironmental                              = Risque environnemental
 RiskEnvironmentals                             = Risques environnementaux
 Riskenvironmentals                             = Risques environnementaux
 DigiriskElementRiskenvironmentalsList          = Liste des risques environnementaux

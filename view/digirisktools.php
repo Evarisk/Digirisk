@@ -792,7 +792,7 @@ if ($action == 'repair_category') {
     if (is_array($_POST) && !empty($_POST)) {
         $errors = [];
         foreach($_POST as $key => $value) {
-            if (strstr($key, 'search_') && !empty($value) && $value >= 0 && $value <= count($dangerCategories)) {
+            if (strstr($key, 'search_') && dol_strlen($value) > 0 && $value >= 0 && $value <= count($dangerCategories)) {
                 $riskId = trim($key, 'search_');
                 $risk->fetch($riskId);
                 $result = $risk->setValueFrom('category', $value);
@@ -979,6 +979,7 @@ if ($user->rights->digiriskdolibarr->adminpage->read) {
     print '<tr class="liste_titre">';
     print '<td class="center">' . $langs->trans('RiskCategory') . '</td>';
     print '<td>' . $langs->trans('Risk') . '</td>';
+    print '<td>' . $langs->trans('Type') . '</td>';
     print '<td>' . $langs->trans('Description') . '</td>';
     print '<td>' . $langs->trans('DigiriskElement') . '</td>';
     print '</tr>';
@@ -1020,14 +1021,15 @@ if ($user->rights->digiriskdolibarr->adminpage->read) {
                 </div>
             <?php
             print '</td>';
-            print '<td>' . $risk->getNomUrl(1) . '</td>';
+            print '<td>' . $risk->getNomUrl(1, 'nolink') . '</td>';
+            print '<td>' . $langs->trans(ucfirst($risk->type)) . '</td>';
             print '<td>' . $risk->description . '</td>';
             print '<td>' . $digiriskElement->getNomUrl(1, '', 0, '', -1, 1) . '</td>';
             $button = '<input type="submit" class="wpeo-button button reposition" value="' . $langs->trans('RepairRisks') . '">';
         }
     } else {
         print '<td class="opacitymedium">' . $langs->trans('NoRiskToRepair') . '</td>';
-        print '<td colspan=3></td>';
+        print '<td colspan=4></td>';
         $button = '<span class="butActionRefused">' . $langs->trans('RepairRisks') . '</span>';
     }
 
