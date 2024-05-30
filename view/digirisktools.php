@@ -1019,10 +1019,10 @@ if ($user->rights->digiriskdolibarr->adminpage->read) {
                     </ul>
                 </div>
             <?php
-            print '</td><br>';
-            print '<td>' . $risk->getNomUrl(1) . '<br></td>';
-            print '<td>' . $risk->description . '<br></td>';
-            print '<td>' . $digiriskElement->getNomUrl(1, '', 0, '', -1, 1) . '<br></td>';
+            print '</td>';
+            print '<td>' . $risk->getNomUrl(1) . '</td>';
+            print '<td>' . $risk->description . '</td>';
+            print '<td>' . $digiriskElement->getNomUrl(1, '', 0, '', -1, 1) . '</td>';
             $button = '<input type="submit" class="wpeo-button button reposition" value="' . $langs->trans('RepairRisks') . '">';
         }
     } else {
