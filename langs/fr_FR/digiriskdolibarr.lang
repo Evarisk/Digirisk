@@ -1004,6 +1004,7 @@ RisksRepartitionByDigiriskElement                = Répartition des risques par 
 
 # Data - Donnée
 Environment                                    = Environnement
+Riskenvironmental                              = Risque environnemental
 RiskEnvironmentals                             = Risques environnementaux
 Riskenvironmentals                             = Risques environnementaux
 DigiriskElementRiskenvironmentalsList          = Liste des risques environnementaux
@@ -1444,6 +1445,11 @@ AdvancedImport                               = Import avancé
 AdvancedImportDescription                    = Permet d'importer chaque élément indépendamment (Arborescence, risques et signalisations)
 DataMigrationWordPressToDolibarr             = Migration des données de WordPress vers Dolibarr
 DataMigrationDolibarrToDolibarr              = Migration des données de Dolibarr vers Dolibarr
+RepairRisks                                  = Réparer les risques
+NumberOfRisksCorrupted                       = Vous avez %s risque(s) dont la catégorie est corrompue, allez sur la page "Outils" pour le(s) réparer
+NoRiskToRepair                               = Aucun risque à réparer
+RiskSuccessfullyRepaired                     = Risques réparés avec succès
+CorruptedCategoryOnRiskList                  = Liste des risques dont la catégorie est corrompue
 
 #
 # Other

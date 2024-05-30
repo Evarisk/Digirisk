@@ -315,6 +315,7 @@ $taskNextValue             = $refTaskMod->getNextValue('', $task);
 $usertmp->fetchAll();
 $usersList                 = $usertmp->users;
 $timeSpentSortedByTasks    = $digiriskTask->fetchAllTimeSpentAllUsers('AND fk_element > 0', 'element_datehour', 'DESC', 1);
+$dangerCategories          = $risk->getDangerCategories();
 
 $riskAssessment->ismultientitymanaged = 1;
 
@@ -633,7 +634,6 @@ $massactionbutton = $form->selectMassAction('', $arrayofmassactions);
 								</div>
 								<ul class="saturne-dropdown-content wpeo-gridlayout grid-5 grid-gap-0">
 									<?php
-									$dangerCategories = $risk->getDangerCategories();
 									if ( ! empty($dangerCategories) ) :
 										foreach ($dangerCategories as $dangerCategory) : ?>
 											<li class="item dropdown-item wpeo-tooltip-event" data-is-preset="<?php echo ''; ?>" data-id="<?php echo $dangerCategory['position'] ?>" aria-label="<?php echo $dangerCategory['name'] ?>">
@@ -837,7 +837,6 @@ $massactionbutton = $form->selectMassAction('', $arrayofmassactions);
 							</div>
 							<ul class="saturne-dropdown-content wpeo-gridlayout grid-5 grid-gap-0">
 								<?php
-								$dangerCategories = $risk->getDangerCategories();
 								if ( ! empty($dangerCategories) ) :
 									foreach ($dangerCategories as $dangerCategory) : ?>
 										<li class="item dropdown-item wpeo-tooltip-event" data-is-preset="<?php echo ''; ?>" data-id="<?php echo $dangerCategory['position'] ?>" aria-label="<?php echo $dangerCategory['name'] ?>">
@@ -1030,6 +1029,16 @@ $massactionbutton = $form->selectMassAction('', $arrayofmassactions);
 print '<div class="div-title-and-table-responsive">';
 print_barre_liste($title, $page, $_SERVER["PHP_SELF"], $param, $sortfield, $sortorder, $massactionbutton, $num, $nbtotalofrecords, $risk->picto, 0, $newcardbutton, '', $limit, 0, 0, 1);
 
+$corruptedRisks = saturne_fetch_all_object_type('Risk', '', '', 0, 0, ['customsql' => 't.category NOT BETWEEN 0 AND ' . count($dangerCategories) . ' AND t.type = "' . $riskType . '"']);
+
+if (is_array($corruptedRisks) && !empty($corruptedRisks)) {
+    print '<div class="wpeo-notice notice-warning notice-red">';
+    print '<div class="notice-content">';
+    print '<a href="' . dol_buildpath('/custom/digiriskdolibarr/view/digirisktools.php', 2) . '">' . '<div class="notice-subtitle"><b>' . $langs->trans('NumberOfRisksCorrupted', count($corruptedRisks)) . ' : ' . $langs->trans('RepairRisks') . '</b></div></a>';
+    print '</div>';
+    print '</div>';
+}
+
 include DOL_DOCUMENT_ROOT . '/core/tpl/massactions_pre.tpl.php';
 
 if ($search_all) {
@@ -1113,7 +1122,6 @@ foreach ($risk->fields as $key => $val) {
 				<?php endif; ?>
 				<ul class="saturne-dropdown-content wpeo-gridlayout grid-5 grid-gap-0">
 					<?php
-					$dangerCategories = $risk->getDangerCategories();
 					if ( ! empty($dangerCategories) ) :
 						foreach ($dangerCategories as $dangerCategory) : ?>
 							<li class="item dropdown-item wpeo-tooltip-event classfortooltip" data-is-preset="<?php echo ''; ?>" data-id="<?php echo $dangerCategory['position'] ?>" aria-label="<?php echo $dangerCategory['name'] ?>">
@@ -1286,7 +1294,6 @@ while ($i < ($limit ? min($num, $limit) : $num)) {
 												<?php if ($conf->global->DIGIRISKDOLIBARR_RISK_CATEGORY_EDIT) : ?>
 												<ul class="saturne-dropdown-content wpeo-gridlayout grid-5 grid-gap-0">
 													<?php
-													$dangerCategories = $risk->getDangerCategories();
 													if ( ! empty($dangerCategories) ) :
 														foreach ($dangerCategories as $dangerCategory) : ?>
 															<li class="item dropdown-item wpeo-tooltip-event classfortooltip" data-is-preset="<?php echo ''; ?>" data-id="<?php echo $dangerCategory['position'] ?>" aria-label="<?php echo $dangerCategory['name'] ?>">
