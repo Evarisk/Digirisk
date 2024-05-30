@@ -428,10 +428,7 @@ if ($object->id > 0 || $fromid > 0) {
 	// List of mass actions available
 	$arrayofmassactions                                       = array();
 	if ($permissiontodelete) $arrayofmassactions['predelete'] = '<span class="fa fa-trash paddingrightonly"></span>' . $langs->trans("Delete");
-
-	if ($action != 'list') {
-		$massactionbutton = $form->selectMassAction('', $arrayofmassactions);
-	} ?>
+    $massactionbutton = $form->selectMassAction('', $arrayofmassactions); ?>
 
 	<!-- BUTTON MODAL EVALUATOR ADD -->
 	<?php if ($permissiontoadd) {

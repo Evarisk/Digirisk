@@ -149,12 +149,9 @@ foreach ($search as $key => $val) {
 include DOL_DOCUMENT_ROOT . '/core/tpl/extrafields_list_search_param.tpl.php';
 
 // List of mass actions available
-$arrayofmassactions                                       = array();
+$arrayofmassactions                                       = [];
 if ($permissiontodelete) $arrayofmassactions['predelete'] = '<span class="fa fa-trash paddingrightonly"></span>' . $langs->trans("Delete");
-
-if ($action != 'list') {
-	$massactionbutton = $form->selectMassAction('', $arrayofmassactions);
-} ?>
+$massactionbutton = $form->selectMassAction('', $arrayofmassactions); ?>
 
 	<!-- BUTTON MODAL RISKSIGN ADD -->
 <?php if ($permissiontoadd) {
