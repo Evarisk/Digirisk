@@ -1445,6 +1445,7 @@ AdvancedImportDescription                    = Permet d'importer chaque élémen
 DataMigrationWordPressToDolibarr             = Migration des données de WordPress vers Dolibarr
 DataMigrationDolibarrToDolibarr              = Migration des données de Dolibarr vers Dolibarr
 RepairRisks                                  = Réparer les risques
+NumberOfRisksCorrupted                       = Vous avez %s risque(s) dont la catégorie est corrompue, allez sur la page "Outils" pour le(s) réparer
 NoRiskToRepair                               = Aucun risque à réparer
 RiskSuccessfullyRepaired                     = Risques réparés avec succès
 CorruptedCategoryOnRiskList                  = Liste des risques dont la catégorie est corrompue

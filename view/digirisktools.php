@@ -30,7 +30,7 @@ if (file_exists('../digiriskdolibarr.main.inc.php')) {
 	die('Include of digiriskdolibarr main fails');
 }
 
-global $conf, $db, $langs, $user;
+global $conf, $db, $langs, $moduleNameLowerCase, $user;
 
 require_once DOL_DOCUMENT_ROOT . '/core/lib/admin.lib.php';
 require_once DOL_DOCUMENT_ROOT . '/core/lib/images.lib.php';
@@ -77,9 +77,10 @@ list ($refGroupmentMod, $refWorkUnitMod, $refRiskMod, $refRiskAssessmentMod, $re
 $numberingModuleName = [
 	'project/task' => $conf->global->PROJECT_TASK_ADDON,
 ];
-list($refTaskMod)     = saturne_require_objects_mod($numberingModuleName, $moduleNameLowerCase);
+list($refTaskMod) = saturne_require_objects_mod($numberingModuleName, $moduleNameLowerCase);
 
-$upload_dir = $conf->digiriskdolibarr->multidir_output[$conf->entity ?? 1];
+$upload_dir       = $conf->digiriskdolibarr->multidir_output[$conf->entity ?? 1];
+$dangerCategories = $risk->getDangerCategories();
 
 // Security check - Protection if external user
 $permissiontoread = $user->rights->digiriskdolibarr->adminpage->read;
@@ -784,10 +785,11 @@ if (GETPOST('dataMigrationImportGlobalDolibarr', 'alpha') && ! empty($conf->glob
 }
 
 if ($action == 'repairCategory') {
+    // @TODO move into saturne when we will repair every fields of every objects
     if (is_array($_POST) && !empty($_POST)) {
         $errors = [];
         foreach($_POST as $key => $value) {
-            if (strstr($key, 'search_') && !empty($value) && $value >= 0 && $value <= 22) {
+            if (strstr($key, 'search_') && !empty($value) && $value >= 0 && $value <= count($dangerCategories)) {
                 $riskId = trim($key, 'search_');
                 $risk->fetch($riskId);
                 $result = $risk->setValueFrom('category', $value);
@@ -978,10 +980,10 @@ if ($user->rights->digiriskdolibarr->adminpage->read) {
     print '<td>' . $langs->trans('DigiriskElement') . '</td>';
     print '</tr>';
 
-    $risks = saturne_fetch_all_object_type('Risk', '', '', 0, 0, ['customsql' => 't.category NOT BETWEEN 0 AND 22']);
+    $corruptedRisks = saturne_fetch_all_object_type('Risk', '', '', 0, 0, ['customsql' => 't.category NOT BETWEEN 0 AND ' . count($dangerCategories)]);
 
-    if (is_array($risks) && !empty($risks)) {
-        foreach ($risks as $key => $risk) {
+    if (is_array($corruptedRisks) && !empty($corruptedRisks)) {
+        foreach ($corruptedRisks as $key => $risk) {
             $digiriskElement->fetch($risk->fk_element);
             print '<tr class="oddeven">';
             print '<td class="center">'
@@ -994,8 +996,7 @@ if ($user->rights->digiriskdolibarr->adminpage->read) {
                         </div>
                     <ul class="saturne-dropdown-content wpeo-gridlayout grid-5 grid-gap-0">
                         <?php
-                        $dangerCategories = $risk->getDangerCategories();
-                        if ( ! empty($dangerCategories) ) :
+                        if (!empty($dangerCategories) ) :
                             foreach ($dangerCategories as $dangerCategory) : ?>
                                 <li class="item dropdown-item wpeo-tooltip-event classfortooltip" data-is-preset="<?php echo ''; ?>" data-id="<?php echo $dangerCategory['position'] ?>" aria-label="<?php echo $dangerCategory['name'] ?>">
                                     <img src="<?php echo DOL_URL_ROOT . '/custom/digiriskdolibarr/img/categorieDangers/' . $dangerCategory['thumbnail_name'] . '.png'?>" class="attachment-thumbail size-thumbnail photo photowithmargin" alt="" loading="lazy" width="48" height="48">
@@ -1014,12 +1015,14 @@ if ($user->rights->digiriskdolibarr->adminpage->read) {
     } else {
         print '<td class="opacitymedium">' . $langs->trans('NoRiskToRepair') . '</td>';
         print '<td colspan=3></td>';
-        $button = '<div class="wpeo-button button-disable">' . $langs->trans('RepairRisks') . '</div>';
+        $button = '<span class="butActionRefused">' . $langs->trans('RepairRisks') . '</span>';
     }
 
     print '</tr>';
     print '</table>';
+    print '<div class="tabsAction">';
     print $button;
+    print '</div>';
     print '</form>';
 }
 

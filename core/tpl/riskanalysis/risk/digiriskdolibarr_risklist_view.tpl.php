@@ -315,6 +315,7 @@ $taskNextValue             = $refTaskMod->getNextValue('', $task);
 $usertmp->fetchAll();
 $usersList                 = $usertmp->users;
 $timeSpentSortedByTasks    = $digiriskTask->fetchAllTimeSpentAllUsers('AND fk_element > 0', 'element_datehour', 'DESC', 1);
+$dangerCategories          = $risk->getDangerCategories();
 
 $riskAssessment->ismultientitymanaged = 1;
 
@@ -631,7 +632,6 @@ if ($action != 'list') {
 								</div>
 								<ul class="saturne-dropdown-content wpeo-gridlayout grid-5 grid-gap-0">
 									<?php
-									$dangerCategories = $risk->getDangerCategories();
 									if ( ! empty($dangerCategories) ) :
 										foreach ($dangerCategories as $dangerCategory) : ?>
 											<li class="item dropdown-item wpeo-tooltip-event" data-is-preset="<?php echo ''; ?>" data-id="<?php echo $dangerCategory['position'] ?>" aria-label="<?php echo $dangerCategory['name'] ?>">
@@ -835,7 +835,6 @@ if ($action != 'list') {
 							</div>
 							<ul class="saturne-dropdown-content wpeo-gridlayout grid-5 grid-gap-0">
 								<?php
-								$dangerCategories = $risk->getDangerCategories();
 								if ( ! empty($dangerCategories) ) :
 									foreach ($dangerCategories as $dangerCategory) : ?>
 										<li class="item dropdown-item wpeo-tooltip-event" data-is-preset="<?php echo ''; ?>" data-id="<?php echo $dangerCategory['position'] ?>" aria-label="<?php echo $dangerCategory['name'] ?>">
@@ -1111,7 +1110,6 @@ foreach ($risk->fields as $key => $val) {
 				<?php endif; ?>
 				<ul class="saturne-dropdown-content wpeo-gridlayout grid-5 grid-gap-0">
 					<?php
-					$dangerCategories = $risk->getDangerCategories();
 					if ( ! empty($dangerCategories) ) :
 						foreach ($dangerCategories as $dangerCategory) : ?>
 							<li class="item dropdown-item wpeo-tooltip-event classfortooltip" data-is-preset="<?php echo ''; ?>" data-id="<?php echo $dangerCategory['position'] ?>" aria-label="<?php echo $dangerCategory['name'] ?>">
@@ -1179,6 +1177,17 @@ print $hookmanager->resPrint;
 // Action column
 print getTitleFieldOfList($selectedfields, 0, $_SERVER["PHP_SELF"], '', '', '', '', $sortfield, $sortorder, 'center maxwidthsearch ') . "\n";
 print '</tr>' . "\n";
+
+$corruptedRisks = saturne_fetch_all_object_type('Risk', '', '', 0, 0, ['customsql' => 't.category NOT BETWEEN 0 AND ' . count($dangerCategories)]);
+
+if (is_array($corruptedRisks) && !empty($corruptedRisks)) {
+    print '<div class="wpeo-notice notice-warning notice-red">';
+    print '<div class="notice-content">';
+    print '<a href="' . dol_buildpath('/custom/digiriskdolibarr/view/digirisktools.php', 2) . '">' . '<b><div class="notice-subtitle">'.$langs->trans('NumberOfRisksCorrupted', count($corruptedRisks)) . ' : ' . $langs->trans('RepairRisks') . '</b></a>';
+    print '</div>';
+    print '</div>';
+    print '</div>';
+}
 
 // Loop on record
 // --------------------------------------------------------------------
@@ -1284,7 +1293,6 @@ while ($i < ($limit ? min($num, $limit) : $num)) {
 												<?php if ($conf->global->DIGIRISKDOLIBARR_RISK_CATEGORY_EDIT) : ?>
 												<ul class="saturne-dropdown-content wpeo-gridlayout grid-5 grid-gap-0">
 													<?php
-													$dangerCategories = $risk->getDangerCategories();
 													if ( ! empty($dangerCategories) ) :
 														foreach ($dangerCategories as $dangerCategory) : ?>
 															<li class="item dropdown-item wpeo-tooltip-event classfortooltip" data-is-preset="<?php echo ''; ?>" data-id="<?php echo $dangerCategory['position'] ?>" aria-label="<?php echo $dangerCategory['name'] ?>">
