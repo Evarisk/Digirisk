@@ -1095,7 +1095,7 @@ foreach ($risk->fields as $key => $val) {
 		elseif (strpos($val['type'], 'integer:') === 0) {
 			print $risk->showInputField($val, $key, $search[$key], '', '', 'search_', 'maxwidth150', 1);
 		} elseif ($key == 'fk_element') {
-			print $digiriskelement->selectDigiriskElementList($search['fk_element'], 'search_fk_element', ['customsql' => 'rowid NOT IN (' . implode(',', $deletedElements) . ')'], 1, 0, [], 0, 0, 'minwidth100', 0, false, 1);
+			print $digiriskelement->selectDigiriskElementList($search['fk_element'], 'search_fk_element', ['customsql' => 'rowid NOT IN (' . implode(',', $deletedElements) . ')'], 1, 0, [], 0, 0, 'minwidth100 maxwidth300', 0, false, 1);
 		} elseif ($key == 'category') { ?>
 			<div class="wpeo-dropdown dropdown-large dropdown-grid category-danger padding" style="position: inherit">
 				<input class="input-hidden-danger" type="hidden" name="<?php echo 'search_' . $key ?>" value="<?php echo dol_escape_htmltag($search[$key]) ?>" />
@@ -1338,7 +1338,7 @@ while ($i < ($limit ? min($num, $limit) : $num)) {
 									<?php if (is_object($activeDigiriskElementList[$risk->fk_element])) {
 										if ($conf->global->DIGIRISKDOLIBARR_MOVE_RISKS) : ?>
 											<input type="hidden" class="current-element-ref" value="<?php echo $activeDigiriskElementList[$risk->fk_element]->ref; ?>">
-											<?php print $activeDigiriskElementList[$risk->fk_element]->selectDigiriskElementList($activeDigiriskElementList[$risk->fk_element]->id, 'socid', [], 0, 0, array(), 0, 0, 'disabled', 0, false, 1); ?>
+											<?php print $activeDigiriskElementList[$risk->fk_element]->selectDigiriskElementList($activeDigiriskElementList[$risk->fk_element]->id, 'socid', [], 0, 0, array(), 0, 0, 'disabled maxwidth300', 0, false, 1); ?>
 										<?php else : ?>
 											<?php print '<span class="opacitymedium">' . '<a href="' . DOL_URL_ROOT . '/custom/digiriskdolibarr/admin/config/riskassessmentdocument.php" target="_blank">' . $langs->trans('SetConfToMoveRisk') . '</a>' . "</span><br>\n"; ?>
 										<?php endif; ?>

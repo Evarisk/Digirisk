@@ -250,7 +250,7 @@ class DigiriskElement extends SaturneObject
      * @return string 							HTML string with
      * @throws Exception
      */
-    public function selectDigiriskElementList($selected = '', $htmlname = 'fk_element', $filter = [], $showempty = '1', $forcecombo = 0, $events = array(), $outputmode = 0, $limit = 0, $morecss = 'minwidth100', $current_element = 0, $multiple = false, $noroot = 0, $contextpage = '', $multientitymanaged = true, $hideref  = false)
+    public function selectDigiriskElementList($selected = '', $htmlname = 'fk_element', $filter = [], $showempty = '1', $forcecombo = 0, $events = array(), $outputmode = 0, $limit = 0, $morecss = 'minwidth100 maxwidth300', $current_element = 0, $multiple = false, $noroot = 0, $contextpage = '', $multientitymanaged = true, $hideref  = false)
     {
         global $conf, $form, $langs;
 
