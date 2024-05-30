@@ -80,7 +80,10 @@ $numberingModuleName = [
 list($refTaskMod) = saturne_require_objects_mod($numberingModuleName, $moduleNameLowerCase);
 
 $upload_dir       = $conf->digiriskdolibarr->multidir_output[$conf->entity ?? 1];
-$dangerCategories = $risk->getDangerCategories();
+
+$dangerCategories        = $risk->getDangerCategories();
+$risk->type              = 'riskenvironmental';
+$environmentalCategories = $risk->getDangerCategories();
 
 // Security check - Protection if external user
 $permissiontoread = $user->rights->digiriskdolibarr->adminpage->read;
@@ -784,7 +787,7 @@ if (GETPOST('dataMigrationImportGlobalDolibarr', 'alpha') && ! empty($conf->glob
 	}
 }
 
-if ($action == 'repairCategory') {
+if ($action == 'repair_category') {
     // @TODO move into saturne when we will repair every fields of every objects
     if (is_array($_POST) && !empty($_POST)) {
         $errors = [];
@@ -970,7 +973,7 @@ if ($user->rights->digiriskdolibarr->adminpage->read) {
 
     print '<form class="repair-category" name="repairCategory" id="repairCategory" action="' . $_SERVER["PHP_SELF"] . '" method="POST">';
     print '<input type="hidden" name="token" value="' . newToken() . '">';
-    print '<input type="hidden" name="action" value="repairCategory">';
+    print '<input type="hidden" name="action" value="repair_category">';
 
     print '<table class="noborder centpercent">';
     print '<tr class="liste_titre">';
@@ -996,13 +999,23 @@ if ($user->rights->digiriskdolibarr->adminpage->read) {
                         </div>
                     <ul class="saturne-dropdown-content wpeo-gridlayout grid-5 grid-gap-0">
                         <?php
-                        if (!empty($dangerCategories) ) :
-                            foreach ($dangerCategories as $dangerCategory) : ?>
-                                <li class="item dropdown-item wpeo-tooltip-event classfortooltip" data-is-preset="<?php echo ''; ?>" data-id="<?php echo $dangerCategory['position'] ?>" aria-label="<?php echo $dangerCategory['name'] ?>">
-                                    <img src="<?php echo DOL_URL_ROOT . '/custom/digiriskdolibarr/img/categorieDangers/' . $dangerCategory['thumbnail_name'] . '.png'?>" class="attachment-thumbail size-thumbnail photo photowithmargin" alt="" loading="lazy" width="48" height="48">
-                                </li>
-                            <?php endforeach;
-                        endif; ?>
+                        if ($risk->type == 'risk') {
+                            if (!empty($dangerCategories) ) :
+                                foreach ($dangerCategories as $dangerCategory) : ?>
+                                    <li class="item dropdown-item wpeo-tooltip-event classfortooltip" data-is-preset="<?php echo ''; ?>" data-id="<?php echo $dangerCategory['position'] ?>" aria-label="<?php echo $dangerCategory['name'] ?>">
+                                        <img src="<?php echo DOL_URL_ROOT . '/custom/digiriskdolibarr/img/categorieDangers/' . $dangerCategory['thumbnail_name'] . '.png'?>" class="attachment-thumbail size-thumbnail photo photowithmargin" alt="" loading="lazy" width="48" height="48">
+                                    </li>
+                                <?php endforeach;
+                            endif;
+                        } else {
+                            if (!empty($environmentalCategories) ) :
+                                foreach ($environmentalCategories as $environmentalCategory) : ?>
+                                    <li class="item dropdown-item wpeo-tooltip-event classfortooltip" data-is-preset="<?php echo ''; ?>" data-id="<?php echo $environmentalCategory['position'] ?>" aria-label="<?php echo $environmentalCategory['name'] ?>">
+                                        <img src="<?php echo DOL_URL_ROOT . '/custom/digiriskdolibarr/img/categorieDangers/' . $environmentalCategory['thumbnail_name'] . '.png'?>" class="attachment-thumbail size-thumbnail photo photowithmargin" alt="" loading="lazy" width="48" height="48">
+                                    </li>
+                                <?php endforeach;
+                            endif;
+                        }?>
                     </ul>
                 </div>
             <?php
