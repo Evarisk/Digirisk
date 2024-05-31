@@ -30,7 +30,7 @@ if (file_exists('../digiriskdolibarr.main.inc.php')) {
 	die('Include of digiriskdolibarr main fails');
 }
 
-global $conf, $db, $langs, $user;
+global $conf, $db, $langs, $mc, $user;
 
 // Libraries
 require_once DOL_DOCUMENT_ROOT . "/core/lib/admin.lib.php";
@@ -174,8 +174,8 @@ $objectModSubdir = 'riskanalysis';
 
 require __DIR__ . '/../../../saturne/core/tpl/admin/object/object_numbering_module_view.tpl.php';
 
-$areRisksShared = !empty($conf->mc->entities['risk']) ? strpos($conf->mc->entities['risk'], $conf->entity) : 0;
-$areRisksSharable = isModEnabled('multicompany') && !empty($conf->mc->sharings['risk']) && $areRisksShared > 0;
+$areRisksShared = !empty($mc->entities['risk']) ? strpos($mc->entities['risk'], $conf->entity) : 0;
+$areRisksSharable = isModEnabled('multicompany') && !empty($mc->sharings['risk']) && $areRisksShared > 0;
 
 $constArray[$moduleNameLowerCase] = [
 	'RiskDescription' => [
@@ -438,8 +438,8 @@ $objectModSubdir = 'riskanalysis';
 
 require __DIR__ . '/../../../saturne/core/tpl/admin/object/object_numbering_module_view.tpl.php';
 
-$areRiskSignsShared    = !empty($conf->mc->entities['risksign']) ? strpos($conf->mc->entities['risksign'], $conf->entity) : 0;
-$areRisksSignsSharable = isModEnabled('multicompany') && !empty($conf->mc->sharings['risksign']) && $areRiskSignsShared > 0;
+$areRiskSignsShared    = !empty($mc->entities['risksign']) ? strpos($mc->entities['risksign'], $conf->entity) : 0;
+$areRisksSignsSharable = isModEnabled('multicompany') && !empty($mc->sharings['risksign']) && $areRiskSignsShared > 0;
 
 $constArray[$moduleNameLowerCase] = [
 	'ShowInheritedRiskSigns' => [

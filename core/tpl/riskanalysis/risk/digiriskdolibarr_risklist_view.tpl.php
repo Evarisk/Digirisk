@@ -315,6 +315,7 @@ $taskNextValue             = $refTaskMod->getNextValue('', $task);
 $usertmp->fetchAll();
 $usersList                 = $usertmp->users;
 $timeSpentSortedByTasks    = $digiriskTask->fetchAllTimeSpentAllUsers('AND fk_element > 0', 'element_datehour', 'DESC', 1);
+$dangerCategories          = $risk->getDangerCategories();
 
 $riskAssessment->ismultientitymanaged = 1;
 
@@ -574,13 +575,15 @@ foreach ($search as $key => $val) {
 include DOL_DOCUMENT_ROOT . '/core/tpl/extrafields_list_search_param.tpl.php';
 
 // List of mass actions available
-$arrayofmassactions                                       = array();
-if ($permissiontodelete) $arrayofmassactions['predelete'] = '<span class="fa fa-trash paddingrightonly"></span>' . $langs->trans("Delete");
+$arrayofmassactions = [];
+if ($permissiontodelete) {
+    $arrayofmassactions['predelete'] = '<span class="fa fa-trash paddingrightonly"></span>' . $langs->trans("Delete");
+}
 
-if ($action != 'list') {
-	$massactionbutton = $form->selectMassAction('', $arrayofmassactions);
-} ?>
-<?php if ( ! $allRisks) : ?>
+$massactionbutton = $form->selectMassAction('', $arrayofmassactions);
+
+?>
+<?php if (!$allRisks) : ?>
 	<!-- BUTTON MODAL RISK ADD -->
 	<?php if ($permissiontoadd) {
 		$newcardbutton = '<div class="risk-add wpeo-button button-square-40 button-blue wpeo-tooltip-event modal-open"  aria-label="' . $langs->trans('AddRisk') . '"  value="' . $object->id . '">';
@@ -631,7 +634,6 @@ if ($action != 'list') {
 								</div>
 								<ul class="saturne-dropdown-content wpeo-gridlayout grid-5 grid-gap-0">
 									<?php
-									$dangerCategories = $risk->getDangerCategories();
 									if ( ! empty($dangerCategories) ) :
 										foreach ($dangerCategories as $dangerCategory) : ?>
 											<li class="item dropdown-item wpeo-tooltip-event" data-is-preset="<?php echo ''; ?>" data-id="<?php echo $dangerCategory['position'] ?>" aria-label="<?php echo $dangerCategory['name'] ?>">
@@ -835,7 +837,6 @@ if ($action != 'list') {
 							</div>
 							<ul class="saturne-dropdown-content wpeo-gridlayout grid-5 grid-gap-0">
 								<?php
-								$dangerCategories = $risk->getDangerCategories();
 								if ( ! empty($dangerCategories) ) :
 									foreach ($dangerCategories as $dangerCategory) : ?>
 										<li class="item dropdown-item wpeo-tooltip-event" data-is-preset="<?php echo ''; ?>" data-id="<?php echo $dangerCategory['position'] ?>" aria-label="<?php echo $dangerCategory['name'] ?>">
@@ -1028,6 +1029,16 @@ if ($action != 'list') {
 print '<div class="div-title-and-table-responsive">';
 print_barre_liste($title, $page, $_SERVER["PHP_SELF"], $param, $sortfield, $sortorder, $massactionbutton, $num, $nbtotalofrecords, $risk->picto, 0, $newcardbutton, '', $limit, 0, 0, 1);
 
+$corruptedRisks = saturne_fetch_all_object_type('Risk', '', '', 0, 0, ['customsql' => 't.category NOT BETWEEN 0 AND ' . count($dangerCategories) . ' AND t.type = "' . $riskType . '"']);
+
+if (is_array($corruptedRisks) && !empty($corruptedRisks)) {
+    print '<div class="wpeo-notice notice-warning notice-red">';
+    print '<div class="notice-content">';
+    print '<a href="' . dol_buildpath('/custom/digiriskdolibarr/view/digirisktools.php', 2) . '">' . '<div class="notice-subtitle"><b>' . $langs->trans('NumberOfRisksCorrupted', count($corruptedRisks)) . ' : ' . $langs->trans('RepairRisks') . '</b></div></a>';
+    print '</div>';
+    print '</div>';
+}
+
 include DOL_DOCUMENT_ROOT . '/core/tpl/massactions_pre.tpl.php';
 
 if ($search_all) {
@@ -1095,7 +1106,7 @@ foreach ($risk->fields as $key => $val) {
 		elseif (strpos($val['type'], 'integer:') === 0) {
 			print $risk->showInputField($val, $key, $search[$key], '', '', 'search_', 'maxwidth150', 1);
 		} elseif ($key == 'fk_element') {
-			print $digiriskelement->selectDigiriskElementList($search['fk_element'], 'search_fk_element', ['customsql' => 'rowid NOT IN (' . implode(',', $deletedElements) . ')'], 1, 0, [], 0, 0, 'minwidth100', 0, false, 1);
+			print $digiriskelement->selectDigiriskElementList($search['fk_element'], 'search_fk_element', ['customsql' => 'rowid NOT IN (' . implode(',', $deletedElements) . ')'], 1, 0, [], 0, 0, 'minwidth100 maxwidth300', 0, false, 1);
 		} elseif ($key == 'category') { ?>
 			<div class="wpeo-dropdown dropdown-large dropdown-grid category-danger padding" style="position: inherit">
 				<input class="input-hidden-danger" type="hidden" name="<?php echo 'search_' . $key ?>" value="<?php echo dol_escape_htmltag($search[$key]) ?>" />
@@ -1111,7 +1122,6 @@ foreach ($risk->fields as $key => $val) {
 				<?php endif; ?>
 				<ul class="saturne-dropdown-content wpeo-gridlayout grid-5 grid-gap-0">
 					<?php
-					$dangerCategories = $risk->getDangerCategories();
 					if ( ! empty($dangerCategories) ) :
 						foreach ($dangerCategories as $dangerCategory) : ?>
 							<li class="item dropdown-item wpeo-tooltip-event classfortooltip" data-is-preset="<?php echo ''; ?>" data-id="<?php echo $dangerCategory['position'] ?>" aria-label="<?php echo $dangerCategory['name'] ?>">
@@ -1284,7 +1294,6 @@ while ($i < ($limit ? min($num, $limit) : $num)) {
 												<?php if ($conf->global->DIGIRISKDOLIBARR_RISK_CATEGORY_EDIT) : ?>
 												<ul class="saturne-dropdown-content wpeo-gridlayout grid-5 grid-gap-0">
 													<?php
-													$dangerCategories = $risk->getDangerCategories();
 													if ( ! empty($dangerCategories) ) :
 														foreach ($dangerCategories as $dangerCategory) : ?>
 															<li class="item dropdown-item wpeo-tooltip-event classfortooltip" data-is-preset="<?php echo ''; ?>" data-id="<?php echo $dangerCategory['position'] ?>" aria-label="<?php echo $dangerCategory['name'] ?>">
@@ -1338,7 +1347,7 @@ while ($i < ($limit ? min($num, $limit) : $num)) {
 									<?php if (is_object($activeDigiriskElementList[$risk->fk_element])) {
 										if ($conf->global->DIGIRISKDOLIBARR_MOVE_RISKS) : ?>
 											<input type="hidden" class="current-element-ref" value="<?php echo $activeDigiriskElementList[$risk->fk_element]->ref; ?>">
-											<?php print $activeDigiriskElementList[$risk->fk_element]->selectDigiriskElementList($activeDigiriskElementList[$risk->fk_element]->id, 'socid', [], 0, 0, array(), 0, 0, 'disabled', 0, false, 1); ?>
+											<?php print $activeDigiriskElementList[$risk->fk_element]->selectDigiriskElementList($activeDigiriskElementList[$risk->fk_element]->id, 'socid', [], 0, 0, array(), 0, 0, 'disabled maxwidth300', 0, false, 1); ?>
 										<?php else : ?>
 											<?php print '<span class="opacitymedium">' . '<a href="' . DOL_URL_ROOT . '/custom/digiriskdolibarr/admin/config/riskassessmentdocument.php" target="_blank">' . $langs->trans('SetConfToMoveRisk') . '</a>' . "</span><br>\n"; ?>
 										<?php endif; ?>

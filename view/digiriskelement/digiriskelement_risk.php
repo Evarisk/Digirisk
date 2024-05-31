@@ -30,7 +30,7 @@ if (file_exists('../digiriskdolibarr.main.inc.php')) {
 	die('Include of digiriskdolibarr main fails');
 }
 
-global $conf, $db, $hookmanager, $langs, $user;
+global $conf, $db, $hookmanager, $langs, $mc, $user;
 
 // Load Dolibarr libraries
 require_once DOL_DOCUMENT_ROOT . '/core/lib/images.lib.php';
@@ -48,7 +48,6 @@ if (isModEnabled('categorie')) {
 // Load DigiriskDolibarr libraries
 require_once __DIR__ . '/../../class/digiriskelement.class.php';
 require_once __DIR__ . '/../../class/digiriskstandard.class.php';
-require_once __DIR__ . '/../../class/digiriskelement.class.php';
 require_once __DIR__ . '/../../class/riskanalysis/risk.class.php';
 require_once __DIR__ . '/../../class/riskanalysis/riskassessment.class.php';
 require_once __DIR__ . '/../../core/modules/digiriskdolibarr/riskanalysis/riskassessment/mod_riskassessment_standard.php';
@@ -298,7 +297,7 @@ if ($sharedrisks) {
 					$nophoto      = DOL_URL_ROOT.'/public/theme/common/nophoto.png';
 
 					$importValue .= '<div class="risk-evaluation-photo risk-evaluation-photo-'. ($lastEvaluation->id > 0 ? $lastEvaluation->id : 0) .  ($risk->id > 0 ? ' risk-' . $risk->id : ' risk-new') .' open-medias-linked" style="margin-right: 0.5em">';
-					$importValue .= '<span class="floatleft inline-block valignmiddle divphotoref risk-evaluation-photo-single">';
+					$importValue .= '<span class="risk-evaluation-photo-single">';
 					$importValue .= '<input class="filepath-to-riskassessment filepath-to-riskassessment-'.( $risk->id > 0 ? $risk->id : 'new') .'" type="hidden" value="'. $pathToThumb .'">';
 					$importValue .=	'<input class="filename" type="hidden" value="">';
 					if (isset($lastEvaluation->photo) && dol_strlen($lastEvaluation->photo) > 0) {

@@ -9,7 +9,7 @@
 			</div>
 			<div class="photo riskassessment-photo-<?php echo $lastEvaluation->id; ?>" style="margin:auto">
 				<?php
-				print saturne_show_medias_linked('digiriskdolibarr', DOL_DATA_ROOT . '/' . ($lastEvaluation->entity > 1 ? $lastEvaluation->entity . '/' : '') . 'digiriskdolibarr/riskassessment/' . $lastEvaluation->ref, 'small', 1, 0, 0, 0, 50, 50, 0, 0, 0, '/riskassessment/' . $lastEvaluation->ref, $lastEvaluation, 'photo', 0, 0, 0, 1);
+				print saturne_show_medias_linked('digiriskdolibarr', DOL_DATA_ROOT . '/' . ($lastEvaluation->entity > 1 ? $lastEvaluation->entity . '/' : '') . 'digiriskdolibarr/riskassessment/' . $lastEvaluation->ref, 'small', 1, 0, 0, 0, 50, 50, 0, 0, 1, '/riskassessment/' . $lastEvaluation->ref, $lastEvaluation, 'photo', 0, 0, 0, 1);
 				?>
 			</div>
 			<div class="risk-evaluation-content">

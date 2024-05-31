@@ -1292,7 +1292,7 @@ if ((empty($action) || ($action != 'create' && $action != 'edit'))) {
 					print '</td>';
 
 					print '<td class="bordertop nobottom linecollocation">';
-					print $digiriskelementtmp->selectDigiriskElementList($item->fk_element, 'fk_element', ['customsql' => ' t.rowid NOT IN (' . implode(',', $deletedElements) . ')'], 0, 0,[], 0, 0, 'minwidth200', 0, false, 1);
+					print $digiriskelementtmp->selectDigiriskElementList($item->fk_element, 'fk_element', ['customsql' => ' t.rowid NOT IN (' . implode(',', $deletedElements) . ')'], 0, 0,[], 0, 0, 'minwidth200 maxwidth300', 0, false, 1);
 					print '</td>';
 
 					$coldisplay++;
@@ -1419,7 +1419,7 @@ if ((empty($action) || ($action != 'create' && $action != 'edit'))) {
 			print $refFirePermitDetMod->getNextValue($objectLine);
 			print '</td>';
 			print '<td>';
-			print $digiriskelementtmp->selectDigiriskElementList('', 'fk_element', ['customsql' => ' t.rowid NOT IN (' . implode(',', $deletedElements) . ')'], 0, 0, array(), 0, 0, 'minwidth200', 0, false, 1);
+			print $digiriskelementtmp->selectDigiriskElementList('', 'fk_element', ['customsql' => ' t.rowid NOT IN (' . implode(',', $deletedElements) . ')'], 0, 0, array(), 0, 0, 'minwidth200 maxwidth300', 0, false, 1);
 			print '</td>';
 
 			$coldisplay++;

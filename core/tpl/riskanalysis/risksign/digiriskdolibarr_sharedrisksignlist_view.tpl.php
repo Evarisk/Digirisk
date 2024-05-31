@@ -192,11 +192,8 @@ foreach ($search as $key => $val) {
 include DOL_DOCUMENT_ROOT . '/core/tpl/extrafields_list_search_param.tpl.php';
 
 // List of mass actions available
-$arrayofmassactions                                       = array();
-
-if ($action != 'list') {
-	$massactionbutton = $form->selectMassAction('', $arrayofmassactions);
-} ?>
+$arrayofmassactions = [];
+$massactionbutton   = $form->selectMassAction('', $arrayofmassactions); ?>
 
 	<!-- BUTTON MODAL RISKSIGN ADD -->
 <?php if ($permissiontoadd) {
@@ -261,7 +258,7 @@ foreach ($risksign->fields as $key => $val) {
 		} elseif ($key == 'entity') {
 			print select_entity_list($search['entity'], 'search_entity', 'e.rowid NOT IN (' . $conf->entity . ')');
 		} elseif ($key == 'fk_element') {
-			print $digiriskelement->selectDigiriskElementList($search['fk_element_shared'], 'search_fk_element_shared', ['customsql' => 's.entity NOT IN (' . $conf->entity . ')'], 1, 0, array(), 0, 0, 'minwidth100', 0, false, 1, $contextpage, false);
+			print $digiriskelement->selectDigiriskElementList($search['fk_element_shared'], 'search_fk_element_shared', ['customsql' => 's.entity NOT IN (' . $conf->entity . ')'], 1, 0, array(), 0, 0, 'minwidth100 maxwidth300', 0, false, 1, $contextpage, false);
 		} elseif ($key == 'category') { ?>
 			<div class="wpeo-dropdown dropdown-large dropdown-grid category-danger padding" style="position: inherit">
 				<input class="input-hidden-danger" type="hidden" name="<?php echo 'search_' . $key ?>" value="<?php echo dol_escape_htmltag($search[$key]) ?>" />

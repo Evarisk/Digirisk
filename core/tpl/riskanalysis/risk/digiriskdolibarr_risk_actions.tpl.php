@@ -649,7 +649,7 @@ if ($action == 'confirm_import_shared_risks' && $confirm == 'yes') {
 
 	$digiriskelementtmp = new DigiriskElement($db);
 
-//	$AllSharingsRisks = $conf->mc->sharings['risk'];
+//	$AllSharingsRisks = $mc->sharings['risk'];
 //
 //	foreach ($AllSharingsRisks as $Allsharingsrisk) {
 //		$filter .= $Allsharingsrisk . ',';

@@ -132,6 +132,16 @@ class ActionsDigiriskdolibarr
             $this->resprints = $out;
         }
 
+        if (strpos($_SERVER['PHP_SELF'], 'digiriskdolibarr') !== false) {
+            ?>
+            <script>
+                $('link[rel="manifest"]').remove();
+            </script>
+            <?php
+
+            $this->resprints = '<link rel="manifest" href="' . DOL_URL_ROOT . '/custom/digiriskdolibarr/manifest.json.php' . '" />';
+        }
+
         return 0; // or return 1 to replace standard code
     }
 
@@ -251,7 +261,7 @@ class ActionsDigiriskdolibarr
 				$object->fetch(GETPOST('id'),'',GETPOST('track_id'));
 				require_once __DIR__ . '/digiriskelement.class.php';
 				$digiriskelement = new DigiriskElement($db);
-				$selectDigiriskElement = $digiriskelement->selectDigiriskElementList($object->array_options['options_digiriskdolibarr_ticket_service'], 'options_digiriskdolibarr_ticket_service', [], 1, 0, array(), 0, 0, 'minwidth100', 0, false, 1);
+				$selectDigiriskElement = $digiriskelement->selectDigiriskElementList($object->array_options['options_digiriskdolibarr_ticket_service'], 'options_digiriskdolibarr_ticket_service', [], 1, 0, array(), 0, 0, 'minwidth100 maxwidth300', 0, false, 1);
 				?>
 				<script>
 					jQuery('#options_digiriskdolibarr_ticket_service').remove()
@@ -596,7 +606,19 @@ class ActionsDigiriskdolibarr
             }
 
             require __DIR__ . '/../../saturne/core/tpl/documents/documents_action.tpl.php';
-		} elseif (in_array($parameters['currentcontext'] , array('ticketlist', 'thirdpartyticket', 'projectticket'))) {
+        } else if (strpos($parameters['context'], 'projectcard') !== false) {
+            if ($action == 'builddoc' && GETPOST('model') == 'orque_projectdocument') {
+                require_once __DIR__ . '/digiriskdolibarrdocuments/projectdocument.class.php';
+
+                $document = new ProjectDocument($this->db);
+
+                $moduleNameLowerCase      = 'digiriskdolibarr';
+                $permissiontoadd          = $user->rights->projet->creer;
+                $moreParams['modulePart'] = 'project';
+
+                require __DIR__ . '/../../saturne/core/tpl/documents/documents_action.tpl.php';
+            }
+        } elseif (in_array($parameters['currentcontext'] , array('ticketlist', 'thirdpartyticket', 'projectticket'))) {
 			if ($action == 'list') {
 				if (GETPOST('button_removefilter_x', 'alpha') || GETPOST('button_removefilter.x', 'alpha') || GETPOST('button_removefilter', 'alpha')) {
 					$searchCategoryTicketList = GETPOST('search_category_ticket_list', 'array');
@@ -847,34 +869,6 @@ class ActionsDigiriskdolibarr
 			$this->errors[] = 'Error message';
 			return -1;
 		}
-	}
-
-	/**
-	 *  Overloading the commonGenerateDocument function : replacing the parent's function with the one below
-	 *
-	 * @param  Hook   $parameters Metadatas (context, etc...)
-	 * @param  object $object     Current object
-	 * @param  string $action
-	 * @return int               0 < on error, 0 on success, 1 to replace standard code
-	 */
-	public function commonGenerateDocument($parameters, $object, $action) {
-		global $db, $user;
-
-		if ($parameters['currentcontext'] == 'projectcard') {
-			if ($parameters['modele'] == 'orque_projectdocument') {
-				require_once __DIR__ . '/../class/digiriskdolibarrdocuments/projectdocument.class.php';
-
-				$projectdocument = new ProjectDocument($db);
-
-				$moreparams['object']     = $object;
-				$moreparams['user']       = $user;
-				$moreparams['objectType'] = 'project';
-				if ($object->element == 'project') {
-					$projectdocument->generateDocument($parameters['modele'], $parameters['outputlangs'], $parameters['hidedetails'], $parameters['hidedesc'], $parameters['hideref'], $moreparams, true);
-				}
-			}
-		}
-		return 0; // return 0 or return 1 to replace standard code
 	}
 
     /**

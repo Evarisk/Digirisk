@@ -1259,7 +1259,7 @@ if ((empty($action) || ($action != 'create' && $action != 'edit'))) {
 					print '</td>';
 
 					print '<td>';
-					print $digiriskelementtmp->selectDigiriskElementList($item->fk_element, 'fk_element', ['customsql' => ' t.rowid NOT IN (' . implode(',', $deletedElements) . ')'], 0, 0, array(), 0, 0, 'minwidth100', 0, false, 1);
+					print $digiriskelementtmp->selectDigiriskElementList($item->fk_element, 'fk_element', ['customsql' => ' t.rowid NOT IN (' . implode(',', $deletedElements) . ')'], 0, 0, array(), 0, 0, 'minwidth100 maxwidth300', 0, false, 1);
 					print '</td>';
 
 					$coldisplay++;
@@ -1387,7 +1387,7 @@ if ((empty($action) || ($action != 'create' && $action != 'edit'))) {
 			print $refPreventionPlanDetMod->getNextValue($preventionplandet);
 			print '</td>';
 			print '<td>';
-			print $digiriskelementtmp->selectDigiriskElementList('', 'fk_element', ['customsql' => ' t.rowid NOT IN (' . implode(',', $deletedElements) . ')'], 0, 0, array(), 0, 0, 'minwidth100', '', false, 1);
+			print $digiriskelementtmp->selectDigiriskElementList('', 'fk_element', ['customsql' => ' t.rowid NOT IN (' . implode(',', $deletedElements) . ')'], 0, 0, array(), 0, 0, 'minwidth100 maxwidth300', '', false, 1);
 			print '</td>';
 
 			$coldisplay++;

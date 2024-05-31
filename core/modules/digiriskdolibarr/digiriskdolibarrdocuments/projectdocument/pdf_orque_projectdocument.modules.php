@@ -54,11 +54,6 @@ class pdf_orque_projectdocument
 	public $description;
 
 	/**
-	 * @var int     Save the name of generated file as the main doc when generating a doc with this template
-	 */
-	public $update_main_doc_field;
-
-	/**
 	 * @var string document type
 	 */
 	public $type;
@@ -122,6 +117,16 @@ class pdf_orque_projectdocument
 	 */
 	public $emetteur;
 
+    /**
+     * @var string Module
+     */
+    public string $module = 'digiriskdolibarr';
+
+    /**
+     * @var string Document type
+     */
+    public string $document_type = 'orque_projectdocument';
+
 	/**
 	 *	Constructor
 	 *
@@ -137,7 +142,6 @@ class pdf_orque_projectdocument
 		$this->db = $db;
 		$this->name = 'orque';
 		$this->description = $langs->trans('DocumentModelOrque');
-		$this->update_main_doc_field = 1; // Save the name of generated file as the main doc when generating a doc with this template
 
 		// Page size for A4 format
 		$this->type = 'pdf';
@@ -201,98 +205,89 @@ class pdf_orque_projectdocument
 		}
 	}
 
-	/**
-	 *  Function to build a document on disk using the generic pdf module.
-	 *
-	 * 	@param	ProjectDocument $objectDocument		Object source to build document
-	 * 	@param	Translate		$outputlangs		Lang output object
-	 * 	@param 	string 			$srctemplatepath 	Full path of source filename for generator using a template file
-	 * 	@param	int				$hidedetails		Do not show line details
-	 * 	@param	int				$hidedesc			Do not show desc
-	 * 	@param	int				$hideref			Do not show ref
-	 * 	@param	array			$moreParams			Array to provide more information
-	 *	@return	int         						1 if OK, <=0 if KO
-	 * 	@throws Exception
-	 */
-	public function write_file(	SaturneDocuments $objectDocument, Translate $outputLangs, string $srcTemplatePath, int $hideDetails = 0, int $hideDesc = 0, int $hideRef = 0, array $moreParams): int
-	{
-		global $conf, $hookmanager, $langs, $user;
+    /**
+     * Function to build a document on disk using the generic pdf module.
+     *
+     * @param  SaturneDocuments $objectDocument  Object source to build document
+     * @param  Translate        $outputLangs     Lang object to use for output
+     * @param  string           $srcTemplatePath Full path of source filename for generator using a template file
+     * @param  int              $hideDetails     Do not show line details
+     * @param  int              $hideDesc        Do not show desc
+     * @param  int              $hideRef         Do not show ref
+     * @param  array            $moreParam       More param (Object/user/etc)
+     * @return int                               1 if OK, <=0 if KO
+     * @throws Exception
+     */
+    public function write_file(SaturneDocuments $objectDocument, Translate $outputLangs, string $srcTemplatePath, int $hideDetails = 0, int $hideDesc = 0, int $hideRef = 0, array $moreParam): int
+    {
+        global $action, $conf, $hookmanager, $langs, $moduleNameLowerCase, $user;
 
-		$object = $moreParams['object'];
+        $object = $moreParam['object'];
 
-		if (!is_object($outputlangs)) {
-			$outputlangs = $langs;
-		}
+        if (empty($moduleNameLowerCase)) {
+            $moduleNameLowerCase = $objectDocument->module;
+        }
 
-		// For backward compatibility with FPDF, force output charset to ISO, because FPDF expect text to be encoded in ISO
-		if (!empty($conf->global->MAIN_USE_FPDF)) {
-			$outputlangs->charset_output = 'ISO-8859-1';
-		}
+        // Add PDF generation hook
+        $hookmanager->initHooks(['pdfgeneration']);
 
-		// Load traductions files required by page
-		$outputlangs->loadLangs(array('main', 'dict', 'companies', 'projects'));
+        if (!is_object($outputLangs)) {
+            $outputLangs                 = $langs;
+            $outputLangs->charset_output = 'UTF-8';
+        }
 
-		if ($conf->projet->dir_output) {
-            // Load numbering modules
-            $numberingModules = [
-                'digiriskdolibarrdocuments/projectdocument' => $conf->global->DIGIRISKDOLIBARR_PROJECTDOCUMENT_ADDON,
-            ];
-            list($refProjectDocumentMod) = saturne_require_objects_mod($numberingModules, 'digiriskdolibarr');
+        if ($conf->projet->dir_output) {
+            $numberingModules = ['digiriskdolibarrdocuments/projectdocument' => $conf->global->DIGIRISKDOLIBARR_PROJECTDOCUMENT_ADDON];
+            list($refModName) = saturne_require_objects_mod($numberingModules, 'digiriskdolibarr');
 
-            $ref = $refProjectDocumentMod->getNextValue($objectDocument);
+            $objectDocumentRef    = $refModName->getNextValue($objectDocument);
+            $objectDocument->ref  = $objectDocumentRef;
+            $objectDocument->type = $this->document_type;
+            $objectDocumentID     = $objectDocument->create($moreParam['user'], true, $object);
 
-			$objectDocument->ref = $ref;
-			$id = $objectDocument->create($user, true, $object);
-			$objectDocument->fetch($id);
+            $objectDocument->fetch($objectDocumentID);
 
-			$objectref = dol_sanitizeFileName($object->ref);
-			$dir = $conf->projet->dir_output;
-            if ($objectDocument->specimen == 0) {
-				$dir .= '/' . $objectref;
-			}
-			$societyname = preg_replace('/\./', '_', $conf->global->MAIN_INFO_SOCIETE_NOM);
+            $objectDocumentRef = dol_sanitizeFileName($objectDocument->ref);
 
-			$date     = dol_print_date(dol_now(), 'dayxcard');
-			$filename = $date . '_' . $objectDocument->ref . '_' . $objectref . '_' .  $societyname . '.pdf';
-			$filename = str_replace(' ', '_', $filename);
-			$filename = dol_sanitizeFileName($filename);
-			$filename = preg_replace('/[’‘‹›‚]/u', '', $filename);
+            $dir = $conf->projet->dir_output . '/' . (dol_strlen($object->ref) > 0 ? $object->ref : '');
 
-			$objectDocument->last_main_doc = $filename;
-
-			$sql  = 'UPDATE ' . MAIN_DB_PREFIX . 'saturne_object_documents';
-			$sql .= ' SET last_main_doc =' . ( ! empty($filename) ? "'" . $this->db->escape($filename) . "'" : 'null');
-			$sql .= ' WHERE rowid = ' . $objectDocument->id;
-
-			dol_syslog('admin.lib::Insert last main doc', LOG_DEBUG);
-			$this->db->query($sql);
-
-            if ($objectDocument->specimen == 1) {
-                $filename = 'SPECIMEN.pdf';
+            if ($moreParam['specimen'] == 1 && $moreParam['zone'] == 'public') {
+                $dir .= 'public_specimen';
             }
-            $file = $dir . '/' . $filename;
 
-			if (!file_exists($dir)) {
-				if (dol_mkdir($dir) < 0) {
-					$this->error = $langs->transnoentities('ErrorCanNotCreateDir', $dir);
-					return 0;
-				}
-			}
+            if (!file_exists($dir)) {
+                if (dol_mkdir($dir) < 0) {
+                    $this->error = $langs->transnoentities('ErrorCanNotCreateDir', $dir);
+                    return -1;
+                }
+            }
 
-			if (file_exists($dir)) {
-				// Add pdfgeneration hook
-				if (!is_object($hookmanager)) {
-					include_once DOL_DOCUMENT_ROOT . '/core/class/hookmanager.class.php';
-					$hookmanager = new HookManager($this->db);
-				}
-				$hookmanager->initHooks(array('pdfgeneration'));
-				$parameters = array('file'=>$file, 'object'=>$object, 'outputlangs'=>$outputlangs);
-				global $action;
-				$reshook = $hookmanager->executeHooks('beforePDFCreation', $parameters, $object, $action); // Note that $action and $object may have been modified by some hooks
+            if (file_exists($dir)) {
+                $societyName = preg_replace('/\./', '_', $conf->global->MAIN_INFO_SOCIETE_NOM);
+
+                $date       = dol_print_date(dol_now(), 'dayxcard');
+                $newFileTmp = $date . (dol_strlen($object->ref) > 0 ? '_' . $object->ref : '') . '_' . $objectDocumentRef . '_' .  $societyName;
+
+                if ($moreParam['specimen'] == 1) {
+                    $newFileTmp .= '_specimen';
+                }
+                $newFileTmp = str_replace(' ', '_', $newFileTmp);
+                $fileName   = dol_sanitizeFileName($newFileTmp) . '.pdf';
+                $file       = $dir . '/' . $fileName;
+
+                $objectDocument->setValueFrom('last_main_doc', $fileName, '', null, '', '', $moreParam['user'], '', '');
+                if (!empty($objectDocument->error)) {
+                    $objectDocument->errors[] = $objectDocument->ref;
+                    setEventMessages($objectDocument->error, $objectDocument->errors, 'errors');
+                    return -1;
+                }
+
+				$parameters = ['file' => $file, 'object' => $object, 'outputlangs' => $outputLangs];
+				$hookmanager->executeHooks('beforePDFCreation', $parameters, $object, $action); // Note that $action and $object may have been modified by some hooks
 
 				// Create pdf instance
 				$pdf = pdf_getInstance($this->format);
-				$default_font_size = pdf_getPDFFontSize($outputlangs); // Must be after pdf_getInstance
+				$default_font_size = pdf_getPDFFontSize($outputLangs); // Must be after pdf_getInstance
 				$pdf->SetAutoPageBreak(1, 0);
 
 				$heightforinfotot = 40; // Height reserved to output the info and total part
@@ -306,7 +301,7 @@ class pdf_orque_projectdocument
 					$pdf->setPrintHeader(false);
 					$pdf->setPrintFooter(false);
 				}
-				$pdf->SetFont(pdf_getPDFFont($outputlangs));
+				$pdf->SetFont(pdf_getPDFFont($outputLangs));
 				// Set path to the background PDF File
 				if (!empty($conf->global->MAIN_ADD_PDF_BACKGROUND)) {
 					$pagecount = $pdf->setSourceFile($conf->mycompany->dir_output.'/'.$conf->global->MAIN_ADD_PDF_BACKGROUND);
@@ -335,12 +330,12 @@ class pdf_orque_projectdocument
 				$pagenb = 0;
 				$pdf->SetDrawColor(128, 128, 128);
 
-				$pdf->SetTitle($outputlangs->convToOutputCharset($object->ref));
-				$pdf->SetSubject($outputlangs->transnoentities('Project'));
+				$pdf->SetTitle($outputLangs->convToOutputCharset($object->ref));
+				$pdf->SetSubject($outputLangs->transnoentities('Project'));
 				$pdf->SetCreator('Dolibarr ' .DOL_VERSION);
-				$pdf->SetAuthor($outputlangs->convToOutputCharset($user->getFullName($outputlangs)));
+				$pdf->SetAuthor($outputLangs->convToOutputCharset($user->getFullName($outputLangs)));
 				$pdf->SetKeyWords(
-                    $outputlangs->convToOutputCharset($object->ref) . ' pdf_orque_projectdocument.modules.php' .$outputlangs->transnoentities('Project'));
+                    $outputLangs->convToOutputCharset($object->ref) . ' pdf_orque_projectdocument.modules.php' .$outputLangs->transnoentities('Project'));
 				if (!empty($conf->global->MAIN_DISABLE_PDF_COMPRESSION)) {
 					$pdf->SetCompression(false);
 				}
@@ -353,7 +348,7 @@ class pdf_orque_projectdocument
 					$pdf->useTemplate($tplidx);
 				}
 				$pagenb++;
-				$this->_pagehead($pdf, $object, 1, $outputlangs);
+				$this->_pagehead($pdf, $object, 1, $outputLangs);
 				$pdf->SetFont('', '', $default_font_size - 1);
 				$pdf->MultiCell(0, 3, ''); // Set interline to 3
 				$pdf->SetTextColor(0, 0, 0);
@@ -366,9 +361,9 @@ class pdf_orque_projectdocument
 				// Show public note
 				$notetoshow = empty($object->note_public) ? '' : $object->note_public;
 				if ($notetoshow) {
-					$substitutionarray = pdf_getSubstitutionArray($outputlangs, null, $object);
-					complete_substitutions_array($substitutionarray, $outputlangs, $object);
-					$notetoshow = make_substitutions($notetoshow, $substitutionarray, $outputlangs);
+					$substitutionarray = pdf_getSubstitutionArray($outputLangs, null, $object);
+					complete_substitutions_array($substitutionarray, $outputLangs, $object);
+					$notetoshow = make_substitutions($notetoshow, $substitutionarray, $outputLangs);
 					$notetoshow = convertBackOfficeMediasLinksToPublicLinks($notetoshow);
 
 					$tab_top -= 2;
@@ -446,17 +441,17 @@ class pdf_orque_projectdocument
 					$pdf->startTransaction();
 					// Label
 					$pdf->SetXY($this->posxlabel, $curY);
-					$pdf->MultiCell($this->posxbudget - $this->posxlabel, 3, $outputlangs->convToOutputCharset($libelleline), 0, 'L');
+					$pdf->MultiCell($this->posxbudget - $this->posxlabel, 3, $outputLangs->convToOutputCharset($libelleline), 0, 'L');
 					$pageposafter = $pdf->getPage();
-					if ($pageposafter > $pageposbefore) {	// There is a pagebreak
+					if ($pageposafter > $pageposbefore) { // There is a pagebreak
 						$pdf->rollbackTransaction(true);
 						$pageposafter = $pageposbefore;
-						//print $pageposafter.'-'.$pageposbefore;exit;
 						$pdf->setPageOrientation($this->orientation, 1, $heightforfooter); // The only function to edit the bottom margin of current page to set it.
+
 						// Label
 						$pdf->SetXY($this->posxlabel, $curY);
 						$posybefore = $pdf->GetY();
-						$pdf->MultiCell($this->posxworkload - $this->posxlabel, 3, $outputlangs->convToOutputCharset($libelleline), 0, 'L');
+						$pdf->MultiCell($this->posxbudget - $this->posxlabel, 3, $outputLangs->convToOutputCharset($libelleline), 0, 'L');
 						$pageposafter = $pdf->getPage();
 						$posyafter = $pdf->GetY();
 						if ($posyafter > ($this->page_hauteur - ($heightforfooter + $heightforfreetext + $heightforinfotot))) {	// There is no space left for total+free text
@@ -466,7 +461,7 @@ class pdf_orque_projectdocument
 									$pdf->useTemplate($tplidx);
 								}
 								if (empty($conf->global->MAIN_PDF_DONOTREPEAT_HEAD)) {
-									$this->_pagehead($pdf, $object, 0, $outputlangs);
+									$this->_pagehead($pdf, $object, 0, $outputLangs);
 								}
 								$pdf->setPage($pageposafter + 1);
 							}
@@ -491,7 +486,7 @@ class pdf_orque_projectdocument
 									$pdf->useTemplate($tplidx);
 								}
 								if (empty($conf->global->MAIN_PDF_DONOTREPEAT_HEAD)) {
-									$this->_pagehead($pdf, $object, 0, $outputlangs);
+									$this->_pagehead($pdf, $object, 0, $outputLangs);
 								}
 								$pdf->setPage($pageposafter + 1);
 								$pdf->SetFont('', '', $default_font_size - 1); // On repositionne la police par defaut
@@ -504,17 +499,15 @@ class pdf_orque_projectdocument
 								// Label
 								$pdf->SetXY($this->posxlabel, $curY);
 								$posybefore = $pdf->GetY();
-								$pdf->MultiCell($this->posxbudget - $this->posxlabel, 3, $outputlangs->convToOutputCharset($libelleline), 0, 'L');
+								$pdf->MultiCell($this->posxbudget - $this->posxlabel, 3, $outputLangs->convToOutputCharset($libelleline), 0, 'L');
 								$pageposafter = $pdf->getPage();
 								$posyafter = $pdf->GetY();
 							}
 						}
-						//var_dump($i.' '.$posybefore.' '.$posyafter.' '.($this->page_hauteur -  ($heightforfooter + $heightforfreetext + $heightforinfotot)).' '.$showpricebeforepagebreak);
-					} else // No pagebreak
-					{
-						$pdf->commitTransaction();
+					} else {
+                        // No pagebreak
+                        $pdf->commitTransaction();
 					}
-					$posYAfterDescription = $pdf->GetY();
 
 					$nexY = $pdf->GetY();
 					$pageposafter = $pdf->getPage();
@@ -524,7 +517,6 @@ class pdf_orque_projectdocument
 
 					// We suppose that a too long description is moved completely on next page
 					if ($pageposafter > $pageposbefore && empty($showpricebeforepagebreak)) {
-						//var_dump($pageposbefore.'-'.$pageposafter.'-'.$showpricebeforepagebreak);
 						$pdf->setPage($pageposafter);
 						$curY = $tab_top_newpage + $heightoftitleline + 1;
 					}
@@ -533,7 +525,7 @@ class pdf_orque_projectdocument
 
 					// Ref of task
 					$pdf->SetXY($this->posxref, $curY);
-					$pdf->MultiCell($this->posxrisk - $this->posxref, 3, $outputlangs->convToOutputCharset($ref), 0, 'L');
+					$pdf->MultiCell($this->posxrisk - $this->posxref, 3, $outputLangs->convToOutputCharset($ref), 0, 'L');
 					// Risk
 					$pdf->SetXY($this->posxrisk, $curY);
 					$pdf->MultiCell($this->posxriskassessment - $this->posxrisk, 3, $riskref, 0, 'L');
@@ -585,16 +577,16 @@ class pdf_orque_projectdocument
 					while ($pagenb < $pageposafter) {
 						$pdf->setPage($pagenb);
 						if ($pagenb == 1) {
-							$this->_tableau($pdf, $tab_top, $this->page_hauteur - $tab_top - $heightforfooter, 0, $outputlangs, 0, 1);
+							$this->_tableau($pdf, $tab_top, $this->page_hauteur - $tab_top - $heightforfooter, 0, $outputLangs, 0, 1);
 						} else {
-							$this->_tableau($pdf, $tab_top_newpage, $this->page_hauteur - $tab_top_newpage - $heightforfooter, 0, $outputlangs, 1, 1);
+							$this->_tableau($pdf, $tab_top_newpage, $this->page_hauteur - $tab_top_newpage - $heightforfooter, 0, $outputLangs, 1, 1);
 						}
-						$this->_pagefoot($pdf, $object, $outputlangs, 1);
+						$this->_pagefoot($pdf, $object, $outputLangs, 1);
 						$pagenb++;
 						$pdf->setPage($pagenb);
 						$pdf->setPageOrientation('', 1, 0); // The only function to edit the bottom margin of current page to set it.
 						if (empty($conf->global->MAIN_PDF_DONOTREPEAT_HEAD)) {
-							$this->_pagehead($pdf, $object, 0, $outputlangs);
+							$this->_pagehead($pdf, $object, 0, $outputLangs);
 						}
 						if (!empty($tplidx)) {
 							$pdf->useTemplate($tplidx);
@@ -602,11 +594,11 @@ class pdf_orque_projectdocument
 					}
 					if (isset($object->lines[$i + 1]->pagebreak) && $object->lines[$i + 1]->pagebreak) {
 						if ($pagenb == 1) {
-							$this->_tableau($pdf, $tab_top, $this->page_hauteur - $tab_top - $heightforfooter, 0, $outputlangs, 0, 1);
+							$this->_tableau($pdf, $tab_top, $this->page_hauteur - $tab_top - $heightforfooter, 0, $outputLangs, 0, 1);
 						} else {
-							$this->_tableau($pdf, $tab_top_newpage, $this->page_hauteur - $tab_top_newpage - $heightforfooter, 0, $outputlangs, 1, 1);
+							$this->_tableau($pdf, $tab_top_newpage, $this->page_hauteur - $tab_top_newpage - $heightforfooter, 0, $outputLangs, 1, 1);
 						}
-						$this->_pagefoot($pdf, $object, $outputlangs, 1);
+						$this->_pagefoot($pdf, $object, $outputLangs, 1);
 						// New page
 						$pdf->AddPage($this->orientation);
 						if (!empty($tplidx)) {
@@ -614,7 +606,7 @@ class pdf_orque_projectdocument
 						}
 						$pagenb++;
 						if (empty($conf->global->MAIN_PDF_DONOTREPEAT_HEAD)) {
-							$this->_pagehead($pdf, $object, 0, $outputlangs);
+							$this->_pagehead($pdf, $object, 0, $outputLangs);
 						}
 					}
 				}
@@ -627,18 +619,18 @@ class pdf_orque_projectdocument
 
 				// Total budget of task
 				$pdf->SetXY($this->posxref, $curY);
-				$pdf->MultiCell($this->posxbudget - $this->posxlabel, 3, $outputlangs->convToOutputCharset($langs->transnoentities('TotalBudget')) . ' : ' . $outputlangs->convToOutputCharset($totalbudget), 0, 'L');
+				$pdf->MultiCell($this->posxbudget - $this->posxlabel, 3, $outputLangs->convToOutputCharset($langs->transnoentities('TotalBudget')) . ' : ' . $outputLangs->convToOutputCharset($totalbudget), 0, 'L');
 
 				// Show square
 				if ($pagenb == 1) {
-					$this->_tableau($pdf, $tab_top, $this->page_hauteur - $tab_top - $heightforinfotot - $heightforfreetext - $heightforfooter, 0, $outputlangs, 0, 0);
+					$this->_tableau($pdf, $tab_top, $this->page_hauteur - $tab_top - $heightforinfotot - $heightforfreetext - $heightforfooter, 0, $outputLangs, 0, 0);
 				} else {
-					$this->_tableau($pdf, $tab_top_newpage, $this->page_hauteur - $tab_top_newpage - $heightforinfotot - $heightforfreetext - $heightforfooter, 0, $outputlangs, 1, 0);
+					$this->_tableau($pdf, $tab_top_newpage, $this->page_hauteur - $tab_top_newpage - $heightforinfotot - $heightforfreetext - $heightforfooter, 0, $outputLangs, 1, 0);
 				}
 				$bottomlasttab = $this->page_hauteur - $heightforinfotot - $heightforfreetext - $heightforfooter + 1;
 
 				// Footer of the page
-				$this->_pagefoot($pdf, $object, $outputlangs);
+				$this->_pagefoot($pdf, $object, $outputLangs);
 				if (method_exists($pdf, 'AliasNbPages')) {
 					$pdf->AliasNbPages();
 				}
@@ -649,7 +641,7 @@ class pdf_orque_projectdocument
 
 				// Add pdfgeneration hook
 				$hookmanager->initHooks(array('pdfgeneration'));
-				$parameters = array('file'=>$file, 'object'=>$object, 'outputlangs'=>$outputlangs);
+				$parameters = array('file'=>$file, 'object'=>$object, 'outputlangs'=>$outputLangs);
 				global $action;
 				$reshook = $hookmanager->executeHooks('afterPDFCreation', $parameters, $this, $action); // Note that $action and $object may have been modified by some hooks
 				if ($reshook < 0) {
@@ -682,18 +674,18 @@ class pdf_orque_projectdocument
 	 *   @param		string		$tab_top		Top position of table
 	 *   @param		string		$tab_height		Height of table (rectangle)
 	 *   @param		int			$nexY			Y
-	 *   @param		Translate	$outputlangs	Langs object
+	 *   @param		Translate	$outputLangs	Langs object
 	 *   @param		int			$hidetop		Hide top bar of array
 	 *   @param		int			$hidebottom		Hide bottom bar of array
 	 *   @return	void
 	 */
-	protected function _tableau(&$pdf, $tab_top, $tab_height, $nexY, $outputlangs, $hidetop = 0, $hidebottom = 0)
+	protected function _tableau(&$pdf, $tab_top, $tab_height, $nexY, $outputLangs, $hidetop = 0, $hidebottom = 0)
 	{
 		global $conf, $mysoc;
 
 		$heightoftitleline = 10;
 
-		$default_font_size = pdf_getPDFFontSize($outputlangs);
+		$default_font_size = pdf_getPDFFontSize($outputLangs);
 
 		$pdf->SetDrawColor(128, 128, 128);
 
@@ -707,33 +699,33 @@ class pdf_orque_projectdocument
 		$pdf->SetFont('', '', $default_font_size);
 
 		$pdf->SetXY($this->posxref, $tab_top + 1);
-		$pdf->MultiCell($this->posxrisk - $this->posxref, 3, $outputlangs->transnoentities('Tasks'), '', 'L');
+		$pdf->MultiCell($this->posxrisk - $this->posxref, 3, $outputLangs->transnoentities('Tasks'), '', 'L');
 
 		$pdf->SetXY($this->posxrisk, $tab_top + 1);
-		$pdf->MultiCell($this->posxriskassessment - $this->posxrisk, 3, $outputlangs->transnoentities('Risk'), '', 'L');
+		$pdf->MultiCell($this->posxriskassessment - $this->posxrisk, 3, $outputLangs->transnoentities('Risk'), '', 'L');
 
 		$pdf->SetXY($this->posxriskassessment, $tab_top + 1);
-		$pdf->MultiCell($this->posxlabel - $this->posxriskassessment, 3, $outputlangs->transnoentities('RiskAssessment'), '', 'L');
+		$pdf->MultiCell($this->posxlabel - $this->posxriskassessment, 3, $outputLangs->transnoentities('RiskAssessment'), '', 'L');
 
 		$pdf->SetXY($this->posxlabel, $tab_top + 1);
-		$pdf->MultiCell($this->posxbudget - $this->posxlabel, 3, $outputlangs->transnoentities('Label'), 0, 'L');
+		$pdf->MultiCell($this->posxbudget - $this->posxlabel, 3, $outputLangs->transnoentities('Label'), 0, 'L');
 
 		$pdf->SetXY($this->posxbudget, $tab_top + 1);
-		$pdf->MultiCell($this->posxworkload - $this->posxbudget, 3, $outputlangs->transnoentities('Budget'), 0, 'R');
+		$pdf->MultiCell($this->posxworkload - $this->posxbudget, 3, $outputLangs->transnoentities('Budget'), 0, 'R');
 
 		$pdf->SetXY($this->posxworkload, $tab_top + 1);
-		$pdf->MultiCell($this->posxprogress - $this->posxworkload, 3, $outputlangs->transnoentities('PlannedWorkloadShort'), 0, 'R');
+		$pdf->MultiCell($this->posxprogress - $this->posxworkload, 3, $outputLangs->transnoentities('PlannedWorkloadShort'), 0, 'R');
 
 		$pdf->SetXY($this->posxprogress, $tab_top + 1);
 		$pdf->MultiCell($this->posxdatestart - $this->posxprogress, 3, '%', 0, 'R');
 
 		// Date start
 		$pdf->SetXY($this->posxdatestart, $tab_top + 1);
-		$pdf->MultiCell($this->posxdateend - $this->posxdatestart, 3, $outputlangs->trans('Start'), 0, 'C');
+		$pdf->MultiCell($this->posxdateend - $this->posxdatestart, 3, $outputLangs->trans('Start'), 0, 'C');
 
 		// Date end
 		$pdf->SetXY($this->posxdateend, $tab_top + 1);
-		$pdf->MultiCell($this->page_largeur - $this->marge_droite - $this->posxdateend, 3, $outputlangs->trans('End'), 0, 'C');
+		$pdf->MultiCell($this->page_largeur - $this->marge_droite - $this->posxdateend, 3, $outputLangs->trans('End'), 0, 'C');
 	}
 
 	// phpcs:disable PEAR.NamingConventions.ValidFunctionName.PublicUnderscore
@@ -743,16 +735,16 @@ class pdf_orque_projectdocument
 	 *  @param	TCPDF		$pdf     		Object PDF
 	 *  @param  Project		$object     	Object to show
 	 *  @param  int	    	$showaddress    0=no, 1=yes
-	 *  @param  Translate	$outputlangs	Object lang for output
+	 *  @param  Translate	$outputLangs	Object lang for output
 	 *  @return	void
 	 */
-	protected function _pagehead(&$pdf, $object, $showaddress, $outputlangs)
+	protected function _pagehead(&$pdf, $object, $showaddress, $outputLangs)
 	{
 		global $langs, $conf, $mysoc;
 
-		$default_font_size = pdf_getPDFFontSize($outputlangs);
+		$default_font_size = pdf_getPDFFontSize($outputLangs);
 
-		pdf_pagehead($pdf, $outputlangs, $this->page_hauteur);
+		pdf_pagehead($pdf, $outputLangs, $this->page_hauteur);
 
 		$pdf->SetTextColor(0, 0, 60);
 		$pdf->SetFont('', 'B', $default_font_size + 3);
@@ -775,30 +767,30 @@ class pdf_orque_projectdocument
 				$pdf->MultiCell(100, 3, $langs->transnoentities('ErrorGoToModuleSetup'), 0, 'L');
 			}
 		} else {
-			$pdf->MultiCell(100, 4, $outputlangs->transnoentities($this->emetteur->name), 0, 'L');
+			$pdf->MultiCell(100, 4, $outputLangs->transnoentities($this->emetteur->name), 0, 'L');
 		}
 
 		$pdf->SetFont('', 'B', $default_font_size + 3);
 		$pdf->SetXY($posx, $posy);
 		$pdf->SetTextColor(0, 0, 60);
-		$pdf->MultiCell(100, 4, $outputlangs->transnoentities('Project') . ' ' .$outputlangs->convToOutputCharset($object->ref), '', 'R');
+		$pdf->MultiCell(100, 4, $outputLangs->transnoentities('Project') . ' ' .$outputLangs->convToOutputCharset($object->ref), '', 'R');
 		$pdf->SetFont('', '', $default_font_size + 2);
 
 		$posy += 6;
 		$pdf->SetXY($posx, $posy);
 		$pdf->SetTextColor(0, 0, 60);
-		$pdf->MultiCell(100, 4, $outputlangs->transnoentities('DateStart'). ' : ' .dol_print_date($object->date_start, 'day', false, $outputlangs, true), '', 'R');
+		$pdf->MultiCell(100, 4, $outputLangs->transnoentities('DateStart'). ' : ' .dol_print_date($object->date_start, 'day', false, $outputLangs, true), '', 'R');
 
 		if ($object->date_end) {
 			$posy += 6;
 			$pdf->SetXY($posx, $posy);
-			$pdf->MultiCell(100, 4, $outputlangs->transnoentities('DateEnd'). ' : ' .dol_print_date($object->date_end, 'day', false, $outputlangs, true), '', 'R');
+			$pdf->MultiCell(100, 4, $outputLangs->transnoentities('DateEnd'). ' : ' .dol_print_date($object->date_end, 'day', false, $outputLangs, true), '', 'R');
 		}
 
 		if (is_object($object->thirdparty)) {
 			$posy += 6;
 			$pdf->SetXY($posx, $posy);
-			$pdf->MultiCell(100, 4, $outputlangs->transnoentities('ThirdParty'). ' : ' .$object->thirdparty->getFullName($outputlangs), '', 'R');
+			$pdf->MultiCell(100, 4, $outputLangs->transnoentities('ThirdParty'). ' : ' .$object->thirdparty->getFullName($outputLangs), '', 'R');
 		}
 
 		$pdf->SetTextColor(0, 0, 60);
@@ -812,7 +804,7 @@ class pdf_orque_projectdocument
 			var_dump($objects);exit;
 			if ($objecttype == 'commande')
 			{
-				$outputlangs->load('orders');
+				$outputLangs->load('orders');
 				$num=count($objects);
 				for ($i=0;$i<$num;$i++)
 				{
@@ -821,7 +813,7 @@ class pdf_orque_projectdocument
 					$pdf->SetFont('','', $default_font_size - 1);
 					$text=$objects[$i]->ref;
 					if ($objects[$i]->ref_client) $text.=' ('.$objects[$i]->ref_client.')';
-					$pdf->MultiCell(100, 4, $outputlangs->transnoentities("RefOrder")." : ".$outputlangs->transnoentities($text), '', 'R');
+					$pdf->MultiCell(100, 4, $outputLangs->transnoentities("RefOrder")." : ".$outputLangs->transnoentities($text), '', 'R');
 				}
 			}
 		}
@@ -834,14 +826,14 @@ class pdf_orque_projectdocument
 	 *
 	 *  @param	TCPDF		$pdf     			PDF
 	 *  @param	Project		$object				Object to show
-	 *  @param	Translate	$outputlangs		Object lang for output
+	 *  @param	Translate	$outputLangs		Object lang for output
 	 *  @param	int			$hidefreetext		1=Hide free text
 	 *  @return    int
 	 */
-	protected function _pagefoot(&$pdf, $object, $outputlangs, $hidefreetext = 0)
+	protected function _pagefoot(&$pdf, $object, $outputLangs, $hidefreetext = 0)
 	{
 		global $conf;
 		$showdetails = empty($conf->global->MAIN_GENERATE_DOCUMENTS_SHOW_FOOT_DETAILS) ? 0 : $conf->global->MAIN_GENERATE_DOCUMENTS_SHOW_FOOT_DETAILS;
-		return pdf_pagefoot($pdf, $outputlangs, 'PROJECT_FREE_TEXT', $this->emetteur, $this->marge_basse, $this->marge_gauche, $this->page_hauteur, $object, $showdetails, $hidefreetext);
+		return pdf_pagefoot($pdf, $outputLangs, 'PROJECT_FREE_TEXT', $this->emetteur, $this->marge_basse, $this->marge_gauche, $this->page_hauteur, $object, $showdetails, $hidefreetext);
 	}
 }

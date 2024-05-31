@@ -187,8 +187,8 @@ class doc_riskassessmentdocument_odt extends SaturneDocumentModel
 				$objectDocument->fillRiskData($odfHandler, $objectDocument, $outputLangs, $tmpArray, $file, $risks, $conf->global->DIGIRISKDOLIBARR_SHOW_SHARED_RISKS);
 
 				//Fill tickets data
-				$filter = array('t.fk_project' => $conf->global->DIGIRISKDOLIBARR_TICKET_PROJECT);
-                $tickets = saturne_fetch_all_object_type('Ticket', '', '', 0, 0,  $filter);
+                $filter    = ['customsql' => 't.fk_project = ' . $conf->global->DIGIRISKDOLIBARR_TICKET_PROJECT . ' AND eft.digiriskdolibarr_ticket_service > 0'];
+                $tickets   = saturne_fetch_all_object_type('Ticket', '', '', 0, 0,  $filter, 'AND', true);
 				$listLines = $odfHandler->setSegment('tickets');
 				if (is_array($tickets) && !empty($tickets)) {
 					foreach ($tickets as $line) {
