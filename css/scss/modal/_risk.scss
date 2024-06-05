@@ -53,8 +53,14 @@
   margin-bottom: 1em;
   border-bottom: 1px solid rgba(0, 0, 0, 0.2);
 
-  .risk-evaluation-header {
+  .risk-evaluation-media-wrapper {
+    display: flex;
+    justify-content: space-between;
     margin-bottom: 1em;
+
+    .risk-evaluation-header {
+      margin-bottom: 1em;
+    }
   }
   .risk-evaluation-content-wrapper {
     display: flex;
