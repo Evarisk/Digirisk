@@ -1017,9 +1017,9 @@ class ActionsDigiriskdolibarr
 		];
 
 		// Do something only for the current context.
-		if (in_array($parameters['currentcontext'], ['digiriskdolibarradmindocuments'])) {
+		if (strpos($parameters['context'], 'digiriskdolibarradmindocuments')) {
 			$this->results = $types;
-		}
+        }
 
 		return 0; // or return 1 to replace standard code.
 	}
@@ -1040,7 +1040,7 @@ class ActionsDigiriskdolibarr
 		];
 
 		// Do something only for the current context.
-		if (in_array($parameters['currentcontext'], ['digiriskdolibarradmindocuments'])) {
+        if (strpos($parameters['context'], 'digiriskdolibarradmindocuments')) {
 			$this->results = $additionalConfig;
 		}
 
