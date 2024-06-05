@@ -1592,6 +1592,10 @@ if ((empty($action) || ($action != 'create' && $action != 'edit'))) {
             }
         }
 
+        if (!array_key_exists($labourInspectorContact->id, $liste)) {
+            $liste[$labourInspectorContact->id] = $labourInspectorContact->firstname . ' ' . $labourInspectorContact->lastname . (!empty($labourInspectorContact->email) ? ' <' . $labourInspectorContact->email . '>' : '');
+        }
+
         $formmail->withto              = $liste;
         $formmail->withtofree          = (GETPOSTISSET('sendto') ? (GETPOST('sendto', 'alphawithlgt') ? GETPOST('sendto', 'alphawithlgt') : '1') : '1');
         $formmail->withtocc            = $liste;
