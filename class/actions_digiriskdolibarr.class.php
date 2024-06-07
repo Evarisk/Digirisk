@@ -47,9 +47,9 @@ class ActionsDigiriskdolibarr
 	public $results = array();
 
 	/**
-	 * @var string String displayed by executeHook() immediately after return
+	 * @var string|null String displayed by executeHook() immediately after return
 	 */
-	public $resprints;
+	public ?string $resprints;
 
 	/**
 	 * Constructor
