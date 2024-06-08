@@ -727,7 +727,7 @@ RiskAssessmentDocumentImportantNote                       = Notes importantes :<
 GenerateZipArchiveWithDigiriskElementDocuments            = Génération d'une archive ZIP avec le Document Unique
 GenerateZipArchiveWithDigiriskElementDocumentsDescription = Génération automatique d'une archive ZIP contenant le Document Unique et toutes les fiches de poste lors de la génération du Document Unique
 RiskAssessmentDocumentDescription                         = Plan d'action Document Unique
-
+RiskAssessmentDocumentGeneration                          = Génération du Document Unique
 # Boxes - Widget
 LastGenerateDate             = DU généré le
 NextGenerateDate             = Prochain DU le
