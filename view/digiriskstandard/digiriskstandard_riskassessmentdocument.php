@@ -237,7 +237,8 @@ if (empty($reshook)) {
                         $nameFile       = dol_sanitizeFileName($nameFile);
 
                         $digiriskelementdocumentGenerated = $digiriskelementdocument->fetchAll('DESC','date_creation',1,0,['customsql' => 'parent_type="'. $digiriskelementsingle['object']->element_type .'" AND parent_id=' . $digiriskelementsingle['object']->id],'','');
-                        $digiriskelementdocument = array_shift($digiriskelementdocumentGenerated);
+                        $digiriskelementdocument          = array_shift($digiriskelementdocumentGenerated);
+
                         copy($sourceFilePath . $digiriskelementdocument->last_main_doc, $pathToZip . '/' . $nameFile . '.odt');
                         $pathinfo = pathinfo($digiriskelementdocument->last_main_doc);
                         if (file_exists($sourceFilePath . $pathinfo['filename'] . '.pdf')) {
@@ -327,10 +328,9 @@ if (empty($reshook)) {
 $title    = $langs->trans('RiskAssessmentDocument');
 $help_url = 'FR:Module_Digirisk#Impression_du_Document_Unique';
 
-digirisk_header($title, $help_url); ?>
-
+digirisk_header($title, $help_url);
+?>
     <div id="cardContent" value="">
-
 <?php // Part to show record
 $res  = $object->fetch_optionals();
 
@@ -613,16 +613,17 @@ if ($action == 'presend') {
     print dol_get_fiche_end();
 }
 
-$saturneDocumentModel = new SaturneDocumentModel($db, 'digiriskdolibarr', 'riskassessmentdocument');
-$documentType = strtolower('riskassessmentdocument');
-$modellist = $saturneDocumentModel->liste_modeles($db, $documentType);
+$saturneDocumentModel        = new SaturneDocumentModel($db, 'digiriskdolibarr', 'riskassessmentdocument');
+$documentType                = strtolower('riskassessmentdocument');
+$modellist                   = $saturneDocumentModel->liste_modeles($db, $documentType);
 $riskassessmentDocumentModel = array_keys($modellist)[1];
 
-$groupmentUrl = DOL_URL_ROOT . '/custom/digiriskdolibarr/view/digiriskelement/digiriskelement_card.php?forcebuilddoc=1';
+$groupmentUrl              = DOL_URL_ROOT . '/custom/digiriskdolibarr/view/digiriskelement/digiriskelement_card.php?forcebuilddoc=1';
 $riskAssessmentDocumentUrl = DOL_URL_ROOT . '/custom/digiriskdolibarr/view/digiriskstandard/digiriskstandard_riskassessmentdocument.php?action=builddoc&model='.$riskassessmentDocumentModel;
 
 $digiriskElementList = $digiriskelement->getActiveDigiriskElements();
-$digiriskElementIds = '';
+$digiriskElementIds  = '';
+
 if (is_array($digiriskElementList) && !empty($digiriskElementList)) {
     foreach($digiriskElementList as $digiriskElementId => $digiriskElementSingle) {
         $digiriskElementIds .= $digiriskElementId . ',';
@@ -642,6 +643,7 @@ print '<input hidden id="digiriskElementIds" value="' . $digiriskElementIds . '"
         </div>
     </div>
 <?php
+
 // End of page
 llxFooter();
 $db->close();

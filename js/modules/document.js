@@ -1,6 +1,6 @@
 
 /**
- * Initialise l'objet "signature" ainsi que la méthode "init" obligatoire pour la bibliothèque DigiriskDolibarr.
+ * Initialise l'objet "document" ainsi que la méthode "init" obligatoire pour la bibliothèque DigiriskDolibarr.
  *
  * @since   1.1.0
  * @version 1.1.0
@@ -140,10 +140,6 @@ window.digiriskdolibarr.document.showAdvancementModal = async function () {
     elements.eq(0).append(newDocumentDiv);
     elements.eq(1).append(newDocumentDiv);
   }, "2000");
-
-
-
-  // afficher la notice
 }
 
 window.digiriskdolibarr.document.updateModal = function (text) {
