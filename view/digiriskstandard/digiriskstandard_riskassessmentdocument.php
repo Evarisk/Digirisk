@@ -620,6 +620,7 @@ $riskassessmentDocumentModel = array_keys($modellist)[1];
 
 $groupmentUrl              = DOL_URL_ROOT . '/custom/digiriskdolibarr/view/digiriskelement/digiriskelement_card.php?forcebuilddoc=1';
 $riskAssessmentDocumentUrl = DOL_URL_ROOT . '/custom/digiriskdolibarr/view/digiriskstandard/digiriskstandard_riskassessmentdocument.php?action=builddoc&model='.$riskassessmentDocumentModel;
+$documentGeneratedText     = $langs->trans('DocumentGenerated');
 
 $digiriskElementList = $digiriskelement->getActiveDigiriskElements();
 $digiriskElementIds  = '';
@@ -632,6 +633,7 @@ if (is_array($digiriskElementList) && !empty($digiriskElementList)) {
 print '<input hidden id="groupmentUrl" value="' . $groupmentUrl . '">';
 print '<input hidden id="riskAssessmentDocumentUrl" value="' . $riskAssessmentDocumentUrl . '">';
 print '<input hidden id="digiriskElementIds" value="' . $digiriskElementIds . '">';
+print '<input hidden id="documentGeneratedText" value="' . $documentGeneratedText . '">';
 
 ?>
     <div id="generationModal" class="wpeo-modal">

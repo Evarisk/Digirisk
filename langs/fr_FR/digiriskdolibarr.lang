@@ -728,6 +728,8 @@ GenerateZipArchiveWithDigiriskElementDocuments            = Génération d'une a
 GenerateZipArchiveWithDigiriskElementDocumentsDescription = Génération automatique d'une archive ZIP contenant le Document Unique et toutes les fiches de poste lors de la génération du Document Unique
 RiskAssessmentDocumentDescription                         = Plan d'action Document Unique
 RiskAssessmentDocumentGeneration                          = Génération du Document Unique
+DocumentGenerated                                         = Document généré
+
 # Boxes - Widget
 LastGenerateDate             = DU généré le
 NextGenerateDate             = Prochain DU le

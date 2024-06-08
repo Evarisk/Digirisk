@@ -66,7 +66,7 @@ window.digiriskdolibarr.document.displayLoader = function(  ) {
   window.saturne.loader.display($(this).closest('.div-table-responsive-no-min'));
 };
 
-window.digiriskdolibarr.document.generateDocument = async function (generationUrl) {
+window.digiriskdolibarr.document.generateDocument = async function (generationUrl, documentGeneratedText) {
   const token = window.saturne.toolbox.getToken()
 
   return await $.ajax({
@@ -78,10 +78,12 @@ window.digiriskdolibarr.document.generateDocument = async function (generationUr
   }).done(function(data) {
     $('.wpeo-loader').removeClass('wpeo-loader')
     $('.loader').html('<i class="fas fa-check" style="color: green"></i>')
+
     const digiriskElementText = $(data).find('.refid').text()
-    const digiriskElementRef = digiriskElementText.split("Description")[0].trim();
-    const documentName = $(data).find('#builddoc_form').find('.documentdownload').first().text();
-    const textToShow = 'Document généré : ' + digiriskElementRef + ' => ' + documentName
+    const digiriskElementRef = digiriskElementText.split(/Description|Projet/)[0].trim();
+    const documentName        = $(data).find('#builddoc_form').find('.documentdownload').first().text()
+    const textToShow   = documentGeneratedText + ' : ' + digiriskElementRef + ' => ' + documentName
+
     window.digiriskdolibarr.document.updateModal(textToShow)
     return data
   });
@@ -97,6 +99,7 @@ window.digiriskdolibarr.document.showAdvancementModal = async function () {
 
   const groupmentUrl = $('#groupmentUrl').val()
   const riskAssessmentDocumentUrl = $('#riskAssessmentDocumentUrl').val()
+  const documentGeneratedText = $('#documentGeneratedText').val()
 
   const digiriskElementIds = $('#digiriskElementIds').val()
   const digiriskElementIdsArray = digiriskElementIds.split(',')
@@ -107,7 +110,7 @@ window.digiriskdolibarr.document.showAdvancementModal = async function () {
   for (let i = 0; i<digiriskElementIdsArray.length; i++) {
     const id = digiriskElementIdsArray[i]
     if (id > 0) {
-      await window.digiriskdolibarr.document.generateDocument(groupmentUrl + '&id=' + id)
+      await window.digiriskdolibarr.document.generateDocument(groupmentUrl + '&id=' + id, documentGeneratedText)
       completedElements++;
       const progress = Math.floor((completedElements / totalElements) * 100);
       $("#progressbar .ui-progressbar-value").animate({ width: progress + "%" }, 500);
@@ -115,7 +118,7 @@ window.digiriskdolibarr.document.showAdvancementModal = async function () {
     }
   }
 
-  const riskassessmentdocumentPage = await window.digiriskdolibarr.document.generateDocument(riskAssessmentDocumentUrl)
+  const riskassessmentdocumentPage = await window.digiriskdolibarr.document.generateDocument(riskAssessmentDocumentUrl, documentGeneratedText)
   completedElements++;
   const progress = Math.floor((completedElements / totalElements) * 100);
   $("#progressbar .ui-progressbar-value").animate({ width: progress + "%" }, 500);
