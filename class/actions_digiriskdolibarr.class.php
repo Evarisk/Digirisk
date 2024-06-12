@@ -508,7 +508,7 @@ class ActionsDigiriskdolibarr
                     }
 				}
 			}
-		} else if (strpos($parameters['context'], 'publicnewticketcard') !== false) {
+		} else if (strpos($parameters['context'], 'ticketpubliccard') !== false) {
 			if (!$conf->multicompany->enabled) {
 				$entity = $conf->entity;
 			} else {
