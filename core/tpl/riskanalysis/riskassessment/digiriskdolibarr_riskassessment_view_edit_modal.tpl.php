@@ -126,10 +126,40 @@
 								<span><?php echo $lastEvaluation->cotation ?: 0 ?></span>
 							</div>
 						</div>
-						<div class="risk-evaluation-comment">
-							<span class="title"><i class="fas fa-comment-dots"></i> <?php echo $langs->trans('Comment'); ?></span>
-							<?php print '<textarea name="evaluationComment' . $lastEvaluation->id . '" rows="' . ROWS_2 . '">' . $lastEvaluation->comment . '</textarea>' . "\n"; ?>
+						<div class="riskassessment-medias linked-medias riskassessment-photo-<?php echo $lastEvaluation->id; ?>">
+							<div class="element-linked-medias element-linked-medias-<?php echo $lastEvaluation->id; ?> risk-<?php echo $risk->id ?>">
+								<div class="medias section-title"><i class="fas fa-picture-o"></i><?php echo $langs->trans('Medias'); ?></div>
+								<table class="add-medias">
+									<tr>
+										<td>
+											<input hidden multiple class="fast-upload" id="fast-upload-photo-riskassessment-photo-<?php echo $lastEvaluation->id; ?>" type="file" name="userfile[]" capture="environment" accept="image/*">
+											<label for="fast-upload-photo-riskassessment-photo-<?php echo $lastEvaluation->id; ?>">
+												<div class="wpeo-button <?php echo ($onPhone ? 'button-square-40' : 'button-square-50'); ?>">
+													<i class="fas fa-camera"></i><i class="fas fa-plus-circle button-add"></i>
+												</div>
+											</label>
+											<input type="hidden" class="favorite-photo" id="photo" name="photo" value="<?php echo $object->photo ?>"/>
+										</td>
+										<td>
+											<div class="wpeo-button <?php echo ($onPhone ? 'button-square-40' : 'button-square-50'); ?> 'open-media-gallery add-media modal-open" value="<?php echo $lastEvaluation->id; ?>">
+												<input type="hidden" class="modal-options" data-modal-to-open="media_gallery" data-from-id="<?php echo $lastEvaluation->id; ?>" data-from-type="riskassessment" data-from-subtype="photo" data-from-subdir="" data-photo-class="riskassessment-photo-<?php echo $lastEvaluation->id; ?>"/>
+												<i class="fas fa-folder-open"></i><i class="fas fa-plus-circle button-add"></i>
+											</div>
+										</td>
+										<td>
+											<?php
+											$relativepath = 'digiriskdolibarr/medias/thumbs';
+											print saturne_show_medias_linked('digiriskdolibarr', $conf->digiriskdolibarr->multidir_output[$conf->entity] . '/riskassessment/' . $lastEvaluation->ref, 'small', 0, 0, 0, 0, $onPhone ? 40 : 50, $onPhone ? 40 : 50, 1, 0, 0, '/riskassessment/' . $lastEvaluation->ref, $lastEvaluation);
+											?>
+										</td>
+									</tr>
+								</table>
+							</div>
 						</div>
+					</div>
+					<div class="risk-evaluation-comment">
+						<span class="title"><i class="fas fa-comment-dots"></i> <?php echo $langs->trans('Comment'); ?></span>
+						<?php print '<textarea name="evaluationComment' . $lastEvaluation->id . '" rows="' . ROWS_2 . '">' . $lastEvaluation->comment . '</textarea>' . "\n"; ?>
 					</div>
 					<?php if ($conf->global->DIGIRISKDOLIBARR_SHOW_RISKASSESSMENT_DATE) : ?>
 						<div class="risk-evaluation-date">
@@ -137,36 +167,6 @@
 							<?php print $form->selectDate($lastEvaluation->date_riskassessment, 'RiskAssessmentDateEdit' . $lastEvaluation->id, 0, 0, 0, '', 1, 1); ?>
 						</div>
 					<?php endif; ?>
-                    <div class="riskassessment-medias linked-medias riskassessment-photo-<?php echo $lastEvaluation->id; ?>">
-                        <div class="element-linked-medias element-linked-medias-<?php echo $lastEvaluation->id; ?> risk-<?php echo $risk->id ?>">
-                            <div class="medias section-title"><i class="fas fa-picture-o"></i><?php echo $langs->trans('Medias'); ?></div>
-                            <table class="add-medias">
-                                <tr>
-                                    <td>
-                                        <input hidden multiple class="fast-upload" id="fast-upload-photo-riskassessment-photo-<?php echo $lastEvaluation->id; ?>" type="file" name="userfile[]" capture="environment" accept="image/*">
-                                        <label for="fast-upload-photo-riskassessment-photo-<?php echo $lastEvaluation->id; ?>">
-                                            <div class="wpeo-button <?php echo ($onPhone ? 'button-square-40' : 'button-square-50'); ?>">
-                                                <i class="fas fa-camera"></i><i class="fas fa-plus-circle button-add"></i>
-                                            </div>
-                                        </label>
-                                        <input type="hidden" class="favorite-photo" id="photo" name="photo" value="<?php echo $object->photo ?>"/>
-                                    </td>
-                                    <td>
-                                        <div class="wpeo-button <?php echo ($onPhone ? 'button-square-40' : 'button-square-50'); ?> 'open-media-gallery add-media modal-open" value="<?php echo $lastEvaluation->id; ?>">
-                                            <input type="hidden" class="modal-options" data-modal-to-open="media_gallery" data-from-id="<?php echo $lastEvaluation->id; ?>" data-from-type="riskassessment" data-from-subtype="photo" data-from-subdir="" data-photo-class="riskassessment-photo-<?php echo $lastEvaluation->id; ?>"/>
-                                            <i class="fas fa-folder-open"></i><i class="fas fa-plus-circle button-add"></i>
-                                        </div>
-                                    </td>
-                                    <td>
-                                        <?php
-                                        $relativepath = 'digiriskdolibarr/medias/thumbs';
-                                        print saturne_show_medias_linked('digiriskdolibarr', $conf->digiriskdolibarr->multidir_output[$conf->entity] . '/riskassessment/' . $lastEvaluation->ref, 'small', 0, 0, 0, 0, $onPhone ? 40 : 50, $onPhone ? 40 : 50, 1, 0, 0, '/riskassessment/' . $lastEvaluation->ref, $lastEvaluation);
-                                        ?>
-                                    </td>
-                                </tr>
-                            </table>
-                        </div>
-                    </div>
 				</div>
 			</div>
 			<!-- Modal-Footer -->

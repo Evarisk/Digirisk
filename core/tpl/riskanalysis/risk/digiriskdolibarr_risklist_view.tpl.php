@@ -728,10 +728,41 @@ $massactionbutton = $form->selectMassAction('', $arrayofmassactions);
 										<span><?php echo 0 ?></span>
 									</div>
 								</div>
-								<div class="risk-evaluation-comment">
-									<span class="title"><i class="fas fa-comment-dots"></i> <?php echo $langs->trans('Comment'); ?></span>
-									<?php print '<textarea name="evaluationComment' . $risk->id . '" class="minwidth150" cols="50" rows="' . ROWS_2 . '">' . ('') . '</textarea>' . "\n"; ?>
+								<div class="riskassessment-medias linked-medias photo">
+									<div class="element-linked-medias element-linked-medias-0 risk-new">
+										<div class="medias section-title"><i class="fas fa-picture-o"></i><?php echo $langs->trans('Medias'); ?></div>
+										<table class="add-medias">
+											<tr>
+												<td>
+													<input hidden multiple class="fast-upload" id="fast-upload-photo-default" type="file" name="userfile[]" capture="environment" accept="image/*">
+													<label for="fast-upload-photo-default">
+														<div class="wpeo-button <?php echo ($onPhone ? 'button-square-40' : 'button-square-50'); ?>">
+															<i class="fas fa-camera"></i><i class="fas fa-plus-circle button-add"></i>
+														</div>
+													</label>
+													<input type="hidden" class="favorite-photo" id="photo" name="photo" value="<?php echo $object->photo ?>"/>
+												</td>
+												<td>
+
+													<div class="wpeo-button <?php echo ($onPhone ? 'button-square-40' : 'button-square-50'); ?> 'open-media-gallery add-media modal-open" value="0">
+														<input type="hidden" class="modal-options" data-modal-to-open="media_gallery" data-from-id="0" data-from-type="riskassessment" data-from-subtype="photo" data-from-subdir=""/>
+														<i class="fas fa-folder-open"></i><i class="fas fa-plus-circle button-add"></i>
+													</div>
+												</td>
+												<td>
+													<?php
+													$relativepath = 'digiriskdolibarr/medias/thumbs';
+													print saturne_show_medias_linked('digiriskdolibarr', $conf->digiriskdolibarr->multidir_output[$conf->entity] . '/riskassessment/tmp/RA0', 'small', 0, 0, 0, 0, $onPhone ? 40 : 50, $onPhone ? 40 : 50, 1, 0, 0, '/riskassessment/tmp/RA0');
+													?>
+												</td>
+											</tr>
+										</table>
+									</div>
 								</div>
+							</div>
+							<div class="risk-evaluation-comment">
+								<span class="title"><i class="fas fa-comment-dots"></i> <?php echo $langs->trans('Comment'); ?></span>
+								<?php print '<textarea name="evaluationComment' . $risk->id . '" class="minwidth150" cols="50" rows="' . ROWS_2 . '">' . ('') . '</textarea>' . "\n"; ?>
 							</div>
 							<?php if ($conf->global->DIGIRISKDOLIBARR_SHOW_RISKASSESSMENT_DATE) : ?>
 								<div class="risk-evaluation-date">
@@ -748,37 +779,6 @@ $massactionbutton = $form->selectMassAction('', $arrayofmassactions);
                                 print "</div>";
                             }
                             ?>
-                            <div class="riskassessment-medias linked-medias photo">
-                                <div class="element-linked-medias element-linked-medias-0 risk-new">
-                                    <div class="medias section-title"><i class="fas fa-picture-o"></i><?php echo $langs->trans('Medias'); ?></div>
-                                    <table class="add-medias">
-                                        <tr>
-                                            <td>
-                                                <input hidden multiple class="fast-upload" id="fast-upload-photo-default" type="file" name="userfile[]" capture="environment" accept="image/*">
-                                                <label for="fast-upload-photo-default">
-                                                    <div class="wpeo-button <?php echo ($onPhone ? 'button-square-40' : 'button-square-50'); ?>">
-                                                        <i class="fas fa-camera"></i><i class="fas fa-plus-circle button-add"></i>
-                                                    </div>
-                                                </label>
-                                                <input type="hidden" class="favorite-photo" id="photo" name="photo" value="<?php echo $object->photo ?>"/>
-                                            </td>
-                                            <td>
-
-                                                <div class="wpeo-button <?php echo ($onPhone ? 'button-square-40' : 'button-square-50'); ?> 'open-media-gallery add-media modal-open" value="0">
-                                                    <input type="hidden" class="modal-options" data-modal-to-open="media_gallery" data-from-id="0" data-from-type="riskassessment" data-from-subtype="photo" data-from-subdir=""/>
-                                                    <i class="fas fa-folder-open"></i><i class="fas fa-plus-circle button-add"></i>
-                                                </div>
-                                            </td>
-                                            <td>
-                                                <?php
-                                                $relativepath = 'digiriskdolibarr/medias/thumbs';
-                                                print saturne_show_medias_linked('digiriskdolibarr', $conf->digiriskdolibarr->multidir_output[$conf->entity] . '/riskassessment/tmp/RA0', 'small', 0, 0, 0, 0, $onPhone ? 40 : 50, $onPhone ? 40 : 50, 1, 0, 0, '/riskassessment/tmp/RA0');
-                                                ?>
-                                            </td>
-                                        </tr>
-                                    </table>
-                                </div>
-                            </div>
 						</div>
 					</div>
 				</div>
@@ -863,52 +863,20 @@ $massactionbutton = $form->selectMassAction('', $arrayofmassactions);
                     print "</div><hr>";
                 } ?>
                 <div class="risk-evaluation-container standard">
-                    <div class="risk-evaluation-media-wrapper">
-                        <div class="risk-evaluation-header">
-        					<span class="section-title"><?php echo ' ' . $langs->trans('RiskAssessment'); ?></span>
-                            <?php if ($conf->global->DIGIRISKDOLIBARR_ADVANCED_RISKASSESSMENT_METHOD) : ?>
-                                <div class="wpeo-button evaluation-standard select-evaluation-method selected button-blue">
-                                    <span><?php echo $langs->trans('SimpleEvaluation') ?></span>
-                                </div>
-                                <div class="wpeo-button evaluation-advanced select-evaluation-method button-grey">
-                                    <span><?php echo $langs->trans('AdvancedEvaluation') ?></span>
-                                </div>
-                            <?php endif; ?>
-                            <input class="risk-evaluation-method" type="hidden" value="standard">
-                            <input class="risk-evaluation-multiple-method" type="hidden" value="1">
-                        </div>
-                        <div class="riskassessment-medias linked-medias photo">
-                            <div class="element-linked-medias element-linked-medias-0 risk-new">
-                                <div class="medias section-title"><i class="fas fa-picture-o"></i><?php echo $langs->trans('Medias'); ?></div>
-                                <table class="add-medias">
-                                    <tr>
-                                        <td>
-                                            <input hidden multiple class="fast-upload" id="fast-upload-photo-default" type="file" name="userfile[]" capture="environment" accept="image/*">
-                                            <label for="fast-upload-photo-default">
-                                                <div class="wpeo-button <?php echo ($onPhone ? 'button-square-40' : 'button-square-50'); ?>">
-                                                    <i class="fas fa-camera"></i><i class="fas fa-plus-circle button-add"></i>
-                                                </div>
-                                            </label>
-                                            <input type="hidden" class="favorite-photo" id="photo" name="photo" value="<?php echo $object->photo ?>"/>
-                                        </td>
-                                        <td>
-                                            <div class="wpeo-button <?php echo ($onPhone ? 'button-square-40' : 'button-square-50'); ?> 'open-media-gallery add-media modal-open" value="0">
-                                                <input type="hidden" class="modal-options" data-modal-to-open="media_gallery" data-from-id="0" data-from-type="riskassessment" data-from-subtype="photo" data-from-subdir=""/>
-                                                <i class="fas fa-folder-open"></i><i class="fas fa-plus-circle button-add"></i>
-                                            </div>
-                                        </td>
-                                        <td>
-                                            <?php
-                                            $relativepath = 'digiriskdolibarr/medias/thumbs';
-                                            print saturne_show_medias_linked('digiriskdolibarr', $conf->digiriskdolibarr->multidir_output[$conf->entity] . '/riskassessment/tmp/RA0', 'small', 0, 0, 0, 0, $onPhone ? 40 : 50, $onPhone ? 40 : 50, 1, 0, 0, '/riskassessment/tmp/RA0');
-                                            ?>
-                                        </td>
-                                    </tr>
-                                </table>
-                            </div>
-                        </div>
-                    </div>
-					<div class="risk-evaluation-content-wrapper">
+					<div class="risk-evaluation-header">
+						<span class="section-title"><?php echo ' ' . $langs->trans('RiskAssessment'); ?></span>
+						<?php if (getDolGlobalInt('DIGIRISKDOLIBARR_ADVANCED_RISKASSESSMENT_METHOD') > 0) : ?>
+							<div class="wpeo-button evaluation-standard select-evaluation-method selected button-blue">
+								<span><?php echo $langs->trans('SimpleEvaluation') ?></span>
+							</div>
+							<div class="wpeo-button evaluation-advanced select-evaluation-method button-grey">
+								<span><?php echo $langs->trans('AdvancedEvaluation') ?></span>
+							</div>
+						<?php endif; ?>
+						<input class="risk-evaluation-method" type="hidden" value="standard">
+						<input class="risk-evaluation-multiple-method" type="hidden" value="1">
+					</div>
+                    <div class="risk-evaluation-content-wrapper ">
 						<div class="risk-evaluation-content">
 							<div class="cotation-container">
 								<div class="cotation-standard">
@@ -977,10 +945,40 @@ $massactionbutton = $form->selectMassAction('', $arrayofmassactions);
 								<span><?php echo 0 ?></span>
 							</div>
 						</div>
-						<div class="risk-evaluation-comment">
-							<span class="title"><i class="fas fa-comment-dots"></i> <?php echo $langs->trans('Comment'); ?></span>
-							<?php print '<textarea name="evaluationComment' . $risk->id . '" class="minwidth150" rows="' . ROWS_2 . '">' . ('') . '</textarea>' . "\n"; ?>
-						</div>
+                        <div class="riskassessment-medias linked-medias photo">
+                            <div class="element-linked-medias element-linked-medias-0 risk-new">
+                                <div class="medias section-title"><i class="fas fa-picture-o"></i><?php echo $langs->trans('Medias'); ?></div>
+                                <table class="add-medias">
+                                    <tr>
+                                        <td>
+                                            <input hidden multiple class="fast-upload" id="fast-upload-photo-default" type="file" name="userfile[]" capture="environment" accept="image/*">
+                                            <label for="fast-upload-photo-default">
+                                                <div class="wpeo-button <?php echo ($onPhone ? 'button-square-40' : 'button-square-50'); ?>">
+                                                    <i class="fas fa-camera"></i><i class="fas fa-plus-circle button-add"></i>
+                                                </div>
+                                            </label>
+                                            <input type="hidden" class="favorite-photo" id="photo" name="photo" value="<?php echo $object->photo ?>"/>
+                                        </td>
+                                        <td>
+                                            <div class="wpeo-button <?php echo ($onPhone ? 'button-square-40' : 'button-square-50'); ?> 'open-media-gallery add-media modal-open" value="0">
+                                                <input type="hidden" class="modal-options" data-modal-to-open="media_gallery" data-from-id="0" data-from-type="riskassessment" data-from-subtype="photo" data-from-subdir=""/>
+                                                <i class="fas fa-folder-open"></i><i class="fas fa-plus-circle button-add"></i>
+                                            </div>
+                                        </td>
+                                        <td>
+                                            <?php
+                                            $relativepath = 'digiriskdolibarr/medias/thumbs';
+                                            print saturne_show_medias_linked('digiriskdolibarr', $conf->digiriskdolibarr->multidir_output[$conf->entity] . '/riskassessment/tmp/RA0', 'small', 0, 0, 0, 0, $onPhone ? 40 : 50, $onPhone ? 40 : 50, 1, 0, 0, '/riskassessment/tmp/RA0');
+                                            ?>
+                                        </td>
+                                    </tr>
+                                </table>
+                            </div>
+                        </div>
+                    </div>
+					<div class="risk-evaluation-comment">
+						<span class="title"><i class="fas fa-comment-dots"></i> <?php echo $langs->trans('Comment'); ?></span>
+						<?php print '<textarea name="evaluationComment' . $risk->id . '" class="minwidth150" rows="' . ROWS_2 . '">' . ('') . '</textarea>' . "\n"; ?>
 					</div>
 					<?php if ($conf->global->DIGIRISKDOLIBARR_SHOW_RISKASSESSMENT_DATE) : ?>
 						<div class="risk-evaluation-date">
@@ -988,7 +986,6 @@ $massactionbutton = $form->selectMassAction('', $arrayofmassactions);
 							<?php print $form->selectDate('', 'RiskAssessmentDate', 0, 0, 0, '', 1, 1); ?>
 						</div>
 					<?php endif; ?>
-                    <hr>
 				</div>
 				<?php if ($conf->global->DIGIRISKDOLIBARR_TASK_MANAGEMENT) : ?>
 					<div class="riskassessment-task">
