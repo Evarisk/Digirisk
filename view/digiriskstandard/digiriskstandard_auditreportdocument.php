@@ -86,6 +86,7 @@ if (empty($resHook)) {
         if (GETPOST('daterange')) {
             $moreParams['dateStart'] = dol_mktime(0, 0, 0, GETPOST('datestartmonth', 'int'), GETPOST('datestartday', 'int'), GETPOST('datestartyear', 'int'));
             $moreParams['dateEnd']   = dol_mktime(0, 0, 0, GETPOST('dateendmonth', 'int'), GETPOST('dateendday', 'int'), GETPOST('dateendyear', 'int'));
+            $moreParams['recipient'] = GETPOST('recipient');
         }
     }
 
@@ -135,6 +136,12 @@ print '<td>' . $langs->trans('From') . $form->selectDate($dateStart, 'datestart'
 print $langs->trans('At') . $form->selectDate(dol_time_plus_duree($dateStart, 1, 'y'), 'dateend');
 print $langs->trans('UseDateRange');
 print '<input type="checkbox" id="daterange" name="daterange" checked>';
+print '</td></tr>';
+
+// Destinataire
+$userRecipient = json_decode($conf->global->DIGIRISKDOLIBARR_RISKASSESSMENTDOCUMENT_RECIPIENT);
+print '<tr class="oddeven"><td>' . $langs->trans("Recipient") . '</td>';
+print '<td>' . $form->select_dolusers($userRecipient, 'recipient', 0, null, 0, '', '', 0, 0, 0, '', 0, '', 'minwidth400', 0, 0, true);
 print '</td></tr>';
 print '</table>';
 

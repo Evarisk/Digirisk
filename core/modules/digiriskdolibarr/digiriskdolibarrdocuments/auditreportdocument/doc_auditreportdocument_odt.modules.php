@@ -108,6 +108,7 @@ class doc_auditreportdocument_odt extends ModeleODTDigiriskElementDocument
         $riskSign        = new RiskSign($this->db);
         $evaluator       = new Evaluator($this->db);
         $accident        = new Accident($this->db);
+        $user            = new User($this->db);
 
         $arraySoc                             = $this->get_substitutionarray_mysoc($mysoc, $outputLangs);
         $tmpArray['mycompany_photo_fullsize'] = $arraySoc['mycompany_logo'];
@@ -119,7 +120,7 @@ class doc_auditreportdocument_odt extends ModeleODTDigiriskElementDocument
         complete_substitutions_array($tmpArray, $outputLangs, $objectDocument);
         $objectDocument->element = $previousObjectDocumentElement;
 
-        if (!empty($moreParam['dateStart']) && $moreParam['dateEnd']) {
+        if (!empty($moreParam['dateStart']) && !empty($moreParam['dateEnd'])) {
             $startDate      = dol_print_date($moreParam['dateStart'], 'dayrfc');
             $endDate        = dol_print_date($moreParam['dateEnd'], 'dayrfc');
             $filter         = " AND (t.date_creation BETWEEN '$startDate' AND '$endDate' OR t.tms BETWEEN '$startDate' AND '$endDate')";
@@ -131,6 +132,21 @@ class doc_auditreportdocument_odt extends ModeleODTDigiriskElementDocument
             $moreParam['filterRisk']           = $filter . ' AND t.type = "risk"';
             $moreParam['filterRiskAssessment'] = $filter;
             $moreParam['specificFilter']       = $specificFilter;
+        }
+
+        if (!empty($moreParam['recipient']) && is_array($moreParam['recipient'])) {
+            $userRecipient = $moreParam['recipient'];
+
+            $tmpArray['destinataireDUER'] = '';
+            $tmpArray['telephone']        = '';
+            $tmpArray['portable']         = '';
+            foreach ($userRecipient as $recipientId) {
+                $user->fetch($recipientId);
+
+                $tmpArray['destinataireDUER'] .= dol_strtoupper($user->lastname) . ' ' . ucfirst($user->firstname) . chr(0x0A);
+                $tmpArray['telephone']        .= (dol_strlen($user->office_phone) > 0 ? $user->office_phone : '-') . chr(0x0A);
+                $tmpArray['portable']         .= (dol_strlen($user->user_mobile) > 0 ? $user->user_mobile : '-') . chr(0x0A);
+            }
         }
 
         $groupments       = [];
