@@ -269,8 +269,8 @@ $evaluation->method = $lastRiskAssessment->method ?: "standard" ;
 				</div>
 				<div class="risk-evaluation-container <?php echo $evaluation->method; ?>">
 					<div class="risk-evaluation-header">
-						<?php if ($conf->global->DIGIRISKDOLIBARR_ADVANCED_RISKASSESSMENT_METHOD) : ?>
-							<?php if ( $conf->global->DIGIRISKDOLIBARR_MULTIPLE_RISKASSESSMENT_METHOD == 1 ) : ?>
+						<?php if (getDolGlobalInt('DIGIRISKDOLIBARR_ADVANCED_RISKASSESSMENT_METHOD') > 0) : ?>
+							<?php if (getDolGlobalInt('DIGIRISKDOLIBARR_MULTIPLE_RISKASSESSMENT_METHOD') == 1) : ?>
 								<div class="wpeo-button evaluation-standard select-evaluation-method<?php echo ($lastRiskAssessment->method == "standard") ? " selected button-blue" : " button-grey" ?> button-radius-2">
 									<span><?php echo $langs->trans('SimpleEvaluation') ?></span>
 								</div>
@@ -356,10 +356,40 @@ $evaluation->method = $lastRiskAssessment->method ?: "standard" ;
 								<span><?php echo 0 ?></span>
 							</div>
 						</div>
-						<div class="risk-evaluation-comment">
-							<span class="title"><i class="fas fa-comment-dots"></i> <?php echo $langs->trans('Comment'); ?></span>
-							<?php print '<textarea name="evaluationComment' . $risk->id . '" rows="' . ROWS_2 . '">' . ('') . '</textarea>' . "\n"; ?>
+						<div class="riskassessment-medias linked-medias riskassessment-from-riskassessment-create-<?php echo $risk->id ?>">
+							<div class="element-linked-medias element-linked-medias-0 risk-<?php echo $risk->id ?>">
+								<div class="medias section-title"><i class="fas fa-picture-o"></i><?php echo $langs->trans('Medias'); ?></div>
+								<table class="add-medias">
+									<tr>
+										<td>
+											<input hidden multiple class="fast-upload" id="fast-upload-photo-riskassessment-create-<?php echo $risk->id ?>" type="file" name="userfile[]" capture="environment" accept="image/*">
+											<label for="fast-upload-photo-riskassessment-create-<?php echo $risk->id ?>">
+												<div class="wpeo-button <?php echo ($onPhone ? 'button-square-40' : 'button-square-50'); ?>">
+													<i class="fas fa-camera"></i><i class="fas fa-plus-circle button-add"></i>
+												</div>
+											</label>
+											<input type="hidden" class="favorite-photo" id="photo" name="photo" value="<?php echo $object->photo ?>"/>
+										</td>
+										<td>
+											<div class="wpeo-button <?php echo ($onPhone ? 'button-square-40' : 'button-square-50'); ?> 'open-media-gallery add-media modal-open" value="<?php echo $lastRiskAssessment->id; ?>">
+												<input type="hidden" class="modal-options" data-modal-to-open="media_gallery" data-from-id="0" data-from-type="riskassessment" data-from-subtype="photo" data-from-subdir="<?php echo $risk->ref; ?>" data-photo-class="riskassessment-from-riskassessment-create-<?php echo $risk->id ?>"/>
+												<i class="fas fa-folder-open"></i><i class="fas fa-plus-circle button-add"></i>
+											</div>
+										</td>
+										<td>
+											<?php
+											$relativepath = 'digiriskdolibarr/medias/thumbs';
+											print saturne_show_medias_linked('digiriskdolibarr', $conf->digiriskdolibarr->multidir_output[$conf->entity] . '/riskassessment/tmp/RA0/' . $risk->ref, 'small', 0, 0, 0, 0, $onPhone ? 40 : 50, $onPhone ? 40 : 50, 1, 0, 0, '/riskassessment/tmp/RA0/' . $risk->ref);
+											?>
+										</td>
+									</tr>
+								</table>
+							</div>
 						</div>
+					</div>
+					<div class="risk-evaluation-comment">
+						<span class="title"><i class="fas fa-comment-dots"></i> <?php echo $langs->trans('Comment'); ?></span>
+						<?php print '<textarea name="evaluationComment' . $risk->id . '" rows="' . ROWS_2 . '">' . ('') . '</textarea>' . "\n"; ?>
 					</div>
 					<?php if ($conf->global->DIGIRISKDOLIBARR_SHOW_RISKASSESSMENT_DATE) : ?>
 						<div class="risk-evaluation-date">
@@ -367,36 +397,6 @@ $evaluation->method = $lastRiskAssessment->method ?: "standard" ;
 							<?php print $form->selectDate('', 'RiskAssessmentDateCreate0', 0, 0, 0, '', 1, 1); ?>
 						</div>
 					<?php endif; ?>
-                    <div class="riskassessment-medias linked-medias riskassessment-from-riskassessment-create-<?php echo $risk->id ?>">
-                        <div class="element-linked-medias element-linked-medias-0 risk-<?php echo $risk->id ?>">
-                            <div class="medias section-title"><i class="fas fa-picture-o"></i><?php echo $langs->trans('Medias'); ?></div>
-                            <table class="add-medias">
-                                <tr>
-                                    <td>
-                                        <input hidden multiple class="fast-upload" id="fast-upload-photo-riskassessment-create-<?php echo $risk->id ?>" type="file" name="userfile[]" capture="environment" accept="image/*">
-                                        <label for="fast-upload-photo-riskassessment-create-<?php echo $risk->id ?>">
-                                            <div class="wpeo-button <?php echo ($onPhone ? 'button-square-40' : 'button-square-50'); ?>">
-                                                <i class="fas fa-camera"></i><i class="fas fa-plus-circle button-add"></i>
-                                            </div>
-                                        </label>
-                                        <input type="hidden" class="favorite-photo" id="photo" name="photo" value="<?php echo $object->photo ?>"/>
-                                    </td>
-                                    <td>
-                                        <div class="wpeo-button <?php echo ($onPhone ? 'button-square-40' : 'button-square-50'); ?> 'open-media-gallery add-media modal-open" value="<?php echo $lastRiskAssessment->id; ?>">
-                                            <input type="hidden" class="modal-options" data-modal-to-open="media_gallery" data-from-id="0" data-from-type="riskassessment" data-from-subtype="photo" data-from-subdir="<?php echo $risk->ref; ?>" data-photo-class="riskassessment-from-riskassessment-create-<?php echo $risk->id ?>"/>
-                                            <i class="fas fa-folder-open"></i><i class="fas fa-plus-circle button-add"></i>
-                                        </div>
-                                    </td>
-                                    <td>
-                                        <?php
-                                        $relativepath = 'digiriskdolibarr/medias/thumbs';
-                                        print saturne_show_medias_linked('digiriskdolibarr', $conf->digiriskdolibarr->multidir_output[$conf->entity] . '/riskassessment/tmp/RA0/' . $risk->ref, 'small', 0, 0, 0, 0, $onPhone ? 40 : 50, $onPhone ? 40 : 50, 1, 0, 0, '/riskassessment/tmp/RA0/' . $risk->ref);
-                                        ?>
-                                    </td>
-                                </tr>
-                            </table>
-                        </div>
-                    </div>
 				</div>
 				<!-- RISK EVALUATION SINGLE -->
 				<?php if ( ! empty($lastRiskAssessment) && $lastRiskAssessment > 0) : ?>
