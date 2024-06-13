@@ -1481,21 +1481,16 @@ if ((empty($action) || ($action != 'create' && $action != 'edit'))) {
     if (!empty($firepermits) && is_array($firepermits)) {
         $firepermitdocument = new FirePermitDocument($db);
         foreach ($firepermits as $firepermit) {
-            $objref    = dol_sanitizeFileName($firepermit->ref);
-            $dirFiles = $firepermitdocument->element . '/' . $objref;
-            echo '<pre>'; print_r( $dirFiles ); echo '</pre>';
+            $objRef    		 = dol_sanitizeFileName($firepermit->ref);
+            $dirFiles  		 = $firepermitdocument->element . '/' . $objRef;
 
-            $filedir   = $upload_dir . '/' . $dirFiles;
+            $filedir   		 = $upload_dir . '/' . $dirFiles;
             $dirFilesArray[] = $dirFiles;
-            $filedirArray[] = $filedir;
+            $filedirArray[]  = $filedir;
 
-            $modulepart   = 'digiriskdolibarr:FirePermitDocument';
-            $defaultmodel = $conf->global->DIGIRISKDOLIBARR_FIREPERMITDOCUMENT_DEFAULT_MODEL;
-            $title        = $langs->trans('FirePermitDocument');
-
-            if ($permissiontoadd || $permissiontoread) {
-                $genallowed = 1;
-            }
+            $modulepart   	 = 'digiriskdolibarr:FirePermitDocument';
+            $defaultmodel 	 = $conf->global->DIGIRISKDOLIBARR_FIREPERMITDOCUMENT_DEFAULT_MODEL;
+            $title        	 = $langs->trans('FirePermitDocument');
 
             $filelist = array_merge($filelist, dol_dir_list($filedir, 'files'));
             if (!empty($filelist) && is_array($filelist)) {
@@ -1508,7 +1503,7 @@ if ((empty($action) || ($action != 'create' && $action != 'edit'))) {
         }
         $urlsource = $_SERVER["PHP_SELF"] . '?id=' . $object->id;
 
-        print saturne_show_documents($modulepart, $dirFilesArray, $filedirArray, $urlsource, $genallowed, 0, $defaultmodel, 1, 0, 0, 0, 0, $title, 0, 0, empty($soc->default_lang) ? '' : $soc->default_lang, $object, 0, 'remove_file', (($object->status > $object::STATUS_VALIDATED) ? 1 : 0), $langs->trans('ObjectMustBeLockedToGenerate', ucfirst($langs->transnoentities('The' . ucfirst($object->element)))));
+        print saturne_show_documents($modulepart, $dirFilesArray, $filedirArray, $urlsource, 0, 0, '', 1, 0, 0, 0, 0, $title, 0, 0, empty($soc->default_lang) ? '' : $soc->default_lang, $object, 0, 'remove_file', (($object->status > $object::STATUS_VALIDATED) ? 1 : 0), $langs->trans('ObjectMustBeLockedToGenerate', ucfirst($langs->transnoentities('The' . ucfirst($object->element)))));
     }
 
     if ($permissiontoadd) {
