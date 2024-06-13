@@ -638,10 +638,16 @@ print '<input hidden id="documentGeneratedText" value="' . $documentGeneratedTex
 ?>
     <div id="generationModal" class="wpeo-modal">
         <div class="modal-container">
-            <h2><?php echo $langs->trans('RiskAssessmentDocumentGeneration')?></h2>
-            <div id="progressbar"><div class="ui-progressbar-value"></div></div>
-            <ul id="generationStatus">
-            </ul>
+            <div class="modal-header">
+                <h2><?php echo $langs->trans('RiskAssessmentDocumentGeneration')?></h2>
+            </div>
+            <div id="progressbar">
+                <div class="ui-progressbar-value"></div>
+            </div>
+            <div class="modal-content">
+                <ul id="generationStatus">
+                </ul>
+            </div>
         </div>
     </div>
 <?php
