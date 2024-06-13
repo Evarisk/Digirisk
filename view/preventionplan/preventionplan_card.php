@@ -1463,7 +1463,6 @@ if ((empty($action) || ($action != 'create' && $action != 'edit'))) {
 			$genallowed = 1;
 		}
 
-//        TODO: Ne fonctionne pas
 		$filelist = dol_dir_list($filedir, 'files');
 		if (!empty($filelist) && is_array($filelist)) {
 			foreach ($filelist as $file) {
