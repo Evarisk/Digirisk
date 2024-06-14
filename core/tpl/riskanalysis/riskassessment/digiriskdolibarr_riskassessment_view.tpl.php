@@ -364,14 +364,14 @@ $evaluation->method = $lastRiskAssessment->method ?: "standard" ;
 										<td>
 											<input hidden multiple class="fast-upload" id="fast-upload-photo-riskassessment-create-<?php echo $risk->id ?>" type="file" name="userfile[]" capture="environment" accept="image/*">
 											<label for="fast-upload-photo-riskassessment-create-<?php echo $risk->id ?>">
-												<div class="wpeo-button <?php echo ($onPhone ? 'button-square-40' : 'button-square-50'); ?>">
+												<div title="<?php echo $langs->trans('AddPhotoFromComputer') ?>" class="wpeo-button <?php echo ($onPhone ? 'button-square-40' : 'button-square-50'); ?>">
 													<i class="fas fa-camera"></i><i class="fas fa-plus-circle button-add"></i>
 												</div>
 											</label>
 											<input type="hidden" class="favorite-photo" id="photo" name="photo" value="<?php echo $object->photo ?>"/>
 										</td>
 										<td>
-											<div class="wpeo-button <?php echo ($onPhone ? 'button-square-40' : 'button-square-50'); ?> 'open-media-gallery add-media modal-open" value="<?php echo $lastRiskAssessment->id; ?>">
+											<div title="<?php echo $langs->trans('AddPhotoFromMediaGallery') ?>" class="wpeo-button <?php echo ($onPhone ? 'button-square-40' : 'button-square-50'); ?> 'open-media-gallery add-media modal-open" value="<?php echo $lastRiskAssessment->id; ?>">
 												<input type="hidden" class="modal-options" data-modal-to-open="media_gallery" data-from-id="0" data-from-type="riskassessment" data-from-subtype="photo" data-from-subdir="<?php echo $risk->ref; ?>" data-photo-class="riskassessment-from-riskassessment-create-<?php echo $risk->id ?>"/>
 												<i class="fas fa-folder-open"></i><i class="fas fa-plus-circle button-add"></i>
 											</div>
