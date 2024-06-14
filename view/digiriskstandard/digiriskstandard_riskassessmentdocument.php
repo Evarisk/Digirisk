@@ -329,9 +329,8 @@ $title    = $langs->trans('RiskAssessmentDocument');
 $help_url = 'FR:Module_Digirisk#Impression_du_Document_Unique';
 
 digirisk_header($title, $help_url);
-?>
-    <div id="cardContent" value="">
-<?php // Part to show record
+print '<div id="cardContent">';
+
 $res  = $object->fetch_optionals();
 
 saturne_get_fiche_head($object, 'standardRiskAssessmentDocument', $title);
@@ -639,7 +638,7 @@ print '<input hidden id="documentGeneratedText" value="' . $documentGeneratedTex
     <div id="generationModal" class="wpeo-modal">
         <div class="modal-container">
             <div class="modal-header">
-                <h2><?php echo $langs->trans('RiskAssessmentDocumentGeneration')?></h2>
+                <h2><?php echo $langs->trans('RiskAssessmentDocumentGenerated')?></h2>
             </div>
             <div id="progressbar">
                 <div class="ui-progressbar-value"></div>
