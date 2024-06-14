@@ -1488,7 +1488,6 @@ if ((empty($action) || ($action != 'create' && $action != 'edit'))) {
             $filedirArray[]  = $filedir;
 
             $modulepart   	 = 'digiriskdolibarr:FirePermitDocument';
-            $defaultmodel 	 = $conf->global->DIGIRISKDOLIBARR_FIREPERMITDOCUMENT_DEFAULT_MODEL;
             $title        	 = $langs->trans('FirePermitDocument');
 
             $filelist = array_merge($filelist, dol_dir_list($filedir, 'files'));
@@ -1502,7 +1501,7 @@ if ((empty($action) || ($action != 'create' && $action != 'edit'))) {
         }
         $urlsource = $_SERVER["PHP_SELF"] . '?id=' . $object->id;
 
-        print saturne_show_documents($modulepart, $dirFilesArray, $filedirArray, $urlsource, 0, 0, '', 1, 0, 0, 0, 0, $title, 0, 0, empty($soc->default_lang) ? '' : $soc->default_lang, $object, 0, 'remove_file', (($object->status > $object::STATUS_VALIDATED) ? 1 : 0), $langs->trans('ObjectMustBeLockedToGenerate', ucfirst($langs->transnoentities('The' . ucfirst($object->element)))));
+        print saturne_show_documents($modulepart, $dirFilesArray, $filedirArray, $urlsource, 0, 0, '', 1, 0, 0, 0, 0, $title, 0, 0);
     }
 
     if ($permissiontoadd) {
