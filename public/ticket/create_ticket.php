@@ -73,7 +73,7 @@ if ( ! dol_strlen($ticketTmpId)) {
 }
 
 // Initialize technical object to manage hooks of page. Note that conf->hooks_modules contains array of hook context
-$hookmanager->initHooks(['ticketpubliccard', 'globalcard']);
+$hookmanager->initHooks(['publicticket', 'saturnepublicinterface']);
 
 $object          = new Ticket($db);
 $formfile        = new FormFile($db);

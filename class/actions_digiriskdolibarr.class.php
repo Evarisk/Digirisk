@@ -508,32 +508,6 @@ class ActionsDigiriskdolibarr
                     }
 				}
 			}
-		} else if (strpos($parameters['context'], 'ticketpubliccard') !== false) {
-			if (!$conf->multicompany->enabled) {
-				$entity = $conf->entity;
-			} else {
-				$entity = GETPOST('entity');
-			}
-			if ($entity > 0) {
-				?>
-				<script>
-					let date = new Date();
-
-					let month    = date.getMonth() + 1;
-					let day      = date.getDate();
-					let fulldate = (day < 10 ? '0' : '') + day + '/' + (month < 10 ? '0' : '') + month + '/' + date.getFullYear();
-					let hour     = date.getHours();
-					let min      = date.getMinutes();
-
-					jQuery('#options_digiriskdolibarr_ticket_date').val(fulldate);
-					jQuery('#options_digiriskdolibarr_ticket_dateday').val((day < 10 ? '0' : '') + day);
-					jQuery('#options_digiriskdolibarr_ticket_datemonth').val((month < 10 ? '0' : '') + month);
-					jQuery('#options_digiriskdolibarr_ticket_dateyear').val(date.getFullYear());
-					jQuery('#options_digiriskdolibarr_ticket_datehour').val((hour < 10 ? '0' : '') + hour);
-					jQuery('#options_digiriskdolibarr_ticket_datemin').val((min < 10 ? '0' : '') + min);
-				</script>
-				<?php
-			}
 		} elseif (strpos($parameters['context'], 'categoryindex') !== false) {	    // do something only for the context 'somecontext1' or 'somecontext2'
             print '<script src="../custom/digiriskdolibarr/js/digiriskdolibarr.js"></script>';
         }
