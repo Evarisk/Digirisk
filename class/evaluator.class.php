@@ -140,6 +140,9 @@ class Evaluator extends SaturneObject
         $arrayNbEmployeesInvolved = $this->getNbEmployeesInvolved();
         $arrayNbEmployees         = $this->getNbEmployees();
 
+        $arrayNbEmployeesInvolved['position'] = 10;
+        $arrayNbEmployees['position']         = 10;
+
         $array['widgets'] = [
             'evaluator' => [
                 'label'      => [$langs->transnoentities('NbEmployeesInvolved') ?? '', $langs->transnoentities('NbEmployees') ?? ''],

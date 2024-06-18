@@ -276,6 +276,10 @@ class TicketDashboard extends DigiriskDolibarrDashboard
         $getTicketsByMainTagAndByDigiriskElement    = $this->getTicketsByMainTagAndByDigiriskElement($mainCategories);
         $getTicketsByMainSubTagAndByDigiriskElement = $this->getTicketsByMainSubTagAndByDigiriskElement($mainCategories);
 
+        $getTicketsByMonth['position']                          = 10;
+        $getTicketsByMainTagAndByDigiriskElement['position']    = 10;
+        $getTicketsByMainSubTagAndByDigiriskElement['position'] = 10;
+
         $getTicketsByYear = $this->getTicketsByYear();
 
         $array['graphs'] = [$getTicketsByMonth, $getTicketsByMainTagAndByDigiriskElement, $getTicketsByMainSubTagAndByDigiriskElement];

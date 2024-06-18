@@ -542,7 +542,10 @@ class DigiriskElement extends SaturneObject
         $getDigiriskElementListsByDepth = $this->getDigiriskElementListsByDepth();
         $getRisksByDigiriskElement      = $this->getRisksByDigiriskElement();
 
-        $array['graphs'] = [$getDigiriskElementListsByDepth, $getRisksByDigiriskElement];
+        $getRisksByDigiriskElement['position']      = 1;
+        $getDigiriskElementListsByDepth['position'] = 10;
+
+        $array['graphs'] = [$getRisksByDigiriskElement, $getDigiriskElementListsByDepth];
 
         return $array;
     }
@@ -597,7 +600,7 @@ class DigiriskElement extends SaturneObject
                 }
             }
         }
-
+        
         return $array;
     }
 
@@ -639,7 +642,7 @@ class DigiriskElement extends SaturneObject
                 ];
             }
         }
-
+        
         if (!empty($digiriskElements)) {
             foreach ($digiriskElements as $digiriskElement) {
                 if ($digiriskElement['depth'] <= getDolGlobalInt('DIGIRISKDOLIBARR_DIGIRISKELEMENT_DEPTH_GRAPH') && $digiriskElement['object']->element_type == 'groupment') {
@@ -649,10 +652,25 @@ class DigiriskElement extends SaturneObject
                     ];
                 }
                 if ($digiriskElement['depth'] <= getDolGlobalInt('DIGIRISKDOLIBARR_DIGIRISKELEMENT_DEPTH_GRAPH') + 1 && $digiriskElement['object']->fk_parent > 0) {
-                    $children[] = $digiriskElement['object']->fk_parent;
+                    $children['all'][] = $digiriskElement['object']->fk_parent;
+                    $children[$digiriskElement['object']->element_type][] = $digiriskElement['object']->fk_parent;
+                }
+
+            }
+            $groupmentValues = array_count_values($children['groupment']);
+            $workunitValues  = array_count_values($children['workunit']);
+
+            if (count($groupmentValues) >= count($workunitValues)) {
+                foreach ($groupmentValues as $key => $value) {
+                    $array['data_labels'][$key] = 'GP: ' . (!empty($value) ? $value : 0) . ', UT: ' . (!empty($workunitValues[$key]) ? $workunitValues[$key] : 0);
+                }
+            } else {
+                foreach ($workunitValues as $key => $value) {
+                    $array['data_labels'][$key] = 'GP: ' . (!empty($groupmentValues[$key]) ? $groupmentValues[$key] : 0) . ', UT: ' . (!empty($value) ? $value : 0);
                 }
             }
-            $array['data'] = array_count_values($children);
+
+            $array['data'] = array_count_values($children['all']);
         }
 
         return $array;

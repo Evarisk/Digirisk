@@ -426,7 +426,18 @@ class Accident extends SaturneObject
         //$arrayGravityIndex           = $this->getGravityIndex();
         $arrayGravityRate              = $this->getGravityRate();
 
-        $array['widgets'] = [
+		$arrayNbDaysWithoutAccident['position']	   = 10;
+		$arrayNbAccidents['position']			   = 10;
+		$arrayNbAccidentsLast3Years['position']	   = 10;
+		$arrayNbWorkstopDays['position']		   = 10;
+		$arrayNbAccidentsByEmployees['position']   = 10;
+		$arrayNbPresquAccidents['position']		   = 10;
+		$arrayNbAccidentInvestigations['position'] = 10;
+		$arrayFrequencyIndex['position']		   = 10;
+		$arrayFrequencyRate['position']			   = 10;
+		$arrayGravityRate['position']			   = 10;
+
+		$array['widgets'] = [
             'accident' => [
                 'label'      => [$langs->transnoentities('DayWithoutAccident') ?? '', $langs->transnoentities('WorkStopDays') ?? '', $langs->transnoentities('NbAccidentsByEmployees') ?? '', $langs->transnoentities('NbPresquAccidents') ?? '', $langs->transnoentities('NbAccidentInvestigations') ?? ''],
                 'content'    => [$arrayNbDaysWithoutAccident['daywithoutaccident'] ?? 0, $arrayNbWorkstopDays['nbworkstopdays'] ?? 0, $arrayNbAccidentsByEmployees['nbaccidentsbyemployees'] ?? 0, $arrayNbPresquAccidents['nbpresquaccidents'] ?? 0, $arrayNbAccidentInvestigations['nbaccidentinvestigations'] ?? 0],
@@ -445,6 +456,7 @@ class Accident extends SaturneObject
                 'widgetName' => $langs->transnoentities('AccidentRateIndicator')
             ]
         ];
+
 
         $array['graphs'] = [$arrayNbAccidents, $arrayNbAccidentsLast3Years];
 

@@ -573,8 +573,12 @@ class Risk extends SaturneObject
         $getRisksByDangerCategoriesAndCriticality = $this->getRisksByDangerCategoriesAndCriticality($dangerCategories);
         $getRisksByDangerCategories               = $this->getRisksByDangerCategories($dangerCategories);
         $getRiskListsByDangerCategories           = $this->getRiskListsByDangerCategories($dangerCategories);
+		
+		$getRisksByDangerCategoriesAndCriticality['position'] = 0;
+		$getRisksByCotation['position']						  = 2;
+		$getRisksByDangerCategories['position']				  = 10;
 
-        $array['graphs'] = [$getRisksByCotation, $getRisksByDangerCategoriesAndCriticality, $getRisksByDangerCategories];
+		$array['graphs'] = [$getRisksByDangerCategoriesAndCriticality, $getRisksByCotation , $getRisksByDangerCategories];
         $array['lists']  = [$getRiskListsByDangerCategories];
 
         return $array;
@@ -604,7 +608,7 @@ class Risk extends SaturneObject
         $array['dataset']    = 1;
         $array['labels']     = $this->cotations;
 
-        $riskAssessmentList = $riskAssessment->fetchAll('', '', 0, 0, ['customsql' => 'status = 1']);
+        $riskAssessmentList = $riskAssessment->fetchAll('', '', 0, 0, ['customsql' => 'status > 0']);
         $array['data']      = $riskAssessment->getRiskAssessmentCategoriesNumber($riskAssessmentList);
 
         return $array;

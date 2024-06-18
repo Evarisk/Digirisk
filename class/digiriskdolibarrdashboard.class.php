@@ -52,12 +52,12 @@ class DigiriskDolibarrDashboard
     {
         $dashboardDatas = [
             ['type' => 'RiskAssessmentDocument', 'classPath' => '/digiriskdolibarrdocuments/riskassessmentdocument.class.php'],
+            ['type' => 'Risk',                   'classPath' => '/riskanalysis/risk.class.php'],
+            ['type' => 'DigiriskElement',        'classPath' => '/digiriskelement.class.php'],
             ['type' => 'Accident',               'classPath' => '/accident.class.php'],
             ['type' => 'Evaluator',              'classPath' => '/evaluator.class.php'],
             ['type' => 'DigiriskResources',      'classPath' => '/digiriskresources.class.php'],
-            ['type' => 'DigiriskElement',        'classPath' => '/digiriskelement.class.php'],
             ['type' => 'SaturneTask',            'classPath' => '/../../saturne/class/task/saturnetask.class.php'],
-            ['type' => 'Risk',                   'classPath' => '/riskanalysis/risk.class.php'],
             ['type' => 'TicketDashboard',        'classPath' => '/ticketdashboard.class.php']
         ];
         foreach ($dashboardDatas as $dashboardData) {
@@ -73,7 +73,6 @@ class DigiriskDolibarrDashboard
                 $array[$dashboardData['type']] = array_key_exists('Load' . $dashboardData['type'], $moreParams) ? $className->load_dashboard(getDolGlobalInt('DIGIRISKDOLIBARR_DU_PROJECT')) : [];
             }
         }
-
         return $array;
     }
 
