@@ -64,7 +64,7 @@ class DigiriskElement extends SaturneObject
     /**
      * @var int Does object support extrafields ? 0 = No, 1 = Yes.
      */
-    public int $isextrafieldmanaged = 1;
+    public $isextrafieldmanaged = 1;
 
     public const STATUS_DELETED   = -1;
     public const STATUS_DRAFT     = 0;
