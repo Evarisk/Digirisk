@@ -1169,7 +1169,7 @@ if ((empty($action) || ($action != 'create' && $action != 'edit'))) {
 
 		print '<tr class="liste_titre">';
 		print '<td><span>' . $langs->trans('Ref.') . '</span></td>';
-		print '<td>' . $langs->trans('Location') . '</td>';
+		print '<td>' . $langs->trans('GP/UT') . '</td>';
 		print '<td>' . $form->textwithpicto($langs->trans('ActionsDescription'), $langs->trans("ActionsDescriptionTooltip")) . '</td>';
 		print '<td class="center">' . $form->textwithpicto($langs->trans('INRSRisk'), $langs->trans('INRSRiskTooltip')) . '</td>';
 		print '<td>' . $form->textwithpicto($langs->trans('PreventionMethod'), $langs->trans('PreventionMethodTooltip')) . '</td>';
@@ -1269,7 +1269,7 @@ if ((empty($action) || ($action != 'create' && $action != 'edit'))) {
 
 		print '<tr class="liste_titre">';
 		print '<td><span>' . $langs->trans('Ref.') . '</span></td>';
-		print '<td>' . $langs->trans('Location') . '</td>';
+		print '<td>' . $langs->trans('GP/UT') . '</td>';
 		print '<td>' . $form->textwithpicto($langs->trans('ActionsDescription'), $langs->trans("ActionsDescriptionTooltip")) . '</td>';
 		print '<td class="center">' . $form->textwithpicto($langs->trans('INRSRisk'), $langs->trans('INRSRiskTooltip')) . '</td>';
 		print '<td>' . $form->textwithpicto($langs->trans('UsedEquipment'), $langs->trans('UsedMaterialTooltip')) . '</td>';
