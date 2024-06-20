@@ -108,7 +108,7 @@ class doc_auditreportdocument_odt extends ModeleODTDigiriskElementDocument
         $riskSign        = new RiskSign($this->db);
         $evaluator       = new Evaluator($this->db);
         $accident        = new Accident($this->db);
-        $user            = new User($this->db);
+        $userTmp         = new User($this->db);
 
         $arraySoc                             = $this->get_substitutionarray_mysoc($mysoc, $outputLangs);
         $tmpArray['mycompany_photo_fullsize'] = $arraySoc['mycompany_logo'];
@@ -134,18 +134,18 @@ class doc_auditreportdocument_odt extends ModeleODTDigiriskElementDocument
             $moreParam['specificFilter']       = $specificFilter;
         }
 
-        if (!empty($moreParam['recipient']) && is_array($moreParam['recipient'])) {
+        if (is_array($moreParam['recipient']) && !empty($moreParam['recipient'])) {
             $userRecipient = $moreParam['recipient'];
 
             $tmpArray['destinataireDUER'] = '';
             $tmpArray['telephone']        = '';
             $tmpArray['portable']         = '';
             foreach ($userRecipient as $recipientId) {
-                $user->fetch($recipientId);
+                $userTmp->fetch($recipientId);
 
-                $tmpArray['destinataireDUER'] .= dol_strtoupper($user->lastname) . ' ' . ucfirst($user->firstname) . chr(0x0A);
-                $tmpArray['telephone']        .= (dol_strlen($user->office_phone) > 0 ? $user->office_phone : '-') . chr(0x0A);
-                $tmpArray['portable']         .= (dol_strlen($user->user_mobile) > 0 ? $user->user_mobile : '-') . chr(0x0A);
+                $tmpArray['destinataireDUER'] .= dol_strtoupper($userTmp->lastname) . ' ' . ucfirst($userTmp->firstname) . chr(0x0A);
+                $tmpArray['telephone']        .= (dol_strlen($userTmp->office_phone) > 0 ? $userTmp->office_phone : '-') . chr(0x0A);
+                $tmpArray['portable']         .= (dol_strlen($userTmp->user_mobile) > 0 ? $userTmp->user_mobile : '-') . chr(0x0A);
             }
         }
 

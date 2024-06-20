@@ -139,8 +139,8 @@ print '<input type="checkbox" id="daterange" name="daterange" checked>';
 print '</td></tr>';
 
 // Destinataire
-$userRecipient = json_decode($conf->global->DIGIRISKDOLIBARR_RISKASSESSMENTDOCUMENT_RECIPIENT);
-print '<tr class="oddeven"><td>' . $langs->trans("Recipient") . '</td>';
+$userRecipient = json_decode(getDolGlobalString('DIGIRISKDOLIBARR_RISKASSESSMENTDOCUMENT_RECIPIENT'));
+print '<tr class="oddeven"><td>' . $langs->trans('Recipient') . '</td>';
 print '<td>' . $form->select_dolusers($userRecipient, 'recipient', 0, null, 0, '', '', 0, 0, 0, '', 0, '', 'minwidth400', 0, 0, true);
 print '</td></tr>';
 print '</table>';
