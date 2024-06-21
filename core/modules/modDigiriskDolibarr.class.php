@@ -416,7 +416,7 @@ class modDigiriskdolibarr extends DolibarrModules
 				'projecttaskcard',
 				'projecttaskscard',
 				'tasklist',
-				'publicnewticketcard',
+				'publicticket',
 				'ticketlist',
 				'thirdpartyticket',
 				'projectticket',
