@@ -24,6 +24,17 @@
   .maxwidthdate {
     max-width: 125px;
   }
+
+  .add-medias {
+    border-spacing: 0;
+
+    tbody {
+      vertical-align: top;
+    }
+    td {
+      padding-right: 0.5em;
+    }
+  }
 }
 
 .wpeo-modal[class*="modal-risk"] .modal-container .risk-content {
@@ -68,13 +79,10 @@
         max-width: 50px;
       }
     }
-    .risk-evaluation-comment {
-      flex-grow: 1;
-      margin-left: 1em;
-
-      textarea {
-        width: 100%;
-      }
+  }
+  .risk-evaluation-comment {
+    textarea {
+      width: 100%;
     }
   }
 

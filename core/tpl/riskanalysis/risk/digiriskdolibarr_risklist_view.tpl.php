@@ -730,7 +730,7 @@ $massactionbutton = $form->selectMassAction('', $arrayofmassactions);
 								</div>
 								<div class="riskassessment-medias linked-medias photo">
 									<div class="element-linked-medias element-linked-medias-0 risk-new">
-										<div class="medias section-title"><i class="fas fa-picture-o"></i><?php echo $langs->trans('Medias'); ?></div>
+										<div class="medias title"><i class="fas fa-picture-o"></i><?php echo $langs->trans('Medias'); ?></div>
 										<table class="add-medias">
 											<tr>
 												<td>
@@ -947,7 +947,7 @@ $massactionbutton = $form->selectMassAction('', $arrayofmassactions);
 						</div>
                         <div class="riskassessment-medias linked-medias photo">
                             <div class="element-linked-medias element-linked-medias-0 risk-new">
-                                <div class="medias section-title"><i class="fas fa-picture-o"></i><?php echo $langs->trans('Medias'); ?></div>
+                                <div class="medias title"><i class="fas fa-picture-o"></i><?php echo $langs->trans('Medias'); ?></div>
                                 <table class="add-medias">
                                     <tr>
                                         <td>

@@ -1,0 +1,10 @@
+@media ( max-width: $media__small ) {
+    .wpeo-modal[class*="modal-risk"] .modal-container {
+        .risk-evaluation-content-wrapper {
+            flex-direction: column;
+        }
+        .cotation-listing {
+            grid-template-columns: repeat(4, 1fr) !important
+        }
+    }
+}
