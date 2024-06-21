@@ -55,7 +55,11 @@ require_once DOL_DOCUMENT_ROOT . '/core/modules/ticket/mod_ticket_simple.php';
 require_once __DIR__ . '/../../lib/digiriskdolibarr_function.lib.php';
 require_once __DIR__ . '/../../class/digiriskelement.class.php';
 
-require_once __DIR__ . '/../../../saturne/lib/saturne_functions.lib.php';
+// Load Saturne libraries
+if (getDolGlobalInt('DIGIRISKDOLIBARR_TICKET_PUBLIC_INTERFACE_USE_SIGNATORY')) {
+    require_once __DIR__ . '/../../../saturne/lib/saturne_functions.lib.php';
+    require_once __DIR__ . '/../../../saturne/class/saturnesignature.class.php';
+}
 
 global $conf, $db, $hookmanager, $langs, $mc, $user;
 
@@ -80,6 +84,11 @@ $formfile        = new FormFile($db);
 $extrafields     = new ExtraFields($db);
 $category        = new Categorie($db);
 $digiriskelement = new DigiriskElement($db);
+if (getDolGlobalInt('DIGIRISKDOLIBARR_TICKET_PUBLIC_INTERFACE_USE_SIGNATORY')) {
+    $signatory = new SaturneSignature($db, $moduleNameLowerCase, $object->element);
+}
+
+$form = new Form($db);
 
 $numRefConf = strtoupper($object->element) . '_ADDON';
 
@@ -375,13 +384,13 @@ if ($action == 'removefile') {
  * View
  */
 
-$form       = new Form($db);
-$formticket = new FormTicket($db);
+$title  = $langs->trans('CreateTicket');
+$moreJS = ['/saturne/js/includes/signature-pad.min.js'];
 
-$arrayofjs  = array("/digiriskdolibarr/js/digiriskdolibarr.min.js", "/saturne/js/saturne.min.js");
-$arrayofcss = array('/opensurvey/css/style.css', '/ticket/css/styles.css.php', "/digiriskdolibarr/css/digiriskdolibarr.css",  "/saturne/css/saturne.css");
+$conf->dol_hide_topmenu  = 1;
+$conf->dol_hide_leftmenu = 1;
 
-digiriskdolibarr_ticket_header($langs->trans("CreateTicket"), "", 0, 0, $arrayofjs, $arrayofcss);
+saturne_header(0,'', $title, '', '', 0, 0, $moreJS, [], '', 'page-public-card page-signature');
 
 if ($entity > 0) {
 	if ( ! $conf->global->DIGIRISKDOLIBARR_TICKET_ENABLE_PUBLIC_INTERFACE) {
@@ -619,14 +628,24 @@ if ($entity > 0) {
 			print '<a class="inline-block valignmiddle" href="' . $_SERVER["PHP_SELF"] . '?entity=' . $entity . '" tabindex="4" data-role="button">' . img_picto($langs->trans("Refresh"), 'refresh', 'id="captcha_refresh_img"') . '</a>';
 			print '</span>';
 			print '</div>';
-		}?>
+		}
+        print '</div>';
+        print dol_get_fiche_end();
 
-		<?php print '<div class="center"><button form="sendTicketForm" type="submit" id ="actionButtonSave" class="wpeo-button" name="add">' . '<i class="fas fa-paper-plane"></i>    ' . $langs->trans("Send") . '</button>'; ?>
-	</div>
-	<?php
-
-	print dol_get_fiche_end();
-
+        if (getDolGlobalInt('DIGIRISKDOLIBARR_TICKET_PUBLIC_INTERFACE_USE_SIGNATORY')) {
+            $previousStatus        = $object->status;
+            $object->status        = $object::STATUS_READ; // Special case because public answer need draft status object to complete question
+            $moreParams['moreCSS'] = 'hidden';             // Needed for prevent click on signature button action
+            print '<div style="margin-top: 2em;">';
+            require_once __DIR__ . '/../../../saturne/core/tpl/signature/public_signature_view.tpl.php';
+            print '</div>';
+            $object->status = $previousStatus;
+        }
+        if ($object->status == $object::STATUS_NOT_READ) {
+            print '<div class="public-card__footer" style="margin-top: 2em;">';
+            print '<button type="submit" class="wpeo-button ' . (getDolGlobalInt('DIGIRISKDOLIBARR_TICKET_PUBLIC_INTERFACE_USE_SIGNATORY') ? 'signature-validate button-disable' : '') . '">' . '<i class="fas fa-paper-plane pictofixedwidth"></i>' . $langs->trans('Send') . '</button>';
+            print '</div>';
+        }
 } else {
 	print '<div class="ticketpublicarea digirisk-page-container center">';
 	print '<form method="POST" action="' . $_SERVER["PHP_SELF"] .'">';
