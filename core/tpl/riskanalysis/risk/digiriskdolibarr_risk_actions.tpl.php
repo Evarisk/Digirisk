@@ -476,7 +476,7 @@ if ( ! $error && $action == 'saveRiskAssessmentTask' && $permissiontoadd) {
 		$task->date_end = dol_time_plus_duree($task->date_end, $hourEnd, 'h');
 		$task->date_end = dol_time_plus_duree($task->date_end, $minEnd, 'i');
 	}
-	$task->budget_amount = is_int($budget) ? $budget : ($task->budget ?? 0);
+	$task->budget_amount = is_numeric($budget) ? $budget : ($task->budget ?? 0);
 
 	if ($taskProgress == 1) {
 		$task->progress = 100;
