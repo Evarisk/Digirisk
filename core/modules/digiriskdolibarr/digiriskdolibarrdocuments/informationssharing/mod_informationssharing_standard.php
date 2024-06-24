@@ -17,7 +17,7 @@
  */
 
 /**
- *	\file       core/modules/digiriskdolibarr/digiriskdocuments/informationssharing/mod_informationssharing_standard.php
+ *	\file       core/modules/digiriskdolibarr/digiriskdolibarrdocuments/informationssharing/mod_informationssharing_standard.php
  * \ingroup     digiriskdolibarr
  *	\brief      File containing class for informationssharing numbering module Standard
  */

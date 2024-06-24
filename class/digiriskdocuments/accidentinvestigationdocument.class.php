@@ -25,7 +25,7 @@
 require_once __DIR__ . '/../../../saturne/class/saturnedocuments.class.php';
 
 /**
- * Class for ControlDocument.
+ * Class for AccidentInvestigationDocument.
  */
 class AccidentInvestigationDocument extends SaturneDocuments
 {

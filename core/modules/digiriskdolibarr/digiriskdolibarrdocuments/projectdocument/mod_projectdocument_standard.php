@@ -17,16 +17,16 @@
  */
 
 /**
- *  \file    core/modules/digiquali/controldocument/mod_controldocument_standard.php
- *  \ingroup digiquali
- *  \brief   File of class to manage controldocument numbering rules standard.
+ *  \file    core/modules/digiriskdolibarr/digiriskdolibarrdocuments/projectdocument/mod_projectdocument_standard.php
+ *  \ingroup digiriskdolibarr
+ *  \brief   File of class to manage projectdocument numbering rules standard.
  */
 
 // Load Saturne libraries.
 require_once __DIR__ . '/../../../../../../saturne/core/modules/saturne/modules_saturne.php';
 
 /**
- *	Class to manage controldocument numbering rules standard.
+ *	Class to manage projectdocument numbering rules standard.
  */
 class mod_projectdocument_standard extends ModeleNumRefSaturne
 {
