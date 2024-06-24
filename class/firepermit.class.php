@@ -60,7 +60,7 @@ class FirePermit extends SaturneObject
 	/**
 	 * @var int Does object support extrafields ? 0 = No, 1 = Yes.
 	 */
-	public int $isextrafieldmanaged = 1;
+	public $isextrafieldmanaged = 1;
 
     /**
      * @var string Name of icon for firepermit. Must be a 'fa-xxx' fontawesome code (or 'fa-xxx_fa_color_size') or 'firepermit@digiriskdolibarr' if picto is file 'img/object_firepermit.png'.

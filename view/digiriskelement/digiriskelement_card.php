@@ -370,13 +370,13 @@ if ((empty($action) || ($action != 'edit' && $action != 'create'))) {
 	print '<span class="add-medias" '. (($object->status != $object::STATUS_LOCKED) ? "" : "style='display:none'") . '>';
 	print '<input hidden multiple class="fast-upload" id="fast-upload-photo-default" type="file" name="userfile[]" capture="environment" accept="image/*">';
 	print '<label for="fast-upload-photo-default">';
-	print '<div class="wpeo-button button-square-50">';
+	print '<div title="'. $langs->trans('AddPhotoFromComputer') .'" class="wpeo-button button-square-50">';
 	print '<i class="fas fa-camera"></i><i class="fas fa-plus-circle button-add"></i>';
 	print '</div>';
 	print '</label>';
 	print '&nbsp';
 	print '<input type="hidden" class="favorite-photo" id="photo" name="photo" value="<?php echo $object->photo ?>"/>';
-	print '<div class="wpeo-button button-square-50 open-media-gallery add-media modal-open" value="0">';
+	print '<div title="'. $langs->trans('AddPhotoFromMediaGallery') .'" class="wpeo-button button-square-50 open-media-gallery add-media modal-open" value="0">';
 	print '<input type="hidden" class="modal-options" data-modal-to-open="media_gallery" data-from-id="'. $object->id .'" data-from-type="'. $object->element_type .'" data-from-subtype="photo" data-from-subdir="" data-photo-class="digirisk-element-photo-'. $object->id .'"/>';
 	print '<i class="fas fa-folder-open"></i><i class="fas fa-plus-circle button-add"></i>';
 	print '</div>';
