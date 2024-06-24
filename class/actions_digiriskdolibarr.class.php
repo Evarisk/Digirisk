@@ -201,7 +201,7 @@ class ActionsDigiriskdolibarr
 				print ajax_combobox('selectDIGIRISKDOLIBARR_COLLECTIVE_AGREEMENT_TITLE');
 			}
 		} else if (strpos($parameters['context'], 'ticketcard') !== false) {
-            if (GETPOST('action') == 'view' || empty(GETPOST('action')) || GETPOST('action') == 'update_extras') {
+            if (GETPOST('action') != 'create') {
                 if (is_numeric($object->array_options['options_digiriskdolibarr_ticket_service']) && $object->array_options['options_digiriskdolibarr_ticket_service'] > 0) {
                     require_once __DIR__ . '/digiriskelement.class.php';
 
