@@ -901,6 +901,7 @@ class modDigiriskdolibarr extends DolibarrModules
 		$this->tabs[] = ['data' => 'thirdparty:+schedules:'. $pictoDigirisk .$langs->trans('Schedules').':digiriskdolibarr@digiriskdolibarr:1:/custom/saturne/view/saturne_schedules.php?id=__ID__&element_type=societe&module_name=societe']; // To add a new tab identified by code tabname1
 		$this->tabs[] = ['data' => 'user:+participation:'. $pictoDigirisk .$langs->trans('GP/UTParticipation').':digiriskdolibarr@digiriskdolibarr:1:/custom/digiriskdolibarr/view/digiriskelement/digiriskelement_evaluator.php?fromid=__ID__']; // To add a new tab identified by code tabname1
         $this->tabs[] = ['data' => 'user:+accidents:'. $pictoDigirisk .$langs->trans('Accidents').':digiriskdolibarr@digiriskdolibarr:1:/custom/digiriskdolibarr/view/accident/accident_list.php?fromiduser=__ID__']; // To add a new tab identified by code tabname1
+        $this->tabs[] = ['data' => 'categories_ticket:+test:' . $pictoDigirisk .$langs->trans('WHSRegister') . ':digiriskdolibarr@digiriskdolibarr:1:/custom/digiriskdolibarr/view/ticket/config_card.php?id=__ID__&type=ticket'];
 
         // Dictionaries
         $this->dictionaries = [
@@ -2222,6 +2223,10 @@ class modDigiriskdolibarr extends DolibarrModules
 		$extra_fields->addExtraField('fk_accident', $langs->transnoentities("AccidentLinked"), 'sellist', 1040, '', 'projet_task', 0, 0, '', 'a:1:{s:7:"options";a:1:{s:54:"digiriskdolibarr_accident:ref:rowid::entity = $ENTITY$";N;}}', '', '', 1);
         $extra_fields->update('fk_accidentinvestigation', $langs->transnoentities("AccidentInvestigationLinked"), 'sellist', '', 'projet_task', 0, 0, 1050, 'a:1:{s:7:"options";a:1:{s:68:"digiriskdolibarr_accident_investigation:ref:rowid::entity = $ENTITY$";N;}}', '', '', 1);
         $extra_fields->addExtraField('fk_accidentinvestigation', $langs->transnoentities("AccidentInvestigationLinked"), 'sellist', 1050, '', 'projet_task', 0, 0, '', 'a:1:{s:7:"options";a:1:{s:68:"digiriskdolibarr_accident_investigation:ref:rowid::entity = $ENTITY$";N;}}', '', '', 1);
+
+        $extra_fields->update('ticket_category_config', 'TicketCategoryConfig', 'text', '', 'categorie', 0, 0, 1000, '', 1, '', 0);
+        $extra_fields->addExtraField('ticket_category_config', 'TicketCategoryConfig', 'text', 1000, '', 'categorie', 0, 0, '', '', 1, '', 0);
+
 
 		if (!$conf->global->DIGIRISKDOLIBARR_TICKET_EXTRAFIELDS_BACKWARD_COMPATIBILITY && (dolibarr_get_const($this->db, 'DIGIRISKDOLIBARR_TICKET_EXTRAFIELDS', 0) || dolibarr_get_const($this->db, 'DIGIRISKDOLIBARR_TICKET_EXTRAFIELDS', $conf->entity))) {
 			if ($conf->multicompany->enabled) {
