@@ -542,7 +542,7 @@ class DigiriskElement extends SaturneObject
         $getDigiriskElementListsByDepth = $this->getDigiriskElementListsByDepth();
         $getRisksByDigiriskElement      = $this->getRisksByDigiriskElement();
 
-        $array['graphs'] = [$getDigiriskElementListsByDepth, $getRisksByDigiriskElement];
+        $array['graphs'] = [$getRisksByDigiriskElement, $getDigiriskElementListsByDepth];
 
         return $array;
     }
@@ -569,6 +569,7 @@ class DigiriskElement extends SaturneObject
         $array['type']       = 'pie';
         $array['showlegend'] = $conf->browser->layout == 'phone' ? 1 : 2;
         $array['dataset']    = 1;
+        $array['position']   = 1;
 
         $digiriskElements = $this->fetchDigiriskElementFlat(GETPOSTISSET('id') ? GETPOST('id') : 0);
 
@@ -597,7 +598,7 @@ class DigiriskElement extends SaturneObject
                 }
             }
         }
-
+        
         return $array;
     }
 
@@ -621,6 +622,7 @@ class DigiriskElement extends SaturneObject
         $array['type']       = 'pie';
         $array['showlegend'] = $conf->browser->layout == 'phone' ? 1 : 2;
         $array['dataset']    = 1;
+        $array['position']   = 20;
 
         $children         = [];
         $digiriskElements = $this->fetchDigiriskElementFlat(GETPOSTISSET('id') ? GETPOST('id') : 0);
@@ -639,7 +641,7 @@ class DigiriskElement extends SaturneObject
                 ];
             }
         }
-
+        
         if (!empty($digiriskElements)) {
             foreach ($digiriskElements as $digiriskElement) {
                 if ($digiriskElement['depth'] <= getDolGlobalInt('DIGIRISKDOLIBARR_DIGIRISKELEMENT_DEPTH_GRAPH') && $digiriskElement['object']->element_type == 'groupment') {

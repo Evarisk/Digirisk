@@ -160,7 +160,9 @@ class Evaluator extends SaturneObject
 	 * @throws Exception
 	 */
 	public function getNbEmployeesInvolved() {
-		// Number employees involved
+        $array['position'] = 130;
+
+        // Number employees involved
 		$allevaluators = $this->fetchAll('','', 0, 0, array(), 'AND', 'fk_user');
 		if (is_array($allevaluators) && !empty($allevaluators)) {
 			$array['nbemployeesinvolved'] = count($allevaluators);
@@ -178,6 +180,8 @@ class Evaluator extends SaturneObject
 	 */
 	public function getNbEmployees() {
 		global $conf;
+
+        $array['position'] = 140;
 
 		// Number employees
 		if ($conf->global->DIGIRISKDOLIBARR_NB_EMPLOYEES > 0 && $conf->global->DIGIRISKDOLIBARR_MANUAL_INPUT_NB_EMPLOYEES) {

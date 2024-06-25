@@ -426,7 +426,7 @@ class Accident extends SaturneObject
         //$arrayGravityIndex           = $this->getGravityIndex();
         $arrayGravityRate              = $this->getGravityRate();
 
-        $array['widgets'] = [
+		$array['widgets'] = [
             'accident' => [
                 'label'      => [$langs->transnoentities('DayWithoutAccident') ?? '', $langs->transnoentities('WorkStopDays') ?? '', $langs->transnoentities('NbAccidentsByEmployees') ?? '', $langs->transnoentities('NbPresquAccidents') ?? '', $langs->transnoentities('NbAccidentInvestigations') ?? ''],
                 'content'    => [$arrayNbDaysWithoutAccident['daywithoutaccident'] ?? 0, $arrayNbWorkstopDays['nbworkstopdays'] ?? 0, $arrayNbAccidentsByEmployees['nbaccidentsbyemployees'] ?? 0, $arrayNbPresquAccidents['nbpresquaccidents'] ?? 0, $arrayNbAccidentInvestigations['nbaccidentinvestigations'] ?? 0],
@@ -446,6 +446,7 @@ class Accident extends SaturneObject
             ]
         ];
 
+
         $array['graphs'] = [$arrayNbAccidents, $arrayNbAccidentsLast3Years];
 
         return $array;
@@ -458,6 +459,8 @@ class Accident extends SaturneObject
 	 * @throws Exception
 	 */
 	public function getNbDaysWithoutAccident() {
+		$array['position'] = 30;
+
 		// Number days without accident
 		$lastAccident = $this->fetchAll('DESC', 'accident_date', 1, 0 );
 		if (is_array($lastAccident) && !empty($lastAccident)) {
@@ -489,6 +492,7 @@ class Accident extends SaturneObject
         $array['type']       = 'pie';
         $array['showlegend'] = $conf->browser->layout == 'phone' ? 1 : 2;
         $array['dataset']    = 1;
+		$array['position']	 = 40;
 
         $array['labels'] = [
             'accidents' => [
@@ -544,6 +548,7 @@ class Accident extends SaturneObject
         $array['type']       = 'bar';
         $array['showlegend'] = 1;
         $array['dataset']    = 3;
+		$array['position']	 = 50;
 
         $array['labels'] = [
             'pastlastyear' => [
@@ -600,6 +605,8 @@ class Accident extends SaturneObject
 	 * @throws Exception
 	 */
 	public function getNbWorkstopDays() {
+		$array['position'] = 60;
+
 		// Number workstop days
 		$allaccidents = $this->fetchAll();
 		if (is_array($allaccidents) && !empty($allaccidents)) {
@@ -630,6 +637,8 @@ class Accident extends SaturneObject
 	public function getNbAccidentsByEmployees() {
 		$evaluator = new Evaluator($this->db);
 
+		$array['position'] = 70;
+
 		// Number accidents by employees
 		$arrayNbAccidents = $this->getNbAccidents();
 		$arrayNbEmployees = $evaluator->getNbEmployees();
@@ -657,6 +666,8 @@ class Accident extends SaturneObject
 
 		$category = new Categorie($this->db);
 
+		$array['position'] = 80;
+
 		// Number accidents presqu'accidents
 		$category->fetch(0, $langs->transnoentities('PresquAccident'));
 		$alltickets = $category->getObjectsInCateg(Categorie::TYPE_TICKET);
@@ -675,6 +686,8 @@ class Accident extends SaturneObject
 	 * @throws Exception
 	 */
 	public function getNbAccidentInvestigations() {
+		$array['position'] = 90;
+
 		// Number accident investigations
 		$allaccidents = $this->fetchAll();
 		if (is_array($allaccidents) && !empty($allaccidents)) {
@@ -706,6 +719,8 @@ class Accident extends SaturneObject
 	public function getFrequencyIndex() {
 		$evaluator = new Evaluator($this->db);
 
+		$array['position'] = 100;
+
 		// (Number accidents with DIAT by employees) x 1 000
 		$arrayNbAccidents = $this->getNbAccidents();
 		$arrayNbEmployees = $evaluator->getNbEmployees();
@@ -729,6 +744,8 @@ class Accident extends SaturneObject
 	 * @throws Exception
 	 */
 	public function getFrequencyRate() {
+		$array['position'] = 110;
+
 		// (Number accidents with DIAT by working hours) x 1 000 000
 		$arrayNbAccidents = $this->getNbAccidents();
 		$total_workhours  = getWorkedHours();
@@ -753,6 +770,8 @@ class Accident extends SaturneObject
 	 * @throws Exception
 	 */
 	public function getGravityRate() {
+		$array['position'] = 120;
+
 		// (Number workstop days by working hours) x 1 000
 		$arrayNbWorkstopDays = $this->getNbWorkstopDays();
 		$total_workhours     = getWorkedHours();

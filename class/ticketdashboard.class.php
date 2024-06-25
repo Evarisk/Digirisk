@@ -304,6 +304,7 @@ class TicketDashboard extends DigiriskDolibarrDashboard
         $array['showlegend'] = 1;
         $array['dataset']    = 2;
         $array['moreCSS']    = 'grid-2';
+        $array['position']   = 160;
 
         $dateStart = dol_mktime(0, 0, 0, GETPOST('dateStartmonth', 'int'), GETPOST('dateStartday', 'int'), GETPOST('dateStartyear', 'int'));
         $dateEnd   = dol_mktime(23, 59, 59, GETPOST('dateEndmonth', 'int'), GETPOST('dateEndday', 'int'), GETPOST('dateEndyear', 'int'));
@@ -361,6 +362,7 @@ class TicketDashboard extends DigiriskDolibarrDashboard
         $array['showlegend'] = 1;
         $array['dataset']    = 2;
         $array['moreCSS']    = 'grid-2';
+        $array['position']   = 170;
 
         $digiriskElement = new DigiriskElement($this->db);
 
@@ -407,6 +409,7 @@ class TicketDashboard extends DigiriskDolibarrDashboard
         $array['showlegend'] = 1;
         $array['dataset']    = 2;
         $array['moreCSS']    = 'grid-2';
+        $array['position']   = 180;
 
         $category        = new Categorie($this->db);
         $digiriskElement = new DigiriskElement($this->db);
