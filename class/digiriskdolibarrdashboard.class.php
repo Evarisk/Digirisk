@@ -68,11 +68,12 @@ class DigiriskDolibarrDashboard
                 $className = new TicketDashboard($this->db, $moreParams['join'], $moreParams['where']);
             }
             if ($dashboardData['type'] != 'SaturneTask') {
-                $array[$dashboardData['type']] = array_key_exists('Load' . $dashboardData['type'], $moreParams) ? $className->load_dashboard() : [];
+                $array[dol_strtolower($dashboardData['type'])] = array_key_exists('Load' . $dashboardData['type'], $moreParams) ? $className->load_dashboard() : [];
             } else {
-                $array[$dashboardData['type']] = array_key_exists('Load' . $dashboardData['type'], $moreParams) ? $className->load_dashboard(getDolGlobalInt('DIGIRISKDOLIBARR_DU_PROJECT')) : [];
+                $array[dol_strtolower($dashboardData['type'])] = array_key_exists('Load' . $dashboardData['type'], $moreParams) ? $className->load_dashboard(getDolGlobalInt('DIGIRISKDOLIBARR_DU_PROJECT')) : [];
             }
         }
+
         return $array;
     }
 
