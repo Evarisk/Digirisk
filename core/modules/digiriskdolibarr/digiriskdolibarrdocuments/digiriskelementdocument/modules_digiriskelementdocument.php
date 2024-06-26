@@ -32,8 +32,9 @@ require_once __DIR__ . '/../../../../../class/riskanalysis/risksign.class.php';
 require_once __DIR__ . '/../../../../../class/riskanalysis/risk.class.php';
 require_once __DIR__ . '/../../../../../class/evaluator.class.php';
 require_once __DIR__ . '/../../../../../class/accident.class.php';
+require_once __DIR__ . '/../../../../../class/digiriskresources.class.php';
 
-// Load saturne libraries
+// Load Saturne libraries
 require_once __DIR__ . '/../../../../../../saturne/core/modules/saturne/modules_saturne.php';
 
 /**
@@ -305,6 +306,32 @@ abstract class ModeleODTDigiriskElementDocument extends SaturneDocumentModel
             $noPhoto           = '/public/theme/common/nophoto.png';
             $tmpArray['photo'] = DOL_DOCUMENT_ROOT . $noPhoto;
         }
+
+        $resources = new DigiriskResources($this->db);
+        $userTmp   = new User($this->db);
+
+        // Get QRCode to public interface
+        if (isModEnabled('multicompany')) {
+            $qrCodePath = DOL_DATA_ROOT . '/digiriskdolibarr/multicompany/ticketqrcode/';
+        } else {
+            $qrCodePath = $conf->digiriskdolibarr->multidir_output[$conf->entity ?: 1] . '/ticketqrcode/';
+        }
+        $QRCodeList = dol_dir_list($qrCodePath);
+        if (is_array($QRCodeList) && !empty($QRCodeList)) {
+            $QRCode          = array_shift($QRCodeList);
+            $QRCodeImagePath = $QRCode['fullname'];
+        } else {
+            $QRCodeImagePath = DOL_DOCUMENT_ROOT . '/public/theme/common/nophoto.png';
+        }
+
+        $allLinks             = $resources->fetchDigiriskResources();
+        $responsibleResources = $allLinks['Responsible'];
+        $userTmp->fetch($responsibleResources->id[0]);
+
+        // @todo The keyword "signature" is needed because we want the image to be cropped to fit in the table
+        $tmpArray['helpUrl']               = DOL_MAIN_URL_ROOT . '/custom/digiriskdolibarr/public/ticket/create_ticket.php';
+        $tmpArray['signatureQRCodeTicket'] = $QRCodeImagePath;
+        $tmpArray['securityResponsible']   = (!empty($userTmp) ? dol_strtoupper($userTmp->lastname) . ' ' . ucfirst($userTmp->firstname) : '');
 
         if (isset($moreParam['tmparray']) && is_array($moreParam['tmparray'])) {
             $moreParam['tmparray'] = array_merge($moreParam['tmparray'], $tmpArray);
