@@ -28,6 +28,7 @@ CREATE TABLE llx_digiriskdolibarr_preventionplan(
   prior_visit_date   datetime,
   prior_visit_text   text,
   cssct_intervention boolean,
+  limit_managers     boolean,
   fk_user_creat      integer NOT NULL,
   fk_user_modif      integer,
   fk_project         integer NOT NULL

@@ -246,6 +246,7 @@ PriorVisitYesNo                                       = Visite préliminaire eff
 PriorVisitText                                        = Note de l'inspection
 CSSCTIntervention                                     = Intervention du CSSCT
 CSSCTInterventionText                                 = Intervention du CSSCT ?
+LimitManagers                                         = Limiter à un responsable
 MasterWorker                                          = Responsable de l'Entreprise Utilisatrice
 MasterWorker                                          = Responsable de l'Entreprise Utilisatrice
 ExtSociety                                            = Entreprise Extérieure

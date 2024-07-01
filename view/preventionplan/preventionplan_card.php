@@ -163,6 +163,7 @@ if (empty($reshook)) {
 		$priorVisitBool           = GETPOST('prior_visit_bool');
 		$priorVisitText           = GETPOST('prior_visit_text');
 		$cssctInterventation      = GETPOST('cssct_intervention');
+		$limitManagers			  = GETPOST('limit_managers');
 
 		// Initialize object preventionplan
 		$now                   = dol_now();
@@ -189,6 +190,7 @@ if (empty($reshook)) {
 		}
 
 		$object->cssct_intervention = $cssctInterventation;
+		$object->limit_managers     = $limitManagers;
 
 		$object->fk_user_creat = $user->id ? $user->id : 1;
 
@@ -283,6 +285,7 @@ if (empty($reshook)) {
 		$priorVisitBool           = GETPOST('prior_visit_bool');
 		$priorVisitText           = GETPOST('prior_visit_text');
 		$cssctInterventation      = GETPOST('cssct_intervention');
+		$limitManagers			  = GETPOST('limit_managers');
 
 		// Initialize object preventionplan
 		$now           = dol_now();
@@ -302,6 +305,7 @@ if (empty($reshook)) {
 			$object->prior_visit_date = $prior_visit_date;
 		}
 		$object->cssct_intervention = $cssctInterventation;
+		$object->limit_managers     = $limitManagers;
 
 		$object->fk_user_creat = $user->id ? $user->id : 1;
 
@@ -720,6 +724,11 @@ if ($action == 'create') {
 	print '<input type="checkbox" id="prior_visit_bool" name="prior_visit_bool"' . (GETPOST('prior_visit_bool') ? ' checked=""' : '') . '>';
 	print $form->textwithpicto('', $langs->trans('CSEMustBeAlerted3DaysBeforeVisit'));
 	print '</td></tr>';
+
+    // Only one manager -- Limiter à un seul responsable
+    print '<tr><td class="minwidth400">' . $langs->trans("LimitManagers") . '</td><td>';
+    print '<input type="checkbox" id="limit_managers" name="limit_managers"' . (GETPOST('limit_managers') ? ' checked=""' : '') . '>';
+    print '</td></tr>';
 
 	//Prior Visit Date -- Date de l'inspection commune préalable
 	print '<tr class="prior_visit_date_field hidden" ' . (GETPOST('prior_visit_bool') ? '' : 'style="display:none"') . '><td class="minwidth400"><label for="prior_visit_date">' . $langs->trans("PriorVisitDate") . '</label></td><td>';
