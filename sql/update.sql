@@ -255,3 +255,6 @@ ALTER TABLE `llx_digiriskdolibarr_risk` ADD `type` VARCHAR(255) NOT NULL DEFAULT
 
 -- 10.1.1
 UPDATE llx_element_element SET targettype = 'digiriskdolibarr_digiriskelement' WHERE targettype = 'digiriskdolibarr_digiriskdolibar' AND sourcetype = 'digiriskdolibarr_risksign';
+
+-- 10.3.0
+ALTER TABLE llx_digiriskdolibarr_preventionplan ADD limit_managers BOOLEAN NOT NULL DEFAULT FALSE AFTER cssct_intervention;
