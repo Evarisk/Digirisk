@@ -285,6 +285,22 @@ if ($action == 'set_multi_company_ticket_public_interface') {
     exit;
 }
 
+if ($action == 'setTicketCreationRedirectionUrl') {
+	$ticketCreationRedirectionUrl = GETPOST('ticketCreationRedirectionUrl', 'none');
+	dolibarr_set_const($db, 'DIGIRISKDOLIBARR_TICKET_CREATION_REDIRECTION_URL', $ticketCreationRedirectionUrl, 'chaine', 0, '', 0);
+
+	setEventMessage('SavedConfig');
+	header('Location: ' . $_SERVER['PHP_SELF'] . '?page_y=' . $pageY);
+	exit;
+}
+
+if ($action == 'setTicketCreationOption') {
+	$value = GETPOST('value', 'none');
+	dolibarr_set_const($db, 'DIGIRISKDOLIBARR_TICKET_CREATION_OPTION', $value, 'chaine', 0, '', 0);
+
+	setEventMessage('SavedConfig');
+}
+
 /*
  * View
  */
@@ -308,7 +324,21 @@ print load_fiche_titre('<i class="fa fa-ticket-alt"></i> ' . $langs->transnoenti
 print '<hr>';
 print load_fiche_titre($langs->transnoentities("PublicInterface"), '', '');
 
-print '<span class="opacitymedium">' . $langs->transnoentities("DigiriskTicketPublicAccess") . '</span> : <a class="wordbreak" href="' . dol_buildpath('/custom/digiriskdolibarr/public/ticket/create_ticket.php?entity=' . $conf->entity, 1) . '" target="_blank" >' . dol_buildpath('/custom/digiriskdolibarr/public/ticket/create_ticket.php?entity=' . $conf->entity, 2) . '</a>';
+print '<span class="opacitymedium">' . $langs->transnoentities("DigiriskTicketPublicAccess") . ' : </span>';
+print '<br />';
+
+print '<input type="radio" name="digiriskdolibarr_ticket_creation_option" value="original_redirection_link"' . ($conf->global->DIGIRISKDOLIBARR_TICKET_CREATION_OPTION == 'original_redirection_link' ? 'checked="checked"' : '') . '/><span class="opacitymedium">URL par défaut</span> : <a class="wordbreak" href="' . dol_buildpath('/custom/digiriskdolibarr/public/ticket/create_ticket.php?entity=' . $conf->entity, 1) . '" target="_blank" >' . dol_buildpath('/custom/digiriskdolibarr/public/ticket/create_ticket.php?entity=' . $conf->entity, 2) . '</a>';
+
+print '<br />';
+
+print '<input type="radio" name="digiriskdolibarr_ticket_creation_option" value="custom_redirection_link"' . ($conf->global->DIGIRISKDOLIBARR_TICKET_CREATION_OPTION == 'custom_redirection_link' ? 'checked="checked"' : '') . '/><span class="opacitymedium">URL personnalise</span> : <a class="wordbreak">' . $conf->global->DIGIRISKDOLIBARR_TICKET_CREATION_REDIRECTION_URL . '</a>';
+print '<form method="POST" action="' . $_SERVER['PHP_SELF'] . '">';
+print '<input type="hidden" name="token" value="' . newToken() . '">';
+print '<input type="hidden" name="action" value="setTicketCreationRedirectionUrl">';
+print '<input type="hidden" name="page_y">';
+print '<input type="text" name="ticketCreationRedirectionUrl" value="' . $conf->global->DIGIRISKDOLIBARR_TICKET_CREATION_REDIRECTION_URL . '">';
+print '<input type="submit" class="button reposition" value="'. $langs->transnoentities('Save') . '">';
+print '</form>';
 
 if (isModEnabled('multicompany')) {
 	print load_fiche_titre($langs->transnoentities("MultiEntityPublicInterface"), '', '');

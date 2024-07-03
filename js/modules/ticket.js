@@ -36,6 +36,7 @@ window.digiriskdolibarr.ticket.event = function() {
 	$( document ).on( 'click', '.close-dashboard-info', window.digiriskdolibarr.ticket.closeDashBoardTicketInfo );
 	$( document ).on( 'keyup', '.email', window.digiriskdolibarr.ticket.checkValidEmail );
 	$( document ).on( 'keyup', '.options_digiriskdolibarr_ticket_phone', window.digiriskdolibarr.ticket.checkValidPhone );
+	$( document ).on( 'click', 'input[name="digiriskdolibarr_ticket_creation_option"]', window.digiriskdolibarr.ticket.toggleTicketCreationOption );
 };
 
 /**
@@ -269,4 +270,24 @@ window.digiriskdolibarr.ticket.checkValidPhone = function() {
 	} else {
 		$(this).css("border", "3px solid green");
 	}
+};
+
+/**
+ * Toggle ticket creation option
+ *
+ * @since   10.3.0
+ * @version 10.3.0
+ *
+ * @return {void}
+ */
+window.digiriskdolibarr.ticket.toggleTicketCreationOption = function() {
+	let value = $(this).val();
+
+	let token = window.saturne.toolbox.getToken()
+	let querySeparator    = window.saturne.toolbox.getQuerySeparator(document.URL)
+
+	$.ajax({
+		url: document.URL + querySeparator + 'action=setTicketCreationOption&value=' + value + '&token=' + token,
+		type: "POST",
+	}).then((resp) => {});
 };
