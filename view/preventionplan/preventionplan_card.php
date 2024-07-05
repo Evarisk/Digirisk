@@ -1103,12 +1103,30 @@ if ((empty($action) || ($action != 'create' && $action != 'edit'))) {
 		print '<td>';
 		print dol_print_date($object->prior_visit_date, 'dayhoursec');
 		print '</td></tr>';
-
+		
 		print '<tr><td class="titlefield">';
 		print $langs->trans("PriorVisitText");
 		print '</td>';
 		print '<td>';
 		print $object->prior_visit_text;
+		print '</td></tr>';
+	}
+	
+	//Limit the number of managers -- Limiter le nombre de responsables
+	print '<tr><td class="titlefield">';
+	print $langs->trans("LimitManagers");
+	print '</td>';
+	print '<td>';
+	print '<input type="checkbox" id="limit_managers" name="limit_managers"' . (!empty($object->max_managers) ? ' checked=""' : '') . 'disabled>';
+	print '</td></tr>';
+
+	if (!empty($object->max_managers)) {
+		//Maximum managers -- Nombre maximum de responsables
+		print '<tr><td class="titlefield">';
+		print $langs->trans("MaxManagers");
+		print '</td>';
+		print '<td>';
+		print $object->max_managers;
 		print '</td></tr>';
 	}
 
