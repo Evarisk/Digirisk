@@ -163,7 +163,7 @@ if (empty($reshook)) {
 		$priorVisitBool           = GETPOST('prior_visit_bool');
 		$priorVisitText           = GETPOST('prior_visit_text');
 		$cssctInterventation      = GETPOST('cssct_intervention');
-		$limitManagers			  = GETPOST('limit_managers');
+		$maxManagers			  = GETPOST('max_managers', 'int');
 
 		// Initialize object preventionplan
 		$now                   = dol_now();
@@ -190,7 +190,7 @@ if (empty($reshook)) {
 		}
 
 		$object->cssct_intervention = $cssctInterventation;
-		$object->limit_managers     = $limitManagers;
+		$object->max_managers = $maxManagers;
 
 		$object->fk_user_creat = $user->id ? $user->id : 1;
 
@@ -285,7 +285,7 @@ if (empty($reshook)) {
 		$priorVisitBool           = GETPOST('prior_visit_bool');
 		$priorVisitText           = GETPOST('prior_visit_text');
 		$cssctInterventation      = GETPOST('cssct_intervention');
-		$limitManagers			  = GETPOST('limit_managers');
+		$maxManagers			  = GETPOST('max_managers', 'int');
 
 		// Initialize object preventionplan
 		$now           = dol_now();
@@ -304,8 +304,9 @@ if (empty($reshook)) {
 			$object->prior_visit_text = $priorVisitText;
 			$object->prior_visit_date = $prior_visit_date;
 		}
+
 		$object->cssct_intervention = $cssctInterventation;
-		$object->limit_managers     = $limitManagers;
+		$object->max_managers = $maxManagers;
 
 		$object->fk_user_creat = $user->id ? $user->id : 1;
 
@@ -725,10 +726,15 @@ if ($action == 'create') {
 	print $form->textwithpicto('', $langs->trans('CSEMustBeAlerted3DaysBeforeVisit'));
 	print '</td></tr>';
 
-    // Only one manager -- Limiter à un seul responsable
+    // Limit the number of managers -- Limiter le nombre de responsables
     print '<tr><td class="minwidth400">' . $langs->trans("LimitManagers") . '</td><td>';
-    print '<input type="checkbox" id="limit_managers" name="limit_managers"' . (GETPOST('limit_managers') ? ' checked=""' : '') . '>';
+    print '<input type="checkbox" id="limit_managers" name="limit_managers"' . (GETPOSTISSET('max_managers') ? ' checked=""' : '') . '>';
     print '</td></tr>';
+
+	// Maximum managers -- Nombre maximum de responsables
+	print '<tr class="max_managers_number_field hidden" ' . (GETPOST('max_managers') ? '' : 'style="display:none"') . '><td class="minwidth400">' . $langs->trans("MaxManagers") . '</td><td>';
+	print '<input type="number" id="max_managers" name="max_managers" value="' . (GETPOSTISSET('max_managers') ? GETPOST('max_managers') : '') . '" />';
+	print '</td></tr>';
 
 	//Prior Visit Date -- Date de l'inspection commune préalable
 	print '<tr class="prior_visit_date_field hidden" ' . (GETPOST('prior_visit_bool') ? '' : 'style="display:none"') . '><td class="minwidth400"><label for="prior_visit_date">' . $langs->trans("PriorVisitDate") . '</label></td><td>';
@@ -892,6 +898,16 @@ if (($id || $ref) && $action == 'edit') {
 	print '</td>';
 	print '<td>';
 	print '<input type="checkbox" id="prior_visit_bool" name="prior_visit_bool"' . ($object->prior_visit_bool ? ' checked=""' : '') . '"> ';
+	print '</td></tr>';
+
+    // Limit the number of managers -- Limiter le nombre de responsables
+    print '<tr><td class="minwidth400">' . $langs->trans("LimitManagers") . '</td><td>';
+    print '<input type="checkbox" id="limit_managers" name="limit_managers"' . (!empty($object->max_managers) ? ' checked=""' : '') . '>';
+    print '</td></tr>';
+
+	// Maximum managers -- Nombre maximum de responsables
+	print '<tr class="max_managers_number_field' . (!empty($object->max_managers) ? '' : ' hidden') . '" ' . (!empty($object->max_managers) ? '' : 'style="display:none"') . '><td class="minwidth400">' . $langs->trans("MaxManagers") . '</td><td>';
+	print '<input type="number" id="max_managers" name="max_managers" value="' . (!empty($object->max_managers) ? $object->max_managers : '') . '" />';
 	print '</td></tr>';
 
 	//Prior Visit Date -- Date de l'inspection commune préalable

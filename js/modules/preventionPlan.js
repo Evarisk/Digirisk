@@ -29,6 +29,7 @@ window.digiriskdolibarr.preventionplan.init = function() {
  */
 window.digiriskdolibarr.preventionplan.event = function() {
 	$( document ).on( 'click', '#prior_visit_bool', window.digiriskdolibarr.preventionplan.showDateAndText );
+	$( document ).on( 'click', '#limit_managers', window.digiriskdolibarr.preventionplan.showMaxManagersInput );
 };
 
 /**
@@ -56,3 +57,26 @@ window.digiriskdolibarr.preventionplan.showDateAndText = function() {
 	}
 
 };
+
+/**
+ * Show max managers input.
+ * 
+ * @since   1.0.0
+ * @version 9.0.0
+ * 	
+ * @return {void}
+ */
+window.digiriskdolibarr.preventionplan.showMaxManagersInput = function() {
+	let maxManagersRow = $(this).closest('.preventionplan-table').find('.max_managers_number_field')
+	let maxManagersInput = $(this).closest('.preventionplan-table').find('input[name="max_managers"]')
+
+	if (maxManagersRow.hasClass('hidden')) {
+		maxManagersRow.attr('style', '')
+		maxManagersRow.removeClass('hidden')
+		maxManagersInput.val('1')
+	} else {
+		maxManagersRow.attr('style', 'display:none')
+		maxManagersRow.addClass('hidden')
+		maxManagersInput.val('0')
+	}
+}
