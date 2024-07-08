@@ -60,7 +60,7 @@ class Risk extends SaturneObject
 	/**
 	 * @var int Does object support extrafields ? 0 = No, 1 = Yes
 	 */
-	public int $isextrafieldmanaged = 1;
+	public $isextrafieldmanaged = 1;
 
     public const STATUS_DELETED   = -1;
     public const STATUS_DRAFT     = 0;
@@ -534,7 +534,7 @@ class Risk extends SaturneObject
 	 */
 	public function getTasksWithFkRisk()
 	{
-		$sql = "SELECT * FROM " . MAIN_DB_PREFIX . 'projet_task_extrafields' . ' WHERE fk_risk > 0';
+		$sql = "SELECT * FROM " . MAIN_DB_PREFIX . 'projet_task_extrafields' . ' WHERE fk_risk > 0 ORDER BY fk_object ASC';
 		$tasksList = saturne_fetch_all_object_type('SaturneTask', '', '', 0, 0, [], 'AND', false, false);
 
 		$resql = $this->db->query($sql);

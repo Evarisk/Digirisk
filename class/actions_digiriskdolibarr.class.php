@@ -47,9 +47,9 @@ class ActionsDigiriskdolibarr
 	public $results = array();
 
 	/**
-	 * @var string String displayed by executeHook() immediately after return
+	 * @var string|null String displayed by executeHook() immediately after return
 	 */
-	public $resprints;
+	public ?string $resprints;
 
 	/**
 	 * Constructor
@@ -157,7 +157,7 @@ class ActionsDigiriskdolibarr
 
 		require_once __DIR__ . '/../../saturne/lib/saturne_functions.lib.php';
 
-		if ($parameters['currentcontext'] == 'admincompany') {	    // do something only for the context 'somecontext1' or 'somecontext2'
+		if (strpos($parameters['context'], 'admincompany') !== false) {	    // do something only for the context 'somecontext1' or 'somecontext2'
 			?>
 			<script src="../custom/digiriskdolibarr/js/digiriskdolibarr.js"></script>
 			<?php
@@ -200,8 +200,8 @@ class ActionsDigiriskdolibarr
 				<?php
 				print ajax_combobox('selectDIGIRISKDOLIBARR_COLLECTIVE_AGREEMENT_TITLE');
 			}
-		} else if ($parameters['currentcontext'] == 'ticketcard') {
-            if (GETPOST('action') == 'view' || empty(GETPOST('action')) || GETPOST('action') == 'update_extras') {
+		} else if (strpos($parameters['context'], 'ticketcard') !== false) {
+            if (GETPOST('action') != 'create') {
                 if (is_numeric($object->array_options['options_digiriskdolibarr_ticket_service']) && $object->array_options['options_digiriskdolibarr_ticket_service'] > 0) {
                     require_once __DIR__ . '/digiriskelement.class.php';
 
@@ -308,7 +308,7 @@ class ActionsDigiriskdolibarr
 					<?php
 				}
 			}
-		} else if (in_array($parameters['currentcontext'], array('projectcard', 'projectcontactcard', 'projecttaskscard', 'projecttaskcard', 'projecttasktime', 'projectOverview', 'projecttaskscard', 'tasklist', 'category'))) {
+        } else if (preg_match('/projectcard|projectcontactcard|projecttaskcard|projecttaskscard|projecttasktime|projectOverview|tasklist|category/', $parameters['context'])) {
 			if ((GETPOST('action') == '' || empty(GETPOST('action')) || GETPOST('action') != 'edit')) {
 				require_once DOL_DOCUMENT_ROOT.'/projet/class/project.class.php';
 				require_once DOL_DOCUMENT_ROOT.'/projet/class/task.class.php';
@@ -330,7 +330,7 @@ class ActionsDigiriskdolibarr
 				$project               = new Project($db);
 				$extrafields           = new ExtraFields($db);
 
-				if ($parameters['currentcontext'] == 'projecttaskcard') {
+				if (strpos($parameters['context'], 'projecttaskcard') !== false) {
 					$task->fetch(GETPOST('id'));
 					$task->fetch_optionals();
 
@@ -385,7 +385,7 @@ class ActionsDigiriskdolibarr
                     <?php }
 				}
 
-				if (($parameters['currentcontext'] == 'projecttaskscard') || ($parameters['currentcontext'] == 'tasklist')) {
+				if ((strpos($parameters['context'], 'projecttaskscard') !== false) || (strpos($parameters['context'], 'tasklist') !== false)) {
 					$extrafields->fetch_name_optionals_label($task->table_element);
 					$alltasks = $task->getTasksArray(null, null, 0, 0, 0, '', '-1', '', 0, 0, $extrafields);
 
@@ -402,7 +402,7 @@ class ActionsDigiriskdolibarr
 							$firepermit->fetch($firepermit_id);
                             $accident->fetch($accident_id);
                             $accidentinvestigation->fetch($accidentinvestigation_id);
-							if ($parameters['currentcontext'] == 'projecttaskscard') {
+							if (strpos($parameters['context'], 'projecttaskcard') !== false) {
 								if (!empty($risk_id) && $risk_id > 0) { ?>
 									<script>
 										jQuery('.div-table-responsive').find('tr[id="row-' + <?php echo $tasksingle->id; ?> +'"]').find('td[data-key="projet_task.fk_risk"]').html(<?php echo json_encode($risk->getNomUrl(1, 'nolink')) ?>);
@@ -429,7 +429,7 @@ class ActionsDigiriskdolibarr
                                     </script>
                                 <?php }
 							}
-							if ($parameters['currentcontext'] == 'tasklist') {
+							if (strpos($parameters['context'], 'tasklist') !== false) {
 								if (!empty($risk_id) && $risk_id > 0) { ?>
 									<script>
 										jQuery('.div-table-responsive').find('tr[data-rowid="' + <?php echo $tasksingle->id; ?> +'"]').find('td[data-key="projet_task.fk_risk"]').html(<?php echo json_encode($risk->getNomUrl(1, 'nolink')) ?>);
@@ -460,14 +460,14 @@ class ActionsDigiriskdolibarr
 					}
 				}
 
-				if (in_array($parameters['currentcontext'], ['projectcard', 'projectcontactcard', 'projecttaskcard', 'projecttaskscard', 'projecttasktime', 'projectOverview']) || ($parameters['currentcontext'] == 'category' && preg_match('/contacttpl/', $parameters['context']))) {
-                    if (in_array($parameters['currentcontext'], ['projecttaskcard']) && !GETPOSTISSET('withproject')) {
+				if (preg_match('/projectcard|projectcontactcard|projecttaskcard|projecttaskscard|projecttasktime|projectOverview/', $parameters['context']) || (strpos($parameters['context'], 'category') !== false && preg_match('/contacttpl/', $parameters['context']))) {
+                    if (strpos($parameters['context'], 'projecttaskcard') !== false && !GETPOSTISSET('withproject')) {
                         return 0;
                     } else {
                         if (GETPOSTISSET('projectid') || GETPOSTISSET('project_ref')) {
                             $project->fetch( GETPOST('projectid'), GETPOST('project_ref'));
                             $projectId = $project->id;
-                        } else if (in_array($parameters['currentcontext'], ['projectcard', 'projectcontactcard', 'projecttaskscard'])) {
+                        } else if (preg_match('/projectcard|projectcontactcard|projecttaskscard/', $parameters['context'])) {
                             $projectId = GETPOST('id');
                         } else {
                             $task->fetch(GETPOST('id'));
@@ -508,33 +508,7 @@ class ActionsDigiriskdolibarr
                     }
 				}
 			}
-		} else if ($parameters['currentcontext'] == 'publicnewticketcard') {
-			if (!$conf->multicompany->enabled) {
-				$entity = $conf->entity;
-			} else {
-				$entity = GETPOST('entity');
-			}
-			if ($entity > 0) {
-				?>
-				<script>
-					let date = new Date();
-
-					let month    = date.getMonth() + 1;
-					let day      = date.getDate();
-					let fulldate = (day < 10 ? '0' : '') + day + '/' + (month < 10 ? '0' : '') + month + '/' + date.getFullYear();
-					let hour     = date.getHours();
-					let min      = date.getMinutes();
-
-					jQuery('#options_digiriskdolibarr_ticket_date').val(fulldate);
-					jQuery('#options_digiriskdolibarr_ticket_dateday').val((day < 10 ? '0' : '') + day);
-					jQuery('#options_digiriskdolibarr_ticket_datemonth').val((month < 10 ? '0' : '') + month);
-					jQuery('#options_digiriskdolibarr_ticket_dateyear').val(date.getFullYear());
-					jQuery('#options_digiriskdolibarr_ticket_datehour').val((hour < 10 ? '0' : '') + hour);
-					jQuery('#options_digiriskdolibarr_ticket_datemin').val((min < 10 ? '0' : '') + min);
-				</script>
-				<?php
-			}
-		} elseif (preg_match('/categoryindex/', $parameters['context'])) {	    // do something only for the context 'somecontext1' or 'somecontext2'
+		} elseif (strpos($parameters['context'], 'categoryindex') !== false) {	    // do something only for the context 'somecontext1' or 'somecontext2'
             print '<script src="../custom/digiriskdolibarr/js/digiriskdolibarr.js"></script>';
         }
 
@@ -562,7 +536,7 @@ class ActionsDigiriskdolibarr
 
         $error = 0;
 		/* print_r($parameters); print_r($object); echo "action: " . $action; */
-		if ($parameters['currentcontext'] == 'admincompany') {	    // do something only for the context 'somecontext1' or 'somecontext2'
+		if (strpos($parameters['context'], 'admincompany') !== false) {	    // do something only for the context 'somecontext1' or 'somecontext2'
 			if ($action == 'update') {
 				dolibarr_set_const($db, "DIGIRISKDOLIBARR_COLLECTIVE_AGREEMENT_TITLE", GETPOST("DIGIRISKDOLIBARR_COLLECTIVE_AGREEMENT_TITLE", 'nohtml'), 'chaine', 0, '', $conf->entity);
 				dolibarr_set_const($db, "DIGIRISKDOLIBARR_PEE_ENABLED", GETPOST("DIGIRISKDOLIBARR_PEE_ENABLED") == 'on' ? 1 : 0, 'integer', 0, '', $conf->entity);
@@ -574,7 +548,7 @@ class ActionsDigiriskdolibarr
 					dolibarr_set_const($db, "DIGIRISKDOLIBARR_NB_WORKED_HOURS", GETPOST("DIGIRISKDOLIBARR_NB_WORKED_HOURS"), 'integer', 0, '', $conf->entity);
 				}
 			}
-		} else if ($parameters['currentcontext'] == 'ticketcard') {
+		} else if (strpos($parameters['context'], 'ticketcard') !== false) {
             if ($action == 'builddoc' && preg_match('/\bticketdocument_odt\b/', GETPOST('model'))) {
                 require_once __DIR__ . '/digiriskdolibarrdocuments/ticketdocument.class.php';
 
@@ -618,7 +592,7 @@ class ActionsDigiriskdolibarr
 
                 require __DIR__ . '/../../saturne/core/tpl/documents/documents_action.tpl.php';
             }
-        } elseif (in_array($parameters['currentcontext'] , array('ticketlist', 'thirdpartyticket', 'projectticket'))) {
+        } elseif (preg_match('/ticketlist|thirdpartyticket|projectticket/', $parameters['context'])) {
 			if ($action == 'list') {
 				if (GETPOST('button_removefilter_x', 'alpha') || GETPOST('button_removefilter.x', 'alpha') || GETPOST('button_removefilter', 'alpha')) {
 					$searchCategoryTicketList = GETPOST('search_category_ticket_list', 'array');
@@ -629,7 +603,7 @@ class ActionsDigiriskdolibarr
 					}
 				}
 			}
-		} elseif (preg_match('/categorycard/', $parameters['context'])) {
+		} elseif (strpos($parameters['context'], 'categorycard') !== false) {
             require_once __DIR__ . '/../class/preventionplan.class.php';
             require_once __DIR__ . '/../class/firepermit.class.php';
             require_once __DIR__ . '/../class/accident.class.php';
@@ -657,7 +631,7 @@ class ActionsDigiriskdolibarr
 		$value = array();
 
 		/* print_r($parameters); print_r($object); echo "action: " . $action; */
-		if (isModEnabled('digiriskdolibarr') && $parameters['currentcontext'] == 'emailtemplates') {	    // do something only for the context 'somecontext1' or 'somecontext2'
+		if (isModEnabled('digiriskdolibarr') && strpos($parameters['context'], 'emailtemplates') !== false) {	    // do something only for the context 'somecontext1' or 'somecontext2'
 			if ($user->hasRight('digiriskdolibarr', 'preventionplan', 'read')) {
 				$value['preventionplan'] = '<i class="fas fa-info"></i>  ' . dol_escape_htmltag($langs->trans('PreventionPlan'));
 			}
@@ -691,7 +665,7 @@ class ActionsDigiriskdolibarr
 		$value = array();
 
 		/* print_r($parameters); print_r($object); echo "action: " . $action; */
-		if ($parameters['currentcontext'] == 'mainloginpage') {	    // do something only for the context 'somecontext1' or 'somecontext2'
+		if (strpos($parameters['context'], 'mainloginpage') !== false) {	    // do something only for the context 'somecontext1' or 'somecontext2'
 			if ($conf->global->DIGIRISKDOLIBARR_REDIRECT_AFTER_CONNECTION > 0) {
 				$value = dol_buildpath('/custom/digiriskdolibarr/digiriskdolibarrindex.php?idmenu=1319&mainmenu=digiriskdolibarr&leftmenu=', 1);
 			} else {
@@ -720,7 +694,7 @@ class ActionsDigiriskdolibarr
 		global $conf, $user, $langs;
 
 		/* print_r($parameters); print_r($object); echo "action: " . $action; */
-		if (in_array($parameters['currentcontext'] , array('ticketlist', 'thirdpartyticket', 'projectticket'))) {	    // do something only for the context 'somecontext1' or 'somecontext2'
+		if (preg_match('/ticketlist|thirdpartyticket|projectticket/', $parameters['context'])) {	    // do something only for the context 'somecontext1' or 'somecontext2'
 			$searchCategoryTicketList = GETPOST('search_category_ticket_list');
 			if (!empty($searchCategoryTicketList)) {
 				$sql = ' LEFT JOIN '.MAIN_DB_PREFIX."categorie_ticket as ct ON t.rowid = ct.fk_ticket"; // We'll need this table joined to the select in order to filter by categ
@@ -749,7 +723,7 @@ class ActionsDigiriskdolibarr
 		global $conf, $user, $langs;
 
 		/* print_r($parameters); print_r($object); echo "action: " . $action; */
-		if (in_array($parameters['currentcontext'] , array('ticketlist', 'thirdpartyticket', 'projectticket'))) {        // do something only for the context 'somecontext1' or 'somecontext2'
+		if (preg_match('/ticketlist|thirdpartyticket|projectticket/', $parameters['context'])) {        // do something only for the context 'somecontext1' or 'somecontext2'
 			$searchCategoryTicketSqlList = array();
 			$searchCategoryTicketList = GETPOST('search_category_ticket_list');
 			if (is_array($searchCategoryTicketList) && !empty($searchCategoryTicketList)) {
@@ -776,7 +750,7 @@ class ActionsDigiriskdolibarr
 			}
 		}
 
-		if ($parameters['currentcontext'] == 'userlist') {
+		if (strpos($parameters['context'], 'userlist') !== false) {
 			$user->fetchAll('','','','',['login' => 'USERAPI']);
 
 			if (is_array($user->users) && !empty($user->users)) {
@@ -807,7 +781,7 @@ class ActionsDigiriskdolibarr
 		global $conf, $db, $user, $langs;
 
 		/* print_r($parameters); print_r($object); echo "action: " . $action; */
-		if (in_array($parameters['currentcontext'] , array('ticketlist', 'thirdpartyticket', 'projectticket'))) {        // do something only for the context 'somecontext1' or 'somecontext2'
+		if (preg_match('/ticketlist|thirdpartyticket|projectticket/', $parameters['context'])) {        // do something only for the context 'somecontext1' or 'somecontext2'
 			require_once DOL_DOCUMENT_ROOT . '/categories/class/categorie.class.php';
 
 			$form = new Form($db);
@@ -851,7 +825,7 @@ class ActionsDigiriskdolibarr
 		global $conf, $db, $user, $langs;
 
 		/* print_r($parameters); print_r($object); echo "action: " . $action; */
-		if (in_array($parameters['currentcontext'] , array('ticketlist', 'thirdpartyticket', 'projectticket'))) {        // do something only for the context 'somecontext1' or 'somecontext2'
+		if (preg_match('/ticketlist|thirdpartyticket|projectticket/', $parameters['context'])) {        // do something only for the context 'somecontext1' or 'somecontext2'
 			$searchCategoryTicketList = GETPOST('search_category_ticket_list');
 			if (is_array($searchCategoryTicketList) && !empty($searchCategoryTicketList)) {
 				foreach ($searchCategoryTicketList as $searchCategoryTicket) {
@@ -882,7 +856,7 @@ class ActionsDigiriskdolibarr
     {
         global $conf, $langs;
 
-        if ($parameters['currentcontext'] == 'firepermitsignature') {
+        if (strpos($parameters['context'], 'firepermitsignature') !== false) {
             require_once __DIR__ . '/../class/digiriskresources.class.php';
 
             $digiriskResources = new DigiriskResources($this->db);
@@ -892,9 +866,25 @@ class ActionsDigiriskdolibarr
 
             $this->resprints = $moreHtmlRef;
         }
-        if (in_array($parameters['currentcontext'], ['digiriskelementdocument', 'digiriskelementagenda', 'accidentdocument', 'accidentagenda', 'accidentsignature', 'digiriskstandardagenda'])) {
+
+        if (preg_match('/digiriskelementdocument|digiriskelementagenda|accidentdocument|accidentagenda|accidentsignature|digiriskstandardagenda/', $parameters['context'])) {
+            $contexts = [
+                'digiriskelementdocument',
+                'digiriskelementagenda',
+                'accidentdocument',
+                'accidentagenda',
+                'accidentsignature',
+                'digiriskstandardagenda'
+            ];
+            $currentContext = '';
+            $contextParts   = explode(':', $parameters['context']);
+            foreach ($contextParts as $context) {
+                if (in_array($context, $contexts)) {
+                    $currentContext = $context;
+                }
+            }
             list($moreHtmlRef, $moreParams) = $object->getBannerTabContent();
-            switch ($parameters['currentcontext']) {
+            switch ($currentContext) {
                 case 'digiriskelementdocument' :
                 case 'digiriskelementagenda' :
                 case 'digiriskstandardagenda' :
@@ -926,7 +916,7 @@ class ActionsDigiriskdolibarr
 		global $moduleNameLowerCase;
 
 		// Do something only for the current context.
-		if (in_array($parameters['currentcontext'], ['preventionplanschedules', 'firepermitschedules'])) {
+		if (preg_match('/preventionplanschedules|firepermitschedules/', $parameters['context'])) {
 			if ($object->status >= $object::STATUS_LOCKED) {
 				return -1;
 			}
@@ -1017,7 +1007,7 @@ class ActionsDigiriskdolibarr
 		];
 
 		// Do something only for the current context.
-		if (strpos($parameters['context'], 'digiriskdolibarradmindocuments')) {
+		if (strpos($parameters['context'], 'digiriskdolibarradmindocuments') !== false) {
 			$this->results = $types;
         }
 
@@ -1040,7 +1030,7 @@ class ActionsDigiriskdolibarr
 		];
 
 		// Do something only for the current context.
-        if (strpos($parameters['context'], 'digiriskdolibarradmindocuments')) {
+        if (strpos($parameters['context'], 'digiriskdolibarradmindocuments') !== false) {
 			$this->results = $additionalConfig;
 		}
 
@@ -1058,7 +1048,7 @@ class ActionsDigiriskdolibarr
 	{
 		// Do something only for the current context.
 
-		if (in_array($parameters['currentcontext'], ['digiriskelementdocument', 'digiriskelementagenda', 'digiriskstandardagenda'])) {
+		if (preg_match('/digiriskelementdocument|digiriskelementagenda|digiriskstandardagenda/', $parameters['context'])) {
 			require_once __DIR__ . '/../lib/digiriskdolibarr_function.lib.php';
 
 			$this->resprints = 'digirisk_header';
@@ -1079,7 +1069,7 @@ class ActionsDigiriskdolibarr
         global $conf;
 
 		// Do something only for the current context.
-		if (in_array($parameters['currentcontext'], ['digiriskelementview', 'digiriskstandardview', 'digiriskstandardagenda', 'digiriskelementagenda', 'digiriskelementdocument'])) {
+		if (preg_match('/digiriskelementview|digiriskstandardview|digiriskstandardagenda|digiriskelementagenda|digiriskelementdocument/', $parameters['context'])) {
 			require_once __DIR__ . '/../lib/digiriskdolibarr_function.lib.php';
 			if ($object->element == 'digiriskelement') {
 				$this->results = ['subdir' => $object->element_type . '/'. $object->ref];
@@ -1131,7 +1121,7 @@ class ActionsDigiriskdolibarr
     {
         global $langs, $user;
 
-        if ($parameters['currentcontext'] == 'ticketcard') {
+        if (strpos($parameters['context'], 'ticketcard') !== false) {
             print dolGetButtonAction('', img_picto('NewAccident', 'fa-user-injured') . ' ' . $langs->trans('NewAccident'), 'default', dol_buildpath('/digiriskdolibarr/view/accident/accident_card.php?action=create&fk_ticket=' . $object->id, 1), '', $user->rights->digiriskdolibarr->accident->write);
         }
 

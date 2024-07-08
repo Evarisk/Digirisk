@@ -1352,6 +1352,7 @@ QRCodeGenerated                          = QRCode généré
 FkTicket                                 = Ticket lié
 PublicTicket                             = Interface publique des tickets
 TicketPublicInterfaceForbidden           = Accès interdit à l'interface publique des tickets
+WHSRegister                              = Registre SST
 
 # Stats - Statistiques
 TicketStatistics    = Statistiques des tickets
