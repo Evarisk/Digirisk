@@ -1126,4 +1126,55 @@ class ActionsDigiriskdolibarr
         }
 
     }
+
+	public function showLinkedObjectBlock($parameters, &$object) {
+		global $conf, $langs;
+
+		if (strpos($parameters['context'], 'preventionplancard') !== false) {
+			$firePermits		= saturne_fetch_all_object_type('FirePermit', '', '', 0, 0, ['customsql' => 'fk_preventionplan = ' . $object->id]);
+			$morehtmlright		= $parameters['morehtmlright'];
+			$nbofdifferenttypes = count($firePermits);
+
+			print load_fiche_titre($langs->trans('RelatedFirePermit'), $morehtmlright, '', 0, 0, 'showlinkedobjectblock');
+
+			print '<div class="div-table-responsive-no-min">';
+			print '<table class="noborder allwidth" data-block="showLinkedObject" data-element="' . $object->element . '"  data-elementid="' . $object->id . '"   >';
+
+			print '<tr class="liste_titre">';
+			print '<td>' . $langs->trans("Type") . '</td>';
+			print '<td>' . $langs->trans("Ref") . '</td>';
+			print '<td>' . $langs->trans("Label") . '</td>';
+			print '<td class="center">' . $langs->trans("DateStart") . '</td>';
+			print '<td class="center">' . $langs->trans("DateEnd") . '</td>';
+			print '<td class="right">' . $langs->trans("Status") . '</td>';
+			print '</tr>';
+
+			$nboftypesoutput = 0;
+			$tplpath		 = $element = $subelement = 'firepermit';
+			$tplname		 = 'linkedobjectblock';
+
+			global $linkedObjectBlock;
+			$linkedObjectBlock = $firePermits;
+
+			$dirtpls = array_merge($conf->modules_parts['tpl'], ['digiriskdolibarr' => '/digiriskdolibarr/core/tpl/' . $tplpath . '/']);
+			foreach ($dirtpls as $reldir) {
+				$res = @include dol_buildpath($reldir . $tplname . '.tpl.php');
+				if ($res) {
+					$nboftypesoutput++;
+					break;
+				}
+			}
+
+			if (!$nboftypesoutput) {
+				print '<tr><td class="impair" colspan="7"><span class="opacitymedium">' . $langs->trans("None") . '</span></td></tr>';
+			}
+
+			print '</table>';
+			print '</div>';
+
+			return 1;
+		}
+
+		return 0;
+	}
 }

@@ -1507,6 +1507,8 @@ if ((empty($action) || ($action != 'create' && $action != 'edit'))) {
         print saturne_show_documents($modulepart, $dirFilesArray, $filedirArray, $urlsource, 0, 0, '', 1, 0, 0, 0, 0, $title, 0, 0);
     }
 
+	$form->showLinkedObjectBlock($object, '', null, $langs->trans('RelatedFirePermit'));
+
     if ($permissiontoadd) {
 		print '</div><div class="fichehalfright">';
 	} else {
