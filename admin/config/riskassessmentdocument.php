@@ -449,7 +449,7 @@ $constArray[$moduleNameLowerCase] = [
 	],
 	'ShowSharedRiskSigns' => [
 		'name'        => 'ShowSharedRiskSigns',
-		'description' => $langs->trans('ShowSharedRiskSignsDescription') . (!$areRisksSharable ? '<br>' . img_picto('danger', 'fa-exclamation-triangle') . $langs->trans('DisabledSharedElement') : ''),
+		'description' => $langs->trans('ShowSharedRiskSignsDescription') . (!$areRisksSignsSharable ? '<br>' . img_picto('danger', 'fa-exclamation-triangle') . $langs->trans('DisabledSharedElement') : ''),
 		'code'        => 'DIGIRISKDOLIBARR_SHOW_SHARED_RISKSIGNS',
         'disabled'    => !$areRisksSignsSharable
 
