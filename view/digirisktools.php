@@ -84,6 +84,7 @@ $upload_dir = $conf->digiriskdolibarr->multidir_output[$conf->entity ?? 1];
 $dangerCategories        = $risk->getDangerCategories();
 $risk->type              = 'riskenvironmental';
 $environmentalCategories = $risk->getDangerCategories();
+$risk->type              = 'risk';
 
 // Security check - Protection if external user
 $permissiontoread = $user->rights->digiriskdolibarr->adminpage->read;
