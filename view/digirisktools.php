@@ -220,6 +220,7 @@ if (GETPOST('dataMigrationImportRisks', 'alpha') && ! empty($conf->global->MAIN_
 			//Risk
 			foreach ($digiriskExportArray['risks'] as $digiriskExportRisk) {
 				$risk->ref        = $refRiskMod->getNextValue($risk);
+                $risk->status     = Risk::STATUS_VALIDATED;
 				$risk->category   = $risk->getDangerCategoryPositionByName($digiriskExportRisk['danger_category']['name']);
 				$risk->fk_element = $digiriskElement->fetch_id_from_wp_digi_id($digiriskExportRisk['parent_id']);
 				$risk->fk_projet  = $conf->global->DIGIRISKDOLIBARR_DU_PROJECT;
@@ -418,6 +419,7 @@ if (GETPOST('dataMigrationImportGlobal', 'alpha') && ! empty($conf->global->MAIN
 			//Risk
 			foreach ($digiriskExportArray['risks'] as $digiriskExportRisk) {
 				$risk->ref        = $refRiskMod->getNextValue($risk);
+                $risk->status     = Risk::STATUS_VALIDATED;
 				$risk->category   = $risk->getDangerCategoryPositionByName($digiriskExportRisk['danger_category']['name']);
 				$risk->fk_element = $digiriskElement->fetch_id_from_wp_digi_id($digiriskExportRisk['parent_id']);
 				$risk->fk_projet  = $conf->global->DIGIRISKDOLIBARR_DU_PROJECT;
