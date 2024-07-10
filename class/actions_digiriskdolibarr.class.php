@@ -1127,6 +1127,14 @@ class ActionsDigiriskdolibarr
 
     }
 
+	/**
+     * Overloading the showLinkedObjectBlock function : replacing the parent's function with the one below
+     *
+     * @param  array     $parameters Hook metadata (context, etc...)
+     * @param  object    $object    The object to process
+     * @return int                  0 < on error, 0 on success, 1 to replace standard code
+     * @throws Exception
+     */
 	public function showLinkedObjectBlock($parameters, &$object) {
 		global $conf, $langs;
 
@@ -1175,6 +1183,6 @@ class ActionsDigiriskdolibarr
 			return 1;
 		}
 
-		return 0;
+		return 0; // or return 1 to replace standard code
 	}
 }
