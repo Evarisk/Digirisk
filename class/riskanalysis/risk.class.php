@@ -307,9 +307,10 @@ class Risk extends SaturneObject
 							foreach ($digiriskElementOfEntity->linkedObjectsIds['digiriskdolibarr_risk'] as $sharedRiskId) {
 								$sharedRisk = $riskList[$sharedRiskId];
 								if (is_object($sharedRisk)) {
-									$sharedRisk->appliedOn = $digiriskElementOfEntity->id;
-									$risks[] = $sharedRisk;
-								}
+                                    $clonedRisk = clone $sharedRisk;
+                                    $clonedRisk->appliedOn = $digiriskElementOfEntity->id;
+                                    $risks[] = $clonedRisk;
+                                }
 							}
 						}
 					}
