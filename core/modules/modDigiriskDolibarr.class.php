@@ -2092,6 +2092,8 @@ class modDigiriskdolibarr extends DolibarrModules
             $resources->setDigiriskResources($this->db, 1,  'LabourInspectorSociety',  'societe', [$labourInspectorID], $conf->entity);
             $resources->setDigiriskResources($this->db, 1,  'RightsDefender',  'societe', [$rightsDefenderID], $conf->entity);
             $resources->setDigiriskResources($this->db, 1,  'PoisonControlCenter',  'societe', [$poisonControlCenterID], $conf->entity);
+
+			dolibarr_set_const($this->db, 'DIGIRISKDOLIBARR_THIRDPARTY_SET', 2, 'integer', 0, '', $conf->entity);
         }
         if (getDolGlobalInt('DIGIRISKDOLIBARR_THIRDPARTY_SET') == 2) {
             $societe->name   = $langs->trans('LabourDoctorName') . ' - ' . $conf->global->MAIN_INFO_SOCIETE_NOM;
@@ -2153,14 +2155,14 @@ class modDigiriskdolibarr extends DolibarrModules
 			$societe->url		   		   = '';
 			$poisonControlCenterToulouseID = $societe->create($user);
 
-			$resources->setDigiriskResources($this->db, 1,  'PoisonControlCenterAngers',  	 'societe', [$poisonControlCenterAngersID],    $conf->entity);
-			$resources->setDigiriskResources($this->db, 1,  'PoisonControlCenterBordeaux',   'societe', [$poisonControlCenterBordeauxID],  $conf->entity);
-			$resources->setDigiriskResources($this->db, 1,  'PoisonControlCenterLille',  	 'societe', [$poisonControlCenterLilleID], 	   $conf->entity);
-			$resources->setDigiriskResources($this->db, 1,  'PoisonControlCenterLyon',  	 'societe', [$poisonControlCenterLyonID], 	   $conf->entity);
-			$resources->setDigiriskResources($this->db, 1,  'PoisonControlCenterMarseille',  'societe', [$poisonControlCenterMarseilleID], $conf->entity);
-			$resources->setDigiriskResources($this->db, 1,  'PoisonControlCenterNancy',  	 'societe', [$poisonControlCenterNancyID], 	   $conf->entity);
-			$resources->setDigiriskResources($this->db, 1,  'PoisonControlCenterParis',  	 'societe', [$poisonControlCenterParisID], 	   $conf->entity);
-			$resources->setDigiriskResources($this->db, 1,  'PoisonControlCenterToulouse',   'societe', [$poisonControlCenterToulouseID],  $conf->entity);
+			$resources->setDigiriskResources($this->db, 1, 'PoisonControlCenterAngers',    'societe', [$poisonControlCenterAngersID],    $conf->entity);
+			$resources->setDigiriskResources($this->db, 1, 'PoisonControlCenterBordeaux',  'societe', [$poisonControlCenterBordeauxID],  $conf->entity);
+			$resources->setDigiriskResources($this->db, 1, 'PoisonControlCenterLille',     'societe', [$poisonControlCenterLilleID], 	 $conf->entity);
+			$resources->setDigiriskResources($this->db, 1, 'PoisonControlCenterLyon',  	   'societe', [$poisonControlCenterLyonID], 	 $conf->entity);
+			$resources->setDigiriskResources($this->db, 1, 'PoisonControlCenterMarseille', 'societe', [$poisonControlCenterMarseilleID], $conf->entity);
+			$resources->setDigiriskResources($this->db, 1, 'PoisonControlCenterNancy',     'societe', [$poisonControlCenterNancyID], 	 $conf->entity);
+			$resources->setDigiriskResources($this->db, 1, 'PoisonControlCenterParis',     'societe', [$poisonControlCenterParisID], 	 $conf->entity);
+			$resources->setDigiriskResources($this->db, 1, 'PoisonControlCenterToulouse',  'societe', [$poisonControlCenterToulouseID],  $conf->entity);
 
             dolibarr_set_const($this->db, 'DIGIRISKDOLIBARR_THIRDPARTY_SET', 4, 'integer', 0, '', $conf->entity);
 		}
