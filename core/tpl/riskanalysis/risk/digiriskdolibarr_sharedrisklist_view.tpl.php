@@ -120,6 +120,7 @@ if ( ! preg_match('/(evaluation)/', $sortfield)) {
 	}
 	$sql .= " AND el.sourcetype = 'digiriskdolibarr_risk'";
     $sql .= ' AND r.type = "' . $riskType . '"';
+    $sql .= ' AND e.rowid IN (' . implode(',', array_keys($alldigiriskelement)) . ')';
 
 	foreach ($search as $key => $val) {
 		if ($key == 'status' && $search[$key] == -1) continue;
@@ -234,6 +235,7 @@ if ( ! preg_match('/(evaluation)/', $sortfield)) {
 	}
 	$sql .= " AND el.sourcetype = 'digiriskdolibarr_risk'";
     $sql .= ' AND r.type = "' . $riskType . '"';
+    $sql .= ' AND e.rowid IN (' . implode(',', array_keys($alldigiriskelement)) . ')';
 
 	foreach ($search as $key => $val) {
 		if ($key == 'status' && $search[$key] == -1) continue;

@@ -192,7 +192,8 @@ class Risk extends SaturneObject
 		$objects = $object->getActiveDigiriskElements();
 
         if ($get_shared_data) {
-            $risk->ismultientitymanaged = 0;
+            $activeDigiriskElements               = $object->getActiveDigiriskElements($get_shared_data);
+            $risk->ismultientitymanaged           = 0;
             $riskAssessment->ismultientitymanaged = 0;
         }
 		$riskList           = $risk->fetchAll('', '', 0, 0, ['customsql' => 'status = ' . self::STATUS_VALIDATED . $moreParams['filterRisk']]);
@@ -305,11 +306,12 @@ class Risk extends SaturneObject
 						$digiriskElementOfEntity->fetchObjectLinked(null, '', $digiriskElementOfEntity->id, 'digiriskdolibarr_digiriskelement', 'AND', 1, 'sourcetype', 0);
 						if (!empty($digiriskElementOfEntity->linkedObjectsIds['digiriskdolibarr_risk'])) {
 							foreach ($digiriskElementOfEntity->linkedObjectsIds['digiriskdolibarr_risk'] as $sharedRiskId) {
-								$sharedRisk = $riskList[$sharedRiskId];
-								if (is_object($sharedRisk)) {
-                                    $clonedRisk = clone $sharedRisk;
+                                $sharedRisk         = $riskList[$sharedRiskId];
+                                $sharedParentActive = array_search($sharedRisk->fk_element, array_column($activeDigiriskElements, 'id'));
+								if (is_object($sharedRisk) && $sharedParentActive > 0) {
+                                    $clonedRisk            = clone $sharedRisk;
                                     $clonedRisk->appliedOn = $digiriskElementOfEntity->id;
-                                    $risks[] = $clonedRisk;
+                                    $risks[]               = $clonedRisk;
                                 }
 							}
 						}
@@ -321,10 +323,12 @@ class Risk extends SaturneObject
 					$parentElement->fetchObjectLinked(null, '', $parent_id, 'digiriskdolibarr_digiriskelement', 'AND', 1, 'sourcetype', 0);
 					if (!empty($parentElement->linkedObjectsIds['digiriskdolibarr_risk'])) {
 						foreach ($parentElement->linkedObjectsIds['digiriskdolibarr_risk'] as $sharedRiskId) {
-							$sharedRisk = $riskList[$sharedRiskId];
-							if (is_object($sharedRisk)) {
-								$sharedRisk->appliedOn = $parent_id;
-								$risks[] = $sharedRisk;
+							$sharedRisk         = $riskList[$sharedRiskId];
+                            $sharedParentActive = array_search($sharedRisk->fk_element, array_column($activeDigiriskElements, 'id'));
+                            if (is_object($sharedRisk)  && $sharedParentActive > 0) {
+                                $clonedRisk            = clone $sharedRisk;
+                                $clonedRisk->appliedOn = $parent_id;
+                                $risks[]               = $clonedRisk;
 							}
 						}
 					}
