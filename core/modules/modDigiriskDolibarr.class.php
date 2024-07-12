@@ -2202,12 +2202,7 @@ class modDigiriskdolibarr extends DolibarrModules
 			dolibarr_set_const($this->db, 'DIGIRISKDOLIBARR_THIRDPARTY_UPDATED', 1, 'integer', 0, '', $conf->entity);
 		}
 		if ( $conf->global->DIGIRISKDOLIBARR_THIRDPARTY_UPDATED == 1 ) {
-			require_once DOL_DOCUMENT_ROOT . '/societe/class/societe.class.php';
-			require_once __DIR__ . '/../../class/digiriskresources.class.php';
-
-			$societe   = new Societe($this->db);
-			$resources = new DigiriskResources($this->db);
-			$rights_defenderID = $resources->fetchDigiriskResource('RightsDefender');
+			$rightsDefenderID = $resources->fetchDigiriskResource('RightsDefender');
 			$societe->fetch($rights_defenderID);
 			$societe->phone = '09 69 39 00 00';
 			$societe->url = 'https://www.defenseurdesdroits.fr/';
