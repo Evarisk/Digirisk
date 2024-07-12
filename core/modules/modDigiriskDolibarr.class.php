@@ -2107,62 +2107,42 @@ class modDigiriskdolibarr extends DolibarrModules
             dolibarr_set_const($this->db, 'DIGIRISKDOLIBARR_THIRDPARTY_SET', 3, 'integer', 0, '', $conf->entity);
         }
 		if (getDolGlobalInt('DIGIRISKDOLIBARR_THIRDPARTY_SET') == 3) {
-			$societe->name		   		 = $langs->trans('PoisonControlCenter') . ' ANGERS - ' . $conf->global->MAIN_INFO_SOCIETE_NOM;
-			$societe->client	   		 = 0;
-			$societe->phone		   		 = '02 41 48 21 21';
-			$societe->url		   		 = '';
-			$poisonControlCenterAngersID = $societe->create($user);
+			$poisonCenters = [
+				"ANGERS" => [
+					"phone" => "02 41 48 21 21",
+				],
+				"BORDEAUX" => [
+					"phone" => "05 56 96 40 80",
+				],
+				"LILLE" => [
+					"phone" => "08 00 59 59 59",
+				],
+				"LYON" => [
+					"phone" => "04 72 11 69 11",
+				],
+				"MARSEILLE" => [
+					"phone" => "04 91 75 25 25",
+				],
+				"NANCY" => [
+					"phone" => "03 83 22 50 50",
+				],
+				"PARIS" => [
+					"phone" => "01 40 05 48 48",
+				],
+				"TOULOUSE" => [
+					"phone" => "05 61 77 74 47",
+				],
+			];
 
-			$societe->name		   		   = $langs->trans('PoisonControlCenter') . ' BORDEAUX - ' . $conf->global->MAIN_INFO_SOCIETE_NOM;
-			$societe->client	   		   = 0;
-			$societe->phone		   		   = '05 56 96 40 80';
-			$societe->url		   		   = '';
-			$poisonControlCenterBordeauxID = $societe->create($user);
+			foreach ($poisonCenters as $city => $poisonCenter) {
+				$societe->name		   = $langs->trans('PoisonControlCenter') . ' ' . $city . ' - ' . $conf->global->MAIN_INFO_SOCIETE_NOM;
+				$societe->client	   = 0;
+				$societe->phone		   = $poisonCenter['phone'];
+				$societe->url		   = '';
+				$poisonControlCenterID = $societe->create($user);
 
-			$societe->name		   		= $langs->trans('PoisonControlCenter') . ' LILLE - ' . $conf->global->MAIN_INFO_SOCIETE_NOM;
-			$societe->client	   		= 0;
-			$societe->phone		   		= '08 00 59 59 59';
-			$societe->url		   		= '';
-			$poisonControlCenterLilleID = $societe->create($user);
-
-			$societe->name		   	   = $langs->trans('PoisonControlCenter') . ' LYON - ' . $conf->global->MAIN_INFO_SOCIETE_NOM;
-			$societe->client	   	   = 0;
-			$societe->phone		   	   = '04 72 11 69 11';
-			$societe->url		   	   = '';
-			$poisonControlCenterLyonID = $societe->create($user);
-
-			$societe->name		   			= $langs->trans('PoisonControlCenter') . ' MARSEILLE - ' . $conf->global->MAIN_INFO_SOCIETE_NOM;
-			$societe->client	   			= 0;
-			$societe->phone		   			= '04 91 75 25 25';
-			$societe->url		   			= '';
-			$poisonControlCenterMarseilleID = $societe->create($user);
-
-			$societe->name		   		= $langs->trans('PoisonControlCenter') . ' NANCY - ' . $conf->global->MAIN_INFO_SOCIETE_NOM;
-			$societe->client	   		= 0;
-			$societe->phone		   		= '03 83 22 50 50';
-			$societe->url		   		= '';
-			$poisonControlCenterNancyID = $societe->create($user);
-
-			$societe->name		   		= $langs->trans('PoisonControlCenter') . ' PARIS - ' . $conf->global->MAIN_INFO_SOCIETE_NOM;
-			$societe->client	   		= 0;
-			$societe->phone		   		= '01 40 05 48 48';
-			$societe->url		   		= '';
-			$poisonControlCenterParisID = $societe->create($user);
-
-			$societe->name		   		   = $langs->trans('PoisonControlCenter') . ' TOULOUSE - ' . $conf->global->MAIN_INFO_SOCIETE_NOM;
-			$societe->client	   		   = 0;
-			$societe->phone		   		   = '05 61 77 74 47';
-			$societe->url		   		   = '';
-			$poisonControlCenterToulouseID = $societe->create($user);
-
-			$resources->setDigiriskResources($this->db, 1, 'PoisonControlCenterAngers',    'societe', [$poisonControlCenterAngersID],    $conf->entity);
-			$resources->setDigiriskResources($this->db, 1, 'PoisonControlCenterBordeaux',  'societe', [$poisonControlCenterBordeauxID],  $conf->entity);
-			$resources->setDigiriskResources($this->db, 1, 'PoisonControlCenterLille',     'societe', [$poisonControlCenterLilleID], 	 $conf->entity);
-			$resources->setDigiriskResources($this->db, 1, 'PoisonControlCenterLyon',  	   'societe', [$poisonControlCenterLyonID], 	 $conf->entity);
-			$resources->setDigiriskResources($this->db, 1, 'PoisonControlCenterMarseille', 'societe', [$poisonControlCenterMarseilleID], $conf->entity);
-			$resources->setDigiriskResources($this->db, 1, 'PoisonControlCenterNancy',     'societe', [$poisonControlCenterNancyID], 	 $conf->entity);
-			$resources->setDigiriskResources($this->db, 1, 'PoisonControlCenterParis',     'societe', [$poisonControlCenterParisID], 	 $conf->entity);
-			$resources->setDigiriskResources($this->db, 1, 'PoisonControlCenterToulouse',  'societe', [$poisonControlCenterToulouseID],  $conf->entity);
+				$resources->setDigiriskResources($this->db, 1, 'PoisonControlCenter' . ucfirst(strtolower($city)), 'societe', [$poisonControlCenterID], $conf->entity);
+			}
 
             dolibarr_set_const($this->db, 'DIGIRISKDOLIBARR_THIRDPARTY_SET', 4, 'integer', 0, '', $conf->entity);
 		}
