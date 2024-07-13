@@ -2106,6 +2106,28 @@ class modDigiriskdolibarr extends DolibarrModules
 
             dolibarr_set_const($this->db, 'DIGIRISKDOLIBARR_THIRDPARTY_SET', 3, 'integer', 0, '', $conf->entity);
         }
+        if (getDolGlobalInt('DIGIRISKDOLIBARR_THIRDPARTY_SET') == 3) {
+            $poisonCenters = [
+                'ANGERS'    => ['phone' => '02 41 48 21 21'],
+                'BORDEAUX'  => ['phone' => '05 56 96 40 80'],
+                'LILLE'     => ['phone' => '08 00 59 59 59'],
+                'LYON'      => ['phone' => '04 72 11 69 11'],
+                'MARSEILLE' => ['phone' => '04 91 75 25 25'],
+                'NANCY'     => ['phone' => '03 83 22 50 50'],
+                'PARIS'     => ['phone' => '01 40 05 48 48'],
+                'TOULOUSE'  => ['phone' => '05 61 77 74 47']
+            ];
+
+            foreach ($poisonCenters as $city => $poisonCenter) {
+                $societe->name         = $langs->trans('PoisonControlCenter') . ' ' . $city . ' - ' . $conf->global->MAIN_INFO_SOCIETE_NOM;
+                $societe->client       = 0;
+                $societe->phone        = $poisonCenter['phone'];
+                $societe->url          = '';
+                $poisonControlCenterID = $societe->create($user);
+            }
+
+            dolibarr_set_const($this->db, 'DIGIRISKDOLIBARR_THIRDPARTY_SET', 4, 'integer', 0, '', $conf->entity);
+        }
 
         if (getDolGlobalInt('DIGIRISKDOLIBARR_CONTACTS_SET') == 0) {
             require_once DOL_DOCUMENT_ROOT . '/contact/class/contact.class.php';
