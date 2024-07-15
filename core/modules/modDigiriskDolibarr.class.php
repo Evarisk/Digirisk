@@ -2205,6 +2205,14 @@ class modDigiriskdolibarr extends DolibarrModules
 
             dolibarr_set_const($this->db, 'DIGIRISKDOLIBARR_THIRDPARTY_UPDATED', 2, 'integer', 0, '', $conf->entity);
         }
+		if ( $conf->global->DIGIRISKDOLIBARR_THIRDPARTY_UPDATED == 2 ) {
+			$labourDoctorID = $resources->fetchDigiriskResource('LabourDoctorSociety');
+			$societe->fetch($labourDoctorID);
+			$societe->name   = $langs->trans('LabourDoctorNameFull') . ' - ' . $conf->global->MAIN_INFO_SOCIETE_NOM;
+            $societe->update(0, $user);
+
+            dolibarr_set_const($this->db, 'DIGIRISKDOLIBARR_THIRDPARTY_SET', 3, 'integer', 0, '', $conf->entity);
+		}
 
 		// Create extrafields during init
 		include_once DOL_DOCUMENT_ROOT . '/core/class/extrafields.class.php';
