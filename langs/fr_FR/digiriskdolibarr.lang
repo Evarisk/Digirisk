@@ -1353,6 +1353,9 @@ FkTicket                                 = Ticket lié
 PublicTicket                             = Interface publique des tickets
 TicketPublicInterfaceForbidden           = Accès interdit à l'interface publique des tickets
 WHSRegister                              = Registre SST
+TicketCreationDefaultURL                 = URL par défaut
+TicketCreationExternalURL                = URL externe
+TicketCreationShortcutURL                = URL raccourcie
 
 # Stats - Statistiques
 TicketStatistics    = Statistiques des tickets
