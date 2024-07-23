@@ -2108,6 +2108,28 @@ class modDigiriskdolibarr extends DolibarrModules
 
             dolibarr_set_const($this->db, 'DIGIRISKDOLIBARR_THIRDPARTY_SET', 3, 'integer', 0, '', $conf->entity);
         }
+        if (getDolGlobalInt('DIGIRISKDOLIBARR_THIRDPARTY_SET') == 3) {
+            $poisonCenters = [
+                'ANGERS'    => ['phone' => '02 41 48 21 21'],
+                'BORDEAUX'  => ['phone' => '05 56 96 40 80'],
+                'LILLE'     => ['phone' => '08 00 59 59 59'],
+                'LYON'      => ['phone' => '04 72 11 69 11'],
+                'MARSEILLE' => ['phone' => '04 91 75 25 25'],
+                'NANCY'     => ['phone' => '03 83 22 50 50'],
+                'PARIS'     => ['phone' => '01 40 05 48 48'],
+                'TOULOUSE'  => ['phone' => '05 61 77 74 47']
+            ];
+
+            foreach ($poisonCenters as $city => $poisonCenter) {
+                $societe->name         = $langs->trans('PoisonControlCenter') . ' ' . $city . ' - ' . $conf->global->MAIN_INFO_SOCIETE_NOM;
+                $societe->client       = 0;
+                $societe->phone        = $poisonCenter['phone'];
+                $societe->url          = '';
+                $poisonControlCenterID = $societe->create($user);
+            }
+
+            dolibarr_set_const($this->db, 'DIGIRISKDOLIBARR_THIRDPARTY_SET', 4, 'integer', 0, '', $conf->entity);
+        }
 
         if (getDolGlobalInt('DIGIRISKDOLIBARR_CONTACTS_SET') == 0) {
             require_once DOL_DOCUMENT_ROOT . '/contact/class/contact.class.php';
@@ -2138,49 +2160,53 @@ class modDigiriskdolibarr extends DolibarrModules
             dolibarr_set_const($this->db, 'DIGIRISKDOLIBARR_CONTACTS_SET', 1, 'integer', 0, '', $conf->entity);
         }
 
-		if ( $conf->global->DIGIRISKDOLIBARR_THIRDPARTY_UPDATED == 0 ) {
-			require_once DOL_DOCUMENT_ROOT . '/societe/class/societe.class.php';
-			require_once __DIR__ . '/../../class/digiriskresources.class.php';
+        if (getDolGlobalInt('DIGIRISKDOLIBARR_THIRDPARTY_UPDATED') == 0) {
+            $labourInspectorID = $resources->fetchDigiriskResource('LabourInspectorSociety');
+            $societe->fetch($labourInspectorID);
+            $societe->name = $langs->trans('LabourInspectorName') . ' - ' . $conf->global->MAIN_INFO_SOCIETE_NOM;
+            $societe->update(0, $user);
 
-			$societe   = new Societe($this->db);
-			$resources = new DigiriskResources($this->db);
-			$labour_inspectorID = $resources->fetchDigiriskResource('LabourInspectorSociety');
-			$societe->fetch($labour_inspectorID);
-			$societe->name = $langs->trans('LabourInspectorName') . ' - ' . $conf->global->MAIN_INFO_SOCIETE_NOM;
-			$societe->update(0, $user);
+            $policeID = $resources->fetchDigiriskResource('Police');
+            $societe->fetch($policeID);
+            $societe->name = $langs->trans('Police') . ' - ' . $conf->global->MAIN_INFO_SOCIETE_NOM;
+            $societe->update(0, $user);
 
-			$policeID = $resources->fetchDigiriskResource('Police');
-			$societe->fetch($policeID);
-			$societe->name = $langs->trans('Police') . ' - ' . $conf->global->MAIN_INFO_SOCIETE_NOM;
-			$societe->update(0, $user);
+            $samuID = $resources->fetchDigiriskResource('SAMU');
+            $societe->fetch($samuID);
+            $societe->name = $langs->trans('SAMU') . ' - ' . $conf->global->MAIN_INFO_SOCIETE_NOM;
+            $societe->update(0, $user);
 
-			$samuID = $resources->fetchDigiriskResource('SAMU');
-			$societe->fetch($samuID);
-			$societe->name = $langs->trans('SAMU') . ' - ' . $conf->global->MAIN_INFO_SOCIETE_NOM;
-			$societe->update(0, $user);
+            $pompiersID = $resources->fetchDigiriskResource('Pompiers');
+            $societe->fetch($pompiersID);
+            $societe->name = $langs->trans('Pompiers') . ' - ' . $conf->global->MAIN_INFO_SOCIETE_NOM;
+            $societe->update(0, $user);
 
-			$pompiersID = $resources->fetchDigiriskResource('Pompiers');
-			$societe->fetch($pompiersID);
-			$societe->name = $langs->trans('Pompiers') . ' - ' . $conf->global->MAIN_INFO_SOCIETE_NOM;
-			$societe->update(0, $user);
+            $emergencyID = $resources->fetchDigiriskResource('AllEmergencies');
+            $societe->fetch($emergencyID);
+            $societe->name = $langs->trans('AllEmergencies') . ' - ' . $conf->global->MAIN_INFO_SOCIETE_NOM;
+            $societe->update(0, $user);
 
-			$emergencyID = $resources->fetchDigiriskResource('AllEmergencies');
-			$societe->fetch($emergencyID);
-			$societe->name = $langs->trans('AllEmergencies') . ' - ' . $conf->global->MAIN_INFO_SOCIETE_NOM;
-			$societe->update(0, $user);
+            $rightsDefenderID = $resources->fetchDigiriskResource('RightsDefender');
+            $societe->fetch($rightsDefenderID);
+            $societe->name = $langs->transnoentities('RightsDefender') . ' - ' . $conf->global->MAIN_INFO_SOCIETE_NOM;
+            $societe->update(0, $user);
 
-			$rights_defenderID = $resources->fetchDigiriskResource('RightsDefender');
-			$societe->fetch($rights_defenderID);
-			$societe->name = $langs->transnoentities('RightsDefender') . ' - ' . $conf->global->MAIN_INFO_SOCIETE_NOM;
-			$societe->update(0, $user);
+            $poisonControlCenterID = $resources->fetchDigiriskResource('PoisonControlCenter');
+            $societe->fetch($poisonControlCenterID);
+            $societe->name = $langs->trans('PoisonControlCenter') . ' - ' . $conf->global->MAIN_INFO_SOCIETE_NOM;
+            $societe->update(0, $user);
 
-			$poison_control_centerID = $resources->fetchDigiriskResource('PoisonControlCenter');
-			$societe->fetch($poison_control_centerID);
-			$societe->name = $langs->trans('PoisonControlCenter') . ' - ' . $conf->global->MAIN_INFO_SOCIETE_NOM;
-			$societe->update(0, $user);
+            dolibarr_set_const($this->db, 'DIGIRISKDOLIBARR_THIRDPARTY_UPDATED', 1, 'integer', 0, '', $conf->entity);
+        }
+        if (getDolGlobalInt('DIGIRISKDOLIBARR_THIRDPARTY_UPDATED') == 1) {
+            $rightsDefenderID = $resources->fetchDigiriskResource('RightsDefender');
+            $societe->fetch($rightsDefenderID);
+            $societe->phone = '09 69 39 00 00';
+            $societe->url   = 'https://www.defenseurdesdroits.fr/';
+            $societe->update(0, $user);
 
-			dolibarr_set_const($this->db, 'DIGIRISKDOLIBARR_THIRDPARTY_UPDATED', 1, 'integer', 0, '', $conf->entity);
-		}
+            dolibarr_set_const($this->db, 'DIGIRISKDOLIBARR_THIRDPARTY_UPDATED', 2, 'integer', 0, '', $conf->entity);
+        }
 
 		// Create extrafields during init
 		include_once DOL_DOCUMENT_ROOT . '/core/class/extrafields.class.php';

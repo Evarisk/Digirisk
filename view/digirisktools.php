@@ -84,6 +84,7 @@ $upload_dir = $conf->digiriskdolibarr->multidir_output[$conf->entity ?? 1];
 $dangerCategories        = $risk->getDangerCategories();
 $risk->type              = 'riskenvironmental';
 $environmentalCategories = $risk->getDangerCategories();
+$risk->type              = 'risk';
 
 // Security check - Protection if external user
 $permissiontoread = $user->rights->digiriskdolibarr->adminpage->read;
@@ -218,19 +219,22 @@ if (GETPOST('dataMigrationImportRisks', 'alpha') && ! empty($conf->global->MAIN_
 
 			//Risk
 			foreach ($digiriskExportArray['risks'] as $digiriskExportRisk) {
-				$risk->ref        = $refRiskMod->getNextValue($risk);
-				$risk->category   = $risk->getDangerCategoryPositionByName($digiriskExportRisk['danger_category']['name']);
-				$risk->fk_element = $digiriskElement->fetch_id_from_wp_digi_id($digiriskExportRisk['parent_id']);
-				$risk->fk_projet  = $conf->global->DIGIRISKDOLIBARR_DU_PROJECT;
+				$risk->ref           = $refRiskMod->getNextValue($risk);
+                $risk->status        = Risk::STATUS_VALIDATED;
+				$risk->category      = $risk->getDangerCategoryPositionByName($digiriskExportRisk['danger_category']['name']);
+				$risk->fk_element    = $digiriskElement->fetch_id_from_wp_digi_id($digiriskExportRisk['parent_id']);
+				$risk->fk_projet     = $conf->global->DIGIRISKDOLIBARR_DU_PROJECT;
+                $risk->date_creation = $digiriskExportRisk['evaluation']['date']['raw'];
 
-				if ( ! $error) {
+				if (!$error) {
 					$result = $risk->create($user, true);
 					if ($result > 0) {
 						$riskAssessment->ref                 = $refRiskAssessmentMod->getNextValue($riskAssessment);
 						$riskAssessment->date_riskassessment = $digiriskExportRisk['evaluation']['date']['raw'];
-						$riskAssessment->cotation            = $digiriskExportRisk['current_equivalence'];
-						$riskAssessment->status              = 1;
-						$riskAssessment->fk_risk             = $risk->id;
+                        $riskAssessment->date_creation       = $digiriskExportRisk['evaluation']['date']['raw'];
+                        $riskAssessment->cotation            = $digiriskExportRisk['current_equivalence'];
+                        $riskAssessment->status              = RiskAssessment::STATUS_VALIDATED;
+                        $riskAssessment->fk_risk             = $risk->id;
 
 						if ($digiriskExportRisk['evaluation_method']['name'] == 'Evarisk') {
 							$riskassessment_variables = array_values($digiriskExportRisk['evaluation']['variables']);
@@ -416,18 +420,21 @@ if (GETPOST('dataMigrationImportGlobal', 'alpha') && ! empty($conf->global->MAIN
 
 			//Risk
 			foreach ($digiriskExportArray['risks'] as $digiriskExportRisk) {
-				$risk->ref        = $refRiskMod->getNextValue($risk);
-				$risk->category   = $risk->getDangerCategoryPositionByName($digiriskExportRisk['danger_category']['name']);
-				$risk->fk_element = $digiriskElement->fetch_id_from_wp_digi_id($digiriskExportRisk['parent_id']);
-				$risk->fk_projet  = $conf->global->DIGIRISKDOLIBARR_DU_PROJECT;
+				$risk->ref           = $refRiskMod->getNextValue($risk);
+                $risk->status        = Risk::STATUS_VALIDATED;
+				$risk->category      = $risk->getDangerCategoryPositionByName($digiriskExportRisk['danger_category']['name']);
+				$risk->fk_element    = $digiriskElement->fetch_id_from_wp_digi_id($digiriskExportRisk['parent_id']);
+				$risk->fk_projet     = $conf->global->DIGIRISKDOLIBARR_DU_PROJECT;
+                $risk->date_creation = $digiriskExportRisk['evaluation']['date']['raw'];
 
-				if ( ! $error) {
+                if (!$error) {
 					$result = $risk->create($user, true);
 					if ($result > 0) {
 						$riskAssessment->ref                 = $refRiskAssessmentMod->getNextValue($riskAssessment);
-						$riskAssessment->date_riskassessment = $digiriskExportRisk['evaluation']['date']['raw'];
+                        $riskAssessment->date_riskassessment = $digiriskExportRisk['evaluation']['date']['raw'];
+                        $riskAssessment->date_creation       = $digiriskExportRisk['evaluation']['date']['raw'];
 						$riskAssessment->cotation            = $digiriskExportRisk['current_equivalence'];
-						$riskAssessment->status              = 1;
+						$riskAssessment->status              = RiskAssessment::STATUS_VALIDATED;
 						$riskAssessment->fk_risk             = $risk->id;
 
 						if ($digiriskExportRisk['evaluation_method']['name'] == 'Evarisk') {

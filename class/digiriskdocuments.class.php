@@ -210,21 +210,21 @@ class DigiriskDocuments extends SaturneDocuments
                                             array_pop($digiriskElementIds);
 
                                             foreach ($digiriskElementIds as $key => $digiriskElementId) {
-                                                $nomElement .= str_repeat(' - ', count($digiriskElementIds) + 1 - $key) . $activeDigiriskElements[$digiriskElementId]->ref . ' - ' . $activeDigiriskElements[$digiriskElementId]->label . chr(0x0A) . chr(0x0A);
+                                                $nomElement .= '<br>' . str_repeat(' - ', count($digiriskElementIds) + 1 - $key) . $activeDigiriskElements[$digiriskElementId]->ref . ' - ' . $activeDigiriskElements[$digiriskElementId]->label . chr(0x0A) . chr(0x0A);
                                             }
                                         }
                                     }
 
                                     if ($conf->global->DIGIRISKDOLIBARR_SHOW_RISK_ORIGIN) {
-                                        $nomElement .= (!empty($conf->global->DIGIRISKDOLIBARR_SHOW_SHARED_RISKS) ? 'S' . $element->entity : '') . ' - ' . $element->ref . ' - ' . $element->label;
+                                        $nomElement .= '<br>' . (!empty($conf->global->DIGIRISKDOLIBARR_SHOW_SHARED_RISKS) ? 'S' . $element->entity : '') . ' - ' . $element->ref . ' - ' . $element->label;
                                         if ($line->fk_element != $line->appliedOn) {
-                                            $nomElement .= ($dash > 0 ? ' - ' : '') . $langs->trans('AppliedOn') . ' ' . $linked_element->ref . ' - ' . $linked_element->label;
+                                            $nomElement .= '<br>' . $langs->trans('AppliedOn') . ' ' . $linked_element->ref . ' - ' . $linked_element->label;
                                         }
                                     } else {
                                         if ($linked_element->id > 0) {
-                                            $nomElement .= ($dash > 0 ? ' - ' : '') . $linked_element->ref . ' - ' . $linked_element->label;
+                                            $nomElement .= '<br>' . ($dash > 0 ? ' - ' : '') . $linked_element->ref . ' - ' . $linked_element->label;
                                         } else {
-                                            $nomElement .= ($dash > 0 ? ' - ' : '') . $element->ref . ' - ' . $element->label;
+                                            $nomElement .= '<br>' . ($dash > 0 ? ' - ' : '') . $element->ref . ' - ' . $element->label;
                                         }
                                     }
 
