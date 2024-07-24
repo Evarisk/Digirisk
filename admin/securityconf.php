@@ -441,10 +441,10 @@ if ($responsibleResources->ref == 'Responsible' && $responsibleResources->id[0] 
 
 	// * Phone number - Numéro de téléphone *
 
-	print '<tr class="oddeven"><td><label for="name">' . $langs->trans("Landline") . '</label></td><td>';
+	print '<tr class="oddeven"><td><label for="name">' . $langs->trans("PhoneMobile") . '</label></td><td>';
 
-	if ($usertmp->office_phone > 0) {
-		print $usertmp->office_phone;
+	if ($usertmp->user_mobile > 0) {
+		print $usertmp->user_mobile;
 	} else { ?>
 		<a href="<?php echo DOL_URL_ROOT . '/' ?>user/card.php?id=<?php echo $usertmp->id ?>" target="_blank">
 			<i class="fas fa-plus"></i><?php print ' ' . $langs->trans('AddPhoneNumber'); ?>
