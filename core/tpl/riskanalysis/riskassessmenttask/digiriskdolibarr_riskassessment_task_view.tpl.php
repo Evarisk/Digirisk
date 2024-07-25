@@ -323,9 +323,19 @@ if (!empty($related_tasks) && $related_tasks > 0) {
 		</div>
 		<!-- RISK ASSESSMENT TASK LIST MODAL END -->
 		<!-- RISK ASSESSMENT TASK EDIT MODALS -->
-		<?php if ( ! empty($related_tasks) && $related_tasks > 0) : ?>
-			<?php foreach ($related_tasks as $related_task) : ?>
-				<?php $allTimeSpentArray = $timeSpentSortedByTasks[$related_task->id]; ?>
+		<?php if ( ! empty($related_tasks) && $related_tasks > 0) :
+            foreach ($related_tasks as $related_task) :
+                if ($conf->global->DIGIRISKDOLIBARR_SHOW_TASK_CALCULATED_PROGRESS) {
+                    $tmparray = $related_task->getSummaryOfTimeSpent();
+                    if ($tmparray['total_duration'] > 0 && !empty($related_task->planned_workload)) {
+                        $task_progress = round($tmparray['total_duration'] / $related_task->planned_workload * 100, 2);
+                    } else {
+                        $task_progress = 0;
+                    }
+                } else {
+                    $task_progress = $related_task->progress;
+                }
+                $allTimeSpentArray = $timeSpentSortedByTasks[$related_task->id]; ?>
 				<div class="wpeo-modal riskassessment-task-edit-modal" id="risk_assessment_task_edit<?php echo $related_task->id ?>">
 					<div class="modal-container wpeo-modal-event">
 						<!-- Modal-Header -->
