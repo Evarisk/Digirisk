@@ -2205,34 +2205,32 @@ class modDigiriskdolibarr extends DolibarrModules
 
             dolibarr_set_const($this->db, 'DIGIRISKDOLIBARR_THIRDPARTY_UPDATED', 2, 'integer', 0, '', $conf->entity);
         }
-		if ( $conf->global->DIGIRISKDOLIBARR_THIRDPARTY_UPDATED == 2 ) {
+		if (getDolGlobalInt('DIGIRISKDOLIBARR_THIRDPARTY_UPDATED') == 2) {
 			require_once __DIR__ . '/../../../saturne/class/saturneschedules.class.php';
 
 			$labourDoctorID = $resources->fetchDigiriskResource('LabourDoctorSociety');
 			$societe->fetch($labourDoctorID);
-			$societe->name   = $langs->trans('LabourDoctorNameFull') . ' - ' . $conf->global->MAIN_INFO_SOCIETE_NOM;
-            $result = $societe->update(0, $user);
+            $result = $societe->setValueFrom('nom', $langs->transnoentities('LabourDoctorNameFull') . ' - ' . getDolGlobalString('MAIN_INFO_SOCIETE_NOM'));
 
 			if ($result >= 0) {
-				$schedule = new SaturneSchedules($this->db);
+				$schedule             = new SaturneSchedules($this->db);
 				$schedule->element_id = $labourDoctorID;
 
-				$schedule->monday 	 = $langs->trans('weekDayDefault');
-				$schedule->tuesday 	 = $langs->trans('weekDayDefault');
-				$schedule->wednesday = $langs->trans('weekDayDefault');
-				$schedule->thursday  = $langs->trans('weekDayDefault');
-				$schedule->friday 	 = $langs->trans('weekDayDefault');
-				$schedule->saturday  = $langs->trans('weekEndDefault');
-				$schedule->sunday 	 = $langs->trans('weekEndDefault');
+				$schedule->monday    = $langs->transnoentities('weekDayDefault');
+				$schedule->tuesday 	 = $langs->transnoentities('weekDayDefault');
+				$schedule->wednesday = $langs->transnoentities('weekDayDefault');
+				$schedule->thursday  = $langs->transnoentities('weekDayDefault');
+				$schedule->friday 	 = $langs->transnoentities('weekDayDefault');
+				$schedule->saturday  = $langs->transnoentities('weekEndDefault');
+				$schedule->sunday 	 = $langs->transnoentities('weekEndDefault');
 
 				$schedule->element_type = 'societe';
-				$schedule->tms          = dol_now('tzuser');
 				$schedule->status       = 1;
 
 				$schedule->create($user);
 			}
 
-            dolibarr_set_const($this->db, 'DIGIRISKDOLIBARR_THIRDPARTY_SET', 3, 'integer', 0, '', $conf->entity);
+            dolibarr_set_const($this->db, 'DIGIRISKDOLIBARR_THIRDPARTY_UPDATED', 3, 'integer', 0, '', $conf->entity);
 		}
 
 		// Create extrafields during init
