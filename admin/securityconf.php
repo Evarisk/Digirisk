@@ -435,14 +435,15 @@ if ($responsibleResources->ref == 'Responsible' && $responsibleResources->id[0] 
 	print '<tr>';
 	print '<td class="" style="width:10%">' . $form->editfieldkey('ResponsibleToNotify', 'Responsible_id', '', $object, 0) . '</td>';
 	print '<td>';
-	print $form->selectarray('responsible_socid', $userlist, $usertmp->id, $langs->trans('SelectUser'), null, null, null, "40%", 0, 0, '', 'minwidth300', 1);
+	print img_picto('', 'user', 'class="pictofixedwidth"') . $form->selectarray('responsible_socid', $userlist, $usertmp->id, $langs->trans('SelectUser'), null, null, null, "40%", 0, 0, '', 'minwidth300', 1);
 	print ' <a href="' . DOL_URL_ROOT . '/user/card.php?action=create&backtopage=' . urlencode($_SERVER["PHP_SELF"] . '?action=create') . '" target="_blank"><span class="fa fa-plus-circle valignmiddle paddingleft" title="' . $langs->trans("AddUser") . '"></span></a>';
 	print '</td></tr>';
 
 	// * Phone number - Numéro de téléphone *
 
-	print '<tr class="oddeven"><td><label for="name">' . $langs->trans("PhoneMobile") . '</label></td><td>';
+	print '<tr class="oddeven"><td><label for="name">' . $langs->trans("PhonePro") . '</label></td><td>';
 
+    print img_picto('', 'object_phoning', 'class="pictofixedwidth"');
 	if ($usertmp->office_phone > 0) {
 		print $usertmp->office_phone;
 	} else { ?>
