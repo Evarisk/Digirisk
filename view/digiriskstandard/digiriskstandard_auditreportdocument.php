@@ -130,10 +130,10 @@ print '<td>' . $langs->trans('Value') . '</td>';
 print '</tr>';
 
 // DateRange -- Plage de date
-$dateStart = getDolGlobalInt('SOCIETE_FISCAL_MONTH_START') ? dol_mktime(0, 0, 0, getDolGlobalInt('SOCIETE_FISCAL_MONTH_START'), 1, strftime("%Y", dol_now())) : dol_now();
+$dateStart = dol_now() - 3600 * 24;
 print '<tr class="oddeven"><td>' . $langs->trans("DateRange") . '</td>';
 print '<td>' . $langs->trans('From') . $form->selectDate($dateStart, 'datestart');
-print $langs->trans('At') . $form->selectDate(dol_time_plus_duree($dateStart, 1, 'y'), 'dateend');
+print $langs->trans('At') . $form->selectDate(dol_time_plus_duree($dateStart, 1, 'd'), 'dateend');
 print $langs->trans('UseDateRange');
 print '<input type="checkbox" id="daterange" name="daterange" checked>';
 print '</td></tr>';
