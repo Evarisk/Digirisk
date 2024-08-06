@@ -130,7 +130,7 @@ print '<td>' . $langs->trans('Value') . '</td>';
 print '</tr>';
 
 // DateRange -- Plage de date
-$dateStart = dol_now() - 3600 * 24;
+$dateStart = dol_time_plus_duree(dol_now(), -1, 'd');
 print '<tr class="oddeven"><td>' . $langs->trans("DateRange") . '</td>';
 print '<td>' . $langs->trans('From') . $form->selectDate($dateStart, 'datestart');
 print $langs->trans('At') . $form->selectDate(dol_time_plus_duree($dateStart, 1, 'd'), 'dateend');
