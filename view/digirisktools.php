@@ -819,6 +819,88 @@ if ($action == 'repair_category') {
     $action = '';
 }
 
+if ($action == 'repair_risk') {
+    $riskFkElements             = $risk->fetchAll('', '', 0, 0, ['customsql' => 't.fk_element <= 0']);
+    $riskAssessmentFkElements   = saturne_fetch_all_object_type('RiskAssessment', '', '', 0, 0, ['customsql' =>  'r.fk_element <= 0'], 'AND', false, true, false, ' LEFT JOIN ' . MAIN_DB_PREFIX . $risk->table_element . ' as r ON r.rowid = t.fk_risk');
+    $riskStatus                 = $risk->fetchAll('', '', 0, 0, ['customsql' => 't.status < 0']);
+    $riskAssessmentStatus       = saturne_fetch_all_object_type('RiskAssessment', '', '', 0, 0, ['customsql' =>  'r.status <= 0'], 'AND', false, true, false, ' LEFT JOIN ' . MAIN_DB_PREFIX . $risk->table_element . ' as r ON r.rowid = t.fk_risk');
+    $riskExistFkElements        = $risk->checkNotExistsDigiriskElementForRisk();
+    $riskAssessmentExistFkRisks = $riskAssessment->checkNotExistsRiskForRiskAssessment();
+
+    $ObjectToDeletes = [];
+    if (is_array($riskFkElements)) {
+        $ObjectToDeletes = array_merge($ObjectToDeletes, $riskFkElements);
+    }
+    if (is_array($riskFkElements)) {
+        $ObjectToDeletes = array_merge($ObjectToDeletes, $riskFkElements);
+    }
+    if (is_array($riskStatus)) {
+        $ObjectToDeletes = array_merge($ObjectToDeletes, $riskStatus);
+    }
+    if (is_array($riskAssessmentStatus)) {
+        $ObjectToDeletes = array_merge($ObjectToDeletes, $riskAssessmentStatus);
+    }
+    if (is_array($riskExistFkElements)) {
+        $ObjectToDeletes = array_merge($ObjectToDeletes, $riskExistFkElements);
+    }
+    if (is_array($riskAssessmentExistFkRisks)) {
+        $ObjectToDeletes = array_merge($ObjectToDeletes, $riskAssessmentExistFkRisks);
+    }
+
+    foreach ($ObjectToDeletes as $object) {
+        $result = $object->delete($user, '', false);
+        if ($result <= 0) {
+            $errors[] = $object->errors;
+        }
+    }
+
+    if (!empty($errors)) {
+        setEventMessages('', $errors, 'errors');
+    } else {
+        setEventMessages($langs->trans('RiskSuccessfullyRepaired'), []);
+    }
+
+    header("Location: " . $_SERVER["PHP_SELF"]);
+    exit;
+}
+
+if ($action == 'repair_risk_assessment') {
+    $riskAssessmentStatus       = $riskAssessment->fetchAll('', '', 0, 0, ['customsql' => 't.status < 0 || t.status IS NULL']);
+    $riskAssessmentCotations    = $riskAssessment->fetchAll('', '', 0, 0, ['customsql' => 't.cotation IS NULL']);
+    $risks                      = saturne_fetch_all_object_type('Risk', '', '', 0, 0, ['customsql' =>  'ra.cotation IS NULL'], 'AND', false, true, false, ' LEFT JOIN ' . MAIN_DB_PREFIX . $riskAssessment->table_element . ' as ra ON ra.fk_risk = t.rowid');
+    $riskAssessmentExistFkRisks = $riskAssessment->checkNotExistsRiskForRiskAssessment();
+
+    $ObjectToDeletes = [];
+    if (is_array($riskAssessmentStatus)) {
+        $ObjectToDeletes = array_merge($ObjectToDeletes, $riskAssessmentStatus);
+    }
+    if (is_array($riskAssessmentCotations)) {
+        $ObjectToDeletes = array_merge($ObjectToDeletes, $riskAssessmentCotations);
+    }
+    if (is_array($risks)) {
+        $ObjectToDeletes = array_merge($ObjectToDeletes, $risks);
+    }
+    if (is_array($riskAssessmentExistFkRisks)) {
+        $ObjectToDeletes = array_merge($ObjectToDeletes, $riskAssessmentExistFkRisks);
+    }
+
+    foreach ($ObjectToDeletes as $object) {
+        $result = $object->delete($user, '', false);
+        if ($result <= 0) {
+            $errors[] = $object->errors;
+        }
+    }
+
+    if (!empty($errors)) {
+        setEventMessages('', $errors, 'errors');
+    } else {
+        setEventMessages($langs->trans('RiskAssessmentSuccessfullyRepaired'), []);
+    }
+
+    header("Location: " . $_SERVER["PHP_SELF"]);
+    exit;
+}
+
 /*
  * View
  */
@@ -1045,6 +1127,89 @@ if ($user->rights->digiriskdolibarr->adminpage->read) {
     print $button;
     print '</div>';
     print '</form>';
+
+    print load_fiche_titre($langs->trans('CleanObject'), '', '');
+
+    print '<table class="noborder centpercent">';
+    print '<tr class="liste_titre">';
+    print '<td>' . $langs->trans('Name') . '</td>';
+    print '<td>' . $langs->trans('Description') . '</td>';
+    print '<td class="center">' . $langs->trans('Action') . '</td>';
+    print '</tr>';
+
+    print '<form name="repair" id="repair" action="' . $_SERVER['PHP_SELF'] . '" method="POST">';
+    print '<input type="hidden" name="token" value="' . newToken() . '">';
+    print '<input type="hidden" name="action" value="repair_risk">';
+
+    print '<tr class="oddeven"><td>';
+    print $langs->trans('CleanRisk');
+    print '</td><td>';
+    print '<div class="wpeo-notice notice-warning">';
+    print '<div class="notice-content">';
+
+    $nbRisks = 0;
+    $risks   = $risk->fetchAll('', '', 0, 0, ['customsql' => 't.fk_element <= 0']);
+    if (is_array($risks) && !empty($risks)) {
+        $nbRisks = count($risks);
+        print '<div class="notice-subtitle"><strong>' . $langs->transnoentities('CleanRiskFkElement', $nbRisks) . '</strong></div>';
+    }
+    $risks = $risk->fetchAll('', '', 0, 0, ['customsql' => 't.status < 0']);
+    if (is_array($risks) && !empty($risks)) {
+        $nbRisks = count($risks);
+        print '<div class="notice-subtitle"><strong>' . $langs->transnoentities('CleanRiskStatus', $nbRisks) . '</strong></div>';
+    }
+    $risks = $risk->checkNotExistsDigiriskElementForRisk();
+    if (is_array($risks) && !empty($risks)) {
+        $nbRisks = count($risks);
+        print '<div class="notice-subtitle"><strong>' . $langs->transnoentities('CleanRiskExistFkElement', $nbRisks) . '</strong></div>';
+    }
+    if ($nbRisks == 0) {
+        print '<div class="notice-subtitle"><strong>' . $langs->trans('NoRiskToClean') . '</strong></div>';
+    }
+
+    print '</div></div>';
+    print '</td><td class="center">';
+    print '<input type="submit" class="button reposition wpeo-button button-load ' . ($nbRisks == 0 ? 'button-disable' : '') . '" name="CleanRisk" value="' . $langs->trans('Clean') . '">';
+    print '</td></tr>';
+    print '</form>';
+
+    print '<form name="repair" id="repair" action="' . $_SERVER['PHP_SELF'] . '" method="POST">';
+    print '<input type="hidden" name="token" value="' . newToken() . '">';
+    print '<input type="hidden" name="action" value="repair_risk_assessment">';
+
+    print '<tr class="oddeven"><td>';
+    print $langs->trans('CleanRiskAssessment');
+    print '</td><td>';
+    print '<div class="wpeo-notice notice-warning">';
+    print '<div class="notice-content">';
+
+    $nbRiskAssessments = 0;
+    $riskAssessments   = $riskAssessment->fetchAll('', '', 0, 0, ['customsql' => 't.status < 0 || t.status IS NULL']);
+    if (is_array($riskAssessments) && !empty($riskAssessments)) {
+        $nbRiskAssessments = count($riskAssessments);
+        print '<div class="notice-subtitle"><strong>' . $langs->transnoentities('CleanRiskAssessmentStatus', $nbRiskAssessments) . '</strong></div>';
+    }
+    $riskAssessments = $riskAssessment->fetchAll('', '', 0, 0, ['customsql' => 't.cotation IS NULL']);;
+    if (is_array($riskAssessments) && !empty($riskAssessments)) {
+        $nbRiskAssessments = count($riskAssessments);
+        print '<div class="notice-subtitle"><strong>' . $langs->transnoentities('CleanRiskAssessmentCotation', $nbRiskAssessments) . '</strong></div>';
+    }
+    $riskAssessments = $riskAssessment->checkNotExistsRiskForRiskAssessment();
+    if (is_array($riskAssessments) && !empty($riskAssessments)) {
+        $nbRiskAssessments = count($riskAssessments);
+        print '<div class="notice-subtitle"><strong>' . $langs->transnoentities('CleanRiskAssessmentExistFkRisk', $nbRiskAssessments) . '</strong></div>';
+    }
+    if ($nbRiskAssessments == 0) {
+        print '<div class="notice-subtitle"><strong>' . $langs->trans('NoRiskAssessmentToClean') . '</strong></div>';
+    }
+
+    print '</div></div>';
+    print '</td><td class="center">';
+    print '<input type="submit" class="button reposition wpeo-button button-load ' . ($nbRiskAssessments == 0 ? 'button-disable' : '') . '" name="RepairRiskAssessment" value="' . $langs->trans('Clean') . '">';
+    print '</td></tr>';
+
+    print '</form>';
+    print '</table>';
 }
 
 // End of page

@@ -1450,7 +1450,23 @@ RepairRisks                                  = Réparer les risques
 NumberOfRisksCorrupted                       = Vous avez %s risque(s) dont la catégorie est corrompue, allez sur la page "Outils" pour le(s) réparer
 NoRiskToRepair                               = Aucun risque à réparer
 RiskSuccessfullyRepaired                     = Risques réparés avec succès
+RiskAssessmentSuccessfullyRepaired           = Évaluation réparées avec succès
 CorruptedCategoryOnRiskList                  = Liste des risques dont la catégorie est corrompue
+
+# Clean - Nettoyer
+Clean                          = Nettoyer
+CleanObject                    = Nettoyer les données
+CleanRiskFkElement             = %d risques ont un GP/UT non valide
+CleanRiskStatus                = %d risques ont un statut non valide
+CleanRiskExistFkElement        = %d risques sont orphelins
+CleanRisk                      = Nettoyer les risques
+CleanRiskAssessmentStatus      = %d évaluations ont un statut non valide
+CleanRiskAssessmentCotation    = %d évaluations ont une cotation vide
+CleanRiskAssessmentExistFkRisk = %d évaluations sont orphelines
+CleanRiskAssessment            = Nettoyer les évaluations
+NoRiskToClean                  = Aucun risque à nettoyer
+NoRiskAssessmentToClean        = Aucune évaluation à nettoyer
+
 
 #
 # Other
