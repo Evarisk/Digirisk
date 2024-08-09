@@ -57,7 +57,7 @@ require_once __DIR__ . '/../../class/digiriskelement.class.php';
 
 require_once __DIR__ . '/../../../saturne/lib/saturne_functions.lib.php';
 
-global $conf, $db, $hookmanager, $langs, $mc, $user;
+global $conf, $db, $hookmanager, $langs, $mc, $mysoc, $user;
 
 // Load translation files required by the page
 saturne_load_langs(['companies', 'other', 'mails', 'ticket']);
@@ -97,6 +97,7 @@ if (!$conf->multicompany->enabled) {
 }
 
 $conf->setEntityValues($db, $entity);
+$mysoc->setMysoc($conf);
 
 //ici charger les conf de la bonne entité
 $upload_dir = $conf->categorie->multidir_output[isset($entity) ? $entity : 1];
@@ -253,10 +254,10 @@ if ($action == 'add') {
 			$subCategoryCat->add_type($object, Categorie::TYPE_TICKET);
 
 			//Add files linked
-			$ticket_upload_dir = $conf->digiriskdolibarr->multidir_output[isset($conf->entity) ? $conf->entity : 1] . '/temp';
+			$ticket_upload_dir = $conf->digiriskdolibarr->multidir_output[isset($entity) ? $entity : 1] . '/temp';
 			$fileList          = dol_dir_list($ticket_upload_dir . '/ticket/' . $ticketTmpId . '/');
 			$thumbsList        = dol_dir_list($ticket_upload_dir . '/ticket/' . $ticketTmpId . '/thumbs/');
-			$ticketDirPath     = $conf->ticket->multidir_output[isset($conf->entity) ? $conf->entity : 1] . '/';
+			$ticketDirPath     = $conf->ticket->multidir_output[isset($entity) ? $entity : 1] . '/';
 			$fullTicketPath    = $ticketDirPath . $object->ref . '/';
 			$thumbsTicketPath  = $ticketDirPath . $object->ref . '/thumbs/';
 
@@ -302,7 +303,7 @@ if ($action == 'add') {
 if ($action == 'sendfile') {
 	include_once DOL_DOCUMENT_ROOT . '/core/lib/files.lib.php';
 
-	$ticket_upload_dir = $conf->digiriskdolibarr->multidir_output[isset($conf->entity) ? $conf->entity : 1] . '/temp';
+	$ticket_upload_dir = $conf->digiriskdolibarr->multidir_output[isset($entity) ? $entity : 1] . '/temp';
 	if ( ! is_dir($ticket_upload_dir)) {
 		dol_mkdir($ticket_upload_dir);
 	}
@@ -348,9 +349,9 @@ if ($action == 'removefile') {
 	include_once DOL_DOCUMENT_ROOT . '/core/lib/files.lib.php';
 	$filetodelete = GETPOST('filetodelete');
 
-	$ticket_upload_dir = $conf->digiriskdolibarr->multidir_output[isset($conf->entity) ? $conf->entity : 1] . '/temp';
+	$ticket_upload_dir = $conf->digiriskdolibarr->multidir_output[isset($entity) ? $entity : 1] . '/temp';
 	//Add files linked
-	$ticket_upload_dir = $conf->digiriskdolibarr->multidir_output[isset($conf->entity) ? $conf->entity : 1] . '/temp/ticket/' . $ticketTmpId . '/';
+	$ticket_upload_dir = $conf->digiriskdolibarr->multidir_output[isset($entity) ? $entity : 1] . '/temp/ticket/' . $ticketTmpId . '/';
 	$fileList          = dol_dir_list($ticket_upload_dir);
 
 	if (is_file($ticket_upload_dir . $filetodelete)) {
@@ -381,7 +382,19 @@ $formticket = new FormTicket($db);
 $arrayofjs  = array("/digiriskdolibarr/js/digiriskdolibarr.min.js", "/saturne/js/saturne.min.js");
 $arrayofcss = array('/opensurvey/css/style.css', '/ticket/css/styles.css.php', "/digiriskdolibarr/css/digiriskdolibarr.css",  "/saturne/css/saturne.css");
 
-digiriskdolibarr_ticket_header($langs->trans("CreateTicket"), "", 0, 0, $arrayofjs, $arrayofcss);
+top_htmlhead('', $langs->trans("CreateTicket"), 0, 0, $arrayofjs, $arrayofcss, 0, 1); // Show html headers
+
+if (!empty($conf->global->DIGIRISKDOLIBARR_TICKET_SHOW_COMPANY_LOGO)) {
+    $urllogo = DOL_URL_ROOT . '/viewimage.php?modulepart=mycompany&entity=' . $entity . '&file=' . urlencode('/logos/thumbs/'.$mysoc->logo_small);
+
+    // Output html code for logo
+    if ($urllogo) {
+        print '<div class="center signature-logo">';
+        print '<img src="' . $urllogo . '">';
+        print '</div>';
+    }
+    print '<div class="underbanner clearboth"></div>';
+}
 
 if ($entity > 0) {
 	if ( ! $conf->global->DIGIRISKDOLIBARR_TICKET_ENABLE_PUBLIC_INTERFACE) {
@@ -495,7 +508,7 @@ if ($entity > 0) {
 
 				<div id="sendFileForm">
 					<div id="fileLinkedTable" class="tableforinputfields">
-						<?php $fileLinkedList = dol_dir_list($conf->digiriskdolibarr->multidir_output[isset($conf->entity) ? $conf->entity : 1] . '/temp/ticket/' . $ticketTmpId . '/thumbs/'); ?>
+						<?php $fileLinkedList = dol_dir_list($conf->digiriskdolibarr->multidir_output[isset($entity) ? $entity : 1] . '/temp/ticket/' . $ticketTmpId . '/thumbs/'); ?>
 						<div class="wpeo-table table-flex table-3 files-uploaded">
 							<?php
 							if ( ! empty($fileLinkedList)) {
@@ -503,7 +516,7 @@ if ($entity > 0) {
 									if (preg_match('/mini/', $fileLinked['name'])) { ?>
 										<div class="table-row">
 											<div class="table-cell table-50 table-padding-0">
-												<?php print '<img class="photo"  width="' . $maxHeight . '" src="' . DOL_URL_ROOT . '/viewimage.php?modulepart=digiriskdolibarr&entity=' . $conf->entity . '&file=' . urlencode('/temp/ticket/' . $ticketTmpId . '/thumbs/' . $fileLinked['name']) . '" title="' . dol_escape_htmltag($alt) . '">'; ?>
+												<?php print '<img class="photo"  width="' . $maxHeight . '" src="' . DOL_URL_ROOT . '/viewimage.php?modulepart=digiriskdolibarr&entity=' . $entity . '&file=' . urlencode('/temp/ticket/' . $ticketTmpId . '/thumbs/' . $fileLinked['name']) . '" title="' . dol_escape_htmltag($alt) . '">'; ?>
 											</div>
 											<div class="table-cell">
 												<?php print preg_replace('/_mini/', '', $fileLinked['name']); ?>
