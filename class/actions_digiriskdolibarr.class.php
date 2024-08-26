@@ -1141,7 +1141,6 @@ class ActionsDigiriskdolibarr
 		if (strpos($parameters['context'], 'preventionplancard') !== false) {
 			$firePermits		= saturne_fetch_all_object_type('FirePermit', '', '', 0, 0, ['customsql' => 'fk_preventionplan = ' . $object->id]);
 			$morehtmlright		= $parameters['morehtmlright'];
-			$nbofdifferenttypes = count($firePermits);
 
 			print load_fiche_titre($langs->trans('RelatedFirePermit'), $morehtmlright, '', 0, 0, 'showlinkedobjectblock');
 
@@ -1157,11 +1156,9 @@ class ActionsDigiriskdolibarr
 			print '<td class="right">' . $langs->trans("Status") . '</td>';
 			print '</tr>';
 
-			$nboftypesoutput = 0;
-			$tplpath		 = $element = $subelement = 'firepermit';
-			$tplname		 = 'linkedobjectblock';
-
-			global $linkedObjectBlock;
+			$nboftypesoutput   = 0;
+			$tplpath		   = 'firepermit';
+			$tplname		   = 'linkedobjectblock';
 			$linkedObjectBlock = $firePermits;
 
 			$dirtpls = array_merge($conf->modules_parts['tpl'], ['digiriskdolibarr' => '/digiriskdolibarr/core/tpl/' . $tplpath . '/']);
