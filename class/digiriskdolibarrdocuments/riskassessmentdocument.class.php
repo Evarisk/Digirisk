@@ -225,27 +225,25 @@ class RiskAssessmentDocument extends DigiriskDocuments
      */
     public function getUrlOfLastGeneratedDocument($type)
     {
+        require_once DOL_DOCUMENT_ROOT . '/core/lib/files.lib.php';
+
         global $conf;
 
         $upload_dir = $conf->digiriskdolibarr->multidir_output[$conf->entity ?? 1];
-        $dirFiles  = 'riskassessmentdocument';
-        $fileDir   = $upload_dir . '/' . $dirFiles;
-
-        require_once DOL_DOCUMENT_ROOT . '/core/lib/files.lib.php';
-
-        $fileList = dol_dir_list($fileDir, 'files', 0, '(\.' . $type .  ')', '', 'date', SORT_DESC, 1);
-        if (!count($fileList)) {
-            return "";
+        $dirFiles   = 'riskassessmentdocument';
+        $fileDir    = $upload_dir . '/' . $dirFiles;
+        $fileList   = dol_dir_list($fileDir, 'files', 0, '(\.' . $type .  ')', '', 'date', SORT_DESC, 1);
+        $result     = '';
+        if (count($fileList)) {
+            $lastFile    = $fileList[0];
+            $documentUrl = DOL_URL_ROOT . '/document.php';
+            if (getDolGlobalString('DOL_URL_ROOT_DOCUMENT_PHP') !== '') {
+                $documentUrl = getDolGlobalString('DOL_URL_ROOT_DOCUMENT_PHP'); // To use another wrapper
+            }
+            $fileUrl    = $documentUrl . '?modulepart=digiriskdolibarr&amp;file=' . urlencode('riskassessmentdocument/' . $lastFile['name']);
+            $icon       = $type == 'pdf' ? 'fa-file-pdf' : 'fa-file-alt';
+            $result     = '<a class="marginleftonly" href="' . $fileUrl . '" target="_blank">' . img_picto('download', $icon) . '</a>';
         }
-        $lastFile = $fileList[0];
-
-        $documentUrl = DOL_URL_ROOT . '/document.php';
-        if (isset($conf->global->DOL_URL_ROOT_DOCUMENT_PHP)) {
-            $documentUrl = $conf->global->DOL_URL_ROOT_DOCUMENT_PHP; // To use another wrapper
-        }
-        $modulePart = 'digiriskdolibarr';
-        $fileUrl = $documentUrl . '?modulepart=' . $modulePart . '&amp;file=' . urlencode('riskassessmentdocument/' . $lastFile['name']);
-        $icon = $type == 'pdf' ? 'fa-file-pdf' : 'fa-file-alt';
-        return '<a class="marginleftonly" href="' . $fileUrl . '" target="_blank">' . img_picto('download', $icon) . '</a>';
+        return $result;
     }
 }
