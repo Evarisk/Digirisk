@@ -1,5 +1,5 @@
 <?php
-/* Copyright (C) 2021-2023 EVARISK <technique@evarisk.com>
+/* Copyright (C) 2021-2024 EVARISK <technique@evarisk.com>
  *
  * This program is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -31,12 +31,12 @@ require_once __DIR__ . '/../digiriskdocuments.class.php';
 class RiskAssessmentDocument extends DigiriskDocuments
 {
 	/**
-	 * @var string Module name.
+	 * @var string Module name
 	 */
 	public $module = 'digiriskdolibarr';
 
 	/**
-	 * @var string Element type of object.
+	 * @var string Element type of object
 	 */
 	public $element = 'riskassessmentdocument';
 
@@ -48,7 +48,7 @@ class RiskAssessmentDocument extends DigiriskDocuments
 	/**
 	 * Constructor.
 	 *
-	 * @param DoliDb $db Database handler.
+	 * @param DoliDb $db Database handler
 	 */
 	public function __construct(DoliDB $db)
 	{
@@ -118,6 +118,8 @@ class RiskAssessmentDocument extends DigiriskDocuments
         $arrayLastGenerateDate             = $this->getLastGenerateDate();
         $arrayNextGenerateDate             = $this->getNextGenerateDate();
         $arrayNbDaysBeforeNextGenerateDate = $this->getNbDaysBeforeNextGenerateDate();
+        $odtFileUrl                        = $this->getUrlOfLastGeneratedDocument('odt');
+        $pdfFileUrl                        = $this->getUrlOfLastGeneratedDocument('pdf');
 
         if (empty($arrayNbDaysBeforeNextGenerateDate['nbdaysbeforenextgeneratedate'])) {
             $arrayNbDaysAfterNextGenerateDate = $this->getNbDaysAfterNextGenerateDate();
@@ -128,10 +130,11 @@ class RiskAssessmentDocument extends DigiriskDocuments
 
         $array['widgets'] = [
             'riskassessmentdocument' => [
-                'label'      => [$langs->transnoentities('LastGenerateDate') ?? '', $langs->transnoentities('NextGenerateDate') ?? '', $langs->transnoentities('NbDaysBeforeNextGenerateDate') ?? '', $langs->transnoentities('NbDaysAfterNextGenerateDate') ?? ''],
-                'content'    => [$arrayLastGenerateDate['lastgeneratedate'] ?? 0, $arrayNextGenerateDate['nextgeneratedate'] ?? 0, $arrayNbDaysBeforeNextGenerateDate['nbdaysbeforenextgeneratedate'] ?? 0, $arrayNbDaysAfterNextGenerateDate['nbdaysafternextgeneratedate'] ?? 0],
-                'picto'      => 'fas fa-info-circle',
-                'widgetName' => $langs->transnoentities('RiskAssessmentDocument')
+                'label'       => [$langs->transnoentities('LastGenerateDate') ?? '', $langs->transnoentities('NextGenerateDate') ?? '', $langs->transnoentities('NbDaysBeforeNextGenerateDate') ?? '', $langs->transnoentities('NbDaysAfterNextGenerateDate') ?? ''],
+                'content'     => [$arrayLastGenerateDate['lastgeneratedate'] ?? 0, $arrayNextGenerateDate['nextgeneratedate'] ?? 0, $arrayNbDaysBeforeNextGenerateDate['nbdaysbeforenextgeneratedate'] ?? 0, $arrayNbDaysAfterNextGenerateDate['nbdaysafternextgeneratedate'] ?? 0],
+                'picto'       => 'fas fa-info-circle',
+                'moreContent' => [$odtFileUrl . $pdfFileUrl],
+                'widgetName'  => $langs->transnoentities('RiskAssessmentDocument')
             ]
         ];
 
@@ -139,7 +142,7 @@ class RiskAssessmentDocument extends DigiriskDocuments
     }
 
 	/**
-	 * Get last riskassessmentdocument generate date.
+	 * Get last riskassessmentdocument generate date
 	 *
 	 * @return array
 	 * @throws Exception
@@ -159,7 +162,7 @@ class RiskAssessmentDocument extends DigiriskDocuments
 	}
 
 	/**
-	 * Get next riskassessmentdocument generate date.
+	 * Get next riskassessmentdocument generate date
 	 *
 	 * @return array
 	 * @throws Exception
@@ -179,7 +182,7 @@ class RiskAssessmentDocument extends DigiriskDocuments
 	}
 
 	/**
-	 * Get number days before next riskassessmentdocument generate date.
+	 * Get number days before next riskassessmentdocument generate date
 	 *
 	 * @return array
 	 * @throws Exception
@@ -197,7 +200,7 @@ class RiskAssessmentDocument extends DigiriskDocuments
 	}
 
 	/**
-	 * Get number days after next riskassessmentdocument generate date.
+	 * Get number days after next riskassessmentdocument generate date
 	 *
 	 * @return array
 	 * @throws Exception
@@ -213,4 +216,36 @@ class RiskAssessmentDocument extends DigiriskDocuments
 		}
 		return $array;
 	}
+
+    /**
+     * Get url of the last riskassessment document generated
+     *
+     * @return string
+     * @throw Exception
+     */
+    public function getUrlOfLastGeneratedDocument($type)
+    {
+        global $conf;
+
+        $upload_dir = $conf->digiriskdolibarr->multidir_output[$conf->entity ?? 1];
+        $dirFiles  = 'riskassessmentdocument';
+        $fileDir   = $upload_dir . '/' . $dirFiles;
+
+        require_once DOL_DOCUMENT_ROOT . '/core/lib/files.lib.php';
+
+        $fileList = dol_dir_list($fileDir, 'files', 0, '(\.' . $type .  ')', '', 'date', SORT_DESC, 1);
+        if (!count($fileList)) {
+            return "";
+        }
+        $lastFile = $fileList[0];
+
+        $documentUrl = DOL_URL_ROOT . '/document.php';
+        if (isset($conf->global->DOL_URL_ROOT_DOCUMENT_PHP)) {
+            $documentUrl = $conf->global->DOL_URL_ROOT_DOCUMENT_PHP; // To use another wrapper
+        }
+        $modulePart = 'digiriskdolibarr';
+        $fileUrl = $documentUrl . '?modulepart=' . $modulePart . '&amp;file=' . urlencode('riskassessmentdocument/' . $lastFile['name']);
+        $icon = $type == 'pdf' ? 'fa-file-pdf' : 'fa-file-alt';
+        return '<a class="marginleftonly" href="' . $fileUrl . '" target="_blank">' . img_picto('download', $icon) . '</a>';
+    }
 }
