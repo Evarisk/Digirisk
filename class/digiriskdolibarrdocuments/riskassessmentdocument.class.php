@@ -118,8 +118,6 @@ class RiskAssessmentDocument extends DigiriskDocuments
         $arrayLastGenerateDate             = $this->getLastGenerateDate();
         $arrayNextGenerateDate             = $this->getNextGenerateDate();
         $arrayNbDaysBeforeNextGenerateDate = $this->getNbDaysBeforeNextGenerateDate();
-        $odtFileUrl                        = $this->getUrlOfLastGeneratedDocument('odt');
-        $pdfFileUrl                        = $this->getUrlOfLastGeneratedDocument('pdf');
 
         if (empty($arrayNbDaysBeforeNextGenerateDate['nbdaysbeforenextgeneratedate'])) {
             $arrayNbDaysAfterNextGenerateDate = $this->getNbDaysAfterNextGenerateDate();
@@ -133,7 +131,7 @@ class RiskAssessmentDocument extends DigiriskDocuments
                 'label'       => [$langs->transnoentities('LastGenerateDate') ?? '', $langs->transnoentities('NextGenerateDate') ?? '', $langs->transnoentities('NbDaysBeforeNextGenerateDate') ?? '', $langs->transnoentities('NbDaysAfterNextGenerateDate') ?? ''],
                 'content'     => [$arrayLastGenerateDate['lastgeneratedate'] ?? 0, $arrayNextGenerateDate['nextgeneratedate'] ?? 0, $arrayNbDaysBeforeNextGenerateDate['nbdaysbeforenextgeneratedate'] ?? 0, $arrayNbDaysAfterNextGenerateDate['nbdaysafternextgeneratedate'] ?? 0],
                 'picto'       => 'fas fa-info-circle',
-                'moreContent' => [$odtFileUrl . $pdfFileUrl],
+                'moreContent' => [$this->generateButtonsDownloadFiles(['odt', 'pdf'])],
                 'widgetName'  => $langs->transnoentities('RiskAssessmentDocument')
             ]
         ];
@@ -217,33 +215,13 @@ class RiskAssessmentDocument extends DigiriskDocuments
 		return $array;
 	}
 
-    /**
-     * Get url of the last riskassessment document generated
-     *
-     * @return string
-     * @throw Exception
-     */
-    public function getUrlOfLastGeneratedDocument($type)
+    public function generateButtonsDownloadFiles(array $types)
     {
-        require_once DOL_DOCUMENT_ROOT . '/core/lib/files.lib.php';
-
-        global $conf;
-
-        $upload_dir = $conf->digiriskdolibarr->multidir_output[$conf->entity ?? 1];
-        $dirFiles   = 'riskassessmentdocument';
-        $fileDir    = $upload_dir . '/' . $dirFiles;
-        $fileList   = dol_dir_list($fileDir, 'files', 0, '(\.' . $type .  ')', '', 'date', SORT_DESC, 1);
-        $result     = '';
-        if (count($fileList)) {
-            $lastFile    = $fileList[0];
-            $documentUrl = DOL_URL_ROOT . '/document.php';
-            if (getDolGlobalString('DOL_URL_ROOT_DOCUMENT_PHP') !== '') {
-                $documentUrl = getDolGlobalString('DOL_URL_ROOT_DOCUMENT_PHP'); // To use another wrapper
-            }
-            $fileUrl    = $documentUrl . '?modulepart=digiriskdolibarr&amp;file=' . urlencode('riskassessmentdocument/' . $lastFile['name']);
-            $icon       = $type == 'pdf' ? 'fa-file-pdf' : 'fa-file-alt';
-            $result     = '<a class="marginleftonly" href="' . $fileUrl . '" target="_blank">' . img_picto('download', $icon) . '</a>';
+        $result = '';
+        foreach ($types as $type) {
+            $result .= $this->getUrlOfLastGeneratedDocument($type, 'digiriskdolibarr', 'riskassessmentdocument');
         }
         return $result;
     }
+
 }
