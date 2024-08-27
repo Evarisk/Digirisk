@@ -87,10 +87,10 @@ window.digiriskdolibarr.document.generateDocument = async function (generationUr
     $('.loader').html('<i class="fas fa-check" style="color: green"></i>')
 
     const digiriskElementText = $(data).find('.refid').text()
-    const digiriskElementRef = digiriskElementText.split(/Description|Projet/)[0].trim();
-    const documentName        = $(data).find('#builddoc_form').find('.documentdownload').first().text()
-    const textToShow   = documentGeneratedText + ' : ' + digiriskElementRef + ' => ' + documentName
-    window.digiriskdolibarr.document.scrollToBottom();
+    const digiriskElementRef = digiriskElementText.split(/Description|Projet/)[0].trim()
+    const documentName = $(data).find('#builddoc_form').find('.documentdownload').first().text()
+    const textToShow = documentGeneratedText + ' : ' + digiriskElementRef + ' => ' + documentName
+    window.digiriskdolibarr.document.scrollToBottom()
     window.digiriskdolibarr.document.updateModal(textToShow)
     return data
   });
