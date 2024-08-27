@@ -215,6 +215,12 @@ class RiskAssessmentDocument extends DigiriskDocuments
 		return $array;
 	}
 
+    /**
+     * Generate buttons for download files
+     *
+     * @param array $types
+     * @return string
+     */
     public function generateButtonsDownloadFiles(array $types)
     {
         $result = '';
