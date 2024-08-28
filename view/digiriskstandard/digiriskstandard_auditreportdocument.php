@@ -130,10 +130,10 @@ print '<td>' . $langs->trans('Value') . '</td>';
 print '</tr>';
 
 // DateRange -- Plage de date
-$dateStart = dol_time_plus_duree(dol_now(), -1, 'd');
+$currentDate = dol_now();
 print '<tr class="oddeven"><td>' . $langs->trans("DateRange") . '</td>';
-print '<td>' . $langs->trans('From') . $form->selectDate($dateStart, 'datestart');
-print $langs->trans('At') . $form->selectDate(dol_time_plus_duree($dateStart, 1, 'd'), 'dateend');
+print '<td>' . $langs->trans('From') . $form->selectDate(dol_time_plus_duree($currentDate, -1, 'd'), 'datestart');
+print $langs->trans('At') . $form->selectDate($currentDate, 'dateend');
 print $langs->trans('UseDateRange');
 print '<input type="checkbox" id="daterange" name="daterange" checked>';
 print '</td></tr>';
