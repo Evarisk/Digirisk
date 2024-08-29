@@ -46,7 +46,7 @@ class RiskAssessmentDocument extends DigiriskDocuments
     public string $picto = 'fontawesome_fa-file-alt_fas_#d35968';
 
 	/**
-	 * Constructor.
+	 * Constructor
 	 *
 	 * @param DoliDb $db Database handler
 	 */
@@ -131,7 +131,7 @@ class RiskAssessmentDocument extends DigiriskDocuments
                 'label'       => [$langs->transnoentities('LastGenerateDate') ?? '', $langs->transnoentities('NextGenerateDate') ?? '', $langs->transnoentities('NbDaysBeforeNextGenerateDate') ?? '', $langs->transnoentities('NbDaysAfterNextGenerateDate') ?? ''],
                 'content'     => [$arrayLastGenerateDate['lastgeneratedate'] ?? 0, $arrayNextGenerateDate['nextgeneratedate'] ?? 0, $arrayNbDaysBeforeNextGenerateDate['nbdaysbeforenextgeneratedate'] ?? 0, $arrayNbDaysAfterNextGenerateDate['nbdaysafternextgeneratedate'] ?? 0],
                 'picto'       => 'fas fa-info-circle',
-                'moreContent' => [$this->generateButtonsDownloadFiles(['odt', 'pdf'])],
+                'moreContent' => [$arrayLastGenerateDate['moreContent'] ?? ''],
                 'widgetName'  => $langs->transnoentities('RiskAssessmentDocument')
             ]
         ];
@@ -156,6 +156,8 @@ class RiskAssessmentDocument extends DigiriskDocuments
 		} else {
 			$array['lastgeneratedate'] = 'N/A';
 		}
+        $array['moreContent'] = $this->showUrlOfLastGeneratedDocument('odt', 'digiriskdolibarr', 'riskassessmentdocument');
+        $array['moreContent'] .= $this->showUrlOfLastGeneratedDocument('pdf', 'digiriskdolibarr', 'riskassessmentdocument');
 		return $array;
 	}
 
@@ -210,24 +212,9 @@ class RiskAssessmentDocument extends DigiriskDocuments
 		if ($arrayNextGenerateDate['nextgeneratedate'] > 0) {
 			$array['nbdaysafternextgeneratedate'] = num_between_day(dol_stringtotime($arrayNextGenerateDate['nextgeneratedate']), dol_now(), 1);
 		} else {
-			$array['nbdaysafternextgeneratedate'] = 'N/A';
-		}
+            $array['nbdaysafternextgeneratedate'] = 'N/A';
+        }
 		return $array;
 	}
-
-    /**
-     * Generate buttons for download files
-     *
-     * @param array $types
-     * @return string
-     */
-    public function generateButtonsDownloadFiles(array $types)
-    {
-        $result = '';
-        foreach ($types as $type) {
-            $result .= $this->getUrlOfLastGeneratedDocument($type, 'digiriskdolibarr', 'riskassessmentdocument');
-        }
-        return $result;
-    }
 
 }
