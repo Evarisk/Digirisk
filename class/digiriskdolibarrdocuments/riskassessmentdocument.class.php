@@ -156,7 +156,7 @@ class RiskAssessmentDocument extends DigiriskDocuments
 		} else {
 			$array['lastgeneratedate'] = 'N/A';
 		}
-        $array['moreContent'] = $this->showUrlOfLastGeneratedDocument('odt', 'digiriskdolibarr', 'riskassessmentdocument');
+        $array['moreContent']  = $this->showUrlOfLastGeneratedDocument('odt', 'digiriskdolibarr', 'riskassessmentdocument');
         $array['moreContent'] .= $this->showUrlOfLastGeneratedDocument('pdf', 'digiriskdolibarr', 'riskassessmentdocument');
 		return $array;
 	}
