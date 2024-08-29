@@ -1,5 +1,5 @@
 <?php
-/* Copyright (C) 2021-2023 EVARISK <technique@evarisk.com>
+/* Copyright (C) 2021-2024 EVARISK <technique@evarisk.com>
  *
  * This program is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -31,12 +31,12 @@ require_once __DIR__ . '/../digiriskdocuments.class.php';
 class RiskAssessmentDocument extends DigiriskDocuments
 {
 	/**
-	 * @var string Module name.
+	 * @var string Module name
 	 */
 	public $module = 'digiriskdolibarr';
 
 	/**
-	 * @var string Element type of object.
+	 * @var string Element type of object
 	 */
 	public $element = 'riskassessmentdocument';
 
@@ -46,9 +46,9 @@ class RiskAssessmentDocument extends DigiriskDocuments
     public string $picto = 'fontawesome_fa-file-alt_fas_#d35968';
 
 	/**
-	 * Constructor.
+	 * Constructor
 	 *
-	 * @param DoliDb $db Database handler.
+	 * @param DoliDb $db Database handler
 	 */
 	public function __construct(DoliDB $db)
 	{
@@ -128,10 +128,11 @@ class RiskAssessmentDocument extends DigiriskDocuments
 
         $array['widgets'] = [
             'riskassessmentdocument' => [
-                'label'      => [$langs->transnoentities('LastGenerateDate') ?? '', $langs->transnoentities('NextGenerateDate') ?? '', $langs->transnoentities('NbDaysBeforeNextGenerateDate') ?? '', $langs->transnoentities('NbDaysAfterNextGenerateDate') ?? ''],
-                'content'    => [$arrayLastGenerateDate['lastgeneratedate'] ?? 0, $arrayNextGenerateDate['nextgeneratedate'] ?? 0, $arrayNbDaysBeforeNextGenerateDate['nbdaysbeforenextgeneratedate'] ?? 0, $arrayNbDaysAfterNextGenerateDate['nbdaysafternextgeneratedate'] ?? 0],
-                'picto'      => 'fas fa-info-circle',
-                'widgetName' => $langs->transnoentities('RiskAssessmentDocument')
+                'label'       => [$langs->transnoentities('LastGenerateDate') ?? '', $langs->transnoentities('NextGenerateDate') ?? '', $langs->transnoentities('NbDaysBeforeNextGenerateDate') ?? '', $langs->transnoentities('NbDaysAfterNextGenerateDate') ?? ''],
+                'content'     => [$arrayLastGenerateDate['lastgeneratedate'] ?? 0, $arrayNextGenerateDate['nextgeneratedate'] ?? 0, $arrayNbDaysBeforeNextGenerateDate['nbdaysbeforenextgeneratedate'] ?? 0, $arrayNbDaysAfterNextGenerateDate['nbdaysafternextgeneratedate'] ?? 0],
+                'picto'       => 'fas fa-info-circle',
+                'moreContent' => [$arrayLastGenerateDate['moreContent'] ?? ''],
+                'widgetName'  => $langs->transnoentities('RiskAssessmentDocument')
             ]
         ];
 
@@ -139,7 +140,7 @@ class RiskAssessmentDocument extends DigiriskDocuments
     }
 
 	/**
-	 * Get last riskassessmentdocument generate date.
+	 * Get last riskassessmentdocument generate date
 	 *
 	 * @return array
 	 * @throws Exception
@@ -155,11 +156,15 @@ class RiskAssessmentDocument extends DigiriskDocuments
 		} else {
 			$array['lastgeneratedate'] = 'N/A';
 		}
+
+        $array['moreContent']  = $this->showUrlOfLastGeneratedDocument($this->module, $this->element, 'odt');
+        $array['moreContent'] .= $this->showUrlOfLastGeneratedDocument($this->module, $this->element, 'pdf');
+
 		return $array;
 	}
 
 	/**
-	 * Get next riskassessmentdocument generate date.
+	 * Get next riskassessmentdocument generate date
 	 *
 	 * @return array
 	 * @throws Exception
@@ -179,7 +184,7 @@ class RiskAssessmentDocument extends DigiriskDocuments
 	}
 
 	/**
-	 * Get number days before next riskassessmentdocument generate date.
+	 * Get number days before next riskassessmentdocument generate date
 	 *
 	 * @return array
 	 * @throws Exception
@@ -197,7 +202,7 @@ class RiskAssessmentDocument extends DigiriskDocuments
 	}
 
 	/**
-	 * Get number days after next riskassessmentdocument generate date.
+	 * Get number days after next riskassessmentdocument generate date
 	 *
 	 * @return array
 	 * @throws Exception
@@ -209,8 +214,9 @@ class RiskAssessmentDocument extends DigiriskDocuments
 		if ($arrayNextGenerateDate['nextgeneratedate'] > 0) {
 			$array['nbdaysafternextgeneratedate'] = num_between_day(dol_stringtotime($arrayNextGenerateDate['nextgeneratedate']), dol_now(), 1);
 		} else {
-			$array['nbdaysafternextgeneratedate'] = 'N/A';
-		}
+            $array['nbdaysafternextgeneratedate'] = 'N/A';
+        }
 		return $array;
 	}
+
 }
