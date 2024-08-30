@@ -285,7 +285,7 @@ if ($action == 'set_multi_company_ticket_public_interface') {
     exit;
 }
 
-if ($action == 'setExternalRedirectionUrl') {
+if ($action == 'set_external_redirection_url') {
 	$externalRedirectionUrl = GETPOST('externalRedirectionUrl', 'none');
 	dolibarr_set_const($db, 'DIGIRISKDOLIBARR_TICKET_CREATION_EXTERNAL_REDIRECTION_URL', $externalRedirectionUrl, 'chaine', 0, '', $conf->entity);
 
@@ -294,7 +294,7 @@ if ($action == 'setExternalRedirectionUrl') {
 	exit;
 }
 
-if ($action == 'setTicketCreationOption') {
+if ($action == 'set_ticket_creation_option') {
 	$ticketCreationOption = GETPOST('ticketCreationOption', 'alpha');
 	dolibarr_set_const($db, 'DIGIRISKDOLIBARR_TICKET_CREATION_OPTION', $ticketCreationOption, 'chaine', 0, '', $conf->entity);
 
@@ -303,7 +303,7 @@ if ($action == 'setTicketCreationOption') {
 	exit;
 }
 
-if ($action == 'generateShortcutUrl') {
+if ($action == 'generate_shortcut_url') {
 	// @todo generate shortcut url
 }
 
@@ -343,39 +343,45 @@ print '<td>' . $langs->transnoentities("Action") . '</td>';
 print '</tr>';
 
 print '<tr class="oddeven">';
-print '<td><input type="radio" name="ticketCreationOption" value="default_redirection_url"' . (getDolGlobalString('DIGIRISKDOLIBARR_TICKET_CREATION_OPTION') == 'default_redirection_url' ? 'checked="checked"' : '') . '/></td>';
+print '<td><form method="POST" action="' . $_SERVER['PHP_SELF'] . '">';
+print '<input type="hidden" name="token" value="' . newToken() . '">';
+print '<input type="hidden" name="action" value="set_ticket_creation_option">';
+print '<input type="hidden" name="page_y">';
+print '<input type="radio" name="ticketCreationOption" value="default_redirection_url"' . (getDolGlobalString('DIGIRISKDOLIBARR_TICKET_CREATION_OPTION') == 'default_redirection_url' ? 'checked="checked"' : '') . ' onchange="this.form.submit()"/>';
+print '</form></td>';
 print '<td><span class="opacitymedium">' . $langs->trans('TicketCreationDefaultURL') . '</span></td>';
 print '<td><a class="wordbreak" href="' . dol_buildpath('/custom/digiriskdolibarr/public/ticket/create_ticket.php?entity=' . $conf->entity, 1) . '" target="_blank" >' . dol_buildpath('/custom/digiriskdolibarr/public/ticket/create_ticket.php?entity=' . $conf->entity, 2) . '</a></td>';
 print '<td></td>';
 print '</tr>';
 
-print '<form method="POST" action="' . $_SERVER['PHP_SELF'] . '">';
-print '<input type="hidden" name="token" value="' . newToken() . '">';
-print '<input type="hidden" name="action" value="setTicketCreationExternalRedirectionUrl">';
-print '<input type="hidden" name="page_y">';
-
 print '<tr class="oddeven">';
-print '<td><input type="radio" name="ticketCreationOption" value="external_redirection_url"' . (getDolGlobalString('DIGIRISKDOLIBARR_TICKET_CREATION_OPTION') == 'external_redirection_url' ? 'checked="checked"' : '') . '/></td>';
+print '<td><form method="POST" action="' . $_SERVER['PHP_SELF'] . '">';
+print '<input type="hidden" name="token" value="' . newToken() . '">';
+print '<input type="hidden" name="action" value="set_ticket_creation_option">';
+print '<input type="hidden" name="page_y">';
+print '<input type="radio" name="ticketCreationOption" value="external_redirection_url"' . (getDolGlobalString('DIGIRISKDOLIBARR_TICKET_CREATION_OPTION') == 'external_redirection_url' ? 'checked="checked"' : '') . ' onchange="this.form.submit()"/>';
+print '</form></td>';
 print '<td><span class="opacitymedium">' . $langs->trans('TicketCreationExternalURL') . '</span></td>';
-print '<td><input class="centpercent" type="text" name="externalRedirectionUrl" value="' . getDolGlobalString('DIGIRISKDOLIBARR_TICKET_CREATION_EXTERNAL_REDIRECTION_URL') . '"></td>';
-print '<td><input type="submit" class="button reposition" value="'. $langs->transnoentities('Save') . '"></td>';
+print '<td><form method="POST" action="' . $_SERVER['PHP_SELF'] . '">';
+print '<input type="hidden" name="token" value="' . newToken() . '">';
+print '<input type="hidden" name="action" value="set_external_redirection_url">';
+print '<input type="hidden" name="page_y">';
+print '<input class="centpercent" type="text" name="externalRedirectionUrl" value="' . getDolGlobalString('DIGIRISKDOLIBARR_TICKET_CREATION_EXTERNAL_REDIRECTION_URL') . '"></td>';
+print '<td><input type="submit" class="button reposition" value="'. $langs->transnoentities('Save') . '">';
+print '</form></td>';
 print '</tr>';
 
-print '</form>';
-
-print '<form method="POST" action="' . $_SERVER['PHP_SELF'] . '">';
-print '<input type="hidden" name="token" value="' . newToken() . '">';
-print '<input type="hidden" name="action" value="generateShortcutUrl">';
-print '<input type="hidden" name="page_y">';
-
 print '<tr class="oddeven">';
-print '<td><input type="radio" name="ticketCreationOption" value="shortcut_redirection_url"' . (getDolGlobalString('DIGIRISKDOLIBARR_TICKET_CREATION_OPTION') == 'shortcut_redirection_url' ? 'checked="checked"' : '') . '/></td>';
+print '<td><form method="POST" action="' . $_SERVER['PHP_SELF'] . '">';
+print '<input type="hidden" name="token" value="' . newToken() . '">';
+print '<input type="hidden" name="action" value="set_ticket_creation_option">';
+print '<input type="hidden" name="page_y">';
+print '<input type="radio" name="ticketCreationOption" value="shortcut_redirection_url"' . (getDolGlobalString('DIGIRISKDOLIBARR_TICKET_CREATION_OPTION') == 'shortcut_redirection_url' ? 'checked="checked"' : '') . ' onchange="this.form.submit()"/>';
+print '</form></td>';
 print '<td><span class="opacitymedium">' . $langs->trans('TicketCreationShortcutURL') . '</span></td>';
 print '<td></td>'; // @todo display shortcut url
-print '<td><input type="submit" class="button reposition" value="'. $langs->transnoentities('Generate') . '"></td>';
+print '<td><a class="button reposition" href="' . $_SERVER['PHP_SELF'] . '?action=generate_shortcut_url&token=' . newToken() . '&page_y=' . $pageY . '">' . $langs->transnoentities('Generate') . '</a></td>';
 print '</tr>';
-
-print '</form>';
 
 print '</table>';
 
