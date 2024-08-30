@@ -1072,7 +1072,7 @@ class ActionsDigiriskdolibarr
 		if (preg_match('/digiriskelementview|digiriskstandardview|digiriskstandardagenda|digiriskelementagenda|digiriskelementdocument/', $parameters['context'])) {
 			require_once __DIR__ . '/../lib/digiriskdolibarr_function.lib.php';
 			if ($object->element == 'digiriskelement') {
-				$this->results = ['subdir' => $object->element_type . '/'. $object->ref];
+				$this->results = ['subdir' => $object->element_type . '/'. $object->ref, 'photoLimit' => 1];
 			} elseif ($object->element == 'digiriskstandard') {
 				$this->results = ['modulepart' => 'mycompany', 'dir' => $conf->mycompany->dir_output, 'subdir' => 'logos', 'photoLimit' => 1];
 			}
