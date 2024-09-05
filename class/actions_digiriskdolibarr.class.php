@@ -208,12 +208,20 @@ class ActionsDigiriskdolibarr
                     $digiriskElement = new DigiriskElement($db);
 
                     $digiriskElement->fetch($object->array_options['options_digiriskdolibarr_ticket_service']);
-                    $selectDictionnary = $digiriskElement->getNomUrl(1, 'blank', 0, '', -1, 1); ?>
+                    $selectDictionnary = $digiriskElement->getNomUrl(1, 'blank', 0, '', -1, 1);
 
-                    <script>
-                        jQuery('.ticket_extras_digiriskdolibarr_ticket_service').html(<?php echo json_encode($selectDictionnary); ?>);
-                    </script>
-                    <?php
+                    //echo '<pre>';
+                    //print_r ($selectDictionnary);
+                    //echo '</pre>';
+                    //exit;
+
+                    if (!(GETPOST('action') == 'edit_extras' && GETPOST('attribute') == 'digiriskdolibarr_ticket_service')) {
+                        ?>
+                        <script>
+                            jQuery('.ticket_extras_digiriskdolibarr_ticket_service').html(<?php echo json_encode($selectDictionnary); ?>);
+                        </script>
+                        <?php
+                    }
                 }
 
                 $moduleNameLowerCase = 'digiriskdolibarr';
