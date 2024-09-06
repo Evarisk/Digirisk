@@ -210,11 +210,6 @@ class ActionsDigiriskdolibarr
                     $digiriskElement->fetch($object->array_options['options_digiriskdolibarr_ticket_service']);
                     $selectDictionnary = $digiriskElement->getNomUrl(1, 'blank', 0, '', -1, 1);
 
-                    //echo '<pre>';
-                    //print_r ($selectDictionnary);
-                    //echo '</pre>';
-                    //exit;
-
                     if (!(GETPOST('action') == 'edit_extras' && GETPOST('attribute') == 'digiriskdolibarr_ticket_service')) {
                         ?>
                         <script>
