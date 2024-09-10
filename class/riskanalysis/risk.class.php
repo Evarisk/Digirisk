@@ -635,10 +635,12 @@ class Risk extends SaturneObject
     /**
      * Get risks by cotation
      *
+     * @param string $type Risk type (risk, riskenvironmental or ...)
+     *
      * @return array
      * @throws Exception
      */
-    public function getRisksByCotation(): array
+    public function getRisksByCotation(string $type = 'risk'): array
     {
         global $conf, $langs;
 
@@ -671,7 +673,7 @@ class Risk extends SaturneObject
                 $digiriskElementSqlFilter = rtrim($digiriskElementSqlFilter, ', ');
             }
             $digiriskElementSqlFilter .= ')';
-            $filter = ' AND r.fk_element NOT IN ' . $digiriskElementSqlFilter;
+            $filter = ' AND r.fk_element NOT IN ' . $digiriskElementSqlFilter . ' AND r.type = "' . $type . '"';
         }
 
         $riskAssessments = saturne_fetch_all_object_type('RiskAssessment', '', '', 0, 0, ['customsql' => 't.status = ' . RiskAssessment::STATUS_VALIDATED . $filter], 'AND', false, true, false, $join);

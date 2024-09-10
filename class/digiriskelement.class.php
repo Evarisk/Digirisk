@@ -570,30 +570,16 @@ class DigiriskElement extends SaturneObject
         $array['showlegend'] = $conf->browser->layout == 'phone' ? 1 : 2;
         $array['dataset']    = 1;
 
-        $digiriskElements = $this->fetchDigiriskElementFlat(GETPOSTISSET('id') ? GETPOST('id') : 0);
-
-        // Get current digirisk element and add data in $digiriskElements array
-        if (GETPOSTISSET('id')) {
-            $currentDigiriskElement = $this->fetchAll('', '', 0, 0, ['customsql' => 't.rowid = ' . GETPOST('id')]);
-            if (is_array($currentDigiriskElement) && !empty($currentDigiriskElement)) {
-                $currentDigiriskElement = array_shift($currentDigiriskElement);
-
-                $array['title'] = $langs->transnoentities('RisksRepartitionByDigiriskElement', ': ' . $currentDigiriskElement->ref . ' - ' . $currentDigiriskElement->label);
-
-                $digiriskElement[$currentDigiriskElement->id]['object'] = $currentDigiriskElement;
-                $digiriskElements = array_merge($digiriskElement, $digiriskElements);
-            }
-        }
-
-        if (!empty($digiriskElements)) {
+        $digiriskElements = $this->getActiveDigiriskElements(0, ['filter' => GETPOSTISSET('id') ? ' AND t.rowid = ' .  GETPOST('id') : '']);
+        if (is_array($digiriskElements) && !empty($digiriskElements)) {
             foreach ($digiriskElements as $digiriskElement) {
-                $risks = saturne_fetch_all_object_type('Risk', '', '', 0, 0, ['customsql' => 't.status = ' . Risk::STATUS_VALIDATED . ' AND t.entity = ' . $conf->entity . ' AND t.type = "' . $riskType . '" AND t.fk_element = ' . $digiriskElement['object']->id]);
+                $risks = saturne_fetch_all_object_type('Risk', '', '', 0, 0, ['customsql' => 't.status = ' . Risk::STATUS_VALIDATED . ' AND t.entity = ' . $conf->entity . ' AND t.type = "' . $riskType . '" AND t.fk_element = ' . $digiriskElement->id]);
                 if (is_array($risks) && !empty($risks)) {
-                    $array['labels'][$digiriskElement['object']->id] = [
-                        'label' => $digiriskElement['object']->ref . ' - ' . $digiriskElement['object']->label,
-                        'color' => SaturneDashboard::getColorRange($digiriskElement['object']->id)
+                    $array['labels'][$digiriskElement->id] = [
+                        'label' => $digiriskElement->ref . ' - ' . $digiriskElement->label,
+                        'color' => SaturneDashboard::getColorRange($digiriskElement->id)
                     ];
-                    $array['data'][$digiriskElement['object']->id] = count($risks);
+                    $array['data'][$digiriskElement->id] = count($risks);
                 }
             }
         }
