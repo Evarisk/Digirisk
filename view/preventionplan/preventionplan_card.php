@@ -554,43 +554,8 @@ if (empty($reshook)) {
 		}
 	}
 
-	// Action to set status STATUS_LOCKED
-	if ($action == 'confirm_setLocked') {
-		$object->fetch($id);
-		if ( ! $error) {
-			$result = $object->setLocked($user, false);
-			if ($result > 0) {
-				// Set locked OK
-				$urltogo = str_replace('__ID__', $result, $backtopage);
-				$urltogo = preg_replace('/--IDFORBACKTOPAGE--/', $id, $urltogo); // New method to autoselect project after a New on another form object creation
-				header("Location: " . $urltogo);
-				exit;
-			} else {
-				// Set locked KO
-				if ( ! empty($object->errors)) setEventMessages(null, $object->errors, 'errors');
-				else setEventMessages($object->error, null, 'errors');
-			}
-		}
-	}
-
-	// Action to set status STATUS_ARCHIVED
-	if ($action == 'setArchived') {
-		$object->fetch($id);
-		if ( ! $error) {
-			$result = $object->setArchived($user, false);
-			if ($result > 0) {
-				// Set Archived OK
-				$urltogo = str_replace('__ID__', $result, $backtopage);
-				$urltogo = preg_replace('/--IDFORBACKTOPAGE--/', $id, $urltogo); // New method to autoselect project after a New on another form object creation
-				header("Location: " . $urltogo);
-				exit;
-			} else {
-				// Set Archived KO
-				if ( ! empty($object->errors)) setEventMessages(null, $object->errors, 'errors');
-				else setEventMessages($object->error, null, 'errors');
-			}
-		}
-	}
+    // Action confirm_lock, confirm_archive.
+    require_once __DIR__ . '/../../../saturne/core/tpl/actions/object_workflow_actions.tpl.php';
 
 	// Action clone object
 	if ($action == 'confirm_clone' && $confirm == 'yes') {
@@ -963,7 +928,7 @@ $formconfirm = '';
 // SetLocked confirmation
 if (($action == 'setLocked' && (empty($conf->use_javascript_ajax) || ! empty($conf->dol_use_jmobile)))		// Output when action = clone if jmobile or no js
 	|| ( ! empty($conf->use_javascript_ajax) && empty($conf->dol_use_jmobile))) {							// Always output when not jmobile nor js
-    $formconfirm .= $form->formconfirm($_SERVER["PHP_SELF"] . '?id=' . $object->id, $langs->trans('LockObject', $langs->transnoentities('The' . ucfirst($object->element))), $langs->trans('ConfirmLockObject', $langs->transnoentities('The' . ucfirst($object->element))), 'confirm_setLocked', '', 'yes', 'actionButtonLock', 350, 600);
+    $formconfirm .= $form->formconfirm($_SERVER["PHP_SELF"] . '?id=' . $object->id, $langs->trans('LockObject', $langs->transnoentities('The' . ucfirst($object->element))), $langs->trans('ConfirmLockObject', $langs->transnoentities('The' . ucfirst($object->element))), 'confirm_lock', '', 'yes', 'actionButtonLock', 350, 600);
 }
 
 // setPendingSignature confirmation
@@ -1210,7 +1175,7 @@ if ((empty($action) || ($action != 'create' && $action != 'edit'))) {
 			// Archive
 			$displayButton = $onPhone ?  '<i class="fas fa-archive fa-2x"></i>' : '<i class="fas fa-archive"></i>' . ' ' . $langs->trans('Archive');
 			if ($object->status == $object::STATUS_LOCKED) {
-				print '<a class="butAction" href="' . $_SERVER['PHP_SELF'] . '?id=' . $object->id . '&action=setArchived&token=' . newToken() . '">' . $displayButton . '</a>';
+				print '<a class="butAction" href="' . $_SERVER['PHP_SELF'] . '?id=' . $object->id . '&action=confirm_archive&forcebuilddoc=true&token=' . newToken() . '">' . $displayButton . '</a>';
 			} else {
 				print '<span class="butActionRefused classfortooltip" title="' . dol_escape_htmltag($langs->trans('ObjectMustBeLockedToArchive', ucfirst($langs->transnoentities('The' . ucfirst($object->element))))) . '">' . $displayButton . '</span>';
 			}
