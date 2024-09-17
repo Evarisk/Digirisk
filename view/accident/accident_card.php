@@ -590,7 +590,7 @@ if (empty($reshook)) {
     include_once __DIR__ . '/../../core/tpl/accident/digiriskdolibarr_accident_lesion_actions.tpl.php';
 
     // Action confirm_lock, confirm_archive.
-	require_once __DIR__ . '/../../../saturne/core/tpl/signature/signature_action_workflow.tpl.php';
+	require_once __DIR__ . '/../../../saturne/core/tpl/actions/object_workflow_actions.tpl.php';
 
     // Actions set_thirdparty, set_project
     require_once __DIR__ . '/../../../saturne/core/tpl/actions/banner_actions.tpl.php';
@@ -938,7 +938,17 @@ if ((empty($action) || ($action != 'create' && $action != 'edit'))) {
 		$formConfirm .= $form->formconfirm($_SERVER['PHP_SELF'] . '?id=' . $object->id, $langs->trans('LockObject', $langs->transnoentities('The' . ucfirst($object->element))), $langs->trans('ConfirmLockObject', $langs->transnoentities('The' . ucfirst($object->element))), 'confirm_lock', '', 'yes', 'actionButtonLock', 350, 600);
 	}
 
-	// Call Hook formConfirm.
+    // Archive confirmation
+    if (($action == 'set_archive' && (empty($conf->use_javascript_ajax) || !empty($conf->dol_use_jmobile))) || (!empty($conf->use_javascript_ajax) && empty($conf->dol_use_jmobile))) {
+        $formConfirm .= $form->formconfirm($_SERVER['PHP_SELF'] . '?id=' . $object->id . '&forcebuilddoc=true', $langs->trans('ArchiveObject', $langs->transnoentities('The' . ucfirst($object->element))), $langs->trans('ConfirmArchiveObject', $langs->transnoentities('The' . ucfirst($object->element))), 'confirm_archive', '', 'yes', 'actionButtonArchive', 350, 600);
+    }
+
+    // Delete (need delete permission, or if draft, just need create/modify permission).
+    $displayButton = $onPhone ? '<i class="fas fa-trash fa-2x"></i>' : '<i class="fas fa-trash"></i>' . ' ' . $langs->trans('Delete');
+    print dolGetButtonAction($displayButton, '', 'delete', $_SERVER['PHP_SELF'] . '?id=' . $object->id . '&action=delete&token=' . newToken(), '', $permissiontodelete || ($object->status == AccidentInvestigation::STATUS_DRAFT));
+
+
+    // Call Hook formConfirm.
 	$parameters = ['formConfirm' => $formConfirm];
 	$reshook    = $hookmanager->executeHooks('formConfirm', $parameters, $object, $action); // Note that $action and $object may have been modified by hook.
 
@@ -1161,7 +1171,7 @@ if ((empty($action) || ($action != 'create' && $action != 'edit'))) {
             // Archive
             $displayButton = $onPhone ?  '<i class="fas fa-archive fa-2x"></i>' : '<i class="fas fa-archive"></i>' . ' ' . $langs->trans('Archive');
             if ($object->status == Accident::STATUS_LOCKED) {
-                print '<a class="butAction" href="' . $_SERVER['PHP_SELF'] . '?id=' . $object->id . '&action=confirm_archive&token=' . newToken() . '">' . $displayButton . '</a>';
+                print '<span class="butAction" id="actionButtonArchive" href="' . $_SERVER['PHP_SELF'] . '?id=' . $object->id . '&action=confirm_archive&token=' . newToken() . '">' . $displayButton . '</span>';
             } else {
                 print '<span class="butActionRefused classfortooltip" title="' . dol_escape_htmltag($langs->trans('ObjectMustBeLockedToArchive', ucfirst($langs->transnoentities('The' . ucfirst($object->element))))) . '">' . $displayButton . '</span>';
             }
