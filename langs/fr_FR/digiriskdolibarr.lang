@@ -1007,6 +1007,7 @@ Environment                                    = Environnement
 Riskenvironmental                              = Risque environnemental
 RiskEnvironmentals                             = Risques environnementaux
 Riskenvironmentals                             = Risques environnementaux
+AddRiskEnvironmental                           = Ajout du risque environnemental
 DigiriskElementRiskenvironmentalsList          = Liste des risques environnementaux
 DigiriskElementInheritedRiskenvironmentalsList = Liste des risques hérités environnementaux
 DigiriskElementSharedRiskenvironmentalsList    = Liste des risques partagés environnementaux
