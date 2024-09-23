@@ -600,7 +600,7 @@ $massactionbutton = $form->selectMassAction('', $arrayofmassactions);
 			<div class="modal-container wpeo-modal-event">
 				<!-- Modal-Header -->
 				<div class="modal-header">
-					<h2 class="modal-title"><?php echo $langs->trans('AddRiskTitle') . ' ' . $refRiskMod->getNextValue($risk);  ?></h2>
+					<h2 class="modal-title"><?php preg_match('/^riskenvironmental$/', $riskType) ? print $langs->trans('AddRiskEnvironmental') . ' ' . $refRiskMod->getNextValue($risk) : print $langs->trans('AddRiskTitle') . ' ' . $refRiskMod->getNextValue($risk); ?></h2>
 					<div class="modal-close"><i class="fas fa-times"></i></div>
 				</div>
 				<!-- Modal-ADD Risk Content-->
@@ -690,13 +690,13 @@ $massactionbutton = $form->selectMassAction('', $arrayofmassactions);
 											<input type="hidden" class="digi-method-evaluation-id" value="<?php echo $risk->id ; ?>" />
 											<textarea style="display: none" name="evaluation_variables" class="tmp_evaluation_variable"><?php echo '{}'; ?></textarea>
 											<span class="title"><i class="fas fa-info-circle"></i> <?php echo $langs->trans('SelectEvaluation') ?><required>*</required></span>
-											<div class="wpeo-table evaluation-method table-flex table-<?php echo count($evaluationMethodSurvey) + 1; ?>">
+											<div style="<?php preg_match('/^riskenvironmental$/', $riskType) ? 'background-color: #22bf4e !important' : '';?>" class="wpeo-table evaluation-method table-flex table-<?php echo count($evaluationMethodSurvey) + 1; ?>">
 												<div class="table-row table-header">
 													<div class="table-cell">
 														<span></span>
 													</div>
 													<?php for ( $l = 0; $l < count($evaluationMethodSurvey); $l++ ) : ?>
-														<div class="table-cell">
+														<div style="<?php preg_match('/^riskenvironmental$/', $riskType) ? 'background-color: green !important' : '';?>" class="table-cell">
 															<span><?php echo $l; ?></span>
 														</div>
 													<?php endfor; ?>
@@ -803,7 +803,7 @@ $massactionbutton = $form->selectMassAction('', $arrayofmassactions);
 		<div class="modal-container wpeo-modal-event">
 			<!-- Modal-Header -->
 			<div class="modal-header">
-				<h2 class="modal-title"><?php echo $langs->trans('AddRiskTitle') . ' ' . $refRiskMod->getNextValue($risk);  ?></h2>
+				<h2 class="modal-title"><?php preg_match('/^riskenvironmental$/', $riskType) ? print $langs->trans('AddRiskEnvironmental') . ' ' . $refRiskMod->getNextValue($risk) : print $langs->trans('AddRiskTitle') . ' ' . $refRiskMod->getNextValue($risk);   ?></h2>
 				<div class="modal-close"><i class="fas fa-times"></i></div>
 			</div>
 			<!-- Modal-ADD Risk Content-->
@@ -909,11 +909,11 @@ $massactionbutton = $form->selectMassAction('', $arrayofmassactions);
 									<span class="title"><i class="fas fa-info-circle"></i> <?php echo $langs->trans('SelectEvaluation') ?><required>*</required></span>
 									<div class="wpeo-table evaluation-method table-flex table-<?php echo count($evaluationMethodSurvey) + 1; ?>">
 										<div class="table-row table-header">
-											<div class="table-cell">
+											<div style="<?php print preg_match('/^riskenvironmental$/', $riskType) ? 'background-color: #22bf4e !important' : '';?>" class="table-cell">
 												<span></span>
 											</div>
 											<?php for ( $l = 0; $l < count($evaluationMethodSurvey); $l++ ) : ?>
-												<div class="table-cell">
+												<div style="<?php print preg_match('/^riskenvironmental$/', $riskType) ? 'background-color: #22bf4e !important' : '';?>" class="table-cell">
 													<span><?php echo $l; ?></span>
 												</div>
 											<?php endfor; ?>
@@ -922,7 +922,7 @@ $massactionbutton = $form->selectMassAction('', $arrayofmassactions);
 										<?php foreach ($evaluationMethodSurvey as $critere) :
 											$name = strtolower($critere['name']); ?>
 											<div class="table-row">
-												<div class="table-cell"><?php echo $critere['name'] ; ?></div>
+												<div style="<?php print preg_match('/^riskenvironmental$/', $riskType) ? 'background-color: #22bf4e !important' : '';?>" class="table-cell"><?php echo $critere['name'] ; ?></div>
 												<?php foreach ($critere['option']['survey']['request'] as $request) : ?>
 													<div class="table-cell can-select cell-0"
 														 data-type="<?php echo $name ?>"
