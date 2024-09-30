@@ -600,7 +600,7 @@ $massactionbutton = $form->selectMassAction('', $arrayofmassactions);
 			<div class="modal-container wpeo-modal-event">
 				<!-- Modal-Header -->
 				<div class="modal-header">
-					<h2 class="modal-title"><?php preg_match('/^riskenvironmental$/', $riskType) ? print $langs->trans('AddRiskEnvironmental') . ' ' . $refRiskMod->getNextValue($risk) : print $langs->trans('AddRiskTitle') . ' ' . $refRiskMod->getNextValue($risk); ?></h2>
+					<h2 class="modal-title"><?php strpos($riskType, 'riskenvironmental') !== false ? print $langs->trans('AddRiskEnvironmental') . ' ' . $refRiskMod->getNextValue($risk) : print $langs->trans('AddRiskTitle') . ' ' . $refRiskMod->getNextValue($risk); ?></h2>
 					<div class="modal-close"><i class="fas fa-times"></i></div>
 				</div>
 				<!-- Modal-ADD Risk Content-->
@@ -690,13 +690,13 @@ $massactionbutton = $form->selectMassAction('', $arrayofmassactions);
 											<input type="hidden" class="digi-method-evaluation-id" value="<?php echo $risk->id ; ?>" />
 											<textarea style="display: none" name="evaluation_variables" class="tmp_evaluation_variable"><?php echo '{}'; ?></textarea>
 											<span class="title"><i class="fas fa-info-circle"></i> <?php echo $langs->trans('SelectEvaluation') ?><required>*</required></span>
-											<div style="<?php preg_match('/^riskenvironmental$/', $riskType) ? 'background-color: #22bf4e !important' : '';?>" class="wpeo-table evaluation-method table-flex table-<?php echo count($evaluationMethodSurvey) + 1; ?>">
+											<div style="<?php strpos($riskType, 'riskenvironmental') !== false ? 'background-color: #22bf4e !important' : '';?>" class="wpeo-table evaluation-method table-flex table-<?php echo count($evaluationMethodSurvey) + 1; ?>">
 												<div class="table-row table-header">
 													<div class="table-cell">
 														<span></span>
 													</div>
 													<?php for ( $l = 0; $l < count($evaluationMethodSurvey); $l++ ) : ?>
-														<div style="<?php preg_match('/^riskenvironmental$/', $riskType) ? 'background-color: green !important' : '';?>" class="table-cell">
+														<div style="<?php strpos($riskType, 'riskenvironmental') !== false ? 'background-color: green !important' : '';?>" class="table-cell">
 															<span><?php echo $l; ?></span>
 														</div>
 													<?php endfor; ?>
@@ -803,7 +803,7 @@ $massactionbutton = $form->selectMassAction('', $arrayofmassactions);
 		<div class="modal-container wpeo-modal-event">
 			<!-- Modal-Header -->
 			<div class="modal-header">
-				<h2 class="modal-title"><?php preg_match('/^riskenvironmental$/', $riskType) ? print $langs->trans('AddRiskEnvironmental') . ' ' . $refRiskMod->getNextValue($risk) : print $langs->trans('AddRiskTitle') . ' ' . $refRiskMod->getNextValue($risk);   ?></h2>
+				<h2 class="modal-title"><?php strpos($riskType, 'riskenvironmental') !== false ? print $langs->trans('AddRiskEnvironmental') . ' ' . $refRiskMod->getNextValue($risk) : print $langs->trans('AddRiskTitle') . ' ' . $refRiskMod->getNextValue($risk);   ?></h2>
 				<div class="modal-close"><i class="fas fa-times"></i></div>
 			</div>
 			<!-- Modal-ADD Risk Content-->
