@@ -597,7 +597,7 @@ class Risk extends SaturneObject
 			$records = array();
 			while ($i < $num) {
 				$obj = $this->db->fetch_object($resql);
-				$records[$obj->fk_risk][$obj->rowid] = $tasksList[$obj->fk_object];
+				$records[$obj->fk_risk][$obj->rowid] = $tasksList[$obj->fk_object] ?? null;
 				$i++;
 			}
 			$this->db->free($resql);
@@ -621,10 +621,16 @@ class Risk extends SaturneObject
     {
         $dangerCategories = $this->getDangerCategories();
 
-        $getRisksByCotation                       = $this->getRisksByCotation();
-        $getRisksByDangerCategoriesAndCriticality = $this->getRisksByDangerCategoriesAndCriticality($dangerCategories);
-        $getRisksByDangerCategories               = $this->getRisksByDangerCategories($dangerCategories);
-        $getRiskListsByDangerCategories           = $this->getRiskListsByDangerCategories($dangerCategories);
+        $digiriskElement = new DigiriskElement($this->db);
+
+        $filter = $digiriskElement->getTrashExclusionSqlFilter();
+
+        $riskByDangerCategoriesAndRiskAssessments = $this->getRiskByDangerCategoriesAndRiskAssessments($dangerCategories, $filter, 'risk');
+
+        $getRisksByCotation                       = $this->getRisksByCotation($filter);
+        $getRisksByDangerCategoriesAndCriticality = $this->getRisksByDangerCategoriesAndCriticality($dangerCategories, $riskByDangerCategoriesAndRiskAssessments);
+        $getRisksByDangerCategories               = $this->getRisksByDangerCategories($dangerCategories, $riskByDangerCategoriesAndRiskAssessments);
+        $getRiskListsByDangerCategories           = $this->getRiskListsByDangerCategories($dangerCategories, $riskByDangerCategoriesAndRiskAssessments, $filter, 'risk');
 
         $array['graphs'] = [$getRisksByCotation, $getRisksByDangerCategoriesAndCriticality, $getRisksByDangerCategories];
         $array['lists']  = [$getRiskListsByDangerCategories];
@@ -635,10 +641,11 @@ class Risk extends SaturneObject
     /**
      * Get risks by cotation
      *
+     * @param  string $filter SQL Filter
      * @return array
      * @throws Exception
      */
-    public function getRisksByCotation(): array
+    public function getRisksByCotation(string $filter = ''): array
     {
         global $conf, $langs;
 
@@ -660,21 +667,7 @@ class Risk extends SaturneObject
         $join  = ' LEFT JOIN ' . MAIN_DB_PREFIX . $this->table_element . ' as r ON r.rowid = t.fk_risk';
         $join .= ' LEFT JOIN ' . MAIN_DB_PREFIX . $digiriskElement->table_element . ' as d ON d.rowid = r.fk_element';
 
-        $filter                = '';
-        $digiriskElementTrashs = $digiriskElement->getMultiEntityTrashList();
-        if (is_array($digiriskElementTrashs) && !empty($digiriskElementTrashs)) {
-            $digiriskElementSqlFilter = '(';
-            foreach (array_keys($digiriskElementTrashs) as $digiriskElementTrash) {
-                $digiriskElementSqlFilter .= $digiriskElementTrash . ', ';
-            }
-            if (preg_match('/, /', $digiriskElementSqlFilter)) {
-                $digiriskElementSqlFilter = rtrim($digiriskElementSqlFilter, ', ');
-            }
-            $digiriskElementSqlFilter .= ')';
-            $filter = ' AND r.fk_element NOT IN ' . $digiriskElementSqlFilter;
-        }
-
-        $riskAssessments = saturne_fetch_all_object_type('RiskAssessment', '', '', 0, 0, ['customsql' => 't.status = ' . RiskAssessment::STATUS_VALIDATED . $filter], 'AND', false, true, false, $join);
+        $riskAssessments = saturne_fetch_all_object_type('RiskAssessment', '', '', 0, 0, ['customsql' => 't.status = ' . RiskAssessment::STATUS_VALIDATED . ' AND r.fk_element NOT IN ' . $filter], 'AND', false, true, false, $join);
         $array['data']   = $riskAssessment->getRiskAssessmentCategoriesNumber($riskAssessments);
 
         return $array;
@@ -683,17 +676,13 @@ class Risk extends SaturneObject
     /**
      * Get risks by danger categories and criticality
      *
-     * @param array  $dangerCategories Danger categories datas
-     * @param string $type             Risk type (risk, riskenvironmental or ...)
-     *
+     * @param  array $dangerCategories                         Danger categories datas
+     * @param  array $riskByDangerCategoriesAndRiskAssessments Risk by danger categories and risk assessments
      * @return array
-     * @throws Exception
      */
-    public function getRisksByDangerCategoriesAndCriticality(array $dangerCategories, string $type = 'risk'): array
+    public function getRisksByDangerCategoriesAndCriticality(array $dangerCategories, array $riskByDangerCategoriesAndRiskAssessments): array
     {
-        global $conf, $langs;
-
-        $digiriskElement = new DigiriskElement($this->db);
+        global $langs;
 
         // Graph Title parameters
         $array['title'] = $langs->transnoentities('RisksRepartitionByDangerCategoriesAndCriticality');
@@ -708,31 +697,10 @@ class Risk extends SaturneObject
         $array['moreCSS']    = 'grid-2';
         $array['labels']     = $this->cotations;
 
-        $join  = ' LEFT JOIN ' . MAIN_DB_PREFIX . $this->table_element . ' as r ON r.rowid = t.fk_risk';
-        $join .= ' LEFT JOIN ' . MAIN_DB_PREFIX . $digiriskElement->table_element . ' as d ON d.rowid = r.fk_element';
-
-        $filter                   = '';
-        $digiriskElementSqlFilter = '';
-        $digiriskElementTrashs    = $digiriskElement->getMultiEntityTrashList();
-        if (is_array($digiriskElementTrashs) && !empty($digiriskElementTrashs)) {
-            $digiriskElementSqlFilter = '(';
-            foreach (array_keys($digiriskElementTrashs) as $digiriskElementTrash) {
-                $digiriskElementSqlFilter .= $digiriskElementTrash . ', ';
-            }
-            if (preg_match('/, /', $digiriskElementSqlFilter)) {
-                $digiriskElementSqlFilter = rtrim($digiriskElementSqlFilter, ', ');
-            }
-            $digiriskElementSqlFilter .= ')';
-            $filter = ' AND r.fk_element NOT IN ' . $digiriskElementSqlFilter;
-        }
-
         foreach ($dangerCategories as $dangerCategory) {
             $array['data'][$dangerCategory['position']][0] = $dangerCategory['name'];
-
-            $risks = saturne_fetch_all_object_type('Risk', '', '', 0, 0, ['customsql' => 't.status = ' . self::STATUS_VALIDATED . ' AND t.entity = ' . $conf->entity . (GETPOSTISSET('id') ? ' AND t.fk_element = ' . GETPOST('id') : '') . ' AND t.type = "' . $type . '" AND t.category = ' . $dangerCategory['position'] . ' AND t.fk_element NOT IN ' . $digiriskElementSqlFilter], 'AND', false, true, false, ' LEFT JOIN ' . MAIN_DB_PREFIX . $digiriskElement->table_element . ' as d ON d.rowid = t.fk_element');
             for ($i = 1; $i <= 4; $i++) {
-                $riskAssessments = saturne_fetch_all_object_type('RiskAssessment', '', '', 0, 0, ['customsql' => 't.status = ' . RiskAssessment::STATUS_VALIDATED . ' AND r.entity = ' . $conf->entity . (GETPOSTISSET('id') ? ' AND r.fk_element = ' . GETPOST('id') : '') . ' AND r.type = "' . $type . '" AND r.category = ' . $dangerCategory['position'] . ' AND t.cotation >= ' . $this->cotations[$i]['start'] . ' AND t.cotation <= ' . $this->cotations[$i]['end'] . $filter], 'AND', false, true, false, $join);
-                $array['data'][$dangerCategory['position']]['y_combined_' . $array['labels'][$i]['label']] = ((is_array($risks) && !empty($risks) && is_array($riskAssessments) && !empty($riskAssessments)) ? count($riskAssessments) / count($risks) : 0);
+                $array['data'][$dangerCategory['position']]['y_combined_' . $array['labels'][$i]['label']] = !empty($riskByDangerCategoriesAndRiskAssessments[$dangerCategory['name']]['risk']) ? $riskByDangerCategoriesAndRiskAssessments[$dangerCategory['name']]['riskAssessments'][$i] / $riskByDangerCategoriesAndRiskAssessments[$dangerCategory['name']]['risk'] : 0;
             }
         }
 
@@ -742,17 +710,15 @@ class Risk extends SaturneObject
     /**
      * Get risks by danger categories
      *
-     * @param array  $dangerCategories Danger categories datas
-     * @param string $type             Risk type (risk, riskenvironmental or ...)
-     *
+     * @param array  $dangerCategories                         Danger categories datas
+     * @param array  $riskByDangerCategoriesAndRiskAssessments Risk by danger categories and risk assessments
+ *
      * @return array
      * @throws Exception
      */
-    public function getRisksByDangerCategories(array $dangerCategories, string $type = 'risk'): array
+    public function getRisksByDangerCategories(array $dangerCategories, array $riskByDangerCategoriesAndRiskAssessments): array
     {
-        global $conf, $langs;
-
-        $digiriskElement = new DigiriskElement($this->db);
+        global $langs;
 
         // Graph Title parameters
         $array['title'] = $langs->transnoentities('RisksRepartitionByDangerCategories');
@@ -773,27 +739,9 @@ class Risk extends SaturneObject
             ]
         ];
 
-        $join = ' LEFT JOIN ' . MAIN_DB_PREFIX . $digiriskElement->table_element . ' as d ON d.rowid = t.fk_element';
-
-        $filter                = '';
-        $digiriskElementTrashs = $digiriskElement->getMultiEntityTrashList();
-        if (is_array($digiriskElementTrashs) && !empty($digiriskElementTrashs)) {
-            $digiriskElementSqlFilter = '(';
-            foreach (array_keys($digiriskElementTrashs) as $digiriskElementTrash) {
-                $digiriskElementSqlFilter .= $digiriskElementTrash . ', ';
-            }
-            if (preg_match('/, /', $digiriskElementSqlFilter)) {
-                $digiriskElementSqlFilter = rtrim($digiriskElementSqlFilter, ', ');
-            }
-            $digiriskElementSqlFilter .= ')';
-            $filter = ' AND t.fk_element NOT IN ' . $digiriskElementSqlFilter;
-        }
-
         foreach ($dangerCategories as $dangerCategory) {
-            $risks = saturne_fetch_all_object_type('Risk', '', '', 0, 0, ['customsql' => 't.status = ' . self::STATUS_VALIDATED . ' AND t.entity = ' . $conf->entity . (GETPOSTISSET('id') ? ' AND t.fk_element = ' . GETPOST('id') : '') . ' AND t.type = "' . $type . '" AND t.category = ' . $dangerCategory['position'] . $filter], 'AND', false, true, false, $join);
-
             $array['data'][$dangerCategory['position']][] = $dangerCategory['name'];
-            $array['data'][$dangerCategory['position']][] = (is_array($risks) && !empty($risks) ? count($risks) : 0);
+            $array['data'][$dangerCategory['position']][] = $riskByDangerCategoriesAndRiskAssessments[$dangerCategory['name']]['risk'];
         }
 
         return $array;
@@ -802,14 +750,17 @@ class Risk extends SaturneObject
     /**
      * Get list of risks by danger categories
      *
-     * @param array  $dangerCategories Danger categories datas
-     * @param string $type             Risk type (risk, riskenvironmental or ...)
+     * @param array  $dangerCategories                         Danger categories datas
+     * @param array  $riskByDangerCategoriesAndRiskAssessments Risk by danger categories and risk assessments
+     * @param string $filter                                   SQL Filter
+     * @param string $type                                     Risk type (risk, riskenvironmental or ...)
      *
      * @return array
      * @throws Exception
      */
-    public function getRiskListsByDangerCategories(array $dangerCategories, string $type = 'risk') : array
+    public function getRiskListsByDangerCategories(array $dangerCategories, array $riskByDangerCategoriesAndRiskAssessments, string $filter = '', string $type = 'risk') : array
     {
+        //$riskByDangerCategoriesAndRiskAssessments
         global $conf, $langs;
 
         $digiriskElement = new DigiriskElement($this->db);
@@ -822,25 +773,7 @@ class Risk extends SaturneObject
         $array['width'] = '100%';
         $array['type']  = 'list';
 
-        $join  = ' LEFT JOIN ' . MAIN_DB_PREFIX . $this->table_element . ' as r ON r.rowid = t.fk_risk';
-        $join .= ' LEFT JOIN ' . MAIN_DB_PREFIX . $digiriskElement->table_element . ' as d ON d.rowid = r.fk_element';
-
-        $filter                   = '';
-        $digiriskElementSqlFilter = '';
-        $digiriskElementTrashs    = $digiriskElement->getMultiEntityTrashList();
-        if (is_array($digiriskElementTrashs) && !empty($digiriskElementTrashs)) {
-            $digiriskElementSqlFilter = '(';
-            foreach (array_keys($digiriskElementTrashs) as $digiriskElementTrash) {
-                $digiriskElementSqlFilter .= $digiriskElementTrash . ', ';
-            }
-            if (preg_match('/, /', $digiriskElementSqlFilter)) {
-                $digiriskElementSqlFilter = rtrim($digiriskElementSqlFilter, ', ');
-            }
-            $digiriskElementSqlFilter .= ')';
-            $filter = ' AND r.fk_element NOT IN ' . $digiriskElementSqlFilter;
-        }
-
-        $totalRisks = saturne_fetch_all_object_type('Risk', '', '', 0, 0, ['customsql' => 't.status = ' . self::STATUS_VALIDATED . ' AND t.entity = ' . $conf->entity . (GETPOSTISSET('id') ? ' AND t.fk_element = ' . GETPOST('id') : '') . ' AND t.type = "' . $type . '"' . ' AND t.fk_element NOT IN ' . $digiriskElementSqlFilter], 'AND', false, true, false, ' LEFT JOIN ' . MAIN_DB_PREFIX . $digiriskElement->table_element . ' as d ON d.rowid = t.fk_element');
+        $totalRisks = saturne_fetch_all_object_type('Risk', '', '', 0, 0, ['customsql' => 't.status = ' . self::STATUS_VALIDATED . ' AND t.entity = ' . $conf->entity . (GETPOSTISSET('id') ? ' AND t.fk_element = ' . GETPOST('id') : '') . ' AND t.type = "' . $type . '"' . ' AND t.fk_element NOT IN ' . $filter], 'AND', false, true, false, ' LEFT JOIN ' . MAIN_DB_PREFIX . $digiriskElement->table_element . ' as d ON d.rowid = t.fk_element');
 
         $array['labels']['Ref']           = $langs->transnoentities('DangerCategories');
         $array['labels']['numberOfRisks'] = $langs->transnoentities('NumberOfRisks') . ' : ' . '<span class="badge badge-info">' . (is_array($totalRisks) && !empty($totalRisks) ? count($totalRisks) : 0) . '</span>';
@@ -851,19 +784,15 @@ class Risk extends SaturneObject
             foreach ($dangerCategories as $dangerCategory) {
                 $arrayRiskLists[$dangerCategory['position']]['Ref']['value'] = $dangerCategory['name'];
 
-                $risks = saturne_fetch_all_object_type('Risk', '', '', 0, 0, ['customsql' => 't.status = ' . self::STATUS_VALIDATED . ' AND t.entity = ' . $conf->entity . (GETPOSTISSET('id') ? ' AND t.fk_element = ' . GETPOST('id') : '') . ' AND t.type = "' . $type . '" AND t.category = ' . $dangerCategory['position'] . ' AND t.fk_element NOT IN ' . $digiriskElementSqlFilter], 'AND', false, true, false, ' LEFT JOIN ' . MAIN_DB_PREFIX . $digiriskElement->table_element . ' as d ON d.rowid = t.fk_element');
 
-                $arrayRiskLists[$dangerCategory['position']]['numberOfRisks']['value']    = is_array($risks) && !empty($risks) ? count($risks) : 0;
+                $arrayRiskLists[$dangerCategory['position']]['numberOfRisks']['value']    = $riskByDangerCategoriesAndRiskAssessments[$dangerCategory['name']]['risk'];
                 $arrayRiskLists[$dangerCategory['position']]['numberOfRisks']['morecss']  = 'risk-evaluation-cotation';
                 $arrayRiskLists[$dangerCategory['position']]['numberOfRisks']['moreAttr'] = 'style="line-height: 0; border-radius: 0; background-color: #A1467EAA; color: #FFF;"';
-                $arrayRiskLists[$dangerCategory['position']]['percentage']['value']       = is_array($risks) && !empty($risks) ? price2num((count($risks) / count($totalRisks)) * 100, 2) . ' %' : 0;
+                $arrayRiskLists[$dangerCategory['position']]['percentage']['value']       = price2num(($riskByDangerCategoriesAndRiskAssessments[$dangerCategory['name']]['risk'] / count($totalRisks)) * 100, 2) . ' %';
 
                 for ($i = 1; $i <= 4; $i++) {
                     $array['labels'][$i] = $this->cotations[$i]['label'];
-
-                    $riskAssessments = saturne_fetch_all_object_type('RiskAssessment', '', '', 0, 0, ['customsql' => 't.status = ' . RiskAssessment::STATUS_VALIDATED . ' AND r.entity = ' . $conf->entity . (GETPOSTISSET('id') ? ' AND r.fk_element = ' . GETPOST('id') : '') . ' AND r.type = "' . $type . '" AND r.category = ' . $dangerCategory['position'] . ' AND t.cotation >= ' . $this->cotations[$i]['start'] . ' AND t.cotation <= ' . $this->cotations[$i]['end'] . $filter], 'AND', false, true, false, $join);
-
-                    $arrayRiskLists[$dangerCategory['position']][$i]['value']    = is_array($riskAssessments) && !empty($riskAssessments) ? count($riskAssessments) : 0;
+                    $arrayRiskLists[$dangerCategory['position']][$i]['value']    = $riskByDangerCategoriesAndRiskAssessments[$dangerCategory['name']]['riskAssessments'][$i];
                     $arrayRiskLists[$dangerCategory['position']][$i]['morecss']  = 'risk-evaluation-cotation';
                     $arrayRiskLists[$dangerCategory['position']][$i]['moreAttr'] = 'data-scale = ' . $i . ' style="line-height: 0; border-radius: 0;"';
                 }
@@ -872,6 +801,36 @@ class Risk extends SaturneObject
 
         $array['data'] = $arrayRiskLists;
 
+        return $array;
+    }
+
+    /**
+     * Get risk by danger categories and risk assessments
+     *
+     * @param array  $dangerCategories Danger categories datas
+     * @param string $filter          SQL Filter
+     * @param string $type            Risk type (risk, riskenvironmental or ...)
+     *
+     * @return array
+     * @throws Exception
+     */
+    public function getRiskByDangerCategoriesAndRiskAssessments(array $dangerCategories, string $filter = '', string $type = 'risk') : array
+    {
+        global $conf;
+
+        $array           = [];
+        $digiriskElement = new DigiriskElement($this->db);
+
+        foreach ($dangerCategories as $dangerCategory) {
+            $risks = saturne_fetch_all_object_type('Risk', '', '', 0, 0, ['customsql' => 't.status = ' . self::STATUS_VALIDATED . ' AND t.entity = ' . $conf->entity . (GETPOSTISSET('id') ? ' AND t.fk_element = ' . GETPOST('id') : '') . ' AND t.type = "' . $type . '" AND t.category = ' . $dangerCategory['position'] . ' AND t.fk_element NOT IN ' . $filter], 'AND', false, true, false, ' LEFT JOIN ' . MAIN_DB_PREFIX . $digiriskElement->table_element . ' as d ON d.rowid = t.fk_element');
+            $array[$dangerCategory['name']]['risk'] = !empty($risks) && is_array($risks) ? count($risks) : 0;
+            for ($i = 1; $i <= 4; $i++) {
+                $join  = ' LEFT JOIN ' . MAIN_DB_PREFIX . $this->table_element . ' as r ON r.rowid = t.fk_risk';
+                $join .= ' LEFT JOIN ' . MAIN_DB_PREFIX . $digiriskElement->table_element . ' as d ON d.rowid = r.fk_element';
+                $riskAssessments = saturne_fetch_all_object_type('RiskAssessment', '', '', 0, 0, ['customsql' => 't.status = ' . RiskAssessment::STATUS_VALIDATED . ' AND r.entity = ' . $conf->entity . (GETPOSTISSET('id') ? ' AND r.fk_element = ' . GETPOST('id') : '') . ' AND r.type = "' . $type . '" AND r.category = ' . $dangerCategory['position'] . ' AND t.cotation >= ' . $this->cotations[$i]['start'] . ' AND t.cotation <= ' . $this->cotations[$i]['end'] . ' AND r.fk_element NOT IN ' . $filter], 'AND', false, true, false, $join);
+                $array[$dangerCategory['name']]['riskAssessments'][$i] = !empty($riskAssessments) && is_array($riskAssessments) ? count($riskAssessments) : 0;
+            }
+        }
         return $array;
     }
 
