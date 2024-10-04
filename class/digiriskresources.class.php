@@ -329,9 +329,11 @@ class DigiriskResources extends SaturneObject
 
         $array['widgets'] = [
             'society' => [
+                'title'      => $langs->transnoentities('Society'),
+                'picto'      => 'fas fa-building',
+                'pictoColor' => '#FB4B54',
                 'label'      => [$langs->transnoentities('SiretNumber') ?? ''],
                 'content'    => [$arraySiretNumber['siretnumber'] ?? 0],
-                'picto'      => 'fas fa-building',
                 'widgetName' => $langs->transnoentities('Society')
             ]
         ];
