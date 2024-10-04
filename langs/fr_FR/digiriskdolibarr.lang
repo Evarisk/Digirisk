@@ -729,10 +729,10 @@ GenerateZipArchiveWithDigiriskElementDocumentsDescription = Génération automat
 RiskAssessmentDocumentDescription                         = Plan d'action Document Unique
 
 # Boxes - Widget
-LastGenerateDate             = DU généré le
-NextGenerateDate             = Prochain DU le
-NbDaysBeforeNextGenerateDate = Nombre de jours avant la prochaine date de génération du DU
-NbDaysAfterNextGenerateDate  = Nombre de jours de retard pour la génération du DU
+NextGenerateDate  = Prochain génération
+LastGenerateDate  = Dernière génération
+DelayGenerateDate = Retard dans la génération
+NoDelay           = Pas de retard
 
 # Email - Mail
 RiskAssessmentDocumentLabel   = Récapitulatif du document unique
