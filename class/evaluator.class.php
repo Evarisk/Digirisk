@@ -170,29 +170,28 @@ class Evaluator extends SaturneObject
 		return $array;
 	}
 
-	/**
-	 * Get number employees.
-	 *
-	 * @return array
-	 * @throws Exception
-	 */
-	public function getNbEmployees() {
-		global $conf;
+    /**
+     * Get number employees
+     *
+     * @return array
+     * @throws Exception
+     */
+    public function getNbEmployees(): array
+    {
+        global $user;
 
-		// Number employees
-		if ($conf->global->DIGIRISKDOLIBARR_NB_EMPLOYEES > 0 && $conf->global->DIGIRISKDOLIBARR_MANUAL_INPUT_NB_EMPLOYEES) {
-			$array['nbemployees'] = $conf->global->DIGIRISKDOLIBARR_NB_EMPLOYEES;
-		} else {
-			$user = new User($this->db);
-			$allusers = $user->get_full_tree(0, 'u.employee = 1');
-			if (!empty($allusers) && is_array($allusers)) {
-				$array['nbemployees'] = count($allusers);
-			} else {
-				$array['nbemployees'] = 'N/A';
-			}
-		}
-		return $array;
-	}
+        if (getDolGlobalInt('DIGIRISKDOLIBARR_NB_EMPLOYEES') > 0 && getDolGlobalInt('DIGIRISKDOLIBARR_MANUAL_INPUT_NB_EMPLOYEES')) {
+            $array['nbemployees'] = getDolGlobalInt('DIGIRISKDOLIBARR_NB_EMPLOYEES');
+        } else {
+            $users = $user->get_full_tree(0, 'u.employee = 1');
+            if (!empty($users) && is_array($users)) {
+                $array['nbemployees'] = count($users);
+            } else {
+                $array['nbemployees'] = 0;
+            }
+        }
+        return $array;
+    }
 
     /**
      * Write information of trigger description

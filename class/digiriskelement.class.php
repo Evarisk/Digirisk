@@ -368,6 +368,30 @@ class DigiriskElement extends SaturneObject
     }
 
     /**
+     * Return SQL filter for trash exclusion
+     *
+     * @return string
+     * @throws Exception
+     */
+    public function getTrashExclusionSqlFilter(): string
+    {
+        $filter                = '';
+        $digiriskElementTrashs = $this->getMultiEntityTrashList();
+        if (!empty($digiriskElementTrashs) && is_array($digiriskElementTrashs)) {
+            $filter = '(';
+            foreach (array_keys($digiriskElementTrashs) as $digiriskElementTrash) {
+                $filter .= $digiriskElementTrash . ', ';
+            }
+            if (preg_match('/, /', $filter)) {
+                $filter = rtrim($filter, ', ');
+            }
+            $filter .= ')';
+        }
+
+        return $filter;
+    }
+
+    /**
      *  Return list of parent ids for an element
      *
      * 	@return    array  Array with ids
@@ -400,7 +424,7 @@ class DigiriskElement extends SaturneObject
             $this->ismultientitymanaged = 0;
         }
 
-        $digiriskElements = $this->fetchAll('',  '',  0,  0, ['customsql' => 'status = ' . self::STATUS_VALIDATED . $moreParams['filter']]);
+        $digiriskElements = $this->fetchAll('',  '',  0,  0, ['customsql' => 'status = ' . self::STATUS_VALIDATED . ($moreParams['filter'] ?? '')]);
         $trashList        = $this->getMultiEntityTrashList();
         if (is_array($trashList) && !empty($trashList)) {
             foreach($trashList as $trashElementID) {
