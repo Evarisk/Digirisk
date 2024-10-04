@@ -632,7 +632,7 @@ class Risk extends SaturneObject
         $getRisksByDangerCategories               = $this->getRisksByDangerCategories($dangerCategories, $riskByDangerCategoriesAndRiskAssessments);
         $getRiskListsByDangerCategories           = $this->getRiskListsByDangerCategories($dangerCategories, $riskByDangerCategoriesAndRiskAssessments, $filter, 'risk');
 
-        $array['graphs'] = [$getRisksByCotation, $getRisksByDangerCategoriesAndCriticality, $getRisksByDangerCategories];
+        $array['graphs'] = [$getRisksByDangerCategoriesAndCriticality, $getRisksByDangerCategories, $getRisksByCotation];
         $array['lists']  = [$getRiskListsByDangerCategories];
 
         return $array;
