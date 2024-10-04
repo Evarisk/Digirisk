@@ -442,12 +442,17 @@ class Accident extends SaturneObject
 
         $array['widgets'] = [
             'accident' => [
+                'title'      => $langs->transnoentities('Accidents'),
+                'picto'      => 'fas fa-user-injured',
+                'pictoColor' => '#F39B1F',
                 'label'      => [$langs->transnoentities('DayWithoutAccident') ?? '', $langs->transnoentities('WorkStopDays') ?? '', $langs->transnoentities('NbAccidentsByEmployees') ?? '', $langs->transnoentities('NbPresquAccidents') ?? '', $langs->transnoentities('NbAccidentInvestigations') ?? ''],
                 'content'    => [$arrayNbDaysWithoutAccident['daywithoutaccident'] ?? 0, $arrayNbWorkstopDays['nbworkstopdays'] ?? 0, $arrayNbAccidentsByEmployees['nbaccidentsbyemployees'] ?? 0, $arrayNbPresquAccidents['nbpresquaccidents'] ?? 0, $arrayNbAccidentInvestigations['nbaccidentinvestigations'] ?? 0],
-                'picto'      => 'fas fa-user-injured',
                 'widgetName' => $langs->transnoentities('Accident')
             ],
             'accidentrateindicator' => [
+                'title'      => $langs->transnoentities('Frequency'),
+                'picto'      => 'fas fa-chart-bar',
+                'pictoColor' => '#9735FF',
                 'label'      => [$langs->transnoentities('FrequencyIndex') ?? '', $langs->transnoentities('FrequencyRate') ?? '', $langs->transnoentities('GravityRate') ?? ''],
                 'content'    => [$arrayFrequencyIndex['frequencyindex'] ?? 0, $arrayFrequencyRate['frequencyrate'] ?? 0, $arrayGravityRate['gravityrate'] ?? 0],
                 'tooltip'    => [
@@ -455,7 +460,6 @@ class Accident extends SaturneObject
                     (($conf->global->DIGIRISKDOLIBARR_NB_WORKED_HOURS > 0 && $conf->global->DIGIRISKDOLIBARR_MANUAL_INPUT_NB_WORKED_HOURS) ? $langs->transnoentities('FrequencyRateTooltip') . '<br>' . $langs->transnoentities('NbWorkedHoursTooltip') : $langs->transnoentities('FrequencyRateTooltip')),
                     (($conf->global->DIGIRISKDOLIBARR_NB_WORKED_HOURS > 0 && $conf->global->DIGIRISKDOLIBARR_MANUAL_INPUT_NB_WORKED_HOURS) ? $langs->transnoentities('GravityRateTooltip') . '<br>' . $langs->transnoentities('NbWorkedHoursTooltip') : $langs->transnoentities('GravityRateTooltip'))
                 ],
-                'picto'      => 'fas fa-chart-bar',
                 'widgetName' => $langs->transnoentities('AccidentRateIndicator')
             ]
         ];

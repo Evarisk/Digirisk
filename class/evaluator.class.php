@@ -142,10 +142,12 @@ class Evaluator extends SaturneObject
 
         $array['widgets'] = [
             'evaluator' => [
+                'title'      => $langs->transnoentities('Employees'),
+                'picto'      => 'fas fa-user',
+                'pictoColor' => '#32E592',
                 'label'      => [$langs->transnoentities('NbEmployeesInvolved') ?? '', $langs->transnoentities('NbEmployees') ?? ''],
                 'content'    => [$arrayNbEmployeesInvolved['nbemployeesinvolved'] ?? 0, $arrayNbEmployees['nbemployees'] ?? 0],
                 'tooltip'    => [$langs->transnoentities('NbEmployeesInvolvedTooltip'), (($conf->global->DIGIRISKDOLIBARR_NB_EMPLOYEES > 0 && $conf->global->DIGIRISKDOLIBARR_MANUAL_INPUT_NB_EMPLOYEES) ? $langs->transnoentities('NbEmployeesConfTooltip') : $langs->transnoentities('NbEmployeesTooltip'))],
-                'picto'      => 'fas fa-user-check',
                 'widgetName' => $langs->transnoentities('Evaluator')
             ]
         ];

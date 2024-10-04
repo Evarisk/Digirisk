@@ -128,9 +128,11 @@ class RiskAssessmentDocument extends DigiriskDocuments
 
         $array['widgets'] = [
             'riskassessmentdocument' => [
+                'title'       => $langs->transnoentities('RiskAssessmentDocument'),
+                'picto'       => 'fas fa-book',
+                'pictoColor'  => '#0D8AFF',
                 'label'       => [$langs->transnoentities('LastGenerateDate') ?? '', $langs->transnoentities('NextGenerateDate') ?? '', $langs->transnoentities('NbDaysBeforeNextGenerateDate') ?? '', $langs->transnoentities('NbDaysAfterNextGenerateDate') ?? ''],
                 'content'     => [$arrayLastGenerateDate['lastgeneratedate'] ?? 0, $arrayNextGenerateDate['nextgeneratedate'] ?? 0, $arrayNbDaysBeforeNextGenerateDate['nbdaysbeforenextgeneratedate'] ?? 0, $arrayNbDaysAfterNextGenerateDate['nbdaysafternextgeneratedate'] ?? 0],
-                'picto'       => 'fas fa-info-circle',
                 'moreContent' => [$arrayLastGenerateDate['moreContent'] ?? ''],
                 'widgetName'  => $langs->transnoentities('RiskAssessmentDocument')
             ]
