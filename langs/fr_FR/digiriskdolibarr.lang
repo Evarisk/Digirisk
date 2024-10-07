@@ -1250,6 +1250,12 @@ TaskHideDateInDocumentDescription        = Masquer la date de début et de fin d
 TaskHideBudgetInDocument                 = Masquer le budget
 TaskHideBudgetInDocumentDescription      = Masquer le budget de la tâche dans les documents
 
+#
+# DigiAI - DigiAI
+#
+
+# Data - Donnée
+WelcomeToDigiAI = Bienvenue sur DigiAI
 
 #
 # Ticket - Interface publique ticket
