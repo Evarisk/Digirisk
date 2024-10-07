@@ -1398,7 +1398,7 @@ class modDigiriskdolibarr extends DolibarrModules
 			'prefix'   => '<i class="fas fa-exclamation-triangle pictofixedwidth"></i>',
 			'mainmenu' => 'digiriskdolibarr',
 			'leftmenu' => 'digiriskstandard',
-			'url'      => '/digiriskdolibarr/view/digiriskstandard/digiriskstandard_card.php',
+			'url'      => '/digiriskdolibarr/view/digiriskstandard/digiriskstandard_card.php?type=risk',
 			'langs'    => 'digiriskdolibarr@digiriskdolibarr',	        // Lang file to use (without .lang) by module. File must be in langs/code_CODE/ directory.
 			'position' => 100 + $r,
 			'enabled'  => '$conf->digiriskdolibarr->enabled',  // Define condition to show or hide menu entry. Use '$conf->digiriskdolibarr->enabled' if entry must be visible if module is enabled. Use '$leftmenu==\'system\'' to show if leftmenu system is selected.
@@ -1459,7 +1459,7 @@ class modDigiriskdolibarr extends DolibarrModules
             'prefix'   => '<i class="fas fa-leaf pictofixedwidth"></i>',
             'mainmenu' => 'digiriskdolibarr',
             'leftmenu' => 'digiriskstandard_riskenvironmental',
-            'url'      => '/digiriskdolibarr/view/digiriskstandard/digiriskstandard_card.php',
+            'url'      => '/digiriskdolibarr/view/digiriskstandard/digiriskstandard_card.php?type=riskenvironmental',
             'langs'    => 'digiriskdolibarr@digiriskdolibarr',
             'position' => 100 + $r,
             'enabled'  => '$conf->digiriskdolibarr->enabled',
