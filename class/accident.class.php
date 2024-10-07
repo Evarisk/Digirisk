@@ -804,7 +804,7 @@ class Accident extends SaturneObject
         }
 
         $ret  = parent::getTriggerDescription($object);
-        $ret .= $langs->trans('UserVictim') . ' : ' . $userVictim->firstname . $userVictim->lastname . '<br>';
+        $ret .= $userVictim->id > 0 ? $langs->trans('UserVictim') . ' : ' . $userVictim->firstname . $userVictim->lastname . '<br>' : '';
         $ret .= $langs->trans('UserEmployer') . ' : ' . $userEmployer->firstname . $userEmployer->lastname . '<br>';
         $ret .= $langs->trans('AccidentLocation') . ' : ' . $accidentLocation  . '<br>';
         $ret .= $langs->trans('AccidentType') . ' : ' . ($object->accident_type ? $langs->trans('CommutingAccident') : $langs->trans('WorkAccidentStatement')) . '<br>';

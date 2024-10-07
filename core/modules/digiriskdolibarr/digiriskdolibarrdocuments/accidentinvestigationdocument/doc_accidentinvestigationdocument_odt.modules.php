@@ -215,17 +215,24 @@ class doc_accidentinvestigationdocument_odt extends SaturneDocumentModel
 			$tmpArray['attendants_number'] = '0 ';
 		}
 
-		$tmpArray['victim_lastname']       = dol_strtoupper($victim->lastname);
-		$tmpArray['victim_firstname']      = ucfirst($victim->firstname);
 		$tmpArray['seniority_in_position'] = $object->seniority_in_position;
 
-		if ($victim->dateemployment > 0) {
-			$daysEmployee                       = dol_time_plus_duree($now, -$victim->dateemployment, 's');
-			$daysEmployee                       = round($daysEmployee / 60 / 60 / 24);
-			$tmpArray['victim_date_employment'] = dol_print_date($victim->dateemployment, 'day', 'tzuser') . ' - ' . $daysEmployee . ' ' . ($daysEmployee <= 1 ? $outputLangs->trans('Day') : $outputLangs->trans('Days'));
-		} else {
-			$tmpArray['victim_date_employment'] = '';
-		}
+        if ($victim->id > 0) {
+            $tmpArray['victim_lastname']  = dol_strtoupper($victim->lastname);
+            $tmpArray['victim_firstname'] = ucfirst($victim->firstname);
+            if ($victim->dateemployment > 0) {
+                $daysEmployee                       = dol_time_plus_duree($now, -$victim->dateemployment, 's');
+                $daysEmployee                       = round($daysEmployee / 60 / 60 / 24);
+                $tmpArray['victim_date_employment'] = dol_print_date($victim->dateemployment, 'day', 'tzuser') . ' - ' . $daysEmployee . ' ' . ($daysEmployee <= 1 ? $outputLangs->trans('Day') : $outputLangs->trans('Days'));
+            } else {
+                $tmpArray['victim_date_employment'] = '';
+            }
+        } else {
+            $tmpArray['victim_lastname']        = '';
+            $tmpArray['victim_firstname']       = '';
+            $tmpArray['victim_date_employment'] = '';
+        }
+
 		$tmpArray['accident_date'] = dol_print_date($accident->accident_date, 'day');
 		$tmpArray['accident_hour'] = dol_print_date($accident->accident_date, 'hour');
 		$tmpArray['accident_day']  = dol_print_date($accident->accident_date, '%A');
