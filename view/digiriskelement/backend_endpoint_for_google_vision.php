@@ -1,4 +1,12 @@
 <?php
+if (file_exists('../digiriskdolibarr.main.inc.php')) {
+    require_once __DIR__ . '/../digiriskdolibarr.main.inc.php';
+} elseif (file_exists('../../digiriskdolibarr.main.inc.php')) {
+    require_once __DIR__ . '/../../digiriskdolibarr.main.inc.php';
+} else {
+    die('Include of digiriskdolibarr main fails');
+}
+
 global $conf;
 
 // Récupération de l'image
@@ -8,6 +16,10 @@ if (isset($_FILES['image_file'])) {
 
     // Appel à l'API Google Vision
     $visionApiKey = $conf->global->DIGIRISKDOLIBARR_GOOGLE_VISION_API_KEY;
+    echo '<pre>';
+    print_r($visionApiKey);
+    echo '</pre>';
+    exit;
     $visionUrl = 'https://vision.googleapis.com/v1/images:annotate?key=' . $visionApiKey;
 
     $visionRequest = [
