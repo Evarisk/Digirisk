@@ -508,7 +508,7 @@ while ($i < ($limit ? min($num, $limit) : $num)) {
 						$arrayAccident[] = $accident->accident_location;
 						break;
 				}
-                $arrayAccident[] = $userVictim->id;
+                $arrayAccident[] = $userVictim->id > 0 ? $userVictim->id : '';
 
                 $accidentLesions = $accidentLesion->fetchAll('', '', 0, 0, ['customsql' => 't.fk_accident = ' . $accident->id]);
                 $arrayAccident[] = (is_array($accidentLesions) && !empty($accidentLesions)) ? count($accidentLesions) : '';
