@@ -996,11 +996,11 @@ $massactionbutton = $form->selectMassAction('', $arrayofmassactions);
 						<div class="riskassessment-task-date wpeo-gridlayout grid-2">
 							<div>
 								<span class="title"><?php echo $langs->trans('DateStart'); ?></span>
-								<?php print $form->selectDate(dol_now('tzuser'), 'RiskassessmentTaskDateStartModalRisk', 1, 1, 0, '', 1, 1); ?>
+                                <?php print '<input type="datetime-local" id="RiskassessmentTaskDateStartModalRisk" name="RiskassessmentTaskDateStartModalRisk" value="' . dol_print_date(dol_now('tzuser'), '%Y-%m-%dT%H:%M:%S') . '">'; ?>
 							</div>
 							<div>
 								<span class="title"><?php echo $langs->trans('Deadline'); ?></span>
-								<?php print $form->selectDate(-1,'RiskassessmentTaskDateEndModalRisk', 1, 1, 0, '', 1, 1); ?>
+                                <?php print '<input type="datetime-local" id="RiskassessmentTaskDateStartModalRisk" name="RiskassessmentTaskDateEndModalRisk">'; ?>
 							</div>
 						</div>
 						<span class="title"><?php echo $langs->trans('Budget'); ?></span>

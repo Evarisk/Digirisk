@@ -194,11 +194,11 @@ if (!empty($related_tasks) && $related_tasks > 0) {
 								<div class="riskassessment-task-date wpeo-gridlayout grid-2">
 									<div>
 										<span class="title"><?php echo $langs->trans('DateStart'); ?></span>
-										<?php print $form->selectDate(dol_now('tzuser'), 'RiskassessmentTaskDateStart' . $risk->id, 1, 1, 0, '', 1, 1); ?>
+										<?php print '<input type="datetime-local" id="RiskassessmentTaskDateStart' . $risk->id . '" name="RiskassessmentTaskDateStart' . $risk->id . '">'; ?>
 									</div>
 									<div>
 										<span class="title"><?php echo $langs->trans('Deadline'); ?></span>
-										<?php print $form->selectDate(-1,'RiskassessmentTaskDateEnd'. $risk->id, 1, 1, 0, '', 1, 1); ?>
+                                        <?php print '<input type="datetime-local" id="RiskassessmentTaskDateEnd' . $risk->id . '" name="RiskassessmentTaskDateEnd' . $risk->id . '">'; ?>
 									</div>
 								</div>
 								<span class="title"><?php echo $langs->trans('Budget'); ?></span>
@@ -382,11 +382,11 @@ if (!empty($related_tasks) && $related_tasks > 0) {
 								<div class="riskassessment-task-date wpeo-gridlayout grid-3">
 									<div>
 										<span class="title"><?php echo $langs->trans('DateStart'); ?></span>
-										<?php print $form->selectDate($related_task->dateo ?: -1, 'RiskassessmentTaskDateStartEdit'.$related_task->id, 1, 1, 0, '', 1, 1); ?>
+                                        <?php print '<input type="datetime-local" id="RiskassessmentTaskDateStartEdit' . $related_task->id . '" name="RiskassessmentTaskDateStartEdit' . $related_task->id . '" value="' . ($related_task->dateo ? dol_print_date($related_task->dateo, '%Y-%m-%dT%H:%M:%S') : '') . '">'; ?>
 									</div>
 									<div>
 										<span class="title"><?php echo $langs->trans('Deadline'); ?></span>
-										<?php print $form->selectDate($related_task->datee ?: -1,'RiskassessmentTaskDateEndEdit'.$related_task->id, 1, 1, 0, '', 1, 1); ?>
+                                        <?php print '<input type="datetime-local" id="RiskassessmentTaskDateEndEdit' . $related_task->id . '" name="RiskassessmentTaskDateEndEdit' . $related_task->id . '" value="' . ($related_task->datee ? dol_print_date($related_task->datee, '%Y-%m-%dT%H:%M:%S') : '') . '">'; ?>
 									</div>
 									<div class="riskassessment-task-budget">
 										<span class="title"><?php echo $langs->trans('Budget'); ?></span>
