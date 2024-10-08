@@ -9,18 +9,12 @@ if (file_exists('../digiriskdolibarr.main.inc.php')) {
 
 global $conf;
 
-// Récupération de l'image
 if (isset($_FILES['image_file'])) {
     $imagePath = $_FILES['image_file']['tmp_name'];
     $imageData = base64_encode(file_get_contents($imagePath));
 
-    // Appel à l'API Google Vision
     $visionApiKey = $conf->global->DIGIRISKDOLIBARR_GOOGLE_VISION_API_KEY;
-    echo '<pre>';
-    print_r($visionApiKey);
-    echo '</pre>';
-    exit;
-    $visionUrl = 'https://vision.googleapis.com/v1/images:annotate?key=' . $visionApiKey;
+    $visionUrl    = 'https://vision.googleapis.com/v1/images:annotate?key=' . $visionApiKey;
 
     $visionRequest = [
         'requests' => [
@@ -35,7 +29,6 @@ if (isset($_FILES['image_file'])) {
         ]
     ];
 
-    // Requête cURL
     $ch = curl_init($visionUrl);
     curl_setopt($ch, CURLOPT_HTTPHEADER, ['Content-Type: application/json']);
     curl_setopt($ch, CURLOPT_POST, true);

@@ -1256,6 +1256,7 @@ TaskHideBudgetInDocumentDescription      = Masquer le budget de la tâche dans l
 
 # Data - Donnée
 WelcomeToDigiAI = Bienvenue sur DigiAI
+UploadAnImage = Téléverser une image
 
 #
 # Ticket - Interface publique ticket
