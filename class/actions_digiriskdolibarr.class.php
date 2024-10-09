@@ -552,7 +552,7 @@ class ActionsDigiriskdolibarr
 				}
 			}
 		} else if (strpos($parameters['context'], 'ticketcard') !== false) {
-            if ($action == 'builddoc' && preg_match('/\bticketdocument_odt\b/', GETPOST('model'))) {
+            if ($action == 'builddoc' && preg_match('/\/(ticketdocument)\/|\/(digiriskdolibarr)\//', GETPOST('model'))) {
                 require_once __DIR__ . '/digiriskdolibarrdocuments/ticketdocument.class.php';
 
                 $document = new TicketDocument($this->db);
@@ -561,7 +561,7 @@ class ActionsDigiriskdolibarr
                 $permissiontoadd     = $user->rights->ticket->write;
             }
 
-            if ($action == 'remove_file' && preg_match('/\bticketdocument\b/', GETPOST('file'))) {
+            if ($action == 'remove_file' && preg_match('/\/(ticketdocument)\/|\/(digiriskdolibarr)\//', GETPOST('file'))) {
                 $upload_dir         = $conf->digiriskdolibarr->multidir_output[$conf->entity ?? 1];
                 $permissiontodelete = $user->rights->ticket->delete;
             }
