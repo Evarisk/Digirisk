@@ -627,7 +627,8 @@ class Risk extends SaturneObject
 
         $riskByDangerCategoriesAndRiskAssessments = $this->getRiskByDangerCategoriesAndRiskAssessments($dangerCategories, $filter, 'risk');
 
-        $getRisksByCotation                       = $this->getRisksByCotation($filter);
+        $moreParam['filter']                      = $filter;
+        $getRisksByCotation                       = $this->getRisksByCotation($moreParam);
         $getRisksByDangerCategoriesAndCriticality = $this->getRisksByDangerCategoriesAndCriticality($dangerCategories, $riskByDangerCategoriesAndRiskAssessments);
         $getRisksByDangerCategories               = $this->getRisksByDangerCategories($dangerCategories, $riskByDangerCategoriesAndRiskAssessments);
         $getRiskListsByDangerCategories           = $this->getRiskListsByDangerCategories($dangerCategories, $riskByDangerCategoriesAndRiskAssessments, $filter, 'risk');
@@ -667,7 +668,7 @@ class Risk extends SaturneObject
         $join  = ' LEFT JOIN ' . MAIN_DB_PREFIX . $this->table_element . ' as r ON r.rowid = t.fk_risk';
         $join .= ' LEFT JOIN ' . MAIN_DB_PREFIX . $digiriskElement->table_element . ' as d ON d.rowid = r.fk_element';
 
-        $riskAssessments = saturne_fetch_all_object_type('RiskAssessment', '', '', 0, 0, ['customsql' => 't.status = ' . RiskAssessment::STATUS_VALIDATED . ' AND r.fk_element NOT IN ' . $moreParam['filter']], 'AND', false, $moreParam['multiEntityManagement'], false, $join);
+        $riskAssessments = saturne_fetch_all_object_type('RiskAssessment', '', '', 0, 0, ['customsql' => 't.status = ' . RiskAssessment::STATUS_VALIDATED . ' AND r.fk_element NOT IN ' . $moreParam['filter']], 'AND', false, $moreParam['multiEntityManagement'] ?? true, false, $join);
         $array['data']   = $riskAssessment->getRiskAssessmentCategoriesNumber($riskAssessments);
 
         return $array;
