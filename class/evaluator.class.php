@@ -158,12 +158,13 @@ class Evaluator extends SaturneObject
 	/**
 	 * Get number employees involved.
 	 *
-	 * @return array
+     * @param  array    $moreParam More param (Object/user/etc)
+     * @return array
 	 * @throws Exception
 	 */
-	public function getNbEmployeesInvolved() {
+	public function getNbEmployeesInvolved(array $moreParam = []) {
 		// Number employees involved
-		$allevaluators = $this->fetchAll('','', 0, 0, array(), 'AND', 'fk_user');
+		$allevaluators = $this->fetchAll('','', 0, 0, ['customsql' => $moreParam['filter']], 'AND', 'fk_user');
 		if (is_array($allevaluators) && !empty($allevaluators)) {
 			$array['nbemployeesinvolved'] = count($allevaluators);
 		} else {
@@ -175,17 +176,18 @@ class Evaluator extends SaturneObject
     /**
      * Get number employees
      *
+     * @param  array    $moreParam More param (Object/user/etc)
      * @return array
      * @throws Exception
      */
-    public function getNbEmployees(): array
+    public function getNbEmployees(array $moreParam = []): array
     {
         global $user;
 
         if (getDolGlobalInt('DIGIRISKDOLIBARR_NB_EMPLOYEES') > 0 && getDolGlobalInt('DIGIRISKDOLIBARR_MANUAL_INPUT_NB_EMPLOYEES')) {
             $array['nbemployees'] = getDolGlobalInt('DIGIRISKDOLIBARR_NB_EMPLOYEES');
         } else {
-            $users = $user->get_full_tree(0, 'u.employee = 1');
+            $users = $user->get_full_tree(0, 'u.employee = 1' . $moreParam['filter']);
             if (!empty($users) && is_array($users)) {
                 $array['nbemployees'] = count($users);
             } else {
