@@ -661,13 +661,19 @@ class Accident extends SaturneObject
     /**
      * Get number accident investigations
      *
+     * @param  array    $moreParam More param (Object/user/etc)
      * @return array
      * @throws Exception
      */
-    public function getNbAccidentInvestigations(): array
+    public function getNbAccidentInvestigations(array $moreParam = []): array
     {
-        $accidentInvestigation  = new AccidentInvestigation($this->db);
-        $accidentInvestigations = $accidentInvestigation->fetchAll('', '', 0, 0, ['customsql' => ' t.status > ' . AccidentInvestigation::STATUS_DRAFT]);
+        require_once __DIR__ . '/accidentinvestigation.class.php';
+
+        $accidentInvestigation = new AccidentInvestigation($this->db);
+        if (strpos($moreParam['filter'], 't.entity') !== false) {
+            $accidentInvestigation->ismultientitymanaged = 0;
+        }
+        $accidentInvestigations = $accidentInvestigation->fetchAll('', '', 0, 0, ['customsql' => ' t.status > ' . AccidentInvestigation::STATUS_DRAFT . $moreParam['filter']]);
         if (!empty($accidentInvestigations) && is_array($accidentInvestigations)) {
             $array['nbaccidentinvestigations'] = count($accidentInvestigations);
         } else {
