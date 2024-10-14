@@ -348,12 +348,6 @@ if ( ! $error && $action == 'saveEvaluation' && $permissiontoadd) {
 	$entity = ($conf->entity > 1) ? '/' . $conf->entity : '';
 
 	$result = $evaluation->update($user);
-
-	if ($result < 0) {
-		// Update evaluation KO
-		if (!empty($evaluation->errors)) setEventMessages(null, $evaluation->errors, 'errors');
-		else setEventMessages($evaluation->error, null, 'errors');
-	}
 }
 
 if ( ! $error && $action == "deleteEvaluation" && $permissiontodelete) {
