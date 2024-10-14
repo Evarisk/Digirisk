@@ -349,14 +349,9 @@ if ( ! $error && $action == 'saveEvaluation' && $permissiontoadd) {
 
 	$result = $evaluation->update($user);
 
-	if ($result > 0) {
-		// Update evaluation OK
-		$urltogo = str_replace('__ID__', $result, $backtopage);
-		$urltogo = preg_replace('/--IDFORBACKTOPAGE--/', $id, $urltogo); // New method to autoselect project after a New on another form object creation
-		header("Location: " . $urltogo);
-	} else {
+	if ($result < 0) {
 		// Update evaluation KO
-		if ( ! empty($evaluation->errors)) setEventMessages(null, $evaluation->errors, 'errors');
+		if (!empty($evaluation->errors)) setEventMessages(null, $evaluation->errors, 'errors');
 		else setEventMessages($evaluation->error, null, 'errors');
 	}
 }
