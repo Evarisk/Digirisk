@@ -150,10 +150,11 @@ class RiskAssessmentDocument extends DigiriskDocuments
         if (!empty($riskAssessmentDocuments) && is_array($riskAssessmentDocuments)) {
             $riskAssessmentDocument       = array_shift($riskAssessmentDocuments);
             $now                          = dol_now();
-            $nextGenerateDate             = dol_print_date(dol_time_plus_duree($riskAssessmentDocument->date_creation, '1', 'y'), 'day');
+            $nextGenerateTimeStamp        = dol_time_plus_duree($riskAssessmentDocument->date_creation, '1', 'y');
+            $nextGenerateDate             = dol_print_date($nextGenerateTimeStamp, 'day');
             $lastGenerateDate             = dol_print_date($riskAssessmentDocument->date_creation, 'day');
-            $nbDaysAfterNextGenerateDate  = num_between_day($now, dol_stringtotime($nextGenerateDate), 1);
-            $nbDaysBeforeNextGenerateDate = num_between_day(dol_stringtotime($nextGenerateDate), $now, 1);
+            $nbDaysAfterNextGenerateDate  = num_between_day($now, $nextGenerateTimeStamp, 1);
+            $nbDaysBeforeNextGenerateDate = num_between_day($nextGenerateTimeStamp, $now, 1);
 
             $array['nextgeneratedate']  = img_picto('', 'fontawesome_fa-calendar_far_#263C5C80', 'class="pictofixedwidth"') . $nextGenerateDate;
             $array['nextgeneratedate'] .= ' ' . (!empty($nbDaysAfterNextGenerateDate) ? $nbDaysAfterNextGenerateDate . ' ' . $langs->transnoentities('Days') : $langs->transnoentities('NoDelay'));
@@ -165,8 +166,8 @@ class RiskAssessmentDocument extends DigiriskDocuments
             $array['delaygeneratedate'] = 'N/A';
         }
 
-        $array['moreContent']  = $this->showUrlOfLastGeneratedDocument($this->module, $this->element, 'odt', 'fontawesome_fa-file-word_far_#263C5C80', $moreParam['entity'] ?? 1);
-        $array['moreContent'] .= $this->showUrlOfLastGeneratedDocument($this->module, $this->element, 'pdf', 'fontawesome_fa-file-pdf_far_#263C5C80', $moreParam['entity'] ?? 1);
+        $array['moreContent']  = $this->showUrlOfLastGeneratedDocument($this->module, $this->element, 'odt', 'fontawesome_fa-file-word_far_#0D8AFF', $moreParam['entity'] ?? 1);
+        $array['moreContent'] .= $this->showUrlOfLastGeneratedDocument($this->module, $this->element, 'pdf', 'fontawesome_fa-file-pdf_far_#FB4B54', $moreParam['entity'] ?? 1);
         return $array;
     }
 }
