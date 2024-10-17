@@ -412,7 +412,11 @@ class Accident extends SaturneObject
      */
     public function load_dashboard(): array
     {
-        global $conf, $langs;
+        global $user, $langs, $conf;
+
+        $confName        = strtoupper($this->module) . '_DASHBOARD_CONFIG';
+        $dashboardConfig = json_decode($user->conf->$confName);
+        $array = ['graphs' => [], 'disabledGraphs' => []];
 
         $join                   = ' LEFT JOIN ' . MAIN_DB_PREFIX . $this->table_element . ' as a ON a.rowid = t.fk_accident';
         $accidentsWithWorkStops = saturne_fetch_all_object_type('AccidentWorkStop', 'DESC', 't.rowid', 0, 0, [], 'AND', false, true, false, $join);
@@ -426,8 +430,6 @@ class Accident extends SaturneObject
         }
 
         $arrayNbDaysWithoutAccident = $this->getNbDaysWithoutAccident($accidents);
-        $arrayNbAccidents           = $this->getNbAccidents($accidents, $accidentsWithWorkStops);
-        $arrayNbAccidentsLast3Years = $this->getNbAccidentsLast3years($accidents);
         $arrayNbWorkstopDays        = $this->getNbWorkstopDays($accidentsWithWorkStops);
 
         $arrayNbPresquAccidents        = $this->getNbPresquAccidents();
@@ -464,7 +466,16 @@ class Accident extends SaturneObject
             ]
         ];
 
-        $array['graphs'] = [$arrayNbAccidents, $arrayNbAccidentsLast3Years];
+        if (empty($dashboardConfig->graphs->AccidentRepartition->hide)) {
+            $array['graphs'][] = $this->getNbAccidents($accidents, $accidentsWithWorkStops);
+        } else {
+            $array['disabledGraphs']['AccidentRepartition'] = $langs->transnoentities('AccidentRepartition');
+        }
+        if (empty($dashboardConfig->graphs->AccidentByYear->hide)) {
+            $array['graphs'][] = $this->getNbAccidentsLast3years($accidents);
+        } else {
+            $array['disabledGraphs']['AccidentByYear'] = $langs->transnoentities('AccidentByYear');
+        }
 
         return $array;
     }
@@ -500,6 +511,7 @@ class Accident extends SaturneObject
 
         // Graph Title parameters
         $array['title'] = $langs->transnoentities('AccidentRepartition');
+        $array['name']  = 'AccidentRepartition';
         $array['picto'] = $this->picto;
 
         // Graph parameters
@@ -538,6 +550,7 @@ class Accident extends SaturneObject
 
         // Graph Title parameters
         $array['title'] = $langs->transnoentities('AccidentByYear');
+        $array['name']  = 'AccidentByYear';
         $array['picto'] = $this->picto;
 
         // Graph parameters

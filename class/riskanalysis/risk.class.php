@@ -619,22 +619,51 @@ class Risk extends SaturneObject
      */
     public function load_dashboard(): array
     {
-        $dangerCategories = $this->getDangerCategories();
+        global $user, $langs;
+
+        $confName        = strtoupper($this->module) . '_DASHBOARD_CONFIG';
+        $dashboardConfig = json_decode($user->conf->$confName);
+        $array = ['graphs' => [], 'lists' => [], 'disabledGraphs' => []];
+
+        $riskType = !empty($dashboardConfig->filters->riskType) ? $dashboardConfig->filters->riskType : 'risk';
 
         $digiriskElement = new DigiriskElement($this->db);
 
         $filter = $digiriskElement->getTrashExclusionSqlFilter();
 
-        $riskByDangerCategoriesAndRiskAssessments = $this->getRiskByDangerCategoriesAndRiskAssessments($dangerCategories, $filter, 'risk');
-
+        $dangerCategories = $this->getDangerCategories();
+        $riskByDangerCategoriesAndRiskAssessments = $this->getRiskByDangerCategoriesAndRiskAssessments($dangerCategories, $filter, $riskType);
         $moreParam['filter']                      = $filter;
-        $getRisksByCotation                       = $this->getRisksByCotation($moreParam);
-        $getRisksByDangerCategoriesAndCriticality = $this->getRisksByDangerCategoriesAndCriticality($dangerCategories, $riskByDangerCategoriesAndRiskAssessments);
-        $getRisksByDangerCategories               = $this->getRisksByDangerCategories($dangerCategories, $riskByDangerCategoriesAndRiskAssessments);
-        $getRiskListsByDangerCategories           = $this->getRiskListsByDangerCategories($dangerCategories, $riskByDangerCategoriesAndRiskAssessments, $filter, 'risk');
 
-        $array['graphs'] = [$getRisksByDangerCategoriesAndCriticality, $getRisksByDangerCategories, $getRisksByCotation];
-        $array['lists']  = [$getRiskListsByDangerCategories];
+        $array['graphsFilters'] = [
+            'riskType' => [
+                'title'        => $langs->transnoentities('DisplayRiskOfType'),
+                'type'         => 'selectarray',
+                'filter'       => 'riskType',
+                'values'       => ['risk' => $langs->transnoentities('Risk'), 'riskenvironmental' => $langs->transnoentities('Riskenvironmental')],
+                'currentValue' => $riskType
+        ]];
+
+        if (empty($dashboardConfig->graphs->RisksRepartitionByDangerCategoriesAndCriticality->hide)) {
+            $array['graphs'][] = $this->getRisksByDangerCategoriesAndCriticality($dangerCategories, $riskByDangerCategoriesAndRiskAssessments);
+        } else {
+            $array['disabledGraphs']['RisksRepartitionByDangerCategoriesAndCriticality'] = $langs->transnoentities('RisksRepartitionByDangerCategoriesAndCriticality');
+        }
+        if (empty($dashboardConfig->graphs->RisksRepartitionByDangerCategories->hide)) {
+            $array['graphs'][] = $this->getRisksByDangerCategories($dangerCategories, $riskByDangerCategoriesAndRiskAssessments);
+        } else {
+            $array['disabledGraphs']['RisksRepartitionByDangerCategories'] = $langs->transnoentities('RisksRepartitionByDangerCategories');
+        }
+        if (empty($dashboardConfig->graphs->RisksRepartitionByCotation->hide)) {
+            $array['graphs'][] = $this->getRisksByCotation($moreParam);
+        } else {
+            $array['disabledGraphs']['RisksRepartitionByCotation'] = $langs->transnoentities('RisksRepartitionByCotation');
+        }
+        if (empty($dashboardConfig->lists->RisksList->hide)) {
+            $array['lists'][] = $this->getRiskListsByDangerCategories($dangerCategories, $riskByDangerCategoriesAndRiskAssessments, $filter, $riskType);
+        } else {
+            $array['disabledGraphs']['RisksList'] = $langs->transnoentities('RisksList');
+        }
 
         return $array;
     }
@@ -655,6 +684,7 @@ class Risk extends SaturneObject
 
         // Graph Title parameters
         $array['title'] = $langs->transnoentities('RisksRepartition');
+        $array['name']  = 'RisksRepartition';
         $array['picto'] = $this->picto;
 
         // Graph parameters
@@ -687,6 +717,7 @@ class Risk extends SaturneObject
 
         // Graph Title parameters
         $array['title'] = $langs->transnoentities('RisksRepartitionByDangerCategoriesAndCriticality');
+        $array['name']  = 'RisksRepartitionByDangerCategoriesAndCriticality';
         $array['picto'] = $this->picto;
 
         // Graph parameters
@@ -723,6 +754,7 @@ class Risk extends SaturneObject
 
         // Graph Title parameters
         $array['title'] = $langs->transnoentities('RisksRepartitionByDangerCategories');
+        $array['name']  = 'RisksRepartitionByDangerCategories';
         $array['picto'] = $this->picto;
 
         // Graph parameters
@@ -768,6 +800,7 @@ class Risk extends SaturneObject
 
         // Graph Title parameters
         $array['title'] = $langs->transnoentities('RiskListsByDangerCategories');
+        $array['name']  = 'RiskListsByDangerCategories';
         $array['picto'] = $this->picto;
 
         // Graph parameters
