@@ -70,7 +70,7 @@ class TicketDashboard extends DigiriskDolibarrDashboard
         if (dol_strlen($moreJoin) > 0) {
             $this->join .= $moreJoin;
         }
-        $this->where  = 't.fk_statut >= 0';
+        $this->where  = 't.fk_statut > 0';
         $this->where .= ' AND t.entity IN (' . getEntity('ticket') . ')';
         if (dol_strlen($moreWhere) > 0) {
             $this->where .= $moreWhere;

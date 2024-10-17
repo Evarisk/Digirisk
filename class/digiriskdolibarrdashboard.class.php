@@ -137,7 +137,7 @@ class DigiriskDolibarrDashboard
                 $result[$i]['year'] = $row->year;
                 $result[$i]['nb']   = $row->nb;
                 if ($i > 0 && $row->nb > 0) {
-                    $result[$i - 1]['avg'] = ($result[$i - 1]['nb']) / $row->nb * 100;
+                    $result[$i - 1]['avg'] = -($row->nb - ($result[$i - 1]['nb'])) / $row->nb * 100;
                 }
                 $i++;
             }
