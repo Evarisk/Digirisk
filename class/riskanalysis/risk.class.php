@@ -659,10 +659,10 @@ class Risk extends SaturneObject
         } else {
             $array['disabledGraphs']['RisksRepartitionByCotation'] = $langs->transnoentities('RisksRepartitionByCotation');
         }
-        if (empty($dashboardConfig->lists->RisksList->hide)) {
+        if (empty($dashboardConfig->graphs->RiskListsByDangerCategories->hide)) {
             $array['lists'][] = $this->getRiskListsByDangerCategories($dangerCategories, $riskByDangerCategoriesAndRiskAssessments, $filter, $riskType);
         } else {
-            $array['disabledGraphs']['RisksList'] = $langs->transnoentities('RisksList');
+            $array['disabledGraphs']['RiskListsByDangerCategories'] = $langs->transnoentities('RiskListsByDangerCategories');
         }
 
         return $array;
