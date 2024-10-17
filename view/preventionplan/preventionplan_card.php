@@ -38,6 +38,7 @@ require_once DOL_DOCUMENT_ROOT . '/core/lib/images.lib.php';
 require_once DOL_DOCUMENT_ROOT . '/categories/class/categorie.class.php';
 
 // Load Saturne libraries.
+require_once __DIR__ . '/../../../saturne/class/saturneform.class.php';
 require_once __DIR__ . '/../../../saturne/class/saturnesignature.class.php';
 
 // Load DigiriskDolibarr libraries.
@@ -507,79 +508,44 @@ if (empty($reshook)) {
 		}
 	}
 
+    // Action clone object
+    if ($action == 'confirm_clone' && $confirm == 'yes') {
+        $options['clone_label']         = GETPOST('clone_label');
+        $options['preventionplan_risk'] = GETPOST('clone_preventionplan_risk');
+        $options['attendants']          = GETPOST('clone_attendants');
+        $options['schedule']            = GETPOST('clone_schedule');
+        $options['categories']          = GETPOST('clone_categories');
+
+        if (1 == 0 && ! GETPOST('clone_preventionplan_risk') && ! GETPOST('clone_attendants') && ! GETPOST('clone_schedule')) {
+            setEventMessages($langs->trans("NoCloneOptionsSpecified"), null, 'errors');
+        } else {
+            if ($object->id > 0) {
+                $result = $object->createFromClone($user, $object->id, $options);
+                if ($result > 0) {
+                    header("Location: " . $_SERVER['PHP_SELF'] . '?id=' . $result);
+                    exit();
+                } else {
+                    setEventMessages($object->error, $object->errors, 'errors');
+                    $action = '';
+                }
+            }
+        }
+    }
+
+    // Actions cancel, add, update, update_extras, confirm_validate, confirm_delete, confirm_deleteline, confirm_clone, confirm_close, confirm_setdraft, confirm_reopen
+    require_once DOL_DOCUMENT_ROOT . '/core/actions_addupdatedelete.inc.php';
+
     // Actions set_thirdparty, set_project
     require_once __DIR__ . '/../../../saturne/core/tpl/actions/banner_actions.tpl.php';
 
-	// Actions builddoc, forcebuilddoc, remove_file.
-	require_once __DIR__ . '/../../../saturne/core/tpl/documents/documents_action.tpl.php';
-
-	// Action to generate pdf from odt file
-    require_once __DIR__ . '/../../../saturne/core/tpl/documents/saturne_manual_pdf_generation_action.tpl.php';
-
-	// Action to set status STATUS_INPROGRESS
-	if ($action == 'confirm_setInProgress') {
-		$object->fetch($id);
-		if ( ! $error) {
-			$result = $object->setInProgress($user, false);
-			if ($result > 0) {
-				// Set In progress OK
-				$urltogo = str_replace('__ID__', $result, $backtopage);
-				$urltogo = preg_replace('/--IDFORBACKTOPAGE--/', $id, $urltogo); // New method to autoselect project after a New on another form object creation
-				header("Location: " . $urltogo);
-				exit;
-			} else {
-				// Set In progress KO
-				if ( ! empty($object->errors)) setEventMessages(null, $object->errors, 'errors');
-				else setEventMessages($object->error, null, 'errors');
-			}
-		}
-	}
-
-	// Action to set status STATUS_VALIDATED
-	if ($action == 'confirm_setPendingSignature') {
-		$object->fetch($id);
-		if ( ! $error) {
-			$result = $object->setPendingSignature($user, false);
-			if ($result > 0) {
-				// Set pending signature OK
-				$urltogo = str_replace('__ID__', $result, $backtopage);
-				$urltogo = preg_replace('/--IDFORBACKTOPAGE--/', $id, $urltogo); // New method to autoselect project after a New on another form object creation
-				header("Location: " . $urltogo);
-				exit;
-			} else {
-				// Set pending signature KO
-				if ( ! empty($object->errors)) setEventMessages(null, $object->errors, 'errors');
-				else setEventMessages($object->error, null, 'errors');
-			}
-		}
-	}
-
-    // Action confirm_lock, confirm_archive.
+    // Action confirm_lock, confirm_archive
     require_once __DIR__ . '/../../../saturne/core/tpl/actions/object_workflow_actions.tpl.php';
 
-	// Action clone object
-	if ($action == 'confirm_clone' && $confirm == 'yes') {
-		$options['clone_label']         = GETPOST('clone_label');
-		$options['preventionplan_risk'] = GETPOST('clone_preventionplan_risk');
-		$options['attendants']          = GETPOST('clone_attendants');
-		$options['schedule']            = GETPOST('clone_schedule');
-        $options['categories']          = GETPOST('clone_categories');
+    // Actions builddoc, forcebuilddoc, remove_file
+    require_once __DIR__ . '/../../../saturne/core/tpl/documents/documents_action.tpl.php';
 
-		if (1 == 0 && ! GETPOST('clone_preventionplan_risk') && ! GETPOST('clone_attendants') && ! GETPOST('clone_schedule')) {
-			setEventMessages($langs->trans("NoCloneOptionsSpecified"), null, 'errors');
-		} else {
-			if ($object->id > 0) {
-				$result = $object->createFromClone($user, $object->id, $options);
-				if ($result > 0) {
-					header("Location: " . $_SERVER['PHP_SELF'] . '?id=' . $result);
-					exit();
-				} else {
-					setEventMessages($object->error, $object->errors, 'errors');
-					$action = '';
-				}
-			}
-		}
-	}
+    // Action to generate pdf from odt file
+    require_once __DIR__ . '/../../../saturne/core/tpl/documents/saturne_manual_pdf_generation_action.tpl.php';
 
 	// Actions to send emails
 	$triggersendname    = 'PREVENTIONPLAN_SENTBYMAIL';
@@ -923,60 +889,6 @@ if (($id || $ref) && $action == 'edit') {
 	print '</form>';
 }
 
-$formconfirm = '';
-
-// SetLocked confirmation
-if (($action == 'setLocked' && (empty($conf->use_javascript_ajax) || ! empty($conf->dol_use_jmobile)))		// Output when action = clone if jmobile or no js
-	|| ( ! empty($conf->use_javascript_ajax) && empty($conf->dol_use_jmobile))) {							// Always output when not jmobile nor js
-    $formconfirm .= $form->formconfirm($_SERVER["PHP_SELF"] . '?id=' . $object->id, $langs->trans('LockObject', $langs->transnoentities('The' . ucfirst($object->element))), $langs->trans('ConfirmLockObject', $langs->transnoentities('The' . ucfirst($object->element))), 'confirm_lock', '', 'yes', 'actionButtonLock', 350, 600);
-}
-
-// setPendingSignature confirmation
-if (($action == 'setPendingSignature' && (empty($conf->use_javascript_ajax) || ! empty($conf->dol_use_jmobile)))		// Output when action = clone if jmobile or no js
-	|| ( ! empty($conf->use_javascript_ajax) && empty($conf->dol_use_jmobile))) {							// Always output when not jmobile nor js
-	$formconfirm .= $form->formconfirm($_SERVER["PHP_SELF"] . '?id=' . $object->id, $langs->trans('ValidatePreventionPlan'), $langs->trans('ConfirmValidatePreventionPlan', $object->ref), 'confirm_setPendingSignature', '', 'yes', 'actionButtonPendingSignature', 350, 600);
-}
-
-// setInProgress confirmation
-if (($action == 'setInProgress' && (empty($conf->use_javascript_ajax) || ! empty($conf->dol_use_jmobile)))		// Output when action = clone if jmobile or no js
-	|| ( ! empty($conf->use_javascript_ajax) && empty($conf->dol_use_jmobile))) {							// Always output when not jmobile nor js
-	$formconfirm .= $form->formconfirm($_SERVER["PHP_SELF"] . '?id=' . $object->id, $langs->trans('ReOpenPreventionPlan'), $langs->trans('ConfirmReOpenPreventionPlan', $object->ref), 'confirm_setInProgress', '', 'yes', 'actionButtonInProgress', 350, 600);
-}
-
-// Archive confirmation
-if (($action == 'set_archive' && (empty($conf->use_javascript_ajax) || !empty($conf->dol_use_jmobile))) || (!empty($conf->use_javascript_ajax) && empty($conf->dol_use_jmobile))) {
-    $formconfirm .= $form->formconfirm($_SERVER['PHP_SELF'] . '?id=' . $object->id . '&forcebuilddoc=true', $langs->trans('ArchiveObject', $langs->transnoentities('The' . ucfirst($object->element))), $langs->trans('ConfirmArchiveObject', $langs->transnoentities('The' . ucfirst($object->element))), 'confirm_archive', '', 'yes', 'actionButtonArchive', 350, 600);
-}
-
-// Clone confirmation
-if (($action == 'clone' && (empty($conf->use_javascript_ajax) || ! empty($conf->dol_use_jmobile)))		// Output when action = clone if jmobile or no js
-	|| ( ! empty($conf->use_javascript_ajax) && empty($conf->dol_use_jmobile))) {							// Always output when not jmobile nor js
-	// Define confirmation messages
-	$formquestionclone = ['text' => $langs->trans("ConfirmClone"),
-		['type' => 'text',     'name' => 'clone_label',               'label' => $langs->trans("NewLabelForClonePreventionPlan"), 'value' => empty($tmpcode) ? $langs->trans("CopyOf") . ' ' . $object->ref : $tmpcode, 'size' => 24],
-		['type' => 'checkbox', 'name' => 'clone_preventionplan_risk', 'label' => $langs->trans("ClonePreventionPlanRisk"),        'value' => 1],
-		['type' => 'checkbox', 'name' => 'clone_attendants',          'label' => $langs->trans("CloneAttendantsPreventionPlan"),  'value' => 1],
-		['type' => 'checkbox', 'name' => 'clone_schedule',            'label' => $langs->trans("CloneSchedulePreventionPlan"),    'value' => 1],
-        ['type' => 'checkbox', 'name' => 'clone_categories',          'label' => $langs->trans('CloneCategories'),                'value' => 1]
-	];
-
-	$formconfirm .= $form->formconfirm($_SERVER["PHP_SELF"] . '?id=' . $object->id, $langs->trans('ToClone'), $langs->trans('ConfirmClonePreventionPlan', $object->ref), 'confirm_clone', $formquestionclone, 'yes', 'actionButtonClone', 350, 600);
-}
-
-// Delete confirmation
-if ($action == 'delete' && $permissiontodelete) {
-	$formconfirm .= $form->formconfirm($_SERVER["PHP_SELF"]."?id=".$object->id, $langs->trans("DeletePreventionPlan"), $langs->trans('ConfirmDeletePreventionPlan'), "confirm_delete", '', '', 1);
-}
-
-// Call Hook formConfirm
-$parameters                        = array('formConfirm' => $formconfirm, 'object' => $object);
-$reshook                           = $hookmanager->executeHooks('formConfirm', $parameters, $object, $action); // Note that $action and $object may have been modified by hook
-if (empty($reshook)) $formconfirm .= $hookmanager->resPrint;
-elseif ($reshook > 0) $formconfirm = $hookmanager->resPrint;
-
-// Print form confirm
-print $formconfirm;
-
 // Part to show record
 if ((empty($action) || ($action != 'create' && $action != 'edit'))) {
 	// Object card
@@ -985,6 +897,22 @@ if ((empty($action) || ($action != 'create' && $action != 'edit'))) {
 	$object->fetch_optionals();
 
 	saturne_get_fiche_head($object, 'card', $title);
+
+    $formQuestionClone = ['text' => $langs->trans('ConfirmClone'),
+        ['type' => 'text',     'name' => 'clone_label',               'label' => $langs->trans('NewLabelForClonePreventionPlan'), 'value' => $langs->trans('CopyOf') . ' ' . $object->ref, 'size' => 24],
+        ['type' => 'checkbox', 'name' => 'clone_preventionplan_risk', 'label' => $langs->trans('ClonePreventionPlanRisk'),        'value' => 1],
+        ['type' => 'checkbox', 'name' => 'clone_attendants',          'label' => $langs->trans('CloneAttendantsPreventionPlan'),  'value' => 1],
+        ['type' => 'checkbox', 'name' => 'clone_schedule',            'label' => $langs->trans('CloneSchedulePreventionPlan'),    'value' => 1],
+        ['type' => 'checkbox', 'name' => 'clone_categories',          'label' => $langs->trans('CloneCategories'),                'value' => 1]
+    ];
+
+    $moreParams['cloneConfirmation'] = ['formQuestion' => $formQuestionClone, 'width' => 600];
+
+    $formConfirm = saturneForm::actionConfirmation($action, $moreParams);
+
+    // Print form confirm
+    print $formConfirm;
+
 
     // External Society -- Société extérieure
     $extSociety  = $digiriskresources->fetchResourcesFromObject('ExtSociety', $object);
@@ -1087,20 +1015,6 @@ if ((empty($action) || ($action != 'create' && $action != 'edit'))) {
 	}
 	print '</td></tr>';
 
-	//Attendants -- Participants
-	print '<tr><td class="titlefield">';
-	print $langs->trans("Attendants");
-	print '</td>';
-	print '<td>';
-	$attendants  = count($signatory->fetchSignatory('MasterWorker', $object->id, 'preventionplan'));
-	$attendants += count($signatory->fetchSignatory('ExtSocietyResponsible', $object->id, 'preventionplan'));
-	$attendants += count($signatory->fetchSignatory('ExtSocietyAttendant', $object->id, 'preventionplan'));
-	$url         = dol_buildpath('/custom/saturne/view/saturne_attendants.php?id=' . $object->id . '&module_name=DigiriskDolibarr&object_type=' . $object->element . '&document_type=PreventionPlanDocument', 3);
-	$displayButton = $onPhone ? '<i class="fas fa-plus fa-2x"></i>' : '<i class="fas fa-plus"></i> ' . $langs->trans('AddAttendants');
-	print '<a ' . ($object->status == 1 ? 'href="' .  $url . '"' : '') . '">' . $attendants;
-	print '<span class="' . ($object->status == $object::STATUS_DRAFT ? 'butAction' : 'butActionRefused classfortooltip') . '" id="actionButtonAddAttendants" title="' . dol_escape_htmltag($langs->trans("PreventionPlanMustBeInProgress")) . '">' .  $displayButton . '</span></a>';
-	print '</td></tr>';
-
     // Categories
     if ($conf->categorie->enabled) {
         print '<tr><td class="valignmiddle">'.$langs->trans("Categories").'</td><td>';
@@ -1114,85 +1028,11 @@ if ((empty($action) || ($action != 'create' && $action != 'edit'))) {
 
 	print dol_get_fiche_end();
 
-	if ($object->id > 0) {
-		// Buttons for actions
-		print '<div class="tabsAction" >';
-		$parameters = array();
-		$reshook    = $hookmanager->executeHooks('addMoreActionsButtons', $parameters, $object, $action); // Note that $action and $object may have been modified by hook
-		if ($reshook < 0) setEventMessages($hookmanager->error, $hookmanager->errors, 'errors');
-
-		if (empty($reshook) && $permissiontoadd) {
-			// Modify
-			$displayButton = $onPhone ? '<i class="fas fa-edit fa-2x"></i>' : '<i class="fas fa-edit"></i>' . ' ' . $langs->trans('Modify');
-			if ($object->status == $object::STATUS_DRAFT) {
-				print '<a class="butAction" id="actionButtonEdit" href="' . $_SERVER['PHP_SELF'] . '?id=' . $object->id . '&action=edit&token=' . newToken() . '">' . $displayButton . '</a>';
-			} else {
-				print '<span class="butActionRefused classfortooltip" title="' . dol_escape_htmltag($langs->trans('PreventionPlanMustBeInProgress')) . '">' . $displayButton . '</span>';
-			}
-
-			// Validate
-			$displayButton = $onPhone ? '<i class="fas fa-check fa-2x"></i>' : '<i class="fas fa-check"></i>' . ' ' . $langs->trans('Validate');
-			if ($object->status == $object::STATUS_DRAFT) {
-				print '<a class="butAction" id="actionButtonPendingSignature">' . $displayButton . '</a>';
-			} else {
-				print '<span class="butActionRefused classfortooltip" title="' . dol_escape_htmltag($langs->trans('PreventionPlanMustBeInProgressToValidate')) . '">' . $displayButton . '</span>';
-			}
-
-			// ReOpen
-			$displayButton = $onPhone ? '<i class="fas fa-lock-open fa-2x"></i>' : '<i class="fas fa-lock-open"></i>' . ' ' . $langs->trans('ReOpenDoli');
-			if ($object->status == $object::STATUS_VALIDATED) {
-				print '<span class="butAction" id="actionButtonInProgress">' . $displayButton . '</span>';
-			} else {
-				print '<span class="butActionRefused classfortooltip" title="' . dol_escape_htmltag($langs->trans('PreventionPlanMustBeValidated')) . '">' . $displayButton . '</span>';
-			}
-
-			// Sign
-			$displayButton = $onPhone ? '<i class="fas fa-signature fa-2x"></i>' : '<i class="fas fa-signature"></i>' . ' ' . $langs->trans('Sign');
-			if ($object->status == $object::STATUS_VALIDATED && !$signatory->checkSignatoriesSignatures($object->id, $object->element)) {
-				print '<a class="butAction" id="actionButtonSign" href="' . dol_buildpath('/custom/saturne/view/saturne_attendants.php?id=' . $object->id . '&module_name=DigiriskDolibarr&object_type=' . $object->element . '&document_type=PreventionPlanDocument', 3) . '">' . $displayButton . '</a>';
-			} else {
-				print '<span class="butActionRefused classfortooltip" title="' . dol_escape_htmltag($langs->trans('ObjectMustBeValidatedToSign', ucfirst($langs->transnoentities('The' . ucfirst($object->element))))) . '">' . $displayButton . '</span>';
-			}
-
-			// Lock
-			$displayButton = $onPhone ? '<i class="fas fa-lock fa-2x"></i>' : '<i class="fas fa-lock"></i>' . ' ' . $langs->trans('Lock');
-			if ($object->status == $object::STATUS_VALIDATED && $signatory->checkSignatoriesSignatures($object->id, $object->element)) {
-				print '<span class="butAction" id="actionButtonLock">' . $displayButton . '</span>';
-			} else {
-				print '<span class="butActionRefused classfortooltip" title="' . dol_escape_htmltag($langs->trans('AllSignatoriesMustHaveSigned')) . '">' . $displayButton . '</span>';
-			}
-
-            // Send email
-            $displayButton = $onPhone ? '<i class="fas fa-envelope fa-2x"></i>' : '<i class="fas fa-envelope"></i>' . ' ' . $langs->trans('SendMail') . ' ';
-            if ($object->status == PreventionPlan::STATUS_LOCKED) {
-                $fileParams = dol_most_recent_file($upload_dir . '/' . $object->element . 'document' . '/' . $object->ref);
-                $file       = $fileParams['fullname'];
-                if (file_exists($file) && !strstr($fileParams['name'], 'specimen')) {
-                    $forcebuilddoc = 0;
-                } else {
-                    $forcebuilddoc = 1;
-                }
-                print dolGetButtonAction($displayButton, '', 'default', $_SERVER['PHP_SELF'] . '?id=' . $object->id . '&action=presend&forcebuilddoc=' . $forcebuilddoc . '&mode=init#formmailbeforetitle');
-            } else {
-                print '<span class="butActionRefused classfortooltip" title="'.dol_escape_htmltag($langs->trans('ObjectMustBeLockedToSendEmail', ucfirst($langs->transnoentities('The' . ucfirst($object->element))))) . '">' . $displayButton . '</span>';
-            }
-
-			// Archive
-			$displayButton = $onPhone ?  '<i class="fas fa-archive fa-2x"></i>' : '<i class="fas fa-archive"></i>' . ' ' . $langs->trans('Archive');
-			if ($object->status == $object::STATUS_LOCKED) {
-				print '<span class="butAction" id="actionButtonArchive" href="' . $_SERVER['PHP_SELF'] . '?id=' . $object->id . '&action=confirm_archive&forcebuilddoc=true&token=' . newToken() . '">' . $displayButton . '</span>';
-			} else {
-				print '<span class="butActionRefused classfortooltip" title="' . dol_escape_htmltag($langs->trans('ObjectMustBeLockedToArchive', ucfirst($langs->transnoentities('The' . ucfirst($object->element))))) . '">' . $displayButton . '</span>';
-			}
-
-			// Clone
-			$displayButton = $onPhone ? '<i class="fas fa-clone fa-2x"></i>' : '<i class="fas fa-clone"></i>' . ' ' . $langs->trans('ToClone');
-			print '<span class="butAction" id="actionButtonClone">' . $displayButton . '</span>';
-
-            $displayButton = $onPhone ? '<i class="fas fa-trash fa-2x"></i>' : '<i class="fas fa-trash"></i>' . ' ' . $langs->trans('Delete');
-            print dolGetButtonAction($displayButton, '', 'delete', $_SERVER['PHP_SELF'] . '?id=' . $object->id . '&action=delete&token=' . newToken(), '', $permissiontodelete || ($object->status == AccidentInvestigation::STATUS_DRAFT));
-        }
-		print '</div>';
+    if ($object->id > 0) {
+        // Buttons for actions
+        print '<div class="tabsAction">';
+        saturneForm::showButtons($object, $action);
+        print '</div>';
 
 		// PREVENTIONPLAN LINES
 		print '<div class="div-table-responsive-no-min" style="overflow-x: unset !important">';
