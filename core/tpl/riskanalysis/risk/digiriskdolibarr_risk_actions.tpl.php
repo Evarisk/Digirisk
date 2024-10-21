@@ -347,7 +347,7 @@ if ( ! $error && $action == 'saveEvaluation' && $permissiontoadd) {
 	}
 	$entity = ($conf->entity > 1) ? '/' . $conf->entity : '';
 
-	$result = $evaluation->update($user);
+	$evaluation->update($user);
 }
 
 if ( ! $error && $action == "deleteEvaluation" && $permissiontodelete) {
