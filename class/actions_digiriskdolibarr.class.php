@@ -753,15 +753,6 @@ class ActionsDigiriskdolibarr
 			}
 		}
 
-		if (strpos($parameters['context'], 'userlist') !== false) {
-			$user->fetchAll('','','','',['login' => 'USERAPI']);
-
-			if (is_array($user->users) && !empty($user->users)) {
-				$userIds = implode(',', array_keys($user->users));
-				$sql .= ' AND u.rowid NOT IN (' . $userIds . ')';
-			}
-		}
-
 		if (true) {
 			$this->resprints = $sql;
 			return 0; // or return 1 to replace standard code
