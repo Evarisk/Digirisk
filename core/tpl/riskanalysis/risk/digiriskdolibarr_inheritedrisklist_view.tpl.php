@@ -330,7 +330,7 @@
 
 	$menuConf = 'MAIN_SELECTEDFIELDS_' . $varpage;
 
-	if (dol_strlen($user->conf->$menuConf) < 1  || preg_match('/t./', $user->conf->$menuConf)) {
+	if (dol_strlen($user->conf->$menuConf) < 1  || preg_match('/t\./', $user->conf->$menuConf)) {
 		$user->conf->$menuConf = 'r.fk_element,r.ref,r.category,evaluation.cotation,';
 	}
 
