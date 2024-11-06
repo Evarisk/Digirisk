@@ -467,11 +467,11 @@ class ActionsDigiriskdolibarr
                     if (strpos($parameters['context'], 'projecttaskcard') !== false && !GETPOSTISSET('withproject')) {
                         return 0;
                     } else {
-                        if (GETPOSTISSET('projectid') || GETPOSTISSET('ref')) {
+                        if (preg_match('/projectcard|projectcontactcard|projecttaskscard/', $parameters['context'])) {
+                            $projectId = GETPOST('id');
+                        } else if (GETPOSTISSET('projectid') || GETPOSTISSET('ref')) {
                             $project->fetch( GETPOST('projectid'), GETPOST('ref'));
                             $projectId = $project->id;
-                        } else if (preg_match('/projectcard|projectcontactcard|projecttaskscard/', $parameters['context'])) {
-                            $projectId = GETPOST('id');
                         } else {
                             $task->fetch(GETPOST('id'));
                             $projectId = $task->fk_project;
