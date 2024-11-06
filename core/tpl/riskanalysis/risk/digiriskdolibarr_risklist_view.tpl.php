@@ -1066,26 +1066,6 @@ if ( ! empty($moreforfilter)) {
 
 $varpage  = empty($contextpage) ? $_SERVER["PHP_SELF"] : $contextpage;
 
-$menuConf = 'MAIN_SELECTEDFIELDS_' . $varpage;
-
-if (dol_strlen($user->conf->$menuConf) < 1 || preg_match('/t\./', $user->conf->$menuConf)) {
-	$user->conf->$menuConf = ($contextpage == 'risklist' ? 'r.fk_element,' : '') . 'r.ref,r.category,evaluation.cotation,';
-}
-
-if ( ! preg_match('/r.description/', $user->conf->$menuConf) && $conf->global->DIGIRISKDOLIBARR_RISK_DESCRIPTION) {
-	$user->conf->$menuConf = $user->conf->$menuConf . 'r.description,';
-} elseif ( ! $conf->global->DIGIRISKDOLIBARR_RISK_DESCRIPTION) {
-	$user->conf->$menuConf = preg_replace('/r.description,/', '', $user->conf->$menuConf);
-	$arrayfields['r.description']['enabled'] = 0;
-}
-
-if ( ! preg_match('/evaluation.has_tasks/', $user->conf->$menuConf) && $conf->global->DIGIRISKDOLIBARR_TASK_MANAGEMENT) {
-	$user->conf->$menuConf .= $user->conf->$menuConf . 'evaluation.has_tasks,';
-} elseif ( ! $conf->global->DIGIRISKDOLIBARR_TASK_MANAGEMENT) {
-	$user->conf->$menuConf = preg_replace('/evaluation.has_tasks,/', '', $user->conf->$menuConf);
-	$arrayfields['evaluation.has_tasks']['enabled'] = 0;
-}
-
 $selectedfields  = $form->multiSelectArrayWithCheckbox('risklist_selectedfields', $arrayfields, $varpage); // This also change content of $arrayfields
 $selectedfields .= (count($arrayofmassactions) ? $form->showCheckAddButtons('checkforselect', 1) : '');
 
