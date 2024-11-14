@@ -1,5 +1,5 @@
 <?php
-/* Copyright (C) 2022-2024 EVARISK <technique@evarisk.com>
+/* Copyright (C) 2024 EVARISK <technique@evarisk.com>
  *
  * This program is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -29,8 +29,8 @@ require_once DOL_DOCUMENT_ROOT . '/categories/class/categorie.class.php';
 require_once DOL_DOCUMENT_ROOT . '/comm/action/class/actioncomm.class.php';
 require_once DOL_DOCUMENT_ROOT . '/societe/class/societe.class.php';
 
-// load DigiriskDolibarr librairies
-require_once DOL_DOCUMENT_ROOT . '/ticket/class/ticket.class.php';
+require_once DOL_DOCUMENT_ROOT . '/user/class/user.class.php';
+
 
 /**
  * Class to manage stats for tickets
@@ -85,10 +85,11 @@ class TicketStatsDashboard extends DigiriskDolibarrDashboard
         $runningTickets = $this->getRunningTickets($allTickets);
         $ticketStats    = $this->getTicketStats($allTickets);
 
+        $ticketRepartitionPerUser = $this->getTicketRepartitionPerUser($allTickets);
         $ticketRepartitionPerSoc = $this->getTicketRepartitionPerSoc($allTickets);
 
         $array['widgets'] = array_merge($runningTickets, $ticketStats);
-        $array['graphs'] = [];
+        $array['graphs'] = [$ticketRepartitionPerUser, $ticketRepartitionPerSoc];
 
         return $array;
     }
@@ -179,7 +180,90 @@ class TicketStatsDashboard extends DigiriskDolibarrDashboard
 
     function getTicketRepartitionPerSoc($allTickets)
     {
+        $soc = new Societe($this->db);
+        $nbTicketBySoc = [];
+        foreach ($allTickets as $ticket) {
+            if ($ticket->fk_soc == null) {
+                continue;
+            }
+            $soc->fetch($ticket->fk_soc);
+            if (!isset($nbTicketBySoc[$soc->name])) {
+                $nbTicketBySoc[$soc->name] = 0;
+            }
+            $nbTicketBySoc[$soc->name]++;
+        }
+        arsort($nbTicketBySoc);
+        $nbTicketBySoc = array_slice($nbTicketBySoc, 0, 10);
 
+        // Graph Title parameters
+        $array['title'] = 'Top 10 des sociétés avec le plus de tickets';
+        $array['picto'] = 'fas fa-chart-bar';
+
+        // Graph parameters
+        $array['width']      = '100%';
+        $array['height']     = 300;
+        $array['type']       = 'bar';
+        $array['showlegend'] = 1;
+        $array['dataset']    = 4;
+        $array['moreCSS']    = 'grid-2';
+
+        $array['labels'] = [[
+            'label' => 'Nombre de tickets',
+            'color' => '#A1467E'
+        ]];
+
+        foreach ($nbTicketBySoc as $socName => $nbTicket) {
+            $dataElem = [
+                $socName,
+                $nbTicket
+            ];
+            $array['data'][] = $dataElem;
+        }
+
+        return $array;
+    }
+
+    function getTicketRepartitionPerUser($allTickets)
+    {
+        $user = new User($this->db);
+        $nbTicketByUser = [];
+        foreach ($allTickets as $ticket) {
+            if ($ticket->fk_user_assign == null) {
+                continue;
+            }
+            $user->fetch($ticket->fk_user_assign);
+            if (!isset($nbTicketByUser[$user->lastname . ' ' . $user->firstname])) {
+                $nbTicketByUser[$user->lastname . ' ' . $user->firstname] = 0;
+            }
+            $nbTicketByUser[$user->lastname . ' ' . $user->firstname]++;
+        }
+        arsort($nbTicketByUser);
+
+        // Graph Title parameters
+        $array['title'] = 'Repartition des tickets par utilisateur';
+        $array['picto'] = 'fas fa-chart-bar';
+
+        // Graph parameters
+        $array['width']      = '100%';
+        $array['height']     = 300;
+        $array['type']       = 'bar';
+        $array['showlegend'] = 1;
+        $array['dataset']    = 4;
+        $array['moreCSS']    = 'grid-2';
+
+        $array['labels'] = [[
+            'label' => 'Nombre de tickets',
+        ]];
+
+        foreach ($nbTicketByUser as $userName => $nbTicket) {
+            $dataElem = [
+                $userName,
+                $nbTicket
+            ];
+            $array['data'][] = $dataElem;
+        }
+
+        return $array;
     }
 
     /**
