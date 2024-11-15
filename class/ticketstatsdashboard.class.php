@@ -78,7 +78,6 @@ class TicketStatsDashboard extends DigiriskDolibarrDashboard
      */
     public function load_dashboard(array $moreParams = []): array
     {
-
         $allTickets = $this->getAllTickets();
         $societe = new Societe($this->db);
 
@@ -102,8 +101,7 @@ class TicketStatsDashboard extends DigiriskDolibarrDashboard
      */
     public function getRunningTickets(array $allTickets): array
     {
-        $array = [];
-        $ticket = new Ticket($this->db);
+        global $langs;
 
         $openTickets = 0;
         $oldestTicket = null;
@@ -125,11 +123,11 @@ class TicketStatsDashboard extends DigiriskDolibarrDashboard
 
         $array = [
             'runningTickets' => [
-                'title'       => 'Tickets en cours',
-                'widgetName'  => 'Tickets en cours',
+                'title'       => $langs->transnoentities('RunningTicket'),
+                'widgetName'  => 'RunningTicket',
                 'picto'       => 'fas fa-ticket-alt',
                 'pictoColor'  => '#0D8AFF',
-                'label'       => ['Nombre de tickets ouverts', 'Ticket le plus ancien', 'Echange le plus vieux'],
+                'label'       => [$langs->transnoentities('NbOfOpennedTicket'), $langs->transnoentities('OldestTicket'), $langs->transnoentities('OldestMessageTicket')],
                 'content'     => [$openTickets, !empty($oldestTicket) ? dol_print_date($oldestTicket->datec, '%d/%m/%Y') . ' (' . convertSecondToTime(dol_now() - $oldestTicket->datec) . ')' : '', !empty($oldestMessageTicket) ? dol_print_date($oldestMessageTicket->datec, '%d/%m/%Y') . ' (' . convertSecondToTime(dol_now() - $oldestMessageTicket->datec) . ')' : ''],
                 'moreContent' => ['', $oldestTicket->getNomUrl(2, 0, 0, 'marginleftonly'), !empty($oldestMessageTicket) ? $allTickets[$oldestMessageTicket->fk_element]->getNomUrl(2, 0, 0, 'marginleftonly') : ''],
             ]
@@ -145,8 +143,9 @@ class TicketStatsDashboard extends DigiriskDolibarrDashboard
      * @return array             Widget of ticket stats
      */
     function getTicketStats($allTickets) {
-        $timePerTicket = [];
+        global $langs;
 
+        $timePerTicket = [];
         $users = [];
         $nbTicketAssigned = 0;
         $nbExchanges = 0;
@@ -165,13 +164,13 @@ class TicketStatsDashboard extends DigiriskDolibarrDashboard
 
         $array = [
             'ticketStats' => [
-                'title'       => 'Statistiques des tickets',
+                'title'       => $langs->transnoentities('TicketStatistics'),
+                'widgetName'  => 'TicketStatistics',
                 'picto'       => 'fas fa-chart-pie',
                 'pictoColor'  => '#32E592',
-                'label'       => ['Nombre de tickets assignés par personne', 'Temps moyen de réponse', 'Nombre d\'échanges par ticket'],
+                'label'       => [$langs->transnoentities('NbTickerPerUser'), $langs->transnoentities('MeanAnswerTime'), $langs->transnoentities('NbExchangePerTicker')],
                 'content'     => [count($users) ? intdiv($nbTicketAssigned, count($users)) : 0, count($timePerTicket) ? convertSecondToTime(array_sum($timePerTicket) / count($timePerTicket), 'allwithouthour') : 'N/A', $allTickets ? ceil($nbExchanges / count($allTickets)) : 0],
                 'moreContent' => [],
-                'widgetName'  => 'Statistiques des tickets'
             ]
         ];
 
@@ -180,6 +179,8 @@ class TicketStatsDashboard extends DigiriskDolibarrDashboard
 
     function getTicketRepartitionPerSoc($allTickets)
     {
+        global $langs;
+
         $soc = new Societe($this->db);
         $nbTicketBySoc = [];
         foreach ($allTickets as $ticket) {
@@ -193,11 +194,12 @@ class TicketStatsDashboard extends DigiriskDolibarrDashboard
             $nbTicketBySoc[$soc->name]++;
         }
         arsort($nbTicketBySoc);
-        $nbTicketBySoc = array_slice($nbTicketBySoc, 0, 10);
+        $nbOfUsers = 10;
+        $nbTicketBySoc = array_slice($nbTicketBySoc, 0, $nbOfUsers);
 
         // Graph Title parameters
-        $array['title'] = 'Top 10 des sociétés avec le plus de tickets';
-        $array['picto'] = 'fas fa-chart-bar';
+        $array['title'] = $langs->transnoentities('TopTicketPerUser', $nbOfUsers);
+        $array['picto'] = 'fontawesome_fa-ticket-alt_fas_#3bbfa8';
 
         // Graph parameters
         $array['width']      = '100%';
@@ -208,7 +210,7 @@ class TicketStatsDashboard extends DigiriskDolibarrDashboard
         $array['moreCSS']    = 'grid-2';
 
         $array['labels'] = [[
-            'label' => 'Nombre de tickets',
+            'label' => $langs->transnoentities('NomberofTickets'),
             'color' => '#A1467E'
         ]];
 
@@ -225,6 +227,8 @@ class TicketStatsDashboard extends DigiriskDolibarrDashboard
 
     function getTicketRepartitionPerUser($allTickets)
     {
+        global $langs;
+
         $user = new User($this->db);
         $nbTicketByUser = [];
         foreach ($allTickets as $ticket) {
@@ -240,8 +244,8 @@ class TicketStatsDashboard extends DigiriskDolibarrDashboard
         arsort($nbTicketByUser);
 
         // Graph Title parameters
-        $array['title'] = 'Repartition des tickets par utilisateur';
-        $array['picto'] = 'fas fa-chart-bar';
+        $array['title'] = $langs->transnoentities('TickerRepartitionPerUser');
+        $array['picto'] = 'fontawesome_fa-ticket-alt_fas_#3bbfa8';
 
         // Graph parameters
         $array['width']      = '100%';
@@ -252,7 +256,7 @@ class TicketStatsDashboard extends DigiriskDolibarrDashboard
         $array['moreCSS']    = 'grid-2';
 
         $array['labels'] = [[
-            'label' => 'Nombre de tickets',
+            'label' => $langs->transnoentities('NomberofTickets'),
         ]];
 
         foreach ($nbTicketByUser as $userName => $nbTicket) {
