@@ -17,7 +17,7 @@
  */
 
 /**
- *  \file    core/modules/digiriskdolibarr/listingrisksdocument/mod_listingrisksdocument_standard.php
+ *  \file    core/modules/digiriskdolibarr/digiriskdolibarrdocuments/listingrisksdocument/mod_listingrisksdocument_standard.php
  *  \ingroup digiriskdolibarr
  *  \brief   File of class to manage listingrisksdocument numbering rules standard
  */

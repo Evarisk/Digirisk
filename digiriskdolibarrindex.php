@@ -21,7 +21,7 @@
  *	\brief      Home page of digiriskdolibarr top menu
  */
 
-// Load DigiQuali environment
+// Load DigiriskDolibarr environment
 if (file_exists('digiriskdolibarr.main.inc.php')) {
 	require_once __DIR__ . '/digiriskdolibarr.main.inc.php';
 } elseif (file_exists('../digiriskdolibarr.main.inc.php')) {
