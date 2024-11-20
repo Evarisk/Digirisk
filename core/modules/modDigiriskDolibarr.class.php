@@ -2207,23 +2207,59 @@ class modDigiriskdolibarr extends DolibarrModules
         }
 
 		// Create extrafields during init
-		include_once DOL_DOCUMENT_ROOT . '/core/class/extrafields.class.php';
+		require_once DOL_DOCUMENT_ROOT . '/core/class/extrafields.class.php';
 		require_once __DIR__ . '/../../lib/digiriskdolibarr_function.lib.php';
 
-		$extra_fields = new ExtraFields($this->db);
+        $extraFields = new ExtraFields($this->db);
 
-		$extra_fields->update('fk_risk', $langs->transnoentities("RiskLinked"), 'sellist', '', 'projet_task', 0, 0, 1010, 'a:1:{s:7:"options";a:1:{s:50:"digiriskdolibarr_risk:ref:rowid::entity = $ENTITY$";N;}}', '', '', 1);
-		$extra_fields->addExtraField('fk_risk', $langs->transnoentities("RiskLinked"), 'sellist', 1010, '', 'projet_task', 0, 0, '', 'a:1:{s:7:"options";a:1:{s:50:"digiriskdolibarr_risk:ref:rowid::entity = $ENTITY$";N;}}', '', '', 1);
-		$extra_fields->update('fk_preventionplan', $langs->transnoentities("PreventionPlanLinked"), 'sellist', '', 'projet_task', 0, 0, 1020, 'a:1:{s:7:"options";a:1:{s:60:"digiriskdolibarr_preventionplan:ref:rowid::entity = $ENTITY$";N;}}', '', '', '', 1);
-		$extra_fields->addExtraField('fk_preventionplan', $langs->transnoentities("PreventionPlanLinked"), 'sellist', 1020, '', 'projet_task', 0, 0, '', 'a:1:{s:7:"options";a:1:{s:60:"digiriskdolibarr_preventionplan:ref:rowid::entity = $ENTITY$";N;}}', '', '', 1);
-		$extra_fields->update('fk_firepermit', $langs->transnoentities("FirePermitLinked"), 'sellist', '', 'projet_task', 0, 0, 1030, 'a:1:{s:7:"options";a:1:{s:56:"digiriskdolibarr_firepermit:ref:rowid::entity = $ENTITY$";N;}}', '', '', '', 1);
-		$extra_fields->addExtraField('fk_firepermit', $langs->transnoentities("FirePermitLinked"), 'sellist', 1030, '', 'projet_task', 0, 0, '', 'a:1:{s:7:"options";a:1:{s:56:"digiriskdolibarr_firepermit:ref:rowid::entity = $ENTITY$";N;}}', '', '', 1);
-		$extra_fields->update('fk_accident', $langs->transnoentities("AccidentLinked"), 'sellist', '', 'projet_task', 0, 0, 1040, 'a:1:{s:7:"options";a:1:{s:54:"digiriskdolibarr_accident:ref:rowid::entity = $ENTITY$";N;}}', '', '', 1);
-		$extra_fields->addExtraField('fk_accident', $langs->transnoentities("AccidentLinked"), 'sellist', 1040, '', 'projet_task', 0, 0, '', 'a:1:{s:7:"options";a:1:{s:54:"digiriskdolibarr_accident:ref:rowid::entity = $ENTITY$";N;}}', '', '', 1);
-        $extra_fields->update('fk_accidentinvestigation', $langs->transnoentities("AccidentInvestigationLinked"), 'sellist', '', 'projet_task', 0, 0, 1050, 'a:1:{s:7:"options";a:1:{s:68:"digiriskdolibarr_accident_investigation:ref:rowid::entity = $ENTITY$";N;}}', '', '', 1);
-        $extra_fields->addExtraField('fk_accidentinvestigation', $langs->transnoentities("AccidentInvestigationLinked"), 'sellist', 1050, '', 'projet_task', 0, 0, '', 'a:1:{s:7:"options";a:1:{s:68:"digiriskdolibarr_accident_investigation:ref:rowid::entity = $ENTITY$";N;}}', '', '', 1);
+        $commonExtraFieldsValue = [
+            'alwayseditable' => 1, 'list' => 1, 'help' => '', 'entity' => 0, 'langfile' => 'digiriskdolibarr@digiriskdolibarr', 'enabled' => "isModEnabled('digiriskdolibarr') && isModEnabled('project')", 'moreparams' => ['css' => 'minwidth100 maxwidth300']
+        ];
 
-		if (!$conf->global->DIGIRISKDOLIBARR_TICKET_EXTRAFIELDS_BACKWARD_COMPATIBILITY && (dolibarr_get_const($this->db, 'DIGIRISKDOLIBARR_TICKET_EXTRAFIELDS', 0) || dolibarr_get_const($this->db, 'DIGIRISKDOLIBARR_TICKET_EXTRAFIELDS', $conf->entity))) {
+        $extraFieldsArrays = [
+            'fk_risk'                  => ['Label' => 'Risk',                  'type' => 'link', 'elementtype' => ['projet_task'], 'position' => $this->numero . 10, 'params' => ['Risk:digiriskdolibarr/class/riskanalysis/risk.class.php:1:((entity:IN:__SHARED_ENTITIES__))' => NULL],                    ],
+            'fk_preventionplan'        => ['Label' => 'PreventionPlan',        'type' => 'link', 'elementtype' => ['projet_task'], 'position' => $this->numero . 20, 'params' => ['PreventionPlan:digiriskdolibarr/class/preventionplan.class.php:1:((entity:IN:__SHARED_ENTITIES__))' => NULL],             ],
+            'fk_firepermit'            => ['Label' => 'FirePermit',            'type' => 'link', 'elementtype' => ['projet_task'], 'position' => $this->numero . 30, 'params' => ['FirePermit:digiriskdolibarr/class/firepermit.class.php:1:((entity:IN:__SHARED_ENTITIES__))' => NULL],                     ],
+            'fk_accident'              => ['Label' => 'Accident',              'type' => 'link', 'elementtype' => ['projet_task'], 'position' => $this->numero . 40, 'params' => ['Accident:digiriskdolibarr/class/accident.class.php:1:((entity:IN:__SHARED_ENTITIES__))' => NULL],                         ],
+            'fk_accidentinvestigation' => ['Label' => 'AccidentInvestigation', 'type' => 'link', 'elementtype' => ['projet_task'], 'position' => $this->numero . 50, 'params' => ['AccidentInvestigation:digiriskdolibarr/class/accidentinvestigation.class.php:1:((entity:IN:__SHARED_ENTITIES__))' => NULL]],
+
+            'wp_digi_id' => ['Label' => 'WPDigiID', 'type' => 'int', 'length' => 100, 'elementtype' => ['digiriskdolibarr_digiriskelement'], 'position' => $this->numero . 10, 'list' => 0, 'enabled' => "isModEnabled('digiriskdolibarr')"],
+            'entity'     => ['Label' => 'Entity',   'type' => 'int', 'length' => 100, 'elementtype' => ['digiriskdolibarr_digiriskelement'], 'position' => $this->numero . 20, 'list' => 0, 'enabled' => "isModEnabled('digiriskdolibarr')"],
+
+            'professional_qualification' => ['Label' => 'ProfessionalQualification', 'type' => 'varchar', 'length' => 255, 'elementtype' => ['user'], 'position' => $this->numero . 10,                                                                                                'enabled' => "isModEnabled('digiriskdolibarr') && isModEnabled('user')"],
+            'contract_type'              => ['Label' => 'ContractType',              'type' => 'select',                   'elementtype' => ['user'], 'position' => $this->numero . 20, 'params' => [1 => 'CDI', 2 => 'CDD', 3 => 'Apprentice/Student', 4 => 'Interim', 5 => 'Other'], 'enabled' => "isModEnabled('digiriskdolibarr') && isModEnabled('user')"],
+        ];
+
+        if (getDolGlobalInt('DIGIRISKDOLIBARR_EXTRAFIELDS_BACKWARD_COMPATIBILITY') == 0) {
+            if (isModEnabled('multicompany')) {
+                require_once __DIR__ . '/../../../multicompany/class/actions_multicompany.class.php';
+
+                $currentEntity       = $conf->entity;
+                $actionsMulticompany = new ActionsMulticompany($this->db);
+                $entities            = $actionsMulticompany->getEntitiesList(false, false, true, true);
+                foreach ($entities as $subEntity => $entity_name) {
+                    $conf->setEntityValues($this->db, $subEntity);
+                    foreach ($extraFieldsArrays as $key => $extraField) {
+                        foreach ($extraField['elementtype'] as $extraFieldElementType) {
+                            $extraFields->delete($key, $extraFieldElementType);
+                        }
+                    }
+                    $conf->setEntityValues($this->db, $currentEntity);
+                }
+            } else {
+                foreach ($extraFieldsArrays as $key => $extraField) {
+                    foreach ($extraField['elementtype'] as $extraFieldElementType) {
+                        $extraFields->delete($key, $extraFieldElementType);
+                    }
+                }
+            }
+
+            dolibarr_set_const($this->db, 'DIGIRISKDOLIBARR_EXTRAFIELDS_BACKWARD_COMPATIBILITY', 1, 'integer', 0, '', $conf->entity);
+        }
+
+        saturne_manage_extrafiels($extraFieldsArrays, $commonExtraFieldsValue);
+
+        if (!$conf->global->DIGIRISKDOLIBARR_TICKET_EXTRAFIELDS_BACKWARD_COMPATIBILITY && (dolibarr_get_const($this->db, 'DIGIRISKDOLIBARR_TICKET_EXTRAFIELDS', 0) || dolibarr_get_const($this->db, 'DIGIRISKDOLIBARR_TICKET_EXTRAFIELDS', $conf->entity))) {
 			if ($conf->multicompany->enabled) {
 				$current_entity = $conf->entity;
 				$object = new ActionsMulticompany($this->db);
@@ -2232,47 +2268,31 @@ class modDigiriskdolibarr extends DolibarrModules
 				foreach ($entities as $sub_entity => $entity_name) {
 					$conf->setEntityValues($this->db, $sub_entity);
 
-					extrafield_soft_delete('digiriskdolibarr_ticket_firstname', 'ticket', $extra_fields);
-					extrafield_soft_delete('digiriskdolibarr_ticket_lastname', 'ticket', $extra_fields);
-					extrafield_soft_delete('digiriskdolibarr_ticket_phone', 'ticket', $extra_fields);
-					extrafield_soft_delete('digiriskdolibarr_ticket_service', 'ticket', $extra_fields);
-					extrafield_soft_delete('digiriskdolibarr_ticket_location', 'ticket', $extra_fields);
-					extrafield_soft_delete('digiriskdolibarr_ticket_date', 'ticket', $extra_fields);
+					extrafield_soft_delete('digiriskdolibarr_ticket_firstname', 'ticket', $extraFields);
+					extrafield_soft_delete('digiriskdolibarr_ticket_lastname', 'ticket', $extraFields);
+					extrafield_soft_delete('digiriskdolibarr_ticket_phone', 'ticket', $extraFields);
+					extrafield_soft_delete('digiriskdolibarr_ticket_service', 'ticket', $extraFields);
+					extrafield_soft_delete('digiriskdolibarr_ticket_location', 'ticket', $extraFields);
+					extrafield_soft_delete('digiriskdolibarr_ticket_date', 'ticket', $extraFields);
 				}
 				$conf->setEntityValues($this->db, $current_entity);
 			} else {
-				extrafield_soft_delete('digiriskdolibarr_ticket_firstname', 'ticket', $extra_fields);
-				extrafield_soft_delete('digiriskdolibarr_ticket_lastname', 'ticket', $extra_fields);
-				extrafield_soft_delete('digiriskdolibarr_ticket_phone', 'ticket', $extra_fields);
-				extrafield_soft_delete('digiriskdolibarr_ticket_service', 'ticket', $extra_fields);
-				extrafield_soft_delete('digiriskdolibarr_ticket_location', 'ticket', $extra_fields);
-				extrafield_soft_delete('digiriskdolibarr_ticket_date', 'ticket', $extra_fields);
+				extrafield_soft_delete('digiriskdolibarr_ticket_firstname', 'ticket', $extraFields);
+				extrafield_soft_delete('digiriskdolibarr_ticket_lastname', 'ticket', $extraFields);
+				extrafield_soft_delete('digiriskdolibarr_ticket_phone', 'ticket', $extraFields);
+				extrafield_soft_delete('digiriskdolibarr_ticket_service', 'ticket', $extraFields);
+				extrafield_soft_delete('digiriskdolibarr_ticket_location', 'ticket', $extraFields);
+				extrafield_soft_delete('digiriskdolibarr_ticket_date', 'ticket', $extraFields);
 			}
 
-			$extra_fields->addExtraField('digiriskdolibarr_ticket_lastname', $langs->transnoentities("LastName"), 'varchar', 2000, 255, 'ticket', 0, 0, '', '', 1, '', 1, '', '', 0);
-			$extra_fields->addExtraField('digiriskdolibarr_ticket_firstname', $langs->transnoentities("FirstName"), 'varchar', 2100, 255, 'ticket', 0, 0, '', '', 1, '', 1, '', '', 0);
-			$extra_fields->addExtraField('digiriskdolibarr_ticket_phone', $langs->transnoentities("Phone"), 'phone', 2200, '', 'ticket', 0, 0, '', '', 1, '', 1, '', '', 0);
-			$extra_fields->addExtraField('digiriskdolibarr_ticket_service', $langs->transnoentities("GP/UT"), 'sellist', 2300, '255', 'ticket', 0, 0, '', 'a:1:{s:7:"options";a:1:{s:61:"digiriskdolibarr_digiriskelement:ref:rowid::entity = $ENTITY$";N;}}', 1, '', 4, '','',0);
-			$extra_fields->addExtraField('digiriskdolibarr_ticket_location', $langs->transnoentities("Location"), 'varchar', 2400, 255, 'ticket', 0, 0, '', '', 1, '', 1, '', '', 0);
-			$extra_fields->addExtraField('digiriskdolibarr_ticket_date', $langs->transnoentities("Date"), 'datetime', 2500, '', 'ticket', 0, 0, '', '', 1, '', 1, '', '', 0);
+			$extraFields->addExtraField('digiriskdolibarr_ticket_lastname', $langs->transnoentities("LastName"), 'varchar', 2000, 255, 'ticket', 0, 0, '', '', 1, '', 1, '', '', 0);
+			$extraFields->addExtraField('digiriskdolibarr_ticket_firstname', $langs->transnoentities("FirstName"), 'varchar', 2100, 255, 'ticket', 0, 0, '', '', 1, '', 1, '', '', 0);
+			$extraFields->addExtraField('digiriskdolibarr_ticket_phone', $langs->transnoentities("Phone"), 'phone', 2200, '', 'ticket', 0, 0, '', '', 1, '', 1, '', '', 0);
+			$extraFields->addExtraField('digiriskdolibarr_ticket_service', $langs->transnoentities("GP/UT"), 'sellist', 2300, '255', 'ticket', 0, 0, '', 'a:1:{s:7:"options";a:1:{s:61:"digiriskdolibarr_digiriskelement:ref:rowid::entity = $ENTITY$";N;}}', 1, '', 4, '','',0);
+			$extraFields->addExtraField('digiriskdolibarr_ticket_location', $langs->transnoentities("Location"), 'varchar', 2400, 255, 'ticket', 0, 0, '', '', 1, '', 1, '', '', 0);
+			$extraFields->addExtraField('digiriskdolibarr_ticket_date', $langs->transnoentities("Date"), 'datetime', 2500, '', 'ticket', 0, 0, '', '', 1, '', 1, '', '', 0);
 			dolibarr_set_const($this->db, 'DIGIRISKDOLIBARR_TICKET_EXTRAFIELDS', 1, 'integer', 0, '', 0);
 			dolibarr_set_const($this->db, 'DIGIRISKDOLIBARR_TICKET_EXTRAFIELDS_BACKWARD_COMPATIBILITY', 1, 'integer', 0, '', 0);
-		}
-
-		//Used for data import from Digirisk Wordpress
-		$extra_fields->update('wp_digi_id', $langs->trans("WPDigiID"), 'int', 100, 'digiriskdolibarr_digiriskelement', 0, 0, 1020, '', '', '', 0);
-		$extra_fields->addExtraField('wp_digi_id', $langs->trans("WPDigiID"), 'int', 100, '', 'digiriskdolibarr_digiriskelement', 0, 0, '', '', '', '', 0);
-		$extra_fields->addExtraField('entity', $langs->trans("Entity"), 'int', 100, '', 'digiriskdolibarr_digiriskelement', 0, 0, '', '', '', '', 0);
-
-		$extra_fields->addExtraField('professional_qualification', $langs->trans("ProfessionalQualification"), 'varchar', 990, 255, 'user', 0, 0, '', 'a:1:{s:7:"options";a:1:{s:0:"";N;}}', 1, '', 1, '', '', 0, 'digiriskdolibarr');
-		$extra_fields->addExtraField('contract_type', $langs->trans("ContractType"), 'select', 1000, '', 'user', 0, 0, '', 'a:1:{s:7:"options";a:5:{i:1;s:3:"CDI";i:2;s:3:"CDD";i:3;s:18:"Apprentice/Student";i:4;s:7:"Interim";i:5;s:5:"Other";}}', 1, '', 1, '', '', 0, 'digiriskdolibarr');
-
-		if ($conf->global->MAIN_EXTRAFIELDS_USE_SELECT2 == 0) {
-			dolibarr_set_const($this->db, 'MAIN_EXTRAFIELDS_USE_SELECT2', 1, 'integer', 0, '', $conf->entity);
-		}
-
-		if ($conf->global->CATEGORIE_RECURSIV_ADD == 0) {
-			dolibarr_set_const($this->db, 'CATEGORIE_RECURSIV_ADD', 1, 'integer', 0, '', $conf->entity);
 		}
 
 		//DigiriskElement favorite medias backward compatibility
