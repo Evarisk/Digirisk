@@ -825,6 +825,7 @@ if ($action == 'repair_risk') {
     $riskStatus                 = $risk->fetchAll('', '', 0, 0, ['customsql' => 't.status < 0']);
     $riskAssessmentStatus       = saturne_fetch_all_object_type('RiskAssessment', '', '', 0, 0, ['customsql' =>  'r.status <= 0'], 'AND', false, true, false, ' LEFT JOIN ' . MAIN_DB_PREFIX . $risk->table_element . ' as r ON r.rowid = t.fk_risk');
     $riskExistFkElements        = $risk->checkNotExistsDigiriskElementForRisk();
+    $riskExistRiskAssessment    = $risk->checkNotExistsRiskAssessmentForRisk();
     $riskAssessmentExistFkRisks = $riskAssessment->checkNotExistsRiskForRiskAssessment();
 
     $ObjectToDeletes = [];
@@ -842,6 +843,9 @@ if ($action == 'repair_risk') {
     }
     if (is_array($riskExistFkElements)) {
         $ObjectToDeletes = array_merge($ObjectToDeletes, $riskExistFkElements);
+    }
+    if (is_array($riskExistRiskAssessment)) {
+        $ObjectToDeletes = array_merge($ObjectToDeletes, $riskExistRiskAssessment);
     }
     if (is_array($riskAssessmentExistFkRisks)) {
         $ObjectToDeletes = array_merge($ObjectToDeletes, $riskAssessmentExistFkRisks);
@@ -1162,6 +1166,11 @@ if ($user->rights->digiriskdolibarr->adminpage->read) {
     if (is_array($risks) && !empty($risks)) {
         $nbRisks = count($risks);
         print '<div class="notice-subtitle"><strong>' . $langs->transnoentities('CleanRiskExistFkElement', $nbRisks) . '</strong></div>';
+    }
+    $risks = $risk->checkNotExistsRiskAssessmentForRisk();
+    if (is_array($risks) && !empty($risks)) {
+        $nbRisks = count($risks);
+        print '<div class="notice-subtitle"><strong>' . $langs->transnoentities('CleanRiskExistRiskAssessment', $nbRisks) . '</strong></div>';
     }
     if ($nbRisks == 0) {
         print '<div class="notice-subtitle"><strong>' . $langs->trans('NoRiskToClean') . '</strong></div>';

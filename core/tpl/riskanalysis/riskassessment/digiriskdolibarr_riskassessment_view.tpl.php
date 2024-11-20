@@ -213,28 +213,6 @@ else : ?>
 		<?php endif; ?>
 	</div>
 </div>
-<div class="risk-evaluation-container risk-evaluation-container-<?php echo $lastEvaluation->id ?>">
-	<div class="risk-evaluation-single-content risk-evaluation-single-content-<?php echo $risk->id ?>">
-		<div class="risk-evaluation-single risk-evaluation-single-<?php echo $risk->id ?>">
-			<div class="risk-evaluation-content">
-				<div class="risk-evaluation-data">
-					<span class="name"><?php echo $langs->trans('NoRiskAssessment'); ?></span>
-				</div>
-			</div>
-			<?php if ($contextpage != 'sharedrisk' && $contextpage != 'inheritedrisk') : ?>
-				<?php if ($permissiontoadd) : ?>
-					<div class="risk-evaluation-add wpeo-button button-square-40 button-primary wpeo-tooltip-event modal-open" aria-label="<?php echo $langs->trans('AddRiskAssessment') ?>" value="<?php echo $risk->id ?>">
-						<i class="fas fa-plus button-icon"></i>
-					</div>
-				<?php else : ?>
-					<div class="wpeo-button button-square-40 button-grey wpeo-tooltip-event" aria-label="<?php echo $langs->trans('PermissionDenied') ?>" value="<?php echo $risk->id;?>">
-						<i class="fas fa-plus button-icon"></i>
-					</div>
-				<?php endif; ?>
-			<?php endif; ?>
-		</div>
-	</div>
-</div>
 <?php endif;
 $evaluation->method = $lastRiskAssessment->method ?: "standard" ;
 ?>
