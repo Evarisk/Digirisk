@@ -108,10 +108,9 @@ print '<input type="hidden" name="action" value="save">';
 
 // Configuration header
 $head = digiriskdolibarr_admin_prepare_head();
-print dol_get_fiche_head($head, 'event', '', -1, $module->picto);
+print dol_get_fiche_head($head, 'event', '', -1, "digiriskdolibarr_color@digiriskdolibarr");
 
 print load_fiche_titre('<i class="fas fa-calendar-alt"></i> ' . $langs->trans('ConfTrigger'), '', '');
-print '<hr>';
 
 print '<table class="noborder centpercent">';
 print '<tr class="liste_titre">';
