@@ -1459,6 +1459,7 @@ CleanObject                    = Nettoyer les données
 CleanRiskFkElement             = %d risques ont un GP/UT non valide
 CleanRiskStatus                = %d risques ont un statut non valide
 CleanRiskExistFkElement        = %d risques sont orphelins
+CleanRiskExistRiskAssessment   = %d risques ont aucune évaluation
 CleanRisk                      = Nettoyer les risques
 CleanRiskAssessmentStatus      = %d évaluations ont un statut non valide
 CleanRiskAssessmentCotation    = %d évaluations ont une cotation vide
