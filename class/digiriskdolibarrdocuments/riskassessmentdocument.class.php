@@ -145,7 +145,7 @@ class RiskAssessmentDocument extends DigiriskDocuments
     {
         global $langs;
 
-        $filter                  = ['customsql' => 't.type = "' . $this->element . '"' . $moreParam['filter']];
+        $filter                  = ['customsql' => 't.type = "' . $this->element . '"' . ($moreParam['filter'] ?? '')];
         $riskAssessmentDocuments = $this->fetchAll('desc', 't.rowid', 1, 0, $filter);
         if (!empty($riskAssessmentDocuments) && is_array($riskAssessmentDocuments)) {
             $riskAssessmentDocument       = array_shift($riskAssessmentDocuments);

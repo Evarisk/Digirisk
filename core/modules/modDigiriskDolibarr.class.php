@@ -1803,7 +1803,7 @@ class modDigiriskdolibarr extends DolibarrModules
             $this->export_entities_array[$r]   = [];
 
             $keyforclass     = ucfirst($key);
-            $keyforclassfile = '/' . $this->rights_class . '/class/' . $objectMetaData['classPath'] . '/' . $key . '.class.php';
+            $keyforclassfile = '/' . $this->rights_class . '/class/' . (isset($objectMetaData['classPath']) ? $objectMetaData['classPath'] . '/' : '') . $key . '.class.php';
             $keyforelement   = $key;
             $keyforalias     = 't';
 

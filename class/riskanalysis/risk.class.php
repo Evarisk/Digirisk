@@ -666,10 +666,10 @@ class Risk extends SaturneObject
      */
     public function load_dashboard(): array
     {
-        global $user, $langs;
+        global $langs;
 
         $confName        = dol_strtoupper($this->module) . '_DASHBOARD_CONFIG';
-        $dashboardConfig = json_decode($user->conf->$confName);
+        $dashboardConfig = json_decode(getDolUserString($confName));
         $array = ['graphs' => [], 'lists' => [], 'disabledGraphs' => []];
 
         $riskType = !empty($dashboardConfig->filters->riskType) ? $dashboardConfig->filters->riskType : 'risk';
