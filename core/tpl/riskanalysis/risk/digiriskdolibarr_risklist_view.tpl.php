@@ -788,40 +788,41 @@ $massactionbutton = $form->selectMassAction('', $arrayofmassactions);
                             </table>
                         </div>
                     </div>
-				</div>
-				<?php if ($conf->global->DIGIRISKDOLIBARR_TASK_MANAGEMENT) : ?>
-					<div class="riskassessment-task">
-						<span class="section-title"><?php echo $langs->trans('Task'); ?></span>
-						<span class="title"><?php echo $langs->trans('Label'); ?> <input type="text" class="" name="label" value=""></span>
-						<div class="riskassessment-task-date wpeo-gridlayout grid-2">
-							<div>
-								<span class="title"><?php echo $langs->trans('DateStart'); ?></span>
-                                <?php print '<input type="datetime-local" id="RiskassessmentTaskDateStartModalRisk" name="RiskassessmentTaskDateStartModalRisk" value="' . dol_print_date(dol_now('tzuser'), '%Y-%m-%dT%H:%M:%S') . '">'; ?>
-							</div>
-							<div>
-								<span class="title"><?php echo $langs->trans('Deadline'); ?></span>
-                                <?php print '<input type="datetime-local" id="RiskassessmentTaskDateStartModalRisk" name="RiskassessmentTaskDateEndModalRisk">'; ?>
-							</div>
-						</div>
-						<span class="title"><?php echo $langs->trans('Budget'); ?></span>
-						<input type="text" class="riskassessment-task-budget" name="budget" value="">
-					</div>
-				<?php endif; ?>
-			</div>
-			<!-- Modal-Footer -->
-			<div class="modal-footer">
-				<?php if ($permissiontoadd) : ?>
-					<div class="risk-create wpeo-button button-primary button-disable modal-close">
-						<span><i class="fas fa-plus"></i>  <?php echo $langs->trans('AddRiskButton'); ?></span>
-					</div>
-				<?php else : ?>
-					<div class="wpeo-button button-grey wpeo-tooltip-event" aria-label="<?php echo $langs->trans('PermissionDenied') ?>">
-						<span><i class="fas fa-plus"></i>  <?php echo $langs->trans('AddRiskButton'); ?></span>
-					</div>
-				<?php endif;?>
-			</div>
-		</div>
-	</div>
+                    <?php if ($conf->global->DIGIRISKDOLIBARR_TASK_MANAGEMENT) : ?>
+                        <hr>
+                        <div class="riskassessment-task">
+                            <span class="section-title"><?php echo $langs->trans('Task'); ?></span>
+                            <span class="title"><?php echo $langs->trans('Label'); ?> <input type="text" class="" name="label" value=""></span>
+                            <div class="riskassessment-task-date wpeo-gridlayout grid-2">
+                                <div>
+                                    <span class="title"><?php echo $langs->trans('DateStart'); ?></span>
+                                    <?php print '<input type="datetime-local" id="RiskassessmentTaskDateStartModalRisk" name="RiskassessmentTaskDateStartModalRisk" value="' . dol_print_date(dol_now('tzuser'), '%Y-%m-%dT%H:%M:%S') . '">'; ?>
+                                </div>
+                                <div>
+                                    <span class="title"><?php echo $langs->trans('Deadline'); ?></span>
+                                    <?php print '<input type="datetime-local" id="RiskassessmentTaskDateStartModalRisk" name="RiskassessmentTaskDateEndModalRisk">'; ?>
+                                </div>
+                            </div>
+                            <span class="title"><?php echo $langs->trans('Budget'); ?></span>
+                            <input type="text" class="riskassessment-task-budget" name="budget" value="">
+                        </div>
+                    <?php endif; ?>
+                </div>
+                <!-- Modal-Footer -->
+                <div class="modal-footer">
+                    <?php if ($permissiontoadd) : ?>
+                        <div class="risk-create wpeo-button button-primary button-disable modal-close">
+                            <span><i class="fas fa-plus"></i>  <?php echo $langs->trans('AddRiskButton'); ?></span>
+                        </div>
+                    <?php else : ?>
+                        <div class="wpeo-button button-grey wpeo-tooltip-event" aria-label="<?php echo $langs->trans('PermissionDenied') ?>">
+                            <span><i class="fas fa-plus"></i>  <?php echo $langs->trans('AddRiskButton'); ?></span>
+                        </div>
+                    <?php endif;?>
+                </div>
+            </div>
+        </div>
+    </div>
 <?php endif; ?>
 <?php $title = $langs->trans('DigiriskElement' . ucfirst($riskType) . 'sList');
 print '<div class="div-title-and-table-responsive">';
