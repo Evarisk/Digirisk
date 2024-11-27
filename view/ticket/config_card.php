@@ -41,14 +41,12 @@ global $conf, $db, $hookmanager, $langs, $user;
 saturne_load_langs();
 
 // Get parameters
-$id                  = GETPOST('id', 'int');
-$ref                 = GETPOST('ref', 'alpha');
-$action              = GETPOST('action', 'aZ09');
-$confirm             = GETPOST('confirm', 'alpha');
-$cancel              = GETPOST('cancel', 'aZ09');
-$contextpage         = GETPOST('contextpage', 'aZ') ? GETPOST('contextpage', 'aZ') : 'digiriskelementcard'; // To manage different context of search
-$backtopage          = GETPOST('backtopage', 'alpha');
-$backtopageforcancel = GETPOST('backtopageforcancel', 'alpha');
+$id          = GETPOST('id', 'int');
+$ref         = GETPOST('ref', 'alpha');
+$action      = GETPOST('action', 'aZ09');
+$cancel      = GETPOST('cancel', 'aZ09');
+$contextpage = GETPOST('contextpage', 'aZ') ? GETPOST('contextpage', 'aZ') : 'digiriskelementcard'; // To manage different context of search
+$backtopage  = GETPOST('backtopage', 'alpha');
 
 // Initialize technical objects
 $object      = new Categorie($db);
@@ -68,13 +66,11 @@ if (empty($action) && empty($id) && empty($ref)) {
 }
 
 // Load object
-include DOL_DOCUMENT_ROOT . '/core/actions_fetchobject.inc.php'; // Must be included, not include_once
+require_once DOL_DOCUMENT_ROOT . '/core/actions_fetchobject.inc.php'; // Must be included, not include_once
 
 // Security check - Protection if external user
-$permissiontoread   = $user->rights->digiriskdolibarr->digiriskelement->read;
-$permissiontoadd    = $user->rights->digiriskdolibarr->digiriskelement->write;
-$permissiontodelete = $user->rights->digiriskdolibarr->digiriskelement->delete;
-saturne_check_access($permissiontoread, $object);
+$permissionToRead = $user->hasRight('categorie', 'creer') && $user->hasRight('digiriskdolibarr', 'adminpage', 'read');;
+saturne_check_access($permissionToRead, $object);
 
 /*
  * Actions
@@ -86,9 +82,7 @@ if ($resHook < 0) {
     setEventMessages($hookmanager->error, $hookmanager->errors, 'errors');
 }
 
-if (empty($reshook)) {
-    $error = 0;
-
+if (empty($resHook)) {
     $backurlforlist = dol_buildpath('/digiriskdolibarr/view/digiriskstandard/digiriskstandard_card.php?id=1', 1);
 
     if (empty($backtopage) || ($cancel && empty($id))) {
@@ -100,6 +94,16 @@ if (empty($reshook)) {
 
     if ($action == 'set_ticket_category_config') {
         $data['use_signatory'] = GETPOST('use_signatory');
+        $data['photo_visible'] = GETPOST('photo_visible');
+
+        $ticketExtraFields = ['digiriskelement', 'email', 'firstname', 'lastname', 'phone', 'location', 'date'];
+        foreach ($ticketExtraFields as $ticketExtraField) {
+            $extraFieldVisible  = $ticketExtraField . '_visible';
+            $extraFieldRequired = $ticketExtraField . '_required';
+
+            $data[$extraFieldVisible]  = GETPOST($extraFieldVisible);
+            $data[$extraFieldRequired] = GETPOST($extraFieldRequired);
+        }
 
         $object->table_element = 'categories';
         $object->array_options['options_ticket_category_config'] = json_encode($data);
@@ -115,56 +119,104 @@ if (empty($reshook)) {
  * View
  */
 
-$title    = $langs->trans(ucfirst($object->element));
-$help_url = 'FR:Module_Digirisk';
+$title   = $langs->trans(ucfirst($object->element));
+$helpUrl = 'FR:Module_Digirisk';
 
-saturne_header(0, '', $title, $help_url);
+saturne_header(0, '', $title, $helpUrl);
 
-// Part to show record
-if ((empty($action) || ($action != 'edit' && $action != 'create'))) {
-    $object->fetch_optionals();
-    $ticketCategoryConfig = json_decode($object->array_options['options_ticket_category_config']);
+$object->fetch_optionals();
+$ticketCategoryConfig = json_decode($object->array_options['options_ticket_category_config']);
 
-    $head = categories_prepare_head($object, 'ticket');
-    print dol_get_fiche_head($head, 'test', $langs->trans($title), -1, 'category');
+$head = categories_prepare_head($object, 'ticket');
+print dol_get_fiche_head($head, 'test', $langs->trans($title), -1, 'category');
 
-    // Object card
-    // ------------------------------------------------------------
-    saturne_banner_tab($object);
+$backtolist = (GETPOST('backtolist') ? GETPOST('backtolist') : DOL_URL_ROOT.'/categories/index.php?leftmenu=cat&type='.urlencode($type));
+$linkback = '<a href="'.dol_sanitizeUrl($backtolist).'">'.$langs->trans("BackToList").'</a>';
+$object->next_prev_filter = 'type:=:'.((int) $object->type);
+$object->ref = $object->label;
+$morehtmlref = '<br><div class="refidno"><a href="'.DOL_URL_ROOT.'/categories/index.php?leftmenu=cat&type='.urlencode($type).'">'.$langs->trans("Root").'</a> >> ';
+$ways = $object->print_all_ways(" &gt;&gt; ", '', 1);
+foreach ($ways as $way) {
+    $morehtmlref .= $way."<br>\n";
+}
+$morehtmlref .= '</div>';
 
-    print '<div class="fichecenter">';
+dol_banner_tab($object, 'id', $linkback, ($user->socid ? 0 : 1), 'rowid', 'ref', $morehtmlref, '&type=ticket');
 
-    print load_fiche_titre($langs->trans('test'), '', '');
+print '<div class="fichecenter">';
+print '<div class="underbanner clearboth"></div>';
 
-    print '<form method="POST" action="' . $_SERVER['PHP_SELF'] . '?id=' . $id . '&type=ticket">';
-    print '<input type="hidden" name="token" value="' . newToken() . '">';
-    print '<input type="hidden" name="action" value="set_ticket_category_config">';
+$link = img_picto('', 'fa-cog', 'class="paddingrightonly"') . '<a href="' . dol_buildpath('digiriskdolibarr/admin/ticket/ticket.php', 1). '" target="_blank">' . $langs->transnoentities('Configuration') . '</a>';
+print load_fiche_titre($langs->transnoentities('CategorieManagement'), $link, '');
 
-    print '<table class="noborder centpercent">';
-    print '<tr class="liste_titre">';
-    print '<td>' . $langs->trans('Parameters') . '</td>';
-    print '<td class="center">' . $langs->trans('ShortInfo') . '</td>';
-    print '<td class="center">' . $langs->trans('Value') . '</td>';
-    print '</tr>';
+print '<form method="POST" action="' . $_SERVER['PHP_SELF'] . '?id=' . $id . '&type=ticket">';
+print '<input type="hidden" name="token" value="' . newToken() . '">';
+print '<input type="hidden" name="action" value="set_ticket_category_config">';
 
-    // Use signatory
-    print '<tr class="oddeven"><td>';
-    print $langs->transnoentities('TicketPublicInterfaceUseSignatory');
-    print '</td><td class="center">';
-    print $form->textwithpicto('', $langs->transnoentities('TicketPublicInterfaceUseSignatoryDescription'), 1, 'help', '', 0, 3, 'abconsmartphone');
-    print '</td>';
-    print '<td class="center">';
-    print '<input type="checkbox" id="use_signatory" name="use_signatory"' . ($ticketCategoryConfig->use_signatory ? ' checked=""' : '') . '"> ';
-    print '</td></tr>';
+print '<table class="noborder centpercent">';
+print '<tr class="liste_titre">';
+print '<td>' . $langs->trans('Parameters') . '</td>';
+print '<td class="center">' . $langs->trans('Value') . '</td>';
+print '</tr>';
 
-    print '</table>';
-    print '<div class="tabsAction"><input type="submit" class="butAction" name="save" value="' . $langs->trans('Save') . '"></div>';
-    print '</form>';
-    print '</div>';
+// Use signatory
+print '<tr class="oddeven"><td>';
+print img_picto('', 'fa-signature', 'class="paddingrightonly"') . $form->textwithpicto($langs->transnoentities('Signatory'), $langs->transnoentities('PublicInterfaceUseSignatoryDescription'), 1, 'info') . '</td>';
+print '</td><td class="center">';
+print '<input type="checkbox" id="use_signatory" name="use_signatory"' . ($ticketCategoryConfig->use_signatory ? ' checked=""' : '') . '"> ';
+print '</td></tr>';
 
-    print dol_get_fiche_end();
+if (getDolGlobalInt('DIGIRISKDOLIBARR_TICKET_ENABLE_PUBLIC_INTERFACE')) {
+    if (dolibarr_get_const($db, 'DIGIRISKDOLIBARR_TICKET_EXTRAFIELDS', 0)) {
+        print load_fiche_titre($langs->transnoentities('PublicInterfaceConfiguration'), $link, '');
+
+        print '<table class="noborder centpercent">';
+        print '<tr class="liste_titre">';
+        print '<td class="maxwidth150onsmartphone">' . $langs->trans('Parameters') . '</td>';
+        print '<td class="center">' . $langs->transnoentities('Visible') . '</td>';
+        print '<td class="center">' . $langs->transnoentities('Required') . '</td>';
+        print '</tr>';
+
+        // Photo visible
+        print '<tr class="oddeven"><td class="maxwidth150onsmartphone">';
+        print img_picto('', 'fa-image', 'class="paddingrightonly"') . $form->textwithpicto($langs->transnoentities('TicketPhotoVisible'), $langs->transnoentities('TicketPhotoVisibleHelp'), 1, 'info') . '</td>';
+        print '</td><td class="center">';
+        print '<input type="checkbox" id="photo_visible" name="photo_visible"' . ($ticketCategoryConfig->photo_visible ? ' checked=""' : '') . '"> ';
+        print '</td><td class="center"></td></tr>';
+
+        $ticketExtraFields = [
+            'digiriskelement' => ['picto' => 'fa-network-wired'],
+            'email'           => ['picto' => 'fa-envelope'],
+            'firstname'       => ['picto' => 'fa-user'],
+            'lastname'        => ['picto' => 'fa-user'],
+            'phone'           => ['picto' => 'fa-phone'],
+            'location'        => ['picto' => 'fa-map-marker'],
+            'date'            => ['picto' => 'fa-calendar-alt']
+        ];
+        foreach ($ticketExtraFields as $ticketExtraField => $ticketExtraFieldData) {
+            $extraFieldVisible  = $ticketExtraField . '_visible';
+            $extraFieldRequired = $ticketExtraField . '_required';
+
+            // Extra field visible and required
+            print '<tr class="oddeven"><td class="maxwidth150onsmartphone">';
+            print img_picto('', $ticketExtraFieldData['picto'], 'class="paddingrightonly"') . $form->textwithpicto($langs->transnoentities('Ticket' . ucfirst($ticketExtraField) . 'Visible'), $langs->transnoentities('Ticket' . ucfirst($ticketExtraField) . 'VisibleHelp'), 1, 'info') . '</td>';
+            print '</td><td class="center">';
+            print '<input type="checkbox" id="' . $extraFieldVisible . '" name="' . $extraFieldVisible . '"' . ($ticketCategoryConfig->$extraFieldVisible ? ' checked=""' : '') . '"> ';
+            print '</td><td class="center">';
+            print '<input type="checkbox" id="' . $extraFieldRequired . '" name="' . $extraFieldRequired . '"' . ($ticketCategoryConfig->$extraFieldRequired ? ' checked=""' : '') . '"> ';
+            print '</td></tr>';
+        }
+
+        print '</table>';
+    }
 }
 
+print '</table>';
+print $form->buttonsSaveCancel('Save', '');
+print '</form>';
+print '</div>';
+
 // End of page
+print dol_get_fiche_end();
 llxFooter();
 $db->close();

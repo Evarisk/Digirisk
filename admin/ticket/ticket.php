@@ -372,7 +372,7 @@ if ($conf->global->DIGIRISKDOLIBARR_TICKET_ENABLE_PUBLIC_INTERFACE == 1) {
 
     // Use signatory
     print '<tr class="oddeven"><td>';
-    print $langs->transnoentities('TicketPublicInterfaceUseSignatory');
+    print $langs->transnoentities('PublicInterfaceUseSignatoryDescription');
     print '</td><td class="center">';
     print ajax_constantonoff('DIGIRISKDOLIBARR_TICKET_PUBLIC_INTERFACE_USE_SIGNATORY');
     print '</td>';
