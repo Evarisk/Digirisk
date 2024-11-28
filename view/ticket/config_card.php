@@ -58,7 +58,7 @@ $form = new Form($db);
 $hookmanager->initHooks(['digiriskelementcard', 'globalcard']); // Note that conf->hooks_modules contains array
 
 // Fetch optionals attributes and labels
-$extraFields->fetch_name_optionals_label($object->table_element);
+$extraFields->fetch_name_optionals_label('ticket');
 
 // Initialize array of search criterias
 if (empty($action) && empty($id) && empty($ref)) {
@@ -96,10 +96,10 @@ if (empty($resHook)) {
         $data['use_signatory'] = GETPOST('use_signatory');
         $data['photo_visible'] = GETPOST('photo_visible');
 
-        $ticketExtraFields = ['digiriskelement', 'email', 'firstname', 'lastname', 'phone', 'location', 'date'];
-        foreach ($ticketExtraFields as $ticketExtraField) {
-            $extraFieldVisible  = $ticketExtraField . '_visible';
-            $extraFieldRequired = $ticketExtraField . '_required';
+        $extraFields->attributes['ticket']['label']['digiriskdolibarr_ticket_email'] = $langs->trans('Email');
+        foreach ($extraFields->attributes['ticket']['label'] as $key => $field) {
+            $extraFieldVisible  = $key . '_visible';
+            $extraFieldRequired = $key . '_required';
 
             $data[$extraFieldVisible]  = GETPOST($extraFieldVisible);
             $data[$extraFieldRequired] = GETPOST($extraFieldRequired);
@@ -184,22 +184,27 @@ if (getDolGlobalInt('DIGIRISKDOLIBARR_TICKET_ENABLE_PUBLIC_INTERFACE')) {
         print '<input type="checkbox" id="photo_visible" name="photo_visible"' . ($ticketCategoryConfig->photo_visible ? ' checked=""' : '') . '"> ';
         print '</td><td class="center"></td></tr>';
 
-        $ticketExtraFields = [
-            'digiriskelement' => ['picto' => 'fa-network-wired'],
-            'email'           => ['picto' => 'fa-envelope'],
-            'firstname'       => ['picto' => 'fa-user'],
-            'lastname'        => ['picto' => 'fa-user'],
-            'phone'           => ['picto' => 'fa-phone'],
-            'location'        => ['picto' => 'fa-map-marker'],
-            'date'            => ['picto' => 'fa-calendar-alt']
+        $fields = [
+            'digiriskdolibarr_ticket_service'   => ['picto' => 'fa-network-wired'],
+            'digiriskdolibarr_ticket_email'     => ['picto' => 'fa-envelope'],
+            'digiriskdolibarr_ticket_firstname' => ['picto' => 'fa-user'],
+            'digiriskdolibarr_ticket_lastname'  => ['picto' => 'fa-user'],
+            'digiriskdolibarr_ticket_phone'     => ['picto' => 'fa-phone'],
+            'digiriskdolibarr_ticket_location'  => ['picto' => 'fa-map-marker'],
+            'digiriskdolibarr_ticket_date'      => ['picto' => 'fa-calendar-alt']
         ];
-        foreach ($ticketExtraFields as $ticketExtraField => $ticketExtraFieldData) {
-            $extraFieldVisible  = $ticketExtraField . '_visible';
-            $extraFieldRequired = $ticketExtraField . '_required';
+        $extraFields->attributes['ticket']['label']['digiriskdolibarr_ticket_email'] = $langs->trans('Email');
+        foreach ($extraFields->attributes['ticket']['label'] as $key => $field) {
+            $label = str_replace('digiriskdolibarr_ticket_', '', $key);
+            if (strpos($key, 'digiriskdolibarr_ticket') === false) {
+                continue; // Goes to the next element if ‘digiriskdolibarr_ticket’ is not found
+            }
+            $extraFieldVisible  = $key . '_visible';
+            $extraFieldRequired = $key . '_required';
 
             // Extra field visible and required
             print '<tr class="oddeven"><td class="maxwidth150onsmartphone">';
-            print img_picto('', $ticketExtraFieldData['picto'], 'class="paddingrightonly"') . $form->textwithpicto($langs->transnoentities('Ticket' . ucfirst($ticketExtraField) . 'Visible'), $langs->transnoentities('Ticket' . ucfirst($ticketExtraField) . 'VisibleHelp'), 1, 'info') . '</td>';
+            print ($fields[$key]['picto'] ? img_picto('', $fields[$key]['picto'], 'class="paddingrightonly"') : getPictoForType($extraFields->attributes['ticket']['type'][$key])) . $form->textwithpicto($langs->transnoentities('Ticket' . ucfirst($label) . 'Visible'), $langs->transnoentities('Ticket' . ucfirst($label) . 'VisibleHelp'), 1, 'info') . '</td>';
             print '</td><td class="center">';
             print '<input type="checkbox" id="' . $extraFieldVisible . '" name="' . $extraFieldVisible . '"' . ($ticketCategoryConfig->$extraFieldVisible ? ' checked=""' : '') . '"> ';
             print '</td><td class="center">';

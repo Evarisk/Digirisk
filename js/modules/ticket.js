@@ -67,23 +67,37 @@ window.digiriskdolibarr.ticket.init = function() {
  * @returns {void} This method does not return a value.
  */
 window.digiriskdolibarr.ticket.event = function() {
-  $(document).on('click', '.ticket-parentCategory', window.digiriskdolibarr.ticket.getMainCategoryID);
-  $(document).on('click', '.ticket-subCategory', window.digiriskdolibarr.ticket.getSheetSubCategoryID);
-	//$( document ).on( 'submit', '#sendFile', window.digiriskdolibarr.ticket.tmpStockFile );
-	//$( document ).on( 'click', '.linked-file-delete', window.digiriskdolibarr.ticket.removeFile );
-	// $( document ).on( 'change', '.add-dashboard-info', window.digiriskdolibarr.ticket.addDashBoardTicketInfo );
-	// $( document ).on( 'click', '.close-dashboard-info', window.digiriskdolibarr.ticket.closeDashBoardTicketInfo );
-	$( document ).on( 'keyup', '#email', window.digiriskdolibarr.ticket.checkValidEmail );
-	$( document ).on( 'keyup', '#options_digiriskdolibarr_ticket_phone', window.digiriskdolibarr.ticket.checkValidPhone );
+  $(document).on('click', '.ticket-parentCategory', function() {
+    window.digiriskdolibarr.ticket.handleCategorySelection({
+      clickedElement: this,
+      isSubCategory: false
+    });
+  });
+  $(document).on('click', '.ticket-subCategory', function() {
+    window.digiriskdolibarr.ticket.handleCategorySelection({
+      clickedElement: this,
+      isSubCategory: true
+    });
+  });
+  $(document).on( 'click', '.public-ticket-validate', window.digiriskdolibarr.ticket.addSignature);
+  $(document).on( 'submit', '#sendFile', window.digiriskdolibarr.ticket.tmpStockFile);
+  $(document).on( 'click', '.linked-file-delete', window.digiriskdolibarr.ticket.removeFile);
+  $(document).on( 'change', '.add-dashboard-info', window.digiriskdolibarr.ticket.addDashBoardTicketInfo);
+  $(document).on( 'click', '.close-dashboard-info', window.digiriskdolibarr.ticket.closeDashBoardTicketInfo);
+  $(document).on( 'keyup', '#email', window.digiriskdolibarr.ticket.checkValidEmail);
+  $(document).on( 'keyup', '#options_digiriskdolibarr_ticket_phone', window.digiriskdolibarr.ticket.checkValidPhone);
 };
 
 /**
- * Retrieves the main category ID when a parent category element is clicked.
+ * Handles the retrieval of category data (main or subcategory) and updates the display.
  *
- * This method performs the following actions:
- * - Retrieves the `data-rowid` attribute of the clicked element to identify the category.
- * - Sends an AJAX request to update the category display based on the selected parent category.
+ * This function performs the following actions:
+ * - Retrieves the `data-rowid` attribute of the clicked element to identify the category (main or sub).
+ * - Optionally identifies the currently active parent category if handling a subcategory.
+ * - Sends an AJAX request to fetch and update the category display based on the selected category.
+ * - Replaces the `.digirisk-page-container` content with the updated response.
  * - Highlights the selected category as active.
+ * - Redraws the signature canvas using `window.saturne.signature.drawSignatureOnCanvas()`.
  *
  * Error handling can be added within the `error` callback to manage failures gracefully.
  *
@@ -91,22 +105,34 @@ window.digiriskdolibarr.ticket.event = function() {
  * @since    10.3.0
  * @version  10.3.0
  *
+ * @param {Object}      options An object containing configuration for the request:
+ * @param {HTMLElement} options.clickedElement The DOM element that triggered the click event.
+ * @param {boolean}     options.isSubCategory Indicates whether the clicked element is a subcategory.
+ *
  * @returns {void} This method does not return a value.
  */
-window.digiriskdolibarr.ticket.getMainCategoryID = function() {
-  let mainCategoryID  = $(this).data('rowid');
-  let token           = window.saturne.toolbox.getToken();
-  let querySeparator  = window.saturne.toolbox.getQuerySeparator(document.URL);
+window.digiriskdolibarr.ticket.handleCategorySelection = function(options) {
+  const { clickedElement, isSubCategory } = options;
+
+  let mainCategoryID = isSubCategory ? $('.ticket-parentCategory.active').data('rowid') : $(clickedElement).data('rowid');
+  let subCategoryID  = isSubCategory ? $(clickedElement).data('rowid') : null;
+  let token          = window.saturne.toolbox.getToken();
+  let querySeparator = window.saturne.toolbox.getQuerySeparator(document.URL);
   window.saturne.loader.display($('.categories-container'));
 
+  let url = document.URL + querySeparator + 'parentCategory=' + mainCategoryID + (isSubCategory ? '&subCategory=' + subCategoryID : '') + '&token=' + token;
   $.ajax({
-    url: document.URL + querySeparator + 'parentCategory=' + mainCategoryID + '&token=' + token,
+    url: url,
     type: 'POST',
     processData: false,
     contentType: false,
     success: function(resp) {
-      $('.img-fields-container').replaceWith($(resp).find('.img-fields-container'));
+      $('.digirisk-page-container').replaceWith($(resp).find('.digirisk-page-container'));
       $('.ticket-parentCategory[data-rowid=' + mainCategoryID + ']').addClass('active');
+      if (isSubCategory) {
+        $('.ticket-subCategory[data-rowid=' + subCategoryID + ']').addClass('active');
+      }
+      window.saturne.signature.drawSignatureOnCanvas();
     },
     error: function() {
       console.error('Failed to retrieve category data. Please try again.');
@@ -115,32 +141,26 @@ window.digiriskdolibarr.ticket.getMainCategoryID = function() {
 };
 
 /**
- * Get sheet sub category ID after click event
+ * Captures and stores the current signature from the canvas.
  *
- * @since   1.10.0
- * @version 1.10.0
+ * This function performs the following actions:
+ * - Checks if the `signaturePad` canvas exists and contains a drawn signature.
+ * - Converts the signature into a Base64 data URL format.
+ * - Stores the serialized signature data into a hidden input field named `signature`.
  *
- * @return {void}
+ * @memberof DigiriskDolibarr_Ticket
+ * @since    10.3.0
+ * @version  10.3.0
+ *
+ * @returns {void} This method does not return a value.
  */
-window.digiriskdolibarr.ticket.getSheetSubCategoryID = function() {
-  let mainCategoryID     = $('.ticket-parentCategory.active').data('rowid');
-  let subCategoryID      = $(this).data('rowid');
-  let token              = window.saturne.toolbox.getToken();
-  let querySeparator     = window.saturne.toolbox.getQuerySeparator(document.URL);
-  window.saturne.loader.display($('.categories-container'));
-
-  $.ajax({
-    url: document.URL + querySeparator + 'parentCategory=' + mainCategoryID + '&subCategory=' + subCategoryID + '&token=' + token,
-    type: 'POST',
-    processData: false,
-    contentType: false,
-    success: function(resp) {
-      $('.img-fields-container').replaceWith($(resp).find('.img-fields-container'));
-      $('.ticket-parentCategory[data-rowid=' + mainCategoryID + ']').addClass('active');
-      $('.ticket-subCategory[data-rowid=' + subCategoryID + ']').addClass('active');
-    },
-    error: function() {}
-  });
+window.digiriskdolibarr.ticket.addSignature = function() {
+  if (window.saturne.signature.canvas) {
+    if (!window.saturne.signature.canvas.signaturePad.isEmpty()) {
+      let signature = window.saturne.signature.canvas.toDataURL();
+      $('input[name="signature"]').val(JSON.stringify(signature));
+    }
+  }
 };
 
 /**
