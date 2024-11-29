@@ -310,6 +310,7 @@ if ($action == 'add') {
                 $signatory->lastname       = $lastname;
                 $signatory->signature_date = dol_now();
                 $signatory->signature      = GETPOST('signature');
+                $signatory->signature_url  = generate_random_id();
                 $signatory->element_type   = 'user';
                 $signatory->element_id     = 0;
                 $signatory->object_type    = 'ticket';
@@ -318,6 +319,8 @@ if ($action == 'add') {
 
                 $signatory->create($user);
             }
+
+            $object->call_trigger('TICKET_PUBLIC_INTERFACE_CREATE', $user);
 
 			// Creation OK
 			dol_delete_dir_recursive($ticket_upload_dir . '/ticket/' . $ticketTmpId . '/');

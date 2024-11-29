@@ -311,6 +311,30 @@ class ActionsDigiriskdolibarr
 					<?php
 				}
 			}
+
+            $signatory = new SaturneSignature($db, 'digiriskdolibarr', $object->element);
+            $signatories = $signatory->fetchSignatory('Attendant', $object->id, $object->element);
+            if (is_array($signatories) && !empty($signatories)) {
+                $signatory = array_shift($signatories);
+                if (dol_strlen( $signatory->signature_url ) > 0) {
+                    $picto        = img_picto('', 'digiriskdolibarr_color@digiriskdolibarr', 'class="pictoModule"');
+                    $signatureUrl = dol_buildpath('custom/saturne/public/signature/add_signature.php?track_id=' . $signatory->signature_url . '&entity=' . $conf->entity . '&module_name=digiriskdolibarr&object_type=' . $object->element . '&document_type=TicketDocument', 3);
+
+                    $out  = '<tr class="trextrafields_collapse_' . $object->id . '"><td class="titlefield">' . $picto . $langs->trans('Signature') . '</td>';
+                    $out .= '<td id="ticket_extras_digiriskdolibarr_ticket_signature_'. $object->id . '" class="valuefield ticket_extras_digiriskdolibarr_ticket_signature wordbreak copy-signatureurl-container">';
+                    $out .= '<a href=' . $signatureUrl . ' target="_blank"><div class="wpeo-button button-blue" style="' . ($conf->browser->layout != 'classic' ? 'font-size: 25px;': '') . '"><i class="fas fa-eye"></i></div></a>';
+                    $out .= ' <i class="fas fa-clipboard copy-signatureurl" data-signature-url="' . $signatureUrl . '" style="color: #666;' .  ($conf->browser->layout != 'classic' ? 'display: none;': '') . '"></i>';
+                    $out .= '<span class="copied-to-clipboard" style="display: none;">' . '  ' . $langs->trans('CopiedToClipboard') . '</span>';
+                    $out .= '</td>';
+                    $out .= '</tr>';
+
+                    ?>
+                    <script>
+                        jQuery('.tabBar .fichehalfleft table:first').append(<?php echo json_encode($out); ?>);
+                    </script>
+                    <?php
+                }
+            }
         } else if (preg_match('/projectcard|projectcontactcard|projecttaskcard|projecttaskscard|projecttasktime|projectOverview|tasklist|category/', $parameters['context'])) {
 			if ((GETPOST('action') == '' || empty(GETPOST('action')) || GETPOST('action') != 'edit')) {
 				require_once DOL_DOCUMENT_ROOT.'/projet/class/project.class.php';
@@ -658,7 +682,7 @@ class ActionsDigiriskdolibarr
     /**
      * Overloading the formObjectOptions function : replacing the parent's function with the one below
      *
-     * @param  array     $parameters Hook metadatas (context, etc...)
+     * @param  array     $parameters Hook metadata (context, etc...)
      * @return int                   0 < on error, 0 on success, 1 to replace standard code
      * @throws Exception
      */
@@ -666,20 +690,13 @@ class ActionsDigiriskdolibarr
     {
         global $extrafields, $langs;
 
-        if (strpos('ticketcard', $parameters['context']) !== false) {
-            $picto     = img_picto('', 'digiriskdolibarr_color@digiriskdolibarr', '', 1, 0, 0, '', 'pictoModule');
-            $extrafields->attributes['projet']['label']['trainingsession_type']     = $picto . $langs->transnoentities($extrafields->attributes['projet']['label']['trainingsession_type']);
-            $extrafields->attributes['projet']['label']['trainingsession_service']  = $picto . $langs->transnoentities($extrafields->attributes['projet']['label']['trainingsession_service']);
-            $extrafields->attributes['projet']['label']['trainingsession_location'] = $picto . $langs->transnoentities($extrafields->attributes['projet']['label']['trainingsession_location']);
-
-            // Initialize the param attribute for trainingsession_service
-            if (isset($extrafields->attributes['propal']['param']['trainingsession_service']) || isset($extrafields->attributes['projet']['param']['trainingsession_service'])) {
-                $filter  = 'product as p:label:rowid::fk_product_type = 1 AND entity = $ENTITY$';
-                $filter .= ' AND rowid IN (SELECT cp.fk_product FROM ' . MAIN_DB_PREFIX . 'categorie_product cp LEFT JOIN ' . MAIN_DB_PREFIX . 'categorie c ON cp.fk_categorie = c.rowid WHERE cp.fk_categorie = ' . getDolGlobalInt('DOLIMEET_FORMATION_MAIN_CATEGORY') . ')';
-                $filter .= ' AND EXISTS (SELECT 1 FROM ' . MAIN_DB_PREFIX . 'dolimeet_session ds WHERE ds.fk_element = p.rowid AND ds.model = 1 AND ds.element_type = "service" AND ds.date_start IS NOT NULL AND ds.date_end IS NOT NULL AND ds.fk_project = ' .  getDolGlobalInt('DOLIMEET_TRAININGSESSION_TEMPLATES_PROJECT') . ' GROUP BY ds.fk_element HAVING SUM(ds.duration) = p.duration * 3600)';
-
-                $extrafields->attributes['projet']['param']['trainingsession_service'] = ['options' => [$filter => '']];
-                $extrafields->attributes['propal']['param']['trainingsession_service'] = ['options' => [$filter => '']];
+        if (strpos($parameters['context'], 'ticketcard') !== false) {
+            $picto = img_picto('', 'digiriskdolibarr_color@digiriskdolibarr', 'class="pictoModule"');
+            foreach ($extrafields->attributes['ticket']['label'] as $key => $value) {
+                if (strpos($key, 'digiriskdolibarr_ticket') === false) {
+                    continue; // Goes to the next element if ‘digiriskdolibarr_ticket’ is not found
+                }
+                $extrafields->attributes['ticket']['label'][$key] = $picto . $langs->transnoentities($value);
             }
         }
 
