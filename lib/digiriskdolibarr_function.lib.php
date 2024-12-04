@@ -1533,13 +1533,15 @@ function getNomUrlEntity($object, $withpicto = 0, $option = '', $addlabel = 0, $
 		$linkstart  = '<a href="' . $url . '"';
 		$linkstart .= $linkclose . '>';
 		$linkend    = '</a>';
+	    $result    .= $linkstart;
 	}
 
-	$result                      .= $linkstart;
 	if ($withpicto) $result      .= '<i class="fas fa-building"></i>' . ' ';
 	if ($withpicto != 2) $result .= 'S' . $object->entity;
 	if ($withpicto != 2) $result .= (($addlabel && dolibarr_get_const($db, 'MAIN_INFO_SOCIETE_NOM', $object->entity)) ? $sep . dol_trunc(dolibarr_get_const($db, 'MAIN_INFO_SOCIETE_NOM', $object->entity), ($addlabel > 1 ? $addlabel : 0)) : '');
-	$result                      .= $linkend;
+    if (isset($linked)) {
+        $result .= $linkend;
+    }
 
 	global $action;
 	$hookmanager->initHooks(array('entitydao'));

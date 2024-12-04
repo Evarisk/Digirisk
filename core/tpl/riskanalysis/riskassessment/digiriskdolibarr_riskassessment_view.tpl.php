@@ -313,10 +313,10 @@ $evaluation->method = $lastRiskAssessment->method ?: "standard" ;
 											<div class="table-row">
 												<div class="table-cell"><?php echo $critere['name'] ; ?></div>
 												<?php foreach ($critere['option']['survey']['request'] as $request) : ?>
-													<div class="table-cell can-select cell-<?php echo  $evaluationId ? $evaluationId : 0 ; ?>"
+													<div class="table-cell can-select cell-<?php echo  !empty($evaluationId) ? $evaluationId : 0 ; ?>"
 														 data-type="<?php echo $name ?>"
 														 data-id="<?php echo  $risk->id ? $risk->id : 0 ; ?>"
-														 data-evaluation-id="<?php echo $evaluationId ? $evaluationId : 0 ; ?>"
+														 data-evaluation-id="<?php echo !empty($evaluationId) ? $evaluationId : 0 ; ?>"
 														 data-variable-id="<?php echo $l ; ?>"
 														 data-seuil="<?php echo  $request['seuil']; ?>">
 														<?php echo  $request['question'] ; ?>
@@ -357,7 +357,7 @@ $evaluation->method = $lastRiskAssessment->method ?: "standard" ;
                                                 <i class="fas fa-camera"></i><i class="fas fa-plus-circle button-add"></i>
                                             </div>
                                         </label>
-                                        <input type="hidden" class="favorite-photo" id="photo" name="photo" value="<?php echo $object->photo ?>"/>
+                                        <input type="hidden" class="favorite-photo" id="photo" name="photo" value="<?php echo $object->photo ?? '' ?>"/>
                                     </td>
                                     <td>
                                         <div class="wpeo-button <?php echo ($onPhone ? 'button-square-40' : 'button-square-50'); ?> 'open-media-gallery add-media modal-open" value="<?php echo $lastRiskAssessment->id; ?>">
