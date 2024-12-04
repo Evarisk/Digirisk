@@ -80,6 +80,8 @@ if (isModEnabled('categorie')) {
     $search_category_array = GETPOST('search_category_risk_list', 'array');
 }
 
+$onPhone = $conf->browser->layout == 'phone';
+
 // Initialize technical objects
 $object           = new DigiriskStandard($db);
 $risk             = new Risk($db);
