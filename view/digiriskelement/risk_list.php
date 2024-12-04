@@ -108,7 +108,7 @@ $search_array_options = $extrafields->getOptionalsFromPost($risk->table_element,
 // Default sort order (if not yet defined by previous GETPOST)
 if ( ! $sortfield) $sortfield = $conf->global->DIGIRISKDOLIBARR_SORT_LISTINGS_BY_COTATION ? "evaluation.cotation" : "r." . key($risk->fields);; // Set here default search field. By default 1st field in definition.
 if ( ! $sortorder) $sortorder         = $conf->global->DIGIRISKDOLIBARR_SORT_LISTINGS_BY_COTATION ? "DESC" : "ASC" ;
-if ( ! $evalsortfield) $evalsortfield = "evaluation." . key($evaluation->fields);
+if (!isset($evalsortfield) || !$evalsortfield) $evalsortfield = "evaluation." . key($evaluation->fields);
 
 $offset   = $limit * $page;
 $pageprev = $page - 1;
@@ -127,7 +127,7 @@ foreach ($risk->fields as $key => $val) {
 // List of fields to search into when doing a "search in all"
 $fieldstosearchall = array();
 foreach ($risk->fields as $key => $val) {
-	if ($val['searchall']) $fieldstosearchall['r.' . $key] = $val['label'];
+	if (!empty($val['searchall'])) $fieldstosearchall['r.' . $key] = $val['label'];
 }
 
 // Definition of fields for list
