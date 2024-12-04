@@ -307,6 +307,12 @@ class PreventionPlan extends SaturneObject
 			$this->labelStatus[self::STATUS_VALIDATED] = $langs->trans('ValidatePendingSignature');
 			$this->labelStatus[self::STATUS_LOCKED]    = $langs->trans('Locked');
 			$this->labelStatus[self::STATUS_ARCHIVED]  = $langs->trans('Archived');
+
+            $this->labelStatusShort[self::STATUS_DELETED]   = $langs->transnoentitiesnoconv('Deleted');
+            $this->labelStatusShort[self::STATUS_DRAFT] = $langs->transnoentitiesnoconv('Draft');
+            $this->labelStatusShort[self::STATUS_VALIDATED] = $langs->transnoentitiesnoconv('Enabled');
+            $this->labelStatusShort[self::STATUS_LOCKED] = $langs->transnoentitiesnoconv('Locked');
+            $this->labelStatusShort[self::STATUS_ARCHIVED] = $langs->transnoentitiesnoconv('Archived');
 		}
 
 		$statusType                                        = 'status' . $status;
