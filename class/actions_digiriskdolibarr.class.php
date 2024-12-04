@@ -792,13 +792,8 @@ class ActionsDigiriskdolibarr
 			}
 		}
 
-		if (true) {
-			$this->resprints = $moreforfilter;
-			return 0; // or return 1 to replace standard code
-		} else {
-			$this->errors[] = 'Error message';
-			return -1;
-		}
+        $this->resprints = $moreforfilter ?? '';
+        return 0; // or return 1 to replace standard code
 	}
 
 	/**
