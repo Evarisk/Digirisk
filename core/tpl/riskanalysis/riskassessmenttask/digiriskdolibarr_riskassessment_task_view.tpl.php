@@ -1,6 +1,6 @@
 <?php
-$related_tasks = $riskAssessmentTaskList[$risk->id];
-if (!empty($related_tasks) && $related_tasks > 0) {
+$related_tasks = $riskAssessmentTaskList[$risk->id] ?? [];
+if (!empty($related_tasks) && is_array($related_tasks)) {
 	foreach ($related_tasks as $related_task_id => $related_task) {
 		if (!is_object($related_task)) {
 			unset($related_tasks[$related_task_id]);
@@ -299,7 +299,7 @@ if (!empty($related_tasks) && $related_tasks > 0) {
                 } else {
                     $task_progress = $related_task->progress;
                 }
-                $allTimeSpentArray = $timeSpentSortedByTasks[$related_task->id]; ?>
+                $allTimeSpentArray = $timeSpentSortedByTasks[$related_task->id] ?? []; ?>
 				<div class="wpeo-modal riskassessment-task-edit-modal" id="risk_assessment_task_edit<?php echo $related_task->id ?>">
 					<div class="modal-container wpeo-modal-event">
 						<!-- Modal-Header -->
