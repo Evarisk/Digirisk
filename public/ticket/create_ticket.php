@@ -456,6 +456,7 @@ if ($entity > 0) {
 	$mainCategoryObject = $category->rechercher($conf->global->DIGIRISKDOLIBARR_TICKET_MAIN_CATEGORY, '', 'ticket', true);
     $mainCategoryChildrenExtrafields = new StdClass();
     $subCategoryExtrafields          = new StdClass();
+    $categoryDescription             = '';
 
 	print '<div class="wpeo-gridlayout grid-3 categories-container">';
 	if ( ! empty($mainCategoryObject) && $mainCategoryObject > 0) {
@@ -465,6 +466,7 @@ if ($entity > 0) {
 			foreach ($mainCategoryChildren as $cat) {
 				if ($cat->id == GETPOST('parentCategory')) {
                     $mainCategoryChildrenExtrafields = json_decode($cat->array_options['options_ticket_category_config']);
+                    $categoryDescription             = $cat->description;
 					print '<div class="ticket-parentCategory ticket-parentCategory'. $cat->id .' active" id="' . $cat->id . '" data-rowid="' . $cat->id . '">';
 				} else {
 					print '<div class="ticket-parentCategory ticket-parentCategory'. $cat->id .'" id="' . $cat->id . '" data-rowid="' . $cat->id . '">';
@@ -495,6 +497,7 @@ if ($entity > 0) {
 					foreach ($selectedParentCategoryChildren as $subCategory) {
 						if ($subCategory->id == GETPOST('subCategory')) {
                             $subCategoryExtrafields = json_decode($subCategory->array_options['options_ticket_category_config']);
+                            $categoryDescription    = $subCategory->description;
 							print '<div class="ticket-subCategory ticket-subCategory'. $subCategory->id .' center active" id="' . $subCategory->id . '" data-rowid="' . $subCategory->id . '">';
 						} else {
 							print '<div class="ticket-subCategory ticket-subCategory'. $subCategory->id .' center" id="' . $subCategory->id . '" data-rowid="' . $subCategory->id . '" style="background:#ffffff">';
@@ -515,6 +518,16 @@ if ($entity > 0) {
     if (GETPOSTISSET('parentCategory') || GETPOSTISSET('parentCategory') && GETPOSTISSET('subCategory')) : ?>
         <div class="wpeo-form tableforinputfields">
             <div class="wpeo-gridlayout grid-2">
+                <?php  $visible = getDolGlobalInt('DIGIRISKDOLIBARR_TICKET_PUBLIC_INTERFACE_SHOW_CATEGORY_DESCRIPTION') || (!getDolGlobalInt('DIGIRISKDOLIBARR_TICKET_PUBLIC_INTERFACE_SHOW_CATEGORY_DESCRIPTION') && $mainCategoryChildrenExtrafields->show_description)
+            || (!getDolGlobalInt('DIGIRISKDOLIBARR_TICKET_PUBLIC_INTERFACE_SHOW_CATEGORY_DESCRIPTION') && $mainCategoryChildrenExtrafields->show_description == NUll && $subCategoryExtrafields->show_description);
+                if ($visible && dol_strlen($categoryDescription) > 0) : ?>
+                    <div class="form-element gridw-2">
+                        <span class="form-label"><?php print $langs->trans('Description'); ?>
+                        <label class="form-field-container">
+                            <textarea readonly><?php echo $categoryDescription; ?></textarea>
+                        </label>
+                    </div>
+                <?php endif; ?>
                 <div class="form-element">
                     <span class="form-label"><?php print $langs->trans("Message"); ?><span style="color:red"> *</span></span>
                     <label class="form-field-container">

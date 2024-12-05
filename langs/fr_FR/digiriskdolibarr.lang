@@ -1356,6 +1356,11 @@ PublicTicket                             = Interface publique des tickets
 TicketPublicInterfaceForbidden           = Accès interdit à l'interface publique des tickets
 WHSRegister                              = Registre SST
 
+#Public interface - Interface publique
+TicketPublicInterfaceShowCategoryDescription     = Afficher la description des catégories de ticket dans l'interface publique
+TicketPublicInterfaceShowCategoryDescriptionHelp = Activer cette option pour afficher la description des catégories de ticket dans l'interface publique
+
+
 # Stats - Statistiques
 TicketStatistics    = Statistiques des tickets
 ExportCSV           = Export CSV

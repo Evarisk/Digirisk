@@ -381,6 +381,17 @@ if ($conf->global->DIGIRISKDOLIBARR_TICKET_ENABLE_PUBLIC_INTERFACE == 1) {
     print $form->textwithpicto('', $langs->transnoentities('TicketPublicInterfaceUseSignatoryDescription'));
     print '</td></tr>';
 
+    // Show category description
+    print '<tr class="oddeven"><td>';
+    print $langs->transnoentities('TicketPublicInterfaceShowCategoryDescription');
+    print '</td><td class="center">';
+    print ajax_constantonoff('DIGIRISKDOLIBARR_TICKET_PUBLIC_INTERFACE_SHOW_CATEGORY_DESCRIPTION');
+    print '</td>';
+    print '<td class="center"></td>';
+    print '<td class="center">';
+    print $form->textwithpicto('', $langs->transnoentities('TicketPublicInterfaceShowCategoryDescriptionHelp'));
+    print '</td></tr>';
+
 	if (isModEnabled('multicompany')) {
 		//Page de sélection de l'entité
 		print '<tr class="oddeven"><td>' . $langs->transnoentities("ShowSelectorOnTicketPublicInterface") . '</td>';

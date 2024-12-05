@@ -87,10 +87,11 @@ if ($resHook < 0) {
 
 if (empty($resHook)) {
     if ($action == 'set_ticket_category_config') {
-        $data['use_signatory'] = GETPOST('use_signatory');
-        $data['mail_template'] = GETPOST('mail_template');
-        $data['recipients']    = implode(',', GETPOST('recipients'));
-        $data['photo_visible'] = GETPOST('photo_visible');
+        $data['use_signatory']    = GETPOST('use_signatory');
+        $data['show_description'] = GETPOST('show_description');
+        $data['mail_template']    = GETPOST('mail_template');
+        $data['recipients']       = implode(',', GETPOST('recipients', 'array'));
+        $data['photo_visible']    = GETPOST('photo_visible');
 
         $extraFields->attributes['ticket']['label']['digiriskdolibarr_ticket_email'] = $langs->trans('Email');
         foreach ($extraFields->attributes['ticket']['label'] as $key => $field) {
@@ -160,6 +161,16 @@ print '<tr class="oddeven"><td>';
 print img_picto('', 'fa-signature', 'class="paddingrightonly"') . $form->textwithpicto($langs->transnoentities('Signatory'), $langs->transnoentities('PublicInterfaceUseSignatoryDescription'), 1, 'info') . '</td>';
 print '</td><td class="center">';
 print '<input type="checkbox" id="use_signatory" name="use_signatory"' . ($ticketCategoryConfig->use_signatory ? ' checked=""' : '') . '"> ';
+print '</td></tr>';
+
+// Show category description
+print '<tr class="oddeven"><td>';
+print img_picto('', 'fa-font', 'class="paddingrightonly"') . $form->textwithpicto($langs->transnoentities('Description'), $langs->transnoentities('TicketPublicInterfaceShowCategoryDescriptionHelp'), 1, 'info') . '</td>';
+print '</td><td class="center">';
+print '<input type="checkbox" id="show_description" name="show_description"' . ($ticketCategoryConfig->show_description ? ' checked=""' : '') . '"> ';
+if (getDolGlobalInt('DIGIRISKDOLIBARR_TICKET_PUBLIC_INTERFACE_SHOW_CATEGORY_DESCRIPTION')) {
+    print $form->textwithtooltip($langs->transnoentities('Inherited'), $langs->transnoentities('PermissionInheritedFromConfig'));
+}
 print '</td></tr>';
 
 // Email template
