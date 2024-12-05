@@ -597,6 +597,7 @@ FirepermitsCategoriesArea         =	Espace des tags/catégories des permis de fe
 AddFirepermitIntoCategory         = Assigner cette catégorie au permis de feu
 RisksCategoriesArea               =	Espace des tags/catégories des risques
 AddRiskIntoCategory               = Assigner cette catégorie au risque
+AddTicketIntoCategory             = Assigner cette catégorie au ticket
 
 # AccidentTooltip - Tooltip des accidents
 VictimActivityTooltip              = Précisez l’activité ou la tâche de la victime au moment de l’accident, c’est-à-dire ce que faisait la victime
