@@ -117,12 +117,8 @@ if ($action == 'generateExtrafields') {
         'digiriskdolibarr_ticket_date'      => ['Label' => 'DeclarationDate', 'type' => 'datetime',                  'elementtype' => ['ticket'], 'position' => 43630260,                                                                                                        ]
     ];
 
-    $result = saturne_manage_extrafields($extraFieldsArrays, $commonExtraFieldsValue);
-    if ($ret1 > 0 && $ret2 > 0 && $ret3 > 0 && $ret4 > 0 && $ret5 > 0 && $ret6 > 0) {
-        setEventMessages($langs->transnoentities('ExtrafieldsCreated'), []);
-    } else {
-        setEventMessages($extra_fields->error, [], 'errors');
-    }
+    saturne_manage_extrafields($extraFieldsArrays, $commonExtraFieldsValue);
+    setEventMessages($langs->transnoentities('ExtrafieldsCreated'), []);
     dolibarr_set_const($db, 'DIGIRISKDOLIBARR_TICKET_EXTRAFIELDS', 1, 'integer', 0, '', 0);
 }
 
