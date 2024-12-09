@@ -901,6 +901,7 @@ class modDigiriskdolibarr extends DolibarrModules
 		$this->tabs[] = ['data' => 'thirdparty:+schedules:'. $pictoDigirisk .$langs->trans('Schedules').':digiriskdolibarr@digiriskdolibarr:1:/custom/saturne/view/saturne_schedules.php?id=__ID__&element_type=societe&module_name=societe']; // To add a new tab identified by code tabname1
 		$this->tabs[] = ['data' => 'user:+participation:'. $pictoDigirisk .$langs->trans('GP/UTParticipation').':digiriskdolibarr@digiriskdolibarr:1:/custom/digiriskdolibarr/view/digiriskelement/digiriskelement_evaluator.php?fromid=__ID__']; // To add a new tab identified by code tabname1
         $this->tabs[] = ['data' => 'user:+accidents:'. $pictoDigirisk .$langs->trans('Accidents').':digiriskdolibarr@digiriskdolibarr:1:/custom/digiriskdolibarr/view/accident/accident_list.php?fromiduser=__ID__']; // To add a new tab identified by code tabname1
+        $this->tabs[] = ['data' => 'categories_ticket:+config:' . $pictoDigirisk .$langs->trans('WHSRegister') . ':digiriskdolibarr@digiriskdolibarr:1:/custom/digiriskdolibarr/view/ticket/category_config.php?id=__ID__&type=ticket'];
 
         // Dictionaries
         $this->dictionaries = [
