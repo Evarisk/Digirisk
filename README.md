@@ -25,6 +25,7 @@
 - Saturne Framework : [Télécharger Saturne](https://dolistore.com/fr/modules/1906-Saturne.html)
 - Forum : [Forum Digirisk](https://dolibarr.fr/forum/t/module-digirisk-document-unique/37119)
 - D'autres modules développés par Evarisk disponibles sur [Dolistore.com](https://dolistore.com)
+- Le récapitulatif avec tous les liens [Linktree](https://linktr.ee/DigiRisk)
 
 ## Fonctionnalités
 
