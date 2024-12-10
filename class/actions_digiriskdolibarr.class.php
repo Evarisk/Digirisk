@@ -528,30 +528,6 @@ class ActionsDigiriskdolibarr
 		}
 	}
 
-    /**
-     * Overloading the formObjectOptions function : replacing the parent's function with the one below
-     *
-     * @param  array     $parameters Hook metadata (context, etc...)
-     * @return int                   0 < on error, 0 on success, 1 to replace standard code
-     * @throws Exception
-     */
-    public function formObjectOptions(array $parameters, $object, $action): int
-    {
-        global $extrafields, $langs;
-
-        if (strpos($parameters['context'], 'ticketcard') !== false) {
-            $picto = img_picto('', 'digiriskdolibarr_color@digiriskdolibarr', 'class="pictoModule"');
-            foreach ($extrafields->attributes['ticket']['label'] as $key => $value) {
-                if (strpos($key, 'digiriskdolibarr_ticket') === false) {
-                    continue; // Goes to the next element if ‘digiriskdolibarr_ticket’ is not found
-                }
-                $extrafields->attributes['ticket']['label'][$key] = $picto . $langs->transnoentities($value);
-            }
-        }
-
-        return 0; // or return 1 to replace standard code
-    }
-
 	/**
 	 *  Overloading the doActions function : replacing the parent's function with the one below
 	 *
@@ -752,6 +728,16 @@ class ActionsDigiriskdolibarr
             $extraFieldsNames = ['fk_risk', 'fk_preventionplan', 'fk_firepermit', 'fk_accident', 'fk_accidentinvestigation'];
             foreach ($extraFieldsNames as $extraFieldsName) {
                 $extrafields->attributes['projet_task']['label'][$extraFieldsName] = $picto . $langs->transnoentities($extrafields->attributes['projet_task']['label'][$extraFieldsName]);
+            }
+        }
+
+        if (strpos($parameters['context'], 'ticketcard') !== false) {
+            $picto = img_picto('', 'digiriskdolibarr_color@digiriskdolibarr', 'class="pictoModule"');
+            foreach ($extrafields->attributes['ticket']['label'] as $key => $value) {
+                if (strpos($key, 'digiriskdolibarr_ticket') === false) {
+                    continue; // Goes to the next element if ‘digiriskdolibarr_ticket’ is not found
+                }
+                $extrafields->attributes['ticket']['label'][$key] = $picto . $langs->transnoentities($value);
             }
         }
 
