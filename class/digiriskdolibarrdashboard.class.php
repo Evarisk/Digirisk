@@ -58,7 +58,8 @@ class DigiriskDolibarrDashboard
             ['type' => 'DigiriskResources',      'classPath' => '/digiriskresources.class.php'],
             ['type' => 'DigiriskElement',        'classPath' => '/digiriskelement.class.php'],
             ['type' => 'SaturneTask',            'classPath' => '/../../saturne/class/task/saturnetask.class.php'],
-            ['type' => 'TicketDashboard',        'classPath' => '/ticketdashboard.class.php']
+            ['type' => 'TicketDashboard',        'classPath' => '/ticketdashboard.class.php'],
+            ['type' => 'TicketStatsDashboard',   'classPath' => '/ticketstatsdashboard.class.php']
         ];
         foreach ($dashboardDatas as $dashboardData) {
             require_once __DIR__ . $dashboardData['classPath'];

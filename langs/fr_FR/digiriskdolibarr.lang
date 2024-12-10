@@ -1386,6 +1386,22 @@ NumberOfTicketsByMainTagAndByDigiriskElement    = Nombre de registres par catég
 NumberOfTicketsByMainSubTagAndByDigiriskElement = Nombre de registres par sous-catégorie et par GP
 NumberOfTicketsByYear                           = Nombre de tickets par année
 
+NomberofTickets                                 = Nombre de tickets
+
+TickerRepartitionPerUser                        = Repartition des tickets par utilisateur
+TopTicketPerUser                                = Top %s des sociétés avec le plus de tickets
+
+RunningTicket                                   = Tickets en cours
+NbOfOpennedTicket                               = Nombre de tickets ouverts
+OldestTicket                                    = Ticket le plus ancien
+OldestExchangeTicket                            = Échange le plus vieux
+
+NbTickerPerUser                                 = Nombre de tickets assignés par personnes
+MeanAnswerTime                                  = Temps moyen de réponse
+NbExchangePerTicker                             = Nombre d'échanges par ticket
+
+
+
 
 # Email - Email
 The                            = Le
