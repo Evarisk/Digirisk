@@ -41,6 +41,11 @@ class TicketDashboard extends DigiriskDolibarrDashboard
     public DoliDB $db;
 
     /**
+     * @var string Module name
+     */
+    public $module = 'digiriskdolibarr';
+
+    /**
      * @var string SQL FROM
      */
     public string $from = '';
@@ -267,10 +272,10 @@ class TicketDashboard extends DigiriskDolibarrDashboard
      */
     public function load_dashboard(array $moreParams = []): array
     {
-        global $user, $langs;
+        global $langs;
 
         $confName        = dol_strtoupper($this->module) . '_DASHBOARD_CONFIG';
-        $dashboardConfig = json_decode($user->conf->$confName);
+        $dashboardConfig = json_decode(getDolUserString($confName));
         $array = ['graphs' => [], 'lists' => [], 'disabledGraphs' => []];
 
         $category = new Categorie($this->db);
@@ -482,7 +487,7 @@ class TicketDashboard extends DigiriskDolibarrDashboard
             foreach ($tickets as $key => $ticket) {
                 $arrayTicketByYear[$key]['Ref']['value']        = $ticket['year'];
                 $arrayTicketByYear[$key]['Tickets']['value']    = $ticket['nb'];
-                $arrayTicketByYear[$key]['Percentage']['value'] = price2num($ticket['avg'] ?: 0, 2) . ' %';
+                $arrayTicketByYear[$key]['Percentage']['value'] = price2num($ticket['avg'] ?? 0, 2) . ' %';
             }
         }
 

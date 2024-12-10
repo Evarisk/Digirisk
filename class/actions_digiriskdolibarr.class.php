@@ -569,6 +569,7 @@ class ActionsDigiriskdolibarr
 	{
 		global $conf, $user, $langs;
 
+        $sql = '';
 		/* print_r($parameters); print_r($object); echo "action: " . $action; */
 		if (preg_match('/ticketlist|thirdpartyticket|projectticket/', $parameters['context'])) {	    // do something only for the context 'somecontext1' or 'somecontext2'
 			$searchCategoryTicketList = GETPOST('search_category_ticket_list');
@@ -577,13 +578,8 @@ class ActionsDigiriskdolibarr
 			}
 		}
 
-		if (true) {
-			$this->resprints = $sql;
-			return 0; // or return 1 to replace standard code
-		} else {
-			$this->errors[] = 'Error message';
-			return -1;
-		}
+        $this->resprints = $sql;
+        return 0; // or return 1 to replace standard code
 	}
 
 
@@ -596,12 +592,10 @@ class ActionsDigiriskdolibarr
 	 */
 	public function printFieldListWhere($parameters, $object)
 	{
-		global $conf, $user, $langs;
-
-		/* print_r($parameters); print_r($object); echo "action: " . $action; */
-		if (preg_match('/ticketlist|thirdpartyticket|projectticket/', $parameters['context'])) {        // do something only for the context 'somecontext1' or 'somecontext2'
+		if (preg_match('/ticketlist|thirdpartyticket|projectticket/', $parameters['context'])) {
 			$searchCategoryTicketSqlList = array();
 			$searchCategoryTicketList = GETPOST('search_category_ticket_list');
+            $sql                      = '';
 			if (is_array($searchCategoryTicketList) && !empty($searchCategoryTicketList)) {
 				foreach ($searchCategoryTicketList as $searchCategoryTicket) {
 					if (intval($searchCategoryTicket) == -2) {
@@ -624,15 +618,11 @@ class ActionsDigiriskdolibarr
 			if (!empty($searchCategoryTicketList)) {
 				$sql .= " GROUP BY t.rowid";
 			}
+
+            $this->resprints = $sql;
 		}
 
-		if (true) {
-			$this->resprints = $sql;
-			return 0; // or return 1 to replace standard code
-		} else {
-			$this->errors[] = 'Error message';
-			return -1;
-		}
+        return 0; // or return 1 to replace standard code
 	}
 
 
@@ -671,13 +661,8 @@ class ActionsDigiriskdolibarr
 			}
 		}
 
-		if (true) {
-			$this->resprints = $moreforfilter;
-			return 0; // or return 1 to replace standard code
-		} else {
-			$this->errors[] = 'Error message';
-			return -1;
-		}
+        $this->resprints = $moreforfilter ?? '';
+        return 0; // or return 1 to replace standard code
 	}
 
 	/**
@@ -691,6 +676,7 @@ class ActionsDigiriskdolibarr
 	{
 		global $conf, $db, $user, $langs;
 
+        $param = '';
 		/* print_r($parameters); print_r($object); echo "action: " . $action; */
 		if (preg_match('/ticketlist|thirdpartyticket|projectticket/', $parameters['context'])) {        // do something only for the context 'somecontext1' or 'somecontext2'
 			$searchCategoryTicketList = GETPOST('search_category_ticket_list');

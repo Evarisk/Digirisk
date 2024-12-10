@@ -149,7 +149,7 @@
                                                 <i class="fas fa-camera"></i><i class="fas fa-plus-circle button-add"></i>
                                             </div>
                                         </label>
-                                        <input type="hidden" class="favorite-photo" id="photo" name="photo" value="<?php echo $object->photo ?>"/>
+                                        <input type="hidden" class="favorite-photo" id="photo" name="photo" value="<?php echo $object->photo ?? '' ?>"/>
                                     </td>
                                     <td>
                                         <div class="wpeo-button <?php echo ($onPhone ? 'button-square-40' : 'button-square-50'); ?> 'open-media-gallery add-media modal-open" value="<?php echo $lastEvaluation->id; ?>">

@@ -301,7 +301,7 @@ class DigiriskResources extends SaturneObject
 		$allLinks = array();
 		if (!empty ($links) && $links > 0) {
 			foreach ($links as $link) {
-				if ($allLinks[$link->ref]->ref == $link->ref) {
+				if (isset($allLinks[$link->ref]) && $allLinks[$link->ref]->ref == $link->ref) {
 					array_push($allLinks[$link->ref]->id, $link->element_id);
 				} else {
 					$allLinks[$link->ref] = new stdClass();

@@ -412,10 +412,10 @@ class Accident extends SaturneObject
      */
     public function load_dashboard(): array
     {
-        global $user, $langs, $conf;
+        global $langs, $conf;
 
         $confName        = dol_strtoupper($this->module) . '_DASHBOARD_CONFIG';
-        $dashboardConfig = json_decode($user->conf->$confName);
+        $dashboardConfig = json_decode(getDolUserString($confName));
         $array = ['graphs' => [], 'disabledGraphs' => []];
 
         $join                   = ' LEFT JOIN ' . MAIN_DB_PREFIX . $this->table_element . ' as a ON a.rowid = t.fk_accident';
@@ -439,8 +439,8 @@ class Accident extends SaturneObject
         $employees                   = $evaluator->getNbEmployees();
         $arrayNbAccidentsByEmployees = $this->getNbAccidentsByEmployees($accidents, $accidentsWithWorkStops, $employees);
         $arrayFrequencyIndex         = $this->getFrequencyIndex($accidentsWithWorkStops, $employees);
-        $arrayFrequencyRate          = $this->getFrequencyRate($employees);
-        $arrayGravityRate            = $this->getGravityRate($employees);
+        $arrayFrequencyRate          = $this->getFrequencyRate($accidentsWithWorkStops);
+        $arrayGravityRate            = $this->getGravityRate($accidentsWithWorkStops);
 
         $array['widgets'] = [
             'accident' => [
@@ -683,10 +683,10 @@ class Accident extends SaturneObject
         require_once __DIR__ . '/accidentinvestigation.class.php';
 
         $accidentInvestigation = new AccidentInvestigation($this->db);
-        if (strpos($moreParam['filter'], 't.entity') !== false) {
+        if (isset($moreParam['filter']) && strpos($moreParam['filter'], 't.entity') !== false) {
             $accidentInvestigation->ismultientitymanaged = 0;
         }
-        $accidentInvestigations = $accidentInvestigation->fetchAll('', '', 0, 0, ['customsql' => ' t.status > ' . AccidentInvestigation::STATUS_DRAFT . $moreParam['filter']]);
+        $accidentInvestigations = $accidentInvestigation->fetchAll('', '', 0, 0, ['customsql' => ' t.status > ' . AccidentInvestigation::STATUS_DRAFT . ($moreParam['filter'] ?? '')]);
         if (!empty($accidentInvestigations) && is_array($accidentInvestigations)) {
             $array['nbaccidentinvestigations'] = count($accidentInvestigations);
         } else {
