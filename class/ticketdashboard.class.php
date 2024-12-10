@@ -41,6 +41,11 @@ class TicketDashboard extends DigiriskDolibarrDashboard
     public DoliDB $db;
 
     /**
+     * @var string Module name
+     */
+    public $module = 'digiriskdolibarr';
+
+    /**
      * @var string SQL FROM
      */
     public string $from = '';
@@ -70,7 +75,7 @@ class TicketDashboard extends DigiriskDolibarrDashboard
         if (dol_strlen($moreJoin) > 0) {
             $this->join .= $moreJoin;
         }
-        $this->where  = 't.fk_statut >= 0';
+        $this->where  = 't.fk_statut > 0';
         $this->where .= ' AND t.entity IN (' . getEntity('ticket') . ')';
         if (dol_strlen($moreWhere) > 0) {
             $this->where .= $moreWhere;
@@ -267,19 +272,36 @@ class TicketDashboard extends DigiriskDolibarrDashboard
      */
     public function load_dashboard(array $moreParams = []): array
     {
-        $getTicketsByMonth = $this->getTicketsByMonth();
+        global $langs;
+
+        $confName        = dol_strtoupper($this->module) . '_DASHBOARD_CONFIG';
+        $dashboardConfig = json_decode(getDolUserString($confName));
+        $array = ['graphs' => [], 'lists' => [], 'disabledGraphs' => []];
 
         $category = new Categorie($this->db);
         $category->fetch(getDolGlobalInt('DIGIRISKDOLIBARR_TICKET_MAIN_CATEGORY'));
         $mainCategories = $category->get_filles();
 
-        $getTicketsByMainTagAndByDigiriskElement    = $this->getTicketsByMainTagAndByDigiriskElement($mainCategories);
-        $getTicketsByMainSubTagAndByDigiriskElement = $this->getTicketsByMainSubTagAndByDigiriskElement($mainCategories);
-
-        $getTicketsByYear = $this->getTicketsByYear();
-
-        $array['graphs'] = [$getTicketsByMonth, $getTicketsByMainTagAndByDigiriskElement, $getTicketsByMainSubTagAndByDigiriskElement];
-        $array['lists']  = [$getTicketsByYear];
+        if (empty($dashboardConfig->graphs->NumberOfTicketsByMonth->hide)) {
+            $array['graphs'][] = $this->getTicketsByMonth();
+        } else {
+            $array['disabledGraphs']['NumberOfTicketsByMonth'] = $langs->transnoentities('NumberOfTicketsByMonth');
+        }
+        if (empty($dashboardConfig->graphs->NumberOfTicketsByMainTagAndByDigiriskElement->hide)) {
+            $array['graphs'][] = $this->getTicketsByMainTagAndByDigiriskElement($mainCategories);
+        } else {
+            $array['disabledGraphs']['NumberOfTicketsByMainTagAndByDigiriskElement'] = $langs->transnoentities('NumberOfTicketsByMainTagAndByDigiriskElement');
+        }
+        if (empty($dashboardConfig->graphs->NumberOfTicketsByMainSubTagAndByDigiriskElement->hide)) {
+            $array['graphs'][] = $this->getTicketsByMainSubTagAndByDigiriskElement($mainCategories);
+        } else {
+            $array['disabledGraphs']['NumberOfTicketsByMainSubTagAndByDigiriskElement'] = $langs->transnoentities('NumberOfTicketsByMainSubTagAndByDigiriskElement');
+        }
+        if (empty($dashboardConfig->graphs->NumberOfTicketsByYear->hide)) {
+            $array['lists'][] = $this->getTicketsByYear();
+        } else {
+            $array['disabledGraphs']['NumberOfTicketsByYear'] = $langs->transnoentities('NumberOfTicketsByYear');
+        }
 
         return $array;
     }
@@ -295,6 +317,7 @@ class TicketDashboard extends DigiriskDolibarrDashboard
 
         // Graph Title parameters
         $array['title'] = $langs->transnoentities('NumberOfTicketsByMonth');
+        $array['name']  = 'NumberOfTicketsByMonth';
         $array['picto'] = 'fontawesome_fa-ticket-alt_fas_#3bbfa8';
 
         // Graph parameters
@@ -352,6 +375,7 @@ class TicketDashboard extends DigiriskDolibarrDashboard
 
         // Graph Title parameters
         $array['title'] = $langs->transnoentities('NumberOfTicketsByMainTagAndByDigiriskElement');
+        $array['name']  = 'NumberOfTicketsByMainTagAndByDigiriskElement';
         $array['picto'] = 'fontawesome_fa-ticket-alt_fas_#3bbfa8';
 
         // Graph parameters
@@ -398,6 +422,7 @@ class TicketDashboard extends DigiriskDolibarrDashboard
 
         // Graph Title parameters
         $array['title'] = $langs->transnoentities('NumberOfTicketsByMainSubTagAndByDigiriskElement');
+        $array['name']  = 'NumberOfTicketsByMainSubTagAndByDigiriskElement';
         $array['picto'] = 'fontawesome_fa-ticket-alt_fas_#3bbfa8';
 
         // Graph parameters
@@ -449,6 +474,7 @@ class TicketDashboard extends DigiriskDolibarrDashboard
 
         // Graph Title parameters
         $array['title'] = $langs->transnoentities('NumberOfTicketsByYear');
+        $array['name']  = 'NumberOfTicketsByYear';
         $array['picto'] = 'fontawesome_fa-ticket-alt_fas_#3bbfa8';
 
         // Graph parameters
@@ -461,7 +487,7 @@ class TicketDashboard extends DigiriskDolibarrDashboard
             foreach ($tickets as $key => $ticket) {
                 $arrayTicketByYear[$key]['Ref']['value']        = $ticket['year'];
                 $arrayTicketByYear[$key]['Tickets']['value']    = $ticket['nb'];
-                $arrayTicketByYear[$key]['Percentage']['value'] = price2num($ticket['avg'] ?: 0, 2) . ' %';
+                $arrayTicketByYear[$key]['Percentage']['value'] = price2num($ticket['avg'] ?? 0, 2) . ' %';
             }
         }
 

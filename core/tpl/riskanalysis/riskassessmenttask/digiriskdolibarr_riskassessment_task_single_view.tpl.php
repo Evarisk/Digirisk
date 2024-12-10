@@ -13,7 +13,7 @@
 						<i class="fas fa-calendar-alt"></i> <?php echo date('d/m/Y', (($conf->global->DIGIRISKDOLIBARR_SHOW_TASK_START_DATE && ( ! empty($related_task->dateo))) ? $related_task->dateo : $related_task->datec)) . (($conf->global->DIGIRISKDOLIBARR_SHOW_TASK_END_DATE && ( ! empty($related_task->datee))) ? ' - ' . date('d/m/Y', $related_task->datee) : ''); ?>
 					</span>
 					<span class="riskassessment-task-timespent  riskassessment-total-task-timespent-<?php echo $related_task->id ?>">
-						<?php $allTimeSpentArray = $timeSpentSortedByTasks[$related_task->id];
+						<?php $allTimeSpentArray = $timeSpentSortedByTasks[$related_task->id] ?? [];
 						$allTimeSpent = 0;
 						if (is_array($allTimeSpentArray) && !empty($allTimeSpentArray)) {
 							foreach ($allTimeSpentArray as $timespent) {

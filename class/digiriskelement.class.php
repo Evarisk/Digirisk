@@ -136,7 +136,7 @@ class DigiriskElement extends SaturneObject
     {
         global $conf;
         if (empty($this->ref)) {
-            $type           = 'DIGIRISKDOLIBARR_' . strtoupper($this->element_type) . '_ADDON';
+            $type           = 'DIGIRISKDOLIBARR_' . dol_strtoupper($this->element_type) . '_ADDON';
             $objectMod = $conf->global->$type;
             $numberingModules = [
                 'digiriskelement/' . $this->element_type => $objectMod
@@ -563,10 +563,22 @@ class DigiriskElement extends SaturneObject
      */
     public function load_dashboard(): array
     {
-        $getDigiriskElementListsByDepth = $this->getDigiriskElementListsByDepth();
-        $getRisksByDigiriskElement      = $this->getRisksByDigiriskElement();
+        global $langs;
 
-        $array['graphs'] = [$getDigiriskElementListsByDepth, $getRisksByDigiriskElement];
+        $confName        = strtoupper($this->module) . '_DASHBOARD_CONFIG';
+        $dashboardConfig = json_decode(getDolUserString($confName));
+        $array = ['graphs' => [], 'disabledGraphs' => []];
+
+        if (empty($dashboardConfig->graphs->DigiriskElementsRepartitionByDepth->hide)) {
+            $array['graphs'][] = $this->getDigiriskElementListsByDepth();
+        } else {
+            $array['disabledGraphs']['DigiriskElementsRepartitionByDepth'] = $langs->transnoentities('DigiriskElementsRepartitionByDepth');
+        }
+        if (empty($dashboardConfig->graphs->RisksRepartitionByDigiriskElement->hide)) {
+            $array['graphs'][] = $this->getRisksByDigiriskElement();
+        } else {
+            $array['disabledGraphs']['RisksRepartitionByDigiriskElement'] = $langs->transnoentities('RisksRepartitionByDigiriskElement');
+        }
 
         return $array;
     }
@@ -585,6 +597,7 @@ class DigiriskElement extends SaturneObject
 
         // Graph Title parameters
         $array['title'] = $langs->transnoentities('RisksRepartitionByDigiriskElement');
+        $array['name']  = 'RisksRepartitionByDigiriskElement';
         $array['picto'] = $this->picto;
 
         // Graph parameters
@@ -637,6 +650,7 @@ class DigiriskElement extends SaturneObject
 
         // Graph Title parameters
         $array['title'] = $langs->transnoentities('DigiriskElementsRepartitionByDepth', getDolGlobalInt('DIGIRISKDOLIBARR_DIGIRISKELEMENT_DEPTH_GRAPH'));
+        $array['name']  = 'DigiriskElementsRepartitionByDepth';
         $array['picto'] = $this->picto;
 
         // Graph parameters

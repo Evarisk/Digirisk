@@ -145,7 +145,7 @@ class RiskAssessmentDocument extends DigiriskDocuments
     {
         global $langs;
 
-        $filter                  = ['customsql' => 't.type = "' . $this->element . '"' . $moreParam['filter']];
+        $filter                  = ['customsql' => 't.type = "' . $this->element . '"' . ($moreParam['filter'] ?? '')];
         $riskAssessmentDocuments = $this->fetchAll('desc', 't.rowid', 1, 0, $filter);
         if (!empty($riskAssessmentDocuments) && is_array($riskAssessmentDocuments)) {
             $riskAssessmentDocument       = array_shift($riskAssessmentDocuments);
@@ -157,7 +157,7 @@ class RiskAssessmentDocument extends DigiriskDocuments
             $nbDaysBeforeNextGenerateDate = num_between_day($nextGenerateTimeStamp, $now, 1);
 
             $array['nextgeneratedate']  = img_picto('', 'fontawesome_fa-calendar_far_#263C5C80', 'class="pictofixedwidth"') . $nextGenerateDate;
-            $array['nextgeneratedate'] .= ' ' . (!empty($nbDaysAfterNextGenerateDate) ? $nbDaysAfterNextGenerateDate . ' ' . $langs->transnoentities('Days') : $langs->transnoentities('NoDelay'));
+            $array['nextgeneratedate'] .= ' ' . (!empty($nbDaysAfterNextGenerateDate) ? $nbDaysAfterNextGenerateDate . ' ' . $langs->transnoentities('Days') : '');
             $array['lastgeneratedate']  = img_picto('', 'fontawesome_fa-calendar_far_#263C5C80', 'class="pictofixedwidth"') . $lastGenerateDate;
             $array['delaygeneratedate'] = !empty($nbDaysBeforeNextGenerateDate) ? $nbDaysBeforeNextGenerateDate . ' ' . $langs->transnoentities('Days') : $langs->transnoentities('NoDelay');
         } else {

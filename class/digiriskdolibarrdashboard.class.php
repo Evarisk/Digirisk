@@ -65,7 +65,7 @@ class DigiriskDolibarrDashboard
             if ($dashboardData['type'] != 'TicketDashboard') {
                 $className = new $dashboardData['type']($this->db);
             } else {
-                $className = new TicketDashboard($this->db, $moreParams['join'], $moreParams['where']);
+                $className = new TicketDashboard($this->db, $moreParams['join'] ?? '', $moreParams['where'] ?? '');
             }
             if ($dashboardData['type'] != 'SaturneTask') {
                 $array[$dashboardData['type']] = array_key_exists('Load' . $dashboardData['type'], $moreParams) && $moreParams['Load' . $dashboardData['type']] ? $className->load_dashboard() : [];
@@ -137,7 +137,7 @@ class DigiriskDolibarrDashboard
                 $result[$i]['year'] = $row->year;
                 $result[$i]['nb']   = $row->nb;
                 if ($i > 0 && $row->nb > 0) {
-                    $result[$i - 1]['avg'] = ($result[$i - 1]['nb']) / $row->nb * 100;
+                    $result[$i - 1]['avg'] = -($row->nb - ($result[$i - 1]['nb'])) / $row->nb * 100;
                 }
                 $i++;
             }

@@ -72,7 +72,10 @@ window.digiriskdolibarr.form.searchForm = function(event) {
     'backtopage',
     'button_removefilter_x',
     'button_removefilter',
-    'button_removefilter.x'
+    'button_removefilter.x',
+    'risklist_selectedfields',
+    'shared_risklist_selectedfields',
+    'inherited_risklist_selectedfields'
   ]
 
   if (!removeFilter) {

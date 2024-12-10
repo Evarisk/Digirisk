@@ -557,38 +557,6 @@ function show_category_image($object, $upload_dir, $noprint = 0)
 }
 
 /**
-* Show header for public page ticket
-*
-* @param  string $title       Title
-* @param  string $head        Head array
-* @param  int    $disablejs   More content into html header
-* @param  int    $disablehead More content into html header
-* @param  array  $arrayofjs   Array of complementary js files
-* @param  array  $arrayofcss  Array of complementary css files
-* @return void
-*/
-function digiriskdolibarr_ticket_header($title, $head = "", $disablejs = 0, $disablehead = 0,$arrayofjs = array(), $arrayofcss = array())
-{
-	global $conf, $mysoc;
-
-	require_once DOL_DOCUMENT_ROOT . '/core/lib/files.lib.php';
-
-	top_htmlhead($head, $title, $disablejs, $disablehead, $arrayofjs, $arrayofcss, 0, 1); // Show html headers
-
-	if (!empty($conf->global->DIGIRISKDOLIBARR_TICKET_SHOW_COMPANY_LOGO)) {
-		$urllogo = DOL_URL_ROOT . '/viewimage.php?modulepart=mycompany&entity=' . $conf->entity . '&file=' . urlencode('/logos/thumbs/'.$mysoc->logo_small);
-
-		// Output html code for logo
-		if ($urllogo) {
-			print '<div class="center signature-logo">';
-			print '<img src="' . $urllogo . '">';
-			print '</div>';
-		}
-		print '<div class="underbanner clearboth"></div>';
-	}
-}
-
-/**
 * @param $sdir
 * @param string $size
 * @param int $maxHeight
@@ -1533,13 +1501,15 @@ function getNomUrlEntity($object, $withpicto = 0, $option = '', $addlabel = 0, $
 		$linkstart  = '<a href="' . $url . '"';
 		$linkstart .= $linkclose . '>';
 		$linkend    = '</a>';
+	    $result    .= $linkstart;
 	}
 
-	$result                      .= $linkstart;
 	if ($withpicto) $result      .= '<i class="fas fa-building"></i>' . ' ';
 	if ($withpicto != 2) $result .= 'S' . $object->entity;
 	if ($withpicto != 2) $result .= (($addlabel && dolibarr_get_const($db, 'MAIN_INFO_SOCIETE_NOM', $object->entity)) ? $sep . dol_trunc(dolibarr_get_const($db, 'MAIN_INFO_SOCIETE_NOM', $object->entity), ($addlabel > 1 ? $addlabel : 0)) : '');
-	$result                      .= $linkend;
+    if (isset($linked)) {
+        $result .= $linkend;
+    }
 
 	global $action;
 	$hookmanager->initHooks(array('entitydao'));
@@ -2052,95 +2022,6 @@ function fetchDictionnary($tablename)
 		return $records;
 	} else {
 		return -1;
-	}
-}
-
-/**
- *	Delete an optional attribute
- *
- *	@param	string	$attrname		Code of attribute to delete
- *  @param  string	$elementtype    Element type ('member', 'product', 'thirdparty', 'contact', ...)
- *  @return int              		< 0 if KO, 0 if nothing is done, 1 if OK
- */
-function extrafield_soft_delete($attrname, $elementtype = 'member', $extrafields)
-{
-	if ($elementtype == 'thirdparty') {
-		$elementtype = 'societe';
-	}
-	if ($elementtype == 'contact') {
-		$elementtype = 'socpeople';
-	}
-
-	$error = 0;
-
-	if (!empty($attrname) && preg_match("/^\w[a-zA-Z0-9-_]*$/", $attrname)) {
-		$result = extrafields_delete_label($attrname, $elementtype, $extrafields);
-		if ($result < 0) {
-			$extrafields->error = $extrafields->db->lasterror();
-			$extrafields->errors[] = $extrafields->db->lasterror();
-			$error++;
-		}
-
-		if (!$error) {
-			$sql = "SELECT COUNT(rowid) as nb";
-			$sql .= " FROM ".MAIN_DB_PREFIX."extrafields";
-			$sql .= " WHERE elementtype = '".$extrafields->db->escape($elementtype)."'";
-			$sql .= " AND name = '".$extrafields->db->escape($attrname)."'";
-			//$sql.= " AND entity IN (0,".$conf->entity.")";      Do not test on entity here. We want to see if there is still on field remaning in other entities before deleting field in table
-			$resql = $extrafields->db->query($sql);
-			if ($resql) {
-				$obj = $extrafields->db->fetch_object($resql);
-				if ($obj->nb <= 0) {
-//					$result = $extrafields->db->DDLDropField(MAIN_DB_PREFIX.$table, $attrname); // This also drop the unique key
-					if ($result < 0) {
-						$extrafields->error = $extrafields->db->lasterror();
-						$extrafields->errors[] = $extrafields->db->lasterror();
-					}
-				}
-			}
-		}
-
-		return $result;
-	} else {
-		return 0;
-	}
-}
-
-// phpcs:disable PEAR.NamingConventions.ValidFunctionName.ScopeNotCamelCaps
-/**
- *	Delete description of an optional attribute
- *
- *	@param	string	$attrname			Code of attribute to delete
- *  @param  string	$elementtype        Element type ('member', 'product', 'thirdparty', ...)
- *  @return int              			< 0 if KO, 0 if nothing is done, 1 if OK
- */
-function extrafields_delete_label($attrname, $elementtype = 'member', $extrafields)
-{
-	global $conf;
-
-	if ($elementtype == 'thirdparty') {
-		$elementtype = 'societe';
-	}
-	if ($elementtype == 'contact') {
-		$elementtype = 'socpeople';
-	}
-
-	if (isset($attrname) && $attrname != '' && preg_match("/^\w[a-zA-Z0-9-_]*$/", $attrname)) {
-		$sql = "DELETE FROM ".MAIN_DB_PREFIX."extrafields";
-		$sql .= " WHERE name = '".$extrafields->db->escape($attrname)."'";
-		$sql .= " AND entity IN  (0,".$conf->entity.')';
-		$sql .= " AND elementtype = '".$extrafields->db->escape($elementtype)."'";
-
-		dol_syslog(get_class($extrafields)."::delete_label", LOG_DEBUG);
-		$resql = $extrafields->db->query($sql);
-		if ($resql) {
-			return 1;
-		} else {
-			dol_print_error($extrafields->db);
-			return -1;
-		}
-	} else {
-		return 0;
 	}
 }
 
