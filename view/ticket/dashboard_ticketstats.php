@@ -1,5 +1,4 @@
 <?php
-
 /* Copyright (C) 2024 EVARISK <technique@evarisk.com>
  *
  * This program is free software; you can redistribute it and/or modify
@@ -19,7 +18,7 @@
 /**
  * \file    view/ticket/dashboard_ticketstats.php
  * \ingroup digiriskdolibarr
- * \brief   Page with tickets statistics
+ * \brief   Page with ticket statistics
  */
 
 if (file_exists('../digiriskdolibarr.main.inc.php')) {
@@ -30,8 +29,68 @@ if (file_exists('../digiriskdolibarr.main.inc.php')) {
     die('Include of digiriskdolibarr main fails');
 }
 
-$moreParams = [
-    'LoadTicketStatsDashboard' => 1
-];
+// Load Saturne libraries
+require_once __DIR__ . '/../../../saturne/class/saturnedashboard.class.php';
 
-require_once __DIR__ . '/../../../saturne/core/tpl/index/index_view.tpl.php';
+// Load DigiriskDolibarr libraries
+require_once __DIR__ . '/../../lib/digiriskdolibarr_ticket.lib.php';
+
+// Global variables definitions
+global $conf, $db, $langs, $hookmanager, $moduleName, $moduleNameLowerCase, $user;
+
+// Load translation files required by the page
+saturne_load_langs();
+
+// Get parameters
+$action = GETPOST('action', 'aZ09');
+
+// Initialize technical objects
+$dashboard = new SaturneDashboard($db, $moduleNameLowerCase);
+
+$upload_dir = $conf->$moduleNameLowerCase->multidir_output[$conf->entity ?? 1];
+
+$hookmanager->initHooks([$moduleNameLowerCase . 'dashboard_ticket', 'globalcard']); // Note that conf->hooks_modules contains array
+
+// Security check - Protection if external user
+$permissionToRead = $user->hasRight($moduleNameLowerCase, 'read');
+saturne_check_access($permissionToRead);
+
+/*
+ * Actions
+ */
+
+$parameters = [];
+$resHook    = $hookmanager->executeHooks('doActions', $parameters, $object, $action); // Note that $action and $object may have been modified by some hooks
+if ($resHook < 0) {
+    setEventMessages($hookmanager->error, $hookmanager->errors, 'errors');
+}
+
+if (empty($resHook)) {
+    // Actions adddashboardinfo, closedashboardinfo, dashboardfilter, generate_csv
+    require_once __DIR__ . '/../../../saturne/core/tpl/actions/dashboard_actions.tpl.php';
+}
+
+/*
+ * View
+ */
+
+$title   = $langs->transnoentities('TicketManagementDashboard');
+$helpUrl = 'FR:Module_' . $moduleName;
+
+saturne_header(0, '', $title, $helpUrl);
+
+print load_fiche_titre($title, '', 'ticket');
+
+$head = ticketstats_prepare_head();
+print dol_get_fiche_head($head, 'dashboard',$title, -1, 'ticket');
+
+print '<div class="fichecenter">';
+
+$moreParams = ['LoadTicketStatsDashboard' => 1];
+$dashboard->show_dashboard($moreParams);
+
+print '</div>';
+
+// End of page
+llxFooter();
+$db->close();
