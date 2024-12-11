@@ -1386,22 +1386,19 @@ NumberOfTicketsByMainTagAndByDigiriskElement    = Nombre de registres par catég
 NumberOfTicketsByMainSubTagAndByDigiriskElement = Nombre de registres par sous-catégorie et par GP
 NumberOfTicketsByYear                           = Nombre de tickets par année
 
-NomberofTickets                                 = Nombre de tickets
-
-TickerRepartitionPerUser                        = Repartition des tickets par utilisateur
-TopTicketPerUser                                = Top %s des sociétés avec le plus de tickets
-
-RunningTicket                                   = Tickets en cours
-NbOfOpennedTicket                               = Nombre de tickets ouverts
-OldestTicket                                    = Ticket le plus ancien
-OldestExchangeTicket                            = Échange le plus vieux
-
-NbTickerPerUser                                 = Nombre de tickets assignés par personnes
-MeanAnswerTime                                  = Temps moyen de réponse
-NbExchangePerTicker                             = Nombre d'échanges par ticket
-
-
-
+# Ticket Management Dashboard - Tableau de bord de gestion des tickets
+TicketManagementDashboard                 = Tableau de bord de gestion des tickets
+RunningTicket                             = Tickets en cours
+NbOfOpenedTicket                          = Nombre de tickets ouverts
+OldestTicket                              = Ticket le plus ancien
+OldestTicketDescription                   = Ticket le plus ancien avec le temps écoulé depuis sa création
+OldestMessageTicket                       = Ticket le plus ancien avec un message
+OldestMessageTicketDescription            = Ticket le plus ancien avec un message et le temps écoulé depuis la création du message
+MeanAnswerTime                            = Temps moyen de réponse
+NbTicketPerUser                           = Nombre de tickets assignés par personnes en moyenne
+NbExchangePerTicket                       = Nombre d'échanges par ticket
+TicketRepartitionPerUserAndMeanAnswerTime = Répartition des tickets par utilisateur et temps moyen de réponse
+TopSocietyWithMostTickets                 = Top %s des sociétés avec le plus de tickets
 
 # Email - Email
 The                            = Le
@@ -1409,6 +1406,7 @@ TicketMessage                  = Message du registre
 SeeTicketUrl                   = Voir le ticket
 AutoNotificationTicket         = Notification mail envoyée automatiquement par
 TicketPublicInterfaceOtherName = Interface de gestion des registres SST et DGI
+
 
 
 # Ticket document
