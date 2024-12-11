@@ -16,21 +16,13 @@
  */
 
 /**
- * \file    class/ticketdashboard.class.php
+ * \file    class/ticketstatsdashboard.class.php
  * \ingroup digiriskdolibarr
  * \brief   Class file for manage TicketDashboard
  */
 
 // load Dolibarr librairies
-require_once DOL_DOCUMENT_ROOT . '/ticket/class/ticket.class.php';
-require_once DOL_DOCUMENT_ROOT . '/core/lib/date.lib.php';
-require_once DOL_DOCUMENT_ROOT . '/categories/class/categorie.class.php';
-
 require_once DOL_DOCUMENT_ROOT . '/comm/action/class/actioncomm.class.php';
-require_once DOL_DOCUMENT_ROOT . '/societe/class/societe.class.php';
-
-require_once DOL_DOCUMENT_ROOT . '/user/class/user.class.php';
-
 
 /**
  * Class to manage stats for tickets
@@ -43,30 +35,13 @@ class TicketStatsDashboard extends DigiriskDolibarrDashboard
     public DoliDB $db;
 
     /**
-     * @var string SQL FROM
-     */
-    public string $from = '';
-
-    /**
-     * @var string|null SQL JOIN
-     */
-    public ?string $join = '';
-
-    /**
-     * @var string|null SQL WHERE
-     */
-    public ?string $where = '';
-
-    /**
      * Constructor
      *
-     * @param DoliDB $db             Database handler
-     * @param string|null $moreJoin  More SQL JOIN
-     * @param string|null $moreWhere More SQL filters (' AND ...')
+     * @param DoliDB $db Database handler
      */
     public function __construct(DoliDB $db)
     {
-        $this->db = $db;
+        parent::__construct($db);
     }
 
     /**
@@ -78,127 +53,181 @@ class TicketStatsDashboard extends DigiriskDolibarrDashboard
      */
     public function load_dashboard(array $moreParams = []): array
     {
-        $allTickets = $this->getAllTickets();
-        $societe = new Societe($this->db);
+        $tickets = $this->getAllTickets();
 
-        $runningTickets = $this->getRunningTickets($allTickets);
-        $ticketStats    = $this->getTicketStats($allTickets);
+        $runningTickets = $this->getRunningTickets($tickets);
+        $ticketStats    = $this->getTicketStats($tickets);
 
-        $ticketRepartitionPerUser = $this->getTicketRepartitionPerUser($allTickets);
-        $ticketRepartitionPerSoc = $this->getTicketRepartitionPerSoc($allTickets);
+        $getTicketRepartitionPerUserAndMeanAnswerTime = $this->getTicketRepartitionPerUserAndMeanAnswerTime($tickets);
+        $getTopSocietyWithMostTickets                 = $this->getTopSocietyWithMostTickets($tickets);
 
         $array['widgets'] = array_merge($runningTickets, $ticketStats);
-        $array['graphs'] = [$ticketRepartitionPerUser, $ticketRepartitionPerSoc];
+        $array['graphs']  = [$getTicketRepartitionPerUserAndMeanAnswerTime, $getTopSocietyWithMostTickets];
 
         return $array;
+    }
+
+    /**
+     * Get all tickets from database for current entity order by datec DESC
+     * fetch all comments for each ticket if exists
+     * add them to ticket object as comms property (array of comments)
+     *
+     * @return array     $tickets All tickets with comments if exists or empty array
+     * @throws Exception          If an error occurs while fetching tickets
+     */
+    public function getAllTickets(): array
+    {
+        try {
+            $actionComm = new ActionComm($this->db);
+            $tickets    = saturne_fetch_all_object_type('Ticket', 'DESC', 't.datec');
+            if (!empty($tickets) && is_array($tickets)) {
+                foreach ($tickets as $ticketID => $ticket) {
+                    $ticket->comms = [];
+                    $actionComms   = $actionComm->getActions(0, $ticketID, 'ticket', 'AND a.code LIKE "TICKET_MSG%"', 'a.datec');
+                    if (!empty($actionComms) && is_array($actionComms)) {
+                        $ticket->comms = $actionComms;
+                    } elseif (is_string($actionComms)) {
+                        dol_syslog(__METHOD__ . 'Error while fetching comments for ticket ID {$ticketID}: ' . $actionComms, LOG_ERR);
+                    }
+                }
+            }
+        } catch (Exception $e) {
+            dol_syslog(__METHOD__ . 'Error while fetching tickets: ' . $e->getMessage(), LOG_ERR);
+            throw $e;
+        }
+
+        return $tickets;
     }
 
     /**
      * Get running tickets
      *
-     * @param  array $allTickets All tickets
-     * @return array             Widget of running tickets
+     * @param  array $tickets All tickets from database for current entity order by datec DESC with comments if exists or empty array
+     * @return array          Widget of running tickets with the oldest ticket and oldest message ticket
      */
-    public function getRunningTickets(array $allTickets): array
+    public function getRunningTickets(array $tickets): array
     {
-        global $langs;
+        global $form, $langs;
 
-        $openTickets = 0;
-        $oldestTicket = null;
+        // Widget title parameters
+        $array['title']      = $langs->transnoentities('RunningTicket');
+        $array['widgetName'] = 'RunningTicket';
+        $array['picto']      = 'fas fa-ticket-alt';
+        $array['pictoColor'] = '#0D8AFF';
+
+        // Widget labels parameters
+        $array['label'] = [
+            $langs->transnoentities('NbOfOpenedTicket'),
+            $form->textwithpicto($langs->transnoentities('OldestTicket'), $langs->transnoentities('OldestTicketDescription')),
+            $form->textwithpicto($langs->transnoentities('OldestMessageTicket'), $langs->transnoentities('OldestMessageTicketDescription'))
+        ];
+
+        // Initialize variables
+        $openTickets         = 0;
+        $oldestTicket        = null;
         $oldestMessageTicket = null;
-        foreach ($allTickets as $ticket) {
-            if (!in_array($ticket->fk_statut, [Ticket::STATUS_CANCELED, Ticket::STATUS_CLOSED])) {
-                $openTickets++;
+        $now                 = dol_now();
 
-                if (empty($oldestTicket) || $ticket->datec < $oldestTicket->datec) {
-                    $oldestTicket = $ticket;
-                }
+        // Get number of open tickets, oldest ticket and oldest message ticket
+        if (!empty($tickets)) {
+            foreach ($tickets as $ticket) {
+                if (!in_array($ticket->fk_statut, [Ticket::STATUS_CANCELED, Ticket::STATUS_CLOSED])) {
+                    $openTickets++;
 
-                $lastComm = !empty($ticket->comms) ? current($ticket->comms) : null;
-                if (!empty($lastComm) && (empty($oldestMessageTicket) || $lastComm->datec < $oldestMessageTicket->datec)) {
-                    $oldestMessageTicket = $lastComm;
+                    if (empty($oldestTicket) || $ticket->datec < $oldestTicket->datec) {
+                        $oldestTicket = $ticket;
+                    }
+
+                    $lastComm = !empty($ticket->comms) ? current($ticket->comms) : null;
+                    if (!empty($lastComm) && (empty($oldestMessageTicket) || $lastComm->datec < $oldestMessageTicket->datec)) {
+                        $oldestMessageTicket = $lastComm;
+                    }
                 }
             }
         }
 
-        $array = [
-            'runningTickets' => [
-                'title'       => $langs->transnoentities('RunningTicket'),
-                'widgetName'  => 'RunningTicket',
-                'picto'       => 'fas fa-ticket-alt',
-                'pictoColor'  => '#0D8AFF',
-                'label'       => [$langs->transnoentities('NbOfOpennedTicket'), $langs->transnoentities('OldestTicket'), $langs->transnoentities('OldestMessageTicket')],
-                'content'     => [$openTickets, !empty($oldestTicket) ? dol_print_date($oldestTicket->datec, '%d/%m/%Y') . ' (' . convertSecondToTime(dol_now() - $oldestTicket->datec) . ')' : '', !empty($oldestMessageTicket) ? dol_print_date($oldestMessageTicket->datec, '%d/%m/%Y') . ' (' . convertSecondToTime(dol_now() - $oldestMessageTicket->datec) . ')' : ''],
-                'moreContent' => ['', $oldestTicket->getNomUrl(2, 0, 0, 'marginleftonly'), !empty($oldestMessageTicket) ? $allTickets[$oldestMessageTicket->fk_element]->getNomUrl(2, 0, 0, 'marginleftonly') : ''],
-            ]
+        // Widget content parameters
+        $array['content'] = [
+            $openTickets,
+            !empty($oldestTicket) ? dol_print_date($oldestTicket->datec, 'day') : $langs->transnoentities('NoData'),
+            !empty($oldestMessageTicket) ? dol_print_date($oldestMessageTicket->datec, 'day') : $langs->transnoentities('NoData')
         ];
 
-        return $array;
+        $array['moreContent'] = [
+            '',
+            !empty($oldestTicket) ? ' (' . convertSecondToTime(roundUpToNextMultiple($now - $oldestTicket->datec, 60)) . ')' . $oldestTicket->getNomUrl(2, '', 0, 'paddingleft') : '',
+            !empty($oldestMessageTicket) ? ' (' . convertSecondToTime(roundUpToNextMultiple($now - $oldestMessageTicket->datec, 60)) . ')' . $tickets[$oldestMessageTicket->fk_element]->getNomUrl(2, '', 0, 'paddingleft') : ''
+        ];
+
+        return ['runningTickets' => $array];
     }
 
     /**
      * Get ticket stats
      *
-     * @param  array $allTickets All tickets
-     * @return array             Widget of ticket stats
+     * @param  array $tickets All tickets from database for current entity order by datec DESC with comments if exists or empty array
+     * @return array          Widget of ticket stats with number of ticket per user, mean answer time and number of exchange per ticket
      */
-    function getTicketStats($allTickets) {
+    function getTicketStats(array $tickets): array
+    {
         global $langs;
 
-        $timePerTicket = [];
-        $users = [];
-        $nbTicketAssigned = 0;
-        $nbExchanges = 0;
-        foreach ($allTickets as $ticket) {
-            if (!empty($ticket->date_close)) {
-                array_push($timePerTicket, $ticket->date_close - $ticket->datec);
-            }
-            if (!empty($ticket->fk_user_assign)) {
-                $nbTicketAssigned++;
-                if (!in_array($ticket->fk_user_assign, $users)) {
-                    $users[] = $ticket->fk_user_assign;
-                }
-            }
-            $nbExchanges += count($ticket->comms);
-        }
+        // Widget title parameters
+        $array['title']      = $langs->transnoentities('TicketStatistics');
+        $array['widgetName'] = 'TicketStatistics';
+        $array['picto']      = 'fas fa-chart-pie';
+        $array['pictoColor'] = '#32E592';
 
-        $array = [
-            'ticketStats' => [
-                'title'       => $langs->transnoentities('TicketStatistics'),
-                'widgetName'  => 'TicketStatistics',
-                'picto'       => 'fas fa-chart-pie',
-                'pictoColor'  => '#32E592',
-                'label'       => [$langs->transnoentities('NbTickerPerUser'), $langs->transnoentities('MeanAnswerTime'), $langs->transnoentities('NbExchangePerTicker')],
-                'content'     => [count($users) ? intdiv($nbTicketAssigned, count($users)) : 0, count($timePerTicket) ? convertSecondToTime(array_sum($timePerTicket) / count($timePerTicket), 'allwithouthour') : 'N/A', $allTickets ? ceil($nbExchanges / count($allTickets)) : 0],
-                'moreContent' => [],
-            ]
+        // Widget labels parameters
+        $array['label'] = [
+            $langs->transnoentities('MeanAnswerTime'),
+            $langs->transnoentities('NbTicketPerUser'),
+            $langs->transnoentities('NbExchangePerTicket')
         ];
 
-        return $array;
+        // Initialize variables
+        $timePerTicket    = [];
+        $users            = [];
+        $nbTicketAssigned = 0;
+        $nbExchanges      = 0;
+
+        if (!empty($tickets)) {
+            foreach ($tickets as $ticket) {
+                if (!empty($ticket->date_close)) {
+                    $timePerTicket[] = $ticket->date_close - $ticket->datec;
+                }
+                if (!empty($ticket->fk_user_assign)) {
+                    $nbTicketAssigned++;
+                    if (!in_array($ticket->fk_user_assign, $users)) {
+                        $users[] = $ticket->fk_user_assign;
+                    }
+                }
+                $nbExchanges += count($ticket->comms);
+            }
+        }
+
+        // Widget content parameters
+        $array['content'] = [
+            count($timePerTicket) ? convertSecondToTime(array_sum($timePerTicket) / count($timePerTicket)) : $langs->transnoentities('NoData'),
+            count($users) ? intdiv($nbTicketAssigned, count($users)) : 0,
+            $tickets ? ceil($nbExchanges / count($tickets)) : 0
+        ];
+
+        return ['ticketStats' => $array];
     }
 
-    function getTicketRepartitionPerSoc($allTickets)
+    /**
+     * Get ticket repartition per user with number of ticket and mean answer time
+     *
+     * @param array $tickets All tickets from database for current entity order by datec DESC with comments if exists or empty array
+     * @return array          Graph of ticket repartition per user with number of ticket and mean answer time
+     */
+    function getTicketRepartitionPerUserAndMeanAnswerTime(array $tickets): array
     {
         global $langs;
 
-        $soc = new Societe($this->db);
-        $nbTicketBySoc = [];
-        foreach ($allTickets as $ticket) {
-            if ($ticket->fk_soc == null) {
-                continue;
-            }
-            $soc->fetch($ticket->fk_soc);
-            if (!isset($nbTicketBySoc[$soc->name])) {
-                $nbTicketBySoc[$soc->name] = 0;
-            }
-            $nbTicketBySoc[$soc->name]++;
-        }
-        arsort($nbTicketBySoc);
-        $nbOfUsers = 10;
-        $nbTicketBySoc = array_slice($nbTicketBySoc, 0, $nbOfUsers);
-
-        // Graph Title parameters
-        $array['title'] = $langs->transnoentities('TopTicketPerUser', $nbOfUsers);
+        // Graph title parameters
+        $array['title'] = $langs->transnoentities('TicketRepartitionPerUserAndMeanAnswerTime');
         $array['picto'] = 'fontawesome_fa-ticket-alt_fas_#3bbfa8';
 
         // Graph parameters
@@ -206,90 +235,116 @@ class TicketStatsDashboard extends DigiriskDolibarrDashboard
         $array['height']     = 300;
         $array['type']       = 'bar';
         $array['showlegend'] = 1;
-        $array['dataset']    = 4;
+        $array['dataset']    = 3;
         $array['moreCSS']    = 'grid-2';
 
-        $array['labels'] = [[
-            'label' => $langs->transnoentities('NomberofTickets'),
-            'color' => '#A1467E'
-        ]];
+        $array['labels'] = [
+            ['label' => $langs->transnoentities('NbOfTickets')],
+            ['label' => $langs->transnoentities('MeanAnswerTime')]
+        ];
 
-        foreach ($nbTicketBySoc as $socName => $nbTicket) {
-            $dataElem = [
-                $socName,
-                $nbTicket
-            ];
-            $array['data'][] = $dataElem;
-        }
+        // Initialize technical objects
+        $userTmp = new User($this->db);
 
-        return $array;
-    }
+        // Initialize variables
+        $nbTicketPerUser = [];
 
-    function getTicketRepartitionPerUser($allTickets)
-    {
-        global $langs;
+        if (!empty($tickets)) {
+            foreach ($tickets as $ticket) {
+                if ($ticket->fk_user_assign == null) {
+                    continue;
+                }
 
-        $user = new User($this->db);
-        $nbTicketByUser = [];
-        foreach ($allTickets as $ticket) {
-            if ($ticket->fk_user_assign == null) {
-                continue;
+                $userTmp->fetch($ticket->fk_user_assign);
+                $userFullName = $userTmp->getFullName($langs);
+                if (!isset($nbTicketPerUser[$userFullName])) {
+                    $nbTicketPerUser[$userFullName]['nbTicket'] = 0;
+                }
+                $nbTicketPerUser[$userFullName]['nbTicket']++;
+                if (!empty($ticket->date_close)) {
+                    $nbTicketPerUser[$userFullName]['meanAnswerTime'][$ticket->id] = $ticket->date_close - $ticket->datec;
+                }
             }
-            $user->fetch($ticket->fk_user_assign);
-            if (!isset($nbTicketByUser[$user->lastname . ' ' . $user->firstname])) {
-                $nbTicketByUser[$user->lastname . ' ' . $user->firstname] = 0;
+
+            if (!empty($nbTicketPerUser)) {
+                uasort($nbTicketPerUser, function($a, $b) {
+                    return $b['nbTicket'] - $a['nbTicket'];
+                });
+
+                foreach ($nbTicketPerUser as $userName => $ticketData) {
+                    $meanAnswerTimePerUser = 0;
+                    if (isset($ticketData['meanAnswerTime'])) {
+                        $meanAnswerTimePerUser = array_sum($ticketData['meanAnswerTime']) / count($ticketData['meanAnswerTime']);
+                        $meanAnswerTimePerUser = round($meanAnswerTimePerUser / 86400);
+                    }
+                    $array['data'][] = [$userName, $ticketData['nbTicket'], $meanAnswerTimePerUser];
+                }
             }
-            $nbTicketByUser[$user->lastname . ' ' . $user->firstname]++;
-        }
-        arsort($nbTicketByUser);
-
-        // Graph Title parameters
-        $array['title'] = $langs->transnoentities('TickerRepartitionPerUser');
-        $array['picto'] = 'fontawesome_fa-ticket-alt_fas_#3bbfa8';
-
-        // Graph parameters
-        $array['width']      = '100%';
-        $array['height']     = 300;
-        $array['type']       = 'bar';
-        $array['showlegend'] = 1;
-        $array['dataset']    = 4;
-        $array['moreCSS']    = 'grid-2';
-
-        $array['labels'] = [[
-            'label' => $langs->transnoentities('NomberofTickets'),
-        ]];
-
-        foreach ($nbTicketByUser as $userName => $nbTicket) {
-            $dataElem = [
-                $userName,
-                $nbTicket
-            ];
-            $array['data'][] = $dataElem;
         }
 
         return $array;
     }
 
     /**
-     * Get all tickets
+     * Get top society with most tickets
      *
-     * @return array All tickets
+     * @param  array $tickets All tickets from database for current entity order by datec DESC with comments if exists or empty array
+     * @return array          Graph of top society with most tickets
      */
-    public function getAllTickets(): array
+    function getTopSocietyWithMostTickets(array $tickets): array
     {
-        global $conf;
+        global $langs;
 
-        $actionComm = new ActionComm($this->db);
-        $tickets = saturne_fetch_all_object_type('Ticket', 'DESC', 't.datec', 0, 0, ['customsql' => 't.entity = ' . $conf->entity], 'AND', true, true);
+        // Graph title parameters
+        $array['title'] = $langs->transnoentities('TopSocietyWithMostTickets', getDolGlobalInt('MAIN_SIZE_SHORTLIST_LIMIT', 5));
+        $array['picto'] = 'fontawesome_fa-ticket-alt_fas_#3bbfa8';
 
-        if (!is_array($tickets))
-            return [];
+        // Graph parameters
+        $array['width']      = '100%';
+        $array['height']     = 300;
+        $array['type']       = 'bar';
+        $array['showlegend'] = 1;
+        $array['dataset']    = 2;
+        $array['moreCSS']    = 'grid-2';
 
-        foreach ($tickets as $rowid => $ticket) {
-            $comms = $actionComm->getActions(0, $rowid, 'ticket', 'AND a.code LIKE "TICKET_MSG%"', 'a.datec', 'DESC');
-            $ticket->comms = $comms;
+        $array['labels'] = [
+            [
+                'label' => $langs->transnoentities('NbOfTickets'),
+                'color' => '#A1467E'
+            ]
+        ];
+
+        // Initialize technical objects
+        $society = new Societe($this->db);
+
+        // Initialize variables
+        $nbTicketPerSociety = [];
+
+        if (!empty($tickets)) {
+            foreach ($tickets as $ticket) {
+                if ($ticket->fk_soc == null) {
+                    continue;
+                }
+
+                $society->fetch($ticket->fk_soc);
+                if (!isset($nbTicketPerSociety[$society->name])) {
+                    $nbTicketPerSociety[$society->name]['nbTicket'] = 0;
+                }
+                $nbTicketPerSociety[$society->name]['nbTicket']++;
+            }
+
+            if (!empty($nbTicketPerSociety)) {
+                uasort($nbTicketPerSociety, function($a, $b) {
+                    return $b['nbTicket'] - $a['nbTicket'];
+                });
+
+                $nbTicketPerSociety = array_slice($nbTicketPerSociety, 0, getDolGlobalInt('MAIN_SIZE_SHORTLIST_LIMIT', 5), true);
+                foreach ($nbTicketPerSociety as $socName => $ticketData) {
+                    $array['data'][] = [$socName, $ticketData['nbTicket']];
+                }
+            }
         }
 
-        return $tickets;
+        return $array;
     }
 }
