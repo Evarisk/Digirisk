@@ -16,9 +16,9 @@
  */
 
 /**
- * \file    view/ticket/dashboard_ticketstats.php
+ * \file    view/ticket/ticket_management_dashboard.php
  * \ingroup digiriskdolibarr
- * \brief   Page with ticket statistics
+ * \brief   Page with ticket dashboard and statistics
  */
 
 if (file_exists('../digiriskdolibarr.main.inc.php')) {
@@ -49,7 +49,7 @@ $dashboard = new SaturneDashboard($db, $moduleNameLowerCase);
 
 $upload_dir = $conf->$moduleNameLowerCase->multidir_output[$conf->entity ?? 1];
 
-$hookmanager->initHooks([$moduleNameLowerCase . 'dashboard_ticket', 'globalcard']); // Note that conf->hooks_modules contains array
+$hookmanager->initHooks([$moduleNameLowerCase . 'ticket_management_dashboard', 'globalcard']); // Note that conf->hooks_modules contains array
 
 // Security check - Protection if external user
 $permissionToRead = $user->hasRight($moduleNameLowerCase, 'read');

@@ -91,7 +91,7 @@ function ticketstats_prepare_head(): array
         $head[$h][2] = 'exportcsv';
         $h++;
 
-        $head[$h][0] = dol_buildpath('custom/digiriskdolibarr/view/ticket/dashboard_ticketstats.php', 1);
+        $head[$h][0] = dol_buildpath('custom/digiriskdolibarr/view/ticket/ticket_management_dashboard.php', 1);
         $head[$h][1] = $conf->browser->layout == 'classic' ? '<i class="fas fa-chart-line pictofixedwidth"></i>' . $langs->transnoentities('TicketManagementDashboard') : '<i class="fas fa-chart-line"></i>';
         $head[$h][2] = 'dashboard';
     }
