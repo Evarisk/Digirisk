@@ -471,7 +471,7 @@ if ($conf->global->DIGIRISKDOLIBARR_TICKET_ENABLE_PUBLIC_INTERFACE == 1) {
         print '</tr>';
 
         // GP/UT Visible and Required
-        print '<tr class="oddeven"><td>' . $langs->transnoentities("TicketDigiriskElementVisible") . '</td>';
+        print '<tr class="oddeven"><td>' . $langs->transnoentities("TicketDigiriskelementVisible") . '</td>';
         print '<td class="center">';
         print ajax_constantonoff('DIGIRISKDOLIBARR_TICKET_DIGIRISKELEMENT_VISIBLE');
         print '</td>';
@@ -479,7 +479,7 @@ if ($conf->global->DIGIRISKDOLIBARR_TICKET_ENABLE_PUBLIC_INTERFACE == 1) {
         print ajax_constantonoff('DIGIRISKDOLIBARR_TICKET_DIGIRISKELEMENT_REQUIRED');
         print '</td>';
         print '<td class="center">';
-        print $form->textwithpicto('', $langs->transnoentities("TicketDigiriskElementVisibleHelp"));
+        print $form->textwithpicto('', $langs->transnoentities("TicketDigiriskelementVisibleHelp"));
         print '</td>';
         print '</tr>';
 
@@ -497,7 +497,7 @@ if ($conf->global->DIGIRISKDOLIBARR_TICKET_ENABLE_PUBLIC_INTERFACE == 1) {
         print '</tr>';
 
         // Firstname Visible and Required
-        print '<tr class="oddeven"><td>' . $langs->transnoentities("TicketFirstNameVisible") . '</td>';
+        print '<tr class="oddeven"><td>' . $langs->transnoentities("TicketFirstnameVisible") . '</td>';
         print '<td class="center">';
         print ajax_constantonoff('DIGIRISKDOLIBARR_TICKET_FIRSTNAME_VISIBLE');
         print '</td>';
@@ -505,12 +505,12 @@ if ($conf->global->DIGIRISKDOLIBARR_TICKET_ENABLE_PUBLIC_INTERFACE == 1) {
         print ajax_constantonoff('DIGIRISKDOLIBARR_TICKET_FIRSTNAME_REQUIRED');
         print '</td>';
         print '<td class="center">';
-        print $form->textwithpicto('', $langs->transnoentities("TicketFirstNameVisibleHelp"));
+        print $form->textwithpicto('', $langs->transnoentities("TicketFirstnameVisibleHelp"));
         print '</td>';
         print '</tr>';
 
         // Lastname Visible and Required
-        print '<tr class="oddeven"><td>' . $langs->transnoentities("TicketLastNameVisible") . '</td>';
+        print '<tr class="oddeven"><td>' . $langs->transnoentities("TicketLastnameVisible") . '</td>';
         print '<td class="center">';
         print ajax_constantonoff('DIGIRISKDOLIBARR_TICKET_LASTNAME_VISIBLE');
         print '</td>';
@@ -518,7 +518,7 @@ if ($conf->global->DIGIRISKDOLIBARR_TICKET_ENABLE_PUBLIC_INTERFACE == 1) {
         print ajax_constantonoff('DIGIRISKDOLIBARR_TICKET_LASTNAME_REQUIRED');
         print '</td>';
         print '<td class="center">';
-        print $form->textwithpicto('', $langs->transnoentities("TicketLastNameVisibleHelp"));
+        print $form->textwithpicto('', $langs->transnoentities("TicketLastnameVisibleHelp"));
         print '</td>';
         print '</tr>';
 
