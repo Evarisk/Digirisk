@@ -136,7 +136,7 @@ class DigiriskElement extends SaturneObject
     {
         global $conf;
         if (empty($this->ref)) {
-            $type           = 'DIGIRISKDOLIBARR_' . strtoupper($this->element_type) . '_ADDON';
+            $type           = 'DIGIRISKDOLIBARR_' . dol_strtoupper($this->element_type) . '_ADDON';
             $objectMod = $conf->global->$type;
             $numberingModules = [
                 'digiriskelement/' . $this->element_type => $objectMod
@@ -368,6 +368,30 @@ class DigiriskElement extends SaturneObject
     }
 
     /**
+     * Return SQL filter for trash exclusion
+     *
+     * @return string
+     * @throws Exception
+     */
+    public function getTrashExclusionSqlFilter(): string
+    {
+        $filter                = '';
+        $digiriskElementTrashs = $this->getMultiEntityTrashList();
+        if (!empty($digiriskElementTrashs) && is_array($digiriskElementTrashs)) {
+            $filter = '(';
+            foreach (array_keys($digiriskElementTrashs) as $digiriskElementTrash) {
+                $filter .= $digiriskElementTrash . ', ';
+            }
+            if (preg_match('/, /', $filter)) {
+                $filter = rtrim($filter, ', ');
+            }
+            $filter .= ')';
+        }
+
+        return $filter;
+    }
+
+    /**
      *  Return list of parent ids for an element
      *
      * 	@return    array  Array with ids
@@ -400,7 +424,7 @@ class DigiriskElement extends SaturneObject
             $this->ismultientitymanaged = 0;
         }
 
-        $digiriskElements = $this->fetchAll('',  '',  0,  0, ['customsql' => 'status = ' . self::STATUS_VALIDATED . $moreParams['filter']]);
+        $digiriskElements = $this->fetchAll('',  '',  0,  0, ['customsql' => 'status = ' . self::STATUS_VALIDATED . ($moreParams['filter'] ?? '')]);
         $trashList        = $this->getMultiEntityTrashList();
         if (is_array($trashList) && !empty($trashList)) {
             foreach($trashList as $trashElementID) {
@@ -539,10 +563,22 @@ class DigiriskElement extends SaturneObject
      */
     public function load_dashboard(): array
     {
-        $getDigiriskElementListsByDepth = $this->getDigiriskElementListsByDepth();
-        $getRisksByDigiriskElement      = $this->getRisksByDigiriskElement();
+        global $langs;
 
-        $array['graphs'] = [$getDigiriskElementListsByDepth, $getRisksByDigiriskElement];
+        $confName        = strtoupper($this->module) . '_DASHBOARD_CONFIG';
+        $dashboardConfig = json_decode(getDolUserString($confName));
+        $array = ['graphs' => [], 'disabledGraphs' => []];
+
+        if (empty($dashboardConfig->graphs->DigiriskElementsRepartitionByDepth->hide)) {
+            $array['graphs'][] = $this->getDigiriskElementListsByDepth();
+        } else {
+            $array['disabledGraphs']['DigiriskElementsRepartitionByDepth'] = $langs->transnoentities('DigiriskElementsRepartitionByDepth');
+        }
+        if (empty($dashboardConfig->graphs->RisksRepartitionByDigiriskElement->hide)) {
+            $array['graphs'][] = $this->getRisksByDigiriskElement();
+        } else {
+            $array['disabledGraphs']['RisksRepartitionByDigiriskElement'] = $langs->transnoentities('RisksRepartitionByDigiriskElement');
+        }
 
         return $array;
     }
@@ -561,6 +597,7 @@ class DigiriskElement extends SaturneObject
 
         // Graph Title parameters
         $array['title'] = $langs->transnoentities('RisksRepartitionByDigiriskElement');
+        $array['name']  = 'RisksRepartitionByDigiriskElement';
         $array['picto'] = $this->picto;
 
         // Graph parameters
@@ -613,6 +650,7 @@ class DigiriskElement extends SaturneObject
 
         // Graph Title parameters
         $array['title'] = $langs->transnoentities('DigiriskElementsRepartitionByDepth', getDolGlobalInt('DIGIRISKDOLIBARR_DIGIRISKELEMENT_DEPTH_GRAPH'));
+        $array['name']  = 'DigiriskElementsRepartitionByDepth';
         $array['picto'] = $this->picto;
 
         // Graph parameters

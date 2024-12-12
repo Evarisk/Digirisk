@@ -865,7 +865,7 @@ if ((empty($action) || ($action != 'create' && $action != 'edit'))) {
 			$arrayAccident[] = $object->accident_location;
 			break;
 	}
-	$arrayAccident[] = $userVictim->id;
+    $arrayAccident[] = $userVictim->id > 0 ? $userVictim->id : '';
 
     $accidentLesions = $accidentLesion->fetchAll('', '', 0, 0, ['customsql' => 't.fk_accident = ' . $object->id]);
     $arrayAccident[] = (is_array($accidentLesions) && !empty($accidentLesions)) ? count($accidentLesions) : '';
@@ -985,14 +985,6 @@ if ((empty($action) || ($action != 'create' && $action != 'edit'))) {
 	if ($usertmp > 0) {
 		print $usertmp->getNomUrl(1);
 	}
-	print '</td></tr>';
-
-	//User Victim -- Victime de l'accident
-	print '<tr><td class="titlefield">';
-	print $form->textwithpicto($langs->trans("UserVictim"), $langs->trans("GaugeCounter"), 1, 'info');
-	print '</td>';
-	print '<td>';
-    print $userVictim->getNomUrl(1);
 	print '</td></tr>';
 
 	//Accident type -- Type de l'accident

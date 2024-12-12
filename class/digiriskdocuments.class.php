@@ -210,21 +210,21 @@ class DigiriskDocuments extends SaturneDocuments
                                             array_pop($digiriskElementIds);
 
                                             foreach ($digiriskElementIds as $key => $digiriskElementId) {
-                                                $nomElement .= str_repeat(' - ', count($digiriskElementIds) + 1 - $key) . $activeDigiriskElements[$digiriskElementId]->ref . ' - ' . $activeDigiriskElements[$digiriskElementId]->label . chr(0x0A) . chr(0x0A);
+                                                $nomElement .= '<br>' . str_repeat(' - ', count($digiriskElementIds) + 1 - $key) . $activeDigiriskElements[$digiriskElementId]->ref . ' - ' . $activeDigiriskElements[$digiriskElementId]->label . chr(0x0A) . chr(0x0A);
                                             }
                                         }
                                     }
 
                                     if ($conf->global->DIGIRISKDOLIBARR_SHOW_RISK_ORIGIN) {
-                                        $nomElement .= (!empty($conf->global->DIGIRISKDOLIBARR_SHOW_SHARED_RISKS) ? 'S' . $element->entity : '') . ' - ' . $element->ref . ' - ' . $element->label;
+                                        $nomElement .= '<br>' . (!empty($conf->global->DIGIRISKDOLIBARR_SHOW_SHARED_RISKS) ? 'S' . $element->entity : '') . ' - ' . $element->ref . ' - ' . $element->label;
                                         if ($line->fk_element != $line->appliedOn) {
-                                            $nomElement .= ($dash > 0 ? ' - ' : '') . $langs->trans('AppliedOn') . ' ' . $linked_element->ref . ' - ' . $linked_element->label;
+                                            $nomElement .= '<br>' . $langs->trans('AppliedOn') . ' ' . $linked_element->ref . ' - ' . $linked_element->label;
                                         }
                                     } else {
                                         if ($linked_element->id > 0) {
-                                            $nomElement .= ($dash > 0 ? ' - ' : '') . $linked_element->ref . ' - ' . $linked_element->label;
+                                            $nomElement .= '<br>' . ($dash > 0 ? ' - ' : '') . $linked_element->ref . ' - ' . $linked_element->label;
                                         } else {
-                                            $nomElement .= ($dash > 0 ? ' - ' : '') . $element->ref . ' - ' . $element->label;
+                                            $nomElement .= '<br>' . ($dash > 0 ? ' - ' : '') . $element->ref . ' - ' . $element->label;
                                         }
                                     }
 
@@ -290,6 +290,7 @@ class DigiriskDocuments extends SaturneDocuments
 
                                                     if ($task_progress == 100) {
                                                         if ($conf->global->DIGIRISKDOLIBARR_WORKUNITDOCUMENT_SHOW_TASK_DONE > 0) {
+                                                            (($related_task->label) ? $tmparray['actionPreventionCompleted'] .= $langs->trans('Label') . ' : ' . $related_task->label . "\n" : '');
                                                             if (!getDolGlobalInt('DIGIRISKDOLIBARR_TASK_HIDE_REF_IN_DOCUMENT')) {
                                                                 (($related_task->ref) ? $tmparray['actionPreventionCompleted'] .= $langs->trans('Ref') . ' : ' . $related_task->ref . "\n" : '');
                                                             }
@@ -313,13 +314,13 @@ class DigiriskDocuments extends SaturneDocuments
                                                                 $tmparray['actionPreventionCompleted'] .= $langs->trans('Budget') . ' : ' . price($related_task->budget_amount, 0, $langs, 1, 0, 0, $conf->currency) . "\n";
                                                             }
                                                             (($AllInitiales) ? $tmparray['actionPreventionCompleted'] .= $langs->trans('ContactsAction') . ' : ' . $AllInitiales . "\n" : '');
-                                                            (($related_task->label) ? $tmparray['actionPreventionCompleted'] .= $langs->trans('Label') . ' : ' . $related_task->label . "\n" : '');
                                                             (($related_task->description) ? $tmparray['actionPreventionCompleted'] .= $langs->trans('Description') . ' : ' . $related_task->description . "\n" : '');
                                                             $tmparray['actionPreventionCompleted'] .= "\n";
                                                         } else {
                                                             $tmparray['actionPreventionCompleted'] = $langs->transnoentities('ActionPreventionCompletedTaskDone');
                                                         }
                                                     } else {
+                                                        (($related_task->label) ? $tmparray['actionPreventionUncompleted'] .= $langs->trans('Label') . ' : ' . $related_task->label . "\n" : '');
                                                         if (!getDolGlobalInt('DIGIRISKDOLIBARR_TASK_HIDE_REF_IN_DOCUMENT')) {
                                                             (($related_task->ref) ? $tmparray['actionPreventionUncompleted'] .= $langs->trans('Ref') . ' : ' . $related_task->ref . "\n" : '');
                                                         }
@@ -345,7 +346,6 @@ class DigiriskDocuments extends SaturneDocuments
                                                         }
                                                         $tmparray['actionPreventionUncompleted'] .= $langs->trans('DigiriskProgress') . ' : ' . ($task_progress ?: 0) . ' %' . "\n";
                                                         (($AllInitiales) ? $tmparray['actionPreventionUncompleted'] .= $langs->trans('ContactsAction') . ' : ' . $AllInitiales . "\n" : '');
-                                                        (($related_task->label) ? $tmparray['actionPreventionUncompleted'] .= $langs->trans('Label') . ' : ' . $related_task->label . "\n" : '');
                                                         (($related_task->description) ? $tmparray['actionPreventionUncompleted'] .= $langs->trans('Description') . ' : ' . $related_task->description . "\n" : '');
                                                         $tmparray['actionPreventionUncompleted'] .= "\n";
                                                     }

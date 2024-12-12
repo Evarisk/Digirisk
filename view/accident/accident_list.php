@@ -90,7 +90,7 @@ foreach ($accident->fields as $key => $val) {
 // List of fields to search into when doing a "search in all"
 $fieldstosearchall = [];
 foreach ($accident->fields as $key => $val) {
-	if ($val['searchall']) {
+	if (!empty($val['searchall'])) {
 		$fieldstosearchall['t.' . $key] = $val['label'];
 	}
 }
@@ -100,10 +100,11 @@ $arrayfields = [];
 
 foreach ($accident->fields as $key => $val) {
 	// If $val['visible']==0, then we never show the field
-	if ( ! empty($val['visible'])) $arrayfields['t.' . $key] = array('label' => $val['label'], 'checked' => (($val['visible'] < 0) ? 0 : 1), 'enabled' => ($val['enabled'] && ($val['visible'] != 3)), 'position' => $val['position']);
+	if (!empty($val['visible'])) $arrayfields['t.' . $key] = ['label' => $val['label'], 'checked' => (($val['visible'] < 0) ? 0 : 1), 'enabled' => ($val['enabled'] && ($val['visible'] != 3)), 'position' => $val['position']];
 }
 
-// Load accident object
+$id = GETPOST('id', 'int'); // get if for actions_fetchobject.inc.php
+// Load accident object, why ?
 include DOL_DOCUMENT_ROOT . '/core/actions_fetchobject.inc.php'; // Must be include, not include_once.
 
 //Permission for accident
@@ -284,7 +285,8 @@ $sql       .= preg_replace('/^,/', '', $hookmanager->resPrint);
 $sql        = preg_replace('/,\s*$/', '', $sql);
 $sql       .= " FROM " . MAIN_DB_PREFIX . $accident->table_element . " as t";
 
-if (is_array($extrafields->attributes[$accident->table_element]['label']) && count($extrafields->attributes[$accident->table_element]['label'])) $sql .= " LEFT JOIN " . MAIN_DB_PREFIX . $accident->table_element . "_extrafields as ef on (t.rowid = ef.fk_object)";
+if (isset($extrafields->attributes[$accident->table_element]['label']) &&
+    is_array($extrafields->attributes[$accident->table_element]['label']) && count($extrafields->attributes[$accident->table_element]['label'])) $sql .= " LEFT JOIN " . MAIN_DB_PREFIX . $accident->table_element . "_extrafields as ef on (t.rowid = ef.fk_object)";
 if ($accident->ismultientitymanaged == 1) $sql                                                                                                        .= " WHERE t.entity IN (" . getEntity($accident->element) . ")";
 else $sql                                                                                                                                             .= " WHERE 1 = 1";
 $sql                                                                                                                                                  .= ' AND status != ' . $accident::STATUS_DELETED;
@@ -378,10 +380,10 @@ foreach ($accident->fields as $key => $val) {
 	if ( ! empty($arrayfields['t.' . $key]['checked'])) {
 		print '<td class="liste_titre' . ($cssforfield ? ' ' . $cssforfield : '') . '">';
 
-		if (is_array($val['arrayofkeyval'])) print $form->selectarray('search_' . $key, $val['arrayofkeyval'], $search[$key], $val['notnull'], 0, 0, '', 1, 0, 0, '', 'maxwidth75');
+		if (isset($val['arrayofkeyval']) && is_array($val['arrayofkeyval'])) print $form->selectarray('search_' . $key, $val['arrayofkeyval'], $search[$key] ?? '', $val['notnull'], 0, 0, '', 1, 0, 0, '', 'maxwidth75');
 		elseif (strpos($val['type'], 'integer:') === 0) {
-			print $accident->showInputField($val, $key, $search[$key], '', '', 'search_', 'maxwidth150', 1);
-		} elseif ( ! preg_match('/^(date|timestamp)/', $val['type'])) print '<input type="text" class="flat maxwidth75" name="search_' . $key . '" value="' . dol_escape_htmltag($search[$key]) . '">';
+			print $accident->showInputField($val, $key, $search[$key] ?? '', '', '', 'search_', 'maxwidth150', 1);
+		} elseif ( ! preg_match('/^(date|timestamp)/', $val['type'])) print '<input type="text" class="flat maxwidth75" name="search_' . $key . '" value="' . dol_escape_htmltag($search[$key] ?? '') . '">';
 		print '</td>';
 	}
     if ($key == 'Custom') {
@@ -458,7 +460,7 @@ $arrayofselected = is_array($toselect) ? $toselect : [];
 // contenu
 $i          = 0;
 $kCounter   = 0;
-$totalarray = [];
+$totalarray = ['nbfield' => 0];
 
 while ($i < ($limit ? min($num, $limit) : $num)) {
 	$obj = $db->fetch_object($resql);
@@ -470,7 +472,11 @@ while ($i < ($limit ? min($num, $limit) : $num)) {
 	$accident->setVarsFromFetchObj($obj);
     $userVictim = $accident->getUserVictim();
 
-	$json = json_decode($accident->json, false, 512, JSON_UNESCAPED_UNICODE)->Accident;
+    if (isset($accident->json)) {
+        $json = json_decode($accident->json, false, 512, JSON_UNESCAPED_UNICODE)->Accident;
+    } else {
+        $json = [];
+    }
 
 	// Show here line of result
 	print '<tr class="oddeven accidentdocument-row accident_row_' . $accident->id . ' accidentdocument-row-content-' . $accident->id . '" id="accident_row_' . $accident->id . '">';
@@ -508,7 +514,7 @@ while ($i < ($limit ? min($num, $limit) : $num)) {
 						$arrayAccident[] = $accident->accident_location;
 						break;
 				}
-                $arrayAccident[] = $userVictim->id;
+                $arrayAccident[] = $userVictim->id > 0 ? $userVictim->id : '';
 
                 $accidentLesions = $accidentLesion->fetchAll('', '', 0, 0, ['customsql' => 't.fk_accident = ' . $accident->id]);
                 $arrayAccident[] = (is_array($accidentLesions) && !empty($accidentLesions)) ? count($accidentLesions) : '';
@@ -608,7 +614,7 @@ if ($num == 0) {
 }
 $db->free($resql);
 
-$parameters = array('arrayfields' => $arrayfields, 'sql' => $sql);
+$parameters = ['arrayfields' => $arrayfields, 'sql' => $sql];
 $reshook    = $hookmanager->executeHooks('printFieldListFooter', $parameters, $risk); // Note that $action and $risk may have been modified by hook
 print $hookmanager->resPrint;
 

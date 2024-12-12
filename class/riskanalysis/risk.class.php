@@ -87,7 +87,7 @@ class Risk extends SaturneObject
 		'import_key'    => ['type' => 'varchar(14)', 'label' => 'ImportId', 'enabled' => '1', 'position' => 70, 'notnull' => -1, 'visible' => 0],
 		'status'        => ['type' => 'smallint', 'label' => 'Status', 'enabled' => '1', 'position' => 80, 'notnull' => 0, 'visible' => 0],
 		'category'      => ['type' => 'varchar(255)', 'label' => 'RiskCategory', 'enabled' => '1', 'position' => 21, 'notnull' => 0, 'visible' => 1],
-		'description'   => ['type' => 'text', 'label' => 'Description', 'enabled' => '1', 'position' => 23, 'notnull' => 0, 'visible' => -1],
+		'description'   => ['type' => 'text', 'label' => 'Description', 'enabled' => '$conf->global->DIGIRISKDOLIBARR_RISK_DESCRIPTION', 'position' => 23, 'notnull' => 0, 'visible' => -1],
 		'type'          => ['type' => 'varchar(255)', 'label' => 'Type', 'enabled' => '1', 'position' => 24, 'notnull' => 1, 'visible' => 0, 'default' => '(PROV)'],
 		'fk_user_creat' => ['type' => 'integer:User:user/class/user.class.php', 'label' => 'UserAuthor', 'enabled' => '1', 'position' => 110, 'notnull' => 1, 'visible' => 0, 'foreignkey' => 'user.rowid'],
 		'fk_user_modif' => ['type' => 'integer:User:user/class/user.class.php', 'label' => 'UserModif', 'enabled' => '1', 'position' => 120, 'notnull' => -1, 'visible' => 0],
@@ -140,12 +140,12 @@ class Risk extends SaturneObject
                 'label' => $langs->transnoentities('RedRisk'),
                 'color' => '#e05353',
                 'start' => 51,
-                'end'   => 80
+                'end'   => 79
             ],
             4 => [
                 'label' => $langs->transnoentities('BlackRisk'),
                 'color' => '#2b2b2b',
-                'start' => 81,
+                'start' => 80,
                 'end'   => 100
             ]
         ];
@@ -192,7 +192,8 @@ class Risk extends SaturneObject
 		$objects = $object->getActiveDigiriskElements();
 
         if ($get_shared_data) {
-            $risk->ismultientitymanaged = 0;
+            $activeDigiriskElements               = $object->getActiveDigiriskElements($get_shared_data);
+            $risk->ismultientitymanaged           = 0;
             $riskAssessment->ismultientitymanaged = 0;
         }
 		$riskList           = $risk->fetchAll('', '', 0, 0, ['customsql' => 'status = ' . self::STATUS_VALIDATED . $moreParams['filterRisk']]);
@@ -305,11 +306,13 @@ class Risk extends SaturneObject
 						$digiriskElementOfEntity->fetchObjectLinked(null, '', $digiriskElementOfEntity->id, 'digiriskdolibarr_digiriskelement', 'AND', 1, 'sourcetype', 0);
 						if (!empty($digiriskElementOfEntity->linkedObjectsIds['digiriskdolibarr_risk'])) {
 							foreach ($digiriskElementOfEntity->linkedObjectsIds['digiriskdolibarr_risk'] as $sharedRiskId) {
-								$sharedRisk = $riskList[$sharedRiskId];
-								if (is_object($sharedRisk)) {
-									$sharedRisk->appliedOn = $digiriskElementOfEntity->id;
-									$risks[] = $sharedRisk;
-								}
+                                $sharedRisk         = $riskList[$sharedRiskId];
+                                $sharedParentActive = array_search($sharedRisk->fk_element, array_column($activeDigiriskElements, 'id'));
+								if (is_object($sharedRisk) && $sharedParentActive > 0) {
+                                    $clonedRisk            = clone $sharedRisk;
+                                    $clonedRisk->appliedOn = $digiriskElementOfEntity->id;
+                                    $risks[]               = $clonedRisk;
+                                }
 							}
 						}
 					}
@@ -320,10 +323,12 @@ class Risk extends SaturneObject
 					$parentElement->fetchObjectLinked(null, '', $parent_id, 'digiriskdolibarr_digiriskelement', 'AND', 1, 'sourcetype', 0);
 					if (!empty($parentElement->linkedObjectsIds['digiriskdolibarr_risk'])) {
 						foreach ($parentElement->linkedObjectsIds['digiriskdolibarr_risk'] as $sharedRiskId) {
-							$sharedRisk = $riskList[$sharedRiskId];
-							if (is_object($sharedRisk)) {
-								$sharedRisk->appliedOn = $parent_id;
-								$risks[] = $sharedRisk;
+							$sharedRisk         = $riskList[$sharedRiskId];
+                            $sharedParentActive = array_search($sharedRisk->fk_element, array_column($activeDigiriskElements, 'id'));
+                            if (is_object($sharedRisk)  && $sharedParentActive > 0) {
+                                $clonedRisk            = clone $sharedRisk;
+                                $clonedRisk->appliedOn = $parent_id;
+                                $risks[]               = $clonedRisk;
 							}
 						}
 					}
@@ -490,6 +495,100 @@ class Risk extends SaturneObject
 		return -1;
 	}
 
+    /**
+     * check if risk not exists for a digirisk element
+     *
+     * @param  int       $limit Limit
+     * @return array|int        Int <0 if KO, array of pages if OK
+     * @throws Exception
+     */
+    public function checkNotExistsDigiriskElementForRisk(int $limit = 0)
+    {
+        dol_syslog(__METHOD__, LOG_DEBUG);
+
+        $digiriskElement = new DigiriskElement($this->db);
+
+        $sql  = 'SELECT ';
+        $sql .= $this->getFieldList('t');
+        $sql .= ' FROM ' . MAIN_DB_PREFIX . $this->table_element . ' as t';
+        $sql .= ' WHERE !EXISTS';
+        $sql .= ' ( SELECT ';
+        $sql .= $digiriskElement->getFieldList('d');
+        $sql .= ' FROM ' . MAIN_DB_PREFIX . $digiriskElement->table_element . ' as d';
+        $sql .= ' WHERE d.rowid = t.fk_element )';
+
+        $records = [];
+        $resql   = $this->db->query($sql);
+        if ($resql) {
+            $num = $this->db->num_rows($resql);
+            $i = 0;
+            while ($i < ($limit ? min($limit, $num) : $num)) {
+                $obj = $this->db->fetch_object($resql);
+
+                $record = new $this($this->db);
+                $record->setVarsFromFetchObj($obj);
+
+                $records[$record->id] = $record;
+
+                $i++;
+            }
+            $this->db->free($resql);
+
+            return $records;
+        } else {
+            $this->errors[] = 'Error ' . $this->db->lasterror();
+            dol_syslog(__METHOD__ . ' ' . join(',', $this->errors), LOG_ERR);
+            return -1;
+        }
+    }
+
+    /**
+     * check if risk assessment not exists for a risk
+     *
+     * @param  int       $limit Limit
+     * @return array|int        Int <0 if KO, array of pages if OK
+     * @throws Exception
+     */
+    public function checkNotExistsRiskAssessmentForRisk(int $limit = 0)
+    {
+        dol_syslog(__METHOD__, LOG_DEBUG);
+
+        $riskAssessment = new RiskAssessment($this->db);
+
+        $sql  = 'SELECT ';
+        $sql .= $this->getFieldList('t');
+        $sql .= ' FROM ' . MAIN_DB_PREFIX . $this->table_element . ' as t';
+        $sql .= ' WHERE !EXISTS';
+        $sql .= ' (SELECT ';
+        $sql .= $riskAssessment->getFieldList('ra');
+        $sql .= ' FROM ' . MAIN_DB_PREFIX . $riskAssessment->table_element . ' as ra';
+        $sql .= ' WHERE ra.fk_risk = t.rowid)';
+
+        $records = [];
+        $resql   = $this->db->query($sql);
+        if ($resql) {
+            $num = $this->db->num_rows($resql);
+            $i = 0;
+            while ($i < ($limit ? min($limit, $num) : $num)) {
+                $obj = $this->db->fetch_object($resql);
+
+                $record = new $this($this->db);
+                $record->setVarsFromFetchObj($obj);
+
+                $records[$record->id] = $record;
+
+                $i++;
+            }
+            $this->db->free($resql);
+
+            return $records;
+        } else {
+            $this->errors[] = 'Error ' . $this->db->lasterror();
+            dol_syslog(__METHOD__ . ' ' . join(',', $this->errors), LOG_ERR);
+            return -1;
+        }
+    }
+
 	/**
 	 * Get children tasks
 	 *
@@ -534,7 +633,7 @@ class Risk extends SaturneObject
 	 */
 	public function getTasksWithFkRisk()
 	{
-		$sql = "SELECT * FROM " . MAIN_DB_PREFIX . 'projet_task_extrafields' . ' WHERE fk_risk > 0';
+		$sql = "SELECT * FROM " . MAIN_DB_PREFIX . 'projet_task_extrafields' . ' WHERE fk_risk > 0 ORDER BY fk_object ASC';
 		$tasksList = saturne_fetch_all_object_type('SaturneTask', '', '', 0, 0, [], 'AND', false, false);
 
 		$resql = $this->db->query($sql);
@@ -545,7 +644,7 @@ class Risk extends SaturneObject
 			$records = array();
 			while ($i < $num) {
 				$obj = $this->db->fetch_object($resql);
-				$records[$obj->fk_risk][$obj->rowid] = $tasksList[$obj->fk_object];
+				$records[$obj->fk_risk][$obj->rowid] = $tasksList[$obj->fk_object] ?? null;
 				$i++;
 			}
 			$this->db->free($resql);
@@ -567,15 +666,51 @@ class Risk extends SaturneObject
      */
     public function load_dashboard(): array
     {
+        global $langs;
+
+        $confName        = dol_strtoupper($this->module) . '_DASHBOARD_CONFIG';
+        $dashboardConfig = json_decode(getDolUserString($confName));
+        $array = ['graphs' => [], 'lists' => [], 'disabledGraphs' => []];
+
+        $riskType = !empty($dashboardConfig->filters->riskType) ? $dashboardConfig->filters->riskType : 'risk';
+
+        $digiriskElement = new DigiriskElement($this->db);
+
+        $filter = 'AND t.fk_element NOT IN ' . $digiriskElement->getTrashExclusionSqlFilter();
+
         $dangerCategories = $this->getDangerCategories();
+        $riskByDangerCategoriesAndRiskAssessments = $this->getRiskByDangerCategoriesAndRiskAssessments($dangerCategories, $filter, $riskType);
+        $moreParam['filter']                      = $filter;
 
-        $getRisksByCotation                       = $this->getRisksByCotation();
-        $getRisksByDangerCategoriesAndCriticality = $this->getRisksByDangerCategoriesAndCriticality($dangerCategories);
-        $getRisksByDangerCategories               = $this->getRisksByDangerCategories($dangerCategories);
-        $getRiskListsByDangerCategories           = $this->getRiskListsByDangerCategories($dangerCategories);
+        $array['graphsFilters'] = [
+            'riskType' => [
+                'title'        => $langs->transnoentities('DisplayRiskOfType'),
+                'type'         => 'selectarray',
+                'filter'       => 'riskType',
+                'values'       => ['risk' => $langs->transnoentities('Risk'), 'riskenvironmental' => $langs->transnoentities('Riskenvironmental')],
+                'currentValue' => $riskType
+        ]];
 
-        $array['graphs'] = [$getRisksByCotation, $getRisksByDangerCategoriesAndCriticality, $getRisksByDangerCategories];
-        $array['lists']  = [$getRiskListsByDangerCategories];
+        if (empty($dashboardConfig->graphs->RisksRepartitionByDangerCategoriesAndCriticality->hide)) {
+            $array['graphs'][] = $this->getRisksByDangerCategoriesAndCriticality($dangerCategories, $riskByDangerCategoriesAndRiskAssessments);
+        } else {
+            $array['disabledGraphs']['RisksRepartitionByDangerCategoriesAndCriticality'] = $langs->transnoentities('RisksRepartitionByDangerCategoriesAndCriticality');
+        }
+        if (empty($dashboardConfig->graphs->RisksRepartitionByDangerCategories->hide)) {
+            $array['graphs'][] = $this->getRisksByDangerCategories($dangerCategories, $riskByDangerCategoriesAndRiskAssessments);
+        } else {
+            $array['disabledGraphs']['RisksRepartitionByDangerCategories'] = $langs->transnoentities('RisksRepartitionByDangerCategories');
+        }
+        if (empty($dashboardConfig->graphs->RisksRepartitionByCotation->hide)) {
+            $array['graphs'][] = $this->getRisksByCotation($moreParam);
+        } else {
+            $array['disabledGraphs']['RisksRepartitionByCotation'] = $langs->transnoentities('RisksRepartitionByCotation');
+        }
+        if (empty($dashboardConfig->graphs->RiskListsByDangerCategories->hide)) {
+            $array['lists'][] = $this->getRiskListsByDangerCategories($dangerCategories, $riskByDangerCategoriesAndRiskAssessments, $filter, $riskType);
+        } else {
+            $array['disabledGraphs']['RiskListsByDangerCategories'] = $langs->transnoentities('RiskListsByDangerCategories');
+        }
 
         return $array;
     }
@@ -583,17 +718,20 @@ class Risk extends SaturneObject
     /**
      * Get risks by cotation
      *
+     * @param  array     $moreParam More param (Object/user/etc)
      * @return array
      * @throws Exception
      */
-    public function getRisksByCotation(): array
+    public function getRisksByCotation(array $moreParam = []): array
     {
         global $conf, $langs;
 
-        $riskAssessment = new RiskAssessment($this->db);
+        $riskAssessment  = new RiskAssessment($this->db);
+        $digiriskElement = new DigiriskElement($this->db);
 
         // Graph Title parameters
         $array['title'] = $langs->transnoentities('RisksRepartition');
+        $array['name']  = 'RisksRepartition';
         $array['picto'] = $this->picto;
 
         // Graph parameters
@@ -604,8 +742,11 @@ class Risk extends SaturneObject
         $array['dataset']    = 1;
         $array['labels']     = $this->cotations;
 
-        $riskAssessmentList = $riskAssessment->fetchAll('', '', 0, 0, ['customsql' => 'status = 1']);
-        $array['data']      = $riskAssessment->getRiskAssessmentCategoriesNumber($riskAssessmentList);
+        $join  = ' LEFT JOIN ' . MAIN_DB_PREFIX . $this->table_element . ' as r ON r.rowid = t.fk_risk';
+        $join .= ' LEFT JOIN ' . MAIN_DB_PREFIX . $digiriskElement->table_element . ' as d ON d.rowid = r.fk_element';
+
+        $riskAssessments = saturne_fetch_all_object_type('RiskAssessment', '', '', 0, 0, ['customsql' => 't.status = ' . RiskAssessment::STATUS_VALIDATED . str_replace('t.fk_element NOT IN', 'r.fk_element NOT IN', $moreParam['filter'])], 'AND', false, $moreParam['multiEntityManagement'] ?? true, false, $join);
+        $array['data']   = $riskAssessment->getRiskAssessmentCategoriesNumber($riskAssessments);
 
         return $array;
     }
@@ -613,18 +754,17 @@ class Risk extends SaturneObject
     /**
      * Get risks by danger categories and criticality
      *
-     * @param array  $dangerCategories Danger categories datas
-     * @param string $type             Risk type (risk, riskenvironmental or ...)
-     *
+     * @param  array $dangerCategories                         Danger categories datas
+     * @param  array $riskByDangerCategoriesAndRiskAssessments Risk by danger categories and risk assessments
      * @return array
-     * @throws Exception
      */
-    public function getRisksByDangerCategoriesAndCriticality(array $dangerCategories, string $type = 'risk'): array
+    public function getRisksByDangerCategoriesAndCriticality(array $dangerCategories, array $riskByDangerCategoriesAndRiskAssessments): array
     {
-        global $conf, $langs;
+        global $langs;
 
         // Graph Title parameters
         $array['title'] = $langs->transnoentities('RisksRepartitionByDangerCategoriesAndCriticality');
+        $array['name']  = 'RisksRepartitionByDangerCategoriesAndCriticality';
         $array['picto'] = $this->picto;
 
         // Graph parameters
@@ -636,14 +776,10 @@ class Risk extends SaturneObject
         $array['moreCSS']    = 'grid-2';
         $array['labels']     = $this->cotations;
 
-        $join = ' LEFT JOIN ' . MAIN_DB_PREFIX . $this->table_element . ' as r ON r.rowid = t.fk_risk';
         foreach ($dangerCategories as $dangerCategory) {
             $array['data'][$dangerCategory['position']][0] = $dangerCategory['name'];
-
-            $risks = $this->fetchAll('', '', 0, 0, ['customsql' => 't.status = ' . self::STATUS_VALIDATED . ' AND t.entity = ' . $conf->entity . (GETPOSTISSET('id') ? ' AND t.fk_element = ' . GETPOST('id') : '') . ' AND t.type = "' . $type . '" AND t.category = ' . $dangerCategory['position']]);
             for ($i = 1; $i <= 4; $i++) {
-                $riskAssessments = saturne_fetch_all_object_type('RiskAssessment', '', '', 0, 0, ['customsql' => 't.status = ' . RiskAssessment::STATUS_VALIDATED . ' AND r.entity = ' . $conf->entity . (GETPOSTISSET('id') ? ' AND r.fk_element = ' . GETPOST('id') : '') . ' AND r.type = "' . $type . '" AND r.category = ' . $dangerCategory['position'] . ' AND t.cotation >= ' . $this->cotations[$i]['start'] . ' AND t.cotation <= ' . $this->cotations[$i]['end']], 'AND', false, true, false, $join);
-                $array['data'][$dangerCategory['position']]['y_combined_' . $array['labels'][$i]['label']] = ((is_array($risks) && !empty($risks) && is_array($riskAssessments) && !empty($riskAssessments)) ? count($riskAssessments) / count($risks) : 0);
+                $array['data'][$dangerCategory['position']]['y_combined_' . $array['labels'][$i]['label']] = !empty($riskByDangerCategoriesAndRiskAssessments[$dangerCategory['name']]['risk']) ? $riskByDangerCategoriesAndRiskAssessments[$dangerCategory['name']]['riskAssessments'][$i] / $riskByDangerCategoriesAndRiskAssessments[$dangerCategory['name']]['risk'] : 0;
             }
         }
 
@@ -653,18 +789,19 @@ class Risk extends SaturneObject
     /**
      * Get risks by danger categories
      *
-     * @param array  $dangerCategories Danger categories datas
-     * @param string $type             Risk type (risk, riskenvironmental or ...)
-     *
+     * @param array  $dangerCategories                         Danger categories datas
+     * @param array  $riskByDangerCategoriesAndRiskAssessments Risk by danger categories and risk assessments
+ *
      * @return array
      * @throws Exception
      */
-    public function getRisksByDangerCategories(array $dangerCategories, string $type = 'risk'): array
+    public function getRisksByDangerCategories(array $dangerCategories, array $riskByDangerCategoriesAndRiskAssessments): array
     {
-        global $conf, $langs;
+        global $langs;
 
         // Graph Title parameters
         $array['title'] = $langs->transnoentities('RisksRepartitionByDangerCategories');
+        $array['name']  = 'RisksRepartitionByDangerCategories';
         $array['picto'] = $this->picto;
 
         // Graph parameters
@@ -683,10 +820,8 @@ class Risk extends SaturneObject
         ];
 
         foreach ($dangerCategories as $dangerCategory) {
-            $risks = $this->fetchAll('', '', 0, 0, ['customsql' => 't.status = ' . self::STATUS_VALIDATED . ' AND t.entity = ' . $conf->entity . (GETPOSTISSET('id') ? ' AND t.fk_element = ' . GETPOST('id') : '') . ' AND t.type = "' . $type . '" AND t.category = ' . $dangerCategory['position']]);
-
             $array['data'][$dangerCategory['position']][] = $dangerCategory['name'];
-            $array['data'][$dangerCategory['position']][] = (is_array($risks) && !empty($risks) ? count($risks) : 0);
+            $array['data'][$dangerCategory['position']][] = $riskByDangerCategoriesAndRiskAssessments[$dangerCategory['name']]['risk'];
         }
 
         return $array;
@@ -695,49 +830,50 @@ class Risk extends SaturneObject
     /**
      * Get list of risks by danger categories
      *
-     * @param array  $dangerCategories Danger categories datas
-     * @param string $type             Risk type (risk, riskenvironmental or ...)
+     * @param array  $dangerCategories                         Danger categories datas
+     * @param array  $riskByDangerCategoriesAndRiskAssessments Risk by danger categories and risk assessments
+     * @param string $filter                                   SQL Filter
+     * @param string $type                                     Risk type (risk, riskenvironmental or ...)
      *
      * @return array
      * @throws Exception
      */
-    public function getRiskListsByDangerCategories(array $dangerCategories, string $type = 'risk') : array
+    public function getRiskListsByDangerCategories(array $dangerCategories, array $riskByDangerCategoriesAndRiskAssessments, string $filter = '', string $type = 'risk') : array
     {
+        //$riskByDangerCategoriesAndRiskAssessments
         global $conf, $langs;
+
+        $digiriskElement = new DigiriskElement($this->db);
 
         // Graph Title parameters
         $array['title'] = $langs->transnoentities('RiskListsByDangerCategories');
+        $array['name']  = 'RiskListsByDangerCategories';
         $array['picto'] = $this->picto;
 
         // Graph parameters
         $array['width'] = '100%';
         $array['type']  = 'list';
 
-        $totalRisks = $this->fetchAll('', '', 0, 0, ['customsql' => 't.status = ' . self::STATUS_VALIDATED . ' AND t.entity = ' . $conf->entity . (GETPOSTISSET('id') ? ' AND t.fk_element = ' . GETPOST('id') : '') . ' AND t.type = "' . $type . '"']);
+        $totalRisks = saturne_fetch_all_object_type('Risk', '', '', 0, 0, ['customsql' => 't.status = ' . self::STATUS_VALIDATED . ' AND t.entity = ' . $conf->entity . (GETPOSTISSET('id') ? ' AND t.fk_element = ' . GETPOST('id') : '') . ' AND t.type = "' . $type . '"' . (!empty($filter) ? ' AND ' . $filter : '')], 'AND', false, true, false, ' LEFT JOIN ' . MAIN_DB_PREFIX . $digiriskElement->table_element . ' as d ON d.rowid = t.fk_element');
 
         $array['labels']['Ref']           = $langs->transnoentities('DangerCategories');
         $array['labels']['numberOfRisks'] = $langs->transnoentities('NumberOfRisks') . ' : ' . '<span class="badge badge-info">' . (is_array($totalRisks) && !empty($totalRisks) ? count($totalRisks) : 0) . '</span>';
         $array['labels']['percentage']    = $langs->transnoentities('Percentage');
 
         $arrayRiskLists = [];
-        $join           = ' LEFT JOIN ' . MAIN_DB_PREFIX . $this->table_element . ' as r ON r.rowid = t.fk_risk';
         if (is_array($totalRisks) && !empty($totalRisks)) {
             foreach ($dangerCategories as $dangerCategory) {
                 $arrayRiskLists[$dangerCategory['position']]['Ref']['value'] = $dangerCategory['name'];
 
-                $risks = $this->fetchAll('', '', 0, 0, ['customsql' => 't.status = ' . self::STATUS_VALIDATED . ' AND t.entity = ' . $conf->entity . (GETPOSTISSET('id') ? ' AND t.fk_element = ' . GETPOST('id') : '') . ' AND t.type = "' . $type . '" AND t.category = ' . $dangerCategory['position']]);
 
-                $arrayRiskLists[$dangerCategory['position']]['numberOfRisks']['value']    = is_array($risks) && !empty($risks) ? count($risks) : 0;
+                $arrayRiskLists[$dangerCategory['position']]['numberOfRisks']['value']    = $riskByDangerCategoriesAndRiskAssessments[$dangerCategory['name']]['risk'];
                 $arrayRiskLists[$dangerCategory['position']]['numberOfRisks']['morecss']  = 'risk-evaluation-cotation';
                 $arrayRiskLists[$dangerCategory['position']]['numberOfRisks']['moreAttr'] = 'style="line-height: 0; border-radius: 0; background-color: #A1467EAA; color: #FFF;"';
-                $arrayRiskLists[$dangerCategory['position']]['percentage']['value']       = is_array($risks) && !empty($risks) ? price2num((count($risks) / count($totalRisks)) * 100, 2) . ' %' : 0;
+                $arrayRiskLists[$dangerCategory['position']]['percentage']['value']       = price2num(($riskByDangerCategoriesAndRiskAssessments[$dangerCategory['name']]['risk'] / count($totalRisks)) * 100, 2) . ' %';
 
                 for ($i = 1; $i <= 4; $i++) {
                     $array['labels'][$i] = $this->cotations[$i]['label'];
-
-                    $riskAssessments = saturne_fetch_all_object_type('RiskAssessment', '', '', 0, 0, ['customsql' => 't.status = ' . RiskAssessment::STATUS_VALIDATED . ' AND r.entity = ' . $conf->entity . (GETPOSTISSET('id') ? ' AND r.fk_element = ' . GETPOST('id') : '') . ' AND r.type = "' . $type . '" AND r.category = ' . $dangerCategory['position'] . ' AND t.cotation >= ' . $this->cotations[$i]['start'] . ' AND t.cotation <= ' . $this->cotations[$i]['end']], 'AND', false, true, false, $join);
-
-                    $arrayRiskLists[$dangerCategory['position']][$i]['value']    = is_array($riskAssessments) && !empty($riskAssessments) ? count($riskAssessments) : 0;
+                    $arrayRiskLists[$dangerCategory['position']][$i]['value']    = $riskByDangerCategoriesAndRiskAssessments[$dangerCategory['name']]['riskAssessments'][$i];
                     $arrayRiskLists[$dangerCategory['position']][$i]['morecss']  = 'risk-evaluation-cotation';
                     $arrayRiskLists[$dangerCategory['position']][$i]['moreAttr'] = 'data-scale = ' . $i . ' style="line-height: 0; border-radius: 0;"';
                 }
@@ -746,6 +882,36 @@ class Risk extends SaturneObject
 
         $array['data'] = $arrayRiskLists;
 
+        return $array;
+    }
+
+    /**
+     * Get risk by danger categories and risk assessments
+     *
+     * @param array  $dangerCategories Danger categories datas
+     * @param string $filter          SQL Filter
+     * @param string $type            Risk type (risk, riskenvironmental or ...)
+     *
+     * @return array
+     * @throws Exception
+     */
+    public function getRiskByDangerCategoriesAndRiskAssessments(array $dangerCategories, string $filter = '', string $type = 'risk') : array
+    {
+        global $conf;
+
+        $array           = [];
+        $digiriskElement = new DigiriskElement($this->db);
+
+        foreach ($dangerCategories as $dangerCategory) {
+            $risks = saturne_fetch_all_object_type('Risk', '', '', 0, 0, ['customsql' => 't.status = ' . self::STATUS_VALIDATED . ' AND t.entity = ' . $conf->entity . (GETPOSTISSET('id') ? ' AND t.fk_element = ' . GETPOST('id') : '') . ' AND t.type = "' . $type . '" AND t.category = ' . $dangerCategory['position'] . $filter], 'AND', false, true, false, ' LEFT JOIN ' . MAIN_DB_PREFIX . $digiriskElement->table_element . ' as d ON d.rowid = t.fk_element');
+            $array[$dangerCategory['name']]['risk'] = !empty($risks) && is_array($risks) ? count($risks) : 0;
+            for ($i = 1; $i <= 4; $i++) {
+                $join  = ' LEFT JOIN ' . MAIN_DB_PREFIX . $this->table_element . ' as r ON r.rowid = t.fk_risk';
+                $join .= ' LEFT JOIN ' . MAIN_DB_PREFIX . $digiriskElement->table_element . ' as d ON d.rowid = r.fk_element';
+                $riskAssessments = saturne_fetch_all_object_type('RiskAssessment', '', '', 0, 0, ['customsql' => 't.status = ' . RiskAssessment::STATUS_VALIDATED . ' AND r.entity = ' . $conf->entity . (GETPOSTISSET('id') ? ' AND r.fk_element = ' . GETPOST('id') : '') . ' AND r.type = "' . $type . '" AND r.category = ' . $dangerCategory['position'] . ' AND t.cotation >= ' . $this->cotations[$i]['start'] . ' AND t.cotation <= ' . $this->cotations[$i]['end'] . str_replace('t.fk_element NOT IN', 'r.fk_element NOT IN', $filter)], 'AND', false, true, false, $join);
+                $array[$dangerCategory['name']]['riskAssessments'][$i] = !empty($riskAssessments) && is_array($riskAssessments) ? count($riskAssessments) : 0;
+            }
+        }
         return $array;
     }
 

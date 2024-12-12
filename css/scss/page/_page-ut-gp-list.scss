@@ -147,16 +147,16 @@
       min-width: 30px;
       width: 30px;
 
-      &::before {
-        display: block;
-        position: absolute;
-        content: '';
-        height: 1px;
-        left: 0;
-        right: 10px;
-        top: 20px;
-        background: rgba(0,0,0,0.3);
-      }
+      //&::before {
+      //  display: block;
+      //  position: absolute;
+      //  content: '';
+      //  height: 1px;
+      //  left: 0;
+      //  right: 10px;
+      //  top: 20px;
+      //  background: rgba(0,0,0,0.3);
+      //}
     }
     .photodigiriskdolibarr {
       display: block;
@@ -229,31 +229,31 @@
     .toggle-unit {
       position: relative;
 
-      &::before {
-        right: 20px;
-        display: block;
-        position: absolute;
-        content: '';
-        height: 1px;
-        left: 0;
-        top: 20px;
-        background: rgba(0,0,0,0.3);
-      }
+      //&::before {
+      //  right: 20px;
+      //  display: block;
+      //  position: absolute;
+      //  content: '';
+      //  height: 1px;
+      //  left: 0;
+      //  top: 20px;
+      //  background: rgba(0,0,0,0.3);
+      //}
     }
     .unit {
       position: relative;
       margin-left: 0.6em;
 
-      &::before {
-        display: block;
-        position: absolute;
-        content: '';
-        width: 1px;
-        height: 100%;
-        left: 0;
-        top: 0;
-        background: rgba(0,0,0,0.3);
-      }
+      //&::before {
+      //  display: block;
+      //  position: absolute;
+      //  content: '';
+      //  width: 1px;
+      //  height: 100%;
+      //  left: 0;
+      //  top: 0;
+      //  background: rgba(0,0,0,0.3);
+      //}
     }
   }
 

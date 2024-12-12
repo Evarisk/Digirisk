@@ -104,18 +104,22 @@ if ($action == 'setEmails') {
 }
 
 if ($action == 'generateExtrafields') {
-	$ret1 = $extra_fields->addExtraField('digiriskdolibarr_ticket_lastname', $langs->transnoentities("LastName"), 'varchar', 2000, 255, 'ticket', 0, 0, '', '', 1, '', 1, '', '', 0);
-	$ret2 = $extra_fields->addExtraField('digiriskdolibarr_ticket_firstname', $langs->transnoentities("FirstName"), 'varchar', 2100, 255, 'ticket', 0, 0, '', '', 1, '', 1, '', '', 0);
-	$ret3 = $extra_fields->addExtraField('digiriskdolibarr_ticket_phone', $langs->transnoentities("Phone"), 'phone', 2200, '', 'ticket', 0, 0, '', '', 1, '', 1, '', '', 0);
-	$ret4 = $extra_fields->addExtraField('digiriskdolibarr_ticket_service', $langs->transnoentities("Service"), 'sellist', 2300, '255', 'ticket', 0, 0, '', 'a:1:{s:7:"options";a:1:{s:61:"digiriskdolibarr_digiriskelement:ref:rowid::entity = $ENTITY$";N;}}', 1, '', 4, '','',0);
-	$ret5 = $extra_fields->addExtraField('digiriskdolibarr_ticket_location', $langs->transnoentities("Location"), 'varchar', 2400, 255, 'ticket', 0, 0, '', '', 1, '', 1, '', '', 0);
-	$ret6 = $extra_fields->addExtraField('digiriskdolibarr_ticket_date', $langs->transnoentities("Date"), 'datetime', 2500, '', 'ticket', 0, 0, '', '', 1, '', 1, '', '', 0);
-	if ($ret1 > 0 && $ret2 > 0 && $ret3 > 0 && $ret4 > 0 && $ret5 > 0 && $ret6 > 0) {
-		setEventMessages($langs->transnoentities('ExtrafieldsCreated'), array());
-	} else {
-		setEventMessages($extra_fields->error, array(), 'errors');
-	}
-	dolibarr_set_const($db, 'DIGIRISKDOLIBARR_TICKET_EXTRAFIELDS', 1, 'integer', 0, '', 0);
+    $commonExtraFieldsValue = [
+        'alwayseditable' => 1, 'list' => 1, 'help' => '', 'entity' => 0, 'langfile' => 'digiriskdolibarr@digiriskdolibarr', 'enabled' => "isModEnabled('digiriskdolibarr') && isModEnabled('ticket')", 'moreparams' => ['css' => 'minwidth100 maxwidth300']
+    ];
+
+    $extraFieldsArrays = [
+        'digiriskdolibarr_ticket_lastname'  => ['Label' => 'LastName',        'type' => 'varchar', 'length' => 255,  'elementtype' => ['ticket'], 'position' => 43630210,                                                                                                        ],
+        'digiriskdolibarr_ticket_firstname' => ['Label' => 'FirstName',       'type' => 'varchar', 'length' => 255,  'elementtype' => ['ticket'], 'position' => 43630220,                                                                                                        ],
+        'digiriskdolibarr_ticket_phone'     => ['Label' => 'Phone',           'type' => 'varchar', 'length' => 255,  'elementtype' => ['ticket'], 'position' => 43630230,                                                                                                        ],
+        'digiriskdolibarr_ticket_service'   => ['Label' => 'GP/UT',           'type' => 'link',                      'elementtype' => ['ticket'], 'position' => 43630240, 'params' => ['DigiriskElement:digiriskdolibarr/class/digiriskelement.class.php:1' => NULL], 'list' => 4],
+        'digiriskdolibarr_ticket_location'  => ['Label' => 'Location',        'type' => 'varchar',  'length' => 255, 'elementtype' => ['ticket'], 'position' => 43630250,                                                                                                        ],
+        'digiriskdolibarr_ticket_date'      => ['Label' => 'DeclarationDate', 'type' => 'datetime',                  'elementtype' => ['ticket'], 'position' => 43630260,                                                                                                        ]
+    ];
+
+    saturne_manage_extrafields($extraFieldsArrays, $commonExtraFieldsValue);
+    setEventMessages($langs->transnoentities('ExtrafieldsCreated'), []);
+    dolibarr_set_const($db, 'DIGIRISKDOLIBARR_TICKET_EXTRAFIELDS', 1, 'integer', 0, '', 0);
 }
 
 if ($action == 'generateCategories') {
@@ -370,6 +374,28 @@ if ($conf->global->DIGIRISKDOLIBARR_TICKET_ENABLE_PUBLIC_INTERFACE == 1) {
 	print '</td>';
 	print '</tr>';
 
+    // Use signatory
+    print '<tr class="oddeven"><td>';
+    print $langs->transnoentities('PublicInterfaceUseSignatoryDescription');
+    print '</td><td class="center">';
+    print ajax_constantonoff('DIGIRISKDOLIBARR_TICKET_PUBLIC_INTERFACE_USE_SIGNATORY');
+    print '</td>';
+    print '<td class="center"></td>';
+    print '<td class="center">';
+    print $form->textwithpicto('', $langs->transnoentities('TicketPublicInterfaceUseSignatoryDescription'));
+    print '</td></tr>';
+
+    // Show category description
+    print '<tr class="oddeven"><td>';
+    print $langs->transnoentities('TicketPublicInterfaceShowCategoryDescription');
+    print '</td><td class="center">';
+    print ajax_constantonoff('DIGIRISKDOLIBARR_TICKET_PUBLIC_INTERFACE_SHOW_CATEGORY_DESCRIPTION');
+    print '</td>';
+    print '<td class="center"></td>';
+    print '<td class="center">';
+    print $form->textwithpicto('', $langs->transnoentities('TicketPublicInterfaceShowCategoryDescriptionHelp'));
+    print '</td></tr>';
+
 	if (isModEnabled('multicompany')) {
 		//Page de sélection de l'entité
 		print '<tr class="oddeven"><td>' . $langs->transnoentities("ShowSelectorOnTicketPublicInterface") . '</td>';
@@ -445,7 +471,7 @@ if ($conf->global->DIGIRISKDOLIBARR_TICKET_ENABLE_PUBLIC_INTERFACE == 1) {
         print '</tr>';
 
         // GP/UT Visible and Required
-        print '<tr class="oddeven"><td>' . $langs->transnoentities("TicketDigiriskElementVisible") . '</td>';
+        print '<tr class="oddeven"><td>' . $langs->transnoentities("TicketDigiriskelementVisible") . '</td>';
         print '<td class="center">';
         print ajax_constantonoff('DIGIRISKDOLIBARR_TICKET_DIGIRISKELEMENT_VISIBLE');
         print '</td>';
@@ -453,7 +479,7 @@ if ($conf->global->DIGIRISKDOLIBARR_TICKET_ENABLE_PUBLIC_INTERFACE == 1) {
         print ajax_constantonoff('DIGIRISKDOLIBARR_TICKET_DIGIRISKELEMENT_REQUIRED');
         print '</td>';
         print '<td class="center">';
-        print $form->textwithpicto('', $langs->transnoentities("TicketDigiriskElementVisibleHelp"));
+        print $form->textwithpicto('', $langs->transnoentities("TicketDigiriskelementVisibleHelp"));
         print '</td>';
         print '</tr>';
 
@@ -471,7 +497,7 @@ if ($conf->global->DIGIRISKDOLIBARR_TICKET_ENABLE_PUBLIC_INTERFACE == 1) {
         print '</tr>';
 
         // Firstname Visible and Required
-        print '<tr class="oddeven"><td>' . $langs->transnoentities("TicketFirstNameVisible") . '</td>';
+        print '<tr class="oddeven"><td>' . $langs->transnoentities("TicketFirstnameVisible") . '</td>';
         print '<td class="center">';
         print ajax_constantonoff('DIGIRISKDOLIBARR_TICKET_FIRSTNAME_VISIBLE');
         print '</td>';
@@ -479,12 +505,12 @@ if ($conf->global->DIGIRISKDOLIBARR_TICKET_ENABLE_PUBLIC_INTERFACE == 1) {
         print ajax_constantonoff('DIGIRISKDOLIBARR_TICKET_FIRSTNAME_REQUIRED');
         print '</td>';
         print '<td class="center">';
-        print $form->textwithpicto('', $langs->transnoentities("TicketFirstNameVisibleHelp"));
+        print $form->textwithpicto('', $langs->transnoentities("TicketFirstnameVisibleHelp"));
         print '</td>';
         print '</tr>';
 
         // Lastname Visible and Required
-        print '<tr class="oddeven"><td>' . $langs->transnoentities("TicketLastNameVisible") . '</td>';
+        print '<tr class="oddeven"><td>' . $langs->transnoentities("TicketLastnameVisible") . '</td>';
         print '<td class="center">';
         print ajax_constantonoff('DIGIRISKDOLIBARR_TICKET_LASTNAME_VISIBLE');
         print '</td>';
@@ -492,7 +518,7 @@ if ($conf->global->DIGIRISKDOLIBARR_TICKET_ENABLE_PUBLIC_INTERFACE == 1) {
         print ajax_constantonoff('DIGIRISKDOLIBARR_TICKET_LASTNAME_REQUIRED');
         print '</td>';
         print '<td class="center">';
-        print $form->textwithpicto('', $langs->transnoentities("TicketLastNameVisibleHelp"));
+        print $form->textwithpicto('', $langs->transnoentities("TicketLastnameVisibleHelp"));
         print '</td>';
         print '</tr>';
 
