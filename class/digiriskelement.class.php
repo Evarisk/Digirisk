@@ -254,7 +254,7 @@ class DigiriskElement extends SaturneObject
     {
         global $conf, $form, $langs;
 
-        if (dol_strlen($filter['customsql'])) {
+        if (!empty($filter['customsql']) && dol_strlen($filter['customsql'])) {
             $filter['customsql'] .= ' AND t.rowid != ' . ($this->id ?? 0);
         }
 
