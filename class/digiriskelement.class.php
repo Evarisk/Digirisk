@@ -504,6 +504,7 @@ class DigiriskElement extends SaturneObject
         // ParentElement
         $parent_element = new self($db);
         $result         = $parent_element->fetch($this->fk_parent);
+        $morehtmlref    = '';
         if ($result > 0) {
             $morehtmlref .= $langs->trans("Description") . ' : ' . $this->description;
             $morehtmlref .= '<br>' . $langs->trans("ParentElement") . ' : ' . $parent_element->getNomUrl(1, 'blank', 1);

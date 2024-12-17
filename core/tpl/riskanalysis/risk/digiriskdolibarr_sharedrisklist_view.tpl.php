@@ -218,7 +218,7 @@ if ( ! preg_match('/(evaluation)/', $sortfield)) {
 	else $sql                                                                                                                                                 .= " WHERE 1 = 1";
 	$sql                                                                                                                                                      .= " AND evaluation.status = 1";
 
-	if ( ! $allRisks) {
+	if (empty($allRisks)) {
 		$sql .= " AND el.fk_target = " . $id;
 	} else {
 		if (is_array($digiriskElementsOfEntity) && !empty($digiriskElementsOfEntity)) {
