@@ -289,6 +289,21 @@ if ($action == 'set_multi_company_ticket_public_interface') {
     exit;
 }
 
+if ($action == 'dragableSubmit') {
+    $data = json_decode(file_get_contents('php://input'), true);
+    if (!empty($data)) {
+        $confName = strtoupper($moduleName) . '_PUBLIC_INTERFACE_TICKET_CONFIG';
+        $config   = json_decode(dolibarr_get_const($db, $confName, $conf->entity)) ?? new stdClass();
+
+        $config->fields = $data;
+
+        dolibarr_set_const($db, $confName, json_encode($config), 'chaine', 0, '', $conf->entity);
+        $action = '';
+    } else {
+        throw new Exception('No data to save');
+    }
+}
+
 /*
  * View
  */
@@ -449,7 +464,7 @@ if ($conf->global->DIGIRISKDOLIBARR_TICKET_ENABLE_PUBLIC_INTERFACE == 1) {
         print load_fiche_titre($langs->transnoentities("PublicInterfaceConfiguration"), '', '');
 
         print '<div class="div-table-responsive-no-min">';
-        print '<table class="noborder centpercent">';
+        print '<table class="noborder centpercent" id="draggableTable">';
         print '<tr class="liste_titre">';
         print '<td>' . $langs->transnoentities("Parameters") . '</td>';
         print '<td class="center">' . $langs->transnoentities("Visible") . '</td>';
@@ -457,111 +472,43 @@ if ($conf->global->DIGIRISKDOLIBARR_TICKET_ENABLE_PUBLIC_INTERFACE == 1) {
         print '<td class="center">' . $langs->transnoentities("ShortInfo") . '</td>';
         print '</tr>';
 
-        // Photo visible
-        print '<tr class="oddeven"><td>' . $langs->transnoentities("TicketPhotoVisible") . '</td>';
-        print '<td class="center">';
-        print ajax_constantonoff('DIGIRISKDOLIBARR_TICKET_PHOTO_VISIBLE');
-        print '</td>';
-        print '<td class="center">';
-        print '';
-        print '</td>';
-        print '<td class="center">';
-        print $form->textwithpicto('', $langs->transnoentities("TicketPhotoVisibleHelp"));
-        print '</td>';
-        print '</tr>';
+        $extra_fields->fetch_name_optionals_label($ticket->table_element);
+        $extra_fields->attributes[$ticket->table_element]['label']['digiriskdolibarr_ticket_photo']           = ['required' => 0];
+        $extra_fields->attributes[$ticket->table_element]['label']['digiriskdolibarr_ticket_digiriskelement'] = [];
+        unset($extra_fields->attributes[$ticket->table_element]['label']['digiriskdolibarr_ticket_service']);
 
-        // GP/UT Visible and Required
-        print '<tr class="oddeven"><td>' . $langs->transnoentities("TicketDigiriskelementVisible") . '</td>';
-        print '<td class="center">';
-        print ajax_constantonoff('DIGIRISKDOLIBARR_TICKET_DIGIRISKELEMENT_VISIBLE');
-        print '</td>';
-        print '<td class="center">';
-        print ajax_constantonoff('DIGIRISKDOLIBARR_TICKET_DIGIRISKELEMENT_REQUIRED');
-        print '</td>';
-        print '<td class="center">';
-        print $form->textwithpicto('', $langs->transnoentities("TicketDigiriskelementVisibleHelp"));
-        print '</td>';
-        print '</tr>';
+        $confName = strtoupper($moduleName) . '_PUBLIC_INTERFACE_TICKET_CONFIG';
+        $config   = json_decode(dolibarr_get_const($db, $confName, $conf->entity)) ?? new stdClass();
+        $fields   = $config->fields ?? ['digiriskdolibarr_ticket_photo', 'digiriskdolibarr_ticket_digiriskelement', 'digiriskdolibarr_ticket_lastname', 'digiriskdolibarr_ticket_firstname', 'digiriskdolibarr_ticket_phone', 'digiriskdolibarr_ticket_location', 'digiriskdolibarr_ticket_date', 'digiriskdolibarr_ticket_email'];
 
-        // Email Visible and Required
-        print '<tr class="oddeven"><td>' . $langs->transnoentities("TicketEmailVisible") . '</td>';
-        print '<td class="center">';
-        print ajax_constantonoff('DIGIRISKDOLIBARR_TICKET_EMAIL_VISIBLE');
-        print '</td>';
-        print '<td class="center">';
-        print ajax_constantonoff('DIGIRISKDOLIBARR_TICKET_EMAIL_REQUIRED');
-        print '</td>';
-        print '<td class="center">';
-        print $form->textwithpicto('', $langs->transnoentities("TicketEmailVisibleHelp"));
-        print '</td>';
-        print '</tr>';
+        $extra_fields->attributes[$ticket->table_element]['label'] = array_merge(array_flip($fields), $extra_fields->attributes[$ticket->table_element]['label']);
 
-        // Firstname Visible and Required
-        print '<tr class="oddeven"><td>' . $langs->transnoentities("TicketFirstnameVisible") . '</td>';
-        print '<td class="center">';
-        print ajax_constantonoff('DIGIRISKDOLIBARR_TICKET_FIRSTNAME_VISIBLE');
-        print '</td>';
-        print '<td class="center">';
-        print ajax_constantonoff('DIGIRISKDOLIBARR_TICKET_FIRSTNAME_REQUIRED');
-        print '</td>';
-        print '<td class="center">';
-        print $form->textwithpicto('', $langs->transnoentities("TicketFirstnameVisibleHelp"));
-        print '</td>';
-        print '</tr>';
+        foreach (array_keys($extra_fields->attributes[$ticket->table_element]['label']) as $key) {
+            if (strpos($key, 'digiriskdolibarr_ticket') === false) {
+                continue;
+            }
 
-        // Lastname Visible and Required
-        print '<tr class="oddeven"><td>' . $langs->transnoentities("TicketLastnameVisible") . '</td>';
-        print '<td class="center">';
-        print ajax_constantonoff('DIGIRISKDOLIBARR_TICKET_LASTNAME_VISIBLE');
-        print '</td>';
-        print '<td class="center">';
-        print ajax_constantonoff('DIGIRISKDOLIBARR_TICKET_LASTNAME_REQUIRED');
-        print '</td>';
-        print '<td class="center">';
-        print $form->textwithpicto('', $langs->transnoentities("TicketLastnameVisibleHelp"));
-        print '</td>';
-        print '</tr>';
+            $name = dol_strtolower(str_replace("digiriskdolibarr_ticket_", "", $key));
+            print '<tr class="oddeven" draggable="true" data-name="' . $key . '"><td>' . $langs->transnoentities("Ticket" . dol_ucfirst($name) . "Visible") . '</td>';
+            print '<td class="center">';
+            print ajax_constantonoff('DIGIRISKDOLIBARR_TICKET_' . dol_strtoupper($name) . '_VISIBLE');
+            print '</td>';
+            print '<td class="center">';
+            $labelValue = $extra_fields->attributes[$ticket->table_element]['label'][$key];
+            if (!is_array($labelValue) || !isset($labelValue['required']) || $labelValue['required']) {
+                print ajax_constantonoff('DIGIRISKDOLIBARR_TICKET_' . dol_strtoupper($name) . '_REQUIRED');
+            }
+            print '</td>';
+            print '<td class="center">';
+            print $form->textwithpicto('', $langs->transnoentities("Ticket" . dol_ucfirst($name) . "VisibleHelp"));
+            print '</td>';
+            print '</tr>';
 
-        // Phone Visible and Required
-        print '<tr class="oddeven"><td>' . $langs->transnoentities("TicketPhoneVisible") . '</td>';
-        print '<td class="center">';
-        print ajax_constantonoff('DIGIRISKDOLIBARR_TICKET_PHONE_VISIBLE');
-        print '</td>';
-        print '<td class="center">';
-        print ajax_constantonoff('DIGIRISKDOLIBARR_TICKET_PHONE_REQUIRED');
-        print '</td>';
-        print '<td class="center">';
-        print $form->textwithpicto('', $langs->transnoentities("TicketPhoneVisibleHelp"));
-        print '</td>';
-        print '</tr>';
-
-        // Location Visible and Required
-        print '<tr class="oddeven"><td>' . $langs->transnoentities("TicketLocationVisible") . '</td>';
-        print '<td class="center">';
-        print ajax_constantonoff('DIGIRISKDOLIBARR_TICKET_LOCATION_VISIBLE');
-        print '</td>';
-        print '<td class="center">';
-        print ajax_constantonoff('DIGIRISKDOLIBARR_TICKET_LOCATION_REQUIRED');
-        print '</td>';
-        print '<td class="center">';
-        print $form->textwithpicto('', $langs->transnoentities("TicketLocationVisibleHelp"));
-        print '</td>';
-        print '</tr>';
-
-        // Date Visible and Required
-        print '<tr class="oddeven"><td>' . $langs->transnoentities("TicketDateVisible") . '</td>';
-        print '<td class="center">';
-        print ajax_constantonoff('DIGIRISKDOLIBARR_TICKET_DATE_VISIBLE');
-        print '</td>';
-        print '<td class="center">';
-        print ajax_constantonoff('DIGIRISKDOLIBARR_TICKET_DATE_REQUIRED');
-        print '</td>';
-        print '<td class="center">';
-        print $form->textwithpicto('', $langs->transnoentities("TicketDateVisibleHelp"));
-        print '</td>';
-        print '</tr>';
+        }
 
         print '</table>';
+
+        print '<div class="right"><input type="submit" class="button" name="submit" id="dragableSubmit" value="'.$langs->trans("Save").'"></div>';
     }
 
 	print load_fiche_titre($langs->transnoentities("TicketSuccessMessageData"), '', '');
