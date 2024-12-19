@@ -1351,6 +1351,9 @@ FkTicket                                 = Ticket lié
 PublicTicket                             = Interface publique des tickets
 TicketPublicInterfaceForbidden           = Accès interdit à l'interface publique des tickets
 WHSRegister                              = Registre SST
+TicketCreationDefaultURL                 = URL par défaut
+TicketCreationExternalURL                = URL externe
+TicketCreationShortcutURL                = URL raccourcie
 
 #Public interface - Interface publique
 TicketPublicInterfaceShowCategoryDescription     = Afficher la description des catégories de ticket dans l'interface publique
