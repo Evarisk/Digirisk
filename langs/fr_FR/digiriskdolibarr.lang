@@ -299,6 +299,7 @@ ErrorThirdPartyHasAtLeastOneChildOfTypePreventionPlan = Le tiers est lié à au 
 ErrorContactHasAtLeastOneChildOfTypePreventionPlan    = Le contact est lié à au moins un enfant de type Plan de Prévention :
 ConfirmDeletePreventionPlan                           = Êtes-vous sûr de vouloir supprimer ce plan de prévention ?
 PreventionPlanRole                                    = Les rôles du plan de prévention
+RelatedFirePermit                                     = Permis de feu liés
 
 # Email - Mail
 PreventionPlanLabel   = Récapitulatif du plan de prévention
