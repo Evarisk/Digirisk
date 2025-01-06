@@ -433,6 +433,7 @@ ModifyAccident                    = Modifier l'accident
 AccidentList                      = Liste des accidents
 Accident                          = Accident
 AccidentCreated                   = Création d'un accident
+DeleteAccident                    = Supprimer l'accident ?
 AccidentModified                  = Modifcation d'un accident
 AccidentDeleted                   = Suppression d'un accident
 AccidentLine                      = risque(s)
