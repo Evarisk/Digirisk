@@ -321,7 +321,7 @@ abstract class ModeleODTDigiriskElementDocument extends SaturneDocumentModel
             $QRCode          = array_shift($QRCodeList);
             $QRCodeImagePath = $QRCode['fullname'];
         } else {
-            $QRCodeImagePath = DOL_DOCUMENT_ROOT . '/public/theme/common/nophoto.png';
+            $QRCodeImagePath = ''; // @todo Add default image
         }
 
         $allLinks             = $resources->fetchDigiriskResources();
