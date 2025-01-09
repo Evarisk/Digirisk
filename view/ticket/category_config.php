@@ -87,28 +87,61 @@ if ($resHook < 0) {
 
 if (empty($resHook)) {
     if ($action == 'set_ticket_category_config') {
-        $data['use_signatory']    = GETPOST('use_signatory');
-        $data['show_description'] = GETPOST('show_description');
+        $data['use_signatory']    = (int) (GETPOST('use_signatory') == 'on');
+        $data['show_description'] = (int) (GETPOST('show_description') == 'on');
         $data['mail_template']    = GETPOST('mail_template');
         $data['recipients']       = implode(',', GETPOST('recipients', 'array'));
-        $data['photo_visible']    = GETPOST('photo_visible');
 
         $extraFields->attributes['ticket']['label']['digiriskdolibarr_ticket_email'] = $langs->trans('Email');
-        foreach ($extraFields->attributes['ticket']['label'] as $key => $field) {
-            $extraFieldVisible  = $key . '_visible';
-            $extraFieldRequired = $key . '_required';
+        $extraFields->attributes['ticket']['label']['digiriskdolibarr_ticket_photo'] = $langs->trans('Photo');
+        $extraFields->attributes['ticket']['label']['digiriskdolibarr_ticket_digiriskelement'] = $langs->transnoentities('Service');
 
-            $data[$extraFieldVisible]  = GETPOST($extraFieldVisible);
-            $data[$extraFieldRequired] = GETPOST($extraFieldRequired);
+        $config = json_decode($object->array_options['options_ticket_category_config'], true) ?? [];
+
+        unset($extraFields->attributes['ticket']['label']['digiriskdolibarr_ticket_service']);
+        foreach ($extraFields->attributes['ticket']['label'] as $key => $field) {
+            $data[$key] = [
+                'visible'  => (int) (GETPOST($key . '_visible') == 'on'),
+                'required' => (int) (GETPOST($key . '_required') == 'on'),
+                'position' => $config[$key]['position'] ?? 0,
+            ];
         }
 
-        $object->table_element = 'categories';
+        $object->table_element = 'categorie';
         $object->array_options['options_ticket_category_config'] = json_encode($data);
-        $object->updateExtraField('ticket_category_config');
+
+        $result = $object->updateExtraField('ticket_category_config');
+
+        if ($result < 0) {
+            throw new Exception($object->error);
+        }
 
         setEventMessage('SavedConfig');
         header('Location: ' . $_SERVER['PHP_SELF'] . '?id=' . $id . '&type=ticket');
         exit;
+    }
+
+    if ($action == 'draggableSubmit') {
+
+        $order = json_decode(file_get_contents('php://input'), true);
+        if (empty($order)) {
+            exit;
+        }
+
+        $data = [];
+        if (!empty($object->array_options['options_ticket_category_config'])) {
+            $data = json_decode($object->array_options['options_ticket_category_config'], true);
+        }
+        foreach ($order as $key => $value) {
+            if (!isset($data[$value])) {
+                $data[$value] = [];
+            }
+            $data[$value]['position'] = $key;
+        }
+
+        $object->array_options['options_ticket_category_config'] = json_encode($data);
+        $object->updateExtraField('ticket_category_config');
+        $action = '';
     }
 }
 
@@ -209,7 +242,7 @@ if (getDolGlobalInt('DIGIRISKDOLIBARR_TICKET_ENABLE_PUBLIC_INTERFACE')) {
     if (getDolGlobalInt('DIGIRISKDOLIBARR_TICKET_EXTRAFIELDS')) {
         print load_fiche_titre($langs->transnoentities('PublicInterfaceConfiguration'), $link, '');
 
-        print '<table class="noborder centpercent">';
+        print '<table class="noborder centpercent" id="draggableTable">';
         print '<tr class="liste_titre">';
         print '<td>' . $langs->trans('Parameters') . '</td>';
         print '<td class="center">' . $langs->transnoentities('Visible') . '</td>';
@@ -217,10 +250,10 @@ if (getDolGlobalInt('DIGIRISKDOLIBARR_TICKET_ENABLE_PUBLIC_INTERFACE')) {
         print '</tr>';
 
         // Photo visible
-        print '<tr class="oddeven"><td>';
+        print '<tr class="oddeven" draggable="true" data-name="digiriskdolibarr_ticket_photo"><td>';
         print img_picto('', 'fa-image', 'class="paddingrightonly"') . $form->textwithpicto($langs->transnoentities('TicketPhotoVisible'), $langs->transnoentities('TicketPhotoVisibleHelp'), 1, 'info') . '</td>';
         print '</td><td class="center">';
-        print '<input type="checkbox" id="photo_visible" name="photo_visible"' . ($ticketCategoryConfig->photo_visible ? ' checked=""' : '') . '"> ';
+        print '<input type="checkbox" id="digiriskdolibarr_ticket_photo_visible" name="digiriskdolibarr_ticket_photo_visible"' . ($ticketCategoryConfig->digiriskdolibarr_ticket_photo->visible ? ' checked=""' : '') . '"> ';
         print '</td><td class="center"></td></tr>';
 
         // Get all categories and their configuration
@@ -235,46 +268,56 @@ if (getDolGlobalInt('DIGIRISKDOLIBARR_TICKET_ENABLE_PUBLIC_INTERFACE')) {
 
         $keysWithValueOn = [];
         $fields          = [
-            'digiriskdolibarr_ticket_service'   => ['picto' => 'fa-network-wired'],
-            'digiriskdolibarr_ticket_email'     => ['picto' => 'fa-envelope'],
-            'digiriskdolibarr_ticket_firstname' => ['picto' => 'fa-user'],
-            'digiriskdolibarr_ticket_lastname'  => ['picto' => 'fa-user'],
-            'digiriskdolibarr_ticket_phone'     => ['picto' => 'fa-phone'],
-            'digiriskdolibarr_ticket_location'  => ['picto' => 'fa-map-marker'],
-            'digiriskdolibarr_ticket_date'      => ['picto' => 'fa-calendar-alt']
+            'digiriskdolibarr_ticket_digiriskelement' => ['picto' => 'fa-network-wired'],
+            'digiriskdolibarr_ticket_email'           => ['picto' => 'fa-envelope'],
+            'digiriskdolibarr_ticket_firstname'       => ['picto' => 'fa-user'],
+            'digiriskdolibarr_ticket_lastname'        => ['picto' => 'fa-user'],
+            'digiriskdolibarr_ticket_phone'           => ['picto' => 'fa-phone'],
+            'digiriskdolibarr_ticket_location'        => ['picto' => 'fa-map-marker'],
+            'digiriskdolibarr_ticket_date'            => ['picto' => 'fa-calendar-alt']
         ];
 
         $extraFields->attributes['ticket']['label']['digiriskdolibarr_ticket_email'] = $langs->trans('Email');
+        $extraFields->attributes['ticket']['label']['digiriskdolibarr_ticket_digiriskelement'] = $langs->transnoentities('Service');
+        unset($extraFields->attributes['ticket']['label']['digiriskdolibarr_ticket_service']);
+
+        // remove from extrafield list all fields that are not ticket related
+        $extraFields->attributes['ticket']['label'] = array_filter($extraFields->attributes['ticket']['label'], function ($key) {
+            return strpos($key, 'digiriskdolibarr_ticket') !== false;
+        }, ARRAY_FILTER_USE_KEY);
+
+        uksort($extraFields->attributes['ticket']['label'], function ($a, $b) use ($ticketCategoryConfig) {
+            return $ticketCategoryConfig->{$a}->position <=> $ticketCategoryConfig->{$b}->position;
+        });
+
         foreach ($extraFields->attributes['ticket']['label'] as $key => $field) {
             $label = str_replace('digiriskdolibarr_ticket_', '', $key);
-            if (strpos($key, 'digiriskdolibarr_ticket') === false) {
-                continue; // Goes to the next element if ‘digiriskdolibarr_ticket’ is not found
-            }
 
             $extraFieldVisible  = $key . '_visible';
             $extraFieldRequired = $key . '_required';
 
             // Check if the field is visible or required in the other categories
             foreach ($categoriesConfig as $category) {
-                if (isset($category[$extraFieldVisible]) && $category[$extraFieldVisible] === 'on') {
-                    $keysWithValueOn[$extraFieldVisible] = true;
+                $keysWithValueOn[$key] = $keysWithValueOn[$key] ?? [];
+                if (!empty($category[$key]['visible'])) {
+                    $keysWithValueOn[$key]['visible'] = true;
                 }
-                if (isset($category[$extraFieldRequired]) && $category[$extraFieldRequired] === 'on') {
-                    $keysWithValueOn[$extraFieldRequired] = true;
+                if (!empty($category[$key]['required'])) {
+                    $keysWithValueOn[$key]['required'] = true;
                 }
             }
 
             // Extra field visible and required
-            print '<tr class="oddeven"><td>';
+            print '<tr class="oddeven" draggable="true" data-name="' . $key . '"><td>';
             print ($fields[$key]['picto'] ? img_picto('', $fields[$key]['picto'], 'class="paddingrightonly"') : getPictoForType($extraFields->attributes['ticket']['type'][$key])) . $form->textwithpicto($langs->transnoentities('Ticket' . ucfirst($label) . 'Visible'), $langs->transnoentities('Ticket' . ucfirst($label) . 'VisibleHelp'), 1, 'info') . '</td>';
             print '</td><td class="center">';
-            print '<input type="checkbox" id="' . $extraFieldVisible . '" name="' . $extraFieldVisible . '"' . (getDolGlobalInt(dol_strtoupper($key) . '_VISIBLE') || $keysWithValueOn[$extraFieldVisible] || $ticketCategoryConfig->$extraFieldVisible ? ' checked' : '') . (getDolGlobalInt(dol_strtoupper($key) . '_VISIBLE') || $keysWithValueOn[$extraFieldVisible] ? ' disabled' : '') . '>';
-            if (getDolGlobalInt(dol_strtoupper($key) . '_VISIBLE') || $keysWithValueOn[$extraFieldVisible]) {
+            print '<input type="checkbox" id="' . $extraFieldVisible . '" name="' . $extraFieldVisible . '"' . (getDolGlobalInt(dol_strtoupper($key) . '_VISIBLE') || !empty($keysWithValueOn[$key]['visible']) || !empty($ticketCategoryConfig->$key->visible) ? ' checked' : '') . (getDolGlobalInt(dol_strtoupper($key) . '_VISIBLE') || !empty($keysWithValueOn[$key]['visible']) ? ' disabled' : '') . '>';
+            if (getDolGlobalInt(dol_strtoupper($key) . '_VISIBLE') || !empty($keysWithValueOn[$key]['visible'])) {
                 print $form->textwithtooltip($langs->transnoentities('Inherited'), $langs->transnoentities('PermissionInheritedFromConfig'));
             }
             print '</td><td class="center">';
-            print '<input type="checkbox" id="' . $extraFieldRequired . '" name="' . $extraFieldRequired . '"' . (getDolGlobalInt(dol_strtoupper($key) . '_REQUIRED') || $keysWithValueOn[$extraFieldRequired] || $ticketCategoryConfig->$extraFieldRequired ? ' checked=""' : '') . (getDolGlobalInt(dol_strtoupper($key) . '_REQUIRED') || $keysWithValueOn[$extraFieldRequired] ? ' disabled' : '') . '>';
-            if (getDolGlobalInt(dol_strtoupper($key) . '_REQUIRED') || $keysWithValueOn[$extraFieldRequired]) {
+            print '<input type="checkbox" id="' . $extraFieldRequired . '" name="' . $extraFieldRequired . '"' . (getDolGlobalInt(dol_strtoupper($key) . '_REQUIRED') || !empty($keysWithValueOn[$key]['required']) || !empty($ticketCategoryConfig->$key->required) ? ' checked=""' : '') . (getDolGlobalInt(dol_strtoupper($key) . '_REQUIRED') || !empty($keysWithValueOn[$key]['required']) ? ' disabled' : '') . '>';
+            if (getDolGlobalInt(dol_strtoupper($key) . '_REQUIRED') || !empty($keysWithValueOn[$key]['required'])) {
                 print $form->textwithtooltip($langs->transnoentities('Inherited'), $langs->transnoentities('PermissionInheritedFromConfig'));
             }
             print '</td></tr>';

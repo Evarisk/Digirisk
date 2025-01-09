@@ -289,19 +289,23 @@ if ($action == 'set_multi_company_ticket_public_interface') {
     exit;
 }
 
-if ($action == 'dragableSubmit') {
+if ($action == 'draggableSubmit') {
     $data = json_decode(file_get_contents('php://input'), true);
-    if (!empty($data)) {
-        $confName = strtoupper($moduleName) . '_PUBLIC_INTERFACE_TICKET_CONFIG';
-        $config   = json_decode(dolibarr_get_const($db, $confName, $conf->entity)) ?? new stdClass();
-
-        $config->fields = $data;
-
-        dolibarr_set_const($db, $confName, json_encode($config), 'chaine', 0, '', $conf->entity);
-        $action = '';
-    } else {
-        throw new Exception('No data to save');
+    if (empty($data)) {
+        exit;
     }
+    $confName = strtoupper($moduleName) . '_PUBLIC_INTERFACE_TICKET_CONFIG';
+    $config   = json_decode(dolibarr_get_const($db, $confName, $conf->entity)) ?? new stdClass();
+
+    $resultData = [];
+    foreach ($data as $key => $value) {
+        $resultData[$value] = ['position' => $key];
+    }
+
+    $config = $resultData;
+
+    dolibarr_set_const($db, $confName, json_encode($config), 'chaine', 0, '', $conf->entity);
+    $action = '';
 }
 
 /*
@@ -478,10 +482,13 @@ if ($conf->global->DIGIRISKDOLIBARR_TICKET_ENABLE_PUBLIC_INTERFACE == 1) {
         unset($extra_fields->attributes[$ticket->table_element]['label']['digiriskdolibarr_ticket_service']);
 
         $confName = strtoupper($moduleName) . '_PUBLIC_INTERFACE_TICKET_CONFIG';
-        $config   = json_decode(dolibarr_get_const($db, $confName, $conf->entity)) ?? new stdClass();
-        $fields   = $config->fields ?? ['digiriskdolibarr_ticket_photo', 'digiriskdolibarr_ticket_digiriskelement', 'digiriskdolibarr_ticket_lastname', 'digiriskdolibarr_ticket_firstname', 'digiriskdolibarr_ticket_phone', 'digiriskdolibarr_ticket_location', 'digiriskdolibarr_ticket_date', 'digiriskdolibarr_ticket_email'];
+        $config   = json_decode(dolibarr_get_const($db, $confName, $conf->entity), true) ?? ['digiriskdolibarr_ticket_photo' => ['position' => 0], 'digiriskdolibarr_ticket_digiriskelement' => ['position' => 1], 'digiriskdolibarr_ticket_lastname' => ['position' => 2], 'digiriskdolibarr_ticket_firstname' => ['position' => 3], 'digiriskdolibarr_ticket_phone' => ['position' => 4], 'digiriskdolibarr_ticket_location' => ['position' => 5], 'digiriskdolibarr_ticket_date' => ['position' => 6], 'digiriskdolibarr_ticket_email' => ['position' => 7]];
 
-        $extra_fields->attributes[$ticket->table_element]['label'] = array_merge(array_flip($fields), $extra_fields->attributes[$ticket->table_element]['label']);
+        uksort($extra_fields->attributes['ticket']['label'], function ($a, $b) use ($config) {
+            return $config[$a]['position'] <=> $config[$b]['position'];
+        });
+
+        //$extra_fields->attributes[$ticket->table_element]['label'] = array_merge(array_flip($fields), $extra_fields->attributes[$ticket->table_element]['label']);
 
         foreach (array_keys($extra_fields->attributes[$ticket->table_element]['label']) as $key) {
             if (strpos($key, 'digiriskdolibarr_ticket') === false) {
@@ -507,8 +514,6 @@ if ($conf->global->DIGIRISKDOLIBARR_TICKET_ENABLE_PUBLIC_INTERFACE == 1) {
         }
 
         print '</table>';
-
-        print '<div class="right"><input type="submit" class="button" name="submit" id="dragableSubmit" value="'.$langs->trans("Save").'"></div>';
     }
 
 	print load_fiche_titre($langs->transnoentities("TicketSuccessMessageData"), '', '');

@@ -454,8 +454,8 @@ if ($entity > 0) {
 	print '<p><strong>' . $conf->global->DIGIRISKDOLIBARR_TICKET_PARENT_CATEGORY_LABEL . '</strong><span style="color:red"> *</span></p>';
 
 	$mainCategoryObject = $category->rechercher($conf->global->DIGIRISKDOLIBARR_TICKET_MAIN_CATEGORY, '', 'ticket', true);
-    $mainCategoryChildrenExtrafields = new StdClass();
-    $subCategoryExtrafields          = new StdClass();
+    $mainCategoryChildrenExtrafields = [];
+    $subCategoryExtrafields          = [];
     $categoryDescription             = '';
 
 	print '<div class="wpeo-gridlayout grid-3 categories-container">';
@@ -465,7 +465,7 @@ if ($entity > 0) {
 			$k = 1;
 			foreach ($mainCategoryChildren as $cat) {
 				if ($cat->id == GETPOST('parentCategory')) {
-                    $mainCategoryChildrenExtrafields = json_decode($cat->array_options['options_ticket_category_config']);
+                    $mainCategoryChildrenExtrafields = json_decode($cat->array_options['options_ticket_category_config'], true);
                     $categoryDescription             = $cat->description;
 					print '<div class="ticket-parentCategory ticket-parentCategory'. $cat->id .' active" id="' . $cat->id . '" data-rowid="' . $cat->id . '">';
 				} else {
@@ -496,7 +496,7 @@ if ($entity > 0) {
 
 					foreach ($selectedParentCategoryChildren as $subCategory) {
 						if ($subCategory->id == GETPOST('subCategory')) {
-                            $subCategoryExtrafields = json_decode($subCategory->array_options['options_ticket_category_config']);
+                            $subCategoryExtrafields = json_decode($subCategory->array_options['options_ticket_category_config'], true);
                             $categoryDescription    = $subCategory->description;
 							print '<div class="ticket-subCategory ticket-subCategory'. $subCategory->id .' center active" id="' . $subCategory->id . '" data-rowid="' . $subCategory->id . '">';
 						} else {
@@ -537,15 +537,23 @@ if ($entity > 0) {
                 </div>
                 <?php
                 if (getDolGlobalInt('DIGIRISKDOLIBARR_TICKET_EXTRAFIELDS')) {
-                    $confName = strtoupper($moduleName) . '_PUBLIC_INTERFACE_TICKET_CONFIG';
-                    $config   = json_decode(dolibarr_get_const($db, $confName, $conf->entity)) ?? new stdClass();
-                    $fields   = $config->fields ?? ['digiriskdolibarr_ticket_photo', 'digiriskdolibarr_ticket_digiriskelement', 'digiriskdolibarr_ticket_lastname', 'digiriskdolibarr_ticket_firstname', 'digiriskdolibarr_ticket_phone', 'digiriskdolibarr_ticket_location', 'digiriskdolibarr_ticket_date', 'digiriskdolibarr_ticket_email'];
+                    if (!empty($subCategoryExtrafields)) {
+                        $config = $subCategoryExtrafields;
+                    } else if (!empty($mainCategoryChildren)) {
+                        $config = $mainCategoryChildren;
+                    } else {
+                        $confName = strtoupper($moduleName) . '_PUBLIC_INTERFACE_TICKET_CONFIG';
+                        $config   = json_decode(dolibarr_get_const($db, $confName, $conf->entity), true) ?? ['digiriskdolibarr_ticket_photo' => ['position' => 0], 'digiriskdolibarr_ticket_digiriskelement' => ['position' => 1], 'digiriskdolibarr_ticket_lastname' => ['position' => 2], 'digiriskdolibarr_ticket_firstname' => ['position' => 3], 'digiriskdolibarr_ticket_phone' => ['position' => 4], 'digiriskdolibarr_ticket_location' => ['position' => 5], 'digiriskdolibarr_ticket_date' => ['position' => 6], 'digiriskdolibarr_ticket_email' => ['position' => 7]];
+                    }
 
                     $extrafields->attributes[$object->table_element]['label']['digiriskdolibarr_ticket_digiriskelement'] = $langs->transnoentities('Service');
                     $extrafields->attributes[$object->table_element]['label']['digiriskdolibarr_ticket_email'] = $langs->transnoentities('Email');
                     $extrafields->attributes[$object->table_element]['label']['digiriskdolibarr_ticket_photo'] = $langs->transnoentities('FilesLinked');
                     unset($extrafields->attributes[$object->table_element]['label']['digiriskdolibarr_ticket_service']);
-                    $extrafields->attributes[$object->table_element]['label'] = array_merge(array_flip($fields), $extrafields->attributes[$object->table_element]['label']);
+
+                    uksort($extrafields->attributes['ticket']['label'], function ($a, $b) use ($config) {
+                        return $config[$a]['position'] <=> $config[$b]['position'];
+                    });
 
                     $fieldsTypes = [
                         'digiriskdolibarr_ticket_email' => ['type' => 'email', 'name' => 'email'],
@@ -553,13 +561,14 @@ if ($entity > 0) {
                     ];
 
                     foreach ($extrafields->attributes[$object->table_element]['label'] as $key => $field) {
+
                         if (strpos($key, 'digiriskdolibarr_ticket') === false) {
                             continue;
                         }
-                        $visible = getDolGlobalInt(dol_strtoupper($key) . '_VISIBLE') || (!getDolGlobalInt(dol_strtoupper($key) . '_VISIBLE') && $mainCategoryChildrenExtrafields->{$key . '_visible'})
-                              || (!getDolGlobalInt(dol_strtoupper($key) . '_VISIBLE') && $mainCategoryChildrenExtrafields->{$key . '_visible'} == NUll && $subCategoryExtrafields->{$key . '_visible'});
-                        $required = getDolGlobalInt(dol_strtoupper($key) . '_REQUIRED') || (!getDolGlobalInt(dol_strtoupper($key) . '_REQUIRED') && $mainCategoryChildrenExtrafields->{$key . '_required'})
-                              || (!getDolGlobalInt(dol_strtoupper($key) . '_REQUIRED') && $mainCategoryChildrenExtrafields->{$key . '_required'} == NUll && $subCategoryExtrafields->{$key . '_required'});
+
+                        $visible = getDolGlobalInt(dol_strtoupper($key) . '_VISIBLE') || !empty($mainCategoryChildrenExtrafields[$key]['visible']) || !empty($subCategoryExtrafields[$key]['visible']);
+                        $required = getDolGlobalInt(dol_strtoupper($key) . '_REQUIRED') || !empty($mainCategoryChildrenExtrafields[$key]['required']) || !empty($subCategoryExtrafields[$key]['required']);
+
                         if (!$visible) {
                             continue;
                         }
@@ -642,8 +651,8 @@ if ($entity > 0) {
         print '</div>';
         print dol_get_fiche_end();
 
-        $visible = getDolGlobalInt('DIGIRISKDOLIBARR_TICKET_PUBLIC_INTERFACE_USE_SIGNATORY') || (!getDolGlobalInt('DIGIRISKDOLIBARR_TICKET_PUBLIC_INTERFACE_USE_SIGNATORY') && $mainCategoryChildrenExtrafields->use_signatory)
-        || (!getDolGlobalInt('DIGIRISKDOLIBARR_TICKET_PUBLIC_INTERFACE_USE_SIGNATORY') && $mainCategoryChildrenExtrafields->use_signatory && $subCategoryExtrafields->use_signatory);
+        $visible = getDolGlobalInt('DIGIRISKDOLIBARR_TICKET_PUBLIC_INTERFACE_USE_SIGNATORY') || (!getDolGlobalInt('DIGIRISKDOLIBARR_TICKET_PUBLIC_INTERFACE_USE_SIGNATORY') && $mainCategoryChildrenExtrafields['use_signatory'])
+        || (!getDolGlobalInt('DIGIRISKDOLIBARR_TICKET_PUBLIC_INTERFACE_USE_SIGNATORY') && $mainCategoryChildrenExtrafields['use_signatory'] && $subCategoryExtrafields['use_signatory']);
         if ($visible) {
             // Load Saturne libraries
             require_once __DIR__ . '/../../../saturne/lib/saturne_functions.lib.php';
