@@ -351,11 +351,11 @@ class Risk extends SaturneObject
 	 *
 	 * @return	array $risk_categories
 	 */
-	public function getDangerCategories()
+	public function getDangerCategories($riskType = 'risk')
 	{
 		$json_categories = file_get_contents(DOL_DOCUMENT_ROOT . '/custom/digiriskdolibarr/js/json/dangerCategories.json');
         $jsonArray       = json_decode($json_categories, true);
-		return $jsonArray[0][$this->type];
+		return $jsonArray[0][$riskType];
 	}
 
 	/**
@@ -678,13 +678,13 @@ class Risk extends SaturneObject
 
         $filter = ' AND t.fk_element NOT IN ' . $digiriskElement->getTrashExclusionSqlFilter();
 
-        $dangerCategories = $this->getDangerCategories();
+        $dangerCategories = $this->getDangerCategories($riskType);
         $riskByDangerCategoriesAndRiskAssessments = $this->getRiskByDangerCategoriesAndRiskAssessments($dangerCategories, $filter, $riskType);
         $moreParam['filter']                      = $filter;
 
         $array['graphsFilters'] = [
             'riskType' => [
-                'title'        => $langs->transnoentities('DisplayRiskOfType'),
+                'title'        => $langs->transnoentities('ShowSelectedRiskTypes'),
                 'type'         => 'selectarray',
                 'filter'       => 'riskType',
                 'values'       => ['risk' => $langs->transnoentities('Risk'), 'riskenvironmental' => $langs->transnoentities('Riskenvironmental')],

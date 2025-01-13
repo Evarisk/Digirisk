@@ -1533,3 +1533,4 @@ ManuelInputNBWorkedHoursDescription = Si l'option est activée, vous pouvez sais
 HowToConfigureSetupConf             = Pour configurer les donnés de la société lié à Digirisk,<br>veuillez vous rendre sur Digirisk - Configuration - Réglages
 PermissionInheritedFromConfig       = Les permissions sont héritées de la configuration générale ou de la configuration parente
 CategorieManagement                 = Gestion des catégories
+ShowSelectedRiskTypes               = Sélectionnez les types de risques à afficher
