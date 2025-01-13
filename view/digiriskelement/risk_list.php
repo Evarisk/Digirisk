@@ -136,11 +136,29 @@ foreach ($risk->fields as $key => $val) {
 $arrayfields = array();
 foreach ($risk->fields as $key => $val) {
 	// If $val['visible']==0, then we never show the field
-	if ( ! empty($val['visible'])) $arrayfields['r.' . $key] = array('label' => $val['label'], 'checked' => (($val['visible'] < 0) ? 0 : 1), 'enabled' => ($val['enabled'] && ($val['visible'] != 3)), 'position' => $val['position']);
+    if (!empty($val['visible'])) {
+        $visible = (int) dol_eval($val['visible'], 1);
+        $arrayfields['r.' . $key] = [
+            'label'       => $val['label'],
+            'checked'     => (($visible < 0) ? 0 : 1),
+            'enabled'     => ($visible != 3 && dol_eval($val['enabled'], 1)),
+            'position'    => $val['position'],
+            'help'        => $val['help']
+        ];
+    }
 }
 foreach ($evaluation->fields as $key => $val) {
 	// If $val['visible']==0, then we never show the field
-	if ( ! empty($val['visible'])) $arrayfields['evaluation.' . $key] = array('label' => $val['label'], 'checked' => (($val['visible'] < 0) ? 0 : 1), 'enabled' => ($val['enabled'] && ($val['visible'] != 3)), 'position' => $val['position']);
+    if (!empty($val['visible'])) {
+        $visible = (int) dol_eval($val['visible'], 1);
+        $arrayfields['evaluation.' . $key] = [
+            'label'       => $val['label'],
+            'checked'     => (($visible < 0) ? 0 : 1),
+            'enabled'     => ($visible != 3 && dol_eval($val['enabled'], 1)),
+            'position'    => $val['position'],
+            'help'        => $val['help']
+        ];
+    }
 }
 
 // Extra fields

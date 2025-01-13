@@ -87,7 +87,7 @@ class Risk extends SaturneObject
 		'import_key'    => ['type' => 'varchar(14)', 'label' => 'ImportId', 'enabled' => '1', 'position' => 70, 'notnull' => -1, 'visible' => 0],
 		'status'        => ['type' => 'smallint', 'label' => 'Status', 'enabled' => '1', 'position' => 80, 'notnull' => 0, 'visible' => 0],
 		'category'      => ['type' => 'varchar(255)', 'label' => 'RiskCategory', 'enabled' => '1', 'position' => 21, 'notnull' => 0, 'visible' => 1],
-		'description'   => ['type' => 'text', 'label' => 'Description', 'enabled' => '$conf->global->DIGIRISKDOLIBARR_RISK_DESCRIPTION', 'position' => 23, 'notnull' => 0, 'visible' => -1],
+		'description'   => ['type' => 'text', 'label' => 'Description', 'enabled' => '$conf->global->DIGIRISKDOLIBARR_RISK_DESCRIPTION', 'position' => 23, 'notnull' => 0, 'visible' => '$conf->global->DIGIRISKDOLIBARR_RISK_DESCRIPTION'],
 		'type'          => ['type' => 'varchar(255)', 'label' => 'Type', 'enabled' => '1', 'position' => 24, 'notnull' => 1, 'visible' => 0, 'default' => '(PROV)'],
 		'fk_user_creat' => ['type' => 'integer:User:user/class/user.class.php', 'label' => 'UserAuthor', 'enabled' => '1', 'position' => 110, 'notnull' => 1, 'visible' => 0, 'foreignkey' => 'user.rowid'],
 		'fk_user_modif' => ['type' => 'integer:User:user/class/user.class.php', 'label' => 'UserModif', 'enabled' => '1', 'position' => 120, 'notnull' => -1, 'visible' => 0],
