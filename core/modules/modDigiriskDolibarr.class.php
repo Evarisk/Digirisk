@@ -482,7 +482,7 @@ class modDigiriskdolibarr extends DolibarrModules
 		$this->conflictwith            = [];
 		$this->langfiles               = ["digiriskdolibarr@digiriskdolibarr"];
 		$this->phpmin                  = [7, 4]; // Minimum version of PHP required by module
-		$this->need_dolibarr_version   = [16, 0]; // Minimum version of Dolibarr required by module
+		$this->need_dolibarr_version   = [20, 0]; // Minimum version of Dolibarr required by module
 		$this->warnings_activation     = []; // Warning to show when we activate module. array('always'='text') or array('FR'='textfr','ES'='textes'...)
 		$this->warnings_activation_ext = []; // Warning to show when we activate an external module. array('always'='text') or array('FR'='textfr','ES'='textes'...)
 		//$this->automatic_activation = array('FR'=>'DigiriskDolibarrWasAutomaticallyActivatedBecauseOfYourCountryChoice');
@@ -2227,35 +2227,10 @@ class modDigiriskdolibarr extends DolibarrModules
             'entity'     => ['Label' => 'Entity',   'type' => 'int', 'length' => 100, 'elementtype' => ['digiriskdolibarr_digiriskelement'], 'position' => $this->numero . 20, 'list' => 0, 'enabled' => "isModEnabled('digiriskdolibarr')"],
 
             'professional_qualification' => ['Label' => 'ProfessionalQualification', 'type' => 'varchar', 'length' => 255, 'elementtype' => ['user'], 'position' => $this->numero . 10,                                                                                                'enabled' => "isModEnabled('digiriskdolibarr') && isModEnabled('user')"],
-            'contract_type'              => ['Label' => 'ContractType',              'type' => 'select',                   'elementtype' => ['user'], 'position' => $this->numero . 20, 'params' => [1 => 'CDI', 2 => 'CDD', 3 => 'Apprentice/Student', 4 => 'Interim', 5 => 'Other'], 'enabled' => "isModEnabled('digiriskdolibarr') && isModEnabled('user')"]
+            'contract_type'              => ['Label' => 'ContractType',              'type' => 'select',                   'elementtype' => ['user'], 'position' => $this->numero . 20, 'params' => [1 => 'CDI', 2 => 'CDD', 3 => 'Apprentice/Student', 4 => 'Interim', 5 => 'Other'], 'enabled' => "isModEnabled('digiriskdolibarr') && isModEnabled('user')"],
+
+            'ticket_category_config' => ['Label' => 'TicketCategoryConfig', 'type' => 'text', 'elementtype' => ['categorie'], 'position' => $this->numero . 10, 'list' => 0, 'enabled' => "isModEnabled('digiriskdolibarr') && isModEnabled('categorie') && isModEnabled('ticket')", 'moreparams' => []]
         ];
-
-        if (getDolGlobalInt('DIGIRISKDOLIBARR_EXTRAFIELDS_BACKWARD_COMPATIBILITY') == 0) {
-            if (isModEnabled('multicompany')) {
-                require_once __DIR__ . '/../../../multicompany/class/actions_multicompany.class.php';
-
-                $currentEntity       = $conf->entity;
-                $actionsMulticompany = new ActionsMulticompany($this->db);
-                $entities            = $actionsMulticompany->getEntitiesList(false, false, true, true);
-                foreach ($entities as $subEntity => $entity_name) {
-                    $conf->setEntityValues($this->db, $subEntity);
-                    foreach ($extraFieldsArrays as $key => $extraField) {
-                        foreach ($extraField['elementtype'] as $extraFieldElementType) {
-                            $extraFields->delete($key, $extraFieldElementType);
-                        }
-                    }
-                    $conf->setEntityValues($this->db, $currentEntity);
-                }
-            } else {
-                foreach ($extraFieldsArrays as $key => $extraField) {
-                    foreach ($extraField['elementtype'] as $extraFieldElementType) {
-                        $extraFields->delete($key, $extraFieldElementType);
-                    }
-                }
-            }
-
-            dolibarr_set_const($this->db, 'DIGIRISKDOLIBARR_EXTRAFIELDS_BACKWARD_COMPATIBILITY', 1, 'integer', 0, '', $conf->entity);
-        }
 
         saturne_manage_extrafields($extraFieldsArrays, $commonExtraFieldsValue);
 

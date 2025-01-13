@@ -87,7 +87,7 @@ class Risk extends SaturneObject
 		'import_key'    => ['type' => 'varchar(14)', 'label' => 'ImportId', 'enabled' => '1', 'position' => 70, 'notnull' => -1, 'visible' => 0],
 		'status'        => ['type' => 'smallint', 'label' => 'Status', 'enabled' => '1', 'position' => 80, 'notnull' => 0, 'visible' => 0],
 		'category'      => ['type' => 'varchar(255)', 'label' => 'RiskCategory', 'enabled' => '1', 'position' => 21, 'notnull' => 0, 'visible' => 1],
-		'description'   => ['type' => 'text', 'label' => 'Description', 'enabled' => '$conf->global->DIGIRISKDOLIBARR_RISK_DESCRIPTION', 'position' => 23, 'notnull' => 0, 'visible' => -1],
+		'description'   => ['type' => 'text', 'label' => 'Description', 'enabled' => '$conf->global->DIGIRISKDOLIBARR_RISK_DESCRIPTION', 'position' => 23, 'notnull' => 0, 'visible' => '$conf->global->DIGIRISKDOLIBARR_RISK_DESCRIPTION'],
 		'type'          => ['type' => 'varchar(255)', 'label' => 'Type', 'enabled' => '1', 'position' => 24, 'notnull' => 1, 'visible' => 0, 'default' => '(PROV)'],
 		'fk_user_creat' => ['type' => 'integer:User:user/class/user.class.php', 'label' => 'UserAuthor', 'enabled' => '1', 'position' => 110, 'notnull' => 1, 'visible' => 0, 'foreignkey' => 'user.rowid'],
 		'fk_user_modif' => ['type' => 'integer:User:user/class/user.class.php', 'label' => 'UserModif', 'enabled' => '1', 'position' => 120, 'notnull' => -1, 'visible' => 0],
@@ -351,11 +351,11 @@ class Risk extends SaturneObject
 	 *
 	 * @return	array $risk_categories
 	 */
-	public function getDangerCategories()
+	public function getDangerCategories($riskType = 'risk')
 	{
 		$json_categories = file_get_contents(DOL_DOCUMENT_ROOT . '/custom/digiriskdolibarr/js/json/dangerCategories.json');
         $jsonArray       = json_decode($json_categories, true);
-		return $jsonArray[0][$this->type];
+		return $jsonArray[0][$riskType];
 	}
 
 	/**
@@ -676,15 +676,15 @@ class Risk extends SaturneObject
 
         $digiriskElement = new DigiriskElement($this->db);
 
-        $filter = 'AND t.fk_element NOT IN ' . $digiriskElement->getTrashExclusionSqlFilter();
+        $filter = ' AND t.fk_element NOT IN ' . $digiriskElement->getTrashExclusionSqlFilter();
 
-        $dangerCategories = $this->getDangerCategories();
+        $dangerCategories = $this->getDangerCategories($riskType);
         $riskByDangerCategoriesAndRiskAssessments = $this->getRiskByDangerCategoriesAndRiskAssessments($dangerCategories, $filter, $riskType);
         $moreParam['filter']                      = $filter;
 
         $array['graphsFilters'] = [
             'riskType' => [
-                'title'        => $langs->transnoentities('DisplayRiskOfType'),
+                'title'        => $langs->transnoentities('ShowSelectedRiskTypes'),
                 'type'         => 'selectarray',
                 'filter'       => 'riskType',
                 'values'       => ['risk' => $langs->transnoentities('Risk'), 'riskenvironmental' => $langs->transnoentities('Riskenvironmental')],
@@ -854,7 +854,7 @@ class Risk extends SaturneObject
         $array['width'] = '100%';
         $array['type']  = 'list';
 
-        $totalRisks = saturne_fetch_all_object_type('Risk', '', '', 0, 0, ['customsql' => 't.status = ' . self::STATUS_VALIDATED . ' AND t.entity = ' . $conf->entity . (GETPOSTISSET('id') ? ' AND t.fk_element = ' . GETPOST('id') : '') . ' AND t.type = "' . $type . '"' . (!empty($filter) ? ' AND ' . $filter : '')], 'AND', false, true, false, ' LEFT JOIN ' . MAIN_DB_PREFIX . $digiriskElement->table_element . ' as d ON d.rowid = t.fk_element');
+        $totalRisks = saturne_fetch_all_object_type('Risk', '', '', 0, 0, ['customsql' => 't.status = ' . self::STATUS_VALIDATED . ' AND t.entity = ' . $conf->entity . (GETPOSTISSET('id') ? ' AND t.fk_element = ' . GETPOST('id') : '') . ' AND t.type = "' . $type . '"' . $filter], 'AND', false, true, false, ' LEFT JOIN ' . MAIN_DB_PREFIX . $digiriskElement->table_element . ' as d ON d.rowid = t.fk_element');
 
         $array['labels']['Ref']           = $langs->transnoentities('DangerCategories');
         $array['labels']['numberOfRisks'] = $langs->transnoentities('NumberOfRisks') . ' : ' . '<span class="badge badge-info">' . (is_array($totalRisks) && !empty($totalRisks) ? count($totalRisks) : 0) . '</span>';
