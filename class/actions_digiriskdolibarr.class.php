@@ -188,11 +188,11 @@ class ActionsDigiriskdolibarr
 					let nbworkedhoursInput = $('<tr class="oddeven"><td><label for="nbworkedhours"><?php print $pictoDigirisk . $form->textwithpicto($langs->transnoentities('NbWorkedHours'), $langs->transnoentities('HowToConfigureSetupConf')); ?></label></td>');
 					nbworkedhoursInput.append('<td><i class="fas fa-clock"></i> ' + <?php echo json_encode($nbworkedhours_input); ?> + '</td></tr>');
 
-					let currentOtherElement = $('table:nth-child(3) .oddeven:last-child');
+					let currentOtherElement = $('table:eq(1) .oddeven:last-child');
 					currentOtherElement.after(nbworkedhoursInput);
 					currentOtherElement.after(nbemployeesInput);
 
-					let currentElement = $('table:nth-child(7) .oddeven:last-child');
+					let currentElement = $('table:eq(2) .oddeven:last-child');
 					currentElement.after(collectiveAgreementDictionary);
 					currentElement.after(peeInput);
 					currentElement.after(percoInput);
