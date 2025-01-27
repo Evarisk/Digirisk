@@ -598,7 +598,9 @@ class Accident extends SaturneObject
 
             foreach($accidentsByYear as $year => $accidentByYear) {
                 foreach($accidentByYear as $month => $accidentByMonth) {
-                    $accidentsArray[$month][$year] = $accidentByMonth;
+                    if (isset($accidentsArray[$month][$year])) {
+                        $accidentsArray[$month][$year] = $accidentByMonth;
+                    }
                 }
             }
 
