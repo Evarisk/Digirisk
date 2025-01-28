@@ -182,9 +182,9 @@ class FirePermit extends SaturneObject
         unset($object->import_key);
 
         // Clear fields
+        $object->date_creation = dol_now();
         $object->ref           = $refFirePermitMod->getNextValue($object);
         $object->label         = $options['clone_label'];
-        $object->date_creation = dol_now();
         $object->status        = self::STATUS_DRAFT;
 
         // Create clone
