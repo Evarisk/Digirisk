@@ -307,7 +307,7 @@
       },
       {
         "name": "Historique",
-        "description": "1 : Jamais arrivé 2 : Circonstances exceptionnelles 3 : S'est produit 2 sur l'an passé 4 : Se produit tous les mois",
+        "description": "1 : Jamais arrivé 2 : Circonstances exceptionnelles 3 : S'est produit 2 fois l'an passé 4 : Se produit tous les mois",
         "key": 3,
         "option": {
           "display_type": "slide",
@@ -331,7 +331,7 @@
                 "seuil": "2"
               },
               {
-                "question": "S'est produit 2 sur l'an passé",
+                "question": "S'est produit 2 fois l'an passé",
                 "seuil": "3"
               },
               {
