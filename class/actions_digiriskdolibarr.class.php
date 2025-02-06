@@ -783,6 +783,16 @@ class ActionsDigiriskdolibarr
             }
         }
 
+        if (strpos($parameters['context'], 'ticketlist') !== false) {
+            $picto = img_picto('', 'digiriskdolibarr_color@digiriskdolibarr', 'class="pictoModule"');
+            foreach ($extrafields->attributes['ticket']['label'] as $key => $value) {
+                if (strpos($key, 'digiriskdolibarr_ticket') === false) {
+                    continue; // Goes to the next element if ‘digiriskdolibarr_ticket’ is not found
+                }
+                $extrafields->attributes['ticket']['label'][$key] = $picto . $langs->transnoentities($value);
+            }
+        }
+
         return 0; // or return 1 to replace standard code
     }
 
