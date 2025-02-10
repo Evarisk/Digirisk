@@ -524,7 +524,10 @@ if ($entity > 0) {
                     <div class="form-element gridw-2">
                         <span class="form-label"><?php print $langs->trans('Description'); ?>
                         <label class="form-field-container">
-                            <textarea readonly><?php echo $categoryDescription; ?></textarea>
+                            <?php
+                                $dolEditor = new DolEditor('category-description', $categoryDescription, '100%', 120, 'dolibarr_readonly', '', false, true, true, ROWS_2, 70, 1);
+                                $dolEditor->Create();
+                            ?>
                         </label>
                     </div>
                 <?php endif; ?>
