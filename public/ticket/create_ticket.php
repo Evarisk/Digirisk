@@ -609,7 +609,7 @@ if ($entity > 0) {
                         || (!getDolGlobalInt(dol_strtoupper($key) . '_REQUIRED') && $mainCategoryChildrenExtrafields->{$key . '_required'} == NUll && $subCategoryExtrafields->{$key . '_required'});
                         if ($visible) {
                             $out  = '<div class="form-element form-field-container">';
-                            $out .= '<label><span class="form-label"' . ($required ? '' : 'style="font-weight:300"') . '>' . $field . ($required ? '<span style="color:red"> *</span>' : '') . '</span>';
+                            $out .= '<label><span class="form-label"' . ($required ? '' : 'style="font-weight:300"') . '>' . $langs->transnoentities($field) . ($required ? '<span style="color:red"> *</span>' : '') . '</span>';
                             if ($key == 'digiriskdolibarr_ticket_email' || $key == 'digiriskdolibarr_ticket_date') {
                                 $out .= '<input type="' . $fields[$key]['type'] . '" name="' . ($fields[$key]['name'] ?? 'options_' . $key) . '" id="' . ($fields[$key]['name'] ?? 'options_' . $key) . '" value="' . GETPOST($fields[$key]['name'] ?? 'options_' . $key) . '"' . ($required ? 'required' : '') . '/>';
                             } else {
