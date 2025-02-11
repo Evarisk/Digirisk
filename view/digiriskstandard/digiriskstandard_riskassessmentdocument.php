@@ -75,10 +75,10 @@ $allLinks = $digiriskresources->fetchDigiriskResources();
 $upload_dir = $conf->digiriskdolibarr->multidir_output[$conf->entity ?? 1];
 
 // Security check - Protection if external user
-$permissiontoread   = $user->rights->digiriskdolibarr->digiriskstandard->read && $user->rights->digiriskdolibarr->riskassessmentdocument->read;
-$permissiontoadd    = $user->rights->digiriskdolibarr->riskassessmentdocument->write;
-$permissiontodelete = $user->rights->digiriskdolibarr->riskassessmentdocument->delete;
-$permtoupload       = $user->rights->ecm->upload;
+$permissiontoread   = $user->hasRight('digiriskdolibarr', 'digiriskstandard', 'read') && $user->hasRight('digiriskdolibarr', 'riskassessmentdocument', 'read');
+$permissiontoadd    = $user->hasRight('digiriskdolibarr', 'riskassessmentdocument', 'write');
+$permissiontodelete = $user->hasRight('digiriskdolibarr', 'riskassessmentdocument', 'delete');
+$permtoupload       = $user->hasRight('ecm', 'upload');
 saturne_check_access($permissiontoread);
 
 /*
