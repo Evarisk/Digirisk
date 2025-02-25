@@ -516,7 +516,7 @@ if ($entity > 0) {
 	}
 
     if (GETPOSTISSET('parentCategory') || GETPOSTISSET('parentCategory') && GETPOSTISSET('subCategory')) : ?>
-        <div class="wpeo-form tableforinputfields">
+        <div class="wpeo-form tableforinputfields" id="ticket-form">
             <div class="wpeo-gridlayout grid-2">
                 <?php  $visible = getDolGlobalInt('DIGIRISKDOLIBARR_TICKET_PUBLIC_INTERFACE_SHOW_CATEGORY_DESCRIPTION') || (!getDolGlobalInt('DIGIRISKDOLIBARR_TICKET_PUBLIC_INTERFACE_SHOW_CATEGORY_DESCRIPTION') && $mainCategoryChildrenExtrafields->show_description)
             || (!getDolGlobalInt('DIGIRISKDOLIBARR_TICKET_PUBLIC_INTERFACE_SHOW_CATEGORY_DESCRIPTION') && $mainCategoryChildrenExtrafields->show_description == NUll && $subCategoryExtrafields->show_description);
@@ -652,6 +652,15 @@ if ($entity > 0) {
             $previousStatus        = $object->status;
             $object->status        = $object::STATUS_READ; // Special case because public answer need draft status object to complete question
             $moreParams['moreCSS'] = 'hidden';             // Needed for prevent click on signature button action
+
+            print '<div class="hidden" id="ticket-summary" style="margin-top: 1em;">';
+            print '<span>' . $langs->transnoentities('ITheUndersigned') . ' : <strong id="ticket-summmary-name">' . $user->firstname . ' ' . $user->lastname . '</strong> ' . $langs->transnoentities('DeclareThe') . ' : <strong id="ticket-summmary-date"></strong></span>';
+            print '<br><br>';
+            print '<span><strong id="ticket-summmary-message"></strong></span>';
+            print '<br><br>';
+            print '<span>' . $langs->transnoentities('OnTheSite') . ' : <strong id="ticket-summmary-location"></strong>. ' . $langs->transnoentities('RegardingTheService') . ' : <strong id="ticket-summmary-service"></strong></span>';
+            print '</div>';
+
             print '<div style="margin-top: 2em;">';
             require_once __DIR__ . '/../../../saturne/core/tpl/signature/public_signature_view.tpl.php';
             print '</div>';
