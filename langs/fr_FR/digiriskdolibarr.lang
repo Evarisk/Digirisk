@@ -527,6 +527,7 @@ DocumentsMetaData                 = Fichiers joints complémentaires
 WorkStopDocument                  = Déclaration d'arrêt de travail
 AccidentMetaDataSave              = Les données complémentaires de l'accident ont bien été enregistrées
 ErrorFieldNotEmpty                = Erreur : le champ <b>'%s'</b> ne peut pas être vide
+ErrorFieldMustBeGreaterOrEqualZero = Erreur : le champ <b>'%s'</b> doit être supérieur ou égal à 0
 ConfirmDeleteAccidentWorkStop     = Êtes-vous sûr de vouloir supprimer l'arrêt de travail <b>%s</b> sur l'accident ?
 AccidentMetaDataLesion            = Données complémentaires des lésions
 TotalWorkStopDays                 = Nombre total de jours d'arrêt de travail

@@ -372,8 +372,8 @@ if (empty($reshook)) {
 		$objectline->fk_accident         = $parent_id;
 
 		// Check parameters
-		if ($workstop_days <= 0) {
-			setEventMessages($langs->trans('ErrorFieldNotEmpty', $langs->transnoentitiesnoconv('WorkStopDays')), null, 'errors');
+		if ($workstop_days < 0) {
+			setEventMessages($langs->trans('ErrorFieldMustBeGreaterOrEqualZero', $langs->transnoentitiesnoconv('WorkStopDays')), null, 'errors');
 			$error++;
 		}
 
@@ -420,8 +420,8 @@ if (empty($reshook)) {
 		$objectline->declaration_link    = $declaration_link;
 
 		// Check parameters
-		if ($workstop_days <= 0) {
-			setEventMessages($langs->trans('ErrorFieldNotEmpty', $langs->transnoentitiesnoconv('WorkStopDays')), [], 'errors');
+		if ($workstop_days < 0) {
+			setEventMessages($langs->trans('ErrorFieldMustBeGreaterOrEqualZero', $langs->transnoentitiesnoconv('WorkStopDays')), [], 'errors');
 			header("Location: " . $_SERVER['PHP_SELF'] . '?id=' . $id . '&action=editline&lineid=' .  $lineid);
 			exit;
 			$error++;
@@ -1210,7 +1210,7 @@ if ((empty($action) || ($action != 'create' && $action != 'edit'))) {
 
                     $coldisplay++;
                     print '<td>';
-                    print '<input type="number" name="workstop_days" class="minwidth150" value="' . $item->workstop_days . '">';
+                    print '<input type="number" name="workstop_days" class="minwidth150" min="0" value="' . $item->workstop_days . '">';
                     print '</td>';
 
                     $coldisplay++;
@@ -1298,7 +1298,7 @@ if ((empty($action) || ($action != 'create' && $action != 'edit'))) {
 
 			$coldisplay++;
 			print '<td>';
-			print '<input type="number" name="workstop_days" class="minwidth150" value="">';
+			print '<input type="number" name="workstop_days" class="minwidth150" min="0" value="">';
 			print '</td>';
 
 			$coldisplay++;
