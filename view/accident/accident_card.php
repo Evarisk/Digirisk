@@ -373,7 +373,7 @@ if (empty($reshook)) {
 
 		// Check parameters
 		if ($workstop_days < 0) {
-			setEventMessages($langs->trans('ErrorFieldMustBePositive', $langs->transnoentitiesnoconv('WorkStopDays')), null, 'errors');
+			setEventMessages($langs->trans('ErrorFieldMustBeGreaterOrEqualZero', $langs->transnoentitiesnoconv('WorkStopDays')), null, 'errors');
 			$error++;
 		}
 
@@ -421,7 +421,7 @@ if (empty($reshook)) {
 
 		// Check parameters
 		if ($workstop_days < 0) {
-			setEventMessages($langs->trans('ErrorFieldMustBePositive', $langs->transnoentitiesnoconv('WorkStopDays')), [], 'errors');
+			setEventMessages($langs->trans('ErrorFieldMustBeGreaterOrEqualZero', $langs->transnoentitiesnoconv('WorkStopDays')), [], 'errors');
 			header("Location: " . $_SERVER['PHP_SELF'] . '?id=' . $id . '&action=editline&lineid=' .  $lineid);
 			exit;
 			$error++;
@@ -1210,7 +1210,7 @@ if ((empty($action) || ($action != 'create' && $action != 'edit'))) {
 
                     $coldisplay++;
                     print '<td>';
-                    print '<input type="number" name="workstop_days" class="minwidth150" value="' . $item->workstop_days . '" min="0">';
+                    print '<input type="number" name="workstop_days" class="minwidth150" min="0" value="' . $item->workstop_days . '">';
                     print '</td>';
 
                     $coldisplay++;
@@ -1298,7 +1298,7 @@ if ((empty($action) || ($action != 'create' && $action != 'edit'))) {
 
 			$coldisplay++;
 			print '<td>';
-			print '<input type="number" name="workstop_days" class="minwidth150" value="">';
+			print '<input type="number" name="workstop_days" class="minwidth150" min="0" value="">';
 			print '</td>';
 
 			$coldisplay++;
