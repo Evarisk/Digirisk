@@ -855,7 +855,9 @@ class Accident extends SaturneObject
             }
             $moreHtmlRef      = $langs->trans('TotalWorkStopDays') . ' : ' . $totalWorkStopDays;
             $lastaccidentline = end($accidentLines);
-            $moreHtmlRef     .= '<br>' . $langs->trans('ReturnWorkDate') . ' : ' . dol_print_date($lastaccidentline->date_end_workstop, 'dayhour');
+            if ($this->status == $this::STATUS_LOCKED) {
+                $moreHtmlRef     .= '<br>' . $langs->trans('ReturnWorkDate') . ' : ' . dol_print_date($lastaccidentline->date_end_workstop, 'dayhour');
+            }
         } else {
             $moreHtmlRef = $langs->trans('RegisterAccident');
         }
