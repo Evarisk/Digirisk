@@ -186,9 +186,11 @@ class doc_riskassessmentdocument_odt extends SaturneDocumentModel
 					$odfHandler->mergeSegment($listLines);
 				}
 
+                $tmpArray['showSharedRisk'] = false;
 				//Fill risks data
 				$objectDocument->fillRiskData($odfHandler, $objectDocument, $outputLangs, $tmpArray, $file, $risks, $activeDigiriskElements, false);
                 if (!empty($conf->global->DIGIRISKDOLIBARR_SHOW_SHARED_RISKS)) {
+                    $tmpArray['showSharedRisk'] = true;
                     $objectDocument->fillRiskData($odfHandler, $objectDocument, $outputLangs, $tmpArray, $file, $risks, $activeDigiriskElements, true);
                 }
 
