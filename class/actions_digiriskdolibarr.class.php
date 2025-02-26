@@ -338,7 +338,7 @@ class ActionsDigiriskdolibarr
         } else if (preg_match('/projectcard|projectcontactcard|projecttaskcard|projecttaskscard|projecttasktime|projectOverview|tasklist|category/', $parameters['context'])) {
 			if ((GETPOST('action') == '' || empty(GETPOST('action')) || GETPOST('action') != 'edit')) {
 				require_once DOL_DOCUMENT_ROOT.'/projet/class/project.class.php';
-				require_once DOL_DOCUMENT_ROOT.'/projet/class/task.class.php';
+                require_once __DIR__ . '/../../saturne/class/task/saturnetask.class.php';
 
 				$task    = new SaturneTask($db);
 				$project = new Project($db);
