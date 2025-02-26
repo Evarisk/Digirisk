@@ -151,17 +151,19 @@ class DigiriskDocuments extends SaturneDocuments
     /**
      * Fill risk data for ODT
      *
-     * @param Odf       $odfHandler  Object builder odf library
-     * @param Object    $object      Object source to build document
-     * @param Translate $outputLangs Lang object to use for output
-     * @param array     $tmparray    Array filled with data
-     * @param string    $file        Filename
-     * @param array     $risk        Array data of risks
+     * @param Odf       $odfHandler             Object builder odf library
+     * @param Object    $object                 Object source to build document
+     * @param Translate $outputLangs            Lang object to use for output
+     * @param array     $tmparray               Array filled with data
+     * @param string    $file                   Filename
+     * @param array     $risk                   Array data of risks
+     * @param array     $activeDigiriskElements Array of active digirisk elements
+     * @param bool      $sharedRisk             Boolean to know if risks are shared
      *
      * @return void
      * @throws Exception
      */
-    public function fillRiskData(Odf $odfHandler, $object, Translate $outputLangs, $tmparray, $file, $risks, $allEntities = false)
+    public function fillRiskData(Odf $odfHandler, $object, Translate $outputLangs, $tmparray, $file, $risks, $activeDigiriskElements, bool $sharedRisk = false)
     {
         global $action, $conf, $hookmanager, $langs, $mc;
 
@@ -172,13 +174,12 @@ class DigiriskDocuments extends SaturneDocuments
         $digiriskelementobject = new DigiriskElement($this->db);
 
         $DUProject->fetch($conf->global->DIGIRISKDOLIBARR_DU_PROJECT);
-        $activeDigiriskElements = $digiriskelementobject->getActiveDigiriskElements($allEntities ? 1 : 0);
         $tasksSortedByRisk      = $risk->getTasksWithFkRisk();
 
         for ($i = 4; $i >= 1; $i--) {
             $foundTagForLines = 1;
             try {
-                $listlines = $odfHandler->setSegment('risk' . $i);
+                $listlines = $odfHandler->setSegment(($sharedRisk ? 'shared' : '') . 'risk' . $i);
             } catch (OdfException|OdfExceptionSegmentNotFound $e) {
                 // We may arrive here if tags for lines not present into template
                 $foundTagForLines = 0;
@@ -189,7 +190,7 @@ class DigiriskDocuments extends SaturneDocuments
             if ($foundTagForLines) {
                 if (is_array($risks) && ! empty($risks)) {
                     foreach ($risks as $line) {
-                        if ($line->fk_element > 0 && in_array($line->fk_element, array_keys($activeDigiriskElements))) {
+                        if ($line->fk_element > 0 && ((!$sharedRisk && $line->origin_type != 'shared') || ($sharedRisk && $line->origin_type == 'shared'))) {
                             $tmparray['actionPreventionUncompleted'] = "";
                             $tmparray['actionPreventionCompleted']   = "";
                             $lastEvaluation                          = $line->lastEvaluation;

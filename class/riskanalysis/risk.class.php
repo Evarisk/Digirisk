@@ -299,6 +299,7 @@ class Risk extends SaturneObject
 
 		//For all documents
 		if ( $get_shared_data ) {
+            $inserted = [];
 			if ($parent_id == 0) {
 				$digiriskElementsOfEntity = $objects;
 				if (is_array($digiriskElementsOfEntity) && !empty($digiriskElementsOfEntity)) {
@@ -308,10 +309,12 @@ class Risk extends SaturneObject
 							foreach ($digiriskElementOfEntity->linkedObjectsIds['digiriskdolibarr_risk'] as $sharedRiskId) {
                                 $sharedRisk         = $riskList[$sharedRiskId];
                                 $sharedParentActive = array_search($sharedRisk->fk_element, array_column($activeDigiriskElements, 'id'));
-								if (is_object($sharedRisk) && $sharedParentActive > 0) {
-                                    $clonedRisk            = clone $sharedRisk;
-                                    $clonedRisk->appliedOn = $digiriskElementOfEntity->id;
-                                    $risks[]               = $clonedRisk;
+								if (is_object($sharedRisk) && $sharedParentActive > 0 && !in_array($sharedRisk->id, $inserted)) {
+                                    $clonedRisk              = clone $sharedRisk;
+                                    $clonedRisk->appliedOn   = $digiriskElementOfEntity->id;
+                                    $clonedRisk->origin_type = 'shared';
+                                    $risks[]                 = $clonedRisk;
+                                    $inserted[]              = $sharedRisk->id;
                                 }
 							}
 						}
@@ -325,10 +328,12 @@ class Risk extends SaturneObject
 						foreach ($parentElement->linkedObjectsIds['digiriskdolibarr_risk'] as $sharedRiskId) {
 							$sharedRisk         = $riskList[$sharedRiskId];
                             $sharedParentActive = array_search($sharedRisk->fk_element, array_column($activeDigiriskElements, 'id'));
-                            if (is_object($sharedRisk)  && $sharedParentActive > 0) {
-                                $clonedRisk            = clone $sharedRisk;
-                                $clonedRisk->appliedOn = $parent_id;
-                                $risks[]               = $clonedRisk;
+                            if (is_object($sharedRisk)  && $sharedParentActive > 0 && !in_array($sharedRisk->id, $inserted)) {
+                                $clonedRisk              = clone $sharedRisk;
+                                $clonedRisk->appliedOn   = $parent_id;
+                                $clonedRisk->origin_type = 'shared';
+                                $risks[]                 = $clonedRisk;
+                                $inserted[]              = $sharedRisk->id;
 							}
 						}
 					}

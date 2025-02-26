@@ -105,9 +105,12 @@ class doc_riskassessmentdocument_odt extends SaturneDocumentModel
 
                 $moreParam['filterRisk'] = ' AND t.type = "risk"';
 				$risks                   = $risk->fetchRisksOrderedByCotation(0, true, $conf->global->DIGIRISKDOLIBARR_SHOW_INHERITED_RISKS_IN_DOCUMENTS, $conf->global->DIGIRISKDOLIBARR_SHOW_SHARED_RISKS, $moreParam);
-				$riskAssessmentList      = $riskassessment->fetchAll('', '', 0, 0, ['customsql' => 'status = 1']);
-				$riskList                = $risk->fetchAll('', '', 0, 0, array(), 'AND', $conf->global->DIGIRISKDOLIBARR_SHOW_SHARED_RISKS);
-				$digiriskelementlist     = $digiriskelementobject->fetchDigiriskElementFlat(0);
+                $digiriskelementlist     = $digiriskelementobject->fetchDigiriskElementFlat(0);
+                $activeDigiriskElements  = $digiriskelementobject->getActiveDigiriskElements($conf->global->DIGIRISKDOLIBARR_SHOW_SHARED_RISKS ? 1 : 0);
+
+                $risks = array_filter($risks, function($risk) use ($activeDigiriskElements) {
+                   return in_array($risk->fk_element, array_keys($activeDigiriskElements));
+                });
 
 				if (is_array($digiriskelementlist) && !empty($digiriskelementlist)) {
 					$listLines = $odfHandler->setSegment('elementParHierarchie');
@@ -184,7 +187,10 @@ class doc_riskassessmentdocument_odt extends SaturneDocumentModel
 				}
 
 				//Fill risks data
-				$objectDocument->fillRiskData($odfHandler, $objectDocument, $outputLangs, $tmpArray, $file, $risks, $conf->global->DIGIRISKDOLIBARR_SHOW_SHARED_RISKS);
+				$objectDocument->fillRiskData($odfHandler, $objectDocument, $outputLangs, $tmpArray, $file, $risks, $activeDigiriskElements, false);
+                if (!empty($conf->global->DIGIRISKDOLIBARR_SHOW_SHARED_RISKS)) {
+                    $objectDocument->fillRiskData($odfHandler, $objectDocument, $outputLangs, $tmpArray, $file, $risks, $activeDigiriskElements, true);
+                }
 
 				//Fill tickets data
                 $filter    = ['customsql' => 't.fk_project = ' . $conf->global->DIGIRISKDOLIBARR_TICKET_PROJECT . ' AND eft.digiriskdolibarr_ticket_service > 0'];

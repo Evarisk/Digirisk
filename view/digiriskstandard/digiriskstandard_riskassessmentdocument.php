@@ -283,7 +283,7 @@ if (empty($reshook)) {
 		}
 
 		if ($result <= 0) {
-			setEventMessages($object->error, $object->errors, 'errors');
+            setEventMessages($document->error, $document->errors, 'errors');
 			$action = '';
 		} else {
 			if (empty($donotredirect)) {
