@@ -90,13 +90,14 @@ class LegalDisplay extends DigiriskDocuments
                 $json['LegalDisplay']['occupational_health_service']['saturday_morning']  = $labourHoursSaturday[0];
                 $json['LegalDisplay']['occupational_health_service']['sunday_morning']    = $labourHoursSunday[0];
 
-                $json['LegalDisplay']['occupational_health_service']['monday_afternoon']    = $labourHoursMonday[1];
-                $json['LegalDisplay']['occupational_health_service']['tuesday_afternoon']   = $labourHoursTuesday[1];
-                $json['LegalDisplay']['occupational_health_service']['wednesday_afternoon'] = $labourHoursWednesday[1];
-                $json['LegalDisplay']['occupational_health_service']['thursday_afternoon']  = $labourHoursThursday[1];
-                $json['LegalDisplay']['occupational_health_service']['friday_afternoon']    = $labourHoursFriday[1];
-                $json['LegalDisplay']['occupational_health_service']['saturday_afternoon']  = $labourHoursSaturday[1];
-                $json['LegalDisplay']['occupational_health_service']['sunday_afternoon']    = $labourHoursSunday[1];
+				// Use null coalescing operator to avoid warnings if labour hours arrays or index [1] are not defined
+				$json['LegalDisplay']['occupational_health_service']['monday_afternoon']    = $labourHoursMonday[1] ?? null;
+				$json['LegalDisplay']['occupational_health_service']['tuesday_afternoon']   = $labourHoursTuesday[1] ?? null;
+				$json['LegalDisplay']['occupational_health_service']['wednesday_afternoon'] = $labourHoursWednesday[1] ?? null;
+				$json['LegalDisplay']['occupational_health_service']['thursday_afternoon']  = $labourHoursThursday[1] ?? null;
+				$json['LegalDisplay']['occupational_health_service']['friday_afternoon']    = $labourHoursFriday[1] ?? null;
+				$json['LegalDisplay']['occupational_health_service']['saturday_afternoon']  = $labourHoursSaturday[1] ?? null;
+				$json['LegalDisplay']['occupational_health_service']['sunday_afternoon']    = $labourHoursSunday[1] ?? null;
 			}
 
 			$labour_doctor_contact = new Contact($this->db);
@@ -136,13 +137,13 @@ class LegalDisplay extends DigiriskDocuments
                 $json['LegalDisplay']['detective_work']['saturday_morning']  = $detectiveHoursSaturday[0];
                 $json['LegalDisplay']['detective_work']['sunday_morning']    = $detectiveHoursSunday[0];
 
-                $json['LegalDisplay']['detective_work']['monday_afternoon']    = $detectiveHoursMonday[1];
-                $json['LegalDisplay']['detective_work']['tuesday_afternoon']   = $detectiveHoursTuesday[1];
-                $json['LegalDisplay']['detective_work']['wednesday_afternoon'] = $detectiveHoursWednesday[1];
-                $json['LegalDisplay']['detective_work']['thursday_afternoon']  = $detectiveHoursThursday[1];
-                $json['LegalDisplay']['detective_work']['friday_afternoon']    = $detectiveHoursFriday[1];
-                $json['LegalDisplay']['detective_work']['saturday_afternoon']  = $detectiveHoursSaturday[1];
-                $json['LegalDisplay']['detective_work']['sunday_afternoon']    = $detectiveHoursSunday[1];
+                $json['LegalDisplay']['detective_work']['monday_afternoon']    = $detectiveHoursMonday[1] ?? null;
+                $json['LegalDisplay']['detective_work']['tuesday_afternoon']   = $detectiveHoursTuesday[1] ?? null;
+                $json['LegalDisplay']['detective_work']['wednesday_afternoon'] = $detectiveHoursWednesday[1] ?? null;
+                $json['LegalDisplay']['detective_work']['thursday_afternoon']  = $detectiveHoursThursday[1] ?? null;
+                $json['LegalDisplay']['detective_work']['friday_afternoon']    = $detectiveHoursFriday[1] ?? null;
+                $json['LegalDisplay']['detective_work']['saturday_afternoon']  = $detectiveHoursSaturday[1] ?? null;
+                $json['LegalDisplay']['detective_work']['sunday_afternoon']    = $detectiveHoursSunday[1] ?? null;
 			}
 
 			$labourInspectorContact = new Contact($this->db);
@@ -200,7 +201,21 @@ class LegalDisplay extends DigiriskDocuments
 			}
 
 			$responsible_prevent = new User($this->db);
-			$result = $responsible_prevent->fetch($digirisk_resources['Responsible']->id[0]);
+			// Check if 'Responsible' resource and its ID are set before fetching
+			if (
+				!empty($digirisk_resources['Responsible']) &&
+				is_object($digirisk_resources['Responsible']) &&
+				!empty($digirisk_resources['Responsible']->id) &&
+				isset($digirisk_resources['Responsible']->id[0])
+			) {
+				// Fetch the responsible prevent entity using the provided ID
+				$result = $responsible_prevent->fetch($digirisk_resources['Responsible']->id[0]);
+			} else {
+				// Log a warning if the Responsible resource or its ID is missing
+				dol_syslog("Warning: 'Responsible' resource or its ID is not defined.", LOG_WARNING);
+				// Set result to an error value to indicate the failure
+				$result = -1;
+			}
 
 			if ($result > 0) {
 				$json['LegalDisplay']['safety_rule']['id']                         = $responsible_prevent->id;
@@ -208,40 +223,41 @@ class LegalDisplay extends DigiriskDocuments
 				$json['LegalDisplay']['safety_rule']['phone']                      = $responsible_prevent->office_phone;
 			}
 
-			$opening_hours_monday    = explode(' ', $conf->global->MAIN_INFO_OPENINGHOURS_MONDAY);
-			$opening_hours_tuesday   = explode(' ', $conf->global->MAIN_INFO_OPENINGHOURS_TUESDAY);
-			$opening_hours_wednesday = explode(' ', $conf->global->MAIN_INFO_OPENINGHOURS_WEDNESDAY);
-			$opening_hours_thursday  = explode(' ', $conf->global->MAIN_INFO_OPENINGHOURS_THURSDAY);
-			$opening_hours_friday    = explode(' ', $conf->global->MAIN_INFO_OPENINGHOURS_FRIDAY);
-			$opening_hours_saturday  = explode(' ', $conf->global->MAIN_INFO_OPENINGHOURS_SATURDAY);
-			$opening_hours_sunday    = explode(' ', $conf->global->MAIN_INFO_OPENINGHOURS_SUNDAY);
+			$opening_hours_monday    = explode(' ', $conf->global->MAIN_INFO_OPENINGHOURS_MONDAY ?? '');
+			$opening_hours_tuesday   = explode(' ', $conf->global->MAIN_INFO_OPENINGHOURS_TUESDAY ?? '');
+			$opening_hours_wednesday = explode(' ', $conf->global->MAIN_INFO_OPENINGHOURS_WEDNESDAY ?? '');
+			$opening_hours_thursday  = explode(' ', $conf->global->MAIN_INFO_OPENINGHOURS_THURSDAY ?? '');
+			$opening_hours_friday    = explode(' ', $conf->global->MAIN_INFO_OPENINGHOURS_FRIDAY ?? '');
+			$opening_hours_saturday  = explode(' ', $conf->global->MAIN_INFO_OPENINGHOURS_SATURDAY ?? '');
+			$opening_hours_sunday    = explode(' ', $conf->global->MAIN_INFO_OPENINGHOURS_SUNDAY ?? '');
+			
 
-			$json['LegalDisplay']['working_hour']['monday_morning']    = $opening_hours_monday[0];
-			$json['LegalDisplay']['working_hour']['tuesday_morning']   = $opening_hours_tuesday[0];
-			$json['LegalDisplay']['working_hour']['wednesday_morning'] = $opening_hours_wednesday[0];
-			$json['LegalDisplay']['working_hour']['thursday_morning']  = $opening_hours_thursday[0];
-			$json['LegalDisplay']['working_hour']['friday_morning']    = $opening_hours_friday[0];
-			$json['LegalDisplay']['working_hour']['saturday_morning']  = $opening_hours_saturday[0];
-			$json['LegalDisplay']['working_hour']['sunday_morning']    = $opening_hours_sunday[0];
+			$json['LegalDisplay']['working_hour']['monday_morning']    = $opening_hours_monday[0] ?? '';
+			$json['LegalDisplay']['working_hour']['tuesday_morning']   = $opening_hours_tuesday[0] ?? '';
+			$json['LegalDisplay']['working_hour']['wednesday_morning'] = $opening_hours_wednesday[0] ?? '';
+			$json['LegalDisplay']['working_hour']['thursday_morning']  = $opening_hours_thursday[0] ?? '';
+			$json['LegalDisplay']['working_hour']['friday_morning']    = $opening_hours_friday[0] ?? '';
+			$json['LegalDisplay']['working_hour']['saturday_morning']  = $opening_hours_saturday[0] ?? '';
+			$json['LegalDisplay']['working_hour']['sunday_morning']    = $opening_hours_sunday[0] ?? '';
 
-			$json['LegalDisplay']['working_hour']['monday_afternoon']    = $opening_hours_monday[1];
-			$json['LegalDisplay']['working_hour']['tuesday_afternoon']   = $opening_hours_tuesday[1];
-			$json['LegalDisplay']['working_hour']['wednesday_afternoon'] = $opening_hours_wednesday[1];
-			$json['LegalDisplay']['working_hour']['thursday_afternoon']  = $opening_hours_thursday[1];
-			$json['LegalDisplay']['working_hour']['friday_afternoon']    = $opening_hours_friday[1];
-			$json['LegalDisplay']['working_hour']['saturday_afternoon']  = $opening_hours_saturday[1];
-			$json['LegalDisplay']['working_hour']['sunday_afternoon']    = $opening_hours_sunday[1];
+			$json['LegalDisplay']['working_hour']['monday_afternoon']    = $opening_hours_monday[1] ?? '';
+			$json['LegalDisplay']['working_hour']['tuesday_afternoon']   = $opening_hours_tuesday[1] ?? '';
+			$json['LegalDisplay']['working_hour']['wednesday_afternoon'] = $opening_hours_wednesday[1] ?? '';
+			$json['LegalDisplay']['working_hour']['thursday_afternoon']  = $opening_hours_thursday[1] ?? '';
+			$json['LegalDisplay']['working_hour']['friday_afternoon']    = $opening_hours_friday[1] ?? '';
+			$json['LegalDisplay']['working_hour']['saturday_afternoon']  = $opening_hours_saturday[1] ?? '';
+			$json['LegalDisplay']['working_hour']['sunday_afternoon']    = $opening_hours_sunday[1] ?? '';
 
 			$json['LegalDisplay']['safety_rule']['location_of_detailed_instruction']                      = $conf->global->DIGIRISKDOLIBARR_LOCATION_OF_DETAILED_INSTRUCTION;
 			$json['LegalDisplay']['derogation_schedule']['permanent']                                     = $conf->global->DIGIRISKDOLIBARR_DEROGATION_SCHEDULE_PERMANENT;
 			$json['LegalDisplay']['derogation_schedule']['occasional']                                    = $conf->global->DIGIRISKDOLIBARR_DEROGATION_SCHEDULE_OCCASIONAL;
-			$json['LegalDisplay']['collective_agreement']['title_of_the_applicable_collective_agreement'] = $conf->global->DIGIRISKDOLIBARR_COLLECTIVE_AGREEMENT_TITLE;
-            $idcc = $this->getIDCCByCode($conf->global->DIGIRISKDOLIBARR_COLLECTIVE_AGREEMENT_TITLE);
+			$json['LegalDisplay']['collective_agreement']['title_of_the_applicable_collective_agreement'] = $conf->global->DIGIRISKDOLIBARR_COLLECTIVE_AGREEMENT_TITLE ?? '';
+            $idcc = $this->getIDCCByCode($conf->global->DIGIRISKDOLIBARR_COLLECTIVE_AGREEMENT_TITLE ??'');
             if (!empty($idcc)) {
                 $json['LegalDisplay']['collective_agreement']['title_of_the_applicable_collective_agreement'] .= ' - ' . $idcc->libelle;
             }
 			$json['LegalDisplay']['collective_agreement']['location_and_access_terms_of_the_agreement']   = $conf->global->DIGIRISKDOLIBARR_COLLECTIVE_AGREEMENT_LOCATION;
-			$json['LegalDisplay']['DUER']['how_access_to_duer']                                           = $conf->global->DIGIRISKDOLIBARR_DUER_LOCATION;
+			$json['LegalDisplay']['DUER']['how_access_to_duer']                                           = $conf->global->DIGIRISKDOLIBARR_DUER_LOCATION ?? '';
 			$json['LegalDisplay']['rules']['location']                                                    = $conf->global->DIGIRISKDOLIBARR_RULES_LOCATION;
 			$json['LegalDisplay']['participation_agreement']['information_procedures']                    = $conf->global->DIGIRISKDOLIBARR_PARTICIPATION_AGREEMENT_INFORMATION_PROCEDURE;
 

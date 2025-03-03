@@ -78,7 +78,7 @@ $reshook                                                                        
 $sql                                                                                                                                                  .= preg_replace('/^,/', '', $hookmanager->resPrint);
 $sql                                                                                                                                                   = preg_replace('/,\s*$/', '', $sql);
 $sql                                                                                                                                                  .= " FROM " . MAIN_DB_PREFIX . $risksign->table_element . " as t";
-if (is_array($extrafields->attributes[$risksign->table_element]['label']) && count($extrafields->attributes[$risksign->table_element]['label'])) $sql .= " LEFT JOIN " . MAIN_DB_PREFIX . $risksign->table_element . "_extrafields as ef on (t.rowid = ef.fk_object)";
+if (isset($extrafields->attributes[$risksign->table_element]['label']) && is_array($extrafields->attributes[$risksign->table_element]['label']) && count($extrafields->attributes[$risksign->table_element]['label'])) $sql .= " LEFT JOIN " . MAIN_DB_PREFIX . $risksign->table_element . "_extrafields as ef on (t.rowid = ef.fk_object)";
 if ($risksign->ismultientitymanaged == 1) $sql                                                                                                        .= " WHERE t.entity IN (" . getEntity($risksign->element) . ")";
 else $sql                                                                                                                                             .= " WHERE 1 = 1";
 $sql                                                                                                                                                  .= " AND fk_element = " . $id;
@@ -250,44 +250,80 @@ print '<table class="tagtable nobottomiftotal liste' . ($moreforfilter ? " listw
 
 // Fields title search
 // --------------------------------------------------------------------
+// Generate table row for field titles in search form
 print '<tr class="liste_titre">';
 foreach ($risksign->fields as $key => $val) {
-	$cssforfield                        = (empty($val['css']) ? '' : $val['css']);
-	if ($key == 'status') $cssforfield .= ($cssforfield ? ' ' : '') . 'center';
-	if ( ! empty($arrayfields['t.' . $key]['checked'])) {
-		print '<td class="liste_titre' . ($cssforfield ? ' ' . $cssforfield : '') . '">';
-		if (is_array($val['arrayofkeyval'])) print $form->selectarray('search_' . $key, $val['arrayofkeyval'], $search[$key], $val['notnull'], 0, 0, '', 1, 0, 0, '', 'maxwidth75');
-		elseif (strpos($val['type'], 'integer:') === 0) {
-			print $risksign->showInputField($val, $key, $search[$key], '', '', 'search_', 'maxwidth150', 1);
-		} elseif ($key == 'category') { ?>
-			<div class="wpeo-dropdown dropdown-large dropdown-grid category-danger padding" style="position: inherit">
-				<input class="input-hidden-danger" type="hidden" name="<?php echo 'search_' . $key ?>" value="<?php echo dol_escape_htmltag($search[$key]) ?>" />
-				<?php if (dol_strlen(dol_escape_htmltag($search[$key])) == 0) : ?>
-					<div class="dropdown-toggle dropdown-add-button">
-						<span class="wpeo-button button-square-50 button-grey"><i class="fas fa-map-signs button-icon"></i></span>
-						<img class="danger-category-pic wpeo-tooltip-event hidden" src="" aria-label=""/>
-					</div>
-				<?php else : ?>
-					<div class="dropdown-toggle dropdown-add-button wpeo-tooltip-event" aria-label="<?php echo (empty(dol_escape_htmltag($search[$key]))) ? $risksign->getRiskSignCategoryName($risksign) : $risksign->getRiskSignCategoryNameByPosition($search[$key]); ?>">
-						<img class="danger-category-pic tooltip hover" src="<?php echo DOL_URL_ROOT . '/custom/digiriskdolibarr/img/' . ((empty(dol_escape_htmltag($search[$key]))) ? $risksign->getRiskSignCategory($risksign) : $risksign->getRiskSignCategoryByPosition($search[$key])) ?>" />
-					</div>
-				<?php endif; ?>
-				<ul class="saturne-dropdown-content wpeo-gridlayout grid-5 grid-gap-0">
-					<?php
-					$risksignCategories = $risksign->getRiskSignCategories();
-					if ( ! empty($risksignCategories) ) :
-						foreach ($risksignCategories as $risksignCategory) : ?>
-							<li class="item dropdown-item wpeo-tooltip-event classfortooltip" data-is-preset="<?php echo ''; ?>" data-id="<?php echo $risksignCategory['position'] ?>" aria-label="<?php echo $risksignCategory['name'] ?>">
-								<img src="<?php echo DOL_URL_ROOT . '/custom/digiriskdolibarr/img/' . $risksignCategory['name_thumbnail'] ?>" class="attachment-thumbail size-thumbnail photo photowithmargin" alt="" loading="lazy" width="48" height="48">
-							</li>
-						<?php endforeach;
-					endif; ?>
-				</ul>
-			</div>
-		<?php } elseif ( ! preg_match('/^(date|timestamp)/', $val['type']) && $key != 'category') print '<input type="text" class="flat maxwidth75" name="search_' . $key . '" value="' . dol_escape_htmltag($search[$key]) . '">';
-		print '</td>';
-	}
+    // Set CSS classes for the field based on configuration
+    $cssforfield = empty($val['css']) ? '' : $val['css'];
+    if ($key === 'status') {
+        $cssforfield .= ($cssforfield ? ' ' : '') . 'center';
+    }
+    // Use null coalescing to avoid undefined index errors for $arrayfields
+    if (!empty($arrayfields['t.' . $key]['checked'] ?? null)) {
+        print '<td class="liste_titre' . ($cssforfield ? ' ' . $cssforfield : '') . '">';
+        // Check if a select dropdown should be rendered
+        if (isset($val['arrayofkeyval']) && is_array($val['arrayofkeyval'])) {
+            print $form->selectarray(
+                'search_' . $key,
+                $val['arrayofkeyval'],
+                $search[$key] ?? '',
+                $val['notnull'],
+                0,
+                0,
+                '',
+                1,
+                0,
+                0,
+                '',
+                'maxwidth75'
+            );
+        } elseif (strpos($val['type'], 'integer:') === 0) {
+            // Render an input field for integer types
+            print $risksign->showInputField(
+                $val,
+                $key,
+                $search[$key] ?? '',
+                '',
+                '',
+                'search_',
+                'maxwidth150',
+                1
+            );
+        } elseif ($key === 'category') { ?>
+            <!-- Dropdown for category selection -->
+            <div class="wpeo-dropdown dropdown-large dropdown-grid category-danger padding" style="position: inherit">
+                <input class="input-hidden-danger" type="hidden" name="<?php echo 'search_' . $key ?>" value="<?php echo dol_escape_htmltag($search[$key] ?? '') ?>" />
+                <?php if (dol_strlen(dol_escape_htmltag($search[$key] ?? '')) == 0) : ?>
+                    <div class="dropdown-toggle dropdown-add-button">
+                        <span class="wpeo-button button-square-50 button-grey"><i class="fas fa-map-signs button-icon"></i></span>
+                        <img class="danger-category-pic wpeo-tooltip-event hidden" src="" aria-label=""/>
+                    </div>
+                <?php else : ?>
+                    <div class="dropdown-toggle dropdown-add-button wpeo-tooltip-event" aria-label="<?php echo empty(dol_escape_htmltag($search[$key] ?? '')) ? $risksign->getRiskSignCategoryName($risksign) : $risksign->getRiskSignCategoryNameByPosition($search[$key] ?? ''); ?>">
+                        <img class="danger-category-pic tooltip hover" src="<?php echo DOL_URL_ROOT . '/custom/digiriskdolibarr/img/' . (empty(dol_escape_htmltag($search[$key] ?? '')) ? $risksign->getRiskSignCategory($risksign) : $risksign->getRiskSignCategoryByPosition($search[$key] ?? '')) ?>" />
+                    </div>
+                <?php endif; ?>
+                <ul class="saturne-dropdown-content wpeo-gridlayout grid-5 grid-gap-0">
+                    <?php
+                    // Retrieve and render risk sign categories if available
+                    $risksignCategories = $risksign->getRiskSignCategories();
+                    if (!empty($risksignCategories)) :
+                        foreach ($risksignCategories as $risksignCategory) : ?>
+                            <li class="item dropdown-item wpeo-tooltip-event classfortooltip" data-is-preset="" data-id="<?php echo $risksignCategory['position'] ?>" aria-label="<?php echo $risksignCategory['name'] ?>">
+                                <img src="<?php echo DOL_URL_ROOT . '/custom/digiriskdolibarr/img/' . $risksignCategory['name_thumbnail'] ?>" class="attachment-thumbail size-thumbnail photo photowithmargin" alt="" loading="lazy" width="48" height="48">
+                            </li>
+                        <?php endforeach;
+                    endif; ?>
+                </ul>
+            </div>
+        <?php } elseif (!preg_match('/^(date|timestamp)/', $val['type']) && $key !== 'category') {
+            // Render a generic text input if not a date/timestamp field and not the category
+            print '<input type="text" class="flat maxwidth75" name="search_' . $key . '" value="' . dol_escape_htmltag($search[$key] ?? '') . '">';
+        }
+        print '</td>';
+    }
 }
+
 
 // Extra fields
 include DOL_DOCUMENT_ROOT . '/core/tpl/extrafields_list_search_input.tpl.php';

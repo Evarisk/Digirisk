@@ -150,7 +150,7 @@ print '</tr>';
 
 print '<tr class="liste_titre">';
 print '<th class="liste_titre" colspan="2">'.$langs->trans("DigiriskActionsEvents").'</th>';
-print '<th class="liste_titre"><a href="'.$_SERVER["PHP_SELF"].'?action=selectall&search_event='. urlencode($searchEvent) . '">'.$langs->trans("All").'</a>/<a href="'.$_SERVER["PHP_SELF"].'?action=selectnone'.($param ? $param : '').'">'.$langs->trans("None").'</a></th>';
+print '<th class="liste_titre"><a href="' . htmlspecialchars($_SERVER["PHP_SELF"]) . '?action=selectall&search_event=' . urlencode(isset($searchEvent) ? $searchEvent : '') . '">' . $langs->trans("All") . '</a>/<a href="' . htmlspecialchars($_SERVER["PHP_SELF"]) . '?action=selectnone' . (isset($param) ? $param : '') . '">' . $langs->trans("None") . '</a></th>';
 print '</tr>';
 
 // Show each trigger (list is in c_digiriskdolibarr_action_trigger)

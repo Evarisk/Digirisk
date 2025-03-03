@@ -102,9 +102,20 @@ $pagenext = $page + 1;
 
 // List of fields to search into when doing a "search in all"
 $fieldstosearchall = array();
-foreach ($evaluator->fields as $key => $val) {
-	if ($val['searchall']) $fieldstosearchall['t.' . $key] = $val['label'];
+// Initialize array for fields to search all
+$fieldstosearchall = [];
+
+// Ensure evaluator fields is set and is an array before looping
+if (!empty($evaluator->fields) && is_array($evaluator->fields)) {
+    foreach ($evaluator->fields as $key => $val) {
+        // Check that $val is an array and 'searchall' key exists and is truthy
+        if (is_array($val) && !empty($val['searchall'])) {
+            // Use null coalescing operator to safely assign label if not defined
+            $fieldstosearchall['t.' . $key] = $val['label'] ?? '';
+        }
+    }
 }
+
 
 // Definition of fields for list
 $arrayfields = array();
@@ -335,7 +346,7 @@ if ($object->id > 0 || $fromid > 0) {
 	$sql                                                                                                                                                    .= preg_replace('/^,/', '', $hookmanager->resPrint);
 	$sql                                                                                                                                                     = preg_replace('/,\s*$/', '', $sql);
 	$sql                                                                                                                                                    .= " FROM " . MAIN_DB_PREFIX . $evaluator->table_element . " as t";
-	if (is_array($extrafields->attributes[$evaluator->table_element]['label']) && count($extrafields->attributes[$evaluator->table_element]['label'])) $sql .= " LEFT JOIN " . MAIN_DB_PREFIX . $evaluator->table_element . "_extrafields as ef on (t.rowid = ef.fk_object)";
+	if (isset($extrafields->attributes[$evaluator->table_element]['label']) && is_array($extrafields->attributes[$evaluator->table_element]['label']) && count($extrafields->attributes[$evaluator->table_element]['label'])) $sql .= " LEFT JOIN " . MAIN_DB_PREFIX . $evaluator->table_element . "_extrafields as ef on (t.rowid = ef.fk_object)";
 	if ($evaluator->ismultientitymanaged == 1) $sql                                                                                                         .= " WHERE t.entity IN (" . getEntity($evaluator->element) . ")";
 	else $sql                                                                                                                                               .= " WHERE 1 = 1";
     $sql                                                                                                                                                    .= " AND status > " . $evaluator::STATUS_DELETED;
@@ -528,21 +539,54 @@ if ($object->id > 0 || $fromid > 0) {
 	// Fields title search
 	// --------------------------------------------------------------------
 	print '<tr class="liste_titre">';
-	foreach ($evaluator->fields as $key => $val) {
-		$cssforfield                        = (empty($val['css']) ? '' : $val['css']);
-		if ($key == 'status') $cssforfield .= ($cssforfield ? ' ' : '') . 'center';
-		if ( ! empty($arrayfields['t.' . $key]['checked'])) {
-			print '<td class="liste_titre' . ($cssforfield ? ' ' . $cssforfield : '') . '">';
-			if (is_array($val['arrayofkeyval'])) print $form->selectarray('search_' . $key, $val['arrayofkeyval'], $search[$key], $val['notnull'], 0, 0, '', 1, 0, 0, '', 'maxwidth75');
-			elseif (strpos($val['type'], 'integer:') === 0) {
-				if ($key == 'fk_user' && $fromid > 0) {
-					$search[$key] = $fromid;
+		foreach ($evaluator->fields as $key => $val) {
+			$cssforfield                        = (empty($val['css']) ? '' : $val['css']);
+			if ($key == 'status') $cssforfield .= ($cssforfield ? ' ' : '') . 'center';
+			if (!empty($arrayfields['t.' . $key]['checked'])) {
+				// Build CSS class for the field if defined, otherwise use empty string
+				$cssClass = (isset($cssforfield) && $cssforfield) ? ' ' . $cssforfield : '';
+				print '<td class="liste_titre' . $cssClass . '">';
+
+				// Check if array of key/value pairs is set and valid, then render select element
+				if (isset($val['arrayofkeyval']) && is_array($val['arrayofkeyval'])) {
+					print $form->selectarray(
+						'search_' . $key,
+						$val['arrayofkeyval'],
+						$search[$key] ?? '',
+						$val['notnull'] ?? 0,
+						0,
+						0,
+						'',
+						1,
+						0,
+						0,
+						'',
+						'maxwidth75'
+					);
 				}
-				print $evaluator->showInputField($val, $key, $search[$key], '', '', 'search_', 'maxwidth150', 1);
-			} elseif ( ! preg_match('/^(date|timestamp)/', $val['type'])) print '<input type="text" class="flat maxwidth75" name="search_' . $key . '" value="' . dol_escape_htmltag($search[$key]) . '">';
-			print '</td>';
+				// Handle integer types; set default for 'fk_user' if applicable and render input field
+				elseif (strpos($val['type'] ?? '', 'integer:') === 0) {
+					if ($key == 'fk_user' && isset($fromid) && $fromid > 0) {
+						$search[$key] = $fromid;
+					}
+					print $evaluator->showInputField(
+						$val,
+						$key,
+						$search[$key] ?? '',
+						'',
+						'',
+						'search_',
+						'maxwidth150',
+						1
+					);
+				}
+				// For other types (excluding date/timestamp), render a simple text input field
+				elseif (!preg_match('/^(date|timestamp)/', $val['type'] ?? '')) {
+					print '<input type="text" class="flat maxwidth75" name="search_' . $key . '" value="' . dol_escape_htmltag($search[$key] ?? '') . '">';
+				}
+				print '</td>';
+			}
 		}
-	}
 
 	// Extra fields
 	include DOL_DOCUMENT_ROOT . '/core/tpl/extrafields_list_search_input.tpl.php';

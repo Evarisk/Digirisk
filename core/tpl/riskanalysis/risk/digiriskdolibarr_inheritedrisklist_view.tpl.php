@@ -177,11 +177,11 @@
 			$sql .= " FROM " . MAIN_DB_PREFIX . $evaluation->table_element . " as evaluation";
 			$sql .= " LEFT JOIN " . MAIN_DB_PREFIX . $risk->table_element . " as r on (evaluation.fk_risk = r.rowid)";
 			$sql .= " LEFT JOIN " . MAIN_DB_PREFIX . $digiriskelement->table_element . " as e on (r.fk_element = e.rowid)";
-			if (is_array($extrafields->attributes[$evaluation->table_element]['label']) && count($extrafields->attributes[$evaluation->table_element]['label'])) $sql .= " LEFT JOIN " . MAIN_DB_PREFIX . $evaluation->table_element . "_extrafields as ef on (evaluation.rowid = ef.fk_object)";
+			if (isset($extrafields->attributes[$evaluation->table_element]['label']) && is_array($extrafields->attributes[$evaluation->table_element]['label']) && count($extrafields->attributes[$evaluation->table_element]['label'])) $sql .= " LEFT JOIN " . MAIN_DB_PREFIX . $evaluation->table_element . "_extrafields as ef on (evaluation.rowid = ef.fk_object)";
 			if ($evaluation->ismultientitymanaged == 1) $sql .= " WHERE evaluation.entity IN (" . getEntity($evaluation->element) . ")";
 			else $sql .= " WHERE 1 = 1";
 			$sql .= " AND evaluation.status = 1";
-			if (!$allRisks) {
+			if (empty($allRisks)) {
 				$inherited_risk_id = $object->fk_parent;
 				$sql .= " AND r.fk_element IN (" . $inherited_risk_id;
 				while ($inherited_risk_id > 0) {
@@ -342,41 +342,76 @@
 	foreach ($risk->fields as $key => $val) {
 		$cssforfield                        = (empty($val['css']) ? '' : $val['css']);
 		if ($key == 'status') $cssforfield .= ($cssforfield ? ' ' : '') . 'center';
-		if ( ! empty($arrayfields['r.' . $key]['checked'])) {
-			print '<td class="liste_titre' . ($cssforfield ? ' ' . $cssforfield : '') . '">';
-			if (is_array($val['arrayofkeyval'])) print $form->selectarray('search_' . $key, $val['arrayofkeyval'], $search[$key], $val['notnull'], 0, 0, '', 1, 0, 0, '', 'maxwidth75');
-			elseif (strpos($val['type'], 'integer:') === 0) {
-				print $risk->showInputField($val, $key, $search[$key], '', '', 'search_', 'maxwidth150', 1);
+		if (!empty($arrayfields['r.' . $key]['checked'])) {
+			// Print table cell header with optional CSS class
+			print '<td class="liste_titre' . (!empty($cssforfield) ? ' ' . $cssforfield : '') . '">';
+			if (isset($val['arrayofkeyval']) && is_array($val['arrayofkeyval'])) {
+				print $form->selectarray(
+					'search_' . $key,
+					$val['arrayofkeyval'],
+					$search[$key] ?? '',
+					$val['notnull'] ?? 0,
+					0, 0, '', 1, 0, 0, '', 'maxwidth75'
+				);
+			} elseif (isset($val['type']) && strpos($val['type'], 'integer:') === 0) {
+				print $risk->showInputField(
+					$val,
+					$key,
+					$search[$key] ?? '',
+					'',
+					'',
+					'search_',
+					'maxwidth150',
+					1
+				);
 			} elseif ($key == 'fk_element') {
-				print $digiriskelement->selectDigiriskElementList($search['fk_element'], 'search_fk_element', [], 1, 0, array(), 0, 0, 'minwidth100 maxwidth300', 0, false, 1);
+				print $digiriskelement->selectDigiriskElementList(
+					$search['fk_element'] ?? '',
+					'search_fk_element',
+					[],
+					1,
+					0,
+					array(),
+					0,
+					0,
+					'minwidth100 maxwidth300',
+					0,
+					false,
+					1
+				);
 			} elseif ($key == 'category') { ?>
 				<div class="wpeo-dropdown dropdown-large dropdown-grid category-danger padding" style="position: inherit">
-					<input class="input-hidden-danger" type="hidden" name="<?php echo 'search_' . $key ?>" value="<?php echo dol_escape_htmltag($search[$key]) ?>" />
-					<?php if (dol_strlen(dol_escape_htmltag($search[$key])) == 0) : ?>
+					<input class="input-hidden-danger" type="hidden" name="<?php echo 'search_' . $key ?>" value="<?php echo dol_escape_htmltag($search[$key] ?? '') ?>" />
+					<?php if (dol_strlen(dol_escape_htmltag($search[$key] ?? '')) == 0) : ?>
 						<div class="dropdown-toggle dropdown-add-button button-cotation">
-							<span class="wpeo-button button-square-50 button-grey"><i class="fas fa-exclamation-triangle button-icon"></i></span>
+							<span class="wpeo-button button-square-50 button-grey">
+								<i class="fas fa-exclamation-triangle button-icon"></i>
+							</span>
 							<img class="danger-category-pic wpeo-tooltip-event hidden" src="" aria-label=""/>
 						</div>
 					<?php else : ?>
-						<div class="dropdown-toggle dropdown-add-button button-cotation wpeo-tooltip-event" aria-label="<?php echo (empty(dol_escape_htmltag($search[$key]))) ? $risk->getDangerCategoryName($risk) : $risk->getDangerCategoryNameByPosition($search[$key]); ?>">
-							<img class="danger-category-pic tooltip hover" src="<?php echo DOL_URL_ROOT . '/custom/digiriskdolibarr/img/categorieDangers/' . ((empty(dol_escape_htmltag($search[$key]))) ? $risk->getDangerCategory($risk) : $risk->getDangerCategoryByPosition($search[$key])) . '.png'?>" />
+						<div class="dropdown-toggle dropdown-add-button button-cotation wpeo-tooltip-event" aria-label="<?php echo (empty(dol_escape_htmltag($search[$key] ?? ''))) ? $risk->getDangerCategoryName($risk) : $risk->getDangerCategoryNameByPosition($search[$key]); ?>">
+							<img class="danger-category-pic tooltip hover" src="<?php echo DOL_URL_ROOT . '/custom/digiriskdolibarr/img/categorieDangers/' . ((empty(dol_escape_htmltag($search[$key] ?? ''))) ? $risk->getDangerCategory($risk) : $risk->getDangerCategoryByPosition($search[$key])) . '.png' ?>" />
 						</div>
 					<?php endif; ?>
 					<ul class="saturne-dropdown-content wpeo-gridlayout grid-5 grid-gap-0">
 						<?php
 						$dangerCategories = $risk->getDangerCategories();
-						if ( ! empty($dangerCategories) ) :
+						if (!empty($dangerCategories)) :
 							foreach ($dangerCategories as $dangerCategory) : ?>
-								<li class="item dropdown-item wpeo-tooltip-event classfortooltip" data-is-preset="<?php echo ''; ?>" data-id="<?php echo $dangerCategory['position'] ?>" aria-label="<?php echo $dangerCategory['name'] ?>">
-									<img src="<?php echo DOL_URL_ROOT . '/custom/digiriskdolibarr/img/categorieDangers/' . $dangerCategory['thumbnail_name'] . '.png'?>" class="attachment-thumbail size-thumbnail photo photowithmargin" alt="" loading="lazy" width="48" height="48">
+								<li class="item dropdown-item wpeo-tooltip-event classfortooltip" data-is-preset="" data-id="<?php echo $dangerCategory['position'] ?>" aria-label="<?php echo $dangerCategory['name'] ?>">
+									<img src="<?php echo DOL_URL_ROOT . '/custom/digiriskdolibarr/img/categorieDangers/' . $dangerCategory['thumbnail_name'] . '.png' ?>" class="attachment-thumbail size-thumbnail photo photowithmargin" alt="" loading="lazy" width="48" height="48">
 								</li>
 							<?php endforeach;
 						endif; ?>
 					</ul>
 				</div>
-			<?php } elseif ( ! preg_match('/^(date|timestamp)/', $val['type']) && $key != 'category') print '<input type="text" class="flat maxwidth75" name="search_' . $key . '" value="' . dol_escape_htmltag($search[$key]) . '">';
+			<?php } elseif (isset($val['type']) && !preg_match('/^(date|timestamp)/', $val['type']) && $key != 'category') {
+				print '<input type="text" class="flat maxwidth75" name="search_' . $key . '" value="' . dol_escape_htmltag($search[$key] ?? '') . '">';
+			}
 			print '</td>';
 		}
+		
 	}
 
 	foreach ($evaluation->fields as $key => $val) {
@@ -485,7 +520,12 @@
 					}
 				} else print $risk->showOutputField($val, $key, $risk->$key, '');
 				print '</td>';
-				if ( ! $i) $totalarray['nbfield']++;
+				// If $i is not set or evaluates to false, increment nbfield count
+				if (empty($i)) {
+    				// Initialize 'nbfield' index if it doesn't exist
+   	 				$totalarray['nbfield'] = isset($totalarray['nbfield']) ? $totalarray['nbfield'] : 0;
+    				$totalarray['nbfield']++;
+				}
 				if ( ! empty($val['isameasure'])) {
 					if ( ! $i) $totalarray['pos'][$totalarray['nbfield']] = 'r.' . $key;
 					$totalarray['val']['r.' . $key]                      += $risk->$key;

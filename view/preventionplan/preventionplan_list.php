@@ -354,7 +354,7 @@ $arrayfields['ExtSociety']            = array('label' => 'ExtSociety', 'checked'
 $arrayfields['ExtSocietyResponsible'] = array('label' => 'ExtSocietyResponsible', 'checked' => 1);
 $arrayfields['ExtSocietyAttendant']   = array('label' => 'ExtSocietyAttendant', 'checked' => 1);
 
-print_barre_liste($form->textwithpicto($title, $texthelp ?? ''), $page, $_SERVER["PHP_SELF"], $param, $sortfield, $sortorder, $massactionbutton, $num, $nbtotalofrecords, $object->picto, 0, $newcardbutton, '', $limit, 0, 0, 1);
+print_barre_liste($form->textwithpicto($title, $texthelp ?? ''), $page, $_SERVER["PHP_SELF"], ($param ?? ''), $sortfield, $sortorder, $massactionbutton, $num, $nbtotalofrecords, $object->picto, 0, $newcardbutton, '', $limit, 0, 0, 1);
 
 $selectedfields                         = $form->multiSelectArrayWithCheckbox('selectedfields', $arrayfields, $varpage); // This also change content of $arrayfields
 if ($massactionbutton) $selectedfields .= $form->showCheckAddButtons('checkforselect', 1);
@@ -418,7 +418,7 @@ foreach ($object->fields as $key => $val) {
 		} else {
 			$disablesort = 0;
 		}
-		print getTitleFieldOfList($arrayfields['t.' . $key]['label'], 0, $_SERVER['PHP_SELF'], 't.' . $key, '', $param, ($cssforfield ? 'class="' . $cssforfield . '"' : ''), $sortfield, $sortorder, ($cssforfield ? $cssforfield . ' ' : ''), $disablesort) . "\n";
+		print getTitleFieldOfList($arrayfields['t.' . $key]['label'], 0, $_SERVER['PHP_SELF'], 't.' . $key, '', ($param ?? ''), ($cssforfield ? 'class="' . $cssforfield . '"' : ''), $sortfield, $sortorder, ($cssforfield ? $cssforfield . ' ' : ''), $disablesort) . "\n";
 	}
 	if ($key == 'Custom') {
 		foreach ($val as $resource) {
@@ -435,7 +435,7 @@ foreach ($object->fields as $key => $val) {
 include DOL_DOCUMENT_ROOT . '/core/tpl/extrafields_list_search_title.tpl.php';
 
 // Hook fields
-$parameters = array('arrayfields' => $arrayfields, 'param' => $param, 'sortfield' => $sortfield, 'sortorder' => $sortorder);
+$parameters = array('arrayfields' => $arrayfields, 'param' => ($param ?? ''), 'sortfield' => $sortfield, 'sortorder' => $sortorder);
 $reshook    = $hookmanager->executeHooks('printFieldListTitle', $parameters, $object); // Note that $action and $objectdocument may have been modified by hook
 print $hookmanager->resPrint;
 

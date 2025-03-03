@@ -155,23 +155,33 @@ class Evaluator extends SaturneObject
         return $array;
     }
 
-	/**
-	 * Get number employees involved.
-	 *
-     * @param  array    $moreParam More param (Object/user/etc)
+    /**
+     * Get number employees involved.
+     *
+     * @param  array    $moreParam More parameters (Object/user/etc)
      * @return array
-	 * @throws Exception
-	 */
-	public function getNbEmployeesInvolved(array $moreParam = []) {
-		// Number employees involved
-		$allevaluators = $this->fetchAll('','', 0, 0, ['customsql' => ($moreParam['filter'] ?? '')], 'AND', 'fk_user');
-		if (is_array($allevaluators) && !empty($allevaluators)) {
-			$array['nbemployeesinvolved'] = count($allevaluators);
-		} else {
-			$array['nbemployeesinvolved'] = 'N/A';
-		}
-		return $array;
-	}
+     * @throws Exception
+     */
+    public function getNbEmployeesInvolved(array $moreParam = []) {
+        // Check if 'filter' parameter exists and is not empty after trimming
+        $filter = trim($moreParam['filter'] ?? '');
+        $params = array();
+        if (!empty($filter)) {
+            $params['customsql'] = $filter;
+        }
+
+        // Fetch all evaluators with the optional custom SQL filter
+        $allevaluators = $this->fetchAll('', '', 0, 0, $params, 'AND', 'fk_user');
+
+        // Check if $allevaluators is defined, is an array, and not empty
+        if (isset($allevaluators) && is_array($allevaluators) && !empty($allevaluators)) {
+            $array['nbemployeesinvolved'] = count($allevaluators);
+        } else {
+            $array['nbemployeesinvolved'] = 'N/A';
+        }
+        return $array;
+    }
+
 
     /**
      * Get number employees

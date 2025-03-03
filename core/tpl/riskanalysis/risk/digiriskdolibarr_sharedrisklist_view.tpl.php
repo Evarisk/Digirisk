@@ -218,22 +218,23 @@ if ( ! preg_match('/(evaluation)/', $sortfield)) {
 	else $sql                                                                                                                                                 .= " WHERE 1 = 1";
 	$sql                                                                                                                                                      .= " AND evaluation.status = 1";
 
-	if ( ! $allRisks) {
-		$sql .= " AND el.fk_target = " . $id;
+	// Ensure that $allRisks is defined; default to false if not set
+	$allRisks = $allRisks ?? false;
+
+	if (!$allRisks) {
+		// Filter by target id if not retrieving all risks
+		$sql .= " AND el.fk_target = " . intval($id); // Using intval for safety
 	} else {
-		if (is_array($digiriskElementsOfEntity) && !empty($digiriskElementsOfEntity)) {
-			$digiriskElementSqlFilter = '(';
-			foreach (array_keys($digiriskElementsOfEntity) as $elementId) {
-				$digiriskElementSqlFilter .= $elementId . ', ';
-			}
-			if (preg_match('/, /', $digiriskElementSqlFilter)) {
-				$digiriskElementSqlFilter = rtrim($digiriskElementSqlFilter, ', ');
-			}
-			$digiriskElementSqlFilter .= ')';
+		// Check if $digiriskElementsOfEntity is defined, is an array, and not empty
+		if (isset($digiriskElementsOfEntity) && is_array($digiriskElementsOfEntity) && !empty($digiriskElementsOfEntity)) {
+			// Get the keys (element IDs) and join them with commas to build the SQL filter
+			$elementIds = array_keys($digiriskElementsOfEntity);
+			$digiriskElementSqlFilter = '(' . implode(', ', $elementIds) . ')';
 
 			$sql .= " AND el.fk_target IN " . $digiriskElementSqlFilter;
 		}
 	}
+
 	$sql .= " AND el.sourcetype = 'digiriskdolibarr_risk'";
     $sql .= ' AND r.type = "' . $riskType . '"';
     $sql .= ' AND e.rowid IN (' . implode(',', array_keys($alldigiriskelement)) . ')';

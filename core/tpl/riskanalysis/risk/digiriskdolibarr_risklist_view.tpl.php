@@ -466,23 +466,27 @@ if ( ! preg_match('/(evaluation)/', $sortfield)) {
     if ($evaluation->ismultientitymanaged == 1) $sql                                                                                                          .= " WHERE evaluation.entity IN (" . getEntity($evaluation->element) . ")";
 	else $sql                                                                                                                                                 .= " WHERE 1 = 1";
 	$sql                                                                                                                                                      .= " AND evaluation.status = 1";
-	if ( ! $allRisks) {
-		$sql .= " AND r.fk_element = " . $id;
+	// Check if we are filtering on a specific element (when $allRisks is empty or false)
+	if (empty($allRisks)) {
+		// Cast $id to integer to ensure SQL safety
+		$sql .= " AND r.fk_element = " . intval($id);
 	} else {
-		if (is_array($activeDigiriskElementList) && !empty($activeDigiriskElementList)) {
-			$digiriskElementSqlFilter = '(';
-			foreach (array_keys($activeDigiriskElementList) as $elementId) {
-				$digiriskElementSqlFilter .= $elementId . ', ';
-			}
-			if (preg_match('/, /', $digiriskElementSqlFilter)) {
-				$digiriskElementSqlFilter = rtrim($digiriskElementSqlFilter, ', ');
-			}
-			$digiriskElementSqlFilter .= ')';
+		// If an active digirisk element list is provided and is a non-empty array, build an IN filter
+		if (!empty($activeDigiriskElementList) && is_array($activeDigiriskElementList)) {
+			// Extract and cast all element IDs to integers for safety
+			$elementIds = array_map('intval', array_keys($activeDigiriskElementList));
+			// Build SQL filter string using implode
+			$digiriskElementSqlFilter = '(' . implode(', ', $elementIds) . ')';
 			$sql .= " AND r.fk_element IN " . $digiriskElementSqlFilter;
 		}
+		// Ensure we only consider records with a valid fk_element value
 		$sql .= " AND r.fk_element > 0";
-		$sql .= " AND e.entity IN (" . $conf->entity . ")";
+		// Append entity filter ensuring $conf->entity exists and is an integer
+		if (isset($conf->entity)) {
+			$sql .= " AND e.entity IN (" . intval($conf->entity) . ")";
+		}
 	}
+
     $sql .= ' AND r.type = "' . $riskType . '"';
 
 	foreach ($search as $key => $val) {
@@ -584,7 +588,7 @@ if ($permissiontodelete) {
 $massactionbutton = $form->selectMassAction('', $arrayofmassactions);
 
 ?>
-<?php if (!$allRisks) : ?>
+<?php if (empty($allRisks)) : ?>
 	<!-- BUTTON MODAL RISK ADD -->
 	<?php if ($permissiontoadd) {
 		$newcardbutton = '<div class="risk-add wpeo-button button-square-40 button-blue wpeo-tooltip-event modal-open"  aria-label="' . $langs->trans('AddRisk') . '"  value="' . $object->id . '">';

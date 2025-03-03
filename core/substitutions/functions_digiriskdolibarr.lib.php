@@ -35,8 +35,8 @@ require_once __DIR__ . '/../../class/digiriskresources.class.php';
  */
 function digiriskdolibarr_completesubstitutionarray(&$substitutionarray, $langs, $object)
 {
-	$type         = $object->element;
-	$element_type = $object->element_type;
+	$type         = $object->element ?? '';
+	$element_type = $object->element_type ?? '';
 
 	switch ($type) {
 		case 'legaldisplay@digiriskdolibarr':

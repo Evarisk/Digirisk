@@ -39,7 +39,7 @@ try {
 print '<tr>';
 print '<td class="titlefield"><i class="fas fa-hospital-alt"></i> ' . $form->textwithpicto($langs->trans("LabourDoctor"), $langs->trans('HowToSetDataLegalDisplay')) . '</td>';
 print '<td>';
-if ($document->occupational_health_service->id > 0) {
+if (isset($document->occupational_health_service->id) && $document->occupational_health_service->id > 0) {
 	$contact->fetch($document->occupational_health_service->id);
 	print $contact->getNomUrl(1);
 }
@@ -49,7 +49,7 @@ print '</td></tr>';
 print '<tr>';
 print '<td class="titlefield"><i class="fas fa-search"></i> ' . $form->textwithpicto($langs->trans("LabourInspector"), $langs->trans('HowToSetDataLegalDisplay')) . '</td>';
 print '<td>';
-if ($document->detective_work->id > 0) {
+if (isset($document->detective_work->id) && $document->detective_work->id > 0) {
 	$contact->fetch($document->detective_work->id);
 	print $contact->getNomUrl(1);
 }
@@ -101,8 +101,10 @@ print '</td></tr>';
 print '<tr>';
 print '<td class="titlefield"><i class="fas fa-user"></i> ' . $form->textwithpicto($langs->trans("ResponsibleToNotify"), $langs->trans('HowToSetDataLegalDisplay')) . '</td>';
 print '<td>';
-$usertmp->fetch($document->safety_rule->id);
-print $usertmp->getNomUrl(1);
+if (isset($document->safety_rule->id)) {
+    $usertmp->fetch($document->safety_rule->id);
+    print $usertmp->getNomUrl(1);
+}
 print '</td></tr>';
 
 ?>

@@ -122,7 +122,10 @@ $numberingModules  = ['project' => $conf->global->PROJECT_ADDON];
 list ($projectRef) = saturne_require_objects_mod($numberingModules, $moduleNameLowerCase);
 
 //Check projet
-if ($conf->global->DIGIRISKDOLIBARR_DU_PROJECT > 0 && $conf->global->DIGIRISKDOLIBARR_DU_PROJECT_BACKWARD_COMPATIBILITY == 0) {
+if (
+	isset($conf->global->DIGIRISKDOLIBARR_DU_PROJECT) && $conf->global->DIGIRISKDOLIBARR_DU_PROJECT > 0 && isset($conf->global->DIGIRISKDOLIBARR_DU_PROJECT_BACKWARD_COMPATIBILITY)
+	&& $conf->global->DIGIRISKDOLIBARR_DU_PROJECT_BACKWARD_COMPATIBILITY == 0
+) {
 	$project->fetch($conf->global->DIGIRISKDOLIBARR_DU_PROJECT);
 	//Backward compatibility
 	if ($project->title == $langs->trans('RiskAssessmentDocument')) {
@@ -178,7 +181,8 @@ if ( $conf->global->DIGIRISKDOLIBARR_DU_PROJECT == 0 || $project->statut == 2 ) 
 	header("Location: " . $_SERVER['PHP_SELF']);
 }
 
-if ($conf->global->DIGIRISKDOLIBARR_PREVENTIONPLAN_PROJECT > 0 && $conf->global->DIGIRISKDOLIBARR_PREVENTIONPLAN_PROJECT_BACKWARD_COMPATIBILITY == 0 ) {
+if (isset($conf->global->DIGIRISKDOLIBARR_PREVENTIONPLAN_PROJECT) && $conf->global->DIGIRISKDOLIBARR_PREVENTIONPLAN_PROJECT > 0 && isset($conf->global->DIGIRISKDOLIBARR_PREVENTIONPLAN_PROJECT_BACKWARD_COMPATIBILITY) 
+	&&  $conf->global->DIGIRISKDOLIBARR_PREVENTIONPLAN_PROJECT_BACKWARD_COMPATIBILITY == 0 ) {
 	$project->fetch($conf->global->DIGIRISKDOLIBARR_PREVENTIONPLAN_PROJECT);
 	//Backward compatibility
 	if ($project->title == $langs->trans('PreventionPlan')) {

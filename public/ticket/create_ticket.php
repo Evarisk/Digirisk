@@ -97,14 +97,23 @@ $extrafields->fetch_name_optionals_label($object->table_element);
 
 $entity = GETPOST('entity');
 
-if (!$conf->multicompany->enabled) {
-	$entity = $conf->entity;
+// If multicompany feature is not enabled (or not defined), set the entity accordingly
+if (empty($conf->multicompany->enabled)) {
+    $entity = $conf->entity;
 }
+
 
 $conf->setEntityValues($db, $entity);
 
 //ici charger les conf de la bonne entité
-$upload_dir = $conf->categorie->multidir_output[isset($entity) ? $entity : 1];
+// Set entity index to the value of $entity if defined, otherwise default to 1
+$entityIndex = isset($entity) ? $entity : 1;
+
+// Get the upload directory if it exists; otherwise, default to an empty string
+$upload_dir = isset($conf->categorie->multidir_output[$entityIndex])
+    ? $conf->categorie->multidir_output[$entityIndex]
+    : '';
+
 
 /*
  * Actions
@@ -417,7 +426,7 @@ $conf->dol_hide_leftmenu = 1;
 
 saturne_header(0,'', $title, '', '', 0, 0, $moreJS, [], '', 'page-public-card page-signature');
 
-if ($entity > 0) {
+if (isset($entity) && $entity > 0) {
 	if ( ! $conf->global->DIGIRISKDOLIBARR_TICKET_ENABLE_PUBLIC_INTERFACE) {
 		print '<div class="error">' . $langs->trans('TicketPublicInterfaceForbidden') . '</div>';
 		$db->close();
@@ -518,9 +527,20 @@ if ($entity > 0) {
     if (GETPOSTISSET('parentCategory') || GETPOSTISSET('parentCategory') && GETPOSTISSET('subCategory')) : ?>
         <div class="wpeo-form tableforinputfields">
             <div class="wpeo-gridlayout grid-2">
-                <?php  $visible = getDolGlobalInt('DIGIRISKDOLIBARR_TICKET_PUBLIC_INTERFACE_SHOW_CATEGORY_DESCRIPTION') || (!getDolGlobalInt('DIGIRISKDOLIBARR_TICKET_PUBLIC_INTERFACE_SHOW_CATEGORY_DESCRIPTION') && $mainCategoryChildrenExtrafields->show_description)
-            || (!getDolGlobalInt('DIGIRISKDOLIBARR_TICKET_PUBLIC_INTERFACE_SHOW_CATEGORY_DESCRIPTION') && $mainCategoryChildrenExtrafields->show_description == NUll && $subCategoryExtrafields->show_description);
-                if ($visible && dol_strlen($categoryDescription) > 0) : ?>
+			<?php
+				// Get global setting for category description display
+				$globalShow = getDolGlobalInt('DIGIRISKDOLIBARR_TICKET_PUBLIC_INTERFACE_SHOW_CATEGORY_DESCRIPTION');
+
+				// Safely get the show_description properties from extra fields objects
+				$mainShow = isset($mainCategoryChildrenExtrafields->show_description) ? $mainCategoryChildrenExtrafields->show_description : null;
+				$subShow  = isset($subCategoryExtrafields->show_description) ? $subCategoryExtrafields->show_description : false;
+
+				// Determine visibility based on the global setting and extra field values
+				$visible = $globalShow 
+					|| (!$globalShow && $mainShow)
+					|| (!$globalShow && is_null($mainShow) && $subShow);
+
+                if (isset($visible) && dol_strlen($categoryDescription) > 0) : ?>
                     <div class="form-element gridw-2">
                         <span class="form-label"><?php print $langs->trans('Description'); ?>
                         <label class="form-field-container">
@@ -535,7 +555,11 @@ if ($entity > 0) {
                     </label>
                 </div>
                 <div class="form-element">
-                    <?php if ($conf->global->DIGIRISKDOLIBARR_TICKET_PHOTO_VISIBLE || (!$conf->global->DIGIRISKDOLIBARR_TICKET_PHOTO_VISIBLE && $mainCategoryChildrenExtrafields->photo_visible)) {?>
+				<?php
+					// Check if ticket photo should be visible based on global configuration or extra field setting
+					if (!empty($conf->global->DIGIRISKDOLIBARR_TICKET_PHOTO_VISIBLE) || !empty($mainCategoryChildrenExtrafields->photo_visible)) {
+					?>
+
                     <div class="wpeo-gridlayout grid-2">
                         <span class="form-label"><?php print $langs->trans("FilesLinked"); ?></span>
                         <label class="wpeo-button button-blue" for="sendfile">
@@ -580,47 +604,87 @@ if ($entity > 0) {
                     <?php } ?>
                 </div>
                 <?php
-                if (getDolGlobalInt('DIGIRISKDOLIBARR_TICKET_EXTRAFIELDS')) {
-                    if ($conf->global->DIGIRISKDOLIBARR_TICKET_DIGIRISKELEMENT_VISIBLE || (!$conf->global->DIGIRISKDOLIBARR_TICKET_DIGIRISKELEMENT_VISIBLE && $mainCategoryChildrenExtrafields->digiriskelement_visible)) {
-                        $selectDigiriskElement = '<div class="gridw-2"><span ' . (($conf->global->DIGIRISKDOLIBARR_TICKET_DIGIRISKELEMENT_REQUIRED) ? 'style="font-weight:600"' : '') . '>' . $langs->trans('Service') . (($conf->global->DIGIRISKDOLIBARR_TICKET_DIGIRISKELEMENT_REQUIRED) ? '<span style="color:red"> *</span>' : '') . '</span>';
+				if (getDolGlobalInt('DIGIRISKDOLIBARR_TICKET_EXTRAFIELDS') || dolibarr_get_const($db, 'DIGIRISKDOLIBARR_TICKET_EXTRAFIELDS', 0)) {
+					if ($conf->global->DIGIRISKDOLIBARR_TICKET_DIGIRISKELEMENT_VISIBLE || (!$conf->global->DIGIRISKDOLIBARR_TICKET_DIGIRISKELEMENT_VISIBLE && $mainCategoryChildrenExtrafields->digiriskelement_visible)) {
+						// Display the service label with translation and required marker if necessary
+						$selectDigiriskElement = '<div class="gridw-2"><span ' . (($conf->global->DIGIRISKDOLIBARR_TICKET_DIGIRISKELEMENT_REQUIRED ?? false) ? 'style="font-weight:600"' : '') . '>' 
+							. $langs->trans('Service') 
+							. (($conf->global->DIGIRISKDOLIBARR_TICKET_DIGIRISKELEMENT_REQUIRED ?? false) ? '<span style="color:red"> *</span>' : '') 
+							. '</span>';
 
-                        $deletedElements = $digiriskelement->getMultiEntityTrashList();
-                        if (empty($deletedElements)) {
-                            $deletedElements = [0];
-                        }
-                        $selectDigiriskElement .= $digiriskelement->selectDigiriskElementList(GETPOST('options_digiriskdolibarr_ticket_service'), 'options_digiriskdolibarr_ticket_service',  ['customsql' => 't.rowid NOT IN (' . implode(',', $deletedElements) . ') AND t.show_in_selector = 1'], $langs->trans('PleaseSelectADigiriskElement'), 0, array(), 0, 0, 'minwidth500', 0, false, 1, '', true, $conf->global->DIGIRISKDOLIBARR_TICKET_DIGIRISKELEMENT_HIDE_REF);
-                        $selectDigiriskElement .= '</div>';
-                        print($selectDigiriskElement);
-                    }
+						$deletedElements = $digiriskelement->getMultiEntityTrashList();
+						if (empty($deletedElements)) {
+							$deletedElements = [0];
+						}
+						$selectDigiriskElement .= $digiriskelement->selectDigiriskElementList(
+							GETPOST('options_digiriskdolibarr_ticket_service'),
+							'options_digiriskdolibarr_ticket_service',
+							['customsql' => 't.rowid NOT IN (' . implode(',', $deletedElements) . ') AND t.show_in_selector = 1'],
+							$langs->trans('PleaseSelectADigiriskElement'),
+							0, array(), 0, 0, 'minwidth500', 0, false, 1, '', true, $conf->global->DIGIRISKDOLIBARR_TICKET_DIGIRISKELEMENT_HIDE_REF
+						);
+						$selectDigiriskElement .= '</div>';
+						print($selectDigiriskElement);
+					}
 
-                    $fields = [
-                        'digiriskdolibarr_ticket_email' => ['type' => 'email', 'name' => 'email'],
-                        'digiriskdolibarr_ticket_date'  => ['type' => 'datetime-local']
-                    ];
-                    $extrafields->attributes[$object->table_element]['label']['digiriskdolibarr_ticket_email']     = $langs->trans('Email');
-                    unset($extrafields->attributes[$object->table_element]['label']['digiriskdolibarr_ticket_service']);
-                    foreach ($extrafields->attributes[$object->table_element]['label'] as $key => $field) {
-                        if (strpos($key, 'digiriskdolibarr_ticket') === false) {
-                            continue; // Goes to the next element if ‘digiriskdolibarr_ticket’ is not found
-                        }
-                        $visible = getDolGlobalInt(dol_strtoupper($key) . '_VISIBLE') || (!getDolGlobalInt(dol_strtoupper($key) . '_VISIBLE') && $mainCategoryChildrenExtrafields->{$key . '_visible'})
-                        || (!getDolGlobalInt(dol_strtoupper($key) . '_VISIBLE') && $mainCategoryChildrenExtrafields->{$key . '_visible'} == NUll && $subCategoryExtrafields->{$key . '_visible'});
-                        $required = getDolGlobalInt(dol_strtoupper($key) . '_REQUIRED') || (!getDolGlobalInt(dol_strtoupper($key) . '_REQUIRED') && $mainCategoryChildrenExtrafields->{$key . '_required'})
-                        || (!getDolGlobalInt(dol_strtoupper($key) . '_REQUIRED') && $mainCategoryChildrenExtrafields->{$key . '_required'} == NUll && $subCategoryExtrafields->{$key . '_required'});
-                        if ($visible) {
-                            $out  = '<div class="form-element form-field-container">';
-                            $out .= '<label><span class="form-label"' . ($required ? '' : 'style="font-weight:300"') . '>' . $field . ($required ? '<span style="color:red"> *</span>' : '') . '</span>';
-                            if ($key == 'digiriskdolibarr_ticket_email' || $key == 'digiriskdolibarr_ticket_date') {
-                                $out .= '<input type="' . $fields[$key]['type'] . '" name="' . ($fields[$key]['name'] ?? 'options_' . $key) . '" id="' . ($fields[$key]['name'] ?? 'options_' . $key) . '" value="' . GETPOST($fields[$key]['name'] ?? 'options_' . $key) . '"' . ($required ? 'required' : '') . '/>';
-                            } else {
-                                $out .= $extrafields->showInputField($key, GETPOST($fields[$key]['name'] ?? 'options_' . $key), ($required ? 'required' : ''), '', '', 0, $object->id, $object->table_element);
-                            }
-                            $out .= '</label>';
-                            $out .= '</div>';
-                            print($out);
-                        }
-                    }
-                }
+					$fields = [
+						'digiriskdolibarr_ticket_email' => ['type' => 'email', 'name' => 'email'],
+						'digiriskdolibarr_ticket_date'  => ['type' => 'datetime-local']
+					];
+					// Set the translated label for email field
+					$extrafields->attributes[$object->table_element]['label']['digiriskdolibarr_ticket_email'] = $langs->trans('Email');
+					unset($extrafields->attributes[$object->table_element]['label']['digiriskdolibarr_ticket_service']);
+					
+					foreach ($extrafields->attributes[$object->table_element]['label'] as $key => $field) {
+						if (strpos($key, 'digiriskdolibarr_ticket') === false) {
+							continue; // Skip element if 'digiriskdolibarr_ticket' is not found
+						}
+						
+						// Retrieve global visible setting and define local visibility values
+						$globalVisible = getDolGlobalInt(dol_strtoupper($key) . '_VISIBLE');
+						$mainCatVisible = isset($mainCategoryChildrenExtrafields->{$key . '_visible'}) ? $mainCategoryChildrenExtrafields->{$key . '_visible'} : null;
+						$subCatVisible  = isset($subCategoryExtrafields->{$key . '_visible'}) ? $subCategoryExtrafields->{$key . '_visible'} : null;
+						$visible = $globalVisible 
+							|| (!$globalVisible && $mainCatVisible) 
+							|| (!$globalVisible && is_null($mainCatVisible) && $subCatVisible);
+					
+						// Retrieve global required setting and define local required values
+						$globalRequired = getDolGlobalInt(dol_strtoupper($key) . '_REQUIRED');
+						$mainCatRequired = isset($mainCategoryChildrenExtrafields->{$key . '_required'}) ? $mainCategoryChildrenExtrafields->{$key . '_required'} : null;
+						$subCatRequired  = isset($subCategoryExtrafields->{$key . '_required'}) ? $subCategoryExtrafields->{$key . '_required'} : null;
+						$required = $globalRequired 
+							|| (!$globalRequired && $mainCatRequired) 
+							|| (!$globalRequired && is_null($mainCatRequired) && $subCatRequired);
+					
+						if ($visible) {
+							$out  = '<div class="form-element form-field-container">';
+							// Translate the label before display
+							$translatedLabel = $langs->trans($field);
+							$out .= '<label><span class="form-label"' . ($required ? '' : ' style="font-weight:300"') . '>' 
+								. $translatedLabel 
+								. ($required ? '<span style="color:red"> *</span>' : '') 
+								. '</span>';
+					
+							// For specific fields, render as input element
+							if ($key == 'digiriskdolibarr_ticket_email' || $key == 'digiriskdolibarr_ticket_date') {
+								$fieldName = $fields[$key]['name'] ?? 'options_' . $key;
+								$fieldType = $fields[$key]['type'] ?? 'text';
+								$value = GETPOST($fieldName);
+								$out .= '<input type="' . $fieldType . '" name="' . $fieldName . '" id="' . $fieldName 
+									. '" value="' . $value . '" ' . ($required ? 'required' : '') . '/>';
+							} else {
+								// For other fields, use the extrafields showInputField method
+								$fieldName = $fields[$key]['name'] ?? 'options_' . $key;
+								$value = GETPOST($fieldName);
+								$out .= $extrafields->showInputField($key, $value, ($required ? 'required' : ''), '', '', 0, $object->id, $object->table_element);
+							}
+							$out .= '</label>';
+							$out .= '</div>';
+							print($out);
+						}
+					}
+				}
+
             print '</div>';
             if (!empty($conf->global->DIGIRISKDOLIBARR_USE_CAPTCHA)) {
                 require_once DOL_DOCUMENT_ROOT . '/core/lib/security2.lib.php';
@@ -637,9 +701,17 @@ if ($entity > 0) {
         print '</div>';
         print dol_get_fiche_end();
 
-        $visible = getDolGlobalInt('DIGIRISKDOLIBARR_TICKET_PUBLIC_INTERFACE_USE_SIGNATORY') || (!getDolGlobalInt('DIGIRISKDOLIBARR_TICKET_PUBLIC_INTERFACE_USE_SIGNATORY') && $mainCategoryChildrenExtrafields->use_signatory)
-        || (!getDolGlobalInt('DIGIRISKDOLIBARR_TICKET_PUBLIC_INTERFACE_USE_SIGNATORY') && $mainCategoryChildrenExtrafields->use_signatory && $subCategoryExtrafields->use_signatory);
-        if ($visible) {
+		// Retrieve the global flag once for performance and to avoid multiple calls
+		$globalFlag = getDolGlobalInt('DIGIRISKDOLIBARR_TICKET_PUBLIC_INTERFACE_USE_SIGNATORY');
+
+		// Use the nullsafe operator and null coalescing operator to avoid "undefined property" warnings in PHP 8.
+		// Note: The third condition is redundant because if $mainCategoryChildrenExtrafields->use_signatory is true, 
+		// the second condition already returns true. We keep it to minimize changes.
+		$visible = $globalFlag 
+			|| (!$globalFlag && ($mainCategoryChildrenExtrafields?->use_signatory ?? false))
+			|| (!$globalFlag && ($mainCategoryChildrenExtrafields?->use_signatory ?? false) && ($subCategoryExtrafields?->use_signatory ?? false));
+
+        if (isset($visible)) {
             // Load Saturne libraries
             require_once __DIR__ . '/../../../saturne/lib/saturne_functions.lib.php';
             require_once __DIR__ . '/../../../saturne/class/saturnesignature.class.php';

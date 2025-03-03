@@ -102,8 +102,16 @@ $pagenext = $page + 1;
 
 // List of fields to search into when doing a "search in all"
 $fieldstosearchall = array();
-foreach ($risksign->fields as $key => $val) {
-	if ($val['searchall']) $fieldstosearchall['t.' . $key] = $val['label'];
+
+// Check if risksign->fields is set and is an array to prevent warnings in PHP8
+if (isset($risksign->fields) && is_array($risksign->fields)) {
+    foreach ($risksign->fields as $key => $val) {
+        // Ensure 'searchall' is defined and truthy before adding to the search fields array
+        if (!empty($val['searchall'])) {
+            // Use null coalescing operator to avoid undefined index for 'label'
+            $fieldstosearchall['t.' . $key] = $val['label'] ?? '';
+        }
+    }
 }
 
 // Definition of fields for list
