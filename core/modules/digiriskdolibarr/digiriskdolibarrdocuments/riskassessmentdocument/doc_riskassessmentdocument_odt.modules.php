@@ -193,8 +193,9 @@ class doc_riskassessmentdocument_odt extends SaturneDocumentModel
                     $tmpArray['showSharedRisk'] = true;
                     $objectDocument->fillRiskData($odfHandler, $objectDocument, $outputLangs, $tmpArray, $file, $risks, $activeDigiriskElements, true);
                 }
+                $odfHandler->setVars('showSharedRisk', $tmpArray['showSharedRisk'], true, 'UTF-8');
 
-				//Fill tickets data
+                //Fill tickets data
                 $filter    = ['customsql' => 't.fk_project = ' . $conf->global->DIGIRISKDOLIBARR_TICKET_PROJECT . ' AND eft.digiriskdolibarr_ticket_service > 0'];
                 $tickets   = saturne_fetch_all_object_type('Ticket', '', '', 0, 0,  $filter, 'AND', true);
 				$listLines = $odfHandler->setSegment('tickets');
