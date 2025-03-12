@@ -1535,3 +1535,4 @@ HowToConfigureSetupConf             = Pour configurer les donnés de la sociét�
 PermissionInheritedFromConfig       = Les permissions sont héritées de la configuration générale ou de la configuration parente
 CategorieManagement                 = Gestion des catégories
 ShowSelectedRiskTypes               = Sélectionnez les types de risques à afficher
+NumberOfLinkedFiles                 = Nombre de fichiers joints
