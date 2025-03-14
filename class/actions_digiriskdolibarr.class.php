@@ -992,10 +992,10 @@ class ActionsDigiriskdolibarr
     /**
      * Overloading the extendSheetLinkableObjectsList function : replacing the parent's function with the one below
      *
-     * @param  array $linkableObjectTypes  Array of linkable objects
-     * @return int                         0 < on error, 0 on success, 1 to replace standard code
+     * @param  array $parameters Hook metadata (context, etc...)
+     * @return int               0 < on error, 0 on success, 1 to replace standard code
      */
-    public function extendSheetLinkableObjectsList(array $linkableObjectTypes): int
+    public function extendSheetLinkableObjectsList(array $parameters): int
     {
         require_once __DIR__ . '/firepermit.class.php';
         require_once __DIR__ . '/../lib/digiriskdolibarr_firepermit.lib.php';
@@ -1016,7 +1016,7 @@ class ActionsDigiriskdolibarr
         ];
         $this->results = $linkableObjectTypes;
 
-        return 1;
+        return 0; // or return 1 to replace standard code
     }
 
     /**
