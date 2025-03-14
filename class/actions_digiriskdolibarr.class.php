@@ -997,8 +997,41 @@ class ActionsDigiriskdolibarr
      */
     public function extendSheetLinkableObjectsList(array $parameters): int
     {
+        require_once __DIR__ . '/preventionplan.class.php';
         require_once __DIR__ . '/firepermit.class.php';
+
+        require_once __DIR__ . '/../lib/digiriskdolibarr_preventionplan.lib.php';
         require_once __DIR__ . '/../lib/digiriskdolibarr_firepermit.lib.php';
+
+        $linkableObjectTypes['digiriskdolibarr_digiriskelement'] = [
+            'langs'          => 'DigiriskElement',
+            'langfile'       => 'digiriskdolibarr@digiriskdolibarr',
+            'picto'          => 'fontawesome_fa-network-wired_fas_#d35968',
+            'className'      => 'DigiriskElement',
+            'name_field'     => 'ref',
+            'post_name'      => 'fk_digiriskelement',
+            'link_name'      => 'digiriskdolibarr_digiriskelement',
+            'tab_type'       => 'digiriskelement',
+            'hook_name_list' => 'digiriskelementlist',
+            'hook_name_card' => 'digiriskelementcard',
+            'create_url'     => 'custom/digiriskdolibarr/view/digiriskelement/digiriskelement_card.php?action=create&element_type=groupment&fk_parent=0',
+            'class_path'     => 'custom/digiriskdolibarr/class/digiriskelement.class.php'
+        ];
+
+        $linkableObjectTypes['digiriskdolibarr_preventionplan'] = [
+            'langs'          => 'Preventionplan',
+            'langfile'       => 'digiriskdolibarr@digiriskdolibarr',
+            'picto'          => 'fontawesome_fa-info_fas_#d35968',
+            'className'      => 'PreventionPlan',
+            'name_field'     => 'ref',
+            'post_name'      => 'fk_preventionplan',
+            'link_name'      => 'digiriskdolibarr_preventionplan',
+            'tab_type'       => 'preventionplan',
+            'hook_name_list' => 'preventionplanlist',
+            'hook_name_card' => 'preventionplancard',
+            'create_url'     => 'custom/digiriskdolibarr/view/preventionplan/preventionplan_card.php?action=create',
+            'class_path'     => 'custom/digiriskdolibarr/class/preventionplan.class.php'
+        ];
 
         $linkableObjectTypes['digiriskdolibarr_firepermit'] = [
             'langs'          => 'Firepermit',
@@ -1014,6 +1047,7 @@ class ActionsDigiriskdolibarr
             'create_url'     => 'custom/digiriskdolibarr/view/firepermit/firepermit_card.php?action=create',
             'class_path'     => 'custom/digiriskdolibarr/class/firepermit.class.php'
         ];
+
         $this->results = $linkableObjectTypes;
 
         return 0; // or return 1 to replace standard code
