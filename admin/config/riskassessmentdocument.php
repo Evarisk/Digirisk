@@ -298,13 +298,45 @@ if (isModEnabled('project')) {
 	$langs->load("projects");
 	print '<tr class="oddeven"><td><label for="DUProject">' . $langs->trans("DUProject") . '</label></td><td>';
 	$formproject->select_projects(-1,  $conf->global->DIGIRISKDOLIBARR_DU_PROJECT, 'DUProject', 0, 0, 0, 0, 0, 0, 0, '', 0, 0, 'maxwidth500');
-	print ' <a href="' . DOL_URL_ROOT . '/projet/card.php?socid=' . $soc->id . '&action=create&status=1&backtopage=' . urlencode($_SERVER["PHP_SELF"] . '?action=create&socid=' . $soc->id) . '"><span class="fa fa-plus-circle valignmiddle" title="' . $langs->trans("AddProject") . '"></span></a>';
-	print '<td><input type="submit" class="button" name="save" value="' . $langs->trans("Save") . '">';
+// Build URL for adding a project and print the icon link
+// Use null coalescing operator to prevent undefined index warning for PHP_SELF
+$phpSelf = $_SERVER['PHP_SELF'] ?? '';
+
+// Ensure that $soc is an object and the 'id' property is defined to avoid warnings
+$socId = isset($soc->id) ? (int)$soc->id : 0; // default to 0 if not set
+
+// Build the back page URL parameter
+$backToPage = urlencode($phpSelf . '?action=create&socid=' . $socId);
+
+// Build the final URL for creating a new project
+$addProjectUrl = DOL_URL_ROOT . '/projet/card.php?socid=' . $socId . '&action=create&status=1&backtopage=' . $backToPage;
+
+
+print '<a href="' . $addProjectUrl . '"><span class="fa fa-plus-circle valignmiddle" title="' . $langs->trans("AddProject") . '"></span></a>';
+
+// Print the submit button input
+print '<td><input type="submit" class="button" name="save" value="' . $langs->trans("Save") . '">';
+	
 	print '</td></tr>';
 
     print '<tr class="oddeven"><td><label for="EnvironmentProject">' . $langs->trans("EnvironmentProject") . '</label></td><td>';
     $formproject->select_projects(-1,  $conf->global->DIGIRISKDOLIBARR_ENVIRONMENT_PROJECT, 'EnvironmentProject', 0, 0, 0, 0, 0, 0, 0, '', 0, 0, 'maxwidth500');
-    print ' <a href="' . DOL_URL_ROOT . '/projet/card.php?socid=' . $soc->id . '&action=create&status=1&backtopage=' . urlencode($_SERVER["PHP_SELF"] . '?action=create&socid=' . $soc->id) . '"><span class="fa fa-plus-circle valignmiddle" title="' . $langs->trans("AddProject") . '"></span></a>';
+// Ensure required variables are defined to prevent undefined variable warnings in PHP 8
+if (!isset($soc->id, $_SERVER["PHP_SELF"], $langs)) {
+    // One or more necessary variables are missing; skip outputting the link.
+    return;
+}
+
+// Construct the 'backtopage' parameter using urlencode for safe URL encoding
+$backtopage = urlencode($_SERVER["PHP_SELF"] . '?action=create&socid=' . $soc->id);
+
+// Build the complete URL for creating a project
+$url = DOL_URL_ROOT . '/projet/card.php?socid=' . $soc->id . '&action=create&status=1&backtopage=' . $backtopage;
+
+// Output the link with proper HTML escaping to avoid XSS issues
+print ' <a href="' . htmlspecialchars($url, ENT_QUOTES, 'UTF-8') . '">
+    <span class="fa fa-plus-circle valignmiddle" title="' . htmlspecialchars($langs->trans("AddProject"), ENT_QUOTES, 'UTF-8') . '"></span>
+</a>';
     print '<td><input type="submit" class="button" name="save" value="' . $langs->trans("Save") . '">';
     print '</td></tr>';
 

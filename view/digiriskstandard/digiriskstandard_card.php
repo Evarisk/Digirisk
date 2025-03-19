@@ -102,7 +102,6 @@ $project->fetch(getDolGlobalInt('DIGIRISKDOLIBARR_DU_PROJECT'));
 $moreHtmlRef .= $langs->trans('Project') . ' : ' . getNomUrlProject($project, 1, 'blank', 1);
 $moreHtmlRef .= '</div>';
 
-$moduleNameLowerCase = 'mycompany';
 saturne_banner_tab($object,'ref','none', 0, 'ref', 'ref', $moreHtmlRef, true);
 $moduleNameLowerCase = 'digiriskdolibarr';
 

@@ -359,6 +359,8 @@ $varpage = empty($contextpage) ? $_SERVER["PHP_SELF"] : $contextpage;
 
 $arrayfields['Victim'] = array('label' => 'Victim', 'checked' => 1);
 
+$param = $param ?? -1;
+
 print_barre_liste($title, $page, $_SERVER["PHP_SELF"], $param, $sortfield, $sortorder, $massactionbutton, $num, $nbtotalofrecords, 'object_' . $accident->picto, 0, $newcardbutton, '', $limit, 0, 0, 1);
 
 $selectedfields                         = $form->multiSelectArrayWithCheckbox('selectedfields', $arrayfields, $varpage); // This also change content of $arrayfields

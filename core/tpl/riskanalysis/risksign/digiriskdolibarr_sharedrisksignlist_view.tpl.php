@@ -73,11 +73,11 @@ $sql                                                                            
 $sql                                                                                                                                                  .= " FROM " . MAIN_DB_PREFIX . $risksign->table_element . " as t";
 $sql                                                                                                                                          		  .= " LEFT JOIN " . MAIN_DB_PREFIX . $digiriskelement->table_element . " as e on (t.fk_element = e.rowid)";
 $sql                                                                                                                                         		  .= " INNER JOIN " . MAIN_DB_PREFIX . 'element_element' . " as el on (t.rowid = el.fk_source)";
-if (is_array($extrafields->attributes[$risksign->table_element]['label']) && count($extrafields->attributes[$risksign->table_element]['label'])) $sql .= " LEFT JOIN " . MAIN_DB_PREFIX . $risksign->table_element . "_extrafields as ef on (t.rowid = ef.fk_object)";
+if (isset($extrafields->attributes[$risksign->table_element]['label']) && is_array($extrafields->attributes[$risksign->table_element]['label']) && count($extrafields->attributes[$risksign->table_element]['label'])) $sql .= " LEFT JOIN " . MAIN_DB_PREFIX . $risksign->table_element . "_extrafields as ef on (t.rowid = ef.fk_object)";
 //if ($risksign->ismultientitymanaged == 1) $sql                                                                                                        .= " WHERE t.entity IN (" . getEntity($risksign->element) . ")";
 //else $sql                                                                                                                                             .= " WHERE 1 = 1";
 //$sql                                                                                                                                                  .= " AND fk_element = " . $id;
-if ( ! $allRisks) {
+if ( empty($allRisks)) {
 	$sql .= " AND el.fk_target = " . $id;
 	$sql .= " AND el.sourcetype = 'digiriskdolibarr_risksign'";
 	$sql .= " AND t.entity IN (" . getEntity($risksign->element) . ") ";
@@ -106,36 +106,53 @@ if ( ! $allRisks) {
 $search['fk_element_shared'] = GETPOST('search_fk_element_shared');
 
 foreach ($search as $key => $val) {
-	if ($key == 'status' && $search[$key] == -1) continue;
-	$mode_search = (($risksign->isInt($risksign->fields[$key]) || $risksign->isFloat($risksign->fields[$key])) ? 1 : 0);
-	if (strpos($risksign->fields[$key]['type'], 'integer:') === 0) {
-		if ($search[$key] == '-1') $search[$key] = '';
-		$mode_search                             = 2;
-	}
-	if ($key == 'category') {
-		$mode_search = 1;
-	}
+    // Skip 'status' search when value equals -1
+    if ($key == 'status' && $val == -1) continue;
 
-	if($search[$key] == '-1') {
-		$search[$key] = '';
-	}
+    // Safely retrieve the field definition
+    $field = isset($risksign->fields[$key]) ? $risksign->fields[$key] : null;
 
-	if ($search[$key] != '' && $key != 'fk_element') {
-		if ($key == 'ref') {
-			$sql .= " AND (t.ref = '$search[$key]')";
-		} elseif ($key == 'fk_element') {
-			if ( $search[$key] > 0){
-				$sql .= " AND (e.rowid = '$search[$key]')";
-			}
-		} elseif ($key == 'entity') {
-			$sql .= " AND (e.entity = '$search[$key]')";
-		} elseif ($key == 'fk_element_shared') {
-			$sql .= " AND (t.fk_element = '$search[$key]')";
-		} else {
-			$sql .= natural_search('t.'.$key, $search[$key], (($key == 'status') ? 2 : $mode_search));
-		}
-	}
+    // Determine search mode based on field type (integer/float) if defined
+    $mode_search = ($field && ($risksign->isInt($field) || $risksign->isFloat($field))) ? 1 : 0;
+
+    // If field type is defined as an integer type, adjust search mode and value
+    if (is_array($field) && isset($field['type']) && strpos($field['type'], 'integer:') === 0) {
+        if ($val === '-1') {
+            $val = '';
+            $search[$key] = '';
+        }
+        $mode_search = 2;
+    }
+
+    // Force search mode to 1 for 'category'
+    if ($key == 'category') {
+        $mode_search = 1;
+    }
+
+    // Convert search value '-1' to empty string
+    if ($val === '-1') {
+        $val = '';
+        $search[$key] = '';
+    }
+
+    // Build SQL only if search value is not empty and key is not 'fk_element'
+    if ($val !== '' && $key != 'fk_element') {
+        if ($key == 'ref') {
+            $sql .= " AND (t.ref = '$val')";
+        } elseif ($key == 'fk_element') {
+            if ($val > 0) {
+                $sql .= " AND (e.rowid = '$val')";
+            }
+        } elseif ($key == 'entity') {
+            $sql .= " AND (e.entity = '$val')";
+        } elseif ($key == 'fk_element_shared') {
+            $sql .= " AND (t.fk_element = '$val')";
+        } else {
+            $sql .= natural_search('t.' . $key, $val, ($key == 'status' ? 2 : $mode_search));
+        }
+    }
 }
+
 if ($search_all) $sql .= natural_search(array_keys($fieldstosearchall), $search_all);
 // Add where from extra fields
 include DOL_DOCUMENT_ROOT . '/core/tpl/extrafields_list_search_sql.tpl.php';
@@ -248,46 +265,91 @@ print '<table class="tagtable nobottomiftotal liste' . ($moreforfilter ? " listw
 // --------------------------------------------------------------------
 print '<tr class="liste_titre">';
 foreach ($risksign->fields as $key => $val) {
-	$cssforfield                        = (empty($val['css']) ? '' : $val['css']);
-	if ($key == 'status') $cssforfield .= ($cssforfield ? ' ' : '') . 'center';
-	if ( ! empty($arrayfields['t.' . $key]['checked'])) {
-		print '<td class="liste_titre' . ($cssforfield ? ' ' . $cssforfield : '') . '">';
-		if (is_array($val['arrayofkeyval'])) print $form->selectarray('search_' . $key, $val['arrayofkeyval'], $search[$key], $val['notnull'], 0, 0, '', 1, 0, 0, '', 'maxwidth75');
-		elseif (strpos($val['type'], 'integer:') === 0) {
-			print $risksign->showInputField($val, $key, $search[$key], '', '', 'search_', 'maxwidth150', 1);
-		} elseif ($key == 'entity') {
-			print select_entity_list($search['entity'], 'search_entity', 'e.rowid NOT IN (' . $conf->entity . ')');
-		} elseif ($key == 'fk_element') {
-			print $digiriskelement->selectDigiriskElementList($search['fk_element_shared'], 'search_fk_element_shared', ['customsql' => 's.entity NOT IN (' . $conf->entity . ')'], 1, 0, array(), 0, 0, 'minwidth100 maxwidth300', 0, false, 1, $contextpage, false);
-		} elseif ($key == 'category') { ?>
-			<div class="wpeo-dropdown dropdown-large dropdown-grid category-danger padding" style="position: inherit">
-				<input class="input-hidden-danger" type="hidden" name="<?php echo 'search_' . $key ?>" value="<?php echo dol_escape_htmltag($search[$key]) ?>" />
-				<?php if (dol_strlen(dol_escape_htmltag($search[$key])) == 0) : ?>
-					<div class="dropdown-toggle dropdown-add-button">
-						<span class="wpeo-button button-square-50 button-grey"><i class="fas fa-map-signs button-icon"></i></span>
-						<img class="danger-category-pic wpeo-tooltip-event hidden" src="" aria-label=""/>
-					</div>
-				<?php else : ?>
-					<div class="dropdown-toggle dropdown-add-button wpeo-tooltip-event" aria-label="<?php echo (empty(dol_escape_htmltag($search[$key]))) ? $risksign->getRiskSignCategoryName($risksign) : $risksign->getRiskSignCategoryNameByPosition($search[$key]); ?>">
-						<img class="danger-category-pic tooltip hover" src="<?php echo DOL_URL_ROOT . '/custom/digiriskdolibarr/img/' . ((empty(dol_escape_htmltag($search[$key]))) ? $risksign->getRiskSignCategory($risksign) : $risksign->getRiskSignCategoryByPosition($search[$key])) ?>" />
-					</div>
-				<?php endif; ?>
-				<ul class="saturne-dropdown-content wpeo-gridlayout grid-5 grid-gap-0">
-					<?php
-					$risksignCategories = $risksign->getRiskSignCategories();
-					if ( ! empty($risksignCategories) ) :
-						foreach ($risksignCategories as $risksignCategory) : ?>
-							<li class="item dropdown-item wpeo-tooltip-event classfortooltip" data-is-preset="<?php echo ''; ?>" data-id="<?php echo $risksignCategory['position'] ?>" aria-label="<?php echo $risksignCategory['name'] ?>">
-								<img src="<?php echo DOL_URL_ROOT . '/custom/digiriskdolibarr/img/' . $risksignCategory['name_thumbnail'] ?>" class="attachment-thumbail size-thumbnail photo photowithmargin" alt="" loading="lazy" width="48" height="48">
-							</li>
-						<?php endforeach;
-					endif; ?>
-				</ul>
-			</div>
-		<?php } elseif ( ! preg_match('/^(date|timestamp)/', $val['type']) && $key != 'category') print '<input type="text" class="flat maxwidth75" name="search_' . $key . '" value="' . dol_escape_htmltag($search[$key]) . '">';
-		print '</td>';
-	}
+    // Set CSS classes for the field, add "center" for status field
+    $cssforfield = !empty($val['css']) ? $val['css'] : '';
+    if ($key === 'status') {
+        $cssforfield .= ($cssforfield ? ' ' : '') . 'center';
+    }
+    // Check if the field is checked in the arrayfields configuration
+    if (!empty($arrayfields['t.' . $key]['checked'])) {
+        print '<td class="liste_titre' . ($cssforfield ? ' ' . $cssforfield : '') . '">';
+        // Use null coalescing to avoid undefined index warnings for search values
+        $searchValue = $search[$key] ?? '';
+        if (isset($val['arrayofkeyval']) && is_array($val['arrayofkeyval'] )) {
+            print $form->selectarray('search_' . $key, $val['arrayofkeyval'], $searchValue, $val['notnull'] ?? '', 0, 0, '', 1, 0, 0, '', 'maxwidth75');
+        } elseif (isset($val['type']) && strpos($val['type'], 'integer:') === 0) {
+            print $risksign->showInputField($val, $key, $searchValue, '', '', 'search_', 'maxwidth150', 1);
+        } elseif ($key === 'entity') {
+            // Use null coalescing operator for search entity value
+            $searchEntity = $search['entity'] ?? '';
+            print select_entity_list($searchEntity, 'search_entity', 'e.rowid NOT IN (' . $conf->entity . ')');
+        } elseif ($key === 'fk_element') {
+			// Use null coalescing operator for shared fk_element search value
+			$searchFkElement = $search['fk_element_shared'] ?? '';
+
+			// Ensure that $conf->entity is defined and properly formatted as an integer or a comma‐separated list
+			$entity = isset($conf->entity) ? $conf->entity : 0;
+			if (is_array($entity)) {
+				// Convert array values to integers and join with commas
+				$entityList = implode(',', array_map('intval', $entity));
+			} else {
+				// Force single value to integer for safety
+				$entityList = intval($entity);
+			}
+
+			// Remove alias 's.' because the alias might not exist in the query context
+			$customsql = 'entity NOT IN (' . $entityList . ')';
+
+			// Call the function with the corrected custom SQL clause
+			print $digiriskelement->selectDigiriskElementList(
+				$searchFkElement,
+				'search_fk_element_shared',
+				['customsql' => $customsql],
+				1,
+				0,
+				[],
+				0,
+				0,
+				'minwidth100 maxwidth300',
+				0,
+				false,
+				1,
+				$contextpage,
+				false
+			);
+
+        } elseif ($key === 'category') { ?>
+            <div class="wpeo-dropdown dropdown-large dropdown-grid category-danger padding" style="position: inherit">
+                <input class="input-hidden-danger" type="hidden" name="<?php echo 'search_' . $key ?>" value="<?php echo dol_escape_htmltag($searchValue) ?>" />
+                <?php if (dol_strlen(dol_escape_htmltag($searchValue)) == 0) : ?>
+                    <div class="dropdown-toggle dropdown-add-button">
+                        <span class="wpeo-button button-square-50 button-grey"><i class="fas fa-map-signs button-icon"></i></span>
+                        <img class="danger-category-pic wpeo-tooltip-event hidden" src="" aria-label=""/>
+                    </div>
+                <?php else : ?>
+                    <div class="dropdown-toggle dropdown-add-button wpeo-tooltip-event" aria-label="<?php echo (empty(dol_escape_htmltag($searchValue))) ? $risksign->getRiskSignCategoryName($risksign) : $risksign->getRiskSignCategoryNameByPosition($searchValue); ?>">
+                        <img class="danger-category-pic tooltip hover" src="<?php echo DOL_URL_ROOT . '/custom/digiriskdolibarr/img/' . ((empty(dol_escape_htmltag($searchValue))) ? $risksign->getRiskSignCategory($risksign) : $risksign->getRiskSignCategoryByPosition($searchValue)) ?>" />
+                    </div>
+                <?php endif; ?>
+                <ul class="saturne-dropdown-content wpeo-gridlayout grid-5 grid-gap-0">
+                    <?php
+                    $risksignCategories = $risksign->getRiskSignCategories();
+                    if (!empty($risksignCategories)) :
+                        foreach ($risksignCategories as $risksignCategory) : ?>
+                            <li class="item dropdown-item wpeo-tooltip-event classfortooltip" data-is-preset="<?php echo ''; ?>" data-id="<?php echo $risksignCategory['position'] ?>" aria-label="<?php echo $risksignCategory['name'] ?>">
+                                <img src="<?php echo DOL_URL_ROOT . '/custom/digiriskdolibarr/img/' . $risksignCategory['name_thumbnail'] ?>" class="attachment-thumbail size-thumbnail photo photowithmargin" alt="" loading="lazy" width="48" height="48">
+                            </li>
+                        <?php endforeach;
+                    endif; ?>
+                </ul>
+            </div>
+        <?php } elseif (!preg_match('/^(date|timestamp)/', $val['type'] ?? '') && $key !== 'category') {
+            print '<input type="text" class="flat maxwidth75" name="search_' . $key . '" value="' . dol_escape_htmltag($searchValue) . '">';
+        }
+        print '</td>';
+    }
 }
+
 
 // Extra fields
 include DOL_DOCUMENT_ROOT . '/core/tpl/extrafields_list_search_input.tpl.php';

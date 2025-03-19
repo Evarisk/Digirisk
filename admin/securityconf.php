@@ -139,14 +139,15 @@ $socialResources   = array("TitularsCSE", "AlternatesCSE", "TitularsDP", "Altern
 $maxnumber = count($securityResources) + count($securityConsts);
 
 foreach ($securityConsts as $securityConst) {
-	if (dol_strlen($conf->global->$securityConst) > 0) {
+	if (isset($conf->global->$securityConst) && dol_strlen($conf->global->$securityConst) > 0) {
 		$counter += 1;
 	}
 }
 foreach ($securityResources as $securityResource) {
-	if ( ! empty($allLinks[$securityResource] && $allLinks[$securityResource]->id[0] > 0)) {
-		$counter += 1;
-	}
+    // Check if the link exists and if its id is set and greater than zero
+    if (isset($allLinks[$securityResource]) && isset($allLinks[$securityResource]->id[0]) && $allLinks[$securityResource]->id[0] > 0) {
+        $counter++;
+    }
 }
 
 
@@ -424,11 +425,19 @@ print '<tr class="liste_titre"><th class="titlefield wordbreak">' . $langs->tran
 
 // * Responsible to notify - Responsable à prévenir *
 
-$responsibleResources = $allLinks['Responsible'];
+// Retrieve responsible resources if they are set, otherwise assign null
+$responsibleResources = $allLinks['Responsible'] ?? null;
 
 // * Third party concerned - Tiers concerné *
 
-if ($responsibleResources->ref == 'Responsible' && $responsibleResources->id[0] > 0) {
+// Check that the 'ref' and 'id' properties are set, and that 'id' is an array with a valid first element
+if (
+    isset($responsibleResources->ref, $responsibleResources->id) &&
+    $responsibleResources->ref === 'Responsible' &&
+    is_array($responsibleResources->id) &&
+    isset($responsibleResources->id[0]) &&
+    $responsibleResources->id[0] > 0
+) {
 	$usertmp->fetch($responsibleResources->id[0]);
 
 	$userlist = $form->select_dolusers(GETPOST('responsible_socid'), '', 0, null, 0, '', '', 0, 0, 0, 'AND u.statut = 1', 0, '', 'minwidth300', 0, 1);
@@ -486,7 +495,7 @@ print '<tr class="liste_titre"><th class="titlefield">' . $langs->trans("Society
 // * Description - Emplacement de la consigne détaillée *
 
 print '<tr class="oddeven"><td><label for="description">' . $langs->trans("Description") . '</label></td><td>';
-$doleditor = new DolEditor('description', $conf->global->DIGIRISKDOLIBARR_SOCIETY_DESCRIPTION ? $conf->global->DIGIRISKDOLIBARR_SOCIETY_DESCRIPTION : '', '', 200, 'dolibarr_details', '', false, true, $conf->global->FCKEDITOR_ENABLE_SOCIETE, ROWS_3, '90%');
+$doleditor = new DolEditor('description', $conf->global->DIGIRISKDOLIBARR_SOCIETY_DESCRIPTION ?? '', '', 200, 'dolibarr_details', '', false, true, $conf->global->FCKEDITOR_ENABLE_SOCIETE, ROWS_3, '90%');
 $doleditor->Create();
 print '</td></tr>';
 
@@ -529,7 +538,7 @@ print '<tr class="liste_titre"><th class="titlefield wordbreak">' . $langs->tran
 // * Risks evaluation location - Emplacement du Document Unique *
 
 print '<tr class="oddeven"><td><label for="emplacementDU">' . $langs->trans("Location") . '</label></td><td>';
-$doleditor = new DolEditor('emplacementDU', $conf->global->DIGIRISKDOLIBARR_DUER_LOCATION ? $conf->global->DIGIRISKDOLIBARR_DUER_LOCATION : '', '', 200, 'dolibarr_details', '', false, true, $conf->global->FCKEDITOR_ENABLE_SOCIETE, ROWS_3, '90%');
+$doleditor = new DolEditor('emplacementDU', $conf->global->DIGIRISKDOLIBARR_DUER_LOCATION ?? '', '', 200, 'dolibarr_details', '', false, true, $conf->global->FCKEDITOR_ENABLE_SOCIETE, ROWS_3, '90%');
 $doleditor->Create();
 print '</td></tr>';
 

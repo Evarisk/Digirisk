@@ -206,7 +206,7 @@ if (is_array($userTmp->users) && !empty($userTmp->users)) {
 print '</td></tr>';
 
 if (getDolGlobalInt('DIGIRISKDOLIBARR_TICKET_ENABLE_PUBLIC_INTERFACE')) {
-    if (getDolGlobalInt('DIGIRISKDOLIBARR_TICKET_EXTRAFIELDS')) {
+    if (getDolGlobalInt('DIGIRISKDOLIBARR_TICKET_EXTRAFIELDS') || dolibarr_get_const($db, 'DIGIRISKDOLIBARR_TICKET_EXTRAFIELDS', 0)) {
         print load_fiche_titre($langs->transnoentities('PublicInterfaceConfiguration'), $link, '');
 
         print '<table class="noborder centpercent">';

@@ -330,8 +330,13 @@ class TicketDashboard extends DigiriskDolibarrDashboard
 
         $dateStart = dol_mktime(0, 0, 0, GETPOST('dateStartmonth', 'int'), GETPOST('dateStartday', 'int'), GETPOST('dateStartyear', 'int'));
         $dateEnd   = dol_mktime(23, 59, 59, GETPOST('dateEndmonth', 'int'), GETPOST('dateEndday', 'int'), GETPOST('dateEndyear', 'int'));
-        $startYear = !empty($dateStart) ? strftime('%Y', $dateStart) : strftime('%Y', dol_now()) - (!getDolGlobalInt('MAIN_STATS_GRAPHS_SHOW_N_YEARS') ? 2 : max(1, min(10, getDolGlobalInt('MAIN_STATS_GRAPHS_SHOW_N_YEARS'))));
-        $endYear   = strftime('%Y', !empty($dateEnd) ? $dateEnd : dol_now());
+        // Use date() instead of strftime() for PHP 8 compatibility
+        $startYear = !empty($dateStart)
+            ? (int) date('Y', $dateStart)
+            : ((int) date('Y', dol_now()) - (!getDolGlobalInt('MAIN_STATS_GRAPHS_SHOW_N_YEARS')
+                ? 2
+                : max(1, min(10, getDolGlobalInt('MAIN_STATS_GRAPHS_SHOW_N_YEARS')))));
+        $endYear = (int) date('Y', !empty($dateEnd) ? $dateEnd : dol_now());
 
         $labels = [];
         for ($i = $startYear; $i <= $endYear; $i++) {

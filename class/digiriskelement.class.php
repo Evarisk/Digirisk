@@ -118,9 +118,9 @@ class DigiriskElement extends SaturneObject
     /**
      * Constructor.
      *
-     * @param DoliDb $db Database handler.
+     * @param DoliDb  $db Database handler.
      */
-    public function __construct(DoliDB $db)
+    public function __construct(DoliDB|null $db)
     {
         parent::__construct($db, $this->module, $this->element);
     }
@@ -147,7 +147,9 @@ class DigiriskElement extends SaturneObject
             $this->ref = $ref;
         }
         $this->element     = $this->element_type . '@digiriskdolibarr';
-        $this->fk_standard = $conf->global->DIGIRISKDOLIBARR_ACTIVE_STANDARD;
+        // Check if the configuration value is defined, otherwise default to 0
+        $this->fk_standard = isset($conf->global->DIGIRISKDOLIBARR_ACTIVE_STANDARD) ? $conf->global->DIGIRISKDOLIBARR_ACTIVE_STANDARD : 0;
+
         $this->status      = 1;
 
         return $this->createCommon($user, $notrigger);
@@ -173,7 +175,7 @@ class DigiriskElement extends SaturneObject
                 $it = new RecursiveIteratorIterator(new RecursiveArrayIterator($elements));
                 $element = array();
                 foreach ($it as $key => $v) {
-                    $element[$key][$v] = $v;
+                    $element[$key][(string)$v] = $v;
                 }
                 $children_id = array_shift($element);
 
@@ -253,8 +255,8 @@ class DigiriskElement extends SaturneObject
     public function selectDigiriskElementList($selected = '', $htmlname = 'fk_element', $filter = [], $showempty = '1', $forcecombo = 0, $events = array(), $outputmode = 0, $limit = 0, $morecss = 'minwidth100 maxwidth300', $current_element = 0, $multiple = false, $noroot = 0, $contextpage = '', $multientitymanaged = true, $hideref  = false)
     {
         global $conf, $form, $langs;
-
-        if (dol_strlen($filter['customsql'])) {
+        // Check if 'customsql' filter is set and not empty to avoid undefined index warning in PHP 8
+        if (isset($filter['customsql']) && dol_strlen($filter['customsql'])) {
             $filter['customsql'] .= ' AND t.rowid != ' . ($this->id ?? 0);
         }
 
@@ -501,15 +503,30 @@ class DigiriskElement extends SaturneObject
 
         $digiriskstandard = new DigiriskStandard($db);
 
-        // ParentElement
+        // Create a new instance of the current class using the provided database connection
         $parent_element = new self($db);
-        $result         = $parent_element->fetch($this->fk_parent);
+
+        // Check if fk_parent is set and not empty before attempting to fetch
+        if (!empty($this->fk_parent)) {
+            $result = $parent_element->fetch($this->fk_parent);
+        } else {
+            // Log a warning if fk_parent is not defined or empty
+            dol_syslog('Warning: fk_parent is not defined or is empty', LOG_WARNING);
+            $result = -1; // Return an error code or handle the error as appropriate
+        }
         if ($result > 0) {
+            $morehtmlref = $morehtmlref ?? '';
             $morehtmlref .= $langs->trans("Description") . ' : ' . $this->description;
             $morehtmlref .= '<br>' . $langs->trans("ParentElement") . ' : ' . $parent_element->getNomUrl(1, 'blank', 1);
         } else {
             $digiriskstandard->fetch($conf->global->DIGIRISKDOLIBARR_ACTIVE_STANDARD);
-            $morehtmlref .= $langs->trans("Description") . ' : ' . $this->description;
+            // Append the translated "Description" followed by the description value if the property exists
+            if (!isset($morehtmlref)){
+                $morehtmlref = '';
+            }
+            $morehtmlref .= $langs->trans("Description") . ' : ' . (property_exists($this, 'description') ? (string)$this->description : '');
+
+
             $morehtmlref .= '<br>' . $langs->trans("ParentElement") . ' : ' . $digiriskstandard->getNomUrl(1, 'blank', 1);
         }
         $morehtmlref .= '<br>';

@@ -161,16 +161,37 @@ class ActionsDigiriskdolibarr
 			?>
 			<script src="../custom/digiriskdolibarr/js/digiriskdolibarr.js"></script>
 			<?php
-			if ($conf->global->MAIN_INFO_SOCIETE_COUNTRY == '1:FR:France') {
+			if ($conf->global->MAIN_INFO_SOCIETE_COUNTRY == '1:FR:France' || $conf->global->MAIN_INFO_SOCIETE_COUNTRY == '6:CH:Suisse') {
 				require_once __DIR__ . '/../lib/digiriskdolibarr_function.lib.php';
 				$form      = new Form($db);
                 $pictopath = dol_buildpath('/custom/digiriskdolibarr/img/digiriskdolibarr_color.png', 1);
                 $pictoDigirisk = img_picto('', $pictopath, '', 1, 0, 0, '', 'pictoModule');
-				$idcc_form = digirisk_select_dictionary('DIGIRISKDOLIBARR_COLLECTIVE_AGREEMENT_TITLE', 'c_conventions_collectives', 'code', 'libelle', $conf->global->DIGIRISKDOLIBARR_COLLECTIVE_AGREEMENT_TITLE, 1, '', '', 'minwidth100');
-				$pee_input = '<input type="checkbox" name="DIGIRISKDOLIBARR_PEE_ENABLED" '. ($conf->global->DIGIRISKDOLIBARR_PEE_ENABLED ? 'checked' : '') .'>';
+				// Retrieve the collective agreement title from configuration, defaulting to an empty string if not set
+				$agreementTitle = $conf->global->DIGIRISKDOLIBARR_COLLECTIVE_AGREEMENT_TITLE ?? '';
+
+				// Call the dictionary selection function with the retrieved value
+				$idcc_form = digirisk_select_dictionary(
+					'DIGIRISKDOLIBARR_COLLECTIVE_AGREEMENT_TITLE',
+					'c_conventions_collectives',
+					'code',
+					'libelle',
+					$agreementTitle,
+					1,
+					'',
+					'',
+					'minwidth100'
+				);
+								$pee_input = '<input type="checkbox" name="DIGIRISKDOLIBARR_PEE_ENABLED" '. ($conf->global->DIGIRISKDOLIBARR_PEE_ENABLED ? 'checked' : '') .'>';
 				$perco_input = '<input type="checkbox" name="DIGIRISKDOLIBARR_PERCO_ENABLED" '. ($conf->global->DIGIRISKDOLIBARR_PERCO_ENABLED ? 'checked' : '') .'>';
-				$nbemployees_input = '<input type="number" name="DIGIRISKDOLIBARR_NB_EMPLOYEES" class="minwidth200" value="' . $conf->global->DIGIRISKDOLIBARR_NB_EMPLOYEES . '"' . ($conf->global->DIGIRISKDOLIBARR_MANUAL_INPUT_NB_EMPLOYEES ? '' : 'disabled') . '>';
-				$nbworkedhours_input = '<input type="number" name="DIGIRISKDOLIBARR_NB_WORKED_HOURS" class="minwidth200" value="' . $conf->global->DIGIRISKDOLIBARR_NB_WORKED_HOURS . '"' . ($conf->global->DIGIRISKDOLIBARR_MANUAL_INPUT_NB_WORKED_HOURS ? '' : 'disabled') . '>';
+				// Generate input for number of employees, using null coalescing to ensure the variable is defined
+				$nbemployees_input = '<input type="number" name="DIGIRISKDOLIBARR_NB_EMPLOYEES" class="minwidth200" value="' 
+					. ($conf->global->DIGIRISKDOLIBARR_NB_EMPLOYEES ?? '') . '"'
+					. ( ($conf->global->DIGIRISKDOLIBARR_MANUAL_INPUT_NB_EMPLOYEES ?? 0) ? '' : ' disabled') . '>';
+
+				// Generate input for number of worked hours, using null coalescing to ensure the variable is defined
+				$nbworkedhours_input = '<input type="number" name="DIGIRISKDOLIBARR_NB_WORKED_HOURS" class="minwidth200" value="' 
+					. ($conf->global->DIGIRISKDOLIBARR_NB_WORKED_HOURS ?? '') . '"'
+					. ( ($conf->global->DIGIRISKDOLIBARR_MANUAL_INPUT_NB_WORKED_HOURS ?? 0) ? '' : ' disabled') . '>';
 				?>
 				<script>
 					let collectiveAgreementDictionary = $('<tr class="oddeven"><td><label for="selectidcc_id"><?php print $pictoDigirisk . $form->textwithpicto($langs->trans('IDCC'), $langs->trans('IDCCTooltip'));?></label></td>');
@@ -339,6 +360,7 @@ class ActionsDigiriskdolibarr
 			if ((GETPOST('action') == '' || empty(GETPOST('action')) || GETPOST('action') != 'edit')) {
 				require_once DOL_DOCUMENT_ROOT.'/projet/class/project.class.php';
 				require_once DOL_DOCUMENT_ROOT.'/projet/class/task.class.php';
+				require_once DOL_DOCUMENT_ROOT.'/custom/saturne/class/task/saturnetask.class.php';
 
 				$task    = new SaturneTask($db);
 				$project = new Project($db);
@@ -356,18 +378,49 @@ class ActionsDigiriskdolibarr
                             $task->fetch(GETPOST('id'));
                             $projectId = $task->fk_project;
                         }
-                        $allTasks = $task->getTasksArray(null, null, $projectId, 0, 0, '', '-1', '', 0, 0, $extrafields);
+						// Ensure $projectId is defined; default to 0 if not already set
+						$projectId = $projectId ?? 0;
+
+						// Ensure $extrafields is defined; default to an empty array if not already set
+						$extrafields = $extrafields ?? [];
+
+						// Retrieve tasks array with the specified filters and default values
+						$allTasks = $task->getTasksArray(
+							null,      // First parameter: unused filter or search criteria
+							null,      // Second parameter: unused filter or search criteria
+							$projectId,// Filter by project ID
+							0,         // Fourth parameter: status filter (default: 0)
+							0,         // Fifth parameter: additional filter (default: 0)
+							'',        // Sixth parameter: search term (default: empty string)
+							'-1',      // Seventh parameter: task status (-1 indicates all statuses)
+							'',        // Eighth parameter: sort order or extra filter (default: empty string)
+							0,         // Ninth parameter: pagination offset (default: 0)
+							0,         // Tenth parameter: pagination limit (default: 0)
+							$extrafields  // Extra fields array for additional task details
+						);
+
                         if (is_array($allTasks) && !empty($allTasks)) {
                             $nbTasks = count($allTasks);
                             foreach ($allTasks as $taskSingle) {
                                 $filter       = ' AND fk_element = ' . $taskSingle->id;
                                 $allTimespent = $task->fetchAllTimeSpentAllUsers($filter);
-                                foreach ($allTimespent as $timespent) {
-                                    $totatConsumedTimeAmount += convertSecondToTime($timespent->timespent_duration, 'allhourmin') * $timespent->timespent_thm;
-                                }
-                                $totalConsumedTime += $taskSingle->duration;
-                                $totalProgress     += $taskSingle->progress;
-                                $totalTasksBudget  += $taskSingle->budget_amount;
+						// Initialize total consumed time amount if not already set
+						if (!isset($totatConsumedTimeAmount)) {
+							$totatConsumedTimeAmount = 0;
+						}
+
+						foreach ($allTimespent as $timespent) {
+							// Check if both properties exist to avoid warnings in PHP 8
+							if (isset($timespent->timespent_duration, $timespent->timespent_thm)) {
+								// Convert seconds to time (ensuring numeric conversion) and multiply by the hourly rate
+								$convertedTime = convertSecondToTime((int)$timespent->timespent_duration, 'allhourmin');
+								$totatConsumedTimeAmount += (float)$convertedTime * (float)$timespent->timespent_thm;
+							}
+						}
+
+								$totalConsumedTime = ($totalConsumedTime ?? 0) + ($taskSingle->duration ?? 0);
+								$totalProgress     = ($totalProgress ?? 0) + ($taskSingle->progress ?? 0);
+								$totalTasksBudget  = ($totalTasksBudget ?? 0) + ($taskSingle->budget_amount ?? 0);
                             }
                         } else {
                             $totalConsumedTime       = 0;
@@ -377,13 +430,17 @@ class ActionsDigiriskdolibarr
                             $totalTasksBudget        = 0;
                         }
                         $outTotatConsumedTime       = '<tr><td>' . $langs->trans('TotalConsumedTime') . '</td><td>' . convertSecondToTime($totalConsumedTime, 'allhourmin') . '</td></tr>';
-                        $outTotatConsumedTimeAmount = '<tr><td>' . $langs->trans('TotalConsumedTimeAmount') . '</td><td>' . price($totatConsumedTimeAmount, 0, $langs, 1, -1, 2, $conf->currency) . '</td></tr>';
+						// Ensure that the variable holding the consumed time amount is defined to avoid warnings (default to 0 if not set)
+						$totalConsumedTimeAmount = isset($totatConsumedTimeAmount) ? $totatConsumedTimeAmount : 0;
+
+						// Build the table row with translation and formatted price, compatible with Dolibarr V20
+						$outTotalConsumedTimeAmount = '<tr><td>' . $langs->trans('TotalConsumedTimeAmount') . '</td><td>' . price($totalConsumedTimeAmount, 0, $langs, 1, -1, 2, $conf->currency) . '</td></tr>';
                         $outNbtasks                 = '<tr><td>' . $langs->trans('NbTasks') . '</td><td>' . $nbTasks . '</td></tr>';
                         $outTotalProgress           = '<tr><td>' . $langs->trans('TotalProgress') . '</td><td>' . (($totalProgress) ? price2num($totalProgress/$nbTasks, 2) . ' %' : '0 %') . '</td></tr>';
                         $outTotalTasksBudget        = '<tr><td>' . $langs->trans('TotalBudget') . '</td><td>' . price($totalTasksBudget, 0, $langs, 1, -1, 2, $conf->currency) . '</td></tr>';?>
                         <script>
                             jQuery('.fichecenter .fichehalfright .tableforfield tbody tr:last-child').first().after(<?php echo json_encode($outTotatConsumedTime) ?>);
-                            jQuery('.fichecenter .fichehalfright .tableforfield tbody tr:last-child').first().after(<?php echo json_encode($outTotatConsumedTimeAmount) ?>);
+                            jQuery('.fichecenter .fichehalfright .tableforfield tbody tr:last-child').first().after(<?php echo json_encode($outTotatConsumedTimeAmount ?? 0) ?>);
                             jQuery('.fichecenter .fichehalfright .tableforfield tbody tr:last-child').first().after(<?php echo json_encode($outNbtasks) ?>);
                             jQuery('.fichecenter .fichehalfright .tableforfield tbody tr:last-child').first().after(<?php echo json_encode($outTotalProgress) ?>);
                             jQuery('.fichecenter .fichehalfright .tableforfield tbody tr:last-child').first().after(<?php echo json_encode($outTotalTasksBudget) ?>);

@@ -1429,7 +1429,7 @@ class modDigiriskdolibarr extends DolibarrModules
             'titre'    => '<i class="fas fa-tasks pictofixedwidth" style="padding-right: 4px;"></i>' . $langs->trans('PAPRIPACT'),
             'mainmenu' => 'digiriskdolibarr',
             'leftmenu' => 'digiriskactionplan',
-            'url'      => '/projet/tasks.php?id=' . $conf->global->DIGIRISKDOLIBARR_DU_PROJECT,
+            'url' => '/projet/tasks.php?id=' . ($conf->global->DIGIRISKDOLIBARR_DU_PROJECT ?? ''),
             'langs'    => 'digiriskdolibarr@digiriskdolibarr',
             'position' => 100 + $r,
             'enabled'  => '$conf->digiriskdolibarr->enabled && $conf->projet->enabled',
@@ -1490,7 +1490,7 @@ class modDigiriskdolibarr extends DolibarrModules
             'titre'    => '<i class="fas fa-tasks pictofixedwidth" style="padding-right: 4px;"></i>' . $langs->trans('ActionPlan'),
             'mainmenu' => 'digiriskdolibarr',
             'leftmenu' => 'digiriskenvironmentalactionplan',
-            'url'      => '/projet/tasks.php?id=' . $conf->global->DIGIRISKDOLIBARR_ENVIRONMENT_PROJECT,
+            'url'      => '/projet/tasks.php?id=' . ($conf->global->DIGIRISKDOLIBARR_ENVIRONMENT_PROJECT ?? ''),
             'langs'    => 'digiriskdolibarr@digiriskdolibarr',
             'position' => 100 + $r,
             'enabled'  => '$conf->digiriskdolibarr->enabled && $conf->projet->enabled',
@@ -1662,7 +1662,7 @@ class modDigiriskdolibarr extends DolibarrModules
 			'prefix'   => '<i class="fa fa-ticket-alt pictofixedwidth"></i>',
 			'mainmenu' => 'digiriskdolibarr',
 			'leftmenu' => '',
-			'url'      => '/custom/digiriskdolibarr/public/ticket/create_ticket.php' . ((!$conf->multicompany->enabled) ? '?entity=' . $conf->entity : ''),
+			'url' => '/custom/digiriskdolibarr/public/ticket/create_ticket.php'. ((!($conf->multicompany->enabled ?? false) && ($conf->entity ?? false)) ? '?entity=' . $conf->entity : ''),
 			'langs'    => '',	        // Lang file to use (without .lang) by module. File must be in langs/code_CODE/ directory.
 			'position' => 100 + $r,
 			'enabled'  => '$conf->digiriskdolibarr->enabled && $conf->global->DIGIRISKDOLIBARR_TICKET_ENABLE_PUBLIC_INTERFACE',  // Define condition to show or hide menu entry. Use '$conf->digiriskdolibarr->enabled' if entry must be visible if module is enabled. Use '$leftmenu==\'system\'' to show if leftmenu system is selected.
@@ -2002,7 +2002,7 @@ class modDigiriskdolibarr extends DolibarrModules
         addDocumentModel('accidentinvestigationdocument_odt', 'accidentinvestigationdocument', 'ODT templates', 'DIGIRISKDOLIBARR_ACCIDENTINVESTIGATIONDOCUMENT_ADDON_ODT_PATH');
         addDocumentModel('registerdocument_odt', 'registerdocument', 'ODT templates', 'DIGIRISKDOLIBARR_REGISTERDOCUMENT_ADDON_ODT_PATH');
 
-		if ( $conf->global->DIGIRISKDOLIBARR_DIGIRISKELEMENT_TRASH == 0 ) {
+		if (isset($conf->global->DIGIRISKDOLIBARR_DIGIRISKELEMENT_TRASH) && $conf->global->DIGIRISKDOLIBARR_DIGIRISKELEMENT_TRASH == 0) {
 			require_once __DIR__ . '/../../class/digiriskelement/groupment.class.php';
 
 			$trashRef                      = 'GP0';
@@ -2018,7 +2018,7 @@ class modDigiriskdolibarr extends DolibarrModules
 			dolibarr_set_const($this->db, 'DIGIRISKDOLIBARR_DIGIRISKELEMENT_TRASH', $trash_id, 'integer', 0, '', $conf->entity);
 		}
 
-		if ( $conf->global->DIGIRISKDOLIBARR_ACTIVE_STANDARD == 0 ) {
+		if (isset($conf->global->DIGIRISKDOLIBARR_ACTIVE_STANDARD ) && $conf->global->DIGIRISKDOLIBARR_ACTIVE_STANDARD == 0 ) {
 			require_once __DIR__ . '/../../class/digiriskstandard.class.php';
 
 			$digiriskstandard                = new DigiriskStandard($this->db);
@@ -2235,7 +2235,9 @@ class modDigiriskdolibarr extends DolibarrModules
         saturne_manage_extrafields($extraFieldsArrays, $commonExtraFieldsValue);
 
 		//DigiriskElement favorite medias backward compatibility
-		if ($conf->global->DIGIRISKDOLIBARR_DIGIRISKELEMENT_MEDIAS_BACKWARD_COMPATIBILITY == 0) {
+		// Check if the backward compatibility flag is set and equals 0
+		if (isset($conf->global->DIGIRISKDOLIBARR_DIGIRISKELEMENT_MEDIAS_BACKWARD_COMPATIBILITY) && $conf->global->DIGIRISKDOLIBARR_DIGIRISKELEMENT_MEDIAS_BACKWARD_COMPATIBILITY == 0) {
+
 			require_once __DIR__ . '/../../class/digiriskelement.class.php';
 
 			$digiriskelement     = new DigiriskElement($this->db);
@@ -2316,7 +2318,7 @@ class modDigiriskdolibarr extends DolibarrModules
             dolibarr_set_const($this->db, 'DIGIRISKDOLIBARR_PROJECT_TAGS_SET', 4, 'integer', 0, '', $conf->entity);
         }
 
-		if ($conf->global->DIGIRISKDOLIBARR_TRIGGERS_UPDATED == 0) {
+		if (isset($conf->global->DIGIRISKDOLIBARR_TRIGGERS_UPDATED ) && $conf->global->DIGIRISKDOLIBARR_TRIGGERS_UPDATED == 0) {
 			require_once DOL_DOCUMENT_ROOT . '/comm/action/class/actioncomm.class.php';
 
 			$actioncomm = new Actioncomm($this->db);

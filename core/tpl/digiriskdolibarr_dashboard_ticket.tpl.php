@@ -85,7 +85,7 @@ if (empty($conf->global->MAIN_DISABLE_WORKBOARD)) {
 		exit;
 	}
 
-	$disabledDashboardInfos = json_decode($user->conf->DIGIRISKDOLIBARR_TICKET_DISABLED_DASHBOARD_INFO);
+	$disabledDashboardInfos = json_decode($user->conf->DIGIRISKDOLIBARR_TICKET_DISABLED_DASHBOARD_INFO ?? '' ) ;
 	if (!empty($disabledDashboardInfos)) {
 		foreach ($disabledDashboardInfos as $key => $disabledDashboardInfo) {
 			if (GETPOST('id')) {
@@ -112,7 +112,7 @@ if (empty($conf->global->MAIN_DISABLE_WORKBOARD)) {
 
 	print '<div class="add-widget-box" style="'. (!empty($disabled_digiriskelements) ? '' : 'display:none').'">';
 
-	print Form::selectarray('boxcombo', $disabled_digiriskelements, -1, $langs->trans("ChooseBoxToAdd") . '...', 0, 0, '', 0, 0, 0, 'ASC', 'maxwidth150onsmartphone hideonprint add-dashboard-info', 0, 'hidden selected', 0, 1);
+	print Form::selectarray('boxcombo', ($disabled_digiriskelements ?? []), -1, $langs->trans("ChooseBoxToAdd") . '...', 0, 0, '', 0, 0, 0, 'ASC', 'maxwidth150onsmartphone hideonprint add-dashboard-info', 0, 'hidden selected', 0, 1);
 	if (!empty($conf->use_javascript_ajax)) {
 		include_once DOL_DOCUMENT_ROOT . '/core/lib/ajax.lib.php';
 		print ajax_combobox("boxcombo");

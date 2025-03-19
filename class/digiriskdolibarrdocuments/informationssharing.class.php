@@ -83,7 +83,21 @@ class InformationsSharing extends DigiriskDocuments
 			}
 
 			$harassment_officer = new User($this->db);
-			$result = $harassment_officer->fetch($digirisk_resources['HarassmentOfficer']->id[0]);
+			// Check that the 'HarassmentOfficer' resource exists and that its 'id' array is defined with at least one element
+			if (
+				!empty($digirisk_resources['HarassmentOfficer']) &&
+				is_object($digirisk_resources['HarassmentOfficer']) &&
+				isset($digirisk_resources['HarassmentOfficer']->id) &&
+				is_array($digirisk_resources['HarassmentOfficer']->id) &&
+				isset($digirisk_resources['HarassmentOfficer']->id[0])
+			) {
+				$result = $harassment_officer->fetch($digirisk_resources['HarassmentOfficer']->id[0]);
+			} else {
+				// Error handling: HarassmentOfficer resource is missing or its id is not properly set
+				$result = false;
+				// Optionally log an error message here to help with debugging
+			}
+
 
 			if ($result > 0) {
 				$json['InformationsSharing']['harassment_officer']['id']    = $harassment_officer->id;
@@ -93,7 +107,18 @@ class InformationsSharing extends DigiriskDocuments
 			}
 
 			$harassment_officer_cse = new User($this->db);
-			$result = $harassment_officer_cse->fetch($digirisk_resources['HarassmentOfficerCSE']->id[0]);
+			// Use PHP8 nullsafe operator to safely access the resource ID and avoid undefined variable warnings
+			$id = $digirisk_resources['HarassmentOfficerCSE']?->id[0] ?? null;
+
+			if ($id !== null) {
+				// Fetch the record using the valid resource ID
+				$result = $harassment_officer_cse->fetch($id);
+			} else {
+				// Log a warning if the resource ID is not defined and set an error result
+				dol_syslog("Warning: HarassmentOfficerCSE resource ID is not defined", LOG_WARNING);
+				$result = -1; // Or use another error handling mechanism as needed
+			}
+
 
 			if ($result > 0) {
 				$json['InformationsSharing']['harassment_officer_cse']['id']    = $harassment_officer_cse->id;
@@ -101,7 +126,12 @@ class InformationsSharing extends DigiriskDocuments
 				$json['InformationsSharing']['harassment_officer_cse']['phone'] = $harassment_officer_cse->office_phone;
 			}
 
-			$json['InformationsSharing']['delegues_du_personnels_date']    	  = (dol_strlen($conf->global->DIGIRISKDOLIBARR_DP_ELECTION_DATE) > 0 && $conf->global->DIGIRISKDOLIBARR_DP_ELECTION_DATE != '--' ? $conf->global->DIGIRISKDOLIBARR_DP_ELECTION_DATE : '');
+			// Check if the election date configuration is set, non-empty, and not a placeholder value
+			$json['InformationsSharing']['delegues_du_personnels_date'] = (
+				isset($conf->global->DIGIRISKDOLIBARR_DP_ELECTION_DATE) &&
+				dol_strlen($conf->global->DIGIRISKDOLIBARR_DP_ELECTION_DATE) > 0 &&
+				$conf->global->DIGIRISKDOLIBARR_DP_ELECTION_DATE !== '--'
+			) ? $conf->global->DIGIRISKDOLIBARR_DP_ELECTION_DATE : '';
 			$json['InformationsSharing']['delegues_du_personnels_titulaires'] = '';
             $json['InformationsSharing']['delegues_du_personnels_titulairesFullName'] = '';
 			if (!empty ($digirisk_resources['TitularsDP']->id )) {
@@ -131,7 +161,11 @@ class InformationsSharing extends DigiriskDocuments
 			}
 
 			// CSE
-			$json['InformationsSharing']['membres_du_comite_entreprise_date']       = (dol_strlen($conf->global->DIGIRISKDOLIBARR_CSE_ELECTION_DATE) > 0 && $conf->global->DIGIRISKDOLIBARR_CSE_ELECTION_DATE != '--' ? $conf->global->DIGIRISKDOLIBARR_CSE_ELECTION_DATE : '');
+			// Retrieve the election date from global configuration if set, otherwise default to an empty string
+			$electionDate = isset($conf->global->DIGIRISKDOLIBARR_CSE_ELECTION_DATE) ? $conf->global->DIGIRISKDOLIBARR_CSE_ELECTION_DATE : '';
+
+			// Assign the election date to the JSON output if it is non-empty and not equal to '--'
+			$json['InformationsSharing']['membres_du_comite_entreprise_date'] = (dol_strlen($electionDate) > 0 && $electionDate !== '--' ? $electionDate : '');
 			$json['InformationsSharing']['membres_du_comite_entreprise_titulaires'] = '';
             $json['InformationsSharing']['membres_du_comite_entreprise_titulairesFullName'] = '';
 			if (!empty ($digirisk_resources['TitularsCSE']->id )) {

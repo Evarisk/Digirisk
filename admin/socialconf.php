@@ -126,14 +126,16 @@ $socialConsts    = array("DIGIRISKDOLIBARR_PARTICIPATION_AGREEMENT_INFORMATION_P
 $maxnumber = count($socialResources) + count($socialConsts);
 
 foreach ($socialConsts as $socialConst) {
-	if (dol_strlen($conf->global->$socialConst) > 0 && $conf->global->$socialConst != '--') {
-		$counter += 1;
-	}
+    // Check if the global property exists and is not empty or equal to '--'
+    if (isset($conf->global->$socialConst) && dol_strlen($conf->global->$socialConst) > 0 && $conf->global->$socialConst !== '--') {
+        $counter++;
+    }
 }
 foreach ($socialResources as $socialResource) {
-	if ( ! empty($allLinks[$socialResource] && $allLinks[$socialResource]->id[0] > 0)) {
-		$counter += 1;
-	}
+    // Check if $allLinks contains the resource and if the first element of its 'id' property is set and greater than 0
+    if (!empty($allLinks[$socialResource]) && isset($allLinks[$socialResource]->id[0]) && $allLinks[$socialResource]->id[0] > 0) {
+        $counter++;
+    }
 }
 
 llxHeader('', $title, $help_url, '', '', '', $morejs, $morecss);
@@ -149,8 +151,10 @@ $resources = new DigiriskResources($db);
 
 $allLinks = $resources->fetchDigiriskResources();
 
-$electionDateCSE = $conf->global->DIGIRISKDOLIBARR_CSE_ELECTION_DATE;
-$electionDateDP  = $conf->global->DIGIRISKDOLIBARR_DP_ELECTION_DATE;
+// Retrieve election dates from Dolibarr global configuration using null coalescing operator for PHP 8 compatibility
+$electionDateCSE = $conf->global->DIGIRISKDOLIBARR_CSE_ELECTION_DATE ?? null;
+$electionDateDP  = $conf->global->DIGIRISKDOLIBARR_DP_ELECTION_DATE ?? null;
+
 
 print '<span class="opacitymedium">' . $langs->trans("DigiriskMenu") . "</span><br>\n";
 print "<br>";
@@ -207,11 +211,34 @@ print '</td></tr>';
 */
 
 print '<tr class="liste_titre"><th class="titlefield wordbreak">' . $langs->trans("HarassmentOfficer") . '</th><th>' . $langs->trans("") . '</th></tr>' . "\n";
-$harassmentOfficer = $allLinks['HarassmentOfficer'];
+// Check if 'HarassmentOfficer' index exists in $allLinks; assign null if not defined.
+$harassmentOfficer = $allLinks['HarassmentOfficer'] ?? null;
 print '<tr>';
 print '<td>' . $langs->trans("ActionOnUser") . '</td>';
 print '<td colspan="3" class="maxwidthonsmartphone">';
-print $form->select_dolusers($harassmentOfficer->id, 'HarassmentOfficer', 1, null, 0, '', '', $conf->entity, 0, 0, 'AND u.statut = 1', 0, '', 'minwidth300');
+// Ensure the harassmentOfficer object is defined and has an id property; default to 0 if not set
+$harassmentOfficerId = (isset($harassmentOfficer) && isset($harassmentOfficer->id)) ? $harassmentOfficer->id : 0;
+
+// Ensure the configuration object is defined and has the 'entity' property; default to 1 if not set
+$entity = (isset($conf) && isset($conf->entity)) ? $conf->entity : 1;
+
+// Display a select list of Dolibarr users with active status (u.statut = 1)
+print $form->select_dolusers(
+    $harassmentOfficerId,
+    'HarassmentOfficer',
+    1,
+    null,
+    0,
+    '',
+    '',
+    $entity,
+    0,
+    0,
+    'AND u.statut = 1',
+    0,
+    '',
+    'minwidth300'
+);
 if ( ! GETPOSTISSET('backtopage')) print ' <a href="' . DOL_URL_ROOT . '/user/card.php?action=create&backtopage=' . urlencode($_SERVER["PHP_SELF"] . '?action=create') . '"><span class="fa fa-plus-circle valignmiddle paddingleft" title="' . $langs->trans("AddUser") . '"></span></a>';
 print '</td></tr>';
 
@@ -220,11 +247,33 @@ print '</td></tr>';
 */
 
 print '<tr class="liste_titre"><th class="titlefield wordbreak">' . $langs->trans("HarassmentOfficerCSE") . '</th><th>' . $langs->trans("") . '</th></tr>' . "\n";
-$harassmentOfficerCSE = $allLinks['HarassmentOfficerCSE'];
+// Retrieve the 'HarassmentOfficerCSE' link from $allLinks array if it exists; otherwise, set to null.
+$harassmentOfficerCSE = $allLinks['HarassmentOfficerCSE'] ?? null;
 print '<tr>';
 print '<td>' . $langs->trans("ActionOnUser") . '</td>';
 print '<td colspan="3" class="maxwidthonsmartphone">';
-print $form->select_dolusers($harassmentOfficerCSE->id, 'HarassmentOfficerCSE', 1, null, 0, '', '', $conf->entity, 0, 0, 'AND u.statut = 1', 0, '', 'minwidth300');
+// Ensure that the harassment officer object and its id property are defined; default to 0 if not
+$idHarassmentOfficer = (isset($harassmentOfficerCSE) && isset($harassmentOfficerCSE->id)) ? $harassmentOfficerCSE->id : 0;
+
+// Print the Dolibarr user selection input
+// Parameters remain unchanged to minimize risk; compatibility with Dolibarr V20 is maintained.
+print $form->select_dolusers(
+    $idHarassmentOfficer,    // Selected user id (defaults to 0 if undefined)
+    'HarassmentOfficerCSE',  // Field name
+    1,                       // Show inactive users? (1 for yes)
+    null,                    // Additional filter (none)
+    0,                       // Default value for options
+    '',                      // Extra parameter (empty)
+    '',                      // Extra parameter (empty)
+    $conf->entity,           // Current entity id from configuration
+    0,                       // Parameter reserved for future use
+    0,                       // Parameter reserved for future use
+    'AND u.statut = 1',      // SQL condition to filter only active users
+    0,                       // Parameter reserved for future use
+    '',                      // Extra parameter (empty)
+    'minwidth300'            // CSS class for minimum width styling
+);
+
 if ( ! GETPOSTISSET('backtopage')) print ' <a href="' . DOL_URL_ROOT . '/user/card.php?action=create&backtopage=' . urlencode($_SERVER["PHP_SELF"] . '?action=create') . '"><span class="fa fa-plus-circle valignmiddle paddingleft" title="' . $langs->trans("AddUser") . '"></span></a>';
 print '</td></tr>';
 
@@ -243,14 +292,20 @@ print '</td></tr>';
 // * ESC Titulars - Titulaires CSE *
 
 $userlist 	  = $form->select_dolusers('', '', 0, null, 0, '', '', $conf->entity, 0, 0, 'AND u.statut = 1', 0, '', '', 0, 1);
-$titularsCse = $allLinks['TitularsCSE'];
+// Use null coalescing operator to avoid "undefined index" warnings in PHP 8
+$titularsCse = $allLinks['TitularsCSE'] ?? null;
 
 print '<tr>';
 print '<td>' . $form->editfieldkey('Titulars', 'TitularsCSE_id', '', $object, 0) . '</td>';
 print '<td colspan="3" class="maxwidthonsmartphone">';
 
 
-print $form->multiselectarray('TitularsCSE', $userlist, $titularsCse->id, null, null, null, null, "300");
+// Check if the $titularsCse object and its id property are defined; otherwise, use an empty array
+$selectedIds = (isset($titularsCse) && is_object($titularsCse) && isset($titularsCse->id)) ? $titularsCse->id : array();
+
+// Render the multiselect element with a fixed width of 300px
+print $form->multiselectarray('TitularsCSE', $userlist, $selectedIds, null, null, null, null, "300");
+
 
 if ( ! GETPOSTISSET('backtopage')) print ' <a href="' . DOL_URL_ROOT . '/user/card.php?action=create&backtopage=' . urlencode($_SERVER["PHP_SELF"] . '?action=create') . '"><span class="fa fa-plus-circle valignmiddle paddingleft" title="' . $langs->trans("AddUser") . '"></span></a>';
 
@@ -259,13 +314,18 @@ print '</td></tr>';
 // * ESC Alternates - Suppléants CSE *
 
 $userlist       = $form->select_dolusers('', '', 0, null, 0, '', '', $conf->entity, 0, 0, 'AND u.statut = 1', 0, '', '', 0, 1);
-$alternatesCse = $allLinks['AlternatesCSE'];
+// Check if the 'AlternatesCSE' key exists in the $allLinks array; if not, set $alternatesCse to null.
+$alternatesCse = $allLinks['AlternatesCSE'] ?? null;
 
 print '<tr>';
 print '<td>' . $form->editfieldkey('Alternates', 'AlternatesCSE_id', '', $object, 0) . '</td>';
 print '<td colspan="3" class="maxwidthonsmartphone">';
 
-print $form->multiselectarray('AlternatesCSE', $userlist, $alternatesCse->id, null, null, null, null, "300");
+// Ensure that $alternatesCse and its 'id' property are defined to prevent undefined variable warnings in PHP 8.
+$idAlternatesCse = (isset($alternatesCse) && isset($alternatesCse->id)) ? $alternatesCse->id : '';
+
+// Call the multiselectarray method with a defined id or an empty string.
+print $form->multiselectarray('AlternatesCSE', $userlist, $idAlternatesCse, null, null, null, null, "300");
 
 if ( ! GETPOSTISSET('backtopage')) print ' <a href="' . DOL_URL_ROOT . '/user/card.php?action=create&backtopage=' . urlencode($_SERVER["PHP_SELF"] . '?action=create') . '"><span class="fa fa-plus-circle valignmiddle paddingleft" title="' . $langs->trans("AddUser") . '"></span></a>';
 
@@ -284,13 +344,18 @@ print $form->selectDate(strtotime($electionDateDP) ? $electionDateDP : -1, 'Elec
 // * Staff Representatives Titulars - Titulaires Délégués du Personnel *
 
 $userlist    = $form->select_dolusers('', '', 0, null, 0, '', '', $conf->entity, 0, 0, 'AND u.statut = 1', 0, '', '', 0, 1);
-$titularsDp = $allLinks['TitularsDP'];
+// Check if 'TitularsDP' exists in $allLinks to avoid undefined index warnings
+$titularsDp = $allLinks['TitularsDP'] ?? null;
 
 print '<tr>';
 print '<td>' . $form->editfieldkey('Titulars', 'TitularsDP_id', '', $object, 0) . '</td>';
 print '<td colspan="3" class="maxwidthonsmartphone">';
 
-print $form->multiselectarray('TitularsDP', $userlist, $titularsDp->id, null, null, null, null, "300");
+// Check if $titularsDp is defined and has an 'id' property, default to 0 if not set
+$titularsDpId = (isset($titularsDp) && property_exists($titularsDp, 'id')) ? $titularsDp->id : 0;
+
+// Call the multiselectarray function with the provided parameters and a numeric width parameter
+print $form->multiselectarray('TitularsDP', $userlist, $titularsDpId, null, null, null, null, 300);
 
 if ( ! GETPOSTISSET('backtopage')) print ' <a href="' . DOL_URL_ROOT . '/user/card.php?action=create&backtopage=' . urlencode($_SERVER["PHP_SELF"] . '?action=create') . '"><span class="fa fa-plus-circle valignmiddle paddingleft" title="' . $langs->trans("AddUser") . '"></span></a>';
 
@@ -299,13 +364,24 @@ print '</td></tr>';
 // * Staff Representatives Suppléants - Suppléants Délégués du Personnel *
 
 $userlist      = $form->select_dolusers('', '', 0, null, 0, '', '', $conf->entity, 0, 0, 'AND u.statut = 1', 0, '', '', 0, 1);
-$alternatesDp = $allLinks['AlternatesDP'];
+// Use null coalescing operator to prevent undefined index warnings in PHP 8
+$alternatesDp = $allLinks['AlternatesDP'] ?? null;
 
 print '<tr>';
 print '<td>' . $form->editfieldkey('Alternates', 'AlternatesDP', '', $object, 0) . '</td>';
 print '<td colspan="3" class="maxwidthonsmartphone">';
 
-print $form->multiselectarray('AlternatesDP', $userlist, $alternatesDp->id, null, null, null, null, "300");
+// Using a ternary operator to ensure $alternatesDp and its property 'id' are defined before use
+print $form->multiselectarray(
+    'AlternatesDP',
+    $userlist,
+    (isset($alternatesDp) && isset($alternatesDp->id)) ? $alternatesDp->id : '',
+    null,
+    null,
+    null,
+    null,
+    "300"
+);
 
 if ( ! GETPOSTISSET('backtopage')) print ' <a href="' . DOL_URL_ROOT . '/user/card.php?action=create&backtopage=' . urlencode($_SERVER["PHP_SELF"] . '?action=create') . '"><span class="fa fa-plus-circle valignmiddle paddingleft" title="' . $langs->trans("AddUser") . '"></span></a>';
 

@@ -198,12 +198,12 @@ if (empty($reshook)) {
 if ($action == 'add' && $permissiontoadd) {
 	$error = 0;
 
-	if ( ! $_POST["lastname"]) {
+	if ( ! isset($_POST["lastname"])) {
 		$error++;
 		setEventMessages($langs->trans("NameNotDefined"), null, 'errors');
 		$action = "create"; // Go back to create page
 	}
-	if ( ! $_POST["login"]) {
+	if ( ! isset($_POST["login"])) {
 		$login = GETPOST('lastname') . GETPOST('firstname');
 	}
 

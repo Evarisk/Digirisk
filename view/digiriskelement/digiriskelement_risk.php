@@ -109,9 +109,31 @@ $extrafields->fetch_name_optionals_label($risk->table_element);
 $search_array_options = $extrafields->getOptionalsFromPost($risk->table_element, '', 'search_');
 
 // Default sort order (if not yet defined by previous GETPOST)
-if ( ! $sortfield) $sortfield = $conf->global->DIGIRISKDOLIBARR_SORT_LISTINGS_BY_COTATION ? "evaluation.cotation" : "r." . key($risk->fields);; // Set here default search field. By default 1st field in definition.
-if ( ! $sortorder) $sortorder         = $conf->global->DIGIRISKDOLIBARR_SORT_LISTINGS_BY_COTATION ? "DESC" : "ASC" ;
-if ( ! $evalsortfield) $evalsortfield = "evaluation." . key($evaluation->fields);
+// Ensure that sortfield, sortorder, and evalsortfield variables are set to avoid warnings.
+if (!isset($sortfield) || empty($sortfield)) {
+    // Set default search field. By default, use the first field from risk definition.
+    if (!empty($conf->global->DIGIRISKDOLIBARR_SORT_LISTINGS_BY_COTATION)) {
+        $sortfield = "evaluation.cotation";
+    } else {
+        // Verify that $risk->fields is defined, is an array, and not empty.
+        $firstRiskField = (isset($risk->fields) && is_array($risk->fields) && count($risk->fields)) ? key($risk->fields) : null;
+        // Fallback to a default field if no field is available.
+        $sortfield = $firstRiskField ? "r." . $firstRiskField : "r.default";
+    }
+}
+
+if (!isset($sortorder) || empty($sortorder)) {
+    // Use "DESC" if the configuration flag is set, otherwise "ASC".
+    $sortorder = !empty($conf->global->DIGIRISKDOLIBARR_SORT_LISTINGS_BY_COTATION) ? "DESC" : "ASC";
+}
+
+if (!isset($evalsortfield) || empty($evalsortfield)) {
+    // Set default evaluation sort field using the first field from evaluation definition.
+    $firstEvaluationField = (isset($evaluation->fields) && is_array($evaluation->fields) && count($evaluation->fields)) ? key($evaluation->fields) : null;
+    // Fallback to a default evaluation field if no field is available.
+    $evalsortfield = $firstEvaluationField ? "evaluation." . $firstEvaluationField : "evaluation.default";
+}
+
 
 $offset   = $limit * $page;
 $pageprev = $page - 1;
@@ -130,9 +152,15 @@ foreach ($risk->fields as $key => $val) {
 
 // List of fields to search into when doing a "search in all"
 $fieldstosearchall = array();
-foreach ($risk->fields as $key => $val) {
-	if ($val['searchall']) $fieldstosearchall['r.' . $key] = $val['label'];
+if (isset($risk->fields) && is_array($risk->fields)) { // Check if fields property exists and is an array
+    foreach ($risk->fields as $key => $val) {
+        // Check if 'searchall' is set and truthy, and that 'label' is defined to avoid undefined index warnings
+        if (!empty($val['searchall']) && isset($val['label'])) {
+            $fieldstosearchall['r.' . $key] = $val['label'];
+        }
+    }
 }
+
 
 // Definition of fields for list
 $arrayfields = array();
@@ -148,7 +176,7 @@ foreach ($risk->fields as $key => $val) {
             'checked'     => (($visible < 0) ? 0 : 1),
             'enabled'     => ($visible != 3 && dol_eval($val['enabled'], 1)),
             'position'    => $val['position'],
-            'help'        => $val['help']
+            'help'        => $val['help'] ?? ''
         ];
     }
 }
@@ -162,7 +190,7 @@ foreach ($evaluation->fields as $key => $val) {
             'checked'     => (($visible < 0) ? 0 : 1),
             'enabled'     => ($visible != 3 && dol_eval($val['enabled'], 1)),
             'position'    => $val['position'],
-            'help'        => $val['help']
+            'help'        => $val['help'] ?? ''
         ];
     }
 }

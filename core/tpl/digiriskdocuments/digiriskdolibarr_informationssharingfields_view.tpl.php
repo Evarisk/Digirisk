@@ -39,7 +39,9 @@ try {
 print '<tr>';
 print '<td class="titlefield"><i class="fas fa-hospital-alt"></i> ' . $form->textwithpicto($langs->trans("LabourDoctor"), $langs->trans('HowToSetDataLegalDisplay')) . '</td>';
 print '<td>';
-if ($document->occupational_health_service->id > 0) {
+
+// Check if occupational_health_service object exists and has an id property greater than 0
+if (isset($document->occupational_health_service->id) && $document->occupational_health_service->id > 0) {
 	$contact->fetch($document->occupational_health_service->id);
 	print $contact->getNomUrl(1) . ' ';
 	print '<i class="fas fa-phone"></i> '  . $document->occupational_health_service->phone;
@@ -50,7 +52,8 @@ print '</td></tr>';
 print '<tr>';
 print '<td class="titlefield minwidth300"><i class="fas fa-search"></i> ' . $form->textwithpicto($langs->trans("LabourInspector"), $langs->trans('HowToSetDataLegalDisplay')) . '</td>';
 print '<td>';
-if ($document->detective_work->id > 0) {
+// Check if detective_work and its id are defined and valid
+if (isset($document->detective_work->id) && $document->detective_work->id > 0) {
 	$contact->fetch($document->detective_work->id);
 	print $contact->getNomUrl(1) . ' ';
 	print '<i class="fas fa-phone"></i> ' . $document->detective_work->phone;
@@ -61,7 +64,7 @@ print '</td></tr>';
 print '<tr>';
 print '<td class="titlefield"><i class="fas fa-user"></i> ' . $form->textwithpicto($langs->trans("HarassmentOfficer"), $langs->trans('HowToSetDataInformationsSharing')) . '</td>';
 print '<td>';
-if ($document->harassment_officer->id > 0) {
+if (isset($document->harassment_officer->id) && $document->harassment_officer->id > 0) {
 	$user->fetch($document->harassment_officer->id);
 	print $user->getNomUrl(1) . ' ';
 	print '<i class="fas fa-phone"></i> ' . $document->harassment_officer->phone;
@@ -72,7 +75,7 @@ print '</td></tr>';
 print '<tr>';
 print '<td class="titlefield"><i class="fas fa-user"></i> ' . $form->textwithpicto($langs->trans("HarassmentOfficerCSE"), $langs->trans('HowToSetDataInformationsSharing')) . '</td>';
 print '<td>';
-if ($document->harassment_officer_cse->id > 0) {
+if (isset($document->harassment_officer_cse->id) && $document->harassment_officer_cse->id > 0) {
 	$user->fetch($document->harassment_officer_cse->id);
 	print $user->getNomUrl(1) . ' ';
 	print '<i class="fas fa-phone"></i> ' . $document->harassment_officer_cse->phone;

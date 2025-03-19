@@ -551,8 +551,8 @@ function show_category_image($object, $upload_dir, $noprint = 0)
 		}
 	}
 
-	if ($noprint) {
-		return $out;
+	if (!empty($noprint)) {
+		return $out ?? null;
 	}
 }
 
@@ -1957,17 +1957,34 @@ function load_board($user, $cat, $digiriskelement)
 	}
 
 	if ($allObjects > 0) {
+		// Create a new response object
 		$response = new WorkboardResponse();
-		$response->id = $cat['id'];
-		$response->color = $cat['color'];
-		$response->img = $cat['photo'];
-		$response->label = $cat['name'] . ' : ';
-		$response->url = DOL_URL_ROOT . '/ticket/list.php?search_options_digiriskdolibarr_ticket_service='.$digiriskelement->id.'&search_category_ticket_list='.$cat['id'];
-		$response->nbtodo = ($nbobject ?: 0);
-		$visible = json_decode($user->conf->DIGIRISKDOLIBARR_TICKET_DISABLED_DASHBOARD_INFO);
-		$digiriskelementID = $digiriskelement->id;
-		$catID = $cat['id'];
-		if (isset($visible->$digiriskelementID->$catID) && $visible->$digiriskelementID->$catID == 0){
+	
+		// Ensure required keys exist in $cat array
+		$response->id = isset($cat['id']) ? $cat['id'] : 0;
+		$response->color = isset($cat['color']) ? $cat['color'] : '';
+		$response->img = isset($cat['photo']) ? $cat['photo'] : '';
+		$response->label = isset($cat['name']) ? $cat['name'] . ' : ' : ' : ';
+		
+		// Build URL using defined digiriskelement id and category id
+		$response->url = DOL_URL_ROOT . '/ticket/list.php?search_options_digiriskdolibarr_ticket_service=' 
+			. (isset($digiriskelement->id) ? $digiriskelement->id : 0)
+			. '&search_category_ticket_list=' . $response->id;
+		
+		// Check if $nbobject is defined, else default to 0
+		$response->nbtodo = isset($nbobject) ? $nbobject : 0;
+	
+		// Ensure configuration string exists before decoding JSON
+		$jsonConf = isset($user->conf->DIGIRISKDOLIBARR_TICKET_DISABLED_DASHBOARD_INFO) 
+			? $user->conf->DIGIRISKDOLIBARR_TICKET_DISABLED_DASHBOARD_INFO 
+			: '{}';
+		$visible = json_decode($jsonConf);
+	
+		$digiriskelementID = isset($digiriskelement->id) ? $digiriskelement->id : 0;
+		$catID = $response->id;
+	
+		// Set visibility flag if the configuration is properly set and equals 0
+		if (isset($visible->$digiriskelementID) && isset($visible->$digiriskelementID->$catID) && $visible->$digiriskelementID->$catID == 0) {
 			$response->visible = 0;
 		} else {
 			$response->visible = 1;
@@ -1976,6 +1993,7 @@ function load_board($user, $cat, $digiriskelement)
 	} else {
 		return -1;
 	}
+	
 }
 
 /**
@@ -2113,7 +2131,7 @@ function getThumbName($filename, $thumb_type = 'small')
  * @param  object            $object           Category object
  * @param  string     	     $filename         File name
  * @param  string        	 $thumb_type       Thumb type (small, mini, large, medium)
- * @return string
+ * @return string[]
  * @throws Exception
 */
 function getAllThumbsNames($filename)
@@ -2145,7 +2163,7 @@ function getWorkedHours()
 	global $conf, $user;
 
 	if ($conf->global->DIGIRISKDOLIBARR_MANUAL_INPUT_NB_WORKED_HOURS) {
-		$total_workhours = $conf->global->DIGIRISKDOLIBARR_NB_WORKED_HOURS;
+		$total_workhours = $conf->global->DIGIRISKDOLIBARR_NB_WORKED_HOURS ?? 0;
 	} else {
 		$userList = $user->get_full_tree();
 		$total_workhours = 0;
@@ -2270,7 +2288,11 @@ function digiriskformconfirm($page, $title, $question, $action, $formquestion = 
 					$more .= '</div></div>'."\n";
 				} elseif ($input['type'] == 'checkbox') {
 					$more .= '<div class="tagtr">';
-					$more .= '<div class="tagtd'.(empty($input['tdclass']) ? '' : (' '.$input['tdclass'])).'">'.$input['label'].' </div><div class="tagtd">';
+					// Ensure that 'tdclass' and 'label' keys exist in the input array
+					$tdclass = !empty($input['tdclass']) ? ' ' . $input['tdclass'] : '';
+					$label = isset($input['label']) ? $input['label'] : '';
+					$more .= '<div class="tagtd' . $tdclass . '">' . $label . ' </div><div class="tagtd">';
+
 					$more .= '<input type="checkbox" class="flat'.$morecss.'" id="'.dol_escape_htmltag($input['name']).'" name="'.dol_escape_htmltag($input['name']).'"'.$moreattr;
 					if (!is_bool($input['value']) && $input['value'] != 'false' && $input['value'] != '0' && $input['value'] != '') {
 						$more .= ' checked';

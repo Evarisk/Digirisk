@@ -348,10 +348,27 @@ class DigiriskResources extends SaturneObject
 	 */
 	public function getSiretNumber()
 	{
-		// Siret number
-		global $mysoc;
+		// Retrieve siret number (or IDE number for Switzerland)
+		global $mysoc, $conf;
 
-		$array['siretnumber'] = (!empty($mysoc->idprof2) ? $mysoc->idprof2 : 'N/A');
-		return $array;
+		$result = array();
+
+		// Check that configuration global variable is properly set
+		if (!isset($conf->global) || !is_object($conf->global)) {
+			// Return default value if config is not set
+			$result['siretnumber'] = 'N/A';
+			return $result;
+		}
+
+		// Determine which idprof to use based on country configuration
+		if (isset($conf->global->MAIN_INFO_SOCIETE_COUNTRY) && $conf->global->MAIN_INFO_SOCIETE_COUNTRY === '6:CH:Suisse') {
+			// For Switzerland, use idprof1 if available
+			$result['siretnumber'] = (!empty($mysoc->idprof1) ? $mysoc->idprof1 : 'N/A');
+		} else {
+			// For other countries, use idprof2 if available
+			$result['siretnumber'] = (!empty($mysoc->idprof2) ? $mysoc->idprof2 : 'N/A');
+		}
+
+		return $result;
 	}
 }
