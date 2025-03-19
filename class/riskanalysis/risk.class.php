@@ -185,6 +185,8 @@ class Risk extends SaturneObject
 	 */
 	public function fetchRisksOrderedByCotation($parent_id, $get_children_data = false, $get_parents_data = false, $get_shared_data = false, $moreParams = [])
 	{
+        global $conf;
+
 		$object         = new DigiriskElement($this->db);
 		$risk           = new Risk($this->db);
         $riskAssessment = new RiskAssessment($this->db);
@@ -226,7 +228,6 @@ class Risk extends SaturneObject
 			}
 		}
 
-
 		//For risks listing of risk assessment document & risks listings
 		if ( $get_children_data ) {
 			if (is_array($objects) && !empty($objects)) {
@@ -235,21 +236,26 @@ class Risk extends SaturneObject
 				return -1;
 			}
 
-			if ( is_array($elementsChildren) && ! empty($elementsChildren) ) {
-				// Super function iterations flat.
-				$it = new RecursiveIteratorIterator(new RecursiveArrayIterator($elementsChildren));
-				$element = array();
-				foreach ($it as $key => $v) {
-					$element[$key][$v] = $v;
-				}
 
-				$children_ids = $element['id'];
+            if ( is_array($elementsChildren) && ! empty($elementsChildren) ) {
+                // Super function iterations flat.
+                $it = new RecursiveIteratorIterator(new RecursiveArrayIterator($elementsChildren));
+                $element = array();
+                foreach ($it as $key => $v) {
+                    $element[$key][$v] = $v;
+                }
+
+                $children_ids = $element['id'];
 
 				// RISKS parent children.
 				if ( !empty($children_ids)) {
 					foreach ($children_ids as $child_id) {
 						if (is_array($risksOrderedByDigiriskElement[$child_id]) && !empty($risksOrderedByDigiriskElement[$child_id])) {
-							$risks = array_merge($risks, $risksOrderedByDigiriskElement[$child_id]);
+                            foreach ($risksOrderedByDigiriskElement[$child_id] as $riskOfChildDigiriskElement) {
+                                if ($riskOfChildDigiriskElement->entity == $conf->entity) {
+                                    $risks[] = $riskOfChildDigiriskElement;
+                                }
+                            }
 						}
 					}
 				}
@@ -273,8 +279,8 @@ class Risk extends SaturneObject
 				//For inherited risks in risk assessment document
 				if (is_array($objects) && !empty($objects)) {
 					foreach ($objects as $digiriskElement) {
-						$parent_element_id = $digiriskElement->fk_parent;
-						while ($parent_element_id > 0) {
+                        $parent_element_id = $digiriskElement->fk_parent;
+                        while ($parent_element_id > 0) {
 							if (is_array($risksOrderedByDigiriskElement[$parent_element_id]) && !empty($risksOrderedByDigiriskElement[$parent_element_id])) {
 								foreach($risksOrderedByDigiriskElement[$parent_element_id] as $riskOfParentDigiriskElement) {
 									$tempRiskOfParentDigiriskElement = new Risk($this->db);
@@ -297,8 +303,9 @@ class Risk extends SaturneObject
 			}
 		}
 
-		//For all documents
+        //For all documents
 		if ( $get_shared_data ) {
+            $inserted = [];
 			if ($parent_id == 0) {
 				$digiriskElementsOfEntity = $objects;
 				if (is_array($digiriskElementsOfEntity) && !empty($digiriskElementsOfEntity)) {
@@ -308,10 +315,12 @@ class Risk extends SaturneObject
 							foreach ($digiriskElementOfEntity->linkedObjectsIds['digiriskdolibarr_risk'] as $sharedRiskId) {
                                 $sharedRisk         = $riskList[$sharedRiskId];
                                 $sharedParentActive = array_search($sharedRisk->fk_element, array_column($activeDigiriskElements, 'id'));
-								if (is_object($sharedRisk) && $sharedParentActive > 0) {
-                                    $clonedRisk            = clone $sharedRisk;
-                                    $clonedRisk->appliedOn = $digiriskElementOfEntity->id;
-                                    $risks[]               = $clonedRisk;
+								if (is_object($sharedRisk) && $sharedParentActive > 0 && !in_array($sharedRisk->id, $inserted)) {
+                                    $clonedRisk              = clone $sharedRisk;
+                                    $clonedRisk->appliedOn   = $digiriskElementOfEntity->id;
+                                    $clonedRisk->origin_type = 'shared';
+                                    $risks[]                 = $clonedRisk;
+                                    $inserted[]              = $sharedRisk->id;
                                 }
 							}
 						}
@@ -325,16 +334,19 @@ class Risk extends SaturneObject
 						foreach ($parentElement->linkedObjectsIds['digiriskdolibarr_risk'] as $sharedRiskId) {
 							$sharedRisk         = $riskList[$sharedRiskId];
                             $sharedParentActive = array_search($sharedRisk->fk_element, array_column($activeDigiriskElements, 'id'));
-                            if (is_object($sharedRisk)  && $sharedParentActive > 0) {
-                                $clonedRisk            = clone $sharedRisk;
-                                $clonedRisk->appliedOn = $parent_id;
-                                $risks[]               = $clonedRisk;
+                            if (is_object($sharedRisk)  && $sharedParentActive > 0 && !in_array($sharedRisk->id, $inserted)) {
+                                $clonedRisk              = clone $sharedRisk;
+                                $clonedRisk->appliedOn   = $parent_id;
+                                $clonedRisk->origin_type = 'shared';
+                                $risks[]                 = $clonedRisk;
+                                $inserted[]              = $sharedRisk->id;
 							}
 						}
 					}
 				}
 			}
 		}
+
 
 		if ( ! empty($risks) && is_array($risks)) {
 			usort($risks, function ($first, $second) {
@@ -351,11 +363,11 @@ class Risk extends SaturneObject
 	 *
 	 * @return	array $risk_categories
 	 */
-	public function getDangerCategories($riskType = 'risk')
+	public function getDangerCategories()
 	{
 		$json_categories = file_get_contents(DOL_DOCUMENT_ROOT . '/custom/digiriskdolibarr/js/json/dangerCategories.json');
         $jsonArray       = json_decode($json_categories, true);
-		return $jsonArray[0][$riskType];
+		return $jsonArray[0][$this->type];
 	}
 
 	/**
@@ -678,7 +690,8 @@ class Risk extends SaturneObject
 
         $filter = ' AND t.fk_element NOT IN ' . $digiriskElement->getTrashExclusionSqlFilter();
 
-        $dangerCategories = $this->getDangerCategories($riskType);
+        $this->type       = $riskType;
+        $dangerCategories = $this->getDangerCategories();
         $riskByDangerCategoriesAndRiskAssessments = $this->getRiskByDangerCategoriesAndRiskAssessments($dangerCategories, $filter, $riskType);
         $moreParam['filter']                      = $filter;
 

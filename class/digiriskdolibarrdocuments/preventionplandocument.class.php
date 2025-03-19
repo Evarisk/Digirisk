@@ -58,7 +58,7 @@ class PreventionPlanDocument extends DigiriskDocuments
 	 */
 	public function PreventionPlanDocumentFillJSON()
 	{
-		global $conf;
+		global $conf, $mysoc;
 
 		$digiriskelement    = new DigiriskElement($this->db);
 		$resources          = new DigiriskResources($this->db);
@@ -129,6 +129,14 @@ class PreventionPlanDocument extends DigiriskDocuments
             $json['PreventionPlan']['maitre_oeuvre']['signature_date'] = $maitreoeuvre->signature_date;
             $json['PreventionPlan']['maitre_oeuvre']['attendance']     = $maitreoeuvre->attendance;
 		}
+
+        $json['PreventionPlan']['society_inside'] = array();
+        $json['PreventionPlan']['society_inside']['id']      = $mysoc->id;
+        $json['PreventionPlan']['society_inside']['name']    = $mysoc->name;
+        $json['PreventionPlan']['society_inside']['siret']   = $mysoc->idprof2;
+        $json['PreventionPlan']['society_inside']['address'] = $mysoc->address;
+        $json['PreventionPlan']['society_inside']['postal']  = $mysoc->zip;
+        $json['PreventionPlan']['society_inside']['town']    = $mysoc->town;
 
 		if ($extsociety->id > 0) {
 			$json['PreventionPlan']['society_outside'] = array();
