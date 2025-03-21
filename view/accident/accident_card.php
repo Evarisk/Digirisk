@@ -636,7 +636,7 @@ if ($action == 'create') {
 	if ( ! empty($mysoc->managers)) {
 		$usertmp->fetch('', $mysoc->managers, $mysoc->id, 0, $conf->entity);
 	}
-	$userlist = $form->select_dolusers( GETPOST('fk_user_employer') ?: ($usertmp->id > 0 ? $usertmp->id : $user->id), '', 0, null, 0, '', '', '', 0, 0, 'AND u.statut = 1', 0, '', 'minwidth300', 0, 1);
+	$userlist = $form->select_dolusers( GETPOST('fk_user_employer') ?: ($usertmp->id > 0 ? $usertmp->id : $user->id), '', 0, null, 0, '', '', '', 0, 0, '(u.statut:=:1)', 0, '', 'minwidth300', 0, 1);
 	print '<tr>';
 	print '<td class="fieldrequired minwidth400" style="width:10%">' . img_picto('', 'user') . ' ' . $form->editfieldkey('UserEmployer', 'UserEmployer_id', '', $object, 0) . '</td>';
 	print '<td>';
@@ -645,7 +645,7 @@ if ($action == 'create') {
 	print '</td></tr>';
 
 	//User Victim -- Utilisateur victime de l'accident
-	$userlist = $form->select_dolusers((GETPOST('fk_user_victim') ?: $user->id), '', 0, null, 0, '', '', '', 0, 0, 'AND u.statut = 1', 0, '', 'minwidth300', 0, 1);
+	$userlist = $form->select_dolusers((GETPOST('fk_user_victim') ?: $user->id), '', 0, null, 0, '', '', '', 0, 0, '(u.statut:=:1)', 0, '', 'minwidth300', 0, 1);
 	print '<tr>';
 	print '<td class="fieldrequired minwidth400" style="width:10%">' . img_picto('', 'user') . ' ' . $form->editfieldkey('UserVictim', 'UserVictim_id', '', $object, 0) . '</td>';
 	print '<td>';
@@ -752,7 +752,7 @@ if (($id || $ref) && $action == 'edit') {
 	print '</td></tr>';
 
 	//User Employer -- Utilisateur responsable de la société
-	$userlist = $form->select_dolusers(( ! empty($object->fk_user_employer) ? $object->fk_user_employer : $user->id), '', 0, null, 0, '', '', $conf->entity, 0, 0, 'AND u.statut = 1', 0, '', 'minwidth300', 0, 1);
+	$userlist = $form->select_dolusers(( ! empty($object->fk_user_employer) ? $object->fk_user_employer : $user->id), '', 0, null, 0, '', '', $conf->entity, 0, 0, '(u.statut:=:1)', 0, '', 'minwidth300', 0, 1);
 	print '<tr>';
 	print '<td class="fieldrequired minwidth400" style="width:10%">' . img_picto('', 'user') . ' ' . $form->editfieldkey('UserEmployer', 'UserEmployer_id', '', $object, 0) . '</td>';
 	print '<td>';

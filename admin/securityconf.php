@@ -431,7 +431,7 @@ $responsibleResources = $allLinks['Responsible'];
 if ($responsibleResources->ref == 'Responsible' && $responsibleResources->id[0] > 0) {
 	$usertmp->fetch($responsibleResources->id[0]);
 
-	$userlist = $form->select_dolusers(GETPOST('responsible_socid'), '', 0, null, 0, '', '', 0, 0, 0, 'AND u.statut = 1', 0, '', 'minwidth300', 0, 1);
+	$userlist = $form->select_dolusers(GETPOST('responsible_socid'), '', 0, null, 0, '', '', 0, 0, 0, '(u.statut:=:1)', 0, '', 'minwidth300', 0, 1);
 	print '<tr>';
 	print '<td class="" style="width:10%">' . $form->editfieldkey('ResponsibleToNotify', 'Responsible_id', '', $object, 0) . '</td>';
 	print '<td>';
@@ -458,7 +458,7 @@ if ($responsibleResources->ref == 'Responsible' && $responsibleResources->id[0] 
 	if ( ! empty($user->socid)) {
 		print $form->select_dolusers($user->socid, 'responsible_socid', 1, 1, 0, 0, 0, 0, 'minwidth300');
 	} else {
-		$userlist = $form->select_dolusers(GETPOST('responsible_socid'), '', 0, null, 0, '', '', 0, 0, 0, 'AND u.statut = 1', 0, '', 'minwidth300', 0, 1);
+		$userlist = $form->select_dolusers(GETPOST('responsible_socid'), '', 0, null, 0, '', '', 0, 0, 0, '(u.statut:=:1)', 0, '', 'minwidth300', 0, 1);
 		print '<tr>';
 		print '<td class="" style="width:10%">' . $form->editfieldkey('ResponsibleToNotify', 'Responsible_id', '', $object, 0) . '</td>';
 		print '<td>';
