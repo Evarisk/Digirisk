@@ -672,7 +672,7 @@ if ($action == 'create') {
 
 	//Maitre d'oeuvre
 	if ($conf->global->DIGIRISKDOLIBARR_FIREPERMIT_MAITRE_OEUVRE < 0 || empty($conf->global->DIGIRISKDOLIBARR_FIREPERMIT_MAITRE_OEUVRE)) {
-		$userlist = $form->select_dolusers(( ! empty(GETPOST('maitre_oeuvre')) ? GETPOST('maitre_oeuvre') : $user->id), '', 0, null, 0, '', '', $conf->entity, 0, 0, 'AND u.statut = 1', 0, '', 'minwidth100imp widthcentpercentminusxx maxwidth400', 0, 1);
+		$userlist = $form->select_dolusers(( ! empty(GETPOST('maitre_oeuvre')) ? GETPOST('maitre_oeuvre') : $user->id), '', 0, null, 0, '', '', $conf->entity, 0, 0, '(u.statut:=:1)', 0, '', 'minwidth100imp widthcentpercentminusxx maxwidth400', 0, 1);
 		print '<tr>';
 		print '<td class="fieldrequired minwidth400" style="width:10%">' . img_picto('', 'user') . ' ' . $form->editfieldkey('MasterWorker', 'MaitreOeuvre_id', '', $object, 0) . '</td>';
 		print '<td>';
@@ -807,7 +807,7 @@ if (($id || $ref) && $action == 'edit') {
 
 	//Maitre d'oeuvre
 	$masterWorker = is_array($objectSignatories['MasterWorker']) ? array_shift($objectSignatories['MasterWorker'])->element_id : '';
-	$userlist     = $form->select_dolusers($masterWorker, '', 1, null, 0, '', '', 0, 0, 0, 'AND u.statut = 1', 0, '', 'minwidth100imp widthcentpercentminusxx maxwidth400', 0, 1);
+	$userlist     = $form->select_dolusers($masterWorker, '', 1, null, 0, '', '', 0, 0, 0, '(u.statut:=:1)', 0, '', 'minwidth100imp widthcentpercentminusxx maxwidth400', 0, 1);
 	print '<tr>';
 	print '<td class="fieldrequired minwidth400" style="width:10%">' . img_picto('', 'user') . ' ' . $form->editfieldkey('MasterWorker', 'MaitreOeuvre_id', '', $object, 0) . '</td>';
 	print '<td>';
