@@ -95,7 +95,8 @@ class doc_listingrisksenvironmentalaction_odt extends SaturneDocumentModel
             $risk  = new Risk($this->db);
             $risks = $risk->fetchRisksOrderedByCotation($digiriskelement->id > 0 ? $digiriskelement->id : 0, true, $conf->global->DIGIRISKDOLIBARR_SHOW_INHERITED_RISKS_IN_DOCUMENTS, $conf->global->DIGIRISKDOLIBARR_SHOW_SHARED_RISKS, $moreParam);
 
-            $objectDocument->fillRiskData($odfHandler, $objectDocument, $outputLangs, [], '', $risks, $conf->global->DIGIRISKDOLIBARR_SHOW_SHARED_RISKS);
+            $activeDigiriskElements  = $digiriskelement->getActiveDigiriskElements($conf->global->DIGIRISKDOLIBARR_SHOW_SHARED_RISKS ? 1 : 0);
+            $objectDocument->fillRiskData($odfHandler, $objectDocument, $outputLangs, [], '', $risks, $activeDigiriskElements, $conf->global->DIGIRISKDOLIBARR_SHOW_SHARED_RISKS);
 
         } catch (OdfException $e) {
             $this->error = $e->getMessage();
