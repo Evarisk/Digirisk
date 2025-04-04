@@ -75,7 +75,7 @@ abstract class ModeleODTDigiriskElementDocument extends SaturneDocumentModel
                     //Fill risks data
                     $risks = $risk->fetchRisksOrderedByCotation($object->element != 'digiriskstandard' ? $object->id : 0, $object->element != 'digiriskstandard' ? false : true, $conf->global->DIGIRISKDOLIBARR_SHOW_INHERITED_RISKS_IN_DOCUMENTS, $conf->global->DIGIRISKDOLIBARR_SHOW_SHARED_RISKS, $moreParam);
 
-                    $objectDocument->fillRiskData($odfHandler, $objectDocument, $outputLangs, [], '', $risks, $conf->global->DIGIRISKDOLIBARR_SHOW_SHARED_RISKS);
+                    $objectDocument->fillRiskData($odfHandler, $objectDocument, $outputLangs, [], '', $risks, null, $conf->global->DIGIRISKDOLIBARR_SHOW_SHARED_RISKS);
 
                     //Fill evaluators data
                     $foundTagForLines = 1;

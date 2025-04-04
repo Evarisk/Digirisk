@@ -163,7 +163,7 @@ class DigiriskDocuments extends SaturneDocuments
      * @return void
      * @throws Exception
      */
-    public function fillRiskData(Odf $odfHandler, $object, Translate $outputLangs, $tmparray, $file, $risks, $activeDigiriskElements, bool $sharedRisk = false)
+    public function fillRiskData(Odf $odfHandler, $object, Translate $outputLangs, $tmparray, $file, $risks, $activeDigiriskElements = null, bool $sharedRisk = false)
     {
         global $action, $conf, $hookmanager, $langs, $mc;
 
@@ -171,7 +171,10 @@ class DigiriskDocuments extends SaturneDocuments
         $project               = new Project($this->db);
         $DUProject             = new Project($this->db);
         $risk                  = new Risk($this->db);
-        $digiriskelementobject = new DigiriskElement($this->db);
+        if ($activeDigiriskElements == null) {
+            $digiriskelementobject = new DigiriskElement($this->db);
+            $activeDigiriskElements = $digiriskelementobject->getActiveDigiriskElements($sharedRisk);
+        }
 
         $DUProject->fetch($conf->global->DIGIRISKDOLIBARR_DU_PROJECT);
         $tasksSortedByRisk      = $risk->getTasksWithFkRisk();
