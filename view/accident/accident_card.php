@@ -143,7 +143,7 @@ if (empty($reshook)) {
 		}
 	}
 
-	if (GETPOST('cancel') || GETPOST('cancelLine')) {
+	if (GETPOST('cancelLine')) {
 		// Cancel accident
 		$urltogo = str_replace('__ID__', $result, $backtopage);
 		$urltogo = preg_replace('/--IDFORBACKTOPAGE--/', $id, $urltogo); // New method to autoselect project after a New on another form object creation
@@ -152,7 +152,7 @@ if (empty($reshook)) {
 	}
 
 	// Action to add record
-	if ($action == 'add' && $permissiontoadd) {
+	if ($action == 'add' && $permissiontoadd && !$cancel) {
 		// Get parameters
 		$user_victim_id     = GETPOST('fk_user_victim');
 		$user_employer_id   = GETPOST('fk_user_employer');
@@ -619,9 +619,12 @@ if ($action == 'create') {
 	print '<form method="POST" action="' . $_SERVER["PHP_SELF"] . '" enctype="multipart/form-data">';
 	print '<input type="hidden" name="token" value="' . newToken() . '">';
 	print '<input type="hidden" name="action" value="add">';
-	print '<input type="hidden" name="backtopage" value="' . $backtopage . '">';
-
-	if ($backtopageforcancel) print '<input type="hidden" name="backtopageforcancel" value="' . $backtopageforcancel . '">';
+    if ($backtopage) {
+        print '<input type="hidden" name="backtopage" value="' . $backtopage . '">';
+    }
+    if ($backtopageforcancel) {
+        print '<input type="hidden" name="backtopageforcancel" value="' . $backtopageforcancel . '">';
+    }
 
 	print dol_get_fiche_head();
 
@@ -688,7 +691,8 @@ if ($action == 'create') {
 
 	//Accident Date -- Date de l'accident
 	print '<tr><td class="minwidth300"><label for="accident_date">' . $langs->trans("AccidentDate") . '</label></td><td>';
-	print $form->selectDate(GETPOST('dateo') ? dol_mktime(GETPOST('dateohour', 'int'),GETPOST('dateomin', 'int'),0,GETPOST('dateomonth', 'int'), GETPOST('dateoday', 'int'), GETPOST('dateoyear', 'int')) : dol_now('tzuser'), 'dateo', 1, 1, 0, '', 1);
+    $dateEo = dol_mktime(GETPOSTINT('dateohour'), GETPOSTINT('dateomin'), GETPOSTINT('dateosec'), GETPOSTINT('dateomonth'), GETPOSTINT('dateoday'), GETPOSTINT('dateoyear'));
+    print $form->selectDate(!empty($dateEo) ? $dateEo : dol_now('tzuser'), 'dateo', 1, 1);
 	print '</td></tr>';
 
 	//Description -- Description
