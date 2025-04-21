@@ -709,7 +709,7 @@ class ActionsDigiriskdolibarr
     {
         global $extrafields, $langs;
 
-        if (strpos($parameters['context'], 'projecttaskcard') !== false) {
+        if (strpos($parameters['context'], 'projecttaskcard') !== false && $object instanceof Task) {
             $picto            = img_picto('', 'digiriskdolibarr_color@digiriskdolibarr', 'class="pictoModule"');
             $extraFieldsNames = ['fk_risk', 'fk_preventionplan', 'fk_firepermit', 'fk_accident', 'fk_accidentinvestigation'];
             foreach ($extraFieldsNames as $extraFieldsName) {
