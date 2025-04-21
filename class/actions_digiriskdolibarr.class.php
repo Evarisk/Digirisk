@@ -494,6 +494,38 @@ class ActionsDigiriskdolibarr
 		}
 	}
 
+    /**
+     * Overloading the addMoreActionsButtons function : replacing the parent's function with the one below
+     *
+     * @param array       $parameters Hook metadata (context, etc...)
+     * @param object|null $object     The object to process
+     *
+     * @return int                    0 < on error, 0 on success, 1 to replace standard code
+     */
+    public function addMoreActionsButtons(array $parameters, ?object $object): int
+    {
+        global $conf, $langs, $user;
+
+        if (strpos($parameters['context'], 'ticketcard') !== false) {
+            $urlParameters = '&fk_ticket=' . $object->id . '&label=' . $object->subject . '&description=' . $object->message;
+            if (!empty($object->array_options['options_digiriskdolibarr_ticket_service'])) {
+                $urlParameters .= '&fromid=' . $object->array_options['options_digiriskdolibarr_ticket_service'];
+            }
+            if (!empty($object->array_options['options_digiriskdolibarr_ticket_date'])) {
+                $declarationDate = dol_getdate($object->array_options['options_digiriskdolibarr_ticket_date'], false, (empty($_SESSION['dol_tz_string']) ? date_default_timezone_get() : $_SESSION['dol_tz_string']));
+                $urlParameters  .= '&dateoyear=' . $declarationDate['year'] . '&dateomonth=' . $declarationDate['mon'] . '&dateoday=' . $declarationDate['mday'];
+                $urlParameters  .= '&dateohour=' . $declarationDate['hours'] . '&dateomin=' . $declarationDate['minutes'];
+            }
+            $urlParameters .= '&backtopageforcancel=' . urlencode($_SERVER['PHP_SELF'] . '?id=' . $object->id);
+
+            $url   = dol_buildpath('digiriskdolibarr/view/accident/accident_card.php?action=create' . $urlParameters, 1);
+            $label = $conf->browser->layout == 'classic' ? '<i class="fas fa-user-injured"></i>' . ' ' . $langs->trans('NewAccident') : '<i class="fas fa-user-injured fa-2x"></i>';
+            print dolGetButtonAction($label, '', 'default', $url, '', $user->hasRight('digiriskdolibarr', 'accident', 'write'));
+        }
+
+        return 0; // or return 1 to replace standard code
+    }
+
 	/**
 	 *  Overloading the doActions function : replacing the parent's function with the one below
 	 *
@@ -1017,20 +1049,5 @@ class ActionsDigiriskdolibarr
         $this->results = $linkableObjectTypes;
 
         return 1;
-    }
-
-    /**
-     * Add new actions buttons on CommonObject
-     *
-     * @param   CommonObject  $object  The object to process (third party and product object)
-     */
-    public function addMoreActionsButtons($parameters, &$object, &$action)
-    {
-        global $langs, $user;
-
-        if (strpos($parameters['context'], 'ticketcard') !== false) {
-            print dolGetButtonAction('', img_picto('NewAccident', 'fa-user-injured') . ' ' . $langs->trans('NewAccident'), 'default', dol_buildpath('/digiriskdolibarr/view/accident/accident_card.php?action=create&fk_ticket=' . $object->id, 1), '', $user->rights->digiriskdolibarr->accident->write);
-        }
-
     }
 }
