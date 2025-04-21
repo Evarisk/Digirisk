@@ -86,6 +86,7 @@ window.digiriskdolibarr.ticket.event = function() {
   $(document).on( 'click', '.close-dashboard-info', window.digiriskdolibarr.ticket.closeDashBoardTicketInfo);
   $(document).on( 'keyup', '#email', window.digiriskdolibarr.ticket.checkValidEmail);
   $(document).on( 'keyup', '#options_digiriskdolibarr_ticket_phone', window.digiriskdolibarr.ticket.checkValidPhone);
+  $(document).on('change', '#ticket-form input, #ticket-form textarea, #ticket-form select', window.digiriskdolibarr.ticket.displayTicketSummary);
 };
 
 /**
@@ -316,3 +317,45 @@ window.digiriskdolibarr.ticket.checkValidPhone = function() {
 		$(this).css("border", "3px solid green");
 	}
 };
+
+/**
+ * Display the ticket summary
+ *
+ * @since   10.3.0
+ * @version 10.3.0
+ *
+ * @return {void}
+ */
+window.digiriskdolibarr.ticket.displayTicketSummary = function() {
+  if ($('#ticket-summary').length == 0) {
+    return;
+  }
+  let message    = $('#ticket-form #message').val();
+  let service    = $('#ticket-form #options_digiriskdolibarr_ticket_service option:selected').text();
+  let serviceId  = $('#ticket-form #options_digiriskdolibarr_ticket_service').val();
+  let last_name  = $('#ticket-form #options_digiriskdolibarr_ticket_lastname').val();
+  let first_name = $('#ticket-form #options_digiriskdolibarr_ticket_firstname').val();
+  let location   = $('#ticket-form #options_digiriskdolibarr_ticket_location').val();
+  let date       = $('#ticket-form #options_digiriskdolibarr_ticket_date').val();
+
+  if (message && service && serviceId != -1 && last_name && first_name && location && date) {
+    $('#ticket-summary').show();
+    $('#ticket-summary #ticket-summmary-name').text(first_name + ' ' + last_name);
+    $('#ticket-summary #ticket-summmary-location').text(location);
+    $('#ticket-summary #ticket-summmary-service').text(service);
+    $('#ticket-summary #ticket-summmary-message').text(message);
+
+    date = new Date(date);
+    let day = String(date.getDate()).padStart(2, '0');
+    let month = String(date.getMonth() + 1).padStart(2, '0');
+    let year = date.getFullYear();
+    let hours = String(date.getHours()).padStart(2, '0');
+    let minutes = String(date.getMinutes()).padStart(2, '0');
+
+    let formattedDate = `${day}/${month}/${year} ${hours}:${minutes}`;
+
+    $('#ticket-summary #ticket-summmary-date').text(formattedDate);
+  } else {
+    $('#ticket-summary').hide();
+  }
+}
