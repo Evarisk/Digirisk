@@ -98,6 +98,34 @@ if ($action == 'setPublicInterface') {
     }
 }
 
+if ($action == 'update_ticket_public_interface_url') {
+    $urlInfos             = ['origin', 'short', 'external'];
+    $publicInterfaceTypes = array_merge(['current'], isModEnabled('multicompany') ? ['multicompany'] : []);
+    foreach ($publicInterfaceTypes as $publicInterfaceType) {
+        $radio = GETPOST($publicInterfaceType . '_ticket_public_interface_url');
+        foreach ($urlInfos as $urlType) {
+            if ($radio != $urlType . dol_ucfirst($publicInterfaceType) . 'TicketPublicInterfaceURL') {
+                continue;
+            }
+
+            $url = GETPOST($urlType . '_' . $publicInterfaceType . '_ticket_public_interface_url', 'custom', 0, FILTER_SANITIZE_URL);
+            if (empty($url)) {
+                setEventMessages($langs->transnoentities('ErrorFieldRequired', $langs->transnoentities(dol_ucfirst($urlType) . 'URL')) . '<br>' . $langs->transnoentities(dol_ucfirst($publicInterfaceType) . 'TicketPublicInterfaceURL'), [], 'errors');
+                header('Location: ' . $_SERVER['PHP_SELF'] . '?page_y=' . $pageY);
+                exit;
+            }
+
+            dolibarr_set_const($db, 'DIGIRISKDOLIBARR_TICKET_' . dol_strtoupper($publicInterfaceType) . '_PUBLIC_INTERFACE_URL_' . dol_strtoupper($urlType), $url, 'chaine', 0, '', $conf->entity);
+        }
+
+        dolibarr_set_const($db, 'DIGIRISKDOLIBARR_TICKET_' . dol_strtoupper($publicInterfaceType) . '_PUBLIC_INTERFACE_RADIO', $radio, 'chaine', 0, '', $conf->entity);
+    }
+
+    setEventMessages('SavedConfig', []);
+    header('Location: ' . $_SERVER['PHP_SELF'] . '?page_y=' . $pageY);
+    exit;
+}
+
 if ($action == 'setEmails') {
 	dolibarr_set_const($db, 'DIGIRISKDOLIBARR_TICKET_SUBMITTED_SEND_MAIL_TO', GETPOST('emails'), 'integer', 0, '', $conf->entity);
 	setEventMessages($langs->transnoentities('EmailsToNotifySet'), array());
@@ -308,20 +336,6 @@ $head = digiriskdolibarr_admin_prepare_head();
 
 print dol_get_fiche_head($head, 'ticket', $title, -1, "digiriskdolibarr_color@digiriskdolibarr");
 
-print load_fiche_titre('<i class="fa fa-ticket-alt"></i> ' . $langs->transnoentities("TicketManagement"), '', '');
-print '<hr>';
-print load_fiche_titre($langs->transnoentities("PublicInterface"), '', '');
-
-print '<span class="opacitymedium">' . $langs->transnoentities("DigiriskTicketPublicAccess") . '</span> : <a class="wordbreak" href="' . dol_buildpath('/custom/digiriskdolibarr/public/ticket/create_ticket.php?entity=' . $conf->entity, 1) . '" target="_blank" >' . dol_buildpath('/custom/digiriskdolibarr/public/ticket/create_ticket.php?entity=' . $conf->entity, 2) . '</a>';
-
-if (isModEnabled('multicompany')) {
-	print load_fiche_titre($langs->transnoentities("MultiEntityPublicInterface"), '', '');
-
-	print '<span class="opacitymedium">' . $langs->transnoentities("DigiriskTicketPublicAccess") . '</span> : <a class="wordbreak" href="' . dol_buildpath('/custom/digiriskdolibarr/public/ticket/create_ticket.php', 1) . '" target="_blank" >' . dol_buildpath('/custom/digiriskdolibarr/public/ticket/create_ticket.php', 2) . '</a>';
-}
-
-print dol_get_fiche_end();
-
 $enableDisableHtml = $langs->transnoentities("TicketActivatePublicInterface") . ' ';
 if (empty($conf->global->DIGIRISKDOLIBARR_TICKET_ENABLE_PUBLIC_INTERFACE)) {
 	// Button off, click to enable
@@ -339,6 +353,53 @@ print '<input type="hidden" id="DIGIRISKDOLIBARR_TICKET_ENABLE_PUBLIC_INTERFACE"
 print '<br><br>';
 
 if ($conf->global->DIGIRISKDOLIBARR_TICKET_ENABLE_PUBLIC_INTERFACE == 1) {
+
+    // Public interface configuration
+    print load_fiche_titre($langs->transnoentities('TicketsPublicInterfaceConfig'), '', '');
+
+    print '<form method="POST" action="' . $_SERVER['PHP_SELF'] . '" name="ticket_public_interface_form">';
+    print '<input type="hidden" name="token" value="' . newToken() . '">';
+    print '<input type="hidden" name="action" value="update_ticket_public_interface_url">';
+    print '<input type="hidden" name="page_y">';
+    print '<table class="noborder centpercent">';
+    print '<tr class="liste_titre">';
+    print '<td>' . $langs->transnoentities('Name') . '</td>';
+    print '<td class="widthcentpercentminusx">' . $langs->transnoentities('Value') . '</td>';
+    print '</tr>';
+
+    // Ticket public interface URL
+    $urlInfos = [
+        'origin'   => 'https://dolibarr.org',
+        'short'    => 'https://demo.digirisk.com/registre',
+        'external' => 'https://evarisk.com/help'
+    ];
+    $publicInterfaceTypes = array_merge(['current'], isModEnabled('multicompany') ? ['multicompany'] : []);
+    foreach ($publicInterfaceTypes as $publicInterfaceType) {
+        print '<tr class="oddeven"><td>' . $langs->transnoentities(dol_ucfirst($publicInterfaceType) . 'TicketPublicInterfaceURL') . '</td>';
+        print '<td class="widthcentpercentminusx">';
+        foreach ($urlInfos as $urlType => $placeholder) {
+            print '<input type="radio" id="' . $urlType . '-' . $publicInterfaceType . '-ticket-public-interface-url" name="' . $publicInterfaceType . '_ticket_public_interface_url" value="' . $urlType . dol_ucfirst($publicInterfaceType) . 'TicketPublicInterfaceURL"' . (getDolGlobalString('DIGIRISKDOLIBARR_TICKET_' . dol_strtoupper($publicInterfaceType) . '_PUBLIC_INTERFACE_RADIO') == $urlType . dol_ucfirst($publicInterfaceType) . 'TicketPublicInterfaceURL' ? 'checked' : '') . '/>';
+            $link                     = img_picto('', 'external-link-alt', 'class="paddingright"');
+            $ticketPublicInterfaceURL = getDolGlobalString('DIGIRISKDOLIBARR_TICKET_' . dol_strtoupper($publicInterfaceType) . '_PUBLIC_INTERFACE_URL_' . dol_strtoupper($urlType));
+            if (!empty($ticketPublicInterfaceURL)) {
+                $link = '<a href="' . $ticketPublicInterfaceURL . '" target="_blank">' . img_picto('', 'external-link-alt', 'class="paddingright"') . '</a>';
+            }
+            print '<label for="' . $urlType . '-' . $publicInterfaceType . '-ticket-public-interface-url" id="' . $urlType . '-' . $publicInterfaceType . '-ticket-public-interface-url-label">' . $link . $langs->transnoentities(dol_ucfirst($urlType) . 'URL');
+            if (!empty($ticketPublicInterfaceURL)) {
+                print showValueWithClipboardCPButton($ticketPublicInterfaceURL, 0, 'none');
+            }
+            print '</label><br>';
+            print '<input type="url" name="' . $urlType . '_' . $publicInterfaceType . '_ticket_public_interface_url" id="' . $urlType . '-' . $publicInterfaceType . '-ticket-public-interface-url-input" class="marginleftonly widthcentpercentminusx" placeholder="' . $placeholder . '" pattern="https?://.*" size="30" value="' . $ticketPublicInterfaceURL . '" /><br>';
+        }
+        print '</td></tr>';
+    }
+
+    print '</table>';
+    print '<div class="tabsAction reposition"><button type="submit" class="butAction">' . $langs->trans('Save') . '</button></div>';
+    print '</form>';
+
+    print load_fiche_titre($langs->transnoentities('Config'), '', '');
+
 	print '<div class="div-table-responsive-no-min">';
 	print '<table class="noborder centpercent">';
 	print '<tr class="liste_titre">';
@@ -347,6 +408,19 @@ if ($conf->global->DIGIRISKDOLIBARR_TICKET_ENABLE_PUBLIC_INTERFACE == 1) {
 	print '<td class="center">' . $langs->transnoentities("Action") . '</td>';
 	print '<td class="center">' . $langs->transnoentities("ShortInfo") . '</td>';
 	print '</tr>';
+
+    // Show logo for company
+    print '<tr class="oddeven"><td>' . $langs->transnoentities("TicketShowCompanyLogo") . '</td>';
+    print '<td class="center">';
+    print ajax_constantonoff('DIGIRISKDOLIBARR_TICKET_SHOW_COMPANY_LOGO');
+    print '</td>';
+    print '<td class="center">';
+    print '';
+    print '</td>';
+    print '<td class="center">';
+    print $form->textwithpicto('', $langs->transnoentities("TicketShowCompanyLogoHelp"));
+    print '</td>';
+    print '</tr>';
 
 	// Show logo for company
 	print '<tr class="oddeven"><td>' . $langs->transnoentities("TicketShowCompanyLogo") . '</td>';

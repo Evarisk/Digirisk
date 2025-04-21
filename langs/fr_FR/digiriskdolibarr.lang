@@ -66,6 +66,14 @@ Subtitle                                = Sous-titre
 DigiriskElementDepthGraph            = Niveau de profondeur dans les graphiques des éléments Digirisk
 DigiriskElementDepthGraphDescription = Cette option permet de choisir le niveau de profondeur dans les graphiques des éléments Digirisk <br> Défaut : Niveau 1
 
+# WHSRegister = Registre SST
+TicketsPublicInterfaceConfig         = Configuration de l'interface publique des tickets
+WHSRegister                          = Registre SST
+CurrentTicketPublicInterfaceURL      = URL de l'interface publique des tickets
+MulticompanyTicketPublicInterfaceURL = URL de l'interface publique des tickets multi-société
+OriginURL                            = URL d'origine
+ShortURL                             = URL raccourcie
+ExternalURL                          = URL externe
 
 
 #
@@ -1352,7 +1360,6 @@ QRCodeGenerated                          = QRCode généré
 FkTicket                                 = Ticket lié
 PublicTicket                             = Interface publique des tickets
 TicketPublicInterfaceForbidden           = Accès interdit à l'interface publique des tickets
-WHSRegister                              = Registre SST
 
 #Public interface - Interface publique
 TicketPublicInterfaceShowCategoryDescription     = Afficher la description des catégories de ticket dans l'interface publique
