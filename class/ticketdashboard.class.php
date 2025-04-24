@@ -278,9 +278,12 @@ class TicketDashboard extends DigiriskDolibarrDashboard
         $dashboardConfig = json_decode(getDolUserString($confName));
         $array = ['graphs' => [], 'lists' => [], 'disabledGraphs' => []];
 
-        $category = new Categorie($this->db);
-        $category->fetch(getDolGlobalInt('DIGIRISKDOLIBARR_TICKET_MAIN_CATEGORY'));
-        $mainCategories = $category->get_filles();
+        $mainCategories = saturne_fetch_all_object_type('Categorie', '', '', 0, 0, ['customsql' => 'fk_parent = ' . getDolGlobalInt('DIGIRISKDOLIBARR_TICKET_MAIN_CATEGORY')]);
+
+        $digiriskElement = new DigiriskElement($this->db);
+
+        $moreParams['filter'] = ' AND t.element_type = "groupment"';
+        $digiriskElements     = $digiriskElement->getActiveDigiriskElements('current', $moreParams);
 
         if (empty($dashboardConfig->graphs->NumberOfTicketsByMonth->hide)) {
             $array['graphs'][] = $this->getTicketsByMonth();
@@ -288,17 +291,17 @@ class TicketDashboard extends DigiriskDolibarrDashboard
             $array['disabledGraphs']['NumberOfTicketsByMonth'] = $langs->transnoentities('NumberOfTicketsByMonth');
         }
         if (empty($dashboardConfig->graphs->NumberOfTicketsByMainTagAndByDigiriskElement->hide)) {
-            $array['graphs'][] = $this->getTicketsByMainTagAndByDigiriskElement($mainCategories);
+            $array['graphs'][] = $this->getTicketsByMainTagAndByDigiriskElement($mainCategories, $digiriskElements);
         } else {
             $array['disabledGraphs']['NumberOfTicketsByMainTagAndByDigiriskElement'] = $langs->transnoentities('NumberOfTicketsByMainTagAndByDigiriskElement');
         }
         if (empty($dashboardConfig->graphs->NumberOfTicketsByMainSubTagAndByDigiriskElement->hide)) {
-            $array['graphs'][] = $this->getTicketsByMainSubTagAndByDigiriskElement($mainCategories);
+            $array['graphs'][] = $this->getTicketsByMainSubTagAndByDigiriskElement($mainCategories, $digiriskElements);
         } else {
             $array['disabledGraphs']['NumberOfTicketsByMainSubTagAndByDigiriskElement'] = $langs->transnoentities('NumberOfTicketsByMainSubTagAndByDigiriskElement');
         }
         if (empty($dashboardConfig->graphs->NumberOfTicketsByYear->hide)) {
-            $array['lists'][] = $this->getTicketsByYear();
+            //$array['lists'][] = $this->getTicketsByYear();
         } else {
             $array['disabledGraphs']['NumberOfTicketsByYear'] = $langs->transnoentities('NumberOfTicketsByYear');
         }
@@ -369,7 +372,7 @@ class TicketDashboard extends DigiriskDolibarrDashboard
      * @return array     $array          Graph datas (label/color/type/title/data etc..)
      * @throws Exception
      */
-    public function getTicketsByMainTagAndByDigiriskElement($mainCategories): array
+    public function getTicketsByMainTagAndByDigiriskElement($mainCategories, $digiriskElements): array
     {
         global $langs;
 
@@ -386,16 +389,12 @@ class TicketDashboard extends DigiriskDolibarrDashboard
         $array['dataset']    = 2;
         $array['moreCSS']    = 'grid-2';
 
-        $digiriskElement = new DigiriskElement($this->db);
-
         if (is_array($mainCategories) && !empty($mainCategories)) {
             foreach ($mainCategories as $mainCategory) {
                 $array['labels'][$mainCategory->id] = [
                     'label' => $mainCategory->label,
                     'color' => '#' . $mainCategory->color
                 ];
-                $moreParams['filter'] = ' AND t.element_type = "groupment"';
-                $digiriskElements     = $digiriskElement->getActiveDigiriskElements('current', $moreParams);
                 if (is_array($digiriskElements) && !empty($digiriskElements)) {
                     foreach ($digiriskElements as $digiriskElement) {
                         $tickets                                = saturne_fetch_all_object_type('Ticket', '', '', 0, 0, ['customsql' => 'cp.fk_categorie = ' . $mainCategory->id  . ' AND eft.digiriskdolibarr_ticket_service = ' . $digiriskElement->id . ' AND ' . $this->where], 'AND', true, true, true, $this->join);
@@ -416,7 +415,7 @@ class TicketDashboard extends DigiriskDolibarrDashboard
      * @return array     $array          Graph datas (label/color/type/title/data etc..)
      * @throws Exception
      */
-    public function getTicketsByMainSubTagAndByDigiriskElement($mainCategories): array
+    public function getTicketsByMainSubTagAndByDigiriskElement($mainCategories, $digiriskElements): array
     {
         global $langs;
 
@@ -434,7 +433,6 @@ class TicketDashboard extends DigiriskDolibarrDashboard
         $array['moreCSS']    = 'grid-2';
 
         $category        = new Categorie($this->db);
-        $digiriskElement = new DigiriskElement($this->db);
 
         if (is_array($mainCategories) && !empty($mainCategories)) {
             foreach ($mainCategories as $mainCategory) {
@@ -446,8 +444,6 @@ class TicketDashboard extends DigiriskDolibarrDashboard
                             'label' => $mainSubCategory->label,
                             'color' => dol_strlen($mainSubCategory->color) > 0 ? '#' . $mainSubCategory->color : '',
                         ];
-                        $moreParams['filter'] = ' AND t.element_type = "groupment"';
-                        $digiriskElements     = $digiriskElement->getActiveDigiriskElements('current', $moreParams);
                         if (is_array($digiriskElements) && !empty($digiriskElements)) {
                             foreach ($digiriskElements as $digiriskElement) {
                                 $tickets                                = saturne_fetch_all_object_type('Ticket', '', '', 0, 0, ['customsql' => 'cp.fk_categorie = ' . $mainSubCategory->id  . ' AND eft.digiriskdolibarr_ticket_service = ' . $digiriskElement->id . ' AND ' . $this->where], 'AND', true, true, true, $this->join);

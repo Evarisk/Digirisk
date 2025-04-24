@@ -688,14 +688,9 @@ class Risk extends SaturneObject
 
         $riskType = !empty($dashboardConfig->filters->riskType) ? $dashboardConfig->filters->riskType : 'risk';
 
-        $digiriskElement = new DigiriskElement($this->db);
-
-        $filter = ' AND t.fk_element NOT IN ' . $digiriskElement->getTrashExclusionSqlFilter();
-
         $this->type       = $riskType;
         $dangerCategories = $this->getDangerCategories();
-        $riskByDangerCategoriesAndRiskAssessments = $this->getRiskByDangerCategoriesAndRiskAssessments($dangerCategories, $filter, $riskType);
-        $moreParam['filter']                      = $filter;
+        $riskByDangerCategoriesAndRiskAssessments = $this->getRiskByDangerCategoriesAndRiskAssessments($dangerCategories, $riskType);
 
         $array['graphsFilters'] = [
             'riskType' => [
@@ -717,12 +712,12 @@ class Risk extends SaturneObject
             $array['disabledGraphs']['RisksRepartitionByDangerCategories'] = $langs->transnoentities('RisksRepartitionByDangerCategories');
         }
         if (empty($dashboardConfig->graphs->RisksRepartitionByCotation->hide)) {
-            $array['graphs'][] = $this->getRisksByCotation($moreParam);
+            $array['graphs'][] = $this->getRisksByCotation($riskByDangerCategoriesAndRiskAssessments);
         } else {
             $array['disabledGraphs']['RisksRepartitionByCotation'] = $langs->transnoentities('RisksRepartitionByCotation');
         }
         if (empty($dashboardConfig->graphs->RiskListsByDangerCategories->hide)) {
-            $array['lists'][] = $this->getRiskListsByDangerCategories($dangerCategories, $riskByDangerCategoriesAndRiskAssessments, $filter, $riskType);
+            $array['lists'][] = $this->getRiskListsByDangerCategories($dangerCategories, $riskByDangerCategoriesAndRiskAssessments, '', $riskType);
         } else {
             $array['disabledGraphs']['RiskListsByDangerCategories'] = $langs->transnoentities('RiskListsByDangerCategories');
         }
@@ -733,16 +728,13 @@ class Risk extends SaturneObject
     /**
      * Get risks by cotation
      *
-     * @param  array     $moreParam More param (Object/user/etc)
+     * @param array $riskByDangerCategoriesAndRiskAssessments Risk by danger categories and risk assessments
      * @return array
      * @throws Exception
      */
-    public function getRisksByCotation(array $moreParam = []): array
+    public function getRisksByCotation(array $riskByDangerCategoriesAndRiskAssessments): array
     {
         global $conf, $langs;
-
-        $riskAssessment  = new RiskAssessment($this->db);
-        $digiriskElement = new DigiriskElement($this->db);
 
         // Graph Title parameters
         $array['title'] = $langs->transnoentities('RisksRepartition');
@@ -757,11 +749,7 @@ class Risk extends SaturneObject
         $array['dataset']    = 1;
         $array['labels']     = $this->cotations;
 
-        $join  = ' LEFT JOIN ' . MAIN_DB_PREFIX . $this->table_element . ' as r ON r.rowid = t.fk_risk';
-        $join .= ' LEFT JOIN ' . MAIN_DB_PREFIX . $digiriskElement->table_element . ' as d ON d.rowid = r.fk_element';
-
-        $riskAssessments = saturne_fetch_all_object_type('RiskAssessment', '', '', 0, 0, ['customsql' => 't.status = ' . RiskAssessment::STATUS_VALIDATED . str_replace('t.fk_element NOT IN', 'r.fk_element NOT IN', $moreParam['filter'])], 'AND', false, $moreParam['multiEntityManagement'] ?? true, false, $join);
-        $array['data']   = $riskAssessment->getRiskAssessmentCategoriesNumber($riskAssessments);
+        $array['data'] = $riskByDangerCategoriesAndRiskAssessments['nbRiskByCotations'];
 
         return $array;
     }
@@ -853,12 +841,9 @@ class Risk extends SaturneObject
      * @return array
      * @throws Exception
      */
-    public function getRiskListsByDangerCategories(array $dangerCategories, array $riskByDangerCategoriesAndRiskAssessments, string $filter = '', string $type = 'risk') : array
+    public function getRiskListsByDangerCategories(array $dangerCategories, array $riskByDangerCategoriesAndRiskAssessments) : array
     {
-        //$riskByDangerCategoriesAndRiskAssessments
-        global $conf, $langs;
-
-        $digiriskElement = new DigiriskElement($this->db);
+        global $langs;
 
         // Graph Title parameters
         $array['title'] = $langs->transnoentities('RiskListsByDangerCategories');
@@ -869,30 +854,57 @@ class Risk extends SaturneObject
         $array['width'] = '100%';
         $array['type']  = 'list';
 
-        $totalRisks = saturne_fetch_all_object_type('Risk', '', '', 0, 0, ['customsql' => 't.status = ' . self::STATUS_VALIDATED . ' AND t.entity = ' . $conf->entity . (GETPOSTISSET('id') ? ' AND t.fk_element = ' . GETPOST('id') : '') . ' AND t.type = "' . $type . '"' . $filter], 'AND', false, true, false, ' LEFT JOIN ' . MAIN_DB_PREFIX . $digiriskElement->table_element . ' as d ON d.rowid = t.fk_element');
-
         $array['labels']['Ref']           = $langs->transnoentities('DangerCategories');
-        $array['labels']['numberOfRisks'] = $langs->transnoentities('NumberOfRisks') . ' : ' . '<span class="badge badge-info">' . (is_array($totalRisks) && !empty($totalRisks) ? count($totalRisks) : 0) . '</span>';
-        $array['labels']['percentage']    = $langs->transnoentities('Percentage');
+        $array['labels']['numberOfRisks'] = $langs->transnoentities('NumberOfRisks');
 
-        $arrayRiskLists = [];
-        if (is_array($totalRisks) && !empty($totalRisks)) {
-            foreach ($dangerCategories as $dangerCategory) {
-                $arrayRiskLists[$dangerCategory['position']]['Ref']['value'] = $dangerCategory['name'];
+        if (empty($riskByDangerCategoriesAndRiskAssessments['totalRisks'])){
+            return $array;
+        }
 
+        $totalNbRiskAssessments         = [];
+        $totalPercentagesRiskAssessment = [];
+        $totalPercentages               = 0;
+        $arrayRiskLists                 = [];
+        foreach ($dangerCategories as $dangerCategory) {
 
-                $arrayRiskLists[$dangerCategory['position']]['numberOfRisks']['value']    = $riskByDangerCategoriesAndRiskAssessments[$dangerCategory['name']]['risk'];
-                $arrayRiskLists[$dangerCategory['position']]['numberOfRisks']['morecss']  = 'risk-evaluation-cotation';
-                $arrayRiskLists[$dangerCategory['position']]['numberOfRisks']['moreAttr'] = 'style="line-height: 0; border-radius: 0; background-color: #A1467EAA; color: #FFF;"';
-                $arrayRiskLists[$dangerCategory['position']]['percentage']['value']       = price2num(($riskByDangerCategoriesAndRiskAssessments[$dangerCategory['name']]['risk'] / count($totalRisks)) * 100, 2) . ' %';
+            $percentage        = price2num(($riskByDangerCategoriesAndRiskAssessments[$dangerCategory['name']]['risk'] / $riskByDangerCategoriesAndRiskAssessments['totalRisks']) * 100, 1);
+            $totalPercentages += $percentage;
 
-                for ($i = 1; $i <= 4; $i++) {
-                    $array['labels'][$i] = $this->cotations[$i]['label'];
-                    $arrayRiskLists[$dangerCategory['position']][$i]['value']    = $riskByDangerCategoriesAndRiskAssessments[$dangerCategory['name']]['riskAssessments'][$i];
-                    $arrayRiskLists[$dangerCategory['position']][$i]['morecss']  = 'risk-evaluation-cotation';
-                    $arrayRiskLists[$dangerCategory['position']][$i]['moreAttr'] = 'data-scale = ' . $i . ' style="line-height: 0; border-radius: 0;"';
-                }
+            $arrayRiskLists[$dangerCategory['position']]['numberOfRisks']['value']    = $riskByDangerCategoriesAndRiskAssessments[$dangerCategory['name']]['risk'];
+            $arrayRiskLists[$dangerCategory['position']]['numberOfRisks']['value']   .= ($percentage > 0 ? ' (' . $percentage . ' %)' : '');
+            $arrayRiskLists[$dangerCategory['position']]['numberOfRisks']['morecss']  = 'risk-evaluation-cotation';
+            $arrayRiskLists[$dangerCategory['position']]['numberOfRisks']['moreAttr'] = 'style="line-height: 0; border-radius: 0; background-color: #A1467EAA; color: #FFF;"';
+
+            $arrayRiskLists[$dangerCategory['position']]['Ref']['value']    = '<img src="' . dol_buildpath('digiriskdolibarr/img/categorieDangers/' . $dangerCategory['thumbnail_name'] . '.png', 1) . '" class="photo" alt="' . $dangerCategory['name'] . '" title="' . $dangerCategory['name'] . '" loading="lazy" width="24px" height="24px" />';
+            $arrayRiskLists[$dangerCategory['position']]['Ref']['value']   .= $dangerCategory['name'];
+            $arrayRiskLists[$dangerCategory['position']]['Ref']['moreAttr'] = 'style="display: flex; align-items: center; max-width: 100%; gap: 5px;"';
+
+            for ($i = 1; $i <= 4; $i++) {
+                $array['labels'][$i] = $this->cotations[$i]['label'];
+
+                $percentage                          = price2num(($riskByDangerCategoriesAndRiskAssessments[$dangerCategory['name']]['riskAssessments'][$i] / $riskByDangerCategoriesAndRiskAssessments['totalRisks']) * 100, 1);
+                $totalPercentagesRiskAssessment[$i] += $percentage;
+
+                $arrayRiskLists[$dangerCategory['position']][$i]['value']    = $riskByDangerCategoriesAndRiskAssessments[$dangerCategory['name']]['riskAssessments'][$i];
+                $totalNbRiskAssessments[$i]                                 += $riskByDangerCategoriesAndRiskAssessments[$dangerCategory['name']]['riskAssessments'][$i];
+                $arrayRiskLists[$dangerCategory['position']][$i]['value']   .= ($percentage > 0 ? ' (' . $percentage . ' %)' : '');
+                $arrayRiskLists[$dangerCategory['position']][$i]['morecss']  = 'risk-evaluation-cotation';
+                $arrayRiskLists[$dangerCategory['position']][$i]['moreAttr'] = 'data-scale = ' . $i . ' style="line-height: 0; border-radius: 0;"';
             }
+        }
+
+        $arrayRiskLists[23]['numberOfRisks']['value']    = '<span class="badge badge-info">' . $riskByDangerCategoriesAndRiskAssessments['totalRisks'] . '</span>';
+        $arrayRiskLists[23]['numberOfRisks']['morecss']  = 'risk-evaluation-cotation';
+        $arrayRiskLists[23]['numberOfRisks']['moreAttr'] = 'style="line-height: 0; border-radius: 0; background-color: #A1467EAA; color: #FFF;"';
+        $arrayRiskLists[23]['numberOfRisks']['value']   .= ' (' . round($totalPercentages) . ' %)';
+
+        $arrayRiskLists[23]['Ref']['value']              = $langs->transnoentities('Total');
+        $arrayRiskLists[23]['Ref']['morecss']            = 'left';
+
+        for ($i = 1; $i <= 4; $i++) {
+            $arrayRiskLists[23][$i]['value']    = $totalNbRiskAssessments[$i] . ' (' . round($totalPercentagesRiskAssessment[$i]) . ' %)';
+            $arrayRiskLists[23][$i]['morecss']  = 'risk-evaluation-cotation';
+            $arrayRiskLists[23][$i]['moreAttr'] = 'data-scale = ' . $i . ' style="line-height: 0; border-radius: 0;"';
         }
 
         $array['data'] = $arrayRiskLists;
@@ -910,23 +922,42 @@ class Risk extends SaturneObject
      * @return array
      * @throws Exception
      */
-    public function getRiskByDangerCategoriesAndRiskAssessments(array $dangerCategories, string $filter = '', string $type = 'risk') : array
+    public function getRiskByDangerCategoriesAndRiskAssessments(array $dangerCategories, string $type = 'risk') : array
     {
         global $conf;
 
-        $array           = [];
-        $digiriskElement = new DigiriskElement($this->db);
+        $array = [];
+
+        $riskAssessment  = new RiskAssessment($this->db);
+
+        $select      = ', ra.cotation';
+        $moreSelects = ['cotation'];
+        $join        = ' INNER JOIN ' . MAIN_DB_PREFIX . $this->module . '_digiriskelement AS d ON d.rowid = t.fk_element';
+        $join       .= ' LEFT JOIN ' . MAIN_DB_PREFIX . $this->module . '_riskassessment AS ra ON t.rowid = ra.fk_risk';
+        $filter      = 't.status = ' . self::STATUS_VALIDATED . ' AND t.entity = ' . $conf->entity . (GETPOSTISSET('id') ? ' AND t.fk_element = ' . GETPOSTINT('id') : '') . ' AND t.type = \'' . $this->db->escape($type) . '\' AND d.status = ' . DigiriskElement::STATUS_VALIDATED . ' AND ra.status = ' . RiskAssessment::STATUS_VALIDATED;
+        $risks       = saturne_fetch_all_object_type('Risk', '', '', 0, 0, ['customsql' => $filter], 'AND', false, false, false, $join, [], $select, $moreSelects);
+        if (!is_array($risks) || empty($risks)) {
+            return $array;
+        }
+
+        $array['totalRisks'] = count($risks);
+
+        $nbRiskByCotations  = [];
+        $nbRiskByCategories = [];
+        foreach ($risks as $risk) {
+            $nbRiskByCategories[$risk->category]++;
+            $riskAssessment->cotation = $risk->cotation;
+            $array['nbRiskByCotations'][$riskAssessment->getEvaluationScale()]++;
+            $nbRiskByCotations[$risk->category][$riskAssessment->getEvaluationScale()]++;
+        }
 
         foreach ($dangerCategories as $dangerCategory) {
-            $risks = saturne_fetch_all_object_type('Risk', '', '', 0, 0, ['customsql' => 't.status = ' . self::STATUS_VALIDATED . ' AND t.entity = ' . $conf->entity . (GETPOSTISSET('id') ? ' AND t.fk_element = ' . GETPOST('id') : '') . ' AND t.type = "' . $type . '" AND t.category = ' . $dangerCategory['position'] . $filter], 'AND', false, true, false, ' LEFT JOIN ' . MAIN_DB_PREFIX . $digiriskElement->table_element . ' as d ON d.rowid = t.fk_element');
-            $array[$dangerCategory['name']]['risk'] = !empty($risks) && is_array($risks) ? count($risks) : 0;
+            $array[$dangerCategory['name']]['risk'] = !empty($nbRiskByCategories[$dangerCategory['position']]) ? $nbRiskByCategories[$dangerCategory['position']] : 0;
             for ($i = 1; $i <= 4; $i++) {
-                $join  = ' LEFT JOIN ' . MAIN_DB_PREFIX . $this->table_element . ' as r ON r.rowid = t.fk_risk';
-                $join .= ' LEFT JOIN ' . MAIN_DB_PREFIX . $digiriskElement->table_element . ' as d ON d.rowid = r.fk_element';
-                $riskAssessments = saturne_fetch_all_object_type('RiskAssessment', '', '', 0, 0, ['customsql' => 't.status = ' . RiskAssessment::STATUS_VALIDATED . ' AND r.entity = ' . $conf->entity . (GETPOSTISSET('id') ? ' AND r.fk_element = ' . GETPOST('id') : '') . ' AND r.type = "' . $type . '" AND r.category = ' . $dangerCategory['position'] . ' AND t.cotation >= ' . $this->cotations[$i]['start'] . ' AND t.cotation <= ' . $this->cotations[$i]['end'] . str_replace('t.fk_element NOT IN', 'r.fk_element NOT IN', $filter)], 'AND', false, true, false, $join);
-                $array[$dangerCategory['name']]['riskAssessments'][$i] = !empty($riskAssessments) && is_array($riskAssessments) ? count($riskAssessments) : 0;
+                $array[$dangerCategory['name']]['riskAssessments'][$i] = !empty($nbRiskByCotations[$dangerCategory['position']][$i]) ? $nbRiskByCotations[$dangerCategory['position']][$i] : 0;
             }
         }
+
         return $array;
     }
 
