@@ -2530,6 +2530,25 @@ class modDigiriskdolibarr extends DolibarrModules
             rename($mediaPath . '/accident_investigationdocument', $mediaPath . '/accidentinvestigationdocument');
         }
 
+        if (getDolGlobalInt('DIGIRISKDOLIBARR_BACKWARD_TRASH_ELEMENTS') == 0 && $conf->entity == 1) {
+            require_once __DIR__ . '/../../class/digiriskelement.class.php';
+
+            $digiriskElement = new DigiriskElement($this->db);
+
+            $trashElementIds = $digiriskElement->getMultiEntityTrashList();
+            if (!empty($trashElementIds)) {
+                $filter = ['customsql' => 't.rowid IN ' . $digiriskElement->getTrashExclusionSqlFilter()];
+                $digiriskElement->ismultientitymanaged = 0;
+                $digiriskElements = $digiriskElement->fetchAll('', '', 0, 0, $filter);
+                foreach ($digiriskElements as $digiriskElement) {
+                    $digiriskElement->status = DigiriskElement::STATUS_TRASHED;
+                    $digiriskElement->setValueFrom('status', $digiriskElement->status, '', '', 'int');
+                }
+
+                dolibarr_set_const($this->db, 'DIGIRISKDOLIBARR_BACKWARD_TRASH_ELEMENTS', 1, 'integer');
+            }
+        }
+
         return $this->_init($sql, $options);
 	}
 
