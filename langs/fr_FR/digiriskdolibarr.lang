@@ -1265,6 +1265,7 @@ NonCompliance                            = Non conformité
 FirstName                                = Prénom
 LastName                                 = Nom
 Phone                                    = Téléphone
+DeclarationDate                          = Date de déclaration
 DigiriskTicketPublicAccess               = Une interface publique ne nécessitant aucune identification est disponible à l'url suivante
 TicketActivatePublicInterface            = Activer l'interface publique
 GenerateExtrafields                      = Génération des extrafields de ticket par défaut

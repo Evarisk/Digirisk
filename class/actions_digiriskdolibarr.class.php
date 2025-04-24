@@ -312,27 +312,29 @@ class ActionsDigiriskdolibarr
 				}
 			}
 
-            $signatory = new SaturneSignature($db, 'digiriskdolibarr', $object->element);
-            $signatories = $signatory->fetchSignatory('Attendant', $object->id, $object->element);
-            if (is_array($signatories) && !empty($signatories)) {
-                $signatory = array_shift($signatories);
-                if (dol_strlen( $signatory->signature_url ) > 0) {
-                    $picto        = img_picto('', 'digiriskdolibarr_color@digiriskdolibarr', 'class="pictoModule"');
-                    $signatureUrl = dol_buildpath('custom/saturne/public/signature/add_signature.php?track_id=' . $signatory->signature_url . '&entity=' . $conf->entity . '&module_name=digiriskdolibarr&object_type=' . $object->element . '&document_type=TicketDocument', 3);
+            if (is_integer($object->id) && !empty($object->id)) {
+                $signatory = new SaturneSignature($db, 'digiriskdolibarr', $object->element);
+                $signatories = $signatory->fetchSignatory('Attendant', $object->id, $object->element);
+                if (is_array($signatories) && !empty($signatories)) {
+                    $signatory = array_shift($signatories);
+                    if (dol_strlen( $signatory->signature_url ) > 0) {
+                        $picto        = img_picto('', 'digiriskdolibarr_color@digiriskdolibarr', 'class="pictoModule"');
+                        $signatureUrl = dol_buildpath('custom/saturne/public/signature/add_signature.php?track_id=' . $signatory->signature_url . '&entity=' . $conf->entity . '&module_name=digiriskdolibarr&object_type=' . $object->element . '&document_type=TicketDocument', 3);
 
-                    $out  = '<tr class="trextrafields_collapse_' . $object->id . '"><td class="titlefield">' . $picto . $langs->trans('Signature') . '</td>';
-                    $out .= '<td id="ticket_extras_digiriskdolibarr_ticket_signature_'. $object->id . '" class="valuefield ticket_extras_digiriskdolibarr_ticket_signature wordbreak copy-signatureurl-container">';
-                    $out .= '<a href=' . $signatureUrl . ' target="_blank"><div class="wpeo-button button-blue" style="' . ($conf->browser->layout != 'classic' ? 'font-size: 25px;': '') . '"><i class="fas fa-eye"></i></div></a>';
-                    $out .= ' <i class="fas fa-clipboard copy-signatureurl" data-signature-url="' . $signatureUrl . '" style="color: #666;' .  ($conf->browser->layout != 'classic' ? 'display: none;': '') . '"></i>';
-                    $out .= '<span class="copied-to-clipboard" style="display: none;">' . '  ' . $langs->trans('CopiedToClipboard') . '</span>';
-                    $out .= '</td>';
-                    $out .= '</tr>';
+                        $out  = '<tr class="trextrafields_collapse_' . $object->id . '"><td class="titlefield">' . $picto . $langs->trans('Signature') . '</td>';
+                        $out .= '<td id="ticket_extras_digiriskdolibarr_ticket_signature_'. $object->id . '" class="valuefield ticket_extras_digiriskdolibarr_ticket_signature wordbreak copy-signatureurl-container">';
+                        $out .= '<a href=' . $signatureUrl . ' target="_blank"><div class="wpeo-button button-blue" style="' . ($conf->browser->layout != 'classic' ? 'font-size: 25px;': '') . '"><i class="fas fa-eye"></i></div></a>';
+                        $out .= ' <i class="fas fa-clipboard copy-signatureurl" data-signature-url="' . $signatureUrl . '" style="color: #666;' .  ($conf->browser->layout != 'classic' ? 'display: none;': '') . '"></i>';
+                        $out .= '<span class="copied-to-clipboard" style="display: none;">' . '  ' . $langs->trans('CopiedToClipboard') . '</span>';
+                        $out .= '</td>';
+                        $out .= '</tr>';
 
-                    ?>
-                    <script>
-                        jQuery('.tabBar .fichehalfleft table:first').append(<?php echo json_encode($out); ?>);
-                    </script>
-                    <?php
+                        ?>
+                        <script>
+                            jQuery('.tabBar .fichehalfleft table:first').append(<?php echo json_encode($out); ?>);
+                        </script>
+                        <?php
+                    }
                 }
             }
         } else if (preg_match('/projectcard|projectcontactcard|projecttaskcard|projecttaskscard|projecttasktime|projectOverview|tasklist|category/', $parameters['context'])) {
@@ -778,6 +780,16 @@ class ActionsDigiriskdolibarr
             $extraFieldsNames = ['fk_risk', 'fk_preventionplan', 'fk_firepermit', 'fk_accident', 'fk_accidentinvestigation'];
             foreach ($extraFieldsNames as $extraFieldsName) {
                 $extrafields->attributes['projet_task']['label'][$extraFieldsName] = $picto . $langs->transnoentities($extrafields->attributes['projet_task']['label'][$extraFieldsName]);
+            }
+        }
+
+        if (strpos($parameters['context'], 'ticketlist') !== false) {
+            $picto = img_picto('', 'digiriskdolibarr_color@digiriskdolibarr', 'class="pictoModule"');
+            foreach ($extrafields->attributes['ticket']['label'] as $key => $value) {
+                if (strpos($key, 'digiriskdolibarr_ticket') === false) {
+                    continue; // Goes to the next element if ‘digiriskdolibarr_ticket’ is not found
+                }
+                $extrafields->attributes['ticket']['label'][$key] = $picto . $langs->transnoentities($value);
             }
         }
 
