@@ -76,181 +76,267 @@ class doc_riskassessmentdocument_odt extends SaturneDocumentModel
 		return parent::info($langs);
 	}
 
+    /**
+     * Load risk assessment document infos
+     * @throws Exception
+     */
+    private function loadRiskAssessmentDocumentInfos(): array
+    {
+        $digiriskElement = new DigiriskElement($this->db);
+        $risk            = new Risk($this->db);
 
-	/**
-	 * Fill all odt tags for segments lines.
-	 *
-	 * @param  Odf       $odfHandler  Object builder odf library.
-	 * @param  Translate $outputLangs Lang object to use for output.
-	 * @param  array     $moreParam   More param (Object/user/etc).
-	 *
-	 * @return int                    1 if OK, <=0 if KO.
-	 * @throws Exception
-	 */
-	public function fillTagsLines(Odf $odfHandler, Translate $outputLangs, array $moreParam): int
-	{
-		global $conf, $user;
+        $currentDigiriskElements = $digiriskElement->fetchDigiriskElementFlat(0, [], 'current');
+        $sharedDigiriskElements  = $digiriskElement->fetchDigiriskElementFlat(0, [], 'shared');
 
-		$objectDocument = $moreParam['objectDocument'];
+        $select          = 'r.fk_element, ';
+        $select         .= 'SUM(CASE WHEN t.cotation < 48 THEN 1 ELSE 0 END) AS nb_risk_grey, ';
+        $select         .= 'SUM(CASE WHEN t.cotation >= 48 AND t.cotation < 51 THEN 1 ELSE 0 END) AS nb_risk_orange, ';
+        $select         .= 'SUM(CASE WHEN t.cotation >= 51 AND t.cotation < 80 THEN 1 ELSE 0 END) AS nb_risk_red, ';
+        $select         .= 'SUM(CASE WHEN t.cotation >= 80 THEN 1 ELSE 0 END) AS nb_risk_black, ';
+        $select         .= 'SUM(t.cotation) AS quotation_totale';
+        $filter          = ' AND r.fk_element NOT IN ' . $digiriskElement->getTrashExclusionSqlFilter();
+        $join            = ' LEFT JOIN ' . MAIN_DB_PREFIX . $risk->table_element . ' as r ON r.rowid = t.fk_risk';
+        $groupBy         = ' GROUP BY r.fk_element';
+        $riskAssessments = saturne_fetch_all_object_type('RiskAssessment', 'DESC', 'quotation_totale', 0, 0, ['customsql' => 't.status = ' . RiskAssessment::STATUS_VALIDATED . $filter], 'AND', false, true, false, $join, [], $select, $groupBy);
 
-		// Replace tags of lines
-		try {
-			$foundtagforlines = 1;
-			if ($foundtagforlines) {
-				$digiriskelementobject = new DigiriskElement($this->db);
-				$risk                  = new Risk($this->db);
-				$riskassessment        = new RiskAssessment($this->db);
-				$ticket                = new Ticket($this->db);
-				$category              = new Categorie($this->db);
+        $filter  = ['customsql' => 't.fk_project = ' . getDolGlobalInt('DIGIRISKDOLIBARR_TICKET_PROJECT') . ' AND eft.digiriskdolibarr_ticket_service > 0'];
+        $tickets = saturne_fetch_all_object_type('Ticket', '', '', 0, 0,  $filter, 'AND', true);
 
-                $moreParam['filterRisk'] = ' AND t.type = "risk"';
-				$risks                   = $risk->fetchRisksOrderedByCotation(0, true, $conf->global->DIGIRISKDOLIBARR_SHOW_INHERITED_RISKS_IN_DOCUMENTS, $conf->global->DIGIRISKDOLIBARR_SHOW_SHARED_RISKS, $moreParam);
-                $digiriskelementlist     = $digiriskelementobject->fetchDigiriskElementFlat(0);
-                $activeDigiriskElements  = $digiriskelementobject->getActiveDigiriskElements($conf->global->DIGIRISKDOLIBARR_SHOW_SHARED_RISKS ? 1 : 0);
+        return [
+            'currentDigiriskElements' => $currentDigiriskElements,
+            'sharedDigiriskElements'  => $sharedDigiriskElements,
+            'riskAssessments'         => $riskAssessments,
+            'tickets'                 => $tickets
+        ];
+    }
 
-                $risks = array_filter($risks, function($risk) use ($activeDigiriskElements) {
-                   return in_array($risk->fk_element, array_keys($activeDigiriskElements));
-                });
+    /**
+     * Set digirisk elements segment
+     *
+     * @param Odf       $odfHandler  Object builder odf library
+     * @param Translate $outputLangs Lang object to use for output
+     * @param array     $moreParam   More param (segmentName, loadRiskAssessmentDocumentInfos)
+     *
+     * @throws OdfException
+     * @throws Exception
+     */
+    private function setDigiriskElementsSegment(Odf $odfHandler, Translate $outputLangs, array $moreParam): void
+    {
+        $foundTagForLines = 1;
+        try {
+            $listLines = $odfHandler->setSegment($moreParam['segmentName']);
+        } catch (OdfExceptionSegmentNotFound $e) {
+            // We may arrive here if tags for lines not present into template
+            $foundTagForLines = 0;
+            $listLines        = '';
+            dol_syslog($e->getMessage());
+        }
 
-				if (is_array($digiriskelementlist) && !empty($digiriskelementlist)) {
-					$listLines = $odfHandler->setSegment('elementParHierarchie');
+        if ($foundTagForLines) {
+            $digiriskElements = $this->loadRiskAssessmentDocumentInfos()[$moreParam['loadRiskAssessmentDocumentInfos']['fetchDigiriskElementFlat']];
+            if (!is_array($digiriskElements) || empty($digiriskElements)) {
+                $tmpArray['nomElement'] = '';
 
-					//Fill digirisk element list table
-					foreach ($digiriskelementlist as $line) {
-						$depthHyphens = '';
-						for ($k = 0; $k < $line['depth']; $k++) {
-							$depthHyphens .= '- ';
-						}
-						$tmpArray['nomElement'] = $depthHyphens . (!empty($conf->global->DIGIRISKDOLIBARR_SHOW_SHARED_RISKS) ? 'S' . $line['object']->entity . ' - ' : '') . $line['object']->ref . ' ' . $line['object']->label;
+                $this->setTmpArrayVars($tmpArray, $listLines, $outputLangs);
+                $odfHandler->mergeSegment($listLines);
+                return;
+            }
 
-						$this->setTmpArrayVars($tmpArray, $listLines, $outputLangs);
-					}
-					$odfHandler->mergeSegment($listLines);
+            foreach ($digiriskElements as $digiriskElement) {
+                $depthHyphens           = str_repeat('- ', $digiriskElement['depth']);
+                $tmpArray['nomElement'] = $depthHyphens . 'S' . $digiriskElement['object']->entity . ' - ' . $digiriskElement['object']->ref . ' - ' . $digiriskElement['object']->label;
 
-					//Fill total cotation by digirisk element table
-					$totalQuotation = 0;
-					$scale_counter = [
-						1 => 0,
-						2 => 0,
-						3 => 0,
-						4 => 0
-					];
-					$line           = '';
-					$listLines      = $odfHandler->setSegment('risqueFiche');
+                $this->setTmpArrayVars($tmpArray, $listLines, $outputLangs);
+            }
+            $odfHandler->mergeSegment($listLines);
+        }
+    }
 
-					if (is_array($risks) && !empty($risks)) {
-						foreach($risks as $riskSingle) {
-							$risksOfDigiriskElements[$riskSingle->appliedOn][] = $riskSingle;
-						}
-					}
+    /**
+     * Set risk assessments segment
+     *
+     * @param Odf       $odfHandler  Object builder odf library
+     * @param Translate $outputLangs Lang object to use for output
+     * @param array     $moreParam   More param (segmentName, loadRiskAssessmentDocumentInfos)
+     *
+     * @throws OdfException
+     * @throws Exception
+     */
+    private function setRiskAssessmentsSegment(Odf $odfHandler, Translate $outputLangs, array $moreParam): void
+    {
+        $foundTagForLines = 1;
+        try {
+            $listLines = $odfHandler->setSegment($moreParam['segmentName']);
+        } catch (OdfExceptionSegmentNotFound $e) {
+            // We may arrive here if tags for lines not present into template
+            $foundTagForLines = 0;
+            $listLines        = '';
+            dol_syslog($e->getMessage());
+        }
 
-					foreach ($digiriskelementlist as $digiriskelementsingle) {
-						$digiriskElementId = $digiriskelementsingle['object']->id;
-						$risksOfDigiriskElement = $risksOfDigiriskElements[$digiriskElementId];
+        if ($foundTagForLines) {
+            $loadRiskAssessmentDocumentInfos = $this->loadRiskAssessmentDocumentInfos();
+            $digiriskElements                = $loadRiskAssessmentDocumentInfos[$moreParam['loadRiskAssessmentDocumentInfos']['fetchDigiriskElementFlat']];
+            $riskAssessments                 = $loadRiskAssessmentDocumentInfos['riskAssessments'];
 
-						if ($risksOfDigiriskElement > 0 && ! empty($risksOfDigiriskElement)) {
-							foreach ($risksOfDigiriskElement as $riskOfDigiriskElement) {
-								$lastEvaluation                     = $riskOfDigiriskElement->lastEvaluation;
-								$totalQuotation                    += $lastEvaluation->cotation;
-								$riskAssessmentsOfDigiriskElement[$digiriskElementId][] = $lastEvaluation;
-							}
-						}
+            if (!is_array($digiriskElements) || empty($digiriskElements) || !is_array($riskAssessments) || empty($riskAssessments)) {
+                $tmpArray['nomElement']      = '';
+                $tmpArray['description']     = '';
+                $tmpArray['quotationTotale'] = '';
+                $tmpArray['NbRiskBlack']     = '';
+                $tmpArray['NbRiskRed']       = '';
+                $tmpArray['NbRiskOrange']    = '';
+                $tmpArray['NbRiskGrey']      = '';
 
-						$elementName  = (!empty($conf->global->DIGIRISKDOLIBARR_SHOW_SHARED_RISKS) ? 'S' . $digiriskelementsingle['object']->entity . ' - ' : '') . $digiriskelementsingle['object']->ref . ' ' . $digiriskelementsingle['object']->label;
-						$scaleCounter = $riskassessment->getRiskAssessmentCategoriesNumber($riskAssessmentsOfDigiriskElement[$digiriskElementId], $risksOfDigiriskElement, $digiriskElementId);
+                $this->setTmpArrayVars($tmpArray, $listLines, $outputLangs);
+                $odfHandler->mergeSegment($listLines);
+                return;
+            }
 
-						$cotationarray[$elementName] = array($totalQuotation, $digiriskelementsingle['object']->description, $scaleCounter);
-
-						$totalQuotation = 0;
-
-						unset($tmpArray['object_fields']);
-					}
-
-					//use arsort to sort array according to value
-					arsort($cotationarray);
-
-					foreach ($cotationarray as $key => $val) {
-						try {
-							$listLines->setVars('nomElement', html_entity_decode($key, ENT_QUOTES | ENT_HTML5), true, 'UTF-8');
-							$listLines->setVars('quotationTotale', $val[0], true, 'UTF-8');
-							$listLines->setVars('description', html_entity_decode($val[1], ENT_QUOTES | ENT_HTML5), true, 'UTF-8');
-							$listLines->setVars('NbRiskBlack', $val[2][4], true, 'UTF-8');
-							$listLines->setVars('NbRiskRed', $val[2][3], true, 'UTF-8');
-							$listLines->setVars('NbRiskOrange', $val[2][2], true, 'UTF-8');
-							$listLines->setVars('NbRiskGrey', $val[2][1], true, 'UTF-8');
-						} catch (SegmentException $e) {
-							dol_syslog($e->getMessage(), LOG_INFO);
-						}
-						$listLines->merge();
-					}
-					$odfHandler->mergeSegment($listLines);
-				}
-
-                $tmpArray['showSharedRisk'] = false;
-				//Fill risks data
-				$objectDocument->fillRiskData($odfHandler, $objectDocument, $outputLangs, $tmpArray, $file, $risks, $activeDigiriskElements, false);
-                if (!empty($conf->global->DIGIRISKDOLIBARR_SHOW_SHARED_RISKS)) {
-                    $tmpArray['showSharedRisk'] = true;
-                    $objectDocument->fillRiskData($odfHandler, $objectDocument, $outputLangs, $tmpArray, $file, $risks, $activeDigiriskElements, true);
+            // Order digirisk elements by risk assessment
+            $orderedDigiriskElements = [];
+            $digiriskElementIds      = array_keys($riskAssessments);
+            foreach ($digiriskElementIds as $digiriskElementId) {
+                if (isset($digiriskElements[$digiriskElementId])) {
+                    $orderedDigiriskElements[$digiriskElementId] = $digiriskElements[$digiriskElementId];
                 }
-                $odfHandler->setVars('showSharedRisk', $tmpArray['showSharedRisk'], true, 'UTF-8');
+            }
 
-                //Fill tickets data
-                $filter    = ['customsql' => 't.fk_project = ' . $conf->global->DIGIRISKDOLIBARR_TICKET_PROJECT . ' AND eft.digiriskdolibarr_ticket_service > 0'];
-                $tickets   = saturne_fetch_all_object_type('Ticket', '', '', 0, 0,  $filter, 'AND', true);
-				$listLines = $odfHandler->setSegment('tickets');
-				if (is_array($tickets) && !empty($tickets)) {
-					foreach ($tickets as $line) {
-						$tmpArray['refticket']     = $line->ref;
+            foreach ($orderedDigiriskElements as $orderedDigiriskElementId => $orderedDigiriskElement) {
+                $tmpArray['nomElement']      = 'S' . $orderedDigiriskElement['object']->entity . ' - ' . $orderedDigiriskElement['object']->ref . ' - ' . $orderedDigiriskElement['object']->label;
+                $tmpArray['description']     = $orderedDigiriskElement['object']->description;
+                $tmpArray['quotationTotale'] = $riskAssessments[$orderedDigiriskElementId]->quotation_totale ?? 0;
+                $tmpArray['NbRiskBlack']     = $riskAssessments[$orderedDigiriskElementId]->nb_risk_black ?? 0;
+                $tmpArray['NbRiskRed']       = $riskAssessments[$orderedDigiriskElementId]->nb_risk_red ?? 0;
+                $tmpArray['NbRiskOrange']    = $riskAssessments[$orderedDigiriskElementId]->nb_risk_orange ?? 0;
+                $tmpArray['NbRiskGrey']      = $riskAssessments[$orderedDigiriskElementId]->nb_risk_grey ?? 0;
 
-						$categories = $category->containing($line->id, Categorie::TYPE_TICKET);
-						if (!empty($categories)) {
-							$allcategories = [];
-							foreach ($categories as $cat) {
-								$allcategories[] = $cat->label;
-							}
-							$tmpArray['categories'] = implode(', ', $allcategories);
-						} else {
-							$tmpArray['categories'] = '';
-						}
+                $this->setTmpArrayVars($tmpArray, $listLines, $outputLangs);
+            }
+            $odfHandler->mergeSegment($listLines);
+        }
+    }
 
-						$tmpArray['creation_date'] = dol_print_date($line->datec, 'dayhoursec', 'tzuser');
-						$tmpArray['subject']       = $line->subject;
-						$tmpArray['message']       = $line->message;
-						$tmpArray['progress']      = (($line->progress) ?: 0) . ' %';
+    /**
+     * Set tickets segment
+     *
+     * @param Odf       $odfHandler  Object builder odf library
+     * @param Translate $outputLangs Lang object to use for output
+     *
+     * @throws OdfException
+     * @throws Exception
+     */
+    private function setTicketsSegment(Odf $odfHandler, Translate $outputLangs): void
+    {
+        $foundTagForLines = 1;
+        try {
+            $listLines = $odfHandler->setSegment('tickets');
+        } catch (OdfExceptionSegmentNotFound $e) {
+            // We may arrive here if tags for lines not present into template
+            $foundTagForLines = 0;
+            $listLines        = '';
+            dol_syslog($e->getMessage());
+        }
 
-						$tickettmp = new Ticket($this->db);
-						$tickettmp->fetch($line->id);
-						$tickettmp->fetch_optionals();
-						$digiriskelementtmp = new DigiriskElement($this->db);
-						$digiriskelementtmp->fetch($tickettmp->array_options['options_digiriskdolibarr_ticket_service']);
-						$tmpArray['digiriskelement_ref_label'] = $digiriskelementtmp->ref . ' - ' . $digiriskelementtmp->label;
+        if ($foundTagForLines) {
+            $loadRiskAssessmentDocumentInfos = $this->loadRiskAssessmentDocumentInfos();
+            $tickets                         = $loadRiskAssessmentDocumentInfos['tickets'];
+            if (!is_array($tickets) || empty($tickets)) {
+                $tmpArray = [
+                    'refticket'                 => '',
+                    'categories'                => '',
+                    'creation_date'             => '',
+                    'subject'                   => '',
+                    'message'                   => '',
+                    'progress'                  => '',
+                    'digiriskelement_ref_label' => '',
+                    'status'                    => '',
+                ];
 
-						$tmpArray['status'] = $tickettmp->getLibStatut();
+                $this->setTmpArrayVars($tmpArray, $listLines, $outputLangs);
+                $odfHandler->mergeSegment($listLines);
+                return;
+            }
 
-						$this->setTmpArrayVars($tmpArray, $listLines, $outputLangs);
-					}
-				} else {
-					$tmpArray['refticket']                 = '';
-					$tmpArray['categories']                = '';
-					$tmpArray['creation_date']             = '';
-					$tmpArray['subject']                   = '';
-					$tmpArray['message']                   = '';
-					$tmpArray['progress']                  = '';
-					$tmpArray['digiriskelement_ref_label'] = '';
-					$tmpArray['status']                    = '';
-					$this->setTmpArrayVars($tmpArray, $listLines, $outputLangs);
-				}
-				$odfHandler->mergeSegment($listLines);
-			}
-		} catch (OdfException $e) {
-			$this->error = $e->getMessage();
-			dol_syslog($this->error, LOG_WARNING);
-			return -1;
-		}
+            $category = new Categorie($this->db);
 
-		return 0;
-	}
+            foreach ($tickets as $ticket) {
+                $categories      = $category->containing($ticket->id, Categorie::TYPE_TICKET);
+                $digiriskElement = $loadRiskAssessmentDocumentInfos['currentDigiriskElements'][$ticket->array_options['options_digiriskdolibarr_ticket_service']]['object'];
+
+                $tmpArray['refticket']                 = $ticket->ref;
+                $tmpArray['categories']                = !empty($categories) ? implode(', ', array_map(fn($cat) => $cat->label, $categories)) : '';
+                $tmpArray['creation_date']             = dol_print_date($ticket->datec, 'dayhoursec');
+                $tmpArray['subject']                   = $ticket->subject;
+                $tmpArray['message']                   = $ticket->message;
+                $tmpArray['progress']                  = ($ticket->progress ?: 0) . ' %';
+                $tmpArray['digiriskelement_ref_label'] = $digiriskElement->ref . ' - ' . $digiriskElement->label;
+                $tmpArray['status']                    = $ticket->getLibStatut();
+
+                $this->setTmpArrayVars($tmpArray, $listLines, $outputLangs);
+            }
+            $odfHandler->mergeSegment($listLines);
+        }
+    }
+
+    /**
+     * Fill all odt tags for segments lines
+     *
+     * @param  Odf       $odfHandler  Object builder odf library
+     * @param  Translate $outputLangs Lang object to use for output
+     * @param  array     $moreParam   More param (Object/user/etc)
+     *
+     * @return int                    1 if OK, <=0 if KO
+     * @throws Exception
+     */
+    public function fillTagsLines(Odf $odfHandler, Translate $outputLangs, array $moreParam): int
+    {
+        // Replace tags of lines
+        try {
+            global $conf;
+
+            $objectDocument = $moreParam['objectDocument'];
+
+            $digiriskelementobject = new DigiriskElement($this->db);
+            $risk                  = new Risk($this->db);
+
+            $moreParam['segmentName']                                                 = 'elementParHierarchie';
+            $moreParam['loadRiskAssessmentDocumentInfos']['fetchDigiriskElementFlat'] = 'currentDigiriskElements';
+            $this->setDigiriskElementsSegment($odfHandler, $outputLangs, $moreParam);
+
+            $moreParam['segmentName']                                                 = 'elementParHierarchie2';
+            $moreParam['loadRiskAssessmentDocumentInfos']['fetchDigiriskElementFlat'] = 'sharedDigiriskElements';
+            $this->setDigiriskElementsSegment($odfHandler, $outputLangs, $moreParam);
+
+            $moreParam['segmentName']                                                 = 'risqueFiche';
+            $moreParam['loadRiskAssessmentDocumentInfos']['fetchDigiriskElementFlat'] = 'currentDigiriskElements';
+            $this->setRiskAssessmentsSegment($odfHandler, $outputLangs, $moreParam);
+
+            $moreParam['segmentName']                                                 = 'risqueFiche2';
+            $moreParam['loadRiskAssessmentDocumentInfos']['fetchDigiriskElementFlat'] = 'sharedDigiriskElements';
+            $this->setRiskAssessmentsSegment($odfHandler, $outputLangs, $moreParam);
+
+            //Fill risks data
+            $moreParam['filterRisk']    = ' AND t.type = "risk"';
+            $tmpArray['showSharedRisk'] = false;
+            $risks                      = $risk->fetchRisksOrderedByCotation(0, true, $conf->global->DIGIRISKDOLIBARR_SHOW_INHERITED_RISKS_IN_DOCUMENTS, 0, $moreParam);
+            $activeDigiriskElements     = $digiriskelementobject->getActiveDigiriskElements();
+            $objectDocument->fillRiskData($odfHandler, $objectDocument, $outputLangs, $tmpArray, '', $risks, $activeDigiriskElements, false);
+            if (getDolGlobalInt('DIGIRISKDOLIBARR_SHOW_SHARED_RISKS')) {
+                $tmpArray['showSharedRisk'] = true;
+                $risks                      = $risk->fetchRisksOrderedByCotation(0, true, $conf->global->DIGIRISKDOLIBARR_SHOW_INHERITED_RISKS_IN_DOCUMENTS, getDolGlobalInt('DIGIRISKDOLIBARR_SHOW_SHARED_RISKS'), $moreParam);
+                $objectDocument->fillRiskData($odfHandler, $objectDocument, $outputLangs, $tmpArray, '', $risks, $activeDigiriskElements, true);
+            }
+            $odfHandler->setVars('showSharedRisk', $tmpArray['showSharedRisk'], true, 'UTF-8');
+
+            $this->setTicketsSegment($odfHandler, $outputLangs);
+        } catch (OdfException $e) {
+            $this->error = $e->getMessage();
+            dol_syslog($this->error, LOG_WARNING);
+            return -1;
+        }
+        return 0;
+    }
 
     /**
      * Function to build a document on disk

@@ -395,7 +395,7 @@ class TicketDashboard extends DigiriskDolibarrDashboard
                     'color' => '#' . $mainCategory->color
                 ];
                 $moreParams['filter'] = ' AND t.element_type = "groupment"';
-                $digiriskElements     = $digiriskElement->getActiveDigiriskElements(0, $moreParams);
+                $digiriskElements     = $digiriskElement->getActiveDigiriskElements('current', $moreParams);
                 if (is_array($digiriskElements) && !empty($digiriskElements)) {
                     foreach ($digiriskElements as $digiriskElement) {
                         $tickets                                = saturne_fetch_all_object_type('Ticket', '', '', 0, 0, ['customsql' => 'cp.fk_categorie = ' . $mainCategory->id  . ' AND eft.digiriskdolibarr_ticket_service = ' . $digiriskElement->id . ' AND ' . $this->where], 'AND', true, true, true, $this->join);
@@ -447,7 +447,7 @@ class TicketDashboard extends DigiriskDolibarrDashboard
                             'color' => dol_strlen($mainSubCategory->color) > 0 ? '#' . $mainSubCategory->color : '',
                         ];
                         $moreParams['filter'] = ' AND t.element_type = "groupment"';
-                        $digiriskElements     = $digiriskElement->getActiveDigiriskElements(0, $moreParams);
+                        $digiriskElements     = $digiriskElement->getActiveDigiriskElements('current', $moreParams);
                         if (is_array($digiriskElements) && !empty($digiriskElements)) {
                             foreach ($digiriskElements as $digiriskElement) {
                                 $tickets                                = saturne_fetch_all_object_type('Ticket', '', '', 0, 0, ['customsql' => 'cp.fk_categorie = ' . $mainSubCategory->id  . ' AND eft.digiriskdolibarr_ticket_service = ' . $digiriskElement->id . ' AND ' . $this->where], 'AND', true, true, true, $this->join);

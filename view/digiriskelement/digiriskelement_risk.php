@@ -241,7 +241,7 @@ print '<div id="cardContent" value="">';
 if ($sharedrisks) {
 	$formconfirm = '';
 
-	$alldigiriskelement = $digiriskelement->getActiveDigiriskElements(1);
+	$alldigiriskelement = $digiriskelement->getActiveDigiriskElements('shared');
 
 	// Import shared risks confirmation
 	if (($action == 'import_shared_risks' && (empty($conf->use_javascript_ajax) || !empty($conf->dol_use_jmobile)))        // Output when action = clone if jmobile or no js

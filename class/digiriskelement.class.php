@@ -156,40 +156,22 @@ class DigiriskElement extends SaturneObject
     /**
      * Load ordered flat list of DigiriskElement in memory from the database
      *
-     * @param int $parent_id Id parent object
-     * @return array         <0 if KO, 0 if not found, >0 if OK
+     * @param  int   $parentID                Id parent object
+     * @param  array $fetchedDigiriskElements Preloaded digirisk elements (optional)
+     * @return array                          Flat list with depth
      * @throws Exception
      */
-    public function fetchDigiriskElementFlat($parent_id)
+    public function fetchDigiriskElementFlat(int $parentID = 0, array $fetchedDigiriskElements = [], string $multiEntityManagement = 'all'): array
     {
-        $object  = new DigiriskElement($this->db);
-        $objects = $object->fetchAll('',  '',  0,  0, array('customsql' => 'status > 0' ));
+        $digiriskElements = $fetchedDigiriskElements ?: self::getActiveDigiriskElements($multiEntityManagement);
 
-        if (is_array($objects)) {
-            $elements = recurse_tree($parent_id, 0, $objects);
-            $digiriskelementlist = array();
-            if ($elements > 0 && ! empty($elements)) {
-                // Super function iterations flat.
-                $it = new RecursiveIteratorIterator(new RecursiveArrayIterator($elements));
-                $element = array();
-                foreach ($it as $key => $v) {
-                    $element[$key][$v] = $v;
-                }
-                $children_id = array_shift($element);
-
-                if ( ! empty($children_id)) {
-                    foreach ($children_id as $id) {
-                        $object = $objects[$id];
-                        $depth = 'depth' . $id;
-                        $digiriskelementlist[$id]['object'] = $object;
-                        $digiriskelementlist[$id]['depth']  = array_shift($element[$depth]);
-                    }
-                }
-            }
-            return $digiriskelementlist;
-        } else {
-            return array();
+        if (!is_array($digiriskElements) || empty($digiriskElements)) {
+            return [];
         }
+
+        $tree = recurse_tree($parentID, 0, $digiriskElements);
+
+        return flatten_tree($tree);
     }
 
     /**
@@ -411,28 +393,41 @@ class DigiriskElement extends SaturneObject
     }
 
     /**
-     * Return list of non deleted digirisk elements
+     * Get active digirisk elements without trash
      *
-     * @param  int       $multiEntityManagement Option for manage multi entities with WHERE
-     * @param  array     $moreParams            More params (Object/user/etc)
-     * @return array|int $digiriskElements      Int <0 if KO, array of pages if OK
+     * @param  string    $multiEntityManagement                        Multi entity management (all, current, shared, entities)
+     * @param  array     $moreParams                                   More params (filter SQL)
+     * @return array|int $digiriskElements|$digiriskElementsByEntities int < 0 if KO, Array of digirisk elements or digirisk elements by entities
      * @throws Exception
      */
-    public function getActiveDigiriskElements(int $multiEntityManagement = 0, array $moreParams = [])
+    public function getActiveDigiriskElements(string $multiEntityManagement = 'current', array $moreParams = [])
     {
-        if ($multiEntityManagement == 1) {
-            $this->ismultientitymanaged = 0;
+        global $conf;
+
+        $filter = ' AND t.rowid NOT IN ' . $this->getTrashExclusionSqlFilter();
+        $digiriskElements =  $this->fetchAll('',  '',  0,  0, ['customsql' => 'status = ' . self::STATUS_VALIDATED . $filter . ($moreParams['filter'] ?? '')]);
+        if (!is_array($digiriskElements) || empty($digiriskElements)) {
+            return -1;
         }
 
-        $digiriskElements = $this->fetchAll('',  '',  0,  0, ['customsql' => 'status = ' . self::STATUS_VALIDATED . ($moreParams['filter'] ?? '')]);
-        $trashList        = $this->getMultiEntityTrashList();
-        if (is_array($trashList) && !empty($trashList)) {
-            foreach($trashList as $trashElementID) {
-                unset($digiriskElements[$trashElementID]);
+        if ($multiEntityManagement == 'all') {
+            return $digiriskElements;
+        }
+
+        $digiriskElementsByEntities = [];
+        foreach ($digiriskElements as $key => $digiriskElement) {
+            if ($multiEntityManagement == 'current' && $digiriskElement->entity == $conf->entity) {
+                $digiriskElementsByEntities[$key] = $digiriskElement;
+            }
+            if ($multiEntityManagement == 'shared' && $digiriskElement->entity != $conf->entity) {
+                $digiriskElementsByEntities[$key] = $digiriskElement;
+            }
+            if ($multiEntityManagement == 'entities') {
+                $digiriskElementsByEntities[$digiriskElement->entity][$key] = $digiriskElement;
             }
         }
 
-        return $digiriskElements;
+        return $digiriskElementsByEntities;
     }
 
     /**
