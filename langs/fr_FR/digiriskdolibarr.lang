@@ -1392,8 +1392,8 @@ Superior            = Supérieur à
 TimeRangeAdded      = Contrainte ajoutée
 TimeRangeDeleted    = Contrainte supprimée
 
-NumberOfTicketsByMainTagAndByDigiriskElement    = Nombre de registres par catégorie et par GP
-NumberOfTicketsByMainSubTagAndByDigiriskElement = Nombre de registres par sous-catégorie et par GP
+NumberOfTicketsByMainCategorieAndDigiriskElement    = Nombre de registres par catégorie et par GP
+NumberOfTicketsByMainSubCategorieAndDigiriskElement = Nombre de registres par sous-catégorie et par GP
 NumberOfTicketsByYear                           = Nombre de tickets par année
 
 # Ticket Management Dashboard - Tableau de bord de gestion des tickets
