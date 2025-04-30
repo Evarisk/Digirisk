@@ -185,6 +185,7 @@ class DigiriskElement extends SaturneObject
         global $conf;
 
         $this->fk_parent = $conf->global->DIGIRISKDOLIBARR_DIGIRISKELEMENT_TRASH;
+        $this->status    = self::STATUS_TRASHED;
 
         $result = $this->update($user, true);
         if ($result > 0 && !empty($conf->global->DIGIRISKDOLIBARR_MAIN_AGENDA_ACTIONAUTO_DIGIRISKELEMENT_DELETE)) {
@@ -250,6 +251,52 @@ class DigiriskElement extends SaturneObject
         }
 
         return $form::selectarray($htmlname, $digiriskElementsData, $selected, $showempty, 0, 0, '', 0, 0, 0, '', $morecss);
+    }
+
+    /**
+     * check if parent digirisk element not exists for a digirisk element
+     *
+     * @param  int       $limit Limit
+     * @return array|int        Int <0 if KO, array of pages if OK
+     * @throws Exception
+     */
+    public function checkNotExistsDigiriskElementForParentDigiriskElement(int $limit = 0)
+    {
+        dol_syslog(__METHOD__, LOG_DEBUG);
+
+        $sql  = 'SELECT ';
+        $sql .= $this->getFieldList('t');
+        $sql .= ' FROM ' . MAIN_DB_PREFIX . $this->table_element . ' as t';
+        $sql .= ' WHERE !EXISTS';
+        $sql .= ' ( SELECT ';
+        $sql .= $this->getFieldList('d');
+        $sql .= ' FROM ' . MAIN_DB_PREFIX . $this->table_element . ' as d';
+        $sql .= ' WHERE d.rowid = t.fk_parent )';
+        $sql .= ' AND t.fk_parent > 0';
+
+        $records = [];
+        $resql   = $this->db->query($sql);
+        if ($resql) {
+            $num = $this->db->num_rows($resql);
+            $i = 0;
+            while ($i < ($limit ? min($limit, $num) : $num)) {
+                $obj = $this->db->fetch_object($resql);
+
+                $record = new $this($this->db);
+                $record->setVarsFromFetchObj($obj);
+
+                $records[$record->id] = $record;
+
+                $i++;
+            }
+            $this->db->free($resql);
+
+            return $records;
+        } else {
+            $this->errors[] = 'Error ' . $this->db->lasterror();
+            dol_syslog(__METHOD__ . ' ' . join(',', $this->errors), LOG_ERR);
+            return -1;
+        }
     }
 
     /**
