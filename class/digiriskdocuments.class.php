@@ -151,294 +151,215 @@ class DigiriskDocuments extends SaturneDocuments
     /**
      * Fill risk data for ODT
      *
-     * @param Odf       $odfHandler             Object builder odf library
-     * @param Object    $object                 Object source to build document
-     * @param Translate $outputLangs            Lang object to use for output
-     * @param array     $tmparray               Array filled with data
-     * @param string    $file                   Filename
-     * @param array     $risk                   Array data of risks
-     * @param array     $activeDigiriskElements Array of active digirisk elements
-     * @param bool      $sharedRisk             Boolean to know if risks are shared
+     * @param Odf       $odfHandler  Object builder odf library
+     * @param Translate $outputLangs Lang object to use for output
+     * @param array     $moreParam   More param (segmentName, dangerCategories, riskByCategories)
      *
-     * @return void
+     * @throws OdfException
      * @throws Exception
      */
-    public function fillRiskData(Odf $odfHandler, $object, Translate $outputLangs, $tmparray, $file, $risks, $activeDigiriskElements = null, bool $sharedRisk = false)
+    private function setRiskTaskTag(Translate $outputLangs, array $moreParam): array
     {
-        global $action, $conf, $hookmanager, $langs, $mc;
+        global $conf, $mc;
 
-        $usertmp               = new User($this->db);
-        $project               = new Project($this->db);
-        $DUProject             = new Project($this->db);
-        $risk                  = new Risk($this->db);
-        if ($activeDigiriskElements == null) {
-            $digiriskelementobject = new DigiriskElement($this->db);
-            $activeDigiriskElements = $digiriskelementobject->getActiveDigiriskElements($sharedRisk);
+        $array = [];
+
+        $riskTasks = $moreParam['riskTasks'];
+        if (empty($riskTasks)) {
+            $array['riskTaskUncompleted'] = '';
+            $array['riskTaskCompleted']   = '';
+            return $array;
         }
 
-        $DUProject->fetch($conf->global->DIGIRISKDOLIBARR_DU_PROJECT);
-        $tasksSortedByRisk      = $risk->getTasksWithFkRisk();
+        $result = 1;
+        if ($moreParam['entity'] == 'shared') {
+            $result = !empty($mc->sharings['project']) ? in_array($project->entity, $mc->sharings['project']) : 0;
+        }
 
-        for ($i = 4; $i >= 1; $i--) {
-            $foundTagForLines = 1;
-            try {
-                $listlines = $odfHandler->setSegment(($sharedRisk ? 'shared' : '') . 'risk' . $i);
-            } catch (OdfException|OdfExceptionSegmentNotFound $e) {
-                // We may arrive here if tags for lines not present into template
-                $foundTagForLines = 0;
-                $listlines        = '';
-                dol_syslog($e->getMessage());
-            }
+        if ($result == 0) {
+            $array['riskTaskUncompleted'] = $outputLangs->trans('NoTaskShared');
+            $array['riskTaskCompleted']   = $outputLangs->trans('NoTaskShared');
+            return $array;
+        }
 
-            if ($foundTagForLines) {
-                if (is_array($risks) && ! empty($risks)) {
-                    foreach ($risks as $line) {
-                        if ($line->fk_element > 0 && ((!$sharedRisk && $line->origin_type != 'shared') || ($sharedRisk && $line->origin_type == 'shared'))) {
-                            $tmparray['actionPreventionUncompleted'] = "";
-                            $tmparray['actionPreventionCompleted']   = "";
-                            $lastEvaluation                          = $line->lastEvaluation;
-
-                            if ($lastEvaluation->cotation >= 0 && !empty($lastEvaluation) && is_object($lastEvaluation)) {
-                                $scale = $lastEvaluation->getEvaluationScale();
-
-                                if ($scale == $i) {
-                                    $element        = $activeDigiriskElements[$line->fk_element];
-                                    $linked_element = $activeDigiriskElements[$line->appliedOn];
-                                    $nomElement     = '';
-                                    $dash           = getDolGlobalInt('DIGIRISKDOLIBARR_RISK_LIST_PARENT_VIEW') > 0;
-                                    if (getDolGlobalInt('DIGIRISKDOLIBARR_RISK_LIST_PARENT_VIEW') > 0) {
-                                        $digiriskElementIds = $activeDigiriskElements[$line->fk_element]->getBranch($line->fk_element);
-
-                                        if (!empty($digiriskElementIds)) {
-                                            $digiriskElementIds = array_reverse($digiriskElementIds);
-                                            array_pop($digiriskElementIds);
-
-                                            foreach ($digiriskElementIds as $key => $digiriskElementId) {
-                                                $nomElement .= '<br>' . str_repeat(' - ', count($digiriskElementIds) + 1 - $key) . $activeDigiriskElements[$digiriskElementId]->ref . ' - ' . $activeDigiriskElements[$digiriskElementId]->label . chr(0x0A) . chr(0x0A);
-                                            }
-                                        }
-                                    }
-
-                                    if ($conf->global->DIGIRISKDOLIBARR_SHOW_RISK_ORIGIN) {
-                                        $nomElement .= '<br>' . (!empty($conf->global->DIGIRISKDOLIBARR_SHOW_SHARED_RISKS) ? 'S' . $element->entity : '') . ' - ' . $element->ref . ' - ' . $element->label;
-                                        if ($line->fk_element != $line->appliedOn) {
-                                            $nomElement .= '<br>' . $langs->trans('AppliedOn') . ' ' . $linked_element->ref . ' - ' . $linked_element->label;
-                                        }
-                                    } else {
-                                        if ($linked_element->id > 0) {
-                                            $nomElement .= '<br>' . ($dash > 0 ? ' - ' : '') . $linked_element->ref . ' - ' . $linked_element->label;
-                                        } else {
-                                            $nomElement .= '<br>' . ($dash > 0 ? ' - ' : '') . $element->ref . ' - ' . $element->label;
-                                        }
-                                    }
-
-                                    $tmparray['nomElement']        = $nomElement;
-                                    $tmparray['nomDanger']         = DOL_DOCUMENT_ROOT . '/custom/digiriskdolibarr/img/categorieDangers/' . $line->getDangerCategory($line) . '.png';
-                                    $tmparray['nomPicto']          = (!empty($conf->global->DIGIRISKDOLIBARR_DOCUMENT_SHOW_PICTO_NAME) ? $line->getDangerCategoryName($line) : ' ');
-                                    $tmparray['identifiantRisque'] = $line->ref . ' - ' . $lastEvaluation->ref;
-                                    $tmparray['quotationRisque']   = $lastEvaluation->cotation ?: 0;
-                                    $tmparray['descriptionRisque'] = $line->description;
-
-                                    if (!getDolGlobalInt('DIGIRISKDOLIBARR_RISKASSESSMENT_HIDE_DATE_IN_DOCUMENT') && dol_strlen($lastEvaluation->comment)) {
-                                        $tmparray['commentaireEvaluation'] = dol_print_date((getDolGlobalInt('DIGIRISKDOLIBARR_SHOW_RISKASSESSMENT_DATE') && !empty($lastEvaluation->date_riskassessment) ? $lastEvaluation->date_riskassessment : $lastEvaluation->date_creation), 'dayreduceformat') . ': ';
-                                    } else {
-                                        $tmparray['commentaireEvaluation'] = '';
-                                    }
-                                    $tmparray['commentaireEvaluation'] .= !empty($lastEvaluation->comment) ? $lastEvaluation->comment : '';
-
-                                    $related_tasks = $tasksSortedByRisk[$line->id];
-                                    if (!empty($related_tasks) && is_array($related_tasks)) {
-                                        foreach ($related_tasks as $related_task) {
-                                            if(is_object($related_task)) {
-                                                if (!empty($conf->global->DIGIRISKDOLIBARR_SHOW_SHARED_RISKS)) {
-                                                    $project->fetch($related_task->fk_projet);
-                                                    if ($project->entity != $conf->entity) {
-                                                        $result = !empty($mc->sharings['project']) ? in_array($project->entity, $mc->sharings['project']) : 0;
-                                                    } else {
-                                                        $result = 1;
-                                                    }
-                                                } else {
-                                                    $result = 1;
-                                                }
-                                                if ($result > 0) {
-                                                    $AllInitiales = '';
-                                                    $related_task_contact_ids = $related_task->getListContactId();
-                                                    if (!empty($related_task_contact_ids) && is_array($related_task_contact_ids)) {
-                                                        foreach ($related_task_contact_ids as $related_task_contact_id) {
-                                                            $usertmp->fetch($related_task_contact_id);
-                                                            $AllInitiales .= strtoupper(str_split($usertmp->firstname, 1)[0] . str_split($usertmp->lastname, 1)[0] . ',');
-                                                        }
-                                                    }
-
-                                                    $contactslistinternal = $related_task->liste_contact(-1, 'internal');
-                                                    $responsible = '';
-
-                                                    if (!empty($contactslistinternal) && is_array($contactslistinternal)) {
-                                                        foreach ($contactslistinternal as $contactlistinternal) {
-                                                            if ($contactlistinternal['code'] == 'TASKEXECUTIVE') {
-                                                                $responsible .= $contactlistinternal['firstname'] . ' ' . $contactlistinternal['lastname'] . ', ';
-                                                            }
-                                                        }
-                                                    }
-
-                                                    if ($conf->global->DIGIRISKDOLIBARR_SHOW_TASK_CALCULATED_PROGRESS) {
-                                                        $timeSpentArray = $related_task->getSummaryOfTimeSpent();
-                                                        if ($timeSpentArray['total_duration'] > 0 && !empty($related_task->planned_workload)) {
-                                                            $task_progress = round($timeSpentArray['total_duration'] / $related_task->planned_workload * 100, 2);
-                                                        } else {
-                                                            $task_progress = 0;
-                                                        }
-                                                    } else {
-                                                        $task_progress = $related_task->progress;
-                                                    }
-
-                                                    if ($task_progress == 100) {
-                                                        if ($conf->global->DIGIRISKDOLIBARR_WORKUNITDOCUMENT_SHOW_TASK_DONE > 0) {
-                                                            (($related_task->label) ? $tmparray['actionPreventionCompleted'] .= $langs->trans('Label') . ' : ' . $related_task->label . "\n" : '');
-                                                            if (!getDolGlobalInt('DIGIRISKDOLIBARR_TASK_HIDE_REF_IN_DOCUMENT')) {
-                                                                (($related_task->ref) ? $tmparray['actionPreventionCompleted'] .= $langs->trans('Ref') . ' : ' . $related_task->ref . "\n" : '');
-                                                            }
-                                                            if (!getDolGlobalInt('DIGIRISKDOLIBARR_TASK_HIDE_RESPONSIBLE_IN_DOCUMENT')) {
-                                                                (($responsible) ? $tmparray['actionPreventionCompleted'] .= $langs->trans('Responsible') . ' : ' . $responsible . "\n" : '');
-                                                            }
-                                                            if (!getDolGlobalInt('DIGIRISKDOLIBARR_TASK_HIDE_DATE_IN_DOCUMENT')) {
-                                                                $tmparray['actionPreventionCompleted'] .= $langs->trans('DateStart') . ' : ';
-                                                                if ($conf->global->DIGIRISKDOLIBARR_SHOW_TASK_START_DATE && !empty($related_task->dateo)) {
-                                                                    $tmparray['actionPreventionCompleted'] .= dol_print_date(($related_task->dateo), 'dayreduceformat');
-                                                                } else {
-                                                                    $tmparray['actionPreventionCompleted'] .= dol_print_date(($related_task->datec), 'dayreduceformat');
-                                                                }
-                                                                if ($conf->global->DIGIRISKDOLIBARR_SHOW_TASK_END_DATE && !empty($related_task->datee)) {
-                                                                    $tmparray['actionPreventionCompleted'] .= "\n" . $langs->transnoentities('Deadline') . ' : ' . dol_print_date($related_task->datee, 'dayreduceformat') . "\n";
-                                                                } else {
-                                                                    $tmparray['actionPreventionCompleted'] .= ' - ' . $langs->transnoentities('Deadline') . ' : ' . $langs->trans('NoData') . "\n";
-                                                                }
-                                                            }
-                                                            if (!getDolGlobalInt('DIGIRISKDOLIBARR_TASK_HIDE_BUDGET_IN_DOCUMENT')) {
-                                                                $tmparray['actionPreventionCompleted'] .= $langs->trans('Budget') . ' : ' . price($related_task->budget_amount, 0, $langs, 1, 0, 0, $conf->currency) . "\n";
-                                                            }
-                                                            (($AllInitiales) ? $tmparray['actionPreventionCompleted'] .= $langs->trans('ContactsAction') . ' : ' . $AllInitiales . "\n" : '');
-                                                            (($related_task->description) ? $tmparray['actionPreventionCompleted'] .= $langs->trans('Description') . ' : ' . $related_task->description . "\n" : '');
-                                                            $tmparray['actionPreventionCompleted'] .= "\n";
-                                                        } else {
-                                                            $tmparray['actionPreventionCompleted'] = $langs->transnoentities('ActionPreventionCompletedTaskDone');
-                                                        }
-                                                    } else {
-                                                        (($related_task->label) ? $tmparray['actionPreventionUncompleted'] .= $langs->trans('Label') . ' : ' . $related_task->label . "\n" : '');
-                                                        if (!getDolGlobalInt('DIGIRISKDOLIBARR_TASK_HIDE_REF_IN_DOCUMENT')) {
-                                                            (($related_task->ref) ? $tmparray['actionPreventionUncompleted'] .= $langs->trans('Ref') . ' : ' . $related_task->ref . "\n" : '');
-                                                        }
-                                                        if (!getDolGlobalInt('DIGIRISKDOLIBARR_TASK_HIDE_RESPONSIBLE_IN_DOCUMENT')) {
-                                                            (($responsible) ? $tmparray['actionPreventionUncompleted'] .= $langs->trans('Responsible') . ' : ' . $responsible . "\n" : '');
-                                                        }
-                                                        if (!getDolGlobalInt('DIGIRISKDOLIBARR_TASK_HIDE_DATE_IN_DOCUMENT')) {
-                                                            $tmparray['actionPreventionUncompleted'] .= $langs->trans('DateStart') . ' : ';
-                                                            if ($conf->global->DIGIRISKDOLIBARR_SHOW_TASK_START_DATE && !empty($related_task->dateo)) {
-                                                                $tmparray['actionPreventionUncompleted'] .= dol_print_date(($related_task->dateo), 'dayreduceformat');
-                                                            } else {
-                                                                $tmparray['actionPreventionUncompleted'] .= dol_print_date(($related_task->datec), 'dayreduceformat');
-                                                            }
-                                                            if ($conf->global->DIGIRISKDOLIBARR_SHOW_TASK_END_DATE && !empty($related_task->datee)) {
-                                                                $tmparray['actionPreventionUncompleted'] .= "\n" . $langs->transnoentities('Deadline') . ' : ' . dol_print_date($related_task->datee, 'dayreduceformat') . "\n";
-                                                            } else {
-                                                                $tmparray['actionPreventionUncompleted'] .= ' - ' . $langs->transnoentities('Deadline') . ' : ' . $langs->trans('NoData') . "\n";
-                                                            }
-
-                                                        }
-                                                        if (!getDolGlobalInt('DIGIRISKDOLIBARR_TASK_HIDE_BUDGET_IN_DOCUMENT')) {
-                                                            $tmparray['actionPreventionUncompleted'] .= $langs->trans('Budget') . ' : ' . price($related_task->budget_amount, 0, $langs, 1, 0, 0, $conf->currency) . ' - ';
-                                                        }
-                                                        $tmparray['actionPreventionUncompleted'] .= $langs->trans('DigiriskProgress') . ' : ' . ($task_progress ?: 0) . ' %' . "\n";
-                                                        (($AllInitiales) ? $tmparray['actionPreventionUncompleted'] .= $langs->trans('ContactsAction') . ' : ' . $AllInitiales . "\n" : '');
-                                                        (($related_task->description) ? $tmparray['actionPreventionUncompleted'] .= $langs->trans('Description') . ' : ' . $related_task->description . "\n" : '');
-                                                        $tmparray['actionPreventionUncompleted'] .= "\n";
-                                                    }
-                                                } else {
-                                                    $tmparray['actionPreventionUncompleted'] = $langs->trans('NoTaskShared');
-                                                    $tmparray['actionPreventionCompleted'] = $langs->trans('NoTaskShared');
-                                                }
-                                            }
-                                        }
-                                    } else {
-                                        $tmparray['actionPreventionUncompleted'] = "";
-                                        $tmparray['actionPreventionCompleted']   = "";
-                                    }
-
-                                    if (dol_strlen($lastEvaluation->photo) && $lastEvaluation !== 'undefined') {
-                                        $entity                    = $lastEvaluation->entity > 1 ? '/' . $lastEvaluation->entity : '';
-                                        $path                      = DOL_DATA_ROOT . $entity . '/digiriskdolibarr/riskassessment/' . $lastEvaluation->ref;
-                                        $thumb_name                = getThumbName($lastEvaluation->photo);
-                                        $image                     = $path . '/thumbs/' . $thumb_name;
-                                        $tmparray['photoAssociee'] = $image;
-                                    } else {
-                                        $tmparray['photoAssociee'] = $langs->transnoentities('NoFileLinked');
-                                    }
-
-                                    unset($tmparray['object_fields']);
-
-                                    complete_substitutions_array($tmparray, $outputLangs, $object, $line, "completesubstitutionarray_lines");
-
-                                    // Call the ODTSubstitutionLine hook
-                                    $parameters = array('odfHandler' => &$odfHandler, 'file' => $file, 'object' => $object, 'outputlangs' => $outputLangs, 'substitutionarray' => &$tmparray, 'line' => $line);
-                                    $hookmanager->executeHooks('ODTSubstitutionLine', $parameters, $this, $action); // Note that $action and $object may have been modified by some hooks
-
-                                    foreach ($tmparray as $key => $val) {
-                                        try {
-                                            if ($key == 'photoAssociee') {
-                                                if (file_exists($val)) {
-                                                    $listlines->setImage($key, $val);
-                                                } else {
-                                                    $listlines->setVars($key, $langs->trans('NoData'), true, 'UTF-8');
-                                                }
-                                            } elseif ($key == 'nomDanger') {
-                                                if (file_exists($val)) {
-                                                    $listlines->setImage($key, $val);
-                                                } else {
-                                                    $listlines->setVars($key, $langs->trans('NoData'), true, 'UTF-8');
-                                                }
-                                            } elseif (empty($val) && $val != '0') {
-
-                                                $listlines->setVars($key, $langs->trans('NoData'), true, 'UTF-8');
-                                            } else {
-
-                                                $listlines->setVars($key, html_entity_decode($val, ENT_QUOTES | ENT_HTML5), true, 'UTF-8');
-                                            }
-                                        } catch (OdfException $e) {
-                                            dol_syslog($e->getMessage());
-                                        }
-                                    }
-                                    $listlines->merge();
-                                }
-                            }
-                        }
-                    }
-                } else {
-                    $tmparray['nomElement']                  = $langs->trans('NoData');
-                    $tmparray['nomDanger']                   = $langs->trans('NoData');
-                    $tmparray['nomPicto']                    = $langs->trans('NoData');
-                    $tmparray['identifiantRisque']           = $langs->trans('NoData');
-                    $tmparray['quotationRisque']             = $langs->trans('NoData');
-                    $tmparray['descriptionRisque']           = $langs->trans('NoDescriptionThere');
-                    $tmparray['commentaireEvaluation']       = $langs->trans('NoRiskThere');
-                    $tmparray['actionPreventionUncompleted'] = $langs->trans('NoTaskUnCompletedThere');
-                    $tmparray['actionPreventionCompleted']   = $langs->trans('NoTaskCompletedThere');
-                    $tmparray['photoAssociee']               = $langs->transnoentities('NoFileLinked');
-                    foreach ($tmparray as $key => $val) {
-                        try {
-                            if (empty($val)) {
-                                $listlines->setVars($key, $langs->trans('NoData'), true, 'UTF-8');
-                            } else {
-                                $listlines->setVars($key, html_entity_decode($val, ENT_QUOTES | ENT_HTML5), true, 'UTF-8');
-                            }
-                        } catch (SegmentException $e) {
-                            dol_syslog($e->getMessage());
-                        }
-                    }
-                    $listlines->merge();
+        foreach ($riskTasks as $riskTask) {
+            $AllInitiales = '';
+            $related_task_contact_ids = $riskTask->getListContactId();
+            if (!empty($related_task_contact_ids) && is_array($related_task_contact_ids)) {
+                foreach ($related_task_contact_ids as $related_task_contact_id) {
+                    $usertmp->fetch($related_task_contact_id);
+                    $AllInitiales .= strtoupper(str_split($usertmp->firstname, 1)[0] . str_split($usertmp->lastname, 1)[0] . ',');
                 }
-                $odfHandler->mergeSegment($listlines);
+            }
+
+            $contactslistinternal = $riskTask->liste_contact(-1, 'internal');
+            $responsible = '';
+
+            if (!empty($contactslistinternal) && is_array($contactslistinternal)) {
+                foreach ($contactslistinternal as $contactlistinternal) {
+                    if ($contactlistinternal['code'] == 'TASKEXECUTIVE') {
+                        $responsible .= $contactlistinternal['firstname'] . ' ' . $contactlistinternal['lastname'] . ', ';
+                    }
+                }
+            }
+
+            $riskTaskProgress = $riskTask->progress;
+            if (getDolGlobalInt('DIGIRISKDOLIBARR_SHOW_TASK_CALCULATED_PROGRESS')) {
+                $timeSpents = $riskTask->getSummaryOfTimeSpent();
+                if ($timeSpents['total_duration'] > 0 && !empty($riskTask->planned_workload)) {
+                    $riskTaskProgress = round($timeSpents['total_duration'] / $riskTask->planned_workload * 100, 2);
+                }
+            }
+
+            $riskTaskTypes = ['Uncompleted'];
+            if ($riskTaskProgress == 100) {
+                if (!getDolGlobalInt('DIGIRISKDOLIBARR_WORKUNITDOCUMENT_SHOW_TASK_DONE')) {
+                    $array['riskTaskCompleted'] = $outputLangs->transnoentities('ActionPreventionCompletedTaskDone');
+                } else {
+                    $riskTaskTypes[] = 'Completed';
+                }
+            }
+            foreach ($riskTaskTypes as $riskTaskType) {
+                $array['riskTask' . $riskTaskType] .= $outputLangs->transnoentities('Label') . ' : ' . $riskTask->label . '<br>';
+                if (!getDolGlobalInt('DIGIRISKDOLIBARR_TASK_HIDE_REF_IN_DOCUMENT')) {
+                    $array['riskTask' . $riskTaskType] .= $outputLangs->transnoentities('Ref') . ' : ' . $riskTask->ref . '<br>';
+                }
+                if (!getDolGlobalInt('DIGIRISKDOLIBARR_TASK_HIDE_RESPONSIBLE_IN_DOCUMENT')) {
+                    (($responsible) ? $array['riskTask' . $riskTaskType] .= $outputLangs->transnoentities('Responsible') . ' : ' . $responsible . '<br>' : '');
+                }
+
+                if (!getDolGlobalInt('DIGIRISKDOLIBARR_TASK_HIDE_DATE_IN_DOCUMENT')) {
+                    $array['riskTask' . $riskTaskType] .= $outputLangs->transnoentities('DateStart') . ' : ';
+                    if (getDolGlobalInt('DIGIRISKDOLIBARR_SHOW_TASK_START_DATE') && !empty($riskTask->dateo)) {
+                        $array['riskTask' . $riskTaskType] .= dol_print_date($riskTask->dateo, 'dayreduceformat') . '<br>';
+                    } else {
+                        $array['riskTask' . $riskTaskType] .= dol_print_date($riskTask->datec, 'dayreduceformat') . '<br>';
+                    }
+                    if (getDolGlobalInt('DIGIRISKDOLIBARR_SHOW_TASK_END_DATE') && !empty($riskTask->datee)) {
+                        $array['riskTask' . $riskTaskType] .= $outputLangs->transnoentities('Deadline') . ' : ' . dol_print_date($riskTask->datee, 'dayreduceformat') . '<br>';
+                    }
+                }
+
+                if (!getDolGlobalInt('DIGIRISKDOLIBARR_TASK_HIDE_BUDGET_IN_DOCUMENT')) {
+                    $array['riskTask' . $riskTaskType] .= $outputLangs->trans('Budget') . ' : ' . price($riskTask->budget_amount, 0, $outputLangs, 1, 0, 0, $conf->currency) . ' - ';
+                }
+                if ($riskTaskType != 'Completed') {
+                    $array['riskTask' . $riskTaskType] .= $outputLangs->trans('DigiriskProgress') . ' : ' . ($riskTaskProgress ?: 0) . ' %'  . '<br>';
+                }
+
+                (($AllInitiales) ? $array['riskTask' . $riskTaskType] .= $outputLangs->trans('ContactsAction') . ' : ' . $AllInitiales . '<br>' : '');
+                (($riskTask->description) ? $array['riskTask' . $riskTaskType] .= $outputLangs->trans('Description') . ' : ' . $riskTask->description . '<br>' : '');
+
+                $array['riskTask' . $riskTaskType] .= '<br>';
             }
         }
+
+        return $array;
+    }
+
+    /**
+     * Fill risk data for ODT
+     *
+     * @param Odf       $odfHandler  Object builder odf library
+     * @param Translate $outputLangs Lang object to use for output
+     * @param array     $moreParam   More param (segmentName, dangerCategories, riskByCategories)
+     *
+     * @throws OdfException
+     * @throws Exception
+     */
+    private function setRisksSegment(Odf $odfHandler, Translate $outputLangs, array $moreParam): void
+    {
+//        echo '<pre>'; print_r($moreParam['segmentName']  ); echo '</pre>'; exit;
+        $foundTagForLines = 1;
+        try {
+            $listLines = $odfHandler->setSegment($moreParam['segmentName']);
+        } catch (OdfExceptionSegmentNotFound $e) {
+            // We may arrive here if tags for lines not present into template
+            $foundTagForLines = 0;
+            $listLines        = '';
+            dol_syslog($e->getMessage());
+        }
+
+        if ($foundTagForLines) {
+            $digiriskElements    = $moreParam['digiriskElements'];
+            $risks               = $moreParam['risks'];
+            $riskAssessmentLevel = explode('Risks', $moreParam['segmentName'])[1];
+            if (empty($digiriskElements) || empty($risks) || empty($risks[$riskAssessmentLevel])) {
+                $tmpArray['digiriskElementLabel']   = '';
+                $tmpArray['picto']                  = '';
+                $tmpArray['riskCategoryName']       = '';
+                $tmpArray['ref']                    = '';
+                $tmpArray['riskAssessmentCotation'] = '';
+                $tmpArray['description']            = $outputLangs->trans('NoDescriptionThere');
+                $tmpArray['riskAssessmentComment']  = $outputLangs->trans('NoRiskThere');
+                $tmpArray['riskTaskUncompleted']    = $outputLangs->trans('NoTaskUnCompletedThere');
+                $tmpArray['riskTaskCompleted']      = $outputLangs->trans('NoTaskCompletedThere');
+                $tmpArray['riskAssessmentPhoto']    = $outputLangs->transnoentities('NoFileLinked');
+
+                SaturneDocumentModel::setTmpArrayVars($tmpArray, $listLines, $outputLangs);
+                $odfHandler->mergeSegment($listLines);
+                return;
+            }
+
+            foreach ($risks[$riskAssessmentLevel] as $risk) {
+                $digiriskElement                  = $digiriskElements[$risk->fk_element];
+                $depthHyphens                     = str_repeat('- ', $digiriskElement['depth']);
+                $tmpArray['digiriskElementLabel'] = $depthHyphens . 'S' . $digiriskElement['object']->entity . ' - ' . $digiriskElement['object']->ref . ' - ' . $digiriskElement['object']->label;
+
+                $tmpArray['picto']                  = DOL_DOCUMENT_ROOT . '/custom/digiriskdolibarr/img/categorieDangers/' . $risk->getDangerCategory($risk) . '.png';
+                $tmpArray['riskCategoryName']       = getDolGlobalInt('DIGIRISKDOLIBARR_DOCUMENT_SHOW_PICTO_NAME') ? $risk->getDangerCategoryName($risk) : ' ';
+                $tmpArray['ref']                    = $risk->ref . ' - ' . $risk->riskAssessmentRef;
+                $tmpArray['riskAssessmentCotation'] = $risk->riskAssessmentCotation ?: 0;
+                $tmpArray['description']            = $risk->description;
+
+                if (!getDolGlobalInt('DIGIRISKDOLIBARR_RISKASSESSMENT_HIDE_DATE_IN_DOCUMENT') && !empty($risk->riskAssessmentComment)) {
+                    $tmpArray['riskAssessmentComment'] = dol_print_date((getDolGlobalInt('DIGIRISKDOLIBARR_SHOW_RISKASSESSMENT_DATE') && !empty($risk->riskAssessmentDate) ? $risk->riskAssessmentDate : $risk->riskAssessmentDateCreation), 'dayreduceformat') . ': ';
+                }
+                $tmpArray['riskAssessmentComment'] .= $risk->riskAssessmentComment ?: '';
+
+//                $riskTask                        = $this->setRiskTaskTag($outputLangs, $moreParam);
+//                $tmpArray['riskTaskUncompleted'] = $riskTask['riskTaskUncompleted'];
+//                $tmpArray['riskTaskCompleted']   = $riskTask['riskTaskCompleted'];
+
+                $tmpArray['riskAssessmentPhoto'] = $outputLangs->transnoentities('NoFileLinked');
+                if (!empty($risk->riskAssessmentPhoto)) {
+                    $entityPath                      = $moreParam['entity'] == 'shared' ? '/' . $risk->entity : '';
+                    $path                            = DOL_DATA_ROOT . $entityPath . '/digiriskdolibarr/riskassessment/' . $risk->riskAssessmentRef;
+                    $fileSmall                       = saturne_get_thumb_name($risk->riskAssessmentPhoto);
+                    $image                           = $path . '/thumbs/' . $fileSmall;
+                    $tmpArray['riskAssessmentPhoto'] = $image;
+                }
+
+                SaturneDocumentModel::setTmpArrayVars($tmpArray, $listLines, $outputLangs);
+            }
+            $odfHandler->mergeSegment($listLines);
+        }
+    }
+
+    /**
+     * Fill risk data for ODT
+     *
+     * @param Odf       $odfHandler  Object builder odf library
+     * @param Translate $outputLangs Lang object to use for output
+     * @param array     $moreParam   More param (entity (current/shared))
+     *
+     * @return int                   1 if OK, <=0 if KO
+     * @throws Exception
+     */
+    public function fillRiskData(Odf $odfHandler, Translate $outputLangs, array $moreParam): int
+    {
+        // Replace tags of lines
+        try {
+            for ($i = 4; $i >= 1; $i--) {
+                $moreParam['segmentName'] = $moreParam['entity'] . 'Risks' . $i;
+                $this->setRisksSegment($odfHandler, $outputLangs, $moreParam);
+            }
+        } catch (OdfException $e) {
+            $this->error = $e->getMessage();
+            dol_syslog($this->error, LOG_WARNING);
+            return -1;
+        }
+        return 0;
     }
 
     /**
