@@ -72,14 +72,11 @@ class doc_riskassessmentdocument_odt extends SaturneDocumentModel
      *
      * @throws Exception
      */
-    private function loadRiskAssessmentDocumentInfos(array $moreParam): array
+    public function loadRiskAssessmentDocumentInfos(array $moreParam): array
     {
-        global $conf, $mc;
-
         $array = [];
 
         $digiriskElement = new DigiriskElement($this->db);
-        $riskAssessment  = new RiskAssessment($this->db);
         $risk            = new Risk($this->db);
 
         $array['dangerCategories'] = $risk->getDangerCategories();
@@ -96,85 +93,26 @@ class doc_riskassessmentdocument_odt extends SaturneDocumentModel
             }
         }
 
-        $select       = ', ra.ref AS riskAssessmentRef, ra.date_creation AS riskAssessmentDateCreation, ra.cotation AS riskAssessmentCotation, ra.date_riskassessment AS riskAssessmentDate, ra.comment AS riskAssessmentComment';
-        $sharedSelect = $select . ', ee.fk_target AS fk_target';
-
-        $moreSelects       = ['riskAssessmentRef', 'riskAssessmentDateCreation', 'riskAssessmentCotation', 'riskAssessmentDate', 'riskAssessmentComment'];
-        $sharedMoreSelects = array_merge($moreSelects, ['fk_target']);
-
-        $join  = ' INNER JOIN ' . $this->db->prefix() . $this->module . '_digiriskelement AS d ON d.rowid = t.fk_element';
-        $join .= ' INNER JOIN ' . $this->db->prefix() . $this->module . '_riskassessment AS ra ON t.rowid = ra.fk_risk';
-
-        $sharedJoin  = ' INNER JOIN ' . $this->db->prefix() . 'element_element AS ee ON (ee.fk_source = t.rowid AND ee.sourcetype = \'' . $this->module . '_risk\' AND ee.targettype = \'' . $this->module . '_digiriskelement\')';
-        $sharedJoin .= ' INNER JOIN ' . $this->db->prefix() . $this->module . '_digiriskelement AS d ON (d.rowid = ee.fk_target AND d.entity = ' . $conf->entity . ')';
-        $sharedJoin .= ' INNER JOIN ' . $this->db->prefix() . $this->module . '_riskassessment AS ra ON t.rowid = ra.fk_risk';
-
-        $filter        = 't.status = ' . Risk::STATUS_VALIDATED . ' AND t.type = \'risk\' AND d.status = ' . DigiriskElement::STATUS_VALIDATED . ' AND ra.status = ' . RiskAssessment::STATUS_VALIDATED;
-        $currentFilter = $filter . ' AND t.entity = ' . $conf->entity;
-
-        $array['current']['risks'] = saturne_fetch_all_object_type('Risk', 'DESC', 'riskAssessmentCotation', 0, 0, ['customsql' => $currentFilter], 'AND', false, false, false, $join, [], $select, $moreSelects);
-        if (!is_array($array['current']['risks']) || empty($array['current']['risks'])) {
-            $array['current']['risks']                         = [];
-            $array['current']['riskByRiskAssessmentCotations'] = [];
-            $array['current']['riskByCategories']              = [];
-            $array['current']['riskByRiskAssessmentLevels']    = [];
-        }
-
-        if ($moreParam['tmparray']['showSharedRisk_nocheck']) {
-            $array['shared']['risks'] = saturne_fetch_all_object_type('Risk', 'DESC', 'riskAssessmentCotation', 0, 0, ['customsql' => $filter], 'AND', false, true, false, $sharedJoin, [], $sharedSelect, $sharedMoreSelects);
-            if (!is_array($array['shared']['risks']) || empty($array['shared']['risks'])) {
-                $array['shared']['risks']                          = [];
-                $array['shared']['riskByCategories']               = [];
-                $array['shared']['riskByRiskAssessmentCotations']  = [];
-                $array['shared']['riskByRiskAssessmentLevels']     = [];
-            }
-        }
-
-        $array['risks'] = array_merge($array['current']['risks'], $array['shared']['risks']);
-
-        $nbTotalRisks = ['current' => 0,'shared' => 0];
-        foreach ($array['risks'] as $risk) {
-            $riskAssessment->cotation = $risk->riskAssessmentCotation;
-            $entity                   = ($risk->entity == $conf->entity) ? 'current' : 'shared';
-
-            $array[$entity]['riskByRiskAssessmentLevels'][$riskAssessment->getEvaluationScale()][] = $risk;
-            $array[$entity]['riskByRiskAssessmentCotations'][$risk->fk_element]['totalRiskAssessmentCotations'] += $risk->riskAssessmentCotation;
-            $array[$entity]['riskByRiskAssessmentCotations'][$risk->fk_element][$riskAssessment->getEvaluationScale()]++;
-            $array[$entity]['riskByCategories'][$risk->category][$riskAssessment->getEvaluationScale()]++;
-            $nbTotalRisks[$entity]++;
-        }
-
-        $array['current']['totalRisks'] = $nbTotalRisks['current'];
-        $array['shared']['totalRisks']  = $nbTotalRisks['shared'];
-
         $filter           = ['customsql' => 't.fk_project = ' . getDolGlobalInt('DIGIRISKDOLIBARR_TICKET_PROJECT') . ' AND eft.digiriskdolibarr_ticket_service > 0'];
         $array['tickets'] = saturne_fetch_all_object_type('Ticket', '', '', 0, 0,  $filter, 'AND', true);
         if (!is_array($array['tickets']) || empty($array['tickets'])) {
             $array['tickets'] = [];
         }
 
-        if (is_object($mc) && isModEnabled('multicompany')) {
-            $filter = 't.entity IN (' . $mc->getEntity('project') . ')';
-        } else {
-            $filter = 't.entity = ' . $conf->entity;
-        }
-        $filter        .= ' AND eft.fk_risk > 0';
-        $array['tasks'] = saturne_fetch_all_object_type('saturneTask', '', '', 0, 0, ['customsql' => $filter], 'AND', true, false);
-        if (!is_array($array['tasks']) || empty($array['tasks'])) {
-            $array['tasks']                     = [];
-            $array['current']['riskTask']       = [];
-            $array['shared']['riskTask']        = [];
-            $array['shared']['projectEntities'] = [];
-        }
-
-        foreach ($array['tasks'] as $task) {
-            $entity = ($task->entity == $conf->entity) ? 'current' : 'shared';
-
-            $array[$entity]['riskTasks'][$task->array_options['options_fk_risk']][] = $task;
-            if ($task->entity != $conf->entity) {
-                $array['shared']['projectEntities'][$task->entity] = '';
-            }
-        }
+        $riskArray = $risk->loadRiskInfos($moreParam);
+        $array['current']['risks']                         = $riskArray['current']['risks'];
+        $array['current']['riskByRiskAssessmentCotations'] = $riskArray['current']['riskByRiskAssessmentCotations'];
+        $array['current']['riskByCategories']              = $riskArray['current']['riskByCategories'];
+        $array['current']['riskByRiskAssessmentLevels']    = $riskArray['current']['riskByRiskAssessmentLevels'];
+        $array['shared']['risks']                          = $riskArray['shared']['risks'];
+        $array['shared']['riskByCategories']               = $riskArray['shared']['riskByCategories'];
+        $array['shared']['riskByRiskAssessmentCotations']  = $riskArray['shared']['riskByRiskAssessmentCotations'];
+        $array['shared']['riskByRiskAssessmentLevels']     = $riskArray['shared']['riskByRiskAssessmentLevels'];
+        $array['current']['totalRisks']                    = $riskArray['current']['totalRisks'];
+        $array['shared']['totalRisks']                     = $riskArray['shared']['totalRisks'];
+        $array['current']['riskTasks']                     = $riskArray['current']['riskTasks'];
+        $array['shared']['riskTasks']                      = $riskArray['shared']['riskTasks'];
+        $array['shared']['projectEntities']                = $riskArray['shared']['projectEntities'];
 
         return $array;
     }

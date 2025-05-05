@@ -149,16 +149,15 @@ class DigiriskDocuments extends SaturneDocuments
 	}
 
     /**
-     * Fill risk data for ODT
+     * Set risk tasks segment
      *
-     * @param Odf       $odfHandler  Object builder odf library
      * @param Translate $outputLangs Lang object to use for output
-     * @param array     $moreParam   More param (segmentName, dangerCategories, riskByCategories)
+     * @param array     $moreParam   More param (projectEntities, riskId, riskTasks)
      *
      * @throws OdfException
      * @throws Exception
      */
-    private static function setRiskTaskTag(Translate $outputLangs, array $moreParam): array
+    private static function setRiskTasksTag(Translate $outputLangs, array $moreParam): array
     {
         global $conf, $mc;
 
@@ -321,7 +320,7 @@ class DigiriskDocuments extends SaturneDocuments
                 $tmpArray['riskAssessmentComment'] .= $risk->riskAssessmentComment ?: '';
 
                 $moreParam['riskId']             = $risk->id;
-                $riskTask                        = static::setRiskTaskTag($outputLangs, $moreParam);
+                $riskTask                        = static::setRiskTasksTag($outputLangs, $moreParam);
                 $tmpArray['riskTaskUncompleted'] = $riskTask['riskTaskUncompleted'];
                 $tmpArray['riskTaskCompleted']   = $riskTask['riskTaskCompleted'];
 
