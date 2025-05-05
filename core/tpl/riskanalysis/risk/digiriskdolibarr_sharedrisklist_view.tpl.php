@@ -61,7 +61,7 @@ $DUProject                      = new Project($db);
 $advanced_method_cotation_json  = file_get_contents(DOL_DOCUMENT_ROOT . '/custom/digiriskdolibarr/js/json/default.json');
 $advancedCotationMethodArray = json_decode($advanced_method_cotation_json, true);
 
-$alldigiriskelement = $digiriskelement->getActiveDigiriskElements(1);
+$alldigiriskelement = $digiriskelement->getActiveDigiriskElements('shared');
 $digiriskElementsOfEntity = $digiriskelement->getActiveDigiriskElements();
 
 $DUProject->fetch($riskType == 'risk' ? $conf->global->DIGIRISKDOLIBARR_DU_PROJECT : $conf->global->DIGIRISKDOLIBARR_ENVIRONMENT_PROJECT);

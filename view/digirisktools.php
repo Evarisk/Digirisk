@@ -839,6 +839,31 @@ if ($action == 'repair_category') {
     $action = '';
 }
 
+if ($action == 'repair_digirisk_element') {
+    $digiriskElementExistParentDigiriskElements = $digiriskElement->checkNotExistsDigiriskElementForParentDigiriskElement();
+
+    $ObjectToDeletes = [];
+    if (is_array($digiriskElementExistParentDigiriskElements)) {
+        $ObjectToDeletes = array_merge($ObjectToDeletes, $digiriskElementExistParentDigiriskElements);
+    }
+
+    foreach ($ObjectToDeletes as $object) {
+        $result = $object->delete($user, '', false);
+        if ($result <= 0) {
+            $errors[] = $object->errors;
+        }
+    }
+
+    if (!empty($errors)) {
+        setEventMessages('', $errors, 'errors');
+    } else {
+        setEventMessages($langs->trans('DigiriskElementSuccessfullyRepaired'), []);
+    }
+
+    header('Location: ' . $_SERVER['PHP_SELF']);
+    exit;
+}
+
 if ($action == 'repair_risk') {
     $riskFkElements             = $risk->fetchAll('', '', 0, 0, ['customsql' => 't.fk_element <= 0']);
     $riskAssessmentFkElements   = saturne_fetch_all_object_type('RiskAssessment', '', '', 0, 0, ['customsql' =>  'r.fk_element <= 0'], 'AND', false, true, false, ' LEFT JOIN ' . MAIN_DB_PREFIX . $risk->table_element . ' as r ON r.rowid = t.fk_risk');
@@ -1168,6 +1193,32 @@ if ($user->rights->digiriskdolibarr->adminpage->read) {
     print '<td>' . $langs->trans('Description') . '</td>';
     print '<td class="center">' . $langs->trans('Action') . '</td>';
     print '</tr>';
+
+    print '<form name="repair" id="repair" action="' . $_SERVER['PHP_SELF'] . '" method="POST">';
+    print '<input type="hidden" name="token" value="' . newToken() . '">';
+    print '<input type="hidden" name="action" value="repair_digirisk_element">';
+
+    print '<tr class="oddeven"><td>';
+    print $langs->trans('CleanDigiriskElement');
+    print '</td><td>';
+    print '<div class="wpeo-notice notice-warning">';
+    print '<div class="notice-content">';
+
+    $nbDigiriskElements = 0;
+    $digiriskElements   = $digiriskElement->checkNotExistsDigiriskElementForParentDigiriskElement();
+    if (is_array($digiriskElements) && !empty($digiriskElements)) {
+        $nbDigiriskElements = count($digiriskElements);
+        print '<div class="notice-subtitle"><strong>' . $langs->transnoentities('CleanDigiriskElementExistParentDigiriskElement', $nbDigiriskElements) . '</strong></div>';
+    }
+    if ($nbDigiriskElements == 0) {
+        print '<div class="notice-subtitle"><strong>' . $langs->trans('NoDigiriskElementToClean') . '</strong></div>';
+    }
+
+    print '</div></div>';
+    print '</td><td class="center">';
+    print '<input type="submit" class="button reposition wpeo-button button-load ' . ($nbDigiriskElements == 0 ? 'button-disable' : '') . '" name="CleanDigiriskElement" value="' . $langs->trans('Clean') . '">';
+    print '</td></tr>';
+    print '</form>';
 
     print '<form name="repair" id="repair" action="' . $_SERVER['PHP_SELF'] . '" method="POST">';
     print '<input type="hidden" name="token" value="' . newToken() . '">';

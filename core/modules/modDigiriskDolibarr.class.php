@@ -818,7 +818,7 @@ class modDigiriskdolibarr extends DolibarrModules
 			$i++ => ['DIGIRISKDOLIBARR_SHOW_PATCH_NOTE', 'integer', 1, '', 0, 'current'],
             $i++ => ['DIGIRISKDOLIBARR_CUSTOM_NUM_REF_SET', 'integer', 0, '', 0, 'current'],
             $i++ => ['DIGIRISKDOLIBARR_LISTINGRISKSDOCUMENT_BACKWARD_ODT_PATH_SET', 'integer', 1, '', 0, 'current'],
-
+            $i++ => ['DIGIRISKDOLIBARR_BACKWARD_TRASH_ELEMENTS', 'integer', 1, '', 0, 'current'],
 
             // CONST ACCIDENT
 			$i++ => ['DIGIRISKDOLIBARR_MAIN_AGENDA_ACTIONAUTO_ACCIDENT_CREATE', 'integer', 1, '', 0, 'current'],
@@ -2016,7 +2016,7 @@ class modDigiriskdolibarr extends DolibarrModules
 			$digiriskelement->element_type = 'groupment';
 			$digiriskelement->ranks        = 0;
 			$digiriskelement->description  = $langs->trans('TrashGroupment');
-			$digiriskelement->status       = 0;
+			$digiriskelement->status       = DigiriskElement::STATUS_TRASHED;
 			$trash_id                      = $digiriskelement->create($user);
 
 			dolibarr_set_const($this->db, 'DIGIRISKDOLIBARR_DIGIRISKELEMENT_TRASH', $trash_id, 'integer', 0, '', $conf->entity);
@@ -2528,6 +2528,25 @@ class modDigiriskdolibarr extends DolibarrModules
         if (is_dir($mediaPath . '/accident_investigationdocument')) {
             chmod($mediaPath . '/accident_investigationdocument', 0755);
             rename($mediaPath . '/accident_investigationdocument', $mediaPath . '/accidentinvestigationdocument');
+        }
+
+        if (!getDolGlobalInt('DIGIRISKDOLIBARR_BACKWARD_TRASH_ELEMENTS') && $conf->entity == 1) {
+            require_once __DIR__ . '/../../class/digiriskelement.class.php';
+
+            $digiriskElement = new DigiriskElement($this->db);
+
+            $trashElementIds = $digiriskElement->getMultiEntityTrashList();
+            if (!empty($trashElementIds)) {
+                $filter = ['customsql' => 't.rowid IN ' . $digiriskElement->getTrashExclusionSqlFilter()];
+                $digiriskElement->ismultientitymanaged = 0;
+                $digiriskElements = $digiriskElement->fetchAll('', '', 0, 0, $filter);
+                foreach ($digiriskElements as $digiriskElement) {
+                    $digiriskElement->status = DigiriskElement::STATUS_TRASHED;
+                    $digiriskElement->setValueFrom('status', $digiriskElement->status, '', '', 'int');
+                }
+
+                dolibarr_set_const($this->db, 'DIGIRISKDOLIBARR_BACKWARD_TRASH_ELEMENTS', 1, 'integer');
+            }
         }
 
         return $this->_init($sql, $options);

@@ -62,9 +62,7 @@ class Evaluator extends SaturneObject
     public string $picto = 'fontawesome_fa-user-check_fas_#d35968';
 
     public const STATUS_DELETED   = -1;
-    public const STATUS_DRAFT     = 0;
     public const STATUS_VALIDATED = 1;
-    public const STATUS_LOCKED    = 2;
     public const STATUS_ARCHIVED  = 3;
 
 	/**
@@ -164,7 +162,7 @@ class Evaluator extends SaturneObject
 	 */
 	public function getNbEmployeesInvolved(array $moreParam = []) {
 		// Number employees involved
-		$allevaluators = $this->fetchAll('','', 0, 0, ['customsql' => ($moreParam['filter'] ?? '')], 'AND', 'fk_user');
+		$allevaluators = $this->fetchAll('','', 0, 0, ['customsql' => 't.status = ' . Evaluator::STATUS_VALIDATED . ($moreParam['filter'] ?? '')]);
 		if (is_array($allevaluators) && !empty($allevaluators)) {
 			$array['nbemployeesinvolved'] = count($allevaluators);
 		} else {

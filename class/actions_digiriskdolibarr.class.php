@@ -592,7 +592,25 @@ class ActionsDigiriskdolibarr
 		}
 	}
 
-	/**
+    /**
+     * Overloading the hookGetEntity function : replacing the parent's function with the one below
+     *
+     * @param  array $parameters Hook metadata (context, etc...)
+     * @return int               0 < on error, 0 on success, 1 to replace standard code
+     */
+    public function hookGetEntity(array $parameters): int
+    {
+        global $mc;
+
+        if (preg_match('/digiriskelementriskassessmentdocument|risklist|riskcard/', $parameters['context']) && in_array($parameters['element'], ['digiriskelement', 'riskassessment']) && getDolGlobalInt('DIGIRISKDOLIBARR_SHOW_SHARED_RISKS')) {
+            $this->resprints = $mc->getEntity('risk', 1);
+            return 1;
+        }
+
+        return 0; // or return 1 to replace standard code
+    }
+
+    /**
 	 *  Overloading the printFieldListFrom function : replacing the parent's function with the one below
 	 *
 	 * @param Hook $parameters metadatas (context, etc...)

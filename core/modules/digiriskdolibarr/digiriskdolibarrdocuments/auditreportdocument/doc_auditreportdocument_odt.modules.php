@@ -149,16 +149,17 @@ class doc_auditreportdocument_odt extends ModeleODTDigiriskElementDocument
             }
         }
 
-        $groupments       = [];
-        $workUnits        = [];
-        $digiriskElements = $digiriskElement->getActiveDigiriskElements(0, $moreParam);
-        if (is_array($digiriskElements) && !empty($digiriskElements)) {
-            foreach ($digiriskElements as $digiriskElement) {
-                if ($digiriskElement->element_type == 'groupment') {
-                    $groupments[] = $digiriskElement;
-                } else {
-                    $workUnits[] = $digiriskElement;
-                }
+        $digiriskElements = $digiriskElement->getActiveDigiriskElements('current', $moreParam);
+        if (!is_array($digiriskElements) || empty($digiriskElements)) {
+            $groupments = [];
+            $workUnits  = [];
+        }
+
+        foreach ($digiriskElements as $digiriskElement) {
+            if ($digiriskElement->element_type == 'groupment') {
+                $groupments[] = $digiriskElement;
+            } else {
+                $workUnits[] = $digiriskElement;
             }
         }
 
@@ -171,8 +172,8 @@ class doc_auditreportdocument_odt extends ModeleODTDigiriskElementDocument
             $tickets = saturne_fetch_all_object_type('Ticket', '', '', 0, 0,  ['customsql' => 'eft.digiriskdolibarr_ticket_service > 0' . $moreParam['specificFilter']], 'AND', true);
         }
 
-        $tmpArray['nb_new_or_edit_groupments'] = is_array($groupments) && !empty($groupments) ? count($groupments) : '';
-        $tmpArray['nb_new_or_edit_workunits']  = is_array($workUnits) && !empty($workUnits) ? count($workUnits) : '';
+        $tmpArray['nb_new_or_edit_groupments'] = !empty($groupments) ? count($groupments) : '';
+        $tmpArray['nb_new_or_edit_workunits']  = !empty($workUnits) ? count($workUnits) : '';
         $tmpArray['nb_new_or_edit_risks']      = is_array($risks) && !empty($risks) ? count($risks) : '';
         $tmpArray['nb_new_or_edit_risksigns']  = is_array($riskSigns) && !empty($riskSigns) ? count($riskSigns) : '';
         $tmpArray['nb_new_or_edit_evaluators'] = is_array($evaluators) && !empty($evaluators) ? count($evaluators) : '';

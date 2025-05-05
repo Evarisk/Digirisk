@@ -659,17 +659,25 @@ class Accident extends SaturneObject
      */
     public function getNbPresquAccidents(): array
     {
-        global $langs;
+        global $conf, $langs;
+
+        $array['nbpresquaccidents'] = 'N/A';
 
         $category = new Categorie($this->db);
 
-        $category->fetch(0, $langs->transnoentities('PresquAccident'));
-        $tickets = $category->getObjectsInCateg(Categorie::TYPE_TICKET);
-        if (!empty($tickets) && is_array($tickets)) {
-            $array['nbpresquaccidents'] = count($tickets);
-        } else {
-            $array['nbpresquaccidents'] = 'N/A';
+        $result = $category->fetch(0, $langs->transnoentities('PresquAccident'));
+        if ($result <= 0) {
+            return $array;
         }
+
+        $filter  = 't.fk_statut > 0 AND t.entity = ' . $conf->entity . ' AND cp.fk_categorie IN (' . $category->id  . ')';
+        $tickets = saturne_fetch_all_object_type('Ticket', '', '', 0, 0, ['customsql' => $filter], 'AND', false, false, true);
+        if (!is_array($tickets) || empty($tickets)) {
+            return $array;
+        }
+
+        $array['nbpresquaccidents'] = count($tickets);
+
         return $array;
     }
 
