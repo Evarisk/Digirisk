@@ -74,7 +74,7 @@ class doc_riskassessmentdocument_odt extends SaturneDocumentModel
      */
     private function loadRiskAssessmentDocumentInfos(array $moreParam): array
     {
-        global $conf;
+        global $conf, $mc;
 
         $array = [];
 
@@ -96,28 +96,48 @@ class doc_riskassessmentdocument_odt extends SaturneDocumentModel
             }
         }
 
-        $select         = ', ra.ref AS riskAssessmentRef, ra.date_creation AS riskAssessmentDateCreation, ra.cotation AS riskAssessmentCotation, ra.date_riskassessment AS riskAssessmentDate, ra.comment AS riskAssessmentComment';
-        $moreSelects    = ['riskAssessmentRef', 'riskAssessmentDateCreation', 'riskAssessmentCotation', 'riskAssessmentDate', 'riskAssessmentComment'];
-        $join           = ' INNER JOIN ' . MAIN_DB_PREFIX . $this->module . '_digiriskelement AS d ON d.rowid = t.fk_element';
-        $join          .= ' LEFT JOIN ' . MAIN_DB_PREFIX . $this->module . '_riskassessment AS ra ON t.rowid = ra.fk_risk';
-        $filter         = 't.status = ' . Risk::STATUS_VALIDATED . ' AND t.type = \'risk\' AND d.status = ' . DigiriskElement::STATUS_VALIDATED . ' AND ra.status = ' . RiskAssessment::STATUS_VALIDATED;
-        $array['risks'] = saturne_fetch_all_object_type('Risk', 'DESC', 'riskAssessmentCotation', 0, 0, ['customsql' => $filter], 'AND', false, true, false, $join, [], $select, $moreSelects);
-        if (!is_array($array['risks']) || empty($array['risks'])) {
-            $array['risks']                                    = [];
+        $select       = ', ra.ref AS riskAssessmentRef, ra.date_creation AS riskAssessmentDateCreation, ra.cotation AS riskAssessmentCotation, ra.date_riskassessment AS riskAssessmentDate, ra.comment AS riskAssessmentComment';
+        $sharedSelect = $select . ', ee.fk_target AS fk_target';
+
+        $moreSelects       = ['riskAssessmentRef', 'riskAssessmentDateCreation', 'riskAssessmentCotation', 'riskAssessmentDate', 'riskAssessmentComment'];
+        $sharedMoreSelects = array_merge($moreSelects, ['fk_target']);
+
+        $join  = ' INNER JOIN ' . $this->db->prefix() . $this->module . '_digiriskelement AS d ON d.rowid = t.fk_element';
+        $join .= ' INNER JOIN ' . $this->db->prefix() . $this->module . '_riskassessment AS ra ON t.rowid = ra.fk_risk';
+
+        $sharedJoin  = ' INNER JOIN ' . $this->db->prefix() . 'element_element AS ee ON (ee.fk_source = t.rowid AND ee.sourcetype = \'' . $this->module . '_risk\' AND ee.targettype = \'' . $this->module . '_digiriskelement\')';
+        $sharedJoin .= ' INNER JOIN ' . $this->db->prefix() . $this->module . '_digiriskelement AS d ON (d.rowid = ee.fk_target AND d.entity = ' . $conf->entity . ')';
+        $sharedJoin .= ' INNER JOIN ' . $this->db->prefix() . $this->module . '_riskassessment AS ra ON t.rowid = ra.fk_risk';
+
+        $filter        = 't.status = ' . Risk::STATUS_VALIDATED . ' AND t.type = \'risk\' AND d.status = ' . DigiriskElement::STATUS_VALIDATED . ' AND ra.status = ' . RiskAssessment::STATUS_VALIDATED;
+        $currentFilter = $filter . ' AND t.entity = ' . $conf->entity;
+
+        $array['current']['risks'] = saturne_fetch_all_object_type('Risk', 'DESC', 'riskAssessmentCotation', 0, 0, ['customsql' => $currentFilter], 'AND', false, false, false, $join, [], $select, $moreSelects);
+        if (!is_array($array['current']['risks']) || empty($array['current']['risks'])) {
             $array['current']['risks']                         = [];
             $array['current']['riskByRiskAssessmentCotations'] = [];
             $array['current']['riskByCategories']              = [];
-            $array['shared']['risks']                          = [];
-            $array['shared']['riskByCategories']               = [];
-            $array['shared']['riskByRiskAssessmentCotations']  = [];
+            $array['current']['riskByRiskAssessmentLevels']    = [];
         }
+
+        if ($moreParam['tmparray']['showSharedRisk_nocheck']) {
+            $array['shared']['risks'] = saturne_fetch_all_object_type('Risk', 'DESC', 'riskAssessmentCotation', 0, 0, ['customsql' => $filter], 'AND', false, true, false, $sharedJoin, [], $sharedSelect, $sharedMoreSelects);
+            if (!is_array($array['shared']['risks']) || empty($array['shared']['risks'])) {
+                $array['shared']['risks']                          = [];
+                $array['shared']['riskByCategories']               = [];
+                $array['shared']['riskByRiskAssessmentCotations']  = [];
+                $array['shared']['riskByRiskAssessmentLevels']     = [];
+            }
+        }
+
+        $array['risks'] = array_merge($array['current']['risks'], $array['shared']['risks']);
 
         $nbTotalRisks = ['current' => 0,'shared' => 0];
         foreach ($array['risks'] as $risk) {
             $riskAssessment->cotation = $risk->riskAssessmentCotation;
             $entity                   = ($risk->entity == $conf->entity) ? 'current' : 'shared';
 
-            $array[$entity]['risks'][$riskAssessment->getEvaluationScale()][] = $risk;
+            $array[$entity]['riskByRiskAssessmentLevels'][$riskAssessment->getEvaluationScale()][] = $risk;
             $array[$entity]['riskByRiskAssessmentCotations'][$risk->fk_element]['totalRiskAssessmentCotations'] += $risk->riskAssessmentCotation;
             $array[$entity]['riskByRiskAssessmentCotations'][$risk->fk_element][$riskAssessment->getEvaluationScale()]++;
             $array[$entity]['riskByCategories'][$risk->category][$riskAssessment->getEvaluationScale()]++;
@@ -133,11 +153,13 @@ class doc_riskassessmentdocument_odt extends SaturneDocumentModel
             $array['tickets'] = [];
         }
 
-        $select         = ', pj.entity';
-        $moreSelects    = ['projectEntity'];
-        $join          .= ' LEFT JOIN ' . MAIN_DB_PREFIX . 'projet AS pj ON t.rowid = pj.fk_projet';
-        $filter         = 'eft.fk_risk > 0';
-        $array['tasks'] = saturne_fetch_all_object_type('saturneTask', '', '', 0, 0, ['customsql' => $filter], 'AND', true, true, false, $join, [], $select, $moreSelects);
+        if (is_object($mc) && isModEnabled('multicompany')) {
+            $filter = 't.entity IN (' . $mc->getEntity('project') . ')';
+        } else {
+            $filter = 't.entity = ' . $conf->entity;
+        }
+        $filter        .= ' AND eft.fk_risk > 0';
+        $array['tasks'] = saturne_fetch_all_object_type('saturneTask', '', '', 0, 0, ['customsql' => $filter], 'AND', true, false);
         if (!is_array($array['tasks']) || empty($array['tasks'])) {
             $array['tasks']                     = [];
             $array['current']['riskTask']       = [];
@@ -148,8 +170,10 @@ class doc_riskassessmentdocument_odt extends SaturneDocumentModel
         foreach ($array['tasks'] as $task) {
             $entity = ($task->entity == $conf->entity) ? 'current' : 'shared';
 
-            $array[$entity]['riskTasks'][$task->array_options['options_fk_risk']] = $task;
-            $array['shared']['projectEntities'][$task->projectEntity] = '';
+            $array[$entity]['riskTasks'][$task->array_options['options_fk_risk']][] = $task;
+            if ($task->entity != $conf->entity) {
+                $array['shared']['projectEntities'][$task->entity] = '';
+            }
         }
 
         return $array;
@@ -165,7 +189,7 @@ class doc_riskassessmentdocument_odt extends SaturneDocumentModel
      * @throws OdfException
      * @throws Exception
      */
-    private function setDigiriskElementsSegment(Odf $odfHandler, Translate $outputLangs, array $moreParam): void
+    private static function setDigiriskElementsSegment(Odf $odfHandler, Translate $outputLangs, array $moreParam): void
     {
         $foundTagForLines = 1;
         try {
@@ -182,16 +206,16 @@ class doc_riskassessmentdocument_odt extends SaturneDocumentModel
             if (empty($digiriskElements)) {
                 $tmpArray['digiriskElementLabel'] = '';
 
-                $this->setTmpArrayVars($tmpArray, $listLines, $outputLangs);
+                static::setTmpArrayVars($tmpArray, $listLines, $outputLangs);
                 $odfHandler->mergeSegment($listLines);
                 return;
             }
 
             foreach ($digiriskElements as $digiriskElement) {
-                $depthHyphens                     = str_repeat('- ', $digiriskElement['depth']);
+                $depthHyphens                     = str_repeat('&nbsp;', 8 * $digiriskElement['depth']);
                 $tmpArray['digiriskElementLabel'] = $depthHyphens . 'S' . $digiriskElement['object']->entity . ' - ' . $digiriskElement['object']->ref . ' - ' . $digiriskElement['object']->label;
 
-                $this->setTmpArrayVars($tmpArray, $listLines, $outputLangs);
+                static::setTmpArrayVars($tmpArray, $listLines, $outputLangs);
             }
             $odfHandler->mergeSegment($listLines);
         }
@@ -207,7 +231,7 @@ class doc_riskassessmentdocument_odt extends SaturneDocumentModel
      * @throws OdfException
      * @throws Exception
      */
-    private function setRiskByRiskAssessmentCotationsSegment(Odf $odfHandler, Translate $outputLangs, array $moreParam): void
+    private static function setRiskByRiskAssessmentCotationsSegment(Odf $odfHandler, Translate $outputLangs, array $moreParam): void
     {
         $foundTagForLines = 1;
         try {
@@ -231,7 +255,7 @@ class doc_riskassessmentdocument_odt extends SaturneDocumentModel
                     $tmpArray['nb' . $riskAssessmentCotationType] = '';
                 }
 
-                $this->setTmpArrayVars($tmpArray, $listLines, $outputLangs);
+                static::setTmpArrayVars($tmpArray, $listLines, $outputLangs);
                 $odfHandler->mergeSegment($listLines);
                 return;
             }
@@ -257,7 +281,7 @@ class doc_riskassessmentdocument_odt extends SaturneDocumentModel
                     $tmpArray['nb' . $riskAssessmentCotationType] = $riskByRiskAssessmentCotations[$orderedDigiriskElementId][$i] ?: 0;
                 }
 
-                $this->setTmpArrayVars($tmpArray, $listLines, $outputLangs);
+                static::setTmpArrayVars($tmpArray, $listLines, $outputLangs);
             }
             $odfHandler->mergeSegment($listLines);
         }
@@ -273,7 +297,7 @@ class doc_riskassessmentdocument_odt extends SaturneDocumentModel
      * @throws OdfException
      * @throws Exception
      */
-    private function setRiskByCategoriesSegment(Odf $odfHandler, Translate $outputLangs, array $moreParam): void
+    private static function setRiskByCategoriesSegment(Odf $odfHandler, Translate $outputLangs, array $moreParam): void
     {
         $foundTagForLines = 1;
         try {
@@ -307,7 +331,7 @@ class doc_riskassessmentdocument_odt extends SaturneDocumentModel
                     $tmpArray['nb' . $riskAssessmentCotationType] = '';
                 }
 
-                $this->setTmpArrayVars($tmpArray, $listLines, $outputLangs);
+                static::setTmpArrayVars($tmpArray, $listLines, $outputLangs);
                 $odfHandler->mergeSegment($listLines);
 
                 $tmpArray[$entityTag . 'TPBC']  = '';
@@ -316,7 +340,7 @@ class doc_riskassessmentdocument_odt extends SaturneDocumentModel
                     $tmpArray[$entityTag . $totalNbRiskByRiskAssessmentCotationType[$riskAssessmentCotationType]['tmpArrayName']] = '';
                 }
 
-                $this->setTmpArrayVars($tmpArray, $odfHandler, $outputLangs, false);
+                static::setTmpArrayVars($tmpArray, $odfHandler, $outputLangs, false);
                 return;
             }
 
@@ -344,7 +368,7 @@ class doc_riskassessmentdocument_odt extends SaturneDocumentModel
                 $totalNbRiskByCategory       += $nbRiskByCategory;
                 $tmpArray['nbRiskByCategory'] = $nbRiskByCategory ?: 0;
 
-                $this->setTmpArrayVars($tmpArray, $listLines, $outputLangs);
+                static::setTmpArrayVars($tmpArray, $listLines, $outputLangs);
             }
             $odfHandler->mergeSegment($listLines);
 
@@ -355,7 +379,7 @@ class doc_riskassessmentdocument_odt extends SaturneDocumentModel
                 $tmpArray[$entityTag . $totalNbRiskByRiskAssessmentCotationType[$riskAssessmentCotationType]['tmpArrayName']] = $totalNbRiskByRiskAssessmentCotationType[$riskAssessmentCotationType]['value'] ?: 0; // Total number by cotation type
             }
 
-            $this->setTmpArrayVars($tmpArray, $odfHandler, $outputLangs, false);
+            static::setTmpArrayVars($tmpArray, $odfHandler, $outputLangs, false);
         }
     }
 
@@ -421,7 +445,7 @@ class doc_riskassessmentdocument_odt extends SaturneDocumentModel
                     'status'                    => '',
                 ];
 
-                $this->setTmpArrayVars($tmpArray, $listLines, $outputLangs);
+                static::setTmpArrayVars($tmpArray, $listLines, $outputLangs);
                 $odfHandler->mergeSegment($listLines);
                 return;
             }
@@ -441,7 +465,7 @@ class doc_riskassessmentdocument_odt extends SaturneDocumentModel
                 $tmpArray['digiriskelement_ref_label'] = $digiriskElement->ref . ' - ' . $digiriskElement->label;
                 $tmpArray['status']                    = $ticket->getLibStatut();
 
-                $this->setTmpArrayVars($tmpArray, $listLines, $outputLangs);
+                static::setTmpArrayVars($tmpArray, $listLines, $outputLangs);
             }
             $odfHandler->mergeSegment($listLines);
         }
@@ -458,26 +482,26 @@ class doc_riskassessmentdocument_odt extends SaturneDocumentModel
      * @throws OdfException
      * @throws Exception
      */
-    private function setRiskAssessmentDocumentByEntity(Odf $odfHandler, Translate $outputLangs, array $moreParam, array $loadRiskAssessmentDocumentInfos): void
+    private static function setRiskAssessmentDocumentByEntity(Odf $odfHandler, Translate $outputLangs, array $moreParam, array $loadRiskAssessmentDocumentInfos): void
     {
         $objectDocument = $moreParam['objectDocument'];
 
         $moreParam['digiriskElements'] = $loadRiskAssessmentDocumentInfos[$moreParam['entity']]['digiriskElements'];
 
         $moreParam['segmentName'] = $moreParam['entity'] . 'DigiriskElements';
-        $this->setDigiriskElementsSegment($odfHandler, $outputLangs, $moreParam);
+        static::setDigiriskElementsSegment($odfHandler, $outputLangs, $moreParam);
 
         $moreParam['riskByRiskAssessmentCotations'] = $loadRiskAssessmentDocumentInfos[$moreParam['entity']]['riskByRiskAssessmentCotations'];
 
         $moreParam['segmentName'] = $moreParam['entity'] . 'RiskByRiskAssessmentCotations';
-        $this->setRiskByRiskAssessmentCotationsSegment($odfHandler, $outputLangs, $moreParam);
+        static::setRiskByRiskAssessmentCotationsSegment($odfHandler, $outputLangs, $moreParam);
 
         $moreParam['dangerCategories'] = $loadRiskAssessmentDocumentInfos['dangerCategories'];
         $moreParam['riskByCategories'] = $loadRiskAssessmentDocumentInfos[$moreParam['entity']]['riskByCategories'];
         $moreParam['totalRisks']       = $loadRiskAssessmentDocumentInfos[$moreParam['entity']]['totalRisks'];
 
         $moreParam['segmentName'] = $moreParam['entity'] . 'RiskByCategories';
-        $this->setRiskByCategoriesSegment($odfHandler, $outputLangs, $moreParam);
+        static::setRiskByCategoriesSegment($odfHandler, $outputLangs, $moreParam);
 
 /*        $moreParam['segmentName'] = $moreParam['entity'] . 'RiskByEntities';
         $this->setRiskByEntitiesSegment($odfHandler, $outputLangs, $moreParam);*/
@@ -486,7 +510,7 @@ class doc_riskassessmentdocument_odt extends SaturneDocumentModel
         if ($moreParam['entity'] == 'shared') {
             $moreParam['projectEntities'] = $loadRiskAssessmentDocumentInfos[$moreParam['entity']]['projectEntities'];
         }
-        $moreParam['risks'] = $loadRiskAssessmentDocumentInfos[$moreParam['entity']]['risks'];
+        $moreParam['riskByRiskAssessmentLevels'] = $loadRiskAssessmentDocumentInfos[$moreParam['entity']]['riskByRiskAssessmentLevels'];
         $objectDocument->fillRiskData($odfHandler, $outputLangs, $moreParam);
     }
 
@@ -507,11 +531,11 @@ class doc_riskassessmentdocument_odt extends SaturneDocumentModel
             $loadRiskAssessmentDocumentInfos = $this->loadRiskAssessmentDocumentInfos($moreParam);
 
             $moreParam['entity'] = 'current';
-            $this->setRiskAssessmentDocumentByEntity($odfHandler, $outputLangs, $moreParam, $loadRiskAssessmentDocumentInfos);
+            static::setRiskAssessmentDocumentByEntity($odfHandler, $outputLangs, $moreParam, $loadRiskAssessmentDocumentInfos);
 
             if ($moreParam['tmparray']['showSharedRisk_nocheck']) {
                 $moreParam['entity'] = 'shared';
-                $this->setRiskAssessmentDocumentByEntity($odfHandler, $outputLangs, $moreParam, $loadRiskAssessmentDocumentInfos);
+                static::setRiskAssessmentDocumentByEntity($odfHandler, $outputLangs, $moreParam, $loadRiskAssessmentDocumentInfos);
             }
 
             $moreParam['digiriskElements'] = $loadRiskAssessmentDocumentInfos['current']['digiriskElements'];

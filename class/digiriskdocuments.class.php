@@ -158,22 +158,16 @@ class DigiriskDocuments extends SaturneDocuments
      * @throws OdfException
      * @throws Exception
      */
-    private function setRiskTaskTag(Translate $outputLangs, array $moreParam): array
+    private static function setRiskTaskTag(Translate $outputLangs, array $moreParam): array
     {
         global $conf, $mc;
 
         $array = [];
 
-        $riskTasks = $moreParam['riskTasks'];
-        if (empty($riskTasks)) {
-            $array['riskTaskUncompleted'] = '';
-            $array['riskTaskCompleted']   = '';
-            return $array;
-        }
-
-        $result = 1;
-        if ($moreParam['entity'] == 'shared') {
-            $result = !empty($mc->sharings['project']) ? in_array($project->entity, $mc->sharings['project']) : 0;
+        $result          = 1;
+        $projectEntities = $moreParam['projectEntities'];
+        if ($moreParam['entity'] == 'shared' && !empty($projectEntities)) {
+            $result = !empty($mc->sharings['project']) ? empty(array_diff(array_keys($projectEntities), $mc->sharings['project'])) : 0;
         }
 
         if ($result == 0) {
@@ -182,13 +176,23 @@ class DigiriskDocuments extends SaturneDocuments
             return $array;
         }
 
-        foreach ($riskTasks as $riskTask) {
+        $riskId    = $moreParam['riskId'];
+        $riskTasks = $moreParam['riskTasks'];
+        if (empty($riskTasks) || empty($riskTasks[$riskId])) {
+            $array['riskTaskUncompleted'] = '';
+            $array['riskTaskCompleted']   = '';
+            return $array;
+        }
+
+        foreach ($riskTasks[$riskId] as $riskTask) {
+            //@todo a refaire
             $AllInitiales = '';
             $related_task_contact_ids = $riskTask->getListContactId();
             if (!empty($related_task_contact_ids) && is_array($related_task_contact_ids)) {
+                $userTmp = new User($riskTask->db);
                 foreach ($related_task_contact_ids as $related_task_contact_id) {
-                    $usertmp->fetch($related_task_contact_id);
-                    $AllInitiales .= strtoupper(str_split($usertmp->firstname, 1)[0] . str_split($usertmp->lastname, 1)[0] . ',');
+                    $userTmp->fetch($related_task_contact_id);
+                    $AllInitiales .= strtoupper(str_split($userTmp->firstname, 1)[0] . str_split($userTmp->lastname, 1)[0] . ',');
                 }
             }
 
@@ -258,18 +262,17 @@ class DigiriskDocuments extends SaturneDocuments
     }
 
     /**
-     * Fill risk data for ODT
+     * Set risk by risk assessment levels segment
      *
      * @param Odf       $odfHandler  Object builder odf library
      * @param Translate $outputLangs Lang object to use for output
-     * @param array     $moreParam   More param (segmentName, dangerCategories, riskByCategories)
+     * @param array     $moreParam   More param (segmentName, digiriskElements, riskByRiskAssessmentLevels)
      *
      * @throws OdfException
      * @throws Exception
      */
-    private function setRisksSegment(Odf $odfHandler, Translate $outputLangs, array $moreParam): void
+    private static function setRiskByRiskAssessmentLevelsSegment(Odf $odfHandler, Translate $outputLangs, array $moreParam): void
     {
-//        echo '<pre>'; print_r($moreParam['segmentName']  ); echo '</pre>'; exit;
         $foundTagForLines = 1;
         try {
             $listLines = $odfHandler->setSegment($moreParam['segmentName']);
@@ -281,10 +284,10 @@ class DigiriskDocuments extends SaturneDocuments
         }
 
         if ($foundTagForLines) {
-            $digiriskElements    = $moreParam['digiriskElements'];
-            $risks               = $moreParam['risks'];
-            $riskAssessmentLevel = explode('Risks', $moreParam['segmentName'])[1];
-            if (empty($digiriskElements) || empty($risks) || empty($risks[$riskAssessmentLevel])) {
+            $digiriskElements           = $moreParam['digiriskElements'];
+            $riskByRiskAssessmentLevels = $moreParam['riskByRiskAssessmentLevels'];
+            $riskAssessmentLevel        = explode('Risks', $moreParam['segmentName'])[1];
+            if (empty($digiriskElements) || empty($riskByRiskAssessmentLevels) || empty($riskByRiskAssessmentLevels[$riskAssessmentLevel])) {
                 $tmpArray['digiriskElementLabel']   = '';
                 $tmpArray['picto']                  = '';
                 $tmpArray['riskCategoryName']       = '';
@@ -301,7 +304,7 @@ class DigiriskDocuments extends SaturneDocuments
                 return;
             }
 
-            foreach ($risks[$riskAssessmentLevel] as $risk) {
+            foreach ($riskByRiskAssessmentLevels[$riskAssessmentLevel] as $risk) {
                 $digiriskElement                  = $digiriskElements[$risk->fk_element];
                 $depthHyphens                     = str_repeat('- ', $digiriskElement['depth']);
                 $tmpArray['digiriskElementLabel'] = $depthHyphens . 'S' . $digiriskElement['object']->entity . ' - ' . $digiriskElement['object']->ref . ' - ' . $digiriskElement['object']->label;
@@ -317,9 +320,10 @@ class DigiriskDocuments extends SaturneDocuments
                 }
                 $tmpArray['riskAssessmentComment'] .= $risk->riskAssessmentComment ?: '';
 
-//                $riskTask                        = $this->setRiskTaskTag($outputLangs, $moreParam);
-//                $tmpArray['riskTaskUncompleted'] = $riskTask['riskTaskUncompleted'];
-//                $tmpArray['riskTaskCompleted']   = $riskTask['riskTaskCompleted'];
+                $moreParam['riskId']             = $risk->id;
+                $riskTask                        = static::setRiskTaskTag($outputLangs, $moreParam);
+                $tmpArray['riskTaskUncompleted'] = $riskTask['riskTaskUncompleted'];
+                $tmpArray['riskTaskCompleted']   = $riskTask['riskTaskCompleted'];
 
                 $tmpArray['riskAssessmentPhoto'] = $outputLangs->transnoentities('NoFileLinked');
                 if (!empty($risk->riskAssessmentPhoto)) {
@@ -352,7 +356,7 @@ class DigiriskDocuments extends SaturneDocuments
         try {
             for ($i = 4; $i >= 1; $i--) {
                 $moreParam['segmentName'] = $moreParam['entity'] . 'Risks' . $i;
-                $this->setRisksSegment($odfHandler, $outputLangs, $moreParam);
+                static::setRiskByRiskAssessmentLevelsSegment($odfHandler, $outputLangs, $moreParam);
             }
         } catch (OdfException $e) {
             $this->error = $e->getMessage();
