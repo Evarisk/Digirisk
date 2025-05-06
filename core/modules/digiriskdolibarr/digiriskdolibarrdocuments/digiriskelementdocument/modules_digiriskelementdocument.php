@@ -70,12 +70,18 @@ abstract class ModeleODTDigiriskElementDocument extends SaturneDocumentModel
                 $accident  = new Accident($this->db);
                 $ticket    = new Ticket($this->db);
                 $category  = new Categorie($this->db);
+                $digiriskElement = new DigiriskElement($this->db);
+
 
                 if ( ! empty($object) ) {
-                    //Fill risks data
-                    $risks = $risk->fetchRisksOrderedByCotation($object->element != 'digiriskstandard' ? $object->id : 0, $object->element != 'digiriskstandard' ? false : true, $conf->global->DIGIRISKDOLIBARR_SHOW_INHERITED_RISKS_IN_DOCUMENTS, $conf->global->DIGIRISKDOLIBARR_SHOW_SHARED_RISKS, $moreParam);
+                    //@todo a refaire
+                    $loadRiskInfos = $risk->loadRiskInfos($moreParam);
 
-                    $objectDocument->fillRiskData($odfHandler, $objectDocument, $outputLangs, [], '', $risks, $conf->global->DIGIRISKDOLIBARR_SHOW_SHARED_RISKS);
+                    $moreParam['digiriskElements']           = $digiriskElement->fetchDigiriskElementFlat(0, [], 'current');
+                    $moreParam['entity']                     = 'current';
+                    $moreParam['riskTasks']                  = $loadRiskInfos['current']['riskTasks'];
+                    $moreParam['riskByRiskAssessmentLevels'] = $loadRiskInfos['current']['riskByRiskAssessmentLevels'];
+                    $objectDocument->fillRiskData($odfHandler, $outputLangs, $moreParam);
 
                     //Fill evaluators data
                     $foundTagForLines = 1;
@@ -321,7 +327,7 @@ abstract class ModeleODTDigiriskElementDocument extends SaturneDocumentModel
             $QRCode          = array_shift($QRCodeList);
             $QRCodeImagePath = $QRCode['fullname'];
         } else {
-            $QRCodeImagePath = DOL_DOCUMENT_ROOT . '/public/theme/common/nophoto.png';
+            $QRCodeImagePath = ''; // @todo Add default image
         }
 
         $allLinks             = $resources->fetchDigiriskResources();

@@ -160,7 +160,7 @@ if ($mode == 'employee' && ! GETPOSTISSET('search_employee')) $search_employee =
  */
 
 if (GETPOST('cancel', 'alpha')) { $action = 'list'; $massaction = ''; }
-if ( ! GETPOST('confirmmassaction', 'alpha') && $massaction != 'presend' && $massaction != 'confirm_presend' && $massaction != 'confirm_createbills') { $massaction = ''; }
+if ( isset($massaction) && !GETPOST('confirmmassaction', 'alpha') && $massaction != 'presend' && $massaction != 'confirm_presend' && $massaction != 'confirm_createbills') { $massaction = ''; }
 
 $parameters = array();
 $reshook    = $hookmanager->executeHooks('doActions', $parameters); // Note that $action and $object may have been modified by some hooks
@@ -329,7 +329,7 @@ if ($reshook > 0) {
 } else {
 	$sql .= " WHERE u.entity IN (".getEntity('user').")";
 }
-if ($socid > 0) $sql .= " AND u.fk_soc = " . $socid;
+if (isset($socid) && $socid > 0) $sql .= " AND u.fk_soc = " . $socid;
 //if ($search_user != '')       $sql.=natural_search(array('u.login', 'u.lastname', 'u.firstname'), $search_user);
 if ($search_supervisor > 0)   $sql                           .= " AND u.fk_user IN (" . $db->escape($search_supervisor) . ")";
 if ($search_thirdparty != '') $sql                           .= natural_search(array('s.nom'), $search_thirdparty);
@@ -352,7 +352,7 @@ if ($search_categ > 0)   $sql                         .= " AND cu.fk_categorie =
 if ($search_categ == -2) $sql                         .= " AND cu.fk_categorie IS NULL";
 if ($search_fk_usergroup > 0)   $sql                  .= " AND g.fk_usergroup IN (" . $db->escape($search_fk_usergroup) . ")";
 
-$user->fetchAll('','','','',['login' => 'USERAPI']);
+$user->fetchAll('','','','', "(login:=:'USERAPI')");
 
 if (is_array($user->users) && !empty($user->users)) {
 	$userIds = implode(',', array_keys($user->users));
@@ -588,13 +588,13 @@ print_liste_field_titre($selectedfields, $_SERVER["PHP_SELF"], "", '', '', '', $
 print "</tr>\n";
 
 $i          = 0;
-$totalarray = array();
+$totalarray = ['nbfield' => 0];
 while ($i < min($num, $limit)) {
 	$obj = $db->fetch_object($result);
 
 	$userstatic->id        = $obj->rowid;
 	$userstatic->admin     = $obj->admin;
-	$userstatic->ref       = $obj->label;
+	$userstatic->ref       = $obj->label ?? '';
 	$userstatic->login     = $obj->login;
 	$userstatic->statut    = $obj->statut;
 	$userstatic->email     = $obj->email;

@@ -62,9 +62,7 @@ class Evaluator extends SaturneObject
     public string $picto = 'fontawesome_fa-user-check_fas_#d35968';
 
     public const STATUS_DELETED   = -1;
-    public const STATUS_DRAFT     = 0;
     public const STATUS_VALIDATED = 1;
-    public const STATUS_LOCKED    = 2;
     public const STATUS_ARCHIVED  = 3;
 
 	/**
@@ -142,10 +140,12 @@ class Evaluator extends SaturneObject
 
         $array['widgets'] = [
             'evaluator' => [
+                'title'      => $langs->transnoentities('Employees'),
+                'picto'      => 'fas fa-user',
+                'pictoColor' => '#32E592',
                 'label'      => [$langs->transnoentities('NbEmployeesInvolved') ?? '', $langs->transnoentities('NbEmployees') ?? ''],
                 'content'    => [$arrayNbEmployeesInvolved['nbemployeesinvolved'] ?? 0, $arrayNbEmployees['nbemployees'] ?? 0],
                 'tooltip'    => [$langs->transnoentities('NbEmployeesInvolvedTooltip'), (($conf->global->DIGIRISKDOLIBARR_NB_EMPLOYEES > 0 && $conf->global->DIGIRISKDOLIBARR_MANUAL_INPUT_NB_EMPLOYEES) ? $langs->transnoentities('NbEmployeesConfTooltip') : $langs->transnoentities('NbEmployeesTooltip'))],
-                'picto'      => 'fas fa-user-check',
                 'widgetName' => $langs->transnoentities('Evaluator')
             ]
         ];
@@ -156,12 +156,13 @@ class Evaluator extends SaturneObject
 	/**
 	 * Get number employees involved.
 	 *
-	 * @return array
+     * @param  array    $moreParam More param (Object/user/etc)
+     * @return array
 	 * @throws Exception
 	 */
-	public function getNbEmployeesInvolved() {
+	public function getNbEmployeesInvolved(array $moreParam = []) {
 		// Number employees involved
-		$allevaluators = $this->fetchAll('','', 0, 0, array(), 'AND', 'fk_user');
+		$allevaluators = $this->fetchAll('','', 0, 0, ['customsql' => 't.status = ' . Evaluator::STATUS_VALIDATED . ($moreParam['filter'] ?? '')]);
 		if (is_array($allevaluators) && !empty($allevaluators)) {
 			$array['nbemployeesinvolved'] = count($allevaluators);
 		} else {
@@ -170,29 +171,29 @@ class Evaluator extends SaturneObject
 		return $array;
 	}
 
-	/**
-	 * Get number employees.
-	 *
-	 * @return array
-	 * @throws Exception
-	 */
-	public function getNbEmployees() {
-		global $conf;
+    /**
+     * Get number employees
+     *
+     * @param  array    $moreParam More param (Object/user/etc)
+     * @return array
+     * @throws Exception
+     */
+    public function getNbEmployees(array $moreParam = []): array
+    {
+        global $user;
 
-		// Number employees
-		if ($conf->global->DIGIRISKDOLIBARR_NB_EMPLOYEES > 0 && $conf->global->DIGIRISKDOLIBARR_MANUAL_INPUT_NB_EMPLOYEES) {
-			$array['nbemployees'] = $conf->global->DIGIRISKDOLIBARR_NB_EMPLOYEES;
-		} else {
-			$user = new User($this->db);
-			$allusers = $user->get_full_tree(0, 'u.employee = 1');
-			if (!empty($allusers) && is_array($allusers)) {
-				$array['nbemployees'] = count($allusers);
-			} else {
-				$array['nbemployees'] = 'N/A';
-			}
-		}
-		return $array;
-	}
+        if (getDolGlobalInt('DIGIRISKDOLIBARR_NB_EMPLOYEES') > 0 && getDolGlobalInt('DIGIRISKDOLIBARR_MANUAL_INPUT_NB_EMPLOYEES')) {
+            $array['nbemployees'] = getDolGlobalInt('DIGIRISKDOLIBARR_NB_EMPLOYEES');
+        } else {
+            $users = $user->get_full_tree(0, 'u.employee = 1' . ($moreParam['filter'] ?? ''));
+            if (!empty($users) && is_array($users)) {
+                $array['nbemployees'] = count($users);
+            } else {
+                $array['nbemployees'] = 0;
+            }
+        }
+        return $array;
+    }
 
     /**
      * Write information of trigger description

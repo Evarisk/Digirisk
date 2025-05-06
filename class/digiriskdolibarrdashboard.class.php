@@ -52,25 +52,26 @@ class DigiriskDolibarrDashboard
     {
         $dashboardDatas = [
             ['type' => 'RiskAssessmentDocument', 'classPath' => '/digiriskdolibarrdocuments/riskassessmentdocument.class.php'],
+            ['type' => 'Risk',                   'classPath' => '/riskanalysis/risk.class.php'],
             ['type' => 'Accident',               'classPath' => '/accident.class.php'],
             ['type' => 'Evaluator',              'classPath' => '/evaluator.class.php'],
             ['type' => 'DigiriskResources',      'classPath' => '/digiriskresources.class.php'],
             ['type' => 'DigiriskElement',        'classPath' => '/digiriskelement.class.php'],
             ['type' => 'SaturneTask',            'classPath' => '/../../saturne/class/task/saturnetask.class.php'],
-            ['type' => 'Risk',                   'classPath' => '/riskanalysis/risk.class.php'],
-            ['type' => 'TicketDashboard',        'classPath' => '/ticketdashboard.class.php']
+            ['type' => 'TicketDashboard',        'classPath' => '/ticketdashboard.class.php'],
+            ['type' => 'TicketStatsDashboard',   'classPath' => '/ticketstatsdashboard.class.php']
         ];
         foreach ($dashboardDatas as $dashboardData) {
             require_once __DIR__ . $dashboardData['classPath'];
             if ($dashboardData['type'] != 'TicketDashboard') {
                 $className = new $dashboardData['type']($this->db);
             } else {
-                $className = new TicketDashboard($this->db, $moreParams['join'], $moreParams['where']);
+                $className = new TicketDashboard($this->db, $moreParams['join'] ?? '', $moreParams['where'] ?? '');
             }
             if ($dashboardData['type'] != 'SaturneTask') {
-                $array[$dashboardData['type']] = array_key_exists('Load' . $dashboardData['type'], $moreParams) ? $className->load_dashboard() : [];
+                $array[$dashboardData['type']] = array_key_exists('Load' . $dashboardData['type'], $moreParams) && $moreParams['Load' . $dashboardData['type']] ? $className->load_dashboard() : [];
             } else {
-                $array[$dashboardData['type']] = array_key_exists('Load' . $dashboardData['type'], $moreParams) ? $className->load_dashboard(getDolGlobalInt('DIGIRISKDOLIBARR_DU_PROJECT')) : [];
+                $array[$dashboardData['type']] = array_key_exists('Load' . $dashboardData['type'], $moreParams) && $moreParams['Load' . $dashboardData['type']] ? $className->load_dashboard(getDolGlobalInt('DIGIRISKDOLIBARR_DU_PROJECT')) : [];
             }
         }
 
@@ -137,7 +138,7 @@ class DigiriskDolibarrDashboard
                 $result[$i]['year'] = $row->year;
                 $result[$i]['nb']   = $row->nb;
                 if ($i > 0 && $row->nb > 0) {
-                    $result[$i - 1]['avg'] = ($result[$i - 1]['nb']) / $row->nb * 100;
+                    $result[$i - 1]['avg'] = -($row->nb - ($result[$i - 1]['nb'])) / $row->nb * 100;
                 }
                 $i++;
             }

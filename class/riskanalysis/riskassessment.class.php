@@ -92,7 +92,7 @@ class RiskAssessment extends SaturneObject
 		'date_riskassessment' => array('type' => 'datetime', 'label' => 'RiskAssessmentDate', 'enabled' => '1', 'position' => 141, 'notnull' => -1, 'visible' => 0,),
 		'comment'             => array('type' => 'text', 'label' => 'Comment', 'enabled' => '1', 'position' => 150, 'notnull' => 0, 'visible' => 0,),
 		'photo'               => array('type' => 'varchar(255)', 'label' => 'Photo', 'enabled' => '1', 'position' => 160, 'notnull' => 0, 'visible' => 0,),
-		'has_tasks'           => array('type' => 'integer', 'label' => 'Tasks', 'enabled' => '1', 'position' => 170, 'notnull' => 0, 'visible' => -1,),
+		'has_tasks'           => array('type' => 'integer', 'label' => 'Tasks', 'enabled' => '$conf->global->DIGIRISKDOLIBARR_TASK_MANAGEMENT', 'position' => 170, 'notnull' => 0, 'visible' => '$conf->global->DIGIRISKDOLIBARR_TASK_MANAGEMENT'),
 		'fk_user_creat'       => array('type' => 'integer:User:user/class/user.class.php', 'label' => 'UserAuthor', 'enabled' => '1', 'position' => 180, 'notnull' => 1, 'visible' => 0, 'foreignkey' => 'user.rowid',),
 		'fk_user_modif'       => array('type' => 'integer:User:user/class/user.class.php', 'label' => 'UserModif', 'enabled' => '1', 'position' => 190, 'notnull' => -1, 'visible' => 0,),
 		'fk_risk'             => array('type' => 'integer', 'label' => 'ParentRisk', 'enabled' => '1', 'position' => 200, 'notnull' => 1, 'visible' => 0,),

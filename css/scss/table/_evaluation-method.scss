@@ -7,14 +7,32 @@
  * .level5 -> cotation 80
  * .method -> cotation personnalisée
  */
+$background-colors: (
+  riskenvironmental: $color__riskenvironmental,
+  risk: $color__secondary
+);
+
 .wpeo-table.evaluation-method {
-  background: none !important;
+  background: none;
 
   .table-row.table-header {
-    @media ( max-width: $media__small ) {
+    @media (max-width: $media__medium) {
       display: none;
     }
   }
+
+  @each $class, $color in $background-colors {
+    &.#{$class} {
+      .table-row.table-header {
+        background: $color;
+      }
+      .table-row > .table-cell:first-child {
+        background: $color;
+        color: #fff;
+      }
+    }
+  }
+
   .table-cell {
     margin: 0;
     text-align: center;
@@ -22,7 +40,7 @@
     padding: 0.8em 0.4em;
     position: relative;
 
-    @media ( max-width: $media__small ) {
+    @media (max-width: $media__small) {
       width: 100% !important;
     }
 
@@ -38,7 +56,7 @@
         background: rgba(0,0,0,0.1);
         transform: scale(0);
         opacity: 0;
-        transition: all 0.2s ease-out;
+        transition: transform 0.2s ease-out, opacity 0.2s ease-out;
       }
       &:hover {
         cursor: pointer;
@@ -51,37 +69,18 @@
         color: #fff;
 
         &::after {
-          transform: scale(1) !important;
-          opacity: 1 !important;
+          transform: scale(1);
+          opacity: 1;
           background: $color__primary;
           z-index: -1;
         }
       }
     }
   }
-  .table-row > .table-cell:first-child {
-    background: $color__secondary;
-    color: #fff;
 
-    @media ( max-width: $media__small ) {
-      background: $color__secondary;
-    }
-  }
-  .table-row:not(.header) {
-    .table-cell:nth-of-type(2).active::after {
-      background: darken($color__primary, 0);
-    }
-    .table-cell:nth-of-type(3).active::after {
-      background: darken($color__primary, 15%);
-    }
-    .table-cell:nth-of-type(4).active::after {
-      background: darken($color__primary, 30%);
-    }
-    .table-cell:nth-of-type(5).active::after {
-      background: darken($color__primary, 45%);
-    }
-    .table-cell:nth-of-type(6).active::after {
-      background: darken($color__primary, 60%);
+  @for $i from 2 through 6 {
+    .table-row:not(.header) .table-cell:nth-of-type(#{$i}).active::after {
+      background: darken($color__primary, (($i - 2) * 15%));
     }
   }
 }
