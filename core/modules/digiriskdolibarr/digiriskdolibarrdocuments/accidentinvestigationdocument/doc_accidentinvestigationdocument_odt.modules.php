@@ -144,9 +144,16 @@ class doc_accidentinvestigationdocument_odt extends SaturneDocumentModel
 		// Replace tags of lines.
 		try {
 			$this->setAttendantsSegment($odfHandler, $outputLangs, $moreParam);
-            $moreParam['filterRisk'] = ' AND t.type = "risk"';
-			$risks = $moreParam['gp_ut_id'] > 0 ? $risk->fetchRisksOrderedByCotation($moreParam['gp_ut_id'], true, $conf->global->DIGIRISKDOLIBARR_SHOW_INHERITED_RISKS_IN_DOCUMENTS, $conf->global->DIGIRISKDOLIBARR_SHOW_SHARED_RISKS, $moreParam) : [];
-			$digiriskDocument->fillRiskData($odfHandler, $this, $outputLangs, [], null, $risks);
+            $digiriskElement = new DigiriskElement($this->db);
+
+            //@todo a refaire
+            $loadRiskInfos = $risk->loadRiskInfos($moreParam);
+
+            $moreParam['digiriskElements']           = $digiriskElement->fetchDigiriskElementFlat(0, [], 'current');
+            $moreParam['entity']                     = 'current';
+            $moreParam['riskTasks']                  = $loadRiskInfos['current']['riskTasks'];
+            $moreParam['riskByRiskAssessmentLevels'] = $loadRiskInfos['current']['riskByRiskAssessmentLevels'];
+            $digiriskDocument->fillRiskData($odfHandler, $outputLangs, $moreParam);
 
 			$moreParam['task_type'] = 'cur_task';
 			$this->setTaskSegment($odfHandler, $outputLangs, $moreParam);
