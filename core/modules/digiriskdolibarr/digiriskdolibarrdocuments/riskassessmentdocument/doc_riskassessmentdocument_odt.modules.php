@@ -79,7 +79,7 @@ class doc_riskassessmentdocument_odt extends SaturneDocumentModel
         $digiriskElement = new DigiriskElement($this->db);
         $risk            = new Risk($this->db);
 
-        $array['dangerCategories'] = $risk->getDangerCategories();
+        $array['dangerCategories'] = Risk::getDangerCategories();
 
         $array['current']['digiriskElements'] = $digiriskElement->fetchDigiriskElementFlat(0, [], 'current');
         if (empty($array['current']['digiriskElements'])) {

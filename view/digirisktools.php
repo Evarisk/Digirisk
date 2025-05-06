@@ -81,10 +81,8 @@ list($refTaskMod) = saturne_require_objects_mod($numberingModuleName, $moduleNam
 
 $upload_dir = $conf->digiriskdolibarr->multidir_output[$conf->entity ?? 1];
 
-$dangerCategories        = $risk->getDangerCategories();
-$risk->type              = 'riskenvironmental';
-$environmentalCategories = $risk->getDangerCategories();
-$risk->type              = 'risk';
+$dangerCategories        = Risk::getDangerCategories();
+$environmentalCategories = Risk::getDangerCategories('riskenvironmental');
 
 // Security check - Protection if external user
 $permissiontoread = $user->rights->digiriskdolibarr->adminpage->read;
@@ -221,7 +219,7 @@ if (GETPOST('dataMigrationImportRisks', 'alpha') && ! empty($conf->global->MAIN_
 			foreach ($digiriskExportArray['risks'] as $digiriskExportRisk) {
 				$risk->ref           = $refRiskMod->getNextValue($risk);
                 $risk->status        = Risk::STATUS_VALIDATED;
-				$risk->category      = $risk->getDangerCategoryPositionByName($digiriskExportRisk['danger_category']['name']);
+				$risk->category      = $risk->getDangerCategoryPositionByName($digiriskExportRisk['danger_category']['name'], $risk->type);
 				$risk->fk_element    = $digiriskElement->fetch_id_from_wp_digi_id($digiriskExportRisk['parent_id']);
 				$risk->fk_projet     = $conf->global->DIGIRISKDOLIBARR_DU_PROJECT;
                 $risk->date_creation = $digiriskExportRisk['evaluation']['date']['raw'];
@@ -422,7 +420,7 @@ if (GETPOST('dataMigrationImportGlobal', 'alpha') && ! empty($conf->global->MAIN
 			foreach ($digiriskExportArray['risks'] as $digiriskExportRisk) {
 				$risk->ref           = $refRiskMod->getNextValue($risk);
                 $risk->status        = Risk::STATUS_VALIDATED;
-				$risk->category      = $risk->getDangerCategoryPositionByName($digiriskExportRisk['danger_category']['name']);
+				$risk->category      = $risk->getDangerCategoryPositionByName($digiriskExportRisk['danger_category']['name'], $risk->type);
 				$risk->fk_element    = $digiriskElement->fetch_id_from_wp_digi_id($digiriskExportRisk['parent_id']);
 				$risk->fk_projet     = $conf->global->DIGIRISKDOLIBARR_DU_PROJECT;
                 $risk->date_creation = $digiriskExportRisk['evaluation']['date']['raw'];
