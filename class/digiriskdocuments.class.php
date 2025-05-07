@@ -296,7 +296,7 @@ class DigiriskDocuments extends SaturneDocuments
                 $tmpArray['riskAssessmentComment']  = $outputLangs->trans('NoRiskThere');
                 $tmpArray['riskTaskUncompleted']    = $outputLangs->trans('NoTaskUnCompletedThere');
                 $tmpArray['riskTaskCompleted']      = $outputLangs->trans('NoTaskCompletedThere');
-                $tmpArray['riskAssessmentPhoto']    = $outputLangs->transnoentities('NoFileLinked');
+                $tmpArray['riskAssessment_photo']   = $outputLangs->transnoentities('NoFileLinked');
 
                 SaturneDocumentModel::setTmpArrayVars($tmpArray, $listLines, $outputLangs);
                 $odfHandler->mergeSegment($listLines);
@@ -324,13 +324,13 @@ class DigiriskDocuments extends SaturneDocuments
                 $tmpArray['riskTaskUncompleted'] = $riskTask['riskTaskUncompleted'];
                 $tmpArray['riskTaskCompleted']   = $riskTask['riskTaskCompleted'];
 
-                $tmpArray['riskAssessmentPhoto'] = $outputLangs->transnoentities('NoFileLinked');
+                $tmpArray['riskAssessment_photo'] = $outputLangs->transnoentities('NoFileLinked');
                 if (!empty($risk->riskAssessmentPhoto)) {
                     $entityPath                      = $moreParam['entity'] == 'shared' ? '/' . $risk->entity : '';
                     $path                            = DOL_DATA_ROOT . $entityPath . '/digiriskdolibarr/riskassessment/' . $risk->riskAssessmentRef;
                     $fileSmall                       = saturne_get_thumb_name($risk->riskAssessmentPhoto);
                     $image                           = $path . '/thumbs/' . $fileSmall;
-                    $tmpArray['riskAssessmentPhoto'] = $image;
+                    $tmpArray['riskAssessment_photo'] = $image;
                 }
 
                 SaturneDocumentModel::setTmpArrayVars($tmpArray, $listLines, $outputLangs);
