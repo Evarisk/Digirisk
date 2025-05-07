@@ -326,10 +326,10 @@ class DigiriskDocuments extends SaturneDocuments
 
                 $tmpArray['riskAssessment_photo'] = $outputLangs->transnoentities('NoFileLinked');
                 if (!empty($risk->riskAssessmentPhoto)) {
-                    $entityPath                      = $moreParam['entity'] == 'shared' ? '/' . $risk->entity : '';
-                    $path                            = DOL_DATA_ROOT . $entityPath . '/digiriskdolibarr/riskassessment/' . $risk->riskAssessmentRef;
-                    $fileSmall                       = saturne_get_thumb_name($risk->riskAssessmentPhoto);
-                    $image                           = $path . '/thumbs/' . $fileSmall;
+                    $entityPath                       = $risk->entity != 1 ? '/' . $risk->entity : '';
+                    $path                             = DOL_DATA_ROOT . $entityPath . '/digiriskdolibarr/riskassessment/' . $risk->riskAssessmentRef;
+                    $fileSmall                        = saturne_get_thumb_name($risk->riskAssessmentPhoto);
+                    $image                            = $path . '/thumbs/' . $fileSmall;
                     $tmpArray['riskAssessment_photo'] = $image;
                 }
 
