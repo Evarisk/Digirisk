@@ -48,6 +48,8 @@ if (empty($user->id)) {
 	$user->getrights();
 }
 
+use PHPUnit\Framework\TestCase;
+
 /**
  * Class for PHPUnit tests
  *
@@ -55,12 +57,17 @@ if (empty($user->id)) {
  * @backupStaticAttributes enabled
  * @remarks  backupGlobals must be disabled to have db,conf,user and lang not erased.
  */
-class RiskUnitTest extends PHPUnit\Framework\TestCase
+class RiskUnitTest extends TestCase
 {
 	protected $savconf;
 	protected $savuser;
 	protected $savlangs;
 	protected $savdb;
+
+    /**
+     * @var string Path to the temporary mock JSON file
+     */
+    private string $testFilePath;
 
 	/**
 	 * Constructor
@@ -116,31 +123,98 @@ class RiskUnitTest extends PHPUnit\Framework\TestCase
 		print __METHOD__ . "\n";
 	}
 
-	/**
-	 * Init phpunit tests
-	 *
-	 * @return  void
-	 */
-	protected function setUp() : void
-	{
-		global $conf, $user, $langs, $db;
-		$conf  = $this->savconf;
-		$user  = $this->savuser;
-		$langs = $this->savlangs;
-		$db    = $this->savdb;
+    /**
+     * Set up test environment
+     * Creates a mock JSON file and defines DOL_DOCUMENT_ROOT if it's not already defined
+     *
+     * @return  void
+     */
+    protected function setUp(): void
+    {
+        global $conf, $user, $langs, $db;
+        $conf  = $this->savconf;
+        $user  = $this->savuser;
+        $langs = $this->savlangs;
+        $db    = $this->savdb;
 
-		print __METHOD__ . "\n";
-	}
+        $this->testFilePath = __DIR__ . '/dangerCategories.json';
+
+        $mockData = [
+            [
+                'risk'              => ['Category A', 'Category B'],
+                'riskenvironmental' => ['Cat Env 1']
+            ]
+        ];
+
+        file_put_contents($this->testFilePath, json_encode($mockData));
+
+        if (!defined('DOL_DOCUMENT_ROOT')) {
+            define('DOL_DOCUMENT_ROOT', __DIR__);
+        }
+
+        print __METHOD__ . "\n";
+    }
 
 	/**
 	 * End phpunit tests
+     * Clean up after tests by deleting the temporary mock file
 	 *
 	 * @return  void
 	 */
 	protected function tearDown() : void
 	{
+        // Delete the temporary mock file after tests
+        if (file_exists($this->testFilePath)) {
+            unlink($this->testFilePath);
+        }
+
 		print __METHOD__ . "\n";
 	}
+
+    /**
+     * Test that getDangerCategories returns the correct categories for 'risk' type
+     *
+     * @covers \Risk::getDangerCategories
+     */
+    public function testGetDangerCategoriesReturnsCorrectRisk()
+    {
+        $result = Risk::getDangerCategories();
+        $this->assertEquals(['Category A', 'Category B'], $result);
+    }
+
+    /**
+     * Test that getDangerCategories returns correct data for 'riskenvironmental' type
+     *
+     * @covers \Risk::getDangerCategories
+     */
+    public function testGetDangerCategoriesReturnsCorrectEnvironmentalRisk()
+    {
+        $result = Risk::getDangerCategories('riskenvironmental');
+        $this->assertEquals(['Cat Env 1'], $result);
+    }
+
+    /**
+     * Test that getDangerCategories returns an empty array for an unknown type
+     *
+     * @covers \Risk::getDangerCategories
+     */
+    public function testGetDangerCategoriesReturnsEmptyArrayIfTypeNotFound()
+    {
+        $result = Risk::getDangerCategories('unknown');
+        $this->assertEquals([], $result);
+    }
+
+    /**
+     * Test that getDangerCategories returns an empty array when the file is missing
+     *
+     * @covers \Risk::getDangerCategories
+     */
+    public function testGetDangerCategoriesReturnsEmptyArrayIfFileMissing()
+    {
+        unlink($this->testFilePath); // Remove the file before test
+        $result = Risk::getDangerCategories();
+        $this->assertEquals([], $result);
+    }
 
 	/**
 	 * testRiskCreate
@@ -328,30 +402,6 @@ class RiskUnitTest extends PHPUnit\Framework\TestCase
 		if (is_array($localobjectList)) {
 			$this->assertInstanceOf(get_class($localobject), array_shift($localobjectList));
 		}
-		print __METHOD__ . " ok";
-		print "\n";
-	}
-
-	/**
-	 * testRiskGetDangerCategories
-	 *
-	 * @return void
-	 *
-	 * @covers Risk::getDangerCategories
-	 *
-	 */
-	public function testRiskGetDangerCategories() : void
-	{
-		global $conf, $user, $langs, $db;
-		$conf  = $this->savconf;
-		$user  = $this->savuser;
-		$langs = $this->savlangs;
-		$db    = $this->savdb;
-
-		$localobject     = new Risk($this->savdb);
-		$localobjectList = $localobject->getDangerCategories();
-
-		$this->assertSame(true, is_array($localobjectList));
 		print __METHOD__ . " ok";
 		print "\n";
 	}

@@ -1285,7 +1285,7 @@ if ((empty($action) || ($action != 'create' && $action != 'edit'))) {
 
 						<ul class="saturne-dropdown-content wpeo-gridlayout grid-5 grid-gap-0">
 							<?php
-							$dangerCategories = $risk->getDangerCategories();
+							$dangerCategories = Risk::getDangerCategories();
 							if ( ! empty($dangerCategories)) :
 								foreach ($dangerCategories as $dangerCategory) : ?>
 									<li class="item dropdown-item wpeo-tooltip-event"
@@ -1410,7 +1410,7 @@ if ((empty($action) || ($action != 'create' && $action != 'edit'))) {
 				</div>
 				<ul class="saturne-dropdown-content wpeo-gridlayout grid-5 grid-gap-0">
 					<?php
-					$dangerCategories = $risk->getDangerCategories();
+					$dangerCategories = Risk::getDangerCategories();
 					if ( ! empty($dangerCategories)) :
 						foreach ($dangerCategories as $dangerCategory) : ?>
 							<li class="item dropdown-item wpeo-tooltip-event" data-is-preset="<?php echo ''; ?>"

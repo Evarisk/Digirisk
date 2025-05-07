@@ -68,43 +68,40 @@ class doc_listingrisksdocument_odt extends SaturneDocumentModel
 		return parent::info($langs);
 	}
 
-	/**
-	 * Fill all odt tags for segments lines
-	 *
-	 * @param  Odf       $odfHandler  Object builder odf library
-	 * @param  Translate $outputLangs Lang object to use for output
-	 * @param  array     $moreParam   More param (Object/user/etc)
-	 *
-	 * @return int                    1 if OK, <=0 if KO
-	 * @throws Exception
-	 */
-	public function fillTagsLines(Odf $odfHandler, Translate $outputLangs, array $moreParam): int
-	{
-		global $conf;
+    /**
+     * Fill all odt tags for segments lines
+     *
+     * @param  Odf       $odfHandler  Object builder odf library
+     * @param  Translate $outputLangs Lang object to use for output
+     * @param  array     $moreParam   More param (Object/user/etc)
+     *
+     * @return int                    1 if OK, <=0 if KO
+     * @throws Exception
+     */
+    public function fillTagsLines(Odf $odfHandler, Translate $outputLangs, array $moreParam): int
+    {
+        $objectDocument = $moreParam['objectDocument'];
 
-		if (get_class($moreParam['object']) == 'DigiriskElement') {
-			$digiriskelement = $moreParam['object'];
-		} else {
-			$digiriskelement = null;
-		}
+        try {
+            $digiriskElement = new DigiriskElement($this->db);
+            $risk            = new Risk($this->db);
 
-		$objectDocument = $moreParam['objectDocument'];
+            //@todo a refaire
+            $loadRiskInfos = $risk->loadRiskInfos($moreParam);
 
-		try {
-            $moreParam['filterRisk'] = ' AND t.type = "risk"';
-			$risk  = new Risk($this->db);
-			$risks = $risk->fetchRisksOrderedByCotation($digiriskelement->id > 0 ? $digiriskelement->id : 0, true, $conf->global->DIGIRISKDOLIBARR_SHOW_INHERITED_RISKS_IN_DOCUMENTS, $conf->global->DIGIRISKDOLIBARR_SHOW_SHARED_RISKS, $moreParam);
+            $moreParam['digiriskElements']           = $digiriskElement->fetchDigiriskElementFlat(0, [], 'current');
+            $moreParam['entity']                     = 'current';
+            $moreParam['riskTasks']                  = $loadRiskInfos['current']['riskTasks'];
+            $moreParam['riskByRiskAssessmentLevels'] = $loadRiskInfos['current']['riskByRiskAssessmentLevels'];
+            $objectDocument->fillRiskData($odfHandler, $outputLangs, $moreParam);
+        } catch (OdfException $e) {
+            $this->error = $e->getMessage();
+            dol_syslog($this->error, LOG_WARNING);
+            return -1;
+        }
 
-            $activeDigiriskElements  = $digiriskelement->getActiveDigiriskElements($conf->global->DIGIRISKDOLIBARR_SHOW_SHARED_RISKS ? 1 : 0);
-            $objectDocument->fillRiskData($odfHandler, $objectDocument, $outputLangs, [], '', $risks, $activeDigiriskElements, $conf->global->DIGIRISKDOLIBARR_SHOW_SHARED_RISKS);
-
-		} catch (OdfException $e) {
-			$this->error = $e->getMessage();
-			dol_syslog($this->error, LOG_WARNING);
-			return -1;
-		}
-		return 0;
-	}
+        return 0;
+    }
 
     /**
      * Function to build a document on disk

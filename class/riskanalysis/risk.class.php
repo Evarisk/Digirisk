@@ -178,7 +178,7 @@ class Risk extends SaturneObject
     /**
      * Load risk infos
      *
-     * @param  array     $moreParam More param (tmparray)
+     * @param  array     $moreParam More param (tmparray/filterRisk)
      * @return array     $array     Array of risks (current and shared)
      * @throws Exception
      */
@@ -203,7 +203,7 @@ class Risk extends SaturneObject
         $sharedJoin .= ' INNER JOIN ' . $this->db->prefix() . $this->module . '_digiriskelement AS d ON (d.rowid = ee.fk_target AND d.entity = ' . $conf->entity . ')';
         $sharedJoin .= ' INNER JOIN ' . $this->db->prefix() . $this->module . '_riskassessment AS ra ON t.rowid = ra.fk_risk';
 
-        $filter        = 't.status = ' . Risk::STATUS_VALIDATED . ' AND t.type = \'risk\' AND d.status = ' . DigiriskElement::STATUS_VALIDATED . ' AND ra.status = ' . RiskAssessment::STATUS_VALIDATED;
+        $filter        = 't.status = ' . Risk::STATUS_VALIDATED . ' AND d.status = ' . DigiriskElement::STATUS_VALIDATED . ' AND ra.status = ' . RiskAssessment::STATUS_VALIDATED . (!empty($moreParam['filterRisk']) ? $moreParam['filterRisk'] : ' AND t.type = \'risk\'');
         $currentFilter = $filter . ' AND t.entity = ' . $conf->entity;
 
         $array['current']['risks'] = saturne_fetch_all_object_type('Risk', 'DESC', 'riskAssessmentCotation', 0, 0, ['customsql' => $currentFilter], 'AND', false, false, false, $join, [], $select, $moreSelects);
@@ -460,27 +460,40 @@ class Risk extends SaturneObject
 		}
 	}
 
-	/**
-	 * Get risk categories json in /digiriskdolibarr/js/json/
-	 *
-	 * @return	array $risk_categories
-	 */
-	public function getDangerCategories()
-	{
-		$json_categories = file_get_contents(DOL_DOCUMENT_ROOT . '/custom/digiriskdolibarr/js/json/dangerCategories.json');
-        $jsonArray       = json_decode($json_categories, true);
-		return $jsonArray[0][$this->type];
-	}
+    /**
+     * Get risk categories from the JSON file
+     *
+     * @param string $riskType Type of risk ('risk', 'riskenvironmental', etc.)
+     * @return array           Array of risk categories, or empty array on failure
+     */
+    public static function getDangerCategories(string $riskType = 'risk'): array
+    {
+        $filePath = DOL_DOCUMENT_ROOT . '/custom/digiriskdolibarr/js/json/dangerCategories.json';
+
+        if (!file_exists($filePath)) {
+            return [];
+        }
+
+        $jsonContent    = file_get_contents($filePath);
+        $riskCategories = json_decode($jsonContent, true);
+
+        if (!isset($riskCategories[0]) || !is_array($riskCategories[0]) || !isset($riskCategories[0][$riskType])) {
+            return [];
+        }
+
+        return $riskCategories[0][$riskType];
+    }
 
 	/**
 	 * Get danger category picto path
 	 *
-	 * @param $object
-	 * @return    string $category['thumbnail_name']     path to danger category picto, -1 if don't exist
+	 * @param         $object
+     * @param  string $riskType                   Type of risk ('risk', 'riskenvironmental', etc.)
+	 * @return string $category['thumbnail_name'] Path to danger category picto, -1 if don't exist
 	 */
-	public function getDangerCategory($object)
+	public function getDangerCategory($object, string $riskType = 'risk')
 	{
-		$risk_categories = $this->getDangerCategories();
+		$risk_categories = static::getDangerCategories($riskType);
 		foreach ($risk_categories as $category) {
 			if ($category['position'] == $object->category) {
 				return $category['thumbnail_name'];
@@ -493,12 +506,13 @@ class Risk extends SaturneObject
 	/**
 	 * Get danger category picto name
 	 *
-	 * @param $object
-	 * @return    string $category['name']     name to danger category picto, -1 if don't exist
+	 * @param         $object
+     * @param  string $riskType         Type of risk ('risk', 'riskenvironmental', etc.)
+	 * @return string $category['name'] Name to danger category picto, -1 if don't exist
 	 */
-	public function getDangerCategoryName($object)
+	public function getDangerCategoryName($object, string $riskType = 'risk')
 	{
-		$risk_categories = $this->getDangerCategories();
+		$risk_categories = static::getDangerCategories($riskType);
 		foreach ($risk_categories as $category) {
 			if ($category['position'] == $object->category) {
 				return $category['name'];
@@ -511,12 +525,13 @@ class Risk extends SaturneObject
 	/**
 	 * Get danger category picto name
 	 *
-	 * @param $name
-	 * @return    string $category['name']     name to danger category picto, -1 if don't exist
+	 * @param  string $name
+     * @param  string $riskType         Type of risk ('risk', 'riskenvironmental', etc.)
+	 * @return string $category['name'] Name to danger category picto, -1 if don't exist
 	 */
-	public function getDangerCategoryPositionByName($name)
+	public function getDangerCategoryPositionByName($name, string $riskType = 'risk')
 	{
-		$risk_categories = $this->getDangerCategories();
+		$risk_categories = static::getDangerCategories($riskType);
 		foreach ($risk_categories as $category) {
 			if ($category['name'] == $name || $category['nameDigiriskWordPress'] == $name) {
 				return $category['position'];
@@ -529,12 +544,13 @@ class Risk extends SaturneObject
 	/**
 	 * Get danger category picto path
 	 *
-	 * @param int $position
-	 * @return    string $category['thumbnail_name']     path to danger category picto, -1 if don't exist
+	 * @param  int    $position
+     * @param  string $riskType                   Type of risk ('risk', 'riskenvironmental', etc.)
+	 * @return string $category['thumbnail_name'] Path to danger category picto, -1 if don't exist
 	 */
-	public function getDangerCategoryByPosition($position)
+	public function getDangerCategoryByPosition($position, string $riskType = 'risk')
 	{
-		$risk_categories = $this->getDangerCategories();
+		$risk_categories = static::getDangerCategories($riskType);
 		foreach ($risk_categories as $category) {
 			if ($category['position'] == $position) {
 				return $category['thumbnail_name'];
@@ -547,12 +563,13 @@ class Risk extends SaturneObject
 	/**
 	 * Get danger category picto path
 	 *
-	 * @param int $position
-	 * @return    string $category['thumbnail_name']     path to danger category picto, -1 if don't exist
+	 * @param  int    $position
+     * @param  string $riskType                   Type of risk ('risk', 'riskenvironmental', etc.)
+	 * @return string $category['thumbnail_name'] Path to danger category picto, -1 if don't exist
 	 */
-	public function getDangerCategoryNameByPosition($position)
+	public function getDangerCategoryNameByPosition($position, string $riskType = 'risk')
 	{
-		$risk_categories = $this->getDangerCategories();
+		$risk_categories = static::getDangerCategories($riskType);
 		foreach ($risk_categories as $category) {
 			if ($category['position'] == $position) {
 				return $category['name'];
@@ -788,8 +805,7 @@ class Risk extends SaturneObject
 
         $riskType = !empty($dashboardConfig->filters->riskType) ? $dashboardConfig->filters->riskType : 'risk';
 
-        $this->type       = $riskType;
-        $dangerCategories = $this->getDangerCategories();
+        $dangerCategories                         = static::getDangerCategories($riskType);
         $riskByDangerCategoriesAndRiskAssessments = $this->getRiskByDangerCategoriesAndRiskAssessments($dangerCategories, $riskType);
 
         $array['graphsFilters'] = [
@@ -1077,7 +1093,7 @@ class Risk extends SaturneObject
         $digiriskelement->fetch($object->fk_element);
 
         $ret .= $langs->trans('ParentElement') . ' : ' . $digiriskelement->ref . " - " . $digiriskelement->label . '<br>';
-        $ret .= $langs->trans('RiskCategory') . ' : ' . $object->getDangerCategoryName($object) . '<br>';
+        $ret .= $langs->trans('RiskCategory') . ' : ' . $object->getDangerCategoryName($object, $object->type) . '<br>';
 
         if (dol_strlen($object->applied_on) > 0) {
             $digiriskelement->fetch($object->applied_on);
