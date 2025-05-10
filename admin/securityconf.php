@@ -50,6 +50,7 @@ saturne_load_langs(["admin", "companies"]);
 
 // Parameters
 $action = GETPOST('action', 'aZ09');
+$type   = GETPOST('type');
 $error  = 0;
 
 // Initialize technical objects
@@ -70,7 +71,7 @@ saturne_check_access($permissiontoread);
  * Actions
  */
 
-$parameters = array();
+$parameters = [];
 $reshook    = $hookmanager->executeHooks('doActions', $parameters, $object, $action); // Note that $action and $object may have been modified by some hooks
 if ($reshook < 0) setEventMessages($hookmanager->error, $hookmanager->errors, 'errors');
 
@@ -78,8 +79,8 @@ if (($action == 'update' && ! GETPOST("cancel", 'alpha')) || ($action == 'update
 	$labourDoctorId[0]    = GETPOST('labourdoctor_socid', 'int') > 0 ? GETPOST('labourdoctor_socid', 'int') : 0 ;
 	$labourInspectorId[0] = GETPOST('labourinspector_socid', 'int') > 0 ? GETPOST('labourinspector_socid', 'int') : 0;
 
-	$labourDoctorSocpeopleAssigned    = ! empty(GETPOST('labourdoctor_contactid', 'array')) ? GETPOST('labourdoctor_contactid', 'array') : (GETPOST('labourdoctor_contactid', 'int') > 0 ? array(GETPOST('labourdoctor_contactid', 'int')) : array());
-	$labourInspectorSocpeopleAssigned = ! empty(GETPOST('labourinspector_contactid', 'array')) ? GETPOST('labourinspector_contactid', 'array') : (GETPOST('labourinspector_contactid', 'int') > 0 ? array(GETPOST('labourinspector_contactid', 'int')) :  array());
+	$labourDoctorSocpeopleAssigned    = !empty(GETPOST('labourdoctor_contactid', 'array')) ? GETPOST('labourdoctor_contactid', 'array') : (GETPOST('labourdoctor_contactid', 'int') > 0 ? array(GETPOST('labourdoctor_contactid', 'int')) : []);
+	$labourInspectorSocpeopleAssigned = !empty(GETPOST('labourinspector_contactid', 'array')) ? GETPOST('labourinspector_contactid', 'array') : (GETPOST('labourinspector_contactid', 'int') > 0 ? array(GETPOST('labourinspector_contactid', 'int')) : []);
 
 	$resources->setDigiriskResources($db, $user->id,  'LabourDoctorSociety',  'societe', $labourDoctorId, $conf->entity);
 	$resources->setDigiriskResources($db, $user->id,  'LabourInspectorSociety',  'societe', $labourInspectorId, $conf->entity);
@@ -171,249 +172,87 @@ print '<input type="hidden" name="action" value="update">'; ?>
 
 <?php print '<table class="noborder centpercent editmode">';
 
+if ($action == 'create_contact') {
+    $lastContactCreated = saturne_fetch_all_object_type('contact', 'DESC', 'rowid', 1);
+    $lastContactId      = array_key_first($lastContactCreated);
+    $contact->fetch($lastContactId);
+}
+
+if ($action == 'create_soc') {
+    $lastSocietyCreated = saturne_fetch_all_object_type('societe', 'DESC', 'rowid', 1);
+}
+
 if (isModEnabled('societe')) {
-	/*
-	*** Labour Doctor -- Médecin du travail ***
-	*/
+    $securityArray = [
+        'LabourDoctor'        => ['labourdoctor',    'fa-briefcase-medical'],
+        'LabourInspector'     => ['labourinspector', 'fa-search'],
+        'SAMU'                => ['samu',            'fa-hospital-alt'],
+        'Pompiers'            => ['pompiers',        'fa-ambulance'],
+        'Police'              => ['police',          'fa-car'],
+        'AllEmergencies'      => ['touteurgence',    'fa-phone'],
+        'RightsDefender'      => ['defenseur',       'fa-gavel'],
+        'PoisonControlCenter' => ['antipoison',      'fa-skull-crossbones'],
+    ];
 
-	print '<tr class="liste_titre"><th class="titlefield wordbreak">' . $langs->trans("LabourDoctor") . '</th><th><i class="fas fa-briefcase-medical"></i></th></tr>' . "\n";
-	print '<tr class="oddeven"><td class="titlefieldcreate nowrap">' . $langs->trans("ActionOnCompany") . '</td><td>';
+    foreach($securityArray as $title => $infos) {
+        $prefix = $infos[0];
+        $icon   = 'fas ' . $infos[1];
 
-	$labourdDoctorSociety = $allLinks['LabourDoctorSociety'];
+        print '<tr class="liste_titre"><th class="titlefield wordbreak">' . $langs->trans($title) . '</th><th><i class="'. $icon .'"></i></th></tr>' . "\n";
+        print '<tr class="oddeven"><td class="titlefieldcreate nowrap">' . $langs->trans("ActionOnCompany") . '</td><td>';
 
-	// * Third party concerned - Tiers concerné *
+        // Exceptions for labour doctor and inspector
+        $labourSociety = ($prefix == 'labourdoctor' || $prefix == 'labourinspector' ? $allLinks[$title . 'Society'] : $allLinks[$title]);
 
-	if ($labourdDoctorSociety->ref == 'LabourDoctorSociety') {
-		$events   = array();
-		$events[] = array('method' => 'getContacts', 'url' => dol_buildpath('/core/ajax/contacts.php?showempty=1', 1), 'htmlname' => 'labourdoctor_contactid', 'params' => array('add-customer-contact' => 'disabled'));
-		$societe->fetch($labourdDoctorSociety->id[0]);
+        // * Third party concerned - Tiers concerné *
+        $events[] = ['method' => 'getContacts', 'url' => dol_buildpath('/core/ajax/contacts.php?showempty=1', 1), 'htmlname' => $prefix . '_contactid', 'params' => ['add-customer-contact' => 'disabled']];
+        if ($labourSociety->ref == $title || $labourSociety->ref == $title . 'Society') {
+            $societe->fetch($labourSociety->id[0]);
 
-		print $form->select_company($labourdDoctorSociety->id[0], 'labourdoctor_socid', '', 'SelectThirdParty', 1, 0, $events, 0, 'minwidth300');
-	} else {
-		$events   = array();
-		$events[] = array('method' => 'getContacts', 'url' => dol_buildpath('/core/ajax/contacts.php?showempty=1', 1), 'htmlname' => 'labourdoctor_contactid', 'params' => array('add-customer-contact' => 'disabled'));
+            if ($action == 'create_soc' && $type == $labourSociety->ref) {
+                $labourSociety->id[0] = array_key_first($lastSocietyCreated);
+            }
 
-		//For external user force the company to user company
-		if ( ! empty($user->socid)) {
-			print $form->select_company($user->socid, 'labourdoctor_socid', '', 0, 1, 0, $events, 0, 'minwidth300');
-		} else {
-			print $form->select_company('', 'labourdoctor_socid', '', 'SelectThirdParty', 1, 0, $events, 0, 'minwidth300');
-		}
-	}
-	if ( ! GETPOSTISSET('backtopage')) print ' <a href="' . DOL_URL_ROOT . '/societe/card.php?action=create&backtopage=' . urlencode($_SERVER["PHP_SELF"] . '?action=create') . '"><span class="fa fa-plus-circle valignmiddle paddingleft" title="' . $langs->trans("AddThirdParty") . '"></span></a>';
-	print '</td></tr>';
+            print $form->select_company($labourSociety->id[0], $prefix . '_socid', '', 'SelectThirdParty', 1, 0, $events, 0, 'minwidth300');
+        } else {
+            //For external user force the company to user company
+            if (!empty($user->socid)) {
+                print $form->select_company($user->socid, $prefix . '_socid', '', 0, 1, 0, $events, 0, 'minwidth300');
+            } else {
+                print $form->select_company('', $prefix . '_socid', '', 'SelectThirdParty', 1, 0, $events, 0, 'minwidth300');
+            }
+        }
+        if (!GETPOSTISSET('backtopage')) {
+            print ' <a href="' . DOL_URL_ROOT . '/societe/card.php?action=create&backtopage=' . urlencode($_SERVER["PHP_SELF"] . '?action=create_soc&type=' . $labourSociety->ref) . '"><span class="fa fa-plus-circle valignmiddle paddingleft" title="' . $langs->trans("AddThirdParty") . '"></span></a>';
+        }
+        print '</td></tr>';
 
-	// * Related contacts - Contacts associés *
-	print '<tr class="oddeven"><td class="nowrap">' . $langs->trans("ActionOnContact") . '</td><td>';
+        // * Related contacts - Contacts associés * for labour doctor and inspector
+        if ($prefix == 'labourdoctor' || $prefix == 'labourinspector') {
+            print '<tr class="oddeven"><td class="nowrap">' . $langs->trans("ActionOnContact") . '</td><td>';
 
-	$labourdDoctorContact 		= $allLinks['LabourDoctorContact'];
-	$labourDoctorPreselectedIds = $labourdDoctorContact->id;
+            $labourContact        = $allLinks[$title . 'Contact'];
+            $labourPreselectedIds = $labourContact->id ?: [];
 
-	if ($labourdDoctorContact->id) {
-		print $form->selectcontacts(empty($labourdDoctorSociety->id[0]) ? -1 : $labourdDoctorSociety->id[0], $labourdDoctorContact->id, 'labourdoctor_contactid[]', 0, '', '', 0, 'quatrevingtpercent', false, 0, array(), false, 'multiple', 'labourdoctor_contactid');
-	} else {
-		$labourDoctorPreselectedIds                                                                                             = GETPOST('labourdoctor_contactid', 'array');
-		if (GETPOST('labourdoctor_contactid', 'array')) $labourDoctorPreselectedIds[GETPOST('labourdoctor_contactid', 'array')] = GETPOST('labourdoctor_contactid', 'array');
-		print $form->selectcontacts(empty(GETPOST('labourdoctor_socid', 'int')) ? -1 : GETPOST('labourdoctor_socid', 'int'), $labourDoctorPreselectedIds, 'labourdoctor_contactid[]', 0, '', '', 0, 'quatrevingtpercent', false, 0, array(), false, 'multiple', 'labourdoctor_contactid');
-	}
-	print '</td></tr>';
+            if ($action == 'create_contact' && $contact->fk_soc == $societe->id) {
+                $labourPreselectedIds = array_merge($labourPreselectedIds, [$lastContactId]);
+            }
 
-	/*
-	 *** Labour Inspector -- Inspecteur du travail ***
-	*/
-
-	print '<tr class="liste_titre"><th class="titlefield wordbreak">' . $langs->trans("LabourInspector") . '</th><th><i class="fas fa-search"></i></th></tr>' . "\n";
-	print '<tr class="oddeven"><td class="titlefieldcreate nowrap">' . $langs->trans("ActionOnCompany") . '</td><td>';
-
-	$labourdInspectorSociete = $allLinks['LabourInspectorSociety'];
-
-	// * Third party concerned - Tiers concerné *
-
-	if ($labourdInspectorSociete->ref == 'LabourInspectorSociety') {
-		$events   = array();
-		$events[] = array('method' => 'getContacts', 'url' => dol_buildpath('/core/ajax/contacts.php?showempty=1', 1), 'htmlname' => 'labourinspector_contactid', 'params' => array('add-customer-contact' => 'disabled'));
-		$societe->fetch($labourdInspectorSociete->id[0]);
-
-		print $form->select_company($labourdInspectorSociete->id[0], 'labourinspector_socid', '', 0, 1, 0, $events, 0, 'minwidth300');
-	} else {
-		$events   = array();
-		$events[] = array('method' => 'getContacts', 'url' => dol_buildpath('/core/ajax/contacts.php?showempty=1', 1), 'htmlname' => 'labourinspector_contactid', 'params' => array('add-customer-contact' => 'disabled'));
-		//For external user force the company to user company
-		if ( ! empty($user->socid)) {
-			print $form->select_company($user->socid, 'labourinspector_socid', '', 0, 1, 0, $events, 0, 'minwidth300');
-		} else {
-			print $form->select_company('', 'labourinspector_socid', '', 'SelectThirdParty', 1, 0, $events, 0, 'minwidth300');
-		}
-	}
-	if ( ! GETPOSTISSET('backtopage')) print ' <a href="' . DOL_URL_ROOT . '/societe/card.php?action=create&backtopage=' . urlencode($_SERVER["PHP_SELF"] . '?action=create') . '"><span class="fa fa-plus-circle valignmiddle paddingleft" title="' . $langs->trans("AddThirdParty") . '"></span></a>';
-	print '</td></tr>';
-
-	// * Related contacts - Contacts associés *
-
-	print '<tr class="oddeven"><td class="nowrap">' . $langs->trans("ActionOnContact") . '</td><td>';
-
-	$labourInspectorContacts       = $allLinks['LabourInspectorContact'];
-	$labourInspectorPreselectedIds = $labourInspectorContacts->id;
-
-	if ($labourInspectorContacts->id) {
-		print $form->selectcontacts(empty($labourdInspectorSociete->id[0]) ? -1 : $labourdInspectorSociete->id[0], $labourInspectorContacts->id, 'labourinspector_contactid[]', 0, '', '', 0, 'quatrevingtpercent', false, 0, array(), false, 'multiple', 'labourinspector_contactid');
-	} else {
-		$labourInspectorPreselectedIds                                                                                                   = GETPOST('labourinspector_contactid', 'array');
-		if (GETPOST('labourinspector_contactid', 'array')) $labourInspectorPreselectedIds[GETPOST('labourinspector_contactid', 'array')] = GETPOST('labourinspector_contactid', 'array');
-		print $form->selectcontacts(empty(GETPOST('labourinspector_socid', 'int')) ? -1 : GETPOST('labourinspector_socid', 'int'), $labourInspectorPreselectedIds, 'labourinspector_contactid[]', 0, '', '', 0, 'quatrevingtpercent', false, 0, array(), false, 'multiple', 'labourinspector_contactid');
-	}
-	print '</td></tr>';
-
-	/*
-	*** Emergencies -- SAMU ***
-	*/
-
-	print '<tr class="liste_titre"><th class="titlefield wordbreak">' . $langs->trans("SAMU") . '</th><th><i class="fas fa-hospital-alt"></i></th></tr>' . "\n";
-	print '<tr class="oddeven"><td class="titlefieldcreate nowrap">' . $langs->trans("ActionOnCompany") . '</td><td>';
-
-	$samuResources = $allLinks['SAMU'];
-
-	// * Third party concerned - Tiers concerné *
-
-	if ($samuResources->ref == 'SAMU') {
-		$societe->fetch($samuResources->id[0]);
-
-		print $form->select_company($samuResources->id[0], 'samu_socid', '', 'SelectThirdParty', 1, 0, 0, 0, 'minwidth300');
-	} else {
-		//For external user force the company to user company
-		if ( ! empty($user->socid)) {
-			print $form->select_company($user->socid, 'samu_socid', '', 1, 1, 0, 0, 0, 'minwidth300');
-		} else {
-			print $form->select_company('', 'samu_socid', '', 'SelectThirdParty', 1, 0, 0, 0, 'minwidth300');
-		}
-	}
-	if ( ! GETPOSTISSET('backtopage')) print ' <a href="' . DOL_URL_ROOT . '/societe/card.php?action=create&backtopage=' . urlencode($_SERVER["PHP_SELF"] . '?action=create') . '"><span class="fa fa-plus-circle valignmiddle paddingleft" title="' . $langs->trans("AddThirdParty") . '"></span></a>';
-	print '</td></tr>';
-
-	/*
-	*** Fire Brigade -- Pompiers ***
-	*/
-
-	print '<tr class="liste_titre"><th class="titlefield wordbreak">' . $langs->trans("FireBrigade") . '</th><th><i class="fas fa-ambulance"></i></th></tr>' . "\n";
-	print '<tr class="oddeven"><td class="titlefieldcreate nowrap">' . $langs->trans("ActionOnCompany") . '</td><td>';
-
-	$pompiersResources = $allLinks['Pompiers'];
-
-	// * Third party concerned - Tiers concerné *
-
-	if ($pompiersResources->ref == 'Pompiers') {
-		$societe->fetch($pompiersResources->id[0]);
-		print $form->select_company($pompiersResources->id[0], 'pompiers_socid', '', 'SelectThirdParty', 1, 0, 0, 0, 'minwidth300');
-	} else {
-		//For external user force the company to user company
-		if ( ! empty($user->socid)) {
-			print $form->select_company($user->socid, 'pompiers_socid', '', 1, 1, 0, 0, 0, 'minwidth300');
-		} else {
-			print $form->select_company('', 'pompiers_socid', '', 'SelectThirdParty', 1, 0, 0, 0, 'minwidth300');
-		}
-	}
-	if ( ! GETPOSTISSET('backtopage')) print ' <a href="' . DOL_URL_ROOT . '/societe/card.php?action=create&backtopage=' . urlencode($_SERVER["PHP_SELF"] . '?action=create') . '"><span class="fa fa-plus-circle valignmiddle paddingleft" title="' . $langs->trans("AddThirdParty") . '"></span></a>';
-	print '</td></tr>';
-
-	/*
-	*** Police -- Police ***
-	*/
-
-	print '<tr class="liste_titre"><th class="titlefield wordbreak">' . $langs->trans("Police") . '</th><th><i class="fas fa-car"></i></th></tr>' . "\n";
-	print '<tr class="oddeven"><td class="titlefieldcreate nowrap">' . $langs->trans("ActionOnCompany") . '</td><td>';
-
-	$policeResources = $allLinks['Police'];
-
-	// * Third party concerned - Tiers concerné *
-
-	if ($policeResources->ref == 'Police') {
-		$societe->fetch($policeResources->id[0]);
-		print $form->select_company($policeResources->id[0], 'police_socid', '', 'SelectThirdParty', 1, 0, 0, 0, 'minwidth300');
-	} else {
-		//For external user force the company to user company
-		if ( ! empty($user->socid)) {
-			print $form->select_company($user->socid, 'police_socid', '', 1, 1, 0, 0, 0, 'minwidth300');
-		} else {
-			print $form->select_company('', 'police_socid', '', 'SelectThirdParty', 1, 0, 0, 0, 'minwidth300');
-		}
-	}
-	if ( ! GETPOSTISSET('backtopage')) print ' <a href="' . DOL_URL_ROOT . '/societe/card.php?action=create&backtopage=' . urlencode($_SERVER["PHP_SELF"] . '?action=create') . '"><span class="fa fa-plus-circle valignmiddle paddingleft" title="' . $langs->trans("AddThirdParty") . '"></span></a>';
-	print '</td></tr>';
-
-	/*
-	*** For any emergency -- Pour toute urgence ***
-	*/
-
-	print '<tr class="liste_titre"><th class="titlefield wordbreak">' . $langs->trans("AllEmergencies") . '</th><th><i class="fas fa-phone"></i></th></tr>' . "\n";
-	print '<tr class="oddeven"><td class="titlefieldcreate nowrap">' . $langs->trans("ActionOnCompany") . '</td><td>';
-
-	$touteUrgenceResources = $allLinks['AllEmergencies'];
-
-	// * Third party concerned - Tiers concerné *
-
-	if ($touteUrgenceResources->ref == 'AllEmergencies') {
-		$societe->fetch($touteUrgenceResources->id[0]);
-		print $form->select_company($touteUrgenceResources->id[0], 'touteurgence_socid', '', 'SelectThirdParty', 1, 0, 0, 0, 'minwidth300');
-	} else {
-		//For external user force the company to user company
-		if ( ! empty($user->socid)) {
-			print $form->select_company($user->socid, 'touteurgence_socid', '', 1, 1, 0, 0, 0, 'minwidth300');
-		} else {
-			print $form->select_company('', 'touteurgence_socid', '', 'SelectThirdParty', 1, 0, 0, 0, 'minwidth300');
-		}
-	}
-	if ( ! GETPOSTISSET('backtopage')) print ' <a href="' . DOL_URL_ROOT . '/societe/card.php?action=create&backtopage=' . urlencode($_SERVER["PHP_SELF"] . '?action=create') . '"><span class="fa fa-plus-circle valignmiddle paddingleft" title="' . $langs->trans("AddThirdParty") . '"></span></a>';
-	print '</td></tr>';
-
-	/*
-	*** Rights defender -- Défenseur des droits ***
-	*/
-
-	print '<tr class="liste_titre"><th class="titlefield wordbreak">' . $langs->trans("RightsDefender") . '</th><th><i class="fas fa-gavel"></i></th></tr>' . "\n";
-	print '<tr class="oddeven"><td class="titlefieldcreate nowrap">' . $langs->trans("ActionOnCompany") . '</td><td>';
-
-	$defenseurResources = $allLinks['RightsDefender'];
-
-	// * Third party concerned - Tiers concerné *
-
-	if ($defenseurResources->ref == 'RightsDefender') {
-		$societe->fetch($defenseurResources->id[0]);
-		print $form->select_company($defenseurResources->id[0], 'defenseur_socid', '', 'SelectThirdParty', 1, 0, 0, 0, 'minwidth300');
-	} else {
-		//For external user force the company to user company
-		if ( ! empty($user->socid)) {
-			print $form->select_company($user->socid, 'defenseur_socid', '', 1, 1, 0, 0, 0, 'minwidth300');
-		} else {
-			print $form->select_company('', 'defenseur_socid', '', 'SelectThirdParty', 1, 0, 0, 0, 'minwidth300');
-		}
-	}
-	if ( ! GETPOSTISSET('backtopage')) print ' <a href="' . DOL_URL_ROOT . '/societe/card.php?action=create&backtopage=' . urlencode($_SERVER["PHP_SELF"] . '?action=create') . '"><span class="fa fa-plus-circle valignmiddle paddingleft" title="' . $langs->trans("AddThirdParty") . '"></span></a>';
-	print '</td></tr>';
-
-	/*
-	*** Poison control center -- Centre antipoison ***
-	*/
-
-	print '<tr class="liste_titre"><th class="titlefield wordbreak">' . $langs->trans("PoisonControlCenter") . '</th><th><i class="fas fa-skull-crossbones"></i></th></tr>' . "\n";
-
-	print '<tr class="oddeven"><td class="titlefieldcreate nowrap">' . $langs->trans("ActionOnCompany") . '</td><td>';
-	$poisonControlCenterResources = $allLinks['PoisonControlCenter'];
-
-	// * Third party concerned - Tiers concerné *
-
-	if ($poisonControlCenterResources->ref == 'PoisonControlCenter') {
-		$societe->fetch($poisonControlCenterResources->id[0]);
-		print $form->select_company($poisonControlCenterResources->id[0], 'antipoison_socid', '', 'SelectThirdParty', 1, 0, 0, 0, 'minwidth300');
-	} else {
-		//For external user force the company to user company
-		if ( ! empty($user->socid)) {
-			print $form->select_company($user->socid, 'antipoison_socid', '', 1, 1, 0, 0, 0, 'minwidth300');
-		} else {
-			print $form->select_company('', 'antipoison_socid', '', 'SelectThirdParty', 1, 0, 0, 0, 'minwidth300');
-		}
-	}
-	if ( ! GETPOSTISSET('backtopage')) print ' <a href="' . DOL_URL_ROOT . '/societe/card.php?action=create&backtopage=' . urlencode($_SERVER["PHP_SELF"] . '?action=create') . '"><span class="fa fa-plus-circle valignmiddle paddingleft" title="' . $langs->trans("AddThirdParty") . '"></span></a>';
-	print '</td></tr>';
+            if ($labourContact->id) {
+                print $form->selectcontacts(empty($labourSociety->id[0]) ? -1 : $labourSociety->id[0], $labourPreselectedIds, $prefix . '_contactid[]', 0, '', '', 0, 'minwidth500', false, 0, [], false, 'multiple', $prefix . '_contactid');
+            } else {
+                $labourPreselectedIds = array_merge($labourPreselectedIds, GETPOST($prefix . '_contactid', 'array'));
+                if (GETPOST($prefix . '_contactid', 'array')) {
+                    $labourPreselectedIds[GETPOST($prefix . '_contactid', 'array')] = GETPOST($prefix . '_contactid', 'array');
+                }
+                print $form->selectcontacts(empty(GETPOST($prefix . '_socid', 'int')) ? $labourSociety->id[0] : GETPOST($prefix . '_socid', 'int'), $labourPreselectedIds, $prefix . '_contactid[]', 0, '', '', 0, 'minwidth500', false, 0, [], false, 'multiple', 'labourdoctor_contactid');
+            }
+            if (!GETPOSTISSET('backtopage')) {
+                print ' <a href="' . DOL_URL_ROOT . '/contact/card.php?action=create&socid=' . $labourSociety->id[0] . '&backtopage=' . urlencode($_SERVER["PHP_SELF"] . '?action=create_contact') . '"><span class="fa fa-plus-circle valignmiddle paddingleft" title="' . $langs->trans("AddContact") . '"></span></a>';
+            }
+            print '</td></tr>';
+        }
+    }
 }
 
 /*
