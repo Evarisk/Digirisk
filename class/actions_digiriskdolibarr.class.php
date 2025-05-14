@@ -990,65 +990,62 @@ class ActionsDigiriskdolibarr
 	}
 
     /**
-     * Overloading the extendSheetLinkableObjectsList function : replacing the parent's function with the one below
+     * Overloading the saturneExtendGetObjectsMetadata function : replacing the parent's function with the one below
      *
      * @param  array $parameters Hook metadata (context, etc...)
      * @return int               0 < on error, 0 on success, 1 to replace standard code
      */
-    public function extendSheetLinkableObjectsList(array $parameters): int
+    public function saturneExtendGetObjectsMetadata(array $parameters): int
     {
-        require_once __DIR__ . '/preventionplan.class.php';
-        require_once __DIR__ . '/firepermit.class.php';
-
-        require_once __DIR__ . '/../lib/digiriskdolibarr_preventionplan.lib.php';
-        require_once __DIR__ . '/../lib/digiriskdolibarr_firepermit.lib.php';
-
-        $linkableObjectTypes['digiriskdolibarr_digiriskelement'] = [
-            'langs'          => 'DigiriskElement',
-            'langfile'       => 'digiriskdolibarr@digiriskdolibarr',
-            'picto'          => 'fontawesome_fa-network-wired_fas_#d35968',
-            'className'      => 'DigiriskElement',
-            'name_field'     => 'ref',
-            'post_name'      => 'fk_digiriskelement',
-            'link_name'      => 'digiriskdolibarr_digiriskelement',
-            'tab_type'       => 'digiriskelement',
-            'hook_name_list' => 'digiriskelementlist',
-            'hook_name_card' => 'digiriskelementcard',
-            'create_url'     => 'custom/digiriskdolibarr/view/digiriskelement/digiriskelement_card.php?action=create&element_type=groupment&fk_parent=0',
-            'class_path'     => 'custom/digiriskdolibarr/class/digiriskelement.class.php'
+        $objects = [
+            'digiriskstandard'      => 'sitemap',
+            'digiriskelement'       => 'network-wired',
+            'risk'                  => 'exclamation-triangle',
+            'riskassessment'        => 'chart-line',
+            'evaluator'             => 'user-check',
+            'risksign'              => 'map-signs',
+            'preventionplan'        => 'info',
+            'firepermit'            => 'fire-alt',
+            'accident'              => 'user-injured',
+            'accidentinvestigation' => 'search',
         ];
+        foreach ($objects as $objectName => $picto) {
+            $objectsMetadata['digiriskdolibarr_' . $objectName] = [
+                'mainmenu'       => 'digiriskdolibarr',
+                'leftmenu'       => '',
+                'langs'          => ucfirst($objectName),
+                'langfile'       => 'digiriskdolibarr@digiriskdolibarr',
+                'picto'          => 'fontawesome_fa-' . $picto . '_fas_#d35968',
+                'color'          => '#d35968',
+                'class_name'     => ucfirst($objectName),
+                'post_name'      => 'fk_' . $objectName,
+                'link_name'      => 'digiriskdolibarr_' . $objectName,
+                'tab_type'       => $objectName,
+                'table_element'  => 'digiriskdolibarr_' . $objectName,
+                'name_field'     => 'ref, label',
+                'label_field'    => 'label',
+                'hook_name_card' => $objectName . 'list',
+                'hook_name_list' => $objectName . 'card',
+                'create_url'     => 'custom/digiriskdolibarr/view/' . $objectName . '/' . $objectName . '_card.php?action=create',
+                'class_path'     => 'custom/digiriskdolibarr/class/' . $objectName . '.class.php',
+                'lib_path'       => 'custom/digiriskdolibarr/lib/digiriskdolibarr_' . $objectName . '.lib.php'
+            ];
+        }
 
-        $linkableObjectTypes['digiriskdolibarr_preventionplan'] = [
-            'langs'          => 'Preventionplan',
-            'langfile'       => 'digiriskdolibarr@digiriskdolibarr',
-            'picto'          => 'fontawesome_fa-info_fas_#d35968',
-            'className'      => 'PreventionPlan',
-            'name_field'     => 'ref',
-            'post_name'      => 'fk_preventionplan',
-            'link_name'      => 'digiriskdolibarr_preventionplan',
-            'tab_type'       => 'preventionplan',
-            'hook_name_list' => 'preventionplanlist',
-            'hook_name_card' => 'preventionplancard',
-            'create_url'     => 'custom/digiriskdolibarr/view/preventionplan/preventionplan_card.php?action=create',
-            'class_path'     => 'custom/digiriskdolibarr/class/preventionplan.class.php'
-        ];
+        // objects specificataions
+        $objects = ['risk', 'riskassessment', 'risksign'];
+        foreach ($objects as $objectName) {
+            $objectsMetadata['digiriskdolibarr_' . $objectName]['create_url'] = '';
+            $objectsMetadata['digiriskdolibarr_' . $objectName]['class_path'] = 'custom/digiriskdolibarr/class/riskanalysis/' . $objectName . '.class.php';
+            $objectsMetadata['digiriskdolibarr_' . $objectName]['lib_path']   = 'custom/digiriskdolibarr/lib/digiriskdolibarr_digiriskelement.lib.php';
+        }
+        $objectsMetadata['digiriskdolibarr_digiriskelement']['create_url'] = 'custom/digiriskdolibarr/view/digiriskelement/digiriskelement_card.php?action=create&element_type=groupment&fk_parent=0';
 
-        $linkableObjectTypes['digiriskdolibarr_firepermit'] = [
-            'langs'          => 'Firepermit',
-            'langfile'       => 'digiriskdolibarr@digiriskdolibarr',
-            'picto'          => 'fontawesome_fa-fire-alt_fas_#d35968',
-            'className'      => 'FirePermit',
-            'name_field'     => 'ref',
-            'post_name'      => 'fk_firepermit',
-            'link_name'      => 'digiriskdolibarr_firepermit',
-            'tab_type'       => 'firepermit',
-            'hook_name_list' => 'firepermitlist',
-            'hook_name_card' => 'firepermitcard',
-            'create_url'     => 'custom/digiriskdolibarr/view/firepermit/firepermit_card.php?action=create',
-            'class_path'     => 'custom/digiriskdolibarr/class/firepermit.class.php'
-        ];
+        $objectsMetadata['digiriskdolibarr_evaluator']['create_url'] = '';
+        $objectsMetadata['digiriskdolibarr_evaluator']['class_path'] = 'custom/digiriskdolibarr/class/evaluator.class.php';
+        $objectsMetadata['digiriskdolibarr_evaluator']['lib_path']   = 'custom/digiriskdolibarr/lib/digiriskdolibarr_digiriskelement.lib.php';
 
-        $this->results = $linkableObjectTypes;
+        $this->results = $objectsMetadata;
 
         return 0; // or return 1 to replace standard code
     }
