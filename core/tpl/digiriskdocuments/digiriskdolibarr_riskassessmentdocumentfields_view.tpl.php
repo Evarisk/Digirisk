@@ -36,6 +36,8 @@ if ( ! is_object($form)) $form = new Form($db);
 
 // Date d'audit
 if ( $action == "edit" && $permissiontoadd ) {
+    require_once DOL_DOCUMENT_ROOT . '/core/class/doleditor.class.php';
+
 	print '<tr>';
 	print '<td class="titlefield"><label for="AuditStartDate">' . $langs->trans("AuditStartDate") . '</label></td><td colspan="2">';
 	print $form->selectDate($conf->global->DIGIRISKDOLIBARR_RISKASSESSMENTDOCUMENT_AUDIT_START_DATE, 'AuditStartDate', '', '', '', "edit", 1, 1);
@@ -82,7 +84,7 @@ if ( $action == "edit" && $permissiontoadd ) {
 	print '<td class="titlefield">' . $form->editfieldkey($langs->trans("SitePlans"), 'SitePlans', '', $object, 0) . '</td>';
 	print '<td>';
     print saturne_show_medias_linked('digiriskdolibarr', $conf->digiriskdolibarr->multidir_output[$conf->entity] . '/riskassessmentdocument/siteplans', 'small', '', 0, 0, 0, 200, 200, 0, 0, 0, 'riskassessmentdocument/siteplans', null, '', 0, 0);
-	print '<input class="flat" type="file" name="userfile[]" id="SitePlans" />';
+	print '<input class="flat" type="file" name="userfile[]" accept="image/*" id="SitePlans" />';
 	print '</td></tr>';
 } else {
 	print '<tr>';
@@ -132,7 +134,7 @@ if ( $action == "edit" && $permissiontoadd ) {
 	print '<tr>';
 	print '<td class="titlefield">' . $langs->trans("SitePlans") . '</td>';
 	print '<td>';
-    print saturne_show_medias_linked('digiriskdolibarr', $conf->digiriskdolibarr->multidir_output[$conf->entity] . '/riskassessmentdocument/siteplans', 'small', '', 0, 0, 0, 200, 200, 0, 0, 0, 'riskassessmentdocument/siteplans', null, '', 0, 0);
+    print saturne_show_medias_linked('digiriskdolibarr', $conf->digiriskdolibarr->multidir_output[$conf->entity] . '/riskassessmentdocument/siteplans', 'small', '', 0, 0, 0, 100, 100, 0, 0, 0, 'riskassessmentdocument/siteplans', null, '', 0, 0);
     print '</td></tr>';
 }
 

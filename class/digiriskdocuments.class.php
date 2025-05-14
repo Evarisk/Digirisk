@@ -317,7 +317,7 @@ class DigiriskDocuments extends SaturneDocuments
                 if (!getDolGlobalInt('DIGIRISKDOLIBARR_RISKASSESSMENT_HIDE_DATE_IN_DOCUMENT') && !empty($risk->riskAssessmentComment)) {
                     $tmpArray['riskAssessmentComment'] = dol_print_date((getDolGlobalInt('DIGIRISKDOLIBARR_SHOW_RISKASSESSMENT_DATE') && !empty($risk->riskAssessmentDate) ? $risk->riskAssessmentDate : $risk->riskAssessmentDateCreation), 'dayreduceformat') . ': ';
                 }
-                $tmpArray['riskAssessmentComment'] .= $risk->riskAssessmentComment ?: '';
+                $tmpArray['riskAssessmentComment'] = $risk->riskAssessmentComment ?: '';
 
                 $moreParam['riskId']             = $risk->id;
                 $riskTask                        = static::setRiskTasksTag($outputLangs, $moreParam);
