@@ -87,6 +87,8 @@ if ( $action == "edit" && $permissiontoadd ) {
 	print '<input class="flat" type="file" name="userfile[]" accept="image/*" id="SitePlans" />';
 	print '</td></tr>';
 } else {
+    $userTmp = new User($db);
+
 	print '<tr>';
 	print '<td class="titlefield">' . $langs->trans("AuditStartDate") . '</td><td colspan="2">';
 	print dol_print_date($conf->global->DIGIRISKDOLIBARR_RISKASSESSMENTDOCUMENT_AUDIT_START_DATE, '%d/%m/%Y');
@@ -103,8 +105,8 @@ if ( $action == "edit" && $permissiontoadd ) {
 	$recipients = json_decode($conf->global->DIGIRISKDOLIBARR_RISKASSESSMENTDOCUMENT_RECIPIENT);
 	if (is_array($recipients) && !empty($recipients)) {
         foreach ($recipients as $recipientId) {
-            $user->fetch($recipientId);
-            print $user->getNomUrl(1) . '<br>';
+            $userTmp->fetch($recipientId);
+            print $userTmp->getNomUrl(1) . '<br>';
         }
     }
 	print '</td></tr>';

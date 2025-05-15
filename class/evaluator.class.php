@@ -126,6 +126,32 @@ class Evaluator extends SaturneObject
 	}
 
     /**
+     * Load evaluator infos
+     *
+     * @return array     $array Array of evaluators
+     * @throws Exception
+     */
+    public static function loadEvaluatorInfos(): array
+    {
+        $array = [];
+
+        $filter              = 't.status = ' . Evaluator::STATUS_VALIDATED;
+        $evaluators = saturne_fetch_all_object_type('Evaluator', '', '', 0, 0, ['customsql' => $filter], 'AND', false, false);
+        if (!is_array($evaluators) || empty($evaluators)) {
+            $evaluators = [];
+        }
+
+        $array['evaluators'] = [];
+        foreach ($evaluators as $evaluator) {
+            $array['evaluators'][$evaluator->entity]['nbEmployeesInvolved']++;
+        }
+
+        return $array;
+    }
+
+
+
+    /**
      * Load dashboard info evaluator
      *
      * @return array

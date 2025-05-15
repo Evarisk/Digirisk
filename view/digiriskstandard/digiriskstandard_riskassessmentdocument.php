@@ -63,7 +63,6 @@ $saturneMail       = new SaturneMail($db, $object->module, $object->element);
 $digiriskResources = new DigiriskResources($db);
 $digiriskelement   = new DigiriskElement($db);
 $thirdparty        = new Societe($db);
-$userTmp           = new User($db);
 
 // Initialize view objects
 $form = new Form($db);
@@ -278,6 +277,7 @@ if (empty($resHook)) {
 
                         // Add current file to archive
                         $zip->addFile($filePath, $relativePath);
+                        $zip->setCompressionName($file, ZipArchive::CM_STORE);
                     }
                 }
 
@@ -432,7 +432,7 @@ if ($object->id > 0) {
         // List of actions on element
         require_once DOL_DOCUMENT_ROOT . '/core/class/html.formactions.class.php';
         $formActions = new FormActions($db);
-         $formActions->showactions($object, $object->element . '@' . $object->module, 0, 1, '', 10, '', $moreHtmlCenter);
+        $formActions->showactions($object, $object->element . '@' . $object->module, 0, 1, '', 10, '', $moreHtmlCenter);
 
         print '</div></div>';
     }
