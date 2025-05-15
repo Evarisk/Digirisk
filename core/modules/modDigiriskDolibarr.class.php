@@ -380,7 +380,7 @@ class modDigiriskdolibarr extends DolibarrModules
 		$this->descriptionlong = "Digirisk";
 		$this->editor_name     = 'Evarisk';
 		$this->editor_url      = 'https://evarisk.com';
-		$this->version         = '20.0.1';
+		$this->version         = '21.0.0';
 		$this->const_name      = 'MAIN_MODULE_' . strtoupper($this->name);
 		$this->picto           = 'digiriskdolibarr_color@digiriskdolibarr';
 
@@ -516,7 +516,7 @@ class modDigiriskdolibarr extends DolibarrModules
 			$i++ => ['DIGIRISKDOLIBARR_RISKASSESSMENTDOCUMENT_CUSTOM_ADDON_ODT_PATH', 'chaine', 'DOL_DATA_ROOT' . (($conf->entity == 1 ) ? '/' : '/' . $conf->entity . '/') . 'ecm/digiriskdolibarr/riskassessmentdocument/', '', 0, 'current'],
 			$i++ => ['DIGIRISKDOLIBARR_RISKASSESSMENTDOCUMENT_DEFAULT_MODEL', 'chaine', 'riskassessmentdocument_odt', '', 0, 'current'],
 			$i++ => ['DIGIRISKDOLIBARR_RISKASSESSMENTDOCUMENT_SHOW_TASK_DONE', 'integer', 1, '', 0, 'current'],
-			$i++ => ['DIGIRISKDOLIBARR_GENERATE_ARCHIVE_WITH_DIGIRISKELEMENT_DOCUMENTS', 'integer', 1, '', 0, 'current'],
+			$i++ => ['DIGIRISKDOLIBARR_GENERATE_ARCHIVE_WITH_DIGIRISKELEMENT_DOCUMENTS', 'integer', 0, '', 0, 'current'],
 
             // CONST AUDIT REPORT DOCUMENT
             $i++ => ['DIGIRISKDOLIBARR_MAIN_AGENDA_ACTIONAUTO_AUDITREPORTDOCUMENT_GENERATE', 'integer', 1, '', 0, 'current'],
@@ -750,6 +750,10 @@ class modDigiriskdolibarr extends DolibarrModules
 			$i++ => ['DIGIRISKDOLIBARR_TICKET_EXTRAFIELDS', 'integer', 0, '', 0, 0],
 			$i++ => ['DIGIRISKDOLIBARR_TICKET_CATEGORIES_CREATED', 'integer', 0, '', 0, 'current'],
 			$i++ => ['DIGIRISKDOLIBARR_TICKET_ENABLE_PUBLIC_INTERFACE', 'integer', 1, '', 0, 'current'],
+            $i++ => ['DIGIRISKDOLIBARR_TICKET_CURRENT_PUBLIC_INTERFACE_RADIO', 'chaine', 'originCurrentTicketPublicInterfaceURL', '', 0, 'current'],
+            $i++ => ['DIGIRISKDOLIBARR_TICKET_CURRENT_PUBLIC_INTERFACE_URL_ORIGIN', 'chaine', dol_buildpath('custom/digiriskdolibarr/public/ticket/create_ticket.php?entity=' . $conf->entity, 2), '', 0, 'current'],
+            $i++ => ['DIGIRISKDOLIBARR_TICKET_MULTICOMPANY_PUBLIC_INTERFACE_RADIO', 'chaine', 'originMulticompanyTicketPublicInterfaceURL', '', 0, 'current'],
+            $i++ => ['DIGIRISKDOLIBARR_TICKET_MULTICOMPANY_PUBLIC_INTERFACE_URL_ORIGIN', 'chaine', dol_buildpath('custom/digiriskdolibarr/public/ticket/create_ticket.php', 2), '', 0, 'current'],
 			$i++ => ['DIGIRISKDOLIBARR_TICKET_SHOW_COMPANY_LOGO', 'integer', 1, '', 0, 'current'],
 			$i++ => ['DIGIRISKDOLIBARR_TICKET_SUBMITTED_SEND_MAIL_TO', 'chaine', '', '', 0, 'current'],
 			$i++ => ['DIGIRISKDOLIBARR_TICKET_PARENT_CATEGORY', 'integer', 0, '', 0, 'current'],
@@ -814,7 +818,7 @@ class modDigiriskdolibarr extends DolibarrModules
 			$i++ => ['DIGIRISKDOLIBARR_SHOW_PATCH_NOTE', 'integer', 1, '', 0, 'current'],
             $i++ => ['DIGIRISKDOLIBARR_CUSTOM_NUM_REF_SET', 'integer', 0, '', 0, 'current'],
             $i++ => ['DIGIRISKDOLIBARR_LISTINGRISKSDOCUMENT_BACKWARD_ODT_PATH_SET', 'integer', 1, '', 0, 'current'],
-
+            $i++ => ['DIGIRISKDOLIBARR_BACKWARD_TRASH_ELEMENTS', 'integer', 1, '', 0, 'current'],
 
             // CONST ACCIDENT
 			$i++ => ['DIGIRISKDOLIBARR_MAIN_AGENDA_ACTIONAUTO_ACCIDENT_CREATE', 'integer', 1, '', 0, 'current'],
@@ -2012,7 +2016,7 @@ class modDigiriskdolibarr extends DolibarrModules
 			$digiriskelement->element_type = 'groupment';
 			$digiriskelement->ranks        = 0;
 			$digiriskelement->description  = $langs->trans('TrashGroupment');
-			$digiriskelement->status       = 0;
+			$digiriskelement->status       = DigiriskElement::STATUS_TRASHED;
 			$trash_id                      = $digiriskelement->create($user);
 
 			dolibarr_set_const($this->db, 'DIGIRISKDOLIBARR_DIGIRISKELEMENT_TRASH', $trash_id, 'integer', 0, '', $conf->entity);
@@ -2233,6 +2237,24 @@ class modDigiriskdolibarr extends DolibarrModules
         ];
 
         saturne_manage_extrafields($extraFieldsArrays, $commonExtraFieldsValue);
+
+        if (dolibarr_get_const($this->db, 'DIGIRISKDOLIBARR_TICKET_EXTRAFIELDS', 0) == 1) {
+            $commonExtraFieldsValue = [
+                'alwayseditable' => 1, 'list' => 1, 'help' => '', 'entity' => 0, 'langfile' => 'digiriskdolibarr@digiriskdolibarr', 'enabled' => "isModEnabled('digiriskdolibarr') && isModEnabled('ticket')", 'moreparams' => ['css' => 'minwidth100 maxwidth300']
+            ];
+
+            $extraFieldsArrays = [
+                'digiriskdolibarr_ticket_lastname'  => ['Label' => 'LastName',        'type' => 'varchar', 'length' => 255,  'elementtype' => ['ticket'], 'position' => 43630210,                                                                                                        ],
+                'digiriskdolibarr_ticket_firstname' => ['Label' => 'FirstName',       'type' => 'varchar', 'length' => 255,  'elementtype' => ['ticket'], 'position' => 43630220,                                                                                                        ],
+                'digiriskdolibarr_ticket_phone'     => ['Label' => 'Phone',           'type' => 'varchar', 'length' => 255,  'elementtype' => ['ticket'], 'position' => 43630230,                                                                                                        ],
+                'digiriskdolibarr_ticket_service'   => ['Label' => 'GP/UT',           'type' => 'link',                      'elementtype' => ['ticket'], 'position' => 43630240, 'params' => ['DigiriskElement:digiriskdolibarr/class/digiriskelement.class.php:1' => NULL], 'list' => 4],
+                'digiriskdolibarr_ticket_location'  => ['Label' => 'Location',        'type' => 'varchar',  'length' => 255, 'elementtype' => ['ticket'], 'position' => 43630250,                                                                                                        ],
+                'digiriskdolibarr_ticket_date'      => ['Label' => 'DeclarationDate', 'type' => 'datetime',                  'elementtype' => ['ticket'], 'position' => 43630260,                                                                                                        ]
+            ];
+
+            saturne_manage_extrafields($extraFieldsArrays, $commonExtraFieldsValue);
+            dolibarr_set_const($this->db, 'DIGIRISKDOLIBARR_TICKET_EXTRAFIELDS', 2, 'integer', 0, '', 0);
+        }
 
 		//DigiriskElement favorite medias backward compatibility
 		if ($conf->global->DIGIRISKDOLIBARR_DIGIRISKELEMENT_MEDIAS_BACKWARD_COMPATIBILITY == 0) {
@@ -2506,6 +2528,25 @@ class modDigiriskdolibarr extends DolibarrModules
         if (is_dir($mediaPath . '/accident_investigationdocument')) {
             chmod($mediaPath . '/accident_investigationdocument', 0755);
             rename($mediaPath . '/accident_investigationdocument', $mediaPath . '/accidentinvestigationdocument');
+        }
+
+        if (!getDolGlobalInt('DIGIRISKDOLIBARR_BACKWARD_TRASH_ELEMENTS') && $conf->entity == 1) {
+            require_once __DIR__ . '/../../class/digiriskelement.class.php';
+
+            $digiriskElement = new DigiriskElement($this->db);
+
+            $trashElementIds = $digiriskElement->getMultiEntityTrashList();
+            if (!empty($trashElementIds)) {
+                $filter = ['customsql' => 't.rowid IN ' . $digiriskElement->getTrashExclusionSqlFilter()];
+                $digiriskElement->ismultientitymanaged = 0;
+                $digiriskElements = $digiriskElement->fetchAll('', '', 0, 0, $filter);
+                foreach ($digiriskElements as $digiriskElement) {
+                    $digiriskElement->status = DigiriskElement::STATUS_TRASHED;
+                    $digiriskElement->setValueFrom('status', $digiriskElement->status, '', '', 'int');
+                }
+
+                dolibarr_set_const($this->db, 'DIGIRISKDOLIBARR_BACKWARD_TRASH_ELEMENTS', 1, 'integer');
+            }
         }
 
         return $this->_init($sql, $options);

@@ -80,31 +80,29 @@ class doc_listingrisksenvironmentalaction_odt extends SaturneDocumentModel
      */
     public function fillTagsLines(Odf $odfHandler, Translate $outputLangs, array $moreParam): int
     {
-        global $conf;
-
-        if (get_class($moreParam['object']) == 'DigiriskElement') {
-            $digiriskelement = $moreParam['object'];
-        } else {
-            $digiriskelement = null;
-        }
-
         $objectDocument = $moreParam['objectDocument'];
 
         try {
-            $moreParam['filterRisk'] = ' AND t.type = "riskenvironmental"';
-            $risk  = new Risk($this->db);
-            $risks = $risk->fetchRisksOrderedByCotation($digiriskelement->id > 0 ? $digiriskelement->id : 0, true, $conf->global->DIGIRISKDOLIBARR_SHOW_INHERITED_RISKS_IN_DOCUMENTS, $conf->global->DIGIRISKDOLIBARR_SHOW_SHARED_RISKS, $moreParam);
+            $digiriskElement = new DigiriskElement($this->db);
+            $risk            = new Risk($this->db);
 
-            $objectDocument->fillRiskData($odfHandler, $objectDocument, $outputLangs, [], '', $risks, $conf->global->DIGIRISKDOLIBARR_SHOW_SHARED_RISKS);
+            //@todo a refaire
+            $moreParam['filterRisk'] = ' AND t.type = \'risksenvironmental\'';
+            $loadRiskInfos = $risk->loadRiskInfos($moreParam);
 
+            $moreParam['digiriskElements']           = $digiriskElement->fetchDigiriskElementFlat(0, [], 'current');
+            $moreParam['entity']                     = 'current';
+            $moreParam['riskTasks']                  = $loadRiskInfos['current']['riskTasks'];
+            $moreParam['riskByRiskAssessmentLevels'] = $loadRiskInfos['current']['riskByRiskAssessmentLevels'];
+            $objectDocument->fillRiskData($odfHandler, $outputLangs, $moreParam);
         } catch (OdfException $e) {
             $this->error = $e->getMessage();
             dol_syslog($this->error, LOG_WARNING);
             return -1;
         }
+
         return 0;
     }
-
     /**
      * Function to build a document on disk
      *

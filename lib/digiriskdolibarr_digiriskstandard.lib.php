@@ -81,7 +81,7 @@ function digiriskstandard_prepare_head(DigiriskStandard $object): array
     }
 
     if ($user->rights->digiriskdolibarr->riskassessmentdocument->read) {
-        $head[$h][0] = dol_buildpath('/digiriskdolibarr/view/digiriskstandard/digiriskstandard_riskassessmentdocument.php', 1);
+        $head[$h][0] = dol_buildpath('/digiriskdolibarr/view/digiriskstandard/digiriskstandard_riskassessmentdocument.php', 1) . '?id=' . $object->id;
         $head[$h][1] = $conf->browser->layout != 'phone' ? '<i class="fas fa-file-alt pictofixedwidth"></i>' . $langs->trans("RiskAssessmentDocument") : '<i class="fas fa-file-alt"></i>';
         $head[$h][2] = 'standardRiskAssessmentDocument';
         $h++;

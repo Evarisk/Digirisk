@@ -330,7 +330,7 @@ class RiskSign extends SaturneObject
         $digiriskelement->fetch($object->fk_element);
 
         $ret .= $langs->trans('ParentElement') . ' : ' . $digiriskelement->ref . " - " . $digiriskelement->label . '<br>';
-        $ret .= $langs->trans('RiskCategory') . ' : ' . $risk->getDangerCategoryName($object) . '<br>';
+        $ret .= $langs->trans('RiskCategory') . ' : ' . $risk->getDangerCategoryName($object, $object->type) . '<br>';
 
         if (dol_strlen($object->applied_on) > 0) {
             $digiriskelement->fetch($object->applied_on);

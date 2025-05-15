@@ -524,7 +524,10 @@ if ($entity > 0) {
                     <div class="form-element gridw-2">
                         <span class="form-label"><?php print $langs->trans('Description'); ?>
                         <label class="form-field-container">
-                            <textarea readonly><?php echo $categoryDescription; ?></textarea>
+                            <?php
+                                $dolEditor = new DolEditor('category-description', $categoryDescription, '100%', 120, 'dolibarr_readonly', '', false, true, true, ROWS_2, 70, 1);
+                                $dolEditor->Create();
+                            ?>
                         </label>
                     </div>
                 <?php endif; ?>
@@ -580,7 +583,7 @@ if ($entity > 0) {
                     <?php } ?>
                 </div>
                 <?php
-                if (getDolGlobalInt('DIGIRISKDOLIBARR_TICKET_EXTRAFIELDS')) {
+                if (dolibarr_get_const($db, 'DIGIRISKDOLIBARR_TICKET_EXTRAFIELDS', 0)) {
                     if ($conf->global->DIGIRISKDOLIBARR_TICKET_DIGIRISKELEMENT_VISIBLE || (!$conf->global->DIGIRISKDOLIBARR_TICKET_DIGIRISKELEMENT_VISIBLE && $mainCategoryChildrenExtrafields->digiriskelement_visible)) {
                         $selectDigiriskElement = '<div class="gridw-2"><span ' . (($conf->global->DIGIRISKDOLIBARR_TICKET_DIGIRISKELEMENT_REQUIRED) ? 'style="font-weight:600"' : '') . '>' . $langs->trans('Service') . (($conf->global->DIGIRISKDOLIBARR_TICKET_DIGIRISKELEMENT_REQUIRED) ? '<span style="color:red"> *</span>' : '') . '</span>';
 
@@ -609,7 +612,7 @@ if ($entity > 0) {
                         || (!getDolGlobalInt(dol_strtoupper($key) . '_REQUIRED') && $mainCategoryChildrenExtrafields->{$key . '_required'} == NUll && $subCategoryExtrafields->{$key . '_required'});
                         if ($visible) {
                             $out  = '<div class="form-element form-field-container">';
-                            $out .= '<label><span class="form-label"' . ($required ? '' : 'style="font-weight:300"') . '>' . $field . ($required ? '<span style="color:red"> *</span>' : '') . '</span>';
+                            $out .= '<label><span class="form-label"' . ($required ? '' : 'style="font-weight:300"') . '>' . $langs->transnoentities($field) . ($required ? '<span style="color:red"> *</span>' : '') . '</span>';
                             if ($key == 'digiriskdolibarr_ticket_email' || $key == 'digiriskdolibarr_ticket_date') {
                                 $out .= '<input type="' . $fields[$key]['type'] . '" name="' . ($fields[$key]['name'] ?? 'options_' . $key) . '" id="' . ($fields[$key]['name'] ?? 'options_' . $key) . '" value="' . GETPOST($fields[$key]['name'] ?? 'options_' . $key) . '"' . ($required ? 'required' : '') . '/>';
                             } else {

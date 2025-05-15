@@ -173,27 +173,47 @@ function digirisk_header($title = '', $helpUrl = '', $arrayofjs = [], $arrayofcs
 }
 
 /**
- *	Recursive tree process
+ * Recursive tree process
  *
- * @param	int             $parent Element Parent id of Digirisk Element object
- * @param 	int             $niveau Depth of tree
- * @param 	array           $array  Global Digirisk Element list
- * @return	array           $result Global Digirisk Element list after recursive process
+ * @param  int   $parentID         Element parent id of Digirisk Element object
+ * @param  int   $depth            Depth of tree
+ * @param  array $digiriskElements Global Digirisk Element list
+ * @return array $tree             Global Digirisk Element list after recursive process
  */
-function recurse_tree($parent, $niveau, $array)
+function recurse_tree(int $parentID, int $depth, array $digiriskElements): array
 {
-	$result = array();
-	foreach ($array as $noeud) {
-		if ($parent == $noeud->fk_parent) {
-			$result[$noeud->id] = array(
-				'id'       => $noeud->id,
-				'depth'    => array('depth' . $noeud->id => $niveau),
-				'object'   => $noeud,
-				'children' => recurse_tree($noeud->id, ($niveau + 1), $array),
-			);
-		}
-	}
-	return $result;
+    $tree = [];
+
+    foreach ($digiriskElements as $digiriskElement) {
+        if ($digiriskElement->fk_parent == $parentID) {
+            $tree[$digiriskElement->id] = [
+                'id'       => $digiriskElement->id,
+                'depth'    => $depth,
+                'object'   => $digiriskElement,
+                'children' => recurse_tree($digiriskElement->id, $depth + 1, $digiriskElements)
+            ];
+        }
+    }
+
+    return $tree;
+}
+
+function flatten_tree($tree)
+{
+    $flat = [];
+
+    foreach ($tree as $node) {
+        $flat[$node['id']] = [
+            'object' => $node['object'],
+            'depth'  => $node['depth']
+        ];
+
+        if (!empty($node['children'])) {
+            $flat += flatten_tree($node['children']);
+        }
+    }
+
+    return $flat;
 }
 
 /**

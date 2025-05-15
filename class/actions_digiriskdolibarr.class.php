@@ -312,33 +312,35 @@ class ActionsDigiriskdolibarr
 				}
 			}
 
-            $signatory = new SaturneSignature($db, 'digiriskdolibarr', $object->element);
-            $signatories = $signatory->fetchSignatory('Attendant', $object->id, $object->element);
-            if (is_array($signatories) && !empty($signatories)) {
-                $signatory = array_shift($signatories);
-                if (dol_strlen( $signatory->signature_url ) > 0) {
-                    $picto        = img_picto('', 'digiriskdolibarr_color@digiriskdolibarr', 'class="pictoModule"');
-                    $signatureUrl = dol_buildpath('custom/saturne/public/signature/add_signature.php?track_id=' . $signatory->signature_url . '&entity=' . $conf->entity . '&module_name=digiriskdolibarr&object_type=' . $object->element . '&document_type=TicketDocument', 3);
+            if (is_integer($object->id) && !empty($object->id)) {
+                $signatory = new SaturneSignature($db, 'digiriskdolibarr', $object->element);
+                $signatories = $signatory->fetchSignatory('Attendant', $object->id, $object->element);
+                if (is_array($signatories) && !empty($signatories)) {
+                    $signatory = array_shift($signatories);
+                    if (dol_strlen( $signatory->signature_url ) > 0) {
+                        $picto        = img_picto('', 'digiriskdolibarr_color@digiriskdolibarr', 'class="pictoModule"');
+                        $signatureUrl = dol_buildpath('custom/saturne/public/signature/add_signature.php?track_id=' . $signatory->signature_url . '&entity=' . $conf->entity . '&module_name=digiriskdolibarr&object_type=' . $object->element . '&document_type=TicketDocument', 3);
 
-                    $out  = '<tr class="trextrafields_collapse_' . $object->id . '"><td class="titlefield">' . $picto . $langs->trans('Signature') . '</td>';
-                    $out .= '<td id="ticket_extras_digiriskdolibarr_ticket_signature_'. $object->id . '" class="valuefield ticket_extras_digiriskdolibarr_ticket_signature wordbreak copy-signatureurl-container">';
-                    $out .= '<a href=' . $signatureUrl . ' target="_blank"><div class="wpeo-button button-blue" style="' . ($conf->browser->layout != 'classic' ? 'font-size: 25px;': '') . '"><i class="fas fa-eye"></i></div></a>';
-                    $out .= ' <i class="fas fa-clipboard copy-signatureurl" data-signature-url="' . $signatureUrl . '" style="color: #666;' .  ($conf->browser->layout != 'classic' ? 'display: none;': '') . '"></i>';
-                    $out .= '<span class="copied-to-clipboard" style="display: none;">' . '  ' . $langs->trans('CopiedToClipboard') . '</span>';
-                    $out .= '</td>';
-                    $out .= '</tr>';
+                        $out  = '<tr class="trextrafields_collapse_' . $object->id . '"><td class="titlefield">' . $picto . $langs->trans('Signature') . '</td>';
+                        $out .= '<td id="ticket_extras_digiriskdolibarr_ticket_signature_'. $object->id . '" class="valuefield ticket_extras_digiriskdolibarr_ticket_signature wordbreak copy-signatureurl-container">';
+                        $out .= '<a href=' . $signatureUrl . ' target="_blank"><div class="wpeo-button button-blue" style="' . ($conf->browser->layout != 'classic' ? 'font-size: 25px;': '') . '"><i class="fas fa-eye"></i></div></a>';
+                        $out .= ' <i class="fas fa-clipboard copy-signatureurl" data-signature-url="' . $signatureUrl . '" style="color: #666;' .  ($conf->browser->layout != 'classic' ? 'display: none;': '') . '"></i>';
+                        $out .= '<span class="copied-to-clipboard" style="display: none;">' . '  ' . $langs->trans('CopiedToClipboard') . '</span>';
+                        $out .= '</td>';
+                        $out .= '</tr>';
 
-                    ?>
-                    <script>
-                        jQuery('.tabBar .fichehalfleft table:first').append(<?php echo json_encode($out); ?>);
-                    </script>
-                    <?php
+                        ?>
+                        <script>
+                            jQuery('.tabBar .fichehalfleft table:first').append(<?php echo json_encode($out); ?>);
+                        </script>
+                        <?php
+                    }
                 }
             }
         } else if (preg_match('/projectcard|projectcontactcard|projecttaskcard|projecttaskscard|projecttasktime|projectOverview|tasklist|category/', $parameters['context'])) {
 			if ((GETPOST('action') == '' || empty(GETPOST('action')) || GETPOST('action') != 'edit')) {
 				require_once DOL_DOCUMENT_ROOT.'/projet/class/project.class.php';
-				require_once DOL_DOCUMENT_ROOT.'/projet/class/task.class.php';
+                require_once __DIR__ . '/../../saturne/class/task/saturnetask.class.php';
 
 				$task    = new SaturneTask($db);
 				$project = new Project($db);
@@ -494,6 +496,38 @@ class ActionsDigiriskdolibarr
 		}
 	}
 
+    /**
+     * Overloading the addMoreActionsButtons function : replacing the parent's function with the one below
+     *
+     * @param array       $parameters Hook metadata (context, etc...)
+     * @param object|null $object     The object to process
+     *
+     * @return int                    0 < on error, 0 on success, 1 to replace standard code
+     */
+    public function addMoreActionsButtons(array $parameters, ?object $object): int
+    {
+        global $conf, $langs, $user;
+
+        if (strpos($parameters['context'], 'ticketcard') !== false) {
+            $urlParameters = '&fk_ticket=' . $object->id . '&label=' . $object->subject . '&description=' . $object->message;
+            if (!empty($object->array_options['options_digiriskdolibarr_ticket_service'])) {
+                $urlParameters .= '&fromid=' . $object->array_options['options_digiriskdolibarr_ticket_service'];
+            }
+            if (!empty($object->array_options['options_digiriskdolibarr_ticket_date'])) {
+                $declarationDate = dol_getdate($object->array_options['options_digiriskdolibarr_ticket_date'], false, (empty($_SESSION['dol_tz_string']) ? date_default_timezone_get() : $_SESSION['dol_tz_string']));
+                $urlParameters  .= '&dateoyear=' . $declarationDate['year'] . '&dateomonth=' . $declarationDate['mon'] . '&dateoday=' . $declarationDate['mday'];
+                $urlParameters  .= '&dateohour=' . $declarationDate['hours'] . '&dateomin=' . $declarationDate['minutes'];
+            }
+            $urlParameters .= '&backtopageforcancel=' . urlencode($_SERVER['PHP_SELF'] . '?id=' . $object->id);
+
+            $url   = dol_buildpath('digiriskdolibarr/view/accident/accident_card.php?action=create' . $urlParameters, 1);
+            $label = $conf->browser->layout == 'classic' ? '<i class="fas fa-user-injured"></i>' . ' ' . $langs->trans('NewAccident') : '<i class="fas fa-user-injured fa-2x"></i>';
+            print dolGetButtonAction($label, '', 'default', $url, '', $user->hasRight('digiriskdolibarr', 'accident', 'write'));
+        }
+
+        return 0; // or return 1 to replace standard code
+    }
+
 	/**
 	 *  Overloading the doActions function : replacing the parent's function with the one below
 	 *
@@ -558,7 +592,25 @@ class ActionsDigiriskdolibarr
 		}
 	}
 
-	/**
+    /**
+     * Overloading the hookGetEntity function : replacing the parent's function with the one below
+     *
+     * @param  array $parameters Hook metadata (context, etc...)
+     * @return int               0 < on error, 0 on success, 1 to replace standard code
+     */
+    public function hookGetEntity(array $parameters): int
+    {
+        global $mc;
+
+        if (preg_match('/digiriskstandardriskassessmentdocument|risklist|riskcard/', $parameters['context']) && in_array($parameters['element'], ['digiriskelement', 'riskassessment']) && getDolGlobalInt('DIGIRISKDOLIBARR_SHOW_SHARED_RISKS')) {
+            $this->resprints = $mc->getEntity('risk', 1);
+            return 1;
+        }
+
+        return 0; // or return 1 to replace standard code
+    }
+
+    /**
 	 *  Overloading the printFieldListFrom function : replacing the parent's function with the one below
 	 *
 	 * @param Hook $parameters metadatas (context, etc...)
@@ -709,7 +761,7 @@ class ActionsDigiriskdolibarr
     {
         global $extrafields, $langs;
 
-        if (strpos($parameters['context'], 'projecttaskcard') !== false) {
+        if (strpos($parameters['context'], 'projecttaskcard') !== false && $object instanceof Task) {
             $picto            = img_picto('', 'digiriskdolibarr_color@digiriskdolibarr', 'class="pictoModule"');
             $extraFieldsNames = ['fk_risk', 'fk_preventionplan', 'fk_firepermit', 'fk_accident', 'fk_accidentinvestigation'];
             foreach ($extraFieldsNames as $extraFieldsName) {
@@ -746,6 +798,16 @@ class ActionsDigiriskdolibarr
             $extraFieldsNames = ['fk_risk', 'fk_preventionplan', 'fk_firepermit', 'fk_accident', 'fk_accidentinvestigation'];
             foreach ($extraFieldsNames as $extraFieldsName) {
                 $extrafields->attributes['projet_task']['label'][$extraFieldsName] = $picto . $langs->transnoentities($extrafields->attributes['projet_task']['label'][$extraFieldsName]);
+            }
+        }
+
+        if (strpos($parameters['context'], 'ticketlist') !== false) {
+            $picto = img_picto('', 'digiriskdolibarr_color@digiriskdolibarr', 'class="pictoModule"');
+            foreach ($extrafields->attributes['ticket']['label'] as $key => $value) {
+                if (strpos($key, 'digiriskdolibarr_ticket') === false) {
+                    continue; // Goes to the next element if ‘digiriskdolibarr_ticket’ is not found
+                }
+                $extrafields->attributes['ticket']['label'][$key] = $picto . $langs->transnoentities($value);
             }
         }
 
@@ -990,47 +1052,63 @@ class ActionsDigiriskdolibarr
 	}
 
     /**
-     * Overloading the extendSheetLinkableObjectsList function : replacing the parent's function with the one below
+     * Overloading the saturneExtendGetObjectsMetadata function : replacing the parent's function with the one below
      *
-     * @param  array $linkableObjectTypes  Array of linkable objects
-     * @return int                         0 < on error, 0 on success, 1 to replace standard code
+     * @param  array $parameters Hook metadata (context, etc...)
+     * @return int               0 < on error, 0 on success, 1 to replace standard code
      */
-    public function extendSheetLinkableObjectsList(array $linkableObjectTypes): int
+    public function saturneExtendGetObjectsMetadata(array $parameters): int
     {
-        require_once __DIR__ . '/firepermit.class.php';
-        require_once __DIR__ . '/../lib/digiriskdolibarr_firepermit.lib.php';
-
-        $linkableObjectTypes['digiriskdolibarr_firepermit'] = [
-            'langs'          => 'Firepermit',
-            'langfile'       => 'digiriskdolibarr@digiriskdolibarr',
-            'picto'          => 'fontawesome_fa-fire-alt_fas_#d35968',
-            'className'      => 'FirePermit',
-            'name_field'     => 'ref',
-            'post_name'      => 'fk_firepermit',
-            'link_name'      => 'digiriskdolibarr_firepermit',
-            'tab_type'       => 'firepermit',
-            'hook_name_list' => 'firepermitlist',
-            'hook_name_card' => 'firepermitcard',
-            'create_url'     => 'custom/digiriskdolibarr/view/firepermit/firepermit_card.php?action=create',
-            'class_path'     => 'custom/digiriskdolibarr/class/firepermit.class.php'
+        $objects = [
+            'digiriskstandard'      => 'sitemap',
+            'digiriskelement'       => 'network-wired',
+            'risk'                  => 'exclamation-triangle',
+            'riskassessment'        => 'chart-line',
+            'evaluator'             => 'user-check',
+            'risksign'              => 'map-signs',
+            'preventionplan'        => 'info',
+            'firepermit'            => 'fire-alt',
+            'accident'              => 'user-injured',
+            'accidentinvestigation' => 'search',
         ];
-        $this->results = $linkableObjectTypes;
-
-        return 1;
-    }
-
-    /**
-     * Add new actions buttons on CommonObject
-     *
-     * @param   CommonObject  $object  The object to process (third party and product object)
-     */
-    public function addMoreActionsButtons($parameters, &$object, &$action)
-    {
-        global $langs, $user;
-
-        if (strpos($parameters['context'], 'ticketcard') !== false) {
-            print dolGetButtonAction('', img_picto('NewAccident', 'fa-user-injured') . ' ' . $langs->trans('NewAccident'), 'default', dol_buildpath('/digiriskdolibarr/view/accident/accident_card.php?action=create&fk_ticket=' . $object->id, 1), '', $user->rights->digiriskdolibarr->accident->write);
+        foreach ($objects as $objectName => $picto) {
+            $objectsMetadata['digiriskdolibarr_' . $objectName] = [
+                'mainmenu'       => 'digiriskdolibarr',
+                'leftmenu'       => '',
+                'langs'          => ucfirst($objectName),
+                'langfile'       => 'digiriskdolibarr@digiriskdolibarr',
+                'picto'          => 'fontawesome_fa-' . $picto . '_fas_#d35968',
+                'color'          => '#d35968',
+                'class_name'     => ucfirst($objectName),
+                'post_name'      => 'fk_' . $objectName,
+                'link_name'      => 'digiriskdolibarr_' . $objectName,
+                'tab_type'       => $objectName,
+                'table_element'  => 'digiriskdolibarr_' . $objectName,
+                'name_field'     => 'ref, label',
+                'label_field'    => 'label',
+                'hook_name_card' => $objectName . 'list',
+                'hook_name_list' => $objectName . 'card',
+                'create_url'     => 'custom/digiriskdolibarr/view/' . $objectName . '/' . $objectName . '_card.php?action=create',
+                'class_path'     => 'custom/digiriskdolibarr/class/' . $objectName . '.class.php',
+                'lib_path'       => 'custom/digiriskdolibarr/lib/digiriskdolibarr_' . $objectName . '.lib.php'
+            ];
         }
 
+        // objects specificataions
+        $objects = ['risk', 'riskassessment', 'risksign'];
+        foreach ($objects as $objectName) {
+            $objectsMetadata['digiriskdolibarr_' . $objectName]['create_url'] = '';
+            $objectsMetadata['digiriskdolibarr_' . $objectName]['class_path'] = 'custom/digiriskdolibarr/class/riskanalysis/' . $objectName . '.class.php';
+            $objectsMetadata['digiriskdolibarr_' . $objectName]['lib_path']   = 'custom/digiriskdolibarr/lib/digiriskdolibarr_digiriskelement.lib.php';
+        }
+        $objectsMetadata['digiriskdolibarr_digiriskelement']['create_url'] = 'custom/digiriskdolibarr/view/digiriskelement/digiriskelement_card.php?action=create&element_type=groupment&fk_parent=0';
+
+        $objectsMetadata['digiriskdolibarr_evaluator']['create_url'] = '';
+        $objectsMetadata['digiriskdolibarr_evaluator']['class_path'] = 'custom/digiriskdolibarr/class/evaluator.class.php';
+        $objectsMetadata['digiriskdolibarr_evaluator']['lib_path']   = 'custom/digiriskdolibarr/lib/digiriskdolibarr_digiriskelement.lib.php';
+
+        $this->results = $objectsMetadata;
+
+        return 0; // or return 1 to replace standard code
     }
 }

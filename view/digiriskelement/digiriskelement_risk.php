@@ -241,7 +241,7 @@ print '<div id="cardContent" value="">';
 if ($sharedrisks) {
 	$formconfirm = '';
 
-	$alldigiriskelement = $digiriskelement->getActiveDigiriskElements(1);
+	$alldigiriskelement = $digiriskelement->getActiveDigiriskElements('shared');
 
 	// Import shared risks confirmation
 	if (($action == 'import_shared_risks' && (empty($conf->use_javascript_ajax) || !empty($conf->dol_use_jmobile)))        // Output when action = clone if jmobile or no js
@@ -287,7 +287,7 @@ if ($sharedrisks) {
 				}
 
 				if (array_key_exists($digiriskelementtmp->id, $alldigiriskelement)) {
-					$photoRisk = '<img class="danger-category-pic hover" src=' . DOL_URL_ROOT . '/custom/digiriskdolibarr/img/categorieDangers/' . $risks->getDangerCategory($risks) . '.png' . '>';
+					$photoRisk = '<img class="danger-category-pic hover" src=' . DOL_URL_ROOT . '/custom/digiriskdolibarr/img/categorieDangers/' . $risks->getDangerCategory($risks, $risks->type) . '.png' . '>';
 
 					$importValue = '<div class="importsharedrisk"><span class="importsharedrisk-ref">' . 'S' . $risks->entity . '</span>';
 					$importValue .= '<span>' . dol_trunc($entityName[$risks->entity], 32) . '</span>';

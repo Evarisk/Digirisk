@@ -31,8 +31,9 @@ if (file_exists('../digiriskdolibarr.main.inc.php')) {
 }
 
 // load Dolibarr libraries
-require_once DOL_DOCUMENT_ROOT . '/categories/class/categorie.class.php';
+require_once DOL_DOCUMENT_ROOT . '/core/lib/admin.lib.php';
 require_once DOL_DOCUMENT_ROOT . '/core/lib/categories.lib.php';
+require_once DOL_DOCUMENT_ROOT . '/categories/class/categorie.class.php';
 require_once DOL_DOCUMENT_ROOT . '/core/class/html.formmail.class.php';
 
 // Global variables definitions
@@ -102,7 +103,7 @@ if (empty($resHook)) {
             $data[$extraFieldRequired] = GETPOST($extraFieldRequired);
         }
 
-        $object->table_element = 'categories';
+        $object->table_element = 'categorie';
         $object->array_options['options_ticket_category_config'] = json_encode($data);
         $object->updateExtraField('ticket_category_config');
 
@@ -206,7 +207,7 @@ if (is_array($userTmp->users) && !empty($userTmp->users)) {
 print '</td></tr>';
 
 if (getDolGlobalInt('DIGIRISKDOLIBARR_TICKET_ENABLE_PUBLIC_INTERFACE')) {
-    if (getDolGlobalInt('DIGIRISKDOLIBARR_TICKET_EXTRAFIELDS')) {
+    if (dolibarr_get_const($db, 'DIGIRISKDOLIBARR_TICKET_EXTRAFIELDS', 0)) {
         print load_fiche_titre($langs->transnoentities('PublicInterfaceConfiguration'), $link, '');
 
         print '<table class="noborder centpercent">';

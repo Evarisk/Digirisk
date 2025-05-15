@@ -598,7 +598,9 @@ class Accident extends SaturneObject
 
             foreach($accidentsByYear as $year => $accidentByYear) {
                 foreach($accidentByYear as $month => $accidentByMonth) {
-                    $accidentsArray[$month][$year] = $accidentByMonth;
+                    if (isset($accidentsArray[$month][$year])) {
+                        $accidentsArray[$month][$year] = $accidentByMonth;
+                    }
                 }
             }
 
@@ -657,17 +659,25 @@ class Accident extends SaturneObject
      */
     public function getNbPresquAccidents(): array
     {
-        global $langs;
+        global $conf, $langs;
+
+        $array['nbpresquaccidents'] = 'N/A';
 
         $category = new Categorie($this->db);
 
-        $category->fetch(0, $langs->transnoentities('PresquAccident'));
-        $tickets = $category->getObjectsInCateg(Categorie::TYPE_TICKET);
-        if (!empty($tickets) && is_array($tickets)) {
-            $array['nbpresquaccidents'] = count($tickets);
-        } else {
-            $array['nbpresquaccidents'] = 'N/A';
+        $result = $category->fetch(0, $langs->transnoentities('PresquAccident'));
+        if ($result <= 0) {
+            return $array;
         }
+
+        $filter  = 't.fk_statut > 0 AND t.entity = ' . $conf->entity . ' AND cp.fk_categorie IN (' . $category->id  . ')';
+        $tickets = saturne_fetch_all_object_type('Ticket', '', '', 0, 0, ['customsql' => $filter], 'AND', false, false, true);
+        if (!is_array($tickets) || empty($tickets)) {
+            return $array;
+        }
+
+        $array['nbpresquaccidents'] = count($tickets);
+
         return $array;
     }
 
@@ -853,7 +863,9 @@ class Accident extends SaturneObject
             }
             $moreHtmlRef      = $langs->trans('TotalWorkStopDays') . ' : ' . $totalWorkStopDays;
             $lastaccidentline = end($accidentLines);
-            $moreHtmlRef     .= '<br>' . $langs->trans('ReturnWorkDate') . ' : ' . dol_print_date($lastaccidentline->date_end_workstop, 'dayhour');
+            if ($this->status == Accident::STATUS_LOCKED) {
+                $moreHtmlRef     .= '<br>' . $langs->trans('ReturnWorkDate') . ' : ' . dol_print_date($lastaccidentline->date_end_workstop, 'dayhour');
+            }
         } else {
             $moreHtmlRef = $langs->trans('RegisterAccident');
         }
@@ -917,7 +929,7 @@ class AccidentWorkStop extends SaturneObject
 		'date_creation'       => ['type' => 'datetime',     'label' => 'DateCreation',      'enabled' => '1', 'position' => 40, 'notnull' => 1,  'visible' => 0,],
 		'tms'                 => ['type' => 'timestamp',    'label' => 'DateModification',  'enabled' => '1', 'position' => 50, 'notnull' => 0,  'visible' => 0,],
 		'status'              => ['type' => 'smallint',     'label' => 'Status',            'enabled' => '1', 'position' => 60, 'notnull' => 0,  'visible' => 0, 'index' => 0,],
-		'workstop_days'       => ['type' => 'integer',      'label' => 'WorkStopDays',      'enabled' => '1', 'position' => 70, 'notnull' => -1, 'visible' => -1,],
+		'workstop_days'       => ['type' => 'integer',      'label' => 'WorkStopDays',      'enabled' => '1', 'position' => 70, 'notnull' => 0, 'visible' => -1,],
 		'date_start_workstop' => ['type' => 'datetime',     'label' => 'DateStartWorkStop', 'enabled' => '1', 'position' => 80, 'notnull' => 0,  'visible' => 0,],
 		'date_end_workstop'   => ['type' => 'datetime',     'label' => 'DateEndWorkStop',   'enabled' => '1', 'position' => 81, 'notnull' => 0,  'visible' => 0,],
 		'declaration_link'    => ['type' => 'text',         'label' => 'DeclarationLink',   'enabled' => '1', 'position' => 82, 'notnull' => 0,  'visible' => 0,],

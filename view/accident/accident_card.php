@@ -143,7 +143,7 @@ if (empty($reshook)) {
 		}
 	}
 
-	if (GETPOST('cancel') || GETPOST('cancelLine')) {
+	if (GETPOST('cancelLine')) {
 		// Cancel accident
 		$urltogo = str_replace('__ID__', $result, $backtopage);
 		$urltogo = preg_replace('/--IDFORBACKTOPAGE--/', $id, $urltogo); // New method to autoselect project after a New on another form object creation
@@ -152,7 +152,7 @@ if (empty($reshook)) {
 	}
 
 	// Action to add record
-	if ($action == 'add' && $permissiontoadd) {
+	if ($action == 'add' && $permissiontoadd && !$cancel) {
 		// Get parameters
 		$user_victim_id     = GETPOST('fk_user_victim');
 		$user_employer_id   = GETPOST('fk_user_employer');
@@ -372,8 +372,8 @@ if (empty($reshook)) {
 		$objectline->fk_accident         = $parent_id;
 
 		// Check parameters
-		if ($workstop_days <= 0) {
-			setEventMessages($langs->trans('ErrorFieldNotEmpty', $langs->transnoentitiesnoconv('WorkStopDays')), null, 'errors');
+		if ($workstop_days < 0) {
+			setEventMessages($langs->trans('ErrorFieldMustBeGreaterOrEqualZero', $langs->transnoentitiesnoconv('WorkStopDays')), null, 'errors');
 			$error++;
 		}
 
@@ -420,8 +420,8 @@ if (empty($reshook)) {
 		$objectline->declaration_link    = $declaration_link;
 
 		// Check parameters
-		if ($workstop_days <= 0) {
-			setEventMessages($langs->trans('ErrorFieldNotEmpty', $langs->transnoentitiesnoconv('WorkStopDays')), [], 'errors');
+		if ($workstop_days < 0) {
+			setEventMessages($langs->trans('ErrorFieldMustBeGreaterOrEqualZero', $langs->transnoentitiesnoconv('WorkStopDays')), [], 'errors');
 			header("Location: " . $_SERVER['PHP_SELF'] . '?id=' . $id . '&action=editline&lineid=' .  $lineid);
 			exit;
 			$error++;
@@ -619,9 +619,12 @@ if ($action == 'create') {
 	print '<form method="POST" action="' . $_SERVER["PHP_SELF"] . '" enctype="multipart/form-data">';
 	print '<input type="hidden" name="token" value="' . newToken() . '">';
 	print '<input type="hidden" name="action" value="add">';
-	print '<input type="hidden" name="backtopage" value="' . $backtopage . '">';
-
-	if ($backtopageforcancel) print '<input type="hidden" name="backtopageforcancel" value="' . $backtopageforcancel . '">';
+    if ($backtopage) {
+        print '<input type="hidden" name="backtopage" value="' . $backtopage . '">';
+    }
+    if ($backtopageforcancel) {
+        print '<input type="hidden" name="backtopageforcancel" value="' . $backtopageforcancel . '">';
+    }
 
 	print dol_get_fiche_head();
 
@@ -636,7 +639,7 @@ if ($action == 'create') {
 	if ( ! empty($mysoc->managers)) {
 		$usertmp->fetch('', $mysoc->managers, $mysoc->id, 0, $conf->entity);
 	}
-	$userlist = $form->select_dolusers( GETPOST('fk_user_employer') ?: ($usertmp->id > 0 ? $usertmp->id : $user->id), '', 0, null, 0, '', '', '', 0, 0, 'AND u.statut = 1', 0, '', 'minwidth300', 0, 1);
+	$userlist = $form->select_dolusers( GETPOST('fk_user_employer') ?: ($usertmp->id > 0 ? $usertmp->id : $user->id), '', 0, null, 0, '', '', '', 0, 0, '(u.statut:=:1)', 0, '', 'minwidth300', 0, 1);
 	print '<tr>';
 	print '<td class="fieldrequired minwidth400" style="width:10%">' . img_picto('', 'user') . ' ' . $form->editfieldkey('UserEmployer', 'UserEmployer_id', '', $object, 0) . '</td>';
 	print '<td>';
@@ -645,7 +648,7 @@ if ($action == 'create') {
 	print '</td></tr>';
 
 	//User Victim -- Utilisateur victime de l'accident
-	$userlist = $form->select_dolusers((GETPOST('fk_user_victim') ?: $user->id), '', 0, null, 0, '', '', '', 0, 0, 'AND u.statut = 1', 0, '', 'minwidth300', 0, 1);
+	$userlist = $form->select_dolusers((GETPOST('fk_user_victim') ?: $user->id), '', 0, null, 0, '', '', '', 0, 0, '(u.statut:=:1)', 0, '', 'minwidth300', 0, 1);
 	print '<tr>';
 	print '<td class="fieldrequired minwidth400" style="width:10%">' . img_picto('', 'user') . ' ' . $form->editfieldkey('UserVictim', 'UserVictim_id', '', $object, 0) . '</td>';
 	print '<td>';
@@ -688,7 +691,8 @@ if ($action == 'create') {
 
 	//Accident Date -- Date de l'accident
 	print '<tr><td class="minwidth300"><label for="accident_date">' . $langs->trans("AccidentDate") . '</label></td><td>';
-	print $form->selectDate(GETPOST('dateo') ? dol_mktime(GETPOST('dateohour', 'int'),GETPOST('dateomin', 'int'),0,GETPOST('dateomonth', 'int'), GETPOST('dateoday', 'int'), GETPOST('dateoyear', 'int')) : dol_now('tzuser'), 'dateo', 1, 1, 0, '', 1);
+    $dateEo = dol_mktime(GETPOSTINT('dateohour'), GETPOSTINT('dateomin'), GETPOSTINT('dateosec'), GETPOSTINT('dateomonth'), GETPOSTINT('dateoday'), GETPOSTINT('dateoyear'));
+    print $form->selectDate(!empty($dateEo) ? $dateEo : dol_now('tzuser'), 'dateo', 1, 1);
 	print '</td></tr>';
 
 	//Description -- Description
@@ -752,7 +756,7 @@ if (($id || $ref) && $action == 'edit') {
 	print '</td></tr>';
 
 	//User Employer -- Utilisateur responsable de la société
-	$userlist = $form->select_dolusers(( ! empty($object->fk_user_employer) ? $object->fk_user_employer : $user->id), '', 0, null, 0, '', '', $conf->entity, 0, 0, 'AND u.statut = 1', 0, '', 'minwidth300', 0, 1);
+	$userlist = $form->select_dolusers(( ! empty($object->fk_user_employer) ? $object->fk_user_employer : $user->id), '', 0, null, 0, '', '', $conf->entity, 0, 0, '(u.statut:=:1)', 0, '', 'minwidth300', 0, 1);
 	print '<tr>';
 	print '<td class="fieldrequired minwidth400" style="width:10%">' . img_picto('', 'user') . ' ' . $form->editfieldkey('UserEmployer', 'UserEmployer_id', '', $object, 0) . '</td>';
 	print '<td>';
@@ -1132,6 +1136,10 @@ if ((empty($action) || ($action != 'create' && $action != 'edit'))) {
                 print '<span class="butActionRefused classfortooltip" title="' . dol_escape_htmltag($langs->trans('ObjectMustBeValidated', ucfirst($langs->transnoentities('The' . ucfirst($object->element))))) . '">' . $displayButton . '</span>';
             }
 
+            // Create Investigation
+            $displayButton = $onPhone ? '<i class="fas fa-search-plus fa-2x"></i>' : '<i class="fas fa-search-plus"></i> ' . $langs->trans('AccidentInvestigation');
+            print '<a class="butAction" id="actionButtonCreateInvestigation" href="'. dol_buildpath('/custom/digiriskdolibarr/view/accidentinvestigation/accidentinvestigation_card.php?action=create&fk_accident=' . $id, 1) .'">' . $displayButton . '</a>';
+
 			// Lock.
 			$displayButton = $onPhone ? '<i class="fas fa-lock fa-2x"></i>' : '<i class="fas fa-lock"></i>' . ' ' . $langs->trans('Lock');
 			if ($object->status == Accident::STATUS_VALIDATED && $allSigned) {
@@ -1140,14 +1148,6 @@ if ((empty($action) || ($action != 'create' && $action != 'edit'))) {
                 print '<span class="butActionRefused classfortooltip" title="' . dol_escape_htmltag($langs->trans('ObjectMustBeValidated', ucfirst($langs->transnoentities('The' . ucfirst($object->element))))) . '">' . $displayButton . '</span>';
             } else {
 				print '<span class="butActionRefused classfortooltip" title="' . dol_escape_htmltag($langs->trans('AllSignatoriesMustHaveSigned', ucfirst($langs->transnoentities('The' . ucfirst($object->element))))) . '">' . $displayButton . '</span>';
-			}
-
-			// Create Investigation.
-			$displayButton = $onPhone ? '<i class="fas fa-search-plus fa-2x"></i>' : '<i class="fas fa-search-plus"></i> ' . $langs->trans('AccidentInvestigation');
-			if ($object->status == $object::STATUS_LOCKED) {
-				print '<a class="butAction" id="actionButtonCreateInvestigation" href="'. dol_buildpath('/custom/digiriskdolibarr/view/accidentinvestigation/accidentinvestigation_card.php?action=create&fk_accident=' . $id, 1) .'">' . $displayButton . '</a>';
-			} else {
-				print '<span class="butActionRefused classfortooltip" title="' . dol_escape_htmltag($langs->trans('ObjectMustBeLocked', ucfirst($langs->transnoentities('The' . ucfirst($object->element))))) . '">' . $displayButton . '</span>';
 			}
 
             // Archive
@@ -1210,7 +1210,7 @@ if ((empty($action) || ($action != 'create' && $action != 'edit'))) {
 
                     $coldisplay++;
                     print '<td>';
-                    print '<input type="number" name="workstop_days" class="minwidth150" value="' . $item->workstop_days . '">';
+                    print '<input type="number" name="workstop_days" class="minwidth150" min="0" value="' . $item->workstop_days . '">';
                     print '</td>';
 
                     $coldisplay++;
@@ -1298,7 +1298,7 @@ if ((empty($action) || ($action != 'create' && $action != 'edit'))) {
 
 			$coldisplay++;
 			print '<td>';
-			print '<input type="number" name="workstop_days" class="minwidth150" value="">';
+			print '<input type="number" name="workstop_days" class="minwidth150" min="0" value="">';
 			print '</td>';
 
 			$coldisplay++;
