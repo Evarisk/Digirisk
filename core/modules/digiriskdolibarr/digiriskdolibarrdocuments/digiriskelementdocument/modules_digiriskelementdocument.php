@@ -247,7 +247,7 @@ abstract class ModeleODTDigiriskElementDocument extends SaturneDocumentModel
                                     $tmpArray['categories'] = '';
                                 }
 
-                                $tmpArray['creation_date'] = dol_print_date($line->datec, 'dayhoursec', 'tzuser');
+                                $tmpArray['creation_date'] = dol_print_date($line->datec, 'dayhour', 'tzuser');
                                 $tmpArray['subject']       = $line->subject;
                                 $tmpArray['message']       = $line->message;
                                 $tmpArray['progress']      = (($line->progress) ?: 0) . ' %';

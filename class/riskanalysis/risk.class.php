@@ -206,6 +206,7 @@ class Risk extends SaturneObject
         $filter        = 't.status = ' . Risk::STATUS_VALIDATED . ' AND d.status = ' . DigiriskElement::STATUS_VALIDATED . ' AND ra.status = ' . RiskAssessment::STATUS_VALIDATED . (!empty($moreParam['filterRisk']) ? $moreParam['filterRisk'] : ' AND t.type = \'risk\'');
         $currentFilter = $filter . ' AND t.entity = ' . $conf->entity;
 
+        $array['riskByEntities']   = [];
         $array['current']['risks'] = saturne_fetch_all_object_type('Risk', 'DESC', 'riskAssessmentCotation', 0, 0, ['customsql' => $currentFilter], 'AND', false, false, false, $join, [], $select, $moreSelects);
         if (!is_array($array['current']['risks']) || empty($array['current']['risks'])) {
             $array['current']['risks']                         = [];
@@ -242,6 +243,8 @@ class Risk extends SaturneObject
             $array[$entity]['riskByRiskAssessmentCotations'][$risk->fk_element]['totalRiskAssessmentCotations'] += $risk->riskAssessmentCotation;
             $array[$entity]['riskByRiskAssessmentCotations'][$risk->fk_element][$riskAssessment->getEvaluationScale()]++;
             $array[$entity]['riskByCategories'][$risk->category][$riskAssessment->getEvaluationScale()]++;
+            $array['riskByEntities'][$risk->entity]['nbTotalRisks']++;
+            $array['riskByEntities'][$risk->entity][$riskAssessment->getEvaluationScale()]++;
             $nbTotalRisks[$entity]++;
         }
 
