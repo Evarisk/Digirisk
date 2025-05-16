@@ -237,7 +237,7 @@ function display_recurse_tree($digiriskElementTree)
 
 	if ($user->rights->digiriskdolibarr->digiriskelement->read) {
 		if ( ! empty($digiriskElementTree)) {
-            $riskType = GETPOSTISSET('type') && !empty(GETPOST('type')) ? GETPOST('type') : 'risk';
+            $riskType = GETPOSTISSET('risk_type') && !empty(GETPOST('risk_type')) ? GETPOST('risk_type') : 'risk';
 			foreach ($digiriskElementTree as $element) { ?>
 				<?php if ($element['object']->id == $conf->global->DIGIRISKDOLIBARR_DIGIRISKELEMENT_TRASH) : ?>
 				<hr>
@@ -259,7 +259,7 @@ function display_recurse_tree($digiriskElementTree)
 					<div class="title" id="scores" value="<?php echo $element['object']->id ?>">
 						<?php
 						if ($user->rights->digiriskdolibarr->risk->read) : ?>
-							<a id="slider" class="linkElement id<?php echo $element['object']->id;?>" href="<?php echo dol_buildpath('/custom/digiriskdolibarr/view/digiriskelement/digiriskelement_risk.php?id=' . $element['object']->id . '&type=' . $riskType, 1);?>">
+							<a id="slider" class="linkElement id<?php echo $element['object']->id;?>" href="<?php echo dol_buildpath('/custom/digiriskdolibarr/view/digiriskelement/digiriskelement_risk.php?id=' . $element['object']->id . '&risk_type=' . $riskType, 1);?>">
 								<span class="title-container">
 									<span class="ref"><?php echo $element['object']->ref; ?></span>
 									<span class="name"><?php echo dol_trunc($element['object']->label, 20); ?></span>
