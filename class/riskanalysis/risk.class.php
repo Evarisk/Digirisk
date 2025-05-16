@@ -152,7 +152,7 @@ class Risk extends SaturneObject
             ]
         ];
 
-        $riskType = GETPOST('type');
+        $riskType = GETPOST('risk_type');
         if ($riskType == 'riskenvironmental') {
             $this->type  = 'riskenvironmental';
             $this->picto = 'fontawesome_fa-leaf_fas_#d35968';
