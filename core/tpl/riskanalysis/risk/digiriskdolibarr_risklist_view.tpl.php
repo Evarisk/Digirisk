@@ -466,7 +466,7 @@ if ( ! preg_match('/(evaluation)/', $sortfield)) {
     if ($evaluation->ismultientitymanaged == 1) $sql                                                                                                          .= " WHERE evaluation.entity IN (" . getEntity($evaluation->element) . ")";
 	else $sql                                                                                                                                                 .= " WHERE 1 = 1";
 	$sql                                                                                                                                                      .= " AND evaluation.status = 1";
-	if ( ! $allRisks) {
+	if (empty($allRisks)) {
 		$sql .= " AND r.fk_element = " . $id;
 	} else {
 		if (is_array($activeDigiriskElementList) && !empty($activeDigiriskElementList)) {
@@ -584,7 +584,7 @@ if ($permissiontodelete) {
 $massactionbutton = $form->selectMassAction('', $arrayofmassactions);
 
 ?>
-<?php if (!$allRisks) : ?>
+<?php if (empty($allRisks)) : ?>
 	<!-- BUTTON MODAL RISK ADD -->
 	<?php if ($permissiontoadd) {
 		$newcardbutton = '<div class="risk-add wpeo-button button-square-40 button-blue wpeo-tooltip-event modal-open"  aria-label="' . $langs->trans('AddRisk') . '"  value="' . $object->id . '">';
