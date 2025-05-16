@@ -175,17 +175,18 @@ function digirisk_header($title = '', $helpUrl = '', $arrayofjs = [], $arrayofcs
 /**
  * Recursive tree process
  *
- * @param  int   $parentID         Element parent id of Digirisk Element object
- * @param  int   $depth            Depth of tree
- * @param  array $digiriskElements Global Digirisk Element list
- * @return array $tree             Global Digirisk Element list after recursive process
+ * @param  int   $parentID                  Element parent id of Digirisk Element object
+ * @param  int   $depth                     Depth of tree
+ * @param  array $digiriskElements          Global Digirisk Element list
+ * @param  bool  $addCurrentDigiriskElement Add current digirisk element info
+ * @return array $tree                      Global Digirisk Element list after recursive process
  */
-function recurse_tree(int $parentID, int $depth, array $digiriskElements): array
+function recurse_tree(int $parentID, int $depth, array $digiriskElements, bool $addCurrentDigiriskElement = false): array
 {
     $tree = [];
 
     foreach ($digiriskElements as $digiriskElement) {
-        if ($digiriskElement->fk_parent == $parentID) {
+        if ($digiriskElement->fk_parent == $parentID || ($digiriskElement->id == $parentID && $addCurrentDigiriskElement)) {
             $tree[$digiriskElement->id] = [
                 'id'       => $digiriskElement->id,
                 'depth'    => $depth,

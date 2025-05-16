@@ -304,7 +304,11 @@ class DigiriskDocuments extends SaturneDocuments
             }
 
             foreach ($riskByRiskAssessmentLevels[$riskAssessmentLevel] as $risk) {
-                $digiriskElement                  = $digiriskElements[$risk->fk_element];
+                $digiriskElement = $digiriskElements[$risk->fk_element];
+                if (empty($digiriskElement)) {
+                    continue; // Skip if digirisk element not found (case of GP/UT fiche with spécific id)
+                }
+
                 $depthHyphens                     = str_repeat('- ', $digiriskElement['depth']);
                 $tmpArray['digiriskElementLabel'] = $depthHyphens . 'S' . $digiriskElement['object']->entity . ' - ' . $digiriskElement['object']->ref . ' - ' . $digiriskElement['object']->label;
 

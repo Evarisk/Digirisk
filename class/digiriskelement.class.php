@@ -155,19 +155,20 @@ class DigiriskElement extends SaturneObject
     /**
      * Load ordered flat list of DigiriskElement in memory from the database
      *
-     * @param  int   $parentID                Id parent object
-     * @param  array $fetchedDigiriskElements Preloaded digirisk elements (optional)
-     * @return array                          Flat list with depth
+     * @param  int   $parentID                 Id parent object
+     * @param  array $fetchedDigiriskElements  Preloaded digirisk elements (optional)
+     * @param  bool $addCurrentDigiriskElement Add current digirisk element info
+     * @return array                           Flat list with depth
      * @throws Exception
      */
-    public function fetchDigiriskElementFlat(int $parentID = 0, array $fetchedDigiriskElements = [], string $multiEntityManagement = 'all'): array
+    public function fetchDigiriskElementFlat(int $parentID = 0, array $fetchedDigiriskElements = [], string $multiEntityManagement = 'all', bool $addCurrentDigiriskElement = false): array
     {
         $digiriskElements = $fetchedDigiriskElements ?: self::getActiveDigiriskElements($multiEntityManagement);
         if (!is_array($digiriskElements) || empty($digiriskElements)) {
             return [];
         }
 
-        $tree = recurse_tree($parentID, 0, $digiriskElements);
+        $tree = recurse_tree($parentID, 0, $digiriskElements, $addCurrentDigiriskElement);
 
         return flatten_tree($tree);
     }

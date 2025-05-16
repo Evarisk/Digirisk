@@ -75,9 +75,11 @@ abstract class ModeleODTDigiriskElementDocument extends SaturneDocumentModel
 
                 if ( ! empty($object) ) {
                     //@todo a refaire
-                    $loadRiskInfos = $risk->loadRiskInfos($moreParam);
+                    $loadRiskInfos                                        = $risk->loadRiskInfos($moreParam);
+                    $digiriskElements[$moreParam['object']->id]['object'] = $moreParam['object'];
+                    $digiriskElements[$moreParam['object']->id]['depth']  = 0;
 
-                    $moreParam['digiriskElements']           = $digiriskElement->fetchDigiriskElementFlat(0, [], 'current');
+                    $moreParam['digiriskElements']           = $digiriskElements;
                     $moreParam['entity']                     = 'current';
                     $moreParam['riskTasks']                  = $loadRiskInfos['current']['riskTasks'];
                     $moreParam['riskByRiskAssessmentLevels'] = $loadRiskInfos['current']['riskByRiskAssessmentLevels'];
