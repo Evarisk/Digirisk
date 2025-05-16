@@ -53,13 +53,28 @@ class TicketStatsDashboard extends DigiriskDolibarrDashboard
      */
     public function load_dashboard(array $moreParams = []): array
     {
-        $tickets = $this->getAllTickets();
+        global $langs;
 
-        $runningTickets = $this->getRunningTickets($tickets);
-        $ticketStats    = $this->getTicketStats($tickets);
+        $dashboardConfig = json_decode(getDolUserString('DIGIRISKDOLIBARR_DASHBOARD_CONFIG'));
+        $filter          = !empty($dashboardConfig->filters->ticketDate) ? $dashboardConfig->filters->ticketDate : 'datec';
 
-        $getTicketRepartitionPerUserAndMeanAnswerTime = $this->getTicketRepartitionPerUserAndMeanAnswerTime($tickets);
+        $tickets = $this->getAllTickets($filter);
+
+        $runningTickets = $this->getRunningTickets($tickets, $filter);
+        $ticketStats    = $this->getTicketStats($tickets, $filter);
+
+        $getTicketRepartitionPerUserAndMeanAnswerTime = $this->getTicketRepartitionPerUserAndMeanAnswerTime($tickets, $filter);
         $getTopSocietyWithMostTickets                 = $this->getTopSocietyWithMostTickets($tickets);
+
+        $array['graphsFilters'] = [
+            'date' => [
+                'title'        => $langs->transnoentities('ShowSelectedDateTypes'),
+                'type'         => 'selectarray',
+                'filter'       => 'ticketDate',
+                'values'       => ['datec' => $langs->transnoentities('DateCreation'), 'declaration_date' => $langs->transnoentities('DeclarationDate')],
+                'currentValue' => $filter
+            ]
+        ];
 
         $array['widgets'] = array_merge($runningTickets, $ticketStats);
         $array['graphs']  = [$getTicketRepartitionPerUserAndMeanAnswerTime, $getTopSocietyWithMostTickets];
@@ -72,14 +87,20 @@ class TicketStatsDashboard extends DigiriskDolibarrDashboard
      * fetch all comments for each ticket if exists
      * add them to ticket object as comms property (array of comments)
      *
-     * @return array     $tickets All tickets with comments if exists or empty array
-     * @throws Exception          If an error occurs while fetching tickets
+     * @param  string $filter Filter to apply on tickets (datec or declaration_date)
+     * @return array          $tickets All tickets with comments if exists or empty array
+     * @throws Exception      If an error occurs while fetching tickets
      */
-    public function getAllTickets(): array
+    public function getAllTickets(string $filter = 'datec'): array
     {
         try {
             $actionComm = new ActionComm($this->db);
-            $tickets    = saturne_fetch_all_object_type('Ticket', 'DESC', 't.datec');
+            if ($filter == 'declaration_date') {
+                $filter = 'eft.digiriskdolibarr_ticket_date';
+            } else {
+                $filter = 't.datec';
+            }
+            $tickets    = saturne_fetch_all_object_type('Ticket', 'DESC', $filter, 0, 0, ['customsql' => $filter . ' IS NOT NULL'], 'AND', true);
             if (!empty($tickets) && is_array($tickets)) {
                 foreach ($tickets as $ticketID => $ticket) {
                     $ticket->comms = [];
@@ -90,6 +111,8 @@ class TicketStatsDashboard extends DigiriskDolibarrDashboard
                         dol_syslog(__METHOD__ . 'Error while fetching comments for ticket ID {$ticketID}: ' . $actionComms, LOG_ERR);
                     }
                 }
+            } else {
+                $tickets = [];
             }
         } catch (Exception $e) {
             dol_syslog(__METHOD__ . 'Error while fetching tickets: ' . $e->getMessage(), LOG_ERR);
@@ -102,10 +125,11 @@ class TicketStatsDashboard extends DigiriskDolibarrDashboard
     /**
      * Get running tickets
      *
-     * @param  array $tickets All tickets from database for current entity order by datec DESC with comments if exists or empty array
-     * @return array          Widget of running tickets with the oldest ticket and oldest message ticket
+     * @param  array  $tickets All tickets from database for current entity order by datec DESC with comments if exists or empty array
+     * @param  string $filter  Filter to apply on tickets (datec or declaration_date)
+     * @return array           Widget of running tickets with the oldest ticket and oldest message ticket
      */
-    public function getRunningTickets(array $tickets): array
+    public function getRunningTickets(array $tickets, string $filter = 'datec'): array
     {
         global $form, $langs;
 
@@ -127,14 +151,30 @@ class TicketStatsDashboard extends DigiriskDolibarrDashboard
         $oldestTicket        = null;
         $oldestMessageTicket = null;
         $now                 = dol_now();
+        $oldestTicketDate    = 0;
+        if ($filter == 'declaration_date') {
+            $filterDate = 'options_digiriskdolibarr_ticket_date';
+        } else {
+            $filterDate = 'datec';
+        }
 
         // Get number of open tickets, oldest ticket and oldest message ticket
         if (!empty($tickets)) {
             foreach ($tickets as $ticket) {
                 if (!in_array($ticket->fk_statut, [Ticket::STATUS_CANCELED, Ticket::STATUS_CLOSED])) {
                     $openTickets++;
-
-                    if (empty($oldestTicket) || $ticket->datec < $oldestTicket->datec) {
+                    if ($filter == 'declaration_date') {
+                        if (!empty($ticket->array_options[$filterDate])) {
+                            $ticketDate = strtotime($ticket->array_options[$filterDate]);
+                        }
+                        if (!empty($oldestTicket->array_options[$filterDate])) {
+                            $oldestTicketDate = strtotime($oldestTicket->array_options[$filterDate]);
+                        }
+                    } else {
+                        $ticketDate       = $ticket->{$filterDate};
+                        $oldestTicketDate = $oldestTicket->{$filterDate};
+                    }
+                    if (empty($oldestTicket) || $ticketDate < $oldestTicketDate) {
                         $oldestTicket = $ticket;
                     }
 
@@ -149,13 +189,13 @@ class TicketStatsDashboard extends DigiriskDolibarrDashboard
         // Widget content parameters
         $array['content'] = [
             $openTickets,
-            !empty($oldestTicket) ? dol_print_date($oldestTicket->datec, 'day') : $langs->transnoentities('NoData'),
+            !empty($oldestTicket) ? dol_print_date($oldestTicketDate, 'day') : $langs->transnoentities('NoData'),
             !empty($oldestMessageTicket) ? dol_print_date($oldestMessageTicket->datec, 'day') : $langs->transnoentities('NoData')
         ];
 
         $array['moreContent'] = [
             '',
-            !empty($oldestTicket) ? ' (' . convertSecondToTime(roundUpToNextMultiple($now - $oldestTicket->datec, 60)) . ')' . $oldestTicket->getNomUrl(2, '', 0, 'paddingleft') : '',
+            !empty($oldestTicket) ? ' (' . convertSecondToTime(roundUpToNextMultiple($now - $oldestTicketDate, 60)) . ')' . $oldestTicket->getNomUrl(2, '', 0, 'paddingleft') : '',
             !empty($oldestMessageTicket) ? ' (' . convertSecondToTime(roundUpToNextMultiple($now - $oldestMessageTicket->datec, 60)) . ')' . $tickets[$oldestMessageTicket->fk_element]->getNomUrl(2, '', 0, 'paddingleft') : ''
         ];
 
@@ -165,10 +205,11 @@ class TicketStatsDashboard extends DigiriskDolibarrDashboard
     /**
      * Get ticket stats
      *
-     * @param  array $tickets All tickets from database for current entity order by datec DESC with comments if exists or empty array
-     * @return array          Widget of ticket stats with number of ticket per user, mean answer time and number of exchange per ticket
+     * @param  array  $tickets All tickets from database for current entity order by datec DESC with comments if exists or empty array
+     * @param  string $filter  Filter to apply on tickets (datec or declaration_date)
+     * @return array           Widget of ticket stats with number of ticket per user, mean answer time and number of exchange per ticket
      */
-    function getTicketStats(array $tickets): array
+    function getTicketStats(array $tickets, string $filter = 'datec'): array
     {
         global $langs;
 
@@ -190,11 +231,23 @@ class TicketStatsDashboard extends DigiriskDolibarrDashboard
         $users            = [];
         $nbTicketAssigned = 0;
         $nbExchanges      = 0;
+        if ($filter == 'declaration_date') {
+            $filterDate = 'options_digiriskdolibarr_ticket_date';
+        } else {
+            $filterDate = 'datec';
+        }
 
         if (!empty($tickets)) {
             foreach ($tickets as $ticket) {
                 if (!empty($ticket->date_close)) {
-                    $timePerTicket[] = $ticket->date_close - $ticket->datec;
+                    if ($filter == 'declaration_date') {
+                        if (!empty($ticket->array_options[$filterDate])) {
+                            $ticketDate = strtotime($ticket->array_options[$filterDate]);
+                        }
+                    } else {
+                        $ticketDate = $ticket->{$filterDate};
+                    }
+                    $timePerTicket[] = $ticket->date_close - $ticketDate;
                 }
                 if (!empty($ticket->fk_user_assign)) {
                     $nbTicketAssigned++;
@@ -219,10 +272,11 @@ class TicketStatsDashboard extends DigiriskDolibarrDashboard
     /**
      * Get ticket repartition per user with number of ticket and mean answer time
      *
-     * @param array $tickets All tickets from database for current entity order by datec DESC with comments if exists or empty array
-     * @return array          Graph of ticket repartition per user with number of ticket and mean answer time
+     * @param  array  $tickets All tickets from database for current entity order by datec DESC with comments if exists or empty array
+     * @param  string $filter  Filter to apply on tickets (datec or declaration_date)
+     * @return array           Graph of ticket repartition per user with number of ticket and mean answer time
      */
-    function getTicketRepartitionPerUserAndMeanAnswerTime(array $tickets): array
+    function getTicketRepartitionPerUserAndMeanAnswerTime(array $tickets, string $filter = 'datec'): array
     {
         global $langs;
 
@@ -248,6 +302,11 @@ class TicketStatsDashboard extends DigiriskDolibarrDashboard
 
         // Initialize variables
         $nbTicketPerUser = [];
+        if ($filter == 'declaration_date') {
+            $filterDate = 'options_digiriskdolibarr_ticket_date';
+        } else {
+            $filterDate = 'datec';
+        }
 
         if (!empty($tickets)) {
             foreach ($tickets as $ticket) {
@@ -262,7 +321,14 @@ class TicketStatsDashboard extends DigiriskDolibarrDashboard
                 }
                 $nbTicketPerUser[$userFullName]['nbTicket']++;
                 if (!empty($ticket->date_close)) {
-                    $nbTicketPerUser[$userFullName]['meanAnswerTime'][$ticket->id] = $ticket->date_close - $ticket->datec;
+                    if ($filter == 'declaration_date') {
+                        if (!empty($ticket->array_options[$filterDate])) {
+                            $ticketDate = strtotime($ticket->array_options[$filterDate]);
+                        }
+                    } else {
+                        $ticketDate = $ticket->{$filterDate};
+                    }
+                    $nbTicketPerUser[$userFullName]['meanAnswerTime'][$ticket->id] = $ticket->date_close - $ticketDate;
                 }
             }
 
