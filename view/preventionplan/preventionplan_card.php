@@ -45,8 +45,10 @@ require_once __DIR__ . '/../../class/digiriskdocuments.class.php';
 require_once __DIR__ . '/../../class/digiriskelement.class.php';
 require_once __DIR__ . '/../../class/digiriskresources.class.php';
 require_once __DIR__ . '/../../class/preventionplan.class.php';
+require_once __DIR__ . '/../../class/firepermit.class.php';
 require_once __DIR__ . '/../../class/riskanalysis/risk.class.php';
 require_once __DIR__ . '/../../class/digiriskdolibarrdocuments/preventionplandocument.class.php';
+require_once __DIR__ . '/../../class/digiriskdolibarrdocuments/firepermitdocument.class.php';
 require_once __DIR__ . '/../../lib/digiriskdolibarr_function.lib.php';
 require_once __DIR__ . '/../../lib/digiriskdolibarr_preventionplan.lib.php';
 
@@ -1446,6 +1448,7 @@ if ((empty($action) || ($action != 'create' && $action != 'edit'))) {
 		print '</table>';
 		print '</div>';
 	}
+
 	// Document Generation -- Génération des documents
 	if ($permissiontoadd) {
 		print '<div class=""><div class="preventionplanDocument fichehalfleft">';
@@ -1475,7 +1478,38 @@ if ((empty($action) || ($action != 'create' && $action != 'edit'))) {
 		print saturne_show_documents($modulepart, $dirFiles, $filedir, $urlsource, $genallowed, 0, $defaultmodel, 1, 0, 0, 0, 0, $title, 0, 0, empty($soc->default_lang) ? '' : $soc->default_lang, $object, 0, 'remove_file', (($object->status > $object::STATUS_VALIDATED) ? 1 : 0), $langs->trans('ObjectMustBeLockedToGenerate', ucfirst($langs->transnoentities('The' . ucfirst($object->element)))));
 	}
 
-	if ($permissiontoadd) {
+    $firepermits = saturne_fetch_all_object_type('FirePermit', '', '', 0, 0, ['customsql' => 'fk_preventionplan = ' . $id]);
+
+    if (!empty($firepermits) && is_array($firepermits)) {
+        $firepermitdocument = new FirePermitDocument($db);
+        foreach ($firepermits as $firepermit) {
+            $objRef    		 = dol_sanitizeFileName($firepermit->ref);
+            $dirFiles  		 = $firepermitdocument->element . '/' . $objRef;
+
+            $filedir   		 = $upload_dir . '/' . $dirFiles;
+            $dirFilesArray[] = $dirFiles;
+            $filedirArray[]  = $filedir;
+
+            $modulepart   	 = 'digiriskdolibarr:FirePermitDocument';
+            $title        	 = $langs->trans('FirePermitDocument');
+
+            $filelist = array_merge($filelist, dol_dir_list($filedir, 'files'));
+            if (!empty($filelist) && is_array($filelist)) {
+                foreach ($filelist as $file) {
+                    if (preg_match('/sign/', $file['name'])) {
+                        $filesigned = 1;
+                    }
+                }
+            }
+        }
+        $urlsource = $_SERVER["PHP_SELF"] . '?id=' . $object->id;
+
+        print saturne_show_documents($modulepart, $dirFilesArray, $filedirArray, $urlsource, 0, 0, '', 1, 0, 0, 0, 0, $title, 0, 0);
+    }
+
+	$form->showLinkedObjectBlock($object, '', null, $langs->trans('RelatedFirePermit'));
+
+    if ($permissiontoadd) {
 		print '</div><div class="fichehalfright">';
 	} else {
 		print '</div><div class="">';
