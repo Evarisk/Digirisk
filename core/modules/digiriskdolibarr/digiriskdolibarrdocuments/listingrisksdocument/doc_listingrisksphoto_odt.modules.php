@@ -93,7 +93,7 @@ class doc_listingrisksphoto_odt extends SaturneDocumentModel
                 $parentId = $moreParam['object']->id;
             }
 
-            $moreParam['digiriskElements']           = $digiriskElement->fetchDigiriskElementFlat($parentId, [], 'current');
+            $moreParam['digiriskElements']           = $digiriskElement->fetchDigiriskElementFlat($parentId, [], 'current', true);
             $moreParam['entity']                     = 'current';
             $moreParam['riskTasks']                  = $loadRiskInfos['current']['riskTasks'];
             $moreParam['riskByRiskAssessmentLevels'] = $loadRiskInfos['current']['riskByRiskAssessmentLevels'];
