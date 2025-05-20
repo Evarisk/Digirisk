@@ -1,5 +1,5 @@
 <?php
-/* Copyright (C) 2021-2023 EVARISK <technique@evarisk.com>
+/* Copyright (C) 2021-2025 EVARISK <technique@evarisk.com>
  *
  * This program is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -17,51 +17,50 @@
  */
 
 /**
- *	\file       core/modules/digiriskdolibarr/digiriskdocuments/workunitdocument/doc_workunitdocument_odt.modules.php
- *	\ingroup    digiriskdolibarr
- *	\brief      File of class to build ODT documents for digiriskdolibarr
+ * \file    core/modules/digiriskdolibarr/digiriskdolibarrdocuments/workunitdocument/doc_workunitdocument_odt.modules.php
+ * \ingroup digiriskdolibarr
+ * \brief   File of class to build ODT documents for workunit document
  */
-
-require_once DOL_DOCUMENT_ROOT . '/core/lib/files.lib.php';
-require_once DOL_DOCUMENT_ROOT . '/core/lib/images.lib.php';
-require_once DOL_DOCUMENT_ROOT . '/core/lib/company.lib.php';
 
 // Load DigiriskDolibarr libraries
-require_once __DIR__ . '/../digiriskelementdocument/modules_digiriskelementdocument.php';
+require_once __DIR__ . '/../modules_digiriskdolibarrdocument.php';
 
 /**
- *	Class to build documents using ODF templates generator
+ * Class to build documents using ODF templates generator
  */
-class doc_workunitdocument_odt extends ModeleODTDigiriskElementDocument
+class doc_workunitdocument_odt extends ModeleODTDigiriskDolibarrDocument
 {
-	/**
-	 * @var string Module.
-	 */
-	public string $module = 'digiriskdolibarr';
+    /**
+     * @var string Document type
+     */
+    public string $document_type = 'workunitdocument';
 
-	/**
-	 * @var string Document type.
-	 */
-	public string $document_type = 'workunitdocument';
+    /**
+     * Constructor
+     *
+     * @param DoliDB $db Database handler
+     */
+    public function __construct(DoliDB $db)
+    {
+        parent::__construct($db, $this->module, $this->document_type);
+    }
 
-	/**
-	 * Constructor.
-	 *
-	 * @param DoliDB $db Database handler.
-	 */
-	public function __construct(DoliDB $db)
-	{
-		parent::__construct($db, $this->module, $this->document_type);
-	}
+    /**
+     * Fill all odt tags for segments lines
+     *
+     * @param  Odf       $odfHandler  Object builder odf library
+     * @param  Translate $outputLangs Lang object to use for output
+     * @param  array     $moreParam   More param (Object/user/etc)
+     *
+     * @return int                    1 if OK, <=0 if KO
+     * @throws Exception
+     */
+    public function fillTagsLines(Odf $odfHandler, Translate $outputLangs, array $moreParam): int
+    {
+        $moreParam['filterEvaluator'] = ' AND t.fk_parent = ' . $moreParam['object']->id;
+        $moreParam['filterTicket']    = ' AND eft.digiriskdolibarr_ticket_service = ' . $moreParam['object']->id;
+        $moreParam['filter']          = ' AND t.fk_element = ' . $moreParam['object']->id;
 
-	/**
-	 * Return description of a module.
-	 *
-	 * @param  Translate $langs Lang object to use for output.
-	 * @return string           Description.
-	 */
-	public function info(Translate $langs): string
-	{
-		return parent::info($langs);
-	}
+        return parent::fillTagsLines($odfHandler, $outputLangs, $moreParam);
+    }
 }

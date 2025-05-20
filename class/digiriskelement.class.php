@@ -212,6 +212,42 @@ class DigiriskElement extends SaturneObject
     }
 
     /**
+     * Load digirisk element infos
+     *
+     * @param  array     $moreParam More param (tmparray)
+     * @return array     $array     Array of current and shared digirisk elements
+     * @throws Exception
+     */
+    public  function loadDigiriskElementInfos(array $moreParam = []): array
+    {
+        global $conf;
+
+        $array = [];
+
+        $array['current']['digiriskElements'] = $this->fetchDigiriskElementFlat(0, [], 'current');
+        if (empty($array['current']['digiriskElements'])) {
+            $array['current']['digiriskElements'] = [];
+        }
+
+        $array['shared']['digiriskElements'] = [];
+        if ($moreParam['tmparray']['showSharedRisk_nocheck']) {
+            $array['shared']['digiriskElements'] = $this->fetchDigiriskElementFlat(0, [], 'shared');
+        }
+
+        $digiriskElements = array_merge($array['current']['digiriskElements'], $array['shared']['digiriskElements']);
+        foreach ($digiriskElements as $digiriskElement) {
+            $entity = ($digiriskElement['object']->entity == $conf->entity) ? 'current' : 'shared';
+            if ($digiriskElement['object']->element_type == 'groupment') {
+                $array[$entity]['nbGroupment']++;
+            } else {
+                $array[$entity]['nbWorkUnit']++;
+            }
+        }
+
+        return $array;
+    }
+
+    /**
      *  Output html form to select a digirisk element.
      *
      * @param  string 		$selected 			Preselected type

@@ -81,24 +81,6 @@ class doc_riskassessmentdocument_odt extends SaturneDocumentModel
 
         $array['dangerCategories'] = Risk::getDangerCategories();
 
-        $array['current']['digiriskElements'] = $digiriskElement->fetchDigiriskElementFlat(0, [], 'current');
-        if (empty($array['current']['digiriskElements'])) {
-            $array['current']['digiriskElements'] = [];
-        }
-
-        if ($moreParam['tmparray']['showSharedRisk_nocheck']) {
-            $array['shared']['digiriskElements'] = $digiriskElement->fetchDigiriskElementFlat(0, [], 'shared');
-            if (empty($array['shared']['digiriskElements'])) {
-                $array['shared']['digiriskElements'] = [];
-            }
-        }
-
-        $filter           = ['customsql' => 't.fk_project = ' . getDolGlobalInt('DIGIRISKDOLIBARR_TICKET_PROJECT') . ' AND eft.digiriskdolibarr_ticket_service > 0'];
-        $array['tickets'] = saturne_fetch_all_object_type('Ticket', '', '', 0, 0,  $filter, 'AND', true);
-        if (!is_array($array['tickets']) || empty($array['tickets'])) {
-            $array['tickets'] = [];
-        }
-
         $riskArray = $risk->loadRiskInfos($moreParam);
         $array['current']['risks']                         = $riskArray['current']['risks'];
         $array['current']['riskByRiskAssessmentCotations'] = $riskArray['current']['riskByRiskAssessmentCotations'];
@@ -422,17 +404,18 @@ class doc_riskassessmentdocument_odt extends SaturneDocumentModel
             $category = new Categorie($this->db);
 
             foreach ($tickets as $ticket) {
-                $categories      = $category->containing($ticket->id, Categorie::TYPE_TICKET);
-                $digiriskElement = $moreParam['digiriskElements'][$ticket->array_options['options_digiriskdolibarr_ticket_service']]['object'];
+                $categories = $category->containing($ticket->id, Categorie::TYPE_TICKET);
 
-                $tmpArray['refticket']                 = $ticket->ref;
-                $tmpArray['categories']                = !empty($categories) ? implode(', ', array_map(fn($cat) => $cat->label, $categories)) : '';
-                $tmpArray['creation_date']             = dol_print_date($ticket->datec, 'dayhour', 'tzuser');
-                $tmpArray['subject']                   = $ticket->subject;
-                $tmpArray['message']                   = $ticket->message;
-                $tmpArray['progress']                  = ($ticket->progress ?: 0) . ' %';
-                $tmpArray['digiriskelement_ref_label'] = $digiriskElement->ref . ' - ' . $digiriskElement->label;
-                $tmpArray['status']                    = $ticket->getLibStatut();
+                $tmpArray = [
+                    'refticket'                 => $ticket->ref,
+                    'categories'                => !empty($categories) ? implode(', ', array_map(fn($cat) => $cat->label, $categories)) : '',
+                    'creation_date'             => dol_print_date($ticket->datec, 'dayhour', 'tzuser'),
+                    'subject'                   => $ticket->subject,
+                    'message'                   => $ticket->message,
+                    'progress'                  => ($ticket->progress ?: 0) . ' %',
+                    'digiriskelement_ref_label' => $ticket->digiriskElementRef . ' - ' . $ticket->digiriskElementLabel,
+                    'status'                    => $ticket->getLibStatut()
+                ];
 
                 static::setTmpArrayVars($tmpArray, $listLines, $outputLangs);
             }
@@ -509,8 +492,7 @@ class doc_riskassessmentdocument_odt extends SaturneDocumentModel
             $moreParam['riskByEntities'] = $loadRiskAssessmentDocumentInfos['riskByEntities'];
             $this->setRiskByEntitiesSegment($odfHandler, $outputLangs, $moreParam);
 
-            $moreParam['digiriskElements'] = $loadRiskAssessmentDocumentInfos['current']['digiriskElements'];
-            $moreParam['tickets']          = $loadRiskAssessmentDocumentInfos['tickets'];
+            $moreParam['tickets'] = $loadRiskAssessmentDocumentInfos['tickets'];
             $this->setTicketsSegment($odfHandler, $outputLangs, $moreParam);
         } catch (OdfException $e) {
             $this->error = $e->getMessage();

@@ -128,28 +128,34 @@ class Evaluator extends SaturneObject
     /**
      * Load evaluator infos
      *
-     * @return array     $array Array of evaluators
+     * @param  array     $moreParam More param (filter/filterEvaluator)
+     * @return array     $array     Array of evaluators / evaluatorByEntities
      * @throws Exception
      */
-    public static function loadEvaluatorInfos(): array
+    public static function loadEvaluatorInfos(array $moreParam = []): array
     {
         $array = [];
 
-        $filter              = 't.status = ' . Evaluator::STATUS_VALIDATED;
-        $evaluators = saturne_fetch_all_object_type('Evaluator', '', '', 0, 0, ['customsql' => $filter], 'AND', false, false);
+        $select       = ', d.ref AS digiriskElementRef, d.entity AS digiriskElementEntity, d.label AS digiriskElementLabel, u.lastname AS userLastName, u.firstname AS userFirstName';
+        $moreSelects  = ['digiriskElementRef', 'digiriskElementEntity', 'digiriskElementLabel', 'userLastName', 'userFirstName'];
+        $join         = ' INNER JOIN ' . MAIN_DB_PREFIX . 'digiriskdolibarr_digiriskelement AS d ON d.rowid = t.fk_parent';
+        $join        .= ' INNER JOIN ' . MAIN_DB_PREFIX . 'user AS u ON u.rowid = t.fk_user';
+        $filter       = 'd.status = ' . DigiriskElement::STATUS_VALIDATED . ' AND t.status = ' . self::STATUS_VALIDATED . ($moreParam['filter'] ?? '') .  ($moreParam['filterEvaluator'] ?? '');
+        $evaluators   = saturne_fetch_all_object_type('Evaluator', '', '', 0, 0, ['customsql' => $filter], 'AND', false, true, false, $join, [], $select, $moreSelects);
         if (!is_array($evaluators) || empty($evaluators)) {
             $evaluators = [];
         }
 
+        $array['nbEvaluators'] = count($evaluators);
+
         $array['evaluators'] = [];
         foreach ($evaluators as $evaluator) {
-            $array['evaluators'][$evaluator->entity]['nbEmployeesInvolved']++;
+            $array['evaluators'][$evaluator->id] = $evaluator;
+            $array['nbEvaluatorByEntities'][$evaluator->entity]++;
         }
 
         return $array;
     }
-
-
 
     /**
      * Load dashboard info evaluator

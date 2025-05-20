@@ -98,3 +98,31 @@ function ticketstats_prepare_head(): array
 
     return $head;
 }
+
+/**
+ * Load ticket infos
+ *
+ * @param  array     $moreParam More param (filterTicket)
+ * @return array     $array     Array of tickets
+ * @throws Exception
+ */
+function load_ticket_infos(array $moreParam = []): array
+{
+    // Load DigiriskDolibarr libraries
+    require_once __DIR__ . '/../class/digiriskelement.class.php';
+
+    $array = [];
+
+    $select           = ', d.ref AS digiriskElementRef, d.label AS digiriskElementLabel';
+    $moreSelects      = ['digiriskElementRef', 'digiriskElementLabel'];
+    $join             = ' INNER JOIN ' . MAIN_DB_PREFIX . 'digiriskdolibarr_digiriskelement AS d ON d.rowid = eft.digiriskdolibarr_ticket_service';
+    $filter           = 't.fk_project = ' . getDolGlobalInt('DIGIRISKDOLIBARR_TICKET_PROJECT') . 'd.status = ' . DigiriskElement::STATUS_VALIDATED . ($moreParam['filterTicket'] ?? '');
+    $array['tickets'] = saturne_fetch_all_object_type('Ticket', '', '', 0, 0,  ['customsql' => $filter], 'AND', true, true, false, $join, [], $select, $moreSelects);
+    if (!is_array($array['tickets']) || empty($array['tickets'])) {
+        $array['tickets'] = [];
+    }
+
+    $array['nbTickets'] = count($array['tickets']);
+
+    return $array;
+}
