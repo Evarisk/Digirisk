@@ -90,8 +90,8 @@ abstract class ModeleODTDigiriskDolibarrDocument extends SaturneDocumentModel
                 $depthHyphens                     = str_repeat('- ', $digiriskElement['depth']);
                 $tmpArray['digiriskElementLabel'] = $depthHyphens . 'S' . $digiriskElement['object']->entity . ' - ' . $digiriskElement['object']->ref . ' - ' . $digiriskElement['object']->label;
 
-                $tmpArray['picto']                  = DOL_DOCUMENT_ROOT . '/custom/digiriskdolibarr/img/categorieDangers/' . $risk->getDangerCategory($risk) . '.png';
-                $tmpArray['riskCategoryName']       = getDolGlobalInt('DIGIRISKDOLIBARR_DOCUMENT_SHOW_PICTO_NAME') ? $risk->getDangerCategoryName($risk) : ' ';
+                $tmpArray['picto']                  = DOL_DOCUMENT_ROOT . '/custom/digiriskdolibarr/img/categorieDangers/' . $risk->getDangerCategory($risk, $risk->type) . '.png';
+                $tmpArray['riskCategoryName']       = getDolGlobalInt('DIGIRISKDOLIBARR_DOCUMENT_SHOW_PICTO_NAME') ? $risk->getDangerCategoryName($risk, $risk->type) : ' ';
                 $tmpArray['ref']                    = $risk->ref . ' - ' . $risk->riskAssessmentRef;
                 $tmpArray['riskAssessmentCotation'] = $risk->riskAssessmentCotation ?: 0;
                 $tmpArray['description']            = $risk->description;
@@ -490,10 +490,11 @@ abstract class ModeleODTDigiriskDolibarrDocument extends SaturneDocumentModel
             $loadAccidentInfos  = $accident->loadAccidentInfos($moreParam);
             $loadTicketInfos    = load_ticket_infos($moreParam);
 
-            $digiriskElements[$moreParam['object']->id]['object'] = $moreParam['object'];
-            $digiriskElements[$moreParam['object']->id]['depth']  = 0;
-
-            $moreParam['digiriskElements']           = $digiriskElements;
+            if (!isset($moreParam['digiriskElements'])) {
+                $digiriskElements[$moreParam['object']->id]['object'] = $moreParam['object'];
+                $digiriskElements[$moreParam['object']->id]['depth']  = 0;
+                $moreParam['digiriskElements']                        = $digiriskElements;
+            }
             $moreParam['entity']                     = 'current';
             $moreParam['riskTasks']                  = $loadRiskInfos['current']['riskTasks'];
             $moreParam['riskByRiskAssessmentLevels'] = $loadRiskInfos['current']['riskByRiskAssessmentLevels'];
@@ -537,53 +538,8 @@ abstract class ModeleODTDigiriskDolibarrDocument extends SaturneDocumentModel
      */
     public function write_file(SaturneDocuments $objectDocument, Translate $outputLangs, string $srcTemplatePath, int $hideDetails = 0, int $hideDesc = 0, int $hideRef = 0, array $moreParam = []): int
     {
-        global $conf;
-
-        // Load DigiriskDolibarr libraries
-        require_once __DIR__ . '/../../../../class/digiriskresources.class.php';
-
-        $digiriskResources = new DigiriskResources($this->db);
-        $userTmp           = new User($this->db);
-
-        $object = $moreParam['object'];
-
-        if (!empty($object->photo)) {
-            $path              = $conf->digiriskdolibarr->multidir_output[$conf->entity] . '/' . $object->element_type . '/' . $object->ref;
-            $fileSmall         = saturne_get_thumb_name($object->photo);
-            $image             = $path . '/thumbs/' . $fileSmall;
-            $tmpArray['photo'] = $image;
-        } else {
-            $noPhoto           = '/public/theme/common/nophoto.png';
-            $tmpArray['photo'] = DOL_DOCUMENT_ROOT . $noPhoto;
-        }
-
-        // Get QRCode to public interface
-        if (isModEnabled('multicompany')) {
-            $qrCodePath = DOL_DATA_ROOT . '/digiriskdolibarr/multicompany/ticketqrcode/';
-        } else {
-            $qrCodePath = $conf->digiriskdolibarr->multidir_output[$conf->entity ?: 1] . '/ticketqrcode/';
-        }
-        $QRCodeList = dol_dir_list($qrCodePath);
-        if (is_array($QRCodeList) && !empty($QRCodeList)) {
-            $QRCode          = array_shift($QRCodeList);
-            $QRCodeImagePath = $QRCode['fullname'];
-        } else {
-            $QRCodeImagePath = '';
-        }
-
-        $allLinks             = $digiriskResources->fetchDigiriskResources();
-        $responsibleResources = $allLinks['Responsible'];
-        $userTmp->fetch($responsibleResources->id[0]);
-
-        // @todo The keyword "signature" is needed because we want the image to be cropped to fit in the table
-        $tmpArray['helpUrl']               = DOL_MAIN_URL_ROOT . '/custom/digiriskdolibarr/public/ticket/create_ticket.php';
-        $tmpArray['signatureQRCodeTicket'] = $QRCodeImagePath;
-        $tmpArray['securityResponsible']   = $userTmp->id > 0 ? dol_strtoupper($userTmp->lastname) . ' ' . ucfirst($userTmp->firstname) : '';
-
-        if (isset($moreParam['tmparray']) && is_array($moreParam['tmparray'])) {
-            $moreParam['tmparray'] = array_merge($moreParam['tmparray'], $tmpArray);
-        } else {
-            $moreParam['tmparray'] = $tmpArray;
+        if (!isset($moreParam['tmparray'])) {
+            $moreParam['tmparray'] = [];
         }
         $moreParam['objectDocument']   = $objectDocument;
         $moreParam['hideTemplateName'] = 1;

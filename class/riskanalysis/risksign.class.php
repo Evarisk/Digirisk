@@ -353,11 +353,10 @@ class RiskSign extends SaturneObject
         $ret = parent::getTriggerDescription($object);
 
         $digiriskelement = new DigiriskElement($this->db);
-        $risk            = new Risk($this->db);
         $digiriskelement->fetch($object->fk_element);
 
         $ret .= $langs->trans('ParentElement') . ' : ' . $digiriskelement->ref . " - " . $digiriskelement->label . '<br>';
-        $ret .= $langs->trans('RiskCategory') . ' : ' . $risk->getDangerCategoryName($object, $object->type) . '<br>';
+        $ret .= $langs->trans('RiskSignCategory') . ' : ' . $this->getRiskSignCategory($object, 'name') . '<br>';
 
         if (dol_strlen($object->applied_on) > 0) {
             $digiriskelement->fetch($object->applied_on);

@@ -621,6 +621,9 @@ class ActionsDigiriskdolibarr
         if (strpos($parameters['context'], 'digiriskstandardauditreportdocument') !== false) {
             $this->resprints = ' AND a.code = \'AC_AUDITREPORTDOCUMENT_GENERATE\'';
         }
+        if (strpos($parameters['context'], 'digiriskstandardriskassessmentdocument') !== false) {
+            $this->resprints = ' AND a.code = \'AC_RISKASSESSMENTDOCUMENT_GENERATE\'';
+        }
 
         return 0; // or return 1 to replace standard code
     }

@@ -141,7 +141,7 @@ class Evaluator extends SaturneObject
         $join         = ' INNER JOIN ' . MAIN_DB_PREFIX . 'digiriskdolibarr_digiriskelement AS d ON d.rowid = t.fk_parent';
         $join        .= ' INNER JOIN ' . MAIN_DB_PREFIX . 'user AS u ON u.rowid = t.fk_user';
         $filter       = 'd.status = ' . DigiriskElement::STATUS_VALIDATED . ' AND t.status = ' . self::STATUS_VALIDATED . ($moreParam['filter'] ?? '') .  ($moreParam['filterEvaluator'] ?? '');
-        $evaluators   = saturne_fetch_all_object_type('Evaluator', '', '', 0, 0, ['customsql' => $filter], 'AND', false, true, false, $join, [], $select, $moreSelects);
+        $evaluators   = saturne_fetch_all_object_type('Evaluator', '', '', 0, 0, ['customsql' => $filter], 'AND', false, false, false, $join, [], $select, $moreSelects);
         if (!is_array($evaluators) || empty($evaluators)) {
             $evaluators = [];
         }

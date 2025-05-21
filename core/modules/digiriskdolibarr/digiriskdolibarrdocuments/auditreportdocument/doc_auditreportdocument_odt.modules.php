@@ -57,14 +57,24 @@ class doc_auditreportdocument_odt extends ModeleODTDigiriskDolibarrDocument
      */
     public function fillTagsLines(Odf $odfHandler, Translate $outputLangs, array $moreParam): int
     {
+        global $conf;
+
         if (!empty($moreParam['dateStart']) && !empty($moreParam['dateEnd'])) {
+            $digiriskElement = new DigiriskElement($this->db);
+
+            $loadDigiriskElementInfos = $digiriskElement->loadDigiriskElementInfos($moreParam);
+
             $startDate    = dol_print_date($moreParam['dateStart'], 'dayrfc');
             $endDate      = dol_print_date($moreParam['dateEnd'], 'dayrfc');
             $filter       = " AND (t.date_creation BETWEEN '$startDate' AND '$endDate' OR t.tms BETWEEN '$startDate' AND '$endDate')";
             $filterTicket = " AND (t.datec BETWEEN '$startDate' AND '$endDate' OR t.tms BETWEEN '$startDate' AND '$endDate')";
 
-            $moreParam['filter']       = $filter;
-            $moreParam['filterTicket'] = $filterTicket;
+            $moreParam['filter']          = $filter;
+            $moreParam['filterTicket']    = $filterTicket;
+            $moreParam['filterEvaluator'] = ' AND t.entity = ' . $conf->entity;
+
+            $moreParam['entity']           = 'current';
+            $moreParam['digiriskElements'] = $loadDigiriskElementInfos[$moreParam['entity']]['digiriskElements'];
         }
 
         return parent::fillTagsLines($odfHandler, $outputLangs, $moreParam);
@@ -85,7 +95,7 @@ class doc_auditreportdocument_odt extends ModeleODTDigiriskDolibarrDocument
      */
     public function write_file(SaturneDocuments $objectDocument, Translate $outputLangs, string $srcTemplatePath, int $hideDetails = 0, int $hideDesc = 0, int $hideRef = 0, array $moreParam = []): int
     {
-        global $mysoc;
+        global $conf, $mysoc;
 
         // Load DigiriskDolibarr libraries
         require_once __DIR__ . '/../../../../../class/digiriskelement.class.php';
@@ -118,8 +128,9 @@ class doc_auditreportdocument_odt extends ModeleODTDigiriskDolibarrDocument
 
             $tmpArray['dateAudit'] = dol_print_date($moreParam['dateStart'], 'day') . ' - ' . dol_print_date($moreParam['dateEnd'], 'day');
 
-            $moreParam['filter']       = $filter;
-            $moreParam['filterTicket'] =  $filterTicket;
+            $moreParam['filter']          = $filter;
+            $moreParam['filterTicket']    =  $filterTicket;
+            $moreParam['filterEvaluator'] = ' AND t.entity = ' . $conf->entity;
         }
 
         if (is_array($moreParam['recipient']) && !empty($moreParam['recipient'])) {
