@@ -155,19 +155,20 @@ class DigiriskElement extends SaturneObject
     /**
      * Load ordered flat list of DigiriskElement in memory from the database
      *
-     * @param  int   $parentID                Id parent object
-     * @param  array $fetchedDigiriskElements Preloaded digirisk elements (optional)
-     * @return array                          Flat list with depth
+     * @param  int   $parentID                 Id parent object
+     * @param  array $fetchedDigiriskElements  Preloaded digirisk elements (optional)
+     * @param  bool $addCurrentDigiriskElement Add current digirisk element info
+     * @return array                           Flat list with depth
      * @throws Exception
      */
-    public function fetchDigiriskElementFlat(int $parentID = 0, array $fetchedDigiriskElements = [], string $multiEntityManagement = 'all'): array
+    public function fetchDigiriskElementFlat(int $parentID = 0, array $fetchedDigiriskElements = [], string $multiEntityManagement = 'all', bool $addCurrentDigiriskElement = false): array
     {
         $digiriskElements = $fetchedDigiriskElements ?: self::getActiveDigiriskElements($multiEntityManagement);
         if (!is_array($digiriskElements) || empty($digiriskElements)) {
             return [];
         }
 
-        $tree = recurse_tree($parentID, 0, $digiriskElements);
+        $tree = recurse_tree($parentID, 0, $digiriskElements, $addCurrentDigiriskElement);
 
         return flatten_tree($tree);
     }
@@ -208,6 +209,42 @@ class DigiriskElement extends SaturneObject
     public function setCategories($categories)
     {
         return 1;
+    }
+
+    /**
+     * Load digirisk element infos
+     *
+     * @param  array     $moreParam More param (tmparray)
+     * @return array     $array     Array of current and shared digirisk elements
+     * @throws Exception
+     */
+    public  function loadDigiriskElementInfos(array $moreParam = []): array
+    {
+        global $conf;
+
+        $array = [];
+
+        $array['current']['digiriskElements'] = $this->fetchDigiriskElementFlat(0, [], 'current');
+        if (empty($array['current']['digiriskElements'])) {
+            $array['current']['digiriskElements'] = [];
+        }
+
+        $array['shared']['digiriskElements'] = [];
+        if ($moreParam['tmparray']['showSharedRisk_nocheck']) {
+            $array['shared']['digiriskElements'] = $this->fetchDigiriskElementFlat(0, [], 'shared');
+        }
+
+        $digiriskElements = array_merge($array['current']['digiriskElements'], $array['shared']['digiriskElements']);
+        foreach ($digiriskElements as $digiriskElement) {
+            $entity = ($digiriskElement['object']->entity == $conf->entity) ? 'current' : 'shared';
+            if ($digiriskElement['object']->element_type == 'groupment') {
+                $array[$entity]['nbGroupment']++;
+            } else {
+                $array[$entity]['nbWorkUnit']++;
+            }
+        }
+
+        return $array;
     }
 
     /**
@@ -525,7 +562,7 @@ class DigiriskElement extends SaturneObject
         }
         $morehtmlref .= '<br>';
         $this->fetch($this->id);
-        $riskType         = GETPOST('type');
+        $riskType         = GETPOST('risk_type');
         $this->fk_project = $riskType == 'riskenvironmental' ? $conf->global->DIGIRISKDOLIBARR_ENVIRONMENT_PROJECT : $conf->global->DIGIRISKDOLIBARR_DU_PROJECT;
         $moreParams['project']['disable_edit'] = 1;
 

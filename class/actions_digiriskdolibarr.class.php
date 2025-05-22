@@ -611,6 +611,24 @@ class ActionsDigiriskdolibarr
     }
 
     /**
+     * Overloading the getActionsListWhere function : replacing the parent's function with the one below
+     *
+     * @param  array $parameters Hook metadata (context, etc...)
+     * @return int               0 < on error, 0 on success, 1 to replace standard code
+     */
+    public function getActionsListWhere(array $parameters): int
+    {
+        if (strpos($parameters['context'], 'digiriskstandardauditreportdocument') !== false) {
+            $this->resprints = ' AND a.code = \'AC_AUDITREPORTDOCUMENT_GENERATE\'';
+        }
+        if (strpos($parameters['context'], 'digiriskstandardriskassessmentdocument') !== false) {
+            $this->resprints = ' AND a.code = \'AC_RISKASSESSMENTDOCUMENT_GENERATE\'';
+        }
+
+        return 0; // or return 1 to replace standard code
+    }
+
+    /**
 	 *  Overloading the printFieldListFrom function : replacing the parent's function with the one below
 	 *
 	 * @param Hook $parameters metadatas (context, etc...)

@@ -1,5 +1,5 @@
 <?php
-/* Copyright (C) 2024 EVARISK <technique@evarisk.com>
+/* Copyright (C) 2024-2025 EVARISK <technique@evarisk.com>
  *
  * This program is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -17,31 +17,19 @@
  */
 
 /**
- *	\file    core/modules/digiriskdolibarr/digiriskdolibarrdocuments/listingrisksenvironmentaldocument/doc_listingrisksenvironmentalaction_odt.modules.php
- *	\ingroup digiriskdolibarr
- *	\brief   File of class to build ODT documents for digiriskdolibarr
+ * \file    core/modules/digiriskdolibarr/digiriskdolibarrdocuments/listingrisksenvironmentaldocument/doc_listingrisksenvironmentalaction_odt.modules.php
+ * \ingroup digiriskdolibarr
+ * \brief   File of class to build ODT documents for listing risks environmental action
  */
-
-require_once DOL_DOCUMENT_ROOT . '/core/lib/files.lib.php';
-require_once DOL_DOCUMENT_ROOT . '/core/lib/company.lib.php';
-require_once DOL_DOCUMENT_ROOT . '/core/lib/doc.lib.php';
 
 // Load DigiriskDolibarr libraries
-require_once __DIR__ . '/../../../../../class/riskanalysis/risk.class.php';
-
-// Load Saturne libraries
-require_once __DIR__ . '/../../../../../../saturne/core/modules/saturne/modules_saturne.php';
+require_once __DIR__ . '/../modules_digiriskdolibarrdocument.php';
 
 /**
- *	Class to build documents using ODF templates generator
+ * Class to build documents using ODF templates generator
  */
-class doc_listingrisksenvironmentalaction_odt extends SaturneDocumentModel
+class doc_listingrisksenvironmentalaction_odt extends ModeleODTDigiriskDolibarrDocument
 {
-    /**
-     * @var string Module
-     */
-    public string $module = 'digiriskdolibarr';
-
     /**
      * @var string Document type
      */
@@ -58,17 +46,6 @@ class doc_listingrisksenvironmentalaction_odt extends SaturneDocumentModel
     }
 
     /**
-     * Return description of a module
-     *
-     * @param  Translate $langs Lang object to use for output
-     * @return string           Description
-     */
-    public function info(Translate $langs): string
-    {
-        return parent::info($langs);
-    }
-
-    /**
      * Fill all odt tags for segments lines
      *
      * @param  Odf       $odfHandler  Object builder odf library
@@ -80,50 +57,18 @@ class doc_listingrisksenvironmentalaction_odt extends SaturneDocumentModel
      */
     public function fillTagsLines(Odf $odfHandler, Translate $outputLangs, array $moreParam): int
     {
-        $objectDocument = $moreParam['objectDocument'];
+        // Load DigiriskDolibarr libraries
+        require_once __DIR__ . '/../../../../../class/digiriskelement.class.php';
 
-        try {
-            $digiriskElement = new DigiriskElement($this->db);
-            $risk            = new Risk($this->db);
+        $digiriskElement = new DigiriskElement($this->db);
 
-            //@todo a refaire
-            $moreParam['filterRisk'] = ' AND t.type = \'risksenvironmental\'';
-            $loadRiskInfos = $risk->loadRiskInfos($moreParam);
-
-            $moreParam['digiriskElements']           = $digiriskElement->fetchDigiriskElementFlat(0, [], 'current');
-            $moreParam['entity']                     = 'current';
-            $moreParam['riskTasks']                  = $loadRiskInfos['current']['riskTasks'];
-            $moreParam['riskByRiskAssessmentLevels'] = $loadRiskInfos['current']['riskByRiskAssessmentLevels'];
-            $objectDocument->fillRiskData($odfHandler, $outputLangs, $moreParam);
-        } catch (OdfException $e) {
-            $this->error = $e->getMessage();
-            dol_syslog($this->error, LOG_WARNING);
-            return -1;
+        $parentId = 0;
+        if ($moreParam['object']->element != 'digiriskstandard') {
+            $parentId = $moreParam['object']->id;
         }
+        $moreParam['digiriskElements'] = $digiriskElement->fetchDigiriskElementFlat($parentId, [], 'current', true);
+        $moreParam['filterRisk']       = ' AND t.type = \'riskenvironmental\'';
 
-        return 0;
-    }
-    /**
-     * Function to build a document on disk
-     *
-     * @param  SaturneDocuments $objectDocument  Object source to build document
-     * @param  Translate        $outputLangs     Lang object to use for output
-     * @param  string           $srcTemplatePath Full path of source filename for generator using a template file
-     * @param  int              $hideDetails     Do not show line details
-     * @param  int              $hideDesc        Do not show desc
-     * @param  int              $hideRef         Do not show ref
-     * @param  array            $moreParam       More param (Object/user/etc)
-     * @return int                               1 if OK, <=0 if KO
-     * @throws Exception
-     */
-    public function write_file(SaturneDocuments $objectDocument, Translate $outputLangs, string $srcTemplatePath, int $hideDetails = 0, int $hideDesc = 0, int $hideRef = 0, array $moreParam): int
-    {
-        $tmpArray = [];
-
-        $moreParam['tmparray']         = $tmpArray;
-        $moreParam['objectDocument']   = $objectDocument;
-        $moreParam['hideTemplateName'] = 1;
-
-        return parent::write_file($objectDocument, $outputLangs, $srcTemplatePath, $hideDetails, $hideDesc, $hideRef, $moreParam);
+        return parent::fillTagsLines($odfHandler, $outputLangs, $moreParam);
     }
 }

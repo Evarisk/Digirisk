@@ -36,20 +36,13 @@ require_once __DIR__ . '/../../../../../class/evaluator.class.php';
 require_once __DIR__ . '/../../../../../class/riskanalysis/risk.class.php';
 require_once __DIR__ . '/../../../../../class/riskanalysis/riskassessment.class.php';
 require_once __DIR__ . '/../../../../../class/riskanalysis/risksign.class.php';
-
-// Load saturne libraries
-require_once __DIR__ . '/../../../../../../saturne/core/modules/saturne/modules_saturne.php';
+require_once __DIR__ . '/../modules_digiriskdolibarrdocument.php';
 
 /**
  * Class to build documents using ODF templates generator
  */
-class doc_riskassessmentdocument_odt extends SaturneDocumentModel
+class doc_riskassessmentdocument_odt extends ModeleODTDigiriskDolibarrDocument
 {
-    /**
-     * @var string Module
-     */
-    public string $module = 'digiriskdolibarr';
-
     /**
      * @var string Document type
      */
@@ -68,7 +61,7 @@ class doc_riskassessmentdocument_odt extends SaturneDocumentModel
     /**
      * Load risk assessment document infos
      *
-     * @param array $moreParam More param (segmentName, loadRiskAssessmentDocumentInfos)
+     * @param array $moreParam More param (filter)
      *
      * @throws Exception
      */
@@ -76,28 +69,9 @@ class doc_riskassessmentdocument_odt extends SaturneDocumentModel
     {
         $array = [];
 
-        $digiriskElement = new DigiriskElement($this->db);
-        $risk            = new Risk($this->db);
+        $risk = new Risk($this->db);
 
         $array['dangerCategories'] = Risk::getDangerCategories();
-
-        $array['current']['digiriskElements'] = $digiriskElement->fetchDigiriskElementFlat(0, [], 'current');
-        if (empty($array['current']['digiriskElements'])) {
-            $array['current']['digiriskElements'] = [];
-        }
-
-        if ($moreParam['tmparray']['showSharedRisk_nocheck']) {
-            $array['shared']['digiriskElements'] = $digiriskElement->fetchDigiriskElementFlat(0, [], 'shared');
-            if (empty($array['shared']['digiriskElements'])) {
-                $array['shared']['digiriskElements'] = [];
-            }
-        }
-
-        $filter           = ['customsql' => 't.fk_project = ' . getDolGlobalInt('DIGIRISKDOLIBARR_TICKET_PROJECT') . ' AND eft.digiriskdolibarr_ticket_service > 0'];
-        $array['tickets'] = saturne_fetch_all_object_type('Ticket', '', '', 0, 0,  $filter, 'AND', true);
-        if (!is_array($array['tickets']) || empty($array['tickets'])) {
-            $array['tickets'] = [];
-        }
 
         $riskArray = $risk->loadRiskInfos($moreParam);
         $array['current']['risks']                         = $riskArray['current']['risks'];
@@ -346,7 +320,7 @@ class doc_riskassessmentdocument_odt extends SaturneDocumentModel
 
         if ($foundTagForLines) {
             $riskByEntities              = $moreParam['riskByEntities'];
-            $evaluators                  = $moreParam['evaluators'];
+            $nbEvaluatorByEntities       = $moreParam['nbEvaluatorByEntities'];
             $riskAssessmentCotationTypes = [1 => 'RiskAssessmentGrey', 2 => 'RiskAssessmentOrange', 3 => 'RiskAssessmentRed', 4 => 'RiskAssessmentBlack'];
             if (empty($riskByEntities)) {
                 $tmpArray['companyName']         = '';
@@ -362,77 +336,14 @@ class doc_riskassessmentdocument_odt extends SaturneDocumentModel
                 return;
             }
 
-
             foreach ($riskByEntities as $entity => $riskByEntity) {
                 $tmpArray['companyName']         = dolibarr_get_const($this->db, 'MAIN_INFO_SOCIETE_NOM', $entity);
                 $tmpArray['siret']               = dolibarr_get_const($this->db, 'MAIN_INFO_SIRET', $entity);
-                $tmpArray['nbEmployeesInvolved'] = $evaluators[$entity]['nbEmployeesInvolved'] ?? 0;
+                $tmpArray['nbEmployeesInvolved'] = $nbEvaluatorByEntities[$entity] ?? 0;
                 $tmpArray['nbTotalRisks']        = $riskByEntity['nbTotalRisks'] ?: 0;
                 foreach ($riskAssessmentCotationTypes as $i => $riskAssessmentCotationType) {
                     $tmpArray['nb' . $riskAssessmentCotationType] = $riskByEntity[$i] ?: 0;
                 }
-
-                static::setTmpArrayVars($tmpArray, $listLines, $outputLangs);
-            }
-            $odfHandler->mergeSegment($listLines);
-        }
-    }
-
-    /**
-     * Set tickets segment
-     *
-     * @param Odf       $odfHandler  Object builder odf library
-     * @param Translate $outputLangs Lang object to use for output
-     * @param array     $moreParam   More param (tickets)
-     *
-     * @throws OdfException
-     * @throws Exception
-     */
-    private function setTicketsSegment(Odf $odfHandler, Translate $outputLangs, array $moreParam): void
-    {
-        $foundTagForLines = 1;
-        try {
-            $listLines = $odfHandler->setSegment('tickets');
-        } catch (OdfExceptionSegmentNotFound $e) {
-            // We may arrive here if tags for lines not present into template
-            $foundTagForLines = 0;
-            $listLines        = '';
-            dol_syslog($e->getMessage());
-        }
-
-        if ($foundTagForLines) {
-            $tickets = $moreParam['tickets'];
-            if (empty($tickets)) {
-                $tmpArray = [
-                    'refticket'                 => '',
-                    'categories'                => '',
-                    'creation_date'             => '',
-                    'subject'                   => '',
-                    'message'                   => '',
-                    'progress'                  => '',
-                    'digiriskelement_ref_label' => '',
-                    'status'                    => '',
-                ];
-
-                static::setTmpArrayVars($tmpArray, $listLines, $outputLangs);
-                $odfHandler->mergeSegment($listLines);
-                return;
-            }
-
-            $category = new Categorie($this->db);
-
-            foreach ($tickets as $ticket) {
-                $categories      = $category->containing($ticket->id, Categorie::TYPE_TICKET);
-                $digiriskElement = $moreParam['digiriskElements'][$ticket->array_options['options_digiriskdolibarr_ticket_service']]['object'];
-
-                $tmpArray['refticket']                 = $ticket->ref;
-                $tmpArray['categories']                = !empty($categories) ? implode(', ', array_map(fn($cat) => $cat->label, $categories)) : '';
-                $tmpArray['creation_date']             = dol_print_date($ticket->datec, 'dayhour', 'tzuser');
-                $tmpArray['subject']                   = $ticket->subject;
-                $tmpArray['message']                   = $ticket->message;
-                $tmpArray['progress']                  = ($ticket->progress ?: 0) . ' %';
-                $tmpArray['digiriskelement_ref_label'] = $digiriskElement->ref . ' - ' . $digiriskElement->label;
-                $tmpArray['status']                    = $ticket->getLibStatut();
 
                 static::setTmpArrayVars($tmpArray, $listLines, $outputLangs);
             }
@@ -453,10 +364,6 @@ class doc_riskassessmentdocument_odt extends SaturneDocumentModel
      */
     private static function setRiskAssessmentDocumentByEntity(Odf $odfHandler, Translate $outputLangs, array $moreParam, array $loadRiskAssessmentDocumentInfos): void
     {
-        $objectDocument = $moreParam['objectDocument'];
-
-        $moreParam['digiriskElements'] = $loadRiskAssessmentDocumentInfos[$moreParam['entity']]['digiriskElements'];
-
         $moreParam['segmentName'] = $moreParam['entity'] . 'DigiriskElements';
         static::setDigiriskElementsSegment($odfHandler, $outputLangs, $moreParam);
 
@@ -477,7 +384,10 @@ class doc_riskassessmentdocument_odt extends SaturneDocumentModel
             $moreParam['projectEntities'] = $loadRiskAssessmentDocumentInfos[$moreParam['entity']]['projectEntities'];
         }
         $moreParam['riskByRiskAssessmentLevels'] = $loadRiskAssessmentDocumentInfos[$moreParam['entity']]['riskByRiskAssessmentLevels'];
-        $objectDocument->fillRiskData($odfHandler, $outputLangs, $moreParam);
+        for ($i = 4; $i >= 1; $i--) {
+            $moreParam['segmentName'] = $moreParam['entity'] . 'Risks' . $i;
+            static::setRiskByRiskAssessmentLevelsSegment($odfHandler, $outputLangs, $moreParam);
+        }
     }
 
     /**
@@ -494,24 +404,31 @@ class doc_riskassessmentdocument_odt extends SaturneDocumentModel
     {
         // Replace tags of lines
         try {
+            require_once __DIR__ . '/../../../../../lib/digiriskdolibarr_ticket.lib.php';
+
+            $digiriskElement = new DigiriskElement($this->db);
+
             $loadRiskAssessmentDocumentInfos = $this->loadRiskAssessmentDocumentInfos($moreParam);
             $loadEvaluatorInfos              = Evaluator::loadEvaluatorInfos();
+            $loadDigiriskElementInfos        = $digiriskElement->loadDigiriskElementInfos($moreParam);
+            $loadTicketInfos                 = load_ticket_infos($moreParam);
 
-            $moreParam['entity'] = 'current';
+            $moreParam['entity']           = 'current';
+            $moreParam['digiriskElements'] = $loadDigiriskElementInfos[$moreParam['entity']]['digiriskElements'];
             static::setRiskAssessmentDocumentByEntity($odfHandler, $outputLangs, $moreParam, $loadRiskAssessmentDocumentInfos);
 
             if ($moreParam['tmparray']['showSharedRisk_nocheck']) {
-                $moreParam['entity'] = 'shared';
+                $moreParam['entity']           = 'shared';
+                $moreParam['digiriskElements'] = $loadDigiriskElementInfos[$moreParam['entity']]['digiriskElements'];
                 static::setRiskAssessmentDocumentByEntity($odfHandler, $outputLangs, $moreParam, $loadRiskAssessmentDocumentInfos);
             }
 
-            $moreParam['evaluators']     = $loadEvaluatorInfos['evaluators'];
-            $moreParam['riskByEntities'] = $loadRiskAssessmentDocumentInfos['riskByEntities'];
+            $moreParam['nbEvaluatorByEntities'] = $loadEvaluatorInfos['nbEvaluatorByEntities'];
+            $moreParam['riskByEntities']        = $loadRiskAssessmentDocumentInfos['riskByEntities'];
             $this->setRiskByEntitiesSegment($odfHandler, $outputLangs, $moreParam);
 
-            $moreParam['digiriskElements'] = $loadRiskAssessmentDocumentInfos['current']['digiriskElements'];
-            $moreParam['tickets']          = $loadRiskAssessmentDocumentInfos['tickets'];
-            $this->setTicketsSegment($odfHandler, $outputLangs, $moreParam);
+            $moreParam['tickets'] = $loadTicketInfos['tickets'];
+            static::setTicketsSegment($odfHandler, $outputLangs, $moreParam);
         } catch (OdfException $e) {
             $this->error = $e->getMessage();
             dol_syslog($this->error, LOG_WARNING);
@@ -534,7 +451,7 @@ class doc_riskassessmentdocument_odt extends SaturneDocumentModel
      * @return int                               1 if OK, <=0 if KO
      * @throws Exception
      */
-    public function write_file(SaturneDocuments $objectDocument, Translate $outputLangs, string $srcTemplatePath, int $hideDetails = 0, int $hideDesc = 0, int $hideRef = 0, array $moreParam): int
+    public function write_file(SaturneDocuments $objectDocument, Translate $outputLangs, string $srcTemplatePath, int $hideDetails = 0, int $hideDesc = 0, int $hideRef = 0, array $moreParam = []): int
     {
         global $conf, $mysoc;
 
@@ -563,9 +480,7 @@ class doc_riskassessmentdocument_odt extends SaturneDocumentModel
             $tmpArray['showSharedRisk_nocheck'] = true;
         }
 
-        $moreParam['tmparray']         = $tmpArray;
-        $moreParam['objectDocument']   = $objectDocument;
-        $moreParam['hideTemplateName'] = 1;
+        $moreParam['tmparray'] = $tmpArray;
 
         return parent::write_file($objectDocument, $outputLangs, $srcTemplatePath, $hideDetails, $hideDesc, $hideRef, $moreParam);
     }

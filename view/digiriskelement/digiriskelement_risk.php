@@ -72,7 +72,7 @@ $sortfield      = GETPOST('sortfield', 'alpha');
 $sortorder      = GETPOST('sortorder', 'alpha');
 $sharedrisks    = GETPOST('sharedrisks', 'int') ? GETPOST('sharedrisks', 'int') : $conf->global->DIGIRISKDOLIBARR_SHOW_SHARED_RISKS;
 $inheritedrisks = GETPOST('inheritedrisks', 'int') ? GETPOST('inheritedrisks', 'int') : $conf->global->DIGIRISKDOLIBARR_SHOW_INHERITED_RISKS_IN_LISTINGS;
-$riskType       = GETPOSTISSET('type') ? GETPOST('type') : 'risk';
+$riskType       = GETPOSTISSET('risk_type') ? GETPOST('risk_type') : 'risk';
 $page           = GETPOSTISSET('pageplusone') ? (GETPOST('pageplusone') - 1) : GETPOST("page", 'int');
 $page           = is_numeric($page) ? $page : 0;
 $page           = $page == -1 ? 0 : $page;
@@ -215,7 +215,7 @@ if (empty($reshook)) {
 
 	$error = 0;
 
-	$backtopage = dol_buildpath('/digiriskdolibarr/view/digiriskelement/digiriskelement_risk.php', 1) . '?id=' . ($id > 0 ? $id : '__ID__') . '&type=' . $riskType;
+	$backtopage = dol_buildpath('/digiriskdolibarr/view/digiriskelement/digiriskelement_risk.php', 1) . '?id=' . ($id > 0 ? $id : '__ID__') . '&risk_type=' . $riskType;
 
 	require_once __DIR__ . '/../../core/tpl/riskanalysis/risk/digiriskdolibarr_risk_actions.tpl.php';
 }
@@ -347,7 +347,7 @@ if ($sharedrisks) {
 			}
 
 		}
-		$formconfirm .= digiriskformconfirm($_SERVER["PHP_SELF"] . '?id=' . $object->id . '&type=' . $riskType, $langs->trans('ImportShared' . ucfirst($riskType) . 's'), '', 'confirm_import_shared_risks', $formquestionimportsharedrisks, 'yes', 'actionButtonImportSharedRisks', 800, 800);
+		$formconfirm .= digiriskformconfirm($_SERVER["PHP_SELF"] . '?id=' . $object->id . '&risk_type=' . $riskType, $langs->trans('ImportShared' . ucfirst($riskType) . 's'), '', 'confirm_import_shared_risks', $formquestionimportsharedrisks, 'yes', 'actionButtonImportSharedRisks', 800, 800);
 	}
 
 	// Call Hook formConfirm
@@ -374,7 +374,7 @@ if ($object->id > 0) {
 	// Buttons for actions
 	print '<div class="tabsAction" >';
 	if ($permissiontoadd && !empty($conf->global->DIGIRISKDOLIBARR_SHOW_SHARED_RISKS)) {
-		print '<span class="butAction" id="actionButtonImportSharedRisks" title="" href="' . $_SERVER["PHP_SELF"] . '?id=' . $object->id . '&type=' . $riskType . '&action=import_shared_risks' . '">' . $langs->trans('ImportShared' . ucfirst($riskType) . 's') . '</span>';
+		print '<span class="butAction" id="actionButtonImportSharedRisks" title="" href="' . $_SERVER["PHP_SELF"] . '?id=' . $object->id . '&risk_type=' . $riskType . '&action=import_shared_risks' . '">' . $langs->trans('ImportShared' . ucfirst($riskType) . 's') . '</span>';
 	}
 	print '</div>';
 

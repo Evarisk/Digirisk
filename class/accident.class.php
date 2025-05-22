@@ -365,6 +365,32 @@ class Accident extends SaturneObject
 		return $this->fetchAll('', '', 0, 0, $filter);
 	}
 
+    /**
+     * Load accident infos
+     *
+     * @param  array     $moreParam More param (filter)
+     * @return array     $array     Array of accidents
+     * @throws Exception
+     */
+    public function loadAccidentInfos(array $moreParam = []): array
+    {
+        $array = [];
+
+        $select             = ', SUM(aw.workstop_days) AS nbAccidentWorkStop';
+        $moreSelects        = ['nbAccidentWorkStop'];
+        $join               = ' INNER JOIN ' . MAIN_DB_PREFIX . 'digiriskdolibarr_accident_workstop AS aw ON t.rowid = aw.fk_accident';
+        $filter             = 't.status = ' . self::STATUS_VALIDATED . ($moreParam['filter'] ?? '');
+        $groupBy            = ' GROUP BY ' . $this->getFieldList('t');
+        $array['accidents'] = saturne_fetch_all_object_type('Accident', '', '', 0, 0, ['customsql' => $filter], 'AND', false, true, false, $join, [], $select, $moreSelects, $groupBy);
+        if (!is_array($array['accidents'] ) || empty($array['accidents'] )) {
+            $array['accidents'] = [];
+        }
+
+        $array['nbAccidents'] = count($array['accidents']);
+
+        return $array;
+    }
+
 	/**
 	 *  Return the status
 	 *

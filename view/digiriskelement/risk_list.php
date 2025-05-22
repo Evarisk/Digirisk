@@ -72,7 +72,7 @@ $toselect    = GETPOST('toselect', 'array'); // Array of ids of elements selecte
 $limit       = GETPOST('limit', 'int') ? GETPOST('limit', 'int') : $conf->liste_limit;
 $sortfield   = GETPOST('sortfield', 'alpha');
 $sortorder   = GETPOST('sortorder', 'alpha');
-$riskType    = GETPOSTISSET('type') ? GETPOST('type') : 'risk';
+$riskType    = GETPOSTISSET('risk_type') ? GETPOST('risk_type') : 'risk';
 $page        = GETPOSTISSET('pageplusone') ? (GETPOST('pageplusone') - 1) : GETPOST("page", 'int');
 $page        = is_numeric($page) ? $page : 0;
 $page        = $page == -1 ? 0 : $page;
@@ -212,7 +212,7 @@ if (empty($reshook)) {
 
 	$error = 0;
 
-	$backtopage = dol_buildpath('/digiriskdolibarr/view/digiriskelement/risk_list.php?type=' . $riskType, 1);
+	$backtopage = dol_buildpath('/digiriskdolibarr/view/digiriskelement/risk_list.php?risk_type=' . $riskType, 1);
 
 	require_once './../../core/tpl/riskanalysis/risk/digiriskdolibarr_risk_actions.tpl.php';
 }

@@ -152,7 +152,7 @@ class Risk extends SaturneObject
             ]
         ];
 
-        $riskType = GETPOST('type');
+        $riskType = GETPOST('risk_type');
         if ($riskType == 'riskenvironmental') {
             $this->type  = 'riskenvironmental';
             $this->picto = 'fontawesome_fa-leaf_fas_#d35968';
@@ -203,7 +203,7 @@ class Risk extends SaturneObject
         $sharedJoin .= ' INNER JOIN ' . $this->db->prefix() . $this->module . '_digiriskelement AS d ON (d.rowid = ee.fk_target AND d.entity = ' . $conf->entity . ')';
         $sharedJoin .= ' INNER JOIN ' . $this->db->prefix() . $this->module . '_riskassessment AS ra ON t.rowid = ra.fk_risk';
 
-        $filter        = 't.status = ' . Risk::STATUS_VALIDATED . ' AND d.status = ' . DigiriskElement::STATUS_VALIDATED . ' AND ra.status = ' . RiskAssessment::STATUS_VALIDATED . (!empty($moreParam['filterRisk']) ? $moreParam['filterRisk'] : ' AND t.type = \'risk\'');
+        $filter        = 't.status = ' . Risk::STATUS_VALIDATED . ' AND d.status = ' . DigiriskElement::STATUS_VALIDATED . ' AND ra.status = ' . RiskAssessment::STATUS_VALIDATED .  ($moreParam['filter'] ?? '') . (!empty($moreParam['filterRisk']) ? $moreParam['filterRisk'] : ' AND t.type = \'risk\'');
         $currentFilter = $filter . ' AND t.entity = ' . $conf->entity;
 
         $array['riskByEntities']   = [];
