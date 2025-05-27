@@ -75,6 +75,27 @@ OriginURL                            = URL d'origine
 ShortURL                             = URL raccourcie
 ExternalURL                          = URL externe
 
+# DigiQuali Sheet - Modèles
+LinkDigiriskdolibarr_digiriskstandard                 = Activer le lien avec les entités principale Digirisk Standard
+LinkDigiriskdolibarr_digiriskstandardDescription      = Permet le lien entre les entités standard Digirisk et les modèles
+LinkDigiriskdolibarr_digiriskelement                  = Activer le lien avec les groupements et unités de travail
+LinkDigiriskdolibarr_digiriskelementDescription       = Permet le lien entre les groupements et unités de travail et les modèles
+LinkDigiriskdolibarr_risk                             = Activer le lien avec les risques
+LinkDigiriskdolibarr_riskDescription                  = Permet le lien entre les risques et les modèles
+LinkDigiriskdolibarr_riskassessment                   = Activer le lien avec les évaluations
+LinkDigiriskdolibarr_riskassessmentDescription        = Permet le lien entre les évaluations et les modèles
+LinkDigiriskdolibarr_evaluator                        = Activer le lien avec les évaluateurs
+LinkDigiriskdolibarr_evaluatorDescription             = Permet le lien entre les évaluateurs et les modèles
+LinkDigiriskdolibarr_risksign                         = Activer le lien avec les signalisations
+LinkDigiriskdolibarr_risksignDescription              = Permet le lien entre les signalisations et les modèles
+LinkDigiriskdolibarr_preventionplan                   = Activer le lien avec les plans de prévention
+LinkDigiriskdolibarr_preventionplanDescription        = Permet le lien entre les plans de prévention et les modèles
+LinkDigiriskdolibarr_firepermit                       = Activer le lien avec les permis de feu
+LinkDigiriskdolibarr_firepermitDescription            = Permet la liaison entre les permis de feu et les modèles
+LinkDigiriskdolibarr_accident                         = Activer le lien avec les accidents
+LinkDigiriskdolibarr_accidentDescription              = Permet le lien entre les accidents et les modèles
+LinkDigiriskdolibarr_accidentinvestigation            = Activer le lien avec les enquêtes accident
+LinkDigiriskdolibarr_accidentinvestigationDescription = Permet le lien entre les enquêtes et les modèles
 
 #
 # DigiriskDolibarr
@@ -384,8 +405,6 @@ ErrorContactHasAtLeastOneChildOfTypeFirePermit    = Le contact est lié à au mo
 ConfirmDeleteFirePermit                           = Êtes-vous sûr de vouloir supprimer ce permis de feu ?
 FirePermitRole                                    = Les rôles du permis de feu
 FirepermitSchedules                               = Horaires du permis de feu
-LinkDigiriskdolibarr_firepermit                   = Activer le lien avec les permis de feu
-LinkDigiriskdolibarr_firepermitDescription        = Permet la liaison entre les permis de feu et les modèles
 
 # Email - Mail
 FirePermitLabel   = Récapitulatif du permis de feu
@@ -604,6 +623,8 @@ AddFirepermitIntoCategory         = Assigner cette catégorie au permis de feu
 RisksCategoriesArea               =	Espace des tags/catégories des risques
 AddRiskIntoCategory               = Assigner cette catégorie au risque
 AddTicketIntoCategory             = Assigner cette catégorie au ticket
+StartDateInvestigate              = Date de début de l'enquête
+EndDateInvestigate                = Date de fin de l'enquête
 
 # AccidentTooltip - Tooltip des accidents
 VictimActivityTooltip              = Précisez l’activité ou la tâche de la victime au moment de l’accident, c’est-à-dire ce que faisait la victime
