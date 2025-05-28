@@ -261,6 +261,7 @@ if (empty($reshook)) {
 		$external_accident  = GETPOST('external_accident');
 		$accident_location  = GETPOST('accident_location');
         $extSocietyId       = GETPOST('fk_soc');
+		$user_victim_id	    = GETPOST('fk_user_victim');
 
 		// Initialize object accident
 		$now                       = dol_now();
@@ -319,6 +320,10 @@ if (empty($reshook)) {
         }
 
 		if (!$error) {
+
+			$usertmp->fetch($user_victim_id);
+			$signatory->setSignatory($object->id, 'accident', 'user', [$usertmp->id], 'Victim');
+
 			$result = $object->update($user);
 			if ($result > 0) {
 //				if (empty($object->fk_user_employer)) {
@@ -764,6 +769,16 @@ if (($id || $ref) && $action == 'edit') {
 	print ' <a href="' . DOL_URL_ROOT . '/user/card.php?action=create&backtopage=' . urlencode($_SERVER["PHP_SELF"] . '?action=create') . '" target="_blank"><span class="fa fa-plus-circle valignmiddle paddingleft" title="' . $langs->trans("AddUser") . '"></span></a>';
 	print '</td></tr>';
 
+	$userVictim = $object->getUserVictim();
+	//User Victim -- Utilisateur victime de l'accident
+	$userlist = $form->select_dolusers(($userVictim->id ?: $user->id), '', 0, null, 0, '', '', '', 0, 0, '(u.statut:=:1)', 0, '', 'minwidth300', 0, 1);
+	print '<tr>';
+	print '<td class="fieldrequired minwidth400" style="width:10%">' . img_picto('', 'user') . ' ' . $form->editfieldkey('UserVictim', 'UserVictim_id', '', $object, 0) . '</td>';
+	print '<td>';
+	print $form->selectarray('fk_user_victim', $userlist, ($userVictim->id ?: $user->id), $langs->trans('SelectUser'), null, null, null, "40%", 0, 0, '', 'minwidth300', 1);
+	print ' <a href="' . DOL_URL_ROOT . '/user/card.php?action=create&backtopage=' . urlencode($_SERVER["PHP_SELF"] . '?action=create') . '" target="_blank"><span class="fa fa-plus-circle valignmiddle paddingleft" title="' . $langs->trans("AddUser") . '"></span></a>';
+	print '</td></tr>';
+
 	//AccidentType
 	print '<tr><td class="minwidth400">' . $langs->trans("AccidentType") . '</td><td>';
 	print $form->selectarray('accident_type', array('0' => $langs->trans('WorkAccidentStatement'), '1' => $langs->trans('CommutingAccident')), $object->accident_type, 0, 0, 0, '', 0, 0, 0, '', 'minwidth300', 1);
@@ -1070,7 +1085,7 @@ if ((empty($action) || ($action != 'create' && $action != 'edit'))) {
     <?php
     $relativepath = 'digiriskdolibarr/medias/thumbs';
     print saturne_show_medias_linked('digiriskdolibarr', $pathPhotos, 'small', 0, 0, 0, 0, 50, 50, 0, 0, 0, 'accident/'. $object->ref . '/photos/', $object, 'photo', $permissiontoadd, $permissiontodelete && $object->status <= Accident::STATUS_DRAFT);
-    print '</td></tr>';
+	print '</td></tr>';
 
     //Fk Ticket -- Fk Ticket
     print '<tr><td class="titlefield">';
@@ -1089,6 +1104,23 @@ if ((empty($action) || ($action != 'create' && $action != 'edit'))) {
         print $form->showCategories($object->id, 'accident', 1);
         print "</td></tr>";
     }
+
+	// Victim
+	print '<tr><td class="titlefield">';
+	print $langs->transnoentities("Victim");
+	print '</td>';
+	print '<td>';
+	print '<a href="' . DOL_URL_ROOT . '/custom/saturne/view/saturne_attendants.php?' . http_build_query([
+		'id' => $object->id,
+		'module_name' => $object->module,
+		'object_type' => $object->element,
+		'attendant_table_mode' => 'advanced'
+	]) . '"';
+
+	if ($userVictim->id > 0) {
+		print $userVictim->getNomUrl(1, 'nolink');
+	}
+	print '</td></tr>';
 
     print '</table></div>';
     print '<div class="clearboth"></div>';
