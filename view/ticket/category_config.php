@@ -169,9 +169,6 @@ print '<tr class="oddeven"><td>';
 print img_picto('', 'fa-font', 'class="paddingrightonly"') . $form->textwithpicto($langs->transnoentities('Description'), $langs->transnoentities('TicketPublicInterfaceShowCategoryDescriptionHelp'), 1, 'info') . '</td>';
 print '</td><td class="center">';
 print '<input type="checkbox" id="show_description" name="show_description"' . ($ticketCategoryConfig->show_description ? ' checked=""' : '') . '"> ';
-if (getDolGlobalInt('DIGIRISKDOLIBARR_TICKET_PUBLIC_INTERFACE_SHOW_CATEGORY_DESCRIPTION')) {
-    print $form->textwithtooltip($langs->transnoentities('Inherited'), $langs->transnoentities('PermissionInheritedFromConfig'));
-}
 print '</td></tr>';
 
 // Email template
@@ -269,13 +266,13 @@ if (getDolGlobalInt('DIGIRISKDOLIBARR_TICKET_ENABLE_PUBLIC_INTERFACE')) {
             print '<tr class="oddeven"><td>';
             print ($fields[$key]['picto'] ? img_picto('', $fields[$key]['picto'], 'class="paddingrightonly"') : getPictoForType($extraFields->attributes['ticket']['type'][$key])) . $form->textwithpicto($langs->transnoentities('Ticket' . ucfirst($label) . 'Visible'), $langs->transnoentities('Ticket' . ucfirst($label) . 'VisibleHelp'), 1, 'info') . '</td>';
             print '</td><td class="center">';
-            print '<input type="checkbox" id="' . $extraFieldVisible . '" name="' . $extraFieldVisible . '"' . (getDolGlobalInt(dol_strtoupper($key) . '_VISIBLE') || $keysWithValueOn[$extraFieldVisible] || $ticketCategoryConfig->$extraFieldVisible ? ' checked' : '') . (getDolGlobalInt(dol_strtoupper($key) . '_VISIBLE') || $keysWithValueOn[$extraFieldVisible] ? ' disabled' : '') . '>';
-            if (getDolGlobalInt(dol_strtoupper($key) . '_VISIBLE') || $keysWithValueOn[$extraFieldVisible]) {
+            print '<input type="checkbox" id="' . $extraFieldVisible . '" name="' . $extraFieldVisible . '"' . ($keysWithValueOn[$extraFieldVisible] || $ticketCategoryConfig->$extraFieldVisible ? ' checked' : '') . ($keysWithValueOn[$extraFieldVisible] ? ' disabled' : '') . '>';
+            if ($keysWithValueOn[$extraFieldVisible]) {
                 print $form->textwithtooltip($langs->transnoentities('Inherited'), $langs->transnoentities('PermissionInheritedFromConfig'));
             }
             print '</td><td class="center">';
-            print '<input type="checkbox" id="' . $extraFieldRequired . '" name="' . $extraFieldRequired . '"' . (getDolGlobalInt(dol_strtoupper($key) . '_REQUIRED') || $keysWithValueOn[$extraFieldRequired] || $ticketCategoryConfig->$extraFieldRequired ? ' checked=""' : '') . (getDolGlobalInt(dol_strtoupper($key) . '_REQUIRED') || $keysWithValueOn[$extraFieldRequired] ? ' disabled' : '') . '>';
-            if (getDolGlobalInt(dol_strtoupper($key) . '_REQUIRED') || $keysWithValueOn[$extraFieldRequired]) {
+            print '<input type="checkbox" id="' . $extraFieldRequired . '" name="' . $extraFieldRequired . '"' . ($keysWithValueOn[$extraFieldRequired] || $ticketCategoryConfig->$extraFieldRequired ? ' checked=""' : '') . ($keysWithValueOn[$extraFieldRequired] ? ' disabled' : '') . '>';
+            if ($keysWithValueOn[$extraFieldRequired]) {
                 print $form->textwithtooltip($langs->transnoentities('Inherited'), $langs->transnoentities('PermissionInheritedFromConfig'));
             }
             print '</td></tr>';
