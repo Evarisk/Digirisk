@@ -465,7 +465,7 @@ class DigiriskElement extends SaturneObject
             return -1;
         }
 
-        if (!isModEnabled('multicompany') || $multiEntityManagement == 'all') {
+        if ($multiEntityManagement == 'all') {
             return $digiriskElements;
         }
 

@@ -237,7 +237,7 @@ class Risk extends SaturneObject
         $nbTotalRisks = ['current' => 0,'shared' => 0];
         foreach ($array['risks'] as $risk) {
             $riskAssessment->cotation = $risk->riskAssessmentCotation;
-            $entity                   = ($risk->entity == $conf->entity) ? 'current' : 'shared';
+            $entity                   = ($risk->entity == $conf->entity || (!isModEnabled('multicompany') && empty($risk->entity))) ? 'current' : 'shared';
 
             $array[$entity]['riskByRiskAssessmentLevels'][$riskAssessment->getEvaluationScale()][] = $risk;
             $array[$entity]['riskByRiskAssessmentCotations'][$risk->fk_element]['totalRiskAssessmentCotations'] += $risk->riskAssessmentCotation;
