@@ -471,7 +471,7 @@ class DigiriskElement extends SaturneObject
 
         $digiriskElementsByEntities = [];
         foreach ($digiriskElements as $key => $digiriskElement) {
-            if ($multiEntityManagement == 'current' && $digiriskElement->entity == $conf->entity) {
+            if ($multiEntityManagement == 'current' && ($digiriskElement->entity == $conf->entity || (!isModEnabled('multicompany') && empty($digiriskElement->entity)))) {
                 $digiriskElementsByEntities[$key] = $digiriskElement;
             }
             if ($multiEntityManagement == 'shared' && $digiriskElement->entity != $conf->entity) {

@@ -1035,13 +1035,13 @@ class Risk extends SaturneObject
      * Get risk by danger categories and risk assessments
      *
      * @param array  $dangerCategories Danger categories datas
-     * @param string $filter          SQL Filter
-     * @param string $type            Risk type (risk, riskenvironmental or ...)
+     * @param string $type             Risk type (risk, riskenvironmental or ...)
+     * @param array  $moreParam        More param (filter)
      *
      * @return array
      * @throws Exception
      */
-    public function getRiskByDangerCategoriesAndRiskAssessments(array $dangerCategories, string $type = 'risk') : array
+    public function getRiskByDangerCategoriesAndRiskAssessments(array $dangerCategories, string $type = 'risk', array $moreParam = []) : array
     {
         global $conf;
 
@@ -1053,7 +1053,7 @@ class Risk extends SaturneObject
         $moreSelects = ['cotation'];
         $join        = ' INNER JOIN ' . MAIN_DB_PREFIX . $this->module . '_digiriskelement AS d ON d.rowid = t.fk_element';
         $join       .= ' LEFT JOIN ' . MAIN_DB_PREFIX . $this->module . '_riskassessment AS ra ON t.rowid = ra.fk_risk';
-        $filter      = 't.status = ' . self::STATUS_VALIDATED . ' AND t.entity = ' . $conf->entity . (GETPOSTISSET('id') ? ' AND t.fk_element = ' . GETPOSTINT('id') : '') . ' AND t.type = \'' . $this->db->escape($type) . '\' AND d.status = ' . DigiriskElement::STATUS_VALIDATED . ' AND ra.status = ' . RiskAssessment::STATUS_VALIDATED;
+        $filter      = 't.status = ' . self::STATUS_VALIDATED . ($moreParam['filterEntity'] ?? ' AND t.entity = ' . $conf->entity) . (GETPOSTISSET('id') ? ' AND t.fk_element = ' . GETPOSTINT('id') : '') . ' AND t.type = \'' . $this->db->escape($type) . '\' AND d.status = ' . DigiriskElement::STATUS_VALIDATED . ' AND ra.status = ' . RiskAssessment::STATUS_VALIDATED;
         $risks       = saturne_fetch_all_object_type('Risk', '', '', 0, 0, ['customsql' => $filter], 'AND', false, false, false, $join, [], $select, $moreSelects);
         if (!is_array($risks) || empty($risks)) {
             return $array;
