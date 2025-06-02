@@ -484,11 +484,13 @@ abstract class ModeleODTDigiriskDolibarrDocument extends SaturneDocumentModel
             $risk     = new Risk($this->db);
             $accident = new Accident($this->db);
 
-            $loadRiskInfos      = $risk->loadRiskInfos($moreParam);
-            $loadRiskSignInfos  = RiskSign::loadRiskSignInfos($moreParam);
-            $loadEvaluatorInfos = Evaluator::loadEvaluatorInfos($moreParam);
-            $loadAccidentInfos  = $accident->loadAccidentInfos($moreParam);
-            $loadTicketInfos    = load_ticket_infos($moreParam);
+            $loadRiskInfos     = $risk->loadRiskInfos($moreParam);
+            $loadRiskSignInfos = RiskSign::loadRiskSignInfos($moreParam);
+            $loadAccidentInfos = $accident->loadAccidentInfos($moreParam);
+            $loadTicketInfos   = load_ticket_infos($moreParam);
+
+            $moreParam['filter'] = ''; // Need because Evaluator don't have fk_element @todo rework fk_parent in fk_element
+            $loadEvaluatorInfos  = Evaluator::loadEvaluatorInfos($moreParam);
 
             if (!isset($moreParam['digiriskElements'])) {
                 $digiriskElements[$moreParam['object']->id]['object'] = $moreParam['object'];
