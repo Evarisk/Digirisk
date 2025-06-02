@@ -88,6 +88,17 @@ if (($action == 'update' && ! GETPOST("cancel", 'alpha')) || ($action == 'update
 	}
 }
 
+if ($action == 'update_user_group') {
+    $TSProject = GETPOST('userGroup', 'none');
+    
+    echo '<pre>'; print_r( $TSProject ); echo '</pre>'; exit;
+
+    dolibarr_set_const($db, "DIGIRISKDOLIBARR_TICKET_USER_GROUP_ID_FOR_USER_ASSIGN", $TSProject, 'integer', 0, '', $conf->entity);
+
+    header('Location: ' . $_SERVER['PHP_SELF']);
+    exit;
+}
+
 if ($action == 'setPublicInterface') {
 	if (GETPOST('value')) {
         dolibarr_set_const($db, 'DIGIRISKDOLIBARR_TICKET_ENABLE_PUBLIC_INTERFACE', 1, 'integer', 0, '', $conf->entity);
@@ -644,6 +655,30 @@ if ($conf->global->DIGIRISKDOLIBARR_TICKET_ENABLE_PUBLIC_INTERFACE == 1) {
 		print '</table>';
 		print '</form>';
 	}
+
+    // Project
+    print load_fiche_titre($langs->transnoentities('UserGroup'), '', '');
+
+    print '<form method="POST" action="' . $_SERVER["PHP_SELF"] . '" name="user_group_form">';
+    print '<input type="hidden" name="token" value="' . newToken() . '">';
+    print '<input type="hidden" name="action" value="update_user_group">';
+    print '<table class="noborder centpercent editmode">';
+    print '<tr class="liste_titre">';
+    print '<td>' . $langs->transnoentities('Parameter') . '</td>';
+    print '<td>' . $langs->transnoentities('Description') . '</td>';
+    print '<td>' . $langs->transnoentities('Value') . '</td>';
+    print '<td>' . $langs->transnoentities('Action') . '</td>';
+    print '</tr>';
+
+    print '<tr class="oddeven"><td><label for="userGroup">' . $langs->transnoentities('UserGroup') . '</label></td>';
+    print '<td>' . $langs->transnoentities('Choix du groupe d\'affectation des utilisateurs') . '</td>';
+    print '<td>' . $form->select_dolgroups(getDolGlobalInt('DIGIRISKDOLIBARR_TICKET_USER_GROUP_ID_FOR_USER_ASSIGN'),  'userGroup', 1, 0, 0, 0, 0, 0, 0, 'maxwidth500') . '</td>';
+    //print ' <a href="' . DOL_URL_ROOT . '/projet/card.php?&action=create&status=1&backtopage=' . urlencode($_SERVER["PHP_SELF"] . '?action=create') . '"><span class="fa fa-plus-circle valignmiddle" title="' . $langs->transnoentities("AddProject") . '"></span></a>';
+    print '<td><input type="submit" class="button reposition" name="save" value="' . $langs->transnoentities('Save') . '">';
+    print '</td></tr>';
+
+    print '</table>';
+    print '</form>';
 
 	print load_fiche_titre($langs->transnoentities("TicketCategories"), '', '', 0, 'TicketCategories');
 
