@@ -72,7 +72,7 @@ class InterfaceDigiriskdolibarrTriggers extends DolibarrTriggers
 		$this->name        = preg_replace('/^Interface/i', '', get_class($this));
 		$this->family      = "demo";
 		$this->description = "Digiriskdolibarr triggers.";
-		$this->version     = '20.0.1';
+		$this->version     = '21.0.1';
 		$this->picto       = 'digiriskdolibarr@digiriskdolibarr';
 	}
 
@@ -401,7 +401,7 @@ class InterfaceDigiriskdolibarrTriggers extends DolibarrTriggers
 				break;
 
 			case 'TICKET_CREATE' :
-				if ($conf->global->DIGIRISKDOLIBARR_SEND_EMAIL_ON_TICKET_SUBMIT) {
+				if (getDolGlobalInt('DIGIRISKDOLIBARR_SEND_EMAIL_ON_TICKET_SUBMIT')) {
 					// envoi du mail avec les infos de l'objet aux adresses mail configurées
 					// envoi du mail avec une trad puis avec un model
 
@@ -894,10 +894,10 @@ class InterfaceDigiriskdolibarrTriggers extends DolibarrTriggers
 
 		}
 
-		if ($result < 0) {
-			$object->errors = array_merge($object->error, $actioncomm->errors);
-			return $result;
-		}
+//		if ($result < 0) {
+//			$object->errors = array_merge($object->error, $actioncomm->errors);
+//			return $result;
+//		}
 		return 0;
 	}
 }

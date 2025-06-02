@@ -365,6 +365,32 @@ class Accident extends SaturneObject
 		return $this->fetchAll('', '', 0, 0, $filter);
 	}
 
+    /**
+     * Load accident infos
+     *
+     * @param  array     $moreParam More param (filter)
+     * @return array     $array     Array of accidents
+     * @throws Exception
+     */
+    public function loadAccidentInfos(array $moreParam = []): array
+    {
+        $array = [];
+
+        $select             = ', SUM(aw.workstop_days) AS nbAccidentWorkStop';
+        $moreSelects        = ['nbAccidentWorkStop'];
+        $join               = ' INNER JOIN ' . MAIN_DB_PREFIX . 'digiriskdolibarr_accident_workstop AS aw ON t.rowid = aw.fk_accident';
+        $filter             = 't.status = ' . self::STATUS_VALIDATED . ($moreParam['filter'] ?? '');
+        $groupBy            = ' GROUP BY ' . $this->getFieldList('t');
+        $array['accidents'] = saturne_fetch_all_object_type('Accident', '', '', 0, 0, ['customsql' => $filter], 'AND', false, true, false, $join, [], $select, $moreSelects, $groupBy);
+        if (!is_array($array['accidents'] ) || empty($array['accidents'] )) {
+            $array['accidents'] = [];
+        }
+
+        $array['nbAccidents'] = count($array['accidents']);
+
+        return $array;
+    }
+
 	/**
 	 *  Return the status
 	 *
@@ -659,17 +685,25 @@ class Accident extends SaturneObject
      */
     public function getNbPresquAccidents(): array
     {
-        global $langs;
+        global $conf, $langs;
+
+        $array['nbpresquaccidents'] = 'N/A';
 
         $category = new Categorie($this->db);
 
-        $category->fetch(0, $langs->transnoentities('PresquAccident'));
-        $tickets = $category->getObjectsInCateg(Categorie::TYPE_TICKET);
-        if (!empty($tickets) && is_array($tickets)) {
-            $array['nbpresquaccidents'] = count($tickets);
-        } else {
-            $array['nbpresquaccidents'] = 'N/A';
+        $result = $category->fetch(0, $langs->transnoentities('PresquAccident'));
+        if ($result <= 0) {
+            return $array;
         }
+
+        $filter  = 't.fk_statut > 0 AND t.entity = ' . $conf->entity . ' AND cp.fk_categorie IN (' . $category->id  . ')';
+        $tickets = saturne_fetch_all_object_type('Ticket', '', '', 0, 0, ['customsql' => $filter], 'AND', false, false, true);
+        if (!is_array($tickets) || empty($tickets)) {
+            return $array;
+        }
+
+        $array['nbpresquaccidents'] = count($tickets);
+
         return $array;
     }
 

@@ -62,9 +62,7 @@ class Evaluator extends SaturneObject
     public string $picto = 'fontawesome_fa-user-check_fas_#d35968';
 
     public const STATUS_DELETED   = -1;
-    public const STATUS_DRAFT     = 0;
     public const STATUS_VALIDATED = 1;
-    public const STATUS_LOCKED    = 2;
     public const STATUS_ARCHIVED  = 3;
 
 	/**
@@ -128,6 +126,38 @@ class Evaluator extends SaturneObject
 	}
 
     /**
+     * Load evaluator infos
+     *
+     * @param  array     $moreParam More param (filter/filterEvaluator)
+     * @return array     $array     Array of evaluators / evaluatorByEntities
+     * @throws Exception
+     */
+    public static function loadEvaluatorInfos(array $moreParam = []): array
+    {
+        $array = [];
+
+        $select       = ', d.ref AS digiriskElementRef, d.entity AS digiriskElementEntity, d.label AS digiriskElementLabel, u.lastname AS userLastName, u.firstname AS userFirstName';
+        $moreSelects  = ['digiriskElementRef', 'digiriskElementEntity', 'digiriskElementLabel', 'userLastName', 'userFirstName'];
+        $join         = ' INNER JOIN ' . MAIN_DB_PREFIX . 'digiriskdolibarr_digiriskelement AS d ON d.rowid = t.fk_parent';
+        $join        .= ' INNER JOIN ' . MAIN_DB_PREFIX . 'user AS u ON u.rowid = t.fk_user';
+        $filter       = 'd.status = ' . DigiriskElement::STATUS_VALIDATED . ' AND t.status = ' . self::STATUS_VALIDATED . ($moreParam['filter'] ?? '') .  ($moreParam['filterEvaluator'] ?? '');
+        $evaluators   = saturne_fetch_all_object_type('Evaluator', '', '', 0, 0, ['customsql' => $filter], 'AND', false, false, false, $join, [], $select, $moreSelects);
+        if (!is_array($evaluators) || empty($evaluators)) {
+            $evaluators = [];
+        }
+
+        $array['nbEvaluators'] = count($evaluators);
+
+        $array['evaluators'] = [];
+        foreach ($evaluators as $evaluator) {
+            $array['evaluators'][$evaluator->id] = $evaluator;
+            $array['nbEvaluatorByEntities'][$evaluator->entity]++;
+        }
+
+        return $array;
+    }
+
+    /**
      * Load dashboard info evaluator
      *
      * @return array
@@ -164,7 +194,7 @@ class Evaluator extends SaturneObject
 	 */
 	public function getNbEmployeesInvolved(array $moreParam = []) {
 		// Number employees involved
-		$allevaluators = $this->fetchAll('','', 0, 0, ['customsql' => ($moreParam['filter'] ?? '')], 'AND', 'fk_user');
+		$allevaluators = $this->fetchAll('','', 0, 0, ['customsql' => 't.status = ' . Evaluator::STATUS_VALIDATED . ($moreParam['filter'] ?? '')]);
 		if (is_array($allevaluators) && !empty($allevaluators)) {
 			$array['nbemployeesinvolved'] = count($allevaluators);
 		} else {

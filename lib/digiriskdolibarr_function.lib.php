@@ -173,27 +173,48 @@ function digirisk_header($title = '', $helpUrl = '', $arrayofjs = [], $arrayofcs
 }
 
 /**
- *	Recursive tree process
+ * Recursive tree process
  *
- * @param	int             $parent Element Parent id of Digirisk Element object
- * @param 	int             $niveau Depth of tree
- * @param 	array           $array  Global Digirisk Element list
- * @return	array           $result Global Digirisk Element list after recursive process
+ * @param  int   $parentID                  Element parent id of Digirisk Element object
+ * @param  int   $depth                     Depth of tree
+ * @param  array $digiriskElements          Global Digirisk Element list
+ * @param  bool  $addCurrentDigiriskElement Add current digirisk element info
+ * @return array $tree                      Global Digirisk Element list after recursive process
  */
-function recurse_tree($parent, $niveau, $array)
+function recurse_tree(int $parentID, int $depth, array $digiriskElements, bool $addCurrentDigiriskElement = false): array
 {
-	$result = array();
-	foreach ($array as $noeud) {
-		if ($parent == $noeud->fk_parent) {
-			$result[$noeud->id] = array(
-				'id'       => $noeud->id,
-				'depth'    => array('depth' . $noeud->id => $niveau),
-				'object'   => $noeud,
-				'children' => recurse_tree($noeud->id, ($niveau + 1), $array),
-			);
-		}
-	}
-	return $result;
+    $tree = [];
+
+    foreach ($digiriskElements as $digiriskElement) {
+        if ($digiriskElement->fk_parent == $parentID || ($digiriskElement->id == $parentID && $addCurrentDigiriskElement)) {
+            $tree[$digiriskElement->id] = [
+                'id'       => $digiriskElement->id,
+                'depth'    => $depth,
+                'object'   => $digiriskElement,
+                'children' => recurse_tree($digiriskElement->id, $depth + 1, $digiriskElements)
+            ];
+        }
+    }
+
+    return $tree;
+}
+
+function flatten_tree($tree)
+{
+    $flat = [];
+
+    foreach ($tree as $node) {
+        $flat[$node['id']] = [
+            'object' => $node['object'],
+            'depth'  => $node['depth']
+        ];
+
+        if (!empty($node['children'])) {
+            $flat += flatten_tree($node['children']);
+        }
+    }
+
+    return $flat;
 }
 
 /**
@@ -217,7 +238,7 @@ function display_recurse_tree($digiriskElementTree)
 
 	if ($user->rights->digiriskdolibarr->digiriskelement->read) {
 		if ( ! empty($digiriskElementTree)) {
-            $riskType = GETPOSTISSET('type') && !empty(GETPOST('type')) ? GETPOST('type') : 'risk';
+            $riskType = GETPOSTISSET('risk_type') && !empty(GETPOST('risk_type')) ? GETPOST('risk_type') : 'risk';
 			foreach ($digiriskElementTree as $element) { ?>
 				<?php if ($element['object']->id == $conf->global->DIGIRISKDOLIBARR_DIGIRISKELEMENT_TRASH) : ?>
 				<hr>
@@ -239,7 +260,7 @@ function display_recurse_tree($digiriskElementTree)
 					<div class="title" id="scores" value="<?php echo $element['object']->id ?>">
 						<?php
 						if ($user->rights->digiriskdolibarr->risk->read) : ?>
-							<a id="slider" class="linkElement id<?php echo $element['object']->id;?>" href="<?php echo dol_buildpath('/custom/digiriskdolibarr/view/digiriskelement/digiriskelement_risk.php?id=' . $element['object']->id . '&type=' . $riskType, 1);?>">
+							<a id="slider" class="linkElement id<?php echo $element['object']->id;?>" href="<?php echo dol_buildpath('/custom/digiriskdolibarr/view/digiriskelement/digiriskelement_risk.php?id=' . $element['object']->id . '&risk_type=' . $riskType, 1);?>">
 								<span class="title-container">
 									<span class="ref"><?php echo $element['object']->ref; ?></span>
 									<span class="name"><?php echo dol_trunc($element['object']->label, 20); ?></span>

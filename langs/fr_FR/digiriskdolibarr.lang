@@ -66,7 +66,36 @@ Subtitle                                = Sous-titre
 DigiriskElementDepthGraph            = Niveau de profondeur dans les graphiques des éléments Digirisk
 DigiriskElementDepthGraphDescription = Cette option permet de choisir le niveau de profondeur dans les graphiques des éléments Digirisk <br> Défaut : Niveau 1
 
+# WHSRegister = Registre SST
+TicketsPublicInterfaceConfig         = Configuration de l'interface publique des tickets
+WHSRegister                          = Registre SST
+CurrentTicketPublicInterfaceURL      = URL de l'interface publique des tickets
+MulticompanyTicketPublicInterfaceURL = URL de l'interface publique des tickets multi-société
+OriginURL                            = URL d'origine
+ShortURL                             = URL raccourcie
+ExternalURL                          = URL externe
 
+# DigiQuali Sheet - Modèles
+LinkDigiriskdolibarr_digiriskstandard                 = Activer le lien avec les entités principale Digirisk Standard
+LinkDigiriskdolibarr_digiriskstandardDescription      = Permet le lien entre les entités standard Digirisk et les modèles
+LinkDigiriskdolibarr_digiriskelement                  = Activer le lien avec les groupements et unités de travail
+LinkDigiriskdolibarr_digiriskelementDescription       = Permet le lien entre les groupements et unités de travail et les modèles
+LinkDigiriskdolibarr_risk                             = Activer le lien avec les risques
+LinkDigiriskdolibarr_riskDescription                  = Permet le lien entre les risques et les modèles
+LinkDigiriskdolibarr_riskassessment                   = Activer le lien avec les évaluations
+LinkDigiriskdolibarr_riskassessmentDescription        = Permet le lien entre les évaluations et les modèles
+LinkDigiriskdolibarr_evaluator                        = Activer le lien avec les évaluateurs
+LinkDigiriskdolibarr_evaluatorDescription             = Permet le lien entre les évaluateurs et les modèles
+LinkDigiriskdolibarr_risksign                         = Activer le lien avec les signalisations
+LinkDigiriskdolibarr_risksignDescription              = Permet le lien entre les signalisations et les modèles
+LinkDigiriskdolibarr_preventionplan                   = Activer le lien avec les plans de prévention
+LinkDigiriskdolibarr_preventionplanDescription        = Permet le lien entre les plans de prévention et les modèles
+LinkDigiriskdolibarr_firepermit                       = Activer le lien avec les permis de feu
+LinkDigiriskdolibarr_firepermitDescription            = Permet la liaison entre les permis de feu et les modèles
+LinkDigiriskdolibarr_accident                         = Activer le lien avec les accidents
+LinkDigiriskdolibarr_accidentDescription              = Permet le lien entre les accidents et les modèles
+LinkDigiriskdolibarr_accidentinvestigation            = Activer le lien avec les enquêtes accident
+LinkDigiriskdolibarr_accidentinvestigationDescription = Permet le lien entre les enquêtes et les modèles
 
 #
 # DigiriskDolibarr
@@ -376,8 +405,6 @@ ErrorContactHasAtLeastOneChildOfTypeFirePermit    = Le contact est lié à au mo
 ConfirmDeleteFirePermit                           = Êtes-vous sûr de vouloir supprimer ce permis de feu ?
 FirePermitRole                                    = Les rôles du permis de feu
 FirepermitSchedules                               = Horaires du permis de feu
-LinkDigiriskdolibarr_firepermit                   = Activer le lien avec les permis de feu
-LinkDigiriskdolibarr_firepermitDescription        = Permet la liaison entre les permis de feu et les modèles
 
 # Email - Mail
 FirePermitLabel   = Récapitulatif du permis de feu
@@ -596,6 +623,8 @@ AddFirepermitIntoCategory         = Assigner cette catégorie au permis de feu
 RisksCategoriesArea               =	Espace des tags/catégories des risques
 AddRiskIntoCategory               = Assigner cette catégorie au risque
 AddTicketIntoCategory             = Assigner cette catégorie au ticket
+StartDateInvestigate              = Date de début de l'enquête
+EndDateInvestigate                = Date de fin de l'enquête
 
 # AccidentTooltip - Tooltip des accidents
 VictimActivityTooltip              = Précisez l’activité ou la tâche de la victime au moment de l’accident, c’est-à-dire ce que faisait la victime
@@ -956,10 +985,10 @@ RiskNotUnlinkShared                      = Erreur : Risque délié
 HasBeenUnlinkSharedM                     = a été délié
 HasNotBeenUnlinkSharedM                  = n'a pas été délié
 RiskSharedTooltip                        = Cette option permet de partager les risques. <br> INFO : Si vous souhaitez pouvoir afficher les tâches, il faut activer l'option de partage des projets.
-ShowInheritedRisksInListings             = Risques hérités - Listings
-ShowInheritedRisksInListingsDescription  = Afficher les risques hérités dans les listings de Digirisk
-ShowInheritedRisksInDocuments            = Risques hérités - Documents
-ShowInheritedRisksInDocumentsDescription = Afficher les risques hérités dans les documents de Digirisk
+ShowInheritedRisksInListings             = Risques hérités - Listings <br> (provenant des niveaux supérieurs)
+ShowInheritedRisksInListingsDescription  = Les risques hérités sont ceux définis à un niveau supérieur (ex : site ou GP) et automatiquement appliqués au GP/UT. <br> Activez cette option pour les afficher dans les listings
+ShowInheritedRisksInDocuments            = Risques hérités - Documents <br> (provenant des niveaux supérieurs)
+ShowInheritedRisksInDocumentsDescription = Les risques hérités sont ceux définis à un niveau supérieur (ex : site ou GP) et automatiquement appliqués au GP/UT. <br> Activez cette option pour les afficher dans les documents
 DigiriskElementInheritedRisksList        = Liste des risques hérités
 ConfirmImportSharedRisks                 = Veuillez choisir les risques partagés à importer
 RisksRepartition                         = Répartition des risques par évaluation
@@ -1257,6 +1286,7 @@ NonCompliance                            = Non conformité
 FirstName                                = Prénom
 LastName                                 = Nom
 Phone                                    = Téléphone
+DeclarationDate                          = Date de déclaration
 DigiriskTicketPublicAccess               = Une interface publique ne nécessitant aucune identification est disponible à l'url suivante
 TicketActivatePublicInterface            = Activer l'interface publique
 GenerateExtrafields                      = Génération des extrafields de ticket par défaut
@@ -1352,7 +1382,6 @@ QRCodeGenerated                          = QRCode généré
 FkTicket                                 = Ticket lié
 PublicTicket                             = Interface publique des tickets
 TicketPublicInterfaceForbidden           = Accès interdit à l'interface publique des tickets
-WHSRegister                              = Registre SST
 
 #Public interface - Interface publique
 TicketPublicInterfaceShowCategoryDescription     = Afficher la description des catégories de ticket dans l'interface publique
@@ -1384,8 +1413,8 @@ Superior            = Supérieur à
 TimeRangeAdded      = Contrainte ajoutée
 TimeRangeDeleted    = Contrainte supprimée
 
-NumberOfTicketsByMainTagAndByDigiriskElement    = Nombre de registres par catégorie et par GP
-NumberOfTicketsByMainSubTagAndByDigiriskElement = Nombre de registres par sous-catégorie et par GP
+NumberOfTicketsByMainCategorieAndDigiriskElement    = Nombre de registres par catégorie et par GP
+NumberOfTicketsByMainSubCategorieAndDigiriskElement = Nombre de registres par sous-catégorie et par GP
 NumberOfTicketsByYear                           = Nombre de tickets par année
 
 # Ticket Management Dashboard - Tableau de bord de gestion des tickets
@@ -1470,24 +1499,28 @@ DataMigrationDolibarrToDolibarr              = Migration des données de Dolibar
 RepairRisks                                  = Réparer les risques
 NumberOfRisksCorrupted                       = Vous avez %s risque(s) dont la catégorie est corrompue, allez sur la page "Outils" pour le(s) réparer
 NoRiskToRepair                               = Aucun risque à réparer
+DigiriskElementSuccessfullyRepaired          = Élements Digirisk (GP/UT) réparés avec succès
 RiskSuccessfullyRepaired                     = Risques réparés avec succès
 RiskAssessmentSuccessfullyRepaired           = Évaluation réparées avec succès
 CorruptedCategoryOnRiskList                  = Liste des risques dont la catégorie est corrompue
 
 # Clean - Nettoyer
-Clean                          = Nettoyer
-CleanObject                    = Nettoyer les données
-CleanRiskFkElement             = %d risques ont un GP/UT non valide
-CleanRiskStatus                = %d risques ont un statut non valide
-CleanRiskExistFkElement        = %d risques sont orphelins
-CleanRiskExistRiskAssessment   = %d risques ont aucune évaluation
-CleanRisk                      = Nettoyer les risques
-CleanRiskAssessmentStatus      = %d évaluations ont un statut non valide
-CleanRiskAssessmentCotation    = %d évaluations ont une cotation vide
-CleanRiskAssessmentExistFkRisk = %d évaluations sont orphelines
-CleanRiskAssessment            = Nettoyer les évaluations
-NoRiskToClean                  = Aucun risque à nettoyer
-NoRiskAssessmentToClean        = Aucune évaluation à nettoyer
+Clean                                          = Nettoyer
+CleanObject                                    = Nettoyer les données
+CleanDigiriskElementExistParentDigiriskElement = %d éléments Digirisk (GP/UT) ont un parent non valide
+CleanDigiriskElement                           = Nettoyer les éléments Digirisk (GP/UT)
+CleanRiskFkElement                             = %d risques ont un GP/UT non valide
+CleanRiskStatus                                = %d risques ont un statut non valide
+CleanRiskExistFkElement                        = %d risques sont orphelins
+CleanRiskExistRiskAssessment                   = %d risques ont aucune évaluation
+CleanRisk                                      = Nettoyer les risques
+CleanRiskAssessmentStatus                      = %d évaluations ont un statut non valide
+CleanRiskAssessmentCotation                    = %d évaluations ont une cotation vide
+CleanRiskAssessmentExistFkRisk                 = %d évaluations sont orphelines
+CleanRiskAssessment                            = Nettoyer les évaluations
+NoDigiriskElementToClean                       = Aucun élément Digirisk (GP/UT) à nettoyer
+NoRiskToClean                                  = Aucun risque à nettoyer
+NoRiskAssessmentToClean                        = Aucune évaluation à nettoyer
 
 
 #
@@ -1536,3 +1569,4 @@ PermissionInheritedFromConfig       = Les permissions sont héritées de la conf
 CategorieManagement                 = Gestion des catégories
 ShowSelectedRiskTypes               = Sélectionnez les types de risques à afficher
 CharRemaining                       = Caractères restants
+NumberOfLinkedFiles                 = Nombre de fichiers joints

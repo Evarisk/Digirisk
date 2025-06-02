@@ -68,6 +68,8 @@ class RiskAssessmentDocument extends DigiriskDocuments
 		$json = [];
         $now  = dol_now(); // To change later because we have to use this->date_creation
 
+        $userTmp = new User($this->db);
+
 		if (!isset($conf->global->DIGIRISKDOLIBARR_RISKASSESSMENTDOCUMENT_AUDIT_START_DATE) || dol_strlen($conf->global->DIGIRISKDOLIBARR_RISKASSESSMENTDOCUMENT_AUDIT_START_DATE) < 1) {
 			dolibarr_set_const($this->db, 'DIGIRISKDOLIBARR_RISKASSESSMENTDOCUMENT_AUDIT_START_DATE', dol_now(), 'chaine', 0, '', $conf->entity);
 		}
@@ -77,9 +79,9 @@ class RiskAssessmentDocument extends DigiriskDocuments
 
 		// *** JSON FILLING ***
 		$json['RiskAssessmentDocument']['nomEntreprise']  = $conf->global->MAIN_INFO_SOCIETE_NOM;
-		$json['RiskAssessmentDocument']['dateAudit']      = dol_print_date($conf->global->DIGIRISKDOLIBARR_RISKASSESSMENTDOCUMENT_AUDIT_START_DATE, '%d/%m/%Y', 'tzuser') . ' - ' . dol_print_date($conf->global->DIGIRISKDOLIBARR_RISKASSESSMENTDOCUMENT_AUDIT_END_DATE, '%d/%m/%Y', 'tzuser');
+		$json['RiskAssessmentDocument']['dateAudit']      = dol_print_date($conf->global->DIGIRISKDOLIBARR_RISKASSESSMENTDOCUMENT_AUDIT_START_DATE, 'day', 'tzuser') . ' - ' . dol_print_date($conf->global->DIGIRISKDOLIBARR_RISKASSESSMENTDOCUMENT_AUDIT_END_DATE, 'day', 'tzuser');
 		$json['RiskAssessmentDocument']['emetteurDUER']   = $user->lastname . ' ' . $user->firstname;
-		$json['RiskAssessmentDocument']['dateGeneration'] = dol_print_date($now, '%d/%m/%Y %H:%M:%S', 'tzuser');
+		$json['RiskAssessmentDocument']['dateGeneration'] = dol_print_date($now, 'dayhour', 'tzuser');
 
 		$userRecipient = json_decode($conf->global->DIGIRISKDOLIBARR_RISKASSESSMENTDOCUMENT_RECIPIENT);
 
@@ -88,11 +90,11 @@ class RiskAssessmentDocument extends DigiriskDocuments
         $json['RiskAssessmentDocument']['portable'] = '';
 		if (is_array($userRecipient) && !empty($userRecipient)) {
 			foreach ($userRecipient as $recipientId) {
-				$user->fetch($recipientId);
+				$userTmp->fetch($recipientId);
 
-				$json['RiskAssessmentDocument']['destinataireDUER'] .= dol_strtoupper($user->lastname) . ' ' . ucfirst($user->firstname) . chr(0x0A);
-				$json['RiskAssessmentDocument']['telephone']        .= (dol_strlen($user->office_phone) > 0 ? $user->office_phone : '-') . chr(0x0A);
-				$json['RiskAssessmentDocument']['portable']         .= (dol_strlen($user->user_mobile) > 0 ? $user->user_mobile : '-') . chr(0x0A);
+				$json['RiskAssessmentDocument']['destinataireDUER'] .= dol_strtoupper($userTmp->lastname) . ' ' . ucfirst($userTmp->firstname) . chr(0x0A);
+				$json['RiskAssessmentDocument']['telephone']        .= (dol_strlen($userTmp->office_phone) > 0 ? $userTmp->office_phone : '-') . chr(0x0A);
+				$json['RiskAssessmentDocument']['portable']         .= (dol_strlen($userTmp->user_mobile) > 0 ? $userTmp->user_mobile : '-') . chr(0x0A);
 			}
 		}
 

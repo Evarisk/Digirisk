@@ -518,8 +518,8 @@ if ($entity > 0) {
     if (GETPOSTISSET('parentCategory') || GETPOSTISSET('parentCategory') && GETPOSTISSET('subCategory')) : ?>
         <div class="wpeo-form tableforinputfields">
             <div class="wpeo-gridlayout grid-2">
-                <?php  $visible = getDolGlobalInt('DIGIRISKDOLIBARR_TICKET_PUBLIC_INTERFACE_SHOW_CATEGORY_DESCRIPTION') || (!getDolGlobalInt('DIGIRISKDOLIBARR_TICKET_PUBLIC_INTERFACE_SHOW_CATEGORY_DESCRIPTION') && $mainCategoryChildrenExtrafields->show_description)
-            || (!getDolGlobalInt('DIGIRISKDOLIBARR_TICKET_PUBLIC_INTERFACE_SHOW_CATEGORY_DESCRIPTION') && $mainCategoryChildrenExtrafields->show_description == NUll && $subCategoryExtrafields->show_description);
+                <?php
+				$visible = $mainCategoryChildrenExtrafields->show_description || $subCategoryExtrafields->show_description;
                 if ($visible && dol_strlen($categoryDescription) > 0) : ?>
                     <div class="form-element gridw-2">
                         <span class="form-label"><?php print $langs->trans('Description'); ?>
@@ -531,10 +531,10 @@ if ($entity > 0) {
                         </label>
                     </div>
                 <?php endif; ?>
-                <div class="form-element">
-                    <span class="form-label"><?php print $langs->trans("Message"); ?><span style="color:red"> *</span></span>
+				<div class="form-element">
+                    <span class="form-label"><?php print $langs->trans("Message"); ?><?php echo ($required ? '<span style="color:red"> *</span>' : ''); ?></span>
                     <label class="form-field-container">
-                        <textarea name="message" id="message" required><?php echo GETPOST('message');?></textarea>
+                        <textarea name="message" id="message" <?php echo ($required ? 'required' : ''); ?>><?php echo GETPOST('message');?></textarea>
                     </label>
                 </div>
                 <div class="form-element">
@@ -606,10 +606,8 @@ if ($entity > 0) {
                         if (strpos($key, 'digiriskdolibarr_ticket') === false) {
                             continue; // Goes to the next element if ‘digiriskdolibarr_ticket’ is not found
                         }
-                        $visible = getDolGlobalInt(dol_strtoupper($key) . '_VISIBLE') || (!getDolGlobalInt(dol_strtoupper($key) . '_VISIBLE') && $mainCategoryChildrenExtrafields->{$key . '_visible'})
-                        || (!getDolGlobalInt(dol_strtoupper($key) . '_VISIBLE') && $mainCategoryChildrenExtrafields->{$key . '_visible'} == NUll && $subCategoryExtrafields->{$key . '_visible'});
-                        $required = getDolGlobalInt(dol_strtoupper($key) . '_REQUIRED') || (!getDolGlobalInt(dol_strtoupper($key) . '_REQUIRED') && $mainCategoryChildrenExtrafields->{$key . '_required'})
-                        || (!getDolGlobalInt(dol_strtoupper($key) . '_REQUIRED') && $mainCategoryChildrenExtrafields->{$key . '_required'} == NUll && $subCategoryExtrafields->{$key . '_required'});
+                        $visible = $mainCategoryChildrenExtrafields->{$key . '_visible'} || $subCategoryExtrafields->{$key . '_visible'};
+                        $required = $mainCategoryChildrenExtrafields->{$key . '_required'} || $subCategoryExtrafields->{$key . '_required'};
                         if ($visible) {
                             $out  = '<div class="form-element form-field-container">';
                             $out .= '<label><span class="form-label"' . ($required ? '' : 'style="font-weight:300"') . '>' . $langs->transnoentities($field) . ($required ? '<span style="color:red"> *</span>' : '') . '</span>';
@@ -640,8 +638,7 @@ if ($entity > 0) {
         print '</div>';
         print dol_get_fiche_end();
 
-        $visible = getDolGlobalInt('DIGIRISKDOLIBARR_TICKET_PUBLIC_INTERFACE_USE_SIGNATORY') || (!getDolGlobalInt('DIGIRISKDOLIBARR_TICKET_PUBLIC_INTERFACE_USE_SIGNATORY') && $mainCategoryChildrenExtrafields->use_signatory)
-        || (!getDolGlobalInt('DIGIRISKDOLIBARR_TICKET_PUBLIC_INTERFACE_USE_SIGNATORY') && $mainCategoryChildrenExtrafields->use_signatory && $subCategoryExtrafields->use_signatory);
+        $visible = $mainCategoryChildrenExtrafields->use_signatory || $subCategoryExtrafields->use_signatory;
         if ($visible) {
             // Load Saturne libraries
             require_once __DIR__ . '/../../../saturne/lib/saturne_functions.lib.php';
