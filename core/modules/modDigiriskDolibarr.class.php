@@ -763,22 +763,7 @@ class modDigiriskdolibarr extends DolibarrModules
 			$i++ => ['DIGIRISKDOLIBARR_TICKET_PROJECT', 'integer', 0, '', 0, 'current'],
 			$i++ => ['DIGIRISKDOLIBARR_TICKET_SUCCESS_MESSAGE', 'chaine', $langs->trans('YouMustNotifyYourHierarchy'), '', 0, 'current'],
 			$i++ => ['DIGIRISKDOLIBARR_SHOW_MULTI_ENTITY_SELECTOR_ON_TICKET_PUBLIC_INTERFACE', 'integer', 0, '', 0, 'current'],
-			$i++ => ['DIGIRISKDOLIBARR_TICKET_DIGIRISKELEMENT_VISIBLE', 'integer', 1, '', 0, 'current'],
-			$i++ => ['DIGIRISKDOLIBARR_TICKET_DIGIRISKELEMENT_REQUIRED', 'integer', 1, '', 0, 'current'],
 			$i++ => ['DIGIRISKDOLIBARR_TICKET_DIGIRISKELEMENT_HIDE_REF', 'integer', 0, '', 0, 'current'],
-			$i++ => ['DIGIRISKDOLIBARR_TICKET_PHOTO_VISIBLE', 'integer', 1, '', 0, 'current'],
-			$i++ => ['DIGIRISKDOLIBARR_TICKET_EMAIL_VISIBLE', 'integer', 0, '', 0, 'current'],
-			$i++ => ['DIGIRISKDOLIBARR_TICKET_EMAIL_REQUIRED', 'integer', 0, '', 0, 'current'],
-			$i++ => ['DIGIRISKDOLIBARR_TICKET_FIRSTNAME_VISIBLE', 'integer', 1, '', 0, 'current'],
-			$i++ => ['DIGIRISKDOLIBARR_TICKET_FIRSTNAME_REQUIRED', 'integer', 1, '', 0, 'current'],
-			$i++ => ['DIGIRISKDOLIBARR_TICKET_LASTNAME_VISIBLE', 'integer', 1, '', 0, 'current'],
-			$i++ => ['DIGIRISKDOLIBARR_TICKET_LASTNAME_REQUIRED', 'integer', 1, '', 0, 'current'],
-			$i++ => ['DIGIRISKDOLIBARR_TICKET_PHONE_VISIBLE', 'integer', 1, '', 0, 'current'],
-			$i++ => ['DIGIRISKDOLIBARR_TICKET_PHONE_REQUIRED', 'integer', 0, '', 0, 'current'],
-			$i++ => ['DIGIRISKDOLIBARR_TICKET_LOCATION_VISIBLE', 'integer', 1, '', 0, 'current'],
-			$i++ => ['DIGIRISKDOLIBARR_TICKET_LOCATION_REQUIRED', 'integer', 0, '', 0, 'current'],
-			$i++ => ['DIGIRISKDOLIBARR_TICKET_DATE_VISIBLE', 'integer', 1, '', 0, 'current'],
-            $i++ => ['DIGIRISKDOLIBARR_TICKET_DATE_REQUIRED', 'integer', 1, '', 0, 'current'],
             $i++ => ['DIGIRISKDOLIBARR_TICKET_STATISTICS_ACCIDENT_TIME_RANGE', 'chaine', '{"'. $langs->transnoentities("WithoutWorkStop") .'":"less:1:days", "'.  $langs->transnoentities("LessThanFourDays") .'":"less:4:days","'.  $langs->transnoentities("LessThanTwentyOneDays") .'":"less:21:days","'.  $langs->transnoentities("LessThanThreeMonth") .'":"less:3:months","'.  $langs->transnoentities("LessThanSixMonths") .'":"less:6:months","'.  $langs->transnoentities("LongTimeWorkStop") .'":"more:6:months"}', '', 0, 'current'],
 
 			// CONST MODULE
@@ -2548,6 +2533,30 @@ class modDigiriskdolibarr extends DolibarrModules
                 dolibarr_set_const($this->db, 'DIGIRISKDOLIBARR_BACKWARD_TRASH_ELEMENTS', 1, 'integer');
             }
         }
+		// BACKWARD REMOVE TICKET PUBLIC INTERFACE CONST
+		if (!getDolGlobalInt('DIGIRISKDOLIBARR_REMOVE_TICKET_PUBLIC_INTERFACE_CONST') && $conf->global->DIGIRISKDOLIBARR_TICKET_MAIN_CATEGORY) {
+			$categorie = new Categorie($this->db);
+
+			$categorie->fetch($conf->global->DIGIRISKDOLIBARR_TICKET_MAIN_CATEGORY);
+			$categorie->table_element = 'categorie';
+			$categorie->array_options['options_ticket_category_config'] = json_encode([
+				"digiriskdolibarr_ticket_lastname_visible" => "on",
+				"digiriskdolibarr_ticket_lastname_required" => "on",
+				"digiriskdolibarr_ticket_firstname_visible" => "on",
+				"digiriskdolibarr_ticket_firstname_required" => "on",
+				"digiriskdolibarr_ticket_phone_visible" => "on",
+				"digiriskdolibarr_ticket_phone_required" => "",
+				"digiriskdolibarr_ticket_service_visible" => "on",
+				"digiriskdolibarr_ticket_service_required" => "on",
+				"digiriskdolibarr_ticket_location_visible" => "on",
+				"digiriskdolibarr_ticket_location_required" => "",
+				"digiriskdolibarr_ticket_date_visible" => "on",
+				"digiriskdolibarr_ticket_date_required" => "on",
+			]);
+			$categorie->updateExtraField('ticket_category_config');
+
+			dolibarr_set_const($this->db, 'DIGIRISKDOLIBARR_REMOVE_TICKET_PUBLIC_INTERFACE_CONST', 1, 'integer', 0, '', $conf->entity);
+		}
 
         return $this->_init($sql, $options);
 	}

@@ -453,10 +453,12 @@ if ($entity > 0) {
 
 	print '<p><strong>' . $conf->global->DIGIRISKDOLIBARR_TICKET_PARENT_CATEGORY_LABEL . '</strong><span style="color:red"> *</span></p>';
 
-	$mainCategoryObject = $category->rechercher($conf->global->DIGIRISKDOLIBARR_TICKET_MAIN_CATEGORY, '', 'ticket', true);
-    $mainCategoryChildrenExtrafields = new StdClass();
+	$mainCategoryObject              = $category->rechercher($conf->global->DIGIRISKDOLIBARR_TICKET_MAIN_CATEGORY, '', 'ticket', true);
+    $mainCategoryExtrafields         = json_decode($mainCategoryObject[0]->array_options['options_ticket_category_config']);
+	$mainCategoryChildrenExtrafields = new StdClass();
     $subCategoryExtrafields          = new StdClass();
     $categoryDescription             = '';
+	$mainCategoryChildrenItem		 = null;
 
 	print '<div class="wpeo-gridlayout grid-3 categories-container">';
 	if ( ! empty($mainCategoryObject) && $mainCategoryObject > 0) {
@@ -465,8 +467,9 @@ if ($entity > 0) {
 			$k = 1;
 			foreach ($mainCategoryChildren as $cat) {
 				if ($cat->id == GETPOST('parentCategory')) {
-                    $mainCategoryChildrenExtrafields = json_decode($cat->array_options['options_ticket_category_config']);
+					$mainCategoryChildrenExtrafields = json_decode($cat->array_options['options_ticket_category_config']);
                     $categoryDescription             = $cat->description;
+					$mainCategoryChildrenItem        = $cat;
 					print '<div class="ticket-parentCategory ticket-parentCategory'. $cat->id .' active" id="' . $cat->id . '" data-rowid="' . $cat->id . '">';
 				} else {
 					print '<div class="ticket-parentCategory ticket-parentCategory'. $cat->id .'" id="' . $cat->id . '" data-rowid="' . $cat->id . '">';
@@ -484,20 +487,18 @@ if ($entity > 0) {
 
 			print '<div class="centpercent tableforimgfields">' . "\n";
 
-			foreach ($mainCategoryChildren as $cat) {
-				$selectedParentCategory = $category;
-                $selectedParentCategory->fetch($cat->id);
-				$selectedParentCategoryChildren = $selectedParentCategory->get_filles();
+			if ($mainCategoryChildrenItem) {
+				$category->fetch($mainCategoryChildrenItem->id);
+				$selectedParentCategoryChildren = $category->get_filles();
 				if ( ! empty($selectedParentCategoryChildren)) {
-
-					print '<div class="subCategories children'. $cat->id .'"'. (GETPOST('parentCategory') == $cat->id ? '' : ' style="display:none">');
+					print '<div class="subCategories children'. $cat->id .'">';
 					print '<p><strong>' . $conf->global->DIGIRISKDOLIBARR_TICKET_CHILD_CATEGORY_LABEL . '</strong></p>';
 					print '<div class="wpeo-gridlayout grid-5">';
 
 					foreach ($selectedParentCategoryChildren as $subCategory) {
 						if ($subCategory->id == GETPOST('subCategory')) {
-                            $subCategoryExtrafields = json_decode($subCategory->array_options['options_ticket_category_config']);
-                            $categoryDescription    = $subCategory->description;
+							$subCategoryExtrafields = json_decode($subCategory->array_options['options_ticket_category_config']);
+							$categoryDescription    = $subCategory->description;
 							print '<div class="ticket-subCategory ticket-subCategory'. $subCategory->id .' center active" id="' . $subCategory->id . '" data-rowid="' . $subCategory->id . '">';
 						} else {
 							print '<div class="ticket-subCategory ticket-subCategory'. $subCategory->id .' center" id="' . $subCategory->id . '" data-rowid="' . $subCategory->id . '" style="background:#ffffff">';
@@ -515,11 +516,11 @@ if ($entity > 0) {
 		}
 	}
 
-    if (GETPOSTISSET('parentCategory') || GETPOSTISSET('parentCategory') && GETPOSTISSET('subCategory')) : ?>
+    if ((GETPOSTISSET('parentCategory') && empty($selectedParentCategoryChildren)) || (GETPOSTISSET('parentCategory') && GETPOSTISSET('subCategory'))) : ?>
         <div class="wpeo-form tableforinputfields">
             <div class="wpeo-gridlayout grid-2">
                 <?php
-				$visible = $mainCategoryChildrenExtrafields->show_description || $subCategoryExtrafields->show_description;
+				$visible = $mainCategoryExtrafields->show_description || $mainCategoryChildrenExtrafields->show_description || $subCategoryExtrafields->show_description;
                 if ($visible && dol_strlen($categoryDescription) > 0) : ?>
                     <div class="form-element gridw-2">
                         <span class="form-label"><?php print $langs->trans('Description'); ?>
@@ -538,7 +539,7 @@ if ($entity > 0) {
                     </label>
                 </div>
                 <div class="form-element">
-                    <?php if ($conf->global->DIGIRISKDOLIBARR_TICKET_PHOTO_VISIBLE || (!$conf->global->DIGIRISKDOLIBARR_TICKET_PHOTO_VISIBLE && $mainCategoryChildrenExtrafields->photo_visible)) {?>
+                    <?php if ($mainCategoryChildrenExtrafields->photo_visible) {?>
                     <div class="wpeo-gridlayout grid-2">
                         <span class="form-label"><?php print $langs->trans("FilesLinked"); ?></span>
                         <label class="wpeo-button button-blue" for="sendfile">
@@ -584,7 +585,7 @@ if ($entity > 0) {
                 </div>
                 <?php
                 if (dolibarr_get_const($db, 'DIGIRISKDOLIBARR_TICKET_EXTRAFIELDS', 0)) {
-                    if ($conf->global->DIGIRISKDOLIBARR_TICKET_DIGIRISKELEMENT_VISIBLE || (!$conf->global->DIGIRISKDOLIBARR_TICKET_DIGIRISKELEMENT_VISIBLE && $mainCategoryChildrenExtrafields->digiriskelement_visible)) {
+                    if ($mainCategoryChildrenExtrafields->digiriskelement_visible) {
                         $selectDigiriskElement = '<div class="gridw-2"><span ' . (($conf->global->DIGIRISKDOLIBARR_TICKET_DIGIRISKELEMENT_REQUIRED) ? 'style="font-weight:600"' : '') . '>' . $langs->trans('Service') . (($conf->global->DIGIRISKDOLIBARR_TICKET_DIGIRISKELEMENT_REQUIRED) ? '<span style="color:red"> *</span>' : '') . '</span>';
 
                         $deletedElements = $digiriskelement->getMultiEntityTrashList();
@@ -606,8 +607,8 @@ if ($entity > 0) {
                         if (strpos($key, 'digiriskdolibarr_ticket') === false) {
                             continue; // Goes to the next element if ‘digiriskdolibarr_ticket’ is not found
                         }
-                        $visible = $mainCategoryChildrenExtrafields->{$key . '_visible'} || $subCategoryExtrafields->{$key . '_visible'};
-                        $required = $mainCategoryChildrenExtrafields->{$key . '_required'} || $subCategoryExtrafields->{$key . '_required'};
+                        $visible = $mainCategoryExtrafields->{$key . '_visible'} || $mainCategoryChildrenExtrafields->{$key . '_visible'} || $subCategoryExtrafields->{$key . '_visible'};
+                        $required = $mainCategoryExtrafields->{$key . '_required'} || $mainCategoryChildrenExtrafields->{$key . '_required'} || $subCategoryExtrafields->{$key . '_required'};
                         if ($visible) {
                             $out  = '<div class="form-element form-field-container">';
                             $out .= '<label><span class="form-label"' . ($required ? '' : 'style="font-weight:300"') . '>' . $langs->transnoentities($field) . ($required ? '<span style="color:red"> *</span>' : '') . '</span>';
@@ -638,7 +639,7 @@ if ($entity > 0) {
         print '</div>';
         print dol_get_fiche_end();
 
-        $visible = $mainCategoryChildrenExtrafields->use_signatory || $subCategoryExtrafields->use_signatory;
+        $visible = $mainCategoryExtrafields->use_signatory || $mainCategoryChildrenExtrafields->use_signatory || $subCategoryExtrafields->use_signatory;
         if ($visible) {
             // Load Saturne libraries
             require_once __DIR__ . '/../../../saturne/lib/saturne_functions.lib.php';

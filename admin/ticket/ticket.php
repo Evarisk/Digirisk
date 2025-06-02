@@ -156,6 +156,28 @@ if ($action == 'generateCategories') {
 	$upload_dir = $conf->categorie->multidir_output[$conf->entity?:1];
 
 	$result = createTicketCategory($langs->transnoentities('Register'), '', '', 1, 'ticket');
+
+	$object = new Categorie($db);
+	$object->fetch($result);
+
+	$object->table_element = 'categorie';
+	$object->array_options['options_ticket_category_config'] = json_encode([
+		"digiriskdolibarr_ticket_lastname_visible" => "on",
+		"digiriskdolibarr_ticket_lastname_required" => "on",
+		"digiriskdolibarr_ticket_firstname_visible" => "on",
+		"digiriskdolibarr_ticket_firstname_required" => "on",
+		"digiriskdolibarr_ticket_phone_visible" => "on",
+		"digiriskdolibarr_ticket_phone_required" => "",
+		"digiriskdolibarr_ticket_service_visible" => "on",
+		"digiriskdolibarr_ticket_service_required" => "on",
+		"digiriskdolibarr_ticket_location_visible" => "on",
+		"digiriskdolibarr_ticket_location_required" => "",
+		"digiriskdolibarr_ticket_date_visible" => "on",
+		"digiriskdolibarr_ticket_date_required" => "on",
+	]);
+	$object->updateExtraField('ticket_category_config');
+
+
 	dolibarr_set_const($db, 'DIGIRISKDOLIBARR_TICKET_MAIN_CATEGORY', $result, 'integer', 0, '', $conf->entity);
 
 	if ($result > 0) {
