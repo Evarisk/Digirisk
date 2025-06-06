@@ -2534,10 +2534,10 @@ class modDigiriskdolibarr extends DolibarrModules
             }
         }
 		// BACKWARD REMOVE TICKET PUBLIC INTERFACE CONST
-		if (!getDolGlobalInt('DIGIRISKDOLIBARR_REMOVE_TICKET_PUBLIC_INTERFACE_CONST') && $conf->global->DIGIRISKDOLIBARR_TICKET_MAIN_CATEGORY) {
+		if (!getDolGlobalInt('DIGIRISKDOLIBARR_REMOVE_TICKET_PUBLIC_INTERFACE_CONST') && getDolGlobalInt('DIGIRISKDOLIBARR_TICKET_MAIN_CATEGORY')) {
 			$categorie = new Categorie($this->db);
 
-			$categorie->fetch($conf->global->DIGIRISKDOLIBARR_TICKET_MAIN_CATEGORY);
+			$categorie->fetch(getDolGlobalInt('DIGIRISKDOLIBARR_TICKET_MAIN_CATEGORY'));
 			$categorie->table_element = 'categorie';
 			$categorie->array_options['options_ticket_category_config'] = json_encode([
 				"digiriskdolibarr_ticket_lastname_visible" => "on",
@@ -2555,7 +2555,7 @@ class modDigiriskdolibarr extends DolibarrModules
 			]);
 			$categorie->updateExtraField('ticket_category_config');
 
-			dolibarr_set_const($this->db, 'DIGIRISKDOLIBARR_REMOVE_TICKET_PUBLIC_INTERFACE_CONST', 1, 'integer', 0, '', $conf->entity);
+			dolibarr_set_const($this->db, 'DIGIRISKDOLIBARR_REMOVE_TICKET_PUBLIC_INTERFACE_CONST', 1, 'integer', 0, '', 0);
 		}
 
         return $this->_init($sql, $options);
