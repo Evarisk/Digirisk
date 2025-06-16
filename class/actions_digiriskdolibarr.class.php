@@ -1132,7 +1132,6 @@ class ActionsDigiriskdolibarr
 
 	public function saturneAddAttendantRow($parameters)
 	{
-
 		if ($parameters['signatoryRole'] == 'Victim' && !empty($parameters['signatories'])) {
 			return 1;
 		}
