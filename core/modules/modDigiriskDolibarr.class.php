@@ -2533,30 +2533,32 @@ class modDigiriskdolibarr extends DolibarrModules
                 dolibarr_set_const($this->db, 'DIGIRISKDOLIBARR_BACKWARD_TRASH_ELEMENTS', 1, 'integer');
             }
         }
-		// BACKWARD REMOVE TICKET PUBLIC INTERFACE CONST
-		if (!getDolGlobalInt('DIGIRISKDOLIBARR_REMOVE_TICKET_PUBLIC_INTERFACE_CONST') && getDolGlobalInt('DIGIRISKDOLIBARR_TICKET_MAIN_CATEGORY')) {
-			$categorie = new Categorie($this->db);
 
-			$categorie->fetch(getDolGlobalInt('DIGIRISKDOLIBARR_TICKET_MAIN_CATEGORY'));
-			$categorie->table_element = 'categorie';
-			$categorie->array_options['options_ticket_category_config'] = json_encode([
-				"digiriskdolibarr_ticket_lastname_visible" => "on",
-				"digiriskdolibarr_ticket_lastname_required" => "on",
-				"digiriskdolibarr_ticket_firstname_visible" => "on",
-				"digiriskdolibarr_ticket_firstname_required" => "on",
-				"digiriskdolibarr_ticket_phone_visible" => "on",
-				"digiriskdolibarr_ticket_phone_required" => "",
-				"digiriskdolibarr_ticket_service_visible" => "on",
-				"digiriskdolibarr_ticket_service_required" => "on",
-				"digiriskdolibarr_ticket_location_visible" => "on",
-				"digiriskdolibarr_ticket_location_required" => "",
-				"digiriskdolibarr_ticket_date_visible" => "on",
-				"digiriskdolibarr_ticket_date_required" => "on",
-			]);
-			$categorie->updateExtraField('ticket_category_config');
+        // BACKWARD REMOVE TICKET PUBLIC INTERFACE CONST
+        if (!getDolGlobalInt('DIGIRISKDOLIBARR_REMOVE_TICKET_PUBLIC_INTERFACE_CONST') && getDolGlobalInt('DIGIRISKDOLIBARR_TICKET_MAIN_CATEGORY')) {
+            $category = new Categorie($this->db);
 
-			dolibarr_set_const($this->db, 'DIGIRISKDOLIBARR_REMOVE_TICKET_PUBLIC_INTERFACE_CONST', 1, 'integer', 0, '', 0);
-		}
+            $category->fetch(getDolGlobalInt('DIGIRISKDOLIBARR_TICKET_MAIN_CATEGORY'));
+
+            $category->table_element = 'categorie';
+            $category->array_options['options_ticket_category_config'] = json_encode([
+                'digiriskdolibarr_ticket_lastname_visible'   => 'on',
+                'digiriskdolibarr_ticket_lastname_required'  => 'on',
+                'digiriskdolibarr_ticket_firstname_visible'  => 'on',
+                'digiriskdolibarr_ticket_firstname_required' => 'on',
+                'digiriskdolibarr_ticket_phone_visible'      => 'on',
+                'digiriskdolibarr_ticket_phone_required'     => '',
+                'digiriskdolibarr_ticket_service_visible'    => 'on',
+                'digiriskdolibarr_ticket_service_required'   => 'on',
+                'digiriskdolibarr_ticket_location_visible'   => 'on',
+                'digiriskdolibarr_ticket_location_required'  => '',
+                'digiriskdolibarr_ticket_date_visible'       => 'on',
+                'digiriskdolibarr_ticket_date_required'      => 'on'
+            ]);
+            $category->updateExtraField('ticket_category_config');
+
+            dolibarr_set_const($this->db, 'DIGIRISKDOLIBARR_REMOVE_TICKET_PUBLIC_INTERFACE_CONST', 1, 'integer', 0, '', $conf->entity);
+        }
 
         return $this->_init($sql, $options);
 	}
