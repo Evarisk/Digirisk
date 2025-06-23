@@ -466,8 +466,12 @@ if ($entity > 0) {
 		if ( ! empty($mainCategoryChildren) && $mainCategoryChildren > 0) {
 			$k = 1;
 			foreach ($mainCategoryChildren as $cat) {
+				$catArrayOptions = json_decode($cat->array_options['options_ticket_category_config']);
+				if (!empty($catArrayOptions->external_link)) {
+					print '<a href="' . $catArrayOptions->external_link . '" class="category-redirect"' . ($catArrayOptions->external_link_new_tab ? 'target="_blank"' : '') . '>';
+				}
 				if ($cat->id == GETPOST('parentCategory')) {
-					$mainCategoryChildrenExtrafields = json_decode($cat->array_options['options_ticket_category_config']);
+					$mainCategoryChildrenExtrafields = $catArrayOptions;
                     $categoryDescription             = $cat->description;
 					$mainCategoryChildrenItem        = $cat;
 					print '<div class="ticket-parentCategory ticket-parentCategory'. $cat->id .' active" id="' . $cat->id . '" data-rowid="' . $cat->id . '">';
@@ -481,6 +485,9 @@ if ($entity > 0) {
 				print '</div>';
 
 				print '</div>';
+				if ( ! empty($catArrayOptions->external_link)) {
+					print '</a>';
+				}
 				$k++;
 			}
 			print '</div>';
@@ -496,8 +503,11 @@ if ($entity > 0) {
 					print '<div class="wpeo-gridlayout grid-5">';
 
 					foreach ($selectedParentCategoryChildren as $subCategory) {
+						$subCategoryExtrafields = json_decode($subCategory->array_options['options_ticket_category_config']);
+						if (!empty($subCategoryExtrafields->external_link)) {
+							print '<a href="' . $subCategoryExtrafields->external_link . '" class="category-redirect"' . ($subCategoryExtrafields->external_link_new_tab ? 'target="_blank"' : '') . '>';
+						}
 						if ($subCategory->id == GETPOST('subCategory')) {
-							$subCategoryExtrafields = json_decode($subCategory->array_options['options_ticket_category_config']);
 							$categoryDescription    = $subCategory->description;
 							print '<div class="ticket-subCategory ticket-subCategory'. $subCategory->id .' center active" id="' . $subCategory->id . '" data-rowid="' . $subCategory->id . '">';
 						} else {
@@ -506,6 +516,9 @@ if ($entity > 0) {
 						show_category_image($subCategory, $upload_dir);
 						print '<span class="button-label">' . $subCategory->label . '</span>';
 						print '</div>';
+						if (!empty($subCategoryExtrafields->external_link)) {
+							print '</a>';
+						}
 					}
 					print '</div>';
 					print '</div>';
