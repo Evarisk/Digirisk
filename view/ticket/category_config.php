@@ -88,11 +88,13 @@ if ($resHook < 0) {
 
 if (empty($resHook)) {
     if ($action == 'set_ticket_category_config') {
-        $data['use_signatory']    = GETPOST('use_signatory');
-        $data['show_description'] = GETPOST('show_description');
-        $data['mail_template']    = GETPOST('mail_template');
-        $data['recipients']       = implode(',', GETPOST('recipients', 'array'));
-        $data['photo_visible']    = GETPOST('photo_visible');
+        $data['use_signatory']         = GETPOST('use_signatory');
+        $data['show_description']      = GETPOST('show_description');
+        $data['mail_template']         = GETPOST('mail_template');
+        $data['recipients']            = implode(',', GETPOST('recipients', 'array'));
+        $data['photo_visible']         = GETPOST('photo_visible');
+        $data['external_link']         = GETPOST('external_link');
+        $data['external_link_new_tab'] = GETPOST('external_link_new_tab') ? 1 : 0;
 
         $extraFields->attributes['ticket']['label']['digiriskdolibarr_ticket_email'] = $langs->trans('Email');
         foreach ($extraFields->attributes['ticket']['label'] as $key => $field) {
@@ -201,6 +203,20 @@ if (is_array($userTmp->users) && !empty($userTmp->users)) {
 } else {
     print $langs->transnoentities('NoRecipient');
 }
+print '</td></tr>';
+
+// External link
+print '<tr class="oddeven"><td>';
+print img_picto('', 'fa-external-link-alt', 'class="paddingrightonly" style="color: black!important"') . $form->textwithpicto($langs->transnoentities('ExternalLink'), $langs->transnoentities('ExternalLinkDescription'), 1, 'info') . '</td>';
+print '</td><td class="center">';
+print '<input type="url" name="external_link" id="external_link" class="marginleftonly" placeholder="https://demo.digirisk.com/ticket" pattern="https?://.*" size="30" value="' . $ticketCategoryConfig->external_link . '" /><br>';
+print '</td></tr>';
+
+// External Link in new tab
+print '<tr class="oddeven"><td>';
+print img_picto('', 'fa-external-link-alt', 'class="paddingrightonly" style="color: black!important"') . $langs->transnoentities('ExternalLinkInNewTab') . '</td>';
+print '</td><td class="center">';
+print '<input type="checkbox" id="external_link_new_tab" name="external_link_new_tab"' . ($ticketCategoryConfig->external_link_new_tab ? ' checked=""' : '') . '"> ';
 print '</td></tr>';
 
 if (getDolGlobalInt('DIGIRISKDOLIBARR_TICKET_ENABLE_PUBLIC_INTERFACE')) {

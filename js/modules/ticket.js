@@ -68,16 +68,20 @@ window.digiriskdolibarr.ticket.init = function() {
  */
 window.digiriskdolibarr.ticket.event = function() {
   $(document).on('click', '.ticket-parentCategory', function() {
-    window.digiriskdolibarr.ticket.handleCategorySelection({
-      clickedElement: this,
-      isSubCategory: false
-    });
+	if (!$(this).parent().hasClass('category-redirect')) {
+		window.digiriskdolibarr.ticket.handleCategorySelection({
+		  clickedElement: this,
+		  isSubCategory: false
+		});
+	}
   });
   $(document).on('click', '.ticket-subCategory', function() {
-    window.digiriskdolibarr.ticket.handleCategorySelection({
-      clickedElement: this,
-      isSubCategory: true
-    });
+	if (!$(this).parent().hasClass('category-redirect')) {
+		window.digiriskdolibarr.ticket.handleCategorySelection({
+		  clickedElement: this,
+		  isSubCategory: true
+		});
+	}
   });
   $(document).on( 'click', '.public-ticket-validate', window.digiriskdolibarr.ticket.addSignature);
   $(document).on( 'submit', '#sendFile', window.digiriskdolibarr.ticket.tmpStockFile);
