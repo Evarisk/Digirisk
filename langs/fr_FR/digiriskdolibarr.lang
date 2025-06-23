@@ -1356,7 +1356,6 @@ TicketCategoriesNotCreated               = Vous n'avez pas créé de catégories
 TicketPublicInterfaceQRCode              = QR Code de l'interface publique des tickets
 MultiEntityTicketPublicInterfaceQRCode   = QR Code de l'interface publique des tickets multi-société
 PublicInterfaceConfiguration             = Champs visibles / requis de l'interface publique
-ExternalLink                             = Lien externe
 ExternalLinkDescription                  = Utiliser la catégorie de ticket avec un lien externe
 ExternalLinkInNewTab                     = Lien externe dans un nouvel onglet
 TicketDigiriskElementRequired            = GP/UT obligatoire pour créer un ticket

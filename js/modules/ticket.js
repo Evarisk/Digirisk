@@ -67,22 +67,16 @@ window.digiriskdolibarr.ticket.init = function() {
  * @returns {void} This method does not return a value.
  */
 window.digiriskdolibarr.ticket.event = function() {
-  $(document).on('click', '.ticket-parentCategory', function() {
+  $(document).on('click', '.ticket-parentCategory, .ticket-subCategory', function() {
 	if (!$(this).parent().hasClass('category-redirect')) {
 		window.digiriskdolibarr.ticket.handleCategorySelection({
 		  clickedElement: this,
-		  isSubCategory: false
+		  isSubCategory: $(this).hasClass('ticket-subCategory')
 		});
 	}
   });
-  $(document).on('click', '.ticket-subCategory', function() {
-	if (!$(this).parent().hasClass('category-redirect')) {
-		window.digiriskdolibarr.ticket.handleCategorySelection({
-		  clickedElement: this,
-		  isSubCategory: true
-		});
-	}
-  });
+
+
   $(document).on( 'click', '.public-ticket-validate', window.digiriskdolibarr.ticket.addSignature);
   $(document).on( 'submit', '#sendFile', window.digiriskdolibarr.ticket.tmpStockFile);
   $(document).on( 'click', '.linked-file-delete', window.digiriskdolibarr.ticket.removeFile);

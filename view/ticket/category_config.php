@@ -207,16 +207,16 @@ print '</td></tr>';
 
 // External link
 print '<tr class="oddeven"><td>';
-print img_picto('', 'fa-external-link-alt', 'class="paddingrightonly" style="color: black!important"') . $form->textwithpicto($langs->transnoentities('ExternalLink'), $langs->transnoentities('ExternalLinkDescription'), 1, 'info') . '</td>';
+print img_picto('', 'fa-external-link-alt', 'class="paddingrightonly"') . $form->textwithpicto($langs->transnoentities('ExternalURL'), $langs->transnoentities('ExternalLinkDescription'), 1, 'info') . '</td>';
 print '</td><td class="center">';
-print '<input type="url" name="external_link" id="external_link" class="marginleftonly" placeholder="https://demo.digirisk.com/ticket" pattern="https?://.*" size="30" value="' . $ticketCategoryConfig->external_link . '" /><br>';
+print '<input type="url" name="external_link" id="external_link" class="marginleftonly" placeholder="https://demo.digirisk.com/ticket" pattern="https?://.*" value="' . $ticketCategoryConfig->external_link . '" />';
 print '</td></tr>';
 
 // External Link in new tab
 print '<tr class="oddeven"><td>';
-print img_picto('', 'fa-external-link-alt', 'class="paddingrightonly" style="color: black!important"') . $langs->transnoentities('ExternalLinkInNewTab') . '</td>';
+print img_picto('', 'fa-external-link-alt', 'class="paddingrightonly"') . $langs->transnoentities('ExternalLinkInNewTab') . '</td>';
 print '</td><td class="center">';
-print '<input type="checkbox" id="external_link_new_tab" name="external_link_new_tab"' . ($ticketCategoryConfig->external_link_new_tab ? ' checked=""' : '') . '"> ';
+print '<input type="checkbox" id="external_link_new_tab" name="external_link_new_tab"' . ($ticketCategoryConfig->external_link_new_tab ? ' checked=""' : '') . '> ';
 print '</td></tr>';
 
 if (getDolGlobalInt('DIGIRISKDOLIBARR_TICKET_ENABLE_PUBLIC_INTERFACE')) {
