@@ -349,7 +349,7 @@ class pdf_orque_projectdocument
 				}
 				$pagenb++;
 				$this->_pagehead($pdf, $object, 1, $outputLangs);
-				$pdf->SetFont('', '', $default_font_size - 1);
+				$pdf->SetFont(pdf_getPDFFont($outputLangs), '', $default_font_size - 1);
 				$pdf->MultiCell(0, 3, ''); // Set interline to 3
 				$pdf->SetTextColor(0, 0, 0);
 
@@ -368,7 +368,7 @@ class pdf_orque_projectdocument
 
 					$tab_top -= 2;
 
-					$pdf->SetFont('', '', $default_font_size - 1);
+					$pdf->SetFont(pdf_getPDFFont($outputLangs), '', $default_font_size - 1);
 					$pdf->writeHTMLCell(190, 3, $this->posxref - 1, $tab_top - 2, dol_htmlentitiesbr($notetoshow), 0, 1);
 					$nexY = $pdf->GetY();
 					$height_note = $nexY - $tab_top;
@@ -417,7 +417,7 @@ class pdf_orque_projectdocument
 
 				for ($i = 0; $i < $nblines; $i++) {
 					$curY = $nexY;
-					$pdf->SetFont('', '', $default_font_size - 1); // Into loop to work with multipage
+					$pdf->SetFont(pdf_getPDFFont($outputLangs), '', $default_font_size - 1); // Into loop to work with multipage
 					$pdf->SetTextColor(0, 0, 0);
 
 					$pdf->setTopMargin($tab_top_newpage);
@@ -477,7 +477,7 @@ class pdf_orque_projectdocument
 
 							$forcedesconsamepage = 1;
 							if ($forcedesconsamepage) {
-								$pdf->rollbackTransaction(true);
+								//$pdf->rollbackTransaction(true);
 								$pageposafter = $pageposbefore;
 								$pdf->setPageOrientation($this->orientation, 1, $heightforfooter); // The only function to edit the bottom margin of current page to set it.
 
@@ -489,7 +489,7 @@ class pdf_orque_projectdocument
 									$this->_pagehead($pdf, $object, 0, $outputLangs);
 								}
 								$pdf->setPage($pageposafter + 1);
-								$pdf->SetFont('', '', $default_font_size - 1); // On repositionne la police par defaut
+								$pdf->SetFont(pdf_getPDFFont($outputLangs), '', $default_font_size - 1); // On repositionne la police par defaut
 								$pdf->MultiCell(0, 3, ''); // Set interline to 3
 								$pdf->SetTextColor(0, 0, 0);
 
@@ -521,7 +521,7 @@ class pdf_orque_projectdocument
 						$curY = $tab_top_newpage + $heightoftitleline + 1;
 					}
 
-					$pdf->SetFont('', '', $default_font_size - 1); // We reposition the default font
+					$pdf->SetFont(pdf_getPDFFont($outputLangs), '', $default_font_size - 1); // We reposition the default font
 
 					// Ref of task
 					$pdf->SetXY($this->posxref, $curY);
@@ -549,12 +549,12 @@ class pdf_orque_projectdocument
 					$pdf->MultiCell($this->posxworkload - $this->posxbudget, 3, $budget, 0, 'R');
 					// Workload
 					$pdf->SetXY($this->posxworkload, $curY);
-					$pdf->SetFont('', '', $default_font_size - 2); // We use a smaller font
+					$pdf->SetFont(pdf_getPDFFont($outputLangs), '', $default_font_size - 2); // We use a smaller font
 					$pdf->MultiCell($this->posxprogress - $this->posxworkload, 3, $planned_workload ? $planned_workload : '', 0, 'R');
 					// Progress
 					$pdf->SetXY($this->posxprogress, $curY);
 					$pdf->MultiCell($this->posxdatestart - $this->posxprogress, 3, $progress, 0, 'R');
-					$pdf->SetFont('', '', $default_font_size - 1); // We restore font
+					$pdf->SetFont(pdf_getPDFFont($outputLangs), '', $default_font_size - 1); // We restore font
 
 					// Date start and end
 					$pdf->SetXY($this->posxdatestart, $curY);
@@ -696,7 +696,7 @@ class pdf_orque_projectdocument
 		$pdf->line($this->marge_gauche, $tab_top + $heightoftitleline, $this->page_largeur - $this->marge_droite, $tab_top + $heightoftitleline);
 
 		$pdf->SetTextColor(0, 0, 0);
-		$pdf->SetFont('', '', $default_font_size);
+		$pdf->SetFont(pdf_getPDFFont($outputLangs), '', $default_font_size);
 
 		$pdf->SetXY($this->posxref, $tab_top + 1);
 		$pdf->MultiCell($this->posxrisk - $this->posxref, 3, $outputLangs->transnoentities('Tasks'), '', 'L');
@@ -747,7 +747,7 @@ class pdf_orque_projectdocument
 		pdf_pagehead($pdf, $outputLangs, $this->page_hauteur);
 
 		$pdf->SetTextColor(0, 0, 60);
-		$pdf->SetFont('', 'B', $default_font_size + 3);
+		$pdf->SetFont(pdf_getPDFFont($outputLangs), 'B', $default_font_size + 3);
 
 		$posx = $this->page_largeur - $this->marge_droite - 100;
 		$posy = $this->marge_haute;
@@ -762,7 +762,7 @@ class pdf_orque_projectdocument
 				$pdf->Image($logo, $this->marge_gauche, $posy, 0, $height); // width=0 (auto)
 			} else {
 				$pdf->SetTextColor(200, 0, 0);
-				$pdf->SetFont('', 'B', $default_font_size - 2);
+				$pdf->SetFont(pdf_getPDFFont($outputLangs), 'B', $default_font_size - 2);
 				$pdf->MultiCell(100, 3, $langs->transnoentities('ErrorLogoFileNotFound', $logo), 0, 'L');
 				$pdf->MultiCell(100, 3, $langs->transnoentities('ErrorGoToModuleSetup'), 0, 'L');
 			}
@@ -770,11 +770,11 @@ class pdf_orque_projectdocument
 			$pdf->MultiCell(100, 4, $outputLangs->transnoentities($this->emetteur->name), 0, 'L');
 		}
 
-		$pdf->SetFont('', 'B', $default_font_size + 3);
+		$pdf->SetFont(pdf_getPDFFont($outputLangs), 'B', $default_font_size + 3);
 		$pdf->SetXY($posx, $posy);
 		$pdf->SetTextColor(0, 0, 60);
 		$pdf->MultiCell(100, 4, $outputLangs->transnoentities('Project') . ' ' .$outputLangs->convToOutputCharset($object->ref), '', 'R');
-		$pdf->SetFont('', '', $default_font_size + 2);
+		$pdf->SetFont(pdf_getPDFFont($outputLangs), '', $default_font_size + 2);
 
 		$posy += 6;
 		$pdf->SetXY($posx, $posy);
@@ -810,7 +810,7 @@ class pdf_orque_projectdocument
 				{
 					$posy+=4;
 					$pdf->SetXY($posx,$posy);
-					$pdf->SetFont('','', $default_font_size - 1);
+					$pdf->SetFont(pdf_getPDFFont($outputLangs),'', $default_font_size - 1);
 					$text=$objects[$i]->ref;
 					if ($objects[$i]->ref_client) $text.=' ('.$objects[$i]->ref_client.')';
 					$pdf->MultiCell(100, 4, $outputLangs->transnoentities("RefOrder")." : ".$outputLangs->transnoentities($text), '', 'R');
