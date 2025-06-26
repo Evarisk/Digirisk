@@ -1,5 +1,5 @@
 <?php
-/* Copyright (C) 2021-2023 EVARISK <technique@evarisk.com>
+/* Copyright (C) 2021-2025 EVARISK <technique@evarisk.com>
  *
  * This program is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -16,9 +16,9 @@
  */
 
 /**
- *       \file       public/ticket/create_ticket.php
- *       \ingroup    digiriskdolibarr
- *       \brief      Display public form to add new ticket
+ * \file    public/ticket/create_ticket.php
+ * \ingroup digiriskdolibarr
+ * \brief   Ticket creation form for public interface
  */
 
 if ( ! defined('NOTOKENRENEWAL')) define('NOTOKENRENEWAL', '1');
@@ -56,7 +56,6 @@ require_once __DIR__ . '/../../lib/digiriskdolibarr_function.lib.php';
 require_once __DIR__ . '/../../class/digiriskelement.class.php';
 
 // Load Saturne libraries
-require_once __DIR__ . '/../../../saturne/lib/saturne_functions.lib.php';
 require_once __DIR__ . '/../../../saturne/class/saturnesignature.class.php';
 
 global $conf, $db, $hookmanager, $langs, $mc, $user;
@@ -65,9 +64,8 @@ global $conf, $db, $hookmanager, $langs, $mc, $user;
 saturne_load_langs(['companies', 'other', 'mails', 'ticket']);
 
 // Get parameters
-$id          = GETPOST('id', 'int');
-$msg_id      = GETPOST('msg_id', 'int');
 $action      = GETPOST('action', 'aZ09');
+$entity      = !isModEnabled('multicompany') ? $conf->entity : GETPOSTINT('entity');
 $ticketTmpId = GETPOST('ticket_id');
 
 if ( ! dol_strlen($ticketTmpId)) {
@@ -95,314 +93,307 @@ list($modTicket) = saturne_require_objects_mod($numberingModuleName);
 
 $extrafields->fetch_name_optionals_label($object->table_element);
 
-$entity = GETPOST('entity');
-
-if (!$conf->multicompany->enabled) {
-	$entity = $conf->entity;
+if ($entity > 0) {
+    $conf->setEntityValues($db, $entity);
+    $upload_dir = $conf->categorie->multidir_output[isset($entity) ? $entity : 1];
 }
-
-$conf->setEntityValues($db, $entity);
-
-//ici charger les conf de la bonne entité
-$upload_dir = $conf->categorie->multidir_output[isset($entity) ? $entity : 1];
 
 /*
  * Actions
  */
 
-$parameters = array(
-	'id' => $id,
-);
-// Note that $action and $object may have been modified by some hooks
-$reshook = $hookmanager->executeHooks('doActions', $parameters, $object, $action);
-if ($reshook < 0) {
-	setEventMessages($hookmanager->error, $hookmanager->errors, 'errors');
+$parameters = [];
+$resHook    = $hookmanager->executeHooks('doActions', $parameters, $object, $action); // Note that $action and $object may have been modified by some hooks.
+if ($resHook < 0) {
+    setEventMessages($hookmanager->error, $hookmanager->errors, 'errors');
 }
 
-if ($action == 'add') {
-	$error = 0;
+if (empty($resHook)) {
+    if ($action == 'add') {
+        $error = 0;
 
-	$parentCategory = GETPOST('parentCategory');
-	$subCategory    = GETPOST('subCategory');
-	$message        = GETPOST('message');
-	$ticketTmpId  = GETPOST('ticket_id');
+        $parentCategory = GETPOST('parentCategory');
+        $subCategory    = GETPOST('subCategory');
+        $message        = GETPOST('message');
+        $ticketTmpId  = GETPOST('ticket_id');
 
-	// Check parameters
-	if (empty($parentCategory)) {
-		setEventMessages($langs->trans('ErrorFieldNotEmpty', $conf->global->DIGIRISKDOLIBARR_TICKET_PARENT_CATEGORY_LABEL), array(), 'errors');
-		$error++;
-	}
+        // Check parameters
+        if (empty($parentCategory)) {
+            setEventMessages($langs->trans('ErrorFieldNotEmpty', $conf->global->DIGIRISKDOLIBARR_TICKET_PARENT_CATEGORY_LABEL), array(), 'errors');
+            $error++;
+        }
 
-	$email = GETPOST('email', 'alpha');
-	if ($conf->global->DIGIRISKDOLIBARR_TICKET_EMAIL_REQUIRED && $conf->global->DIGIRISKDOLIBARR_TICKET_EMAIL_VISIBLE) {
-		if (empty($email)) {
-			setEventMessages($langs->trans('ErrorFieldNotEmpty', $langs->transnoentities('Email')), array(), 'errors');
-			$error++;
-		}
-	}
+        $email = GETPOST('email', 'alpha');
+        if ($conf->global->DIGIRISKDOLIBARR_TICKET_EMAIL_REQUIRED && $conf->global->DIGIRISKDOLIBARR_TICKET_EMAIL_VISIBLE) {
+            if (empty($email)) {
+                setEventMessages($langs->trans('ErrorFieldNotEmpty', $langs->transnoentities('Email')), array(), 'errors');
+                $error++;
+            }
+        }
 
-	$firstname = GETPOST('options_digiriskdolibarr_ticket_firstname', 'alpha');
-	if ($conf->global->DIGIRISKDOLIBARR_TICKET_FIRSTNAME_REQUIRED && $conf->global->DIGIRISKDOLIBARR_TICKET_FIRSTNAME_VISIBLE) {
-		if (empty($firstname)) {
-			setEventMessages($langs->trans('ErrorFieldNotEmpty', $langs->transnoentities('FirstName')), array(), 'errors');
-			$error++;
-		}
-	}
+        $firstname = GETPOST('options_digiriskdolibarr_ticket_firstname', 'alpha');
+        if ($conf->global->DIGIRISKDOLIBARR_TICKET_FIRSTNAME_REQUIRED && $conf->global->DIGIRISKDOLIBARR_TICKET_FIRSTNAME_VISIBLE) {
+            if (empty($firstname)) {
+                setEventMessages($langs->trans('ErrorFieldNotEmpty', $langs->transnoentities('FirstName')), array(), 'errors');
+                $error++;
+            }
+        }
 
-	$lastname = GETPOST('options_digiriskdolibarr_ticket_lastname', 'alpha');
-	if ($conf->global->DIGIRISKDOLIBARR_TICKET_LASTNAME_REQUIRED && $conf->global->DIGIRISKDOLIBARR_TICKET_LASTNAME_VISIBLE) {
-		if (empty($lastname)) {
-			setEventMessages($langs->trans('ErrorFieldNotEmpty', $langs->transnoentities('LastName')), array(), 'errors');
-			$error++;
-		}
-	}
+        $lastname = GETPOST('options_digiriskdolibarr_ticket_lastname', 'alpha');
+        if ($conf->global->DIGIRISKDOLIBARR_TICKET_LASTNAME_REQUIRED && $conf->global->DIGIRISKDOLIBARR_TICKET_LASTNAME_VISIBLE) {
+            if (empty($lastname)) {
+                setEventMessages($langs->trans('ErrorFieldNotEmpty', $langs->transnoentities('LastName')), array(), 'errors');
+                $error++;
+            }
+        }
 
-	$phone = GETPOST('options_digiriskdolibarr_ticket_phone', 'alpha');
-	if ($conf->global->DIGIRISKDOLIBARR_TICKET_PHONE_REQUIRED && $conf->global->DIGIRISKDOLIBARR_TICKET_PHONE_VISIBLE) {
-		if (empty($phone)) {
-			setEventMessages($langs->trans('ErrorFieldNotEmpty', $langs->transnoentities('Phone')), array(), 'errors');
-			$error++;
-		}
-	}
+        $phone = GETPOST('options_digiriskdolibarr_ticket_phone', 'alpha');
+        if ($conf->global->DIGIRISKDOLIBARR_TICKET_PHONE_REQUIRED && $conf->global->DIGIRISKDOLIBARR_TICKET_PHONE_VISIBLE) {
+            if (empty($phone)) {
+                setEventMessages($langs->trans('ErrorFieldNotEmpty', $langs->transnoentities('Phone')), array(), 'errors');
+                $error++;
+            }
+        }
 
-	$location = GETPOST('options_digiriskdolibarr_ticket_location', 'alpha');
-	if ($conf->global->DIGIRISKDOLIBARR_TICKET_LOCATION_REQUIRED && $conf->global->DIGIRISKDOLIBARR_TICKET_LOCATION_VISIBLE) {
-		if (empty($location)) {
-			setEventMessages($langs->trans('ErrorFieldNotEmpty', $langs->transnoentities('Location')), array(), 'errors');
-			$error++;
-		}
-	}
+        $location = GETPOST('options_digiriskdolibarr_ticket_location', 'alpha');
+        if ($conf->global->DIGIRISKDOLIBARR_TICKET_LOCATION_REQUIRED && $conf->global->DIGIRISKDOLIBARR_TICKET_LOCATION_VISIBLE) {
+            if (empty($location)) {
+                setEventMessages($langs->trans('ErrorFieldNotEmpty', $langs->transnoentities('Location')), array(), 'errors');
+                $error++;
+            }
+        }
 
-	$regEmail = '/^([A-Za-z0-9_\-\.])+\@([A-Za-z0-9_\-\.])+\.([A-Za-z]{2,4})$/';
-	if (preg_match($regEmail, $email) || empty($email)) {
-		$object->origin_email = $email;
-	} else {
-		setEventMessages($langs->trans('ErrorFieldEmail'), array(), 'errors');
-		$error++;
-	}
+        $regEmail = '/^([A-Za-z0-9_\-\.])+\@([A-Za-z0-9_\-\.])+\.([A-Za-z]{2,4})$/';
+        if (preg_match($regEmail, $email) || empty($email)) {
+            $object->origin_email = $email;
+        } else {
+            setEventMessages($langs->trans('ErrorFieldEmail'), array(), 'errors');
+            $error++;
+        }
 
-	$regPhone = '/^(?:(?:(?:\+|00)\d{2}[\s]?(?:\(0\)[\s]?)?)|0){1}[1-9]{1}([\s.-]?)(?:\d{2}\1?){3}\d{2}$/';
-	if (!preg_match($regPhone, $phone) && !empty($phone)) {
-		setEventMessages($langs->trans('ErrorFieldPhone'), array(), 'errors');
-		$error++;
-	}
+        $regPhone = '/^(?:(?:(?:\+|00)\d{2}[\s]?(?:\(0\)[\s]?)?)|0){1}[1-9]{1}([\s.-]?)(?:\d{2}\1?){3}\d{2}$/';
+        if (!preg_match($regPhone, $phone) && !empty($phone)) {
+            setEventMessages($langs->trans('ErrorFieldPhone'), array(), 'errors');
+            $error++;
+        }
 
-	// Quand le registre choisi est Danger Grave et Imminent, il ne faut pas check ça
-	//  if (empty($subCategory)) {
-	//      setEventMessages($langs->trans('ErrorFieldNotEmpty', $langs->transnoentitiesnoconv('Pertinence')), null, 'errors');
-	//      $error++;
-	//  }
-	if (empty($message)) {
-		setEventMessages($langs->trans('ErrorFieldNotEmpty', $langs->transnoentitiesnoconv('Message')), array(), 'errors');
-		$error++;
-	}
+        // Quand le registre choisi est Danger Grave et Imminent, il ne faut pas check ça
+        //  if (empty($subCategory)) {
+        //      setEventMessages($langs->trans('ErrorFieldNotEmpty', $langs->transnoentitiesnoconv('Pertinence')), null, 'errors');
+        //      $error++;
+        //  }
+        if (empty($message)) {
+            setEventMessages($langs->trans('ErrorFieldNotEmpty', $langs->transnoentitiesnoconv('Message')), array(), 'errors');
+            $error++;
+        }
 
-	if ($conf->global->DIGIRISKDOLIBARR_TICKET_DIGIRISKELEMENT_REQUIRED && $conf->global->DIGIRISKDOLIBARR_TICKET_DIGIRISKELEMENT_VISIBLE) {
-		if (empty(GETPOST('options_digiriskdolibarr_ticket_service')) || GETPOST('options_digiriskdolibarr_ticket_service') == -1) {
-			setEventMessages($langs->trans('ErrorFieldNotEmpty', $langs->transnoentitiesnoconv('GP/UT')), array(), 'errors');
-			$error++;
-		}
-	}
+        if ($conf->global->DIGIRISKDOLIBARR_TICKET_DIGIRISKELEMENT_REQUIRED && $conf->global->DIGIRISKDOLIBARR_TICKET_DIGIRISKELEMENT_VISIBLE) {
+            if (empty(GETPOST('options_digiriskdolibarr_ticket_service')) || GETPOST('options_digiriskdolibarr_ticket_service') == -1) {
+                setEventMessages($langs->trans('ErrorFieldNotEmpty', $langs->transnoentitiesnoconv('GP/UT')), array(), 'errors');
+                $error++;
+            }
+        }
 
-	$date = GETPOST('options_digiriskdolibarr_ticket_date', 'alpha');
-	if ($conf->global->DIGIRISKDOLIBARR_TICKET_DATE_REQUIRED && $conf->global->DIGIRISKDOLIBARR_TICKET_DATE_VISIBLE) {
-		if (empty($date)) {
-			setEventMessages($langs->trans('ErrorFieldNotEmpty', $langs->transnoentitiesnoconv('Date')), array(), 'errors');
-			$error++;
-		}
-	}
+        $date = GETPOST('options_digiriskdolibarr_ticket_date', 'alpha');
+        if ($conf->global->DIGIRISKDOLIBARR_TICKET_DATE_REQUIRED && $conf->global->DIGIRISKDOLIBARR_TICKET_DATE_VISIBLE) {
+            if (empty($date)) {
+                setEventMessages($langs->trans('ErrorFieldNotEmpty', $langs->transnoentitiesnoconv('Date')), array(), 'errors');
+                $error++;
+            }
+        }
 
-	$object->ref = $modTicket->getNextValue($thirdparty, $object);
+        $object->ref = $modTicket->getNextValue($thirdparty, $object);
 
-	$object->type_code  = 'OTHER';
-	$label_type         = ($langs->trans("TicketTypeShort" . $object->type_code) != ("TicketTypeShort" . $object->type_code) ? $langs->trans("TicketTypeShort" . $object->type_code) : ($object->type_label != '-' ? $object->type_label : ''));
-	$object->type_label = $label_type;
+        $object->type_code  = 'OTHER';
+        $label_type         = ($langs->trans("TicketTypeShort" . $object->type_code) != ("TicketTypeShort" . $object->type_code) ? $langs->trans("TicketTypeShort" . $object->type_code) : ($object->type_label != '-' ? $object->type_label : ''));
+        $object->type_label = $label_type;
 
-	$object->category_code  = 'OTHER';
-	$label_category         = ($langs->trans("TicketCategoryShort" . $object->category_code) != ("TicketCategoryShort" . $object->category_code) ? $langs->trans("TicketCategoryShort" . $object->category_code) : ($object->category_label != '-' ? $object->category_label : ''));
-	$object->category_label = $label_category;
+        $object->category_code  = 'OTHER';
+        $label_category         = ($langs->trans("TicketCategoryShort" . $object->category_code) != ("TicketCategoryShort" . $object->category_code) ? $langs->trans("TicketCategoryShort" . $object->category_code) : ($object->category_label != '-' ? $object->category_label : ''));
+        $object->category_label = $label_category;
 
-	$object->severity_code  = 'NORMAL';
-	$label_severity         = ($langs->trans("TicketSeverityShort" . $object->severity_code) != ("TicketSeverityShort" . $object->severity_code) ? $langs->trans("TicketSeverityShort" . $object->severity_code) : ($object->severity_label != '-' ? $object->severity_label : ''));
-	$object->severity_label = $label_severity;
+        $object->severity_code  = 'NORMAL';
+        $label_severity         = ($langs->trans("TicketSeverityShort" . $object->severity_code) != ("TicketSeverityShort" . $object->severity_code) ? $langs->trans("TicketSeverityShort" . $object->severity_code) : ($object->severity_label != '-' ? $object->severity_label : ''));
+        $object->severity_label = $label_severity;
 
-	$object->message = html_entity_decode($message);
+        $object->message = html_entity_decode($message);
 
-	$object->fk_project = $conf->global->DIGIRISKDOLIBARR_TICKET_PROJECT;
+        $object->fk_project = $conf->global->DIGIRISKDOLIBARR_TICKET_PROJECT;
 
-    if (!empty($date)) {
-        $timeStamp = dol_stringtotime($date);
-        $date      = dol_getdate($timeStamp);
-        $_POST['options_digiriskdolibarr_ticket_datehour']  = $date['hours'];
-        $_POST['options_digiriskdolibarr_ticket_datemin']   = $date['minutes'];
-        $_POST['options_digiriskdolibarr_ticket_dateday']   = $date['mday'];
-        $_POST['options_digiriskdolibarr_ticket_datemonth'] = $date['mon'];
-        $_POST['options_digiriskdolibarr_ticket_dateyear']  = $date['year'];
+        if (!empty($date)) {
+            $timeStamp = dol_stringtotime($date);
+            $date      = dol_getdate($timeStamp);
+            $_POST['options_digiriskdolibarr_ticket_datehour']  = $date['hours'];
+            $_POST['options_digiriskdolibarr_ticket_datemin']   = $date['minutes'];
+            $_POST['options_digiriskdolibarr_ticket_dateday']   = $date['mday'];
+            $_POST['options_digiriskdolibarr_ticket_datemonth'] = $date['mon'];
+            $_POST['options_digiriskdolibarr_ticket_dateyear']  = $date['year'];
+        }
+
+        $extrafields->setOptionalsFromPost(null, $object);
+
+        // Check Captcha code if is enabled
+        if ( ! empty($conf->global->DIGIRISKDOLIBARR_USE_CAPTCHA)) {
+            $sessionkey = 'dol_antispam_value';
+            $ok         = (array_key_exists($sessionkey, $_SESSION) === true && (strtolower($_SESSION[$sessionkey]) === strtolower(GETPOST('code', 'none'))));
+            if ( ! $ok) {
+                $error++;
+                setEventMessage($langs->trans('ErrorBadValueForCode'), 'errors');
+                $action = '';
+            }
+        }
+        if (empty($error)) {
+            $result = $object->create($user);
+            $object->fetch($result);
+            $track_id = $object->track_id;
+
+            if ($result > 0) {
+                //Add categories linked
+                $parentCategoryCat = $category;
+                $parentCategoryCat->fetch($parentCategory);
+                $parentCategoryCat->add_type($object, Categorie::TYPE_TICKET);
+
+                $subCategoryCat = $category;
+                $subCategoryCat->fetch($subCategory);
+                $subCategoryCat->add_type($object, Categorie::TYPE_TICKET);
+
+                //Add files linked
+                $ticket_upload_dir = $conf->digiriskdolibarr->multidir_output[isset($conf->entity) ? $conf->entity : 1] . '/temp';
+                $fileList          = dol_dir_list($ticket_upload_dir . '/ticket/' . $ticketTmpId . '/');
+                $thumbsList        = dol_dir_list($ticket_upload_dir . '/ticket/' . $ticketTmpId . '/thumbs/');
+                $ticketDirPath     = $conf->ticket->multidir_output[isset($conf->entity) ? $conf->entity : 1] . '/';
+                $fullTicketPath    = $ticketDirPath . $object->ref . '/';
+                $thumbsTicketPath  = $ticketDirPath . $object->ref . '/thumbs/';
+
+                if ( ! is_dir($ticketDirPath)) {
+                    dol_mkdir($ticketDirPath);
+                }
+
+                if ( ! is_dir($fullTicketPath)) {
+                    dol_mkdir($fullTicketPath);
+                }
+
+                if ( ! is_dir($thumbsTicketPath)) {
+                    dol_mkdir($thumbsTicketPath);
+                }
+
+                if ( ! empty($fileList)) {
+                    foreach ($fileList as $fileToCopy) {
+                        if (is_file($fileToCopy['fullname'])) {
+                            rename($fileToCopy['fullname'], $fullTicketPath . $fileToCopy['name']);
+                        }
+                    }
+                }
+
+                if ( ! empty($thumbsList)) {
+                    foreach ($thumbsList as $thumbsToCopy) {
+                        if (is_file($thumbsToCopy['fullname'])) {
+                            rename($thumbsToCopy['fullname'], $fullTicketPath . '/thumbs/' . $thumbsToCopy['name']);
+                        }
+                    }
+                }
+
+                if (GETPOSTISSET('signature')) {
+                    $signatory->status         = SaturneSignature::STATUS_SIGNED;
+                    $signatory->role           = 'Attendant';
+                    $signatory->firstname      = $firstname;
+                    $signatory->lastname       = $lastname;
+                    $signatory->signature_date = dol_now();
+                    $signatory->signature      = GETPOST('signature');
+                    $signatory->signature_url  = generate_random_id();
+                    $signatory->element_type   = 'user';
+                    $signatory->element_id     = 0;
+                    $signatory->object_type    = 'ticket';
+                    $signatory->fk_object      = $result;
+                    $signatory->module_name    = 'digiriskdolibarr';
+
+                    $signatory->create($user);
+                }
+
+                $object->call_trigger('TICKET_PUBLIC_INTERFACE_CREATE', $user);
+
+                // Creation OK
+                dol_delete_dir_recursive($ticket_upload_dir . '/ticket/' . $ticketTmpId . '/');
+                $urltogo = $_SERVER['PHP_SELF'] . '/../ticket_success.php?track_id=' . $track_id;
+                setEventMessages($langs->trans("TicketSent", ''), null);
+                header("Location: " . $urltogo);
+                exit;
+            }
+        }
     }
 
-	$extrafields->setOptionalsFromPost(null, $object);
+    // Add file in ticket form
+    if ($action == 'sendfile') {
+        include_once DOL_DOCUMENT_ROOT . '/core/lib/files.lib.php';
 
-	// Check Captcha code if is enabled
-	if ( ! empty($conf->global->DIGIRISKDOLIBARR_USE_CAPTCHA)) {
-		$sessionkey = 'dol_antispam_value';
-		$ok         = (array_key_exists($sessionkey, $_SESSION) === true && (strtolower($_SESSION[$sessionkey]) === strtolower(GETPOST('code', 'none'))));
-		if ( ! $ok) {
-			$error++;
-			setEventMessage($langs->trans('ErrorBadValueForCode'), 'errors');
-			$action = '';
-		}
-	}
-	if (empty($error)) {
-		$result = $object->create($user);
-		$object->fetch($result);
-		$track_id = $object->track_id;
+        $ticket_upload_dir = $conf->digiriskdolibarr->multidir_output[isset($conf->entity) ? $conf->entity : 1] . '/temp';
+        if ( ! is_dir($ticket_upload_dir)) {
+            dol_mkdir($ticket_upload_dir);
+        }
+        if ( ! is_dir($ticket_upload_dir . '/ticket')) {
+            dol_mkdir($ticket_upload_dir . '/ticket');
+        }
+        $fullTicketTmpPath = $ticket_upload_dir . '/ticket/' . $ticketTmpId . '/';
+        dol_mkdir($fullTicketTmpPath);
 
-		if ($result > 0) {
-			//Add categories linked
-			$parentCategoryCat = $category;
-			$parentCategoryCat->fetch($parentCategory);
-			$parentCategoryCat->add_type($object, Categorie::TYPE_TICKET);
+        for ($k = 0; $k < count($_FILES['files']['name']); $k++) {
+            if (($_FILES['files']['name'][$k] != "")) {
+                // Where the file is going to be stored
+                $target_dir        = $fullTicketTmpPath;
+                $file              = $_FILES['files']['name'][$k];
+                $path              = pathinfo($file);
+                $filename          = $path['filename'];
+                $ext               = $path['extension'];
+                $temp_name         = $_FILES['files']['tmp_name'][$k];
+                $path_filename_ext = $target_dir . $filename . "." . $ext;
 
-			$subCategoryCat = $category;
-			$subCategoryCat->fetch($subCategory);
-			$subCategoryCat->add_type($object, Categorie::TYPE_TICKET);
+                if (file_exists($path_filename_ext)) {
+                    echo "Sorry, file already exists.";
+                } else {
+                    echo $temp_name;
+                    echo $path_filename_ext;
+                    move_uploaded_file($temp_name, $path_filename_ext);
+                    echo "Congratulations! File Uploaded Successfully.";
 
-			//Add files linked
-			$ticket_upload_dir = $conf->digiriskdolibarr->multidir_output[isset($conf->entity) ? $conf->entity : 1] . '/temp';
-			$fileList          = dol_dir_list($ticket_upload_dir . '/ticket/' . $ticketTmpId . '/');
-			$thumbsList        = dol_dir_list($ticket_upload_dir . '/ticket/' . $ticketTmpId . '/thumbs/');
-			$ticketDirPath     = $conf->ticket->multidir_output[isset($conf->entity) ? $conf->entity : 1] . '/';
-			$fullTicketPath    = $ticketDirPath . $object->ref . '/';
-			$thumbsTicketPath  = $ticketDirPath . $object->ref . '/thumbs/';
+                    global $maxwidthmini, $maxheightmini, $maxwidthsmall, $maxheightsmall;
 
-			if ( ! is_dir($ticketDirPath)) {
-				dol_mkdir($ticketDirPath);
-			}
-
-			if ( ! is_dir($fullTicketPath)) {
-				dol_mkdir($fullTicketPath);
-			}
-
-			if ( ! is_dir($thumbsTicketPath)) {
-				dol_mkdir($thumbsTicketPath);
-			}
-
-			if ( ! empty($fileList)) {
-				foreach ($fileList as $fileToCopy) {
-					if (is_file($fileToCopy['fullname'])) {
-						rename($fileToCopy['fullname'], $fullTicketPath . $fileToCopy['name']);
-					}
-				}
-			}
-
-			if ( ! empty($thumbsList)) {
-				foreach ($thumbsList as $thumbsToCopy) {
-					if (is_file($thumbsToCopy['fullname'])) {
-						rename($thumbsToCopy['fullname'], $fullTicketPath . '/thumbs/' . $thumbsToCopy['name']);
-					}
-				}
-			}
-
-            if (GETPOSTISSET('signature')) {
-                $signatory->status         = SaturneSignature::STATUS_SIGNED;
-                $signatory->role           = 'Attendant';
-                $signatory->firstname      = $firstname;
-                $signatory->lastname       = $lastname;
-                $signatory->signature_date = dol_now();
-                $signatory->signature      = GETPOST('signature');
-                $signatory->signature_url  = generate_random_id();
-                $signatory->element_type   = 'user';
-                $signatory->element_id     = 0;
-                $signatory->object_type    = 'ticket';
-                $signatory->fk_object      = $result;
-                $signatory->module_name    = 'digiriskdolibarr';
-
-                $signatory->create($user);
+                    // Create thumbs
+                    $imgThumbLarge = vignette($path_filename_ext, $conf->global->DIGIRISKDOLIBARR_MEDIA_MAX_WIDTH_LARGE, $conf->global->DIGIRISKDOLIBARR_MEDIA_MAX_HEIGHT_LARGE, '_large', 50, "thumbs");
+                    $imgThumbMedium = vignette($path_filename_ext, $conf->global->DIGIRISKDOLIBARR_MEDIA_MAX_WIDTH_MEDIUM, $conf->global->DIGIRISKDOLIBARR_MEDIA_MAX_HEIGHT_MEDIUM, '_medium', 50, "thumbs");
+                    $imgThumbSmall = vignette($path_filename_ext, $maxwidthsmall, $maxheightsmall, '_small', 50, "thumbs");
+                    // Create mini thumbs for image (Ratio is near 16/9)
+                    $imgThumbMini = vignette($path_filename_ext, 30, 30, '_mini', 50, "thumbs");
+                }
             }
+        }
+    }
+    // Remove file
+    if ($action == 'removefile') {
+        include_once DOL_DOCUMENT_ROOT . '/core/lib/files.lib.php';
+        $filetodelete = GETPOST('filetodelete');
 
-            $object->call_trigger('TICKET_PUBLIC_INTERFACE_CREATE', $user);
+        $ticket_upload_dir = $conf->digiriskdolibarr->multidir_output[isset($conf->entity) ? $conf->entity : 1] . '/temp';
+        //Add files linked
+        $ticket_upload_dir = $conf->digiriskdolibarr->multidir_output[isset($conf->entity) ? $conf->entity : 1] . '/temp/ticket/' . $ticketTmpId . '/';
+        $fileList          = dol_dir_list($ticket_upload_dir);
 
-			// Creation OK
-			dol_delete_dir_recursive($ticket_upload_dir . '/ticket/' . $ticketTmpId . '/');
-			$urltogo = $_SERVER['PHP_SELF'] . '/../ticket_success.php?track_id=' . $track_id;
-			setEventMessages($langs->trans("TicketSent", ''), null);
-			header("Location: " . $urltogo);
-			exit;
-		}
-	}
-}
+        if (is_file($ticket_upload_dir . $filetodelete)) {
+            //Delete file
+            dol_delete_file($ticket_upload_dir . $filetodelete);
 
-// Add file in ticket form
-if ($action == 'sendfile') {
-	include_once DOL_DOCUMENT_ROOT . '/core/lib/files.lib.php';
-
-	$ticket_upload_dir = $conf->digiriskdolibarr->multidir_output[isset($conf->entity) ? $conf->entity : 1] . '/temp';
-	if ( ! is_dir($ticket_upload_dir)) {
-		dol_mkdir($ticket_upload_dir);
-	}
-	if ( ! is_dir($ticket_upload_dir . '/ticket')) {
-		dol_mkdir($ticket_upload_dir . '/ticket');
-	}
-	$fullTicketTmpPath = $ticket_upload_dir . '/ticket/' . $ticketTmpId . '/';
-	dol_mkdir($fullTicketTmpPath);
-
-	for ($k = 0; $k < count($_FILES['files']['name']); $k++) {
-		if (($_FILES['files']['name'][$k] != "")) {
-			// Where the file is going to be stored
-			$target_dir        = $fullTicketTmpPath;
-			$file              = $_FILES['files']['name'][$k];
-			$path              = pathinfo($file);
-			$filename          = $path['filename'];
-			$ext               = $path['extension'];
-			$temp_name         = $_FILES['files']['tmp_name'][$k];
-			$path_filename_ext = $target_dir . $filename . "." . $ext;
-
-			if (file_exists($path_filename_ext)) {
-				echo "Sorry, file already exists.";
-			} else {
-				echo $temp_name;
-				echo $path_filename_ext;
-				move_uploaded_file($temp_name, $path_filename_ext);
-				echo "Congratulations! File Uploaded Successfully.";
-
-				global $maxwidthmini, $maxheightmini, $maxwidthsmall, $maxheightsmall;
-
-				// Create thumbs
-				$imgThumbLarge = vignette($path_filename_ext, $conf->global->DIGIRISKDOLIBARR_MEDIA_MAX_WIDTH_LARGE, $conf->global->DIGIRISKDOLIBARR_MEDIA_MAX_HEIGHT_LARGE, '_large', 50, "thumbs");
-				$imgThumbMedium = vignette($path_filename_ext, $conf->global->DIGIRISKDOLIBARR_MEDIA_MAX_WIDTH_MEDIUM, $conf->global->DIGIRISKDOLIBARR_MEDIA_MAX_HEIGHT_MEDIUM, '_medium', 50, "thumbs");
-				$imgThumbSmall = vignette($path_filename_ext, $maxwidthsmall, $maxheightsmall, '_small', 50, "thumbs");
-				// Create mini thumbs for image (Ratio is near 16/9)
-				$imgThumbMini = vignette($path_filename_ext, 30, 30, '_mini', 50, "thumbs");
-			}
-		}
-	}
-}
-// Remove file
-if ($action == 'removefile') {
-	include_once DOL_DOCUMENT_ROOT . '/core/lib/files.lib.php';
-	$filetodelete = GETPOST('filetodelete');
-
-	$ticket_upload_dir = $conf->digiriskdolibarr->multidir_output[isset($conf->entity) ? $conf->entity : 1] . '/temp';
-	//Add files linked
-	$ticket_upload_dir = $conf->digiriskdolibarr->multidir_output[isset($conf->entity) ? $conf->entity : 1] . '/temp/ticket/' . $ticketTmpId . '/';
-	$fileList          = dol_dir_list($ticket_upload_dir);
-
-	if (is_file($ticket_upload_dir . $filetodelete)) {
-		//Delete file
-		dol_delete_file($ticket_upload_dir . $filetodelete);
-
-		//Delete file thumbs
-		$thumbs_names = getAllThumbsNames($filename);
-		if (!empty($thumbs_names)) {
-			foreach($thumbs_names as $thumb_name) {
-				$thumb_fullname  = $ticket_upload_dir . 'thumbs/' . $thumb_name;
-				if (file_exists($thumb_fullname)) {
-					unlink($thumb_fullname);
-				}
-			}
-		}
-	}
-	$action = '';
+            //Delete file thumbs
+            $thumbs_names = getAllThumbsNames($filename);
+            if (!empty($thumbs_names)) {
+                foreach($thumbs_names as $thumb_name) {
+                    $thumb_fullname  = $ticket_upload_dir . 'thumbs/' . $thumb_name;
+                    if (file_exists($thumb_fullname)) {
+                        unlink($thumb_fullname);
+                    }
+                }
+            }
+        }
+        $action = '';
+    }
 }
 
 /*
@@ -693,7 +684,7 @@ if ($entity > 0) {
 		print $mc->select_entities('', 'entity');
 		print '<input class="wpeo-button button-blue" type="submit" value="'. $langs->trans('Go') .'">';
 	} else {
-		$entities_list = $mc->getEntitiesList(false, false, true);
+		$entities_list = $mc->getEntitiesList(true, false, true);
 
 		print '<div class="wpeo-gridlayout grid-4">';
 		if (!empty($entities_list)) {
