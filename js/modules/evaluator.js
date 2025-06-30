@@ -30,6 +30,9 @@ window.digiriskdolibarr.evaluator.init = function() {
 window.digiriskdolibarr.evaluator.event = function() {
 	$( document ).on( 'click', '.evaluator-create', window.digiriskdolibarr.evaluator.createEvaluator );
 	$( document ).on( 'change', '#fk_user_employer', window.digiriskdolibarr.evaluator.selectUser );
+
+	$( document ).on( 'click', '#openCreateUser', window.digiriskdolibarr.evaluator.openCreateUser );
+	$( document ).on( 'click', '.user-create .wpeo-button', window.digiriskdolibarr.evaluator.createUser );
 };
 
 /**
@@ -143,3 +146,66 @@ window.digiriskdolibarr.evaluator.createEvaluator = function ( event ) {
 	});
 
 };
+
+/**
+ * Action open create user.
+ * @since   21.0.0
+ * @version 21.0.0
+ *
+ * @param  {ClickEvent} event L'état du clic.
+ * @return {void}
+ */
+window.digiriskdolibarr.evaluator.openCreateUser = function( event ) {
+	event.preventDefault();
+	event.stopPropagation();
+
+	let $box = $(document).find('.user-create');
+
+	$box.fadeIn();
+
+	$box.find('input:not([type="hidden"])').first().focus();
+}
+
+/**
+ * Action create user.
+ *  @since   21.0.0
+ *  @version 21.0.0
+ *  @param  {ClickEvent} event L'état du clic.
+ *  @return {void}
+ * */
+window.digiriskdolibarr.evaluator.createUser = function( event ) {
+	$this =  $(this);
+	let values = {};
+
+	$this.closest('.user-create').find('input, select').each(function() {
+		let name = $(this).attr('name');
+		if (name) {
+			values[name] = $(this).val();
+		}
+	});
+
+	let token = window.saturne.toolbox.getToken()
+	$.ajax({
+		url: document.URL + '&action=create_user&token='+token,
+		type: "POST",
+		data: JSON.stringify(values),
+		contentType: "application/json",
+		success: function (resp) {
+			$.jnotify($(resp).find('#actionMessage').val(), {
+				type: $(resp).find('#actionNewUserId').val() > 0 ? 'success' : 'error',
+				sticky: false,
+				position: 'top-right',
+			})
+			if ($(resp).find('#actionNewUserId').val() <= 0) {
+				return;
+			}
+			let newOption = new Option(values.lastname + ' ' + values.firstname, $(resp).find('#actionNewUserId').val(), true, true);
+			let $select = $('#fk_user_employer');
+
+			$select.append(newOption);
+			$select.trigger('change');
+
+			$this.closest('.user-create').fadeOut();
+		},
+	});
+}

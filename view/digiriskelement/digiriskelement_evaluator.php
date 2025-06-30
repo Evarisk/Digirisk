@@ -242,6 +242,43 @@ if (empty($reshook)) {
 		$userID = $data['userID'];
 		$usertmp->fetch($userID);
 	}
+
+	if ( ! $error && $action == 'create_user' && $permissiontoadd) {
+
+		$data = json_decode(file_get_contents('php://input'), true);
+
+		$user = new User($db);
+
+		$user->lastname  = $data['lastname'];
+		$user->firstname = $data['firstname'];
+		$user->login     = $user->firstname . $user->lastname;
+		$user->email     = preg_replace('/\s+/', '', $data['email']);
+		$user->job       = $data['job'] ?? '';
+
+		// Fill array 'array_options' with data from add form
+		$ret = $extrafields->setOptionalsFromPost(null, $user);
+		if ($ret < 0) {
+			$error++;
+		}
+
+		// Set entity property
+		$user->entity = getDolGlobalInt('MULTICOMPANY_TRANSVERSE_MODE') ? 1 : $conf->entity;
+
+		$db->begin();
+
+		$actionNewUserId = $user->create($user);
+		if ($actionNewUserId > 0) {
+			$user->SetInGroup($data['groupid'], $conf->entity);
+
+			$actionMessage = $langs->trans("UserCreated");
+			$db->commit();
+		} else {
+			$langs->load("errors");
+			$db->rollback();
+			$actionMessage = $langs->trans($object->error);
+		}
+	}
+	$action = '';
 }
 
 /*
@@ -260,6 +297,11 @@ if ($fromid > 0) {
 }
 
 print '<div id="cardContent" value="">';
+
+if (!empty($actionNewUserId)) {
+	print '<input type="hidden" id="actionNewUserId" value="' . $actionNewUserId . '">';
+	print '<input type="hidden" id="actionMessage" value="' . $actionMessage . '">';
+}
 
 if ($object->id > 0 || $fromid > 0) {
 	$res = $object->fetch_optionals();
@@ -460,7 +502,7 @@ if ($object->id > 0 || $fromid > 0) {
 							print '<table><tr>';
 							print '<td>';
 							print $form->selectarray('fk_user_employer', $userlist, (GETPOST('userid') ? GETPOST('userid') : $usertmp->id), $langs->trans('SelectUser'), null, null, null, "40%", 0, 0, '', 'minwidth300', 1);
-							print ' <a href="' . dol_buildpath('custom/digiriskdolibarr/view/digiriskusers.php?backtopage=' . urlencode($_SERVER["PHP_SELF"] . '?id=' . $id . '&userid=USERID&modalactive=1&job=JOB') . '#addUser', 1) . '"><span class="fa fa-plus-circle valignmiddle paddingleft" title="' . $langs->trans("AddUser") . '"></span></a>';
+							print '<span class="fa fa-plus-circle valignmiddle paddingleft" id="openCreateUser" title="' . $langs->trans("AddUser") . '"></span>';
 							print '</td></tr></table>';
 							?>
 						</div>
@@ -479,6 +521,31 @@ if ($object->id > 0 || $fromid > 0) {
 							</div>
 						</div>
 					</div>
+
+					<div class="user-create wpeo-gridlayout grid-6" style="display: none;">
+						<input type="hidden" name="action" value="create_user" />
+						<div class="table-cell table-150">
+							<input type="text" id="lastname" placeholder="<?php echo $langs->trans('LastName'); ?>" name="lastname" value="<?php echo dol_escape_htmltag(GETPOST('lastname')); ?>" />
+						</div>
+						<div class="table-cell table-150">
+							<input type="text" id="firstname" placeholder="<?php echo $langs->trans('FirstName'); ?>" name="firstname" value="<?php echo dol_escape_htmltag(GETPOST('firstname')); ?>" />
+						</div>
+						<div class="table-cell table-300">
+							<input style="width:100%" type="email" id="email" class="email" placeholder="<?php echo $langs->trans('Email') ; ?>" name="email" value="<?php echo GETPOST('email'); ?>" />
+						</div>
+						<div class="table-cell table-150">
+							<input type="text" id="job" placeholder="<?php echo $langs->trans('PostOrFunction'); ?>" name="job" value="<?php echo dol_escape_htmltag(GETPOST('job')); ?>" />
+						</div>
+						<div class="table-cell table-300">
+							<?php echo $form->select_dolgroups(getDolGlobalInt('DIGIRISKDOLIBARR_READERGROUP_SET'), 'groupid', 1, '', 0, '', array(), (string) $conf->entity, false, 'minwidth100imp widthcentpercentminusxx groupselectcontact'); ?>
+						</div>
+						<div class="table-cell">
+							<button type="button" class="wpeo-button button-square-50 button-blue wpeo-tooltip-event" aria-label="<?php echo $langs->trans('CreateUser'); ?>">
+								<i class="button-icon fas fa-plus"></i>
+							</button>
+						</div>
+					</div>
+
 				</div>
 				<!-- Modal-Footer -->
 				<div class="modal-footer">
