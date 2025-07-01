@@ -686,6 +686,19 @@ if ($entity > 0) {
 
         $visible = $mainCategoryExtrafields->use_signatory || $mainCategoryChildrenExtrafields->use_signatory || $subCategoryExtrafields->use_signatory;
         if ($visible) {
+
+            $validateText = !empty($mainCategoryExtrafields->validate_text) || !empty($mainCategoryChildrenExtrafields->validate_text) || !empty($subCategoryExtrafields->validate_text);
+            if ($validateText) {
+                $content = $mainCategoryExtrafields->validate_text ?: $mainCategoryChildrenExtrafields->validate_text ?: $subCategoryExtrafields->validate_text;
+
+                print '<label style="display: flex; align-items: flex-start; margin: 1em 0;">';
+                print '<input type="checkbox" id="validate_text_checkbox" name="validate_text" style="margin-right: 1em; margin-top: 0.2em;" required>';
+                print '<div style="flex: 1;">';
+                print $content;
+                print '</div>';
+                print '</label>';
+            }
+
             // Load Saturne libraries
             require_once __DIR__ . '/../../../saturne/lib/saturne_functions.lib.php';
             require_once __DIR__ . '/../../../saturne/class/saturnesignature.class.php';

@@ -1369,6 +1369,7 @@ MultiEntityTicketPublicInterfaceQRCode   = QR Code de l'interface publique des t
 PublicInterfaceConfiguration             = Champs visibles / requis de l'interface publique
 ExternalLinkDescription                  = Utiliser la catégorie de ticket avec un lien externe
 ExternalLinkInNewTab                     = Lien externe dans un nouvel onglet
+ValidateText                             = Conditions à accepter
 TicketDigiriskElementRequired            = GP/UT obligatoire pour créer un ticket
 TicketDigiriskElementRequiredHelp        = Activer cette option pour rendre obligatoire la selection d'un GP/UT pour créer un ticket dans l'interface publique
 TicketDigiriskElementHideRef             = Cacher la référence des GP/UT dans le sélecteur de service l'interface publique
