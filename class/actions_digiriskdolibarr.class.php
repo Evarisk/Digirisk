@@ -297,10 +297,10 @@ class ActionsDigiriskdolibarr
                 $out  = '<tr class="field_user_group"><td class="titlefieldmax45 wordbreak">';
                 $out .= $langs->transnoentities('UserGroup');
                 $out .= '</td><td class="valuefieldcreate_ticket_user_group">';
-                $out .= img_picto('', $userGroup->picto, 'class="pictofixedwidth"') . Form::selectarray('user_group', $userGroups, GETPOST('user_group'), -1, 0, 0, '', '', 0, 0, '', 'minwidth100imp maxwidth500 widthcentpercentminusxx');
+                $out .= img_picto('', $userGroup->picto, 'class="pictofixedwidth"') . Form::selectarray('user_group', $userGroups, getDolGlobalInt('DIGIRISKDOLIBARR_TICKET_DEFAULT_USER_GROUP'), -1, 0, 0, '', '', 0, 0, '', 'minwidth100imp maxwidth500 widthcentpercentminusxx');
                 $out .= '</td></tr>';
 
-                $userGroupID = GETPOSTISSET('user_group') ? GETPOST('user_group') : 0;
+                $userGroupID = GETPOSTISSET('user_group') ? GETPOST('user_group') : getDolGlobalInt('DIGIRISKDOLIBARR_TICKET_DEFAULT_USER_GROUP');
                 $userGroup->fetch($userGroupID);
                 $users = $userGroup->listUsersForGroup();
                 $users = array_map(fn($userTmp) => $userTmp->getFullName($langs), $users);
@@ -310,31 +310,56 @@ class ActionsDigiriskdolibarr
                 $out .= '</td><td class="valuefieldcreate_ticket_fk_user_assign">';
                 $out .= img_picto('', $user->picto, 'class="pictofixedwidth"') . Form::selectarray('fk_user_assign', $users, GETPOST('fk_user_assign'), -1, 0, 0, '', '', 0, 0, '', 'minwidth100imp maxwidth500 widthcentpercentminusxx');
                 $out .= '</td></tr>'; ?>
-                <script>
-                    //$('#fk_user_assign').closest('tr').remove();
-                    $('#notify_tiers_at_create').closest('tr').after(<?php echo json_encode($out); ?>);
-                </script>
 
                 <?php if (GETPOST('action') == 'create') : ?>
                     <script>
-                        $(document).on('change', '#user_group', function () {
-                            const field        = $(this).val();
-                            let token          = window.saturne.toolbox.getToken();
+                        $('#fk_user_assign').closest('tr').remove();
+                        $('#notify_tiers_at_create').closest('tr').after(<?php echo json_encode($out); ?>);
+
+                    </script>
+                <?php endif;
+                if (GETPOST('set') == 'assign_ticket') : ?>
+                    <script>
+                        $('#fk_user_assign').remove();
+                        $('input[value="assign_user"]').parent().prepend(<?php echo json_encode($out); ?>);
+                        $('input[value="assign_user"]').closest('tr').children('td').first().html('');
+                    </script>
+                <?php endif;
+
+                if (GETPOST('action') == 'create' || GETPOST('set') == 'assign_ticket') {
+                    ?>
+                    <script>
+                        $('#user_group').on('change', function () {
                             let querySeparator = window.saturne.toolbox.getQuerySeparator(document.URL);
 
+                            $('#fk_user_assign').empty();
                             $.ajax({
-                                url: document.URL + querySeparator + 'action=create&user_group=' + field + '&token=' + token,
+                                url: document.URL + querySeparator + 'action=get_user_group&user_group=' + $(this).val(),
                                 type: 'POST',
-                                processData: false,
-                                contentType: false,
-                                success: function() {
-                                    window.location.href = document.URL + querySeparator + 'action=create&user_group=' + field + '&token=' + token;
-                                },
-                                error: function() {}
+                                success: function (data) {
+                                    let usersList = JSON.parse(atob($('<div>').html(data).find('input[name="users_list"]').val()));
+                                    $('#fk_user_assign').empty();
+                                    $.each(usersList, function (index, userName) {
+                                        let option = new Option(userName, index);
+                                        $('#fk_user_assign').append(option);
+                                    });
+                                    $('#fk_user_assign').trigger('change');
+                                }
                             });
                         });
                     </script>
-                <?php endif;
+                    <?php
+                }
+
+                if (GETPOST('action') == 'get_user_group') {
+                    $userGroupID = GETPOST('user_group');
+                    $userGroup->fetch($userGroupID);
+                    $users = $userGroup->listUsersForGroup();
+                    $users = array_map(fn($userTmp) => $userTmp->getFullName($langs), $users);
+
+                    echo '<input type="hidden" name="users_list" value="' . base64_encode(json_encode($users)) . '">';
+                }
+
 			if (GETPOST('action') == 'add_message') {
 
 				$object = new Ticket($this->db);
