@@ -2547,13 +2547,13 @@ class modDigiriskdolibarr extends DolibarrModules
                 'digiriskdolibarr_ticket_firstname_visible'  => 'on',
                 'digiriskdolibarr_ticket_firstname_required' => 'on',
                 'digiriskdolibarr_ticket_phone_visible'      => 'on',
-                'digiriskdolibarr_ticket_phone_required'     => '',
                 'digiriskdolibarr_ticket_service_visible'    => 'on',
                 'digiriskdolibarr_ticket_service_required'   => 'on',
                 'digiriskdolibarr_ticket_location_visible'   => 'on',
-                'digiriskdolibarr_ticket_location_required'  => '',
                 'digiriskdolibarr_ticket_date_visible'       => 'on',
-                'digiriskdolibarr_ticket_date_required'      => 'on'
+                'digiriskdolibarr_ticket_date_required'      => 'on',
+				'digiriskdolibarr_ticket_email_visible'      => 'on',
+				'photo_visible'                              => 'on',
             ]);
             $category->updateExtraField('ticket_category_config');
 

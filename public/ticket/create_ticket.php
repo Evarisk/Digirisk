@@ -117,6 +117,37 @@ if (empty($resHook)) {
         $message        = GETPOST('message');
         $ticketTmpId  = GETPOST('ticket_id');
 
+        $mainCategoryObject              = $category->rechercher($conf->global->DIGIRISKDOLIBARR_TICKET_MAIN_CATEGORY, '', 'ticket', true);
+        $mainCategoryExtrafields         = json_decode($mainCategoryObject[0]->array_options['options_ticket_category_config'], true);
+        $mainCategoryChildrenExtrafields = new StdClass();
+        $subCategoryExtrafields          = new StdClass();
+        $mainCategoryChildrenItem        = null;
+
+        if ( ! empty($mainCategoryObject) && $mainCategoryObject > 0) {
+            $mainCategoryChildren = $mainCategoryObject[0]->get_filles();
+            if ( ! empty($mainCategoryChildren) && $mainCategoryChildren > 0) {
+                foreach ($mainCategoryChildren as $cat) {
+                    if ($cat->id == GETPOST('parentCategory')) {
+                        $mainCategoryChildrenExtrafields = json_decode($cat->array_options['options_ticket_category_config'], true);
+                        $mainCategoryChildrenItem        = $cat;
+                    }
+                }
+
+                if ($mainCategoryChildrenItem) {
+                    $category->fetch($mainCategoryChildrenItem->id);
+                    $selectedParentCategoryChildren = $category->get_filles();
+                    if ( ! empty($selectedParentCategoryChildren)) {
+                        foreach ($selectedParentCategoryChildren as $subCategory) {
+                            if ($subCategory->id == GETPOSTINT('subCategory')) {
+                                $subCategoryExtrafields = json_decode($subCategory->array_options['options_ticket_category_config'], true);
+                            }
+                        }
+                    }
+                }
+            }
+        }
+        $config = array_merge(array_filter($mainCategoryExtrafields ?? []), array_filter($mainCategoryChildrenExtrafields ?? []), array_filter($subCategoryExtrafields ?? []));
+
         // Check parameters
         if (empty($parentCategory)) {
             setEventMessages($langs->trans('ErrorFieldNotEmpty', $conf->global->DIGIRISKDOLIBARR_TICKET_PARENT_CATEGORY_LABEL), array(), 'errors');
@@ -124,7 +155,7 @@ if (empty($resHook)) {
         }
 
         $email = GETPOST('email', 'alpha');
-        if ($conf->global->DIGIRISKDOLIBARR_TICKET_EMAIL_REQUIRED && $conf->global->DIGIRISKDOLIBARR_TICKET_EMAIL_VISIBLE) {
+        if ($config['digiriskdolibarr_ticket_email_visible'] && $config['digiriskdolibarr_ticket_email_required']) {
             if (empty($email)) {
                 setEventMessages($langs->trans('ErrorFieldNotEmpty', $langs->transnoentities('Email')), array(), 'errors');
                 $error++;
@@ -132,7 +163,7 @@ if (empty($resHook)) {
         }
 
         $firstname = GETPOST('options_digiriskdolibarr_ticket_firstname', 'alpha');
-        if ($conf->global->DIGIRISKDOLIBARR_TICKET_FIRSTNAME_REQUIRED && $conf->global->DIGIRISKDOLIBARR_TICKET_FIRSTNAME_VISIBLE) {
+        if ($config['digiriskdolibarr_ticket_firstname_visible'] && $config['digiriskdolibarr_ticket_firstname_required']) {
             if (empty($firstname)) {
                 setEventMessages($langs->trans('ErrorFieldNotEmpty', $langs->transnoentities('FirstName')), array(), 'errors');
                 $error++;
@@ -140,7 +171,7 @@ if (empty($resHook)) {
         }
 
         $lastname = GETPOST('options_digiriskdolibarr_ticket_lastname', 'alpha');
-        if ($conf->global->DIGIRISKDOLIBARR_TICKET_LASTNAME_REQUIRED && $conf->global->DIGIRISKDOLIBARR_TICKET_LASTNAME_VISIBLE) {
+        if ($config['digiriskdolibarr_ticket_lastname_visible'] && $config['digiriskdolibarr_ticket_lastname_required']) {
             if (empty($lastname)) {
                 setEventMessages($langs->trans('ErrorFieldNotEmpty', $langs->transnoentities('LastName')), array(), 'errors');
                 $error++;
@@ -148,7 +179,7 @@ if (empty($resHook)) {
         }
 
         $phone = GETPOST('options_digiriskdolibarr_ticket_phone', 'alpha');
-        if ($conf->global->DIGIRISKDOLIBARR_TICKET_PHONE_REQUIRED && $conf->global->DIGIRISKDOLIBARR_TICKET_PHONE_VISIBLE) {
+        if ($config['digiriskdolibarr_ticket_phone_visible'] && $config['digiriskdolibarr_ticket_phone_required']) {
             if (empty($phone)) {
                 setEventMessages($langs->trans('ErrorFieldNotEmpty', $langs->transnoentities('Phone')), array(), 'errors');
                 $error++;
@@ -156,7 +187,7 @@ if (empty($resHook)) {
         }
 
         $location = GETPOST('options_digiriskdolibarr_ticket_location', 'alpha');
-        if ($conf->global->DIGIRISKDOLIBARR_TICKET_LOCATION_REQUIRED && $conf->global->DIGIRISKDOLIBARR_TICKET_LOCATION_VISIBLE) {
+        if ($config['digiriskdolibarr_ticket_location_visible'] && $config['digiriskdolibarr_ticket_location_required']) {
             if (empty($location)) {
                 setEventMessages($langs->trans('ErrorFieldNotEmpty', $langs->transnoentities('Location')), array(), 'errors');
                 $error++;
@@ -187,7 +218,7 @@ if (empty($resHook)) {
             $error++;
         }
 
-        if ($conf->global->DIGIRISKDOLIBARR_TICKET_DIGIRISKELEMENT_REQUIRED && $conf->global->DIGIRISKDOLIBARR_TICKET_DIGIRISKELEMENT_VISIBLE) {
+        if ($config['digiriskdolibarr_ticket_service_visible'] && $config['digiriskdolibarr_ticket_service_required']) {
             if (empty(GETPOST('options_digiriskdolibarr_ticket_service')) || GETPOST('options_digiriskdolibarr_ticket_service') == -1) {
                 setEventMessages($langs->trans('ErrorFieldNotEmpty', $langs->transnoentitiesnoconv('GP/UT')), array(), 'errors');
                 $error++;
@@ -195,7 +226,7 @@ if (empty($resHook)) {
         }
 
         $date = GETPOST('options_digiriskdolibarr_ticket_date', 'alpha');
-        if ($conf->global->DIGIRISKDOLIBARR_TICKET_DATE_REQUIRED && $conf->global->DIGIRISKDOLIBARR_TICKET_DATE_VISIBLE) {
+        if ($config['digiriskdolibarr_ticket_date_visible'] && $config['digiriskdolibarr_ticket_date_required']) {
             if (empty($date)) {
                 setEventMessages($langs->trans('ErrorFieldNotEmpty', $langs->transnoentitiesnoconv('Date')), array(), 'errors');
                 $error++;
@@ -559,6 +590,11 @@ if ($entity > 0) {
 				});
 				$fieldList = array_merge(['message' => $langs->transnoentities('Message')], $fieldList);
 
+                $fields = [
+                    'digiriskdolibarr_ticket_email' => ['type' => 'email', 'name' => 'email'],
+                    'digiriskdolibarr_ticket_date'  => ['type' => 'datetime-local']
+                ];
+
 				foreach ($fieldList as $key => $label) {
 					if (strpos($key, 'digiriskdolibarr_ticket') === false && !in_array($key, ['message'])) {
 						continue;
@@ -620,7 +656,6 @@ if ($entity > 0) {
 							$out .= '</div></div></div>';
 							break;
 						case 'digiriskdolibarr_ticket_email':
-						case 'digiriskdolibarr_ticket_date':
 							$out .= '<input type="' . $fields[$key]['type'] . '" name="' . ($fields[$key]['name'] ?? 'options_' . $key) . '" id="' . ($fields[$key]['name'] ?? 'options_' . $key) . '" value="' . GETPOST($fields[$key]['name'] ?? 'options_' . $key) . '"' . ($required ? 'required' : '') . '/>';
 							break;
 						default:
