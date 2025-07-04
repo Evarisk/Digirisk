@@ -247,28 +247,28 @@ if (empty($reshook)) {
 
 		$data = json_decode(file_get_contents('php://input'), true);
 
-		$user = new User($db);
+		$userTmp = new User($db);
 
-		$user->lastname  = $data['lastname'];
-		$user->firstname = $data['firstname'];
-		$user->login     = $user->firstname . $user->lastname;
-		$user->email     = preg_replace('/\s+/', '', $data['email']);
-		$user->job       = $data['job'] ?? '';
+		$userTmp->lastname  = $data['lastname'];
+		$userTmp->firstname = $data['firstname'];
+		$userTmp->login     = $userTmp->firstname . $userTmp->lastname;
+		$userTmp->email     = preg_replace('/\s+/', '', $data['email']);
+		$userTmp->job       = $data['job'] ?? '';
 
 		// Fill array 'array_options' with data from add form
-		$ret = $extrafields->setOptionalsFromPost(null, $user);
+		$ret = $extrafields->setOptionalsFromPost(null, $userTmp);
 		if ($ret < 0) {
 			$error++;
 		}
 
 		// Set entity property
-		$user->entity = getDolGlobalInt('MULTICOMPANY_TRANSVERSE_MODE') ? 1 : $conf->entity;
+		$userTmp->entity = getDolGlobalInt('MULTICOMPANY_TRANSVERSE_MODE') ? 1 : $conf->entity;
 
 		$db->begin();
 
-		$actionNewUserId = $user->create($user);
+		$actionNewUserId = $user->create($userTmp);
 		if ($actionNewUserId > 0) {
-			$user->SetInGroup($data['groupid'], $conf->entity);
+			$userTmp->SetInGroup($data['groupid'], $conf->entity);
 
 			$actionMessage = $langs->trans("UserCreated");
 			$db->commit();
