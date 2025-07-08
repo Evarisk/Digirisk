@@ -735,7 +735,7 @@ if ($entity > 0) {
 					}
 
 					print '<a href="' . $_SERVER["PHP_SELF"] . '?entity=' . $entityId . '">';
-					print '<div class="card" style="height: 200px">';
+					print '<div class="card">';
 					print '<br>';
 					print '<img src="' . $logo_src . '" alt="SocietyLogo" style="width:40%">';
 					print '<div class="card-container">';
