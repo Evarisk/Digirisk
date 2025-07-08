@@ -546,6 +546,8 @@ class InterfaceDigiriskdolibarrTriggers extends DolibarrTriggers
 				break;
 
             case 'TICKET_PUBLIC_INTERFACE_CREATE' :
+                require_once __DIR__ . '/../../../saturne/class/saturnemail.class.php';
+
                 $categories = $object->getCategoriesCommon('ticket');
                 if (is_array($categories) && !empty($categories)) {
                     $category = new Categorie($this->db);
@@ -553,8 +555,8 @@ class InterfaceDigiriskdolibarrTriggers extends DolibarrTriggers
                         $category->fetch($categoryID);
                         $categoryConfigs = json_decode($category->array_options['options_ticket_category_config']);
                         if ($categoryConfigs->mail_template && $categoryConfigs->recipients) {
-                            $modelMail = new ModelMail($this->db);
-                            $modelMail->fetch($categoryConfigs->mail_template);
+                            $saturneMail = new SaturneMail($this->db);
+                            $saturneMail->fetch($categoryConfigs->mail_template);
                             $recipients = explode(',', $categoryConfigs->recipients);
                             foreach ($recipients as $recipientID) {
                                 $userTmp = new User($this->db);
@@ -568,7 +570,7 @@ class InterfaceDigiriskdolibarrTriggers extends DolibarrTriggers
 
                                     // Create form object
                                     // Send mail (substitutionarray must be done just before this)
-                                    $mailfile = new CMailFile($modelMail->topic, $sendto, $from, $modelMail->content, array(), array(), array(), "", "", 0, -1, '', '', $trackid, '', 'ticket');
+                                    $mailfile = new CMailFile($saturneMail->topic, $sendto, $from, $saturneMail->content, array(), array(), array(), "", "", 0, -1, '', '', $trackid, '', 'ticket');
                                     if ($mailfile->error) {
                                         setEventMessages($mailfile->error, $mailfile->errors, 'errors');
                                     } else {
@@ -589,8 +591,8 @@ class InterfaceDigiriskdolibarrTriggers extends DolibarrTriggers
                                                 $actioncomm->elementtype   = 'ticket';
                                                 $actioncomm->label         = $langs->transnoentities('TicketCreationMailWellSent');
                                                 $actioncomm->note_private  = $langs->transnoentities('TicketCreationMailSent', $sendto) . '<br>';
-                                                $actioncomm->note_private .= $modelMail->topic . '<br>';
-                                                $actioncomm->note_private .= $modelMail->content;
+                                                $actioncomm->note_private .= $saturneMail->topic . '<br>';
+                                                $actioncomm->note_private .= $saturneMail->content;
                                                 $result = $actioncomm->create($user);
                                             }
                                         }
