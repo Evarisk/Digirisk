@@ -286,7 +286,80 @@ class ActionsDigiriskdolibarr
 					jQuery('tr.ticket_extras_digiriskdolibarr_ticket_firstname').after(<?php echo json_encode($selectDigiriskElement) ; ?>)
 				</script>
 				<?php
-			}
+            }
+
+                require_once DOL_DOCUMENT_ROOT . '/user/class/usergroup.class.php';
+
+                $userGroup  = new UserGroup($this->db);
+                $userGroups = saturne_fetch_all_object_type('UserGroup');
+                $userGroups = array_column($userGroups, 'nom', 'id');
+
+                $out  = '<tr class="field_user_group"><td class="titlefieldmax45 wordbreak">';
+                $out .= $langs->transnoentities('UserGroup');
+                $out .= '</td><td class="valuefieldcreate_ticket_user_group">';
+                $out .= img_picto('', $userGroup->picto, 'class="pictofixedwidth"') . Form::selectarray('user_group', $userGroups, getDolGlobalInt('DIGIRISKDOLIBARR_TICKET_DEFAULT_USER_GROUP'), -1, 0, 0, '', '', 0, 0, '', 'minwidth100imp maxwidth500 widthcentpercentminusxx');
+                $out .= '</td></tr>';
+
+                $userGroupID = GETPOSTISSET('user_group') ? GETPOST('user_group') : getDolGlobalInt('DIGIRISKDOLIBARR_TICKET_DEFAULT_USER_GROUP');
+                $userGroup->fetch($userGroupID);
+                $users = $userGroup->listUsersForGroup();
+                $users = array_map(fn($userTmp) => $userTmp->getFullName($langs), $users);
+
+                $out .= '<tr class="field_fk_user_assign"><td class="titlefieldmax45 wordbreak">';
+                $out .= $langs->transnoentities('AssignedTo');
+                $out .= '</td><td class="valuefieldcreate_ticket_fk_user_assign">';
+                $out .= img_picto('', $user->picto, 'class="pictofixedwidth"') . Form::selectarray('fk_user_assign', $users, GETPOST('fk_user_assign'), -1, 0, 0, '', '', 0, 0, '', 'minwidth100imp maxwidth500 widthcentpercentminusxx');
+                $out .= '</td></tr>'; ?>
+
+                <?php if (GETPOST('action') == 'create') : ?>
+                    <script>
+                        $('#fk_user_assign').closest('tr').remove();
+                        $('#notify_tiers_at_create').closest('tr').after(<?php echo json_encode($out); ?>);
+
+                    </script>
+                <?php endif;
+                if (GETPOST('set') == 'assign_ticket') : ?>
+                    <script>
+                        $('#fk_user_assign').remove();
+                        $('input[value="assign_user"]').parent().prepend(<?php echo json_encode($out); ?>);
+                        $('input[value="assign_user"]').closest('tr').children('td').first().html('');
+                    </script>
+                <?php endif;
+
+                if (GETPOST('action') == 'create' || GETPOST('set') == 'assign_ticket') {
+                    ?>
+                    <script>
+                        $('#user_group').on('change', function () {
+                            let querySeparator = window.saturne.toolbox.getQuerySeparator(document.URL);
+
+                            $('#fk_user_assign').empty();
+                            $.ajax({
+                                url: document.URL + querySeparator + 'action=get_user_group&user_group=' + $(this).val(),
+                                type: 'POST',
+                                success: function (data) {
+                                    let usersList = JSON.parse(atob($('<div>').html(data).find('input[name="users_list"]').val()));
+                                    $('#fk_user_assign').empty();
+                                    $.each(usersList, function (index, userName) {
+                                        let option = new Option(userName, index);
+                                        $('#fk_user_assign').append(option);
+                                    });
+                                    $('#fk_user_assign').trigger('change');
+                                }
+                            });
+                        });
+                    </script>
+                    <?php
+                }
+
+                if (GETPOST('action') == 'get_user_group') {
+                    $userGroupID = GETPOST('user_group');
+                    $userGroup->fetch($userGroupID);
+                    $users = $userGroup->listUsersForGroup();
+                    $users = array_map(fn($userTmp) => $userTmp->getFullName($langs), $users);
+
+                    echo '<input type="hidden" name="users_list" value="' . base64_encode(json_encode($users)) . '">';
+                }
+
 			if (GETPOST('action') == 'add_message') {
 
 				$object = new Ticket($this->db);
@@ -399,6 +472,29 @@ class ActionsDigiriskdolibarr
 
         return 0; // or return 1 to replace standard code
 	}
+
+    /**
+     *  Overloading the addSQLWhereFilterOnSelectUsers function : replacing the parent's function with the one below
+     *
+     * @param Hook $parameters metadatas (context, etc...)
+     * @param $object current object
+     * @param $action
+     * @return int              < 0 on error, 0 on success, 1 to replace standard code
+     */
+    public function addSQLWhereFilterOnSelectUsers($parameters, $object, $action) {
+        if (strpos($parameters['context'], 'ticketcard') !== false){
+            $sql         = '';
+            $userGroupID = getDolGlobalInt('DIGIRISKDOLIBARR_TICKET_USER_GROUP_ID_FOR_USER_ASSIGN');
+            if ($userGroupID > 0) {
+                $sql = ' AND u.rowid IN (SELECT ug.fk_user FROM ' . $this->db->prefix() . 'usergroup_user as ug WHERE ug.entity IN (' . getEntity('usergroup') . ') AND ug.fk_usergroup = ' . $userGroupID . ')';
+            }
+
+            $this->resprints = $sql;
+            return  1;
+        }
+
+        return 0; // or return 1 to replace standard code
+    }
 
 	/**
 	 *  Overloading the doActions function : replacing the parent's function with the one below
