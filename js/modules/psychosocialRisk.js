@@ -171,7 +171,6 @@ window.digiriskdolibarr.psychosocial_risk.populateRisksTable = function() {
     const tr = $('<tr class="oddeven psychosocial-risk-row" id="psychosocial_risk_' + index + '">');
     tr.attr('data-category', risk.title);
 
-    // Utilisation des fonctions communes
     const checkbox = window.digiriskdolibarr.risk_table_common.createCheckbox('select-psychosocial-risk', 'submit_selected_psychosocial_risks');
     const categoryCell = window.digiriskdolibarr.risk_table_common.createCategoryImage(
       dolUrlRoot + '/custom/digiriskdolibarr/img/categorieDangers/rps_v2.png',
@@ -181,7 +180,6 @@ window.digiriskdolibarr.psychosocial_risk.populateRisksTable = function() {
     const descInput = window.digiriskdolibarr.risk_table_common.createDescriptionTextarea(risk.description);
     const actionsContainer = window.digiriskdolibarr.risk_table_common.createActionsContainer(risk.prevention_actions);
 
-    // Assembler la ligne
     tr.append($('<td>').append(checkbox));
     tr.append($('<td>').append(categoryCell));
     tr.append($('<td>').append(cotationInput));
@@ -207,14 +205,12 @@ window.digiriskdolibarr.psychosocial_risk.addSelectedRisks = function() {
     return;
   }
 
-  // Extraire les données des lignes sélectionnées
   const risksData = [];
   selectedRows.each(function() {
     const riskData = window.digiriskdolibarr.risk_table_common.extractRiskDataFromRow($(this));
     risksData.push(riskData);
   });
 
-  // Utiliser la fonction commune pour soumettre les risques
   window.digiriskdolibarr.risk_table_common.submitRisks(
     risksData,
     function(response, index) {

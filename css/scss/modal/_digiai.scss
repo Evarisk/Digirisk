@@ -1,17 +1,8 @@
-// Import des styles communs
-@import 'risk_table_common';
-
-// Styles spécifiques à DigiAI
-.digiai-modal {
-  // Styles spécifiques à la modal DigiAI
-}
-
 .modal-analyse-phase {
-  // Styles pour la phase d'analyse
   .analysis-in-progress {
     text-align: center;
     padding: 20px;
-    
+
     .loader {
       margin: 20px auto;
       border: 4px solid #f3f3f3;
@@ -25,7 +16,6 @@
 }
 
 .modal-result-phase {
-  // Styles pour la phase de résultats
   display: none;
 }
 
@@ -37,21 +27,10 @@
   margin: 10px auto;
 }
 
-.risque-table {
-  // Les styles de base sont hérités du fichier commun
-  // Styles spécifiques si nécessaire
-}
-
-.select-risk {
-  // Les styles de base sont hérités du fichier commun
-  // Styles spécifiques si nécessaire
-}
-
 .previous-risks-list {
-  // Styles pour les risques déjà ajoutés
   tr {
     opacity: 0.8;
-    
+
     textarea, input {
       background-color: #f8f9fa !important;
       cursor: not-allowed;
@@ -62,4 +41,4 @@
 @keyframes spin {
   0% { transform: rotate(0deg); }
   100% { transform: rotate(360deg); }
-} 
+}

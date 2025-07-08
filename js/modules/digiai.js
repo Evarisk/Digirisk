@@ -102,7 +102,6 @@ window.digiriskdolibarr.digiai.submitForm = async function(e) {
       let description = risque.description;
       let prevention_actions = risque.prevention_actions;
 
-      // Utilisation des fonctions communes
       let descInput = window.digiriskdolibarr.risk_table_common.createDescriptionTextarea(description);
       let cotationInput = window.digiriskdolibarr.risk_table_common.createCotationElement(cotation);
       let actionsContainer = window.digiriskdolibarr.risk_table_common.createActionsContainer(prevention_actions);
@@ -154,13 +153,13 @@ window.digiriskdolibarr.digiai.submitForm = async function(e) {
 
               $('.risque-table .previous-risks-list').append(clonedRow);
               row.remove();
-              
+
               // Vérifier s'il reste des risques à sélectionner
               const remainingRows = $('input.select-risk').length;
               if (remainingRows === 0) {
                 $('#submit_selected_risks').prop('disabled', true).css('opacity', 0.6);
               }
-              
+
               window.saturne.loader.remove($('#submit_selected_risks'))
               $('#submit_selected_risks').removeClass('button-disable');
             },
@@ -202,7 +201,6 @@ async function loadCategoryMap() {
   window.digiriskdolibarr.categoryMap[0].riskenvironmental.forEach(item => {
     categoryMap[item.thumbnail_name] = item.name;
   });
-  console.log(categoryMap)
 
   return categoryMap;
 }

@@ -1,5 +1,3 @@
-/* Styles communs pour les tableaux de risques (DigiAI et risques psychosociaux) */
-
 .risk-table-common,
 .psychosocial-risk-table,
 .risque-table {
@@ -22,7 +20,6 @@
     text-align: center;
   }
 
-  // Colonne checkbox (première colonne)
   th:nth-child(1),
   td:nth-child(1) {
     width: 80px;
@@ -30,7 +27,6 @@
     vertical-align: middle;
   }
 
-  // Colonne image catégorie (deuxième colonne)
   th:nth-child(2),
   td:nth-child(2) {
     width: 100px;
@@ -38,14 +34,12 @@
     vertical-align: middle;
   }
 
-  // Colonne cotation (troisième colonne)
   th:nth-child(3),
   td:nth-child(3) {
     width: 300px;
     vertical-align: middle;
   }
 
-  // Colonne description (quatrième colonne)
   th:nth-child(4),
   td:nth-child(4) {
     width: 40%;
@@ -53,7 +47,6 @@
     overflow-wrap: break-word;
   }
 
-  // Colonne actions de prévention (cinquième colonne)
   th:nth-child(5),
   td:nth-child(5) {
     width: auto;
@@ -68,7 +61,6 @@
     gap: 5px;
   }
 
-  /* Responsive */
   @media (max-width: 768px) {
     font-size: 12px;
 
@@ -137,7 +129,6 @@
   }
 }
 
-/* Boutons de soumission communs */
 .risk-submit-button {
   opacity: 0.6;
   transition: opacity 0.3s ease;
