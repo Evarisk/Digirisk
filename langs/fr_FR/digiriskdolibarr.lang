@@ -1007,7 +1007,10 @@ RiskListParentView                       = Afficher tous les éléments parents
 RiskListParentViewDescription            = Afficher tous les éléments parents d'un risque dans la liste des risques et dans les documents
 CategoryOnRisk                           = Afficher les tags/catégories sur les risques
 CategoryOnRiskDescription                = Permet d'attribuer des tags/catégories aux risques et de les afficher - à manipuler avec précaution
-
+AddPsychosocialRisk                      = Ajouter un risque psychosocial
+AddPsychosocialRiskTitle                 = Ajout d'un risque psychosocial
+AddPsychosocialRiskButton                = Ajouter le risque psychosocial
+AddSelectedPsychosocialRisks             = Ajouter les risques psychosociaux sélectionnés
 
 
 # Stats - Statistiques

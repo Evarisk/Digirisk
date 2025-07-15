@@ -37,99 +37,59 @@ window.digiriskdolibarr.psychosocial_risk.event = function() {
 window.digiriskdolibarr.psychosocial_risk.predefinedRisks = [
   {
     title: "rps_v2",
-    category: "Exigences émotionnelles",
-    description: "Exposition à des situations émotionnellement difficiles (contact avec la souffrance, agressivité, tensions relationnelles)",
+    category: "Risques psychosociaux",
+    description: "Rapports sociaux au travail",
     cotation: 65,
-    prevention_actions: [
-      "Former le personnel à la gestion des situations difficiles",
-      "Mettre en place un soutien psychologique",
-      "Organiser des débriefings après incidents",
-      "Améliorer les conditions d'accueil et de communication"
-    ]
+    prevention_actions: []
   },
   {
     title: "rps_v2",
-    category: "Intensité et temps de travail",
-    description: "Charge de travail excessive, rythme imposé, interruptions fréquentes, horaires de travail contraignants",
-    cotation: 45,
-    prevention_actions: [
-      "Analyser et réorganiser la charge de travail",
-      "Respecter les temps de pause et de récupération",
-      "Améliorer la planification des tâches",
-      "Former à la gestion du temps et des priorités"
-    ]
+    category: "Risques psychosociaux",
+    description: "Intensité et temps de travail",
+    cotation: 48,
+    prevention_actions: []
   },
   {
     title: "rps_v2",
-    category: "Autonomie",
-    description: "Manque de marge de manœuvre dans l'exécution du travail, procédures trop rigides, sous-utilisation des compétences",
-    cotation: 45,
-    prevention_actions: [
-      "Développer les marges de manœuvre des salariés",
-      "Favoriser la participation aux décisions",
-      "Adapter les compétences aux postes",
-      "Encourager l'initiative et la créativité"
-    ]
+    category: "Risques psychosociaux",
+    description: "Exigences émotionnelles",
+    cotation: 48,
+    prevention_actions: []
   },
   {
     title: "rps_v2",
-    category: "Rapports sociaux au travail",
-    description: "Relations difficiles avec la hiérarchie, les collègues ou le public, manque de soutien social",
-    cotation: 45,
-    prevention_actions: [
-      "Former les managers au management bienveillant",
-      "Améliorer la communication interne",
-      "Développer l'esprit d'équipe",
-      "Mettre en place des espaces d'échange"
-    ]
+    category: "Risques psychosociaux",
+    description: "Autonomie",
+    cotation: 48,
+    prevention_actions: []
   },
   {
     title: "rps_v2",
-    category: "Sens du travail",
-    description: "Perte du sens du travail, conflits de valeurs, qualité empêchée, travail inutile",
-    cotation: 45,
-    prevention_actions: [
-      "Clarifier les objectifs et la finalité du travail",
-      "Valoriser les métiers et les compétences",
-      "Améliorer la qualité du travail",
-      "Favoriser la reconnaissance du travail accompli"
-    ]
+    category: "Risques psychosociaux",
+    description: "Sens du travail",
+    cotation: 48,
+    prevention_actions: []
   },
   {
     title: "rps_v2",
-    category: "Insécurité de la situation de travail",
-    description: "Précarité de l'emploi, changements organisationnels non maîtrisés, avenir professionnel incertain",
-    cotation: 45,
-    prevention_actions: [
-      "Améliorer la communication sur les évolutions",
-      "Accompagner les changements organisationnels",
-      "Développer l'employabilité des salariés",
-      "Sécuriser les parcours professionnels"
-    ]
+    category: "Risques psychosociaux",
+    description: "Insécurité de la situation de travail",
+    cotation: 48,
+    prevention_actions: []
   },
   {
     title: "rps_v2",
-    category: "Contexte de prévention dans l'entreprise",
-    description: "Absence de politique de prévention des RPS, manque de formation, défaut de détection des situations à risque",
+    category: "Risques psychosociaux",
+    description: "Contexte de prévention dans l'entreprise",
     cotation: 65,
-    prevention_actions: [
-      "Élaborer une politique de prévention des RPS",
-      "Former les acteurs de la prévention",
-      "Mettre en place des indicateurs de suivi",
-      "Créer des instances de dialogue social"
-    ]
+    prevention_actions: []
   },
   {
     title: "rps_v2",
-    category: "Impact des RPS sur l'entreprise et les salariés",
-    description: "Conséquences des RPS : absentéisme, turnover, accidents du travail, maladies professionnelles, perte de performance",
-    cotation: 45,
-    prevention_actions: [
-      "Surveiller les indicateurs d'alerte",
-      "Mettre en place un suivi médical renforcé",
-      "Analyser les causes d'absentéisme",
-      "Améliorer les conditions de travail globales"
-    ]
+    category: "Risques psychosociaux",
+    description: "Impact des RPS sur l'entreprise et les salariés",
+    cotation: 25,
+    prevention_actions: []
   }
 ];
 

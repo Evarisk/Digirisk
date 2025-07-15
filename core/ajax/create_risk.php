@@ -39,12 +39,12 @@ $numberingModuleName = [
 list($refRiskMod, $refEvaluationMod, $refProjectMod, $refTaskMod) = saturne_require_objects_mod($numberingModuleName, 'digiriskdolibarr');
 
 
-$risk->fk_element = $data['fk_element'] ?? 0;
-$risk->ref        = $refRiskMod->getNextValue($risk);
-$risk->category   = $data['category'];
-$risk->description = '';
-$risk->status     = 1;
-$risk->fk_projet = $conf->global->DIGIRISKDOLIBARR_DU_PROJECT;
+$risk->fk_element  = $data['fk_element'] ?? 0;
+$risk->ref         = $refRiskMod->getNextValue($risk);
+$risk->category    = $data['category'];
+$risk->description = $data['description'];
+$risk->status      = 1;
+$risk->fk_projet   = $conf->global->DIGIRISKDOLIBARR_DU_PROJECT;
 
 $result = $risk->create($user);
 
