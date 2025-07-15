@@ -116,7 +116,7 @@ class InterfaceDigiriskdolibarrTriggers extends DolibarrTriggers
 
         // Allowed triggers are a list of trigger from other module that should activate this file
 		if (!isModEnabled('digiriskdolibarr') || !$active) {
-            $allowedTriggers = ['COMPANY_DELETE', 'CONTACT_DELETE', 'TICKET_CREATE', 'TICKET_PUBLIC_INTERFACE_CREATE'];
+			$allowedTriggers = ['COMPANY_DELETE', 'CONTACT_DELETE', 'TICKET_CREATE', 'TICKET_PUBLIC_INTERFACE_CREATE', 'TICKET_SIGN'];
             if (!in_array($action, $allowedTriggers)) {
                 return 0;  // If module is not enabled or trigger is deactivated, we do nothing
             }
@@ -543,6 +543,13 @@ class InterfaceDigiriskdolibarrTriggers extends DolibarrTriggers
 						}
 					}
 				}
+				break;
+
+			case 'TICKET_SIGN':
+				$actioncomm->elementtype = 'ticket';
+				$actioncomm->label = $langs->transnoentities('ObjectSignedTrigger', $langs->transnoentities(get_class($object)), $object->ref);
+
+				$result = $actioncomm->create($user);
 				break;
 
             case 'TICKET_PUBLIC_INTERFACE_CREATE' :
