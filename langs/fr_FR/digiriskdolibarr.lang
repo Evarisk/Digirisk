@@ -315,6 +315,7 @@ PreventionPlanData                                    = Données du Plan de pré
 MasterWorkerDescription                               = L'utilisateur utilisé par défaut comme Responsable de l'Entreprise Utilisatrice
 NoPreventionPlanRisk                                  = Aucun risque sur le plan de prévention
 NoPreventionPlanLinked                                = Aucun plan de prévention lié
+PreventionPlanLinked                                  = Plan de prévention lié
 PreventionPlanManagement                              = Gestion des plans de prévention
 PPRProject                                            = Projet lié aux plans de prévention
 NewLabelForClonePreventionPlan                        = Libellé du nouveau plan de prévention
