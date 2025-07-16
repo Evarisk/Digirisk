@@ -1386,6 +1386,7 @@ PublicTicket                             = Interface publique des tickets
 TicketPublicInterfaceForbidden           = Accès interdit à l'interface publique des tickets
 DefaultUserGroup                         = Groupe par défaut
 DefaultUserGroupDescription              = Groupe par défaut dans les selecteurs de groupes
+ConfigureDefaultUserGroup                = Configurer le groupe par défaut
 
 #Public interface - Interface publique
 TicketPublicInterfaceShowCategoryDescription     = Afficher la description des catégories de ticket dans l'interface publique

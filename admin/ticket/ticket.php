@@ -684,7 +684,7 @@ if ($conf->global->DIGIRISKDOLIBARR_TICKET_ENABLE_PUBLIC_INTERFACE == 1) {
     print '<td><input type="submit" class="button reposition" name="save" value="' . $langs->transnoentities('Save') . '">';
     print '</td></form></tr>';
 
-	print '<tr class="oddeven"><td><label for="userGroup">' . $langs->transnoentities('DefaultUserGroup') . '</label></td>';
+	print '<tr class="oddeven" id="userGroup"><td><label for="userGroup">' . $langs->transnoentities('DefaultUserGroup') . '</label></td>';
 	print '<form method="POST" action="' . $_SERVER["PHP_SELF"] . '" name="user_default_group_form">';
     print '<input type="hidden" name="token" value="' . newToken() . '">';
     print '<input type="hidden" name="action" value="update_user_default_group">';
