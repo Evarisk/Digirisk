@@ -339,6 +339,7 @@ if (empty($resHook)) {
                     $signatory->module_name    = 'digiriskdolibarr';
 
                     $signatory->create($user);
+                    $object->call_trigger('TICKET_SIGN', $user);
                 }
 
                 $object->call_trigger('TICKET_PUBLIC_INTERFACE_CREATE', $user);
