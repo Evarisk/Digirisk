@@ -1,0 +1,44 @@
+.modal-analyse-phase {
+  .analysis-in-progress {
+    text-align: center;
+    padding: 20px;
+
+    .loader {
+      margin: 20px auto;
+      border: 4px solid #f3f3f3;
+      border-top: 4px solid #3498db;
+      border-radius: 50%;
+      width: 40px;
+      height: 40px;
+      animation: spin 2s linear infinite;
+    }
+  }
+}
+
+.modal-result-phase {
+  display: none;
+}
+
+.uploaded-image-preview {
+  max-width: 100%;
+  max-height: 300px;
+  object-fit: contain;
+  display: block;
+  margin: 10px auto;
+}
+
+.previous-risks-list {
+  tr {
+    opacity: 0.8;
+
+    textarea, input {
+      background-color: #f8f9fa !important;
+      cursor: not-allowed;
+    }
+  }
+}
+
+@keyframes spin {
+  0% { transform: rotate(0deg); }
+  100% { transform: rotate(360deg); }
+}
