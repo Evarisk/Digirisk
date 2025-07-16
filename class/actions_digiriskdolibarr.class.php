@@ -297,7 +297,10 @@ class ActionsDigiriskdolibarr
                 $out  = '<tr class="field_user_group"><td class="titlefieldmax45 wordbreak">';
                 $out .= $langs->transnoentities('UserGroup');
                 $out .= '</td><td class="valuefieldcreate_ticket_user_group">';
-                $out .= img_picto('', $userGroup->picto, 'class="pictofixedwidth"') . Form::selectarray('user_group', $userGroups, getDolGlobalInt('DIGIRISKDOLIBARR_TICKET_DEFAULT_USER_GROUP'), -1, 0, 0, '', '', 0, 0, '', 'minwidth100imp maxwidth500 widthcentpercentminusxx');
+                $out .= img_picto('', $userGroup->picto, 'class="pictofixedwidth"') . Form::selectarray('user_group', $userGroups, getDolGlobalInt('DIGIRISKDOLIBARR_TICKET_DEFAULT_USER_GROUP'), -1, 0, 0, 'disabled', '', 0, 0, '', 'minwidth100imp maxwidth500 widthcentpercentminusxx');
+                $out .= ' <a href="' . dol_buildpath('/custom/digiriskdolibarr/admin/ticket/ticket.php#userGroup', 1) . '" title="' . $langs->trans('ConfigureDefaultUserGroup') . '" target="_blank">';
+                $out .= img_picto($langs->trans('ConfigureDefaultUserGroup'), 'setup', 'class="pictofixedwidth opacitymedium"');
+                $out .= '</a>';
                 $out .= '</td></tr>';
 
                 $userGroupID = GETPOSTISSET('user_group') ? GETPOST('user_group') : getDolGlobalInt('DIGIRISKDOLIBARR_TICKET_DEFAULT_USER_GROUP');
@@ -308,7 +311,7 @@ class ActionsDigiriskdolibarr
                 $out .= '<tr class="field_fk_user_assign"><td class="titlefieldmax45 wordbreak">';
                 $out .= $langs->transnoentities('AssignedTo');
                 $out .= '</td><td class="valuefieldcreate_ticket_fk_user_assign">';
-                $out .= img_picto('', $user->picto, 'class="pictofixedwidth"') . Form::selectarray('fk_user_assign', $users, GETPOST('fk_user_assign'), -1, 0, 0, '', '', 0, 0, '', 'minwidth100imp maxwidth500 widthcentpercentminusxx');
+                $out .= img_picto('', $user->picto, 'class="pictofixedwidth"') . Form::selectarray('fk_user_assign', $users, GETPOSTINT('fk_user_assign') ?? $object->fk_user_assign, -1, 0, 0, '', '', 0, 0, '', 'minwidth100imp maxwidth500 widthcentpercentminusxx');
                 $out .= '</td></tr>'; ?>
 
                 <?php if (GETPOST('action') == 'create') : ?>
