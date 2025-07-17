@@ -694,7 +694,9 @@ if ($entity > 0) {
                 print '<label style="display: flex; align-items: flex-start; margin: 1em 0;">';
                 print '<input type="checkbox" id="validate_text_checkbox" name="validate_text" style="margin-right: 1em; margin-top: 0.2em;" required>';
                 print '<div style="flex: 1;">';
-                print $content;
+                $substitutionarray = getCommonSubstitutionArray($langs);
+        		complete_substitutions_array($substitutionarray, $langs);
+                print make_substitutions($content, $substitutionarray, $langs);
                 print '</div>';
                 print '</label>';
             }
