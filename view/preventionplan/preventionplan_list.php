@@ -494,7 +494,7 @@ while ($i < ($limit ? min($num, $limit) : $num)) {
 		if ($key == 'Custom') {
 			foreach ($val as $name => $resource) {
 				if ($resource['checked']) {
-					print '<td class="tdoverflowmax150">';
+					print '<td class="tdoverflowmax125">';
 					if ($resource['label'] == 'MasterWorker') {
 						$element = $signatory->fetchSignatory('MasterWorker', $object->id, 'preventionplan');
 						if (is_array($element) && !empty($element)) {
