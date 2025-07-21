@@ -125,11 +125,12 @@ window.digiriskdolibarr.psychosocial_risk.populateRisksTable = function() {
   tbody.empty();
 
   const dolUrlRoot = $('#dol_url_root').val() || window.location.origin;
-  const risks = window.digiriskdolibarr.psychosocial_risk.predefinedRisks;
+  const risks            = window.digiriskdolibarr.psychosocial_risk.predefinedRisks;
+  const positionCategory = "17";
 
   risks.forEach((risk, index) => {
     const tr = $('<tr class="oddeven psychosocial-risk-row" id="psychosocial_risk_' + index + '">');
-    tr.attr('data-category', risk.title);
+    tr.attr('data-category', positionCategory);
 
     const checkbox = window.digiriskdolibarr.risk_table_common.createCheckbox('select-psychosocial-risk', 'submit_selected_psychosocial_risks');
     const categoryCell = window.digiriskdolibarr.risk_table_common.createCategoryImage(
