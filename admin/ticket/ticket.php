@@ -277,12 +277,6 @@ if ($action == 'setChildCategoryLabel') {
 	setEventMessages($langs->transnoentities('ChildCategoryLabelSet'), array());
 }
 
-if ($action == 'setTicketSuccessMessage') {
-	$successmessage = GETPOST('DIGIRISKDOLIBARR_TICKET_SUCCESS_MESSAGE', 'none');
-	dolibarr_set_const($db, 'DIGIRISKDOLIBARR_TICKET_SUCCESS_MESSAGE', $successmessage, 'chaine', 0, '', $conf->entity);
-	setEventMessages($langs->transnoentities('TicketSuccessMessageSet'), array());
-}
-
 if ($action == 'generateQRCode') {
 	$urlToEncode = GETPOST('urlToEncode');
 	$targetPath = GETPOST('targetPath');
@@ -559,45 +553,6 @@ if ($conf->global->DIGIRISKDOLIBARR_TICKET_ENABLE_PUBLIC_INTERFACE == 1) {
 	print '</td>';
 	print '</tr>';
 	print '</form>';
-
-	print load_fiche_titre($langs->transnoentities("TicketSuccessMessageData"), '', '');
-
-	print '<table class="noborder centpercent">';
-
-	print '<form method="post" action="'.$_SERVER['PHP_SELF'].'" enctype="multipart/form-data" >';
-	print '<input type="hidden" name="token" value="'.newToken().'">';
-	print '<input type="hidden" name="action" value="setTicketSuccessMessage">';
-    print '<input type="hidden" name="page_y">';
-
-	print '<tr class="liste_titre">';
-	print '<td>'.$langs->transnoentities("Name").'</td>';
-	print '<td>' . $langs->transnoentities("Description") . '</td>';
-	print '<td class="center">' . $langs->transnoentities("Action") . '</td>';
-	print "</tr>";
-
-	$substitutionarray = getCommonSubstitutionArray($langs, 0, null, $ticket);
-	complete_substitutions_array($substitutionarray, $langs, $ticket);
-
-	// Substitution array/string
-	$helpforsubstitution = '';
-	if (is_array($substitutionarray) && count($substitutionarray)) {
-		$helpforsubstitution .= $langs->trans('AvailableVariables').' :<br>'."\n";
-	}
-	foreach ($substitutionarray as $key => $val) {
-		$helpforsubstitution .= $key.' -> '.$langs->trans(dol_string_nohtmltag(dolGetFirstLineOfText($val))).'<br>';
-	}
-
-	// Ticket success message
-	$successmessage = $langs->transnoentities($conf->global->DIGIRISKDOLIBARR_TICKET_SUCCESS_MESSAGE) ?: $langs->transnoentities('YouMustNotifyYourHierarchy');
-	print '<tr class="oddeven"><td>'.$form->textwithpicto($langs->transnoentities("TicketSuccessMessage"), $helpforsubstitution, 1, 'help', '', 0, 2, 'substittooltipfrombody');
-	print '</td><td>';
-	$doleditor = new DolEditor('DIGIRISKDOLIBARR_TICKET_SUCCESS_MESSAGE', $successmessage, '100%', 120, 'dolibarr_details', '', false, true, $conf->global->FCKEDITOR_ENABLE_MAIL, ROWS_2, 70);
-	$doleditor->Create();
-	print '</td>';
-	print '<td><input type="submit" class="button reposition" name="save" value="' . $langs->transnoentities("Save") . '">';
-	print '</td></tr>';
-	print '</form>';
-	print '</table>';
 
 	print '</div>';
 

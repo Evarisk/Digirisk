@@ -1497,7 +1497,6 @@ ticketdocument_custom.odt      = Fiche personnalisée du ticket
 ticketdocument_events.odt      = Fiche du ticket avec événements
 ticketdocument_sign.odt        = Fiche du ticket avec signature
 ticketdocument_event_sign.odt  = Fiche du ticket avec événement et signature
-TicketSuccessMessageData       = Message du ticket
 TicketSuccessMessage           = Message de succès du ticket
 TicketSuccessMessageSet        = Le message a bien été modifié
 
