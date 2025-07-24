@@ -114,8 +114,9 @@ if (empty($resHook)) {
 
         $parentCategoryId = GETPOST('parentCategory');
         $subCategoryId    = GETPOST('subCategory');
-        $message          = GETPOST('message');
-        $ticketTmpId      = GETPOST('ticket_id');
+
+        $message        = GETPOST('message');
+        $ticketTmpId  = GETPOST('ticket_id');
 
         $mainCategoryObject              = $category->rechercher($conf->global->DIGIRISKDOLIBARR_TICKET_MAIN_CATEGORY, '', 'ticket', true);
         $mainCategoryExtrafields         = json_decode($mainCategoryObject[0]->array_options['options_ticket_category_config'], true);
