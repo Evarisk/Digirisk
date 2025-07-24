@@ -98,6 +98,7 @@ if (empty($resHook)) {
         $data['external_link']         = GETPOST('external_link');
         $data['external_link_new_tab'] = GETPOST('external_link_new_tab') ? 1 : 0;
         $data['validate_text']         = GETPOST('validate_text', 'restricthtml');
+        $data['success_message']       = GETPOST('success_message', 'restricthtml');
 
         $extraFields->attributes['ticket']['label']['digiriskdolibarr_ticket_email'] = $langs->trans('Email');
         foreach ($extraFields->attributes['ticket']['label'] as $key => $field) {
@@ -254,6 +255,35 @@ print '</td><td class="center">';
 print '<input type="checkbox" id="external_link_new_tab" name="external_link_new_tab"' . ($ticketCategoryConfig->external_link_new_tab ? ' checked=""' : '') . '> ';
 print '</td></tr>';
 
+// Get all categories and their configuration
+$categories = $object->get_all_ways();
+$categoriesConfig = [];
+$order = $ticketCategoryConfig->order ?? [];
+foreach ($categories[0] as $category) {
+    if ($category->id == $id) {
+        continue;
+    }
+    $categoriesConfig[$category->label] = json_decode($category->array_options['options_ticket_category_config'], true);
+    if (isset($categoriesConfig[$category->label]['order'])) {
+        $order = array_merge($categoriesConfig[$category->label]['order']);
+    }
+}
+
+$successMessage = $langs->transnoentities('YouMustNotifyYourHierarchy');
+foreach ($categoriesConfig as $categoryLabel => $categoryConfig) {
+    if (!empty($categoryConfig['success_message'])) {
+        $successMessage = $categoryConfig['success_message'];
+    }
+}
+
+// Success Message
+print '<tr class="oddeven">';
+print '<td>' . $form->textwithpicto($langs->transnoentities("TicketSuccessMessage"), $helpforsubstitution, 1, 'help', '', 0, 2, 'substittooltipfrombody') . '</td>';
+print '</td><td class="center">';
+$doleditor = new DolEditor('success_message', $ticketCategoryConfig->success_message ?? $successMessage, '100%', 120, 'dolibarr_details', '', false, true, $conf->global->FCKEDITOR_ENABLE_MAIL, ROWS_2, 70);
+$doleditor->Create();
+print '</td></tr>';
+
 print '</table>';
 
 print $form->buttonsSaveCancel('Save', '');
@@ -268,20 +298,6 @@ if (getDolGlobalInt('DIGIRISKDOLIBARR_TICKET_ENABLE_PUBLIC_INTERFACE')) {
         print '<td class="center">' . $langs->transnoentities('Visible') . '</td>';
         print '<td class="center">' . $langs->transnoentities('Required') . '</td>';
         print '</tr>';
-
-        // Get all categories and their configuration
-        $categories = $object->get_all_ways();
-        $categoriesConfig = [];
-        $order = $ticketCategoryConfig->order ?? [];
-        foreach ($categories[0] as $category) {
-            if ($category->id == $id) {
-                continue;
-            }
-            $categoriesConfig[$category->label] = json_decode($category->array_options['options_ticket_category_config'], true);
-            if (isset($categoriesConfig[$category->label]['order'])) {
-                $order = array_merge($categoriesConfig[$category->label]['order']);
-            }
-        }
 
         $keysWithValueOn = [];
         $fields          = [

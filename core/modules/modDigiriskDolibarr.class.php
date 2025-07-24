@@ -761,7 +761,6 @@ class modDigiriskdolibarr extends DolibarrModules
 			$i++ => ['DIGIRISKDOLIBARR_TICKET_PARENT_CATEGORY_LABEL', 'chaine', $langs->trans('Registre'), '', 0, 'current'],
 			$i++ => ['DIGIRISKDOLIBARR_TICKET_CHILD_CATEGORY_LABEL', 'chaine', $langs->trans('Rubriques'), '', 0, 'current'],
 			$i++ => ['DIGIRISKDOLIBARR_TICKET_PROJECT', 'integer', 0, '', 0, 'current'],
-			$i++ => ['DIGIRISKDOLIBARR_TICKET_SUCCESS_MESSAGE', 'chaine', $langs->trans('YouMustNotifyYourHierarchy'), '', 0, 'current'],
 			$i++ => ['DIGIRISKDOLIBARR_SHOW_MULTI_ENTITY_SELECTOR_ON_TICKET_PUBLIC_INTERFACE', 'integer', 0, '', 0, 'current'],
 			$i++ => ['DIGIRISKDOLIBARR_TICKET_DIGIRISKELEMENT_HIDE_REF', 'integer', 0, '', 0, 'current'],
             $i++ => ['DIGIRISKDOLIBARR_TICKET_STATISTICS_ACCIDENT_TIME_RANGE', 'chaine', '{"'. $langs->transnoentities("WithoutWorkStop") .'":"less:1:days", "'.  $langs->transnoentities("LessThanFourDays") .'":"less:4:days","'.  $langs->transnoentities("LessThanTwentyOneDays") .'":"less:21:days","'.  $langs->transnoentities("LessThanThreeMonth") .'":"less:3:months","'.  $langs->transnoentities("LessThanSixMonths") .'":"less:6:months","'.  $langs->transnoentities("LongTimeWorkStop") .'":"more:6:months"}', '', 0, 'current'],
