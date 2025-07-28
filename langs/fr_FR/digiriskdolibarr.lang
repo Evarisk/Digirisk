@@ -929,7 +929,8 @@ UpdateData   = Mettre à jour
 #
 
 # Rights  - Droits
-RisksMin = risques
+RisksMin              = risques
+RisksEnvironmentalMin = risques environnementaux
 
 # Data - Donnée
 Risks                                    = Risques

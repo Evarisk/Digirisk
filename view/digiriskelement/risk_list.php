@@ -172,9 +172,16 @@ $arrayfields = dol_sort_array($arrayfields, 'position');
 include DOL_DOCUMENT_ROOT . '/core/actions_fetchobject.inc.php'; // Must be include, not include_once.
 
 //Permission for digiriskelement_risk
-$permissiontoread   = $user->rights->digiriskdolibarr->risk->read;
-$permissiontoadd    = $user->rights->digiriskdolibarr->risk->write;
-$permissiontodelete = $user->rights->digiriskdolibarr->risk->delete;
+
+if ($riskType == 'risk') {
+    $permissiontoread   = $user->rights->digiriskdolibarr->risk->read;
+    $permissiontoadd    = $user->rights->digiriskdolibarr->risk->write;
+    $permissiontodelete = $user->rights->digiriskdolibarr->risk->delete;
+} elseif ($riskType == 'riskenvironmental') {
+    $permissiontoread   = $user->rights->digiriskdolibarr->riskenvironment->read;
+    $permissiontoadd    = $user->rights->digiriskdolibarr->riskenvironment->write;
+    $permissiontodelete = $user->rights->digiriskdolibarr->riskenvironment->delete;
+}
 
 // Security check
 saturne_check_access($permissiontoread);
