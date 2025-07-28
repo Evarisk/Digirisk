@@ -1986,7 +1986,7 @@ class modDigiriskdolibarr extends DolibarrModules
 		delDocumentModel('riskassessmentdocument_odt', 'riskassessmentdocument');
 		delDocumentModel('auditreportdocument_odt', 'auditreportdocument');
 		delDocumentModel('ticketdocument_odt', 'ticketdocument');
-        delDocumentModel('orque_projectdocument', 'project');
+        delDocumentModel('papripact_a3_paysage_projectdocument', 'project');
         delDocumentModel('accidentinvestigationdocument_odt', 'accidentinvestigationdocument');
         delDocumentModel('registerdocument_odt', 'registerdocument');
 
@@ -2004,7 +2004,7 @@ class modDigiriskdolibarr extends DolibarrModules
 		addDocumentModel('riskassessmentdocument_odt', 'riskassessmentdocument', 'ODT templates', 'DIGIRISKDOLIBARR_RISKASSESSMENTDOCUMENT_ADDON_ODT_PATH');
 		addDocumentModel('auditreportdocument_odt', 'auditreportdocument', 'ODT templates', 'DIGIRISKDOLIBARR_AUDITREPORTDOCUMENT_ADDON_ODT_PATH');
 		addDocumentModel('ticketdocument_odt', 'ticketdocument', 'ODT templates', 'DIGIRISKDOLIBARR_TICKETDOCUMENT_ADDON_ODT_PATH');
-		addDocumentModel('orque_projectdocument', 'project', 'orque');
+		addDocumentModel('papripact_a3_paysage_projectdocument', 'project', 'PAPRIPACT-A3-PAYSAGE');
         addDocumentModel('accidentinvestigationdocument_odt', 'accidentinvestigationdocument', 'ODT templates', 'DIGIRISKDOLIBARR_ACCIDENTINVESTIGATIONDOCUMENT_ADDON_ODT_PATH');
         addDocumentModel('registerdocument_odt', 'registerdocument', 'ODT templates', 'DIGIRISKDOLIBARR_REGISTERDOCUMENT_ADDON_ODT_PATH');
 
