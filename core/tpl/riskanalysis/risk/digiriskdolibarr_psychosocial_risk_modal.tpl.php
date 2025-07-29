@@ -90,7 +90,10 @@ $predefinedPsychosocialRisks = [
                         <table id="psychosocial_risk_table" class="psychosocial-risk-table">
                             <thead>
                             <tr>
-                                <th>Action</th>
+                                <th>
+                                    <input type="checkbox" id="select_all_psychosocial_risks" class="select-all-risks">
+                                    <label for="select_all_psychosocial_risks" style="margin-left: 5px; font-weight: normal;">Tout sélectionner</label>
+                                </th>
                                 <th>Catégorie</th>
                                 <th style="width: 300px; text-align: center;">Cotation</th>
                                 <th>Description du Risque</th>

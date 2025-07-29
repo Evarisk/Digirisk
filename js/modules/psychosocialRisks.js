@@ -30,6 +30,7 @@ window.digiriskdolibarr.psychosocialRisks.init = function() {
 window.digiriskdolibarr.psychosocialRisks.event = function() {
   $( document ).on( 'change', '.select-psychosocial-risk', window.digiriskdolibarr.psychosocialRisks.toggleAddButton );
   $( document ).on( 'click', '#submit_selected_psychosocial_risks', window.digiriskdolibarr.psychosocialRisks.submitSelectedRisks );
+  $( document ).on( 'change', '#select_all_psychosocial_risks', window.digiriskdolibarr.psychosocialRisks.toggleSelectAll );
   //on checkbox click
 
 };
@@ -53,6 +54,47 @@ window.digiriskdolibarr.psychosocialRisks.toggleAddButton = function() {
     $('#submit_selected_psychosocial_risks').attr('disabled', 'disabled').css('opacity', '0.6');
   }
 
+  // Mettre à jour l'état de la case "tout sélectionner"
+  window.digiriskdolibarr.psychosocialRisks.updateSelectAllState();
+};
+
+/**
+ * Gère la fonctionnalité "tout sélectionner / tout désélectionner"
+ *
+ * @since   21.1.0
+ * @version 21.1.0
+ *
+ * @return {void}
+ */
+window.digiriskdolibarr.psychosocialRisks.toggleSelectAll = function() {
+  let selectAll = $(this);
+  let isChecked = selectAll.is(':checked');
+
+  $('.select-psychosocial-risk').prop('checked', isChecked);
+
+  window.digiriskdolibarr.psychosocialRisks.toggleAddButton();
+};
+
+/**
+ * Met à jour l'état de la case "tout sélectionner" en fonction des sélections individuelles
+ *
+ * @since   21.1.0
+ * @version 21.1.0
+ *
+ * @return {void}
+ */
+window.digiriskdolibarr.psychosocialRisks.updateSelectAllState = function() {
+  let totalRisks = $('.select-psychosocial-risk').length;
+  let selectedRisks = $('.select-psychosocial-risk:checked').length;
+  let selectAllCheckbox = $('#select_all_psychosocial_risks');
+
+  if (selectedRisks === totalRisks) {
+    selectAllCheckbox.prop('checked', true);
+    selectAllCheckbox.prop('indeterminate', false);
+  } else {
+    selectAllCheckbox.prop('checked', false);
+    selectAllCheckbox.prop('indeterminate', true);
+  }
 };
 
 /**
@@ -87,7 +129,7 @@ window.digiriskdolibarr.psychosocialRisks.collectSelectedRisksData = function() 
       method: 'standard',
       fk_element: fkElement,
       category: 17,
-      subCategory: subCategory,
+      sub_category: subCategory,
       photo: '',
       tasks: tasks,
       dateStart: '',
