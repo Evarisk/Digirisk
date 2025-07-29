@@ -214,12 +214,14 @@ class Risk extends SaturneObject
             $array['current']['risks']                         = [];
             $array['current']['riskByRiskAssessmentCotations'] = [];
             $array['current']['riskByCategories']              = [];
+            $array['current']['riskBySubCategories']           = [];
             $array['current']['riskByRiskAssessmentLevels']    = [];
         }
 
         if (empty($moreParam['tmparray']['showSharedRisk_nocheck'])) {
             $array['shared']['risks']                         = [];
             $array['shared']['riskByCategories']              = [];
+            $array['shared']['riskBySubCategories']           = [];
             $array['shared']['riskByRiskAssessmentCotations'] = [];
             $array['shared']['riskByRiskAssessmentLevels']    = [];
         }
@@ -229,14 +231,15 @@ class Risk extends SaturneObject
             if (!is_array($array['shared']['risks']) || empty($array['shared']['risks'])) {
                 $array['shared']['risks']                          = [];
                 $array['shared']['riskByCategories']               = [];
+                $array['shared']['riskBySubCategories']            = [];
                 $array['shared']['riskByRiskAssessmentCotations']  = [];
                 $array['shared']['riskByRiskAssessmentLevels']     = [];
             }
         }
 
         $array['risks'] = array_merge($array['current']['risks'], $array['shared']['risks']);
-
         $nbTotalRisks = ['current' => 0,'shared' => 0];
+
         foreach ($array['risks'] as $risk) {
             $riskAssessment->cotation = $risk->riskAssessmentCotation;
             $entity                   = ($risk->entity == $conf->entity || (!isModEnabled('multicompany') && empty($risk->entity))) ? 'current' : 'shared';
@@ -245,6 +248,7 @@ class Risk extends SaturneObject
             $array[$entity]['riskByRiskAssessmentCotations'][$risk->fk_element]['totalRiskAssessmentCotations'] += $risk->riskAssessmentCotation;
             $array[$entity]['riskByRiskAssessmentCotations'][$risk->fk_element][$riskAssessment->getEvaluationScale()]++;
             $array[$entity]['riskByCategories'][$risk->category][$riskAssessment->getEvaluationScale()]++;
+            $array[$entity]['riskBySubCategories'][$risk->sub_category][$riskAssessment->getEvaluationScale()]++;
             $array['riskByEntities'][$risk->entity]['nbTotalRisks']++;
             $array['riskByEntities'][$risk->entity][$riskAssessment->getEvaluationScale()]++;
             $nbTotalRisks[$entity]++;
@@ -489,7 +493,32 @@ class Risk extends SaturneObject
         return $riskCategories[0][$riskType];
     }
 
-	/**
+
+    /**
+     * Get risk sub categories from the JSON file
+     *
+     * @param string $riskType Subtype of risk
+     * @return array           Array of risk sub categories, or empty array on failure
+     */
+    public static function getDangerSubCategories(): array
+    {
+        $filePath = DOL_DOCUMENT_ROOT . '/custom/digiriskdolibarr/js/json/dangerSubCategories.json';
+
+        if (!file_exists($filePath)) {
+            return [];
+        }
+
+        $jsonContent    = file_get_contents($filePath);
+        $riskSubCategories = json_decode($jsonContent, true);
+
+        if (!isset($riskSubCategories[0]) || !is_array($riskSubCategories[0])) {
+            return [];
+        }
+        return $riskSubCategories[0];
+    }
+
+
+    /**
 	 * Get danger category picto path
 	 *
 	 * @param         $object
