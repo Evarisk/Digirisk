@@ -1012,7 +1012,14 @@ AddPsychosocialRisk                      = Ajouter un risque psychosocial
 AddPsychosocialRiskTitle                 = Ajout d'un risque psychosocial
 AddPsychosocialRiskButton                = Ajouter le risque psychosocial
 AddSelectedPsychosocialRisks             = Ajouter les risques psychosociaux sélectionnés
-
+SocialRelationsAtWork                    = Rapports sociaux au travail
+WorkIntensityAndTime                     = Intensité et temps de travail
+EmotionalRequirements                    = Exigences émotionnelles
+Autonomy                                 = Autonomie
+MeaningOfWork                            = Sens du travail
+WorkSituationInsecurity                  = Insécurité de la situation de travail
+PreventionContextInCompany               = Contexte de prévention dans l'entreprise
+RPSImpactOnCompanyAndEmployees           = Impact des RPS sur l'entreprise et les salariés
 
 # Stats - Statistiques
 GreyRisk                                         = Risque faible

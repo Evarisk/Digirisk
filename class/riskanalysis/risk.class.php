@@ -86,6 +86,7 @@ class Risk extends SaturneObject
         'import_key'    => ['type' => 'varchar(14)',  'label' => 'ImportId',         'enabled' => 1, 'position' => 60, 'notnull' => -1, 'visible' => -2],
         'status'        => ['type' => 'smallint',     'label' => 'Status',           'enabled' => 1, 'position' => 70, 'notnull' => 0,  'visible' => -2],
         'category'      => ['type' => 'integer',      'label' => 'RiskCategory',     'enabled' => 1, 'position' => 80, 'notnull' => 0,  'visible' => 1, 'csslist' => 'risk-category'],
+        'sub_category'  => ['type' => 'integer',      'label' => 'SubCategory',      'enabled' => 1, 'position' => 85, 'notnull' => 0, 'visible' => 0],
         'description'   => ['type' => 'text',         'label' => 'Description',      'enabled' => 'getDolGlobalInt("DIGIRISKDOLIBARR_RISK_DESCRIPTION")', 'position' => 90, 'notnull' => 0, 'visible' => '$conf->global->DIGIRISKDOLIBARR_RISK_DESCRIPTION', 'csslist' => 'risk-description'],
         'type'          => ['type' => 'varchar(255)', 'label' => 'Type',             'enabled' => 1, 'position' => 100, 'notnull' => 1,  'visible' => 0, 'default' => '(PROV)'],
         'fk_user_creat' => ['type' => 'integer:User:user/class/user.class.php',                                   'label' => 'UserAuthor',    'enabled' => 1, 'position' => 110, 'notnull' => 1,  'visible' => -2, 'foreignkey' => 'user.rowid'],
@@ -105,6 +106,7 @@ class Risk extends SaturneObject
 	public $import_key;
 	public $status;
 	public $category;
+    public $sub_category;
 	public $description;
     public $type = 'risk';
 	public $fk_user_creat;

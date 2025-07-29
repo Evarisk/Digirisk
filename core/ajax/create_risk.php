@@ -42,6 +42,7 @@ list($refRiskMod, $refEvaluationMod, $refProjectMod, $refTaskMod) = saturne_requ
 $risk->fk_element  = $data['fk_element'] ?? 0;
 $risk->ref         = $refRiskMod->getNextValue($risk);
 $risk->category    = $data['category'];
+$risk->sub_category = $data['sub-category'] ?? 0;
 $risk->description = $data['description'];
 $risk->status      = 1;
 $risk->fk_projet   = $conf->global->DIGIRISKDOLIBARR_DU_PROJECT;

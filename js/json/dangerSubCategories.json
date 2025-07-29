@@ -1,0 +1,36 @@
+[{
+  "17": [
+    {
+      "name": "Exigences émotionnelles",
+      "position": 0
+    },
+    {
+      "name": "Intensité et temps de travail",
+      "position": 1
+    },
+    {
+      "name": "Autonomie",
+      "position": 2
+    },
+    {
+      "name": "Rapports sociaux au travail",
+      "position": 3
+    },
+    {
+      "name": "Sens du travail",
+      "position": 4
+    },
+    {
+      "name": "Insécurité de la situation de travail",
+      "position": 5
+    },
+    {
+      "name": "Contexte de prévention dans l'entreprise",
+      "position": 6
+    },
+    {
+      "name": "Impact des RPS sur l'entreprise et les salariés",
+      "position": 7
+    }
+  ]
+}]

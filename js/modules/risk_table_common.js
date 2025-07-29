@@ -151,7 +151,7 @@ window.digiriskdolibarr.risk_table_common.createDescriptionTextarea = function(d
 window.digiriskdolibarr.risk_table_common.submitRisks = function(risksData, successCallback, errorCallback) {
   const token = window.saturne.toolbox.getToken();
   const dolUrlRoot = $('#dol_url_root').val() || window.location.origin;
-  
+
   let completedRequests = 0;
   let failedRequests = 0;
   const totalRequests = risksData.length;
@@ -169,11 +169,11 @@ window.digiriskdolibarr.risk_table_common.submitRisks = function(risksData, succ
       },
       success: function(response) {
         completedRequests++;
-        
+
         if (typeof successCallback === 'function') {
           successCallback(response, index);
         }
-        
+
         if (completedRequests + failedRequests === totalRequests) {
           if (failedRequests === 0) {
             window.location.reload();
@@ -184,11 +184,11 @@ window.digiriskdolibarr.risk_table_common.submitRisks = function(risksData, succ
       },
       error: function(xhr, status, error) {
         failedRequests++;
-        
+
         if (typeof errorCallback === 'function') {
           errorCallback(xhr, status, error, index);
         }
-        
+
         if (completedRequests + failedRequests === totalRequests) {
           if (completedRequests > 0) {
             window.location.reload();
@@ -218,7 +218,7 @@ window.digiriskdolibarr.risk_table_common.extractRiskDataFromRow = function(row)
   });
 
   const category = row.data('category');
-  const digiriskElementId = $('.psychosocial-risk-add, .digiai-risk-add').attr('value') || $('#digiriskElementId').val();
+  const digiriskElementId = $('.digiai-risk-add').attr('value') || $('#digiriskElementId').val();
 
   return {
     description: description,

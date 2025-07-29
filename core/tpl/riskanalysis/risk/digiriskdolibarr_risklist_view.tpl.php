@@ -595,7 +595,7 @@ $massactionbutton = $form->selectMassAction('', $arrayofmassactions);
         // Bouton pour les risques psychosociaux
         $newcardbutton .= '<div class="psychosocial-risk-add wpeo-button button-square-40 button-blue wpeo-tooltip-event modal-open" style="margin-left: 10px;" aria-label="' . $langs->trans('AddPsychosocialRisk') . '" value="' . $object->id . '">';
         $newcardbutton .= '<i class="fas fa-brain button-icon"></i><i class="fas fa-plus-circle button-add animated"></i>';
-        $newcardbutton .= '	<input type="hidden" class="modal-options" data-modal-to-open="psychosocial_risk_add'. $object->id .'" data-from-id="'. $object->id .'" data-from-type="digiriskelement" data-from-subtype="photo" data-from-subdir="photos"/>';
+        $newcardbutton .= '	<input type="hidden" class="modal-options" data-modal-to-open="psychosocial_risk_add" data-from-id="'. $object->id .'" data-from-type="digiriskelement" data-from-subtype="photo" data-from-subdir="photos"/>';
         $newcardbutton .= '</div>';
     } else {
         $newcardbutton = '<div class="wpeo-button button-square-40 button-grey wpeo-tooltip-event" aria-label="' . $langs->trans('PermissionDenied') . '" data-direction="left" value="' . $object->id . '"><i class="fas fa-exclamation-triangle button-icon"></i><i class="fas fa-plus-circle button-add animated"></i></div>';
@@ -827,51 +827,6 @@ $massactionbutton = $form->selectMassAction('', $arrayofmassactions);
                     <?php else : ?>
                         <div class="wpeo-button button-grey wpeo-tooltip-event" aria-label="<?php echo $langs->trans('PermissionDenied') ?>">
                             <span><i class="fas fa-plus"></i>  <?php echo $langs->trans('AddRiskButton'); ?></span>
-                        </div>
-                    <?php endif;?>
-                </div>
-            </div>
-        </div>
-    </div>
-    <!-- PSYCHOSOCIAL RISK ADD MODAL-->
-    <div class="psychosocial-risk-add-modal" value="<?php echo $object->id ?>">
-        <div class="wpeo-modal modal-risk-0 modal-risk" id="psychosocial_risk_add<?php echo $object->id ?>" value="new">
-            <div class="modal-container wpeo-modal-event" style="max-width: 80%; max-height: 80%;">
-                <!-- Modal-Header -->
-                <div class="modal-header">
-                    <h2 class="modal-title"><i class="fas fa-brain"></i> <?php print $langs->trans('AddPsychosocialRiskTitle'); ?></h2>
-                    <div class="modal-close"><i class="fas fa-times"></i></div>
-                </div>
-                <!-- Modal-Content -->
-                <div class="modal-content" id="#modalContent">
-                    <div class="psychosocial-risk-content">
-                        <div class="psychosocial-risk-wrapper">
-                            <table id="psychosocial_risk_table" class="psychosocial-risk-table">
-                                <thead>
-                                <tr>
-                                    <th>Action</th>
-                                    <th>Catégorie</th>
-                                    <th style="width: 300px; text-align: center;">Cotation</th>
-                                    <th>Description du Risque</th>
-                                    <th>Actions de Prévention</th>
-                                </tr>
-                                </thead>
-                                <tbody id="psychosocial_risks_list">
-                                <!-- Les risques prédéfinis seront ajoutés ici via JavaScript -->
-                                </tbody>
-                            </table>
-                        </div>
-                    </div>
-                </div>
-                <!-- Modal-Footer -->
-                <div class="modal-footer">
-                    <?php if ($permissiontoadd) : ?>
-                        <div id="submit_selected_psychosocial_risks" class="wpeo-button button-primary" disabled style="opacity: 0.6;">
-                            <span><i class="fas fa-plus"></i> <?php echo $langs->trans('AddSelectedPsychosocialRisks'); ?></span>
-                        </div>
-                    <?php else : ?>
-                        <div class="wpeo-button button-grey wpeo-tooltip-event" aria-label="<?php echo $langs->trans('PermissionDenied') ?>">
-                            <span><i class="fas fa-plus"></i> <?php echo $langs->trans('AddSelectedPsychosocialRisks'); ?></span>
                         </div>
                     <?php endif;?>
                 </div>

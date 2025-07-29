@@ -392,6 +392,8 @@ if ($object->id > 0) {
 		$contextpage = 'sharedrisk';
 		require_once __DIR__ . '/../../core/tpl/riskanalysis/risk/digiriskdolibarr_sharedrisklist_view.tpl.php';
 	}
+
+	require_once __DIR__ . '/../../core/tpl/riskanalysis/risk/digiriskdolibarr_psychosocial_risk_modal.tpl.php';
 }
 
 ?>
