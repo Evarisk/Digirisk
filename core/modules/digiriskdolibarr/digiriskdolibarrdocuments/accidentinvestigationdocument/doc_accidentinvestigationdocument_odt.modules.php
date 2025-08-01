@@ -1,5 +1,5 @@
 <?php
-/* Copyright (C) 2021-2023 EVARISK <technique@evarisk.com>
+/* Copyright (C) 2021-2025 EVARISK <technique@evarisk.com>
  *
  * This program is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -16,9 +16,9 @@
  */
 
 /**
- *	\file       core/modules/digiriskdolibarr/digiriskdolibarrdocuments/accidentinvestigationdocument/doc_accidentinvestigationdocument_odt.modules.php
- *	\ingroup    digiriskdolibarr
- *	\brief      File of class to build ODT documents for digiriskdolibarr
+ * \file    core/modules/digiriskdolibarr/digiriskdolibarrdocuments/accidentinvestigationdocument/doc_accidentinvestigationdocument_odt.modules.php
+ * \ingroup digiriskdolibarr
+ * \brief   File of class to build ODT documents for accident investigation document
  */
 
 // Load Dolibarr libraries.
@@ -33,132 +33,126 @@ require_once __DIR__ . '/../../../../../../saturne/class/saturnesignature.class.
 require_once __DIR__ . '/../../../../../class/digiriskstandard.class.php';
 require_once __DIR__ . '/mod_accidentinvestigationdocument_standard.php';
 
+// Load DigiriskDolibarr libraries
+require_once __DIR__ . '/../modules_digiriskdolibarrdocument.php';
+
 /**
- *	Class to build documents using ODF templates generator
+ * Class to build documents using ODF templates generator
  */
-class doc_accidentinvestigationdocument_odt extends SaturneDocumentModel
+class doc_accidentinvestigationdocument_odt extends ModeleODTDigiriskDolibarrDocument
 {
-	/**
-	 * @var string Module.
-	 */
-	public string $module = 'digiriskdolibarr';
+    /**
+     * @var string Document type
+     */
+    public string $document_type = 'accidentinvestigationdocument';
 
-	/**
-	 * @var string Document type.
-	 */
-	public string $document_type = 'accidentinvestigationdocument';
+    /**
+     * Constructor
+     *
+     * @param DoliDB $db Database handler
+     */
+    public function __construct(DoliDB $db)
+    {
+        parent::__construct($db, $this->module, $this->document_type);
+    }
 
-	/**
-	 * Constructor.
-	 *
-	 * @param DoliDB $db Database handler.
-	 */
-	public function __construct(DoliDB $db)
-	{
-		parent::__construct($db, $this->module, $this->document_type);
-	}
+    /**
+     * Set task segment.
+     *
+     * @param  Odf       $odfHandler  Object builder odf library.
+     * @param  Translate $outputLangs Lang object to use for output.
+     * @param  array     $moreParam   More param (Object/user/etc).
+     *
+     * @throws Exception
+     */
+    public function setTaskSegment(Odf $odfHandler, Translate $outputLangs, array $moreParam)
+    {
+        // Get tasks.
+        $foundTagForLines = 1;
+        $tmpArray         = [];
+        $taskType         = $moreParam['task_type'];
+        try {
+            $listLines = $odfHandler->setSegment($taskType);
+        } catch (OdfException|OdfExceptionSegmentNotFound $e) {
+            // We may arrive here if tags for lines not present into template.
+            $foundTagForLines = 0;
+            $listLines        = '';
+            dol_syslog($e->getMessage());
+        }
 
-	/**
-	 * Return description of a module.
-	 *
-	 * @param  Translate $langs Lang object to use for output.
-	 * @return string           Description.
-	 */
-	public function info(Translate $langs): string
-	{
-		return parent::info($langs);
-	}
+        $taskParentId = $taskType == 'cur_task' ?  $moreParam['curativeTaskId'] : $moreParam['preventiveTaskId'];
+        $actionTasks  = saturne_fetch_all_object_type('SaturneTask', '', '', 0, 0, ['customsql' => 'fk_task_parent = ' . $taskParentId]);
 
-	/**
-	 * Set task segment.
-	 *
-	 * @param  Odf       $odfHandler  Object builder odf library.
-	 * @param  Translate $outputLangs Lang object to use for output.
-	 * @param  array     $moreParam   More param (Object/user/etc).
-	 *
-	 * @throws Exception
-	 */
-	public function setTaskSegment(Odf $odfHandler, Translate $outputLangs, array $moreParam)
-	{
-		// Get tasks.
-		$foundTagForLines = 1;
-		$tmpArray         = [];
-		$taskType         = $moreParam['task_type'];
-		try {
-			$listLines = $odfHandler->setSegment($taskType);
-		} catch (OdfException|OdfExceptionSegmentNotFound $e) {
-			// We may arrive here if tags for lines not present into template.
-			$foundTagForLines = 0;
-			$listLines        = '';
-			dol_syslog($e->getMessage());
-		}
-
-		$taskParentId = $taskType == 'cur_task' ?  $moreParam['curativeTaskId'] : $moreParam['preventiveTaskId'];
-		$actionTasks  = saturne_fetch_all_object_type('SaturneTask', '', '', 0, 0, ['customsql' => 'fk_task_parent = ' . $taskParentId]);
-
-		if ($foundTagForLines) {
-			if (is_array($actionTasks) && !empty($actionTasks)) {
-				foreach ($actionTasks as $actionTask) {
-					$taskExecutive = $actionTask->liste_contact(-1, 'internal', 0, 'TASKEXECUTIVE');
+        if ($foundTagForLines) {
+            if (is_array($actionTasks) && !empty($actionTasks)) {
+                foreach ($actionTasks as $actionTask) {
+                    $taskExecutive = $actionTask->liste_contact(-1, 'internal', 0, 'TASKEXECUTIVE');
 
                     $tmpArray[$taskType . '_ref']         = $actionTask->ref;
                     $tmpArray[$taskType . '_label']       = $actionTask->label;
-					$tmpArray[$taskType . '_description'] = $actionTask->description;
-					$tmpArray[$taskType . '_resp']        = dol_strtoupper($taskExecutive[0]['lastname']) . ' ' . ucfirst($taskExecutive[0]['firstname']);
-					$tmpArray[$taskType . '_end_date']    = dol_print_date($actionTask->datee, 'dayhour', 'tzuser');
-					$tmpArray[$taskType . '_budget']      = price($actionTask->budget_amount, 0, '', 1, -1, -1, 'auto');
-					$this->setTmpArrayVars($tmpArray, $listLines, $outputLangs);
-				}
-			} else {
+                    $tmpArray[$taskType . '_description'] = $actionTask->description;
+                    $tmpArray[$taskType . '_resp']        = dol_strtoupper($taskExecutive[0]['lastname']) . ' ' . ucfirst($taskExecutive[0]['firstname']);
+                    $tmpArray[$taskType . '_end_date']    = dol_print_date($actionTask->datee, 'dayhour', 'tzuser');
+                    $tmpArray[$taskType . '_budget']      = price($actionTask->budget_amount, 0, '', 1, -1, -1, 'auto');
+                    $this->setTmpArrayVars($tmpArray, $listLines, $outputLangs);
+                }
+            } else {
                 $tmpArray[$taskType . '_ref']         = '';
                 $tmpArray[$taskType . '_label']       = '';
-				$tmpArray[$taskType . '_description'] = '';
-				$tmpArray[$taskType . '_resp']        = '';
-				$tmpArray[$taskType . '_end_date']    = '';
-				$tmpArray[$taskType . '_budget']      = '';
-				$this->setTmpArrayVars($tmpArray, $listLines, $outputLangs);
-			}
-			$odfHandler->mergeSegment($listLines);
-		}
-	}
+                $tmpArray[$taskType . '_description'] = '';
+                $tmpArray[$taskType . '_resp']        = '';
+                $tmpArray[$taskType . '_end_date']    = '';
+                $tmpArray[$taskType . '_budget']      = '';
+                $this->setTmpArrayVars($tmpArray, $listLines, $outputLangs);
+            }
+            $odfHandler->mergeSegment($listLines);
+        }
+    }
 
-	/**
-	 * Fill all odt tags for segments lines.
-	 *
-	 * @param  Odf       $odfHandler  Object builder odf library.
-	 * @param  Translate $outputLangs Lang object to use for output.
-	 * @param  array     $moreParam   More param (Object/user/etc).
-	 *
-	 * @return int                    1 if OK, <=0 if KO.
-	 * @throws Exception
-	 */
-	public function fillTagsLines(Odf $odfHandler, Translate $outputLangs, array $moreParam): int
-	{
-		require_once __DIR__ . '/../../../../../class/digiriskdocuments.class.php';
-        require_once __DIR__ . '/../../../../../class/riskanalysis/risk.class.php';
+    /**
+     * Fill all odt tags for segments lines.
+     *
+     * @param  Odf       $odfHandler  Object builder odf library.
+     * @param  Translate $outputLangs Lang object to use for output.
+     * @param  array     $moreParam   More param (Object/user/etc).
+     *
+     * @return int                    1 if OK, <=0 if KO.
+     * @throws Exception
+     */
+    public function fillTagsLines(Odf $odfHandler, Translate $outputLangs, array $moreParam): int
+    {
+        // Replace tags of lines
+        try {
+            require_once __DIR__ . '/../../../../../class/riskanalysis/risk.class.php';
 
-		global $conf;
+            $digiriskElement = new DigiriskElement($this->db);
+            $risk            = new Risk($this->db);
 
-		$digiriskDocument = new DigiriskDocuments($this->db, $this->module, 'accidentinvestigationdocument');
-		$risk             = new Risk($this->db);
-		// Replace tags of lines.
-		try {
-			$this->setAttendantsSegment($odfHandler, $outputLangs, $moreParam);
-            $moreParam['filterRisk'] = ' AND t.type = "risk"';
-			$risks = $moreParam['gp_ut_id'] > 0 ? $risk->fetchRisksOrderedByCotation($moreParam['gp_ut_id'], true, $conf->global->DIGIRISKDOLIBARR_SHOW_INHERITED_RISKS_IN_DOCUMENTS, $conf->global->DIGIRISKDOLIBARR_SHOW_SHARED_RISKS, $moreParam) : [];
-			$digiriskDocument->fillRiskData($odfHandler, $this, $outputLangs, [], null, $risks);
+            $this->setAttendantsSegment($odfHandler, $outputLangs, $moreParam);
 
-			$moreParam['task_type'] = 'cur_task';
-			$this->setTaskSegment($odfHandler, $outputLangs, $moreParam);
-			$moreParam['task_type'] = 'prev_task';
-			$this->setTaskSegment($odfHandler, $outputLangs, $moreParam);
-		} catch (OdfException $e) {
-			$this->error = $e->getMessage();
-			dol_syslog($this->error, LOG_WARNING);
-			return -1;
-		}
-		return 0;
-	}
+            $loadRiskInfos = $risk->loadRiskInfos($moreParam);
+
+            $moreParam['digiriskElements']           = $digiriskElement->fetchDigiriskElementFlat(0, [], 'current');
+            $moreParam['entity']                     = 'current';
+            $moreParam['riskTasks']                  = $loadRiskInfos['current']['riskTasks'];
+            $moreParam['riskByRiskAssessmentLevels'] = $loadRiskInfos['current']['riskByRiskAssessmentLevels'];
+            for ($i = 4; $i >= 1; $i--) {
+                $moreParam['segmentName'] = $moreParam['entity'] . 'Risks' . $i;
+                static::setRiskByRiskAssessmentLevelsSegment($odfHandler, $outputLangs, $moreParam);
+            }
+
+            $moreParam['task_type'] = 'cur_task';
+            $this->setTaskSegment($odfHandler, $outputLangs, $moreParam);
+
+            $moreParam['task_type'] = 'prev_task';
+            $this->setTaskSegment($odfHandler, $outputLangs, $moreParam);
+        } catch (OdfException $e) {
+            $this->error = $e->getMessage();
+            dol_syslog($this->error, LOG_WARNING);
+            return -1;
+        }
+        return 0;
+    }
 
 	/**
 	 * Function to build a document on disk.
@@ -215,17 +209,24 @@ class doc_accidentinvestigationdocument_odt extends SaturneDocumentModel
 			$tmpArray['attendants_number'] = '0 ';
 		}
 
-		$tmpArray['victim_lastname']       = dol_strtoupper($victim->lastname);
-		$tmpArray['victim_firstname']      = ucfirst($victim->firstname);
 		$tmpArray['seniority_in_position'] = $object->seniority_in_position;
 
-		if ($victim->dateemployment > 0) {
-			$daysEmployee                       = dol_time_plus_duree($now, -$victim->dateemployment, 's');
-			$daysEmployee                       = round($daysEmployee / 60 / 60 / 24);
-			$tmpArray['victim_date_employment'] = dol_print_date($victim->dateemployment, 'day', 'tzuser') . ' - ' . $daysEmployee . ' ' . ($daysEmployee <= 1 ? $outputLangs->trans('Day') : $outputLangs->trans('Days'));
-		} else {
-			$tmpArray['victim_date_employment'] = '';
-		}
+        if ($victim->id > 0) {
+            $tmpArray['victim_lastname']  = dol_strtoupper($victim->lastname);
+            $tmpArray['victim_firstname'] = ucfirst($victim->firstname);
+            if ($victim->dateemployment > 0) {
+                $daysEmployee                       = dol_time_plus_duree($now, -$victim->dateemployment, 's');
+                $daysEmployee                       = round($daysEmployee / 60 / 60 / 24);
+                $tmpArray['victim_date_employment'] = dol_print_date($victim->dateemployment, 'day', 'tzuser') . ' - ' . $daysEmployee . ' ' . ($daysEmployee <= 1 ? $outputLangs->trans('Day') : $outputLangs->trans('Days'));
+            } else {
+                $tmpArray['victim_date_employment'] = '';
+            }
+        } else {
+            $tmpArray['victim_lastname']        = '';
+            $tmpArray['victim_firstname']       = '';
+            $tmpArray['victim_date_employment'] = '';
+        }
+
 		$tmpArray['accident_date'] = dol_print_date($accident->accident_date, 'day');
 		$tmpArray['accident_hour'] = dol_print_date($accident->accident_date, 'hour');
 		$tmpArray['accident_day']  = dol_print_date($accident->accident_date, '%A');

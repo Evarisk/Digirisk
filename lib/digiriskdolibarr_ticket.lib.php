@@ -80,16 +80,49 @@ function ticketstats_prepare_head(): array
     $h    = 0;
     $head = [];
 
-    if ($user->rights->ticket->read) {
-        $head[$h][0] = DOL_URL_ROOT . '/custom/digiriskdolibarr/view/ticket/ticketstats.php';
-        $head[$h][1] = $conf->browser->layout != 'phone' ? '<i class="fas fa-calendar-alt pictofixedwidth"></i>'  . $langs->trans('ByMonthYear') : '<i class="fas fa-calendar-alt"></i>';
+    if ($user->hasRight('ticket', 'read')) {
+        $head[$h][0] = dol_buildpath('custom/digiriskdolibarr/view/ticket/ticket_management_dashboard.php', 1);
+        $head[$h][1] = $conf->browser->layout == 'classic' ? '<i class="fas fa-chart-line pictofixedwidth"></i>' . $langs->transnoentities('TicketManagementDashboard') : '<i class="fas fa-chart-line"></i>';
+        $head[$h][2] = 'dashboard';
+        $h++;
+
+        $head[$h][0] = dol_buildpath('custom/digiriskdolibarr/view/ticket/ticketstats.php', 1);
+        $head[$h][1] = $conf->browser->layout == 'classic' ? '<i class="fas fa-calendar-alt pictofixedwidth"></i>'  . $langs->trans('ByMonthYear') : '<i class="fas fa-calendar-alt"></i>';
         $head[$h][2] = 'byyear';
         $h++;
 
-        $head[$h][0] = DOL_URL_ROOT . '/custom/digiriskdolibarr/view/ticket/ticketstatscsv.php';
-        $head[$h][1] = $conf->browser->layout != 'phone' ? '<i class="fas fa-file-csv pictofixedwidth"></i>' . $langs->trans('ExportCSV') : '<i class="fas fa-file-csv"></i>';
+        $head[$h][0] = dol_buildpath('custom/digiriskdolibarr/view/ticket/ticketstatscsv.php', 1);
+        $head[$h][1] = $conf->browser->layout == 'classic' ? '<i class="fas fa-file-csv pictofixedwidth"></i>' . $langs->trans('ExportCSV') : '<i class="fas fa-file-csv"></i>';
         $head[$h][2] = 'exportcsv';
     }
 
     return $head;
+}
+
+/**
+ * Load ticket infos
+ *
+ * @param  array     $moreParam More param (filterTicket)
+ * @return array     $array     Array of tickets
+ * @throws Exception
+ */
+function load_ticket_infos(array $moreParam = []): array
+{
+    // Load DigiriskDolibarr libraries
+    require_once __DIR__ . '/../class/digiriskelement.class.php';
+
+    $array = [];
+
+    $select           = ', d.ref AS digiriskElementRef, d.label AS digiriskElementLabel';
+    $moreSelects      = ['digiriskElementRef', 'digiriskElementLabel'];
+    $join             = ' INNER JOIN ' . MAIN_DB_PREFIX . 'digiriskdolibarr_digiriskelement AS d ON d.rowid = eft.digiriskdolibarr_ticket_service';
+    $filter           = 't.fk_project = ' . getDolGlobalInt('DIGIRISKDOLIBARR_TICKET_PROJECT') . ' AND d.status = ' . DigiriskElement::STATUS_VALIDATED . ($moreParam['filterTicket'] ?? '');
+    $array['tickets'] = saturne_fetch_all_object_type('Ticket', '', '', 0, 0,  ['customsql' => $filter], 'AND', true, true, false, $join, [], $select, $moreSelects);
+    if (!is_array($array['tickets']) || empty($array['tickets'])) {
+        $array['tickets'] = [];
+    }
+
+    $array['nbTickets'] = count($array['tickets']);
+
+    return $array;
 }

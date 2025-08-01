@@ -216,7 +216,7 @@ print $form->select_dolusers($userAssignID, 'userAssignID', 1, '', 0, '', '', $c
 
 // Status
 print '<tr><td>' . $form->textwithpicto($langs->trans('Status'), $langs->trans('StatusHelp')) . '</td><td>';
-print $form->multiselectarray('status', $all + $none + $object->statuts_short, (!empty(GETPOST('refresh', 'int')) ? GETPOST('status', 'array') : $all + $none + $object->statuts_short), 0, 0, 'minwidth100imp widthcentpercentminusx maxwidth300', 1);
+print $form->multiselectarray('status', $all + $none + $object->labelStatusShort, (!empty(GETPOST('refresh', 'int')) ? GETPOST('status', 'array') : $all + $none + $object->labelStatusShort), 0, 0, 'minwidth100imp widthcentpercentminusx maxwidth300', 1);
 print '</td></tr>';
 
 // DateRange

@@ -1,5 +1,5 @@
 <?php
-/* Copyright (C) 2024 EVARISK <technique@evarisk.com>
+/* Copyright (C) 2024-2025 EVARISK <technique@evarisk.com>
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -21,6 +21,23 @@
  * \brief   Page to view auditreportdocument
  */
 
+// Better performance by disabling some features not used in this page
+if (!defined('DISABLE_CKEDITOR')) {
+    define('DISABLE_CKEDITOR', 1);
+}
+if (!defined('DISABLE_JQUERY_TABLEDND')) {
+    define('DISABLE_JQUERY_TABLEDND', 1);
+}
+if (!defined('DISABLE_JQUERY_JNOTIFY')) {
+    define('DISABLE_JQUERY_JNOTIFY', 1);
+}
+if (!defined('DISABLE_JS_GRAPH')) {
+    define('DISABLE_JS_GRAPH', 1);
+}
+if (!defined('DISABLE_MULTISELECT')) {
+    define('DISABLE_MULTISELECT', 1);
+}
+
 // Load DigiriskDolibarr environment
 if (file_exists('../digiriskdolibarr.main.inc.php')) {
     require_once __DIR__ . '/../digiriskdolibarr.main.inc.php';
@@ -29,9 +46,6 @@ if (file_exists('../digiriskdolibarr.main.inc.php')) {
 } else {
     die('Include of digiriskdolibarr main fails');
 }
-
-// Load Dolibarr libraries
-require_once DOL_DOCUMENT_ROOT . '/projet/class/project.class.php';
 
 // Load DigiriskDolibarr libraries
 require_once __DIR__ . '/../../class/digiriskstandard.class.php';
@@ -47,27 +61,33 @@ global $conf, $db, $hookmanager, $langs, $user;
 saturne_load_langs();
 
 // Get parameters
+$id        = GETPOSTINT('id');
 $action    = GETPOST('action', 'aZ09');
 $subaction = GETPOST('subaction', 'aZ09');
 
 // Initialize technical objects
 $object   = new DigiriskStandard($db);
 $document = new AuditReportDocument($db);
-$project  = new Project($db);
 
 // Initialize view objects
 $form = new Form($db);
 
-$hookmanager->initHooks(['digiriskstandardauditreportdocument', 'digiriskstandardview', 'globalcard']); // Note that conf->hooks_modules contains array
+$hookmanager->initHooks([$object->element . $document->element, $object->element . 'view', 'globalcard']); // Note that conf->hooks_modules contains array
 
-$object->fetch(getDolGlobalInt('DIGIRISKDOLIBARR_ACTIVE_STANDARD'));
+if (empty($action) && empty($id)) {
+    $action = 'view';
+}
 
-$upload_dir = $conf->digiriskdolibarr->multidir_output[$conf->entity ?? 1];
+// Load object
+require_once DOL_DOCUMENT_ROOT . '/core/actions_fetchobject.inc.php'; // Must be included, not include_once
+$object->fk_project = getDolGlobalInt('DIGIRISKDOLIBARR_DU_PROJECT');
+
+$upload_dir = $conf->{$object->module}->multidir_output[$object->entity ?? 1];
 
 // Security check - Protection if external user
-$permissionToRead   = $user->rights->digiriskdolibarr->digiriskstandard->read && $user->rights->digiriskdolibarr->auditreportdocument->read;
-$permissiontoadd    = $user->rights->digiriskdolibarr->auditreportdocument->write;
-$permissiontodelete = $user->rights->digiriskdolibarr->auditreportdocument->delete;
+$permissionToRead   = $user->hasRight($object->module, $object->element, 'read') && $user->hasRight($object->module, $document->element, 'read');
+$permissiontoadd    = $user->hasRight($object->module, $document->element, 'write');
+$permissiontodelete = $user->hasRight($object->module, $document->element, 'delete');
 saturne_check_access($permissionToRead);
 
 /*
@@ -107,51 +127,58 @@ $help_url = 'FR:Module_Digirisk';
 digirisk_header($title, $help_url);
 
 // Part to show record
-saturne_get_fiche_head($object, 'standardAuditReportDocument', $title);
+if ($object->id > 0) {
+    saturne_get_fiche_head($object, 'standardAuditReportDocument', $title);
+    saturne_banner_tab($object,'ref','none', 0, 'ref', 'ref', '', true);
 
-$moreHtmlRef = '<div class="refidno">';
-$project->fetch(getDolGlobalInt('DIGIRISKDOLIBARR_DU_PROJECT'));
-$moreHtmlRef .= $langs->trans('Project') . ' : ' . getNomUrlProject($project, 1, 'blank', 1);
-$moreHtmlRef .= '</div>';
+    print load_fiche_titre($langs->trans('Config'), '', '');
 
-$moduleNameLowerCase = 'mycompany';
-saturne_banner_tab($object,'ref','none', 0, 'ref', 'ref', $moreHtmlRef, true);
-$moduleNameLowerCase = 'digiriskdolibarr';
+    print '<form method="POST" action="' . $_SERVER['PHP_SELF'] . '?id=' . $id . '#builddoc" id="builddoc_form">';
+    print '<table class="noborder centpercent">';
+    print '<tr class="liste_titre">';
+    print '<td>' . $langs->trans('Parameters') . '</td>';
+    print '<td>' . $langs->trans('Value') . '</td>';
+    print '</tr>';
 
-print dol_get_fiche_end();
+    // DateRange -- Plage de date
+    $firstDayOfTheYear = dol_get_first_day(date('Y)'));
+    print '<tr class="oddeven"><td>' . $langs->trans("DateRange") . '</td>';
+    print '<td>' . $langs->trans('From') . $form->selectDate($firstDayOfTheYear, 'datestart');
+    print $langs->trans('At') . $form->selectDate(dol_now(), 'dateend');
+    print $langs->trans('UseDateRange');
+    print '<input type="checkbox" id="daterange" name="daterange" checked>';
+    print '</td></tr>';
 
-print load_fiche_titre($langs->trans('Config'), '', '');
+    // Destinataire
+    $userRecipient = json_decode(getDolGlobalString('DIGIRISKDOLIBARR_RISKASSESSMENTDOCUMENT_RECIPIENT'));
+    print '<tr class="oddeven"><td>' . $langs->trans('Recipient') . '</td>';
+    print '<td>' . $form->select_dolusers($userRecipient, 'recipient', 1, null, 0, '', '', 0, 0, 0, '', 0, '', 'minwidth400', 0, 0, true);
+    print '</td></tr>';
+    print '</table>';
 
-print '<form method="POST" action="' . $_SERVER['PHP_SELF'] . '#builddoc" id="builddoc_form">';
-print '<table class="noborder centpercent">';
-print '<tr class="liste_titre">';
-print '<td>' . $langs->trans('Parameters') . '</td>';
-print '<td>' . $langs->trans('Value') . '</td>';
-print '</tr>';
+    print dol_get_fiche_end();
 
-// DateRange -- Plage de date
-$dateStart = getDolGlobalInt('SOCIETE_FISCAL_MONTH_START') ? dol_mktime(0, 0, 0, getDolGlobalInt('SOCIETE_FISCAL_MONTH_START'), 1, strftime("%Y", dol_now())) : dol_now();
-print '<tr class="oddeven"><td>' . $langs->trans("DateRange") . '</td>';
-print '<td>' . $langs->trans('From') . $form->selectDate($dateStart, 'datestart');
-print $langs->trans('At') . $form->selectDate(dol_time_plus_duree($dateStart, 1, 'y'), 'dateend');
-print $langs->trans('UseDateRange');
-print '<input type="checkbox" id="daterange" name="daterange" checked>';
-print '</td></tr>';
+    print '<div class="fichecenter"><div class="fichehalfleft">';
 
-// Destinataire
-$userRecipient = json_decode(getDolGlobalString('DIGIRISKDOLIBARR_RISKASSESSMENTDOCUMENT_RECIPIENT'));
-print '<tr class="oddeven"><td>' . $langs->trans('Recipient') . '</td>';
-print '<td>' . $form->select_dolusers($userRecipient, 'recipient', 0, null, 0, '', '', 0, 0, 0, '', 0, '', 'minwidth400', 0, 0, true);
-print '</td></tr>';
-print '</table>';
+    $objRef    = dol_sanitizeFileName($object->ref);
+    $dirFiles  = $document->element . '/' . $objRef;
+    $fileDir   = $upload_dir . '/' . $dirFiles;
+    $urlSource =  $_SERVER['PHP_SELF'] .'?id=' . $object->id;
 
-$objRef    = dol_sanitizeFileName($object->ref);
-$dirFiles  = 'auditreportdocument/' . $objRef;
-$fileDir   = $upload_dir . '/' . $dirFiles;
-$urlSource = $_SERVER['PHP_SELF'];
+    print saturne_show_documents($object->module . ':AuditReportDocument', $dirFiles, $fileDir, $urlSource, $permissiontoadd, $permissiontodelete, '', 1, 0, 0, 1, 0, '', '', $langs->defaultlang, '', $object);
+    print '</form>';
 
-print saturne_show_documents('digiriskdolibarr:AuditReportDocument', $dirFiles, $fileDir, $urlSource, $permissiontoadd, $permissiontodelete, '', 1, 0, 0, 1, 0, '', '', $langs->defaultlang, '', $object);
-print '</form>';
+    print '</div><div class="fichehalfright">';
+
+    $moreHtmlCenter = dolGetButtonTitle($langs->trans('SeeAll'), '', 'fa fa-bars imgforviewmode', dol_buildpath('/saturne/view/saturne_agenda.php', 1) . '?id=' . $object->id . '&module_name=DigiriskDolibarr&object_type=' . $object->element . '&show_nav=0&handle_photo=true');
+
+    // List of actions on element
+    require_once DOL_DOCUMENT_ROOT . '/core/class/html.formactions.class.php';
+    $formActions = new FormActions($db);
+    $formActions->showactions($object, $object->element . '@' . $object->module, 0, 1, '', 10, '', $moreHtmlCenter);
+
+    print '</div></div>';
+}
 
 // End of page
 llxFooter();

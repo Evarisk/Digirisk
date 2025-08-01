@@ -1,5 +1,5 @@
 <?php
-/* Copyright (C) 2024 EVARISK <technique@evarisk.com>
+/* Copyright (C) 2024-2025 EVARISK <technique@evarisk.com>
  *
  * This program is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -23,18 +23,13 @@
  */
 
 // Load DigiriskDolibarr libraries
-require_once __DIR__ . '/../digiriskelementdocument/modules_digiriskelementdocument.php';
+require_once __DIR__ . '/../modules_digiriskdolibarrdocument.php';
 
 /**
  * Class to build documents using ODF templates generator
  */
-class doc_auditreportdocument_odt extends ModeleODTDigiriskElementDocument
+class doc_auditreportdocument_odt extends ModeleODTDigiriskDolibarrDocument
 {
-    /**
-     * @var string Module
-     */
-    public string $module = 'digiriskdolibarr';
-
     /**
      * @var string Document type
      */
@@ -51,17 +46,6 @@ class doc_auditreportdocument_odt extends ModeleODTDigiriskElementDocument
     }
 
     /**
-     * Return description of a module
-     *
-     * @param  Translate $langs Lang object to use for output
-     * @return string           Description
-     */
-    public function info(Translate $langs): string
-    {
-        return parent::info($langs);
-    }
-
-    /**
      * Fill all odt tags for segments lines
      *
      * @param  Odf       $odfHandler  Object builder odf library
@@ -73,14 +57,24 @@ class doc_auditreportdocument_odt extends ModeleODTDigiriskElementDocument
      */
     public function fillTagsLines(Odf $odfHandler, Translate $outputLangs, array $moreParam): int
     {
-        if (!empty($moreParam['dateStart']) && $moreParam['dateEnd']) {
-            $startDate      = dol_print_date($moreParam['dateStart'], 'dayrfc');
-            $endDate        = dol_print_date($moreParam['dateEnd'], 'dayrfc');
-            $filter         = " AND (t.date_creation BETWEEN '$startDate' AND '$endDate' OR t.tms BETWEEN '$startDate' AND '$endDate')";
-            $specificFilter = " AND (t.datec BETWEEN '$startDate' AND '$endDate' OR t.tms BETWEEN '$startDate' AND '$endDate')";
+        global $conf;
 
-            $moreParam['filter']         = $filter;
-            $moreParam['specificFilter'] = $specificFilter;
+        if (!empty($moreParam['dateStart']) && !empty($moreParam['dateEnd'])) {
+            $digiriskElement = new DigiriskElement($this->db);
+
+            $loadDigiriskElementInfos = $digiriskElement->loadDigiriskElementInfos($moreParam);
+
+            $startDate    = dol_print_date($moreParam['dateStart'], 'dayrfc');
+            $endDate      = dol_print_date($moreParam['dateEnd'], 'dayrfc');
+            $filter       = " AND (t.date_creation BETWEEN '$startDate' AND '$endDate' OR t.tms BETWEEN '$startDate' AND '$endDate')";
+            $filterTicket = " AND (t.datec BETWEEN '$startDate' AND '$endDate' OR t.tms BETWEEN '$startDate' AND '$endDate')";
+
+            $moreParam['filter']          = $filter;
+            $moreParam['filterTicket']    = $filterTicket;
+            $moreParam['filterEvaluator'] = ' AND t.entity = ' . $conf->entity;
+
+            $moreParam['entity']           = 'current';
+            $moreParam['digiriskElements'] = $loadDigiriskElementInfos[$moreParam['entity']]['digiriskElements'];
         }
 
         return parent::fillTagsLines($odfHandler, $outputLangs, $moreParam);
@@ -99,14 +93,20 @@ class doc_auditreportdocument_odt extends ModeleODTDigiriskElementDocument
      * @return int                               1 if OK, <=0 if KO
      * @throws Exception
      */
-    public function write_file(SaturneDocuments $objectDocument, Translate $outputLangs, string $srcTemplatePath, int $hideDetails = 0, int $hideDesc = 0, int $hideRef = 0, array $moreParam): int
+    public function write_file(SaturneDocuments $objectDocument, Translate $outputLangs, string $srcTemplatePath, int $hideDetails = 0, int $hideDesc = 0, int $hideRef = 0, array $moreParam = []): int
     {
-        global $mysoc;
+        global $conf, $mysoc;
+
+        // Load DigiriskDolibarr libraries
+        require_once __DIR__ . '/../../../../../class/digiriskelement.class.php';
+        require_once __DIR__ . '/../../../../../class/riskanalysis/risk.class.php';
+        require_once __DIR__ . '/../../../../../class/riskanalysis/risksign.class.php';
+        require_once __DIR__ . '/../../../../../class/evaluator.class.php';
+        require_once __DIR__ . '/../../../../../class/accident.class.php';
+        require_once __DIR__ . '/../../../../../lib/digiriskdolibarr_ticket.lib.php';
 
         $digiriskElement = new DigiriskElement($this->db);
         $risk            = new Risk($this->db);
-        $riskSign        = new RiskSign($this->db);
-        $evaluator       = new Evaluator($this->db);
         $accident        = new Accident($this->db);
         $userTmp         = new User($this->db);
 
@@ -121,17 +121,16 @@ class doc_auditreportdocument_odt extends ModeleODTDigiriskElementDocument
         $objectDocument->element = $previousObjectDocumentElement;
 
         if (!empty($moreParam['dateStart']) && !empty($moreParam['dateEnd'])) {
-            $startDate      = dol_print_date($moreParam['dateStart'], 'dayrfc');
-            $endDate        = dol_print_date($moreParam['dateEnd'], 'dayrfc');
-            $filter         = " AND (t.date_creation BETWEEN '$startDate' AND '$endDate' OR t.tms BETWEEN '$startDate' AND '$endDate')";
-            $specificFilter = " AND (t.datec BETWEEN '$startDate' AND '$endDate' OR t.tms BETWEEN '$startDate' AND '$endDate')";
+            $startDate    = dol_print_date($moreParam['dateStart'], 'dayrfc');
+            $endDate      = dol_print_date($moreParam['dateEnd'], 'dayrfc');
+            $filter       = " AND (t.date_creation BETWEEN '$startDate' AND '$endDate' OR t.tms BETWEEN '$startDate' AND '$endDate')";
+            $filterTicket = " AND (t.datec BETWEEN '$startDate' AND '$endDate' OR t.tms BETWEEN '$startDate' AND '$endDate')";
 
             $tmpArray['dateAudit'] = dol_print_date($moreParam['dateStart'], 'day') . ' - ' . dol_print_date($moreParam['dateEnd'], 'day');
 
-            $moreParam['filter']               = $filter;
-            $moreParam['filterRisk']           = $filter . ' AND t.type = "risk"';
-            $moreParam['filterRiskAssessment'] = $filter;
-            $moreParam['specificFilter']       = $specificFilter;
+            $moreParam['filter']          = $filter;
+            $moreParam['filterTicket']    =  $filterTicket;
+            $moreParam['filterEvaluator'] = ' AND t.entity = ' . $conf->entity;
         }
 
         if (is_array($moreParam['recipient']) && !empty($moreParam['recipient'])) {
@@ -149,35 +148,20 @@ class doc_auditreportdocument_odt extends ModeleODTDigiriskElementDocument
             }
         }
 
-        $groupments       = [];
-        $workUnits        = [];
-        $digiriskElements = $digiriskElement->getActiveDigiriskElements(0, $moreParam);
-        if (is_array($digiriskElements) && !empty($digiriskElements)) {
-            foreach ($digiriskElements as $digiriskElement) {
-                if ($digiriskElement->element_type == 'groupment') {
-                    $groupments[] = $digiriskElement;
-                } else {
-                    $workUnits[] = $digiriskElement;
-                }
-            }
-        }
+        $loadDigiriskElementInfos = $digiriskElement->loadDigiriskElementInfos($moreParam);
+        $loadRiskInfos            = $risk->loadRiskInfos($moreParam);
+        $loadRiskSignInfos        = RiskSign::loadRiskSignInfos($moreParam);
+        $loadEvaluatorInfos       = Evaluator::loadEvaluatorInfos($moreParam);
+        $loadAccidentInfos        = $accident->loadAccidentInfos($moreParam);
+        $loadTicketInfos          = load_ticket_infos($moreParam);
 
-        $risks      = $risk->fetchRisksOrderedByCotation(0, true, getDolGlobalInt('DIGIRISKDOLIBARR_SHOW_INHERITED_RISKS_IN_DOCUMENTS'), getDolGlobalInt('DIGIRISKDOLIBARR_SHOW_SHARED_RISKS'), $moreParam);;
-        $riskSigns  = $riskSign->fetchAll('', '', 0, 0, ['customsql' => 'status = ' . RiskSign::STATUS_VALIDATED . $moreParam['filter']]);
-        $evaluators = $evaluator->fetchAll('', '', 0, 0, ['customsql' => 'status = ' . Evaluator::STATUS_VALIDATED . $moreParam['filter']]);
-        $accidents  = $accident->fetchAll('', '', 0, 0, ['customsql' => 'status >= ' . Accident::STATUS_VALIDATED . $moreParam['filter']]);
-        $tickets    = [];
-        if (dolibarr_get_const($this->db, 'DIGIRISKDOLIBARR_TICKET_EXTRAFIELDS', 0)) {
-            $tickets = saturne_fetch_all_object_type('Ticket', '', '', 0, 0,  ['customsql' => 'eft.digiriskdolibarr_ticket_service > 0' . $moreParam['specificFilter']], 'AND', true);
-        }
-
-        $tmpArray['nb_new_or_edit_groupments'] = is_array($groupments) && !empty($groupments) ? count($groupments) : '';
-        $tmpArray['nb_new_or_edit_workunits']  = is_array($workUnits) && !empty($workUnits) ? count($workUnits) : '';
-        $tmpArray['nb_new_or_edit_risks']      = is_array($risks) && !empty($risks) ? count($risks) : '';
-        $tmpArray['nb_new_or_edit_risksigns']  = is_array($riskSigns) && !empty($riskSigns) ? count($riskSigns) : '';
-        $tmpArray['nb_new_or_edit_evaluators'] = is_array($evaluators) && !empty($evaluators) ? count($evaluators) : '';
-        $tmpArray['nb_new_or_edit_accidents']  = is_array($accidents) && !empty($accidents) ? count($accidents) : '';
-        $tmpArray['nb_new_or_edit_tickets']    = is_array($tickets) && !empty($tickets) ? count($tickets) : '';
+        $tmpArray['nb_new_or_edit_groupments'] = $loadDigiriskElementInfos['current']['nbGroupment'];
+        $tmpArray['nb_new_or_edit_workunits']  = $loadDigiriskElementInfos['current']['nbWorkUnit'];
+        $tmpArray['nb_new_or_edit_risks']      = count($loadRiskInfos['risks']);
+        $tmpArray['nb_new_or_edit_risksigns']  = $loadRiskSignInfos['nbRiskSigns'];
+        $tmpArray['nb_new_or_edit_evaluators'] = $loadEvaluatorInfos['nbEvaluators'];
+        $tmpArray['nb_new_or_edit_accidents']  = $loadAccidentInfos['nbAccidents'];
+        $tmpArray['nb_new_or_edit_tickets']    = $loadTicketInfos['nbTickets'];
 
         $moreParam['tmparray'] = $tmpArray;
 

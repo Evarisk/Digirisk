@@ -72,13 +72,15 @@ $toselect    = GETPOST('toselect', 'array'); // Array of ids of elements selecte
 $limit       = GETPOST('limit', 'int') ? GETPOST('limit', 'int') : $conf->liste_limit;
 $sortfield   = GETPOST('sortfield', 'alpha');
 $sortorder   = GETPOST('sortorder', 'alpha');
-$riskType    = GETPOSTISSET('type') ? GETPOST('type') : 'risk';
+$riskType    = GETPOSTISSET('risk_type') ? GETPOST('risk_type') : 'risk';
 $page        = GETPOSTISSET('pageplusone') ? (GETPOST('pageplusone') - 1) : GETPOST("page", 'int');
 $page        = is_numeric($page) ? $page : 0;
 $page        = $page == -1 ? 0 : $page;
 if (isModEnabled('categorie')) {
     $search_category_array = GETPOST('search_category_risk_list', 'array');
 }
+
+$onPhone = $conf->browser->layout == 'phone';
 
 // Initialize technical objects
 $object           = new DigiriskStandard($db);
@@ -108,7 +110,7 @@ $search_array_options = $extrafields->getOptionalsFromPost($risk->table_element,
 // Default sort order (if not yet defined by previous GETPOST)
 if ( ! $sortfield) $sortfield = $conf->global->DIGIRISKDOLIBARR_SORT_LISTINGS_BY_COTATION ? "evaluation.cotation" : "r." . key($risk->fields);; // Set here default search field. By default 1st field in definition.
 if ( ! $sortorder) $sortorder         = $conf->global->DIGIRISKDOLIBARR_SORT_LISTINGS_BY_COTATION ? "DESC" : "ASC" ;
-if ( ! $evalsortfield) $evalsortfield = "evaluation." . key($evaluation->fields);
+if (!isset($evalsortfield) || !$evalsortfield) $evalsortfield = "evaluation." . key($evaluation->fields);
 
 $offset   = $limit * $page;
 $pageprev = $page - 1;
@@ -127,18 +129,36 @@ foreach ($risk->fields as $key => $val) {
 // List of fields to search into when doing a "search in all"
 $fieldstosearchall = array();
 foreach ($risk->fields as $key => $val) {
-	if ($val['searchall']) $fieldstosearchall['r.' . $key] = $val['label'];
+	if (!empty($val['searchall'])) $fieldstosearchall['r.' . $key] = $val['label'];
 }
 
 // Definition of fields for list
 $arrayfields = array();
 foreach ($risk->fields as $key => $val) {
 	// If $val['visible']==0, then we never show the field
-	if ( ! empty($val['visible'])) $arrayfields['r.' . $key] = array('label' => $val['label'], 'checked' => (($val['visible'] < 0) ? 0 : 1), 'enabled' => ($val['enabled'] && ($val['visible'] != 3)), 'position' => $val['position']);
+    if (!empty($val['visible'])) {
+        $visible = (int) dol_eval($val['visible'], 1);
+        $arrayfields['r.' . $key] = [
+            'label'       => $val['label'],
+            'checked'     => (($visible < 0) ? 0 : 1),
+            'enabled'     => ($visible != 3 && dol_eval($val['enabled'], 1)),
+            'position'    => $val['position'],
+            'help'        => $val['help']
+        ];
+    }
 }
 foreach ($evaluation->fields as $key => $val) {
 	// If $val['visible']==0, then we never show the field
-	if ( ! empty($val['visible'])) $arrayfields['evaluation.' . $key] = array('label' => $val['label'], 'checked' => (($val['visible'] < 0) ? 0 : 1), 'enabled' => ($val['enabled'] && ($val['visible'] != 3)), 'position' => $val['position']);
+    if (!empty($val['visible'])) {
+        $visible = (int) dol_eval($val['visible'], 1);
+        $arrayfields['evaluation.' . $key] = [
+            'label'       => $val['label'],
+            'checked'     => (($visible < 0) ? 0 : 1),
+            'enabled'     => ($visible != 3 && dol_eval($val['enabled'], 1)),
+            'position'    => $val['position'],
+            'help'        => $val['help']
+        ];
+    }
 }
 
 // Extra fields
@@ -192,7 +212,7 @@ if (empty($reshook)) {
 
 	$error = 0;
 
-	$backtopage = dol_buildpath('/digiriskdolibarr/view/digiriskelement/risk_list.php?type=' . $riskType, 1);
+	$backtopage = dol_buildpath('/digiriskdolibarr/view/digiriskelement/risk_list.php?risk_type=' . $riskType, 1);
 
 	require_once './../../core/tpl/riskanalysis/risk/digiriskdolibarr_risk_actions.tpl.php';
 }

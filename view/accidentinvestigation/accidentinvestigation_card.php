@@ -333,8 +333,8 @@ if ($action == 'create') {
 
 	require_once DOL_DOCUMENT_ROOT . '/core/tpl/commonfields_view.tpl.php';
 
-	print '<td class="titlefield">' . $langs->trans("UserVictim") . '</td>';
-	print '<td>' . $victim->getNomUrl(1) . '</td>';
+    print '<td class="titlefield">' . $langs->trans("UserVictim") . '</td>';
+    print '<td>' . ($victim->id > 0 ? $victim->getNomUrl(1) : '') . '</td>';
 	print '<tr class="linked-medias causality_tree gallery-table"> <td class=""><label for="causality_tree">' . $langs->trans("CausalityTree") . '</label></td>';
 	print '<td class="linked-medias-list">';
 	$pathPhotos = $conf->digiriskdolibarr->multidir_output[$conf->entity] . '/accidentinvestigation/'. $object->ref . '/causality_tree/';

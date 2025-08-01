@@ -127,8 +127,8 @@
 							</div>
 						</div>
 						<div class="risk-evaluation-comment">
-							<span class="title"><i class="fas fa-comment-dots"></i> <?php echo $langs->trans('Comment'); ?></span>
-							<?php print '<textarea name="evaluationComment' . $lastEvaluation->id . '" rows="' . ROWS_2 . '">' . $lastEvaluation->comment . '</textarea>' . "\n"; ?>
+							<span class="title"><i class="fas fa-comment-dots"></i> <?php echo $langs->trans('Comment'); ?> (<span class="char-counter"><?php echo 65535 - strlen($lastEvaluation->comment); ?></span> <?php echo $langs->trans('CharRemaining'); ?>)</span>
+							<?php print '<textarea class="evaluation-comment-textarea" data-maxlength="65535" maxlength="65535" name="evaluationComment' . $lastEvaluation->id . '" rows="' . ROWS_2 . '">' . $lastEvaluation->comment . '</textarea>' . "\n"; ?>
 						</div>
 					</div>
 					<?php if ($conf->global->DIGIRISKDOLIBARR_SHOW_RISKASSESSMENT_DATE) : ?>
@@ -149,7 +149,7 @@
                                                 <i class="fas fa-camera"></i><i class="fas fa-plus-circle button-add"></i>
                                             </div>
                                         </label>
-                                        <input type="hidden" class="favorite-photo" id="photo" name="photo" value="<?php echo $object->photo ?>"/>
+                                        <input type="hidden" class="favorite-photo" id="photo" name="photo" value="<?php echo $object->photo ?? '' ?>"/>
                                     </td>
                                     <td>
                                         <div class="wpeo-button <?php echo ($onPhone ? 'button-square-40' : 'button-square-50'); ?> 'open-media-gallery add-media modal-open" value="<?php echo $lastEvaluation->id; ?>">

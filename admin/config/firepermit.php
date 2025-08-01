@@ -159,7 +159,7 @@ print '</tr>';
 
 print '<tr class="oddeven"><td><label for="MasterWorker">' . $langs->trans("MasterWorker") . '</label></td>';
 print '<td>' . $langs->trans("MasterWorkerDescription") . '</td>';
-$userlist = $form->select_dolusers(( ! empty($conf->global->DIGIRISKDOLIBARR_FIREPERMIT_MAITRE_OEUVRE) ? $conf->global->DIGIRISKDOLIBARR_FIREPERMIT_MAITRE_OEUVRE : $user->id), '', 0, null, 0, '', '', $conf->entity, 0, 0, 'AND u.statut = 1', 0, '', 'minwidth300', 0, 1);
+$userlist = $form->select_dolusers(( ! empty($conf->global->DIGIRISKDOLIBARR_FIREPERMIT_MAITRE_OEUVRE) ? $conf->global->DIGIRISKDOLIBARR_FIREPERMIT_MAITRE_OEUVRE : $user->id), '', 0, null, 0, '', '', $conf->entity, 0, 0, '(u.statut:=:1)', 0, '', 'minwidth300', 0, 1);
 print '<td>';
 print $form->selectarray('maitre_oeuvre', $userlist, ( ! empty($conf->global->DIGIRISKDOLIBARR_FIREPERMIT_MAITRE_OEUVRE) ? $conf->global->DIGIRISKDOLIBARR_FIREPERMIT_MAITRE_OEUVRE : $user->id), $langs->trans('SelectUser'), null, null, null, "40%", 0, 0, '', 'minwidth300', 1);
 print ' <a href="' . DOL_URL_ROOT . '/user/card.php?action=create&backtopage=' . urlencode($_SERVER["PHP_SELF"] . '?action=create') . '" target="_blank"><span class="fa fa-plus-circle valignmiddle paddingleft" title="' . $langs->trans("AddUser") . '"></span></a>';

@@ -365,6 +365,32 @@ class Accident extends SaturneObject
 		return $this->fetchAll('', '', 0, 0, $filter);
 	}
 
+    /**
+     * Load accident infos
+     *
+     * @param  array     $moreParam More param (filter)
+     * @return array     $array     Array of accidents
+     * @throws Exception
+     */
+    public function loadAccidentInfos(array $moreParam = []): array
+    {
+        $array = [];
+
+        $select             = ', SUM(aw.workstop_days) AS nbAccidentWorkStop';
+        $moreSelects        = ['nbAccidentWorkStop'];
+        $join               = ' INNER JOIN ' . MAIN_DB_PREFIX . 'digiriskdolibarr_accident_workstop AS aw ON t.rowid = aw.fk_accident';
+        $filter             = 't.status = ' . self::STATUS_VALIDATED . ($moreParam['filter'] ?? '');
+        $groupBy            = ' GROUP BY ' . $this->getFieldList('t');
+        $array['accidents'] = saturne_fetch_all_object_type('Accident', '', '', 0, 0, ['customsql' => $filter], 'AND', false, true, false, $join, [], $select, $moreSelects, $groupBy);
+        if (!is_array($array['accidents'] ) || empty($array['accidents'] )) {
+            $array['accidents'] = [];
+        }
+
+        $array['nbAccidents'] = count($array['accidents']);
+
+        return $array;
+    }
+
 	/**
 	 *  Return the status
 	 *
@@ -412,28 +438,49 @@ class Accident extends SaturneObject
      */
     public function load_dashboard(): array
     {
-        global $conf, $langs;
+        global $langs, $conf;
 
-        $arrayNbDaysWithoutAccident    = $this->getNbDaysWithoutAccident();
-        $arrayNbAccidents              = $this->getNbAccidents();
-        $arrayNbAccidentsLast3Years    = $this->getNbAccidentsLast3years();
-        $arrayNbWorkstopDays           = $this->getNbWorkstopDays();
-        $arrayNbAccidentsByEmployees   = $this->getNbAccidentsByEmployees();
+        $confName        = dol_strtoupper($this->module) . '_DASHBOARD_CONFIG';
+        $dashboardConfig = json_decode(getDolUserString($confName));
+        $array = ['graphs' => [], 'disabledGraphs' => []];
+
+        $join                   = ' LEFT JOIN ' . MAIN_DB_PREFIX . $this->table_element . ' as a ON a.rowid = t.fk_accident';
+        $accidentsWithWorkStops = saturne_fetch_all_object_type('AccidentWorkStop', 'DESC', 't.rowid', 0, 0, [], 'AND', false, true, false, $join);
+        $accidents              = $this->fetchAll('', '', 0, 0, ['customsql' => ' t.status > ' . self::STATUS_DRAFT]);
+
+        if (empty($accidents) && !is_array($accidents)) {
+            $accidents = [];
+        }
+        if (empty($accidentsWithWorkStops) && !is_array($accidentsWithWorkStops)) {
+            $accidentsWithWorkStops = [];
+        }
+
+        $arrayNbDaysWithoutAccident = $this->getNbDaysWithoutAccident($accidents);
+        $arrayNbWorkstopDays        = $this->getNbWorkstopDays($accidentsWithWorkStops);
+
         $arrayNbPresquAccidents        = $this->getNbPresquAccidents();
         $arrayNbAccidentInvestigations = $this->getNbAccidentInvestigations();
-        $arrayFrequencyIndex           = $this->getFrequencyIndex();
-        $arrayFrequencyRate            = $this->getFrequencyRate();
-        //$arrayGravityIndex           = $this->getGravityIndex();
-        $arrayGravityRate              = $this->getGravityRate();
+
+        $evaluator                   = new Evaluator($this->db);
+        $employees                   = $evaluator->getNbEmployees();
+        $arrayNbAccidentsByEmployees = $this->getNbAccidentsByEmployees($accidents, $accidentsWithWorkStops, $employees);
+        $arrayFrequencyIndex         = $this->getFrequencyIndex($accidentsWithWorkStops, $employees);
+        $arrayFrequencyRate          = $this->getFrequencyRate($accidentsWithWorkStops);
+        $arrayGravityRate            = $this->getGravityRate($accidentsWithWorkStops);
 
         $array['widgets'] = [
             'accident' => [
+                'title'      => $langs->transnoentities('Accidents'),
+                'picto'      => 'fas fa-user-injured',
+                'pictoColor' => '#F39B1F',
                 'label'      => [$langs->transnoentities('DayWithoutAccident') ?? '', $langs->transnoentities('WorkStopDays') ?? '', $langs->transnoentities('NbAccidentsByEmployees') ?? '', $langs->transnoentities('NbPresquAccidents') ?? '', $langs->transnoentities('NbAccidentInvestigations') ?? ''],
                 'content'    => [$arrayNbDaysWithoutAccident['daywithoutaccident'] ?? 0, $arrayNbWorkstopDays['nbworkstopdays'] ?? 0, $arrayNbAccidentsByEmployees['nbaccidentsbyemployees'] ?? 0, $arrayNbPresquAccidents['nbpresquaccidents'] ?? 0, $arrayNbAccidentInvestigations['nbaccidentinvestigations'] ?? 0],
-                'picto'      => 'fas fa-user-injured',
                 'widgetName' => $langs->transnoentities('Accident')
             ],
             'accidentrateindicator' => [
+                'title'      => $langs->transnoentities('Frequency'),
+                'picto'      => 'fas fa-chart-bar',
+                'pictoColor' => '#9735FF',
                 'label'      => [$langs->transnoentities('FrequencyIndex') ?? '', $langs->transnoentities('FrequencyRate') ?? '', $langs->transnoentities('GravityRate') ?? ''],
                 'content'    => [$arrayFrequencyIndex['frequencyindex'] ?? 0, $arrayFrequencyRate['frequencyrate'] ?? 0, $arrayGravityRate['gravityrate'] ?? 0],
                 'tooltip'    => [
@@ -441,46 +488,56 @@ class Accident extends SaturneObject
                     (($conf->global->DIGIRISKDOLIBARR_NB_WORKED_HOURS > 0 && $conf->global->DIGIRISKDOLIBARR_MANUAL_INPUT_NB_WORKED_HOURS) ? $langs->transnoentities('FrequencyRateTooltip') . '<br>' . $langs->transnoentities('NbWorkedHoursTooltip') : $langs->transnoentities('FrequencyRateTooltip')),
                     (($conf->global->DIGIRISKDOLIBARR_NB_WORKED_HOURS > 0 && $conf->global->DIGIRISKDOLIBARR_MANUAL_INPUT_NB_WORKED_HOURS) ? $langs->transnoentities('GravityRateTooltip') . '<br>' . $langs->transnoentities('NbWorkedHoursTooltip') : $langs->transnoentities('GravityRateTooltip'))
                 ],
-                'picto'      => 'fas fa-chart-bar',
                 'widgetName' => $langs->transnoentities('AccidentRateIndicator')
             ]
         ];
 
-        $array['graphs'] = [$arrayNbAccidents, $arrayNbAccidentsLast3Years];
+        if (empty($dashboardConfig->graphs->AccidentRepartition->hide)) {
+            $array['graphs'][] = $this->getNbAccidents($accidents, $accidentsWithWorkStops);
+        } else {
+            $array['disabledGraphs']['AccidentRepartition'] = $langs->transnoentities('AccidentRepartition');
+        }
+        if (empty($dashboardConfig->graphs->AccidentByYear->hide)) {
+            $array['graphs'][] = $this->getNbAccidentsLast3years($accidents);
+        } else {
+            $array['disabledGraphs']['AccidentByYear'] = $langs->transnoentities('AccidentByYear');
+        }
 
         return $array;
     }
 
-	/**
-	 * Get number days without accident.
-	 *
-	 * @return array
-	 * @throws Exception
-	 */
-	public function getNbDaysWithoutAccident() {
-		// Number days without accident
-		$lastAccident = $this->fetchAll('DESC', 'accident_date', 1, 0 );
-		if (is_array($lastAccident) && !empty($lastAccident)) {
-			$lastTimeAccident = dol_now() - reset($lastAccident)->accident_date;
-			$array['daywithoutaccident'] = abs(round($lastTimeAccident / 86400));
-		} else {
-			$array['daywithoutaccident'] = 'N/A';
-		}
-		return $array;
-	}
+    /**
+     * Get number days without accident
+     *
+     * @param  array $accidents Array of accidents
+     * @return array
+     */
+    public function getNbDaysWithoutAccident(array $accidents = []): array
+    {
+        $lastAccident = end($accidents);
+        if ($lastAccident != null) {
+            $lastTimeAccident            = dol_now() - $lastAccident->accident_date;
+            $array['daywithoutaccident'] = abs(round($lastTimeAccident / 86400));
+        } else {
+            $array['daywithoutaccident'] = 'N/A';
+        }
+        return $array;
+    }
 
     /**
      * Get number accidents
      *
+     * @param array $accidents              Array of accidents
+     * @param array $accidentsWithWorkStops Array of accidents with work stops
      * @return array
-     * @throws Exception
      */
-    public function getNbAccidents(): array
+    public function getNbAccidents(array $accidents = [], array $accidentsWithWorkStops = []): array
     {
         global $conf, $langs;
 
         // Graph Title parameters
         $array['title'] = $langs->transnoentities('AccidentRepartition');
+        $array['name']  = 'AccidentRepartition';
         $array['picto'] = $this->picto;
 
         // Graph parameters
@@ -501,25 +558,8 @@ class Accident extends SaturneObject
             ],
         ];
 
-        $nbAccidents            = 0;
-        $nbAccidentsWithoutDIAT = 0;
-        $accidents              = $this->fetchAll('','',0,0,['customsql' => ' t.status > 0 ']);
-        if (is_array($accidents) && !empty($accidents)) {
-            $accidentWorkStop = new AccidentWorkStop($this->db);
-            foreach ($accidents as $accident) {
-                $accidentWorkStops = $accidentWorkStop->fetchFromParent($accident->id);
-                if (is_array($accidentWorkStops) && !empty($accidentWorkStops)) {
-                    $nbAccidents += 1;
-                } else {
-                    $nbAccidentsWithoutDIAT += 1;
-                }
-            }
-            $array['data']['accidents'] = $nbAccidents;
-            $array['data']['accidentswithoutDIAT'] = $nbAccidentsWithoutDIAT;
-        } else {
-            $array['data']['accidents'] = 0;
-            $array['data']['accidentswithoutDIAT'] = 0;
-        }
+        $array['data']['accidents']            = count($accidentsWithWorkStops);
+        $array['data']['accidentswithoutDIAT'] = count($accidents) - $array['data']['accidents'];
 
         return $array;
     }
@@ -527,15 +567,16 @@ class Accident extends SaturneObject
     /**
      * Get number accidents for last 3 years
      *
+     * @param  array $accidents Array of accidents
      * @return array
-     * @throws Exception
      */
-    public function getNbAccidentsLast3years(): array
+    public function getNbAccidentsLast3years(array $accidents = []): array
     {
         global $langs;
 
         // Graph Title parameters
         $array['title'] = $langs->transnoentities('AccidentByYear');
+        $array['name']  = 'AccidentByYear';
         $array['picto'] = $this->picto;
 
         // Graph parameters
@@ -562,12 +603,14 @@ class Accident extends SaturneObject
 
         $accidentsByYear = [];
         $accidentsArray  = [];
-        $accidents       = $this->fetchAll('', '', 0, 0, ['customsql' => 't.status > 0']);
         if (is_array($accidents) && !empty($accidents)) {
             foreach($accidents as $accident) {
                 $accidentDate = dol_getdate($accident->accident_date);
                 $yearKey      = $accidentDate['year'];
                 $monthKey     = $accidentDate['mon'];
+                if (!isset($accidentsByYear[$yearKey][$monthKey - 1])) {
+                    $accidentsByYear[$yearKey][$monthKey - 1] = 0;
+                }
                 $accidentsByYear[$yearKey][$monthKey - 1] += 1;
             }
 
@@ -581,7 +624,9 @@ class Accident extends SaturneObject
 
             foreach($accidentsByYear as $year => $accidentByYear) {
                 foreach($accidentByYear as $month => $accidentByMonth) {
-                    $accidentsArray[$month][$year] = $accidentByMonth;
+                    if (isset($accidentsArray[$month][$year])) {
+                        $accidentsArray[$month][$year] = $accidentByMonth;
+                    }
                 }
             }
 
@@ -593,181 +638,165 @@ class Accident extends SaturneObject
         return $array;
     }
 
-	/**
-	 * Get number workstop days.
-	 *
-	 * @return array
-	 * @throws Exception
-	 */
-	public function getNbWorkstopDays() {
-		// Number workstop days
-		$allaccidents = $this->fetchAll();
-		if (is_array($allaccidents) && !empty($allaccidents)) {
-			$accidentworkstop = new AccidentWorkStop($this->db);
-			foreach ($allaccidents as $accident) {
-				$allaccidentworkstop = $accidentworkstop->fetchFromParent($accident->id);
-				if (is_array($allaccidentworkstop) && !empty($allaccidentworkstop)) {
-					foreach ($allaccidentworkstop as $accidentworkstop) {
-						if ($accidentworkstop->id > 0) {
-							$nbworkstopdays += $accidentworkstop->workstop_days;
-						}
-					}
-				}
-			}
-			$array['nbworkstopdays'] = $nbworkstopdays ?: 0;
-		} else {
-			$array['nbworkstopdays'] = 0;
-		}
-		return $array;
-	}
+    /**
+     * Get number workstop days
+     *
+     * @param  array $accidentsWithWorkStops Array of accidents with work stops
+     * @return array
+     */
+    public function getNbWorkstopDays(array $accidentsWithWorkStops = []): array
+    {
+        $nbWorkStopDays = 0;
+        if (!empty($accidentsWithWorkStops)) {
+            foreach ($accidentsWithWorkStops as $accidentsWithWorkStop) {
+                $nbWorkStopDays += $accidentsWithWorkStop->workstop_days;
+            }
+        }
+        $array['nbworkstopdays'] = $nbWorkStopDays;
 
-	/**
-	 * Get number accidents by employees.
-	 *
-	 * @return array
-	 * @throws Exception
-	 */
-	public function getNbAccidentsByEmployees() {
-		$evaluator = new Evaluator($this->db);
+        return $array;
+    }
 
-		// Number accidents by employees
-		$arrayNbAccidents = $this->getNbAccidents();
-		$arrayNbEmployees = $evaluator->getNbEmployees();
-		if ($arrayNbEmployees['nbemployees'] > 0) {
-			$nbaccidentsbyemployees = ($arrayNbAccidents['data']['accidents'] + $arrayNbAccidents['data']['accidentswithoutDIAT']) / $arrayNbEmployees['nbemployees'];
-			if ($nbaccidentsbyemployees > 0) {
-				$array['nbaccidentsbyemployees'] = price2Num($nbaccidentsbyemployees, 2);
-			} else {
-				$array['nbaccidentsbyemployees'] = 'N/A';
-			}
-		} else {
-			$array['nbaccidentsbyemployees'] = 'N/A';
-		}
-		return $array;
-	}
+    /**
+     * Get number accidents by employees
+     *
+     * @param  array $accidents              Array of accidents
+     * @param  array $accidentsWithWorkStops Array of accidents with work stops
+     * @param  array $employees              Array of employees
+     * @return array
+     */
+    public function getNbAccidentsByEmployees(array $accidents = [], array $accidentsWithWorkStops = [], array $employees = []): array
+    {
+        $arrayNbAccidents = $this->getNbAccidents($accidents, $accidentsWithWorkStops);
+        if ($employees['nbemployees'] > 0 && ($arrayNbAccidents['data']['accidents'] + $arrayNbAccidents['data']['accidentswithoutDIAT']) > 0) {
+            $nbAccidentsByEmployees          = ($arrayNbAccidents['data']['accidents'] + $arrayNbAccidents['data']['accidentswithoutDIAT']) / $employees['nbemployees'];
+            $array['nbaccidentsbyemployees'] = price2Num($nbAccidentsByEmployees, 2);
+        } else {
+            $array['nbaccidentsbyemployees'] = 'N/A';
+        }
+        return $array;
+    }
 
-	/**
-	 * Get number presqu'accidents.
-	 *
-	 * @return array
-	 * @throws Exception
-	 */
-	public function getNbPresquAccidents() {
-		global $langs;
+    /**
+     * Get number presqu'accidents
+     *
+     * @return array
+     * @throws Exception
+     */
+    public function getNbPresquAccidents(): array
+    {
+        global $conf, $langs;
 
-		$category = new Categorie($this->db);
+        $array['nbpresquaccidents'] = 'N/A';
 
-		// Number accidents presqu'accidents
-		$category->fetch(0, $langs->transnoentities('PresquAccident'));
-		$alltickets = $category->getObjectsInCateg(Categorie::TYPE_TICKET);
-		if (is_array($alltickets) && !empty($alltickets)) {
-			$array['nbpresquaccidents'] = count($alltickets);
-		} else {
-			$array['nbpresquaccidents'] = 'N/A';
-		}
-		return $array;
-	}
+        $category = new Categorie($this->db);
 
-	/**
-	 * Get number accident investigations.
-	 *
-	 * @return array
-	 * @throws Exception
-	 */
-	public function getNbAccidentInvestigations() {
-		// Number accident investigations
-		$allaccidents = $this->fetchAll();
-		if (is_array($allaccidents) && !empty($allaccidents)) {
-			$accidentmetadata = new AccidentMetaData($this->db);
-			foreach ($allaccidents as $accident) {
-				$filter = ' AND t.fk_accident = ' . $accident->id . ' AND t.status = 1 AND t.accident_investigation = 1';
-				$result = $accidentmetadata->fetch(0, '', $filter);
-				if ($result > 0) {
-					$nbaccidentinvestigations += 1;
-				}
-			}
-			if ($nbaccidentinvestigations > 0) {
-				$array['nbaccidentinvestigations'] = $nbaccidentinvestigations;
-			} else {
-				$array['nbaccidentinvestigations'] = 'N/A';
-			}
-		} else {
-			$array['nbaccidentinvestigations'] = 'N/A';
-		}
-		return $array;
-	}
+        $result = $category->fetch(0, $langs->transnoentities('PresquAccident'));
+        if ($result <= 0) {
+            return $array;
+        }
 
-	/**
-	 * Get frequency index (number accidents with DIAT by employees) x 1000.
-	 *
-	 * @return array
-	 * @throws Exception
-	 */
-	public function getFrequencyIndex() {
-		$evaluator = new Evaluator($this->db);
+        $filter  = 't.fk_statut > 0 AND t.entity = ' . $conf->entity . ' AND cp.fk_categorie IN (' . $category->id  . ')';
+        $tickets = saturne_fetch_all_object_type('Ticket', '', '', 0, 0, ['customsql' => $filter], 'AND', false, false, true);
+        if (!is_array($tickets) || empty($tickets)) {
+            return $array;
+        }
 
-		// (Number accidents with DIAT by employees) x 1 000
-		$arrayNbAccidents = $this->getNbAccidents();
-		$arrayNbEmployees = $evaluator->getNbEmployees();
-		if ($arrayNbEmployees['nbemployees'] > 0) {
-			$frequencyindex = ($arrayNbAccidents['data']['accidents']/$arrayNbEmployees['nbemployees']) * 1000;
-			if ($frequencyindex > 0) {
-				$array['frequencyindex'] = price2Num($frequencyindex, 2);
-			} else {
-				$array['frequencyindex'] = 'N/A';
-			}
-		} else {
-			$array['frequencyindex'] = 'N/A';
-		}
-		return $array;
-	}
+        $array['nbpresquaccidents'] = count($tickets);
 
-	/**
-	 * Get frequency rate (number accidents with DIAT by working hours) x 1 000 000.
-	 *
-	 * @return array
-	 * @throws Exception
-	 */
-	public function getFrequencyRate() {
-		// (Number accidents with DIAT by working hours) x 1 000 000
-		$arrayNbAccidents = $this->getNbAccidents();
-		$total_workhours  = getWorkedHours();
+        return $array;
+    }
 
-		if ($total_workhours > 0) {
-			$frequencyrate = ($arrayNbAccidents['data']['accidents']/$total_workhours) * 1000000;
-			if ($frequencyrate > 0) {
-				$array['frequencyrate'] = price2Num($frequencyrate, 5);
-			} else {
-				$array['frequencyrate'] = 'N/A';
-			}
-		} else {
-			$array['frequencyrate'] = 'N/A';
-		}
-		return $array;
-	}
+    /**
+     * Get number accident investigations
+     *
+     * @param  array    $moreParam More param (Object/user/etc)
+     * @return array
+     * @throws Exception
+     */
+    public function getNbAccidentInvestigations(array $moreParam = []): array
+    {
+        require_once __DIR__ . '/accidentinvestigation.class.php';
 
-	/**
-	 * Get gravity rate (number workstop days by working hours) x 1 000.
-	 *
-	 * @return array
-	 * @throws Exception
-	 */
-	public function getGravityRate() {
-		// (Number workstop days by working hours) x 1 000
-		$arrayNbWorkstopDays = $this->getNbWorkstopDays();
-		$total_workhours     = getWorkedHours();
-		if ($total_workhours > 0) {
-			$gravityrate = ($arrayNbWorkstopDays['nbworkstopdays']/$total_workhours) * 1000;
-			if ($gravityrate > 0) {
-				$array['gravityrate'] = price2Num($gravityrate, 5);
-			} else {
-				$array['gravityrate'] = 'N/A';
-			}
-		} else {
-			$array['gravityrate'] = 'N/A';
-		}
-		return $array;
-	}
+        $accidentInvestigation = new AccidentInvestigation($this->db);
+        if (isset($moreParam['filter']) && strpos($moreParam['filter'], 't.entity') !== false) {
+            $accidentInvestigation->ismultientitymanaged = 0;
+        }
+        $accidentInvestigations = $accidentInvestigation->fetchAll('', '', 0, 0, ['customsql' => ' t.status > ' . AccidentInvestigation::STATUS_DRAFT . ($moreParam['filter'] ?? '')]);
+        if (!empty($accidentInvestigations) && is_array($accidentInvestigations)) {
+            $array['nbaccidentinvestigations'] = count($accidentInvestigations);
+        } else {
+            $array['nbaccidentinvestigations'] = 'N/A';
+        }
+        return $array;
+    }
+
+    /**
+     * Get frequency index (number accidents with DIAT by employees) x 1000
+     *
+     * @param  array $accidentsWithWorkStops Array of accidents with work stops
+     * @param  array $employees              Array of employees
+     * @return array
+     */
+    public function getFrequencyIndex(array $accidentsWithWorkStops = [], array $employees = []): array
+    {
+        if ($employees['nbemployees'] > 0) {
+            $frequencyIndex = (count($accidentsWithWorkStops) / $employees['nbemployees']) * 1000;
+            if ($frequencyIndex > 0) {
+                $array['frequencyindex'] = price2Num($frequencyIndex, 2);
+            } else {
+                $array['frequencyindex'] = 'N/A';
+            }
+        } else {
+            $array['frequencyindex'] = 'N/A';
+        }
+        return $array;
+    }
+
+    /**
+     * Get frequency rate (number accidents with DIAT by working hours) x 1 000 000
+     *
+     * @param  array $accidentsWithWorkStops Array of accidents with work stops
+     * @return array
+     */
+    public function getFrequencyRate(array $accidentsWithWorkStops = []): array
+    {
+        $workHours = getWorkedHours();
+        if ($workHours > 0) {
+            $frequencyRate = (count($accidentsWithWorkStops) / $workHours) * 1000000;
+            if ($frequencyRate > 0) {
+                $array['frequencyrate'] = price2Num($frequencyRate, 2);
+            } else {
+                $array['frequencyrate'] = 'N/A';
+            }
+        } else {
+            $array['frequencyrate'] = 'N/A';
+        }
+        return $array;
+    }
+
+    /**
+     * Get gravity rate (number workstop days by working hours) x 1 000
+     *
+     * @param  array $accidentsWithWorkStops Array of accidents with work stops
+     * @return array
+     */
+    public function getGravityRate(array $accidentsWithWorkStops = []): array
+    {
+        $arrayNbWorkstopDays = $this->getNbWorkstopDays($accidentsWithWorkStops);
+        $workHours           = getWorkedHours();
+        if ($workHours > 0) {
+            $gravityRate = ($arrayNbWorkstopDays['nbworkstopdays'] / $workHours) * 1000;
+            if ($gravityRate > 0) {
+                $array['gravityrate'] = price2Num($gravityRate, 5);
+            } else {
+                $array['gravityrate'] = 'N/A';
+            }
+        } else {
+            $array['gravityrate'] = 'N/A';
+        }
+        return $array;
+    }
 
     /**
      * Get user victim object.
@@ -830,7 +859,7 @@ class Accident extends SaturneObject
         }
 
         $ret  = parent::getTriggerDescription($object);
-        $ret .= $langs->trans('UserVictim') . ' : ' . $userVictim->firstname . $userVictim->lastname . '<br>';
+        $ret .= $userVictim->id > 0 ? $langs->trans('UserVictim') . ' : ' . $userVictim->firstname . $userVictim->lastname . '<br>' : '';
         $ret .= $langs->trans('UserEmployer') . ' : ' . $userEmployer->firstname . $userEmployer->lastname . '<br>';
         $ret .= $langs->trans('AccidentLocation') . ' : ' . $accidentLocation  . '<br>';
         $ret .= $langs->trans('AccidentType') . ' : ' . ($object->accident_type ? $langs->trans('CommutingAccident') : $langs->trans('WorkAccidentStatement')) . '<br>';
@@ -860,7 +889,9 @@ class Accident extends SaturneObject
             }
             $moreHtmlRef      = $langs->trans('TotalWorkStopDays') . ' : ' . $totalWorkStopDays;
             $lastaccidentline = end($accidentLines);
-            $moreHtmlRef     .= '<br>' . $langs->trans('ReturnWorkDate') . ' : ' . dol_print_date($lastaccidentline->date_end_workstop, 'dayhour');
+            if ($this->status == Accident::STATUS_LOCKED) {
+                $moreHtmlRef     .= '<br>' . $langs->trans('ReturnWorkDate') . ' : ' . dol_print_date($lastaccidentline->date_end_workstop, 'dayhour');
+            }
         } else {
             $moreHtmlRef = $langs->trans('RegisterAccident');
         }
@@ -924,7 +955,7 @@ class AccidentWorkStop extends SaturneObject
 		'date_creation'       => ['type' => 'datetime',     'label' => 'DateCreation',      'enabled' => '1', 'position' => 40, 'notnull' => 1,  'visible' => 0,],
 		'tms'                 => ['type' => 'timestamp',    'label' => 'DateModification',  'enabled' => '1', 'position' => 50, 'notnull' => 0,  'visible' => 0,],
 		'status'              => ['type' => 'smallint',     'label' => 'Status',            'enabled' => '1', 'position' => 60, 'notnull' => 0,  'visible' => 0, 'index' => 0,],
-		'workstop_days'       => ['type' => 'integer',      'label' => 'WorkStopDays',      'enabled' => '1', 'position' => 70, 'notnull' => -1, 'visible' => -1,],
+		'workstop_days'       => ['type' => 'integer',      'label' => 'WorkStopDays',      'enabled' => '1', 'position' => 70, 'notnull' => 0, 'visible' => -1,],
 		'date_start_workstop' => ['type' => 'datetime',     'label' => 'DateStartWorkStop', 'enabled' => '1', 'position' => 80, 'notnull' => 0,  'visible' => 0,],
 		'date_end_workstop'   => ['type' => 'datetime',     'label' => 'DateEndWorkStop',   'enabled' => '1', 'position' => 81, 'notnull' => 0,  'visible' => 0,],
 		'declaration_link'    => ['type' => 'text',         'label' => 'DeclarationLink',   'enabled' => '1', 'position' => 82, 'notnull' => 0,  'visible' => 0,],

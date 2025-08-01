@@ -61,7 +61,7 @@ $DUProject                      = new Project($db);
 $advanced_method_cotation_json  = file_get_contents(DOL_DOCUMENT_ROOT . '/custom/digiriskdolibarr/js/json/default.json');
 $advancedCotationMethodArray = json_decode($advanced_method_cotation_json, true);
 
-$alldigiriskelement = $digiriskelement->getActiveDigiriskElements(1);
+$alldigiriskelement = $digiriskelement->getActiveDigiriskElements('shared');
 $digiriskElementsOfEntity = $digiriskelement->getActiveDigiriskElements();
 
 $DUProject->fetch($riskType == 'risk' ? $conf->global->DIGIRISKDOLIBARR_DU_PROJECT : $conf->global->DIGIRISKDOLIBARR_ENVIRONMENT_PROJECT);
@@ -120,6 +120,7 @@ if ( ! preg_match('/(evaluation)/', $sortfield)) {
 	}
 	$sql .= " AND el.sourcetype = 'digiriskdolibarr_risk'";
     $sql .= ' AND r.type = "' . $riskType . '"';
+    $sql .= ' AND e.rowid IN (' . implode(',', array_keys($alldigiriskelement)) . ')';
 
 	foreach ($search as $key => $val) {
 		if ($key == 'status' && $search[$key] == -1) continue;
@@ -211,7 +212,8 @@ if ( ! preg_match('/(evaluation)/', $sortfield)) {
 	$sql                                                                                                                                                      .= " LEFT JOIN " . MAIN_DB_PREFIX . $risk->table_element . " as r on (evaluation.fk_risk = r.rowid)";
 	$sql 																																					  .= " INNER JOIN " . MAIN_DB_PREFIX . 'element_element' . " as el on (r.rowid = el.fk_source)";
 	$sql 																																					  .= " LEFT JOIN " . MAIN_DB_PREFIX . $digiriskelement->table_element . " as e on (r.fk_element = e.rowid)";
-	if (is_array($extrafields->attributes[$evaluation->table_element]['label']) && count($extrafields->attributes[$evaluation->table_element]['label'])) $sql .= " LEFT JOIN " . MAIN_DB_PREFIX . $evaluation->table_element . "_extrafields as ef on (evaluation.rowid = ef.fk_object)";
+	if (isset($extrafields->attributes[$evaluation->table_element]) &&
+        is_array($extrafields->attributes[$evaluation->table_element]['label']) && count($extrafields->attributes[$evaluation->table_element]['label'])) $sql .= " LEFT JOIN " . MAIN_DB_PREFIX . $evaluation->table_element . "_extrafields as ef on (evaluation.rowid = ef.fk_object)";
 	//if ($evaluation->ismultientitymanaged == 1) $sql                                                                                                          .= " WHERE evaluation.entity IN (" . getEntity($evaluation->element) . ")";
 	else $sql                                                                                                                                                 .= " WHERE 1 = 1";
 	$sql                                                                                                                                                      .= " AND evaluation.status = 1";
@@ -234,6 +236,7 @@ if ( ! preg_match('/(evaluation)/', $sortfield)) {
 	}
 	$sql .= " AND el.sourcetype = 'digiriskdolibarr_risk'";
     $sql .= ' AND r.type = "' . $riskType . '"';
+    $sql .= ' AND e.rowid IN (' . implode(',', array_keys($alldigiriskelement)) . ')';
 
 	foreach ($search as $key => $val) {
 		if ($key == 'status' && $search[$key] == -1) continue;
@@ -368,26 +371,6 @@ $arrayfields['r.applied_on']['disablesort'] = 1;
 
 $arrayfields = dol_sort_array($arrayfields, 'position');
 
-$menuConf = 'MAIN_SELECTEDFIELDS_' . $varpage;
-
-if (dol_strlen($user->conf->$menuConf) < 1 || preg_match('/t./', $user->conf->$menuConf)) {
-	$user->conf->$menuConf = 'r.entity,r.fk_element,r.applied_on,r.ref,r.category,evaluation.cotation,';
-}
-
-if ( ! preg_match('/r.description/', $user->conf->$menuConf) && $conf->global->DIGIRISKDOLIBARR_RISK_DESCRIPTION) {
-	$user->conf->$menuConf = $user->conf->$menuConf  . 'r.description,';
-} elseif ( ! $conf->global->DIGIRISKDOLIBARR_RISK_DESCRIPTION) {
-	$user->conf->$menuConf = preg_replace('/r.description,/', '', $user->conf->$menuConf);
-	$arrayfields['r.description']['enabled'] = 0;
-}
-
-if ( ! preg_match('/evaluation.has_tasks/', $user->conf->$menuConf) && $conf->global->DIGIRISKDOLIBARR_TASK_MANAGEMENT) {
-	$user->conf->$menuConf .= $user->conf->$menuConf  . 'evaluation.has_tasks,';
-} elseif ( ! $conf->global->DIGIRISKDOLIBARR_TASK_MANAGEMENT) {
-	$user->conf->$menuConf = preg_replace('/evaluation.has_tasks,/', '', $user->conf->$menuConf);
-	$arrayfields['evaluation.has_tasks']['enabled'] = 0;
-}
-
 $selectedfields  = $form->multiSelectArrayWithCheckbox('shared_risklist_selectedfields', $arrayfields, $varpage); // This also change content of $arrayfields
 $selectedfields .= (count($arrayofmassactions) ? $form->showCheckAddButtons('checkforselect', 1) : '');
 
@@ -408,31 +391,31 @@ foreach ($risk->fields as $key => $val) {
 	if ($key == 'status') $cssforfield .= ($cssforfield ? ' ' : '') . 'center';
 	if ( ! empty($arrayfields['r.' . $key]['checked'])) {
 		print '<td class="liste_titre' . ($cssforfield ? ' ' . $cssforfield : '') . '">';
-		if (is_array($val['arrayofkeyval'])) print $form->selectarray('search_' . $key, $val['arrayofkeyval'], $search[$key], $val['notnull'], 0, 0, '', 1, 0, 0, '', 'maxwidth75');
-		elseif (strpos($val['type'], 'integer:') === 0) {
+		if (isset($val['arrayofkeyval']) && is_array($val['arrayofkeyval'])) print $form->selectarray('search_' . $key, $val['arrayofkeyval'], $search[$key], $val['notnull'], 0, 0, '', 1, 0, 0, '', 'maxwidth75');
+		elseif (strpos($val['type'] ?? '', 'integer:') === 0) {
 			print $risk->showInputField($val, $key, $search[$key], '', '', 'search_', 'maxwidth150', 1);
 		} elseif ($key == 'entity') {
-			print select_entity_list($search['entity'], 'search_entity', 'e.rowid NOT IN (' . $conf->entity . ')');
+			print select_entity_list($search['entity'] ?? '', 'search_entity', 'e.rowid NOT IN (' . $conf->entity . ')');
 		} elseif ($key == 'fk_element') {
-			print $digiriskelement->selectDigiriskElementList($search['fk_element'], 'search_fk_element_sharedrisk', ['customsql' => 'entity NOT IN (' . $conf->entity . ') AND rowid NOT IN (' . implode(',', $deletedElements) . ')'], 1, 0, array(), 0, 0, 'minwidth100 maxwidth300', 0, false, 1, $contextpage, false);
+			print $digiriskelement->selectDigiriskElementList($search['fk_element'] ?? '', 'search_fk_element_sharedrisk', ['customsql' => 'entity NOT IN (' . $conf->entity . ') AND rowid NOT IN (' . implode(',', $deletedElements) . ')'], 1, 0, array(), 0, 0, 'minwidth100 maxwidth300', 0, false, 1, $contextpage, false);
 		}  elseif ($key == 'applied_on') {
 //				print $digiriskelement->select_digiriskelement_list($search['search_applied_on_sharedrisk'], 'search_applied_on_sharedrisk', '', 1, 0, array(), 0, 0, 'minwidth100', 0, false, 1, $contextpage);
 		} elseif ($key == 'category') { ?>
 			<div class="wpeo-dropdown dropdown-large dropdown-grid category-danger padding" style="position: inherit">
-				<input class="input-hidden-danger" type="hidden" name="<?php echo 'search_' . $key ?>" value="<?php echo dol_escape_htmltag($search[$key]) ?>" />
-				<?php if (dol_strlen(dol_escape_htmltag($search[$key])) == 0) : ?>
+				<input class="input-hidden-danger" type="hidden" name="<?php echo 'search_' . $key ?>" value="<?php echo dol_escape_htmltag($search[$key] ?? '') ?>" />
+				<?php if (dol_strlen(dol_escape_htmltag($search[$key] ?? '')) == 0) : ?>
 					<div class="dropdown-toggle dropdown-add-button button-cotation">
 						<span class="wpeo-button button-square-50 button-grey"><i class="fas fa-exclamation-triangle button-icon"></i></span>
 						<img class="danger-category-pic wpeo-tooltip-event hidden" src="" aria-label=""/>
 					</div>
 				<?php else : ?>
-					<div class="dropdown-toggle dropdown-add-button button-cotation wpeo-tooltip-event" aria-label="<?php echo (empty(dol_escape_htmltag($search[$key]))) ? $risk->getDangerCategoryName($risk) : $risk->getDangerCategoryNameByPosition($search[$key]); ?>">
-						<img class="danger-category-pic tooltip hover" src="<?php echo DOL_URL_ROOT . '/custom/digiriskdolibarr/img/categorieDangers/' . ((empty(dol_escape_htmltag($search[$key]))) ? $risk->getDangerCategory($risk) : $risk->getDangerCategoryByPosition($search[$key])) . '.png'?>" />
+					<div class="dropdown-toggle dropdown-add-button button-cotation wpeo-tooltip-event" aria-label="<?php echo (empty(dol_escape_htmltag($search[$key]))) ? $risk->getDangerCategoryName($risk, $riskType) : $risk->getDangerCategoryNameByPosition($search[$key], $riskType); ?>">
+						<img class="danger-category-pic tooltip hover" src="<?php echo DOL_URL_ROOT . '/custom/digiriskdolibarr/img/categorieDangers/' . ((empty(dol_escape_htmltag($search[$key]))) ? $risk->getDangerCategory($risk, $riskType) : $risk->getDangerCategoryByPosition($search[$key], $riskType)) . '.png'?>" />
 					</div>
 				<?php endif; ?>
 				<ul class="saturne-dropdown-content wpeo-gridlayout grid-5 grid-gap-0">
 					<?php
-					$dangerCategories = $risk->getDangerCategories();
+					$dangerCategories = Risk::getDangerCategories($riskType);
 					if ( ! empty($dangerCategories) ) :
 						foreach ($dangerCategories as $dangerCategory) : ?>
 							<li class="item dropdown-item wpeo-tooltip-event classfortooltip" data-is-preset="<?php echo ''; ?>" data-id="<?php echo $dangerCategory['position'] ?>" aria-label="<?php echo $dangerCategory['name'] ?>">
@@ -442,7 +425,7 @@ foreach ($risk->fields as $key => $val) {
 					endif; ?>
 				</ul>
 			</div>
-		<?php } elseif ( ! preg_match('/^(date|timestamp)/', $val['type']) && $key != 'category') print '<input type="text" class="flat maxwidth75" name="search_' . $key . '" value="' . dol_escape_htmltag($search[$key]) . '">';
+		<?php } elseif ( ! preg_match('/^(date|timestamp)/', $val['type']) && $key != 'category') print '<input type="text" class="flat maxwidth75" name="search_' . $key . '" value="' . dol_escape_htmltag($search[$key] ?? '') . '">';
 		print '</td>';
 	}
 }
@@ -479,7 +462,7 @@ foreach ($risk->fields as $key => $val) {
     $cssforfield                        = (empty($val['csslist']) ? (empty($val['css']) ? '' : $val['css']) : $val['csslist']);
 	if ($key == 'status') $cssforfield .= ($cssforfield ? ' ' : '') . 'center';
 	if ( ! empty($arrayfields['r.' . $key]['checked'])) {
-		print getTitleFieldOfList($arrayfields['r.' . $key]['label'], 0, $_SERVER['PHP_SELF'], 'r.' . $key, '', $param, ($cssforfield ? 'class="' . $cssforfield . '"' : ''), $sortfield, $sortorder, ($cssforfield ? $cssforfield . ' ' : ''), $arrayfields['r.' . $key]['disablesort']) . "\n";
+		print getTitleFieldOfList($arrayfields['r.' . $key]['label'] ?? '', 0, $_SERVER['PHP_SELF'], 'r.' . $key, '', $param, ($cssforfield ? 'class="' . $cssforfield . '"' : ''), $sortfield, $sortorder, ($cssforfield ? $cssforfield . ' ' : ''), $arrayfields['r.' . $key]['disablesort'] ?? '') . "\n";
 	}
 }
 
@@ -507,7 +490,7 @@ print '</tr>' . "\n";
 
 // contenu
 $i          = 0;
-$totalarray = array();
+$totalarray = ['nbfield' => 0];
 unset($risk->fields['applied_on']);
 
 while ($i < ($limit ? min($num, $limit) : $num)) {
@@ -560,8 +543,8 @@ while ($i < ($limit ? min($num, $limit) : $num)) {
                 }
             } elseif ($key == 'category') { ?>
 				<div class="table-cell table-50 cell-risk" data-title="Risque">
-					<div class="wpeo-dropdown dropdown-large category-danger padding wpeo-tooltip-event" aria-label="<?php echo $risk->getDangerCategoryName($risk) ?>">
-						<img class="danger-category-pic hover" src="<?php echo DOL_URL_ROOT . '/custom/digiriskdolibarr/img/categorieDangers/' . $risk->getDangerCategory($risk) . '.png' ; ?>"/>
+					<div class="wpeo-dropdown dropdown-large category-danger padding wpeo-tooltip-event" aria-label="<?php echo $risk->getDangerCategoryName($risk, $riskType) ?>">
+						<img class="danger-category-pic hover" src="<?php echo DOL_URL_ROOT . '/custom/digiriskdolibarr/img/categorieDangers/' . $risk->getDangerCategory($risk, $riskType) . '.png' ; ?>"/>
 					</div>
 				</div>
 				<?php

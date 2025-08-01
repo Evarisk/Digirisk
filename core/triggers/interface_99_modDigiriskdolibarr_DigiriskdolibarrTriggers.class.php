@@ -72,7 +72,7 @@ class InterfaceDigiriskdolibarrTriggers extends DolibarrTriggers
 		$this->name        = preg_replace('/^Interface/i', '', get_class($this));
 		$this->family      = "demo";
 		$this->description = "Digiriskdolibarr triggers.";
-		$this->version     = '10.2.1';
+		$this->version     = '21.0.1';
 		$this->picto       = 'digiriskdolibarr@digiriskdolibarr';
 	}
 
@@ -116,7 +116,7 @@ class InterfaceDigiriskdolibarrTriggers extends DolibarrTriggers
 
         // Allowed triggers are a list of trigger from other module that should activate this file
 		if (!isModEnabled('digiriskdolibarr') || !$active) {
-            $allowedTriggers = ['COMPANY_DELETE', 'CONTACT_DELETE', 'TICKET_CREATE'];
+			$allowedTriggers = ['COMPANY_DELETE', 'CONTACT_DELETE', 'TICKET_CREATE', 'TICKET_PUBLIC_INTERFACE_CREATE', 'TICKET_SIGN'];
             if (!in_array($action, $allowedTriggers)) {
                 return 0;  // If module is not enabled or trigger is deactivated, we do nothing
             }
@@ -401,7 +401,7 @@ class InterfaceDigiriskdolibarrTriggers extends DolibarrTriggers
 				break;
 
 			case 'TICKET_CREATE' :
-				if ($conf->global->DIGIRISKDOLIBARR_SEND_EMAIL_ON_TICKET_SUBMIT) {
+				if (getDolGlobalInt('DIGIRISKDOLIBARR_SEND_EMAIL_ON_TICKET_SUBMIT')) {
 					// envoi du mail avec les infos de l'objet aux adresses mail configurées
 					// envoi du mail avec une trad puis avec un model
 
@@ -440,6 +440,7 @@ class InterfaceDigiriskdolibarrTriggers extends DolibarrTriggers
 						$langs->load('mails');
 
 						$listOfMails = $conf->global->DIGIRISKDOLIBARR_TICKET_SUBMITTED_SEND_MAIL_TO;
+
 						if ( ! preg_match('/;/', $listOfMails)) {
 							$sendto = $listOfMails;
 
@@ -543,6 +544,76 @@ class InterfaceDigiriskdolibarrTriggers extends DolibarrTriggers
 					}
 				}
 				break;
+
+			case 'TICKET_SIGN':
+				$actioncomm->elementtype = 'ticket';
+				$actioncomm->label = $langs->transnoentities('ObjectSignedTrigger', $langs->transnoentities(get_class($object)), $object->ref);
+
+				$result = $actioncomm->create($user);
+				break;
+
+            case 'TICKET_PUBLIC_INTERFACE_CREATE' :
+                require_once __DIR__ . '/../../../saturne/class/saturnemail.class.php';
+
+                $categories = $object->getCategoriesCommon('ticket');
+                if (is_array($categories) && !empty($categories)) {
+                    $category = new Categorie($this->db);
+                    foreach ($categories as $categoryID) {
+                        $category->fetch($categoryID);
+                        $categoryConfigs = json_decode($category->array_options['options_ticket_category_config']);
+                        if ($categoryConfigs->mail_template && $categoryConfigs->recipients) {
+                            $saturneMail = new SaturneMail($this->db);
+                            $saturneMail->fetch($categoryConfigs->mail_template);
+                            $recipients = explode(',', $categoryConfigs->recipients);
+                            foreach ($recipients as $recipientID) {
+                                $userTmp = new User($this->db);
+                                $userTmp->fetch($recipientID);
+                                $sendto = $userTmp->email;
+                                if (dol_strlen($sendto) && (!empty($conf->global->MAIN_MAIL_EMAIL_FROM))) {
+                                    require_once DOL_DOCUMENT_ROOT . '/core/class/CMailFile.class.php';
+
+                                    $from = $conf->global->MAIN_MAIL_EMAIL_FROM;
+                                    $trackid = 'tic' . $object->id;
+
+                                    // Create form object
+                                    // Send mail (substitutionarray must be done just before this)
+                                    $mailfile = new CMailFile($saturneMail->topic, $sendto, $from, $saturneMail->content, array(), array(), array(), "", "", 0, -1, '', '', $trackid, '', 'ticket');
+                                    if ($mailfile->error) {
+                                        setEventMessages($mailfile->error, $mailfile->errors, 'errors');
+                                    } else {
+                                        if (1) {
+                                            $result = $mailfile->sendfile();
+                                            if ( ! $result) {
+                                                $langs->load("other");
+                                                $mesg = '<div class="error">';
+                                                if ($mailfile->error) {
+                                                    $mesg .= $langs->transnoentities('ErrorFailedToSendMail', dol_escape_htmltag($from), dol_escape_htmltag($sendto));
+                                                    $mesg .= '<br>' . $mailfile->error;
+                                                } else {
+                                                    $mesg .= $langs->transnoentities('ErrorFailedToSendMail', dol_escape_htmltag($from), dol_escape_htmltag($sendto));
+                                                }
+                                                $mesg .= '</div>';
+                                                setEventMessages($mesg, null, 'warnings');
+                                            } else {
+                                                $actioncomm->elementtype   = 'ticket';
+                                                $actioncomm->label         = $langs->transnoentities('TicketCreationMailWellSent');
+                                                $actioncomm->note_private  = $langs->transnoentities('TicketCreationMailSent', $sendto) . '<br>';
+                                                $actioncomm->note_private .= $saturneMail->topic . '<br>';
+                                                $actioncomm->note_private .= $saturneMail->content;
+                                                $result = $actioncomm->create($user);
+                                            }
+                                        }
+                                    }
+                                } else {
+                                    $langs->load("errors");
+                                    setEventMessages($langs->trans('ErrorFieldRequired', $langs->transnoentitiesnoconv("MailTo")), null, 'warnings');
+                                    dol_syslog('Try to send email with no recipient defined', LOG_WARNING);
+                                }
+                            }
+                        }
+                    }
+                }
+                break;
 
             case 'RISKSIGN_CREATE' :
 			case 'RISK_CREATE' :
@@ -832,10 +903,10 @@ class InterfaceDigiriskdolibarrTriggers extends DolibarrTriggers
 
 		}
 
-		if ($result < 0) {
-			$object->errors = array_merge($object->error, $actioncomm->errors);
-			return $result;
-		}
+//		if ($result < 0) {
+//			$object->errors = array_merge($object->error, $actioncomm->errors);
+//			return $result;
+//		}
 		return 0;
 	}
 }

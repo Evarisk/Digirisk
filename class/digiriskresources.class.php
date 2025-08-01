@@ -301,7 +301,7 @@ class DigiriskResources extends SaturneObject
 		$allLinks = array();
 		if (!empty ($links) && $links > 0) {
 			foreach ($links as $link) {
-				if ($allLinks[$link->ref]->ref == $link->ref) {
+				if (isset($allLinks[$link->ref]) && $allLinks[$link->ref]->ref == $link->ref) {
 					array_push($allLinks[$link->ref]->id, $link->element_id);
 				} else {
 					$allLinks[$link->ref] = new stdClass();
@@ -329,9 +329,11 @@ class DigiriskResources extends SaturneObject
 
         $array['widgets'] = [
             'society' => [
+                'title'      => $langs->transnoentities('Society'),
+                'picto'      => 'fas fa-building',
+                'pictoColor' => '#FB4B54',
                 'label'      => [$langs->transnoentities('SiretNumber') ?? ''],
                 'content'    => [$arraySiretNumber['siretnumber'] ?? 0],
-                'picto'      => 'fas fa-building',
                 'widgetName' => $langs->transnoentities('Society')
             ]
         ];

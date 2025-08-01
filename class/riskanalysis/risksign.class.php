@@ -124,6 +124,33 @@ class RiskSign extends SaturneObject
 		return $this->fetchAll('', '', 0, 0, $filter, 'AND');
 	}
 
+    /**
+     * Load risk sign infos
+     *
+     * @param  array     $moreParam More param (filter)
+     * @return array     $array     Array of risk signs
+     * @throws Exception
+     */
+    public static function loadRiskSignInfos(array $moreParam = []): array
+    {
+        $array = [];
+
+        //@todo: missing shared and inherited risksigns
+
+        $select             = ', d.ref AS digiriskElementRef, d.entity AS digiriskElementEntity, d.label AS digiriskElementLabel';
+        $moreSelects        = ['digiriskElementRef', 'digiriskElementEntity', 'digiriskElementLabel'];
+        $join               = ' INNER JOIN ' . MAIN_DB_PREFIX . 'digiriskdolibarr_digiriskelement AS d ON d.rowid = t.fk_element';
+        $filter             = 'd.status = ' . DigiriskElement::STATUS_VALIDATED . ' AND t.status = ' . self::STATUS_VALIDATED . ($moreParam['filter'] ?? '');
+        $array['riskSigns'] = saturne_fetch_all_object_type('RiskSign', '', '', 0, 0, ['customsql' => $filter], 'AND', false, false, false, $join, [], $select, $moreSelects);
+        if (!is_array($array['riskSigns']) || empty($array['riskSigns'])) {
+            $array['riskSigns'] = [];
+        }
+
+        $array['nbRiskSigns'] = count($array['riskSigns']);
+
+        return $array;
+    }
+
 	/**
 	 * Get risksign categories json in /digiriskdolibarr/js/json/
 	 *
@@ -326,11 +353,10 @@ class RiskSign extends SaturneObject
         $ret = parent::getTriggerDescription($object);
 
         $digiriskelement = new DigiriskElement($this->db);
-        $risk            = new Risk($this->db);
         $digiriskelement->fetch($object->fk_element);
 
         $ret .= $langs->trans('ParentElement') . ' : ' . $digiriskelement->ref . " - " . $digiriskelement->label . '<br>';
-        $ret .= $langs->trans('RiskCategory') . ' : ' . $risk->getDangerCategoryName($object) . '<br>';
+        $ret .= $langs->trans('RiskSignCategory') . ' : ' . $this->getRiskSignCategory($object, 'name') . '<br>';
 
         if (dol_strlen($object->applied_on) > 0) {
             $digiriskelement->fetch($object->applied_on);

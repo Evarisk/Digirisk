@@ -277,8 +277,9 @@ window.digiriskdolibarr.riskassessmenttask.saveRiskAssessmentTask = function ( e
 		success: function ( resp ) {
 			$('#risk_assessment_task_edit'+editedRiskAssessmentTaskId).removeClass('modal-active')
 			$('.riskassessment-task-container-'+editedRiskAssessmentTaskId).replaceWith($(resp).find('.riskassessment-task-container-'+editedRiskAssessmentTaskId).first())
-			$('#risk_assessment_task_edit'+editedRiskAssessmentTaskId+' .riskassessment-task-data .riskassessment-task-budget').replaceWith($(resp).find('.riskassessment-task-container-'+editedRiskAssessmentTaskId+' .riskassessment-task-budget').first())
-			let actionContainerSuccess = $('.messageSuccessTaskEdit');
+			$('#risk_assessment_task_edit'+editedRiskAssessmentTaskId+' .riskassessment-task-data .riskassessment-task-budget').replaceWith($(resp).find('.riskassessment-task-container-'+editedRiskAssessmentTaskId+' .riskassessment-task-budget').first());
+			$('#risk_assessment_task_edit' + editedRiskAssessmentTaskId).replaceWith($(resp).find('#risk_assessment_task_edit' + editedRiskAssessmentTaskId));
+      let actionContainerSuccess = $('.messageSuccessTaskEdit');
 			$('.riskassessment-tasks' + riskId).fadeOut(800);
 			$('.riskassessment-tasks' + riskId).fadeIn(800);
 			textToShow += actionContainerSuccess.find('.valueForEditTask1').val()

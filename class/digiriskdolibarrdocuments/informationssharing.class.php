@@ -57,7 +57,7 @@ class InformationsSharing extends DigiriskDocuments
 	 */
 	public function InformationsSharingFillJSON()
 	{
-		global $conf;
+		global $conf, $langs;
 
 		$resources 			= new DigiriskResources($this->db);
 		$digirisk_resources = $resources->fetchDigiriskResources();
@@ -87,6 +87,7 @@ class InformationsSharing extends DigiriskDocuments
 
 			if ($result > 0) {
 				$json['InformationsSharing']['harassment_officer']['id']    = $harassment_officer->id;
+
 				$json['InformationsSharing']['harassment_officer']['name']  = $harassment_officer->getFullName($langs);
 				$json['InformationsSharing']['harassment_officer']['phone'] = $harassment_officer->office_phone;
 			}
@@ -102,6 +103,7 @@ class InformationsSharing extends DigiriskDocuments
 
 			$json['InformationsSharing']['delegues_du_personnels_date']    	  = (dol_strlen($conf->global->DIGIRISKDOLIBARR_DP_ELECTION_DATE) > 0 && $conf->global->DIGIRISKDOLIBARR_DP_ELECTION_DATE != '--' ? $conf->global->DIGIRISKDOLIBARR_DP_ELECTION_DATE : '');
 			$json['InformationsSharing']['delegues_du_personnels_titulaires'] = '';
+            $json['InformationsSharing']['delegues_du_personnels_titulairesFullName'] = '';
 			if (!empty ($digirisk_resources['TitularsDP']->id )) {
 				foreach ($digirisk_resources['TitularsDP']->id as $dp_titular) {
 
@@ -115,6 +117,7 @@ class InformationsSharing extends DigiriskDocuments
 			}
 
 			$json['InformationsSharing']['delegues_du_personnels_suppleants'] = '';
+            $json['InformationsSharing']['delegues_du_personnels_suppleantsFullName'] = '';
 			if (!empty ($digirisk_resources['AlternatesDP']->id )) {
 				foreach ($digirisk_resources['AlternatesDP']->id as $dp_alternate) {
 
@@ -130,6 +133,7 @@ class InformationsSharing extends DigiriskDocuments
 			// CSE
 			$json['InformationsSharing']['membres_du_comite_entreprise_date']       = (dol_strlen($conf->global->DIGIRISKDOLIBARR_CSE_ELECTION_DATE) > 0 && $conf->global->DIGIRISKDOLIBARR_CSE_ELECTION_DATE != '--' ? $conf->global->DIGIRISKDOLIBARR_CSE_ELECTION_DATE : '');
 			$json['InformationsSharing']['membres_du_comite_entreprise_titulaires'] = '';
+            $json['InformationsSharing']['membres_du_comite_entreprise_titulairesFullName'] = '';
 			if (!empty ($digirisk_resources['TitularsCSE']->id )) {
 				foreach ($digirisk_resources['TitularsCSE']->id as $cse_titular) {
 					$cse_titulars = new User($this->db);
@@ -142,6 +146,7 @@ class InformationsSharing extends DigiriskDocuments
 			}
 
 			$json['InformationsSharing']['membres_du_comite_entreprise_suppleants'] = '';
+            $json['InformationsSharing']['membres_du_comite_entreprise_suppleantsFullName'] = '';
 			if (!empty ($digirisk_resources['AlternatesCSE']->id )) {
 				foreach ($digirisk_resources['AlternatesCSE']->id as $cse_alternate) {
 					$cse_alternates = new User($this->db);

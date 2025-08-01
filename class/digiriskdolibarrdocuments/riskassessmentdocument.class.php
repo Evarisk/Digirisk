@@ -1,5 +1,5 @@
 <?php
-/* Copyright (C) 2021-2023 EVARISK <technique@evarisk.com>
+/* Copyright (C) 2021-2024 EVARISK <technique@evarisk.com>
  *
  * This program is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -31,12 +31,12 @@ require_once __DIR__ . '/../digiriskdocuments.class.php';
 class RiskAssessmentDocument extends DigiriskDocuments
 {
 	/**
-	 * @var string Module name.
+	 * @var string Module name
 	 */
 	public $module = 'digiriskdolibarr';
 
 	/**
-	 * @var string Element type of object.
+	 * @var string Element type of object
 	 */
 	public $element = 'riskassessmentdocument';
 
@@ -46,9 +46,9 @@ class RiskAssessmentDocument extends DigiriskDocuments
     public string $picto = 'fontawesome_fa-file-alt_fas_#d35968';
 
 	/**
-	 * Constructor.
+	 * Constructor
 	 *
-	 * @param DoliDb $db Database handler.
+	 * @param DoliDb $db Database handler
 	 */
 	public function __construct(DoliDB $db)
 	{
@@ -68,6 +68,8 @@ class RiskAssessmentDocument extends DigiriskDocuments
 		$json = [];
         $now  = dol_now(); // To change later because we have to use this->date_creation
 
+        $userTmp = new User($this->db);
+
 		if (!isset($conf->global->DIGIRISKDOLIBARR_RISKASSESSMENTDOCUMENT_AUDIT_START_DATE) || dol_strlen($conf->global->DIGIRISKDOLIBARR_RISKASSESSMENTDOCUMENT_AUDIT_START_DATE) < 1) {
 			dolibarr_set_const($this->db, 'DIGIRISKDOLIBARR_RISKASSESSMENTDOCUMENT_AUDIT_START_DATE', dol_now(), 'chaine', 0, '', $conf->entity);
 		}
@@ -77,9 +79,9 @@ class RiskAssessmentDocument extends DigiriskDocuments
 
 		// *** JSON FILLING ***
 		$json['RiskAssessmentDocument']['nomEntreprise']  = $conf->global->MAIN_INFO_SOCIETE_NOM;
-		$json['RiskAssessmentDocument']['dateAudit']      = dol_print_date($conf->global->DIGIRISKDOLIBARR_RISKASSESSMENTDOCUMENT_AUDIT_START_DATE, '%d/%m/%Y', 'tzuser') . ' - ' . dol_print_date($conf->global->DIGIRISKDOLIBARR_RISKASSESSMENTDOCUMENT_AUDIT_END_DATE, '%d/%m/%Y', 'tzuser');
+		$json['RiskAssessmentDocument']['dateAudit']      = dol_print_date($conf->global->DIGIRISKDOLIBARR_RISKASSESSMENTDOCUMENT_AUDIT_START_DATE, 'day', 'tzuser') . ' - ' . dol_print_date($conf->global->DIGIRISKDOLIBARR_RISKASSESSMENTDOCUMENT_AUDIT_END_DATE, 'day', 'tzuser');
 		$json['RiskAssessmentDocument']['emetteurDUER']   = $user->lastname . ' ' . $user->firstname;
-		$json['RiskAssessmentDocument']['dateGeneration'] = dol_print_date($now, '%d/%m/%Y %H:%M:%S', 'tzuser');
+		$json['RiskAssessmentDocument']['dateGeneration'] = dol_print_date($now, 'dayhour', 'tzuser');
 
 		$userRecipient = json_decode($conf->global->DIGIRISKDOLIBARR_RISKASSESSMENTDOCUMENT_RECIPIENT);
 
@@ -88,11 +90,11 @@ class RiskAssessmentDocument extends DigiriskDocuments
         $json['RiskAssessmentDocument']['portable'] = '';
 		if (is_array($userRecipient) && !empty($userRecipient)) {
 			foreach ($userRecipient as $recipientId) {
-				$user->fetch($recipientId);
+				$userTmp->fetch($recipientId);
 
-				$json['RiskAssessmentDocument']['destinataireDUER'] .= dol_strtoupper($user->lastname) . ' ' . ucfirst($user->firstname) . chr(0x0A);
-				$json['RiskAssessmentDocument']['telephone']        .= (dol_strlen($user->office_phone) > 0 ? $user->office_phone : '-') . chr(0x0A);
-				$json['RiskAssessmentDocument']['portable']         .= (dol_strlen($user->user_mobile) > 0 ? $user->user_mobile : '-') . chr(0x0A);
+				$json['RiskAssessmentDocument']['destinataireDUER'] .= dol_strtoupper($userTmp->lastname) . ' ' . ucfirst($userTmp->firstname) . chr(0x0A);
+				$json['RiskAssessmentDocument']['telephone']        .= (dol_strlen($userTmp->office_phone) > 0 ? $userTmp->office_phone : '-') . chr(0x0A);
+				$json['RiskAssessmentDocument']['portable']         .= (dol_strlen($userTmp->user_mobile) > 0 ? $userTmp->user_mobile : '-') . chr(0x0A);
 			}
 		}
 
@@ -115,102 +117,59 @@ class RiskAssessmentDocument extends DigiriskDocuments
     {
         global $langs;
 
-        $arrayLastGenerateDate             = $this->getLastGenerateDate();
-        $arrayNextGenerateDate             = $this->getNextGenerateDate();
-        $arrayNbDaysBeforeNextGenerateDate = $this->getNbDaysBeforeNextGenerateDate();
-
-        if (empty($arrayNbDaysBeforeNextGenerateDate['nbdaysbeforenextgeneratedate'])) {
-            $arrayNbDaysAfterNextGenerateDate = $this->getNbDaysAfterNextGenerateDate();
-            $arrayNbDaysBeforeNextGenerateDate = ['nbdaysbeforenextgeneratedate' => 'N/A'];
-        } else {
-            $arrayNbDaysAfterNextGenerateDate = ['nbdaysafternextgeneratedate' => 'N/A'];
-        }
+        $arrayGetGenerationDateInfos = $this->getGenerationDateInfos();
 
         $array['widgets'] = [
             'riskassessmentdocument' => [
-                'label'      => [$langs->transnoentities('LastGenerateDate') ?? '', $langs->transnoentities('NextGenerateDate') ?? '', $langs->transnoentities('NbDaysBeforeNextGenerateDate') ?? '', $langs->transnoentities('NbDaysAfterNextGenerateDate') ?? ''],
-                'content'    => [$arrayLastGenerateDate['lastgeneratedate'] ?? 0, $arrayNextGenerateDate['nextgeneratedate'] ?? 0, $arrayNbDaysBeforeNextGenerateDate['nbdaysbeforenextgeneratedate'] ?? 0, $arrayNbDaysAfterNextGenerateDate['nbdaysafternextgeneratedate'] ?? 0],
-                'picto'      => 'fas fa-info-circle',
-                'widgetName' => $langs->transnoentities('RiskAssessmentDocument')
+                'title'       => $langs->transnoentities('RiskAssessmentDocument'),
+                'picto'       => 'fas fa-book',
+                'pictoColor'  => '#0D8AFF',
+                'label'       => [$langs->transnoentities('NextGenerateDate') ?? '', $langs->transnoentities('LastGenerateDate') ?? '', $langs->transnoentities('DelayGenerateDate') ?? ''],
+                'content'     => [$arrayGetGenerationDateInfos['nextgeneratedate'], $arrayGetGenerationDateInfos['lastgeneratedate'], $arrayGetGenerationDateInfos['delaygeneratedate']],
+                'picto'       => 'fas fa-info-circle',
+                'moreContent' => ['', $arrayGetGenerationDateInfos['moreContent'] ?? ''],
+                'widgetName'  => $langs->transnoentities('RiskAssessmentDocument')
             ]
         ];
 
         return $array;
     }
 
-	/**
-	 * Get last riskassessmentdocument generate date.
-	 *
-	 * @return array
-	 * @throws Exception
-	 */
-	public function getLastGenerateDate()
-	{
-		// Last riskassessmentdocument generate date
-		$filter                      = array('customsql' => "t.type='riskassessmentdocument'");
-		$riskassessmentdocumentarray = $this->fetchAll('desc', 't.rowid', 1, 0, $filter, 'AND');
-		if ( ! empty($riskassessmentdocumentarray) && $riskassessmentdocumentarray > 0 && is_array($riskassessmentdocumentarray)) {
-			$riskassessmentdocument = array_shift($riskassessmentdocumentarray);
-			$array['lastgeneratedate'] = dol_print_date($riskassessmentdocument->date_creation, 'day');
-		} else {
-			$array['lastgeneratedate'] = 'N/A';
-		}
-		return $array;
-	}
+    /**
+     * Get generation date infos
+     *
+     * @param array $moreParam More param (Object/user/etc)
+     *
+     * @return array
+     * @throws Exception
+     */
+    public function getGenerationDateInfos(array $moreParam = []): array
+    {
+        global $langs;
 
-	/**
-	 * Get next riskassessmentdocument generate date.
-	 *
-	 * @return array
-	 * @throws Exception
-	 */
-	public function getNextGenerateDate()
-	{
-		// Next riskassessmentdocument generate date
-		$filter                      = array('customsql' => "t.type='riskassessmentdocument'");
-		$riskassessmentdocumentarray = $this->fetchAll('desc', 't.rowid', 1, 0, $filter, 'AND');
-		if ( ! empty($riskassessmentdocumentarray) && $riskassessmentdocumentarray > 0 && is_array($riskassessmentdocumentarray)) {
-			$riskassessmentdocument = array_shift($riskassessmentdocumentarray);
-			$array['nextgeneratedate'] = dol_print_date(dol_time_plus_duree($riskassessmentdocument->date_creation, '1', 'y'), 'day');
-		} else {
-			$array['nextgeneratedate'] = 'N/A';
-		}
-		return $array;
-	}
+        $filter                  = ['customsql' => 't.type = "' . $this->element . '"' . ($moreParam['filter'] ?? '')];
+        $riskAssessmentDocuments = $this->fetchAll('desc', 't.rowid', 1, 0, $filter);
+        if (!empty($riskAssessmentDocuments) && is_array($riskAssessmentDocuments)) {
+            $riskAssessmentDocument       = array_shift($riskAssessmentDocuments);
+            $now                          = dol_now();
+            $nextGenerateTimeStamp        = dol_time_plus_duree($riskAssessmentDocument->date_creation, '1', 'y');
+            $nextGenerateDate             = dol_print_date($nextGenerateTimeStamp, 'day');
+            $lastGenerateDate             = dol_print_date($riskAssessmentDocument->date_creation, 'day');
+            $nbDaysAfterNextGenerateDate  = num_between_day($now, $nextGenerateTimeStamp, 1);
+            $nbDaysBeforeNextGenerateDate = num_between_day($nextGenerateTimeStamp, $now, 1);
 
-	/**
-	 * Get number days before next riskassessmentdocument generate date.
-	 *
-	 * @return array
-	 * @throws Exception
-	 */
-	public function getNbDaysBeforeNextGenerateDate()
-	{
-		// Number days before next riskassessmentdocument generate date
-		$arrayNextGenerateDate = $this->getNextGenerateDate();
-		if ($arrayNextGenerateDate['nextgeneratedate'] > 0) {
-			$array['nbdaysbeforenextgeneratedate'] = num_between_day(dol_now(), dol_stringtotime($arrayNextGenerateDate['nextgeneratedate']), 1);
-		} else {
-			$array['nbdaysbeforenextgeneratedate'] = 'N/A';
-		}
-		return $array;
-	}
+            $array['nextgeneratedate']  = img_picto('', 'fontawesome_fa-calendar_far_#263C5C80', 'class="pictofixedwidth"') . $nextGenerateDate;
+            $array['nextgeneratedate'] .= ' ' . (!empty($nbDaysAfterNextGenerateDate) ? $nbDaysAfterNextGenerateDate . ' ' . $langs->transnoentities('Days') : '');
+            $array['lastgeneratedate']  = img_picto('', 'fontawesome_fa-calendar_far_#263C5C80', 'class="pictofixedwidth"') . $lastGenerateDate;
+            $array['delaygeneratedate'] = !empty($nbDaysBeforeNextGenerateDate) ? $nbDaysBeforeNextGenerateDate . ' ' . $langs->transnoentities('Days') : $langs->transnoentities('NoDelay');
+        } else {
+            $array['nextgeneratedate']  = 'N/A';
+            $array['lastgeneratedate']  = 'N/A';
+            $array['delaygeneratedate'] = 'N/A';
+        }
 
-	/**
-	 * Get number days after next riskassessmentdocument generate date.
-	 *
-	 * @return array
-	 * @throws Exception
-	 */
-	public function getNbDaysAfterNextGenerateDate()
-	{
-		// Number days after next riskassessmentdocument generate date
-		$arrayNextGenerateDate = $this->getNextGenerateDate();
-		if ($arrayNextGenerateDate['nextgeneratedate'] > 0) {
-			$array['nbdaysafternextgeneratedate'] = num_between_day(dol_stringtotime($arrayNextGenerateDate['nextgeneratedate']), dol_now(), 1);
-		} else {
-			$array['nbdaysafternextgeneratedate'] = 'N/A';
-		}
-		return $array;
-	}
+        $array['moreContent']  = $this->showUrlOfLastGeneratedDocument($this->module, $this->element, 'odt', 'fontawesome_fa-file-word_far_#0D8AFF', $moreParam['entity'] ?? 1);
+        $array['moreContent'] .= $this->showUrlOfLastGeneratedDocument($this->module, $this->element, 'pdf', 'fontawesome_fa-file-pdf_far_#FB4B54', $moreParam['entity'] ?? 1);
+        return $array;
+    }
 }

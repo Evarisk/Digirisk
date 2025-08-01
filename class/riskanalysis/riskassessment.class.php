@@ -92,7 +92,7 @@ class RiskAssessment extends SaturneObject
 		'date_riskassessment' => array('type' => 'datetime', 'label' => 'RiskAssessmentDate', 'enabled' => '1', 'position' => 141, 'notnull' => -1, 'visible' => 0,),
 		'comment'             => array('type' => 'text', 'label' => 'Comment', 'enabled' => '1', 'position' => 150, 'notnull' => 0, 'visible' => 0,),
 		'photo'               => array('type' => 'varchar(255)', 'label' => 'Photo', 'enabled' => '1', 'position' => 160, 'notnull' => 0, 'visible' => 0,),
-		'has_tasks'           => array('type' => 'integer', 'label' => 'Tasks', 'enabled' => '1', 'position' => 170, 'notnull' => 0, 'visible' => -1,),
+		'has_tasks'           => array('type' => 'integer', 'label' => 'Tasks', 'enabled' => '$conf->global->DIGIRISKDOLIBARR_TASK_MANAGEMENT', 'position' => 170, 'notnull' => 0, 'visible' => '$conf->global->DIGIRISKDOLIBARR_TASK_MANAGEMENT'),
 		'fk_user_creat'       => array('type' => 'integer:User:user/class/user.class.php', 'label' => 'UserAuthor', 'enabled' => '1', 'position' => 180, 'notnull' => 1, 'visible' => 0, 'foreignkey' => 'user.rowid',),
 		'fk_user_modif'       => array('type' => 'integer:User:user/class/user.class.php', 'label' => 'UserModif', 'enabled' => '1', 'position' => 190, 'notnull' => -1, 'visible' => 0,),
 		'fk_risk'             => array('type' => 'integer', 'label' => 'ParentRisk', 'enabled' => '1', 'position' => 200, 'notnull' => 1, 'visible' => 0,),
@@ -189,6 +189,53 @@ class RiskAssessment extends SaturneObject
             foreach ($riskAssessments as $riskAssessment) {
                 $riskAssessment->setValueFrom('status', 1, '', '', 'int', '', $user);
             }
+        }
+    }
+
+    /**
+     * check if risk assessment not exists for a risk
+     *
+     * @param  int       $limit Limit
+     * @return array|int        Int <0 if KO, array of pages if OK
+     * @throws Exception
+     */
+    public function checkNotExistsRiskForRiskAssessment(int $limit = 0)
+    {
+        dol_syslog(__METHOD__, LOG_DEBUG);
+
+        $risk = new Risk($this->db);
+
+        $sql  = 'SELECT ';
+        $sql .= $this->getFieldList('t');
+        $sql .= ' FROM ' . MAIN_DB_PREFIX . $this->table_element . ' as t';
+        $sql .= ' WHERE !EXISTS';
+        $sql .= ' ( SELECT ';
+        $sql .= $risk->getFieldList('r');
+        $sql .= ' FROM ' . MAIN_DB_PREFIX . $risk->table_element . ' as r';
+        $sql .= ' WHERE r.rowid = t.fk_risk )';
+
+        $records = [];
+        $resql   = $this->db->query($sql);
+        if ($resql) {
+            $num = $this->db->num_rows($resql);
+            $i = 0;
+            while ($i < ($limit ? min($limit, $num) : $num)) {
+                $obj = $this->db->fetch_object($resql);
+
+                $record = new $this($this->db);
+                $record->setVarsFromFetchObj($obj);
+
+                $records[$record->id] = $record;
+
+                $i++;
+            }
+            $this->db->free($resql);
+
+            return $records;
+        } else {
+            $this->errors[] = 'Error ' . $this->db->lasterror();
+            dol_syslog(__METHOD__ . ' ' . join(',', $this->errors), LOG_ERR);
+            return -1;
         }
     }
 

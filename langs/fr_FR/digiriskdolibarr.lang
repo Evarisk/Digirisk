@@ -66,7 +66,36 @@ Subtitle                                = Sous-titre
 DigiriskElementDepthGraph            = Niveau de profondeur dans les graphiques des éléments Digirisk
 DigiriskElementDepthGraphDescription = Cette option permet de choisir le niveau de profondeur dans les graphiques des éléments Digirisk <br> Défaut : Niveau 1
 
+# WHSRegister = Registre SST
+TicketsPublicInterfaceConfig         = Configuration de l'interface publique des tickets
+WHSRegister                          = Registre SST
+CurrentTicketPublicInterfaceURL      = URL de l'interface publique des tickets
+MulticompanyTicketPublicInterfaceURL = URL de l'interface publique des tickets multi-société
+OriginURL                            = URL d'origine
+ShortURL                             = URL raccourcie
+ExternalURL                          = URL externe
 
+# DigiQuali Sheet - Modèles
+LinkDigiriskdolibarr_digiriskstandard                 = Activer le lien avec les entités principale Digirisk Standard
+LinkDigiriskdolibarr_digiriskstandardDescription      = Permet le lien entre les entités standard Digirisk et les modèles
+LinkDigiriskdolibarr_digiriskelement                  = Activer le lien avec les groupements et unités de travail
+LinkDigiriskdolibarr_digiriskelementDescription       = Permet le lien entre les groupements et unités de travail et les modèles
+LinkDigiriskdolibarr_risk                             = Activer le lien avec les risques
+LinkDigiriskdolibarr_riskDescription                  = Permet le lien entre les risques et les modèles
+LinkDigiriskdolibarr_riskassessment                   = Activer le lien avec les évaluations
+LinkDigiriskdolibarr_riskassessmentDescription        = Permet le lien entre les évaluations et les modèles
+LinkDigiriskdolibarr_evaluator                        = Activer le lien avec les évaluateurs
+LinkDigiriskdolibarr_evaluatorDescription             = Permet le lien entre les évaluateurs et les modèles
+LinkDigiriskdolibarr_risksign                         = Activer le lien avec les signalisations
+LinkDigiriskdolibarr_risksignDescription              = Permet le lien entre les signalisations et les modèles
+LinkDigiriskdolibarr_preventionplan                   = Activer le lien avec les plans de prévention
+LinkDigiriskdolibarr_preventionplanDescription        = Permet le lien entre les plans de prévention et les modèles
+LinkDigiriskdolibarr_firepermit                       = Activer le lien avec les permis de feu
+LinkDigiriskdolibarr_firepermitDescription            = Permet la liaison entre les permis de feu et les modèles
+LinkDigiriskdolibarr_accident                         = Activer le lien avec les accidents
+LinkDigiriskdolibarr_accidentDescription              = Permet le lien entre les accidents et les modèles
+LinkDigiriskdolibarr_accidentinvestigation            = Activer le lien avec les enquêtes accident
+LinkDigiriskdolibarr_accidentinvestigationDescription = Permet le lien entre les enquêtes et les modèles
 
 #
 # DigiriskDolibarr
@@ -140,7 +169,7 @@ PEETooltip                     = Si votre société possède un PEE, cochez cett
 ShowPictoName                  = Afficher le nom du pictogramme de danger
 ShowPictoNameDescription       = Afficher le nom du pictogramme de danger de risque dans les documents <br> Utile si on souhaite transférer le tableau dans un tableur
 RiskAssessmentColor            = Couleur des évaluations
-RiskAssessmentColorDescription = Affiche la couleur des évaluations dans le document Orque
+RiskAssessmentColorDescription = Affiche la couleur des évaluations dans le document Papripact-A3-Paysage
 
 #
 # LegalDisplay - Affichage légal
@@ -285,9 +314,9 @@ PreventionPlanMustBeInProgressToValidate              = Le plan de prévention e
 CSEMustBeAlerted3DaysBeforeVisit                      = Le CSE doit être prévenu 3 jours avant l'inspection commune préalable (art. R. 4514-1 1°, R. 4514-3 et R. 4514-9 du Code du travail)
 PreventionPlanData                                    = Données du Plan de prévention
 MasterWorkerDescription                               = L'utilisateur utilisé par défaut comme Responsable de l'Entreprise Utilisatrice
-PreventionPlanLinked                                  = Plan de prévention lié
 NoPreventionPlanRisk                                  = Aucun risque sur le plan de prévention
 NoPreventionPlanLinked                                = Aucun plan de prévention lié
+PreventionPlanLinked                                  = Plan de prévention lié
 PreventionPlanManagement                              = Gestion des plans de prévention
 PPRProject                                            = Projet lié aux plans de prévention
 NewLabelForClonePreventionPlan                        = Libellé du nouveau plan de prévention
@@ -370,7 +399,6 @@ FirePermitDescription                             = Projet des permis de feu
 FirePermitData                                    = Données du Permis de feu
 FirePermitManagement                              = Gestion des permis de feu
 FPRProject                                        = Projet lié aux permis de feu
-FirePermitLinked                                  = Permis de feu lié
 firepermitdocument.odt                            = Permis de feu
 firepermitdocument_custom.odt                     = Permis de feu personnalisé
 UsedEquipment                                     = Matériel utilisé
@@ -379,8 +407,6 @@ ErrorContactHasAtLeastOneChildOfTypeFirePermit    = Le contact est lié à au mo
 ConfirmDeleteFirePermit                           = Êtes-vous sûr de vouloir supprimer ce permis de feu ?
 FirePermitRole                                    = Les rôles du permis de feu
 FirepermitSchedules                               = Horaires du permis de feu
-LinkDigiriskdolibarr_firepermit                   = Activer le lien avec les permis de feu
-LinkDigiriskdolibarr_firepermitDescription        = Permet la liaison entre les permis de feu et les modèles
 
 # Email - Mail
 FirePermitLabel   = Récapitulatif du permis de feu
@@ -436,6 +462,7 @@ ModifyAccident                    = Modifier l'accident
 AccidentList                      = Liste des accidents
 Accident                          = Accident
 AccidentCreated                   = Création d'un accident
+DeleteAccident                    = Supprimer l'accident ?
 AccidentModified                  = Modifcation d'un accident
 AccidentDeleted                   = Suppression d'un accident
 AccidentLine                      = risque(s)
@@ -529,11 +556,11 @@ DocumentsMetaData                 = Fichiers joints complémentaires
 WorkStopDocument                  = Déclaration d'arrêt de travail
 AccidentMetaDataSave              = Les données complémentaires de l'accident ont bien été enregistrées
 ErrorFieldNotEmpty                = Erreur : le champ <b>'%s'</b> ne peut pas être vide
+ErrorFieldMustBeGreaterOrEqualZero = Erreur : le champ <b>'%s'</b> doit être supérieur ou égal à 0
 ConfirmDeleteAccidentWorkStop     = Êtes-vous sûr de vouloir supprimer l'arrêt de travail <b>%s</b> sur l'accident ?
 AccidentMetaDataLesion            = Données complémentaires des lésions
 TotalWorkStopDays                 = Nombre total de jours d'arrêt de travail
 RegisterAccident                  = Accident bénin
-AccidentLinked                    = Accident lié
 AccidentsLinked                   = Accident(s) lié(s)
 GaugeCounter                      = Ce champ est utilisé dans le compteur de la jauge
 DateStartWorkStop                 = Date de début d'arrêt de travail
@@ -587,7 +614,6 @@ CloneWorkStop                     = Cloner les arrêts de travail ?
 CloneMetadata                     = Cloner les données complémentaires ?
 CloneLesion                       = Cloner les données complémentaires des lésions ?
 CloneFrom                         = Clone de
-AccidentInvestigationLinked       = Enquête accident liée
 AccidentInvestigationRole         = Les rôles de l'enquête accident
 LesionsOrWorkStop                 = lésions ou arrêts de travail
 AccidentsCategoriesArea           =	Espace des tags/catégories des accidents
@@ -598,6 +624,9 @@ FirepermitsCategoriesArea         =	Espace des tags/catégories des permis de fe
 AddFirepermitIntoCategory         = Assigner cette catégorie au permis de feu
 RisksCategoriesArea               =	Espace des tags/catégories des risques
 AddRiskIntoCategory               = Assigner cette catégorie au risque
+AddTicketIntoCategory             = Assigner cette catégorie au ticket
+StartDateInvestigate              = Date de début de l'enquête
+EndDateInvestigate                = Date de fin de l'enquête
 
 # AccidentTooltip - Tooltip des accidents
 VictimActivityTooltip              = Précisez l’activité ou la tâche de la victime au moment de l’accident, c’est-à-dire ce que faisait la victime
@@ -632,7 +661,7 @@ Head              = Tête
 Eyes              = Yeux
 InternalSeating   = Sièges internes
 Neck              = Cou
-Back              = Bas
+Back              = Dos
 WholeBody         = Ensemble du corps
 NotSpecified      = Non précisé
 
@@ -662,6 +691,7 @@ ListingRisksDocumentMin = listings des risques avec documents
 # Data - Donnée
 ListingRisksDocument            = Listing risques
 Listingrisksdocument            = Listing risques
+ListingRisksHeader              = Risques - %s
 ListingRisksDocumentGenerated   = Génération de listing des Risques avec Documents
 listingrisksdocument.odt        = Listing des risques avec documents
 listingrisksdocument_custom.odt = Listing des risques avec documents personnalisé
@@ -730,10 +760,10 @@ GenerateZipArchiveWithDigiriskElementDocumentsDescription = Génération automat
 RiskAssessmentDocumentDescription                         = Plan d'action Document Unique
 
 # Boxes - Widget
-LastGenerateDate             = DU généré le
-NextGenerateDate             = Prochain DU le
-NbDaysBeforeNextGenerateDate = Nombre de jours avant la prochaine date de génération du DU
-NbDaysAfterNextGenerateDate  = Nombre de jours de retard pour la génération du DU
+NextGenerateDate  = Prochain génération
+LastGenerateDate  = Dernière génération
+DelayGenerateDate = Retard dans la génération
+NoDelay           = Pas de retard
 
 # Email - Mail
 RiskAssessmentDocumentLabel   = Récapitulatif du document unique
@@ -938,7 +968,6 @@ RiskDescriptionNotActivated              = Veuillez activer le champ description
 AddRisk                                  = Ajouter un risque
 NoDescriptionThere                       = Aucune description renseignée sur ce risque
 NoRiskThere                              = "Aucun risque spécifique sur cette unité" Cependant vous pouvez être soumis aux risques génériques de vos groupements de travail.
-RiskLinked                               = Risque lié
 MoveRisk                                 = Déplacer le risque
 MoveRisks                                = Déplacer les risques
 MoveRisksDescription                     = Permet de déplacer les risques d'un groupement ou d'une unité de travail à un(e) autre
@@ -959,10 +988,10 @@ RiskNotUnlinkShared                      = Erreur : Risque délié
 HasBeenUnlinkSharedM                     = a été délié
 HasNotBeenUnlinkSharedM                  = n'a pas été délié
 RiskSharedTooltip                        = Cette option permet de partager les risques. <br> INFO : Si vous souhaitez pouvoir afficher les tâches, il faut activer l'option de partage des projets.
-ShowInheritedRisksInListings             = Risques hérités - Listings
-ShowInheritedRisksInListingsDescription  = Afficher les risques hérités dans les listings de Digirisk
-ShowInheritedRisksInDocuments            = Risques hérités - Documents
-ShowInheritedRisksInDocumentsDescription = Afficher les risques hérités dans les documents de Digirisk
+ShowInheritedRisksInListings             = Risques hérités - Listings <br> (provenant des niveaux supérieurs)
+ShowInheritedRisksInListingsDescription  = Les risques hérités sont ceux définis à un niveau supérieur (ex : site ou GP) et automatiquement appliqués au GP/UT. <br> Activez cette option pour les afficher dans les listings
+ShowInheritedRisksInDocuments            = Risques hérités - Documents <br> (provenant des niveaux supérieurs)
+ShowInheritedRisksInDocumentsDescription = Les risques hérités sont ceux définis à un niveau supérieur (ex : site ou GP) et automatiquement appliqués au GP/UT. <br> Activez cette option pour les afficher dans les documents
 DigiriskElementInheritedRisksList        = Liste des risques hérités
 ConfirmImportSharedRisks                 = Veuillez choisir les risques partagés à importer
 RisksRepartition                         = Répartition des risques par évaluation
@@ -981,8 +1010,18 @@ RiskListParentView                       = Afficher tous les éléments parents
 RiskListParentViewDescription            = Afficher tous les éléments parents d'un risque dans la liste des risques et dans les documents
 CategoryOnRisk                           = Afficher les tags/catégories sur les risques
 CategoryOnRiskDescription                = Permet d'attribuer des tags/catégories aux risques et de les afficher - à manipuler avec précaution
-
-
+AddPsychosocialRisk                      = Ajouter un risque psychosocial
+AddPsychosocialRiskTitle                 = Ajout d'un risque psychosocial
+AddPsychosocialRiskButton                = Ajouter le risque psychosocial
+AddSelectedPsychosocialRisks             = Ajouter les risques psychosociaux sélectionnés
+SocialRelationsAtWork                    = Rapports sociaux au travail
+WorkIntensityAndTime                     = Intensité et temps de travail
+EmotionalRequirements                    = Exigences émotionnelles
+Autonomy                                 = Autonomie
+MeaningOfWork                            = Sens du travail
+WorkSituationInsecurity                  = Insécurité de la situation de travail
+PreventionContextInCompany               = Contexte de prévention dans l'entreprise
+RPSImpactOnCompanyAndEmployees           = Impact des RPS sur l'entreprise et les salariés
 
 # Stats - Statistiques
 GreyRisk                                         = Risque faible
@@ -1008,6 +1047,7 @@ Environment                                    = Environnement
 Riskenvironmental                              = Risque environnemental
 RiskEnvironmentals                             = Risques environnementaux
 Riskenvironmentals                             = Risques environnementaux
+AddRiskenvironmentalTitle                      = Ajout du risque environnemental
 DigiriskElementRiskenvironmentalsList          = Liste des risques environnementaux
 DigiriskElementInheritedRiskenvironmentalsList = Liste des risques hérités environnementaux
 DigiriskElementSharedRiskenvironmentalsList    = Liste des risques partagés environnementaux
@@ -1061,7 +1101,6 @@ MultipleRiskAssessmentMethodName            = Méthodes d'évaluations
 MultipleRiskAssessmentMethodDescription     = Activer le changement de méthode d'évaluation
 AdvancedRiskAssessmentMethod                = Méthode d'évaluation avancée
 AdvancedRiskAssessmentMethodDescription     = Activer la méthode d'évaluation avancée
-NoRiskAssessment                            = Pas d'évaluation assignée au risque
 RiskAssessmentList                          = Liste des évaluations du risque
 EditRiskAssessment                          = Editer l'évaluation
 ShowAllRiskAssessments                      = Voir toutes les évaluations
@@ -1224,6 +1263,13 @@ TaskHideDateInDocumentDescription        = Masquer la date de début et de fin d
 TaskHideBudgetInDocument                 = Masquer le budget
 TaskHideBudgetInDocumentDescription      = Masquer le budget de la tâche dans les documents
 
+#
+# DigiAI - DigiAI
+#
+
+# Data - Donnée
+WelcomeToDigiAI = Bienvenue sur DigiAI
+UploadAnImage = Téléverser une image
 
 #
 # Ticket - Interface publique ticket
@@ -1260,6 +1306,7 @@ NonCompliance                            = Non conformité
 FirstName                                = Prénom
 LastName                                 = Nom
 Phone                                    = Téléphone
+DeclarationDate                          = Date de déclaration
 DigiriskTicketPublicAccess               = Une interface publique ne nécessitant aucune identification est disponible à l'url suivante
 TicketActivatePublicInterface            = Activer l'interface publique
 GenerateExtrafields                      = Génération des extrafields de ticket par défaut
@@ -1329,20 +1376,25 @@ TicketCategoriesNotCreated               = Vous n'avez pas créé de catégories
 TicketPublicInterfaceQRCode              = QR Code de l'interface publique des tickets
 MultiEntityTicketPublicInterfaceQRCode   = QR Code de l'interface publique des tickets multi-société
 PublicInterfaceConfiguration             = Champs visibles / requis de l'interface publique
+ExternalLinkDescription                  = Utiliser la catégorie de ticket avec un lien externe
+ExternalLinkInNewTab                     = Lien externe dans un nouvel onglet
+ValidateText                             = Conditions à accepter pour la signature
 TicketDigiriskElementRequired            = GP/UT obligatoire pour créer un ticket
 TicketDigiriskElementRequiredHelp        = Activer cette option pour rendre obligatoire la selection d'un GP/UT pour créer un ticket dans l'interface publique
 TicketDigiriskElementHideRef             = Cacher la référence des GP/UT dans le sélecteur de service l'interface publique
 TicketDigiriskElementHideRefHelp         = Activer cette option pour rendre cacher la référence d'un GP/UT dans l'interface publique
-TicketDigiriskElementVisible             = Afficher le champ GP/UT pour créer un ticket
-TicketDigiriskElementVisibleHelp         = Activer cette option pour afficher le champ GP/UT dans l'interface publique et le rendre obligatoire si nécessaire
+TicketDigiriskelementVisible             = Afficher le champ GP/UT pour créer un ticket
+TicketServiceVisible                     = Afficher le champ GP/UT pour créer un ticket
+TicketDigiriskelementVisibleHelp         = Activer cette option pour afficher le champ GP/UT dans l'interface publique et le rendre obligatoire si nécessaire
+TicketServiceVisibleHelp                 = Activer cette option pour afficher le champ GP/UT dans l'interface publique et le rendre obligatoire si nécessaire
 TicketPhotoVisible                       = Afficher le champ Photo pour créer un ticket
 TicketPhotoVisibleHelp                   = Activer cette option pour afficher le champ Photo dans l'interface publique
 TicketEmailVisible                       = Afficher le champ Email pour créer un ticket
 TicketEmailVisibleHelp                   = Activer cette option pour afficher le champ Email dans l'interface publique et le rendre obligatoire si nécessaire
-TicketFirstNameVisible                   = Afficher le champ Prénom pour créer un ticket
-TicketFirstNameVisibleHelp               = Activer cette option pour afficher le champ Prénom dans l'interface publique et le rendre obligatoire si nécessaire
-TicketLastNameVisible                    = Afficher le champ Nom pour créer un ticket
-TicketLastNameVisibleHelp                = Activer cette option pour afficher le champ Nom dans l'interface publique et le rendre obligatoire si nécessaire
+TicketLastnameVisible                    = Afficher le champ Nom pour créer un ticket
+TicketLastnameVisibleHelp                = Activer cette option pour afficher le champ Nom dans l'interface publique et le rendre obligatoire si nécessaire
+TicketFirstnameVisible                   = Afficher le champ Prénom pour créer un ticket
+TicketFirstnameVisibleHelp               = Activer cette option pour afficher le champ Prénom dans l'interface publique et le rendre obligatoire si nécessaire
 TicketPhoneVisible                       = Afficher le champ Téléphone pour créer un ticket
 TicketPhoneVisibleHelp                   = Activer cette option pour afficher le champ Téléphone dans l'interface publique et le rendre obligatoire si nécessaire
 TicketLocationVisible                    = Afficher le champ Lieu pour créer un ticket
@@ -1353,7 +1405,14 @@ QRCodeGenerated                          = QRCode généré
 FkTicket                                 = Ticket lié
 PublicTicket                             = Interface publique des tickets
 TicketPublicInterfaceForbidden           = Accès interdit à l'interface publique des tickets
-WHSRegister                              = Registre SST
+DefaultUserGroup                         = Groupe par défaut
+DefaultUserGroupDescription              = Groupe par défaut dans les selecteurs de groupes
+ConfigureDefaultUserGroup                = Configurer le groupe par défaut
+
+#Public interface - Interface publique
+TicketPublicInterfaceShowCategoryDescription     = Afficher la description des catégories de ticket dans l'interface publique
+TicketPublicInterfaceShowCategoryDescriptionHelp = Activer cette option pour afficher la description des catégories de ticket dans l'interface publique
+
 
 # Stats - Statistiques
 TicketStatistics    = Statistiques des tickets
@@ -1380,10 +1439,23 @@ Superior            = Supérieur à
 TimeRangeAdded      = Contrainte ajoutée
 TimeRangeDeleted    = Contrainte supprimée
 
-NumberOfTicketsByMainTagAndByDigiriskElement    = Nombre de registres par catégorie et par GP
-NumberOfTicketsByMainSubTagAndByDigiriskElement = Nombre de registres par sous-catégorie et par GP
+NumberOfTicketsByMainCategorieAndDigiriskElement    = Nombre de registres par catégorie et par GP
+NumberOfTicketsByMainSubCategorieAndDigiriskElement = Nombre de registres par sous-catégorie et par GP
 NumberOfTicketsByYear                           = Nombre de tickets par année
 
+# Ticket Management Dashboard - Tableau de bord de gestion des tickets
+TicketManagementDashboard                 = Tableau de bord de gestion des tickets
+RunningTicket                             = Tickets en cours
+NbOfOpenedTicket                          = Nombre de tickets ouverts
+OldestTicket                              = Ticket le plus ancien
+OldestTicketDescription                   = Ticket le plus ancien avec le temps écoulé depuis sa création
+OldestMessageTicket                       = Ticket le plus ancien avec un message
+OldestMessageTicketDescription            = Ticket le plus ancien avec un message et le temps écoulé depuis la création du message
+MeanAnswerTime                            = Temps moyen de réponse
+NbTicketPerUser                           = Nombre de tickets assignés par personnes en moyenne
+NbExchangePerTicket                       = Nombre d'échanges par ticket
+TicketRepartitionPerUserAndMeanAnswerTime = Répartition des tickets par utilisateur et temps moyen de réponse
+TopSocietyWithMostTickets                 = Top %s des sociétés avec le plus de tickets
 
 # Email - Email
 The                            = Le
@@ -1393,24 +1465,27 @@ AutoNotificationTicket         = Notification mail envoyée automatiquement par
 TicketPublicInterfaceOtherName = Interface de gestion des registres SST et DGI
 
 
+
 # Ticket document
 
 # Data - Donnée
-TicketDocument            = Fiche du ticket
-Ticketdocument            = Fiche du ticket
-ticketdocument.odt        = Fiche du ticket
-ticketdocument_custom.odt = Fiche personnalisée du ticket
-ticketdocument_events.odt = Fiche du ticket avec événements
-TicketSuccessMessageData  = Message du ticket
-TicketSuccessMessage      = Message de succès du ticket
-TicketSuccessMessageSet   = Le message a bien été modifié
+TicketDocument                 = Fiche du ticket
+Ticketdocument                 = Fiche du ticket
+ticketdocument.odt             = Fiche du ticket
+ticketdocument_custom.odt      = Fiche personnalisée du ticket
+ticketdocument_events.odt      = Fiche du ticket avec événements
+ticketdocument_sign.odt        = Fiche du ticket avec signature
+ticketdocument_event_sign.odt  = Fiche du ticket avec événement et signature
+TicketSuccessMessageData       = Message du ticket
+TicketSuccessMessage           = Message de succès du ticket
+TicketSuccessMessageSet        = Le message a bien été modifié
 
 
 # Project document
 
 # ODT Template - Template ODT
 DigiriskTemplateDocumentProject = Modèle de documents des fiches de projets de Digirisk
-DocumentModelOrque              = Modèles de document de rapport prévisionnel sur les tâches de projets
+DocumentModelPapripactA3Paysage            = Modèles de document de rapport prévisionnel sur les tâches de projets
 
 # Register Document
 
@@ -1432,6 +1507,8 @@ DataMigrationImportRisks                     = Importation des données des risq
 DataMigrationImportRisksDescription          = Importation des données des risques de Digirisk WordPress au format ZIP
 ErrorFileNotWellFormatted                    = Le fichier n'est pas au bon format ou est vide. Vous devez joindre un fichier d'import provenant de Digirisk WordPress nommé DATE_OBJET_export.json
 ErrorFileNotWellFormattedZIP                 = Le fichier n'est pas au bon format ou est vide. Vous devez joindre un fichier d'import provenant de Digirisk WordPress nommé DATE_OBJET_export.zip
+ErrorJsonBadFormatted                        = Le fichier JSON n'est pas bien formaté
+SuccessImport                                = Importation réussie des données
 DataMigrationImportRiskSigns                 = Importation des données des signalisations de Digirisk
 DataMigrationImportRiskSignsDescription      = Importation des données des signalisations de Digirisk WordPress au format ZIP
 DataMigrationImportGlobal                    = Importation des données globales de Digirisk <br> (Arborescence, risques et signalisations)
@@ -1450,8 +1527,29 @@ DataMigrationDolibarrToDolibarr              = Migration des données de Dolibar
 RepairRisks                                  = Réparer les risques
 NumberOfRisksCorrupted                       = Vous avez %s risque(s) dont la catégorie est corrompue, allez sur la page "Outils" pour le(s) réparer
 NoRiskToRepair                               = Aucun risque à réparer
+DigiriskElementSuccessfullyRepaired          = Élements Digirisk (GP/UT) réparés avec succès
 RiskSuccessfullyRepaired                     = Risques réparés avec succès
+RiskAssessmentSuccessfullyRepaired           = Évaluation réparées avec succès
 CorruptedCategoryOnRiskList                  = Liste des risques dont la catégorie est corrompue
+
+# Clean - Nettoyer
+Clean                                          = Nettoyer
+CleanObject                                    = Nettoyer les données
+CleanDigiriskElementExistParentDigiriskElement = %d éléments Digirisk (GP/UT) ont un parent non valide
+CleanDigiriskElement                           = Nettoyer les éléments Digirisk (GP/UT)
+CleanRiskFkElement                             = %d risques ont un GP/UT non valide
+CleanRiskStatus                                = %d risques ont un statut non valide
+CleanRiskExistFkElement                        = %d risques sont orphelins
+CleanRiskExistRiskAssessment                   = %d risques ont aucune évaluation
+CleanRisk                                      = Nettoyer les risques
+CleanRiskAssessmentStatus                      = %d évaluations ont un statut non valide
+CleanRiskAssessmentCotation                    = %d évaluations ont une cotation vide
+CleanRiskAssessmentExistFkRisk                 = %d évaluations sont orphelines
+CleanRiskAssessment                            = Nettoyer les évaluations
+NoDigiriskElementToClean                       = Aucun élément Digirisk (GP/UT) à nettoyer
+NoRiskToClean                                  = Aucun risque à nettoyer
+NoRiskAssessmentToClean                        = Aucune évaluation à nettoyer
+
 
 #
 # Other
@@ -1496,3 +1594,8 @@ ManuelInputNBWorkedHours            = Saisir manuellement le nombre d'heures tra
 ManuelInputNBWorkedHoursDescription = Si l'option est activée, vous pouvez saisir manuellement le nombre d'heures travaillées dans la configuration de la société.<br>Sinon le nombre d'heures travaillées est calculé.<br>Consulter la documentation pour plus d'informations.
 HowToConfigureSetupConf             = Pour configurer les donnés de la société lié à Digirisk,<br>veuillez vous rendre sur Digirisk - Configuration - Réglages
 LabourDoctorNameFull                = Association des Médecins
+PermissionInheritedFromConfig       = Les permissions sont héritées de la configuration générale ou de la configuration parente
+CategorieManagement                 = Gestion des catégories
+ShowSelectedRiskTypes               = Sélectionnez les types de risques à afficher
+CharRemaining                       = Caractères restants
+NumberOfLinkedFiles                 = Nombre de fichiers joints

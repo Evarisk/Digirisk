@@ -41,6 +41,11 @@ class TicketDashboard extends DigiriskDolibarrDashboard
     public DoliDB $db;
 
     /**
+     * @var string Module name
+     */
+    public $module = 'digiriskdolibarr';
+
+    /**
      * @var string SQL FROM
      */
     public string $from = '';
@@ -70,7 +75,7 @@ class TicketDashboard extends DigiriskDolibarrDashboard
         if (dol_strlen($moreJoin) > 0) {
             $this->join .= $moreJoin;
         }
-        $this->where  = 't.fk_statut >= 0';
+        $this->where  = 't.fk_statut > 0';
         $this->where .= ' AND t.entity IN (' . getEntity('ticket') . ')';
         if (dol_strlen($moreWhere) > 0) {
             $this->where .= $moreWhere;
@@ -267,19 +272,79 @@ class TicketDashboard extends DigiriskDolibarrDashboard
      */
     public function load_dashboard(array $moreParams = []): array
     {
-        $getTicketsByMonth = $this->getTicketsByMonth();
+        global $conf, $langs;
 
-        $category = new Categorie($this->db);
-        $category->fetch(getDolGlobalInt('DIGIRISKDOLIBARR_TICKET_MAIN_CATEGORY'));
-        $mainCategories = $category->get_filles();
+        $digiriskElement = new DigiriskElement($this->db);
 
-        $getTicketsByMainTagAndByDigiriskElement    = $this->getTicketsByMainTagAndByDigiriskElement($mainCategories);
-        $getTicketsByMainSubTagAndByDigiriskElement = $this->getTicketsByMainSubTagAndByDigiriskElement($mainCategories);
+        $confName        = dol_strtoupper($this->module) . '_DASHBOARD_CONFIG';
+        $dashboardConfig = json_decode(getDolUserString($confName));
+        $array = ['graphs' => [], 'lists' => [], 'disabledGraphs' => []];
 
-        $getTicketsByYear = $this->getTicketsByYear();
+        $mainCategories = saturne_fetch_all_object_type('Categorie', '', '', 0, 0, ['customsql' => 'fk_parent = ' . getDolGlobalInt('DIGIRISKDOLIBARR_TICKET_MAIN_CATEGORY')]);
+        if (!is_array($mainCategories) || empty($mainCategories)) {
+            return $array;
+        }
 
-        $array['graphs'] = [$getTicketsByMonth, $getTicketsByMainTagAndByDigiriskElement, $getTicketsByMainSubTagAndByDigiriskElement];
-        $array['lists']  = [$getTicketsByYear];
+        $moreParams['filter'] = ' AND t.element_type = "groupment"';
+        $digiriskElements     = $digiriskElement->getActiveDigiriskElements('current', $moreParams);
+        if (!is_array($digiriskElements) || empty($digiriskElements)) {
+            return $array;
+        }
+
+        $mainCategoriesImploded = implode(',', array_column($mainCategories, 'id'));
+
+        $select      = ', cp.fk_categorie';
+        $moreSelects = ['fk_categorie'];
+        $join        = ' INNER JOIN ' . MAIN_DB_PREFIX . $this->module . '_digiriskelement AS d ON d.rowid = eft.digiriskdolibarr_ticket_service';
+        $filter      = 't.fk_statut > 0 AND t.entity = ' . $conf->entity . ' AND cp.fk_categorie IN (' . $mainCategoriesImploded  . ') AND d.status = ' . DigiriskElement::STATUS_VALIDATED;
+        $tickets     = saturne_fetch_all_object_type('Ticket', 'ASC', 'eft.digiriskdolibarr_ticket_service', 0, 0, ['customsql' => $filter], 'AND', true, false, true, $join, [], $select, $moreSelects);
+        if (!is_array($tickets) || empty($tickets)) {
+            return $array;
+        }
+
+        $ticketByMainCategoriesByDigiriskElements = [];
+        foreach ($tickets as $ticket) {
+            $ticketByMainCategoriesByDigiriskElements[$ticket->array_options['options_digiriskdolibarr_ticket_service']][$ticket->fk_categorie]++;
+        }
+
+        $mainSubCategories = saturne_fetch_all_object_type('Categorie', '', '', 0, 0, ['customsql' => 'fk_parent IN (' . $mainCategoriesImploded  . ')']);
+        if (!is_array($mainSubCategories) || empty($mainSubCategories)) {
+            return $array;
+        }
+
+        $mainSubCategoriesImploded = implode(',', array_column($mainSubCategories, 'id'));
+
+        $filter  = 't.fk_statut > 0 AND t.entity = ' . $conf->entity . ' AND cp.fk_categorie IN (' . $mainSubCategoriesImploded  . ') AND d.status = ' . DigiriskElement::STATUS_VALIDATED;
+        $tickets = saturne_fetch_all_object_type('Ticket', 'ASC', 'eft.digiriskdolibarr_ticket_service', 0, 0, ['customsql' => $filter], 'AND', true, false, true, $join, [], $select, $moreSelects);
+        if (!is_array($tickets) || empty($tickets)) {
+            return $array;
+        }
+
+        $ticketByMainSubCategoriesByDigiriskElements = [];
+        foreach ($tickets as $ticket) {
+            $ticketByMainSubCategoriesByDigiriskElements[$ticket->array_options['options_digiriskdolibarr_ticket_service']][$ticket->fk_categorie]++;
+        }
+
+        if (empty($dashboardConfig->graphs->NumberOfTicketsByMonth->hide)) {
+            $array['graphs'][] = $this->getTicketsByMonth();
+        } else {
+            $array['disabledGraphs']['NumberOfTicketsByMonth'] = $langs->transnoentities('NumberOfTicketsByMonth');
+        }
+        if (empty($dashboardConfig->graphs->NumberOfTicketsByMainTagAndByDigiriskElement->hide)) {
+            $array['graphs'][] = $this->getTicketsByCategoriesAndDigiriskElements($mainCategories, $digiriskElements, $ticketByMainCategoriesByDigiriskElements);
+        } else {
+            $array['disabledGraphs']['NumberOfTicketsByMainTagAndByDigiriskElement'] = $langs->transnoentities('NumberOfTicketsByMainTagAndByDigiriskElement');
+        }
+        if (empty($dashboardConfig->graphs->NumberOfTicketsByMainSubTagAndByDigiriskElement->hide)) {
+            $array['graphs'][] = $this->getTicketsByCategoriesAndDigiriskElements($mainSubCategories, $digiriskElements, $ticketByMainSubCategoriesByDigiriskElements, 'mainSub');
+        } else {
+            $array['disabledGraphs']['NumberOfTicketsByMainSubTagAndByDigiriskElement'] = $langs->transnoentities('NumberOfTicketsByMainSubTagAndByDigiriskElement');
+        }
+        if (empty($dashboardConfig->graphs->NumberOfTicketsByYear->hide)) {
+            $array['lists'][] = $this->getTicketsByYear();
+        } else {
+            $array['disabledGraphs']['NumberOfTicketsByYear'] = $langs->transnoentities('NumberOfTicketsByYear');
+        }
 
         return $array;
     }
@@ -295,6 +360,7 @@ class TicketDashboard extends DigiriskDolibarrDashboard
 
         // Graph Title parameters
         $array['title'] = $langs->transnoentities('NumberOfTicketsByMonth');
+        $array['name']  = 'NumberOfTicketsByMonth';
         $array['picto'] = 'fontawesome_fa-ticket-alt_fas_#3bbfa8';
 
         // Graph parameters
@@ -340,18 +406,22 @@ class TicketDashboard extends DigiriskDolibarrDashboard
     }
 
     /**
-     * Get tickets by main tag and digirisk element
+     * Get tickets by tag and digirisk element
      *
-     * @param  array|int $mainCategories Int <0 if KO, array of main categories if OK
-     * @return array     $array          Graph datas (label/color/type/title/data etc..)
+     * @param  array     $categories                            Categories
+     * @param  array     $digiriskElements                      Digirisk elements
+     * @param  array     $ticketByCategoriesAndDigiriskElements Ticket by categories and digirisk elements
+     * @param  string    $categoryDepth                         Category depth by default ('main')
+     * @return array     $array                                 Graph datas (label/color/type/title/data etc..)
      * @throws Exception
      */
-    public function getTicketsByMainTagAndByDigiriskElement($mainCategories): array
+    public function getTicketsByCategoriesAndDigiriskElements(array $categories, array $digiriskElements, array $ticketByCategoriesAndDigiriskElements, string $categoryDepth = 'main'): array
     {
         global $langs;
 
         // Graph Title parameters
-        $array['title'] = $langs->transnoentities('NumberOfTicketsByMainTagAndByDigiriskElement');
+        $array['title'] = $langs->transnoentities('NumberOfTicketsBy' . dol_ucfirst($categoryDepth) . 'CategorieAndDigiriskElement');
+        $array['name']  = 'NumberOfTicketsBy' . dol_ucfirst($categoryDepth) . 'CategorieAndDigiriskElement';
         $array['picto'] = 'fontawesome_fa-ticket-alt_fas_#3bbfa8';
 
         // Graph parameters
@@ -362,76 +432,24 @@ class TicketDashboard extends DigiriskDolibarrDashboard
         $array['dataset']    = 2;
         $array['moreCSS']    = 'grid-2';
 
-        $digiriskElement = new DigiriskElement($this->db);
-
-        if (is_array($mainCategories) && !empty($mainCategories)) {
-            foreach ($mainCategories as $mainCategory) {
-                $array['labels'][$mainCategory->id] = [
-                    'label' => $mainCategory->label,
-                    'color' => '#' . $mainCategory->color
-                ];
-                $moreParams['filter'] = ' AND t.element_type = "groupment"';
-                $digiriskElements     = $digiriskElement->getActiveDigiriskElements(0, $moreParams);
-                if (is_array($digiriskElements) && !empty($digiriskElements)) {
-                    foreach ($digiriskElements as $digiriskElement) {
-                        $tickets                                = saturne_fetch_all_object_type('Ticket', '', '', 0, 0, ['customsql' => 'cp.fk_categorie = ' . $mainCategory->id  . ' AND eft.digiriskdolibarr_ticket_service = ' . $digiriskElement->id . ' AND ' . $this->where], 'AND', true, true, true, $this->join);
-                        $array['data'][$digiriskElement->id][0] = $digiriskElement->ref . ' - ' . $digiriskElement->label;
-                        $array['data'][$digiriskElement->id][]  = is_array($tickets) && !empty($tickets) ? count($tickets) : 0;
-                    }
-                }
-            }
+        foreach ($categories as $category) {
+            $array['labels'][$category->id] = [
+                'label' => $category->label,
+                'color' => dol_strlen($category->color) > 0 ? '#' . $category->color : '',
+            ];
         }
 
-        return $array;
-    }
+        foreach ($digiriskElements as $digiriskElement) {
+            $array['data'][$digiriskElement->id][0] = $digiriskElement->ref . ' - ' . $digiriskElement->label;
+            if (!isset($ticketByCategoriesAndDigiriskElements[$digiriskElement->id])) {
+                continue;
+            }
 
-    /**
-     * Get tickets by main sub tag and digirisk element
-     *
-     * @param  array|int $mainCategories Int <0 if KO, array of main categories if OK
-     * @return array     $array          Graph datas (label/color/type/title/data etc..)
-     * @throws Exception
-     */
-    public function getTicketsByMainSubTagAndByDigiriskElement($mainCategories): array
-    {
-        global $langs;
+            $array['data'][$digiriskElement->id] = $array['data'][$digiriskElement->id] + $ticketByCategoriesAndDigiriskElements[$digiriskElement->id];
+            $array['data'][$digiriskElement->id] = array_values($array['data'][$digiriskElement->id]);
 
-        // Graph Title parameters
-        $array['title'] = $langs->transnoentities('NumberOfTicketsByMainSubTagAndByDigiriskElement');
-        $array['picto'] = 'fontawesome_fa-ticket-alt_fas_#3bbfa8';
-
-        // Graph parameters
-        $array['width']      = '100%';
-        $array['height']     = 400;
-        $array['type']       = 'bar';
-        $array['showlegend'] = 1;
-        $array['dataset']    = 2;
-        $array['moreCSS']    = 'grid-2';
-
-        $category        = new Categorie($this->db);
-        $digiriskElement = new DigiriskElement($this->db);
-
-        if (is_array($mainCategories) && !empty($mainCategories)) {
-            foreach ($mainCategories as $mainCategory) {
-                $category->fetch($mainCategory->id);
-                $mainSubCategories = $category->get_filles();
-                if (is_array($mainSubCategories) && !empty($mainSubCategories)) {
-                    foreach ($mainSubCategories as $mainSubCategory) {
-                        $array['labels'][$mainSubCategory->id] = [
-                            'label' => $mainSubCategory->label,
-                            'color' => dol_strlen($mainSubCategory->color) > 0 ? '#' . $mainSubCategory->color : '',
-                        ];
-                        $moreParams['filter'] = ' AND t.element_type = "groupment"';
-                        $digiriskElements     = $digiriskElement->getActiveDigiriskElements(0, $moreParams);
-                        if (is_array($digiriskElements) && !empty($digiriskElements)) {
-                            foreach ($digiriskElements as $digiriskElement) {
-                                $tickets                                = saturne_fetch_all_object_type('Ticket', '', '', 0, 0, ['customsql' => 'cp.fk_categorie = ' . $mainSubCategory->id  . ' AND eft.digiriskdolibarr_ticket_service = ' . $digiriskElement->id . ' AND ' . $this->where], 'AND', true, true, true, $this->join);
-                                $array['data'][$digiriskElement->id][0] = $digiriskElement->ref . ' - ' . $digiriskElement->label;
-                                $array['data'][$digiriskElement->id][]  = is_array($tickets) && !empty($tickets) ? count($tickets) : 0;
-                            }
-                        }
-                    }
-                }
+            if (count($array['data'][$digiriskElement->id]) - 1 < count($categories)) {
+                $array['data'][$digiriskElement->id] = array_pad($array['data'][$digiriskElement->id], count($categories) + 1, 0);
             }
         }
 
@@ -449,6 +467,7 @@ class TicketDashboard extends DigiriskDolibarrDashboard
 
         // Graph Title parameters
         $array['title'] = $langs->transnoentities('NumberOfTicketsByYear');
+        $array['name']  = 'NumberOfTicketsByYear';
         $array['picto'] = 'fontawesome_fa-ticket-alt_fas_#3bbfa8';
 
         // Graph parameters
@@ -461,7 +480,7 @@ class TicketDashboard extends DigiriskDolibarrDashboard
             foreach ($tickets as $key => $ticket) {
                 $arrayTicketByYear[$key]['Ref']['value']        = $ticket['year'];
                 $arrayTicketByYear[$key]['Tickets']['value']    = $ticket['nb'];
-                $arrayTicketByYear[$key]['Percentage']['value'] = price2num($ticket['avg'] ?: 0, 2) . ' %';
+                $arrayTicketByYear[$key]['Percentage']['value'] = price2num($ticket['avg'] ?? 0, 2) . ' %';
             }
         }
 

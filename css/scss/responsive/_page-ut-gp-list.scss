@@ -7,6 +7,9 @@
     background: none;
     border: 0;
 
+    .navigation-container {
+      padding-right: 0.5em;
+    }
     .side-nav-responsive {
       display: block;
       background: $color__secondary;
@@ -31,6 +34,8 @@
       transition: all 0.2s ease-out;
       max-height: 500px;
       overflow-y: auto;
+      width: 80%;
+      max-width: 350px;
 
       &:not(.active) {
         opacity: 0;

@@ -46,7 +46,7 @@
 		"risk_variable": [
 		{
 			"name": "Gravite",
-			"description": "0 : Pas de blessure possible 1 : Blessure légère 2 : ITT5 < jours ou effet irréversible 4 : Menace sur la vie",
+			"description": "0 : Pas de blessure possible 1 : Blessure légère 2 : ITT <5 jours ou effet irréversible 4 : Menace sur la vie",
 			"key": 1,
 			"option": {
 				"display_type": "slide",
@@ -66,11 +66,11 @@
 						"seuil": "1"
 						},
 						{
-						"question": "ITT<5 jours ou effet réversible",
+						"question": "ITT <5 jours ou effet réversible",
 						"seuil": "2"
 						},
 						{
-						"question": "ITT>5jours ou effet irréversible",
+						"question": "ITT >5 jours ou effet irréversible",
 						"seuil": "3"
 						},
 						{
@@ -270,7 +270,7 @@
       },
       {
         "name": "Frequence",
-        "description": "0 : Jamais en contact 1 : Evénement exceptionnel (1 fois par an) 2 Evénement peu fréquent (Plusieurs fois par an) 3 : Evénement occasionnelle (1 fois par semaine) 4 : Continu très fréquent (1 fois par jour)",
+        "description": "0 : Jamais en contact 1 : Evénement exceptionnel (1 fois par an) 2 : Evénement peu fréquent (Plusieurs fois par an) 3 : Evénement occasionnel (1 fois par semaine) 4 : Continu très fréquent (1 fois par jour)",
         "key": 2,
         "option": {
           "display_type": "slide",
@@ -294,7 +294,7 @@
                 "seuil": "2"
               },
               {
-                "question": "Evénement occasionnelle (1 fois par semaine)",
+                "question": "Evénement occasionnel (1 fois par semaine)",
                 "seuil": "3"
               },
               {
@@ -307,7 +307,7 @@
       },
       {
         "name": "Historique",
-        "description": "1 : Jamais arrivé 2 : Circonstances exceptionnelles 3 : S'est produit 2 sur l'an passé 4 : Se produit tous les mois",
+        "description": "1 : Jamais arrivé 2 : Circonstances exceptionnelles 3 : S'est produit 2 fois l'an passé 4 : Se produit tous les mois",
         "key": 3,
         "option": {
           "display_type": "slide",
@@ -331,7 +331,7 @@
                 "seuil": "2"
               },
               {
-                "question": "S'est produit 2 sur l'an passé",
+                "question": "S'est produit 2 fois l'an passé",
                 "seuil": "3"
               },
               {
@@ -476,7 +476,7 @@
 		"variable": [
 			{
 				"name": "Amiante",
-				"description": "Risque noir si exposition entre 6000 et 25000 Fibres/litresnRisque rouge si exposition entre 100 et 6000 Fibres/litresnRisque orange si exposition inférieur à 100 FIbrers/litresnRisque blanc si aucune exposition",
+				"description": "Risque noir si exposition entre 6000 et 25000 fibres/litre. Risque rouge si exposition entre 100 et 6000 fibres/litre. Risque orange si exposition inférieur à 100 fibres/litre. Risque blanc si aucune exposition",
 				"option": {
 				"display_type": "checkbox",
 				"range": [
@@ -491,15 +491,15 @@
 							"seuil": 0
 						},
 						{
-							"question": "Exposition niveau 1: Infu00e9rieur u00e0 100 Fibres/litres",
+							"question": "Exposition niveau 1: Infu00e9rieur u00e0 100 fibres/litre",
 							"seuil": 48
 						},
 						{
-							"question": "Exposition niveau 2u00a0: Entre 100 et 6000 Fibres/litres",
+							"question": "Exposition niveau 2u00a0: Entre 100 et 6000 fibres/litre",
 							"seuil": 51
 						},
 						{
-							"question": "Exposition niveau 3u00a0: Entre 6000 et 25000Fibres/litres",
+							"question": "Exposition niveau 3u00a0: Entre 6000 et 25000 fibres/litre",
 							"seuil": 80
 						}
 					]

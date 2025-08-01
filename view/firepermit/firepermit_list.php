@@ -95,6 +95,10 @@ $formother = new FormOther($db);
 
 $hookmanager->initHooks(['firepermitlist']); // Note that conf->hooks_modules contains array.
 
+if (!isset($socid)) {
+    $socid = $user->socid != null ? $user->socid : 0;
+}
+
 // Default sort order (if not yet defined by previous GETPOST).
 if ( ! $sortfield) $sortfield = "t.ref";
 if ( ! $sortorder) $sortorder = "ASC";
@@ -109,7 +113,7 @@ foreach ($object->fields as $key => $val) {
 // List of fields to search into when doing a "search in all"
 $fieldstosearchall = array();
 foreach ($object->fields as $key => $val) {
-	if ($val['searchall']) $fieldstosearchall['t.' . $key] = $val['label'];
+	if (!empty($val['searchall'])) $fieldstosearchall['t.' . $key] = $val['label'];
 }
 
 // Definition of fields for list
@@ -222,7 +226,7 @@ print '<input type="hidden" name="formfilteraction" id="formfilteraction" value=
 print '<input type="hidden" name="action" value="list">';
 print '<input type="hidden" name="sortfield" value="' . $sortfield . '">';
 print '<input type="hidden" name="sortorder" value="' . $sortorder . '">';
-print '<input type="hidden" name="type" value="' . $type . '">';
+print '<input type="hidden" name="type" value="' . ($type ?? '') . '">';
 print '<input type="hidden" name="contextpage" value="' . $contextpage . '">';
 
 include DOL_DOCUMENT_ROOT . '/core/tpl/massactions_pre.tpl.php';
@@ -245,7 +249,8 @@ $sql       .= preg_replace('/^,/', '', $hookmanager->resPrint);
 $sql        = preg_replace('/,\s*$/', '', $sql);
 $sql       .= " FROM " . MAIN_DB_PREFIX . $object->table_element . " as t";
 
-if (is_array($extrafields->attributes[$object->table_element]['label']) && count($extrafields->attributes[$object->table_element]['label'])) $sql .= " LEFT JOIN " . MAIN_DB_PREFIX . $object->table_element . "_extrafields as ef on (t.rowid = ef.fk_object)";
+if (isset($extrafields->attributes[$object->table_element]['label']) &&
+    is_array($extrafields->attributes[$object->table_element]['label']) && count($extrafields->attributes[$object->table_element]['label'])) $sql .= " LEFT JOIN " . MAIN_DB_PREFIX . $object->table_element . "_extrafields as ef on (t.rowid = ef.fk_object)";
 if ($object->ismultientitymanaged == 1) $sql                                                                                                      .= " WHERE t.entity IN (" . getEntity($object->element) . ")";
 else $sql                                                                                                                                         .= " WHERE 1 = 1";
 $sql                                                                                                                                              .= ' AND status != -1';
@@ -318,7 +323,7 @@ $arrayfields['ExtSociety']             = array('label' => 'ExtSociety', 'checked
 $arrayfields['ExtSocietyResponsible']  = array('label' => 'ExtSocietyResponsible', 'checked' => 1);
 $arrayfields['ExtSocietyAttendant']    = array('label' => 'ExtSocietyAttendant', 'checked' => 1);
 
-print_barre_liste($form->textwithpicto($title, $texthelp), $page, $_SERVER["PHP_SELF"], $param, $sortfield, $sortorder, $massactionbutton, $num, $nbtotalofrecords, $object->picto, 0, $newcardbutton, '', $limit, 0, 0, 1);
+print_barre_liste($form->textwithpicto($title, $texthelp ?? ''), $page, $_SERVER["PHP_SELF"], $param, $sortfield, $sortorder, $massactionbutton, $num, $nbtotalofrecords, $object->picto, 0, $newcardbutton, '', $limit, 0, 0, 1);
 
 $selectedfields                         = $form->multiSelectArrayWithCheckbox('selectedfields', $arrayfields, $varpage); // This also change content of $arrayfields
 if ($massactionbutton) $selectedfields .= $form->showCheckAddButtons('checkforselect', 1);
@@ -338,10 +343,10 @@ foreach ($object->fields as $key => $val) {
 	if ( ! empty($arrayfields['t.' . $key]['checked'])) {
 		print '<td class="liste_titre' . ($cssforfield ? ' ' . $cssforfield : '') . '">';
 
-		if (is_array($val['arrayofkeyval'])) print $form->selectarray('search_' . $key, $val['arrayofkeyval'], $search[$key], $val['notnull'], 0, 0, '', 1, 0, 0, '', 'maxwidth75');
+		if (isset($val['arrayofkeyval']) && is_array($val['arrayofkeyval'])) print $form->selectarray('search_' . $key, $val['arrayofkeyval'], $search[$key] ?? '', $val['notnull'], 0, 0, '', 1, 0, 0, '', 'maxwidth75');
 		elseif (strpos($val['type'], 'integer:') === 0) {
-			print $object->showInputField($val, $key, $search[$key], '', '', 'search_', 'maxwidth150', 1);
-		} elseif ( ! preg_match('/^(date|timestamp)/', $val['type'])) print '<input type="text" class="flat maxwidth75" name="search_' . $key . '" value="' . dol_escape_htmltag($search[$key]) . '">';
+			print $object->showInputField($val, $key, $search[$key] ?? '', '', '', 'search_', 'maxwidth150', 1);
+		} elseif ( ! preg_match('/^(date|timestamp)/', $val['type'])) print '<input type="text" class="flat maxwidth75" name="search_' . $key . '" value="' . dol_escape_htmltag($search[$key] ?? '') . '">';
 		print '</td>';
 	}
 	if ($key == 'Custom') {
@@ -407,14 +412,14 @@ print $hookmanager->resPrint;
 print getTitleFieldOfList($selectedfields, 0, $_SERVER["PHP_SELF"], '', '', '', '', $sortfield, $sortorder, 'center maxwidthsearch ') . "\n";
 print '</tr>' . "\n";
 
-$arrayofselected = is_array($toselect) ? $toselect : array();
+$arrayofselected = is_array($toselect) ? $toselect : [];
 
 // Loop on record
 // --------------------------------------------------------------------
 
 // contenu
 $i          = 0;
-$totalarray = array();
+$totalarray = ['nbfield' => 0];
 
 while ($i < ($limit ? min($num, $limit) : $num)) {
 	$obj = $db->fetch_object($resql);
@@ -425,7 +430,11 @@ while ($i < ($limit ? min($num, $limit) : $num)) {
 	// Store properties in $objectdocument
 	$object->setVarsFromFetchObj($obj);
 
-	$json = json_decode($object->json, false, 512, JSON_UNESCAPED_UNICODE)->FirePermit;
+    if (isset($object->json)) {
+        $json = json_decode($object->json, false, 512, JSON_UNESCAPED_UNICODE)->FirePermit;
+    } else {
+        $json = [];
+    }
 
 	// Show here line of result
 	print '<tr class="oddeven firepermitdocument-row firepermit_row_' . $object->id . ' firepermitdocument-row-content-' . $object->id . '" id="firepermit_row_' . $object->id . '">';

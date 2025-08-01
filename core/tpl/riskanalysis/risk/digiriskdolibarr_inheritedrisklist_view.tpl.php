@@ -328,26 +328,6 @@
 
 	$arrayfields = dol_sort_array($arrayfields, 'position');
 
-	$menuConf = 'MAIN_SELECTEDFIELDS_' . $varpage;
-
-	if (dol_strlen($user->conf->$menuConf) < 1  || preg_match('/t./', $user->conf->$menuConf)) {
-		$user->conf->$menuConf = 'r.fk_element,r.ref,r.category,evaluation.cotation,';
-	}
-
-	if ( ! preg_match('/r.description/', $user->conf->$menuConf) && $conf->global->DIGIRISKDOLIBARR_RISK_DESCRIPTION) {
-		$user->conf->$menuConf = $user->conf->$menuConf . 'r.description,';
-	} elseif ( ! $conf->global->DIGIRISKDOLIBARR_RISK_DESCRIPTION) {
-		$user->conf->$menuConf = preg_replace('/r.description,/', '', $user->conf->$menuConf);
-		$arrayfields['r.description']['enabled'] = 0;
-	}
-
-	if ( ! preg_match('/evaluation.has_tasks/', $user->conf->$menuConf) && $conf->global->DIGIRISKDOLIBARR_TASK_MANAGEMENT) {
-		$user->conf->$menuConf .= $user->conf->$menuConf  . 'evaluation.has_tasks,';
-	} elseif ( ! $conf->global->DIGIRISKDOLIBARR_TASK_MANAGEMENT) {
-		$user->conf->$menuConf = preg_replace('/evaluation.has_tasks,/', '', $user->conf->$menuConf);
-		$arrayfields['evaluation.has_tasks']['enabled'] = 0;
-	}
-
 	$selectedfields  = $form->multiSelectArrayWithCheckbox('inherited_risklist_selectedfields', $arrayfields, $varpage); // This also change content of $arrayfields
 	$selectedfields .= (count($arrayofmassactions) ? $form->showCheckAddButtons('checkforselect', 1) : '');
 
@@ -378,13 +358,13 @@
 							<img class="danger-category-pic wpeo-tooltip-event hidden" src="" aria-label=""/>
 						</div>
 					<?php else : ?>
-						<div class="dropdown-toggle dropdown-add-button button-cotation wpeo-tooltip-event" aria-label="<?php echo (empty(dol_escape_htmltag($search[$key]))) ? $risk->getDangerCategoryName($risk) : $risk->getDangerCategoryNameByPosition($search[$key]); ?>">
-							<img class="danger-category-pic tooltip hover" src="<?php echo DOL_URL_ROOT . '/custom/digiriskdolibarr/img/categorieDangers/' . ((empty(dol_escape_htmltag($search[$key]))) ? $risk->getDangerCategory($risk) : $risk->getDangerCategoryByPosition($search[$key])) . '.png'?>" />
+						<div class="dropdown-toggle dropdown-add-button button-cotation wpeo-tooltip-event" aria-label="<?php echo (empty(dol_escape_htmltag($search[$key]))) ? $risk->getDangerCategoryName($risk, $riskType) : $risk->getDangerCategoryNameByPosition($search[$key], $riskType); ?>">
+							<img class="danger-category-pic tooltip hover" src="<?php echo DOL_URL_ROOT . '/custom/digiriskdolibarr/img/categorieDangers/' . ((empty(dol_escape_htmltag($search[$key]))) ? $risk->getDangerCategory($risk, $riskType) : $risk->getDangerCategoryByPosition($search[$key], $riskType)) . '.png'?>" />
 						</div>
 					<?php endif; ?>
 					<ul class="saturne-dropdown-content wpeo-gridlayout grid-5 grid-gap-0">
 						<?php
-						$dangerCategories = $risk->getDangerCategories();
+						$dangerCategories = Risk::getDangerCategories($riskType);
 						if ( ! empty($dangerCategories) ) :
 							foreach ($dangerCategories as $dangerCategory) : ?>
 								<li class="item dropdown-item wpeo-tooltip-event classfortooltip" data-is-preset="<?php echo ''; ?>" data-id="<?php echo $dangerCategory['position'] ?>" aria-label="<?php echo $dangerCategory['name'] ?>">
@@ -490,8 +470,8 @@
 					}
 				} elseif ($key == 'category') { ?>
 					<div class="table-cell table-50 cell-risk" data-title="Risque">
-						<div class="wpeo-dropdown dropdown-large category-danger padding wpeo-tooltip-event" aria-label="<?php echo $risk->getDangerCategoryName($risk) ?>">
-							<img class="danger-category-pic hover" src="<?php echo DOL_URL_ROOT . '/custom/digiriskdolibarr/img/categorieDangers/' . $risk->getDangerCategory($risk) . '.png' ; ?>"/>
+						<div class="wpeo-dropdown dropdown-large category-danger padding wpeo-tooltip-event" aria-label="<?php echo $risk->getDangerCategoryName($risk, $riskType) ?>">
+							<img class="danger-category-pic hover" src="<?php echo DOL_URL_ROOT . '/custom/digiriskdolibarr/img/categorieDangers/' . $risk->getDangerCategory($risk, $riskType) . '.png' ; ?>"/>
 						</div>
 					</div>
 					<?php
