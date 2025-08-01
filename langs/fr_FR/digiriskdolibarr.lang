@@ -153,7 +153,8 @@ LabourInspectorSociety   = Tiers Inspecteur du travail
 LabourInspectorAssigned  = Inspecteur du travail
 
 SocieteSchedules = Horaires de la société
-
+weekDayDefault   = Cf-Site Internet
+weekEndDefault   = Fermé Fermé
 
 #
 # DigriskDocuments - Documents Digirisk
@@ -1592,6 +1593,7 @@ ManuelInputNBEmployeesDescription   = Si l'option est activée, vous pouvez sais
 ManuelInputNBWorkedHours            = Saisir manuellement le nombre d'heures travaillées
 ManuelInputNBWorkedHoursDescription = Si l'option est activée, vous pouvez saisir manuellement le nombre d'heures travaillées dans la configuration de la société.<br>Sinon le nombre d'heures travaillées est calculé.<br>Consulter la documentation pour plus d'informations.
 HowToConfigureSetupConf             = Pour configurer les donnés de la société lié à Digirisk,<br>veuillez vous rendre sur Digirisk - Configuration - Réglages
+LabourDoctorNameFull                = Association des Médecins
 PermissionInheritedFromConfig       = Les permissions sont héritées de la configuration générale ou de la configuration parente
 CategorieManagement                 = Gestion des catégories
 ShowSelectedRiskTypes               = Sélectionnez les types de risques à afficher

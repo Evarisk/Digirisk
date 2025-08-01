@@ -2212,6 +2212,33 @@ class modDigiriskdolibarr extends DolibarrModules
 
             dolibarr_set_const($this->db, 'DIGIRISKDOLIBARR_THIRDPARTY_UPDATED', 2, 'integer', 0, '', $conf->entity);
         }
+		if (getDolGlobalInt('DIGIRISKDOLIBARR_THIRDPARTY_UPDATED') == 2) {
+			require_once __DIR__ . '/../../../saturne/class/saturneschedules.class.php';
+
+			$labourDoctorID = $resources->fetchDigiriskResource('LabourDoctorSociety');
+			$societe->fetch($labourDoctorID);
+            $result = $societe->setValueFrom('nom', $langs->transnoentities('LabourDoctorNameFull') . ' - ' . getDolGlobalString('MAIN_INFO_SOCIETE_NOM'));
+
+			if ($result >= 0) {
+				$schedule             = new SaturneSchedules($this->db);
+				$schedule->element_id = $labourDoctorID;
+
+				$schedule->monday    = $langs->transnoentities('weekDayDefault');
+				$schedule->tuesday 	 = $langs->transnoentities('weekDayDefault');
+				$schedule->wednesday = $langs->transnoentities('weekDayDefault');
+				$schedule->thursday  = $langs->transnoentities('weekDayDefault');
+				$schedule->friday 	 = $langs->transnoentities('weekDayDefault');
+				$schedule->saturday  = $langs->transnoentities('weekEndDefault');
+				$schedule->sunday 	 = $langs->transnoentities('weekEndDefault');
+
+				$schedule->element_type = 'societe';
+				$schedule->status       = 1;
+
+				$schedule->create($user);
+			}
+
+            dolibarr_set_const($this->db, 'DIGIRISKDOLIBARR_THIRDPARTY_UPDATED', 3, 'integer', 0, '', $conf->entity);
+		}
 
         // Create extrafields during init
         require_once DOL_DOCUMENT_ROOT . '/core/class/extrafields.class.php';
