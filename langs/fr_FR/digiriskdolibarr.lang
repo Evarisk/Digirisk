@@ -690,6 +690,7 @@ ListingRisksDocumentMin = listings des risques avec documents
 # Data - Donnée
 ListingRisksDocument            = Listing risques
 Listingrisksdocument            = Listing risques
+ListingRisksHeader              = Risques - %s
 ListingRisksDocumentGenerated   = Génération de listing des Risques avec Documents
 listingrisksdocument.odt        = Listing des risques avec documents
 listingrisksdocument_custom.odt = Listing des risques avec documents personnalisé
