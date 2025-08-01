@@ -35,6 +35,7 @@ require_once DOL_DOCUMENT_ROOT . '/core/lib/admin.lib.php';
 require_once DOL_DOCUMENT_ROOT . '/core/lib/categories.lib.php';
 require_once DOL_DOCUMENT_ROOT . '/categories/class/categorie.class.php';
 require_once DOL_DOCUMENT_ROOT . '/core/class/html.formmail.class.php';
+require_once DOL_DOCUMENT_ROOT . '/core/class/doleditor.class.php';
 
 // Global variables definitions
 global $conf, $db, $hookmanager, $langs, $user;
@@ -88,6 +89,7 @@ if ($resHook < 0) {
 
 if (empty($resHook)) {
     if ($action == 'set_ticket_category_config') {
+
         $data['use_signatory']         = GETPOST('use_signatory');
         $data['show_description']      = GETPOST('show_description');
         $data['mail_template']         = GETPOST('mail_template');
@@ -95,6 +97,7 @@ if (empty($resHook)) {
         $data['photo_visible']         = GETPOST('photo_visible');
         $data['external_link']         = GETPOST('external_link');
         $data['external_link_new_tab'] = GETPOST('external_link_new_tab') ? 1 : 0;
+        $data['validate_text']         = GETPOST('validate_text', 'restricthtml');
 
         $extraFields->attributes['ticket']['label']['digiriskdolibarr_ticket_email'] = $langs->trans('Email');
         foreach ($extraFields->attributes['ticket']['label'] as $key => $field) {
@@ -190,6 +193,14 @@ print '</td><td class="center">';
 print '<input type="checkbox" id="use_signatory" name="use_signatory"' . ($ticketCategoryConfig->use_signatory ? ' checked=""' : '') . '"> ';
 print '</td></tr>';
 
+// External Link in new tab
+print '<tr class="oddeven"><td>';
+print img_picto('', 'fa-edit', 'class="paddingrightonly"') . $langs->transnoentities('ValidateText') . '</td>';
+print '</td><td class="center">';
+$doleditor = new DolEditor('validate_text', $ticketCategoryConfig->validate_text ?? '', '100%', 120, 'dolibarr_details', '', false, true, $conf->global->FCKEDITOR_ENABLE_MAIL, ROWS_2, 70);
+$doleditor->Create();
+print '</td></tr>';
+
 // Show category description
 print '<tr class="oddeven"><td>';
 print img_picto('', 'fa-font', 'class="paddingrightonly"') . $form->textwithpicto($langs->transnoentities('Description'), $langs->transnoentities('TicketPublicInterfaceShowCategoryDescriptionHelp'), 1, 'info') . '</td>';
@@ -242,6 +253,10 @@ print img_picto('', 'fa-external-link-alt', 'class="paddingrightonly"') . $langs
 print '</td><td class="center">';
 print '<input type="checkbox" id="external_link_new_tab" name="external_link_new_tab"' . ($ticketCategoryConfig->external_link_new_tab ? ' checked=""' : '') . '> ';
 print '</td></tr>';
+
+print '</table>';
+
+print $form->buttonsSaveCancel('Save', '');
 
 if (getDolGlobalInt('DIGIRISKDOLIBARR_TICKET_ENABLE_PUBLIC_INTERFACE')) {
     if (dolibarr_get_const($db, 'DIGIRISKDOLIBARR_TICKET_EXTRAFIELDS', 0)) {
