@@ -701,7 +701,7 @@ class ActionsDigiriskdolibarr
     {
         global $mc;
 
-        if (preg_match('/digiriskstandardriskassessmentdocument|risklist|riskcard/', $parameters['context']) && in_array($parameters['element'], ['digiriskelement', 'riskassessment']) && getDolGlobalInt('DIGIRISKDOLIBARR_SHOW_SHARED_RISKS')) {
+        if (preg_match('/digiriskstandardriskassessmentdocument|risklist|riskcard/', $parameters['context']) && in_array($parameters['element'], ['digiriskelement', 'riskassessment']) && getDolGlobalInt('DIGIRISKDOLIBARR_SHOW_SHARED_RISKS') && !empty($mc)) {
             $this->resprints = $mc->getEntity('risk', 1);
             return 1;
         }
