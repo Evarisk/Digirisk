@@ -178,9 +178,9 @@ if ($riskType == 'risk') {
     $permissiontoadd    = $user->rights->digiriskdolibarr->risk->write;
     $permissiontodelete = $user->rights->digiriskdolibarr->risk->delete;
 } elseif ($riskType == 'riskenvironmental') {
-    $permissiontoread   = $user->rights->digiriskdolibarr->riskenvironment->read;
-    $permissiontoadd    = $user->rights->digiriskdolibarr->riskenvironment->write;
-    $permissiontodelete = $user->rights->digiriskdolibarr->riskenvironment->delete;
+    $permissiontoread   = $user->rights->digiriskdolibarr->riskenvironmental->read;
+    $permissiontoadd    = $user->rights->digiriskdolibarr->riskenvironmental->write;
+    $permissiontodelete = $user->rights->digiriskdolibarr->riskenvironmental->delete;
 }
 
 // Security check

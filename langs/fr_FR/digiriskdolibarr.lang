@@ -929,8 +929,7 @@ UpdateData   = Mettre à jour
 #
 
 # Rights  - Droits
-RisksMin              = risques
-RisksEnvironmentalMin = risques environnementaux
+RisksMin = risques
 
 # Data - Donnée
 Risks                                    = Risques
@@ -1039,6 +1038,7 @@ Environment                                    = Environnement
 Riskenvironmental                              = Risque environnemental
 RiskEnvironmentals                             = Risques environnementaux
 Riskenvironmentals                             = Risques environnementaux
+RiskEnvironmentalsMin                          = risques environnementaux
 AddRiskenvironmentalTitle                      = Ajout du risque environnemental
 DigiriskElementRiskenvironmentalsList          = Liste des risques environnementaux
 DigiriskElementInheritedRiskenvironmentalsList = Liste des risques hérités environnementaux

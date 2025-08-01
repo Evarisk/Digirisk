@@ -483,8 +483,6 @@ if (getDolGlobalInt('DIGIRISKDOLIBARR_USERGROUP_UPDATED') >= 0 && getDolGlobalIn
                 $userGroup->addrights(43630250, 'digiriskdolibarr');  // Accident create
                 $userGroup->addrights(43630252, 'digiriskdolibarr');  // AccidentInvestigation read
                 $userGroup->addrights(43630253, 'digiriskdolibarr');  // AccidentInvestigation create
-                $userGroup->addrights(43630261, 'digiriskdolibarr');  // RisksEnvironmental read
-                $userGroup->addrights(43630262, 'digiriskdolibarr');  // RisksEnvironmental create
 
                 $userGroup->addrights('', 'saturne', 'lire');
                 $userGroup->addrights('', 'saturne', 'read');
