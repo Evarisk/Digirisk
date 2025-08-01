@@ -1456,6 +1456,7 @@ NbTicketPerUser                           = Nombre de tickets assignés par pers
 NbExchangePerTicket                       = Nombre d'échanges par ticket
 TicketRepartitionPerUserAndMeanAnswerTime = Répartition des tickets par utilisateur et temps moyen de réponse
 TopSocietyWithMostTickets                 = Top %s des sociétés avec le plus de tickets
+ShowSelectedDateTypes                     = Sélectionnez le type de date à afficher
 
 # Email - Email
 The                            = Le
