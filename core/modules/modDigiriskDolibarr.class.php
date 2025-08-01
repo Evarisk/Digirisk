@@ -1189,6 +1189,23 @@ class modDigiriskdolibarr extends DolibarrModules
 		$this->rights[$r][5] = 'delete'; // In php code, permission will be checked by test if ($user->rights->digiriskdolibarr->level1->level2)
 		$r++;
 
+        /* ENVIRONMENTAL RISKS PERMISSIONS */
+        $this->rights[$r][0] = $this->numero . sprintf('%02d', $r + 1); // Permission id (must not be already used)
+        $this->rights[$r][1] = $langs->transnoentities('ReadObjects', $langs->transnoentities('RiskEnvironmentalsMin')); // Permission label
+        $this->rights[$r][4] = 'riskenvironmental'; // In php code, permission will be checked by test if ($user->rights->digiriskdolibarr->level1->level2)
+        $this->rights[$r][5] = 'read'; // In php code, permission will be checked by test if ($user->rights->digiriskdolibarr->level1->level2)
+        $r++;
+        $this->rights[$r][0] = $this->numero . sprintf('%02d', $r + 1); // Permission id (must not be already used)
+        $this->rights[$r][1] = $langs->transnoentities('CreateObjects', $langs->transnoentities('RiskEnvironmentalsMin')); // Permission label
+        $this->rights[$r][4] = 'riskenvironmental'; // In php code, permission will be checked by test if ($user->rights->digiriskdolibarr->level1->level2)
+        $this->rights[$r][5] = 'write'; // In php code, permission will be checked by test if ($user->rights->digiriskdolibarr->level1->level2)
+        $r++;
+        $this->rights[$r][0] = $this->numero . sprintf('%02d', $r + 1); // Permission id (must not be already used)
+        $this->rights[$r][1] = $langs->transnoentities('DeleteObjects', $langs->transnoentities('RiskEnvironmentalsMin')); // Permission label
+        $this->rights[$r][4] = 'riskenvironmental'; // In php code, permission will be checked by test if ($user->rights->digiriskdolibarr->level1->level2)
+        $this->rights[$r][5] = 'delete'; // In php code, permission will be checked by test if ($user->rights->digiriskdolibarr->level1->level2)
+        $r++;
+
         /* LISTING RISKS DOCUMENT PERMISSIONS */
         $this->rights[$r][0] = $this->numero . sprintf('%02d', $r + 1); // Permission id (must not be already used)
         $this->rights[$r][1] = $langs->transnoentities('ReadObjects',$langs->transnoentities('ListingRisksDocumentMin')); // Permission label
@@ -1470,7 +1487,7 @@ class modDigiriskdolibarr extends DolibarrModules
             'langs'    => 'digiriskdolibarr@digiriskdolibarr',
             'position' => 100 + $r,
             'enabled'  => '$conf->digiriskdolibarr->enabled',
-            'perms'    => '$user->rights->digiriskdolibarr->riskassessmentdocument->read',
+            'perms'    => '$user->rights->digiriskdolibarr->riskassessmentdocument->read && $user->rights->digiriskdolibarr->riskenvironmental->read',
             'target'   => '',
             'user'     => 0
         ];
@@ -1485,7 +1502,7 @@ class modDigiriskdolibarr extends DolibarrModules
             'langs'    => 'digiriskdolibarr@digiriskdolibarr',
             'position' => 100 + $r,
             'enabled'  => '$conf->digiriskdolibarr->enabled',
-            'perms'    => '$user->rights->digiriskdolibarr->risk->read',
+            'perms'    => '$user->rights->digiriskdolibarr->riskenvironmental->read',
             'target'   => '',
             'user'     => 0
         ];
