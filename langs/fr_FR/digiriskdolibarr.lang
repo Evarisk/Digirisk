@@ -168,7 +168,7 @@ PEETooltip                     = Si votre société possède un PEE, cochez cett
 ShowPictoName                  = Afficher le nom du pictogramme de danger
 ShowPictoNameDescription       = Afficher le nom du pictogramme de danger de risque dans les documents <br> Utile si on souhaite transférer le tableau dans un tableur
 RiskAssessmentColor            = Couleur des évaluations
-RiskAssessmentColorDescription = Affiche la couleur des évaluations dans le document Orque
+RiskAssessmentColorDescription = Affiche la couleur des évaluations dans le document Papripact-A3-Paysage
 
 #
 # LegalDisplay - Affichage légal
@@ -1012,7 +1012,14 @@ AddPsychosocialRisk                      = Ajouter un risque psychosocial
 AddPsychosocialRiskTitle                 = Ajout d'un risque psychosocial
 AddPsychosocialRiskButton                = Ajouter le risque psychosocial
 AddSelectedPsychosocialRisks             = Ajouter les risques psychosociaux sélectionnés
-
+SocialRelationsAtWork                    = Rapports sociaux au travail
+WorkIntensityAndTime                     = Intensité et temps de travail
+EmotionalRequirements                    = Exigences émotionnelles
+Autonomy                                 = Autonomie
+MeaningOfWork                            = Sens du travail
+WorkSituationInsecurity                  = Insécurité de la situation de travail
+PreventionContextInCompany               = Contexte de prévention dans l'entreprise
+RPSImpactOnCompanyAndEmployees           = Impact des RPS sur l'entreprise et les salariés
 
 # Stats - Statistiques
 GreyRisk                                         = Risque faible
@@ -1476,7 +1483,7 @@ TicketSuccessMessageSet        = Le message a bien été modifié
 
 # ODT Template - Template ODT
 DigiriskTemplateDocumentProject = Modèle de documents des fiches de projets de Digirisk
-DocumentModelOrque              = Modèles de document de rapport prévisionnel sur les tâches de projets
+DocumentModelPapripactA3Paysage            = Modèles de document de rapport prévisionnel sur les tâches de projets
 
 # Register Document
 

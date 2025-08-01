@@ -255,3 +255,6 @@ ALTER TABLE `llx_digiriskdolibarr_risk` ADD `type` VARCHAR(255) NOT NULL DEFAULT
 
 -- 10.1.1
 UPDATE llx_element_element SET targettype = 'digiriskdolibarr_digiriskelement' WHERE targettype = 'digiriskdolibarr_digiriskdolibar' AND sourcetype = 'digiriskdolibarr_risksign';
+
+-- 21.0
+ALTER TABLE llx_digiriskdolibarr_risk ADD `sub_category` VARCHAR(255) NULL DEFAULT NULL AFTER `category`;

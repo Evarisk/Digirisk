@@ -21,12 +21,14 @@
  * \brief   Page to view riskassessmentdocument
  */
 
-
 // Load DigiriskDolibarr environment
-if (!file_exists('../../digiriskdolibarr.main.inc.php')) {
+if (file_exists('../digiriskdolibarr.main.inc.php')) {
+    require_once __DIR__ . '/../digiriskdolibarr.main.inc.php';
+} elseif (file_exists('../../digiriskdolibarr.main.inc.php')) {
+    require_once __DIR__ . '/../../digiriskdolibarr.main.inc.php';
+} else {
     die('Include of digiriskdolibarr main fails');
 }
-require_once __DIR__ . '/../../digiriskdolibarr.main.inc.php';
 
 // Load Dolibarr libraries
 require_once DOL_DOCUMENT_ROOT . '/core/lib/admin.lib.php';
