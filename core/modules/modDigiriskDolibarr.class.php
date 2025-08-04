@@ -2004,6 +2004,7 @@ class modDigiriskdolibarr extends DolibarrModules
 		delDocumentModel('auditreportdocument_odt', 'auditreportdocument');
 		delDocumentModel('ticketdocument_odt', 'ticketdocument');
         delDocumentModel('papripact_a3_paysage_projectdocument', 'project');
+        delDocumentModel('orque_projectdocument', 'project');
         delDocumentModel('accidentinvestigationdocument_odt', 'accidentinvestigationdocument');
         delDocumentModel('registerdocument_odt', 'registerdocument');
 
