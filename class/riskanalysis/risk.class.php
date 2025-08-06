@@ -215,6 +215,7 @@ class Risk extends SaturneObject
             $array['current']['riskByRiskAssessmentCotations'] = [];
             $array['current']['riskByCategories']              = [];
             $array['current']['riskBySubCategories']           = [];
+            $array['current']['psychosocialRisksByGPUT']       = [];
             $array['current']['riskByRiskAssessmentLevels']    = [];
         }
 
@@ -222,6 +223,7 @@ class Risk extends SaturneObject
             $array['shared']['risks']                         = [];
             $array['shared']['riskByCategories']              = [];
             $array['shared']['riskBySubCategories']           = [];
+            $array['shared']['psychosocialRisksByGPUT']       = [];
             $array['shared']['riskByRiskAssessmentCotations'] = [];
             $array['shared']['riskByRiskAssessmentLevels']    = [];
         }
@@ -232,6 +234,7 @@ class Risk extends SaturneObject
                 $array['shared']['risks']                          = [];
                 $array['shared']['riskByCategories']               = [];
                 $array['shared']['riskBySubCategories']            = [];
+                $array['shared']['psychosocialRisksByGPUT']       = [];
                 $array['shared']['riskByRiskAssessmentCotations']  = [];
                 $array['shared']['riskByRiskAssessmentLevels']     = [];
             }
@@ -247,6 +250,7 @@ class Risk extends SaturneObject
             $array[$entity]['riskByRiskAssessmentLevels'][$riskAssessment->getEvaluationScale()][] = $risk;
             $array[$entity]['riskByRiskAssessmentCotations'][$risk->fk_element]['totalRiskAssessmentCotations'] += $risk->riskAssessmentCotation;
             $array[$entity]['riskByRiskAssessmentCotations'][$risk->fk_element][$riskAssessment->getEvaluationScale()]++;
+            $array[$entity]['psychosocialRisksByGPUT'][$risk->fk_element][$risk->sub_category][$risk->riskAssessmentDate] = $riskAssessment->cotation;
             $array[$entity]['riskByCategories'][$risk->category][$riskAssessment->getEvaluationScale()]++;
             $array[$entity]['riskBySubCategories'][$risk->sub_category][$riskAssessment->getEvaluationScale()]++;
             $array['riskByEntities'][$risk->entity]['nbTotalRisks']++;
@@ -555,6 +559,45 @@ class Risk extends SaturneObject
 
 		return -1;
 	}
+
+    /**
+     * Get danger sub category name
+     *
+     * @param  int    $position
+     *
+     */
+    public function getDangerSubCategoryName($mainCategory, $position) {
+        $subCategories = static::getDangerSubCategories();
+        if (!isset($subCategories[$mainCategory]) || !is_array($subCategories[$mainCategory])) {
+            return -1;
+        }
+        foreach ($subCategories[$mainCategory] as $subCategory) {
+            if ($subCategory['position'] == $position) {
+                return $subCategory['label'];
+            }
+        }
+
+        return -1;
+    }
+
+    /**
+     * Get danger sub category scale label
+     *
+     * @param $scale
+     * @return mixed
+     */
+    public function getDangerSubCategoryScaleLabel($scale) {
+        global $langs;
+        if ($scale < 48) {
+            return $langs->trans('Weak');
+        } elseif ($scale < 51) {
+            return $langs->trans('Moderate');
+        } elseif ($scale < 80) {
+            return $langs->trans('High');
+        } else {
+            return $langs->trans('Extreme');
+        }
+    }
 
 	/**
 	 * Get danger category picto name

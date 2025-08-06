@@ -1022,6 +1022,12 @@ MeaningOfWork                            = Sens du travail
 WorkSituationInsecurity                  = Insécurité de la situation de travail
 PreventionContextInCompany               = Contexte de prévention dans l'entreprise
 RPSImpactOnCompanyAndEmployees           = Impact des RPS sur l'entreprise et les salariés
+PsychosocialRisksFactors                 = Facteurs de risques psychosociaux
+CompanyPreventionInformations            = Informations sur la prévention dans l'entreprise
+Weak                                     = Faible
+Moderate                                 = Modéré
+High                                     = Elevé
+Extreme                                  = Extrême
 
 # Stats - Statistiques
 GreyRisk                                         = Risque faible
