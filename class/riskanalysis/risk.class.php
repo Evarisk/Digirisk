@@ -250,7 +250,9 @@ class Risk extends SaturneObject
             $array[$entity]['riskByRiskAssessmentLevels'][$riskAssessment->getEvaluationScale()][] = $risk;
             $array[$entity]['riskByRiskAssessmentCotations'][$risk->fk_element]['totalRiskAssessmentCotations'] += $risk->riskAssessmentCotation;
             $array[$entity]['riskByRiskAssessmentCotations'][$risk->fk_element][$riskAssessment->getEvaluationScale()]++;
-            $array[$entity]['psychosocialRisksByGPUT'][$risk->fk_element][$risk->sub_category][$risk->riskAssessmentDate] = $riskAssessment->cotation;
+            if ($risk->sub_category >= 0) {
+                $array[$entity]['psychosocialRisksByGPUT'][$risk->fk_element][$risk->sub_category][$risk->riskAssessmentDate] = $riskAssessment->cotation;
+            }
             $array[$entity]['riskByCategories'][$risk->category][$riskAssessment->getEvaluationScale()]++;
             $array[$entity]['riskBySubCategories'][$risk->sub_category][$riskAssessment->getEvaluationScale()]++;
             $array['riskByEntities'][$risk->entity]['nbTotalRisks']++;
@@ -595,7 +597,7 @@ class Risk extends SaturneObject
         } elseif ($scale < 80) {
             return $langs->trans('High');
         } else {
-            return $langs->trans('Extreme');
+            return $langs->trans('NA');
         }
     }
 

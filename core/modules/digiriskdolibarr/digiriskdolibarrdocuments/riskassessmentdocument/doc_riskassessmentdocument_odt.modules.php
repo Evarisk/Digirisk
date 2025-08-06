@@ -434,6 +434,14 @@ class doc_riskassessmentdocument_odt extends ModeleODTDigiriskDolibarrDocument
             $digiriskElement = new DigiriskElement($db);
             $risk = new Risk($db);
             $psychosocialRisksByGPUT = $moreParam['psychosocialRisksByGPUT'];
+            $tmpArray = [];
+            $dangerSubCategories = $risk->getDangerSubCategories();
+
+            foreach($dangerSubCategories[17] as $dangerSubCategory) {
+                $subCategoryName = $risk->getDangerSubCategoryName(17, $dangerSubCategory['position']);
+                $formattedSubCategoryName = lcfirst($subCategoryName) . 'Scale';
+                $tmpArray[$formattedSubCategoryName] = '';
+            }
 
             if (is_array($psychosocialRisksByGPUT) && !empty($psychosocialRisksByGPUT)) {
                 foreach($psychosocialRisksByGPUT as $digiriskElementId => $psychosocialRiskByGPUT) {
@@ -459,7 +467,6 @@ class doc_riskassessmentdocument_odt extends ModeleODTDigiriskDolibarrDocument
                             $tmpArray['riskAssessmentDate'] = dol_print_date($lastRiskAssessmentDate, 'dayhour', $outputLangs);
                         }
                     }
-
 
                     static::setTmpArrayVars($tmpArray, $listLines, $outputLangs);
                 }
