@@ -440,7 +440,7 @@ class doc_riskassessmentdocument_odt extends ModeleODTDigiriskDolibarrDocument
             foreach($dangerSubCategories[17] as $dangerSubCategory) {
                 $subCategoryName = $risk->getDangerSubCategoryName(17, $dangerSubCategory['position']);
                 $formattedSubCategoryName = lcfirst($subCategoryName) . 'Scale';
-                $tmpArray[$formattedSubCategoryName] = '';
+                $tmpArray[$formattedSubCategoryName] = '-';
             }
 
             if (is_array($psychosocialRisksByGPUT) && !empty($psychosocialRisksByGPUT)) {

@@ -597,7 +597,7 @@ class Risk extends SaturneObject
         } elseif ($scale < 80) {
             return $langs->trans('High');
         } else {
-            return $langs->trans('NA');
+            return $langs->trans('-');
         }
     }
 
