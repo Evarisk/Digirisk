@@ -80,10 +80,12 @@ class doc_riskassessmentdocument_odt extends ModeleODTDigiriskDolibarrDocument
         $array['current']['riskByRiskAssessmentCotations'] = $riskArray['current']['riskByRiskAssessmentCotations'];
         $array['current']['riskByCategories']              = $riskArray['current']['riskByCategories'];
         $array['current']['riskBySubCategories']           = $riskArray['current']['riskBySubCategories'];
+        $array['current']['psychosocialRisksByGPUT']       = $riskArray['current']['psychosocialRisksByGPUT'];
         $array['current']['riskByRiskAssessmentLevels']    = $riskArray['current']['riskByRiskAssessmentLevels'];
         $array['shared']['risks']                          = $riskArray['shared']['risks'];
         $array['shared']['riskByCategories']               = $riskArray['shared']['riskByCategories'];
         $array['shared']['riskBySubCategories']            = $riskArray['shared']['riskBySubCategories'];
+        $array['shared']['psychosocialRisksByGPUT']        = $riskArray['shared']['psychosocialRisksByGPUT'];
         $array['shared']['riskByRiskAssessmentCotations']  = $riskArray['shared']['riskByRiskAssessmentCotations'];
         $array['shared']['riskByRiskAssessmentLevels']     = $riskArray['shared']['riskByRiskAssessmentLevels'];
         $array['current']['totalRisks']                    = $riskArray['current']['totalRisks'];
@@ -407,6 +409,66 @@ class doc_riskassessmentdocument_odt extends ModeleODTDigiriskDolibarrDocument
     }
 
     /**
+     * Set psychosocial risk by GP/UT segment
+     *
+     * @param Odf       $odfHandler  Object builder odf library
+     * @param Translate $outputLangs Lang object to use for output
+     * @param array     $moreParam   More param (segmentName, dangerCategories, riskByCategories)
+     *
+     * @throws OdfException
+     * @throws Exception
+     */
+    private static function setPsychosocialRiskByGPUTSegment(Odf $odfHandler, Translate $outputLangs, array $moreParam): void
+    {
+        global $db;
+        $foundTagForLines = 1;
+        try {
+            $listLines = $odfHandler->setSegment($moreParam['segmentName']);
+        } catch (OdfExceptionSegmentNotFound $e) {
+            $foundTagForLines = 0;
+            $listLines        = '';
+            dol_syslog($e->getMessage());
+        }
+
+        if ($foundTagForLines) {
+            $digiriskElement = new DigiriskElement($db);
+            $risk = new Risk($db);
+            $psychosocialRisksByGPUT = $moreParam['psychosocialRisksByGPUT'];
+
+            if (is_array($psychosocialRisksByGPUT) && !empty($psychosocialRisksByGPUT)) {
+                foreach($psychosocialRisksByGPUT as $digiriskElementId => $psychosocialRiskByGPUT) {
+                    $digiriskElement->fetch($digiriskElementId);
+                    $tmpArray['digiriskElementLabel'] = 'S' . $digiriskElement->entity . ' - ' . $digiriskElement->ref . ' - ' . $digiriskElement->label;
+                    if (is_array($psychosocialRiskByGPUT) && !empty($psychosocialRiskByGPUT)) {
+                        foreach($psychosocialRiskByGPUT as $riskAssessmentCotationType => $riskAssessments) {
+                            $subCategoryName = $risk->getDangerSubCategoryName(17, $riskAssessmentCotationType);
+                            $formattedSubCategoryName = lcfirst($subCategoryName) . 'Scale';
+                            $lastRiskAssessmentCotation = null;
+                            $lastRiskAssessmentDate = null;
+
+                            if (is_array($riskAssessments) && !empty($riskAssessments)) {
+                                foreach ($riskAssessments as $date => $riskAssessmentCotation) {
+                                     if (is_null($lastRiskAssessmentCotation) || $date > $lastRiskAssessmentDate) {
+                                         $lastRiskAssessmentDate = $date;
+                                         $lastRiskAssessmentCotation = $riskAssessmentCotation;
+                                        }
+                                }
+                            }
+
+                            $tmpArray[$formattedSubCategoryName] = $risk->getDangerSubCategoryScaleLabel($lastRiskAssessmentCotation);
+                            $tmpArray['riskAssessmentDate'] = dol_print_date($lastRiskAssessmentDate, 'dayhour', $outputLangs);
+                        }
+                    }
+
+
+                    static::setTmpArrayVars($tmpArray, $listLines, $outputLangs);
+                }
+            }
+            $odfHandler->mergeSegment($listLines);
+        }
+    }
+
+    /**
      * Set risk by entities segment
      *
      * @param Odf       $odfHandler  Object builder odf library
@@ -486,13 +548,16 @@ class doc_riskassessmentdocument_odt extends ModeleODTDigiriskDolibarrDocument
         $moreParam['dangerSubCategories'] = $loadRiskAssessmentDocumentInfos['dangerSubCategories'];
         $moreParam['riskByCategories']    = $loadRiskAssessmentDocumentInfos[$moreParam['entity']]['riskByCategories'];
         $moreParam['riskBySubCategories'] = $loadRiskAssessmentDocumentInfos[$moreParam['entity']]['riskBySubCategories'];
+        $moreParam['psychosocialRisksByGPUT'] = $loadRiskAssessmentDocumentInfos[$moreParam['entity']]['psychosocialRisksByGPUT'];
         $moreParam['totalRisks']          = $loadRiskAssessmentDocumentInfos[$moreParam['entity']]['totalRisks'];
-
         $moreParam['segmentName'] = $moreParam['entity'] . 'RiskByCategories';
         static::setRiskByCategoriesSegment($odfHandler, $outputLangs, $moreParam);
 
         $moreParam['segmentName'] = $moreParam['entity'] . 'PsychosocialRiskByCategories';
         static::setPsychosocialRiskByCategoriesSegment($odfHandler, $outputLangs, $moreParam);
+
+        $moreParam['segmentName'] = $moreParam['entity'] . 'PsychosocialRiskByGPUT';
+        static::setPsychosocialRiskByGPUTSegment($odfHandler, $outputLangs, $moreParam);
 
         $moreParam['riskTasks'] = $loadRiskAssessmentDocumentInfos[$moreParam['entity']]['riskTasks'];
         if ($moreParam['entity'] == 'shared') {

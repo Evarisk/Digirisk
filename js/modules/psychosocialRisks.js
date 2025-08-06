@@ -17,6 +17,11 @@ window.digiriskdolibarr.psychosocialRisks = {};
  */
 window.digiriskdolibarr.psychosocialRisks.init = function() {
   window.digiriskdolibarr.psychosocialRisks.event();
+
+  // Initialiser l'état du bouton et de la case "tout sélectionner" au chargement
+  setTimeout(function() {
+    window.digiriskdolibarr.psychosocialRisks.toggleAddButton();
+  }, 100);
 };
 
 /**
@@ -44,14 +49,15 @@ window.digiriskdolibarr.psychosocialRisks.event = function() {
  * @return {void}
  */
 window.digiriskdolibarr.psychosocialRisks.toggleAddButton = function() {
-  console.log('coucou')
   let selectedRisks = $('.select-psychosocial-risk:checked').length;
-  console.log('selectedRisks', selectedRisks);
-  console.log('submit_selected_psychosocial_risks',  $('#submit_selected_psychosocial_risks').removeAttr('disabled'));
   if (selectedRisks > 0) {
     $('#submit_selected_psychosocial_risks').removeAttr('disabled').css('opacity', '1');
+    //add class button-disabled
+    $('#submit_selected_psychosocial_risks').removeClass('button-grey');
   } else {
     $('#submit_selected_psychosocial_risks').attr('disabled', 'disabled').css('opacity', '0.6');
+    //add class button-grey
+    $('#submit_selected_psychosocial_risks').addClass('button-grey');
   }
 
   // Mettre à jour l'état de la case "tout sélectionner"
@@ -88,12 +94,15 @@ window.digiriskdolibarr.psychosocialRisks.updateSelectAllState = function() {
   let selectedRisks = $('.select-psychosocial-risk:checked').length;
   let selectAllCheckbox = $('#select_all_psychosocial_risks');
 
-  if (selectedRisks === totalRisks) {
+  if (selectedRisks === totalRisks && totalRisks > 0) {
     selectAllCheckbox.prop('checked', true);
-    selectAllCheckbox.prop('indeterminate', false);
+    selectAllCheckbox.prop('', false);
+  } else if (selectedRisks === 0) {
+    selectAllCheckbox.prop('checked', false);
+    selectAllCheckbox.prop('', false);
   } else {
     selectAllCheckbox.prop('checked', false);
-    selectAllCheckbox.prop('indeterminate', true);
+    selectAllCheckbox.prop('', true);
   }
 };
 
@@ -122,12 +131,14 @@ window.digiriskdolibarr.psychosocialRisks.collectSelectedRisksData = function() 
     let cotation = riskRow.find('.risk-evaluation-cotation.selected-cotation').data('evaluation-id');
     let description = riskRow.find('.risk-description').val();
     let subCategory = riskRow.find('.sub-category').val();
+    let riskassessmentDate = riskRow.find('.riskassessment-date').val() || '';
 
     selectedRisks.push({
       description: description,
       cotation: cotation,
       method: 'standard',
       fk_element: fkElement,
+      riskassessment_date: riskassessmentDate,
       category: 17,
       sub_category: subCategory,
       photo: '',

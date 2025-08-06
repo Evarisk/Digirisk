@@ -48,7 +48,6 @@ $risk->status      = 1;
 $risk->fk_projet   = $conf->global->DIGIRISKDOLIBARR_DU_PROJECT;
 
 $result = $risk->create($user);
-
 if ($result > 0) {
     $eval = new RiskAssessment($db);
     $eval->fk_risk = $risk->id;
@@ -57,7 +56,7 @@ if ($result > 0) {
     $eval->status = 1;
     $eval->method = $data['method'] ?? 'simple';
     $eval->comment = $data['description'] ?? '';
-    $eval->date_riskassessment = dol_now();
+    $eval->date_riskassessment = $data['riskassessment_date'] ? strtotime($data['riskassessment_date']) : dol_now();
     $result2 = $eval->create($user);
 
     if ($result2 > 0) {
