@@ -1,7 +1,144 @@
+// Styles pour les onglets DigiAI
+.digiAI-tabs-container {
+  margin-bottom: 20px;
+}
+
+.digiAI-tabs {
+  display: flex;
+  border-bottom: 2px solid #e9ecef;
+  margin-bottom: 20px;
+}
+
+.digiAI-tab-button {
+  background: none;
+  border: none;
+  padding: 12px 24px;
+  cursor: pointer;
+  font-size: 16px;
+  color: #6c757d;
+  border-bottom: 3px solid transparent;
+  transition: all 0.3s ease;
+
+  &:hover {
+    color: #007bff;
+    background-color: #f8f9fa;
+  }
+
+  &.active {
+    color: #007bff;
+    border-bottom-color: #007bff;
+    font-weight: bold;
+  }
+
+  i {
+    margin-right: 5px;
+  }
+}
+
+.digiAI-tab-content {
+  display: none;
+
+  &.active {
+    display: block;
+  }
+}
+
+// Styles pour l'onglet image (existant)
+.digiAI-upload-container-full {
+  // Styles existants conservés
+}
+
+// Styles pour l'onglet texte
+.digiAI-text-container-full {
+  background: #f8f9fa;
+  border-radius: 10px;
+  padding: 30px;
+  text-align: center;
+}
+
+.digiAI-text-area-container {
+  margin-bottom: 20px;
+
+  label {
+    display: block;
+    margin-bottom: 10px;
+    font-size: 18px;
+    color: #495057;
+    font-weight: bold;
+
+    i {
+      margin-right: 8px;
+      color: #007bff;
+    }
+  }
+}
+
+.digiAI-textarea {
+  width: 100%;
+  min-height: 200px;
+  padding: 15px;
+  border: 2px dashed #ced4da;
+  border-radius: 8px;
+  font-size: 14px;
+  line-height: 1.5;
+  resize: vertical;
+  transition: border-color 0.3s ease;
+  font-family: inherit;
+
+  &:focus {
+    outline: none;
+    border-color: #007bff;
+    box-shadow: 0 0 0 0.2rem rgba(0, 123, 255, 0.25);
+  }
+
+  &::placeholder {
+    color: #6c757d;
+    font-style: italic;
+  }
+}
+
+.digiAI-text-submit {
+  margin-top: 20px;
+}
+
+.digiAI-analyze-button {
+  background: linear-gradient(135deg, #007bff, #0056b3);
+  color: white;
+  border: none;
+  padding: 12px 30px;
+  border-radius: 25px;
+  font-size: 16px;
+  font-weight: bold;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  box-shadow: 0 4px 8px rgba(0, 123, 255, 0.3);
+
+  &:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 6px 12px rgba(0, 123, 255, 0.4);
+  }
+
+  &:active {
+    transform: translateY(0);
+  }
+
+  i {
+    margin-right: 8px;
+  }
+}
+
+// Modal phases
 .modal-analyse-phase {
   .analysis-in-progress {
     text-align: center;
     padding: 20px;
+
+    .digiai-loader-text {
+      font-size: 1.1em;
+      font-weight: 500;
+      margin-bottom: 15px;
+      color: #495057;
+    }
 
     .loader {
       margin: 20px auto;
@@ -19,14 +156,52 @@
   display: none;
 }
 
-.uploaded-image-preview {
+// Preview des contenus analysés
+#uploaded-image-preview {
   max-width: 100%;
   max-height: 300px;
   object-fit: contain;
   display: block;
   margin: 10px auto;
+  border-radius: 8px;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
 }
 
+#analyzed-text-preview {
+  background: #f8f9fa;
+  border-radius: 8px;
+  padding: 15px;
+  max-height: 300px;
+  overflow-y: auto;
+  display: none;
+
+  h4 {
+    margin: 0 0 10px 0;
+    color: #495057;
+    font-size: 16px;
+
+    i {
+      margin-right: 8px;
+      color: #007bff;
+    }
+  }
+
+  .text-preview-content {
+    background: white;
+    border-radius: 4px;
+    padding: 10px;
+    margin-top: 10px;
+    text-align: left;
+    font-family: monospace;
+    font-size: 13px;
+    line-height: 1.4;
+    border: 1px solid #dee2e6;
+    max-height: 200px;
+    overflow-y: auto;
+  }
+}
+
+// Styles pour les risques précédemment ajoutés
 .previous-risks-list {
   tr {
     opacity: 0.8;
@@ -38,7 +213,41 @@
   }
 }
 
+// Animation du loader
 @keyframes spin {
   0% { transform: rotate(0deg); }
   100% { transform: rotate(360deg); }
+}
+
+// Responsive design
+@media (max-width: 768px) {
+  .digiAI-tabs {
+    flex-direction: column;
+  }
+
+  .digiAI-tab-button {
+    border-bottom: none;
+    border-left: 3px solid transparent;
+
+    &.active {
+      border-bottom: none;
+      border-left-color: #007bff;
+    }
+  }
+
+  .digiAI-text-container-full {
+    padding: 20px;
+  }
+
+  .digiAI-textarea {
+    min-height: 150px;
+  }
+
+  #analyzed-text-preview {
+    max-height: 200px;
+
+    .text-preview-content {
+      max-height: 150px;
+    }
+  }
 }
