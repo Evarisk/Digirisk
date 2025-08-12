@@ -111,8 +111,6 @@ if (empty($reshook)) {
     $error = 0;
 
     $backtopage = dol_buildpath('/digiriskdolibarr/view/digiriskelement/digiriskelement_digiai.php', 1) . (empty($fromid) ? '?id=' . ($id > 0 ? $id : '__ID__') : '?fromid=' . ($fromid > 0 ? $fromid : '__ID__'));
-
-
 }
 
 /*
@@ -145,15 +143,19 @@ if ($object->id > 0) {
 
     print '<div class="fichecenter digiailist wpeo-wrap">';
 
-    // Partie avec le formulaire stylisé pour téléversement avec picto
-    print '<div class="digiAI-upload-container-full">';
+    print '<div class="digiAI-tabs-container">';
+    print '<div class="digiAI-tabs">';
+    print '<button class="digiAI-tab-button active" data-tab="image-tab"><i class="fas fa-image"></i>'. $langs->trans('ImageAnalysis') .'</button>';
+    print '<button class="digiAI-tab-button" data-tab="text-tab"><i class="fas fa-keyboard"></i>'. $langs->trans('TextAnalysis') .'</button>';
+    print '</div>';
 
+    print '<div id="image-tab" class="digiAI-tab-content active">';
+    print '<div class="digiAI-upload-container-full">';
     print '<form method="POST" enctype="multipart/form-data" action="' . $_SERVER["PHP_SELF"] . '?id='. $id .'" name="upload_image_form" id="upload_image_form" class="digiAI-form">' . "\n";
     print '<input type="hidden" name="token" value="' . newToken() . '">';
     print '<input type="hidden" name="action" value="upload_image">';
     print '<input type="hidden" name="id" id="digiriskElementId" value="' . $id . '">';
 
-// Grande zone de téléversement
     print '<div class="digiAI-dropzone" id="dropzone" onclick="document.getElementById(\'image_file\').click();">';
     print '<i class="fas fa-cloud-upload-alt"></i>';
     print '<p>' . $langs->trans('UploadAnImage') . '</p>';
@@ -162,29 +164,57 @@ if ($object->id > 0) {
 
     print '</form>';
     print '</div>';
+    print '</div>';
+
+    print '<div id="text-tab" class="digiAI-tab-content">';
+    print '<div class="digiAI-text-container-full">';
+    print '<form method="POST" action="' . $_SERVER["PHP_SELF"] . '?id='. $id .'" name="analyze_text_form" id="analyze_text_form" class="digiAI-form">' . "\n";
+    print '<input type="hidden" name="token" value="' . newToken() . '">';
+    print '<input type="hidden" name="action" value="analyze_text">';
+    print '<input type="hidden" name="id" value="' . $id . '">';
+
+    print '<div class="digiAI-text-area-container">';
+    print '<label for="analysis_text"><i class="fas fa-keyboard"></i> ' . $langs->trans('EnterTextForAnalysis') . '</label>';
+    print '<textarea name="analysis_text" id="analysis_text" placeholder="Décrivez la situation de travail, les équipements, les procédures ou tout autre élément que vous souhaitez analyser..." rows="8" class="digiAI-textarea"></textarea>';
+    print '</div>';
+
+    print '<div class="digiAI-text-submit">';
+    print '<button type="submit" class="digiAI-analyze-button" id="analyze_text_button">';
+    print '<i class="fas fa-brain"></i> ' . $langs->trans('AnalyzeText');
+    print '</button>';
+    print '</div>';
+
+    print '</form>';
+    print '</div>';
+    print '</div>';
+
+    print '</div>';
+
     print '<div class="wpeo-modal" id="digiai_modal" >';
     print '  <div class="modal-container"style="max-width: 65%; max-height: 65%">';
     print '    <div class="modal-header">';
-    print '      <h2><i class="fas fa-robot"></i> Analyse de risques par l\'IA</h2>';
+    print '      <h2><i class="fas fa-robot"></i> '. $langs->trans('AIRiskAnalysis') .'</h2>';
     print '      <button class="modal-close" onclick="$(\'#digiai_modal\').removeClass(\'modal-active\')">&times;</button>';
     print '    </div>';
 
-// PHASE 1 : image + loader
     print '    <div class="modal-analyse-phase">';
     print '      <div class="modal-body">';
     print '        <div class="modal-left">';
-    print '          <img id="uploaded-image-preview" />';
+    print '          <img id="uploaded-image-preview" style="display: none;" />';
+    print '          <div id="analyzed-text-preview" style="display: none;">';
+    print '            <h4><i class="fas fa-file-text"></i> Texte analysé :</h4>';
+    print '            <div class="text-preview-content"></div>';
+    print '          </div>';
     print '        </div>';
     print '        <div class="modal-right">';
     print '          <div class="analysis-in-progress">';
-    print '            <p class="digiai-loader-text">Analyse en cours de l\'image...</p>';
+    print '            <p class="digiai-loader-text">'. $langs->trans('AnalysisInProgress') .'</p>';
     print '            <div class="loader"></div>';
     print '          </div>';
     print '        </div>';
     print '      </div>';
     print '    </div>';
 
-// PHASE 2 : résultats
     print '    <div class="modal-result-phase" style="display: none;">';
     print '      <div class="modal-result-wrapper">';
     print '        <table id="risque_table" class="risque-table">';
@@ -220,9 +250,7 @@ if ($object->id > 0) {
     ?>
     <script>
         window.digiriskdolibarr = window.digiriskdolibarr || {};
-        window.digiriskdolibarr.categoryMap = <?php
-        echo $json;
-        ?>;
+        window.digiriskdolibarr.categoryMap = <?php echo $json; ?>;
     </script>
 <?php
 }

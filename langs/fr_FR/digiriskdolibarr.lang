@@ -1028,6 +1028,13 @@ Weak                                     = Faible
 Moderate                                 = Modéré
 High                                     = Elevé
 Extreme                                  = Extrême
+HereIsTheWorkStationDescription          = Voici la description du poste de travail
+ImageAnalysis                            = Analyse de l'image
+TextAnalysis                             = Analyse de texte
+AnalyzeText                              = Analyser le texte
+EnterTextForAnalysis                     = Saisissez le texte à analyser
+AIRiskAnalysis                           = Analyse de risques par l'IA
+AnalysisInProgress                       = Analyse en cours...
 
 # Stats - Statistiques
 GreyRisk                                         = Risque faible

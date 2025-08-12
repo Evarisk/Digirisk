@@ -7,24 +7,45 @@ if (file_exists('../digiriskdolibarr.main.inc.php')) {
     die('Include of digiriskdolibarr main fails');
 }
 
-global $conf;
+global $conf, $langs;
 
 $chatGptApiKey = $conf->global->DIGIRISKDOLIBARR_CHATGPT_API_KEY;
 $chatGptUrl = 'https://api.openai.com/v1/chat/completions';
 
-// Vérifie si un fichier a été envoyé
-if (!isset($_FILES['image_file']) || $_FILES['image_file']['error'] !== UPLOAD_ERR_OK) {
-    http_response_code(400);
-    echo json_encode(['error' => 'Aucune image reçue ou erreur lors de l\'upload.']);
-    exit;
+$action = $_POST['action'] ?? '';
+
+
+if ($action == 'analyze_image') {
+    if (!isset($_FILES['image_file']) || $_FILES['image_file']['error'] !== UPLOAD_ERR_OK) {
+        http_response_code(400);
+        echo json_encode(['error' => 'Aucune image reçue ou erreur lors de l\'upload.']);
+        exit;
+    }
+
+    $imagePath = $_FILES['image_file']['tmp_name'];
+    $imageData = base64_encode(file_get_contents($imagePath));
+    $imageMimeType = mime_content_type($imagePath);
+    if ($imageData) {
+        $content = [
+            'type' => 'image_url',
+            'image_url' => [
+                'url' => 'data:' . $imageMimeType . ';base64,' . $imageData,
+            ]
+        ];
+    }
 }
 
-// Lecture et encodage base64
-$imagePath = $_FILES['image_file']['tmp_name'];
-$imageData = base64_encode(file_get_contents($imagePath));
-$imageMimeType = mime_content_type($imagePath); // ex: image/png
+if ($action == 'analyze_text') {
 
-// Préparation du message avec vision
+    $textAnalysis = $_POST['analysis_text'] ?? '';
+    if ($textAnalysis) {
+        $content = [
+            'type' => 'text',
+            'text' => $langs->trans('HereIsTheWorkStationDescription') . $textAnalysis
+        ];
+    }
+}
+
 $chatGptRequest = [
     'model' => 'gpt-4o',
     'messages' => [
@@ -35,12 +56,7 @@ $chatGptRequest = [
         [
             'role' => 'user',
             'content' => [
-                [
-                    'type' => 'image_url',
-                    'image_url' => [
-                        'url' => 'data:' . $imageMimeType . ';base64,' . $imageData,
-                    ]
-                ],
+                $content,
                 [
                     'type' => 'text',
                     'text' => <<<EOT
