@@ -12,7 +12,7 @@ $defaultCotation = [0 => '0-47', 48 => '48-50', 51 => '51-80', 100 => '81-100'];
 
 if (is_array($allRiskAssessment) && !empty($allRiskAssessment)) :
 	usort($allRiskAssessment, function ($riskAssessmentComparer, $riskAssessmentCompared) {
-	return $riskAssessmentComparer->date_creation < $riskAssessmentCompared->date_creation;
+		return $riskAssessmentComparer->cotation < $riskAssessmentCompared->cotation;
 	}); ?>
 	<div class="table-cell-header">
 		<div class="table-cell-header-label"><strong><?php echo $langs->trans('ListingHeaderEvaluation'); ?> (<?php echo count($allRiskAssessment); ?>)</strong></div>
