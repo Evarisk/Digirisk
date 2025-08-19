@@ -1422,6 +1422,7 @@ TicketPublicInterfaceForbidden           = Accès interdit à l'interface publiq
 DefaultUserGroup                         = Groupe par défaut
 DefaultUserGroupDescription              = Groupe par défaut dans les selecteurs de groupes
 ConfigureDefaultUserGroup                = Configurer le groupe par défaut
+RegisterSigned                           = Registre signé
 
 #Public interface - Interface publique
 TicketPublicInterfaceShowCategoryDescription     = Afficher la description des catégories de ticket dans l'interface publique
