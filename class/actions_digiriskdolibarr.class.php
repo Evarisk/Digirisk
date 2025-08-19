@@ -257,38 +257,6 @@ class ActionsDigiriskdolibarr
                 </script>
                 <?php
 
-                $category = new Categorie($db);
-                $categories = $category->containing($object->id, $object->element);
-
-                $childrenMap = [];
-                $idMap       = [];
-                foreach ($categories as $cat) {
-                    $childrenMap[$cat->fk_parent][] = $cat;
-                    $idMap[$cat->id]                = $cat;
-                }
-                $path    = [];
-                $current = $idMap[$conf->global->DIGIRISKDOLIBARR_TICKET_MAIN_CATEGORY] ?? null;
-                while ($current) {
-                    $path[] = $current->id;
-
-                    if (isset($childrenMap[$current->id])) {
-                        $current = $childrenMap[$current->id][0];
-                    } else {
-                        break;
-                    }
-                }
-                $validateText = '';
-                foreach ($path as $catId) {
-                    $cat    = $idMap[$catId];
-                    $config = json_decode($cat->array_options['options_ticket_category_config'], true) ?? [];
-                    if (!empty($config['validate_text'])) {
-                        $validateText = $config['validate_text'];
-                    }
-                }
-                $substitutionArray = getCommonSubstitutionArray($langs, 0, null, $object);
-                complete_substitutions_array($substitutionArray, $langs, $object);
-                $validateText = make_substitutions($validateText, $substitutionArray);
-
                 $signatory   = new SaturneSignature($db, 'digiriskdolibarr', $object->element);
                 $signatories = $signatory->fetchSignatory('Attendant', $object->id, $object->element);
 
@@ -297,9 +265,11 @@ class ActionsDigiriskdolibarr
                     $signature = current($signatories);
                 }
 
+                $object->fetch_optionals();
+
                 $signatureTab  = '<tr class="trextrafields_collapse_2"><td class="titlefield"><span class="fas fa-edit paddingrightonly" style=""></span>' . $langs->trans('ValidateText').'</td>';
                 $signatureTab .= '<td id="ticket_extras_digiriskdolibarr_ticket_signature_'. $object->id .'" class="valuefield ticket_extras_digiriskdolibarr_ticket_signature wordbreak">';
-                $signatureTab .= $validateText;
+                $signatureTab .= $object->array_options['options_digiriskdolibarr_condition_message'] ?? '';
                 if ($signature && !empty($signature->signature)) {
                     $signatureTab .= ' <button type="button" class="wpeo-button button-blue" onclick="window.open(\'' . dol_buildpath('/custom/saturne/public/signature/add_signature.php?track_id=' . $signature->signature_url . '&entity=' . $conf->entity . '&module_name=ticket&object_type=' . $object->element . '&document_type=TicketDocument', 3) . '\', \'_blank\')"><i class="fas fa-eye"></i></button>';
                 }
