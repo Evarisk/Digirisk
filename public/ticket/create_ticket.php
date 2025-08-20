@@ -609,15 +609,14 @@ if ($entity > 0) {
 						continue;
 					}
 					$out  = '<div class="form-element form-field-container">';
-					if ($key != 'photo') {
+					if ($key != 'photo' && $key != 'message') {
 						$out .= '<label><span class="form-label"' . ($required ? '' : 'style="font-weight:300"') . '>' . $langs->transnoentities($label) . ($required ? '<span style="color:red"> *</span>' : '') . '</span>';
 					}
 
 					switch ($key) {
 						case 'message':
-							$out .= '<label class="form-field-container">';
-							$out .= '<textarea name="message" id="message"' . ($required ? 'required' : '') . '>' . GETPOST('message') . '</textarea>';
-							$out .= '</label>';
+							$out .= '<label class="form-field-container">' . ucfirst($key) . '<span style="color:red"> *</span></label>' ;
+                            $out .= '<textarea name="message" id="message"' . ($required ? 'required' : '') . '>' . GETPOST('message') . '</textarea>';
 							break;
 						case 'photo':
 							$out .= <<<HTML
