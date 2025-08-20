@@ -165,15 +165,25 @@ if (!empty($related_tasks) && is_array($related_tasks)) {
                                         <?php print '<input type="datetime-local" id="RiskassessmentTaskDateEnd' . $risk->id . '" name="RiskassessmentTaskDateEnd' . $risk->id . '">'; ?>
 									</div>
 								</div>
-								<span class="title"><?php echo $langs->trans('Budget'); ?></span>
-								<input type="text" class="riskassessment-task-budget" name="budget" value="">
+                                <div class="wpeo-gridlayout grid-2">
+                                    <div>
+                                        <span class="title"><?php echo $langs->trans('Budget'); ?></span>
+                                        <input type="text" class="riskassessment-task-budget" name="budget" value="">
+                                    </div>
+                                    <div>
+                                        <span class="title"><?php echo $langs->trans('Responsible'); ?></span>
+                                        <div style="display: flex; flex-direction: row; align-items: center; justify-content: center">
+                                            <i class="fas fa-user-tie"></i> <?php print $form->select_dolusers(0, 'executive_id', 1, null, 0, '', 0, '', 0, 'minwidth200', '', 0, '', 'executiveSelect'); ?>
+                                        </div>
+                                    </div>
+                                </div>
 							</div>
 						</div>
 					</div>
 					<!-- Modal-Footer -->
 					<div class="modal-footer">
 						<?php if ($permissiontoadd) : ?>
-							<div class="wpeo-button riskassessment-task-create button-blue button-disable modal-close" value="<?php echo $risk->id ?>">
+							<div class="wpeo-button riskassessment-task-create button-blue button-disable modal-close"  style="color: #fff" value="<?php echo $risk->id ?>">
 								<i class="fas fa-plus"></i> <?php echo $langs->trans('Add'); ?>
 							</div>
 						<?php else : ?>
