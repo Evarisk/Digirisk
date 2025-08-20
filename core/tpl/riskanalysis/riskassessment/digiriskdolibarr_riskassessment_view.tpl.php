@@ -414,8 +414,8 @@ $evaluation->method = $lastRiskAssessment->method ?: "standard" ;
 			<!-- Modal-Footer -->
 			<div class="modal-footer">
 				<?php if ($permissiontoadd) : ?>
-					<div class="risk-evaluation-create wpeo-button button-blue button-disable modal-close" value="<?php echo $risk->id ?>">
-						<i class="fas fa-plus"></i> <?php echo $langs->trans('Add'); ?>
+					<div class="risk-evaluation-create wpeo-button button-blue button-disable modal-close"value="<?php echo $risk->id ?>">
+						<i class="fas fa-plus"></i> <span style="color: #fff"><?php echo $langs->trans('Add'); ?></span>
 					</div>
 				<?php else : ?>
 					<div class="wpeo-button button-grey wpeo-tooltip-event" aria-label="<?php echo $langs->trans('PermissionDenied') ?>">
