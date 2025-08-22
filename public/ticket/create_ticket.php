@@ -98,6 +98,10 @@ if ($entity > 0) {
     $upload_dir = $conf->categorie->multidir_output[isset($entity) ? $entity : 1];
 }
 
+if (dolibarr_get_const($db, 'DIGIRISKDOLIBARR_SHOW_HIDDEN_DIGIRISKELEMENT') == 0) {
+    $digiriskelement = $digiriskelement->getActiveDigiriskElements();
+}
+
 /*
  * Actions
  */
@@ -668,6 +672,17 @@ if ($entity > 0) {
 						case 'digiriskdolibarr_ticket_email':
 							$out .= '<input type="' . $fields[$key]['type'] . '" name="' . ($fields[$key]['name'] ?? 'options_' . $key) . '" id="' . ($fields[$key]['name'] ?? 'options_' . $key) . '" value="' . GETPOST($fields[$key]['name'] ?? 'options_' . $key) . '"' . ($required ? 'required' : '') . '/>';
 							break;
+                        case 'digiriskdolibarr_ticket_service':
+                            if (dolibarr_get_const($db, 'DIGIRISKDOLIBARR_TASK_HIDE_REF_IN_DOCUMENT') == 1) {
+                                $digiriskelementlabel = [];
+                                foreach ($digiriskelement as $element) {
+                                    $digiriskelementlabel[] = $element->label;
+                                }
+                                $out .= $extrafields->showInputField($key, $digiriskelementlabel, ($required ? 'required' : ''), '', '', 0, $object->id, $object->table_element);
+                            } else {
+							    $out .= $extrafields->showInputField($key, $digiriskelement, ($required ? 'required' : ''), '', '', 0, $object->id, $object->table_element);
+                            }
+                            break;
 						default:
 							$out .= $extrafields->showInputField($key, GETPOST($fields[$key]['name'] ?? 'options_' . $key), ($required ? 'required' : ''), '', '', 0, $object->id, $object->table_element);
 							break;
