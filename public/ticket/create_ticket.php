@@ -112,10 +112,10 @@ if (empty($resHook)) {
     if ($action == 'add') {
         $error = 0;
 
-        $parentCategory = GETPOST('parentCategory');
-        $subCategory    = GETPOST('subCategory');
-        $message        = GETPOST('message');
-        $ticketTmpId  = GETPOST('ticket_id');
+        $parentCategoryId = GETPOST('parentCategory');
+        $subCategoryId    = GETPOST('subCategory');
+        $message          = GETPOST('message');
+        $ticketTmpId      = GETPOST('ticket_id');
 
         $mainCategoryObject              = $category->rechercher($conf->global->DIGIRISKDOLIBARR_TICKET_MAIN_CATEGORY, '', 'ticket', true);
         $mainCategoryExtrafields         = json_decode($mainCategoryObject[0]->array_options['options_ticket_category_config'], true);
@@ -149,7 +149,7 @@ if (empty($resHook)) {
         $config = array_merge(array_filter($mainCategoryExtrafields ?? []), array_filter($mainCategoryChildrenExtrafields ?? []), array_filter($subCategoryExtrafields ?? []));
 
         // Check parameters
-        if (empty($parentCategory)) {
+        if (empty($parentCategoryId)) {
             setEventMessages($langs->trans('ErrorFieldNotEmpty', $conf->global->DIGIRISKDOLIBARR_TICKET_PARENT_CATEGORY_LABEL), array(), 'errors');
             $error++;
         }
@@ -281,12 +281,14 @@ if (empty($resHook)) {
             if ($result > 0) {
                 //Add categories linked
                 $parentCategoryCat = $category;
-                $parentCategoryCat->fetch($parentCategory);
+                $parentCategoryCat->fetch($parentCategoryId);
                 $parentCategoryCat->add_type($object, Categorie::TYPE_TICKET);
 
-                $subCategoryCat = $category;
-                $subCategoryCat->fetch($subCategory);
-                $subCategoryCat->add_type($object, Categorie::TYPE_TICKET);
+                if (!empty($subCategoryId)) {
+                    $subCategoryCat = $category;
+                    $subCategoryCat->fetch($subCategoryId);
+                    $subCategoryCat->add_type($object, Categorie::TYPE_TICKET);
+                }
 
                 //Add files linked
                 $ticket_upload_dir = $conf->digiriskdolibarr->multidir_output[isset($conf->entity) ? $conf->entity : 1] . '/temp';
