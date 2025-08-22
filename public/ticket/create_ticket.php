@@ -261,6 +261,14 @@ if (empty($resHook)) {
             $_POST['options_digiriskdolibarr_ticket_dateyear']  = $date['year'];
         }
 
+        if (!empty($config['validate_text'])) {
+            $validateText = $config['validate_text'];
+
+            $substitutionarray = getCommonSubstitutionArray($langs);
+            complete_substitutions_array($substitutionarray, $langs);
+            $object->array_options['options_digiriskdolibarr_condition_message'] = make_substitutions($validateText, $substitutionarray, $langs);
+        }
+
         $extrafields->setOptionalsFromPost(null, $object);
 
         // Check Captcha code if is enabled
@@ -690,7 +698,7 @@ if ($entity > 0) {
 
             $validateText = !empty($mainCategoryExtrafields->validate_text) || !empty($mainCategoryChildrenExtrafields->validate_text) || !empty($subCategoryExtrafields->validate_text);
             if ($validateText) {
-                $content = $mainCategoryExtrafields->validate_text ?: $mainCategoryChildrenExtrafields->validate_text ?: $subCategoryExtrafields->validate_text;
+                $content = $subCategoryExtrafields->validate_text ?: $mainCategoryChildrenExtrafields->validate_text ?: $mainCategoryExtrafields->validate_text;
 
                 print '<label style="display: flex; align-items: flex-start; margin: 1em 0;">';
                 print '<input type="checkbox" id="validate_text_checkbox" name="validate_text" style="margin-right: 1em; margin-top: 0.2em;" required>';

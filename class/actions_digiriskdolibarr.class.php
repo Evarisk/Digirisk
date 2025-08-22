@@ -256,6 +256,37 @@ class ActionsDigiriskdolibarr
                     jQuery('table.border.tableforfield.centpercent').first().append(<?php echo json_encode($fieldLinkedAccidents) ; ?>)
                 </script>
                 <?php
+
+                $signatory   = new SaturneSignature($db, 'digiriskdolibarr', $object->element);
+                $signatories = $signatory->fetchSignatory('Attendant', $object->id, $object->element);
+
+                $signature = null;
+                if (is_array($signatories) && !empty($signatories)) {
+                    $signature = current($signatories);
+                }
+
+                $object->fetch_optionals();
+
+                $signatureTab  = '<tr class="trextrafields_collapse_2"><td class="titlefield"><span class="fas fa-edit paddingrightonly" style=""></span>' . $langs->trans('ValidateText').'</td>';
+                $signatureTab .= '<td id="ticket_extras_digiriskdolibarr_ticket_signature_'. $object->id .'" class="valuefield ticket_extras_digiriskdolibarr_ticket_signature wordbreak">';
+                $signatureTab .= $object->array_options['options_digiriskdolibarr_condition_message'] ?? '';
+                if ($signature && !empty($signature->signature)) {
+                    $signatureTab .= ' <button type="button" class="wpeo-button button-blue" onclick="window.open(\'' . dol_buildpath('/custom/saturne/public/signature/add_signature.php?track_id=' . $signature->signature_url . '&entity=' . $conf->entity . '&module_name=ticket&object_type=' . $object->element . '&document_type=TicketDocument', 3) . '\', \'_blank\')"><i class="fas fa-eye"></i></button>';
+                }
+                $signatureTab .= '</td>';
+                $signatureTab .= '</tr>';
+
+                $signatureTab .= '<tr class="trextrafields_collapse_2"><td class="titlefield">' . $langs->trans('RegisterSigned') .'</td>';
+                $signatureTab .= '<td id="ticket_extras_digiriskdolibarr_ticket_signature_ok_'. $object->id .'" class="valuefield ticket_extras_digiriskdolibarr_ticket_signature_ok wordbreak">';
+                $signatureTab .= '<input type="checkbox"' . ($signature && !empty($signature->signature) ? ' checked' : '') . ' disabled>';
+                $signatureTab .= '</td>';
+                $signatureTab .= '</tr>';
+                ?>
+                <script>
+                    jQuery('table.border.tableforfield.centpercent').first().append(<?php echo json_encode($signatureTab) ; ?>)
+                </script>
+                <?php
+
 			}
 			if (GETPOST('action') == 'edit_extras' && GETPOST('attribute') == 'digiriskdolibarr_ticket_service') {
 				require_once __DIR__ . '/../lib/digiriskdolibarr_function.lib.php';
