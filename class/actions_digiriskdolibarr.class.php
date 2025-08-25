@@ -269,7 +269,7 @@ class ActionsDigiriskdolibarr
 
                 $signatureTab  = '<tr class="trextrafields_collapse_2"><td class="titlefield"><span class="fas fa-edit paddingrightonly" style=""></span>' . $langs->trans('ValidateText').'</td>';
                 $signatureTab .= '<td id="ticket_extras_digiriskdolibarr_ticket_signature_'. $object->id .'" class="valuefield ticket_extras_digiriskdolibarr_ticket_signature wordbreak">';
-                $signatureTab .= $object->array_options['options_digiriskdolibarr_condition_message'] ?? '';
+                $signatureTab .= $object->array_options['options_digiriskdolibarr_ticket_condition_message'] ?? '';
                 if ($signature && !empty($signature->signature)) {
                     $signatureTab .= ' <button type="button" class="wpeo-button button-blue" onclick="window.open(\'' . dol_buildpath('/custom/saturne/public/signature/add_signature.php?track_id=' . $signature->signature_url . '&entity=' . $conf->entity . '&module_name=ticket&object_type=' . $object->element . '&document_type=TicketDocument', 3) . '\', \'_blank\')"><i class="fas fa-eye"></i></button>';
                 }

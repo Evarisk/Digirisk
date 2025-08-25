@@ -266,7 +266,7 @@ if (empty($resHook)) {
 
             $substitutionarray = getCommonSubstitutionArray($langs);
             complete_substitutions_array($substitutionarray, $langs);
-            $object->array_options['options_digiriskdolibarr_condition_message'] = make_substitutions($validateText, $substitutionarray, $langs);
+            $object->array_options['options_digiriskdolibarr_ticket_condition_message'] = make_substitutions($validateText, $substitutionarray, $langs);
         }
 
         $extrafields->setOptionalsFromPost(null, $object);
