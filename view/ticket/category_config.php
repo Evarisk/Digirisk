@@ -188,7 +188,7 @@ print '</tr>';
 
 // Use signatory
 print '<tr class="oddeven"><td>';
-print img_picto('', 'fa-signature', 'class="paddingrightonly"') . $form->textwithpicto($langs->transnoentities('Signatory'), $langs->transnoentities('PublicInterfaceUseSignatoryDescription'), 1, 'info') . '</td>';
+print img_picto('', 'fa-signature', 'class="paddingrightonly"') . $form->textwithpicto($langs->transnoentities('PublicInterfaceUseSignatory'), $langs->transnoentities('PublicInterfaceUseSignatoryDescription'), 1, 'info') . '</td>';
 print '</td><td class="center">';
 print '<input type="checkbox" id="use_signatory" name="use_signatory"' . ($ticketCategoryConfig->use_signatory ? ' checked=""' : '') . '"> ';
 print '</td></tr>';
@@ -203,7 +203,7 @@ print '</td></tr>';
 
 // Show category description
 print '<tr class="oddeven"><td>';
-print img_picto('', 'fa-font', 'class="paddingrightonly"') . $form->textwithpicto($langs->transnoentities('Description'), $langs->transnoentities('TicketPublicInterfaceShowCategoryDescriptionHelp'), 1, 'info') . '</td>';
+print img_picto('', 'fa-font', 'class="paddingrightonly"') . $form->textwithpicto($langs->transnoentities('TicketPublicInterfaceShowCategory'), $langs->transnoentities('TicketPublicInterfaceShowCategoryDescriptionHelp'), 1, 'info') . '</td>';
 print '</td><td class="center">';
 print '<input type="checkbox" id="show_description" name="show_description"' . ($ticketCategoryConfig->show_description ? ' checked=""' : '') . '"> ';
 print '</td></tr>';
@@ -245,13 +245,8 @@ print '<tr class="oddeven"><td>';
 print img_picto('', 'fa-external-link-alt', 'class="paddingrightonly"') . $form->textwithpicto($langs->transnoentities('ExternalURL'), $langs->transnoentities('ExternalLinkDescription'), 1, 'info') . '</td>';
 print '</td><td class="center">';
 print '<input type="url" name="external_link" id="external_link" class="marginleftonly" placeholder="https://demo.digirisk.com/ticket" pattern="https?://.*" value="' . $ticketCategoryConfig->external_link . '" />';
-print '</td></tr>';
-
-// External Link in new tab
-print '<tr class="oddeven"><td>';
-print img_picto('', 'fa-external-link-alt', 'class="paddingrightonly"') . $langs->transnoentities('ExternalLinkInNewTab') . '</td>';
-print '</td><td class="center">';
-print '<input type="checkbox" id="external_link_new_tab" name="external_link_new_tab"' . ($ticketCategoryConfig->external_link_new_tab ? ' checked=""' : '') . '> ';
+print '<input type="checkbox" id="external_link_new_tab" name="external_link_new_tab" class="marginleftonly" ' . ($ticketCategoryConfig->external_link_new_tab ? ' checked=""' : '') . '> ';
+print '<label for="external_link_new_tab">' . $langs->transnoentities('OpenInNewTab') . '</label>';
 print '</td></tr>';
 
 print '</table>';
