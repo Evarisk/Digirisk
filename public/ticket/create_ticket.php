@@ -381,30 +381,36 @@ if (empty($resHook)) {
         for ($k = 0; $k < count($_FILES['files']['name']); $k++) {
             if (($_FILES['files']['name'][$k] != "")) {
                 // Where the file is going to be stored
+
+                if (!empty($_FILES['files']['error'][$k])) {
+                    if ($_FILES['files']['error'][$k] == 1 || $_FILES['files']['error'][$k] == 2) { // UPLOAD_ERR_INI_SIZE
+                        echo '<input type="hidden" class="file-error" value="' . $langs->trans('ErrorFileSizeTooLarge') . '">';
+                    }
+                }
+
                 $target_dir        = $fullTicketTmpPath;
                 $file              = $_FILES['files']['name'][$k];
                 $path              = pathinfo($file);
-                $filename          = $path['filename'];
+                // remove spaces, apostrophes, quotes and parentheses in filename
+                $filename          = preg_replace('/[\s\'"()]/', '_', $path['filename']);
                 $ext               = $path['extension'];
                 $temp_name         = $_FILES['files']['tmp_name'][$k];
                 $path_filename_ext = $target_dir . $filename . "." . $ext;
 
+                $path_filename_ext = str_replace('\\', '/', $path_filename_ext);
+
                 if (file_exists($path_filename_ext)) {
                     echo "Sorry, file already exists.";
                 } else {
-                    echo $temp_name;
-                    echo $path_filename_ext;
                     move_uploaded_file($temp_name, $path_filename_ext);
-                    echo "Congratulations! File Uploaded Successfully.";
-
                     global $maxwidthmini, $maxheightmini, $maxwidthsmall, $maxheightsmall;
 
                     // Create thumbs
-                    $imgThumbLarge = vignette($path_filename_ext, $conf->global->DIGIRISKDOLIBARR_MEDIA_MAX_WIDTH_LARGE, $conf->global->DIGIRISKDOLIBARR_MEDIA_MAX_HEIGHT_LARGE, '_large', 50, "thumbs");
-                    $imgThumbMedium = vignette($path_filename_ext, $conf->global->DIGIRISKDOLIBARR_MEDIA_MAX_WIDTH_MEDIUM, $conf->global->DIGIRISKDOLIBARR_MEDIA_MAX_HEIGHT_MEDIUM, '_medium', 50, "thumbs");
-                    $imgThumbSmall = vignette($path_filename_ext, $maxwidthsmall, $maxheightsmall, '_small', 50, "thumbs");
+                    $imgThumbLarge = vignette($path_filename_ext, $conf->global->DIGIRISKDOLIBARR_MEDIA_MAX_WIDTH_LARGE, $conf->global->DIGIRISKDOLIBARR_MEDIA_MAX_HEIGHT_LARGE, '_large');
+                    $imgThumbMedium = vignette($path_filename_ext, $conf->global->DIGIRISKDOLIBARR_MEDIA_MAX_WIDTH_MEDIUM, $conf->global->DIGIRISKDOLIBARR_MEDIA_MAX_HEIGHT_MEDIUM, '_medium');
+                    $imgThumbSmall = vignette($path_filename_ext, $maxwidthsmall, $maxheightsmall, '_small');
                     // Create mini thumbs for image (Ratio is near 16/9)
-                    $imgThumbMini = vignette($path_filename_ext, 30, 30, '_mini', 50, "thumbs");
+                    $imgThumbMini = vignette($path_filename_ext, 30, 30, '_mini');
                 }
             }
         }
@@ -618,7 +624,7 @@ if ($entity > 0) {
 					if (!$visible && $key != 'message') {
 						continue;
 					}
-					$out  = '<div class="form-element form-field-container">';
+					$out  = '<div class="form-element form-field-container ' . ($key == 'message' ? 'gridw-2' : '') . '">';
 					if ($key != 'photo' && $key != 'message') {
 						$out .= '<label><span class="form-label"' . ($required ? '' : 'style="font-weight:300"') . '>' . $langs->transnoentities($label) . ($required ? '<span style="color:red"> *</span>' : '') . '</span>';
 					}
@@ -629,16 +635,16 @@ if ($entity > 0) {
                             $out .= '<textarea name="message" id="message"' . ($required ? 'required' : '') . '>' . GETPOST('message') . '</textarea>';
 							break;
 						case 'photo':
-							$out .= <<<HTML
-								<div class="wpeo-gridlayout grid-2">
-									<span class="form-label">{$langs->trans("FilesLinked")}</span>
-									<label class="wpeo-button button-blue" for="sendfile">
-										<i class="fas fa-image button-icon"></i>
-										<span class="button-label">{$langs->trans('AddDocument')}</span>
-										<input type="file" name="userfile[]" multiple="multiple" id="sendfile" onchange="window.digiriskdolibarr.ticket.tmpStockFile()"  style="display: none"/>
-									</label>
-								</div>
-							HTML;
+                            $out .= <<<HTML
+                                <div class="wpeo-gridlayout grid-2">
+                                    <span class="form-label">{$langs->trans("FilesLinked")}</span>
+                                    <label class="wpeo-button button-blue" for="sendfile">
+                                        <i class="fas fa-image button-icon"></i>
+                                        <span class="button-label">{$langs->trans('AddDocument')}</span>
+                                        <input type="file" name="userfile[]" multiple="multiple" id="sendfile" onchange="window.digiriskdolibarr.ticket.tmpStockFile()"  style="display: none"/>
+                                    </label>
+                                </div>
+                            HTML;
 							$out .= '<div id="sendFileForm">';
 							$out .= '<div id="fileLinkedTable" class="tableforinputfields">';
 							$out .= '<div class="wpeo-table table-flex table-3 files-uploaded">';
