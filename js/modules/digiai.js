@@ -17,6 +17,7 @@ window.digiriskdolibarr.digiai = {};
 window.digiriskdolibarr.digiai.init = function() {
   window.digiriskdolibarr.digiai.event();
   window.digiriskdolibarr.digiai.initTabs();
+  // window.digiriskdolibarr.digiai.bypassSaturneForDigiAI();
 };
 
 /**
@@ -28,9 +29,11 @@ window.digiriskdolibarr.digiai.init = function() {
  * @return {void}
  */
 window.digiriskdolibarr.digiai.event = function() {
-  $(document).on('change', '#image_file', window.digiriskdolibarr.digiai.submitImageForm);
   $(document).on('submit', '#analyze_text_form', window.digiriskdolibarr.digiai.submitTextForm);
   $(document).on('click', '.digiAI-tab-button', window.digiriskdolibarr.digiai.switchTab);
+  $(document).on('click', '.open-analyze-image-modal', window.digiriskdolibarr.digiai.changeModalButton);
+  $(document).on('click', '.analyze-image', window.digiriskdolibarr.digiai.submitImageForm);
+  $( document ).on( 'click', '.clickable-photo', window.digiriskdolibarr.digiai.selectPhoto );
 };
 
 /**
@@ -67,6 +70,33 @@ window.digiriskdolibarr.digiai.switchTab = function(e) {
 };
 
 /**
+ * Select photo
+ *
+ * @since   1.0.0
+ * @version 1.0.0
+ *
+ * @return {void}
+ */
+window.digiriskdolibarr.digiai.selectPhoto = function( event ) {
+  $('.analyze-image').removeClass('button-disable');
+};
+
+/**
+ * Bypass complètement Saturne pour DigiAI
+ *
+ * @since   21.1.0
+ * @version 21.1.0
+ *
+ * @return {void}
+ */
+window.digiriskdolibarr.digiai.changeModalButton = function() {
+  $('.modal-photo[data-from-type="digiAi"]')
+    .find('.save-photo')
+    .removeClass('save-photo')
+    .addClass('analyze-image');
+};
+
+/**
  * Méthode pour gérer le formulaire de soumission du fichier image et l'analyse directe par ChatGPT.
  *
  * @since   21.1.0
@@ -78,28 +108,45 @@ window.digiriskdolibarr.digiai.submitImageForm = async function(e) {
   e.preventDefault();
 
   window.digiriskdolibarr.digiai.resetModal('image');
+  let mediaGallery = $('#media_gallery');
+  let mediaGalleryModal = $(this).closest('.modal-container');
+  mediaGallery.removeClass('modal-active');
 
-  let input = document.getElementById('image_file');
-  let imageFile = input.files[0];
-  if (!imageFile) {
+  let fileLinked = mediaGalleryModal.find('.clicked-photo').first().find('.filename').val();
+  let imgSrc = mediaGalleryModal.find('.clicked-photo').first().find('img').attr('src');
+
+  if (!fileLinked) {
     alert('Veuillez sélectionner une image.');
     return;
   }
-  input.value = '';
 
-  let imageUrl = URL.createObjectURL(imageFile);
-  $('#uploaded-image-preview').attr('src', imageUrl).css('opacity', 1).show();
+  $('#uploaded-image-preview').attr('src', imgSrc).css('opacity', 1).show();
   $('#analyzed-text-preview').hide();
   $('.analysis-in-progress').show().css('opacity', 1);
   $('.analysis-result').hide();
 
   $('#digiai_modal').addClass('modal-active');
 
-  let formData = new FormData();
-  formData.append('image_file', imageFile);
-  formData.append('action', 'analyze_image');
+  try {
+    const response = await fetch(imgSrc);
+    if (!response.ok) {
+      throw new Error(`HTTP error! status: ${response.status}`);
+    }
 
-  window.digiriskdolibarr.digiai.getChatGptResponse(formData)
+    const blob = await response.blob();
+
+    const formData = new FormData();
+    formData.append('image_file', blob, fileLinked);
+    formData.append('action', 'analyze_image');
+
+    window.digiriskdolibarr.digiai.getChatGptResponse(formData);
+
+  } catch (error) {
+    console.error('Erreur lors du chargement de l\'image:', error);
+    alert('Erreur lors du chargement de l\'image depuis la bibliothèque de médias');
+
+    $('#digiai_modal').removeClass('modal-active');
+  }
 };
 
 /**
@@ -158,19 +205,28 @@ window.digiriskdolibarr.digiai.getChatGptResponse = async function(formData) {
     });
 
     if (!chatGptResponse.ok) {
-      throw new Error('Failed to fetch ChatGPT with image');
+      throw new Error('Pas de clé API ou de jetons suffisants, veuillez configurer votre clé API dans "Configuration => DigiAI"');
     }
-
     let chatGptData = await chatGptResponse.json();
+
+    if (chatGptData.error) {
+      throw new Error('Pas de clé API ou de jetons suffisants, veuillez configurer votre clé API dans "Configuration => DigiAI"');
+    }
 
     let rawContent = chatGptData.choices[0].message.content.trim();
     let cleanedContent = rawContent.replace(/^```json\s*|```$/g, '').trim();
+
+    try {
+      JSON.parse(cleanedContent);
+    } catch (e) {
+      throw new Error('Erreur lors de l\'analyse de l\'image, veuillez réessayer');
+    }
     let risque = JSON.parse(cleanedContent);
 
     window.digiriskdolibarr.digiai.displayResults(risque);
 
   } catch (error) {
-    alert('Erreur lors de l\'analyse : ' + error.message);
+    alert(error.message);
     $('#digiai_modal').removeClass('modal-active');
   }
 }
