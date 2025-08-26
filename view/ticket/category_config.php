@@ -181,7 +181,7 @@ print '<form method="POST" action="' . $_SERVER['PHP_SELF'] . '?id=' . $id . '&t
 print '<input type="hidden" name="token" value="' . newToken() . '">';
 print '<input type="hidden" name="action" value="set_ticket_category_config">';
 
-print '<table class="noborder centpercent">';
+print '<table class="noborder centpercent param-table" data-btn="savebtn-1">';
 print '<tr class="liste_titre">';
 print '<td>' . $langs->trans('Parameters') . '</td>';
 print '<td class="center">' . $langs->trans('Value') . '</td>';
@@ -281,17 +281,29 @@ print '</td></tr>';
 
 print '</table>';
 
-print $form->buttonsSaveCancel('Save', '');
+print '<div class="center" bis_skin_checked="1">';
+print '<input type="submit" class="button button-save savebtn-1" name="save" value="' . $langs->trans('Save') . '" disabled>';
+print '</div>';
 
 if (getDolGlobalInt('DIGIRISKDOLIBARR_TICKET_ENABLE_PUBLIC_INTERFACE')) {
     if (dolibarr_get_const($db, 'DIGIRISKDOLIBARR_TICKET_EXTRAFIELDS', 0)) {
         print load_fiche_titre($langs->transnoentities('PublicInterfaceConfiguration'), $link, '');
 
-        print '<table class="noborder centpercent dragable-container" data-loader="default">';
+        print '<table class="noborder centpercent dragable-container param-table" data-loader="default" data-btn="savebtn-2">';
+        ?>
+        <script>
+        $(document).ready(function(){
+            $(".config-move-line").css("background-image",'url(<?php echo DOL_URL_ROOT.'/theme/'.$conf->theme.'/img/grip.png'; ?>)');
+            $(".config-move-line").css("background-repeat","no-repeat");
+            $(".config-move-line").css("background-position","center center");
+        });
+        </script>
+        <?php
         print '<tr class="liste_titre">';
         print '<td>' . $langs->trans('Parameters') . '</td>';
         print '<td class="center">' . $langs->transnoentities('Visible') . '</td>';
         print '<td class="center">' . $langs->transnoentities('Required') . '</td>';
+        print '<td></td>';
         print '</tr>';
 
         $keysWithValueOn = [];
@@ -352,7 +364,9 @@ if (getDolGlobalInt('DIGIRISKDOLIBARR_TICKET_ENABLE_PUBLIC_INTERFACE')) {
                     print $form->textwithtooltip($langs->transnoentities('Inherited'), $langs->transnoentities('PermissionInheritedFromConfig'));
                 }
             }
-            print '</td></tr>';
+            print '</td>';
+            print '<td class="config-move-line">';
+            print '</tr>';
         }
 
         print '</table>';
@@ -360,7 +374,9 @@ if (getDolGlobalInt('DIGIRISKDOLIBARR_TICKET_ENABLE_PUBLIC_INTERFACE')) {
 }
 
 print '</table>';
-print $form->buttonsSaveCancel('Save', '');
+print '<div class="center" bis_skin_checked="1">';
+print '<input type="submit" class="button button-save savebtn-2" name="save" value="' . $langs->trans('Save') . '" disabled>';
+print '<div>';
 print '</form>';
 print '</div>';
 
