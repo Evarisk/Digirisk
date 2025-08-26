@@ -68,6 +68,11 @@ function digiriskdolibarr_admin_prepare_head(): array
     $head[$h][2] = 'ticket';
     $h++;
 
+    $head[$h][0] = dol_buildpath('/digiriskdolibarr/admin/config/digiai.php', 1);
+    $head[$h][1] = $conf->browser->layout != 'phone' ? '<i class="fa fa-magic pictofixedwidth"></i>' . $langs->trans('DigiAI') : '<i class="fas fa-magic"></i>';
+    $head[$h][2] = 'digiai';
+    $h++;
+
     $head[$h][0] = dol_buildpath('/digiriskdolibarr/admin/event.php', 1);
     $head[$h][1] = $conf->browser->layout != 'phone' ? '<i class="fas fa-calendar-alt pictofixedwidth"></i>' . $langs->trans('Events') : '<i class="fas fa-calendar-alt"></i>';
     $head[$h][2] = 'event';
