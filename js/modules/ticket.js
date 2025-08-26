@@ -178,8 +178,6 @@ window.digiriskdolibarr.ticket.addSignature = function() {
  */
 window.digiriskdolibarr.ticket.tmpStockFile = function( ) {
 	
-	console.log('tmpStockFile');
-
 	event.preventDefault()
 
 	let files = $('#sendfile').prop('files');
