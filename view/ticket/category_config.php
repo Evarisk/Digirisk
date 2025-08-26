@@ -264,7 +264,7 @@ if (getDolGlobalInt('DIGIRISKDOLIBARR_TICKET_ENABLE_PUBLIC_INTERFACE')) {
     if (dolibarr_get_const($db, 'DIGIRISKDOLIBARR_TICKET_EXTRAFIELDS', 0)) {
         print load_fiche_titre($langs->transnoentities('PublicInterfaceConfiguration'), $link, '');
 
-        print '<table class="noborder centpercent dragable-container param-table" data-loader="default" data-success-message="' . $langs->transnoentities('SavedConfig') . '" data-btn="savebtn-2">';
+        print '<table class="noborder centpercent dragable-container param-table" data-loader="default" data-success-message="' . $langs->transnoentities('SavedConfig') . '" data-error-message="' . $langs->transnoentities('Error') . '" data-btn="savebtn-2">';
         ?>
         <script>
         $(document).ready(function(){
