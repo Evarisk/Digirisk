@@ -1284,6 +1284,8 @@ TaskHideBudgetInDocumentDescription      = Masquer le budget de la tâche dans l
 # Data - Donnée
 WelcomeToDigiAI = Bienvenue sur DigiAI
 UploadAnImage = Téléverser une image
+OpenAIApiKey = Clé API OpenAI
+OpenAIApiKeyDescription = Pour utiliser DigiAI, vous devez disposer d'une clé API OpenAI. Vous pouvez en obtenir une en créant un compte sur <a href="https://platform.openai.com/signup" target="_blank">https://platform.openai.com/signup</a>. Une fois inscrit, vous pourrez générer une clé API dans la section "API Keys" de votre tableau de bord.
 
 #
 # Ticket - Interface publique ticket
@@ -1619,3 +1621,4 @@ CategorieManagement                 = Gestion des catégories
 ShowSelectedRiskTypes               = Sélectionnez les types de risques à afficher
 CharRemaining                       = Caractères restants
 NumberOfLinkedFiles                 = Nombre de fichiers joints
+ChooseAnImage                       = Choisir une image
