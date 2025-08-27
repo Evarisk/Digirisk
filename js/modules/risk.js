@@ -285,7 +285,7 @@ window.digiriskdolibarr.risk.saveRisk = function ( event ) {
 				$('.risk-row-content-' + editedRiskId).find('.risk-description-'+editedRiskId).fadeIn(800);
 			} else {
 				$('.risk-row-content-'+editedRiskId).fadeOut(800, function () {
-					$('.fichecenter .opacitymedium.colorblack.paddingleft').html($(resp).find('#searchFormListRisks .opacitymedium.colorblack.paddingleft'))
+					$('.risklist').replaceWith($(resp).find('.risklist'))
 				});
 			}
 
