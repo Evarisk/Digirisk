@@ -243,7 +243,7 @@ function display_recurse_tree($digiriskElementTree)
 				<?php if ($element['object']->id == $conf->global->DIGIRISKDOLIBARR_DIGIRISKELEMENT_TRASH) : ?>
 				<hr>
 				<?php endif; ?>
-			<li class="unit type-<?php echo $element['object']->element_type; ?>" id="unit<?php  echo $element['object']->id; ?>">
+			<li class="unit type-<?php echo $element['object']->element_type; ?>" id="unit<?php  echo $element['object']->id; ?>" data-object-id="<?php  echo $element['object']->id; ?>">
 				<div class="unit-container">
 					<?php if ($element['object']->element_type == 'groupment' && count($element['children'])) { ?>
 					<div class="toggle-unit">

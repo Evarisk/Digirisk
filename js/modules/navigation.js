@@ -30,51 +30,10 @@ window.digiriskdolibarr.navigation.init = function() {
  */
 window.digiriskdolibarr.navigation.event = function() {
 	// Main Menu Digirisk Society
-	$( document ).on( 'click', '.toggle-unit', window.digiriskdolibarr.navigation.switchToggle );
 	$( document ).on( 'click', '.digirisk-wrap .navigation-container .toolbar div', window.digiriskdolibarr.navigation.toggleAll );
 	$( document ).on( 'click', '#slider', window.digiriskdolibarr.navigation.setUnitActive );
 	$( document ).on( 'click', '.side-nav-responsive', window.digiriskdolibarr.navigation.toggleMobileNav );
 	$( document ).on( 'click', '.save-organization', window.digiriskdolibarr.navigation.saveOrganization );
-};
-
-/**
- * Gestion du toggle dans la navigation.
- *
- * @since   1.0.0
- * @version 1.0.0
- *
- * @param  {MouseEvent} event Les attributs lors du clic.
- * @return {void}
- */
-window.digiriskdolibarr.navigation.switchToggle = function( event ) {
-
-	var MENU = localStorage.menu
-	if (MENU == null || MENU == '') {
-		MENU = new Set()
-	} else {
-		MENU = JSON.parse(MENU)
-		MENU = new Set(MENU)
-	}
-
-	if ( $( this ).find( '.toggle-icon' ).hasClass( 'fa-chevron-down' ) ) {
-
-		$(this).find( '.toggle-icon' ).removeClass('fa-chevron-down').addClass('fa-chevron-right');
-		var idUnToggled = $(this).closest('.unit').attr('id').split('unit')[1]
-		$(this).closest('.unit').removeClass('toggled');
-
-		MENU.delete(idUnToggled)
-		localStorage.setItem('menu',  JSON.stringify(Array.from(MENU.keys())))
-
-	} else if ( $( this ).find( '.toggle-icon' ).hasClass( 'fa-chevron-right' ) ){
-
-		$(this).find( '.toggle-icon' ).removeClass('fa-chevron-right').addClass('fa-chevron-down');
-		$(this).closest('.unit').addClass('toggled');
-
-		var idToggled = $(this).closest('.unit').attr('id').split('unit')[1]
-		MENU.add(idToggled)
-		localStorage.setItem('menu',  JSON.stringify(Array.from(MENU.keys())))
-	}
-
 };
 
 /**
