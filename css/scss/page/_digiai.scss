@@ -47,7 +47,7 @@
 .digiAI-input-file {
   display: none; /* Input invisible, cliquable via la zone */
 }
-.wpeo-modal {
+#digiai_modal .wpeo-modal {
   display: block;
   position: fixed;
   z-index: 9999;
@@ -60,7 +60,7 @@
   padding: 30px 10px;
 }
 
-.modal-container {
+#digiai_modal .modal-container {
   background: #fefefe;
   border-radius: 12px;
   padding: 30px;
@@ -71,7 +71,7 @@
   animation: fadeIn 0.3s ease-in-out;
 }
 
-.modal-header {
+#digiai_modal .modal-header {
   display: flex;
   justify-content: space-between;
   align-items: center;
@@ -79,7 +79,7 @@
   margin-bottom: 20px;
 }
 
-.modal-header h2 {
+#digiai_modal .modal-header h2 {
   font-size: 1.5em;
   color: #2d3436;
   margin: 0;
