@@ -40,7 +40,7 @@ require_once __DIR__ . '/../../class/digiriskstandard.class.php';
 require_once __DIR__ . '/../../lib/digiriskdolibarr_digiriskelement.lib.php';
 require_once __DIR__ . '/../../lib/digiriskdolibarr_function.lib.php';
 
-global $conf, $db, $hookmanager, $langs, $user;
+global $conf, $db, $hookmanager, $langs, $moduleNameLowerCase, $user;
 
 saturne_load_langs(['other']);
 
@@ -145,28 +145,11 @@ if ($object->id > 0) {
 
     print '<div class="digiAI-tabs-container">';
     print '<div class="digiAI-tabs">';
-    print '<button class="digiAI-tab-button active" data-tab="image-tab"><i class="fas fa-image"></i>'. $langs->trans('ImageAnalysis') .'</button>';
-    print '<button class="digiAI-tab-button" data-tab="text-tab"><i class="fas fa-keyboard"></i>'. $langs->trans('TextAnalysis') .'</button>';
+    print '<button class="digiAI-tab-button active" data-tab="text-tab"><i class="fas fa-keyboard"></i>'. $langs->trans('TextAnalysis') .'</button>';
+    print '<button class="digiAI-tab-button" data-tab="image-tab"><i class="fas fa-image"></i>'. $langs->trans('ImageAnalysis') .'</button>';
     print '</div>';
 
-    print '<div id="image-tab" class="digiAI-tab-content active">';
-    print '<div class="digiAI-upload-container-full">';
-    print '<form method="POST" enctype="multipart/form-data" action="' . $_SERVER["PHP_SELF"] . '?id='. $id .'" name="upload_image_form" id="upload_image_form" class="digiAI-form">' . "\n";
-    print '<input type="hidden" name="token" value="' . newToken() . '">';
-    print '<input type="hidden" name="action" value="upload_image">';
-    print '<input type="hidden" name="id" id="digiriskElementId" value="' . $id . '">';
-
-    print '<div class="digiAI-dropzone" id="dropzone" onclick="document.getElementById(\'image_file\').click();">';
-    print '<i class="fas fa-cloud-upload-alt"></i>';
-    print '<p>' . $langs->trans('UploadAnImage') . '</p>';
-    print '<input type="file" name="image_file" id="image_file" accept="image/*" class="digiAI-input-file">';
-    print '</div>';
-
-    print '</form>';
-    print '</div>';
-    print '</div>';
-
-    print '<div id="text-tab" class="digiAI-tab-content">';
+    print '<div id="text-tab" class="digiAI-tab-content active">';
     print '<div class="digiAI-text-container-full">';
     print '<form method="POST" action="' . $_SERVER["PHP_SELF"] . '?id='. $id .'" name="analyze_text_form" id="analyze_text_form" class="digiAI-form">' . "\n";
     print '<input type="hidden" name="token" value="' . newToken() . '">';
@@ -180,8 +163,28 @@ if ($object->id > 0) {
 
     print '<div class="digiAI-text-submit">';
     print '<button type="submit" class="digiAI-analyze-button" id="analyze_text_button">';
-    print '<i class="fas fa-brain"></i> ' . $langs->trans('AnalyzeText');
+    print $langs->trans('AnalyzeText');
     print '</button>';
+    print '</div>';
+
+    print '</form>';
+    print '</div>';
+    print '</div>';
+
+    print '<div id="image-tab" class="digiAI-tab-content">';
+    print '<div class="digiAI-upload-container-full">';
+    print '<form method="POST" enctype="multipart/form-data" action="' . $_SERVER["PHP_SELF"] . '?id='. $id .'" name="upload_image_form" id="upload_image_form" class="digiAI-form">' . "\n";
+    print '<input type="hidden" name="token" value="' . newToken() . '">';
+    print '<input type="hidden" name="action" value="upload_image">';
+    print '<input type="hidden" name="id" id="digiriskElementId" value="' . $id . '">';
+
+    print '<div class="digiAI-dropzone modal-open open-analyze-image-modal" id="dropzone">';
+    print '<div class="modal-options" data-modal-to-open="media_gallery" data-from-id="' . $id . '" data-from-type="digiAi" data-from-subtype="photo" data-from-subdir="photos" data-from-module="digiriskdolibarr"></div>';
+    $pathToECMImg = $conf->ecm->multidir_output[$conf->entity] . '/'. $moduleNameLowerCase .'/medias';
+    print '<input hidden class="modal-file-path" value="'. $pathToECMImg.'">';
+    print '<i class="fas fa-images"></i>';
+    print '<p>' . $langs->trans('ChooseAnImage') . '</p>';
+    print '<input type="file" name="image_file" id="image_file" accept="image/*" class="digiAI-input-file" style="display: none;">';
     print '</div>';
 
     print '</form>';
@@ -246,6 +249,14 @@ if ($object->id > 0) {
     print '<input hidden id="dol_url_root" value="'. DOL_URL_ROOT .'">';
     print dol_get_fiche_end();
     $json = file_get_contents(DOL_DOCUMENT_ROOT . '/custom/digiriskdolibarr/js/json/dangerCategories.json');
+
+    // Inclusion de la bibliothèque de médias Saturne
+    $moduleNameLowerCase = 'digiriskdolibarr';
+    $moduleName = 'DigiriskDolibarr';
+    $moduleNameUpperCase = 'DIGIRISKDOLIBARR';
+    if (file_exists(DOL_DOCUMENT_ROOT . '/custom/saturne/core/tpl/medias/medias_gallery_modal.tpl.php')) {
+        include DOL_DOCUMENT_ROOT . '/custom/saturne/core/tpl/medias/medias_gallery_modal.tpl.php';
+    }
 
     ?>
     <script>

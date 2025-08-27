@@ -54,6 +54,7 @@ if (file_exists('../../digiriskdolibarr.main.inc.php')) {
 
 // Load Dolibarr libraries
 require_once DOL_DOCUMENT_ROOT . '/ticket/class/ticket.class.php';
+require_once DOL_DOCUMENT_ROOT . '/categories/class/categorie.class.php';
 
 // Global variables definitions
 global $conf, $db, $hookmanager, $langs;
@@ -66,11 +67,43 @@ $trackID = GETPOST('track_id', 'alpha');
 
 // Initialize technical objects
 $object = new Ticket($db);
+$category = new Categorie($db);
 
 $hookmanager->initHooks(['publicticket', 'saturnepublicinterface']); // Note that conf->hooks_modules contains array
 
 // Load object
 $object->fetch(0, '', $trackID);
+$categories = $category->containing($object->id, $object->element);
+
+$childrenMap = [];
+$idMap       = [];
+foreach ($categories as $cat) {
+    $childrenMap[$cat->fk_parent][] = $cat;
+    $idMap[$cat->id]                = $cat;
+}
+$path    = [];
+$current = $idMap[$conf->global->DIGIRISKDOLIBARR_TICKET_MAIN_CATEGORY] ?? null;
+while ($current) {
+    $path[] = $current->id;
+
+    if (isset($childrenMap[$current->id])) {
+        $current = $childrenMap[$current->id][0];
+    } else {
+        break;
+    }
+}
+$successMessage = $langs->transnoentities('YouMustNotifyYourHierarchy');
+foreach ($path as $catId) {
+    $cat    = $idMap[$catId];
+    $config = json_decode($cat->array_options['options_ticket_category_config'], true) ?? [];
+    if (!empty($config['success_message'])) {
+        $successMessage = $config['success_message'];
+    }
+}
+
+$substitutionArray = getCommonSubstitutionArray($langs, 0, null, $object);
+complete_substitutions_array($substitutionArray, $langs, $object);
+$ticketSuccessMessage = make_substitutions($successMessage, $substitutionArray);
 
 /*
  * View
@@ -88,19 +121,15 @@ if (!getDolGlobalInt('DIGIRISKDOLIBARR_TICKET_ENABLE_PUBLIC_INTERFACE')) {
     exit;
 }
 
-$substitutionArray = getCommonSubstitutionArray($langs, 0, null, $object);
-complete_substitutions_array($substitutionArray, $langs, $object);
-$ticketSuccessMessage = make_substitutions($langs->transnoentities(getDolGlobalString('DIGIRISKDOLIBARR_TICKET_SUCCESS_MESSAGE')), $substitutionArray);
-
 ?>
 <div class="public-card__container" data-public-interface="true">
     <div class="public-card__header">
         <div class="header-information center">
             <div class="left"><a href="<?php echo dol_buildpath('/custom/digiriskdolibarr/public/ticket/create_ticket.php?entity=' . $conf->entity, 1); ?>" class="information-back"><i class="fas fa-sm fa-chevron-left paddingright"></i><?php echo $langs->trans('Back'); ?></a></div>
             <div class="information-title"><?php echo $langs->trans('TicketSuccess') . ' <b>' . $object->ref . '</b>'; ?></div>
-            <span class="wpeo-notice notice-warning left" style="margin-left: 16%; width: 70%; border-left: solid red 6px; color: red; background: rgba(255, 0, 0, 0.05);">
+            <span class="wpeo-notice notice-info left" style="margin-left: 16%; width: 70%">
                 <span class="notice-content">
-                    <span class="notice-subtitle" style="color: red"><?php echo $langs->transnoentities($ticketSuccessMessage) ?: $langs->transnoentities('YouMustNotifyYourHierarchy'); ?></span>
+                    <span class="notice-subtitle"><?php echo $langs->transnoentities($ticketSuccessMessage); ?></span>
                 </span>
             </span>
         </div>

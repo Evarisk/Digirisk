@@ -1284,6 +1284,8 @@ TaskHideBudgetInDocumentDescription      = Masquer le budget de la tâche dans l
 # Data - Donnée
 WelcomeToDigiAI = Bienvenue sur DigiAI
 UploadAnImage = Téléverser une image
+OpenAIApiKey = Clé API OpenAI
+OpenAIApiKeyDescription = Pour utiliser DigiAI, vous devez disposer d'une clé API OpenAI. Vous pouvez en obtenir une en créant un compte sur <a href="https://platform.openai.com/signup" target="_blank">https://platform.openai.com/signup</a>. Une fois inscrit, vous pourrez générer une clé API dans la section "API Keys" de votre tableau de bord.
 
 #
 # Ticket - Interface publique ticket
@@ -1390,9 +1392,14 @@ TicketCategoriesNotCreated               = Vous n'avez pas créé de catégories
 TicketPublicInterfaceQRCode              = QR Code de l'interface publique des tickets
 MultiEntityTicketPublicInterfaceQRCode   = QR Code de l'interface publique des tickets multi-société
 PublicInterfaceConfiguration             = Champs visibles / requis de l'interface publique
-ExternalLinkDescription                  = Utiliser la catégorie de ticket avec un lien externe
-ExternalLinkInNewTab                     = Lien externe dans un nouvel onglet
+
+PublicInterfaceUseSignatory              = Demande de signature pour la déclaration du registre
 ValidateText                             = Conditions à accepter pour la signature
+TicketPublicInterfaceShowCategory        = Afficher la descritpion de la catégorie
+EmailTemplate                            = Modèle d'e-mail
+EmailTemplateDescription                 = Modèle d'e-mail
+
+OpenInNewTab                             = Ouvrir dans un nouvel onglet
 TicketDigiriskElementRequired            = GP/UT obligatoire pour créer un ticket
 TicketDigiriskElementRequiredHelp        = Activer cette option pour rendre obligatoire la selection d'un GP/UT pour créer un ticket dans l'interface publique
 TicketDigiriskElementHideRef             = Cacher la référence des GP/UT dans le sélecteur de service l'interface publique
@@ -1492,7 +1499,6 @@ ticketdocument_custom.odt      = Fiche personnalisée du ticket
 ticketdocument_events.odt      = Fiche du ticket avec événements
 ticketdocument_sign.odt        = Fiche du ticket avec signature
 ticketdocument_event_sign.odt  = Fiche du ticket avec événement et signature
-TicketSuccessMessageData       = Message du ticket
 TicketSuccessMessage           = Message de succès du ticket
 TicketSuccessMessageSet        = Le message a bien été modifié
 
@@ -1615,3 +1621,4 @@ CategorieManagement                 = Gestion des catégories
 ShowSelectedRiskTypes               = Sélectionnez les types de risques à afficher
 CharRemaining                       = Caractères restants
 NumberOfLinkedFiles                 = Nombre de fichiers joints
+ChooseAnImage                       = Choisir une image
