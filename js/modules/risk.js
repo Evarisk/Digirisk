@@ -1,4 +1,3 @@
-
 /**
  * Initialise l'objet "risk" ainsi que la méthode "init" obligatoire pour la bibliothèque DigiriskDolibarr.
  *
@@ -33,6 +32,7 @@ window.digiriskdolibarr.risk.event = function() {
 	$( document ).on( 'click', '.risk-save', window.digiriskdolibarr.risk.saveRisk );
 	$( document ).on( 'click', '.risk-unlink-shared', window.digiriskdolibarr.risk.unlinkSharedRisk );
 	$( document ).on( 'click', 'div[aria-describedby="dialog-confirm-actionButtonImportSharedRisks"] .ui-button.ui-corner-all.ui-widget', window.digiriskdolibarr.risk.sharedRiskBoxLoader );
+	$( document ).on( 'input', '.evaluation-comment-textarea', window.digiriskdolibarr.risk.evaluationCommentChange );
 };
 
 /**
@@ -285,7 +285,7 @@ window.digiriskdolibarr.risk.saveRisk = function ( event ) {
 				$('.risk-row-content-' + editedRiskId).find('.risk-description-'+editedRiskId).fadeIn(800);
 			} else {
 				$('.risk-row-content-'+editedRiskId).fadeOut(800, function () {
-					$('.fichecenter .opacitymedium.colorblack.paddingleft').html($(resp).find('#searchFormListRisks .opacitymedium.colorblack.paddingleft'))
+					$('.risklist').replaceWith($(resp).find('.risklist'))
 				});
 			}
 
@@ -382,3 +382,29 @@ window.digiriskdolibarr.risk.sharedRiskBoxLoader = function ( event ) {
 		window.saturne.loader.display($('#searchFormSharedListRisks'))
 	}
 };
+
+/**
+ * Action evaluation comment change.
+ *
+ * @since   20.0.2
+ * @version 20.0.2
+ *
+ * @return {void}
+ */
+window.digiriskdolibarr.risk.evaluationCommentChange = function ( event ) {
+    const textarea       = $(this);
+    const maxLength      = textarea.data('maxlength') || 65535;
+    const currentLength  = textarea.val().length;
+    const remainingChars = maxLength - currentLength;
+    
+    const commentContainer = textarea.closest('.risk-evaluation-comment');
+    const titleSpan        = commentContainer.find('.title');
+    
+    titleSpan.find('.char-counter').text(remainingChars);
+    
+    if (remainingChars < maxLength * 0.2) {
+        titleSpan.find('.char-counter').addClass('text-warning');
+    } else {
+        titleSpan.find('.char-counter').removeClass('text-warning');
+    }
+}

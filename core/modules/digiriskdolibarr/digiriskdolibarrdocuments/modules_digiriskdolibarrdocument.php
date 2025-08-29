@@ -67,14 +67,14 @@ abstract class ModeleODTDigiriskDolibarrDocument extends SaturneDocumentModel
             if (empty($digiriskElements) || empty($riskByRiskAssessmentLevels) || empty($riskByRiskAssessmentLevels[$riskAssessmentLevel])) {
                 $tmpArray['digiriskElementLabel']   = '';
                 $tmpArray['picto']                  = '';
-                $tmpArray['riskCategoryName']       = '';
-                $tmpArray['ref']                    = '';
-                $tmpArray['riskAssessmentCotation'] = '';
-                $tmpArray['description']            = $outputLangs->trans('NoDescriptionThere');
-                $tmpArray['riskAssessmentComment']  = $outputLangs->trans('NoRiskThere');
-                $tmpArray['riskTaskUncompleted']    = $outputLangs->trans('NoTaskUnCompletedThere');
-                $tmpArray['riskTaskCompleted']      = $outputLangs->trans('NoTaskCompletedThere');
-                $tmpArray['riskAssessment_photo']   = $outputLangs->transnoentities('NoFileLinked');
+                $tmpArray['riskCategoryName']       = '-';
+                $tmpArray['ref']                    = '-';
+                $tmpArray['riskAssessmentCotation'] = '-';
+                $tmpArray['description']            = '-';
+                $tmpArray['riskAssessmentComment']  = '-';
+                $tmpArray['riskTaskUncompleted']    = '-';
+                $tmpArray['riskTaskCompleted']      = '-';
+                $tmpArray['riskAssessment_photo']   = '-';
 
                 SaturneDocumentModel::setTmpArrayVars($tmpArray, $listLines, $outputLangs);
                 $odfHandler->mergeSegment($listLines);
@@ -187,13 +187,15 @@ abstract class ModeleODTDigiriskDolibarrDocument extends SaturneDocumentModel
                 }
             }
 
-            $riskTaskTypes = ['Uncompleted'];
+            $riskTaskTypes = [];
             if ($riskTaskProgress == 100) {
                 if (!getDolGlobalInt('DIGIRISKDOLIBARR_WORKUNITDOCUMENT_SHOW_TASK_DONE')) {
                     $array['riskTaskCompleted'] = $outputLangs->transnoentities('ActionPreventionCompletedTaskDone');
                 } else {
                     $riskTaskTypes[] = 'Completed';
                 }
+            } else {
+                $riskTaskTypes[] = 'Uncompleted';
             }
             foreach ($riskTaskTypes as $riskTaskType) {
                 $array['riskTask' . $riskTaskType] .= $outputLangs->transnoentities('Label') . ' : ' . $riskTask->label . '<br>';
@@ -484,11 +486,13 @@ abstract class ModeleODTDigiriskDolibarrDocument extends SaturneDocumentModel
             $risk     = new Risk($this->db);
             $accident = new Accident($this->db);
 
-            $loadRiskInfos      = $risk->loadRiskInfos($moreParam);
-            $loadRiskSignInfos  = RiskSign::loadRiskSignInfos($moreParam);
-            $loadEvaluatorInfos = Evaluator::loadEvaluatorInfos($moreParam);
-            $loadAccidentInfos  = $accident->loadAccidentInfos($moreParam);
-            $loadTicketInfos    = load_ticket_infos($moreParam);
+            $loadRiskInfos     = $risk->loadRiskInfos($moreParam);
+            $loadRiskSignInfos = RiskSign::loadRiskSignInfos($moreParam);
+            $loadAccidentInfos = $accident->loadAccidentInfos($moreParam);
+            $loadTicketInfos   = load_ticket_infos($moreParam);
+
+            $moreParam['filter'] = ''; // Need because Evaluator don't have fk_element @todo rework fk_parent in fk_element
+            $loadEvaluatorInfos  = Evaluator::loadEvaluatorInfos($moreParam);
 
             if (!isset($moreParam['digiriskElements'])) {
                 $digiriskElements[$moreParam['object']->id]['object'] = $moreParam['object'];

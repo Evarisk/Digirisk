@@ -95,13 +95,14 @@ window.digiriskdolibarr.riskassessmenttask.createRiskAssessmentTask = function (
 	let taskText = single.find('.riskassessment-task-label').val()
 	taskText     = window.digiriskdolibarr.risk.sanitizeBeforeRequest(taskText)
 
-	let dateStart = single.find('#RiskassessmentTaskDateStart' + riskToAssign).val();
-	let hourStart = single.find('#RiskassessmentTaskDateStart' + riskToAssign + 'hour').val();
-	let minStart  = single.find('#RiskassessmentTaskDateStart' + riskToAssign + 'min').val();
-	let dateEnd   = single.find('#RiskassessmentTaskDateEnd' + riskToAssign).val();
-	let hourEnd   = single.find('#RiskassessmentTaskDateEnd' + riskToAssign + 'hour').val();
-	let minEnd    = single.find('#RiskassessmentTaskDateEnd' + riskToAssign + 'min').val();
-	let budget    = single.find('.riskassessment-task-budget').val()
+	let dateStart  = single.find('#RiskassessmentTaskDateStart' + riskToAssign).val();
+	let hourStart  = single.find('#RiskassessmentTaskDateStart' + riskToAssign + 'hour').val();
+	let minStart   = single.find('#RiskassessmentTaskDateStart' + riskToAssign + 'min').val();
+	let dateEnd    = single.find('#RiskassessmentTaskDateEnd' + riskToAssign).val();
+	let hourEnd    = single.find('#RiskassessmentTaskDateEnd' + riskToAssign + 'hour').val();
+	let minEnd     = single.find('#RiskassessmentTaskDateEnd' + riskToAssign + 'min').val();
+	let budget     = single.find('.riskassessment-task-budget').val();
+  let executiveId= single.find('.executiveSelect').val();
 
 	window.saturne.loader.display($(this));
 	window.saturne.loader.display($('.riskassessment-tasks' + riskToAssign));
@@ -119,6 +120,7 @@ window.digiriskdolibarr.riskassessmenttask.createRiskAssessmentTask = function (
 			minEnd: minEnd,
 			budget: budget,
 			riskToAssign: riskToAssign,
+      executiveId: executiveId,
 		}),
 		processData: false,
 		contentType: false,

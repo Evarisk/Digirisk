@@ -86,6 +86,7 @@ class Risk extends SaturneObject
         'import_key'    => ['type' => 'varchar(14)',  'label' => 'ImportId',         'enabled' => 1, 'position' => 60, 'notnull' => -1, 'visible' => -2],
         'status'        => ['type' => 'smallint',     'label' => 'Status',           'enabled' => 1, 'position' => 70, 'notnull' => 0,  'visible' => -2],
         'category'      => ['type' => 'integer',      'label' => 'RiskCategory',     'enabled' => 1, 'position' => 80, 'notnull' => 0,  'visible' => 1, 'csslist' => 'risk-category'],
+        'sub_category'  => ['type' => 'integer',      'label' => 'SubCategory',      'enabled' => 1, 'position' => 85, 'notnull' => 0, 'visible' => 0],
         'description'   => ['type' => 'text',         'label' => 'Description',      'enabled' => 'getDolGlobalInt("DIGIRISKDOLIBARR_RISK_DESCRIPTION")', 'position' => 90, 'notnull' => 0, 'visible' => '$conf->global->DIGIRISKDOLIBARR_RISK_DESCRIPTION', 'csslist' => 'risk-description'],
         'type'          => ['type' => 'varchar(255)', 'label' => 'Type',             'enabled' => 1, 'position' => 100, 'notnull' => 1,  'visible' => 0, 'default' => '(PROV)'],
         'fk_user_creat' => ['type' => 'integer:User:user/class/user.class.php',                                   'label' => 'UserAuthor',    'enabled' => 1, 'position' => 110, 'notnull' => 1,  'visible' => -2, 'foreignkey' => 'user.rowid'],
@@ -105,6 +106,7 @@ class Risk extends SaturneObject
 	public $import_key;
 	public $status;
 	public $category;
+    public $sub_category;
 	public $description;
     public $type = 'risk';
 	public $fk_user_creat;
@@ -212,12 +214,16 @@ class Risk extends SaturneObject
             $array['current']['risks']                         = [];
             $array['current']['riskByRiskAssessmentCotations'] = [];
             $array['current']['riskByCategories']              = [];
+            $array['current']['riskBySubCategories']           = [];
+            $array['current']['psychosocialRisksByGPUT']       = [];
             $array['current']['riskByRiskAssessmentLevels']    = [];
         }
 
         if (empty($moreParam['tmparray']['showSharedRisk_nocheck'])) {
             $array['shared']['risks']                         = [];
             $array['shared']['riskByCategories']              = [];
+            $array['shared']['riskBySubCategories']           = [];
+            $array['shared']['psychosocialRisksByGPUT']       = [];
             $array['shared']['riskByRiskAssessmentCotations'] = [];
             $array['shared']['riskByRiskAssessmentLevels']    = [];
         }
@@ -227,22 +233,28 @@ class Risk extends SaturneObject
             if (!is_array($array['shared']['risks']) || empty($array['shared']['risks'])) {
                 $array['shared']['risks']                          = [];
                 $array['shared']['riskByCategories']               = [];
+                $array['shared']['riskBySubCategories']            = [];
+                $array['shared']['psychosocialRisksByGPUT']       = [];
                 $array['shared']['riskByRiskAssessmentCotations']  = [];
                 $array['shared']['riskByRiskAssessmentLevels']     = [];
             }
         }
 
         $array['risks'] = array_merge($array['current']['risks'], $array['shared']['risks']);
-
         $nbTotalRisks = ['current' => 0,'shared' => 0];
+
         foreach ($array['risks'] as $risk) {
             $riskAssessment->cotation = $risk->riskAssessmentCotation;
-            $entity                   = ($risk->entity == $conf->entity) ? 'current' : 'shared';
+            $entity                   = ($risk->entity == $conf->entity || (!isModEnabled('multicompany') && empty($risk->entity))) ? 'current' : 'shared';
 
             $array[$entity]['riskByRiskAssessmentLevels'][$riskAssessment->getEvaluationScale()][] = $risk;
             $array[$entity]['riskByRiskAssessmentCotations'][$risk->fk_element]['totalRiskAssessmentCotations'] += $risk->riskAssessmentCotation;
             $array[$entity]['riskByRiskAssessmentCotations'][$risk->fk_element][$riskAssessment->getEvaluationScale()]++;
+            if ($risk->sub_category >= 0) {
+                $array[$entity]['psychosocialRisksByGPUT'][$risk->fk_element][$risk->sub_category][$risk->riskAssessmentDate] = $riskAssessment->cotation;
+            }
             $array[$entity]['riskByCategories'][$risk->category][$riskAssessment->getEvaluationScale()]++;
+            $array[$entity]['riskBySubCategories'][$risk->sub_category][$riskAssessment->getEvaluationScale()]++;
             $array['riskByEntities'][$risk->entity]['nbTotalRisks']++;
             $array['riskByEntities'][$risk->entity][$riskAssessment->getEvaluationScale()]++;
             $nbTotalRisks[$entity]++;
@@ -487,7 +499,32 @@ class Risk extends SaturneObject
         return $riskCategories[0][$riskType];
     }
 
-	/**
+
+    /**
+     * Get risk sub categories from the JSON file
+     *
+     * @param string $riskType Subtype of risk
+     * @return array           Array of risk sub categories, or empty array on failure
+     */
+    public static function getDangerSubCategories(): array
+    {
+        $filePath = DOL_DOCUMENT_ROOT . '/custom/digiriskdolibarr/js/json/dangerSubCategories.json';
+
+        if (!file_exists($filePath)) {
+            return [];
+        }
+
+        $jsonContent    = file_get_contents($filePath);
+        $riskSubCategories = json_decode($jsonContent, true);
+
+        if (!isset($riskSubCategories[0]) || !is_array($riskSubCategories[0])) {
+            return [];
+        }
+        return $riskSubCategories[0];
+    }
+
+
+    /**
 	 * Get danger category picto path
 	 *
 	 * @param         $object
@@ -524,6 +561,45 @@ class Risk extends SaturneObject
 
 		return -1;
 	}
+
+    /**
+     * Get danger sub category name
+     *
+     * @param  int    $position
+     *
+     */
+    public function getDangerSubCategoryName($mainCategory, $position) {
+        $subCategories = static::getDangerSubCategories();
+        if (!isset($subCategories[$mainCategory]) || !is_array($subCategories[$mainCategory])) {
+            return -1;
+        }
+        foreach ($subCategories[$mainCategory] as $subCategory) {
+            if ($subCategory['position'] == $position) {
+                return $subCategory['label'];
+            }
+        }
+
+        return -1;
+    }
+
+    /**
+     * Get danger sub category scale label
+     *
+     * @param $scale
+     * @return mixed
+     */
+    public function getDangerSubCategoryScaleLabel($scale) {
+        global $langs;
+        if ($scale < 48) {
+            return $langs->trans('Weak');
+        } elseif ($scale < 51) {
+            return $langs->trans('Moderate');
+        } elseif ($scale < 80) {
+            return $langs->trans('High');
+        } else {
+            return $langs->trans('-');
+        }
+    }
 
 	/**
 	 * Get danger category picto name
@@ -1035,13 +1111,13 @@ class Risk extends SaturneObject
      * Get risk by danger categories and risk assessments
      *
      * @param array  $dangerCategories Danger categories datas
-     * @param string $filter          SQL Filter
-     * @param string $type            Risk type (risk, riskenvironmental or ...)
+     * @param string $type             Risk type (risk, riskenvironmental or ...)
+     * @param array  $moreParam        More param (filter)
      *
      * @return array
      * @throws Exception
      */
-    public function getRiskByDangerCategoriesAndRiskAssessments(array $dangerCategories, string $type = 'risk') : array
+    public function getRiskByDangerCategoriesAndRiskAssessments(array $dangerCategories, string $type = 'risk', array $moreParam = []) : array
     {
         global $conf;
 
@@ -1053,7 +1129,7 @@ class Risk extends SaturneObject
         $moreSelects = ['cotation'];
         $join        = ' INNER JOIN ' . MAIN_DB_PREFIX . $this->module . '_digiriskelement AS d ON d.rowid = t.fk_element';
         $join       .= ' LEFT JOIN ' . MAIN_DB_PREFIX . $this->module . '_riskassessment AS ra ON t.rowid = ra.fk_risk';
-        $filter      = 't.status = ' . self::STATUS_VALIDATED . ' AND t.entity = ' . $conf->entity . (GETPOSTISSET('id') ? ' AND t.fk_element = ' . GETPOSTINT('id') : '') . ' AND t.type = \'' . $this->db->escape($type) . '\' AND d.status = ' . DigiriskElement::STATUS_VALIDATED . ' AND ra.status = ' . RiskAssessment::STATUS_VALIDATED;
+        $filter      = 't.status = ' . self::STATUS_VALIDATED . ($moreParam['filterEntity'] ?? ' AND t.entity = ' . $conf->entity) . (GETPOSTISSET('id') ? ' AND t.fk_element = ' . GETPOSTINT('id') : '') . ' AND t.type = \'' . $this->db->escape($type) . '\' AND d.status = ' . DigiriskElement::STATUS_VALIDATED . ' AND ra.status = ' . RiskAssessment::STATUS_VALIDATED;
         $risks       = saturne_fetch_all_object_type('Risk', '', '', 0, 0, ['customsql' => $filter], 'AND', false, false, false, $join, [], $select, $moreSelects);
         if (!is_array($risks) || empty($risks)) {
             return $array;

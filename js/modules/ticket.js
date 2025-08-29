@@ -67,18 +67,16 @@ window.digiriskdolibarr.ticket.init = function() {
  * @returns {void} This method does not return a value.
  */
 window.digiriskdolibarr.ticket.event = function() {
-  $(document).on('click', '.ticket-parentCategory', function() {
-    window.digiriskdolibarr.ticket.handleCategorySelection({
-      clickedElement: this,
-      isSubCategory: false
-    });
+  $(document).on('click', '.ticket-parentCategory, .ticket-subCategory', function() {
+	if (!$(this).parent().hasClass('category-redirect')) {
+		window.digiriskdolibarr.ticket.handleCategorySelection({
+		  clickedElement: this,
+		  isSubCategory: $(this).hasClass('ticket-subCategory')
+		});
+	}
   });
-  $(document).on('click', '.ticket-subCategory', function() {
-    window.digiriskdolibarr.ticket.handleCategorySelection({
-      clickedElement: this,
-      isSubCategory: true
-    });
-  });
+
+
   $(document).on( 'click', '.public-ticket-validate', window.digiriskdolibarr.ticket.addSignature);
   $(document).on( 'submit', '#sendFile', window.digiriskdolibarr.ticket.tmpStockFile);
   $(document).on( 'click', '.linked-file-delete', window.digiriskdolibarr.ticket.removeFile);
@@ -86,6 +84,13 @@ window.digiriskdolibarr.ticket.event = function() {
   $(document).on( 'click', '.close-dashboard-info', window.digiriskdolibarr.ticket.closeDashBoardTicketInfo);
   $(document).on( 'keyup', '#email', window.digiriskdolibarr.ticket.checkValidEmail);
   $(document).on( 'keyup', '#options_digiriskdolibarr_ticket_phone', window.digiriskdolibarr.ticket.checkValidPhone);
+
+  $(document).on( 'change', '.param-table input, .param-table select, .param-table textarea', window.digiriskdolibarr.ticket.handleParamChange);
+  CKEDITOR.on('instanceReady', function(e) {
+	CKEDITOR.instances[e.editor.name].on('change', function() {
+		window.digiriskdolibarr.ticket.handleParamChange.call(this.container.$)
+	});
+ });
 };
 
 /**
@@ -172,9 +177,13 @@ window.digiriskdolibarr.ticket.addSignature = function() {
  * @return {void}
  */
 window.digiriskdolibarr.ticket.tmpStockFile = function( ) {
+	
 	event.preventDefault()
 
-	var files = $('#sendfile').prop('files');
+	let files = $('#sendfile').prop('files');
+	let parentCategory = $('#parentCategory').val();
+	let subCategory = $('#subCategory').val();
+
 
 	const formData = new FormData();
 	for (let i = 0; i < files.length; i++) {
@@ -190,7 +199,13 @@ window.digiriskdolibarr.ticket.tmpStockFile = function( ) {
 		method: 'POST',
 		body: formData,
 	}).then((resp) => {
-		$('#sendFileForm').load(document.URL+ querySeparator + 'ticket_id='+ticket_id + ' #fileLinkedTable')
+
+		let errorMessage = $(resp).find('.file-error').val();
+		if (errorMessage) {
+			$.jnotify(errorMessage, 'error');
+		}
+
+		$('#sendFileForm').load(document.URL+ querySeparator + 'ticket_id='+ticket_id + '&parentCategory='+parentCategory + '&subCategory='+subCategory + ' #fileLinkedTable')
 	})
 };
 
@@ -315,4 +330,16 @@ window.digiriskdolibarr.ticket.checkValidPhone = function() {
 	} else {
 		$(this).css("border", "3px solid green");
 	}
+};
+
+/**
+ * Handle parameter change to enable save button
+ *
+ * @since   21.1.0
+ * @version 21.1.0
+ */
+window.digiriskdolibarr.ticket.handleParamChange = function() {
+	$table = $(this).closest('table');
+	$btn   = $('.'+$table.data('btn'));
+	$btn.prop('disabled', false);
 };

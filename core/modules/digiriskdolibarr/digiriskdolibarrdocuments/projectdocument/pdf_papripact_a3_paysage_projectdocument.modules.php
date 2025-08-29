@@ -17,9 +17,9 @@
  */
 
 /**
- *	\file       core/modules/digiriskdolibarr/digiriskdocuments/projectdocument/pdf_orque_projectdocument.modules.php
+ *	\file       core/modules/digiriskdolibarr/digiriskdocuments/projectdocument/pdf_papripact_a3_paysage_projectdocument.modules.php
  *	\ingroup    digiriskdolibarr
- *	\brief      File of class to generate project document orque
+ *	\brief      File of class to generate project document papripact_a3_paysage
  */
 
 require_once DOL_DOCUMENT_ROOT . '/core/modules/project/modules_project.php';
@@ -34,9 +34,9 @@ require_once __DIR__ . '/../../../../../class/riskanalysis/risk.class.php';
 require_once __DIR__ . '/../../../../../class/riskanalysis/riskassessment.class.php';
 
 /**
- *	Class to manage generation of project document Orque
+ *	Class to manage generation of project document papripact_a3_paysage
  */
-class pdf_orque_projectdocument
+class pdf_papripact_a3_paysage_projectdocument
 {
 	/**
 	 * @var DoliDb Database handler
@@ -109,7 +109,7 @@ class pdf_orque_projectdocument
 	 * Page orientation
 	 * @var string 'P' or 'Portait' (default), 'L' or 'Landscape'
 	 */
-	private $orientation = '';
+	private $orientation = 'L';
 
 	/**
 	 * Issuer
@@ -125,7 +125,7 @@ class pdf_orque_projectdocument
     /**
      * @var string Document type
      */
-    public string $document_type = 'orque_projectdocument';
+    public string $document_type = 'papripact_a3_paysage_projectdocument';
 
 	/**
 	 *	Constructor
@@ -140,19 +140,20 @@ class pdf_orque_projectdocument
 		$langs->loadLangs(array('main', 'projects', 'companies'));
 
 		$this->db = $db;
-		$this->name = 'orque';
-		$this->description = $langs->trans('DocumentModelOrque');
+		$this->name = 'PAPRIPACT-A3-PAYSAGE';
+		$this->description = $langs->trans('DocumentModelPapripactA3Paysage');
 
-		// Page size for A4 format
+		// Page size for A3 format
 		$this->type = 'pdf';
-		$formatarray = pdf_getFormat();
+        $formatarray['width'] = 420;
+        $formatarray['height'] = 297;
 		$this->orientation = 'L';
 		if ($this->orientation == 'L' || $this->orientation == 'Landscape') {
-			$this->page_largeur = $formatarray['height'];
-			$this->page_hauteur = $formatarray['width'];
-		} else {
 			$this->page_largeur = $formatarray['width'];
 			$this->page_hauteur = $formatarray['height'];
+		} else {
+			$this->page_largeur = $formatarray['height'];
+			$this->page_hauteur = $formatarray['width'];
 		}
 		$this->format = array($this->page_largeur, $this->page_hauteur);
 		$this->marge_gauche = isset($conf->global->MAIN_PDF_MARGIN_LEFT) ? $conf->global->MAIN_PDF_MARGIN_LEFT : 10;
@@ -170,39 +171,45 @@ class pdf_orque_projectdocument
 			$this->emetteur->country_code = substr($langs->defaultlang, -2); // By default if not defined
 		}
 
-		// Define position of columns
-		if ($this->orientation == 'L' || $this->orientation == 'Landscape') {
-			$this->posxref = $this->marge_gauche + 1;
-			$this->posxrisk = $this->marge_gauche + 25;
-			$this->posxriskassessment = $this->marge_gauche + 40;
-			$this->posxlabel = $this->marge_gauche + 60;
-			$this->posxbudget = $this->marge_gauche + 170;
-			$this->posxworkload = $this->marge_gauche + 190;
-			$this->posxprogress = $this->marge_gauche + 210;
-			$this->posxdatestart = $this->marge_gauche + 230;
-			$this->posxdateend = $this->marge_gauche + 250;
-		} else {
-			$this->posxref = $this->marge_gauche + 1;
-			$this->posxrisk = $this->marge_gauche + 25;
-			$this->posxriskassessment = $this->marge_gauche + 40;
-			$this->posxlabel = $this->marge_gauche + 60;
-			$this->posxbudget = $this->marge_gauche + 120;
-			$this->posxworkload = $this->marge_gauche + 130;
-			$this->posxprogress = $this->marge_gauche + 140;
-			$this->posxdatestart = $this->marge_gauche + 150;
-			$this->posxdateend = $this->marge_gauche + 180;
-		}
-		if ($this->page_largeur < 210) { // To work with US executive format
-			$this->posxref -= 20;
-			$this->posxrisk -= 20;
-			$this->posxriskassessment -= 20;
-			$this->posxlabel -= 20;
-			$this->posxbudget -= 20;
-			$this->posxworkload -= 20;
-			$this->posxprogress -= 20;
-			$this->posxdatestart -= 20;
-			$this->posxdateend -= 20;
-		}
+        // Define position of columns
+        if ($this->orientation == 'L' || $this->orientation == 'Landscape') {
+            $this->posxref                   = $this->marge_gauche + 1;           // Start position
+            $this->posxlabel                 = $this->posxref + 25;               // Ref: 35mm
+            $this->posxdatestart             = $this->posxlabel + 120;             // Label: 65mm (main content)
+            $this->posxdateend               = $this->posxdatestart + 25;         // Start Date: 25mm
+            $this->posxworkload              = $this->posxdateend + 25;           // End Date: 25mm
+            $this->posxbudget                = $this->posxworkload + 30;          // Workload: 30mm
+            $this->posxprogress              = $this->posxbudget + 15;            // Budget: 40mm
+            $this->posxuser                  = $this->posxprogress + 25;          // Progress: 25mm
+            $this->posxrisk                  = $this->posxuser + 30;              // User: 30mm
+            $this->posxriskcategory          = $this->posxrisk + 15;              // Risk: 35mm
+            $this->posxriskassessment        = $this->posxriskcategory + 65;
+        } else {
+            $this->posxref                   = $this->marge_gauche + 1;
+            $this->posxlabel                 = $this->marge_gauche + 25;
+            $this->posxdatestart             = $this->marge_gauche + 30;
+            $this->posxdateend               = $this->marge_gauche + 40;
+            $this->posxworkload              = $this->marge_gauche + 60;
+            $this->posxbudget                = $this->marge_gauche + 120;
+            $this->posxprogress              = $this->marge_gauche + 150;
+            $this->posxuser                  = $this->marge_gauche + 140;
+            $this->posxrisk                  = $this->marge_gauche + 170;
+            $this->posxriskcategory          = $this->marge_gauche + 180;
+            $this->posxriskassessment        = $this->marge_gauche + 190;
+        }
+        if ($this->page_largeur < 210) { // To work with US executive format
+            $this->posxref                   -= 20;
+            $this->posxlabel                 -= 20;
+            $this->posxdatestart             -= 20;
+            $this->posxdateend               -= 20;
+            $this->posxworkload              -= 20;
+            $this->posxbudget                -= 20;
+            $this->posxprogress              -= 20;
+            $this->posxuser                  -= 20;
+            $this->posxrisk                  -= 20;
+            $this->posxriskcategory          -= 20;
+            $this->posxriskassessment        -= 20;
+        }
 	}
 
     /**
@@ -335,7 +342,7 @@ class pdf_orque_projectdocument
 				$pdf->SetCreator('Dolibarr ' .DOL_VERSION);
 				$pdf->SetAuthor($outputLangs->convToOutputCharset($user->getFullName($outputLangs)));
 				$pdf->SetKeyWords(
-                    $outputLangs->convToOutputCharset($object->ref) . ' pdf_orque_projectdocument.modules.php' .$outputLangs->transnoentities('Project'));
+                    $outputLangs->convToOutputCharset($object->ref) . ' pdf_papripact_a3_paysage_projectdocument.modules.php' .$outputLangs->transnoentities('Project'));
 				if (!empty($conf->global->MAIN_DISABLE_PDF_COMPRESSION)) {
 					$pdf->SetCompression(false);
 				}
@@ -349,7 +356,7 @@ class pdf_orque_projectdocument
 				}
 				$pagenb++;
 				$this->_pagehead($pdf, $object, 1, $outputLangs);
-				$pdf->SetFont('', '', $default_font_size - 1);
+				$pdf->SetFont(pdf_getPDFFont($outputLangs), '', $default_font_size - 1);
 				$pdf->MultiCell(0, 3, ''); // Set interline to 3
 				$pdf->SetTextColor(0, 0, 0);
 
@@ -368,8 +375,8 @@ class pdf_orque_projectdocument
 
 					$tab_top -= 2;
 
-					$pdf->SetFont('', '', $default_font_size - 1);
-					$pdf->writeHTMLCell(190, 3, $this->posxref - 1, $tab_top - 2, dol_htmlentitiesbr($notetoshow), 0, 1);
+					$pdf->SetFont(pdf_getPDFFont($outputLangs), '', $default_font_size - 1);
+					$pdf->writeHTMLCell(420, 3, $this->posxref - 1, $tab_top - 2, dol_htmlentitiesbr($notetoshow), 0, 1);
 					$nexY = $pdf->GetY();
 					$height_note = $nexY - $tab_top;
 
@@ -398,26 +405,38 @@ class pdf_orque_projectdocument
 						$lastEvaluation = array_shift($lastEvaluation);
 					}
 
+                    $users         = $object->lines[$i]->liste_contact(-1, 'internal');
+                    $userExecutives = [];
+                    foreach ($users as $gooduser) {
+                        if (!empty($gooduser) && $gooduser['code'] == 'TASKEXECUTIVE') {
+                            $userExecutives = $gooduser;
+                        }
+                    };
+
+                    $risk->category = $risk->getDangerCategoryName($risk);
+
 					$tmpArray = array("cotation" => empty($lastEvaluation->cotation) ? 0 : $lastEvaluation->cotation);
 					$tmpArray += array("task_ref" => $object->lines[$i]->ref);
 					$tmpArray += array("risk_ref" => $risk->ref);
+                    $tmpArray += array("risk_category" => $risk->category);
 					$tmpArray += array("label" => $object->lines[$i]->label);
 					$tmpArray += array("budget" => $object->lines[$i]->budget_amount);
 					$tmpArray += array("progress" => $object->lines[$i]->progress ? $object->lines[$i]->progress . '%' : '');
 					$tmpArray += array("date_start" => $object->lines[$i]->date_start);
 					$tmpArray += array("date_end" => $object->lines[$i]->date_end);
 					$tmpArray += array("workload" =>  $object->lines[$i]->planned_workload);
+                    $tmpArray += array("userExecutive" =>  $userExecutives);
+
 					array_push($objectDoc, $tmpArray);
 				}
 				usort($objectDoc, function($a, $b) {
 					return $b['cotation'] <=> $a['cotation'];
 				});
-
 				// Loop on each lines
 
 				for ($i = 0; $i < $nblines; $i++) {
 					$curY = $nexY;
-					$pdf->SetFont('', '', $default_font_size - 1); // Into loop to work with multipage
+					$pdf->SetFont(pdf_getPDFFont($outputLangs), '', $default_font_size - 1); // Into loop to work with multipage
 					$pdf->SetTextColor(0, 0, 0);
 
 					$pdf->setTopMargin($tab_top_newpage);
@@ -425,23 +444,25 @@ class pdf_orque_projectdocument
 					$pageposbefore = $pdf->getPage();
 
 					// Description of line
-					$ref = $objectDoc[$i]['task_ref'];
-					$libelleline = $objectDoc[$i]['label'];
-					$riskref = $objectDoc[$i]['risk_ref'];
-					$lastEvaluation = $objectDoc[$i]['cotation'];
-					$budget = price($objectDoc[$i]['budget'], 0, $langs, 1, 0, 0, $conf->currency);
-					$progress = $objectDoc[$i]['progress'];
-					$datestart = dol_print_date($objectDoc[$i]['date_start'], 'day');
-					$dateend = dol_print_date($objectDoc[$i]['date_end'], 'day');
+					$ref              = $objectDoc[$i]['task_ref'];
+					$libelleline      = $objectDoc[$i]['label'];
+					$riskref          = $objectDoc[$i]['risk_ref'];
+                    $riskcategory     = $objectDoc[$i]['risk_category'];
+					$lastEvaluation   = $objectDoc[$i]['cotation'];
+					$budget           = price($objectDoc[$i]['budget'], 0, $langs, 1, 0, 0, $conf->currency);
+					$progress         = $objectDoc[$i]['progress'];
+					$datestart        = dol_print_date($objectDoc[$i]['date_start'], 'day');
+					$dateend          = dol_print_date($objectDoc[$i]['date_end'], 'day');
 					$planned_workload = convertSecondToTime((int) $objectDoc[$i]['workload'], 'allhourmin');
-					$totalbudget += $objectDoc[$i]['budget'];
+                    $userExecutive    = $objectDoc[$i]['userExecutive'];
+					$totalbudget      += $objectDoc[$i]['budget'];
 
 					$showpricebeforepagebreak = 1;
 
 					$pdf->startTransaction();
 					// Label
 					$pdf->SetXY($this->posxlabel, $curY);
-					$pdf->MultiCell($this->posxbudget - $this->posxlabel, 3, $outputLangs->convToOutputCharset($libelleline), 0, 'L');
+					$pdf->MultiCell($this->posxdatestart - $this->posxlabel, 3, $outputLangs->convToOutputCharset($libelleline), 0, 'L');
 					$pageposafter = $pdf->getPage();
 					if ($pageposafter > $pageposbefore) { // There is a pagebreak
 						$pdf->rollbackTransaction(true);
@@ -449,7 +470,7 @@ class pdf_orque_projectdocument
 						$pdf->setPageOrientation($this->orientation, 1, $heightforfooter); // The only function to edit the bottom margin of current page to set it.
 
 						// Label
-						$pdf->SetXY($this->posxlabel, $curY);
+					 	$pdf->SetXY($this->posxlabel, $curY);
 						$posybefore = $pdf->GetY();
 						$pdf->MultiCell($this->posxbudget - $this->posxlabel, 3, $outputLangs->convToOutputCharset($libelleline), 0, 'L');
 						$pageposafter = $pdf->getPage();
@@ -477,7 +498,7 @@ class pdf_orque_projectdocument
 
 							$forcedesconsamepage = 1;
 							if ($forcedesconsamepage) {
-								$pdf->rollbackTransaction(true);
+								//$pdf->rollbackTransaction(true);
 								$pageposafter = $pageposbefore;
 								$pdf->setPageOrientation($this->orientation, 1, $heightforfooter); // The only function to edit the bottom margin of current page to set it.
 
@@ -489,7 +510,7 @@ class pdf_orque_projectdocument
 									$this->_pagehead($pdf, $object, 0, $outputLangs);
 								}
 								$pdf->setPage($pageposafter + 1);
-								$pdf->SetFont('', '', $default_font_size - 1); // On repositionne la police par defaut
+								$pdf->SetFont(pdf_getPDFFont($outputLangs), '', $default_font_size - 1); // On repositionne la police par defaut
 								$pdf->MultiCell(0, 3, ''); // Set interline to 3
 								$pdf->SetTextColor(0, 0, 0);
 
@@ -499,9 +520,9 @@ class pdf_orque_projectdocument
 								// Label
 								$pdf->SetXY($this->posxlabel, $curY);
 								$posybefore = $pdf->GetY();
-								$pdf->MultiCell($this->posxbudget - $this->posxlabel, 3, $outputLangs->convToOutputCharset($libelleline), 0, 'L');
+								$pdf->MultiCell($this->posxdatestart - $this->posxlabel, 6, $outputLangs->convToOutputCharset($libelleline), 0, 'L');
 								$pageposafter = $pdf->getPage();
-								$posyafter = $pdf->GetY();
+								$posyafter    = $pdf->GetY();
 							}
 						}
 					} else {
@@ -521,14 +542,47 @@ class pdf_orque_projectdocument
 						$curY = $tab_top_newpage + $heightoftitleline + 1;
 					}
 
-					$pdf->SetFont('', '', $default_font_size - 1); // We reposition the default font
+					$pdf->SetFont(pdf_getPDFFont($outputLangs), '', $default_font_size - 1); // We reposition the default font
 
 					// Ref of task
 					$pdf->SetXY($this->posxref, $curY);
-					$pdf->MultiCell($this->posxrisk - $this->posxref, 3, $outputLangs->convToOutputCharset($ref), 0, 'L');
+					$pdf->MultiCell($this->posxlabel - $this->posxref, 6, $outputLangs->convToOutputCharset($ref), 0, 'L');
+
+                    // Date start and end
+                    $pdf->SetXY($this->posxdatestart, $curY);
+                    $pdf->MultiCell($this->posxdateend - $this->posxdatestart, 6, $datestart, 0, 'C');
+                    $pdf->SetXY($this->posxdateend, $curY);
+                    $pdf->MultiCell($this->posxworkload - $this->posxdateend, 6, $dateend, 0, 'C');
+
+                    // Workload
+                    $pdf->SetXY($this->posxworkload, $curY);
+                    $pdf->SetFont(pdf_getPDFFont($outputLangs), '', $default_font_size - 2); // We use a smaller font
+                    $pdf->MultiCell($this->posxbudget - $this->posxworkload, 6, $planned_workload ? $planned_workload : '', 0, 'C');
+
+                    // task budget
+                    $pdf->SetXY($this->posxbudget, $curY);
+                    $pdf->MultiCell($this->posxprogress - $this->posxbudget, 6, $budget, 0, 'R');
+
+                    // Progress
+                    $pdf->SetXY($this->posxprogress, $curY);
+                    $pdf->MultiCell($this->posxuser - $this->posxprogress, 6, $progress, 0, 'R');
+                    $pdf->SetFont(pdf_getPDFFont($outputLangs), '', $default_font_size - 1); // We restore font
+
+                    // Executive name
+                    $pdf->SetXY($this->posxuser, $curY);
+                    $pdf->MultiCell($this->posxrisk - $this->posxuser, 6, ucfirst(substr($userExecutive['firstname'], 0, 1)) . ucfirst(substr($userExecutive['lastname'], 0, 1)), 0, 'C');
+                    $pdf->SetFont(pdf_getPDFFont($outputLangs), '', $default_font_size - 1); // We restore font
+
 					// Risk
 					$pdf->SetXY($this->posxrisk, $curY);
-					$pdf->MultiCell($this->posxriskassessment - $this->posxrisk, 3, $riskref, 0, 'L');
+					$pdf->MultiCell($this->posxriskcategory - $this->posxrisk, 6, $riskref, 0, 'L');
+
+                    // Risk category
+                    $pdf->SetXY($this->posxriskcategory, $curY);
+                    $pdf->SetFont(pdf_getPDFFont($outputLangs), '', $default_font_size - 3); // We restore font
+                    $pdf->MultiCell($this->posxriskassessment - $this->posxriskcategory, 0, $riskcategory, 0, 'L');
+                    $pdf->SetFont(pdf_getPDFFont($outputLangs), '', $default_font_size - 1); // We restore font
+
 					// Risk assessment
 					if ($conf->global->DIGIRISKDOLIBARR_PROJECTDOCUMENT_DISPLAY_RISKASSESSMENT_COLOR) {
 						if ($lastEvaluation < 47) {
@@ -542,25 +596,8 @@ class pdf_orque_projectdocument
 						}
 					}
 					$pdf->SetXY($this->posxriskassessment, $curY);
-					$pdf->MultiCell($this->posxlabel - $this->posxriskassessment, 3, $lastEvaluation, 0, 'C');
+					$pdf->MultiCell($this->page_largeur - $this->marge_droite - $this->posxriskassessment, 6, $lastEvaluation, 0, 'R');
 					$pdf->SetTextColor(0, 0, 0);
-					// task budget
-					$pdf->SetXY($this->posxbudget, $curY);
-					$pdf->MultiCell($this->posxworkload - $this->posxbudget, 3, $budget, 0, 'R');
-					// Workload
-					$pdf->SetXY($this->posxworkload, $curY);
-					$pdf->SetFont('', '', $default_font_size - 2); // We use a smaller font
-					$pdf->MultiCell($this->posxprogress - $this->posxworkload, 3, $planned_workload ? $planned_workload : '', 0, 'R');
-					// Progress
-					$pdf->SetXY($this->posxprogress, $curY);
-					$pdf->MultiCell($this->posxdatestart - $this->posxprogress, 3, $progress, 0, 'R');
-					$pdf->SetFont('', '', $default_font_size - 1); // We restore font
-
-					// Date start and end
-					$pdf->SetXY($this->posxdatestart, $curY);
-					$pdf->MultiCell($this->posxdateend - $this->posxdatestart, 3, $datestart, 0, 'C');
-					$pdf->SetXY($this->posxdateend, $curY);
-					$pdf->MultiCell($this->page_largeur - $this->marge_droite - $this->posxdateend, 3, $dateend, 0, 'C');
 
 					// Add line
 					if (!empty($conf->global->MAIN_PDF_DASH_BETWEEN_LINES) && $i < ($nblines - 1)) {
@@ -621,6 +658,7 @@ class pdf_orque_projectdocument
 				$pdf->SetXY($this->posxref, $curY);
 				$pdf->MultiCell($this->posxbudget - $this->posxlabel, 3, $outputLangs->convToOutputCharset($langs->transnoentities('TotalBudget')) . ' : ' . $outputLangs->convToOutputCharset($totalbudget), 0, 'L');
 
+
 				// Show square
 				if ($pagenb == 1) {
 					$this->_tableau($pdf, $tab_top, $this->page_hauteur - $tab_top - $heightforinfotot - $heightforfreetext - $heightforfooter, 0, $outputLangs, 0, 0);
@@ -628,6 +666,8 @@ class pdf_orque_projectdocument
 					$this->_tableau($pdf, $tab_top_newpage, $this->page_hauteur - $tab_top_newpage - $heightforinfotot - $heightforfreetext - $heightforfooter, 0, $outputLangs, 1, 0);
 				}
 				$bottomlasttab = $this->page_hauteur - $heightforinfotot - $heightforfreetext - $heightforfooter + 1;
+
+
 
 				// Footer of the page
 				$this->_pagefoot($pdf, $object, $outputLangs);
@@ -696,36 +736,51 @@ class pdf_orque_projectdocument
 		$pdf->line($this->marge_gauche, $tab_top + $heightoftitleline, $this->page_largeur - $this->marge_droite, $tab_top + $heightoftitleline);
 
 		$pdf->SetTextColor(0, 0, 0);
-		$pdf->SetFont('', '', $default_font_size);
+		$pdf->SetFont(pdf_getPDFFont($outputLangs), '', $default_font_size);
 
+        // Task ref
 		$pdf->SetXY($this->posxref, $tab_top + 1);
-		$pdf->MultiCell($this->posxrisk - $this->posxref, 3, $outputLangs->transnoentities('Tasks'), '', 'L');
+		$pdf->MultiCell($this->posxlabel - $this->posxref, 3, $outputLangs->transnoentities('Tasks'), '', 'L');
 
+        // Task label
+        $pdf->SetXY($this->posxlabel, $tab_top + 1);
+        $pdf->MultiCell($this->posxdatestart - $this->posxlabel, 3, $outputLangs->transnoentities('Label'), 0, 'L');
+
+        // Date start
+        $pdf->SetXY($this->posxdatestart, $tab_top + 1);
+        $pdf->MultiCell($this->posxdateend - $this->posxdatestart, 3, $outputLangs->trans('Start'), 0, 'C');
+
+        // Date end
+        $pdf->SetXY($this->posxdateend, $tab_top + 1);
+        $pdf->MultiCell($this->posxworkload - $this->posxdateend, 3, $outputLangs->trans('End'), 0, 'C');
+
+        // Task Workload
+        $pdf->SetXY($this->posxworkload, $tab_top + 1);
+        $pdf->MultiCell($this->posxbudget - $this->posxworkload, 3, $outputLangs->transnoentities('PlannedWorkloadShort'), 0, 'R');
+
+        // Task Budget
+        $pdf->SetXY($this->posxbudget, $tab_top + 1);
+        $pdf->MultiCell($this->posxprogress - $this->posxbudget, 3, $outputLangs->transnoentities('Budget'), 0, 'R');
+
+        // Task Progress
+        $pdf->SetXY($this->posxprogress, $tab_top + 1);
+        $pdf->MultiCell($this->posxuser - $this->posxprogress, 3, 'ARD', 0, 'R');
+
+        // Executive user
+        $pdf->SetXY($this->posxuser, $tab_top + 1);
+        $pdf->MultiCell($this->posxrisk - $this->posxuser, 3, $outputLangs->transnoentities('Responsible'), 0, 'C');
+
+        // Task Risk
 		$pdf->SetXY($this->posxrisk, $tab_top + 1);
-		$pdf->MultiCell($this->posxriskassessment - $this->posxrisk, 3, $outputLangs->transnoentities('Risk'), '', 'L');
+		$pdf->MultiCell($this->posxriskcategory - $this->posxrisk, 3, $outputLangs->transnoentities('Risk'), '', 'L');
 
+        // Rsk Category
+        $pdf->SetXY($this->posxriskcategory, $tab_top + 1);
+        $pdf->MultiCell($this->posxriskassessment - $this->posxrisk, 3, $outputLangs->transnoentities('RiskCategory'), '', 'L');
+
+        // Risk Evaluation
 		$pdf->SetXY($this->posxriskassessment, $tab_top + 1);
-		$pdf->MultiCell($this->posxlabel - $this->posxriskassessment, 3, $outputLangs->transnoentities('RiskAssessment'), '', 'L');
-
-		$pdf->SetXY($this->posxlabel, $tab_top + 1);
-		$pdf->MultiCell($this->posxbudget - $this->posxlabel, 3, $outputLangs->transnoentities('Label'), 0, 'L');
-
-		$pdf->SetXY($this->posxbudget, $tab_top + 1);
-		$pdf->MultiCell($this->posxworkload - $this->posxbudget, 3, $outputLangs->transnoentities('Budget'), 0, 'R');
-
-		$pdf->SetXY($this->posxworkload, $tab_top + 1);
-		$pdf->MultiCell($this->posxprogress - $this->posxworkload, 3, $outputLangs->transnoentities('PlannedWorkloadShort'), 0, 'R');
-
-		$pdf->SetXY($this->posxprogress, $tab_top + 1);
-		$pdf->MultiCell($this->posxdatestart - $this->posxprogress, 3, '%', 0, 'R');
-
-		// Date start
-		$pdf->SetXY($this->posxdatestart, $tab_top + 1);
-		$pdf->MultiCell($this->posxdateend - $this->posxdatestart, 3, $outputLangs->trans('Start'), 0, 'C');
-
-		// Date end
-		$pdf->SetXY($this->posxdateend, $tab_top + 1);
-		$pdf->MultiCell($this->page_largeur - $this->marge_droite - $this->posxdateend, 3, $outputLangs->trans('End'), 0, 'C');
+		$pdf->MultiCell($this->page_largeur - $this->marge_droite - $this->posxriskassessment, 3, $outputLangs->transnoentities('RiskAssessment'), '', 'R');
 	}
 
 	// phpcs:disable PEAR.NamingConventions.ValidFunctionName.PublicUnderscore
@@ -747,7 +802,7 @@ class pdf_orque_projectdocument
 		pdf_pagehead($pdf, $outputLangs, $this->page_hauteur);
 
 		$pdf->SetTextColor(0, 0, 60);
-		$pdf->SetFont('', 'B', $default_font_size + 3);
+		$pdf->SetFont(pdf_getPDFFont($outputLangs), 'B', $default_font_size + 3);
 
 		$posx = $this->page_largeur - $this->marge_droite - 100;
 		$posy = $this->marge_haute;
@@ -762,7 +817,7 @@ class pdf_orque_projectdocument
 				$pdf->Image($logo, $this->marge_gauche, $posy, 0, $height); // width=0 (auto)
 			} else {
 				$pdf->SetTextColor(200, 0, 0);
-				$pdf->SetFont('', 'B', $default_font_size - 2);
+				$pdf->SetFont(pdf_getPDFFont($outputLangs), 'B', $default_font_size - 2);
 				$pdf->MultiCell(100, 3, $langs->transnoentities('ErrorLogoFileNotFound', $logo), 0, 'L');
 				$pdf->MultiCell(100, 3, $langs->transnoentities('ErrorGoToModuleSetup'), 0, 'L');
 			}
@@ -770,11 +825,11 @@ class pdf_orque_projectdocument
 			$pdf->MultiCell(100, 4, $outputLangs->transnoentities($this->emetteur->name), 0, 'L');
 		}
 
-		$pdf->SetFont('', 'B', $default_font_size + 3);
+		$pdf->SetFont(pdf_getPDFFont($outputLangs), 'B', $default_font_size + 3);
 		$pdf->SetXY($posx, $posy);
 		$pdf->SetTextColor(0, 0, 60);
 		$pdf->MultiCell(100, 4, $outputLangs->transnoentities('Project') . ' ' .$outputLangs->convToOutputCharset($object->ref), '', 'R');
-		$pdf->SetFont('', '', $default_font_size + 2);
+		$pdf->SetFont(pdf_getPDFFont($outputLangs), '', $default_font_size + 2);
 
 		$posy += 6;
 		$pdf->SetXY($posx, $posy);
@@ -810,7 +865,7 @@ class pdf_orque_projectdocument
 				{
 					$posy+=4;
 					$pdf->SetXY($posx,$posy);
-					$pdf->SetFont('','', $default_font_size - 1);
+					$pdf->SetFont(pdf_getPDFFont($outputLangs),'', $default_font_size - 1);
 					$text=$objects[$i]->ref;
 					if ($objects[$i]->ref_client) $text.=' ('.$objects[$i]->ref_client.')';
 					$pdf->MultiCell(100, 4, $outputLangs->transnoentities("RefOrder")." : ".$outputLangs->transnoentities($text), '', 'R');

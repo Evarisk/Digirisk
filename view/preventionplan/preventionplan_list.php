@@ -282,35 +282,44 @@ $sql       .= " FROM " . MAIN_DB_PREFIX . $object->table_element . " as t";
 
 if (isset($extrafields->attributes[$object->table_element]['label']) &&
     is_array($extrafields->attributes[$object->table_element]['label']) && count($extrafields->attributes[$object->table_element]['label'])) $sql .= " LEFT JOIN " . MAIN_DB_PREFIX . $object->table_element . "_extrafields as ef on (t.rowid = ef.fk_object)";
+$sql .= ' LEFT JOIN ' . MAIN_DB_PREFIX . 'digiriskdolibarr_digiriskresources as rs ON rs.ref = "ExtSociety" AND rs.object_type = "preventionplan" AND rs.object_id = t.rowid';
+
 if ($object->ismultientitymanaged == 1) $sql                                                                                                      .= " WHERE t.entity IN (" . getEntity($object->element) . ")";
 else $sql                                                                                                                                         .= " WHERE 1 = 1";
-$sql                                                                                                                                              .= ' AND status != -1';
+$sql                                                                                                                                              .= ' AND t.status != -1';
 
 
 foreach ($search as $key => $val) {
-		if ($key == 'status' && $search[$key] == -1) continue;
-		$mode_search = ((isset($object->fields[$key]) && ($object->isInt($object->fields[$key]) || $object->isFloat($object->fields[$key]))) ? 1 : 0);
+    if ($key == 'status' && $search[$key] == -1)
+        continue;
+    $mode_search = ((isset($object->fields[$key]) && ($object->isInt($object->fields[$key]) || $object->isFloat($object->fields[$key]))) ? 1 : 0);
 	if (strpos($object->fields[$key]['type'] ?? '', 'integer:') === 0) {
-		if ($search[$key] == '-1') $search[$key] = '';
-		$mode_search                             = 2;
+		if ($search[$key] == '-1')
+            $search[$key] = '';
+		$mode_search = 2;
 	}
-		if ($search[$key] != '') $sql .= natural_search($key, $search[$key], (($key == 'status') ? 2 : $mode_search));
+    if ($search[$key] != '')
+        $sql .= natural_search($key, $search[$key], (($key == 'status') ? 2 : $mode_search));
 }
-	if ($search_all) $sql .= natural_search(array_keys($fieldstosearchall), $search_all);
-	// Add where from extra fields
-	include DOL_DOCUMENT_ROOT . '/core/tpl/extrafields_list_search_sql.tpl.php';
-	// Add where from hooks
-	$parameters = array();
-	$reshook    = $hookmanager->executeHooks('printFieldListWhere', $parameters, $object); // Note that $action and $objectdocument may have been modified by hook
-	$sql       .= $hookmanager->resPrint;
+if ($search_all) $sql .= natural_search(array_keys($fieldstosearchall), $search_all);
 
-	$sql .= $db->order($sortfield, $sortorder);
+if (GETPOSTISSET('search_extsociety') && GETPOSTINT('search_extsociety') != -1) {
+    $sql .= ' AND rs.element_id = ' . GETPOSTINT('search_extsociety');
+}
 
-	// Count total nb of records
-	$nbtotalofrecords = '';
+// Add where from extra fields
+include DOL_DOCUMENT_ROOT . '/core/tpl/extrafields_list_search_sql.tpl.php';
+// Add where from hooks
+$parameters = [];
+$reshook    = $hookmanager->executeHooks('printFieldListWhere', $parameters, $object); // Note that $action and $objectdocument may have been modified by hook
+$sql       .= $hookmanager->resPrint;
+
+$sql .= $db->order($sortfield, $sortorder);
+
+// Count total nb of records
+$nbtotalofrecords = '';
 if (empty($conf->global->MAIN_DISABLE_FULL_SCANLIST)) {
 	$resql = $db->query($sql);
-
 	$nbtotalofrecords = $db->num_rows($resql);
 	if (($page * $limit) > $nbtotalofrecords) {	// if total of record found is smaller than page * limit, goto and load page 0
 		$page   = 0;
@@ -349,10 +358,16 @@ $moreforfilter = '';
 
 $varpage = empty($contextpage) ? $_SERVER["PHP_SELF"] : $contextpage;
 
-$arrayfields['MasterWorker']          = array('label' => 'MasterWorker', 'checked' => 1);
-$arrayfields['ExtSociety']            = array('label' => 'ExtSociety', 'checked' => 1);
-$arrayfields['ExtSocietyResponsible'] = array('label' => 'ExtSocietyResponsible', 'checked' => 1);
-$arrayfields['ExtSocietyAttendant']   = array('label' => 'ExtSocietyAttendant', 'checked' => 1);
+$arrayfields['MasterWorker']          = ['label' => 'MasterWorker', 'checked' => 1];
+$arrayfields['ExtSociety']            = ['label' => 'ExtSociety', 'checked' => 1, 'arrayofkeyval' => [], 'sortfield' => 'rs.object_id'];
+$tmpsql   = 'SELECT rowid, nom FROM ' . MAIN_DB_PREFIX . 'societe WHERE entity = ' . $conf->entity;
+$tmpresql = $db->query($tmpsql);
+while ($tmpobj = $db->fetch_object($tmpresql)) {
+    $arrayfields['ExtSociety']['arrayofkeyval'][$tmpobj->rowid] = $tmpobj->nom;
+}
+$db->free($tmpresql);
+$arrayfields['ExtSocietyResponsible'] = ['label' => 'ExtSocietyResponsible', 'checked' => 1];
+$arrayfields['ExtSocietyAttendant']   = ['label' => 'ExtSocietyAttendant', 'checked' => 1];
 
 print_barre_liste($form->textwithpicto($title, $texthelp ?? ''), $page, $_SERVER["PHP_SELF"], $param, $sortfield, $sortorder, $massactionbutton, $num, $nbtotalofrecords, $object->picto, 0, $newcardbutton, '', $limit, 0, 0, 1);
 
@@ -383,9 +398,12 @@ foreach ($object->fields as $key => $val) {
 	if ($key == 'Custom') {
 		foreach ($val as $resource) {
 			if ($resource['checked']) {
-				print '<td>';
-				print '</td>';
-			}
+                print '<td>';
+                if (isset($resource['arrayofkeyval']) && is_array($resource['arrayofkeyval'])) {
+                    print $form->selectarray('search_' . dol_strtolower($resource['label']), $resource['arrayofkeyval'], GETPOSTINT('search_' . dol_strtolower($resource['label'])), 1, 0, 0, '', 1, 0, 0, '', 'maxwidth150');
+                }
+                print '</td>';
+            }
 		}
 	}
 }
@@ -422,10 +440,13 @@ foreach ($object->fields as $key => $val) {
 	}
 	if ($key == 'Custom') {
 		foreach ($val as $resource) {
-			if ($resource['checked']) {
-				print '<td>';
-				print $langs->trans($resource['label']);
-				print '</td>';
+			if (!empty($resource['checked'])) {
+                if (!empty($resource['sortfield'])) {
+                    $disablesort = 0;
+                } else {
+                    $disablesort = 1;
+                }
+                print getTitleFieldOfList($resource['label'], 0, $_SERVER['PHP_SELF'], $resource['sortfield'], '', $param, ($cssforfield ? 'class="' . $cssforfield . '"' : ''), $sortfield, $sortorder, ($cssforfield ? $cssforfield . ' ' : ''), $disablesort) . "\n";
 			}
 		}
 	}
@@ -494,7 +515,7 @@ while ($i < ($limit ? min($num, $limit) : $num)) {
 		if ($key == 'Custom') {
 			foreach ($val as $name => $resource) {
 				if ($resource['checked']) {
-					print '<td>';
+					print '<td class="tdoverflowmax125">';
 					if ($resource['label'] == 'MasterWorker') {
 						$element = $signatory->fetchSignatory('MasterWorker', $object->id, 'preventionplan');
 						if (is_array($element) && !empty($element)) {

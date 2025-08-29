@@ -72,7 +72,7 @@ class InterfaceDigiriskdolibarrTriggers extends DolibarrTriggers
 		$this->name        = preg_replace('/^Interface/i', '', get_class($this));
 		$this->family      = "demo";
 		$this->description = "Digiriskdolibarr triggers.";
-		$this->version     = '21.0.1';
+		$this->version     = '21.1.0';
 		$this->picto       = 'digiriskdolibarr@digiriskdolibarr';
 	}
 
@@ -116,7 +116,7 @@ class InterfaceDigiriskdolibarrTriggers extends DolibarrTriggers
 
         // Allowed triggers are a list of trigger from other module that should activate this file
 		if (!isModEnabled('digiriskdolibarr') || !$active) {
-            $allowedTriggers = ['COMPANY_DELETE', 'CONTACT_DELETE', 'TICKET_CREATE', 'TICKET_PUBLIC_INTERFACE_CREATE'];
+			$allowedTriggers = ['COMPANY_DELETE', 'CONTACT_DELETE', 'TICKET_CREATE', 'TICKET_PUBLIC_INTERFACE_CREATE', 'TICKET_SIGN'];
             if (!in_array($action, $allowedTriggers)) {
                 return 0;  // If module is not enabled or trigger is deactivated, we do nothing
             }
@@ -545,7 +545,16 @@ class InterfaceDigiriskdolibarrTriggers extends DolibarrTriggers
 				}
 				break;
 
+			case 'TICKET_SIGN':
+				$actioncomm->elementtype = 'ticket';
+				$actioncomm->label = $langs->transnoentities('ObjectSignedTrigger', $langs->transnoentities(get_class($object)), $object->ref);
+
+				$result = $actioncomm->create($user);
+				break;
+
             case 'TICKET_PUBLIC_INTERFACE_CREATE' :
+                require_once __DIR__ . '/../../../saturne/class/saturnemail.class.php';
+
                 $categories = $object->getCategoriesCommon('ticket');
                 if (is_array($categories) && !empty($categories)) {
                     $category = new Categorie($this->db);
@@ -553,8 +562,8 @@ class InterfaceDigiriskdolibarrTriggers extends DolibarrTriggers
                         $category->fetch($categoryID);
                         $categoryConfigs = json_decode($category->array_options['options_ticket_category_config']);
                         if ($categoryConfigs->mail_template && $categoryConfigs->recipients) {
-                            $modelMail = new ModelMail($this->db);
-                            $modelMail->fetch($categoryConfigs->mail_template);
+                            $saturneMail = new SaturneMail($this->db);
+                            $saturneMail->fetch($categoryConfigs->mail_template);
                             $recipients = explode(',', $categoryConfigs->recipients);
                             foreach ($recipients as $recipientID) {
                                 $userTmp = new User($this->db);
@@ -568,7 +577,7 @@ class InterfaceDigiriskdolibarrTriggers extends DolibarrTriggers
 
                                     // Create form object
                                     // Send mail (substitutionarray must be done just before this)
-                                    $mailfile = new CMailFile($modelMail->topic, $sendto, $from, $modelMail->content, array(), array(), array(), "", "", 0, -1, '', '', $trackid, '', 'ticket');
+                                    $mailfile = new CMailFile($saturneMail->topic, $sendto, $from, $saturneMail->content, array(), array(), array(), "", "", 0, -1, '', '', $trackid, '', 'ticket');
                                     if ($mailfile->error) {
                                         setEventMessages($mailfile->error, $mailfile->errors, 'errors');
                                     } else {
@@ -589,8 +598,8 @@ class InterfaceDigiriskdolibarrTriggers extends DolibarrTriggers
                                                 $actioncomm->elementtype   = 'ticket';
                                                 $actioncomm->label         = $langs->transnoentities('TicketCreationMailWellSent');
                                                 $actioncomm->note_private  = $langs->transnoentities('TicketCreationMailSent', $sendto) . '<br>';
-                                                $actioncomm->note_private .= $modelMail->topic . '<br>';
-                                                $actioncomm->note_private .= $modelMail->content;
+                                                $actioncomm->note_private .= $saturneMail->topic . '<br>';
+                                                $actioncomm->note_private .= $saturneMail->content;
                                                 $result = $actioncomm->create($user);
                                             }
                                         }

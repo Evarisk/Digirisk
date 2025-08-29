@@ -1,0 +1,44 @@
+[{
+  "17": [
+    {
+      "name": "Exigences émotionnelles",
+      "label": "EmotionalRequirements",
+      "position": 0
+    },
+    {
+      "name": "Intensité et temps de travail",
+      "label": "WorkIntensityAndTime",
+      "position": 1
+    },
+    {
+      "name": "Autonomie",
+      "label": "Autonomy",
+      "position": 2
+    },
+    {
+      "name": "Rapports sociaux au travail",
+      "label": "SocialRelationsAtWork",
+      "position": 3
+    },
+    {
+      "name": "Sens du travail",
+      "label": "MeaningOfWork",
+      "position": 4
+    },
+    {
+      "name": "Insécurité de la situation de travail",
+      "label": "WorkSituationInsecurity",
+      "position": 5
+    },
+    {
+      "name": "Contexte de prévention dans l'entreprise",
+      "label": "CompanyPreventionInformations",
+      "position": 6
+    },
+    {
+      "name": "Impact des RPS sur l'entreprise et les salariés",
+      "label": "RPSImpactOnCompanyAndEmployees",
+      "position": 7
+    }
+  ]
+}]
