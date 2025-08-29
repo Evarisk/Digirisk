@@ -123,7 +123,7 @@ window.digiriskdolibarr.riskassessmenttask.createRiskAssessmentTask = function (
       executiveId: executiveId,
 		}),
 		processData: false,
-		contentType: false,
+    contentType: 'application/json charset=utf-8',
 		success: function ( resp ) {
 			$('.tasks-list-container-'+riskToAssign).replaceWith($(resp).find('.tasks-list-container-'+riskToAssign))
 			let actionContainerSuccess = $('.messageSuccessTaskCreate');
@@ -185,7 +185,7 @@ window.digiriskdolibarr.riskassessmenttask.deleteRiskAssessmentTask = function (
 			url: document.URL + '&action=deleteRiskAssessmentTask&deletedRiskAssessmentTaskId=' + deletedRiskAssessmentTaskId + '&token=' + token,
 			type: "POST",
 			processData: false,
-			contentType: false,
+      contentType: 'application/json charset=utf-8',
 			success: function ( resp ) {
 				$('.riskassessment-task-listing-wrapper-'+riskId).replaceWith($(resp).find('.riskassessment-task-listing-wrapper-'+riskId))
 				$('.riskassessment-tasks' + riskId).fadeOut(800);
@@ -275,7 +275,7 @@ window.digiriskdolibarr.riskassessmenttask.saveRiskAssessmentTask = function ( e
 		}),
 		type: "POST",
 		processData: false,
-		contentType: false,
+    contentType: 'application/json charset=utf-8',
 		success: function ( resp ) {
 			$('#risk_assessment_task_edit'+editedRiskAssessmentTaskId).removeClass('modal-active')
 			$('.riskassessment-task-container-'+editedRiskAssessmentTaskId).replaceWith($(resp).find('.riskassessment-task-container-'+editedRiskAssessmentTaskId).first())
@@ -357,7 +357,7 @@ window.digiriskdolibarr.riskassessmenttask.createRiskAssessmentTaskTimeSpent = f
 			duration: duration,
 		}),
 		processData: false,
-		contentType: false,
+    contentType: 'application/json charset=utf-8',
 		success: function ( resp ) {
 			//element.html($(resp).find(single))
 			let actionContainerSuccess = $('.messageSuccessTaskTimeSpentCreate'+ taskID);
@@ -420,7 +420,7 @@ window.digiriskdolibarr.riskassessmenttask.deleteRiskAssessmentTaskTimeSpent = f
 			url: document.URL + '&action=deleteRiskAssessmentTaskTimeSpent&deletedRiskAssessmentTaskTimeSpentId=' + deletedRiskAssessmentTaskTimeSpentId + '&token=' + token,
 			type: "POST",
 			processData: false,
-			contentType: false,
+      contentType: 'application/json charset=utf-8',
 			success: function ( resp ) {
 				//$('.fichecenter.risklist').html($(resp).find('#searchFormListRisks'))
 				let actionContainerSuccess = $('.messageSuccessTaskTimeSpentDelete'+ taskID);
@@ -496,7 +496,7 @@ window.digiriskdolibarr.riskassessmenttask.saveRiskAssessmentTaskTimeSpent = fun
 		}),
 		type: "POST",
 		processData: false,
-		contentType: false,
+    contentType: 'application/json charset=utf-8',
 		success: function ( resp ) {
 			currentElement.closest('.modal-active').removeClass('modal-active')
 			let actionContainerSuccess = $('.messageSuccessTaskTimeSpentEdit'+ taskID);
@@ -565,7 +565,7 @@ window.digiriskdolibarr.riskassessmenttask.checkTaskProgress = function ( event 
 		}),
 		type: "POST",
 		processData: false,
-		contentType: false,
+    contentType: 'application/json charset=utf-8',
 		success: function ( resp ) {
 			$('.fichecenter.risklist').html($(resp).find('#searchFormListRisks'))
 			let actionContainerSuccess = $('.messageSuccessTaskEdit');

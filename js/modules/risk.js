@@ -196,7 +196,7 @@ window.digiriskdolibarr.risk.createRisk = function ( event ) {
 			}
 		}),
 		processData: false,
-		contentType: false,
+    contentType: 'application/json charset=utf-8',
 		success: function ( resp ) {
 			$('.fichecenter.risklist').html($(resp).find('#searchFormListRisks'))
 
@@ -271,7 +271,7 @@ window.digiriskdolibarr.risk.saveRisk = function ( event ) {
 			newParent: newParent,
       categories: categories
 		}),
-		contentType: false,
+    contentType: 'application/json charset=utf-8',
 		success: function ( resp ) {
 			$('.wpeo-loader').removeClass('wpeo-loader');
 			let actionContainerSuccess = $('.messageSuccessRiskEdit');
@@ -337,7 +337,7 @@ window.digiriskdolibarr.risk.unlinkSharedRisk = function ( event ) {
 		data: JSON.stringify({
 			riskID: riskId,
 		}),
-		contentType: false,
+    contentType: 'application/json charset=utf-8',
 		success: function ( resp ) {
 			//refresh shared risk list form
 			$('.confirmquestions').html($(resp).find('.confirmquestions').children())
@@ -396,12 +396,12 @@ window.digiriskdolibarr.risk.evaluationCommentChange = function ( event ) {
     const maxLength      = textarea.data('maxlength') || 65535;
     const currentLength  = textarea.val().length;
     const remainingChars = maxLength - currentLength;
-    
+
     const commentContainer = textarea.closest('.risk-evaluation-comment');
     const titleSpan        = commentContainer.find('.title');
-    
+
     titleSpan.find('.char-counter').text(remainingChars);
-    
+
     if (remainingChars < maxLength * 0.2) {
         titleSpan.find('.char-counter').addClass('text-warning');
     } else {
