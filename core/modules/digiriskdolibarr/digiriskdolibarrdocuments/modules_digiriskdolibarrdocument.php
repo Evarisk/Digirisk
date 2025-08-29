@@ -67,14 +67,14 @@ abstract class ModeleODTDigiriskDolibarrDocument extends SaturneDocumentModel
             if (empty($digiriskElements) || empty($riskByRiskAssessmentLevels) || empty($riskByRiskAssessmentLevels[$riskAssessmentLevel])) {
                 $tmpArray['digiriskElementLabel']   = '';
                 $tmpArray['picto']                  = '';
-                $tmpArray['riskCategoryName']       = '';
-                $tmpArray['ref']                    = '';
-                $tmpArray['riskAssessmentCotation'] = '';
-                $tmpArray['description']            = $outputLangs->trans('NoDescriptionThere');
-                $tmpArray['riskAssessmentComment']  = $outputLangs->trans('NoRiskThere');
-                $tmpArray['riskTaskUncompleted']    = $outputLangs->trans('NoTaskUnCompletedThere');
-                $tmpArray['riskTaskCompleted']      = $outputLangs->trans('NoTaskCompletedThere');
-                $tmpArray['riskAssessment_photo']   = $outputLangs->transnoentities('NoFileLinked');
+                $tmpArray['riskCategoryName']       = '-';
+                $tmpArray['ref']                    = '-';
+                $tmpArray['riskAssessmentCotation'] = '-';
+                $tmpArray['description']            = '-';
+                $tmpArray['riskAssessmentComment']  = '-';
+                $tmpArray['riskTaskUncompleted']    = '-';
+                $tmpArray['riskTaskCompleted']      = '-';
+                $tmpArray['riskAssessment_photo']   = '-';
 
                 SaturneDocumentModel::setTmpArrayVars($tmpArray, $listLines, $outputLangs);
                 $odfHandler->mergeSegment($listLines);
@@ -187,13 +187,15 @@ abstract class ModeleODTDigiriskDolibarrDocument extends SaturneDocumentModel
                 }
             }
 
-            $riskTaskTypes = ['Uncompleted'];
+            $riskTaskTypes = [];
             if ($riskTaskProgress == 100) {
                 if (!getDolGlobalInt('DIGIRISKDOLIBARR_WORKUNITDOCUMENT_SHOW_TASK_DONE')) {
                     $array['riskTaskCompleted'] = $outputLangs->transnoentities('ActionPreventionCompletedTaskDone');
                 } else {
                     $riskTaskTypes[] = 'Completed';
                 }
+            } else {
+                $riskTaskTypes[] = 'Uncompleted';
             }
             foreach ($riskTaskTypes as $riskTaskType) {
                 $array['riskTask' . $riskTaskType] .= $outputLangs->transnoentities('Label') . ' : ' . $riskTask->label . '<br>';
