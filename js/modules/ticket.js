@@ -177,7 +177,7 @@ window.digiriskdolibarr.ticket.addSignature = function() {
  * @return {void}
  */
 window.digiriskdolibarr.ticket.tmpStockFile = function( ) {
-	
+
 	event.preventDefault()
 
 	let files = $('#sendfile').prop('files');
@@ -254,7 +254,7 @@ window.digiriskdolibarr.ticket.addDashBoardTicketInfo = function() {
 			digiriskelementID: digiriskelementID,
 			catID: catID
 		}),
-		contentType: false,
+    contentType: 'application/json charset=utf-8',
 		success: function ( resp ) {
 			window.location.reload();
 		},
@@ -287,7 +287,7 @@ window.digiriskdolibarr.ticket.closeDashBoardTicketInfo = function() {
 			digiriskelementID: digiriskelementID,
 			catID: catID
 		}),
-		contentType: false,
+		contentType: 'application/json charset=utf-8',
 		success: function ( resp ) {
 			box.closest('.box-flex-item').fadeOut(400)
 			$('.add-widget-box').attr('style', '')

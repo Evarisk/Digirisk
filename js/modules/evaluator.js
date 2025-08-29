@@ -56,7 +56,7 @@ window.digiriskdolibarr.evaluator.selectUser = function( event ) {
 		data: JSON.stringify({
 			userID: userID
 		}),
-		contentType: false,
+    contentType: 'application/json charset=utf-8',
 		success: function ( resp ) {
 			elementParent.find('input[name="evaluatorJob"]').val($(resp).find('input[name="evaluatorJob"]').val())
 			elementParent.find('input[name="evaluatorJob"]').removeClass('wpeo-loader')
@@ -125,10 +125,10 @@ window.digiriskdolibarr.evaluator.createEvaluator = function ( event ) {
 			job: job
 		}),
 		processData: false,
-		contentType: false,
+    contentType: 'application/json charset=utf-8',
 		success: function ( resp ) {
 			$('.fichecenter').html($(resp).find('#searchFormEvaluator'))
- 
+
 			let actionContainerSuccess = $('.messageSuccessEvaluatorCreate');
 
 			actionContainerSuccess.find($(resp).find('.evaluator-create-success-notice'))

@@ -104,7 +104,7 @@ window.digiriskdolibarr.risksign.createRiskSign = function ( event ) {
 			riskSignDescription: description
 		}),
 		processData: false,
-		contentType: false,
+    contentType: 'application/json charset=utf-8',
 		success: function ( resp ) {
 			$('.fichecenter.risksignlist').html($(resp).find('#searchFormListRiskSigns'))
 
@@ -155,7 +155,7 @@ window.digiriskdolibarr.risksign.saveRiskSign = function ( event ) {
 		}),
 		type: "POST",
 		processData: false,
-		contentType: false,
+    contentType: 'application/json charset=utf-8',
 		success: function ( resp ) {
 			$('.fichecenter.risksignlist').html($(resp).find('#searchFormListRiskSigns'))
 
@@ -210,7 +210,7 @@ window.digiriskdolibarr.risksign.unlinkSharedRiskSign = function ( event ) {
 		data: JSON.stringify({
 			risksignID: risksignId,
 		}),
-		contentType: false,
+    contentType: 'application/json charset=utf-8',
 		success: function ( resp ) {
 			$('.fichecenter.sharedrisksignlist .opacitymedium.colorblack.paddingleft').html($(resp).find('#searchFormSharedListRiskSigns .opacitymedium.colorblack.paddingleft'))
 			let actionContainerSuccess = $('.messageSuccessRiskSignUnlinkShared');
