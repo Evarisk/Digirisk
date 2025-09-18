@@ -98,9 +98,11 @@ if ($entity > 0) {
     $upload_dir = $conf->categorie->multidir_output[isset($entity) ? $entity : 1];
 }
 
-if (dolibarr_get_const($db, 'DIGIRISKDOLIBARR_SHOW_HIDDEN_DIGIRISKELEMENT') == 0) {
-    $digiriskelement = $digiriskelement->getActiveDigiriskElements();
+$moreParams = [];
+if (dolibarr_get_const($db, 'DIGIRISKDOLIBARR_SHOW_HIDDEN_DIGIRISKELEMENT') == 1) {
+    $moreParams['filter'] = ' AND t.show_in_selector = 1 ';
 }
+$digiriskelement = $digiriskelement->getActiveDigiriskElements('current', $moreParams);
 
 /*
  * Actions
@@ -683,11 +685,15 @@ if ($entity > 0) {
                             if (dolibarr_get_const($db, 'DIGIRISKDOLIBARR_TASK_HIDE_REF_IN_DOCUMENT') == 1) {
                                 $digiriskelementlabel = [];
                                 foreach ($digiriskelement as $element) {
-                                    $digiriskelementlabel[] = $element->label;
+                                    $digiriskelementlabel[$element->id] = $element->label;
                                 }
-                                $out .= $extrafields->showInputField($key, $digiriskelementlabel, ($required ? 'required' : ''), '', '', 0, $object->id, $object->table_element);
+                                $out .= Form::selectarray($key, $digiriskelementlabel);
                             } else {
-							    $out .= $extrafields->showInputField($key, $digiriskelement, ($required ? 'required' : ''), '', '', 0, $object->id, $object->table_element);
+                                $digiriskelementlabel = [];
+                                foreach ($digiriskelement as $element) {
+                                    $digiriskelementlabel[$element->id] = $element->ref . ' - ' . $element->label;
+                                }
+                                $out .= Form::selectarray($key, $digiriskelementlabel);
                             }
                             break;
 						default:
