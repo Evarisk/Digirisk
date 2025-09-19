@@ -258,16 +258,6 @@ if (empty($resHook)) {
 
         $object->fk_project = $conf->global->DIGIRISKDOLIBARR_TICKET_PROJECT;
 
-        if (!empty($date)) {
-            $timeStamp = dol_stringtotime($date);
-            $date      = dol_getdate($timeStamp);
-            $_POST['options_digiriskdolibarr_ticket_datehour']  = $date['hours'];
-            $_POST['options_digiriskdolibarr_ticket_datemin']   = $date['minutes'];
-            $_POST['options_digiriskdolibarr_ticket_dateday']   = $date['mday'];
-            $_POST['options_digiriskdolibarr_ticket_datemonth'] = $date['mon'];
-            $_POST['options_digiriskdolibarr_ticket_dateyear']  = $date['year'];
-        }
-
         if (!empty($config['validate_text'])) {
             $validateText = $config['validate_text'];
 
@@ -619,6 +609,8 @@ if ($entity > 0) {
                     'digiriskdolibarr_ticket_date'  => ['type' => 'datetime-local']
                 ];
 
+                $_POST['options_digiriskdolibarr_ticket_date'] = dol_now();
+
 				foreach ($fieldList as $key => $label) {
 					if (strpos($key, 'digiriskdolibarr_ticket') === false && !in_array($key, ['message'])) {
 						continue;
@@ -639,7 +631,7 @@ if ($entity > 0) {
 					switch ($key) {
 						case 'message':
 							$out .= '<label class="form-field-container">' . ucfirst($key) . '<span style="color:red"> *</span></label>' ;
-                            $out .= '<textarea name="message" id="message"' . ($required ? 'required' : '') . '>' . GETPOST('message') . '</textarea>';
+                            $out .= '<textarea name="message" id="message" required>' . GETPOST('message') . '</textarea>';
 							break;
 						case 'photo':
                             $out .= <<<HTML
@@ -687,13 +679,13 @@ if ($entity > 0) {
                                 foreach ($digiriskelement as $element) {
                                     $digiriskelementlabel[$element->id] = $element->label;
                                 }
-                                $out .= Form::selectarray($key, $digiriskelementlabel);
+                                $out .= Form::selectarray('options_' . $key, $digiriskelementlabel);
                             } else {
                                 $digiriskelementlabel = [];
                                 foreach ($digiriskelement as $element) {
                                     $digiriskelementlabel[$element->id] = $element->ref . ' - ' . $element->label;
                                 }
-                                $out .= Form::selectarray($key, $digiriskelementlabel);
+                                $out .= Form::selectarray('options_' . $key, $digiriskelementlabel);
                             }
                             break;
 						default:
