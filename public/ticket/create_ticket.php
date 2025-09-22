@@ -104,6 +104,9 @@ if (dolibarr_get_const($db, 'DIGIRISKDOLIBARR_SHOW_HIDDEN_DIGIRISKELEMENT') == 1
 }
 $digiriskelement = $digiriskelement->getActiveDigiriskElements('current', $moreParams);
 
+$timezone = new DateTimeZone($_SESSION['dol_tz_string'] ?? 'UTC');
+$now      = new DateTime('now', $timezone);
+
 /*
  * Actions
  */
@@ -115,6 +118,11 @@ if ($resHook < 0) {
 }
 
 if (empty($resHook)) {
+    if ($_SERVER['REQUEST_METHOD'] === 'POST' && GETPOSTISSET('tz')) {
+        $_SESSION['dol_tz_string'] = GETPOST('tz');
+        exit;
+    }
+
     if ($action == 'add') {
         $error = 0;
 
@@ -451,9 +459,16 @@ $moreJS = ['/saturne/js/includes/signature-pad.min.js'];
 $conf->dol_hide_topmenu  = 1;
 $conf->dol_hide_leftmenu = 1;
 
-saturne_header(0,'', $title, '', '', 0, 0, $moreJS, [], '', 'page-public-card page-signature');
+saturne_header(0,'', $title, '', '', 0, 0, $moreJS, [], '', 'page-public-card page-signature'); ?>
 
-if ($entity > 0) {
+<script>
+    $(document).ready(function() {
+        window.saturne.utils.timezoneDefined = <?= isset($_SESSION['dol_tz_string']) ? 'true' : 'false' ?>;
+        window.saturne.utils.ensureTimezoneInSession();
+    });
+</script>
+
+<?php if ($entity > 0) {
 	if ( ! $conf->global->DIGIRISKDOLIBARR_TICKET_ENABLE_PUBLIC_INTERFACE) {
 		print '<div class="error">' . $langs->trans('TicketPublicInterfaceForbidden') . '</div>';
 		$db->close();
@@ -609,7 +624,7 @@ if ($entity > 0) {
                     'digiriskdolibarr_ticket_date'  => ['type' => 'datetime-local']
                 ];
 
-                $_POST['options_digiriskdolibarr_ticket_date'] = dol_now();
+                $_POST['options_digiriskdolibarr_ticket_date'] = $now->getTimestamp();
 
 				foreach ($fieldList as $key => $label) {
 					if (strpos($key, 'digiriskdolibarr_ticket') === false && !in_array($key, ['message'])) {

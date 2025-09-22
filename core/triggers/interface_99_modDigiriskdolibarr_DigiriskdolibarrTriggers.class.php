@@ -411,10 +411,7 @@ class InterfaceDigiriskdolibarrTriggers extends DolibarrTriggers
 
 					$arraydefaultmessage = $formmail->getEMailTemplate($this->db, 'ticket_send', $user, $langs); // If $model_id is empty, preselect the first one
 
-					$table_element = $object->table_element;
-					$object->table_element = '';
 					$substitutionarray = getCommonSubstitutionArray($langs, 0, null,$object);
-					$object->table_element = $table_element;
 
 					$message = $langs->trans('Hello') . ',' . '<br><br>';
 					$message .= '<span style="color:#c55a11">' . $langs->trans('ANewTicketHasBeenSubmitted', $conf->global->MAIN_INFO_SOCIETE_NOM) . '.' . '</span><br><br>';
