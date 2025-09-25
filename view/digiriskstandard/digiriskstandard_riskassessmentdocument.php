@@ -194,6 +194,10 @@ if (empty($resHook)) {
         $moreparams['objectType'] = 'riskassessment';
 
         $result = $document->generateDocument($model, $outputlangs, $hidedetails, $hidedesc, $hideref, $moreparams);
+        // Need to reset $document->error because commonGenerateDocument call unwanted function dol_delete_preview
+        if ($document->error == 'ErrorObjectNoSupportedByFunction') {
+            $document->error = '';
+        }
 
         $object->ref = $previousRef;
         if ($result > 0 && getDolGlobalInt('DIGIRISKDOLIBARR_GENERATE_ARCHIVE_WITH_DIGIRISKELEMENT_DOCUMENTS')) {
