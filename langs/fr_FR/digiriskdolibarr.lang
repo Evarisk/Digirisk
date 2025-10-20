@@ -950,6 +950,7 @@ RiskList                                 = Listing de risques
 AddRiskTitle                             = Ajout du risque
 AddRiskButton                            = Ajouter le risque
 EditRisk                                 = Édition du risque
+LinkedRisk                               = Risque lié
 RiskCategory                             = Cat.
 RiskCategoryEdit                         = Catégorie de risque
 RiskCategoryEditDescription              = Activer la modification de la catégorie d'un risque existant
