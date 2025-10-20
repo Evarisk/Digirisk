@@ -586,17 +586,21 @@ class pdf_papripact_a3_paysage_projectdocument
 					// Risk assessment
 					if ($conf->global->DIGIRISKDOLIBARR_PROJECTDOCUMENT_DISPLAY_RISKASSESSMENT_COLOR) {
 						if ($lastEvaluation < 47) {
-							$pdf->SetTextColor(169, 169, 169);
+                            $pdf->SetFillColor(169, 169, 169);
+							$pdf->SetTextColor(255, 255, 255);
 						} else if ($lastEvaluation < 51) {
-							$pdf->SetTextColor(255, 165, 0);
+                            $pdf->SetFillColor(255, 165, 0);
+							$pdf->SetTextColor(255, 255, 255);
 						} else if ($lastEvaluation < 80) {
-							$pdf->SetTextColor(255, 0, 0);
+                            $pdf->SetFillColor(255, 0, 0);
+							$pdf->SetTextColor(255, 255, 255);
 						} else {
-							$pdf->SetTextColor(0, 0, 0);
+                            $pdf->SetFillColor(0, 0, 0);
+							$pdf->SetTextColor(255, 255, 255);
 						}
 					}
 					$pdf->SetXY($this->posxriskassessment, $curY);
-					$pdf->MultiCell($this->page_largeur - $this->marge_droite - $this->posxriskassessment, 6, $lastEvaluation, 0, 'R');
+					$pdf->MultiCell($this->page_largeur - $this->marge_droite - $this->posxriskassessment, 6, $lastEvaluation, 0, 'R', true);
 					$pdf->SetTextColor(0, 0, 0);
 
 					// Add line
@@ -748,15 +752,15 @@ class pdf_papripact_a3_paysage_projectdocument
 
         // Date start
         $pdf->SetXY($this->posxdatestart, $tab_top + 1);
-        $pdf->MultiCell($this->posxdateend - $this->posxdatestart, 3, $outputLangs->trans('Start'), 0, 'C');
+        $pdf->MultiCell($this->posxdateend - $this->posxdatestart, 3, $outputLangs->transnoentities('StartDate'), 0, 'C');
 
         // Date end
         $pdf->SetXY($this->posxdateend, $tab_top + 1);
-        $pdf->MultiCell($this->posxworkload - $this->posxdateend, 3, $outputLangs->trans('End'), 0, 'C');
+        $pdf->MultiCell($this->posxworkload - $this->posxdateend, 3, $outputLangs->transnoentities('EndDate'), 0, 'C');
 
         // Task Workload
         $pdf->SetXY($this->posxworkload, $tab_top + 1);
-        $pdf->MultiCell($this->posxbudget - $this->posxworkload, 3, $outputLangs->transnoentities('PlannedWorkloadShort'), 0, 'R');
+        $pdf->MultiCell($this->posxbudget - $this->posxworkload, 3, $outputLangs->transnoentities('PlannedWorkload'), 0, 'R');
 
         // Task Budget
         $pdf->SetXY($this->posxbudget, $tab_top + 1);
@@ -764,7 +768,7 @@ class pdf_papripact_a3_paysage_projectdocument
 
         // Task Progress
         $pdf->SetXY($this->posxprogress, $tab_top + 1);
-        $pdf->MultiCell($this->posxuser - $this->posxprogress, 3, 'ARD', 0, 'R');
+        $pdf->MultiCell($this->posxuser - $this->posxprogress, 3, $outputLangs->transnoentities('DigiriskProgress'), 0, 'R');
 
         // Executive user
         $pdf->SetXY($this->posxuser, $tab_top + 1);
@@ -772,17 +776,16 @@ class pdf_papripact_a3_paysage_projectdocument
 
         // Task Risk
 		$pdf->SetXY($this->posxrisk, $tab_top + 1);
-		$pdf->MultiCell($this->posxriskcategory - $this->posxrisk, 3, $outputLangs->transnoentities('Risk'), '', 'L');
+		$pdf->MultiCell($this->posxriskcategory - $this->posxrisk, 3, $outputLangs->transnoentities('LinkedRisk'), '', 'L');
 
         // Rsk Category
         $pdf->SetXY($this->posxriskcategory, $tab_top + 1);
-        $pdf->MultiCell($this->posxriskassessment - $this->posxrisk, 3, $outputLangs->transnoentities('RiskCategory'), '', 'L');
+        $pdf->MultiCell($this->posxriskassessment - $this->posxrisk, 3, $outputLangs->transnoentities('RiskCategoryEdit'), '', 'L');
 
         // Risk Evaluation
 		$pdf->SetXY($this->posxriskassessment, $tab_top + 1);
-		$pdf->MultiCell($this->page_largeur - $this->marge_droite - $this->posxriskassessment, 3, $outputLangs->transnoentities('RiskAssessment'), '', 'R');
+		$pdf->MultiCell($this->page_largeur - $this->marge_droite - $this->posxriskassessment, 3, $outputLangs->transnoentities('Cotation'), '', 'R');
 	}
-
 	// phpcs:disable PEAR.NamingConventions.ValidFunctionName.PublicUnderscore
 	/**
 	 *  Show top header of page.
