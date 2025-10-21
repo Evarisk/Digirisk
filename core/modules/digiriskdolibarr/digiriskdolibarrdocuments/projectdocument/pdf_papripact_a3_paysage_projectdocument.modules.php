@@ -405,7 +405,7 @@ class pdf_papripact_a3_paysage_projectdocument
 						$lastEvaluation = array_shift($lastEvaluation);
 					}
 
-                    $users         = $object->lines[$i]->liste_contact(-1, 'internal');
+                    $users          = $object->lines[$i]->liste_contact(-1, 'internal');
                     $userExecutives = [];
                     foreach ($users as $gooduser) {
                         if (!empty($gooduser) && $gooduser['code'] == 'TASKEXECUTIVE') {
@@ -837,12 +837,12 @@ class pdf_papripact_a3_paysage_projectdocument
 		$posy += 6;
 		$pdf->SetXY($posx, $posy);
 		$pdf->SetTextColor(0, 0, 60);
-		$pdf->MultiCell(100, 4, $outputLangs->transnoentities('DateStart'). ' : ' .dol_print_date($object->date_start, 'day', false, $outputLangs, true), '', 'R');
+		$pdf->MultiCell(100, 4, $outputLangs->transnoentities('DateStart') . ' : ' . dol_print_date($object->date_start, 'day', false, $outputLangs, true), '', 'R');
 
 		if ($object->date_end) {
 			$posy += 6;
 			$pdf->SetXY($posx, $posy);
-			$pdf->MultiCell(100, 4, $outputLangs->transnoentities('DateEnd'). ' : ' .dol_print_date($object->date_end, 'day', false, $outputLangs, true), '', 'R');
+			$pdf->MultiCell(100, 4, $outputLangs->transnoentities('DateEnd') . ' : ' . dol_print_date($object->date_end, 'day', false, $outputLangs, true), '', 'R');
 		}
 
 		if (is_object($object->thirdparty)) {
@@ -851,6 +851,8 @@ class pdf_papripact_a3_paysage_projectdocument
 			$pdf->MultiCell(100, 4, $outputLangs->transnoentities('ThirdParty'). ' : ' .$object->thirdparty->getFullName($outputLangs), '', 'R');
 		}
 
+        $pdf->Cell(0, 10, 'PAPRIPACT - ' . $conf->global->MAIN_INFO_SOCIETE_NOM . ' ' . dol_print_date($object->date_start, 'day', false, $outputLangs, true) . ' - ' . dol_print_date($object->date_end, 'day', false, $outputLangs, true), 0, 1, 'C');
+        $pdf->Cell(0, 10, $langs->transnoentities('PapripactFullName'), 0, 1, 'C');
 		$pdf->SetTextColor(0, 0, 60);
 
 		// Add list of linked objects
