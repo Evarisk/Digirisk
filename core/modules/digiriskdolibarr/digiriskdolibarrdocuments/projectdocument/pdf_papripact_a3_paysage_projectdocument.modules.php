@@ -585,18 +585,16 @@ class pdf_papripact_a3_paysage_projectdocument
 
 					// Risk assessment
 					if ($conf->global->DIGIRISKDOLIBARR_PROJECTDOCUMENT_DISPLAY_RISKASSESSMENT_COLOR) {
+                        $pdf->SetTextColor(255, 255, 255);
 						if ($lastEvaluation < 47) {
-                            $pdf->SetFillColor(169, 169, 169);
-							$pdf->SetTextColor(255, 255, 255);
+                            $pdf->SetFillColor(236, 236, 236);
+                            $pdf->SetTextColor(0, 0, 0);
 						} else if ($lastEvaluation < 51) {
-                            $pdf->SetFillColor(255, 165, 0);
-							$pdf->SetTextColor(255, 255, 255);
+                            $pdf->SetFillColor(233, 173, 79);
 						} else if ($lastEvaluation < 80) {
-                            $pdf->SetFillColor(255, 0, 0);
-							$pdf->SetTextColor(255, 255, 255);
+                            $pdf->SetFillColor(224, 83, 83);
 						} else {
-                            $pdf->SetFillColor(0, 0, 0);
-							$pdf->SetTextColor(255, 255, 255);
+                            $pdf->SetFillColor(43, 43, 43);
 						}
 					}
 					$pdf->SetXY($this->posxriskassessment, $curY);
@@ -812,6 +810,9 @@ class pdf_papripact_a3_paysage_projectdocument
 
 		$pdf->SetXY($this->marge_gauche, $posy);
 
+        // PAPRIPACT title
+        $pdf->Cell(0, 10, 'PAPRIPACT - ' . $conf->global->MAIN_INFO_SOCIETE_NOM . ' ' . dol_print_date($object->date_start, 'day', false, $outputLangs, true) . ' - ' . dol_print_date($object->date_end, 'day', false, $outputLangs, true), 0, 1, 'C');
+        $pdf->Cell(0, 10, $langs->transnoentities('PapripactFullName'), 0, 1, 'C');
 		// Logo
 		$logo = $conf->mycompany->dir_output.'/logos/'.$mysoc->logo;
 		if ($mysoc->logo) {
@@ -851,8 +852,6 @@ class pdf_papripact_a3_paysage_projectdocument
 			$pdf->MultiCell(100, 4, $outputLangs->transnoentities('ThirdParty'). ' : ' .$object->thirdparty->getFullName($outputLangs), '', 'R');
 		}
 
-        $pdf->Cell(0, 10, 'PAPRIPACT - ' . $conf->global->MAIN_INFO_SOCIETE_NOM . ' ' . dol_print_date($object->date_start, 'day', false, $outputLangs, true) . ' - ' . dol_print_date($object->date_end, 'day', false, $outputLangs, true), 0, 1, 'C');
-        $pdf->Cell(0, 10, $langs->transnoentities('PapripactFullName'), 0, 1, 'C');
 		$pdf->SetTextColor(0, 0, 60);
 
 		// Add list of linked objects
