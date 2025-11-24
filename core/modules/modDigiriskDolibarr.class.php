@@ -440,7 +440,8 @@ class modDigiriskdolibarr extends DolibarrModules
                 'digiriskstandardagenda',
                 'category',
                 'categoryindex',
-                'main'
+                'main',
+                'saturnegetobjectsmetadata'
 			],
 			'tabs' => [
 				'mycompany_admin'
