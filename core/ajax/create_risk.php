@@ -64,6 +64,7 @@ if ($result > 0) {
 
         foreach ($tasks as $tasktitle) {
             $task = new Task($db);
+            $task->ref   = $refTaskMod->getNextValue('', $task);
             $task->label = $tasktitle;
             $task->description = '';
             $task->status = 1;
