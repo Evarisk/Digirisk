@@ -167,7 +167,7 @@ class doc_accidentinvestigationdocument_odt extends ModeleODTDigiriskDolibarrDoc
 	 * @return int                               1 if OK, <=0 if KO.
 	 * @throws Exception
 	 */
-	public function write_file(SaturneDocuments $objectDocument, Translate $outputLangs, string $srcTemplatePath, int $hideDetails = 0, int $hideDesc = 0, int $hideRef = 0, array $moreParam): int
+	public function write_file(SaturneDocuments $objectDocument, Translate $outputLangs, string $srcTemplatePath, int $hideDetails = 0, int $hideDesc = 0, int $hideRef = 0, array $moreParam = []): int
 	{
         require_once DOL_DOCUMENT_ROOT . '/core/lib/date.lib.php';
         require_once __DIR__ . '/../../../../../class/accident.class.php';
