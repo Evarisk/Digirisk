@@ -109,6 +109,8 @@ class RiskAssessmentDocument extends DigiriskDocuments
 
     public function generateArchiveWithDigiriskElementDocuments($moreparams, $outputLangs, $hideDetails, $hideDesc, $hideRef)
     {
+        global $user;
+
         if (!getDolGlobalInt('DIGIRISKDOLIBARR_GENERATE_ARCHIVE_WITH_DIGIRISKELEMENT_DOCUMENTS')) {
             return 0;
         }
@@ -145,7 +147,7 @@ class RiskAssessmentDocument extends DigiriskDocuments
 
         $digiriskElementObjects = ['groupment', 'workunit'];
         foreach ($digiriskElementObjects as $digiriskElementObject) {
-            $digiriskElementDocumentPath[$digiriskElementObject] = $moreparams['uploadDir'] . '/' . $digiriskElementObject . 'document';
+            $digiriskElementDocumentPaths[$digiriskElementObject] = $moreparams['uploadDir'] . '/' . $digiriskElementObject . 'document';
 
             $modelLists[$digiriskElementObject] = saturne_get_list_of_models($this->db, $digiriskElementObject . 'document');
             if (!is_array($modelLists[$digiriskElementObject]) || empty($modelLists[$digiriskElementObject])) {
@@ -181,6 +183,7 @@ class RiskAssessmentDocument extends DigiriskDocuments
 
             $moreParams['object'] = $digiriskElementSingle['object'];
             $moreParams['zone']   = 'private';
+            $moreParams['user']   = $user;
 
             $result = $digiriskElementDocument->generateDocument($model[$digiriskElementSingle['object']->element_type], $outputLangs, $hideDetails, $hideDesc, $hideRef, $moreParams);
             if ($result < 0) {
@@ -188,8 +191,8 @@ class RiskAssessmentDocument extends DigiriskDocuments
                 return -1;
             }
 
-            $digiriskElementDocumentPath = $digiriskElementDocumentPath[$digiriskElementSingle['object']->element_type] . '/' . $digiriskElementSingle['object']->ref . '/';
-            $result                      = dol_copy($digiriskElementDocumentPath . '/' . $this->last_main_doc, $digiriskElementDocumentZipPath . '/' . $this->last_main_doc);
+            $digiriskElementDocumentPath = $digiriskElementDocumentPaths[$digiriskElementSingle['object']->element_type] . '/' . $digiriskElementSingle['object']->ref;
+            $result                      = dol_copy($digiriskElementDocumentPath . '/' . $digiriskElementDocument->last_main_doc, $digiriskElementDocumentZipPath . '/' . $digiriskElementDocument->last_main_doc);
             if ($result < 0) {
                 $this->error = 'error3';
                 return -1;
@@ -227,9 +230,6 @@ class RiskAssessmentDocument extends DigiriskDocuments
         }
 
         $zipArchive->close();
-
-        //move archive to riskassessmentdocument folder
-        //rename(DOL_DOCUMENT_ROOT . '/custom/digiriskdolibarr/view/digiriskstandard/' . $document->ref . '.zip', $pathToZip . '.zip');
 
         return 1;
     }

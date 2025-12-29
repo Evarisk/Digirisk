@@ -170,6 +170,7 @@ if (empty($resHook)) {
 
     // Action to build doc
     if (($action == 'builddoc' || GETPOST('forcebuilddoc')) && $permissiontoadd) {
+        $error       = 0;
         $outputlangs = $langs;
         $newlang     = '';
 
@@ -187,8 +188,6 @@ if (empty($resHook)) {
 
         $model = GETPOST('model', 'alpha');
 
-        $previousRef = $object->ref;
-        $object->ref = '';
         $moreparams['object'] = $object;
         $moreparams['user']   = $user;
         $moreparams['objectType'] = 'riskassessment';
@@ -196,36 +195,32 @@ if (empty($resHook)) {
         $moreparams['digiriskElement'] = $digiriskelement;
 
         $result = $document->generateDocument($model, $outputlangs, $hidedetails, $hidedesc, $hideref, $moreparams);
-        // Need to reset $document->error because commonGenerateDocument call unwanted function dol_delete_preview
-        if ($document->error == 'ErrorObjectNoSupportedByFunction') {
-            $document->error = '';
-        }
-
-        $object->ref = $previousRef;
-        $a = $document->generateArchiveWithDigiriskElementDocuments($moreparams, $outputlangs, $hidedetails, $hidedesc, $hideref);
-        if ($a < 0) {
-            setEventMessages($document->error, $document->errors, 'errors');
-            $action = '';
-        }
-
         if ($result <= 0) {
             setEventMessages($document->error, $document->errors, 'errors');
+            $error++;
             $action = '';
-        } else {
-            if (empty($donotredirect)) {
-                setEventMessages($langs->trans("FileGenerated") . ' - ' . $document->last_main_doc, null);
+        }
 
-                $urltoredirect = $_SERVER['REQUEST_URI'];
-                $urltoredirect = preg_replace('/#builddoc$/', '', $urltoredirect);
-                $urltoredirect = preg_replace('/action=builddoc&?/', '', $urltoredirect); // To avoid infinite loop
-                if (preg_match('/forcebuilddoc=1/', $urltoredirect)) {
-                    $urltoredirect = preg_replace('/forcebuilddoc=1&?/', '', $urltoredirect); // To avoid infinite loop
-                    header('Location: ' . $urltoredirect . '#sendEmail');
-                } else {
-                    header('Location: ' . $urltoredirect . '#builddoc');
-                }
-                exit;
+        $result = $document->generateArchiveWithDigiriskElementDocuments($moreparams, $outputlangs, $hidedetails, $hidedesc, $hideref);
+        if ($result < 0) {
+            setEventMessages($document->error, $document->errors, 'errors');
+            $error++;
+            $action = '';
+        }
+
+        if (!$error && empty($donotredirect)) {
+            setEventMessages($langs->trans("FileGenerated") . ' - ' . $document->last_main_doc, null);
+
+            $urltoredirect = $_SERVER['REQUEST_URI'];
+            $urltoredirect = preg_replace('/#builddoc$/', '', $urltoredirect);
+            $urltoredirect = preg_replace('/action=builddoc&?/', '', $urltoredirect); // To avoid infinite loop
+            if (preg_match('/forcebuilddoc=1/', $urltoredirect)) {
+                $urltoredirect = preg_replace('/forcebuilddoc=1&?/', '', $urltoredirect); // To avoid infinite loop
+                header('Location: ' . $urltoredirect . '#sendEmail');
+            } else {
+                header('Location: ' . $urltoredirect . '#builddoc');
             }
+            exit;
         }
     }
 
