@@ -107,10 +107,8 @@ class RiskAssessmentDocument extends DigiriskDocuments
 		return $jsonFormatted;
 	}
 
-    public function testb($moreparams)
+    public function generateArchiveWithDigiriskElementDocuments($moreparams, $outputLangs, $hideDetails, $hideDesc, $hideRef)
     {
-        global $langs;
-
         if (!getDolGlobalInt('DIGIRISKDOLIBARR_GENERATE_ARCHIVE_WITH_DIGIRISKELEMENT_DOCUMENTS')) {
             return 0;
         }
@@ -121,96 +119,119 @@ class RiskAssessmentDocument extends DigiriskDocuments
             return -1;
         }
 
-        'c:/wamp64/www/dolibarr/documents/digiriskdolibarr/riskassessmentdocument';
         $uploadDir = $moreparams['uploadDir'] . '/' . $this->element;
 
-        '20251218_AI2312-0001_AID2512-0005_Industrie_standard';
-        $fileName  = pathinfo($this->last_main_doc, PATHINFO_FILENAME);
-        $pathToZip = $uploadDir . '/' . $fileName;
-        $result    = dol_mkdir($pathToZip);
+        $fileName = pathinfo($this->last_main_doc, PATHINFO_FILENAME);
+        $zipPath  = $uploadDir . '/' . $fileName;
+        $result   = dol_mkdir($zipPath);
         if ($result < 0) {
             $this->error = 'error2';
             return -1;
         }
 
-        $result = dol_copy($uploadDir . '/' . $this->last_main_doc, $pathToZip . '/' . $this->last_main_doc);
+        $result = dol_copy($uploadDir . '/' . $this->last_main_doc, $zipPath . '/' . $this->last_main_doc);
         if ($result < 0) {
             $this->error = 'error3';
             return -1;
         }
 
         if (file_exists($uploadDir . '/' . $fileName . '.pdf')) {
-            $result = dol_copy($uploadDir . '/' . $fileName . '.pdf', $pathToZip . '/' . $fileName . '.pdf');
+            $result = dol_copy($uploadDir . '/' . $fileName . '.pdf', $zipPath . '/' . $fileName . '.pdf');
             if ($result < 0) {
                 $this->error = 'error3';
                 return -1;
             }
         }
 
-        foreach ($digiriskElements as $digiriskElementSingle) {
-            if ($digiriskElementSingle['object']->element_type == 'groupment') {
-                $digiriskelementdocument = new GroupmentDocument($db);
-            } elseif ($digiriskelementsingle['object']->element_type == 'workunit') {
-                $digiriskelementdocument = new WorkUnitDocument($db);
+        $digiriskElementObjects = ['groupment', 'workunit'];
+        foreach ($digiriskElementObjects as $digiriskElementObject) {
+            $digiriskElementDocumentPath[$digiriskElementObject] = $moreparams['uploadDir'] . '/' . $digiriskElementObject . 'document';
+
+            $modelLists[$digiriskElementObject] = saturne_get_list_of_models($this->db, $digiriskElementObject . 'document');
+            if (!is_array($modelLists[$digiriskElementObject]) || empty($modelLists[$digiriskElementObject])) {
+                $this->error = 'error4';
+                return -1;
             }
-            $subFolder = $digiriskelementdocument->element;
 
-            $moreparams['object']     = $digiriskelementsingle['object'];
-            $moreparams['objectType'] = $digiriskelementsingle['object']->element_type;
+            $model[$digiriskElementObject] = '';
+            $defaultModel                  = getDolGlobalString(dol_strtoupper($this->module) . '_' . dol_strtoupper($digiriskElementObject . 'document') . '_DEFAULT_MODEL');
+            if (!dol_strlen($defaultModel)) {
+                $model[$digiriskElementObject] = key($modelLists[$digiriskElementObject]);
+            } else {
+                foreach ($modelLists[$digiriskElementObject] as $modelKey => $modelList) {
+                    if (strpos($modelKey, $defaultModel) !== false) {
+                        $model[$digiriskElementObject] = $modelKey;
+                    }
+                }
+            }
+            $model[$digiriskElementObject] = str_replace($digiriskElementObject . 'document_custom_odt', $digiriskElementObject . 'document_odt', $model[$digiriskElementObject]);
+        }
 
-            $confName      = getDolGlobalString(dol_strtoupper($this->module) . '_' . dol_strtoupper($digiriskelementdocument->element) . '_ADDON_ODT_PATH');
-            $templatePath  = preg_replace('/DOL_DOCUMENT_ROOT/', DOL_DOCUMENT_ROOT, $confName);
-            $model         = $conf->global->$digiriskelementdocumentmodel . ':' . $digiriskelementdocumentmodelpath . 'template_' . $templateName;
-            $defaultModel  = getDolGlobalString(dol_strtoupper($this->module) . '_' . dol_strtoupper($digiriskelementdocument->element) . '_DEFAULT_MODEL');
+        foreach ($digiriskElements as $digiriskElementSingle) {
+            $digiriskElementDocumentZipPath = $zipPath . '/' . $digiriskElementSingle['object']->ref;
+            $result                         = dol_mkdir($digiriskElementDocumentZipPath);
+            if ($result < 0) {
+                $this->error = 'error2';
+                return -1;
+            }
 
-            $result = $digiriskelementdocument->generateDocument($digiriskelementdocumentmodelfinal, $outputlangs, $hidedetails, $hidedesc, $hideref, $moreparams);
+            $digiriskElementDocument = new DigiriskDocuments($this->db, $this->module, $digiriskElementSingle['object']->element_type . 'document');
 
-            // Ajout du fichier au dossier à zipper
-            $sourceFilePath = $pathToZip . '/' . $subFolder . '/' . $digiriskelementsingle['object']->ref . '/';
-            $nameFile       = $date . '_' . $document->ref . '_' . $digiriskelementsingle['object']->ref . '_' . $digiriskelementdocument->ref . '_' . $digiriskelementsingle['object']->label . '_' . $nameSociety;
-            $nameFile       = str_replace(' ', '_', $nameFile);
-            $nameFile       = dol_sanitizeFileName($nameFile);
+            $digiriskElementDocument->element = $digiriskElementSingle['object']->element_type . 'document';
 
-            copy($sourceFilePath . $digiriskelementdocument->last_main_doc, $pathToZip . '/' . $nameFile . '.odt');
-            $pathinfo = pathinfo($digiriskelementdocument->last_main_doc);
-            if (file_exists($sourceFilePath . $pathinfo['filename'] . '.pdf')) {
-                copy($sourceFilePath . $pathinfo['filename'] . '.pdf', $pathToZip . '/' . $nameFile . '.pdf');
+            $moreParams['object'] = $digiriskElementSingle['object'];
+            $moreParams['zone']   = 'private';
+
+            $result = $digiriskElementDocument->generateDocument($model[$digiriskElementSingle['object']->element_type], $outputLangs, $hideDetails, $hideDesc, $hideRef, $moreParams);
+            if ($result < 0) {
+                $this->error = 'error5';
+                return -1;
+            }
+
+            $digiriskElementDocumentPath = $digiriskElementDocumentPath[$digiriskElementSingle['object']->element_type] . '/' . $digiriskElementSingle['object']->ref . '/';
+            $result                      = dol_copy($digiriskElementDocumentPath . '/' . $this->last_main_doc, $digiriskElementDocumentZipPath . '/' . $this->last_main_doc);
+            if ($result < 0) {
+                $this->error = 'error3';
+                return -1;
+            }
+
+            $fileName = pathinfo($this->last_main_doc, PATHINFO_FILENAME);
+            if (file_exists($digiriskElementDocumentPath . '/' . $fileName . '.pdf')) {
+                $result = dol_copy($digiriskElementDocumentPath . '/' . $fileName . '.pdf', $digiriskElementDocumentZipPath . '/' . $fileName . '.pdf');
+                if ($result < 0) {
+                    $this->error = 'error3';
+                    return -1;
+                }
             }
         }
 
-            // Get real path for our folder
-            $rootPath = realpath($pathToZip);
+        $sourceDir = realpath($zipPath);
+        $zipFile   = $sourceDir . '.zip';
 
-            // Initialize archive object
-            $zip = new ZipArchive();
+        $zipArchive = new ZipArchive();
+        $zipArchive->open($zipFile, ZipArchive::CREATE | ZipArchive::OVERWRITE);
 
-            $zip->open($document->ref . '.zip', ZipArchive::CREATE | ZipArchive::OVERWRITE);
+        $files = new RecursiveIteratorIterator(
+            new RecursiveDirectoryIterator($sourceDir, FilesystemIterator::SKIP_DOTS),
+            RecursiveIteratorIterator::SELF_FIRST
+        );
 
-            // Create recursive directory iterator
-            /** @var SplFileInfo[] $files */
-            $files = new RecursiveIteratorIterator(
-                new RecursiveDirectoryIterator($rootPath),
-                RecursiveIteratorIterator::LEAVES_ONLY
-            );
+        foreach ($files as $file) {
+            if (!$file->isDir()) {
+                $filePath     = $file->getRealPath();
+                $relativePath = substr($filePath, strlen($sourceDir) + 1);
 
-            foreach ($files as $name => $file) {
-                // Skip directories (they would be added automatically)
-                if ( ! $file->isDir()) {
-                    // Get real and relative path for current file
-                    $filePath     = $file->getRealPath();
-                    $relativePath = substr($filePath, strlen($rootPath) + 1);
-
-                    // Add current file to archive
-                    $zip->addFile($filePath, $relativePath);
-                    $zip->setCompressionName($file, ZipArchive::CM_STORE);
-                }
+                $zipArchive->addFile($filePath, $relativePath);
+                $zipArchive->setCompressionName($relativePath, ZipArchive::CM_STORE);
             }
+        }
 
-            // Zip archive will be created only after closing object
-            $zip->close();
+        $zipArchive->close();
 
-            //move archive to riskassessmentdocument folder
-            rename(DOL_DOCUMENT_ROOT . '/custom/digiriskdolibarr/view/digiriskstandard/' . $document->ref . '.zip', $pathToZip . '.zip');
+        //move archive to riskassessmentdocument folder
+        //rename(DOL_DOCUMENT_ROOT . '/custom/digiriskdolibarr/view/digiriskstandard/' . $document->ref . '.zip', $pathToZip . '.zip');
+
+        return 1;
     }
 
     /**

@@ -202,7 +202,11 @@ if (empty($resHook)) {
         }
 
         $object->ref = $previousRef;
-        $document->testb($moreparams);
+        $a = $document->generateArchiveWithDigiriskElementDocuments($moreparams, $outputlangs, $hidedetails, $hidedesc, $hideref);
+        if ($a < 0) {
+            setEventMessages($document->error, $document->errors, 'errors');
+            $action = '';
+        }
 
         if ($result <= 0) {
             setEventMessages($document->error, $document->errors, 'errors');
