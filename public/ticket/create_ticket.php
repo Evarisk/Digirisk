@@ -82,6 +82,10 @@ $category        = new Categorie($db);
 $digiriskelement = new DigiriskElement($db);
 $signatory       = new SaturneSignature($db, $moduleNameLowerCase, $object->element);
 
+$tzString = !empty($_SESSION['dol_tz_string']) ? $_SESSION['dol_tz_string'] : 'UTC';
+$timezone = new DateTimeZone($tzString);
+$now      = new DateTime('now', $timezone);
+
 $form = new Form($db);
 
 $numRefConf = strtoupper($object->element) . '_ADDON';
@@ -103,9 +107,6 @@ if (dolibarr_get_const($db, 'DIGIRISKDOLIBARR_SHOW_HIDDEN_DIGIRISKELEMENT') == 1
     $moreParams['filter'] = ' AND t.show_in_selector = 1 ';
 }
 $digiriskelement = $digiriskelement->getActiveDigiriskElements('current', $moreParams);
-
-$timezone = new DateTimeZone($_SESSION['dol_tz_string'] ?? 'UTC');
-$now      = new DateTime('now', $timezone);
 
 /*
  * Actions
