@@ -762,7 +762,7 @@ RiskAssessmentDocumentDescription                         = Plan d'action Docume
 # Boxes - Widget
 NextGenerateDate  = Prochain génération
 LastGenerateDate  = Dernière génération
-DelayGenerateDate = Retard dans la génération
+DelayGenerateDate = Jours restants
 NoDelay           = Pas de retard
 
 # Email - Mail
@@ -900,9 +900,9 @@ DeleteEvaluatorMessage       = Suppression de l'évaluateur
 DigiriskEvaluatorData        = Données configurables des évaluateurs
 EvaluatorDuration            = Durée de l'évaluation par l'évaluateur
 EvaluatorDurationDescription = Le temps que met l'évaluateur à réaliser son évaluation des risques
-NbEmployeesInvolved          = Nombre de salariés impliqués
-NbEmployees                  = Nombre de salariés
-NbEmployeesInvolvedTooltip   = Nombre de salariés (évaluateurs) uniques
+NbEmployeesInvolved          = Salariés impliqués
+NbEmployees                  = Salariés
+NbEmployeesInvolvedTooltip   = Salariés (évaluateurs) uniques
 NbEmployeesTooltip           = Si la gestion centralisée des utilisateurs et des groupes sur l'entité principale est activée.<br>Le nombre de salariés correspond au nombre d'utilisateurs partagés/affectés à un groupe et aussi au nombre d'administrateur de l'entité principale
 NbEmployeesConfTooltip       = Le nombre de salariés a été saisi manuellement
 

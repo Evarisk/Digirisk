@@ -277,18 +277,25 @@ class RiskAssessmentDocument extends DigiriskDocuments
         $filter                  = ['customsql' => 't.type = "' . $this->element . '"' . ($moreParam['filter'] ?? '')];
         $riskAssessmentDocuments = $this->fetchAll('desc', 't.rowid', 1, 0, $filter);
         if (!empty($riskAssessmentDocuments) && is_array($riskAssessmentDocuments)) {
-            $riskAssessmentDocument       = array_shift($riskAssessmentDocuments);
-            $now                          = dol_now();
-            $nextGenerateTimeStamp        = dol_time_plus_duree($riskAssessmentDocument->date_creation, '1', 'y');
-            $nextGenerateDate             = dol_print_date($nextGenerateTimeStamp, 'day');
-            $lastGenerateDate             = dol_print_date($riskAssessmentDocument->date_creation, 'day');
-            $nbDaysAfterNextGenerateDate  = num_between_day($now, $nextGenerateTimeStamp, 1);
-            $nbDaysBeforeNextGenerateDate = num_between_day($nextGenerateTimeStamp, $now, 1);
+            $riskAssessmentDocument = array_shift($riskAssessmentDocuments);
+            $now                    = dol_now('tzuser');
+            $nextGenerateTimeStamp  = dol_time_plus_duree($riskAssessmentDocument->date_creation, '1', 'y');
+            $nextGenerateDate       = dol_print_date($nextGenerateTimeStamp, 'day');
+            $lastGenerateDate       = dol_print_date($riskAssessmentDocument->date_creation, 'day');
 
-            $array['nextgeneratedate']  = img_picto('', 'fontawesome_fa-calendar_far_#263C5C80', 'class="pictofixedwidth"') . $nextGenerateDate;
-            $array['nextgeneratedate'] .= ' ' . (!empty($nbDaysAfterNextGenerateDate) ? $nbDaysAfterNextGenerateDate . ' ' . $langs->transnoentities('Days') : '');
-            $array['lastgeneratedate']  = img_picto('', 'fontawesome_fa-calendar_far_#263C5C80', 'class="pictofixedwidth"') . $lastGenerateDate;
-            $array['delaygeneratedate'] = !empty($nbDaysBeforeNextGenerateDate) ? $nbDaysBeforeNextGenerateDate . ' ' . $langs->transnoentities('Days') : $langs->transnoentities('NoDelay');
+            $delayGenerateColor = '#C7BA10'; // Default color
+            $delayGenerateDate    = (int) round(($nextGenerateTimeStamp - $now)/(3600 * 24));
+            $delayGenerateFrequencies = [0 => '#FF3535', 30 => '#FD7E00', 60 => '#FFB700', 90 => '#C7BA10'];
+            foreach ($delayGenerateFrequencies as $delayGenerateFrequency => $delayGenerateFrequencyDefaultColor) {
+                if ($delayGenerateDate <= $delayGenerateFrequency) {
+                    $delayGenerateColor = $delayGenerateFrequencyDefaultColor;
+                    break;
+                }
+            }
+
+            $array['nextgeneratedate']  = $nextGenerateDate;
+            $array['lastgeneratedate']  = $lastGenerateDate;
+            $array['delaygeneratedate'] = '<span style="color:' . $delayGenerateColor . ';">' . abs($delayGenerateDate) . ' ' . $langs->transnoentities('Days')  . '</span>';
         } else {
             $array['nextgeneratedate']  = 'N/A';
             $array['lastgeneratedate']  = 'N/A';
