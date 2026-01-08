@@ -188,6 +188,8 @@ if (empty($resHook)) {
 
         $model = GETPOST('model', 'alpha');
 
+        $previousRef = $object->ref;
+        $object->ref = '';
         $moreparams['object'] = $object;
         $moreparams['user']   = $user;
         $moreparams['objectType'] = 'riskassessment';
@@ -201,6 +203,7 @@ if (empty($resHook)) {
             $action = '';
         }
 
+        $object->ref = $previousRef;
         $result = $document->generateArchiveWithDigiriskElementDocuments($moreparams, $outputlangs, $hidedetails, $hidedesc, $hideref);
         if ($result < 0) {
             setEventMessages($document->error, $document->errors, 'errors');

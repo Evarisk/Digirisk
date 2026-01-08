@@ -167,16 +167,16 @@ class RiskAssessmentDocument extends DigiriskDocuments
                 }
             }
             $model[$digiriskElementObject] = str_replace($digiriskElementObject . 'document_custom_odt', $digiriskElementObject . 'document_odt', $model[$digiriskElementObject]);
-        }
 
-        foreach ($digiriskElements as $digiriskElementSingle) {
-            $digiriskElementDocumentZipPath = $zipPath . '/' . $digiriskElementSingle['object']->ref;
-            $result                         = dol_mkdir($digiriskElementDocumentZipPath);
+            $digiriskElementDocumentZipPaths[$digiriskElementObject] = $zipPath . '/' . $digiriskElementObject . 'document';
+            $result                                                  = dol_mkdir($digiriskElementDocumentZipPaths[$digiriskElementObject]);
             if ($result < 0) {
                 $this->error = 'error2';
                 return -1;
             }
+        }
 
+        foreach ($digiriskElements as $digiriskElementSingle) {
             $digiriskElementDocument = new DigiriskDocuments($this->db, $this->module, $digiriskElementSingle['object']->element_type . 'document');
 
             $digiriskElementDocument->element = $digiriskElementSingle['object']->element_type . 'document';
@@ -192,7 +192,7 @@ class RiskAssessmentDocument extends DigiriskDocuments
             }
 
             $digiriskElementDocumentPath = $digiriskElementDocumentPaths[$digiriskElementSingle['object']->element_type] . '/' . $digiriskElementSingle['object']->ref;
-            $result                      = dol_copy($digiriskElementDocumentPath . '/' . $digiriskElementDocument->last_main_doc, $digiriskElementDocumentZipPath . '/' . $digiriskElementDocument->last_main_doc);
+            $result                      = dol_copy($digiriskElementDocumentPath . '/' . $digiriskElementDocument->last_main_doc, $digiriskElementDocumentZipPaths[$digiriskElementSingle['object']->element_type] . '/' . $digiriskElementDocument->last_main_doc);
             if ($result < 0) {
                 $this->error = 'error3';
                 return -1;
@@ -200,7 +200,7 @@ class RiskAssessmentDocument extends DigiriskDocuments
 
             $fileName = pathinfo($this->last_main_doc, PATHINFO_FILENAME);
             if (file_exists($digiriskElementDocumentPath . '/' . $fileName . '.pdf')) {
-                $result = dol_copy($digiriskElementDocumentPath . '/' . $fileName . '.pdf', $digiriskElementDocumentZipPath . '/' . $fileName . '.pdf');
+                $result = dol_copy($digiriskElementDocumentPath . '/' . $fileName . '.pdf', $digiriskElementDocumentZipPaths[$digiriskElementSingle['object']->element_type] . '/' . $fileName . '.pdf');
                 if ($result < 0) {
                     $this->error = 'error3';
                     return -1;
@@ -225,7 +225,7 @@ class RiskAssessmentDocument extends DigiriskDocuments
                 $relativePath = substr($filePath, strlen($sourceDir) + 1);
 
                 $zipArchive->addFile($filePath, $relativePath);
-                $zipArchive->setCompressionName($relativePath, ZipArchive::CM_STORE);
+                $zipArchive->setCompressionName($relativePath, ZipArchive::CM_DEFLATE);
             }
         }
 

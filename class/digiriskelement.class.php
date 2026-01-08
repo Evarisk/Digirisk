@@ -238,9 +238,11 @@ class DigiriskElement extends SaturneObject
         foreach ($digiriskElements as $digiriskElement) {
             $entity = ($digiriskElement['object']->entity == $conf->entity) ? 'current' : 'shared';
             if ($digiriskElement['object']->element_type == 'groupment') {
-                $array[$entity]['nbGroupment']++;
+                $array[$entity]['nbGroupment'] =
+                    ($array[$entity]['nbGroupment'] ?? 0) + 1;
             } else {
-                $array[$entity]['nbWorkUnit']++;
+                $array[$entity]['nbWorkunit'] =
+                    ($array[$entity]['nbWorkunit'] ?? 0) + 1;
             }
         }
 
