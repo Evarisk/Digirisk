@@ -295,7 +295,7 @@ class RiskAssessmentDocument extends DigiriskDocuments
 
             $array['nextgeneratedate']  = $nextGenerateDate;
             $array['lastgeneratedate']  = $lastGenerateDate;
-            $array['delaygeneratedate'] = '<span style="color:' . $delayGenerateColor . ';">' . abs($delayGenerateDate) . ' ' . $langs->transnoentities('Days')  . '</span>';
+            $array['delaygeneratedate'] = '<span style="color:' . $delayGenerateColor . ';">' . $delayGenerateDate . ' ' . $langs->transnoentities('Days')  . '</span>';
         } else {
             $array['nextgeneratedate']  = 'N/A';
             $array['lastgeneratedate']  = 'N/A';
