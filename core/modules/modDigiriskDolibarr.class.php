@@ -2285,47 +2285,24 @@ class modDigiriskdolibarr extends DolibarrModules
 
         saturne_manage_extrafields($extraFieldsArrays, $commonExtraFieldsValue);
 
-        if (dolibarr_get_const($this->db, 'DIGIRISKDOLIBARR_TICKET_EXTRAFIELDS', 0) == 1) {
+        if (dolibarr_get_const($this->db, 'DIGIRISKDOLIBARR_TICKET_EXTRAFIELDS', 0) <= 3) {
             $commonExtraFieldsValue = [
-                'alwayseditable' => 1, 'list' => 1, 'help' => '', 'entity' => 0, 'langfile' => 'digiriskdolibarr@digiriskdolibarr', 'enabled' => "isModEnabled('digiriskdolibarr') && isModEnabled('ticket')", 'moreparams' => ['css' => 'minwidth100 maxwidth300']
-            ];
-
-            $extraFieldsArrays = [
-                'digiriskdolibarr_ticket_lastname'   => ['Label' => 'LastName',         'type' => 'varchar', 'length' => 255,  'elementtype' => ['ticket'], 'position' => $this->numero . 10,                                                                                                        ],
-                'digiriskdolibarr_ticket_firstname'  => ['Label' => 'FirstName',        'type' => 'varchar', 'length' => 255,  'elementtype' => ['ticket'], 'position' => $this->numero . 20,                                                                                                        ],
-                'digiriskdolibarr_ticket_phone'      => ['Label' => 'Phone',            'type' => 'varchar', 'length' => 255,  'elementtype' => ['ticket'], 'position' => $this->numero . 30,                                                                                                        ],
-                'digiriskdolibarr_ticket_service'    => ['Label' => 'GP/UT',            'type' => 'link',                      'elementtype' => ['ticket'], 'position' => $this->numero . 40, 'params' => ['DigiriskElement:digiriskdolibarr/class/digiriskelement.class.php:1' => NULL], 'list' => 4],
-                'digiriskdolibarr_ticket_location'   => ['Label' => 'Location',         'type' => 'varchar',  'length' => 255, 'elementtype' => ['ticket'], 'position' => $this->numero . 50,                                                                                                        ],
-                'digiriskdolibarr_ticket_date'       => ['Label' => 'DeclarationDate',  'type' => 'datetime',                  'elementtype' => ['ticket'], 'position' => $this->numero . 60,                                                                                                        ],
-                'digiriskdolibarr_condition_message' => ['Label' => 'ConditionMessage', 'type' => 'text',                      'elementtype' => ['ticket'], 'position' => $this->numero . 70]
-            ];
-
-            saturne_manage_extrafields($extraFieldsArrays, $commonExtraFieldsValue);
-            dolibarr_set_const($this->db, 'DIGIRISKDOLIBARR_TICKET_EXTRAFIELDS', 2, 'integer', 0, '', 0);
-        } elseif (dolibarr_get_const($this->db, 'DIGIRISKDOLIBARR_TICKET_EXTRAFIELDS', 0) == 2) {
-            // BACKWARD COMPATIBILITY
-            $commonExtraFieldsValue = [
-                'alwayseditable' => 1, 'list' => 1, 'help' => '', 'entity' => 0, 'langfile' => 'digiriskdolibarr@digiriskdolibarr', 'enabled' => "isModEnabled('digiriskdolibarr') && isModEnabled('ticket')", 'moreparams' => ['css' => 'minwidth100 maxwidth300']
-            ];
-
-            $extraFieldsArrays = [
-                'digiriskdolibarr_condition_message' => ['Label' => 'ConditionMessage', 'type' => 'text', 'elementtype' => ['ticket'], 'position' => $this->numero . 70]
-            ];
-
-            saturne_manage_extrafields($extraFieldsArrays, $commonExtraFieldsValue);
-            dolibarr_set_const($this->db, 'DIGIRISKDOLIBARR_TICKET_EXTRAFIELDS', 3, 'integer', 0, '', 0);
-        }
-
-		if (dolibarr_get_const($this->db, 'DIGIRISKDOLIBARR_TICKET_EXTRAFIELDS', 0) == 2) {
+				'alwayseditable' => 1, 'list' => 1, 'help' => '', 'entity' => 0, 'langfile' => 'digiriskdolibarr@digiriskdolibarr', 'enabled' => "isModEnabled('digiriskdolibarr') && isModEnabled('ticket')", 'moreparams' => ['css' => 'minwidth100 maxwidth300']
+			];
 
 			$extraFieldsArrays = [
-                'digiriskdolibarr_ticket_service'   => ['Label' => 'GP/UT',           'type' => 'link',                      'elementtype' => ['ticket'], 'position' => 43630240, 'params' => ['DigiriskElement:digiriskdolibarr/class/digiriskelement.class.php:1:(status:>:0)' => NULL], 'list' => 4],
-            ];
+				'digiriskdolibarr_ticket_lastname'   => ['Label' => 'LastName',         'type' => 'varchar', 'length' => 255,  'elementtype' => ['ticket'], 'position' => $this->numero . 10,                                                                                                        ],
+				'digiriskdolibarr_ticket_firstname'  => ['Label' => 'FirstName',        'type' => 'varchar', 'length' => 255,  'elementtype' => ['ticket'], 'position' => $this->numero . 20,                                                                                                        ],
+				'digiriskdolibarr_ticket_phone'      => ['Label' => 'Phone',            'type' => 'varchar', 'length' => 255,  'elementtype' => ['ticket'], 'position' => $this->numero . 30,                                                                                                        ],
+				'digiriskdolibarr_ticket_service'   => ['Label' => 'GP/UT',           'type' => 'link',                      'elementtype' => ['ticket'], 'position' => 43630240, 'params' => ['DigiriskElement:digiriskdolibarr/class/digiriskelement.class.php:1:(status:>:0)' => NULL], 'list' => 4],
+				'digiriskdolibarr_ticket_location'   => ['Label' => 'Location',         'type' => 'varchar',  'length' => 255, 'elementtype' => ['ticket'], 'position' => $this->numero . 50,                                                                                                        ],
+				'digiriskdolibarr_ticket_date'       => ['Label' => 'DeclarationDate',  'type' => 'datetime',                  'elementtype' => ['ticket'], 'position' => $this->numero . 60,                                                                                                        ],
+				'digiriskdolibarr_condition_message' => ['Label' => 'ConditionMessage', 'type' => 'text', 'elementtype' => ['ticket'], 'position' => $this->numero . 70]
+			];
 
-			saturne_manage_extrafields($extraFieldsArrays, []);
-
-			dolibarr_set_const($this->db, 'DIGIRISKDOLIBARR_TICKET_EXTRAFIELDS', 3, 'integer', 0, '', 0);
-		}
+			saturne_manage_extrafields($extraFieldsArrays, $commonExtraFieldsValue);
+			dolibarr_set_const($this->db, 'DIGIRISKDOLIBARR_TICKET_EXTRAFIELDS', 4, 'integer', 0, '', 0);
+        }
 
 		//DigiriskElement favorite medias backward compatibility
 		if ($conf->global->DIGIRISKDOLIBARR_DIGIRISKELEMENT_MEDIAS_BACKWARD_COMPATIBILITY == 0) {
