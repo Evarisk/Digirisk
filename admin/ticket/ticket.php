@@ -155,18 +155,18 @@ if ($action == 'generateExtrafields') {
     ];
 
     $extraFieldsArrays = [
-        'digiriskdolibarr_ticket_lastname'          => ['Label' => 'LastName',         'type' => 'varchar', 'length' => 255,  'elementtype' => ['ticket'], 'position' => 43630210,                                                                                                        ],
-        'digiriskdolibarr_ticket_firstname'         => ['Label' => 'FirstName',        'type' => 'varchar', 'length' => 255,  'elementtype' => ['ticket'], 'position' => 43630220,                                                                                                        ],
-        'digiriskdolibarr_ticket_phone'             => ['Label' => 'Phone',            'type' => 'varchar', 'length' => 255,  'elementtype' => ['ticket'], 'position' => 43630230,                                                                                                        ],
-        'digiriskdolibarr_ticket_service'           => ['Label' => 'GP/UT',            'type' => 'link',                      'elementtype' => ['ticket'], 'position' => 43630240, 'params' => ['DigiriskElement:digiriskdolibarr/class/digiriskelement.class.php:1' => NULL], 'list' => 4],
-        'digiriskdolibarr_ticket_location'          => ['Label' => 'Location',         'type' => 'varchar',  'length' => 255, 'elementtype' => ['ticket'], 'position' => 43630250,                                                                                                        ],
-        'digiriskdolibarr_ticket_date'              => ['Label' => 'DeclarationDate',  'type' => 'datetime',                  'elementtype' => ['ticket'], 'position' => 43630260,                                                                                                        ],
-        'digiriskdolibarr_ticket_condition_message' => ['Label' => 'ConditionMessage', 'type' => 'text',                      'elementtype' => ['ticket'], 'position' => 43630270]
+        'digiriskdolibarr_ticket_lastname'   => ['Label' => 'LastName',         'type' => 'varchar', 'length' => 255,  'elementtype' => ['ticket'], 'position' => 43630210,                                                                                                        ],
+        'digiriskdolibarr_ticket_firstname'  => ['Label' => 'FirstName',        'type' => 'varchar', 'length' => 255,  'elementtype' => ['ticket'], 'position' => 43630220,                                                                                                        ],
+        'digiriskdolibarr_ticket_phone'      => ['Label' => 'Phone',            'type' => 'varchar', 'length' => 255,  'elementtype' => ['ticket'], 'position' => 43630230,                                                                                                        ],
+        'digiriskdolibarr_ticket_service'    => ['Label' => 'GP/UT',            'type' => 'link',                      'elementtype' => ['ticket'], 'position' => 43630240, 'params' => ['DigiriskElement:digiriskdolibarr/class/digiriskelement.class.php:1:(status:>:0)' => NULL], 'list' => 4],
+        'digiriskdolibarr_ticket_location'   => ['Label' => 'Location',         'type' => 'varchar',  'length' => 255, 'elementtype' => ['ticket'], 'position' => 43630250,                                                                                                        ],
+        'digiriskdolibarr_ticket_date'       => ['Label' => 'DeclarationDate',  'type' => 'datetime',                  'elementtype' => ['ticket'], 'position' => 43630260,                                                                                                        ],
+        'digiriskdolibarr_condition_message' => ['Label' => 'ConditionMessage', 'type' => 'text',                      'elementtype' => ['ticket'], 'position' => 43630270]
     ];
 
     saturne_manage_extrafields($extraFieldsArrays, $commonExtraFieldsValue);
     setEventMessages($langs->transnoentities('ExtrafieldsCreated'), []);
-    dolibarr_set_const($db, 'DIGIRISKDOLIBARR_TICKET_EXTRAFIELDS', 1, 'integer', 0, '', 0);
+    dolibarr_set_const($db, 'DIGIRISKDOLIBARR_TICKET_EXTRAFIELDS', 4, 'integer', 0, '', 0);
 }
 
 if ($action == 'generateCategories') {
