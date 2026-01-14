@@ -106,6 +106,11 @@ if (empty($resHook)) {
         if (GETPOST('daterange')) {
             $moreParams['dateStart'] = dol_mktime(0, 0, 0, GETPOST('datestartmonth', 'int'), GETPOST('datestartday', 'int'), GETPOST('datestartyear', 'int'));
             $moreParams['dateEnd']   = dol_mktime(0, 0, 0, GETPOST('dateendmonth', 'int'), GETPOST('dateendday', 'int'), GETPOST('dateendyear', 'int'));
+            if ($moreParams['dateStart'] > $moreParams['dateEnd']) {
+                setEventMessage($langs->trans('StartDateCannotBeAfterEndDate'), 'errors');
+                header('Location: ' . $_SERVER["PHP_SELF"] . '?id=' . $id . '&test=lol');
+                exit;
+            }
             $moreParams['recipient'] = GETPOST('recipient');
         }
     }
