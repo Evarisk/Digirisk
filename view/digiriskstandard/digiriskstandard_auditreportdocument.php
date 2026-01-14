@@ -108,7 +108,7 @@ if (empty($resHook)) {
             $moreParams['dateEnd']   = dol_mktime(0, 0, 0, GETPOST('dateendmonth', 'int'), GETPOST('dateendday', 'int'), GETPOST('dateendyear', 'int'));
             if ($moreParams['dateStart'] > $moreParams['dateEnd']) {
                 setEventMessage($langs->trans('StartDateCannotBeAfterEndDate'), 'errors');
-                header('Location: ' . $_SERVER["PHP_SELF"] . '?id=' . $id . '&test=lol');
+                header('Location: ' . $_SERVER["PHP_SELF"] . '?id=' . $id);
                 exit;
             }
             $moreParams['recipient'] = GETPOST('recipient');
