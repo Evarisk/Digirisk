@@ -741,7 +741,7 @@ saturne_header(0,'', $title, '', '', 0, 0, $moreJS, [], '', 'page-public-card pa
                 print '<div style="flex: 1;">';
                 $substitutionarray = getCommonSubstitutionArray($langs);
         		complete_substitutions_array($substitutionarray, $langs);
-                print make_substitutions($content, $substitutionarray, $langs);
+                print make_substitutions($content, $substitutionarray, $langs) . '<span style="color:red"> *</span>';
                 print '</div>';
                 print '</label>';
             }
