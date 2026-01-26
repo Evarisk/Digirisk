@@ -328,9 +328,9 @@ class doc_preventionplandocument_odt extends SaturneDocumentModel
         $intSociety = $arrayData['society_inside'];
         if (!empty($intSociety) && $intSociety > 0) {
             $tmpArray['society_title']    = $intSociety->name;
-            $tmpArray['society_siret_id'] = $intSociety->idprof2;
+            $tmpArray['society_siret_id'] = $intSociety->siret;
             $tmpArray['society_address']  = $intSociety->address;
-            $tmpArray['society_postcode'] = $intSociety->zip;
+            $tmpArray['society_postcode'] = $intSociety->postal;
             $tmpArray['society_town']     = $intSociety->town;
         }
 
@@ -338,9 +338,9 @@ class doc_preventionplandocument_odt extends SaturneDocumentModel
         $extSociety = $arrayData['society_outside'];
         if (!empty($extSociety) && $extSociety > 0) {
             $tmpArray['society_outside_title']    = $extSociety->name;
-            $tmpArray['society_outside_siret_id'] = $extSociety->idprof2;
+            $tmpArray['society_outside_siret_id'] = $extSociety->siret;
             $tmpArray['society_outside_address']  = $extSociety->address;
-            $tmpArray['society_outside_postcode'] = $extSociety->zip;
+            $tmpArray['society_outside_postcode'] = $extSociety->postal;
             $tmpArray['society_outside_town']     = $extSociety->town;
         }
 
