@@ -447,7 +447,7 @@ if ((empty($action) || ($action != 'edit' && $action != 'create'))) {
 
 		$MAXEVENT = 10;
 
-		$morehtmlright  = '<a href="' . dol_buildpath('/digiriskdolibarr/view/digiriskelement/digiriskelement_agenda.php', 1) . '?id=' . $object->id . '">';
+		$morehtmlright  = '<a href="' . dol_buildpath('/saturne/view/saturne_agenda.php', 1) . '?id=' . $object->id . '&module_name=' . $moduleName . '&object_type=' . $object->element . '">';
 		$morehtmlright .= $langs->trans("SeeAll");
 		$morehtmlright .= '</a>';
 
