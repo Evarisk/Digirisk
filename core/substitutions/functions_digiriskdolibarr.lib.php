@@ -169,6 +169,10 @@ function digiriskdolibarr_completesubstitutionarray(array &$substitutionarray, T
             $substitutionarray['sources']            = dol_htmlentitiesbr_decode(strip_tags($riskassessmentdocument->sources, '<br>'));
             $substitutionarray['remarqueImportante'] = dol_htmlentitiesbr_decode(strip_tags($riskassessmentdocument->remarqueImportante, '<br>'));
             break;
+        case 'ticket':
+            if (!empty($object->array_options['options_digiriskdolibarr_ticket_date'])) {
+                $substitutionarray['__EXTRAFIELD_DIGIRISKDOLIBARR_TICKET_DATE__'] = dol_print_date($object->array_options['options_digiriskdolibarr_ticket_date'], 'dayhour', 'tzuserrel');
+            }
     }
 
     switch ($element_type) {
