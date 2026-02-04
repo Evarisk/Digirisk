@@ -695,13 +695,13 @@ saturne_header(0,'', $title, '', '', 0, 0, $moreJS, [], '', 'page-public-card pa
                                 foreach ($digiriskelement as $element) {
                                     $digiriskelementlabel[$element->id] = $element->label;
                                 }
-                                $out .= Form::selectarray('options_' . $key, $digiriskelementlabel);
+                                $out .= Form::selectarray('options_' . $key, $digiriskelementlabel, '', 1);
                             } else {
                                 $digiriskelementlabel = [];
                                 foreach ($digiriskelement as $element) {
                                     $digiriskelementlabel[$element->id] = $element->ref . ' - ' . $element->label;
                                 }
-                                $out .= Form::selectarray('options_' . $key, $digiriskelementlabel);
+                                $out .= Form::selectarray('options_' . $key, $digiriskelementlabel, '', 1);
                             }
                             break;
 						default:
