@@ -1082,8 +1082,8 @@ class Risk extends SaturneObject
             return $array;
         }
 
-        $totalNbRiskAssessments         = [];
-        $totalPercentagesRiskAssessment = [];
+        $totalNbRiskAssessments         = [1 => 0,  2 => 0, 3 => 0, 4 => 0];
+        $totalPercentagesRiskAssessment = [1 => 0,  2 => 0, 3 => 0, 4 => 0];
         $totalPercentages               = 0;
         $arrayRiskLists                 = [];
         foreach ($dangerCategories as $dangerCategory) {
@@ -1103,7 +1103,7 @@ class Risk extends SaturneObject
             for ($i = 1; $i <= 4; $i++) {
                 $array['labels'][$i] = $this->cotations[$i]['label'];
 
-                $percentage                          = price2num(($riskByDangerCategoriesAndRiskAssessments[$dangerCategory['name']]['riskAssessments'][$i] / $riskByDangerCategoriesAndRiskAssessments['totalRisks']) * 100, 1);
+                $percentage                         = price2num(($riskByDangerCategoriesAndRiskAssessments[$dangerCategory['name']]['riskAssessments'][$i] / $riskByDangerCategoriesAndRiskAssessments['totalRisks']) * 100, 1);
                 $totalPercentagesRiskAssessment[$i] += $percentage;
 
                 $arrayRiskLists[$dangerCategory['position']][$i]['value']    = $riskByDangerCategoriesAndRiskAssessments[$dangerCategory['name']]['riskAssessments'][$i];
@@ -1163,13 +1163,32 @@ class Risk extends SaturneObject
 
         $array['totalRisks'] = count($risks);
 
-        $nbRiskByCotations  = [];
-        $nbRiskByCategories = [];
+        $nbRiskByCotations          = [];
+        $nbRiskByCategories         = [];
+        $array['nbRiskByCotations'] = [];
         foreach ($risks as $risk) {
+            if (!isset($nbRiskByCategories[$risk->category])) {
+                $nbRiskByCategories[$risk->category] = 0;
+            }
             $nbRiskByCategories[$risk->category]++;
+
             $riskAssessment->cotation = $risk->cotation;
-            $array['nbRiskByCotations'][$riskAssessment->getEvaluationScale()]++;
-            $nbRiskByCotations[$risk->category][$riskAssessment->getEvaluationScale()]++;
+
+            $scale = $riskAssessment->getEvaluationScale();
+            if (!isset($array['nbRiskByCotations'][$scale])) {
+                $array['nbRiskByCotations'][$scale] = 0;
+            }
+            $array['nbRiskByCotations'][$scale]++;
+
+            $category = $risk->category;
+            if (!isset($nbRiskByCotations[$category])) {
+                $nbRiskByCotations[$category] = [];
+            }
+
+            if (!isset($nbRiskByCotations[$category][$scale])) {
+                $nbRiskByCotations[$category][$scale] = 0;
+            }
+            $nbRiskByCotations[$category][$scale]++;
         }
 
         foreach ($dangerCategories as $dangerCategory) {

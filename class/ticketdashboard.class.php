@@ -304,6 +304,9 @@ class TicketDashboard extends DigiriskDolibarrDashboard
 
         $ticketByMainCategoriesByDigiriskElements = [];
         foreach ($tickets as $ticket) {
+            if (!isset($ticketByMainCategoriesByDigiriskElements[$ticket->array_options['options_digiriskdolibarr_ticket_service']][$ticket->fk_categorie])) {
+                $ticketByMainCategoriesByDigiriskElements[$ticket->array_options['options_digiriskdolibarr_ticket_service']][$ticket->fk_categorie] = 0;
+            }
             $ticketByMainCategoriesByDigiriskElements[$ticket->array_options['options_digiriskdolibarr_ticket_service']][$ticket->fk_categorie]++;
         }
 
@@ -322,6 +325,9 @@ class TicketDashboard extends DigiriskDolibarrDashboard
 
         $ticketByMainSubCategoriesByDigiriskElements = [];
         foreach ($tickets as $ticket) {
+            if (!isset($ticketByMainSubCategoriesByDigiriskElements[$ticket->array_options['options_digiriskdolibarr_ticket_service']][$ticket->fk_categorie])) {
+                $ticketByMainSubCategoriesByDigiriskElements[$ticket->array_options['options_digiriskdolibarr_ticket_service']][$ticket->fk_categorie] = 0;
+            }
             $ticketByMainSubCategoriesByDigiriskElements[$ticket->array_options['options_digiriskdolibarr_ticket_service']][$ticket->fk_categorie]++;
         }
 
