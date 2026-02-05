@@ -590,12 +590,14 @@ saturne_header(0,'', $title, '', '', 0, 0, $moreJS, [], '', 'page-public-card pa
                 if ($visible && dol_strlen($categoryDescription) > 0) : ?>
                     <div class="form-element gridw-2">
                         <span class="form-label"><?php print $langs->trans('Description'); ?>
-                        <label class="form-field-container">
-                            <?php
-                                $dolEditor = new DolEditor('category-description', $categoryDescription, '100%', 120, 'dolibarr_readonly', '', false, true, true, ROWS_2, 70, 1);
-                                $dolEditor->Create();
-                            ?>
-                        </label>
+                        <br>
+                        <div class="form-field-container">
+                            <label class="form-field-text">
+                                <?php
+                                    echo $categoryDescription;
+                                ?>
+                            </label>
+                        </div>
                     </div>
                 <?php endif;
 
