@@ -278,14 +278,19 @@ class DigiriskElement extends SaturneObject
             $filter['customsql'] .= ' AND t.rowid != ' . ($this->id ?? 0);
         }
 
-        $objectList           = saturne_fetch_all_object_type('digiriskelement', '', '', $limit, 0, $filter, 'AND', false, $multientitymanaged);
+        $objectList = $this->fetchDigiriskElementFlat(0);
         $digiriskElementsData = [];
         if ($noroot == 0) {
             $digiriskElementsData[0] = $langs->trans('Root') . ' : ' . $conf->global->MAIN_INFO_SOCIETE_NOM ;
         }
+
         if (is_array($objectList) && !empty($objectList)) {
             foreach ($objectList as $digiriskElement) {
-                $digiriskElementsData[$digiriskElement->id] = ($hideref ? '' : $digiriskElement->ref . ' - ') . $digiriskElement->label;
+                $tmpdigiriskElement = current($digiriskElement);
+                if ($digiriskElement->status < 0) {
+                    continue;
+                }
+                $digiriskElementsData[$tmpdigiriskElement->id] = '<span style="margin-left: ' . (15 * $digiriskElement['depth']) . 'px;"></span> ' . ($hideref ? '' : $tmpdigiriskElement->ref . ' - ') . $tmpdigiriskElement->label;
             }
         }
 
