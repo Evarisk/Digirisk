@@ -1378,6 +1378,13 @@ class modDigiriskdolibarr extends DolibarrModules
 		$this->rights[$r][5] = 'write';
 		$r++;
 
+		/* TICKET CONFIG PERMISSIONS */
+		$this->rights[$r][0] = $this->numero . sprintf('%02d', $r + 1);
+		$this->rights[$r][1] = $langs->transnoentities('TicketTagsConfig');
+		$this->rights[$r][4] = 'ticket';
+		$this->rights[$r][5] = 'categoryconfig';
+		$r++;
+
 		// Main menu entries to add
 		$this->menu       = [];
 		$r                = 0;

@@ -528,7 +528,7 @@ if (getDolGlobalInt('DIGIRISKDOLIBARR_ADMINUSERGROUP_SET') == 0) {
     dolibarr_set_const($db, 'DIGIRISKDOLIBARR_ADMINUSERGROUP_SET', $userGroupID, 'integer', 0, '', $conf->entity);
 }
 
-if (getDolGlobalInt('DIGIRISKDOLIBARR_ADMINUSERGROUP_UPDATED') >= 0 && getDolGlobalInt('DIGIRISKDOLIBARR_ADMINUSERGROUP_UPDATED') < 5) {
+if (getDolGlobalInt('DIGIRISKDOLIBARR_ADMINUSERGROUP_UPDATED') >= 0 && getDolGlobalInt('DIGIRISKDOLIBARR_ADMINUSERGROUP_UPDATED') < 6) {
     $userGroupID = getDolGlobalInt('DIGIRISKDOLIBARR_ADMINUSERGROUP_SET');
     if ($userGroupID > 0) {
         $userGroup->fetch($userGroupID);
@@ -537,9 +537,10 @@ if (getDolGlobalInt('DIGIRISKDOLIBARR_ADMINUSERGROUP_UPDATED') >= 0 && getDolGlo
             case 2 :
             case 3 :
             case 4 :
+			case 5 :
                 $userGroup->addrights('', 'allmodules');
 
-                $adminUserGroupConf = 5;
+                $adminUserGroupConf = 6;
                 break;
             case 1:
                 $userGroup->name = $conf->global->MAIN_INFO_SOCIETE_NOM . ' - ' . $langs->trans('DigiriskAdminUserGroup');
