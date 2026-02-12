@@ -1389,6 +1389,10 @@ TicketCategoriesNotCreated               = Vous n'avez pas créé de catégories
 TicketPublicInterfaceQRCode              = QR Code de l'interface publique des tickets
 MultiEntityTicketPublicInterfaceQRCode   = QR Code de l'interface publique des tickets multi-société
 PublicInterfaceConfiguration             = Champs visibles / requis de l'interface publique
+TicketNumber                             = N° du ticket
+FromAndDate                              = Provenance et date
+AuthorRequest                            = Demandeur
+DateCloture                              = Date de clôture
 
 PublicInterfaceUseSignatory              = Demande de signature pour la déclaration du registre
 ValidateText                             = Conditions à accepter pour la signature
@@ -1498,6 +1502,8 @@ ticketdocument_sign.odt        = Fiche du ticket avec signature
 ticketdocument_event_sign.odt  = Fiche du ticket avec événement et signature
 TicketSuccessMessage           = Message de succès du ticket
 TicketSuccessMessageSet        = Le message a bien été modifié
+TicketDocumentPDF              = FT-A4-PAYSAGE
+TicketDocumentPDFDescription   = Afficher la fiche ticket
 
 
 # Project document
