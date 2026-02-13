@@ -106,9 +106,80 @@ if ($object->id > 0) {
 
 	print load_fiche_titre($langs->trans("DashBoard"), '', 'digiriskdolibarr_color.png@digiriskdolibarr');
 
-	$digiriskelement = $object;
+	$object = new Ticket($db);
 
-	require_once __DIR__ . '/../../core/tpl/digiriskdolibarr_dashboard_ticket.tpl.php';
+	$extrafields->fetch_name_optionals_label($object->table_element);
+	$search_array_options = $extrafields->getOptionalsFromPost($object->table_element, '', 'search_');
+	$search_array_options['search_options_digiriskdolibarr_ticket_service'] = $id;
+
+	if (isModEnabled('categorie')) {
+		$searchCategories = GETPOST('search_category_' . $object->element . '_list', 'array');
+	}
+
+	// Default sort order (if not yet defined by previous GETPOST)
+	if (!$sortfield) {
+		reset($object->fields);   // Reset is required to avoid key() to return null
+		$sortfield = 't.datec'; // Set here default search field. By default, date_creation
+	}
+	if (!$sortorder) {
+		$sortorder = 'DESC';
+	}
+
+	$excludeFields      = [];
+
+	$excludeFields = array_merge($excludeFields, []);
+
+	// Initialize array of search criterias
+	$searchAll        = trim(GETPOST('search_all'));
+	$search           = [];
+	$search['status'] = [1,2];
+	foreach ($object->fields as $key => $val) {
+		if (GETPOST('search_' . $key, 'alpha') !== '') {
+			$search[$key] = GETPOST('search_' . $key, 'alpha');
+		}
+		if (in_array($val['type'], ['date', 'datetime', 'timestamp'])) {
+			$search[$key . '_dtstart'] = dol_mktime(0, 0, 0, GETPOSTINT('search_' . $key . '_dtstartmonth'), GETPOSTINT('search_' . $key . '_dtstartday'), GETPOSTINT('search_' . $key . '_dtstartyear'));
+			$search[$key . '_dtend']   = dol_mktime(23, 59, 59, GETPOSTINT('search_' . $key . '_dtendmonth'), GETPOSTINT('search_' . $key . '_dtendday'), GETPOSTINT('search_' . $key . '_dtendyear'));
+		}
+	}
+
+	// List of fields to search into when doing a "search in all"
+	$fieldsToSearchAll = [];
+	foreach ($object->fields as $key => $val) {
+		if (!empty($val['searchall'])) {
+			$fieldsToSearchAll['t.' . $key] = $val['label'];
+		}
+	}
+
+	// Definition of array of fields for columns
+	foreach ($object->fields as $key => $val) {
+		if (!empty($val['visible'])) {
+			$visible = (int) dol_eval($val['visible']);
+			$arrayfields['t.' . $key] = [
+				'label'    => $val['label'],
+				'checked'  => (($visible < 0) ? 0 : 1),
+				'enabled'  => ($visible != 3 && dol_eval($val['enabled'])),
+				'position' => $val['position'],
+				'help'     => $val['help'] ?? '',
+			];
+		}
+	}
+
+
+	// Extra fields
+	require_once DOL_DOCUMENT_ROOT . '/core/tpl/extrafields_list_array_fields.tpl.php';
+
+	$object->fields = dol_sort_array($object->fields, 'position');
+	$arrayfields    = dol_sort_array($arrayfields, 'position');
+
+	$conf->global->MAIN_DISABLE_FULL_SCANLIST = 1;
+	require_once __DIR__ . '/../../../saturne/core/tpl/list/objectfields_list_build_sql_select.tpl.php';
+	require_once __DIR__ . '/../../../saturne/core/tpl/list/objectfields_list_header.tpl.php';
+	require_once __DIR__ . '/../../../saturne/core/tpl/list/objectfields_list_search_input.tpl.php';
+	require_once __DIR__ . '/../../../saturne/core/tpl/list/objectfields_list_search_title.tpl.php';
+	require_once __DIR__ . '/../../../saturne/core/tpl/list/objectfields_list_loop_object.tpl.php';
+	require_once __DIR__ . '/../../../saturne/core/tpl/list/objectfields_list_footer.tpl.php';
+
 }
 
 // End of page
