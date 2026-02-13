@@ -103,7 +103,7 @@ if ($entity > 0) {
 }
 
 $moreParams = [];
-if (dolibarr_get_const($db, 'DIGIRISKDOLIBARR_SHOW_HIDDEN_DIGIRISKELEMENT') == 1) {
+if (empty(dolibarr_get_const($db, 'DIGIRISKDOLIBARR_SHOW_HIDDEN_DIGIRISKELEMENT'))) {
     $moreParams['filter'] = ' AND t.show_in_selector = 1 ';
 }
 $digiriskelement = $digiriskelement->getActiveDigiriskElements('current', $moreParams);
