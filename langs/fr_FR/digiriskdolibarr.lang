@@ -1288,6 +1288,9 @@ OpenAIApiKeyDescription = Pour utiliser DigiAI, vous devez disposer d'une clé A
 # Ticket - Interface publique ticket
 #
 
+# Rights - Droits
+TicketTagsConfig                         = Modification des registres SST
+
 # Data - Donnée
 Register                                 = Registre
 Send                                     = Envoyer
