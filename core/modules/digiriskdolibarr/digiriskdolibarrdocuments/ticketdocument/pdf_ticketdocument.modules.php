@@ -22,15 +22,6 @@
  * \brief   File of class to generate control document pdf
  */
 
-// Load Dolibarr libraries
-require_once DOL_DOCUMENT_ROOT . '/core/modules/project/modules_project.php';
-require_once DOL_DOCUMENT_ROOT . '/projet/class/project.class.php';
-require_once DOL_DOCUMENT_ROOT . '/projet/class/task.class.php';
-require_once DOL_DOCUMENT_ROOT . '/core/lib/company.lib.php';
-require_once DOL_DOCUMENT_ROOT . '/core/lib/pdf.lib.php';
-require_once DOL_DOCUMENT_ROOT . '/core/lib/date.lib.php';
-require_once DOL_DOCUMENT_ROOT . '/core/lib/functions2.lib.php';
-
 // Load Saturne libraries
 require_once __DIR__ . '/../../../../../../saturne/core/modules/saturne/modules_saturne.php';
 require_once __DIR__ . '/../../../../../../saturne/lib/medias.lib.php';
@@ -80,7 +71,7 @@ class pdf_ticketdocument extends SaturneDocumentModel
         parent::__construct($db, $this->module, $this->document_type);
 
         $this->name         = 'ticketdocument';
-        $this->description  = $langs->trans('ControlDocumentPDFDescription');
+        $this->description  = $langs->trans('TicketDocumentPDFDescription');
         $this->type         = 'pdf';
         $this->height       = 8;
         $this->orientation  = 'L';
@@ -102,6 +93,14 @@ class pdf_ticketdocument extends SaturneDocumentModel
         }
     }
 
+    /**
+     *  Draw tables for pdf
+     *
+     * @param Object $pdf
+     * @param array $data
+     * @param array $widths
+     * @param float $lineHeight
+     */
     function drawTable($pdf, $data, $widths, $lineHeight)
     {
         global $langs;
@@ -120,7 +119,11 @@ class pdf_ticketdocument extends SaturneDocumentModel
                 $y    = $pdf->GetY();
                 $cell = $cell ?? $langs->transnoentities('NoData');
 
-                $pdf->MultiCell($widths[$key], $lineHeight, $cell, 1, 'C', 0, 0, $x, $y, true, 0, false, true, $lineHeight, 'M');
+                if (($cells[0] == $langs->transnoentities('Subject') || $cells[0] == $langs->transnoentities('Message') || $cells[0] == 'Tags') && $key == 1) {
+                    $pdf->MultiCell($widths[$key], $lineHeight, $cell, 1, 'L', 0, 0, $x, $y, true, 0, false, true, $lineHeight, 'M');
+                } else {
+                    $pdf->MultiCell($widths[$key], $lineHeight, $cell, 1, 'C', 0, 0, $x, $y, true, 0, false, true, $lineHeight, 'M');
+                }
                 $pdf->SetXY($x + $widths[$key], $y);
             }
             $pdf->Ln($maxHeight);
@@ -182,6 +185,25 @@ class pdf_ticketdocument extends SaturneDocumentModel
         return $top_shift;
     }
 
+    /**
+     *  Show footer of page
+     *
+     *  @param	TCPDF		$pdf     		Object PDF
+     *  @param  Contrat		$object     	Object to show
+     *  @param  Translate	$outputlangs	Object lang for output
+     *  @return	float|int                   Return topshift value
+     */
+    function _pageFooter($pdf, $object, $outputLangs, $defaultFontSize)
+    {
+        $pdf->SetY($pdf->getPageHeight() - ($this->marge_basse * 2));
+
+        $leftText  = $object->ref;
+        $rightText = 'Version 1.0.0 - Page 1/1';
+
+        $pdf->MultiCell($pdf->GetStringWidth($leftText) + 5, $this->height, $leftText, 0, 'L', false, 0, $this->marge_gauche);
+        $pdf->MultiCell($pdf->GetStringWidth($rightText) + 5, $this->height, $rightText, 0, 'L', false, 0, $pdf->GetPageWidth() - ($this->marge_droite * 5));
+    }
+
 
     /**
      *  Write the PDF file to disk
@@ -199,8 +221,12 @@ class pdf_ticketdocument extends SaturneDocumentModel
     {
         global $action, $langs, $hookmanager, $user;
 
+        $object = $moreparams['object'];
+
         $moreparams['hideTemplateName'] = 1;
-        $file = $this->buildDocumentFilename($objectDocument, $outputLangs, $moreparams['object'], $moreparams);
+
+        $object->module = $this->module;
+        $file           = $this->buildDocumentFilename($objectDocument, $outputLangs, $object, $moreparams);
 
         if ($file < 0) {
             $this->error = $langs->transnoentities('ErrorFileNameCanNotBeBuilt');
@@ -208,20 +234,19 @@ class pdf_ticketdocument extends SaturneDocumentModel
         }
 
         $hookmanager->initHooks(['pdfgeneration']);
-        $parameters = ['file' => $file, 'object' => $moreparams['object'], 'outputlangs' => $outputLangs];
-        $hookmanager->executeHooks('beforePDFCreation', $parameters, $moreparams['object'], $action);
+        $parameters = ['file' => $file, 'object' => $object, 'outputlangs' => $outputLangs];
+        $hookmanager->executeHooks('beforePDFCreation', $parameters, $object, $action);
 
         // Init PDF
         $pdf             = pdf_getInstance($this->format);
         $defaultFontSize = pdf_getPDFFontSize($outputLangs) + 2;
 
         $category        = new Categorie($this->db);
-        $user            = new User($this->db);
         $digiriskElement = new DigiriskElement($this->db);
 
-        $user->fetch($moreparams['object']->fk_user_assign);
-        $digiriskElement->fetch($moreparams['object']->array_options['options_digiriskdolibarr_ticket_service']);
-        $categories = $category->containing($moreparams['object']->id, Categorie::TYPE_TICKET);
+        $user->fetch($object->fk_user_assign);
+        $digiriskElement->fetch($object->array_options['options_digiriskdolibarr_ticket_service']);
+        $categories = $category->containing($object->id, Categorie::TYPE_TICKET);
         if (!empty($categories)) {
             $index = 0;
             foreach ($categories as $cat) {
@@ -244,7 +269,9 @@ class pdf_ticketdocument extends SaturneDocumentModel
         $pdf->SetDrawColor(128, 128, 128);
 
         $pdf->SetTitle($outputLangs->convToOutputCharset($this->document_type));
+        $pdf->SetSubject($outputLangs->transnoentities($this->document_type));
         $pdf->SetCreator('Dolibarr ' . DOL_VERSION);
+        $pdf->SetAuthor($outputLangs->convToOutputCharset($user->getFullName($outputLangs)));
 
         $pdf->SetMargins($this->marge_gauche, $this->marge_haute, $this->marge_droite);
         $pdf->setPageOrientation($this->orientation, 1, $this->marge_basse);
@@ -255,36 +282,47 @@ class pdf_ticketdocument extends SaturneDocumentModel
 
         $pageWidth   = $pdf->GetPageWidth() - $this->marge_gauche - $this->marge_droite;
         $tableWidth  = $pageWidth * 0.5;
-        $imageWidth  = $pageWidth * 0.5;
-        $imageHeight = 120;
+        $rectWidth   = $pageWidth * 0.5;
+        $rectHeight  = 120;
 
         $pdf->SetFont('', 'B', 12);
 
-        $this->_pagehead($pdf, $moreparams['object'], $outputLangs, $defaultFontSize);
-        $pdf->Ln(25);
+        $this->_pagehead($pdf, $object, $outputLangs, $defaultFontSize);
+
+        $pdf->Ln(10);
+
         $startY = $pdf->GetY();
         $startX = $this->marge_gauche + $tableWidth + 5;
         $pdf->setX($startX);
-        $photoPath = getMultidirOutput($moreparams['object'], $moreparams['object']->module) . '/' . $moreparams['object']->ref;
+        $photoPath = getMultidirOutput($object, 'ticket') . '/' . $object->ref;
         $fileArray = dol_dir_list($photoPath, 'files', 0, '', '(\.odt|\.pdf)$');
         if (count($fileArray) && !empty($fileArray)) {
             $fileArray = dol_sort_array($fileArray, 'position');
             $thumbName = saturne_get_thumb_name($fileArray[0]['name']);
-            $photo = $photoPath . '/thumbs/' . $thumbName;
+            $photo     = $photoPath . '/thumbs/' . $thumbName;
         }
 
         if (!empty($photo) && file_exists($photo)) {
-            $pdf->Image($photo, $startX, $startY, $imageWidth, $imageHeight);
+            list($imgW_px, $imgH_px) = getimagesize($photo);
+
+            $dpi     = 96;
+            $imgW_mm = $imgW_px * 25.4 / $dpi;
+            $imgH_mm = $imgH_px * 25.4 / $dpi;
+            $imgX    = $startX + ($rectWidth - $imgW_mm) / 2;
+            $imgY    = $startY + ($rectHeight - $imgH_mm) / 2;
+
+            $pdf->Rect($startX, $startY, $rectWidth, $rectHeight);
+            $pdf->Image($photo, $imgX - 5, $imgY - 5, 0, 0);
         } else {
-            $pdf->Rect($startX, $startY, $imageWidth, $imageHeight);
+            $pdf->Rect($startX, $startY, $rectWidth, $rectHeight);
             $pdf->SetFont('', 'I', 9);
-            $pdf->SetXY($startX, $startY + ($imageHeight / 2) - 3);
-            $pdf->Cell($imageWidth, 6, $langs->transnoentities('NoPhoto'), 0, 0, 'C');
+            $pdf->SetXY($startX, $startY + ($rectHeight / 2) - 3);
+            $pdf->Cell($rectWidth, 6, $langs->transnoentities('NoPhoto'), 0, 0, 'C');
         }
 
         $pdf->setY($startY);
         $header = [
-            [$langs->transnoentities('TicketNumber'), $moreparams['object']->ref]
+            [$langs->transnoentities('TicketNumber'), $object->ref]
         ];
 
         $widths = [
@@ -295,51 +333,57 @@ class pdf_ticketdocument extends SaturneDocumentModel
         $this->drawTable($pdf, $header, $widths, $this->height);
 
         $pdf->SetFont('', 'B', 11);
-        $pdf->SetFillColor(153, 204, 204);
+        $pdf->SetFillColor(42, 157, 143);
+        $pdf->SetTextColor(255, 255, 255);
         $pdf->Cell($tableWidth, 8, $langs->transnoentities('AuthorRequest'), 1, 1, 'C', true);
+        $pdf->SetTextColor(0, 0, 0);
         $pdf->SetFont('', '', 10);
 
         $author = [
-            [$langs->transnoentities('LastName'), $moreparams['object']->array_options['options_digiriskdolibarr_ticket_lastname'], $langs->transnoentities('Phone')],
-            [$langs->transnoentities('FirstName'), $moreparams['object']->array_options['options_digiriskdolibarr_ticket_firstname'], $moreparams['object']->array_options['options_digiriskdolibarr_ticket_phone']]
+            [$langs->transnoentities('LastName'), $object->array_options['options_digiriskdolibarr_ticket_lastname'], $langs->transnoentities('Phone')],
+            [$langs->transnoentities('FirstName'), $object->array_options['options_digiriskdolibarr_ticket_firstname'], $object->array_options['options_digiriskdolibarr_ticket_phone']]
         ];
 
         $widths = [
-            $tableWidth * 0.34,
-            $tableWidth * 0.33,
-            $tableWidth * 0.33,
+            $tableWidth * 0.15,
+            $tableWidth * 0.60,
+            $tableWidth * 0.25,
         ];
 
         $this->drawTable($pdf, $author, $widths, $this->height);
 
         $pdf->SetFont('', 'B', 11);
-        $pdf->SetFillColor(153, 204, 204);
+        $pdf->SetTextColor(255, 255, 255);
+        $pdf->SetFillColor(42, 157, 143);
         $pdf->Cell($tableWidth, 8, $langs->transnoentities('FromAndDate'), 1, 1, 'C', true);
+        $pdf->SetTextColor(0, 0, 0);
 
         $pdf->SetFont('', '', 10);
 
         $ticketData = [
             [$langs->transnoentities('Service'), $digiriskElement->ref . ' ' . $digiriskElement->label],
-            [$langs->transnoentities('Location'), $moreparams['object']->array_options['options_digiriskdolibarr_ticket_location']],
-            [$langs->transnoentities('DateCreation'), dol_print_date($moreparams['object']->date_creation, 'dayhour')],
-            [$langs->transnoentities('DateValidation'), dol_print_date($moreparams['object']->date_validation, 'dayhour')],
-            [$langs->transnoentities('DateClosing'), dol_print_date($moreparams['object']->date_close, 'dayhour')]
+            [$langs->transnoentities('Location'), $object->array_options['options_digiriskdolibarr_ticket_location']],
+            [$langs->transnoentities('DateCreation'), dol_print_date($object->date_creation, 'dayhour')],
+            [$langs->transnoentities('DateValidation'), dol_print_date($object->date_validation, 'dayhour')],
+            [$langs->transnoentities('DateClosing'), dol_print_date($object->date_close, 'dayhour')]
         ];
 
         $widths = [
-            $tableWidth * 0.3,
-            $tableWidth * 0.7
+            $tableWidth * 0.20,
+            $tableWidth * 0.80
         ];
 
         $this->drawTable($pdf, $ticketData, $widths, $this->height);
         $pdf->SetFont('', 'B', 11);
-        $pdf->SetFillColor(153, 204, 204);
+        $pdf->SetTextColor(255, 255, 255);
+        $pdf->SetFillColor(42, 157, 143);
         $pdf->Cell($tableWidth, 8, $langs->transnoentities('Info'), 1, 1, 'C', true);
+        $pdf->SetTextColor(0, 0, 0);
 
         $pdf->SetFont('', '', 10);
 
-        $contactListExternal = $moreparams['object']->liste_contact(-1, 'external');
-        $contactListInternal = $moreparams['object']->liste_contact(-1, 'internal');
+        $contactListExternal = $object->liste_contact(-1, 'external');
+        $contactListInternal = $object->liste_contact(-1, 'internal');
         $contactList         = [];
         $contactNames        = '';
 
@@ -358,30 +402,33 @@ class pdf_ticketdocument extends SaturneDocumentModel
         }
 
         $progessionData = [
-            [$langs->transnoentities('Progress'), $moreparams['object']->progress . '%'],
-            [$langs->transnoentities('Status'), $moreparams['object']->getLibStatut()],
+            [$langs->transnoentities('Progress'), $object->progress . '%'],
+            [$langs->transnoentities('Status'), $object->getLibStatut()],
             [$langs->transnoentities('Assigned'), dol_ucfirst($user->firstname) . ' ' . dol_ucfirst($user->lastname)],
             [$langs->transnoentities('Contact'), $contactNames]
         ];
 
         $widths = [
-            $tableWidth * 0.3,
-            $tableWidth * 0.7
+            $tableWidth * 0.21,
+            $tableWidth * 0.79
         ];
 
         $this->drawTable($pdf, $progessionData, $widths, $this->height);
         $infos = [
-            [$langs->transnoentities('Subject'), $moreparams['object']->subject],
-            [$langs->transnoentities('Message'), $moreparams['object']->message],
+            [$langs->transnoentities('Subject'), dol_string_nohtmltag($object->subject)],
+            [$langs->transnoentities('Message'), dol_string_nohtmltag($object->message)],
             ['Tags', $allCategories]
         ];
 
+        $pdf->Ln(3);
+
         $widths = [
-            $pageWidth * 0.15,
-            $pageWidth * 0.87
+            $pageWidth * 0.10,
+            $pageWidth * 0.92
         ];
 
         $this->drawTable($pdf, $infos, $widths, $this->height);
+        $this->_pageFooter($pdf, $object, $outputLangs, $defaultFontSize);
 
         try {
             $pdf->Output($file, 'F');
