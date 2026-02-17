@@ -1507,6 +1507,7 @@ TicketSuccessMessage           = Message de succès du ticket
 TicketSuccessMessageSet        = Le message a bien été modifié
 TicketDocumentPDF              = FT-A4-PAYSAGE
 TicketDocumentPDFDescription   = Afficher la fiche ticket
+GeneratedTicketDocumentDate    = Date de l’exportation de ce ticket
 
 
 # Project document
