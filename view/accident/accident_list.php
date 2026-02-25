@@ -206,6 +206,16 @@ if ($fromid > 0) {
     }
 }
 
+$moreParams = [
+    'LoadAccident'               => 1,
+    'specialModuleNameLowerCase' => 'digirisk'
+];
+
+require_once __DIR__ . '/../../../saturne/class/saturnedashboard.class.php';
+
+$dashboard = new SaturneDashboard($db, $moduleNameLowerCase);
+$dashboard->show_dashboard($moreParams);
+
 // Object card
 // ------------------------------------------------------------
 if ($fromid > 0) {

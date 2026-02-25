@@ -488,7 +488,6 @@ class ActionsDigiriskdolibarr
 		} elseif (strpos($parameters['context'], 'categoryindex') !== false) {	    // do something only for the context 'somecontext1' or 'somecontext2'
             print '<script src="../custom/digiriskdolibarr/js/digiriskdolibarr.js"></script>';
         }
-
         return 0; // or return 1 to replace standard code
 	}
 
