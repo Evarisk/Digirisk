@@ -74,7 +74,7 @@ if (empty($action) && empty($id) && empty($ref)) {
 require_once DOL_DOCUMENT_ROOT . '/core/actions_fetchobject.inc.php'; // Must be included, not include_once
 
 // Security check - Protection if external user
-$permissionToRead = $user->hasRight('categorie', 'creer') && $user->hasRight('digiriskdolibarr', 'adminpage', 'read');;
+$permissionToRead = $user->hasRight('categorie', 'creer') && $user->hasRight('digiriskdolibarr', 'ticket', 'categoryconfig');
 saturne_check_access($permissionToRead, $object);
 
 /*

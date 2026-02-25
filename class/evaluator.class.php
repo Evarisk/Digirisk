@@ -151,7 +151,8 @@ class Evaluator extends SaturneObject
         $array['evaluators'] = [];
         foreach ($evaluators as $evaluator) {
             $array['evaluators'][$evaluator->id] = $evaluator;
-            $array['nbEvaluatorByEntities'][$evaluator->entity]++;
+            $array['nbEvaluatorByEntities'][$evaluator->entity] =
+                ($array['nbEvaluatorByEntities'][$evaluator->entity] ?? 0) + 1;
         }
 
         return $array;

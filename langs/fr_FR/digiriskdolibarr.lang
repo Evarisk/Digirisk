@@ -762,7 +762,7 @@ RiskAssessmentDocumentDescription                         = Plan d'action Docume
 # Boxes - Widget
 NextGenerateDate  = Prochain génération
 LastGenerateDate  = Dernière génération
-DelayGenerateDate = Retard dans la génération
+DelayGenerateDate = Jours restants
 NoDelay           = Pas de retard
 
 # Email - Mail
@@ -900,9 +900,9 @@ DeleteEvaluatorMessage       = Suppression de l'évaluateur
 DigiriskEvaluatorData        = Données configurables des évaluateurs
 EvaluatorDuration            = Durée de l'évaluation par l'évaluateur
 EvaluatorDurationDescription = Le temps que met l'évaluateur à réaliser son évaluation des risques
-NbEmployeesInvolved          = Nombre de salariés impliqués
-NbEmployees                  = Nombre de salariés
-NbEmployeesInvolvedTooltip   = Nombre de salariés (évaluateurs) uniques
+NbEmployeesInvolved          = Salariés impliqués
+NbEmployees                  = Salariés
+NbEmployeesInvolvedTooltip   = Salariés (évaluateurs) uniques
 NbEmployeesTooltip           = Si la gestion centralisée des utilisateurs et des groupes sur l'entité principale est activée.<br>Le nombre de salariés correspond au nombre d'utilisateurs partagés/affectés à un groupe et aussi au nombre d'administrateur de l'entité principale
 NbEmployeesConfTooltip       = Le nombre de salariés a été saisi manuellement
 
@@ -950,6 +950,7 @@ RiskList                                 = Listing de risques
 AddRiskTitle                             = Ajout du risque
 AddRiskButton                            = Ajouter le risque
 EditRisk                                 = Édition du risque
+LinkedRisk                               = Risque lié
 RiskCategory                             = Cat.
 RiskCategoryEdit                         = Catégorie de risque
 RiskCategoryEditDescription              = Activer la modification de la catégorie d'un risque existant
@@ -1287,6 +1288,9 @@ OpenAIApiKeyDescription = Pour utiliser DigiAI, vous devez disposer d'une clé A
 # Ticket - Interface publique ticket
 #
 
+# Rights - Droits
+TicketTagsConfig                         = Modification des registres SST
+
 # Data - Donnée
 Register                                 = Registre
 Send                                     = Envoyer
@@ -1388,6 +1392,10 @@ TicketCategoriesNotCreated               = Vous n'avez pas créé de catégories
 TicketPublicInterfaceQRCode              = QR Code de l'interface publique des tickets
 MultiEntityTicketPublicInterfaceQRCode   = QR Code de l'interface publique des tickets multi-société
 PublicInterfaceConfiguration             = Champs visibles / requis de l'interface publique
+TicketNumber                             = N° du ticket
+FromAndDate                              = Provenance et date
+AuthorRequest                            = Demandeur
+DateCloture                              = Date de clôture
 
 PublicInterfaceUseSignatory              = Demande de signature pour la déclaration du registre
 ValidateText                             = Conditions à accepter pour la signature
@@ -1497,13 +1505,17 @@ ticketdocument_sign.odt        = Fiche du ticket avec signature
 ticketdocument_event_sign.odt  = Fiche du ticket avec événement et signature
 TicketSuccessMessage           = Message de succès du ticket
 TicketSuccessMessageSet        = Le message a bien été modifié
+TicketDocumentPDF              = FT-A4-PAYSAGE
+TicketDocumentPDFDescription   = Afficher la fiche ticket
+GeneratedTicketDocumentDate    = Date de l’exportation de ce ticket
 
 
 # Project document
 
 # ODT Template - Template ODT
 DigiriskTemplateDocumentProject = Modèle de documents des fiches de projets de Digirisk
-DocumentModelPapripactA3Paysage            = Modèles de document de rapport prévisionnel sur les tâches de projets
+DocumentModelPapripactA3Paysage = Modèles de document de rapport prévisionnel sur les tâches de projets
+PapripactFullName               = Programme Annuel de Prévention des Risques Professionnels et d'Amélioration des Conditions de Travail
 
 # Register Document
 

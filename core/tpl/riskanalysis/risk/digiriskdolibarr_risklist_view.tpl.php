@@ -894,7 +894,7 @@ foreach ($risk->fields as $key => $val) {
         print '<td class="liste_titre' . ($cssforfield ? ' ' . $cssforfield : '') . '">';
         if (isset($val['arrayofkeyval']) && is_array($val['arrayofkeyval'])) print $form->selectarray('search_' . $key, $val['arrayofkeyval'], $search[$key], $val['notnull'], 0, 0, '', 1, 0, 0, '', 'maxwidth75');
         elseif (strpos($val['type'], 'integer:') === 0) {
-            print $risk->showInputField($val, $key, $search[$key], '', '', 'search_', 'maxwidth150', 1);
+            print $risk->showInputField($val, $key, $search[$key] ?? '', '', '', 'search_', 'maxwidth150', 1);
         } elseif ($key == 'fk_element') {
             print $digiriskelement->selectDigiriskElementList($search['fk_element'] ?? '', 'search_fk_element', ['customsql' => 'rowid NOT IN (' . implode(',', $deletedElements) . ')'], 1, 0, [], 0, 0, 'minwidth100 maxwidth300', 0, false, 1);
         } elseif ($key == 'category') { ?>
@@ -1023,7 +1023,9 @@ while ($i < ($limit ? min($num, $limit) : $num)) {
                             $digiriskElementIds = array_reverse($digiriskElementIds);
 
                             foreach ($digiriskElementIds as $key => $digiriskElementId) {
-                                print str_repeat(' &#160', $key + 1) . '&#x21B3' . $activeDigiriskElementList[$digiriskElementId]->getNomUrl(1, 'blank', 0, '', -1, 1) . '<br>';
+                                if ($activeDigiriskElementList[$digiriskElementId]) {
+                                    print str_repeat(' &#160', $key + 1) . '&#x21B3' . $activeDigiriskElementList[$digiriskElementId]->getNomUrl(1, 'blank', 0, '', -1, 1) . '<br>';
+                                }
                             }
                         }
                     }

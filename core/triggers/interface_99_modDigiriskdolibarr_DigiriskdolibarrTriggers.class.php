@@ -72,7 +72,7 @@ class InterfaceDigiriskdolibarrTriggers extends DolibarrTriggers
 		$this->name        = preg_replace('/^Interface/i', '', get_class($this));
 		$this->family      = "demo";
 		$this->description = "Digiriskdolibarr triggers.";
-		$this->version     = '21.1.0';
+		$this->version     = '22.0.0';
 		$this->picto       = 'digiriskdolibarr@digiriskdolibarr';
 	}
 
@@ -411,10 +411,7 @@ class InterfaceDigiriskdolibarrTriggers extends DolibarrTriggers
 
 					$arraydefaultmessage = $formmail->getEMailTemplate($this->db, 'ticket_send', $user, $langs); // If $model_id is empty, preselect the first one
 
-					$table_element = $object->table_element;
-					$object->table_element = '';
 					$substitutionarray = getCommonSubstitutionArray($langs, 0, null,$object);
-					$object->table_element = $table_element;
 
 					$message = $langs->trans('Hello') . ',' . '<br><br>';
 					$message .= '<span style="color:#c55a11">' . $langs->trans('ANewTicketHasBeenSubmitted', $conf->global->MAIN_INFO_SOCIETE_NOM) . '.' . '</span><br><br>';

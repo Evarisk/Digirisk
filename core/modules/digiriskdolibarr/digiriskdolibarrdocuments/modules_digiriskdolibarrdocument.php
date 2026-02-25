@@ -136,8 +136,11 @@ abstract class ModeleODTDigiriskDolibarrDocument extends SaturneDocumentModel
 
         $array = [];
 
+        $array['riskTaskUncompleted'] = '';
+        $array['riskTaskCompleted']   = '';
+
         $result          = 1;
-        $projectEntities = $moreParam['projectEntities'];
+        $projectEntities = $moreParam['projectEntities'] ?? [];
         if ($moreParam['entity'] == 'shared' && !empty($projectEntities)) {
             $result = !empty($mc->sharings['project']) ? empty(array_diff(array_keys($projectEntities), $mc->sharings['project'])) : 0;
         }
@@ -151,8 +154,6 @@ abstract class ModeleODTDigiriskDolibarrDocument extends SaturneDocumentModel
         $riskId    = $moreParam['riskId'];
         $riskTasks = $moreParam['riskTasks'];
         if (empty($riskTasks) || empty($riskTasks[$riskId])) {
-            $array['riskTaskUncompleted'] = '';
-            $array['riskTaskCompleted']   = '';
             return $array;
         }
 
@@ -164,7 +165,9 @@ abstract class ModeleODTDigiriskDolibarrDocument extends SaturneDocumentModel
                 $userTmp = new User($riskTask->db);
                 foreach ($related_task_contact_ids as $related_task_contact_id) {
                     $userTmp->fetch($related_task_contact_id);
-                    $AllInitiales .= strtoupper(str_split($userTmp->firstname, 1)[0] . str_split($userTmp->lastname, 1)[0] . ',');
+                    $firstInitial  = dol_strtoupper(str_split($userTmp->firstname ?? '')[0] ?? '');
+                    $lastInitial   = dol_strtoupper(str_split($userTmp->lastname ?? '')[0] ?? '');
+                    $AllInitiales .= $firstInitial . $lastInitial . ',';
                 }
             }
 

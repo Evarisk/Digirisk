@@ -176,14 +176,14 @@ class pdf_papripact_a3_paysage_projectdocument
             $this->posxref                   = $this->marge_gauche + 1;           // Start position
             $this->posxlabel                 = $this->posxref + 25;               // Ref: 35mm
             $this->posxdatestart             = $this->posxlabel + 120;             // Label: 65mm (main content)
-            $this->posxdateend               = $this->posxdatestart + 25;         // Start Date: 25mm
-            $this->posxworkload              = $this->posxdateend + 25;           // End Date: 25mm
+            $this->posxdateend               = $this->posxdatestart + 20;         // Start Date: 25mm
+            $this->posxworkload              = $this->posxdateend + 20;           // End Date: 25mm
             $this->posxbudget                = $this->posxworkload + 30;          // Workload: 30mm
             $this->posxprogress              = $this->posxbudget + 15;            // Budget: 40mm
-            $this->posxuser                  = $this->posxprogress + 25;          // Progress: 25mm
+            $this->posxuser                  = $this->posxprogress + 20;          // Progress: 25mm
             $this->posxrisk                  = $this->posxuser + 30;              // User: 30mm
-            $this->posxriskcategory          = $this->posxrisk + 15;              // Risk: 35mm
-            $this->posxriskassessment        = $this->posxriskcategory + 65;
+            $this->posxriskcategory          = $this->posxrisk + 25;              // Risk: 35mm
+            $this->posxriskassessment        = $this->posxriskcategory + 75;
         } else {
             $this->posxref                   = $this->marge_gauche + 1;
             $this->posxlabel                 = $this->marge_gauche + 25;
@@ -405,7 +405,7 @@ class pdf_papripact_a3_paysage_projectdocument
 						$lastEvaluation = array_shift($lastEvaluation);
 					}
 
-                    $users         = $object->lines[$i]->liste_contact(-1, 'internal');
+                    $users          = $object->lines[$i]->liste_contact(-1, 'internal');
                     $userExecutives = [];
                     foreach ($users as $gooduser) {
                         if (!empty($gooduser) && $gooduser['code'] == 'TASKEXECUTIVE') {
@@ -426,7 +426,6 @@ class pdf_papripact_a3_paysage_projectdocument
 					$tmpArray += array("date_end" => $object->lines[$i]->date_end);
 					$tmpArray += array("workload" =>  $object->lines[$i]->planned_workload);
                     $tmpArray += array("userExecutive" =>  $userExecutives);
-
 					array_push($objectDoc, $tmpArray);
 				}
 				usort($objectDoc, function($a, $b) {
@@ -458,23 +457,19 @@ class pdf_papripact_a3_paysage_projectdocument
 					$totalbudget      += $objectDoc[$i]['budget'];
 
 					$showpricebeforepagebreak = 1;
-
+                    $labelHeightBefore = $pdf->GetY();
 					$pdf->startTransaction();
 					// Label
 					$pdf->SetXY($this->posxlabel, $curY);
 					$pdf->MultiCell($this->posxdatestart - $this->posxlabel, 3, $outputLangs->convToOutputCharset($libelleline), 0, 'L');
+                    $labelHeightAfter = $pdf->GetY();
+                    $labelHeight = $labelHeightAfter - $labelHeightBefore;
 					$pageposafter = $pdf->getPage();
 					if ($pageposafter > $pageposbefore) { // There is a pagebreak
 						$pdf->rollbackTransaction(true);
 						$pageposafter = $pageposbefore;
-						$pdf->setPageOrientation($this->orientation, 1, $heightforfooter); // The only function to edit the bottom margin of current page to set it.
-
-						// Label
 					 	$pdf->SetXY($this->posxlabel, $curY);
-						$posybefore = $pdf->GetY();
-						$pdf->MultiCell($this->posxbudget - $this->posxlabel, 3, $outputLangs->convToOutputCharset($libelleline), 0, 'L');
-						$pageposafter = $pdf->getPage();
-						$posyafter = $pdf->GetY();
+						$pdf->setPageOrientation($this->orientation, 1, $heightforfooter); // The only function to edit the bottom margin of current page to set it.
 						if ($posyafter > ($this->page_hauteur - ($heightforfooter + $heightforfreetext + $heightforinfotot))) {	// There is no space left for total+free text
 							if ($i == ($nblines - 1)) {	// No more lines, and no space left to show total, so we create a new page
 								$pdf->AddPage($this->orientation, '', true);
@@ -561,11 +556,11 @@ class pdf_papripact_a3_paysage_projectdocument
 
                     // task budget
                     $pdf->SetXY($this->posxbudget, $curY);
-                    $pdf->MultiCell($this->posxprogress - $this->posxbudget, 6, $budget, 0, 'R');
+                    $pdf->MultiCell($this->posxprogress - $this->posxbudget, 6, $budget, 0, 'C');
 
                     // Progress
                     $pdf->SetXY($this->posxprogress, $curY);
-                    $pdf->MultiCell($this->posxuser - $this->posxprogress, 6, $progress, 0, 'R');
+                    $pdf->MultiCell($this->posxuser - $this->posxprogress, 6, $progress, 0, 'C');
                     $pdf->SetFont(pdf_getPDFFont($outputLangs), '', $default_font_size - 1); // We restore font
 
                     // Executive name
@@ -585,18 +580,20 @@ class pdf_papripact_a3_paysage_projectdocument
 
 					// Risk assessment
 					if ($conf->global->DIGIRISKDOLIBARR_PROJECTDOCUMENT_DISPLAY_RISKASSESSMENT_COLOR) {
+                        $pdf->SetTextColor(255, 255, 255);
 						if ($lastEvaluation < 47) {
-							$pdf->SetTextColor(169, 169, 169);
+                            $pdf->SetFillColor(236, 236, 236);
+                            $pdf->SetTextColor(0, 0, 0);
 						} else if ($lastEvaluation < 51) {
-							$pdf->SetTextColor(255, 165, 0);
+                            $pdf->SetFillColor(233, 173, 79);
 						} else if ($lastEvaluation < 80) {
-							$pdf->SetTextColor(255, 0, 0);
+                            $pdf->SetFillColor(224, 83, 83);
 						} else {
-							$pdf->SetTextColor(0, 0, 0);
+                            $pdf->SetFillColor(43, 43, 43);
 						}
 					}
 					$pdf->SetXY($this->posxriskassessment, $curY);
-					$pdf->MultiCell($this->page_largeur - $this->marge_droite - $this->posxriskassessment, 6, $lastEvaluation, 0, 'R');
+					$pdf->MultiCell($this->page_largeur - $this->marge_droite - $this->posxriskassessment, $labelHeight, $lastEvaluation, 0, 'C', true, 1, null, null, true, 0, false, true, 0, 'M');
 					$pdf->SetTextColor(0, 0, 0);
 
 					// Add line
@@ -748,27 +745,27 @@ class pdf_papripact_a3_paysage_projectdocument
 
         // Date start
         $pdf->SetXY($this->posxdatestart, $tab_top + 1);
-        $pdf->MultiCell($this->posxdateend - $this->posxdatestart, 3, $outputLangs->trans('Start'), 0, 'C');
+        $pdf->MultiCell($this->posxdateend - $this->posxdatestart, 3, $outputLangs->transnoentities('Début'), 0, 'C');
 
         // Date end
         $pdf->SetXY($this->posxdateend, $tab_top + 1);
-        $pdf->MultiCell($this->posxworkload - $this->posxdateend, 3, $outputLangs->trans('End'), 0, 'C');
+        $pdf->MultiCell($this->posxworkload - $this->posxdateend, 3, $outputLangs->transnoentities('Fin'), 0, 'C');
 
         // Task Workload
         $pdf->SetXY($this->posxworkload, $tab_top + 1);
-        $pdf->MultiCell($this->posxbudget - $this->posxworkload, 3, $outputLangs->transnoentities('PlannedWorkloadShort'), 0, 'R');
+        $pdf->MultiCell($this->posxbudget - $this->posxworkload, 3, $outputLangs->transnoentities('CTP(h)'), 0, 'C');
 
         // Task Budget
         $pdf->SetXY($this->posxbudget, $tab_top + 1);
-        $pdf->MultiCell($this->posxprogress - $this->posxbudget, 3, $outputLangs->transnoentities('Budget'), 0, 'R');
+        $pdf->MultiCell($this->posxprogress - $this->posxbudget, 3, $outputLangs->transnoentities('Budget'), 0, 'C');
 
         // Task Progress
         $pdf->SetXY($this->posxprogress, $tab_top + 1);
-        $pdf->MultiCell($this->posxuser - $this->posxprogress, 3, 'ARD', 0, 'R');
+        $pdf->MultiCell($this->posxuser - $this->posxprogress, 3, $outputLangs->transnoentities('ARD(%)'), 0, 'C');
 
         // Executive user
         $pdf->SetXY($this->posxuser, $tab_top + 1);
-        $pdf->MultiCell($this->posxrisk - $this->posxuser, 3, $outputLangs->transnoentities('Responsible'), 0, 'C');
+        $pdf->MultiCell($this->posxrisk - $this->posxuser, 3, $outputLangs->transnoentities('Resp.'), 0, 'C');
 
         // Task Risk
 		$pdf->SetXY($this->posxrisk, $tab_top + 1);
@@ -776,13 +773,12 @@ class pdf_papripact_a3_paysage_projectdocument
 
         // Rsk Category
         $pdf->SetXY($this->posxriskcategory, $tab_top + 1);
-        $pdf->MultiCell($this->posxriskassessment - $this->posxrisk, 3, $outputLangs->transnoentities('RiskCategory'), '', 'L');
+        $pdf->MultiCell($this->posxriskassessment - $this->posxriskcategory, 3, $outputLangs->transnoentities('RiskCategoryEdit'), '', 'L');
 
         // Risk Evaluation
 		$pdf->SetXY($this->posxriskassessment, $tab_top + 1);
-		$pdf->MultiCell($this->page_largeur - $this->marge_droite - $this->posxriskassessment, 3, $outputLangs->transnoentities('RiskAssessment'), '', 'R');
+		$pdf->MultiCell($this->page_largeur - $this->marge_droite - $this->posxriskassessment, 3, $outputLangs->transnoentities('Cot.'), '', 'C');
 	}
-
 	// phpcs:disable PEAR.NamingConventions.ValidFunctionName.PublicUnderscore
 	/**
 	 *  Show top header of page.
@@ -809,6 +805,9 @@ class pdf_papripact_a3_paysage_projectdocument
 
 		$pdf->SetXY($this->marge_gauche, $posy);
 
+        // PAPRIPACT title
+        $pdf->Cell(0, 10, 'PAPRIPACT - ' . $conf->global->MAIN_INFO_SOCIETE_NOM . ' ' . dol_print_date($object->date_start, 'day', false, $outputLangs, true) . ' - ' . dol_print_date($object->date_end, 'day', false, $outputLangs, true), 0, 1, 'C');
+        $pdf->Cell(0, 10, $langs->transnoentities('PapripactFullName'), 0, 1, 'C');
 		// Logo
 		$logo = $conf->mycompany->dir_output.'/logos/'.$mysoc->logo;
 		if ($mysoc->logo) {
@@ -834,12 +833,12 @@ class pdf_papripact_a3_paysage_projectdocument
 		$posy += 6;
 		$pdf->SetXY($posx, $posy);
 		$pdf->SetTextColor(0, 0, 60);
-		$pdf->MultiCell(100, 4, $outputLangs->transnoentities('DateStart'). ' : ' .dol_print_date($object->date_start, 'day', false, $outputLangs, true), '', 'R');
+		$pdf->MultiCell(100, 4, $outputLangs->transnoentities('DateStart') . ' : ' . dol_print_date($object->date_start, 'day', false, $outputLangs, true), '', 'R');
 
 		if ($object->date_end) {
 			$posy += 6;
 			$pdf->SetXY($posx, $posy);
-			$pdf->MultiCell(100, 4, $outputLangs->transnoentities('DateEnd'). ' : ' .dol_print_date($object->date_end, 'day', false, $outputLangs, true), '', 'R');
+			$pdf->MultiCell(100, 4, $outputLangs->transnoentities('DateEnd') . ' : ' . dol_print_date($object->date_end, 'day', false, $outputLangs, true), '', 'R');
 		}
 
 		if (is_object($object->thirdparty)) {

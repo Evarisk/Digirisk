@@ -178,7 +178,7 @@ window.digiriskdolibarr.evaluation.createEvaluation = function ( event ) {
 			}
 		}),
 		processData: false,
-		contentType: false,
+    contentType: 'application/json charset=utf-8',
 		success: function( resp ) {
 
 			if ($(resp).find('.risk-evaluation-list-container-' + riskToAssign).length > 0) {
@@ -242,7 +242,6 @@ window.digiriskdolibarr.evaluation.deleteEvaluation = function ( event ) {
 			url:document.URL + '&action=deleteEvaluation&deletedEvaluationId=' + evaluationID + '&token=' + token,
 			type: "POST",
 			processData: false,
-			contentType: false,
 			success: function ( resp ) {
 				//remove risk assessment from list in modal
 				$('.risk-evaluation-container-' + evaluationID).fadeOut(400)
@@ -347,8 +346,8 @@ window.digiriskdolibarr.evaluation.saveEvaluation = function ( event ) {
         exposition: criteres['exposition'] ? criteres['exposition'] : (criteres['frequence'] ? criteres['frequence'] : 0)
 			}
 		}),
-		contentType: false,
-		success: function ( resp ) {
+    contentType: 'application/json charset=utf-8',
+    success: function ( resp ) {
 			$('#risk_evaluation_edit'+evaluationID).removeClass('modal-active')
 
 			if ($(resp).find('.risk-evaluation-container.risk-evaluation-container-'+evaluationID+':not(.last-risk-assessment)').length > 0) {

@@ -82,6 +82,10 @@ $category        = new Categorie($db);
 $digiriskelement = new DigiriskElement($db);
 $signatory       = new SaturneSignature($db, $moduleNameLowerCase, $object->element);
 
+$tzString = !empty($_SESSION['dol_tz_string']) ? $_SESSION['dol_tz_string'] : 'UTC';
+$timezone = new DateTimeZone($tzString);
+$now      = new DateTime('now', $timezone);
+
 $form = new Form($db);
 
 $numRefConf = strtoupper($object->element) . '_ADDON';
@@ -98,9 +102,11 @@ if ($entity > 0) {
     $upload_dir = $conf->categorie->multidir_output[isset($entity) ? $entity : 1];
 }
 
-if (dolibarr_get_const($db, 'DIGIRISKDOLIBARR_SHOW_HIDDEN_DIGIRISKELEMENT') == 0) {
-    $digiriskelement = $digiriskelement->getActiveDigiriskElements();
+$moreParams = [];
+if (empty(dolibarr_get_const($db, 'DIGIRISKDOLIBARR_SHOW_HIDDEN_DIGIRISKELEMENT'))) {
+    $moreParams['filter'] = ' AND t.show_in_selector = 1 ';
 }
+$digiriskelement = $digiriskelement->getActiveDigiriskElements('current', $moreParams);
 
 /*
  * Actions
@@ -113,6 +119,11 @@ if ($resHook < 0) {
 }
 
 if (empty($resHook)) {
+    if ($_SERVER['REQUEST_METHOD'] === 'POST' && GETPOSTISSET('tz')) {
+        $_SESSION['dol_tz_string'] = GETPOST('tz');
+        exit;
+    }
+
     if ($action == 'add') {
         $error = 0;
 
@@ -255,16 +266,6 @@ if (empty($resHook)) {
         $object->message = html_entity_decode($message);
 
         $object->fk_project = $conf->global->DIGIRISKDOLIBARR_TICKET_PROJECT;
-
-        if (!empty($date)) {
-            $timeStamp = dol_stringtotime($date);
-            $date      = dol_getdate($timeStamp);
-            $_POST['options_digiriskdolibarr_ticket_datehour']  = $date['hours'];
-            $_POST['options_digiriskdolibarr_ticket_datemin']   = $date['minutes'];
-            $_POST['options_digiriskdolibarr_ticket_dateday']   = $date['mday'];
-            $_POST['options_digiriskdolibarr_ticket_datemonth'] = $date['mon'];
-            $_POST['options_digiriskdolibarr_ticket_dateyear']  = $date['year'];
-        }
 
         if (!empty($config['validate_text'])) {
             $validateText = $config['validate_text'];
@@ -459,9 +460,16 @@ $moreJS = ['/saturne/js/includes/signature-pad.min.js'];
 $conf->dol_hide_topmenu  = 1;
 $conf->dol_hide_leftmenu = 1;
 
-saturne_header(0,'', $title, '', '', 0, 0, $moreJS, [], '', 'page-public-card page-signature');
+saturne_header(0,'', $title, '', '', 0, 0, $moreJS, [], '', 'page-public-card page-signature'); ?>
 
-if ($entity > 0) {
+<script>
+    $(document).ready(function() {
+        window.saturne.utils.timezoneDefined = <?= isset($_SESSION['dol_tz_string']) ? 'true' : 'false' ?>;
+        window.saturne.utils.ensureTimezoneInSession();
+    });
+</script>
+
+<?php if ($entity > 0) {
 	if ( ! $conf->global->DIGIRISKDOLIBARR_TICKET_ENABLE_PUBLIC_INTERFACE) {
 		print '<div class="error">' . $langs->trans('TicketPublicInterfaceForbidden') . '</div>';
 		$db->close();
@@ -582,12 +590,14 @@ if ($entity > 0) {
                 if ($visible && dol_strlen($categoryDescription) > 0) : ?>
                     <div class="form-element gridw-2">
                         <span class="form-label"><?php print $langs->trans('Description'); ?>
-                        <label class="form-field-container">
-                            <?php
-                                $dolEditor = new DolEditor('category-description', $categoryDescription, '100%', 120, 'dolibarr_readonly', '', false, true, true, ROWS_2, 70, 1);
-                                $dolEditor->Create();
-                            ?>
-                        </label>
+                        <br>
+                        <div class="form-field-container">
+                            <label class="form-field-text">
+                                <?php
+                                    echo $categoryDescription;
+                                ?>
+                            </label>
+                        </div>
                     </div>
                 <?php endif;
 
@@ -617,6 +627,8 @@ if ($entity > 0) {
                     'digiriskdolibarr_ticket_date'  => ['type' => 'datetime-local']
                 ];
 
+                $_POST['options_digiriskdolibarr_ticket_date'] = $now->getTimestamp();
+
 				foreach ($fieldList as $key => $label) {
 					if (strpos($key, 'digiriskdolibarr_ticket') === false && !in_array($key, ['message'])) {
 						continue;
@@ -637,7 +649,7 @@ if ($entity > 0) {
 					switch ($key) {
 						case 'message':
 							$out .= '<label class="form-field-container">' . ucfirst($key) . '<span style="color:red"> *</span></label>' ;
-                            $out .= '<textarea name="message" id="message"' . ($required ? 'required' : '') . '>' . GETPOST('message') . '</textarea>';
+                            $out .= '<textarea name="message" id="message" required>' . GETPOST('message') . '</textarea>';
 							break;
 						case 'photo':
                             $out .= <<<HTML
@@ -683,11 +695,15 @@ if ($entity > 0) {
                             if (dolibarr_get_const($db, 'DIGIRISKDOLIBARR_TASK_HIDE_REF_IN_DOCUMENT') == 1) {
                                 $digiriskelementlabel = [];
                                 foreach ($digiriskelement as $element) {
-                                    $digiriskelementlabel[] = $element->label;
+                                    $digiriskelementlabel[$element->id] = $element->label;
                                 }
-                                $out .= $extrafields->showInputField($key, $digiriskelementlabel, ($required ? 'required' : ''), '', '', 0, $object->id, $object->table_element);
+                                $out .= Form::selectarray('options_' . $key, $digiriskelementlabel, '', 1);
                             } else {
-							    $out .= $extrafields->showInputField($key, $digiriskelement, ($required ? 'required' : ''), '', '', 0, $object->id, $object->table_element);
+                                $digiriskelementlabel = [];
+                                foreach ($digiriskelement as $element) {
+                                    $digiriskelementlabel[$element->id] = $element->ref . ' - ' . $element->label;
+                                }
+                                $out .= Form::selectarray('options_' . $key, $digiriskelementlabel, '', 1);
                             }
                             break;
 						default:
@@ -727,7 +743,7 @@ if ($entity > 0) {
                 print '<div style="flex: 1;">';
                 $substitutionarray = getCommonSubstitutionArray($langs);
         		complete_substitutions_array($substitutionarray, $langs);
-                print make_substitutions($content, $substitutionarray, $langs);
+                print make_substitutions($content, $substitutionarray, $langs) . '<span style="color:red"> *</span>';
                 print '</div>';
                 print '</label>';
             }

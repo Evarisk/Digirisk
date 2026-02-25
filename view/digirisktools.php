@@ -625,15 +625,14 @@ if (GETPOST('dataMigrationExportGlobal', 'alpha') && ! empty($conf->global->MAIN
 if ($action == 'import_global_dolibarr' && ! empty($conf->global->MAIN_UPLOAD_DOC)) {
 	// Submit file
     $actionError = [];
-
-	if ( ! empty($_FILES)) {
-		if ( ! preg_match('/dolibarr_global_export.zip/', $_FILES['file']['name']) || $_FILES['file']['size'] < 1) {
+    if ( ! empty($_FILES)) {
+		if ( ! preg_match('/dolibarr_global_export.zip/', $_FILES['file']['name'][0]) || $_FILES['file']['size'][0] < 1) {
             $actionError[] = $langs->trans('ErrorFileNotWellFormattedZIP');
 		} else {
 
-            if (empty($_FILES['file']['tmp_name'])) {
+            if (empty($_FILES['file']['tmp_name'][0])) {
                 $error++;
-                if ($_FILES['file']['error'] == 1 || $_FILES['file']['error'] == 2) {
+                if ($_FILES['file']['error'][0] == 1 || $_FILES['file']['error'][0] == 2) {
                     $actionError[] = $langs->trans('ErrorFileSizeTooLarge');
                 } else {
                     $actionError[] = $langs->trans("ErrorFieldRequired", $langs->transnoentitiesnoconv("File"));
@@ -649,13 +648,13 @@ if ($action == 'import_global_dolibarr' && ! empty($conf->global->MAIN_UPLOAD_DO
 
 			if ($result > 0) {
 				$zip = new ZipArchive;
-				if ($zip->open($filedir . $_FILES['file']['name']) === TRUE) {
+				if ($zip->open($filedir . $_FILES['file']['name'][0]) === TRUE) {
 					$zip->extractTo($filedir);
 					$zip->close();
 				}
 			}
 
-			$filename = preg_replace( '/\.zip/', '.json', $_FILES['file']['name']);
+			$filename = preg_replace( '/\.zip/', '.json', $_FILES['file']['name'][0]);
 
 			$json                = file_get_contents($filedir . $filename);
 			$digiriskExportArray = json_decode($json, true);
@@ -1096,7 +1095,7 @@ if ($user->rights->digiriskdolibarr->adminpage->read) {
 
 	print '<form class="data-migration-from" name="DataMigration" id="DataMigration" action="' . $_SERVER["PHP_SELF"] . '" enctype="multipart/form-data" method="POST">';
 	print '<input type="hidden" name="token" value="' . newToken() . '">';
-	print '<input type="hidden" name="action" value="">';
+	print '<input type="hidden" name="action" value="import_global_dolibarr">';
 
 	// Import data from Dolibarr
 	print '<tr class="oddeven"><td>';
@@ -1106,8 +1105,8 @@ if ($user->rights->digiriskdolibarr->adminpage->read) {
 	print '</td>';
 
 	print '<td class="center data-migration-import-global-dolibarr">';
-	print '<input class="flat" type="file" name="dataMigrationImportGlobalDolibarrfile[]" />';
-	print '<input type="submit" class="button reposition data-migration-submit" name="dataMigrationImportGlobalDolibarr" id="data-migration-import-global-dolibarr" value="' . $langs->trans("Upload") . '">';
+	print '<input type="file" name="file[]" />';
+	print '<input type="submit" class="button reposition" name="dataMigrationImportGlobalDolibarr" value="' . $langs->trans("Upload") . '">';
 	print '</td>';
 	print '</tr>';
 	print '</table>';

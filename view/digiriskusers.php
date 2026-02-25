@@ -245,7 +245,7 @@ if ($action == 'add' && $permissiontoadd) {
 		}
 
 		// Set entity property
-		$object->entity = $conf->entity;
+		$object->entity = getDolGlobalInt('MULTICOMPANY_TRANSVERSE_MODE') ? 1 : $conf->entity;
 
 		$db->begin();
 
@@ -254,7 +254,8 @@ if ($action == 'add' && $permissiontoadd) {
 			if (GETPOST('password')) {
 				$newpassword = $object->setPassword($user, GETPOST('password'));
 			}
-			$object->SetInGroup($group, $conf->entity);
+
+			$object->SetInGroup(GETPOSTINT('groupid'), $conf->entity);
 
 			if ($newpassword < 0) {
 				// Echec
@@ -785,7 +786,7 @@ print "</table>";
 
 print "</form>\n";
 
-if ($permissiontoadd && (empty($conf->global->MULTICOMPANY_TRANSVERSE_MODE) || $conf->entity == 1)) {
+if ($permissiontoadd) {
 	print '<form action="' . $_SERVER['PHP_SELF'] . '" method="POST" name="createuser">';
 	print '<input type="hidden" name="token" value="' . newToken() . '">';
 	print '<input type="hidden" name="action" value="add">';
@@ -818,6 +819,9 @@ if ($permissiontoadd && (empty($conf->global->MULTICOMPANY_TRANSVERSE_MODE) || $
 								<div class="table-cell table-150">
 									<input type="text" id="job" placeholder="<?php echo $langs->trans('PostOrFunction'); ?>" name="job" value="<?php echo dol_escape_htmltag(GETPOST('job')); ?>" />
 								</div>
+								<div class="table-cell table-300">
+									<?php echo $form->select_dolgroups($group, 'groupid', 1, '', 0, '', array(), (string) $conf->entity, false, 'minwidth100imp widthcentpercentminusxx groupselectcontact'); ?>
+								</div>
 								<div class="table-cell">
 									<input type="submit" id="createuseraction" name="createuseraction" style="display : none">
 									<label for="createuseraction">
@@ -837,13 +841,7 @@ if ($permissiontoadd && (empty($conf->global->MULTICOMPANY_TRANSVERSE_MODE) || $
 	$action = '';
 	print '</form>';
 	print '</table></tr>';
-} else { ?>
-	<div class="wpeo-notice notice-info">
-		<div class="notice-content">
-			<div class="notice-subtitle"><?php echo $langs->trans("MulticompanyTransverseModeEnabled"); ?></div>
-		</div>
-	</div>
-<?php }
+}
 
 print '</div>';
 

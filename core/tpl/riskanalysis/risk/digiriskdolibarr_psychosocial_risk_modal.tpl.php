@@ -180,7 +180,7 @@ $predefinedPsychosocialRisks = [
                                                       name="selected_risks[<?php echo $riskIndex; ?>][prevention_actions]"
                                                       rows="1"
                                                       style="width: 100%; max-width: 180px;"
-                                                      placeholder="<?php echo $langs->trans('PreventionActions'); ?>">Lire le rapport sur les RPS dans la pièce jointe de cette tâche</textarea>
+                                                      placeholder="<?php echo $langs->trans('PreventionActions'); ?>"></textarea>
                                         </td>
                                     </tr>
 

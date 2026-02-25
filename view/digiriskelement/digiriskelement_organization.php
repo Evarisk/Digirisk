@@ -222,16 +222,16 @@ if (!empty($results)) :
             <div class="notice-close"><i class="fas fa-times"></i></div>
         </div>
     </div>
+    <h3 class='title' id='title0'><?php echo $conf->global->MAIN_INFO_SOCIETE_NOM ?></h3>
+    <button class="save-organization wpeo-button button-disable" style=""><?= $langs->trans('Save') ?><i style="display:none" class="fas fa-times"></i><i style="display:none" class="fas fa-check"></i></button>
     <div class='container'>
         <input type="hidden" name="token" value="<?php echo newToken() ?>">
-        <h3 class='title' id='title0'><?php echo $conf->global->MAIN_INFO_SOCIETE_NOM ?></h3>
         <ul class='space space-0 first-space ui-sortable' id='space0' value="0">
             <?php display_recurse_tree_organization($results) ?>
         </ul>
     </div>
 <?php
 print '<hr>';
-print '<button class="save-organization wpeo-button button-disable" style="">' . $langs->trans('Save') . '  <i style="display:none" class="fas fa-times"></i><i style="display:none" class="fas fa-check"></i></button>';
 
 else :
 		print '<div class="wpeo-notice notice-warning notice-red">';

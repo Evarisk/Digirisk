@@ -91,8 +91,8 @@ class doc_riskassessmentdocument_odt extends ModeleODTDigiriskDolibarrDocument
         $array['current']['totalRisks']                    = $riskArray['current']['totalRisks'];
         $array['shared']['totalRisks']                     = $riskArray['shared']['totalRisks'];
         $array['current']['riskTasks']                     = $riskArray['current']['riskTasks'];
-        $array['shared']['riskTasks']                      = $riskArray['shared']['riskTasks'];
-        $array['shared']['projectEntities']                = $riskArray['shared']['projectEntities'];
+        $array['shared']['riskTasks']                      = $riskArray['shared']['riskTasks'] ?? [];
+        $array['shared']['projectEntities']                = $riskArray['shared']['projectEntities'] ?? [];
         $array['riskByEntities']                           = $riskArray['riskByEntities'];
 
         return $array;
@@ -197,7 +197,7 @@ class doc_riskassessmentdocument_odt extends ModeleODTDigiriskDolibarrDocument
                 $tmpArray['description']                  = $orderedDigiriskElement['object']->description;
                 $tmpArray['totalRiskAssessmentCotations'] = $riskByRiskAssessmentCotations[$orderedDigiriskElementId]['totalRiskAssessmentCotations'] ?: 0;
                 foreach ($riskAssessmentCotationTypes as $i => $riskAssessmentCotationType) {
-                    $tmpArray['nb' . $riskAssessmentCotationType] = $riskByRiskAssessmentCotations[$orderedDigiriskElementId][$i] ?: 0;
+                    $tmpArray['nb' . $riskAssessmentCotationType] = $riskByRiskAssessmentCotations[$orderedDigiriskElementId][$i] ?? 0;
                 }
 
                 static::setTmpArrayVars($tmpArray, $listLines, $outputLangs);
@@ -278,9 +278,9 @@ class doc_riskassessmentdocument_odt extends ModeleODTDigiriskDolibarrDocument
                         $nbRiskByCategory += $riskByCategories[$dangerCategory['position']][$i];
                     }
 
-                    $nbRiskByRiskAssessmentCotationType                                             = $riskByCategories[$dangerCategory['position']][$i] ?: 0;
+                    $nbRiskByRiskAssessmentCotationType                                             = $riskByCategories[$dangerCategory['position']][$i] ?? 0;
                     $totalNbRiskByRiskAssessmentCotationType[$riskAssessmentCotationType]['value'] += $nbRiskByRiskAssessmentCotationType;
-                    $tmpArray['nb' . $riskAssessmentCotationType]                                   = $riskByCategories[$dangerCategory['position']][$i] ?: 0;
+                    $tmpArray['nb' . $riskAssessmentCotationType]                                   = $riskByCategories[$dangerCategory['position']][$i] ?? 0;
                 }
 
                 $percentageByCategory       = ($nbRiskByCategory > 0) ? round(($nbRiskByCategory / $totalRisks) * 100, 1) : 0;
@@ -381,9 +381,9 @@ class doc_riskassessmentdocument_odt extends ModeleODTDigiriskDolibarrDocument
                             $nbRiskByCategory += $riskBySubCategories[$dangerSubCategory['position']][$i];
                         }
 
-                        $nbRiskByRiskAssessmentCotationType                                             = $riskBySubCategories[$dangerSubCategory['position']][$i] ?: 0;
+                        $nbRiskByRiskAssessmentCotationType                                             = $riskBySubCategories[$dangerSubCategory['position']][$i] ?? 0;
                         $totalNbRiskByRiskAssessmentCotationType[$riskAssessmentCotationType]['value'] += $nbRiskByRiskAssessmentCotationType;
-                        $tmpArray['nb' . $riskAssessmentCotationType]                                   = $riskBySubCategories[$dangerSubCategory['position']][$i] ?: 0;
+                        $tmpArray['nb' . $riskAssessmentCotationType]                                   = $riskBySubCategories[$dangerSubCategory['position']][$i] ?? 0;
                     }
                     $percentageByCategory       = ($nbRiskByCategory > 0) ? round(($nbRiskByCategory / $totalRisks) * 100, 1) : 0;
                     $totalPercentageByCategory += $percentageByCategory;

@@ -3795,10 +3795,6 @@ td > .risk-evaluation-list-content .risk-evaluation-container:not(.advanced, .st
   max-height: 32px !important;
 }
 
-.dropdown-toggle::after {
-  display: none;
-}
-
 .favorite-photo {
   border: 5px solid #0d8aff;
 }

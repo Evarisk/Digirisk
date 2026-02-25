@@ -228,15 +228,15 @@ class Risk extends SaturneObject
             $array['shared']['riskByRiskAssessmentLevels']    = [];
         }
 
-        if ($moreParam['tmparray']['showSharedRisk_nocheck']) {
+        if (isset($moreParam['tmparray']['showSharedRisk_nocheck']) && $moreParam['tmparray']['showSharedRisk_nocheck'] === true) {
             $array['shared']['risks'] = saturne_fetch_all_object_type('Risk', 'DESC', 'riskAssessmentCotation', 0, 0, ['customsql' => $filter], 'AND', false, true, false, $sharedJoin, [], $sharedSelect, $sharedMoreSelects);
             if (!is_array($array['shared']['risks']) || empty($array['shared']['risks'])) {
-                $array['shared']['risks']                          = [];
-                $array['shared']['riskByCategories']               = [];
-                $array['shared']['riskBySubCategories']            = [];
+                $array['shared']['risks']                         = [];
+                $array['shared']['riskByCategories']              = [];
+                $array['shared']['riskBySubCategories']           = [];
                 $array['shared']['psychosocialRisksByGPUT']       = [];
-                $array['shared']['riskByRiskAssessmentCotations']  = [];
-                $array['shared']['riskByRiskAssessmentLevels']     = [];
+                $array['shared']['riskByRiskAssessmentCotations'] = [];
+                $array['shared']['riskByRiskAssessmentLevels']    = [];
             }
         }
 
@@ -247,16 +247,42 @@ class Risk extends SaturneObject
             $riskAssessment->cotation = $risk->riskAssessmentCotation;
             $entity                   = ($risk->entity == $conf->entity || (!isModEnabled('multicompany') && empty($risk->entity))) ? 'current' : 'shared';
 
-            $array[$entity]['riskByRiskAssessmentLevels'][$riskAssessment->getEvaluationScale()][] = $risk;
-            $array[$entity]['riskByRiskAssessmentCotations'][$risk->fk_element]['totalRiskAssessmentCotations'] += $risk->riskAssessmentCotation;
-            $array[$entity]['riskByRiskAssessmentCotations'][$risk->fk_element][$riskAssessment->getEvaluationScale()]++;
+            $scale     = $riskAssessment->getEvaluationScale();
+            $fkElement = $risk->fk_element;
+
+            $array[$entity]['riskByRiskAssessmentLevels'][$scale]
+                = $array[$entity]['riskByRiskAssessmentLevels'][$scale] ?? [];
+
+            $array[$entity]['riskByRiskAssessmentCotations'][$fkElement]['totalRiskAssessmentCotations']
+                = $array[$entity]['riskByRiskAssessmentCotations'][$fkElement]['totalRiskAssessmentCotations'] ?? 0;
+
+            $array[$entity]['riskByRiskAssessmentCotations'][$fkElement][$scale]
+                = $array[$entity]['riskByRiskAssessmentCotations'][$fkElement][$scale] ?? 0;
+
+            $array[$entity]['riskByCategories'][$risk->category][$scale]
+                = $array[$entity]['riskByCategories'][$risk->category][$scale] ?? 0;
+
+            $array[$entity]['riskBySubCategories'][$risk->sub_category][$scale]
+                = $array[$entity]['riskBySubCategories'][$risk->sub_category][$scale] ?? 0;
+
+            $array['riskByEntities'][$risk->entity]['nbTotalRisks']
+                = $array['riskByEntities'][$risk->entity]['nbTotalRisks'] ?? 0;
+
+            $array['riskByEntities'][$risk->entity][$scale]
+                = $array['riskByEntities'][$risk->entity][$scale] ?? 0;
+
+            $nbTotalRisks[$entity] = $nbTotalRisks[$entity] ?? 0;
+
+            $array[$entity]['riskByRiskAssessmentLevels'][$scale][] = $risk;
+            $array[$entity]['riskByRiskAssessmentCotations'][$fkElement]['totalRiskAssessmentCotations'] += $risk->riskAssessmentCotation;
+            $array[$entity]['riskByRiskAssessmentCotations'][$fkElement][$scale]++;
             if ($risk->sub_category >= 0) {
-                $array[$entity]['psychosocialRisksByGPUT'][$risk->fk_element][$risk->sub_category][$risk->riskAssessmentDate] = $riskAssessment->cotation;
+                $array[$entity]['psychosocialRisksByGPUT'][$fkElement][$risk->sub_category][$risk->riskAssessmentDate] = $riskAssessment->cotation;
             }
-            $array[$entity]['riskByCategories'][$risk->category][$riskAssessment->getEvaluationScale()]++;
-            $array[$entity]['riskBySubCategories'][$risk->sub_category][$riskAssessment->getEvaluationScale()]++;
+            $array[$entity]['riskByCategories'][$risk->category][$scale]++;
+            $array[$entity]['riskBySubCategories'][$risk->sub_category][$scale]++;
             $array['riskByEntities'][$risk->entity]['nbTotalRisks']++;
-            $array['riskByEntities'][$risk->entity][$riskAssessment->getEvaluationScale()]++;
+            $array['riskByEntities'][$risk->entity][$scale]++;
             $nbTotalRisks[$entity]++;
         }
 
@@ -1056,8 +1082,8 @@ class Risk extends SaturneObject
             return $array;
         }
 
-        $totalNbRiskAssessments         = [];
-        $totalPercentagesRiskAssessment = [];
+        $totalNbRiskAssessments         = [1 => 0,  2 => 0, 3 => 0, 4 => 0];
+        $totalPercentagesRiskAssessment = [1 => 0,  2 => 0, 3 => 0, 4 => 0];
         $totalPercentages               = 0;
         $arrayRiskLists                 = [];
         foreach ($dangerCategories as $dangerCategory) {
@@ -1077,7 +1103,7 @@ class Risk extends SaturneObject
             for ($i = 1; $i <= 4; $i++) {
                 $array['labels'][$i] = $this->cotations[$i]['label'];
 
-                $percentage                          = price2num(($riskByDangerCategoriesAndRiskAssessments[$dangerCategory['name']]['riskAssessments'][$i] / $riskByDangerCategoriesAndRiskAssessments['totalRisks']) * 100, 1);
+                $percentage                         = price2num(($riskByDangerCategoriesAndRiskAssessments[$dangerCategory['name']]['riskAssessments'][$i] / $riskByDangerCategoriesAndRiskAssessments['totalRisks']) * 100, 1);
                 $totalPercentagesRiskAssessment[$i] += $percentage;
 
                 $arrayRiskLists[$dangerCategory['position']][$i]['value']    = $riskByDangerCategoriesAndRiskAssessments[$dangerCategory['name']]['riskAssessments'][$i];
@@ -1137,13 +1163,32 @@ class Risk extends SaturneObject
 
         $array['totalRisks'] = count($risks);
 
-        $nbRiskByCotations  = [];
-        $nbRiskByCategories = [];
+        $nbRiskByCotations          = [];
+        $nbRiskByCategories         = [];
+        $array['nbRiskByCotations'] = [];
         foreach ($risks as $risk) {
+            if (!isset($nbRiskByCategories[$risk->category])) {
+                $nbRiskByCategories[$risk->category] = 0;
+            }
             $nbRiskByCategories[$risk->category]++;
+
             $riskAssessment->cotation = $risk->cotation;
-            $array['nbRiskByCotations'][$riskAssessment->getEvaluationScale()]++;
-            $nbRiskByCotations[$risk->category][$riskAssessment->getEvaluationScale()]++;
+
+            $scale = $riskAssessment->getEvaluationScale();
+            if (!isset($array['nbRiskByCotations'][$scale])) {
+                $array['nbRiskByCotations'][$scale] = 0;
+            }
+            $array['nbRiskByCotations'][$scale]++;
+
+            $category = $risk->category;
+            if (!isset($nbRiskByCotations[$category])) {
+                $nbRiskByCotations[$category] = [];
+            }
+
+            if (!isset($nbRiskByCotations[$category][$scale])) {
+                $nbRiskByCotations[$category][$scale] = 0;
+            }
+            $nbRiskByCotations[$category][$scale]++;
         }
 
         foreach ($dangerCategories as $dangerCategory) {
