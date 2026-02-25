@@ -2294,6 +2294,11 @@ class modDigiriskdolibarr extends DolibarrModules
         saturne_manage_extrafields($extraFieldsArrays, $commonExtraFieldsValue);
 
         if (dolibarr_get_const($this->db, 'DIGIRISKDOLIBARR_TICKET_EXTRAFIELDS', 0) <= 3) {
+            $result = $this->_load_tables('/install/mysql/', 'ticket');
+            if ($result < 0) {
+                return -1;
+            }
+
             $commonExtraFieldsValue = [
                 'alwayseditable' => 1, 'list' => 1, 'help' => '', 'entity' => 0, 'langfile' => 'digiriskdolibarr@digiriskdolibarr', 'enabled' => "isModEnabled('digiriskdolibarr') && isModEnabled('ticket')", 'moreparams' => ['css' => 'minwidth100 maxwidth300']
             ];
