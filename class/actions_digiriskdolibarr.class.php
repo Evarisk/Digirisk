@@ -1253,4 +1253,34 @@ class ActionsDigiriskdolibarr
 
 		return 0;
 	}
+
+    public function printFieldListValue($parameters, $object, $action)
+    {
+        global $db;
+
+        if (strpos($parameters['context'], 'ticketlist') && isModEnabled('categorie')) {
+
+            $obj = $parameters['object'];
+
+            $categorie = new Categorie($db);
+            $categories = $categorie->getListForItem($obj->id, $obj->element);
+
+            $out = '';
+
+            foreach ($categories as $cat) {
+                $out .= '<div class="noborderoncategories paddingleft marginbottom" style="background: #'. (empty($cat['color']) ? 'bbb' : $cat['color']) .'">';
+                $out .= '<div class="categtextwhite" data-catid="' . $cat['id'] . '" style="cursor: pointer;"><span class="fas fa-tag paddingright" style=""></span>' . addslashes($cat['label']) . '</div></div>';
+            }
+
+            ?>
+            <script>
+                $('[data-key="ticket.ticket_categories"]').eq(<?= $parameters['i'] ?>).html('<?= $out ?>')
+                $('[data-key="ticket.ticket_categories"]').eq(<?= $parameters['i'] ?>).find('.categtextwhite').on('click', function() {
+                    $('#search_category_ticket_list').val($(this).data('catid')).trigger('change');
+                    $('button[name="button_search_x"]').click();
+                });
+            </script>
+            <?php
+        }
+    }
 }
