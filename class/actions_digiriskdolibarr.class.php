@@ -1253,4 +1253,29 @@ class ActionsDigiriskdolibarr
 
 		return 0;
 	}
+
+    public function cardExtraFieldNameDisplay($parameters, $object, $action)
+    {
+        if (strpos($parameters['name'], 'digiriskdolibarr') !== false) {
+
+            $pictopath = dol_buildpath('/custom/digiriskdolibarr/img/digiriskdolibarr_color.png', 1);
+            $pictoDigirisk = img_picto('', $pictopath, '', 1, 0, 0, '', 'pictoModule');
+
+            $this->resprints = $pictoDigirisk . ' ' . $parameters['value'];
+
+            return 1;
+        }
+        return 0;
+    }
+
+    public function cardExtrafieldValueDisplay($parameters, $object, $action)
+    {
+        if ($parameters['name'] == 'digiriskdolibarr_ticket_service') {
+            $digiriskelement = new DigiriskElement($this->db);
+            $digiriskelement->fetch($parameters['value']);
+            $this->resprints = $digiriskelement->getNomUrl(1, '', 0, '', -1, 1);
+            return 1;
+        }
+        return 0;
+    }
 }
