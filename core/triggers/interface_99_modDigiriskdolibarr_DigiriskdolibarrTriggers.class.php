@@ -405,6 +405,8 @@ class InterfaceDigiriskdolibarrTriggers extends DolibarrTriggers
 					// envoi du mail avec les infos de l'objet aux adresses mail configurées
 					// envoi du mail avec une trad puis avec un model
 
+                    require_once DOL_DOCUMENT_ROOT . '/core/class/html.formmail.class.php';
+
 					$error = 0;
 					$formmail        = new FormMail($this->db);
 

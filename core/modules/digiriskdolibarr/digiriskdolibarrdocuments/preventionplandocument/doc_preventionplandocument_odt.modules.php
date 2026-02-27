@@ -332,6 +332,8 @@ class doc_preventionplandocument_odt extends SaturneDocumentModel
             $tmpArray['society_address']  = $intSociety->address;
             $tmpArray['society_postcode'] = $intSociety->postal;
             $tmpArray['society_town']     = $intSociety->town;
+            $tmpArray['society_mail']     = $intSociety->email;
+            $tmpArray['society_phone']    = $intSociety->phone;
         }
 
         // Information external society
