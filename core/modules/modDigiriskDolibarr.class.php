@@ -2271,6 +2271,11 @@ class modDigiriskdolibarr extends DolibarrModules
 
         $extraFields = new ExtraFields($this->db);
 
+        $result = $this->_load_tables('/install/mysql/', 'ticket');
+        if ($result < 0) {
+            return -1;
+        }
+
         $commonExtraFieldsValue = [
             'alwayseditable' => 1, 'list' => 1, 'help' => '', 'entity' => 0, 'langfile' => 'digiriskdolibarr@digiriskdolibarr', 'enabled' => "isModEnabled('digiriskdolibarr') && isModEnabled('project')", 'moreparams' => ['css' => 'minwidth100 maxwidth300']
         ];
