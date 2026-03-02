@@ -638,6 +638,10 @@ AddRiskIntoCategory                      = Assigner cette catégorie au risque
 AddTicketIntoCategory                    = Assigner cette catégorie au ticket
 StartDateInvestigate                     = Date de début de l'enquête
 EndDateInvestigate                       = Date de fin de l'enquête
+YearType                                 = Type d'année
+AllYears                                 = Toutes les années
+FiscalYear                               = Année fiscale
+CalendarYear                             = Année calendaire
 
 # AccidentTooltip - Tooltip des accidents
 VictimActivityTooltip              = Précisez l’activité ou la tâche de la victime au moment de l’accident, c’est-à-dire ce que faisait la victime
