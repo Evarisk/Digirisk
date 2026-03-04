@@ -352,6 +352,39 @@ if ($action == 'set_multi_company_ticket_public_interface') {
     exit;
 }
 
+if ($action == 'createCategorieGroup') {
+
+	$ticketCategorieGroupsJson = $conf->global->DIGIRISKDOLIBARR_TICKET_CATEGORIES_GROUPS;
+	$ticketCategorieGroups     = json_decode($ticketCategorieGroupsJson, true) ?? [];
+
+	$lastKey = -436302;
+	if (!empty($ticketCategorieGroups)) {
+		$lastKey = array_key_last($ticketCategorieGroups);
+	}
+	$newKey = $lastKey - 1;
+
+	$ticketCategorieGroups[$newKey] = ['name' => GETPOST('group_name'), 'selected' => GETPOST('group_cats')];
+
+	$newticketCategorieGroupsJson = json_encode($ticketCategorieGroups);
+
+    dolibarr_set_const($db, 'DIGIRISKDOLIBARR_TICKET_CATEGORIES_GROUPS', $newticketCategorieGroupsJson, 'chaine', 0, '', $conf->entity);
+
+    setEventMessages($langs->transnoentities('CategorieGroupCreated'), array());
+	header('Location: ' . $_SERVER['PHP_SELF'] . '?page_y=' . $pageY);
+}
+
+if ($action == 'deleteCategorieGroup') {
+	$ticketCategorieGroupsJson = $conf->global->DIGIRISKDOLIBARR_TICKET_CATEGORIES_GROUPS;
+	$ticketCategorieGroups     = json_decode($ticketCategorieGroupsJson, true) ?? [];
+
+	unset($ticketCategorieGroups[GETPOST('value')]);
+
+	dolibarr_set_const($db, 'DIGIRISKDOLIBARR_TICKET_CATEGORIES_GROUPS', $newticketCategorieGroupsJson, 'chaine', 0, '', $conf->entity);
+
+    setEventMessages($langs->transnoentities('CategorieGroupDeleted'), array());
+	header('Location: ' . $_SERVER['PHP_SELF'] . '?page_y=' . $pageY);
+}
+
 /*
  * View
  */
@@ -955,6 +988,59 @@ print '<input type="number" min="0" name="range_value" />';
 print '</td>';
 print '<td>';
 print $form::selectarray('time_range', $range);
+print '</td>';
+print '<td>';
+print '<button type="submit" class="wpeo-button button-blue reposition"><i class="fas fa-plus"></i></button>';
+print '</td>';
+print '</td>';
+print '</tr>';
+print '</form>';
+
+
+print load_fiche_titre($langs->transnoentities("TicketCategoriesGroups"), '', '');
+
+$ticketCategorieGroupsJson = $conf->global->DIGIRISKDOLIBARR_TICKET_CATEGORIES_GROUPS;
+$ticketCategorieGroups     = json_decode($ticketCategorieGroupsJson, true);
+
+print '<div class="div-table-responsive-no-min">';
+print '<table class="noborder centpercent">';
+print '<tr class="liste_titre">';
+print '<td>' . $langs->transnoentities("Name") . '</td>';
+print '<td>' . $langs->transnoentities("Group") . '</td>';
+print '<td>' . $langs->transnoentities('Action') . '</td>';
+print '</tr>';
+
+// Existing constraints
+if (is_array($ticketCategorieGroups) && !empty($ticketCategorieGroups)) {
+    foreach ($ticketCategorieGroups as $groupId => $group) {
+        print '<tr>';
+        print '<td>';
+        print $group['name'];
+        print '</td>';
+        print '<td class="maxwidth200">';
+		$_GET['group_cats'.$groupId] = $group['selected'];
+        print $form->selectCategories('ticket', 'group_cats'.$groupId);
+        print '</td>';
+        print '<td>';
+        print '<a href="'. $_SERVER['PHP_SELF'] . '?action=deleteCategorieGroup&token=' . newToken() . '&value=' . $goupId.'" class="wpeo-button button-grey reposition">';
+        print '<i class="fas fa-trash"></i>';
+        print '</a>';
+        print '</td>';
+	}
+}
+
+// Add new constraint
+print '<form method="POST" action="' . $_SERVER["PHP_SELF"] . '">';
+print '<input type="hidden" name="token" value="' . newToken() . '">';
+print '<input type="hidden" name="action" value="createCategorieGroup">';
+print '<input type="hidden" name="backtopage" value="' . $backtopage . '">';
+print '<input type="hidden" name="page_y">';
+print '<tr>';
+print '<td>';
+print '<input type="text" name="group_name" required />';
+print '</td>';
+print '<td class="maxwidth200">';
+print $form->selectCategories('ticket', 'group_cats');
 print '</td>';
 print '<td>';
 print '<button type="submit" class="wpeo-button button-blue reposition"><i class="fas fa-plus"></i></button>';

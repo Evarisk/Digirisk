@@ -488,6 +488,72 @@ class ActionsDigiriskdolibarr
 		} elseif (strpos($parameters['context'], 'categoryindex') !== false) {	    // do something only for the context 'somecontext1' or 'somecontext2'
             print '<script src="../custom/digiriskdolibarr/js/digiriskdolibarr.js"></script>';
         }
+
+        if (strpos($parameters['context'], 'ticketlist') !== false) {
+
+            $ticketCategorieGroupsJson = $conf->global->DIGIRISKDOLIBARR_TICKET_CATEGORIES_GROUPS;
+            $ticketCategorieGroups     = json_decode($ticketCategorieGroupsJson, true) ?? [];
+            ?>
+
+            <script>
+                var valuesJson = <?= json_encode($ticketCategorieGroups); ?>;
+
+                var $select = $('#search_category_ticket_list');
+
+                // Ajouter dynamiquement les options spéciales
+                Object.keys(valuesJson).forEach(function(key) {
+
+                    $select.prepend(
+                        $('<option>', {
+                            value: key,
+                            text: '-- ' + valuesJson[key].name + ' --'
+                        })
+                    );
+
+                });
+
+                $select.trigger('change');
+
+                $select.on('select2:select', function (e) {
+
+                    var selectedId = e.params.data.id;
+
+                    // Vérifie si la clé existe dans le mapping PHP
+                    if (valuesJson[selectedId]) {
+
+                        let values = $select.val() || [];
+
+                        // Récupère les valeurs à sélectionner
+                        let toAdd = valuesJson[selectedId].selected.map(String);
+
+                        // Fusion sans doublons
+                        let newValues = [...new Set([...values, ...toAdd])];
+
+                        $select.val(newValues).trigger('change');
+                    }
+
+                });
+
+                $select.on('select2:unselect', function (e) {
+                    var unselectedId = e.params.data.id;
+
+                    // Vérifie si c'est une valeur spéciale
+                    if (valuesJson[unselectedId]) {
+                        let values = $select.val() || [];
+
+                        // Supprime toutes les valeurs du groupe correspondant
+                        let toRemove = valuesJson[unselectedId].selected.map(String);
+                        let newValues = values.filter(v => !toRemove.includes(v));
+
+                        $select.val(newValues).trigger('change');
+                    }
+                });
+
+            </script>
+
+            <?php
+
+        }
         return 0; // or return 1 to replace standard code
 	}
 
