@@ -199,22 +199,12 @@ if ($fromid > 0) {
     if ($fromiduser > 0) {
         $userObject = new User($db);
         $userObject->fetch($fromiduser, '', '', 1);
-        $userObject->getrights();
+        $userObject->loadRights();
         saturne_get_fiche_head($userObject, 'accidents', $langs->trans('Accidents'));
     } elseif ($accident->id > 0) {
         saturne_get_fiche_head($object,'elementAccidents', $langs->trans('Accident'));
     }
 }
-
-$moreParams = [
-    'LoadAccident'               => 1,
-    'specialModuleNameLowerCase' => 'digirisk'
-];
-
-require_once __DIR__ . '/../../../saturne/class/saturnedashboard.class.php';
-
-$dashboard = new SaturneDashboard($db, $moduleNameLowerCase);
-$dashboard->show_dashboard($moreParams);
 
 // Object card
 // ------------------------------------------------------------

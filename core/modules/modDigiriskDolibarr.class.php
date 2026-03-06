@@ -1597,6 +1597,21 @@ class modDigiriskdolibarr extends DolibarrModules
 			'prefix'   => '<i class="fas fa-user-injured pictofixedwidth"></i>',
 			'mainmenu' => 'digiriskdolibarr',
 			'leftmenu' => 'digiriskaccident',
+			'url'      => '/digiriskdolibarr/view/accident/accident.php',
+			'langs'    => 'digiriskdolibarr@digiriskdolibarr',	        // Lang file to use (without .lang) by module. File must be in langs/code_CODE/ directory.
+			'position' => 100 + $r,
+			'enabled'  => '$conf->digiriskdolibarr->enabled',  // Define condition to show or hide menu entry. Use '$conf->digiriskdolibarr->enabled' if entry must be visible if module is enabled. Use '$leftmenu==\'system\'' to show if leftmenu system is selected.
+			'perms'    => '$user->rights->digiriskdolibarr->accident->read', // Use 'perms'=>'$user->rights->digiriskdolibarr->level1->level2' if you want your menu with a permission rules
+			'target'   => '',
+			'user'     => 0,				                // 0=Menu for internal users, 1=external users, 2=both
+		];
+
+		$this->menu[$r++] = [
+			'fk_menu'  => 'fk_mainmenu=digiriskdolibarr,fk_leftmenu=digiriskaccident',	    // '' if this is a top menu. For left menu, use 'fk_mainmenu=xxx' or 'fk_mainmenu=xxx,fk_leftmenu=yyy' where xxx is mainmenucode and yyy is a leftmenucode
+			'type'     => 'left',			                // This is a Left menu entry
+			'titre'    => '<i class="fas fa-list pictofixedwidth"></i>' . $langs->trans('AccidentList'),
+			'mainmenu' => 'digiriskdolibarr',
+			'leftmenu' => 'digiriskaccidentlist',
 			'url'      => '/digiriskdolibarr/view/accident/accident_list.php',
 			'langs'    => 'digiriskdolibarr@digiriskdolibarr',	        // Lang file to use (without .lang) by module. File must be in langs/code_CODE/ directory.
 			'position' => 100 + $r,

@@ -440,13 +440,26 @@ class Accident extends SaturneObject
     {
         global $langs, $conf, $db;
 
+        // echo '<pre>'; print_r(getDolGlobalInt('SOCIETE_FISCAL_MONTH_START')); echo '</pre>'; exit;
+
         $confName        = dol_strtoupper($this->module) . '_DASHBOARD_CONFIG';
         $dashboardConfig = json_decode(getDolUserString($confName));
-        $array = ['graphs' => [], 'disabledGraphs' => []];
+        $array = ['graphs' => [], 'lists' => [], 'disabledGraphs' => []];
+
+        $yearType = !empty($dashboardConfig->filters->yearType) ? $dashboardConfig->filters->yearType : 'calendar';
+        $year     = !empty($dashboardConfig->filters->year) ? $dashboardConfig->filters->year : -1;
+
+        $now       = dol_now('tzuserrel');
+        $date      = dol_getdate($now);
+        $startDate = dol_mktime(-1, -1, -1, $yearType == 'calendar' ? 1 : getDolGlobalInt('SOCIETE_FISCAL_MONTH_START'), 1, $year == -1 ? $date['year'] : $year);
+        if ($startDate > $now) {
+            $startDate = dol_time_plus_duree($startDate, -1, 'y');
+        }
+        $endDate = dol_time_plus_duree($startDate, 1, 'y');
 
         $join                   = ' LEFT JOIN ' . MAIN_DB_PREFIX . $this->table_element . ' as a ON a.rowid = t.fk_accident';
-        $accidentsWithWorkStops = saturne_fetch_all_object_type('AccidentWorkStop', 'DESC', 't.rowid', 0, 0, [], 'AND', false, true, false, $join);
-        $accidents              = $this->fetchAll('', '', 0, 0, ['customsql' => ' t.status > ' . self::STATUS_DRAFT]);
+        $accidentsWithWorkStops = saturne_fetch_all_object_type('AccidentWorkStop', 'DESC', 't.rowid', 0, 0, $year == -1 ? [] : ['customsql' => ' t.date_start_workstop >= \'' . dol_print_date($startDate, '%Y/%m/%d') . '\' AND t.date_start_workstop < \'' . dol_print_date($endDate, '%Y/%m/%d') . '\''], 'AND', false, true, false, $join);
+        $accidents              = $this->fetchAll('', '', 0, 0, ['customsql' => ' t.status > ' . self::STATUS_DRAFT . ($year == -1 ? '' : ' AND t.accident_date >= \'' . dol_print_date($startDate, '%Y/%m/%d') . '\' AND t.accident_date < \'' . dol_print_date($endDate, '%Y/%m/%d') . '\'')]);
         $digiriskElement        = new DigiriskElement($db);
         $digiriskElements       = $digiriskElement->fetchDigiriskElementFlat(0);
 
@@ -469,6 +482,29 @@ class Accident extends SaturneObject
         $arrayFrequencyIndex         = $this->getFrequencyIndex($accidentsWithWorkStops, $employees);
         $arrayFrequencyRate          = $this->getFrequencyRate($accidentsWithWorkStops);
         $arrayGravityRate            = $this->getGravityRate($accidentsWithWorkStops);
+
+        // dol_time_plus_duree
+
+        $currentYear = (int) dol_print_date(dol_now('tzuserrel'), '%Y');
+        $years = range($currentYear, $currentYear - 10);
+
+
+        $array['graphsFilters'] = [
+            'yearType' => [
+                'title'        => $langs->transnoentities('YearType'),
+                'type'         => 'selectarray',
+                'filter'       => 'yearType',
+                'values'       => ['calendar' => $langs->transnoentities('CalendarYear'), 'fiscal' => $langs->transnoentities('FiscalYear')],
+                'currentValue' => $yearType
+            ],
+            'year' => [
+                'title'        => $langs->transnoentities('Year'),
+                'type'         => 'selectarray',
+                'filter'       => 'year',
+                'values'       => array_combine(array_merge([-1], $years), array_merge([$langs->transnoentities('AllYears')], array_map('strval', $years))),
+                'currentValue' => $year
+            ]
+    ];
 
         $array['widgets'] = [
             'accident' => [
@@ -499,10 +535,12 @@ class Accident extends SaturneObject
         } else {
             $array['disabledGraphs']['AccidentRepartition'] = $langs->transnoentities('AccidentRepartition');
         }
-        if (empty($dashboardConfig->graphs->AccidentByYear->hide)) {
-            $array['graphs'][] = $this->getNbAccidentsLast3years($accidents);
-        } else {
-            $array['disabledGraphs']['AccidentByYear'] = $langs->transnoentities('AccidentByYear');
+        if ($year == -1) {
+            if (empty($dashboardConfig->graphs->AccidentByYear->hide)) {
+                $array['graphs'][] = $this->getNbAccidentsLast3years($accidents);
+            } else {
+                $array['disabledGraphs']['AccidentByYear'] = $langs->transnoentities('AccidentByYear');
+            }
         }
         if (empty($dashboardConfig->graphs->AccidentRegister->hide)) {
             $array['graphs'][] = $this->getAccidentRegister($accidents);
