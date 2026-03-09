@@ -258,3 +258,5 @@ UPDATE llx_element_element SET targettype = 'digiriskdolibarr_digiriskelement' W
 
 -- 21.0
 ALTER TABLE llx_digiriskdolibarr_risk ADD `sub_category` VARCHAR(255) NULL DEFAULT NULL AFTER `category`;
+
+ALTER TABLE llx_digiriskdolibarr_digiriskelement CHANGE import_key import_key VARCHAR(14) NULL DEFAULT NULL;

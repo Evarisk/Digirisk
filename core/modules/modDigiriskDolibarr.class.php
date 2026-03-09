@@ -1868,6 +1868,50 @@ class modDigiriskdolibarr extends DolibarrModules
 
         // Imports profiles provided by this module
         $r = 1;
+        $this->import_code[$r]                 = $this->rights_class . '_digiriskelement_' . $r;
+        $this->import_label[$r]                = 'DigiriskElement'; // Translation key (used only if key ExportDataset_xxx_z not found)
+        $this->import_icon[$r]                 = 'fontawesome_fa-network-wired_fas_#d35968';
+        $this->import_tables_array[$r]         = ['t' => MAIN_DB_PREFIX . 'digiriskdolibarr_digiriskelement', 'extra' => MAIN_DB_PREFIX . 'digiriskdolibarr_digiriskelement_extrafields'];
+        $this->import_tables_creator_array[$r] = ['t' => 'fk_user_creat']; // Fields to store import user id
+
+        $importSample    = [];
+        $keyforclass     = 'DigiriskElement';
+        $keyforclassfile = '/digiriskdolibarr/class/digiriskelement.class.php';
+        $keyforelement   = 'digiriskelement';
+
+        require DOL_DOCUMENT_ROOT . '/core/commonfieldsinimport.inc.php';
+
+        $unsetFields = ['t.rowid', 't.entity', 't.tms', 't.import_key', 't.fk_user_creat', 't.fk_user_modif'];
+        foreach ($unsetFields as $unsetField) {
+            unset($this->import_fields_array[$r][$unsetField]);
+            unset($this->import_TypeFields_array[$r][$unsetField]);
+            unset($this->import_entities_array[$r][$unsetField]);
+            unset($this->import_help_array[$r][$unsetField]);
+        }
+
+        $importExtrafieldSample = [];
+        $keyforselect           = 'digiriskelement';
+        $keyforaliasextra       = 'extra';
+        $keyforelement          = 'digiriskelement';
+
+        require DOL_DOCUMENT_ROOT . '/core/extrafieldsinimport.inc.php';
+
+        $this->import_entities_array[$r]      = ['t.fk_element' => 'fontawesome_fa-network-wired_fas_#d35968']; // We define here only fields that use another icon that the one defined into import_icon
+        $this->import_fieldshidden_array[$r]  = ['extra.fk_object' => 'lastrowid-' . MAIN_DB_PREFIX . 'digiriskdolibarr_digiriskelement'];
+        $this->import_regex_array[$r]         = [];
+        $this->import_examplevalues_array[$r] = array_merge($importSample, $importExtrafieldSample);
+        $this->import_updatekeys_array[$r]    = ['t.ref' => 'Ref'];
+//        $this->import_convertvalue_array[$r]  = [
+//            't.ref' => [
+//                'rule'        => 'getrefifauto',
+//                'class'       => (empty($conf->global->DIGIRISKDOLIBARR_DIGIRISKELEMENT_ADDON) ? 'mod_digiriskelement_standard' : $conf->global->DIGIRISKDOLIBARR_DIGIRISKELEMENT_ADDON),
+//                'path'        => '/core/modules/digiriskdolibarr/riskanalysis/riskassessment/' . (empty($conf->global->DIGIRISKDOLIBARR_DIGIRISKELEMENT_ADDON) ? 'mod_digiriskelement_standard' : $conf->global->DIGIRISKDOLIBARR_DIGIRISKELEMENT_ADDON) . '.php',
+//                'classobject' => 'RiskAssessment',
+//                'pathobject'  => '/digiriskdolibarr/class/riskanalysis/riskassessment.class.php'
+//            ]
+//        ];
+
+        $r++;
         $this->import_code[$r]                 = $this->rights_class . '_risk_' . $r;
         $this->import_label[$r]                = 'Risk'; // Translation key (used only if key ExportDataset_xxx_z not found)
         $this->import_icon[$r]                 = 'fontawesome_fa-exclamation-triangle_fas_#d35968';
