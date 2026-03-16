@@ -488,6 +488,33 @@ class ActionsDigiriskdolibarr
 		} elseif (strpos($parameters['context'], 'categoryindex') !== false) {	    // do something only for the context 'somecontext1' or 'somecontext2'
             print '<script src="../custom/digiriskdolibarr/js/digiriskdolibarr.js"></script>';
         }
+
+        if (strpos($parameters['context'], 'ticketlist')) {
+            ?>
+            <script>
+                    //$('table tr.oddeven td').css('padding', 2);
+
+                    var titles = ["Sujet"];
+
+                    // Récupère les index correspondants
+                    var indexes = {};
+
+                    titles.forEach(function(title) {
+                        var index = $('th[title="' + title + '"]').index();
+                        if (index !== -1) {
+                            indexes[index] = title.replace(" ", "_");
+                        }
+                    });
+
+                    // Applique le traitement sur chaque colonne trouvée
+                    Object.entries(indexes).forEach(([index, title]) => {
+                        var cells = $('table tr').find('td:eq(' + index + ')');
+                        cells.removeClass('tdoverflowmax250 ');
+                    });
+                </script>
+
+            <?php
+        }
         return 0; // or return 1 to replace standard code
 	}
 
