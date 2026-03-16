@@ -1412,7 +1412,7 @@ FromAndDate                              = Provenance et date
 AuthorRequest                            = Demandeur
 DateCloture                              = Date de clôture
 
-PublicInterfaceUseSignatory              = Demande de signature pour la déclaration du registre
+PublicInterfaceUseSignatory              = Signature obligatoire pour déclaré ce registre
 ValidateText                             = Conditions à accepter pour la signature
 TicketPublicInterfaceShowCategory        = Afficher la descritpion de la catégorie
 EmailTemplate                            = Modèle d'e-mail
