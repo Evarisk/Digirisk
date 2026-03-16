@@ -241,6 +241,18 @@ class ActionsDigiriskdolibarr
                 </script>
                 <?php
 
+                $digiriskelement    = new DigiriskElement($db);
+                $res = $digiriskelement->fetch($object->array_options['options_digiriskdolibarr_ticket_service']);
+                if ($res > 0) {
+                    $outDigiriskElement = $digiriskelement->getNomUrl(1, 'blank', 0, '', -1, 1);
+                    ?>
+                    <script>
+                        jQuery('td[id*="digiriskdolibarr_ticket_service"]').html('<?= $outDigiriskElement ?>');
+                    </script>
+                    <?php
+                }
+
+
                 if (!empty($object->id)) {
                     $signatory   = new SaturneSignature($db, 'digiriskdolibarr', $object->element);
                     $signatories = $signatory->fetchSignatory('Attendant', $object->id, $object->element);
@@ -1258,7 +1270,6 @@ class ActionsDigiriskdolibarr
         global $db;
 
         if (strpos($parameters['context'], 'ticketlist') && isModEnabled('categorie')) {
-
             $obj = $parameters['object'];
 
             $categorie = new Categorie($db);
@@ -1280,6 +1291,19 @@ class ActionsDigiriskdolibarr
                 });
             </script>
             <?php
+
+            $serviceId = $parameters['obj']->options_digiriskdolibarr_ticket_service;
+
+            $digiriskelement = new DigiriskElement($db);
+            $res = $digiriskelement->fetch($serviceId);
+            if ($res > 0) {
+                $out = $digiriskelement->getNomUrl(1, 'blank', 0, '', -1, 1);
+                ?>
+                <script>
+                    $('[data-key="ticket.digiriskdolibarr_ticket_service"]').eq(<?= $parameters['i'] ?>).html('<?= $out ?>')
+                </script>
+                <?php
+            }
         }
     }
 }
