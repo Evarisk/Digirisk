@@ -252,6 +252,28 @@ class ActionsDigiriskdolibarr
                     <?php
                 }
 
+                // Collect ticket category IDs including their ancestors (getListForItem returns the full hierarchy)
+                $ticketCategoryIds = array_column((array) (new Categorie($db))->getListForItem($object->id, 'ticket'), 'id');
+
+                // Hide extrafields not available for the ticket's categories
+                $extraFieldsTmp = new ExtraFields($db);
+                $extraFieldsTmp->fetch_name_optionals_label($object->table_element);
+                $fieldsToHide = array_keys(array_filter(
+                    $extraFieldsTmp->attributes[$object->table_element]['labe/bl'] ?? [],
+                    function ($_, $key) use ($extraFieldsTmp, $object, $ticketCategoryIds) {
+                        $fieldCats = $extraFieldsTmp->attributes[$object->table_element]['param'][$key]['options']['categories'] ?? [];
+                        return !empty($fieldCats) && empty(array_intersect($ticketCategoryIds, $fieldCats));
+                    },
+                    ARRAY_FILTER_USE_BOTH
+                ));
+                if (!empty($fieldsToHide)) { ?>
+                    <script>
+                        <?php foreach ($fieldsToHide as $fieldKey): ?>
+                        jQuery('td[id*="<?= $fieldKey ?>"]').closest('tr').hide();
+                        <?php endforeach; ?>
+                    </script>
+                <?php }
+
 
                 if (!empty($object->id)) {
                     $signatory   = new SaturneSignature($db, 'digiriskdolibarr', $object->element);

@@ -627,10 +627,32 @@ saturne_header(0,'', $title, '', '', 0, 0, $moreJS, [], '', 'page-public-card pa
 
                 $_POST['options_digiriskdolibarr_ticket_date'] = $now->getTimestamp();
 
+				$activeCategoryIds = array_values(array_filter([
+					!empty($mainCategoryObject[0]->id) ? (int) $mainCategoryObject[0]->id : null,
+					GETPOSTINT('parentCategory') ?: null,
+					GETPOSTINT('subCategory') ?: null,
+				]));
+
 				foreach ($fieldList as $key => $label) {
 					if (strpos($key, 'digiriskdolibarr_ticket') === false && !in_array($key, ['message'])) {
 						continue;
 					}
+
+					// Skip if the extrafield is restricted to categories that don't include the current category path
+					$fieldCategories = $extrafields->attributes[$object->table_element]['param'][$key]['options']['categories'] ?? [];
+					if (!empty($fieldCategories)) {
+						$categoryInList = false;
+						foreach ($activeCategoryIds as $catId) {
+							if (in_array($catId, $fieldCategories)) {
+								$categoryInList = true;
+								break;
+							}
+						}
+						if (!$categoryInList) {
+							continue;
+						}
+					}
+
 					if ($key == 'digiriskdolibarr_ticket_photo') {
 						$key = 'photo';
 					}
