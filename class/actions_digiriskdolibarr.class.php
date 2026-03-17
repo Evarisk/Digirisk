@@ -259,7 +259,7 @@ class ActionsDigiriskdolibarr
                 $extraFieldsTmp = new ExtraFields($db);
                 $extraFieldsTmp->fetch_name_optionals_label($object->table_element);
                 $fieldsToHide = array_keys(array_filter(
-                    $extraFieldsTmp->attributes[$object->table_element]['labe/bl'] ?? [],
+                    $extraFieldsTmp->attributes[$object->table_element]['label'] ?? [],
                     function ($_, $key) use ($extraFieldsTmp, $object, $ticketCategoryIds) {
                         $fieldCats = $extraFieldsTmp->attributes[$object->table_element]['param'][$key]['options']['categories'] ?? [];
                         return !empty($fieldCats) && empty(array_intersect($ticketCategoryIds, $fieldCats));
