@@ -2359,7 +2359,7 @@ class modDigiriskdolibarr extends DolibarrModules
 
         saturne_manage_extrafields($extraFieldsArrays, $commonExtraFieldsValue);
 
-        if (dolibarr_get_const($this->db, 'DIGIRISKDOLIBARR_TICKET_EXTRAFIELDS', 0) <= 3) {
+        if (dolibarr_get_const($this->db, 'DIGIRISKDOLIBARR_TICKET_EXTRAFIELDS', 0) <= 4) {
             $result = $this->_load_tables('/install/mysql/', 'ticket');
             if ($result < 0) {
                 return -1;
@@ -2380,7 +2380,7 @@ class modDigiriskdolibarr extends DolibarrModules
             ];
 
             saturne_manage_extrafields($extraFieldsArrays, $commonExtraFieldsValue);
-            dolibarr_set_const($this->db, 'DIGIRISKDOLIBARR_TICKET_EXTRAFIELDS', 4, 'integer', 0, '', 0);
+            dolibarr_set_const($this->db, 'DIGIRISKDOLIBARR_TICKET_EXTRAFIELDS', 5, 'integer', 0, '', 0);
         }
 
 		//DigiriskElement favorite medias backward compatibility
