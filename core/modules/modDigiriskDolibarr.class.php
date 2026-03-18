@@ -380,7 +380,7 @@ class modDigiriskdolibarr extends DolibarrModules
 		$this->descriptionlong = "Digirisk";
 		$this->editor_name     = 'Evarisk';
 		$this->editor_url      = 'https://evarisk.com';
-		$this->version         = '22.0.0';
+		$this->version         = '22.1.0';
 		$this->const_name      = 'MAIN_MODULE_' . strtoupper($this->name);
 		$this->picto           = 'digiriskdolibarr_color@digiriskdolibarr';
 
@@ -1597,6 +1597,21 @@ class modDigiriskdolibarr extends DolibarrModules
 			'prefix'   => '<i class="fas fa-user-injured pictofixedwidth"></i>',
 			'mainmenu' => 'digiriskdolibarr',
 			'leftmenu' => 'digiriskaccident',
+			'url'      => '/digiriskdolibarr/view/accident/accident.php',
+			'langs'    => 'digiriskdolibarr@digiriskdolibarr',	        // Lang file to use (without .lang) by module. File must be in langs/code_CODE/ directory.
+			'position' => 100 + $r,
+			'enabled'  => '$conf->digiriskdolibarr->enabled',  // Define condition to show or hide menu entry. Use '$conf->digiriskdolibarr->enabled' if entry must be visible if module is enabled. Use '$leftmenu==\'system\'' to show if leftmenu system is selected.
+			'perms'    => '$user->rights->digiriskdolibarr->accident->read', // Use 'perms'=>'$user->rights->digiriskdolibarr->level1->level2' if you want your menu with a permission rules
+			'target'   => '',
+			'user'     => 0,				                // 0=Menu for internal users, 1=external users, 2=both
+		];
+
+		$this->menu[$r++] = [
+			'fk_menu'  => 'fk_mainmenu=digiriskdolibarr,fk_leftmenu=digiriskaccident',	    // '' if this is a top menu. For left menu, use 'fk_mainmenu=xxx' or 'fk_mainmenu=xxx,fk_leftmenu=yyy' where xxx is mainmenucode and yyy is a leftmenucode
+			'type'     => 'left',			                // This is a Left menu entry
+			'titre'    => '<i class="fas fa-list pictofixedwidth"></i>' . $langs->trans('AccidentList'),
+			'mainmenu' => 'digiriskdolibarr',
+			'leftmenu' => 'digiriskaccidentlist',
 			'url'      => '/digiriskdolibarr/view/accident/accident_list.php',
 			'langs'    => 'digiriskdolibarr@digiriskdolibarr',	        // Lang file to use (without .lang) by module. File must be in langs/code_CODE/ directory.
 			'position' => 100 + $r,
@@ -1853,6 +1868,50 @@ class modDigiriskdolibarr extends DolibarrModules
 
         // Imports profiles provided by this module
         $r = 1;
+        $this->import_code[$r]                 = $this->rights_class . '_digiriskelement_' . $r;
+        $this->import_label[$r]                = 'DigiriskElement'; // Translation key (used only if key ExportDataset_xxx_z not found)
+        $this->import_icon[$r]                 = 'fontawesome_fa-network-wired_fas_#d35968';
+        $this->import_tables_array[$r]         = ['t' => MAIN_DB_PREFIX . 'digiriskdolibarr_digiriskelement', 'extra' => MAIN_DB_PREFIX . 'digiriskdolibarr_digiriskelement_extrafields'];
+        $this->import_tables_creator_array[$r] = ['t' => 'fk_user_creat']; // Fields to store import user id
+
+        $importSample    = [];
+        $keyforclass     = 'DigiriskElement';
+        $keyforclassfile = '/digiriskdolibarr/class/digiriskelement.class.php';
+        $keyforelement   = 'digiriskelement';
+
+        require DOL_DOCUMENT_ROOT . '/core/commonfieldsinimport.inc.php';
+
+        $unsetFields = ['t.rowid', 't.entity', 't.tms', 't.import_key', 't.fk_user_creat', 't.fk_user_modif'];
+        foreach ($unsetFields as $unsetField) {
+            unset($this->import_fields_array[$r][$unsetField]);
+            unset($this->import_TypeFields_array[$r][$unsetField]);
+            unset($this->import_entities_array[$r][$unsetField]);
+            unset($this->import_help_array[$r][$unsetField]);
+        }
+
+        $importExtrafieldSample = [];
+        $keyforselect           = 'digiriskelement';
+        $keyforaliasextra       = 'extra';
+        $keyforelement          = 'digiriskelement';
+
+        require DOL_DOCUMENT_ROOT . '/core/extrafieldsinimport.inc.php';
+
+        $this->import_entities_array[$r]      = ['t.fk_element' => 'fontawesome_fa-network-wired_fas_#d35968']; // We define here only fields that use another icon that the one defined into import_icon
+        $this->import_fieldshidden_array[$r]  = ['extra.fk_object' => 'lastrowid-' . MAIN_DB_PREFIX . 'digiriskdolibarr_digiriskelement'];
+        $this->import_regex_array[$r]         = [];
+        $this->import_examplevalues_array[$r] = array_merge($importSample, $importExtrafieldSample);
+        $this->import_updatekeys_array[$r]    = ['t.ref' => 'Ref'];
+//        $this->import_convertvalue_array[$r]  = [
+//            't.ref' => [
+//                'rule'        => 'getrefifauto',
+//                'class'       => (empty($conf->global->DIGIRISKDOLIBARR_DIGIRISKELEMENT_ADDON) ? 'mod_digiriskelement_standard' : $conf->global->DIGIRISKDOLIBARR_DIGIRISKELEMENT_ADDON),
+//                'path'        => '/core/modules/digiriskdolibarr/riskanalysis/riskassessment/' . (empty($conf->global->DIGIRISKDOLIBARR_DIGIRISKELEMENT_ADDON) ? 'mod_digiriskelement_standard' : $conf->global->DIGIRISKDOLIBARR_DIGIRISKELEMENT_ADDON) . '.php',
+//                'classobject' => 'RiskAssessment',
+//                'pathobject'  => '/digiriskdolibarr/class/riskanalysis/riskassessment.class.php'
+//            ]
+//        ];
+
+        $r++;
         $this->import_code[$r]                 = $this->rights_class . '_risk_' . $r;
         $this->import_label[$r]                = 'Risk'; // Translation key (used only if key ExportDataset_xxx_z not found)
         $this->import_icon[$r]                 = 'fontawesome_fa-exclamation-triangle_fas_#d35968';
@@ -2271,6 +2330,11 @@ class modDigiriskdolibarr extends DolibarrModules
 
         $extraFields = new ExtraFields($this->db);
 
+        $result = $this->_load_tables('/install/mysql/', 'ticket');
+        if ($result < 0) {
+            return -1;
+        }
+
         $commonExtraFieldsValue = [
             'alwayseditable' => 1, 'list' => 1, 'help' => '', 'entity' => 0, 'langfile' => 'digiriskdolibarr@digiriskdolibarr', 'enabled' => "isModEnabled('digiriskdolibarr') && isModEnabled('project')", 'moreparams' => ['css' => 'minwidth100 maxwidth300']
         ];
@@ -2289,11 +2353,18 @@ class modDigiriskdolibarr extends DolibarrModules
             'contract_type'              => ['Label' => 'ContractType',              'type' => 'select',                   'elementtype' => ['user'], 'position' => $this->numero . 20, 'params' => [1 => 'CDI', 2 => 'CDD', 3 => 'Apprentice/Student', 4 => 'Interim', 5 => 'Other'], 'enabled' => "isModEnabled('digiriskdolibarr') && isModEnabled('user')"],
 
             'ticket_category_config' => ['Label' => 'TicketCategoryConfig', 'type' => 'text', 'elementtype' => ['categorie'], 'position' => $this->numero . 10, 'list' => 0, 'enabled' => "isModEnabled('digiriskdolibarr') && isModEnabled('categorie') && isModEnabled('ticket')", 'moreparams' => []],
+
+			'ticket_categories' => ['Label' => 'Categories', 'type' => 'text', 'elementtype' => ['ticket'], 'position' => 1, 'list' => 2, 'enabled' => "isModEnabled('digiriskdolibarr') && isModEnabled('categorie') && isModEnabled('ticket')", 'moreparams' => []]
 		];
 
         saturne_manage_extrafields($extraFieldsArrays, $commonExtraFieldsValue);
 
         if (dolibarr_get_const($this->db, 'DIGIRISKDOLIBARR_TICKET_EXTRAFIELDS', 0) <= 3) {
+            $result = $this->_load_tables('/install/mysql/', 'ticket');
+            if ($result < 0) {
+                return -1;
+            }
+
             $commonExtraFieldsValue = [
                 'alwayseditable' => 1, 'list' => 1, 'help' => '', 'entity' => 0, 'langfile' => 'digiriskdolibarr@digiriskdolibarr', 'enabled' => "isModEnabled('digiriskdolibarr') && isModEnabled('ticket')", 'moreparams' => ['css' => 'minwidth100 maxwidth300']
             ];
@@ -2302,8 +2373,8 @@ class modDigiriskdolibarr extends DolibarrModules
                 'digiriskdolibarr_ticket_lastname'   => ['Label' => 'LastName',         'type' => 'varchar', 'length' => 255,  'elementtype' => ['ticket'], 'position' => $this->numero . 10,                                                                                                        ],
                 'digiriskdolibarr_ticket_firstname'  => ['Label' => 'FirstName',        'type' => 'varchar', 'length' => 255,  'elementtype' => ['ticket'], 'position' => $this->numero . 20,                                                                                                        ],
                 'digiriskdolibarr_ticket_phone'      => ['Label' => 'Phone',            'type' => 'varchar', 'length' => 255,  'elementtype' => ['ticket'], 'position' => $this->numero . 30,                                                                                                        ],
-                'digiriskdolibarr_ticket_service'    => ['Label' => 'GP/UT',            'type' => 'link',                      'elementtype' => ['ticket'], 'position' => $this->numero . 40, 'params' => ['DigiriskElement:digiriskdolibarr/class/digiriskelement.class.php:1:(status:>:0)' => NULL], 'list' => 4],
-                'digiriskdolibarr_ticket_location'   => ['Label' => 'Location',         'type' => 'varchar',  'length' => 255, 'elementtype' => ['ticket'], 'position' => $this->numero . 50,                                                                                                        ],
+				'digiriskdolibarr_ticket_service'    => ['Label' => 'GP/UT', 'type' => 'chkbxlst', 'elementtype' => ['ticket'], 'position' => $this->numero . 40, 'params' => ['digiriskdolibarr_digiriskelement:ref|label:rowid::((status:>:0) AND (entity:=:$ENTITY$))' => null], 'list' => 4],
+				'digiriskdolibarr_ticket_location'   => ['Label' => 'Location',         'type' => 'varchar',  'length' => 255, 'elementtype' => ['ticket'], 'position' => $this->numero . 50,                                                                                                        ],
                 'digiriskdolibarr_ticket_date'       => ['Label' => 'DeclarationDate',  'type' => 'datetime',                  'elementtype' => ['ticket'], 'position' => $this->numero . 60,                                                                                                        ],
                 'digiriskdolibarr_condition_message' => ['Label' => 'ConditionMessage', 'type' => 'text',                      'elementtype' => ['ticket'], 'position' => $this->numero . 70]
             ];

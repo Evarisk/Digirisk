@@ -187,19 +187,15 @@ print '<td>' . $langs->trans('Parameters') . '</td>';
 print '<td class="center">' . $langs->trans('Value') . '</td>';
 print '</tr>';
 
-// Use signatory
+// Use signatory + Validate text
 print '<tr class="oddeven"><td>';
-print img_picto('', 'fa-signature', 'class="paddingrightonly"') . $form->textwithpicto($langs->transnoentities('PublicInterfaceUseSignatory'), $langs->transnoentities('PublicInterfaceUseSignatoryDescription'), 1, 'info') . '</td>';
+print img_picto('', 'fa-signature', 'class="paddingrightonly"') . $form->textwithpicto($langs->transnoentities('PublicInterfaceUseSignatory'), $langs->transnoentities('PublicInterfaceUseSignatoryDescription'), 1, 'info');
 print '</td><td class="center">';
+print '<div style="display:flex;align-items:center;gap:8px;">';
 print '<input type="checkbox" id="use_signatory" name="use_signatory"' . ($ticketCategoryConfig->use_signatory ? ' checked=""' : '') . '"> ';
-print '</td></tr>';
-
-// External Link in new tab
-print '<tr class="oddeven"><td>';
-print img_picto('', 'fa-edit', 'class="paddingrightonly"') . $langs->transnoentities('ValidateText') . '</td>';
-print '</td><td class="center">';
 $doleditor = new DolEditor('validate_text', $ticketCategoryConfig->validate_text ?? '', '100%', 120, 'dolibarr_details', '', false, true, $conf->global->FCKEDITOR_ENABLE_MAIL, ROWS_2, 70);
 $doleditor->Create();
+print '</div>';
 print '</td></tr>';
 
 // Show category description

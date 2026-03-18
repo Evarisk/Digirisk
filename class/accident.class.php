@@ -438,15 +438,30 @@ class Accident extends SaturneObject
      */
     public function load_dashboard(): array
     {
-        global $langs, $conf;
+        global $langs, $conf, $db;
+
+        // echo '<pre>'; print_r(getDolGlobalInt('SOCIETE_FISCAL_MONTH_START')); echo '</pre>'; exit;
 
         $confName        = dol_strtoupper($this->module) . '_DASHBOARD_CONFIG';
         $dashboardConfig = json_decode(getDolUserString($confName));
-        $array = ['graphs' => [], 'disabledGraphs' => []];
+        $array = ['graphs' => [], 'lists' => [], 'disabledGraphs' => []];
+
+        $yearType = !empty($dashboardConfig->filters->yearType) ? $dashboardConfig->filters->yearType : 'calendar';
+        $year     = !empty($dashboardConfig->filters->year) ? $dashboardConfig->filters->year : -1;
+
+        $now       = dol_now('tzuserrel');
+        $date      = dol_getdate($now);
+        $startDate = dol_mktime(-1, -1, -1, $yearType == 'calendar' ? 1 : getDolGlobalInt('SOCIETE_FISCAL_MONTH_START'), 1, $year == -1 ? $date['year'] : $year);
+        if ($startDate > $now) {
+            $startDate = dol_time_plus_duree($startDate, -1, 'y');
+        }
+        $endDate = dol_time_plus_duree($startDate, 1, 'y');
 
         $join                   = ' LEFT JOIN ' . MAIN_DB_PREFIX . $this->table_element . ' as a ON a.rowid = t.fk_accident';
-        $accidentsWithWorkStops = saturne_fetch_all_object_type('AccidentWorkStop', 'DESC', 't.rowid', 0, 0, [], 'AND', false, true, false, $join);
-        $accidents              = $this->fetchAll('', '', 0, 0, ['customsql' => ' t.status > ' . self::STATUS_DRAFT]);
+        $accidentsWithWorkStops = saturne_fetch_all_object_type('AccidentWorkStop', 'DESC', 't.rowid', 0, 0, $year == -1 ? [] : ['customsql' => ' t.date_start_workstop >= \'' . dol_print_date($startDate, '%Y/%m/%d') . '\' AND t.date_start_workstop < \'' . dol_print_date($endDate, '%Y/%m/%d') . '\''], 'AND', false, true, false, $join);
+        $accidents              = $this->fetchAll('', '', 0, 0, ['customsql' => ' t.status > ' . self::STATUS_DRAFT . ($year == -1 ? '' : ' AND t.accident_date >= \'' . dol_print_date($startDate, '%Y/%m/%d') . '\' AND t.accident_date < \'' . dol_print_date($endDate, '%Y/%m/%d') . '\'')]);
+        $digiriskElement        = new DigiriskElement($db);
+        $digiriskElements       = $digiriskElement->fetchDigiriskElementFlat(0);
 
         if (empty($accidents) && !is_array($accidents)) {
             $accidents = [];
@@ -467,6 +482,29 @@ class Accident extends SaturneObject
         $arrayFrequencyIndex         = $this->getFrequencyIndex($accidentsWithWorkStops, $employees);
         $arrayFrequencyRate          = $this->getFrequencyRate($accidentsWithWorkStops);
         $arrayGravityRate            = $this->getGravityRate($accidentsWithWorkStops);
+
+        // dol_time_plus_duree
+
+        $currentYear = (int) dol_print_date(dol_now('tzuserrel'), '%Y');
+        $years = range($currentYear, $currentYear - 10);
+
+
+        $array['graphsFilters'] = [
+            'yearType' => [
+                'title'        => $langs->transnoentities('YearType'),
+                'type'         => 'selectarray',
+                'filter'       => 'yearType',
+                'values'       => ['calendar' => $langs->transnoentities('CalendarYear'), 'fiscal' => $langs->transnoentities('FiscalYear')],
+                'currentValue' => $yearType
+            ],
+            'year' => [
+                'title'        => $langs->transnoentities('Year'),
+                'type'         => 'selectarray',
+                'filter'       => 'year',
+                'values'       => array_combine(array_merge([-1], $years), array_merge([$langs->transnoentities('AllYears')], array_map('strval', $years))),
+                'currentValue' => $year
+            ]
+    ];
 
         $array['widgets'] = [
             'accident' => [
@@ -489,7 +527,7 @@ class Accident extends SaturneObject
                     (($conf->global->DIGIRISKDOLIBARR_NB_WORKED_HOURS > 0 && $conf->global->DIGIRISKDOLIBARR_MANUAL_INPUT_NB_WORKED_HOURS) ? $langs->transnoentities('GravityRateTooltip') . '<br>' . $langs->transnoentities('NbWorkedHoursTooltip') : $langs->transnoentities('GravityRateTooltip'))
                 ],
                 'widgetName' => $langs->transnoentities('AccidentRateIndicator')
-            ]
+            ],
         ];
 
         if (empty($dashboardConfig->graphs->AccidentRepartition->hide)) {
@@ -497,10 +535,27 @@ class Accident extends SaturneObject
         } else {
             $array['disabledGraphs']['AccidentRepartition'] = $langs->transnoentities('AccidentRepartition');
         }
-        if (empty($dashboardConfig->graphs->AccidentByYear->hide)) {
-            $array['graphs'][] = $this->getNbAccidentsLast3years($accidents);
+        if ($year == -1) {
+            if (empty($dashboardConfig->graphs->AccidentByYear->hide)) {
+                $array['graphs'][] = $this->getNbAccidentsLast3years($accidents);
+            } else {
+                $array['disabledGraphs']['AccidentByYear'] = $langs->transnoentities('AccidentByYear');
+            }
+        }
+        if (empty($dashboardConfig->graphs->AccidentRegister->hide)) {
+            $array['graphs'][] = $this->getAccidentRegister($accidents);
         } else {
-            $array['disabledGraphs']['AccidentByYear'] = $langs->transnoentities('AccidentByYear');
+            $array['disabledGraphs']['AccidentRegister'] = $langs->transnoentities('AccidentRegister');
+        }
+        if (empty($dashboardConfig->graphs->AccidentsByWorkStops->hide)) {
+            $array['graphs'][] = $this->getNbAccidentsByWorkStops($accidents, $accidentsWithWorkStops);
+        } else {
+            $array['disabledGraphs']['AccidentsByWorkStops'] = $langs->transnoentities('AccidentsByWorkStops');
+        }
+        if (empty($dashboardConfig->graphs->AccidentsWorkStopByDigiriskElem->hide)) {
+            $array['graphs'][] = $this->getAccidentsWorkStopByDigiriskElem($accidents, $accidentsWithWorkStops, $digiriskElements);
+        } else {
+            $array['disabledGraphs']['AccidentsWorkStopByDigiriskElem'] = $langs->transnoentities('AccidentsWorkStopByDigiriskElem');
         }
 
         return $array;
@@ -795,6 +850,175 @@ class Accident extends SaturneObject
         } else {
             $array['gravityrate'] = 'N/A';
         }
+        return $array;
+    }
+
+    /**
+     * Get graph of AccidentRegister
+     *
+     * @param  array $accident Array of accidents
+     * @return array
+     */
+    public function getAccidentRegister(array $accident = []): array
+    {
+        global $langs;
+
+        $accidentWithoutRegister = count(array_filter($accident, function($elem) {
+            return $elem->fk_ticket === null;
+        }));
+        $array = [];
+
+        $array['title'] = $langs->transnoentities('AccidentRegister');
+        $array['name']  = 'AccidentRegister';
+        $array['picto'] = $this->picto;
+
+        // Graph parameters
+        $array['width']      = '100%';
+        $array['height']     = 400;
+        $array['type']       = 'pie';
+        $array['showlegend'] = 2;
+        $array['dataset']    = 1;
+
+        $array['labels'] = [
+            [
+                'label' => $langs->transnoentities('AccidentWithoutRegister'),
+                'color' => '#9567aa'
+            ],
+            [
+                'label' => $langs->transnoentities('AccidentWithRegister'),
+                'color' => '#4f9ebe'
+            ],
+        ];
+
+        $array['data'] = [$accidentWithoutRegister, count($accident) - $accidentWithoutRegister];
+        return $array;
+    }
+
+    /**
+     * Get graph of NbAccidentsByWorkStops
+     *
+     * @param  array $accidents             Array of accidents
+     * @param  array $accidentsWithWorkStop Array of work stops
+     * @return array
+     */
+    public function getNbAccidentsByWorkStops(array $accidents = [], array $accidentsWithWorkStop = []): array
+    {
+        global $langs;
+
+        $array['title'] = $langs->transnoentities('WorkStopDurationDistribution');
+        $array['name']  = 'WorkStopDurationDistribution';
+        $array['picto'] = $this->picto;
+
+        // Graph parameters
+        $array['width']      = '100%';
+        $array['height']     = 400;
+        $array['type']       = 'pie';
+        $array['showlegend'] = 2;
+        $array['dataset']    = 1;
+
+        $array['labels'] = [
+            'noAbsence' => [
+                'label' => $langs->transnoentities('NoAbsence'),
+                'color' => '#4caf50'
+            ],
+            'upTo4Days' => [
+                'label' => $langs->transnoentities('UpTo4Days'),
+                'color' => '#8bc34a'
+            ],
+            'upTo21Days' => [
+                'label' => $langs->transnoentities('UpTo21Days'),
+                'color' => '#ffc107'
+            ],
+            'upTo3Months' => [
+                'label' => $langs->transnoentities('UpTo3Months'),
+                'color' => '#ff9800'
+            ],
+            'upTo6Months' => [
+                'label' => $langs->transnoentities('UpTo6Months'),
+                'color' => '#ff5722'
+            ],
+            'moreThan6Months' => [
+                'label' => $langs->transnoentities('MoreThan6Months'),
+                'color' => '#f44336'
+            ],
+        ];
+        $array['data'] = [
+            'noAbsence'       => 0,
+            'upTo4Days'       => 0,
+            'upTo21Days'      => 0,
+            'upTo3Months'     => 0,
+            'upTo6Months'     => 0,
+            'moreThan6Months' => 0,
+        ];
+
+        $nbAccidensWithWorkStop = [];
+        foreach ($accidentsWithWorkStop as $workstop) {
+            $days = abs($workstop->date_end_workstop - $workstop->date_start_workstop) / 86400;
+
+            if ($days < 4) {
+                $array['data']['upTo4Days']++;
+            } elseif ($days < 21) {
+                $array['data']['upTo21Days']++;
+            } elseif ($days < 90) {
+                $array['data']['upTo3Months']++;
+            } elseif ($days < 180) {
+                $array['data']['upTo6Months']++;
+            } else {
+                $array['data']['moreThan6Months']++;
+            }
+            $nbAccidensWithWorkStop[$workstop->fk_accident] = $workstop->fk_accident;
+        }
+        foreach ($accidents as $accident) {
+            if (!in_array($accident->id, $nbAccidensWithWorkStop)) {
+                $array['data']['noAbsence']++;
+            }
+        }
+        return $array;
+    }
+
+    /**
+     * Get graph of AccidentsWorkStopByDigiriskElem
+     *
+     * @param  array $accidents             Array of accidents
+     * @param  array $accidentsWithWorkStop Array of work stops
+     * @param  array $digiriskElements      Array of digirisk elements
+     * @return array
+     */
+    public function getAccidentsWorkStopByDigiriskElem(array $accidents = [], array $accidentsWithWorkStop = [], array $digiriskElements = []): array
+    {
+        global $langs;
+
+        $array['title'] = $langs->transnoentities('WorkStopDurationDistributionDigiriskElem');
+        $array['name']  = 'WorkStopDurationDistributionDigiriskElem';
+        $array['picto'] = $this->picto;
+
+        // Graph parameters
+        $array['width']      = '100%';
+        $array['height']     = 400;
+        $array['type']       = 'pie';
+        $array['showlegend'] = 2;
+        $array['dataset']    = 1;
+
+        $array['data'] = [];
+        foreach ($accidentsWithWorkStop as $workstop) {
+            if (!empty($accidents[$workstop->fk_accident])) {
+                $accident = $accidents[$workstop->fk_accident];
+                if (empty($array['data'][$accident->fk_element])) {
+                    $array['data'][$accident->fk_element] = 0;
+                }
+                $array['data'][$accident->fk_element] += abs($workstop->date_end_workstop - $workstop->date_start_workstop) / 86400;
+            }
+        }
+        unset($array['data'][null]);
+
+        $array['labels'] = [];
+        foreach (array_keys($array['data']) as $digiriskElemId) {
+            $digiriskElem = $digiriskElements[$digiriskElemId]['object'];
+            $array['labels'][$digiriskElemId] = [
+                'label' => $digiriskElem->ref . ' - ' . $digiriskElem->label,
+            ];
+        }
+
         return $array;
     }
 

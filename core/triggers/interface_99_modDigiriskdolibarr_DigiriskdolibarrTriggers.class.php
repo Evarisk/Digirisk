@@ -72,7 +72,7 @@ class InterfaceDigiriskdolibarrTriggers extends DolibarrTriggers
 		$this->name        = preg_replace('/^Interface/i', '', get_class($this));
 		$this->family      = "demo";
 		$this->description = "Digiriskdolibarr triggers.";
-		$this->version     = '22.0.0';
+		$this->version     = '22.1.0';
 		$this->picto       = 'digiriskdolibarr@digiriskdolibarr';
 	}
 
@@ -404,6 +404,8 @@ class InterfaceDigiriskdolibarrTriggers extends DolibarrTriggers
 				if (getDolGlobalInt('DIGIRISKDOLIBARR_SEND_EMAIL_ON_TICKET_SUBMIT')) {
 					// envoi du mail avec les infos de l'objet aux adresses mail configurées
 					// envoi du mail avec une trad puis avec un model
+
+                    require_once DOL_DOCUMENT_ROOT . '/core/class/html.formmail.class.php';
 
 					$error = 0;
 					$formmail        = new FormMail($this->db);

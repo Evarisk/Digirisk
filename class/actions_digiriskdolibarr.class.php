@@ -241,6 +241,18 @@ class ActionsDigiriskdolibarr
                 </script>
                 <?php
 
+                $digiriskelement    = new DigiriskElement($db);
+                $res = $digiriskelement->fetch($object->array_options['options_digiriskdolibarr_ticket_service']);
+                if ($res > 0) {
+                    $outDigiriskElement = $digiriskelement->getNomUrl(1, 'blank', 0, '', -1, 1);
+                    ?>
+                    <script>
+                        jQuery('td[id*="digiriskdolibarr_ticket_service"]').html('<?= $outDigiriskElement ?>');
+                    </script>
+                    <?php
+                }
+
+
                 if (!empty($object->id)) {
                     $signatory   = new SaturneSignature($db, 'digiriskdolibarr', $object->element);
                     $signatories = $signatory->fetchSignatory('Attendant', $object->id, $object->element);
@@ -489,6 +501,32 @@ class ActionsDigiriskdolibarr
             print '<script src="../custom/digiriskdolibarr/js/digiriskdolibarr.js"></script>';
         }
 
+        if (strpos($parameters['context'], 'ticketlist')) {
+            ?>
+            <script>
+                    //$('table tr.oddeven td').css('padding', 2);
+
+                    var titles = ["Sujet"];
+
+                    // Récupère les index correspondants
+                    var indexes = {};
+
+                    titles.forEach(function(title) {
+                        var index = $('th[title="' + title + '"]').index();
+                        if (index !== -1) {
+                            indexes[index] = title.replace(" ", "_");
+                        }
+                    });
+
+                    // Applique le traitement sur chaque colonne trouvée
+                    Object.entries(indexes).forEach(([index, title]) => {
+                        var cells = $('table tr').find('td:eq(' + index + ')');
+                        cells.removeClass('tdoverflowmax250 ');
+                    });
+                </script>
+
+            <?php
+        }
         return 0; // or return 1 to replace standard code
 	}
 
@@ -1253,4 +1291,46 @@ class ActionsDigiriskdolibarr
 
 		return 0;
 	}
+
+    public function printFieldListValue($parameters, $object, $action)
+    {
+        global $db;
+
+        if (strpos($parameters['context'], 'ticketlist') && isModEnabled('categorie')) {
+            $obj = $parameters['object'];
+
+            $categorie = new Categorie($db);
+            $categories = $categorie->getListForItem($obj->id, $obj->element);
+
+            $out = '';
+
+            foreach ($categories as $cat) {
+                $out .= '<div class="noborderoncategories paddingleft marginbottom" style="background: #'. (empty($cat['color']) ? 'bbb' : $cat['color']) .'">';
+                $out .= '<div class="categtextwhite" data-catid="' . $cat['id'] . '" style="cursor: pointer;"><span class="fas fa-tag paddingright" style=""></span>' . addslashes($cat['label']) . '</div></div>';
+            }
+
+            ?>
+            <script>
+                $('[data-key="ticket.ticket_categories"]').eq(<?= $parameters['i'] ?>).html('<?= $out ?>')
+                $('[data-key="ticket.ticket_categories"]').eq(<?= $parameters['i'] ?>).find('.categtextwhite').on('click', function() {
+                    $('#search_category_ticket_list').val($(this).data('catid')).trigger('change');
+                    $('button[name="button_search_x"]').click();
+                });
+            </script>
+            <?php
+
+            $serviceId = $parameters['obj']->options_digiriskdolibarr_ticket_service;
+
+            $digiriskelement = new DigiriskElement($db);
+            $res = $digiriskelement->fetch($serviceId);
+            if ($res > 0) {
+                $out = $digiriskelement->getNomUrl(1, 'blank', 0, '', -1, 1);
+                ?>
+                <script>
+                    $('[data-key="ticket.digiriskdolibarr_ticket_service"]').eq(<?= $parameters['i'] ?>).html('<?= $out ?>')
+                </script>
+                <?php
+            }
+        }
+    }
 }

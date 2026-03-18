@@ -102,11 +102,9 @@ if ($entity > 0) {
     $upload_dir = $conf->categorie->multidir_output[isset($entity) ? $entity : 1];
 }
 
-$moreParams = [];
-if (empty(dolibarr_get_const($db, 'DIGIRISKDOLIBARR_SHOW_HIDDEN_DIGIRISKELEMENT'))) {
-    $moreParams['filter'] = ' AND t.show_in_selector = 1 ';
-}
-$digiriskelement = $digiriskelement->getActiveDigiriskElements('current', $moreParams);
+$moreParams           = [];
+$moreParams['filter'] = ' AND t.show_in_selector = 1';
+$digiriskelement      = $digiriskelement->getActiveDigiriskElements('current', $moreParams);
 
 /*
  * Actions
