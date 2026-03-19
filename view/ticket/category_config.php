@@ -381,7 +381,7 @@ if (getDolGlobalInt('DIGIRISKDOLIBARR_TICKET_ENABLE_PUBLIC_INTERFACE')) {
             } else {
                 print $langs->transnoentities('NoCategories');
             }
-            print ' <span class="opacitymedium">' . $langs->transnoentities('IfEmptyVisibleAllCategories') . '</span>';
+            print ' <span class="opacitymedium">(' . $langs->transnoentities('IfEmptyVisibleAllCategories') . ')</span>';
             print '</td>';
             print '</tr>';
 

@@ -74,6 +74,8 @@ MulticompanyTicketPublicInterfaceURL = URL de l'interface publique des tickets m
 OriginURL                            = URL d'origine
 ShortURL                             = URL raccourcie
 ExternalURL                          = URL externe
+AddExtraField                        = Creer un extrafield
+IfEmptyVisibleAllCategories          = Si vide, visible sur toutes les catégories
 
 # DigiQuali Sheet - Modèles
 LinkDigiriskdolibarr_digiriskstandard                 = Activer le lien avec les entités principale Digirisk Standard
