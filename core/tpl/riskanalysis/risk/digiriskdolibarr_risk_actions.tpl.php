@@ -430,6 +430,7 @@ if ( ! $error && $action == 'saveRiskAssessmentTask' && $permissiontoadd) {
     $dateEnd              = dol_stringtotime($data['dateEnd']);
 	$budget               = $data['budget'];
 	$taskProgress         = $data['taskProgress'];
+	$executiveUser        = $data['executiveId'];
 
 	$task->fetch($riskAssessmentTaskID);
 
@@ -452,6 +453,18 @@ if ( ! $error && $action == 'saveRiskAssessmentTask' && $permissiontoadd) {
 	}
 
 	$result = $task->update($user, empty($conf->global->DIGIRISKDOLIBARR_MAIN_AGENDA_ACTIONAUTO_TASK_MODIFY));
+
+	if ($result > 0 && isset($executiveUser)) {
+		$existingContacts = $task->liste_contact(-1, 'internal', 0, 'TASKEXECUTIVE');
+		if (!empty($existingContacts)) {
+			foreach ($existingContacts as $contact) {
+				$task->delete_contact($contact['rowid']);
+			}
+		}
+		if (!empty($executiveUser)) {
+			$task->add_contact($executiveUser, 'TASKEXECUTIVE', 'internal');
+		}
+	}
 
 	if ($result > 0) {
 		// Update task OK

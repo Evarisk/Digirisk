@@ -254,7 +254,8 @@ window.digiriskdolibarr.riskassessmenttask.saveRiskAssessmentTask = function ( e
 	let dateEnd   = elementRiskAssessmentTask.find('#RiskassessmentTaskDateEndEdit' + editedRiskAssessmentTaskId).val();
 	let hourEnd   = elementRiskAssessmentTask.find('#RiskassessmentTaskDateEndEdit' + editedRiskAssessmentTaskId + 'hour').val();
 	let minEnd    = elementRiskAssessmentTask.find('#RiskassessmentTaskDateEndEdit' + editedRiskAssessmentTaskId + 'min').val();
-	let budget    = elementRiskAssessmentTask.find('.riskassessment-task-budget'  + editedRiskAssessmentTaskId).val()
+	let budget      = elementRiskAssessmentTask.find('.riskassessment-task-budget'  + editedRiskAssessmentTaskId).val()
+	let executiveId = elementRiskAssessmentTask.find('.executiveSelectEdit').val();
 
 	window.saturne.loader.display($(this));
 	window.saturne.loader.display($('.riskassessment-task-single-'+ editedRiskAssessmentTaskId));
@@ -272,6 +273,7 @@ window.digiriskdolibarr.riskassessmenttask.saveRiskAssessmentTask = function ( e
 			minEnd: minEnd,
 			budget: budget,
 			taskProgress: taskProgress,
+			executiveId: executiveId,
 		}),
 		type: "POST",
 		processData: false,

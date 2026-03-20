@@ -367,7 +367,23 @@ if (!empty($related_tasks) && is_array($related_tasks)) {
 										<input type="text" class="riskassessment-task-budget<?php echo $related_task->id ?>" name="budget" value="<?php echo price2num($related_task->budget_amount); ?>">
 									</div>
 								</div>
+							<div class="flex flex-row items-center" style="margin-top: 1em;">
+								<i class="fas fa-user-tie" style="margin-right: 1em;"></i>
+								<?php
+								$contactsIntern     = $related_task->liste_contact(-1, 'internal');
+								$currentExecutiveId = '';
+								if (!empty($contactsIntern)) {
+									foreach ($contactsIntern as $contact) {
+										if ($contact['code'] === 'TASKEXECUTIVE') {
+											$currentExecutiveId = $contact['id'];
+											break;
+										}
+									}
+								}
+								print $form->select_dolusers($currentExecutiveId, 'executive_id_edit' . $related_task->id, 1, null, 0, '', 0, '', 0, 'minwidth200', '', 0, '', 'executiveSelectEdit');
+								?>
 							</div>
+						</div>
 							<hr>
 							<!-- RISKASSESSMENT TASK TIME SPENT NOTICE -->
 							<div class="messageSuccessTaskTimeSpentCreate<?php echo $related_task->id ?> notice hidden">
