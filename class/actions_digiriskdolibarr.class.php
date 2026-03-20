@@ -815,16 +815,20 @@ class ActionsDigiriskdolibarr
 		global $conf, $user, $langs;
 
         $sql = '';
-		/* print_r($parameters); print_r($object); echo "action: " . $action; */
-		if (preg_match('/ticketlist|thirdpartyticket|projectticket/', $parameters['context'])) {	    // do something only for the context 'somecontext1' or 'somecontext2'
+		if (preg_match('/ticketlist|thirdpartyticket|projectticket/', $parameters['context'])) {
 			$searchCategoryTicketList = GETPOST('search_category_ticket_list');
 			if (!empty($searchCategoryTicketList)) {
-				$sql = ' LEFT JOIN '.MAIN_DB_PREFIX."categorie_ticket as ct ON t.rowid = ct.fk_ticket"; // We'll need this table joined to the select in order to filter by categ
+				$sql = ' LEFT JOIN '.MAIN_DB_PREFIX."categorie_ticket as ct ON t.rowid = ct.fk_ticket";
 			}
 		}
 
+        if (preg_match('/preventionplanlist/', $parameters['context'])) {
+            $sql .= ' LEFT JOIN ' . MAIN_DB_PREFIX . 'digiriskdolibarr_digiriskresources as rs'
+                . ' ON rs.ref = "ExtSociety" AND rs.object_type = "preventionplan" AND rs.object_id = t.rowid';
+        }
+
         $this->resprints = $sql;
-        return 0; // or return 1 to replace standard code
+        return 0;
 	}
 
 
@@ -1313,6 +1317,98 @@ class ActionsDigiriskdolibarr
 
 		return 0;
 	}
+
+    /**
+     * Overloading the printFieldListSearch function : replacing the parent's function with the one below
+     *
+     * @param  array $parameters Hook metadata (context, etc...)
+     * @return int               0 < on error, 0 on success, 1 to replace standard code
+     */
+    public function printFieldListSearch(array $parameters): int
+    {
+        if (preg_match('/preventionplanlist/', $parameters['context'])) {
+            if ($parameters['key'] == 'ExtSociety') {
+                $val = (int) ($parameters['val'] ?? 0);
+                if ($val > 0) {
+                    echo ' AND rs.element_id = ' . $val;
+                }
+                return 1; // Replace default SQL generation
+            }
+        }
+
+        return 0;
+    }
+
+    /**
+     * Overloading the saturnePrintFieldListLoopObject function : replacing the parent's function with the one below
+     *
+     * @param  array  $parameters Hook metadata (context, etc...)
+     * @param  object $object     Current object
+     * @return int                0 < on error, 0 on success, 1 to replace standard code
+     */
+    public function saturnePrintFieldListLoopObject(array $parameters, object $object): int
+    {
+        if (preg_match('/preventionplanlist/', $parameters['context'])) {
+            $key = $parameters['key'];
+
+            if (!in_array($key, ['MasterWorker', 'ExtSociety', 'ExtSocietyResponsible', 'ExtSocietyAttendant'])) {
+                return 0;
+            }
+
+            require_once DOL_DOCUMENT_ROOT . '/user/class/user.class.php';
+            require_once DOL_DOCUMENT_ROOT . '/contact/class/contact.class.php';
+            require_once __DIR__ . '/../../saturne/class/saturnesignature.class.php';
+            require_once __DIR__ . '/../class/digiriskresources.class.php';
+
+            global $moduleNameLowerCase;
+
+            $signatory         = new SaturneSignature($this->db, $moduleNameLowerCase, $object->element);
+            $digiriskresources = new DigiriskResources($this->db);
+            $out               = [];
+
+            if ($key == 'MasterWorker') {
+                $element = $signatory->fetchSignatory('MasterWorker', $object->id, 'preventionplan');
+                if (is_array($element) && !empty($element)) {
+                    $element = array_shift($element);
+                    $usertmp = new User($this->db);
+                    $usertmp->fetch($element->element_id);
+                    $out[$key] = $usertmp->getNomUrl(1);
+                } else {
+                    $out[$key] = '';
+                }
+            } elseif ($key == 'ExtSociety') {
+                $extSociety = $digiriskresources->fetchResourcesFromObject('ExtSociety', $object);
+                $out[$key]  = ($extSociety > 0) ? $extSociety->getNomUrl(1) : '';
+            } elseif ($key == 'ExtSocietyResponsible') {
+                $element = $signatory->fetchSignatory('ExtSocietyResponsible', $object->id, 'preventionplan');
+                if (is_array($element) && !empty($element)) {
+                    $element = array_shift($element);
+                    $contact = new Contact($this->db);
+                    $contact->fetch($element->element_id);
+                    $out[$key] = $contact->getNomUrl(1);
+                } else {
+                    $out[$key] = '';
+                }
+            } elseif ($key == 'ExtSocietyAttendant') {
+                $attendants = $signatory->fetchSignatory('ExtSocietyAttendant', $object->id, 'preventionplan');
+                $html       = '';
+                if (is_array($attendants) && !empty($attendants)) {
+                    $contact = new Contact($this->db);
+                    foreach ($attendants as $attendant) {
+                        if ($attendant->element_id > 0) {
+                            $contact->fetch($attendant->element_id);
+                            $html .= $contact->getNomUrl(1) . '<br>';
+                        }
+                    }
+                }
+                $out[$key] = $html;
+            }
+
+            $this->results = $out;
+        }
+
+        return 0;
+    }
 
     public function printFieldListValue($parameters, $object, $action)
     {
