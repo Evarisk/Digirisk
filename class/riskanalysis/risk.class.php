@@ -71,7 +71,7 @@ class Risk extends SaturneObject
 	/**
 	 * @var string String with name of icon for risk. Must be the part after the 'object_' into object_risk.png
 	 */
-	public $picto = 'fontawesome_fa-exclamation-triangle_fas_#d35968';
+	public string $picto = 'fontawesome_fa-exclamation-triangle_fas_#d35968';
 
 	/**
 	 * @var array  Array with all fields and their property. Do not use it as a static var. It may be modified by constructor

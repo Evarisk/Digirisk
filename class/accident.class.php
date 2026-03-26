@@ -100,7 +100,7 @@ class Accident extends SaturneObject
 	/**
 	 * @var string String with name of icon for digiriskelement. Must be the part after the 'object_' into object_digiriskelement.png
 	 */
-	public $picto = 'fontawesome_fa-user-injured_fas_#d35968';
+	public string $picto = 'fontawesome_fa-user-injured_fas_#d35968';
 
 	const STATUS_DELETED   = -1;
 	const STATUS_DRAFT     = 0;
@@ -1165,7 +1165,7 @@ class AccidentWorkStop extends SaturneObject
 	/**
 	 * @var string String with name of icon for digiriskelement. Must be the part after the 'object_' into object_digiriskelement.png
 	 */
-	public $picto = 'fontawesome_fa-user-injured_fas_#d35968';
+	public string $picto = 'fontawesome_fa-user-injured_fas_#d35968';
 
 	const STATUS_DELETED = -1;
 
@@ -1292,7 +1292,7 @@ class AccidentMetaData extends SaturneObject
 	/**
 	 * @var string String with name of icon for digiriskelement. Must be the part after the 'object_' into object_digiriskelement.png
 	 */
-	public $picto = 'fontawesome_fa-user-injured_fas_#d35968';
+	public string $picto = 'fontawesome_fa-user-injured_fas_#d35968';
 
 
 	/**
@@ -1458,7 +1458,7 @@ class AccidentLesion extends SaturneObject
 	/**
 	 * @var string String with name of icon for digiriskelement. Must be the part after the 'object_' into object_digiriskelement.png
 	 */
-	public $picto = 'fontawesome_fa-user-injured_fas_#d35968';
+	public string $picto = 'fontawesome_fa-user-injured_fas_#d35968';
 
     const STATUS_DELETED   = -1;
 
