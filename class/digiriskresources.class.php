@@ -62,7 +62,7 @@ class DigiriskResources extends SaturneObject
 	/**
 	 * @var string String with name of icon for digiriskresources. Must be the part after the 'object_' into object_digiriskresources.png
 	 */
-	public $picto = 'digiriskresources@digiriskdolibarr';
+	public string $picto = 'digiriskresources@digiriskdolibarr';
 
 	/**
 	 * @var array  Array with all fields and their property. Do not use it as a static var. It may be modified by constructor.
