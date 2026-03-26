@@ -60,7 +60,7 @@ class RiskSign extends SaturneObject
 	/**
 	 * @var string String with name of icon for risksign. Must be the part after the 'object_' into object_risksign.png
 	 */
-	public $picto = 'risksign@digiriskdolibarr';
+	public string $picto = 'risksign@digiriskdolibarr';
 
     public const STATUS_DELETED   = -1;
     public const STATUS_DRAFT     = 0;
