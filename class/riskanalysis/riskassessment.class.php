@@ -134,29 +134,28 @@ class RiskAssessment extends SaturneObject
 		parent::__construct($db, $this->module, $this->element);
 	}
 
+    /**
+     * Create object into database
+     *
+     * @param  User        $user         User that creates
+     * @param  int<0,1>    $noTrigger    0 = launch triggers after, 1 = disable triggers
+     * @param  bool        $updateStatus Update previous riskassessment status
+     * @return int<-1,max>               Return integer 0 < if KO, ID of created object if OK
+     */
+    public function create(User $user, int $noTrigger = 0, bool $updateStatus = true): int
+    {
+        $result = $this->createCommon($user, $noTrigger);
 
-	/**
-	 * Create object into database
-	 *
-	 * @param  User $user         User that creates
-	 * @param  bool $notrigger    False=launch triggers after, true=disable triggers
-	 * @param  bool $updatestatus Update previous riskassessment status
-	 * @return int                if < KO, ID of created object if OK
-	 */
-	public function create(User $user, bool $notrigger = false, bool $updatestatus = true): int
-	{
-		$result = $this->createCommon($user, $notrigger);
+        if ($result > 0 && $updateStatus > 0) {
+            $sql = "UPDATE " . MAIN_DB_PREFIX . "digiriskdolibarr_riskassessment";
+            $sql .= " SET status = 0";
+            $sql .= " WHERE fk_risk = " . $this->fk_risk;
+            $sql .= " AND rowid != " . $result;
+            $this->db->query($sql);
+        }
 
-		if ($result > 0 && $updatestatus > 0) {
-			$sql = "UPDATE " . MAIN_DB_PREFIX . "digiriskdolibarr_riskassessment";
-			$sql .= " SET status = 0";
-			$sql .= " WHERE fk_risk = " . $this->fk_risk;
-			$sql .= " AND rowid != " . $result;
-			$this->db->query($sql);
-		}
-
-		return $result;
-	}
+        return $result;
+    }
 
 	/**
 	 * Load object in memory from the database with Parent ID

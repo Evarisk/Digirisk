@@ -54,14 +54,15 @@ class DigiriskDocuments extends SaturneDocuments
     /**
      * Create object into database
      *
-     * @param  User $user      User that creates
-     * @param  bool $notrigger false = launch triggers after, true = disable triggers
-     * @return int             0 < if KO, ID of created object if OK
+     * @param  User        $user         User that creates
+     * @param  int<0,1>    $noTrigger    0 = launch triggers after, 1 = disable triggers
+     * @param  object|null $parentObject Current object
+     * @return int<-1,max>               Return integer 0 < if KO, ID of created object if OK
      */
-    public function create(User $user, bool $notrigger = false, object $parentObject = null): int
+    public function create(User $user, int $noTrigger = 0, ?object $parentObject = null): int
     {
         $this->DigiriskFillJSON();
-        return parent::create($user, $notrigger, $parentObject);
+        return parent::create($user, $noTrigger, $parentObject);
     }
 
 	/**
@@ -89,62 +90,6 @@ class DigiriskDocuments extends SaturneDocuments
 			case "firepermitdocument":
 				$this->json = $this->FirePermitDocumentFillJSON();
 				break;
-		}
-	}
-
-	/**
-	 *	Load the info information of the object
-	 *
-	 *	@param  int		$id       ID of object
-	 *	@return	int
-	 */
-	public function info($id)
-	{
-		$fieldlist = $this->getFieldList();
-
-		if (empty($fieldlist)) return 0;
-
-		$sql = 'SELECT '.$fieldlist;
-		$sql .= ' FROM '.MAIN_DB_PREFIX.$this->table_element.' as t';
-		$sql .= ' WHERE t.rowid = '.$id;
-		$result = $this->db->query($sql);
-		if ($result)
-		{
-			if ($this->db->num_rows($result))
-			{
-				$obj = $this->db->fetch_object($result);
-				$this->id = $obj->rowid;
-//				if ($obj->fk_user_author)
-//				{
-//					$cuser = new User($this->db);
-//					$cuser->fetch($obj->fk_user_author);
-//					$this->user_creation = $cuser;
-//				}
-//
-//				if ($obj->fk_user_valid)
-//				{
-//					$vuser = new User($this->db);
-//					$vuser->fetch($obj->fk_user_valid);
-//					$this->user_validation = $vuser;
-//				}
-//
-//				if ($obj->fk_user_cloture)
-//				{
-//					$cluser = new User($this->db);
-//					$cluser->fetch($obj->fk_user_cloture);
-//					$this->user_cloture = $cluser;
-//				}
-
-				$this->date_creation = $this->db->jdate($obj->date_creation);
-				//$this->date_modification = $this->db->jdate($obj->datem);
-				//$this->date_validation   = $this->db->jdate($obj->datev);
-			}
-
-			$this->db->free($result);
-		}
-		else
-		{
-			dol_print_error($this->db);
 		}
 	}
 

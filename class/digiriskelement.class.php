@@ -125,13 +125,13 @@ class DigiriskElement extends SaturneObject
     }
 
     /**
-     * Create object into database.
+     * Create object into database
      *
-     * @param  User $user      User that creates.
-     * @param  bool $notrigger false = launch triggers after, true = disable triggers.
-     * @return int             0 < if KO, ID of created object if OK.
+     * @param  User        $user      User that creates
+     * @param  int<0,1>    $noTrigger 0 = launch triggers after, 1 = disable triggers
+     * @return int<-1,max>            Return integer 0 < if KO, ID of created object if OK
      */
-    public function create(User $user, bool $notrigger = false): int
+    public function create(User $user, int $noTrigger = 0): int
     {
         global $conf;
         if (empty($this->ref)) {
@@ -149,7 +149,7 @@ class DigiriskElement extends SaturneObject
         $this->fk_standard = $conf->global->DIGIRISKDOLIBARR_ACTIVE_STANDARD;
         $this->status      = 1;
 
-        return $this->createCommon($user, $notrigger);
+        return $this->createCommon($user, $noTrigger);
     }
 
     /**
@@ -493,11 +493,11 @@ class DigiriskElement extends SaturneObject
     }
 
     /**
-     * Return the status.
+     * Return the status
      *
-     * @param  int    $status ID status.
-     * @param  int    $mode   0 = long label, 1 = short label, 2 = Picto + short label, 3 = Picto, 4 = Picto + long label, 5 = Short label + Picto, 6 = Long label + Picto.
-     * @return string         Label of status.
+     * @param  int    $status ID status
+     * @param  int    $mode   0 = long label, 1 = short label, 2 = Picto + short label, 3 = Picto, 4 = Picto + long label, 5 = Short label + Picto, 6 = Long label + Picto
+     * @return string         Label of status
      */
     public function LibStatut(int $status, int $mode = 0): string
     {
