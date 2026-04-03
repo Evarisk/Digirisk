@@ -174,14 +174,14 @@ class DigiriskElement extends SaturneObject
     }
 
     /**
-     * Delete object in database.
+     * Delete object in database
      *
-     * @param  User $user       User that deletes.
-     * @param  bool $notrigger  false = launch triggers after, true = disable triggers.
-     * @param  bool $softDelete Don't delete object.
-     * @return int              0 < if KO, > 0 if OK.
+     * @param  User        $user       User that deletes
+     * @param  int<0,1>    $noTrigger  0 = launch triggers after, 1 = disable triggers
+     * @param  bool        $softDelete Don't delete object
+     * @return int<-1,1>               Return integer 0 < if KO, > 0 if OK
      */
-    public function delete(User $user, bool $notrigger = false, bool $softDelete = true): int
+    public function delete(User $user, int $noTrigger = 0, bool $softDelete = true): int
     {
         global $conf;
 
@@ -194,21 +194,6 @@ class DigiriskElement extends SaturneObject
         }
 
         return $result;
-    }
-
-    /**
-     * Sets object to supplied categories.
-     *
-     * Deletes object from existing categories not supplied.
-     * Adds it to non-existing supplied categories.
-     * Existing categories are left untouched.
-     *
-     * @param  int[]|int $categories Category or categories IDs.
-     * @return float|int
-     */
-    public function setCategories($categories)
-    {
-        return 1;
     }
 
     /**
