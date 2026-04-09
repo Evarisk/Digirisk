@@ -178,6 +178,12 @@ class AccidentInvestigation extends SaturneObject
      */
     public int $fk_accident = 0;
 
+    const STATUS_DELETED   = -1;
+    const STATUS_DRAFT     = 0;
+    const STATUS_VALIDATED = 1;
+    const STATUS_LOCKED    = 2;
+    const STATUS_ARCHIVED  = 3;
+
     /**
      * Constructor
      *
