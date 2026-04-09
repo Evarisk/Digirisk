@@ -231,30 +231,29 @@ class Evaluator extends SaturneObject
     /**
      * Write information of trigger description
      *
-     * @param  Object $object Object calling the trigger
-     * @return string         Description to display in actioncomm->note_private
+     * @return string Description to display in actioncomm->note_private
      */
-    public function getTriggerDescription(SaturneObject $object): string
+    public function getTriggerDescription(): string
     {
         global $langs;
 
         require_once __DIR__ . '/digiriskelement.class.php';
 
-        $ret = parent::getTriggerDescription($object);
+        $ret = parent::getTriggerDescription();
 
         $now             = dol_now();
         $userstat        = new User($this->db);
         $digiriskelement = new DigiriskElement($this->db);
 
-        $digiriskelement->fetch($object->fk_parent);
-        $userstat->fetch($object->fk_user);
+        $digiriskelement->fetch($this->fk_parent);
+        $userstat->fetch($this->fk_user);
         $langs->load('companies');
 
         $ret .= $langs->trans('ParentElement') . ' : ' . $digiriskelement->ref . " - " . $digiriskelement->label . '<br>';
         $ret .= $langs->trans('UserAssigned') . ' : ' . $userstat->firstname . " " . $userstat->lastname . '<br>';
-        $ret .= $langs->trans('PostOrFunction') . ' : ' . (!empty($object->job) ? $object->job : 'N/A') . '<br>';
+        $ret .= $langs->trans('PostOrFunction') . ' : ' . (!empty($this->job) ? $this->job : 'N/A') . '<br>';
         $ret .= $langs->trans('AssignmentDate') . ' : ' . dol_print_date($now, 'dayhoursec', 'tzuser') . '<br>';
-        $ret .= $langs->trans('EvaluationDuration') . ' : ' . convertSecondToTime($object->duration * 60, 'allhourmin') . ' min' . '<br>';
+        $ret .= $langs->trans('EvaluationDuration') . ' : ' . convertSecondToTime($this->duration * 60, 'allhourmin') . ' min' . '<br>';
 
         return $ret;
     }

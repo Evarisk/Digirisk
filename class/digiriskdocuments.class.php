@@ -96,14 +96,13 @@ class DigiriskDocuments extends SaturneDocuments
     /**
      * Write information of trigger description
      *
-     * @param  Object $object Object calling the trigger
-     * @return string         Description to display in actioncomm->note_private
+     * @return string Description to display in actioncomm->note_private
      */
-    public function getTriggerDescription(SaturneObject $object): string
+    public function getTriggerDescription(): string
     {
         global $langs;
 
-        $className = $object->parent_type;
+        $className = $this->parent_type;
         if (file_exists( __DIR__ . '/digiriskelement/' . $className .'.class.php')) {
             require_once __DIR__ . '/digiriskelement/' . $className .'.class.php';
         } else if (file_exists( __DIR__ . '/digiriskdolibarrdocuments/' . $className .'.class.php')) {
@@ -113,13 +112,13 @@ class DigiriskDocuments extends SaturneDocuments
         }
 
         $parentElement = new $className($this->db);
-        $parentElement->fetch($object->parent_id);
+        $parentElement->fetch($this->parent_id);
 
-        $ret  = parent::getTriggerDescription($object);
+        $ret  = parent::getTriggerDescription();
 
-        $ret .= $langs->transnoentities('ElementType') . ' : ' . $object->parent_type . '<br>';
+        $ret .= $langs->transnoentities('ElementType') . ' : ' . $this->parent_type . '<br>';
         $ret .= $langs->transnoentities('ParentElement') . ' : ' . $parentElement->ref . ' ' . $parentElement->label . '<br>';
-        $ret .= $langs->transnoentities('LastMainDoc') . ' : ' . $object->last_main_doc . '<br>';
+        $ret .= $langs->transnoentities('LastMainDoc') . ' : ' . $this->last_main_doc . '<br>';
 
         return $ret;
     }

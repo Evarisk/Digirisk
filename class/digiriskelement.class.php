@@ -564,10 +564,9 @@ class DigiriskElement extends SaturneObject
     /**
      * Write information of trigger description
      *
-     * @param  Object $object Object calling the trigger
-     * @return string         Description to display in actioncomm->note_private
+     * @return string Description to display in actioncomm->note_private
      */
-    public function getTriggerDescription(SaturneObject $object): string
+    public function getTriggerDescription(): string
     {
         global $conf, $langs;
 
@@ -575,22 +574,22 @@ class DigiriskElement extends SaturneObject
         require_once __DIR__ . '/../../saturne/class/task/saturnetask.class.php';
 
         $digiriskStandard = new DigiriskStandard($this->db);
-        $digiriskStandard->fetch($object->fk_standard);
+        $digiriskStandard->fetch($this->fk_standard);
 
-        $ret = parent::getTriggerDescription($object);
+        $ret = parent::getTriggerDescription();
 
-        if (!empty($object->fk_parent)) {
+        if (!empty($this->fk_parent)) {
             require_once __DIR__ . '/digiriskelement.class.php';
             $digiriskElement = new DigiriskElement($this->db);
-            $digiriskElement->fetch($object->fk_parent);
+            $digiriskElement->fetch($this->fk_parent);
             $ret .= $langs->trans('ParentElement') . ' : ' .  $digiriskElement->ref . ' - ' . $digiriskElement->label . '<br/>';
         }
 
         $ret .= $langs->trans('Standard') . ' : ' . $digiriskStandard->ref . ' - ' . $conf->global->MAIN_INFO_SOCIETE_NOM . '<br/>';
-        $ret .= $langs->trans('Photo') . ' : ' . (!empty($object->photo) ? $object->photo : 'N/A') . '<br>';
-        $ret .= $langs->trans('ElementType') . ' : ' . $langs->trans($object->element_type) . '<br>';
-        ($object->ranks != 0 ? $ret .= $langs->trans('Order') . ' : ' . $object->ranks . '<br>' : '');
-        $ret .= $langs->trans('ShowInSelectOnPublicTicketInterface') . ' : ' . ($object->show_in_selector ? $langs->trans('Yes') : $langs->trans('No')) . '<br>';
+        $ret .= $langs->trans('Photo') . ' : ' . (!empty($this->photo) ? $this->photo : 'N/A') . '<br>';
+        $ret .= $langs->trans('ElementType') . ' : ' . $langs->trans($this->element_type) . '<br>';
+        ($this->ranks != 0 ? $ret .= $langs->trans('Order') . ' : ' . $this->ranks . '<br>' : '');
+        $ret .= $langs->trans('ShowInSelectOnPublicTicketInterface') . ' : ' . ($this->show_in_selector ? $langs->trans('Yes') : $langs->trans('No')) . '<br>';
 
         return $ret;
     }

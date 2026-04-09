@@ -340,27 +340,26 @@ class RiskSign extends SaturneObject
     /**
      * Write information of trigger description
      *
-     * @param  Object $object Object calling the trigger
-     * @return string         Description to display in actioncomm->note_private
+     * @return string Description to display in actioncomm->note_private
      */
-    public function getTriggerDescription(SaturneObject $object): string
+    public function getTriggerDescription(): string
     {
         global $conf, $langs;
 
         require_once __DIR__ . '/../digiriskelement.class.php';
         require_once __DIR__ . '/risk.class.php';
 
-        $ret = parent::getTriggerDescription($object);
+        $ret = parent::getTriggerDescription();
 
         $digiriskelement = new DigiriskElement($this->db);
-        $digiriskelement->fetch($object->fk_element);
+        $digiriskelement->fetch($this->fk_element);
 
         $ret .= $langs->trans('ParentElement') . ' : ' . $digiriskelement->ref . " - " . $digiriskelement->label . '<br>';
-        $ret .= $langs->trans('RiskSignCategory') . ' : ' . $this->getRiskSignCategory($object, 'name') . '<br>';
+        $ret .= $langs->trans('RiskSignCategory') . ' : ' . $this->getRiskSignCategory($this, 'name') . '<br>';
 
-        if (dol_strlen($object->applied_on) > 0) {
-            $digiriskelement->fetch($object->applied_on);
-            $ret .= $langs->trans('RiskSignSharedWithEntityRefLabel', $object->ref) . ' S' . $conf->entity . ' ' . $digiriskelement->ref . " - " . $digiriskelement->label . '<br>';
+        if (dol_strlen($this->applied_on) > 0) {
+            $digiriskelement->fetch($this->applied_on);
+            $ret .= $langs->trans('RiskSignSharedWithEntityRefLabel', $this->ref) . ' S' . $conf->entity . ' ' . $digiriskelement->ref . " - " . $digiriskelement->label . '<br>';
         }
 
         return $ret;

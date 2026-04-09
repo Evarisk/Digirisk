@@ -307,29 +307,28 @@ class RiskAssessment extends SaturneObject
     /**
      * Write information of trigger description
      *
-     * @param  Object $object Object calling the trigger
-     * @return string         Description to display in actioncomm->note_private
+     * @return string Description to display in actioncomm->note_private
      */
-    public function getTriggerDescription(SaturneObject $object): string
+    public function getTriggerDescription(): string
     {
         global $conf, $langs;
 
         $risk = new Risk($this->db);
-        $risk->fetch($object->fk_risk);
+        $risk->fetch($this->fk_risk);
 
-        $ret = parent::getTriggerDescription($object);
+        $ret = parent::getTriggerDescription();
 
         $ret .= $langs->trans('ParentRisk') . ' : ' . $risk->ref . '<br>';
-        $ret .= $langs->trans('Comment') . ' : ' . (!empty($object->comment) ? $object->comment : 'N/A') . '<br>';
-        $ret .= ((!empty($object->date_riskassessment) && $conf->global->DIGIRISKDOLIBARR_SHOW_RISKASSESSMENT_DATE) ? $langs->trans('RiskAssessmentDate') . ' : ' . dol_print_date($object->date_riskassessment, 'day') . '<br>' : '');
-        $ret .= $langs->trans('Photo') . ' : ' . (!empty($object->photo) ? $object->photo : 'N/A') . '<br>';
-        if ($object->method == 'advanced') {
-            $ret .= $langs->trans('Evaluation') . ' : ' . $object->cotation . '<br>';
-            $ret .= $langs->trans('Gravity') . ' : ' . $object->gravite . '<br>';
-            $ret .= $langs->trans('Protection') . ' : ' . $object->protection . '<br>';
-            $ret .= $langs->trans('Occurrence') . ' : ' . $object->occurrence . '<br>';
-            $ret .= $langs->trans('Formation') . ' : ' . $object->formation . '<br>';
-            $ret .= $langs->trans('Exposition') . ' : ' . $object->exposition . '<br>';
+        $ret .= $langs->trans('Comment') . ' : ' . (!empty($this->comment) ? $this->comment : 'N/A') . '<br>';
+        $ret .= ((!empty($this->date_riskassessment) && $conf->global->DIGIRISKDOLIBARR_SHOW_RISKASSESSMENT_DATE) ? $langs->trans('RiskAssessmentDate') . ' : ' . dol_print_date($this->date_riskassessment, 'day') . '<br>' : '');
+        $ret .= $langs->trans('Photo') . ' : ' . (!empty($this->photo) ? $this->photo : 'N/A') . '<br>';
+        if ($this->method == 'advanced') {
+            $ret .= $langs->trans('Evaluation') . ' : ' . $this->cotation . '<br>';
+            $ret .= $langs->trans('Gravity') . ' : ' . $this->gravite . '<br>';
+            $ret .= $langs->trans('Protection') . ' : ' . $this->protection . '<br>';
+            $ret .= $langs->trans('Occurrence') . ' : ' . $this->occurrence . '<br>';
+            $ret .= $langs->trans('Formation') . ' : ' . $this->formation . '<br>';
+            $ret .= $langs->trans('Exposition') . ' : ' . $this->exposition . '<br>';
         }
 
         return $ret;

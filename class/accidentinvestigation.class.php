@@ -231,38 +231,37 @@ class AccidentInvestigation extends SaturneObject
 		return $this->setStatusCommon($user, self::STATUS_DRAFT, $noTrigger, 'ACCIDENTINVESTIGATION_UNVALIDATE');
 	}
 
-	/**
-	 * Write information of trigger description
-	 *
-	 * @param  Object $object Object calling the trigger
-	 * @return string         Description to display in actioncomm->note_private
-	 */
-	public function getTriggerDescription(SaturneObject $object): string
-	{
-		require_once __DIR__ . '/accident.class.php';
-		require_once __DIR__ . '/../../saturne/class/task/saturnetask.class.php';
+    /**
+     * Write information of trigger description
+     *
+     * @return string Description to display in actioncomm->note_private
+     */
+    public function getTriggerDescription(): string
+    {
+        require_once __DIR__ . '/accident.class.php';
+        require_once __DIR__ . '/../../saturne/class/task/saturnetask.class.php';
 
-		global $langs;
+        global $langs;
 
-		$accident = new Accident($this->db);
-		$accident->fetch($object->fk_accident);
-		if ($object->fk_task > 0) {
-			$task = new SaturneTask($this->db);
-			$task->fetch($object->fk_task);
-		}
+        $accident = new Accident($this->db);
+        $accident->fetch($this->fk_accident);
+        if ($this->fk_task > 0) {
+            $task = new SaturneTask($this->db);
+            $task->fetch($this->fk_task);
+        }
 
-		$ret  = parent::getTriggerDescription($object);
-		$ret .= $langs->transnoentities('Accident') . ' : ' . $accident->ref . ' - ' . $accident->label . '<br>';
-		$ret .= ($object->fk_task > 0 ? $langs->transnoentities('Task') . ' : ' . $task->ref . ' - ' . $task->label . '<br>': '');
-		$ret .= (dol_strlen($object->seniority_in_position) > 0 ? $langs->transnoentities('SeniorityInPosition') . ' : ' . $object->seniority_in_position . '<br>' : '');
-		$ret .= (dol_strlen($object->victim_skills) > 0 ? $langs->transnoentities('VictimSkills') . ' : ' . $object->victim_skills . '<br>' : '');
-		$ret .= (dol_strlen($object->collective_equipment) > 0 ? $langs->transnoentities('CollectiveEquipment') . ' : ' . $object->collective_equipment . '<br>' : '');
-		$ret .= (dol_strlen($object->individual_equipment) > 0 ? $langs->transnoentities('IndividualEquipment') . ' : ' . $object->individual_equipment . '<br>' : '');
-		$ret .= (dol_strlen($object->circumstances) > 0 ? $langs->transnoentities('Circumstances') . ' : ' . $object->circumstances . '<br>' : '');
-		$ret .= (dol_strlen($object->causality_tree) > 0 ? $langs->transnoentities('CausalityTree') . ' : ' . $object->causality_tree . '<br>' : '');
+        $ret  = parent::getTriggerDescription();
+        $ret .= $langs->transnoentities('Accident') . ' : ' . $accident->ref . ' - ' . $accident->label . '<br>';
+        $ret .= ($this->fk_task > 0 ? $langs->transnoentities('Task') . ' : ' . $task->ref . ' - ' . $task->label . '<br>': '');
+        $ret .= (dol_strlen($this->seniority_in_position) > 0 ? $langs->transnoentities('SeniorityInPosition') . ' : ' . $this->seniority_in_position . '<br>' : '');
+        $ret .= (dol_strlen($this->victim_skills) > 0 ? $langs->transnoentities('VictimSkills') . ' : ' . $this->victim_skills . '<br>' : '');
+        $ret .= (dol_strlen($this->collective_equipment) > 0 ? $langs->transnoentities('CollectiveEquipment') . ' : ' . $this->collective_equipment . '<br>' : '');
+        $ret .= (dol_strlen($this->individual_equipment) > 0 ? $langs->transnoentities('IndividualEquipment') . ' : ' . $this->individual_equipment . '<br>' : '');
+        $ret .= (dol_strlen($this->circumstances) > 0 ? $langs->transnoentities('Circumstances') . ' : ' . $this->circumstances . '<br>' : '');
+        $ret .= (dol_strlen($this->causality_tree) > 0 ? $langs->transnoentities('CausalityTree') . ' : ' . $this->causality_tree . '<br>' : '');
 
-		return $ret;
-	}
+        return $ret;
+    }
 
 	/**
 	 * Clone an object into another one.

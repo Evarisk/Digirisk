@@ -963,10 +963,9 @@ class Accident extends SaturneObject
     /**
      * Write information of trigger description
      *
-     * @param  Object $object Object calling the trigger
-     * @return string         Description to display in actioncomm->note_private
+     * @return string Description to display in actioncomm->note_private
      */
-    public function getTriggerDescription(SaturneObject $object): string
+    public function getTriggerDescription(): string
     {
         global $conf, $langs;
 
@@ -975,39 +974,39 @@ class Accident extends SaturneObject
         $userEmployer = new User($this->db);
         $userVictim   = $this->getUserVictim();
 
-        $userEmployer->fetch($object->fk_user_employer);
+        $userEmployer->fetch($this->fk_user_employer);
 
         //1 : Accident in DU / GP, 2 : Accident in society, 3 : Accident in another location
-        switch ($object->external_accident) {
+        switch ($this->external_accident) {
             case 1:
-                if (!empty($object->fk_standard)) {
+                if (!empty($this->fk_standard)) {
                     require_once __DIR__ . '/digiriskstandard.class.php';
                     $digiriskStandard = new DigiriskStandard($this->db);
-                    $digiriskStandard->fetch($object->fk_standard);
+                    $digiriskStandard->fetch($this->fk_standard);
                     $accidentLocation = $digiriskStandard->ref . " - " . $conf->global->MAIN_INFO_SOCIETE_NOM;
-                } else if (!empty($object->fk_element)) {
+                } else if (!empty($this->fk_element)) {
                     require_once __DIR__ . '/digiriskelement.class.php';
                     $digiriskElement  = new DigiriskElement($this->db);
-                    $digiriskElement->fetch($object->fk_element);
+                    $digiriskElement->fetch($this->fk_element);
                     $accidentLocation = $digiriskElement->ref . " - " . $digiriskElement->label;
                 }
                 break;
             case 2:
                 require_once DOL_DOCUMENT_ROOT . '/societe/class/societe.class.php';
                 $society          = new Societe($this->db);
-                $society->fetch($object->fk_soc);
+                $society->fetch($this->fk_soc);
                 $accidentLocation = $society->ref . " - " . $society->label;
             case 3:
-                $accidentLocation = (dol_strlen($object->accident_location) > 0 ? $object->accident_location : $langs->trans('NoData'));
+                $accidentLocation = (dol_strlen($this->accident_location) > 0 ? $this->accident_location : $langs->trans('NoData'));
                 break;
         }
 
-        $ret  = parent::getTriggerDescription($object);
+        $ret  = parent::getTriggerDescription();
         $ret .= $userVictim->id > 0 ? $langs->trans('UserVictim') . ' : ' . $userVictim->firstname . $userVictim->lastname . '<br>' : '';
         $ret .= $langs->trans('UserEmployer') . ' : ' . $userEmployer->firstname . $userEmployer->lastname . '<br>';
         $ret .= $langs->trans('AccidentLocation') . ' : ' . $accidentLocation  . '<br>';
-        $ret .= $langs->trans('AccidentType') . ' : ' . ($object->accident_type ? $langs->trans('CommutingAccident') : $langs->trans('WorkAccidentStatement')) . '<br>';
-        $ret .= (dol_strlen($object->accident_date) > 0 ? $langs->trans('AccidentDate') . ' : ' . dol_print_date($object->accident_date, 'dayhoursec') . '<br>' : '');
+        $ret .= $langs->trans('AccidentType') . ' : ' . ($this->accident_type ? $langs->trans('CommutingAccident') : $langs->trans('WorkAccidentStatement')) . '<br>';
+        $ret .= (dol_strlen($this->accident_date) > 0 ? $langs->trans('AccidentDate') . ' : ' . dol_print_date($this->accident_date, 'dayhoursec') . '<br>' : '');
 
         return $ret;
     }
@@ -1121,21 +1120,20 @@ class AccidentWorkStop extends SaturneObject
         return $this->fetchAll('', '', 0, 0, $filter);
     }
 
-    /*
+    /**
      * Write information of trigger description
      *
-     * @param  Object $object Object calling the trigger
-     * @return string         Description to display in actioncomm->note_private
+     * @return string Description to display in actioncomm->note_private
      */
-    public function getTriggerDescription(SaturneObject $object): string
+    public function getTriggerDescription(): string
     {
         global $langs;
 
-        $ret  = parent::getTriggerDescription($object);
-        $ret .= $langs->transnoentities('WorkStopDays') . ' : ' . $object->workstop_days . '<br>';
-        $ret .= $langs->transnoentities('WorkStopDocument') . ' : ' . (!empty($object->declaration_link) ? $object->declaration_link : 'N/A') . '<br>';
-        $ret .= (dol_strlen($object->date_start_workstop) > 0 ? $langs->transnoentities('DateStartWorkStop') . ' : ' . dol_print_date($object->date_start_workstop, 'dayhoursec') . '<br>' : '');
-        $ret .= (dol_strlen($object->date_end_workstop) > 0 ? $langs->transnoentities('DateEndWorkStop') . ' : ' . dol_print_date($object->date_end_workstop, 'dayhoursec') . '<br>' : '');
+        $ret  = parent::getTriggerDescription();
+        $ret .= $langs->transnoentities('WorkStopDays') . ' : ' . $this->workstop_days . '<br>';
+        $ret .= $langs->transnoentities('WorkStopDocument') . ' : ' . (!empty($this->declaration_link) ? $this->declaration_link : 'N/A') . '<br>';
+        $ret .= (dol_strlen($this->date_start_workstop) > 0 ? $langs->transnoentities('DateStartWorkStop') . ' : ' . dol_print_date($this->date_start_workstop, 'dayhoursec') . '<br>' : '');
+        $ret .= (dol_strlen($this->date_end_workstop) > 0 ? $langs->transnoentities('DateEndWorkStop') . ' : ' . dol_print_date($this->date_end_workstop, 'dayhoursec') . '<br>' : '');
 
         return $ret;
     }
@@ -1395,16 +1393,15 @@ class AccidentLesion extends SaturneObject
     /**
      * Write information of trigger description
      *
-     * @param  Object $object Object calling the trigger
-     * @return string         Description to display in actioncomm->note_private
+     * @return string Description to display in actioncomm->note_private
      */
-    public function getTriggerDescription(SaturneObject $object): string
+    public function getTriggerDescription(): string
     {
         global $langs;
 
-        $ret  = parent::getTriggerDescription($object);
-        $ret .= $langs->transnoentities('LesionLocalization') . ' : ' . $object->lesion_localization . '<br>';
-        $ret .= $langs->transnoentities('LesionNature') . ' : ' . $object->lesion_nature . '<br>';
+        $ret  = parent::getTriggerDescription();
+        $ret .= $langs->transnoentities('LesionLocalization') . ' : ' . $this->lesion_localization . '<br>';
+        $ret .= $langs->transnoentities('LesionNature') . ' : ' . $this->lesion_nature . '<br>';
 
         return $ret;
     }

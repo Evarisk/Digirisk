@@ -326,10 +326,9 @@ class FirePermit extends SaturneObject
     /**
      * Write information of trigger description
      *
-     * @param  Object $object Object calling the trigger
-     * @return string         Description to display in actioncomm->note_private
+     * @return string Description to display in actioncomm->note_private
      */
-    public function getTriggerDescription(SaturneObject $object): string
+    public function getTriggerDescription(): string
     {
         global $langs;
 
@@ -338,16 +337,16 @@ class FirePermit extends SaturneObject
         require_once __DIR__ . '/../../saturne/class/saturnesignature.class.php';
 
         $digiriskResources = new DigiriskResources($this->db);
-        $saturneSignature  = new SaturneSignature($this->db, $object->module, $object->element);
+        $saturneSignature  = new SaturneSignature($this->db, $this->module, $this->element);
         $preventionplan    = new PreventionPlan($this->db);
-        $societies         = $digiriskResources->fetchResourcesFromObject('', $object);
-        $signatories       = $saturneSignature->fetchSignatories($object->id, $object->element);
-        $preventionplan->fetch($object->fk_preventionplan);
+        $societies         = $digiriskResources->fetchResourcesFromObject('', $this);
+        $signatories       = $saturneSignature->fetchSignatories($this->id, $this->element);
+        $preventionplan->fetch($this->fk_preventionplan);
 
-        $ret  = parent::getTriggerDescription($object);
+        $ret  = parent::getTriggerDescription();
 
-        $ret .= (dol_strlen($object->date_start) > 0 ? $langs->transnoentities('StartDate') . ' : ' . dol_print_date($object->date_start, 'dayhoursec') . '<br>' : '');
-        $ret .= (dol_strlen($object->date_end) > 0 ? $langs->transnoentities('EndDate') . ' : ' . dol_print_date($object->date_end, 'dayhoursec') . '<br>' : '');
+        $ret .= (dol_strlen($this->date_start) > 0 ? $langs->transnoentities('StartDate') . ' : ' . dol_print_date($this->date_start, 'dayhoursec') . '<br>' : '');
+        $ret .= (dol_strlen($this->date_end) > 0 ? $langs->transnoentities('EndDate') . ' : ' . dol_print_date($this->date_end, 'dayhoursec') . '<br>' : '');
         if (is_array($signatories) && !empty($signatories)) {
             foreach($signatories as $signatory) {
                 $ret .= $langs->transnoentities($signatory->role) . ' : ' . $signatory->firstname . ' ' . $signatory->lastname . '<br>';
@@ -443,25 +442,24 @@ class FirePermitLine extends SaturneObject
     /**
      * Write information of trigger description
      *
-     * @param  Object $object Object calling the trigger
-     * @return string         Description to display in actioncomm->note_private
+     * @return string Description to display in actioncomm->note_private
      */
-    public function getTriggerDescription(SaturneObject $object): string
+    public function getTriggerDescription(): string
     {
         global $langs;
 
         require_once __DIR__ . '/digiriskelement.class.php';
         require_once __DIR__ . '/riskanalysis/risk.class.php';
 
-        $ret = parent::getTriggerDescription($object);
+        $ret = parent::getTriggerDescription();
 
         $risk            = new Risk($this->db);
         $digiriskelement = new DigiriskElement($this->db);
-        $digiriskelement->fetch($object->fk_element);
+        $digiriskelement->fetch($this->fk_element);
 
         $ret .= $langs->trans('ParentElement') . ' : ' . $digiriskelement->ref . " - " . $digiriskelement->label . '<br>';
-        $ret .= $langs->trans('INRSRisk') . ' : ' .  $risk->getFirePermitDangerCategoryName($object) . '<br>';
-        $ret .= $langs->trans('UsedEquipment') . ' : ' . (!empty($object->used_equipment) ? $object->used_equipment : 'N/A') . '<br>';
+        $ret .= $langs->trans('INRSRisk') . ' : ' .  $risk->getFirePermitDangerCategoryName($this) . '<br>';
+        $ret .= $langs->trans('UsedEquipment') . ' : ' . (!empty($this->used_equipment) ? $this->used_equipment : 'N/A') . '<br>';
 
         return $ret;
     }
