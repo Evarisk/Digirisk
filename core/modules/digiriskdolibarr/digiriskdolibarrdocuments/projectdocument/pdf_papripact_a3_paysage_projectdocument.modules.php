@@ -39,7 +39,7 @@ require_once __DIR__ . '/../../../../../class/riskanalysis/riskassessment.class.
 class pdf_papripact_a3_paysage_projectdocument
 {
 	/**
-	 * @var DoliDb Database handler
+	 * @var DoliDB Database handler
 	 */
 	public $db;
 

@@ -1100,7 +1100,7 @@ class AccidentWorkStop extends SaturneObject
     /**
      * Constructor
      *
-     * @param DoliDb $db Database handler
+     * @param DoliDB $db Database handler
      */
     public function __construct(DoliDB $db)
     {
@@ -1278,7 +1278,7 @@ class AccidentMetaData extends SaturneObject
 	/**
 	 * Constructor
 	 *
-	 * @param DoliDb $db Database handler
+	 * @param DoliDB $db Database handler
 	 */
 	public function __construct(DoliDB $db)
 	{
@@ -1385,7 +1385,7 @@ class AccidentLesion extends SaturneObject
 	/**
 	 * Constructor
 	 *
-	 * @param DoliDb $db Database handler
+	 * @param DoliDB $db Database handler
 	 */
 	public function __construct(DoliDB $db)
 	{

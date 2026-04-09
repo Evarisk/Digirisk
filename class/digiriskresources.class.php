@@ -96,7 +96,7 @@ class DigiriskResources extends SaturneObject
 	/**
 	 * Constructor
 	 *
-	 * @param DoliDb $db Database handler
+	 * @param DoliDB $db Database handler
 	 */
 	public function __construct(DoliDB $db)
 	{
@@ -106,7 +106,7 @@ class DigiriskResources extends SaturneObject
 	/**
 	 * Set resources in database
 	 *
-	 * @param DoliDb $db
+	 * @param DoliDB $db
 	 * @param $user_creat
 	 * @param string $ref name of resource
 	 * @param string $element_type type of resource
