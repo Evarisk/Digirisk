@@ -150,8 +150,8 @@ class InterfaceDigiriskdolibarrTriggers extends DolibarrTriggers
             if (strstr($action, '_CREATE')) {
                 $object->fetch($object->id);
             }
-		    if (getDolGlobalInt('DIGIRISKDOLIBARR_ADVANCED_TRIGGER') && !empty($object->fields)) {
-                $actioncomm->note_private = $object->getTriggerDescription($object);
+		    if (getDolGlobalInt('DIGIRISKDOLIBARR_ADVANCED_TRIGGER') == 1 && !empty($object->fields)) {
+                $actioncomm->note_private = $object->getTriggerDescription();
             }
 		}
 
