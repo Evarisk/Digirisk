@@ -148,7 +148,7 @@ function digirisk_header($title = '', $helpUrl = '', $arrayofjs = [], $arrayofcs
 								id = !id ? params.get('fromid') : id
 
 								if ((document.URL.match(/digiriskelement/) || document.URL.match(/accident/)) && !document.URL.match(/type=standard/)) {
-									var elementBranch = <?php echo json_encode($object->getBranch(GETPOST('id'))); ?>;
+									var elementBranch = <?php echo json_encode($idToFetch > 0 ? $object->getBranch($idToFetch) : []); ?>;
 									elementBranch.forEach((id) =>  {
 										jQuery( '#menu'+id).removeClass( 'fa-chevron-right').addClass( 'fa-chevron-down' );
 										jQuery( '#unit'+id ).addClass( 'toggled' );
