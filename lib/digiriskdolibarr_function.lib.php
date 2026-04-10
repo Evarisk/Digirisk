@@ -57,7 +57,7 @@ function digirisk_header($title = '', $helpUrl = '', $arrayofjs = [], $arrayofcs
 	if ($conf->global->DIGIRISKDOLIBARR_SHOW_HIDDEN_DIGIRISKELEMENT) {
 		$objects = $object->fetchAll('',  'ranks');
 	} else {
-		$objects = $object->fetchAll('',  'ranks',  0,  0, array('customsql' => 'status > 0 AND entity IN ('. $conf->entity .')'));
+		$objects = $object->fetchAll('',  'ranks',  0,  0, array('customsql' => 't.status > 0 AND t.entity IN ('. $conf->entity .')'));
 	}
 
 	$digiriskElementTree = array();
