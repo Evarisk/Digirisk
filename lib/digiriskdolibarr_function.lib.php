@@ -129,7 +129,12 @@ function digirisk_header($title = '', $helpUrl = '', $arrayofjs = [], $arrayofcs
 									jQuery( '#unit'+id ).addClass( 'toggled' );
 								});
 
-								<?php $object->fetch(GETPOST('id') ?: GETPOST('fromid')); ?>
+								<?php
+								$idToFetch = GETPOSTINT('id') ?: GETPOSTINT('fromid');
+								if ($idToFetch > 0) {
+									$object->fetch($idToFetch);
+								}
+								?>
 								var idParent = <?php echo json_encode($object->fk_parent);?> ;
 
 								jQuery( '#menu'+idParent).removeClass( 'fa-chevron-right').addClass( 'fa-chevron-down' );

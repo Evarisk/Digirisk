@@ -311,7 +311,7 @@ class ActionsDigiriskdolibarr
 				require_once __DIR__ . '/../lib/digiriskdolibarr_function.lib.php';
 
 				$object = new Ticket($db);
-				$object->fetch(GETPOST('id'),'',GETPOST('track_id'));
+				$object->fetch(GETPOSTINT('id'),'',GETPOST('track_id'));
 				require_once __DIR__ . '/digiriskelement.class.php';
 				$digiriskelement = new DigiriskElement($db);
 				$selectDigiriskElement = $digiriskelement->selectDigiriskElementList($object->array_options['options_digiriskdolibarr_ticket_service'], 'options_digiriskdolibarr_ticket_service', ['customsql' => ' t.status > 0'], 1, 0, array(), 0, 0, 'minwidth100 maxwidth300', 0, false, 1);
@@ -416,7 +416,7 @@ class ActionsDigiriskdolibarr
 			if (GETPOST('action') == 'add_message') {
 
 				$object = new Ticket($this->db);
-				$result = $object->fetch(GETPOST('id'),GETPOST('ref','alpha'),GETPOST('track_id','alpha'));
+				$result = $object->fetch(GETPOSTINT('id'),GETPOST('ref','alpha'),GETPOST('track_id','alpha'));
 
 				if ($result > 0) {
 					$object->fetch_optionals();
