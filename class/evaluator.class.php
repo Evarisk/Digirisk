@@ -52,11 +52,6 @@ class Evaluator extends SaturneObject
     public $ismultientitymanaged = 1;
 
     /**
-     * @var int Does object support extrafields ? 0 = No, 1 = Yes.
-     */
-    public $isextrafieldmanaged = 1;
-
-    /**
      * @var string Name of icon for evaluator. Must be a 'fa-xxx' fontawesome code (or 'fa-xxx_fa_color_size') or 'evaluator@digiriskdolibarr' if picto is file 'img/object_evaluator.png'.
      */
     public string $picto = 'fontawesome_fa-user-check_fas_#d35968';

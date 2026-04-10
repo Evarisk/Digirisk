@@ -57,11 +57,6 @@ class Risk extends SaturneObject
 	 */
 	public $ismultientitymanaged = 1;
 
-	/**
-	 * @var int Does object support extrafields ? 0 = No, 1 = Yes
-	 */
-	public $isextrafieldmanaged = 1;
-
     public const STATUS_DELETED   = -1;
     public const STATUS_DRAFT     = 0;
     public const STATUS_VALIDATED = 1;
