@@ -50,7 +50,7 @@ global $conf, $db, $hookmanager, $langs, $user;
 saturne_load_langs(['other']);
 
 // Get parameters
-$id                  = GETPOST('id', 'int');
+$id                  = GETPOSTINT('id');
 $ref                 = GETPOST('ref', 'alpha');
 $action              = GETPOST('action', 'aZ09');
 $subaction           = GETPOST('subaction', 'aZ09');
