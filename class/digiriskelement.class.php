@@ -66,6 +66,11 @@ class DigiriskElement extends SaturneObject
      */
     public $isextrafieldmanaged = 1;
 
+    /**
+     * @var int Does object support category module ? 0 = No, 1 = Yes.
+     */
+    public int $isCategoryManaged = 0;
+
     public const STATUS_TRASHED   = -2;
     public const STATUS_DELETED   = -1;
     public const STATUS_VALIDATED = 1;
