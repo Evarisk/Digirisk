@@ -41,7 +41,7 @@ global $conf, $db, $hookmanager, $langs, $user;
 // Load translation files required by the page
 saturne_load_langs(['other']);
 // Get parameters
-$id                  = GETPOST('id', 'int');
+$id                  = GETPOSTINT('id');
 $ref                 = GETPOST('ref', 'alpha');
 $action              = GETPOST('action', 'aZ09');
 $confirm             = GETPOST('confirm', 'alpha');
