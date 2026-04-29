@@ -225,9 +225,13 @@ class pdf_papripact_a3_paysage_projectdocument
      * @return int                               1 if OK, <=0 if KO
      * @throws Exception
      */
-    public function write_file(SaturneDocuments $objectDocument, Translate $outputLangs, string $srcTemplatePath, int $hideDetails = 0, int $hideDesc = 0, int $hideRef = 0, array $moreParam): int
+    public function write_file(SaturneDocuments $objectDocument, Translate $outputLangs, string $srcTemplatePath, int $hideDetails = 0, int $hideDesc = 0, int $hideRef = 0, array $moreParam = []): int
     {
         global $action, $conf, $hookmanager, $langs, $moduleNameLowerCase, $user;
+
+        if (empty($moreParam)) {
+            $moreParam = $objectDocument->context['moreparams'] ?? [];
+        }
 
         $object = $moreParam['object'];
 
