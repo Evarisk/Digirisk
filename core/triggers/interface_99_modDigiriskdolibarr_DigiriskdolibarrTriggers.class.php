@@ -72,7 +72,7 @@ class InterfaceDigiriskdolibarrTriggers extends DolibarrTriggers
 		$this->name        = preg_replace('/^Interface/i', '', get_class($this));
 		$this->family      = "demo";
 		$this->description = "Digiriskdolibarr triggers.";
-		$this->version     = '22.1.0';
+		$this->version     = '23.0.0';
 		$this->picto       = 'digiriskdolibarr@digiriskdolibarr';
 	}
 
@@ -150,8 +150,8 @@ class InterfaceDigiriskdolibarrTriggers extends DolibarrTriggers
             if (strstr($action, '_CREATE')) {
                 $object->fetch($object->id);
             }
-		    if (getDolGlobalInt('DIGIRISKDOLIBARR_ADVANCED_TRIGGER') && !empty($object->fields)) {
-                $actioncomm->note_private = $object->getTriggerDescription($object);
+		    if (getDolGlobalInt('DIGIRISKDOLIBARR_ADVANCED_TRIGGER') == 1 && !empty($object->fields)) {
+                $actioncomm->note_private = $object->getTriggerDescription();
             }
 		}
 
@@ -418,7 +418,7 @@ class InterfaceDigiriskdolibarrTriggers extends DolibarrTriggers
 					$message = $langs->trans('Hello') . ',' . '<br><br>';
 					$message .= '<span style="color:#c55a11">' . $langs->trans('ANewTicketHasBeenSubmitted', $conf->global->MAIN_INFO_SOCIETE_NOM) . '.' . '</span><br><br>';
 					$message .= '<strong>' . $langs->trans('Service') . ' : ' . '</strong>';
-					$digiriskelement->fetch($object->array_options['options_digiriskdolibarr_ticket_service']);
+					$digiriskelement->fetch((int)$object->array_options['options_digiriskdolibarr_ticket_service']);
 					$message .= $digiriskelement->ref . ' - ' . $digiriskelement->label . '<br><br>';
 					$message .= '<strong>' . $langs->trans('Author') . ' : ' . '</strong>';
 					$message .= strtoupper($object->array_options['options_digiriskdolibarr_ticket_lastname']) . ' ' . $object->array_options['options_digiriskdolibarr_ticket_firstname'] . '<br><br>';
@@ -671,8 +671,8 @@ class InterfaceDigiriskdolibarrTriggers extends DolibarrTriggers
 					$langs->load("projects");
 
 					$risk = new Risk($this->db);
-					$digiriskelement->fetch($object->fk_element);
-					$risk->fetch($object->array_options['options_fk_risk']);
+					$digiriskelement->fetch((int)$object->fk_element);
+					$risk->fetch((int)$object->array_options['options_fk_risk']);
 
 					if ($conf->global->DIGIRISKDOLIBARR_SHOW_TASK_CALCULATED_PROGRESS) {
 						$timeSpent = $object->getSummaryOfTimeSpent();
@@ -703,8 +703,8 @@ class InterfaceDigiriskdolibarrTriggers extends DolibarrTriggers
 					$langs->load("projects");
 
 					$risk = new Risk($this->db);
-					$digiriskelement->fetch($object->fk_element);
-					$risk->fetch($object->array_options['options_fk_risk']);
+					$digiriskelement->fetch((int)$object->fk_element);
+					$risk->fetch((int)$object->array_options['options_fk_risk']);
 
 					if ($conf->global->DIGIRISKDOLIBARR_SHOW_TASK_CALCULATED_PROGRESS) {
 						$timeSpent = $object->getSummaryOfTimeSpent();
@@ -734,8 +734,8 @@ class InterfaceDigiriskdolibarrTriggers extends DolibarrTriggers
 					$langs->load("projects");
 
 					$risk = new Risk($this->db);
-					$digiriskelement->fetch($object->fk_element);
-					$risk->fetch($object->array_options['options_fk_risk']);
+					$digiriskelement->fetch((int)$object->fk_element);
+					$risk->fetch((int)$object->array_options['options_fk_risk']);
 
 					if ($conf->global->DIGIRISKDOLIBARR_SHOW_TASK_CALCULATED_PROGRESS) {
 						$timeSpent = $object->getSummaryOfTimeSpent();
@@ -762,7 +762,7 @@ class InterfaceDigiriskdolibarrTriggers extends DolibarrTriggers
 			case 'RISKASSESSMENT_CREATE' :
 				require_once __DIR__ . '/../../class/riskanalysis/risk.class.php';
 				$risk = new Risk($this->db);
-				$risk->fetch($object->fk_risk);
+				$risk->fetch((int)$object->fk_risk);
 
 				$actioncomm->elementtype = 'digiriskelement@digiriskdolibarr';
 
@@ -775,7 +775,7 @@ class InterfaceDigiriskdolibarrTriggers extends DolibarrTriggers
 			case 'RISKASSESSMENT_MODIFY' :
 				require_once __DIR__ . '/../../class/riskanalysis/risk.class.php';
 				$risk = new Risk($this->db);
-				$risk->fetch($object->fk_risk);
+				$risk->fetch((int)$object->fk_risk);
 
 				$actioncomm->elementtype = 'digiriskelement@digiriskdolibarr';
 
@@ -788,7 +788,7 @@ class InterfaceDigiriskdolibarrTriggers extends DolibarrTriggers
 			case 'RISKASSESSMENT_DELETE' :
 				require_once __DIR__ . '/../../class/riskanalysis/risk.class.php';
 				$risk = new Risk($this->db);
-				$risk->fetch($object->fk_risk);
+				$risk->fetch((int)$object->fk_risk);
 
 				$actioncomm->elementtype = 'digiriskelement@digiriskdolibarr';
 

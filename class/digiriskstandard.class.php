@@ -51,11 +51,6 @@ class DigiriskStandard extends SaturneObject
     public $ismultientitymanaged = 1;
 
     /**
-     * @var int Does object support extrafields ? 0 = No, 1 = Yes.
-     */
-    public $isextrafieldmanaged = 1;
-
-    /**
      * @var string Name of icon for digiriskstandard. Must be a 'fa-xxx' fontawesome code (or 'fa-xxx_fa_color_size') or 'digiriskstandard@digiriskdolibarr' if picto is file 'img/object_digiriskstandard.png'
      */
     public string $picto = 'fontawesome_fa-sitemap_fas_#d35968';
@@ -206,7 +201,7 @@ class DigiriskStandard extends SaturneObject
     /**
      * Constructor
      *
-     * @param DoliDb $db Database handler
+     * @param DoliDB $db Database handler
      */
     public function __construct(DoliDB $db)
     {

@@ -35,7 +35,7 @@
     class pdf_ticketdocument extends SaturneDocumentModel
     {
         /**
-         * @var DoliDb Database handler
+         * @var DoliDB Database handler
          */
         public $db;
 

@@ -1,5 +1,6 @@
 <?php
-/* Copyright (C) 2021-2023 EVARISK <technique@evarisk.com>
+
+/* Copyright (C) 2021-2026 EVARISK <technique@evarisk.com>
  *
  * This program is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -16,9 +17,9 @@
  */
 
 /**
- * \file        class/accident.class.php
- * \ingroup     digiriskdolibarr
- * \brief       This file is a class file for Accident
+ * \file    class/accident.class.php
+ * \ingroup digiriskdolibarr
+ * \brief   This file is a class file for Accident
  */
 
 require_once DOL_DOCUMENT_ROOT . '/user/class/user.class.php';
@@ -40,67 +41,32 @@ require_once __DIR__ . '/../core/modules/digiriskdolibarr/digiriskelement/accide
  */
 class Accident extends SaturneObject
 {
-	/**
-	 * @var string Module name.
-	 */
-	public $module = 'digiriskdolibarr';
+    /**
+     * @var string Module name
+     */
+    public $module = 'digiriskdolibarr';
 
-	/**
-	 * @var string Error string
-	 * @see        $errors
-	 */
-	public $error;
+    /**
+     * @var string Element type of object
+     */
+    public $element = 'accident';
 
-	/**
-	 * @var string[] Array of error strings
-	 */
-	public $errors = [];
+    /**
+     * @var string Name of table without prefix where object is stored. This is also the key used for extrafields management
+     */
+    public $table_element = 'digiriskdolibarr_accident';
 
-	/**
-	 * @var array Result array.
-	 */
-	public $result = [];
+    /**
+     * @var string Name of table without prefix where object is stored. This is also the key used for extrafields management
+     */
+    public $table_element_line = 'digiriskdolibarr_accidentdet';
 
-	/**
-	 * @var int The object identifier
-	 */
-	public $id;
-
-	/**
-	 * @var AccidentWorkStop[]     Array of subtable lines
-	 */
-	public $lines = [];
-
-	/**
-	 * @var string ID to identify managed object.
-	 */
-	public $element = 'accident';
-
-	/**
-	 * @var string Name of table without prefix where object is stored. This is also the key used for extrafields management.
-	 */
-	public $table_element = 'digiriskdolibarr_accident';
-
-	/**
-	 * @var string Name of table without prefix where object is stored. This is also the key used for extrafields management.
-	 */
-	public $table_element_line = 'digiriskdolibarr_accidentdet';
-
-	/**
-	 * @var int  Does this object support multicompany module ?
-	 * 0=No test on entity, 1=Test with field entity, 'field@table'=Test with link by field@table
-	 */
-	public $ismultientitymanaged = 1;
-
-	/**
-	 * @var int  Does object support extrafields ? 0=No, 1=Yes
-	 */
-	public $isextrafieldmanaged = 1;
-
-	/**
-	 * @var string String with name of icon for digiriskelement. Must be the part after the 'object_' into object_digiriskelement.png
-	 */
-	public $picto = 'fontawesome_fa-user-injured_fas_#d35968';
+    /**
+     * @var string Name of icon for accident
+     * Must be a 'fa-xxx' fontawesome code (or 'fa-xxx_fa_color_size')
+     * or 'accident@digiriskdolibarr' if picto is file 'img/object_accident.png'
+     */
+    public string $picto = 'fontawesome_fa-user-injured_fas_#d35968';
 
 	const STATUS_DELETED   = -1;
 	const STATUS_DRAFT     = 0;
@@ -160,7 +126,7 @@ class Accident extends SaturneObject
 		'status'            => ['type' => 'smallint',     'label' => 'Status',           'enabled' => '1', 'position' => 70, 'notnull' => 1, 'visible' => 2, 'index' => 0, 'arrayofkeyval' => [0 => 'StatusDraft', 1 => 'Validated', 2 => 'Locked', 3 => 'Archived']],
 		'label'             => ['type' => 'varchar(255)', 'label' => 'Label',            'enabled' => '1', 'position' => 80, 'notnull' => 0, 'visible' => 1, 'searchall' => 1, 'css' => 'minwidth200', 'help' => "Help text", 'showoncombobox' => '1',],
 		'fk_user_employer'  => ['type' => 'integer:User:user/class/user.class.php', 'label' => 'UserEmployer', 'enabled' => '1', 'position' => 82, 'notnull' => -1, 'visible' => 1,],
-		'accident_type'     => ['type' => 'text',         'label' => 'AccidentType',     'enabled' => '1', 'position' => 90, 'notnull' => -1, 'visible' => 1,  'css' => 'minwidth150',],
+		'accident_type'     => ['type' => 'text',         'label' => 'AccidentType',     'enabled' => '1', 'position' => 90, 'notnull' => -1, 'visible' => 1,  'css' => 'minwidth150', 'arrayofkeyval' => [0 => 'WorkAccidentStatement', 1 => 'CommutingAccident']],
 		'fk_element'        => ['type' => 'integer',      'label' => 'AccidentLocation', 'enabled' => '1', 'position' => 91, 'notnull' => -1, 'visible' => 1,  'css' => 'minwidth150',],
 		'fk_standard'       => ['type' => 'integer',      'label' => 'AccidentLocation', 'enabled' => '1', 'position' => 94, 'notnull' => -1, 'visible' => 0,  'css' => 'minwidth150',],
 		'fk_soc'            => ['type' => 'integer',      'label' => 'ExtSociety',       'enabled' => '1', 'position' => 95, 'notnull' => -1, 'visible' => 3,],
@@ -175,13 +141,6 @@ class Accident extends SaturneObject
         'fk_user_modif'     => ['type' => 'integer:User:user/class/user.class.php', 'label' => 'UserModif',  'enabled' => '1', 'position' => 160, 'notnull' => -1, 'visible' => 0,],
 	];
 
-	public $rowid;
-	public $ref;
-	public $ref_ext;
-	public $entity;
-	public $date_creation;
-	public $tms;
-	public $status;
 	public $label;
 	public $accident_date;
 	public $description;
@@ -197,19 +156,19 @@ class Accident extends SaturneObject
 	public $fk_soc;
 	public $fk_user_employer;
 
-	/**
-	 * Constructor
-	 *
-	 * @param DoliDb $db Database handler
-	 */
-	public function __construct(DoliDB $db)
-	{
+    /**
+     * Constructor
+     *
+     * @param DoliDB $db Database handler
+     */
+    public function __construct(DoliDB $db)
+    {
         //Transform fk_user_victim into victim signatory for every accidents (backward compatibility)
-        if (empty(getDolGlobalInt("DIGIRISKDOLIBARR_ACCIDENT_REMOVE_FK_USER_VICTIM"))) {
+        if (!getDolGlobalInt('DIGIRISKDOLIBARR_ACCIDENT_REMOVE_FK_USER_VICTIM')) {
             $this->fields['fk_user_victim'] = ['type' => 'integer:User:user/class/user.class.php', 'label' => 'UserVictim',   'enabled' => '1', 'position' => 81, 'notnull' => -1, 'visible' => 1,];
         }
-		return parent::__construct($db, $this->module, $this->element);
-	}
+        return parent::__construct($db, $this->module, $this->element);
+    }
 
 
 	/**
@@ -390,45 +349,6 @@ class Accident extends SaturneObject
 
         return $array;
     }
-
-	/**
-	 *  Return the status
-	 *
-	 *  @param	int		$status        Id status
-	 *  @param  int		$mode          0=long label, 1=short label, 2=Picto + short label, 3=Picto, 4=Picto + long label, 5=Short label + Picto, 6=Long label + Picto
-	 *  @return string 			       Label of status
-	 */
-	public function LibStatut(int $status, int $mode = 0): string
-	{
-		if (empty($this->labelStatus) || empty($this->labelStatusShort)) {
-			global $langs;
-
-			$this->labelStatus[self::STATUS_DELETED]   = $langs->transnoentitiesnoconv('Deleted');
-            $this->labelStatus[self::STATUS_DRAFT]     = $langs->transnoentitiesnoconv('StatusDraft');
-            $this->labelStatus[self::STATUS_VALIDATED] = $langs->transnoentitiesnoconv('Validated');
-			$this->labelStatus[self::STATUS_LOCKED]    = $langs->transnoentitiesnoconv('Locked');
-            $this->labelStatus[self::STATUS_ARCHIVED]  = $langs->transnoentitiesnoconv('Archived');
-
-			$this->labelStatusShort[self::STATUS_DELETED]   = $langs->transnoentitiesnoconv('Deleted');
-            $this->labelStatusShort[self::STATUS_DRAFT]     = $langs->transnoentitiesnoconv('StatusDraft');
-            $this->labelStatusShort[self::STATUS_VALIDATED] = $langs->transnoentitiesnoconv('Validated');
-			$this->labelStatusShort[self::STATUS_LOCKED]    = $langs->transnoentitiesnoconv('Locked');
-            $this->labelStatusShort[self::STATUS_ARCHIVED]  = $langs->transnoentitiesnoconv('Archived');
-		}
-
-        $statusType = 'status' . $status;
-        if ($status == self::STATUS_VALIDATED) {
-            $statusType = 'status4';
-        }
-        if ($status == self::STATUS_LOCKED || $status == self::STATUS_ARCHIVED) {
-            $statusType = 'status8';
-        }
-        if ($status == self::STATUS_DELETED) {
-            $statusType = 'status9';
-        }
-
-		return dolGetStatus($this->labelStatus[$status], $this->labelStatusShort[$status], '', $statusType, $mode);
-	}
 
     /**
      * Load dashboard info accident
@@ -1043,10 +963,9 @@ class Accident extends SaturneObject
     /**
      * Write information of trigger description
      *
-     * @param  Object $object Object calling the trigger
-     * @return string         Description to display in actioncomm->note_private
+     * @return string Description to display in actioncomm->note_private
      */
-    public function getTriggerDescription(SaturneObject $object): string
+    public function getTriggerDescription(): string
     {
         global $conf, $langs;
 
@@ -1055,39 +974,39 @@ class Accident extends SaturneObject
         $userEmployer = new User($this->db);
         $userVictim   = $this->getUserVictim();
 
-        $userEmployer->fetch($object->fk_user_employer);
+        $userEmployer->fetch($this->fk_user_employer);
 
         //1 : Accident in DU / GP, 2 : Accident in society, 3 : Accident in another location
-        switch ($object->external_accident) {
+        switch ($this->external_accident) {
             case 1:
-                if (!empty($object->fk_standard)) {
+                if (!empty($this->fk_standard)) {
                     require_once __DIR__ . '/digiriskstandard.class.php';
                     $digiriskStandard = new DigiriskStandard($this->db);
-                    $digiriskStandard->fetch($object->fk_standard);
+                    $digiriskStandard->fetch($this->fk_standard);
                     $accidentLocation = $digiriskStandard->ref . " - " . $conf->global->MAIN_INFO_SOCIETE_NOM;
-                } else if (!empty($object->fk_element)) {
+                } else if (!empty($this->fk_element)) {
                     require_once __DIR__ . '/digiriskelement.class.php';
                     $digiriskElement  = new DigiriskElement($this->db);
-                    $digiriskElement->fetch($object->fk_element);
+                    $digiriskElement->fetch($this->fk_element);
                     $accidentLocation = $digiriskElement->ref . " - " . $digiriskElement->label;
                 }
                 break;
             case 2:
                 require_once DOL_DOCUMENT_ROOT . '/societe/class/societe.class.php';
                 $society          = new Societe($this->db);
-                $society->fetch($object->fk_soc);
+                $society->fetch($this->fk_soc);
                 $accidentLocation = $society->ref . " - " . $society->label;
             case 3:
-                $accidentLocation = (dol_strlen($object->accident_location) > 0 ? $object->accident_location : $langs->trans('NoData'));
+                $accidentLocation = (dol_strlen($this->accident_location) > 0 ? $this->accident_location : $langs->trans('NoData'));
                 break;
         }
 
-        $ret  = parent::getTriggerDescription($object);
+        $ret  = parent::getTriggerDescription();
         $ret .= $userVictim->id > 0 ? $langs->trans('UserVictim') . ' : ' . $userVictim->firstname . $userVictim->lastname . '<br>' : '';
         $ret .= $langs->trans('UserEmployer') . ' : ' . $userEmployer->firstname . $userEmployer->lastname . '<br>';
         $ret .= $langs->trans('AccidentLocation') . ' : ' . $accidentLocation  . '<br>';
-        $ret .= $langs->trans('AccidentType') . ' : ' . ($object->accident_type ? $langs->trans('CommutingAccident') : $langs->trans('WorkAccidentStatement')) . '<br>';
-        $ret .= (dol_strlen($object->accident_date) > 0 ? $langs->trans('AccidentDate') . ' : ' . dol_print_date($object->accident_date, 'dayhoursec') . '<br>' : '');
+        $ret .= $langs->trans('AccidentType') . ' : ' . ($this->accident_type ? $langs->trans('CommutingAccident') : $langs->trans('WorkAccidentStatement')) . '<br>';
+        $ret .= (dol_strlen($this->accident_date) > 0 ? $langs->trans('AccidentDate') . ' : ' . dol_print_date($this->accident_date, 'dayhoursec') . '<br>' : '');
 
         return $ret;
     }
@@ -1132,81 +1051,60 @@ class Accident extends SaturneObject
  */
 class AccidentWorkStop extends SaturneObject
 {
-	/**
-	 * @var string Module name.
-	 */
-	public $module = 'digiriskdolibarr';
+    /**
+     * @var string Module name
+     */
+    public $module = 'digiriskdolibarr';
 
-	/**
-	 * @var DoliDB Database handler.
-	 */
-	public $db;
+    /**
+     * @var string Element type of object
+     */
+    public $element = 'accidentworkstop';
 
-	/**
-	 * @var string Error string
-	 */
-	public $error;
+    /**
+     * @var string Name of table without prefix where object is stored
+     */
+    public $table_element = 'digiriskdolibarr_accident_workstop';
 
-	/**
-	 * @var int The object identifier
-	 */
-	public $id;
+    /**
+     * @var string Name of icon for accidentworkstop
+     * Must be a 'fa-xxx' fontawesome code (or 'fa-xxx_fa_color_size')
+     * or 'accidentworkstop@digiriskdolibarr' if picto is file 'img/object_accidentworkstop.png'
+     */
+    public string $picto = 'fontawesome_fa-user-injured_fas_#d35968';
 
-	/**
-	 * @var string ID to identify managed object
-	 */
-	public $element = 'accidentworkstop';
+    /**
+     * @var array  Array with all fields and their property. Do not use it as a static var. It may be modified by constructor.
+     */
+    public $fields = [
+        'rowid'               => ['type' => 'integer',      'label' => 'TechnicalID',       'enabled' => '1', 'position' => 1,  'notnull' => 1,  'visible' => 0, 'noteditable' => '1', 'index' => 1, 'comment' => "Id"],
+        'ref'                 => ['type' => 'varchar(128)', 'label' => 'Ref',               'enabled' => '1', 'position' => 10, 'notnull' => 1,  'visible' => 1, 'noteditable' => '1', 'default' => '(PROV)', 'index' => 1, 'searchall' => 1, 'showoncombobox' => '1', 'comment' => "Reference of object"],
+        'entity'              => ['type' => 'integer',      'label' => 'Entity',            'enabled' => '1', 'position' => 30, 'notnull' => 1,  'visible' => 0,],
+        'date_creation'       => ['type' => 'datetime',     'label' => 'DateCreation',      'enabled' => '1', 'position' => 40, 'notnull' => 1,  'visible' => 0,],
+        'tms'                 => ['type' => 'timestamp',    'label' => 'DateModification',  'enabled' => '1', 'position' => 50, 'notnull' => 0,  'visible' => 0,],
+        'status'              => ['type' => 'smallint',     'label' => 'Status',            'enabled' => '1', 'position' => 60, 'notnull' => 0,  'visible' => 0, 'index' => 0,],
+        'workstop_days'       => ['type' => 'integer',      'label' => 'WorkStopDays',      'enabled' => '1', 'position' => 70, 'notnull' => 0, 'visible' => -1,],
+        'date_start_workstop' => ['type' => 'datetime',     'label' => 'DateStartWorkStop', 'enabled' => '1', 'position' => 80, 'notnull' => 0,  'visible' => 0,],
+        'date_end_workstop'   => ['type' => 'datetime',     'label' => 'DateEndWorkStop',   'enabled' => '1', 'position' => 81, 'notnull' => 0,  'visible' => 0,],
+        'declaration_link'    => ['type' => 'text',         'label' => 'DeclarationLink',   'enabled' => '1', 'position' => 82, 'notnull' => 0,  'visible' => 0,],
+        'fk_accident'         => ['type' => 'integer',      'label' => 'FkAccident',        'enabled' => '1', 'position' => 90, 'notnull' => 1,  'visible' => 0,],
+    ];
 
-	/**
-	 * @var string Name of table without prefix where object is stored
-	 */
-	public $table_element = 'digiriskdolibarr_accident_workstop';
+    public $workstop_days;
+    public $date_start_workstop;
+    public $date_end_workstop;
+    public $declaration_link;
+    public $fk_accident;
 
-	/**
-	 * @var string String with name of icon for digiriskelement. Must be the part after the 'object_' into object_digiriskelement.png
-	 */
-	public $picto = 'fontawesome_fa-user-injured_fas_#d35968';
-
-	const STATUS_DELETED = -1;
-
-	/**
-	 * @var array  Array with all fields and their property. Do not use it as a static var. It may be modified by constructor.
-	 */
-	public $fields = [
-		'rowid'               => ['type' => 'integer',      'label' => 'TechnicalID',       'enabled' => '1', 'position' => 1,  'notnull' => 1,  'visible' => 0, 'noteditable' => '1', 'index' => 1, 'comment' => "Id"],
-		'ref'                 => ['type' => 'varchar(128)', 'label' => 'Ref',               'enabled' => '1', 'position' => 10, 'notnull' => 1,  'visible' => 1, 'noteditable' => '1', 'default' => '(PROV)', 'index' => 1, 'searchall' => 1, 'showoncombobox' => '1', 'comment' => "Reference of object"],
-		'entity'              => ['type' => 'integer',      'label' => 'Entity',            'enabled' => '1', 'position' => 30, 'notnull' => 1,  'visible' => 0,],
-		'date_creation'       => ['type' => 'datetime',     'label' => 'DateCreation',      'enabled' => '1', 'position' => 40, 'notnull' => 1,  'visible' => 0,],
-		'tms'                 => ['type' => 'timestamp',    'label' => 'DateModification',  'enabled' => '1', 'position' => 50, 'notnull' => 0,  'visible' => 0,],
-		'status'              => ['type' => 'smallint',     'label' => 'Status',            'enabled' => '1', 'position' => 60, 'notnull' => 0,  'visible' => 0, 'index' => 0,],
-		'workstop_days'       => ['type' => 'integer',      'label' => 'WorkStopDays',      'enabled' => '1', 'position' => 70, 'notnull' => 0, 'visible' => -1,],
-		'date_start_workstop' => ['type' => 'datetime',     'label' => 'DateStartWorkStop', 'enabled' => '1', 'position' => 80, 'notnull' => 0,  'visible' => 0,],
-		'date_end_workstop'   => ['type' => 'datetime',     'label' => 'DateEndWorkStop',   'enabled' => '1', 'position' => 81, 'notnull' => 0,  'visible' => 0,],
-		'declaration_link'    => ['type' => 'text',         'label' => 'DeclarationLink',   'enabled' => '1', 'position' => 82, 'notnull' => 0,  'visible' => 0,],
-		'fk_accident'         => ['type' => 'integer',      'label' => 'FkAccident',        'enabled' => '1', 'position' => 90, 'notnull' => 1,  'visible' => 0,],
-	];
-
-	public $rowid;
-	public $ref;
-	public $entity;
-	public $date_creation;
-	public $tms;
-	public $status;
-	public $workstop_days;
-	public $date_start_workstop;
-	public $date_end_workstop;
-	public $declaration_link;
-	public $fk_accident;
-
-	/**
-	 * Constructor
-	 *
-	 * @param DoliDb $db Database handler
-	 */
-	public function __construct(DoliDB $db)
-	{
-		return parent::__construct($db, $this->module, $this->element);
-	}
+    /**
+     * Constructor
+     *
+     * @param DoliDB $db Database handler
+     */
+    public function __construct(DoliDB $db)
+    {
+        return parent::__construct($db, $this->module, $this->element);
+    }
 
     /*
      * Load object in memory from the database
@@ -1222,21 +1120,20 @@ class AccidentWorkStop extends SaturneObject
         return $this->fetchAll('', '', 0, 0, $filter);
     }
 
-    /*
+    /**
      * Write information of trigger description
      *
-     * @param  Object $object Object calling the trigger
-     * @return string         Description to display in actioncomm->note_private
+     * @return string Description to display in actioncomm->note_private
      */
-    public function getTriggerDescription(SaturneObject $object): string
+    public function getTriggerDescription(): string
     {
         global $langs;
 
-        $ret  = parent::getTriggerDescription($object);
-        $ret .= $langs->transnoentities('WorkStopDays') . ' : ' . $object->workstop_days . '<br>';
-        $ret .= $langs->transnoentities('WorkStopDocument') . ' : ' . (!empty($object->declaration_link) ? $object->declaration_link : 'N/A') . '<br>';
-        $ret .= (dol_strlen($object->date_start_workstop) > 0 ? $langs->transnoentities('DateStartWorkStop') . ' : ' . dol_print_date($object->date_start_workstop, 'dayhoursec') . '<br>' : '');
-        $ret .= (dol_strlen($object->date_end_workstop) > 0 ? $langs->transnoentities('DateEndWorkStop') . ' : ' . dol_print_date($object->date_end_workstop, 'dayhoursec') . '<br>' : '');
+        $ret  = parent::getTriggerDescription();
+        $ret .= $langs->transnoentities('WorkStopDays') . ' : ' . $this->workstop_days . '<br>';
+        $ret .= $langs->transnoentities('WorkStopDocument') . ' : ' . (!empty($this->declaration_link) ? $this->declaration_link : 'N/A') . '<br>';
+        $ret .= (dol_strlen($this->date_start_workstop) > 0 ? $langs->transnoentities('DateStartWorkStop') . ' : ' . dol_print_date($this->date_start_workstop, 'dayhoursec') . '<br>' : '');
+        $ret .= (dol_strlen($this->date_end_workstop) > 0 ? $langs->transnoentities('DateEndWorkStop') . ' : ' . dol_print_date($this->date_end_workstop, 'dayhoursec') . '<br>' : '');
 
         return $ret;
     }
@@ -1285,14 +1182,9 @@ class AccidentMetaData extends SaturneObject
 	public $ismultientitymanaged = 1;
 
 	/**
-	 * @var int  Does object support extrafields ? 0=No, 1=Yes
-	 */
-	public $isextrafieldmanaged = 1;
-
-	/**
 	 * @var string String with name of icon for digiriskelement. Must be the part after the 'object_' into object_digiriskelement.png
 	 */
-	public $picto = 'fontawesome_fa-user-injured_fas_#d35968';
+	public string $picto = 'fontawesome_fa-user-injured_fas_#d35968';
 
 
 	/**
@@ -1379,39 +1271,37 @@ class AccidentMetaData extends SaturneObject
 	/**
 	 * Constructor
 	 *
-	 * @param DoliDb $db Database handler
+	 * @param DoliDB $db Database handler
 	 */
 	public function __construct(DoliDB $db)
 	{
 		return parent::__construct($db, $this->module, $this->element);
 	}
 
-	/**
-	 * Create object into database
-	 *
-	 * @param  User $user      User that creates
-	 * @param  bool $notrigger false=launch triggers after, true=disable triggers
-	 * @return int             <0 if KO, Id of created object if OK
-	 * @throws Exception
-	 */
-	public function create(User $user, bool $notrigger = false): int
-	{
-		$result = $this->createCommon($user, $notrigger);
+    /**
+     * Create object into database
+     *
+     * @param  User        $user      User that creates
+     * @param  int<0,1>    $noTrigger 0 = launch triggers after, 1 = disable triggers
+     * @return int<-1,max>            Return integer 0 < if KO, ID of created object if OK
+     */
+    public function create(User $user, int $noTrigger = 0): int
+    {
+        $result = $this->createCommon($user, $noTrigger);
 
-		if ($result > 0) {
-			$sql                                                                              = "UPDATE " . MAIN_DB_PREFIX . "$this->table_element";
-			$sql                                                                             .= " SET status = 0";
-			if (isset($this->ismultientitymanaged) && $this->ismultientitymanaged == 1) $sql .= ' WHERE entity IN (' . getEntity($this->table_element) . ')';
-			else $sql                                                                        .= ' WHERE 1 = 1';
-			$sql                                                                             .= " AND fk_accident = " . $this->fk_accident;
-			$sql                                                                             .= " AND rowid != " . $result;
+        if ($result > 0) {
+            $sql                                                                              = "UPDATE " . MAIN_DB_PREFIX . "$this->table_element";
+            $sql                                                                             .= " SET status = 0";
+            if (isset($this->ismultientitymanaged) && $this->ismultientitymanaged == 1) $sql .= ' WHERE entity IN (' . getEntity($this->table_element) . ')';
+            else $sql                                                                        .= ' WHERE 1 = 1';
+            $sql                                                                             .= " AND fk_accident = " . $this->fk_accident;
+            $sql                                                                             .= " AND rowid != " . $result;
 
-			dol_syslog("accidentmetadata.class::create", LOG_DEBUG);
-			$this->db->query($sql);
-		}
+            $this->db->query($sql);
+        }
 
-		return $result;
-	}
+        return $result;
+    }
 }
 
 /**
@@ -1458,7 +1348,7 @@ class AccidentLesion extends SaturneObject
 	/**
 	 * @var string String with name of icon for digiriskelement. Must be the part after the 'object_' into object_digiriskelement.png
 	 */
-	public $picto = 'fontawesome_fa-user-injured_fas_#d35968';
+	public string $picto = 'fontawesome_fa-user-injured_fas_#d35968';
 
     const STATUS_DELETED   = -1;
 
@@ -1488,7 +1378,7 @@ class AccidentLesion extends SaturneObject
 	/**
 	 * Constructor
 	 *
-	 * @param DoliDb $db Database handler
+	 * @param DoliDB $db Database handler
 	 */
 	public function __construct(DoliDB $db)
 	{
@@ -1498,16 +1388,15 @@ class AccidentLesion extends SaturneObject
     /**
      * Write information of trigger description
      *
-     * @param  Object $object Object calling the trigger
-     * @return string         Description to display in actioncomm->note_private
+     * @return string Description to display in actioncomm->note_private
      */
-    public function getTriggerDescription(SaturneObject $object): string
+    public function getTriggerDescription(): string
     {
         global $langs;
 
-        $ret  = parent::getTriggerDescription($object);
-        $ret .= $langs->transnoentities('LesionLocalization') . ' : ' . $object->lesion_localization . '<br>';
-        $ret .= $langs->transnoentities('LesionNature') . ' : ' . $object->lesion_nature . '<br>';
+        $ret  = parent::getTriggerDescription();
+        $ret .= $langs->transnoentities('LesionLocalization') . ' : ' . $this->lesion_localization . '<br>';
+        $ret .= $langs->transnoentities('LesionNature') . ' : ' . $this->lesion_nature . '<br>';
 
         return $ret;
     }

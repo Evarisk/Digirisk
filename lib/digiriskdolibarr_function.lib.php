@@ -57,7 +57,7 @@ function digirisk_header($title = '', $helpUrl = '', $arrayofjs = [], $arrayofcs
 	if ($conf->global->DIGIRISKDOLIBARR_SHOW_HIDDEN_DIGIRISKELEMENT) {
 		$objects = $object->fetchAll('',  'ranks');
 	} else {
-		$objects = $object->fetchAll('',  'ranks',  0,  0, array('customsql' => 'status > 0 AND entity IN ('. $conf->entity .')'));
+		$objects = $object->fetchAll('',  'ranks',  0,  0, array('customsql' => 't.status > 0 AND t.entity IN ('. $conf->entity .')'));
 	}
 
 	$digiriskElementTree = array();
@@ -129,7 +129,12 @@ function digirisk_header($title = '', $helpUrl = '', $arrayofjs = [], $arrayofcs
 									jQuery( '#unit'+id ).addClass( 'toggled' );
 								});
 
-								<?php $object->fetch(GETPOST('id') ?: GETPOST('fromid')); ?>
+								<?php
+								$idToFetch = GETPOSTINT('id') ?: GETPOSTINT('fromid');
+								if ($idToFetch > 0) {
+									$object->fetch($idToFetch);
+								}
+								?>
 								var idParent = <?php echo json_encode($object->fk_parent);?> ;
 
 								jQuery( '#menu'+idParent).removeClass( 'fa-chevron-right').addClass( 'fa-chevron-down' );
@@ -143,7 +148,7 @@ function digirisk_header($title = '', $helpUrl = '', $arrayofjs = [], $arrayofcs
 								id = !id ? params.get('fromid') : id
 
 								if ((document.URL.match(/digiriskelement/) || document.URL.match(/accident/)) && !document.URL.match(/type=standard/)) {
-									var elementBranch = <?php echo json_encode($object->getBranch(GETPOST('id'))); ?>;
+									var elementBranch = <?php echo json_encode($idToFetch > 0 ? $object->getBranch($idToFetch) : []); ?>;
 									elementBranch.forEach((id) =>  {
 										jQuery( '#menu'+id).removeClass( 'fa-chevron-right').addClass( 'fa-chevron-down' );
 										jQuery( '#unit'+id ).addClass( 'toggled' );

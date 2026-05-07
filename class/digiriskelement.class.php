@@ -66,6 +66,11 @@ class DigiriskElement extends SaturneObject
      */
     public $isextrafieldmanaged = 1;
 
+    /**
+     * @var int Does object support category module ? 0 = No, 1 = Yes.
+     */
+    public int $isCategoryManaged = 0;
+
     public const STATUS_TRASHED   = -2;
     public const STATUS_DELETED   = -1;
     public const STATUS_VALIDATED = 1;
@@ -117,7 +122,7 @@ class DigiriskElement extends SaturneObject
     /**
      * Constructor.
      *
-     * @param DoliDb $db Database handler.
+     * @param DoliDB $db Database handler.
      */
     public function __construct(DoliDB $db)
     {
@@ -125,13 +130,13 @@ class DigiriskElement extends SaturneObject
     }
 
     /**
-     * Create object into database.
+     * Create object into database
      *
-     * @param  User $user      User that creates.
-     * @param  bool $notrigger false = launch triggers after, true = disable triggers.
-     * @return int             0 < if KO, ID of created object if OK.
+     * @param  User        $user      User that creates
+     * @param  int<0,1>    $noTrigger 0 = launch triggers after, 1 = disable triggers
+     * @return int<-1,max>            Return integer 0 < if KO, ID of created object if OK
      */
-    public function create(User $user, bool $notrigger = false): int
+    public function create(User $user, int $noTrigger = 0): int
     {
         global $conf;
         if (empty($this->ref)) {
@@ -149,7 +154,7 @@ class DigiriskElement extends SaturneObject
         $this->fk_standard = $conf->global->DIGIRISKDOLIBARR_ACTIVE_STANDARD;
         $this->status      = 1;
 
-        return $this->createCommon($user, $notrigger);
+        return $this->createCommon($user, $noTrigger);
     }
 
     /**
@@ -174,14 +179,14 @@ class DigiriskElement extends SaturneObject
     }
 
     /**
-     * Delete object in database.
+     * Delete object in database
      *
-     * @param  User $user       User that deletes.
-     * @param  bool $notrigger  false = launch triggers after, true = disable triggers.
-     * @param  bool $softDelete Don't delete object.
-     * @return int              0 < if KO, > 0 if OK.
+     * @param  User        $user       User that deletes
+     * @param  int<0,1>    $noTrigger  0 = launch triggers after, 1 = disable triggers
+     * @param  bool        $softDelete Don't delete object
+     * @return int<-1,1>               Return integer 0 < if KO, > 0 if OK
      */
-    public function delete(User $user, bool $notrigger = false, bool $softDelete = true): int
+    public function delete(User $user, int $noTrigger = 0, bool $softDelete = true): int
     {
         global $conf;
 
@@ -194,21 +199,6 @@ class DigiriskElement extends SaturneObject
         }
 
         return $result;
-    }
-
-    /**
-     * Sets object to supplied categories.
-     *
-     * Deletes object from existing categories not supplied.
-     * Adds it to non-existing supplied categories.
-     * Existing categories are left untouched.
-     *
-     * @param  int[]|int $categories Category or categories IDs.
-     * @return float|int
-     */
-    public function setCategories($categories)
-    {
-        return 1;
     }
 
     /**
@@ -493,11 +483,11 @@ class DigiriskElement extends SaturneObject
     }
 
     /**
-     * Return the status.
+     * Return the status
      *
-     * @param  int    $status ID status.
-     * @param  int    $mode   0 = long label, 1 = short label, 2 = Picto + short label, 3 = Picto, 4 = Picto + long label, 5 = Short label + Picto, 6 = Long label + Picto.
-     * @return string         Label of status.
+     * @param  int    $status ID status
+     * @param  int    $mode   0 = long label, 1 = short label, 2 = Picto + short label, 3 = Picto, 4 = Picto + long label, 5 = Short label + Picto, 6 = Long label + Picto
+     * @return string         Label of status
      */
     public function LibStatut(int $status, int $mode = 0): string
     {
@@ -579,10 +569,9 @@ class DigiriskElement extends SaturneObject
     /**
      * Write information of trigger description
      *
-     * @param  Object $object Object calling the trigger
-     * @return string         Description to display in actioncomm->note_private
+     * @return string Description to display in actioncomm->note_private
      */
-    public function getTriggerDescription(SaturneObject $object): string
+    public function getTriggerDescription(): string
     {
         global $conf, $langs;
 
@@ -590,22 +579,22 @@ class DigiriskElement extends SaturneObject
         require_once __DIR__ . '/../../saturne/class/task/saturnetask.class.php';
 
         $digiriskStandard = new DigiriskStandard($this->db);
-        $digiriskStandard->fetch($object->fk_standard);
+        $digiriskStandard->fetch($this->fk_standard);
 
-        $ret = parent::getTriggerDescription($object);
+        $ret = parent::getTriggerDescription();
 
-        if (!empty($object->fk_parent)) {
+        if (!empty($this->fk_parent)) {
             require_once __DIR__ . '/digiriskelement.class.php';
             $digiriskElement = new DigiriskElement($this->db);
-            $digiriskElement->fetch($object->fk_parent);
+            $digiriskElement->fetch($this->fk_parent);
             $ret .= $langs->trans('ParentElement') . ' : ' .  $digiriskElement->ref . ' - ' . $digiriskElement->label . '<br/>';
         }
 
         $ret .= $langs->trans('Standard') . ' : ' . $digiriskStandard->ref . ' - ' . $conf->global->MAIN_INFO_SOCIETE_NOM . '<br/>';
-        $ret .= $langs->trans('Photo') . ' : ' . (!empty($object->photo) ? $object->photo : 'N/A') . '<br>';
-        $ret .= $langs->trans('ElementType') . ' : ' . $langs->trans($object->element_type) . '<br>';
-        ($object->ranks != 0 ? $ret .= $langs->trans('Order') . ' : ' . $object->ranks . '<br>' : '');
-        $ret .= $langs->trans('ShowInSelectOnPublicTicketInterface') . ' : ' . ($object->show_in_selector ? $langs->trans('Yes') : $langs->trans('No')) . '<br>';
+        $ret .= $langs->trans('Photo') . ' : ' . (!empty($this->photo) ? $this->photo : 'N/A') . '<br>';
+        $ret .= $langs->trans('ElementType') . ' : ' . $langs->trans($this->element_type) . '<br>';
+        ($this->ranks != 0 ? $ret .= $langs->trans('Order') . ' : ' . $this->ranks . '<br>' : '');
+        $ret .= $langs->trans('ShowInSelectOnPublicTicketInterface') . ' : ' . ($this->show_in_selector ? $langs->trans('Yes') : $langs->trans('No')) . '<br>';
 
         return $ret;
     }

@@ -252,6 +252,28 @@ class ActionsDigiriskdolibarr
                     <?php
                 }
 
+                // Collect ticket category IDs including their ancestors (getListForItem returns the full hierarchy)
+                $ticketCategoryIds = array_column((array) (new Categorie($db))->getListForItem($object->id, 'ticket'), 'id');
+
+                // Hide extrafields not available for the ticket's categories
+                $extraFieldsTmp = new ExtraFields($db);
+                $extraFieldsTmp->fetch_name_optionals_label($object->table_element);
+                $fieldsToHide = array_keys(array_filter(
+                    $extraFieldsTmp->attributes[$object->table_element]['label'] ?? [],
+                    function ($_, $key) use ($extraFieldsTmp, $object, $ticketCategoryIds) {
+                        $fieldCats = $extraFieldsTmp->attributes[$object->table_element]['param'][$key]['options']['categories'] ?? [];
+                        return !empty($fieldCats) && empty(array_intersect($ticketCategoryIds, $fieldCats));
+                    },
+                    ARRAY_FILTER_USE_BOTH
+                ));
+                if (!empty($fieldsToHide)) { ?>
+                    <script>
+                        <?php foreach ($fieldsToHide as $fieldKey): ?>
+                        jQuery('td[id*="<?= $fieldKey ?>"]').closest('tr').hide();
+                        <?php endforeach; ?>
+                    </script>
+                <?php }
+
 
                 if (!empty($object->id)) {
                     $signatory   = new SaturneSignature($db, 'digiriskdolibarr', $object->element);
@@ -289,7 +311,7 @@ class ActionsDigiriskdolibarr
 				require_once __DIR__ . '/../lib/digiriskdolibarr_function.lib.php';
 
 				$object = new Ticket($db);
-				$object->fetch(GETPOST('id'),'',GETPOST('track_id'));
+				$object->fetch(GETPOSTINT('id'),'',GETPOST('track_id'));
 				require_once __DIR__ . '/digiriskelement.class.php';
 				$digiriskelement = new DigiriskElement($db);
 				$selectDigiriskElement = $digiriskelement->selectDigiriskElementList($object->array_options['options_digiriskdolibarr_ticket_service'], 'options_digiriskdolibarr_ticket_service', ['customsql' => ' t.status > 0'], 1, 0, array(), 0, 0, 'minwidth100 maxwidth300', 0, false, 1);
@@ -394,7 +416,7 @@ class ActionsDigiriskdolibarr
 			if (GETPOST('action') == 'add_message') {
 
 				$object = new Ticket($this->db);
-				$result = $object->fetch(GETPOST('id'),GETPOST('ref','alpha'),GETPOST('track_id','alpha'));
+				$result = $object->fetch(GETPOSTINT('id'),GETPOST('ref','alpha'),GETPOST('track_id','alpha'));
 
 				if ($result > 0) {
 					$object->fetch_optionals();

@@ -44,7 +44,7 @@ class DigiriskDocuments extends SaturneDocuments
 	/**
 	 * Constructor
 	 *
-	 * @param DoliDb $db Database handler
+	 * @param DoliDB $db Database handler
 	 */
 	public function __construct(DoliDB $db, $module, $element)
 	{
@@ -54,14 +54,15 @@ class DigiriskDocuments extends SaturneDocuments
     /**
      * Create object into database
      *
-     * @param  User $user      User that creates
-     * @param  bool $notrigger false = launch triggers after, true = disable triggers
-     * @return int             0 < if KO, ID of created object if OK
+     * @param  User        $user         User that creates
+     * @param  int<0,1>    $noTrigger    0 = launch triggers after, 1 = disable triggers
+     * @param  object|null $parentObject Current object
+     * @return int<-1,max>               Return integer 0 < if KO, ID of created object if OK
      */
-    public function create(User $user, bool $notrigger = false, object $parentObject = null): int
+    public function create(User $user, int $noTrigger = 0, ?object $parentObject = null): int
     {
         $this->DigiriskFillJSON();
-        return parent::create($user, $notrigger, $parentObject);
+        return parent::create($user, $noTrigger, $parentObject);
     }
 
 	/**
@@ -92,73 +93,16 @@ class DigiriskDocuments extends SaturneDocuments
 		}
 	}
 
-	/**
-	 *	Load the info information of the object
-	 *
-	 *	@param  int		$id       ID of object
-	 *	@return	int
-	 */
-	public function info($id)
-	{
-		$fieldlist = $this->getFieldList();
-
-		if (empty($fieldlist)) return 0;
-
-		$sql = 'SELECT '.$fieldlist;
-		$sql .= ' FROM '.MAIN_DB_PREFIX.$this->table_element.' as t';
-		$sql .= ' WHERE t.rowid = '.$id;
-		$result = $this->db->query($sql);
-		if ($result)
-		{
-			if ($this->db->num_rows($result))
-			{
-				$obj = $this->db->fetch_object($result);
-				$this->id = $obj->rowid;
-//				if ($obj->fk_user_author)
-//				{
-//					$cuser = new User($this->db);
-//					$cuser->fetch($obj->fk_user_author);
-//					$this->user_creation = $cuser;
-//				}
-//
-//				if ($obj->fk_user_valid)
-//				{
-//					$vuser = new User($this->db);
-//					$vuser->fetch($obj->fk_user_valid);
-//					$this->user_validation = $vuser;
-//				}
-//
-//				if ($obj->fk_user_cloture)
-//				{
-//					$cluser = new User($this->db);
-//					$cluser->fetch($obj->fk_user_cloture);
-//					$this->user_cloture = $cluser;
-//				}
-
-				$this->date_creation = $this->db->jdate($obj->date_creation);
-				//$this->date_modification = $this->db->jdate($obj->datem);
-				//$this->date_validation   = $this->db->jdate($obj->datev);
-			}
-
-			$this->db->free($result);
-		}
-		else
-		{
-			dol_print_error($this->db);
-		}
-	}
-
     /**
      * Write information of trigger description
      *
-     * @param  Object $object Object calling the trigger
-     * @return string         Description to display in actioncomm->note_private
+     * @return string Description to display in actioncomm->note_private
      */
-    public function getTriggerDescription(SaturneObject $object): string
+    public function getTriggerDescription(): string
     {
         global $langs;
 
-        $className = $object->parent_type;
+        $className = $this->parent_type;
         if (file_exists( __DIR__ . '/digiriskelement/' . $className .'.class.php')) {
             require_once __DIR__ . '/digiriskelement/' . $className .'.class.php';
         } else if (file_exists( __DIR__ . '/digiriskdolibarrdocuments/' . $className .'.class.php')) {
@@ -168,13 +112,13 @@ class DigiriskDocuments extends SaturneDocuments
         }
 
         $parentElement = new $className($this->db);
-        $parentElement->fetch($object->parent_id);
+        $parentElement->fetch($this->parent_id);
 
-        $ret  = parent::getTriggerDescription($object);
+        $ret  = parent::getTriggerDescription();
 
-        $ret .= $langs->transnoentities('ElementType') . ' : ' . $object->parent_type . '<br>';
+        $ret .= $langs->transnoentities('ElementType') . ' : ' . $this->parent_type . '<br>';
         $ret .= $langs->transnoentities('ParentElement') . ' : ' . $parentElement->ref . ' ' . $parentElement->label . '<br>';
-        $ret .= $langs->transnoentities('LastMainDoc') . ' : ' . $object->last_main_doc . '<br>';
+        $ret .= $langs->transnoentities('LastMainDoc') . ' : ' . $this->last_main_doc . '<br>';
 
         return $ret;
     }

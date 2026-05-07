@@ -57,11 +57,6 @@ class Risk extends SaturneObject
 	 */
 	public $ismultientitymanaged = 1;
 
-	/**
-	 * @var int Does object support extrafields ? 0 = No, 1 = Yes
-	 */
-	public $isextrafieldmanaged = 1;
-
     public const STATUS_DELETED   = -1;
     public const STATUS_DRAFT     = 0;
     public const STATUS_VALIDATED = 1;
@@ -71,7 +66,7 @@ class Risk extends SaturneObject
 	/**
 	 * @var string String with name of icon for risk. Must be the part after the 'object_' into object_risk.png
 	 */
-	public $picto = 'fontawesome_fa-exclamation-triangle_fas_#d35968';
+	public string $picto = 'fontawesome_fa-exclamation-triangle_fas_#d35968';
 
 	/**
 	 * @var array  Array with all fields and their property. Do not use it as a static var. It may be modified by constructor
@@ -121,7 +116,7 @@ class Risk extends SaturneObject
 	/**
 	 * Constructor
 	 *
-	 * @param DoliDb $db Database handler
+	 * @param DoliDB $db Database handler
 	 */
 	public function __construct(DoliDB $db)
 	{
@@ -1204,24 +1199,23 @@ class Risk extends SaturneObject
     /**
      * Write information of trigger description
      *
-     * @param  Object $object Object calling the trigger
-     * @return string         Description to display in actioncomm->note_private
+     * @return string Description to display in actioncomm->note_private
      */
-    public function getTriggerDescription(SaturneObject $object): string
+    public function getTriggerDescription(): string
     {
         global $conf, $langs;
 
-        $ret = parent::getTriggerDescription($object);
+        $ret = parent::getTriggerDescription();
 
         $digiriskelement = new DigiriskElement($this->db);
-        $digiriskelement->fetch($object->fk_element);
+        $digiriskelement->fetch($this->fk_element);
 
         $ret .= $langs->trans('ParentElement') . ' : ' . $digiriskelement->ref . " - " . $digiriskelement->label . '<br>';
-        $ret .= $langs->trans('RiskCategory') . ' : ' . $object->getDangerCategoryName($object, $object->type) . '<br>';
+        $ret .= $langs->trans('RiskCategory') . ' : ' . $this->getDangerCategoryName($this, $this->type) . '<br>';
 
-        if (dol_strlen($object->applied_on) > 0) {
-            $digiriskelement->fetch($object->applied_on);
-            $ret .= $langs->trans('RiskSharedWithEntityRefLabel', $object->ref) . ' S' . $conf->entity . ' ' . $digiriskelement->ref . " - " . $digiriskelement->label . '<br>';
+        if (dol_strlen($this->applied_on) > 0) {
+            $digiriskelement->fetch($this->applied_on);
+            $ret .= $langs->trans('RiskSharedWithEntityRefLabel', $this->ref) . ' S' . $conf->entity . ' ' . $digiriskelement->ref . " - " . $digiriskelement->label . '<br>';
         }
 
         return $ret;
