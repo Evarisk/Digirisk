@@ -1,8 +1,29 @@
+# Generated binaries
+/build/*.zip
+/bin/*.zip
+# Doxygen generated documentation
+/build/doxygen/doxygen_warnings.log
+/doc/code/doxygen
+# Composer managed dependencies
+/vendor
+/dev/bin
+# PHPStan cache
+/.github/tmp/phpstan
+# Phan cache
+/.phan/output
+# PHPdocumentor generated files
+/build/phpdoc
+/doc/code/phpdoc
+# Sphinx generated files
+/doc/user/build
+/.settings/
+/.buildpath
+/.project
+# Other
+*.back
+/.editorconfig
+/.gitattributes
 node_modules
+/.idea
 npm-debug.log
-.idea
-vendor
-.editorconfig
-.gitattributes
 digirisk-workflow
-package-lock.json
