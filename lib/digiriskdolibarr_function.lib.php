@@ -324,19 +324,71 @@ function display_recurse_tree($digiriskElementTree)
 * @param 	int   $i
 * @return	void
 */
-function display_recurse_tree_organization($digiriskElementTree, $i = 1)
+function display_recurse_tree_organization($digiriskElementTree, $i = 1, $riskInfos = array())
 {
-	global $langs, $user;
+	global $langs, $user, $conf;
 
 	if ($user->rights->digiriskdolibarr->digiriskelement->read) {
 		if ( ! empty($digiriskElementTree)) {
-			foreach ($digiriskElementTree as $element) { ?>
-				<li class="route ui-sortable-handle level-<?php echo $i ?>" id="<?php  echo $element['object']->id; ?>" value="<?php echo $i ?>">
-					 <h3 class='title <?php echo $element['object']->element_type ?>'>
-						<span class="ref"><?php echo  $element['object']->ref; ?></span><?php echo $element['object']->label; ?>
-					  </h3>
-					 <span class='ui-icon ui-icon-arrow-4-diag'></span>
-					<ul class="space space-<?php echo $i; ?> ui-sortable  <?php echo $element['object']->element_type ?>" id="space<?php echo $element['object']->id?>" value="<?php echo $i ?>"><?php display_recurse_tree_organization($element['children'], $i + 1) ?></ul>
+			foreach ($digiriskElementTree as $element) {
+                $obj = $element['object'];
+                $type = $obj->element_type;
+                $hasChildren = ($type == 'groupment' && count($element['children']) > 0);
+                $fk_element = $obj->id;
+
+                $counts = array(4 => 0, 3 => 0, 2 => 0, 1 => 0);
+                if (!empty($riskInfos['current']['riskByRiskAssessmentCotations'][$fk_element])) {
+                    foreach(array(4, 3, 2, 1) as $scale) {
+                        $counts[$scale] = isset($riskInfos['current']['riskByRiskAssessmentCotations'][$fk_element][$scale]) ? $riskInfos['current']['riskByRiskAssessmentCotations'][$fk_element][$scale] : 0;
+                    }
+                }
+            ?>
+				<li class="route ui-sortable-handle level-<?php echo $i ?>" id="<?php  echo $obj->id; ?>" value="<?php echo $i ?>">
+                    <div class="row-container <?php echo $type ?>">
+                        <div class="drag-handle"><i class="fas fa-grip-vertical"></i></div>
+                        
+                        <div class="chevron">
+                            <?php if ($type == 'groupment' && $hasChildren) { ?>
+                            <i class="fas fa-chevron-down toggle-children"></i>
+                            <?php } elseif ($type == 'groupment') { ?>
+                            <i class="fas fa-chevron-right chevron-empty"></i>
+                            <?php } ?>
+                        </div>
+
+                        <div class="photo-container">
+                            <?php
+                            $mediaOutput = saturne_show_medias_linked('digiriskdolibarr', $conf->digiriskdolibarr->multidir_output[$conf->entity] . '/' . $obj->element_type . '/' . $obj->ref, 'small', 1, 0, 0, 0, 40, 40, 1, 0, 0, $obj->element_type . '/' . $obj->ref, $obj, 'photo', 0, 0, 0, 1, 'cursorpointer');
+                            if (strpos($mediaOutput, 'nophoto.png') !== false) {
+                                print '<svg class="nophoto-placeholder" width="40" height="40" viewBox="0 0 40 40" fill="none" xmlns="http://www.w3.org/2000/svg"><rect width="40" height="40" rx="6" fill="#f0f0f0"/><path d="M20 16a3 3 0 100 6 3 3 0 000-6z" fill="#bbb"/><path d="M14 13h3l1.5-2h3l1.5 2h3a2 2 0 012 2v10a2 2 0 01-2 2H14a2 2 0 01-2-2V15a2 2 0 012-2z" stroke="#bbb" stroke-width="1.5" fill="none"/></svg>';
+                            } else {
+                                print $mediaOutput;
+                            }
+                            ?>
+                        </div>
+
+                        <div class="ref-badge <?php echo $type ?>-badge">
+                            <a href="<?php echo dol_buildpath('/digiriskdolibarr/view/digiriskelement/digiriskelement_card.php', 1) . '?id=' . $obj->id ?>"><?php echo $obj->ref; ?></a>
+                        </div>
+                        
+                        <h3 class="title element-label"><?php echo $obj->label; ?></h3>
+                        
+                        <div class="risk-badges">
+                            <?php foreach(array(4 => 'black', 3 => 'red', 2 => 'orange', 1 => 'grey') as $scale => $colorClass) { ?>
+                            <span class="badge <?php echo $colorClass ?><?php echo (empty($counts[$scale]) ? ' empty' : '') ?>"><?php echo $counts[$scale] ?></span>
+                            <?php } ?>
+                        </div>
+
+                        <div class="actions">
+                            <?php if ($user->rights->digiriskdolibarr->digiriskelement->write && $type == 'groupment') { ?>
+                            <div class="wpeo-button button-square-40 button-secondary wpeo-tooltip-event quick-add-btn" data-direction="bottom" data-color="light" aria-label="<?php echo $langs->trans('NewGroupment'); ?>" data-parent-id="<?php echo $obj->id ?>" data-parent-ref="<?php echo $obj->ref ?>" data-parent-label="<?php echo dol_escape_htmltag($obj->label) ?>" data-type="groupment"><strong>GP</strong><span class="button-add animated fas fa-plus-circle"></span></div>
+                            <div class="wpeo-button button-square-40 wpeo-tooltip-event quick-add-btn" data-direction="bottom" data-color="light" aria-label="<?php echo $langs->trans('NewWorkUnit'); ?>" data-parent-id="<?php echo $obj->id ?>" data-parent-ref="<?php echo $obj->ref ?>" data-parent-label="<?php echo dol_escape_htmltag($obj->label) ?>" data-type="workunit"><strong>UT</strong><span class="button-add animated fas fa-plus-circle"></span></div>
+                            <?php } ?>
+                            <?php if ($user->rights->digiriskdolibarr->digiriskelement->delete) { ?>
+                            <div class="wpeo-button button-square-40 button-red wpeo-tooltip-event delete-element-btn" data-direction="bottom" data-color="light" aria-label="<?php echo $langs->trans('Delete'); ?>" data-id="<?php echo $obj->id ?>" data-ref="<?php echo $obj->ref ?>"><i class="fas fa-trash"></i></div>
+                            <?php } ?>
+                        </div>
+                    </div>
+					<ul class="space space-<?php echo $i; ?> ui-sortable <?php echo $type ?>" id="space<?php echo $obj->id?>" value="<?php echo $i ?>"><?php display_recurse_tree_organization($element['children'], $i + 1, $riskInfos) ?></ul>
 				</li>
 			<?php }
 		}
