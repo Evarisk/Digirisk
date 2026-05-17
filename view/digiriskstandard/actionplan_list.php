@@ -306,6 +306,44 @@ if ($action == 'updateTaskMeta' && !empty(GETPOSTINT('task_id'))) {
     exit;
 }
 
+// AJAX action to update task date (date_start or date_end)
+if ($action == 'updateTaskDate' && !empty(GETPOSTINT('task_id'))) {
+    header('Content-Type: application/json');
+
+    $taskId = GETPOSTINT('task_id');
+    $field  = GETPOST('field', 'alpha');
+    $value  = GETPOST('value', 'alpha');
+
+    $taskToUpdate = new SaturneTask($db);
+    $result = $taskToUpdate->fetch($taskId);
+
+    if ($result > 0 && $taskToUpdate->fk_project == $projectId) {
+        if (in_array($field, ['date_start', 'date_end'])) {
+            $timestamp = !empty($value) ? strtotime($value) : 0;
+            if ($field == 'date_start') {
+                $taskToUpdate->dateo = $timestamp > 0 ? $timestamp : null;
+            } else {
+                $taskToUpdate->datee = $timestamp > 0 ? $timestamp : null;
+            }
+            $res = $taskToUpdate->update($user);
+            if ($res > 0) {
+                $fmtValue = $timestamp > 0 ? dol_print_date($timestamp, 'day') : '-';
+                $rawValue = $timestamp > 0 ? dol_print_date($timestamp, 'dayrfc') : '';
+                print json_encode(['success' => 1, 'formatted' => $fmtValue, 'raw' => $rawValue]);
+            } else {
+                print json_encode(['success' => 0, 'error' => $taskToUpdate->error]);
+            }
+        } else {
+            print json_encode(['success' => 0, 'error' => 'Unknown field']);
+        }
+    } else {
+        http_response_code(404);
+        print json_encode(['success' => 0, 'error' => 'Task not found']);
+    }
+    $db->close();
+    exit;
+}
+
 /*
  * View
  */

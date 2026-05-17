@@ -158,11 +158,17 @@ foreach ($tasksJson as $t) {
 
                         <!-- Dates row -->
                         <div class="kanban-dates-row">
-                            <span class="kanban-date kanban-date-start" title="<?= dol_escape_htmltag($langs->trans('DateStart')) ?>">
-                                <i class="fas fa-calendar-plus"></i> <?= !empty($t['date_start_fmt']) ? $t['date_start_fmt'] : '-' ?>
+                            <span class="kanban-date kanban-date-start kanban-editable-date"
+                                  data-task-id="<?= $t['id'] ?>" data-field="date_start"
+                                  data-raw="<?= $t['date_start'] ?>"
+                                  title="<?= dol_escape_htmltag($langs->trans('DateStart')) ?>">
+                                <i class="fas fa-calendar-plus"></i> <span class="kanban-date-value"><?= !empty($t['date_start_fmt']) ? $t['date_start_fmt'] : '-' ?></span>
                             </span>
-                            <span class="kanban-date kanban-date-end" title="<?= dol_escape_htmltag($langs->trans('DateEnd')) ?>">
-                                <i class="fas fa-calendar-check"></i> <?= !empty($t['date_end_fmt']) ? $t['date_end_fmt'] : '-' ?>
+                            <span class="kanban-date kanban-date-end kanban-editable-date"
+                                  data-task-id="<?= $t['id'] ?>" data-field="date_end"
+                                  data-raw="<?= $t['date_end'] ?>"
+                                  title="<?= dol_escape_htmltag($langs->trans('DateEnd')) ?>">
+                                <i class="fas fa-calendar-check"></i> <span class="kanban-date-value"><?= !empty($t['date_end_fmt']) ? $t['date_end_fmt'] : '-' ?></span>
                             </span>
                         </div>
 
