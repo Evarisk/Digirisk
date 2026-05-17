@@ -58,6 +58,19 @@ window.digiriskdolibarr.actionplanKanban.event = function() {
             }
         });
     });
+
+    // Responsible change
+    $(document).on('change', '.kanban-responsible-select', function() {
+        var $select = $(this);
+        var taskId  = $select.data('task-id');
+        var userId  = $select.val();
+        window.digiriskdolibarr.actionplanKanban.saveResponsible(taskId, userId, $select);
+    });
+
+    // Prevent card drag when interacting with select
+    $(document).on('mousedown', '.kanban-responsible-select', function(e) {
+        e.stopPropagation();
+    });
 };
 
 /**
@@ -216,6 +229,48 @@ window.digiriskdolibarr.actionplanKanban.saveLabel = function(taskId, newLabel, 
         },
         error: function() {
             $labelEl.removeClass('kanban-label-saving').text(originalText);
+        }
+    });
+};
+
+/**
+ * AJAX save task responsible (TASKEXECUTIVE contact)
+ *
+ * @param {number} taskId   Task row ID
+ * @param {number} userId   User ID (0 = unassign)
+ * @param {jQuery} $select  The select element
+ */
+window.digiriskdolibarr.actionplanKanban.saveResponsible = function(taskId, userId, $select) {
+    var token          = window.saturne.toolbox.getToken();
+    var querySeparator = window.saturne.toolbox.getQuerySeparator(document.URL);
+    var $card          = $select.closest('.kanban-card');
+
+    $card.addClass('kanban-card-saving');
+
+    $.ajax({
+        url: document.URL + querySeparator + 'action=updateTaskResponsible&task_id=' + taskId + '&user_id=' + userId + '&token=' + token,
+        type: 'POST',
+        dataType: 'json',
+        success: function(response) {
+            $card.removeClass('kanban-card-saving');
+            if (response.success) {
+                $card.addClass('kanban-card-saved');
+                setTimeout(function() {
+                    $card.removeClass('kanban-card-saved');
+                }, 2000);
+            } else {
+                $card.addClass('kanban-card-error');
+                setTimeout(function() {
+                    $card.removeClass('kanban-card-error');
+                }, 3000);
+            }
+        },
+        error: function() {
+            $card.removeClass('kanban-card-saving');
+            $card.addClass('kanban-card-error');
+            setTimeout(function() {
+                $card.removeClass('kanban-card-error');
+            }, 3000);
         }
     });
 };
