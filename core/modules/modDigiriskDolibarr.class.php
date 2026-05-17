@@ -1458,7 +1458,7 @@ class modDigiriskdolibarr extends DolibarrModules
             'titre'    => '<i class="fas fa-tasks pictofixedwidth" style="padding-right: 4px;"></i>' . $langs->trans('PAPRIPACT'),
             'mainmenu' => 'digiriskdolibarr',
             'leftmenu' => 'digiriskactionplan',
-            'url'      => '/digiriskdolibarr/view/digiriskstandard/actionplan_list.php',
+            'url'      => '/digiriskdolibarr/view/digiriskstandard/actionplan_list.php?view=kanban',
             'langs'    => 'digiriskdolibarr@digiriskdolibarr',
             'position' => 100 + $r,
             'enabled'  => '$conf->digiriskdolibarr->enabled && $conf->projet->enabled',
