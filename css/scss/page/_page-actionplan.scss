@@ -192,6 +192,38 @@
     }
 }
 
+.kanban-editable-meta {
+    cursor: pointer;
+    padding: 1px 4px;
+    border-radius: 4px;
+    transition: background 0.15s ease;
+
+    &:hover {
+        background: #f0f4ff;
+        color: #555;
+    }
+}
+
+.kanban-meta-input {
+    width: 55px;
+    font-size: 11px;
+    font-weight: 600;
+    border: 1px solid #3b82f6;
+    border-radius: 3px;
+    padding: 1px 4px;
+    outline: none;
+    background: #fff;
+    color: #333;
+    box-shadow: 0 0 0 2px rgba(59, 130, 246, 0.15);
+    -moz-appearance: textfield;
+
+    &::-webkit-outer-spin-button,
+    &::-webkit-inner-spin-button {
+        -webkit-appearance: none;
+        margin: 0;
+    }
+}
+
 /* Card label */
 .kanban-card-label {
     font-size: 13px;

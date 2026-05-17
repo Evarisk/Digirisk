@@ -225,6 +225,81 @@ window.digiriskdolibarr.actionplanKanban.event = function() {
     $(document).on('mousedown', '.kanban-card-progress', function(e) {
         e.stopPropagation();
     });
+
+    // Editable meta fields (workload / budget): click to edit
+    $(document).on('click', '.kanban-editable-meta', function(e) {
+        e.stopPropagation();
+        var $meta = $(this);
+        if ($meta.find('input').length > 0) return;
+
+        var $value   = $meta.find('.kanban-meta-value');
+        var field    = $meta.data('field');
+        var taskId   = $meta.data('task-id');
+        var rawVal   = $meta.data('raw') || 0;
+        var origText = $value.text();
+        var placeholder = field === 'budget' ? '0.00' : '0';
+
+        var $input = $('<input type="number" class="kanban-meta-input" step="any" min="0">');
+        $input.val(rawVal > 0 ? rawVal : '');
+        $input.attr('placeholder', placeholder);
+        $value.replaceWith($input);
+        $input.trigger('focus').select();
+
+        function save() {
+            var val = $input.val();
+            var $card = $meta.closest('.kanban-card');
+            $card.addClass('kanban-card-saving');
+
+            var token = window.saturne.toolbox.getToken();
+            var sep   = window.saturne.toolbox.getQuerySeparator(document.URL);
+
+            $.ajax({
+                url: document.URL + sep + 'action=updateTaskMeta&task_id=' + taskId + '&field=' + field + '&value=' + encodeURIComponent(val) + '&token=' + token,
+                type: 'POST',
+                dataType: 'json',
+                success: function(response) {
+                    $card.removeClass('kanban-card-saving');
+                    var $newValue = $('<span class="kanban-meta-value"></span>');
+                    if (response.success) {
+                        $newValue.text(response.formatted);
+                        $meta.data('raw', response.raw);
+                        $card.addClass('kanban-card-saved');
+                        setTimeout(function() { $card.removeClass('kanban-card-saved'); }, 2000);
+                    } else {
+                        $newValue.text(origText);
+                        $card.addClass('kanban-card-error');
+                        setTimeout(function() { $card.removeClass('kanban-card-error'); }, 3000);
+                    }
+                    $input.replaceWith($newValue);
+                },
+                error: function() {
+                    $card.removeClass('kanban-card-saving');
+                    var $newValue = $('<span class="kanban-meta-value"></span>').text(origText);
+                    $input.replaceWith($newValue);
+                    $card.addClass('kanban-card-error');
+                    setTimeout(function() { $card.removeClass('kanban-card-error'); }, 3000);
+                }
+            });
+        }
+
+        $input.on('blur', save);
+        $input.on('keydown', function(ev) {
+            if (ev.key === 'Enter') {
+                ev.preventDefault();
+                $input.off('blur');
+                save();
+            } else if (ev.key === 'Escape') {
+                $input.off('blur');
+                var $newValue = $('<span class="kanban-meta-value"></span>').text(origText);
+                $input.replaceWith($newValue);
+            }
+        });
+    });
+
+    // Prevent drag on editable meta
+    $(document).on('mousedown', '.kanban-editable-meta', function(e) {
+        e.stopPropagation();
+    });
 };
 
 /**
@@ -240,7 +315,7 @@ window.digiriskdolibarr.actionplanKanban.initSortable = function() {
         placeholder: 'kanban-card-placeholder',
         tolerance: 'pointer',
         cursor: 'grabbing',
-        cancel: '.kanban-progress-bar, .kanban-card-progress, .kanban-responsible-select, .kanban-contributor-select, .kanban-add-contributor-btn, .kanban-initial-responsible, .kanban-card-label, .kanban-inline-edit',
+        cancel: '.kanban-progress-bar, .kanban-card-progress, .kanban-responsible-select, .kanban-contributor-select, .kanban-add-contributor-btn, .kanban-initial-responsible, .kanban-card-label, .kanban-inline-edit, .kanban-editable-meta',
         receive: function(event, ui) {
             var $card    = ui.item;
             var $column  = $(this);

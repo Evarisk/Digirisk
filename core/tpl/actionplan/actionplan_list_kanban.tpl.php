@@ -62,16 +62,16 @@ foreach ($tasksJson as $t) {
                                     <i class="fas fa-calendar-alt"></i> <?= $t['date_end_fmt'] ?>
                                 </span>
                             <?php endif; ?>
-                            <?php if (!empty($t['planned_workload_fmt'])) : ?>
-                                <span class="kanban-meta-item" title="<?= dol_escape_htmltag($langs->trans('PlannedWorkload')) ?>">
-                                    <i class="fas fa-clock"></i> <?= $t['planned_workload_fmt'] ?>
-                                </span>
-                            <?php endif; ?>
-                            <?php if (!empty($t['budget_fmt'])) : ?>
-                                <span class="kanban-meta-item" title="<?= dol_escape_htmltag($langs->trans('Budget')) ?>">
-                                    <i class="fas fa-coins"></i> <?= $t['budget_fmt'] ?>
-                                </span>
-                            <?php endif; ?>
+                            <span class="kanban-meta-item kanban-editable-meta" data-field="planned_workload" data-task-id="<?= $t['id'] ?>"
+                                  data-raw="<?= $t['planned_workload'] > 0 ? round($t['planned_workload'] / 3600, 2) : 0 ?>"
+                                  title="<?= dol_escape_htmltag($langs->trans('PlannedWorkload')) ?>">
+                                <i class="fas fa-clock"></i> <span class="kanban-meta-value"><?= !empty($t['planned_workload_fmt']) ? $t['planned_workload_fmt'] : '-' ?></span>
+                            </span>
+                            <span class="kanban-meta-item kanban-editable-meta" data-field="budget" data-task-id="<?= $t['id'] ?>"
+                                  data-raw="<?= $t['budget'] ?>"
+                                  title="<?= dol_escape_htmltag($langs->trans('Budget')) ?>">
+                                <i class="fas fa-coins"></i> <span class="kanban-meta-value"><?= !empty($t['budget_fmt']) ? $t['budget_fmt'] : '-' ?></span>
+                            </span>
                             <?php if (!empty($t['risk_nomurl'])) : ?>
                                 <span class="kanban-card-risk"><?= $t['risk_nomurl'] ?></span>
                             <?php endif; ?>
