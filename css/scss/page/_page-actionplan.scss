@@ -503,6 +503,33 @@
     white-space: nowrap;
 }
 
+/* Dates row above progress */
+.kanban-dates-row {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 2px;
+}
+
+.kanban-date {
+    font-size: 10px;
+    color: #888;
+    white-space: nowrap;
+
+    i {
+        margin-right: 2px;
+        font-size: 9px;
+    }
+}
+
+.kanban-date-start {
+    color: #3085d6;
+}
+
+.kanban-date-end {
+    color: #e05353;
+}
+
 /* Progress bar */
 .kanban-card-progress {
     display: flex;

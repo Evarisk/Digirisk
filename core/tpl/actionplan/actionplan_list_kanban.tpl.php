@@ -57,11 +57,7 @@ foreach ($tasksJson as $t) {
                         <!-- Header: Ref + Date + Workload + Budget + Risk -->
                         <div class="kanban-card-header">
                             <a href="<?= $t['url'] ?>" class="kanban-card-ref" target="_blank"><?= dol_escape_htmltag($t['ref']) ?></a>
-                            <?php if (!empty($t['date_end_fmt'])) : ?>
-                                <span class="kanban-meta-item" title="<?= dol_escape_htmltag($langs->trans('Deadline')) ?>">
-                                    <i class="fas fa-calendar-alt"></i> <?= $t['date_end_fmt'] ?>
-                                </span>
-                            <?php endif; ?>
+
                             <span class="kanban-meta-item kanban-editable-meta" data-field="planned_workload" data-task-id="<?= $t['id'] ?>"
                                   data-raw="<?= $t['planned_workload'] > 0 ? round($t['planned_workload'] / 3600, 2) : 0 ?>"
                                   title="<?= dol_escape_htmltag($langs->trans('PlannedWorkload')) ?>">
@@ -158,6 +154,16 @@ foreach ($tasksJson as $t) {
                                     <?php endif; ?>
                                 </select>
                             </div>
+                        </div>
+
+                        <!-- Dates row -->
+                        <div class="kanban-dates-row">
+                            <span class="kanban-date kanban-date-start" title="<?= dol_escape_htmltag($langs->trans('DateStart')) ?>">
+                                <i class="fas fa-calendar-plus"></i> <?= !empty($t['date_start_fmt']) ? $t['date_start_fmt'] : '-' ?>
+                            </span>
+                            <span class="kanban-date kanban-date-end" title="<?= dol_escape_htmltag($langs->trans('DateEnd')) ?>">
+                                <i class="fas fa-calendar-check"></i> <?= !empty($t['date_end_fmt']) ? $t['date_end_fmt'] : '-' ?>
+                            </span>
                         </div>
 
                         <!-- Progress bar -->
