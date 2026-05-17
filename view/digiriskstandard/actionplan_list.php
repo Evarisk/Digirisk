@@ -71,6 +71,42 @@ $projectId = getDolGlobalInt('DIGIRISKDOLIBARR_DU_PROJECT');
 $permissiontoread = $user->hasRight('digiriskdolibarr', 'riskassessmentdocument', 'read');
 saturne_check_access($permissiontoread);
 
+// Load ActionComm for event logging
+require_once DOL_DOCUMENT_ROOT . '/comm/action/class/actioncomm.class.php';
+
+/**
+ * Create an ActionComm event for task modification if the corresponding config toggle is enabled
+ *
+ * @param  DoliDB   $db        Database handler
+ * @param  User     $user      Current user
+ * @param  Translate $langs    Language object
+ * @param  object   $task      Task object
+ * @param  string   $constName Configuration constant name (e.g. DIGIRISKDOLIBARR_ACTIONPLAN_LOG_LABEL)
+ * @param  string   $label     Event label (translated)
+ * @param  string   $note      Event note with before/after details
+ * @return void
+ */
+function createActionPlanEvent($db, $user, $langs, $task, $constName, $label, $note)
+{
+    global $conf;
+
+    if (empty(getDolGlobalInt($constName))) {
+        return;
+    }
+
+    $actioncomm = new ActionComm($db);
+    $actioncomm->type_code    = 'AC_OTH_AUTO';
+    $actioncomm->code         = 'AC_TASK_MODIFY';
+    $actioncomm->label        = $label;
+    $actioncomm->note_private = $note;
+    $actioncomm->fk_element   = $task->id;
+    $actioncomm->elementtype  = 'project_task';
+    $actioncomm->userownerid  = $user->id;
+    $actioncomm->datep        = dol_now();
+    $actioncomm->percentage   = -1;
+    $actioncomm->create($user);
+}
+
 /*
  * Actions
  */
@@ -86,12 +122,15 @@ if ($action == 'updateTaskProgress' && !empty(GETPOSTINT('task_id'))) {
     $result = $taskToUpdate->fetch($taskId);
 
     if ($result > 0 && $taskToUpdate->fk_project == $projectId) {
+        $oldProgress = $taskToUpdate->progress;
         $taskToUpdate->progress = $newProgress;
         $updateResult = $taskToUpdate->update($user);
 
         if ($updateResult > 0) {
+            createActionPlanEvent($db, $user, $langs, $taskToUpdate, 'DIGIRISKDOLIBARR_ACTIONPLAN_LOG_PROGRESS', $taskToUpdate->ref . ' - ' . $langs->trans('ActionPlanLogProgress'), $langs->trans('ActionPlanTaskProgressChanged', $oldProgress, $newProgress));
             print json_encode(['success' => 1]);
         } else {
+            dol_syslog('ActionPlan Kanban: updateTaskProgress error for task ' . $taskId . ' - ' . $taskToUpdate->error, LOG_ERR);
             http_response_code(500);
             print json_encode(['success' => 0, 'error' => $taskToUpdate->error]);
         }
@@ -121,12 +160,15 @@ if ($action == 'updateTaskLabel' && !empty(GETPOSTINT('task_id'))) {
     $result = $taskToUpdate->fetch($taskId);
 
     if ($result > 0 && $taskToUpdate->fk_project == $projectId) {
+        $oldLabel = $taskToUpdate->label;
         $taskToUpdate->label = $newLabel;
         $updateResult = $taskToUpdate->update($user);
 
         if ($updateResult > 0) {
+            createActionPlanEvent($db, $user, $langs, $taskToUpdate, 'DIGIRISKDOLIBARR_ACTIONPLAN_LOG_LABEL', $taskToUpdate->ref . ' - ' . $langs->trans('ActionPlanLogLabel'), $langs->trans('ActionPlanTaskLabelChanged', $oldLabel, $newLabel));
             print json_encode(['success' => 1, 'label' => $newLabel]);
         } else {
+            dol_syslog('ActionPlan Kanban: updateTaskLabel error for task ' . $taskId . ' - ' . $taskToUpdate->error, LOG_ERR);
             http_response_code(500);
             print json_encode(['success' => 0, 'error' => $taskToUpdate->error]);
         }
@@ -223,8 +265,10 @@ if ($action == 'addTaskContributor' && !empty(GETPOSTINT('task_id'))) {
                     $addedInitials = strtoupper(mb_substr($addedContact->firstname, 0, 1) . mb_substr($addedContact->lastname, 0, 1));
                 }
             }
+            createActionPlanEvent($db, $user, $langs, $taskToUpdate, 'DIGIRISKDOLIBARR_ACTIONPLAN_LOG_CONTRIBUTOR_ADD', $taskToUpdate->ref . ' - ' . $langs->trans('ActionPlanLogContributorAdd'), $langs->trans('ActionPlanTaskContributorAdded', $addedFullname));
             print json_encode(['success' => 1, 'fullname' => $addedFullname, 'initials' => $addedInitials, 'user_id' => $userId]);
         } else {
+            dol_syslog('ActionPlan Kanban: addTaskContributor error for task ' . $taskId . ' - ' . $taskToUpdate->error, LOG_ERR);
             http_response_code(500);
             print json_encode(['success' => 0, 'error' => $taskToUpdate->error]);
         }
@@ -261,8 +305,10 @@ if ($action == 'removeTaskContributor' && !empty(GETPOSTINT('task_id'))) {
             }
         }
         if ($deleted) {
+            createActionPlanEvent($db, $user, $langs, $taskToUpdate, 'DIGIRISKDOLIBARR_ACTIONPLAN_LOG_CONTRIBUTOR_REMOVE', $taskToUpdate->ref . ' - ' . $langs->trans('ActionPlanLogContributorRemove'), $langs->trans('ActionPlanTaskContributorRemoved', $userId));
             print json_encode(['success' => 1]);
         } else {
+            dol_syslog('ActionPlan Kanban: removeTaskContributor error for task ' . $taskId . ' user ' . $userId, LOG_ERR);
             print json_encode(['success' => 0, 'error' => 'Contact not found or delete failed']);
         }
     } else {
@@ -286,6 +332,7 @@ if ($action == 'updateTaskMeta' && !empty(GETPOSTINT('task_id'))) {
 
     if ($result > 0 && $taskToUpdate->fk_project == $projectId) {
         if ($field == 'planned_workload') {
+            $oldWorkload = $taskToUpdate->planned_workload > 0 ? convertSecondToTime($taskToUpdate->planned_workload, 'allhourmin') : '-';
             // Accept HH:MM (e.g. "22:35") or decimal hours (e.g. "14.5")
             $value = trim($value);
             if (preg_match('/^(\d+):(\d{1,2})$/', $value, $m)) {
@@ -299,17 +346,22 @@ if ($action == 'updateTaskMeta' && !empty(GETPOSTINT('task_id'))) {
             if ($res > 0) {
                 $fmtValue = $taskToUpdate->planned_workload > 0 ? convertSecondToTime($taskToUpdate->planned_workload, 'allhourmin') : '-';
                 $rawHours = round($taskToUpdate->planned_workload / 3600, 4);
+                createActionPlanEvent($db, $user, $langs, $taskToUpdate, 'DIGIRISKDOLIBARR_ACTIONPLAN_LOG_WORKLOAD', $taskToUpdate->ref . ' - ' . $langs->trans('ActionPlanLogWorkload'), $langs->trans('ActionPlanTaskWorkloadChanged', $oldWorkload, $fmtValue));
                 print json_encode(['success' => 1, 'formatted' => $fmtValue, 'raw' => $rawHours]);
             } else {
+                dol_syslog('ActionPlan Kanban: updateTaskMeta workload error for task ' . $taskId . ' - ' . $taskToUpdate->error, LOG_ERR);
                 print json_encode(['success' => 0, 'error' => $taskToUpdate->error]);
             }
         } elseif ($field == 'budget') {
+            $oldBudget = $taskToUpdate->budget_amount > 0 ? price($taskToUpdate->budget_amount, 0, $langs, 1, -1, -1, $conf->currency) : '-';
             $taskToUpdate->budget_amount = (float) str_replace(',', '.', $value);
             $res = $taskToUpdate->update($user);
             if ($res > 0) {
                 $fmtValue = $taskToUpdate->budget_amount > 0 ? price($taskToUpdate->budget_amount, 0, $langs, 1, -1, -1, $conf->currency) : '-';
+                createActionPlanEvent($db, $user, $langs, $taskToUpdate, 'DIGIRISKDOLIBARR_ACTIONPLAN_LOG_BUDGET', $taskToUpdate->ref . ' - ' . $langs->trans('ActionPlanLogBudget'), $langs->trans('ActionPlanTaskBudgetChanged', $oldBudget, $fmtValue));
                 print json_encode(['success' => 1, 'formatted' => $fmtValue, 'raw' => $taskToUpdate->budget_amount]);
             } else {
+                dol_syslog('ActionPlan Kanban: updateTaskMeta budget error for task ' . $taskId . ' - ' . $taskToUpdate->error, LOG_ERR);
                 print json_encode(['success' => 0, 'error' => $taskToUpdate->error]);
             }
         } else {
@@ -336,6 +388,8 @@ if ($action == 'updateTaskDate' && !empty(GETPOSTINT('task_id'))) {
 
     if ($result > 0 && $taskToUpdate->fk_project == $projectId) {
         if (in_array($field, ['date_start', 'date_end'])) {
+            $oldDate = ($field == 'date_start') ? $taskToUpdate->date_start : $taskToUpdate->date_end;
+            $oldDateFmt = $oldDate > 0 ? dol_print_date($oldDate, 'day') : '-';
             $timestamp = !empty($value) ? strtotime($value) : 0;
             if ($field == 'date_start') {
                 $taskToUpdate->date_start = $timestamp > 0 ? $timestamp : null;
@@ -346,8 +400,13 @@ if ($action == 'updateTaskDate' && !empty(GETPOSTINT('task_id'))) {
             if ($res > 0) {
                 $fmtValue = $timestamp > 0 ? dol_print_date($timestamp, 'day') : '-';
                 $rawValue = $timestamp > 0 ? dol_print_date($timestamp, 'dayrfc') : '';
+                $logConst = ($field == 'date_start') ? 'DIGIRISKDOLIBARR_ACTIONPLAN_LOG_DATE_START' : 'DIGIRISKDOLIBARR_ACTIONPLAN_LOG_DATE_END';
+                $logLabel = ($field == 'date_start') ? 'ActionPlanLogDateStart' : 'ActionPlanLogDateEnd';
+                $logTrans = ($field == 'date_start') ? 'ActionPlanTaskDateStartChanged' : 'ActionPlanTaskDateEndChanged';
+                createActionPlanEvent($db, $user, $langs, $taskToUpdate, $logConst, $taskToUpdate->ref . ' - ' . $langs->trans($logLabel), $langs->trans($logTrans, $oldDateFmt, $fmtValue));
                 print json_encode(['success' => 1, 'formatted' => $fmtValue, 'raw' => $rawValue]);
             } else {
+                dol_syslog('ActionPlan Kanban: updateTaskDate error for task ' . $taskId . ' field ' . $field . ' - ' . $taskToUpdate->error, LOG_ERR);
                 print json_encode(['success' => 0, 'error' => $taskToUpdate->error]);
             }
         } else {
@@ -377,8 +436,10 @@ if ($action == 'addTaskCategory' && !empty(GETPOSTINT('task_id'))) {
         if ($resCat > 0) {
             $res = $cat->add_type($taskToUpdate, 'project_task');
             if ($res > 0 || $res == -3) { // -3 = already linked
+                createActionPlanEvent($db, $user, $langs, $taskToUpdate, 'DIGIRISKDOLIBARR_ACTIONPLAN_LOG_TAG', $taskToUpdate->ref . ' - ' . $langs->trans('ActionPlanLogTag'), $langs->trans('ActionPlanTaskTagAdded', $cat->label));
                 print json_encode(['success' => 1, 'label' => $cat->label, 'color' => $cat->color, 'id' => $cat->id]);
             } else {
+                dol_syslog('ActionPlan Kanban: addTaskCategory error for task ' . $taskId . ' cat ' . $catId . ' - ' . $cat->error, LOG_ERR);
                 print json_encode(['success' => 0, 'error' => $cat->error]);
             }
         } else {
@@ -408,8 +469,10 @@ if ($action == 'removeTaskCategory' && !empty(GETPOSTINT('task_id'))) {
         if ($resCat > 0) {
             $res = $cat->del_type($taskToUpdate, 'project_task');
             if ($res >= 0) {
+                createActionPlanEvent($db, $user, $langs, $taskToUpdate, 'DIGIRISKDOLIBARR_ACTIONPLAN_LOG_TAG', $taskToUpdate->ref . ' - ' . $langs->trans('ActionPlanLogTag'), $langs->trans('ActionPlanTaskTagRemoved', $cat->label));
                 print json_encode(['success' => 1]);
             } else {
+                dol_syslog('ActionPlan Kanban: removeTaskCategory error for task ' . $taskId . ' cat ' . $catId . ' - ' . $cat->error, LOG_ERR);
                 print json_encode(['success' => 0, 'error' => $cat->error]);
             }
         } else {
