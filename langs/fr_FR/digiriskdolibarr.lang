@@ -1669,3 +1669,7 @@ TaskMovedTo                         = Tâche déplacée vers %s
 AddCategory                        = Ajouter une catégorie
 SelectCategory                     = Choisir une catégorie
 DateEndBeforeStart                 = Date fin antérieure au début
+InternalUsers                      = Utilisateurs internes
+ExternalContacts                   = Contacts externes
+AddContributor                     = Ajouter un contributeur
+RemoveContact                      = Retirer le contact
