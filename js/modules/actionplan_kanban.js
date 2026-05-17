@@ -413,6 +413,102 @@ window.digiriskdolibarr.actionplanKanban.event = function() {
         e.stopPropagation();
     });
 
+    // Tag: toggle add-tag select
+    $(document).on('click', '.kanban-add-tag-btn', function(e) {
+        e.stopPropagation();
+        var $select = $(this).siblings('.kanban-tag-select');
+        $select.toggleClass('visible');
+        if ($select.hasClass('visible')) {
+            $select.trigger('focus');
+        }
+    });
+
+    // Tag: add category to task
+    $(document).on('change', '.kanban-tag-select', function() {
+        var $select = $(this);
+        var catId   = $select.val();
+        var taskId  = $select.data('task-id');
+        if (!catId) return;
+
+        var selectedText  = $select.find('option:selected').text().trim();
+        var selectedColor = $select.find('option:selected').data('color') || '8c8c8c';
+        var $card = $select.closest('.kanban-card');
+        var $tagsRow = $select.closest('.kanban-card-tags');
+
+        $card.addClass('kanban-card-saving');
+        var token = window.saturne.toolbox.getToken();
+        var sep   = window.saturne.toolbox.getQuerySeparator(document.URL);
+
+        $.ajax({
+            url: document.URL + sep + 'action=addTaskCategory&task_id=' + taskId + '&cat_id=' + catId + '&token=' + token,
+            type: 'POST',
+            dataType: 'json',
+            success: function(response) {
+                $card.removeClass('kanban-card-saving');
+                if (response.success) {
+                    var bgColor = response.color ? '#' + response.color : '#8c8c8c';
+                    var $tag = $('<span class="kanban-tag" data-cat-id="' + response.id + '" style="background:' + bgColor + '">' + response.label + '<span class="kanban-tag-remove" title="Supprimer">&times;</span></span>');
+                    $tagsRow.find('.kanban-add-tag-wrapper').before($tag);
+                    $card.addClass('kanban-card-saved');
+                    setTimeout(function() { $card.removeClass('kanban-card-saved'); }, 2000);
+                } else {
+                    $card.addClass('kanban-card-error');
+                    setTimeout(function() { $card.removeClass('kanban-card-error'); }, 3000);
+                }
+            },
+            error: function() {
+                $card.removeClass('kanban-card-saving');
+                $card.addClass('kanban-card-error');
+                setTimeout(function() { $card.removeClass('kanban-card-error'); }, 3000);
+            }
+        });
+
+        $select.val('').removeClass('visible');
+    });
+
+    // Tag: hide select on blur
+    $(document).on('blur', '.kanban-tag-select', function() {
+        var $select = $(this);
+        setTimeout(function() { $select.removeClass('visible'); }, 200);
+    });
+
+    // Tag: remove category from task
+    $(document).on('click', '.kanban-tag-remove', function(e) {
+        e.stopPropagation();
+        var $btn  = $(this);
+        var $tag  = $btn.closest('.kanban-tag');
+        var catId = $tag.data('cat-id');
+        var $card = $tag.closest('.kanban-card');
+        var taskId = $card.data('task-id');
+
+        $tag.css('opacity', '0.4');
+        var token = window.saturne.toolbox.getToken();
+        var sep   = window.saturne.toolbox.getQuerySeparator(document.URL);
+
+        $.ajax({
+            url: document.URL + sep + 'action=removeTaskCategory&task_id=' + taskId + '&cat_id=' + catId + '&token=' + token,
+            type: 'POST',
+            dataType: 'json',
+            success: function(response) {
+                if (response.success) {
+                    $tag.slideUp(150, function() { $(this).remove(); });
+                    $card.addClass('kanban-card-saved');
+                    setTimeout(function() { $card.removeClass('kanban-card-saved'); }, 2000);
+                } else {
+                    $tag.css('opacity', '1');
+                }
+            },
+            error: function() {
+                $tag.css('opacity', '1');
+            }
+        });
+    });
+
+    // Prevent drag on tag elements
+    $(document).on('mousedown', '.kanban-tag, .kanban-tag-remove, .kanban-add-tag-btn, .kanban-tag-select, .kanban-add-tag-wrapper', function(e) {
+        e.stopPropagation();
+    });
+
     // Remove contributor: click on × button
     $(document).on('click', '.kanban-remove-contact', function(e) {
         e.stopPropagation();
@@ -471,7 +567,7 @@ window.digiriskdolibarr.actionplanKanban.initSortable = function() {
         placeholder: 'kanban-card-placeholder',
         tolerance: 'pointer',
         cursor: 'grabbing',
-        cancel: '.kanban-progress-bar, .kanban-card-progress, .kanban-responsible-select, .kanban-contributor-select, .kanban-add-contributor-btn, .kanban-initial-responsible, .kanban-card-label, .kanban-inline-edit, .kanban-editable-meta, .kanban-remove-contact, .kanban-initial-wrapper, .kanban-editable-date',
+        cancel: '.kanban-progress-bar, .kanban-card-progress, .kanban-responsible-select, .kanban-contributor-select, .kanban-add-contributor-btn, .kanban-initial-responsible, .kanban-card-label, .kanban-inline-edit, .kanban-editable-meta, .kanban-remove-contact, .kanban-initial-wrapper, .kanban-editable-date, .kanban-tag, .kanban-tag-remove, .kanban-add-tag-btn, .kanban-tag-select, .kanban-add-tag-wrapper',
         receive: function(event, ui) {
             var $card    = ui.item;
             var $column  = $(this);

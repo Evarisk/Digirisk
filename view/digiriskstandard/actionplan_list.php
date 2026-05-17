@@ -344,6 +344,68 @@ if ($action == 'updateTaskDate' && !empty(GETPOSTINT('task_id'))) {
     exit;
 }
 
+// AJAX action to add a category to a task
+if ($action == 'addTaskCategory' && !empty(GETPOSTINT('task_id'))) {
+    header('Content-Type: application/json');
+
+    $taskId = GETPOSTINT('task_id');
+    $catId  = GETPOSTINT('cat_id');
+
+    $taskToUpdate = new SaturneTask($db);
+    $result = $taskToUpdate->fetch($taskId);
+
+    if ($result > 0 && $taskToUpdate->fk_project == $projectId) {
+        $cat = new Categorie($db);
+        $resCat = $cat->fetch($catId);
+        if ($resCat > 0) {
+            $res = $cat->add_type($taskToUpdate, 'project_task');
+            if ($res > 0 || $res == -3) { // -3 = already linked
+                print json_encode(['success' => 1, 'label' => $cat->label, 'color' => $cat->color, 'id' => $cat->id]);
+            } else {
+                print json_encode(['success' => 0, 'error' => $cat->error]);
+            }
+        } else {
+            print json_encode(['success' => 0, 'error' => 'Category not found']);
+        }
+    } else {
+        http_response_code(404);
+        print json_encode(['success' => 0, 'error' => 'Task not found']);
+    }
+    $db->close();
+    exit;
+}
+
+// AJAX action to remove a category from a task
+if ($action == 'removeTaskCategory' && !empty(GETPOSTINT('task_id'))) {
+    header('Content-Type: application/json');
+
+    $taskId = GETPOSTINT('task_id');
+    $catId  = GETPOSTINT('cat_id');
+
+    $taskToUpdate = new SaturneTask($db);
+    $result = $taskToUpdate->fetch($taskId);
+
+    if ($result > 0 && $taskToUpdate->fk_project == $projectId) {
+        $cat = new Categorie($db);
+        $resCat = $cat->fetch($catId);
+        if ($resCat > 0) {
+            $res = $cat->del_type($taskToUpdate, 'project_task');
+            if ($res >= 0) {
+                print json_encode(['success' => 1]);
+            } else {
+                print json_encode(['success' => 0, 'error' => $cat->error]);
+            }
+        } else {
+            print json_encode(['success' => 0, 'error' => 'Category not found']);
+        }
+    } else {
+        http_response_code(404);
+        print json_encode(['success' => 0, 'error' => 'Task not found']);
+    }
+    $db->close();
+    exit;
+}
+
 /*
  * View
  */
@@ -432,6 +494,17 @@ foreach ($allTasks as $t) {
     if (is_array($cats) && !empty($cats)) {
         $taskCategories[$t->id] = $cats;
     }
+}
+
+// Load all available categories of type 'project_task' for tag selector
+$allAvailableCategories = [];
+$sqlCats = "SELECT rowid, label, color FROM " . MAIN_DB_PREFIX . "categorie WHERE type = " . (int)$categorie->MAP_ID['project_task'] . " AND entity IN (" . getEntity('category') . ") ORDER BY label";
+$resCats = $db->query($sqlCats);
+if ($resCats) {
+    while ($objCat = $db->fetch_object($resCats)) {
+        $allAvailableCategories[] = ['id' => (int)$objCat->rowid, 'label' => $objCat->label, 'color' => $objCat->color];
+    }
+    $db->free($resCats);
 }
 
 // Kanban column thresholds (configurable)
