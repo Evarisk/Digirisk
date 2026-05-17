@@ -48,8 +48,8 @@
 
 .kanban-column {
     flex: 1;
-    min-width: 280px;
-    max-width: 350px;
+    min-width: 260px;
+    max-width: 310px;
     background: #f8f9fa;
     border-radius: 10px;
     display: flex;
@@ -443,22 +443,76 @@
     }
 }
 
-.kanban-contributor-select {
+.kanban-contributor-dropdown {
     display: none;
     position: absolute;
     top: 100%;
     left: 0;
-    z-index: 20;
-    font-size: 10px;
-    padding: 2px 4px;
-    border: 1px solid #0d8aff;
-    border-radius: 6px;
+    z-index: 30;
     background: #fff;
-    min-width: 140px;
-    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+    min-width: 220px;
+    max-width: 280px;
+    border: 1px solid #3b82f6;
+    border-radius: 8px;
+    box-shadow: 0 6px 20px rgba(0, 0, 0, 0.15);
+    margin-top: 4px;
+    overflow: hidden;
 
     &.visible {
         display: block;
+    }
+}
+
+.kanban-contributor-search {
+    width: 100%;
+    padding: 6px 10px;
+    border: none;
+    border-bottom: 1px solid #e5e7eb;
+    font-size: 11px;
+    outline: none;
+    box-sizing: border-box;
+
+    &::placeholder {
+        color: #aaa;
+    }
+}
+
+.kanban-contributor-options {
+    max-height: 200px;
+    overflow-y: auto;
+}
+
+.kanban-optgroup-label {
+    font-size: 9px;
+    font-weight: 700;
+    text-transform: uppercase;
+    color: #6b7280;
+    padding: 6px 10px 2px;
+    letter-spacing: 0.5px;
+}
+
+.kanban-contributor-option {
+    padding: 5px 10px;
+    font-size: 11px;
+    cursor: pointer;
+    transition: background 0.1s;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+
+    &:hover:not(.assigned) {
+        background: #eff6ff;
+        color: #1d4ed8;
+    }
+
+    &.assigned {
+        color: #aaa;
+        cursor: default;
+        background: #f9fafb;
+    }
+
+    &.hidden {
+        display: none;
     }
 }
 
