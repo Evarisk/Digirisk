@@ -552,6 +552,7 @@ if (!empty($allTasks)) {
 
                 $riskData[$obj->fk_risk] = [
                     'ref'            => $riskObj->ref,
+                    'fk_element'     => $riskObj->fk_element,
                     'description'    => $riskObj->description,
                     'category_name'  => $dangerCatName,
                     'cotation'       => $cotation,
