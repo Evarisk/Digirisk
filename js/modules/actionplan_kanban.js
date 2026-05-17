@@ -153,17 +153,26 @@ window.digiriskdolibarr.actionplanKanban.event = function() {
             return Math.max(0, Math.min(100, pct));
         }
 
-        // Visual update
+        // Visual update – use column thresholds for color
         function updateVisual(pct) {
             $fill.css('width', pct + '%');
-            $fill.removeClass('progress-red progress-yellow progress-green');
-            if (pct === 0) {
-                $fill.addClass('progress-red');
-            } else if (pct < 100) {
-                $fill.addClass('progress-yellow');
-            } else {
-                $fill.addClass('progress-green');
-            }
+            $fill.removeClass('progress-grey progress-yellow progress-blue progress-green');
+
+            // Find which column this pct belongs to
+            var colorClass = 'progress-grey';
+            $('.kanban-column').each(function() {
+                var min = parseInt($(this).data('progress-min'));
+                var max = parseInt($(this).data('progress-max'));
+                if (pct >= min && pct <= max) {
+                    var col = $(this).data('column');
+                    if (col === 'draft')    colorClass = 'progress-grey';
+                    if (col === 'progress') colorClass = 'progress-yellow';
+                    if (col === 'control')  colorClass = 'progress-blue';
+                    if (col === 'done')     colorClass = 'progress-green';
+                    return false;
+                }
+            });
+            $fill.addClass(colorClass);
             $text.text(pct + '%');
         }
 
@@ -259,14 +268,11 @@ window.digiriskdolibarr.actionplanKanban.initSortable = function() {
 
             // Update progress bar color
             var $fill = $card.find('.kanban-progress-fill');
-            $fill.removeClass('progress-red progress-yellow progress-green');
-            if (newProgress === 0) {
-                $fill.addClass('progress-red');
-            } else if (newProgress < 100) {
-                $fill.addClass('progress-yellow');
-            } else {
-                $fill.addClass('progress-green');
-            }
+            $fill.removeClass('progress-grey progress-yellow progress-blue progress-green');
+            if (colKey === 'draft')         $fill.addClass('progress-grey');
+            else if (colKey === 'progress') $fill.addClass('progress-yellow');
+            else if (colKey === 'control')  $fill.addClass('progress-blue');
+            else                            $fill.addClass('progress-green');
 
             // Remove empty state from target
             $column.find('.kanban-empty').remove();
