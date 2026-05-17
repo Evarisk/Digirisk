@@ -266,7 +266,23 @@
 }
 
 .kanban-responsible-wrapper {
+    display: flex;
+    align-items: center;
+    gap: 4px;
     flex-shrink: 0;
+}
+
+.kanban-responsible-avatars {
+    display: flex;
+    align-items: center;
+    cursor: default;
+}
+
+.kanban-avatar-more {
+    font-size: 10px;
+    font-weight: 700;
+    color: #888;
+    margin-left: 2px;
 }
 
 .kanban-responsible-select {
@@ -277,7 +293,7 @@
     background: #fff;
     color: #333;
     cursor: pointer;
-    max-width: 140px;
+    max-width: 130px;
     font-weight: 600;
     appearance: auto;
 
@@ -292,13 +308,66 @@
     color: #ddd;
     font-size: 16px;
     line-height: 1;
-    margin: 0 2px;
+    margin: 0 4px;
 }
 
-.kanban-contributors {
+.kanban-contributor-count {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    min-width: 20px;
+    height: 20px;
+    border-radius: 50%;
+    background: #e9ecef;
+    color: #555;
+    font-size: 10px;
+    font-weight: 700;
+    cursor: default;
+}
+
+.kanban-add-contributor-wrapper {
+    position: relative;
+}
+
+.kanban-add-contributor-btn {
+    background: none;
+    border: 1px solid #d0d5dd;
+    border-radius: 50%;
+    width: 24px;
+    height: 24px;
     display: flex;
     align-items: center;
-    gap: 0;
+    justify-content: center;
+    cursor: pointer;
+    color: #888;
+    font-size: 10px;
+    transition: all 0.2s ease;
+    padding: 0;
+
+    &:hover {
+        background: #e8f5e9;
+        color: #2e7d32;
+        border-color: #2e7d32;
+    }
+}
+
+.kanban-contributor-select {
+    display: none;
+    position: absolute;
+    top: 100%;
+    left: 0;
+    z-index: 20;
+    font-size: 10px;
+    padding: 2px 4px;
+    border: 1px solid #0d8aff;
+    border-radius: 6px;
+    background: #fff;
+    min-width: 140px;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+
+    &.visible {
+        display: block;
+    }
 }
 
 .kanban-avatar {
@@ -324,11 +393,6 @@
     color: #555;
     font-size: 10px;
     font-weight: 700;
-}
-
-.kanban-contact-none {
-    background: #f5f5f5;
-    color: #aaa;
 }
 
 /* Category tags */
