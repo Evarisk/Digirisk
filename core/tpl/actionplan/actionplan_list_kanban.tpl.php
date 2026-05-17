@@ -79,15 +79,14 @@ foreach ($tasksJson as $t) {
                                     <div class="kanban-risk-tooltip">
                                         <div class="krt-header">
                                             <i class="fas fa-exclamation-triangle" style="color:<?= $cotColor ?>"></i>
-                                            <strong><?= dol_escape_htmltag($langs->trans('Risk')) ?></strong> |
-                                            <?= $langs->trans('Ref') ?> : <strong><?= dol_escape_htmltag($rd['ref']) ?></strong>
+                                            <strong><?= dol_escape_htmltag($rd['ref']) ?></strong>
                                             <?php if (!empty($rd['category_name'])) : ?>
-                                                | <?= $langs->trans('Description') ?> : <?= dol_escape_htmltag($rd['category_name']) ?>
+                                                : <?= dol_escape_htmltag($rd['category_name']) ?>
                                             <?php endif; ?>
                                         </div>
                                         <?php if (!empty($rd['ra_ref'])) : ?>
                                         <div class="krt-eval">
-                                            <span><i class="fas fa-chart-line"></i> <?= dol_escape_htmltag($langs->trans('Evaluation')) ?></span>
+                                            <i class="fas fa-chart-line"></i>
                                             <?php if (!empty($rd['ra_photo_url'])) : ?>
                                                 <img src="<?= $rd['ra_photo_url'] ?>" class="krt-photo" alt="">
                                             <?php endif; ?>
@@ -102,7 +101,7 @@ foreach ($tasksJson as $t) {
                                         <?php endif; ?>
                                         <?php if (!empty($rd['ra_comment'])) : ?>
                                         <div class="krt-comment">
-                                            <i class="fas fa-comment"></i> <?= $langs->trans('Comment') ?> : <?= dol_escape_htmltag(dol_trunc($rd['ra_comment'], 120)) ?>
+                                            <i class="fas fa-comment"></i> <?= dol_escape_htmltag(dol_trunc($rd['ra_comment'], 120)) ?>
                                         </div>
                                         <?php endif; ?>
                                     </div>
