@@ -99,39 +99,62 @@ window.digiriskdolibarr.actionplanKanban.event = function() {
     });
 
     // Prevent card drag when interacting with selects
-    $(document).on('mousedown', '.kanban-responsible-select, .kanban-contributor-select, .kanban-add-contributor-btn, .kanban-initial-responsible', function(e) {
+    $(document).on('mousedown', '.kanban-responsible-select, .kanban-contributor-dropdown, .kanban-add-contributor-btn, .kanban-initial-responsible, .kanban-contributor-search, .kanban-contributor-option', function(e) {
         e.stopPropagation();
     });
 
-    // Add contributor: toggle select visibility
+    // Add contributor: toggle dropdown visibility
     $(document).on('click', '.kanban-add-contributor-btn', function(e) {
         e.preventDefault();
         e.stopPropagation();
-        var $select = $(this).siblings('.kanban-contributor-select');
-        $select.toggleClass('visible');
-        if ($select.hasClass('visible')) {
-            $select.trigger('focus');
+        // Close all other dropdowns first
+        $('.kanban-contributor-dropdown.visible').not($(this).siblings('.kanban-contributor-dropdown')).removeClass('visible');
+        var $dropdown = $(this).siblings('.kanban-contributor-dropdown');
+        $dropdown.toggleClass('visible');
+        if ($dropdown.hasClass('visible')) {
+            var $search = $dropdown.find('.kanban-contributor-search');
+            $search.val('').trigger('input');
+            $search.trigger('focus');
         }
     });
 
-    // Contributor select change: AJAX save
-    $(document).on('change', '.kanban-contributor-select', function() {
-        var $select = $(this);
-        var taskId  = $select.data('task-id');
-        var userId  = $select.val();
-        if (userId) {
-            window.digiriskdolibarr.actionplanKanban.addContributor(taskId, userId, $select);
-        }
-        $select.removeClass('visible');
-        $select.val(''); // Reset
+    // Contributor search: filter options
+    $(document).on('input', '.kanban-contributor-search', function() {
+        var query = $(this).val().toLowerCase();
+        $(this).closest('.kanban-contributor-dropdown').find('.kanban-contributor-option').each(function() {
+            var text = $(this).data('search') || '';
+            if (query === '' || text.indexOf(query) !== -1) {
+                $(this).removeClass('hidden');
+            } else {
+                $(this).addClass('hidden');
+            }
+        });
     });
 
-    // Hide contributor select on blur
-    $(document).on('blur', '.kanban-contributor-select', function() {
-        var $select = $(this);
-        setTimeout(function() {
-            $select.removeClass('visible');
-        }, 200);
+    // Contributor option click: AJAX add
+    $(document).on('click', '.kanban-contributor-option', function(e) {
+        e.stopPropagation();
+        var $opt = $(this);
+        if ($opt.hasClass('assigned')) return;
+
+        var $dropdown = $opt.closest('.kanban-contributor-dropdown');
+        var taskId = $dropdown.data('task-id');
+        var userId = $opt.data('value');
+
+        $dropdown.removeClass('visible');
+        window.digiriskdolibarr.actionplanKanban.addContributor(taskId, userId, $dropdown);
+
+        // Mark as assigned immediately
+        $opt.addClass('assigned');
+        $opt.append('<i class="fas fa-check" style="margin-left:4px;font-size:9px;color:#28a745"></i>');
+    });
+
+    // Close dropdown on outside click
+    $(document).on('click', function() {
+        $('.kanban-contributor-dropdown.visible').removeClass('visible');
+    });
+    $(document).on('click', '.kanban-contributor-dropdown', function(e) {
+        e.stopPropagation();
     });
 
     // Progress bar: draggable slider
@@ -567,7 +590,7 @@ window.digiriskdolibarr.actionplanKanban.initSortable = function() {
         placeholder: 'kanban-card-placeholder',
         tolerance: 'pointer',
         cursor: 'grabbing',
-        cancel: '.kanban-progress-bar, .kanban-card-progress, .kanban-responsible-select, .kanban-contributor-select, .kanban-add-contributor-btn, .kanban-initial-responsible, .kanban-card-label, .kanban-inline-edit, .kanban-editable-meta, .kanban-remove-contact, .kanban-initial-wrapper, .kanban-editable-date, .kanban-tag, .kanban-tag-remove, .kanban-add-tag-btn, .kanban-tag-select, .kanban-add-tag-wrapper',
+        cancel: '.kanban-progress-bar, .kanban-card-progress, .kanban-responsible-select, .kanban-contributor-dropdown, .kanban-add-contributor-btn, .kanban-initial-responsible, .kanban-contributor-search, .kanban-contributor-option, .kanban-card-label, .kanban-inline-edit, .kanban-editable-meta, .kanban-remove-contact, .kanban-initial-wrapper, .kanban-editable-date, .kanban-tag, .kanban-tag-remove, .kanban-add-tag-btn, .kanban-tag-select, .kanban-add-tag-wrapper',
         receive: function(event, ui) {
             var $card    = ui.item;
             var $column  = $(this);

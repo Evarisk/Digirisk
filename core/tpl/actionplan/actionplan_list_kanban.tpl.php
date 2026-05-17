@@ -138,21 +138,42 @@ foreach ($tasksJson as $t) {
                                 <button class="kanban-add-contributor-btn" title="<?= dol_escape_htmltag($langs->trans('AddContributor')) ?>">
                                     <i class="fas fa-user-plus"></i>
                                 </button>
-                                <select class="kanban-contributor-select" data-task-id="<?= $t['id'] ?>">
-                                    <option value=""><?= dol_escape_htmltag($langs->trans('SelectUser')) ?></option>
-                                    <optgroup label="<?= dol_escape_htmltag($langs->trans('InternalUsers')) ?>">
-                                        <?php foreach ($allUsers as $u) : ?>
-                                            <option value="internal_<?= $u['id'] ?>"><?= dol_escape_htmltag($u['fullname']) ?></option>
+                                <div class="kanban-contributor-dropdown" data-task-id="<?= $t['id'] ?>">
+                                    <input type="text" class="kanban-contributor-search" placeholder="<?= dol_escape_htmltag($langs->trans('Search')) ?>..." autocomplete="off">
+                                    <div class="kanban-contributor-options">
+                                        <div class="kanban-optgroup-label"><?= dol_escape_htmltag($langs->trans('InternalUsers')) ?></div>
+                                        <?php
+                                        // Build list of already assigned contributor IDs
+                                        $assignedIds = [];
+                                        if (!empty($t['contributors'])) {
+                                            foreach ($t['contributors'] as $contrib) {
+                                                $assignedIds[] = 'internal_' . $contrib['id'];
+                                            }
+                                        }
+                                        ?>
+                                        <?php foreach ($allUsers as $u) :
+                                            $optVal = 'internal_' . $u['id'];
+                                            $isAssigned = in_array($optVal, $assignedIds);
+                                        ?>
+                                            <div class="kanban-contributor-option<?= $isAssigned ? ' assigned' : '' ?>" data-value="<?= $optVal ?>" data-search="<?= dol_escape_htmltag(strtolower($u['fullname'])) ?>">
+                                                <?= dol_escape_htmltag($u['fullname']) ?>
+                                                <?php if ($isAssigned) : ?><i class="fas fa-check" style="margin-left:4px;font-size:9px;color:#28a745"></i><?php endif; ?>
+                                            </div>
                                         <?php endforeach; ?>
-                                    </optgroup>
-                                    <?php if (!empty($allContacts)) : ?>
-                                        <optgroup label="<?= dol_escape_htmltag($langs->trans('ExternalContacts')) ?> (HS)">
-                                            <?php foreach ($allContacts as $c) : ?>
-                                                <option value="external_<?= $c['id'] ?>"><?= dol_escape_htmltag($c['fullname']) ?></option>
+                                        <?php if (!empty($allContacts)) : ?>
+                                            <div class="kanban-optgroup-label"><?= dol_escape_htmltag($langs->trans('ExternalContacts')) ?> (HS)</div>
+                                            <?php foreach ($allContacts as $c) :
+                                                $optVal = 'external_' . $c['id'];
+                                                $isAssigned = in_array($optVal, $assignedIds);
+                                            ?>
+                                                <div class="kanban-contributor-option<?= $isAssigned ? ' assigned' : '' ?>" data-value="<?= $optVal ?>" data-search="<?= dol_escape_htmltag(strtolower($c['fullname'])) ?>">
+                                                    <?= dol_escape_htmltag($c['fullname']) ?>
+                                                    <?php if ($isAssigned) : ?><i class="fas fa-check" style="margin-left:4px;font-size:9px;color:#28a745"></i><?php endif; ?>
+                                                </div>
                                             <?php endforeach; ?>
-                                        </optgroup>
-                                    <?php endif; ?>
-                                </select>
+                                        <?php endif; ?>
+                                    </div>
+                                </div>
                             </div>
                         </div>
 
