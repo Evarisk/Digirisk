@@ -59,16 +59,47 @@ window.digiriskdolibarr.actionplanKanban.event = function() {
         });
     });
 
-    // Responsible change
+    // Responsible: click initial → show select
+    $(document).on('click', '.kanban-initial-responsible', function(e) {
+        e.stopPropagation();
+        var $wrapper = $(this).closest('.kanban-responsible-wrapper');
+        var $select  = $wrapper.find('.kanban-responsible-select');
+        $(this).hide();
+        $select.addClass('visible').trigger('focus');
+    });
+
+    // Responsible: change → save + hide select → update initial
     $(document).on('change', '.kanban-responsible-select', function() {
-        var $select = $(this);
-        var taskId  = $select.data('task-id');
-        var userId  = $select.val();
+        var $select  = $(this);
+        var $wrapper = $select.closest('.kanban-responsible-wrapper');
+        var $initial = $wrapper.find('.kanban-initial-responsible');
+        var taskId   = $select.data('task-id');
+        var userId   = $select.val();
+        var selText  = $select.find('option:selected').text().trim();
+        var newInit  = userId > 0 ? selText.charAt(0).toUpperCase() : '?';
+
+        // Hide select, update initial, show initial
+        $select.removeClass('visible');
+        $initial.text(newInit)
+                .attr('title', userId > 0 ? selText : '')
+                .toggleClass('kanban-initial-empty', userId == 0)
+                .show();
+
         window.digiriskdolibarr.actionplanKanban.saveResponsible(taskId, userId, $select);
     });
 
+    // Responsible: blur select → hide if no change
+    $(document).on('blur', '.kanban-responsible-select', function() {
+        var $select = $(this);
+        var $initial = $select.siblings('.kanban-initial-responsible');
+        setTimeout(function() {
+            $select.removeClass('visible');
+            $initial.show();
+        }, 200);
+    });
+
     // Prevent card drag when interacting with selects
-    $(document).on('mousedown', '.kanban-responsible-select, .kanban-contributor-select, .kanban-add-contributor-btn', function(e) {
+    $(document).on('mousedown', '.kanban-responsible-select, .kanban-contributor-select, .kanban-add-contributor-btn, .kanban-initial-responsible', function(e) {
         e.stopPropagation();
     });
 

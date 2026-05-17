@@ -80,29 +80,30 @@ foreach ($tasksJson as $t) {
                         <!-- Label -->
                         <div class="kanban-card-label"><?= dol_escape_htmltag($t['label']) ?></div>
 
-                        <!-- Contacts row: [Responsible avatar + select] | [contributor count] [add contributor] -->
+                        <!-- Contacts row: [Resp initial] | [Contrib initials] [count] [👤+] -->
                         <div class="kanban-card-contacts">
-                            <!-- Responsible: avatar(s) + select -->
-                            <div class="kanban-responsible-wrapper">
-                                <?php if (!empty($t['responsible'])) : ?>
-                                    <div class="kanban-responsible-avatars"
-                                         title="<?= dol_escape_htmltag(implode(', ', array_map(function($r) { return $r['fullname']; }, $t['responsible']))) ?>">
-                                        <?php $firstResp = $t['responsible'][0]; ?>
-                                        <?php if (!empty($firstResp['photo'])) : ?>
-                                            <img src="<?= $firstResp['photo'] ?>" class="kanban-avatar" alt="<?= dol_escape_htmltag($firstResp['fullname']) ?>">
-                                        <?php else : ?>
-                                            <span class="kanban-avatar kanban-avatar-initials"><?= strtoupper(mb_substr($firstResp['fullname'], 0, 1)) ?></span>
-                                        <?php endif; ?>
-                                        <?php if (count($t['responsible']) > 1) : ?>
-                                            <span class="kanban-avatar-more">...</span>
-                                        <?php endif; ?>
-                                    </div>
-                                <?php endif; ?>
+                            <!-- Responsible: clickable initial circle -->
+                            <?php
+                            $respInitial  = '';
+                            $respFullname = '';
+                            $respId       = 0;
+                            if (!empty($t['responsible'])) {
+                                $respInitial  = strtoupper(mb_substr($t['responsible'][0]['fullname'], 0, 1));
+                                $respFullname = $t['responsible'][0]['fullname'];
+                                $respId       = $t['responsible'][0]['id'];
+                            }
+                            ?>
+                            <div class="kanban-responsible-wrapper" data-task-id="<?= $t['id'] ?>" data-current-user="<?= $respId ?>">
+                                <span class="kanban-initial kanban-initial-responsible <?= empty($respInitial) ? 'kanban-initial-empty' : '' ?>"
+                                      title="<?= dol_escape_htmltag($respFullname ?: $langs->trans('Unassigned')) ?>">
+                                    <?= $respInitial ?: '?' ?>
+                                </span>
+                                <!-- Hidden select, shown on click -->
                                 <select class="kanban-responsible-select" data-task-id="<?= $t['id'] ?>">
                                     <option value="0"><?= dol_escape_htmltag($langs->trans('Unassigned')) ?></option>
                                     <?php foreach ($allUsers as $u) : ?>
-                                        <option value="<?= $u['id'] ?>"
-                                            <?= (!empty($t['responsible']) && $t['responsible'][0]['id'] == $u['id']) ? 'selected' : '' ?>>
+                                        <option value="<?= $u['id'] ?>" data-initial="<?= strtoupper(mb_substr($u['fullname'], 0, 1)) ?>"
+                                            <?= ($respId == $u['id']) ? 'selected' : '' ?>>
                                             <?= dol_escape_htmltag($u['fullname']) ?>
                                         </option>
                                     <?php endforeach; ?>
@@ -110,6 +111,16 @@ foreach ($tasksJson as $t) {
                             </div>
 
                             <span class="kanban-separator">|</span>
+
+                            <!-- Contributor initials -->
+                            <?php if (!empty($t['contributors'])) : ?>
+                                <?php foreach ($t['contributors'] as $contrib) : ?>
+                                    <span class="kanban-initial kanban-initial-contributor"
+                                          title="<?= dol_escape_htmltag($contrib['fullname']) ?>">
+                                        <?= strtoupper(mb_substr($contrib['fullname'], 0, 2)) ?>
+                                    </span>
+                                <?php endforeach; ?>
+                            <?php endif; ?>
 
                             <!-- Contributor count badge -->
                             <span class="kanban-contributor-count"
@@ -129,13 +140,6 @@ foreach ($tasksJson as $t) {
                                     <?php endforeach; ?>
                                 </select>
                             </div>
-
-                            <!-- File count -->
-                            <?php if ($t['file_count'] > 0) : ?>
-                                <a href="<?= $t['url'] ?>" class="kanban-file-badge" title="<?= dol_escape_htmltag($langs->trans('NumberOfLinkedFiles')) ?>">
-                                    <i class="fas fa-paperclip"></i> <?= $t['file_count'] ?>
-                                </a>
-                            <?php endif; ?>
                         </div>
 
                         <!-- Progress bar -->
