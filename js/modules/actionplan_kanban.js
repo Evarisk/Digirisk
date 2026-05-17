@@ -231,6 +231,7 @@ window.digiriskdolibarr.actionplanKanban.initSortable = function() {
         placeholder: 'kanban-card-placeholder',
         tolerance: 'pointer',
         cursor: 'grabbing',
+        cancel: '.kanban-progress-bar, .kanban-card-progress, .kanban-responsible-select, .kanban-contributor-select, .kanban-add-contributor-btn, .kanban-initial-responsible, .kanban-card-label, .kanban-inline-edit',
         receive: function(event, ui) {
             var $card    = ui.item;
             var $column  = $(this);
