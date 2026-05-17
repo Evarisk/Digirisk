@@ -53,7 +53,7 @@ $action = GETPOST('action', 'aZ09');
 $view   = GETPOST('view', 'alpha');
 
 if (empty($view) || !in_array($view, ['gantt', 'kanban'])) {
-    $view = 'gantt';
+    $view = 'kanban';
 }
 
 // Initialize technical objects
