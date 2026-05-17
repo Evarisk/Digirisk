@@ -470,8 +470,9 @@
     border-radius: 4px;
     transition: width 0.05s linear;
 
-    &.progress-red    { background: #e05353; }
+    &.progress-grey   { background: #999999; }
     &.progress-yellow { background: #e9ad4f; }
+    &.progress-blue   { background: #3085d6; }
     &.progress-green  { background: #47e58e; }
 }
 

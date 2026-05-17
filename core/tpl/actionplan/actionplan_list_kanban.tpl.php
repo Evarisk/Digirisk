@@ -13,7 +13,7 @@
 
 // Kanban columns definition
 $columns = [
-    'draft'    => ['label' => $langs->trans('ColumnDraft'),      'icon' => 'fa-pencil-alt', 'color' => '#e05353', 'min' => 0,  'max' => $kanbanThresholds['draft_max']],
+    'draft'    => ['label' => $langs->trans('ColumnDraft'),      'icon' => 'fa-pencil-alt', 'color' => '#999999', 'min' => 0,  'max' => $kanbanThresholds['draft_max']],
     'progress' => ['label' => $langs->trans('ColumnInProgress'), 'icon' => 'fa-spinner',    'color' => '#e9ad4f', 'min' => $kanbanThresholds['draft_max'] + 1, 'max' => $kanbanThresholds['progress_max']],
     'control'  => ['label' => $langs->trans('ColumnInControl'),  'icon' => 'fa-search',     'color' => '#3085d6', 'min' => $kanbanThresholds['progress_max'] + 1, 'max' => $kanbanThresholds['control_max']],
     'done'     => ['label' => $langs->trans('ColumnDone'),       'icon' => 'fa-check',      'color' => '#47e58e', 'min' => 100, 'max' => 100],
@@ -95,7 +95,7 @@ foreach ($tasksJson as $t) {
                             // Color matching progress bar
                             $p = $t['progress'];
                             if ($p <= $kanbanThresholds['draft_max']) {
-                                $respColor = '#e05353';
+                                $respColor = '#999999';
                             } elseif ($p <= $kanbanThresholds['progress_max']) {
                                 $respColor = '#e9ad4f';
                             } elseif ($p <= $kanbanThresholds['control_max']) {
@@ -157,7 +157,18 @@ foreach ($tasksJson as $t) {
                         <!-- Progress bar -->
                         <div class="kanban-card-progress">
                             <div class="kanban-progress-bar">
-                                <div class="kanban-progress-fill <?= $t['progress'] == 0 ? 'progress-red' : ($t['progress'] < 100 ? 'progress-yellow' : 'progress-green') ?>"
+                                <?php
+                                if ($t['progress'] <= $kanbanThresholds['draft_max']) {
+                                    $barClass = 'progress-grey';
+                                } elseif ($t['progress'] <= $kanbanThresholds['progress_max']) {
+                                    $barClass = 'progress-yellow';
+                                } elseif ($t['progress'] <= $kanbanThresholds['control_max']) {
+                                    $barClass = 'progress-blue';
+                                } else {
+                                    $barClass = 'progress-green';
+                                }
+                                ?>
+                                <div class="kanban-progress-fill <?= $barClass ?>"
                                      style="width: <?= $t['progress'] ?>%"></div>
                             </div>
                             <span class="kanban-progress-text"><?= $t['progress'] ?>%</span>
