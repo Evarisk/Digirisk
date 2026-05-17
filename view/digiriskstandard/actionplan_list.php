@@ -112,6 +112,9 @@ $help_url = 'FR:Module_Digirisk#Plan_d_action';
 
 saturne_header(0, '', $title, $help_url);
 
+// Hidden token for AJAX requests (normally provided by digirisk_header sidebar, but we use saturne_header for full-width)
+print '<input type="hidden" name="token" value="' . newToken() . '">';
+
 // Fetch all tasks for the DU project
 $allTasks = [];
 if ($projectId > 0) {
