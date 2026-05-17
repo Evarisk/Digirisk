@@ -223,17 +223,12 @@ foreach ($tasksJson as $t) {
                                     </span>
                                 <?php endforeach; ?>
                             <?php endif; ?>
-                            <div class="kanban-add-tag-wrapper">
-                                <button class="kanban-add-tag-btn" title="<?= dol_escape_htmltag($langs->trans('AddCategory')) ?>">
-                                    <i class="fas fa-tag"></i><i class="fas fa-plus" style="font-size:7px;margin-left:2px"></i>
-                                </button>
-                                <select class="kanban-tag-select" data-task-id="<?= $t['id'] ?>">
-                                    <option value=""><?= dol_escape_htmltag($langs->trans('SelectCategory')) ?></option>
-                                    <?php foreach ($allAvailableCategories as $ac) : ?>
-                                        <option value="<?= $ac['id'] ?>" data-color="<?= dol_escape_htmltag($ac['color']) ?>"><?= dol_escape_htmltag($ac['label']) ?></option>
-                                    <?php endforeach; ?>
-                                </select>
-                            </div>
+                            <select class="kanban-tag-select" data-task-id="<?= $t['id'] ?>">
+                                <option value=""><?= dol_escape_htmltag($langs->trans('AddCategory')) ?></option>
+                                <?php foreach ($allAvailableCategories as $ac) : ?>
+                                    <option value="<?= $ac['id'] ?>" data-color="<?= dol_escape_htmltag($ac['color']) ?>"><?= dol_escape_htmltag($ac['label']) ?></option>
+                                <?php endforeach; ?>
+                            </select>
                         </div>
 
                     </div>
