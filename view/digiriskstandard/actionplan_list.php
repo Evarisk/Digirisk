@@ -200,21 +200,13 @@ if ($action == 'addTaskContributor' && !empty(GETPOSTINT('task_id'))) {
     $result = $taskToUpdate->fetch($taskId);
 
     if ($result > 0 && $taskToUpdate->fk_project == $projectId) {
-        $addResult = $taskToUpdate->add_contact($userId, 'TASKCONTRIBUTOR', 'internal');
+        $source = GETPOST('source', 'alpha');
+        if (empty($source) || !in_array($source, ['internal', 'external'])) {
+            $source = 'internal';
+        }
+        $addResult = $taskToUpdate->add_contact($userId, 'TASKCONTRIBUTOR', $source);
         if ($addResult > 0) {
-            // Count contributors after addition
-            $contacts = $taskToUpdate->liste_contact(-1, 'internal');
-            $contribCount = 0;
-            $contribNames = [];
-            if (is_array($contacts)) {
-                foreach ($contacts as $c) {
-                    if ($c['code'] != 'TASKEXECUTIVE') {
-                        $contribCount++;
-                        $contribNames[] = trim($c['firstname'] . ' ' . $c['lastname']);
-                    }
-                }
-            }
-            print json_encode(['success' => 1, 'count' => $contribCount, 'names' => implode(', ', $contribNames)]);
+            print json_encode(['success' => 1]);
         } else {
             http_response_code(500);
             print json_encode(['success' => 0, 'error' => $taskToUpdate->error]);
@@ -238,16 +230,17 @@ if ($action == 'removeTaskContributor' && !empty(GETPOSTINT('task_id'))) {
     $result = $taskToUpdate->fetch($taskId);
 
     if ($result > 0 && $taskToUpdate->fk_project == $projectId) {
-        // Find the contact line ID to delete
-        $contacts = $taskToUpdate->liste_contact(-1, 'internal');
+        // Find the contact line ID to delete (check both internal and external)
+        $allContacts = array_merge(
+            (array) $taskToUpdate->liste_contact(-1, 'internal'),
+            (array) $taskToUpdate->liste_contact(-1, 'external')
+        );
         $deleted = false;
-        if (is_array($contacts)) {
-            foreach ($contacts as $c) {
-                if ($c['id'] == $userId && $c['code'] == 'TASKCONTRIBUTOR') {
-                    $res = $taskToUpdate->delete_contact($c['rowid']);
-                    $deleted = ($res >= 0);
-                    break;
-                }
+        foreach ($allContacts as $c) {
+            if ($c['id'] == $userId && $c['code'] == 'TASKCONTRIBUTOR') {
+                $res = $taskToUpdate->delete_contact($c['rowid']);
+                $deleted = ($res >= 0);
+                break;
             }
         }
         if ($deleted) {
@@ -342,6 +335,27 @@ if ($resUsers) {
         ];
     }
     $db->free($resUsers);
+}
+
+// Load all external contacts (societe contacts) for contributor dropdown
+$allContacts = [];
+$sqlContacts = "SELECT sp.rowid, sp.firstname, sp.lastname, s.nom as society_name FROM " . MAIN_DB_PREFIX . "socpeople sp";
+$sqlContacts .= " LEFT JOIN " . MAIN_DB_PREFIX . "societe s ON s.rowid = sp.fk_soc";
+$sqlContacts .= " WHERE sp.statut = 1 AND sp.entity IN (" . getEntity('contact') . ")";
+$sqlContacts .= " ORDER BY sp.lastname, sp.firstname";
+$resContacts = $db->query($sqlContacts);
+if ($resContacts) {
+    while ($objC = $db->fetch_object($resContacts)) {
+        $fullname = trim($objC->firstname . ' ' . $objC->lastname);
+        if (!empty($objC->society_name)) {
+            $fullname .= ' (' . $objC->society_name . ')';
+        }
+        $allContacts[] = [
+            'id'       => (int) $objC->rowid,
+            'fullname' => $fullname,
+        ];
+    }
+    $db->free($resContacts);
 }
 
 // Fetch all tasks for the DU project

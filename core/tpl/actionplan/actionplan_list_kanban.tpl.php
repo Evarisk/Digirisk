@@ -144,9 +144,18 @@ foreach ($tasksJson as $t) {
                                 </button>
                                 <select class="kanban-contributor-select" data-task-id="<?= $t['id'] ?>">
                                     <option value=""><?= dol_escape_htmltag($langs->trans('SelectUser')) ?></option>
-                                    <?php foreach ($allUsers as $u) : ?>
-                                        <option value="<?= $u['id'] ?>"><?= dol_escape_htmltag($u['fullname']) ?></option>
-                                    <?php endforeach; ?>
+                                    <optgroup label="<?= dol_escape_htmltag($langs->trans('InternalUsers')) ?>">
+                                        <?php foreach ($allUsers as $u) : ?>
+                                            <option value="internal_<?= $u['id'] ?>"><?= dol_escape_htmltag($u['fullname']) ?></option>
+                                        <?php endforeach; ?>
+                                    </optgroup>
+                                    <?php if (!empty($allContacts)) : ?>
+                                        <optgroup label="<?= dol_escape_htmltag($langs->trans('ExternalContacts')) ?> (HS)">
+                                            <?php foreach ($allContacts as $c) : ?>
+                                                <option value="external_<?= $c['id'] ?>"><?= dol_escape_htmltag($c['fullname']) ?></option>
+                                            <?php endforeach; ?>
+                                        </optgroup>
+                                    <?php endif; ?>
                                 </select>
                             </div>
                         </div>

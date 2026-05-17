@@ -615,17 +615,29 @@ window.digiriskdolibarr.actionplanKanban.addContributor = function(taskId, userI
     var querySeparator = window.saturne.toolbox.getQuerySeparator(document.URL);
     var $card          = $select.closest('.kanban-card');
 
+    // Parse source type from prefixed value (internal_123 or external_456)
+    var parts  = userId.split('_');
+    var source = parts[0]; // 'internal' or 'external'
+    var realId = parts[1];
+    var selectedText = $select.find('option:selected').text().trim();
+    var initials = selectedText.substring(0, 2).toUpperCase();
+
     $card.addClass('kanban-card-saving');
 
     $.ajax({
-        url: document.URL + querySeparator + 'action=addTaskContributor&task_id=' + taskId + '&user_id=' + userId + '&token=' + token,
+        url: document.URL + querySeparator + 'action=addTaskContributor&task_id=' + taskId + '&user_id=' + realId + '&source=' + source + '&token=' + token,
         type: 'POST',
         dataType: 'json',
         success: function(response) {
             $card.removeClass('kanban-card-saving');
             if (response.success) {
-                // Update count badge and tooltip
-                $card.find('.kanban-contributor-count').text(response.count).attr('title', response.names);
+                // Add contributor initial chip to the DOM
+                var $wrapper = $('<span class="kanban-initial-wrapper" data-task-id="' + taskId + '" data-user-id="' + realId + '"></span>');
+                var $chip = $('<span class="kanban-initial kanban-initial-contributor" title="' + selectedText + '">' + initials + '</span>');
+                var $remove = $('<span class="kanban-remove-contact" title="Supprimer">&times;</span>');
+                $wrapper.append($chip).append($remove);
+                $card.find('.kanban-add-contributor-wrapper').before($wrapper);
+
                 $card.addClass('kanban-card-saved');
                 setTimeout(function() {
                     $card.removeClass('kanban-card-saved');
