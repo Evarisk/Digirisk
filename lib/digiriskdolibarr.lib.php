@@ -53,6 +53,11 @@ function digiriskdolibarr_admin_prepare_head(): array
     $head[$h][2] = 'preventionplan';
     $h++;
 
+    $head[$h][0] = dol_buildpath('/digiriskdolibarr/admin/config/actionplan.php', 1);
+    $head[$h][1] = $conf->browser->layout != 'phone' ? '<i class="fas fa-columns pictofixedwidth"></i>' . $langs->trans('ActionPlan') : '<i class="fas fa-columns"></i>';
+    $head[$h][2] = 'actionplan';
+    $h++;
+
     $head[$h][0] = dol_buildpath('/digiriskdolibarr/admin/config/firepermit.php', 1);
     $head[$h][1] = $conf->browser->layout != 'phone' ? '<i class="fas fa-fire-alt pictofixedwidth"></i>' . $langs->trans('FirePermit') : '<i class="fas fa-fire-alt"></i>';
     $head[$h][2] = 'firepermit';
