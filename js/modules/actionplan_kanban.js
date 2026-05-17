@@ -329,6 +329,37 @@ window.digiriskdolibarr.actionplanKanban.event = function() {
         function saveDate() {
             var val = $input.val();
             var $card = $date.closest('.kanban-card');
+
+            // Cross-validate start vs end date
+            if (val) {
+                var $row = $date.closest('.kanban-dates-row');
+                var $otherDate = $row.find('.kanban-editable-date').not($date);
+                var otherRaw = $otherDate.data('raw') || '';
+                if (otherRaw) {
+                    var isInvalid = false;
+                    if (field === 'date_end' && val < otherRaw) {
+                        isInvalid = true;
+                    } else if (field === 'date_start' && val > otherRaw) {
+                        isInvalid = true;
+                    }
+                    if (isInvalid) {
+                        // Show discreet warning toast on card
+                        var $toast = $('<div class="kanban-date-warning"><i class="fas fa-exclamation-triangle"></i> Date fin antérieure au début</div>');
+                        $card.append($toast);
+                        setTimeout(function() { $toast.addClass('visible'); }, 10);
+                        setTimeout(function() {
+                            $toast.removeClass('visible');
+                            setTimeout(function() { $toast.remove(); }, 300);
+                        }, 3000);
+
+                        // Restore original text
+                        var $newValue = $('<span class="kanban-date-value"></span>').text(origText);
+                        $input.replaceWith($newValue);
+                        return;
+                    }
+                }
+            }
+
             $card.addClass('kanban-card-saving');
 
             var token = window.saturne.toolbox.getToken();

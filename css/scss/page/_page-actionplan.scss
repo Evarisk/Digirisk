@@ -99,6 +99,7 @@
 
 /* Cards */
 .kanban-card {
+    position: relative;
     background: #fff;
     border-radius: 8px;
     padding: 12px;
@@ -552,6 +553,34 @@
     box-shadow: 0 0 0 2px rgba(59, 130, 246, 0.15);
 }
 
+.kanban-date-warning {
+    position: absolute;
+    bottom: 8px;
+    left: 50%;
+    transform: translateX(-50%) translateY(4px);
+    background: #fff3cd;
+    color: #856404;
+    border: 1px solid #ffc107;
+    border-radius: 6px;
+    padding: 4px 10px;
+    font-size: 10px;
+    font-weight: 600;
+    white-space: nowrap;
+    opacity: 0;
+    transition: opacity 0.2s ease, transform 0.2s ease;
+    z-index: 10;
+    box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+
+    i {
+        color: #e9a100;
+        margin-right: 4px;
+    }
+
+    &.visible {
+        opacity: 1;
+        transform: translateX(-50%) translateY(0);
+    }
+}
 /* Progress bar */
 .kanban-card-progress {
     display: flex;
