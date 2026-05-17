@@ -645,10 +645,6 @@ $head[0][0] = $_SERVER['PHP_SELF'] . '?view=kanban';
 $head[0][1] = '<i class="fas fa-columns pictofixedwidth"></i>' . $langs->trans('ActionPlanKanban');
 $head[0][2] = 'kanban';
 
-$head[1][0] = $_SERVER['PHP_SELF'] . '?view=gantt';
-$head[1][1] = '<i class="fas fa-chart-bar pictofixedwidth"></i>' . $langs->trans('ActionPlanGantt');
-$head[1][2] = 'gantt';
-
 print dol_get_fiche_head($head, $view, $title, -1, 'task');
 
 // Include appropriate TPL
