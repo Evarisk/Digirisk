@@ -127,9 +127,12 @@ foreach ($tasksJson as $t) {
                             <!-- Contributor initials -->
                             <?php if (!empty($t['contributors'])) : ?>
                                 <?php foreach ($t['contributors'] as $contrib) : ?>
-                                    <span class="kanban-initial kanban-initial-contributor"
-                                          title="<?= dol_escape_htmltag($contrib['fullname']) ?>">
-                                        <?= strtoupper(mb_substr($contrib['fullname'], 0, 2)) ?>
+                                    <span class="kanban-initial-wrapper" data-task-id="<?= $t['id'] ?>" data-user-id="<?= $contrib['id'] ?>">
+                                        <span class="kanban-initial kanban-initial-contributor"
+                                              title="<?= dol_escape_htmltag($contrib['fullname']) ?>">
+                                            <?= strtoupper(mb_substr($contrib['fullname'], 0, 2)) ?>
+                                        </span>
+                                        <span class="kanban-remove-contact" title="<?= dol_escape_htmltag($langs->trans('RemoveContact')) ?>">&times;</span>
                                     </span>
                                 <?php endforeach; ?>
                             <?php endif; ?>

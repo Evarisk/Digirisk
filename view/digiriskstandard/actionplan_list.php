@@ -227,6 +227,42 @@ if ($action == 'addTaskContributor' && !empty(GETPOSTINT('task_id'))) {
     exit;
 }
 
+// AJAX action to remove a contributor from a task
+if ($action == 'removeTaskContributor' && !empty(GETPOSTINT('task_id'))) {
+    header('Content-Type: application/json');
+
+    $taskId = GETPOSTINT('task_id');
+    $userId = GETPOSTINT('user_id');
+
+    $taskToUpdate = new SaturneTask($db);
+    $result = $taskToUpdate->fetch($taskId);
+
+    if ($result > 0 && $taskToUpdate->fk_project == $projectId) {
+        // Find the contact line ID to delete
+        $contacts = $taskToUpdate->liste_contact(-1, 'internal');
+        $deleted = false;
+        if (is_array($contacts)) {
+            foreach ($contacts as $c) {
+                if ($c['id'] == $userId && $c['code'] == 'TASKCONTRIBUTOR') {
+                    $res = $taskToUpdate->delete_contact($c['rowid']);
+                    $deleted = ($res >= 0);
+                    break;
+                }
+            }
+        }
+        if ($deleted) {
+            print json_encode(['success' => 1]);
+        } else {
+            print json_encode(['success' => 0, 'error' => 'Contact not found or delete failed']);
+        }
+    } else {
+        http_response_code(404);
+        print json_encode(['success' => 0, 'error' => 'Task not found']);
+    }
+    $db->close();
+    exit;
+}
+
 // AJAX action to update task workload or budget
 if ($action == 'updateTaskMeta' && !empty(GETPOSTINT('task_id'))) {
     header('Content-Type: application/json');
