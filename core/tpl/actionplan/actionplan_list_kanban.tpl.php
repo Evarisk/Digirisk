@@ -105,8 +105,11 @@ foreach ($tasksJson as $t) {
                                         <?php if (!empty($rd['ra_ref'])) : ?>
                                         <div class="krt-eval">
                                             <i class="fas fa-chart-line"></i>
+                                            <span class="krt-cotation" style="background:<?= $cotColor ?>;color:<?= $textColor ?>"><?= $rd['cotation'] ?></span>
                                             <?php if (!empty($rd['ra_photo_url'])) : ?>
                                                 <img src="<?= $rd['ra_photo_url'] ?>" class="krt-photo" alt="">
+                                            <?php else : ?>
+                                                <span class="krt-photo-default"><i class="fas fa-image"></i></span>
                                             <?php endif; ?>
                                             <span><?= dol_escape_htmltag($rd['ra_ref']) ?></span>
                                             <?php if (!empty($rd['ra_date'])) : ?>
