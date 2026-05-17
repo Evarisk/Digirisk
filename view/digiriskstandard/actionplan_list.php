@@ -157,16 +157,21 @@ $kanbanThresholds = [
     'control_max'  => getDolGlobalInt('DIGIRISKDOLIBARR_KANBAN_CONTROL_MAX', 99),
 ];
 
-// Prepare JSON data for JS
+// Prepare enriched data for templates
 $tasksJson = [];
 foreach ($allTasks as $t) {
-    $riskRef = '';
-    $riskId  = 0;
+    // Risk data
+    $riskRef     = '';
+    $riskId      = 0;
+    $riskNomUrl  = '';
     if (isset($taskRiskMap[$t->id]) && isset($riskObjects[$taskRiskMap[$t->id]])) {
-        $riskRef = $riskObjects[$taskRiskMap[$t->id]]->ref;
-        $riskId  = $riskObjects[$taskRiskMap[$t->id]]->id;
+        $riskObj    = $riskObjects[$taskRiskMap[$t->id]];
+        $riskRef    = $riskObj->ref;
+        $riskId     = $riskObj->id;
+        $riskNomUrl = $riskObj->getNomUrl(1);
     }
 
+    // Categories
     $cats = [];
     if (isset($taskCategories[$t->id])) {
         foreach ($taskCategories[$t->id] as $cat) {
@@ -174,20 +179,75 @@ foreach ($allTasks as $t) {
         }
     }
 
+    // Contacts: responsible (TASKEXECUTIVE) and associated people
+    $taskObj = new SaturneTask($db);
+    $taskObj->fetch($t->id);
+    $contactsInternal = $taskObj->liste_contact(-1, 'internal');
+    $contactsExternal = $taskObj->liste_contact(-1, 'external');
+
+    $responsible  = [];
+    $associated   = [];
+    if (is_array($contactsInternal)) {
+        foreach ($contactsInternal as $c) {
+            $contactInfo = [
+                'id'       => $c['id'],
+                'fullname' => trim($c['firstname'] . ' ' . $c['lastname']),
+                'photo'    => '',
+            ];
+            // TASKEXECUTIVE = responsable de la tâche
+            if ($c['code'] == 'TASKEXECUTIVE') {
+                $responsible[] = $contactInfo;
+            } else {
+                $associated[] = $contactInfo;
+            }
+        }
+    }
+    if (is_array($contactsExternal)) {
+        foreach ($contactsExternal as $c) {
+            $associated[] = [
+                'id'       => $c['id'],
+                'fullname' => trim($c['firstname'] . ' ' . $c['lastname']),
+                'photo'    => '',
+            ];
+        }
+    }
+
+    // File count
+    $fileCount = 0;
+    $sqlFiles  = "SELECT COUNT(*) as nb FROM " . MAIN_DB_PREFIX . "ecm_files WHERE src_object_type = 'projet_task' AND src_object_id = " . ((int) $t->id);
+    $resFiles  = $db->query($sqlFiles);
+    if ($resFiles) {
+        $objFiles  = $db->fetch_object($resFiles);
+        $fileCount = (int) $objFiles->nb;
+        $db->free($resFiles);
+    }
+
+    // Budget
+    $budget = property_exists($t, 'budget_amount') ? (float) $t->budget_amount : 0;
+
     $tasksJson[] = [
-        'id'               => $t->id,
-        'ref'              => $t->ref,
-        'label'            => $t->label,
-        'date_start'       => $t->date_start ? dol_print_date($t->date_start, 'dayrfc') : '',
-        'date_end'         => $t->date_end ? dol_print_date($t->date_end, 'dayrfc') : '',
-        'planned_workload' => $t->planned_workload,
+        'id'                 => $t->id,
+        'ref'                => $t->ref,
+        'label'              => $t->label,
+        'date_start'         => $t->date_start ? dol_print_date($t->date_start, 'dayrfc') : '',
+        'date_start_fmt'     => $t->date_start ? dol_print_date($t->date_start, 'day') : '',
+        'date_end'           => $t->date_end ? dol_print_date($t->date_end, 'dayrfc') : '',
+        'date_end_fmt'       => $t->date_end ? dol_print_date($t->date_end, 'day') : '',
+        'planned_workload'   => $t->planned_workload,
+        'planned_workload_fmt' => $t->planned_workload > 0 ? convertSecondToTime($t->planned_workload, 'allhourmin') : '',
         'duration_effective' => $t->duration_effective,
-        'progress'         => (int) $t->progress,
-        'status'           => (int) $t->fk_statut,
-        'risk_ref'         => $riskRef,
-        'risk_id'          => $riskId,
-        'categories'       => $cats,
-        'url'              => DOL_URL_ROOT . '/projet/tasks/task.php?id=' . $t->id . '&withproject=1',
+        'progress'           => (int) $t->progress,
+        'status'             => (int) $t->fk_statut,
+        'risk_ref'           => $riskRef,
+        'risk_id'            => $riskId,
+        'risk_nomurl'        => $riskNomUrl,
+        'categories'         => $cats,
+        'responsible'        => $responsible,
+        'associated'         => $associated,
+        'file_count'         => $fileCount,
+        'budget'             => $budget,
+        'budget_fmt'         => $budget > 0 ? price($budget, 0, $langs, 1, -1, -1, $conf->currency) : '',
+        'url'                => DOL_URL_ROOT . '/projet/tasks/task.php?id=' . $t->id . '&withproject=1',
     ];
 }
 

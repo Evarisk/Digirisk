@@ -48,8 +48,8 @@
 
 .kanban-column {
     flex: 1;
-    min-width: 260px;
-    max-width: 320px;
+    min-width: 280px;
+    max-width: 340px;
     background: #f8f9fa;
     border-radius: 10px;
     display: flex;
@@ -125,17 +125,19 @@
     margin-bottom: 8px;
 }
 
+/* Card header */
 .kanban-card-header {
     display: flex;
     align-items: center;
-    justify-content: space-between;
+    flex-wrap: wrap;
+    gap: 6px;
     margin-bottom: 6px;
 }
 
 .kanban-card-ref {
     font-weight: 700;
     font-size: 12px;
-    color: #0d8aff;
+    color: #e05353;
     text-decoration: none;
 
     &:hover {
@@ -144,14 +146,38 @@
 }
 
 .kanban-card-risk {
-    font-size: 10px;
-    padding: 2px 6px;
-    border-radius: 4px;
-    background: #fff3cd;
-    color: #856404;
-    font-weight: 600;
+    font-size: 11px;
+    margin-left: auto;
+
+    a {
+        padding: 2px 6px;
+        border-radius: 4px;
+        background: #fff3cd;
+        color: #856404;
+        font-weight: 600;
+        text-decoration: none;
+        display: inline-flex;
+        align-items: center;
+        gap: 3px;
+        font-size: 10px;
+
+        &:hover {
+            background: #ffe69c;
+        }
+    }
 }
 
+.kanban-meta-item {
+    font-size: 10px;
+    color: #888;
+    white-space: nowrap;
+
+    i {
+        margin-right: 2px;
+    }
+}
+
+/* Card label */
 .kanban-card-label {
     font-size: 13px;
     color: #333;
@@ -159,36 +185,75 @@
     margin-bottom: 8px;
 }
 
+/* Contacts row */
+.kanban-card-contacts {
+    display: flex;
+    align-items: center;
+    flex-wrap: wrap;
+    gap: 6px;
+    margin-bottom: 8px;
+    padding: 6px 0;
+    border-top: 1px solid #f0f0f0;
+    border-bottom: 1px solid #f0f0f0;
+}
+
+.kanban-file-badge {
+    font-size: 10px;
+    padding: 2px 8px;
+    border-radius: 12px;
+    background: #e8f4fd;
+    color: #0d6efd;
+    font-weight: 600;
+    text-decoration: none;
+    display: inline-flex;
+    align-items: center;
+    gap: 3px;
+
+    &:hover {
+        background: #c5e4f9;
+    }
+}
+
+.kanban-contact {
+    font-size: 10px;
+    padding: 2px 8px;
+    border-radius: 12px;
+    display: inline-flex;
+    align-items: center;
+    gap: 3px;
+    font-weight: 600;
+}
+
+.kanban-contact-responsible {
+    background: #e8f5e9;
+    color: #2e7d32;
+}
+
+.kanban-contact-associated {
+    background: #f3e5f5;
+    color: #7b1fa2;
+}
+
+.kanban-contact-none {
+    background: #f5f5f5;
+    color: #aaa;
+}
+
 /* Category tags */
 .kanban-card-tags {
     display: flex;
     flex-wrap: wrap;
     gap: 4px;
-    margin-bottom: 8px;
+    margin-top: 6px;
 }
 
 .kanban-tag {
     font-size: 10px;
-    padding: 2px 8px;
+    padding: 2px 10px;
     border-radius: 12px;
     color: #fff;
     font-weight: 600;
     white-space: nowrap;
-}
-
-.kanban-card-meta {
-    display: flex;
-    gap: 12px;
-    margin-bottom: 8px;
-}
-
-.kanban-meta-item {
-    font-size: 11px;
-    color: #888;
-
-    i {
-        margin-right: 3px;
-    }
 }
 
 /* Progress bar */
@@ -253,8 +318,8 @@
 
 /* Sidebar */
 .gantt-sidebar {
-    min-width: 320px;
-    max-width: 320px;
+    min-width: 420px;
+    max-width: 420px;
     border-right: 2px solid #e0e0e0;
     flex-shrink: 0;
     background: #fafbfc;
@@ -264,12 +329,22 @@
     height: 44px;
     display: flex;
     align-items: center;
-    padding: 0 16px;
+    padding: 0 12px;
     font-weight: 700;
-    font-size: 13px;
+    font-size: 12px;
     color: #555;
     background: #f0f2f5;
     border-bottom: 1px solid #e0e0e0;
+    gap: 8px;
+
+    .gantt-col-task {
+        flex: 1;
+    }
+
+    .gantt-col-resp {
+        width: 120px;
+        text-align: center;
+    }
 }
 
 .gantt-sidebar-row {
@@ -284,11 +359,24 @@
     &:nth-child(even) {
         background: #f8f9fa;
     }
+
+    .gantt-col-task {
+        flex: 1;
+        display: flex;
+        align-items: center;
+        gap: 6px;
+        overflow: hidden;
+    }
+
+    .gantt-col-resp {
+        width: 120px;
+        text-align: center;
+    }
 }
 
 .gantt-task-ref {
     font-weight: 700;
-    color: #0d8aff;
+    color: #e05353;
     text-decoration: none;
     white-space: nowrap;
     font-size: 11px;
@@ -308,12 +396,36 @@
 
 .gantt-risk-badge {
     font-size: 10px;
-    padding: 1px 6px;
-    border-radius: 4px;
-    background: #fff3cd;
-    color: #856404;
+    white-space: nowrap;
+
+    a {
+        padding: 1px 6px;
+        border-radius: 4px;
+        background: #fff3cd;
+        color: #856404;
+        font-weight: 600;
+        text-decoration: none;
+        font-size: 10px;
+
+        &:hover {
+            background: #ffe69c;
+        }
+    }
+}
+
+.gantt-responsible {
+    font-size: 10px;
+    color: #2e7d32;
     font-weight: 600;
     white-space: nowrap;
+
+    i {
+        margin-right: 2px;
+    }
+}
+
+.gantt-responsible-none {
+    color: #aaa;
 }
 
 .gantt-tags {
@@ -342,6 +454,7 @@
     position: relative;
     background: #f0f2f5;
     border-bottom: 1px solid #e0e0e0;
+    overflow: visible;
 }
 
 .gantt-months {

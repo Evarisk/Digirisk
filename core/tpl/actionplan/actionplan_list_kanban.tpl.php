@@ -5,7 +5,7 @@
  * \brief   Kanban board template for action plan tasks
  *
  * Variables expected from calling PHP:
- * - $tasksJson          array  Task data
+ * - $tasksJson          array  Task data (enriched)
  * - $kanbanThresholds   array  Column threshold config
  * - $langs              Translate
  * - $projectId          int    DU project ID
@@ -13,10 +13,10 @@
 
 // Kanban columns definition
 $columns = [
-    'draft'    => ['label' => $langs->trans('ColumnDraft'),     'icon' => 'fa-pencil-alt', 'color' => '#e05353', 'min' => 0,  'max' => $kanbanThresholds['draft_max']],
-    'progress' => ['label' => $langs->trans('ColumnInProgress'),'icon' => 'fa-spinner',    'color' => '#e9ad4f', 'min' => $kanbanThresholds['draft_max'] + 1, 'max' => $kanbanThresholds['progress_max']],
-    'control'  => ['label' => $langs->trans('ColumnInControl'), 'icon' => 'fa-search',     'color' => '#3085d6', 'min' => $kanbanThresholds['progress_max'] + 1, 'max' => $kanbanThresholds['control_max']],
-    'done'     => ['label' => $langs->trans('ColumnDone'),      'icon' => 'fa-check',      'color' => '#47e58e', 'min' => 100, 'max' => 100],
+    'draft'    => ['label' => $langs->trans('ColumnDraft'),      'icon' => 'fa-pencil-alt', 'color' => '#e05353', 'min' => 0,  'max' => $kanbanThresholds['draft_max']],
+    'progress' => ['label' => $langs->trans('ColumnInProgress'), 'icon' => 'fa-spinner',    'color' => '#e9ad4f', 'min' => $kanbanThresholds['draft_max'] + 1, 'max' => $kanbanThresholds['progress_max']],
+    'control'  => ['label' => $langs->trans('ColumnInControl'),  'icon' => 'fa-search',     'color' => '#3085d6', 'min' => $kanbanThresholds['progress_max'] + 1, 'max' => $kanbanThresholds['control_max']],
+    'done'     => ['label' => $langs->trans('ColumnDone'),       'icon' => 'fa-check',      'color' => '#47e58e', 'min' => 100, 'max' => 100],
 ];
 
 // Sort tasks into columns
@@ -37,7 +37,7 @@ foreach ($tasksJson as $t) {
 
 <div class="actionplan-unsaved-indicator"></div>
 
-<div class="kanban-board" data-token="<?= newToken() ?>" data-url="<?= $_SERVER['PHP_SELF'] ?>">
+<div class="kanban-board" data-token="<?= newToken() ?>">
     <?php foreach ($columns as $colKey => $colDef) : ?>
         <div class="kanban-column" data-column="<?= $colKey ?>"
              data-progress-min="<?= $colDef['min'] ?>"
@@ -53,39 +53,59 @@ foreach ($tasksJson as $t) {
                 <?php endif; ?>
                 <?php foreach ($columnTasks[$colKey] as $t) : ?>
                     <div class="kanban-card" data-task-id="<?= $t['id'] ?>" data-progress="<?= $t['progress'] ?>">
+
+                        <!-- Header: Ref + Date + Workload + Budget + Risk -->
                         <div class="kanban-card-header">
                             <a href="<?= $t['url'] ?>" class="kanban-card-ref" target="_blank"><?= dol_escape_htmltag($t['ref']) ?></a>
-                            <?php if (!empty($t['risk_ref'])) : ?>
-                                <span class="kanban-card-risk badge badge-warning" title="<?= dol_escape_htmltag($langs->trans('LinkedRisk')) ?>">
-                                    <i class="fas fa-exclamation-triangle"></i> <?= dol_escape_htmltag($t['risk_ref']) ?>
+                            <?php if (!empty($t['date_end_fmt'])) : ?>
+                                <span class="kanban-meta-item" title="<?= dol_escape_htmltag($langs->trans('Deadline')) ?>">
+                                    <i class="fas fa-calendar-alt"></i> <?= $t['date_end_fmt'] ?>
                                 </span>
                             <?php endif; ?>
+                            <?php if (!empty($t['planned_workload_fmt'])) : ?>
+                                <span class="kanban-meta-item" title="<?= dol_escape_htmltag($langs->trans('PlannedWorkload')) ?>">
+                                    <i class="fas fa-clock"></i> <?= $t['planned_workload_fmt'] ?>
+                                </span>
+                            <?php endif; ?>
+                            <?php if (!empty($t['budget_fmt'])) : ?>
+                                <span class="kanban-meta-item" title="<?= dol_escape_htmltag($langs->trans('Budget')) ?>">
+                                    <i class="fas fa-coins"></i> <?= $t['budget_fmt'] ?>
+                                </span>
+                            <?php endif; ?>
+                            <?php if (!empty($t['risk_nomurl'])) : ?>
+                                <span class="kanban-card-risk"><?= $t['risk_nomurl'] ?></span>
+                            <?php endif; ?>
                         </div>
-                        <div class="kanban-card-label"><?= dol_escape_htmltag(dol_trunc($t['label'], 80)) ?></div>
 
-                        <?php if (!empty($t['categories'])) : ?>
-                            <div class="kanban-card-tags">
-                                <?php foreach ($t['categories'] as $cat) : ?>
-                                    <span class="kanban-tag" style="background: <?= !empty($cat['color']) ? '#' . dol_escape_htmltag($cat['color']) : '#8c8c8c' ?>">
-                                        <?= dol_escape_htmltag(dol_trunc($cat['label'], 20)) ?>
+                        <!-- Label -->
+                        <div class="kanban-card-label"><?= dol_escape_htmltag($t['label']) ?></div>
+
+                        <!-- Contacts row: Files + Responsible + Associated -->
+                        <div class="kanban-card-contacts">
+                            <?php if ($t['file_count'] > 0) : ?>
+                                <a href="<?= $t['url'] ?>" class="kanban-file-badge" title="<?= dol_escape_htmltag($langs->trans('NumberOfLinkedFiles')) ?>">
+                                    <i class="fas fa-paperclip"></i> <?= $t['file_count'] ?>
+                                </a>
+                            <?php endif; ?>
+                            <?php if (!empty($t['responsible'])) : ?>
+                                <?php foreach ($t['responsible'] as $resp) : ?>
+                                    <span class="kanban-contact kanban-contact-responsible" title="<?= dol_escape_htmltag($resp['fullname'] . ' (' . $langs->trans('TaskExecutive') . ')') ?>">
+                                        <i class="fas fa-user-tie"></i> <?= dol_escape_htmltag(dol_trunc($resp['fullname'], 18)) ?>
                                     </span>
                                 <?php endforeach; ?>
-                            </div>
-                        <?php endif; ?>
-
-                        <div class="kanban-card-meta">
-                            <?php if ($t['planned_workload'] > 0) : ?>
-                                <span class="kanban-meta-item" title="<?= dol_escape_htmltag($langs->trans('PlannedWorkload')) ?>">
-                                    <i class="fas fa-clock"></i> <?= convertSecondToTime($t['planned_workload'], 'allhourmin') ?>
+                            <?php else : ?>
+                                <span class="kanban-contact kanban-contact-none" title="<?= dol_escape_htmltag($langs->trans('TaskExecutive')) ?>">
+                                    <i class="fas fa-user-tie"></i> N/A
                                 </span>
                             <?php endif; ?>
-                            <?php if (!empty($t['date_end'])) : ?>
-                                <span class="kanban-meta-item" title="<?= dol_escape_htmltag($langs->trans('Deadline')) ?>">
-                                    <i class="fas fa-calendar-alt"></i> <?= dol_print_date(dol_stringtotime($t['date_end']), 'day') ?>
+                            <?php if (!empty($t['associated'])) : ?>
+                                <span class="kanban-contact kanban-contact-associated" title="<?= dol_escape_htmltag(implode(', ', array_map(function($a) { return $a['fullname']; }, $t['associated']))) ?>">
+                                    <i class="fas fa-users"></i> <?= count($t['associated']) ?>
                                 </span>
                             <?php endif; ?>
                         </div>
 
+                        <!-- Progress bar -->
                         <div class="kanban-card-progress">
                             <div class="kanban-progress-bar">
                                 <div class="kanban-progress-fill <?= $t['progress'] == 0 ? 'progress-red' : ($t['progress'] < 100 ? 'progress-yellow' : 'progress-green') ?>"
@@ -93,6 +113,18 @@ foreach ($tasksJson as $t) {
                             </div>
                             <span class="kanban-progress-text"><?= $t['progress'] ?>%</span>
                         </div>
+
+                        <!-- Categories/Tags -->
+                        <?php if (!empty($t['categories'])) : ?>
+                            <div class="kanban-card-tags">
+                                <?php foreach ($t['categories'] as $cat) : ?>
+                                    <span class="kanban-tag" style="background: <?= !empty($cat['color']) ? '#' . dol_escape_htmltag($cat['color']) : '#8c8c8c' ?>">
+                                        <?= dol_escape_htmltag($cat['label']) ?>
+                                    </span>
+                                <?php endforeach; ?>
+                            </div>
+                        <?php endif; ?>
+
                     </div>
                 <?php endforeach; ?>
             </div>
