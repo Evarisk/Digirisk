@@ -496,9 +496,11 @@ foreach ($allTasks as $t) {
     }
 }
 
-// Load all available categories of type 'project_task' for tag selector
+// Load all available categories for tag selector (project + project_task types)
 $allAvailableCategories = [];
-$sqlCats = "SELECT rowid, label, color FROM " . MAIN_DB_PREFIX . "categorie WHERE type = " . (int)$categorie->MAP_ID['project_task'] . " AND entity IN (" . getEntity('category') . ") ORDER BY label";
+$projectTaskType = (int)$categorie->MAP_ID['project_task'];
+$projectType     = (int)$categorie->MAP_ID['project'];
+$sqlCats = "SELECT rowid, label, color FROM " . MAIN_DB_PREFIX . "categorie WHERE type IN (" . $projectType . ", " . $projectTaskType . ") AND entity IN (" . getEntity('category') . ") ORDER BY label";
 $resCats = $db->query($sqlCats);
 if ($resCats) {
     while ($objCat = $db->fetch_object($resCats)) {
