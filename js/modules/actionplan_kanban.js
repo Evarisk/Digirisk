@@ -447,17 +447,41 @@ window.digiriskdolibarr.actionplanKanban.event = function() {
         e.stopPropagation();
     });
 
-    // Tag: add category to task
-    $(document).on('change', '.kanban-tag-select', function() {
-        var $select = $(this);
-        var catId   = $select.val();
-        var taskId  = $select.data('task-id');
-        if (!catId) return;
+    // Tag: toggle dropdown
+    $(document).on('click', '.kanban-add-tag-btn', function(e) {
+        e.preventDefault();
+        e.stopPropagation();
+        // Close all other tag dropdowns
+        $('.kanban-tag-dropdown.visible').not($(this).siblings('.kanban-tag-dropdown')).each(function() {
+            $(this).removeClass('visible');
+            $(this).closest('.kanban-card').removeClass('kanban-card-dropdown-open');
+        });
+        var $dropdown = $(this).siblings('.kanban-tag-dropdown');
+        var $card = $(this).closest('.kanban-card');
+        $dropdown.toggleClass('visible');
+        if ($dropdown.hasClass('visible')) {
+            $card.addClass('kanban-card-dropdown-open');
+        } else {
+            $card.removeClass('kanban-card-dropdown-open');
+        }
+    });
 
-        var $card = $select.closest('.kanban-card');
-        var $tagsRow = $select.closest('.kanban-card-tags');
+    // Tag: option click - add category
+    $(document).on('click', '.kanban-tag-option', function(e) {
+        e.stopPropagation();
+        var $opt = $(this);
+        if ($opt.hasClass('assigned')) return;
 
+        var $dropdown = $opt.closest('.kanban-tag-dropdown');
+        var taskId = $dropdown.data('task-id');
+        var catId  = $opt.data('value');
+        var $card  = $opt.closest('.kanban-card');
+        var $tagsRow = $card.find('.kanban-card-tags');
+
+        $dropdown.removeClass('visible');
+        $card.removeClass('kanban-card-dropdown-open');
         $card.addClass('kanban-card-saving');
+
         var token = window.saturne.toolbox.getToken();
         var sep   = window.saturne.toolbox.getQuerySeparator(document.URL);
 
@@ -470,7 +494,10 @@ window.digiriskdolibarr.actionplanKanban.event = function() {
                 if (response.success) {
                     var bgColor = response.color ? '#' + response.color : '#8c8c8c';
                     var $tag = $('<span class="kanban-tag" data-cat-id="' + response.id + '" style="background:' + bgColor + '">' + response.label + '<span class="kanban-tag-remove" title="Supprimer">&times;</span></span>');
-                    $select.before($tag);
+                    $tagsRow.find('.kanban-tag-dropdown-wrapper').before($tag);
+                    // Mark as assigned
+                    $opt.addClass('assigned');
+                    $opt.append('<i class="fas fa-check" style="margin-left:auto;font-size:9px;color:#28a745"></i>');
                     $card.addClass('kanban-card-saved');
                     setTimeout(function() { $card.removeClass('kanban-card-saved'); }, 2000);
                 } else {
@@ -484,8 +511,17 @@ window.digiriskdolibarr.actionplanKanban.event = function() {
                 setTimeout(function() { $card.removeClass('kanban-card-error'); }, 3000);
             }
         });
+    });
 
-        $select.val('');
+    // Tag: close dropdown on outside click
+    $(document).on('click', function() {
+        $('.kanban-tag-dropdown.visible').each(function() {
+            $(this).removeClass('visible');
+            $(this).closest('.kanban-card').removeClass('kanban-card-dropdown-open');
+        });
+    });
+    $(document).on('click', '.kanban-tag-dropdown', function(e) {
+        e.stopPropagation();
     });
 
     // Tag: remove category from task
@@ -508,6 +544,8 @@ window.digiriskdolibarr.actionplanKanban.event = function() {
             success: function(response) {
                 if (response.success) {
                     $tag.slideUp(150, function() { $(this).remove(); });
+                    // Unmark from dropdown
+                    $card.find('.kanban-tag-option[data-value="' + catId + '"]').removeClass('assigned').find('.fa-check').remove();
                     $card.addClass('kanban-card-saved');
                     setTimeout(function() { $card.removeClass('kanban-card-saved'); }, 2000);
                 } else {
@@ -521,7 +559,7 @@ window.digiriskdolibarr.actionplanKanban.event = function() {
     });
 
     // Prevent drag on tag elements
-    $(document).on('mousedown', '.kanban-tag, .kanban-tag-remove, .kanban-tag-select', function(e) {
+    $(document).on('mousedown', '.kanban-tag, .kanban-tag-remove, .kanban-add-tag-btn, .kanban-tag-dropdown, .kanban-tag-option', function(e) {
         e.stopPropagation();
     });
 
@@ -583,7 +621,7 @@ window.digiriskdolibarr.actionplanKanban.initSortable = function() {
         placeholder: 'kanban-card-placeholder',
         tolerance: 'pointer',
         cursor: 'grabbing',
-        cancel: '.kanban-progress-bar, .kanban-card-progress, .kanban-responsible-select, .kanban-contributor-dropdown, .kanban-add-contributor-btn, .kanban-initial-responsible, .kanban-contributor-search, .kanban-contributor-option, .kanban-card-label, .kanban-inline-edit, .kanban-editable-meta, .kanban-remove-contact, .kanban-initial-wrapper, .kanban-editable-date, .kanban-tag, .kanban-tag-remove, .kanban-tag-select',
+        cancel: '.kanban-progress-bar, .kanban-card-progress, .kanban-responsible-select, .kanban-contributor-dropdown, .kanban-add-contributor-btn, .kanban-initial-responsible, .kanban-contributor-search, .kanban-contributor-option, .kanban-card-label, .kanban-inline-edit, .kanban-editable-meta, .kanban-remove-contact, .kanban-initial-wrapper, .kanban-editable-date, .kanban-tag, .kanban-tag-remove, .kanban-add-tag-btn, .kanban-tag-dropdown, .kanban-tag-option',
         receive: function(event, ui) {
             var $card    = ui.item;
             var $column  = $(this);
