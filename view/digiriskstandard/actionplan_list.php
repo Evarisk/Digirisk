@@ -208,20 +208,22 @@ if ($action == 'addTaskContributor' && !empty(GETPOSTINT('task_id'))) {
         if ($addResult > 0) {
             // Fetch fullname for the added contact
             $addedFullname = '';
+            $addedInitials = '';
             if ($source == 'internal') {
                 $addedUser = new User($db);
                 if ($addedUser->fetch($userId) > 0) {
                     $addedFullname = $addedUser->getFullName($langs);
+                    $addedInitials = strtoupper(mb_substr($addedUser->firstname, 0, 1) . mb_substr($addedUser->lastname, 0, 1));
                 }
             } else {
                 require_once DOL_DOCUMENT_ROOT . '/contact/class/contact.class.php';
                 $addedContact = new Contact($db);
                 if ($addedContact->fetch($userId) > 0) {
                     $addedFullname = $addedContact->getFullName($langs);
+                    $addedInitials = strtoupper(mb_substr($addedContact->firstname, 0, 1) . mb_substr($addedContact->lastname, 0, 1));
                 }
             }
-            $initials = strtoupper(mb_substr($addedFullname, 0, 2));
-            print json_encode(['success' => 1, 'fullname' => $addedFullname, 'initials' => $initials, 'user_id' => $userId]);
+            print json_encode(['success' => 1, 'fullname' => $addedFullname, 'initials' => $addedInitials, 'user_id' => $userId]);
         } else {
             http_response_code(500);
             print json_encode(['success' => 0, 'error' => $taskToUpdate->error]);
@@ -446,6 +448,7 @@ if ($resUsers) {
         $allUsers[] = [
             'id'       => (int) $objU->rowid,
             'fullname' => trim($objU->firstname . ' ' . $objU->lastname),
+            'initials' => strtoupper(mb_substr($objU->firstname, 0, 1) . mb_substr($objU->lastname, 0, 1)),
             'photo'    => $photoUrl,
         ];
     }
@@ -572,6 +575,7 @@ foreach ($allTasks as $t) {
             $contactInfo = [
                 'id'       => $c['id'],
                 'fullname' => trim($c['firstname'] . ' ' . $c['lastname']),
+                'initials' => strtoupper(mb_substr($c['firstname'], 0, 1) . mb_substr($c['lastname'], 0, 1)),
                 'photo'    => $photoUrl,
             ];
             // TASKEXECUTIVE = responsable de la tâche
@@ -587,6 +591,7 @@ foreach ($allTasks as $t) {
             $contactInfo = [
                 'id'       => $c['id'],
                 'fullname' => trim($c['firstname'] . ' ' . $c['lastname']),
+                'initials' => strtoupper(mb_substr($c['firstname'], 0, 1) . mb_substr($c['lastname'], 0, 1)),
                 'photo'    => '',
             ];
             if ($c['code'] == 'TASKCONTRIBUTOR') {

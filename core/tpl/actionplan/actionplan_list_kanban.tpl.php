@@ -84,7 +84,7 @@ foreach ($tasksJson as $t) {
                             $respFullname = '';
                             $respId       = 0;
                             if (!empty($t['responsible'])) {
-                                $respInitial  = strtoupper(mb_substr($t['responsible'][0]['fullname'], 0, 2));
+                                $respInitial  = !empty($t['responsible'][0]['initials']) ? $t['responsible'][0]['initials'] : strtoupper(mb_substr($t['responsible'][0]['fullname'], 0, 2));
                                 $respFullname = $t['responsible'][0]['fullname'];
                                 $respId       = $t['responsible'][0]['id'];
                             }
@@ -110,7 +110,7 @@ foreach ($tasksJson as $t) {
                                 <select class="kanban-responsible-select" data-task-id="<?= $t['id'] ?>">
                                     <option value="0"><?= dol_escape_htmltag($langs->trans('Unassigned')) ?></option>
                                     <?php foreach ($allUsers as $u) : ?>
-                                        <option value="<?= $u['id'] ?>" data-initial="<?= strtoupper(mb_substr($u['fullname'], 0, 2)) ?>"
+                                        <option value="<?= $u['id'] ?>" data-initial="<?= $u['initials'] ?>"
                                             <?= ($respId == $u['id']) ? 'selected' : '' ?>>
                                             <?= dol_escape_htmltag($u['fullname']) ?>
                                         </option>
@@ -126,7 +126,7 @@ foreach ($tasksJson as $t) {
                                     <span class="kanban-initial-wrapper" data-task-id="<?= $t['id'] ?>" data-user-id="<?= $contrib['id'] ?>">
                                         <span class="kanban-initial kanban-initial-contributor"
                                               title="<?= dol_escape_htmltag($contrib['fullname']) ?>">
-                                            <?= strtoupper(mb_substr($contrib['fullname'], 0, 2)) ?>
+                                            <?= !empty($contrib['initials']) ? $contrib['initials'] : strtoupper(mb_substr($contrib['fullname'], 0, 2)) ?>
                                         </span>
                                         <span class="kanban-remove-contact" title="<?= dol_escape_htmltag($langs->trans('RemoveContact')) ?>">&times;</span>
                                     </span>
