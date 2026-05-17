@@ -237,11 +237,19 @@ window.digiriskdolibarr.actionplanKanban.event = function() {
         var taskId   = $meta.data('task-id');
         var rawVal   = $meta.data('raw') || 0;
         var origText = $value.text();
-        var placeholder = field === 'budget' ? '0.00' : '0';
 
-        var $input = $('<input type="number" class="kanban-meta-input" step="any" min="0">');
-        $input.val(rawVal > 0 ? rawVal : '');
-        $input.attr('placeholder', placeholder);
+        var $input;
+        if (field === 'planned_workload') {
+            // rawVal is in hours (decimal), convert to HH:MM for display
+            var h = Math.floor(rawVal);
+            var m = Math.round((rawVal - h) * 60);
+            var displayVal = rawVal > 0 ? (h + ':' + (m < 10 ? '0' : '') + m) : '';
+            $input = $('<input type="text" class="kanban-meta-input" placeholder="0:00">');
+            $input.val(displayVal);
+        } else {
+            $input = $('<input type="number" class="kanban-meta-input" step="any" min="0" placeholder="0.00">');
+            $input.val(rawVal > 0 ? rawVal : '');
+        }
         $value.replaceWith($input);
         $input.trigger('focus').select();
 
