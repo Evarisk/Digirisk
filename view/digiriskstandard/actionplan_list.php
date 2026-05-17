@@ -227,6 +227,49 @@ if ($action == 'addTaskContributor' && !empty(GETPOSTINT('task_id'))) {
     exit;
 }
 
+// AJAX action to update task workload or budget
+if ($action == 'updateTaskMeta' && !empty(GETPOSTINT('task_id'))) {
+    header('Content-Type: application/json');
+
+    $taskId = GETPOSTINT('task_id');
+    $field  = GETPOST('field', 'alpha');
+    $value  = GETPOST('value', 'alpha');
+
+    $taskToUpdate = new SaturneTask($db);
+    $result = $taskToUpdate->fetch($taskId);
+
+    if ($result > 0 && $taskToUpdate->fk_project == $projectId) {
+        if ($field == 'planned_workload') {
+            // Value is in hours (e.g. "14" or "14.5"), convert to seconds
+            $hours = (float) str_replace(',', '.', $value);
+            $taskToUpdate->planned_workload = (int) ($hours * 3600);
+            $res = $taskToUpdate->update($user);
+            if ($res > 0) {
+                $fmtValue = $taskToUpdate->planned_workload > 0 ? convertSecondToTime($taskToUpdate->planned_workload, 'allhourmin') : '-';
+                print json_encode(['success' => 1, 'formatted' => $fmtValue, 'raw' => $hours]);
+            } else {
+                print json_encode(['success' => 0, 'error' => $taskToUpdate->error]);
+            }
+        } elseif ($field == 'budget') {
+            $taskToUpdate->budget_amount = (float) str_replace(',', '.', $value);
+            $res = $taskToUpdate->update($user);
+            if ($res > 0) {
+                $fmtValue = $taskToUpdate->budget_amount > 0 ? price($taskToUpdate->budget_amount, 0, $langs, 1, -1, -1, $conf->currency) : '-';
+                print json_encode(['success' => 1, 'formatted' => $fmtValue, 'raw' => $taskToUpdate->budget_amount]);
+            } else {
+                print json_encode(['success' => 0, 'error' => $taskToUpdate->error]);
+            }
+        } else {
+            print json_encode(['success' => 0, 'error' => 'Unknown field']);
+        }
+    } else {
+        http_response_code(404);
+        print json_encode(['success' => 0, 'error' => 'Task not found']);
+    }
+    $db->close();
+    exit;
+}
+
 /*
  * View
  */
