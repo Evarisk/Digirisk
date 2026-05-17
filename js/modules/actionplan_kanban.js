@@ -864,17 +864,15 @@ window.digiriskdolibarr.actionplanKanban.saveResponsible = function(taskId, user
  * @param {number} userId   User ID
  * @param {jQuery} $select  The select element
  */
-window.digiriskdolibarr.actionplanKanban.addContributor = function(taskId, userId, $select) {
+window.digiriskdolibarr.actionplanKanban.addContributor = function(taskId, userId, $dropdown) {
     var token          = window.saturne.toolbox.getToken();
     var querySeparator = window.saturne.toolbox.getQuerySeparator(document.URL);
-    var $card          = $select.closest('.kanban-card');
+    var $card          = $dropdown.closest('.kanban-card');
 
     // Parse source type from prefixed value (internal_123 or external_456)
     var parts  = userId.split('_');
     var source = parts[0]; // 'internal' or 'external'
     var realId = parts[1];
-    var selectedText = $select.find('option:selected').text().trim();
-    var initials = selectedText.substring(0, 2).toUpperCase();
 
     $card.addClass('kanban-card-saving');
 
@@ -885,9 +883,11 @@ window.digiriskdolibarr.actionplanKanban.addContributor = function(taskId, userI
         success: function(response) {
             $card.removeClass('kanban-card-saving');
             if (response.success) {
+                var initials = response.initials || '??';
+                var fullname = response.fullname || '';
                 // Add contributor initial chip to the DOM
                 var $wrapper = $('<span class="kanban-initial-wrapper" data-task-id="' + taskId + '" data-user-id="' + realId + '"></span>');
-                var $chip = $('<span class="kanban-initial kanban-initial-contributor" title="' + selectedText + '">' + initials + '</span>');
+                var $chip = $('<span class="kanban-initial kanban-initial-contributor" title="' + fullname + '">' + initials + '</span>');
                 var $remove = $('<span class="kanban-remove-contact" title="Supprimer">&times;</span>');
                 $wrapper.append($chip).append($remove);
                 $card.find('.kanban-add-contributor-wrapper').before($wrapper);
