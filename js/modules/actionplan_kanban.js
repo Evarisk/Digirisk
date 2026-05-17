@@ -108,13 +108,20 @@ window.digiriskdolibarr.actionplanKanban.event = function() {
         e.preventDefault();
         e.stopPropagation();
         // Close all other dropdowns first
-        $('.kanban-contributor-dropdown.visible').not($(this).siblings('.kanban-contributor-dropdown')).removeClass('visible');
+        $('.kanban-contributor-dropdown.visible').not($(this).siblings('.kanban-contributor-dropdown')).each(function() {
+            $(this).removeClass('visible');
+            $(this).closest('.kanban-card').removeClass('kanban-card-dropdown-open');
+        });
         var $dropdown = $(this).siblings('.kanban-contributor-dropdown');
+        var $card = $(this).closest('.kanban-card');
         $dropdown.toggleClass('visible');
         if ($dropdown.hasClass('visible')) {
+            $card.addClass('kanban-card-dropdown-open');
             var $search = $dropdown.find('.kanban-contributor-search');
             $search.val('').trigger('input');
             $search.trigger('focus');
+        } else {
+            $card.removeClass('kanban-card-dropdown-open');
         }
     });
 
@@ -142,6 +149,7 @@ window.digiriskdolibarr.actionplanKanban.event = function() {
         var userId = $opt.data('value');
 
         $dropdown.removeClass('visible');
+        $dropdown.closest('.kanban-card').removeClass('kanban-card-dropdown-open');
         window.digiriskdolibarr.actionplanKanban.addContributor(taskId, userId, $dropdown);
 
         // Mark as assigned immediately
@@ -151,7 +159,10 @@ window.digiriskdolibarr.actionplanKanban.event = function() {
 
     // Close dropdown on outside click
     $(document).on('click', function() {
-        $('.kanban-contributor-dropdown.visible').removeClass('visible');
+        $('.kanban-contributor-dropdown.visible').each(function() {
+            $(this).removeClass('visible');
+            $(this).closest('.kanban-card').removeClass('kanban-card-dropdown-open');
+        });
     });
     $(document).on('click', '.kanban-contributor-dropdown', function(e) {
         e.stopPropagation();
