@@ -92,10 +92,22 @@ foreach ($tasksJson as $t) {
                                 $respFullname = $t['responsible'][0]['fullname'];
                                 $respId       = $t['responsible'][0]['id'];
                             }
+                            // Color matching progress bar
+                            $p = $t['progress'];
+                            if ($p <= $kanbanThresholds['draft_max']) {
+                                $respColor = '#e05353';
+                            } elseif ($p <= $kanbanThresholds['progress_max']) {
+                                $respColor = '#e9ad4f';
+                            } elseif ($p <= $kanbanThresholds['control_max']) {
+                                $respColor = '#3085d6';
+                            } else {
+                                $respColor = '#47e58e';
+                            }
                             ?>
                             <div class="kanban-responsible-wrapper" data-task-id="<?= $t['id'] ?>" data-current-user="<?= $respId ?>">
                                 <span class="kanban-initial kanban-initial-responsible <?= empty($respInitial) ? 'kanban-initial-empty' : '' ?>"
-                                      title="<?= dol_escape_htmltag($respFullname ?: $langs->trans('Unassigned')) ?>">
+                                      title="<?= dol_escape_htmltag($respFullname ?: $langs->trans('Unassigned')) ?>"
+                                      style="background: <?= $respColor ?>">
                                     <?= $respInitial ?: '?' ?>
                                 </span>
                                 <!-- Hidden select, shown on click -->
