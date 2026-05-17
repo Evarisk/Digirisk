@@ -485,9 +485,11 @@ if ($projectId > 0) {
     }
 }
 
-// Fetch risk links (fk_risk => tasks)
+// Fetch risk links (fk_risk => tasks) and load last evaluation data
 $taskRiskMap = [];
 $riskObjects = [];
+$riskData    = []; // enriched data for template
+require_once __DIR__ . '/../../class/riskanalysis/riskassessment.class.php';
 if (!empty($allTasks)) {
     $sql = "SELECT fk_object, fk_risk FROM " . MAIN_DB_PREFIX . "projet_task_extrafields WHERE fk_risk > 0";
     $resql = $db->query($sql);
@@ -498,6 +500,50 @@ if (!empty($allTasks)) {
                 $riskObj = new Risk($db);
                 $riskObj->fetch($obj->fk_risk);
                 $riskObjects[$obj->fk_risk] = $riskObj;
+
+                // Load last validated risk assessment
+                $riskAssessment = new RiskAssessment($db);
+                $raList = $riskAssessment->fetchAll('DESC', 'date_creation', 1, 0, ['customsql' => 'fk_risk = ' . (int)$obj->fk_risk . ' AND status = ' . RiskAssessment::STATUS_VALIDATED]);
+                $lastRA = (is_array($raList) && !empty($raList)) ? reset($raList) : null;
+
+                // Determine cotation color
+                $cotation = $lastRA ? (int)$lastRA->cotation : 0;
+                if ($cotation >= 80)     { $cotColor = '#2b2b2b'; }
+                elseif ($cotation >= 51) { $cotColor = '#e05353'; }
+                elseif ($cotation >= 48) { $cotColor = '#e9ad4f'; }
+                else                     { $cotColor = '#ececec'; }
+
+                // Category name
+                $dangerCatName = $riskObj->getDangerCategoryName($riskObj, $riskObj->type ?: 'risk');
+                if ($dangerCatName == -1) $dangerCatName = '';
+
+                // Evaluation photo URL
+                $raPhotoUrl = '';
+                if ($lastRA && !empty($lastRA->photo)) {
+                    $raPhotoUrl = DOL_URL_ROOT . '/custom/digiriskdolibarr/documents/riskassessment/' . $lastRA->ref . '/' . $lastRA->photo;
+                }
+
+                // Evaluator
+                $raUserInitials = '';
+                if ($lastRA && $lastRA->fk_user_creat > 0) {
+                    $raUser = new User($db);
+                    if ($raUser->fetch($lastRA->fk_user_creat) > 0) {
+                        $raUserInitials = strtoupper(mb_substr($raUser->firstname, 0, 1) . mb_substr($raUser->lastname, 0, 1));
+                    }
+                }
+
+                $riskData[$obj->fk_risk] = [
+                    'ref'            => $riskObj->ref,
+                    'description'    => $riskObj->description,
+                    'category_name'  => $dangerCatName,
+                    'cotation'       => $cotation,
+                    'cotation_color' => $cotColor,
+                    'ra_ref'         => $lastRA ? $lastRA->ref : '',
+                    'ra_date'        => $lastRA && $lastRA->date_creation ? dol_print_date($lastRA->date_creation, 'day') : '',
+                    'ra_comment'     => $lastRA ? $lastRA->comment : '',
+                    'ra_photo_url'   => $raPhotoUrl,
+                    'ra_user'        => $raUserInitials,
+                ];
             }
         }
         $db->free($resql);
@@ -629,6 +675,7 @@ foreach ($allTasks as $t) {
         'risk_ref'           => $riskRef,
         'risk_id'            => $riskId,
         'risk_nomurl'        => $riskNomUrl,
+        'risk_data'          => isset($riskData[$riskId]) ? $riskData[$riskId] : [],
         'categories'         => $cats,
         'responsible'        => $responsible,
         'contributors'       => $contributors,
