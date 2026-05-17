@@ -41,12 +41,12 @@ foreach ($tasksJson as $t) {
     </button>
     <div class="kanban-settings-popover" id="kanbanSettingsPopover">
         <div class="ksp-row">
-            <label><i class="fas fa-arrows-alt-h"></i> <?= $langs->trans('Width') ?></label>
+            <label><i class="fas fa-arrows-alt-h"></i> <?= $langs->trans('ColumnWidth') ?></label>
             <input type="range" id="kanbanColWidth" min="260" max="500" value="350" step="10">
             <span class="ksp-val" id="kanbanColWidthVal">350px</span>
         </div>
         <div class="ksp-row">
-            <label><i class="fas fa-columns"></i> <?= $langs->trans('Gap') ?></label>
+            <label><i class="fas fa-columns"></i> <?= $langs->trans('ColumnGap') ?></label>
             <input type="range" id="kanbanColGap" min="8" max="50" value="26" step="2">
             <span class="ksp-val" id="kanbanColGapVal">26px</span>
         </div>

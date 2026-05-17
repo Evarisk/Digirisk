@@ -1673,3 +1673,5 @@ InternalUsers                      = Utilisateurs internes
 ExternalContacts                   = Contacts externes
 AddContributor                     = Ajouter un contributeur
 RemoveContact                      = Retirer le contact
+ColumnWidth                        = Largeur
+ColumnGap                          = Espacement
