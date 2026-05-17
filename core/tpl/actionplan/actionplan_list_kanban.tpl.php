@@ -193,15 +193,27 @@ foreach ($tasksJson as $t) {
                         </div>
 
                         <!-- Categories/Tags -->
-                        <?php if (!empty($t['categories'])) : ?>
-                            <div class="kanban-card-tags">
+                        <div class="kanban-card-tags" data-task-id="<?= $t['id'] ?>">
+                            <?php if (!empty($t['categories'])) : ?>
                                 <?php foreach ($t['categories'] as $cat) : ?>
-                                    <span class="kanban-tag" style="background: <?= !empty($cat['color']) ? '#' . dol_escape_htmltag($cat['color']) : '#8c8c8c' ?>">
+                                    <span class="kanban-tag" data-cat-id="<?= $cat['id'] ?>" style="background: <?= !empty($cat['color']) ? '#' . dol_escape_htmltag($cat['color']) : '#8c8c8c' ?>">
                                         <?= dol_escape_htmltag($cat['label']) ?>
+                                        <span class="kanban-tag-remove" title="<?= dol_escape_htmltag($langs->trans('Remove')) ?>">&times;</span>
                                     </span>
                                 <?php endforeach; ?>
+                            <?php endif; ?>
+                            <div class="kanban-add-tag-wrapper">
+                                <button class="kanban-add-tag-btn" title="<?= dol_escape_htmltag($langs->trans('AddCategory')) ?>">
+                                    <i class="fas fa-tag"></i><i class="fas fa-plus" style="font-size:7px;margin-left:2px"></i>
+                                </button>
+                                <select class="kanban-tag-select" data-task-id="<?= $t['id'] ?>">
+                                    <option value=""><?= dol_escape_htmltag($langs->trans('SelectCategory')) ?></option>
+                                    <?php foreach ($allAvailableCategories as $ac) : ?>
+                                        <option value="<?= $ac['id'] ?>" data-color="<?= dol_escape_htmltag($ac['color']) ?>"><?= dol_escape_htmltag($ac['label']) ?></option>
+                                    <?php endforeach; ?>
+                                </select>
                             </div>
-                        <?php endif; ?>
+                        </div>
 
                     </div>
                 <?php endforeach; ?>

@@ -502,6 +502,82 @@
     color: #fff;
     font-weight: 600;
     white-space: nowrap;
+    position: relative;
+    cursor: default;
+    transition: padding-right 0.15s ease;
+
+    &:hover {
+        padding-right: 18px;
+    }
+
+    &:hover .kanban-tag-remove {
+        opacity: 1;
+        transform: scale(1);
+    }
+}
+
+.kanban-tag-remove {
+    position: absolute;
+    top: -2px;
+    right: -2px;
+    width: 14px;
+    height: 14px;
+    border-radius: 50%;
+    background: #dc3545;
+    color: #fff;
+    font-size: 10px;
+    line-height: 14px;
+    text-align: center;
+    cursor: pointer;
+    opacity: 0;
+    transform: scale(0.5);
+    transition: opacity 0.15s ease, transform 0.15s ease;
+
+    &:hover {
+        background: #a71d2a;
+    }
+}
+
+.kanban-add-tag-wrapper {
+    position: relative;
+    display: inline-flex;
+    align-items: center;
+}
+
+.kanban-add-tag-btn {
+    background: none;
+    border: 1px dashed #ccc;
+    border-radius: 12px;
+    padding: 2px 8px;
+    cursor: pointer;
+    color: #999;
+    font-size: 10px;
+    transition: border-color 0.2s, color 0.2s;
+
+    &:hover {
+        border-color: #3b82f6;
+        color: #3b82f6;
+    }
+}
+
+.kanban-tag-select {
+    display: none;
+    position: absolute;
+    top: 100%;
+    left: 0;
+    z-index: 20;
+    min-width: 140px;
+    font-size: 11px;
+    border: 1px solid #3b82f6;
+    border-radius: 4px;
+    padding: 2px;
+    background: #fff;
+    box-shadow: 0 4px 12px rgba(0,0,0,0.12);
+    margin-top: 2px;
+
+    &.visible {
+        display: block;
+    }
 }
 
 /* Dates row above progress */
