@@ -319,6 +319,30 @@
     object-fit: cover;
 }
 
+.krt-photo-default {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    width: 36px;
+    height: 36px;
+    border-radius: 4px;
+    background: #f0f0f0;
+    color: #bbb;
+    font-size: 16px;
+}
+
+.krt-cotation {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    min-width: 22px;
+    height: 18px;
+    border-radius: 3px;
+    font-size: 10px;
+    font-weight: 700;
+    padding: 0 4px;
+}
+
 .krt-user {
     display: inline-flex;
     align-items: center;
