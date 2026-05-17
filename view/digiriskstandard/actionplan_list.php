@@ -240,13 +240,20 @@ if ($action == 'updateTaskMeta' && !empty(GETPOSTINT('task_id'))) {
 
     if ($result > 0 && $taskToUpdate->fk_project == $projectId) {
         if ($field == 'planned_workload') {
-            // Value is in hours (e.g. "14" or "14.5"), convert to seconds
-            $hours = (float) str_replace(',', '.', $value);
-            $taskToUpdate->planned_workload = (int) ($hours * 3600);
+            // Accept HH:MM (e.g. "22:35") or decimal hours (e.g. "14.5")
+            $value = trim($value);
+            if (preg_match('/^(\d+):(\d{1,2})$/', $value, $m)) {
+                $totalSeconds = ((int) $m[1]) * 3600 + ((int) $m[2]) * 60;
+            } else {
+                $hours = (float) str_replace(',', '.', $value);
+                $totalSeconds = (int) ($hours * 3600);
+            }
+            $taskToUpdate->planned_workload = $totalSeconds;
             $res = $taskToUpdate->update($user);
             if ($res > 0) {
                 $fmtValue = $taskToUpdate->planned_workload > 0 ? convertSecondToTime($taskToUpdate->planned_workload, 'allhourmin') : '-';
-                print json_encode(['success' => 1, 'formatted' => $fmtValue, 'raw' => $hours]);
+                $rawHours = round($taskToUpdate->planned_workload / 3600, 4);
+                print json_encode(['success' => 1, 'formatted' => $fmtValue, 'raw' => $rawHours]);
             } else {
                 print json_encode(['success' => 0, 'error' => $taskToUpdate->error]);
             }
