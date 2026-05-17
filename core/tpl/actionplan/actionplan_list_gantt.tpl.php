@@ -9,9 +9,27 @@
  * - $langs       Translate
  * - $projectId   int    DU project ID
  */
+
+// Create clean data for Gantt JS (without HTML fields like risk_nomurl)
+$ganttData = [];
+foreach ($tasksJson as $t) {
+    $ganttData[] = [
+        'id'         => $t['id'],
+        'ref'        => $t['ref'],
+        'label'      => $t['label'],
+        'date_start' => $t['date_start'],
+        'date_end'   => $t['date_end'],
+        'progress'   => $t['progress'],
+        'risk_ref'   => $t['risk_ref'],
+        'url'        => $t['url'],
+    ];
+}
 ?>
 
-<div class="gantt-container" data-tasks='<?= dol_escape_htmltag(json_encode($tasksJson)) ?>'>
+<!-- JSON data for Gantt JS -->
+<script type="application/json" id="gantt-data"><?= json_encode($ganttData) ?></script>
+
+<div class="gantt-container">
     <?php if (empty($tasksJson)) : ?>
         <div class="gantt-empty">
             <i class="fas fa-tasks" style="font-size: 48px; opacity: 0.3;"></i>
@@ -23,7 +41,7 @@
             <div class="gantt-sidebar">
                 <div class="gantt-sidebar-header">
                     <span class="gantt-col-task"><?= $langs->trans('Task') ?></span>
-                    <span class="gantt-col-resp"><?= $langs->trans('TaskExecutive') ?></span>
+                    <span class="gantt-col-resp"><?= $langs->trans('Responsible') ?></span>
                 </div>
                 <?php foreach ($tasksJson as $t) : ?>
                     <div class="gantt-sidebar-row" data-task-id="<?= $t['id'] ?>">
