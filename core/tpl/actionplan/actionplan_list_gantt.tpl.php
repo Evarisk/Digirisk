@@ -5,7 +5,7 @@
  * \brief   Gantt chart template for action plan tasks
  *
  * Variables expected from calling PHP:
- * - $tasksJson   array  Task data
+ * - $tasksJson   array  Task data (enriched)
  * - $langs       Translate
  * - $projectId   int    DU project ID
  */
@@ -19,27 +19,36 @@
         </div>
     <?php else : ?>
         <div class="gantt-chart">
+            <!-- Sidebar: task list -->
             <div class="gantt-sidebar">
                 <div class="gantt-sidebar-header">
-                    <span><?= $langs->trans('Task') ?></span>
+                    <span class="gantt-col-task"><?= $langs->trans('Task') ?></span>
+                    <span class="gantt-col-resp"><?= $langs->trans('TaskExecutive') ?></span>
                 </div>
                 <?php foreach ($tasksJson as $t) : ?>
                     <div class="gantt-sidebar-row" data-task-id="<?= $t['id'] ?>">
-                        <a href="<?= $t['url'] ?>" target="_blank" class="gantt-task-ref"><?= dol_escape_htmltag($t['ref']) ?></a>
-                        <span class="gantt-task-label" title="<?= dol_escape_htmltag($t['label']) ?>"><?= dol_escape_htmltag(dol_trunc($t['label'], 30)) ?></span>
-                        <?php if (!empty($t['risk_ref'])) : ?>
-                            <span class="gantt-risk-badge"><i class="fas fa-exclamation-triangle"></i> <?= dol_escape_htmltag($t['risk_ref']) ?></span>
-                        <?php endif; ?>
-                        <?php if (!empty($t['categories'])) : ?>
-                            <span class="gantt-tags">
-                                <?php foreach ($t['categories'] as $cat) : ?>
-                                    <span class="gantt-tag" style="background: <?= !empty($cat['color']) ? '#' . dol_escape_htmltag($cat['color']) : '#8c8c8c' ?>"><?= dol_escape_htmltag(dol_trunc($cat['label'], 12)) ?></span>
+                        <div class="gantt-col-task">
+                            <a href="<?= $t['url'] ?>" target="_blank" class="gantt-task-ref"><?= dol_escape_htmltag($t['ref']) ?></a>
+                            <span class="gantt-task-label" title="<?= dol_escape_htmltag($t['label']) ?>"><?= dol_escape_htmltag(dol_trunc($t['label'], 25)) ?></span>
+                            <?php if (!empty($t['risk_nomurl'])) : ?>
+                                <span class="gantt-risk-badge"><?= $t['risk_nomurl'] ?></span>
+                            <?php endif; ?>
+                        </div>
+                        <div class="gantt-col-resp">
+                            <?php if (!empty($t['responsible'])) : ?>
+                                <?php foreach ($t['responsible'] as $resp) : ?>
+                                    <span class="gantt-responsible" title="<?= dol_escape_htmltag($resp['fullname']) ?>">
+                                        <i class="fas fa-user-tie"></i> <?= dol_escape_htmltag(dol_trunc($resp['fullname'], 15)) ?>
+                                    </span>
                                 <?php endforeach; ?>
-                            </span>
-                        <?php endif; ?>
+                            <?php else : ?>
+                                <span class="gantt-responsible gantt-responsible-none">N/A</span>
+                            <?php endif; ?>
+                        </div>
                     </div>
                 <?php endforeach; ?>
             </div>
+            <!-- Timeline: rendered by JS -->
             <div class="gantt-timeline-wrapper">
                 <div class="gantt-timeline-header" id="gantt-timeline-header"></div>
                 <div class="gantt-timeline-body" id="gantt-timeline-body">
