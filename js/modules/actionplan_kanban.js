@@ -67,9 +67,40 @@ window.digiriskdolibarr.actionplanKanban.event = function() {
         window.digiriskdolibarr.actionplanKanban.saveResponsible(taskId, userId, $select);
     });
 
-    // Prevent card drag when interacting with select
-    $(document).on('mousedown', '.kanban-responsible-select', function(e) {
+    // Prevent card drag when interacting with selects
+    $(document).on('mousedown', '.kanban-responsible-select, .kanban-contributor-select, .kanban-add-contributor-btn', function(e) {
         e.stopPropagation();
+    });
+
+    // Add contributor: toggle select visibility
+    $(document).on('click', '.kanban-add-contributor-btn', function(e) {
+        e.preventDefault();
+        e.stopPropagation();
+        var $select = $(this).siblings('.kanban-contributor-select');
+        $select.toggleClass('visible');
+        if ($select.hasClass('visible')) {
+            $select.trigger('focus');
+        }
+    });
+
+    // Contributor select change: AJAX save
+    $(document).on('change', '.kanban-contributor-select', function() {
+        var $select = $(this);
+        var taskId  = $select.data('task-id');
+        var userId  = $select.val();
+        if (userId) {
+            window.digiriskdolibarr.actionplanKanban.addContributor(taskId, userId, $select);
+        }
+        $select.removeClass('visible');
+        $select.val(''); // Reset
+    });
+
+    // Hide contributor select on blur
+    $(document).on('blur', '.kanban-contributor-select', function() {
+        var $select = $(this);
+        setTimeout(function() {
+            $select.removeClass('visible');
+        }, 200);
     });
 };
 
@@ -254,6 +285,50 @@ window.digiriskdolibarr.actionplanKanban.saveResponsible = function(taskId, user
         success: function(response) {
             $card.removeClass('kanban-card-saving');
             if (response.success) {
+                $card.addClass('kanban-card-saved');
+                setTimeout(function() {
+                    $card.removeClass('kanban-card-saved');
+                }, 2000);
+            } else {
+                $card.addClass('kanban-card-error');
+                setTimeout(function() {
+                    $card.removeClass('kanban-card-error');
+                }, 3000);
+            }
+        },
+        error: function() {
+            $card.removeClass('kanban-card-saving');
+            $card.addClass('kanban-card-error');
+            setTimeout(function() {
+                $card.removeClass('kanban-card-error');
+            }, 3000);
+        }
+    });
+};
+
+/**
+ * AJAX add contributor (TASKCONTRIBUTOR contact)
+ *
+ * @param {number} taskId   Task row ID
+ * @param {number} userId   User ID
+ * @param {jQuery} $select  The select element
+ */
+window.digiriskdolibarr.actionplanKanban.addContributor = function(taskId, userId, $select) {
+    var token          = window.saturne.toolbox.getToken();
+    var querySeparator = window.saturne.toolbox.getQuerySeparator(document.URL);
+    var $card          = $select.closest('.kanban-card');
+
+    $card.addClass('kanban-card-saving');
+
+    $.ajax({
+        url: document.URL + querySeparator + 'action=addTaskContributor&task_id=' + taskId + '&user_id=' + userId + '&token=' + token,
+        type: 'POST',
+        dataType: 'json',
+        success: function(response) {
+            $card.removeClass('kanban-card-saving');
+            if (response.success) {
+                // Update count badge and tooltip
+                $card.find('.kanban-contributor-count').text(response.count).attr('title', response.names);
                 $card.addClass('kanban-card-saved');
                 setTimeout(function() {
                     $card.removeClass('kanban-card-saved');

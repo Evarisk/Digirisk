@@ -182,6 +182,51 @@ if ($action == 'updateTaskResponsible' && !empty(GETPOSTINT('task_id'))) {
     exit;
 }
 
+// AJAX action to add a contributor (TASKCONTRIBUTOR contact)
+if ($action == 'addTaskContributor' && !empty(GETPOSTINT('task_id'))) {
+    header('Content-Type: application/json');
+
+    $taskId = GETPOSTINT('task_id');
+    $userId = GETPOSTINT('user_id');
+
+    if ($userId <= 0) {
+        http_response_code(400);
+        print json_encode(['success' => 0, 'error' => 'No user selected']);
+        $db->close();
+        exit;
+    }
+
+    $taskToUpdate = new SaturneTask($db);
+    $result = $taskToUpdate->fetch($taskId);
+
+    if ($result > 0 && $taskToUpdate->fk_project == $projectId) {
+        $addResult = $taskToUpdate->add_contact($userId, 'TASKCONTRIBUTOR', 'internal');
+        if ($addResult > 0) {
+            // Count contributors after addition
+            $contacts = $taskToUpdate->liste_contact(-1, 'internal');
+            $contribCount = 0;
+            $contribNames = [];
+            if (is_array($contacts)) {
+                foreach ($contacts as $c) {
+                    if ($c['code'] != 'TASKEXECUTIVE') {
+                        $contribCount++;
+                        $contribNames[] = trim($c['firstname'] . ' ' . $c['lastname']);
+                    }
+                }
+            }
+            print json_encode(['success' => 1, 'count' => $contribCount, 'names' => implode(', ', $contribNames)]);
+        } else {
+            http_response_code(500);
+            print json_encode(['success' => 0, 'error' => $taskToUpdate->error]);
+        }
+    } else {
+        http_response_code(404);
+        print json_encode(['success' => 0, 'error' => 'Task not found']);
+    }
+    $db->close();
+    exit;
+}
+
 /*
  * View
  */

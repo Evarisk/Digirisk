@@ -80,10 +80,24 @@ foreach ($tasksJson as $t) {
                         <!-- Label -->
                         <div class="kanban-card-label"><?= dol_escape_htmltag($t['label']) ?></div>
 
-                        <!-- Contacts row: Responsible (dropdown) | separator | Contributors (avatars) -->
+                        <!-- Contacts row: [Responsible avatar + select] | [contributor count] [add contributor] -->
                         <div class="kanban-card-contacts">
-                            <!-- Responsible: clickable dropdown -->
+                            <!-- Responsible: avatar(s) + select -->
                             <div class="kanban-responsible-wrapper">
+                                <?php if (!empty($t['responsible'])) : ?>
+                                    <div class="kanban-responsible-avatars"
+                                         title="<?= dol_escape_htmltag(implode(', ', array_map(function($r) { return $r['fullname']; }, $t['responsible']))) ?>">
+                                        <?php $firstResp = $t['responsible'][0]; ?>
+                                        <?php if (!empty($firstResp['photo'])) : ?>
+                                            <img src="<?= $firstResp['photo'] ?>" class="kanban-avatar" alt="<?= dol_escape_htmltag($firstResp['fullname']) ?>">
+                                        <?php else : ?>
+                                            <span class="kanban-avatar kanban-avatar-initials"><?= strtoupper(mb_substr($firstResp['fullname'], 0, 1)) ?></span>
+                                        <?php endif; ?>
+                                        <?php if (count($t['responsible']) > 1) : ?>
+                                            <span class="kanban-avatar-more">...</span>
+                                        <?php endif; ?>
+                                    </div>
+                                <?php endif; ?>
                                 <select class="kanban-responsible-select" data-task-id="<?= $t['id'] ?>">
                                     <option value="0"><?= dol_escape_htmltag($langs->trans('Unassigned')) ?></option>
                                     <?php foreach ($allUsers as $u) : ?>
@@ -95,24 +109,26 @@ foreach ($tasksJson as $t) {
                                 </select>
                             </div>
 
-                            <?php if (!empty($t['contributors']) || $t['file_count'] > 0) : ?>
-                                <span class="kanban-separator">|</span>
-                            <?php endif; ?>
+                            <span class="kanban-separator">|</span>
 
-                            <!-- Contributors: avatars -->
-                            <?php if (!empty($t['contributors'])) : ?>
-                                <div class="kanban-contributors">
-                                    <?php foreach ($t['contributors'] as $contrib) : ?>
-                                        <?php if (!empty($contrib['photo'])) : ?>
-                                            <img src="<?= $contrib['photo'] ?>" class="kanban-avatar" title="<?= dol_escape_htmltag($contrib['fullname']) ?>" alt="<?= dol_escape_htmltag($contrib['fullname']) ?>">
-                                        <?php else : ?>
-                                            <span class="kanban-avatar kanban-avatar-initials" title="<?= dol_escape_htmltag($contrib['fullname']) ?>">
-                                                <?= strtoupper(mb_substr($contrib['fullname'], 0, 1)) ?>
-                                            </span>
-                                        <?php endif; ?>
+                            <!-- Contributor count badge -->
+                            <span class="kanban-contributor-count"
+                                  title="<?= !empty($t['contributors']) ? dol_escape_htmltag(implode(', ', array_map(function($c) { return $c['fullname']; }, $t['contributors']))) : dol_escape_htmltag($langs->trans('NoContributors')) ?>">
+                                <?= count($t['contributors'] ?? []) ?>
+                            </span>
+
+                            <!-- Add contributor -->
+                            <div class="kanban-add-contributor-wrapper">
+                                <button class="kanban-add-contributor-btn" title="<?= dol_escape_htmltag($langs->trans('AddContributor')) ?>">
+                                    <i class="fas fa-user-plus"></i>
+                                </button>
+                                <select class="kanban-contributor-select" data-task-id="<?= $t['id'] ?>">
+                                    <option value=""><?= dol_escape_htmltag($langs->trans('SelectUser')) ?></option>
+                                    <?php foreach ($allUsers as $u) : ?>
+                                        <option value="<?= $u['id'] ?>"><?= dol_escape_htmltag($u['fullname']) ?></option>
                                     <?php endforeach; ?>
-                                </div>
-                            <?php endif; ?>
+                                </select>
+                            </div>
 
                             <!-- File count -->
                             <?php if ($t['file_count'] > 0) : ?>
