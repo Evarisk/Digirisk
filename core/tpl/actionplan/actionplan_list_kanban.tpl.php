@@ -14,7 +14,7 @@
 // Kanban columns definition
 $columns = [
     'draft'    => ['label' => $langs->trans('ColumnDraft'),      'icon' => 'fa-pencil-alt', 'color' => '#999999', 'min' => 0,  'max' => $kanbanThresholds['draft_max']],
-    'progress' => ['label' => $langs->trans('ColumnInProgress'), 'icon' => 'fa-spinner',    'color' => '#e9ad4f', 'min' => $kanbanThresholds['draft_max'] + 1, 'max' => $kanbanThresholds['progress_max']],
+    'progress' => ['label' => $langs->trans('ColumnInProgress'), 'icon' => 'fa-play',       'color' => '#e9ad4f', 'min' => $kanbanThresholds['draft_max'] + 1, 'max' => $kanbanThresholds['progress_max']],
     'control'  => ['label' => $langs->trans('ColumnInControl'),  'icon' => 'fa-search',     'color' => '#3085d6', 'min' => $kanbanThresholds['progress_max'] + 1, 'max' => $kanbanThresholds['control_max']],
     'done'     => ['label' => $langs->trans('ColumnDone'),       'icon' => 'fa-check',      'color' => '#47e58e', 'min' => 100, 'max' => 100],
 ];
