@@ -115,6 +115,21 @@
         box-shadow: 0 4px 12px rgba(0, 0, 0, 0.14);
         transform: translateY(-2px);
     }
+
+    &.kanban-card-saving {
+        opacity: 0.7;
+        outline: 2px solid #e9ad4f;
+    }
+
+    &.kanban-card-saved {
+        outline: 2px solid #47e58e;
+        box-shadow: 0 0 0 4px rgba(71, 229, 142, 0.2);
+    }
+
+    &.kanban-card-error {
+        outline: 2px solid #e05353;
+        box-shadow: 0 0 0 4px rgba(224, 83, 83, 0.2);
+    }
 }
 
 .kanban-card-placeholder {

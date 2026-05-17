@@ -145,39 +145,35 @@ window.digiriskdolibarr.actionplanKanban.updateCounts = function() {
  */
 window.digiriskdolibarr.actionplanKanban.saveProgress = function(taskId, newProgress) {
     var token          = window.saturne.toolbox.getToken();
-    var querySeparator = '?';
+    var querySeparator = window.saturne.toolbox.getQuerySeparator(document.URL);
+    var $card          = $('.kanban-card[data-task-id="' + taskId + '"]');
 
-    if (document.URL.match(/\?/)) {
-        querySeparator = '&';
-    }
-
-    var $indicator = $('.actionplan-unsaved-indicator');
-    $indicator.addClass('visible').removeClass('saved');
-    $indicator.html('<i class="fas fa-spinner fa-spin"></i> Sauvegarde en cours...');
+    $card.addClass('kanban-card-saving');
 
     $.ajax({
         url: document.URL + querySeparator + 'action=updateTaskProgress&task_id=' + taskId + '&new_progress=' + newProgress + '&token=' + token,
         type: 'POST',
         dataType: 'json',
         success: function(response) {
+            $card.removeClass('kanban-card-saving');
             if (response.success) {
-                $indicator.addClass('saved');
-                $indicator.html('<i class="fas fa-check-circle"></i> Sauvegardé');
+                $card.addClass('kanban-card-saved');
                 setTimeout(function() {
-                    $indicator.removeClass('visible saved');
+                    $card.removeClass('kanban-card-saved');
                 }, 2000);
             } else {
-                $indicator.html('<i class="fas fa-exclamation-triangle"></i> Erreur');
+                $card.addClass('kanban-card-error');
                 setTimeout(function() {
-                    $indicator.removeClass('visible');
-                }, 4000);
+                    $card.removeClass('kanban-card-error');
+                }, 3000);
             }
         },
         error: function() {
-            $indicator.html('<i class="fas fa-exclamation-triangle"></i> Erreur réseau');
+            $card.removeClass('kanban-card-saving');
+            $card.addClass('kanban-card-error');
             setTimeout(function() {
-                $indicator.removeClass('visible');
-            }, 4000);
+                $card.removeClass('kanban-card-error');
+            }, 3000);
         }
     });
 };
