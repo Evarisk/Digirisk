@@ -24,6 +24,40 @@ window.digiriskdolibarr.actionplanKanban.event = function() {
     $(document).on('mouseleave', '.kanban-card', function() {
         $(this).removeClass('kanban-card-hover');
     });
+
+    // Inline edit: double-click on label to edit
+    $(document).on('dblclick', '.kanban-card-label', function(e) {
+        e.stopPropagation();
+        var $label = $(this);
+
+        // Prevent multiple edits
+        if ($label.find('textarea').length > 0) {
+            return;
+        }
+
+        var originalText = $label.text().trim();
+        var taskId       = $label.closest('.kanban-card').data('task-id');
+
+        // Replace text with textarea
+        var $textarea = $('<textarea class="kanban-inline-edit">' + originalText + '</textarea>');
+        $label.empty().append($textarea);
+        $textarea.trigger('focus').select();
+
+        // Save on blur
+        $textarea.on('blur', function() {
+            window.digiriskdolibarr.actionplanKanban.saveLabel(taskId, $textarea.val().trim(), $label, originalText);
+        });
+
+        // Save on Enter (without Shift), cancel on Escape
+        $textarea.on('keydown', function(ev) {
+            if (ev.key === 'Enter' && !ev.shiftKey) {
+                ev.preventDefault();
+                $textarea.trigger('blur');
+            } else if (ev.key === 'Escape') {
+                $label.text(originalText);
+            }
+        });
+    });
 };
 
 /**
@@ -144,6 +178,48 @@ window.digiriskdolibarr.actionplanKanban.saveProgress = function(taskId, newProg
             setTimeout(function() {
                 $indicator.removeClass('visible');
             }, 4000);
+        }
+    });
+};
+
+/**
+ * AJAX save task label (inline edit)
+ *
+ * @param {number} taskId       Task row ID
+ * @param {string} newLabel     New label text
+ * @param {jQuery} $labelEl     The label DOM element
+ * @param {string} originalText Original text (for rollback)
+ */
+window.digiriskdolibarr.actionplanKanban.saveLabel = function(taskId, newLabel, $labelEl, originalText) {
+    // If unchanged, just restore text
+    if (newLabel === originalText || newLabel === '') {
+        $labelEl.text(originalText);
+        return;
+    }
+
+    var token          = window.saturne.toolbox.getToken();
+    var querySeparator = window.saturne.toolbox.getQuerySeparator(document.URL);
+
+    $labelEl.text(newLabel).addClass('kanban-label-saving');
+
+    $.ajax({
+        url: document.URL + querySeparator + 'action=updateTaskLabel&task_id=' + taskId + '&token=' + token,
+        type: 'POST',
+        data: { new_label: newLabel },
+        dataType: 'json',
+        success: function(response) {
+            $labelEl.removeClass('kanban-label-saving');
+            if (response.success) {
+                $labelEl.addClass('kanban-label-saved');
+                setTimeout(function() {
+                    $labelEl.removeClass('kanban-label-saved');
+                }, 1500);
+            } else {
+                $labelEl.text(originalText);
+            }
+        },
+        error: function() {
+            $labelEl.removeClass('kanban-label-saving').text(originalText);
         }
     });
 };

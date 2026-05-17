@@ -183,6 +183,42 @@
     color: #333;
     line-height: 1.4;
     margin-bottom: 8px;
+    cursor: text;
+    border-radius: 4px;
+    padding: 2px 4px;
+    margin: -2px -4px 8px;
+    transition: background 0.2s ease, outline 0.2s ease;
+
+    &:hover {
+        background: #f0f4ff;
+        outline: 1px dashed #b0c4de;
+    }
+
+    &.kanban-label-saving {
+        opacity: 0.6;
+    }
+
+    &.kanban-label-saved {
+        background: #e8f5e9;
+        outline: 1px solid #47e58e;
+    }
+}
+
+/* Inline edit textarea */
+.kanban-inline-edit {
+    width: 100%;
+    min-height: 50px;
+    font-size: 13px;
+    font-family: inherit;
+    line-height: 1.4;
+    color: #333;
+    border: 1px solid #0d8aff;
+    border-radius: 4px;
+    padding: 4px 6px;
+    resize: vertical;
+    outline: none;
+    background: #fff;
+    box-shadow: 0 0 0 3px rgba(13, 138, 255, 0.15);
 }
 
 /* Contacts row */

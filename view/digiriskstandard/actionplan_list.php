@@ -103,6 +103,41 @@ if ($action == 'updateTaskProgress' && !empty(GETPOSTINT('task_id'))) {
     exit;
 }
 
+// AJAX action to update task label (inline edit from Kanban)
+if ($action == 'updateTaskLabel' && !empty(GETPOSTINT('task_id'))) {
+    header('Content-Type: application/json');
+
+    $taskId   = GETPOSTINT('task_id');
+    $newLabel = GETPOST('new_label', 'alphanohtml');
+
+    if (empty($newLabel)) {
+        http_response_code(400);
+        print json_encode(['success' => 0, 'error' => 'Empty label']);
+        $db->close();
+        exit;
+    }
+
+    $taskToUpdate = new SaturneTask($db);
+    $result = $taskToUpdate->fetch($taskId);
+
+    if ($result > 0 && $taskToUpdate->fk_project == $projectId) {
+        $taskToUpdate->label = $newLabel;
+        $updateResult = $taskToUpdate->update($user);
+
+        if ($updateResult > 0) {
+            print json_encode(['success' => 1, 'label' => $newLabel]);
+        } else {
+            http_response_code(500);
+            print json_encode(['success' => 0, 'error' => $taskToUpdate->error]);
+        }
+    } else {
+        http_response_code(404);
+        print json_encode(['success' => 0, 'error' => 'Task not found or wrong project']);
+    }
+    $db->close();
+    exit;
+}
+
 /*
  * View
  */
