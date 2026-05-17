@@ -88,7 +88,7 @@ foreach ($tasksJson as $t) {
                             $respFullname = '';
                             $respId       = 0;
                             if (!empty($t['responsible'])) {
-                                $respInitial  = strtoupper(mb_substr($t['responsible'][0]['fullname'], 0, 1));
+                                $respInitial  = strtoupper(mb_substr($t['responsible'][0]['fullname'], 0, 2));
                                 $respFullname = $t['responsible'][0]['fullname'];
                                 $respId       = $t['responsible'][0]['id'];
                             }
@@ -114,7 +114,7 @@ foreach ($tasksJson as $t) {
                                 <select class="kanban-responsible-select" data-task-id="<?= $t['id'] ?>">
                                     <option value="0"><?= dol_escape_htmltag($langs->trans('Unassigned')) ?></option>
                                     <?php foreach ($allUsers as $u) : ?>
-                                        <option value="<?= $u['id'] ?>" data-initial="<?= strtoupper(mb_substr($u['fullname'], 0, 1)) ?>"
+                                        <option value="<?= $u['id'] ?>" data-initial="<?= strtoupper(mb_substr($u['fullname'], 0, 2)) ?>"
                                             <?= ($respId == $u['id']) ? 'selected' : '' ?>>
                                             <?= dol_escape_htmltag($u['fullname']) ?>
                                         </option>

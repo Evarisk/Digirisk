@@ -76,7 +76,7 @@ window.digiriskdolibarr.actionplanKanban.event = function() {
         var taskId   = $select.data('task-id');
         var userId   = $select.val();
         var selText  = $select.find('option:selected').text().trim();
-        var newInit  = userId > 0 ? selText.charAt(0).toUpperCase() : '?';
+        var newInit  = userId > 0 ? ($select.find('option:selected').data('initial') || selText.substring(0, 2).toUpperCase()) : '?';
 
         // Hide select, update initial, show initial
         $select.removeClass('visible');
