@@ -61,11 +61,6 @@ saturne_check_access($permissiontoread);
  * Actions
  */
 
-// Initialize ActionPlan logging constants with defaults (label ON, others OFF)
-if (!isset($conf->global->DIGIRISKDOLIBARR_ACTIONPLAN_LOG_LABEL)) {
-    dolibarr_set_const($db, 'DIGIRISKDOLIBARR_ACTIONPLAN_LOG_LABEL', 1, 'chaine', 0, '', $conf->entity);
-}
-
 require_once '../core/tpl/digiriskdolibarr_projectcreation_action.tpl.php';
 
 if ($action == 'setredirectafterconnection') {
@@ -191,41 +186,6 @@ print '<td class="center">';
 print ajax_constantonoff('DIGIRISKDOLIBARR_MANUAL_INPUT_NB_WORKED_HOURS');
 print '</td>';
 print '</tr>';
-print '</table>';
-
-print load_fiche_titre($langs->trans("ActionPlanLogging"), '', '');
-
-print '<table class="noborder centpercent">';
-print '<tr class="liste_titre">';
-print '<td>' . $langs->trans("Name") . '</td>';
-print '<td>' . $langs->trans("Description") . '</td>';
-print '<td class="center">' . $langs->trans("Status") . '</td>';
-print '</tr>';
-
-$actionPlanLogs = [
-    'DIGIRISKDOLIBARR_ACTIONPLAN_LOG_LABEL'              => ['ActionPlanLogLabel', 'ActionPlanLogLabelDesc'],
-    'DIGIRISKDOLIBARR_ACTIONPLAN_LOG_WORKLOAD'            => ['ActionPlanLogWorkload', 'ActionPlanLogWorkloadDesc'],
-    'DIGIRISKDOLIBARR_ACTIONPLAN_LOG_BUDGET'              => ['ActionPlanLogBudget', 'ActionPlanLogBudgetDesc'],
-    'DIGIRISKDOLIBARR_ACTIONPLAN_LOG_CONTRIBUTOR_ADD'      => ['ActionPlanLogContributorAdd', 'ActionPlanLogContributorAddDesc'],
-    'DIGIRISKDOLIBARR_ACTIONPLAN_LOG_CONTRIBUTOR_REMOVE'   => ['ActionPlanLogContributorRemove', 'ActionPlanLogContributorRemoveDesc'],
-    'DIGIRISKDOLIBARR_ACTIONPLAN_LOG_PROGRESS'             => ['ActionPlanLogProgress', 'ActionPlanLogProgressDesc'],
-    'DIGIRISKDOLIBARR_ACTIONPLAN_LOG_TAG'                  => ['ActionPlanLogTag', 'ActionPlanLogTagDesc'],
-    'DIGIRISKDOLIBARR_ACTIONPLAN_LOG_DATE_START'           => ['ActionPlanLogDateStart', 'ActionPlanLogDateStartDesc'],
-    'DIGIRISKDOLIBARR_ACTIONPLAN_LOG_DATE_END'             => ['ActionPlanLogDateEnd', 'ActionPlanLogDateEndDesc'],
-];
-
-foreach ($actionPlanLogs as $constName => $transKeys) {
-    print '<tr class="oddeven"><td>';
-    print $langs->trans($transKeys[0]);
-    print '</td><td>';
-    print $langs->trans($transKeys[1]);
-    print '</td>';
-    print '<td class="center">';
-    print ajax_constantonoff($constName);
-    print '</td>';
-    print '</tr>';
-}
-
 print '</table>';
 
 print load_fiche_titre($langs->trans("MediaData"), '', '');
