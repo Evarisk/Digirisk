@@ -321,9 +321,9 @@ if ($action == 'updateTaskDate' && !empty(GETPOSTINT('task_id'))) {
         if (in_array($field, ['date_start', 'date_end'])) {
             $timestamp = !empty($value) ? strtotime($value) : 0;
             if ($field == 'date_start') {
-                $taskToUpdate->dateo = $timestamp > 0 ? $timestamp : null;
+                $taskToUpdate->date_start = $timestamp > 0 ? $timestamp : null;
             } else {
-                $taskToUpdate->datee = $timestamp > 0 ? $timestamp : null;
+                $taskToUpdate->date_end = $timestamp > 0 ? $timestamp : null;
             }
             $res = $taskToUpdate->update($user);
             if ($res > 0) {
