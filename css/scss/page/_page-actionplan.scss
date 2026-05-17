@@ -34,6 +34,89 @@
 }
 
 /* =============================================
+ * KANBAN SETTINGS
+ * ============================================= */
+
+.kanban-settings-wrapper {
+    position: relative;
+    display: flex;
+    justify-content: flex-end;
+    margin-bottom: -8px;
+}
+
+.kanban-settings-btn {
+    background: none;
+    border: 1px solid #ddd;
+    border-radius: 6px;
+    padding: 4px 8px;
+    cursor: pointer;
+    color: #888;
+    font-size: 14px;
+    transition: all 0.15s;
+
+    &:hover {
+        color: #333;
+        border-color: #bbb;
+        background: #f5f5f5;
+    }
+}
+
+.kanban-settings-popover {
+    display: none;
+    position: absolute;
+    top: calc(100% + 4px);
+    right: 0;
+    z-index: 60;
+    background: #fff;
+    border: 1px solid #e0e0e0;
+    border-radius: 8px;
+    box-shadow: 0 6px 20px rgba(0, 0, 0, 0.14);
+    padding: 12px 16px;
+    min-width: 220px;
+
+    &.open {
+        display: block;
+    }
+}
+
+.ksp-row {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    margin-bottom: 8px;
+
+    &:last-child {
+        margin-bottom: 0;
+    }
+
+    label {
+        font-size: 11px;
+        color: #555;
+        white-space: nowrap;
+        min-width: 65px;
+
+        i {
+            color: #999;
+            margin-right: 2px;
+        }
+    }
+
+    input[type="range"] {
+        flex: 1;
+        height: 4px;
+        cursor: pointer;
+    }
+}
+
+.ksp-val {
+    font-size: 11px;
+    font-weight: 600;
+    color: #333;
+    min-width: 38px;
+    text-align: right;
+}
+
+/* =============================================
  * KANBAN BOARD
  * ============================================= */
 
