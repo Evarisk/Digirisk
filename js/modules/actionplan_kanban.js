@@ -134,45 +134,86 @@ window.digiriskdolibarr.actionplanKanban.event = function() {
         }, 200);
     });
 
-    // Progress bar: click to edit
-    $(document).on('click', '.kanban-card-progress', function(e) {
+    // Progress bar: draggable slider
+    $(document).on('mousedown', '.kanban-progress-bar', function(e) {
+        e.preventDefault();
         e.stopPropagation();
-        var $progress = $(this);
 
-        // Prevent multiple inputs
-        if ($progress.find('input').length > 0) {
-            return;
+        var $bar     = $(this);
+        var $card    = $bar.closest('.kanban-card');
+        var $fill    = $bar.find('.kanban-progress-fill');
+        var $text    = $bar.siblings('.kanban-progress-text');
+        var taskId   = $card.data('task-id');
+        var barWidth = $bar.width();
+
+        // Calculate % from mouse position
+        function calcPercent(pageX) {
+            var offset = $bar.offset().left;
+            var pct = Math.round(((pageX - offset) / barWidth) * 100);
+            return Math.max(0, Math.min(100, pct));
         }
 
-        var $card    = $progress.closest('.kanban-card');
-        var taskId   = $card.data('task-id');
-        var current  = parseInt($card.data('progress')) || 0;
+        // Visual update
+        function updateVisual(pct) {
+            $fill.css('width', pct + '%');
+            $fill.removeClass('progress-red progress-yellow progress-green');
+            if (pct === 0) {
+                $fill.addClass('progress-red');
+            } else if (pct < 100) {
+                $fill.addClass('progress-yellow');
+            } else {
+                $fill.addClass('progress-green');
+            }
+            $text.text(pct + '%');
+        }
 
-        // Replace with input
-        var origHtml = $progress.html();
-        $progress.html('<input type="number" class="kanban-progress-input" min="0" max="100" step="1" value="' + current + '">');
-        var $input = $progress.find('input');
-        $input.trigger('focus').select();
+        // Initial click position
+        var pct = calcPercent(e.pageX);
+        updateVisual(pct);
+        $bar.addClass('kanban-bar-dragging');
 
-        // Save on blur
-        $input.on('blur', function() {
-            var val = Math.max(0, Math.min(100, parseInt($input.val()) || 0));
-            window.digiriskdolibarr.actionplanKanban.updateProgress($card, taskId, val, origHtml);
+        $(document).on('mousemove.progressDrag', function(ev) {
+            pct = calcPercent(ev.pageX);
+            updateVisual(pct);
         });
 
-        // Save on Enter, cancel on Escape
-        $input.on('keydown', function(ev) {
-            if (ev.key === 'Enter') {
-                ev.preventDefault();
-                $input.trigger('blur');
-            } else if (ev.key === 'Escape') {
-                $progress.html(origHtml);
+        $(document).on('mouseup.progressDrag', function() {
+            $(document).off('mousemove.progressDrag mouseup.progressDrag');
+            $bar.removeClass('kanban-bar-dragging');
+            $card.data('progress', pct);
+
+            // Move card to correct column
+            var targetColumn = null;
+            $('.kanban-column').each(function() {
+                var min = parseInt($(this).data('progress-min'));
+                var max = parseInt($(this).data('progress-max'));
+                if (pct >= min && pct <= max) {
+                    targetColumn = $(this);
+                    return false;
+                }
+            });
+
+            if (targetColumn) {
+                var $currentCol = $card.closest('.kanban-column');
+                if (targetColumn[0] !== $currentCol[0]) {
+                    $card.detach();
+                    targetColumn.find('.kanban-column-body .kanban-empty').remove();
+                    targetColumn.find('.kanban-column-body').append($card);
+                    var $sourceBody = $currentCol.find('.kanban-column-body');
+                    if ($sourceBody.children('.kanban-card').length === 0) {
+                        $sourceBody.append('<div class="kanban-empty">Aucune action corrective</div>');
+                    }
+                    window.digiriskdolibarr.actionplanKanban.updateCounts();
+                }
             }
+
+            // AJAX save
+            window.digiriskdolibarr.actionplanKanban.saveProgress(taskId, pct);
         });
     });
 
-    // Prevent drag on progress input
-    $(document).on('mousedown', '.kanban-progress-input', function(e) {
+    // Prevent card drag when interacting with progress bar
+    $(document).on('mousedown', '.kanban-card-progress', function(e) {
         e.stopPropagation();
     });
 };
