@@ -223,12 +223,33 @@ foreach ($tasksJson as $t) {
                                     </span>
                                 <?php endforeach; ?>
                             <?php endif; ?>
-                            <select class="kanban-tag-select" data-task-id="<?= $t['id'] ?>">
-                                <option value=""><?= dol_escape_htmltag($langs->trans('AddCategory')) ?></option>
-                                <?php foreach ($allAvailableCategories as $ac) : ?>
-                                    <option value="<?= $ac['id'] ?>" data-color="<?= dol_escape_htmltag($ac['color']) ?>"><?= dol_escape_htmltag($ac['label']) ?></option>
-                                <?php endforeach; ?>
-                            </select>
+                            <div class="kanban-tag-dropdown-wrapper">
+                                <button class="kanban-add-tag-btn" title="<?= dol_escape_htmltag($langs->trans('AddCategory')) ?>">
+                                    <i class="fas fa-tag"></i><i class="fas fa-plus" style="font-size:7px;margin-left:1px"></i>
+                                </button>
+                                <?php
+                                    $assignedCatIds = [];
+                                    if (!empty($t['categories'])) {
+                                        foreach ($t['categories'] as $cat) {
+                                            $assignedCatIds[] = $cat['id'];
+                                        }
+                                    }
+                                ?>
+                                <div class="kanban-tag-dropdown" data-task-id="<?= $t['id'] ?>">
+                                    <?php foreach ($allAvailableCategories as $ac) :
+                                        $isAssigned = in_array($ac['id'], $assignedCatIds);
+                                        $dotColor = !empty($ac['color']) ? '#' . dol_escape_htmltag($ac['color']) : '#8c8c8c';
+                                    ?>
+                                        <div class="kanban-tag-option<?= $isAssigned ? ' assigned' : '' ?>" data-value="<?= $ac['id'] ?>" data-color="<?= dol_escape_htmltag($ac['color']) ?>">
+                                            <span class="kanban-tag-dot" style="background: <?= $dotColor ?>"></span>
+                                            <?= dol_escape_htmltag($ac['label']) ?>
+                                            <?php if ($isAssigned) : ?>
+                                                <i class="fas fa-check" style="margin-left:auto;font-size:9px;color:#28a745"></i>
+                                            <?php endif; ?>
+                                        </div>
+                                    <?php endforeach; ?>
+                                </div>
+                            </div>
                         </div>
 
                     </div>
