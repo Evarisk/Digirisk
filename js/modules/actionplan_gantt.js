@@ -30,14 +30,14 @@ window.digiriskdolibarr.actionplanGantt.event = function() {
  * Render the Gantt chart from data attributes
  */
 window.digiriskdolibarr.actionplanGantt.render = function() {
-    var $container = $('.gantt-container');
-    if ($container.length === 0) {
+    var $dataEl = $('#gantt-data');
+    if ($dataEl.length === 0) {
         return;
     }
 
     var tasksData = [];
     try {
-        tasksData = JSON.parse($container.attr('data-tasks'));
+        tasksData = JSON.parse($dataEl.text());
     } catch (e) {
         return;
     }
