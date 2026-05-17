@@ -308,6 +308,50 @@ window.digiriskdolibarr.actionplanKanban.event = function() {
     $(document).on('mousedown', '.kanban-editable-meta', function(e) {
         e.stopPropagation();
     });
+
+    // Remove contributor: click on × button
+    $(document).on('click', '.kanban-remove-contact', function(e) {
+        e.stopPropagation();
+        e.preventDefault();
+
+        var $btn     = $(this);
+        var $wrapper = $btn.closest('.kanban-initial-wrapper');
+        var taskId   = $wrapper.data('task-id');
+        var userId   = $wrapper.data('user-id');
+        var $card    = $wrapper.closest('.kanban-card');
+
+        $wrapper.css('opacity', '0.4');
+
+        var token = window.saturne.toolbox.getToken();
+        var sep   = window.saturne.toolbox.getQuerySeparator(document.URL);
+
+        $.ajax({
+            url: document.URL + sep + 'action=removeTaskContributor&task_id=' + taskId + '&user_id=' + userId + '&token=' + token,
+            type: 'POST',
+            dataType: 'json',
+            success: function(response) {
+                if (response.success) {
+                    $wrapper.slideUp(150, function() { $(this).remove(); });
+                    $card.addClass('kanban-card-saved');
+                    setTimeout(function() { $card.removeClass('kanban-card-saved'); }, 2000);
+                } else {
+                    $wrapper.css('opacity', '1');
+                    $card.addClass('kanban-card-error');
+                    setTimeout(function() { $card.removeClass('kanban-card-error'); }, 3000);
+                }
+            },
+            error: function() {
+                $wrapper.css('opacity', '1');
+                $card.addClass('kanban-card-error');
+                setTimeout(function() { $card.removeClass('kanban-card-error'); }, 3000);
+            }
+        });
+    });
+
+    // Prevent drag on remove buttons
+    $(document).on('mousedown', '.kanban-remove-contact, .kanban-initial-wrapper', function(e) {
+        e.stopPropagation();
+    });
 };
 
 /**
@@ -323,7 +367,7 @@ window.digiriskdolibarr.actionplanKanban.initSortable = function() {
         placeholder: 'kanban-card-placeholder',
         tolerance: 'pointer',
         cursor: 'grabbing',
-        cancel: '.kanban-progress-bar, .kanban-card-progress, .kanban-responsible-select, .kanban-contributor-select, .kanban-add-contributor-btn, .kanban-initial-responsible, .kanban-card-label, .kanban-inline-edit, .kanban-editable-meta',
+        cancel: '.kanban-progress-bar, .kanban-card-progress, .kanban-responsible-select, .kanban-contributor-select, .kanban-add-contributor-btn, .kanban-initial-responsible, .kanban-card-label, .kanban-inline-edit, .kanban-editable-meta, .kanban-remove-contact, .kanban-initial-wrapper',
         receive: function(event, ui) {
             var $card    = ui.item;
             var $column  = $(this);
