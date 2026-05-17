@@ -88,8 +88,8 @@ foreach ($tasksJson as $t) {
                                 $rd = $t['risk_data'];
                                 $cotColor = !empty($rd['cotation_color']) ? $rd['cotation_color'] : '#ececec';
                                 $textColor = in_array($cotColor, ['#2b2b2b', '#e05353']) ? '#fff' : '#333';
-                                // Build risk URL from getNomUrl pattern
-                                $riskUrl = DOL_URL_ROOT . '/custom/digiriskdolibarr/view/digiriskelement/digiriskelement_risk.php?id=' . $t['risk_id'];
+                                // Build risk URL matching getNomUrl: ?id=fk_element
+                                $riskUrl = !empty($rd['fk_element']) ? DOL_URL_ROOT . '/custom/digiriskdolibarr/view/digiriskelement/digiriskelement_risk.php?id=' . $rd['fk_element'] : '';
                             ?>
                                 <a href="<?= $riskUrl ?>" class="kanban-card-risk kanban-risk-tooltip-trigger" style="background:<?= $cotColor ?>;color:<?= $textColor ?>" target="_blank">
                                     <i class="fas fa-exclamation-triangle"></i> <?= dol_escape_htmltag($t['risk_ref']) ?>
