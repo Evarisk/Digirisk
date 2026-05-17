@@ -1458,12 +1458,12 @@ class modDigiriskdolibarr extends DolibarrModules
             'titre'    => '<i class="fas fa-tasks pictofixedwidth" style="padding-right: 4px;"></i>' . $langs->trans('PAPRIPACT'),
             'mainmenu' => 'digiriskdolibarr',
             'leftmenu' => 'digiriskactionplan',
-            'url'      => '/projet/tasks.php?id=' . $conf->global->DIGIRISKDOLIBARR_DU_PROJECT,
+            'url'      => '/digiriskdolibarr/view/digiriskstandard/actionplan_list.php',
             'langs'    => 'digiriskdolibarr@digiriskdolibarr',
             'position' => 100 + $r,
             'enabled'  => '$conf->digiriskdolibarr->enabled && $conf->projet->enabled',
             'perms'    => '$user->rights->projet->lire',
-            'target'   => '_blank',
+            'target'   => '',
             'user'     => 0,
         ];
 

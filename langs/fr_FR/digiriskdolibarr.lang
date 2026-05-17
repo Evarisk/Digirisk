@@ -1651,3 +1651,17 @@ ShowSelectedRiskTypes               = Sélectionnez les types de risques à affi
 CharRemaining                       = Caractères restants
 NumberOfLinkedFiles                 = Nombre de fichiers joints
 ChooseAnImage                       = Choisir une image
+
+# Action Plan - Gantt / Kanban
+ActionPlanGantt                     = Diagramme de Gantt
+ActionPlanKanban                    = Kanban
+ActionPlanView                      = Plan d'Action
+ColumnDraft                         = Brouillon
+ColumnInProgress                    = En cours
+ColumnInControl                     = À contrôler
+ColumnDone                          = Terminé
+NoTasks                             = Aucune action corrective
+PlannedWorkload                     = Charge prévue
+TimeSpent                           = Temps consommé
+LinkedRisk                          = Risque associé
+TaskMovedTo                         = Tâche déplacée vers %s
