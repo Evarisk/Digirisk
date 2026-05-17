@@ -134,12 +134,6 @@ foreach ($tasksJson as $t) {
                                 <?php endforeach; ?>
                             <?php endif; ?>
 
-                            <!-- Contributor count badge -->
-                            <span class="kanban-contributor-count"
-                                  title="<?= !empty($t['contributors']) ? dol_escape_htmltag(implode(', ', array_map(function($c) { return $c['fullname']; }, $t['contributors']))) : dol_escape_htmltag($langs->trans('NoContributors')) ?>">
-                                <?= count($t['contributors'] ?? []) ?>
-                            </span>
-
                             <!-- Add contributor -->
                             <div class="kanban-add-contributor-wrapper">
                                 <button class="kanban-add-contributor-btn" title="<?= dol_escape_htmltag($langs->trans('AddContributor')) ?>">
