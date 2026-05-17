@@ -80,28 +80,45 @@ foreach ($tasksJson as $t) {
                         <!-- Label -->
                         <div class="kanban-card-label"><?= dol_escape_htmltag($t['label']) ?></div>
 
-                        <!-- Contacts row: Files + Responsible + Associated -->
+                        <!-- Contacts row: Responsible (dropdown) | separator | Contributors (avatars) -->
                         <div class="kanban-card-contacts">
+                            <!-- Responsible: clickable dropdown -->
+                            <div class="kanban-responsible-wrapper">
+                                <select class="kanban-responsible-select" data-task-id="<?= $t['id'] ?>">
+                                    <option value="0"><?= dol_escape_htmltag($langs->trans('Unassigned')) ?></option>
+                                    <?php foreach ($allUsers as $u) : ?>
+                                        <option value="<?= $u['id'] ?>"
+                                            <?= (!empty($t['responsible']) && $t['responsible'][0]['id'] == $u['id']) ? 'selected' : '' ?>>
+                                            <?= dol_escape_htmltag($u['fullname']) ?>
+                                        </option>
+                                    <?php endforeach; ?>
+                                </select>
+                            </div>
+
+                            <?php if (!empty($t['contributors']) || $t['file_count'] > 0) : ?>
+                                <span class="kanban-separator">|</span>
+                            <?php endif; ?>
+
+                            <!-- Contributors: avatars -->
+                            <?php if (!empty($t['contributors'])) : ?>
+                                <div class="kanban-contributors">
+                                    <?php foreach ($t['contributors'] as $contrib) : ?>
+                                        <?php if (!empty($contrib['photo'])) : ?>
+                                            <img src="<?= $contrib['photo'] ?>" class="kanban-avatar" title="<?= dol_escape_htmltag($contrib['fullname']) ?>" alt="<?= dol_escape_htmltag($contrib['fullname']) ?>">
+                                        <?php else : ?>
+                                            <span class="kanban-avatar kanban-avatar-initials" title="<?= dol_escape_htmltag($contrib['fullname']) ?>">
+                                                <?= strtoupper(mb_substr($contrib['fullname'], 0, 1)) ?>
+                                            </span>
+                                        <?php endif; ?>
+                                    <?php endforeach; ?>
+                                </div>
+                            <?php endif; ?>
+
+                            <!-- File count -->
                             <?php if ($t['file_count'] > 0) : ?>
                                 <a href="<?= $t['url'] ?>" class="kanban-file-badge" title="<?= dol_escape_htmltag($langs->trans('NumberOfLinkedFiles')) ?>">
                                     <i class="fas fa-paperclip"></i> <?= $t['file_count'] ?>
                                 </a>
-                            <?php endif; ?>
-                            <?php if (!empty($t['responsible'])) : ?>
-                                <?php foreach ($t['responsible'] as $resp) : ?>
-                                    <span class="kanban-contact kanban-contact-responsible" title="<?= dol_escape_htmltag($resp['fullname'] . ' (' . $langs->trans('TaskExecutive') . ')') ?>">
-                                        <i class="fas fa-user-tie"></i> <?= dol_escape_htmltag(dol_trunc($resp['fullname'], 18)) ?>
-                                    </span>
-                                <?php endforeach; ?>
-                            <?php else : ?>
-                                <span class="kanban-contact kanban-contact-none" title="<?= dol_escape_htmltag($langs->trans('TaskExecutive')) ?>">
-                                    <i class="fas fa-user-tie"></i> N/A
-                                </span>
-                            <?php endif; ?>
-                            <?php if (!empty($t['associated'])) : ?>
-                                <span class="kanban-contact kanban-contact-associated" title="<?= dol_escape_htmltag(implode(', ', array_map(function($a) { return $a['fullname']; }, $t['associated']))) ?>">
-                                    <i class="fas fa-users"></i> <?= count($t['associated']) ?>
-                                </span>
                             <?php endif; ?>
                         </div>
 

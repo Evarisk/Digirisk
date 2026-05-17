@@ -138,6 +138,50 @@ if ($action == 'updateTaskLabel' && !empty(GETPOSTINT('task_id'))) {
     exit;
 }
 
+// AJAX action to update task responsible (TASKEXECUTIVE contact)
+if ($action == 'updateTaskResponsible' && !empty(GETPOSTINT('task_id'))) {
+    header('Content-Type: application/json');
+
+    $taskId    = GETPOSTINT('task_id');
+    $newUserId = GETPOSTINT('user_id'); // 0 = remove
+
+    $taskToUpdate = new SaturneTask($db);
+    $result = $taskToUpdate->fetch($taskId);
+
+    if ($result > 0 && $taskToUpdate->fk_project == $projectId) {
+        // Remove existing TASKEXECUTIVE contacts
+        $existingContacts = $taskToUpdate->liste_contact(-1, 'internal');
+        if (is_array($existingContacts)) {
+            foreach ($existingContacts as $c) {
+                if ($c['code'] == 'TASKEXECUTIVE') {
+                    $taskToUpdate->delete_contact($c['rowid']);
+                }
+            }
+        }
+
+        // Add new one if user_id > 0
+        if ($newUserId > 0) {
+            $addResult = $taskToUpdate->add_contact($newUserId, 'TASKEXECUTIVE', 'internal');
+            if ($addResult > 0) {
+                // Get user name for response
+                $newUser = new User($db);
+                $newUser->fetch($newUserId);
+                print json_encode(['success' => 1, 'fullname' => $newUser->getFullName($langs)]);
+            } else {
+                http_response_code(500);
+                print json_encode(['success' => 0, 'error' => $taskToUpdate->error]);
+            }
+        } else {
+            print json_encode(['success' => 1, 'fullname' => '']);
+        }
+    } else {
+        http_response_code(404);
+        print json_encode(['success' => 0, 'error' => 'Task not found']);
+    }
+    $db->close();
+    exit;
+}
+
 /*
  * View
  */
@@ -149,6 +193,25 @@ saturne_header(0, '', $title, $help_url);
 
 // Hidden token for AJAX requests (normally provided by digirisk_header sidebar, but we use saturne_header for full-width)
 print '<input type="hidden" name="token" value="' . newToken() . '">';
+
+// Load all internal users for responsible dropdown
+$allUsers = [];
+$sqlUsers = "SELECT u.rowid, u.firstname, u.lastname, u.photo FROM " . MAIN_DB_PREFIX . "user u WHERE u.statut = 1 AND u.entity IN (" . getEntity('user') . ") ORDER BY u.lastname, u.firstname";
+$resUsers = $db->query($sqlUsers);
+if ($resUsers) {
+    while ($objU = $db->fetch_object($resUsers)) {
+        $photoUrl = '';
+        if (!empty($objU->photo)) {
+            $photoUrl = DOL_URL_ROOT . '/viewimage.php?modulepart=userphoto&entity=' . $conf->entity . '&file=' . urlencode($objU->rowid . '/thumbs/' . preg_replace('/(\.\w+)$/', '_mini$1', $objU->photo));
+        }
+        $allUsers[] = [
+            'id'       => (int) $objU->rowid,
+            'fullname' => trim($objU->firstname . ' ' . $objU->lastname),
+            'photo'    => $photoUrl,
+        ];
+    }
+    $db->free($resUsers);
+}
 
 // Fetch all tasks for the DU project
 $allTasks = [];
@@ -223,20 +286,26 @@ foreach ($allTasks as $t) {
     $contactsInternal = $taskObj->liste_contact(-1, 'internal');
     $contactsExternal = $taskObj->liste_contact(-1, 'external');
 
-    $responsible  = [];
-    $associated   = [];
+    $responsible   = [];
+    $contributors  = [];
     if (is_array($contactsInternal)) {
         foreach ($contactsInternal as $c) {
+            // Build photo URL
+            $photoUrl = '';
+            $userTmp = new User($db);
+            if ($userTmp->fetch($c['id']) > 0 && !empty($userTmp->photo)) {
+                $photoUrl = DOL_URL_ROOT . '/viewimage.php?modulepart=userphoto&entity=' . $conf->entity . '&file=' . urlencode($userTmp->id . '/thumbs/' . preg_replace('/(\.\w+)$/', '_mini$1', $userTmp->photo));
+            }
             $contactInfo = [
                 'id'       => $c['id'],
                 'fullname' => trim($c['firstname'] . ' ' . $c['lastname']),
-                'photo'    => '',
+                'photo'    => $photoUrl,
             ];
             // TASKEXECUTIVE = responsable de la tâche
             if ($c['code'] == 'TASKEXECUTIVE') {
                 $responsible[] = $contactInfo;
             } else {
-                $associated[] = $contactInfo;
+                $contributors[] = $contactInfo;
             }
         }
     }
@@ -281,7 +350,7 @@ foreach ($allTasks as $t) {
         'risk_nomurl'        => $riskNomUrl,
         'categories'         => $cats,
         'responsible'        => $responsible,
-        'associated'         => $associated,
+        'contributors'       => $contributors,
         'file_count'         => $fileCount,
         'budget'             => $budget,
         'budget_fmt'         => $budget > 0 ? price($budget, 0, $langs, 1, -1, -1, $conf->currency) : '',
