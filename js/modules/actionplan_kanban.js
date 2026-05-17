@@ -110,17 +110,20 @@ window.digiriskdolibarr.actionplanKanban.updateCounts = function() {
  * @param {number} newProgress New progress value (0-100)
  */
 window.digiriskdolibarr.actionplanKanban.saveProgress = function(taskId, newProgress) {
-    var $board = $('.kanban-board');
-    var token  = window.saturne.toolbox.getToken();
-    var url    = $board.data('url');
+    var token          = window.saturne.toolbox.getToken();
+    var querySeparator = '?';
+
+    if (document.URL.match(/\?/)) {
+        querySeparator = '&';
+    }
 
     var $indicator = $('.actionplan-unsaved-indicator');
     $indicator.addClass('visible').removeClass('saved');
     $indicator.html('<i class="fas fa-spinner fa-spin"></i> Sauvegarde en cours...');
 
     $.ajax({
-        url: url + '?action=updateTaskProgress&task_id=' + taskId + '&new_progress=' + newProgress + '&token=' + token,
-        type: 'GET',
+        url: document.URL + querySeparator + 'action=updateTaskProgress&task_id=' + taskId + '&new_progress=' + newProgress + '&token=' + token,
+        type: 'POST',
         dataType: 'json',
         success: function(response) {
             if (response.success) {
