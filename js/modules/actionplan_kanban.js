@@ -447,16 +447,6 @@ window.digiriskdolibarr.actionplanKanban.event = function() {
         e.stopPropagation();
     });
 
-    // Tag: toggle add-tag select
-    $(document).on('click', '.kanban-add-tag-btn', function(e) {
-        e.stopPropagation();
-        var $select = $(this).siblings('.kanban-tag-select');
-        $select.toggleClass('visible');
-        if ($select.hasClass('visible')) {
-            $select.trigger('focus');
-        }
-    });
-
     // Tag: add category to task
     $(document).on('change', '.kanban-tag-select', function() {
         var $select = $(this);
@@ -464,8 +454,6 @@ window.digiriskdolibarr.actionplanKanban.event = function() {
         var taskId  = $select.data('task-id');
         if (!catId) return;
 
-        var selectedText  = $select.find('option:selected').text().trim();
-        var selectedColor = $select.find('option:selected').data('color') || '8c8c8c';
         var $card = $select.closest('.kanban-card');
         var $tagsRow = $select.closest('.kanban-card-tags');
 
@@ -482,7 +470,7 @@ window.digiriskdolibarr.actionplanKanban.event = function() {
                 if (response.success) {
                     var bgColor = response.color ? '#' + response.color : '#8c8c8c';
                     var $tag = $('<span class="kanban-tag" data-cat-id="' + response.id + '" style="background:' + bgColor + '">' + response.label + '<span class="kanban-tag-remove" title="Supprimer">&times;</span></span>');
-                    $tagsRow.find('.kanban-add-tag-wrapper').before($tag);
+                    $select.before($tag);
                     $card.addClass('kanban-card-saved');
                     setTimeout(function() { $card.removeClass('kanban-card-saved'); }, 2000);
                 } else {
@@ -497,13 +485,7 @@ window.digiriskdolibarr.actionplanKanban.event = function() {
             }
         });
 
-        $select.val('').removeClass('visible');
-    });
-
-    // Tag: hide select on blur
-    $(document).on('blur', '.kanban-tag-select', function() {
-        var $select = $(this);
-        setTimeout(function() { $select.removeClass('visible'); }, 200);
+        $select.val('');
     });
 
     // Tag: remove category from task
@@ -539,7 +521,7 @@ window.digiriskdolibarr.actionplanKanban.event = function() {
     });
 
     // Prevent drag on tag elements
-    $(document).on('mousedown', '.kanban-tag, .kanban-tag-remove, .kanban-add-tag-btn, .kanban-tag-select, .kanban-add-tag-wrapper', function(e) {
+    $(document).on('mousedown', '.kanban-tag, .kanban-tag-remove, .kanban-tag-select', function(e) {
         e.stopPropagation();
     });
 
@@ -601,7 +583,7 @@ window.digiriskdolibarr.actionplanKanban.initSortable = function() {
         placeholder: 'kanban-card-placeholder',
         tolerance: 'pointer',
         cursor: 'grabbing',
-        cancel: '.kanban-progress-bar, .kanban-card-progress, .kanban-responsible-select, .kanban-contributor-dropdown, .kanban-add-contributor-btn, .kanban-initial-responsible, .kanban-contributor-search, .kanban-contributor-option, .kanban-card-label, .kanban-inline-edit, .kanban-editable-meta, .kanban-remove-contact, .kanban-initial-wrapper, .kanban-editable-date, .kanban-tag, .kanban-tag-remove, .kanban-add-tag-btn, .kanban-tag-select, .kanban-add-tag-wrapper',
+        cancel: '.kanban-progress-bar, .kanban-card-progress, .kanban-responsible-select, .kanban-contributor-dropdown, .kanban-add-contributor-btn, .kanban-initial-responsible, .kanban-contributor-search, .kanban-contributor-option, .kanban-card-label, .kanban-inline-edit, .kanban-editable-meta, .kanban-remove-contact, .kanban-initial-wrapper, .kanban-editable-date, .kanban-tag, .kanban-tag-remove, .kanban-tag-select',
         receive: function(event, ui) {
             var $card    = ui.item;
             var $column  = $(this);
