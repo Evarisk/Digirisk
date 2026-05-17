@@ -75,8 +75,10 @@ saturne_check_access($permissiontoread);
  * Actions
  */
 
-// AJAX action to update task status from Kanban drag & drop
+// AJAX action to update task progress from Kanban drag & drop
 if ($action == 'updateTaskProgress' && !empty(GETPOSTINT('task_id'))) {
+    header('Content-Type: application/json');
+
     $taskId      = GETPOSTINT('task_id');
     $newProgress = GETPOSTINT('new_progress');
 
@@ -90,11 +92,14 @@ if ($action == 'updateTaskProgress' && !empty(GETPOSTINT('task_id'))) {
         if ($updateResult > 0) {
             print json_encode(['success' => 1]);
         } else {
+            http_response_code(500);
             print json_encode(['success' => 0, 'error' => $taskToUpdate->error]);
         }
     } else {
+        http_response_code(404);
         print json_encode(['success' => 0, 'error' => 'Task not found or wrong project']);
     }
+    $db->close();
     exit;
 }
 
