@@ -517,10 +517,28 @@ if (!empty($allTasks)) {
                 $dangerCatName = $riskObj->getDangerCategoryName($riskObj, $riskObj->type ?: 'risk');
                 if ($dangerCatName == -1) $dangerCatName = '';
 
-                // Evaluation photo URL
+                // Evaluation photo URL (served via viewimage.php)
                 $raPhotoUrl = '';
-                if ($lastRA && !empty($lastRA->photo)) {
-                    $raPhotoUrl = DOL_URL_ROOT . '/custom/digiriskdolibarr/documents/riskassessment/' . $lastRA->ref . '/' . $lastRA->photo;
+                if ($lastRA) {
+                    $raDir = $conf->digiriskdolibarr->multidir_output[$conf->entity] . '/riskassessment/' . $lastRA->ref;
+                    if (is_dir($raDir)) {
+                        // Look for image files (not in thumbs)
+                        $raFiles = scandir($raDir);
+                        foreach ($raFiles as $raFile) {
+                            if ($raFile == '.' || $raFile == '..' || $raFile == 'thumbs') continue;
+                            if (preg_match('/\.(jpg|jpeg|png|gif|webp)$/i', $raFile)) {
+                                // Build thumb URL for smaller display
+                                $thumbName = preg_replace('/(\.\w+)$/', '_small$1', $raFile);
+                                $thumbPath = $raDir . '/thumbs/' . $thumbName;
+                                if (file_exists($thumbPath)) {
+                                    $raPhotoUrl = DOL_URL_ROOT . '/custom/digiriskdolibarr/documents/viewimage.php?modulepart=digiriskdolibarr&entity=' . $conf->entity . '&file=' . urlencode('riskassessment/' . $lastRA->ref . '/thumbs/' . $thumbName);
+                                } else {
+                                    $raPhotoUrl = DOL_URL_ROOT . '/custom/digiriskdolibarr/documents/viewimage.php?modulepart=digiriskdolibarr&entity=' . $conf->entity . '&file=' . urlencode('riskassessment/' . $lastRA->ref . '/' . $raFile);
+                                }
+                                break;
+                            }
+                        }
+                    }
                 }
 
                 // Evaluator
