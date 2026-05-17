@@ -131,6 +131,10 @@
         outline: 2px solid #e05353;
         box-shadow: 0 0 0 4px rgba(224, 83, 83, 0.2);
     }
+
+    &.kanban-card-dropdown-open {
+        z-index: 50;
+    }
 }
 
 .kanban-card-placeholder {
