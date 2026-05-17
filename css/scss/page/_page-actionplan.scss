@@ -166,25 +166,92 @@
 }
 
 .kanban-card-risk {
-    font-size: 11px;
+    font-size: 10px;
     margin-left: auto;
+    padding: 2px 8px;
+    border-radius: 4px;
+    font-weight: 600;
+    display: inline-flex;
+    align-items: center;
+    gap: 3px;
+    cursor: pointer;
+    position: relative;
+    white-space: nowrap;
+}
 
-    a {
-        padding: 2px 6px;
-        border-radius: 4px;
-        background: #fff3cd;
-        color: #856404;
-        font-weight: 600;
-        text-decoration: none;
-        display: inline-flex;
-        align-items: center;
-        gap: 3px;
-        font-size: 10px;
+.kanban-risk-tooltip-trigger {
+    position: relative;
+}
 
-        &:hover {
-            background: #ffe69c;
-        }
-    }
+.kanban-risk-tooltip {
+    display: none;
+    position: absolute;
+    top: calc(100% + 6px);
+    right: 0;
+    z-index: 50;
+    background: #fff;
+    border: 1px solid #e0e0e0;
+    border-radius: 8px;
+    box-shadow: 0 8px 28px rgba(0, 0, 0, 0.18);
+    padding: 10px 14px;
+    min-width: 280px;
+    max-width: 380px;
+    color: #333;
+    font-weight: 400;
+    font-size: 11px;
+    white-space: normal;
+    cursor: default;
+}
+
+.kanban-risk-tooltip-trigger:hover .kanban-risk-tooltip {
+    display: block;
+}
+
+.krt-header {
+    display: flex;
+    align-items: center;
+    gap: 4px;
+    flex-wrap: wrap;
+    padding-bottom: 6px;
+    border-bottom: 1px solid #f0f0f0;
+    font-size: 11px;
+}
+
+.krt-eval {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    flex-wrap: wrap;
+    padding: 6px 0;
+    font-size: 11px;
+    border-bottom: 1px solid #f0f0f0;
+}
+
+.krt-photo {
+    width: 36px;
+    height: 36px;
+    border-radius: 4px;
+    object-fit: cover;
+}
+
+.krt-user {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    width: 22px;
+    height: 22px;
+    border-radius: 50%;
+    background: #6c757d;
+    color: #fff;
+    font-size: 9px;
+    font-weight: 700;
+}
+
+.krt-comment {
+    padding-top: 6px;
+    font-size: 11px;
+    color: #666;
+    line-height: 1.4;
 }
 
 .kanban-meta-item {

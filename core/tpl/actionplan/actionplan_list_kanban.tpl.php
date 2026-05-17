@@ -68,8 +68,46 @@ foreach ($tasksJson as $t) {
                                   title="<?= dol_escape_htmltag($langs->trans('Budget')) ?>">
                                 <i class="fas fa-coins"></i> <span class="kanban-meta-value"><?= !empty($t['budget_fmt']) ? $t['budget_fmt'] : '-' ?></span>
                             </span>
-                            <?php if (!empty($t['risk_nomurl'])) : ?>
-                                <span class="kanban-card-risk"><?= $t['risk_nomurl'] ?></span>
+                            <?php if (!empty($t['risk_ref'])) :
+                                $rd = $t['risk_data'];
+                                $cotColor = !empty($rd['cotation_color']) ? $rd['cotation_color'] : '#ececec';
+                                $textColor = in_array($cotColor, ['#2b2b2b', '#e05353']) ? '#fff' : '#333';
+                            ?>
+                                <span class="kanban-card-risk kanban-risk-tooltip-trigger" style="background:<?= $cotColor ?>;color:<?= $textColor ?>">
+                                    <i class="fas fa-exclamation-triangle"></i> <?= dol_escape_htmltag($t['risk_ref']) ?>
+                                    <?php if (!empty($rd)) : ?>
+                                    <div class="kanban-risk-tooltip">
+                                        <div class="krt-header">
+                                            <i class="fas fa-exclamation-triangle" style="color:<?= $cotColor ?>"></i>
+                                            <strong><?= dol_escape_htmltag($langs->trans('Risk')) ?></strong> |
+                                            <?= $langs->trans('Ref') ?> : <strong><?= dol_escape_htmltag($rd['ref']) ?></strong>
+                                            <?php if (!empty($rd['category_name'])) : ?>
+                                                | <?= $langs->trans('Description') ?> : <?= dol_escape_htmltag($rd['category_name']) ?>
+                                            <?php endif; ?>
+                                        </div>
+                                        <?php if (!empty($rd['ra_ref'])) : ?>
+                                        <div class="krt-eval">
+                                            <span><i class="fas fa-chart-line"></i> <?= dol_escape_htmltag($langs->trans('Evaluation')) ?></span>
+                                            <?php if (!empty($rd['ra_photo_url'])) : ?>
+                                                <img src="<?= $rd['ra_photo_url'] ?>" class="krt-photo" alt="">
+                                            <?php endif; ?>
+                                            <span><?= dol_escape_htmltag($rd['ra_ref']) ?></span>
+                                            <?php if (!empty($rd['ra_date'])) : ?>
+                                                <span><i class="fas fa-calendar-alt"></i> <?= dol_escape_htmltag($rd['ra_date']) ?></span>
+                                            <?php endif; ?>
+                                            <?php if (!empty($rd['ra_user'])) : ?>
+                                                <span class="krt-user"><?= dol_escape_htmltag($rd['ra_user']) ?></span>
+                                            <?php endif; ?>
+                                        </div>
+                                        <?php endif; ?>
+                                        <?php if (!empty($rd['ra_comment'])) : ?>
+                                        <div class="krt-comment">
+                                            <i class="fas fa-comment"></i> <?= $langs->trans('Comment') ?> : <?= dol_escape_htmltag(dol_trunc($rd['ra_comment'], 120)) ?>
+                                        </div>
+                                        <?php endif; ?>
+                                    </div>
+                                    <?php endif; ?>
+                                </span>
                             <?php endif; ?>
                         </div>
 
