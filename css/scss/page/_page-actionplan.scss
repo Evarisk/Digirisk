@@ -177,6 +177,8 @@
     cursor: pointer;
     position: relative;
     white-space: nowrap;
+    text-decoration: none;
+    color: inherit;
 }
 
 .kanban-risk-tooltip-trigger {
