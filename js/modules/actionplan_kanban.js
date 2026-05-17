@@ -11,6 +11,7 @@ window.digiriskdolibarr.actionplanKanban = {};
 window.digiriskdolibarr.actionplanKanban.init = function() {
     window.digiriskdolibarr.actionplanKanban.event();
     window.digiriskdolibarr.actionplanKanban.initSortable();
+    window.digiriskdolibarr.actionplanKanban.initSettings();
 };
 
 /**
@@ -910,5 +911,64 @@ window.digiriskdolibarr.actionplanKanban.addContributor = function(taskId, userI
                 $card.removeClass('kanban-card-error');
             }, 3000);
         }
+    });
+};
+
+/**
+ * Kanban settings — column width & gap with localStorage persistence
+ */
+window.digiriskdolibarr.actionplanKanban.initSettings = function() {
+    var $btn     = $('#kanbanSettingsBtn');
+    var $popover = $('#kanbanSettingsPopover');
+    var $board   = $('.kanban-board');
+    var $widthSlider = $('#kanbanColWidth');
+    var $gapSlider   = $('#kanbanColGap');
+    var $widthVal    = $('#kanbanColWidthVal');
+    var $gapVal      = $('#kanbanColGapVal');
+
+    if (!$btn.length) return;
+
+    // Restore saved values
+    var savedWidth = localStorage.getItem('kanbanColWidth');
+    var savedGap   = localStorage.getItem('kanbanColGap');
+
+    if (savedWidth) {
+        $widthSlider.val(savedWidth);
+        $widthVal.text(savedWidth + 'px');
+        $('.kanban-column').css({'min-width': savedWidth + 'px', 'max-width': savedWidth + 'px'});
+    }
+    if (savedGap) {
+        $gapSlider.val(savedGap);
+        $gapVal.text(savedGap + 'px');
+        $board.css('gap', savedGap + 'px');
+    }
+
+    // Toggle popover
+    $btn.on('click', function(e) {
+        e.stopPropagation();
+        $popover.toggleClass('open');
+    });
+
+    // Close on outside click
+    $(document).on('click', function(e) {
+        if (!$(e.target).closest('.kanban-settings-wrapper').length) {
+            $popover.removeClass('open');
+        }
+    });
+
+    // Width slider
+    $widthSlider.on('input', function() {
+        var val = $(this).val();
+        $widthVal.text(val + 'px');
+        $('.kanban-column').css({'min-width': val + 'px', 'max-width': val + 'px'});
+        localStorage.setItem('kanbanColWidth', val);
+    });
+
+    // Gap slider
+    $gapSlider.on('input', function() {
+        var val = $(this).val();
+        $gapVal.text(val + 'px');
+        $board.css('gap', val + 'px');
+        localStorage.setItem('kanbanColGap', val);
     });
 };
