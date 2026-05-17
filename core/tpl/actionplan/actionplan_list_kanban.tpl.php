@@ -79,7 +79,7 @@ foreach ($tasksJson as $t) {
                                     <div class="kanban-risk-tooltip">
                                         <div class="krt-header">
                                             <i class="fas fa-exclamation-triangle" style="color:<?= $cotColor ?>"></i>
-                                            <strong><?= dol_escape_htmltag($rd['ref']) ?></strong>
+                                            <strong><?= $t['risk_nomurl'] ?></strong>
                                             <?php if (!empty($rd['category_name'])) : ?>
                                                 : <?= dol_escape_htmltag($rd['category_name']) ?>
                                             <?php endif; ?>
