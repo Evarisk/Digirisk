@@ -25,8 +25,8 @@ window.digiriskdolibarr.actionplanKanban.event = function() {
         $(this).removeClass('kanban-card-hover');
     });
 
-    // Inline edit: double-click on label to edit
-    $(document).on('dblclick', '.kanban-card-label', function(e) {
+    // Inline edit: click on label to edit
+    $(document).on('click', '.kanban-card-label', function(e) {
         e.stopPropagation();
         var $label = $(this);
 
