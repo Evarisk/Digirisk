@@ -206,7 +206,22 @@ if ($action == 'addTaskContributor' && !empty(GETPOSTINT('task_id'))) {
         }
         $addResult = $taskToUpdate->add_contact($userId, 'TASKCONTRIBUTOR', $source);
         if ($addResult > 0) {
-            print json_encode(['success' => 1]);
+            // Fetch fullname for the added contact
+            $addedFullname = '';
+            if ($source == 'internal') {
+                $addedUser = new User($db);
+                if ($addedUser->fetch($userId) > 0) {
+                    $addedFullname = $addedUser->getFullName($langs);
+                }
+            } else {
+                require_once DOL_DOCUMENT_ROOT . '/contact/class/contact.class.php';
+                $addedContact = new Contact($db);
+                if ($addedContact->fetch($userId) > 0) {
+                    $addedFullname = $addedContact->getFullName($langs);
+                }
+            }
+            $initials = strtoupper(mb_substr($addedFullname, 0, 2));
+            print json_encode(['success' => 1, 'fullname' => $addedFullname, 'initials' => $initials, 'user_id' => $userId]);
         } else {
             http_response_code(500);
             print json_encode(['success' => 0, 'error' => $taskToUpdate->error]);
@@ -569,11 +584,14 @@ foreach ($allTasks as $t) {
     }
     if (is_array($contactsExternal)) {
         foreach ($contactsExternal as $c) {
-            $associated[] = [
+            $contactInfo = [
                 'id'       => $c['id'],
                 'fullname' => trim($c['firstname'] . ' ' . $c['lastname']),
                 'photo'    => '',
             ];
+            if ($c['code'] == 'TASKCONTRIBUTOR') {
+                $contributors[] = $contactInfo;
+            }
         }
     }
 
