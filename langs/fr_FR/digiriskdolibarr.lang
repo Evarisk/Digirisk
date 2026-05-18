@@ -1736,4 +1736,9 @@ TicketActionAssignedSelfDone         = Ticket assigné à vous
 TicketActionAssignedOtherDone        = Ticket assigné
 TicketActionCloseConfirm             = Confirmer la clôture
 TicketActionCancelConfirm            = Confirmer l'annulation
+TicketActionCardRegistresSection     = Informations registres
+TicketActionCardClassificationSection = Classification
+TicketActionCardDatesSection         = Dates clés
+UnknownFieldToUpdate                 = Champ inconnu : %s
+Saved                                = Enregistré
 

@@ -55,7 +55,7 @@ global $conf, $db, $langs, $user;
 
 $langs->loadLangs(['digiriskdolibarr@digiriskdolibarr', 'ticket']);
 
-// Inputs
+// Inputs — 'aZ09' permits a-z, 0-9, _, -, . so update_field passes through fine.
 $ticketId = GETPOSTINT('ticket_id');
 $action   = GETPOST('action', 'aZ09');
 $param    = GETPOST('param', 'alpha');
@@ -166,6 +166,87 @@ switch ($action) {
             respond(true, $langs->trans('TicketActionAssignedOtherDone'), $buildPayload($object));
         }
         respond(false, $object->error ?: $langs->trans('Error'));
+
+    /*
+     * update_field — generic tap-to-edit dispatcher used by the reworked card.
+     *
+     * Inputs:  field (string), value (raw scalar, may be empty), ticket_id.
+     * Outputs: success+message+ticket{} as the other actions, plus 'display' = best-effort
+     *          re-rendered string for the field (so the JS can replace the value cell
+     *          without a full page reload).
+     */
+    case 'update_field':
+        // 'aZ09' already permits underscores — using 'aZ09_' would be an unknown filter and silently return ''.
+        $field = GETPOST('field', 'aZ09');
+        $rawValue = GETPOST('value', 'restricthtml');
+        if ($field === '') {
+            respond(false, $langs->trans('ErrorBadParameters'));
+        }
+
+        $display = '';
+        $msg     = $langs->trans('Saved');
+
+        if ($field === 'subject') {
+            $object->subject = trim((string) $rawValue);
+            $res = $object->update($user) > 0;
+            $display = dol_escape_htmltag($object->subject ?: $langs->trans('NoSubject'));
+        } elseif ($field === 'fk_statut') {
+            $newStatus = (int) $rawValue;
+            $res = $object->setStatut($newStatus, null, '', 'TICKET_MODIFY') > 0;
+            $object->fetch($ticketId);
+            $display = $object->getLibStatut(2);
+        } elseif ($field === 'fk_user_assign') {
+            $newAssignee = (int) $rawValue;
+            if ($newAssignee === 0) {
+                // Dolibarr Ticket has no native "unassign" — write the column directly via update().
+                $object->fk_user_assign = null;
+                $res = $object->update($user) > 0;
+                $display = '<i class="fas fa-user-slash"></i> ' . dol_escape_htmltag($langs->trans('NotAssigned'));
+            } else {
+                $res = $object->assignUser($user, $newAssignee, 1) > 0;
+                if ($res && (int) $object->fk_statut === Ticket::STATUS_NOT_READ) {
+                    $object->setStatut(Ticket::STATUS_ASSIGNED, null, '', 'TICKET_MODIFY');
+                }
+                $object->fetch($ticketId);
+                $newUser = new User($db);
+                $newUser->fetch($newAssignee);
+                $display = '<i class="fas fa-user"></i> ' . dol_escape_htmltag($newUser->getFullName($langs));
+            }
+        } elseif ($field === 'progress') {
+            $newProgress = max(0, min(100, (int) $rawValue));
+            $res = $object->setProgression($newProgress) >= 0;
+            $object->progress = $newProgress;
+            $display = '<i class="fas fa-tasks"></i> ' . $newProgress . '%';
+        } elseif (strpos($field, 'options_digiriskdolibarr_') === 0 || strpos($field, 'options_digiriskdolibarr_condition') === 0) {
+            $extraKey = substr($field, strlen('options_'));
+            $valueToStore = $rawValue;
+
+            // Date fields come in as YYYY-MM-DD — convert to timestamp.
+            if ($extraKey === 'digiriskdolibarr_ticket_date' && $rawValue !== '') {
+                $ts = strtotime((string) $rawValue);
+                $valueToStore = $ts ?: '';
+            }
+
+            $object->array_options['options_' . $extraKey] = $valueToStore;
+            $res = $object->insertExtraFields() >= 0;
+
+            if ($extraKey === 'digiriskdolibarr_ticket_date') {
+                $display = $valueToStore ? dol_print_date((int) $valueToStore, 'day') : '';
+            } else {
+                $display = dol_escape_htmltag((string) $valueToStore);
+            }
+        } else {
+            respond(false, $langs->trans('UnknownFieldToUpdate', $field));
+        }
+
+        if (!$res) {
+            respond(false, $object->error ?: $langs->trans('Error'));
+        }
+
+        $payload = $buildPayload($object);
+        $payload['field']   = $field;
+        $payload['display'] = $display;
+        respond(true, $msg, $payload);
 
     default:
         respond(false, $langs->trans('ErrorBadParameters'));

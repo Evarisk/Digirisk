@@ -1,21 +1,20 @@
-// 1-click ticket action card (issue #4443) — big tile UI for fast ticket handling.
-//
-// Scoped under `.ticket-action-card` and `.ticket-action-picker` so the styles
-// only apply when the dedicated view is rendered.
+// Reworked ticket card (issue #4443) — hero header + 2-col sections + tap-to-edit fields.
+// Coexists with the standard Dolibarr card via the "Détails complets" link.
 
-$tile-size:        148px;
 $tile-radius:      14px;
 $tile-shadow:      0 2px 6px rgba(0, 0, 0, 0.06);
 $tile-shadow-hov:  0 8px 24px rgba(0, 0, 0, 0.12);
-$tile-blue:        #0d8aff;
-$tile-green:       #22bf4e;
-$tile-orange:      #e9ad4f;
-$tile-purple:      #7a5cf0;
-$tile-red:         #e05353;
-$tile-grey:        #6b7280;
+$tac-blue:         #0d8aff;
+$tac-green:        #22bf4e;
+$tac-orange:       #e9ad4f;
+$tac-purple:       #7a5cf0;
+$tac-red:          #e05353;
+$tac-grey:         #6b7280;
+$tac-bg:           #f9fafb;
+$tac-border:       #e5e7eb;
 
 // ---------------------------------------------------------------------------
-// Picker view (shown when no ticket id is in the URL).
+// Picker view (unchanged).
 // ---------------------------------------------------------------------------
 .ticket-action-picker {
     margin: 1em 0;
@@ -31,7 +30,7 @@ $tile-grey:        #6b7280;
         display: block;
         padding: 14px 16px;
         background: #fff;
-        border: 1px solid #e5e7eb;
+        border: 1px solid $tac-border;
         border-radius: 10px;
         box-shadow: $tile-shadow;
         text-decoration: none;
@@ -41,308 +40,416 @@ $tile-grey:        #6b7280;
         &:hover {
             transform: translateY(-2px);
             box-shadow: $tile-shadow-hov;
-            border-color: $tile-blue;
+            border-color: $tac-blue;
         }
 
-        &__ref {
-            font-weight: 700;
-            color: $tile-blue;
-            font-size: 1.05em;
-        }
-
-        &__subject {
-            margin-top: 4px;
-            color: #1f2937;
-            line-height: 1.35;
-        }
-
-        &__status {
-            margin-top: 8px;
-        }
+        &__ref       { font-weight: 700; color: $tac-blue; font-size: 1.05em; }
+        &__subject   { margin-top: 4px; color: #1f2937; line-height: 1.35; }
+        &__status    { margin-top: 8px; }
     }
 }
 
 // ---------------------------------------------------------------------------
-// Action card layout.
+// Reworked card.
 // ---------------------------------------------------------------------------
-.ticket-action-card {
-    max-width: 1100px;
-    margin: 1em auto;
+.ticket-action-card.tac-card {
+    max-width: 1280px;
+    margin: 1em auto 6em auto; // bottom margin for the sticky bar
     background: #fff;
     border-radius: 12px;
     box-shadow: $tile-shadow;
     overflow: hidden;
+}
 
-    &__header {
-        padding: 16px 20px;
-        border-bottom: 1px solid #e5e7eb;
-        background: linear-gradient(135deg, #f9fafb 0%, #ffffff 100%);
-    }
+// ----- Hero -----
+.tac-hero {
+    background: linear-gradient(135deg, #f9fafb 0%, #ffffff 100%);
+    padding: 16px 24px 0 24px;
+    border-bottom: 1px solid $tac-border;
 
-    &__back {
-        margin-bottom: 8px;
-    }
-
-    &__back-link {
-        color: $tile-grey;
-        text-decoration: none;
+    &__top {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
         font-size: 0.9em;
+        margin-bottom: 12px;
 
-        &:hover {
-            color: $tile-blue;
+        a {
+            color: $tac-grey;
+            text-decoration: none;
+            &:hover { color: $tac-blue; }
         }
     }
 
-    &__title {
-        margin-bottom: 8px;
-    }
-
-    &__ref {
-        font-size: 1.4em;
-        font-weight: 700;
-        color: $tile-blue;
-    }
-
+    &__main { margin-bottom: 14px; }
+    &__ref  { font-size: 1.5em; font-weight: 700; color: $tac-blue; }
     &__subject {
-        font-size: 1.05em;
+        font-size: 1.15em;
         color: #1f2937;
         margin-top: 4px;
         line-height: 1.35;
+        cursor: text;
+        padding: 2px 4px;
+        border-radius: 4px;
+        transition: background 0.15s ease;
+        &:hover { background: rgba(13,138,255,0.06); }
     }
 
-    &__meta {
+    &__chips {
         display: flex;
         flex-wrap: wrap;
-        gap: 10px 16px;
-        margin-top: 8px;
-        font-size: 0.92em;
+        gap: 8px 12px;
+        margin-bottom: 12px;
     }
 
-    &__meta-item {
-        display: inline-flex;
-        align-items: center;
-        gap: 6px;
-        color: #374151;
-
-        i {
-            color: $tile-grey;
-        }
+    &__nav-tabs {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 4px 8px;
+        margin: 0 -8px;
+        border-top: 1px solid $tac-border;
+        padding-top: 10px;
     }
 
-    &__status {
-        font-weight: 600;
-    }
+    &__nav-tab {
+        padding: 6px 12px;
+        font-size: 0.9em;
+        color: $tac-grey;
+        text-decoration: none;
+        border-radius: 6px 6px 0 0;
 
-    &__body {
-        padding: 20px;
-    }
-
-    &__section {
-        margin-bottom: 24px;
-
-        &:last-child {
-            margin-bottom: 0;
-        }
-
-        &--danger {
-            padding-top: 12px;
-            border-top: 1px dashed #e5e7eb;
-        }
-    }
-
-    &__section-title {
-        text-transform: uppercase;
-        letter-spacing: 0.04em;
-        font-size: 0.78em;
-        font-weight: 700;
-        color: $tile-grey;
-        margin: 0 0 10px 2px;
-    }
-
-    &__tiles {
-        display: grid;
-        grid-template-columns: repeat(auto-fill, minmax($tile-size, 1fr));
-        gap: 12px;
-    }
-
-    &__toast {
-        margin: 16px 20px;
-        padding: 10px 14px;
-        border-radius: 8px;
-        font-size: 0.95em;
-        min-height: 0;
-        transition: all 0.25s ease;
-
-        &:empty {
-            display: none;
-        }
-
-        &.is-success {
-            background: rgba(34, 191, 78, 0.12);
-            color: darken($tile-green, 18%);
-            border: 1px solid rgba(34, 191, 78, 0.4);
-        }
-
-        &.is-error {
-            background: rgba(224, 83, 83, 0.12);
-            color: darken($tile-red, 12%);
-            border: 1px solid rgba(224, 83, 83, 0.4);
-        }
+        &:hover { background: rgba(13,138,255,0.08); color: $tac-blue; }
     }
 }
 
-// ---------------------------------------------------------------------------
-// Action tile.
-// ---------------------------------------------------------------------------
-.ticket-action-tile {
-    appearance: none;
+// ----- Chips (status / assignee / progress / dates) -----
+.tac-chip {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    padding: 6px 12px;
     background: #fff;
-    border: 2px solid transparent;
-    border-radius: $tile-radius;
-    box-shadow: $tile-shadow;
-    padding: 18px 10px;
-    min-height: $tile-size;
+    border: 1px solid $tac-border;
+    border-radius: 999px;
+    font-size: 0.92em;
+    font-weight: 500;
     cursor: pointer;
-    transition: transform 0.18s ease, box-shadow 0.18s ease, background 0.18s ease, border-color 0.18s ease;
+    transition: border-color 0.15s ease, box-shadow 0.15s ease, background 0.15s ease;
+
+    &:hover { border-color: $tac-blue; box-shadow: $tile-shadow; }
+
+    i { color: $tac-grey; }
+
+    &--readonly {
+        cursor: default;
+        background: transparent;
+        border-style: dashed;
+        &:hover { border-color: $tac-border; box-shadow: none; }
+    }
+}
+
+// ----- Body 2-col grid -----
+.tac-body {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 16px 20px;
+    padding: 20px 24px;
+
+    @media (max-width: 1024px) {
+        grid-template-columns: 1fr;
+    }
+}
+
+.tac-col {
     display: flex;
     flex-direction: column;
-    align-items: center;
-    justify-content: center;
-    text-align: center;
-    color: #1f2937;
-    font-weight: 600;
-    font-size: 0.95em;
-    line-height: 1.25;
-    font-family: inherit;
+    gap: 16px;
+    min-width: 0;
+}
+
+// ----- Section card -----
+.tac-section {
+    background: $tac-bg;
+    border: 1px solid $tac-border;
+    border-radius: 10px;
+    padding: 14px 16px;
+
+    &__title {
+        margin: 0 0 10px 0;
+        font-size: 0.78em;
+        font-weight: 700;
+        letter-spacing: 0.04em;
+        text-transform: uppercase;
+        color: $tac-grey;
+
+        i { margin-right: 6px; color: $tac-blue; }
+    }
+
+    &__edit-link {
+        display: inline-flex;
+        align-items: center;
+        gap: 4px;
+        margin-top: 10px;
+        font-size: 0.85em;
+        color: $tac-grey;
+        text-decoration: none;
+        &:hover { color: $tac-blue; }
+    }
+}
+
+// ----- Tap-to-edit field grid -----
+.tac-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 8px 12px;
+
+    &--single { grid-template-columns: 1fr; }
+
+    @media (max-width: 640px) { grid-template-columns: 1fr; }
+}
+
+.tac-field {
+    background: #fff;
+    border: 1px solid transparent;
+    border-radius: 6px;
+    padding: 6px 8px;
+    cursor: pointer;
+    transition: background 0.15s ease, border-color 0.15s ease;
+    min-height: 44px;
 
     &:hover {
-        transform: translateY(-3px);
-        box-shadow: $tile-shadow-hov;
-    }
-
-    &:active {
-        transform: translateY(-1px);
-    }
-
-    &__icon {
-        font-size: 2em;
-        margin-bottom: 10px;
-        display: flex;
-        align-items: center;
-        justify-content: center;
-        width: 56px;
-        height: 56px;
-        border-radius: 50%;
-        background: #f3f4f6;
-        transition: background 0.18s ease, color 0.18s ease;
+        border-color: $tac-blue;
+        background: rgba(13,138,255,0.04);
     }
 
     &__label {
-        display: block;
-        max-width: 100%;
-        word-break: keep-all;
+        font-size: 0.72em;
+        color: $tac-grey;
+        text-transform: uppercase;
+        letter-spacing: 0.04em;
+        font-weight: 600;
+        margin-bottom: 2px;
     }
 
-    // Color variants — icon background + hover border.
-    &--blue {
-        .ticket-action-tile__icon { background: rgba(13, 138, 255, 0.12); color: $tile-blue; }
-        &:hover { border-color: $tile-blue; }
-    }
-    &--green {
-        .ticket-action-tile__icon { background: rgba(34, 191, 78, 0.14); color: $tile-green; }
-        &:hover { border-color: $tile-green; }
-    }
-    &--orange {
-        .ticket-action-tile__icon { background: rgba(233, 173, 79, 0.18); color: $tile-orange; }
-        &:hover { border-color: $tile-orange; }
-    }
-    &--purple {
-        .ticket-action-tile__icon { background: rgba(122, 92, 240, 0.14); color: $tile-purple; }
-        &:hover { border-color: $tile-purple; }
-    }
-    &--red {
-        .ticket-action-tile__icon { background: rgba(224, 83, 83, 0.14); color: $tile-red; }
-        &:hover { border-color: $tile-red; }
-    }
-    &--grey {
-        .ticket-action-tile__icon { background: rgba(107, 114, 128, 0.12); color: $tile-grey; }
-        &:hover { border-color: $tile-grey; }
+    &__value {
+        color: #1f2937;
+        line-height: 1.4;
+        min-height: 18px;
+        word-break: break-word;
     }
 
-    // Disabled state — dimmed, no hover lift.
-    &--disabled {
-        opacity: 0.4;
-        cursor: not-allowed;
+    &__empty { color: #cbd5e1; }
 
-        &:hover {
-            transform: none;
-            box-shadow: $tile-shadow;
-        }
+    &--readonly {
+        cursor: default;
+        &:hover { background: transparent; border-color: transparent; }
     }
 
-    // Armed state — destructive tiles waiting for confirm click.
-    &--armed {
-        background: rgba(224, 83, 83, 0.08);
-        border-color: $tile-red;
-        animation: ticket-action-tile-pulse 1.2s ease-in-out infinite;
-
-        .ticket-action-tile__label {
-            color: $tile-red;
-        }
-    }
-
-    // Loading state — pending AJAX response.
-    &--loading {
-        pointer-events: none;
-        position: relative;
-
-        &::after {
-            content: '';
-            position: absolute;
-            top: 50%;
-            left: 50%;
-            width: 22px;
-            height: 22px;
-            margin: -11px 0 0 -11px;
-            border: 3px solid rgba(13, 138, 255, 0.18);
-            border-top-color: $tile-blue;
-            border-radius: 50%;
-            animation: ticket-action-tile-spin 0.8s linear infinite;
-        }
-
-        .ticket-action-tile__icon,
-        .ticket-action-tile__label {
-            visibility: hidden;
-        }
+    &--longtext {
+        grid-column: 1 / -1;
+        .tac-field__value { white-space: pre-wrap; }
     }
 }
 
-@keyframes ticket-action-tile-pulse {
+// ----- Edit mode -----
+.tac-edit-input,
+.tac-edit-textarea {
+    width: 100%;
+    padding: 6px 8px;
+    border: 1px solid $tac-blue;
+    border-radius: 6px;
+    background: #fff;
+    font-size: 0.95em;
+    font-family: inherit;
+    outline: none;
+    box-shadow: 0 0 0 3px rgba(13,138,255,0.15);
+}
+.tac-edit-input--narrow { max-width: 100px; }
+.tac-edit-textarea     { min-height: 80px; resize: vertical; }
+
+.tac-editing {
+    background: rgba(13,138,255,0.08) !important;
+    border-color: $tac-blue !important;
+}
+
+.tac-saving {
+    position: relative;
+    opacity: 0.7;
+    pointer-events: none;
+    &::after {
+        content: '';
+        position: absolute;
+        top: 50%;
+        right: 8px;
+        width: 14px;
+        height: 14px;
+        margin-top: -7px;
+        border: 2px solid rgba(13,138,255,0.25);
+        border-top-color: $tac-blue;
+        border-radius: 50%;
+        animation: tac-spin 0.7s linear infinite;
+    }
+}
+
+.tac-saved {
+    animation: tac-flash-save 1.2s ease;
+}
+
+@keyframes tac-spin    { to { transform: rotate(360deg); } }
+@keyframes tac-flash-save {
+    0%, 100% { background: transparent; }
+    20%      { background: rgba(34,191,78,0.16); border-color: $tac-green; }
+}
+
+// ----- Tags (Classification) -----
+.tac-tags {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 6px;
+}
+.tac-tag {
+    display: inline-block;
+    padding: 4px 10px;
+    border-radius: 999px;
+    font-size: 0.85em;
+    color: #1f2937;
+    background: #e5e7eb;
+
+    &--empty {
+        background: transparent;
+        color: $tac-grey;
+        font-style: italic;
+    }
+}
+
+// ----- List (Linked accidents) -----
+.tac-list {
+    list-style: none;
+    padding: 0;
+    margin: 0;
+
+    &__item {
+        padding: 4px 0;
+        &--empty { color: $tac-grey; font-style: italic; }
+    }
+}
+
+// ----- Rich text block (initial message) -----
+.tac-rich-text {
+    padding: 8px 10px;
+    background: #fff;
+    border: 1px solid $tac-border;
+    border-radius: 6px;
+    min-height: 60px;
+    max-height: 200px;
+    overflow-y: auto;
+    line-height: 1.5;
+}
+
+// ----- Sticky action bar (bottom) -----
+.tac-sticky-bar {
+    position: sticky;
+    bottom: 0;
+    left: 0;
+    right: 0;
+    background: #fff;
+    border-top: 1px solid $tac-border;
+    padding: 12px 24px;
+    display: flex;
+    gap: 8px;
+    justify-content: flex-end;
+    box-shadow: 0 -2px 8px rgba(0,0,0,0.04);
+    z-index: 10;
+
+    &__btn {
+        appearance: none;
+        border: 1px solid $tac-border;
+        background: #fff;
+        padding: 8px 16px;
+        border-radius: 8px;
+        font-weight: 600;
+        cursor: pointer;
+        font-family: inherit;
+        font-size: 0.95em;
+        display: inline-flex;
+        align-items: center;
+        gap: 6px;
+        transition: background 0.15s ease, border-color 0.15s ease;
+
+        i { font-size: 1.1em; }
+
+        &:hover { box-shadow: $tile-shadow; }
+
+        &[disabled] { opacity: 0.4; cursor: not-allowed; }
+
+        &--green  { color: $tac-green;  &:hover { border-color: $tac-green;  background: rgba(34,191,78,0.08); } }
+        &--orange { color: $tac-orange; &:hover { border-color: $tac-orange; background: rgba(233,173,79,0.08); } }
+        &--red    { color: $tac-red;    &:hover { border-color: $tac-red;    background: rgba(224,83,83,0.08); } }
+    }
+}
+
+// Armed state on sticky destructive buttons.
+.tac-sticky-bar__btn.ticket-action-tile--armed {
+    background: rgba(224,83,83,0.08);
+    border-color: $tac-red;
+    color: $tac-red;
+    animation: tac-pulse-red 1.2s ease-in-out infinite;
+}
+
+@keyframes tac-pulse-red {
     0%, 100% { box-shadow: 0 0 0 0 rgba(224, 83, 83, 0.4); }
     50%      { box-shadow: 0 0 0 8px rgba(224, 83, 83, 0); }
 }
 
-@keyframes ticket-action-tile-spin {
-    to { transform: rotate(360deg); }
+.tac-sticky-bar__btn.ticket-action-tile--loading {
+    position: relative;
+    color: transparent;
+    pointer-events: none;
+    &::after {
+        content: '';
+        position: absolute;
+        top: 50%;
+        left: 50%;
+        width: 18px;
+        height: 18px;
+        margin: -9px 0 0 -9px;
+        border: 2px solid rgba(13,138,255,0.2);
+        border-top-color: $tac-blue;
+        border-radius: 50%;
+        animation: tac-spin 0.7s linear infinite;
+    }
+}
+
+// ----- Toast -----
+.tac-toast,
+.ticket-action-card__toast {
+    margin: 0 24px 16px 24px;
+    padding: 10px 14px;
+    border-radius: 8px;
+    font-size: 0.95em;
+    min-height: 0;
+    transition: all 0.25s ease;
+
+    &:empty { display: none; }
+
+    &.is-success {
+        background: rgba(34, 191, 78, 0.12);
+        color: darken($tac-green, 18%);
+        border: 1px solid rgba(34, 191, 78, 0.4);
+    }
+
+    &.is-error {
+        background: rgba(224, 83, 83, 0.12);
+        color: darken($tac-red, 12%);
+        border: 1px solid rgba(224, 83, 83, 0.4);
+    }
 }
 
 // ---------------------------------------------------------------------------
-// Responsive — collapse to single column on small screens.
+// Legacy action tile classes — kept so the sticky-bar buttons can reuse
+// the same JS arm/loading classes without forking the JS module.
+// (The old big tile grid is gone in the reworked card.)
 // ---------------------------------------------------------------------------
-@media (max-width: $media__small) {
-    .ticket-action-card__tiles {
-        grid-template-columns: repeat(2, 1fr);
-    }
-    .ticket-action-tile {
-        min-height: 110px;
-        padding: 12px 6px;
-        font-size: 0.85em;
-
-        &__icon {
-            width: 44px;
-            height: 44px;
-            font-size: 1.5em;
-            margin-bottom: 6px;
-        }
-    }
+.ticket-action-tile {
+    // Empty placeholder, real styles live under .tac-sticky-bar__btn above.
 }
