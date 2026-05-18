@@ -1715,23 +1715,6 @@ class modDigiriskdolibarr extends DolibarrModules
 			'user'     => 0,				                // 0=Menu for internal users, 1=external users, 2=both
 		];
 
-		// Issue #4443 — 1-click ticket action card (big tile UI, replaces the slow "click into card -> click into menu" flow).
-		$this->menu[$r++] = [
-			'fk_menu'  => 'fk_mainmenu=digiriskdolibarr',
-			'type'     => 'left',
-			'titre'    => $langs->transnoentities('TicketActionCard'),
-			'prefix'   => '<i class="fas fa-hand-pointer pictofixedwidth"></i>',
-			'mainmenu' => 'digiriskdolibarr',
-			'leftmenu' => 'digiriskticketactioncard',
-			'url'      => '/digiriskdolibarr/view/ticket/ticket_action_card.php',
-			'langs'    => 'digiriskdolibarr@digiriskdolibarr',
-			'position' => 100 + $r,
-			'enabled'  => '$conf->digiriskdolibarr->enabled && $conf->ticket->enabled',
-			'perms'    => '$user->rights->ticket->read && $user->rights->digiriskdolibarr->lire',
-			'target'   => '',
-			'user'     => 0,
-		];
-
 		$this->menu[$r++] = [
 			'fk_menu'  => 'fk_mainmenu=digiriskdolibarr',	    // '' if this is a top menu. For left menu, use 'fk_mainmenu=xxx' or 'fk_mainmenu=xxx,fk_leftmenu=yyy' where xxx is mainmenucode and yyy is a leftmenucode
 			'type'     => 'left',			                // This is a Left menu entry
@@ -1762,6 +1745,23 @@ class modDigiriskdolibarr extends DolibarrModules
 			'perms'    => '$user->rights->ticket->read && $user->rights->digiriskdolibarr->lire', // Use 'perms'=>'$user->rights->digiriskdolibarr->level1->level2' if you want your menu with a permission rules
 			'target'   => '',
 			'user'     => 0,				                // 0=Menu for internal users, 1=external users, 2=both
+		];
+
+		// Issue #4443 — 1-click ticket action card, nested under Ticket > Tableau de bord (ticketstats).
+		$this->menu[$r++] = [
+			'fk_menu'  => 'fk_mainmenu=ticket,fk_leftmenu=ticketstats',
+			'type'     => 'left',
+			'titre'    => $langs->transnoentities('TicketActionCard'),
+			'prefix'   => '<i class="fas fa-hand-pointer pictofixedwidth"></i>',
+			'mainmenu' => 'ticket',
+			'leftmenu' => 'digiriskticketactioncard',
+			'url'      => '/digiriskdolibarr/view/ticket/ticket_action_card.php',
+			'langs'    => 'digiriskdolibarr@digiriskdolibarr',
+			'position' => 100 + $r,
+			'enabled'  => '$conf->digiriskdolibarr->enabled && $conf->ticket->enabled',
+			'perms'    => '$user->rights->ticket->read && $user->rights->digiriskdolibarr->lire',
+			'target'   => '',
+			'user'     => 0,
 		];
 
 		// Exports profiles provided by this module
