@@ -36,7 +36,11 @@ if (empty($conf) || empty($db) || empty($langs) || empty($user) || empty($object
 
 require_once DOL_DOCUMENT_ROOT . '/ticket/class/ticket.class.php';
 require_once DOL_DOCUMENT_ROOT . '/user/class/user.class.php';
+require_once DOL_DOCUMENT_ROOT . '/societe/class/societe.class.php';
 require_once DOL_DOCUMENT_ROOT . '/categories/class/categorie.class.php';
+require_once DOL_DOCUMENT_ROOT . '/comm/action/class/actioncomm.class.php';
+require_once DOL_DOCUMENT_ROOT . '/core/class/extrafields.class.php';
+require_once DOL_DOCUMENT_ROOT . '/core/lib/files.lib.php';
 require_once DOL_DOCUMENT_ROOT . '/core/lib/ticket.lib.php';
 
 $status       = (int) $object->fk_statut;
@@ -98,6 +102,97 @@ $dolibarrTabs = ticket_prepare_head($object);
 
 // Resolve all Digirisk extrafield values up-front so the TPL stays read-only.
 $extra = $object->array_options ?? [];
+
+// ---- Dictionary options for type / severity / category (native ticket fields).
+$dictOptions = function (string $table, ?string $code = null) use ($db, $langs): array {
+    $opts = [['id' => '', 'label' => '— ' . $langs->trans('NoneSelected') . ' —']];
+    $sql = 'SELECT code, label, active FROM ' . MAIN_DB_PREFIX . $db->escape($table)
+        . ' WHERE active = 1 AND entity IN (' . getEntity($table) . ') ORDER BY label';
+    $r = $db->query($sql);
+    if ($r) {
+        while ($row = $db->fetch_object($r)) {
+            $opts[] = ['id' => $row->code, 'label' => $langs->trans($row->label) ?: $row->label];
+        }
+    }
+    return $opts;
+};
+$typeOptions     = $dictOptions('c_ticket_type');
+$severityOptions = $dictOptions('c_ticket_severity');
+$categoryOptions = $dictOptions('c_ticket_category');
+
+// ---- Third party picker (companies). Capped at 200 to avoid huge dropdowns.
+$socOptions = [['id' => 0, 'label' => '— ' . $langs->trans('NoneSelected') . ' —']];
+$socRes = $db->query('SELECT rowid, nom FROM ' . MAIN_DB_PREFIX . "societe WHERE status = 1 AND entity IN (" . getEntity('societe') . ') ORDER BY nom LIMIT 200');
+if ($socRes) {
+    while ($row = $db->fetch_object($socRes)) {
+        $socOptions[] = ['id' => (int) $row->rowid, 'label' => $row->nom];
+    }
+}
+$linkedSociete = null;
+if ((int) $object->fk_soc > 0) {
+    $linkedSociete = new Societe($db);
+    $linkedSociete->fetch((int) $object->fk_soc);
+}
+
+// ---- All non-Digirisk extrafields, rendered automatically.
+// This auto-detects any extrafield added by another module (DigiQuali QcFrequency, EasyURL EasyUrlAllLink, etc.).
+$extrafieldsObj = new ExtraFields($db);
+$extrafieldsObj->fetch_name_optionals_label($object->table_element);
+$digiriskExtrafieldKeys = [
+    'digiriskdolibarr_ticket_lastname', 'digiriskdolibarr_ticket_firstname',
+    'digiriskdolibarr_ticket_phone', 'digiriskdolibarr_ticket_service',
+    'digiriskdolibarr_ticket_location', 'digiriskdolibarr_ticket_date',
+    'digiriskdolibarr_condition_message',
+];
+$otherExtrafields = [];
+foreach (($extrafieldsObj->attributes[$object->table_element]['label'] ?? []) as $key => $label) {
+    if (in_array($key, $digiriskExtrafieldKeys, true)) {
+        continue;
+    }
+    if (($extrafieldsObj->attributes[$object->table_element]['type'][$key] ?? '') === 'separate') {
+        continue;
+    }
+    if (empty($extrafieldsObj->attributes[$object->table_element]['perms'][$key] ?? 1)) {
+        continue;
+    }
+    $otherExtrafields[$key] = [
+        'label' => $label,
+        'type'  => $extrafieldsObj->attributes[$object->table_element]['type'][$key] ?? 'varchar',
+        'value' => $extra[$key] ?? null,
+    ];
+}
+
+// ---- Linked files (read-only list).
+$uploadDir = $conf->ticket->multidir_output[$conf->entity ?? 1] . '/' . dol_sanitizeFileName($object->ref);
+$linkedFiles = is_dir($uploadDir) ? dol_dir_list($uploadDir, 'files', 0) : [];
+
+// ---- Recent events (actioncomm) attached to this ticket — last 10.
+$recentEvents = [];
+$evtSql = 'SELECT a.id, a.label, a.datep, a.fk_user_author, u.lastname, u.firstname'
+    . ' FROM ' . MAIN_DB_PREFIX . 'actioncomm a LEFT JOIN ' . MAIN_DB_PREFIX . 'user u ON u.rowid = a.fk_user_author'
+    . " WHERE a.fk_element = " . (int) $object->id . " AND a.elementtype = 'ticket'"
+    . " AND a.entity IN (" . getEntity('agenda') . ')'
+    . ' ORDER BY a.datep DESC LIMIT 10';
+$evtRes = $db->query($evtSql);
+if ($evtRes) {
+    while ($row = $db->fetch_object($evtRes)) {
+        $recentEvents[] = $row;
+    }
+}
+
+// ---- Related objects (fetchObjectLinked).
+$object->fetchObjectLinked();
+$relatedObjects = [];
+foreach ($object->linkedObjects as $linkedType => $linkedSet) {
+    foreach ($linkedSet as $linkedObj) {
+        $relatedObjects[] = [
+            'type'  => $linkedType,
+            'ref'   => $linkedObj->ref ?? ('#' . ($linkedObj->id ?? '?')),
+            'label' => $linkedObj->label ?? $linkedObj->title ?? '',
+            'url'   => method_exists($linkedObj, 'getNomUrl') ? $linkedObj->getNomUrl(1) : '',
+        ];
+    }
+}
 
 /**
  * Render a tap-to-edit field.
@@ -224,6 +319,54 @@ $renderField = function (string $field, string $type, string $label, $value, str
         <!-- LEFT COLUMN -->
         <div class="tac-col tac-col--left">
 
+            <!-- Section: Identification (native ticket fields) -->
+            <section class="tac-section">
+                <h3 class="tac-section__title"><i class="fas fa-id-card"></i> <?php print $langs->trans('TicketActionCardIdentificationSection'); ?></h3>
+                <div class="tac-grid">
+                    <!-- Tracking ID — readonly identifier -->
+                    <div class="tac-field tac-field--readonly">
+                        <div class="tac-field__label"><?php print $langs->trans('TicketTrackId'); ?></div>
+                        <div class="tac-field__value"><code><?php print dol_escape_htmltag($object->track_id ?? ''); ?></code></div>
+                    </div>
+
+                    <!-- Type (select from c_ticket_type) -->
+                    <?php
+                    $typeDisplay = '';
+                    foreach ($typeOptions as $opt) {
+                        if ((string) $opt['id'] === (string) ($object->type_code ?? '')) {
+                            $typeDisplay = dol_escape_htmltag($opt['label']);
+                            break;
+                        }
+                    }
+                    $renderField('type_code', 'select', 'Type', $object->type_code ?? '', $typeDisplay, ['options' => $typeOptions]);
+
+                    // Severity (select from c_ticket_severity)
+                    $severityDisplay = '';
+                    foreach ($severityOptions as $opt) {
+                        if ((string) $opt['id'] === (string) ($object->severity_code ?? '')) {
+                            $severityDisplay = dol_escape_htmltag($opt['label']);
+                            break;
+                        }
+                    }
+                    $renderField('severity_code', 'select', 'Severity', $object->severity_code ?? '', $severityDisplay, ['options' => $severityOptions]);
+
+                    // Category (select from c_ticket_category)
+                    $categoryDisplay = '';
+                    foreach ($categoryOptions as $opt) {
+                        if ((string) $opt['id'] === (string) ($object->category_code ?? '')) {
+                            $categoryDisplay = dol_escape_htmltag($opt['label']);
+                            break;
+                        }
+                    }
+                    $renderField('category_code', 'select', 'TicketCategory', $object->category_code ?? '', $categoryDisplay, ['options' => $categoryOptions]);
+
+                    // Third party (select limited to 200 most-active companies; full picker stays on Dolibarr card)
+                    $socDisplay = $linkedSociete ? $linkedSociete->getNomUrl(1) : '';
+                    $renderField('fk_soc', 'select', 'ThirdParty', (int) $object->fk_soc, $socDisplay, ['options' => $socOptions]);
+                    ?>
+                </div>
+            </section>
+
             <!-- Section: Informations registres (Digirisk extrafields) -->
             <section class="tac-section">
                 <h3 class="tac-section__title"><i class="fas fa-clipboard-list"></i> <?php print $langs->trans('TicketActionCardRegistresSection'); ?></h3>
@@ -279,6 +422,49 @@ $renderField = function (string $field, string $type, string $label, $value, str
                 </div>
             </section>
 
+            <!-- Section: Other extrafields (auto-detected from non-Digirisk modules) -->
+            <?php if (!empty($otherExtrafields)) : ?>
+            <section class="tac-section">
+                <h3 class="tac-section__title"><i class="fas fa-puzzle-piece"></i> <?php print $langs->trans('TicketActionCardOtherFieldsSection'); ?></h3>
+                <div class="tac-grid">
+                    <?php foreach ($otherExtrafields as $key => $info) :
+                        $val = $info['value'];
+                        $type = $info['type'];
+                        // Map Dolibarr extrafield types to our tap-to-edit ui types.
+                        $uiType = 'text';
+                        if (in_array($type, ['int', 'double', 'price'], true)) {
+                            $uiType = 'number';
+                        } elseif ($type === 'text' || $type === 'html') {
+                            $uiType = 'longtext';
+                        } elseif ($type === 'date' || $type === 'datetime') {
+                            $uiType = 'date';
+                        } elseif (in_array($type, ['boolean', 'checkbox'], true)) {
+                            $uiType = 'select';
+                        }
+                        // Build display value.
+                        $display = '';
+                        if ($val !== null && $val !== '') {
+                            if ($uiType === 'date') {
+                                $display = dol_print_date(is_numeric($val) ? (int) $val : strtotime((string) $val), 'day');
+                            } elseif ($uiType === 'longtext') {
+                                $display = dolPrintHTML((string) $val);
+                            } else {
+                                $display = dol_escape_htmltag((string) $val);
+                            }
+                        }
+                        $opts = [];
+                        if ($uiType === 'select') {
+                            $opts['options'] = [
+                                ['id' => '0', 'label' => $langs->trans('No')],
+                                ['id' => '1', 'label' => $langs->trans('Yes')],
+                            ];
+                        }
+                        $renderField('options_' . $key, $uiType, $info['label'], $val, $display, $opts);
+                    endforeach; ?>
+                </div>
+            </section>
+            <?php endif; ?>
+
             <!-- Section: Initial message — display only, edit through Dolibarr card. -->
             <section class="tac-section">
                 <h3 class="tac-section__title"><i class="fas fa-envelope-open-text"></i> <?php print $langs->trans('InitialMessage'); ?></h3>
@@ -330,6 +516,69 @@ $renderField = function (string $field, string $type, string $label, $value, str
                 </a>
             </section>
 
+            <!-- Section: Linked files (read-only list + upload link) -->
+            <section class="tac-section">
+                <h3 class="tac-section__title"><i class="fas fa-paperclip"></i> <?php print $langs->trans('LinkedFiles'); ?></h3>
+                <ul class="tac-list">
+                    <?php foreach ($linkedFiles as $f) :
+                        $name = $f['name'] ?? '';
+                        $size = isset($f['size']) ? dol_print_size((int) $f['size']) : '';
+                        $href = DOL_URL_ROOT . '/document.php?modulepart=ticket&file=' . urlencode(dol_sanitizeFileName($object->ref) . '/' . $name);
+                        ?>
+                        <li class="tac-list__item">
+                            <a href="<?php print dol_escape_htmltag($href); ?>" target="_blank">
+                                <i class="fas fa-file"></i> <?php print dol_escape_htmltag($name); ?>
+                            </a>
+                            <span class="opacitymedium"><?php print $size; ?></span>
+                        </li>
+                    <?php endforeach; ?>
+                    <?php if (empty($linkedFiles)) : ?>
+                        <li class="tac-list__item tac-list__item--empty">—</li>
+                    <?php endif; ?>
+                </ul>
+                <a class="tac-section__edit-link" href="<?php print DOL_URL_ROOT . '/ticket/document.php?id=' . (int) $object->id; ?>">
+                    <i class="fas fa-upload"></i> <?php print $langs->trans('Upload'); ?>
+                </a>
+            </section>
+
+            <!-- Section: Recent events (read-only, last 10) -->
+            <section class="tac-section">
+                <h3 class="tac-section__title"><i class="fas fa-history"></i> <?php print $langs->trans('TicketActionCardEventsSection'); ?></h3>
+                <ul class="tac-list tac-list--events">
+                    <?php foreach ($recentEvents as $evt) :
+                        $userName = trim(($evt->firstname ?: '') . ' ' . ($evt->lastname ?: ''));
+                        ?>
+                        <li class="tac-list__item">
+                            <div class="tac-list__item-meta">
+                                <?php print dol_print_date($db->jdate($evt->datep), 'dayhour'); ?>
+                                <?php if ($userName) : ?> · <?php print dol_escape_htmltag($userName); ?><?php endif; ?>
+                            </div>
+                            <div><?php print dol_escape_htmltag(dol_trunc((string) $evt->label, 80)); ?></div>
+                        </li>
+                    <?php endforeach; ?>
+                    <?php if (empty($recentEvents)) : ?>
+                        <li class="tac-list__item tac-list__item--empty">—</li>
+                    <?php endif; ?>
+                </ul>
+                <a class="tac-section__edit-link" href="<?php print DOL_URL_ROOT . '/ticket/agenda.php?id=' . (int) $object->id; ?>">
+                    <i class="fas fa-external-link-alt"></i> <?php print $langs->trans('SeeAll'); ?>
+                </a>
+            </section>
+
+            <!-- Section: Related objects (fetchObjectLinked) -->
+            <?php if (!empty($relatedObjects)) : ?>
+            <section class="tac-section">
+                <h3 class="tac-section__title"><i class="fas fa-link"></i> <?php print $langs->trans('TicketActionCardRelatedSection'); ?></h3>
+                <ul class="tac-list">
+                    <?php foreach ($relatedObjects as $rel) : ?>
+                        <li class="tac-list__item">
+                            <?php print $rel['url'] ?: (dol_escape_htmltag($rel['type']) . ' · ' . dol_escape_htmltag($rel['ref'])); ?>
+                        </li>
+                    <?php endforeach; ?>
+                </ul>
+            </section>
+            <?php endif; ?>
+
             <!-- Section: Key dates (read-only) -->
             <section class="tac-section">
                 <h3 class="tac-section__title"><i class="fas fa-calendar"></i> <?php print $langs->trans('TicketActionCardDatesSection'); ?></h3>
@@ -353,6 +602,25 @@ $renderField = function (string $field, string $type, string $label, $value, str
 
     <!-- ====== STICKY ACTION BAR ====== -->
     <div class="tac-sticky-bar">
+        <!-- Quick-creation actions: link out to Dolibarr screens with the ticket pre-linked. -->
+        <a class="tac-sticky-bar__btn tac-sticky-bar__btn--neutral" href="<?php print DOL_URL_ROOT . '/ticket/agenda.php?action=presend&mode=init&id=' . (int) $object->id; ?>">
+            <i class="fas fa-envelope"></i> <?php print $langs->trans('SendMail'); ?>
+        </a>
+        <a class="tac-sticky-bar__btn tac-sticky-bar__btn--neutral" href="<?php print DOL_URL_ROOT . '/ticket/messaging.php?action=presend&id=' . (int) $object->id; ?>">
+            <i class="fas fa-comment-dots"></i> <?php print $langs->trans('TicketAddMessage'); ?>
+        </a>
+        <a class="tac-sticky-bar__btn tac-sticky-bar__btn--neutral" href="<?php print dol_buildpath('/custom/digiriskdolibarr/view/accident/accident_card.php?action=create&fk_ticket=' . (int) $object->id, 1); ?>">
+            <i class="fas fa-exclamation-triangle"></i> <?php print $langs->trans('NewAccident'); ?>
+        </a>
+        <?php if (isModEnabled('intervention')) : ?>
+        <a class="tac-sticky-bar__btn tac-sticky-bar__btn--neutral" href="<?php print DOL_URL_ROOT . '/fichinter/card.php?action=create&origin=ticket&originid=' . (int) $object->id; ?>">
+            <i class="fas fa-wrench"></i> <?php print $langs->trans('CreateIntervention'); ?>
+        </a>
+        <?php endif; ?>
+
+        <!-- Spacer pushes destructive group to the right. -->
+        <span class="tac-sticky-bar__spacer"></span>
+
         <button type="button" class="tac-sticky-bar__btn tac-sticky-bar__btn--orange ticket-action-tile" data-action="set_waiting" <?php print $isClosed || $status === Ticket::STATUS_WAITING ? 'disabled' : ''; ?>>
             <i class="fas fa-pause-circle"></i> <?php print $langs->trans('TicketActionWaiting'); ?>
         </button>

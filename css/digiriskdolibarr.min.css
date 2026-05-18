@@ -3027,10 +3027,14 @@ textarea.action-textarea:not(:last-child) {
   border-top: 1px solid #e5e7eb;
   padding: 12px 24px;
   display: flex;
+  flex-wrap: wrap;
   gap: 8px;
-  justify-content: flex-end;
+  align-items: center;
   box-shadow: 0 -2px 8px rgba(0, 0, 0, 0.04);
   z-index: 10;
+}
+.tac-sticky-bar__spacer {
+  flex: 1 1 auto;
 }
 .tac-sticky-bar__btn {
   appearance: none;
@@ -3042,6 +3046,7 @@ textarea.action-textarea:not(:last-child) {
   cursor: pointer;
   font-family: inherit;
   font-size: 0.95em;
+  text-decoration: none;
   display: inline-flex;
   align-items: center;
   gap: 6px;
@@ -3056,6 +3061,14 @@ textarea.action-textarea:not(:last-child) {
 .tac-sticky-bar__btn[disabled] {
   opacity: 0.4;
   cursor: not-allowed;
+}
+.tac-sticky-bar__btn--neutral {
+  color: #6b7280;
+}
+.tac-sticky-bar__btn--neutral:hover {
+  border-color: #0d8aff;
+  background: rgba(13, 138, 255, 0.06);
+  color: #0d8aff;
 }
 .tac-sticky-bar__btn--green {
   color: #22bf4e;
@@ -3077,6 +3090,19 @@ textarea.action-textarea:not(:last-child) {
 .tac-sticky-bar__btn--red:hover {
   border-color: #e05353;
   background: rgba(224, 83, 83, 0.08);
+}
+
+.tac-list--events .tac-list__item {
+  border-bottom: 1px solid #e5e7eb;
+  padding: 6px 0;
+}
+.tac-list--events .tac-list__item:last-child {
+  border-bottom: none;
+}
+.tac-list--events .tac-list__item .tac-list__item-meta {
+  font-size: 0.78em;
+  color: #6b7280;
+  margin-bottom: 2px;
 }
 
 .tac-sticky-bar__btn.ticket-action-tile--armed {

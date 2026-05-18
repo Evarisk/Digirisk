@@ -356,10 +356,13 @@ $tac-border:       #e5e7eb;
     border-top: 1px solid $tac-border;
     padding: 12px 24px;
     display: flex;
+    flex-wrap: wrap;
     gap: 8px;
-    justify-content: flex-end;
+    align-items: center;
     box-shadow: 0 -2px 8px rgba(0,0,0,0.04);
     z-index: 10;
+
+    &__spacer { flex: 1 1 auto; }
 
     &__btn {
         appearance: none;
@@ -371,6 +374,7 @@ $tac-border:       #e5e7eb;
         cursor: pointer;
         font-family: inherit;
         font-size: 0.95em;
+        text-decoration: none;
         display: inline-flex;
         align-items: center;
         gap: 6px;
@@ -382,9 +386,23 @@ $tac-border:       #e5e7eb;
 
         &[disabled] { opacity: 0.4; cursor: not-allowed; }
 
-        &--green  { color: $tac-green;  &:hover { border-color: $tac-green;  background: rgba(34,191,78,0.08); } }
-        &--orange { color: $tac-orange; &:hover { border-color: $tac-orange; background: rgba(233,173,79,0.08); } }
-        &--red    { color: $tac-red;    &:hover { border-color: $tac-red;    background: rgba(224,83,83,0.08); } }
+        &--neutral { color: $tac-grey;   &:hover { border-color: $tac-blue;   background: rgba(13,138,255,0.06); color: $tac-blue; } }
+        &--green   { color: $tac-green;  &:hover { border-color: $tac-green;  background: rgba(34,191,78,0.08); } }
+        &--orange  { color: $tac-orange; &:hover { border-color: $tac-orange; background: rgba(233,173,79,0.08); } }
+        &--red     { color: $tac-red;    &:hover { border-color: $tac-red;    background: rgba(224,83,83,0.08); } }
+    }
+}
+
+// ----- Event list (timeline) -----
+.tac-list--events .tac-list__item {
+    border-bottom: 1px solid $tac-border;
+    padding: 6px 0;
+    &:last-child { border-bottom: none; }
+
+    .tac-list__item-meta {
+        font-size: 0.78em;
+        color: $tac-grey;
+        margin-bottom: 2px;
     }
 }
 

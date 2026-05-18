@@ -217,12 +217,42 @@ switch ($action) {
             $res = $object->setProgression($newProgress) >= 0;
             $object->progress = $newProgress;
             $display = '<i class="fas fa-tasks"></i> ' . $newProgress . '%';
-        } elseif (strpos($field, 'options_digiriskdolibarr_') === 0 || strpos($field, 'options_digiriskdolibarr_condition') === 0) {
+        } elseif (in_array($field, ['type_code', 'severity_code', 'category_code'], true)) {
+            // Type / severity / category — string code in the corresponding c_ticket_* dictionary.
+            $object->{$field} = (string) $rawValue;
+            $res = $object->update($user) > 0;
+            // Resolve the human label for the display.
+            $table = ['type_code' => 'c_ticket_type', 'severity_code' => 'c_ticket_severity', 'category_code' => 'c_ticket_category'][$field];
+            $labelRes = $db->query('SELECT label FROM ' . MAIN_DB_PREFIX . $db->escape($table) . " WHERE code = '" . $db->escape((string) $rawValue) . "' LIMIT 1");
+            $display = '';
+            if ($labelRes && ($row = $db->fetch_object($labelRes))) {
+                $display = dol_escape_htmltag($langs->trans($row->label) ?: $row->label);
+            }
+        } elseif ($field === 'fk_soc') {
+            // Third party link — accepts 0 to detach.
+            $newSocId = (int) $rawValue;
+            $object->fk_soc = $newSocId > 0 ? $newSocId : null;
+            $res = $object->update($user) > 0;
+            if ($newSocId > 0) {
+                require_once DOL_DOCUMENT_ROOT . '/societe/class/societe.class.php';
+                $soc = new Societe($db);
+                $soc->fetch($newSocId);
+                $display = $soc->getNomUrl(1);
+            } else {
+                $display = '<span class="opacitymedium">—</span>';
+            }
+        } elseif (strpos($field, 'options_') === 0) {
+            // Generic extrafield write path — catches Digirisk + any other module's extrafield on ticket.
             $extraKey = substr($field, strlen('options_'));
             $valueToStore = $rawValue;
 
-            // Date fields come in as YYYY-MM-DD — convert to timestamp.
-            if ($extraKey === 'digiriskdolibarr_ticket_date' && $rawValue !== '') {
+            // Detect the extrafield type so we can normalize date values to timestamps.
+            require_once DOL_DOCUMENT_ROOT . '/core/class/extrafields.class.php';
+            $efTmp = new ExtraFields($db);
+            $efTmp->fetch_name_optionals_label($object->table_element);
+            $efType = $efTmp->attributes[$object->table_element]['type'][$extraKey] ?? 'varchar';
+
+            if (in_array($efType, ['date', 'datetime'], true) && $rawValue !== '') {
                 $ts = strtotime((string) $rawValue);
                 $valueToStore = $ts ?: '';
             }
@@ -230,7 +260,7 @@ switch ($action) {
             $object->array_options['options_' . $extraKey] = $valueToStore;
             $res = $object->insertExtraFields() >= 0;
 
-            if ($extraKey === 'digiriskdolibarr_ticket_date') {
+            if (in_array($efType, ['date', 'datetime'], true)) {
                 $display = $valueToStore ? dol_print_date((int) $valueToStore, 'day') : '';
             } else {
                 $display = dol_escape_htmltag((string) $valueToStore);
