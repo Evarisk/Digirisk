@@ -109,8 +109,14 @@ if (file_exists($accidentClassPath)) {
 // Standard Dolibarr ticket tabs (Contacts, Documents, Events…) so the user can hop to native screens.
 $dolibarrTabs = ticket_prepare_head($object);
 
-// Resolve all Digirisk extrafield values up-front so the TPL stays read-only.
-$extra = $object->array_options ?? [];
+// Resolve all extrafield values up-front so the TPL stays read-only.
+// $object->array_options keys come in prefixed with "options_" — strip that so the
+// rest of the TPL can do $extra['my_field'] without repeating the prefix everywhere.
+$extra = [];
+foreach (($object->array_options ?? []) as $rawKey => $val) {
+    $cleanKey = (strpos($rawKey, 'options_') === 0) ? substr($rawKey, strlen('options_')) : $rawKey;
+    $extra[$cleanKey] = $val;
+}
 
 // ---- Dictionary options for type / severity / category (native ticket fields).
 $dictOptions = function (string $table, ?string $code = null) use ($db, $langs): array {

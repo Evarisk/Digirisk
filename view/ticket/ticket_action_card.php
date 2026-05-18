@@ -23,6 +23,12 @@
  * Issue #4443 — IHM ticket registre.
  */
 
+// Force-load CKEditor so the longtext tap-to-edit (ConditionMessage, Initial message)
+// can replace its textarea with a rich-text editor on demand.
+if (!defined('FORCE_CKEDITOR')) {
+    define('FORCE_CKEDITOR', 1);
+}
+
 if (file_exists('../digiriskdolibarr.main.inc.php')) {
     require_once __DIR__ . '/../digiriskdolibarr.main.inc.php';
 } elseif (file_exists('../../digiriskdolibarr.main.inc.php')) {

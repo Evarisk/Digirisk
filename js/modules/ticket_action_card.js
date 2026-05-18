@@ -605,7 +605,10 @@ window.digiriskdolibarr.ticketActionCard.onFieldClick = function(event) {
     if (type === 'text') {
         $input = $('<input type="text" class="tac-edit-input">').val(current);
     } else if (type === 'longtext') {
-        $input = $('<textarea class="tac-edit-textarea" rows="4">').val(current);
+        // Unique id so CKEditor.replace() can target the textarea after it's inserted in the DOM.
+        var taId = 'tac-longtext-' + Math.random().toString(36).slice(2, 8);
+        $input = $('<textarea class="tac-edit-textarea" rows="6">').attr('id', taId).val(current);
+        $wrap.data('tac-editor-id', taId);
     } else if (type === 'number') {
         $input = $('<input type="number" min="0" max="100" step="1" class="tac-edit-input tac-edit-input--narrow">').val(current);
     } else if (type === 'date') {
@@ -641,44 +644,100 @@ window.digiriskdolibarr.ticketActionCard.onFieldClick = function(event) {
         $valueCell.html('').append($input);
     }
     $input.focus();
-    if ($input.is('input[type="text"], textarea, input[type="number"]')) {
+    if ($input.is('input[type="text"], input[type="number"]')) {
         $input.select && $input.select();
     }
 
     // ---- Save handlers
     var commit = function() {
-        var newValue = $input.val();
+        // For longtext fields backed by a CKEditor instance, pull the rich HTML
+        // from the editor rather than the (stale) underlying textarea.
+        var newValue;
+        var editorId = $wrap.data('tac-editor-id');
+        if (type === 'longtext' && editorId && window.CKEDITOR && window.CKEDITOR.instances && window.CKEDITOR.instances[editorId]) {
+            newValue = window.CKEDITOR.instances[editorId].getData();
+        } else {
+            newValue = $input.val();
+        }
         var oldValue = current;
         if (String(newValue) === String(oldValue)) {
-            // Nothing changed — restore display and bail.
+            window.digiriskdolibarr.ticketActionCard.cleanupEditor($wrap);
             window.digiriskdolibarr.ticketActionCard.restoreField($wrap, originalHtml);
             return;
         }
+        window.digiriskdolibarr.ticketActionCard.cleanupEditor($wrap);
         window.digiriskdolibarr.ticketActionCard.saveField($wrap, field, newValue, originalHtml);
     };
     var cancel = function() {
+        window.digiriskdolibarr.ticketActionCard.cleanupEditor($wrap);
         window.digiriskdolibarr.ticketActionCard.restoreField($wrap, originalHtml);
     };
 
     if (type === 'longtext') {
-        // For textareas: Ctrl+Enter saves, Escape cancels, blur saves.
-        $input.on('keydown', function(e) {
+        // Init CKEditor on the textarea after it's in the DOM. Save is via the floating
+        // "Enregistrer" button injected next to the editor (blur on a CKEditor area is
+        // unreliable because the user may click any toolbar button).
+        if (window.CKEDITOR && $input.attr('id')) {
+            try {
+                window.CKEDITOR.replace($input.attr('id'), {
+                    customConfig: window.ckeditorConfig || '',
+                    removePlugins: 'elementspath,save,flash,div,anchor,specialchar,exportpdf,wsc,scayt',
+                    versionCheck: false,
+                    htmlEncodeOutput: false,
+                    allowedContent: true,
+                    toolbar: 'Basic',
+                    height: 200,
+                    width: '100%'
+                });
+            } catch (e) {
+                console.warn('CKEditor init failed, falling back to plain textarea:', e);
+            }
+        }
+        // Floating action bar for longtext (Save / Cancel) — blur would fire on every
+        // toolbar click otherwise.
+        var $bar = $('<div class="tac-edit-actions">'
+            + '<button type="button" class="tac-edit-actions__save">Enregistrer</button> '
+            + '<button type="button" class="tac-edit-actions__cancel">Annuler</button>'
+            + '</div>');
+        $input.after($bar);
+        $bar.find('.tac-edit-actions__save').on('click', function(e) { e.stopPropagation(); commit(); });
+        $bar.find('.tac-edit-actions__cancel').on('click', function(e) { e.stopPropagation(); cancel(); });
+        $wrap.data('tac-edit-bar', $bar);
+        // Keep Escape support too.
+        $(document).on('keydown.tac-longtext-' + ($input.attr('id') || ''), function(e) {
             if (e.key === 'Escape') { cancel(); }
-            else if (e.key === 'Enter' && e.ctrlKey) { commit(); }
         });
     } else if (type === 'select') {
-        // Selects: change fires immediately, no need to wait for blur.
         $input.on('change', commit);
-        $input.on('keydown', function(e) {
-            if (e.key === 'Escape') { cancel(); }
-        });
+        $input.on('keydown', function(e) { if (e.key === 'Escape') { cancel(); } });
+        $input.on('blur', commit);
     } else {
         $input.on('keydown', function(e) {
             if (e.key === 'Escape') { cancel(); }
             else if (e.key === 'Enter') { commit(); }
         });
+        $input.on('blur', commit);
     }
-    $input.on('blur', commit);
+};
+
+/**
+ * Destroy any CKEditor instance attached to this field + remove the floating
+ * Save/Cancel bar. Called on commit and cancel of longtext fields.
+ *
+ * @param  {jQuery} $wrap
+ * @return {void}
+ */
+window.digiriskdolibarr.ticketActionCard.cleanupEditor = function($wrap) {
+    var editorId = $wrap.data('tac-editor-id');
+    if (editorId && window.CKEDITOR && window.CKEDITOR.instances && window.CKEDITOR.instances[editorId]) {
+        try { window.CKEDITOR.instances[editorId].destroy(true); } catch (e) {}
+        $(document).off('keydown.tac-longtext-' + editorId);
+    }
+    var $bar = $wrap.data('tac-edit-bar');
+    if ($bar) {
+        $bar.remove();
+    }
+    $wrap.removeData('tac-editor-id').removeData('tac-edit-bar');
 };
 
 /**

@@ -3337,6 +3337,39 @@ textarea.action-textarea:not(:last-child) {
   resize: vertical;
 }
 
+.tac-edit-actions {
+  margin-top: 8px;
+  display: flex;
+  gap: 8px;
+}
+.tac-edit-actions__save, .tac-edit-actions__cancel {
+  appearance: none;
+  padding: 6px 14px;
+  border-radius: 6px;
+  font-family: inherit;
+  font-size: 0.9em;
+  cursor: pointer;
+  border: 1px solid #e5e7eb;
+  background: #fff;
+  color: #6b7280;
+  transition: background 0.15s ease, color 0.15s ease, border-color 0.15s ease;
+}
+.tac-edit-actions__save:hover, .tac-edit-actions__cancel:hover {
+  background: rgba(13, 138, 255, 0.08);
+  color: #0d8aff;
+  border-color: #0d8aff;
+}
+.tac-edit-actions__save {
+  background: #0d8aff;
+  border-color: #0d8aff;
+  color: #fff;
+}
+.tac-edit-actions__save:hover {
+  background: #007df3;
+  color: #fff;
+  border-color: #007df3;
+}
+
 .tac-editing {
   background: rgba(13, 138, 255, 0.08) !important;
   border-color: #0d8aff !important;

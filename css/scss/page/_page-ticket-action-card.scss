@@ -563,6 +563,36 @@ $tac-border:       #e5e7eb;
 .tac-edit-input--narrow { max-width: 100px; }
 .tac-edit-textarea     { min-height: 80px; resize: vertical; }
 
+// Floating Save/Cancel pair shown under a CKEditor longtext field.
+.tac-edit-actions {
+    margin-top: 8px;
+    display: flex;
+    gap: 8px;
+
+    &__save,
+    &__cancel {
+        appearance: none;
+        padding: 6px 14px;
+        border-radius: 6px;
+        font-family: inherit;
+        font-size: 0.9em;
+        cursor: pointer;
+        border: 1px solid $tac-border;
+        background: #fff;
+        color: $tac-grey;
+        transition: background 0.15s ease, color 0.15s ease, border-color 0.15s ease;
+
+        &:hover { background: rgba(13,138,255,0.08); color: $tac-blue; border-color: $tac-blue; }
+    }
+
+    &__save {
+        background: $tac-blue;
+        border-color: $tac-blue;
+        color: #fff;
+        &:hover { background: darken($tac-blue, 5%); color: #fff; border-color: darken($tac-blue, 5%); }
+    }
+}
+
 .tac-editing {
     background: rgba(13,138,255,0.08) !important;
     border-color: $tac-blue !important;

@@ -361,6 +361,9 @@ switch ($action) {
 
             if (in_array($efType, ['date', 'datetime'], true)) {
                 $display = $valueToStore ? dol_print_date((int) $valueToStore, 'day') : '';
+            } elseif (in_array($efType, ['text', 'html'], true)) {
+                // dol_escape_htmltag would strip <strong>/<b>; dolPrintHTML preserves rich HTML safely.
+                $display = dolPrintHTML((string) $valueToStore);
             } else {
                 $display = dol_escape_htmltag((string) $valueToStore);
             }
