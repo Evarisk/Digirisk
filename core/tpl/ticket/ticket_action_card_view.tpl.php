@@ -153,9 +153,16 @@ $digiriskExtrafieldKeys = [
     'digiriskdolibarr_ticket_location', 'digiriskdolibarr_ticket_date',
     'digiriskdolibarr_condition_message',
 ];
+// Extrafields that duplicate dedicated card sections and therefore shouldn't show in "Autres infos".
+$duplicateExtrafieldKeys = [
+    'ticket_categories', // covered by the Classification section
+];
 $otherExtrafields = [];
 foreach (($extrafieldsObj->attributes[$object->table_element]['label'] ?? []) as $key => $label) {
     if (in_array($key, $digiriskExtrafieldKeys, true)) {
+        continue;
+    }
+    if (in_array($key, $duplicateExtrafieldKeys, true)) {
         continue;
     }
     if (($extrafieldsObj->attributes[$object->table_element]['type'][$key] ?? '') === 'separate') {
