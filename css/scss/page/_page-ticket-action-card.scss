@@ -301,6 +301,37 @@ $tac-border:       #e5e7eb;
     align-items: center;
     gap: 12px;
 }
+// ----- Density toolbar in the hero (3-button group) -----
+.tac-hero__density {
+    display: inline-flex;
+    border: 1px solid $tac-border;
+    border-radius: 6px;
+    overflow: hidden;
+    background: #fff;
+
+    &-btn {
+        appearance: none;
+        background: transparent;
+        border: none;
+        border-right: 1px solid $tac-border;
+        padding: 4px 10px;
+        cursor: pointer;
+        color: $tac-grey;
+        font-family: inherit;
+        font-size: 0.85em;
+        transition: background 0.15s ease, color 0.15s ease;
+
+        &:last-child { border-right: none; }
+        &:hover { background: rgba(13,138,255,0.08); color: $tac-blue; }
+
+        &.is-active {
+            background: $tac-blue;
+            color: #fff;
+            &:hover { background: darken($tac-blue, 5%); color: #fff; }
+        }
+    }
+}
+
 .tac-hero__customize,
 .tac-hero__reset {
     appearance: none;
@@ -327,13 +358,53 @@ $tac-border:       #e5e7eb;
     &:hover { background: darken($tac-blue, 5%); color: #fff; }
 }
 
-// Reset button is only shown while the edit mode is active.
-.tac-hero__reset { display: none; }
+// Reset button and density toolbar are only shown while the edit mode is active.
+.tac-hero__reset,
+.tac-hero__density { display: none; }
 .tac-edit-mode .tac-hero__reset {
     display: inline-flex;
     color: $tac-red;
     border-color: $tac-red;
     &:hover { background: rgba(224,83,83,0.08); color: $tac-red; border-color: $tac-red; }
+}
+.tac-edit-mode .tac-hero__density { display: inline-flex; }
+
+// ---------------------------------------------------------------------------
+// Density variants — adjust padding / gap / font-size on the card.
+// Default styles target "cozy" (matches the original look), with overrides for compact + spacious.
+// ---------------------------------------------------------------------------
+.tac-density-compact {
+    .tac-body         { gap: 8px 10px; padding: 12px 16px; }
+    .tac-section      { padding: 8px 10px; border-radius: 8px; }
+    .tac-section__title { font-size: 0.72em; margin-bottom: 6px; }
+    .tac-grid         { gap: 4px 8px; }
+    .tac-field        { padding: 3px 6px; min-height: 36px; }
+    .tac-field__label { font-size: 0.68em; }
+    .tac-field__value { font-size: 0.88em; line-height: 1.25; }
+    .tac-hero         { padding: 10px 18px 0; }
+    .tac-hero__ref    { font-size: 1.25em; }
+    .tac-hero__subject{ font-size: 1em; }
+    .tac-chip         { padding: 3px 8px; font-size: 0.85em; }
+    .tac-list__item   { padding: 3px 0; }
+    .tac-rich-text    { padding: 6px 8px; min-height: 40px; max-height: 140px; }
+    .tac-tag          { padding: 2px 8px; font-size: 0.8em; }
+}
+
+.tac-density-spacious {
+    .tac-body         { gap: 24px 28px; padding: 28px 32px; }
+    .tac-section      { padding: 20px 22px; border-radius: 12px; }
+    .tac-section__title { font-size: 0.85em; margin-bottom: 14px; letter-spacing: 0.05em; }
+    .tac-grid         { gap: 12px 18px; }
+    .tac-field        { padding: 10px 12px; min-height: 56px; }
+    .tac-field__label { font-size: 0.78em; margin-bottom: 4px; }
+    .tac-field__value { font-size: 1.02em; line-height: 1.5; }
+    .tac-hero         { padding: 22px 32px 0; }
+    .tac-hero__ref    { font-size: 1.7em; }
+    .tac-hero__subject{ font-size: 1.25em; }
+    .tac-chip         { padding: 8px 14px; font-size: 1em; }
+    .tac-list__item   { padding: 8px 0; }
+    .tac-rich-text    { padding: 12px 14px; min-height: 80px; max-height: 260px; }
+    .tac-tag          { padding: 6px 12px; font-size: 0.92em; }
 }
 
 // ----- Tap-to-edit field grid -----

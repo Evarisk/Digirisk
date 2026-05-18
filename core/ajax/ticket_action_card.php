@@ -178,8 +178,12 @@ switch ($action) {
             respond(false, $langs->transnoentities('ErrorBadParameters'));
         }
         // Re-encode to canonicalize and strip anything unexpected.
-        // Schema v2: { visible, width, order } per section — single flat grid, no column field.
-        $sanitized = ['v' => 2, 'sections' => []];
+        // Schema v2: top-level density (compact|cozy|spacious) + { visible, width, order } per section.
+        $sanitized = [
+            'v'       => 2,
+            'density' => in_array($decoded['density'] ?? '', ['compact', 'cozy', 'spacious'], true) ? $decoded['density'] : 'cozy',
+            'sections' => [],
+        ];
         foreach (($decoded['sections'] ?? []) as $id => $cfg) {
             if (!preg_match('/^[a-z_]+$/', (string) $id) || !is_array($cfg)) {
                 continue;

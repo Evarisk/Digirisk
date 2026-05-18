@@ -69,8 +69,13 @@ window.digiriskdolibarr.ticketActionCard.applyLayout = function() {
  * @return {Object}
  */
 window.digiriskdolibarr.ticketActionCard.serializeLayout = function() {
-    var layout = { v: 2, sections: {} };
-    $('.tac-card .tac-body .tac-section[data-section-id]').each(function(idx) {
+    var $card = $('.tac-card').first();
+    var layout = {
+        v: 2,
+        density: $card.attr('data-density') || 'cozy',
+        sections: {},
+    };
+    $card.find('.tac-body .tac-section[data-section-id]').each(function(idx) {
         var $s = $(this);
         layout.sections[$s.attr('data-section-id')] = {
             visible: !$s.hasClass('tac-section--hidden'),
@@ -79,6 +84,28 @@ window.digiriskdolibarr.ticketActionCard.serializeLayout = function() {
         };
     });
     return layout;
+};
+
+/**
+ * Density button click — switch the card's density class and persist.
+ *
+ * @param  {MouseEvent} event
+ * @return {void}
+ */
+window.digiriskdolibarr.ticketActionCard.onDensityChange = function(event) {
+    event.stopPropagation();
+    var $btn   = $(this);
+    var newDen = $btn.data('density');
+    if (!newDen) {
+        return;
+    }
+    var $card = $('.tac-card').first();
+    $card.removeClass('tac-density-compact tac-density-cozy tac-density-spacious');
+    $card.addClass('tac-density-' + newDen);
+    $card.attr('data-density', newDen);
+    $btn.closest('.tac-hero__density').find('.tac-hero__density-btn').removeClass('is-active');
+    $btn.addClass('is-active');
+    window.digiriskdolibarr.ticketActionCard.saveLayout();
 };
 
 /**
@@ -126,12 +153,13 @@ window.digiriskdolibarr.ticketActionCard.event = function() {
     // Tap-to-edit — bind on the field WRAPPER so clicks anywhere in it (label/value) work.
     $(document).on('click', '.tac-field:not(.tac-field--readonly), .tac-chip:not(.tac-chip--readonly), .tac-hero__subject', window.digiriskdolibarr.ticketActionCard.onFieldClick);
 
-    // ---- Layout customization (edit mode toggle, drag/resize/hide/reset).
+    // ---- Layout customization (edit mode toggle, drag/resize/hide/reset/density).
     $(document).on('click', '[data-customize-toggle]',     window.digiriskdolibarr.ticketActionCard.onCustomizeToggle);
     $(document).on('click', '[data-layout-reset]',         window.digiriskdolibarr.ticketActionCard.onLayoutReset);
     $(document).on('click', '.tac-section__hide-btn',      window.digiriskdolibarr.ticketActionCard.onHideSection);
     $(document).on('click', '.tac-section__show-btn',      window.digiriskdolibarr.ticketActionCard.onShowSection);
     $(document).on('click', '.tac-section__width-btn',     window.digiriskdolibarr.ticketActionCard.onWidthChange);
+    $(document).on('click', '.tac-hero__density-btn',      window.digiriskdolibarr.ticketActionCard.onDensityChange);
 };
 
 /**

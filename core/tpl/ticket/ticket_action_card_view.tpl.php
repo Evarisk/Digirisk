@@ -191,6 +191,7 @@ if ($evtRes) {
 // Default mimics the previous 2-col layout by interleaving left/right groups (full = half body).
 $defaultLayout = [
     'v'        => 2,
+    'density'  => 'cozy', // compact | cozy | spacious — drives padding/gap/font scale on .tac-card
     'sections' => [
         // Interleaved L/R for an alternating 2-col visual.
         'identification'    => ['visible' => true, 'width' => 'full', 'order' => 0],
@@ -210,21 +211,27 @@ $rawLayout  = $user->conf->DIGIRISK_TICKET_CARD_LAYOUT ?? '';
 $userLayout = $defaultLayout;
 if ($rawLayout) {
     $decoded = json_decode((string) $rawLayout, true);
-    if (is_array($decoded) && isset($decoded['sections'])) {
-        // Migration: old schema (v1) had a "column" field; we drop it but keep the rest.
-        foreach ($decoded['sections'] as $id => $cfg) {
-            if (isset($userLayout['sections'][$id]) && is_array($cfg)) {
-                $merged = $userLayout['sections'][$id];
-                if (isset($cfg['visible'])) {
-                    $merged['visible'] = (bool) $cfg['visible'];
+    if (is_array($decoded)) {
+        // density override (independent of sections)
+        if (isset($decoded['density']) && in_array($decoded['density'], ['compact', 'cozy', 'spacious'], true)) {
+            $userLayout['density'] = $decoded['density'];
+        }
+        if (isset($decoded['sections'])) {
+            // Migration: old schema (v1) had a "column" field; we drop it but keep the rest.
+            foreach ($decoded['sections'] as $id => $cfg) {
+                if (isset($userLayout['sections'][$id]) && is_array($cfg)) {
+                    $merged = $userLayout['sections'][$id];
+                    if (isset($cfg['visible'])) {
+                        $merged['visible'] = (bool) $cfg['visible'];
+                    }
+                    if (isset($cfg['width']) && in_array($cfg['width'], ['half', 'full', 'span'], true)) {
+                        $merged['width'] = $cfg['width'];
+                    }
+                    if (isset($cfg['order'])) {
+                        $merged['order'] = (int) $cfg['order'];
+                    }
+                    $userLayout['sections'][$id] = $merged;
                 }
-                if (isset($cfg['width']) && in_array($cfg['width'], ['half', 'full', 'span'], true)) {
-                    $merged['width'] = $cfg['width'];
-                }
-                if (isset($cfg['order'])) {
-                    $merged['order'] = (int) $cfg['order'];
-                }
-                $userLayout['sections'][$id] = $merged;
             }
         }
     }
@@ -298,10 +305,11 @@ $renderField = function (string $field, string $type, string $label, $value, str
 };
 ?>
 
-<div class="ticket-action-card tac-card"
+<div class="ticket-action-card tac-card tac-density-<?php print dol_escape_htmltag($userLayout['density']); ?>"
      data-ticket-id="<?php print (int) $object->id; ?>"
      data-ajax-url="<?php print dol_escape_htmltag($ajaxUrl); ?>"
-     data-layout="<?php print dol_escape_htmltag($layoutJson); ?>">
+     data-layout="<?php print dol_escape_htmltag($layoutJson); ?>"
+     data-density="<?php print dol_escape_htmltag($userLayout['density']); ?>">
     <input type="hidden" name="token" value="<?php print newToken(); ?>">
 
     <!-- ====== HERO HEADER ====== -->
@@ -311,6 +319,17 @@ $renderField = function (string $field, string $type, string $label, $value, str
                 <i class="fas fa-arrow-left"></i> <?php print $langs->trans('BackToList'); ?>
             </a>
             <span class="tac-hero__top-right">
+                <span class="tac-hero__density" role="toolbar" aria-label="<?php print dol_escape_htmltag($langs->trans('LayoutDensity')); ?>">
+                    <button type="button" class="tac-hero__density-btn<?php print $userLayout['density'] === 'compact' ? ' is-active' : ''; ?>" data-density="compact" title="<?php print dol_escape_htmltag($langs->trans('LayoutDensityCompact')); ?>">
+                        <i class="fas fa-compress-alt"></i>
+                    </button>
+                    <button type="button" class="tac-hero__density-btn<?php print $userLayout['density'] === 'cozy' ? ' is-active' : ''; ?>" data-density="cozy" title="<?php print dol_escape_htmltag($langs->trans('LayoutDensityCozy')); ?>">
+                        <i class="fas fa-equals"></i>
+                    </button>
+                    <button type="button" class="tac-hero__density-btn<?php print $userLayout['density'] === 'spacious' ? ' is-active' : ''; ?>" data-density="spacious" title="<?php print dol_escape_htmltag($langs->trans('LayoutDensitySpacious')); ?>">
+                        <i class="fas fa-expand-alt"></i>
+                    </button>
+                </span>
                 <button type="button" class="tac-hero__reset" data-layout-reset title="<?php print dol_escape_htmltag($langs->trans('LayoutResetTitle')); ?>">
                     <i class="fas fa-undo"></i> <?php print $langs->trans('LayoutReset'); ?>
                 </button>

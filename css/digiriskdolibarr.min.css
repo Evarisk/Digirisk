@@ -2955,6 +2955,41 @@ textarea.action-textarea:not(:last-child) {
   gap: 12px;
 }
 
+.tac-hero__density {
+  display: inline-flex;
+  border: 1px solid #e5e7eb;
+  border-radius: 6px;
+  overflow: hidden;
+  background: #fff;
+}
+.tac-hero__density-btn {
+  appearance: none;
+  background: transparent;
+  border: none;
+  border-right: 1px solid #e5e7eb;
+  padding: 4px 10px;
+  cursor: pointer;
+  color: #6b7280;
+  font-family: inherit;
+  font-size: 0.85em;
+  transition: background 0.15s ease, color 0.15s ease;
+}
+.tac-hero__density-btn:last-child {
+  border-right: none;
+}
+.tac-hero__density-btn:hover {
+  background: rgba(13, 138, 255, 0.08);
+  color: #0d8aff;
+}
+.tac-hero__density-btn.is-active {
+  background: #0d8aff;
+  color: #fff;
+}
+.tac-hero__density-btn.is-active:hover {
+  background: #007df3;
+  color: #fff;
+}
+
 .tac-hero__customize,
 .tac-hero__reset {
   appearance: none;
@@ -2988,7 +3023,8 @@ textarea.action-textarea:not(:last-child) {
   color: #fff;
 }
 
-.tac-hero__reset {
+.tac-hero__reset,
+.tac-hero__density {
   display: none;
 }
 
@@ -3001,6 +3037,116 @@ textarea.action-textarea:not(:last-child) {
   background: rgba(224, 83, 83, 0.08);
   color: #e05353;
   border-color: #e05353;
+}
+
+.tac-edit-mode .tac-hero__density {
+  display: inline-flex;
+}
+
+.tac-density-compact .tac-body {
+  gap: 8px 10px;
+  padding: 12px 16px;
+}
+.tac-density-compact .tac-section {
+  padding: 8px 10px;
+  border-radius: 8px;
+}
+.tac-density-compact .tac-section__title {
+  font-size: 0.72em;
+  margin-bottom: 6px;
+}
+.tac-density-compact .tac-grid {
+  gap: 4px 8px;
+}
+.tac-density-compact .tac-field {
+  padding: 3px 6px;
+  min-height: 36px;
+}
+.tac-density-compact .tac-field__label {
+  font-size: 0.68em;
+}
+.tac-density-compact .tac-field__value {
+  font-size: 0.88em;
+  line-height: 1.25;
+}
+.tac-density-compact .tac-hero {
+  padding: 10px 18px 0;
+}
+.tac-density-compact .tac-hero__ref {
+  font-size: 1.25em;
+}
+.tac-density-compact .tac-hero__subject {
+  font-size: 1em;
+}
+.tac-density-compact .tac-chip {
+  padding: 3px 8px;
+  font-size: 0.85em;
+}
+.tac-density-compact .tac-list__item {
+  padding: 3px 0;
+}
+.tac-density-compact .tac-rich-text {
+  padding: 6px 8px;
+  min-height: 40px;
+  max-height: 140px;
+}
+.tac-density-compact .tac-tag {
+  padding: 2px 8px;
+  font-size: 0.8em;
+}
+
+.tac-density-spacious .tac-body {
+  gap: 24px 28px;
+  padding: 28px 32px;
+}
+.tac-density-spacious .tac-section {
+  padding: 20px 22px;
+  border-radius: 12px;
+}
+.tac-density-spacious .tac-section__title {
+  font-size: 0.85em;
+  margin-bottom: 14px;
+  letter-spacing: 0.05em;
+}
+.tac-density-spacious .tac-grid {
+  gap: 12px 18px;
+}
+.tac-density-spacious .tac-field {
+  padding: 10px 12px;
+  min-height: 56px;
+}
+.tac-density-spacious .tac-field__label {
+  font-size: 0.78em;
+  margin-bottom: 4px;
+}
+.tac-density-spacious .tac-field__value {
+  font-size: 1.02em;
+  line-height: 1.5;
+}
+.tac-density-spacious .tac-hero {
+  padding: 22px 32px 0;
+}
+.tac-density-spacious .tac-hero__ref {
+  font-size: 1.7em;
+}
+.tac-density-spacious .tac-hero__subject {
+  font-size: 1.25em;
+}
+.tac-density-spacious .tac-chip {
+  padding: 8px 14px;
+  font-size: 1em;
+}
+.tac-density-spacious .tac-list__item {
+  padding: 8px 0;
+}
+.tac-density-spacious .tac-rich-text {
+  padding: 12px 14px;
+  min-height: 80px;
+  max-height: 260px;
+}
+.tac-density-spacious .tac-tag {
+  padding: 6px 12px;
+  font-size: 0.92em;
 }
 
 .tac-grid {
