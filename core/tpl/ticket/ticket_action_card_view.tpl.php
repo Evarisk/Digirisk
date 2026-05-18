@@ -86,6 +86,13 @@ $ticketCategories = $catObj->containing($object->id, Categorie::TYPE_TICKET);
 if (!is_array($ticketCategories)) {
     $ticketCategories = [];
 }
+// All available ticket categories — used to render the "+ Tag" 1-click chips for unassigned ones.
+$allTicketCategories = $catObj->get_full_arbo(Categorie::TYPE_TICKET);
+if (!is_array($allTicketCategories)) {
+    $allTicketCategories = [];
+}
+// Quick lookup of category IDs already on this ticket.
+$assignedCategoryIds = array_map(static fn($c) => (int) $c->id, $ticketCategories);
 
 // Load linked accidents (Digirisk Accident class).
 $linkedAccidents = [];
@@ -577,25 +584,45 @@ $renderField = function (string $field, string $type, string $label, $value, str
                 </a>
             </section>
 
-            <!-- Section: Classification (tags) -->
+            <!-- Section: Classification (tags) — 1-click add/remove. -->
             <section class="tac-section" data-section-id="classification">
                 <h3 class="tac-section__title"><i class="fas fa-tags"></i> <?php print $langs->trans('TicketActionCardClassificationSection'); ?></h3>
                 <?php $sectionControls('classification'); ?>
-                <div class="tac-tags">
+                <div class="tac-tags" data-tags-container>
                     <?php foreach ($ticketCategories as $cat) :
                         $catColor = !empty($cat->color) ? '#' . dol_escape_htmltag($cat->color) : '#e5e7eb';
                         ?>
-                        <span class="tac-tag" style="background:<?php print $catColor; ?>;">
+                        <span class="tac-tag tac-tag--assigned" style="background:<?php print $catColor; ?>;" data-category-id="<?php print (int) $cat->id; ?>">
                             <?php print dol_escape_htmltag($cat->label); ?>
+                            <button type="button" class="tac-tag__remove" title="<?php print dol_escape_htmltag($langs->trans('Remove')); ?>" data-tag-remove>×</button>
                         </span>
                     <?php endforeach; ?>
                     <?php if (empty($ticketCategories)) : ?>
                         <span class="tac-tag tac-tag--empty"><?php print $langs->trans('NoneSelected'); ?></span>
                     <?php endif; ?>
                 </div>
-                <a class="tac-section__edit-link" href="<?php print dol_escape_htmltag($fullCardUrl); ?>">
-                    <i class="fas fa-pen"></i> <?php print $langs->trans('Modify'); ?>
-                </a>
+                <?php
+                // Render the "+ Add" chips for ticket categories not already assigned.
+                $unassigned = [];
+                foreach ($allTicketCategories as $cat) {
+                    $cid = (int) ($cat['rowid'] ?? 0);
+                    if ($cid > 0 && !in_array($cid, $assignedCategoryIds, true)) {
+                        $unassigned[] = $cat;
+                    }
+                }
+                if (!empty($unassigned)) : ?>
+                <div class="tac-tags-pool" data-tags-pool>
+                    <span class="tac-tags-pool__label"><i class="fas fa-plus"></i> <?php print $langs->trans('AddTag'); ?></span>
+                    <?php foreach ($unassigned as $cat) :
+                        $catColor = !empty($cat['color']) ? '#' . dol_escape_htmltag($cat['color']) : '';
+                        $bgStyle  = $catColor ? 'style="border-color:' . $catColor . ';"' : '';
+                        ?>
+                        <button type="button" class="tac-tag tac-tag--available" data-tag-add data-category-id="<?php print (int) $cat['rowid']; ?>" <?php print $bgStyle; ?>>
+                            + <?php print dol_escape_htmltag($cat['label']); ?>
+                        </button>
+                    <?php endforeach; ?>
+                </div>
+                <?php endif; ?>
             </section>
 
             <!-- Section: Linked accidents -->

@@ -3278,17 +3278,82 @@ textarea.action-textarea:not(:last-child) {
 }
 
 .tac-tag {
-  display: inline-block;
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
   padding: 4px 10px;
   border-radius: 999px;
   font-size: 0.85em;
   color: #1f2937;
   background: #e5e7eb;
+  font-family: inherit;
+  line-height: 1.2;
 }
 .tac-tag--empty {
   background: transparent;
   color: #6b7280;
   font-style: italic;
+}
+.tac-tag__remove {
+  appearance: none;
+  background: rgba(0, 0, 0, 0.12);
+  border: none;
+  border-radius: 50%;
+  width: 16px;
+  height: 16px;
+  padding: 0;
+  font-size: 13px;
+  line-height: 1;
+  cursor: pointer;
+  color: #1f2937;
+  margin-left: 2px;
+  opacity: 0;
+  transition: opacity 0.15s ease, background 0.15s ease;
+}
+.tac-tag__remove:hover {
+  background: rgba(0, 0, 0, 0.25);
+}
+.tac-tag--assigned:hover .tac-tag__remove {
+  opacity: 1;
+}
+
+.tac-tags-pool {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+  margin-top: 8px;
+  padding-top: 8px;
+  border-top: 1px dashed #e5e7eb;
+}
+.tac-tags-pool__label {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  font-size: 0.78em;
+  color: #6b7280;
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+  font-weight: 600;
+  margin-right: 6px;
+}
+
+.tac-tag--available {
+  appearance: none;
+  cursor: pointer;
+  background: #fff;
+  border: 1px dashed #e5e7eb;
+  color: #6b7280;
+  transition: background 0.15s ease, color 0.15s ease, border-color 0.15s ease, transform 0.15s ease;
+}
+.tac-tag--available:hover {
+  background: rgba(13, 138, 255, 0.08);
+  color: #0d8aff;
+  border-style: solid;
+  border-color: #0d8aff;
+  transform: translateY(-1px);
+}
+.tac-tag--available:active {
+  transform: translateY(0);
 }
 
 .tac-list {

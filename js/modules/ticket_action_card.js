@@ -160,6 +160,84 @@ window.digiriskdolibarr.ticketActionCard.event = function() {
     $(document).on('click', '.tac-section__show-btn',      window.digiriskdolibarr.ticketActionCard.onShowSection);
     $(document).on('click', '.tac-section__width-btn',     window.digiriskdolibarr.ticketActionCard.onWidthChange);
     $(document).on('click', '.tac-hero__density-btn',      window.digiriskdolibarr.ticketActionCard.onDensityChange);
+
+    // ---- Classification tags 1-click add/remove.
+    $(document).on('click', '[data-tag-add]',              window.digiriskdolibarr.ticketActionCard.onTagAdd);
+    $(document).on('click', '[data-tag-remove]',           window.digiriskdolibarr.ticketActionCard.onTagRemove);
+};
+
+/**
+ * Add a classification tag to the ticket in 1 click.
+ *
+ * @param  {MouseEvent} event
+ * @return {void}
+ */
+window.digiriskdolibarr.ticketActionCard.onTagAdd = function(event) {
+    event.preventDefault();
+    var $btn = $(this);
+    var catId = $btn.data('category-id');
+    if (!catId) {
+        return;
+    }
+    window.digiriskdolibarr.ticketActionCard.tagAjax('add_category', catId, $btn);
+};
+
+/**
+ * Remove a classification tag from the ticket in 1 click.
+ *
+ * @param  {MouseEvent} event
+ * @return {void}
+ */
+window.digiriskdolibarr.ticketActionCard.onTagRemove = function(event) {
+    event.preventDefault();
+    event.stopPropagation();
+    var $tag = $(this).closest('.tac-tag');
+    var catId = $tag.data('category-id');
+    if (!catId) {
+        return;
+    }
+    window.digiriskdolibarr.ticketActionCard.tagAjax('remove_category', catId, $tag);
+};
+
+/**
+ * Shared AJAX call for tag add/remove. Reloads the page on success so the
+ * available / assigned chip lists are rebuilt server-side (simpler than
+ * patching the DOM and keeping both pools in sync).
+ *
+ * @param  {string}  ajaxAction  'add_category' or 'remove_category'
+ * @param  {number}  catId
+ * @param  {jQuery}  $sourceEl
+ * @return {void}
+ */
+window.digiriskdolibarr.ticketActionCard.tagAjax = function(ajaxAction, catId, $sourceEl) {
+    var $card = $('.tac-card').first();
+    var ajaxUrl = $card.data('ajax-url');
+    var ticketId = $card.data('ticket-id');
+
+    $sourceEl.css('opacity', 0.5).prop('disabled', true);
+
+    $.ajax({
+        url: ajaxUrl,
+        method: 'POST',
+        dataType: 'json',
+        data: {
+            ticket_id: ticketId,
+            action: ajaxAction,
+            category_id: catId,
+            token: $('input[name="token"]').val() || ''
+        }
+    }).done(function(response) {
+        if (response && response.success) {
+            window.digiriskdolibarr.ticketActionCard.flash($card, response.message || 'OK', 'success');
+            setTimeout(function() { window.location.reload(); }, 500);
+        } else {
+            $sourceEl.css('opacity', 1).prop('disabled', false);
+            window.digiriskdolibarr.ticketActionCard.flash($card, (response && response.message) || 'Erreur', 'error');
+        }
+    }).fail(function() {
+        $sourceEl.css('opacity', 1).prop('disabled', false);
+        window.digiriskdolibarr.ticketActionCard.flash($card, 'Erreur réseau', 'error');
+    });
 };
 
 /**

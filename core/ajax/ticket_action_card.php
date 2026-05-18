@@ -153,6 +153,46 @@ switch ($action) {
         respond(false, $object->error ?: $langs->transnoentities('Error'));
 
     /*
+     * add_category / remove_category — 1-click tag toggle on the ticket. Uses Dolibarr's
+     * Categorie::add_type / del_type which mutate the llx_categorie_ticket link table.
+     */
+    case 'add_category':
+    case 'remove_category':
+        $categoryId = (int) GETPOST('category_id', 'int');
+        if ($categoryId <= 0) {
+            respond(false, $langs->transnoentities('ErrorBadParameters'));
+        }
+        require_once DOL_DOCUMENT_ROOT . '/categories/class/categorie.class.php';
+        $catObj = new Categorie($db);
+        if ($catObj->fetch($categoryId) <= 0) {
+            respond(false, $langs->transnoentities('RecordNotFound'));
+        }
+        // After fetch(), $catObj->type is the integer code from llx_categorie.type (12 for ticket).
+        // MAP_ID translates the symbolic name to that int — robust against future renumbering.
+        $expectedTicketTypeId = (int) ($catObj->MAP_ID['ticket'] ?? 12);
+        if ((int) $catObj->type !== $expectedTicketTypeId) {
+            respond(false, $langs->transnoentities('RecordNotFound'));
+        }
+        if ($action === 'add_category') {
+            $res = $catObj->add_type($object, 'ticket');
+            // add_type returns 1 on success, -3 if the link already exists. Treat both as OK.
+            $ok = ($res > 0 || $res === -3);
+            $msg = $langs->transnoentities('TagAdded');
+        } else {
+            $res = $catObj->del_type($object, 'ticket');
+            $ok = ($res > 0);
+            $msg = $langs->transnoentities('TagRemoved');
+        }
+        if (!$ok) {
+            respond(false, $catObj->error ?: ($langs->transnoentities('Error') . ' (' . (int) $res . ')'));
+        }
+        respond(true, $msg, [
+            'category_id' => $categoryId,
+            'label'       => $catObj->label,
+            'color'       => $catObj->color,
+        ]);
+
+    /*
      * reset_layout — wipe the user's saved layout so the page reverts to defaults.
      */
     case 'reset_layout':

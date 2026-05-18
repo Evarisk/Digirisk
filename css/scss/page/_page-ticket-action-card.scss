@@ -518,18 +518,88 @@ $tac-border:       #e5e7eb;
     gap: 6px;
 }
 .tac-tag {
-    display: inline-block;
+    display: inline-flex;
+    align-items: center;
+    gap: 4px;
     padding: 4px 10px;
     border-radius: 999px;
     font-size: 0.85em;
     color: #1f2937;
     background: #e5e7eb;
+    font-family: inherit;
+    line-height: 1.2;
 
     &--empty {
         background: transparent;
         color: $tac-grey;
         font-style: italic;
     }
+
+    // Remove (×) button — appears on hover on assigned tags.
+    &__remove {
+        appearance: none;
+        background: rgba(0, 0, 0, 0.12);
+        border: none;
+        border-radius: 50%;
+        width: 16px;
+        height: 16px;
+        padding: 0;
+        font-size: 13px;
+        line-height: 1;
+        cursor: pointer;
+        color: #1f2937;
+        margin-left: 2px;
+        opacity: 0;
+        transition: opacity 0.15s ease, background 0.15s ease;
+
+        &:hover { background: rgba(0, 0, 0, 0.25); }
+    }
+
+    &--assigned:hover .tac-tag__remove {
+        opacity: 1;
+    }
+}
+
+// Pool of available (unassigned) tags — rendered below the assigned ones.
+.tac-tags-pool {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 6px;
+    margin-top: 8px;
+    padding-top: 8px;
+    border-top: 1px dashed $tac-border;
+
+    &__label {
+        display: inline-flex;
+        align-items: center;
+        gap: 4px;
+        font-size: 0.78em;
+        color: $tac-grey;
+        text-transform: uppercase;
+        letter-spacing: 0.04em;
+        font-weight: 600;
+        margin-right: 6px;
+    }
+}
+
+// Available tag = clickable button. Outlined, becomes solid on hover.
+.tac-tag--available {
+    appearance: none;
+    cursor: pointer;
+    background: #fff;
+    border: 1px dashed $tac-border;
+    color: $tac-grey;
+    transition: background 0.15s ease, color 0.15s ease, border-color 0.15s ease, transform 0.15s ease;
+
+    &:hover {
+        background: rgba(13,138,255,0.08);
+        color: $tac-blue;
+        border-style: solid;
+        border-color: $tac-blue;
+        transform: translateY(-1px);
+    }
+
+    &:active { transform: translateY(0); }
 }
 
 // ----- List (Linked accidents) -----
