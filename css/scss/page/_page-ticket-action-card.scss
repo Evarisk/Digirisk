@@ -301,9 +301,10 @@ $tac-border:       #e5e7eb;
     align-items: center;
     gap: 12px;
 }
-// ----- Density / TagsMode toolbar in the hero (button groups) -----
+// ----- Density / TagsMode / ActionsMode toolbar in the hero (button groups) -----
 .tac-hero__density,
-.tac-hero__tagsmode {
+.tac-hero__tagsmode,
+.tac-hero__actionsmode {
     display: inline-flex;
     border: 1px solid $tac-border;
     border-radius: 6px;
@@ -359,10 +360,11 @@ $tac-border:       #e5e7eb;
     &:hover { background: darken($tac-blue, 5%); color: #fff; }
 }
 
-// Reset button and density/tagsmode toolbars are only shown while the edit mode is active.
+// Reset button and density/tagsmode/actionsmode toolbars are only shown while the edit mode is active.
 .tac-hero__reset,
 .tac-hero__density,
-.tac-hero__tagsmode { display: none; }
+.tac-hero__tagsmode,
+.tac-hero__actionsmode { display: none; }
 .tac-edit-mode .tac-hero__reset {
     display: inline-flex;
     color: $tac-red;
@@ -370,7 +372,88 @@ $tac-border:       #e5e7eb;
     &:hover { background: rgba(224,83,83,0.08); color: $tac-red; border-color: $tac-red; }
 }
 .tac-edit-mode .tac-hero__density,
-.tac-edit-mode .tac-hero__tagsmode { display: inline-flex; }
+.tac-edit-mode .tac-hero__tagsmode,
+.tac-edit-mode .tac-hero__actionsmode { display: inline-flex; }
+
+// ----- Kebab menu (⋮) — used when actionsMode === 'menu' -----
+.tac-sticky-bar--menu { justify-content: flex-end; }
+
+.tac-kebab {
+    position: relative;
+
+    &__trigger {
+        appearance: none;
+        background: #fff;
+        border: 1px solid $tac-border;
+        border-radius: 8px;
+        width: 40px;
+        height: 40px;
+        cursor: pointer;
+        color: $tac-grey;
+        font-size: 1.1em;
+        transition: background 0.15s ease, color 0.15s ease, border-color 0.15s ease;
+
+        &:hover { background: rgba(13,138,255,0.08); color: $tac-blue; border-color: $tac-blue; }
+    }
+
+    &__menu {
+        position: absolute;
+        bottom: calc(100% + 8px);
+        right: 0;
+        min-width: 240px;
+        background: #fff;
+        border: 1px solid $tac-border;
+        border-radius: 10px;
+        box-shadow: 0 8px 24px rgba(0,0,0,0.12);
+        padding: 6px;
+        display: none;
+        z-index: 100;
+    }
+
+    &.is-open .tac-kebab__menu { display: block; }
+    &.is-open .tac-kebab__trigger {
+        background: $tac-blue;
+        color: #fff;
+        border-color: $tac-blue;
+    }
+
+    &__item {
+        appearance: none;
+        display: flex;
+        align-items: center;
+        gap: 10px;
+        width: 100%;
+        padding: 8px 12px;
+        border: none;
+        background: transparent;
+        text-align: left;
+        text-decoration: none;
+        color: #1f2937;
+        font-family: inherit;
+        font-size: 0.95em;
+        border-radius: 6px;
+        cursor: pointer;
+        transition: background 0.12s ease;
+
+        i { width: 18px; text-align: center; }
+
+        &:hover { background: rgba(13,138,255,0.08); }
+
+        &.is-disabled,
+        &[disabled] { opacity: 0.4; pointer-events: none; }
+
+        &--green   { color: $tac-green; }
+        &--orange  { color: $tac-orange; }
+        &--red     { color: $tac-red; }
+        &--neutral { color: #1f2937; }
+    }
+
+    &__sep {
+        border: none;
+        border-top: 1px solid $tac-border;
+        margin: 6px 4px;
+    }
+}
 
 // ---------------------------------------------------------------------------
 // Density variants — adjust padding / gap / font-size on the card.

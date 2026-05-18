@@ -2956,7 +2956,8 @@ textarea.action-textarea:not(:last-child) {
 }
 
 .tac-hero__density,
-.tac-hero__tagsmode {
+.tac-hero__tagsmode,
+.tac-hero__actionsmode {
   display: inline-flex;
   border: 1px solid #e5e7eb;
   border-radius: 6px;
@@ -2964,7 +2965,8 @@ textarea.action-textarea:not(:last-child) {
   background: #fff;
 }
 .tac-hero__density-btn,
-.tac-hero__tagsmode-btn {
+.tac-hero__tagsmode-btn,
+.tac-hero__actionsmode-btn {
   appearance: none;
   background: transparent;
   border: none;
@@ -2977,21 +2979,25 @@ textarea.action-textarea:not(:last-child) {
   transition: background 0.15s ease, color 0.15s ease;
 }
 .tac-hero__density-btn:last-child,
-.tac-hero__tagsmode-btn:last-child {
+.tac-hero__tagsmode-btn:last-child,
+.tac-hero__actionsmode-btn:last-child {
   border-right: none;
 }
 .tac-hero__density-btn:hover,
-.tac-hero__tagsmode-btn:hover {
+.tac-hero__tagsmode-btn:hover,
+.tac-hero__actionsmode-btn:hover {
   background: rgba(13, 138, 255, 0.08);
   color: #0d8aff;
 }
 .tac-hero__density-btn.is-active,
-.tac-hero__tagsmode-btn.is-active {
+.tac-hero__tagsmode-btn.is-active,
+.tac-hero__actionsmode-btn.is-active {
   background: #0d8aff;
   color: #fff;
 }
 .tac-hero__density-btn.is-active:hover,
-.tac-hero__tagsmode-btn.is-active:hover {
+.tac-hero__tagsmode-btn.is-active:hover,
+.tac-hero__actionsmode-btn.is-active:hover {
   background: #007df3;
   color: #fff;
 }
@@ -3031,7 +3037,8 @@ textarea.action-textarea:not(:last-child) {
 
 .tac-hero__reset,
 .tac-hero__density,
-.tac-hero__tagsmode {
+.tac-hero__tagsmode,
+.tac-hero__actionsmode {
   display: none;
 }
 
@@ -3047,8 +3054,101 @@ textarea.action-textarea:not(:last-child) {
 }
 
 .tac-edit-mode .tac-hero__density,
-.tac-edit-mode .tac-hero__tagsmode {
+.tac-edit-mode .tac-hero__tagsmode,
+.tac-edit-mode .tac-hero__actionsmode {
   display: inline-flex;
+}
+
+.tac-sticky-bar--menu {
+  justify-content: flex-end;
+}
+
+.tac-kebab {
+  position: relative;
+}
+.tac-kebab__trigger {
+  appearance: none;
+  background: #fff;
+  border: 1px solid #e5e7eb;
+  border-radius: 8px;
+  width: 40px;
+  height: 40px;
+  cursor: pointer;
+  color: #6b7280;
+  font-size: 1.1em;
+  transition: background 0.15s ease, color 0.15s ease, border-color 0.15s ease;
+}
+.tac-kebab__trigger:hover {
+  background: rgba(13, 138, 255, 0.08);
+  color: #0d8aff;
+  border-color: #0d8aff;
+}
+.tac-kebab__menu {
+  position: absolute;
+  bottom: calc(100% + 8px);
+  right: 0;
+  min-width: 240px;
+  background: #fff;
+  border: 1px solid #e5e7eb;
+  border-radius: 10px;
+  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.12);
+  padding: 6px;
+  display: none;
+  z-index: 100;
+}
+.tac-kebab.is-open .tac-kebab__menu {
+  display: block;
+}
+.tac-kebab.is-open .tac-kebab__trigger {
+  background: #0d8aff;
+  color: #fff;
+  border-color: #0d8aff;
+}
+.tac-kebab__item {
+  appearance: none;
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  width: 100%;
+  padding: 8px 12px;
+  border: none;
+  background: transparent;
+  text-align: left;
+  text-decoration: none;
+  color: #1f2937;
+  font-family: inherit;
+  font-size: 0.95em;
+  border-radius: 6px;
+  cursor: pointer;
+  transition: background 0.12s ease;
+}
+.tac-kebab__item i {
+  width: 18px;
+  text-align: center;
+}
+.tac-kebab__item:hover {
+  background: rgba(13, 138, 255, 0.08);
+}
+.tac-kebab__item.is-disabled, .tac-kebab__item[disabled] {
+  opacity: 0.4;
+  pointer-events: none;
+}
+.tac-kebab__item--green {
+  color: #22bf4e;
+}
+.tac-kebab__item--orange {
+  color: #e9ad4f;
+}
+.tac-kebab__item--red {
+  color: #e05353;
+}
+.tac-kebab__item--neutral {
+  color: #1f2937;
+}
+.tac-kebab__sep {
+  border: none;
+  border-top: 1px solid #e5e7eb;
+  margin: 6px 4px;
 }
 
 .tac-density-compact .tac-body {

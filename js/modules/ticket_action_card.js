@@ -72,8 +72,9 @@ window.digiriskdolibarr.ticketActionCard.serializeLayout = function() {
     var $card = $('.tac-card').first();
     var layout = {
         v: 2,
-        density:  $card.attr('data-density')   || 'cozy',
-        tagsMode: $card.attr('data-tags-mode') || 'chips',
+        density:     $card.attr('data-density')      || 'cozy',
+        tagsMode:    $card.attr('data-tags-mode')    || 'chips',
+        actionsMode: $card.attr('data-actions-mode') || 'bar',
         sections: {},
     };
     $card.find('.tac-body .tac-section[data-section-id]').each(function(idx) {
@@ -216,11 +217,73 @@ window.digiriskdolibarr.ticketActionCard.event = function() {
     $(document).on('click', '.tac-section__width-btn',     window.digiriskdolibarr.ticketActionCard.onWidthChange);
     $(document).on('click', '.tac-hero__density-btn',      window.digiriskdolibarr.ticketActionCard.onDensityChange);
     $(document).on('click', '.tac-hero__tagsmode-btn',     window.digiriskdolibarr.ticketActionCard.onTagsModeChange);
+    $(document).on('click', '.tac-hero__actionsmode-btn',  window.digiriskdolibarr.ticketActionCard.onActionsModeChange);
 
     // ---- Classification tags 1-click add/remove.
     $(document).on('click',  '[data-tag-add]',             window.digiriskdolibarr.ticketActionCard.onTagAdd);
     $(document).on('click',  '[data-tag-remove]',          window.digiriskdolibarr.ticketActionCard.onTagRemove);
     $(document).on('change', '[data-tag-add-select]',      window.digiriskdolibarr.ticketActionCard.onTagAddSelect);
+
+    // ---- Kebab menu open/close + outside-click dismissal.
+    $(document).on('click', '[data-kebab-toggle]',         window.digiriskdolibarr.ticketActionCard.onKebabToggle);
+    $(document).on('click', function(e) {
+        // Close all open kebabs when the click is outside any open kebab.
+        if (!$(e.target).closest('[data-kebab]').length) {
+            $('[data-kebab].is-open').removeClass('is-open');
+        }
+    });
+    $(document).on('keydown', function(e) {
+        if (e.key === 'Escape') {
+            $('[data-kebab].is-open').removeClass('is-open');
+        }
+    });
+};
+
+/**
+ * Actions-mode switch (bar ↔ kebab menu). Saves + reloads since the bar / menu
+ * rendering is server-side conditional.
+ *
+ * @param  {MouseEvent} event
+ * @return {void}
+ */
+window.digiriskdolibarr.ticketActionCard.onActionsModeChange = function(event) {
+    event.stopPropagation();
+    var $btn  = $(this);
+    var mode  = $btn.data('actionsmode');
+    if (!mode) { return; }
+    var $card = $('.tac-card').first();
+    if (($card.attr('data-actions-mode') || 'bar') === mode) { return; }
+    $card.attr('data-actions-mode', mode);
+    $btn.closest('.tac-hero__actionsmode').find('.tac-hero__actionsmode-btn').removeClass('is-active');
+    $btn.addClass('is-active');
+
+    var layout = window.digiriskdolibarr.ticketActionCard.serializeLayout();
+    $.ajax({
+        url: $card.data('ajax-url'),
+        method: 'POST',
+        dataType: 'json',
+        data: {
+            ticket_id: $card.data('ticket-id'),
+            action: 'save_layout',
+            layout: JSON.stringify(layout),
+            token: $('input[name="token"]').val() || ''
+        }
+    }).done(function() { window.location.reload(); });
+};
+
+/**
+ * Open/close the kebab menu (⋮). Toggling is_open swaps visibility via CSS.
+ *
+ * @param  {MouseEvent} event
+ * @return {void}
+ */
+window.digiriskdolibarr.ticketActionCard.onKebabToggle = function(event) {
+    event.preventDefault();
+    event.stopPropagation();
+    var $kebab = $(this).closest('[data-kebab]');
+    // Close other open kebabs before opening this one.
+    $('[data-kebab].is-open').not($kebab).removeClass('is-open');
+    $kebab.toggleClass('is-open');
 };
 
 /**

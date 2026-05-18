@@ -197,10 +197,11 @@ if ($evtRes) {
 //   - "span" = span 4 (= 100% body width)
 // Default mimics the previous 2-col layout by interleaving left/right groups (full = half body).
 $defaultLayout = [
-    'v'        => 2,
-    'density'  => 'cozy',  // compact | cozy | spacious — drives padding/gap/font scale on .tac-card
-    'tagsMode' => 'chips', // chips | selector — Classification section UI for adding tags
-    'sections' => [
+    'v'           => 2,
+    'density'     => 'cozy',  // compact | cozy | spacious — drives padding/gap/font scale on .tac-card
+    'tagsMode'    => 'chips', // chips | selector — Classification section UI for adding tags
+    'actionsMode' => 'bar',   // bar | menu — sticky-bar buttons or single kebab (⋮) overflow menu
+    'sections'    => [
         // Interleaved L/R for an alternating 2-col visual.
         'identification'    => ['visible' => true, 'width' => 'full', 'order' => 0],
         'classification'    => ['visible' => true, 'width' => 'full', 'order' => 1],
@@ -226,6 +227,9 @@ if ($rawLayout) {
         }
         if (isset($decoded['tagsMode']) && in_array($decoded['tagsMode'], ['chips', 'selector'], true)) {
             $userLayout['tagsMode'] = $decoded['tagsMode'];
+        }
+        if (isset($decoded['actionsMode']) && in_array($decoded['actionsMode'], ['bar', 'menu'], true)) {
+            $userLayout['actionsMode'] = $decoded['actionsMode'];
         }
         if (isset($decoded['sections'])) {
             // Migration: old schema (v1) had a "column" field; we drop it but keep the rest.
@@ -321,7 +325,8 @@ $renderField = function (string $field, string $type, string $label, $value, str
      data-ajax-url="<?php print dol_escape_htmltag($ajaxUrl); ?>"
      data-layout="<?php print dol_escape_htmltag($layoutJson); ?>"
      data-density="<?php print dol_escape_htmltag($userLayout['density']); ?>"
-     data-tags-mode="<?php print dol_escape_htmltag($userLayout['tagsMode']); ?>">
+     data-tags-mode="<?php print dol_escape_htmltag($userLayout['tagsMode']); ?>"
+     data-actions-mode="<?php print dol_escape_htmltag($userLayout['actionsMode']); ?>">
     <input type="hidden" name="token" value="<?php print newToken(); ?>">
 
     <!-- ====== HERO HEADER ====== -->
@@ -348,6 +353,14 @@ $renderField = function (string $field, string $type, string $label, $value, str
                     </button>
                     <button type="button" class="tac-hero__tagsmode-btn<?php print $userLayout['tagsMode'] === 'selector' ? ' is-active' : ''; ?>" data-tagsmode="selector" title="<?php print dol_escape_htmltag($langs->trans('LayoutTagsModeSelector')); ?>">
                         <i class="fas fa-caret-square-down"></i>
+                    </button>
+                </span>
+                <span class="tac-hero__actionsmode" role="toolbar" aria-label="<?php print dol_escape_htmltag($langs->trans('LayoutActionsMode')); ?>">
+                    <button type="button" class="tac-hero__actionsmode-btn<?php print $userLayout['actionsMode'] === 'bar' ? ' is-active' : ''; ?>" data-actionsmode="bar" title="<?php print dol_escape_htmltag($langs->trans('LayoutActionsModeBar')); ?>">
+                        <i class="fas fa-grip-horizontal"></i>
+                    </button>
+                    <button type="button" class="tac-hero__actionsmode-btn<?php print $userLayout['actionsMode'] === 'menu' ? ' is-active' : ''; ?>" data-actionsmode="menu" title="<?php print dol_escape_htmltag($langs->trans('LayoutActionsModeMenu')); ?>">
+                        <i class="fas fa-ellipsis-v"></i>
                     </button>
                 </span>
                 <button type="button" class="tac-hero__reset" data-layout-reset title="<?php print dol_escape_htmltag($langs->trans('LayoutResetTitle')); ?>">
@@ -755,37 +768,89 @@ $renderField = function (string $field, string $type, string $label, $value, str
             </section>
     </div>
 
-    <!-- ====== STICKY ACTION BAR ====== -->
-    <div class="tac-sticky-bar">
-        <!-- Quick-creation actions: link out to Dolibarr screens with the ticket pre-linked. -->
-        <a class="tac-sticky-bar__btn tac-sticky-bar__btn--neutral" href="<?php print DOL_URL_ROOT . '/ticket/agenda.php?action=presend&mode=init&id=' . (int) $object->id; ?>">
-            <i class="fas fa-envelope"></i> <?php print $langs->trans('SendMail'); ?>
-        </a>
-        <a class="tac-sticky-bar__btn tac-sticky-bar__btn--neutral" href="<?php print DOL_URL_ROOT . '/ticket/messaging.php?action=presend&id=' . (int) $object->id; ?>">
-            <i class="fas fa-comment-dots"></i> <?php print $langs->trans('TicketAddMessage'); ?>
-        </a>
-        <a class="tac-sticky-bar__btn tac-sticky-bar__btn--neutral" href="<?php print dol_buildpath('/custom/digiriskdolibarr/view/accident/accident_card.php?action=create&fk_ticket=' . (int) $object->id, 1); ?>">
-            <i class="fas fa-exclamation-triangle"></i> <?php print $langs->trans('NewAccident'); ?>
-        </a>
-        <?php if (isModEnabled('intervention')) : ?>
-        <a class="tac-sticky-bar__btn tac-sticky-bar__btn--neutral" href="<?php print DOL_URL_ROOT . '/fichinter/card.php?action=create&origin=ticket&originid=' . (int) $object->id; ?>">
-            <i class="fas fa-wrench"></i> <?php print $langs->trans('CreateIntervention'); ?>
-        </a>
-        <?php endif; ?>
+    <!-- ====== STICKY ACTION BAR (bar mode) OR KEBAB MENU (menu mode) ====== -->
+    <?php
+    // Pre-compute the button list once. Each item: ['kind'=>'link'|'button', html-attrs..., 'label', 'icon', 'variant'].
+    $sendMailUrl   = DOL_URL_ROOT . '/ticket/agenda.php?action=presend&mode=init&id=' . (int) $object->id;
+    $addMsgUrl     = DOL_URL_ROOT . '/ticket/messaging.php?action=presend&id=' . (int) $object->id;
+    $newAccUrl     = dol_buildpath('/custom/digiriskdolibarr/view/accident/accident_card.php?action=create&fk_ticket=' . (int) $object->id, 1);
+    $newInterUrl   = DOL_URL_ROOT . '/fichinter/card.php?action=create&origin=ticket&originid=' . (int) $object->id;
 
-        <!-- Spacer pushes destructive group to the right. -->
-        <span class="tac-sticky-bar__spacer"></span>
+    $actionItems = [
+        ['kind' => 'link',   'href' => $sendMailUrl, 'icon' => 'fas fa-envelope',           'label' => $langs->trans('SendMail'),          'variant' => 'neutral', 'enabled' => true],
+        ['kind' => 'link',   'href' => $addMsgUrl,   'icon' => 'fas fa-comment-dots',       'label' => $langs->trans('TicketAddMessage'),  'variant' => 'neutral', 'enabled' => true],
+        ['kind' => 'link',   'href' => $newAccUrl,   'icon' => 'fas fa-exclamation-triangle','label' => $langs->trans('NewAccident'),      'variant' => 'neutral', 'enabled' => true],
+    ];
+    if (isModEnabled('intervention')) {
+        // Use Dolibarr core "AddIntervention" lang key (Créer intervention) — it's already shipped, no need for our own.
+        $langs->load('interventions');
+        $actionItems[] = ['kind' => 'link', 'href' => $newInterUrl, 'icon' => 'fas fa-wrench', 'label' => $langs->trans('AddIntervention'), 'variant' => 'neutral', 'enabled' => true];
+    }
+    // Spacer + destructive group (set_waiting / set_closed / set_cancelled).
+    $actionItems[] = ['kind' => 'spacer'];
+    $actionItems[] = ['kind' => 'button', 'action' => 'set_waiting',  'icon' => 'fas fa-pause-circle',  'label' => $langs->trans('TicketActionWaiting'), 'variant' => 'orange', 'enabled' => !$isClosed && $status !== Ticket::STATUS_WAITING];
+    $actionItems[] = ['kind' => 'button', 'action' => 'set_closed',   'icon' => 'fas fa-check-circle',  'label' => $langs->trans('TicketActionClose'),   'variant' => 'green',  'enabled' => !$isClosed, 'confirm' => 'TicketActionCloseConfirm'];
+    $actionItems[] = ['kind' => 'button', 'action' => 'set_cancelled','icon' => 'fas fa-times-circle',  'label' => $langs->trans('TicketActionCancel'),  'variant' => 'red',    'enabled' => !$isClosed, 'confirm' => 'TicketActionCancelConfirm'];
 
-        <button type="button" class="tac-sticky-bar__btn tac-sticky-bar__btn--orange ticket-action-tile" data-action="set_waiting" <?php print $isClosed || $status === Ticket::STATUS_WAITING ? 'disabled' : ''; ?>>
-            <i class="fas fa-pause-circle"></i> <?php print $langs->trans('TicketActionWaiting'); ?>
-        </button>
-        <button type="button" class="tac-sticky-bar__btn tac-sticky-bar__btn--green ticket-action-tile" data-action="set_closed" data-confirm="TicketActionCloseConfirm" <?php print $isClosed ? 'disabled' : ''; ?>>
-            <i class="fas fa-check-circle"></i> <?php print $langs->trans('TicketActionClose'); ?>
-        </button>
-        <button type="button" class="tac-sticky-bar__btn tac-sticky-bar__btn--red ticket-action-tile" data-action="set_cancelled" data-confirm="TicketActionCancelConfirm" <?php print $isClosed ? 'disabled' : ''; ?>>
-            <i class="fas fa-times-circle"></i> <?php print $langs->trans('TicketActionCancel'); ?>
-        </button>
-    </div>
+    if ($userLayout['actionsMode'] === 'menu') : ?>
+        <!-- Menu mode: a single kebab (⋮) button reveals all actions in a popup. -->
+        <div class="tac-sticky-bar tac-sticky-bar--menu">
+            <span class="tac-sticky-bar__spacer"></span>
+            <div class="tac-kebab" data-kebab>
+                <button type="button" class="tac-kebab__trigger" data-kebab-toggle title="<?php print dol_escape_htmltag($langs->trans('LayoutActionsModeMenu')); ?>">
+                    <i class="fas fa-ellipsis-v"></i>
+                </button>
+                <div class="tac-kebab__menu" data-kebab-menu>
+                    <?php foreach ($actionItems as $item) :
+                        if (($item['kind'] ?? '') === 'spacer') :
+                            ?><hr class="tac-kebab__sep"><?php
+                            continue;
+                        endif;
+                        $iconHtml = '<i class="' . dol_escape_htmltag($item['icon']) . '"></i>';
+                        $cls = 'tac-kebab__item tac-kebab__item--' . dol_escape_htmltag($item['variant']);
+                        if (empty($item['enabled'])) {
+                            $cls .= ' is-disabled';
+                        }
+                        if ($item['kind'] === 'link') : ?>
+                            <a class="<?php print $cls; ?>" href="<?php print dol_escape_htmltag($item['href']); ?>">
+                                <?php print $iconHtml; ?> <?php print dol_escape_htmltag($item['label']); ?>
+                            </a>
+                        <?php else : ?>
+                            <button type="button" class="<?php print $cls; ?> ticket-action-tile"
+                                    data-action="<?php print dol_escape_htmltag($item['action']); ?>"
+                                    <?php if (!empty($item['confirm'])) { print 'data-confirm="' . dol_escape_htmltag($item['confirm']) . '"'; } ?>
+                                    <?php if (empty($item['enabled'])) { print 'disabled'; } ?>>
+                                <?php print $iconHtml; ?> <?php print dol_escape_htmltag($item['label']); ?>
+                            </button>
+                        <?php endif; ?>
+                    <?php endforeach; ?>
+                </div>
+            </div>
+        </div>
+    <?php else : ?>
+        <div class="tac-sticky-bar">
+            <?php foreach ($actionItems as $item) :
+                if (($item['kind'] ?? '') === 'spacer') :
+                    ?><span class="tac-sticky-bar__spacer"></span><?php
+                    continue;
+                endif;
+                $iconHtml = '<i class="' . dol_escape_htmltag($item['icon']) . '"></i>';
+                $cls = 'tac-sticky-bar__btn tac-sticky-bar__btn--' . dol_escape_htmltag($item['variant']);
+                if ($item['kind'] === 'link') : ?>
+                    <a class="<?php print $cls; ?>" href="<?php print dol_escape_htmltag($item['href']); ?>">
+                        <?php print $iconHtml; ?> <?php print dol_escape_htmltag($item['label']); ?>
+                    </a>
+                <?php else : ?>
+                    <button type="button" class="<?php print $cls; ?> ticket-action-tile"
+                            data-action="<?php print dol_escape_htmltag($item['action']); ?>"
+                            <?php if (!empty($item['confirm'])) { print 'data-confirm="' . dol_escape_htmltag($item['confirm']) . '"'; } ?>
+                            <?php if (empty($item['enabled'])) { print 'disabled'; } ?>>
+                        <?php print $iconHtml; ?> <?php print dol_escape_htmltag($item['label']); ?>
+                    </button>
+                <?php endif; ?>
+            <?php endforeach; ?>
+        </div>
+    <?php endif; ?>
 
     <!-- Toast/feedback area populated by JS -->
     <div class="ticket-action-card__toast tac-toast" role="status" aria-live="polite"></div>
