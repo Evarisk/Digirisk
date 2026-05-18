@@ -1,3 +1,68 @@
+// Compact, modern look for the Digirisk-customised back-office ticket card.
+// Scoped to `mod-ticket.page-card` so it never leaks into other modules.
+// Issue #4443 — IHM ticket registre.
+.mod-ticket.page-card {
+
+    // --- Banner: smaller picto + tighter ref/author line ---
+    .arearef {
+        padding-top: 6px;
+        padding-bottom: 6px;
+    }
+    .photoref,
+    .photowithmargin {
+        max-width: 56px;
+        max-height: 56px;
+        padding: 2px;
+    }
+    .refidno {
+        margin-top: 2px;
+        font-size: 0.95em;
+        line-height: 1.4;
+    }
+
+    // --- Tabs row: slimmer ---
+    div.tabBar,
+    .tabsAction {
+        padding-top: 4px;
+        padding-bottom: 4px;
+    }
+    div.tabs .tab,
+    div.tabs .tabactive {
+        padding: 6px 12px;
+        font-size: 0.95em;
+    }
+
+    // --- Section headers (liste_titre/trforfield) in uppercase ---
+    // Matches the "REF. TÂCHE / LIBELLÉ / CLASSIFICATION" look from the mockup.
+    table.tableforfield {
+        tr.liste_titre.trforfield > td,
+        tr.liste_titre > td {
+            text-transform: uppercase;
+            letter-spacing: 0.02em;
+            font-size: 0.85em;
+            font-weight: 600;
+        }
+    }
+
+    // --- Tighter row padding inside the field tables ---
+    table.tableforfield td.titlefield,
+    table.tableforfield td.titlefieldmiddle,
+    table.tableforfield td.valuefield,
+    table.tableforfield td {
+        padding-top: 4px;
+        padding-bottom: 4px;
+    }
+
+    // --- Status action buttons: smaller pills ---
+    div.tabsAction a.butAction,
+    div.tabsAction a.butActionDelete,
+    div.tabsAction a.butActionRefused {
+        padding: 4px 10px;
+        margin: 2px 4px;
+        font-size: 0.9em;
+    }
+}
+
 .ticketpublicarea {
   .ticket-parentCategory {
     width: 100%;

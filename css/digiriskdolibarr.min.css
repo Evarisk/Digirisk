@@ -233,6 +233,7 @@
 /** Content */
 .page-ut-gp-list .side-nav .workunit-list {
   padding-left: 0;
+  /** Toggle */
 }
 .page-ut-gp-list .side-nav .workunit-list ul, .page-ut-gp-list .side-nav .workunit-list li {
   list-style-type: none;
@@ -342,9 +343,6 @@
 .page-ut-gp-list .side-nav .workunit-list .unit.type-workunit .unit-container .ref {
   background: #0d8aff;
 }
-.page-ut-gp-list .side-nav .workunit-list {
-  /** Toggle */
-}
 .page-ut-gp-list .side-nav .workunit-list .unit.toggled > .sub-list {
   display: block;
 }
@@ -367,6 +365,53 @@
   width: 100%;
   height: auto;
   border: 1px solid rgba(0, 0, 0, 0.4) !important;
+}
+
+.mod-ticket.page-card .arearef {
+  padding-top: 6px;
+  padding-bottom: 6px;
+}
+.mod-ticket.page-card .photoref,
+.mod-ticket.page-card .photowithmargin {
+  max-width: 56px;
+  max-height: 56px;
+  padding: 2px;
+}
+.mod-ticket.page-card .refidno {
+  margin-top: 2px;
+  font-size: 0.95em;
+  line-height: 1.4;
+}
+.mod-ticket.page-card div.tabBar,
+.mod-ticket.page-card .tabsAction {
+  padding-top: 4px;
+  padding-bottom: 4px;
+}
+.mod-ticket.page-card div.tabs .tab,
+.mod-ticket.page-card div.tabs .tabactive {
+  padding: 6px 12px;
+  font-size: 0.95em;
+}
+.mod-ticket.page-card table.tableforfield tr.liste_titre.trforfield > td,
+.mod-ticket.page-card table.tableforfield tr.liste_titre > td {
+  text-transform: uppercase;
+  letter-spacing: 0.02em;
+  font-size: 0.85em;
+  font-weight: 600;
+}
+.mod-ticket.page-card table.tableforfield td.titlefield,
+.mod-ticket.page-card table.tableforfield td.titlefieldmiddle,
+.mod-ticket.page-card table.tableforfield td.valuefield,
+.mod-ticket.page-card table.tableforfield td {
+  padding-top: 4px;
+  padding-bottom: 4px;
+}
+.mod-ticket.page-card div.tabsAction a.butAction,
+.mod-ticket.page-card div.tabsAction a.butActionDelete,
+.mod-ticket.page-card div.tabsAction a.butActionRefused {
+  padding: 4px 10px;
+  margin: 2px 4px;
+  font-size: 0.9em;
 }
 
 .ticketpublicarea .ticket-parentCategory {
@@ -992,7 +1037,7 @@ li.route .row-container .actions a:hover {
   pointer-events: none;
 }
 .save-organization:hover {
-  background: rgb(0, 112.0867768595, 217);
+  background: #0070d9;
   box-shadow: 0 6px 20px rgba(13, 138, 255, 0.5);
   transform: scale(1.1);
 }
@@ -3062,13 +3107,13 @@ td > .risk-evaluation-list-content .risk-evaluation-container:not(.advanced, .st
   background: #0d8aff;
 }
 .wpeo-table.evaluation-method .table-row:not(.header) .table-cell:nth-of-type(3).active::after {
-  background: rgb(0, 98.9152892562, 191.5);
+  background: #0063c0;
 }
 .wpeo-table.evaluation-method .table-row:not(.header) .table-cell:nth-of-type(4).active::after {
-  background: rgb(0, 59.4008264463, 115);
+  background: #003b73;
 }
 .wpeo-table.evaluation-method .table-row:not(.header) .table-cell:nth-of-type(5).active::after {
-  background: rgb(0, 19.8863636364, 38.5);
+  background: #001427;
 }
 .wpeo-table.evaluation-method .table-row:not(.header) .table-cell:nth-of-type(6).active::after {
   background: black;
@@ -3842,7 +3887,7 @@ td > .risk-evaluation-list-content .risk-evaluation-container:not(.advanced, .st
   }
   #id-container.page-ut-gp-list .side-nav .side-nav-responsive:hover {
     cursor: pointer;
-    background: rgb(67.8153846154, 107.0769230769, 164.1846153846);
+    background: #446ba4;
   }
   #id-container.page-ut-gp-list .side-nav #id-left {
     position: absolute;
