@@ -62,16 +62,16 @@ $param    = GETPOST('param', 'alpha');
 
 // Permission gate — all writes require ticket->write + digiriskdolibarr->lire.
 if ( ! ($user->hasRight('ticket', 'write') && $user->hasRight('digiriskdolibarr', 'lire'))) {
-    respond(false, $langs->trans('NotEnoughPermissions'));
+    respond(false, $langs->transnoentities('NotEnoughPermissions'));
 }
 
 if ($ticketId <= 0 || empty($action)) {
-    respond(false, $langs->trans('ErrorBadParameters'));
+    respond(false, $langs->transnoentities('ErrorBadParameters'));
 }
 
 $object = new Ticket($db);
 if ($object->fetch($ticketId) <= 0 || $object->id <= 0) {
-    respond(false, $langs->trans('RecordNotFound'));
+    respond(false, $langs->transnoentities('RecordNotFound'));
 }
 
 /**
@@ -103,42 +103,42 @@ switch ($action) {
         $res = $object->markAsRead($user);
         if ($res > 0) {
             $object->fetch($ticketId);
-            respond(true, $langs->trans('TicketActionMarkedRead'), $buildPayload($object));
+            respond(true, $langs->transnoentities('TicketActionMarkedRead'), $buildPayload($object));
         }
-        respond(false, $object->error ?: $langs->trans('Error'));
+        respond(false, $object->error ?: $langs->transnoentities('Error'));
         // no break — respond() exits.
 
     case 'set_progress':
         $res = $object->setStatut(Ticket::STATUS_IN_PROGRESS, null, '', 'TICKET_MODIFY');
         if ($res > 0) {
             $object->fetch($ticketId);
-            respond(true, $langs->trans('TicketActionInProgressDone'), $buildPayload($object));
+            respond(true, $langs->transnoentities('TicketActionInProgressDone'), $buildPayload($object));
         }
-        respond(false, $object->error ?: $langs->trans('Error'));
+        respond(false, $object->error ?: $langs->transnoentities('Error'));
 
     case 'set_waiting':
         $res = $object->setStatut(Ticket::STATUS_WAITING, null, '', 'TICKET_MODIFY');
         if ($res > 0) {
             $object->fetch($ticketId);
-            respond(true, $langs->trans('TicketActionWaitingDone'), $buildPayload($object));
+            respond(true, $langs->transnoentities('TicketActionWaitingDone'), $buildPayload($object));
         }
-        respond(false, $object->error ?: $langs->trans('Error'));
+        respond(false, $object->error ?: $langs->transnoentities('Error'));
 
     case 'set_closed':
         $res = $object->setStatut(Ticket::STATUS_CLOSED, null, '', 'TICKET_MODIFY');
         if ($res > 0) {
             $object->fetch($ticketId);
-            respond(true, $langs->trans('TicketActionClosedDone'), $buildPayload($object));
+            respond(true, $langs->transnoentities('TicketActionClosedDone'), $buildPayload($object));
         }
-        respond(false, $object->error ?: $langs->trans('Error'));
+        respond(false, $object->error ?: $langs->transnoentities('Error'));
 
     case 'set_cancelled':
         $res = $object->setStatut(Ticket::STATUS_CANCELED, null, '', 'TICKET_MODIFY');
         if ($res > 0) {
             $object->fetch($ticketId);
-            respond(true, $langs->trans('TicketActionCancelledDone'), $buildPayload($object));
+            respond(true, $langs->transnoentities('TicketActionCancelledDone'), $buildPayload($object));
         }
-        respond(false, $object->error ?: $langs->trans('Error'));
+        respond(false, $object->error ?: $langs->transnoentities('Error'));
 
     case 'assign_self':
         $res = $object->assignUser($user, (int) $user->id, 1);
@@ -148,9 +148,9 @@ switch ($action) {
                 $object->setStatut(Ticket::STATUS_ASSIGNED, null, '', 'TICKET_MODIFY');
             }
             $object->fetch($ticketId);
-            respond(true, $langs->trans('TicketActionAssignedSelfDone'), $buildPayload($object));
+            respond(true, $langs->transnoentities('TicketActionAssignedSelfDone'), $buildPayload($object));
         }
-        respond(false, $object->error ?: $langs->trans('Error'));
+        respond(false, $object->error ?: $langs->transnoentities('Error'));
 
     /*
      * reset_layout — wipe the user's saved layout so the page reverts to defaults.
@@ -164,7 +164,7 @@ switch ($action) {
         if (!$ok) {
             respond(false, $db->lasterror() ?: 'ResetFailed');
         }
-        respond(true, $langs->trans('LayoutReset'));
+        respond(true, $langs->transnoentities('LayoutReset'));
 
     /*
      * save_layout — per-user persistence of the card layout (visible/width/order
@@ -175,7 +175,7 @@ switch ($action) {
         $layoutRaw = GETPOST('layout', 'restricthtml');
         $decoded = json_decode((string) $layoutRaw, true);
         if (!is_array($decoded)) {
-            respond(false, $langs->trans('ErrorBadParameters'));
+            respond(false, $langs->transnoentities('ErrorBadParameters'));
         }
         // Re-encode to canonicalize and strip anything unexpected.
         // Schema v2: { visible, width, order } per section — single flat grid, no column field.
@@ -203,12 +203,12 @@ switch ($action) {
         if (!$ok) {
             respond(false, $db->lasterror() ?: 'SaveFailed');
         }
-        respond(true, $langs->trans('LayoutSaved'), ['layout' => $sanitized]);
+        respond(true, $langs->transnoentities('LayoutSaved'), ['layout' => $sanitized]);
 
     case 'assign_other':
         $userIdToAssign = (int) $param;
         if ($userIdToAssign <= 0) {
-            respond(false, $langs->trans('ErrorBadParameters'));
+            respond(false, $langs->transnoentities('ErrorBadParameters'));
         }
         $res = $object->assignUser($user, $userIdToAssign, 1);
         if ($res > 0) {
@@ -216,9 +216,9 @@ switch ($action) {
                 $object->setStatut(Ticket::STATUS_ASSIGNED, null, '', 'TICKET_MODIFY');
             }
             $object->fetch($ticketId);
-            respond(true, $langs->trans('TicketActionAssignedOtherDone'), $buildPayload($object));
+            respond(true, $langs->transnoentities('TicketActionAssignedOtherDone'), $buildPayload($object));
         }
-        respond(false, $object->error ?: $langs->trans('Error'));
+        respond(false, $object->error ?: $langs->transnoentities('Error'));
 
     /*
      * update_field — generic tap-to-edit dispatcher used by the reworked card.
@@ -233,11 +233,11 @@ switch ($action) {
         $field = GETPOST('field', 'aZ09');
         $rawValue = GETPOST('value', 'restricthtml');
         if ($field === '') {
-            respond(false, $langs->trans('ErrorBadParameters'));
+            respond(false, $langs->transnoentities('ErrorBadParameters'));
         }
 
         $display = '';
-        $msg     = $langs->trans('Saved');
+        $msg     = $langs->transnoentities('Saved');
 
         if ($field === 'subject') {
             $object->subject = trim((string) $rawValue);
@@ -319,11 +319,11 @@ switch ($action) {
                 $display = dol_escape_htmltag((string) $valueToStore);
             }
         } else {
-            respond(false, $langs->trans('UnknownFieldToUpdate', $field));
+            respond(false, $langs->transnoentities('UnknownFieldToUpdate', $field));
         }
 
         if (!$res) {
-            respond(false, $object->error ?: $langs->trans('Error'));
+            respond(false, $object->error ?: $langs->transnoentities('Error'));
         }
 
         $payload = $buildPayload($object);
@@ -332,5 +332,5 @@ switch ($action) {
         respond(true, $msg, $payload);
 
     default:
-        respond(false, $langs->trans('ErrorBadParameters'));
+        respond(false, $langs->transnoentities('ErrorBadParameters'));
 }
