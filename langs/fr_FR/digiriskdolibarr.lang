@@ -1707,3 +1707,33 @@ ActionPlanTaskTagAdded             = Tag ajouté : %s
 ActionPlanTaskTagRemoved           = Tag retiré : ID %s
 ActionPlanTaskDateStartChanged     = Date début modifiée : %s → %s
 ActionPlanTaskDateEndChanged       = Date fin modifiée : %s → %s
+
+# ===========================================================================
+# Ticket action card — issue #4443 (1-click tile UI)
+# ===========================================================================
+TicketActionCard                     = Action ticket
+TicketActionCardPickerIntro          = Sélectionnez un ticket pour effectuer une action rapide en 1 clic.
+TicketActionCardStatusSection        = Statut
+TicketActionCardAssignSection        = Affectation
+TicketActionCardContentSection       = Contenu
+TicketActionCardDangerSection        = Zone sensible
+TicketActionMarkRead                 = Marquer comme lu
+TicketActionInProgress               = Mettre en cours
+TicketActionWaiting                  = Mettre en attente
+TicketActionClose                    = Clôturer
+TicketActionCancel                   = Annuler ticket
+TicketActionAssignSelf               = M'assigner
+TicketActionAssignOther              = Assigner à...
+TicketActionAddMessage               = Ajouter un message
+TicketActionLinkAccident             = Lier un accident
+TicketActionOpenFull                 = Détails complets
+TicketActionMarkedRead               = Ticket marqué comme lu
+TicketActionInProgressDone           = Ticket passé en cours
+TicketActionWaitingDone              = Ticket mis en attente
+TicketActionClosedDone               = Ticket clôturé
+TicketActionCancelledDone            = Ticket annulé
+TicketActionAssignedSelfDone         = Ticket assigné à vous
+TicketActionAssignedOtherDone        = Ticket assigné
+TicketActionCloseConfirm             = Confirmer la clôture
+TicketActionCancelConfirm            = Confirmer l'annulation
+

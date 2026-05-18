@@ -233,6 +233,7 @@
 /** Content */
 .page-ut-gp-list .side-nav .workunit-list {
   padding-left: 0;
+  /** Toggle */
 }
 .page-ut-gp-list .side-nav .workunit-list ul, .page-ut-gp-list .side-nav .workunit-list li {
   list-style-type: none;
@@ -341,9 +342,6 @@
 }
 .page-ut-gp-list .side-nav .workunit-list .unit.type-workunit .unit-container .ref {
   background: #0d8aff;
-}
-.page-ut-gp-list .side-nav .workunit-list {
-  /** Toggle */
 }
 .page-ut-gp-list .side-nav .workunit-list .unit.toggled > .sub-list {
   display: block;
@@ -992,7 +990,7 @@ li.route .row-container .actions a:hover {
   pointer-events: none;
 }
 .save-organization:hover {
-  background: rgb(0, 112.0867768595, 217);
+  background: #0070d9;
   box-shadow: 0 6px 20px rgba(13, 138, 255, 0.5);
   transform: scale(1.1);
 }
@@ -2660,6 +2658,304 @@ textarea.action-textarea:not(:last-child) {
   opacity: 1;
 }
 
+.ticket-action-picker {
+  margin: 1em 0;
+}
+.ticket-action-picker-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(260px, 1fr));
+  gap: 12px;
+  margin-top: 1em;
+}
+.ticket-action-picker-item {
+  display: block;
+  padding: 14px 16px;
+  background: #fff;
+  border: 1px solid #e5e7eb;
+  border-radius: 10px;
+  box-shadow: 0 2px 6px rgba(0, 0, 0, 0.06);
+  text-decoration: none;
+  color: inherit;
+  transition: transform 0.18s ease, box-shadow 0.18s ease, border-color 0.18s ease;
+}
+.ticket-action-picker-item:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.12);
+  border-color: #0d8aff;
+}
+.ticket-action-picker-item__ref {
+  font-weight: 700;
+  color: #0d8aff;
+  font-size: 1.05em;
+}
+.ticket-action-picker-item__subject {
+  margin-top: 4px;
+  color: #1f2937;
+  line-height: 1.35;
+}
+.ticket-action-picker-item__status {
+  margin-top: 8px;
+}
+
+.ticket-action-card {
+  max-width: 1100px;
+  margin: 1em auto;
+  background: #fff;
+  border-radius: 12px;
+  box-shadow: 0 2px 6px rgba(0, 0, 0, 0.06);
+  overflow: hidden;
+}
+.ticket-action-card__header {
+  padding: 16px 20px;
+  border-bottom: 1px solid #e5e7eb;
+  background: linear-gradient(135deg, #f9fafb 0%, #ffffff 100%);
+}
+.ticket-action-card__back {
+  margin-bottom: 8px;
+}
+.ticket-action-card__back-link {
+  color: #6b7280;
+  text-decoration: none;
+  font-size: 0.9em;
+}
+.ticket-action-card__back-link:hover {
+  color: #0d8aff;
+}
+.ticket-action-card__title {
+  margin-bottom: 8px;
+}
+.ticket-action-card__ref {
+  font-size: 1.4em;
+  font-weight: 700;
+  color: #0d8aff;
+}
+.ticket-action-card__subject {
+  font-size: 1.05em;
+  color: #1f2937;
+  margin-top: 4px;
+  line-height: 1.35;
+}
+.ticket-action-card__meta {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 10px 16px;
+  margin-top: 8px;
+  font-size: 0.92em;
+}
+.ticket-action-card__meta-item {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  color: #374151;
+}
+.ticket-action-card__meta-item i {
+  color: #6b7280;
+}
+.ticket-action-card__status {
+  font-weight: 600;
+}
+.ticket-action-card__body {
+  padding: 20px;
+}
+.ticket-action-card__section {
+  margin-bottom: 24px;
+}
+.ticket-action-card__section:last-child {
+  margin-bottom: 0;
+}
+.ticket-action-card__section--danger {
+  padding-top: 12px;
+  border-top: 1px dashed #e5e7eb;
+}
+.ticket-action-card__section-title {
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+  font-size: 0.78em;
+  font-weight: 700;
+  color: #6b7280;
+  margin: 0 0 10px 2px;
+}
+.ticket-action-card__tiles {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(148px, 1fr));
+  gap: 12px;
+}
+.ticket-action-card__toast {
+  margin: 16px 20px;
+  padding: 10px 14px;
+  border-radius: 8px;
+  font-size: 0.95em;
+  min-height: 0;
+  transition: all 0.25s ease;
+}
+.ticket-action-card__toast:empty {
+  display: none;
+}
+.ticket-action-card__toast.is-success {
+  background: rgba(34, 191, 78, 0.12);
+  color: #14712e;
+  border: 1px solid rgba(34, 191, 78, 0.4);
+}
+.ticket-action-card__toast.is-error {
+  background: rgba(224, 83, 83, 0.12);
+  color: #d02626;
+  border: 1px solid rgba(224, 83, 83, 0.4);
+}
+
+.ticket-action-tile {
+  appearance: none;
+  background: #fff;
+  border: 2px solid transparent;
+  border-radius: 14px;
+  box-shadow: 0 2px 6px rgba(0, 0, 0, 0.06);
+  padding: 18px 10px;
+  min-height: 148px;
+  cursor: pointer;
+  transition: transform 0.18s ease, box-shadow 0.18s ease, background 0.18s ease, border-color 0.18s ease;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  text-align: center;
+  color: #1f2937;
+  font-weight: 600;
+  font-size: 0.95em;
+  line-height: 1.25;
+  font-family: inherit;
+}
+.ticket-action-tile:hover {
+  transform: translateY(-3px);
+  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.12);
+}
+.ticket-action-tile:active {
+  transform: translateY(-1px);
+}
+.ticket-action-tile__icon {
+  font-size: 2em;
+  margin-bottom: 10px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 56px;
+  height: 56px;
+  border-radius: 50%;
+  background: #f3f4f6;
+  transition: background 0.18s ease, color 0.18s ease;
+}
+.ticket-action-tile__label {
+  display: block;
+  max-width: 100%;
+  word-break: keep-all;
+}
+.ticket-action-tile--blue .ticket-action-tile__icon {
+  background: rgba(13, 138, 255, 0.12);
+  color: #0d8aff;
+}
+.ticket-action-tile--blue:hover {
+  border-color: #0d8aff;
+}
+.ticket-action-tile--green .ticket-action-tile__icon {
+  background: rgba(34, 191, 78, 0.14);
+  color: #22bf4e;
+}
+.ticket-action-tile--green:hover {
+  border-color: #22bf4e;
+}
+.ticket-action-tile--orange .ticket-action-tile__icon {
+  background: rgba(233, 173, 79, 0.18);
+  color: #e9ad4f;
+}
+.ticket-action-tile--orange:hover {
+  border-color: #e9ad4f;
+}
+.ticket-action-tile--purple .ticket-action-tile__icon {
+  background: rgba(122, 92, 240, 0.14);
+  color: #7a5cf0;
+}
+.ticket-action-tile--purple:hover {
+  border-color: #7a5cf0;
+}
+.ticket-action-tile--red .ticket-action-tile__icon {
+  background: rgba(224, 83, 83, 0.14);
+  color: #e05353;
+}
+.ticket-action-tile--red:hover {
+  border-color: #e05353;
+}
+.ticket-action-tile--grey .ticket-action-tile__icon {
+  background: rgba(107, 114, 128, 0.12);
+  color: #6b7280;
+}
+.ticket-action-tile--grey:hover {
+  border-color: #6b7280;
+}
+.ticket-action-tile--disabled {
+  opacity: 0.4;
+  cursor: not-allowed;
+}
+.ticket-action-tile--disabled:hover {
+  transform: none;
+  box-shadow: 0 2px 6px rgba(0, 0, 0, 0.06);
+}
+.ticket-action-tile--armed {
+  background: rgba(224, 83, 83, 0.08);
+  border-color: #e05353;
+  animation: ticket-action-tile-pulse 1.2s ease-in-out infinite;
+}
+.ticket-action-tile--armed .ticket-action-tile__label {
+  color: #e05353;
+}
+.ticket-action-tile--loading {
+  pointer-events: none;
+  position: relative;
+}
+.ticket-action-tile--loading::after {
+  content: "";
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  width: 22px;
+  height: 22px;
+  margin: -11px 0 0 -11px;
+  border: 3px solid rgba(13, 138, 255, 0.18);
+  border-top-color: #0d8aff;
+  border-radius: 50%;
+  animation: ticket-action-tile-spin 0.8s linear infinite;
+}
+.ticket-action-tile--loading .ticket-action-tile__icon,
+.ticket-action-tile--loading .ticket-action-tile__label {
+  visibility: hidden;
+}
+
+@keyframes ticket-action-tile-pulse {
+  0%, 100% {
+    box-shadow: 0 0 0 0 rgba(224, 83, 83, 0.4);
+  }
+  50% {
+    box-shadow: 0 0 0 8px rgba(224, 83, 83, 0);
+  }
+}
+@keyframes ticket-action-tile-spin {
+  to {
+    transform: rotate(360deg);
+  }
+}
+@media (max-width: 480px) {
+  .ticket-action-card__tiles {
+    grid-template-columns: repeat(2, 1fr);
+  }
+  .ticket-action-tile {
+    min-height: 110px;
+    padding: 12px 6px;
+    font-size: 0.85em;
+  }
+  .ticket-action-tile__icon {
+    width: 44px;
+    height: 44px;
+    font-size: 1.5em;
+    margin-bottom: 6px;
+  }
+}
 /** Cell header */
 .table-cell-header {
   display: flex;
@@ -3062,13 +3358,13 @@ td > .risk-evaluation-list-content .risk-evaluation-container:not(.advanced, .st
   background: #0d8aff;
 }
 .wpeo-table.evaluation-method .table-row:not(.header) .table-cell:nth-of-type(3).active::after {
-  background: rgb(0, 98.9152892562, 191.5);
+  background: #0063c0;
 }
 .wpeo-table.evaluation-method .table-row:not(.header) .table-cell:nth-of-type(4).active::after {
-  background: rgb(0, 59.4008264463, 115);
+  background: #003b73;
 }
 .wpeo-table.evaluation-method .table-row:not(.header) .table-cell:nth-of-type(5).active::after {
-  background: rgb(0, 19.8863636364, 38.5);
+  background: #001427;
 }
 .wpeo-table.evaluation-method .table-row:not(.header) .table-cell:nth-of-type(6).active::after {
   background: black;
@@ -3842,7 +4138,7 @@ td > .risk-evaluation-list-content .risk-evaluation-container:not(.advanced, .st
   }
   #id-container.page-ut-gp-list .side-nav .side-nav-responsive:hover {
     cursor: pointer;
-    background: rgb(67.8153846154, 107.0769230769, 164.1846153846);
+    background: #446ba4;
   }
   #id-container.page-ut-gp-list .side-nav #id-left {
     position: absolute;

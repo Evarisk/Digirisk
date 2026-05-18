@@ -1,0 +1,348 @@
+// 1-click ticket action card (issue #4443) — big tile UI for fast ticket handling.
+//
+// Scoped under `.ticket-action-card` and `.ticket-action-picker` so the styles
+// only apply when the dedicated view is rendered.
+
+$tile-size:        148px;
+$tile-radius:      14px;
+$tile-shadow:      0 2px 6px rgba(0, 0, 0, 0.06);
+$tile-shadow-hov:  0 8px 24px rgba(0, 0, 0, 0.12);
+$tile-blue:        #0d8aff;
+$tile-green:       #22bf4e;
+$tile-orange:      #e9ad4f;
+$tile-purple:      #7a5cf0;
+$tile-red:         #e05353;
+$tile-grey:        #6b7280;
+
+// ---------------------------------------------------------------------------
+// Picker view (shown when no ticket id is in the URL).
+// ---------------------------------------------------------------------------
+.ticket-action-picker {
+    margin: 1em 0;
+
+    &-grid {
+        display: grid;
+        grid-template-columns: repeat(auto-fill, minmax(260px, 1fr));
+        gap: 12px;
+        margin-top: 1em;
+    }
+
+    &-item {
+        display: block;
+        padding: 14px 16px;
+        background: #fff;
+        border: 1px solid #e5e7eb;
+        border-radius: 10px;
+        box-shadow: $tile-shadow;
+        text-decoration: none;
+        color: inherit;
+        transition: transform 0.18s ease, box-shadow 0.18s ease, border-color 0.18s ease;
+
+        &:hover {
+            transform: translateY(-2px);
+            box-shadow: $tile-shadow-hov;
+            border-color: $tile-blue;
+        }
+
+        &__ref {
+            font-weight: 700;
+            color: $tile-blue;
+            font-size: 1.05em;
+        }
+
+        &__subject {
+            margin-top: 4px;
+            color: #1f2937;
+            line-height: 1.35;
+        }
+
+        &__status {
+            margin-top: 8px;
+        }
+    }
+}
+
+// ---------------------------------------------------------------------------
+// Action card layout.
+// ---------------------------------------------------------------------------
+.ticket-action-card {
+    max-width: 1100px;
+    margin: 1em auto;
+    background: #fff;
+    border-radius: 12px;
+    box-shadow: $tile-shadow;
+    overflow: hidden;
+
+    &__header {
+        padding: 16px 20px;
+        border-bottom: 1px solid #e5e7eb;
+        background: linear-gradient(135deg, #f9fafb 0%, #ffffff 100%);
+    }
+
+    &__back {
+        margin-bottom: 8px;
+    }
+
+    &__back-link {
+        color: $tile-grey;
+        text-decoration: none;
+        font-size: 0.9em;
+
+        &:hover {
+            color: $tile-blue;
+        }
+    }
+
+    &__title {
+        margin-bottom: 8px;
+    }
+
+    &__ref {
+        font-size: 1.4em;
+        font-weight: 700;
+        color: $tile-blue;
+    }
+
+    &__subject {
+        font-size: 1.05em;
+        color: #1f2937;
+        margin-top: 4px;
+        line-height: 1.35;
+    }
+
+    &__meta {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 10px 16px;
+        margin-top: 8px;
+        font-size: 0.92em;
+    }
+
+    &__meta-item {
+        display: inline-flex;
+        align-items: center;
+        gap: 6px;
+        color: #374151;
+
+        i {
+            color: $tile-grey;
+        }
+    }
+
+    &__status {
+        font-weight: 600;
+    }
+
+    &__body {
+        padding: 20px;
+    }
+
+    &__section {
+        margin-bottom: 24px;
+
+        &:last-child {
+            margin-bottom: 0;
+        }
+
+        &--danger {
+            padding-top: 12px;
+            border-top: 1px dashed #e5e7eb;
+        }
+    }
+
+    &__section-title {
+        text-transform: uppercase;
+        letter-spacing: 0.04em;
+        font-size: 0.78em;
+        font-weight: 700;
+        color: $tile-grey;
+        margin: 0 0 10px 2px;
+    }
+
+    &__tiles {
+        display: grid;
+        grid-template-columns: repeat(auto-fill, minmax($tile-size, 1fr));
+        gap: 12px;
+    }
+
+    &__toast {
+        margin: 16px 20px;
+        padding: 10px 14px;
+        border-radius: 8px;
+        font-size: 0.95em;
+        min-height: 0;
+        transition: all 0.25s ease;
+
+        &:empty {
+            display: none;
+        }
+
+        &.is-success {
+            background: rgba(34, 191, 78, 0.12);
+            color: darken($tile-green, 18%);
+            border: 1px solid rgba(34, 191, 78, 0.4);
+        }
+
+        &.is-error {
+            background: rgba(224, 83, 83, 0.12);
+            color: darken($tile-red, 12%);
+            border: 1px solid rgba(224, 83, 83, 0.4);
+        }
+    }
+}
+
+// ---------------------------------------------------------------------------
+// Action tile.
+// ---------------------------------------------------------------------------
+.ticket-action-tile {
+    appearance: none;
+    background: #fff;
+    border: 2px solid transparent;
+    border-radius: $tile-radius;
+    box-shadow: $tile-shadow;
+    padding: 18px 10px;
+    min-height: $tile-size;
+    cursor: pointer;
+    transition: transform 0.18s ease, box-shadow 0.18s ease, background 0.18s ease, border-color 0.18s ease;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    text-align: center;
+    color: #1f2937;
+    font-weight: 600;
+    font-size: 0.95em;
+    line-height: 1.25;
+    font-family: inherit;
+
+    &:hover {
+        transform: translateY(-3px);
+        box-shadow: $tile-shadow-hov;
+    }
+
+    &:active {
+        transform: translateY(-1px);
+    }
+
+    &__icon {
+        font-size: 2em;
+        margin-bottom: 10px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        width: 56px;
+        height: 56px;
+        border-radius: 50%;
+        background: #f3f4f6;
+        transition: background 0.18s ease, color 0.18s ease;
+    }
+
+    &__label {
+        display: block;
+        max-width: 100%;
+        word-break: keep-all;
+    }
+
+    // Color variants — icon background + hover border.
+    &--blue {
+        .ticket-action-tile__icon { background: rgba(13, 138, 255, 0.12); color: $tile-blue; }
+        &:hover { border-color: $tile-blue; }
+    }
+    &--green {
+        .ticket-action-tile__icon { background: rgba(34, 191, 78, 0.14); color: $tile-green; }
+        &:hover { border-color: $tile-green; }
+    }
+    &--orange {
+        .ticket-action-tile__icon { background: rgba(233, 173, 79, 0.18); color: $tile-orange; }
+        &:hover { border-color: $tile-orange; }
+    }
+    &--purple {
+        .ticket-action-tile__icon { background: rgba(122, 92, 240, 0.14); color: $tile-purple; }
+        &:hover { border-color: $tile-purple; }
+    }
+    &--red {
+        .ticket-action-tile__icon { background: rgba(224, 83, 83, 0.14); color: $tile-red; }
+        &:hover { border-color: $tile-red; }
+    }
+    &--grey {
+        .ticket-action-tile__icon { background: rgba(107, 114, 128, 0.12); color: $tile-grey; }
+        &:hover { border-color: $tile-grey; }
+    }
+
+    // Disabled state — dimmed, no hover lift.
+    &--disabled {
+        opacity: 0.4;
+        cursor: not-allowed;
+
+        &:hover {
+            transform: none;
+            box-shadow: $tile-shadow;
+        }
+    }
+
+    // Armed state — destructive tiles waiting for confirm click.
+    &--armed {
+        background: rgba(224, 83, 83, 0.08);
+        border-color: $tile-red;
+        animation: ticket-action-tile-pulse 1.2s ease-in-out infinite;
+
+        .ticket-action-tile__label {
+            color: $tile-red;
+        }
+    }
+
+    // Loading state — pending AJAX response.
+    &--loading {
+        pointer-events: none;
+        position: relative;
+
+        &::after {
+            content: '';
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            width: 22px;
+            height: 22px;
+            margin: -11px 0 0 -11px;
+            border: 3px solid rgba(13, 138, 255, 0.18);
+            border-top-color: $tile-blue;
+            border-radius: 50%;
+            animation: ticket-action-tile-spin 0.8s linear infinite;
+        }
+
+        .ticket-action-tile__icon,
+        .ticket-action-tile__label {
+            visibility: hidden;
+        }
+    }
+}
+
+@keyframes ticket-action-tile-pulse {
+    0%, 100% { box-shadow: 0 0 0 0 rgba(224, 83, 83, 0.4); }
+    50%      { box-shadow: 0 0 0 8px rgba(224, 83, 83, 0); }
+}
+
+@keyframes ticket-action-tile-spin {
+    to { transform: rotate(360deg); }
+}
+
+// ---------------------------------------------------------------------------
+// Responsive — collapse to single column on small screens.
+// ---------------------------------------------------------------------------
+@media (max-width: $media__small) {
+    .ticket-action-card__tiles {
+        grid-template-columns: repeat(2, 1fr);
+    }
+    .ticket-action-tile {
+        min-height: 110px;
+        padding: 12px 6px;
+        font-size: 0.85em;
+
+        &__icon {
+            width: 44px;
+            height: 44px;
+            font-size: 1.5em;
+            margin-bottom: 6px;
+        }
+    }
+}
