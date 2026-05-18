@@ -220,8 +220,9 @@ switch ($action) {
         // Re-encode to canonicalize and strip anything unexpected.
         // Schema v2: top-level density (compact|cozy|spacious) + { visible, width, order } per section.
         $sanitized = [
-            'v'       => 2,
-            'density' => in_array($decoded['density'] ?? '', ['compact', 'cozy', 'spacious'], true) ? $decoded['density'] : 'cozy',
+            'v'        => 2,
+            'density'  => in_array($decoded['density'] ?? '', ['compact', 'cozy', 'spacious'], true) ? $decoded['density'] : 'cozy',
+            'tagsMode' => in_array($decoded['tagsMode'] ?? '', ['chips', 'selector'], true) ? $decoded['tagsMode'] : 'chips',
             'sections' => [],
         ];
         foreach (($decoded['sections'] ?? []) as $id => $cfg) {

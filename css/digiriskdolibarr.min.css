@@ -2955,14 +2955,16 @@ textarea.action-textarea:not(:last-child) {
   gap: 12px;
 }
 
-.tac-hero__density {
+.tac-hero__density,
+.tac-hero__tagsmode {
   display: inline-flex;
   border: 1px solid #e5e7eb;
   border-radius: 6px;
   overflow: hidden;
   background: #fff;
 }
-.tac-hero__density-btn {
+.tac-hero__density-btn,
+.tac-hero__tagsmode-btn {
   appearance: none;
   background: transparent;
   border: none;
@@ -2974,18 +2976,22 @@ textarea.action-textarea:not(:last-child) {
   font-size: 0.85em;
   transition: background 0.15s ease, color 0.15s ease;
 }
-.tac-hero__density-btn:last-child {
+.tac-hero__density-btn:last-child,
+.tac-hero__tagsmode-btn:last-child {
   border-right: none;
 }
-.tac-hero__density-btn:hover {
+.tac-hero__density-btn:hover,
+.tac-hero__tagsmode-btn:hover {
   background: rgba(13, 138, 255, 0.08);
   color: #0d8aff;
 }
-.tac-hero__density-btn.is-active {
+.tac-hero__density-btn.is-active,
+.tac-hero__tagsmode-btn.is-active {
   background: #0d8aff;
   color: #fff;
 }
-.tac-hero__density-btn.is-active:hover {
+.tac-hero__density-btn.is-active:hover,
+.tac-hero__tagsmode-btn.is-active:hover {
   background: #007df3;
   color: #fff;
 }
@@ -3024,7 +3030,8 @@ textarea.action-textarea:not(:last-child) {
 }
 
 .tac-hero__reset,
-.tac-hero__density {
+.tac-hero__density,
+.tac-hero__tagsmode {
   display: none;
 }
 
@@ -3039,7 +3046,8 @@ textarea.action-textarea:not(:last-child) {
   border-color: #e05353;
 }
 
-.tac-edit-mode .tac-hero__density {
+.tac-edit-mode .tac-hero__density,
+.tac-edit-mode .tac-hero__tagsmode {
   display: inline-flex;
 }
 
@@ -3335,6 +3343,28 @@ textarea.action-textarea:not(:last-child) {
   letter-spacing: 0.04em;
   font-weight: 600;
   margin-right: 6px;
+}
+
+.tac-tags-selector {
+  margin-top: 8px;
+  padding-top: 8px;
+  border-top: 1px dashed #e5e7eb;
+}
+.tac-tags-selector__input {
+  width: 100%;
+  max-width: 320px;
+  padding: 6px 10px;
+  border: 1px solid #e5e7eb;
+  border-radius: 6px;
+  background: #fff;
+  font-family: inherit;
+  font-size: 0.9em;
+  cursor: pointer;
+}
+.tac-tags-selector__input:focus {
+  outline: none;
+  border-color: #0d8aff;
+  box-shadow: 0 0 0 3px rgba(13, 138, 255, 0.15);
 }
 
 .tac-tag--available {

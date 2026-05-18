@@ -198,7 +198,8 @@ if ($evtRes) {
 // Default mimics the previous 2-col layout by interleaving left/right groups (full = half body).
 $defaultLayout = [
     'v'        => 2,
-    'density'  => 'cozy', // compact | cozy | spacious — drives padding/gap/font scale on .tac-card
+    'density'  => 'cozy',  // compact | cozy | spacious — drives padding/gap/font scale on .tac-card
+    'tagsMode' => 'chips', // chips | selector — Classification section UI for adding tags
     'sections' => [
         // Interleaved L/R for an alternating 2-col visual.
         'identification'    => ['visible' => true, 'width' => 'full', 'order' => 0],
@@ -222,6 +223,9 @@ if ($rawLayout) {
         // density override (independent of sections)
         if (isset($decoded['density']) && in_array($decoded['density'], ['compact', 'cozy', 'spacious'], true)) {
             $userLayout['density'] = $decoded['density'];
+        }
+        if (isset($decoded['tagsMode']) && in_array($decoded['tagsMode'], ['chips', 'selector'], true)) {
+            $userLayout['tagsMode'] = $decoded['tagsMode'];
         }
         if (isset($decoded['sections'])) {
             // Migration: old schema (v1) had a "column" field; we drop it but keep the rest.
@@ -316,7 +320,8 @@ $renderField = function (string $field, string $type, string $label, $value, str
      data-ticket-id="<?php print (int) $object->id; ?>"
      data-ajax-url="<?php print dol_escape_htmltag($ajaxUrl); ?>"
      data-layout="<?php print dol_escape_htmltag($layoutJson); ?>"
-     data-density="<?php print dol_escape_htmltag($userLayout['density']); ?>">
+     data-density="<?php print dol_escape_htmltag($userLayout['density']); ?>"
+     data-tags-mode="<?php print dol_escape_htmltag($userLayout['tagsMode']); ?>">
     <input type="hidden" name="token" value="<?php print newToken(); ?>">
 
     <!-- ====== HERO HEADER ====== -->
@@ -335,6 +340,14 @@ $renderField = function (string $field, string $type, string $label, $value, str
                     </button>
                     <button type="button" class="tac-hero__density-btn<?php print $userLayout['density'] === 'spacious' ? ' is-active' : ''; ?>" data-density="spacious" title="<?php print dol_escape_htmltag($langs->trans('LayoutDensitySpacious')); ?>">
                         <i class="fas fa-expand-alt"></i>
+                    </button>
+                </span>
+                <span class="tac-hero__tagsmode" role="toolbar" aria-label="<?php print dol_escape_htmltag($langs->trans('LayoutTagsMode')); ?>">
+                    <button type="button" class="tac-hero__tagsmode-btn<?php print $userLayout['tagsMode'] === 'chips' ? ' is-active' : ''; ?>" data-tagsmode="chips" title="<?php print dol_escape_htmltag($langs->trans('LayoutTagsModeChips')); ?>">
+                        <i class="fas fa-tags"></i>
+                    </button>
+                    <button type="button" class="tac-hero__tagsmode-btn<?php print $userLayout['tagsMode'] === 'selector' ? ' is-active' : ''; ?>" data-tagsmode="selector" title="<?php print dol_escape_htmltag($langs->trans('LayoutTagsModeSelector')); ?>">
+                        <i class="fas fa-caret-square-down"></i>
                     </button>
                 </span>
                 <button type="button" class="tac-hero__reset" data-layout-reset title="<?php print dol_escape_htmltag($langs->trans('LayoutResetTitle')); ?>">
@@ -602,7 +615,7 @@ $renderField = function (string $field, string $type, string $label, $value, str
                     <?php endif; ?>
                 </div>
                 <?php
-                // Render the "+ Add" chips for ticket categories not already assigned.
+                // Compute the unassigned pool — used by both chips mode and selector mode.
                 $unassigned = [];
                 foreach ($allTicketCategories as $cat) {
                     $cid = (int) ($cat['rowid'] ?? 0);
@@ -610,18 +623,31 @@ $renderField = function (string $field, string $type, string $label, $value, str
                         $unassigned[] = $cat;
                     }
                 }
-                if (!empty($unassigned)) : ?>
-                <div class="tac-tags-pool" data-tags-pool>
-                    <span class="tac-tags-pool__label"><i class="fas fa-plus"></i> <?php print $langs->trans('AddTag'); ?></span>
-                    <?php foreach ($unassigned as $cat) :
-                        $catColor = !empty($cat['color']) ? '#' . dol_escape_htmltag($cat['color']) : '';
-                        $bgStyle  = $catColor ? 'style="border-color:' . $catColor . ';"' : '';
-                        ?>
-                        <button type="button" class="tac-tag tac-tag--available" data-tag-add data-category-id="<?php print (int) $cat['rowid']; ?>" <?php print $bgStyle; ?>>
-                            + <?php print dol_escape_htmltag($cat['label']); ?>
-                        </button>
-                    <?php endforeach; ?>
-                </div>
+                if (!empty($unassigned)) :
+                    if ($userLayout['tagsMode'] === 'selector') : ?>
+                        <!-- Selector mode — single dropdown, light footprint when there are many categories. -->
+                        <div class="tac-tags-selector" data-tags-selector>
+                            <select class="tac-tags-selector__input" data-tag-add-select>
+                                <option value="">— <?php print $langs->trans('AddTag'); ?> —</option>
+                                <?php foreach ($unassigned as $cat) : ?>
+                                    <option value="<?php print (int) $cat['rowid']; ?>"><?php print dol_escape_htmltag($cat['label']); ?></option>
+                                <?php endforeach; ?>
+                            </select>
+                        </div>
+                    <?php else : ?>
+                        <!-- Chips mode — every unassigned tag visible as a button. -->
+                        <div class="tac-tags-pool" data-tags-pool>
+                            <span class="tac-tags-pool__label"><i class="fas fa-plus"></i> <?php print $langs->trans('AddTag'); ?></span>
+                            <?php foreach ($unassigned as $cat) :
+                                $catColor = !empty($cat['color']) ? '#' . dol_escape_htmltag($cat['color']) : '';
+                                $bgStyle  = $catColor ? 'style="border-color:' . $catColor . ';"' : '';
+                                ?>
+                                <button type="button" class="tac-tag tac-tag--available" data-tag-add data-category-id="<?php print (int) $cat['rowid']; ?>" <?php print $bgStyle; ?>>
+                                    + <?php print dol_escape_htmltag($cat['label']); ?>
+                                </button>
+                            <?php endforeach; ?>
+                        </div>
+                    <?php endif; ?>
                 <?php endif; ?>
             </section>
 

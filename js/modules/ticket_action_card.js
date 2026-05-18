@@ -72,7 +72,8 @@ window.digiriskdolibarr.ticketActionCard.serializeLayout = function() {
     var $card = $('.tac-card').first();
     var layout = {
         v: 2,
-        density: $card.attr('data-density') || 'cozy',
+        density:  $card.attr('data-density')   || 'cozy',
+        tagsMode: $card.attr('data-tags-mode') || 'chips',
         sections: {},
     };
     $card.find('.tac-body .tac-section[data-section-id]').each(function(idx) {
@@ -106,6 +107,60 @@ window.digiriskdolibarr.ticketActionCard.onDensityChange = function(event) {
     $btn.closest('.tac-hero__density').find('.tac-hero__density-btn').removeClass('is-active');
     $btn.addClass('is-active');
     window.digiriskdolibarr.ticketActionCard.saveLayout();
+};
+
+/**
+ * Tags mode switch (chips ↔ selector). Persists the choice, then reloads so the
+ * Classification section is re-rendered server-side with the right widget.
+ *
+ * @param  {MouseEvent} event
+ * @return {void}
+ */
+window.digiriskdolibarr.ticketActionCard.onTagsModeChange = function(event) {
+    event.stopPropagation();
+    var $btn  = $(this);
+    var mode  = $btn.data('tagsmode');
+    if (!mode) {
+        return;
+    }
+    var $card = $('.tac-card').first();
+    if (($card.attr('data-tags-mode') || 'chips') === mode) {
+        return; // already in this mode
+    }
+    $card.attr('data-tags-mode', mode);
+    $btn.closest('.tac-hero__tagsmode').find('.tac-hero__tagsmode-btn').removeClass('is-active');
+    $btn.addClass('is-active');
+
+    // Save then reload — TPL renders chips vs selector at PHP level, so a soft reload is needed.
+    var ajaxUrl  = $card.data('ajax-url');
+    var ticketId = $card.data('ticket-id');
+    var layout   = window.digiriskdolibarr.ticketActionCard.serializeLayout();
+    $.ajax({
+        url: ajaxUrl,
+        method: 'POST',
+        dataType: 'json',
+        data: {
+            ticket_id: ticketId,
+            action: 'save_layout',
+            layout: JSON.stringify(layout),
+            token: $('input[name="token"]').val() || ''
+        }
+    }).done(function() { window.location.reload(); });
+};
+
+/**
+ * Selector-mode tag add — fires on <select> change.
+ *
+ * @param  {Event} event
+ * @return {void}
+ */
+window.digiriskdolibarr.ticketActionCard.onTagAddSelect = function(event) {
+    var $sel = $(this);
+    var catId = parseInt($sel.val(), 10);
+    if (!catId) {
+        return;
+    }
+    window.digiriskdolibarr.ticketActionCard.tagAjax('add_category', catId, $sel);
 };
 
 /**
@@ -160,10 +215,12 @@ window.digiriskdolibarr.ticketActionCard.event = function() {
     $(document).on('click', '.tac-section__show-btn',      window.digiriskdolibarr.ticketActionCard.onShowSection);
     $(document).on('click', '.tac-section__width-btn',     window.digiriskdolibarr.ticketActionCard.onWidthChange);
     $(document).on('click', '.tac-hero__density-btn',      window.digiriskdolibarr.ticketActionCard.onDensityChange);
+    $(document).on('click', '.tac-hero__tagsmode-btn',     window.digiriskdolibarr.ticketActionCard.onTagsModeChange);
 
     // ---- Classification tags 1-click add/remove.
-    $(document).on('click', '[data-tag-add]',              window.digiriskdolibarr.ticketActionCard.onTagAdd);
-    $(document).on('click', '[data-tag-remove]',           window.digiriskdolibarr.ticketActionCard.onTagRemove);
+    $(document).on('click',  '[data-tag-add]',             window.digiriskdolibarr.ticketActionCard.onTagAdd);
+    $(document).on('click',  '[data-tag-remove]',          window.digiriskdolibarr.ticketActionCard.onTagRemove);
+    $(document).on('change', '[data-tag-add-select]',      window.digiriskdolibarr.ticketActionCard.onTagAddSelect);
 };
 
 /**
