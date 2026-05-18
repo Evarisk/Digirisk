@@ -2826,6 +2826,8 @@ textarea.action-textarea:not(:last-child) {
   border: 1px solid #e5e7eb;
   border-radius: 10px;
   padding: 14px 16px;
+  position: relative;
+  transition: opacity 0.18s ease, border-color 0.18s ease;
 }
 .tac-section__title {
   margin: 0 0 10px 0;
@@ -2850,6 +2852,120 @@ textarea.action-textarea:not(:last-child) {
 }
 .tac-section__edit-link:hover {
   color: #0d8aff;
+}
+.tac-section__controls {
+  display: none;
+  position: absolute;
+  top: 8px;
+  right: 8px;
+  gap: 2px;
+  background: rgba(255, 255, 255, 0.95);
+  border: 1px solid #e5e7eb;
+  border-radius: 6px;
+  padding: 2px 4px;
+  box-shadow: 0 2px 6px rgba(0, 0, 0, 0.06);
+  z-index: 5;
+}
+.tac-section__drag {
+  cursor: grab;
+  padding: 4px 6px;
+  color: #6b7280;
+  display: inline-flex;
+  align-items: center;
+}
+.tac-section__drag:active {
+  cursor: grabbing;
+}
+.tac-section__width-btn, .tac-section__hide-btn, .tac-section__show-btn {
+  appearance: none;
+  background: transparent;
+  border: 1px solid transparent;
+  border-radius: 4px;
+  padding: 4px 6px;
+  cursor: pointer;
+  color: #6b7280;
+  font-size: 0.9em;
+  transition: background 0.15s ease, color 0.15s ease;
+}
+.tac-section__width-btn:hover, .tac-section__hide-btn:hover, .tac-section__show-btn:hover {
+  background: rgba(13, 138, 255, 0.1);
+  color: #0d8aff;
+}
+.tac-section__show-btn {
+  display: none;
+}
+.tac-section--hidden {
+  display: none;
+}
+.tac-edit-mode .tac-section--hidden {
+  display: block;
+  opacity: 0.35;
+  border-style: dashed;
+}
+.tac-edit-mode .tac-section--hidden .tac-section__hide-btn {
+  display: none;
+}
+.tac-edit-mode .tac-section--hidden .tac-section__show-btn {
+  display: inline-flex;
+}
+.tac-section--width-half { /* default behavior: fills its col (1fr) */ }
+.tac-section--width-full { /* same as half for now — both fill their column */ }
+.tac-section--width-span {
+  grid-column: 1/-1;
+}
+
+.tac-edit-mode .tac-section {
+  border: 1px dashed #0d8aff;
+  background: rgba(13, 138, 255, 0.04);
+}
+.tac-edit-mode .tac-section__controls {
+  display: flex;
+}
+.tac-edit-mode .tac-section__drag {
+  color: #0d8aff;
+}
+.tac-edit-mode .tac-section-placeholder {
+  background: rgba(13, 138, 255, 0.12);
+  border: 2px dashed #0d8aff;
+  border-radius: 10px;
+  height: 80px;
+  margin-bottom: 14px;
+}
+
+.tac-hero__top-right {
+  display: inline-flex;
+  align-items: center;
+  gap: 12px;
+}
+
+.tac-hero__customize {
+  appearance: none;
+  background: transparent;
+  border: 1px solid #e5e7eb;
+  border-radius: 6px;
+  padding: 4px 10px;
+  cursor: pointer;
+  color: #6b7280;
+  font-family: inherit;
+  font-size: 0.85em;
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  transition: background 0.15s ease, color 0.15s ease, border-color 0.15s ease;
+}
+.tac-hero__customize:hover {
+  background: rgba(13, 138, 255, 0.08);
+  color: #0d8aff;
+  border-color: #0d8aff;
+}
+.tac-hero__customize--active {
+  background: #0d8aff;
+  color: #fff;
+  border-color: #0d8aff;
+}
+.tac-hero__customize--active:hover {
+  background: #007df3;
+  color: #fff;
 }
 
 .tac-grid {

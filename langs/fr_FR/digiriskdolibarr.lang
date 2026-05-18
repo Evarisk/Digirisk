@@ -1746,4 +1746,14 @@ TicketActionCardRelatedSection        = Objets liés
 UnknownFieldToUpdate                  = Champ inconnu : %s
 Saved                                 = Enregistré
 SeeAll                                = Voir tout
+LayoutCustomize                       = Personnaliser
+LayoutDone                            = Terminé
+LayoutControls                        = Contrôles de mise en page
+LayoutWidthHalf                       = Demi-colonne
+LayoutWidthFull                       = Colonne entière
+LayoutWidthSpan                       = Pleine largeur
+LayoutSaved                           = Mise en page sauvegardée
+Move                                  = Déplacer
+Hide                                  = Masquer
+Show                                  = Afficher
 

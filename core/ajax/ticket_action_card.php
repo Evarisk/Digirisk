@@ -152,6 +152,45 @@ switch ($action) {
         }
         respond(false, $object->error ?: $langs->trans('Error'));
 
+    /*
+     * save_layout — per-user persistence of the card layout (visible/width/column/order
+     * for each section). Writes a JSON blob to llx_user_param so user->conf->DIGIRISK_TICKET_CARD_LAYOUT
+     * is populated automatically on subsequent logins.
+     */
+    case 'save_layout':
+        $layoutRaw = GETPOST('layout', 'restricthtml');
+        $decoded = json_decode((string) $layoutRaw, true);
+        if (!is_array($decoded)) {
+            respond(false, $langs->trans('ErrorBadParameters'));
+        }
+        // Re-encode to canonicalize and strip anything unexpected.
+        $sanitized = ['v' => 1, 'sections' => []];
+        foreach (($decoded['sections'] ?? []) as $id => $cfg) {
+            if (!preg_match('/^[a-z_]+$/', (string) $id) || !is_array($cfg)) {
+                continue;
+            }
+            $sanitized['sections'][$id] = [
+                'visible' => !empty($cfg['visible']),
+                'width'   => in_array($cfg['width'] ?? '', ['half', 'full', 'span'], true) ? $cfg['width'] : 'full',
+                'column'  => in_array($cfg['column'] ?? '', ['left', 'right'], true) ? $cfg['column'] : 'left',
+                'order'   => isset($cfg['order']) ? (int) $cfg['order'] : 0,
+            ];
+        }
+        $json = json_encode($sanitized);
+
+        // Upsert into llx_user_param.
+        $sqlDel = 'DELETE FROM ' . MAIN_DB_PREFIX . 'user_param WHERE fk_user = ' . ((int) $user->id)
+            . ' AND entity = ' . ((int) $conf->entity)
+            . " AND param = 'DIGIRISK_TICKET_CARD_LAYOUT'";
+        $db->query($sqlDel);
+        $sqlIns = 'INSERT INTO ' . MAIN_DB_PREFIX . "user_param (fk_user, entity, param, value)"
+            . ' VALUES (' . ((int) $user->id) . ', ' . ((int) $conf->entity) . ", 'DIGIRISK_TICKET_CARD_LAYOUT', '" . $db->escape($json) . "')";
+        $ok = $db->query($sqlIns);
+        if (!$ok) {
+            respond(false, $db->lasterror() ?: 'SaveFailed');
+        }
+        respond(true, $langs->trans('LayoutSaved'), ['layout' => $sanitized]);
+
     case 'assign_other':
         $userIdToAssign = (int) $param;
         if ($userIdToAssign <= 0) {

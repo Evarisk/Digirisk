@@ -180,6 +180,40 @@ if ($evtRes) {
     }
 }
 
+// ---- User-saved layout (per-user, stored in llx_user_param as JSON).
+// Schema: { "v": 1, "sections": { "<id>": { "visible": bool, "width": "half"|"full"|"span", "column": "left"|"right", "order": int } } }
+// Default layout if nothing saved.
+$defaultLayout = [
+    'v'        => 1,
+    'sections' => [
+        'identification'    => ['visible' => true, 'width' => 'full', 'column' => 'left',  'order' => 0],
+        'registres'         => ['visible' => true, 'width' => 'full', 'column' => 'left',  'order' => 1],
+        'condition_message' => ['visible' => true, 'width' => 'full', 'column' => 'left',  'order' => 2],
+        'other_extras'      => ['visible' => true, 'width' => 'full', 'column' => 'left',  'order' => 3],
+        'initial_message'   => ['visible' => true, 'width' => 'full', 'column' => 'left',  'order' => 4],
+        'classification'    => ['visible' => true, 'width' => 'full', 'column' => 'right', 'order' => 0],
+        'accidents'         => ['visible' => true, 'width' => 'full', 'column' => 'right', 'order' => 1],
+        'linked_files'      => ['visible' => true, 'width' => 'full', 'column' => 'right', 'order' => 2],
+        'events'            => ['visible' => true, 'width' => 'full', 'column' => 'right', 'order' => 3],
+        'related'           => ['visible' => true, 'width' => 'full', 'column' => 'right', 'order' => 4],
+        'dates'             => ['visible' => true, 'width' => 'full', 'column' => 'right', 'order' => 5],
+    ],
+];
+$rawLayout  = $user->conf->DIGIRISK_TICKET_CARD_LAYOUT ?? '';
+$userLayout = $defaultLayout;
+if ($rawLayout) {
+    $decoded = json_decode((string) $rawLayout, true);
+    if (is_array($decoded) && isset($decoded['sections'])) {
+        // Merge: keep defaults for unknown sections, override with user's saved settings.
+        foreach ($decoded['sections'] as $id => $cfg) {
+            if (isset($userLayout['sections'][$id]) && is_array($cfg)) {
+                $userLayout['sections'][$id] = array_merge($userLayout['sections'][$id], $cfg);
+            }
+        }
+    }
+}
+$layoutJson = json_encode($userLayout);
+
 // ---- Related objects (fetchObjectLinked).
 $object->fetchObjectLinked();
 $relatedObjects = [];
@@ -204,6 +238,21 @@ foreach ($object->linkedObjects as $linkedType => $linkedSet) {
  * @param string $display  Current display value (already HTML-safe).
  * @param array  $opts     Extra options. For 'select'/'user': 'options' => [{id,label}, ...]. For 'date': 'format' => 'day'/'dayhour'.
  */
+/**
+ * Render the layout-mode controls (drag handle, width presets, hide) — shown only when
+ * the card is in edit mode. Each section calls this right after its title.
+ */
+$sectionControls = function (string $id) use ($langs): void {
+    print '<div class="tac-section__controls" aria-label="' . dol_escape_htmltag($langs->trans('LayoutControls')) . '">';
+    print '<span class="tac-section__drag" title="' . dol_escape_htmltag($langs->trans('Move')) . '"><i class="fas fa-grip-vertical"></i></span>';
+    print '<button type="button" class="tac-section__width-btn" data-width="half" title="' . dol_escape_htmltag($langs->trans('LayoutWidthHalf')) . '"><i class="fas fa-compress-alt"></i></button>';
+    print '<button type="button" class="tac-section__width-btn" data-width="full" title="' . dol_escape_htmltag($langs->trans('LayoutWidthFull')) . '"><i class="fas fa-square"></i></button>';
+    print '<button type="button" class="tac-section__width-btn" data-width="span" title="' . dol_escape_htmltag($langs->trans('LayoutWidthSpan')) . '"><i class="fas fa-expand-alt"></i></button>';
+    print '<button type="button" class="tac-section__hide-btn" title="' . dol_escape_htmltag($langs->trans('Hide')) . '"><i class="fas fa-eye-slash"></i></button>';
+    print '<button type="button" class="tac-section__show-btn" title="' . dol_escape_htmltag($langs->trans('Show')) . '"><i class="fas fa-eye"></i></button>';
+    print '</div>';
+};
+
 $renderField = function (string $field, string $type, string $label, $value, string $display, array $opts = []) use ($langs): void {
     $classes  = ['tac-field', 'tac-field--' . $type];
     if ($type === 'readonly') {
@@ -232,7 +281,10 @@ $renderField = function (string $field, string $type, string $label, $value, str
 };
 ?>
 
-<div class="ticket-action-card tac-card" data-ticket-id="<?php print (int) $object->id; ?>" data-ajax-url="<?php print dol_escape_htmltag($ajaxUrl); ?>">
+<div class="ticket-action-card tac-card"
+     data-ticket-id="<?php print (int) $object->id; ?>"
+     data-ajax-url="<?php print dol_escape_htmltag($ajaxUrl); ?>"
+     data-layout="<?php print dol_escape_htmltag($layoutJson); ?>">
     <input type="hidden" name="token" value="<?php print newToken(); ?>">
 
     <!-- ====== HERO HEADER ====== -->
@@ -241,9 +293,14 @@ $renderField = function (string $field, string $type, string $label, $value, str
             <a href="<?php print dol_escape_htmltag($backUrl); ?>" class="tac-hero__back">
                 <i class="fas fa-arrow-left"></i> <?php print $langs->trans('BackToList'); ?>
             </a>
-            <a href="<?php print dol_escape_htmltag($fullCardUrl); ?>" class="tac-hero__full" title="<?php print dol_escape_htmltag($langs->trans('TicketActionOpenFull')); ?>">
-                <i class="fas fa-external-link-alt"></i> <?php print $langs->trans('TicketActionOpenFull'); ?>
-            </a>
+            <span class="tac-hero__top-right">
+                <button type="button" class="tac-hero__customize" data-customize-toggle>
+                    <i class="fas fa-th-large"></i> <span class="tac-hero__customize-label" data-edit-on-label="<?php print dol_escape_htmltag($langs->trans('LayoutDone')); ?>" data-edit-off-label="<?php print dol_escape_htmltag($langs->trans('LayoutCustomize')); ?>"><?php print $langs->trans('LayoutCustomize'); ?></span>
+                </button>
+                <a href="<?php print dol_escape_htmltag($fullCardUrl); ?>" class="tac-hero__full" title="<?php print dol_escape_htmltag($langs->trans('TicketActionOpenFull')); ?>">
+                    <i class="fas fa-external-link-alt"></i> <?php print $langs->trans('TicketActionOpenFull'); ?>
+                </a>
+            </span>
         </div>
 
         <div class="tac-hero__main">
@@ -320,8 +377,9 @@ $renderField = function (string $field, string $type, string $label, $value, str
         <div class="tac-col tac-col--left">
 
             <!-- Section: Identification (native ticket fields) -->
-            <section class="tac-section">
+            <section class="tac-section" data-section-id="identification">
                 <h3 class="tac-section__title"><i class="fas fa-id-card"></i> <?php print $langs->trans('TicketActionCardIdentificationSection'); ?></h3>
+                <?php $sectionControls('identification'); ?>
                 <div class="tac-grid">
                     <!-- Tracking ID — readonly identifier -->
                     <div class="tac-field tac-field--readonly">
@@ -368,8 +426,9 @@ $renderField = function (string $field, string $type, string $label, $value, str
             </section>
 
             <!-- Section: Informations registres (Digirisk extrafields) -->
-            <section class="tac-section">
+            <section class="tac-section" data-section-id="registres">
                 <h3 class="tac-section__title"><i class="fas fa-clipboard-list"></i> <?php print $langs->trans('TicketActionCardRegistresSection'); ?></h3>
+                <?php $sectionControls('registres'); ?>
                 <div class="tac-grid">
                     <?php
                     $renderField('options_digiriskdolibarr_ticket_lastname',  'text',     'LastName',
@@ -410,8 +469,9 @@ $renderField = function (string $field, string $type, string $label, $value, str
             </section>
 
             <!-- Section: Condition message (longtext) -->
-            <section class="tac-section">
+            <section class="tac-section" data-section-id="condition_message">
                 <h3 class="tac-section__title"><i class="fas fa-file-signature"></i> <?php print $langs->trans('ConditionMessage'); ?></h3>
+                <?php $sectionControls('condition_message'); ?>
                 <div class="tac-grid tac-grid--single">
                     <?php
                     $condition = $extra['digiriskdolibarr_condition_message'] ?? '';
@@ -424,8 +484,9 @@ $renderField = function (string $field, string $type, string $label, $value, str
 
             <!-- Section: Other extrafields (auto-detected from non-Digirisk modules) -->
             <?php if (!empty($otherExtrafields)) : ?>
-            <section class="tac-section">
+            <section class="tac-section" data-section-id="other_extras">
                 <h3 class="tac-section__title"><i class="fas fa-puzzle-piece"></i> <?php print $langs->trans('TicketActionCardOtherFieldsSection'); ?></h3>
+                <?php $sectionControls('other_extras'); ?>
                 <div class="tac-grid">
                     <?php foreach ($otherExtrafields as $key => $info) :
                         $val = $info['value'];
@@ -466,8 +527,9 @@ $renderField = function (string $field, string $type, string $label, $value, str
             <?php endif; ?>
 
             <!-- Section: Initial message — display only, edit through Dolibarr card. -->
-            <section class="tac-section">
+            <section class="tac-section" data-section-id="initial_message">
                 <h3 class="tac-section__title"><i class="fas fa-envelope-open-text"></i> <?php print $langs->trans('InitialMessage'); ?></h3>
+                <?php $sectionControls('initial_message'); ?>
                 <div class="tac-rich-text">
                     <?php print $object->message ? dolPrintHTML($object->message) : '<span class="opacitymedium">—</span>'; ?>
                 </div>
@@ -481,8 +543,9 @@ $renderField = function (string $field, string $type, string $label, $value, str
         <div class="tac-col tac-col--right">
 
             <!-- Section: Classification (tags) -->
-            <section class="tac-section">
+            <section class="tac-section" data-section-id="classification">
                 <h3 class="tac-section__title"><i class="fas fa-tags"></i> <?php print $langs->trans('TicketActionCardClassificationSection'); ?></h3>
+                <?php $sectionControls('classification'); ?>
                 <div class="tac-tags">
                     <?php foreach ($ticketCategories as $cat) :
                         $catColor = !empty($cat->color) ? '#' . dol_escape_htmltag($cat->color) : '#e5e7eb';
@@ -501,8 +564,9 @@ $renderField = function (string $field, string $type, string $label, $value, str
             </section>
 
             <!-- Section: Linked accidents -->
-            <section class="tac-section">
+            <section class="tac-section" data-section-id="accidents">
                 <h3 class="tac-section__title"><i class="fas fa-exclamation-triangle"></i> <?php print $langs->trans('AccidentsLinked'); ?></h3>
+                <?php $sectionControls('accidents'); ?>
                 <ul class="tac-list">
                     <?php foreach ($linkedAccidents as $acc) : ?>
                         <li class="tac-list__item"><?php print $acc->getNomUrl(1); ?></li>
@@ -517,8 +581,9 @@ $renderField = function (string $field, string $type, string $label, $value, str
             </section>
 
             <!-- Section: Linked files (read-only list + upload link) -->
-            <section class="tac-section">
+            <section class="tac-section" data-section-id="linked_files">
                 <h3 class="tac-section__title"><i class="fas fa-paperclip"></i> <?php print $langs->trans('LinkedFiles'); ?></h3>
+                <?php $sectionControls('linked_files'); ?>
                 <ul class="tac-list">
                     <?php foreach ($linkedFiles as $f) :
                         $name = $f['name'] ?? '';
@@ -542,8 +607,9 @@ $renderField = function (string $field, string $type, string $label, $value, str
             </section>
 
             <!-- Section: Recent events (read-only, last 10) -->
-            <section class="tac-section">
+            <section class="tac-section" data-section-id="events">
                 <h3 class="tac-section__title"><i class="fas fa-history"></i> <?php print $langs->trans('TicketActionCardEventsSection'); ?></h3>
+                <?php $sectionControls('events'); ?>
                 <ul class="tac-list tac-list--events">
                     <?php foreach ($recentEvents as $evt) :
                         $userName = trim(($evt->firstname ?: '') . ' ' . ($evt->lastname ?: ''));
@@ -567,8 +633,9 @@ $renderField = function (string $field, string $type, string $label, $value, str
 
             <!-- Section: Related objects (fetchObjectLinked) -->
             <?php if (!empty($relatedObjects)) : ?>
-            <section class="tac-section">
+            <section class="tac-section" data-section-id="related">
                 <h3 class="tac-section__title"><i class="fas fa-link"></i> <?php print $langs->trans('TicketActionCardRelatedSection'); ?></h3>
+                <?php $sectionControls('related'); ?>
                 <ul class="tac-list">
                     <?php foreach ($relatedObjects as $rel) : ?>
                         <li class="tac-list__item">
@@ -580,8 +647,9 @@ $renderField = function (string $field, string $type, string $label, $value, str
             <?php endif; ?>
 
             <!-- Section: Key dates (read-only) -->
-            <section class="tac-section">
+            <section class="tac-section" data-section-id="dates">
                 <h3 class="tac-section__title"><i class="fas fa-calendar"></i> <?php print $langs->trans('TicketActionCardDatesSection'); ?></h3>
+                <?php $sectionControls('dates'); ?>
                 <div class="tac-grid">
                     <div class="tac-field tac-field--readonly">
                         <div class="tac-field__label"><?php print $langs->trans('DateCreation'); ?></div>

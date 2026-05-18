@@ -16,6 +16,119 @@ window.digiriskdolibarr.ticketActionCard = {};
  */
 window.digiriskdolibarr.ticketActionCard.init = function() {
     window.digiriskdolibarr.ticketActionCard.event();
+    window.digiriskdolibarr.ticketActionCard.applyLayout();
+};
+
+/**
+ * Apply the saved user layout to the DOM on initial render.
+ * Reads data-layout JSON from .tac-card, sorts sections per saved order,
+ * hides invisible ones, applies width classes.
+ *
+ * @return {void}
+ */
+window.digiriskdolibarr.ticketActionCard.applyLayout = function() {
+    var $card = $('.tac-card').first();
+    if (!$card.length) {
+        return;
+    }
+    var rawLayout = $card.attr('data-layout');
+    if (!rawLayout) {
+        return;
+    }
+    var layout;
+    try { layout = JSON.parse(rawLayout); } catch (e) { return; }
+    if (!layout || !layout.sections) {
+        return;
+    }
+
+    // Group sections by destination column and sort by order.
+    var byCol = { left: [], right: [] };
+    $card.find('.tac-section[data-section-id]').each(function() {
+        var $sec = $(this);
+        var id = $sec.attr('data-section-id');
+        var cfg = layout.sections[id];
+        if (!cfg) {
+            return; // unknown section — leave where the TPL put it
+        }
+        var col = (cfg.column === 'right') ? 'right' : 'left';
+        $sec.attr('data-col', col);
+        $sec.attr('data-order', cfg.order || 0);
+        $sec.attr('data-width', cfg.width || 'full');
+        $sec.toggleClass('tac-section--hidden', cfg.visible === false);
+        $sec.removeClass('tac-section--width-half tac-section--width-full tac-section--width-span');
+        $sec.addClass('tac-section--width-' + (cfg.width || 'full'));
+        byCol[col].push({ $el: $sec, order: cfg.order || 0 });
+    });
+
+    var $leftCol  = $card.find('.tac-col--left').first();
+    var $rightCol = $card.find('.tac-col--right').first();
+    ['left', 'right'].forEach(function(col) {
+        byCol[col].sort(function(a, b) { return a.order - b.order; });
+        var $target = (col === 'left') ? $leftCol : $rightCol;
+        byCol[col].forEach(function(item) { $target.append(item.$el); });
+    });
+};
+
+/**
+ * Serialize the current DOM state into a layout object ready for the AJAX save.
+ *
+ * @return {Object}
+ */
+window.digiriskdolibarr.ticketActionCard.serializeLayout = function() {
+    var layout = { v: 1, sections: {} };
+    $('.tac-card .tac-col--left .tac-section[data-section-id]').each(function(idx) {
+        var $s = $(this);
+        layout.sections[$s.attr('data-section-id')] = {
+            visible: !$s.hasClass('tac-section--hidden'),
+            width:   $s.attr('data-width') || 'full',
+            column:  'left',
+            order:   idx,
+        };
+    });
+    $('.tac-card .tac-col--right .tac-section[data-section-id]').each(function(idx) {
+        var $s = $(this);
+        layout.sections[$s.attr('data-section-id')] = {
+            visible: !$s.hasClass('tac-section--hidden'),
+            width:   $s.attr('data-width') || 'full',
+            column:  'right',
+            order:   idx,
+        };
+    });
+    return layout;
+};
+
+/**
+ * Persist the layout to the server.
+ *
+ * @return {void}
+ */
+window.digiriskdolibarr.ticketActionCard.saveLayout = function() {
+    var $card    = $('.tac-card').first();
+    var ajaxUrl  = $card.data('ajax-url');
+    var ticketId = $card.data('ticket-id');
+    var layout   = window.digiriskdolibarr.ticketActionCard.serializeLayout();
+
+    $.ajax({
+        url: ajaxUrl,
+        method: 'POST',
+        dataType: 'json',
+        data: {
+            ticket_id: ticketId,
+            action: 'save_layout',
+            layout: JSON.stringify(layout),
+            token: $('input[name="token"]').val() || ''
+        }
+    }).done(function(response) {
+        if (response && response.success) {
+            // Refresh the data-layout attribute so reloads / subsequent serialize() start fresh.
+            $card.attr('data-layout', JSON.stringify({ v: 1, sections: layout.sections }));
+            window.digiriskdolibarr.ticketActionCard.flash($card, response.message || 'Saved', 'success');
+        } else {
+            window.digiriskdolibarr.ticketActionCard.flash($card, (response && response.message) || 'Erreur', 'error');
+        }
+    }).fail(function() {
+        window.digiriskdolibarr.ticketActionCard.flash($('.tac-card').first(), 'Erreur réseau', 'error');
+    });
 };
 
 /**
@@ -28,6 +141,112 @@ window.digiriskdolibarr.ticketActionCard.event = function() {
     $(document).on('click', '.ticket-action-tile:not([disabled])', window.digiriskdolibarr.ticketActionCard.onTileClick);
     // Tap-to-edit — bind on the field WRAPPER so clicks anywhere in it (label/value) work.
     $(document).on('click', '.tac-field:not(.tac-field--readonly), .tac-chip:not(.tac-chip--readonly), .tac-hero__subject', window.digiriskdolibarr.ticketActionCard.onFieldClick);
+
+    // ---- Layout customization (edit mode toggle, drag/resize/hide).
+    $(document).on('click', '[data-customize-toggle]',     window.digiriskdolibarr.ticketActionCard.onCustomizeToggle);
+    $(document).on('click', '.tac-section__hide-btn',      window.digiriskdolibarr.ticketActionCard.onHideSection);
+    $(document).on('click', '.tac-section__show-btn',      window.digiriskdolibarr.ticketActionCard.onShowSection);
+    $(document).on('click', '.tac-section__width-btn',     window.digiriskdolibarr.ticketActionCard.onWidthChange);
+};
+
+/**
+ * Toggle the layout edit mode.
+ * Turn on: activate jQuery UI sortable on both columns, show controls, dashed borders.
+ * Turn off: destroy sortable, save layout, hide controls.
+ *
+ * @return {void}
+ */
+window.digiriskdolibarr.ticketActionCard.onCustomizeToggle = function() {
+    var $card  = $('.tac-card').first();
+    var $body  = $('body');
+    var $btn   = $('[data-customize-toggle]');
+    var $label = $btn.find('.tac-hero__customize-label');
+    var isOn   = $body.hasClass('tac-edit-mode');
+
+    if (!isOn) {
+        // Entering edit mode.
+        $body.addClass('tac-edit-mode');
+        $label.text($label.data('edit-on-label') || 'Terminé');
+        $btn.addClass('tac-hero__customize--active');
+
+        // Activate jQuery UI sortable on both columns. The :ui-sortable check avoids re-init.
+        if ($.fn.sortable) {
+            ['.tac-col--left', '.tac-col--right'].forEach(function(sel) {
+                var $col = $(sel);
+                if ($col.length && !$col.data('uiSortable')) {
+                    $col.sortable({
+                        connectWith: '.tac-col--left, .tac-col--right',
+                        handle:      '.tac-section__drag',
+                        placeholder: 'tac-section-placeholder',
+                        tolerance:   'pointer',
+                        opacity:     0.8,
+                        stop: function() {
+                            // After a drop, persist the new order/column.
+                            window.digiriskdolibarr.ticketActionCard.saveLayout();
+                        }
+                    });
+                }
+            });
+        }
+    } else {
+        // Exiting edit mode.
+        $body.removeClass('tac-edit-mode');
+        $label.text($label.data('edit-off-label') || 'Personnaliser');
+        $btn.removeClass('tac-hero__customize--active');
+        if ($.fn.sortable) {
+            ['.tac-col--left', '.tac-col--right'].forEach(function(sel) {
+                var $col = $(sel);
+                if ($col.data('uiSortable')) {
+                    $col.sortable('destroy');
+                }
+            });
+        }
+        // Final save on exit, just in case.
+        window.digiriskdolibarr.ticketActionCard.saveLayout();
+    }
+};
+
+/**
+ * Hide a section (edit mode).
+ *
+ * @param  {MouseEvent} event
+ * @return {void}
+ */
+window.digiriskdolibarr.ticketActionCard.onHideSection = function(event) {
+    event.stopPropagation();
+    var $sec = $(this).closest('.tac-section');
+    $sec.addClass('tac-section--hidden');
+    window.digiriskdolibarr.ticketActionCard.saveLayout();
+};
+
+/**
+ * Show a previously hidden section (edit mode).
+ *
+ * @param  {MouseEvent} event
+ * @return {void}
+ */
+window.digiriskdolibarr.ticketActionCard.onShowSection = function(event) {
+    event.stopPropagation();
+    var $sec = $(this).closest('.tac-section');
+    $sec.removeClass('tac-section--hidden');
+    window.digiriskdolibarr.ticketActionCard.saveLayout();
+};
+
+/**
+ * Change a section width preset (half / full / span).
+ *
+ * @param  {MouseEvent} event
+ * @return {void}
+ */
+window.digiriskdolibarr.ticketActionCard.onWidthChange = function(event) {
+    event.stopPropagation();
+    var $btn   = $(this);
+    var width  = $btn.data('width');
+    var $sec   = $btn.closest('.tac-section');
+    $sec.removeClass('tac-section--width-half tac-section--width-full tac-section--width-span');
+    $sec.addClass('tac-section--width-' + width);
+    $sec.attr('data-width', width);
+    window.digiriskdolibarr.ticketActionCard.saveLayout();
 };
 
 /**

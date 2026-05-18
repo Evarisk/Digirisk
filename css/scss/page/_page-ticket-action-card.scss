@@ -173,6 +173,8 @@ $tac-border:       #e5e7eb;
     border: 1px solid $tac-border;
     border-radius: 10px;
     padding: 14px 16px;
+    position: relative;
+    transition: opacity 0.18s ease, border-color 0.18s ease;
 
     &__title {
         margin: 0 0 10px 0;
@@ -194,6 +196,125 @@ $tac-border:       #e5e7eb;
         color: $tac-grey;
         text-decoration: none;
         &:hover { color: $tac-blue; }
+    }
+
+    // Controls (drag handle, width buttons, hide/show) — only shown in edit mode.
+    &__controls {
+        display: none;
+        position: absolute;
+        top: 8px;
+        right: 8px;
+        gap: 2px;
+        background: rgba(255,255,255,0.95);
+        border: 1px solid $tac-border;
+        border-radius: 6px;
+        padding: 2px 4px;
+        box-shadow: $tile-shadow;
+        z-index: 5;
+    }
+
+    &__drag {
+        cursor: grab;
+        padding: 4px 6px;
+        color: $tac-grey;
+        display: inline-flex;
+        align-items: center;
+        &:active { cursor: grabbing; }
+    }
+
+    &__width-btn,
+    &__hide-btn,
+    &__show-btn {
+        appearance: none;
+        background: transparent;
+        border: 1px solid transparent;
+        border-radius: 4px;
+        padding: 4px 6px;
+        cursor: pointer;
+        color: $tac-grey;
+        font-size: 0.9em;
+        transition: background 0.15s ease, color 0.15s ease;
+
+        &:hover { background: rgba(13,138,255,0.1); color: $tac-blue; }
+    }
+
+    &__show-btn { display: none; }
+
+    // Hidden state — normal mode collapses it entirely; edit mode shows it dimmed so user can restore.
+    &--hidden {
+        display: none;
+
+        .tac-edit-mode & {
+            display: block;
+            opacity: 0.35;
+            border-style: dashed;
+
+            .tac-section__hide-btn { display: none; }
+            .tac-section__show-btn { display: inline-flex; }
+        }
+    }
+
+    // Width presets — applied within the 2-col body grid.
+    &--width-half { /* default behavior: fills its col (1fr) */ }
+    &--width-full { /* same as half for now — both fill their column */ }
+    &--width-span {
+        grid-column: 1 / -1;
+    }
+}
+
+// Body becomes a single masonry-ish grid when there are span-2 sections;
+// but each column is a separate sortable, so span only takes effect inside its column.
+
+// ---- Edit mode ----
+.tac-edit-mode {
+    .tac-section {
+        border: 1px dashed $tac-blue;
+        background: rgba(13,138,255,0.04);
+    }
+    .tac-section__controls {
+        display: flex;
+    }
+    .tac-section__drag {
+        color: $tac-blue;
+    }
+    // Show a clear visual hint where to drop the dragged section.
+    .tac-section-placeholder {
+        background: rgba(13,138,255,0.12);
+        border: 2px dashed $tac-blue;
+        border-radius: 10px;
+        height: 80px;
+        margin-bottom: 14px;
+    }
+}
+
+// "Personnaliser" toggle button in the hero.
+.tac-hero__top-right {
+    display: inline-flex;
+    align-items: center;
+    gap: 12px;
+}
+.tac-hero__customize {
+    appearance: none;
+    background: transparent;
+    border: 1px solid $tac-border;
+    border-radius: 6px;
+    padding: 4px 10px;
+    cursor: pointer;
+    color: $tac-grey;
+    font-family: inherit;
+    font-size: 0.85em;
+    display: inline-flex;
+    align-items: center;
+    gap: 4px;
+    transition: background 0.15s ease, color 0.15s ease, border-color 0.15s ease;
+
+    &:hover { background: rgba(13,138,255,0.08); color: $tac-blue; border-color: $tac-blue; }
+
+    &--active {
+        background: $tac-blue;
+        color: #fff;
+        border-color: $tac-blue;
+        &:hover { background: darken($tac-blue, 5%); color: #fff; }
     }
 }
 
