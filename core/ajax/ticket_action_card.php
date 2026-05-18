@@ -153,7 +153,21 @@ switch ($action) {
         respond(false, $object->error ?: $langs->trans('Error'));
 
     /*
-     * save_layout — per-user persistence of the card layout (visible/width/column/order
+     * reset_layout — wipe the user's saved layout so the page reverts to defaults.
+     */
+    case 'reset_layout':
+        $sqlDel = 'DELETE FROM ' . MAIN_DB_PREFIX . 'user_param'
+            . ' WHERE fk_user = ' . ((int) $user->id)
+            . ' AND entity = ' . ((int) $conf->entity)
+            . " AND param = 'DIGIRISK_TICKET_CARD_LAYOUT'";
+        $ok = $db->query($sqlDel);
+        if (!$ok) {
+            respond(false, $db->lasterror() ?: 'ResetFailed');
+        }
+        respond(true, $langs->trans('LayoutReset'));
+
+    /*
+     * save_layout — per-user persistence of the card layout (visible/width/order
      * for each section). Writes a JSON blob to llx_user_param so user->conf->DIGIRISK_TICKET_CARD_LAYOUT
      * is populated automatically on subsequent logins.
      */
@@ -164,7 +178,8 @@ switch ($action) {
             respond(false, $langs->trans('ErrorBadParameters'));
         }
         // Re-encode to canonicalize and strip anything unexpected.
-        $sanitized = ['v' => 1, 'sections' => []];
+        // Schema v2: { visible, width, order } per section — single flat grid, no column field.
+        $sanitized = ['v' => 2, 'sections' => []];
         foreach (($decoded['sections'] ?? []) as $id => $cfg) {
             if (!preg_match('/^[a-z_]+$/', (string) $id) || !is_array($cfg)) {
                 continue;
@@ -172,7 +187,6 @@ switch ($action) {
             $sanitized['sections'][$id] = [
                 'visible' => !empty($cfg['visible']),
                 'width'   => in_array($cfg['width'] ?? '', ['half', 'full', 'span'], true) ? $cfg['width'] : 'full',
-                'column'  => in_array($cfg['column'] ?? '', ['left', 'right'], true) ? $cfg['column'] : 'left',
                 'order'   => isset($cfg['order']) ? (int) $cfg['order'] : 0,
             ];
         }

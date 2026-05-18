@@ -181,22 +181,27 @@ if ($evtRes) {
 }
 
 // ---- User-saved layout (per-user, stored in llx_user_param as JSON).
-// Schema: { "v": 1, "sections": { "<id>": { "visible": bool, "width": "half"|"full"|"span", "column": "left"|"right", "order": int } } }
-// Default layout if nothing saved.
+// Schema v2: { "v": 2, "sections": { "<id>": { "visible": bool, "width": "half"|"full"|"span", "order": int } } }
+// Body uses a single 4-column CSS grid with grid-auto-flow: dense:
+//   - "half" = span 1 (= 25% body width)
+//   - "full" = span 2 (= 50% body width — the historical "1 column")
+//   - "span" = span 4 (= 100% body width)
+// Default mimics the previous 2-col layout by interleaving left/right groups (full = half body).
 $defaultLayout = [
-    'v'        => 1,
+    'v'        => 2,
     'sections' => [
-        'identification'    => ['visible' => true, 'width' => 'full', 'column' => 'left',  'order' => 0],
-        'registres'         => ['visible' => true, 'width' => 'full', 'column' => 'left',  'order' => 1],
-        'condition_message' => ['visible' => true, 'width' => 'full', 'column' => 'left',  'order' => 2],
-        'other_extras'      => ['visible' => true, 'width' => 'full', 'column' => 'left',  'order' => 3],
-        'initial_message'   => ['visible' => true, 'width' => 'full', 'column' => 'left',  'order' => 4],
-        'classification'    => ['visible' => true, 'width' => 'full', 'column' => 'right', 'order' => 0],
-        'accidents'         => ['visible' => true, 'width' => 'full', 'column' => 'right', 'order' => 1],
-        'linked_files'      => ['visible' => true, 'width' => 'full', 'column' => 'right', 'order' => 2],
-        'events'            => ['visible' => true, 'width' => 'full', 'column' => 'right', 'order' => 3],
-        'related'           => ['visible' => true, 'width' => 'full', 'column' => 'right', 'order' => 4],
-        'dates'             => ['visible' => true, 'width' => 'full', 'column' => 'right', 'order' => 5],
+        // Interleaved L/R for an alternating 2-col visual.
+        'identification'    => ['visible' => true, 'width' => 'full', 'order' => 0],
+        'classification'    => ['visible' => true, 'width' => 'full', 'order' => 1],
+        'registres'         => ['visible' => true, 'width' => 'full', 'order' => 2],
+        'accidents'         => ['visible' => true, 'width' => 'full', 'order' => 3],
+        'condition_message' => ['visible' => true, 'width' => 'full', 'order' => 4],
+        'linked_files'      => ['visible' => true, 'width' => 'full', 'order' => 5],
+        'other_extras'      => ['visible' => true, 'width' => 'full', 'order' => 6],
+        'events'            => ['visible' => true, 'width' => 'full', 'order' => 7],
+        'initial_message'   => ['visible' => true, 'width' => 'full', 'order' => 8],
+        'related'           => ['visible' => true, 'width' => 'full', 'order' => 9],
+        'dates'             => ['visible' => true, 'width' => 'full', 'order' => 10],
     ],
 ];
 $rawLayout  = $user->conf->DIGIRISK_TICKET_CARD_LAYOUT ?? '';
@@ -204,10 +209,20 @@ $userLayout = $defaultLayout;
 if ($rawLayout) {
     $decoded = json_decode((string) $rawLayout, true);
     if (is_array($decoded) && isset($decoded['sections'])) {
-        // Merge: keep defaults for unknown sections, override with user's saved settings.
+        // Migration: old schema (v1) had a "column" field; we drop it but keep the rest.
         foreach ($decoded['sections'] as $id => $cfg) {
             if (isset($userLayout['sections'][$id]) && is_array($cfg)) {
-                $userLayout['sections'][$id] = array_merge($userLayout['sections'][$id], $cfg);
+                $merged = $userLayout['sections'][$id];
+                if (isset($cfg['visible'])) {
+                    $merged['visible'] = (bool) $cfg['visible'];
+                }
+                if (isset($cfg['width']) && in_array($cfg['width'], ['half', 'full', 'span'], true)) {
+                    $merged['width'] = $cfg['width'];
+                }
+                if (isset($cfg['order'])) {
+                    $merged['order'] = (int) $cfg['order'];
+                }
+                $userLayout['sections'][$id] = $merged;
             }
         }
     }
@@ -294,6 +309,9 @@ $renderField = function (string $field, string $type, string $label, $value, str
                 <i class="fas fa-arrow-left"></i> <?php print $langs->trans('BackToList'); ?>
             </a>
             <span class="tac-hero__top-right">
+                <button type="button" class="tac-hero__reset" data-layout-reset title="<?php print dol_escape_htmltag($langs->trans('LayoutResetTitle')); ?>">
+                    <i class="fas fa-undo"></i> <?php print $langs->trans('LayoutReset'); ?>
+                </button>
                 <button type="button" class="tac-hero__customize" data-customize-toggle>
                     <i class="fas fa-th-large"></i> <span class="tac-hero__customize-label" data-edit-on-label="<?php print dol_escape_htmltag($langs->trans('LayoutDone')); ?>" data-edit-off-label="<?php print dol_escape_htmltag($langs->trans('LayoutCustomize')); ?>"><?php print $langs->trans('LayoutCustomize'); ?></span>
                 </button>
@@ -370,11 +388,10 @@ $renderField = function (string $field, string $type, string $label, $value, str
         </div>
     </div>
 
-    <!-- ====== BODY: 2-column grid ====== -->
+    <!-- ====== BODY: flat 4-col grid (dense packing) ====== -->
+    <!-- All sections are direct children. Width classes (--width-half / --width-full / --width-span)
+         control how many sub-columns each section spans. -->
     <div class="tac-body">
-
-        <!-- LEFT COLUMN -->
-        <div class="tac-col tac-col--left">
 
             <!-- Section: Identification (native ticket fields) -->
             <section class="tac-section" data-section-id="identification">
@@ -527,6 +544,7 @@ $renderField = function (string $field, string $type, string $label, $value, str
             <?php endif; ?>
 
             <!-- Section: Initial message — display only, edit through Dolibarr card. -->
+            <!-- (The next group was the old RIGHT column; everything is now flat in the body grid.) -->
             <section class="tac-section" data-section-id="initial_message">
                 <h3 class="tac-section__title"><i class="fas fa-envelope-open-text"></i> <?php print $langs->trans('InitialMessage'); ?></h3>
                 <?php $sectionControls('initial_message'); ?>
@@ -537,10 +555,6 @@ $renderField = function (string $field, string $type, string $label, $value, str
                     <i class="fas fa-pen"></i> <?php print $langs->trans('Modify'); ?>
                 </a>
             </section>
-        </div>
-
-        <!-- RIGHT COLUMN -->
-        <div class="tac-col tac-col--right">
 
             <!-- Section: Classification (tags) -->
             <section class="tac-section" data-section-id="classification">
@@ -665,7 +679,6 @@ $renderField = function (string $field, string $type, string $label, $value, str
                     </div>
                 </div>
             </section>
-        </div>
     </div>
 
     <!-- ====== STICKY ACTION BAR ====== -->

@@ -41,8 +41,9 @@ window.digiriskdolibarr.ticketActionCard.applyLayout = function() {
         return;
     }
 
-    // Group sections by destination column and sort by order.
-    var byCol = { left: [], right: [] };
+    // Flat: collect every section, sort by 'order', append in order to the single .tac-body grid.
+    var $body = $card.find('.tac-body').first();
+    var bag = [];
     $card.find('.tac-section[data-section-id]').each(function() {
         var $sec = $(this);
         var id = $sec.attr('data-section-id');
@@ -50,23 +51,16 @@ window.digiriskdolibarr.ticketActionCard.applyLayout = function() {
         if (!cfg) {
             return; // unknown section — leave where the TPL put it
         }
-        var col = (cfg.column === 'right') ? 'right' : 'left';
-        $sec.attr('data-col', col);
+        var width = cfg.width || 'full';
         $sec.attr('data-order', cfg.order || 0);
-        $sec.attr('data-width', cfg.width || 'full');
+        $sec.attr('data-width', width);
         $sec.toggleClass('tac-section--hidden', cfg.visible === false);
         $sec.removeClass('tac-section--width-half tac-section--width-full tac-section--width-span');
-        $sec.addClass('tac-section--width-' + (cfg.width || 'full'));
-        byCol[col].push({ $el: $sec, order: cfg.order || 0 });
+        $sec.addClass('tac-section--width-' + width);
+        bag.push({ $el: $sec, order: cfg.order || 0 });
     });
-
-    var $leftCol  = $card.find('.tac-col--left').first();
-    var $rightCol = $card.find('.tac-col--right').first();
-    ['left', 'right'].forEach(function(col) {
-        byCol[col].sort(function(a, b) { return a.order - b.order; });
-        var $target = (col === 'left') ? $leftCol : $rightCol;
-        byCol[col].forEach(function(item) { $target.append(item.$el); });
-    });
+    bag.sort(function(a, b) { return a.order - b.order; });
+    bag.forEach(function(item) { $body.append(item.$el); });
 };
 
 /**
@@ -75,22 +69,12 @@ window.digiriskdolibarr.ticketActionCard.applyLayout = function() {
  * @return {Object}
  */
 window.digiriskdolibarr.ticketActionCard.serializeLayout = function() {
-    var layout = { v: 1, sections: {} };
-    $('.tac-card .tac-col--left .tac-section[data-section-id]').each(function(idx) {
+    var layout = { v: 2, sections: {} };
+    $('.tac-card .tac-body .tac-section[data-section-id]').each(function(idx) {
         var $s = $(this);
         layout.sections[$s.attr('data-section-id')] = {
             visible: !$s.hasClass('tac-section--hidden'),
             width:   $s.attr('data-width') || 'full',
-            column:  'left',
-            order:   idx,
-        };
-    });
-    $('.tac-card .tac-col--right .tac-section[data-section-id]').each(function(idx) {
-        var $s = $(this);
-        layout.sections[$s.attr('data-section-id')] = {
-            visible: !$s.hasClass('tac-section--hidden'),
-            width:   $s.attr('data-width') || 'full',
-            column:  'right',
             order:   idx,
         };
     });
@@ -142,8 +126,9 @@ window.digiriskdolibarr.ticketActionCard.event = function() {
     // Tap-to-edit — bind on the field WRAPPER so clicks anywhere in it (label/value) work.
     $(document).on('click', '.tac-field:not(.tac-field--readonly), .tac-chip:not(.tac-chip--readonly), .tac-hero__subject', window.digiriskdolibarr.ticketActionCard.onFieldClick);
 
-    // ---- Layout customization (edit mode toggle, drag/resize/hide).
+    // ---- Layout customization (edit mode toggle, drag/resize/hide/reset).
     $(document).on('click', '[data-customize-toggle]',     window.digiriskdolibarr.ticketActionCard.onCustomizeToggle);
+    $(document).on('click', '[data-layout-reset]',         window.digiriskdolibarr.ticketActionCard.onLayoutReset);
     $(document).on('click', '.tac-section__hide-btn',      window.digiriskdolibarr.ticketActionCard.onHideSection);
     $(document).on('click', '.tac-section__show-btn',      window.digiriskdolibarr.ticketActionCard.onShowSection);
     $(document).on('click', '.tac-section__width-btn',     window.digiriskdolibarr.ticketActionCard.onWidthChange);
@@ -164,29 +149,26 @@ window.digiriskdolibarr.ticketActionCard.onCustomizeToggle = function() {
     var isOn   = $body.hasClass('tac-edit-mode');
 
     if (!isOn) {
-        // Entering edit mode.
+        // Entering edit mode — activate sortable on the single body grid.
         $body.addClass('tac-edit-mode');
         $label.text($label.data('edit-on-label') || 'Terminé');
         $btn.addClass('tac-hero__customize--active');
 
-        // Activate jQuery UI sortable on both columns. The :ui-sortable check avoids re-init.
         if ($.fn.sortable) {
-            ['.tac-col--left', '.tac-col--right'].forEach(function(sel) {
-                var $col = $(sel);
-                if ($col.length && !$col.data('uiSortable')) {
-                    $col.sortable({
-                        connectWith: '.tac-col--left, .tac-col--right',
-                        handle:      '.tac-section__drag',
-                        placeholder: 'tac-section-placeholder',
-                        tolerance:   'pointer',
-                        opacity:     0.8,
-                        stop: function() {
-                            // After a drop, persist the new order/column.
-                            window.digiriskdolibarr.ticketActionCard.saveLayout();
-                        }
-                    });
-                }
-            });
+            var $grid = $card.find('.tac-body').first();
+            if ($grid.length && !$grid.data('uiSortable')) {
+                $grid.sortable({
+                    items:       '> .tac-section',
+                    handle:      '.tac-section__drag',
+                    placeholder: 'tac-section-placeholder',
+                    tolerance:   'pointer',
+                    opacity:     0.8,
+                    forcePlaceholderSize: true,
+                    stop: function() {
+                        window.digiriskdolibarr.ticketActionCard.saveLayout();
+                    }
+                });
+            }
         }
     } else {
         // Exiting edit mode.
@@ -194,16 +176,46 @@ window.digiriskdolibarr.ticketActionCard.onCustomizeToggle = function() {
         $label.text($label.data('edit-off-label') || 'Personnaliser');
         $btn.removeClass('tac-hero__customize--active');
         if ($.fn.sortable) {
-            ['.tac-col--left', '.tac-col--right'].forEach(function(sel) {
-                var $col = $(sel);
-                if ($col.data('uiSortable')) {
-                    $col.sortable('destroy');
-                }
-            });
+            var $grid2 = $card.find('.tac-body').first();
+            if ($grid2.data('uiSortable')) {
+                $grid2.sortable('destroy');
+            }
         }
-        // Final save on exit, just in case.
         window.digiriskdolibarr.ticketActionCard.saveLayout();
     }
+};
+
+/**
+ * Reset the user's saved layout (server-side delete) then reload to show defaults.
+ *
+ * @return {void}
+ */
+window.digiriskdolibarr.ticketActionCard.onLayoutReset = function() {
+    if (!window.confirm('Réinitialiser la mise en page ?')) {
+        return;
+    }
+    var $card   = $('.tac-card').first();
+    var ajaxUrl = $card.data('ajax-url');
+    var ticketId = $card.data('ticket-id');
+
+    $.ajax({
+        url: ajaxUrl,
+        method: 'POST',
+        dataType: 'json',
+        data: {
+            ticket_id: ticketId,
+            action: 'reset_layout',
+            token: $('input[name="token"]').val() || ''
+        }
+    }).done(function(response) {
+        if (response && response.success) {
+            window.location.reload();
+        } else {
+            window.digiriskdolibarr.ticketActionCard.flash($card, (response && response.message) || 'Erreur', 'error');
+        }
+    }).fail(function() {
+        window.digiriskdolibarr.ticketActionCard.flash($card, 'Erreur réseau', 'error');
+    });
 };
 
 /**

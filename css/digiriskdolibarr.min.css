@@ -2804,21 +2804,21 @@ textarea.action-textarea:not(:last-child) {
 
 .tac-body {
   display: grid;
-  grid-template-columns: 1fr 1fr;
+  grid-template-columns: repeat(4, 1fr);
+  grid-auto-flow: dense;
+  align-items: start;
   gap: 16px 20px;
   padding: 20px 24px;
 }
 @media (max-width: 1024px) {
   .tac-body {
-    grid-template-columns: 1fr;
+    grid-template-columns: repeat(2, 1fr);
   }
 }
-
-.tac-col {
-  display: flex;
-  flex-direction: column;
-  gap: 16px;
-  min-width: 0;
+@media (max-width: 640px) {
+  .tac-body {
+    grid-template-columns: 1fr;
+  }
 }
 
 .tac-section {
@@ -2908,10 +2908,27 @@ textarea.action-textarea:not(:last-child) {
 .tac-edit-mode .tac-section--hidden .tac-section__show-btn {
   display: inline-flex;
 }
-.tac-section--width-half { /* default behavior: fills its col (1fr) */ }
-.tac-section--width-full { /* same as half for now — both fill their column */ }
+.tac-section--width-half {
+  grid-column: span 1;
+}
+.tac-section--width-full {
+  grid-column: span 2;
+}
 .tac-section--width-span {
   grid-column: 1/-1;
+}
+@media (max-width: 1024px) {
+  .tac-section--width-half {
+    grid-column: span 1;
+  }
+  .tac-section--width-full {
+    grid-column: span 2;
+  }
+}
+@media (max-width: 640px) {
+  .tac-section--width-half, .tac-section--width-full, .tac-section--width-span {
+    grid-column: 1/-1;
+  }
 }
 
 .tac-edit-mode .tac-section {
@@ -2938,7 +2955,8 @@ textarea.action-textarea:not(:last-child) {
   gap: 12px;
 }
 
-.tac-hero__customize {
+.tac-hero__customize,
+.tac-hero__reset {
   appearance: none;
   background: transparent;
   border: 1px solid #e5e7eb;
@@ -2953,11 +2971,13 @@ textarea.action-textarea:not(:last-child) {
   gap: 4px;
   transition: background 0.15s ease, color 0.15s ease, border-color 0.15s ease;
 }
-.tac-hero__customize:hover {
+.tac-hero__customize:hover,
+.tac-hero__reset:hover {
   background: rgba(13, 138, 255, 0.08);
   color: #0d8aff;
   border-color: #0d8aff;
 }
+
 .tac-hero__customize--active {
   background: #0d8aff;
   color: #fff;
@@ -2966,6 +2986,21 @@ textarea.action-textarea:not(:last-child) {
 .tac-hero__customize--active:hover {
   background: #007df3;
   color: #fff;
+}
+
+.tac-hero__reset {
+  display: none;
+}
+
+.tac-edit-mode .tac-hero__reset {
+  display: inline-flex;
+  color: #e05353;
+  border-color: #e05353;
+}
+.tac-edit-mode .tac-hero__reset:hover {
+  background: rgba(224, 83, 83, 0.08);
+  color: #e05353;
+  border-color: #e05353;
 }
 
 .tac-grid {

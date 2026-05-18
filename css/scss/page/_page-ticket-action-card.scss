@@ -148,23 +148,24 @@ $tac-border:       #e5e7eb;
     }
 }
 
-// ----- Body 2-col grid -----
+// ----- Body grid (4 sub-columns + dense packing) -----
+// width-half = span 1 (25% body) → enables two half-width boxes side by side in what used to be a "column".
+// width-full = span 2 (50% body) → matches the historical default of 1 box per column.
+// width-span = span 4 (100% body) → full hero-width banner.
 .tac-body {
     display: grid;
-    grid-template-columns: 1fr 1fr;
+    grid-template-columns: repeat(4, 1fr);
+    grid-auto-flow: dense;
+    align-items: start;
     gap: 16px 20px;
     padding: 20px 24px;
 
     @media (max-width: 1024px) {
+        grid-template-columns: repeat(2, 1fr);
+    }
+    @media (max-width: 640px) {
         grid-template-columns: 1fr;
     }
-}
-
-.tac-col {
-    display: flex;
-    flex-direction: column;
-    gap: 16px;
-    min-width: 0;
 }
 
 // ----- Section card -----
@@ -254,16 +255,23 @@ $tac-border:       #e5e7eb;
         }
     }
 
-    // Width presets — applied within the 2-col body grid.
-    &--width-half { /* default behavior: fills its col (1fr) */ }
-    &--width-full { /* same as half for now — both fill their column */ }
-    &--width-span {
-        grid-column: 1 / -1;
+    // Width presets — applied against the 4-col body grid.
+    &--width-half { grid-column: span 1; }
+    &--width-full { grid-column: span 2; }
+    &--width-span { grid-column: 1 / -1; }
+
+    // On medium screens (≤1024px) the body collapses to 2 cols, so half ≈ full visually.
+    @media (max-width: 1024px) {
+        &--width-half { grid-column: span 1; }
+        &--width-full { grid-column: span 2; }
+    }
+    // On narrow screens (≤640px) the body is 1 col, all sections stack full width.
+    @media (max-width: 640px) {
+        &--width-half,
+        &--width-full,
+        &--width-span { grid-column: 1 / -1; }
     }
 }
-
-// Body becomes a single masonry-ish grid when there are span-2 sections;
-// but each column is a separate sortable, so span only takes effect inside its column.
 
 // ---- Edit mode ----
 .tac-edit-mode {
@@ -293,7 +301,8 @@ $tac-border:       #e5e7eb;
     align-items: center;
     gap: 12px;
 }
-.tac-hero__customize {
+.tac-hero__customize,
+.tac-hero__reset {
     appearance: none;
     background: transparent;
     border: 1px solid $tac-border;
@@ -309,13 +318,22 @@ $tac-border:       #e5e7eb;
     transition: background 0.15s ease, color 0.15s ease, border-color 0.15s ease;
 
     &:hover { background: rgba(13,138,255,0.08); color: $tac-blue; border-color: $tac-blue; }
+}
 
-    &--active {
-        background: $tac-blue;
-        color: #fff;
-        border-color: $tac-blue;
-        &:hover { background: darken($tac-blue, 5%); color: #fff; }
-    }
+.tac-hero__customize--active {
+    background: $tac-blue;
+    color: #fff;
+    border-color: $tac-blue;
+    &:hover { background: darken($tac-blue, 5%); color: #fff; }
+}
+
+// Reset button is only shown while the edit mode is active.
+.tac-hero__reset { display: none; }
+.tac-edit-mode .tac-hero__reset {
+    display: inline-flex;
+    color: $tac-red;
+    border-color: $tac-red;
+    &:hover { background: rgba(224,83,83,0.08); color: $tac-red; border-color: $tac-red; }
 }
 
 // ----- Tap-to-edit field grid -----
