@@ -56,7 +56,9 @@ $ajaxUrl     = dol_buildpath('/custom/digiriskdolibarr/core/ajax/ticket_action_c
 $fullCardUrl = DOL_URL_ROOT . '/ticket/card.php?id=' . (int) $object->id;
 
 // Build the user dropdown options once, shared by the assignee tap-to-edit and (later) other user pickers.
-$userPickerOptions = [['id' => 0, 'label' => $langs->trans('NotAssigned')]];
+// All option labels use transnoentities() because they end up serialized to JSON and rendered by
+// jQuery .text() — which would print "&eacute;" literally if trans() returned HTML-encoded text.
+$userPickerOptions = [['id' => 0, 'label' => $langs->transnoentities('NotAssigned')]];
 $tmpUserSql = 'SELECT rowid, login, lastname, firstname FROM ' . MAIN_DB_PREFIX . 'user WHERE statut = 1 AND entity IN (' . getEntity('user') . ') ORDER BY lastname, firstname';
 $tmpRes = $db->query($tmpUserSql);
 if ($tmpRes) {
@@ -66,16 +68,16 @@ if ($tmpRes) {
     }
 }
 
-// Ticket status options for the status tap-to-edit.
+// Ticket status options for the status tap-to-edit. transnoentities() because they go through JSON → JS .text().
 $statusOptions = [
-    Ticket::STATUS_NOT_READ       => $langs->trans('Unread'),
-    Ticket::STATUS_READ           => $langs->trans('Read'),
-    Ticket::STATUS_ASSIGNED       => $langs->trans('Assigned'),
-    Ticket::STATUS_IN_PROGRESS    => $langs->trans('InProgress'),
-    Ticket::STATUS_NEED_MORE_INFO => $langs->trans('NeedMoreInformationShort'),
-    Ticket::STATUS_WAITING        => $langs->trans('OnHold'),
-    Ticket::STATUS_CLOSED         => $langs->trans('SolvedClosed'),
-    Ticket::STATUS_CANCELED       => $langs->trans('Canceled'),
+    Ticket::STATUS_NOT_READ       => $langs->transnoentities('Unread'),
+    Ticket::STATUS_READ           => $langs->transnoentities('Read'),
+    Ticket::STATUS_ASSIGNED       => $langs->transnoentities('Assigned'),
+    Ticket::STATUS_IN_PROGRESS    => $langs->transnoentities('InProgress'),
+    Ticket::STATUS_NEED_MORE_INFO => $langs->transnoentities('NeedMoreInformationShort'),
+    Ticket::STATUS_WAITING        => $langs->transnoentities('OnHold'),
+    Ticket::STATUS_CLOSED         => $langs->transnoentities('SolvedClosed'),
+    Ticket::STATUS_CANCELED       => $langs->transnoentities('Canceled'),
 ];
 
 // Load all categories for this ticket (Classification section).
@@ -105,13 +107,13 @@ $extra = $object->array_options ?? [];
 
 // ---- Dictionary options for type / severity / category (native ticket fields).
 $dictOptions = function (string $table, ?string $code = null) use ($db, $langs): array {
-    $opts = [['id' => '', 'label' => '— ' . $langs->trans('NoneSelected') . ' —']];
+    $opts = [['id' => '', 'label' => '— ' . $langs->transnoentities('NoneSelected') . ' —']];
     $sql = 'SELECT code, label, active FROM ' . MAIN_DB_PREFIX . $db->escape($table)
         . ' WHERE active = 1 AND entity IN (' . getEntity($table) . ') ORDER BY label';
     $r = $db->query($sql);
     if ($r) {
         while ($row = $db->fetch_object($r)) {
-            $opts[] = ['id' => $row->code, 'label' => $langs->trans($row->label) ?: $row->label];
+            $opts[] = ['id' => $row->code, 'label' => $langs->transnoentities($row->label) ?: $row->label];
         }
     }
     return $opts;
@@ -121,7 +123,7 @@ $severityOptions = $dictOptions('c_ticket_severity');
 $categoryOptions = $dictOptions('c_ticket_category');
 
 // ---- Third party picker (companies). Capped at 200 to avoid huge dropdowns.
-$socOptions = [['id' => 0, 'label' => '— ' . $langs->trans('NoneSelected') . ' —']];
+$socOptions = [['id' => 0, 'label' => '— ' . $langs->transnoentities('NoneSelected') . ' —']];
 $socRes = $db->query('SELECT rowid, nom FROM ' . MAIN_DB_PREFIX . "societe WHERE status = 1 AND entity IN (" . getEntity('societe') . ') ORDER BY nom LIMIT 200');
 if ($socRes) {
     while ($row = $db->fetch_object($socRes)) {
@@ -533,8 +535,8 @@ $renderField = function (string $field, string $type, string $label, $value, str
                         $opts = [];
                         if ($uiType === 'select') {
                             $opts['options'] = [
-                                ['id' => '0', 'label' => $langs->trans('No')],
-                                ['id' => '1', 'label' => $langs->trans('Yes')],
+                                ['id' => '0', 'label' => $langs->transnoentities('No')],
+                                ['id' => '1', 'label' => $langs->transnoentities('Yes')],
                             ];
                         }
                         $renderField('options_' . $key, $uiType, $info['label'], $val, $display, $opts);
