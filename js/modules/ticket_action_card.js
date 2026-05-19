@@ -49,14 +49,14 @@ window.digiriskdolibarr.ticketActionCard.initThreadReplyEditor = function() {
             width: '100%'
         });
         // Ctrl/Cmd+Enter inside the CKEditor iframe also fires Send.
-        ed.on('instanceReady', function() {
-            ed.document.on('keydown', function(e) {
-                var ev = e.data && e.data.$;
-                if (ev && ev.key === 'Enter' && (ev.ctrlKey || ev.metaKey)) {
-                    ev.preventDefault();
-                    $('[data-thread-send]').first().trigger('click');
-                }
-            });
+        // CKEditor encodes modifiers into the keystroke value: CTRL=0x110000, ENTER=13.
+        // Numpad Enter is keyCode 10 on some keyboards, so we accept both.
+        ed.on('key', function(ev) {
+            var CTRL = window.CKEDITOR.CTRL || 0x110000;
+            if (ev.data.keyCode === (CTRL + 13) || ev.data.keyCode === (CTRL + 10)) {
+                ev.cancel();
+                $('[data-thread-send]').first().trigger('click');
+            }
         });
     } catch (e) {
         // Fallback: keep the plain textarea.
@@ -666,13 +666,14 @@ window.digiriskdolibarr.ticketActionCard.onMsgQuote = function(event) {
     var $form   = $('[data-thread-reply]').first();
     var $ta     = $form.find('.tac-thread__reply-body');
     var taId    = $ta.attr('id');
-    var quoted  = '<blockquote><strong>' + $('<div>').text(author).html() + ' :</strong><br>' + body + '</blockquote><p></p>';
+    // Quote sits BEFORE the user's reply so they type their answer underneath it.
+    var quoted  = '<blockquote><strong>' + $('<div>').text(author).html() + ' :</strong>' + body + '</blockquote><p>&nbsp;</p>';
     if (taId && window.CKEDITOR && window.CKEDITOR.instances && window.CKEDITOR.instances[taId]) {
         var ed = window.CKEDITOR.instances[taId];
-        ed.setData((ed.getData() || '') + quoted);
+        ed.setData(quoted + (ed.getData() || ''));
         ed.focus();
     } else {
-        $ta.val(($ta.val() || '') + quoted).focus();
+        $ta.val(quoted + ($ta.val() || '')).focus();
     }
     if ($form[0].scrollIntoView) {
         $form[0].scrollIntoView({behavior: 'smooth', block: 'nearest'});

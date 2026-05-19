@@ -51,6 +51,24 @@ function respond(bool $success, string $message, array $extra = []): void
     exit;
 }
 
+/**
+ * Sanitize and render a thread message body, keeping <blockquote> intact
+ * (dolPrintHTML's "common" whitelist drops it, breaking quote-replies).
+ */
+function renderThreadBody(string $raw): string
+{
+    $stringWithEntities = dol_htmlentitiesbr($raw);
+    $clean              = dol_htmlwithnojs(dol_string_onlythesehtmltags($stringWithEntities, 1, 1, 1));
+    return dol_escape_htmltag(
+        $clean,
+        1,
+        1,
+        'html,body,a,b,em,hr,i,u,ul,ol,li,br,div,img,font,p,span,strong,table,tr,td,th,tbody,h1,h2,h3,h4,h5,h6,header,footer,nav,section,menu,menuitem,blockquote,pre,code,kbd',
+        0,
+        1
+    );
+}
+
 global $conf, $db, $langs, $user;
 
 $langs->loadLangs(['digiriskdolibarr@digiriskdolibarr', 'ticket']);
@@ -195,7 +213,7 @@ switch ($action) {
         $bodyLinkified = preg_replace_callback(
             '#(?<!href=["\'])(https?://[^\s<>"\']+)#i',
             static fn($m) => '<a href="' . dol_escape_htmltag($m[1]) . '" target="_blank" rel="noopener">' . dol_escape_htmltag($m[1]) . '</a>',
-            dolPrintHTML($body)
+            renderThreadBody($body)
         );
         $bubble = '<li class="' . $cls . '" data-msg-id="' . (int) $newId . '" data-msg-mine="1">'
             . $avatar
@@ -245,7 +263,7 @@ switch ($action) {
         $bodyLinkified = preg_replace_callback(
             '#(?<!href=["\'])(https?://[^\s<>"\']+)#i',
             static fn($m) => '<a href="' . dol_escape_htmltag($m[1]) . '" target="_blank" rel="noopener">' . dol_escape_htmltag($m[1]) . '</a>',
-            dolPrintHTML($body)
+            renderThreadBody($body)
         );
         respond(true, $langs->transnoentities('MessageEdited'), [
             'message_id' => $msgId,

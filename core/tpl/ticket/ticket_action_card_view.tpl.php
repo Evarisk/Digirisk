@@ -332,6 +332,25 @@ $linkifyUrls = static function (string $html): string {
 };
 
 /**
+ * Render a message body, preserving the tags allowed in a chat bubble.
+ * dolPrintHTML's "common" whitelist drops <blockquote>, which breaks quote-replies, so
+ * we widen the noescape list to keep quotes, code blocks and rich text intact while
+ * still running the full sanitize pipeline (entities, no-JS, only-these-html-tags).
+ */
+$threadBodyHtml = static function (string $raw): string {
+    $stringWithEntities = dol_htmlentitiesbr($raw);
+    $clean              = dol_htmlwithnojs(dol_string_onlythesehtmltags($stringWithEntities, 1, 1, 1));
+    return dol_escape_htmltag(
+        $clean,
+        1,
+        1,
+        'html,body,a,b,em,hr,i,u,ul,ol,li,br,div,img,font,p,span,strong,table,tr,td,th,tbody,h1,h2,h3,h4,h5,h6,header,footer,nav,section,menu,menuitem,blockquote,pre,code,kbd',
+        0,
+        1
+    );
+};
+
+/**
  * Count attached files for an actioncomm entry (stored under agenda upload dir).
  */
 $attachedFileCount = static function (int $actioncommId) use ($conf): int {
@@ -890,7 +909,7 @@ if (!in_array($severityKey, ['low', 'normal', 'high', 'blocking'], true)) {
                         $msgTs       = $db->jdate($msg->datep);
                         $absoluteDt  = dol_print_date($msgTs, 'dayhour', 'tzuser');
                         $relativeDt  = $relativeTime((int) $msgTs);
-                        $bodyHtml    = !empty($msg->note_private) ? $linkifyUrls(dolPrintHTML((string) $msg->note_private)) : '<span class="opacitymedium">—</span>';
+                        $bodyHtml    = !empty($msg->note_private) ? $linkifyUrls($threadBodyHtml((string) $msg->note_private)) : '<span class="opacitymedium">—</span>';
                         $fileCount   = $attachedFileCount((int) $msg->id);
                         $authorUrl   = !empty($msg->fk_user_author) ? DOL_URL_ROOT . '/user/card.php?id=' . (int) $msg->fk_user_author : '';
                         $msgClasses  = 'tac-thread__msg';

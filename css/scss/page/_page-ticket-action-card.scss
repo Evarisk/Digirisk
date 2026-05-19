@@ -1424,14 +1424,25 @@ $tac-border:       #e5e7eb;
         word-break: break-word;
 
         a { color: $tac-blue; text-decoration: underline; }
+        p { margin: 0 0 4px; &:last-child { margin-bottom: 0; } }
         blockquote {
-            margin: 4px 0;
-            padding: 4px 10px;
-            border-left: 3px solid $tac-grey;
-            background: rgba(107,114,128,0.06);
-            color: $tac-grey;
-            font-size: 0.95em;
+            margin: 4px 0 6px;
+            padding: 6px 10px;
+            border-left: 3px solid rgba(31, 41, 55, 0.25);
+            background: rgba(0, 0, 0, 0.04);
+            color: #4b5563;
+            font-size: 0.92em;
+            border-radius: 0 4px 4px 0;
+
+            strong { color: #1f2937; }
+            p { margin: 2px 0; }
+            br + p, p:first-child { margin-top: 0; }
         }
+    }
+    // Inside mine bubbles (blue tint), shift the quote tint so it still reads.
+    &__msg--mine &__body blockquote {
+        background: rgba(13, 138, 255, 0.08);
+        border-left-color: rgba(13, 138, 255, 0.45);
     }
 
     &__attachments {
