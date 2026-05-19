@@ -221,6 +221,34 @@ foreach (($extrafieldsObj->attributes[$object->table_element]['label'] ?? []) as
 $uploadDir = $conf->ticket->multidir_output[$conf->entity ?? 1] . '/' . dol_sanitizeFileName($object->ref);
 $linkedFiles = is_dir($uploadDir) ? dol_dir_list($uploadDir, 'files', 0, '', null, 'date', SORT_DESC, 1) : [];
 
+// ---- Status timeline (sparkline) — sequence of status changes detected from ActionComm log.
+// The timeline shows: created, read, assigned, in progress, waiting, closed/cancelled,
+// based on the dated milestones available on $object. ActionComm doesn't store the
+// individual status changes consistently, so we read what's reliably on the ticket row.
+$statusMilestones = [];
+if (!empty($object->datec)) {
+    $statusMilestones[] = ['code' => 'NOT_READ',    'date' => (int) $object->datec, 'label' => $langs->trans('Unread')];
+}
+if (!empty($object->date_read)) {
+    $statusMilestones[] = ['code' => 'READ',        'date' => (int) $object->date_read, 'label' => $langs->trans('Read')];
+}
+if (!empty($object->date_close)) {
+    $closedLabel = ($status === Ticket::STATUS_CANCELED) ? $langs->trans('Canceled') : $langs->trans('SolvedClosed');
+    $statusMilestones[] = ['code' => 'CLOSED',      'date' => (int) $object->date_close, 'label' => $closedLabel];
+}
+// Sort by date ascending.
+usort($statusMilestones, static fn($a, $b) => $a['date'] <=> $b['date']);
+// Always show the current status as the trailing point if it's not already represented by a date.
+$currentStatusLabel = $object->getLibStatut(0);
+if (!empty($statusMilestones)) {
+    $last = end($statusMilestones);
+    if (!in_array($status, [Ticket::STATUS_NOT_READ, Ticket::STATUS_READ, Ticket::STATUS_CLOSED, Ticket::STATUS_CANCELED], true)) {
+        $statusMilestones[] = ['code' => 'CURRENT', 'date' => time(), 'label' => $currentStatusLabel, 'current' => true];
+    } elseif ($last['code'] !== 'CURRENT') {
+        $statusMilestones[count($statusMilestones) - 1]['current'] = true;
+    }
+}
+
 // ---- Recent events (actioncomm) attached to this ticket — last 10.
 $recentEvents = [];
 $evtSql = 'SELECT a.id, a.label, a.datep, a.fk_user_author, u.lastname, u.firstname'
@@ -306,6 +334,11 @@ if ($rawLayout) {
 }
 $layoutJson = json_encode($userLayout);
 
+// ---- Watch state: list of ticket ids this user has bookmarked.
+$rawWatchList = $user->conf->DIGIRISK_TICKET_WATCHLIST ?? '';
+$watchList    = array_filter(array_map('intval', explode(',', (string) $rawWatchList)));
+$isWatched    = in_array((int) $object->id, $watchList, true);
+
 // ---- Related objects (fetchObjectLinked).
 $object->fetchObjectLinked();
 $relatedObjects = [];
@@ -373,13 +406,22 @@ $renderField = function (string $field, string $type, string $label, $value, str
 };
 ?>
 
-<div class="ticket-action-card tac-card tac-density-<?php print dol_escape_htmltag($userLayout['density']); ?>"
+<?php
+// Map ticket severity to a CSS modifier so the card border can be tinted at a glance.
+// Falls back to "default" when the ticket has no severity_code or an unknown one.
+$severityKey = strtolower(preg_replace('/[^a-z0-9_-]/i', '', (string) ($object->severity_code ?? '')));
+if (!in_array($severityKey, ['low', 'normal', 'high', 'blocking'], true)) {
+    $severityKey = 'default';
+}
+?>
+<div class="ticket-action-card tac-card tac-density-<?php print dol_escape_htmltag($userLayout['density']); ?> tac-severity-<?php print dol_escape_htmltag($severityKey); ?>"
      data-ticket-id="<?php print (int) $object->id; ?>"
      data-ajax-url="<?php print dol_escape_htmltag($ajaxUrl); ?>"
      data-layout="<?php print dol_escape_htmltag($layoutJson); ?>"
      data-density="<?php print dol_escape_htmltag($userLayout['density']); ?>"
      data-tags-mode="<?php print dol_escape_htmltag($userLayout['tagsMode']); ?>"
-     data-actions-mode="<?php print dol_escape_htmltag($userLayout['actionsMode']); ?>">
+     data-actions-mode="<?php print dol_escape_htmltag($userLayout['actionsMode']); ?>"
+     data-severity="<?php print dol_escape_htmltag($severityKey); ?>">
     <input type="hidden" name="token" value="<?php print newToken(); ?>">
 
     <!-- ====== HERO HEADER ====== -->
@@ -389,6 +431,11 @@ $renderField = function (string $field, string $type, string $label, $value, str
                 <i class="fas fa-arrow-left"></i> <?php print $langs->trans('BackToList'); ?>
             </a>
             <span class="tac-hero__top-right">
+                <button type="button" class="tac-hero__watch<?php print $isWatched ? ' is-watched' : ''; ?>"
+                        data-watch-toggle
+                        title="<?php print dol_escape_htmltag($langs->trans($isWatched ? 'UnwatchTicket' : 'WatchTicket')); ?>">
+                    <i class="<?php print $isWatched ? 'fas' : 'far'; ?> fa-star"></i>
+                </button>
                 <span class="tac-hero__density" role="toolbar" aria-label="<?php print dol_escape_htmltag($langs->trans('LayoutDensity')); ?>">
                     <button type="button" class="tac-hero__density-btn<?php print $userLayout['density'] === 'compact' ? ' is-active' : ''; ?>" data-density="compact" title="<?php print dol_escape_htmltag($langs->trans('LayoutDensityCompact')); ?>">
                         <i class="fas fa-compress-alt"></i>
@@ -476,6 +523,25 @@ $renderField = function (string $field, string $type, string $label, $value, str
             </span>
             <?php endif; ?>
         </div>
+
+        <!-- Status timeline sparkline (created → read → assigned → in progress → closed). -->
+        <?php if (count($statusMilestones) >= 2) : ?>
+        <div class="tac-timeline" aria-label="<?php print dol_escape_htmltag($langs->trans('StatusTimeline')); ?>">
+            <?php
+            $first = $statusMilestones[0]['date'];
+            $last  = end($statusMilestones)['date'];
+            $span  = max(1, $last - $first);
+            foreach ($statusMilestones as $i => $m) :
+                $offsetPct = round(100 * ($m['date'] - $first) / $span, 2);
+                $dotClass  = 'tac-timeline__dot' . (!empty($m['current']) ? ' tac-timeline__dot--current' : '');
+                $tooltip   = $m['label'] . ' · ' . dol_print_date($m['date'], 'dayhour', 'tzuser');
+                ?>
+                <span class="<?php print $dotClass; ?>" style="left: <?php print $offsetPct; ?>%;" title="<?php print dol_escape_htmltag($tooltip); ?>">
+                    <span class="tac-timeline__label"><?php print dol_escape_htmltag($m['label']); ?></span>
+                </span>
+            <?php endforeach; ?>
+        </div>
+        <?php endif; ?>
 
         <!-- Dolibarr native tabs (Contacts, Documents, Events) inline as quick links -->
         <div class="tac-hero__nav-tabs">

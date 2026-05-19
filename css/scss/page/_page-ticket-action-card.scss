@@ -57,8 +57,16 @@ $tac-border:       #e5e7eb;
     margin: 1em auto 6em auto; // bottom margin for the sticky bar
     background: #fff;
     border-radius: 12px;
+    border-left: 6px solid $tac-border;
     box-shadow: $tile-shadow;
     overflow: hidden;
+    transition: border-color 0.2s ease;
+
+    // Severity tint on the left rail — quick visual sort by urgency.
+    &.tac-severity-low      { border-left-color: #6b7280; }
+    &.tac-severity-normal   { border-left-color: $tac-blue; }
+    &.tac-severity-high     { border-left-color: $tac-orange; }
+    &.tac-severity-blocking { border-left-color: $tac-red; box-shadow: 0 2px 6px rgba(224,83,83,0.18); }
 }
 
 // ----- Hero -----
@@ -120,6 +128,96 @@ $tac-border:       #e5e7eb;
 
         &:hover { background: rgba(13,138,255,0.08); color: $tac-blue; }
     }
+}
+
+// ----- Watch / bookmark button (star icon in the hero) -----
+.tac-hero__watch {
+    appearance: none;
+    background: transparent;
+    border: 1px solid $tac-border;
+    border-radius: 6px;
+    padding: 4px 10px;
+    cursor: pointer;
+    color: $tac-grey;
+    font-family: inherit;
+    font-size: 0.95em;
+    transition: color 0.15s ease, background 0.15s ease, border-color 0.15s ease;
+
+    &:hover { color: $tac-orange; border-color: $tac-orange; background: rgba(233,173,79,0.08); }
+
+    &.is-watched {
+        color: $tac-orange;
+        border-color: $tac-orange;
+        background: rgba(233,173,79,0.08);
+    }
+}
+
+// ----- Drag & drop overlay -----
+.tac-card.tac-dragover {
+    position: relative;
+
+    &::after {
+        content: 'Déposez ici pour joindre au ticket';
+        position: absolute;
+        inset: 0;
+        background: rgba(13,138,255,0.12);
+        border: 3px dashed $tac-blue;
+        border-radius: 12px;
+        z-index: 500;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        color: $tac-blue;
+        font-weight: 600;
+        font-size: 1.2em;
+        pointer-events: none;
+    }
+}
+
+// ----- Status timeline sparkline -----
+.tac-timeline {
+    position: relative;
+    height: 36px;
+    margin: 4px 0 10px;
+    background: linear-gradient(to right, $tac-border 0%, $tac-border 100%);
+    background-size: 100% 2px;
+    background-position: 0 50%;
+    background-repeat: no-repeat;
+
+    &__dot {
+        position: absolute;
+        top: 50%;
+        transform: translate(-50%, -50%);
+        width: 12px;
+        height: 12px;
+        border-radius: 50%;
+        background: $tac-blue;
+        border: 2px solid #fff;
+        box-shadow: 0 0 0 1px $tac-border;
+        cursor: help;
+
+        &--current {
+            background: $tac-orange;
+            box-shadow: 0 0 0 1px $tac-orange, 0 0 0 4px rgba(233,173,79,0.18);
+            animation: tac-timeline-pulse 1.6s ease-in-out infinite;
+        }
+    }
+
+    &__label {
+        position: absolute;
+        bottom: -16px;
+        left: 50%;
+        transform: translateX(-50%);
+        white-space: nowrap;
+        font-size: 0.7em;
+        color: $tac-grey;
+        pointer-events: none;
+    }
+}
+
+@keyframes tac-timeline-pulse {
+    0%, 100% { box-shadow: 0 0 0 1px $tac-orange, 0 0 0 4px rgba(233,173,79,0.18); }
+    50%      { box-shadow: 0 0 0 1px $tac-orange, 0 0 0 8px rgba(233,173,79,0.06); }
 }
 
 // ----- Chips (status / assignee / progress / dates) -----

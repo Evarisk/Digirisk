@@ -224,6 +224,37 @@ window.digiriskdolibarr.ticketActionCard.event = function() {
     $(document).on('click',  '[data-tag-remove]',          window.digiriskdolibarr.ticketActionCard.onTagRemove);
     $(document).on('change', '[data-tag-add-select]',      window.digiriskdolibarr.ticketActionCard.onTagAddSelect);
 
+    // ---- Watch / bookmark toggle.
+    $(document).on('click', '[data-watch-toggle]',         window.digiriskdolibarr.ticketActionCard.onWatchToggle);
+
+    // ---- Drag & drop file upload anywhere on the card.
+    var $card = $('.tac-card');
+    if ($card.length) {
+        $card.on('dragover dragenter', function(e) {
+            e.preventDefault();
+            e.stopPropagation();
+            // Only react to file drags.
+            if (e.originalEvent.dataTransfer && e.originalEvent.dataTransfer.types && Array.from(e.originalEvent.dataTransfer.types).indexOf('Files') !== -1) {
+                $card.addClass('tac-dragover');
+            }
+        });
+        $card.on('dragleave drop', function(e) {
+            // Only remove if we leave the card itself (not a child).
+            if (e.type === 'dragleave' && e.relatedTarget && $card[0].contains(e.relatedTarget)) {
+                return;
+            }
+            $card.removeClass('tac-dragover');
+        });
+        $card.on('drop', function(e) {
+            e.preventDefault();
+            e.stopPropagation();
+            var files = e.originalEvent.dataTransfer ? e.originalEvent.dataTransfer.files : null;
+            if (files && files.length) {
+                window.digiriskdolibarr.ticketActionCard.uploadFiles(files);
+            }
+        });
+    }
+
     // ---- Linked files preview + delete.
     $(document).on('click', '[data-file-preview]',         window.digiriskdolibarr.ticketActionCard.onFilePreview);
     $(document).on('click', '[data-file-delete]',          window.digiriskdolibarr.ticketActionCard.onFileDelete);
@@ -251,6 +282,97 @@ window.digiriskdolibarr.ticketActionCard.event = function() {
                 window.digiriskdolibarr.ticketActionCard.closeLightbox();
             }
         }
+    });
+};
+
+/**
+ * Upload one or more files to the ticket via FormData / AJAX. Each file is
+ * sent in its own request so partial failures don't abort the rest. The page
+ * reloads once all uploads succeed so the new files appear in the list.
+ *
+ * @param  {FileList} files
+ * @return {void}
+ */
+window.digiriskdolibarr.ticketActionCard.uploadFiles = function(files) {
+    var $card    = $('.tac-card').first();
+    var ajaxUrl  = $card.data('ajax-url');
+    var ticketId = $card.data('ticket-id');
+    var total    = files.length;
+    var done     = 0;
+    var failed   = 0;
+
+    window.digiriskdolibarr.ticketActionCard.flash($card, 'Upload ' + total + ' fichier(s)…', 'success');
+
+    Array.prototype.forEach.call(files, function(file) {
+        var fd = new FormData();
+        fd.append('ticket_id', ticketId);
+        fd.append('action', 'upload_file');
+        fd.append('upload', file);
+        fd.append('token', $('input[name="token"]').val() || '');
+        $.ajax({
+            url: ajaxUrl,
+            method: 'POST',
+            data: fd,
+            contentType: false,
+            processData: false,
+            dataType: 'json'
+        }).done(function(response) {
+            if (!response || !response.success) { failed++; }
+        }).fail(function() {
+            failed++;
+        }).always(function() {
+            done++;
+            if (done === total) {
+                if (failed === 0) {
+                    window.digiriskdolibarr.ticketActionCard.flash($card, 'Upload terminé', 'success');
+                    setTimeout(function() { window.location.reload(); }, 500);
+                } else {
+                    window.digiriskdolibarr.ticketActionCard.flash($card, failed + ' échec(s) sur ' + total + ' fichier(s)', 'error');
+                }
+            }
+        });
+    });
+};
+
+/**
+ * Toggle watch / bookmark state on the ticket. Updates the button icon
+ * optimistically, rolls back on AJAX failure.
+ *
+ * @param  {MouseEvent} event
+ * @return {void}
+ */
+window.digiriskdolibarr.ticketActionCard.onWatchToggle = function(event) {
+    event.preventDefault();
+    var $btn = $(this);
+    var $card = $('.tac-card').first();
+    var wasWatched = $btn.hasClass('is-watched');
+
+    // Optimistic flip.
+    $btn.toggleClass('is-watched');
+    $btn.find('i').toggleClass('fas far');
+
+    $.ajax({
+        url: $card.data('ajax-url'),
+        method: 'POST',
+        dataType: 'json',
+        data: {
+            ticket_id: $card.data('ticket-id'),
+            action: 'toggle_watch',
+            token: $('input[name="token"]').val() || ''
+        }
+    }).done(function(response) {
+        if (response && response.success) {
+            window.digiriskdolibarr.ticketActionCard.flash($card, response.message || '', 'success');
+        } else {
+            // Rollback.
+            $btn.toggleClass('is-watched');
+            $btn.find('i').toggleClass('fas far');
+            window.digiriskdolibarr.ticketActionCard.flash($card, (response && response.message) || 'Erreur', 'error');
+        }
+    }).fail(function() {
+        $btn.toggleClass('is-watched');
+        $btn.find('i').toggleClass('fas far');
+        window.digiriskdolibarr.ticketActionCard.flash($card, 'Erreur réseau', 'error');
     });
 };
 

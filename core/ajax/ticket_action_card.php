@@ -153,6 +153,65 @@ switch ($action) {
         respond(false, $object->error ?: $langs->transnoentities('Error'));
 
     /*
+     * upload_file — receive a single file via FormData and drop it in the ticket's
+     * upload directory. Caller-side drag&drop sends one request per file.
+     * Sanitizes the filename + checks size against PHP's upload_max_filesize.
+     */
+    case 'upload_file':
+        require_once DOL_DOCUMENT_ROOT . '/core/lib/files.lib.php';
+        if (empty($_FILES['upload']) || !is_uploaded_file($_FILES['upload']['tmp_name'] ?? '')) {
+            respond(false, $langs->transnoentities('ErrorFileNotUploaded'));
+        }
+        if (!empty($_FILES['upload']['error'])) {
+            respond(false, $langs->transnoentities('Error') . ' (' . (int) $_FILES['upload']['error'] . ')');
+        }
+        $name = dol_sanitizeFileName((string) $_FILES['upload']['name']);
+        if ($name === '' || $name[0] === '.') {
+            respond(false, $langs->transnoentities('ErrorBadParameters'));
+        }
+        $uploadDir = $conf->ticket->multidir_output[$conf->entity ?? 1] . '/' . dol_sanitizeFileName($object->ref);
+        if (!is_dir($uploadDir)) {
+            dol_mkdir($uploadDir);
+        }
+        $target = $uploadDir . '/' . $name;
+        $moved  = dol_move_uploaded_file($_FILES['upload']['tmp_name'], $target, 1, 0, 0, 0, 'upload');
+        if ($moved <= 0) {
+            respond(false, $langs->transnoentities('ErrorFailedToWriteFile') . ' ' . $name);
+        }
+        respond(true, $langs->transnoentities('FileUploaded') . ': ' . $name, ['file_name' => $name]);
+
+    /*
+     * toggle_watch — bookmark/unbookmark this ticket for the current user.
+     * Persists in llx_user_param under the DIGIRISK_TICKET_WATCHLIST key as a CSV of ids.
+     */
+    case 'toggle_watch':
+        $sqlSel = 'SELECT value FROM ' . MAIN_DB_PREFIX . 'user_param'
+            . ' WHERE fk_user = ' . ((int) $user->id) . ' AND entity = ' . ((int) $conf->entity)
+            . " AND param = 'DIGIRISK_TICKET_WATCHLIST'";
+        $existing = '';
+        $rWatch = $db->query($sqlSel);
+        if ($rWatch && ($row = $db->fetch_object($rWatch))) {
+            $existing = (string) $row->value;
+        }
+        $ids = array_values(array_filter(array_map('intval', explode(',', $existing))));
+        $idsKey = array_search((int) $object->id, $ids, true);
+        $nowWatched = false;
+        if ($idsKey === false) {
+            $ids[] = (int) $object->id;
+            $nowWatched = true;
+        } else {
+            unset($ids[$idsKey]);
+            $ids = array_values($ids);
+        }
+        $newVal = implode(',', $ids);
+        $db->query('DELETE FROM ' . MAIN_DB_PREFIX . 'user_param'
+            . ' WHERE fk_user = ' . ((int) $user->id) . ' AND entity = ' . ((int) $conf->entity)
+            . " AND param = 'DIGIRISK_TICKET_WATCHLIST'");
+        $db->query('INSERT INTO ' . MAIN_DB_PREFIX . "user_param (fk_user, entity, param, value)"
+            . ' VALUES (' . ((int) $user->id) . ', ' . ((int) $conf->entity) . ", 'DIGIRISK_TICKET_WATCHLIST', '" . $db->escape($newVal) . "')");
+        respond(true, $langs->transnoentities($nowWatched ? 'TicketWatched' : 'TicketUnwatched'), ['watched' => $nowWatched]);
+
+    /*
      * delete_file — remove a file attached to the ticket's upload directory.
      * The filename is sanitized and resolved against the canonical ticket dir to
      * prevent any path traversal (../something) from escaping the sandbox.
