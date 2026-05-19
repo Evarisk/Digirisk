@@ -398,13 +398,14 @@ switch ($action) {
                 $display = dolPrintHTML((string) $valueToStore);
             } elseif ($extraKey === 'digiriskdolibarr_ticket_service') {
                 // GP/UT extrafield — render the linked DigiriskElement's HTML link, not the raw id.
+                // $addLabel=1 (last arg) appends " - <label>" to the ref so users see "GP1 - Siège Evarisk".
                 $display = '';
                 $newId = (int) $valueToStore;
                 if ($newId > 0 && file_exists(DOL_DOCUMENT_ROOT . '/custom/digiriskdolibarr/class/digiriskelement.class.php')) {
                     require_once DOL_DOCUMENT_ROOT . '/custom/digiriskdolibarr/class/digiriskelement.class.php';
                     $de = new DigiriskElement($db);
                     if ($de->fetch($newId) > 0) {
-                        $display = $de->getNomUrl(1);
+                        $display = $de->getNomUrl(1, '', 0, '', -1, 1);
                     }
                 }
             } else {

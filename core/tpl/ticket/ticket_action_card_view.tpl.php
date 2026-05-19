@@ -547,7 +547,8 @@ $renderField = function (string $field, string $type, string $label, $value, str
                         require_once DOL_DOCUMENT_ROOT . '/custom/digiriskdolibarr/class/digiriskelement.class.php';
                         $de = new DigiriskElement($db);
                         if ($firstServiceId > 0 && $de->fetch($firstServiceId) > 0) {
-                            $serviceDisplay = $de->getNomUrl(1);
+                            // 6th arg ($addLabel=1) appends " - <label>" after the ref.
+                            $serviceDisplay = $de->getNomUrl(1, '', 0, '', -1, 1);
                         }
                         $allElements = $de->fetchAll('ASC', 't.ref', 0, 0, ['customsql' => 't.status > 0 AND t.entity IN (' . getEntity('digiriskdolibarr_digiriskelement') . ')']);
                         if (is_array($allElements)) {
