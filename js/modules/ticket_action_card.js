@@ -224,6 +224,17 @@ window.digiriskdolibarr.ticketActionCard.event = function() {
     $(document).on('click',  '[data-tag-remove]',          window.digiriskdolibarr.ticketActionCard.onTagRemove);
     $(document).on('change', '[data-tag-add-select]',      window.digiriskdolibarr.ticketActionCard.onTagAddSelect);
 
+    // ---- Linked files preview + delete.
+    $(document).on('click', '[data-file-preview]',         window.digiriskdolibarr.ticketActionCard.onFilePreview);
+    $(document).on('click', '[data-file-delete]',          window.digiriskdolibarr.ticketActionCard.onFileDelete);
+    $(document).on('click', '[data-lightbox-close]',       window.digiriskdolibarr.ticketActionCard.closeLightbox);
+    $(document).on('click', '[data-lightbox]', function(e) {
+        // Click on the lightbox backdrop (outside the inner content) closes it.
+        if (e.target === this) {
+            window.digiriskdolibarr.ticketActionCard.closeLightbox();
+        }
+    });
+
     // ---- Kebab menu open/close + outside-click dismissal.
     $(document).on('click', '[data-kebab-toggle]',         window.digiriskdolibarr.ticketActionCard.onKebabToggle);
     $(document).on('click', function(e) {
@@ -235,7 +246,111 @@ window.digiriskdolibarr.ticketActionCard.event = function() {
     $(document).on('keydown', function(e) {
         if (e.key === 'Escape') {
             $('[data-kebab].is-open').removeClass('is-open');
+            // Escape also closes the lightbox if open.
+            if ($('[data-lightbox]').is(':visible')) {
+                window.digiriskdolibarr.ticketActionCard.closeLightbox();
+            }
         }
+    });
+};
+
+/**
+ * Open the lightbox modal with the previewed file (image or PDF).
+ *
+ * @param  {MouseEvent} event
+ * @return {void}
+ */
+window.digiriskdolibarr.ticketActionCard.onFilePreview = function(event) {
+    event.preventDefault();
+    event.stopPropagation();
+    var $btn  = $(this);
+    var href  = $btn.data('file-href');
+    var kind  = $btn.data('file-kind');
+    var name  = $btn.data('file-name') || '';
+    var $lb   = $('[data-lightbox]');
+    var $title = $('[data-lightbox-title]');
+    var $body = $('[data-lightbox-content]');
+
+    $title.text(name);
+    if (kind === 'image') {
+        $body.html('<img src="' + encodeURI(href) + '" alt="" />');
+    } else if (kind === 'pdf') {
+        $body.html('<iframe src="' + encodeURI(href) + '" frameborder="0"></iframe>');
+    } else {
+        // Fallback: just open in a new tab.
+        window.open(href, '_blank');
+        return;
+    }
+    $lb.addClass('is-open').attr('aria-hidden', 'false');
+};
+
+/**
+ * Close the lightbox modal.
+ *
+ * @return {void}
+ */
+window.digiriskdolibarr.ticketActionCard.closeLightbox = function() {
+    var $lb = $('[data-lightbox]');
+    $lb.removeClass('is-open').attr('aria-hidden', 'true');
+    $('[data-lightbox-content]').empty();
+};
+
+/**
+ * Delete an attached file. Uses the arm-confirm pattern (click once = warn,
+ * click again within 4s = actually delete).
+ *
+ * @param  {MouseEvent} event
+ * @return {void}
+ */
+window.digiriskdolibarr.ticketActionCard.onFileDelete = function(event) {
+    event.preventDefault();
+    event.stopPropagation();
+    var $btn  = $(this);
+    var name  = $btn.data('file-name');
+    if (!name) { return; }
+
+    // Two-click safety: first click swaps the icon for "?" and pulses red.
+    if (!$btn.hasClass('is-armed')) {
+        $btn.addClass('is-armed');
+        var originalHtml = $btn.html();
+        $btn.data('original-html', originalHtml);
+        $btn.html('<i class="fas fa-question"></i>');
+        setTimeout(function() {
+            if ($btn.hasClass('is-armed')) {
+                $btn.removeClass('is-armed').html($btn.data('original-html'));
+            }
+        }, 4000);
+        return;
+    }
+    $btn.removeClass('is-armed');
+
+    var $card    = $('.tac-card').first();
+    var ajaxUrl  = $card.data('ajax-url');
+    var ticketId = $card.data('ticket-id');
+
+    $btn.prop('disabled', true);
+    $.ajax({
+        url: ajaxUrl,
+        method: 'POST',
+        dataType: 'json',
+        data: {
+            ticket_id: ticketId,
+            action: 'delete_file',
+            file_name: name,
+            token: $('input[name="token"]').val() || ''
+        }
+    }).done(function(response) {
+        if (response && response.success) {
+            window.digiriskdolibarr.ticketActionCard.flash($card, response.message || 'OK', 'success');
+            // Remove the row from the DOM rather than reloading the page.
+            $btn.closest('.tac-files-list__item').fadeOut(150, function() { $(this).remove(); });
+        } else {
+            $btn.prop('disabled', false);
+            window.digiriskdolibarr.ticketActionCard.flash($card, (response && response.message) || 'Erreur', 'error');
+        }
+    }).fail(function() {
+        $btn.prop('disabled', false);
+        window.digiriskdolibarr.ticketActionCard.flash($card, 'Erreur réseau', 'error');
     });
 };
 

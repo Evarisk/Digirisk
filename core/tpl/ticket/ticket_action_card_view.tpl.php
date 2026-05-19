@@ -694,14 +694,12 @@ $renderField = function (string $field, string $type, string $label, $value, str
                 </a>
             </section>
 
-            <!-- Section: Linked files — thumbnail grid (image preview for pictures, icon + extension for others). -->
+            <!-- Section: Linked files — compact list with preview / delete actions. -->
             <section class="tac-section" data-section-id="linked_files">
                 <h3 class="tac-section__title"><i class="fas fa-paperclip"></i> <?php print $langs->trans('LinkedFiles'); ?></h3>
                 <?php $sectionControls('linked_files'); ?>
                 <?php
-                /**
-                 * Map a file extension to a Font Awesome icon class. Falls back to fa-file.
-                 */
+                /** Map a file extension to a Font Awesome icon class. Falls back to fa-file. */
                 $iconForExt = static function (string $ext): string {
                     $ext = strtolower($ext);
                     if (in_array($ext, ['pdf'], true))                                           return 'fas fa-file-pdf';
@@ -717,38 +715,57 @@ $renderField = function (string $field, string $type, string $label, $value, str
                 };
                 ?>
                 <?php if (!empty($linkedFiles)) : ?>
-                <div class="tac-files-grid">
+                <ul class="tac-files-list">
                     <?php foreach ($linkedFiles as $f) :
                         $name = (string) ($f['name'] ?? '');
                         if ($name === '' || $name[0] === '.') {
-                            // Skip dotfiles (.thumbs metadata etc.)
                             continue;
                         }
-                        $size = isset($f['size']) ? dol_print_size((int) $f['size']) : '';
+                        $sizeRaw = (int) ($f['size'] ?? 0);
+                        $size    = $sizeRaw ? dol_print_size($sizeRaw) : '';
+                        $dateRaw = (int) ($f['date'] ?? 0);
                         $relPath = dol_sanitizeFileName($object->ref) . '/' . $name;
-                        $href = DOL_URL_ROOT . '/document.php?modulepart=ticket&file=' . urlencode($relPath);
-                        $ext = strtolower(pathinfo($name, PATHINFO_EXTENSION));
+                        $href    = DOL_URL_ROOT . '/document.php?modulepart=ticket&file=' . urlencode($relPath);
+                        $ext     = strtolower(pathinfo($name, PATHINFO_EXTENSION));
                         $isImage = in_array($ext, ['jpg', 'jpeg', 'png', 'gif', 'webp', 'svg', 'bmp'], true);
+                        $isPdf   = ($ext === 'pdf');
+                        $previewable = $isImage || $isPdf;
                         ?>
-                        <a class="tac-file-card<?php print $isImage ? ' tac-file-card--image' : ''; ?>"
-                           href="<?php print dol_escape_htmltag($href); ?>"
-                           target="_blank"
-                           title="<?php print dol_escape_htmltag($name); ?>">
-                            <div class="tac-file-card__thumb">
-                                <?php if ($isImage) : ?>
-                                    <img src="<?php print dol_escape_htmltag($href); ?>" alt="<?php print dol_escape_htmltag($name); ?>" loading="lazy">
-                                <?php else : ?>
-                                    <i class="<?php print dol_escape_htmltag($iconForExt($ext)); ?>"></i>
-                                    <?php if ($ext) : ?><span class="tac-file-card__ext"><?php print dol_escape_htmltag(strtoupper($ext)); ?></span><?php endif; ?>
+                        <li class="tac-files-list__item" data-file-name="<?php print dol_escape_htmltag($name); ?>">
+                            <span class="tac-files-list__icon">
+                                <i class="<?php print dol_escape_htmltag($iconForExt($ext)); ?>"></i>
+                                <?php if ($ext) : ?><span class="tac-files-list__ext"><?php print dol_escape_htmltag(strtoupper($ext)); ?></span><?php endif; ?>
+                            </span>
+                            <a class="tac-files-list__name" href="<?php print dol_escape_htmltag($href); ?>" target="_blank" title="<?php print dol_escape_htmltag($name); ?>">
+                                <?php print dol_escape_htmltag($name); ?>
+                            </a>
+                            <span class="tac-files-list__meta">
+                                <?php if ($size) : ?><span class="tac-files-list__size"><?php print $size; ?></span><?php endif; ?>
+                                <?php if ($dateRaw) : ?><span class="tac-files-list__date"><?php print dol_print_date($dateRaw, 'day'); ?></span><?php endif; ?>
+                            </span>
+                            <span class="tac-files-list__actions">
+                                <?php if ($previewable) : ?>
+                                    <button type="button" class="tac-files-list__btn tac-files-list__btn--preview"
+                                            data-file-preview
+                                            data-file-href="<?php print dol_escape_htmltag($href); ?>"
+                                            data-file-kind="<?php print $isImage ? 'image' : 'pdf'; ?>"
+                                            data-file-name="<?php print dol_escape_htmltag($name); ?>"
+                                            title="<?php print dol_escape_htmltag($langs->trans('Preview')); ?>">
+                                        <i class="fas fa-search-plus"></i>
+                                    </button>
                                 <?php endif; ?>
-                            </div>
-                            <div class="tac-file-card__name"><?php print dol_escape_htmltag($name); ?></div>
-                            <?php if ($size) : ?><div class="tac-file-card__size"><?php print $size; ?></div><?php endif; ?>
-                        </a>
+                                <button type="button" class="tac-files-list__btn tac-files-list__btn--delete"
+                                        data-file-delete
+                                        data-file-name="<?php print dol_escape_htmltag($name); ?>"
+                                        title="<?php print dol_escape_htmltag($langs->trans('Delete')); ?>">
+                                    <i class="fas fa-trash-alt"></i>
+                                </button>
+                            </span>
+                        </li>
                     <?php endforeach; ?>
-                </div>
+                </ul>
                 <?php else : ?>
-                    <div class="tac-files-grid__empty">—</div>
+                    <div class="tac-files-list__empty">—</div>
                 <?php endif; ?>
                 <a class="tac-section__edit-link" href="<?php print DOL_URL_ROOT . '/ticket/document.php?id=' . (int) $object->id; ?>">
                     <i class="fas fa-upload"></i> <?php print $langs->trans('Upload'); ?>
@@ -899,6 +916,13 @@ $renderField = function (string $field, string $type, string $label, $value, str
             <?php endforeach; ?>
         </div>
     <?php endif; ?>
+
+    <!-- Lightbox for file preview (hidden until JS injects the right src). -->
+    <div class="tac-lightbox" data-lightbox aria-hidden="true">
+        <button type="button" class="tac-lightbox__close" data-lightbox-close aria-label="<?php print dol_escape_htmltag($langs->trans('Close')); ?>">×</button>
+        <div class="tac-lightbox__title" data-lightbox-title></div>
+        <div class="tac-lightbox__content" data-lightbox-content></div>
+    </div>
 
     <!-- Toast/feedback area populated by JS -->
     <div class="ticket-action-card__toast tac-toast" role="status" aria-live="polite"></div>

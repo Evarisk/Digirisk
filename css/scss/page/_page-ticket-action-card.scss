@@ -814,7 +814,177 @@ $tac-border:       #e5e7eb;
     }
 }
 
-// ----- Linked files thumbnail grid -----
+// ----- Linked files compact list -----
+.tac-files-list {
+    list-style: none;
+    padding: 0;
+    margin: 0;
+
+    &__item {
+        display: flex;
+        align-items: center;
+        gap: 8px;
+        padding: 5px 4px;
+        border-bottom: 1px solid $tac-border;
+        font-size: 0.88em;
+
+        &:last-child { border-bottom: none; }
+        &:hover { background: rgba(13,138,255,0.04); }
+    }
+
+    &__icon {
+        position: relative;
+        width: 28px;
+        text-align: center;
+        color: $tac-grey;
+        flex: 0 0 auto;
+
+        i { font-size: 1.3em; }
+
+        .fa-file-pdf   { color: #d35968; }
+        .fa-file-word  { color: #1e6cb5; }
+        .fa-file-excel { color: #22a06b; }
+        .fa-file-powerpoint { color: #d35968; }
+        .fa-file-archive    { color: #b46a2e; }
+    }
+
+    &__ext {
+        position: absolute;
+        bottom: -4px;
+        right: -10px;
+        background: rgba(0,0,0,0.55);
+        color: #fff;
+        font-size: 0.55em;
+        font-weight: 700;
+        letter-spacing: 0.03em;
+        padding: 1px 4px;
+        border-radius: 2px;
+    }
+
+    &__name {
+        flex: 1 1 auto;
+        min-width: 0;
+        overflow: hidden;
+        text-overflow: ellipsis;
+        white-space: nowrap;
+        color: #1f2937;
+        text-decoration: none;
+
+        &:hover { color: $tac-blue; text-decoration: underline; }
+    }
+
+    &__meta {
+        display: flex;
+        gap: 8px;
+        flex: 0 0 auto;
+        font-size: 0.82em;
+        color: $tac-grey;
+    }
+
+    &__actions {
+        display: flex;
+        gap: 2px;
+        flex: 0 0 auto;
+    }
+
+    &__btn {
+        appearance: none;
+        background: transparent;
+        border: 1px solid transparent;
+        border-radius: 4px;
+        padding: 4px 6px;
+        cursor: pointer;
+        color: $tac-grey;
+        font-size: 0.9em;
+        transition: background 0.15s ease, color 0.15s ease;
+
+        &:hover { background: rgba(13,138,255,0.08); color: $tac-blue; }
+
+        &--delete:hover { background: rgba(224,83,83,0.12); color: $tac-red; }
+        &--delete.is-armed {
+            background: rgba(224,83,83,0.15);
+            color: $tac-red;
+            border-color: $tac-red;
+            animation: tac-pulse-red 1.2s ease-in-out infinite;
+        }
+    }
+
+    &__empty {
+        color: $tac-grey;
+        font-style: italic;
+        padding: 6px 0;
+    }
+}
+
+// ----- Lightbox modal for file preview -----
+.tac-lightbox {
+    display: none;
+    position: fixed;
+    inset: 0;
+    background: rgba(0,0,0,0.78);
+    z-index: 1000;
+    padding: 24px;
+    align-items: center;
+    justify-content: center;
+    flex-direction: column;
+
+    &.is-open { display: flex; }
+
+    &__close {
+        position: absolute;
+        top: 12px;
+        right: 16px;
+        appearance: none;
+        background: rgba(255,255,255,0.15);
+        color: #fff;
+        border: none;
+        width: 36px;
+        height: 36px;
+        border-radius: 50%;
+        font-size: 24px;
+        line-height: 1;
+        cursor: pointer;
+        transition: background 0.15s ease;
+
+        &:hover { background: rgba(255,255,255,0.3); }
+    }
+
+    &__title {
+        color: #fff;
+        font-size: 0.95em;
+        margin-bottom: 8px;
+        max-width: 90%;
+        overflow: hidden;
+        text-overflow: ellipsis;
+        white-space: nowrap;
+    }
+
+    &__content {
+        max-width: 92vw;
+        max-height: 86vh;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+
+        img {
+            max-width: 92vw;
+            max-height: 86vh;
+            object-fit: contain;
+            border-radius: 6px;
+            box-shadow: 0 10px 40px rgba(0,0,0,0.5);
+        }
+
+        iframe {
+            width: 90vw;
+            height: 86vh;
+            border: none;
+            border-radius: 6px;
+            background: #fff;
+        }
+    }
+}
+
+// ----- Legacy thumbnail grid (kept as no-op so old SCSS dependents don't break) -----
 .tac-files-grid {
     display: grid;
     grid-template-columns: repeat(auto-fill, minmax(112px, 1fr));

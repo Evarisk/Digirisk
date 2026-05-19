@@ -153,6 +153,32 @@ switch ($action) {
         respond(false, $object->error ?: $langs->transnoentities('Error'));
 
     /*
+     * delete_file — remove a file attached to the ticket's upload directory.
+     * The filename is sanitized and resolved against the canonical ticket dir to
+     * prevent any path traversal (../something) from escaping the sandbox.
+     */
+    case 'delete_file':
+        require_once DOL_DOCUMENT_ROOT . '/core/lib/files.lib.php';
+        $rawName = (string) GETPOST('file_name', 'alphanohtml');
+        $name    = dol_sanitizeFileName($rawName);
+        if ($name === '' || $name[0] === '.') {
+            respond(false, $langs->transnoentities('ErrorBadParameters'));
+        }
+        $uploadDir = $conf->ticket->multidir_output[$conf->entity ?? 1] . '/' . dol_sanitizeFileName($object->ref);
+        $target    = $uploadDir . '/' . $name;
+        // Resolve to absolute path and check it still lives under the upload dir.
+        $real      = realpath($target);
+        $realDir   = realpath($uploadDir);
+        if (!$real || !$realDir || strpos($real, $realDir . DIRECTORY_SEPARATOR) !== 0) {
+            respond(false, $langs->transnoentities('RecordNotFound'));
+        }
+        $ok = dol_delete_file($real, 0, 0, 0, $object);
+        if (!$ok) {
+            respond(false, $langs->transnoentities('Error'));
+        }
+        respond(true, $langs->transnoentities('FileDeleted'), ['file_name' => $name]);
+
+    /*
      * add_category / remove_category — 1-click tag toggle on the ticket. Uses Dolibarr's
      * Categorie::add_type / del_type which mutate the llx_categorie_ticket link table.
      */
