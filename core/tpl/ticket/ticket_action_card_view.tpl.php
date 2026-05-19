@@ -612,17 +612,16 @@ $renderField = function (string $field, string $type, string $label, $value, str
             </section>
             <?php endif; ?>
 
-            <!-- Section: Initial message — display only, edit through Dolibarr card. -->
+            <!-- Section: Initial message — tap-to-edit rich-text (CKEditor) on the native ticket.message column. -->
             <!-- (The next group was the old RIGHT column; everything is now flat in the body grid.) -->
             <section class="tac-section" data-section-id="initial_message">
                 <h3 class="tac-section__title"><i class="fas fa-envelope-open-text"></i> <?php print $langs->trans('InitialMessage'); ?></h3>
                 <?php $sectionControls('initial_message'); ?>
-                <div class="tac-rich-text">
-                    <?php print $object->message ? dolPrintHTML($object->message) : '<span class="opacitymedium">—</span>'; ?>
+                <div class="tac-grid tac-grid--single">
+                    <?php $renderField('message', 'longtext', 'InitialMessage',
+                        $object->message ?? '',
+                        !empty($object->message) ? dolPrintHTML($object->message) : ''); ?>
                 </div>
-                <a class="tac-section__edit-link" href="<?php print dol_escape_htmltag($fullCardUrl); ?>&action=edit_message_init">
-                    <i class="fas fa-pen"></i> <?php print $langs->trans('Modify'); ?>
-                </a>
             </section>
 
             <!-- Section: Classification (tags) — 1-click add/remove. -->

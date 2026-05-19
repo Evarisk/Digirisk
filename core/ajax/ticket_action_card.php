@@ -315,6 +315,12 @@ switch ($action) {
             $object->subject = trim((string) $rawValue);
             $res = $object->update($user) > 0;
             $display = dol_escape_htmltag($object->subject ?: $langs->trans('NoSubject'));
+        } elseif ($field === 'message') {
+            // Native ticket.message column — rich HTML from CKEditor. dolPrintHTML preserves
+            // safe tags (b/strong/em/etc.) for the inline post-save replacement.
+            $object->message = (string) $rawValue;
+            $res = $object->update($user) > 0;
+            $display = !empty($object->message) ? dolPrintHTML($object->message) : '';
         } elseif ($field === 'fk_statut') {
             $newStatus = (int) $rawValue;
             $res = $object->setStatut($newStatus, null, '', 'TICKET_MODIFY') > 0;
