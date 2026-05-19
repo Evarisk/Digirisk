@@ -37,6 +37,7 @@ if (empty($conf) || empty($db) || empty($langs) || empty($user) || empty($object
 require_once DOL_DOCUMENT_ROOT . '/ticket/class/ticket.class.php';
 require_once DOL_DOCUMENT_ROOT . '/user/class/user.class.php';
 require_once DOL_DOCUMENT_ROOT . '/societe/class/societe.class.php';
+require_once DOL_DOCUMENT_ROOT . '/projet/class/project.class.php';
 require_once DOL_DOCUMENT_ROOT . '/categories/class/categorie.class.php';
 require_once DOL_DOCUMENT_ROOT . '/comm/action/class/actioncomm.class.php';
 require_once DOL_DOCUMENT_ROOT . '/core/class/extrafields.class.php';
@@ -147,6 +148,26 @@ $linkedSociete = null;
 if ((int) $object->fk_soc > 0) {
     $linkedSociete = new Societe($db);
     $linkedSociete->fetch((int) $object->fk_soc);
+}
+
+// ---- Project picker (only if the project module is enabled).
+$projectOptions = [['id' => 0, 'label' => '— ' . $langs->transnoentities('NoneSelected') . ' —']];
+$linkedProject  = null;
+if (isModEnabled('project')) {
+    $projRes = $db->query('SELECT rowid, ref, title FROM ' . MAIN_DB_PREFIX . "projet WHERE fk_statut > 0 AND entity IN (" . getEntity('project') . ') ORDER BY ref LIMIT 200');
+    if ($projRes) {
+        while ($row = $db->fetch_object($projRes)) {
+            $label = trim(($row->ref ? $row->ref . ' — ' : '') . ($row->title ?? ''));
+            if ($label === '') {
+                $label = '#' . (int) $row->rowid;
+            }
+            $projectOptions[] = ['id' => (int) $row->rowid, 'label' => $label];
+        }
+    }
+    if ((int) $object->fk_project > 0) {
+        $linkedProject = new Project($db);
+        $linkedProject->fetch((int) $object->fk_project);
+    }
 }
 
 // ---- All non-Digirisk extrafields, rendered automatically.
@@ -514,6 +535,16 @@ $renderField = function (string $field, string $type, string $label, $value, str
                     // Third party (select limited to 200 most-active companies; full picker stays on Dolibarr card)
                     $socDisplay = $linkedSociete ? $linkedSociete->getNomUrl(1) : '';
                     $renderField('fk_soc', 'select', 'ThirdParty', (int) $object->fk_soc, $socDisplay, ['options' => $socOptions]);
+
+                    // Project (only if project module is enabled).
+                    if (isModEnabled('project')) {
+                        $projDisplay = $linkedProject ? $linkedProject->getNomUrl(1, '', 0, '', '<strong>' . dol_escape_htmltag($linkedProject->title) . '</strong>') : '';
+                        // getNomUrl on Project doesn't have the addLabel arg; fallback: append title manually.
+                        if ($linkedProject) {
+                            $projDisplay = $linkedProject->getNomUrl(1) . ($linkedProject->title ? ' - ' . dol_escape_htmltag($linkedProject->title) : '');
+                        }
+                        $renderField('fk_project', 'select', 'Project', (int) $object->fk_project, $projDisplay, ['options' => $projectOptions]);
+                    }
                     ?>
                 </div>
             </section>

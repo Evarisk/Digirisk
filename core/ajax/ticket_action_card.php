@@ -372,6 +372,19 @@ switch ($action) {
             } else {
                 $display = '<span class="opacitymedium">—</span>';
             }
+        } elseif ($field === 'fk_project') {
+            // Project link — accepts 0 to detach.
+            $newProjectId = (int) $rawValue;
+            $object->fk_project = $newProjectId > 0 ? $newProjectId : null;
+            $res = $object->update($user) > 0;
+            if ($newProjectId > 0) {
+                require_once DOL_DOCUMENT_ROOT . '/projet/class/project.class.php';
+                $project = new Project($db);
+                $project->fetch($newProjectId);
+                $display = $project->getNomUrl(1) . ($project->title ? ' - ' . dol_escape_htmltag($project->title) : '');
+            } else {
+                $display = '<span class="opacitymedium">—</span>';
+            }
         } elseif (strpos($field, 'options_') === 0) {
             // Generic extrafield write path — catches Digirisk + any other module's extrafield on ticket.
             $extraKey = substr($field, strlen('options_'));
