@@ -196,6 +196,71 @@ switch ($action) {
         if (!$newId || $newId <= 0) {
             respond(false, $object->error ?: $langs->transnoentities('Error'));
         }
+        // Actually fire the email if the user requested it. createTicketMessage with
+        // $send_email=true only flags the actioncomm code as _SENTBYMAIL, it does
+        // not send anything. Mirror what htdocs/ticket/card.php does on add_message.
+        $mailNotice = '';
+        if ($byEmail && !getDolGlobalString('TICKET_DISABLE_ALL_MAILS')) {
+            global $mysoc;
+            $object->fetch_thirdparty($object->fk_soc);
+
+            // Build the recipient list: internal contacts always; external + thirdparty
+            // email only when the message is not flagged private.
+            $sendto       = [];
+            $internalList = $object->getInfosTicketInternalContact(1);
+            if (is_array($internalList)) {
+                foreach ($internalList as $info) {
+                    $email = (string) ($info['email'] ?? '');
+                    if ($email !== '' && (int) ($info['id'] ?? 0) !== (int) $user->id) {
+                        $sendto[$email] = trim(((string) ($info['firstname'] ?? '')) . ' ' . ((string) ($info['lastname'] ?? ''))) . ' <' . $email . '>';
+                    }
+                }
+            }
+            if (!$private) {
+                $externalList = $object->getInfosTicketExternalContact(1);
+                if (is_array($externalList)) {
+                    foreach ($externalList as $info) {
+                        $email = (string) ($info['email'] ?? '');
+                        if ($email !== '' && !isset($sendto[$email])) {
+                            $sendto[$email] = trim(((string) ($info['firstname'] ?? '')) . ' ' . ((string) ($info['lastname'] ?? ''))) . ' <' . $email . '>';
+                        }
+                    }
+                }
+                // Fallback: thirdparty's own email when no external contact is linked.
+                if (empty($externalList) && !empty($object->thirdparty->email)) {
+                    $em = $object->thirdparty->email;
+                    if (!isset($sendto[$em])) {
+                        $sendto[$em] = $object->thirdparty->name . ' <' . $em . '>';
+                    }
+                }
+            }
+
+            if (!empty($sendto)) {
+                $appli       = getDolGlobalString('MAIN_APPLICATION_TITLE', !empty($mysoc->name) ? $mysoc->name : 'Dolibarr');
+                $mailSubject = $subject !== '' ? $subject : '[' . $appli . ' - ' . $langs->transnoentities('Ticket') . ' #' . $object->track_id . '] ' . $langs->transnoentities('TicketNewMessage');
+                $intro       = getDolGlobalString('TICKET_MESSAGE_MAIL_INTRO', $langs->transnoentities('TicketMessageMailIntroText'));
+                $signature   = getDolGlobalString('TICKET_MESSAGE_MAIL_SIGNATURE');
+                $url         = dol_buildpath('/ticket/card.php', 2) . '?track_id=' . $object->track_id;
+                $mailBody    = $intro . '<br><br>' . $body . '<br><br>'
+                    . '==============================================<br>'
+                    . $langs->transnoentities('TicketNotificationEmailBodyInfosTrackUrlinternal') . ' : <a href="' . $url . '">' . $object->track_id . '</a>';
+                if (!empty($signature)) {
+                    $mailBody .= '<br><br>' . $signature;
+                }
+                $from    = getDolGlobalString('TICKET_NOTIFICATION_EMAIL_FROM');
+                $replyto = getDolGlobalString('TICKET_NOTIFICATION_EMAIL_REPLYTO');
+                $nRecipients = count($sendto);
+                $ok          = $object->sendTicketMessageByEmail($mailSubject, $mailBody, 0, $sendto, [], [], [], [], $from, $replyto);
+                // transnoentities() runs its own sprintf with empty defaults, which would
+                // turn our %d into 0 if we wrapped it ourselves. Pass the count as $param1
+                // so the internal sprintf substitutes it correctly.
+                $mailNotice  = $ok
+                    ? ' — ' . $langs->transnoentities('MailSentToNRecipients', (string) $nRecipients)
+                    : ' — ' . $langs->transnoentities('MailNotSent');
+            } else {
+                $mailNotice = ' — ' . $langs->transnoentities('NoRecipientFound');
+            }
+        }
         // Build the bubble HTML — mirrors the TPL renderer (SMS layout, avatar, action buttons).
         $authorName = $user->getFullName($langs) ?: ($user->login ?: $langs->transnoentities('Unknown'));
         $initials   = strtoupper(substr((string) ($user->firstname ?: $user->lastname ?: $user->login ?: '?'), 0, 1));
@@ -232,7 +297,7 @@ switch ($action) {
             . '</div>'
             . '</div>'
             . '</li>';
-        respond(true, $langs->transnoentities('MessagePosted'), ['message_id' => (int) $newId, 'bubble' => $bubble]);
+        respond(true, $langs->transnoentities('MessagePosted') . $mailNotice, ['message_id' => (int) $newId, 'bubble' => $bubble]);
 
     /*
      * edit_message — update a TICKET_MSG ActionComm's body (and optionally subject).

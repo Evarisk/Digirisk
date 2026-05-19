@@ -279,8 +279,10 @@ $formatDelta = static function (int $from, int $to): string {
 };
 
 // ---- Messages thread (actioncomm TICKET_MSG*) chronological, oldest first.
+// Note: the DB column is `note` (longtext); the ActionComm class exposes it as
+// `note_private`, so we alias it here so $msg->note_private keeps working.
 $threadMessages = [];
-$thrSql = "SELECT a.id, a.code, a.label, a.note_private, a.datep, a.fk_user_author, u.lastname, u.firstname, u.login, u.photo"
+$thrSql = "SELECT a.id, a.code, a.label, a.note as note_private, a.datep, a.fk_user_author, u.lastname, u.firstname, u.login, u.photo"
     . " FROM " . MAIN_DB_PREFIX . "actioncomm a LEFT JOIN " . MAIN_DB_PREFIX . "user u ON u.rowid = a.fk_user_author"
     . " WHERE a.fk_element = " . (int) $object->id . " AND a.elementtype = 'ticket'"
     . " AND a.entity IN (" . getEntity('agenda') . ")"
