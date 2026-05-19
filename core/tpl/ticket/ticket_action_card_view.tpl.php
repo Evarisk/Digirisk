@@ -145,9 +145,19 @@ if ($socRes) {
     }
 }
 $linkedSociete = null;
+$socTicketCount = 0;
 if ((int) $object->fk_soc > 0) {
     $linkedSociete = new Societe($db);
     $linkedSociete->fetch((int) $object->fk_soc);
+    // Count of other tickets for this company so the user can see at a glance whether
+    // there's history worth digging into.
+    $cntRes = $db->query('SELECT COUNT(*) AS nb FROM ' . MAIN_DB_PREFIX . 'ticket'
+        . ' WHERE fk_soc = ' . (int) $object->fk_soc
+        . ' AND entity IN (' . getEntity('ticket') . ')'
+        . ' AND rowid <> ' . (int) $object->id);
+    if ($cntRes && ($cntRow = $db->fetch_object($cntRes))) {
+        $socTicketCount = (int) $cntRow->nb;
+    }
 }
 
 // ---- Project picker (only if the project module is enabled).
@@ -534,6 +544,15 @@ $renderField = function (string $field, string $type, string $label, $value, str
 
                     // Third party (select limited to 200 most-active companies; full picker stays on Dolibarr card)
                     $socDisplay = $linkedSociete ? $linkedSociete->getNomUrl(1) : '';
+                    // Append "(N tickets antérieurs)" link when this company has a ticket history.
+                    if ($linkedSociete && $socTicketCount > 0) {
+                        $histUrl   = DOL_URL_ROOT . '/ticket/list.php?socid=' . (int) $object->fk_soc;
+                        $socDisplay .= ' <a class="tac-soc-history" href="' . dol_escape_htmltag($histUrl) . '" title="'
+                            . dol_escape_htmltag($langs->trans('SeeOtherTicketsForThisCompany')) . '">'
+                            . '<i class="fas fa-history"></i> ' . $socTicketCount . ' '
+                            . dol_escape_htmltag($langs->trans($socTicketCount > 1 ? 'OtherTickets' : 'OtherTicket'))
+                            . '</a>';
+                    }
                     $renderField('fk_soc', 'select', 'ThirdParty', (int) $object->fk_soc, $socDisplay, ['options' => $socOptions]);
 
                     // Project (only if project module is enabled).

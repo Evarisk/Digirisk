@@ -713,6 +713,11 @@ window.digiriskdolibarr.ticketActionCard.onFieldClick = function(event) {
     if ($wrap.hasClass('tac-editing') || $wrap.hasClass('tac-saving')) {
         return; // already in edit mode
     }
+    // Let inner <a> links (history badges, getNomUrl links, etc.) navigate normally
+    // instead of opening the tap-to-edit input.
+    if ($(event.target).closest('a').length) {
+        return;
+    }
     var type    = $wrap.data('edit-type');
     var field   = $wrap.data('edit-field');
     var current = String($wrap.attr('data-edit-value') == null ? '' : $wrap.attr('data-edit-value'));
