@@ -396,6 +396,17 @@ switch ($action) {
             } elseif (in_array($efType, ['text', 'html'], true)) {
                 // dol_escape_htmltag would strip <strong>/<b>; dolPrintHTML preserves rich HTML safely.
                 $display = dolPrintHTML((string) $valueToStore);
+            } elseif ($extraKey === 'digiriskdolibarr_ticket_service') {
+                // GP/UT extrafield — render the linked DigiriskElement's HTML link, not the raw id.
+                $display = '';
+                $newId = (int) $valueToStore;
+                if ($newId > 0 && file_exists(DOL_DOCUMENT_ROOT . '/custom/digiriskdolibarr/class/digiriskelement.class.php')) {
+                    require_once DOL_DOCUMENT_ROOT . '/custom/digiriskdolibarr/class/digiriskelement.class.php';
+                    $de = new DigiriskElement($db);
+                    if ($de->fetch($newId) > 0) {
+                        $display = $de->getNomUrl(1);
+                    }
+                }
             } else {
                 $display = dol_escape_htmltag((string) $valueToStore);
             }

@@ -536,17 +536,32 @@ $renderField = function (string $field, string $type, string $label, $value, str
                         $extra['digiriskdolibarr_ticket_phone']     ?? '',
                         dol_escape_htmltag((string) ($extra['digiriskdolibarr_ticket_phone']     ?? '')));
 
-                    // GP/UT — readonly link display (edit handled by full Dolibarr card for now).
+                    // GP/UT — link to a DigiriskElement. Render as a tap-to-edit select
+                    // populated with all active DigiriskElements (current entity).
                     $serviceId = $extra['digiriskdolibarr_ticket_service'] ?? '';
+                    // chkbxlst stores comma-separated ids; link stores a single int. Pick the first when multiple.
+                    $firstServiceId = (int) (is_string($serviceId) ? strtok((string) $serviceId, ',') : $serviceId);
                     $serviceDisplay = '';
-                    if (!empty($serviceId) && file_exists(DOL_DOCUMENT_ROOT . '/custom/digiriskdolibarr/class/digiriskelement.class.php')) {
+                    $serviceOptions = [['id' => 0, 'label' => '— ' . $langs->transnoentities('NoneSelected') . ' —']];
+                    if (file_exists(DOL_DOCUMENT_ROOT . '/custom/digiriskdolibarr/class/digiriskelement.class.php')) {
                         require_once DOL_DOCUMENT_ROOT . '/custom/digiriskdolibarr/class/digiriskelement.class.php';
                         $de = new DigiriskElement($db);
-                        if ($de->fetch((int) $serviceId) > 0) {
+                        if ($firstServiceId > 0 && $de->fetch($firstServiceId) > 0) {
                             $serviceDisplay = $de->getNomUrl(1);
                         }
+                        $allElements = $de->fetchAll('ASC', 't.ref', 0, 0, ['customsql' => 't.status > 0 AND t.entity IN (' . getEntity('digiriskdolibarr_digiriskelement') . ')']);
+                        if (is_array($allElements)) {
+                            foreach ($allElements as $el) {
+                                $label = trim(($el->ref ? $el->ref . ' — ' : '') . ($el->label ?? ''));
+                                if ($label === '') {
+                                    $label = '#' . (int) $el->id;
+                                }
+                                $serviceOptions[] = ['id' => (int) $el->id, 'label' => $label];
+                            }
+                        }
                     }
-                    $renderField('options_digiriskdolibarr_ticket_service', 'readonly', 'GP/UT', $serviceId, $serviceDisplay);
+                    $renderField('options_digiriskdolibarr_ticket_service', 'select', 'GP/UT',
+                        $firstServiceId, $serviceDisplay, ['options' => $serviceOptions]);
 
                     $renderField('options_digiriskdolibarr_ticket_location',  'text',     'Location',
                         $extra['digiriskdolibarr_ticket_location']  ?? '',
