@@ -272,12 +272,21 @@ window.digiriskdolibarr.ticketActionCard.onFilePreview = function(event) {
     var $body = $('[data-lightbox-content]');
 
     $title.text(name);
+    $('[data-lightbox-open]').attr('href', href);
+    // The href comes pre-encoded from PHP (urlencode on the filename portion). Do NOT
+    // re-encode it here — re-running encodeURI re-encodes already-safe chars and breaks
+    // document.php's file= parameter.
     if (kind === 'image') {
-        $body.html('<img src="' + encodeURI(href) + '" alt="" />');
+        $body.html('<img alt="" />');
+        $body.find('img').attr('src', href);
     } else if (kind === 'pdf') {
-        $body.html('<iframe src="' + encodeURI(href) + '" frameborder="0"></iframe>');
+        // <embed> tends to render better than <iframe> for inline PDF viewing
+        // (Chrome + Firefox + Edge use their built-in viewer plugin). Falls back to
+        // download if no viewer is available, and shows the "Open in new tab" link
+        // we put at the top of the lightbox.
+        $body.html('<embed type="application/pdf">');
+        $body.find('embed').attr('src', href);
     } else {
-        // Fallback: just open in a new tab.
         window.open(href, '_blank');
         return;
     }

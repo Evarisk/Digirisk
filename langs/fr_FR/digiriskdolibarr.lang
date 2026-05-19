@@ -1763,6 +1763,7 @@ AddTag                                = Ajouter un tag
 TagAdded                              = Tag ajouté
 TagRemoved                            = Tag retiré
 Preview                               = Aperçu
+OpenInNewTab                          = Ouvrir dans un nouvel onglet
 FileDeleted                           = Fichier supprimé
 LayoutTagsMode                        = Affichage des tags
 LayoutTagsModeChips                   = Liste complète (chips)

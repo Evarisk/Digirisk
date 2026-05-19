@@ -185,8 +185,10 @@ foreach (($extrafieldsObj->attributes[$object->table_element]['label'] ?? []) as
 }
 
 // ---- Linked files (read-only list).
+// mode=1 makes dol_dir_list() load each entry's size + date + perm. With mode=0
+// (the default) those fields come back empty and the UI would just show the name.
 $uploadDir = $conf->ticket->multidir_output[$conf->entity ?? 1] . '/' . dol_sanitizeFileName($object->ref);
-$linkedFiles = is_dir($uploadDir) ? dol_dir_list($uploadDir, 'files', 0) : [];
+$linkedFiles = is_dir($uploadDir) ? dol_dir_list($uploadDir, 'files', 0, '', null, 'date', SORT_DESC, 1) : [];
 
 // ---- Recent events (actioncomm) attached to this ticket — last 10.
 $recentEvents = [];
@@ -725,7 +727,11 @@ $renderField = function (string $field, string $type, string $label, $value, str
                         $size    = $sizeRaw ? dol_print_size($sizeRaw) : '';
                         $dateRaw = (int) ($f['date'] ?? 0);
                         $relPath = dol_sanitizeFileName($object->ref) . '/' . $name;
+                        // Plain download URL (used by the filename link → opens with native dialog).
                         $href    = DOL_URL_ROOT . '/document.php?modulepart=ticket&file=' . urlencode($relPath);
+                        // Inline URL for the lightbox: attachment=0 makes document.php send
+                        // Content-Disposition: inline so <img>/<iframe> can render the bytes.
+                        $hrefInline = $href . '&attachment=0';
                         $ext     = strtolower(pathinfo($name, PATHINFO_EXTENSION));
                         $isImage = in_array($ext, ['jpg', 'jpeg', 'png', 'gif', 'webp', 'svg', 'bmp'], true);
                         $isPdf   = ($ext === 'pdf');
@@ -747,7 +753,7 @@ $renderField = function (string $field, string $type, string $label, $value, str
                                 <?php if ($previewable) : ?>
                                     <button type="button" class="tac-files-list__btn tac-files-list__btn--preview"
                                             data-file-preview
-                                            data-file-href="<?php print dol_escape_htmltag($href); ?>"
+                                            data-file-href="<?php print dol_escape_htmltag($hrefInline); ?>"
                                             data-file-kind="<?php print $isImage ? 'image' : 'pdf'; ?>"
                                             data-file-name="<?php print dol_escape_htmltag($name); ?>"
                                             title="<?php print dol_escape_htmltag($langs->trans('Preview')); ?>">
@@ -919,8 +925,13 @@ $renderField = function (string $field, string $type, string $label, $value, str
 
     <!-- Lightbox for file preview (hidden until JS injects the right src). -->
     <div class="tac-lightbox" data-lightbox aria-hidden="true">
-        <button type="button" class="tac-lightbox__close" data-lightbox-close aria-label="<?php print dol_escape_htmltag($langs->trans('Close')); ?>">×</button>
-        <div class="tac-lightbox__title" data-lightbox-title></div>
+        <div class="tac-lightbox__header">
+            <span class="tac-lightbox__title" data-lightbox-title></span>
+            <a class="tac-lightbox__open" data-lightbox-open target="_blank" rel="noopener" title="<?php print dol_escape_htmltag($langs->trans('OpenInNewTab')); ?>">
+                <i class="fas fa-external-link-alt"></i>
+            </a>
+            <button type="button" class="tac-lightbox__close" data-lightbox-close aria-label="Close">×</button>
+        </div>
         <div class="tac-lightbox__content" data-lightbox-content></div>
     </div>
 
