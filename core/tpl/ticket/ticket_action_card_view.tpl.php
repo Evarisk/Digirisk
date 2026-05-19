@@ -235,25 +235,17 @@ if (!empty($object->date_close)) {
     $closedLabel = ($status === Ticket::STATUS_CANCELED) ? $langs->trans('Canceled') : $langs->trans('SolvedClosed');
     $statusMilestones[] = ['code' => 'CLOSED',  'date' => (int) $object->date_close, 'label' => $closedLabel];
 }
-// Pull status transitions from ActionComm — codes Dolibarr triggers emit on assign/modify.
-$tlSql = "SELECT a.code, a.label, a.datep FROM " . MAIN_DB_PREFIX . "actioncomm a"
+// Pull only ASSIGN transitions from ActionComm — MODIFY is too generic ("ticket was modified")
+// and pollutes the timeline with vague events. Keep only the LAST assign so the timeline
+// stays compact.
+$tlSql = "SELECT a.code, a.datep FROM " . MAIN_DB_PREFIX . "actioncomm a"
     . " WHERE a.fk_element = " . (int) $object->id . " AND a.elementtype = 'ticket'"
     . " AND a.entity IN (" . getEntity('agenda') . ")"
-    . " AND a.code IN ('AC_TICKET_ASSIGN', 'AC_TICKET_MODIFY', 'AC_TICKET_CREATE', 'AC_TICKET_CLOSE')"
-    . " ORDER BY a.datep ASC";
+    . " AND a.code = 'AC_TICKET_ASSIGN'"
+    . " ORDER BY a.datep DESC LIMIT 1";
 $tlRes = $db->query($tlSql);
-if ($tlRes) {
-    // Keep only the LAST occurrence per code to keep the timeline readable.
-    $seen = [];
-    while ($row = $db->fetch_object($tlRes)) {
-        if (in_array($row->code, ['AC_TICKET_CREATE', 'AC_TICKET_CLOSE'], true)) {
-            continue; // already covered by datec / date_close on the ticket row
-        }
-        $seen[$row->code] = ['code' => $row->code, 'date' => (int) $db->jdate($row->datep), 'label' => dol_trunc((string) $row->label, 40)];
-    }
-    foreach ($seen as $entry) {
-        $statusMilestones[] = $entry;
-    }
+if ($tlRes && ($row = $db->fetch_object($tlRes))) {
+    $statusMilestones[] = ['code' => 'ASSIGN', 'date' => (int) $db->jdate($row->datep), 'label' => $langs->trans('Assigned')];
 }
 // Dedupe + sort by date asc.
 usort($statusMilestones, static fn($a, $b) => $a['date'] <=> $b['date']);
@@ -575,28 +567,22 @@ if (!in_array($severityKey, ['low', 'normal', 'high', 'blocking'], true)) {
             <?php endif; ?>
         </div>
 
-        <!-- Status timeline sparkline (created → read → assigned → in progress → closed). -->
+        <!-- Status timeline — horizontal pills with delta connectors. Compact and overlap-free. -->
         <?php if (count($statusMilestones) >= 2) : ?>
         <div class="tac-timeline" aria-label="<?php print dol_escape_htmltag($langs->trans('StatusTimeline')); ?>">
-            <?php
-            $first = $statusMilestones[0]['date'];
-            $last  = end($statusMilestones)['date'];
-            $span  = max(1, $last - $first);
-            $milestoneCount = count($statusMilestones);
-            foreach ($statusMilestones as $i => $m) :
-                $offsetPct = round(100 * ($m['date'] - $first) / $span, 2);
-                $dotClass  = 'tac-timeline__dot' . (!empty($m['current']) ? ' tac-timeline__dot--current' : '');
-                // Alternate label above/below to avoid horizontal collisions.
-                $dotClass .= ($i % 2 === 0) ? ' tac-timeline__dot--below' : ' tac-timeline__dot--above';
-                $tooltip   = $m['label'] . ' · ' . dol_print_date($m['date'], 'dayhour', 'tzuser');
-                $deltaText = '';
-                if ($i > 0) {
+            <?php foreach ($statusMilestones as $i => $m) :
+                if ($i > 0) :
                     $deltaText = $formatDelta((int) $statusMilestones[$i - 1]['date'], (int) $m['date']);
-                }
+                    ?>
+                    <span class="tac-timeline__delta" aria-hidden="true">
+                        <i class="fas fa-long-arrow-alt-right"></i> <?php print dol_escape_htmltag($deltaText); ?>
+                    </span>
+                <?php endif;
+                $stepClass = 'tac-timeline__step' . (!empty($m['current']) ? ' tac-timeline__step--current' : '');
+                $tooltip   = dol_print_date($m['date'], 'dayhour', 'tzuser');
                 ?>
-                <span class="<?php print $dotClass; ?>" style="left: <?php print $offsetPct; ?>%;" title="<?php print dol_escape_htmltag($tooltip); ?>">
-                    <span class="tac-timeline__label"><?php print dol_escape_htmltag($m['label']); ?></span>
-                    <?php if ($deltaText) : ?><span class="tac-timeline__delta"><?php print dol_escape_htmltag($deltaText); ?></span><?php endif; ?>
+                <span class="<?php print $stepClass; ?>" title="<?php print dol_escape_htmltag($tooltip); ?>">
+                    <?php print dol_escape_htmltag($m['label']); ?>
                 </span>
             <?php endforeach; ?>
         </div>
