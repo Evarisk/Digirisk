@@ -158,6 +158,46 @@ switch ($action) {
         respond(false, $object->error ?: $langs->transnoentities('Error'));
 
     /*
+     * post_message — append a new TICKET_MSG ActionComm to the ticket. Lightweight
+     * wrapper over Ticket::createTicketMessage(). Returns the freshly-built bubble
+     * HTML so the JS can append it to the thread without a reload.
+     */
+    case 'post_message':
+        $subject = trim((string) GETPOST('subject', 'alphanohtml'));
+        $body    = trim((string) GETPOST('body', 'restricthtml'));
+        $private = (int) GETPOST('private', 'int');
+        if ($body === '') {
+            respond(false, $langs->transnoentities('ErrorBadParameters'));
+        }
+        // Hand to the existing Dolibarr method so triggers fire normally.
+        $object->subject = $subject ?: ($object->subject ?? '');
+        $object->message = $body;
+        $object->private = $private;
+        $newId = $object->createTicketMessage($user, 0);
+        if (!$newId || $newId <= 0) {
+            respond(false, $object->error ?: $langs->transnoentities('Error'));
+        }
+        // Build the bubble HTML mirror of the TPL render.
+        $authorName = $user->getFullName($langs) ?: ($user->login ?: $langs->transnoentities('Unknown'));
+        $initials   = strtoupper(substr((string) ($user->firstname ?: $user->lastname ?: $user->login ?: '?'), 0, 1));
+        $cls        = 'tac-thread__msg' . ($private ? ' tac-thread__msg--private' : '');
+        $tagPrivate = $private ? '<span class="tac-thread__tag tac-thread__tag--private"><i class="fas fa-lock"></i> ' . dol_escape_htmltag($langs->transnoentities('Private')) . '</span>' : '';
+        $subjectHtml = $subject !== '' ? '<div class="tac-thread__subject">' . dol_escape_htmltag($subject) . '</div>' : '';
+        $bubble = '<li class="' . $cls . '" data-msg-id="' . (int) $newId . '">'
+            . '<div class="tac-thread__avatar">' . dol_escape_htmltag($initials) . '</div>'
+            . '<div class="tac-thread__bubble">'
+            . '<div class="tac-thread__meta">'
+            . '<span class="tac-thread__author">' . dol_escape_htmltag($authorName) . '</span>'
+            . '<span class="tac-thread__date">' . dol_print_date(dol_now(), 'dayhour', 'tzuser') . '</span>'
+            . $tagPrivate
+            . '</div>'
+            . $subjectHtml
+            . '<div class="tac-thread__body">' . dolPrintHTML($body) . '</div>'
+            . '</div>'
+            . '</li>';
+        respond(true, $langs->transnoentities('MessagePosted'), ['message_id' => (int) $newId, 'bubble' => $bubble]);
+
+    /*
      * upload_file — receive a single file via FormData and drop it in the ticket's
      * upload directory. Caller-side drag&drop sends one request per file.
      * Sanitizes the filename + checks size against PHP's upload_max_filesize.

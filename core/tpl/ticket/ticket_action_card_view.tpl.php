@@ -278,6 +278,21 @@ $formatDelta = static function (int $from, int $to): string {
     return '+ ' . (int) ($secs / (86400 * 30)) . 'mois';
 };
 
+// ---- Messages thread (actioncomm TICKET_MSG*) chronological, oldest first.
+$threadMessages = [];
+$thrSql = "SELECT a.id, a.code, a.label, a.note_private, a.datep, a.fk_user_author, u.lastname, u.firstname, u.login, u.photo"
+    . " FROM " . MAIN_DB_PREFIX . "actioncomm a LEFT JOIN " . MAIN_DB_PREFIX . "user u ON u.rowid = a.fk_user_author"
+    . " WHERE a.fk_element = " . (int) $object->id . " AND a.elementtype = 'ticket'"
+    . " AND a.entity IN (" . getEntity('agenda') . ")"
+    . " AND a.code LIKE 'TICKET_MSG%'"
+    . " ORDER BY a.datep ASC";
+$thrRes = $db->query($thrSql);
+if ($thrRes) {
+    while ($row = $db->fetch_object($thrRes)) {
+        $threadMessages[] = $row;
+    }
+}
+
 // ---- Recent events (actioncomm) attached to this ticket — last 10.
 $recentEvents = [];
 $evtSql = 'SELECT a.id, a.label, a.datep, a.fk_user_author, u.lastname, u.firstname'
@@ -315,15 +330,16 @@ $defaultLayout = [
         //   7. Reference data (linked files, events history, related objects, dates)
         'identification'    => ['visible' => true, 'width' => 'full', 'order' => 0],
         'initial_message'   => ['visible' => true, 'width' => 'full', 'order' => 1],
-        'registres'         => ['visible' => true, 'width' => 'full', 'order' => 2],
-        'classification'    => ['visible' => true, 'width' => 'full', 'order' => 3],
-        'condition_message' => ['visible' => true, 'width' => 'full', 'order' => 4],
-        'accidents'         => ['visible' => true, 'width' => 'full', 'order' => 5],
-        'other_extras'      => ['visible' => true, 'width' => 'full', 'order' => 6],
-        'linked_files'      => ['visible' => true, 'width' => 'full', 'order' => 7],
-        'events'            => ['visible' => true, 'width' => 'full', 'order' => 8],
-        'related'           => ['visible' => true, 'width' => 'full', 'order' => 9],
-        'dates'             => ['visible' => true, 'width' => 'full', 'order' => 10],
+        'messages_thread'   => ['visible' => true, 'width' => 'span', 'order' => 2],
+        'registres'         => ['visible' => true, 'width' => 'full', 'order' => 3],
+        'classification'    => ['visible' => true, 'width' => 'full', 'order' => 4],
+        'condition_message' => ['visible' => true, 'width' => 'full', 'order' => 5],
+        'accidents'         => ['visible' => true, 'width' => 'full', 'order' => 6],
+        'other_extras'      => ['visible' => true, 'width' => 'full', 'order' => 7],
+        'linked_files'      => ['visible' => true, 'width' => 'full', 'order' => 8],
+        'events'            => ['visible' => true, 'width' => 'full', 'order' => 9],
+        'related'           => ['visible' => true, 'width' => 'full', 'order' => 10],
+        'dates'             => ['visible' => true, 'width' => 'full', 'order' => 11],
     ],
 ];
 $rawLayout  = $user->conf->DIGIRISK_TICKET_CARD_LAYOUT ?? '';
@@ -806,6 +822,60 @@ if (!in_array($severityKey, ['low', 'normal', 'high', 'blocking'], true)) {
                         $object->message ?? '',
                         !empty($object->message) ? dolPrintHTML($object->message) : ''); ?>
                 </div>
+            </section>
+
+            <!-- Section: Messages thread + reply form. -->
+            <section class="tac-section" data-section-id="messages_thread">
+                <h3 class="tac-section__title"><i class="fas fa-comments"></i> <?php print $langs->trans('Messages'); ?> <span class="opacitymedium">(<?php print count($threadMessages); ?>)</span></h3>
+                <?php $sectionControls('messages_thread'); ?>
+
+                <ul class="tac-thread" data-thread>
+                    <?php foreach ($threadMessages as $msg) :
+                        $isPrivate  = (bool) preg_match('/PRIVATE/', (string) $msg->code);
+                        $sentByMail = (bool) preg_match('/SENTBYMAIL/', (string) $msg->code);
+                        $authorName = trim(((string) ($msg->firstname ?? '')) . ' ' . ((string) ($msg->lastname ?? '')));
+                        if ($authorName === '') {
+                            $authorName = $msg->login ?: $langs->trans('Unknown');
+                        }
+                        $initials = strtoupper(substr((string) ($msg->firstname ?: $msg->lastname ?: $msg->login ?: '?'), 0, 1));
+                        ?>
+                        <li class="tac-thread__msg<?php print $isPrivate ? ' tac-thread__msg--private' : ''; ?>" data-msg-id="<?php print (int) $msg->id; ?>">
+                            <div class="tac-thread__avatar"><?php print dol_escape_htmltag($initials); ?></div>
+                            <div class="tac-thread__bubble">
+                                <div class="tac-thread__meta">
+                                    <span class="tac-thread__author"><?php print dol_escape_htmltag($authorName); ?></span>
+                                    <span class="tac-thread__date" title="<?php print dol_escape_htmltag(dol_print_date($db->jdate($msg->datep), 'dayhour', 'tzuser')); ?>">
+                                        <?php print dol_print_date($db->jdate($msg->datep), 'dayhour', 'tzuser'); ?>
+                                    </span>
+                                    <?php if ($isPrivate) : ?><span class="tac-thread__tag tac-thread__tag--private"><i class="fas fa-lock"></i> <?php print $langs->trans('Private'); ?></span><?php endif; ?>
+                                    <?php if ($sentByMail) : ?><span class="tac-thread__tag tac-thread__tag--mail"><i class="fas fa-envelope"></i></span><?php endif; ?>
+                                </div>
+                                <?php if (!empty($msg->label)) : ?><div class="tac-thread__subject"><?php print dol_escape_htmltag($msg->label); ?></div><?php endif; ?>
+                                <div class="tac-thread__body"><?php print !empty($msg->note_private) ? dolPrintHTML((string) $msg->note_private) : '<span class="opacitymedium">—</span>'; ?></div>
+                            </div>
+                        </li>
+                    <?php endforeach; ?>
+                    <?php if (empty($threadMessages)) : ?>
+                        <li class="tac-thread__empty opacitymedium"><?php print $langs->trans('NoMessageYet'); ?></li>
+                    <?php endif; ?>
+                </ul>
+
+                <!-- Reply form -->
+                <form class="tac-thread__reply" data-thread-reply>
+                    <input type="text" class="tac-thread__reply-subject" name="subject" placeholder="<?php print dol_escape_htmltag($langs->trans('Subject')); ?>">
+                    <?php
+                    $replyId = 'tac-thread-reply-' . (int) $object->id;
+                    ?>
+                    <textarea id="<?php print $replyId; ?>" class="tac-thread__reply-body" name="body" rows="3" placeholder="<?php print dol_escape_htmltag($langs->trans('TypeYourReply')); ?>"></textarea>
+                    <div class="tac-thread__reply-actions">
+                        <label class="tac-thread__reply-private">
+                            <input type="checkbox" name="private"> <?php print $langs->trans('PrivateMessage'); ?>
+                        </label>
+                        <button type="button" class="tac-thread__reply-send" data-thread-send>
+                            <i class="fas fa-paper-plane"></i> <?php print $langs->trans('Send'); ?>
+                        </button>
+                    </div>
+                </form>
             </section>
 
             <!-- Section: Classification (tags) — 1-click add/remove. -->

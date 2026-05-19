@@ -17,6 +17,38 @@ window.digiriskdolibarr.ticketActionCard = {};
 window.digiriskdolibarr.ticketActionCard.init = function() {
     window.digiriskdolibarr.ticketActionCard.event();
     window.digiriskdolibarr.ticketActionCard.applyLayout();
+    window.digiriskdolibarr.ticketActionCard.initThreadReplyEditor();
+};
+
+/**
+ * Boot CKEditor on the thread reply textarea once on page load. Keeps the editor
+ * persistent (no tap-to-edit swap) since the reply box is a permanent form.
+ *
+ * @return {void}
+ */
+window.digiriskdolibarr.ticketActionCard.initThreadReplyEditor = function() {
+    var $ta = $('.tac-thread__reply-body');
+    if (!$ta.length || !window.CKEDITOR) {
+        return;
+    }
+    var id = $ta.attr('id');
+    if (!id) {
+        return;
+    }
+    try {
+        window.CKEDITOR.replace(id, {
+            customConfig: window.ckeditorConfig || '',
+            removePlugins: 'elementspath,save,flash,div,anchor,specialchar,exportpdf,wsc,scayt',
+            versionCheck: false,
+            htmlEncodeOutput: false,
+            allowedContent: true,
+            toolbar: 'Basic',
+            height: 100,
+            width: '100%'
+        });
+    } catch (e) {
+        // Fallback: keep the plain textarea.
+    }
 };
 
 /**
@@ -227,6 +259,9 @@ window.digiriskdolibarr.ticketActionCard.event = function() {
     // ---- Watch / bookmark toggle.
     $(document).on('click', '[data-watch-toggle]',         window.digiriskdolibarr.ticketActionCard.onWatchToggle);
 
+    // ---- Thread reply send.
+    $(document).on('click', '[data-thread-send]',          window.digiriskdolibarr.ticketActionCard.onThreadSend);
+
     // ---- Drag & drop file upload anywhere on the card.
     // Uses a "drag enter/leave counter" pattern: dragenter increments, dragleave
     // decrements. The overlay shows when counter > 0. Fixes the flicker that
@@ -409,6 +444,79 @@ window.digiriskdolibarr.ticketActionCard.uploadFiles = function(files) {
                 }
             }
         });
+    });
+};
+
+/**
+ * Send a reply to the ticket thread.
+ *
+ * @param  {MouseEvent} event
+ * @return {void}
+ */
+window.digiriskdolibarr.ticketActionCard.onThreadSend = function(event) {
+    event.preventDefault();
+    var $btn      = $(this);
+    var $form     = $btn.closest('[data-thread-reply]');
+    var $card     = $('.tac-card').first();
+    var ajaxUrl   = $card.data('ajax-url');
+    var ticketId  = $card.data('ticket-id');
+    var subject   = $form.find('input[name="subject"]').val();
+    var isPrivate = $form.find('input[name="private"]').is(':checked') ? 1 : 0;
+
+    // Pull body from CKEditor if it's bound, else from the raw textarea.
+    var $ta = $form.find('.tac-thread__reply-body');
+    var taId = $ta.attr('id');
+    var body = '';
+    if (taId && window.CKEDITOR && window.CKEDITOR.instances && window.CKEDITOR.instances[taId]) {
+        body = window.CKEDITOR.instances[taId].getData();
+    } else {
+        body = $ta.val();
+    }
+    if (!body || !body.trim()) {
+        window.digiriskdolibarr.ticketActionCard.flash($card, 'Le message est vide', 'error');
+        return;
+    }
+
+    $btn.prop('disabled', true);
+    $.ajax({
+        url: ajaxUrl,
+        method: 'POST',
+        dataType: 'json',
+        data: {
+            ticket_id: ticketId,
+            action: 'post_message',
+            subject: subject,
+            body: body,
+            private: isPrivate,
+            token: $('input[name="token"]').val() || ''
+        }
+    }).done(function(response) {
+        $btn.prop('disabled', false);
+        if (response && response.success) {
+            // Append the new bubble at the end of the thread + clear the form.
+            var $thread = $form.siblings('[data-thread]');
+            $thread.find('.tac-thread__empty').remove();
+            $thread.append(response.bubble);
+            $form.find('input[name="subject"]').val('');
+            $form.find('input[name="private"]').prop('checked', false);
+            if (taId && window.CKEDITOR && window.CKEDITOR.instances && window.CKEDITOR.instances[taId]) {
+                window.CKEDITOR.instances[taId].setData('');
+            } else {
+                $ta.val('');
+            }
+            // Update the (N) counter in the section title.
+            var $count = $('.tac-section[data-section-id="messages_thread"] h3 span');
+            if ($count.length) {
+                var n = parseInt(($count.text().match(/\d+/) || [0])[0], 10);
+                $count.text('(' + (n + 1) + ')');
+            }
+            window.digiriskdolibarr.ticketActionCard.flash($card, response.message || 'OK', 'success');
+        } else {
+            window.digiriskdolibarr.ticketActionCard.flash($card, (response && response.message) || 'Erreur', 'error');
+        }
+    }).fail(function() {
+        $btn.prop('disabled', false);
+        window.digiriskdolibarr.ticketActionCard.flash($card, 'Erreur réseau', 'error');
     });
 };
 

@@ -1309,6 +1309,149 @@ $tac-border:       #e5e7eb;
 .tac-file-card .fa-file-powerpoint { color: #d35968; }
 .tac-file-card .fa-file-archive { color: #b46a2e; }
 
+// ----- Messages thread (bubbles + reply form) -----
+.tac-thread {
+    list-style: none;
+    margin: 0 0 12px;
+    padding: 0;
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+
+    &__msg {
+        display: flex;
+        align-items: flex-start;
+        gap: 10px;
+
+        &--private .tac-thread__bubble {
+            background: rgba(233,173,79,0.06);
+            border-color: rgba(233,173,79,0.4);
+        }
+    }
+
+    &__avatar {
+        flex: 0 0 auto;
+        width: 34px;
+        height: 34px;
+        border-radius: 50%;
+        background: $tac-blue;
+        color: #fff;
+        font-weight: 700;
+        font-size: 0.95em;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+    }
+
+    &__bubble {
+        flex: 1 1 auto;
+        min-width: 0;
+        background: #fff;
+        border: 1px solid $tac-border;
+        border-radius: 10px;
+        padding: 8px 12px;
+    }
+
+    &__meta {
+        display: flex;
+        align-items: center;
+        gap: 8px;
+        font-size: 0.78em;
+        color: $tac-grey;
+        flex-wrap: wrap;
+    }
+
+    &__author { color: #1f2937; font-weight: 600; }
+    &__date   { font-size: 0.95em; }
+
+    &__tag {
+        display: inline-flex;
+        align-items: center;
+        gap: 3px;
+        padding: 1px 6px;
+        border-radius: 999px;
+        font-size: 0.9em;
+        background: rgba(13,138,255,0.1);
+        color: $tac-blue;
+
+        &--private { background: rgba(233,173,79,0.18); color: darken($tac-orange, 14%); }
+        &--mail    { background: rgba(122,92,240,0.14); color: $tac-purple; }
+    }
+
+    &__subject { margin-top: 4px; font-weight: 600; color: #1f2937; font-size: 0.92em; }
+    &__body    { margin-top: 4px; line-height: 1.45; word-break: break-word; }
+
+    &__empty {
+        text-align: center;
+        font-style: italic;
+        padding: 12px;
+    }
+
+    &__reply {
+        margin-top: 8px;
+        display: flex;
+        flex-direction: column;
+        gap: 6px;
+    }
+
+    &__reply-subject {
+        width: 100%;
+        padding: 6px 10px;
+        border: 1px solid $tac-border;
+        border-radius: 6px;
+        font-family: inherit;
+        font-size: 0.9em;
+
+        &:focus { outline: none; border-color: $tac-blue; box-shadow: 0 0 0 3px rgba(13,138,255,0.15); }
+    }
+    &__reply-body {
+        width: 100%;
+        min-height: 80px;
+        padding: 6px 10px;
+        border: 1px solid $tac-border;
+        border-radius: 6px;
+        font-family: inherit;
+        font-size: 0.92em;
+        resize: vertical;
+
+        &:focus { outline: none; border-color: $tac-blue; box-shadow: 0 0 0 3px rgba(13,138,255,0.15); }
+    }
+
+    &__reply-actions {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        gap: 8px;
+    }
+
+    &__reply-private {
+        display: inline-flex;
+        align-items: center;
+        gap: 6px;
+        font-size: 0.85em;
+        color: $tac-grey;
+        cursor: pointer;
+    }
+
+    &__reply-send {
+        appearance: none;
+        background: $tac-blue;
+        color: #fff;
+        border: none;
+        padding: 6px 16px;
+        border-radius: 6px;
+        font-family: inherit;
+        font-size: 0.95em;
+        cursor: pointer;
+        display: inline-flex;
+        align-items: center;
+        gap: 6px;
+
+        &:hover { background: darken($tac-blue, 5%); }
+        &[disabled] { opacity: 0.5; cursor: not-allowed; }
+    }
+}
+
 // ----- Event list (timeline) -----
 .tac-list--events .tac-list__item {
     border-bottom: 1px solid $tac-border;
