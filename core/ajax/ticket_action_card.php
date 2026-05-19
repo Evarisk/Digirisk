@@ -166,6 +166,7 @@ switch ($action) {
         $subject = trim((string) GETPOST('subject', 'alphanohtml'));
         $body    = trim((string) GETPOST('body', 'restricthtml'));
         $private = (int) GETPOST('private', 'int');
+        $byEmail = (int) GETPOST('by_email', 'int');
         if ($body === '') {
             respond(false, $langs->transnoentities('ErrorBadParameters'));
         }
@@ -173,29 +174,105 @@ switch ($action) {
         $object->subject = $subject ?: ($object->subject ?? '');
         $object->message = $body;
         $object->private = $private;
-        $newId = $object->createTicketMessage($user, 0);
+        $newId = $object->createTicketMessage($user, 0, [], [], [], (bool) $byEmail);
         if (!$newId || $newId <= 0) {
             respond(false, $object->error ?: $langs->transnoentities('Error'));
         }
-        // Build the bubble HTML mirror of the TPL render.
+        // Build the bubble HTML — mirrors the TPL renderer (SMS layout, avatar, action buttons).
         $authorName = $user->getFullName($langs) ?: ($user->login ?: $langs->transnoentities('Unknown'));
         $initials   = strtoupper(substr((string) ($user->firstname ?: $user->lastname ?: $user->login ?: '?'), 0, 1));
-        $cls        = 'tac-thread__msg' . ($private ? ' tac-thread__msg--private' : '');
+        if (!empty($user->photo) && (int) $user->id > 0 && file_exists(DOL_DATA_ROOT . '/users/' . (int) $user->id . '/' . $user->photo)) {
+            $thumbUrl = DOL_URL_ROOT . '/viewimage.php?modulepart=userphoto&entity=' . (int) ($conf->entity ?? 1) . '&file=' . urlencode((int) $user->id . '/' . $user->photo) . '&cache=' . (int) $user->id;
+            $avatar   = '<img class="tac-thread__avatar tac-thread__avatar--img" src="' . dol_escape_htmltag($thumbUrl) . '" alt="' . dol_escape_htmltag($initials) . '">';
+        } else {
+            $avatar   = '<div class="tac-thread__avatar">' . dol_escape_htmltag($initials) . '</div>';
+        }
+        $cls        = 'tac-thread__msg tac-thread__msg--mine' . ($private ? ' tac-thread__msg--private' : '');
+        $authorUrl  = DOL_URL_ROOT . '/user/card.php?id=' . (int) $user->id;
         $tagPrivate = $private ? '<span class="tac-thread__tag tac-thread__tag--private"><i class="fas fa-lock"></i> ' . dol_escape_htmltag($langs->transnoentities('Private')) . '</span>' : '';
+        $tagMail    = $byEmail ? '<span class="tac-thread__tag tac-thread__tag--mail"><i class="fas fa-envelope"></i> ' . dol_escape_htmltag($langs->transnoentities('SentByMail')) . '</span>' : '';
         $subjectHtml = $subject !== '' ? '<div class="tac-thread__subject">' . dol_escape_htmltag($subject) . '</div>' : '';
-        $bubble = '<li class="' . $cls . '" data-msg-id="' . (int) $newId . '">'
-            . '<div class="tac-thread__avatar">' . dol_escape_htmltag($initials) . '</div>'
+        $bodyLinkified = preg_replace_callback(
+            '#(?<!href=["\'])(https?://[^\s<>"\']+)#i',
+            static fn($m) => '<a href="' . dol_escape_htmltag($m[1]) . '" target="_blank" rel="noopener">' . dol_escape_htmltag($m[1]) . '</a>',
+            dolPrintHTML($body)
+        );
+        $bubble = '<li class="' . $cls . '" data-msg-id="' . (int) $newId . '" data-msg-mine="1">'
+            . $avatar
             . '<div class="tac-thread__bubble">'
             . '<div class="tac-thread__meta">'
-            . '<span class="tac-thread__author">' . dol_escape_htmltag($authorName) . '</span>'
-            . '<span class="tac-thread__date">' . dol_print_date(dol_now(), 'dayhour', 'tzuser') . '</span>'
-            . $tagPrivate
+            . '<a class="tac-thread__author" href="' . dol_escape_htmltag($authorUrl) . '">' . dol_escape_htmltag($authorName) . '</a>'
+            . '<span class="tac-thread__date">' . dol_escape_htmltag($langs->transnoentities('JustNow')) . '</span>'
+            . $tagPrivate . $tagMail
             . '</div>'
             . $subjectHtml
-            . '<div class="tac-thread__body">' . dolPrintHTML($body) . '</div>'
+            . '<div class="tac-thread__body" data-msg-body>' . $bodyLinkified . '</div>'
+            . '<div class="tac-thread__actions">'
+            . '<button type="button" class="tac-thread__action" data-msg-quote title="' . dol_escape_htmltag($langs->transnoentities('Quote')) . '"><i class="fas fa-quote-right"></i></button>'
+            . '<button type="button" class="tac-thread__action" data-msg-edit title="' . dol_escape_htmltag($langs->transnoentities('Edit')) . '"><i class="fas fa-pen"></i></button>'
+            . '<button type="button" class="tac-thread__action tac-thread__action--danger" data-msg-delete title="' . dol_escape_htmltag($langs->transnoentities('Delete')) . '"><i class="fas fa-trash"></i></button>'
+            . '</div>'
             . '</div>'
             . '</li>';
         respond(true, $langs->transnoentities('MessagePosted'), ['message_id' => (int) $newId, 'bubble' => $bubble]);
+
+    /*
+     * edit_message — update a TICKET_MSG ActionComm's body (and optionally subject).
+     * Only the message's author can edit their own posts.
+     */
+    case 'edit_message':
+        $msgId   = (int) GETPOST('message_id', 'int');
+        $body    = trim((string) GETPOST('body', 'restricthtml'));
+        $subject = trim((string) GETPOST('subject', 'alphanohtml'));
+        if ($msgId <= 0 || $body === '') {
+            respond(false, $langs->transnoentities('ErrorBadParameters'));
+        }
+        require_once DOL_DOCUMENT_ROOT . '/comm/action/class/actioncomm.class.php';
+        $ac = new ActionComm($db);
+        if ($ac->fetch($msgId) <= 0) {
+            respond(false, $langs->transnoentities('ErrorRecordNotFound'));
+        }
+        if ((int) $ac->elementid !== (int) $object->id || (int) $ac->authorid !== (int) $user->id) {
+            respond(false, $langs->transnoentities('NotAllowed'));
+        }
+        $ac->note_private = $body;
+        if ($subject !== '') {
+            $ac->label = $subject;
+        }
+        if ($ac->update($user) <= 0) {
+            respond(false, $ac->error ?: $langs->transnoentities('Error'));
+        }
+        $bodyLinkified = preg_replace_callback(
+            '#(?<!href=["\'])(https?://[^\s<>"\']+)#i',
+            static fn($m) => '<a href="' . dol_escape_htmltag($m[1]) . '" target="_blank" rel="noopener">' . dol_escape_htmltag($m[1]) . '</a>',
+            dolPrintHTML($body)
+        );
+        respond(true, $langs->transnoentities('MessageEdited'), [
+            'message_id' => $msgId,
+            'body_html'  => $bodyLinkified,
+            'subject'    => $subject,
+        ]);
+
+    /*
+     * delete_message — remove a TICKET_MSG ActionComm. Only the original author may delete.
+     */
+    case 'delete_message':
+        $msgId = (int) GETPOST('message_id', 'int');
+        if ($msgId <= 0) {
+            respond(false, $langs->transnoentities('ErrorBadParameters'));
+        }
+        require_once DOL_DOCUMENT_ROOT . '/comm/action/class/actioncomm.class.php';
+        $ac = new ActionComm($db);
+        if ($ac->fetch($msgId) <= 0) {
+            respond(false, $langs->transnoentities('ErrorRecordNotFound'));
+        }
+        if ((int) $ac->elementid !== (int) $object->id || (int) $ac->authorid !== (int) $user->id) {
+            respond(false, $langs->transnoentities('NotAllowed'));
+        }
+        if ($ac->delete($user) <= 0) {
+            respond(false, $ac->error ?: $langs->transnoentities('Error'));
+        }
+        respond(true, $langs->transnoentities('MessageDeleted'), ['message_id' => $msgId]);
 
     /*
      * upload_file — receive a single file via FormData and drop it in the ticket's

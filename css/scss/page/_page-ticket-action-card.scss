@@ -1309,23 +1309,49 @@ $tac-border:       #e5e7eb;
 .tac-file-card .fa-file-powerpoint { color: #d35968; }
 .tac-file-card .fa-file-archive { color: #b46a2e; }
 
-// ----- Messages thread (bubbles + reply form) -----
+// ----- Messages thread (SMS-style bubbles + sticky reply form) -----
 .tac-thread {
     list-style: none;
     margin: 0 0 12px;
     padding: 0;
     display: flex;
     flex-direction: column;
-    gap: 10px;
+    gap: 14px;
+    max-height: 560px;
+    overflow-y: auto;
+    scroll-behavior: smooth;
+    padding-right: 4px;
 
+    // SMS metaphor: others on the left, mine on the right.
     &__msg {
         display: flex;
         align-items: flex-start;
         gap: 10px;
+        max-width: 88%;
+        position: relative;
+
+        // Hovering reveals the per-bubble action buttons.
+        &:hover .tac-thread__actions { opacity: 1; pointer-events: auto; }
+
+        &--mine {
+            margin-left: auto;
+            flex-direction: row-reverse;
+
+            .tac-thread__bubble {
+                background: rgba(13,138,255,0.08);
+                border-color: rgba(13,138,255,0.25);
+            }
+            .tac-thread__meta { justify-content: flex-end; }
+        }
 
         &--private .tac-thread__bubble {
-            background: rgba(233,173,79,0.06);
+            background: rgba(233,173,79,0.08);
             border-color: rgba(233,173,79,0.4);
+        }
+
+        // First message — pinned-looking marker on the left edge.
+        &--original .tac-thread__bubble {
+            border-left: 3px solid $tac-blue;
         }
     }
 
@@ -1341,6 +1367,11 @@ $tac-border:       #e5e7eb;
         display: flex;
         align-items: center;
         justify-content: center;
+        overflow: hidden;
+
+        &--img {
+            object-fit: cover;
+        }
     }
 
     &__bubble {
@@ -1348,8 +1379,9 @@ $tac-border:       #e5e7eb;
         min-width: 0;
         background: #fff;
         border: 1px solid $tac-border;
-        border-radius: 10px;
+        border-radius: 12px;
         padding: 8px 12px;
+        position: relative;
     }
 
     &__meta {
@@ -1361,8 +1393,14 @@ $tac-border:       #e5e7eb;
         flex-wrap: wrap;
     }
 
-    &__author { color: #1f2937; font-weight: 600; }
-    &__date   { font-size: 0.95em; }
+    &__author {
+        color: #1f2937;
+        font-weight: 600;
+        text-decoration: none;
+
+        &:hover { color: $tac-blue; text-decoration: underline; }
+    }
+    &__date { font-size: 0.95em; }
 
     &__tag {
         display: inline-flex;
@@ -1374,24 +1412,110 @@ $tac-border:       #e5e7eb;
         background: rgba(13,138,255,0.1);
         color: $tac-blue;
 
-        &--private { background: rgba(233,173,79,0.18); color: darken($tac-orange, 14%); }
-        &--mail    { background: rgba(122,92,240,0.14); color: $tac-purple; }
+        &--private  { background: rgba(233,173,79,0.18); color: darken($tac-orange, 14%); }
+        &--mail     { background: rgba(122,92,240,0.14); color: $tac-purple; }
+        &--original { background: rgba(13,138,255,0.14); color: $tac-blue; }
     }
 
     &__subject { margin-top: 4px; font-weight: 600; color: #1f2937; font-size: 0.92em; }
-    &__body    { margin-top: 4px; line-height: 1.45; word-break: break-word; }
+    &__body {
+        margin-top: 4px;
+        line-height: 1.45;
+        word-break: break-word;
 
-    &__empty {
-        text-align: center;
-        font-style: italic;
-        padding: 12px;
+        a { color: $tac-blue; text-decoration: underline; }
+        blockquote {
+            margin: 4px 0;
+            padding: 4px 10px;
+            border-left: 3px solid $tac-grey;
+            background: rgba(107,114,128,0.06);
+            color: $tac-grey;
+            font-size: 0.95em;
+        }
     }
 
+    &__attachments {
+        display: inline-flex;
+        align-items: center;
+        gap: 4px;
+        margin-top: 4px;
+        font-size: 0.82em;
+        color: $tac-blue;
+        text-decoration: none;
+
+        &:hover { text-decoration: underline; }
+    }
+
+    // Hover-only floating action bar.
+    &__actions {
+        position: absolute;
+        top: -10px;
+        right: 8px;
+        display: flex;
+        gap: 4px;
+        background: #fff;
+        border: 1px solid $tac-border;
+        border-radius: 999px;
+        padding: 2px 4px;
+        box-shadow: 0 2px 6px rgba(0,0,0,0.08);
+        opacity: 0;
+        pointer-events: none;
+        transition: opacity 0.15s ease;
+    }
+    &__msg--mine &__actions { right: auto; left: 8px; }
+
+    &__action {
+        appearance: none;
+        background: transparent;
+        border: none;
+        color: $tac-grey;
+        cursor: pointer;
+        padding: 4px 6px;
+        border-radius: 50%;
+        font-size: 0.82em;
+
+        &:hover { background: rgba(13,138,255,0.1); color: $tac-blue; }
+        &--danger:hover { background: rgba(224,83,83,0.1); color: $tac-red; }
+    }
+
+    // Empty state — XXL icon centered.
+    &__empty {
+        text-align: center;
+        padding: 32px 12px;
+        color: $tac-grey;
+
+        &-icon {
+            font-size: 3em;
+            color: rgba(13,138,255,0.25);
+            margin-bottom: 8px;
+        }
+        &-title {
+            font-weight: 600;
+            color: #1f2937;
+            margin-bottom: 4px;
+        }
+        &-hint { font-size: 0.9em; }
+    }
+
+    // Sticky reply form — pinned to the bottom of the section while scrolling.
     &__reply {
+        position: sticky;
+        bottom: 0;
         margin-top: 8px;
+        padding: 8px;
         display: flex;
         flex-direction: column;
         gap: 6px;
+        background: #fff;
+        border: 1px solid $tac-border;
+        border-radius: 10px;
+        box-shadow: 0 -4px 12px rgba(0,0,0,0.04);
+        z-index: 2;
+
+        &--editing {
+            border-color: $tac-orange;
+            box-shadow: 0 -4px 12px rgba(233,173,79,0.15);
+        }
     }
 
     &__reply-subject {
@@ -1420,17 +1544,34 @@ $tac-border:       #e5e7eb;
     &__reply-actions {
         display: flex;
         align-items: center;
-        justify-content: space-between;
-        gap: 8px;
+        justify-content: flex-end;
+        gap: 12px;
+        flex-wrap: wrap;
     }
 
-    &__reply-private {
+    &__reply-toggle {
         display: inline-flex;
         align-items: center;
         gap: 6px;
         font-size: 0.85em;
         color: $tac-grey;
         cursor: pointer;
+        margin-right: auto;
+    }
+
+    &__reply-hint {
+        font-size: 0.78em;
+        color: $tac-grey;
+
+        kbd {
+            display: inline-block;
+            padding: 1px 5px;
+            font-size: 0.85em;
+            background: rgba(0,0,0,0.05);
+            border: 1px solid $tac-border;
+            border-radius: 4px;
+            font-family: inherit;
+        }
     }
 
     &__reply-send {

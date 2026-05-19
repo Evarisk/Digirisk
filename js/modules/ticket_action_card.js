@@ -18,6 +18,8 @@ window.digiriskdolibarr.ticketActionCard.init = function() {
     window.digiriskdolibarr.ticketActionCard.event();
     window.digiriskdolibarr.ticketActionCard.applyLayout();
     window.digiriskdolibarr.ticketActionCard.initThreadReplyEditor();
+    // Drop the newest message into view on load — feels like opening a chat app.
+    setTimeout(function() { window.digiriskdolibarr.ticketActionCard.scrollThreadToBottom(); }, 200);
 };
 
 /**
@@ -36,7 +38,7 @@ window.digiriskdolibarr.ticketActionCard.initThreadReplyEditor = function() {
         return;
     }
     try {
-        window.CKEDITOR.replace(id, {
+        var ed = window.CKEDITOR.replace(id, {
             customConfig: window.ckeditorConfig || '',
             removePlugins: 'elementspath,save,flash,div,anchor,specialchar,exportpdf,wsc,scayt',
             versionCheck: false,
@@ -45,6 +47,16 @@ window.digiriskdolibarr.ticketActionCard.initThreadReplyEditor = function() {
             toolbar: 'Basic',
             height: 100,
             width: '100%'
+        });
+        // Ctrl/Cmd+Enter inside the CKEditor iframe also fires Send.
+        ed.on('instanceReady', function() {
+            ed.document.on('keydown', function(e) {
+                var ev = e.data && e.data.$;
+                if (ev && ev.key === 'Enter' && (ev.ctrlKey || ev.metaKey)) {
+                    ev.preventDefault();
+                    $('[data-thread-send]').first().trigger('click');
+                }
+            });
         });
     } catch (e) {
         // Fallback: keep the plain textarea.
@@ -259,8 +271,12 @@ window.digiriskdolibarr.ticketActionCard.event = function() {
     // ---- Watch / bookmark toggle.
     $(document).on('click', '[data-watch-toggle]',         window.digiriskdolibarr.ticketActionCard.onWatchToggle);
 
-    // ---- Thread reply send.
-    $(document).on('click', '[data-thread-send]',          window.digiriskdolibarr.ticketActionCard.onThreadSend);
+    // ---- Thread reply send + edit/delete/quote per-message actions.
+    $(document).on('click',    '[data-thread-send]',       window.digiriskdolibarr.ticketActionCard.onThreadSend);
+    $(document).on('click',    '[data-msg-edit]',          window.digiriskdolibarr.ticketActionCard.onMsgEdit);
+    $(document).on('click',    '[data-msg-delete]',        window.digiriskdolibarr.ticketActionCard.onMsgDelete);
+    $(document).on('click',    '[data-msg-quote]',         window.digiriskdolibarr.ticketActionCard.onMsgQuote);
+    $(document).on('keydown',  '[data-thread-reply] input, [data-thread-reply] textarea', window.digiriskdolibarr.ticketActionCard.onReplyKeydown);
 
     // ---- Drag & drop file upload anywhere on the card.
     // Uses a "drag enter/leave counter" pattern: dragenter increments, dragleave
@@ -462,6 +478,7 @@ window.digiriskdolibarr.ticketActionCard.onThreadSend = function(event) {
     var ticketId  = $card.data('ticket-id');
     var subject   = $form.find('input[name="subject"]').val();
     var isPrivate = $form.find('input[name="private"]').is(':checked') ? 1 : 0;
+    var byEmail   = $form.find('input[name="by_email"]').is(':checked') ? 1 : 0;
 
     // Pull body from CKEditor if it's bound, else from the raw textarea.
     var $ta = $form.find('.tac-thread__reply-body');
@@ -477,6 +494,8 @@ window.digiriskdolibarr.ticketActionCard.onThreadSend = function(event) {
         return;
     }
 
+    var editingId = $form.data('editing-message-id');
+
     $btn.prop('disabled', true);
     $.ajax({
         url: ajaxUrl,
@@ -484,31 +503,45 @@ window.digiriskdolibarr.ticketActionCard.onThreadSend = function(event) {
         dataType: 'json',
         data: {
             ticket_id: ticketId,
-            action: 'post_message',
+            action: editingId ? 'edit_message' : 'post_message',
+            message_id: editingId || 0,
             subject: subject,
             body: body,
             private: isPrivate,
+            by_email: byEmail,
             token: $('input[name="token"]').val() || ''
         }
     }).done(function(response) {
         $btn.prop('disabled', false);
         if (response && response.success) {
-            // Append the new bubble at the end of the thread + clear the form.
             var $thread = $form.siblings('[data-thread]');
-            $thread.find('.tac-thread__empty').remove();
-            $thread.append(response.bubble);
+            if (editingId) {
+                // In-place body refresh; clear edit state on the form.
+                var $msg = $thread.find('.tac-thread__msg[data-msg-id="' + editingId + '"]');
+                $msg.find('[data-msg-body]').html(response.body_html || '');
+                if (response.subject) {
+                    $msg.find('.tac-thread__subject').text(response.subject);
+                }
+                $form.removeData('editing-message-id').removeClass('tac-thread__reply--editing');
+                $form.find('[data-thread-send]').html('<i class="fas fa-paper-plane"></i> ' + (($('[data-thread-reply]').data('lang-send') || 'Envoyer')));
+            } else {
+                // Append new bubble + update (N) counter.
+                $thread.find('.tac-thread__empty').remove();
+                $thread.append(response.bubble);
+                var $count = $('.tac-section[data-section-id="messages_thread"] h3 span');
+                if ($count.length) {
+                    var n = parseInt(($count.text().match(/\d+/) || [0])[0], 10);
+                    $count.text('(' + (n + 1) + ')');
+                }
+                window.digiriskdolibarr.ticketActionCard.scrollThreadToBottom();
+            }
             $form.find('input[name="subject"]').val('');
             $form.find('input[name="private"]').prop('checked', false);
+            $form.find('input[name="by_email"]').prop('checked', false);
             if (taId && window.CKEDITOR && window.CKEDITOR.instances && window.CKEDITOR.instances[taId]) {
                 window.CKEDITOR.instances[taId].setData('');
             } else {
                 $ta.val('');
-            }
-            // Update the (N) counter in the section title.
-            var $count = $('.tac-section[data-section-id="messages_thread"] h3 span');
-            if ($count.length) {
-                var n = parseInt(($count.text().match(/\d+/) || [0])[0], 10);
-                $count.text('(' + (n + 1) + ')');
             }
             window.digiriskdolibarr.ticketActionCard.flash($card, response.message || 'OK', 'success');
         } else {
@@ -518,6 +551,147 @@ window.digiriskdolibarr.ticketActionCard.onThreadSend = function(event) {
         $btn.prop('disabled', false);
         window.digiriskdolibarr.ticketActionCard.flash($card, 'Erreur réseau', 'error');
     });
+};
+
+/**
+ * Smoothly scroll the thread to the bottom so the latest bubble is visible.
+ * Used after sending a reply.
+ *
+ * @return {void}
+ */
+window.digiriskdolibarr.ticketActionCard.scrollThreadToBottom = function() {
+    var $thread = $('[data-thread]').first();
+    if (!$thread.length) {
+        return;
+    }
+    var $last = $thread.find('.tac-thread__msg').last();
+    if ($last.length && $last[0].scrollIntoView) {
+        $last[0].scrollIntoView({behavior: 'smooth', block: 'nearest'});
+    }
+};
+
+/**
+ * Start editing a message: load its body back into the reply form and flip the
+ * Send button into "Save" mode. Form keeps the edit state in a data attribute.
+ *
+ * @param  {MouseEvent} event
+ * @return {void}
+ */
+window.digiriskdolibarr.ticketActionCard.onMsgEdit = function(event) {
+    event.preventDefault();
+    var $msg = $(this).closest('.tac-thread__msg');
+    var msgId = $msg.data('msg-id');
+    if (!msgId) {
+        return;
+    }
+    var $form = $('[data-thread-reply]').first();
+    var $ta   = $form.find('.tac-thread__reply-body');
+    var taId  = $ta.attr('id');
+    var body  = $msg.find('[data-msg-body]').html() || '';
+    var subj  = $msg.find('.tac-thread__subject').text() || '';
+
+    $form.data('editing-message-id', msgId).addClass('tac-thread__reply--editing');
+    $form.find('input[name="subject"]').val(subj);
+    if (taId && window.CKEDITOR && window.CKEDITOR.instances && window.CKEDITOR.instances[taId]) {
+        window.CKEDITOR.instances[taId].setData(body);
+        window.CKEDITOR.instances[taId].focus();
+    } else {
+        $ta.val(body).focus();
+    }
+    $form.find('[data-thread-send]').html('<i class="fas fa-save"></i> ' + (($('[data-thread-reply]').data('lang-save') || 'Enregistrer')));
+    if ($form[0].scrollIntoView) {
+        $form[0].scrollIntoView({behavior: 'smooth', block: 'nearest'});
+    }
+};
+
+/**
+ * Delete a message after confirmation. Removes the bubble on success and
+ * decrements the (N) counter.
+ *
+ * @param  {MouseEvent} event
+ * @return {void}
+ */
+window.digiriskdolibarr.ticketActionCard.onMsgDelete = function(event) {
+    event.preventDefault();
+    var $msg  = $(this).closest('.tac-thread__msg');
+    var msgId = $msg.data('msg-id');
+    var $card = $('.tac-card').first();
+    if (!msgId) {
+        return;
+    }
+    if (!window.confirm($('[data-thread-reply]').data('lang-confirm-delete') || 'Supprimer ce message ?')) {
+        return;
+    }
+    $.ajax({
+        url: $card.data('ajax-url'),
+        method: 'POST',
+        dataType: 'json',
+        data: {
+            ticket_id: $card.data('ticket-id'),
+            action: 'delete_message',
+            message_id: msgId,
+            token: $('input[name="token"]').val() || ''
+        }
+    }).done(function(response) {
+        if (response && response.success) {
+            $msg.fadeOut(150, function() {
+                $(this).remove();
+                var $count = $('.tac-section[data-section-id="messages_thread"] h3 span');
+                if ($count.length) {
+                    var n = parseInt(($count.text().match(/\d+/) || [0])[0], 10);
+                    $count.text('(' + Math.max(0, n - 1) + ')');
+                }
+            });
+            window.digiriskdolibarr.ticketActionCard.flash($card, response.message || 'OK', 'success');
+        } else {
+            window.digiriskdolibarr.ticketActionCard.flash($card, (response && response.message) || 'Erreur', 'error');
+        }
+    }).fail(function() {
+        window.digiriskdolibarr.ticketActionCard.flash($card, 'Erreur réseau', 'error');
+    });
+};
+
+/**
+ * Quote a message: copies its body into the reply textarea wrapped in a
+ * <blockquote> with author/date attribution.
+ *
+ * @param  {MouseEvent} event
+ * @return {void}
+ */
+window.digiriskdolibarr.ticketActionCard.onMsgQuote = function(event) {
+    event.preventDefault();
+    var $msg    = $(this).closest('.tac-thread__msg');
+    var author  = $msg.find('.tac-thread__author').first().text() || '';
+    var body    = $msg.find('[data-msg-body]').html() || '';
+    var $form   = $('[data-thread-reply]').first();
+    var $ta     = $form.find('.tac-thread__reply-body');
+    var taId    = $ta.attr('id');
+    var quoted  = '<blockquote><strong>' + $('<div>').text(author).html() + ' :</strong><br>' + body + '</blockquote><p></p>';
+    if (taId && window.CKEDITOR && window.CKEDITOR.instances && window.CKEDITOR.instances[taId]) {
+        var ed = window.CKEDITOR.instances[taId];
+        ed.setData((ed.getData() || '') + quoted);
+        ed.focus();
+    } else {
+        $ta.val(($ta.val() || '') + quoted).focus();
+    }
+    if ($form[0].scrollIntoView) {
+        $form[0].scrollIntoView({behavior: 'smooth', block: 'nearest'});
+    }
+};
+
+/**
+ * Ctrl/Cmd+Enter inside the reply textarea triggers Send. Bound on the document
+ * so it survives CKEditor remounts.
+ *
+ * @param  {KeyboardEvent} event
+ * @return {void}
+ */
+window.digiriskdolibarr.ticketActionCard.onReplyKeydown = function(event) {
+    if (event.key !== 'Enter' || !(event.ctrlKey || event.metaKey)) {
+        return;
+    }
+    event.preventDefault();
+    $('[data-thread-send]').first().trigger('click');
 };
 
 /**

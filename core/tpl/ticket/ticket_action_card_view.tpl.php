@@ -293,6 +293,54 @@ if ($thrRes) {
     }
 }
 
+/**
+ * Build the avatar HTML for a user — <img> with the photo if available, otherwise
+ * a coloured initial bubble.
+ */
+$avatarHtml = static function ($userId, $firstname, $lastname, $login, $photo) use ($conf): string {
+    $initials = strtoupper(substr((string) ($firstname ?: $lastname ?: $login ?: '?'), 0, 1));
+    if (!empty($photo) && (int) $userId > 0 && file_exists(DOL_DATA_ROOT . '/users/' . (int) $userId . '/' . $photo)) {
+        $thumbUrl = DOL_URL_ROOT . '/viewimage.php?modulepart=userphoto&entity=' . (int) ($conf->entity ?? 1) . '&file=' . urlencode((int) $userId . '/' . $photo) . '&cache=' . (int) $userId;
+        return '<img class="tac-thread__avatar tac-thread__avatar--img" src="' . dol_escape_htmltag($thumbUrl) . '" alt="' . dol_escape_htmltag($initials) . '">';
+    }
+    return '<div class="tac-thread__avatar">' . dol_escape_htmltag($initials) . '</div>';
+};
+
+/**
+ * Format a timestamp as a relative duration ("il y a 5min", "hier", "il y a 3j")
+ * to make the thread feel chatty. Absolute date stays in the tooltip.
+ */
+$relativeTime = static function (int $ts) use ($langs): string {
+    $delta = max(0, dol_now() - $ts);
+    if ($delta < 60)         { return $langs->transnoentities('JustNow'); }
+    if ($delta < 3600)       { return sprintf($langs->transnoentities('NMinAgo'),  (int) ($delta / 60)); }
+    if ($delta < 86400)      { return sprintf($langs->transnoentities('NHAgo'),    (int) ($delta / 3600)); }
+    if ($delta < 86400 * 7)  { return sprintf($langs->transnoentities('NDAgo'),    (int) ($delta / 86400)); }
+    return dol_print_date($ts, 'day', 'tzuser');
+};
+
+/**
+ * Linkify plain-text URLs inside an HTML fragment without touching already-anchored ones.
+ * Keeps Dolibarr's restrictHTML output safe by only adding <a target=_blank rel=noopener>.
+ */
+$linkifyUrls = static function (string $html): string {
+    return preg_replace_callback(
+        '#(?<!href=["\'])(https?://[^\s<>"\']+)#i',
+        static fn($m) => '<a href="' . dol_escape_htmltag($m[1]) . '" target="_blank" rel="noopener">' . dol_escape_htmltag($m[1]) . '</a>',
+        $html
+    );
+};
+
+/**
+ * Count attached files for an actioncomm entry (stored under agenda upload dir).
+ */
+$attachedFileCount = static function (int $actioncommId) use ($conf): int {
+    if ($actioncommId <= 0 || empty($conf->agenda->dir_output)) { return 0; }
+    $dir = $conf->agenda->dir_output . '/' . $actioncommId;
+    if (!is_dir($dir)) { return 0; }
+    return count(dol_dir_list($dir, 'files', 0));
+};
+
 // ---- Recent events (actioncomm) attached to this ticket — last 10.
 $recentEvents = [];
 $evtSql = 'SELECT a.id, a.label, a.datep, a.fk_user_author, u.lastname, u.firstname'
@@ -830,47 +878,86 @@ if (!in_array($severityKey, ['low', 'normal', 'high', 'blocking'], true)) {
                 <?php $sectionControls('messages_thread'); ?>
 
                 <ul class="tac-thread" data-thread>
-                    <?php foreach ($threadMessages as $msg) :
+                    <?php foreach ($threadMessages as $idx => $msg) :
                         $isPrivate  = (bool) preg_match('/PRIVATE/', (string) $msg->code);
                         $sentByMail = (bool) preg_match('/SENTBYMAIL/', (string) $msg->code);
+                        $isMine     = ((int) $msg->fk_user_author === (int) $user->id);
+                        $isOriginal = ($idx === 0);
                         $authorName = trim(((string) ($msg->firstname ?? '')) . ' ' . ((string) ($msg->lastname ?? '')));
                         if ($authorName === '') {
                             $authorName = $msg->login ?: $langs->trans('Unknown');
                         }
-                        $initials = strtoupper(substr((string) ($msg->firstname ?: $msg->lastname ?: $msg->login ?: '?'), 0, 1));
+                        $msgTs       = $db->jdate($msg->datep);
+                        $absoluteDt  = dol_print_date($msgTs, 'dayhour', 'tzuser');
+                        $relativeDt  = $relativeTime((int) $msgTs);
+                        $bodyHtml    = !empty($msg->note_private) ? $linkifyUrls(dolPrintHTML((string) $msg->note_private)) : '<span class="opacitymedium">—</span>';
+                        $fileCount   = $attachedFileCount((int) $msg->id);
+                        $authorUrl   = !empty($msg->fk_user_author) ? DOL_URL_ROOT . '/user/card.php?id=' . (int) $msg->fk_user_author : '';
+                        $msgClasses  = 'tac-thread__msg';
+                        $msgClasses .= $isMine     ? ' tac-thread__msg--mine'     : '';
+                        $msgClasses .= $isPrivate  ? ' tac-thread__msg--private'  : '';
+                        $msgClasses .= $isOriginal ? ' tac-thread__msg--original' : '';
                         ?>
-                        <li class="tac-thread__msg<?php print $isPrivate ? ' tac-thread__msg--private' : ''; ?>" data-msg-id="<?php print (int) $msg->id; ?>">
-                            <div class="tac-thread__avatar"><?php print dol_escape_htmltag($initials); ?></div>
+                        <li class="<?php print $msgClasses; ?>" data-msg-id="<?php print (int) $msg->id; ?>" data-msg-mine="<?php print $isMine ? '1' : '0'; ?>">
+                            <?php print $avatarHtml($msg->fk_user_author, $msg->firstname, $msg->lastname, $msg->login, $msg->photo); ?>
                             <div class="tac-thread__bubble">
                                 <div class="tac-thread__meta">
-                                    <span class="tac-thread__author"><?php print dol_escape_htmltag($authorName); ?></span>
-                                    <span class="tac-thread__date" title="<?php print dol_escape_htmltag(dol_print_date($db->jdate($msg->datep), 'dayhour', 'tzuser')); ?>">
-                                        <?php print dol_print_date($db->jdate($msg->datep), 'dayhour', 'tzuser'); ?>
+                                    <?php if ($authorUrl !== '') : ?>
+                                        <a class="tac-thread__author" href="<?php print dol_escape_htmltag($authorUrl); ?>"><?php print dol_escape_htmltag($authorName); ?></a>
+                                    <?php else : ?>
+                                        <span class="tac-thread__author"><?php print dol_escape_htmltag($authorName); ?></span>
+                                    <?php endif; ?>
+                                    <span class="tac-thread__date" title="<?php print dol_escape_htmltag($absoluteDt); ?>">
+                                        <?php print dol_escape_htmltag($relativeDt); ?>
                                     </span>
+                                    <?php if ($isOriginal) : ?><span class="tac-thread__tag tac-thread__tag--original"><i class="fas fa-flag"></i> <?php print $langs->trans('OriginalMessage'); ?></span><?php endif; ?>
                                     <?php if ($isPrivate) : ?><span class="tac-thread__tag tac-thread__tag--private"><i class="fas fa-lock"></i> <?php print $langs->trans('Private'); ?></span><?php endif; ?>
-                                    <?php if ($sentByMail) : ?><span class="tac-thread__tag tac-thread__tag--mail"><i class="fas fa-envelope"></i></span><?php endif; ?>
+                                    <?php if ($sentByMail) : ?><span class="tac-thread__tag tac-thread__tag--mail"><i class="fas fa-envelope"></i> <?php print $langs->trans('SentByMail'); ?></span><?php endif; ?>
                                 </div>
                                 <?php if (!empty($msg->label)) : ?><div class="tac-thread__subject"><?php print dol_escape_htmltag($msg->label); ?></div><?php endif; ?>
-                                <div class="tac-thread__body"><?php print !empty($msg->note_private) ? dolPrintHTML((string) $msg->note_private) : '<span class="opacitymedium">—</span>'; ?></div>
+                                <div class="tac-thread__body" data-msg-body><?php print $bodyHtml; ?></div>
+                                <?php if ($fileCount > 0) : ?>
+                                    <a class="tac-thread__attachments" href="<?php print DOL_URL_ROOT; ?>/comm/action/document.php?id=<?php print (int) $msg->id; ?>" target="_blank" rel="noopener">
+                                        <i class="fas fa-paperclip"></i> <?php print sprintf($langs->trans('NAttachedFiles'), (int) $fileCount); ?>
+                                    </a>
+                                <?php endif; ?>
+                                <div class="tac-thread__actions">
+                                    <button type="button" class="tac-thread__action" data-msg-quote title="<?php print dol_escape_htmltag($langs->trans('Quote')); ?>"><i class="fas fa-quote-right"></i></button>
+                                    <?php if ($isMine) : ?>
+                                        <button type="button" class="tac-thread__action" data-msg-edit title="<?php print dol_escape_htmltag($langs->trans('Edit')); ?>"><i class="fas fa-pen"></i></button>
+                                        <button type="button" class="tac-thread__action tac-thread__action--danger" data-msg-delete title="<?php print dol_escape_htmltag($langs->trans('Delete')); ?>"><i class="fas fa-trash"></i></button>
+                                    <?php endif; ?>
+                                </div>
                             </div>
                         </li>
                     <?php endforeach; ?>
                     <?php if (empty($threadMessages)) : ?>
-                        <li class="tac-thread__empty opacitymedium"><?php print $langs->trans('NoMessageYet'); ?></li>
+                        <li class="tac-thread__empty">
+                            <i class="fas fa-comments tac-thread__empty-icon"></i>
+                            <div class="tac-thread__empty-title"><?php print $langs->trans('NoMessageYet'); ?></div>
+                            <div class="tac-thread__empty-hint opacitymedium"><?php print $langs->trans('BeFirstToReply'); ?></div>
+                        </li>
                     <?php endif; ?>
                 </ul>
 
-                <!-- Reply form -->
-                <form class="tac-thread__reply" data-thread-reply>
+                <!-- Reply form (sticky to bottom of section while scrolling). -->
+                <form class="tac-thread__reply" data-thread-reply
+                    data-lang-save="<?php print dol_escape_htmltag($langs->transnoentities('Save')); ?>"
+                    data-lang-send="<?php print dol_escape_htmltag($langs->transnoentities('Send')); ?>"
+                    data-lang-confirm-delete="<?php print dol_escape_htmltag($langs->transnoentities('ConfirmDeleteMessage')); ?>">
                     <input type="text" class="tac-thread__reply-subject" name="subject" placeholder="<?php print dol_escape_htmltag($langs->trans('Subject')); ?>">
                     <?php
                     $replyId = 'tac-thread-reply-' . (int) $object->id;
                     ?>
                     <textarea id="<?php print $replyId; ?>" class="tac-thread__reply-body" name="body" rows="3" placeholder="<?php print dol_escape_htmltag($langs->trans('TypeYourReply')); ?>"></textarea>
                     <div class="tac-thread__reply-actions">
-                        <label class="tac-thread__reply-private">
-                            <input type="checkbox" name="private"> <?php print $langs->trans('PrivateMessage'); ?>
+                        <label class="tac-thread__reply-toggle">
+                            <input type="checkbox" name="private"> <i class="fas fa-lock"></i> <?php print $langs->trans('PrivateMessage'); ?>
                         </label>
+                        <label class="tac-thread__reply-toggle">
+                            <input type="checkbox" name="by_email"> <i class="fas fa-envelope"></i> <?php print $langs->trans('ReplyByEmail'); ?>
+                        </label>
+                        <span class="tac-thread__reply-hint opacitymedium"><kbd>Ctrl</kbd>+<kbd>Enter</kbd></span>
                         <button type="button" class="tac-thread__reply-send" data-thread-send>
                             <i class="fas fa-paper-plane"></i> <?php print $langs->trans('Send'); ?>
                         </button>
