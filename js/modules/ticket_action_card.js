@@ -1127,10 +1127,13 @@ window.digiriskdolibarr.ticketActionCard.saveField = function($wrap, field, newV
                 $card.addClass('tac-severity-' + newKey);
                 $card.attr('data-severity', newKey);
                 // Hero severity badge — remove for low/normal, show for high/blocking.
+                // Read the label from the AJAX response display HTML (server-rendered),
+                // not from the DOM — at this point the field cell still contains the
+                // <select> with ALL the options, so .text() would return everything concatenated.
                 $('[data-severity-badge]').remove();
                 if (newKey === 'high' || newKey === 'blocking') {
                     var variant = (newKey === 'blocking') ? 'red' : 'orange';
-                    var label = $('.tac-field[data-edit-field="severity_code"] .tac-field__value').text().trim();
+                    var label = $('<div>').html(response.display || '').text().trim();
                     $('.tac-chip--status').after(
                         '<span class="tac-chip tac-chip--readonly tac-chip--severity tac-chip--severity-' + variant + '" data-severity-badge>'
                         + '<i class="fas fa-exclamation-triangle"></i> ' + label.toUpperCase()
