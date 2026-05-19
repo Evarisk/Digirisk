@@ -814,6 +814,98 @@ $tac-border:       #e5e7eb;
     }
 }
 
+// ----- Linked files thumbnail grid -----
+.tac-files-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(112px, 1fr));
+    gap: 10px;
+
+    &__empty {
+        color: $tac-grey;
+        font-style: italic;
+        padding: 8px 0;
+    }
+}
+
+.tac-file-card {
+    display: flex;
+    flex-direction: column;
+    text-decoration: none;
+    color: inherit;
+    background: #fff;
+    border: 1px solid $tac-border;
+    border-radius: 8px;
+    overflow: hidden;
+    transition: transform 0.15s ease, box-shadow 0.15s ease, border-color 0.15s ease;
+
+    &:hover {
+        transform: translateY(-2px);
+        box-shadow: $tile-shadow-hov;
+        border-color: $tac-blue;
+    }
+
+    &__thumb {
+        position: relative;
+        background: $tac-bg;
+        height: 100px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        overflow: hidden;
+        color: $tac-grey;
+
+        img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+            display: block;
+        }
+
+        i {
+            font-size: 2.4em;
+            color: $tac-grey;
+        }
+    }
+
+    &__ext {
+        position: absolute;
+        bottom: 6px;
+        right: 6px;
+        background: rgba(0,0,0,0.55);
+        color: #fff;
+        font-size: 0.65em;
+        font-weight: 700;
+        letter-spacing: 0.04em;
+        padding: 2px 6px;
+        border-radius: 3px;
+    }
+
+    &__name {
+        padding: 6px 8px 0;
+        font-size: 0.78em;
+        line-height: 1.25;
+        color: #1f2937;
+        word-break: break-all;
+        display: -webkit-box;
+        -webkit-line-clamp: 2;
+        -webkit-box-orient: vertical;
+        overflow: hidden;
+    }
+
+    &__size {
+        padding: 0 8px 6px;
+        font-size: 0.7em;
+        color: $tac-grey;
+    }
+}
+
+// PDF cards get a soft red tint on the icon so they're spottable.
+.tac-file-card .fa-file-pdf  { color: #d35968; }
+.tac-file-card .fa-file-word { color: #1e6cb5; }
+.tac-file-card .fa-file-excel{ color: #22a06b; }
+.tac-file-card .fa-file-powerpoint { color: #d35968; }
+.tac-file-card .fa-file-archive { color: #b46a2e; }
+
 // ----- Event list (timeline) -----
 .tac-list--events .tac-list__item {
     border-bottom: 1px solid $tac-border;

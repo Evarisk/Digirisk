@@ -3617,6 +3617,102 @@ textarea.action-textarea:not(:last-child) {
   background: rgba(224, 83, 83, 0.08);
 }
 
+.tac-files-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(112px, 1fr));
+  gap: 10px;
+}
+.tac-files-grid__empty {
+  color: #6b7280;
+  font-style: italic;
+  padding: 8px 0;
+}
+
+.tac-file-card {
+  display: flex;
+  flex-direction: column;
+  text-decoration: none;
+  color: inherit;
+  background: #fff;
+  border: 1px solid #e5e7eb;
+  border-radius: 8px;
+  overflow: hidden;
+  transition: transform 0.15s ease, box-shadow 0.15s ease, border-color 0.15s ease;
+}
+.tac-file-card:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.12);
+  border-color: #0d8aff;
+}
+.tac-file-card__thumb {
+  position: relative;
+  background: #f9fafb;
+  height: 100px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  overflow: hidden;
+  color: #6b7280;
+}
+.tac-file-card__thumb img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  display: block;
+}
+.tac-file-card__thumb i {
+  font-size: 2.4em;
+  color: #6b7280;
+}
+.tac-file-card__ext {
+  position: absolute;
+  bottom: 6px;
+  right: 6px;
+  background: rgba(0, 0, 0, 0.55);
+  color: #fff;
+  font-size: 0.65em;
+  font-weight: 700;
+  letter-spacing: 0.04em;
+  padding: 2px 6px;
+  border-radius: 3px;
+}
+.tac-file-card__name {
+  padding: 6px 8px 0;
+  font-size: 0.78em;
+  line-height: 1.25;
+  color: #1f2937;
+  word-break: break-all;
+  display: -webkit-box;
+  -webkit-line-clamp: 2;
+  -webkit-box-orient: vertical;
+  overflow: hidden;
+}
+.tac-file-card__size {
+  padding: 0 8px 6px;
+  font-size: 0.7em;
+  color: #6b7280;
+}
+
+.tac-file-card .fa-file-pdf {
+  color: #d35968;
+}
+
+.tac-file-card .fa-file-word {
+  color: #1e6cb5;
+}
+
+.tac-file-card .fa-file-excel {
+  color: #22a06b;
+}
+
+.tac-file-card .fa-file-powerpoint {
+  color: #d35968;
+}
+
+.tac-file-card .fa-file-archive {
+  color: #b46a2e;
+}
+
 .tac-list--events .tac-list__item {
   border-bottom: 1px solid #e5e7eb;
   padding: 6px 0;

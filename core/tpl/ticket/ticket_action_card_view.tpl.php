@@ -694,27 +694,62 @@ $renderField = function (string $field, string $type, string $label, $value, str
                 </a>
             </section>
 
-            <!-- Section: Linked files (read-only list + upload link) -->
+            <!-- Section: Linked files — thumbnail grid (image preview for pictures, icon + extension for others). -->
             <section class="tac-section" data-section-id="linked_files">
                 <h3 class="tac-section__title"><i class="fas fa-paperclip"></i> <?php print $langs->trans('LinkedFiles'); ?></h3>
                 <?php $sectionControls('linked_files'); ?>
-                <ul class="tac-list">
+                <?php
+                /**
+                 * Map a file extension to a Font Awesome icon class. Falls back to fa-file.
+                 */
+                $iconForExt = static function (string $ext): string {
+                    $ext = strtolower($ext);
+                    if (in_array($ext, ['pdf'], true))                                           return 'fas fa-file-pdf';
+                    if (in_array($ext, ['doc', 'docx', 'odt', 'rtf'], true))                     return 'fas fa-file-word';
+                    if (in_array($ext, ['xls', 'xlsx', 'ods', 'csv'], true))                     return 'fas fa-file-excel';
+                    if (in_array($ext, ['ppt', 'pptx', 'odp'], true))                            return 'fas fa-file-powerpoint';
+                    if (in_array($ext, ['zip', 'rar', '7z', 'tar', 'gz'], true))                 return 'fas fa-file-archive';
+                    if (in_array($ext, ['mp3', 'wav', 'ogg', 'flac', 'm4a'], true))              return 'fas fa-file-audio';
+                    if (in_array($ext, ['mp4', 'mov', 'avi', 'mkv', 'webm'], true))              return 'fas fa-file-video';
+                    if (in_array($ext, ['txt', 'md', 'log'], true))                              return 'fas fa-file-alt';
+                    if (in_array($ext, ['html', 'htm', 'php', 'js', 'css', 'json', 'xml'], true)) return 'fas fa-file-code';
+                    return 'fas fa-file';
+                };
+                ?>
+                <?php if (!empty($linkedFiles)) : ?>
+                <div class="tac-files-grid">
                     <?php foreach ($linkedFiles as $f) :
-                        $name = $f['name'] ?? '';
+                        $name = (string) ($f['name'] ?? '');
+                        if ($name === '' || $name[0] === '.') {
+                            // Skip dotfiles (.thumbs metadata etc.)
+                            continue;
+                        }
                         $size = isset($f['size']) ? dol_print_size((int) $f['size']) : '';
-                        $href = DOL_URL_ROOT . '/document.php?modulepart=ticket&file=' . urlencode(dol_sanitizeFileName($object->ref) . '/' . $name);
+                        $relPath = dol_sanitizeFileName($object->ref) . '/' . $name;
+                        $href = DOL_URL_ROOT . '/document.php?modulepart=ticket&file=' . urlencode($relPath);
+                        $ext = strtolower(pathinfo($name, PATHINFO_EXTENSION));
+                        $isImage = in_array($ext, ['jpg', 'jpeg', 'png', 'gif', 'webp', 'svg', 'bmp'], true);
                         ?>
-                        <li class="tac-list__item">
-                            <a href="<?php print dol_escape_htmltag($href); ?>" target="_blank">
-                                <i class="fas fa-file"></i> <?php print dol_escape_htmltag($name); ?>
-                            </a>
-                            <span class="opacitymedium"><?php print $size; ?></span>
-                        </li>
+                        <a class="tac-file-card<?php print $isImage ? ' tac-file-card--image' : ''; ?>"
+                           href="<?php print dol_escape_htmltag($href); ?>"
+                           target="_blank"
+                           title="<?php print dol_escape_htmltag($name); ?>">
+                            <div class="tac-file-card__thumb">
+                                <?php if ($isImage) : ?>
+                                    <img src="<?php print dol_escape_htmltag($href); ?>" alt="<?php print dol_escape_htmltag($name); ?>" loading="lazy">
+                                <?php else : ?>
+                                    <i class="<?php print dol_escape_htmltag($iconForExt($ext)); ?>"></i>
+                                    <?php if ($ext) : ?><span class="tac-file-card__ext"><?php print dol_escape_htmltag(strtoupper($ext)); ?></span><?php endif; ?>
+                                <?php endif; ?>
+                            </div>
+                            <div class="tac-file-card__name"><?php print dol_escape_htmltag($name); ?></div>
+                            <?php if ($size) : ?><div class="tac-file-card__size"><?php print $size; ?></div><?php endif; ?>
+                        </a>
                     <?php endforeach; ?>
-                    <?php if (empty($linkedFiles)) : ?>
-                        <li class="tac-list__item tac-list__item--empty">—</li>
-                    <?php endif; ?>
-                </ul>
+                </div>
+                <?php else : ?>
+                    <div class="tac-files-grid__empty">—</div>
+                <?php endif; ?>
                 <a class="tac-section__edit-link" href="<?php print DOL_URL_ROOT . '/ticket/document.php?id=' . (int) $object->id; ?>">
                     <i class="fas fa-upload"></i> <?php print $langs->trans('Upload'); ?>
                 </a>
