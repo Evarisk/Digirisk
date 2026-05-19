@@ -85,6 +85,10 @@ $buildPayload = static function (Ticket $tkt) use ($db, $langs): array {
         $assignedUser->fetch((int) $tkt->fk_user_assign);
         $assignedLabel = $assignedUser->getFullName($langs);
     }
+    $severityKey = strtolower(preg_replace('/[^a-z0-9_-]/i', '', (string) ($tkt->severity_code ?? '')));
+    if (!in_array($severityKey, ['low', 'normal', 'high', 'blocking'], true)) {
+        $severityKey = 'default';
+    }
     return [
         'ticket' => [
             'id'            => (int) $tkt->id,
@@ -92,6 +96,7 @@ $buildPayload = static function (Ticket $tkt) use ($db, $langs): array {
             'status_html'   => $tkt->getLibStatut(2),
             'assigned_id'   => (int) $tkt->fk_user_assign,
             'assigned_name' => $assignedLabel,
+            'severity_key'  => $severityKey,
         ],
     ];
 };

@@ -2661,6 +2661,36 @@ textarea.action-textarea:not(:last-child) {
 .ticket-action-picker {
   margin: 1em 0;
 }
+.ticket-action-picker-toolbar {
+  display: flex;
+  gap: 8px;
+  margin-bottom: 10px;
+}
+.ticket-action-picker-toolbar__btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  padding: 6px 12px;
+  border: 1px solid #e5e7eb;
+  border-radius: 999px;
+  color: #6b7280;
+  text-decoration: none;
+  font-size: 0.9em;
+  transition: background 0.15s ease, color 0.15s ease, border-color 0.15s ease;
+}
+.ticket-action-picker-toolbar__btn:hover {
+  background: rgba(13, 138, 255, 0.06);
+  color: #0d8aff;
+  border-color: #0d8aff;
+}
+.ticket-action-picker-toolbar__btn.is-active {
+  background: #0d8aff;
+  color: #fff;
+  border-color: #0d8aff;
+}
+.ticket-action-picker-toolbar__btn i {
+  font-size: 0.95em;
+}
 .ticket-action-picker-grid {
   display: grid;
   grid-template-columns: repeat(auto-fill, minmax(260px, 1fr));
@@ -2668,6 +2698,7 @@ textarea.action-textarea:not(:last-child) {
   margin-top: 1em;
 }
 .ticket-action-picker-item {
+  position: relative;
   display: block;
   padding: 14px 16px;
   background: #fff;
@@ -2696,6 +2727,17 @@ textarea.action-textarea:not(:last-child) {
 .ticket-action-picker-item__status {
   margin-top: 8px;
 }
+.ticket-action-picker-item__star {
+  position: absolute;
+  top: 10px;
+  right: 12px;
+  color: #e9ad4f;
+  font-size: 0.92em;
+}
+.ticket-action-picker-item--watched {
+  border-color: rgba(233, 173, 79, 0.5);
+  background: linear-gradient(135deg, rgba(233, 173, 79, 0.04) 0%, #fff 60%);
+}
 
 .ticket-action-card.tac-card {
   max-width: 1280px;
@@ -2716,9 +2758,31 @@ textarea.action-textarea:not(:last-child) {
 .ticket-action-card.tac-card.tac-severity-high {
   border-left-color: #e9ad4f;
 }
+.ticket-action-card.tac-card.tac-severity-high .tac-hero__ref {
+  color: #e9ad4f;
+}
 .ticket-action-card.tac-card.tac-severity-blocking {
   border-left-color: #e05353;
   box-shadow: 0 2px 6px rgba(224, 83, 83, 0.18);
+}
+.ticket-action-card.tac-card.tac-severity-blocking .tac-hero__ref {
+  color: #e05353;
+}
+
+.tac-chip--severity {
+  font-weight: 600;
+  letter-spacing: 0.04em;
+  border-style: solid;
+}
+.tac-chip--severity-orange {
+  color: #e9ad4f;
+  border-color: #e9ad4f;
+  background: rgba(233, 173, 79, 0.1);
+}
+.tac-chip--severity-red {
+  color: #e05353;
+  border-color: #e05353;
+  background: rgba(224, 83, 83, 0.1);
 }
 
 .tac-hero {
@@ -2810,6 +2874,49 @@ textarea.action-textarea:not(:last-child) {
   background: rgba(233, 173, 79, 0.08);
 }
 
+.tac-upload-bar {
+  margin-top: 6px;
+  height: 6px;
+  background: rgba(13, 138, 255, 0.1);
+  border-radius: 3px;
+  overflow: hidden;
+}
+.tac-upload-bar__fill {
+  display: block;
+  height: 100%;
+  background: #0d8aff;
+  transition: width 0.2s ease;
+}
+
+.tac-upload-label {
+  font-size: 0.92em;
+}
+
+.tac-files-actions {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  margin-top: 8px;
+}
+.tac-files-actions__hint {
+  font-size: 0.8em;
+}
+.tac-files-actions button[data-pick-file] {
+  appearance: none;
+  background: transparent;
+  border: 1px dashed #e5e7eb;
+  border-radius: 6px;
+  padding: 4px 12px;
+  cursor: pointer;
+  color: #0d8aff;
+  font-family: inherit;
+  font-size: 0.88em;
+}
+.tac-files-actions button[data-pick-file]:hover {
+  background: rgba(13, 138, 255, 0.06);
+  border-color: #0d8aff;
+}
+
 .tac-card.tac-dragover {
   position: relative;
 }
@@ -2832,8 +2939,8 @@ textarea.action-textarea:not(:last-child) {
 
 .tac-timeline {
   position: relative;
-  height: 36px;
-  margin: 4px 0 10px;
+  height: 58px;
+  margin: 14px 4px 22px 4px;
   background: linear-gradient(to right, #e5e7eb 0%, #e5e7eb 100%);
   background-size: 100% 2px;
   background-position: 0 50%;
@@ -2858,13 +2965,30 @@ textarea.action-textarea:not(:last-child) {
 }
 .tac-timeline__label {
   position: absolute;
-  bottom: -16px;
   left: 50%;
   transform: translateX(-50%);
   white-space: nowrap;
   font-size: 0.7em;
-  color: #6b7280;
+  color: #1f2937;
+  font-weight: 500;
   pointer-events: none;
+}
+.tac-timeline__delta {
+  position: absolute;
+  right: 100%;
+  top: 50%;
+  transform: translate(-6px, -50%);
+  white-space: nowrap;
+  font-size: 0.62em;
+  color: #6b7280;
+  font-style: italic;
+  pointer-events: none;
+}
+.tac-timeline__dot--above .tac-timeline__label {
+  bottom: 14px;
+}
+.tac-timeline__dot--below .tac-timeline__label {
+  top: 14px;
 }
 
 @keyframes tac-timeline-pulse {

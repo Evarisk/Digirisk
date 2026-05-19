@@ -221,33 +221,70 @@ foreach (($extrafieldsObj->attributes[$object->table_element]['label'] ?? []) as
 $uploadDir = $conf->ticket->multidir_output[$conf->entity ?? 1] . '/' . dol_sanitizeFileName($object->ref);
 $linkedFiles = is_dir($uploadDir) ? dol_dir_list($uploadDir, 'files', 0, '', null, 'date', SORT_DESC, 1) : [];
 
-// ---- Status timeline (sparkline) — sequence of status changes detected from ActionComm log.
-// The timeline shows: created, read, assigned, in progress, waiting, closed/cancelled,
-// based on the dated milestones available on $object. ActionComm doesn't store the
-// individual status changes consistently, so we read what's reliably on the ticket row.
+// ---- Status timeline (sparkline) — sequence of status changes.
+// Start from the dated fields on the ticket row, then enrich with ActionComm entries
+// matching known transition codes so we trace assign/in-progress changes too.
 $statusMilestones = [];
 if (!empty($object->datec)) {
-    $statusMilestones[] = ['code' => 'NOT_READ',    'date' => (int) $object->datec, 'label' => $langs->trans('Unread')];
+    $statusMilestones[] = ['code' => 'CREATED', 'date' => (int) $object->datec, 'label' => $langs->trans('Created')];
 }
 if (!empty($object->date_read)) {
-    $statusMilestones[] = ['code' => 'READ',        'date' => (int) $object->date_read, 'label' => $langs->trans('Read')];
+    $statusMilestones[] = ['code' => 'READ',    'date' => (int) $object->date_read, 'label' => $langs->trans('Read')];
 }
 if (!empty($object->date_close)) {
     $closedLabel = ($status === Ticket::STATUS_CANCELED) ? $langs->trans('Canceled') : $langs->trans('SolvedClosed');
-    $statusMilestones[] = ['code' => 'CLOSED',      'date' => (int) $object->date_close, 'label' => $closedLabel];
+    $statusMilestones[] = ['code' => 'CLOSED',  'date' => (int) $object->date_close, 'label' => $closedLabel];
 }
-// Sort by date ascending.
+// Pull status transitions from ActionComm — codes Dolibarr triggers emit on assign/modify.
+$tlSql = "SELECT a.code, a.label, a.datep FROM " . MAIN_DB_PREFIX . "actioncomm a"
+    . " WHERE a.fk_element = " . (int) $object->id . " AND a.elementtype = 'ticket'"
+    . " AND a.entity IN (" . getEntity('agenda') . ")"
+    . " AND a.code IN ('AC_TICKET_ASSIGN', 'AC_TICKET_MODIFY', 'AC_TICKET_CREATE', 'AC_TICKET_CLOSE')"
+    . " ORDER BY a.datep ASC";
+$tlRes = $db->query($tlSql);
+if ($tlRes) {
+    // Keep only the LAST occurrence per code to keep the timeline readable.
+    $seen = [];
+    while ($row = $db->fetch_object($tlRes)) {
+        if (in_array($row->code, ['AC_TICKET_CREATE', 'AC_TICKET_CLOSE'], true)) {
+            continue; // already covered by datec / date_close on the ticket row
+        }
+        $seen[$row->code] = ['code' => $row->code, 'date' => (int) $db->jdate($row->datep), 'label' => dol_trunc((string) $row->label, 40)];
+    }
+    foreach ($seen as $entry) {
+        $statusMilestones[] = $entry;
+    }
+}
+// Dedupe + sort by date asc.
 usort($statusMilestones, static fn($a, $b) => $a['date'] <=> $b['date']);
-// Always show the current status as the trailing point if it's not already represented by a date.
+$statusMilestones = array_values(array_filter($statusMilestones, static function ($m) {
+    static $seenDates = [];
+    if (!$m['date']) { return false; }
+    if (isset($seenDates[$m['date']])) { return false; }
+    $seenDates[$m['date']] = true;
+    return true;
+}));
+// Mark the trailing point as "current".
 $currentStatusLabel = $object->getLibStatut(0);
 if (!empty($statusMilestones)) {
-    $last = end($statusMilestones);
     if (!in_array($status, [Ticket::STATUS_NOT_READ, Ticket::STATUS_READ, Ticket::STATUS_CLOSED, Ticket::STATUS_CANCELED], true)) {
         $statusMilestones[] = ['code' => 'CURRENT', 'date' => time(), 'label' => $currentStatusLabel, 'current' => true];
-    } elseif ($last['code'] !== 'CURRENT') {
+    } else {
         $statusMilestones[count($statusMilestones) - 1]['current'] = true;
     }
 }
+
+/**
+ * Format a duration between two timestamps as "+ 3j", "+ 2h", "+ 5min".
+ */
+$formatDelta = static function (int $from, int $to): string {
+    $secs = max(0, $to - $from);
+    if ($secs < 60)             { return '+ ' . $secs . 's'; }
+    if ($secs < 3600)           { return '+ ' . (int) ($secs / 60) . 'min'; }
+    if ($secs < 3600 * 24)      { return '+ ' . (int) ($secs / 3600) . 'h'; }
+    if ($secs < 3600 * 24 * 30) { return '+ ' . (int) ($secs / 86400) . 'j'; }
+    return '+ ' . (int) ($secs / (86400 * 30)) . 'mois';
+};
 
 // ---- Recent events (actioncomm) attached to this ticket — last 10.
 $recentEvents = [];
@@ -494,6 +531,20 @@ if (!in_array($severityKey, ['low', 'normal', 'high', 'blocking'], true)) {
                 <?php print $object->getLibStatut(2); ?>
             </span>
 
+            <?php
+            // Severity badge — visible only for HIGH and BLOCKING (the ones the user needs to spot quickly).
+            $sevBadgeMap = [
+                'high'     => ['label' => $langs->transnoentities('High'),               'variant' => 'orange'],
+                'blocking' => ['label' => $langs->transnoentities('Critical / blocking'), 'variant' => 'red'],
+            ];
+            if (isset($sevBadgeMap[$severityKey])) :
+                $sb = $sevBadgeMap[$severityKey];
+                ?>
+                <span class="tac-chip tac-chip--readonly tac-chip--severity tac-chip--severity-<?php print dol_escape_htmltag($sb['variant']); ?>" data-severity-badge title="<?php print dol_escape_htmltag($langs->trans('Severity')); ?>">
+                    <i class="fas fa-exclamation-triangle"></i> <?php print dol_escape_htmltag(strtoupper($sb['label'])); ?>
+                </span>
+            <?php endif; ?>
+
             <span class="tac-chip tac-chip--assignee"
                   data-edit-field="fk_user_assign"
                   data-edit-type="select"
@@ -531,13 +582,21 @@ if (!in_array($severityKey, ['low', 'normal', 'high', 'blocking'], true)) {
             $first = $statusMilestones[0]['date'];
             $last  = end($statusMilestones)['date'];
             $span  = max(1, $last - $first);
+            $milestoneCount = count($statusMilestones);
             foreach ($statusMilestones as $i => $m) :
                 $offsetPct = round(100 * ($m['date'] - $first) / $span, 2);
                 $dotClass  = 'tac-timeline__dot' . (!empty($m['current']) ? ' tac-timeline__dot--current' : '');
+                // Alternate label above/below to avoid horizontal collisions.
+                $dotClass .= ($i % 2 === 0) ? ' tac-timeline__dot--below' : ' tac-timeline__dot--above';
                 $tooltip   = $m['label'] . ' · ' . dol_print_date($m['date'], 'dayhour', 'tzuser');
+                $deltaText = '';
+                if ($i > 0) {
+                    $deltaText = $formatDelta((int) $statusMilestones[$i - 1]['date'], (int) $m['date']);
+                }
                 ?>
                 <span class="<?php print $dotClass; ?>" style="left: <?php print $offsetPct; ?>%;" title="<?php print dol_escape_htmltag($tooltip); ?>">
                     <span class="tac-timeline__label"><?php print dol_escape_htmltag($m['label']); ?></span>
+                    <?php if ($deltaText) : ?><span class="tac-timeline__delta"><?php print dol_escape_htmltag($deltaText); ?></span><?php endif; ?>
                 </span>
             <?php endforeach; ?>
         </div>
@@ -911,9 +970,13 @@ if (!in_array($severityKey, ['low', 'normal', 'high', 'blocking'], true)) {
                 <?php else : ?>
                     <div class="tac-files-list__empty">—</div>
                 <?php endif; ?>
-                <a class="tac-section__edit-link" href="<?php print DOL_URL_ROOT . '/ticket/document.php?id=' . (int) $object->id; ?>">
-                    <i class="fas fa-upload"></i> <?php print $langs->trans('Upload'); ?>
-                </a>
+                <div class="tac-files-actions">
+                    <button type="button" class="tac-section__edit-link" data-pick-file>
+                        <i class="fas fa-upload"></i> <?php print $langs->trans('UploadFile'); ?>
+                    </button>
+                    <span class="opacitymedium tac-files-actions__hint"><?php print $langs->trans('OrDropAnywhere'); ?></span>
+                    <input type="file" id="tac-file-input" multiple style="display:none">
+                </div>
             </section>
 
             <!-- Section: Recent events (read-only, last 10) -->

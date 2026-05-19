@@ -24,7 +24,6 @@
  *   $db, $langs, $user
  */
 
-// Protection
 if (empty($conf) || empty($db) || empty($langs) || empty($user)) {
     print 'Error, missing parameters';
     exit;
@@ -32,9 +31,12 @@ if (empty($conf) || empty($db) || empty($langs) || empty($user)) {
 
 require_once DOL_DOCUMENT_ROOT . '/ticket/class/ticket.class.php';
 
-// Open tickets only — assigned to the current user when possible, all others as fallback.
-// Ticket::fetchAll signature is ($user, $sortorder, $sortfield, $limit, $offset, $arch, $filter).
-// It populates $this->lines instead of returning the list.
+// User's watchlist (CSV of ticket ids stored in llx_user_param) for the "watched" filter + star.
+$rawWatchList = $user->conf->DIGIRISK_TICKET_WATCHLIST ?? '';
+$watchSet     = array_flip(array_filter(array_map('intval', explode(',', (string) $rawWatchList))));
+$showOnlyWatched = (GETPOST('watched', 'aZ09') === '1');
+
+// Open tickets only.
 $pickerTicket = new Ticket($db);
 $filter       = [
     't.fk_statut' => [
@@ -46,19 +48,42 @@ $filter       = [
         Ticket::STATUS_WAITING,
     ],
 ];
-$pickerTicket->fetchAll($user, 'DESC', 't.datec', 20, 0, 0, $filter);
+$pickerTicket->fetchAll($user, 'DESC', 't.datec', 50, 0, 0, $filter);
+
+// Restrict to watched tickets when the toggle is on.
+$tickets = is_array($pickerTicket->lines) ? $pickerTicket->lines : [];
+if ($showOnlyWatched) {
+    $tickets = array_filter($tickets, static fn($t) => isset($watchSet[(int) $t->id]));
+}
+
+$watchedCount = count($watchSet);
 
 print load_fiche_titre($langs->trans('TicketActionCard'), '', 'ticket');
 
 print '<div class="ticket-action-picker">';
 print '<p class="opacitymedium">' . $langs->trans('TicketActionCardPickerIntro') . '</p>';
 
-if (is_array($pickerTicket->lines) && !empty($pickerTicket->lines)) {
-    print '<div class="ticket-action-picker-grid">';
-    foreach ($pickerTicket->lines as $tkt) {
-        $url = dol_buildpath('/custom/digiriskdolibarr/view/ticket/ticket_action_card.php', 1) . '?id=' . (int) $tkt->id;
+// Filter toolbar: Tous / Suivis seulement.
+$baseUrl  = dol_buildpath('/custom/digiriskdolibarr/view/ticket/ticket_action_card.php', 1);
+$allUrl   = $baseUrl;
+$watchUrl = $baseUrl . '?watched=1';
+print '<div class="ticket-action-picker-toolbar">';
+print '<a class="ticket-action-picker-toolbar__btn' . (!$showOnlyWatched ? ' is-active' : '') . '" href="' . dol_escape_htmltag($allUrl) . '">'
+    . $langs->trans('AllTickets') . '</a>';
+print '<a class="ticket-action-picker-toolbar__btn' . ($showOnlyWatched ? ' is-active' : '') . '" href="' . dol_escape_htmltag($watchUrl) . '">'
+    . '<i class="fas fa-star"></i> ' . $langs->trans('WatchedOnly') . ' (' . (int) $watchedCount . ')</a>';
+print '</div>';
 
-        print '<a class="ticket-action-picker-item" href="' . dol_escape_htmltag($url) . '">';
+if (!empty($tickets)) {
+    print '<div class="ticket-action-picker-grid">';
+    foreach ($tickets as $tkt) {
+        $url = $baseUrl . '?id=' . (int) $tkt->id;
+        $isWatched = isset($watchSet[(int) $tkt->id]);
+
+        print '<a class="ticket-action-picker-item' . ($isWatched ? ' ticket-action-picker-item--watched' : '') . '" href="' . dol_escape_htmltag($url) . '">';
+        if ($isWatched) {
+            print '<i class="fas fa-star ticket-action-picker-item__star" title="' . dol_escape_htmltag($langs->trans('WatchedTicket')) . '"></i>';
+        }
         print '<div class="ticket-action-picker-item__ref">' . dol_escape_htmltag($tkt->ref) . '</div>';
         print '<div class="ticket-action-picker-item__subject">' . dol_escape_htmltag(dol_trunc((string) $tkt->subject, 80)) . '</div>';
         print '<div class="ticket-action-picker-item__status">' . $tkt->getLibStatut(2) . '</div>';
@@ -66,7 +91,7 @@ if (is_array($pickerTicket->lines) && !empty($pickerTicket->lines)) {
     }
     print '</div>';
 } else {
-    print '<div class="opacitymedium center">' . $langs->trans('NoTicketOpen') . '</div>';
+    print '<div class="opacitymedium center">' . $langs->trans($showOnlyWatched ? 'NoWatchedTicket' : 'NoTicketOpen') . '</div>';
 }
 
 print '</div>';

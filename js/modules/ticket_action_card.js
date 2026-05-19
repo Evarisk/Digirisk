@@ -228,29 +228,51 @@ window.digiriskdolibarr.ticketActionCard.event = function() {
     $(document).on('click', '[data-watch-toggle]',         window.digiriskdolibarr.ticketActionCard.onWatchToggle);
 
     // ---- Drag & drop file upload anywhere on the card.
+    // Uses a "drag enter/leave counter" pattern: dragenter increments, dragleave
+    // decrements. The overlay shows when counter > 0. Fixes the flicker that
+    // happens when the cursor moves between child elements during a drag.
     var $card = $('.tac-card');
     if ($card.length) {
-        $card.on('dragover dragenter', function(e) {
+        var dragCounter = 0;
+        $card.on('dragenter', function(e) {
+            if (!e.originalEvent.dataTransfer || !e.originalEvent.dataTransfer.types) { return; }
+            if (Array.from(e.originalEvent.dataTransfer.types).indexOf('Files') === -1) { return; }
             e.preventDefault();
             e.stopPropagation();
-            // Only react to file drags.
-            if (e.originalEvent.dataTransfer && e.originalEvent.dataTransfer.types && Array.from(e.originalEvent.dataTransfer.types).indexOf('Files') !== -1) {
+            dragCounter++;
+            if (dragCounter === 1) {
                 $card.addClass('tac-dragover');
             }
         });
-        $card.on('dragleave drop', function(e) {
-            // Only remove if we leave the card itself (not a child).
-            if (e.type === 'dragleave' && e.relatedTarget && $card[0].contains(e.relatedTarget)) {
-                return;
+        $card.on('dragover', function(e) {
+            e.preventDefault();
+            e.stopPropagation();
+        });
+        $card.on('dragleave', function(e) {
+            if (dragCounter > 0) { dragCounter--; }
+            if (dragCounter === 0) {
+                $card.removeClass('tac-dragover');
             }
-            $card.removeClass('tac-dragover');
         });
         $card.on('drop', function(e) {
             e.preventDefault();
             e.stopPropagation();
+            dragCounter = 0;
+            $card.removeClass('tac-dragover');
             var files = e.originalEvent.dataTransfer ? e.originalEvent.dataTransfer.files : null;
             if (files && files.length) {
                 window.digiriskdolibarr.ticketActionCard.uploadFiles(files);
+            }
+        });
+
+        // "Choisir fichier" button — hidden <input type="file"> next to the Upload link.
+        $(document).on('click', '[data-pick-file]', function(e) {
+            e.preventDefault();
+            $('#tac-file-input').trigger('click');
+        });
+        $(document).on('change', '#tac-file-input', function() {
+            if (this.files && this.files.length) {
+                window.digiriskdolibarr.ticketActionCard.uploadFiles(this.files);
             }
         });
     }
@@ -282,6 +304,17 @@ window.digiriskdolibarr.ticketActionCard.event = function() {
                 window.digiriskdolibarr.ticketActionCard.closeLightbox();
             }
         }
+        // 'w' shortcut toggles watch — but only when not typing in a field.
+        if (e.key === 'w' && !e.ctrlKey && !e.metaKey && !e.altKey) {
+            var tag = (e.target && e.target.tagName) || '';
+            if (['INPUT', 'TEXTAREA', 'SELECT'].indexOf(tag) !== -1) { return; }
+            if (e.target && e.target.isContentEditable) { return; }
+            var $btn = $('[data-watch-toggle]');
+            if ($btn.length) {
+                e.preventDefault();
+                $btn.trigger('click');
+            }
+        }
     });
 };
 
@@ -297,13 +330,56 @@ window.digiriskdolibarr.ticketActionCard.uploadFiles = function(files) {
     var $card    = $('.tac-card').first();
     var ajaxUrl  = $card.data('ajax-url');
     var ticketId = $card.data('ticket-id');
-    var total    = files.length;
-    var done     = 0;
-    var failed   = 0;
 
-    window.digiriskdolibarr.ticketActionCard.flash($card, 'Upload ' + total + ' fichier(s)…', 'success');
+    // 1. Client-side validation: max size (mirrors common PHP upload_max_filesize default).
+    var MAX_BYTES = 32 * 1024 * 1024; // 32 MB
+    var FORBIDDEN_EXT = /\.(php|phtml|exe|bat|cmd|sh|js|html?|jar)$/i;
+    var validFiles = [];
+    var rejected = [];
+    Array.prototype.forEach.call(files, function(f) {
+        if (f.size > MAX_BYTES) {
+            rejected.push(f.name + ' (trop volumineux > 32 MB)');
+        } else if (FORBIDDEN_EXT.test(f.name)) {
+            rejected.push(f.name + ' (extension interdite)');
+        } else {
+            validFiles.push(f);
+        }
+    });
+    if (rejected.length) {
+        window.digiriskdolibarr.ticketActionCard.flash($card, 'Refusé : ' + rejected.join(', '), 'error');
+    }
+    if (!validFiles.length) {
+        return;
+    }
 
-    Array.prototype.forEach.call(files, function(file) {
+    // 2. Duplicate check: if filenames match existing entries in the list, ask once for confirmation.
+    var existing = $('.tac-files-list__item').map(function() { return $(this).data('file-name'); }).get();
+    var duplicates = validFiles.filter(function(f) { return existing.indexOf(f.name) !== -1; });
+    if (duplicates.length) {
+        var names = duplicates.map(function(f) { return f.name; }).join(', ');
+        if (!window.confirm('Écraser les fichiers déjà présents ?\n\n' + names)) {
+            // Filter out duplicates.
+            validFiles = validFiles.filter(function(f) { return existing.indexOf(f.name) === -1; });
+            if (!validFiles.length) { return; }
+        }
+    }
+
+    // 3. Render a progress UI in the toast area.
+    var total   = validFiles.length;
+    var done    = 0;
+    var failed  = 0;
+    var $toast  = $card.find('.tac-toast, .ticket-action-card__toast').first();
+    $toast.removeClass('is-error is-success').addClass('is-success')
+        .html('<span class="tac-upload-label">Upload 0 / ' + total + '…</span>'
+            + '<div class="tac-upload-bar"><span class="tac-upload-bar__fill" style="width:0%"></span></div>');
+
+    var updateProgress = function() {
+        var pct = Math.round(100 * done / total);
+        $toast.find('.tac-upload-label').text('Upload ' + done + ' / ' + total + ' (' + pct + '%)');
+        $toast.find('.tac-upload-bar__fill').css('width', pct + '%');
+    };
+
+    validFiles.forEach(function(file) {
         var fd = new FormData();
         fd.append('ticket_id', ticketId);
         fd.append('action', 'upload_file');
@@ -322,12 +398,14 @@ window.digiriskdolibarr.ticketActionCard.uploadFiles = function(files) {
             failed++;
         }).always(function() {
             done++;
+            updateProgress();
             if (done === total) {
                 if (failed === 0) {
-                    window.digiriskdolibarr.ticketActionCard.flash($card, 'Upload terminé', 'success');
+                    $toast.html('Upload terminé ✓');
                     setTimeout(function() { window.location.reload(); }, 500);
                 } else {
-                    window.digiriskdolibarr.ticketActionCard.flash($card, failed + ' échec(s) sur ' + total + ' fichier(s)', 'error');
+                    $toast.removeClass('is-success').addClass('is-error')
+                        .html(failed + ' échec(s) sur ' + total + ' fichier(s)');
                 }
             }
         });
@@ -1039,6 +1117,27 @@ window.digiriskdolibarr.ticketActionCard.saveField = function($wrap, field, newV
         if (response && response.success) {
             // Apply the server-rendered display (already escaped).
             var displayHtml = response.display || originalHtml;
+            // Severity changed → refresh the card's tac-severity-* class so the rail
+            // and ref tint update without a full reload. Also show/hide the hero badge.
+            if (field === 'severity_code') {
+                var $card = $('.tac-card').first();
+                $card.attr('class', function(_, c) { return c.replace(/\btac-severity-\S+/g, ''); });
+                var newKey = (response.ticket && response.ticket.severity_key) || (String(newValue || '').toLowerCase().replace(/[^a-z0-9_-]/g, '') || 'default');
+                if (['low','normal','high','blocking'].indexOf(newKey) === -1) { newKey = 'default'; }
+                $card.addClass('tac-severity-' + newKey);
+                $card.attr('data-severity', newKey);
+                // Hero severity badge — remove for low/normal, show for high/blocking.
+                $('[data-severity-badge]').remove();
+                if (newKey === 'high' || newKey === 'blocking') {
+                    var variant = (newKey === 'blocking') ? 'red' : 'orange';
+                    var label = $('.tac-field[data-edit-field="severity_code"] .tac-field__value').text().trim();
+                    $('.tac-chip--status').after(
+                        '<span class="tac-chip tac-chip--readonly tac-chip--severity tac-chip--severity-' + variant + '" data-severity-badge>'
+                        + '<i class="fas fa-exclamation-triangle"></i> ' + label.toUpperCase()
+                        + '</span>'
+                    );
+                }
+            }
             if ($wrap.is('.tac-chip') || $wrap.is('.tac-hero__subject')) {
                 $wrap.html(displayHtml);
             } else {

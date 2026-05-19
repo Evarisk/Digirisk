@@ -19,6 +19,35 @@ $tac-border:       #e5e7eb;
 .ticket-action-picker {
     margin: 1em 0;
 
+    &-toolbar {
+        display: flex;
+        gap: 8px;
+        margin-bottom: 10px;
+
+        &__btn {
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+            padding: 6px 12px;
+            border: 1px solid $tac-border;
+            border-radius: 999px;
+            color: $tac-grey;
+            text-decoration: none;
+            font-size: 0.9em;
+            transition: background 0.15s ease, color 0.15s ease, border-color 0.15s ease;
+
+            &:hover { background: rgba(13,138,255,0.06); color: $tac-blue; border-color: $tac-blue; }
+
+            &.is-active {
+                background: $tac-blue;
+                color: #fff;
+                border-color: $tac-blue;
+            }
+
+            i { font-size: 0.95em; }
+        }
+    }
+
     &-grid {
         display: grid;
         grid-template-columns: repeat(auto-fill, minmax(260px, 1fr));
@@ -27,6 +56,7 @@ $tac-border:       #e5e7eb;
     }
 
     &-item {
+        position: relative;
         display: block;
         padding: 14px 16px;
         background: #fff;
@@ -46,6 +76,19 @@ $tac-border:       #e5e7eb;
         &__ref       { font-weight: 700; color: $tac-blue; font-size: 1.05em; }
         &__subject   { margin-top: 4px; color: #1f2937; line-height: 1.35; }
         &__status    { margin-top: 8px; }
+
+        &__star {
+            position: absolute;
+            top: 10px;
+            right: 12px;
+            color: $tac-orange;
+            font-size: 0.92em;
+        }
+
+        &--watched {
+            border-color: rgba(233,173,79,0.5);
+            background: linear-gradient(135deg, rgba(233,173,79,0.04) 0%, #fff 60%);
+        }
     }
 }
 
@@ -62,11 +105,28 @@ $tac-border:       #e5e7eb;
     overflow: hidden;
     transition: border-color 0.2s ease;
 
-    // Severity tint on the left rail — quick visual sort by urgency.
+    // Severity tint on the left rail + ref colour, so urgency is also visible from the title.
     &.tac-severity-low      { border-left-color: #6b7280; }
     &.tac-severity-normal   { border-left-color: $tac-blue; }
-    &.tac-severity-high     { border-left-color: $tac-orange; }
-    &.tac-severity-blocking { border-left-color: $tac-red; box-shadow: 0 2px 6px rgba(224,83,83,0.18); }
+    &.tac-severity-high     {
+        border-left-color: $tac-orange;
+        .tac-hero__ref { color: $tac-orange; }
+    }
+    &.tac-severity-blocking {
+        border-left-color: $tac-red;
+        box-shadow: 0 2px 6px rgba(224,83,83,0.18);
+        .tac-hero__ref { color: $tac-red; }
+    }
+}
+
+// Severity chip in the hero (HIGH / BLOCKING only).
+.tac-chip--severity {
+    font-weight: 600;
+    letter-spacing: 0.04em;
+    border-style: solid;
+
+    &-orange { color: $tac-orange; border-color: $tac-orange; background: rgba(233,173,79,0.10); }
+    &-red    { color: $tac-red;    border-color: $tac-red;    background: rgba(224,83,83,0.10); }
 }
 
 // ----- Hero -----
@@ -152,6 +212,48 @@ $tac-border:       #e5e7eb;
     }
 }
 
+// ----- Upload progress bar + actions row -----
+.tac-upload-bar {
+    margin-top: 6px;
+    height: 6px;
+    background: rgba(13,138,255,0.1);
+    border-radius: 3px;
+    overflow: hidden;
+
+    &__fill {
+        display: block;
+        height: 100%;
+        background: $tac-blue;
+        transition: width 0.2s ease;
+    }
+}
+.tac-upload-label { font-size: 0.92em; }
+
+.tac-files-actions {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    margin-top: 8px;
+
+    &__hint {
+        font-size: 0.8em;
+    }
+
+    button[data-pick-file] {
+        appearance: none;
+        background: transparent;
+        border: 1px dashed $tac-border;
+        border-radius: 6px;
+        padding: 4px 12px;
+        cursor: pointer;
+        color: $tac-blue;
+        font-family: inherit;
+        font-size: 0.88em;
+
+        &:hover { background: rgba(13,138,255,0.06); border-color: $tac-blue; }
+    }
+}
+
 // ----- Drag & drop overlay -----
 .tac-card.tac-dragover {
     position: relative;
@@ -174,11 +276,11 @@ $tac-border:       #e5e7eb;
     }
 }
 
-// ----- Status timeline sparkline -----
+// ----- Status timeline sparkline (anti-collision: alternate above/below) -----
 .tac-timeline {
     position: relative;
-    height: 36px;
-    margin: 4px 0 10px;
+    height: 58px;
+    margin: 14px 4px 22px 4px;
     background: linear-gradient(to right, $tac-border 0%, $tac-border 100%);
     background-size: 100% 2px;
     background-position: 0 50%;
@@ -205,14 +307,30 @@ $tac-border:       #e5e7eb;
 
     &__label {
         position: absolute;
-        bottom: -16px;
         left: 50%;
         transform: translateX(-50%);
         white-space: nowrap;
         font-size: 0.7em;
-        color: $tac-grey;
+        color: #1f2937;
+        font-weight: 500;
         pointer-events: none;
     }
+
+    &__delta {
+        position: absolute;
+        right: 100%;
+        top: 50%;
+        transform: translate(-6px, -50%);
+        white-space: nowrap;
+        font-size: 0.62em;
+        color: $tac-grey;
+        font-style: italic;
+        pointer-events: none;
+    }
+
+    // Above / below alternation to avoid label overlaps.
+    &__dot--above .tac-timeline__label { bottom: 14px; }
+    &__dot--below .tac-timeline__label { top: 14px; }
 }
 
 @keyframes tac-timeline-pulse {
