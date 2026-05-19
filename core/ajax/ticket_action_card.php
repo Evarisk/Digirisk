@@ -392,7 +392,7 @@ switch ($action) {
             $res = $object->insertExtraFields() >= 0;
 
             if (in_array($efType, ['date', 'datetime'], true)) {
-                $display = $valueToStore ? dol_print_date((int) $valueToStore, 'day') : '';
+                $display = $valueToStore ? dol_print_date((int) $valueToStore, 'day', 'tzuser') : '';
             } elseif (in_array($efType, ['text', 'html'], true)) {
                 // dol_escape_htmltag would strip <strong>/<b>; dolPrintHTML preserves rich HTML safely.
                 $display = dolPrintHTML((string) $valueToStore);

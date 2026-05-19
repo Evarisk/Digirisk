@@ -435,13 +435,13 @@ $renderField = function (string $field, string $type, string $label, $value, str
 
             <span class="tac-chip tac-chip--readonly" title="<?php print dol_escape_htmltag($langs->trans('DateCreation')); ?>">
                 <i class="fas fa-calendar-plus"></i>
-                <?php print dol_print_date($object->datec, 'day'); ?>
+                <?php print dol_print_date($object->datec, 'day', 'tzuser'); ?>
             </span>
 
             <?php if (!empty($object->date_read)) : ?>
             <span class="tac-chip tac-chip--readonly" title="<?php print dol_escape_htmltag($langs->trans('TicketReadOn')); ?>">
                 <i class="fas fa-eye"></i>
-                <?php print dol_print_date($object->date_read, 'day'); ?>
+                <?php print dol_print_date($object->date_read, 'day', 'tzuser'); ?>
             </span>
             <?php endif; ?>
         </div>
@@ -571,7 +571,7 @@ $renderField = function (string $field, string $type, string $label, $value, str
                     $dateDeclar = $extra['digiriskdolibarr_ticket_date'] ?? null;
                     $renderField('options_digiriskdolibarr_ticket_date',      'date',     'DeclarationDate',
                         $dateDeclar ? (int) $dateDeclar : '',
-                        $dateDeclar ? dol_print_date((int) $dateDeclar, 'day') : '',
+                        $dateDeclar ? dol_print_date((int) $dateDeclar, 'day', 'tzuser') : '',
                         ['format' => 'day']);
                     ?>
                 </div>
@@ -615,7 +615,7 @@ $renderField = function (string $field, string $type, string $label, $value, str
                         $display = '';
                         if ($val !== null && $val !== '') {
                             if ($uiType === 'date') {
-                                $display = dol_print_date(is_numeric($val) ? (int) $val : strtotime((string) $val), 'day');
+                                $display = dol_print_date(is_numeric($val) ? (int) $val : strtotime((string) $val), 'day', 'tzuser');
                             } elseif ($uiType === 'longtext') {
                                 $display = dolPrintHTML((string) $val);
                             } else {
@@ -769,7 +769,7 @@ $renderField = function (string $field, string $type, string $label, $value, str
                             </a>
                             <span class="tac-files-list__meta">
                                 <?php if ($size) : ?><span class="tac-files-list__size"><?php print $size; ?></span><?php endif; ?>
-                                <?php if ($dateRaw) : ?><span class="tac-files-list__date"><?php print dol_print_date($dateRaw, 'day'); ?></span><?php endif; ?>
+                                <?php if ($dateRaw) : ?><span class="tac-files-list__date"><?php print dol_print_date($dateRaw, 'day', 'tzuser'); ?></span><?php endif; ?>
                             </span>
                             <span class="tac-files-list__actions">
                                 <?php if ($previewable) : ?>
@@ -810,7 +810,7 @@ $renderField = function (string $field, string $type, string $label, $value, str
                         ?>
                         <li class="tac-list__item">
                             <div class="tac-list__item-meta">
-                                <?php print dol_print_date($db->jdate($evt->datep), 'dayhour'); ?>
+                                <?php print dol_print_date($db->jdate($evt->datep), 'dayhour', 'tzuser'); ?>
                                 <?php if ($userName) : ?> · <?php print dol_escape_htmltag($userName); ?><?php endif; ?>
                             </div>
                             <div><?php print dol_escape_htmltag(dol_trunc((string) $evt->label, 80)); ?></div>
@@ -847,15 +847,15 @@ $renderField = function (string $field, string $type, string $label, $value, str
                 <div class="tac-grid">
                     <div class="tac-field tac-field--readonly">
                         <div class="tac-field__label"><?php print $langs->trans('DateCreation'); ?></div>
-                        <div class="tac-field__value"><?php print dol_print_date($object->datec, 'dayhour'); ?></div>
+                        <div class="tac-field__value"><?php print dol_print_date($object->datec, 'dayhour', 'tzuser'); ?></div>
                     </div>
                     <div class="tac-field tac-field--readonly">
                         <div class="tac-field__label"><?php print $langs->trans('TicketReadOn'); ?></div>
-                        <div class="tac-field__value"><?php print !empty($object->date_read) ? dol_print_date($object->date_read, 'dayhour') : '<span class="tac-field__empty">—</span>'; ?></div>
+                        <div class="tac-field__value"><?php print !empty($object->date_read) ? dol_print_date($object->date_read, 'dayhour', 'tzuser') : '<span class="tac-field__empty">—</span>'; ?></div>
                     </div>
                     <div class="tac-field tac-field--readonly">
                         <div class="tac-field__label"><?php print $langs->trans('TicketCloseOn'); ?></div>
-                        <div class="tac-field__value"><?php print !empty($object->date_close) ? dol_print_date($object->date_close, 'dayhour') : '<span class="tac-field__empty">—</span>'; ?></div>
+                        <div class="tac-field__value"><?php print !empty($object->date_close) ? dol_print_date($object->date_close, 'dayhour', 'tzuser') : '<span class="tac-field__empty">—</span>'; ?></div>
                     </div>
                 </div>
             </section>
