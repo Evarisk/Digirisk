@@ -1747,6 +1747,23 @@ class modDigiriskdolibarr extends DolibarrModules
 			'user'     => 0,				                // 0=Menu for internal users, 1=external users, 2=both
 		];
 
+		// Issue #4443 — 1-click ticket action card, nested under Ticket > Tableau de bord (ticketstats).
+		$this->menu[$r++] = [
+			'fk_menu'  => 'fk_mainmenu=ticket,fk_leftmenu=ticketstats',
+			'type'     => 'left',
+			'titre'    => $langs->transnoentities('TicketActionCard'),
+			'prefix'   => '<i class="fas fa-hand-pointer pictofixedwidth"></i>',
+			'mainmenu' => 'ticket',
+			'leftmenu' => 'digiriskticketactioncard',
+			'url'      => '/digiriskdolibarr/view/ticket/ticket_action_card.php',
+			'langs'    => 'digiriskdolibarr@digiriskdolibarr',
+			'position' => 100 + $r,
+			'enabled'  => '$conf->digiriskdolibarr->enabled && $conf->ticket->enabled',
+			'perms'    => '$user->rights->ticket->read && $user->rights->digiriskdolibarr->lire',
+			'target'   => '',
+			'user'     => 0,
+		];
+
 		// Exports profiles provided by this module
 		$r = 1;
 
