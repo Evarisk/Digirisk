@@ -18,33 +18,8 @@ window.digiriskdolibarr.ticketActionCard.init = function() {
     window.digiriskdolibarr.ticketActionCard.event();
     window.digiriskdolibarr.ticketActionCard.applyLayout();
     window.digiriskdolibarr.ticketActionCard.initThreadReplyEditor();
-    window.digiriskdolibarr.ticketActionCard.initStaticSelects();
     // Drop the newest message into view on load — feels like opening a chat app.
     setTimeout(function() { window.digiriskdolibarr.ticketActionCard.scrollThreadToBottom(); }, 200);
-};
-
-/**
- * Enhance the always-on selects on the card (tag selector, etc.) with Select2
- * so they get a search box and a friendlier dropdown.
- *
- * @return {void}
- */
-window.digiriskdolibarr.ticketActionCard.initStaticSelects = function() {
-    if (!$.fn.select2) {
-        return;
-    }
-    $('[data-tag-add-select]').each(function() {
-        var $sel = $(this);
-        if ($sel.data('select2')) { return; }
-        try {
-            $sel.select2({
-                width: '100%',
-                dropdownAutoWidth: true,
-                minimumResultsForSearch: 0,
-                placeholder: $sel.find('option:first').text()
-            });
-        } catch (e) { /* fall back to plain select */ }
-    });
 };
 
 /**
@@ -1345,33 +1320,14 @@ window.digiriskdolibarr.ticketActionCard.onFieldClick = function(event) {
             if (e.key === 'Escape') { cancel(); }
         });
     } else if (type === 'select') {
-        // Select2 only on long lists rendered as full-width tac-field — short chip
-        // selects (status, severity) live inside narrow pills where the Select2
-        // widget would shred the layout. Threshold: > 8 options.
-        var optionCount = ($wrap.data('edit-options') || []).length;
-        var canUseSelect2 = $.fn.select2 && !$wrap.is('.tac-chip') && !$wrap.is('.tac-hero__subject') && optionCount > 8;
-        if (canUseSelect2) {
-            try {
-                $input.select2({
-                    width: '100%',
-                    dropdownAutoWidth: true,
-                    minimumResultsForSearch: 0,
-                    placeholder: '—'
-                });
-                $input.select2('open');
-                $input.on('select2:close', function() {
-                    setTimeout(function() {
-                        if ($wrap.hasClass('tac-editing')) { commit(); }
-                    }, 50);
-                });
-            } catch (e) {
-                $input.on('blur', commit);
-            }
-        } else {
-            $input.on('blur', commit);
-        }
+        // Native <select> for now. A previous attempt at wrapping with Select2 for
+        // search-on-long-lists ran into a Dolibarr-specific bug where the dropdown
+        // stays stuck on "Searching…" because the synchronous SelectAdapter query
+        // never delivers results to the results pane. Revisit with a custom dropdown
+        // or a different lib when needed.
         $input.on('change', commit);
         $input.on('keydown', function(e) { if (e.key === 'Escape') { cancel(); } });
+        $input.on('blur', commit);
     } else {
         $input.on('keydown', function(e) {
             if (e.key === 'Escape') { cancel(); }
