@@ -1117,6 +1117,24 @@ window.digiriskdolibarr.ticketActionCard.saveField = function($wrap, field, newV
         if (response && response.success) {
             // Apply the server-rendered display (already escaped).
             var displayHtml = response.display || originalHtml;
+            // Status changed → append a new pill to the timeline so users see the
+            // transition live without a reload. Tile / sticky actions reload the page
+            // anyway (server-rendered milestones), so this only matters for the
+            // tap-to-edit path on .tac-chip--status.
+            if (field === 'fk_statut') {
+                var $timeline = $('.tac-timeline');
+                if ($timeline.length) {
+                    // Strip --current from the previous tail.
+                    $timeline.find('.tac-timeline__step--current').removeClass('tac-timeline__step--current');
+                    // Extract the new status label from the badge HTML the server returned.
+                    var newStatusLabel = $('<div>').html(response.display || '').text().trim();
+                    if (newStatusLabel) {
+                        $timeline
+                            .append('<span class="tac-timeline__delta" aria-hidden="true"><i class="fas fa-long-arrow-alt-right"></i> à l\'instant</span>')
+                            .append('<span class="tac-timeline__step tac-timeline__step--current" title="à l\'instant">' + newStatusLabel + '</span>');
+                    }
+                }
+            }
             // Severity changed → refresh the card's tac-severity-* class so the rail
             // and ref tint update without a full reload. Also show/hide the hero badge.
             if (field === 'severity_code') {
