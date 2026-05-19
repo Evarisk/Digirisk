@@ -18,8 +18,33 @@ window.digiriskdolibarr.ticketActionCard.init = function() {
     window.digiriskdolibarr.ticketActionCard.event();
     window.digiriskdolibarr.ticketActionCard.applyLayout();
     window.digiriskdolibarr.ticketActionCard.initThreadReplyEditor();
+    window.digiriskdolibarr.ticketActionCard.initStaticSelects();
     // Drop the newest message into view on load — feels like opening a chat app.
     setTimeout(function() { window.digiriskdolibarr.ticketActionCard.scrollThreadToBottom(); }, 200);
+};
+
+/**
+ * Enhance the always-on selects on the card (tag selector, etc.) with Select2
+ * so they get a search box and a friendlier dropdown.
+ *
+ * @return {void}
+ */
+window.digiriskdolibarr.ticketActionCard.initStaticSelects = function() {
+    if (!$.fn.select2) {
+        return;
+    }
+    $('[data-tag-add-select]').each(function() {
+        var $sel = $(this);
+        if ($sel.data('select2')) { return; }
+        try {
+            $sel.select2({
+                width: '100%',
+                dropdownAutoWidth: true,
+                minimumResultsForSearch: 0,
+                placeholder: $sel.find('option:first').text()
+            });
+        } catch (e) { /* fall back to plain select */ }
+    });
 };
 
 /**
@@ -1320,9 +1345,33 @@ window.digiriskdolibarr.ticketActionCard.onFieldClick = function(event) {
             if (e.key === 'Escape') { cancel(); }
         });
     } else if (type === 'select') {
+        // Plain <select> is unusable past ~10 options. Wrap with Select2 (already
+        // loaded by Dolibarr), force the search box even on short lists, and open
+        // the dropdown immediately so the user can type to filter.
+        if ($.fn.select2) {
+            try {
+                $input.select2({
+                    width: '100%',
+                    dropdownAutoWidth: true,
+                    minimumResultsForSearch: 0,
+                    placeholder: '—'
+                });
+                $input.select2('open');
+                // select2 fires its own change; on close without selection -> cancel.
+                $input.on('select2:close', function() {
+                    // setTimeout so the change handler runs first if a selection was made.
+                    setTimeout(function() {
+                        if ($wrap.hasClass('tac-editing')) { commit(); }
+                    }, 50);
+                });
+            } catch (e) {
+                $input.on('blur', commit);
+            }
+        } else {
+            $input.on('blur', commit);
+        }
         $input.on('change', commit);
         $input.on('keydown', function(e) { if (e.key === 'Escape') { cancel(); } });
-        $input.on('blur', commit);
     } else {
         $input.on('keydown', function(e) {
             if (e.key === 'Escape') { cancel(); }
