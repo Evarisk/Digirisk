@@ -1345,10 +1345,12 @@ window.digiriskdolibarr.ticketActionCard.onFieldClick = function(event) {
             if (e.key === 'Escape') { cancel(); }
         });
     } else if (type === 'select') {
-        // Plain <select> is unusable past ~10 options. Wrap with Select2 (already
-        // loaded by Dolibarr), force the search box even on short lists, and open
-        // the dropdown immediately so the user can type to filter.
-        if ($.fn.select2) {
+        // Select2 only on long lists rendered as full-width tac-field — short chip
+        // selects (status, severity) live inside narrow pills where the Select2
+        // widget would shred the layout. Threshold: > 8 options.
+        var optionCount = ($wrap.data('edit-options') || []).length;
+        var canUseSelect2 = $.fn.select2 && !$wrap.is('.tac-chip') && !$wrap.is('.tac-hero__subject') && optionCount > 8;
+        if (canUseSelect2) {
             try {
                 $input.select2({
                     width: '100%',
@@ -1357,9 +1359,7 @@ window.digiriskdolibarr.ticketActionCard.onFieldClick = function(event) {
                     placeholder: '—'
                 });
                 $input.select2('open');
-                // select2 fires its own change; on close without selection -> cancel.
                 $input.on('select2:close', function() {
-                    // setTimeout so the change handler runs first if a selection was made.
                     setTimeout(function() {
                         if ($wrap.hasClass('tac-editing')) { commit(); }
                     }, 50);
