@@ -217,16 +217,23 @@ $defaultLayout = [
     'tagsMode'    => 'chips', // chips | selector — Classification section UI for adding tags
     'actionsMode' => 'bar',   // bar | menu — sticky-bar buttons or single kebab (⋮) overflow menu
     'sections'    => [
-        // Interleaved L/R for an alternating 2-col visual.
+        // Order by relevance for ticket reading flow:
+        //   1. Identification — who/what/where (ref, type, severity, third party)
+        //   2. Initial message — the actual user request, read FIRST after the headline
+        //   3. Registres — Digirisk-specific extrafields (Nom, Prénom, Phone, Lieu...)
+        //   4. Classification — tags help triage
+        //   5. Condition message + Accidents — workflow context for SST registers
+        //   6. Other extrafields (3rd party modules: Tâche, QcFrequency, Deadline...)
+        //   7. Reference data (linked files, events history, related objects, dates)
         'identification'    => ['visible' => true, 'width' => 'full', 'order' => 0],
-        'classification'    => ['visible' => true, 'width' => 'full', 'order' => 1],
+        'initial_message'   => ['visible' => true, 'width' => 'full', 'order' => 1],
         'registres'         => ['visible' => true, 'width' => 'full', 'order' => 2],
-        'accidents'         => ['visible' => true, 'width' => 'full', 'order' => 3],
+        'classification'    => ['visible' => true, 'width' => 'full', 'order' => 3],
         'condition_message' => ['visible' => true, 'width' => 'full', 'order' => 4],
-        'linked_files'      => ['visible' => true, 'width' => 'full', 'order' => 5],
+        'accidents'         => ['visible' => true, 'width' => 'full', 'order' => 5],
         'other_extras'      => ['visible' => true, 'width' => 'full', 'order' => 6],
-        'events'            => ['visible' => true, 'width' => 'full', 'order' => 7],
-        'initial_message'   => ['visible' => true, 'width' => 'full', 'order' => 8],
+        'linked_files'      => ['visible' => true, 'width' => 'full', 'order' => 7],
+        'events'            => ['visible' => true, 'width' => 'full', 'order' => 8],
         'related'           => ['visible' => true, 'width' => 'full', 'order' => 9],
         'dates'             => ['visible' => true, 'width' => 'full', 'order' => 10],
     ],
