@@ -1,0 +1,31 @@
+# Digirisk Dolibarr - English translations
+# Copyright (C) Evarisk
+#
+# This file is a i18n/l10n file for Dolibarr.
+# Strings in this file can contain special characters.
+# A string can be used as a title, a menu entry, a label, a description...
+# Keys can be the same as the English string (when empty of accents).
+
+CurativeAction                           = Curative actions
+CorrectiveAction                         = Corrective actions
+PreventiveAction                         = Preventive actions
+DigiriskActionType                       = Digirisk action type
+Actions                                  = Actions
+ActionsTab                               = Actions
+CurativeActions                          = Curative actions
+CorrectiveActions                        = Corrective actions
+AddCurativeAction                        = Add a curative action
+AddCorrectiveAction                      = Add a corrective action
+InvestigationNotValidatedYet             = Please validate the accident investigation first to create actions
+ActionLabel                              = Action label
+ActionDeadline                           = Deadline
+ActionAssignedTo                         = Assigned to
+ActionProgress                           = Progress
+MarkAsDone                               = Mark as done
+XActionsOfY                              = %s / %s done
+NoActionsYet                             = No actions yet
+ActionAdded                              = Action has been created
+ActionClosed                             = Action has been closed
+ActionsAreProjectTasks                   = Actions are Dolibarr project sub-tasks
+SeeProjectTasksView                      = See parent task
+OpenTask                                 = Open task

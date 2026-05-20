@@ -30,9 +30,58 @@
  */
 function accidentinvestigation_prepare_head(AccidentInvestigation $object): array
 {
+    global $langs;
+
     $moreParams['attendantTableMode'] = 'simple';
 
-    return saturne_object_prepare_head($object, [], $moreParams, true);
+    // Key 15 places this tab between attendants (10) and note (20) after ksort.
+    $head     = [];
+    $head[15] = [
+        dol_buildpath('/digiriskdolibarr/view/accidentinvestigation/accidentinvestigation_actions.php', 1) . '?id=' . $object->id,
+        '<i class="fas fa-tasks pictofixedwidth"></i>' . $langs->trans('ActionsTab'),
+        'actions',
+    ];
+
+    return saturne_object_prepare_head($object, $head, $moreParams, true);
+}
+
+/**
+ * Return subtasks of an accident investigation task filtered by digirisk_action_type.
+ *
+ * @param  DoliDB $db           Database handler
+ * @param  int    $parentTaskId fk_task of the AccidentInvestigation
+ * @param  int    $type         1 = curative, 2 = corrective
+ * @return array                Array of stdClass rows
+ */
+function getAccidentInvestigationActionsByType(DoliDB $db, int $parentTaskId, int $type): array
+{
+    $results = [];
+
+    $sql  = 'SELECT t.rowid, t.ref, t.label, t.datee, t.progress, t.fk_statut,';
+    $sql .= ' (SELECT CONCAT(u2.firstname, \' \', u2.lastname)';
+    $sql .= '  FROM ' . MAIN_DB_PREFIX . 'element_contact ec2';
+    $sql .= '  INNER JOIN ' . MAIN_DB_PREFIX . 'c_type_contact ctc2';
+    $sql .= '   ON ctc2.rowid = ec2.fk_c_type_contact';
+    $sql .= '   AND ctc2.code = \'TASKEXECUTIVE\' AND ctc2.element = \'projet_task\'';
+    $sql .= '  INNER JOIN ' . MAIN_DB_PREFIX . 'user u2 ON u2.rowid = ec2.fk_socpeople';
+    $sql .= '  WHERE ec2.element_id = t.rowid LIMIT 1) AS user_fullname';
+    $sql .= ' FROM ' . MAIN_DB_PREFIX . 'projet_task t';
+    $sql .= ' LEFT JOIN ' . MAIN_DB_PREFIX . 'projet_task_extrafields ef ON ef.fk_object = t.rowid';
+    $sql .= ' WHERE t.fk_task_parent = ' . $parentTaskId;
+    $sql .= '   AND ef.digirisk_action_type = ' . $type;
+    $sql .= ' ORDER BY t.datee ASC, t.rowid ASC';
+
+    $resql = $db->query($sql);
+    if ($resql) {
+        while ($obj = $db->fetch_object($resql)) {
+            $results[] = $obj;
+        }
+        $db->free($resql);
+    } else {
+        dol_syslog(__FUNCTION__ . ': ' . $db->lasterror(), LOG_ERR);
+    }
+
+    return $results;
 }
 
 /**
