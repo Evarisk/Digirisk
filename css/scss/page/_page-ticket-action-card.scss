@@ -660,20 +660,24 @@ $tac-border:       #e5e7eb;
 // Default styles target "cozy" (matches the original look), with overrides for compact + spacious.
 // ---------------------------------------------------------------------------
 .tac-density-compact {
-    .tac-body         { gap: 8px 10px; padding: 12px 16px; }
-    .tac-section      { padding: 8px 10px; border-radius: 8px; }
-    .tac-section__title { font-size: 0.72em; margin-bottom: 6px; }
-    .tac-grid         { gap: 4px 8px; }
-    .tac-field        { padding: 3px 6px; min-height: 36px; }
-    .tac-field__label { font-size: 0.68em; }
-    .tac-field__value { font-size: 0.88em; line-height: 1.25; }
-    .tac-hero         { padding: 10px 18px 0; }
-    .tac-hero__ref    { font-size: 1.25em; }
-    .tac-hero__subject{ font-size: 1em; }
-    .tac-chip         { padding: 3px 8px; font-size: 0.85em; }
-    .tac-list__item   { padding: 3px 0; }
-    .tac-rich-text    { padding: 6px 8px; min-height: 40px; max-height: 140px; }
-    .tac-tag          { padding: 2px 8px; font-size: 0.8em; }
+    .tac-body         { gap: 6px 8px; padding: 8px 12px; }
+    .tac-section      { padding: 6px 8px; border-radius: 8px; }
+    .tac-section__title { font-size: 0.7em; margin-bottom: 4px; }
+    .tac-grid         { gap: 2px 8px; }
+    .tac-field        { padding: 2px 6px; min-height: 0; }
+    .tac-field__label { font-size: 0.66em; margin-bottom: 0; }
+    .tac-field__value { font-size: 0.86em; line-height: 1.2; min-height: 0; }
+    .tac-hero         { padding: 8px 16px 0; }
+    .tac-hero__ref    { font-size: 1.2em; }
+    .tac-hero__subject{ font-size: 0.95em; }
+    .tac-chip         { padding: 2px 8px; font-size: 0.82em; }
+    .tac-list__item   { padding: 2px 0; }
+    .tac-list--events .tac-list__item { padding: 3px 0; }
+    .tac-rich-text    { padding: 5px 8px; min-height: 32px; max-height: 120px; }
+    .tac-tag          { padding: 2px 8px; font-size: 0.78em; }
+    .tac-thread       { gap: 8px; max-height: 420px; }
+    .tac-thread__bubble { padding: 6px 10px; }
+    .tac-thread__reply  { padding: 6px; }
 }
 
 .tac-density-spacious {
