@@ -136,14 +136,7 @@ $typeOptions     = $dictOptions('c_ticket_type');
 $severityOptions = $dictOptions('c_ticket_severity');
 $categoryOptions = $dictOptions('c_ticket_category');
 
-// ---- Third party picker (companies). Capped at 200 to avoid huge dropdowns.
-$socOptions = [['id' => 0, 'label' => '— ' . $langs->transnoentities('NoneSelected') . ' —']];
-$socRes = $db->query('SELECT rowid, nom FROM ' . MAIN_DB_PREFIX . "societe WHERE status = 1 AND entity IN (" . getEntity('societe') . ') ORDER BY nom LIMIT 200');
-if ($socRes) {
-    while ($row = $db->fetch_object($socRes)) {
-        $socOptions[] = ['id' => (int) $row->rowid, 'label' => $row->nom];
-    }
-}
+// ---- Third party: too many companies to embed, the combo searches server-side.
 $linkedSociete = null;
 $socTicketCount = 0;
 if ((int) $object->fk_soc > 0) {
@@ -160,20 +153,9 @@ if ((int) $object->fk_soc > 0) {
     }
 }
 
-// ---- Project picker (only if the project module is enabled).
-$projectOptions = [['id' => 0, 'label' => '— ' . $langs->transnoentities('NoneSelected') . ' —']];
-$linkedProject  = null;
+// ---- Project: too many to embed either, also searched server-side.
+$linkedProject = null;
 if (isModEnabled('project')) {
-    $projRes = $db->query('SELECT rowid, ref, title FROM ' . MAIN_DB_PREFIX . "projet WHERE fk_statut > 0 AND entity IN (" . getEntity('project') . ') ORDER BY ref LIMIT 200');
-    if ($projRes) {
-        while ($row = $db->fetch_object($projRes)) {
-            $label = trim(($row->ref ? $row->ref . ' — ' : '') . ($row->title ?? ''));
-            if ($label === '') {
-                $label = '#' . (int) $row->rowid;
-            }
-            $projectOptions[] = ['id' => (int) $row->rowid, 'label' => $label];
-        }
-    }
     if ((int) $object->fk_project > 0) {
         $linkedProject = new Project($db);
         $linkedProject->fetch((int) $object->fk_project);
@@ -506,6 +488,10 @@ $renderField = function (string $field, string $type, string $label, $value, str
     if (!empty($opts['options'])) {
         $attrs['data-edit-options'] = json_encode(array_values($opts['options']));
     }
+    if (!empty($opts['remote'])) {
+        // Field with too many rows to embed — the combo searches server-side instead.
+        $attrs['data-edit-remote'] = $opts['remote'];
+    }
     if (!empty($opts['format'])) {
         $attrs['data-edit-format'] = $opts['format'];
     }
@@ -749,7 +735,13 @@ if (!in_array($severityKey, ['low', 'normal', 'high', 'blocking'], true)) {
                             . dol_escape_htmltag($langs->trans($socTicketCount > 1 ? 'OtherTickets' : 'OtherTicket'))
                             . '</a>';
                     }
-                    $renderField('fk_soc', 'select', 'ThirdParty', (int) $object->fk_soc, $socDisplay, ['options' => $socOptions]);
+                    // Too many thirdparties to embed — search server-side. Seed with the
+                    // current value so the combo can show it as the active option.
+                    $socSeed = [['id' => 0, 'label' => '— ' . $langs->transnoentities('NoneSelected') . ' —']];
+                    if ($linkedSociete) {
+                        $socSeed[] = ['id' => (int) $object->fk_soc, 'label' => $linkedSociete->name];
+                    }
+                    $renderField('fk_soc', 'select', 'ThirdParty', (int) $object->fk_soc, $socDisplay, ['options' => $socSeed, 'remote' => 'societe']);
 
                     // Project (only if project module is enabled).
                     if (isModEnabled('project')) {
@@ -758,7 +750,11 @@ if (!in_array($severityKey, ['low', 'normal', 'high', 'blocking'], true)) {
                         if ($linkedProject) {
                             $projDisplay = $linkedProject->getNomUrl(1) . ($linkedProject->title ? ' - ' . dol_escape_htmltag($linkedProject->title) : '');
                         }
-                        $renderField('fk_project', 'select', 'Project', (int) $object->fk_project, $projDisplay, ['options' => $projectOptions]);
+                        $projSeed = [['id' => 0, 'label' => '— ' . $langs->transnoentities('NoneSelected') . ' —']];
+                        if ($linkedProject) {
+                            $projSeed[] = ['id' => (int) $object->fk_project, 'label' => $linkedProject->ref . ($linkedProject->title ? ' - ' . $linkedProject->title : '')];
+                        }
+                        $renderField('fk_project', 'select', 'Project', (int) $object->fk_project, $projDisplay, ['options' => $projSeed, 'remote' => 'project']);
                     }
                     ?>
                 </div>

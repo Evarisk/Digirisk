@@ -122,6 +122,46 @@ $buildPayload = static function (Ticket $tkt) use ($db, $langs): array {
 $res = 0;
 
 switch ($action) {
+    /*
+     * search_options — server-side search for combos backed by large tables
+     * (thirdparties, projects) that are too big to embed in the page. Returns
+     * up to 50 matching {id, label} rows for the given source + term.
+     */
+    case 'search_options':
+        $source = GETPOST('source', 'aZ09');
+        $term   = trim((string) GETPOST('term', 'alphanohtml'));
+        $like   = '%' . $db->escape($term) . '%';
+        $results = [];
+        if ($source === 'societe') {
+            $sql = 'SELECT rowid, nom FROM ' . MAIN_DB_PREFIX . 'societe'
+                . " WHERE status = 1 AND entity IN (" . getEntity('societe') . ')'
+                . ($term !== '' ? " AND nom LIKE '" . $like . "'" : '')
+                . ' ORDER BY nom LIMIT 50';
+            $r = $db->query($sql);
+            if ($r) {
+                while ($row = $db->fetch_object($r)) {
+                    $results[] = ['id' => (int) $row->rowid, 'label' => $row->nom];
+                }
+            }
+        } elseif ($source === 'project') {
+            $sql = 'SELECT rowid, ref, title FROM ' . MAIN_DB_PREFIX . 'projet'
+                . " WHERE fk_statut > 0 AND entity IN (" . getEntity('project') . ')'
+                . ($term !== '' ? " AND (ref LIKE '" . $like . "' OR title LIKE '" . $like . "')" : '')
+                . ' ORDER BY ref LIMIT 50';
+            $r = $db->query($sql);
+            if ($r) {
+                while ($row = $db->fetch_object($r)) {
+                    $label = trim(((string) $row->ref !== '' ? $row->ref . ' — ' : '') . ((string) ($row->title ?? '')));
+                    $results[] = ['id' => (int) $row->rowid, 'label' => ($label !== '' ? $label : '#' . (int) $row->rowid)];
+                }
+            }
+        } else {
+            respond(false, $langs->transnoentities('ErrorBadParameters'));
+        }
+        // Always offer the "none" option at the top so users can clear the value.
+        array_unshift($results, ['id' => 0, 'label' => '— ' . $langs->transnoentities('NoneSelected') . ' —']);
+        respond(true, '', ['results' => $results]);
+
     case 'mark_read':
         $res = $object->markAsRead($user);
         if ($res > 0) {

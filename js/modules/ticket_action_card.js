@@ -1233,9 +1233,9 @@ window.digiriskdolibarr.ticketActionCard.onFieldClick = function(event) {
         $input = $('<input type="date" class="tac-edit-input">').val(dateValue);
     } else if (type === 'select') {
         var options = $wrap.data('edit-options') || [];
-        // Long lists get a searchable combo (text input + filtered floating list);
-        // short lists keep a plain native <select> which is fine to scroll.
-        var useCombo = options.length > 8 && !$wrap.is('.tac-hero__subject');
+        // Long lists (or any server-searched field) get a searchable combo; short
+        // static lists keep a plain native <select> which is fine to scroll.
+        var useCombo = (!!$wrap.data('edit-remote') || options.length > 8) && !$wrap.is('.tac-hero__subject');
         if (useCombo) {
             var curLabel = '';
             options.forEach(function(opt) {
@@ -1341,8 +1341,9 @@ window.digiriskdolibarr.ticketActionCard.onFieldClick = function(event) {
         // Custom searchable combo — built in-house because Select2 stalls on
         // "Searching…" in this Dolibarr build. A floating, accent-insensitive
         // filtered list anchored to the input via fixed positioning (so it escapes
-        // the card's overflow:hidden).
-        window.digiriskdolibarr.ticketActionCard.initCombo($wrap, $input, $wrap.data('edit-options') || [], current, commit, cancel);
+        // the card's overflow:hidden). When the field declares data-edit-remote, the
+        // list is fetched server-side instead of filtered from a static array.
+        window.digiriskdolibarr.ticketActionCard.initCombo($wrap, $input, $wrap.data('edit-options') || [], current, commit, cancel, $wrap.data('edit-remote') || '');
     } else if (type === 'select') {
         $input.on('change', commit);
         $input.on('keydown', function(e) { if (e.key === 'Escape') { cancel(); } });
@@ -1395,17 +1396,21 @@ window.digiriskdolibarr.ticketActionCard.cleanupEditor = function($wrap) {
  *
  * @param  {jQuery}   $wrap     The field wrapper (.tac-field / .tac-chip).
  * @param  {jQuery}   $input    The text input rendered in place of the value.
- * @param  {Array}    options   [{id, label}, ...]
+ * @param  {Array}    options   [{id, label}, ...] (static mode seed).
  * @param  {string}   current   Currently selected id.
  * @param  {Function} commit    Save callback (reads $input.data('combo-value')).
  * @param  {Function} cancel    Restore callback.
+ * @param  {string}   remote    Optional server source key ('societe'|'project'); when
+ *                              set, the list is fetched via AJAX instead of filtered.
  * @return {void}
  */
-window.digiriskdolibarr.ticketActionCard.initCombo = function($wrap, $input, options, current, commit, cancel) {
+window.digiriskdolibarr.ticketActionCard.initCombo = function($wrap, $input, options, current, commit, cancel, remote) {
     var ns = 'taccombo' + Math.random().toString(36).slice(2, 8);
     var $list = $('<ul class="tac-combo__list" role="listbox">').appendTo('body');
     var activeIndex = -1;
     var visible = [];
+    var searchTimer = null;
+    var reqSeq = 0;
 
     // commit/cancel must fire at most once — a mousedown on an option bubbles to the
     // outside-click handler too, which would otherwise cancel right after committing.
@@ -1429,13 +1434,12 @@ window.digiriskdolibarr.ticketActionCard.initCombo = function($wrap, $input, opt
         });
     };
 
-    var render = function(term) {
-        var f = norm(term);
+    // Paint the list from a [{id,label}] array (used by both static and remote).
+    var paint = function(rows) {
         $list.empty();
         visible = [];
         activeIndex = -1;
-        options.forEach(function(opt) {
-            if (f && norm(opt.label).indexOf(f) === -1) { return; }
+        rows.forEach(function(opt) {
             var $li = $('<li class="tac-combo__opt" role="option">')
                 .attr('data-value', String(opt.id))
                 .text(opt.label);
@@ -1447,6 +1451,42 @@ window.digiriskdolibarr.ticketActionCard.initCombo = function($wrap, $input, opt
             $list.append('<li class="tac-combo__empty">Aucun résultat</li>');
         }
         position();
+    };
+
+    var render = function(term) {
+        if (remote) {
+            // Debounced server-side search.
+            $list.empty().append('<li class="tac-combo__empty">…</li>');
+            position();
+            if (searchTimer) { clearTimeout(searchTimer); }
+            var seq = ++reqSeq;
+            searchTimer = setTimeout(function() {
+                var $card = $wrap.closest('.ticket-action-card');
+                $.ajax({
+                    url: $card.data('ajax-url'),
+                    method: 'POST',
+                    dataType: 'json',
+                    data: {
+                        ticket_id: $card.data('ticket-id'),
+                        action: 'search_options',
+                        source: remote,
+                        term: term || '',
+                        token: $('input[name="token"]').val() || ''
+                    }
+                }).done(function(response) {
+                    if (seq !== reqSeq) { return; } // a newer query superseded this one
+                    paint((response && response.success && response.results) ? response.results : []);
+                }).fail(function() {
+                    if (seq !== reqSeq) { return; }
+                    paint([]);
+                });
+            }, 250);
+            return;
+        }
+        var f = norm(term);
+        paint(options.filter(function(opt) {
+            return !f || norm(opt.label).indexOf(f) !== -1;
+        }));
     };
 
     var choose = function(value) {
