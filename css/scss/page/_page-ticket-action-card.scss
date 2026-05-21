@@ -764,6 +764,55 @@ $tac-border:       #e5e7eb;
 .tac-edit-input--narrow { max-width: 100px; }
 .tac-edit-textarea     { min-height: 80px; resize: vertical; }
 
+// ----- Searchable combo (custom, replaces Select2 for long lists) -----
+.tac-combo__input {
+    background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='14' height='14' viewBox='0 0 24 24' fill='none' stroke='%236b7280' stroke-width='2.5'%3E%3Ccircle cx='11' cy='11' r='7'/%3E%3Cline x1='21' y1='21' x2='16.65' y2='16.65'/%3E%3C/svg%3E");
+    background-repeat: no-repeat;
+    background-position: right 8px center;
+    padding-right: 28px;
+}
+
+// The list is appended to <body> and positioned with position:fixed via JS, so it
+// escapes the card's overflow:hidden. Keep it above everything on the page.
+.tac-combo__list {
+    list-style: none;
+    margin: 0;
+    padding: 4px;
+    background: #fff;
+    border: 1px solid $tac-border;
+    border-radius: 8px;
+    box-shadow: 0 6px 20px rgba(0, 0, 0, 0.16);
+    max-height: 260px;
+    overflow-y: auto;
+    min-width: 220px;
+    z-index: 100000;
+
+    .tac-combo__opt {
+        padding: 7px 10px;
+        border-radius: 5px;
+        cursor: pointer;
+        font-size: 0.92em;
+        color: #1f2937;
+        white-space: nowrap;
+        overflow: hidden;
+        text-overflow: ellipsis;
+
+        &:hover,
+        &.is-active { background: rgba(13, 138, 255, 0.1); }
+        &.is-current {
+            font-weight: 600;
+            color: $tac-blue;
+        }
+    }
+
+    .tac-combo__empty {
+        padding: 8px 10px;
+        color: $tac-grey;
+        font-style: italic;
+        font-size: 0.9em;
+    }
+}
+
 // Floating Save/Cancel pair shown under a CKEditor longtext field.
 .tac-edit-actions {
     margin-top: 8px;

@@ -1232,15 +1232,29 @@ window.digiriskdolibarr.ticketActionCard.onFieldClick = function(event) {
         }
         $input = $('<input type="date" class="tac-edit-input">').val(dateValue);
     } else if (type === 'select') {
-        $input = $('<select class="tac-edit-input">');
         var options = $wrap.data('edit-options') || [];
-        options.forEach(function(opt) {
-            var $opt = $('<option>').val(String(opt.id)).text(opt.label);
-            if (String(opt.id) === current) {
-                $opt.prop('selected', true);
-            }
-            $input.append($opt);
-        });
+        // Long lists get a searchable combo (text input + filtered floating list);
+        // short lists keep a plain native <select> which is fine to scroll.
+        var useCombo = options.length > 8 && !$wrap.is('.tac-hero__subject');
+        if (useCombo) {
+            var curLabel = '';
+            options.forEach(function(opt) {
+                if (String(opt.id) === current) { curLabel = opt.label; }
+            });
+            $input = $('<input type="text" class="tac-edit-input tac-combo__input" autocomplete="off">')
+                .attr('placeholder', curLabel || '—')
+                .data('combo-value', current)
+                .data('is-combo', true);
+        } else {
+            $input = $('<select class="tac-edit-input">');
+            options.forEach(function(opt) {
+                var $opt = $('<option>').val(String(opt.id)).text(opt.label);
+                if (String(opt.id) === current) {
+                    $opt.prop('selected', true);
+                }
+                $input.append($opt);
+            });
+        }
     } else {
         $wrap.removeClass('tac-editing');
         return;
@@ -1268,6 +1282,10 @@ window.digiriskdolibarr.ticketActionCard.onFieldClick = function(event) {
         var editorId = $wrap.data('tac-editor-id');
         if (type === 'longtext' && editorId && window.CKEDITOR && window.CKEDITOR.instances && window.CKEDITOR.instances[editorId]) {
             newValue = window.CKEDITOR.instances[editorId].getData();
+        } else if ($input.data('is-combo')) {
+            // Searchable combo stores the chosen option id separately from the
+            // visible search text.
+            newValue = $input.data('combo-value');
         } else {
             newValue = $input.val();
         }
@@ -1319,12 +1337,13 @@ window.digiriskdolibarr.ticketActionCard.onFieldClick = function(event) {
         $(document).on('keydown.tac-longtext-' + ($input.attr('id') || ''), function(e) {
             if (e.key === 'Escape') { cancel(); }
         });
+    } else if (type === 'select' && $input.data('is-combo')) {
+        // Custom searchable combo — built in-house because Select2 stalls on
+        // "Searching…" in this Dolibarr build. A floating, accent-insensitive
+        // filtered list anchored to the input via fixed positioning (so it escapes
+        // the card's overflow:hidden).
+        window.digiriskdolibarr.ticketActionCard.initCombo($wrap, $input, $wrap.data('edit-options') || [], current, commit, cancel);
     } else if (type === 'select') {
-        // Native <select> for now. A previous attempt at wrapping with Select2 for
-        // search-on-long-lists ran into a Dolibarr-specific bug where the dropdown
-        // stays stuck on "Searching…" because the synchronous SelectAdapter query
-        // never delivers results to the results pane. Revisit with a custom dropdown
-        // or a different lib when needed.
         $input.on('change', commit);
         $input.on('keydown', function(e) { if (e.key === 'Escape') { cancel(); } });
         $input.on('blur', commit);
@@ -1354,7 +1373,126 @@ window.digiriskdolibarr.ticketActionCard.cleanupEditor = function($wrap) {
     if ($bar) {
         $bar.remove();
     }
+    // Tear down a searchable combo's floating list + its document/window handlers.
+    var comboNs = $wrap.data('tac-combo-ns');
+    if (comboNs) {
+        var $list = $wrap.data('tac-combo-list');
+        if ($list) { $list.remove(); }
+        $(document).off('.' + comboNs);
+        $(window).off('.' + comboNs);
+        $wrap.removeData('tac-combo-ns').removeData('tac-combo-list');
+    }
     $wrap.removeData('tac-editor-id').removeData('tac-edit-bar');
+};
+
+/**
+ * Build a searchable combo for a long select field: a text input (already inserted
+ * by the caller) plus a floating, accent-insensitive filtered option list.
+ *
+ * The list is appended to <body> and positioned with position:fixed so it is not
+ * clipped by the card's overflow:hidden. Selecting an option stores its id on the
+ * input via .data('combo-value') and commits.
+ *
+ * @param  {jQuery}   $wrap     The field wrapper (.tac-field / .tac-chip).
+ * @param  {jQuery}   $input    The text input rendered in place of the value.
+ * @param  {Array}    options   [{id, label}, ...]
+ * @param  {string}   current   Currently selected id.
+ * @param  {Function} commit    Save callback (reads $input.data('combo-value')).
+ * @param  {Function} cancel    Restore callback.
+ * @return {void}
+ */
+window.digiriskdolibarr.ticketActionCard.initCombo = function($wrap, $input, options, current, commit, cancel) {
+    var ns = 'taccombo' + Math.random().toString(36).slice(2, 8);
+    var $list = $('<ul class="tac-combo__list" role="listbox">').appendTo('body');
+    var activeIndex = -1;
+    var visible = [];
+
+    // commit/cancel must fire at most once — a mousedown on an option bubbles to the
+    // outside-click handler too, which would otherwise cancel right after committing.
+    var settled = false;
+    var doCommit = function() { if (settled) { return; } settled = true; commit(); };
+    var doCancel = function() { if (settled) { return; } settled = true; cancel(); };
+
+    var norm = function(s) {
+        return String(s == null ? '' : s)
+            .normalize('NFD').replace(/[̀-ͯ]/g, '')
+            .toLowerCase();
+    };
+
+    var position = function() {
+        var r = $input[0].getBoundingClientRect();
+        $list.css({
+            position: 'fixed',
+            top: Math.round(r.bottom + 2) + 'px',
+            left: Math.round(r.left) + 'px',
+            width: Math.round(r.width) + 'px'
+        });
+    };
+
+    var render = function(term) {
+        var f = norm(term);
+        $list.empty();
+        visible = [];
+        activeIndex = -1;
+        options.forEach(function(opt) {
+            if (f && norm(opt.label).indexOf(f) === -1) { return; }
+            var $li = $('<li class="tac-combo__opt" role="option">')
+                .attr('data-value', String(opt.id))
+                .text(opt.label);
+            if (String(opt.id) === String(current)) { $li.addClass('is-current'); }
+            $list.append($li);
+            visible.push(opt);
+        });
+        if (visible.length === 0) {
+            $list.append('<li class="tac-combo__empty">Aucun résultat</li>');
+        }
+        position();
+    };
+
+    var choose = function(value) {
+        $input.data('combo-value', String(value));
+        doCommit();
+    };
+
+    var setActive = function(idx) {
+        var $opts = $list.find('.tac-combo__opt');
+        if (!$opts.length) { return; }
+        activeIndex = Math.max(0, Math.min(idx, $opts.length - 1));
+        $opts.removeClass('is-active');
+        var $a = $opts.eq(activeIndex).addClass('is-active');
+        var liTop = $a[0].offsetTop, liBot = liTop + $a[0].offsetHeight;
+        if (liTop < $list[0].scrollTop) { $list[0].scrollTop = liTop; }
+        else if (liBot > $list[0].scrollTop + $list[0].clientHeight) { $list[0].scrollTop = liBot - $list[0].clientHeight; }
+    };
+
+    render('');
+    $input.focus();
+
+    $input.on('input', function() { render($input.val()); });
+    $input.on('keydown', function(e) {
+        if (e.key === 'Escape') { e.preventDefault(); doCancel(); }
+        else if (e.key === 'ArrowDown') { e.preventDefault(); setActive(activeIndex + 1); }
+        else if (e.key === 'ArrowUp') { e.preventDefault(); setActive(activeIndex - 1); }
+        else if (e.key === 'Enter') {
+            e.preventDefault();
+            if (activeIndex >= 0 && visible[activeIndex]) { choose(visible[activeIndex].id); }
+        }
+    });
+
+    // mousedown (not click) so we beat the input's blur-cancel race.
+    $list.on('mousedown', '.tac-combo__opt', function(e) {
+        e.preventDefault();
+        choose($(this).attr('data-value'));
+    });
+
+    // Click anywhere outside the input + list cancels.
+    $(document).on('mousedown.' + ns, function(e) {
+        if ($(e.target).closest($input).length || $(e.target).closest($list).length) { return; }
+        doCancel();
+    });
+    $(window).on('scroll.' + ns + ' resize.' + ns, position);
+
+    $wrap.data('tac-combo-ns', ns).data('tac-combo-list', $list);
 };
 
 /**
@@ -1426,12 +1564,12 @@ window.digiriskdolibarr.ticketActionCard.saveField = function($wrap, field, newV
             // Severity changed → refresh the card's tac-severity-* class so the rail
             // and ref tint update without a full reload. Also show/hide the hero badge.
             if (field === 'severity_code') {
-                var $card = $('.tac-card').first();
-                $card.attr('class', function(_, c) { return c.replace(/\btac-severity-\S+/g, ''); });
+                var $sevCard = $('.tac-card').first();
+                $sevCard.attr('class', function(_, c) { return c.replace(/\btac-severity-\S+/g, ''); });
                 var newKey = (response.ticket && response.ticket.severity_key) || (String(newValue || '').toLowerCase().replace(/[^a-z0-9_-]/g, '') || 'default');
                 if (['low','normal','high','blocking'].indexOf(newKey) === -1) { newKey = 'default'; }
-                $card.addClass('tac-severity-' + newKey);
-                $card.attr('data-severity', newKey);
+                $sevCard.addClass('tac-severity-' + newKey);
+                $sevCard.attr('data-severity', newKey);
                 // Hero severity badge — remove for low/normal, show for high/blocking.
                 // Read the label from the AJAX response display HTML (server-rendered),
                 // not from the DOM — at this point the field cell still contains the
