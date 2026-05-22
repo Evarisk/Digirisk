@@ -136,14 +136,7 @@ $typeOptions     = $dictOptions('c_ticket_type');
 $severityOptions = $dictOptions('c_ticket_severity');
 $categoryOptions = $dictOptions('c_ticket_category');
 
-// ---- Third party picker (companies). Capped at 200 to avoid huge dropdowns.
-$socOptions = [['id' => 0, 'label' => '— ' . $langs->transnoentities('NoneSelected') . ' —']];
-$socRes = $db->query('SELECT rowid, nom FROM ' . MAIN_DB_PREFIX . "societe WHERE status = 1 AND entity IN (" . getEntity('societe') . ') ORDER BY nom LIMIT 200');
-if ($socRes) {
-    while ($row = $db->fetch_object($socRes)) {
-        $socOptions[] = ['id' => (int) $row->rowid, 'label' => $row->nom];
-    }
-}
+// ---- Third party: too many companies to embed, the combo searches server-side.
 $linkedSociete = null;
 $socTicketCount = 0;
 if ((int) $object->fk_soc > 0) {
@@ -160,20 +153,9 @@ if ((int) $object->fk_soc > 0) {
     }
 }
 
-// ---- Project picker (only if the project module is enabled).
-$projectOptions = [['id' => 0, 'label' => '— ' . $langs->transnoentities('NoneSelected') . ' —']];
-$linkedProject  = null;
+// ---- Project: too many to embed either, also searched server-side.
+$linkedProject = null;
 if (isModEnabled('project')) {
-    $projRes = $db->query('SELECT rowid, ref, title FROM ' . MAIN_DB_PREFIX . "projet WHERE fk_statut > 0 AND entity IN (" . getEntity('project') . ') ORDER BY ref LIMIT 200');
-    if ($projRes) {
-        while ($row = $db->fetch_object($projRes)) {
-            $label = trim(($row->ref ? $row->ref . ' — ' : '') . ($row->title ?? ''));
-            if ($label === '') {
-                $label = '#' . (int) $row->rowid;
-            }
-            $projectOptions[] = ['id' => (int) $row->rowid, 'label' => $label];
-        }
-    }
     if ((int) $object->fk_project > 0) {
         $linkedProject = new Project($db);
         $linkedProject->fetch((int) $object->fk_project);
@@ -221,6 +203,147 @@ foreach (($extrafieldsObj->attributes[$object->table_element]['label'] ?? []) as
 $uploadDir = $conf->ticket->multidir_output[$conf->entity ?? 1] . '/' . dol_sanitizeFileName($object->ref);
 $linkedFiles = is_dir($uploadDir) ? dol_dir_list($uploadDir, 'files', 0, '', null, 'date', SORT_DESC, 1) : [];
 
+// ---- Status timeline (sparkline) — sequence of status changes.
+// Start from the dated fields on the ticket row, then enrich with ActionComm entries
+// matching known transition codes so we trace assign/in-progress changes too.
+$statusMilestones = [];
+if (!empty($object->datec)) {
+    $statusMilestones[] = ['code' => 'CREATED', 'date' => (int) $object->datec, 'label' => $langs->trans('Created')];
+}
+if (!empty($object->date_read)) {
+    $statusMilestones[] = ['code' => 'READ',    'date' => (int) $object->date_read, 'label' => $langs->trans('Read')];
+}
+if (!empty($object->date_close)) {
+    $closedLabel = ($status === Ticket::STATUS_CANCELED) ? $langs->trans('Canceled') : $langs->trans('SolvedClosed');
+    $statusMilestones[] = ['code' => 'CLOSED',  'date' => (int) $object->date_close, 'label' => $closedLabel];
+}
+// Pull only ASSIGN transitions from ActionComm — MODIFY is too generic ("ticket was modified")
+// and pollutes the timeline with vague events. Keep only the LAST assign so the timeline
+// stays compact.
+$tlSql = "SELECT a.code, a.datep FROM " . MAIN_DB_PREFIX . "actioncomm a"
+    . " WHERE a.fk_element = " . (int) $object->id . " AND a.elementtype = 'ticket'"
+    . " AND a.entity IN (" . getEntity('agenda') . ")"
+    . " AND a.code = 'AC_TICKET_ASSIGN'"
+    . " ORDER BY a.datep DESC LIMIT 1";
+$tlRes = $db->query($tlSql);
+if ($tlRes && ($row = $db->fetch_object($tlRes))) {
+    $statusMilestones[] = ['code' => 'ASSIGN', 'date' => (int) $db->jdate($row->datep), 'label' => $langs->trans('Assigned')];
+}
+// Dedupe + sort by date asc.
+usort($statusMilestones, static fn($a, $b) => $a['date'] <=> $b['date']);
+$statusMilestones = array_values(array_filter($statusMilestones, static function ($m) {
+    static $seenDates = [];
+    if (!$m['date']) { return false; }
+    if (isset($seenDates[$m['date']])) { return false; }
+    $seenDates[$m['date']] = true;
+    return true;
+}));
+// Mark the trailing point as "current".
+$currentStatusLabel = $object->getLibStatut(0);
+if (!empty($statusMilestones)) {
+    if (!in_array($status, [Ticket::STATUS_NOT_READ, Ticket::STATUS_READ, Ticket::STATUS_CLOSED, Ticket::STATUS_CANCELED], true)) {
+        $statusMilestones[] = ['code' => 'CURRENT', 'date' => time(), 'label' => $currentStatusLabel, 'current' => true];
+    } else {
+        $statusMilestones[count($statusMilestones) - 1]['current'] = true;
+    }
+}
+
+/**
+ * Format a duration between two timestamps as "+ 3j", "+ 2h", "+ 5min".
+ */
+$formatDelta = static function (int $from, int $to): string {
+    $secs = max(0, $to - $from);
+    if ($secs < 60)             { return '+ ' . $secs . 's'; }
+    if ($secs < 3600)           { return '+ ' . (int) ($secs / 60) . 'min'; }
+    if ($secs < 3600 * 24)      { return '+ ' . (int) ($secs / 3600) . 'h'; }
+    if ($secs < 3600 * 24 * 30) { return '+ ' . (int) ($secs / 86400) . 'j'; }
+    return '+ ' . (int) ($secs / (86400 * 30)) . 'mois';
+};
+
+// ---- Messages thread (actioncomm TICKET_MSG*) chronological, oldest first.
+// Note: the DB column is `note` (longtext); the ActionComm class exposes it as
+// `note_private`, so we alias it here so $msg->note_private keeps working.
+$threadMessages = [];
+$thrSql = "SELECT a.id, a.code, a.label, a.note as note_private, a.datep, a.fk_user_author, u.lastname, u.firstname, u.login, u.photo"
+    . " FROM " . MAIN_DB_PREFIX . "actioncomm a LEFT JOIN " . MAIN_DB_PREFIX . "user u ON u.rowid = a.fk_user_author"
+    . " WHERE a.fk_element = " . (int) $object->id . " AND a.elementtype = 'ticket'"
+    . " AND a.entity IN (" . getEntity('agenda') . ")"
+    . " AND a.code LIKE 'TICKET_MSG%'"
+    . " ORDER BY a.datep ASC";
+$thrRes = $db->query($thrSql);
+if ($thrRes) {
+    while ($row = $db->fetch_object($thrRes)) {
+        $threadMessages[] = $row;
+    }
+}
+
+/**
+ * Build the avatar HTML for a user — <img> with the photo if available, otherwise
+ * a coloured initial bubble.
+ */
+$avatarHtml = static function ($userId, $firstname, $lastname, $login, $photo) use ($conf): string {
+    $initials = strtoupper(substr((string) ($firstname ?: $lastname ?: $login ?: '?'), 0, 1));
+    if (!empty($photo) && (int) $userId > 0 && file_exists(DOL_DATA_ROOT . '/users/' . (int) $userId . '/' . $photo)) {
+        $thumbUrl = DOL_URL_ROOT . '/viewimage.php?modulepart=userphoto&entity=' . (int) ($conf->entity ?? 1) . '&file=' . urlencode((int) $userId . '/' . $photo) . '&cache=' . (int) $userId;
+        return '<img class="tac-thread__avatar tac-thread__avatar--img" src="' . dol_escape_htmltag($thumbUrl) . '" alt="' . dol_escape_htmltag($initials) . '">';
+    }
+    return '<div class="tac-thread__avatar">' . dol_escape_htmltag($initials) . '</div>';
+};
+
+/**
+ * Format a timestamp as a relative duration ("il y a 5min", "hier", "il y a 3j")
+ * to make the thread feel chatty. Absolute date stays in the tooltip.
+ */
+$relativeTime = static function (int $ts) use ($langs): string {
+    $delta = max(0, dol_now() - $ts);
+    if ($delta < 60)         { return $langs->transnoentities('JustNow'); }
+    if ($delta < 3600)       { return sprintf($langs->transnoentities('NMinAgo'),  (int) ($delta / 60)); }
+    if ($delta < 86400)      { return sprintf($langs->transnoentities('NHAgo'),    (int) ($delta / 3600)); }
+    if ($delta < 86400 * 7)  { return sprintf($langs->transnoentities('NDAgo'),    (int) ($delta / 86400)); }
+    return dol_print_date($ts, 'day', 'tzuser');
+};
+
+/**
+ * Linkify plain-text URLs inside an HTML fragment without touching already-anchored ones.
+ * Keeps Dolibarr's restrictHTML output safe by only adding <a target=_blank rel=noopener>.
+ */
+$linkifyUrls = static function (string $html): string {
+    return preg_replace_callback(
+        '#(?<!href=["\'])(https?://[^\s<>"\']+)#i',
+        static fn($m) => '<a href="' . dol_escape_htmltag($m[1]) . '" target="_blank" rel="noopener">' . dol_escape_htmltag($m[1]) . '</a>',
+        $html
+    );
+};
+
+/**
+ * Render a message body, preserving the tags allowed in a chat bubble.
+ * dolPrintHTML's "common" whitelist drops <blockquote>, which breaks quote-replies, so
+ * we widen the noescape list to keep quotes, code blocks and rich text intact while
+ * still running the full sanitize pipeline (entities, no-JS, only-these-html-tags).
+ */
+$threadBodyHtml = static function (string $raw): string {
+    $stringWithEntities = dol_htmlentitiesbr($raw);
+    $clean              = dol_htmlwithnojs(dol_string_onlythesehtmltags($stringWithEntities, 1, 1, 1));
+    return dol_escape_htmltag(
+        $clean,
+        1,
+        1,
+        'html,body,a,b,em,hr,i,u,ul,ol,li,br,div,img,font,p,span,strong,table,tr,td,th,tbody,h1,h2,h3,h4,h5,h6,header,footer,nav,section,menu,menuitem,blockquote,pre,code,kbd',
+        0,
+        1
+    );
+};
+
+/**
+ * Count attached files for an actioncomm entry (stored under agenda upload dir).
+ */
+$attachedFileCount = static function (int $actioncommId) use ($conf): int {
+    if ($actioncommId <= 0 || empty($conf->agenda->dir_output)) { return 0; }
+    $dir = $conf->agenda->dir_output . '/' . $actioncommId;
+    if (!is_dir($dir)) { return 0; }
+    return count(dol_dir_list($dir, 'files', 0));
+};
+
 // ---- Recent events (actioncomm) attached to this ticket — last 10.
 $recentEvents = [];
 $evtSql = 'SELECT a.id, a.label, a.datep, a.fk_user_author, u.lastname, u.firstname'
@@ -258,15 +381,16 @@ $defaultLayout = [
         //   7. Reference data (linked files, events history, related objects, dates)
         'identification'    => ['visible' => true, 'width' => 'full', 'order' => 0],
         'initial_message'   => ['visible' => true, 'width' => 'full', 'order' => 1],
-        'registres'         => ['visible' => true, 'width' => 'full', 'order' => 2],
-        'classification'    => ['visible' => true, 'width' => 'full', 'order' => 3],
-        'condition_message' => ['visible' => true, 'width' => 'full', 'order' => 4],
-        'accidents'         => ['visible' => true, 'width' => 'full', 'order' => 5],
-        'other_extras'      => ['visible' => true, 'width' => 'full', 'order' => 6],
-        'linked_files'      => ['visible' => true, 'width' => 'full', 'order' => 7],
-        'events'            => ['visible' => true, 'width' => 'full', 'order' => 8],
-        'related'           => ['visible' => true, 'width' => 'full', 'order' => 9],
-        'dates'             => ['visible' => true, 'width' => 'full', 'order' => 10],
+        'messages_thread'   => ['visible' => true, 'width' => 'span', 'order' => 2],
+        'registres'         => ['visible' => true, 'width' => 'full', 'order' => 3],
+        'classification'    => ['visible' => true, 'width' => 'full', 'order' => 4],
+        'condition_message' => ['visible' => true, 'width' => 'full', 'order' => 5],
+        'accidents'         => ['visible' => true, 'width' => 'full', 'order' => 6],
+        'other_extras'      => ['visible' => true, 'width' => 'full', 'order' => 7],
+        'linked_files'      => ['visible' => true, 'width' => 'full', 'order' => 8],
+        'events'            => ['visible' => true, 'width' => 'full', 'order' => 9],
+        'related'           => ['visible' => true, 'width' => 'full', 'order' => 10],
+        'dates'             => ['visible' => true, 'width' => 'full', 'order' => 11],
     ],
 ];
 $rawLayout  = $user->conf->DIGIRISK_TICKET_CARD_LAYOUT ?? '';
@@ -305,6 +429,11 @@ if ($rawLayout) {
     }
 }
 $layoutJson = json_encode($userLayout);
+
+// ---- Watch state: list of ticket ids this user has bookmarked.
+$rawWatchList = $user->conf->DIGIRISK_TICKET_WATCHLIST ?? '';
+$watchList    = array_filter(array_map('intval', explode(',', (string) $rawWatchList)));
+$isWatched    = in_array((int) $object->id, $watchList, true);
 
 // ---- Related objects (fetchObjectLinked).
 $object->fetchObjectLinked();
@@ -359,6 +488,10 @@ $renderField = function (string $field, string $type, string $label, $value, str
     if (!empty($opts['options'])) {
         $attrs['data-edit-options'] = json_encode(array_values($opts['options']));
     }
+    if (!empty($opts['remote'])) {
+        // Field with too many rows to embed — the combo searches server-side instead.
+        $attrs['data-edit-remote'] = $opts['remote'];
+    }
     if (!empty($opts['format'])) {
         $attrs['data-edit-format'] = $opts['format'];
     }
@@ -373,13 +506,22 @@ $renderField = function (string $field, string $type, string $label, $value, str
 };
 ?>
 
-<div class="ticket-action-card tac-card tac-density-<?php print dol_escape_htmltag($userLayout['density']); ?>"
+<?php
+// Map ticket severity to a CSS modifier so the card border can be tinted at a glance.
+// Falls back to "default" when the ticket has no severity_code or an unknown one.
+$severityKey = strtolower(preg_replace('/[^a-z0-9_-]/i', '', (string) ($object->severity_code ?? '')));
+if (!in_array($severityKey, ['low', 'normal', 'high', 'blocking'], true)) {
+    $severityKey = 'default';
+}
+?>
+<div class="ticket-action-card tac-card tac-density-<?php print dol_escape_htmltag($userLayout['density']); ?> tac-severity-<?php print dol_escape_htmltag($severityKey); ?>"
      data-ticket-id="<?php print (int) $object->id; ?>"
      data-ajax-url="<?php print dol_escape_htmltag($ajaxUrl); ?>"
      data-layout="<?php print dol_escape_htmltag($layoutJson); ?>"
      data-density="<?php print dol_escape_htmltag($userLayout['density']); ?>"
      data-tags-mode="<?php print dol_escape_htmltag($userLayout['tagsMode']); ?>"
-     data-actions-mode="<?php print dol_escape_htmltag($userLayout['actionsMode']); ?>">
+     data-actions-mode="<?php print dol_escape_htmltag($userLayout['actionsMode']); ?>"
+     data-severity="<?php print dol_escape_htmltag($severityKey); ?>">
     <input type="hidden" name="token" value="<?php print newToken(); ?>">
 
     <!-- ====== HERO HEADER ====== -->
@@ -389,6 +531,11 @@ $renderField = function (string $field, string $type, string $label, $value, str
                 <i class="fas fa-arrow-left"></i> <?php print $langs->trans('BackToList'); ?>
             </a>
             <span class="tac-hero__top-right">
+                <button type="button" class="tac-hero__watch<?php print $isWatched ? ' is-watched' : ''; ?>"
+                        data-watch-toggle
+                        title="<?php print dol_escape_htmltag($langs->trans($isWatched ? 'UnwatchTicket' : 'WatchTicket')); ?>">
+                    <i class="<?php print $isWatched ? 'fas' : 'far'; ?> fa-star"></i>
+                </button>
                 <span class="tac-hero__density" role="toolbar" aria-label="<?php print dol_escape_htmltag($langs->trans('LayoutDensity')); ?>">
                     <button type="button" class="tac-hero__density-btn<?php print $userLayout['density'] === 'compact' ? ' is-active' : ''; ?>" data-density="compact" title="<?php print dol_escape_htmltag($langs->trans('LayoutDensityCompact')); ?>">
                         <i class="fas fa-compress-alt"></i>
@@ -447,6 +594,20 @@ $renderField = function (string $field, string $type, string $label, $value, str
                 <?php print $object->getLibStatut(2); ?>
             </span>
 
+            <?php
+            // Severity badge — visible only for HIGH and BLOCKING (the ones the user needs to spot quickly).
+            $sevBadgeMap = [
+                'high'     => ['label' => $langs->transnoentities('High'),               'variant' => 'orange'],
+                'blocking' => ['label' => $langs->transnoentities('Critical / blocking'), 'variant' => 'red'],
+            ];
+            if (isset($sevBadgeMap[$severityKey])) :
+                $sb = $sevBadgeMap[$severityKey];
+                ?>
+                <span class="tac-chip tac-chip--readonly tac-chip--severity tac-chip--severity-<?php print dol_escape_htmltag($sb['variant']); ?>" data-severity-badge title="<?php print dol_escape_htmltag($langs->trans('Severity')); ?>">
+                    <i class="fas fa-exclamation-triangle"></i> <?php print dol_escape_htmltag(strtoupper($sb['label'])); ?>
+                </span>
+            <?php endif; ?>
+
             <span class="tac-chip tac-chip--assignee"
                   data-edit-field="fk_user_assign"
                   data-edit-type="select"
@@ -476,6 +637,27 @@ $renderField = function (string $field, string $type, string $label, $value, str
             </span>
             <?php endif; ?>
         </div>
+
+        <!-- Status timeline — horizontal pills with delta connectors. Compact and overlap-free. -->
+        <?php if (count($statusMilestones) >= 2) : ?>
+        <div class="tac-timeline" aria-label="<?php print dol_escape_htmltag($langs->trans('StatusTimeline')); ?>">
+            <?php foreach ($statusMilestones as $i => $m) :
+                if ($i > 0) :
+                    $deltaText = $formatDelta((int) $statusMilestones[$i - 1]['date'], (int) $m['date']);
+                    ?>
+                    <span class="tac-timeline__delta" aria-hidden="true">
+                        <i class="fas fa-long-arrow-alt-right"></i> <?php print dol_escape_htmltag($deltaText); ?>
+                    </span>
+                <?php endif;
+                $stepClass = 'tac-timeline__step' . (!empty($m['current']) ? ' tac-timeline__step--current' : '');
+                $tooltip   = dol_print_date($m['date'], 'dayhour', 'tzuser');
+                ?>
+                <span class="<?php print $stepClass; ?>" title="<?php print dol_escape_htmltag($tooltip); ?>">
+                    <?php print dol_escape_htmltag($m['label']); ?>
+                </span>
+            <?php endforeach; ?>
+        </div>
+        <?php endif; ?>
 
         <!-- Dolibarr native tabs (Contacts, Documents, Events) inline as quick links -->
         <div class="tac-hero__nav-tabs">
@@ -553,7 +735,13 @@ $renderField = function (string $field, string $type, string $label, $value, str
                             . dol_escape_htmltag($langs->trans($socTicketCount > 1 ? 'OtherTickets' : 'OtherTicket'))
                             . '</a>';
                     }
-                    $renderField('fk_soc', 'select', 'ThirdParty', (int) $object->fk_soc, $socDisplay, ['options' => $socOptions]);
+                    // Too many thirdparties to embed — search server-side. Seed with the
+                    // current value so the combo can show it as the active option.
+                    $socSeed = [['id' => 0, 'label' => '— ' . $langs->transnoentities('NoneSelected') . ' —']];
+                    if ($linkedSociete) {
+                        $socSeed[] = ['id' => (int) $object->fk_soc, 'label' => $linkedSociete->name];
+                    }
+                    $renderField('fk_soc', 'select', 'ThirdParty', (int) $object->fk_soc, $socDisplay, ['options' => $socSeed, 'remote' => 'societe']);
 
                     // Project (only if project module is enabled).
                     if (isModEnabled('project')) {
@@ -562,7 +750,11 @@ $renderField = function (string $field, string $type, string $label, $value, str
                         if ($linkedProject) {
                             $projDisplay = $linkedProject->getNomUrl(1) . ($linkedProject->title ? ' - ' . dol_escape_htmltag($linkedProject->title) : '');
                         }
-                        $renderField('fk_project', 'select', 'Project', (int) $object->fk_project, $projDisplay, ['options' => $projectOptions]);
+                        $projSeed = [['id' => 0, 'label' => '— ' . $langs->transnoentities('NoneSelected') . ' —']];
+                        if ($linkedProject) {
+                            $projSeed[] = ['id' => (int) $object->fk_project, 'label' => $linkedProject->ref . ($linkedProject->title ? ' - ' . $linkedProject->title : '')];
+                        }
+                        $renderField('fk_project', 'select', 'Project', (int) $object->fk_project, $projDisplay, ['options' => $projSeed, 'remote' => 'project']);
                     }
                     ?>
                 </div>
@@ -695,6 +887,99 @@ $renderField = function (string $field, string $type, string $label, $value, str
                         $object->message ?? '',
                         !empty($object->message) ? dolPrintHTML($object->message) : ''); ?>
                 </div>
+            </section>
+
+            <!-- Section: Messages thread + reply form. -->
+            <section class="tac-section" data-section-id="messages_thread">
+                <h3 class="tac-section__title"><i class="fas fa-comments"></i> <?php print $langs->trans('Messages'); ?> <span class="opacitymedium">(<?php print count($threadMessages); ?>)</span></h3>
+                <?php $sectionControls('messages_thread'); ?>
+
+                <ul class="tac-thread" data-thread>
+                    <?php foreach ($threadMessages as $idx => $msg) :
+                        $isPrivate  = (bool) preg_match('/PRIVATE/', (string) $msg->code);
+                        $sentByMail = (bool) preg_match('/SENTBYMAIL/', (string) $msg->code);
+                        $isMine     = ((int) $msg->fk_user_author === (int) $user->id);
+                        $isOriginal = ($idx === 0);
+                        $authorName = trim(((string) ($msg->firstname ?? '')) . ' ' . ((string) ($msg->lastname ?? '')));
+                        if ($authorName === '') {
+                            $authorName = $msg->login ?: $langs->trans('Unknown');
+                        }
+                        $msgTs       = $db->jdate($msg->datep);
+                        $absoluteDt  = dol_print_date($msgTs, 'dayhour', 'tzuser');
+                        $relativeDt  = $relativeTime((int) $msgTs);
+                        $bodyHtml    = !empty($msg->note_private) ? $linkifyUrls($threadBodyHtml((string) $msg->note_private)) : '<span class="opacitymedium">—</span>';
+                        $fileCount   = $attachedFileCount((int) $msg->id);
+                        $authorUrl   = !empty($msg->fk_user_author) ? DOL_URL_ROOT . '/user/card.php?id=' . (int) $msg->fk_user_author : '';
+                        $msgClasses  = 'tac-thread__msg';
+                        $msgClasses .= $isMine     ? ' tac-thread__msg--mine'     : '';
+                        $msgClasses .= $isPrivate  ? ' tac-thread__msg--private'  : '';
+                        $msgClasses .= $isOriginal ? ' tac-thread__msg--original' : '';
+                        ?>
+                        <li class="<?php print $msgClasses; ?>" data-msg-id="<?php print (int) $msg->id; ?>" data-msg-mine="<?php print $isMine ? '1' : '0'; ?>">
+                            <?php print $avatarHtml($msg->fk_user_author, $msg->firstname, $msg->lastname, $msg->login, $msg->photo); ?>
+                            <div class="tac-thread__bubble">
+                                <div class="tac-thread__meta">
+                                    <?php if ($authorUrl !== '') : ?>
+                                        <a class="tac-thread__author" href="<?php print dol_escape_htmltag($authorUrl); ?>"><?php print dol_escape_htmltag($authorName); ?></a>
+                                    <?php else : ?>
+                                        <span class="tac-thread__author"><?php print dol_escape_htmltag($authorName); ?></span>
+                                    <?php endif; ?>
+                                    <span class="tac-thread__date" title="<?php print dol_escape_htmltag($absoluteDt); ?>">
+                                        <?php print dol_escape_htmltag($relativeDt); ?>
+                                    </span>
+                                    <?php if ($isOriginal) : ?><span class="tac-thread__tag tac-thread__tag--original"><i class="fas fa-flag"></i> <?php print $langs->trans('OriginalMessage'); ?></span><?php endif; ?>
+                                    <?php if ($isPrivate) : ?><span class="tac-thread__tag tac-thread__tag--private"><i class="fas fa-lock"></i> <?php print $langs->trans('Private'); ?></span><?php endif; ?>
+                                    <?php if ($sentByMail) : ?><span class="tac-thread__tag tac-thread__tag--mail"><i class="fas fa-envelope"></i> <?php print $langs->trans('SentByMail'); ?></span><?php endif; ?>
+                                </div>
+                                <?php if (!empty($msg->label)) : ?><div class="tac-thread__subject"><?php print dol_escape_htmltag($msg->label); ?></div><?php endif; ?>
+                                <div class="tac-thread__body" data-msg-body><?php print $bodyHtml; ?></div>
+                                <?php if ($fileCount > 0) : ?>
+                                    <a class="tac-thread__attachments" href="<?php print DOL_URL_ROOT; ?>/comm/action/document.php?id=<?php print (int) $msg->id; ?>" target="_blank" rel="noopener">
+                                        <i class="fas fa-paperclip"></i> <?php print sprintf($langs->trans('NAttachedFiles'), (int) $fileCount); ?>
+                                    </a>
+                                <?php endif; ?>
+                                <div class="tac-thread__actions">
+                                    <button type="button" class="tac-thread__action" data-msg-quote title="<?php print dol_escape_htmltag($langs->trans('Quote')); ?>"><i class="fas fa-quote-right"></i></button>
+                                    <?php if ($isMine) : ?>
+                                        <button type="button" class="tac-thread__action" data-msg-edit title="<?php print dol_escape_htmltag($langs->trans('Edit')); ?>"><i class="fas fa-pen"></i></button>
+                                        <button type="button" class="tac-thread__action tac-thread__action--danger" data-msg-delete title="<?php print dol_escape_htmltag($langs->trans('Delete')); ?>"><i class="fas fa-trash"></i></button>
+                                    <?php endif; ?>
+                                </div>
+                            </div>
+                        </li>
+                    <?php endforeach; ?>
+                    <?php if (empty($threadMessages)) : ?>
+                        <li class="tac-thread__empty">
+                            <i class="fas fa-comments tac-thread__empty-icon"></i>
+                            <div class="tac-thread__empty-title"><?php print $langs->trans('NoMessageYet'); ?></div>
+                            <div class="tac-thread__empty-hint opacitymedium"><?php print $langs->trans('BeFirstToReply'); ?></div>
+                        </li>
+                    <?php endif; ?>
+                </ul>
+
+                <!-- Reply form (sticky to bottom of section while scrolling). -->
+                <form class="tac-thread__reply" data-thread-reply
+                    data-lang-save="<?php print dol_escape_htmltag($langs->transnoentities('Save')); ?>"
+                    data-lang-send="<?php print dol_escape_htmltag($langs->transnoentities('Send')); ?>"
+                    data-lang-confirm-delete="<?php print dol_escape_htmltag($langs->transnoentities('ConfirmDeleteMessage')); ?>">
+                    <input type="text" class="tac-thread__reply-subject" name="subject" placeholder="<?php print dol_escape_htmltag($langs->trans('Subject')); ?>">
+                    <?php
+                    $replyId = 'tac-thread-reply-' . (int) $object->id;
+                    ?>
+                    <textarea id="<?php print $replyId; ?>" class="tac-thread__reply-body" name="body" rows="3" placeholder="<?php print dol_escape_htmltag($langs->trans('TypeYourReply')); ?>"></textarea>
+                    <div class="tac-thread__reply-actions">
+                        <label class="tac-thread__reply-toggle">
+                            <input type="checkbox" name="private"> <i class="fas fa-lock"></i> <?php print $langs->trans('PrivateMessage'); ?>
+                        </label>
+                        <label class="tac-thread__reply-toggle">
+                            <input type="checkbox" name="by_email"> <i class="fas fa-envelope"></i> <?php print $langs->trans('ReplyByEmail'); ?>
+                        </label>
+                        <span class="tac-thread__reply-hint opacitymedium"><kbd>Ctrl</kbd>+<kbd>Enter</kbd></span>
+                        <button type="button" class="tac-thread__reply-send" data-thread-send>
+                            <i class="fas fa-paper-plane"></i> <?php print $langs->trans('Send'); ?>
+                        </button>
+                    </div>
+                </form>
             </section>
 
             <!-- Section: Classification (tags) — 1-click add/remove. -->
@@ -845,9 +1130,13 @@ $renderField = function (string $field, string $type, string $label, $value, str
                 <?php else : ?>
                     <div class="tac-files-list__empty">—</div>
                 <?php endif; ?>
-                <a class="tac-section__edit-link" href="<?php print DOL_URL_ROOT . '/ticket/document.php?id=' . (int) $object->id; ?>">
-                    <i class="fas fa-upload"></i> <?php print $langs->trans('Upload'); ?>
-                </a>
+                <div class="tac-files-actions">
+                    <button type="button" class="tac-section__edit-link" data-pick-file>
+                        <i class="fas fa-upload"></i> <?php print $langs->trans('UploadFile'); ?>
+                    </button>
+                    <span class="opacitymedium tac-files-actions__hint"><?php print $langs->trans('OrDropAnywhere'); ?></span>
+                    <input type="file" id="tac-file-input" multiple style="display:none">
+                </div>
             </section>
 
             <!-- Section: Recent events (read-only, last 10) -->

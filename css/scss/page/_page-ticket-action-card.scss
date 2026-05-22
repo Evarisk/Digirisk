@@ -19,6 +19,35 @@ $tac-border:       #e5e7eb;
 .ticket-action-picker {
     margin: 1em 0;
 
+    &-toolbar {
+        display: flex;
+        gap: 8px;
+        margin-bottom: 10px;
+
+        &__btn {
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+            padding: 6px 12px;
+            border: 1px solid $tac-border;
+            border-radius: 999px;
+            color: $tac-grey;
+            text-decoration: none;
+            font-size: 0.9em;
+            transition: background 0.15s ease, color 0.15s ease, border-color 0.15s ease;
+
+            &:hover { background: rgba(13,138,255,0.06); color: $tac-blue; border-color: $tac-blue; }
+
+            &.is-active {
+                background: $tac-blue;
+                color: #fff;
+                border-color: $tac-blue;
+            }
+
+            i { font-size: 0.95em; }
+        }
+    }
+
     &-grid {
         display: grid;
         grid-template-columns: repeat(auto-fill, minmax(260px, 1fr));
@@ -27,6 +56,7 @@ $tac-border:       #e5e7eb;
     }
 
     &-item {
+        position: relative;
         display: block;
         padding: 14px 16px;
         background: #fff;
@@ -46,6 +76,19 @@ $tac-border:       #e5e7eb;
         &__ref       { font-weight: 700; color: $tac-blue; font-size: 1.05em; }
         &__subject   { margin-top: 4px; color: #1f2937; line-height: 1.35; }
         &__status    { margin-top: 8px; }
+
+        &__star {
+            position: absolute;
+            top: 10px;
+            right: 12px;
+            color: $tac-orange;
+            font-size: 0.92em;
+        }
+
+        &--watched {
+            border-color: rgba(233,173,79,0.5);
+            background: linear-gradient(135deg, rgba(233,173,79,0.04) 0%, #fff 60%);
+        }
     }
 }
 
@@ -57,8 +100,33 @@ $tac-border:       #e5e7eb;
     margin: 1em auto 6em auto; // bottom margin for the sticky bar
     background: #fff;
     border-radius: 12px;
+    border-left: 6px solid $tac-border;
     box-shadow: $tile-shadow;
     overflow: hidden;
+    transition: border-color 0.2s ease;
+
+    // Severity tint on the left rail + ref colour, so urgency is also visible from the title.
+    &.tac-severity-low      { border-left-color: #6b7280; }
+    &.tac-severity-normal   { border-left-color: $tac-blue; }
+    &.tac-severity-high     {
+        border-left-color: $tac-orange;
+        .tac-hero__ref { color: $tac-orange; }
+    }
+    &.tac-severity-blocking {
+        border-left-color: $tac-red;
+        box-shadow: 0 2px 6px rgba(224,83,83,0.18);
+        .tac-hero__ref { color: $tac-red; }
+    }
+}
+
+// Severity chip in the hero (HIGH / BLOCKING only).
+.tac-chip--severity {
+    font-weight: 600;
+    letter-spacing: 0.04em;
+    border-style: solid;
+
+    &-orange { color: $tac-orange; border-color: $tac-orange; background: rgba(233,173,79,0.10); }
+    &-red    { color: $tac-red;    border-color: $tac-red;    background: rgba(224,83,83,0.10); }
 }
 
 // ----- Hero -----
@@ -120,6 +188,138 @@ $tac-border:       #e5e7eb;
 
         &:hover { background: rgba(13,138,255,0.08); color: $tac-blue; }
     }
+}
+
+// ----- Watch / bookmark button (star icon in the hero) -----
+.tac-hero__watch {
+    appearance: none;
+    background: transparent;
+    border: 1px solid $tac-border;
+    border-radius: 6px;
+    padding: 4px 10px;
+    cursor: pointer;
+    color: $tac-grey;
+    font-family: inherit;
+    font-size: 0.95em;
+    transition: color 0.15s ease, background 0.15s ease, border-color 0.15s ease;
+
+    &:hover { color: $tac-orange; border-color: $tac-orange; background: rgba(233,173,79,0.08); }
+
+    &.is-watched {
+        color: $tac-orange;
+        border-color: $tac-orange;
+        background: rgba(233,173,79,0.08);
+    }
+}
+
+// ----- Upload progress bar + actions row -----
+.tac-upload-bar {
+    margin-top: 6px;
+    height: 6px;
+    background: rgba(13,138,255,0.1);
+    border-radius: 3px;
+    overflow: hidden;
+
+    &__fill {
+        display: block;
+        height: 100%;
+        background: $tac-blue;
+        transition: width 0.2s ease;
+    }
+}
+.tac-upload-label { font-size: 0.92em; }
+
+.tac-files-actions {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    margin-top: 8px;
+
+    &__hint {
+        font-size: 0.8em;
+    }
+
+    button[data-pick-file] {
+        appearance: none;
+        background: transparent;
+        border: 1px dashed $tac-border;
+        border-radius: 6px;
+        padding: 4px 12px;
+        cursor: pointer;
+        color: $tac-blue;
+        font-family: inherit;
+        font-size: 0.88em;
+
+        &:hover { background: rgba(13,138,255,0.06); border-color: $tac-blue; }
+    }
+}
+
+// ----- Drag & drop overlay -----
+.tac-card.tac-dragover {
+    position: relative;
+
+    &::after {
+        content: 'Déposez ici pour joindre au ticket';
+        position: absolute;
+        inset: 0;
+        background: rgba(13,138,255,0.12);
+        border: 3px dashed $tac-blue;
+        border-radius: 12px;
+        z-index: 500;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        color: $tac-blue;
+        font-weight: 600;
+        font-size: 1.2em;
+        pointer-events: none;
+    }
+}
+
+// ----- Status timeline as horizontal pills with delta connectors -----
+// No absolute positioning. Pills wrap naturally if the container is narrow.
+.tac-timeline {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    gap: 6px 8px;
+    margin: 8px 0 12px;
+    font-size: 0.78em;
+
+    &__step {
+        display: inline-flex;
+        align-items: center;
+        padding: 3px 10px;
+        border-radius: 999px;
+        background: rgba(13,138,255,0.08);
+        color: $tac-blue;
+        white-space: nowrap;
+        cursor: help;
+
+        &--current {
+            background: rgba(233,173,79,0.16);
+            color: darken($tac-orange, 12%);
+            font-weight: 600;
+            box-shadow: 0 0 0 2px rgba(233,173,79,0.18);
+            animation: tac-timeline-pulse 1.6s ease-in-out infinite;
+        }
+    }
+
+    &__delta {
+        display: inline-flex;
+        align-items: center;
+        gap: 3px;
+        color: $tac-grey;
+        font-style: italic;
+        font-size: 0.92em;
+
+        i { font-size: 0.95em; }
+    }
+}
+
+@keyframes tac-timeline-pulse {
+    0%, 100% { box-shadow: 0 0 0 2px rgba(233,173,79,0.18); }
+    50%      { box-shadow: 0 0 0 4px rgba(233,173,79,0.06); }
 }
 
 // ----- Chips (status / assignee / progress / dates) -----
@@ -460,20 +660,24 @@ $tac-border:       #e5e7eb;
 // Default styles target "cozy" (matches the original look), with overrides for compact + spacious.
 // ---------------------------------------------------------------------------
 .tac-density-compact {
-    .tac-body         { gap: 8px 10px; padding: 12px 16px; }
-    .tac-section      { padding: 8px 10px; border-radius: 8px; }
-    .tac-section__title { font-size: 0.72em; margin-bottom: 6px; }
-    .tac-grid         { gap: 4px 8px; }
-    .tac-field        { padding: 3px 6px; min-height: 36px; }
-    .tac-field__label { font-size: 0.68em; }
-    .tac-field__value { font-size: 0.88em; line-height: 1.25; }
-    .tac-hero         { padding: 10px 18px 0; }
-    .tac-hero__ref    { font-size: 1.25em; }
-    .tac-hero__subject{ font-size: 1em; }
-    .tac-chip         { padding: 3px 8px; font-size: 0.85em; }
-    .tac-list__item   { padding: 3px 0; }
-    .tac-rich-text    { padding: 6px 8px; min-height: 40px; max-height: 140px; }
-    .tac-tag          { padding: 2px 8px; font-size: 0.8em; }
+    .tac-body         { gap: 6px 8px; padding: 8px 12px; }
+    .tac-section      { padding: 6px 8px; border-radius: 8px; }
+    .tac-section__title { font-size: 0.7em; margin-bottom: 4px; }
+    .tac-grid         { gap: 2px 8px; }
+    .tac-field        { padding: 2px 6px; min-height: 0; }
+    .tac-field__label { font-size: 0.66em; margin-bottom: 0; }
+    .tac-field__value { font-size: 0.86em; line-height: 1.2; min-height: 0; }
+    .tac-hero         { padding: 8px 16px 0; }
+    .tac-hero__ref    { font-size: 1.2em; }
+    .tac-hero__subject{ font-size: 0.95em; }
+    .tac-chip         { padding: 2px 8px; font-size: 0.82em; }
+    .tac-list__item   { padding: 2px 0; }
+    .tac-list--events .tac-list__item { padding: 3px 0; }
+    .tac-rich-text    { padding: 5px 8px; min-height: 32px; max-height: 120px; }
+    .tac-tag          { padding: 2px 8px; font-size: 0.78em; }
+    .tac-thread       { gap: 8px; max-height: 420px; }
+    .tac-thread__bubble { padding: 6px 10px; }
+    .tac-thread__reply  { padding: 6px; }
 }
 
 .tac-density-spacious {
@@ -560,8 +764,58 @@ $tac-border:       #e5e7eb;
     outline: none;
     box-shadow: 0 0 0 3px rgba(13,138,255,0.15);
 }
+
 .tac-edit-input--narrow { max-width: 100px; }
 .tac-edit-textarea     { min-height: 80px; resize: vertical; }
+
+// ----- Searchable combo (custom, replaces Select2 for long lists) -----
+.tac-combo__input {
+    background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='14' height='14' viewBox='0 0 24 24' fill='none' stroke='%236b7280' stroke-width='2.5'%3E%3Ccircle cx='11' cy='11' r='7'/%3E%3Cline x1='21' y1='21' x2='16.65' y2='16.65'/%3E%3C/svg%3E");
+    background-repeat: no-repeat;
+    background-position: right 8px center;
+    padding-right: 28px;
+}
+
+// The list is appended to <body> and positioned with position:fixed via JS, so it
+// escapes the card's overflow:hidden. Keep it above everything on the page.
+.tac-combo__list {
+    list-style: none;
+    margin: 0;
+    padding: 4px;
+    background: #fff;
+    border: 1px solid $tac-border;
+    border-radius: 8px;
+    box-shadow: 0 6px 20px rgba(0, 0, 0, 0.16);
+    max-height: 260px;
+    overflow-y: auto;
+    min-width: 220px;
+    z-index: 100000;
+
+    .tac-combo__opt {
+        padding: 7px 10px;
+        border-radius: 5px;
+        cursor: pointer;
+        font-size: 0.92em;
+        color: #1f2937;
+        white-space: nowrap;
+        overflow: hidden;
+        text-overflow: ellipsis;
+
+        &:hover,
+        &.is-active { background: rgba(13, 138, 255, 0.1); }
+        &.is-current {
+            font-weight: 600;
+            color: $tac-blue;
+        }
+    }
+
+    .tac-combo__empty {
+        padding: 8px 10px;
+        color: $tac-grey;
+        font-style: italic;
+        font-size: 0.9em;
+    }
+}
 
 // Floating Save/Cancel pair shown under a CKEditor longtext field.
 .tac-edit-actions {
@@ -1108,6 +1362,301 @@ $tac-border:       #e5e7eb;
 .tac-file-card .fa-file-excel{ color: #22a06b; }
 .tac-file-card .fa-file-powerpoint { color: #d35968; }
 .tac-file-card .fa-file-archive { color: #b46a2e; }
+
+// ----- Messages thread (SMS-style bubbles + sticky reply form) -----
+.tac-thread {
+    list-style: none;
+    margin: 0 0 12px;
+    padding: 0;
+    display: flex;
+    flex-direction: column;
+    gap: 14px;
+    max-height: 560px;
+    overflow-y: auto;
+    scroll-behavior: smooth;
+    padding-right: 4px;
+
+    // SMS metaphor: others on the left, mine on the right.
+    &__msg {
+        display: flex;
+        align-items: flex-start;
+        gap: 10px;
+        max-width: 88%;
+        position: relative;
+
+        // Hovering reveals the per-bubble action buttons.
+        &:hover .tac-thread__actions { opacity: 1; pointer-events: auto; }
+
+        &--mine {
+            margin-left: auto;
+            flex-direction: row-reverse;
+
+            .tac-thread__bubble {
+                background: rgba(13,138,255,0.08);
+                border-color: rgba(13,138,255,0.25);
+            }
+            .tac-thread__meta { justify-content: flex-end; }
+        }
+
+        &--private .tac-thread__bubble {
+            background: rgba(233,173,79,0.08);
+            border-color: rgba(233,173,79,0.4);
+        }
+
+        // First message — pinned-looking marker on the left edge.
+        &--original .tac-thread__bubble {
+            border-left: 3px solid $tac-blue;
+        }
+    }
+
+    &__avatar {
+        flex: 0 0 auto;
+        width: 34px;
+        height: 34px;
+        border-radius: 50%;
+        background: $tac-blue;
+        color: #fff;
+        font-weight: 700;
+        font-size: 0.95em;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        overflow: hidden;
+
+        &--img {
+            object-fit: cover;
+        }
+    }
+
+    &__bubble {
+        flex: 1 1 auto;
+        min-width: 0;
+        background: #fff;
+        border: 1px solid $tac-border;
+        border-radius: 12px;
+        padding: 8px 12px;
+        position: relative;
+    }
+
+    &__meta {
+        display: flex;
+        align-items: center;
+        gap: 8px;
+        font-size: 0.78em;
+        color: $tac-grey;
+        flex-wrap: wrap;
+    }
+
+    &__author {
+        color: #1f2937;
+        font-weight: 600;
+        text-decoration: none;
+
+        &:hover { color: $tac-blue; text-decoration: underline; }
+    }
+    &__date { font-size: 0.95em; }
+
+    &__tag {
+        display: inline-flex;
+        align-items: center;
+        gap: 3px;
+        padding: 1px 6px;
+        border-radius: 999px;
+        font-size: 0.9em;
+        background: rgba(13,138,255,0.1);
+        color: $tac-blue;
+
+        &--private  { background: rgba(233,173,79,0.18); color: darken($tac-orange, 14%); }
+        &--mail     { background: rgba(122,92,240,0.14); color: $tac-purple; }
+        &--original { background: rgba(13,138,255,0.14); color: $tac-blue; }
+    }
+
+    &__subject { margin-top: 4px; font-weight: 600; color: #1f2937; font-size: 0.92em; }
+    &__body {
+        margin-top: 4px;
+        line-height: 1.45;
+        word-break: break-word;
+
+        a { color: $tac-blue; text-decoration: underline; }
+        p { margin: 0 0 4px; &:last-child { margin-bottom: 0; } }
+        blockquote {
+            margin: 4px 0 6px;
+            padding: 6px 10px;
+            border-left: 3px solid rgba(31, 41, 55, 0.25);
+            background: rgba(0, 0, 0, 0.04);
+            color: #4b5563;
+            font-size: 0.92em;
+            border-radius: 0 4px 4px 0;
+
+            strong { color: #1f2937; }
+            p { margin: 2px 0; }
+            br + p, p:first-child { margin-top: 0; }
+        }
+    }
+    // Inside mine bubbles (blue tint), shift the quote tint so it still reads.
+    &__msg--mine &__body blockquote {
+        background: rgba(13, 138, 255, 0.08);
+        border-left-color: rgba(13, 138, 255, 0.45);
+    }
+
+    &__attachments {
+        display: inline-flex;
+        align-items: center;
+        gap: 4px;
+        margin-top: 4px;
+        font-size: 0.82em;
+        color: $tac-blue;
+        text-decoration: none;
+
+        &:hover { text-decoration: underline; }
+    }
+
+    // Hover-only floating action bar.
+    &__actions {
+        position: absolute;
+        top: -10px;
+        right: 8px;
+        display: flex;
+        gap: 4px;
+        background: #fff;
+        border: 1px solid $tac-border;
+        border-radius: 999px;
+        padding: 2px 4px;
+        box-shadow: 0 2px 6px rgba(0,0,0,0.08);
+        opacity: 0;
+        pointer-events: none;
+        transition: opacity 0.15s ease;
+    }
+    &__msg--mine &__actions { right: auto; left: 8px; }
+
+    &__action {
+        appearance: none;
+        background: transparent;
+        border: none;
+        color: $tac-grey;
+        cursor: pointer;
+        padding: 4px 6px;
+        border-radius: 50%;
+        font-size: 0.82em;
+
+        &:hover { background: rgba(13,138,255,0.1); color: $tac-blue; }
+        &--danger:hover { background: rgba(224,83,83,0.1); color: $tac-red; }
+    }
+
+    // Empty state — XXL icon centered.
+    &__empty {
+        text-align: center;
+        padding: 32px 12px;
+        color: $tac-grey;
+
+        &-icon {
+            font-size: 3em;
+            color: rgba(13,138,255,0.25);
+            margin-bottom: 8px;
+        }
+        &-title {
+            font-weight: 600;
+            color: #1f2937;
+            margin-bottom: 4px;
+        }
+        &-hint { font-size: 0.9em; }
+    }
+
+    // Sticky reply form — pinned to the bottom of the section while scrolling.
+    &__reply {
+        position: sticky;
+        bottom: 0;
+        margin-top: 8px;
+        padding: 8px;
+        display: flex;
+        flex-direction: column;
+        gap: 6px;
+        background: #fff;
+        border: 1px solid $tac-border;
+        border-radius: 10px;
+        box-shadow: 0 -4px 12px rgba(0,0,0,0.04);
+        z-index: 2;
+
+        &--editing {
+            border-color: $tac-orange;
+            box-shadow: 0 -4px 12px rgba(233,173,79,0.15);
+        }
+    }
+
+    &__reply-subject {
+        width: 100%;
+        padding: 6px 10px;
+        border: 1px solid $tac-border;
+        border-radius: 6px;
+        font-family: inherit;
+        font-size: 0.9em;
+
+        &:focus { outline: none; border-color: $tac-blue; box-shadow: 0 0 0 3px rgba(13,138,255,0.15); }
+    }
+    &__reply-body {
+        width: 100%;
+        min-height: 80px;
+        padding: 6px 10px;
+        border: 1px solid $tac-border;
+        border-radius: 6px;
+        font-family: inherit;
+        font-size: 0.92em;
+        resize: vertical;
+
+        &:focus { outline: none; border-color: $tac-blue; box-shadow: 0 0 0 3px rgba(13,138,255,0.15); }
+    }
+
+    &__reply-actions {
+        display: flex;
+        align-items: center;
+        justify-content: flex-end;
+        gap: 12px;
+        flex-wrap: wrap;
+    }
+
+    &__reply-toggle {
+        display: inline-flex;
+        align-items: center;
+        gap: 6px;
+        font-size: 0.85em;
+        color: $tac-grey;
+        cursor: pointer;
+        margin-right: auto;
+    }
+
+    &__reply-hint {
+        font-size: 0.78em;
+        color: $tac-grey;
+
+        kbd {
+            display: inline-block;
+            padding: 1px 5px;
+            font-size: 0.85em;
+            background: rgba(0,0,0,0.05);
+            border: 1px solid $tac-border;
+            border-radius: 4px;
+            font-family: inherit;
+        }
+    }
+
+    &__reply-send {
+        appearance: none;
+        background: $tac-blue;
+        color: #fff;
+        border: none;
+        padding: 6px 16px;
+        border-radius: 6px;
+        font-family: inherit;
+        font-size: 0.95em;
+        cursor: pointer;
+        display: inline-flex;
+        align-items: center;
+        gap: 6px;
+
+        &:hover { background: darken($tac-blue, 5%); }
+        &[disabled] { opacity: 0.5; cursor: not-allowed; }
+    }
+}
 
 // ----- Event list (timeline) -----
 .tac-list--events .tac-list__item {

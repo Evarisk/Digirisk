@@ -51,6 +51,24 @@ function respond(bool $success, string $message, array $extra = []): void
     exit;
 }
 
+/**
+ * Sanitize and render a thread message body, keeping <blockquote> intact
+ * (dolPrintHTML's "common" whitelist drops it, breaking quote-replies).
+ */
+function renderThreadBody(string $raw): string
+{
+    $stringWithEntities = dol_htmlentitiesbr($raw);
+    $clean              = dol_htmlwithnojs(dol_string_onlythesehtmltags($stringWithEntities, 1, 1, 1));
+    return dol_escape_htmltag(
+        $clean,
+        1,
+        1,
+        'html,body,a,b,em,hr,i,u,ul,ol,li,br,div,img,font,p,span,strong,table,tr,td,th,tbody,h1,h2,h3,h4,h5,h6,header,footer,nav,section,menu,menuitem,blockquote,pre,code,kbd',
+        0,
+        1
+    );
+}
+
 global $conf, $db, $langs, $user;
 
 $langs->loadLangs(['digiriskdolibarr@digiriskdolibarr', 'ticket']);
@@ -85,6 +103,10 @@ $buildPayload = static function (Ticket $tkt) use ($db, $langs): array {
         $assignedUser->fetch((int) $tkt->fk_user_assign);
         $assignedLabel = $assignedUser->getFullName($langs);
     }
+    $severityKey = strtolower(preg_replace('/[^a-z0-9_-]/i', '', (string) ($tkt->severity_code ?? '')));
+    if (!in_array($severityKey, ['low', 'normal', 'high', 'blocking'], true)) {
+        $severityKey = 'default';
+    }
     return [
         'ticket' => [
             'id'            => (int) $tkt->id,
@@ -92,6 +114,7 @@ $buildPayload = static function (Ticket $tkt) use ($db, $langs): array {
             'status_html'   => $tkt->getLibStatut(2),
             'assigned_id'   => (int) $tkt->fk_user_assign,
             'assigned_name' => $assignedLabel,
+            'severity_key'  => $severityKey,
         ],
     ];
 };
@@ -99,6 +122,46 @@ $buildPayload = static function (Ticket $tkt) use ($db, $langs): array {
 $res = 0;
 
 switch ($action) {
+    /*
+     * search_options — server-side search for combos backed by large tables
+     * (thirdparties, projects) that are too big to embed in the page. Returns
+     * up to 50 matching {id, label} rows for the given source + term.
+     */
+    case 'search_options':
+        $source = GETPOST('source', 'aZ09');
+        $term   = trim((string) GETPOST('term', 'alphanohtml'));
+        $like   = '%' . $db->escape($term) . '%';
+        $results = [];
+        if ($source === 'societe') {
+            $sql = 'SELECT rowid, nom FROM ' . MAIN_DB_PREFIX . 'societe'
+                . " WHERE status = 1 AND entity IN (" . getEntity('societe') . ')'
+                . ($term !== '' ? " AND nom LIKE '" . $like . "'" : '')
+                . ' ORDER BY nom LIMIT 50';
+            $r = $db->query($sql);
+            if ($r) {
+                while ($row = $db->fetch_object($r)) {
+                    $results[] = ['id' => (int) $row->rowid, 'label' => $row->nom];
+                }
+            }
+        } elseif ($source === 'project') {
+            $sql = 'SELECT rowid, ref, title FROM ' . MAIN_DB_PREFIX . 'projet'
+                . " WHERE fk_statut > 0 AND entity IN (" . getEntity('project') . ')'
+                . ($term !== '' ? " AND (ref LIKE '" . $like . "' OR title LIKE '" . $like . "')" : '')
+                . ' ORDER BY ref LIMIT 50';
+            $r = $db->query($sql);
+            if ($r) {
+                while ($row = $db->fetch_object($r)) {
+                    $label = trim(((string) $row->ref !== '' ? $row->ref . ' — ' : '') . ((string) ($row->title ?? '')));
+                    $results[] = ['id' => (int) $row->rowid, 'label' => ($label !== '' ? $label : '#' . (int) $row->rowid)];
+                }
+            }
+        } else {
+            respond(false, $langs->transnoentities('ErrorBadParameters'));
+        }
+        // Always offer the "none" option at the top so users can clear the value.
+        array_unshift($results, ['id' => 0, 'label' => '— ' . $langs->transnoentities('NoneSelected') . ' —']);
+        respond(true, '', ['results' => $results]);
+
     case 'mark_read':
         $res = $object->markAsRead($user);
         if ($res > 0) {
@@ -151,6 +214,247 @@ switch ($action) {
             respond(true, $langs->transnoentities('TicketActionAssignedSelfDone'), $buildPayload($object));
         }
         respond(false, $object->error ?: $langs->transnoentities('Error'));
+
+    /*
+     * post_message — append a new TICKET_MSG ActionComm to the ticket. Lightweight
+     * wrapper over Ticket::createTicketMessage(). Returns the freshly-built bubble
+     * HTML so the JS can append it to the thread without a reload.
+     */
+    case 'post_message':
+        $subject = trim((string) GETPOST('subject', 'alphanohtml'));
+        $body    = trim((string) GETPOST('body', 'restricthtml'));
+        $private = (int) GETPOST('private', 'int');
+        $byEmail = (int) GETPOST('by_email', 'int');
+        if ($body === '') {
+            respond(false, $langs->transnoentities('ErrorBadParameters'));
+        }
+        // Hand to the existing Dolibarr method so triggers fire normally.
+        $object->subject = $subject ?: ($object->subject ?? '');
+        $object->message = $body;
+        $object->private = $private;
+        $newId = $object->createTicketMessage($user, 0, [], [], [], (bool) $byEmail);
+        if (!$newId || $newId <= 0) {
+            respond(false, $object->error ?: $langs->transnoentities('Error'));
+        }
+        // Actually fire the email if the user requested it. createTicketMessage with
+        // $send_email=true only flags the actioncomm code as _SENTBYMAIL, it does
+        // not send anything. Mirror what htdocs/ticket/card.php does on add_message.
+        $mailNotice = '';
+        if ($byEmail && !getDolGlobalString('TICKET_DISABLE_ALL_MAILS')) {
+            global $mysoc;
+            $object->fetch_thirdparty($object->fk_soc);
+
+            // Build the recipient list: internal contacts always; external + thirdparty
+            // email only when the message is not flagged private.
+            $sendto       = [];
+            $internalList = $object->getInfosTicketInternalContact(1);
+            if (is_array($internalList)) {
+                foreach ($internalList as $info) {
+                    $email = (string) ($info['email'] ?? '');
+                    if ($email !== '' && (int) ($info['id'] ?? 0) !== (int) $user->id) {
+                        $sendto[$email] = trim(((string) ($info['firstname'] ?? '')) . ' ' . ((string) ($info['lastname'] ?? ''))) . ' <' . $email . '>';
+                    }
+                }
+            }
+            if (!$private) {
+                $externalList = $object->getInfosTicketExternalContact(1);
+                if (is_array($externalList)) {
+                    foreach ($externalList as $info) {
+                        $email = (string) ($info['email'] ?? '');
+                        if ($email !== '' && !isset($sendto[$email])) {
+                            $sendto[$email] = trim(((string) ($info['firstname'] ?? '')) . ' ' . ((string) ($info['lastname'] ?? ''))) . ' <' . $email . '>';
+                        }
+                    }
+                }
+                // Fallback: thirdparty's own email when no external contact is linked.
+                if (empty($externalList) && !empty($object->thirdparty->email)) {
+                    $em = $object->thirdparty->email;
+                    if (!isset($sendto[$em])) {
+                        $sendto[$em] = $object->thirdparty->name . ' <' . $em . '>';
+                    }
+                }
+            }
+
+            if (!empty($sendto)) {
+                $appli       = getDolGlobalString('MAIN_APPLICATION_TITLE', !empty($mysoc->name) ? $mysoc->name : 'Dolibarr');
+                $mailSubject = $subject !== '' ? $subject : '[' . $appli . ' - ' . $langs->transnoentities('Ticket') . ' #' . $object->track_id . '] ' . $langs->transnoentities('TicketNewMessage');
+                $intro       = getDolGlobalString('TICKET_MESSAGE_MAIL_INTRO', $langs->transnoentities('TicketMessageMailIntroText'));
+                $signature   = getDolGlobalString('TICKET_MESSAGE_MAIL_SIGNATURE');
+                $url         = dol_buildpath('/ticket/card.php', 2) . '?track_id=' . $object->track_id;
+                $mailBody    = $intro . '<br><br>' . $body . '<br><br>'
+                    . '==============================================<br>'
+                    . $langs->transnoentities('TicketNotificationEmailBodyInfosTrackUrlinternal') . ' : <a href="' . $url . '">' . $object->track_id . '</a>';
+                if (!empty($signature)) {
+                    $mailBody .= '<br><br>' . $signature;
+                }
+                $from    = getDolGlobalString('TICKET_NOTIFICATION_EMAIL_FROM');
+                $replyto = getDolGlobalString('TICKET_NOTIFICATION_EMAIL_REPLYTO');
+                $nRecipients = count($sendto);
+                $ok          = $object->sendTicketMessageByEmail($mailSubject, $mailBody, 0, $sendto, [], [], [], [], $from, $replyto);
+                // transnoentities() runs its own sprintf with empty defaults, which would
+                // turn our %d into 0 if we wrapped it ourselves. Pass the count as $param1
+                // so the internal sprintf substitutes it correctly.
+                $mailNotice  = $ok
+                    ? ' — ' . $langs->transnoentities('MailSentToNRecipients', (string) $nRecipients)
+                    : ' — ' . $langs->transnoentities('MailNotSent');
+            } else {
+                $mailNotice = ' — ' . $langs->transnoentities('NoRecipientFound');
+            }
+        }
+        // Build the bubble HTML — mirrors the TPL renderer (SMS layout, avatar, action buttons).
+        $authorName = $user->getFullName($langs) ?: ($user->login ?: $langs->transnoentities('Unknown'));
+        $initials   = strtoupper(substr((string) ($user->firstname ?: $user->lastname ?: $user->login ?: '?'), 0, 1));
+        if (!empty($user->photo) && (int) $user->id > 0 && file_exists(DOL_DATA_ROOT . '/users/' . (int) $user->id . '/' . $user->photo)) {
+            $thumbUrl = DOL_URL_ROOT . '/viewimage.php?modulepart=userphoto&entity=' . (int) ($conf->entity ?? 1) . '&file=' . urlencode((int) $user->id . '/' . $user->photo) . '&cache=' . (int) $user->id;
+            $avatar   = '<img class="tac-thread__avatar tac-thread__avatar--img" src="' . dol_escape_htmltag($thumbUrl) . '" alt="' . dol_escape_htmltag($initials) . '">';
+        } else {
+            $avatar   = '<div class="tac-thread__avatar">' . dol_escape_htmltag($initials) . '</div>';
+        }
+        $cls        = 'tac-thread__msg tac-thread__msg--mine' . ($private ? ' tac-thread__msg--private' : '');
+        $authorUrl  = DOL_URL_ROOT . '/user/card.php?id=' . (int) $user->id;
+        $tagPrivate = $private ? '<span class="tac-thread__tag tac-thread__tag--private"><i class="fas fa-lock"></i> ' . dol_escape_htmltag($langs->transnoentities('Private')) . '</span>' : '';
+        $tagMail    = $byEmail ? '<span class="tac-thread__tag tac-thread__tag--mail"><i class="fas fa-envelope"></i> ' . dol_escape_htmltag($langs->transnoentities('SentByMail')) . '</span>' : '';
+        $subjectHtml = $subject !== '' ? '<div class="tac-thread__subject">' . dol_escape_htmltag($subject) . '</div>' : '';
+        $bodyLinkified = preg_replace_callback(
+            '#(?<!href=["\'])(https?://[^\s<>"\']+)#i',
+            static fn($m) => '<a href="' . dol_escape_htmltag($m[1]) . '" target="_blank" rel="noopener">' . dol_escape_htmltag($m[1]) . '</a>',
+            renderThreadBody($body)
+        );
+        $bubble = '<li class="' . $cls . '" data-msg-id="' . (int) $newId . '" data-msg-mine="1">'
+            . $avatar
+            . '<div class="tac-thread__bubble">'
+            . '<div class="tac-thread__meta">'
+            . '<a class="tac-thread__author" href="' . dol_escape_htmltag($authorUrl) . '">' . dol_escape_htmltag($authorName) . '</a>'
+            . '<span class="tac-thread__date">' . dol_escape_htmltag($langs->transnoentities('JustNow')) . '</span>'
+            . $tagPrivate . $tagMail
+            . '</div>'
+            . $subjectHtml
+            . '<div class="tac-thread__body" data-msg-body>' . $bodyLinkified . '</div>'
+            . '<div class="tac-thread__actions">'
+            . '<button type="button" class="tac-thread__action" data-msg-quote title="' . dol_escape_htmltag($langs->transnoentities('Quote')) . '"><i class="fas fa-quote-right"></i></button>'
+            . '<button type="button" class="tac-thread__action" data-msg-edit title="' . dol_escape_htmltag($langs->transnoentities('Edit')) . '"><i class="fas fa-pen"></i></button>'
+            . '<button type="button" class="tac-thread__action tac-thread__action--danger" data-msg-delete title="' . dol_escape_htmltag($langs->transnoentities('Delete')) . '"><i class="fas fa-trash"></i></button>'
+            . '</div>'
+            . '</div>'
+            . '</li>';
+        respond(true, $langs->transnoentities('MessagePosted') . $mailNotice, ['message_id' => (int) $newId, 'bubble' => $bubble]);
+
+    /*
+     * edit_message — update a TICKET_MSG ActionComm's body (and optionally subject).
+     * Only the message's author can edit their own posts.
+     */
+    case 'edit_message':
+        $msgId   = (int) GETPOST('message_id', 'int');
+        $body    = trim((string) GETPOST('body', 'restricthtml'));
+        $subject = trim((string) GETPOST('subject', 'alphanohtml'));
+        if ($msgId <= 0 || $body === '') {
+            respond(false, $langs->transnoentities('ErrorBadParameters'));
+        }
+        require_once DOL_DOCUMENT_ROOT . '/comm/action/class/actioncomm.class.php';
+        $ac = new ActionComm($db);
+        if ($ac->fetch($msgId) <= 0) {
+            respond(false, $langs->transnoentities('ErrorRecordNotFound'));
+        }
+        if ((int) $ac->elementid !== (int) $object->id || (int) $ac->authorid !== (int) $user->id) {
+            respond(false, $langs->transnoentities('NotAllowed'));
+        }
+        $ac->note_private = $body;
+        if ($subject !== '') {
+            $ac->label = $subject;
+        }
+        if ($ac->update($user) <= 0) {
+            respond(false, $ac->error ?: $langs->transnoentities('Error'));
+        }
+        $bodyLinkified = preg_replace_callback(
+            '#(?<!href=["\'])(https?://[^\s<>"\']+)#i',
+            static fn($m) => '<a href="' . dol_escape_htmltag($m[1]) . '" target="_blank" rel="noopener">' . dol_escape_htmltag($m[1]) . '</a>',
+            renderThreadBody($body)
+        );
+        respond(true, $langs->transnoentities('MessageEdited'), [
+            'message_id' => $msgId,
+            'body_html'  => $bodyLinkified,
+            'subject'    => $subject,
+        ]);
+
+    /*
+     * delete_message — remove a TICKET_MSG ActionComm. Only the original author may delete.
+     */
+    case 'delete_message':
+        $msgId = (int) GETPOST('message_id', 'int');
+        if ($msgId <= 0) {
+            respond(false, $langs->transnoentities('ErrorBadParameters'));
+        }
+        require_once DOL_DOCUMENT_ROOT . '/comm/action/class/actioncomm.class.php';
+        $ac = new ActionComm($db);
+        if ($ac->fetch($msgId) <= 0) {
+            respond(false, $langs->transnoentities('ErrorRecordNotFound'));
+        }
+        if ((int) $ac->elementid !== (int) $object->id || (int) $ac->authorid !== (int) $user->id) {
+            respond(false, $langs->transnoentities('NotAllowed'));
+        }
+        if ($ac->delete($user) <= 0) {
+            respond(false, $ac->error ?: $langs->transnoentities('Error'));
+        }
+        respond(true, $langs->transnoentities('MessageDeleted'), ['message_id' => $msgId]);
+
+    /*
+     * upload_file — receive a single file via FormData and drop it in the ticket's
+     * upload directory. Caller-side drag&drop sends one request per file.
+     * Sanitizes the filename + checks size against PHP's upload_max_filesize.
+     */
+    case 'upload_file':
+        require_once DOL_DOCUMENT_ROOT . '/core/lib/files.lib.php';
+        if (empty($_FILES['upload']) || !is_uploaded_file($_FILES['upload']['tmp_name'] ?? '')) {
+            respond(false, $langs->transnoentities('ErrorFileNotUploaded'));
+        }
+        if (!empty($_FILES['upload']['error'])) {
+            respond(false, $langs->transnoentities('Error') . ' (' . (int) $_FILES['upload']['error'] . ')');
+        }
+        $name = dol_sanitizeFileName((string) $_FILES['upload']['name']);
+        if ($name === '' || $name[0] === '.') {
+            respond(false, $langs->transnoentities('ErrorBadParameters'));
+        }
+        $uploadDir = $conf->ticket->multidir_output[$conf->entity ?? 1] . '/' . dol_sanitizeFileName($object->ref);
+        if (!is_dir($uploadDir)) {
+            dol_mkdir($uploadDir);
+        }
+        $target = $uploadDir . '/' . $name;
+        $moved  = dol_move_uploaded_file($_FILES['upload']['tmp_name'], $target, 1, 0, 0, 0, 'upload');
+        if ($moved <= 0) {
+            respond(false, $langs->transnoentities('ErrorFailedToWriteFile') . ' ' . $name);
+        }
+        respond(true, $langs->transnoentities('FileUploaded') . ': ' . $name, ['file_name' => $name]);
+
+    /*
+     * toggle_watch — bookmark/unbookmark this ticket for the current user.
+     * Persists in llx_user_param under the DIGIRISK_TICKET_WATCHLIST key as a CSV of ids.
+     */
+    case 'toggle_watch':
+        $sqlSel = 'SELECT value FROM ' . MAIN_DB_PREFIX . 'user_param'
+            . ' WHERE fk_user = ' . ((int) $user->id) . ' AND entity = ' . ((int) $conf->entity)
+            . " AND param = 'DIGIRISK_TICKET_WATCHLIST'";
+        $existing = '';
+        $rWatch = $db->query($sqlSel);
+        if ($rWatch && ($row = $db->fetch_object($rWatch))) {
+            $existing = (string) $row->value;
+        }
+        $ids = array_values(array_filter(array_map('intval', explode(',', $existing))));
+        $idsKey = array_search((int) $object->id, $ids, true);
+        $nowWatched = false;
+        if ($idsKey === false) {
+            $ids[] = (int) $object->id;
+            $nowWatched = true;
+        } else {
+            unset($ids[$idsKey]);
+            $ids = array_values($ids);
+        }
+        $newVal = implode(',', $ids);
+        $db->query('DELETE FROM ' . MAIN_DB_PREFIX . 'user_param'
+            . ' WHERE fk_user = ' . ((int) $user->id) . ' AND entity = ' . ((int) $conf->entity)
+            . " AND param = 'DIGIRISK_TICKET_WATCHLIST'");
+        $db->query('INSERT INTO ' . MAIN_DB_PREFIX . "user_param (fk_user, entity, param, value)"
+            . ' VALUES (' . ((int) $user->id) . ', ' . ((int) $conf->entity) . ", 'DIGIRISK_TICKET_WATCHLIST', '" . $db->escape($newVal) . "')");
+        respond(true, $langs->transnoentities($nowWatched ? 'TicketWatched' : 'TicketUnwatched'), ['watched' => $nowWatched]);
 
     /*
      * delete_file — remove a file attached to the ticket's upload directory.

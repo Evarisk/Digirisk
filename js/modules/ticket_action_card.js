@@ -17,6 +17,50 @@ window.digiriskdolibarr.ticketActionCard = {};
 window.digiriskdolibarr.ticketActionCard.init = function() {
     window.digiriskdolibarr.ticketActionCard.event();
     window.digiriskdolibarr.ticketActionCard.applyLayout();
+    window.digiriskdolibarr.ticketActionCard.initThreadReplyEditor();
+    // Drop the newest message into view on load — feels like opening a chat app.
+    setTimeout(function() { window.digiriskdolibarr.ticketActionCard.scrollThreadToBottom(); }, 200);
+};
+
+/**
+ * Boot CKEditor on the thread reply textarea once on page load. Keeps the editor
+ * persistent (no tap-to-edit swap) since the reply box is a permanent form.
+ *
+ * @return {void}
+ */
+window.digiriskdolibarr.ticketActionCard.initThreadReplyEditor = function() {
+    var $ta = $('.tac-thread__reply-body');
+    if (!$ta.length || !window.CKEDITOR) {
+        return;
+    }
+    var id = $ta.attr('id');
+    if (!id) {
+        return;
+    }
+    try {
+        var ed = window.CKEDITOR.replace(id, {
+            customConfig: window.ckeditorConfig || '',
+            removePlugins: 'elementspath,save,flash,div,anchor,specialchar,exportpdf,wsc,scayt',
+            versionCheck: false,
+            htmlEncodeOutput: false,
+            allowedContent: true,
+            toolbar: 'Basic',
+            height: 100,
+            width: '100%'
+        });
+        // Ctrl/Cmd+Enter inside the CKEditor iframe also fires Send.
+        // CKEditor encodes modifiers into the keystroke value: CTRL=0x110000, ENTER=13.
+        // Numpad Enter is keyCode 10 on some keyboards, so we accept both.
+        ed.on('key', function(ev) {
+            var CTRL = window.CKEDITOR.CTRL || 0x110000;
+            if (ev.data.keyCode === (CTRL + 13) || ev.data.keyCode === (CTRL + 10)) {
+                ev.cancel();
+                $('[data-thread-send]').first().trigger('click');
+            }
+        });
+    } catch (e) {
+        // Fallback: keep the plain textarea.
+    }
 };
 
 /**
@@ -224,6 +268,66 @@ window.digiriskdolibarr.ticketActionCard.event = function() {
     $(document).on('click',  '[data-tag-remove]',          window.digiriskdolibarr.ticketActionCard.onTagRemove);
     $(document).on('change', '[data-tag-add-select]',      window.digiriskdolibarr.ticketActionCard.onTagAddSelect);
 
+    // ---- Watch / bookmark toggle.
+    $(document).on('click', '[data-watch-toggle]',         window.digiriskdolibarr.ticketActionCard.onWatchToggle);
+
+    // ---- Thread reply send + edit/delete/quote per-message actions.
+    $(document).on('click',    '[data-thread-send]',       window.digiriskdolibarr.ticketActionCard.onThreadSend);
+    $(document).on('click',    '[data-msg-edit]',          window.digiriskdolibarr.ticketActionCard.onMsgEdit);
+    $(document).on('click',    '[data-msg-delete]',        window.digiriskdolibarr.ticketActionCard.onMsgDelete);
+    $(document).on('click',    '[data-msg-quote]',         window.digiriskdolibarr.ticketActionCard.onMsgQuote);
+    $(document).on('keydown',  '[data-thread-reply] input, [data-thread-reply] textarea', window.digiriskdolibarr.ticketActionCard.onReplyKeydown);
+
+    // ---- Drag & drop file upload anywhere on the card.
+    // Uses a "drag enter/leave counter" pattern: dragenter increments, dragleave
+    // decrements. The overlay shows when counter > 0. Fixes the flicker that
+    // happens when the cursor moves between child elements during a drag.
+    var $card = $('.tac-card');
+    if ($card.length) {
+        var dragCounter = 0;
+        $card.on('dragenter', function(e) {
+            if (!e.originalEvent.dataTransfer || !e.originalEvent.dataTransfer.types) { return; }
+            if (Array.from(e.originalEvent.dataTransfer.types).indexOf('Files') === -1) { return; }
+            e.preventDefault();
+            e.stopPropagation();
+            dragCounter++;
+            if (dragCounter === 1) {
+                $card.addClass('tac-dragover');
+            }
+        });
+        $card.on('dragover', function(e) {
+            e.preventDefault();
+            e.stopPropagation();
+        });
+        $card.on('dragleave', function(e) {
+            if (dragCounter > 0) { dragCounter--; }
+            if (dragCounter === 0) {
+                $card.removeClass('tac-dragover');
+            }
+        });
+        $card.on('drop', function(e) {
+            e.preventDefault();
+            e.stopPropagation();
+            dragCounter = 0;
+            $card.removeClass('tac-dragover');
+            var files = e.originalEvent.dataTransfer ? e.originalEvent.dataTransfer.files : null;
+            if (files && files.length) {
+                window.digiriskdolibarr.ticketActionCard.uploadFiles(files);
+            }
+        });
+
+        // "Choisir fichier" button — hidden <input type="file"> next to the Upload link.
+        $(document).on('click', '[data-pick-file]', function(e) {
+            e.preventDefault();
+            $('#tac-file-input').trigger('click');
+        });
+        $(document).on('change', '#tac-file-input', function() {
+            if (this.files && this.files.length) {
+                window.digiriskdolibarr.ticketActionCard.uploadFiles(this.files);
+            }
+        });
+    }
+
     // ---- Linked files preview + delete.
     $(document).on('click', '[data-file-preview]',         window.digiriskdolibarr.ticketActionCard.onFilePreview);
     $(document).on('click', '[data-file-delete]',          window.digiriskdolibarr.ticketActionCard.onFileDelete);
@@ -251,6 +355,385 @@ window.digiriskdolibarr.ticketActionCard.event = function() {
                 window.digiriskdolibarr.ticketActionCard.closeLightbox();
             }
         }
+        // 'w' shortcut toggles watch — but only when not typing in a field.
+        if (e.key === 'w' && !e.ctrlKey && !e.metaKey && !e.altKey) {
+            var tag = (e.target && e.target.tagName) || '';
+            if (['INPUT', 'TEXTAREA', 'SELECT'].indexOf(tag) !== -1) { return; }
+            if (e.target && e.target.isContentEditable) { return; }
+            var $btn = $('[data-watch-toggle]');
+            if ($btn.length) {
+                e.preventDefault();
+                $btn.trigger('click');
+            }
+        }
+    });
+};
+
+/**
+ * Upload one or more files to the ticket via FormData / AJAX. Each file is
+ * sent in its own request so partial failures don't abort the rest. The page
+ * reloads once all uploads succeed so the new files appear in the list.
+ *
+ * @param  {FileList} files
+ * @return {void}
+ */
+window.digiriskdolibarr.ticketActionCard.uploadFiles = function(files) {
+    var $card    = $('.tac-card').first();
+    var ajaxUrl  = $card.data('ajax-url');
+    var ticketId = $card.data('ticket-id');
+
+    // 1. Client-side validation: max size (mirrors common PHP upload_max_filesize default).
+    var MAX_BYTES = 32 * 1024 * 1024; // 32 MB
+    var FORBIDDEN_EXT = /\.(php|phtml|exe|bat|cmd|sh|js|html?|jar)$/i;
+    var validFiles = [];
+    var rejected = [];
+    Array.prototype.forEach.call(files, function(f) {
+        if (f.size > MAX_BYTES) {
+            rejected.push(f.name + ' (trop volumineux > 32 MB)');
+        } else if (FORBIDDEN_EXT.test(f.name)) {
+            rejected.push(f.name + ' (extension interdite)');
+        } else {
+            validFiles.push(f);
+        }
+    });
+    if (rejected.length) {
+        window.digiriskdolibarr.ticketActionCard.flash($card, 'Refusé : ' + rejected.join(', '), 'error');
+    }
+    if (!validFiles.length) {
+        return;
+    }
+
+    // 2. Duplicate check: if filenames match existing entries in the list, ask once for confirmation.
+    var existing = $('.tac-files-list__item').map(function() { return $(this).data('file-name'); }).get();
+    var duplicates = validFiles.filter(function(f) { return existing.indexOf(f.name) !== -1; });
+    if (duplicates.length) {
+        var names = duplicates.map(function(f) { return f.name; }).join(', ');
+        if (!window.confirm('Écraser les fichiers déjà présents ?\n\n' + names)) {
+            // Filter out duplicates.
+            validFiles = validFiles.filter(function(f) { return existing.indexOf(f.name) === -1; });
+            if (!validFiles.length) { return; }
+        }
+    }
+
+    // 3. Render a progress UI in the toast area.
+    var total   = validFiles.length;
+    var done    = 0;
+    var failed  = 0;
+    var $toast  = $card.find('.tac-toast, .ticket-action-card__toast').first();
+    $toast.removeClass('is-error is-success').addClass('is-success')
+        .html('<span class="tac-upload-label">Upload 0 / ' + total + '…</span>'
+            + '<div class="tac-upload-bar"><span class="tac-upload-bar__fill" style="width:0%"></span></div>');
+
+    var updateProgress = function() {
+        var pct = Math.round(100 * done / total);
+        $toast.find('.tac-upload-label').text('Upload ' + done + ' / ' + total + ' (' + pct + '%)');
+        $toast.find('.tac-upload-bar__fill').css('width', pct + '%');
+    };
+
+    validFiles.forEach(function(file) {
+        var fd = new FormData();
+        fd.append('ticket_id', ticketId);
+        fd.append('action', 'upload_file');
+        fd.append('upload', file);
+        fd.append('token', $('input[name="token"]').val() || '');
+        $.ajax({
+            url: ajaxUrl,
+            method: 'POST',
+            data: fd,
+            contentType: false,
+            processData: false,
+            dataType: 'json'
+        }).done(function(response) {
+            if (!response || !response.success) { failed++; }
+        }).fail(function() {
+            failed++;
+        }).always(function() {
+            done++;
+            updateProgress();
+            if (done === total) {
+                if (failed === 0) {
+                    $toast.html('Upload terminé ✓');
+                    setTimeout(function() { window.location.reload(); }, 500);
+                } else {
+                    $toast.removeClass('is-success').addClass('is-error')
+                        .html(failed + ' échec(s) sur ' + total + ' fichier(s)');
+                }
+            }
+        });
+    });
+};
+
+/**
+ * Send a reply to the ticket thread.
+ *
+ * @param  {MouseEvent} event
+ * @return {void}
+ */
+window.digiriskdolibarr.ticketActionCard.onThreadSend = function(event) {
+    event.preventDefault();
+    var $btn      = $(this);
+    var $form     = $btn.closest('[data-thread-reply]');
+    var $card     = $('.tac-card').first();
+    var ajaxUrl   = $card.data('ajax-url');
+    var ticketId  = $card.data('ticket-id');
+    var subject   = $form.find('input[name="subject"]').val();
+    var isPrivate = $form.find('input[name="private"]').is(':checked') ? 1 : 0;
+    var byEmail   = $form.find('input[name="by_email"]').is(':checked') ? 1 : 0;
+
+    // Pull body from CKEditor if it's bound, else from the raw textarea.
+    var $ta = $form.find('.tac-thread__reply-body');
+    var taId = $ta.attr('id');
+    var body = '';
+    if (taId && window.CKEDITOR && window.CKEDITOR.instances && window.CKEDITOR.instances[taId]) {
+        body = window.CKEDITOR.instances[taId].getData();
+    } else {
+        body = $ta.val();
+    }
+    if (!body || !body.trim()) {
+        window.digiriskdolibarr.ticketActionCard.flash($card, 'Le message est vide', 'error');
+        return;
+    }
+
+    var editingId = $form.data('editing-message-id');
+
+    $btn.prop('disabled', true);
+    $.ajax({
+        url: ajaxUrl,
+        method: 'POST',
+        dataType: 'json',
+        data: {
+            ticket_id: ticketId,
+            action: editingId ? 'edit_message' : 'post_message',
+            message_id: editingId || 0,
+            subject: subject,
+            body: body,
+            private: isPrivate,
+            by_email: byEmail,
+            token: $('input[name="token"]').val() || ''
+        }
+    }).done(function(response) {
+        $btn.prop('disabled', false);
+        if (response && response.success) {
+            var $thread = $form.siblings('[data-thread]');
+            if (editingId) {
+                // In-place body refresh; clear edit state on the form.
+                var $msg = $thread.find('.tac-thread__msg[data-msg-id="' + editingId + '"]');
+                $msg.find('[data-msg-body]').html(response.body_html || '');
+                if (response.subject) {
+                    $msg.find('.tac-thread__subject').text(response.subject);
+                }
+                $form.removeData('editing-message-id').removeClass('tac-thread__reply--editing');
+                $form.find('[data-thread-send]').html('<i class="fas fa-paper-plane"></i> ' + (($('[data-thread-reply]').data('lang-send') || 'Envoyer')));
+            } else {
+                // Append new bubble + update (N) counter.
+                $thread.find('.tac-thread__empty').remove();
+                $thread.append(response.bubble);
+                var $count = $('.tac-section[data-section-id="messages_thread"] h3 span');
+                if ($count.length) {
+                    var n = parseInt(($count.text().match(/\d+/) || [0])[0], 10);
+                    $count.text('(' + (n + 1) + ')');
+                }
+                window.digiriskdolibarr.ticketActionCard.scrollThreadToBottom();
+            }
+            $form.find('input[name="subject"]').val('');
+            $form.find('input[name="private"]').prop('checked', false);
+            $form.find('input[name="by_email"]').prop('checked', false);
+            if (taId && window.CKEDITOR && window.CKEDITOR.instances && window.CKEDITOR.instances[taId]) {
+                window.CKEDITOR.instances[taId].setData('');
+            } else {
+                $ta.val('');
+            }
+            window.digiriskdolibarr.ticketActionCard.flash($card, response.message || 'OK', 'success');
+        } else {
+            window.digiriskdolibarr.ticketActionCard.flash($card, (response && response.message) || 'Erreur', 'error');
+        }
+    }).fail(function() {
+        $btn.prop('disabled', false);
+        window.digiriskdolibarr.ticketActionCard.flash($card, 'Erreur réseau', 'error');
+    });
+};
+
+/**
+ * Smoothly scroll the thread to the bottom so the latest bubble is visible.
+ * Used after sending a reply.
+ *
+ * @return {void}
+ */
+window.digiriskdolibarr.ticketActionCard.scrollThreadToBottom = function() {
+    var $thread = $('[data-thread]').first();
+    if (!$thread.length) {
+        return;
+    }
+    var $last = $thread.find('.tac-thread__msg').last();
+    if ($last.length && $last[0].scrollIntoView) {
+        $last[0].scrollIntoView({behavior: 'smooth', block: 'nearest'});
+    }
+};
+
+/**
+ * Start editing a message: load its body back into the reply form and flip the
+ * Send button into "Save" mode. Form keeps the edit state in a data attribute.
+ *
+ * @param  {MouseEvent} event
+ * @return {void}
+ */
+window.digiriskdolibarr.ticketActionCard.onMsgEdit = function(event) {
+    event.preventDefault();
+    var $msg = $(this).closest('.tac-thread__msg');
+    var msgId = $msg.data('msg-id');
+    if (!msgId) {
+        return;
+    }
+    var $form = $('[data-thread-reply]').first();
+    var $ta   = $form.find('.tac-thread__reply-body');
+    var taId  = $ta.attr('id');
+    var body  = $msg.find('[data-msg-body]').html() || '';
+    var subj  = $msg.find('.tac-thread__subject').text() || '';
+
+    $form.data('editing-message-id', msgId).addClass('tac-thread__reply--editing');
+    $form.find('input[name="subject"]').val(subj);
+    if (taId && window.CKEDITOR && window.CKEDITOR.instances && window.CKEDITOR.instances[taId]) {
+        window.CKEDITOR.instances[taId].setData(body);
+        window.CKEDITOR.instances[taId].focus();
+    } else {
+        $ta.val(body).focus();
+    }
+    $form.find('[data-thread-send]').html('<i class="fas fa-save"></i> ' + (($('[data-thread-reply]').data('lang-save') || 'Enregistrer')));
+    if ($form[0].scrollIntoView) {
+        $form[0].scrollIntoView({behavior: 'smooth', block: 'nearest'});
+    }
+};
+
+/**
+ * Delete a message after confirmation. Removes the bubble on success and
+ * decrements the (N) counter.
+ *
+ * @param  {MouseEvent} event
+ * @return {void}
+ */
+window.digiriskdolibarr.ticketActionCard.onMsgDelete = function(event) {
+    event.preventDefault();
+    var $msg  = $(this).closest('.tac-thread__msg');
+    var msgId = $msg.data('msg-id');
+    var $card = $('.tac-card').first();
+    if (!msgId) {
+        return;
+    }
+    if (!window.confirm($('[data-thread-reply]').data('lang-confirm-delete') || 'Supprimer ce message ?')) {
+        return;
+    }
+    $.ajax({
+        url: $card.data('ajax-url'),
+        method: 'POST',
+        dataType: 'json',
+        data: {
+            ticket_id: $card.data('ticket-id'),
+            action: 'delete_message',
+            message_id: msgId,
+            token: $('input[name="token"]').val() || ''
+        }
+    }).done(function(response) {
+        if (response && response.success) {
+            $msg.fadeOut(150, function() {
+                $(this).remove();
+                var $count = $('.tac-section[data-section-id="messages_thread"] h3 span');
+                if ($count.length) {
+                    var n = parseInt(($count.text().match(/\d+/) || [0])[0], 10);
+                    $count.text('(' + Math.max(0, n - 1) + ')');
+                }
+            });
+            window.digiriskdolibarr.ticketActionCard.flash($card, response.message || 'OK', 'success');
+        } else {
+            window.digiriskdolibarr.ticketActionCard.flash($card, (response && response.message) || 'Erreur', 'error');
+        }
+    }).fail(function() {
+        window.digiriskdolibarr.ticketActionCard.flash($card, 'Erreur réseau', 'error');
+    });
+};
+
+/**
+ * Quote a message: copies its body into the reply textarea wrapped in a
+ * <blockquote> with author/date attribution.
+ *
+ * @param  {MouseEvent} event
+ * @return {void}
+ */
+window.digiriskdolibarr.ticketActionCard.onMsgQuote = function(event) {
+    event.preventDefault();
+    var $msg    = $(this).closest('.tac-thread__msg');
+    var author  = $msg.find('.tac-thread__author').first().text() || '';
+    var body    = $msg.find('[data-msg-body]').html() || '';
+    var $form   = $('[data-thread-reply]').first();
+    var $ta     = $form.find('.tac-thread__reply-body');
+    var taId    = $ta.attr('id');
+    // Quote sits BEFORE the user's reply so they type their answer underneath it.
+    var quoted  = '<blockquote><strong>' + $('<div>').text(author).html() + ' :</strong>' + body + '</blockquote><p>&nbsp;</p>';
+    if (taId && window.CKEDITOR && window.CKEDITOR.instances && window.CKEDITOR.instances[taId]) {
+        var ed = window.CKEDITOR.instances[taId];
+        ed.setData(quoted + (ed.getData() || ''));
+        ed.focus();
+    } else {
+        $ta.val(quoted + ($ta.val() || '')).focus();
+    }
+    if ($form[0].scrollIntoView) {
+        $form[0].scrollIntoView({behavior: 'smooth', block: 'nearest'});
+    }
+};
+
+/**
+ * Ctrl/Cmd+Enter inside the reply textarea triggers Send. Bound on the document
+ * so it survives CKEditor remounts.
+ *
+ * @param  {KeyboardEvent} event
+ * @return {void}
+ */
+window.digiriskdolibarr.ticketActionCard.onReplyKeydown = function(event) {
+    if (event.key !== 'Enter' || !(event.ctrlKey || event.metaKey)) {
+        return;
+    }
+    event.preventDefault();
+    $('[data-thread-send]').first().trigger('click');
+};
+
+/**
+ * Toggle watch / bookmark state on the ticket. Updates the button icon
+ * optimistically, rolls back on AJAX failure.
+ *
+ * @param  {MouseEvent} event
+ * @return {void}
+ */
+window.digiriskdolibarr.ticketActionCard.onWatchToggle = function(event) {
+    event.preventDefault();
+    var $btn = $(this);
+    var $card = $('.tac-card').first();
+    var wasWatched = $btn.hasClass('is-watched');
+
+    // Optimistic flip.
+    $btn.toggleClass('is-watched');
+    $btn.find('i').toggleClass('fas far');
+
+    $.ajax({
+        url: $card.data('ajax-url'),
+        method: 'POST',
+        dataType: 'json',
+        data: {
+            ticket_id: $card.data('ticket-id'),
+            action: 'toggle_watch',
+            token: $('input[name="token"]').val() || ''
+        }
+    }).done(function(response) {
+        if (response && response.success) {
+            window.digiriskdolibarr.ticketActionCard.flash($card, response.message || '', 'success');
+        } else {
+            // Rollback.
+            $btn.toggleClass('is-watched');
+            $btn.find('i').toggleClass('fas far');
+            window.digiriskdolibarr.ticketActionCard.flash($card, (response && response.message) || 'Erreur', 'error');
+        }
+    }).fail(function() {
+        $btn.toggleClass('is-watched');
+        $btn.find('i').toggleClass('fas far');
+        window.digiriskdolibarr.ticketActionCard.flash($card, 'Erreur réseau', 'error');
     });
 };
 
@@ -749,15 +1232,29 @@ window.digiriskdolibarr.ticketActionCard.onFieldClick = function(event) {
         }
         $input = $('<input type="date" class="tac-edit-input">').val(dateValue);
     } else if (type === 'select') {
-        $input = $('<select class="tac-edit-input">');
         var options = $wrap.data('edit-options') || [];
-        options.forEach(function(opt) {
-            var $opt = $('<option>').val(String(opt.id)).text(opt.label);
-            if (String(opt.id) === current) {
-                $opt.prop('selected', true);
-            }
-            $input.append($opt);
-        });
+        // Long lists (or any server-searched field) get a searchable combo; short
+        // static lists keep a plain native <select> which is fine to scroll.
+        var useCombo = (!!$wrap.data('edit-remote') || options.length > 8) && !$wrap.is('.tac-hero__subject');
+        if (useCombo) {
+            var curLabel = '';
+            options.forEach(function(opt) {
+                if (String(opt.id) === current) { curLabel = opt.label; }
+            });
+            $input = $('<input type="text" class="tac-edit-input tac-combo__input" autocomplete="off">')
+                .attr('placeholder', curLabel || '—')
+                .data('combo-value', current)
+                .data('is-combo', true);
+        } else {
+            $input = $('<select class="tac-edit-input">');
+            options.forEach(function(opt) {
+                var $opt = $('<option>').val(String(opt.id)).text(opt.label);
+                if (String(opt.id) === current) {
+                    $opt.prop('selected', true);
+                }
+                $input.append($opt);
+            });
+        }
     } else {
         $wrap.removeClass('tac-editing');
         return;
@@ -785,6 +1282,10 @@ window.digiriskdolibarr.ticketActionCard.onFieldClick = function(event) {
         var editorId = $wrap.data('tac-editor-id');
         if (type === 'longtext' && editorId && window.CKEDITOR && window.CKEDITOR.instances && window.CKEDITOR.instances[editorId]) {
             newValue = window.CKEDITOR.instances[editorId].getData();
+        } else if ($input.data('is-combo')) {
+            // Searchable combo stores the chosen option id separately from the
+            // visible search text.
+            newValue = $input.data('combo-value');
         } else {
             newValue = $input.val();
         }
@@ -836,6 +1337,13 @@ window.digiriskdolibarr.ticketActionCard.onFieldClick = function(event) {
         $(document).on('keydown.tac-longtext-' + ($input.attr('id') || ''), function(e) {
             if (e.key === 'Escape') { cancel(); }
         });
+    } else if (type === 'select' && $input.data('is-combo')) {
+        // Custom searchable combo — built in-house because Select2 stalls on
+        // "Searching…" in this Dolibarr build. A floating, accent-insensitive
+        // filtered list anchored to the input via fixed positioning (so it escapes
+        // the card's overflow:hidden). When the field declares data-edit-remote, the
+        // list is fetched server-side instead of filtered from a static array.
+        window.digiriskdolibarr.ticketActionCard.initCombo($wrap, $input, $wrap.data('edit-options') || [], current, commit, cancel, $wrap.data('edit-remote') || '');
     } else if (type === 'select') {
         $input.on('change', commit);
         $input.on('keydown', function(e) { if (e.key === 'Escape') { cancel(); } });
@@ -866,7 +1374,165 @@ window.digiriskdolibarr.ticketActionCard.cleanupEditor = function($wrap) {
     if ($bar) {
         $bar.remove();
     }
+    // Tear down a searchable combo's floating list + its document/window handlers.
+    var comboNs = $wrap.data('tac-combo-ns');
+    if (comboNs) {
+        var $list = $wrap.data('tac-combo-list');
+        if ($list) { $list.remove(); }
+        $(document).off('.' + comboNs);
+        $(window).off('.' + comboNs);
+        $wrap.removeData('tac-combo-ns').removeData('tac-combo-list');
+    }
     $wrap.removeData('tac-editor-id').removeData('tac-edit-bar');
+};
+
+/**
+ * Build a searchable combo for a long select field: a text input (already inserted
+ * by the caller) plus a floating, accent-insensitive filtered option list.
+ *
+ * The list is appended to <body> and positioned with position:fixed so it is not
+ * clipped by the card's overflow:hidden. Selecting an option stores its id on the
+ * input via .data('combo-value') and commits.
+ *
+ * @param  {jQuery}   $wrap     The field wrapper (.tac-field / .tac-chip).
+ * @param  {jQuery}   $input    The text input rendered in place of the value.
+ * @param  {Array}    options   [{id, label}, ...] (static mode seed).
+ * @param  {string}   current   Currently selected id.
+ * @param  {Function} commit    Save callback (reads $input.data('combo-value')).
+ * @param  {Function} cancel    Restore callback.
+ * @param  {string}   remote    Optional server source key ('societe'|'project'); when
+ *                              set, the list is fetched via AJAX instead of filtered.
+ * @return {void}
+ */
+window.digiriskdolibarr.ticketActionCard.initCombo = function($wrap, $input, options, current, commit, cancel, remote) {
+    var ns = 'taccombo' + Math.random().toString(36).slice(2, 8);
+    var $list = $('<ul class="tac-combo__list" role="listbox">').appendTo('body');
+    var activeIndex = -1;
+    var visible = [];
+    var searchTimer = null;
+    var reqSeq = 0;
+
+    // commit/cancel must fire at most once — a mousedown on an option bubbles to the
+    // outside-click handler too, which would otherwise cancel right after committing.
+    var settled = false;
+    var doCommit = function() { if (settled) { return; } settled = true; commit(); };
+    var doCancel = function() { if (settled) { return; } settled = true; cancel(); };
+
+    var norm = function(s) {
+        return String(s == null ? '' : s)
+            .normalize('NFD').replace(/[̀-ͯ]/g, '')
+            .toLowerCase();
+    };
+
+    var position = function() {
+        var r = $input[0].getBoundingClientRect();
+        $list.css({
+            position: 'fixed',
+            top: Math.round(r.bottom + 2) + 'px',
+            left: Math.round(r.left) + 'px',
+            width: Math.round(r.width) + 'px'
+        });
+    };
+
+    // Paint the list from a [{id,label}] array (used by both static and remote).
+    var paint = function(rows) {
+        $list.empty();
+        visible = [];
+        activeIndex = -1;
+        rows.forEach(function(opt) {
+            var $li = $('<li class="tac-combo__opt" role="option">')
+                .attr('data-value', String(opt.id))
+                .text(opt.label);
+            if (String(opt.id) === String(current)) { $li.addClass('is-current'); }
+            $list.append($li);
+            visible.push(opt);
+        });
+        if (visible.length === 0) {
+            $list.append('<li class="tac-combo__empty">Aucun résultat</li>');
+        }
+        position();
+    };
+
+    var render = function(term) {
+        if (remote) {
+            // Debounced server-side search.
+            $list.empty().append('<li class="tac-combo__empty">…</li>');
+            position();
+            if (searchTimer) { clearTimeout(searchTimer); }
+            var seq = ++reqSeq;
+            searchTimer = setTimeout(function() {
+                var $card = $wrap.closest('.ticket-action-card');
+                $.ajax({
+                    url: $card.data('ajax-url'),
+                    method: 'POST',
+                    dataType: 'json',
+                    data: {
+                        ticket_id: $card.data('ticket-id'),
+                        action: 'search_options',
+                        source: remote,
+                        term: term || '',
+                        token: $('input[name="token"]').val() || ''
+                    }
+                }).done(function(response) {
+                    if (seq !== reqSeq) { return; } // a newer query superseded this one
+                    paint((response && response.success && response.results) ? response.results : []);
+                }).fail(function() {
+                    if (seq !== reqSeq) { return; }
+                    paint([]);
+                });
+            }, 250);
+            return;
+        }
+        var f = norm(term);
+        paint(options.filter(function(opt) {
+            return !f || norm(opt.label).indexOf(f) !== -1;
+        }));
+    };
+
+    var choose = function(value) {
+        $input.data('combo-value', String(value));
+        doCommit();
+    };
+
+    var setActive = function(idx) {
+        var $opts = $list.find('.tac-combo__opt');
+        if (!$opts.length) { return; }
+        activeIndex = Math.max(0, Math.min(idx, $opts.length - 1));
+        $opts.removeClass('is-active');
+        var $a = $opts.eq(activeIndex).addClass('is-active');
+        var liTop = $a[0].offsetTop, liBot = liTop + $a[0].offsetHeight;
+        if (liTop < $list[0].scrollTop) { $list[0].scrollTop = liTop; }
+        else if (liBot > $list[0].scrollTop + $list[0].clientHeight) { $list[0].scrollTop = liBot - $list[0].clientHeight; }
+    };
+
+    render('');
+    $input.focus();
+
+    $input.on('input', function() { render($input.val()); });
+    $input.on('keydown', function(e) {
+        if (e.key === 'Escape') { e.preventDefault(); doCancel(); }
+        else if (e.key === 'ArrowDown') { e.preventDefault(); setActive(activeIndex + 1); }
+        else if (e.key === 'ArrowUp') { e.preventDefault(); setActive(activeIndex - 1); }
+        else if (e.key === 'Enter') {
+            e.preventDefault();
+            if (activeIndex >= 0 && visible[activeIndex]) { choose(visible[activeIndex].id); }
+        }
+    });
+
+    // mousedown (not click) so we beat the input's blur-cancel race.
+    $list.on('mousedown', '.tac-combo__opt', function(e) {
+        e.preventDefault();
+        choose($(this).attr('data-value'));
+    });
+
+    // Click anywhere outside the input + list cancels.
+    $(document).on('mousedown.' + ns, function(e) {
+        if ($(e.target).closest($input).length || $(e.target).closest($list).length) { return; }
+        doCancel();
+    });
+    $(window).on('scroll.' + ns + ' resize.' + ns, position);
+
+    $wrap.data('tac-combo-ns', ns).data('tac-combo-list', $list);
 };
 
 /**
@@ -917,6 +1583,48 @@ window.digiriskdolibarr.ticketActionCard.saveField = function($wrap, field, newV
         if (response && response.success) {
             // Apply the server-rendered display (already escaped).
             var displayHtml = response.display || originalHtml;
+            // Status changed → append a new pill to the timeline so users see the
+            // transition live without a reload. Tile / sticky actions reload the page
+            // anyway (server-rendered milestones), so this only matters for the
+            // tap-to-edit path on .tac-chip--status.
+            if (field === 'fk_statut') {
+                var $timeline = $('.tac-timeline');
+                if ($timeline.length) {
+                    // Strip --current from the previous tail.
+                    $timeline.find('.tac-timeline__step--current').removeClass('tac-timeline__step--current');
+                    // Extract the new status label from the badge HTML the server returned.
+                    var newStatusLabel = $('<div>').html(response.display || '').text().trim();
+                    if (newStatusLabel) {
+                        $timeline
+                            .append('<span class="tac-timeline__delta" aria-hidden="true"><i class="fas fa-long-arrow-alt-right"></i> à l\'instant</span>')
+                            .append('<span class="tac-timeline__step tac-timeline__step--current" title="à l\'instant">' + newStatusLabel + '</span>');
+                    }
+                }
+            }
+            // Severity changed → refresh the card's tac-severity-* class so the rail
+            // and ref tint update without a full reload. Also show/hide the hero badge.
+            if (field === 'severity_code') {
+                var $sevCard = $('.tac-card').first();
+                $sevCard.attr('class', function(_, c) { return c.replace(/\btac-severity-\S+/g, ''); });
+                var newKey = (response.ticket && response.ticket.severity_key) || (String(newValue || '').toLowerCase().replace(/[^a-z0-9_-]/g, '') || 'default');
+                if (['low','normal','high','blocking'].indexOf(newKey) === -1) { newKey = 'default'; }
+                $sevCard.addClass('tac-severity-' + newKey);
+                $sevCard.attr('data-severity', newKey);
+                // Hero severity badge — remove for low/normal, show for high/blocking.
+                // Read the label from the AJAX response display HTML (server-rendered),
+                // not from the DOM — at this point the field cell still contains the
+                // <select> with ALL the options, so .text() would return everything concatenated.
+                $('[data-severity-badge]').remove();
+                if (newKey === 'high' || newKey === 'blocking') {
+                    var variant = (newKey === 'blocking') ? 'red' : 'orange';
+                    var label = $('<div>').html(response.display || '').text().trim();
+                    $('.tac-chip--status').after(
+                        '<span class="tac-chip tac-chip--readonly tac-chip--severity tac-chip--severity-' + variant + '" data-severity-badge>'
+                        + '<i class="fas fa-exclamation-triangle"></i> ' + label.toUpperCase()
+                        + '</span>'
+                    );
+                }
+            }
             if ($wrap.is('.tac-chip') || $wrap.is('.tac-hero__subject')) {
                 $wrap.html(displayHtml);
             } else {

@@ -339,7 +339,10 @@ window.digiriskdolibarr.ticket.checkValidPhone = function() {
  * @version 21.1.0
  */
 window.digiriskdolibarr.ticket.handleParamChange = function() {
-	$table = $(this).closest('table');
-	$btn   = $('.'+$table.data('btn'));
+	var $table = $(this).closest('.param-table');
+	if (!$table.length) {
+		return;
+	}
+	var $btn = $('.' + $table.data('btn'));
 	$btn.prop('disabled', false);
 };
