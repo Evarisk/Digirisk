@@ -236,6 +236,16 @@ function renderDimKanban($columns, $colTickets, $dim, $allUsers, $allCats, $allS
         </div>
     </div>
 
+    <!-- Quick-create button -->
+    <?php if ($user->hasRight('ticket', 'write')) : ?>
+    <div class="tac-picker-topbar">
+        <button type="button" class="tac-picker-topbar__btn tac-quick-create-open" id="tacQuickCreateBtn">
+            <i class="fas fa-plus"></i> <?= $langs->trans('NewTicket') ?>
+        </button>
+    </div>
+    <?php endif; ?>
+
+
     <!-- Tab navigation -->
     <div class="tac-dim-tabs" id="tacDimTabs">
         <button class="tac-dim-tab active" data-dim="status">
@@ -274,3 +284,108 @@ function renderDimKanban($columns, $colTickets, $dim, $allUsers, $allCats, $allS
     </div>
 
 </div>
+
+<?php if ($user->hasRight('ticket', 'write')) : ?>
+<!-- Quick-create drawer (slide-in from right) -->
+<div class="tac-quick-create" id="tacQuickCreate" aria-hidden="true">
+    <div class="tac-quick-create__overlay tac-quick-create-close"></div>
+    <div class="tac-quick-create__drawer" role="dialog" aria-modal="true" aria-label="<?= dol_escape_htmltag($langs->trans('NewTicket')) ?>">
+        <div class="tac-quick-create__header">
+            <span class="tac-quick-create__title"><i class="fas fa-ticket-alt"></i> <?= $langs->trans('NewTicket') ?></span>
+            <button type="button" class="tac-quick-create__close tac-quick-create-close" aria-label="<?= dol_escape_htmltag($langs->trans('Close')) ?>">
+                <i class="fas fa-times"></i>
+            </button>
+        </div>
+
+        <form class="tac-quick-create__form" id="tacQuickCreateForm" novalidate>
+            <input type="hidden" name="token" value="<?= newToken() ?>">
+
+            <!-- Sujet -->
+            <div class="tac-qc-field tac-qc-field--required">
+                <label class="tac-qc-label" for="tacQcSubject">
+                    <i class="fas fa-heading"></i> <?= $langs->trans('Subject') ?>
+                </label>
+                <input type="text" id="tacQcSubject" name="subject" class="tac-qc-input" required
+                       placeholder="<?= dol_escape_htmltag($langs->trans('TicketSubjectPlaceholder') !== 'TicketSubjectPlaceholder' ? $langs->trans('TicketSubjectPlaceholder') : 'Titre du ticket...') ?>">
+            </div>
+
+            <!-- Type (pleine largeur) -->
+            <div class="tac-qc-field">
+                <label class="tac-qc-label" for="tacQcType">
+                    <i class="fas fa-tag"></i> <?= $langs->trans('Type') ?>
+                </label>
+                <select id="tacQcType" name="type_code" class="tac-qc-select">
+                    <option value=""><?= dol_escape_htmltag($langs->trans('SelectNothing')) ?></option>
+                    <?php foreach ($createFormTypes as $code => $label) : ?>
+                    <option value="<?= dol_escape_htmltag($code) ?>"><?= dol_escape_htmltag($label) ?></option>
+                    <?php endforeach; ?>
+                </select>
+            </div>
+
+            <!-- Sévérité + Assigné (2 colonnes) -->
+            <div class="tac-qc-row">
+                <div class="tac-qc-field">
+                    <label class="tac-qc-label" for="tacQcSeverity">
+                        <i class="fas fa-exclamation-triangle"></i> <?= $langs->trans('Severity') ?>
+                    </label>
+                    <select id="tacQcSeverity" name="severity_code" class="tac-qc-select">
+                        <option value=""><?= dol_escape_htmltag($langs->trans('SelectNothing')) ?></option>
+                        <?php foreach ($createFormSeverities as $code => $label) : ?>
+                        <option value="<?= dol_escape_htmltag($code) ?>"><?= dol_escape_htmltag($label) ?></option>
+                        <?php endforeach; ?>
+                    </select>
+                </div>
+                <div class="tac-qc-field">
+                    <label class="tac-qc-label" for="tacQcAssignee">
+                        <i class="fas fa-user-check"></i> <?= $langs->trans('AssignedTo') ?>
+                    </label>
+                    <select id="tacQcAssignee" name="fk_user_assign" class="tac-qc-select">
+                        <option value="0"><?= dol_escape_htmltag($langs->trans('Unassigned')) ?></option>
+                        <?php foreach ($createFormUsers as $u) : ?>
+                        <option value="<?= (int) $u['id'] ?>"><?= dol_escape_htmltag($u['fullname']) ?></option>
+                        <?php endforeach; ?>
+                    </select>
+                </div>
+            </div>
+
+            <!-- Message initial -->
+            <div class="tac-qc-field">
+                <label class="tac-qc-label" for="tacQcMessage">
+                    <i class="fas fa-comment-alt"></i> <?= $langs->trans('TicketInitialMessage') ?>
+                </label>
+                <textarea id="tacQcMessage" name="message" class="tac-qc-textarea"
+                          rows="4" placeholder="<?= dol_escape_htmltag($langs->trans('OptionalDescription')) ?>"></textarea>
+            </div>
+
+            <!-- Pièces jointes -->
+            <div class="tac-qc-field">
+                <label class="tac-qc-label">
+                    <i class="fas fa-paperclip"></i> <?= $langs->trans('QuickCreateAttachments') ?>
+                </label>
+                <div class="tac-qc-dropzone" id="tacQcDropzone" tabindex="0" role="button"
+                     aria-label="<?= dol_escape_htmltag($langs->trans('QuickCreateDropzone')) ?>">
+                    <input type="file" id="tacQcFiles" name="attachments[]" multiple
+                           class="tac-qc-file-input" accept="image/*,.pdf,.doc,.docx,.xls,.xlsx,.odt,.ods,.txt,.zip">
+                    <div class="tac-qc-dropzone__icon"><i class="fas fa-cloud-upload-alt"></i></div>
+                    <div class="tac-qc-dropzone__label"><?= $langs->trans('QuickCreateDropzone') ?></div>
+                    <div class="tac-qc-dropzone__hint"><?= $langs->trans('QuickCreateAttachmentHint') ?></div>
+                </div>
+                <ul class="tac-qc-file-list" id="tacQcFileList"></ul>
+            </div>
+
+            <!-- Toast interne au formulaire -->
+            <div class="tac-qc-toast" id="tacQcToast" aria-live="polite"></div>
+
+            <!-- Actions -->
+            <div class="tac-qc-actions">
+                <button type="button" class="tac-qc-btn tac-qc-btn--secondary tac-quick-create-close">
+                    <?= $langs->trans('Cancel') ?>
+                </button>
+                <button type="submit" class="tac-qc-btn tac-qc-btn--primary" id="tacQcSubmit">
+                    <i class="fas fa-plus-circle"></i> <?= $langs->trans('CreateTicket') ?>
+                </button>
+            </div>
+        </form>
+    </div>
+</div>
+<?php endif; ?>

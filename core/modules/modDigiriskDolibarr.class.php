@@ -1751,13 +1751,30 @@ class modDigiriskdolibarr extends DolibarrModules
 		$this->menu[$r++] = [
 			'fk_menu'  => 'fk_mainmenu=ticket,fk_leftmenu=ticketstats',
 			'type'     => 'left',
-			'titre'    => $langs->transnoentities('TicketActionCard'),
-			'prefix'   => '<i class="fas fa-hand-pointer pictofixedwidth"></i>',
+			'titre'    => $langs->transnoentities('TicketKanban'),
+			'prefix'   => '<i class="fas fa-columns pictofixedwidth"></i>',
 			'mainmenu' => 'ticket',
-			'leftmenu' => 'digiriskticketactioncard',
+			'leftmenu' => 'digiriskticketkanban',
 			'url'      => '/digiriskdolibarr/view/ticket/ticket_action_card.php',
 			'langs'    => 'digiriskdolibarr@digiriskdolibarr',
 			'position' => 100 + $r,
+			'enabled'  => '$conf->digiriskdolibarr->enabled && $conf->ticket->enabled',
+			'perms'    => '$user->rights->ticket->read && $user->rights->digiriskdolibarr->lire',
+			'target'   => '',
+			'user'     => 0,
+		];
+
+		// Entrée liste de tickets (vue standard Dolibarr).
+		$this->menu[$r++] = [
+			'fk_menu'  => 'fk_mainmenu=ticket,fk_leftmenu=ticketstats',
+			'type'     => 'left',
+			'titre'    => $langs->transnoentities('List'),
+			'prefix'   => '<i class="fas fa-list pictofixedwidth"></i>',
+			'mainmenu' => 'ticket',
+			'leftmenu' => 'digiriskticketlist',
+			'url'      => '/ticket/list.php',
+			'langs'    => 'digiriskdolibarr@digiriskdolibarr',
+			'position' => 101 + $r,
 			'enabled'  => '$conf->digiriskdolibarr->enabled && $conf->ticket->enabled',
 			'perms'    => '$user->rights->ticket->read && $user->rights->digiriskdolibarr->lire',
 			'target'   => '',

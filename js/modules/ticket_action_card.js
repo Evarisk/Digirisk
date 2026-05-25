@@ -1679,6 +1679,7 @@ window.digiriskdolibarr.ticketPickerKanban.init = function() {
     window.digiriskdolibarr.ticketPickerKanban.event();
     window.digiriskdolibarr.ticketPickerKanban.initSortable();
     window.digiriskdolibarr.ticketPickerKanban.initSettings();
+    window.digiriskdolibarr.ticketPickerKanban.initQuickCreate();
 
     // Restore the last active tab from localStorage.
     var savedDim = localStorage.getItem('tacPickerActiveDim');
@@ -2274,5 +2275,187 @@ window.digiriskdolibarr.ticketPickerKanban.initSettings = function() {
         $gVal.text(val + 'px');
         $board.css('gap', val + 'px');
         localStorage.setItem('tacPickerKanbanColGap', val);
+    });
+};
+
+// ---------------------------------------------------------------------------
+// Quick-create ticket drawer
+// ---------------------------------------------------------------------------
+
+/**
+ * Open the quick-create drawer and focus the subject field.
+ *
+ * @return {void}
+ */
+window.digiriskdolibarr.ticketPickerKanban.openQuickCreate = function() {
+    var $drawer = $('#tacQuickCreate');
+    if (!$drawer.length) {
+        return;
+    }
+    $drawer.addClass('is-open').attr('aria-hidden', 'false');
+    $('body').css('overflow', 'hidden');
+    // Reset the form and file list each time it opens.
+    $('#tacQuickCreateForm')[0].reset();
+    $('#tacQcFileList').empty();
+    $('#tacQcDropzone').removeClass('is-dragover');
+    $('#tacQcToast').removeClass('is-error is-success').text('');
+    $('#tacQcSubmit').removeClass('is-loading').prop('disabled', false);
+    setTimeout(function() { $('#tacQcSubject').trigger('focus'); }, 220);
+};
+
+/**
+ * Close the quick-create drawer.
+ *
+ * @return {void}
+ */
+window.digiriskdolibarr.ticketPickerKanban.closeQuickCreate = function() {
+    $('#tacQuickCreate').removeClass('is-open').attr('aria-hidden', 'true');
+    $('body').css('overflow', '');
+};
+
+/**
+ * Submit the quick-create form via AJAX (multipart/form-data for file uploads).
+ *
+ * @param {Event} e  Form submit event
+ * @return {void}
+ */
+window.digiriskdolibarr.ticketPickerKanban.submitQuickCreate = function(e) {
+    e.preventDefault();
+
+    var $form   = $('#tacQuickCreateForm');
+    var $submit = $('#tacQcSubmit');
+    var $toast  = $('#tacQcToast');
+
+    var subject = $.trim($('#tacQcSubject').val());
+    if (!subject) {
+        $toast.removeClass('is-success').addClass('is-error').text('Le sujet est obligatoire.');
+        $('#tacQcSubject').trigger('focus');
+        return;
+    }
+
+    var token = window.saturne.toolbox.getToken();
+    var sep   = window.saturne.toolbox.getQuerySeparator(document.URL);
+
+    // Use FormData so that file inputs are included in the request.
+    var fd = new FormData($form[0]);
+
+    $submit.addClass('is-loading').prop('disabled', true);
+    $toast.removeClass('is-error is-success').text('');
+
+    $.ajax({
+        url: document.URL + sep + 'action=createTicket&token=' + token,
+        type: 'POST',
+        dataType: 'json',
+        data: fd,
+        processData: false,
+        contentType: false,
+        success: function(response) {
+            $submit.removeClass('is-loading').prop('disabled', false);
+            if (response.success) {
+                window.location.href = response.url;
+            } else {
+                $toast.removeClass('is-success').addClass('is-error')
+                      .text(response.error || 'Une erreur est survenue.');
+            }
+        },
+        error: function() {
+            $submit.removeClass('is-loading').prop('disabled', false);
+            $toast.removeClass('is-success').addClass('is-error')
+                  .text('Erreur réseau. Veuillez réessayer.');
+        }
+    });
+};
+
+/**
+ * Render the selected files list below the dropzone.
+ *
+ * @param {FileList} files
+ * @return {void}
+ */
+window.digiriskdolibarr.ticketPickerKanban.renderFileList = function(files) {
+    var $list = $('#tacQcFileList');
+    $list.empty();
+    if (!files || !files.length) {
+        return;
+    }
+    $.each(files, function(i, file) {
+        var icon = 'fa-file';
+        if (/image\//i.test(file.type))           { icon = 'fa-file-image'; }
+        else if (/pdf/i.test(file.type))          { icon = 'fa-file-pdf'; }
+        else if (/word|doc/i.test(file.type))     { icon = 'fa-file-word'; }
+        else if (/excel|sheet|xls/i.test(file.type)) { icon = 'fa-file-excel'; }
+        else if (/zip|archive/i.test(file.type)) { icon = 'fa-file-archive'; }
+
+        var size = file.size < 1024 * 1024
+            ? Math.round(file.size / 1024) + ' Ko'
+            : (file.size / (1024 * 1024)).toFixed(1) + ' Mo';
+
+        $list.append(
+            '<li>'
+            + '<i class="fas ' + icon + '"></i>'
+            + '<span title="' + $('<span>').text(file.name).html() + '">' + $('<span>').text(file.name).html() + '</span>'
+            + '<small style="color:#9ca3af;flex:0 0 auto">' + size + '</small>'
+            + '</li>'
+        );
+    });
+};
+
+/**
+ * Wire quick-create drawer events (called from ticketPickerKanban.init).
+ *
+ * @return {void}
+ */
+window.digiriskdolibarr.ticketPickerKanban.initQuickCreate = function() {
+    $(document).on('click', '.tac-quick-create-open', window.digiriskdolibarr.ticketPickerKanban.openQuickCreate);
+    $(document).on('click', '.tac-quick-create-close', window.digiriskdolibarr.ticketPickerKanban.closeQuickCreate);
+    $(document).on('keydown', function(e) {
+        if (e.key === 'Escape' && $('#tacQuickCreate').hasClass('is-open')) {
+            window.digiriskdolibarr.ticketPickerKanban.closeQuickCreate();
+        }
+    });
+    $(document).on('submit', '#tacQuickCreateForm', window.digiriskdolibarr.ticketPickerKanban.submitQuickCreate);
+
+    // File input change → update list.
+    $(document).on('change', '#tacQcFiles', function() {
+        window.digiriskdolibarr.ticketPickerKanban.renderFileList(this.files);
+    });
+
+    // Drag-and-drop on the dropzone.
+    $(document).on('dragover dragenter', '#tacQcDropzone', function(e) {
+        e.preventDefault();
+        e.stopPropagation();
+        $(this).addClass('is-dragover');
+    });
+    $(document).on('dragleave dragend drop', '#tacQcDropzone', function(e) {
+        e.preventDefault();
+        e.stopPropagation();
+        $(this).removeClass('is-dragover');
+    });
+    $(document).on('drop', '#tacQcDropzone', function(e) {
+        e.preventDefault();
+        e.stopPropagation();
+        var dt    = e.originalEvent.dataTransfer;
+        var files = dt && dt.files;
+        if (!files || !files.length) {
+            return;
+        }
+        // Assign dropped files to the real input via DataTransfer.
+        try {
+            var input = document.getElementById('tacQcFiles');
+            var transfer = new DataTransfer();
+            $.each(files, function(i, f) { transfer.items.add(f); });
+            input.files = transfer.files;
+            window.digiriskdolibarr.ticketPickerKanban.renderFileList(input.files);
+        } catch (err) {
+            // DataTransfer API not available (old browser) — silently skip preview.
+        }
+    });
+
+    // Keyboard activation of the dropzone (Enter/Space → click the hidden input).
+    $(document).on('keydown', '#tacQcDropzone', function(e) {
+        if (e.key === 'Enter' || e.key === ' ') {
+            e.preventDefault();
+            $(this).find('#tacQcFiles').trigger('click');
+        }
     });
 };
