@@ -2023,7 +2023,12 @@ window.digiriskdolibarr.ticketPickerKanban.updateCounts = function() {
 window.digiriskdolibarr.ticketPickerKanban.saveDim = function(ticketId, dim, newVal, $card) {
     var token     = window.saturne.toolbox.getToken();
     var sep       = window.saturne.toolbox.getQuerySeparator(document.URL);
-    var actionMap = {type: 'updateTicketType', group: 'updateTicketGroup', severity: 'updateTicketSeverity'};
+    var actionMap = {
+        status:   'updateTicketStatus',
+        type:     'updateTicketType',
+        group:    'updateTicketGroup',
+        severity: 'updateTicketSeverity'
+    };
     var action    = actionMap[dim];
     if (!action) {
         return;

@@ -1815,3 +1815,30 @@ Move                                  = Déplacer
 Hide                                  = Masquer
 Show                                  = Afficher
 
+# ===========================================================================
+# Ticket kanban — admin logging config — issue #4753
+# ===========================================================================
+TicketKanban                           = Kanban tickets
+TicketKanbanLogging                    = Kanban tickets — Historique des modifications
+TicketKanbanLoggingDescription         = Activer la création d'événements lors des modifications dans le kanban
+TicketKanbanLogStatus                  = Modification du statut
+TicketKanbanLogStatusDesc              = Créer un événement lorsque le statut d'un ticket est modifié via le kanban
+TicketKanbanLogAssignee                = Modification de l'assigné
+TicketKanbanLogAssigneeDesc            = Créer un événement lorsque l'assigné d'un ticket est modifié via le kanban
+TicketKanbanLogCategoryAdd             = Ajout d'un tag
+TicketKanbanLogCategoryAddDesc         = Créer un événement lorsqu'un tag est ajouté à un ticket via le kanban
+TicketKanbanLogCategoryRemove          = Retrait d'un tag
+TicketKanbanLogCategoryRemoveDesc      = Créer un événement lorsqu'un tag est retiré d'un ticket via le kanban
+TicketKanbanLogType                    = Modification du type
+TicketKanbanLogTypeDesc                = Créer un événement lorsque le type d'un ticket est modifié via le kanban
+TicketKanbanLogGroup                   = Modification du groupe
+TicketKanbanLogGroupDesc               = Créer un événement lorsque le groupe d'un ticket est modifié via le kanban
+TicketKanbanLogSeverity                = Modification de la sévérité
+TicketKanbanLogSeverityDesc            = Créer un événement lorsque la sévérité d'un ticket est modifiée via le kanban
+TicketKanbanLogSubject                 = Modification du sujet
+TicketKanbanLogSubjectDesc             = Créer un événement lorsque le sujet d'un ticket est modifié via le kanban
+TicketKanbanLogDeadline                = Modification de la date limite
+TicketKanbanLogDeadlineDesc            = Créer un événement lorsque la date limite d'un ticket est modifiée via le kanban
+TicketKanbanClosedLimit                = Limite tickets fermés
+TicketKanbanClosedLimitDesc            = Nombre maximum de tickets fermés/annulés affichés dans le kanban (0 = illimité)
+

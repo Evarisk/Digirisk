@@ -58,6 +58,11 @@ function digiriskdolibarr_admin_prepare_head(): array
     $head[$h][2] = 'actionplan';
     $h++;
 
+    $head[$h][0] = dol_buildpath('/digiriskdolibarr/admin/config/ticket_kanban.php', 1);
+    $head[$h][1] = $conf->browser->layout != 'phone' ? '<i class="fas fa-th-large pictofixedwidth"></i>' . $langs->trans('TicketKanban') : '<i class="fas fa-th-large"></i>';
+    $head[$h][2] = 'ticket_kanban';
+    $h++;
+
     $head[$h][0] = dol_buildpath('/digiriskdolibarr/admin/config/firepermit.php', 1);
     $head[$h][1] = $conf->browser->layout != 'phone' ? '<i class="fas fa-fire-alt pictofixedwidth"></i>' . $langs->trans('FirePermit') : '<i class="fas fa-fire-alt"></i>';
     $head[$h][2] = 'firepermit';
