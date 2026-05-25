@@ -1659,3 +1659,615 @@ window.digiriskdolibarr.ticketActionCard.flash = function($card, message, kind) 
     $toast.removeClass('is-error is-success').addClass('is-' + kind).text(message);
     setTimeout(function() { $toast.text(''); $toast.removeClass('is-error is-success'); }, 2500);
 };
+
+/* ============================================================
+ * KANBAN PICKER — ticket_action_card.php picker view
+ * Three dimension tabs: Type / Group / Severity.
+ * ============================================================ */
+
+window.digiriskdolibarr.ticketPickerKanban = {};
+
+/**
+ * Auto-invoked by digiriskdolibarr.js on document.ready.
+ *
+ * @return {void}
+ */
+window.digiriskdolibarr.ticketPickerKanban.init = function() {
+    if (!$('.tac-picker-kanban-board').length) {
+        return;
+    }
+    window.digiriskdolibarr.ticketPickerKanban.event();
+    window.digiriskdolibarr.ticketPickerKanban.initSortable();
+    window.digiriskdolibarr.ticketPickerKanban.initSettings();
+
+    // Restore the last active tab from localStorage.
+    var savedDim = localStorage.getItem('tacPickerActiveDim');
+    if (savedDim && $('#tacDimTabs .tac-dim-tab[data-dim="' + savedDim + '"]').length) {
+        $('#tacDimTabs .tac-dim-tab').removeClass('active');
+        $('#tacDimTabs .tac-dim-tab[data-dim="' + savedDim + '"]').addClass('active');
+        $('#tacDimPanels .tac-dim-panel').removeClass('active');
+        $('#tacDimPanels .tac-dim-panel[data-dim="' + savedDim + '"]').addClass('active');
+    }
+};
+
+/**
+ * Register delegated events for the kanban picker.
+ *
+ * @return {void}
+ */
+window.digiriskdolibarr.ticketPickerKanban.event = function() {
+    // Assignee initial: click → show select
+    $(document).on('click', '.tac-picker-kanban-board .kanban-initial-responsible, .tac-picker-kanban-board .tac-picker-card__assignee-img', function(e) {
+        e.stopPropagation();
+        var $wrapper = $(this).closest('.kanban-responsible-wrapper');
+        var $select  = $wrapper.find('.tac-picker-assignee-select');
+        $(this).hide();
+        $select.addClass('visible').trigger('focus');
+    });
+
+    // Assignee select: change → save + hide select → update avatar
+    $(document).on('change', '.tac-picker-assignee-select', function() {
+        var $select  = $(this);
+        var $wrapper = $select.closest('.kanban-responsible-wrapper');
+        var $avatar  = $wrapper.find('.kanban-initial-responsible, .tac-picker-card__assignee-img');
+        var ticketId = $select.data('ticket-id');
+        var userId   = parseInt($select.val(), 10);
+        var selOpt   = $select.find('option:selected');
+        var newInit  = userId > 0 ? (selOpt.data('initial') || selOpt.text().substring(0, 2).toUpperCase()) : '?';
+        var photo    = userId > 0 ? (selOpt.data('photo') || '') : '';
+
+        $select.removeClass('visible');
+
+        if (photo) {
+            $avatar.attr('src', photo).attr('title', selOpt.text().trim()).show();
+        } else {
+            $avatar.text(newInit)
+                   .attr('title', userId > 0 ? selOpt.text().trim() : '')
+                   .toggleClass('kanban-initial-empty', userId === 0)
+                   .show();
+        }
+
+        window.digiriskdolibarr.ticketPickerKanban.saveAssignee(ticketId, userId, $select);
+    });
+
+    // Assignee select blur → hide
+    $(document).on('blur', '.tac-picker-assignee-select', function() {
+        var $select = $(this);
+        var $avatar = $select.siblings('.kanban-initial-responsible, .tac-picker-card__assignee-img');
+        setTimeout(function() {
+            $select.removeClass('visible');
+            $avatar.show();
+        }, 200);
+    });
+
+    // Prevent card drag when touching the assignee controls
+    $(document).on('mousedown', '.tac-picker-assignee-select, .tac-picker-card__assignee-img, .kanban-responsible-wrapper', function(e) {
+        e.stopPropagation();
+    });
+
+    // Tag: toggle dropdown
+    $(document).on('click', '.tac-picker-kanban-board .kanban-add-tag-btn', function(e) {
+        e.preventDefault();
+        e.stopPropagation();
+        $('.tac-picker-kanban-board .kanban-tag-dropdown.visible')
+            .not($(this).siblings('.kanban-tag-dropdown'))
+            .each(function() {
+                $(this).removeClass('visible');
+                $(this).closest('.tac-picker-card').removeClass('kanban-card-dropdown-open');
+            });
+        var $dropdown = $(this).siblings('.kanban-tag-dropdown');
+        var $card = $(this).closest('.tac-picker-card');
+        $dropdown.toggleClass('visible');
+        $card.toggleClass('kanban-card-dropdown-open', $dropdown.hasClass('visible'));
+    });
+
+    // Tag option click: add category
+    $(document).on('click', '.tac-picker-kanban-board .kanban-tag-option', function(e) {
+        e.stopPropagation();
+        var $opt = $(this);
+        if ($opt.hasClass('assigned')) {
+            return;
+        }
+        var $dropdown = $opt.closest('.kanban-tag-dropdown');
+        var ticketId  = $dropdown.data('ticket-id');
+        var catId     = $opt.data('value');
+        var $card     = $opt.closest('.tac-picker-card');
+        var $tagsRow  = $card.find('.kanban-card-tags');
+
+        $dropdown.removeClass('visible');
+        $card.removeClass('kanban-card-dropdown-open');
+
+        window.digiriskdolibarr.ticketPickerKanban.saveTagAdd(ticketId, catId, $opt, $tagsRow, $card);
+    });
+
+    // Close tag dropdown on outside click
+    $(document).on('click', function() {
+        $('.tac-picker-kanban-board .kanban-tag-dropdown.visible').each(function() {
+            $(this).removeClass('visible');
+            $(this).closest('.tac-picker-card').removeClass('kanban-card-dropdown-open');
+        });
+    });
+    $(document).on('click', '.tac-picker-kanban-board .kanban-tag-dropdown', function(e) {
+        e.stopPropagation();
+    });
+
+    // Tag remove
+    $(document).on('click', '.tac-picker-kanban-board .kanban-tag-remove', function(e) {
+        e.stopPropagation();
+        var $tag     = $(this).closest('.kanban-tag');
+        var catId    = $tag.data('cat-id');
+        var $card    = $tag.closest('.tac-picker-card');
+        var ticketId = $card.data('ticket-id');
+
+        $tag.css('opacity', '0.4');
+        window.digiriskdolibarr.ticketPickerKanban.saveTagRemove(ticketId, catId, $tag, $card);
+    });
+
+    // Prevent drag on tag elements
+    $(document).on('mousedown', '.tac-picker-kanban-board .kanban-tag, .tac-picker-kanban-board .kanban-tag-remove, .tac-picker-kanban-board .kanban-add-tag-btn, .tac-picker-kanban-board .kanban-tag-dropdown, .tac-picker-kanban-board .kanban-tag-option', function(e) {
+        e.stopPropagation();
+    });
+
+    // Tab switching — persist active dim in localStorage so F5 keeps the current tab.
+    $(document).on('click', '#tacDimTabs .tac-dim-tab', function() {
+        var dim = $(this).data('dim');
+        $('#tacDimTabs .tac-dim-tab').removeClass('active');
+        $(this).addClass('active');
+        $('#tacDimPanels .tac-dim-panel').removeClass('active');
+        $('#tacDimPanels .tac-dim-panel[data-dim="' + dim + '"]').addClass('active');
+        localStorage.setItem('tacPickerActiveDim', dim);
+    });
+
+    // Subject: focus on contenteditable span → store original for rollback.
+    $(document).on('focus', '.tac-picker-kanban-board .tac-picker-card__subject-text', function() {
+        var $span = $(this);
+        $span.data('editOriginal', this.innerText || $span.text());
+        $span.addClass('tac-picker-subject--editing');
+        // Select all text so user can replace immediately.
+        var el = this;
+        setTimeout(function() {
+            var range = document.createRange();
+            range.selectNodeContents(el);
+            var sel = window.getSelection();
+            sel.removeAllRanges();
+            sel.addRange(range);
+        }, 0);
+    });
+
+    // Subject: Enter saves, Escape restores.
+    $(document).on('keydown', '.tac-picker-kanban-board .tac-picker-card__subject-text', function(e) {
+        if (e.key === 'Enter') {
+            e.preventDefault();
+            this.blur();
+        }
+        if (e.key === 'Escape') {
+            e.preventDefault();
+            var original = $(this).data('editOriginal') || '';
+            this.textContent = original;
+            this.blur();
+        }
+    });
+
+    // Subject: plain-text paste only.
+    $(document).on('paste', '.tac-picker-kanban-board .tac-picker-card__subject-text', function(e) {
+        e.preventDefault();
+        var text = (e.originalEvent.clipboardData || window.clipboardData).getData('text/plain');
+        var sel  = window.getSelection();
+        if (sel.rangeCount) {
+            var range = sel.getRangeAt(0);
+            range.deleteContents();
+            range.insertNode(document.createTextNode(text));
+            range.collapse(false);
+            sel.removeAllRanges();
+            sel.addRange(range);
+        }
+    });
+
+    // Subject: blur → save if changed.
+    $(document).on('blur', '.tac-picker-kanban-board .tac-picker-card__subject-text', function() {
+        var $span      = $(this);
+        $span.removeClass('tac-picker-subject--editing');
+        var newSubject = $.trim(this.innerText || this.textContent || '');
+        var original   = $span.data('editOriginal') || '';
+        var ticketId   = $span.data('ticket-id');
+
+        if (!newSubject) {
+            this.textContent = original;
+            return;
+        }
+        if (newSubject === original) {
+            return;
+        }
+
+        var $card = $span.closest('.tac-picker-card');
+        window.digiriskdolibarr.ticketPickerKanban.saveSubject(ticketId, newSubject, $span, original, $card);
+    });
+
+    // Prevent drag when clicking the subject text.
+    $(document).on('mousedown', '.tac-picker-kanban-board .tac-picker-card__subject-text', function(e) {
+        e.stopPropagation();
+    });
+
+    // Severity badge click → show inline select.
+    $(document).on('click', '.tac-picker-kanban-board .tac-picker-sev-badge', function(e) {
+        e.stopPropagation();
+        var $badge  = $(this);
+        var $card   = $badge.closest('.tac-picker-card');
+        var $select = $card.find('.tac-picker-sev-inline-select');
+
+        $badge.hide();
+        $select.addClass('visible').trigger('focus');
+    });
+
+    // Severity inline select change → save + update badge.
+    $(document).on('change', '.tac-picker-kanban-board .tac-picker-sev-inline-select', function() {
+        var $select  = $(this);
+        var $card    = $select.closest('.tac-picker-card');
+        var $badge   = $card.find('.tac-picker-sev-badge');
+        var ticketId = $select.data('ticket-id');
+        var newVal   = $select.val();
+        var selText  = $select.find('option:selected').text().trim();
+
+        $select.removeClass('visible');
+
+        var sevColors = {
+            'LOW':      {bg: '#e9ecef', text: '#495057'},
+            'NORMAL':   {bg: '#cfe2ff', text: '#0a58ca'},
+            'HIGH':     {bg: '#fff3cd', text: '#664d03'},
+            'BLOCKING': {bg: '#f8d7da', text: '#842029'}
+        };
+        var col = sevColors[(newVal || '').toUpperCase()] || {bg: '#e9ecef', text: '#495057'};
+
+        $badge.css({'background': col.bg, 'color': col.text}).text(selText).show();
+        $badge.attr('data-severity-code', newVal);
+
+        window.digiriskdolibarr.ticketPickerKanban.saveDim(ticketId, 'severity', newVal || '__none__', $card);
+    });
+
+    // Severity inline select blur → restore badge.
+    $(document).on('blur', '.tac-picker-kanban-board .tac-picker-sev-inline-select', function() {
+        var $select = $(this);
+        var $badge  = $select.closest('.tac-picker-card').find('.tac-picker-sev-badge');
+        setTimeout(function() {
+            if ($select.hasClass('visible')) {
+                $select.removeClass('visible');
+                $badge.show();
+            }
+        }, 200);
+    });
+
+    // Prevent drag when clicking severity badge or select.
+    $(document).on('mousedown', '.tac-picker-kanban-board .tac-picker-sev-badge, .tac-picker-kanban-board .tac-picker-sev-inline-select', function(e) {
+        e.stopPropagation();
+    });
+};
+
+/**
+ * Initialize jQuery UI Sortable for all three dimension kanban boards.
+ * Each board's column bodies use the class kanban-picker-sortable and
+ * are connected only within the same board (same data-dim value).
+ *
+ * @return {void}
+ */
+window.digiriskdolibarr.ticketPickerKanban.initSortable = function() {
+    if (!$('.kanban-picker-sortable').length) {
+        return;
+    }
+
+    var dims = ['status', 'type', 'group', 'severity'];
+    var actionMap = {
+        status:   'updateTicketStatus',
+        type:     'updateTicketType',
+        group:    'updateTicketGroup',
+        severity: 'updateTicketSeverity'
+    };
+    var cancelSel = '.kanban-responsible-wrapper, .tac-picker-assignee-select, .kanban-tag, '
+        + '.kanban-tag-remove, .kanban-add-tag-btn, .kanban-tag-dropdown, .kanban-tag-option, '
+        + '.tac-picker-card__assignee-img, .kanban-initial-responsible, .kanban-card-label, '
+        + '.tac-picker-card__subject-text, .tac-picker-sev-badge, .tac-picker-sev-inline-select';
+
+    $.each(dims, function(i, dim) {
+        var $cols = $('.kanban-picker-sortable[data-dim="' + dim + '"]');
+        if (!$cols.length) {
+            return;
+        }
+        $cols.sortable({
+            connectWith:  '.kanban-picker-sortable[data-dim="' + dim + '"]',
+            placeholder:  'kanban-card-placeholder',
+            tolerance:    'pointer',
+            cursor:       'grabbing',
+            cancel:       cancelSel,
+            receive: function(event, ui) {
+                var $card    = ui.item;
+                var $column  = $(this);
+                var ticketId = $card.data('ticket-id');
+                var newVal   = $column.data('dim-value');
+
+                $card.data('dim-value', newVal);
+
+                $column.find('.kanban-empty').remove();
+
+                var $source = ui.sender;
+                if ($source.children('.tac-picker-card').length === 0) {
+                    $source.append('<div class="kanban-empty">Aucun ticket</div>');
+                }
+
+                window.digiriskdolibarr.ticketPickerKanban.updateCounts();
+                window.digiriskdolibarr.ticketPickerKanban.saveDim(ticketId, dim, newVal, $card);
+            }
+        });
+    });
+};
+
+/**
+ * Update column header counters after a card move.
+ *
+ * @return {void}
+ */
+window.digiriskdolibarr.ticketPickerKanban.updateCounts = function() {
+    $('.tac-picker-column').each(function() {
+        var count = $(this).find('.tac-picker-card').length;
+        $(this).find('.kanban-column-count').text(count);
+    });
+};
+
+/**
+ * AJAX — save a dimension change (type / group / severity) after drag & drop.
+ *
+ * @param {number} ticketId  Ticket row ID
+ * @param {string} dim       Dimension: 'type' | 'group' | 'severity'
+ * @param {string} newVal    New code value for that dimension
+ * @param {jQuery} $card     The card element
+ * @return {void}
+ */
+window.digiriskdolibarr.ticketPickerKanban.saveDim = function(ticketId, dim, newVal, $card) {
+    var token     = window.saturne.toolbox.getToken();
+    var sep       = window.saturne.toolbox.getQuerySeparator(document.URL);
+    var actionMap = {type: 'updateTicketType', group: 'updateTicketGroup', severity: 'updateTicketSeverity'};
+    var action    = actionMap[dim];
+    if (!action) {
+        return;
+    }
+
+    $card.addClass('kanban-card-saving');
+
+    $.ajax({
+        url:      document.URL + sep + 'action=' + action + '&ticket_id=' + ticketId + '&dim_value=' + encodeURIComponent(newVal) + '&token=' + token,
+        type:     'POST',
+        dataType: 'json',
+        success: function(response) {
+            $card.removeClass('kanban-card-saving');
+            if (response.success) {
+                $card.addClass('kanban-card-saved');
+                setTimeout(function() { $card.removeClass('kanban-card-saved'); }, 2000);
+            } else {
+                $card.addClass('kanban-card-error');
+                setTimeout(function() { $card.removeClass('kanban-card-error'); }, 3000);
+            }
+        },
+        error: function() {
+            $card.removeClass('kanban-card-saving');
+            $card.addClass('kanban-card-error');
+            setTimeout(function() { $card.removeClass('kanban-card-error'); }, 3000);
+        }
+    });
+};
+
+/**
+ * AJAX — save new assignee for a ticket card.
+ *
+ * @param {number} ticketId   Ticket row ID
+ * @param {number} userId     User row ID (0 = unassign)
+ * @param {jQuery} $select    The select element
+ * @return {void}
+ */
+window.digiriskdolibarr.ticketPickerKanban.saveAssignee = function(ticketId, userId, $select) {
+    var token = window.saturne.toolbox.getToken();
+    var sep   = window.saturne.toolbox.getQuerySeparator(document.URL);
+    var $card = $select.closest('.tac-picker-card');
+
+    $card.addClass('kanban-card-saving');
+
+    $.ajax({
+        url: document.URL + sep + 'action=updateTicketAssignee&ticket_id=' + ticketId + '&user_id=' + userId + '&token=' + token,
+        type: 'POST',
+        dataType: 'json',
+        success: function(response) {
+            $card.removeClass('kanban-card-saving');
+            if (response.success) {
+                $card.addClass('kanban-card-saved');
+                setTimeout(function() { $card.removeClass('kanban-card-saved'); }, 2000);
+            } else {
+                $card.addClass('kanban-card-error');
+                setTimeout(function() { $card.removeClass('kanban-card-error'); }, 3000);
+            }
+        },
+        error: function() {
+            $card.removeClass('kanban-card-saving');
+            $card.addClass('kanban-card-error');
+            setTimeout(function() { $card.removeClass('kanban-card-error'); }, 3000);
+        }
+    });
+};
+
+/**
+ * AJAX — add a category to a ticket, then inject the new tag chip.
+ *
+ * @param {number} ticketId  Ticket row ID
+ * @param {number} catId     Category row ID
+ * @param {jQuery} $opt      The clicked option element
+ * @param {jQuery} $tagsRow  The .kanban-card-tags container
+ * @param {jQuery} $card     The card element
+ * @return {void}
+ */
+window.digiriskdolibarr.ticketPickerKanban.saveTagAdd = function(ticketId, catId, $opt, $tagsRow, $card) {
+    var token = window.saturne.toolbox.getToken();
+    var sep   = window.saturne.toolbox.getQuerySeparator(document.URL);
+
+    $card.addClass('kanban-card-saving');
+
+    $.ajax({
+        url: document.URL + sep + 'action=addTicketCategory&ticket_id=' + ticketId + '&cat_id=' + catId + '&token=' + token,
+        type: 'POST',
+        dataType: 'json',
+        success: function(response) {
+            $card.removeClass('kanban-card-saving');
+            if (response.success) {
+                var bgColor = response.color ? '#' + response.color : '#8c8c8c';
+                var $tag = $('<span class="kanban-tag" data-cat-id="' + response.id + '" style="background:' + bgColor + '">'
+                    + response.label
+                    + '<span class="kanban-tag-remove" title="Supprimer">&times;</span></span>');
+                $tagsRow.find('.kanban-tag-dropdown-wrapper').before($tag);
+                $opt.addClass('assigned').append('<i class="fas fa-check" style="margin-left:auto;font-size:9px;color:#28a745"></i>');
+                $card.addClass('kanban-card-saved');
+                setTimeout(function() { $card.removeClass('kanban-card-saved'); }, 2000);
+            } else {
+                $card.addClass('kanban-card-error');
+                setTimeout(function() { $card.removeClass('kanban-card-error'); }, 3000);
+            }
+        },
+        error: function() {
+            $card.removeClass('kanban-card-saving');
+            $card.addClass('kanban-card-error');
+            setTimeout(function() { $card.removeClass('kanban-card-error'); }, 3000);
+        }
+    });
+};
+
+/**
+ * AJAX — remove a category from a ticket, then remove the tag chip.
+ *
+ * @param {number} ticketId  Ticket row ID
+ * @param {number} catId     Category row ID
+ * @param {jQuery} $tag      The tag chip element
+ * @param {jQuery} $card     The card element
+ * @return {void}
+ */
+window.digiriskdolibarr.ticketPickerKanban.saveTagRemove = function(ticketId, catId, $tag, $card) {
+    var token = window.saturne.toolbox.getToken();
+    var sep   = window.saturne.toolbox.getQuerySeparator(document.URL);
+
+    $.ajax({
+        url: document.URL + sep + 'action=removeTicketCategory&ticket_id=' + ticketId + '&cat_id=' + catId + '&token=' + token,
+        type: 'POST',
+        dataType: 'json',
+        success: function(response) {
+            if (response.success) {
+                $tag.slideUp(150, function() {
+                    $(this).remove();
+                    $card.find('.kanban-tag-option[data-value="' + catId + '"]').removeClass('assigned').find('.fa-check').remove();
+                });
+                $card.addClass('kanban-card-saved');
+                setTimeout(function() { $card.removeClass('kanban-card-saved'); }, 2000);
+            } else {
+                $tag.css('opacity', '1');
+                $card.addClass('kanban-card-error');
+                setTimeout(function() { $card.removeClass('kanban-card-error'); }, 3000);
+            }
+        },
+        error: function() {
+            $tag.css('opacity', '1');
+        }
+    });
+};
+
+/**
+ * AJAX — save an updated subject after contenteditable edit.
+ *
+ * @param {number} ticketId     Ticket row ID
+ * @param {string} newSubject   New subject text
+ * @param {jQuery} $span        The contenteditable .tac-picker-card__subject-text element
+ * @param {string} originalText Subject before editing (for rollback)
+ * @param {jQuery} $card        The card element
+ * @return {void}
+ */
+window.digiriskdolibarr.ticketPickerKanban.saveSubject = function(ticketId, newSubject, $span, originalText, $card) {
+    var token = window.saturne.toolbox.getToken();
+    var sep   = window.saturne.toolbox.getQuerySeparator(document.URL);
+
+    $card.addClass('kanban-card-saving');
+
+    $.ajax({
+        url:      document.URL + sep + 'action=updateTicketSubject&ticket_id=' + ticketId + '&token=' + token,
+        type:     'POST',
+        data:     {subject: newSubject},
+        dataType: 'json',
+        success: function(response) {
+            $card.removeClass('kanban-card-saving');
+            if (response.success) {
+                var saved = response.subject || newSubject;
+                $span[0].textContent = saved;
+                $span.data('editOriginal', saved);
+                $card.addClass('kanban-card-saved');
+                setTimeout(function() { $card.removeClass('kanban-card-saved'); }, 2000);
+            } else {
+                $span[0].textContent = originalText;
+                $span.data('editOriginal', originalText);
+                $card.addClass('kanban-card-error');
+                setTimeout(function() { $card.removeClass('kanban-card-error'); }, 3000);
+            }
+        },
+        error: function() {
+            $card.removeClass('kanban-card-saving');
+            $span[0].textContent = originalText;
+            $span.data('editOriginal', originalText);
+            $card.addClass('kanban-card-error');
+            setTimeout(function() { $card.removeClass('kanban-card-error'); }, 3000);
+        }
+    });
+};
+
+/**
+ * Column width & gap settings with localStorage persistence.
+ *
+ * @return {void}
+ */
+window.digiriskdolibarr.ticketPickerKanban.initSettings = function() {
+    var $btn      = $('#kanbanPickerSettingsBtn');
+    var $popover  = $('#kanbanPickerSettingsPopover');
+    var $board    = $('.tac-picker-kanban-board');
+    var $wSlider  = $('#kanbanPickerColWidth');
+    var $gSlider  = $('#kanbanPickerColGap');
+    var $wVal     = $('#kanbanPickerColWidthVal');
+    var $gVal     = $('#kanbanPickerColGapVal');
+
+    if (!$btn.length) {
+        return;
+    }
+
+    var savedW = localStorage.getItem('tacPickerKanbanColWidth');
+    var savedG = localStorage.getItem('tacPickerKanbanColGap');
+    if (savedW) {
+        $wSlider.val(savedW);
+        $wVal.text(savedW + 'px');
+        $board.find('.tac-picker-column').css({'min-width': savedW + 'px', 'max-width': savedW + 'px'});
+    }
+    if (savedG) {
+        $gSlider.val(savedG);
+        $gVal.text(savedG + 'px');
+        $board.css('gap', savedG + 'px');
+    }
+
+    $btn.on('click', function(e) {
+        e.stopPropagation();
+        $popover.toggleClass('open');
+    });
+    $(document).on('click', function(e) {
+        if (!$(e.target).closest('#kanbanPickerSettingsBtn, #kanbanPickerSettingsPopover').length) {
+            $popover.removeClass('open');
+        }
+    });
+
+    $wSlider.on('input', function() {
+        var val = $(this).val();
+        $wVal.text(val + 'px');
+        $board.find('.tac-picker-column').css({'min-width': val + 'px', 'max-width': val + 'px'});
+        localStorage.setItem('tacPickerKanbanColWidth', val);
+    });
+    $gSlider.on('input', function() {
+        var val = $(this).val();
+        $gVal.text(val + 'px');
+        $board.css('gap', val + 'px');
+        localStorage.setItem('tacPickerKanbanColGap', val);
+    });
+};

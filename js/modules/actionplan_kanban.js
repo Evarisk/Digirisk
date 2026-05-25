@@ -9,6 +9,9 @@ window.digiriskdolibarr.actionplanKanban = {};
  * Init — auto-called by saturne.js on document.ready
  */
 window.digiriskdolibarr.actionplanKanban.init = function() {
+    if (!$('.actionplan-kanban-board').length) {
+        return;
+    }
     window.digiriskdolibarr.actionplanKanban.event();
     window.digiriskdolibarr.actionplanKanban.initSortable();
     window.digiriskdolibarr.actionplanKanban.initSettings();
