@@ -1842,3 +1842,16 @@ TicketKanbanLogDeadlineDesc            = Créer un événement lorsque la date l
 TicketKanbanClosedLimit                = Limite tickets fermés
 TicketKanbanClosedLimitDesc            = Nombre maximum de tickets fermés/annulés affichés dans le kanban (0 = illimité)
 
+# Drawer de création rapide de ticket
+SelectNothing                          = — Sélectionner —
+QuickCreateTicket                      = Créer rapidement un ticket
+TicketSubjectPlaceholder               = Titre du ticket...
+TicketInitialMessage                   = Message initial
+OptionalDescription                    = Description (optionnel)...
+Unassigned                             = Non assigné
+QuickCreateAttachments                 = Pièces jointes
+QuickCreateDropzone                    = Glisser-déposer ou cliquer pour sélectionner
+QuickCreateDropzoneActive              = Déposez ici…
+QuickCreateAttachmentHint              = Formats acceptés : images, PDF, docs. Max 10 Mo par fichier.
+QuickCreateTicketSuccess               = Ticket %s créé avec succès.
+

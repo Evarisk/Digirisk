@@ -1950,3 +1950,364 @@ $tac-border:       #e5e7eb;
 
     &.visible { display: inline-block; }
 }
+
+// ---------------------------------------------------------------------------
+// Picker top bar — "Nouveau ticket" button sits above the tabs.
+// ---------------------------------------------------------------------------
+.tac-picker-topbar {
+    display: flex;
+    justify-content: flex-start;
+    margin-bottom: 10px;
+
+    &__btn {
+        display: inline-flex;
+        align-items: center;
+        gap: 7px;
+        padding: 7px 16px;
+        background: $tac-blue;
+        color: #fff;
+        border: none;
+        border-radius: 8px;
+        font-family: inherit;
+        font-size: 0.92em;
+        font-weight: 600;
+        cursor: pointer;
+        transition: background 0.15s ease, box-shadow 0.15s ease;
+
+        &:hover { background: darken($tac-blue, 6%); box-shadow: 0 4px 12px rgba(13,138,255,0.3); }
+
+        i { font-size: 0.9em; }
+    }
+}
+
+// ---------------------------------------------------------------------------
+// Quick-create drawer.
+// ---------------------------------------------------------------------------
+.tac-quick-create {
+    display: none;
+    position: fixed;
+    inset: 0;
+    z-index: 2000;
+
+    &.is-open { display: block; }
+
+    &__overlay {
+        position: absolute;
+        inset: 0;
+        background: rgba(0, 0, 0, 0.45);
+        animation: tac-qc-fade-in 0.2s ease;
+        cursor: pointer;
+    }
+
+    &__drawer {
+        position: absolute;
+        top: 0;
+        right: 0;
+        bottom: 0;
+        width: 100%;
+        max-width: 480px;
+        background: #fff;
+        box-shadow: -4px 0 24px rgba(0, 0, 0, 0.15);
+        display: flex;
+        flex-direction: column;
+        animation: tac-qc-slide-in 0.22s cubic-bezier(0.25, 0.46, 0.45, 0.94);
+        overflow: hidden;
+    }
+
+    &__header {
+        display: flex;
+        align-items: center;
+        gap: 10px;
+        padding: 18px 20px;
+        border-bottom: 1px solid $tac-border;
+        background: $tac-bg;
+        flex: 0 0 auto;
+    }
+
+    &__title {
+        flex: 1 1 auto;
+        font-size: 1.05em;
+        font-weight: 700;
+        color: #1f2937;
+
+        i { color: $tac-blue; margin-right: 6px; }
+    }
+
+    &__close {
+        appearance: none;
+        background: transparent;
+        border: 1px solid $tac-border;
+        border-radius: 6px;
+        width: 32px;
+        height: 32px;
+        cursor: pointer;
+        color: $tac-grey;
+        font-size: 1em;
+        transition: background 0.15s ease, color 0.15s ease, border-color 0.15s ease;
+        flex: 0 0 auto;
+
+        &:hover { background: rgba(224,83,83,0.08); color: $tac-red; border-color: $tac-red; }
+    }
+
+    &__form {
+        flex: 1 1 auto;
+        overflow-y: auto;
+        padding: 20px;
+        display: flex;
+        flex-direction: column;
+        gap: 16px;
+    }
+}
+
+@keyframes tac-qc-fade-in {
+    from { opacity: 0; }
+    to   { opacity: 1; }
+}
+
+@keyframes tac-qc-slide-in {
+    from { transform: translateX(100%); }
+    to   { transform: translateX(0); }
+}
+
+// ----- Form field primitives -----
+.tac-qc-field {
+    display: flex;
+    flex-direction: column;
+    gap: 5px;
+
+    &--required .tac-qc-label::after {
+        content: ' *';
+        color: $tac-red;
+    }
+}
+
+.tac-qc-row {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 12px;
+
+    @media (max-width: 480px) { grid-template-columns: 1fr; }
+}
+
+.tac-qc-label {
+    font-size: 0.76em;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 0.04em;
+    color: $tac-grey;
+
+    i { color: $tac-blue; margin-right: 4px; }
+}
+
+.tac-qc-input,
+.tac-qc-select,
+.tac-qc-textarea {
+    width: 100%;
+    padding: 8px 10px;
+    border: 1px solid $tac-border;
+    border-radius: 7px;
+    background: #fff;
+    font-family: inherit;
+    font-size: 0.93em;
+    color: #1f2937;
+    transition: border-color 0.15s ease, box-shadow 0.15s ease;
+
+    &:focus {
+        outline: none;
+        border-color: $tac-blue;
+        box-shadow: 0 0 0 3px rgba(13, 138, 255, 0.15);
+    }
+
+    &:invalid:not(:placeholder-shown) {
+        border-color: $tac-red;
+    }
+}
+
+.tac-qc-textarea {
+    resize: vertical;
+    min-height: 90px;
+}
+
+.tac-qc-toast {
+    padding: 10px 12px;
+    border-radius: 7px;
+    font-size: 0.9em;
+
+    &:empty { display: none; }
+
+    &.is-error {
+        background: rgba(224, 83, 83, 0.1);
+        border: 1px solid rgba(224, 83, 83, 0.4);
+        color: darken($tac-red, 10%);
+    }
+
+    &.is-success {
+        background: rgba(34, 191, 78, 0.1);
+        border: 1px solid rgba(34, 191, 78, 0.4);
+        color: darken($tac-green, 16%);
+    }
+}
+
+.tac-qc-actions {
+    display: flex;
+    justify-content: flex-end;
+    gap: 10px;
+    margin-top: 4px;
+    padding-top: 12px;
+    border-top: 1px solid $tac-border;
+    flex: 0 0 auto;
+}
+
+.tac-qc-btn {
+    appearance: none;
+    border: 1px solid $tac-border;
+    border-radius: 8px;
+    padding: 9px 20px;
+    font-family: inherit;
+    font-size: 0.93em;
+    font-weight: 600;
+    cursor: pointer;
+    display: inline-flex;
+    align-items: center;
+    gap: 7px;
+    transition: background 0.15s ease, border-color 0.15s ease, box-shadow 0.15s ease;
+
+    i { font-size: 0.95em; }
+
+    &--secondary {
+        background: #fff;
+        color: $tac-grey;
+        &:hover { background: rgba(0,0,0,0.04); border-color: darken($tac-border, 10%); }
+    }
+
+    &--primary {
+        background: $tac-blue;
+        color: #fff;
+        border-color: $tac-blue;
+
+        &:hover { background: darken($tac-blue, 6%); box-shadow: 0 4px 12px rgba(13,138,255,0.3); }
+
+        &[disabled] {
+            opacity: 0.55;
+            cursor: not-allowed;
+            &:hover { background: $tac-blue; box-shadow: none; }
+        }
+
+        // Loading spinner
+        &.is-loading {
+            position: relative;
+            color: transparent;
+            pointer-events: none;
+
+            &::after {
+                content: '';
+                position: absolute;
+                top: 50%;
+                left: 50%;
+                width: 16px;
+                height: 16px;
+                margin: -8px 0 0 -8px;
+                border: 2px solid rgba(255, 255, 255, 0.35);
+                border-top-color: #fff;
+                border-radius: 50%;
+                animation: tac-spin 0.65s linear infinite;
+            }
+        }
+    }
+}
+
+// ----- Dropzone pièces jointes -----
+.tac-qc-dropzone {
+    position: relative;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    gap: 6px;
+    padding: 20px 16px;
+    border: 2px dashed $tac-border;
+    border-radius: 10px;
+    background: $tac-bg;
+    text-align: center;
+    cursor: pointer;
+    transition: border-color 0.15s ease, background 0.15s ease;
+
+    &:hover,
+    &:focus { border-color: $tac-blue; background: rgba(13,138,255,0.04); outline: none; }
+
+    &.is-dragover {
+        border-color: $tac-blue;
+        background: rgba(13,138,255,0.08);
+
+        .tac-qc-dropzone__label { color: $tac-blue; font-weight: 600; }
+    }
+
+    &__icon {
+        font-size: 1.8em;
+        color: rgba(13,138,255,0.45);
+        line-height: 1;
+    }
+
+    &__label {
+        font-size: 0.88em;
+        color: $tac-grey;
+        transition: color 0.15s ease;
+    }
+
+    &__hint {
+        font-size: 0.75em;
+        color: lighten($tac-grey, 15%);
+    }
+}
+
+// The real <input type="file"> is invisible but covers the whole dropzone.
+.tac-qc-file-input {
+    position: absolute;
+    inset: 0;
+    width: 100%;
+    height: 100%;
+    opacity: 0;
+    cursor: pointer;
+}
+
+// File list below the dropzone.
+.tac-qc-file-list {
+    list-style: none;
+    padding: 0;
+    margin: 6px 0 0;
+    display: flex;
+    flex-direction: column;
+    gap: 4px;
+
+    &:empty { display: none; }
+
+    li {
+        display: flex;
+        align-items: center;
+        gap: 8px;
+        padding: 5px 8px;
+        background: #fff;
+        border: 1px solid $tac-border;
+        border-radius: 6px;
+        font-size: 0.85em;
+        color: #1f2937;
+
+        i { color: $tac-grey; flex: 0 0 auto; }
+
+        span { flex: 1 1 auto; min-width: 0; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+
+        button {
+            appearance: none;
+            background: transparent;
+            border: none;
+            color: $tac-grey;
+            cursor: pointer;
+            padding: 2px 4px;
+            border-radius: 4px;
+            font-size: 0.9em;
+            flex: 0 0 auto;
+
+            &:hover { color: $tac-red; background: rgba(224,83,83,0.08); }
+        }
+    }
+}

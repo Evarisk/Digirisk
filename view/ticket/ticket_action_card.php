@@ -372,6 +372,73 @@ if ($action == 'updateTicketSubject' && !empty(GETPOSTINT('ticket_id'))) {
     exit;
 }
 
+// AJAX: quick-create a ticket from the picker drawer
+if ($action == 'createTicket' && $permissionToWrite) {
+    header('Content-Type: application/json');
+
+    $newTicket                       = new Ticket($db);
+    $newTicket->subject              = GETPOST('subject', 'alphanohtml');
+    $newTicket->type_code            = GETPOST('type_code', 'alpha');
+    $newTicket->severity_code        = GETPOST('severity_code', 'alpha');
+    $newTicket->message              = GETPOST('message', 'restricthtml');
+    $newTicket->fk_user_create       = $user->id;
+    $newTicket->email_from           = $user->email;
+    $newTicket->origin_email         = null;
+    $newTicket->notify_tiers_at_create = 0;
+
+    $newTicket->type_label     = $langs->getLabelFromKey($db, $newTicket->type_code, 'c_ticket_type', 'code', 'label');
+    $newTicket->severity_label = $langs->getLabelFromKey($db, $newTicket->severity_code, 'c_ticket_severity', 'code', 'label');
+
+    // Generate the next ticket reference (required by Ticket::verify() before create).
+    $newTicket->ref = $newTicket->getDefaultRef();
+
+    $fkAssign = GETPOSTINT('fk_user_assign');
+    if ($fkAssign > 0) {
+        $newTicket->fk_user_assign = $fkAssign;
+        $newTicket->status         = Ticket::STATUS_ASSIGNED;
+    }
+
+    $newId = $newTicket->create($user, 1);
+    if ($newId > 0) {
+        // Move uploaded attachments into the ticket directory.
+        $uploadedNames = !empty($_FILES['attachments']['name']) ? (array) $_FILES['attachments']['name'] : [];
+        $uploadedTmps  = !empty($_FILES['attachments']['tmp_name']) ? (array) $_FILES['attachments']['tmp_name'] : [];
+        $uploadedErrs  = !empty($_FILES['attachments']['error']) ? (array) $_FILES['attachments']['error'] : [];
+
+        if (!empty($uploadedNames) && $uploadedNames[0] !== '') {
+            require_once DOL_DOCUMENT_ROOT . '/core/lib/files.lib.php';
+
+            $destDir = $conf->ticket->dir_output . '/' . dol_sanitizeFileName($newTicket->ref);
+            if (!dol_is_dir($destDir)) {
+                dol_mkdir($destDir);
+            }
+
+            foreach ($uploadedNames as $i => $rawName) {
+                if (!empty($uploadedErrs[$i]) || empty($rawName) || empty($uploadedTmps[$i])) {
+                    continue;
+                }
+                $safeName = dol_sanitizeFileName($rawName);
+                $destFile = $destDir . '/' . $safeName;
+                if (file_exists($destFile)) {
+                    $pi       = pathinfo($safeName);
+                    $destFile = $destDir . '/' . $pi['filename'] . '-' . dol_print_date(dol_now(), 'dayhourlog') . '.' . ($pi['extension'] ?? 'bin');
+                }
+                dol_move_uploaded_file($uploadedTmps[$i], $destFile, 1, 0, $uploadedErrs[$i]);
+            }
+        }
+
+        $detailUrl = dol_buildpath('/custom/digiriskdolibarr/view/ticket/ticket_action_card.php', 1) . '?id=' . $newId;
+        print json_encode(['success' => 1, 'id' => $newId, 'ref' => $newTicket->ref, 'url' => $detailUrl]);
+    } else {
+        $errMsg = $newTicket->error ?: implode(', ', $newTicket->errors ?: []);
+        dol_syslog('ticket_action_card.php createTicket: create failed - ' . $errMsg, LOG_ERR);
+        http_response_code(500);
+        print json_encode(['success' => 0, 'error' => $errMsg ?: 'Ticket creation failed']);
+    }
+    $db->close();
+    exit;
+}
+
 /*
  * View
  */
@@ -771,6 +838,50 @@ if ($object->id <= 0) {
             $pickerStatusTickets[$sts][] = $t;
         }
     }
+}
+
+// Quick-create drawer data — always loaded so the drawer is available on both views.
+$createFormTypes      = [];
+$createFormSeverities = [];
+$createFormUsers      = $pickerAllUsers; // already populated when no ticket is selected
+
+if ($object->id > 0) {
+    // On the detail view the picker arrays are empty — re-fetch users.
+    $sqlU = 'SELECT rowid, firstname, lastname FROM ' . MAIN_DB_PREFIX . 'user'
+        . ' WHERE statut = 1 AND entity IN (' . getEntity('user') . ') ORDER BY lastname, firstname';
+    $resU = $db->query($sqlU);
+    if ($resU) {
+        while ($u = $db->fetch_object($resU)) {
+            $createFormUsers[] = [
+                'id'       => (int) $u->rowid,
+                'fullname' => trim($u->firstname . ' ' . $u->lastname),
+            ];
+        }
+        $db->free($resU);
+    }
+}
+
+$sqlCft = 'SELECT code, label FROM ' . MAIN_DB_PREFIX . 'c_ticket_type WHERE active = 1 AND entity IN (' . getEntity('c_ticket_type') . ') ORDER BY label';
+$resCft = $db->query($sqlCft);
+if ($resCft) {
+    while ($r = $db->fetch_object($resCft)) {
+        $transKey = 'TicketTypeShort' . $r->code;
+        $lbl      = $langs->trans($transKey);
+        $createFormTypes[$r->code] = ($lbl === $transKey) ? $r->label : $lbl;
+    }
+    $db->free($resCft);
+}
+
+
+$sqlCfs = 'SELECT code, label FROM ' . MAIN_DB_PREFIX . 'c_ticket_severity WHERE active = 1 AND entity IN (' . getEntity('c_ticket_severity') . ') ORDER BY code';
+$resCfs = $db->query($sqlCfs);
+if ($resCfs) {
+    while ($r = $db->fetch_object($resCfs)) {
+        $transKey = 'TicketSeverityShort' . $r->code;
+        $lbl      = $langs->trans($transKey);
+        $createFormSeverities[$r->code] = ($lbl === $transKey) ? $r->label : $lbl;
+    }
+    $db->free($resCfs);
 }
 
 // Page entry point — kanban picker if no ticket loaded, otherwise the tile card.
