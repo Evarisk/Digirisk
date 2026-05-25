@@ -19,6 +19,7 @@
  * \file    view/ticket/ticket_action_card.php
  * \ingroup digiriskdolibarr
  * \brief   One-click ticket action card — large tile UI for fast status / assignment / link actions.
+ *          Picker (no ticket selected) renders a Kanban board of all open tickets.
  *
  * Issue #4443 — IHM ticket registre.
  */
@@ -40,6 +41,7 @@ if (file_exists('../digiriskdolibarr.main.inc.php')) {
 // Load Dolibarr libraries
 require_once DOL_DOCUMENT_ROOT . '/ticket/class/ticket.class.php';
 require_once DOL_DOCUMENT_ROOT . '/user/class/user.class.php';
+require_once DOL_DOCUMENT_ROOT . '/categories/class/categorie.class.php';
 
 // Global variables definitions
 global $conf, $db, $hookmanager, $langs, $moduleNameLowerCase, $user;
@@ -69,6 +71,242 @@ $permissionToWrite = $user->hasRight('ticket', 'write');
 saturne_check_access($permissionToRead);
 
 /*
+ * Actions
+ */
+
+// AJAX: update ticket status from kanban drag & drop
+if ($action == 'updateTicketStatus' && !empty(GETPOSTINT('ticket_id'))) {
+    header('Content-Type: application/json');
+
+    $ticketId  = GETPOSTINT('ticket_id');
+    $dimValue  = GETPOST('dim_value', 'alpha');
+    $newStatus = $dimValue !== '' ? (int) $dimValue : GETPOSTINT('new_status');
+
+    $ticketToUpdate = new Ticket($db);
+    $result         = $ticketToUpdate->fetch($ticketId);
+
+    if ($result > 0) {
+        $res = $ticketToUpdate->setStatut($newStatus, $user);
+        if ($res > 0) {
+            print json_encode(['success' => 1]);
+        } else {
+            http_response_code(500);
+            print json_encode(['success' => 0, 'error' => $ticketToUpdate->error]);
+        }
+    } else {
+        http_response_code(404);
+        print json_encode(['success' => 0, 'error' => 'Ticket not found']);
+    }
+    $db->close();
+    exit;
+}
+
+// AJAX: update ticket assignee from inline edit
+if ($action == 'updateTicketAssignee' && !empty(GETPOSTINT('ticket_id'))) {
+    header('Content-Type: application/json');
+
+    $ticketId = GETPOSTINT('ticket_id');
+    $userId   = GETPOSTINT('user_id');
+
+    $ticketToUpdate = new Ticket($db);
+    $result         = $ticketToUpdate->fetch($ticketId);
+
+    if ($result > 0) {
+        $ticketToUpdate->fk_user_assign = $userId > 0 ? $userId : null;
+        $res = $ticketToUpdate->update($user);
+        if ($res > 0) {
+            $fullname  = '';
+            $initials  = '';
+            if ($userId > 0) {
+                $assignedUser = new User($db);
+                $assignedUser->fetch($userId);
+                $fullname = $assignedUser->getFullName($langs);
+                $initials = strtoupper(mb_substr($assignedUser->firstname, 0, 1) . mb_substr($assignedUser->lastname, 0, 1));
+            }
+            print json_encode(['success' => 1, 'fullname' => $fullname, 'initials' => $initials]);
+        } else {
+            http_response_code(500);
+            print json_encode(['success' => 0, 'error' => $ticketToUpdate->error]);
+        }
+    } else {
+        http_response_code(404);
+        print json_encode(['success' => 0, 'error' => 'Ticket not found']);
+    }
+    $db->close();
+    exit;
+}
+
+// AJAX: add a category to a ticket
+if ($action == 'addTicketCategory' && !empty(GETPOSTINT('ticket_id'))) {
+    header('Content-Type: application/json');
+
+    $ticketId = GETPOSTINT('ticket_id');
+    $catId    = GETPOSTINT('cat_id');
+
+    $ticketToUpdate = new Ticket($db);
+    $result         = $ticketToUpdate->fetch($ticketId);
+
+    if ($result > 0) {
+        $cat    = new Categorie($db);
+        $resCat = $cat->fetch($catId);
+        if ($resCat > 0) {
+            $res = $cat->add_type($ticketToUpdate, 'ticket');
+            if ($res > 0 || $res == -3) {
+                print json_encode(['success' => 1, 'label' => $cat->label, 'color' => $cat->color, 'id' => $cat->id]);
+            } else {
+                print json_encode(['success' => 0, 'error' => $cat->error]);
+            }
+        } else {
+            print json_encode(['success' => 0, 'error' => 'Category not found']);
+        }
+    } else {
+        http_response_code(404);
+        print json_encode(['success' => 0, 'error' => 'Ticket not found']);
+    }
+    $db->close();
+    exit;
+}
+
+// AJAX: remove a category from a ticket
+if ($action == 'removeTicketCategory' && !empty(GETPOSTINT('ticket_id'))) {
+    header('Content-Type: application/json');
+
+    $ticketId = GETPOSTINT('ticket_id');
+    $catId    = GETPOSTINT('cat_id');
+
+    $ticketToUpdate = new Ticket($db);
+    $result         = $ticketToUpdate->fetch($ticketId);
+
+    if ($result > 0) {
+        $cat    = new Categorie($db);
+        $resCat = $cat->fetch($catId);
+        if ($resCat > 0) {
+            $res = $cat->del_type($ticketToUpdate, 'ticket');
+            if ($res >= 0) {
+                print json_encode(['success' => 1]);
+            } else {
+                print json_encode(['success' => 0, 'error' => $cat->error]);
+            }
+        } else {
+            print json_encode(['success' => 0, 'error' => 'Category not found']);
+        }
+    } else {
+        http_response_code(404);
+        print json_encode(['success' => 0, 'error' => 'Ticket not found']);
+    }
+    $db->close();
+    exit;
+}
+
+// AJAX: update ticket type (dim kanban drag & drop)
+if ($action == 'updateTicketType' && !empty(GETPOSTINT('ticket_id'))) {
+    header('Content-Type: application/json');
+
+    $ticketId = GETPOSTINT('ticket_id');
+    $dimValue = GETPOST('dim_value', 'alpha');
+
+    $ticketToUpdate = new Ticket($db);
+    $result         = $ticketToUpdate->fetch($ticketId);
+
+    if ($result > 0) {
+        $ticketToUpdate->type_code = !empty($dimValue) && $dimValue !== '__none__' ? $dimValue : '';
+        $res = $ticketToUpdate->update($user);
+        if ($res > 0) {
+            print json_encode(['success' => 1]);
+        } else {
+            http_response_code(500);
+            print json_encode(['success' => 0, 'error' => $ticketToUpdate->error]);
+        }
+    } else {
+        http_response_code(404);
+        print json_encode(['success' => 0, 'error' => 'Ticket not found']);
+    }
+    $db->close();
+    exit;
+}
+
+// AJAX: update ticket group/category (dim kanban drag & drop)
+if ($action == 'updateTicketGroup' && !empty(GETPOSTINT('ticket_id'))) {
+    header('Content-Type: application/json');
+
+    $ticketId = GETPOSTINT('ticket_id');
+    $dimValue = GETPOST('dim_value', 'alpha');
+
+    $ticketToUpdate = new Ticket($db);
+    $result         = $ticketToUpdate->fetch($ticketId);
+
+    if ($result > 0) {
+        $ticketToUpdate->category_code = !empty($dimValue) && $dimValue !== '__none__' ? $dimValue : '';
+        $res = $ticketToUpdate->update($user);
+        if ($res > 0) {
+            print json_encode(['success' => 1]);
+        } else {
+            http_response_code(500);
+            print json_encode(['success' => 0, 'error' => $ticketToUpdate->error]);
+        }
+    } else {
+        http_response_code(404);
+        print json_encode(['success' => 0, 'error' => 'Ticket not found']);
+    }
+    $db->close();
+    exit;
+}
+
+// AJAX: update ticket severity (dim kanban drag & drop)
+if ($action == 'updateTicketSeverity' && !empty(GETPOSTINT('ticket_id'))) {
+    header('Content-Type: application/json');
+
+    $ticketId = GETPOSTINT('ticket_id');
+    $dimValue = GETPOST('dim_value', 'alpha');
+
+    $ticketToUpdate = new Ticket($db);
+    $result         = $ticketToUpdate->fetch($ticketId);
+
+    if ($result > 0) {
+        $ticketToUpdate->severity_code = !empty($dimValue) && $dimValue !== '__none__' ? $dimValue : '';
+        $res = $ticketToUpdate->update($user);
+        if ($res > 0) {
+            print json_encode(['success' => 1]);
+        } else {
+            http_response_code(500);
+            print json_encode(['success' => 0, 'error' => $ticketToUpdate->error]);
+        }
+    } else {
+        http_response_code(404);
+        print json_encode(['success' => 0, 'error' => 'Ticket not found']);
+    }
+    $db->close();
+    exit;
+}
+
+// AJAX: update ticket subject (inline edit on kanban card)
+if ($action == 'updateTicketSubject' && !empty(GETPOSTINT('ticket_id'))) {
+    header('Content-Type: application/json');
+
+    $ticketId   = GETPOSTINT('ticket_id');
+    $newSubject = GETPOST('subject', 'nohtml');
+
+    $ticketToUpdate = new Ticket($db);
+    $result         = $ticketToUpdate->fetch($ticketId);
+
+    if ($result > 0) {
+        $ticketToUpdate->subject = $newSubject;
+        $res = $ticketToUpdate->update($user);
+        if ($res > 0) {
+            print json_encode(['success' => 1, 'subject' => $newSubject]);
+        } else {
+            http_response_code(500);
+            print json_encode(['success' => 0, 'error' => $ticketToUpdate->error]);
+        }
+    } else {
+        http_response_code(404);
+        print json_encode(['success' => 0, 'error' => 'Ticket not found']);
+    }
+    $db->close();
+    exit;
+}
+
+/*
  * View
  */
 
@@ -77,7 +315,319 @@ $helpUrl = 'FR:Module_Digirisk';
 
 saturne_header(0, '', $title, $helpUrl);
 
-// Page entry point — picker if no ticket loaded, otherwise the tile card.
+// Kanban picker data — loaded only when no specific ticket is requested.
+$pickerAllUsers          = [];
+$pickerAllCategories     = [];
+$pickerTicketsJson       = [];
+$pickerTypeColumns       = [];
+$pickerTypeTickets       = [];
+$pickerGroupColumns      = [];
+$pickerGroupTickets      = [];
+$pickerSeverityColumns   = [];
+$pickerSeverityTickets   = [];
+$pickerStatusColumns     = [];
+$pickerStatusTickets     = [];
+
+if ($object->id <= 0) {
+    // Hidden token for AJAX requests
+    print '<input type="hidden" name="token" value="' . newToken() . '">';
+
+    // All active internal users for the assignee picker
+    $sqlUsers = 'SELECT u.rowid, u.firstname, u.lastname, u.photo FROM ' . MAIN_DB_PREFIX . 'user u'
+        . ' WHERE u.statut = 1 AND u.entity IN (' . getEntity('user') . ')'
+        . ' ORDER BY u.lastname, u.firstname';
+    $resUsers = $db->query($sqlUsers);
+    if ($resUsers) {
+        while ($objU = $db->fetch_object($resUsers)) {
+            $photoUrl = '';
+            if (!empty($objU->photo)) {
+                $photoFile = DOL_DATA_ROOT . '/users/' . (int) $objU->rowid . '/' . $objU->photo;
+                if (file_exists($photoFile)) {
+                    $photoUrl = DOL_URL_ROOT . '/viewimage.php?modulepart=userphoto&entity=' . $conf->entity
+                        . '&file=' . urlencode($objU->rowid . '/' . $objU->photo)
+                        . '&cache=' . (int) $objU->rowid;
+                }
+            }
+            $pickerAllUsers[] = [
+                'id'       => (int) $objU->rowid,
+                'fullname' => trim($objU->firstname . ' ' . $objU->lastname),
+                'initials' => strtoupper(mb_substr($objU->firstname, 0, 1) . mb_substr($objU->lastname, 0, 1)),
+                'photo'    => $photoUrl,
+            ];
+        }
+        $db->free($resUsers);
+    }
+
+    // All available ticket categories
+    $categorie       = new Categorie($db);
+    $ticketCatTypeId = (int) $categorie->MAP_ID['ticket'];
+    $sqlCats         = 'SELECT rowid, label, color FROM ' . MAIN_DB_PREFIX . 'categorie'
+        . ' WHERE type = ' . $ticketCatTypeId . ' AND entity IN (' . getEntity('category') . ')'
+        . ' ORDER BY label';
+    $resCats = $db->query($sqlCats);
+    if ($resCats) {
+        while ($objCat = $db->fetch_object($resCats)) {
+            $pickerAllCategories[] = ['id' => (int) $objCat->rowid, 'label' => $objCat->label, 'color' => $objCat->color];
+        }
+        $db->free($resCats);
+    }
+
+    // Tickets with enriched data (assignee, severity, type, group, company)
+    $sqlTickets = 'SELECT t.rowid, t.ref, t.subject, t.fk_statut, t.datec, t.severity_code,'
+        . ' t.type_code, t.category_code,'
+        . ' t.fk_user_assign, t.fk_soc,'
+        . ' u.firstname as assign_firstname, u.lastname as assign_lastname, u.photo as assign_photo,'
+        . ' s.nom as company_name'
+        . ' FROM ' . MAIN_DB_PREFIX . 'ticket t'
+        . ' LEFT JOIN ' . MAIN_DB_PREFIX . 'user u ON u.rowid = t.fk_user_assign'
+        . ' LEFT JOIN ' . MAIN_DB_PREFIX . 'societe s ON s.rowid = t.fk_soc'
+        . ' WHERE t.entity IN (' . getEntity('ticket') . ')'
+        . ' ORDER BY t.datec DESC'
+        . ' LIMIT 500';
+    $resTickets = $db->query($sqlTickets);
+    $ticketIds  = [];
+    if ($resTickets) {
+        while ($row = $db->fetch_object($resTickets)) {
+            $assignId       = (int) $row->fk_user_assign;
+            $assignInitials = '';
+            $assignFullname = '';
+            $assignPhoto    = '';
+            if ($assignId > 0) {
+                $assignFullname = trim($row->assign_firstname . ' ' . $row->assign_lastname);
+                $assignInitials = strtoupper(mb_substr($row->assign_firstname, 0, 1) . mb_substr($row->assign_lastname, 0, 1));
+                if (!empty($row->assign_photo)) {
+                    $photoFile = DOL_DATA_ROOT . '/users/' . $assignId . '/' . $row->assign_photo;
+                    if (file_exists($photoFile)) {
+                        $assignPhoto = DOL_URL_ROOT . '/viewimage.php?modulepart=userphoto&entity=' . $conf->entity
+                            . '&file=' . urlencode($assignId . '/' . $row->assign_photo)
+                            . '&cache=' . $assignId;
+                    }
+                }
+            }
+
+            $detailUrl = dol_buildpath('/custom/digiriskdolibarr/view/ticket/ticket_action_card.php', 1) . '?id=' . (int) $row->rowid;
+
+            $sevCode  = strtoupper((string) ($row->severity_code ?: ''));
+            $sevTrans = $sevCode !== '' ? $langs->trans('TicketSeverityShort' . $sevCode) : '';
+            if ($sevTrans === 'TicketSeverityShort' . $sevCode) {
+                $sevTrans = $sevCode;
+            }
+
+            $pickerTicketsJson[] = [
+                'id'              => (int) $row->rowid,
+                'ref'             => $row->ref,
+                'subject'         => $row->subject,
+                'status'          => (int) $row->fk_statut,
+                'severity_code'   => $sevCode,
+                'severity_label'  => $sevTrans,
+                'type_code'       => (string) ($row->type_code ?: ''),
+                'category_code'   => (string) ($row->category_code ?: ''),
+                'date_c'          => $row->datec ? dol_print_date($db->jdate($row->datec), 'day') : '',
+                'company_name'    => $row->company_name ?: '',
+                'assign_id'       => $assignId,
+                'assign_fullname' => $assignFullname,
+                'assign_initials' => $assignInitials,
+                'assign_photo'    => $assignPhoto,
+                'categories'      => [],
+                'url'             => $detailUrl,
+            ];
+            $ticketIds[] = (int) $row->rowid;
+        }
+        $db->free($resTickets);
+    }
+
+    // Batch-load categories for all tickets
+    if (!empty($ticketIds)) {
+        $sqlTktCats = 'SELECT ct.fk_ticket, c.rowid, c.label, c.color'
+            . ' FROM ' . MAIN_DB_PREFIX . 'categorie c'
+            . ' JOIN ' . MAIN_DB_PREFIX . 'categorie_ticket ct ON ct.fk_categorie = c.rowid'
+            . ' WHERE ct.fk_ticket IN (' . implode(',', $ticketIds) . ')';
+        $resTktCats = $db->query($sqlTktCats);
+        $catsByTicket = [];
+        if ($resTktCats) {
+            while ($row = $db->fetch_object($resTktCats)) {
+                $catsByTicket[(int) $row->fk_ticket][] = [
+                    'id'    => (int) $row->rowid,
+                    'label' => $row->label,
+                    'color' => $row->color,
+                ];
+            }
+            $db->free($resTktCats);
+        }
+        foreach ($pickerTicketsJson as &$t) {
+            if (isset($catsByTicket[$t['id']])) {
+                $t['categories'] = $catsByTicket[$t['id']];
+            }
+        }
+        unset($t);
+    }
+
+    // -----------------------------------------------------------------------
+    // Dimension 1 — Type
+    // -----------------------------------------------------------------------
+    $pickerTypeColumns  = [];
+    $pickerTypeTickets  = [];
+    $dimColorPalette    = ['#5b8cdb', '#e9ad4f', '#28a745', '#9c6ade', '#17a2b8', '#fd7e14', '#6f42c1', '#6c757d'];
+
+    $sqlTypes = 'SELECT code, label FROM ' . MAIN_DB_PREFIX . 'c_ticket_type'
+        . ' WHERE active = 1 AND entity IN (' . getEntity('c_ticket_type') . ')'
+        . ' ORDER BY label';
+    $resTypes = $db->query($sqlTypes);
+    $typeColorIdx = 0;
+    if ($resTypes) {
+        while ($r = $db->fetch_object($resTypes)) {
+            $transKey = 'TicketTypeShort' . $r->code;
+            $label    = $langs->trans($transKey);
+            if ($label === $transKey) {
+                $label = $r->label;
+            }
+            $pickerTypeColumns[$r->code] = [
+                'label' => $label,
+                'icon'  => 'fa-tag',
+                'color' => $dimColorPalette[$typeColorIdx % count($dimColorPalette)],
+            ];
+            $typeColorIdx++;
+        }
+        $db->free($resTypes);
+    }
+    $pickerTypeColumns['__none__'] = ['label' => $langs->trans('Undefined'), 'icon' => 'fa-tag', 'color' => '#adb5bd'];
+
+    foreach (array_keys($pickerTypeColumns) as $tc) {
+        $pickerTypeTickets[$tc] = [];
+    }
+    foreach ($pickerTicketsJson as $t) {
+        $tc = !empty($t['type_code']) ? $t['type_code'] : '__none__';
+        if (!isset($pickerTypeTickets[$tc])) {
+            $pickerTypeTickets['__none__'][] = $t;
+        } else {
+            $pickerTypeTickets[$tc][] = $t;
+        }
+    }
+
+    // -----------------------------------------------------------------------
+    // Dimension 2 — Group (category_code)
+    // -----------------------------------------------------------------------
+    $pickerGroupColumns = [];
+    $pickerGroupTickets = [];
+
+    $sqlGroups = 'SELECT code, label FROM ' . MAIN_DB_PREFIX . 'c_ticket_category'
+        . ' WHERE active = 1 AND entity IN (' . getEntity('c_ticket_category') . ')'
+        . ' ORDER BY label';
+    $resGroups = $db->query($sqlGroups);
+    $groupColorIdx = 0;
+    if ($resGroups) {
+        while ($r = $db->fetch_object($resGroups)) {
+            $transKey = 'TicketCategoryShort' . $r->code;
+            $label    = $langs->trans($transKey);
+            if ($label === $transKey) {
+                $label = $r->label;
+            }
+            $pickerGroupColumns[$r->code] = [
+                'label' => $label,
+                'icon'  => 'fa-folder',
+                'color' => $dimColorPalette[$groupColorIdx % count($dimColorPalette)],
+            ];
+            $groupColorIdx++;
+        }
+        $db->free($resGroups);
+    }
+    $pickerGroupColumns['__none__'] = ['label' => $langs->trans('Undefined'), 'icon' => 'fa-folder', 'color' => '#adb5bd'];
+
+    foreach (array_keys($pickerGroupColumns) as $gc) {
+        $pickerGroupTickets[$gc] = [];
+    }
+    foreach ($pickerTicketsJson as $t) {
+        $gc = !empty($t['category_code']) ? $t['category_code'] : '__none__';
+        if (!isset($pickerGroupTickets[$gc])) {
+            $pickerGroupTickets['__none__'][] = $t;
+        } else {
+            $pickerGroupTickets[$gc][] = $t;
+        }
+    }
+
+    // -----------------------------------------------------------------------
+    // Dimension 3 — Severity
+    // -----------------------------------------------------------------------
+    $pickerSeverityColumns = [];
+    $pickerSeverityTickets = [];
+    $sevColorMap = [
+        'LOW'      => '#28a745',
+        'NORMAL'   => '#007bff',
+        'HIGH'     => '#fd7e14',
+        'BLOCKING' => '#dc3545',
+    ];
+
+    $sqlSevs = 'SELECT code, label FROM ' . MAIN_DB_PREFIX . 'c_ticket_severity'
+        . ' WHERE active = 1 AND entity IN (' . getEntity('c_ticket_severity') . ')'
+        . ' ORDER BY code';
+    $resSevs = $db->query($sqlSevs);
+    if ($resSevs) {
+        while ($r = $db->fetch_object($resSevs)) {
+            $transKey = 'TicketSeverityShort' . $r->code;
+            $label    = $langs->trans($transKey);
+            if ($label === $transKey) {
+                $label = $r->label;
+            }
+            $pickerSeverityColumns[$r->code] = [
+                'label' => $label,
+                'icon'  => 'fa-exclamation-triangle',
+                'color' => $sevColorMap[$r->code] ?? '#6c757d',
+            ];
+        }
+        $db->free($resSevs);
+    }
+    $pickerSeverityColumns['__none__'] = ['label' => $langs->trans('Undefined'), 'icon' => 'fa-exclamation-triangle', 'color' => '#adb5bd'];
+
+    foreach (array_keys($pickerSeverityColumns) as $sc) {
+        $pickerSeverityTickets[$sc] = [];
+    }
+    foreach ($pickerTicketsJson as $t) {
+        $sc = !empty($t['severity_code']) ? $t['severity_code'] : '__none__';
+        if (!isset($pickerSeverityTickets[$sc])) {
+            $pickerSeverityTickets['__none__'][] = $t;
+        } else {
+            $pickerSeverityTickets[$sc][] = $t;
+        }
+    }
+
+    // -----------------------------------------------------------------------
+    // Dimension 4 — Status (fk_statut)
+    // -----------------------------------------------------------------------
+    $tempTicket = new Ticket($db);
+    $statusDefs = [
+        Ticket::STATUS_NOT_READ    => ['icon' => 'fa-inbox',          'color' => '#6c757d'],
+        Ticket::STATUS_READ        => ['icon' => 'fa-eye',            'color' => '#17a2b8'],
+        Ticket::STATUS_ASSIGNED    => ['icon' => 'fa-user',           'color' => '#5b8cdb'],
+        Ticket::STATUS_IN_PROGRESS => ['icon' => 'fa-cogs',           'color' => '#e9ad4f'],
+        Ticket::STATUS_NEED_MORE_INFO => ['icon' => 'fa-question-circle', 'color' => '#9c6ade'],
+        Ticket::STATUS_CLOSED      => ['icon' => 'fa-check-circle',   'color' => '#28a745'],
+    ];
+
+    foreach ($statusDefs as $statusInt => $statusMeta) {
+        $transKey = !empty($tempTicket->labelStatusShort[$statusInt]) ? $tempTicket->labelStatusShort[$statusInt] : '';
+        $label    = $transKey !== '' ? $langs->transnoentitiesnoconv($transKey) : (string) $statusInt;
+        $pickerStatusColumns[$statusInt] = [
+            'label' => $label,
+            'icon'  => $statusMeta['icon'],
+            'color' => $statusMeta['color'],
+        ];
+    }
+    $pickerStatusColumns['__none__'] = ['label' => $langs->trans('Other'), 'icon' => 'fa-question', 'color' => '#adb5bd'];
+
+    foreach (array_keys($pickerStatusColumns) as $sts) {
+        $pickerStatusTickets[$sts] = [];
+    }
+    foreach ($pickerTicketsJson as $t) {
+        $sts = isset($pickerStatusColumns[$t['status']]) ? $t['status'] : '__none__';
+        if (!isset($pickerStatusTickets[$sts])) {
+            $pickerStatusTickets['__none__'][] = $t;
+        } else {
+            $pickerStatusTickets[$sts][] = $t;
+        }
+    }
+}
+
+// Page entry point — kanban picker if no ticket loaded, otherwise the tile card.
 if ($object->id <= 0) {
     require_once __DIR__ . '/../../core/tpl/ticket/ticket_action_card_picker.tpl.php';
 } else {
