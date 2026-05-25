@@ -2378,15 +2378,17 @@ window.digiriskdolibarr.ticketPickerKanban.renderFileList = function(files) {
     if (!files || !files.length) {
         return;
     }
-    $.each(files, function(i, file) {
-        var icon = 'fa-file';
-        if (/image\//i.test(file.type))           { icon = 'fa-file-image'; }
-        else if (/pdf/i.test(file.type))          { icon = 'fa-file-pdf'; }
-        else if (/word|doc/i.test(file.type))     { icon = 'fa-file-word'; }
+    var k, file, icon, size;
+    for (k = 0; k < files.length; k++) {
+        file = files[k];
+        icon = 'fa-file';
+        if (/image\//i.test(file.type))              { icon = 'fa-file-image'; }
+        else if (/pdf/i.test(file.type))             { icon = 'fa-file-pdf'; }
+        else if (/word|doc/i.test(file.type))        { icon = 'fa-file-word'; }
         else if (/excel|sheet|xls/i.test(file.type)) { icon = 'fa-file-excel'; }
-        else if (/zip|archive/i.test(file.type)) { icon = 'fa-file-archive'; }
+        else if (/zip|archive/i.test(file.type))     { icon = 'fa-file-archive'; }
 
-        var size = file.size < 1024 * 1024
+        size = file.size < 1024 * 1024
             ? Math.round(file.size / 1024) + ' Ko'
             : (file.size / (1024 * 1024)).toFixed(1) + ' Mo';
 
@@ -2397,7 +2399,7 @@ window.digiriskdolibarr.ticketPickerKanban.renderFileList = function(files) {
             + '<small style="color:#9ca3af;flex:0 0 auto">' + size + '</small>'
             + '</li>'
         );
-    });
+    }
 };
 
 /**
@@ -2443,10 +2445,11 @@ window.digiriskdolibarr.ticketPickerKanban.initQuickCreate = function() {
         try {
             var input = document.getElementById('tacQcFiles');
             var transfer = new DataTransfer();
-            $.each(files, function(i, f) { transfer.items.add(f); });
+            var j;
+            for (j = 0; j < files.length; j++) { transfer.items.add(files[j]); }
             input.files = transfer.files;
             window.digiriskdolibarr.ticketPickerKanban.renderFileList(input.files);
-        } catch (err) {
+        } catch {
             // DataTransfer API not available (old browser) — silently skip preview.
         }
     });
