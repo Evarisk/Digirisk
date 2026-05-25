@@ -42,6 +42,7 @@ if (file_exists('../digiriskdolibarr.main.inc.php')) {
 require_once DOL_DOCUMENT_ROOT . '/ticket/class/ticket.class.php';
 require_once DOL_DOCUMENT_ROOT . '/user/class/user.class.php';
 require_once DOL_DOCUMENT_ROOT . '/categories/class/categorie.class.php';
+require_once DOL_DOCUMENT_ROOT . '/comm/action/class/actioncomm.class.php';
 
 // Global variables definitions
 global $conf, $db, $hookmanager, $langs, $moduleNameLowerCase, $user;
@@ -70,6 +71,37 @@ $permissionToRead  = $user->hasRight('ticket', 'read') && $user->hasRight($modul
 $permissionToWrite = $user->hasRight('ticket', 'write');
 saturne_check_access($permissionToRead);
 
+/**
+ * Create an ActionComm audit event for a ticket kanban modification.
+ * Only fires when the given config constant is enabled (non-zero).
+ *
+ * @param DoliDB $db         Database connection
+ * @param User   $user       Current user
+ * @param Ticket $ticket     The modified ticket
+ * @param string $constName  Config constant controlling whether this event is logged
+ * @param string $label      Short event label
+ * @param string $note       Detailed private note
+ * @return void
+ */
+function createTicketKanbanEvent($db, $user, $ticket, $constName, $label, $note)
+{
+    if (empty(getDolGlobalInt($constName))) {
+        return;
+    }
+
+    $actioncomm               = new ActionComm($db);
+    $actioncomm->type_code    = 'AC_OTH_AUTO';
+    $actioncomm->code         = 'AC_OTH_AUTO';
+    $actioncomm->label        = $label;
+    $actioncomm->note_private = $note;
+    $actioncomm->fk_element   = $ticket->id;
+    $actioncomm->elementtype  = 'ticket';
+    $actioncomm->userownerid  = $user->id;
+    $actioncomm->datep        = dol_now();
+    $actioncomm->percentage   = -1;
+    $actioncomm->create($user);
+}
+
 /*
  * Actions
  */
@@ -88,12 +120,16 @@ if ($action == 'updateTicketStatus' && !empty(GETPOSTINT('ticket_id'))) {
     if ($result > 0) {
         $res = $ticketToUpdate->setStatut($newStatus, $user);
         if ($res > 0) {
+            createTicketKanbanEvent($db, $user, $ticketToUpdate, 'DIGIRISKDOLIBARR_TICKET_KANBAN_LOG_STATUS',
+                'Statut modifié (kanban)', 'Statut modifié → ' . $newStatus);
             print json_encode(['success' => 1]);
         } else {
+            dol_syslog('ticket_action_card.php updateTicketStatus: setStatut failed ticketId=' . $ticketId . ' - ' . $ticketToUpdate->error, LOG_ERR);
             http_response_code(500);
             print json_encode(['success' => 0, 'error' => $ticketToUpdate->error]);
         }
     } else {
+        dol_syslog('ticket_action_card.php updateTicketStatus: ticket not found ticketId=' . $ticketId, LOG_ERR);
         http_response_code(404);
         print json_encode(['success' => 0, 'error' => 'Ticket not found']);
     }
@@ -123,12 +159,16 @@ if ($action == 'updateTicketAssignee' && !empty(GETPOSTINT('ticket_id'))) {
                 $fullname = $assignedUser->getFullName($langs);
                 $initials = strtoupper(mb_substr($assignedUser->firstname, 0, 1) . mb_substr($assignedUser->lastname, 0, 1));
             }
+            createTicketKanbanEvent($db, $user, $ticketToUpdate, 'DIGIRISKDOLIBARR_TICKET_KANBAN_LOG_ASSIGNEE',
+                'Assigné modifié (kanban)', 'Assigné → ' . ($fullname ?: $langs->trans('Unassigned')));
             print json_encode(['success' => 1, 'fullname' => $fullname, 'initials' => $initials]);
         } else {
+            dol_syslog('ticket_action_card.php updateTicketAssignee: update failed ticketId=' . $ticketId . ' - ' . $ticketToUpdate->error, LOG_ERR);
             http_response_code(500);
             print json_encode(['success' => 0, 'error' => $ticketToUpdate->error]);
         }
     } else {
+        dol_syslog('ticket_action_card.php updateTicketAssignee: ticket not found ticketId=' . $ticketId, LOG_ERR);
         http_response_code(404);
         print json_encode(['success' => 0, 'error' => 'Ticket not found']);
     }
@@ -152,14 +192,19 @@ if ($action == 'addTicketCategory' && !empty(GETPOSTINT('ticket_id'))) {
         if ($resCat > 0) {
             $res = $cat->add_type($ticketToUpdate, 'ticket');
             if ($res > 0 || $res == -3) {
+                createTicketKanbanEvent($db, $user, $ticketToUpdate, 'DIGIRISKDOLIBARR_TICKET_KANBAN_LOG_CATEGORY_ADD',
+                    'Tag ajouté (kanban)', 'Tag ajouté : ' . $cat->label);
                 print json_encode(['success' => 1, 'label' => $cat->label, 'color' => $cat->color, 'id' => $cat->id]);
             } else {
+                dol_syslog('ticket_action_card.php addTicketCategory: add_type failed ticketId=' . $ticketId . ' catId=' . $catId . ' - ' . $cat->error, LOG_ERR);
                 print json_encode(['success' => 0, 'error' => $cat->error]);
             }
         } else {
+            dol_syslog('ticket_action_card.php addTicketCategory: category not found catId=' . $catId, LOG_ERR);
             print json_encode(['success' => 0, 'error' => 'Category not found']);
         }
     } else {
+        dol_syslog('ticket_action_card.php addTicketCategory: ticket not found ticketId=' . $ticketId, LOG_ERR);
         http_response_code(404);
         print json_encode(['success' => 0, 'error' => 'Ticket not found']);
     }
@@ -183,14 +228,19 @@ if ($action == 'removeTicketCategory' && !empty(GETPOSTINT('ticket_id'))) {
         if ($resCat > 0) {
             $res = $cat->del_type($ticketToUpdate, 'ticket');
             if ($res >= 0) {
+                createTicketKanbanEvent($db, $user, $ticketToUpdate, 'DIGIRISKDOLIBARR_TICKET_KANBAN_LOG_CATEGORY_REMOVE',
+                    'Tag retiré (kanban)', 'Tag retiré : ' . $cat->label);
                 print json_encode(['success' => 1]);
             } else {
+                dol_syslog('ticket_action_card.php removeTicketCategory: del_type failed ticketId=' . $ticketId . ' catId=' . $catId . ' - ' . $cat->error, LOG_ERR);
                 print json_encode(['success' => 0, 'error' => $cat->error]);
             }
         } else {
+            dol_syslog('ticket_action_card.php removeTicketCategory: category not found catId=' . $catId, LOG_ERR);
             print json_encode(['success' => 0, 'error' => 'Category not found']);
         }
     } else {
+        dol_syslog('ticket_action_card.php removeTicketCategory: ticket not found ticketId=' . $ticketId, LOG_ERR);
         http_response_code(404);
         print json_encode(['success' => 0, 'error' => 'Ticket not found']);
     }
@@ -212,12 +262,16 @@ if ($action == 'updateTicketType' && !empty(GETPOSTINT('ticket_id'))) {
         $ticketToUpdate->type_code = !empty($dimValue) && $dimValue !== '__none__' ? $dimValue : '';
         $res = $ticketToUpdate->update($user);
         if ($res > 0) {
+            createTicketKanbanEvent($db, $user, $ticketToUpdate, 'DIGIRISKDOLIBARR_TICKET_KANBAN_LOG_TYPE',
+                'Type modifié (kanban)', 'Type modifié → ' . ($dimValue ?: 'Non défini'));
             print json_encode(['success' => 1]);
         } else {
+            dol_syslog('ticket_action_card.php updateTicketType: update failed ticketId=' . $ticketId . ' - ' . $ticketToUpdate->error, LOG_ERR);
             http_response_code(500);
             print json_encode(['success' => 0, 'error' => $ticketToUpdate->error]);
         }
     } else {
+        dol_syslog('ticket_action_card.php updateTicketType: ticket not found ticketId=' . $ticketId, LOG_ERR);
         http_response_code(404);
         print json_encode(['success' => 0, 'error' => 'Ticket not found']);
     }
@@ -239,12 +293,16 @@ if ($action == 'updateTicketGroup' && !empty(GETPOSTINT('ticket_id'))) {
         $ticketToUpdate->category_code = !empty($dimValue) && $dimValue !== '__none__' ? $dimValue : '';
         $res = $ticketToUpdate->update($user);
         if ($res > 0) {
+            createTicketKanbanEvent($db, $user, $ticketToUpdate, 'DIGIRISKDOLIBARR_TICKET_KANBAN_LOG_GROUP',
+                'Groupe modifié (kanban)', 'Groupe modifié → ' . ($dimValue ?: 'Non défini'));
             print json_encode(['success' => 1]);
         } else {
+            dol_syslog('ticket_action_card.php updateTicketGroup: update failed ticketId=' . $ticketId . ' - ' . $ticketToUpdate->error, LOG_ERR);
             http_response_code(500);
             print json_encode(['success' => 0, 'error' => $ticketToUpdate->error]);
         }
     } else {
+        dol_syslog('ticket_action_card.php updateTicketGroup: ticket not found ticketId=' . $ticketId, LOG_ERR);
         http_response_code(404);
         print json_encode(['success' => 0, 'error' => 'Ticket not found']);
     }
@@ -266,12 +324,16 @@ if ($action == 'updateTicketSeverity' && !empty(GETPOSTINT('ticket_id'))) {
         $ticketToUpdate->severity_code = !empty($dimValue) && $dimValue !== '__none__' ? $dimValue : '';
         $res = $ticketToUpdate->update($user);
         if ($res > 0) {
+            createTicketKanbanEvent($db, $user, $ticketToUpdate, 'DIGIRISKDOLIBARR_TICKET_KANBAN_LOG_SEVERITY',
+                'Sévérité modifiée (kanban)', 'Sévérité modifiée → ' . ($dimValue ?: 'Non définie'));
             print json_encode(['success' => 1]);
         } else {
+            dol_syslog('ticket_action_card.php updateTicketSeverity: update failed ticketId=' . $ticketId . ' - ' . $ticketToUpdate->error, LOG_ERR);
             http_response_code(500);
             print json_encode(['success' => 0, 'error' => $ticketToUpdate->error]);
         }
     } else {
+        dol_syslog('ticket_action_card.php updateTicketSeverity: ticket not found ticketId=' . $ticketId, LOG_ERR);
         http_response_code(404);
         print json_encode(['success' => 0, 'error' => 'Ticket not found']);
     }
@@ -293,12 +355,16 @@ if ($action == 'updateTicketSubject' && !empty(GETPOSTINT('ticket_id'))) {
         $ticketToUpdate->subject = $newSubject;
         $res = $ticketToUpdate->update($user);
         if ($res > 0) {
+            createTicketKanbanEvent($db, $user, $ticketToUpdate, 'DIGIRISKDOLIBARR_TICKET_KANBAN_LOG_SUBJECT',
+                'Sujet modifié (kanban)', 'Sujet modifié → "' . $newSubject . '"');
             print json_encode(['success' => 1, 'subject' => $newSubject]);
         } else {
+            dol_syslog('ticket_action_card.php updateTicketSubject: update failed ticketId=' . $ticketId . ' - ' . $ticketToUpdate->error, LOG_ERR);
             http_response_code(500);
             print json_encode(['success' => 0, 'error' => $ticketToUpdate->error]);
         }
     } else {
+        dol_syslog('ticket_action_card.php updateTicketSubject: ticket not found ticketId=' . $ticketId, LOG_ERR);
         http_response_code(404);
         print json_encode(['success' => 0, 'error' => 'Ticket not found']);
     }
@@ -372,7 +438,12 @@ if ($object->id <= 0) {
         $db->free($resCats);
     }
 
-    // Tickets with enriched data (assignee, severity, type, group, company)
+    // Tickets with enriched data (assignee, severity, type, group, company).
+    // Closed and canceled tickets are limited by the admin config to avoid overloading the board.
+    $closedStatusList  = implode(',', [Ticket::STATUS_CLOSED, Ticket::STATUS_CANCELED]);
+    $closedLimit       = getDolGlobalInt('DIGIRISKDOLIBARR_TICKET_KANBAN_CLOSED_LIMIT', 50);
+    $closedLimitClause = $closedLimit > 0 ? ' AND t.fk_statut NOT IN (' . $closedStatusList . ')' : '';
+
     $sqlTickets = 'SELECT t.rowid, t.ref, t.subject, t.fk_statut, t.datec, t.severity_code,'
         . ' t.type_code, t.category_code,'
         . ' t.fk_user_assign, t.fk_soc,'
@@ -382,8 +453,24 @@ if ($object->id <= 0) {
         . ' LEFT JOIN ' . MAIN_DB_PREFIX . 'user u ON u.rowid = t.fk_user_assign'
         . ' LEFT JOIN ' . MAIN_DB_PREFIX . 'societe s ON s.rowid = t.fk_soc'
         . ' WHERE t.entity IN (' . getEntity('ticket') . ')'
+        . $closedLimitClause
         . ' ORDER BY t.datec DESC'
         . ' LIMIT 500';
+
+    if ($closedLimit > 0) {
+        $sqlClosed = 'SELECT t.rowid, t.ref, t.subject, t.fk_statut, t.datec, t.severity_code,'
+            . ' t.type_code, t.category_code,'
+            . ' t.fk_user_assign, t.fk_soc,'
+            . ' u.firstname as assign_firstname, u.lastname as assign_lastname, u.photo as assign_photo,'
+            . ' s.nom as company_name'
+            . ' FROM ' . MAIN_DB_PREFIX . 'ticket t'
+            . ' LEFT JOIN ' . MAIN_DB_PREFIX . 'user u ON u.rowid = t.fk_user_assign'
+            . ' LEFT JOIN ' . MAIN_DB_PREFIX . 'societe s ON s.rowid = t.fk_soc'
+            . ' WHERE t.entity IN (' . getEntity('ticket') . ')'
+            . ' AND t.fk_statut IN (' . $closedStatusList . ')'
+            . ' ORDER BY t.datec DESC'
+            . ' LIMIT ' . (int) $closedLimit;
+    }
     $resTickets = $db->query($sqlTickets);
     $ticketIds  = [];
     if ($resTickets) {
@@ -434,6 +521,59 @@ if ($object->id <= 0) {
             $ticketIds[] = (int) $row->rowid;
         }
         $db->free($resTickets);
+    }
+
+    // Append closed/canceled tickets (limited by admin config)
+    if ($closedLimit > 0 && !empty($sqlClosed)) {
+        $resClosed = $db->query($sqlClosed);
+        if ($resClosed) {
+            while ($row = $db->fetch_object($resClosed)) {
+                $assignId       = (int) $row->fk_user_assign;
+                $assignInitials = '';
+                $assignFullname = '';
+                $assignPhoto    = '';
+                if ($assignId > 0) {
+                    $assignFullname = trim($row->assign_firstname . ' ' . $row->assign_lastname);
+                    $assignInitials = strtoupper(mb_substr($row->assign_firstname, 0, 1) . mb_substr($row->assign_lastname, 0, 1));
+                    if (!empty($row->assign_photo)) {
+                        $photoFile = DOL_DATA_ROOT . '/users/' . $assignId . '/' . $row->assign_photo;
+                        if (file_exists($photoFile)) {
+                            $assignPhoto = DOL_URL_ROOT . '/viewimage.php?modulepart=userphoto&entity=' . $conf->entity
+                                . '&file=' . urlencode($assignId . '/' . $row->assign_photo)
+                                . '&cache=' . $assignId;
+                        }
+                    }
+                }
+
+                $detailUrl = dol_buildpath('/custom/digiriskdolibarr/view/ticket/ticket_action_card.php', 1) . '?id=' . (int) $row->rowid;
+                $sevCode   = strtoupper((string) ($row->severity_code ?: ''));
+                $sevTrans  = $sevCode !== '' ? $langs->trans('TicketSeverityShort' . $sevCode) : '';
+                if ($sevTrans === 'TicketSeverityShort' . $sevCode) {
+                    $sevTrans = $sevCode;
+                }
+
+                $pickerTicketsJson[] = [
+                    'id'              => (int) $row->rowid,
+                    'ref'             => $row->ref,
+                    'subject'         => $row->subject,
+                    'status'          => (int) $row->fk_statut,
+                    'severity_code'   => $sevCode,
+                    'severity_label'  => $sevTrans,
+                    'type_code'       => (string) ($row->type_code ?: ''),
+                    'category_code'   => (string) ($row->category_code ?: ''),
+                    'date_c'          => $row->datec ? dol_print_date($db->jdate($row->datec), 'day') : '',
+                    'company_name'    => $row->company_name ?: '',
+                    'assign_id'       => $assignId,
+                    'assign_fullname' => $assignFullname,
+                    'assign_initials' => $assignInitials,
+                    'assign_photo'    => $assignPhoto,
+                    'categories'      => [],
+                    'url'             => $detailUrl,
+                ];
+                $ticketIds[] = (int) $row->rowid;
+            }
+            $db->free($resClosed);
+        }
     }
 
     // Batch-load categories for all tickets
@@ -595,13 +735,19 @@ if ($object->id <= 0) {
     // -----------------------------------------------------------------------
     $tempTicket = new Ticket($db);
     $statusDefs = [
-        Ticket::STATUS_NOT_READ    => ['icon' => 'fa-inbox',          'color' => '#6c757d'],
-        Ticket::STATUS_READ        => ['icon' => 'fa-eye',            'color' => '#17a2b8'],
-        Ticket::STATUS_ASSIGNED    => ['icon' => 'fa-user',           'color' => '#5b8cdb'],
-        Ticket::STATUS_IN_PROGRESS => ['icon' => 'fa-cogs',           'color' => '#e9ad4f'],
-        Ticket::STATUS_NEED_MORE_INFO => ['icon' => 'fa-question-circle', 'color' => '#9c6ade'],
-        Ticket::STATUS_CLOSED      => ['icon' => 'fa-check-circle',   'color' => '#28a745'],
+        Ticket::STATUS_NOT_READ       => ['icon' => 'fa-inbox',            'color' => '#6c757d'],
+        Ticket::STATUS_READ           => ['icon' => 'fa-eye',              'color' => '#17a2b8'],
+        Ticket::STATUS_ASSIGNED       => ['icon' => 'fa-user',             'color' => '#5b8cdb'],
+        Ticket::STATUS_IN_PROGRESS    => ['icon' => 'fa-cogs',             'color' => '#e9ad4f'],
+        Ticket::STATUS_NEED_MORE_INFO => ['icon' => 'fa-question-circle',  'color' => '#9c6ade'],
+        Ticket::STATUS_CLOSED         => ['icon' => 'fa-check-circle',     'color' => '#28a745'],
+        Ticket::STATUS_CANCELED       => ['icon' => 'fa-times-circle',     'color' => '#dc3545'],
     ];
+
+    // STATUS_WAITING (7 = OnHold) is only available when TICKET_INCLUDE_SUSPENDED_STATUS is enabled
+    if (getDolGlobalString('TICKET_INCLUDE_SUSPENDED_STATUS')) {
+        $statusDefs[Ticket::STATUS_WAITING] = ['icon' => 'fa-pause-circle', 'color' => '#fd7e14'];
+    }
 
     foreach ($statusDefs as $statusInt => $statusMeta) {
         $transKey = !empty($tempTicket->labelStatusShort[$statusInt]) ? $tempTicket->labelStatusShort[$statusInt] : '';
