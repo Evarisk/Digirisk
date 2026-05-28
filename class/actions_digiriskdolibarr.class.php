@@ -1341,7 +1341,10 @@ class ActionsDigiriskdolibarr
             </script>
             <?php
 
-            $serviceId = $parameters['obj']->options_digiriskdolibarr_ticket_service;
+            $serviceId = (int) ($parameters['obj']->options_digiriskdolibarr_ticket_service ?? 0);
+            if ($serviceId <= 0) {
+                return 0;
+            }
 
             $digiriskelement = new DigiriskElement($db);
             $res = $digiriskelement->fetch($serviceId);

@@ -87,7 +87,7 @@ abstract class ModeleODTDigiriskDolibarrDocument extends SaturneDocumentModel
                     continue; // Skip if digirisk element not found (case of GP/UT fiche with spécific id)
                 }
 
-                $depthHyphens                     = str_repeat('- ', $digiriskElement['depth']);
+                $depthHyphens                     = str_repeat('  ', $digiriskElement['depth']);
                 $tmpArray['digiriskElementLabel'] = $depthHyphens . 'S' . $digiriskElement['object']->entity . ' - ' . $digiriskElement['object']->ref . ' - ' . $digiriskElement['object']->label;
 
                 $tmpArray['picto']                  = DOL_DOCUMENT_ROOT . '/custom/digiriskdolibarr/img/categorieDangers/' . $risk->getDangerCategory($risk, $risk->type) . '.png';

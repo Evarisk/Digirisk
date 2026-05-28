@@ -380,7 +380,7 @@ class modDigiriskdolibarr extends DolibarrModules
 		$this->descriptionlong = "Digirisk";
 		$this->editor_name     = 'Evarisk';
 		$this->editor_url      = 'https://evarisk.com';
-		$this->version         = '23.0.0';
+		$this->version         = '23.1.0';
 		$this->const_name      = 'MAIN_MODULE_' . strtoupper($this->name);
 		$this->picto           = 'digiriskdolibarr_color@digiriskdolibarr';
 
@@ -1458,12 +1458,12 @@ class modDigiriskdolibarr extends DolibarrModules
             'titre'    => '<i class="fas fa-tasks pictofixedwidth" style="padding-right: 4px;"></i>' . $langs->trans('PAPRIPACT'),
             'mainmenu' => 'digiriskdolibarr',
             'leftmenu' => 'digiriskactionplan',
-            'url'      => '/projet/tasks.php?id=' . $conf->global->DIGIRISKDOLIBARR_DU_PROJECT,
+            'url'      => '/digiriskdolibarr/view/digiriskstandard/actionplan_list.php?view=kanban',
             'langs'    => 'digiriskdolibarr@digiriskdolibarr',
             'position' => 100 + $r,
             'enabled'  => '$conf->digiriskdolibarr->enabled && $conf->projet->enabled',
             'perms'    => '$user->rights->projet->lire',
-            'target'   => '_blank',
+            'target'   => '',
             'user'     => 0,
         ];
 
@@ -1745,6 +1745,40 @@ class modDigiriskdolibarr extends DolibarrModules
 			'perms'    => '$user->rights->ticket->read && $user->rights->digiriskdolibarr->lire', // Use 'perms'=>'$user->rights->digiriskdolibarr->level1->level2' if you want your menu with a permission rules
 			'target'   => '',
 			'user'     => 0,				                // 0=Menu for internal users, 1=external users, 2=both
+		];
+
+		// Issue #4443 — 1-click ticket action card, nested under Ticket > Tableau de bord (ticketstats).
+		$this->menu[$r++] = [
+			'fk_menu'  => 'fk_mainmenu=ticket,fk_leftmenu=ticketstats',
+			'type'     => 'left',
+			'titre'    => $langs->transnoentities('TicketKanban'),
+			'prefix'   => '<i class="fas fa-columns pictofixedwidth"></i>',
+			'mainmenu' => 'ticket',
+			'leftmenu' => 'digiriskticketkanban',
+			'url'      => '/digiriskdolibarr/view/ticket/ticket_action_card.php',
+			'langs'    => 'digiriskdolibarr@digiriskdolibarr',
+			'position' => 100 + $r,
+			'enabled'  => '$conf->digiriskdolibarr->enabled && $conf->ticket->enabled',
+			'perms'    => '$user->rights->ticket->read && $user->rights->digiriskdolibarr->lire',
+			'target'   => '',
+			'user'     => 0,
+		];
+
+		// Entrée liste de tickets (vue standard Dolibarr).
+		$this->menu[$r++] = [
+			'fk_menu'  => 'fk_mainmenu=ticket,fk_leftmenu=ticketstats',
+			'type'     => 'left',
+			'titre'    => $langs->transnoentities('List'),
+			'prefix'   => '<i class="fas fa-list pictofixedwidth"></i>',
+			'mainmenu' => 'ticket',
+			'leftmenu' => 'digiriskticketlist',
+			'url'      => '/ticket/list.php',
+			'langs'    => 'digiriskdolibarr@digiriskdolibarr',
+			'position' => 101 + $r,
+			'enabled'  => '$conf->digiriskdolibarr->enabled && $conf->ticket->enabled',
+			'perms'    => '$user->rights->ticket->read && $user->rights->digiriskdolibarr->lire',
+			'target'   => '',
+			'user'     => 0,
 		];
 
 		// Exports profiles provided by this module
