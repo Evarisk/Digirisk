@@ -1,19 +1,31 @@
-# [Digirisk] [23.0.0] - Robustesse PHP 8 - Schéma SQL nettoyé
+# [Digirisk] [23.1.0] - Nouvelle carte ticket & Kanban du plan d'action
 
-Description : Cette version durcit le code face à PHP 8 (sécurisation systématique des paramètres `id` via `GETPOSTINT` et casts en entier), nettoie en profondeur le schéma SQL des extrafields, et apporte plusieurs améliorations sur la liste des risques et les extrafields personnalisés.
+Description : Cette version apporte deux gros chantiers d'interface — une nouvelle carte ticket entièrement éditable en ligne (style « tap-to-edit ») avec fil de discussion, et un Kanban / Gantt pour le plan d'action PAPRIPACT — ainsi qu'une refonte de la page d'organisation et un suivi d'activité (ActionComm) sur les tâches.
 
 ## Nouvelles fonctionnalités et innovations
 
-### Liste des risques
+### Nouvelle carte ticket
 
-* Ajout de la personne assignée lorsqu'on édite une tâche directement depuis la liste des risques — plus besoin d'ouvrir la fiche du risque pour assigner un responsable.
+* Carte ticket repensée avec édition en ligne « tap-to-edit » : sujet, sévérité, statut, GP/UT, projet, tags… modifiables directement sans recharger la page.
+* Fil de discussion des messages intégré (réponse en ligne, citation, édition/suppression, envoi par mail, Ctrl+Entrée pour envoyer) avec éditeur WYSIWYG Dolibarr (CKEditor).
+* Section fichiers compacte avec aperçu en miniatures et lightbox, suppression intégrée.
+* Personnalisation du layout par utilisateur : densité (compact / cozy / spacious), largeurs des blocs, masquer/déplacer/redimensionner les sections, le tout persisté.
+* Picker Kanban à 4 onglets et drawer de création rapide d'un ticket depuis le Kanban.
 
 <!-- 📸 Ajouter une screenshot ici -->
 
-### Extrafields personnalisés
+### Kanban & Gantt du plan d'action (PAPRIPACT)
 
-* Création rapide d'extrafields directement depuis l'interface, avec gestion des catégories d'extrafields.
-* Nouvelles traductions associées à la création rapide d'extrafields.
+* Vues Kanban et Gantt du plan d'action du Document Unique, le Kanban devenant la vue par défaut.
+* Cartes enrichies : responsables et contributeurs (avatars/initiales), tags avec gestion en ligne, dates de début/fin éditables, charge et budget, badge de cotation du risque avec tooltip détaillé.
+* Édition en ligne (libellé, progression avec slider, dates) et drag & drop entre colonnes.
+* Page d'administration dédiée pour régler la largeur/l'espacement des colonnes et activer les options de journalisation.
+
+<!-- 📸 Ajouter une screenshot ici -->
+
+### Refonte de la page d'organisation
+
+* Hiérarchie GP/UT modernisée : enregistrement automatique, suppression en ligne via dialogue, badges de risques et boutons d'ajout rapide.
 
 <!-- 📸 Ajouter une screenshot ici -->
 
@@ -21,48 +33,32 @@ Description : Cette version durcit le code face à PHP 8 (sécurisation systéma
 
 ## Améliorations & corrections
 
-### Robustesse PHP 8
+### Suivi d'activité (ActionComm)
 
-* Tous les paramètres `id` lus depuis les requêtes utilisent désormais `GETPOSTINT` au lieu d'un cast manuel : élimine les `TypeError` rencontrés sur PHP 8 lors de l'appel à `fetch()`.
-* Triggers : les arguments passés à `fetch()` sont systématiquement castés en `int` pour éviter tout `TypeError`.
-* Corrigé sur les vues d'organisation, les éléments Digirisk et les accidents.
+* Journalisation ActionComm sur les modifications de tâches du plan d'action, avec 9 réglages activables et journalisation des erreurs via `dol_syslog`.
+* Audit ActionComm sur les tickets, gestion des statuts 7/9 et limite du nombre de tickets fermés affichés.
 
-### Schéma SQL
+### Tickets
 
-* Refonte complète du schéma extrafields : suppression de tous les fichiers SQL d'extrafields obsolètes et des références dans `update.sql`.
-* Ajout des tables d'extrafields manquantes pour `digiriskresources`, `accident_lesion`, `accidentmetadata` et `accident_investigation`.
-* Suppression du surcharge `isextrafieldmanaged` sur toutes les classes — le comportement par défaut de Saturne est désormais utilisé.
+* Affichage du ref + label pour les GP/UT, projet (`fk_project`) dans la section Identification, badge d'historique client.
+* Corrections : dates affichées dans le fuseau de l'utilisateur, valeurs d'extrafields masquées à cause d'un préfixe de clé, entités HTML rendues littéralement dans les réponses AJAX et les libellés de listes déroulantes.
+* `printFieldListValue` ne provoque plus de fatale lorsque le service est vide (#4729).
 
-### Création de groupements / unités de travail
+### ODT
 
-* Création d'un GP/UT ne provoque plus d'erreur SQL : `isCategoryManaged` est correctement positionné à `0` sur la classe `DigiriskElement`.
+* Suppression des tirets de profondeur en trop dans le libellé d'élément lors des générations ODT (#4763).
 
-### Documents projet
+### Documentation
 
-* `ProjectDocument::write_file` accepte maintenant une valeur par défaut pour `moreParam` — corrige les générations de documents projet où ce paramètre n'était pas fourni.
+* Adaptation des instructions IA Saturne et de la philosophie d'architecture (#4733).
 
-### Class
+## Comparaison des versions [23.0.0](https://github.com/Evarisk/Digirisk/compare/23.0.0...23.1.0) et 23.1.0
 
-* Champ `picto` correctement typé en chaîne (string) sur les classes principales.
-* Plusieurs passes de nettoyage de code (lisibilité, signatures, suppression de code mort).
-
-### Extrafields
-
-* Le label des extrafields s'enregistre désormais correctement (au lieu d'une chaîne tronquée ou vide dans certains cas).
-
-## Comparaison des versions [22.1.0](https://github.com/Evarisk/Digirisk/compare/22.1.0...23.0.0) et 23.0.0
-
-* [#4727] [ProjectDocument] fix: add default value to moreParam in write_file [`#4728`](https://github.com/Evarisk/Digirisk/pull/4728)
-* [#4725] [DigiriskElement] fix: set isCategoryManaged to 0 to prevent invalid SQL on GP/UT creation [`#4726`](https://github.com/Evarisk/Digirisk/pull/4726)
-* [#4722] [DigiriskElement] fix: use GETPOSTINT for id in organization view [`#4723`](https://github.com/Evarisk/Digirisk/pull/4723)
-* [#4719] [DigiriskElement] fix: use GETPOSTINT for id parameter to avoid TypeError on fetch() [`#4720`](https://github.com/Evarisk/Digirisk/pull/4720)
-* [#4718] [Trigger] fix: cast fetch() arguments to int to avoid TypeError [`#4721`](https://github.com/Evarisk/Digirisk/pull/4721)
-* [#4716] [Accident] fix: use GETPOSTINT instead of cast to int [`1db00fd4`](https://github.com/Evarisk/Digirisk/commit/1db00fd4) [`ff127e6a`](https://github.com/Evarisk/Digirisk/commit/ff127e6a)
-* [#4711] [SQL] rework: remove all extrafields SQL files and update.sql references [`862c89de`](https://github.com/Evarisk/Digirisk/commit/862c89de)
-* [#4711] [Class] rework: remove isextrafieldmanaged override from all classes [`4c3a3d2b`](https://github.com/Evarisk/Digirisk/commit/4c3a3d2b)
-* [#4711] [SQL] fix: add missing extrafields tables [`b4f4fc09`](https://github.com/Evarisk/Digirisk/commit/b4f4fc09)
-* [#4700] [Class] fix: picto type string [`5b3d8045`](https://github.com/Evarisk/Digirisk/commit/5b3d8045) [`e71ebcda`](https://github.com/Evarisk/Digirisk/commit/e71ebcda)
-* [#4661] [RiskList] add: assigned person when editing task in risk list [`4b6214a5`](https://github.com/Evarisk/Digirisk/commit/4b6214a5)
-* [#4683] [Extrafield] add: quick extra create and categories for extrafield [`f0e25c51`](https://github.com/Evarisk/Digirisk/commit/f0e25c51)
-* [#4683] [Extrafield] fix: label not written properly [`6eeb8ea2`](https://github.com/Evarisk/Digirisk/commit/6eeb8ea2)
-* [#4695] [Lang] add: lang trans for quick extrafield creation [`856a6a27`](https://github.com/Evarisk/Digirisk/commit/856a6a27)
+* [#4443] [Ticket] feat: nouvelle carte ticket éditable en ligne, fil de discussion et personnalisation du layout [`#4755`](https://github.com/Evarisk/Digirisk/pull/4755) [`#4756`](https://github.com/Evarisk/Digirisk/pull/4756) [`#4760`](https://github.com/Evarisk/Digirisk/pull/4760)
+* [#4738] [ActionPlan] feat: Kanban & Gantt du plan d'action PAPRIPACT
+* [#4744] [ActionPlan] feat: ActionComm sur les tâches + page admin de configuration
+* [#4753] [Ticket] feat: Kanban ticket (picker, audit, limite tickets fermés, page admin) [`#4758`](https://github.com/Evarisk/Digirisk/pull/4758) [`#4759`](https://github.com/Evarisk/Digirisk/pull/4759)
+* [#4735] [Organization] rework: refonte de la hiérarchie GP/UT (auto-save, suppression en ligne, badges risques, ajout rapide)
+* [#4763] [ODT] fix: remove extra depth hyphens in element label [`#4764`](https://github.com/Evarisk/Digirisk/pull/4764)
+* [#4733] [Docs] feat: adapt Saturne AI instructions and architecture philosophy
+* [#4729] [Ticket] fix: prevent fatal in printFieldListValue when service is empty [`#4730`](https://github.com/Evarisk/Digirisk/pull/4730)
