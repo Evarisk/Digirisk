@@ -9,7 +9,11 @@ window.digiriskdolibarr.actionplanKanban = {};
  * Init — auto-called by saturne.js on document.ready
  */
 window.digiriskdolibarr.actionplanKanban.init = function() {
-    if (!$('.kanban-board').length) {
+    // The ticket action-card picker reuses the generic .kanban-board / .kanban-*
+    // markup but has its own module (ticketPickerKanban). Bail out here so this
+    // module's global, unscoped handlers don't double-bind onto the picker
+    // (e.g. the "+ tag" toggle would fire twice and cancel itself out).
+    if (!$('.kanban-board').length || $('.tac-picker-kanban-board').length) {
         return;
     }
     window.digiriskdolibarr.actionplanKanban.event();

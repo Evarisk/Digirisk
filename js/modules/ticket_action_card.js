@@ -1697,13 +1697,19 @@ window.digiriskdolibarr.ticketPickerKanban.init = function() {
  * @return {void}
  */
 window.digiriskdolibarr.ticketPickerKanban.event = function() {
-    // Assignee initial: click → show select
+    // Assignee initial: click → reveal a searchable select2 user picker.
     $(document).on('click', '.tac-picker-kanban-board .kanban-initial-responsible, .tac-picker-kanban-board .tac-picker-card__assignee-img', function(e) {
         e.stopPropagation();
         var $wrapper = $(this).closest('.kanban-responsible-wrapper');
         var $select  = $wrapper.find('.tac-picker-assignee-select');
         $(this).hide();
-        $select.addClass('visible').trigger('focus');
+        $select.addClass('visible');
+        if ($.fn.select2) {
+            window.digiriskdolibarr.ticketPickerKanban.initAssigneeSelect2($select, $wrapper);
+            $select.select2('open');
+        } else {
+            $select.trigger('focus');
+        }
     });
 
     // Assignee select: change → save + hide select → update avatar
@@ -1718,6 +1724,10 @@ window.digiriskdolibarr.ticketPickerKanban.event = function() {
         var photo    = userId > 0 ? (selOpt.data('photo') || '') : '';
 
         $select.removeClass('visible');
+        if ($.fn.select2 && $select.hasClass('select2-hidden-accessible')) {
+            $select.off('select2:close');
+            $select.select2('destroy');
+        }
 
         if (photo) {
             $avatar.attr('src', photo).attr('title', selOpt.text().trim()).show();
@@ -1731,9 +1741,13 @@ window.digiriskdolibarr.ticketPickerKanban.event = function() {
         window.digiriskdolibarr.ticketPickerKanban.saveAssignee(ticketId, userId, $select);
     });
 
-    // Assignee select blur → hide
+    // Assignee select blur → hide (native fallback only; select2 manages its own
+    // close via the select2:close event, so skip when select2 is active).
     $(document).on('blur', '.tac-picker-assignee-select', function() {
         var $select = $(this);
+        if ($.fn.select2 && $select.hasClass('select2-hidden-accessible')) {
+            return;
+        }
         var $avatar = $select.siblings('.kanban-initial-responsible, .tac-picker-card__assignee-img');
         setTimeout(function() {
             $select.removeClass('visible');
@@ -2057,6 +2071,57 @@ window.digiriskdolibarr.ticketPickerKanban.saveDim = function(ticketId, dim, new
             setTimeout(function() { $card.removeClass('kanban-card-error'); }, 3000);
         }
     });
+};
+
+/**
+ * Initialise a select2 searchable picker on a card's assignee <select>.
+ * Options are already embedded in the DOM (no AJAX source) so it never hits
+ * the "Searching…" stall that remote select2 shows in this Dolibarr build.
+ *
+ * @param  {jQuery} $select   The .tac-picker-assignee-select element.
+ * @param  {jQuery} $wrapper  The .kanban-responsible-wrapper around it.
+ * @return {void}
+ */
+window.digiriskdolibarr.ticketPickerKanban.initAssigneeSelect2 = function($select, $wrapper) {
+    if ($select.hasClass('select2-hidden-accessible')) {
+        return;
+    }
+    // select2 builds aria-controls from the element id; the same ticket is rendered
+    // on 4 boards so the markup carries no id. Give each one a unique id to avoid
+    // select2's invalid "input[aria-controls*=]" selector error.
+    if (!$select.attr('id')) {
+        $select.attr('id', 'tac-assignee-' + Math.random().toString(36).slice(2, 9));
+    }
+    $select.select2({
+        width:             '190px',
+        dropdownCssClass:  'tac-picker-assignee-dropdown',
+        containerCssClass: 'tac-picker-assignee-container'
+    });
+    // Closing the picker without choosing anyone restores the avatar. A real
+    // selection is handled by the 'change' handler, which tears select2 down.
+    $select.on('select2:close', function() {
+        setTimeout(function() {
+            if ($select.hasClass('visible')) {
+                window.digiriskdolibarr.ticketPickerKanban.teardownAssigneeSelect2($select, $wrapper);
+            }
+        }, 50);
+    });
+};
+
+/**
+ * Destroy the assignee select2 widget and restore the avatar bubble.
+ *
+ * @param  {jQuery} $select   The .tac-picker-assignee-select element.
+ * @param  {jQuery} $wrapper  The .kanban-responsible-wrapper around it.
+ * @return {void}
+ */
+window.digiriskdolibarr.ticketPickerKanban.teardownAssigneeSelect2 = function($select, $wrapper) {
+    $select.removeClass('visible');
+    if ($.fn.select2 && $select.hasClass('select2-hidden-accessible')) {
+        $select.off('select2:close');
+        $select.select2('destroy');
+    }
+    $wrapper.find('.kanban-initial-responsible, .tac-picker-card__assignee-img').show();
 };
 
 /**
