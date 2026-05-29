@@ -86,11 +86,18 @@ window.digiriskdolibarr.ticket.event = function() {
   $(document).on( 'keyup', '#options_digiriskdolibarr_ticket_phone', window.digiriskdolibarr.ticket.checkValidPhone);
 
   $(document).on( 'change', '.param-table input, .param-table select, .param-table textarea', window.digiriskdolibarr.ticket.handleParamChange);
-  CKEDITOR.on('instanceReady', function(e) {
-	CKEDITOR.instances[e.editor.name].on('change', function() {
-		window.digiriskdolibarr.ticket.handleParamChange.call(this.container.$)
-	});
- });
+  // CKEDITOR is only loaded on pages with a rich-text editor. Guard the global
+  // so this handler never throws "CKEDITOR is not defined" — an uncaught error
+  // here aborts the whole digiriskdolibarr init chain (no try/catch in the
+  // auto-init loop), leaving later modules (e.g. the ticket kanban picker)
+  // unwired.
+  if (typeof CKEDITOR !== 'undefined') {
+    CKEDITOR.on('instanceReady', function(e) {
+      CKEDITOR.instances[e.editor.name].on('change', function() {
+        window.digiriskdolibarr.ticket.handleParamChange.call(this.container.$);
+      });
+    });
+  }
 };
 
 /**
