@@ -468,8 +468,9 @@ class ActionsDigiriskdolibarr
 				require_once DOL_DOCUMENT_ROOT.'/projet/class/project.class.php';
                 require_once __DIR__ . '/../../saturne/class/task/saturnetask.class.php';
 
-				$task    = new SaturneTask($db);
-				$project = new Project($db);
+				$task        = new SaturneTask($db);
+				$project     = new Project($db);
+				$extrafields = new ExtraFields($db);
 
 				if (preg_match('/projectcard|projectcontactcard|projecttaskcard|projecttaskscard|projecttasktime|projectOverview/', $parameters['context']) || (strpos($parameters['context'], 'category') !== false && preg_match('/contacttpl/', $parameters['context']))) {
                     if (strpos($parameters['context'], 'projecttaskcard') !== false && !GETPOSTISSET('withproject')) {
