@@ -965,7 +965,7 @@ class Risk extends SaturneObject
         $array['dataset']    = 1;
         $array['labels']     = $this->cotations;
 
-        $array['data'] = $riskByDangerCategoriesAndRiskAssessments['nbRiskByCotations'];
+        $array['data'] = $riskByDangerCategoriesAndRiskAssessments['nbRiskByCotations'] ?? [];
 
         return $array;
     }
