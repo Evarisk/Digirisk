@@ -122,7 +122,7 @@ $numberingModules  = ['project' => $conf->global->PROJECT_ADDON];
 list ($projectRef) = saturne_require_objects_mod($numberingModules, $moduleNameLowerCase);
 
 //Check projet
-if ($conf->global->DIGIRISKDOLIBARR_DU_PROJECT > 0 && $conf->global->DIGIRISKDOLIBARR_DU_PROJECT_BACKWARD_COMPATIBILITY == 0) {
+if ($conf->global->DIGIRISKDOLIBARR_DU_PROJECT > 0 && empty($conf->global->DIGIRISKDOLIBARR_DU_PROJECT_BACKWARD_COMPATIBILITY)) {
 	$project->fetch($conf->global->DIGIRISKDOLIBARR_DU_PROJECT);
 	//Backward compatibility
 	if ($project->title == $langs->trans('RiskAssessmentDocument')) {
@@ -178,7 +178,7 @@ if ( $conf->global->DIGIRISKDOLIBARR_DU_PROJECT == 0 || $project->statut == 2 ) 
 	header("Location: " . $_SERVER['PHP_SELF']);
 }
 
-if ($conf->global->DIGIRISKDOLIBARR_PREVENTIONPLAN_PROJECT > 0 && $conf->global->DIGIRISKDOLIBARR_PREVENTIONPLAN_PROJECT_BACKWARD_COMPATIBILITY == 0 ) {
+if ($conf->global->DIGIRISKDOLIBARR_PREVENTIONPLAN_PROJECT > 0 && empty($conf->global->DIGIRISKDOLIBARR_PREVENTIONPLAN_PROJECT_BACKWARD_COMPATIBILITY)) {
 	$project->fetch($conf->global->DIGIRISKDOLIBARR_PREVENTIONPLAN_PROJECT);
 	//Backward compatibility
 	if ($project->title == $langs->trans('PreventionPlan')) {
