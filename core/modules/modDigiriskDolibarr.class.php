@@ -2127,7 +2127,7 @@ class modDigiriskdolibarr extends DolibarrModules
         addDocumentModel('accidentinvestigationdocument_odt', 'accidentinvestigationdocument', 'ODT templates', 'DIGIRISKDOLIBARR_ACCIDENTINVESTIGATIONDOCUMENT_ADDON_ODT_PATH');
         addDocumentModel('registerdocument_odt', 'registerdocument', 'ODT templates', 'DIGIRISKDOLIBARR_REGISTERDOCUMENT_ADDON_ODT_PATH');
 
-		if ( $conf->global->DIGIRISKDOLIBARR_DIGIRISKELEMENT_TRASH == 0 ) {
+		if (empty($conf->global->DIGIRISKDOLIBARR_DIGIRISKELEMENT_TRASH)) {
 			require_once __DIR__ . '/../../class/digiriskelement/groupment.class.php';
 
 			$trashRef                      = 'GP0';
@@ -2143,7 +2143,7 @@ class modDigiriskdolibarr extends DolibarrModules
 			dolibarr_set_const($this->db, 'DIGIRISKDOLIBARR_DIGIRISKELEMENT_TRASH', $trash_id, 'integer', 0, '', $conf->entity);
 		}
 
-		if ( $conf->global->DIGIRISKDOLIBARR_ACTIVE_STANDARD == 0 ) {
+		if (empty($conf->global->DIGIRISKDOLIBARR_ACTIVE_STANDARD)) {
 			require_once __DIR__ . '/../../class/digiriskstandard.class.php';
 
 			$digiriskstandard                = new DigiriskStandard($this->db);
@@ -2418,7 +2418,7 @@ class modDigiriskdolibarr extends DolibarrModules
         }
 
 		//DigiriskElement favorite medias backward compatibility
-		if ($conf->global->DIGIRISKDOLIBARR_DIGIRISKELEMENT_MEDIAS_BACKWARD_COMPATIBILITY == 0) {
+		if (empty($conf->global->DIGIRISKDOLIBARR_DIGIRISKELEMENT_MEDIAS_BACKWARD_COMPATIBILITY)) {
 			require_once __DIR__ . '/../../class/digiriskelement.class.php';
 
 			$digiriskelement     = new DigiriskElement($this->db);
@@ -2499,7 +2499,7 @@ class modDigiriskdolibarr extends DolibarrModules
             dolibarr_set_const($this->db, 'DIGIRISKDOLIBARR_PROJECT_TAGS_SET', 4, 'integer', 0, '', $conf->entity);
         }
 
-		if ($conf->global->DIGIRISKDOLIBARR_TRIGGERS_UPDATED == 0) {
+		if (empty($conf->global->DIGIRISKDOLIBARR_TRIGGERS_UPDATED)) {
 			require_once DOL_DOCUMENT_ROOT . '/comm/action/class/actioncomm.class.php';
 
 			$actioncomm = new Actioncomm($this->db);
