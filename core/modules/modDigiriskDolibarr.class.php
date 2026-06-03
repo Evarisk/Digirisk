@@ -1519,7 +1519,7 @@ class modDigiriskdolibarr extends DolibarrModules
             'titre'    => '<i class="fas fa-tasks pictofixedwidth" style="padding-right: 4px;"></i>' . $langs->trans('ActionPlan'),
             'mainmenu' => 'digiriskdolibarr',
             'leftmenu' => 'digiriskenvironmentalactionplan',
-            'url'      => '/projet/tasks.php?id=' . $conf->global->DIGIRISKDOLIBARR_ENVIRONMENT_PROJECT,
+            'url'      => '/projet/tasks.php?id=' . ($conf->global->DIGIRISKDOLIBARR_ENVIRONMENT_PROJECT ?? ''),
             'langs'    => 'digiriskdolibarr@digiriskdolibarr',
             'position' => 100 + $r,
             'enabled'  => '$conf->digiriskdolibarr->enabled && $conf->projet->enabled',
