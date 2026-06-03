@@ -1040,7 +1040,7 @@ class Risk extends SaturneObject
 
         foreach ($dangerCategories as $dangerCategory) {
             $array['data'][$dangerCategory['position']][] = $dangerCategory['name'];
-            $array['data'][$dangerCategory['position']][] = $riskByDangerCategoriesAndRiskAssessments[$dangerCategory['name']]['risk'];
+            $array['data'][$dangerCategory['position']][] = $riskByDangerCategoriesAndRiskAssessments[$dangerCategory['name']]['risk'] ?? 0;
         }
 
         return $array;
