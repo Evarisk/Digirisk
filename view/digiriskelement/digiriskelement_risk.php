@@ -148,7 +148,7 @@ foreach ($risk->fields as $key => $val) {
             'checked'     => (($visible < 0) ? 0 : 1),
             'enabled'     => ($visible != 3 && dol_eval($val['enabled'], 1)),
             'position'    => $val['position'],
-            'help'        => $val['help']
+            'help'        => $val['help'] ?? ''
         ];
     }
 }
@@ -162,7 +162,7 @@ foreach ($evaluation->fields as $key => $val) {
             'checked'     => (($visible < 0) ? 0 : 1),
             'enabled'     => ($visible != 3 && dol_eval($val['enabled'], 1)),
             'position'    => $val['position'],
-            'help'        => $val['help']
+            'help'        => $val['help'] ?? ''
         ];
     }
 }
