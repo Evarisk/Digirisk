@@ -1,4 +1,5 @@
 <?php
+$allRisks             = $allRisks ?? 0;
 $selectedfields_label = 'risklist_selectedfields';
 // Selection of new fields
 require __DIR__ . '/../../../../class/actions_changeselectedfields.php';
