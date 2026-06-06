@@ -488,24 +488,23 @@ class ActionsDigiriskdolibarr
                             $projectId = $task->fk_project;
                         }
                         $allTasks = $task->getTasksArray(null, null, $projectId, 0, 0, '', '-1', '', 0, 0, $extrafields);
+                        $totalConsumedTime       = 0;
+                        $totatConsumedTimeAmount = 0;
+                        $nbTasks                 = 0;
+                        $totalProgress           = 0;
+                        $totalTasksBudget        = 0;
                         if (is_array($allTasks) && !empty($allTasks)) {
                             $nbTasks = count($allTasks);
                             foreach ($allTasks as $taskSingle) {
                                 $filter       = ' AND fk_element = ' . $taskSingle->id;
                                 $allTimespent = $task->fetchAllTimeSpentAllUsers($filter);
                                 foreach ($allTimespent as $timespent) {
-                                    $totatConsumedTimeAmount += convertSecondToTime($timespent->timespent_duration, 'allhourmin') * $timespent->timespent_thm;
+                                    $totatConsumedTimeAmount += ((float)$timespent->timespent_duration / 3600) * (float)$timespent->timespent_thm;
                                 }
-                                $totalConsumedTime += $taskSingle->duration;
-                                $totalProgress     += $taskSingle->progress;
-                                $totalTasksBudget  += $taskSingle->budget_amount;
+                                $totalConsumedTime += (float)$taskSingle->duration;
+                                $totalProgress     += (float)$taskSingle->progress;
+                                $totalTasksBudget  += (float)$taskSingle->budget_amount;
                             }
-                        } else {
-                            $totalConsumedTime       = 0;
-                            $totatConsumedTimeAmount = 0;
-                            $nbTasks                 = 0;
-                            $totalProgress           = 0;
-                            $totalTasksBudget        = 0;
                         }
                         $outTotatConsumedTime       = '<tr><td>' . $langs->trans('TotalConsumedTime') . '</td><td>' . convertSecondToTime($totalConsumedTime, 'allhourmin') . '</td></tr>';
                         $outTotatConsumedTimeAmount = '<tr><td>' . $langs->trans('TotalConsumedTimeAmount') . '</td><td>' . price($totatConsumedTimeAmount, 0, $langs, 1, -1, 2, $conf->currency) . '</td></tr>';
