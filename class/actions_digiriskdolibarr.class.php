@@ -241,15 +241,17 @@ class ActionsDigiriskdolibarr
                 </script>
                 <?php
 
-                $digiriskelement    = new DigiriskElement($db);
-                $res = $digiriskelement->fetch($object->array_options['options_digiriskdolibarr_ticket_service']);
-                if ($res > 0) {
-                    $outDigiriskElement = $digiriskelement->getNomUrl(1, 'blank', 0, '', -1, 1);
-                    ?>
-                    <script>
-                        jQuery('td[id*="digiriskdolibarr_ticket_service"]').html('<?= $outDigiriskElement ?>');
-                    </script>
-                    <?php
+                if (!empty($object->array_options['options_digiriskdolibarr_ticket_service'])) {
+                    $digiriskelement    = new DigiriskElement($db);
+                    $res = $digiriskelement->fetch((int)$object->array_options['options_digiriskdolibarr_ticket_service']);
+                    if ($res > 0) {
+                        $outDigiriskElement = $digiriskelement->getNomUrl(1, 'blank', 0, '', -1, 1);
+                        ?>
+                        <script>
+                            jQuery('td[id*="digiriskdolibarr_ticket_service"]').html('<?= $outDigiriskElement ?>');
+                        </script>
+                        <?php
+                    }
                 }
 
                 // Collect ticket category IDs including their ancestors (getListForItem returns the full hierarchy)
