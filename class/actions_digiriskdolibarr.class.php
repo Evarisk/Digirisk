@@ -111,6 +111,39 @@ class ActionsDigiriskdolibarr
     }
 
     /**
+     * Overloading the saturneIndex hook: print a weather vigilance banner on the Digirisk dashboard.
+     *
+     * @param  array        $parameters Hook metadata (context, etc...)
+     * @param  CommonObject $object     Current object
+     * @return int                      0 to let Dolibarr continue
+     */
+    public function saturneIndex($parameters, &$object)
+    {
+        if (strpos($parameters['context'], 'digiriskdolibarrindex') === false) {
+            return 0;
+        }
+
+        // Feature disabled in the module configuration (off by default): no banner.
+        if (!getDolGlobalInt('DIGIRISKDOLIBARR_METEOFRANCE_VIGILANCE_ENABLED')) {
+            return 0;
+        }
+
+        require_once __DIR__ . '/meteovigilance.class.php';
+
+        $meteoVigilance = new MeteoVigilance($this->db);
+        $vigilance      = $meteoVigilance->fetchVigilance();
+        if (is_array($vigilance) && (int) $vigilance['level'] >= 3) {
+            global $langs;
+            $departmentCode = $meteoVigilance->getDepartmentCode();
+            ob_start();
+            require __DIR__ . '/../core/tpl/meteovigilance/banner.tpl.php';
+            $this->resprints = ob_get_clean();
+        }
+
+        return 0;
+    }
+
+    /**
      * Overloading the addHtmlHeader function : replacing the parent's function with the one below
      *
      * @param  array $parameters Hook metadata (context, etc...)

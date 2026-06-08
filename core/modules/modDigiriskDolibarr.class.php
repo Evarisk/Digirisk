@@ -441,7 +441,8 @@ class modDigiriskdolibarr extends DolibarrModules
                 'category',
                 'categoryindex',
                 'main',
-                'saturnegetobjectsmetadata'
+                'saturnegetobjectsmetadata',
+                'digiriskdolibarrindex'
 			],
 			'tabs' => [
 				'mycompany_admin'
