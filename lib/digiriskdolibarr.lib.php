@@ -73,6 +73,11 @@ function digiriskdolibarr_admin_prepare_head(): array
     $head[$h][2] = 'accident';
     $h++;
 
+    $head[$h][0] = dol_buildpath('/digiriskdolibarr/admin/config/meteovigilance.php', 1);
+    $head[$h][1] = $conf->browser->layout != 'phone' ? '<i class="fas fa-cloud-sun-rain pictofixedwidth"></i>' . $langs->trans('MeteoVigilance') : '<i class="fas fa-cloud-sun-rain"></i>';
+    $head[$h][2] = 'meteovigilance';
+    $h++;
+
     $head[$h][0] = dol_buildpath('/digiriskdolibarr/admin/ticket/ticket.php', 1);
     $head[$h][1] = $conf->browser->layout != 'phone' ? '<i class="fa fa-ticket-alt pictofixedwidth"></i>' . $langs->trans('WHSRegister') : '<i class="fas fa-ticket-alt"></i>';
     $head[$h][2] = 'ticket';
