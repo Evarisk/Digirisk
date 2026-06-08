@@ -10,14 +10,22 @@
 Les entreprises ayant des activités sensibles à la météo (chantiers, travaux
 extérieurs, interventions terrain) doivent pouvoir consulter immédiatement
 l'état de vigilance météorologique de leur département dès l'arrivée sur le
-tableau de bord Digirisk (DigiBoard). La nouvelle réglementation 2025 sur les
-canicules renforce ce besoin.
+tableau de bord Digirisk. La nouvelle réglementation 2025 sur les canicules
+renforce ce besoin.
+
+> **Précision d'intégration** — Le « DigiBoard » évoqué dans l'issue désigne le
+> **tableau de bord de la page d'accueil du module**, rendu par
+> `digiriskdolibarrindex.php` (→ `saturne/core/tpl/index/index_view.tpl.php` →
+> `SaturneDashboard::show_dashboard()`). Ce n'est **pas** un module séparé : il
+> n'existe pas de module `modDigiBoard` côté code. Tous les branchements de
+> cette feature se font donc autour de `digiriskdolibarrindex.php`.
 
 Le périmètre couvre :
 
-1. Une **carte** sur le DigiBoard affichant le niveau de vigilance
-   Météo-France du département de la société (couleur + phénomènes actifs).
-2. Un **bandeau d'alerte prioritaire** en tête du DigiBoard en cas de
+1. Une **carte** sur le tableau de bord (`digiriskdolibarrindex.php`) affichant
+   le niveau de vigilance Météo-France du département de la société
+   (couleur + phénomènes actifs).
+2. Un **bandeau d'alerte prioritaire** en tête de ce tableau de bord en cas de
    vigilance orange ou rouge.
 3. Une **page de configuration admin** pour saisir la clé API Météo-France et,
    optionnellement, forcer un département.
@@ -27,7 +35,7 @@ Le périmètre couvre :
 | Sujet | Décision |
 |---|---|
 | Source de données | **API officielle Météo-France DPVigilance** (clé API requise) |
-| Portée du bandeau | **DigiBoard uniquement** |
+| Portée du bandeau | **Tableau de bord (`digiriskdolibarrindex.php`) uniquement** |
 | Département surveillé | **Département de la société (`$mysoc`)** avec override admin |
 | Rafraîchissement | **Cache fichier avec TTL** lu au chargement (pas de cron) |
 
@@ -199,6 +207,6 @@ via fixture).
 ## 15. Hors périmètre (YAGNI)
 
 - Vigilance par site/élément Digirisk (multi-départements) — la société suffit.
-- Bandeau global multi-pages — DigiBoard uniquement.
+- Bandeau global multi-pages — tableau de bord (`digiriskdolibarrindex.php`) uniquement.
 - DOM-TOM (non couverts par cet endpoint).
 - Historique / notifications push des vigilances.
