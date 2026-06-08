@@ -123,6 +123,11 @@ class ActionsDigiriskdolibarr
             return 0;
         }
 
+        // Feature disabled in the module configuration: no banner.
+        if (!getDolGlobalInt('DIGIRISKDOLIBARR_METEOFRANCE_VIGILANCE_ENABLED', 1)) {
+            return 0;
+        }
+
         require_once __DIR__ . '/meteovigilance.class.php';
 
         $meteoVigilance = new MeteoVigilance($this->db);

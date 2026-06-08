@@ -316,6 +316,11 @@ class MeteoVigilance
     {
         global $langs;
 
+        // Feature disabled in the module configuration: no widget at all.
+        if (!getDolGlobalInt('DIGIRISKDOLIBARR_METEOFRANCE_VIGILANCE_ENABLED', 1)) {
+            return [];
+        }
+
         $widget = [
             'title'      => $langs->transnoentities('MeteoVigilance'),
             'picto'      => 'fas fa-cloud-sun-rain',

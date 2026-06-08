@@ -34,6 +34,7 @@ global $conf, $db, $langs, $user;
 
 // Libraries
 require_once DOL_DOCUMENT_ROOT . '/core/lib/admin.lib.php';
+require_once DOL_DOCUMENT_ROOT . '/core/class/html.form.class.php';
 
 require_once __DIR__ . '/../../lib/digiriskdolibarr.lib.php';
 
@@ -44,6 +45,7 @@ saturne_load_langs(['admin']);
 $action     = GETPOST('action', 'alpha');
 $backtopage = GETPOST('backtopage', 'alpha');
 
+$enabled    = GETPOSTINT('MeteoVigilanceEnabled');
 $apiKey     = GETPOST('MeteoVigilanceApiKey', 'alpha');
 $department = GETPOST('MeteoVigilanceDepartment', 'alpha');
 $cacheTtl   = GETPOSTINT('MeteoVigilanceCacheTTL');
@@ -57,6 +59,7 @@ saturne_check_access($permissiontoread);
  */
 
 if ($action == 'update') {
+    dolibarr_set_const($db, 'DIGIRISKDOLIBARR_METEOFRANCE_VIGILANCE_ENABLED', $enabled, 'integer', 0, '', $conf->entity);
     dolibarr_set_const($db, 'DIGIRISKDOLIBARR_METEOFRANCE_VIGILANCE_API_KEY', $apiKey, 'chaine', 0, '', $conf->entity);
     dolibarr_set_const($db, 'DIGIRISKDOLIBARR_METEOFRANCE_VIGILANCE_DEPARTMENT', strtoupper(trim($department)), 'chaine', 0, '', $conf->entity);
     dolibarr_set_const($db, 'DIGIRISKDOLIBARR_METEOFRANCE_VIGILANCE_CACHE_TTL', ($cacheTtl > 0 ? $cacheTtl : 3600), 'integer', 0, '', $conf->entity);
@@ -80,6 +83,8 @@ print load_fiche_titre($title, $linkback, 'title_setup');
 $head = digiriskdolibarr_admin_prepare_head();
 print dol_get_fiche_head($head, 'meteovigilance', $title, -1, 'digiriskdolibarr_color@digiriskdolibarr');
 
+$form = new Form($db);
+
 print '<form method="POST" action="' . $_SERVER['PHP_SELF'] . '">';
 print '<input type="hidden" name="token" value="' . newToken() . '">';
 print '<input type="hidden" name="action" value="update">';
@@ -89,6 +94,10 @@ print '<td>' . $langs->trans('Name') . '</td>';
 print '<td>' . $langs->trans('Description') . '</td>';
 print '<td>' . $langs->trans('Value') . '</td>';
 print '</tr>';
+
+print '<tr class="oddeven"><td><label for="MeteoVigilanceEnabled">' . $langs->trans('MeteoVigilanceEnabled') . '</label></td>';
+print '<td>' . $langs->trans('MeteoVigilanceEnabledDescription') . '</td>';
+print '<td>' . $form->selectyesno('MeteoVigilanceEnabled', getDolGlobalInt('DIGIRISKDOLIBARR_METEOFRANCE_VIGILANCE_ENABLED', 1), 1) . '</td></tr>';
 
 print '<tr class="oddeven"><td><label for="MeteoVigilanceApiKey">' . $langs->trans('MeteoVigilanceApiKey') . '</label></td>';
 print '<td>' . $langs->trans('MeteoVigilanceApiKeyDescription') . '</td>';
