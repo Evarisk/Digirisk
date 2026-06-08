@@ -1,0 +1,47 @@
+# Copyright (C) 2021-2023 EVARISK <technique@evarisk.com>
+#
+# This program is free software: you can redistribute it and/or modify
+# it under the terms of the GNU General Public License as published by
+# the Free Software Foundation, either version 3 of the License, or
+# (at your option) any later version.
+#
+# This program is distributed in the hope that it will be useful,
+# but WITHOUT ANY WARRANTY; without even the implied warranty of
+# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+# GNU General Public License for more details.
+#
+# You should have received a copy of the GNU General Public License
+# along with this program.  If not, see <https://www.gnu.org/licenses/>.
+
+# MeteoVigilance - Météo-France weather warnings
+MeteoVigilance = Weather warning
+MeteoVigilanceLevel = Warning level
+MeteoVigilanceActivePhenomena = Active phenomena
+MeteoVigilanceNoAlert = No particular warning
+MeteoVigilanceSource = Source
+MeteoVigilanceSeeOnMeteoFrance = View on vigilance.meteofrance.fr
+MeteoVigilanceNotConfigured = Météo-France API key not configured — click to configure
+MeteoVigilanceUnknownDepartment = Company department could not be determined
+MeteoVigilanceUnavailable = Warning data temporarily unavailable
+MeteoVigilanceBannerTitle = %s warning in effect for department %s
+MeteoVigilanceLevel1 = Green
+MeteoVigilanceLevel2 = Yellow
+MeteoVigilanceLevel3 = Orange
+MeteoVigilanceLevel4 = Red
+MeteoVigilancePhenomenon1 = Strong wind
+MeteoVigilancePhenomenon2 = Rain-flood
+MeteoVigilancePhenomenon3 = Thunderstorms
+MeteoVigilancePhenomenon4 = Floods
+MeteoVigilancePhenomenon5 = Snow-ice
+MeteoVigilancePhenomenon6 = Heatwave
+MeteoVigilancePhenomenon7 = Extreme cold
+MeteoVigilancePhenomenon8 = Avalanches
+MeteoVigilancePhenomenon9 = Coastal flooding
+MeteoVigilanceSetup = Weather warning configuration
+MeteoVigilanceApiKey = Météo-France API key
+MeteoVigilanceApiKeyDescription = API key from the Météo-France portal (create an account and a "Bulletin Vigilance" application on <a href="https://portail-api.meteofrance.fr" target="_blank">portail-api.meteofrance.fr</a> to generate the key).
+MeteoVigilanceDepartment = Department code (override)
+MeteoVigilanceDepartmentDescription = Leave empty to auto-detect the department from the company address. Otherwise enter a code (e.g. 35, 2A).
+MeteoVigilanceCacheTTL = Cache duration (seconds)
+MeteoVigilanceCacheTTLDescription = How long API data is cached before a new call (default 3600).
+MeteoVigilanceSettings = Weather warning configuration

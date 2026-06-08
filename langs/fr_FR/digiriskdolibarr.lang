@@ -1857,3 +1857,35 @@ QuickCreateDropzoneActive              = Déposez ici…
 QuickCreateAttachmentHint              = Formats acceptés : images, PDF, docs. Max 10 Mo par fichier.
 QuickCreateTicketSuccess               = Ticket %s créé avec succès.
 
+# MeteoVigilance - Vigilance Météo-France
+MeteoVigilance = Vigilance météo
+MeteoVigilanceLevel = Niveau de vigilance
+MeteoVigilanceActivePhenomena = Phénomènes actifs
+MeteoVigilanceNoAlert = Aucune vigilance particulière
+MeteoVigilanceSource = Source
+MeteoVigilanceSeeOnMeteoFrance = Voir sur vigilance.meteofrance.fr
+MeteoVigilanceNotConfigured = Clé API Météo-France non configurée — cliquez pour configurer
+MeteoVigilanceUnknownDepartment = Département de la société non déterminé
+MeteoVigilanceUnavailable = Données de vigilance momentanément indisponibles
+MeteoVigilanceBannerTitle = Vigilance %s en cours sur le département %s
+MeteoVigilanceLevel1 = Vert
+MeteoVigilanceLevel2 = Jaune
+MeteoVigilanceLevel3 = Orange
+MeteoVigilanceLevel4 = Rouge
+MeteoVigilancePhenomenon1 = Vent violent
+MeteoVigilancePhenomenon2 = Pluie-inondation
+MeteoVigilancePhenomenon3 = Orages
+MeteoVigilancePhenomenon4 = Crues
+MeteoVigilancePhenomenon5 = Neige-verglas
+MeteoVigilancePhenomenon6 = Canicule
+MeteoVigilancePhenomenon7 = Grand-froid
+MeteoVigilancePhenomenon8 = Avalanches
+MeteoVigilancePhenomenon9 = Vagues-submersion
+MeteoVigilanceSetup = Configuration Vigilance Météo
+MeteoVigilanceApiKey = Clé API Météo-France
+MeteoVigilanceApiKeyDescription = Clé API du portail Météo-France (créez un compte et une application « Bulletin Vigilance » sur <a href="https://portail-api.meteofrance.fr" target="_blank">portail-api.meteofrance.fr</a> pour générer la clé).
+MeteoVigilanceDepartment = Code département (override)
+MeteoVigilanceDepartmentDescription = Laissez vide pour déduire automatiquement le département de l'adresse de la société. Sinon, saisissez un code (ex. 35, 2A).
+MeteoVigilanceCacheTTL = Durée du cache (secondes)
+MeteoVigilanceCacheTTLDescription = Durée pendant laquelle les données de l'API sont mises en cache avant un nouvel appel (défaut 3600).
+MeteoVigilanceSettings = Configuration Vigilance Météo
