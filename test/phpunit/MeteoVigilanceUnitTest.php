@@ -163,4 +163,22 @@ class MeteoVigilanceUnitTest extends PHPUnit\Framework\TestCase
         $this->assertSame('#E1031A', MeteoVigilance::getLevelColor(4));
         $this->assertSame('#2BAD4E', MeteoVigilance::getLevelColor(0));
     }
+
+    /**
+     * Test that the admin override takes precedence over the company department.
+     *
+     * @return void
+     */
+    public function testGetDepartmentCodeOverride(): void
+    {
+        global $conf, $db;
+
+        $saved = getDolGlobalString('DIGIRISKDOLIBARR_METEOFRANCE_VIGILANCE_DEPARTMENT');
+        $conf->global->DIGIRISKDOLIBARR_METEOFRANCE_VIGILANCE_DEPARTMENT = '2a';
+
+        $meteoVigilance = new MeteoVigilance($db);
+        $this->assertSame('2A', $meteoVigilance->getDepartmentCode());
+
+        $conf->global->DIGIRISKDOLIBARR_METEOFRANCE_VIGILANCE_DEPARTMENT = $saved;
+    }
 }

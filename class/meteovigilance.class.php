@@ -152,4 +152,179 @@ class MeteoVigilance
 
         return $langs->transnoentities('MeteoVigilancePhenomenon' . $id);
     }
+
+    /**
+     * Resolve the department code to monitor: admin override first, else the company department.
+     *
+     * @return string Department code (e.g. "31", "2A"), or '' if undetermined
+     */
+    public function getDepartmentCode(): string
+    {
+        global $mysoc;
+
+        $override = getDolGlobalString('DIGIRISKDOLIBARR_METEOFRANCE_VIGILANCE_DEPARTMENT');
+        if (!empty($override)) {
+            return strtoupper(trim($override));
+        }
+
+        if (empty($mysoc->state_id)) {
+            return '';
+        }
+
+        $sql   = 'SELECT code_departement FROM ' . MAIN_DB_PREFIX . 'c_departements WHERE rowid = ' . ((int) $mysoc->state_id);
+        $resql = $this->db->query($sql);
+        if ($resql && $this->db->num_rows($resql) > 0) {
+            $obj = $this->db->fetch_object($resql);
+            $this->db->free($resql);
+            return strtoupper(trim($obj->code_departement));
+        }
+
+        return '';
+    }
+
+    /**
+     * Fetch the current vigilance for the configured department, using a TTL file cache.
+     * Returns null when not configured, department undetermined, or data unavailable.
+     *
+     * @return array|null ['level' => int, 'phenomena' => array, 'update_time' => string] or null
+     */
+    public function fetchVigilance(): ?array
+    {
+        global $conf;
+
+        $departmentCode = $this->getDepartmentCode();
+        if (empty($departmentCode)) {
+            return null;
+        }
+        if (array_key_exists($departmentCode, $this->memo)) {
+            return $this->memo[$departmentCode];
+        }
+
+        $apiKey = getDolGlobalString('DIGIRISKDOLIBARR_METEOFRANCE_VIGILANCE_API_KEY');
+        if (empty($apiKey)) {
+            return $this->memo[$departmentCode] = null;
+        }
+
+        $ttl       = getDolGlobalInt('DIGIRISKDOLIBARR_METEOFRANCE_VIGILANCE_CACHE_TTL');
+        $ttl       = $ttl > 0 ? $ttl : self::DEFAULT_CACHE_TTL;
+        $cacheDir  = $conf->digiriskdolibarr->multidir_output[$conf->entity] . '/temp';
+        $cacheFile = $cacheDir . '/meteovigilance_' . dol_sanitizeFileName($departmentCode) . '.json';
+
+        // Serve fresh cache when available.
+        if (dol_is_file($cacheFile) && (dol_filemtime($cacheFile) > (dol_now() - $ttl))) {
+            $cached = json_decode(file_get_contents($cacheFile), true);
+            if (is_array($cached)) {
+                return $this->memo[$departmentCode] = $cached;
+            }
+        }
+
+        // Call the API with a short timeout (connect 5s, response 10s) so a slow API never blocks the dashboard.
+        $response = getURLContent(self::API_URL, 'GET', '', 1, ['apikey: ' . $apiKey, 'Accept: */*'], ['http', 'https'], 0, -1, 5, 10);
+        if (($response['http_code'] ?? 0) == 200 && !empty($response['content'])) {
+            $parsed = self::parseVigilance($response['content'], $departmentCode);
+            if (is_array($parsed)) {
+                dol_mkdir($cacheDir);
+                file_put_contents($cacheFile, json_encode($parsed));
+                return $this->memo[$departmentCode] = $parsed;
+            }
+        } else {
+            dol_syslog('MeteoVigilance::fetchVigilance API error http_code=' . ($response['http_code'] ?? '?') . ' ' . ($response['curl_error_msg'] ?? ''), LOG_WARNING);
+        }
+
+        // Fallback to stale cache if the call failed.
+        if (dol_is_file($cacheFile)) {
+            $cached = json_decode(file_get_contents($cacheFile), true);
+            if (is_array($cached)) {
+                return $this->memo[$departmentCode] = $cached;
+            }
+        }
+
+        return $this->memo[$departmentCode] = null;
+    }
+
+    /**
+     * Return the highest current vigilance level (for the alert banner). 0 when none/unavailable.
+     *
+     * @return int
+     */
+    public function getHighestLevel(): int
+    {
+        $vigilance = $this->fetchVigilance();
+        return is_array($vigilance) ? (int) $vigilance['level'] : 0;
+    }
+
+    /**
+     * Build a small colored badge (HTML) for the dashboard widget customContent field.
+     *
+     * @param  string $label Text shown in the badge
+     * @param  int    $level Vigilance level driving the color
+     * @return string        HTML span
+     */
+    private static function renderBadge(string $label, int $level): string
+    {
+        return '<span class="meteo-vigilance-badge meteo-vigilance-level-' . $level . '">' . dol_escape_htmltag($label) . '</span>';
+    }
+
+    /**
+     * Build the dashboard widget consumed by SaturneDashboard::show_dashboard().
+     *
+     * @return array ['widgets' => ['meteovigilance' => [...]]]
+     */
+    public function load_dashboard(): array
+    {
+        global $langs;
+
+        $widget = [
+            'title'      => $langs->transnoentities('MeteoVigilance'),
+            'picto'      => 'fas fa-cloud-sun-rain',
+            'pictoColor' => '#9E9E9E',
+            'widgetName' => $langs->transnoentities('MeteoVigilance'),
+        ];
+
+        // Not configured.
+        if (empty(getDolGlobalString('DIGIRISKDOLIBARR_METEOFRANCE_VIGILANCE_API_KEY'))) {
+            $configUrl               = dol_buildpath('/digiriskdolibarr/admin/config/meteovigilance.php', 1);
+            $widget['label']         = [$langs->transnoentities('MeteoVigilanceLevel')];
+            $widget['customContent'] = ['<a href="' . $configUrl . '">' . $langs->transnoentities('MeteoVigilanceNotConfigured') . '</a>'];
+            return ['widgets' => ['meteovigilance' => $widget]];
+        }
+
+        // Department undetermined.
+        $departmentCode = $this->getDepartmentCode();
+        if (empty($departmentCode)) {
+            $widget['label']         = [$langs->transnoentities('MeteoVigilanceLevel')];
+            $widget['customContent'] = [$langs->transnoentities('MeteoVigilanceUnknownDepartment')];
+            return ['widgets' => ['meteovigilance' => $widget]];
+        }
+
+        // Data unavailable.
+        $vigilance = $this->fetchVigilance();
+        if (!is_array($vigilance)) {
+            $widget['label']         = [$langs->transnoentities('MeteoVigilanceLevel')];
+            $widget['customContent'] = [$langs->transnoentities('MeteoVigilanceUnavailable')];
+            return ['widgets' => ['meteovigilance' => $widget]];
+        }
+
+        // Nominal rendering.
+        $level                   = (int) $vigilance['level'];
+        $widget['pictoColor']    = self::getLevelColor($level);
+        $widget['label']         = [$langs->transnoentities('MeteoVigilanceLevel') . ' (' . dol_escape_htmltag($departmentCode) . ')'];
+        $widget['customContent'] = [self::renderBadge(self::getLevelLabel($level), $level)];
+
+        $widget['label'][] = $langs->transnoentities('MeteoVigilanceActivePhenomena');
+        if (!empty($vigilance['phenomena'])) {
+            $badges = '';
+            foreach ($vigilance['phenomena'] as $phenomenon) {
+                $badges .= self::renderBadge(self::getPhenomenonLabel($phenomenon['id']), (int) $phenomenon['level']) . ' ';
+            }
+            $widget['customContent'][] = $badges;
+        } else {
+            $widget['customContent'][] = $langs->transnoentities('MeteoVigilanceNoAlert');
+        }
+
+        $widget['label'][]         = $langs->transnoentities('MeteoVigilanceSource');
+        $widget['customContent'][] = '<a href="https://vigilance.meteofrance.fr/fr" target="_blank" rel="noopener">' . $langs->transnoentities('MeteoVigilanceSeeOnMeteoFrance') . '</a>';
+
+        return ['widgets' => ['meteovigilance' => $widget]];
+    }
 }
