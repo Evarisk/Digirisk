@@ -54,7 +54,10 @@ global $conf, $db, $hookmanager, $langs, $user;
 saturne_load_langs();
 
 // Get parameters
-$id        = GETPOSTINT('id');
+// The risk assessment document is a singleton per entity: always load the active standard of the
+// current entity, not a URL id. Otherwise, under multicompany, an id pointing to another entity's
+// standard makes document generation resolve an empty output directory ("Répertoire introuvable").
+$id        = getDolGlobalInt('DIGIRISKDOLIBARR_ACTIVE_STANDARD');
 $action    = GETPOST('action', 'aZ09');
 $subaction = GETPOST('subaction', 'aZ09');
 
