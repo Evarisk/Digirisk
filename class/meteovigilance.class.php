@@ -375,7 +375,7 @@ class MeteoVigilance
                 $widget['customContent'][] = self::renderLevelDot((int) $phenomenon['level']);
             }
         } else {
-            $widget['label'][]         = $langs->transnoentities('MeteoVigilanceActivePhenomena');
+            $widget['label'][]         = $langs->transnoentities('MeteoVigilanceNoAlert');
             $widget['customContent'][] = self::renderLevelDot($level);
         }
 
