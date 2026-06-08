@@ -1,0 +1,36 @@
+.mod-digiriskdolibarr {
+    .meteo-vigilance-badge {
+        display: inline-block;
+        margin: 2px 4px 2px 0;
+        padding: 2px 10px;
+        border-radius: 12px;
+        color: #fff;
+        font-weight: 600;
+        font-size: 12px;
+        line-height: 18px;
+        white-space: nowrap;
+
+        &.meteo-vigilance-level-1 {
+            background: #2BAD4E;
+        }
+
+        &.meteo-vigilance-level-2 {
+            background: #FFD600;
+            color: #333;
+        }
+
+        &.meteo-vigilance-level-3 {
+            background: #FF7A00;
+        }
+
+        &.meteo-vigilance-level-4 {
+            background: #E1031A;
+        }
+    }
+
+    .meteo-vigilance-banner {
+        .notice-title i {
+            margin-right: 8px;
+        }
+    }
+}
