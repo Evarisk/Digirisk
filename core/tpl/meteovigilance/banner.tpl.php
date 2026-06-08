@@ -33,10 +33,12 @@ $levelLabel  = MeteoVigilance::getLevelLabel($level);
 
 $phenomenaLabels = [];
 foreach ($vigilance['phenomena'] as $phenomenon) {
-    $phenomenaLabels[] = MeteoVigilance::getPhenomenonLabel($phenomenon['id']);
+    if ((int) $phenomenon['level'] >= 2) {
+        $phenomenaLabels[] = MeteoVigilance::getPhenomenonLabel($phenomenon['id']);
+    }
 }
 ?>
-<div class="wpeo-notice <?php echo $noticeClass; ?> meteo-vigilance-banner">
+<div class="wpeo-notice <?php echo $noticeClass; ?> meteo-vigilance-banner meteo-vigilance-banner-level-<?php echo $level; ?>">
     <div class="notice-content">
         <div class="notice-title">
             <i class="fas fa-exclamation-triangle"></i>

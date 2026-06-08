@@ -14,7 +14,12 @@
 # along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
 # MeteoVigilance - Météo-France weather warnings
-MeteoVigilance = Weather warning
+MeteoVigilance = Météo-France weather warning
+MeteoVigilancePanelTitle = %s warning
+MeteoVigilanceAdvice2 = Be alert
+MeteoVigilanceAdvice3 = Be very vigilant
+MeteoVigilanceAdvice4 = Take action
+MeteoVigilanceUpdatedAt = Updated %s
 MeteoVigilanceLevel = Warning level
 MeteoVigilanceActivePhenomena = Active phenomena
 MeteoVigilanceNoAlert = No particular warning

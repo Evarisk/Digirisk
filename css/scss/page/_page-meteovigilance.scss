@@ -1,36 +1,198 @@
 .mod-digiriskdolibarr {
-    .meteo-vigilance-badge {
-        display: inline-block;
-        margin: 2px 4px 2px 0;
-        padding: 2px 10px;
-        border-radius: 12px;
-        color: #fff;
-        font-weight: 600;
-        font-size: 12px;
-        line-height: 18px;
-        white-space: nowrap;
+    // Solid level colors (1 green, 2 yellow, 3 orange, 4 red) for dots and panel icon.
+    .meteo-vigilance-bg-1 {
+        background: #2BAD4E;
+    }
 
-        &.meteo-vigilance-level-1 {
-            background: #2BAD4E;
+    .meteo-vigilance-bg-2 {
+        background: #FFD600;
+    }
+
+    .meteo-vigilance-bg-3 {
+        background: #FF7A00;
+    }
+
+    .meteo-vigilance-bg-4 {
+        background: #E1031A;
+    }
+
+    // The widget body is injected as a single full-width custom content:
+    // neutralize the generic row chrome so the card can lay itself out.
+    #widget-meteovigilance {
+        .body__row {
+            display: block;
+            padding: 0;
         }
 
-        &.meteo-vigilance-level-2 {
-            background: #FFD600;
-            color: #333;
+        .row__libelle {
+            display: none;
         }
 
-        &.meteo-vigilance-level-3 {
-            background: #FF7A00;
-        }
-
-        &.meteo-vigilance-level-4 {
-            background: #E1031A;
+        .row__data-container,
+        .row__data {
+            display: block;
+            width: 100%;
         }
     }
 
+    .meteo-vigilance-card {
+        display: flex;
+        flex-direction: column;
+        gap: 10px;
+    }
+
+    // Attention panel shown when there is a vigilance (level >= 2).
+    .meteo-vigilance-panel {
+        display: flex;
+        align-items: center;
+        gap: 12px;
+        padding: 12px 14px;
+        border-radius: 6px;
+        border-left: 5px solid transparent;
+        background: #f5f5f5;
+
+        &.meteo-vigilance-border-2 {
+            border-left-color: #FFD600;
+            background: rgba(255, 214, 0, 0.12);
+
+            .meteo-vigilance-panel__icon {
+                color: #5a4b00;
+            }
+        }
+
+        &.meteo-vigilance-border-3 {
+            border-left-color: #FF7A00;
+            background: rgba(255, 122, 0, 0.12);
+        }
+
+        &.meteo-vigilance-border-4 {
+            border-left-color: #E1031A;
+            background: rgba(225, 3, 26, 0.12);
+        }
+
+        &__icon {
+            flex: 0 0 auto;
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: #fff;
+            font-size: 18px;
+        }
+
+        &__text {
+            display: flex;
+            flex-direction: column;
+        }
+
+        &__title {
+            font-weight: 700;
+            font-size: 15px;
+        }
+
+        &__subtitle {
+            color: #555;
+            font-size: 13px;
+        }
+    }
+
+    // Phenomena list: icon + label on the left, colored level dot on the right.
+    .meteo-vigilance-phenomena {
+        list-style: none;
+        margin: 0;
+        padding: 0;
+    }
+
+    .meteo-vigilance-phenomenon {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        padding: 6px 2px;
+        border-bottom: 1px solid #eee;
+
+        &:last-child {
+            border-bottom: 0;
+        }
+
+        &__label {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            color: #333;
+        }
+
+        &__icon {
+            width: 18px;
+            text-align: center;
+            color: #777;
+        }
+    }
+
+    .meteo-vigilance-dot {
+        flex: 0 0 auto;
+        width: 14px;
+        height: 14px;
+        border-radius: 50%;
+        display: inline-block;
+    }
+
+    .meteo-vigilance-noalert {
+        padding: 8px 2px;
+        color: #2BAD4E;
+        font-weight: 600;
+    }
+
+    .meteo-vigilance-footer {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        margin-top: 4px;
+        padding-top: 8px;
+        border-top: 1px solid #eee;
+        font-size: 12px;
+
+        &__update {
+            color: #999;
+        }
+
+        &__link {
+            white-space: nowrap;
+        }
+    }
+
+    // Page-top alert banner (saturneIndex hook), shown for orange/red vigilance.
     .meteo-vigilance-banner {
+        border-left: 6px solid transparent;
+        border-radius: 4px;
+
+        .notice-title {
+            font-weight: 600;
+        }
+
         .notice-title i {
+            font-size: 1.4em;
             margin-right: 8px;
+            vertical-align: middle;
+        }
+
+        &.meteo-vigilance-banner-level-3 {
+            border-left-color: #FF7A00;
+            background: rgba(255, 122, 0, 0.10);
+
+            .notice-title i {
+                color: #FF7A00;
+            }
+        }
+
+        &.meteo-vigilance-banner-level-4 {
+            border-left-color: #E1031A;
+            background: rgba(225, 3, 26, 0.10);
+
+            .notice-title i {
+                color: #E1031A;
+            }
         }
     }
 }

@@ -98,21 +98,23 @@ class MeteoVigilanceUnitTest extends PHPUnit\Framework\TestCase
     }
 
     /**
-     * Test parsing an orange department with active phenomena.
+     * Test parsing an orange department: all phenomena are returned with their level.
      *
      * @return void
      */
-    public function testParseReturnsLevelAndActivePhenomena(): void
+    public function testParseReturnsLevelAndAllPhenomena(): void
     {
         $result = MeteoVigilance::parseVigilance($this->sampleJson(), '31');
 
         $this->assertIsArray($result);
         $this->assertSame(3, $result['level']);
-        // Only phenomena with level >= 2 are kept (id 1 at level 1 is dropped).
-        $this->assertCount(2, $result['phenomena']);
+        // All phenomena are kept, including green (level 1) ones, so the widget can show every type.
+        $this->assertCount(3, $result['phenomena']);
         $this->assertSame('6', $result['phenomena'][0]['id']);
         $this->assertSame(3, $result['phenomena'][0]['level']);
         $this->assertSame('3', $result['phenomena'][1]['id']);
+        $this->assertSame('1', $result['phenomena'][2]['id']);
+        $this->assertSame(1, $result['phenomena'][2]['level']);
     }
 
     /**

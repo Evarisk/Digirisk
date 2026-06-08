@@ -1858,7 +1858,12 @@ QuickCreateAttachmentHint              = Formats acceptés : images, PDF, docs. 
 QuickCreateTicketSuccess               = Ticket %s créé avec succès.
 
 # MeteoVigilance - Vigilance Météo-France
-MeteoVigilance = Vigilance météo
+MeteoVigilance = Vigilance Météo-France
+MeteoVigilancePanelTitle = Vigilance %s
+MeteoVigilanceAdvice2 = Soyez attentif
+MeteoVigilanceAdvice3 = Soyez très vigilant
+MeteoVigilanceAdvice4 = Vigilance absolue
+MeteoVigilanceUpdatedAt = Mis à jour %s
 MeteoVigilanceLevel = Niveau de vigilance
 MeteoVigilanceActivePhenomena = Phénomènes actifs
 MeteoVigilanceNoAlert = Aucune vigilance particulière

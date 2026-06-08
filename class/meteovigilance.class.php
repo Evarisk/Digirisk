@@ -86,13 +86,10 @@ class MeteoVigilance
 
                 $phenomena = [];
                 foreach ($domain['phenomenon_items'] ?? [] as $item) {
-                    $phenomenonLevel = (int) ($item['phenomenon_max_color_id'] ?? 1);
-                    if ($phenomenonLevel >= 2) {
-                        $phenomena[] = [
-                            'id'    => (string) ($item['phenomenon_id'] ?? ''),
-                            'level' => $phenomenonLevel,
-                        ];
-                    }
+                    $phenomena[] = [
+                        'id'    => (string) ($item['phenomenon_id'] ?? ''),
+                        'level' => (int) ($item['phenomenon_max_color_id'] ?? 1),
+                    ];
                 }
 
                 return [
@@ -254,15 +251,49 @@ class MeteoVigilance
     }
 
     /**
-     * Build a small colored badge (HTML) for the dashboard widget customContent field.
+     * Return a FontAwesome icon class for a phenomenon id.
      *
-     * @param  string $label Text shown in the badge
-     * @param  int    $level Vigilance level driving the color
-     * @return string        HTML span
+     * @param  string $id Phenomenon id ("1" .. "9")
+     * @return string     FontAwesome class
      */
-    private static function renderBadge(string $label, int $level): string
+    public static function getPhenomenonIcon(string $id): string
     {
-        return '<span class="meteo-vigilance-badge meteo-vigilance-level-' . $level . '">' . dol_escape_htmltag($label) . '</span>';
+        $icons = [
+            '1' => 'fas fa-wind',
+            '2' => 'fas fa-cloud-showers-heavy',
+            '3' => 'fas fa-bolt',
+            '4' => 'fas fa-water',
+            '5' => 'fas fa-snowflake',
+            '6' => 'fas fa-thermometer-full',
+            '7' => 'fas fa-thermometer-empty',
+            '8' => 'fas fa-mountain',
+            '9' => 'fas fa-water',
+        ];
+
+        return $icons[$id] ?? 'fas fa-exclamation-triangle';
+    }
+
+    /**
+     * Return the department name for a department code (for display), or '' if unknown.
+     *
+     * @param  string $code Department code (e.g. "34", "2A")
+     * @return string       Department name (e.g. "Hérault")
+     */
+    public function getDepartmentName(string $code): string
+    {
+        if (empty($code)) {
+            return '';
+        }
+
+        $sql   = "SELECT nom FROM " . MAIN_DB_PREFIX . "c_departements WHERE code_departement = '" . $this->db->escape($code) . "'";
+        $resql = $this->db->query($sql);
+        if ($resql && $this->db->num_rows($resql) > 0) {
+            $obj = $this->db->fetch_object($resql);
+            $this->db->free($resql);
+            return $obj->nom;
+        }
+
+        return '';
     }
 
     /**
@@ -305,25 +336,18 @@ class MeteoVigilance
             return ['widgets' => ['meteovigilance' => $widget]];
         }
 
-        // Nominal rendering.
-        $level                   = (int) $vigilance['level'];
-        $widget['pictoColor']    = self::getLevelColor($level);
-        $widget['label']         = [$langs->transnoentities('MeteoVigilanceLevel') . ' (' . dol_escape_htmltag($departmentCode) . ')'];
-        $widget['customContent'] = [self::renderBadge(self::getLevelLabel($level), $level)];
+        // Nominal rendering: the whole card body (attention panel + phenomena list + footer)
+        // is rendered by a dedicated TPL and injected as a single full-width custom content.
+        $level                = (int) $vigilance['level'];
+        $widget['pictoColor'] = self::getLevelColor($level);
+        $departmentName       = $this->getDepartmentName($departmentCode);
 
-        $widget['label'][] = $langs->transnoentities('MeteoVigilanceActivePhenomena');
-        if (!empty($vigilance['phenomena'])) {
-            $badges = '';
-            foreach ($vigilance['phenomena'] as $phenomenon) {
-                $badges .= self::renderBadge(self::getPhenomenonLabel($phenomenon['id']), (int) $phenomenon['level']) . ' ';
-            }
-            $widget['customContent'][] = $badges;
-        } else {
-            $widget['customContent'][] = $langs->transnoentities('MeteoVigilanceNoAlert');
-        }
+        ob_start();
+        require __DIR__ . '/../core/tpl/meteovigilance/widget.tpl.php';
+        $cardHtml = ob_get_clean();
 
-        $widget['label'][]         = $langs->transnoentities('MeteoVigilanceSource');
-        $widget['customContent'][] = '<a href="https://vigilance.meteofrance.fr/fr" target="_blank" rel="noopener">' . $langs->transnoentities('MeteoVigilanceSeeOnMeteoFrance') . '</a>';
+        $widget['label']         = [' '];
+        $widget['customContent'] = [$cardHtml];
 
         return ['widgets' => ['meteovigilance' => $widget]];
     }
