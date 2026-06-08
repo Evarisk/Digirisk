@@ -316,8 +316,8 @@ class MeteoVigilance
     {
         global $langs;
 
-        // Feature disabled in the module configuration: no widget at all.
-        if (!getDolGlobalInt('DIGIRISKDOLIBARR_METEOFRANCE_VIGILANCE_ENABLED', 1)) {
+        // Feature disabled in the module configuration (off by default): no widget at all.
+        if (!getDolGlobalInt('DIGIRISKDOLIBARR_METEOFRANCE_VIGILANCE_ENABLED')) {
             return [];
         }
 

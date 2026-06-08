@@ -97,7 +97,7 @@ print '</tr>';
 
 print '<tr class="oddeven"><td><label for="MeteoVigilanceEnabled">' . $langs->trans('MeteoVigilanceEnabled') . '</label></td>';
 print '<td>' . $langs->trans('MeteoVigilanceEnabledDescription') . '</td>';
-print '<td>' . $form->selectyesno('MeteoVigilanceEnabled', getDolGlobalInt('DIGIRISKDOLIBARR_METEOFRANCE_VIGILANCE_ENABLED', 1), 1) . '</td></tr>';
+print '<td>' . $form->selectyesno('MeteoVigilanceEnabled', getDolGlobalInt('DIGIRISKDOLIBARR_METEOFRANCE_VIGILANCE_ENABLED'), 1) . '</td></tr>';
 
 print '<tr class="oddeven"><td><label for="MeteoVigilanceApiKey">' . $langs->trans('MeteoVigilanceApiKey') . '</label></td>';
 print '<td>' . $langs->trans('MeteoVigilanceApiKeyDescription') . '</td>';

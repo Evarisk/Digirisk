@@ -123,8 +123,8 @@ class ActionsDigiriskdolibarr
             return 0;
         }
 
-        // Feature disabled in the module configuration: no banner.
-        if (!getDolGlobalInt('DIGIRISKDOLIBARR_METEOFRANCE_VIGILANCE_ENABLED', 1)) {
+        // Feature disabled in the module configuration (off by default): no banner.
+        if (!getDolGlobalInt('DIGIRISKDOLIBARR_METEOFRANCE_VIGILANCE_ENABLED')) {
             return 0;
         }
 
