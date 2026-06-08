@@ -548,97 +548,145 @@ if ($projectId > 0) {
     }
 }
 
-// Fetch risk links (fk_risk => tasks) and load last evaluation data
+// Fetch risk links (fk_risk => tasks) — scoped to current project tasks only
 $taskRiskMap = [];
 $riskObjects = [];
-$riskData    = []; // enriched data for template
+$riskData    = [];
 require_once __DIR__ . '/../../class/riskanalysis/riskassessment.class.php';
 if (!empty($allTasks)) {
-    $sql = "SELECT fk_object, fk_risk FROM " . MAIN_DB_PREFIX . "projet_task_extrafields WHERE fk_risk > 0";
+    $taskIds = array_map(function ($t) { return (int) $t->id; }, $allTasks);
+    $sql  = "SELECT fk_object, fk_risk FROM " . MAIN_DB_PREFIX . "projet_task_extrafields";
+    $sql .= " WHERE fk_risk > 0 AND fk_object IN (" . implode(',', $taskIds) . ")";
     $resql = $db->query($sql);
     if ($resql) {
         while ($obj = $db->fetch_object($resql)) {
-            $taskRiskMap[$obj->fk_object] = $obj->fk_risk;
-            if (!isset($riskObjects[$obj->fk_risk])) {
-                $riskObj = new Risk($db);
-                $riskObj->fetch($obj->fk_risk);
-                $riskObjects[$obj->fk_risk] = $riskObj;
-
-                // Load last validated risk assessment
-                $riskAssessment = new RiskAssessment($db);
-                $raList = $riskAssessment->fetchAll('DESC', 'date_creation', 1, 0, ['customsql' => 'fk_risk = ' . (int)$obj->fk_risk . ' AND status = ' . RiskAssessment::STATUS_VALIDATED]);
-                $lastRA = (is_array($raList) && !empty($raList)) ? reset($raList) : null;
-
-                // Determine cotation color
-                $cotation = $lastRA ? (int)$lastRA->cotation : 0;
-                if ($cotation >= 80)     { $cotColor = '#2b2b2b'; }
-                elseif ($cotation >= 51) { $cotColor = '#e05353'; }
-                elseif ($cotation >= 48) { $cotColor = '#e9ad4f'; }
-                else                     { $cotColor = '#ececec'; }
-
-                // Category name
-                $dangerCatName = $riskObj->getDangerCategoryName($riskObj, $riskObj->type ?: 'risk');
-                if ($dangerCatName == -1) $dangerCatName = '';
-
-                // Evaluation photo URL (served via viewimage.php)
-                $raPhotoUrl = '';
-                if ($lastRA) {
-                    $raDir = $conf->digiriskdolibarr->multidir_output[$conf->entity] . '/riskassessment/' . $lastRA->ref;
-                    if (is_dir($raDir)) {
-                        // Look for image files (not in thumbs)
-                        $raFiles = scandir($raDir);
-                        foreach ($raFiles as $raFile) {
-                            if ($raFile == '.' || $raFile == '..' || $raFile == 'thumbs') continue;
-                            if (preg_match('/\.(jpg|jpeg|png|gif|webp)$/i', $raFile)) {
-                                // Build thumb URL for smaller display
-                                $thumbName = preg_replace('/(\.\w+)$/', '_small$1', $raFile);
-                                $thumbPath = $raDir . '/thumbs/' . $thumbName;
-                                if (file_exists($thumbPath)) {
-                                    $raPhotoUrl = DOL_URL_ROOT . '/custom/digiriskdolibarr/documents/viewimage.php?modulepart=digiriskdolibarr&entity=' . $conf->entity . '&file=' . urlencode('riskassessment/' . $lastRA->ref . '/thumbs/' . $thumbName);
-                                } else {
-                                    $raPhotoUrl = DOL_URL_ROOT . '/custom/digiriskdolibarr/documents/viewimage.php?modulepart=digiriskdolibarr&entity=' . $conf->entity . '&file=' . urlencode('riskassessment/' . $lastRA->ref . '/' . $raFile);
-                                }
-                                break;
-                            }
-                        }
-                    }
-                }
-
-                // Evaluator
-                $raUserInitials = '';
-                if ($lastRA && $lastRA->fk_user_creat > 0) {
-                    $raUser = new User($db);
-                    if ($raUser->fetch($lastRA->fk_user_creat) > 0) {
-                        $raUserInitials = strtoupper(mb_substr($raUser->firstname, 0, 1) . mb_substr($raUser->lastname, 0, 1));
-                    }
-                }
-
-                $riskData[$obj->fk_risk] = [
-                    'ref'            => $riskObj->ref,
-                    'fk_element'     => $riskObj->fk_element,
-                    'description'    => $riskObj->description,
-                    'category_name'  => $dangerCatName,
-                    'cotation'       => $cotation,
-                    'cotation_color' => $cotColor,
-                    'ra_ref'         => $lastRA ? $lastRA->ref : '',
-                    'ra_date'        => $lastRA && $lastRA->date_creation ? dol_print_date($lastRA->date_creation, 'day') : '',
-                    'ra_comment'     => $lastRA ? $lastRA->comment : '',
-                    'ra_photo_url'   => $raPhotoUrl,
-                    'ra_user'        => $raUserInitials,
-                ];
-            }
+            $taskRiskMap[(int) $obj->fk_object] = (int) $obj->fk_risk;
         }
         $db->free($resql);
     }
 }
 
-// Fetch categories/tags for tasks
+if (!empty($taskRiskMap)) {
+    $riskIds = array_unique(array_values($taskRiskMap));
+
+    // Batch load all risks — single query via ORM
+    $riskLoader  = new Risk($db);
+    $riskObjects = $riskLoader->fetchAll('', '', 0, 0, ['customsql' => 't.rowid IN (' . implode(',', $riskIds) . ')']);
+    if (!is_array($riskObjects)) {
+        $riskObjects = [];
+    }
+
+    // Batch load latest validated risk assessment per risk — single query via ORM
+    $riskAssessmentLoader = new RiskAssessment($db);
+    $allValidatedRA       = $riskAssessmentLoader->fetchAll('DESC', 'date_creation', 0, 0, [
+        'customsql' => 'fk_risk IN (' . implode(',', $riskIds) . ') AND status = ' . RiskAssessment::STATUS_VALIDATED,
+    ]);
+    $latestRAByRisk = [];
+    if (is_array($allValidatedRA)) {
+        foreach ($allValidatedRA as $ra) {
+            if (!isset($latestRAByRisk[$ra->fk_risk])) {
+                $latestRAByRisk[$ra->fk_risk] = $ra;
+            }
+        }
+    }
+
+    // Batch load assessor user initials — single query
+    $assessorIds    = array_unique(array_filter(array_map(function ($ra) { return (int) $ra->fk_user_creat; }, $latestRAByRisk)));
+    $assessorInitials = [];
+    if (!empty($assessorIds)) {
+        $sqlAssessors = "SELECT rowid, firstname, lastname FROM " . MAIN_DB_PREFIX . "user WHERE rowid IN (" . implode(',', $assessorIds) . ")";
+        $resAssessors = $db->query($sqlAssessors);
+        if ($resAssessors) {
+            while ($objU = $db->fetch_object($resAssessors)) {
+                $assessorInitials[(int) $objU->rowid] = strtoupper(mb_substr($objU->firstname, 0, 1) . mb_substr($objU->lastname, 0, 1));
+            }
+            $db->free($resAssessors);
+        }
+    }
+
+    // Build riskData map
+    foreach ($riskIds as $riskId) {
+        if (!isset($riskObjects[$riskId])) {
+            continue;
+        }
+        $riskObj = $riskObjects[$riskId];
+        $lastRA  = $latestRAByRisk[$riskId] ?? null;
+
+        $cotation = $lastRA ? (int) $lastRA->cotation : 0;
+        if ($cotation >= 80) {
+            $cotColor = '#2b2b2b';
+        } elseif ($cotation >= 51) {
+            $cotColor = '#e05353';
+        } elseif ($cotation >= 48) {
+            $cotColor = '#e9ad4f';
+        } else {
+            $cotColor = '#ececec';
+        }
+
+        $dangerCatName = $riskObj->getDangerCategoryName($riskObj, $riskObj->type ?: 'risk');
+        if ($dangerCatName == -1) {
+            $dangerCatName = '';
+        }
+
+        $raPhotoUrl = '';
+        if ($lastRA) {
+            $raDir = $conf->digiriskdolibarr->multidir_output[$conf->entity] . '/riskassessment/' . $lastRA->ref;
+            if (is_dir($raDir)) {
+                $raFiles = scandir($raDir);
+                foreach ($raFiles as $raFile) {
+                    if ($raFile == '.' || $raFile == '..' || $raFile == 'thumbs') {
+                        continue;
+                    }
+                    if (preg_match('/\.(jpg|jpeg|png|gif|webp)$/i', $raFile)) {
+                        $thumbName = preg_replace('/(\.\w+)$/', '_small$1', $raFile);
+                        $thumbPath = $raDir . '/thumbs/' . $thumbName;
+                        if (file_exists($thumbPath)) {
+                            $raPhotoUrl = DOL_URL_ROOT . '/custom/digiriskdolibarr/documents/viewimage.php?modulepart=digiriskdolibarr&entity=' . $conf->entity . '&file=' . urlencode('riskassessment/' . $lastRA->ref . '/thumbs/' . $thumbName);
+                        } else {
+                            $raPhotoUrl = DOL_URL_ROOT . '/custom/digiriskdolibarr/documents/viewimage.php?modulepart=digiriskdolibarr&entity=' . $conf->entity . '&file=' . urlencode('riskassessment/' . $lastRA->ref . '/' . $raFile);
+                        }
+                        break;
+                    }
+                }
+            }
+        }
+
+        $riskData[$riskId] = [
+            'ref'            => $riskObj->ref,
+            'fk_element'     => $riskObj->fk_element,
+            'description'    => $riskObj->description,
+            'category_name'  => $dangerCatName,
+            'cotation'       => $cotation,
+            'cotation_color' => $cotColor,
+            'ra_ref'         => $lastRA ? $lastRA->ref : '',
+            'ra_date'        => $lastRA && $lastRA->date_creation ? dol_print_date($lastRA->date_creation, 'day') : '',
+            'ra_comment'     => $lastRA ? $lastRA->comment : '',
+            'ra_photo_url'   => $raPhotoUrl,
+            'ra_user'        => $lastRA && $lastRA->fk_user_creat > 0 ? ($assessorInitials[$lastRA->fk_user_creat] ?? '') : '',
+        ];
+    }
+}
+
+// Fetch categories/tags for tasks (single batch query instead of N+1)
 $taskCategories = [];
 $categorie = new Categorie($db);
-foreach ($allTasks as $t) {
-    $cats = $categorie->containing($t->id, 'project_task');
-    if (is_array($cats) && !empty($cats)) {
-        $taskCategories[$t->id] = $cats;
+if (!empty($allTasks)) {
+    $taskIds     = array_map(function ($t) { return (int) $t->id; }, $allTasks);
+    $sqlTaskCats  = "SELECT ct.fk_project_task, c.rowid, c.label, c.color";
+    $sqlTaskCats .= " FROM " . MAIN_DB_PREFIX . "categorie_project_task as ct";
+    $sqlTaskCats .= " INNER JOIN " . MAIN_DB_PREFIX . "categorie as c ON ct.fk_categorie = c.rowid";
+    $sqlTaskCats .= " WHERE ct.fk_project_task IN (" . implode(',', $taskIds) . ")";
+    $sqlTaskCats .= " AND c.entity IN (" . getEntity('category') . ")";
+    $resTaskCats = $db->query($sqlTaskCats);
+    if ($resTaskCats) {
+        while ($objCat = $db->fetch_object($resTaskCats)) {
+            $catObj        = new Categorie($db);
+            $catObj->id    = (int) $objCat->rowid;
+            $catObj->label = $objCat->label;
+            $catObj->color = $objCat->color;
+            $taskCategories[(int) $objCat->fk_project_task][] = $catObj;
+        }
+        $db->free($resTaskCats);
     }
 }
 
@@ -661,6 +709,22 @@ $kanbanThresholds = [
     'progress_max' => getDolGlobalInt('DIGIRISKDOLIBARR_KANBAN_PROGRESS_MAX', 80),
     'control_max'  => getDolGlobalInt('DIGIRISKDOLIBARR_KANBAN_CONTROL_MAX', 99),
 ];
+
+// Batch file counts for all tasks (single query instead of N+1)
+$taskFileCounts = [];
+if (!empty($allTasks)) {
+    $taskIds       = array_map(function ($t) { return (int) $t->id; }, $allTasks);
+    $sqlFileCounts  = "SELECT src_object_id, COUNT(*) as nb FROM " . MAIN_DB_PREFIX . "ecm_files";
+    $sqlFileCounts .= " WHERE src_object_type = 'projet_task' AND src_object_id IN (" . implode(',', $taskIds) . ")";
+    $sqlFileCounts .= " GROUP BY src_object_id";
+    $resFileCounts = $db->query($sqlFileCounts);
+    if ($resFileCounts) {
+        while ($objFC = $db->fetch_object($resFileCounts)) {
+            $taskFileCounts[(int) $objFC->src_object_id] = (int) $objFC->nb;
+        }
+        $db->free($resFileCounts);
+    }
+}
 
 // Prepare enriched data for templates
 $tasksJson = [];
@@ -685,20 +749,17 @@ foreach ($allTasks as $t) {
     }
 
     // Contacts: responsible (TASKEXECUTIVE) and associated people
-    $taskObj = new SaturneTask($db);
-    $taskObj->fetch($t->id);
-    $contactsInternal = $taskObj->liste_contact(-1, 'internal');
-    $contactsExternal = $taskObj->liste_contact(-1, 'external');
+    $contactsInternal = $t->liste_contact(-1, 'internal');
+    $contactsExternal = $t->liste_contact(-1, 'external');
 
     $responsible   = [];
     $contributors  = [];
     if (is_array($contactsInternal)) {
         foreach ($contactsInternal as $c) {
-            // Build photo URL
+            // Build photo URL ($c['photo'] is already returned by liste_contact)
             $photoUrl = '';
-            $userTmp = new User($db);
-            if ($userTmp->fetch($c['id']) > 0 && !empty($userTmp->photo)) {
-                $photoUrl = DOL_URL_ROOT . '/viewimage.php?modulepart=userphoto&entity=' . $conf->entity . '&file=' . urlencode($userTmp->id . '/thumbs/' . preg_replace('/(\.\w+)$/', '_mini$1', $userTmp->photo));
+            if (!empty($c['photo'])) {
+                $photoUrl = DOL_URL_ROOT . '/viewimage.php?modulepart=userphoto&entity=' . $conf->entity . '&file=' . urlencode($c['id'] . '/thumbs/' . preg_replace('/(\.\w+)$/', '_mini$1', $c['photo']));
             }
             $contactInfo = [
                 'id'       => $c['id'],
@@ -728,15 +789,8 @@ foreach ($allTasks as $t) {
         }
     }
 
-    // File count
-    $fileCount = 0;
-    $sqlFiles  = "SELECT COUNT(*) as nb FROM " . MAIN_DB_PREFIX . "ecm_files WHERE src_object_type = 'projet_task' AND src_object_id = " . ((int) $t->id);
-    $resFiles  = $db->query($sqlFiles);
-    if ($resFiles) {
-        $objFiles  = $db->fetch_object($resFiles);
-        $fileCount = (int) $objFiles->nb;
-        $db->free($resFiles);
-    }
+    // File count (pre-fetched in batch above)
+    $fileCount = $taskFileCounts[$t->id] ?? 0;
 
     // Budget
     $budget = property_exists($t, 'budget_amount') ? (float) $t->budget_amount : 0;
