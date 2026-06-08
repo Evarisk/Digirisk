@@ -297,6 +297,17 @@ class MeteoVigilance
     }
 
     /**
+     * Render a colored level dot (FontAwesome circle, inline color) for the widget rows.
+     *
+     * @param  int    $level Vigilance level (1 green .. 4 red)
+     * @return string        HTML icon
+     */
+    private static function renderLevelDot(int $level): string
+    {
+        return '<i class="fas fa-circle" style="color: ' . self::getLevelColor($level) . ';" title="' . dol_escape_htmltag(self::getLevelLabel($level)) . '"></i>';
+    }
+
+    /**
      * Build the dashboard widget consumed by SaturneDashboard::show_dashboard().
      *
      * @return array ['widgets' => ['meteovigilance' => [...]]]
@@ -336,18 +347,43 @@ class MeteoVigilance
             return ['widgets' => ['meteovigilance' => $widget]];
         }
 
-        // Nominal rendering: the whole card body (attention panel + phenomena list + footer)
-        // is rendered by a dedicated TPL and injected as a single full-width custom content.
+        // Nominal rendering, using the native dashboard rows (label on the left, colored
+        // level dot on the right). Colors are applied inline, like the framework does for
+        // its pictos, so the widget needs no extra compiled CSS to look right.
         $level                = (int) $vigilance['level'];
         $widget['pictoColor'] = self::getLevelColor($level);
         $departmentName       = $this->getDepartmentName($departmentCode);
+        $location             = trim(($departmentName !== '' ? $departmentName . ' ' : '') . '(' . $departmentCode . ')');
 
-        ob_start();
-        require __DIR__ . '/../core/tpl/meteovigilance/widget.tpl.php';
-        $cardHtml = ob_get_clean();
+        $widget['label']         = [];
+        $widget['customContent'] = [];
 
-        $widget['label']         = [' '];
-        $widget['customContent'] = [$cardHtml];
+        // Overall vigilance line: alert type on the left, colored level dot on the right.
+        $summaryLabel = ($level >= 2 ? '<i class="fas fa-exclamation-triangle" style="color: ' . self::getLevelColor($level) . ';"></i> ' : '')
+            . '<strong>' . $langs->trans('MeteoVigilancePanelTitle', self::getLevelLabel($level)) . '</strong> · ' . dol_escape_htmltag($location);
+        if ($level >= 2) {
+            $summaryLabel .= ' — ' . $langs->transnoentities('MeteoVigilanceAdvice' . $level);
+        }
+        $widget['label'][]         = $summaryLabel;
+        $widget['customContent'][] = self::renderLevelDot($level);
+
+        // One row per phenomenon: icon + name on the left, colored level dot on the right.
+        if (!empty($vigilance['phenomena'])) {
+            foreach ($vigilance['phenomena'] as $phenomenon) {
+                $phenomenonId              = (string) $phenomenon['id'];
+                $widget['label'][]         = '<i class="' . self::getPhenomenonIcon($phenomenonId) . '"></i> ' . dol_escape_htmltag(self::getPhenomenonLabel($phenomenonId));
+                $widget['customContent'][] = self::renderLevelDot((int) $phenomenon['level']);
+            }
+        } else {
+            $widget['label'][]         = $langs->transnoentities('MeteoVigilanceActivePhenomena');
+            $widget['customContent'][] = self::renderLevelDot($level);
+        }
+
+        // Footer line: last update time + link to Météo-France.
+        if (!empty($vigilance['update_time'])) {
+            $widget['label'][]         = $langs->trans('MeteoVigilanceUpdatedAt', dol_print_date(strtotime($vigilance['update_time']), 'dayhour'));
+            $widget['customContent'][] = '<a href="https://vigilance.meteofrance.fr/fr" target="_blank" rel="noopener">' . $langs->transnoentities('MeteoVigilanceSeeOnMeteoFrance') . '</a>';
+        }
 
         return ['widgets' => ['meteovigilance' => $widget]];
     }
