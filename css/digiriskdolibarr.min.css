@@ -1550,6 +1550,72 @@ textarea.action-textarea:not(:last-child) {
 }
 
 /* =============================================
+ * GLOBAL PROGRESS (PAPRIPACT)
+ * ============================================= */
+.actionplan-global-progress {
+  background: #fff;
+  border: 1px solid #e0e0e0;
+  border-radius: 10px;
+  padding: 14px 18px;
+  margin-bottom: 8px;
+  box-shadow: 0 1px 4px rgba(0, 0, 0, 0.06);
+}
+
+.apgp-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 8px;
+}
+
+.apgp-title {
+  font-size: 14px;
+  font-weight: 700;
+  color: #333;
+}
+.apgp-title i {
+  margin-right: 6px;
+  color: #3085d6;
+}
+
+.apgp-percent {
+  font-size: 20px;
+  font-weight: 800;
+  color: #333;
+}
+
+.apgp-bar {
+  height: 14px;
+  background: #e9ecef;
+  border-radius: 7px;
+  overflow: hidden;
+}
+
+.apgp-fill {
+  height: 100%;
+  border-radius: 7px;
+  transition: width 0.4s ease;
+}
+.apgp-fill.progress-grey {
+  background: #999999;
+}
+.apgp-fill.progress-yellow {
+  background: #e9ad4f;
+}
+.apgp-fill.progress-blue {
+  background: #3085d6;
+}
+.apgp-fill.progress-green {
+  background: #47e58e;
+}
+
+.apgp-subtitle {
+  margin-top: 6px;
+  font-size: 11px;
+  color: #888;
+}
+
+/* =============================================
  * KANBAN BOARD
  * ============================================= */
 .kanban-board {

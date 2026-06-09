@@ -822,6 +822,17 @@ foreach ($allTasks as $t) {
     ];
 }
 
+// Compute global PAPRIPACT progress: average of all corrective action progress percentages
+$globalProgress  = 0;
+$globalTaskCount = count($tasksJson);
+if ($globalTaskCount > 0) {
+    $progressSum = 0;
+    foreach ($tasksJson as $t) {
+        $progressSum += $t['progress'];
+    }
+    $globalProgress = (int) round($progressSum / $globalTaskCount);
+}
+
 // Tab header
 $head = [];
 $head[0][0] = $_SERVER['PHP_SELF'] . '?view=kanban';
