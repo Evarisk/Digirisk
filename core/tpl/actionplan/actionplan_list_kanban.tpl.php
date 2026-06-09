@@ -7,6 +7,8 @@
  * Variables expected from calling PHP:
  * - $tasksJson          array  Task data (enriched)
  * - $kanbanThresholds   array  Column threshold config
+ * - $globalProgress     int    Global PAPRIPACT progress (average of all task percentages)
+ * - $globalTaskCount    int    Total number of corrective actions
  * - $langs              Translate
  * - $projectId          int    DU project ID
  */
@@ -33,7 +35,29 @@ foreach ($tasksJson as $t) {
         $columnTasks['done'][] = $t;
     }
 }
+
+// Global progress bar color, matching the per-card threshold logic
+if ($globalProgress <= $kanbanThresholds['draft_max']) {
+    $globalBarClass = 'progress-grey';
+} elseif ($globalProgress <= $kanbanThresholds['progress_max']) {
+    $globalBarClass = 'progress-yellow';
+} elseif ($globalProgress <= $kanbanThresholds['control_max']) {
+    $globalBarClass = 'progress-blue';
+} else {
+    $globalBarClass = 'progress-green';
+}
 ?>
+
+<div class="actionplan-global-progress">
+    <div class="apgp-header">
+        <span class="apgp-title"><i class="fas fa-chart-line"></i> <?= $langs->trans('ActionPlanGlobalProgress') ?></span>
+        <span class="apgp-percent"><?= $globalProgress ?>%</span>
+    </div>
+    <div class="apgp-bar">
+        <div class="apgp-fill <?= $globalBarClass ?>" style="width: <?= $globalProgress ?>%"></div>
+    </div>
+    <div class="apgp-subtitle"><?= $langs->trans('ActionPlanGlobalProgressInfo', $globalTaskCount) ?></div>
+</div>
 
 <div class="kanban-settings-wrapper">
     <button type="button" class="kanban-settings-btn" id="kanbanSettingsBtn" title="<?= dol_escape_htmltag($langs->trans('Settings')) ?>">
