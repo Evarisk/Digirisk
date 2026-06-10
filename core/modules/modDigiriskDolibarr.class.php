@@ -2128,9 +2128,29 @@ class modDigiriskdolibarr extends DolibarrModules
         addDocumentModel('accidentinvestigationdocument_odt', 'accidentinvestigationdocument', 'ODT templates', 'DIGIRISKDOLIBARR_ACCIDENTINVESTIGATIONDOCUMENT_ADDON_ODT_PATH');
         addDocumentModel('registerdocument_odt', 'registerdocument', 'ODT templates', 'DIGIRISKDOLIBARR_REGISTERDOCUMENT_ADDON_ODT_PATH');
 
-		if (empty($conf->global->DIGIRISKDOLIBARR_DIGIRISKELEMENT_TRASH)) {
-			require_once __DIR__ . '/../../class/digiriskelement/groupment.class.php';
+		// The entity conf may have been cloned from another entity (multicompany): the constants can point
+		// to objects of the source entity, so check the pointed object entity, not only the constant emptiness.
+		// The standard is checked before the trash so a recreated trash gets the right fk_standard.
+		require_once __DIR__ . '/../../class/digiriskstandard.class.php';
+		require_once __DIR__ . '/../../class/digiriskelement/groupment.class.php';
 
+		$digiriskstandard = new DigiriskStandard($this->db);
+		$activeStandardID = getDolGlobalInt('DIGIRISKDOLIBARR_ACTIVE_STANDARD');
+		if ($activeStandardID <= 0 || $digiriskstandard->fetch($activeStandardID) <= 0 || $digiriskstandard->entity != $conf->entity) {
+			$digiriskstandard                = new DigiriskStandard($this->db);
+			$digiriskstandard->ref           = 'DU';
+			$digiriskstandard->description   = 'DUDescription';
+			$digiriskstandard->date_creation = dol_now();
+			$digiriskstandard->status        = 1;
+
+			$standard_id = $digiriskstandard->create($user);
+
+			dolibarr_set_const($this->db, 'DIGIRISKDOLIBARR_ACTIVE_STANDARD', $standard_id, 'integer', 0, '', $conf->entity);
+		}
+
+		$trash           = new DigiriskElement($this->db);
+		$previousTrashID = getDolGlobalInt('DIGIRISKDOLIBARR_DIGIRISKELEMENT_TRASH');
+		if ($previousTrashID <= 0 || $trash->fetch($previousTrashID) <= 0 || $trash->entity != $conf->entity) {
 			$trashRef                      = 'GP0';
 			$digiriskelement               = new Groupment($this->db);
 			$digiriskelement->ref          = $trashRef;
@@ -2141,21 +2161,17 @@ class modDigiriskdolibarr extends DolibarrModules
 			$digiriskelement->status       = DigiriskElement::STATUS_TRASHED;
 			$trash_id                      = $digiriskelement->create($user);
 
+			// Elements of the current entity already trashed under the foreign trash must follow the new one
+			if ($previousTrashID > 0 && $trash_id > 0) {
+				$trashedElements = $trash->fetchAll('', '', 0, 0, ['customsql' => 't.fk_parent = ' . $previousTrashID . ' AND t.entity = ' . ((int) $conf->entity)]);
+				if (is_array($trashedElements)) {
+					foreach ($trashedElements as $trashedElement) {
+						$trashedElement->setValueFrom('fk_parent', $trash_id, '', null, '', '', $user);
+					}
+				}
+			}
+
 			dolibarr_set_const($this->db, 'DIGIRISKDOLIBARR_DIGIRISKELEMENT_TRASH', $trash_id, 'integer', 0, '', $conf->entity);
-		}
-
-		if (empty($conf->global->DIGIRISKDOLIBARR_ACTIVE_STANDARD)) {
-			require_once __DIR__ . '/../../class/digiriskstandard.class.php';
-
-			$digiriskstandard                = new DigiriskStandard($this->db);
-			$digiriskstandard->ref           = 'DU';
-			$digiriskstandard->description   = 'DUDescription';
-			$digiriskstandard->date_creation = dol_now();
-			$digiriskstandard->status        = 1;
-
-			$standard_id = $digiriskstandard->create($user);
-
-			dolibarr_set_const($this->db, 'DIGIRISKDOLIBARR_ACTIVE_STANDARD', $standard_id, 'integer', 0, '', $conf->entity);
 		}
 
         require_once DOL_DOCUMENT_ROOT . '/societe/class/societe.class.php';
