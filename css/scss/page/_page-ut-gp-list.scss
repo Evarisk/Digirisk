@@ -15,7 +15,7 @@
 /** Screen */
 .page-ut-gp-list #id-right {
   padding-left: 300px;
-  width: calc(100% + 40px);
+  width: 100%;
   display: block;
 }
 
@@ -104,7 +104,7 @@
   }
 }
 
-/** Content */
+/** Content - GP/UT organization tree inside the navigation panel */
 .page-ut-gp-list .side-nav .workunit-list {
   padding-left: 0;
 
@@ -113,168 +113,96 @@
     margin: 0;
   }
 
-  > .unit:first-child > .unit-container:first-child > .title {
-    border-top: 1px solid rgba(0,0,0,0.1);
+  /* Drag & drop placeholder inside the narrow panel */
+  .ui-sortable-placeholder {
+    height: 40px !important;
+    margin-bottom: 5px;
   }
 
-  .unit-container {
-    display: flex;
+  /* Compact the organization row (.row-container styles come from the organization partial) to fit the panel width */
+  .row-container {
     position: relative;
+    padding: 5px 7px;
+    margin-bottom: 5px;
 
-    &:hover .add-container {
-      opacity: 1;
-      pointer-events: all;
+    .drag-handle {
+      margin-right: 6px;
+      font-size: 13px;
     }
 
-    .toggle-unit {
+    .toggle-unit,
+    .chevron {
+      min-width: 20px;
+      width: 20px;
       color: rgba(0, 0, 0, 0.6);
-      line-height: 40px;
-      font-size: 18px;
-      min-width: 30px;
-      width: 30px;
-      text-align: center;
-      transition: all 0.2s ease-out;
+      display: flex;
+      align-items: center;
+      justify-content: center;
 
       &:hover {
         cursor: pointer;
       }
-      .toggle-icon {
-        line-height: 40px;
-      }
     }
     .spacer {
-      position: relative;
+      min-width: 20px;
+      width: 20px;
+    }
+
+    .photo-container {
       min-width: 30px;
       width: 30px;
-
-      //&::before {
-      //  display: block;
-      //  position: absolute;
-      //  content: '';
-      //  height: 1px;
-      //  left: 0;
-      //  right: 10px;
-      //  top: 20px;
-      //  background: rgba(0,0,0,0.3);
-      //}
+      height: 30px;
+      margin-right: 8px;
     }
-    .photodigiriskdolibarr {
-      display: block;
-      width: 40px;
-      min-width: 40px;
-      height: 40px;
-      position: relative;
+
+    .ref-badge {
+      margin-right: 7px;
+      font-size: 10px;
+      padding: 3px 6px;
+    }
+
+    .title.element-label {
+      font-size: 13px;
+      padding-left: 0;
+      min-width: 0;
+      overflow: hidden;
+      text-overflow: ellipsis;
+      white-space: nowrap;
+    }
+
+    /* Actions float over the right edge on hover so they never reserve width nor push other elements */
+    .actions {
+      position: absolute;
+      top: 50%;
+      right: 6px;
+      transform: translateY(-50%);
+      gap: 4px;
+      padding-left: 10px;
       background: #fff;
-      text-align: center;
-      transition: all 0.2s ease-out;
-    }
-    .divphotoref {
-      max-width: 50px;
-      position: relative;
+      border-radius: 6px;
 
-      .photo {
-        object-fit: cover;
-        //width: 100%;
-        //height: 100%;
-        margin: 0;
-      }
-    }
-    .title {
-      width: 100%;
-      padding-left: 1em;
-      display: flex;
-      border-bottom: 1px solid rgba(0,0,0,0.1);
-
-      .linkElement {
-        width: 100%;
-        padding-top: 0.5em;
-        text-decoration: none;
-
-        &:hover .name {
-          color: $color__primary;
-        }
-      }
-      .title-container {
-        margin: auto 0;
-      }
-      .ref {
-        font-size: 10px;
-        color: #fff;
-        text-transform: uppercase;
-        font-weight: 600;
-        display: inline-block;
-        background: $color__secondary;
-        padding: 0.2em 0.4em;
-      }
-      .name {
-        font-size: 14px;
-        color: #000;
-        display: block;
-        transition: all 0.2s ease-out;
+      .wpeo-button {
+        min-width: 26px;
+        width: 26px;
+        height: 26px;
+        line-height: 26px;
+        font-size: 11px;
       }
     }
   }
 
-  .unit > .unit-container {
-    //padding: 4px 0 0 0;
+  /* Active element highlight (saturneElement.getLeftMenuCurrentUnit) */
+  .unit.active > .unit-container.row-container {
+    border-color: $color__primary;
+    box-shadow: 0 0 0 1px $color__primary;
   }
 
+  /* Toggle: children hidden unless the unit is toggled (saturneElement.js) */
   .unit > .sub-list {
-    padding: 0 0 0 7px;
+    padding: 0 0 0 13px;
     display: none;
-
-    > .unit:last-child::before {
-      height: 24px;
-    }
-    .toggle-unit {
-      position: relative;
-
-      //&::before {
-      //  right: 20px;
-      //  display: block;
-      //  position: absolute;
-      //  content: '';
-      //  height: 1px;
-      //  left: 0;
-      //  top: 20px;
-      //  background: rgba(0,0,0,0.3);
-      //}
-    }
-    .unit {
-      position: relative;
-      margin-left: 0.6em;
-
-      //&::before {
-      //  display: block;
-      //  position: absolute;
-      //  content: '';
-      //  width: 1px;
-      //  height: 100%;
-      //  left: 0;
-      //  top: 0;
-      //  background: rgba(0,0,0,0.3);
-      //}
-    }
   }
-
-  .unit.active {
-    > .unit-container {
-      .title {
-        background: rgba(0,0,0,0.1);
-        .name {
-          font-weight: 600;
-        }
-      }
-    }
-  }
-
-  .unit.type-workunit .unit-container .ref {
-    background: $color__primary;
-  }
-
-  /** Toggle */
   .unit.toggled > .sub-list {
     display: block;
   }
-
 }
