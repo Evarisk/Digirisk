@@ -152,7 +152,7 @@
 /** Screen */
 .page-ut-gp-list #id-right {
   padding-left: 300px;
-  width: calc(100% + 40px);
+  width: 100%;
   display: block;
 }
 
@@ -230,7 +230,7 @@
   opacity: 0.6;
 }
 
-/** Content */
+/** Content - GP/UT organization tree inside the navigation panel */
 .page-ut-gp-list .side-nav .workunit-list {
   padding-left: 0;
 }
@@ -238,112 +238,94 @@
   list-style-type: none;
   margin: 0;
 }
-.page-ut-gp-list .side-nav .workunit-list > .unit:first-child > .unit-container:first-child > .title {
-  border-top: 1px solid rgba(0, 0, 0, 0.1);
+.page-ut-gp-list .side-nav .workunit-list {
+  /* Drag & drop placeholder inside the narrow panel */
 }
-.page-ut-gp-list .side-nav .workunit-list .unit-container {
-  display: flex;
-  position: relative;
-}
-.page-ut-gp-list .side-nav .workunit-list .unit-container:hover .add-container {
-  opacity: 1;
-  pointer-events: all;
-}
-.page-ut-gp-list .side-nav .workunit-list .unit-container .toggle-unit {
-  color: rgba(0, 0, 0, 0.6);
-  line-height: 40px;
-  font-size: 18px;
-  min-width: 30px;
-  width: 30px;
-  text-align: center;
-  transition: all 0.2s ease-out;
-}
-.page-ut-gp-list .side-nav .workunit-list .unit-container .toggle-unit:hover {
-  cursor: pointer;
-}
-.page-ut-gp-list .side-nav .workunit-list .unit-container .toggle-unit .toggle-icon {
-  line-height: 40px;
-}
-.page-ut-gp-list .side-nav .workunit-list .unit-container .spacer {
-  position: relative;
-  min-width: 30px;
-  width: 30px;
-}
-.page-ut-gp-list .side-nav .workunit-list .unit-container .photodigiriskdolibarr {
-  display: block;
-  width: 40px;
-  min-width: 40px;
-  height: 40px;
-  position: relative;
-  background: #fff;
-  text-align: center;
-  transition: all 0.2s ease-out;
-}
-.page-ut-gp-list .side-nav .workunit-list .unit-container .divphotoref {
-  max-width: 50px;
-  position: relative;
-}
-.page-ut-gp-list .side-nav .workunit-list .unit-container .divphotoref .photo {
-  object-fit: cover;
-  margin: 0;
-}
-.page-ut-gp-list .side-nav .workunit-list .unit-container .title {
-  width: 100%;
-  padding-left: 1em;
-  display: flex;
-  border-bottom: 1px solid rgba(0, 0, 0, 0.1);
-}
-.page-ut-gp-list .side-nav .workunit-list .unit-container .title .linkElement {
-  width: 100%;
-  padding-top: 0.5em;
-  text-decoration: none;
-}
-.page-ut-gp-list .side-nav .workunit-list .unit-container .title .linkElement:hover .name {
-  color: #0d8aff;
-}
-.page-ut-gp-list .side-nav .workunit-list .unit-container .title .title-container {
-  margin: auto 0;
-}
-.page-ut-gp-list .side-nav .workunit-list .unit-container .title .ref {
-  font-size: 10px;
-  color: #fff;
-  text-transform: uppercase;
-  font-weight: 600;
-  display: inline-block;
-  background: #263C5C;
-  padding: 0.2em 0.4em;
-}
-.page-ut-gp-list .side-nav .workunit-list .unit-container .title .name {
-  font-size: 14px;
-  color: #000;
-  display: block;
-  transition: all 0.2s ease-out;
-}
-.page-ut-gp-list .side-nav .workunit-list .unit > .sub-list {
-  padding: 0 0 0 7px;
-  display: none;
-}
-.page-ut-gp-list .side-nav .workunit-list .unit > .sub-list > .unit:last-child::before {
-  height: 24px;
-}
-.page-ut-gp-list .side-nav .workunit-list .unit > .sub-list .toggle-unit {
-  position: relative;
-}
-.page-ut-gp-list .side-nav .workunit-list .unit > .sub-list .unit {
-  position: relative;
-  margin-left: 0.6em;
-}
-.page-ut-gp-list .side-nav .workunit-list .unit.active > .unit-container .title {
-  background: rgba(0, 0, 0, 0.1);
-}
-.page-ut-gp-list .side-nav .workunit-list .unit.active > .unit-container .title .name {
-  font-weight: 600;
-}
-.page-ut-gp-list .side-nav .workunit-list .unit.type-workunit .unit-container .ref {
-  background: #0d8aff;
+.page-ut-gp-list .side-nav .workunit-list .ui-sortable-placeholder {
+  height: 40px !important;
+  margin-bottom: 5px;
 }
 .page-ut-gp-list .side-nav .workunit-list {
-  /** Toggle */
+  /* Compact the organization row (.row-container styles come from the organization partial) to fit the panel width */
+}
+.page-ut-gp-list .side-nav .workunit-list .row-container {
+  position: relative;
+  padding: 5px 7px;
+  margin-bottom: 5px;
+}
+.page-ut-gp-list .side-nav .workunit-list .row-container .drag-handle {
+  margin-right: 6px;
+  font-size: 13px;
+}
+.page-ut-gp-list .side-nav .workunit-list .row-container .toggle-unit,
+.page-ut-gp-list .side-nav .workunit-list .row-container .chevron {
+  min-width: 20px;
+  width: 20px;
+  color: rgba(0, 0, 0, 0.6);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+.page-ut-gp-list .side-nav .workunit-list .row-container .toggle-unit:hover,
+.page-ut-gp-list .side-nav .workunit-list .row-container .chevron:hover {
+  cursor: pointer;
+}
+.page-ut-gp-list .side-nav .workunit-list .row-container .spacer {
+  min-width: 20px;
+  width: 20px;
+}
+.page-ut-gp-list .side-nav .workunit-list .row-container .photo-container {
+  min-width: 30px;
+  width: 30px;
+  height: 30px;
+  margin-right: 8px;
+}
+.page-ut-gp-list .side-nav .workunit-list .row-container .ref-badge {
+  margin-right: 7px;
+  font-size: 10px;
+  padding: 3px 6px;
+}
+.page-ut-gp-list .side-nav .workunit-list .row-container .title.element-label {
+  font-size: 13px;
+  padding-left: 0;
+  min-width: 0;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+.page-ut-gp-list .side-nav .workunit-list .row-container {
+  /* Actions float over the right edge on hover so they never reserve width nor push other elements */
+}
+.page-ut-gp-list .side-nav .workunit-list .row-container .actions {
+  position: absolute;
+  top: 50%;
+  right: 6px;
+  transform: translateY(-50%);
+  gap: 4px;
+  padding-left: 10px;
+  background: #fff;
+  border-radius: 6px;
+}
+.page-ut-gp-list .side-nav .workunit-list .row-container .actions .wpeo-button {
+  min-width: 26px;
+  width: 26px;
+  height: 26px;
+  line-height: 26px;
+  font-size: 11px;
+}
+.page-ut-gp-list .side-nav .workunit-list {
+  /* Active element highlight (saturneElement.getLeftMenuCurrentUnit) */
+}
+.page-ut-gp-list .side-nav .workunit-list .unit.active > .unit-container.row-container {
+  border-color: #0d8aff;
+  box-shadow: 0 0 0 1px #0d8aff;
+}
+.page-ut-gp-list .side-nav .workunit-list {
+  /* Toggle: children hidden unless the unit is toggled (saturneElement.js) */
+}
+.page-ut-gp-list .side-nav .workunit-list .unit > .sub-list {
+  padding: 0 0 0 13px;
+  display: none;
 }
 .page-ut-gp-list .side-nav .workunit-list .unit.toggled > .sub-list {
   display: block;
@@ -802,6 +784,7 @@ li.route .row-container {
   border-radius: 6px;
   padding: 8px 16px;
   transition: box-shadow 0.2s;
+  cursor: pointer;
 }
 li.route .row-container:hover {
   box-shadow: 0 4px 12px rgba(0, 0, 0, 0.08);
@@ -952,6 +935,13 @@ li.route .row-container .actions a {
 }
 li.route .row-container .actions a:hover {
   background: #e9ecef;
+}
+li.route .row-container .actions {
+  /* Keep the trash icon white on the red delete button */
+}
+li.route .row-container .actions .delete-element-btn,
+li.route .row-container .actions .delete-element-btn i {
+  color: #fff;
 }
 
 /* Cacher l'espace de drop quand il n'est pas utilisé activement si on veut garder un design propre */
