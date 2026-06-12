@@ -598,6 +598,13 @@ $massactionbutton = $form->selectMassAction('', $arrayofmassactions);
         $newcardbutton .= '<i class="fas fa-brain button-icon"></i><i class="fas fa-plus-circle button-add animated"></i>';
         $newcardbutton .= '	<input type="hidden" class="modal-options" data-modal-to-open="psychosocial_risk_add" data-from-id="'. $object->id .'" data-from-type="digiriskelement" data-from-subtype="photo" data-from-subdir="photos"/>';
         $newcardbutton .= '</div>';
+
+        // Bouton importer des risques partagés : icône seule + texte en tooltip, à côté des boutons d'ajout (id conservé pour déclencher la popup de confirmation)
+        if (!empty($conf->global->DIGIRISKDOLIBARR_SHOW_SHARED_RISKS)) {
+            $newcardbutton .= '<div class="import-shared-risks wpeo-button button-square-40 button-secondary wpeo-tooltip-event" id="actionButtonImportSharedRisks" style="margin-left: 10px;" aria-label="' . $langs->trans('ImportShared' . ucfirst($riskType) . 's') . '" value="' . $object->id . '">';
+            $newcardbutton .= '<i class="fas fa-file-import button-icon"></i>';
+            $newcardbutton .= '</div>';
+        }
     } else {
         $newcardbutton = '<div class="wpeo-button button-square-40 button-grey wpeo-tooltip-event" aria-label="' . $langs->trans('PermissionDenied') . '" data-direction="left" value="' . $object->id . '"><i class="fas fa-exclamation-triangle button-icon"></i><i class="fas fa-plus-circle button-add animated"></i></div>';
 

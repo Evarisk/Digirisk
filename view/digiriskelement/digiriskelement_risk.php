@@ -372,10 +372,8 @@ if ($object->id > 0) {
     saturne_banner_tab($object,'ref','none', 0, 'ref', 'ref', $morehtmlref, true, $moreParams);
 
 	// Buttons for actions
+	// The "import shared risks" action moved next to the "add risk" buttons (icon + tooltip) in the risk list view
 	print '<div class="tabsAction" >';
-	if ($permissiontoadd && !empty($conf->global->DIGIRISKDOLIBARR_SHOW_SHARED_RISKS)) {
-		print '<span class="butAction" id="actionButtonImportSharedRisks" title="" href="' . $_SERVER["PHP_SELF"] . '?id=' . $object->id . '&risk_type=' . $riskType . '&action=import_shared_risks' . '">' . $langs->trans('ImportShared' . ucfirst($riskType) . 's') . '</span>';
-	}
 	print '</div>';
 
 	if ($conf->global->DIGIRISKDOLIBARR_SHOW_RISKS == 1) {
