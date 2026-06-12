@@ -17,6 +17,8 @@
   padding-left: 300px;
   width: 100%;
   display: block;
+  /* Contain wide content (Dolibarr list tables) so it scrolls inside the content area instead of overflowing the whole page, especially when the left menu is expanded */
+  overflow-x: auto;
 }
 
 
