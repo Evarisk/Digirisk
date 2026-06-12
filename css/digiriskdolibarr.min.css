@@ -149,6 +149,11 @@
   margin-right: 0 !important;
 }
 
+/* On GP/UT panel pages, the full-bleed layout (margin-left: -40px) + wide content (modals, list tables already scrollable in their .div-table-responsive) can exceed the viewport when the left menu is expanded. Clip the residual horizontal overflow so the page never gets a horizontal scrollbar. */
+body:has(.page-ut-gp-list) {
+  overflow-x: hidden;
+}
+
 /** Screen */
 .page-ut-gp-list #id-right {
   padding-left: 300px;
