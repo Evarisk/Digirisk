@@ -56,6 +56,8 @@ if (file_exists('../../digiriskdolibarr.main.inc.php')) {
 require_once DOL_DOCUMENT_ROOT . '/ticket/class/ticket.class.php';
 require_once DOL_DOCUMENT_ROOT . '/categories/class/categorie.class.php';
 
+require_once __DIR__ . '/../../lib/digiriskdolibarr_function.lib.php';
+
 // Global variables definitions
 global $conf, $db, $hookmanager, $langs;
 
@@ -105,6 +107,9 @@ $substitutionArray = getCommonSubstitutionArray($langs, 0, null, $object);
 complete_substitutions_array($substitutionArray, $langs, $object);
 $ticketSuccessMessage = make_substitutions($successMessage, $substitutionArray);
 
+// Clickable link for connected back-office users only (public page, $user is not loaded here)
+$ticketRefDisplay = getNomUrlTicketPublic($object);
+
 /*
  * View
  */
@@ -126,7 +131,7 @@ if (!getDolGlobalInt('DIGIRISKDOLIBARR_TICKET_ENABLE_PUBLIC_INTERFACE')) {
     <div class="public-card__header">
         <div class="header-information center">
             <div class="left"><a href="<?php echo dol_buildpath('/custom/digiriskdolibarr/public/ticket/create_ticket.php?entity=' . $conf->entity, 1); ?>" class="information-back"><i class="fas fa-sm fa-chevron-left paddingright"></i><?php echo $langs->trans('Back'); ?></a></div>
-            <div class="information-title"><?php echo $langs->trans('TicketSuccess') . ' <b>' . $object->ref . '</b>'; ?></div>
+            <div class="information-title"><?php echo $langs->trans('TicketSuccess') . ' ' . $ticketRefDisplay; ?></div>
             <span class="wpeo-notice notice-info left" style="margin-left: 16%; width: 70%">
                 <span class="notice-content">
                     <span class="notice-subtitle"><?php echo $langs->transnoentities($ticketSuccessMessage); ?></span>

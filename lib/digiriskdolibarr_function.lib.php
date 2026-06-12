@@ -559,6 +559,36 @@ function getNomUrlUser(User $object, $withpictoimg = 0, $option = '', $infologin
 }
 
 /**
+ * Return a ticket reference as a clickable getNomUrl link for the public ticket interface.
+ *
+ * The public pages are NOLOGIN, so $user is never loaded from the session. We detect an active
+ * back-office session through $_SESSION['dol_login'] and only render a link when that user is
+ * connected and holds the ticket read permission, otherwise we keep the bold reference.
+ *
+ * @param  Ticket $ticket Ticket object, already fetched
+ * @return string         getNomUrl link if connected with read access, '<b>ref</b>' otherwise
+ */
+function getNomUrlTicketPublic(Ticket $ticket): string
+{
+	global $db;
+
+	$display = '<b>' . $ticket->ref . '</b>';
+	if (!empty($_SESSION['dol_login'])) {
+		$connectedUser = new User($db);
+		if ($connectedUser->fetch(0, $_SESSION['dol_login']) > 0) {
+			// fetch() does not populate rights, so hasRight() would always return 0 without this
+			$connectedUser->loadRights('ticket');
+			if ($connectedUser->hasRight('ticket', 'read')) {
+				// Tooltip disabled: the public interface does not load Dolibarr tooltip CSS/JS
+				$display = $ticket->getNomUrl(1, '', 1);
+			}
+		}
+	}
+
+	return $display;
+}
+
+/**
  *	Show category image
  *
 * @param object	$object
