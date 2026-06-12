@@ -5198,17 +5198,19 @@ textarea.action-textarea:not(:last-child) {
   flex-direction: column;
   align-items: flex-start;
   gap: 4px;
+  max-width: 100%;
   font-size: 12px;
 }
 .banner-risk-badges .banner-risk-badge {
-  display: inline-flex;
+  display: flex;
   align-items: center;
   gap: 6px;
-  white-space: nowrap;
+  max-width: 100%;
   color: #333;
   font-weight: 600;
 }
 .banner-risk-badges .banner-risk-badge .brb-count {
+  flex: 0 0 auto;
   display: inline-flex;
   align-items: center;
   justify-content: center;

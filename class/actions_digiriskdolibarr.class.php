@@ -1141,7 +1141,9 @@ class ActionsDigiriskdolibarr
         $out = '<div class="banner-risk-badges">';
         foreach ($cotations as $scale => $info) {
             $count = (int) ($counts[$scale] ?? 0);
-            $out  .= '<span class="banner-risk-badge ' . $info['class'] . ($count ? '' : ' empty') . '"><span class="brb-count">' . $count . '</span>' . dol_escape_htmltag($langs->trans($info['label'])) . '</span>';
+            // Short label to keep the badge compact in the banner (e.g. "Risque inacceptable" -> "Inacceptable")
+            $label = dol_ucfirst(preg_replace('/^risque\s+/i', '', $langs->trans($info['label'])));
+            $out  .= '<span class="banner-risk-badge ' . $info['class'] . ($count ? '' : ' empty') . '"><span class="brb-count">' . $count . '</span>' . dol_escape_htmltag($label) . '</span>';
         }
         $out .= '</div>';
 
