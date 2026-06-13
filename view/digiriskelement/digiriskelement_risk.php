@@ -228,7 +228,9 @@ $form    = new Form($db);
 $title   = $langs->trans(ucfirst($riskType) . 's');
 $helpUrl = 'FR:Module_Digirisk#.C3.89valuation_des_Risques';
 
-digirisk_header($title, $helpUrl);
+// classforhorizontalscrolloftabs constrains #id-right width so the wide risk list table
+// scrolls inside its own .div-table-responsive instead of widening the whole page
+digirisk_header($title, $helpUrl, [], [], '', 'classforhorizontalscrolloftabs');
 
 if ($conf->browser->layout == 'phone') {
     $onPhone = 1;
