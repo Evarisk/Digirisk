@@ -149,11 +149,18 @@
   margin-right: 0 !important;
 }
 
+/* On GP/UT panel pages, the full-bleed layout (margin-left: -40px) + wide content (modals, list tables already scrollable in their .div-table-responsive) can exceed the viewport when the left menu is expanded. Clip the residual horizontal overflow so the page never gets a horizontal scrollbar. */
+body:has(.page-ut-gp-list) {
+  overflow-x: hidden;
+}
+
 /** Screen */
 .page-ut-gp-list #id-right {
   padding-left: 300px;
   width: 100%;
   display: block;
+  /* Contain wide content (Dolibarr list tables) so it scrolls inside the content area instead of overflowing the whole page, especially when the left menu is expanded */
+  overflow-x: auto;
 }
 
 /** UT / GP Navigation */
@@ -5188,6 +5195,52 @@ textarea.action-textarea:not(:last-child) {
 .tac-qc-file-list li button:hover {
   color: #e05353;
   background: rgba(224, 83, 83, 0.08);
+}
+
+/** Risk page banner: cotation counts replacing the native status (moreHtmlStatus hook) */
+.banner-risk-badges {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  gap: 4px;
+  max-width: 100%;
+  font-size: 12px;
+}
+.banner-risk-badges .banner-risk-badge {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  max-width: 100%;
+  color: #333;
+  font-weight: 600;
+}
+.banner-risk-badges .banner-risk-badge .brb-count {
+  flex: 0 0 auto;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  min-width: 22px;
+  height: 22px;
+  padding: 0 6px;
+  border-radius: 5px;
+  color: #fff;
+  font-size: 13px;
+  font-weight: 800;
+}
+.banner-risk-badges .banner-risk-badge.black .brb-count {
+  background: #2b2b2b;
+}
+.banner-risk-badges .banner-risk-badge.red .brb-count {
+  background: #e05353;
+}
+.banner-risk-badges .banner-risk-badge.orange .brb-count {
+  background: #e9ad4f;
+}
+.banner-risk-badges .banner-risk-badge.grey .brb-count {
+  background: #b0b0b0;
+}
+.banner-risk-badges .banner-risk-badge.empty {
+  opacity: 0.5;
 }
 
 /** Cell header */

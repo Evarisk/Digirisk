@@ -1101,6 +1101,57 @@ class ActionsDigiriskdolibarr
         return 0; // or return 1 to replace standard code
     }
 
+    /**
+     * Overloading the moreHtmlStatus function : on the risk page, replace the banner status by the risk cotation counts (black/red/orange/grey) of the current element.
+     *
+     * @param  array        $parameters Hook metadatas (context, morehtmlstatus, etc...).
+     * @param  CommonObject $object     Current object.
+     * @return int                      0 to keep the standard status, 1 to replace it.
+     */
+    public function moreHtmlStatus(array $parameters, $object): int
+    {
+        if (strpos($parameters['context'], 'riskcard') === false || !is_a($object, 'DigiriskElement')) {
+            return 0;
+        }
+
+        global $langs;
+
+        require_once __DIR__ . '/riskanalysis/risk.class.php';
+
+        $riskType = GETPOST('risk_type', 'aZ09');
+        if (empty($riskType)) {
+            $riskType = 'risk';
+        }
+
+        // Count only this element's risks of the current type (lightweight filtered fetch)
+        $risk      = new Risk($this->db);
+        $riskInfos = $risk->loadRiskInfos([
+            'filter'     => ' AND t.fk_element = ' . (int) $object->id,
+            'filterRisk' => ' AND t.type = \'' . $this->db->escape($riskType) . '\''
+        ]);
+        $counts = $riskInfos['current']['riskByRiskAssessmentCotations'][$object->id] ?? [];
+
+        // Cotation scale: 4 = black, 3 = red, 2 = orange, 1 = grey
+        $cotations = [
+            4 => ['class' => 'black',  'label' => 'BlackRisk'],
+            3 => ['class' => 'red',    'label' => 'RedRisk'],
+            2 => ['class' => 'orange', 'label' => 'OrangeRisk'],
+            1 => ['class' => 'grey',   'label' => 'GreyRisk'],
+        ];
+        $out = '<div class="banner-risk-badges">';
+        foreach ($cotations as $scale => $info) {
+            $count = (int) ($counts[$scale] ?? 0);
+            // Short label to keep the badge compact in the banner (e.g. "Risque inacceptable" -> "Inacceptable")
+            $label = dol_ucfirst(preg_replace('/^risque\s+/i', '', $langs->trans($info['label'])));
+            $out  .= '<span class="banner-risk-badge ' . $info['class'] . ($count ? '' : ' empty') . '"><span class="brb-count">' . $count . '</span>' . dol_escape_htmltag($label) . '</span>';
+        }
+        $out .= '</div>';
+
+        $this->resprints = $out;
+
+        return 1;
+    }
+
 	/**
 	 *  Overloading the saturneAttendantsBackToCard function : replacing the parent's function with the one below.
 	 *
