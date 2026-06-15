@@ -488,8 +488,8 @@ if ( ! preg_match('/(evaluation)/', $sortfield)) {
 
     foreach ($search as $key => $val) {
         if ($key == 'status' && $search[$key] == -1) continue;
-        $mode_search = (($evaluation->isInt($evaluation->fields[$key]) || $evaluation->isFloat($evaluation->fields[$key])) ? 1 : 0);
-        if (strpos($evaluation->fields[$key]['type'], 'integer:') === 0) {
+        $mode_search = (($risk->isInt($risk->fields[$key]) || $risk->isFloat($risk->fields[$key])) ? 1 : 0);
+        if (strpos($risk->fields[$key]['type'], 'integer:') === 0) {
             if ($search[$key] == '-1') $search[$key] = '';
             $mode_search                             = 2;
         }
