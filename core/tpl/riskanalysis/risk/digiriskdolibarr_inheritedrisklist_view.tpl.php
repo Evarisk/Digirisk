@@ -64,7 +64,7 @@
 			$sql = preg_replace('/,\s*$/', '', $sql);
 			$sql .= " FROM " . MAIN_DB_PREFIX . $risk->table_element . " as r";
 			$sql .= " LEFT JOIN " . MAIN_DB_PREFIX . $digiriskelement->table_element . " as e on (r.fk_element = e.rowid)";
-			if (is_array($extrafields->attributes[$risk->table_element]['label']) && count($extrafields->attributes[$risk->table_element]['label'])) $sql .= " LEFT JOIN " . MAIN_DB_PREFIX . $risk->table_element . "_extrafields as ef on (r.rowid = ef.fk_object)";
+			if (!empty($extrafields->attributes[$risk->table_element]['label'])) $sql .= " LEFT JOIN " . MAIN_DB_PREFIX . $risk->table_element . "_extrafields as ef on (r.rowid = ef.fk_object)";
 			if ($risk->ismultientitymanaged == 1) $sql .= " WHERE r.entity IN (" . getEntity($risk->element) . ")";
 			else $sql .= " WHERE 1 = 1";
 			if (!$allRisks) {
@@ -177,7 +177,7 @@
 			$sql .= " FROM " . MAIN_DB_PREFIX . $evaluation->table_element . " as evaluation";
 			$sql .= " LEFT JOIN " . MAIN_DB_PREFIX . $risk->table_element . " as r on (evaluation.fk_risk = r.rowid)";
 			$sql .= " LEFT JOIN " . MAIN_DB_PREFIX . $digiriskelement->table_element . " as e on (r.fk_element = e.rowid)";
-			if (is_array($extrafields->attributes[$evaluation->table_element]['label']) && count($extrafields->attributes[$evaluation->table_element]['label'])) $sql .= " LEFT JOIN " . MAIN_DB_PREFIX . $evaluation->table_element . "_extrafields as ef on (evaluation.rowid = ef.fk_object)";
+			if (!empty($extrafields->attributes[$evaluation->table_element]['label'])) $sql .= " LEFT JOIN " . MAIN_DB_PREFIX . $evaluation->table_element . "_extrafields as ef on (evaluation.rowid = ef.fk_object)";
 			if ($evaluation->ismultientitymanaged == 1) $sql .= " WHERE evaluation.entity IN (" . getEntity($evaluation->element) . ")";
 			else $sql .= " WHERE 1 = 1";
 			$sql .= " AND evaluation.status = 1";
@@ -437,8 +437,9 @@
 	// --------------------------------------------------------------------
 
 	// contenu
-	$i          = 0;
-	$totalarray = array();
+	$i                       = 0;
+	$totalarray              = array();
+	$totalarray['nbfield']   = 0;
 
 	while ($i < ($limit ? min($num, $limit) : $num)) {
 		$obj = $db->fetch_object($resql);
