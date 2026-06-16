@@ -726,6 +726,43 @@ if (!empty($allTasks)) {
     }
 }
 
+// Batch load all task contacts (internal users + external contacts) — 2 queries instead of 2 per task (N+1)
+$taskContactsInternal = [];
+$taskContactsExternal = [];
+if (!empty($allTasks)) {
+    $taskIds = array_map(function ($t) { return (int) $t->id; }, $allTasks);
+
+    // Internal contacts (users)
+    $sqlCInt  = "SELECT ec.element_id, ec.fk_socpeople as id, tc.code, u.firstname, u.lastname, u.photo";
+    $sqlCInt .= " FROM " . MAIN_DB_PREFIX . "element_contact as ec";
+    $sqlCInt .= " INNER JOIN " . MAIN_DB_PREFIX . "c_type_contact as tc ON ec.fk_c_type_contact = tc.rowid";
+    $sqlCInt .= " INNER JOIN " . MAIN_DB_PREFIX . "user as u ON ec.fk_socpeople = u.rowid";
+    $sqlCInt .= " WHERE ec.element_id IN (" . implode(',', $taskIds) . ")";
+    $sqlCInt .= " AND tc.element = 'project_task' AND tc.source = 'internal' AND tc.active = 1";
+    $resCInt = $db->query($sqlCInt);
+    if ($resCInt) {
+        while ($objC = $db->fetch_object($resCInt)) {
+            $taskContactsInternal[(int) $objC->element_id][] = $objC;
+        }
+        $db->free($resCInt);
+    }
+
+    // External contacts (socpeople)
+    $sqlCExt  = "SELECT ec.element_id, ec.fk_socpeople as id, tc.code, sp.firstname, sp.lastname";
+    $sqlCExt .= " FROM " . MAIN_DB_PREFIX . "element_contact as ec";
+    $sqlCExt .= " INNER JOIN " . MAIN_DB_PREFIX . "c_type_contact as tc ON ec.fk_c_type_contact = tc.rowid";
+    $sqlCExt .= " INNER JOIN " . MAIN_DB_PREFIX . "socpeople as sp ON ec.fk_socpeople = sp.rowid";
+    $sqlCExt .= " WHERE ec.element_id IN (" . implode(',', $taskIds) . ")";
+    $sqlCExt .= " AND tc.element = 'project_task' AND tc.source = 'external' AND tc.active = 1";
+    $resCExt = $db->query($sqlCExt);
+    if ($resCExt) {
+        while ($objC = $db->fetch_object($resCExt)) {
+            $taskContactsExternal[(int) $objC->element_id][] = $objC;
+        }
+        $db->free($resCExt);
+    }
+}
+
 // Prepare enriched data for templates
 $tasksJson = [];
 foreach ($allTasks as $t) {
@@ -748,44 +785,39 @@ foreach ($allTasks as $t) {
         }
     }
 
-    // Contacts: responsible (TASKEXECUTIVE) and associated people
-    $contactsInternal = $t->liste_contact(-1, 'internal');
-    $contactsExternal = $t->liste_contact(-1, 'external');
+    // Contacts: responsible (TASKEXECUTIVE) and associated people (pre-fetched in batch above)
+    $contactsInternal = $taskContactsInternal[$t->id] ?? [];
+    $contactsExternal = $taskContactsExternal[$t->id] ?? [];
 
     $responsible   = [];
     $contributors  = [];
-    if (is_array($contactsInternal)) {
-        foreach ($contactsInternal as $c) {
-            // Build photo URL ($c['photo'] is already returned by liste_contact)
-            $photoUrl = '';
-            if (!empty($c['photo'])) {
-                $photoUrl = DOL_URL_ROOT . '/viewimage.php?modulepart=userphoto&entity=' . $conf->entity . '&file=' . urlencode($c['id'] . '/thumbs/' . preg_replace('/(\.\w+)$/', '_mini$1', $c['photo']));
-            }
-            $contactInfo = [
-                'id'       => $c['id'],
-                'fullname' => trim($c['firstname'] . ' ' . $c['lastname']),
-                'initials' => strtoupper(mb_substr($c['firstname'], 0, 1) . mb_substr($c['lastname'], 0, 1)),
-                'photo'    => $photoUrl,
-            ];
-            // TASKEXECUTIVE = responsable de la tâche
-            if ($c['code'] == 'TASKEXECUTIVE') {
-                $responsible[] = $contactInfo;
-            } else {
-                $contributors[] = $contactInfo;
-            }
+    foreach ($contactsInternal as $c) {
+        $photoUrl = '';
+        if (!empty($c->photo)) {
+            $photoUrl = DOL_URL_ROOT . '/viewimage.php?modulepart=userphoto&entity=' . $conf->entity . '&file=' . urlencode($c->id . '/thumbs/' . preg_replace('/(\.\w+)$/', '_mini$1', $c->photo));
+        }
+        $contactInfo = [
+            'id'       => (int) $c->id,
+            'fullname' => trim($c->firstname . ' ' . $c->lastname),
+            'initials' => strtoupper(mb_substr($c->firstname, 0, 1) . mb_substr($c->lastname, 0, 1)),
+            'photo'    => $photoUrl,
+        ];
+        // TASKEXECUTIVE = responsable de la tâche
+        if ($c->code == 'TASKEXECUTIVE') {
+            $responsible[] = $contactInfo;
+        } else {
+            $contributors[] = $contactInfo;
         }
     }
-    if (is_array($contactsExternal)) {
-        foreach ($contactsExternal as $c) {
-            $contactInfo = [
-                'id'       => $c['id'],
-                'fullname' => trim($c['firstname'] . ' ' . $c['lastname']),
-                'initials' => strtoupper(mb_substr($c['firstname'], 0, 1) . mb_substr($c['lastname'], 0, 1)),
-                'photo'    => '',
-            ];
-            if ($c['code'] == 'TASKCONTRIBUTOR') {
-                $contributors[] = $contactInfo;
-            }
+    foreach ($contactsExternal as $c) {
+        $contactInfo = [
+            'id'       => (int) $c->id,
+            'fullname' => trim($c->firstname . ' ' . $c->lastname),
+            'initials' => strtoupper(mb_substr($c->firstname, 0, 1) . mb_substr($c->lastname, 0, 1)),
+            'photo'    => '',
+        ];
+        if ($c->code == 'TASKCONTRIBUTOR') {
+            $contributors[] = $contactInfo;
         }
     }
 

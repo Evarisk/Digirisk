@@ -57,6 +57,19 @@ if (!isset($conf->global->DIGIRISKDOLIBARR_ACTIONPLAN_LOG_LABEL)) {
     dolibarr_set_const($db, 'DIGIRISKDOLIBARR_ACTIONPLAN_LOG_LABEL', 1, 'chaine', 0, '', $conf->entity);
 }
 
+// Save Kanban display settings (page size + column thresholds)
+if ($action == 'update_kanban') {
+    $pageSize = GETPOSTINT('DIGIRISKDOLIBARR_KANBAN_PAGE_SIZE');
+    if ($pageSize < 1) {
+        $pageSize = 30;
+    }
+    dolibarr_set_const($db, 'DIGIRISKDOLIBARR_KANBAN_PAGE_SIZE', $pageSize, 'chaine', 0, '', $conf->entity);
+    dolibarr_set_const($db, 'DIGIRISKDOLIBARR_KANBAN_DRAFT_MAX', GETPOSTINT('DIGIRISKDOLIBARR_KANBAN_DRAFT_MAX'), 'chaine', 0, '', $conf->entity);
+    dolibarr_set_const($db, 'DIGIRISKDOLIBARR_KANBAN_PROGRESS_MAX', GETPOSTINT('DIGIRISKDOLIBARR_KANBAN_PROGRESS_MAX'), 'chaine', 0, '', $conf->entity);
+    dolibarr_set_const($db, 'DIGIRISKDOLIBARR_KANBAN_CONTROL_MAX', GETPOSTINT('DIGIRISKDOLIBARR_KANBAN_CONTROL_MAX'), 'chaine', 0, '', $conf->entity);
+    setEventMessages($langs->trans('SetupSaved'), null, 'mesgs');
+}
+
 /*
  * View
  */
@@ -111,6 +124,43 @@ foreach ($actionPlanLogs as $constName => $transKeys) {
 }
 
 print '</table>';
+
+// Kanban display settings
+print '<br>';
+print load_fiche_titre('<i class="fas fa-th-large"></i> ' . $langs->trans("KanbanDisplay"), '', '');
+print '<hr>';
+
+print '<form method="POST" action="' . $_SERVER['PHP_SELF'] . '">';
+print '<input type="hidden" name="token" value="' . newToken() . '">';
+print '<input type="hidden" name="action" value="update_kanban">';
+
+print '<table class="noborder centpercent">';
+print '<tr class="liste_titre">';
+print '<td>' . $langs->trans("Name") . '</td>';
+print '<td>' . $langs->trans("Description") . '</td>';
+print '<td class="center">' . $langs->trans("Value") . '</td>';
+print '</tr>';
+
+$kanbanSettings = [
+    'DIGIRISKDOLIBARR_KANBAN_PAGE_SIZE'    => ['KanbanPageSize', 'KanbanPageSizeDesc', 30, 1],
+    'DIGIRISKDOLIBARR_KANBAN_DRAFT_MAX'    => ['KanbanDraftMax', 'KanbanDraftMaxDesc', 0, 0],
+    'DIGIRISKDOLIBARR_KANBAN_PROGRESS_MAX' => ['KanbanProgressMax', 'KanbanProgressMaxDesc', 80, 0],
+    'DIGIRISKDOLIBARR_KANBAN_CONTROL_MAX'  => ['KanbanControlMax', 'KanbanControlMaxDesc', 99, 0],
+];
+
+foreach ($kanbanSettings as $constName => $cfg) {
+    print '<tr class="oddeven"><td>';
+    print $langs->trans($cfg[0]);
+    print '</td><td>';
+    print $langs->trans($cfg[1]);
+    print '</td><td class="center">';
+    print '<input type="number" class="width75 right" name="' . $constName . '" min="' . $cfg[3] . '" value="' . getDolGlobalInt($constName, $cfg[2]) . '">';
+    print '</td></tr>';
+}
+
+print '</table>';
+print '<div class="center"><input type="submit" class="button button-save" value="' . $langs->trans("Save") . '"></div>';
+print '</form>';
 
 // Page end
 print dol_get_fiche_end();
