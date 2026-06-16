@@ -1675,6 +1675,28 @@ textarea.action-textarea:not(:last-child) {
   font-style: italic;
 }
 
+.kanban-load-more {
+  display: block;
+  width: 100%;
+  margin-top: 4px;
+  padding: 8px 12px;
+  border: 1px dashed #c4c4c4;
+  border-radius: 8px;
+  background: #fafafa;
+  color: #555;
+  font-size: 13px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: background 0.2s ease, border-color 0.2s ease;
+}
+.kanban-load-more i {
+  margin-right: 4px;
+}
+.kanban-load-more:hover {
+  background: #f0f0f0;
+  border-color: #999;
+}
+
 /* Cards */
 .kanban-card {
   position: relative;
