@@ -17,9 +17,20 @@ window.digiriskdolibarr.actionplanKanban.init = function() {
         return;
     }
     window.digiriskdolibarr.actionplanKanban.event();
+    window.digiriskdolibarr.actionplanKanban.initLazyLoad();
     window.digiriskdolibarr.actionplanKanban.initSortable();
     window.digiriskdolibarr.actionplanKanban.initSettings();
 };
+
+/**
+ * Pre-rendered cards awaiting injection, keyed by column. Populated by initLazyLoad.
+ */
+window.digiriskdolibarr.actionplanKanban.deferredCards = {};
+
+/**
+ * Number of cards rendered live per "load more" click (matches server page size default)
+ */
+window.digiriskdolibarr.actionplanKanban.chunkSize = 30;
 
 /**
  * Register delegated events
@@ -614,6 +625,18 @@ window.digiriskdolibarr.actionplanKanban.event = function() {
     $(document).on('mousedown', '.kanban-remove-contact, .kanban-initial-wrapper', function(e) {
         e.stopPropagation();
     });
+
+    // Lazy-load: "load more" button injects the next chunk of deferred cards
+    $(document).on('click', '.kanban-load-more', function(e) {
+        e.preventDefault();
+        e.stopPropagation();
+        window.digiriskdolibarr.actionplanKanban.loadMore($(this).data('column'));
+    });
+
+    // Prevent card drag when clicking the load-more button
+    $(document).on('mousedown', '.kanban-load-more', function(e) {
+        e.stopPropagation();
+    });
 };
 
 /**
@@ -626,6 +649,7 @@ window.digiriskdolibarr.actionplanKanban.initSortable = function() {
 
     $('.kanban-sortable').sortable({
         connectWith: '.kanban-sortable',
+        items: '> .kanban-card',
         placeholder: 'kanban-card-placeholder',
         tolerance: 'pointer',
         cursor: 'grabbing',
@@ -666,6 +690,9 @@ window.digiriskdolibarr.actionplanKanban.initSortable = function() {
             // Remove empty state from target
             $column.find('.kanban-empty').remove();
 
+            // Keep the "load more" button anchored at the bottom of the column
+            $column.append($column.children('.kanban-load-more'));
+
             // Add empty state to source if needed
             var $source = ui.sender;
             if ($source.children('.kanban-card').length === 0) {
@@ -682,11 +709,63 @@ window.digiriskdolibarr.actionplanKanban.initSortable = function() {
 };
 
 /**
- * Update column counters after drag & drop
+ * Read the deferred (lazy-loaded) card payloads emitted per column by the TPL
+ * and stash them in memory so loadMore() can inject them on demand.
+ */
+window.digiriskdolibarr.actionplanKanban.initLazyLoad = function() {
+    window.digiriskdolibarr.actionplanKanban.deferredCards = {};
+    $('.kanban-deferred-data').each(function() {
+        var colKey = $(this).data('column');
+        try {
+            window.digiriskdolibarr.actionplanKanban.deferredCards[colKey] = JSON.parse($(this).text()) || [];
+        } catch (err) {
+            window.digiriskdolibarr.actionplanKanban.deferredCards[colKey] = [];
+        }
+        // Free the inline payload from the DOM once parsed
+        $(this).remove();
+    });
+};
+
+/**
+ * Inject the next chunk of deferred cards into a column.
+ *
+ * @param {string} colKey Column key (draft / progress / control / done)
+ */
+window.digiriskdolibarr.actionplanKanban.loadMore = function(colKey) {
+    var remaining = window.digiriskdolibarr.actionplanKanban.deferredCards[colKey] || [];
+    if (remaining.length === 0) {
+        return;
+    }
+
+    var $column = $('.kanban-column[data-column="' + colKey + '"]');
+    var $body   = $column.find('.kanban-column-body');
+    var $btn    = $body.find('.kanban-load-more');
+
+    var chunk = remaining.splice(0, window.digiriskdolibarr.actionplanKanban.chunkSize);
+    $btn.before(chunk.join(''));
+
+    // Update or remove the load-more button
+    if (remaining.length === 0) {
+        $btn.remove();
+    } else {
+        $btn.attr('data-remaining', remaining.length);
+        var labelTpl = $btn.data('label') || '+ %s';
+        $btn.find('.kanban-load-more-text').text(labelTpl.replace('%s', remaining.length));
+    }
+
+    // Make the freshly injected cards draggable
+    $('.kanban-sortable').sortable('refresh');
+};
+
+/**
+ * Update column counters after drag & drop.
+ * Live DOM cards + still-deferred (not yet injected) cards = true total.
  */
 window.digiriskdolibarr.actionplanKanban.updateCounts = function() {
     $('.kanban-column').each(function() {
-        var count = $(this).find('.kanban-card').length;
+        var colKey   = $(this).data('column');
+        var deferred = window.digiriskdolibarr.actionplanKanban.deferredCards[colKey];
+        var count    = $(this).find('.kanban-card').length + (deferred ? deferred.length : 0);
         $(this).find('.kanban-column-count').text(count);
     });
 };
