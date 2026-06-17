@@ -813,6 +813,10 @@ Groupmentdocument                        = Fiche de Groupement
 GroupmentDocumentGenerated               = Génération de fiche de Groupement
 groupmentdocument.odt                    = Fiche de Groupement
 groupmentdocument_custom.odt             = Fiche de Groupement personnalisée
+groupmentdocumentinherited.odt           = Fiche de Groupement - Risques hérités
+groupmentdocumentinherited_custom.odt    = Fiche de Groupement - Risques hérités personnalisée
+groupmentdocumentshared.odt              = Fiche de Groupement - Risques partagés
+groupmentdocumentshared_custom.odt       = Fiche de Groupement - Risques partagés personnalisée
 DigiriskGroupmentDocumentData            = Données configurables des fiches de groupement
 ShowTaskDoneGroupmentDocumentDescription = Permettre d'afficher ou non les tâches soldées dans la fiche de groupement
 
@@ -828,6 +832,10 @@ Workunitdocument                        = Fiche d'Unité de travail
 WorkUnitDocumentGenerated               = Génération de fiche d'Unité de Travail
 workunitdocument.odt                    = Fiche d'Unité de travail
 workunitdocument_custom.odt             = Fiche d'Unité de travail personnalisée
+workunitdocumentinherited.odt           = Fiche d'Unité de travail - Risques hérités
+workunitdocumentinherited_custom.odt    = Fiche d'Unité de travail - Risques hérités personnalisée
+workunitdocumentshared.odt              = Fiche d'Unité de travail - Risques partagés
+workunitdocumentshared_custom.odt       = Fiche d'Unité de travail - Risques partagés personnalisée
 DigiriskWorkUnitDocumentData            = Données configurables des fiches d'unités de travail
 ShowTaskDoneWorkUnitDocumentDescription = Permettre d'afficher ou non les tâches soldées dans la fiche d'unité de travail
 
