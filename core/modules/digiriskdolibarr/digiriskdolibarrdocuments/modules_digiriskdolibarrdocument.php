@@ -510,6 +510,22 @@ abstract class ModeleODTDigiriskDolibarrDocument extends SaturneDocumentModel
                 static::setRiskByRiskAssessmentLevelsSegment($odfHandler, $outputLangs, $moreParam);
             }
 
+            // Opt-in: render inherited/children and shared risks in their own dedicated tables
+            // (segments inheritedRisks1..4 and sharedRisks1..4). Missing segments are skipped silently.
+            if (!empty($moreParam['includeInheritedAndShared'])) {
+                $ownDigiriskElements = $moreParam['digiriskElements'];
+                $inheritedAndShared  = $risk->getInheritedAndSharedRiskLevels($moreParam);
+
+                foreach (['inherited', 'shared'] as $bucket) {
+                    $moreParam['riskByRiskAssessmentLevels'] = $inheritedAndShared[$bucket]['riskByRiskAssessmentLevels'];
+                    $moreParam['digiriskElements']           = $ownDigiriskElements + $inheritedAndShared[$bucket]['digiriskElements'];
+                    for ($i = 4; $i >= 1; $i--) {
+                        $moreParam['segmentName'] = $bucket . 'Risks' . $i;
+                        static::setRiskByRiskAssessmentLevelsSegment($odfHandler, $outputLangs, $moreParam);
+                    }
+                }
+            }
+
             $moreParam['riskSigns'] = $loadRiskSignInfos['riskSigns'];
             static::setRiskSignsSegment($odfHandler, $outputLangs, $moreParam);
 
