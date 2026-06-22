@@ -1600,6 +1600,22 @@ class modDigiriskdolibarr extends DolibarrModules
         ];
 
 		$this->menu[$r++] = [
+			'fk_menu'  => 'fk_mainmenu=digiriskdolibarr,fk_leftmenu=digiriskfirepermit',
+			'type'     => 'left',
+			'titre'    => $langs->transnoentities('Application'),
+			'prefix'   => '<i class="fas fa-mobile-alt pictofixedwidth" style="padding-right: 4px;"></i>',
+			'mainmenu' => 'digiriskdolibarr',
+			'leftmenu' => 'digiriskfirepermitpwa',
+			'url'      => '/custom/digiriskdolibarr/public/mobile_firepermit.php' . ((!isModEnabled('multicompany')) ? '?entity=' . $conf->entity : ''),
+			'langs'    => '',
+			'position' => 100 + $r,
+			'enabled'  => '$conf->digiriskdolibarr->enabled',
+			'perms'    => '$user->rights->digiriskdolibarr->firepermit->read',
+			'target'   => '',
+			'user'     => 0,
+		];
+
+		$this->menu[$r++] = [
 			'fk_menu'  => 'fk_mainmenu=digiriskdolibarr',	    // '' if this is a top menu. For left menu, use 'fk_mainmenu=xxx' or 'fk_mainmenu=xxx,fk_leftmenu=yyy' where xxx is mainmenucode and yyy is a leftmenucode
 			'type'     => 'left',			                // This is a Left menu entry
 			'titre'    => $langs->trans('Accident'),
@@ -1724,21 +1740,6 @@ class modDigiriskdolibarr extends DolibarrModules
 			'user'     => 0,				                // 0=Menu for internal users, 1=external users, 2=both
 		];
 
-		$this->menu[$r++] = [
-			'fk_menu'  => 'fk_mainmenu=digiriskdolibarr',	    // '' if this is a top menu. For left menu, use 'fk_mainmenu=xxx' or 'fk_mainmenu=xxx,fk_leftmenu=yyy' where xxx is mainmenucode and yyy is a leftmenucode
-			'type'     => 'left',			                // This is a Left menu entry
-			'titre'    => $langs->transnoentities('FirePermitPWA'),
-			'prefix'   => '<i class="fa fa-fire-alt pictofixedwidth"></i>',
-			'mainmenu' => 'digiriskdolibarr',
-			'leftmenu' => '',
-			'url'      => '/custom/digiriskdolibarr/public/mobile_firepermit.php' . ((!isModEnabled('multicompany')) ? '?entity=' . $conf->entity : ''),
-			'langs'    => '',	        // Lang file to use (without .lang) by module. File must be in langs/code_CODE/ directory.
-			'position' => 100 + $r,
-			'enabled'  => '$conf->digiriskdolibarr->enabled',  // Define condition to show or hide menu entry. Use '$conf->digiriskdolibarr->enabled' if entry must be visible if module is enabled. Use '$leftmenu==\'system\'' to show if leftmenu system is selected.
-			'perms'    => 1,			                // Use 'perms'=>'$user->rights->digiriskdolibarr->level1->level2' if you want your menu with a permission rules
-			'target'   => '',
-			'user'     => 0,				                // 0=Menu for internal users, 1=external users, 2=both
-		];
 
 		$this->menu[$r++] = [
 			'fk_menu'  => 'fk_mainmenu=digiriskdolibarr',	    // '' if this is a top menu. For left menu, use 'fk_mainmenu=xxx' or 'fk_mainmenu=xxx,fk_leftmenu=yyy' where xxx is mainmenucode and yyy is a leftmenucode
