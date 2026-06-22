@@ -58,7 +58,7 @@ saturne_load_langs(['other', 'mails']);
 
 // Get parameters
 $id                  = GETPOSTINT('id');
-$lineid              = GETPOST('lineid', 'int');
+$lineid              = GETPOSTINT('lineid');
 $ref                 = GETPOST('ref', 'alpha');
 $action              = GETPOST('action', 'aZ09');
 $subaction           = GETPOST('subaction', 'aZ09');
@@ -67,7 +67,8 @@ $cancel              = GETPOST('cancel', 'aZ09');
 $contextpage         = GETPOST('contextpage', 'aZ') ? GETPOST('contextpage', 'aZ') : 'preventionplancard'; // To manage different context of search
 $backtopage          = GETPOST('backtopage', 'alpha');
 $backtopageforcancel = GETPOST('backtopageforcancel', 'alpha');
-$fk_parent           = GETPOST('fk_parent', 'int');
+
+$fk_parent           = GETPOSTINT('fk_parent');
 
 // Initialize technical objects
 $object             = new PreventionPlan($db);
@@ -86,7 +87,9 @@ $thirdparty         = new Societe($db);
 $project            = new Project($db);
 
 // Load object
-$object->fetch($id);
+if ($id > 0 || !empty($ref)) {
+	$object->fetch($id, $ref);
+}
 
 $deletedElements = $digiriskelement->getMultiEntityTrashList();
 if (empty($deletedElements)) {
