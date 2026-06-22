@@ -26,6 +26,13 @@ body:has(.page-ut-gp-list) {
   overflow-x: auto;
 }
 
+/* The infobox (Document unique, etc.) does not shrink below its flex content and
+   overshoots #id-right by ~15px, which is enough to trigger the overflow-x:auto
+   scrollbar above for nothing. Cap it to the content width so no phantom scrollbar appears. */
+.page-ut-gp-list #id-right .wpeo-infobox-container {
+  max-width: 100%;
+}
+
 
 /** UT / GP Navigation */
 .page-ut-gp-list .side-nav {
