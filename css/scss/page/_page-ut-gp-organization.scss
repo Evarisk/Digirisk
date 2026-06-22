@@ -264,7 +264,7 @@
 }
 
 /* Header : titre société + indicateur unsaved */
-.organization-header {
+.organization-page .organization-header {
   display: flex;
   align-items: center;
   gap: 16px;
@@ -277,7 +277,7 @@
   }
 }
 
-.unsaved-indicator {
+.organization-page .unsaved-indicator {
   display: inline-flex;
   align-items: center;
   gap: 6px;
@@ -304,13 +304,13 @@
   }
 }
 
-.container {
+.organization-page .container {
   position: relative;
   min-height: 500px;
   padding: 20px;
 }
 
-ul.space {
+.organization-page ul.space {
   list-style-type: none;
   padding-left: 30px;
   margin: 0;
@@ -321,7 +321,7 @@ ul.space {
   }
 }
 
-li.route {
+.organization-page li.route {
   margin-bottom: 8px;
   
   .row-container {

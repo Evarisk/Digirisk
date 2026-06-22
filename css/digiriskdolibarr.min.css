@@ -728,19 +728,19 @@ body:has(.page-ut-gp-list) {
   }
 }
 /* Header : titre société + indicateur unsaved */
-.organization-header {
+.organization-page .organization-header {
   display: flex;
   align-items: center;
   gap: 16px;
   margin-bottom: 8px;
 }
-.organization-header .title {
+.organization-page .organization-header .title {
   margin: 0;
   font-size: 18px;
   font-weight: 700;
 }
 
-.unsaved-indicator {
+.organization-page .unsaved-indicator {
   display: inline-flex;
   align-items: center;
   gap: 6px;
@@ -752,38 +752,38 @@ body:has(.page-ut-gp-list) {
   transition: opacity 0.3s, transform 0.3s;
   pointer-events: none;
 }
-.unsaved-indicator.visible {
+.organization-page .unsaved-indicator.visible {
   opacity: 1;
   transform: translateX(0);
   pointer-events: auto;
 }
-.unsaved-indicator.saved {
+.organization-page .unsaved-indicator.saved {
   color: #47e58e;
 }
-.unsaved-indicator .fas {
+.organization-page .unsaved-indicator .fas {
   font-size: 14px;
 }
 
-.container {
+.organization-page .container {
   position: relative;
   min-height: 500px;
   padding: 20px;
 }
 
-ul.space {
+.organization-page ul.space {
   list-style-type: none;
   padding-left: 30px;
   margin: 0;
   min-height: 10px; /* Pour permettre le drop même si vide */
 }
-ul.space.first-space {
+.organization-page ul.space.first-space {
   padding-left: 0;
 }
 
-li.route {
+.organization-page li.route {
   margin-bottom: 8px;
 }
-li.route .row-container {
+.organization-page li.route .row-container {
   display: flex;
   align-items: center;
   background: #fff;
@@ -793,23 +793,23 @@ li.route .row-container {
   transition: box-shadow 0.2s;
   cursor: pointer;
 }
-li.route .row-container:hover {
+.organization-page li.route .row-container:hover {
   box-shadow: 0 4px 12px rgba(0, 0, 0, 0.08);
 }
-li.route .row-container:hover .actions {
+.organization-page li.route .row-container:hover .actions {
   opacity: 1;
   pointer-events: auto;
 }
-li.route .row-container .drag-handle {
+.organization-page li.route .row-container .drag-handle {
   cursor: grab;
   color: #b0b0b0;
   margin-right: 16px;
   font-size: 16px;
 }
-li.route .row-container .drag-handle:active {
+.organization-page li.route .row-container .drag-handle:active {
   cursor: grabbing;
 }
-li.route .row-container .chevron {
+.organization-page li.route .row-container .chevron {
   width: 24px;
   cursor: pointer;
   color: #666;
@@ -817,12 +817,12 @@ li.route .row-container .chevron {
   align-items: center;
   justify-content: center;
 }
-li.route .row-container .chevron .chevron-empty {
+.organization-page li.route .row-container .chevron .chevron-empty {
   color: #d0d0d0;
   cursor: default;
   pointer-events: none;
 }
-li.route .row-container .photo-container {
+.organization-page li.route .row-container .photo-container {
   width: 40px;
   height: 40px;
   border-radius: 4px;
@@ -834,12 +834,12 @@ li.route .row-container .photo-container {
   align-items: center;
   justify-content: center;
 }
-li.route .row-container .photo-container img {
+.organization-page li.route .row-container .photo-container img {
   max-width: 100%;
   max-height: 100%;
   object-fit: cover;
 }
-li.route .row-container .ref-badge {
+.organization-page li.route .row-container .ref-badge {
   font-size: 11px;
   font-weight: 700;
   padding: 4px 8px;
@@ -848,36 +848,36 @@ li.route .row-container .ref-badge {
   color: #fff;
   text-transform: uppercase;
 }
-li.route .row-container .ref-badge.groupment-badge {
+.organization-page li.route .row-container .ref-badge.groupment-badge {
   background: #263C5C;
 }
-li.route .row-container .ref-badge.workunit-badge {
+.organization-page li.route .row-container .ref-badge.workunit-badge {
   background: #0d8aff;
 }
-li.route .row-container .ref-badge a {
+.organization-page li.route .row-container .ref-badge a {
   color: inherit;
   text-decoration: none;
 }
-li.route .row-container .ref-badge a:hover {
+.organization-page li.route .row-container .ref-badge a:hover {
   text-decoration: underline;
 }
-li.route .row-container .title {
+.organization-page li.route .row-container .title {
   flex-grow: 1;
   margin: 0;
   font-size: 15px;
   font-weight: 500;
   color: #333;
 }
-li.route .row-container .title.element-label {
+.organization-page li.route .row-container .title.element-label {
   cursor: text;
   border-bottom: 1px dashed transparent;
   transition: border-color 0.2s, color 0.3s;
   padding-bottom: 2px;
 }
-li.route .row-container .title.element-label:hover {
+.organization-page li.route .row-container .title.element-label:hover {
   border-bottom-color: #b0b0b0;
 }
-li.route .row-container .title.element-label .inline-edit-input {
+.organization-page li.route .row-container .title.element-label .inline-edit-input {
   font-size: 15px;
   font-weight: 500;
   font-family: inherit;
@@ -890,12 +890,12 @@ li.route .row-container .title.element-label .inline-edit-input {
   padding: 0 0 2px 0;
   margin: 0;
 }
-li.route .row-container .risk-badges {
+.organization-page li.route .row-container .risk-badges {
   display: flex;
   gap: 8px;
   margin-right: 20px;
 }
-li.route .row-container .risk-badges .badge {
+.organization-page li.route .row-container .risk-badges .badge {
   display: inline-flex;
   align-items: center;
   justify-content: center;
@@ -907,30 +907,30 @@ li.route .row-container .risk-badges .badge {
   font-weight: 700;
   color: #fff;
 }
-li.route .row-container .risk-badges .badge.black {
+.organization-page li.route .row-container .risk-badges .badge.black {
   background: #2b2b2b;
 }
-li.route .row-container .risk-badges .badge.red {
+.organization-page li.route .row-container .risk-badges .badge.red {
   background: #e05353;
 }
-li.route .row-container .risk-badges .badge.orange {
+.organization-page li.route .row-container .risk-badges .badge.orange {
   background: #e9ad4f;
 }
-li.route .row-container .risk-badges .badge.grey {
+.organization-page li.route .row-container .risk-badges .badge.grey {
   background: #ececec;
   color: #666;
 }
-li.route .row-container .risk-badges .badge.empty {
+.organization-page li.route .row-container .risk-badges .badge.empty {
   opacity: 0.3;
 }
-li.route .row-container .actions {
+.organization-page li.route .row-container .actions {
   opacity: 0;
   pointer-events: none;
   transition: opacity 0.2s;
   display: flex;
   gap: 8px;
 }
-li.route .row-container .actions a {
+.organization-page li.route .row-container .actions a {
   text-decoration: none;
   padding: 4px 10px;
   font-size: 12px;
@@ -940,14 +940,14 @@ li.route .row-container .actions a {
   color: #333;
   transition: background 0.2s;
 }
-li.route .row-container .actions a:hover {
+.organization-page li.route .row-container .actions a:hover {
   background: #e9ecef;
 }
-li.route .row-container .actions {
+.organization-page li.route .row-container .actions {
   /* Keep the trash icon white on the red delete button */
 }
-li.route .row-container .actions .delete-element-btn,
-li.route .row-container .actions .delete-element-btn i {
+.organization-page li.route .row-container .actions .delete-element-btn,
+.organization-page li.route .row-container .actions .delete-element-btn i {
   color: #fff;
 }
 
