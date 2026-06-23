@@ -886,7 +886,7 @@ class modDigiriskdolibarr extends DolibarrModules
 
 		if (!isModEnabled('digiriskdolibarr')) {
 			$conf->digiriskdolibarr          = new stdClass();
-			!empty($conf->digiriskdolibarr->enabled) = 0;
+			$conf->digiriskdolibarr->enabled = 0;
 		}
 
 		// Array to add new pages in new tabs
