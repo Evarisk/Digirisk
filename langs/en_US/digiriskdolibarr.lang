@@ -52,3 +52,5 @@ MeteoVigilanceDepartmentDescription = Leave empty to auto-detect the department 
 MeteoVigilanceCacheTTL = Cache duration (seconds)
 MeteoVigilanceCacheTTLDescription = How long API data is cached before a new call (default 3600).
 MeteoVigilanceSettings = Weather warning configuration
+MeteoVigilanceRefreshNow = Refresh now
+MeteoVigilanceRefreshed = Data refreshed: %s warning for department %s

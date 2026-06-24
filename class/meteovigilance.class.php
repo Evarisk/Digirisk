@@ -183,9 +183,11 @@ class MeteoVigilance
      * Fetch the current vigilance for the configured department, using a TTL file cache.
      * Returns null when not configured, department undetermined, or data unavailable.
      *
-     * @return array|null ['level' => int, 'phenomena' => array, 'update_time' => string] or null
+     * @param  bool       $forceRefresh When true, bypass both the in-request memo and the file
+     *                                  cache to always call the API (manual refresh from admin).
+     * @return array|null               ['level' => int, 'phenomena' => array, 'update_time' => string] or null
      */
-    public function fetchVigilance(): ?array
+    public function fetchVigilance(bool $forceRefresh = false): ?array
     {
         global $conf;
 
@@ -193,7 +195,7 @@ class MeteoVigilance
         if (empty($departmentCode)) {
             return null;
         }
-        if (array_key_exists($departmentCode, $this->memo)) {
+        if (!$forceRefresh && array_key_exists($departmentCode, $this->memo)) {
             return $this->memo[$departmentCode];
         }
 
@@ -207,8 +209,8 @@ class MeteoVigilance
         $cacheDir  = $conf->digiriskdolibarr->multidir_output[$conf->entity] . '/temp';
         $cacheFile = $cacheDir . '/meteovigilance_' . dol_sanitizeFileName($departmentCode) . '.json';
 
-        // Serve fresh cache when available.
-        if (dol_is_file($cacheFile) && (dol_filemtime($cacheFile) > (dol_now() - $ttl))) {
+        // Serve fresh cache when available (skipped on a manual refresh, which always re-calls the API).
+        if (!$forceRefresh && dol_is_file($cacheFile) && (dol_filemtime($cacheFile) > (dol_now() - $ttl))) {
             $cached = json_decode(file_get_contents($cacheFile), true);
             if (is_array($cached)) {
                 return $this->memo[$departmentCode] = $cached;

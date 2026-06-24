@@ -1916,3 +1916,5 @@ MeteoVigilanceDepartmentDescription = Laissez vide pour déduire automatiquement
 MeteoVigilanceCacheTTL = Durée du cache (secondes)
 MeteoVigilanceCacheTTLDescription = Durée pendant laquelle les données de l'API sont mises en cache avant un nouvel appel (défaut 3600).
 MeteoVigilanceSettings = Configuration Vigilance Météo
+MeteoVigilanceRefreshNow = Rafraîchir maintenant
+MeteoVigilanceRefreshed = Données rafraîchies : vigilance %s sur le département %s
