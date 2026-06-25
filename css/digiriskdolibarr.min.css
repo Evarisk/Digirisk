@@ -303,9 +303,9 @@ body:has(.page-ut-gp-list) {
   font-size: 13px;
   padding-left: 0;
   min-width: 0;
-  overflow: hidden;
-  text-overflow: ellipsis;
-  white-space: nowrap;
+  white-space: normal;
+  overflow-wrap: anywhere;
+  word-break: break-word;
 }
 .page-ut-gp-list .side-nav .workunit-list .row-container {
   /* Actions float over the right edge on hover so they never reserve width nor push other elements */
