@@ -175,13 +175,14 @@ body:has(.page-ut-gp-list) {
       padding: 3px 6px;
     }
 
+    /* Long GP/UT names wrap onto new lines instead of stretching the row; flex-grow + min-width:0 keep the row within the fixed panel width */
     .title.element-label {
       font-size: 13px;
       padding-left: 0;
       min-width: 0;
-      overflow: hidden;
-      text-overflow: ellipsis;
-      white-space: nowrap;
+      white-space: normal;
+      overflow-wrap: anywhere;
+      word-break: break-word;
     }
 
     /* Actions float over the right edge on hover so they never reserve width nor push other elements */
