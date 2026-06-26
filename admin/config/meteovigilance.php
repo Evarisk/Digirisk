@@ -64,6 +64,26 @@ if ($action == 'update') {
     setEventMessages($langs->trans('SetupSaved'), []);
 }
 
+// Manual refresh: force a fresh Météo-France call, bypassing the file cache.
+if ($action == 'refresh') {
+    require_once __DIR__ . '/../../class/meteovigilance.class.php';
+
+    $meteoVigilance = new MeteoVigilance($db);
+    $departmentCode = $meteoVigilance->getDepartmentCode();
+    if (empty(getDolGlobalString('DIGIRISKDOLIBARR_METEOFRANCE_VIGILANCE_API_KEY'))) {
+        setEventMessages($langs->trans('MeteoVigilanceNotConfigured'), [], 'warnings');
+    } elseif (empty($departmentCode)) {
+        setEventMessages($langs->trans('MeteoVigilanceUnknownDepartment'), [], 'warnings');
+    } else {
+        $vigilance = $meteoVigilance->fetchVigilance(true);
+        if (is_array($vigilance)) {
+            setEventMessages($langs->trans('MeteoVigilanceRefreshed', MeteoVigilance::getLevelLabel((int) $vigilance['level']), $departmentCode), []);
+        } else {
+            setEventMessages($langs->trans('MeteoVigilanceUnavailable'), [], 'errors');
+        }
+    }
+}
+
 /*
  * View
  */
@@ -110,6 +130,11 @@ print '<td><input type="number" name="MeteoVigilanceCacheTTL" value="' . (getDol
 print '</table>';
 print '<div class="center"><input type="submit" class="button" name="save" value="' . $langs->trans('Save') . '"></div>';
 print '</form>';
+
+// Manual fetch button: force a fresh API call (bypasses the cache) to refresh the dashboard data on demand.
+print '<div class="center">';
+print '<a class="butAction" href="' . $_SERVER['PHP_SELF'] . '?action=refresh&token=' . newToken() . '">' . $langs->trans('MeteoVigilanceRefreshNow') . '</a>';
+print '</div>';
 
 // Page end
 print dol_get_fiche_end();
