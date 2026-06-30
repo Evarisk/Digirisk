@@ -50,7 +50,7 @@ global $conf, $db, $hookmanager, $langs, $user;
 saturne_load_langs(['other']);
 
 // Get parameters
-$id                  = GETPOST('id', 'int');
+$id                  = GETPOSTINT('id');
 $ref                 = GETPOST('ref', 'alpha');
 $action              = GETPOST('action', 'aZ09');
 $subaction           = GETPOST('subaction', 'aZ09');
@@ -367,7 +367,7 @@ if ((empty($action) || ($action != 'edit' && $action != 'create'))) {
 	print '</td></tr>';
 
 	print '<tr class="linked-medias digirisk-element-photo-'. $object->id .'"><td class=""><label for="photos">' . $langs->trans("Photo") . '</label></td><td class="linked-medias-list" style="display: flex; gap: 10px; height: auto;">';
-	print '<span class="add-medias" '. (($object->status != $object::STATUS_LOCKED) ? "" : "style='display:none'") . '>';
+	print '<span class="add-medias" '. (($object->status == $object::STATUS_VALIDATED) ? "" : "style='display:none'") . '>';
 	print '<input hidden multiple class="fast-upload" id="fast-upload-photo-default" type="file" name="userfile[]" capture="environment" accept="image/*">';
 	print '<label for="fast-upload-photo-default">';
 	print '<div title="'. $langs->trans('AddPhotoFromComputer') .'" class="wpeo-button button-square-50">';
@@ -382,7 +382,7 @@ if ((empty($action) || ($action != 'edit' && $action != 'create'))) {
 	print '</div>';
 	print '</span>';
 	print '&nbsp';
-    print saturne_show_medias_linked('digiriskdolibarr', $conf->digiriskdolibarr->multidir_output[$conf->entity] . '/' . $object->element_type . '/' . $object->ref, 'small', 5, 0, 0, 0, 50, 50, 0, 0, 0, $object->element_type . '/'. $object->ref . '/', $object, 'photo', $object->status != $object::STATUS_LOCKED, $permissiontodelete && $object->status != $object::STATUS_LOCKED);
+    print saturne_show_medias_linked('digiriskdolibarr', $conf->digiriskdolibarr->multidir_output[$conf->entity] . '/' . $object->element_type . '/' . $object->ref, 'small', 5, 0, 0, 0, 50, 50, 0, 0, 0, $object->element_type . '/'. $object->ref . '/', $object, 'photo', $object->status == $object::STATUS_VALIDATED, $permissiontodelete && $object->status == $object::STATUS_VALIDATED);
 	print '</td></tr>';
 
 	// Other attributes. Fields from hook formObjectOptions and Extrafields.
@@ -447,7 +447,7 @@ if ((empty($action) || ($action != 'edit' && $action != 'create'))) {
 
 		$MAXEVENT = 10;
 
-		$morehtmlright  = '<a href="' . dol_buildpath('/digiriskdolibarr/view/digiriskelement/digiriskelement_agenda.php', 1) . '?id=' . $object->id . '">';
+		$morehtmlright  = '<a href="' . dol_buildpath('/saturne/view/saturne_agenda.php', 1) . '?id=' . $object->id . '&module_name=' . $moduleName . '&object_type=' . $object->element . '">';
 		$morehtmlright .= $langs->trans("SeeAll");
 		$morehtmlright .= '</a>';
 

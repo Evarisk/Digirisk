@@ -54,11 +54,6 @@ class RiskAssessment extends SaturneObject
 	 */
 	public $ismultientitymanaged = 1;
 
-	/**
-	 * @var int Does object support extrafields ? 0 = No, 1 = Yes.
-	 */
-	public $isextrafieldmanaged = 1;
-
     /**
      * @var string Name of icon for riskassessment. Must be a 'fa-xxx' fontawesome code (or 'fa-xxx_fa_color_size') or 'riskassessment@digiriskdolibarr' if picto is file 'img/object_riskassessment.png'
      */
@@ -126,7 +121,7 @@ class RiskAssessment extends SaturneObject
 	/**
 	 * Constructor.
 	 *
-	 * @param DoliDb $db Database handler.
+	 * @param DoliDB $db Database handler.
 	 */
 	public function __construct(DoliDB $db)
 	{
@@ -134,29 +129,28 @@ class RiskAssessment extends SaturneObject
 		parent::__construct($db, $this->module, $this->element);
 	}
 
+    /**
+     * Create object into database
+     *
+     * @param  User        $user         User that creates
+     * @param  int<0,1>    $noTrigger    0 = launch triggers after, 1 = disable triggers
+     * @param  bool        $updateStatus Update previous riskassessment status
+     * @return int<-1,max>               Return integer 0 < if KO, ID of created object if OK
+     */
+    public function create(User $user, int $noTrigger = 0, bool $updateStatus = true): int
+    {
+        $result = $this->createCommon($user, $noTrigger);
 
-	/**
-	 * Create object into database
-	 *
-	 * @param  User $user         User that creates
-	 * @param  bool $notrigger    False=launch triggers after, true=disable triggers
-	 * @param  bool $updatestatus Update previous riskassessment status
-	 * @return int                if < KO, ID of created object if OK
-	 */
-	public function create(User $user, bool $notrigger = false, bool $updatestatus = true): int
-	{
-		$result = $this->createCommon($user, $notrigger);
+        if ($result > 0 && $updateStatus > 0) {
+            $sql = "UPDATE " . MAIN_DB_PREFIX . "digiriskdolibarr_riskassessment";
+            $sql .= " SET status = 0";
+            $sql .= " WHERE fk_risk = " . $this->fk_risk;
+            $sql .= " AND rowid != " . $result;
+            $this->db->query($sql);
+        }
 
-		if ($result > 0 && $updatestatus > 0) {
-			$sql = "UPDATE " . MAIN_DB_PREFIX . "digiriskdolibarr_riskassessment";
-			$sql .= " SET status = 0";
-			$sql .= " WHERE fk_risk = " . $this->fk_risk;
-			$sql .= " AND rowid != " . $result;
-			$this->db->query($sql);
-		}
-
-		return $result;
-	}
+        return $result;
+    }
 
 	/**
 	 * Load object in memory from the database with Parent ID
@@ -308,29 +302,28 @@ class RiskAssessment extends SaturneObject
     /**
      * Write information of trigger description
      *
-     * @param  Object $object Object calling the trigger
-     * @return string         Description to display in actioncomm->note_private
+     * @return string Description to display in actioncomm->note_private
      */
-    public function getTriggerDescription(SaturneObject $object): string
+    public function getTriggerDescription(): string
     {
         global $conf, $langs;
 
         $risk = new Risk($this->db);
-        $risk->fetch($object->fk_risk);
+        $risk->fetch($this->fk_risk);
 
-        $ret = parent::getTriggerDescription($object);
+        $ret = parent::getTriggerDescription();
 
         $ret .= $langs->trans('ParentRisk') . ' : ' . $risk->ref . '<br>';
-        $ret .= $langs->trans('Comment') . ' : ' . (!empty($object->comment) ? $object->comment : 'N/A') . '<br>';
-        $ret .= ((!empty($object->date_riskassessment) && $conf->global->DIGIRISKDOLIBARR_SHOW_RISKASSESSMENT_DATE) ? $langs->trans('RiskAssessmentDate') . ' : ' . dol_print_date($object->date_riskassessment, 'day') . '<br>' : '');
-        $ret .= $langs->trans('Photo') . ' : ' . (!empty($object->photo) ? $object->photo : 'N/A') . '<br>';
-        if ($object->method == 'advanced') {
-            $ret .= $langs->trans('Evaluation') . ' : ' . $object->cotation . '<br>';
-            $ret .= $langs->trans('Gravity') . ' : ' . $object->gravite . '<br>';
-            $ret .= $langs->trans('Protection') . ' : ' . $object->protection . '<br>';
-            $ret .= $langs->trans('Occurrence') . ' : ' . $object->occurrence . '<br>';
-            $ret .= $langs->trans('Formation') . ' : ' . $object->formation . '<br>';
-            $ret .= $langs->trans('Exposition') . ' : ' . $object->exposition . '<br>';
+        $ret .= $langs->trans('Comment') . ' : ' . (!empty($this->comment) ? $this->comment : 'N/A') . '<br>';
+        $ret .= ((!empty($this->date_riskassessment) && $conf->global->DIGIRISKDOLIBARR_SHOW_RISKASSESSMENT_DATE) ? $langs->trans('RiskAssessmentDate') . ' : ' . dol_print_date($this->date_riskassessment, 'day') . '<br>' : '');
+        $ret .= $langs->trans('Photo') . ' : ' . (!empty($this->photo) ? $this->photo : 'N/A') . '<br>';
+        if ($this->method == 'advanced') {
+            $ret .= $langs->trans('Evaluation') . ' : ' . $this->cotation . '<br>';
+            $ret .= $langs->trans('Gravity') . ' : ' . $this->gravite . '<br>';
+            $ret .= $langs->trans('Protection') . ' : ' . $this->protection . '<br>';
+            $ret .= $langs->trans('Occurrence') . ' : ' . $this->occurrence . '<br>';
+            $ret .= $langs->trans('Formation') . ' : ' . $this->formation . '<br>';
+            $ret .= $langs->trans('Exposition') . ' : ' . $this->exposition . '<br>';
         }
 
         return $ret;

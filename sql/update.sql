@@ -152,37 +152,25 @@ ALTER TABLE `llx_digiriskdolibarr_object_signature` ADD module_name VARCHAR(128)
 
 ALTER TABLE llx_digiriskdolibarr_accident CHANGE `tms` `tms` timestamp DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP;
 ALTER TABLE llx_digiriskdolibarr_accident_investigation CHANGE `tms` `tms` timestamp DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP;
-ALTER TABLE llx_digiriskdolibarr_accident_extrafields CHANGE `tms` `tms` timestamp DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP;
 ALTER TABLE llx_digiriskdolibarr_accident_lesion CHANGE `tms` `tms` timestamp DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP;
 ALTER TABLE llx_digiriskdolibarr_accident_workstop CHANGE `tms` `tms` timestamp DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP;
-ALTER TABLE llx_digiriskdolibarr_accident_workstop_extrafields CHANGE `tms` `tms` timestamp DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP;
 ALTER TABLE llx_digiriskdolibarr_accident_metadata CHANGE `tms` `tms` timestamp DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP;
 
 ALTER TABLE llx_digiriskdolibarr_digiriskelement CHANGE `tms` `tms` timestamp DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP;
-ALTER TABLE llx_digiriskdolibarr_digiriskelement_extrafields CHANGE `tms` `tms` timestamp DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP;
 
 ALTER TABLE llx_digiriskdolibarr_firepermit CHANGE `tms` `tms` timestamp DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP;
-ALTER TABLE llx_digiriskdolibarr_firepermit_extrafields CHANGE `tms` `tms` timestamp DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP;
 ALTER TABLE llx_digiriskdolibarr_firepermitdet CHANGE `tms` `tms` timestamp DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP;
-ALTER TABLE llx_digiriskdolibarr_firepermitdet_extrafields CHANGE `tms` `tms` timestamp DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP;
 
 ALTER TABLE llx_digiriskdolibarr_preventionplan CHANGE `tms` `tms` timestamp DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP;
-ALTER TABLE llx_digiriskdolibarr_preventionplan_extrafields CHANGE `tms` `tms` timestamp DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP;
 ALTER TABLE llx_digiriskdolibarr_preventionplandet CHANGE `tms` `tms` timestamp DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP;
-ALTER TABLE llx_digiriskdolibarr_preventionplandet_extrafields CHANGE `tms` `tms` timestamp DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP;
 
 ALTER TABLE llx_digiriskdolibarr_risk CHANGE `tms` `tms` timestamp DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP;
-ALTER TABLE llx_digiriskdolibarr_risk_extrafields CHANGE `tms` `tms` timestamp DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP;
 ALTER TABLE llx_digiriskdolibarr_riskassessment CHANGE `tms` `tms` timestamp DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP;
-ALTER TABLE llx_digiriskdolibarr_riskassessment_extrafields CHANGE `tms` `tms` timestamp DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP;
 ALTER TABLE llx_digiriskdolibarr_risksign CHANGE `tms` `tms` timestamp DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP;
-ALTER TABLE llx_digiriskdolibarr_risksign_extrafields CHANGE `tms` `tms` timestamp DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP;
 
 ALTER TABLE llx_digiriskdolibarr_digiriskresources CHANGE `tms` `tms` timestamp DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP;
 ALTER TABLE llx_digiriskdolibarr_digiriskstandard CHANGE `tms` `tms` timestamp DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP;
-ALTER TABLE llx_digiriskdolibarr_digiriskstandard_extrafields CHANGE `tms` `tms` timestamp DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP;
 ALTER TABLE llx_digiriskdolibarr_evaluator CHANGE `tms` `tms` timestamp DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP;
-ALTER TABLE llx_digiriskdolibarr_evaluator_extrafields CHANGE `tms` `tms` timestamp DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP;
 
 ALTER TABLE llx_digiriskdolibarr_accident_investigation ADD fk_project integer NULL AFTER fk_task;
 
@@ -255,3 +243,35 @@ ALTER TABLE `llx_digiriskdolibarr_risk` ADD `type` VARCHAR(255) NOT NULL DEFAULT
 
 -- 10.1.1
 UPDATE llx_element_element SET targettype = 'digiriskdolibarr_digiriskelement' WHERE targettype = 'digiriskdolibarr_digiriskdolibar' AND sourcetype = 'digiriskdolibarr_risksign';
+
+-- 21.0
+ALTER TABLE llx_digiriskdolibarr_risk ADD `sub_category` VARCHAR(255) NULL DEFAULT NULL AFTER `category`;
+
+ALTER TABLE llx_digiriskdolibarr_digiriskelement CHANGE import_key import_key VARCHAR(14) NULL DEFAULT NULL;
+
+-- 21.x - digirisk_action_type migration
+-- Migrate T1 subtasks -> curative (1)
+UPDATE llx_projet_task_extrafields ef
+INNER JOIN llx_projet_task t ON t.rowid = ef.fk_object
+SET ef.digirisk_action_type = 1
+WHERE t.label LIKE '% - T1 - %'
+  AND (ef.digirisk_action_type IS NULL OR ef.digirisk_action_type = 0);
+
+-- Migrate T2 subtasks -> corrective (2)
+UPDATE llx_projet_task_extrafields ef
+INNER JOIN llx_projet_task t ON t.rowid = ef.fk_object
+SET ef.digirisk_action_type = 2
+WHERE t.label LIKE '% - T2 - %'
+  AND (ef.digirisk_action_type IS NULL OR ef.digirisk_action_type = 0);
+
+-- Create missing extrafields rows
+INSERT IGNORE INTO llx_projet_task_extrafields (fk_object, digirisk_action_type)
+SELECT t.rowid,
+  CASE
+    WHEN t.label LIKE '% - T1 - %' THEN 1
+    WHEN t.label LIKE '% - T2 - %' THEN 2
+  END
+FROM llx_projet_task t
+LEFT JOIN llx_projet_task_extrafields ef ON ef.fk_object = t.rowid
+WHERE ef.fk_object IS NULL
+  AND (t.label LIKE '% - T1 - %' OR t.label LIKE '% - T2 - %');

@@ -53,6 +53,16 @@ function digiriskdolibarr_admin_prepare_head(): array
     $head[$h][2] = 'preventionplan';
     $h++;
 
+    $head[$h][0] = dol_buildpath('/digiriskdolibarr/admin/config/actionplan.php', 1);
+    $head[$h][1] = $conf->browser->layout != 'phone' ? '<i class="fas fa-columns pictofixedwidth"></i>' . $langs->trans('ActionPlan') : '<i class="fas fa-columns"></i>';
+    $head[$h][2] = 'actionplan';
+    $h++;
+
+    $head[$h][0] = dol_buildpath('/digiriskdolibarr/admin/config/ticket_kanban.php', 1);
+    $head[$h][1] = $conf->browser->layout != 'phone' ? '<i class="fas fa-th-large pictofixedwidth"></i>' . $langs->trans('TicketKanban') : '<i class="fas fa-th-large"></i>';
+    $head[$h][2] = 'ticket_kanban';
+    $h++;
+
     $head[$h][0] = dol_buildpath('/digiriskdolibarr/admin/config/firepermit.php', 1);
     $head[$h][1] = $conf->browser->layout != 'phone' ? '<i class="fas fa-fire-alt pictofixedwidth"></i>' . $langs->trans('FirePermit') : '<i class="fas fa-fire-alt"></i>';
     $head[$h][2] = 'firepermit';
@@ -63,9 +73,19 @@ function digiriskdolibarr_admin_prepare_head(): array
     $head[$h][2] = 'accident';
     $h++;
 
+    $head[$h][0] = dol_buildpath('/digiriskdolibarr/admin/config/meteovigilance.php', 1);
+    $head[$h][1] = $conf->browser->layout != 'phone' ? '<i class="fas fa-cloud-sun-rain pictofixedwidth"></i>' . $langs->trans('MeteoVigilance') : '<i class="fas fa-cloud-sun-rain"></i>';
+    $head[$h][2] = 'meteovigilance';
+    $h++;
+
     $head[$h][0] = dol_buildpath('/digiriskdolibarr/admin/ticket/ticket.php', 1);
     $head[$h][1] = $conf->browser->layout != 'phone' ? '<i class="fa fa-ticket-alt pictofixedwidth"></i>' . $langs->trans('WHSRegister') : '<i class="fas fa-ticket-alt"></i>';
     $head[$h][2] = 'ticket';
+    $h++;
+
+    $head[$h][0] = dol_buildpath('/digiriskdolibarr/admin/config/digiai.php', 1);
+    $head[$h][1] = $conf->browser->layout != 'phone' ? '<i class="fa fa-magic pictofixedwidth"></i>' . $langs->trans('DigiAI') : '<i class="fas fa-magic"></i>';
+    $head[$h][2] = 'digiai';
     $h++;
 
     $head[$h][0] = dol_buildpath('/digiriskdolibarr/admin/event.php', 1);

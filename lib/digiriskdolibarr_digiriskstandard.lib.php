@@ -68,29 +68,29 @@ function digiriskstandard_prepare_head(DigiriskStandard $object): array
 
     if ($user->rights->digiriskdolibarr->listingrisksaction->read && $user->rights->digiriskdolibarr->listingrisksphoto->read  && $user->rights->digiriskdolibarr->listingrisksdocument->read) {
         $head[$h][0] = dol_buildpath('/digiriskdolibarr/view/digiriskelement/digiriskelement_listingrisksdocument.php', 1) . '?type=standard';
-        $head[$h][1] = $conf->browser->layout != 'phone' ? '<i class="fas fa-list pictofixedwidth"></i>' . $langs->trans('ListingRisksDocument') : '<i class="fas fa-list"></i>';
+        $head[$h][1] = $conf->browser->layout != 'phone' ? '<i class="fas fa-list pictofixedwidth"></i>' . $langs->trans('ListingRisksHeader', 'PRO') : '<i class="fas fa-list"></i>';
         $head[$h][2] = 'elementListingRisksDocument';
         $h++;
     }
 
-    if ($user->rights->digiriskdolibarr->listingrisksenvironmentalaction->read) {
-        $head[$h][0] = dol_buildpath('/digiriskdolibarr/view/digiriskelement/digiriskelement_environment.php', 1) . '?type=standard';
-        $head[$h][1] = $conf->browser->layout != 'phone' ? '<i class="fas fa-list pictofixedwidth"></i>' . $langs->trans('Environment') : '<i class="fas fa-list"></i>';
-        $head[$h][2] = 'elementEnvironment';
-        $h++;
-    }
-
     if ($user->rights->digiriskdolibarr->riskassessmentdocument->read) {
-        $head[$h][0] = dol_buildpath('/digiriskdolibarr/view/digiriskstandard/digiriskstandard_riskassessmentdocument.php', 1);
+        $head[$h][0] = dol_buildpath('/digiriskdolibarr/view/digiriskstandard/digiriskstandard_riskassessmentdocument.php', 1) . '?id=' . $object->id;
         $head[$h][1] = $conf->browser->layout != 'phone' ? '<i class="fas fa-file-alt pictofixedwidth"></i>' . $langs->trans("RiskAssessmentDocument") : '<i class="fas fa-file-alt"></i>';
         $head[$h][2] = 'standardRiskAssessmentDocument';
         $h++;
     }
 
     if ($user->rights->digiriskdolibarr->auditreportdocument->read) {
-        $head[$h][0] = dol_buildpath('/digiriskdolibarr/view/digiriskstandard/digiriskstandard_auditreportdocument.php', 1);
+        $head[$h][0] = dol_buildpath('/digiriskdolibarr/view/digiriskstandard/digiriskstandard_auditreportdocument.php', 1) . '?id=' . $object->id;
         $head[$h][1] = $conf->browser->layout != 'phone' ? '<i class="fas fa-file-alt pictofixedwidth"></i>' . $langs->trans('AuditReportDocument') : '<i class="fas fa-file-alt"></i>';
         $head[$h][2] = 'standardAuditReportDocument';
+        $h++;
+    }
+
+    if ($user->rights->digiriskdolibarr->listingrisksenvironmentalaction->read) {
+        $head[$h][0] = dol_buildpath('/digiriskdolibarr/view/digiriskelement/digiriskelement_environment.php', 1) . '?type=standard';
+        $head[$h][1] = $conf->browser->layout != 'phone' ? '<i class="fas fa-list pictofixedwidth"></i>' . $langs->trans('ListingRisksHeader', 'ENV') : '<i class="fas fa-list"></i>';
+        $head[$h][2] = 'elementEnvironment';
         $h++;
     }
 

@@ -369,7 +369,7 @@ if ($id && $action == 'edit') {
 	print $form->selectarray('first_person_noticed_is_witness', array('1' => $langs->trans('Witness'), '2' => $langs->trans('FirstPersonNoticed')), $accidentmetadata->first_person_noticed_is_witness, -1, 0, 0, '', 0, 0, 0, '', 'minwidth400', 1);
 
 	//FKUserWitness
-	$userlist = $form->select_dolusers('', 'fk_user_witness', 0, null, 0, '', '', $conf->entity, 0, 0, 'AND u.statut = 1', 0, '', 'minwidth300', 0, 1);
+	$userlist = $form->select_dolusers('', 'fk_user_witness', 0, null, 0, '', '', $conf->entity, 0, 0, '(u.statut:=:1)', 0, '', 'minwidth300', 0, 1);
 	print $form->selectarray('fk_user_witness', $userlist, $accidentmetadata->fk_user_witness, $langs->trans('SelectUser'), null, null, null, "40%", 0, 0, '', 'minwidth300', 1);
 	print ' <a href="' . DOL_URL_ROOT . '/user/card.php?action=create&backtopage=' . urlencode($_SERVER["PHP_SELF"] . '?action=create') . '" target="_blank"><span class="fa fa-plus-circle valignmiddle paddingleft" title="' . $langs->trans("AddUser") . '"></span></a>';
 	print '</td></tr>';

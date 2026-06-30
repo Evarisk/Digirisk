@@ -72,7 +72,7 @@ class InterfaceDigiriskdolibarrTriggers extends DolibarrTriggers
 		$this->name        = preg_replace('/^Interface/i', '', get_class($this));
 		$this->family      = "demo";
 		$this->description = "Digiriskdolibarr triggers.";
-		$this->version     = '20.0.1';
+		$this->version     = '23.1.0';
 		$this->picto       = 'digiriskdolibarr@digiriskdolibarr';
 	}
 
@@ -116,7 +116,7 @@ class InterfaceDigiriskdolibarrTriggers extends DolibarrTriggers
 
         // Allowed triggers are a list of trigger from other module that should activate this file
 		if (!isModEnabled('digiriskdolibarr') || !$active) {
-            $allowedTriggers = ['COMPANY_DELETE', 'CONTACT_DELETE', 'TICKET_CREATE', 'TICKET_PUBLIC_INTERFACE_CREATE'];
+			$allowedTriggers = ['COMPANY_DELETE', 'CONTACT_DELETE', 'TICKET_CREATE', 'TICKET_PUBLIC_INTERFACE_CREATE', 'TICKET_SIGN'];
             if (!in_array($action, $allowedTriggers)) {
                 return 0;  // If module is not enabled or trigger is deactivated, we do nothing
             }
@@ -150,8 +150,8 @@ class InterfaceDigiriskdolibarrTriggers extends DolibarrTriggers
             if (strstr($action, '_CREATE')) {
                 $object->fetch($object->id);
             }
-		    if (getDolGlobalInt('DIGIRISKDOLIBARR_ADVANCED_TRIGGER') && !empty($object->fields)) {
-                $actioncomm->note_private = $object->getTriggerDescription($object);
+		    if (getDolGlobalInt('DIGIRISKDOLIBARR_ADVANCED_TRIGGER') == 1 && !empty($object->fields)) {
+                $actioncomm->note_private = $object->getTriggerDescription();
             }
 		}
 
@@ -401,9 +401,11 @@ class InterfaceDigiriskdolibarrTriggers extends DolibarrTriggers
 				break;
 
 			case 'TICKET_CREATE' :
-				if ($conf->global->DIGIRISKDOLIBARR_SEND_EMAIL_ON_TICKET_SUBMIT) {
+				if (getDolGlobalInt('DIGIRISKDOLIBARR_SEND_EMAIL_ON_TICKET_SUBMIT')) {
 					// envoi du mail avec les infos de l'objet aux adresses mail configurées
 					// envoi du mail avec une trad puis avec un model
+
+                    require_once DOL_DOCUMENT_ROOT . '/core/class/html.formmail.class.php';
 
 					$error = 0;
 					$formmail        = new FormMail($this->db);
@@ -411,15 +413,12 @@ class InterfaceDigiriskdolibarrTriggers extends DolibarrTriggers
 
 					$arraydefaultmessage = $formmail->getEMailTemplate($this->db, 'ticket_send', $user, $langs); // If $model_id is empty, preselect the first one
 
-					$table_element = $object->table_element;
-					$object->table_element = '';
 					$substitutionarray = getCommonSubstitutionArray($langs, 0, null,$object);
-					$object->table_element = $table_element;
 
 					$message = $langs->trans('Hello') . ',' . '<br><br>';
 					$message .= '<span style="color:#c55a11">' . $langs->trans('ANewTicketHasBeenSubmitted', $conf->global->MAIN_INFO_SOCIETE_NOM) . '.' . '</span><br><br>';
 					$message .= '<strong>' . $langs->trans('Service') . ' : ' . '</strong>';
-					$digiriskelement->fetch($object->array_options['options_digiriskdolibarr_ticket_service']);
+					$digiriskelement->fetch((int)$object->array_options['options_digiriskdolibarr_ticket_service']);
 					$message .= $digiriskelement->ref . ' - ' . $digiriskelement->label . '<br><br>';
 					$message .= '<strong>' . $langs->trans('Author') . ' : ' . '</strong>';
 					$message .= strtoupper($object->array_options['options_digiriskdolibarr_ticket_lastname']) . ' ' . $object->array_options['options_digiriskdolibarr_ticket_firstname'] . '<br><br>';
@@ -545,7 +544,16 @@ class InterfaceDigiriskdolibarrTriggers extends DolibarrTriggers
 				}
 				break;
 
+			case 'TICKET_SIGN':
+				$actioncomm->elementtype = 'ticket';
+				$actioncomm->label = $langs->transnoentities('ObjectSignedTrigger', $langs->transnoentities(get_class($object)), $object->ref);
+
+				$result = $actioncomm->create($user);
+				break;
+
             case 'TICKET_PUBLIC_INTERFACE_CREATE' :
+                require_once __DIR__ . '/../../../saturne/class/saturnemail.class.php';
+
                 $categories = $object->getCategoriesCommon('ticket');
                 if (is_array($categories) && !empty($categories)) {
                     $category = new Categorie($this->db);
@@ -553,8 +561,8 @@ class InterfaceDigiriskdolibarrTriggers extends DolibarrTriggers
                         $category->fetch($categoryID);
                         $categoryConfigs = json_decode($category->array_options['options_ticket_category_config']);
                         if ($categoryConfigs->mail_template && $categoryConfigs->recipients) {
-                            $modelMail = new ModelMail($this->db);
-                            $modelMail->fetch($categoryConfigs->mail_template);
+                            $saturneMail = new SaturneMail($this->db);
+                            $saturneMail->fetch($categoryConfigs->mail_template);
                             $recipients = explode(',', $categoryConfigs->recipients);
                             foreach ($recipients as $recipientID) {
                                 $userTmp = new User($this->db);
@@ -568,7 +576,7 @@ class InterfaceDigiriskdolibarrTriggers extends DolibarrTriggers
 
                                     // Create form object
                                     // Send mail (substitutionarray must be done just before this)
-                                    $mailfile = new CMailFile($modelMail->topic, $sendto, $from, $modelMail->content, array(), array(), array(), "", "", 0, -1, '', '', $trackid, '', 'ticket');
+                                    $mailfile = new CMailFile($saturneMail->topic, $sendto, $from, $saturneMail->content, array(), array(), array(), "", "", 0, -1, '', '', $trackid, '', 'ticket');
                                     if ($mailfile->error) {
                                         setEventMessages($mailfile->error, $mailfile->errors, 'errors');
                                     } else {
@@ -589,8 +597,8 @@ class InterfaceDigiriskdolibarrTriggers extends DolibarrTriggers
                                                 $actioncomm->elementtype   = 'ticket';
                                                 $actioncomm->label         = $langs->transnoentities('TicketCreationMailWellSent');
                                                 $actioncomm->note_private  = $langs->transnoentities('TicketCreationMailSent', $sendto) . '<br>';
-                                                $actioncomm->note_private .= $modelMail->topic . '<br>';
-                                                $actioncomm->note_private .= $modelMail->content;
+                                                $actioncomm->note_private .= $saturneMail->topic . '<br>';
+                                                $actioncomm->note_private .= $saturneMail->content;
                                                 $result = $actioncomm->create($user);
                                             }
                                         }
@@ -663,8 +671,8 @@ class InterfaceDigiriskdolibarrTriggers extends DolibarrTriggers
 					$langs->load("projects");
 
 					$risk = new Risk($this->db);
-					$digiriskelement->fetch($object->fk_element);
-					$risk->fetch($object->array_options['options_fk_risk']);
+					$digiriskelement->fetch((int)$object->fk_element);
+					$risk->fetch((int)$object->array_options['options_fk_risk']);
 
 					if ($conf->global->DIGIRISKDOLIBARR_SHOW_TASK_CALCULATED_PROGRESS) {
 						$timeSpent = $object->getSummaryOfTimeSpent();
@@ -695,8 +703,8 @@ class InterfaceDigiriskdolibarrTriggers extends DolibarrTriggers
 					$langs->load("projects");
 
 					$risk = new Risk($this->db);
-					$digiriskelement->fetch($object->fk_element);
-					$risk->fetch($object->array_options['options_fk_risk']);
+					$digiriskelement->fetch((int)$object->fk_element);
+					$risk->fetch((int)$object->array_options['options_fk_risk']);
 
 					if ($conf->global->DIGIRISKDOLIBARR_SHOW_TASK_CALCULATED_PROGRESS) {
 						$timeSpent = $object->getSummaryOfTimeSpent();
@@ -726,8 +734,8 @@ class InterfaceDigiriskdolibarrTriggers extends DolibarrTriggers
 					$langs->load("projects");
 
 					$risk = new Risk($this->db);
-					$digiriskelement->fetch($object->fk_element);
-					$risk->fetch($object->array_options['options_fk_risk']);
+					$digiriskelement->fetch((int)$object->fk_element);
+					$risk->fetch((int)$object->array_options['options_fk_risk']);
 
 					if ($conf->global->DIGIRISKDOLIBARR_SHOW_TASK_CALCULATED_PROGRESS) {
 						$timeSpent = $object->getSummaryOfTimeSpent();
@@ -754,7 +762,7 @@ class InterfaceDigiriskdolibarrTriggers extends DolibarrTriggers
 			case 'RISKASSESSMENT_CREATE' :
 				require_once __DIR__ . '/../../class/riskanalysis/risk.class.php';
 				$risk = new Risk($this->db);
-				$risk->fetch($object->fk_risk);
+				$risk->fetch((int)$object->fk_risk);
 
 				$actioncomm->elementtype = 'digiriskelement@digiriskdolibarr';
 
@@ -767,7 +775,7 @@ class InterfaceDigiriskdolibarrTriggers extends DolibarrTriggers
 			case 'RISKASSESSMENT_MODIFY' :
 				require_once __DIR__ . '/../../class/riskanalysis/risk.class.php';
 				$risk = new Risk($this->db);
-				$risk->fetch($object->fk_risk);
+				$risk->fetch((int)$object->fk_risk);
 
 				$actioncomm->elementtype = 'digiriskelement@digiriskdolibarr';
 
@@ -780,7 +788,7 @@ class InterfaceDigiriskdolibarrTriggers extends DolibarrTriggers
 			case 'RISKASSESSMENT_DELETE' :
 				require_once __DIR__ . '/../../class/riskanalysis/risk.class.php';
 				$risk = new Risk($this->db);
-				$risk->fetch($object->fk_risk);
+				$risk->fetch((int)$object->fk_risk);
 
 				$actioncomm->elementtype = 'digiriskelement@digiriskdolibarr';
 
@@ -894,10 +902,10 @@ class InterfaceDigiriskdolibarrTriggers extends DolibarrTriggers
 
 		}
 
-		if ($result < 0) {
-			$object->errors = array_merge($object->error, $actioncomm->errors);
-			return $result;
-		}
+//		if ($result < 0) {
+//			$object->errors = array_merge($object->error, $actioncomm->errors);
+//			return $result;
+//		}
 		return 0;
 	}
 }

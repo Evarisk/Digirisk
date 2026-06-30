@@ -104,6 +104,9 @@ class AllTests
 		require_once dirname(__FILE__) . '/AccidentUnitTest.php';
 		$suite->addTestSuite('AccidentUnitTest');
 
+		require_once dirname(__FILE__) . '/MeteoVigilanceUnitTest.php';
+		$suite->addTestSuite('MeteoVigilanceUnitTest');
+
 		return $suite;
 	}
 }

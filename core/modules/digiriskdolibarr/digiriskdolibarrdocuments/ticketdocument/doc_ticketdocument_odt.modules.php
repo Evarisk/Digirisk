@@ -32,7 +32,7 @@ require_once __DIR__ . '/../../../../../class/digiriskelement.class.php';
 // Load Saturne libraries
 require_once __DIR__ . '/../../../../../../saturne/lib/medias.lib.php';
 require_once __DIR__ . '/../../../../../../saturne/core/modules/saturne/modules_saturne.php';
-
+require_once __DIR__ . '/../../../../../../saturne/class/saturnesignature.class.php';
 /**
  *	Class to build documents using ODF templates generator
  */
@@ -138,7 +138,7 @@ class doc_ticketdocument_odt extends SaturneDocumentModel
      */
     public function write_file(SaturneDocuments $objectDocument, Translate $outputLangs, string $srcTemplatePath, int $hideDetails = 0, int $hideDesc = 0, int $hideRef = 0, array $moreParam): int
     {
-        global $conf;
+        global $conf, $langs;
 
         $object = $moreParam['object'];
 
@@ -210,6 +210,23 @@ class doc_ticketdocument_odt extends SaturneDocumentModel
             }
         } else {
             $tmpArray['contacts'] = '';
+        }
+
+        $signatory   = new SaturneSignature($this->db);
+        $signatories = $signatory->fetchSignatory('Attendant', $object->id, $object->element);
+
+        if (!empty($signatories) && is_array($signatories)) {
+            $tempDir = $conf->digiriskdolibarr->multidir_output[$object->entity ?? 1] . '/temp/';
+
+            $signature = current($signatories);
+
+             $encodedImage = explode(',', $signature->signature)[1];
+            $decodedImage = base64_decode($encodedImage);
+            file_put_contents($tempDir . 'signature.png', $decodedImage);
+
+            $tmpArray['signature'] = $tempDir . 'signature.png';
+        } else {
+            $tmpArray['signature'] = $langs->trans('NoSignature');
         }
 
         $moreParam['tmparray']         = $tmpArray;

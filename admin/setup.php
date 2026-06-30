@@ -186,6 +186,17 @@ print '<td class="center">';
 print ajax_constantonoff('DIGIRISKDOLIBARR_MANUAL_INPUT_NB_WORKED_HOURS');
 print '</td>';
 print '</tr>';
+
+// Show patch note again on module home page
+print '<tr class="oddeven"><td>';
+print  $langs->trans("ShowPatchNoteAgain");
+print '</td><td>';
+print $langs->trans('ShowPatchNoteAgainDescription');
+print '</td>';
+print '<td class="center">';
+print ajax_constantonoff('DIGIRISKDOLIBARR_SHOW_PATCH_NOTE');
+print '</td>';
+print '</tr>';
 print '</table>';
 
 print load_fiche_titre($langs->trans("MediaData"), '', '');

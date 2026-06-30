@@ -1,0 +1,17 @@
+---
+name: Release
+
+on:
+    push:
+      tags:
+        - '[0-9]*.*.*'
+
+jobs:
+    release:
+      uses: Evarisk/Saturne/.github/workflows/release.yml@main
+      with:
+        tag: ${{ github.ref_name }}
+        module: digiriskdolibarr
+
+      permissions:
+        contents: write

@@ -1,4 +1,5 @@
 <?php
+
 if ( ! $error && $action == 'add' && $permissiontoadd) {
 	$data = json_decode(file_get_contents('php://input'), true);
 
@@ -379,12 +380,12 @@ if ( ! $error && $action == "deleteEvaluation" && $permissiontodelete) {
 if ( ! $error && $action == 'addRiskAssessmentTask' && $permissiontoadd) {
 	$data = json_decode(file_get_contents('php://input'), true);
 
-	$riskID    = $data['riskToAssign'];
-	$tasktitle = $data['tasktitle'];
-    $dateStart = dol_stringtotime($data['dateStart']);
-    $dateEnd   = dol_stringtotime($data['dateEnd']);
-	$budget    = $data['budget'];
-
+	$riskID        = $data['riskToAssign'];
+	$tasktitle     = $data['tasktitle'];
+    $dateStart     = dol_stringtotime($data['dateStart']);
+    $dateEnd       = dol_stringtotime($data['dateEnd']);
+	$budget        = $data['budget'];
+    $executiveUser = $data['executiveId'];
 	$extrafields->fetch_name_optionals_label($task->table_element);
 
 	$task->ref        = $refTaskMod->getNextValue('', $task);
@@ -404,6 +405,7 @@ if ( ! $error && $action == 'addRiskAssessmentTask' && $permissiontoadd) {
 	$task->array_options['options_fk_risk'] = $riskID;
 
 	$result = $task->create($user, true);
+    $task->add_contact($executiveUser, 'TASKEXECUTIVE', 'internal');
 
 	if ($result > 0) {
 		if (!empty($conf->global->DIGIRISKDOLIBARR_MAIN_AGENDA_ACTIONAUTO_TASK_CREATE)) $task->call_trigger('TASK_CREATE', $user);
@@ -428,6 +430,7 @@ if ( ! $error && $action == 'saveRiskAssessmentTask' && $permissiontoadd) {
     $dateEnd              = dol_stringtotime($data['dateEnd']);
 	$budget               = $data['budget'];
 	$taskProgress         = $data['taskProgress'];
+	$executiveUser        = $data['executiveId'];
 
 	$task->fetch($riskAssessmentTaskID);
 
@@ -450,6 +453,18 @@ if ( ! $error && $action == 'saveRiskAssessmentTask' && $permissiontoadd) {
 	}
 
 	$result = $task->update($user, empty($conf->global->DIGIRISKDOLIBARR_MAIN_AGENDA_ACTIONAUTO_TASK_MODIFY));
+
+	if ($result > 0 && isset($executiveUser)) {
+		$existingContacts = $task->liste_contact(-1, 'internal', 0, 'TASKEXECUTIVE');
+		if (!empty($existingContacts)) {
+			foreach ($existingContacts as $contact) {
+				$task->delete_contact($contact['rowid']);
+			}
+		}
+		if (!empty($executiveUser)) {
+			$task->add_contact($executiveUser, 'TASKEXECUTIVE', 'internal');
+		}
+	}
 
 	if ($result > 0) {
 		// Update task OK

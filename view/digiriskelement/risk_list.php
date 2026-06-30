@@ -64,18 +64,24 @@ $id          = GETPOST('id', 'int');
 $action      = GETPOST('action', 'aZ09');
 $subaction   = GETPOST('subaction', 'aZ09');
 $massaction  = GETPOST('massaction', 'alpha'); // The bulk action (combo box choice into lists)
-$confirm     = GETPOST('confirm', 'alpha');
 $cancel      = GETPOST('cancel', 'aZ09');
-$contextpage = GETPOST('contextpage', 'aZ') ? GETPOST('contextpage', 'aZ') : 'risklist'; // To manage different context of search
 $backtopage  = GETPOST('backtopage', 'alpha');
-$toselect    = GETPOST('toselect', 'array'); // Array of ids of elements selected into a list
 $limit       = GETPOST('limit', 'int') ? GETPOST('limit', 'int') : $conf->liste_limit;
 $sortfield   = GETPOST('sortfield', 'alpha');
 $sortorder   = GETPOST('sortorder', 'alpha');
-$riskType    = GETPOSTISSET('type') ? GETPOST('type') : 'risk';
+$riskType    = GETPOSTISSET('risk_type') ? GETPOST('risk_type') : 'risk';
 $page        = GETPOSTISSET('pageplusone') ? (GETPOST('pageplusone') - 1) : GETPOST("page", 'int');
 $page        = is_numeric($page) ? $page : 0;
 $page        = $page == -1 ? 0 : $page;
+
+// Get list parameters
+$toselect                                   = [];
+[$confirm, $contextpage, $optioncss, $mode] = ['', '', '', ''];
+$listParameters                             = saturne_load_list_parameters(basename(dirname(__FILE__)));
+foreach ($listParameters as $listParameterKey => $listParameter) {
+    $$listParameterKey = $listParameter;
+}
+
 if (isModEnabled('categorie')) {
     $search_category_array = GETPOST('search_category_risk_list', 'array');
 }
@@ -120,7 +126,7 @@ $pagenext = $page + 1;
 $search_all = GETPOST('search_all', 'alphanohtml') ? trim(GETPOST('search_all', 'alphanohtml')) : trim(GETPOST('sall', 'alphanohtml'));
 $search     = array();
 foreach ($risk->fields as $key => $val) {
-	if (GETPOST('search_' . $key, 'alpha') !== '') $search[$key] = GETPOST('search_' . $key, 'alpha');
+	$search[$key] = (GETPOST('search_' . $key, 'alpha') !== '') ? GETPOST('search_' . $key, 'alpha') : '';
 	if ($key == 'fk_element' && $contextpage == 'sharedrisk') {
 		$search[$key] = GETPOST('search_' . $key . '_sharedrisk', 'alpha');
 	}
@@ -132,31 +138,30 @@ foreach ($risk->fields as $key => $val) {
 	if (!empty($val['searchall'])) $fieldstosearchall['r.' . $key] = $val['label'];
 }
 
-// Definition of fields for list
+// Definition of array of fields for columns
 $arrayfields = array();
 foreach ($risk->fields as $key => $val) {
-	// If $val['visible']==0, then we never show the field
     if (!empty($val['visible'])) {
-        $visible = (int) dol_eval($val['visible'], 1);
+        $visible = (int) dol_eval($val['visible']);
         $arrayfields['r.' . $key] = [
-            'label'       => $val['label'],
-            'checked'     => (($visible < 0) ? 0 : 1),
-            'enabled'     => ($visible != 3 && dol_eval($val['enabled'], 1)),
-            'position'    => $val['position'],
-            'help'        => $val['help']
+            'label'    => $val['label'],
+            'checked'  => (($visible < 0 || (!isset($val['showinpwa']) && $mode == 'pwa')) ? 0 : 1),
+            'enabled'  => ($visible != 3 && dol_eval($val['enabled'])),
+            'position' => $val['position'],
+            'help'     => $val['help'] ?? '',
         ];
     }
 }
+
 foreach ($evaluation->fields as $key => $val) {
-	// If $val['visible']==0, then we never show the field
     if (!empty($val['visible'])) {
-        $visible = (int) dol_eval($val['visible'], 1);
+        $visible = (int) dol_eval($val['visible']);
         $arrayfields['evaluation.' . $key] = [
-            'label'       => $val['label'],
-            'checked'     => (($visible < 0) ? 0 : 1),
-            'enabled'     => ($visible != 3 && dol_eval($val['enabled'], 1)),
-            'position'    => $val['position'],
-            'help'        => $val['help']
+            'label'    => $val['label'],
+            'checked'  => (($visible < 0 || (!isset($val['showinpwa']) && $mode == 'pwa')) ? 0 : 1),
+            'enabled'  => ($visible != 3 && dol_eval($val['enabled'])),
+            'position' => $val['position'],
+            'help'     => $val['help'] ?? '',
         ];
     }
 }
@@ -172,9 +177,16 @@ $arrayfields = dol_sort_array($arrayfields, 'position');
 include DOL_DOCUMENT_ROOT . '/core/actions_fetchobject.inc.php'; // Must be include, not include_once.
 
 //Permission for digiriskelement_risk
-$permissiontoread   = $user->rights->digiriskdolibarr->risk->read;
-$permissiontoadd    = $user->rights->digiriskdolibarr->risk->write;
-$permissiontodelete = $user->rights->digiriskdolibarr->risk->delete;
+
+if ($riskType == 'risk') {
+    $permissiontoread   = $user->rights->digiriskdolibarr->risk->read;
+    $permissiontoadd    = $user->rights->digiriskdolibarr->risk->write;
+    $permissiontodelete = $user->rights->digiriskdolibarr->risk->delete;
+} elseif ($riskType == 'riskenvironmental') {
+    $permissiontoread   = $user->rights->digiriskdolibarr->riskenvironmental->read;
+    $permissiontoadd    = $user->rights->digiriskdolibarr->riskenvironmental->write;
+    $permissiontodelete = $user->rights->digiriskdolibarr->riskenvironmental->delete;
+}
 
 // Security check
 saturne_check_access($permissiontoread);
@@ -212,7 +224,7 @@ if (empty($reshook)) {
 
 	$error = 0;
 
-	$backtopage = dol_buildpath('/digiriskdolibarr/view/digiriskelement/risk_list.php?type=' . $riskType, 1);
+	$backtopage = dol_buildpath('/digiriskdolibarr/view/digiriskelement/risk_list.php?risk_type=' . $riskType, 1);
 
 	require_once './../../core/tpl/riskanalysis/risk/digiriskdolibarr_risk_actions.tpl.php';
 }

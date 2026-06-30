@@ -55,14 +55,9 @@ class DigiriskResources extends SaturneObject
 	public $ismultientitymanaged = 1;
 
 	/**
-	 * @var int Does object support extrafields ? 0 = No, 1 = Yes.
-	 */
-	public $isextrafieldmanaged = 1;
-
-	/**
 	 * @var string String with name of icon for digiriskresources. Must be the part after the 'object_' into object_digiriskresources.png
 	 */
-	public $picto = 'digiriskresources@digiriskdolibarr';
+	public string $picto = 'digiriskresources@digiriskdolibarr';
 
 	/**
 	 * @var array  Array with all fields and their property. Do not use it as a static var. It may be modified by constructor.
@@ -96,7 +91,7 @@ class DigiriskResources extends SaturneObject
 	/**
 	 * Constructor
 	 *
-	 * @param DoliDb $db Database handler
+	 * @param DoliDB $db Database handler
 	 */
 	public function __construct(DoliDB $db)
 	{
@@ -106,7 +101,7 @@ class DigiriskResources extends SaturneObject
 	/**
 	 * Set resources in database
 	 *
-	 * @param DoliDb $db
+	 * @param DoliDB $db
 	 * @param $user_creat
 	 * @param string $ref name of resource
 	 * @param string $element_type type of resource

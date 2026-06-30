@@ -1,0 +1,2313 @@
+// Reworked ticket card (issue #4443) — hero header + 2-col sections + tap-to-edit fields.
+// Coexists with the standard Dolibarr card via the "Détails complets" link.
+
+$tile-radius:      14px;
+$tile-shadow:      0 2px 6px rgba(0, 0, 0, 0.06);
+$tile-shadow-hov:  0 8px 24px rgba(0, 0, 0, 0.12);
+$tac-blue:         #0d8aff;
+$tac-green:        #22bf4e;
+$tac-orange:       #e9ad4f;
+$tac-purple:       #7a5cf0;
+$tac-red:          #e05353;
+$tac-grey:         #6b7280;
+$tac-bg:           #f9fafb;
+$tac-border:       #e5e7eb;
+
+// ---------------------------------------------------------------------------
+// Picker view (unchanged).
+// ---------------------------------------------------------------------------
+.ticket-action-picker {
+    margin: 1em 0;
+
+    &-toolbar {
+        display: flex;
+        gap: 8px;
+        margin-bottom: 10px;
+
+        &__btn {
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+            padding: 6px 12px;
+            border: 1px solid $tac-border;
+            border-radius: 999px;
+            color: $tac-grey;
+            text-decoration: none;
+            font-size: 0.9em;
+            transition: background 0.15s ease, color 0.15s ease, border-color 0.15s ease;
+
+            &:hover { background: rgba(13,138,255,0.06); color: $tac-blue; border-color: $tac-blue; }
+
+            &.is-active {
+                background: $tac-blue;
+                color: #fff;
+                border-color: $tac-blue;
+            }
+
+            i { font-size: 0.95em; }
+        }
+    }
+
+    &-grid {
+        display: grid;
+        grid-template-columns: repeat(auto-fill, minmax(260px, 1fr));
+        gap: 12px;
+        margin-top: 1em;
+    }
+
+    &-item {
+        position: relative;
+        display: block;
+        padding: 14px 16px;
+        background: #fff;
+        border: 1px solid $tac-border;
+        border-radius: 10px;
+        box-shadow: $tile-shadow;
+        text-decoration: none;
+        color: inherit;
+        transition: transform 0.18s ease, box-shadow 0.18s ease, border-color 0.18s ease;
+
+        &:hover {
+            transform: translateY(-2px);
+            box-shadow: $tile-shadow-hov;
+            border-color: $tac-blue;
+        }
+
+        &__ref       { font-weight: 700; color: $tac-blue; font-size: 1.05em; }
+        &__subject   { margin-top: 4px; color: #1f2937; line-height: 1.35; }
+        &__status    { margin-top: 8px; }
+
+        &__star {
+            position: absolute;
+            top: 10px;
+            right: 12px;
+            color: $tac-orange;
+            font-size: 0.92em;
+        }
+
+        &--watched {
+            border-color: rgba(233,173,79,0.5);
+            background: linear-gradient(135deg, rgba(233,173,79,0.04) 0%, #fff 60%);
+        }
+    }
+}
+
+// ---------------------------------------------------------------------------
+// Reworked card.
+// ---------------------------------------------------------------------------
+.ticket-action-card.tac-card {
+    max-width: 1280px;
+    margin: 1em auto 6em auto; // bottom margin for the sticky bar
+    background: #fff;
+    border-radius: 12px;
+    border-left: 6px solid $tac-border;
+    box-shadow: $tile-shadow;
+    overflow: hidden;
+    transition: border-color 0.2s ease;
+
+    // Severity tint on the left rail + ref colour, so urgency is also visible from the title.
+    &.tac-severity-low      { border-left-color: #6b7280; }
+    &.tac-severity-normal   { border-left-color: $tac-blue; }
+    &.tac-severity-high     {
+        border-left-color: $tac-orange;
+        .tac-hero__ref { color: $tac-orange; }
+    }
+    &.tac-severity-blocking {
+        border-left-color: $tac-red;
+        box-shadow: 0 2px 6px rgba(224,83,83,0.18);
+        .tac-hero__ref { color: $tac-red; }
+    }
+}
+
+// Severity chip in the hero (HIGH / BLOCKING only).
+.tac-chip--severity {
+    font-weight: 600;
+    letter-spacing: 0.04em;
+    border-style: solid;
+
+    &-orange { color: $tac-orange; border-color: $tac-orange; background: rgba(233,173,79,0.10); }
+    &-red    { color: $tac-red;    border-color: $tac-red;    background: rgba(224,83,83,0.10); }
+}
+
+// ----- Hero -----
+.tac-hero {
+    background: linear-gradient(135deg, #f9fafb 0%, #ffffff 100%);
+    padding: 16px 24px 0 24px;
+    border-bottom: 1px solid $tac-border;
+
+    &__top {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        font-size: 0.9em;
+        margin-bottom: 12px;
+
+        a {
+            color: $tac-grey;
+            text-decoration: none;
+            &:hover { color: $tac-blue; }
+        }
+    }
+
+    &__main { margin-bottom: 14px; }
+    &__ref  { font-size: 1.5em; font-weight: 700; color: $tac-blue; }
+    &__subject {
+        font-size: 1.15em;
+        color: #1f2937;
+        margin-top: 4px;
+        line-height: 1.35;
+        cursor: text;
+        padding: 2px 4px;
+        border-radius: 4px;
+        transition: background 0.15s ease;
+        &:hover { background: rgba(13,138,255,0.06); }
+    }
+
+    &__chips {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 8px 12px;
+        margin-bottom: 12px;
+    }
+
+    &__nav-tabs {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 4px 8px;
+        margin: 0 -8px;
+        border-top: 1px solid $tac-border;
+        padding-top: 10px;
+    }
+
+    &__nav-tab {
+        padding: 6px 12px;
+        font-size: 0.9em;
+        color: $tac-grey;
+        text-decoration: none;
+        border-radius: 6px 6px 0 0;
+
+        &:hover { background: rgba(13,138,255,0.08); color: $tac-blue; }
+    }
+}
+
+// ----- Watch / bookmark button (star icon in the hero) -----
+.tac-hero__watch {
+    appearance: none;
+    background: transparent;
+    border: 1px solid $tac-border;
+    border-radius: 6px;
+    padding: 4px 10px;
+    cursor: pointer;
+    color: $tac-grey;
+    font-family: inherit;
+    font-size: 0.95em;
+    transition: color 0.15s ease, background 0.15s ease, border-color 0.15s ease;
+
+    &:hover { color: $tac-orange; border-color: $tac-orange; background: rgba(233,173,79,0.08); }
+
+    &.is-watched {
+        color: $tac-orange;
+        border-color: $tac-orange;
+        background: rgba(233,173,79,0.08);
+    }
+}
+
+// ----- Upload progress bar + actions row -----
+.tac-upload-bar {
+    margin-top: 6px;
+    height: 6px;
+    background: rgba(13,138,255,0.1);
+    border-radius: 3px;
+    overflow: hidden;
+
+    &__fill {
+        display: block;
+        height: 100%;
+        background: $tac-blue;
+        transition: width 0.2s ease;
+    }
+}
+.tac-upload-label { font-size: 0.92em; }
+
+.tac-files-actions {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    margin-top: 8px;
+
+    &__hint {
+        font-size: 0.8em;
+    }
+
+    button[data-pick-file] {
+        appearance: none;
+        background: transparent;
+        border: 1px dashed $tac-border;
+        border-radius: 6px;
+        padding: 4px 12px;
+        cursor: pointer;
+        color: $tac-blue;
+        font-family: inherit;
+        font-size: 0.88em;
+
+        &:hover { background: rgba(13,138,255,0.06); border-color: $tac-blue; }
+    }
+}
+
+// ----- Drag & drop overlay -----
+.tac-card.tac-dragover {
+    position: relative;
+
+    &::after {
+        content: 'Déposez ici pour joindre au ticket';
+        position: absolute;
+        inset: 0;
+        background: rgba(13,138,255,0.12);
+        border: 3px dashed $tac-blue;
+        border-radius: 12px;
+        z-index: 500;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        color: $tac-blue;
+        font-weight: 600;
+        font-size: 1.2em;
+        pointer-events: none;
+    }
+}
+
+// ----- Status timeline as horizontal pills with delta connectors -----
+// No absolute positioning. Pills wrap naturally if the container is narrow.
+.tac-timeline {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    gap: 6px 8px;
+    margin: 8px 0 12px;
+    font-size: 0.78em;
+
+    &__step {
+        display: inline-flex;
+        align-items: center;
+        padding: 3px 10px;
+        border-radius: 999px;
+        background: rgba(13,138,255,0.08);
+        color: $tac-blue;
+        white-space: nowrap;
+        cursor: help;
+
+        &--current {
+            background: rgba(233,173,79,0.16);
+            color: darken($tac-orange, 12%);
+            font-weight: 600;
+            box-shadow: 0 0 0 2px rgba(233,173,79,0.18);
+            animation: tac-timeline-pulse 1.6s ease-in-out infinite;
+        }
+    }
+
+    &__delta {
+        display: inline-flex;
+        align-items: center;
+        gap: 3px;
+        color: $tac-grey;
+        font-style: italic;
+        font-size: 0.92em;
+
+        i { font-size: 0.95em; }
+    }
+}
+
+@keyframes tac-timeline-pulse {
+    0%, 100% { box-shadow: 0 0 0 2px rgba(233,173,79,0.18); }
+    50%      { box-shadow: 0 0 0 4px rgba(233,173,79,0.06); }
+}
+
+// ----- Chips (status / assignee / progress / dates) -----
+.tac-chip {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    padding: 6px 12px;
+    background: #fff;
+    border: 1px solid $tac-border;
+    border-radius: 999px;
+    font-size: 0.92em;
+    font-weight: 500;
+    cursor: pointer;
+    transition: border-color 0.15s ease, box-shadow 0.15s ease, background 0.15s ease;
+
+    &:hover { border-color: $tac-blue; box-shadow: $tile-shadow; }
+
+    i { color: $tac-grey; }
+
+    &--readonly {
+        cursor: default;
+        background: transparent;
+        border-style: dashed;
+        &:hover { border-color: $tac-border; box-shadow: none; }
+    }
+}
+
+// ----- Body grid (4 sub-columns + dense packing) -----
+// width-half = span 1 (25% body) → enables two half-width boxes side by side in what used to be a "column".
+// width-full = span 2 (50% body) → matches the historical default of 1 box per column.
+// width-span = span 4 (100% body) → full hero-width banner.
+.tac-body {
+    display: grid;
+    grid-template-columns: repeat(4, 1fr);
+    grid-auto-flow: dense;
+    align-items: start;
+    gap: 16px 20px;
+    padding: 20px 24px;
+
+    @media (max-width: 1024px) {
+        grid-template-columns: repeat(2, 1fr);
+    }
+    @media (max-width: 640px) {
+        grid-template-columns: 1fr;
+    }
+}
+
+// ----- Section card -----
+.tac-section {
+    background: $tac-bg;
+    border: 1px solid $tac-border;
+    border-radius: 10px;
+    padding: 14px 16px;
+    position: relative;
+    transition: opacity 0.18s ease, border-color 0.18s ease;
+
+    &__title {
+        margin: 0 0 10px 0;
+        font-size: 0.78em;
+        font-weight: 700;
+        letter-spacing: 0.04em;
+        text-transform: uppercase;
+        color: $tac-grey;
+
+        i { margin-right: 6px; color: $tac-blue; }
+    }
+
+    &__edit-link {
+        display: inline-flex;
+        align-items: center;
+        gap: 4px;
+        margin-top: 10px;
+        font-size: 0.85em;
+        color: $tac-grey;
+        text-decoration: none;
+        &:hover { color: $tac-blue; }
+    }
+
+    // Controls (drag handle, width buttons, hide/show) — only shown in edit mode.
+    &__controls {
+        display: none;
+        position: absolute;
+        top: 8px;
+        right: 8px;
+        gap: 2px;
+        background: rgba(255,255,255,0.95);
+        border: 1px solid $tac-border;
+        border-radius: 6px;
+        padding: 2px 4px;
+        box-shadow: $tile-shadow;
+        z-index: 5;
+    }
+
+    &__drag {
+        cursor: grab;
+        padding: 4px 6px;
+        color: $tac-grey;
+        display: inline-flex;
+        align-items: center;
+        &:active { cursor: grabbing; }
+    }
+
+    &__width-btn,
+    &__hide-btn,
+    &__show-btn {
+        appearance: none;
+        background: transparent;
+        border: 1px solid transparent;
+        border-radius: 4px;
+        padding: 4px 6px;
+        cursor: pointer;
+        color: $tac-grey;
+        font-size: 0.9em;
+        transition: background 0.15s ease, color 0.15s ease;
+
+        &:hover { background: rgba(13,138,255,0.1); color: $tac-blue; }
+    }
+
+    &__show-btn { display: none; }
+
+    // Hidden state — normal mode collapses it entirely; edit mode shows it dimmed so user can restore.
+    &--hidden {
+        display: none;
+
+        .tac-edit-mode & {
+            display: block;
+            opacity: 0.35;
+            border-style: dashed;
+
+            .tac-section__hide-btn { display: none; }
+            .tac-section__show-btn { display: inline-flex; }
+        }
+    }
+
+    // Width presets — applied against the 4-col body grid.
+    &--width-half { grid-column: span 1; }
+    &--width-full { grid-column: span 2; }
+    &--width-span { grid-column: 1 / -1; }
+
+    // On medium screens (≤1024px) the body collapses to 2 cols, so half ≈ full visually.
+    @media (max-width: 1024px) {
+        &--width-half { grid-column: span 1; }
+        &--width-full { grid-column: span 2; }
+    }
+    // On narrow screens (≤640px) the body is 1 col, all sections stack full width.
+    @media (max-width: 640px) {
+        &--width-half,
+        &--width-full,
+        &--width-span { grid-column: 1 / -1; }
+    }
+}
+
+// ---- Edit mode ----
+.tac-edit-mode {
+    .tac-section {
+        border: 1px dashed $tac-blue;
+        background: rgba(13,138,255,0.04);
+    }
+    .tac-section__controls {
+        display: flex;
+    }
+    .tac-section__drag {
+        color: $tac-blue;
+    }
+    // Show a clear visual hint where to drop the dragged section.
+    .tac-section-placeholder {
+        background: rgba(13,138,255,0.12);
+        border: 2px dashed $tac-blue;
+        border-radius: 10px;
+        height: 80px;
+        margin-bottom: 14px;
+    }
+}
+
+// "Personnaliser" toggle button in the hero.
+.tac-hero__top-right {
+    display: inline-flex;
+    align-items: center;
+    gap: 12px;
+}
+// ----- Density / TagsMode / ActionsMode toolbar in the hero (button groups) -----
+.tac-hero__density,
+.tac-hero__tagsmode,
+.tac-hero__actionsmode {
+    display: inline-flex;
+    border: 1px solid $tac-border;
+    border-radius: 6px;
+    overflow: hidden;
+    background: #fff;
+
+    &-btn {
+        appearance: none;
+        background: transparent;
+        border: none;
+        border-right: 1px solid $tac-border;
+        padding: 4px 10px;
+        cursor: pointer;
+        color: $tac-grey;
+        font-family: inherit;
+        font-size: 0.85em;
+        transition: background 0.15s ease, color 0.15s ease;
+
+        &:last-child { border-right: none; }
+        &:hover { background: rgba(13,138,255,0.08); color: $tac-blue; }
+
+        &.is-active {
+            background: $tac-blue;
+            color: #fff;
+            &:hover { background: darken($tac-blue, 5%); color: #fff; }
+        }
+    }
+}
+
+.tac-hero__customize,
+.tac-hero__reset {
+    appearance: none;
+    background: transparent;
+    border: 1px solid $tac-border;
+    border-radius: 6px;
+    padding: 4px 10px;
+    cursor: pointer;
+    color: $tac-grey;
+    font-family: inherit;
+    font-size: 0.85em;
+    display: inline-flex;
+    align-items: center;
+    gap: 4px;
+    transition: background 0.15s ease, color 0.15s ease, border-color 0.15s ease;
+
+    &:hover { background: rgba(13,138,255,0.08); color: $tac-blue; border-color: $tac-blue; }
+}
+
+.tac-hero__customize--active {
+    background: $tac-blue;
+    color: #fff;
+    border-color: $tac-blue;
+    &:hover { background: darken($tac-blue, 5%); color: #fff; }
+}
+
+// Reset button and density/tagsmode/actionsmode toolbars are only shown while the edit mode is active.
+.tac-hero__reset,
+.tac-hero__density,
+.tac-hero__tagsmode,
+.tac-hero__actionsmode { display: none; }
+.tac-edit-mode .tac-hero__reset {
+    display: inline-flex;
+    color: $tac-red;
+    border-color: $tac-red;
+    &:hover { background: rgba(224,83,83,0.08); color: $tac-red; border-color: $tac-red; }
+}
+.tac-edit-mode .tac-hero__density,
+.tac-edit-mode .tac-hero__tagsmode,
+.tac-edit-mode .tac-hero__actionsmode { display: inline-flex; }
+
+// ----- Kebab menu (⋮) — used when actionsMode === 'menu' -----
+.tac-sticky-bar--menu { justify-content: flex-end; }
+
+.tac-kebab {
+    position: relative;
+
+    &__trigger {
+        appearance: none;
+        background: #fff;
+        border: 1px solid $tac-border;
+        border-radius: 8px;
+        width: 40px;
+        height: 40px;
+        cursor: pointer;
+        color: $tac-grey;
+        font-size: 1.1em;
+        transition: background 0.15s ease, color 0.15s ease, border-color 0.15s ease;
+
+        &:hover { background: rgba(13,138,255,0.08); color: $tac-blue; border-color: $tac-blue; }
+    }
+
+    &__menu {
+        position: absolute;
+        bottom: calc(100% + 8px);
+        right: 0;
+        min-width: 240px;
+        background: #fff;
+        border: 1px solid $tac-border;
+        border-radius: 10px;
+        box-shadow: 0 8px 24px rgba(0,0,0,0.12);
+        padding: 6px;
+        display: none;
+        z-index: 100;
+    }
+
+    &.is-open .tac-kebab__menu { display: block; }
+    &.is-open .tac-kebab__trigger {
+        background: $tac-blue;
+        color: #fff;
+        border-color: $tac-blue;
+    }
+
+    &__item {
+        appearance: none;
+        display: flex;
+        align-items: center;
+        gap: 10px;
+        width: 100%;
+        padding: 8px 12px;
+        border: none;
+        background: transparent;
+        text-align: left;
+        text-decoration: none;
+        color: #1f2937;
+        font-family: inherit;
+        font-size: 0.95em;
+        border-radius: 6px;
+        cursor: pointer;
+        transition: background 0.12s ease;
+
+        i { width: 18px; text-align: center; }
+
+        &:hover { background: rgba(13,138,255,0.08); }
+
+        &.is-disabled,
+        &[disabled] { opacity: 0.4; pointer-events: none; }
+
+        &--green   { color: $tac-green; }
+        &--orange  { color: $tac-orange; }
+        &--red     { color: $tac-red; }
+        &--neutral { color: #1f2937; }
+    }
+
+    &__sep {
+        border: none;
+        border-top: 1px solid $tac-border;
+        margin: 6px 4px;
+    }
+}
+
+// ---------------------------------------------------------------------------
+// Density variants — adjust padding / gap / font-size on the card.
+// Default styles target "cozy" (matches the original look), with overrides for compact + spacious.
+// ---------------------------------------------------------------------------
+.tac-density-compact {
+    .tac-body         { gap: 6px 8px; padding: 8px 12px; }
+    .tac-section      { padding: 6px 8px; border-radius: 8px; }
+    .tac-section__title { font-size: 0.7em; margin-bottom: 4px; }
+    .tac-grid         { gap: 2px 8px; }
+    .tac-field        { padding: 2px 6px; min-height: 0; }
+    .tac-field__label { font-size: 0.66em; margin-bottom: 0; }
+    .tac-field__value { font-size: 0.86em; line-height: 1.2; min-height: 0; }
+    .tac-hero         { padding: 8px 16px 0; }
+    .tac-hero__ref    { font-size: 1.2em; }
+    .tac-hero__subject{ font-size: 0.95em; }
+    .tac-chip         { padding: 2px 8px; font-size: 0.82em; }
+    .tac-list__item   { padding: 2px 0; }
+    .tac-list--events .tac-list__item { padding: 3px 0; }
+    .tac-rich-text    { padding: 5px 8px; min-height: 32px; max-height: 120px; }
+    .tac-tag          { padding: 2px 8px; font-size: 0.78em; }
+    .tac-thread       { gap: 8px; max-height: 420px; }
+    .tac-thread__bubble { padding: 6px 10px; }
+    .tac-thread__reply  { padding: 6px; }
+}
+
+.tac-density-spacious {
+    .tac-body         { gap: 24px 28px; padding: 28px 32px; }
+    .tac-section      { padding: 20px 22px; border-radius: 12px; }
+    .tac-section__title { font-size: 0.85em; margin-bottom: 14px; letter-spacing: 0.05em; }
+    .tac-grid         { gap: 12px 18px; }
+    .tac-field        { padding: 10px 12px; min-height: 56px; }
+    .tac-field__label { font-size: 0.78em; margin-bottom: 4px; }
+    .tac-field__value { font-size: 1.02em; line-height: 1.5; }
+    .tac-hero         { padding: 22px 32px 0; }
+    .tac-hero__ref    { font-size: 1.7em; }
+    .tac-hero__subject{ font-size: 1.25em; }
+    .tac-chip         { padding: 8px 14px; font-size: 1em; }
+    .tac-list__item   { padding: 8px 0; }
+    .tac-rich-text    { padding: 12px 14px; min-height: 80px; max-height: 260px; }
+    .tac-tag          { padding: 6px 12px; font-size: 0.92em; }
+}
+
+// ----- Tap-to-edit field grid -----
+.tac-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 8px 12px;
+
+    &--single { grid-template-columns: 1fr; }
+
+    @media (max-width: 640px) { grid-template-columns: 1fr; }
+}
+
+.tac-field {
+    background: #fff;
+    border: 1px solid transparent;
+    border-radius: 6px;
+    padding: 6px 8px;
+    cursor: pointer;
+    transition: background 0.15s ease, border-color 0.15s ease;
+    min-height: 44px;
+
+    &:hover {
+        border-color: $tac-blue;
+        background: rgba(13,138,255,0.04);
+    }
+
+    &__label {
+        font-size: 0.72em;
+        color: $tac-grey;
+        text-transform: uppercase;
+        letter-spacing: 0.04em;
+        font-weight: 600;
+        margin-bottom: 2px;
+    }
+
+    &__value {
+        color: #1f2937;
+        line-height: 1.4;
+        min-height: 18px;
+        word-break: break-word;
+    }
+
+    &__empty { color: #cbd5e1; }
+
+    &--readonly {
+        cursor: default;
+        &:hover { background: transparent; border-color: transparent; }
+    }
+
+    &--longtext {
+        grid-column: 1 / -1;
+        .tac-field__value { white-space: pre-wrap; }
+    }
+}
+
+// ----- Edit mode -----
+.tac-edit-input,
+.tac-edit-textarea {
+    width: 100%;
+    padding: 6px 8px;
+    border: 1px solid $tac-blue;
+    border-radius: 6px;
+    background: #fff;
+    font-size: 0.95em;
+    font-family: inherit;
+    outline: none;
+    box-shadow: 0 0 0 3px rgba(13,138,255,0.15);
+}
+
+.tac-edit-input--narrow { max-width: 100px; }
+.tac-edit-textarea     { min-height: 80px; resize: vertical; }
+
+// ----- Searchable combo (custom, replaces Select2 for long lists) -----
+.tac-combo__input {
+    background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='14' height='14' viewBox='0 0 24 24' fill='none' stroke='%236b7280' stroke-width='2.5'%3E%3Ccircle cx='11' cy='11' r='7'/%3E%3Cline x1='21' y1='21' x2='16.65' y2='16.65'/%3E%3C/svg%3E");
+    background-repeat: no-repeat;
+    background-position: right 8px center;
+    padding-right: 28px;
+}
+
+// The list is appended to <body> and positioned with position:fixed via JS, so it
+// escapes the card's overflow:hidden. Keep it above everything on the page.
+.tac-combo__list {
+    list-style: none;
+    margin: 0;
+    padding: 4px;
+    background: #fff;
+    border: 1px solid $tac-border;
+    border-radius: 8px;
+    box-shadow: 0 6px 20px rgba(0, 0, 0, 0.16);
+    max-height: 260px;
+    overflow-y: auto;
+    min-width: 220px;
+    z-index: 100000;
+
+    .tac-combo__opt {
+        padding: 7px 10px;
+        border-radius: 5px;
+        cursor: pointer;
+        font-size: 0.92em;
+        color: #1f2937;
+        white-space: nowrap;
+        overflow: hidden;
+        text-overflow: ellipsis;
+
+        &:hover,
+        &.is-active { background: rgba(13, 138, 255, 0.1); }
+        &.is-current {
+            font-weight: 600;
+            color: $tac-blue;
+        }
+    }
+
+    .tac-combo__empty {
+        padding: 8px 10px;
+        color: $tac-grey;
+        font-style: italic;
+        font-size: 0.9em;
+    }
+}
+
+// Floating Save/Cancel pair shown under a CKEditor longtext field.
+.tac-edit-actions {
+    margin-top: 8px;
+    display: flex;
+    gap: 8px;
+
+    &__save,
+    &__cancel {
+        appearance: none;
+        padding: 6px 14px;
+        border-radius: 6px;
+        font-family: inherit;
+        font-size: 0.9em;
+        cursor: pointer;
+        border: 1px solid $tac-border;
+        background: #fff;
+        color: $tac-grey;
+        transition: background 0.15s ease, color 0.15s ease, border-color 0.15s ease;
+
+        &:hover { background: rgba(13,138,255,0.08); color: $tac-blue; border-color: $tac-blue; }
+    }
+
+    &__save {
+        background: $tac-blue;
+        border-color: $tac-blue;
+        color: #fff;
+        &:hover { background: darken($tac-blue, 5%); color: #fff; border-color: darken($tac-blue, 5%); }
+    }
+}
+
+.tac-editing {
+    background: rgba(13,138,255,0.08) !important;
+    border-color: $tac-blue !important;
+}
+
+.tac-saving {
+    position: relative;
+    opacity: 0.7;
+    pointer-events: none;
+    &::after {
+        content: '';
+        position: absolute;
+        top: 50%;
+        right: 8px;
+        width: 14px;
+        height: 14px;
+        margin-top: -7px;
+        border: 2px solid rgba(13,138,255,0.25);
+        border-top-color: $tac-blue;
+        border-radius: 50%;
+        animation: tac-spin 0.7s linear infinite;
+    }
+}
+
+.tac-saved {
+    animation: tac-flash-save 1.2s ease;
+}
+
+@keyframes tac-spin    { to { transform: rotate(360deg); } }
+@keyframes tac-flash-save {
+    0%, 100% { background: transparent; }
+    20%      { background: rgba(34,191,78,0.16); border-color: $tac-green; }
+}
+
+// ----- Inline history badge next to Third party -----
+.tac-soc-history {
+    display: inline-flex;
+    align-items: center;
+    gap: 4px;
+    margin-left: 8px;
+    padding: 1px 8px;
+    border-radius: 999px;
+    background: rgba(13,138,255,0.1);
+    color: $tac-blue;
+    font-size: 0.78em;
+    text-decoration: none;
+    transition: background 0.15s ease;
+
+    &:hover { background: rgba(13,138,255,0.2); color: $tac-blue; }
+    i { font-size: 0.92em; }
+}
+
+// ----- Tags (Classification) -----
+.tac-tags {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 6px;
+}
+.tac-tag {
+    display: inline-flex;
+    align-items: center;
+    gap: 4px;
+    padding: 4px 10px;
+    border-radius: 999px;
+    font-size: 0.85em;
+    color: #1f2937;
+    background: #e5e7eb;
+    font-family: inherit;
+    line-height: 1.2;
+
+    &--empty {
+        background: transparent;
+        color: $tac-grey;
+        font-style: italic;
+    }
+
+    // Remove (×) button — appears on hover on assigned tags.
+    &__remove {
+        appearance: none;
+        background: rgba(0, 0, 0, 0.12);
+        border: none;
+        border-radius: 50%;
+        width: 16px;
+        height: 16px;
+        padding: 0;
+        font-size: 13px;
+        line-height: 1;
+        cursor: pointer;
+        color: #1f2937;
+        margin-left: 2px;
+        opacity: 0;
+        transition: opacity 0.15s ease, background 0.15s ease;
+
+        &:hover { background: rgba(0, 0, 0, 0.25); }
+    }
+
+    &--assigned:hover .tac-tag__remove {
+        opacity: 1;
+    }
+}
+
+// Pool of available (unassigned) tags — rendered below the assigned ones.
+.tac-tags-pool {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 6px;
+    margin-top: 8px;
+    padding-top: 8px;
+    border-top: 1px dashed $tac-border;
+
+    &__label {
+        display: inline-flex;
+        align-items: center;
+        gap: 4px;
+        font-size: 0.78em;
+        color: $tac-grey;
+        text-transform: uppercase;
+        letter-spacing: 0.04em;
+        font-weight: 600;
+        margin-right: 6px;
+    }
+}
+
+// Compact selector mode for the Classification section (alternative to chips pool).
+.tac-tags-selector {
+    margin-top: 8px;
+    padding-top: 8px;
+    border-top: 1px dashed $tac-border;
+
+    &__input {
+        width: 100%;
+        max-width: 320px;
+        padding: 6px 10px;
+        border: 1px solid $tac-border;
+        border-radius: 6px;
+        background: #fff;
+        font-family: inherit;
+        font-size: 0.9em;
+        cursor: pointer;
+
+        &:focus {
+            outline: none;
+            border-color: $tac-blue;
+            box-shadow: 0 0 0 3px rgba(13,138,255,0.15);
+        }
+    }
+}
+
+// Available tag = clickable button. Outlined, becomes solid on hover.
+.tac-tag--available {
+    appearance: none;
+    cursor: pointer;
+    background: #fff;
+    border: 1px dashed $tac-border;
+    color: $tac-grey;
+    transition: background 0.15s ease, color 0.15s ease, border-color 0.15s ease, transform 0.15s ease;
+
+    &:hover {
+        background: rgba(13,138,255,0.08);
+        color: $tac-blue;
+        border-style: solid;
+        border-color: $tac-blue;
+        transform: translateY(-1px);
+    }
+
+    &:active { transform: translateY(0); }
+}
+
+// ----- List (Linked accidents) -----
+.tac-list {
+    list-style: none;
+    padding: 0;
+    margin: 0;
+
+    &__item {
+        padding: 4px 0;
+        &--empty { color: $tac-grey; font-style: italic; }
+    }
+}
+
+// ----- Rich text block (initial message) -----
+.tac-rich-text {
+    padding: 8px 10px;
+    background: #fff;
+    border: 1px solid $tac-border;
+    border-radius: 6px;
+    min-height: 60px;
+    max-height: 200px;
+    overflow-y: auto;
+    line-height: 1.5;
+}
+
+// ----- Sticky action bar (bottom) -----
+.tac-sticky-bar {
+    position: sticky;
+    bottom: 0;
+    left: 0;
+    right: 0;
+    background: #fff;
+    border-top: 1px solid $tac-border;
+    padding: 12px 24px;
+    display: flex;
+    flex-wrap: wrap;
+    gap: 8px;
+    align-items: center;
+    box-shadow: 0 -2px 8px rgba(0,0,0,0.04);
+    z-index: 10;
+
+    &__spacer { flex: 1 1 auto; }
+
+    &__btn {
+        appearance: none;
+        border: 1px solid $tac-border;
+        background: #fff;
+        padding: 8px 16px;
+        border-radius: 8px;
+        font-weight: 600;
+        cursor: pointer;
+        font-family: inherit;
+        font-size: 0.95em;
+        text-decoration: none;
+        display: inline-flex;
+        align-items: center;
+        gap: 6px;
+        transition: background 0.15s ease, border-color 0.15s ease;
+
+        i { font-size: 1.1em; }
+
+        &:hover { box-shadow: $tile-shadow; }
+
+        &[disabled] { opacity: 0.4; cursor: not-allowed; }
+
+        &--neutral { color: $tac-grey;   &:hover { border-color: $tac-blue;   background: rgba(13,138,255,0.06); color: $tac-blue; } }
+        &--green   { color: $tac-green;  &:hover { border-color: $tac-green;  background: rgba(34,191,78,0.08); } }
+        &--orange  { color: $tac-orange; &:hover { border-color: $tac-orange; background: rgba(233,173,79,0.08); } }
+        &--red     { color: $tac-red;    &:hover { border-color: $tac-red;    background: rgba(224,83,83,0.08); } }
+    }
+}
+
+// ----- Linked files compact list -----
+.tac-files-list {
+    list-style: none;
+    padding: 0;
+    margin: 0;
+
+    &__item {
+        display: flex;
+        align-items: center;
+        gap: 8px;
+        padding: 5px 4px;
+        border-bottom: 1px solid $tac-border;
+        font-size: 0.88em;
+
+        &:last-child { border-bottom: none; }
+        &:hover { background: rgba(13,138,255,0.04); }
+    }
+
+    &__icon {
+        position: relative;
+        width: 28px;
+        text-align: center;
+        color: $tac-grey;
+        flex: 0 0 auto;
+
+        i { font-size: 1.3em; }
+
+        .fa-file-pdf   { color: #d35968; }
+        .fa-file-word  { color: #1e6cb5; }
+        .fa-file-excel { color: #22a06b; }
+        .fa-file-powerpoint { color: #d35968; }
+        .fa-file-archive    { color: #b46a2e; }
+    }
+
+    &__ext {
+        position: absolute;
+        bottom: -4px;
+        right: -10px;
+        background: rgba(0,0,0,0.55);
+        color: #fff;
+        font-size: 0.55em;
+        font-weight: 700;
+        letter-spacing: 0.03em;
+        padding: 1px 4px;
+        border-radius: 2px;
+    }
+
+    &__name {
+        flex: 1 1 auto;
+        min-width: 0;
+        overflow: hidden;
+        text-overflow: ellipsis;
+        white-space: nowrap;
+        color: #1f2937;
+        text-decoration: none;
+
+        &:hover { color: $tac-blue; text-decoration: underline; }
+    }
+
+    &__meta {
+        display: flex;
+        gap: 8px;
+        flex: 0 0 auto;
+        font-size: 0.82em;
+        color: $tac-grey;
+    }
+
+    &__actions {
+        display: flex;
+        gap: 2px;
+        flex: 0 0 auto;
+    }
+
+    &__btn {
+        appearance: none;
+        background: transparent;
+        border: 1px solid transparent;
+        border-radius: 4px;
+        padding: 4px 6px;
+        cursor: pointer;
+        color: $tac-grey;
+        font-size: 0.9em;
+        transition: background 0.15s ease, color 0.15s ease;
+
+        &:hover { background: rgba(13,138,255,0.08); color: $tac-blue; }
+
+        &--delete:hover { background: rgba(224,83,83,0.12); color: $tac-red; }
+        &--delete.is-armed {
+            background: rgba(224,83,83,0.15);
+            color: $tac-red;
+            border-color: $tac-red;
+            animation: tac-pulse-red 1.2s ease-in-out infinite;
+        }
+    }
+
+    &__empty {
+        color: $tac-grey;
+        font-style: italic;
+        padding: 6px 0;
+    }
+}
+
+// ----- Lightbox modal for file preview -----
+.tac-lightbox {
+    display: none;
+    position: fixed;
+    inset: 0;
+    background: rgba(0,0,0,0.85);
+    z-index: 1000;
+    padding: 16px 24px;
+    align-items: center;
+    justify-content: center;
+    flex-direction: column;
+
+    &.is-open { display: flex; }
+
+    // Top bar holds title + open-in-new-tab + close, sitting above the content
+    // so z-index against an inner iframe/embed is irrelevant.
+    &__header {
+        width: 100%;
+        max-width: 92vw;
+        display: flex;
+        align-items: center;
+        gap: 12px;
+        padding: 0 4px;
+        margin-bottom: 8px;
+        color: #fff;
+    }
+
+    &__title {
+        flex: 1 1 auto;
+        font-size: 0.95em;
+        overflow: hidden;
+        text-overflow: ellipsis;
+        white-space: nowrap;
+    }
+
+    &__open,
+    &__close {
+        appearance: none;
+        background: rgba(255,255,255,0.15);
+        color: #fff;
+        border: none;
+        width: 32px;
+        height: 32px;
+        border-radius: 50%;
+        font-size: 16px;
+        line-height: 1;
+        cursor: pointer;
+        text-decoration: none;
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        transition: background 0.15s ease;
+
+        &:hover { background: rgba(255,255,255,0.3); color: #fff; }
+    }
+    &__close { font-size: 22px; }
+
+    &__content {
+        width: 92vw;
+        height: calc(92vh - 60px); // leave room for the header bar
+        display: flex;
+        align-items: center;
+        justify-content: center;
+
+        img {
+            max-width: 100%;
+            max-height: 100%;
+            object-fit: contain;
+            border-radius: 6px;
+            box-shadow: 0 10px 40px rgba(0,0,0,0.5);
+        }
+
+        iframe,
+        embed {
+            width: 100%;
+            height: 100%;
+            border: none;
+            border-radius: 6px;
+            background: #fff;
+        }
+    }
+}
+
+// ----- Legacy thumbnail grid (kept as no-op so old SCSS dependents don't break) -----
+.tac-files-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(112px, 1fr));
+    gap: 10px;
+
+    &__empty {
+        color: $tac-grey;
+        font-style: italic;
+        padding: 8px 0;
+    }
+}
+
+.tac-file-card {
+    display: flex;
+    flex-direction: column;
+    text-decoration: none;
+    color: inherit;
+    background: #fff;
+    border: 1px solid $tac-border;
+    border-radius: 8px;
+    overflow: hidden;
+    transition: transform 0.15s ease, box-shadow 0.15s ease, border-color 0.15s ease;
+
+    &:hover {
+        transform: translateY(-2px);
+        box-shadow: $tile-shadow-hov;
+        border-color: $tac-blue;
+    }
+
+    &__thumb {
+        position: relative;
+        background: $tac-bg;
+        height: 100px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        overflow: hidden;
+        color: $tac-grey;
+
+        img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+            display: block;
+        }
+
+        i {
+            font-size: 2.4em;
+            color: $tac-grey;
+        }
+    }
+
+    &__ext {
+        position: absolute;
+        bottom: 6px;
+        right: 6px;
+        background: rgba(0,0,0,0.55);
+        color: #fff;
+        font-size: 0.65em;
+        font-weight: 700;
+        letter-spacing: 0.04em;
+        padding: 2px 6px;
+        border-radius: 3px;
+    }
+
+    &__name {
+        padding: 6px 8px 0;
+        font-size: 0.78em;
+        line-height: 1.25;
+        color: #1f2937;
+        word-break: break-all;
+        display: -webkit-box;
+        -webkit-line-clamp: 2;
+        -webkit-box-orient: vertical;
+        overflow: hidden;
+    }
+
+    &__size {
+        padding: 0 8px 6px;
+        font-size: 0.7em;
+        color: $tac-grey;
+    }
+}
+
+// PDF cards get a soft red tint on the icon so they're spottable.
+.tac-file-card .fa-file-pdf  { color: #d35968; }
+.tac-file-card .fa-file-word { color: #1e6cb5; }
+.tac-file-card .fa-file-excel{ color: #22a06b; }
+.tac-file-card .fa-file-powerpoint { color: #d35968; }
+.tac-file-card .fa-file-archive { color: #b46a2e; }
+
+// ----- Messages thread (SMS-style bubbles + sticky reply form) -----
+.tac-thread {
+    list-style: none;
+    margin: 0 0 12px;
+    padding: 0;
+    display: flex;
+    flex-direction: column;
+    gap: 14px;
+    max-height: 560px;
+    overflow-y: auto;
+    scroll-behavior: smooth;
+    padding-right: 4px;
+
+    // SMS metaphor: others on the left, mine on the right.
+    &__msg {
+        display: flex;
+        align-items: flex-start;
+        gap: 10px;
+        max-width: 88%;
+        position: relative;
+
+        // Hovering reveals the per-bubble action buttons.
+        &:hover .tac-thread__actions { opacity: 1; pointer-events: auto; }
+
+        &--mine {
+            margin-left: auto;
+            flex-direction: row-reverse;
+
+            .tac-thread__bubble {
+                background: rgba(13,138,255,0.08);
+                border-color: rgba(13,138,255,0.25);
+            }
+            .tac-thread__meta { justify-content: flex-end; }
+        }
+
+        &--private .tac-thread__bubble {
+            background: rgba(233,173,79,0.08);
+            border-color: rgba(233,173,79,0.4);
+        }
+
+        // First message — pinned-looking marker on the left edge.
+        &--original .tac-thread__bubble {
+            border-left: 3px solid $tac-blue;
+        }
+    }
+
+    &__avatar {
+        flex: 0 0 auto;
+        width: 34px;
+        height: 34px;
+        border-radius: 50%;
+        background: $tac-blue;
+        color: #fff;
+        font-weight: 700;
+        font-size: 0.95em;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        overflow: hidden;
+
+        &--img {
+            object-fit: cover;
+        }
+    }
+
+    &__bubble {
+        flex: 1 1 auto;
+        min-width: 0;
+        background: #fff;
+        border: 1px solid $tac-border;
+        border-radius: 12px;
+        padding: 8px 12px;
+        position: relative;
+    }
+
+    &__meta {
+        display: flex;
+        align-items: center;
+        gap: 8px;
+        font-size: 0.78em;
+        color: $tac-grey;
+        flex-wrap: wrap;
+    }
+
+    &__author {
+        color: #1f2937;
+        font-weight: 600;
+        text-decoration: none;
+
+        &:hover { color: $tac-blue; text-decoration: underline; }
+    }
+    &__date { font-size: 0.95em; }
+
+    &__tag {
+        display: inline-flex;
+        align-items: center;
+        gap: 3px;
+        padding: 1px 6px;
+        border-radius: 999px;
+        font-size: 0.9em;
+        background: rgba(13,138,255,0.1);
+        color: $tac-blue;
+
+        &--private  { background: rgba(233,173,79,0.18); color: darken($tac-orange, 14%); }
+        &--mail     { background: rgba(122,92,240,0.14); color: $tac-purple; }
+        &--original { background: rgba(13,138,255,0.14); color: $tac-blue; }
+    }
+
+    &__subject { margin-top: 4px; font-weight: 600; color: #1f2937; font-size: 0.92em; }
+    &__body {
+        margin-top: 4px;
+        line-height: 1.45;
+        word-break: break-word;
+
+        a { color: $tac-blue; text-decoration: underline; }
+        p { margin: 0 0 4px; &:last-child { margin-bottom: 0; } }
+        blockquote {
+            margin: 4px 0 6px;
+            padding: 6px 10px;
+            border-left: 3px solid rgba(31, 41, 55, 0.25);
+            background: rgba(0, 0, 0, 0.04);
+            color: #4b5563;
+            font-size: 0.92em;
+            border-radius: 0 4px 4px 0;
+
+            strong { color: #1f2937; }
+            p { margin: 2px 0; }
+            br + p, p:first-child { margin-top: 0; }
+        }
+    }
+    // Inside mine bubbles (blue tint), shift the quote tint so it still reads.
+    &__msg--mine &__body blockquote {
+        background: rgba(13, 138, 255, 0.08);
+        border-left-color: rgba(13, 138, 255, 0.45);
+    }
+
+    &__attachments {
+        display: inline-flex;
+        align-items: center;
+        gap: 4px;
+        margin-top: 4px;
+        font-size: 0.82em;
+        color: $tac-blue;
+        text-decoration: none;
+
+        &:hover { text-decoration: underline; }
+    }
+
+    // Hover-only floating action bar.
+    &__actions {
+        position: absolute;
+        top: -10px;
+        right: 8px;
+        display: flex;
+        gap: 4px;
+        background: #fff;
+        border: 1px solid $tac-border;
+        border-radius: 999px;
+        padding: 2px 4px;
+        box-shadow: 0 2px 6px rgba(0,0,0,0.08);
+        opacity: 0;
+        pointer-events: none;
+        transition: opacity 0.15s ease;
+    }
+    &__msg--mine &__actions { right: auto; left: 8px; }
+
+    &__action {
+        appearance: none;
+        background: transparent;
+        border: none;
+        color: $tac-grey;
+        cursor: pointer;
+        padding: 4px 6px;
+        border-radius: 50%;
+        font-size: 0.82em;
+
+        &:hover { background: rgba(13,138,255,0.1); color: $tac-blue; }
+        &--danger:hover { background: rgba(224,83,83,0.1); color: $tac-red; }
+    }
+
+    // Empty state — XXL icon centered.
+    &__empty {
+        text-align: center;
+        padding: 32px 12px;
+        color: $tac-grey;
+
+        &-icon {
+            font-size: 3em;
+            color: rgba(13,138,255,0.25);
+            margin-bottom: 8px;
+        }
+        &-title {
+            font-weight: 600;
+            color: #1f2937;
+            margin-bottom: 4px;
+        }
+        &-hint { font-size: 0.9em; }
+    }
+
+    // Sticky reply form — pinned to the bottom of the section while scrolling.
+    &__reply {
+        position: sticky;
+        bottom: 0;
+        margin-top: 8px;
+        padding: 8px;
+        display: flex;
+        flex-direction: column;
+        gap: 6px;
+        background: #fff;
+        border: 1px solid $tac-border;
+        border-radius: 10px;
+        box-shadow: 0 -4px 12px rgba(0,0,0,0.04);
+        z-index: 2;
+
+        &--editing {
+            border-color: $tac-orange;
+            box-shadow: 0 -4px 12px rgba(233,173,79,0.15);
+        }
+    }
+
+    &__reply-subject {
+        width: 100%;
+        padding: 6px 10px;
+        border: 1px solid $tac-border;
+        border-radius: 6px;
+        font-family: inherit;
+        font-size: 0.9em;
+
+        &:focus { outline: none; border-color: $tac-blue; box-shadow: 0 0 0 3px rgba(13,138,255,0.15); }
+    }
+    &__reply-body {
+        width: 100%;
+        min-height: 80px;
+        padding: 6px 10px;
+        border: 1px solid $tac-border;
+        border-radius: 6px;
+        font-family: inherit;
+        font-size: 0.92em;
+        resize: vertical;
+
+        &:focus { outline: none; border-color: $tac-blue; box-shadow: 0 0 0 3px rgba(13,138,255,0.15); }
+    }
+
+    &__reply-actions {
+        display: flex;
+        align-items: center;
+        justify-content: flex-end;
+        gap: 12px;
+        flex-wrap: wrap;
+    }
+
+    &__reply-toggle {
+        display: inline-flex;
+        align-items: center;
+        gap: 6px;
+        font-size: 0.85em;
+        color: $tac-grey;
+        cursor: pointer;
+        margin-right: auto;
+    }
+
+    &__reply-hint {
+        font-size: 0.78em;
+        color: $tac-grey;
+
+        kbd {
+            display: inline-block;
+            padding: 1px 5px;
+            font-size: 0.85em;
+            background: rgba(0,0,0,0.05);
+            border: 1px solid $tac-border;
+            border-radius: 4px;
+            font-family: inherit;
+        }
+    }
+
+    &__reply-send {
+        appearance: none;
+        background: $tac-blue;
+        color: #fff;
+        border: none;
+        padding: 6px 16px;
+        border-radius: 6px;
+        font-family: inherit;
+        font-size: 0.95em;
+        cursor: pointer;
+        display: inline-flex;
+        align-items: center;
+        gap: 6px;
+
+        &:hover { background: darken($tac-blue, 5%); }
+        &[disabled] { opacity: 0.5; cursor: not-allowed; }
+    }
+}
+
+// ----- Event list (timeline) -----
+.tac-list--events .tac-list__item {
+    border-bottom: 1px solid $tac-border;
+    padding: 6px 0;
+    &:last-child { border-bottom: none; }
+
+    .tac-list__item-meta {
+        font-size: 0.78em;
+        color: $tac-grey;
+        margin-bottom: 2px;
+    }
+}
+
+// Armed state on sticky destructive buttons.
+.tac-sticky-bar__btn.ticket-action-tile--armed {
+    background: rgba(224,83,83,0.08);
+    border-color: $tac-red;
+    color: $tac-red;
+    animation: tac-pulse-red 1.2s ease-in-out infinite;
+}
+
+@keyframes tac-pulse-red {
+    0%, 100% { box-shadow: 0 0 0 0 rgba(224, 83, 83, 0.4); }
+    50%      { box-shadow: 0 0 0 8px rgba(224, 83, 83, 0); }
+}
+
+.tac-sticky-bar__btn.ticket-action-tile--loading {
+    position: relative;
+    color: transparent;
+    pointer-events: none;
+    &::after {
+        content: '';
+        position: absolute;
+        top: 50%;
+        left: 50%;
+        width: 18px;
+        height: 18px;
+        margin: -9px 0 0 -9px;
+        border: 2px solid rgba(13,138,255,0.2);
+        border-top-color: $tac-blue;
+        border-radius: 50%;
+        animation: tac-spin 0.7s linear infinite;
+    }
+}
+
+// ----- Toast -----
+.tac-toast,
+.ticket-action-card__toast {
+    margin: 0 24px 16px 24px;
+    padding: 10px 14px;
+    border-radius: 8px;
+    font-size: 0.95em;
+    min-height: 0;
+    transition: all 0.25s ease;
+
+    &:empty { display: none; }
+
+    &.is-success {
+        background: rgba(34, 191, 78, 0.12);
+        color: darken($tac-green, 18%);
+        border: 1px solid rgba(34, 191, 78, 0.4);
+    }
+
+    &.is-error {
+        background: rgba(224, 83, 83, 0.12);
+        color: darken($tac-red, 12%);
+        border: 1px solid rgba(224, 83, 83, 0.4);
+    }
+}
+
+// ---------------------------------------------------------------------------
+// Legacy action tile classes — kept so the sticky-bar buttons can reuse
+// the same JS arm/loading classes without forking the JS module.
+// (The old big tile grid is gone in the reworked card.)
+// ---------------------------------------------------------------------------
+.ticket-action-tile {
+    // Empty placeholder, real styles live under .tac-sticky-bar__btn above.
+}
+
+// ---------------------------------------------------------------------------
+// Kanban picker board — ticket_action_card.php without a selected ticket.
+// Reuses all .kanban-* base rules from _page-actionplan.scss.
+// Only ticket-specific additions live here.
+// ---------------------------------------------------------------------------
+
+.tac-picker-kanban-board {
+    // Slightly narrower default column than actionplan (tickets have fewer meta fields).
+    .tac-picker-column {
+        min-width: 260px;
+        max-width: 300px;
+    }
+}
+
+// Severity badge inside a kanban card (inline pill, no icon).
+.tac-picker-card__severity {
+    font-size: 9px;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 0.4px;
+    padding: 1px 6px;
+    border-radius: 4px;
+    white-space: nowrap;
+    flex-shrink: 0;
+}
+
+// Company name inside a kanban card header.
+.tac-picker-card__company {
+    font-size: 10px;
+    color: #6a7491;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    max-width: 100px;
+
+    i { margin-right: 2px; }
+}
+
+// Creation date inside a kanban card header.
+.tac-picker-card__date {
+    font-size: 10px;
+    color: #aaa;
+    white-space: nowrap;
+    margin-left: auto;
+
+    i { margin-right: 2px; }
+}
+
+// Subject link — looks like plain text but navigates on click.
+.tac-picker-card__subject-link {
+    color: inherit;
+    text-decoration: none;
+
+    &:hover {
+        color: $tac-blue;
+        text-decoration: underline;
+    }
+}
+
+// Photo avatar in the assignee slot.
+.tac-picker-card__assignee-img {
+    width: 26px;
+    height: 26px;
+    border-radius: 50%;
+    object-fit: cover;
+    cursor: pointer;
+    border: 2px solid #fff;
+    box-shadow: 0 0 0 1px rgba(0, 0, 0, 0.1);
+    transition: transform 0.15s ease, box-shadow 0.15s ease;
+
+    &:hover {
+        transform: scale(1.15);
+        box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.3);
+    }
+}
+
+// ---------------------------------------------------------------------------
+// Picker wrapper — outer container holding tabs + boards.
+// ---------------------------------------------------------------------------
+.tac-picker-wrapper {
+    display: flex;
+    flex-direction: column;
+    gap: 0;
+    position: relative;
+}
+
+// ---------------------------------------------------------------------------
+// Dimension tab bar.
+// ---------------------------------------------------------------------------
+.tac-dim-tabs {
+    display: flex;
+    gap: 4px;
+    padding: 0 0 0 2px;
+    margin-bottom: 12px;
+    border-bottom: 2px solid #e2e6ea;
+}
+
+.tac-dim-tab {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    padding: 7px 16px 8px;
+    background: none;
+    border: none;
+    border-bottom: 3px solid transparent;
+    margin-bottom: -2px;
+    font-size: 13px;
+    font-weight: 500;
+    color: #6c757d;
+    cursor: pointer;
+    transition: color 0.15s, border-color 0.15s;
+
+    i { font-size: 11px; }
+
+    &:hover {
+        color: $tac-blue;
+    }
+
+    &.active {
+        color: $tac-blue;
+        border-bottom-color: $tac-blue;
+    }
+}
+
+// ---------------------------------------------------------------------------
+// Dimension panels — only the active panel is shown.
+// ---------------------------------------------------------------------------
+.tac-dim-panels {
+    flex: 1;
+}
+
+.tac-dim-panel {
+    display: none;
+
+    &.active {
+        display: block;
+    }
+}
+
+// ---------------------------------------------------------------------------
+// Subject contenteditable on picker kanban cards.
+// ---------------------------------------------------------------------------
+
+// Card label — flex row so the icon sits at end.
+.tac-picker-kanban-board .kanban-card-label {
+    display: flex;
+    align-items: baseline;
+    gap: 4px;
+}
+
+// Contenteditable subject span: truncated at rest, expanded when focused.
+.tac-picker-card__subject-text {
+    flex: 1 1 0;
+    min-width: 0;
+    display: block;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    cursor: text;
+    border-radius: 3px;
+    padding: 1px 3px;
+    margin: -1px -3px;
+    outline: none;
+    transition: background 0.12s ease, box-shadow 0.12s ease;
+
+    &:hover {
+        background: rgba(13, 138, 255, 0.05);
+    }
+
+    &:focus,
+    &.tac-picker-subject--editing {
+        white-space: pre-wrap;
+        overflow: visible;
+        word-break: break-word;
+        background: #fff;
+        box-shadow: 0 0 0 2px $tac-blue;
+    }
+}
+
+// External link icon — never shown in the label area.
+.tac-picker-kanban-board .tac-picker-card__subject-link {
+    display: none;
+}
+
+// ---------------------------------------------------------------------------
+// Severity badge inline select on picker kanban cards.
+// ---------------------------------------------------------------------------
+
+// Severity badge becomes a click target.
+.tac-picker-sev-badge {
+    cursor: pointer;
+    transition: opacity 0.1s ease;
+
+    &:hover { opacity: 0.75; }
+}
+
+// Inline select — hidden by default, shown when badge is clicked.
+.tac-picker-sev-inline-select {
+    display: none;
+    padding: 2px 4px;
+    font-size: 0.82em;
+    font-family: inherit;
+    border: 1px solid $tac-blue;
+    border-radius: 4px;
+    background: #fff;
+    color: #1f2937;
+    cursor: pointer;
+    outline: none;
+    box-shadow: 0 0 0 2px rgba(13, 138, 255, 0.15);
+    max-width: 120px;
+
+    &.visible { display: inline-block; }
+}
+
+// ---------------------------------------------------------------------------
+// Picker top bar — "Nouveau ticket" button sits above the tabs.
+// ---------------------------------------------------------------------------
+.tac-picker-topbar {
+    display: flex;
+    justify-content: flex-start;
+    margin-bottom: 10px;
+
+    &__btn {
+        display: inline-flex;
+        align-items: center;
+        gap: 7px;
+        padding: 7px 16px;
+        background: $tac-blue;
+        color: #fff;
+        border: none;
+        border-radius: 8px;
+        font-family: inherit;
+        font-size: 0.92em;
+        font-weight: 600;
+        cursor: pointer;
+        transition: background 0.15s ease, box-shadow 0.15s ease;
+
+        &:hover { background: darken($tac-blue, 6%); box-shadow: 0 4px 12px rgba(13,138,255,0.3); }
+
+        i { font-size: 0.9em; }
+    }
+}
+
+// ---------------------------------------------------------------------------
+// Quick-create drawer.
+// ---------------------------------------------------------------------------
+.tac-quick-create {
+    display: none;
+    position: fixed;
+    inset: 0;
+    z-index: 2000;
+
+    &.is-open { display: block; }
+
+    &__overlay {
+        position: absolute;
+        inset: 0;
+        background: rgba(0, 0, 0, 0.45);
+        animation: tac-qc-fade-in 0.2s ease;
+        cursor: pointer;
+    }
+
+    &__drawer {
+        position: absolute;
+        top: 0;
+        right: 0;
+        bottom: 0;
+        width: 100%;
+        max-width: 480px;
+        background: #fff;
+        box-shadow: -4px 0 24px rgba(0, 0, 0, 0.15);
+        display: flex;
+        flex-direction: column;
+        animation: tac-qc-slide-in 0.22s cubic-bezier(0.25, 0.46, 0.45, 0.94);
+        overflow: hidden;
+    }
+
+    &__header {
+        display: flex;
+        align-items: center;
+        gap: 10px;
+        padding: 18px 20px;
+        border-bottom: 1px solid $tac-border;
+        background: $tac-bg;
+        flex: 0 0 auto;
+    }
+
+    &__title {
+        flex: 1 1 auto;
+        font-size: 1.05em;
+        font-weight: 700;
+        color: #1f2937;
+
+        i { color: $tac-blue; margin-right: 6px; }
+    }
+
+    &__close {
+        appearance: none;
+        background: transparent;
+        border: 1px solid $tac-border;
+        border-radius: 6px;
+        width: 32px;
+        height: 32px;
+        cursor: pointer;
+        color: $tac-grey;
+        font-size: 1em;
+        transition: background 0.15s ease, color 0.15s ease, border-color 0.15s ease;
+        flex: 0 0 auto;
+
+        &:hover { background: rgba(224,83,83,0.08); color: $tac-red; border-color: $tac-red; }
+    }
+
+    &__form {
+        flex: 1 1 auto;
+        overflow-y: auto;
+        padding: 20px;
+        display: flex;
+        flex-direction: column;
+        gap: 16px;
+    }
+}
+
+@keyframes tac-qc-fade-in {
+    from { opacity: 0; }
+    to   { opacity: 1; }
+}
+
+@keyframes tac-qc-slide-in {
+    from { transform: translateX(100%); }
+    to   { transform: translateX(0); }
+}
+
+// ----- Form field primitives -----
+.tac-qc-field {
+    display: flex;
+    flex-direction: column;
+    gap: 5px;
+
+    &--required .tac-qc-label::after {
+        content: ' *';
+        color: $tac-red;
+    }
+}
+
+.tac-qc-row {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 12px;
+
+    @media (max-width: 480px) { grid-template-columns: 1fr; }
+}
+
+.tac-qc-label {
+    font-size: 0.76em;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 0.04em;
+    color: $tac-grey;
+
+    i { color: $tac-blue; margin-right: 4px; }
+}
+
+.tac-qc-input,
+.tac-qc-select,
+.tac-qc-textarea {
+    width: 100%;
+    padding: 8px 10px;
+    border: 1px solid $tac-border;
+    border-radius: 7px;
+    background: #fff;
+    font-family: inherit;
+    font-size: 0.93em;
+    color: #1f2937;
+    transition: border-color 0.15s ease, box-shadow 0.15s ease;
+
+    &:focus {
+        outline: none;
+        border-color: $tac-blue;
+        box-shadow: 0 0 0 3px rgba(13, 138, 255, 0.15);
+    }
+
+    &:invalid:not(:placeholder-shown) {
+        border-color: $tac-red;
+    }
+}
+
+.tac-qc-textarea {
+    resize: vertical;
+    min-height: 90px;
+}
+
+.tac-qc-toast {
+    padding: 10px 12px;
+    border-radius: 7px;
+    font-size: 0.9em;
+
+    &:empty { display: none; }
+
+    &.is-error {
+        background: rgba(224, 83, 83, 0.1);
+        border: 1px solid rgba(224, 83, 83, 0.4);
+        color: darken($tac-red, 10%);
+    }
+
+    &.is-success {
+        background: rgba(34, 191, 78, 0.1);
+        border: 1px solid rgba(34, 191, 78, 0.4);
+        color: darken($tac-green, 16%);
+    }
+}
+
+.tac-qc-actions {
+    display: flex;
+    justify-content: flex-end;
+    gap: 10px;
+    margin-top: 4px;
+    padding-top: 12px;
+    border-top: 1px solid $tac-border;
+    flex: 0 0 auto;
+}
+
+.tac-qc-btn {
+    appearance: none;
+    border: 1px solid $tac-border;
+    border-radius: 8px;
+    padding: 9px 20px;
+    font-family: inherit;
+    font-size: 0.93em;
+    font-weight: 600;
+    cursor: pointer;
+    display: inline-flex;
+    align-items: center;
+    gap: 7px;
+    transition: background 0.15s ease, border-color 0.15s ease, box-shadow 0.15s ease;
+
+    i { font-size: 0.95em; }
+
+    &--secondary {
+        background: #fff;
+        color: $tac-grey;
+        &:hover { background: rgba(0,0,0,0.04); border-color: darken($tac-border, 10%); }
+    }
+
+    &--primary {
+        background: $tac-blue;
+        color: #fff;
+        border-color: $tac-blue;
+
+        &:hover { background: darken($tac-blue, 6%); box-shadow: 0 4px 12px rgba(13,138,255,0.3); }
+
+        &[disabled] {
+            opacity: 0.55;
+            cursor: not-allowed;
+            &:hover { background: $tac-blue; box-shadow: none; }
+        }
+
+        // Loading spinner
+        &.is-loading {
+            position: relative;
+            color: transparent;
+            pointer-events: none;
+
+            &::after {
+                content: '';
+                position: absolute;
+                top: 50%;
+                left: 50%;
+                width: 16px;
+                height: 16px;
+                margin: -8px 0 0 -8px;
+                border: 2px solid rgba(255, 255, 255, 0.35);
+                border-top-color: #fff;
+                border-radius: 50%;
+                animation: tac-spin 0.65s linear infinite;
+            }
+        }
+    }
+}
+
+// ----- Dropzone pièces jointes -----
+.tac-qc-dropzone {
+    position: relative;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    gap: 6px;
+    padding: 20px 16px;
+    border: 2px dashed $tac-border;
+    border-radius: 10px;
+    background: $tac-bg;
+    text-align: center;
+    cursor: pointer;
+    transition: border-color 0.15s ease, background 0.15s ease;
+
+    &:hover,
+    &:focus { border-color: $tac-blue; background: rgba(13,138,255,0.04); outline: none; }
+
+    &.is-dragover {
+        border-color: $tac-blue;
+        background: rgba(13,138,255,0.08);
+
+        .tac-qc-dropzone__label { color: $tac-blue; font-weight: 600; }
+    }
+
+    &__icon {
+        font-size: 1.8em;
+        color: rgba(13,138,255,0.45);
+        line-height: 1;
+    }
+
+    &__label {
+        font-size: 0.88em;
+        color: $tac-grey;
+        transition: color 0.15s ease;
+    }
+
+    &__hint {
+        font-size: 0.75em;
+        color: lighten($tac-grey, 15%);
+    }
+}
+
+// The real <input type="file"> is invisible but covers the whole dropzone.
+.tac-qc-file-input {
+    position: absolute;
+    inset: 0;
+    width: 100%;
+    height: 100%;
+    opacity: 0;
+    cursor: pointer;
+}
+
+// File list below the dropzone.
+.tac-qc-file-list {
+    list-style: none;
+    padding: 0;
+    margin: 6px 0 0;
+    display: flex;
+    flex-direction: column;
+    gap: 4px;
+
+    &:empty { display: none; }
+
+    li {
+        display: flex;
+        align-items: center;
+        gap: 8px;
+        padding: 5px 8px;
+        background: #fff;
+        border: 1px solid $tac-border;
+        border-radius: 6px;
+        font-size: 0.85em;
+        color: #1f2937;
+
+        i { color: $tac-grey; flex: 0 0 auto; }
+
+        span { flex: 1 1 auto; min-width: 0; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+
+        button {
+            appearance: none;
+            background: transparent;
+            border: none;
+            color: $tac-grey;
+            cursor: pointer;
+            padding: 2px 4px;
+            border-radius: 4px;
+            font-size: 0.9em;
+            flex: 0 0 auto;
+
+            &:hover { color: $tac-red; background: rgba(224,83,83,0.08); }
+        }
+    }
+}

@@ -57,8 +57,8 @@ global $conf, $db, $hookmanager, $langs, $moduleNameLowerCase, $user;
 saturne_load_langs(['other', 'mails']);
 
 // Get parameters
-$id                  = GETPOST('id', 'int');
-$lineid              = GETPOST('lineid', 'int');
+$id                  = GETPOSTINT('id');
+$lineid              = GETPOSTINT('lineid');
 $ref                 = GETPOST('ref', 'alpha');
 $action              = GETPOST('action', 'aZ09');
 $subaction           = GETPOST('subaction', 'aZ09');
@@ -67,7 +67,8 @@ $cancel              = GETPOST('cancel', 'aZ09');
 $contextpage         = GETPOST('contextpage', 'aZ') ? GETPOST('contextpage', 'aZ') : 'preventionplancard'; // To manage different context of search
 $backtopage          = GETPOST('backtopage', 'alpha');
 $backtopageforcancel = GETPOST('backtopageforcancel', 'alpha');
-$fk_parent           = GETPOST('fk_parent', 'int');
+
+$fk_parent           = GETPOSTINT('fk_parent');
 
 // Initialize technical objects
 $object             = new PreventionPlan($db);
@@ -86,7 +87,9 @@ $thirdparty         = new Societe($db);
 $project            = new Project($db);
 
 // Load object
-$object->fetch($id);
+if ($id > 0 || !empty($ref)) {
+	$object->fetch($id, $ref);
+}
 
 $deletedElements = $digiriskelement->getMultiEntityTrashList();
 if (empty($deletedElements)) {
@@ -620,9 +623,11 @@ if (empty($reshook)) {
 	$triggersendname    = 'PREVENTIONPLAN_SENTBYMAIL';
 	$trackid            = 'preventionplan' . $object->id;
 	$labourInspector    = $digiriskresources->fetchResourcesFromObject('LabourInspector', $object);
-	$labourInspectorId  = $labourInspector->id;
-	$thirdparty->fetch($labourInspectorId);
-	$object->thirdparty = $thirdparty;
+	$labourInspectorId  = is_object($labourInspector) ? $labourInspector->id : 0;
+	if ($labourInspectorId > 0) {
+		$thirdparty->fetch($labourInspectorId);
+		$object->thirdparty = $thirdparty;
+	}
 
 	include DOL_DOCUMENT_ROOT . '/core/actions_sendmails.inc.php';
 }
@@ -679,7 +684,7 @@ if ($action == 'create') {
 
 	//Maitre d'oeuvre
 	if ($conf->global->DIGIRISKDOLIBARR_PREVENTIONPLAN_MAITRE_OEUVRE < 0 || empty($conf->global->DIGIRISKDOLIBARR_PREVENTIONPLAN_MAITRE_OEUVRE)) {
-		$userlist = $form->select_dolusers(( ! empty(GETPOST('maitre_oeuvre')) ? GETPOST('maitre_oeuvre') : $user->id), '', 0, null, 0, '', '', $conf->entity, 0, 0, 'AND u.statut = 1', 0, '', 'minwidth100imp widthcentpercentminusxx maxwidth400', 0, 1);
+		$userlist = $form->select_dolusers(( ! empty(GETPOST('maitre_oeuvre')) ? GETPOST('maitre_oeuvre') : $user->id), '', 0, null, 0, '', '', $conf->entity, 0, 0, '(u.statut:=:1)', 0, '', 'minwidth100imp widthcentpercentminusxx maxwidth400', 0, 1);
 		print '<tr>';
 		print '<td class="fieldrequired minwidth400" style="width:10%">' . img_picto('', 'user') . ' ' . $form->editfieldkey('MasterWorker', 'MasterWorker_id', '', $object, 0) . '</td>';
 		print '<td>';
@@ -829,7 +834,7 @@ if (($id || $ref) && $action == 'edit') {
 
 	//Maitre d'oeuvre
 	$masterWorker  = is_array($objectSignatories['MasterWorker']) ? array_shift($objectSignatories['MasterWorker'])->element_id : '';
-	$userlist      = $form->select_dolusers($masterWorker, '', 1, null, 0, '', '', 0, 0, 0, 'AND u.statut = 1', 0, '', 'minwidth100imp widthcentpercentminusxx maxwidth400', 0, 1);
+	$userlist      = $form->select_dolusers($masterWorker, '', 1, null, 0, '', '', 0, 0, 0, '(u.statut:=:1)', 0, '', 'minwidth100imp widthcentpercentminusxx maxwidth400', 0, 1);
 	print '<tr>';
 	print '<td class="fieldrequired minwidth400" style="width:10%">' . img_picto('', 'user') . ' ' . $form->editfieldkey('MasterWorker', 'MasterWorker_id', '', $object, 0) . '</td>';
 	print '<td>';
@@ -1285,7 +1290,7 @@ if ((empty($action) || ($action != 'create' && $action != 'edit'))) {
 
 						<ul class="saturne-dropdown-content wpeo-gridlayout grid-5 grid-gap-0">
 							<?php
-							$dangerCategories = $risk->getDangerCategories();
+							$dangerCategories = Risk::getDangerCategories();
 							if ( ! empty($dangerCategories)) :
 								foreach ($dangerCategories as $dangerCategory) : ?>
 									<li class="item dropdown-item wpeo-tooltip-event"
@@ -1410,7 +1415,7 @@ if ((empty($action) || ($action != 'create' && $action != 'edit'))) {
 				</div>
 				<ul class="saturne-dropdown-content wpeo-gridlayout grid-5 grid-gap-0">
 					<?php
-					$dangerCategories = $risk->getDangerCategories();
+					$dangerCategories = Risk::getDangerCategories();
 					if ( ! empty($dangerCategories)) :
 						foreach ($dangerCategories as $dangerCategory) : ?>
 							<li class="item dropdown-item wpeo-tooltip-event" data-is-preset="<?php echo ''; ?>"

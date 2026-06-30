@@ -30,6 +30,17 @@ if (file_exists('digiriskdolibarr.main.inc.php')) {
 	die('Include of digiriskdolibarr main fails');
 }
 
+// Better performance by disabling some features not used in this page
+if (!defined('DISABLE_CKEDITOR')) {
+    define('DISABLE_CKEDITOR', 1);
+}
+if (!defined('DISABLE_JQUERY_TABLEDND')) {
+    define('DISABLE_JQUERY_TABLEDND', 1);
+}
+if (!defined('DISABLE_MULTISELECT')) {
+    define('DISABLE_MULTISELECT', 1);
+}
+
 require_once __DIR__ . '/core/tpl/digiriskdolibarr_projectcreation_action.tpl.php';
 
 $moreParams = [
@@ -41,6 +52,7 @@ $moreParams = [
     'LoadSaturneTask'            => 1,
     'LoadRisk'                   => 1,
     'LoadTicketDashboard'        => 1,
+    'LoadMeteoVigilance'         => 1,
     'specialModuleNameLowerCase' => 'digirisk'
 ];
 

@@ -95,13 +95,14 @@ window.digiriskdolibarr.riskassessmenttask.createRiskAssessmentTask = function (
 	let taskText = single.find('.riskassessment-task-label').val()
 	taskText     = window.digiriskdolibarr.risk.sanitizeBeforeRequest(taskText)
 
-	let dateStart = single.find('#RiskassessmentTaskDateStart' + riskToAssign).val();
-	let hourStart = single.find('#RiskassessmentTaskDateStart' + riskToAssign + 'hour').val();
-	let minStart  = single.find('#RiskassessmentTaskDateStart' + riskToAssign + 'min').val();
-	let dateEnd   = single.find('#RiskassessmentTaskDateEnd' + riskToAssign).val();
-	let hourEnd   = single.find('#RiskassessmentTaskDateEnd' + riskToAssign + 'hour').val();
-	let minEnd    = single.find('#RiskassessmentTaskDateEnd' + riskToAssign + 'min').val();
-	let budget    = single.find('.riskassessment-task-budget').val()
+	let dateStart  = single.find('#RiskassessmentTaskDateStart' + riskToAssign).val();
+	let hourStart  = single.find('#RiskassessmentTaskDateStart' + riskToAssign + 'hour').val();
+	let minStart   = single.find('#RiskassessmentTaskDateStart' + riskToAssign + 'min').val();
+	let dateEnd    = single.find('#RiskassessmentTaskDateEnd' + riskToAssign).val();
+	let hourEnd    = single.find('#RiskassessmentTaskDateEnd' + riskToAssign + 'hour').val();
+	let minEnd     = single.find('#RiskassessmentTaskDateEnd' + riskToAssign + 'min').val();
+	let budget     = single.find('.riskassessment-task-budget').val();
+  let executiveId= single.find('.executiveSelect').val();
 
 	window.saturne.loader.display($(this));
 	window.saturne.loader.display($('.riskassessment-tasks' + riskToAssign));
@@ -119,9 +120,10 @@ window.digiriskdolibarr.riskassessmenttask.createRiskAssessmentTask = function (
 			minEnd: minEnd,
 			budget: budget,
 			riskToAssign: riskToAssign,
+      executiveId: executiveId,
 		}),
 		processData: false,
-		contentType: false,
+    contentType: 'application/json charset=utf-8',
 		success: function ( resp ) {
 			$('.tasks-list-container-'+riskToAssign).replaceWith($(resp).find('.tasks-list-container-'+riskToAssign))
 			let actionContainerSuccess = $('.messageSuccessTaskCreate');
@@ -183,7 +185,7 @@ window.digiriskdolibarr.riskassessmenttask.deleteRiskAssessmentTask = function (
 			url: document.URL + '&action=deleteRiskAssessmentTask&deletedRiskAssessmentTaskId=' + deletedRiskAssessmentTaskId + '&token=' + token,
 			type: "POST",
 			processData: false,
-			contentType: false,
+      contentType: 'application/json charset=utf-8',
 			success: function ( resp ) {
 				$('.riskassessment-task-listing-wrapper-'+riskId).replaceWith($(resp).find('.riskassessment-task-listing-wrapper-'+riskId))
 				$('.riskassessment-tasks' + riskId).fadeOut(800);
@@ -252,7 +254,8 @@ window.digiriskdolibarr.riskassessmenttask.saveRiskAssessmentTask = function ( e
 	let dateEnd   = elementRiskAssessmentTask.find('#RiskassessmentTaskDateEndEdit' + editedRiskAssessmentTaskId).val();
 	let hourEnd   = elementRiskAssessmentTask.find('#RiskassessmentTaskDateEndEdit' + editedRiskAssessmentTaskId + 'hour').val();
 	let minEnd    = elementRiskAssessmentTask.find('#RiskassessmentTaskDateEndEdit' + editedRiskAssessmentTaskId + 'min').val();
-	let budget    = elementRiskAssessmentTask.find('.riskassessment-task-budget'  + editedRiskAssessmentTaskId).val()
+	let budget      = elementRiskAssessmentTask.find('.riskassessment-task-budget'  + editedRiskAssessmentTaskId).val()
+	let executiveId = elementRiskAssessmentTask.find('.executiveSelectEdit').val();
 
 	window.saturne.loader.display($(this));
 	window.saturne.loader.display($('.riskassessment-task-single-'+ editedRiskAssessmentTaskId));
@@ -270,10 +273,11 @@ window.digiriskdolibarr.riskassessmenttask.saveRiskAssessmentTask = function ( e
 			minEnd: minEnd,
 			budget: budget,
 			taskProgress: taskProgress,
+			executiveId: executiveId,
 		}),
 		type: "POST",
 		processData: false,
-		contentType: false,
+    contentType: 'application/json charset=utf-8',
 		success: function ( resp ) {
 			$('#risk_assessment_task_edit'+editedRiskAssessmentTaskId).removeClass('modal-active')
 			$('.riskassessment-task-container-'+editedRiskAssessmentTaskId).replaceWith($(resp).find('.riskassessment-task-container-'+editedRiskAssessmentTaskId).first())
@@ -355,7 +359,7 @@ window.digiriskdolibarr.riskassessmenttask.createRiskAssessmentTaskTimeSpent = f
 			duration: duration,
 		}),
 		processData: false,
-		contentType: false,
+    contentType: 'application/json charset=utf-8',
 		success: function ( resp ) {
 			//element.html($(resp).find(single))
 			let actionContainerSuccess = $('.messageSuccessTaskTimeSpentCreate'+ taskID);
@@ -418,7 +422,7 @@ window.digiriskdolibarr.riskassessmenttask.deleteRiskAssessmentTaskTimeSpent = f
 			url: document.URL + '&action=deleteRiskAssessmentTaskTimeSpent&deletedRiskAssessmentTaskTimeSpentId=' + deletedRiskAssessmentTaskTimeSpentId + '&token=' + token,
 			type: "POST",
 			processData: false,
-			contentType: false,
+      contentType: 'application/json charset=utf-8',
 			success: function ( resp ) {
 				//$('.fichecenter.risklist').html($(resp).find('#searchFormListRisks'))
 				let actionContainerSuccess = $('.messageSuccessTaskTimeSpentDelete'+ taskID);
@@ -494,7 +498,7 @@ window.digiriskdolibarr.riskassessmenttask.saveRiskAssessmentTaskTimeSpent = fun
 		}),
 		type: "POST",
 		processData: false,
-		contentType: false,
+    contentType: 'application/json charset=utf-8',
 		success: function ( resp ) {
 			currentElement.closest('.modal-active').removeClass('modal-active')
 			let actionContainerSuccess = $('.messageSuccessTaskTimeSpentEdit'+ taskID);
@@ -563,7 +567,7 @@ window.digiriskdolibarr.riskassessmenttask.checkTaskProgress = function ( event 
 		}),
 		type: "POST",
 		processData: false,
-		contentType: false,
+    contentType: 'application/json charset=utf-8',
 		success: function ( resp ) {
 			$('.fichecenter.risklist').html($(resp).find('#searchFormListRisks'))
 			let actionContainerSuccess = $('.messageSuccessTaskEdit');

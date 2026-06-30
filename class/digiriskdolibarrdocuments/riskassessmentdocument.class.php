@@ -48,7 +48,7 @@ class RiskAssessmentDocument extends DigiriskDocuments
 	/**
 	 * Constructor
 	 *
-	 * @param DoliDb $db Database handler
+	 * @param DoliDB $db Database handler
 	 */
 	public function __construct(DoliDB $db)
 	{
@@ -68,6 +68,8 @@ class RiskAssessmentDocument extends DigiriskDocuments
 		$json = [];
         $now  = dol_now(); // To change later because we have to use this->date_creation
 
+        $userTmp = new User($this->db);
+
 		if (!isset($conf->global->DIGIRISKDOLIBARR_RISKASSESSMENTDOCUMENT_AUDIT_START_DATE) || dol_strlen($conf->global->DIGIRISKDOLIBARR_RISKASSESSMENTDOCUMENT_AUDIT_START_DATE) < 1) {
 			dolibarr_set_const($this->db, 'DIGIRISKDOLIBARR_RISKASSESSMENTDOCUMENT_AUDIT_START_DATE', dol_now(), 'chaine', 0, '', $conf->entity);
 		}
@@ -77,9 +79,9 @@ class RiskAssessmentDocument extends DigiriskDocuments
 
 		// *** JSON FILLING ***
 		$json['RiskAssessmentDocument']['nomEntreprise']  = $conf->global->MAIN_INFO_SOCIETE_NOM;
-		$json['RiskAssessmentDocument']['dateAudit']      = dol_print_date($conf->global->DIGIRISKDOLIBARR_RISKASSESSMENTDOCUMENT_AUDIT_START_DATE, '%d/%m/%Y', 'tzuser') . ' - ' . dol_print_date($conf->global->DIGIRISKDOLIBARR_RISKASSESSMENTDOCUMENT_AUDIT_END_DATE, '%d/%m/%Y', 'tzuser');
+		$json['RiskAssessmentDocument']['dateAudit']      = dol_print_date($conf->global->DIGIRISKDOLIBARR_RISKASSESSMENTDOCUMENT_AUDIT_START_DATE, 'day', 'tzuser') . ' - ' . dol_print_date($conf->global->DIGIRISKDOLIBARR_RISKASSESSMENTDOCUMENT_AUDIT_END_DATE, 'day', 'tzuser');
 		$json['RiskAssessmentDocument']['emetteurDUER']   = $user->lastname . ' ' . $user->firstname;
-		$json['RiskAssessmentDocument']['dateGeneration'] = dol_print_date($now, '%d/%m/%Y %H:%M:%S', 'tzuser');
+		$json['RiskAssessmentDocument']['dateGeneration'] = dol_print_date($now, 'dayhour', 'tzuser');
 
 		$userRecipient = json_decode($conf->global->DIGIRISKDOLIBARR_RISKASSESSMENTDOCUMENT_RECIPIENT);
 
@@ -88,11 +90,11 @@ class RiskAssessmentDocument extends DigiriskDocuments
         $json['RiskAssessmentDocument']['portable'] = '';
 		if (is_array($userRecipient) && !empty($userRecipient)) {
 			foreach ($userRecipient as $recipientId) {
-				$user->fetch($recipientId);
+				$userTmp->fetch($recipientId);
 
-				$json['RiskAssessmentDocument']['destinataireDUER'] .= dol_strtoupper($user->lastname) . ' ' . ucfirst($user->firstname) . chr(0x0A);
-				$json['RiskAssessmentDocument']['telephone']        .= (dol_strlen($user->office_phone) > 0 ? $user->office_phone : '-') . chr(0x0A);
-				$json['RiskAssessmentDocument']['portable']         .= (dol_strlen($user->user_mobile) > 0 ? $user->user_mobile : '-') . chr(0x0A);
+				$json['RiskAssessmentDocument']['destinataireDUER'] .= dol_strtoupper($userTmp->lastname) . ' ' . ucfirst($userTmp->firstname) . chr(0x0A);
+				$json['RiskAssessmentDocument']['telephone']        .= (dol_strlen($userTmp->office_phone) > 0 ? $userTmp->office_phone : '-') . chr(0x0A);
+				$json['RiskAssessmentDocument']['portable']         .= (dol_strlen($userTmp->user_mobile) > 0 ? $userTmp->user_mobile : '-') . chr(0x0A);
 			}
 		}
 
@@ -104,6 +106,133 @@ class RiskAssessmentDocument extends DigiriskDocuments
 
 		return $jsonFormatted;
 	}
+
+    public function generateArchiveWithDigiriskElementDocuments($moreparams, $outputLangs, $hideDetails, $hideDesc, $hideRef)
+    {
+        global $user;
+
+        if (!getDolGlobalInt('DIGIRISKDOLIBARR_GENERATE_ARCHIVE_WITH_DIGIRISKELEMENT_DOCUMENTS')) {
+            return 0;
+        }
+
+        $digiriskElements = $moreparams['digiriskElement']->fetchDigiriskElementFlat(0);
+        if (!is_array($digiriskElements) || empty($digiriskElements)) {
+            $this->error = 'error1';
+            return -1;
+        }
+
+        $uploadDir = $moreparams['uploadDir'] . '/' . $this->element;
+
+        $fileName = pathinfo($this->last_main_doc, PATHINFO_FILENAME);
+        $zipPath  = $uploadDir . '/' . $fileName;
+        $result   = dol_mkdir($zipPath);
+        if ($result < 0) {
+            $this->error = 'error2';
+            return -1;
+        }
+
+        $result = dol_copy($uploadDir . '/' . $this->last_main_doc, $zipPath . '/' . $this->last_main_doc);
+        if ($result < 0) {
+            $this->error = 'error3';
+            return -1;
+        }
+
+        if (file_exists($uploadDir . '/' . $fileName . '.pdf')) {
+            $result = dol_copy($uploadDir . '/' . $fileName . '.pdf', $zipPath . '/' . $fileName . '.pdf');
+            if ($result < 0) {
+                $this->error = 'error3';
+                return -1;
+            }
+        }
+
+        $digiriskElementObjects = ['groupment', 'workunit'];
+        foreach ($digiriskElementObjects as $digiriskElementObject) {
+            $digiriskElementDocumentPaths[$digiriskElementObject] = $moreparams['uploadDir'] . '/' . $digiriskElementObject . 'document';
+
+            $modelLists[$digiriskElementObject] = saturne_get_list_of_models($this->db, $digiriskElementObject . 'document');
+            if (!is_array($modelLists[$digiriskElementObject]) || empty($modelLists[$digiriskElementObject])) {
+                $this->error = 'error4';
+                return -1;
+            }
+
+            $model[$digiriskElementObject] = '';
+            $defaultModel                  = getDolGlobalString(dol_strtoupper($this->module) . '_' . dol_strtoupper($digiriskElementObject . 'document') . '_DEFAULT_MODEL');
+            if (!dol_strlen($defaultModel)) {
+                $model[$digiriskElementObject] = key($modelLists[$digiriskElementObject]);
+            } else {
+                foreach ($modelLists[$digiriskElementObject] as $modelKey => $modelList) {
+                    if (strpos($modelKey, $defaultModel) !== false) {
+                        $model[$digiriskElementObject] = $modelKey;
+                    }
+                }
+            }
+            $model[$digiriskElementObject] = str_replace($digiriskElementObject . 'document_custom_odt', $digiriskElementObject . 'document_odt', $model[$digiriskElementObject]);
+
+            $digiriskElementDocumentZipPaths[$digiriskElementObject] = $zipPath . '/' . $digiriskElementObject . 'document';
+            $result                                                  = dol_mkdir($digiriskElementDocumentZipPaths[$digiriskElementObject]);
+            if ($result < 0) {
+                $this->error = 'error2';
+                return -1;
+            }
+        }
+
+        foreach ($digiriskElements as $digiriskElementSingle) {
+            $digiriskElementDocument = new DigiriskDocuments($this->db, $this->module, $digiriskElementSingle['object']->element_type . 'document');
+
+            $digiriskElementDocument->element = $digiriskElementSingle['object']->element_type . 'document';
+
+            $moreParams['object'] = $digiriskElementSingle['object'];
+            $moreParams['zone']   = 'private';
+            $moreParams['user']   = $user;
+
+            $result = $digiriskElementDocument->generateDocument($model[$digiriskElementSingle['object']->element_type], $outputLangs, $hideDetails, $hideDesc, $hideRef, $moreParams);
+            if ($result < 0) {
+                $this->error = 'error5';
+                return -1;
+            }
+
+            $digiriskElementDocumentPath = $digiriskElementDocumentPaths[$digiriskElementSingle['object']->element_type] . '/' . $digiriskElementSingle['object']->ref;
+            $result                      = dol_copy($digiriskElementDocumentPath . '/' . $digiriskElementDocument->last_main_doc, $digiriskElementDocumentZipPaths[$digiriskElementSingle['object']->element_type] . '/' . $digiriskElementDocument->last_main_doc);
+            if ($result < 0) {
+                $this->error = 'error3';
+                return -1;
+            }
+
+            $fileName = pathinfo($this->last_main_doc, PATHINFO_FILENAME);
+            if (file_exists($digiriskElementDocumentPath . '/' . $fileName . '.pdf')) {
+                $result = dol_copy($digiriskElementDocumentPath . '/' . $fileName . '.pdf', $digiriskElementDocumentZipPaths[$digiriskElementSingle['object']->element_type] . '/' . $fileName . '.pdf');
+                if ($result < 0) {
+                    $this->error = 'error3';
+                    return -1;
+                }
+            }
+        }
+
+        $sourceDir = realpath($zipPath);
+        $zipFile   = $sourceDir . '.zip';
+
+        $zipArchive = new ZipArchive();
+        $zipArchive->open($zipFile, ZipArchive::CREATE | ZipArchive::OVERWRITE);
+
+        $files = new RecursiveIteratorIterator(
+            new RecursiveDirectoryIterator($sourceDir, FilesystemIterator::SKIP_DOTS),
+            RecursiveIteratorIterator::SELF_FIRST
+        );
+
+        foreach ($files as $file) {
+            if (!$file->isDir()) {
+                $filePath     = $file->getRealPath();
+                $relativePath = substr($filePath, strlen($sourceDir) + 1);
+
+                $zipArchive->addFile($filePath, $relativePath);
+                $zipArchive->setCompressionName($relativePath, ZipArchive::CM_DEFLATE);
+            }
+        }
+
+        $zipArchive->close();
+
+        return 1;
+    }
 
     /**
      * Load dashboard info riskassessmentdocument
@@ -148,18 +277,25 @@ class RiskAssessmentDocument extends DigiriskDocuments
         $filter                  = ['customsql' => 't.type = "' . $this->element . '"' . ($moreParam['filter'] ?? '')];
         $riskAssessmentDocuments = $this->fetchAll('desc', 't.rowid', 1, 0, $filter);
         if (!empty($riskAssessmentDocuments) && is_array($riskAssessmentDocuments)) {
-            $riskAssessmentDocument       = array_shift($riskAssessmentDocuments);
-            $now                          = dol_now();
-            $nextGenerateTimeStamp        = dol_time_plus_duree($riskAssessmentDocument->date_creation, '1', 'y');
-            $nextGenerateDate             = dol_print_date($nextGenerateTimeStamp, 'day');
-            $lastGenerateDate             = dol_print_date($riskAssessmentDocument->date_creation, 'day');
-            $nbDaysAfterNextGenerateDate  = num_between_day($now, $nextGenerateTimeStamp, 1);
-            $nbDaysBeforeNextGenerateDate = num_between_day($nextGenerateTimeStamp, $now, 1);
+            $riskAssessmentDocument = array_shift($riskAssessmentDocuments);
+            $now                    = dol_now('tzuser');
+            $nextGenerateTimeStamp  = dol_time_plus_duree($riskAssessmentDocument->date_creation, '1', 'y');
+            $nextGenerateDate       = dol_print_date($nextGenerateTimeStamp, 'day');
+            $lastGenerateDate       = dol_print_date($riskAssessmentDocument->date_creation, 'day');
 
-            $array['nextgeneratedate']  = img_picto('', 'fontawesome_fa-calendar_far_#263C5C80', 'class="pictofixedwidth"') . $nextGenerateDate;
-            $array['nextgeneratedate'] .= ' ' . (!empty($nbDaysAfterNextGenerateDate) ? $nbDaysAfterNextGenerateDate . ' ' . $langs->transnoentities('Days') : '');
-            $array['lastgeneratedate']  = img_picto('', 'fontawesome_fa-calendar_far_#263C5C80', 'class="pictofixedwidth"') . $lastGenerateDate;
-            $array['delaygeneratedate'] = !empty($nbDaysBeforeNextGenerateDate) ? $nbDaysBeforeNextGenerateDate . ' ' . $langs->transnoentities('Days') : $langs->transnoentities('NoDelay');
+            $delayGenerateColor = '#C7BA10'; // Default color
+            $delayGenerateDate    = (int) round(($nextGenerateTimeStamp - $now)/(3600 * 24));
+            $delayGenerateFrequencies = [0 => '#FF3535', 30 => '#FD7E00', 60 => '#FFB700', 90 => '#C7BA10'];
+            foreach ($delayGenerateFrequencies as $delayGenerateFrequency => $delayGenerateFrequencyDefaultColor) {
+                if ($delayGenerateDate <= $delayGenerateFrequency) {
+                    $delayGenerateColor = $delayGenerateFrequencyDefaultColor;
+                    break;
+                }
+            }
+
+            $array['nextgeneratedate']  = $nextGenerateDate;
+            $array['lastgeneratedate']  = $lastGenerateDate;
+            $array['delaygeneratedate'] = '<span style="color:' . $delayGenerateColor . ';">' . $delayGenerateDate . ' ' . $langs->transnoentities('Days')  . '</span>';
         } else {
             $array['nextgeneratedate']  = 'N/A';
             $array['lastgeneratedate']  = 'N/A';

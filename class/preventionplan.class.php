@@ -56,13 +56,9 @@ class PreventionPlan extends SaturneObject
 	public $ismultientitymanaged = 1;
 
 	/**
-	 * @var int Does object support extrafields ? 0 = No, 1 = Yes.
-	 */
-	public $isextrafieldmanaged = 1;
-	/**
 	 * @var string String with name of icon for digiriskelement. Must be the part after the 'object_' into object_digiriskelement.png
 	 */
-	public $picto = 'fontawesome_fa-info_fas_#d35968';
+	public string $picto = 'fontawesome_fa-info_fas_#d35968';
 
 	/**
 	 * @var PreventionPlanLine[]     Array of subtable lines
@@ -124,7 +120,7 @@ class PreventionPlan extends SaturneObject
 	/**
 	 * Constructor
 	 *
-	 * @param DoliDb $db Database handler
+	 * @param DoliDB $db Database handler
 	 */
 	public function __construct(DoliDB $db)
 	{
@@ -289,14 +285,14 @@ class PreventionPlan extends SaturneObject
 		return $this->setStatusCommon($user, self::STATUS_VALIDATED, $notrigger, 'PREVENTIONPLAN_PENDINGSIGNATURE');
 	}
 
-	/**
-	 *  Return the status
-	 *
-	 *  @param	int		$status        Id status
-	 *  @param  int		$mode          0=long label, 1=short label, 2=Picto + short label, 3=Picto, 4=Picto + long label, 5=Short label + Picto, 6=Long label + Picto
-	 *  @return string 			       Label of status
-	 */
-	public function LibStatut($status, $mode = 0): string
+    /**
+     * Return the status
+     *
+     * @param  int    $status ID status
+     * @param  int    $mode   0 = long label, 1 = short label, 2 = Picto + short label, 3 = Picto, 4 = Picto + long label, 5 = Short label + Picto, 6 = Long label + Picto
+     * @return string         Label of status
+     */
+    public function LibStatut(int $status, int $mode = 0): string
 	{
 		if (empty($this->labelStatus) || empty($this->labelStatusShort)) {
 			global $langs;
@@ -364,10 +360,9 @@ class PreventionPlan extends SaturneObject
     /**
      * Write information of trigger description
      *
-     * @param  Object $object Object calling the trigger
-     * @return string         Description to display in actioncomm->note_private
+     * @return string Description to display in actioncomm->note_private
      */
-    public function getTriggerDescription(SaturneObject $object): string
+    public function getTriggerDescription(): string
     {
         global $langs;
 
@@ -375,14 +370,14 @@ class PreventionPlan extends SaturneObject
         require_once __DIR__ . '/../../saturne/class/saturnesignature.class.php';
 
         $digiriskResources = new DigiriskResources($this->db);
-        $saturneSignature  = new SaturneSignature($this->db, $object->module, $object->element);
-        $societies         = $digiriskResources->fetchResourcesFromObject('', $object);
-        $signatories       = $saturneSignature->fetchSignatories($object->id, $object->element);
+        $saturneSignature  = new SaturneSignature($this->db, $this->module, $this->element);
+        $societies         = $digiriskResources->fetchResourcesFromObject('', $this);
+        $signatories       = $saturneSignature->fetchSignatories($this->id, $this->element);
 
-        $ret  = parent::getTriggerDescription($object);
+        $ret  = parent::getTriggerDescription();
 
-        $ret .= (dol_strlen($object->date_start) > 0 ? $langs->transnoentities('StartDate') . ' : ' . dol_print_date($object->date_start, 'dayhoursec') . '<br>' : '');
-        $ret .= (dol_strlen($object->date_end) > 0 ? $langs->transnoentities('EndDate') . ' : ' . dol_print_date($object->date_end, 'dayhoursec') . '<br>' : '');
+        $ret .= (dol_strlen($this->date_start) > 0 ? $langs->transnoentities('StartDate') . ' : ' . dol_print_date($this->date_start, 'dayhoursec') . '<br>' : '');
+        $ret .= (dol_strlen($this->date_end) > 0 ? $langs->transnoentities('EndDate') . ' : ' . dol_print_date($this->date_end, 'dayhoursec') . '<br>' : '');
         if (is_array($signatories) && !empty($signatories)) {
             foreach($signatories as $signatory) {
                 $ret .= $langs->transnoentities($signatory->role) . ' : ' . $signatory->firstname . ' ' . $signatory->lastname . '<br>';
@@ -404,11 +399,11 @@ class PreventionPlan extends SaturneObject
                 }
             }
         }
-        $ret .= $langs->transnoentities('CSSCTIntervention') . ' : ' . ($object->cssct_intervention ? $langs->transnoentities("Yes") : $langs->transnoentities("No")) . '<br>';
-        $ret .= $langs->transnoentities('PriorVisit') . ' : ' . ($object->prior_visit_bool ? $langs->transnoentities("Yes") : $langs->transnoentities("No")) . '<br>';
-        if ($object->prior_visit_bool) {
-            $ret .= $langs->transnoentities('PriorVisitText') . ' : ' . (!empty($object->prior_visit_text) ? $object->prior_visit_text : 'N/A') . '<br>';
-            $ret .= (dol_strlen($object->prior_visit_date) > 0 ? $langs->transnoentities('PriorVisitDate') . ' : ' . dol_print_date($object->prior_visit_date, 'dayhoursec') . '<br>' : '');
+        $ret .= $langs->transnoentities('CSSCTIntervention') . ' : ' . ($this->cssct_intervention ? $langs->transnoentities("Yes") : $langs->transnoentities("No")) . '<br>';
+        $ret .= $langs->transnoentities('PriorVisit') . ' : ' . ($this->prior_visit_bool ? $langs->transnoentities("Yes") : $langs->transnoentities("No")) . '<br>';
+        if ($this->prior_visit_bool) {
+            $ret .= $langs->transnoentities('PriorVisitText') . ' : ' . (!empty($this->prior_visit_text) ? $this->prior_visit_text : 'N/A') . '<br>';
+            $ret .= (dol_strlen($this->prior_visit_date) > 0 ? $langs->transnoentities('PriorVisitDate') . ' : ' . dol_print_date($this->prior_visit_date, 'dayhoursec') . '<br>' : '');
         }
 
         return $ret;
@@ -487,7 +482,7 @@ class PreventionPlanLine extends SaturneObject
 	/**
 	 * Constructor
 	 *
-	 * @param DoliDb $db Database handler
+	 * @param DoliDB $db Database handler
 	 */
 	public function __construct(DoliDB $db)
 	{
@@ -497,25 +492,24 @@ class PreventionPlanLine extends SaturneObject
     /**
      * Write information of trigger description
      *
-     * @param  Object $object Object calling the trigger
-     * @return string         Description to display in actioncomm->note_private
+     * @return string Description to display in actioncomm->note_private
      */
-    public function getTriggerDescription(SaturneObject $object): string
+    public function getTriggerDescription(): string
     {
         global $langs;
 
         require_once __DIR__ . '/digiriskelement.class.php';
         require_once __DIR__ . '/riskanalysis/risk.class.php';
 
-        $ret = parent::getTriggerDescription($object);
+        $ret = parent::getTriggerDescription();
 
         $risk            = new Risk($this->db);
         $digiriskelement = new DigiriskElement($this->db);
-        $digiriskelement->fetch($object->fk_element);
+        $digiriskelement->fetch($this->fk_element);
 
         $ret .= $langs->trans('ParentElement') . ' : ' . $digiriskelement->ref . " - " . $digiriskelement->label . '<br>';
-        $ret .= $langs->trans('INRSRisk') . ' : ' .  $risk->getDangerCategoryName($object) . '<br>';
-        $ret .= $langs->trans('PreventionMethod') . ' : ' . (!empty($object->prevention_method) ? $object->prevention_method : 'N/A') . '<br>';
+        $ret .= $langs->trans('INRSRisk') . ' : ' .  $risk->getDangerCategoryName($this) . '<br>';
+        $ret .= $langs->trans('PreventionMethod') . ' : ' . (!empty($this->prevention_method) ? $this->prevention_method : 'N/A') . '<br>';
 
         return $ret;
     }

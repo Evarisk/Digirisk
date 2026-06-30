@@ -52,19 +52,12 @@ class Evaluator extends SaturneObject
     public $ismultientitymanaged = 1;
 
     /**
-     * @var int Does object support extrafields ? 0 = No, 1 = Yes.
-     */
-    public $isextrafieldmanaged = 1;
-
-    /**
      * @var string Name of icon for evaluator. Must be a 'fa-xxx' fontawesome code (or 'fa-xxx_fa_color_size') or 'evaluator@digiriskdolibarr' if picto is file 'img/object_evaluator.png'.
      */
     public string $picto = 'fontawesome_fa-user-check_fas_#d35968';
 
     public const STATUS_DELETED   = -1;
-    public const STATUS_DRAFT     = 0;
     public const STATUS_VALIDATED = 1;
-    public const STATUS_LOCKED    = 2;
     public const STATUS_ARCHIVED  = 3;
 
 	/**
@@ -107,7 +100,7 @@ class Evaluator extends SaturneObject
     /**
      * Constructor.
      *
-     * @param DoliDb $db Database handler.
+     * @param DoliDB $db Database handler.
      */
     public function __construct(DoliDB $db)
     {
@@ -128,6 +121,39 @@ class Evaluator extends SaturneObject
 	}
 
     /**
+     * Load evaluator infos
+     *
+     * @param  array     $moreParam More param (filter/filterEvaluator)
+     * @return array     $array     Array of evaluators / evaluatorByEntities
+     * @throws Exception
+     */
+    public static function loadEvaluatorInfos(array $moreParam = []): array
+    {
+        $array = [];
+
+        $select       = ', d.ref AS digiriskElementRef, d.entity AS digiriskElementEntity, d.label AS digiriskElementLabel, u.lastname AS userLastName, u.firstname AS userFirstName';
+        $moreSelects  = ['digiriskElementRef', 'digiriskElementEntity', 'digiriskElementLabel', 'userLastName', 'userFirstName'];
+        $join         = ' INNER JOIN ' . MAIN_DB_PREFIX . 'digiriskdolibarr_digiriskelement AS d ON d.rowid = t.fk_parent';
+        $join        .= ' INNER JOIN ' . MAIN_DB_PREFIX . 'user AS u ON u.rowid = t.fk_user';
+        $filter       = 'd.status = ' . DigiriskElement::STATUS_VALIDATED . ' AND t.status = ' . self::STATUS_VALIDATED . ($moreParam['filter'] ?? '') .  ($moreParam['filterEvaluator'] ?? '');
+        $evaluators   = saturne_fetch_all_object_type('Evaluator', '', '', 0, 0, ['customsql' => $filter], 'AND', false, false, false, $join, [], $select, $moreSelects);
+        if (!is_array($evaluators) || empty($evaluators)) {
+            $evaluators = [];
+        }
+
+        $array['nbEvaluators'] = count($evaluators);
+
+        $array['evaluators'] = [];
+        foreach ($evaluators as $evaluator) {
+            $array['evaluators'][$evaluator->id] = $evaluator;
+            $array['nbEvaluatorByEntities'][$evaluator->entity] =
+                ($array['nbEvaluatorByEntities'][$evaluator->entity] ?? 0) + 1;
+        }
+
+        return $array;
+    }
+
+    /**
      * Load dashboard info evaluator
      *
      * @return array
@@ -141,14 +167,14 @@ class Evaluator extends SaturneObject
         $arrayNbEmployees         = $this->getNbEmployees();
 
         $array['widgets'] = [
-            'evaluator' => [
+            'employees' => [
                 'title'      => $langs->transnoentities('Employees'),
                 'picto'      => 'fas fa-user',
                 'pictoColor' => '#32E592',
                 'label'      => [$langs->transnoentities('NbEmployeesInvolved') ?? '', $langs->transnoentities('NbEmployees') ?? ''],
                 'content'    => [$arrayNbEmployeesInvolved['nbemployeesinvolved'] ?? 0, $arrayNbEmployees['nbemployees'] ?? 0],
                 'tooltip'    => [$langs->transnoentities('NbEmployeesInvolvedTooltip'), (($conf->global->DIGIRISKDOLIBARR_NB_EMPLOYEES > 0 && $conf->global->DIGIRISKDOLIBARR_MANUAL_INPUT_NB_EMPLOYEES) ? $langs->transnoentities('NbEmployeesConfTooltip') : $langs->transnoentities('NbEmployeesTooltip'))],
-                'widgetName' => $langs->transnoentities('Evaluator')
+                'widgetName' => $langs->transnoentities('Employees'),
             ]
         ];
 
@@ -164,7 +190,7 @@ class Evaluator extends SaturneObject
 	 */
 	public function getNbEmployeesInvolved(array $moreParam = []) {
 		// Number employees involved
-		$allevaluators = $this->fetchAll('','', 0, 0, ['customsql' => ($moreParam['filter'] ?? '')], 'AND', 'fk_user');
+		$allevaluators = $this->fetchAll('','', 0, 0, ['customsql' => 't.status = ' . Evaluator::STATUS_VALIDATED . ($moreParam['filter'] ?? '')]);
 		if (is_array($allevaluators) && !empty($allevaluators)) {
 			$array['nbemployeesinvolved'] = count($allevaluators);
 		} else {
@@ -182,14 +208,21 @@ class Evaluator extends SaturneObject
      */
     public function getNbEmployees(array $moreParam = []): array
     {
-        global $user;
+        global $db;
 
         if (getDolGlobalInt('DIGIRISKDOLIBARR_NB_EMPLOYEES') > 0 && getDolGlobalInt('DIGIRISKDOLIBARR_MANUAL_INPUT_NB_EMPLOYEES')) {
             $array['nbemployees'] = getDolGlobalInt('DIGIRISKDOLIBARR_NB_EMPLOYEES');
         } else {
-            $users = $user->get_full_tree(0, 'u.employee = 1' . ($moreParam['filter'] ?? ''));
-            if (!empty($users) && is_array($users)) {
-                $array['nbemployees'] = count($users);
+            $sql  = 'SELECT COUNT(DISTINCT u.rowid) as nb';
+            $sql .= ' FROM ' . MAIN_DB_PREFIX . 'user AS u';
+            $sql .= ' WHERE u.entity IN (' . getEntity('user') . ')';
+            $sql .= ' AND u.employee = 1';
+            $sql .= ' AND u.statut = 1';
+
+            $resql = $db->query($sql);
+            if ($resql) {
+                $obj = $db->fetch_object($resql);
+                $array['nbemployees'] = (int) $obj->nb;
             } else {
                 $array['nbemployees'] = 0;
             }
@@ -200,30 +233,29 @@ class Evaluator extends SaturneObject
     /**
      * Write information of trigger description
      *
-     * @param  Object $object Object calling the trigger
-     * @return string         Description to display in actioncomm->note_private
+     * @return string Description to display in actioncomm->note_private
      */
-    public function getTriggerDescription(SaturneObject $object): string
+    public function getTriggerDescription(): string
     {
         global $langs;
 
         require_once __DIR__ . '/digiriskelement.class.php';
 
-        $ret = parent::getTriggerDescription($object);
+        $ret = parent::getTriggerDescription();
 
         $now             = dol_now();
         $userstat        = new User($this->db);
         $digiriskelement = new DigiriskElement($this->db);
 
-        $digiriskelement->fetch($object->fk_parent);
-        $userstat->fetch($object->fk_user);
+        $digiriskelement->fetch($this->fk_parent);
+        $userstat->fetch($this->fk_user);
         $langs->load('companies');
 
         $ret .= $langs->trans('ParentElement') . ' : ' . $digiriskelement->ref . " - " . $digiriskelement->label . '<br>';
         $ret .= $langs->trans('UserAssigned') . ' : ' . $userstat->firstname . " " . $userstat->lastname . '<br>';
-        $ret .= $langs->trans('PostOrFunction') . ' : ' . (!empty($object->job) ? $object->job : 'N/A') . '<br>';
+        $ret .= $langs->trans('PostOrFunction') . ' : ' . (!empty($this->job) ? $this->job : 'N/A') . '<br>';
         $ret .= $langs->trans('AssignmentDate') . ' : ' . dol_print_date($now, 'dayhoursec', 'tzuser') . '<br>';
-        $ret .= $langs->trans('EvaluationDuration') . ' : ' . convertSecondToTime($object->duration * 60, 'allhourmin') . ' min' . '<br>';
+        $ret .= $langs->trans('EvaluationDuration') . ' : ' . convertSecondToTime($this->duration * 60, 'allhourmin') . ' min' . '<br>';
 
         return $ret;
     }

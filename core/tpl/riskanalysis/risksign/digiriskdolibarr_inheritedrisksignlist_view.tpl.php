@@ -45,6 +45,7 @@ if ($object->fk_parent > 0) {
 		}
 	}
 	$sql .= ")";
+    $sql .= ' AND t.status > 0'; // We only want to show inherited risksigns that are not deleted
 
 	foreach ($search as $key => $val) {
 		if ($key == 'status' && $search[$key] == -1) continue;

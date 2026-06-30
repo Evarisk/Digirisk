@@ -335,8 +335,8 @@ $evaluation->method = $lastRiskAssessment->method ?: "standard" ;
 							</div>
 						</div>
 						<div class="risk-evaluation-comment">
-							<span class="title"><i class="fas fa-comment-dots"></i> <?php echo $langs->trans('Comment'); ?></span>
-							<?php print '<textarea name="evaluationComment' . $risk->id . '" rows="' . ROWS_2 . '">' . ('') . '</textarea>' . "\n"; ?>
+							<span class="title"><i class="fas fa-comment-dots"></i> <?php echo $langs->trans('Comment'); ?> (<span class="char-counter">65535</span> <?php echo $langs->trans('CharRemaining'); ?>)</span>
+							<?php print '<textarea class="evaluation-comment-textarea" data-maxlength="65535" maxlength="65535" name="evaluationComment' . $risk->id . '" rows="' . ROWS_2 . '">' . ('') . '</textarea>' . "\n"; ?>
 						</div>
 					</div>
 					<?php if ($conf->global->DIGIRISKDOLIBARR_SHOW_RISKASSESSMENT_DATE) : ?>
@@ -414,8 +414,8 @@ $evaluation->method = $lastRiskAssessment->method ?: "standard" ;
 			<!-- Modal-Footer -->
 			<div class="modal-footer">
 				<?php if ($permissiontoadd) : ?>
-					<div class="risk-evaluation-create wpeo-button button-blue button-disable modal-close" value="<?php echo $risk->id ?>">
-						<i class="fas fa-plus"></i> <?php echo $langs->trans('Add'); ?>
+					<div class="risk-evaluation-create wpeo-button button-blue button-disable modal-close"value="<?php echo $risk->id ?>">
+						<i class="fas fa-plus"></i> <span style="color: #fff"><?php echo $langs->trans('Add'); ?></span>
 					</div>
 				<?php else : ?>
 					<div class="wpeo-button button-grey wpeo-tooltip-event" aria-label="<?php echo $langs->trans('PermissionDenied') ?>">

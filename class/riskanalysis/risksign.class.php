@@ -53,14 +53,9 @@ class RiskSign extends SaturneObject
 	public $ismultientitymanaged = 1;
 
 	/**
-	 * @var int Does object support extrafields ? 0 = No, 1 = Yes.
-	 */
-	public $isextrafieldmanaged = 1;
-
-	/**
 	 * @var string String with name of icon for risksign. Must be the part after the 'object_' into object_risksign.png
 	 */
-	public $picto = 'risksign@digiriskdolibarr';
+	public string $picto = 'risksign@digiriskdolibarr';
 
     public const STATUS_DELETED   = -1;
     public const STATUS_DRAFT     = 0;
@@ -104,7 +99,7 @@ class RiskSign extends SaturneObject
 	/**
 	 * Constructor.
 	 *
-	 * @param DoliDb $db Database handler.
+	 * @param DoliDB $db Database handler.
 	 */
 	public function __construct(DoliDB $db)
 	{
@@ -123,6 +118,33 @@ class RiskSign extends SaturneObject
 		$filter = array('customsql' => 'fk_element=' . $this->db->escape($parent_id) . ' AND status > ' . $this::STATUS_DELETED);
 		return $this->fetchAll('', '', 0, 0, $filter, 'AND');
 	}
+
+    /**
+     * Load risk sign infos
+     *
+     * @param  array     $moreParam More param (filter)
+     * @return array     $array     Array of risk signs
+     * @throws Exception
+     */
+    public static function loadRiskSignInfos(array $moreParam = []): array
+    {
+        $array = [];
+
+        //@todo: missing shared and inherited risksigns
+
+        $select             = ', d.ref AS digiriskElementRef, d.entity AS digiriskElementEntity, d.label AS digiriskElementLabel';
+        $moreSelects        = ['digiriskElementRef', 'digiriskElementEntity', 'digiriskElementLabel'];
+        $join               = ' INNER JOIN ' . MAIN_DB_PREFIX . 'digiriskdolibarr_digiriskelement AS d ON d.rowid = t.fk_element';
+        $filter             = 'd.status = ' . DigiriskElement::STATUS_VALIDATED . ' AND t.status = ' . self::STATUS_VALIDATED . ($moreParam['filter'] ?? '');
+        $array['riskSigns'] = saturne_fetch_all_object_type('RiskSign', '', '', 0, 0, ['customsql' => $filter], 'AND', false, false, false, $join, [], $select, $moreSelects);
+        if (!is_array($array['riskSigns']) || empty($array['riskSigns'])) {
+            $array['riskSigns'] = [];
+        }
+
+        $array['nbRiskSigns'] = count($array['riskSigns']);
+
+        return $array;
+    }
 
 	/**
 	 * Get risksign categories json in /digiriskdolibarr/js/json/
@@ -313,28 +335,26 @@ class RiskSign extends SaturneObject
     /**
      * Write information of trigger description
      *
-     * @param  Object $object Object calling the trigger
-     * @return string         Description to display in actioncomm->note_private
+     * @return string Description to display in actioncomm->note_private
      */
-    public function getTriggerDescription(SaturneObject $object): string
+    public function getTriggerDescription(): string
     {
         global $conf, $langs;
 
         require_once __DIR__ . '/../digiriskelement.class.php';
         require_once __DIR__ . '/risk.class.php';
 
-        $ret = parent::getTriggerDescription($object);
+        $ret = parent::getTriggerDescription();
 
         $digiriskelement = new DigiriskElement($this->db);
-        $risk            = new Risk($this->db);
-        $digiriskelement->fetch($object->fk_element);
+        $digiriskelement->fetch($this->fk_element);
 
         $ret .= $langs->trans('ParentElement') . ' : ' . $digiriskelement->ref . " - " . $digiriskelement->label . '<br>';
-        $ret .= $langs->trans('RiskCategory') . ' : ' . $risk->getDangerCategoryName($object) . '<br>';
+        $ret .= $langs->trans('RiskSignCategory') . ' : ' . $this->getRiskSignCategory($this, 'name') . '<br>';
 
-        if (dol_strlen($object->applied_on) > 0) {
-            $digiriskelement->fetch($object->applied_on);
-            $ret .= $langs->trans('RiskSignSharedWithEntityRefLabel', $object->ref) . ' S' . $conf->entity . ' ' . $digiriskelement->ref . " - " . $digiriskelement->label . '<br>';
+        if (dol_strlen($this->applied_on) > 0) {
+            $digiriskelement->fetch($this->applied_on);
+            $ret .= $langs->trans('RiskSignSharedWithEntityRefLabel', $this->ref) . ' S' . $conf->entity . ' ' . $digiriskelement->ref . " - " . $digiriskelement->label . '<br>';
         }
 
         return $ret;

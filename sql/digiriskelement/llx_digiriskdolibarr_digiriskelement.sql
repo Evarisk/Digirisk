@@ -20,7 +20,7 @@ CREATE TABLE llx_digiriskdolibarr_digiriskelement(
 	entity           integer DEFAULT 1 NOT NULL,
 	date_creation    datetime NOT NULL,
 	tms              timestamp DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
-	import_key       integer DEFAULT NULL,
+	import_key       varchar(14),
 	status           smallint DEFAULT 1,
 	label            varchar(255) NOT NULL,
 	description      text,
