@@ -446,6 +446,7 @@
             $userTmp->fetch($object->fk_user_assign);
             $digiriskElement->fetch($object->array_options['options_digiriskdolibarr_ticket_service']);
             $categories = $category->containing($object->id, Categorie::TYPE_TICKET);
+            $allCategories = '';
             if (!empty($categories)) {
                 $index = 0;
                 foreach ($categories as $cat) {
