@@ -299,6 +299,9 @@ body:has(.page-ut-gp-list) {
   font-size: 10px;
   padding: 3px 6px;
 }
+.page-ut-gp-list .side-nav .workunit-list .row-container {
+  /* Long GP/UT names wrap onto new lines instead of stretching the row; flex-grow + min-width:0 keep the row within the fixed panel width */
+}
 .page-ut-gp-list .side-nav .workunit-list .row-container .title.element-label {
   font-size: 13px;
   padding-left: 0;
@@ -6188,6 +6191,33 @@ td > .risk-evaluation-list-content .risk-evaluation-container:not(.advanced, .st
 
 .risk-evaluation-edit-modal .wpeo-modal.modal-risk.modal-active {
   z-index: 1004;
+}
+
+#generationStatus li {
+  display: flex;
+  align-items: center;
+  margin-left: 15px;
+}
+
+#progressbar {
+  margin: 20px;
+}
+
+#progressbar .ui-progressbar-value {
+  background-color: #966ea2;
+  width: 0;
+}
+
+#generationStatus, .loader, .modal-container h2 {
+  margin-left: 15px;
+}
+
+.loader {
+  margin-right: 15px;
+}
+
+.new-document {
+  color: green;
 }
 
 .digiAI-tabs-container {

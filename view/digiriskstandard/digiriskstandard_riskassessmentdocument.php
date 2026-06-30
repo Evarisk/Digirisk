@@ -47,6 +47,9 @@ require_once __DIR__ . '/../../class/digiriskdolibarrdocuments/riskassessmentdoc
 require_once __DIR__ . '/../../lib/digiriskdolibarr_digiriskstandard.lib.php';
 require_once __DIR__ . '/../../lib/digiriskdolibarr_function.lib.php';
 
+// Load Saturne libraries
+require_once __DIR__ . '/../../../saturne/core/modules/saturne/modules_saturne.php';
+
 // Global variables definitions
 global $conf, $db, $hookmanager, $langs, $user;
 
@@ -343,7 +346,9 @@ if ($object->id > 0) {
         $fileDir   = $upload_dir . '/' . $document->element;
         $urlSource =  $_SERVER['PHP_SELF'] .'?id=' . $object->id;
 
+        print '<div class="riskassessmentdocument-generation">';
         print saturne_show_documents($object->module . ':RiskAssessmentDocument', $document->element, $fileDir, $urlSource, $permissiontoadd, $permissiontodelete, '', 1, 0, 0, 0, '', '', '', $langs->defaultlang, '', $object);
+        print '</div>';
 
         print '</div><div class="fichehalfright">';
 
@@ -377,6 +382,45 @@ if ($object->id > 0) {
 
     require_once DOL_DOCUMENT_ROOT . '/core/tpl/card_presend.tpl.php';
 }
+
+$saturneDocumentModel        = new SaturneDocumentModel($db, 'digiriskdolibarr', 'riskassessmentdocument');
+$documentType                = strtolower('riskassessmentdocument');
+$modellist                   = $saturneDocumentModel->liste_modeles($db, $documentType);
+$riskassessmentDocumentModel = array_keys($modellist)[1];
+
+$groupmentUrl              = DOL_URL_ROOT . '/custom/digiriskdolibarr/view/digiriskelement/digiriskelement_card.php?forcebuilddoc=1';
+$riskAssessmentDocumentUrl = DOL_URL_ROOT . '/custom/digiriskdolibarr/view/digiriskstandard/digiriskstandard_riskassessmentdocument.php?action=builddoc&model='.$riskassessmentDocumentModel;
+$documentGeneratedText     = $langs->trans('DocumentGenerated');
+
+$digiriskElementList = $digiriskelement->getActiveDigiriskElements();
+$digiriskElementIds  = '';
+
+if (is_array($digiriskElementList) && !empty($digiriskElementList)) {
+    foreach($digiriskElementList as $digiriskElementId => $digiriskElementSingle) {
+        $digiriskElementIds .= $digiriskElementId . ',';
+    }
+}
+print '<input hidden id="groupmentUrl" value="' . $groupmentUrl . '">';
+print '<input hidden id="riskAssessmentDocumentUrl" value="' . $riskAssessmentDocumentUrl . '">';
+print '<input hidden id="digiriskElementIds" value="' . $digiriskElementIds . '">';
+print '<input hidden id="documentGeneratedText" value="' . $documentGeneratedText . '">';
+
+?>
+    <div id="generationModal" class="wpeo-modal">
+        <div class="modal-container">
+            <div class="modal-header">
+                <h2><?php echo $langs->trans('RiskAssessmentDocumentGenerated')?></h2>
+            </div>
+            <div id="progressbar">
+                <div class="ui-progressbar-value"></div>
+            </div>
+            <div class="modal-content">
+                <ul id="generationStatus">
+                </ul>
+            </div>
+        </div>
+    </div>
+<?php
 
 // End of page
 llxFooter();

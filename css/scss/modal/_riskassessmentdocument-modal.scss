@@ -1,0 +1,27 @@
+#generationStatus li {
+  display: flex;
+  align-items: center;
+  margin-left: 15px;
+}
+
+#progressbar {
+  margin: 20px;
+}
+
+#progressbar .ui-progressbar-value {
+  background-color: #966ea2;
+  width: 0;
+}
+
+#generationStatus, .loader, .modal-container h2 {
+  margin-left: 15px;
+}
+
+.loader {
+  margin-right: 15px;
+}
+
+.new-document {
+  color: green;
+}
+
