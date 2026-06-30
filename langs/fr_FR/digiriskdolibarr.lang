@@ -1718,6 +1718,9 @@ AddContributor                     = Ajouter un contributeur
 RemoveContact                      = Retirer le contact
 ColumnWidth                        = Largeur
 ColumnGap                          = Espacement
+ActionPlanExportCsv                = Télécharger le PAPRIPACT au format CSV
+ActionPlanExportA3                 = Télécharger le PAPRIPACT en PDF A3 paysage
+ActionPlanExportGantt              = Télécharger le diagramme de Gantt en image PNG
 
 # ActionPlan — ActionComm Logging
 ActionPlanLogging                  = Plan d'Action — Historique des modifications

@@ -486,6 +486,118 @@ if ($action == 'removeTaskCategory' && !empty(GETPOSTINT('task_id'))) {
     exit;
 }
 
+// Action to generate and download the PAPRIPACT in A3 landscape format
+if ($action == 'builddoc' && GETPOST('model', 'alpha') == 'papripact_a3_paysage_projectdocument' && $user->hasRight('projet', 'creer')) {
+    require_once DOL_DOCUMENT_ROOT . '/projet/class/project.class.php';
+    require_once __DIR__ . '/../../class/digiriskdolibarrdocuments/projectdocument.class.php';
+
+    $project = new Project($db);
+    if ($projectId > 0 && $project->fetch($projectId) > 0) {
+        // documents_action.tpl.php expects these variables
+        $object          = $project;
+        $document        = new ProjectDocument($db);
+        $permissiontoadd = 1;
+        $moreParams      = ['modulePart' => 'project'];
+        $shouldRedirect  = false;
+
+        require __DIR__ . '/../../../saturne/core/tpl/documents/documents_action.tpl.php';
+
+        if (!empty($document->last_main_doc)) {
+            $downloadUrl = DOL_URL_ROOT . '/document.php?modulepart=project&file=' . urlencode($project->ref . '/' . $document->last_main_doc) . '&entity=' . $conf->entity;
+            header('Location: ' . $downloadUrl);
+            exit;
+        }
+        // On failure documents_action.tpl.php has already queued the error messages
+    } else {
+        setEventMessages($langs->trans('ErrorRecordNotFound'), [], 'errors');
+    }
+
+    header('Location: ' . $_SERVER['PHP_SELF'] . '?view=kanban');
+    exit;
+}
+
+// Action to export the action plan (PAPRIPACT) corrective actions as a CSV file
+if ($action == 'exportCsv' && $permissiontoread) {
+    $exportTasks = ($projectId > 0) ? $task->getTasksArray(0, 0, $projectId) : [];
+    if (!is_array($exportTasks)) {
+        $exportTasks = [];
+    }
+
+    $exportTaskIds = array_map(function ($t) { return (int) $t->id; }, $exportTasks);
+
+    // Linked risk ref per task
+    $exportRiskRef = [];
+    if (!empty($exportTaskIds)) {
+        $sql  = "SELECT te.fk_object, r.ref FROM " . MAIN_DB_PREFIX . "projet_task_extrafields as te";
+        $sql .= " INNER JOIN " . MAIN_DB_PREFIX . "digiriskdolibarr_risk as r ON r.rowid = te.fk_risk";
+        $sql .= " WHERE te.fk_risk > 0 AND te.fk_object IN (" . implode(',', $exportTaskIds) . ")";
+        $resql = $db->query($sql);
+        if ($resql) {
+            while ($obj = $db->fetch_object($resql)) {
+                $exportRiskRef[(int) $obj->fk_object] = $obj->ref;
+            }
+            $db->free($resql);
+        }
+    }
+
+    // Responsible (TASKEXECUTIVE) per task
+    $exportResponsible = [];
+    if (!empty($exportTaskIds)) {
+        $sql  = "SELECT ec.element_id, u.firstname, u.lastname FROM " . MAIN_DB_PREFIX . "element_contact as ec";
+        $sql .= " INNER JOIN " . MAIN_DB_PREFIX . "c_type_contact as tc ON ec.fk_c_type_contact = tc.rowid";
+        $sql .= " INNER JOIN " . MAIN_DB_PREFIX . "user as u ON ec.fk_socpeople = u.rowid";
+        $sql .= " WHERE ec.element_id IN (" . implode(',', $exportTaskIds) . ")";
+        $sql .= " AND tc.element = 'project_task' AND tc.source = 'internal' AND tc.code = 'TASKEXECUTIVE'";
+        $resql = $db->query($sql);
+        if ($resql) {
+            while ($obj = $db->fetch_object($resql)) {
+                $exportResponsible[(int) $obj->element_id][] = trim($obj->firstname . ' ' . $obj->lastname);
+            }
+            $db->free($resql);
+        }
+    }
+
+    $separator = getDolGlobalString('DIGIRISKDOLIBARR_KANBAN_CSV_SEPARATOR', ';');
+    $fileName  = 'papripact_' . dol_print_date(dol_now(), 'dayxcard') . '.csv';
+
+    header('Content-Type: text/csv; charset=UTF-8');
+    header('Content-Disposition: attachment; filename="' . $fileName . '"');
+
+    $output = fopen('php://output', 'w');
+    // UTF-8 BOM so Excel reads accented characters correctly
+    fwrite($output, "\xEF\xBB\xBF");
+
+    fputcsv($output, [
+        $langs->transnoentities('Ref'),
+        $langs->transnoentities('Label'),
+        $langs->transnoentities('DateStart'),
+        $langs->transnoentities('DateEnd'),
+        $langs->transnoentities('PlannedWorkload'),
+        $langs->transnoentities('Budget'),
+        $langs->transnoentities('Progress'),
+        $langs->transnoentities('LinkedRisk'),
+        $langs->transnoentities('Responsible'),
+    ], $separator);
+
+    foreach ($exportTasks as $t) {
+        $budget = property_exists($t, 'budget_amount') ? (float) $t->budget_amount : 0;
+        fputcsv($output, [
+            $t->ref,
+            $t->label,
+            $t->date_start ? dol_print_date($t->date_start, 'day') : '',
+            $t->date_end ? dol_print_date($t->date_end, 'day') : '',
+            $t->planned_workload > 0 ? convertSecondToTime($t->planned_workload, 'allhourmin') : '',
+            $budget > 0 ? $budget : '',
+            (int) $t->progress . '%',
+            $exportRiskRef[$t->id] ?? '',
+            isset($exportResponsible[$t->id]) ? implode(', ', $exportResponsible[$t->id]) : '',
+        ], $separator);
+    }
+    fclose($output);
+    $db->close();
+    exit;
+}
+
 /*
  * View
  */
@@ -872,6 +984,9 @@ $head[0][1] = '<i class="fas fa-columns pictofixedwidth"></i>' . $langs->trans('
 $head[0][2] = 'kanban';
 
 print dol_get_fiche_head($head, $view, $title, -1, 'task');
+
+// Top-right export toolbar (CSV / PAPRIPACT A3 PDF / Gantt PNG), shared by both views
+require __DIR__ . '/../../core/tpl/actionplan/actionplan_export_buttons.tpl.php';
 
 // Include appropriate TPL
 if ($view === 'kanban') {
