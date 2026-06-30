@@ -29,7 +29,9 @@ foreach ($tasksJson as $t) {
 <!-- JSON data for Gantt JS -->
 <script type="application/json" id="gantt-data"><?= json_encode($ganttData) ?></script>
 
-<div class="gantt-container">
+<div class="gantt-container"
+     data-autoexport="<?= GETPOST('export', 'aZ09') == 'png' ? 'png' : '' ?>"
+     data-html2canvas-url="<?= DOL_URL_ROOT ?>/custom/digiriskdolibarr/js/lib/html2canvas.min.js">
     <?php if (empty($tasksJson)) : ?>
         <div class="gantt-empty">
             <i class="fas fa-tasks" style="font-size: 48px; opacity: 0.3;"></i>
