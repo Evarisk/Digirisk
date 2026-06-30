@@ -403,11 +403,17 @@ class pdf_papripact_a3_paysage_projectdocument
 				$objectDoc = array();
 				for ($i = 0; $i < $nblines; $i++) {
                     $object->lines[$i]->fetch_optionals();
-                    $risk->fetch($object->lines[$i]->array_options['options_fk_risk']);
-					$lastEvaluation = $riskassessment->fetchFromParent($risk->id, 1);
-					if ($lastEvaluation > 0 && !empty($lastEvaluation) && is_array($lastEvaluation)) {
-						$lastEvaluation = array_shift($lastEvaluation);
-					}
+                    // A corrective action is not necessarily linked to a risk: reset and guard the fetch to avoid a fatal on a null fk_risk
+                    $risk           = new Risk($this->db);
+                    $fkRisk         = (int) ($object->lines[$i]->array_options['options_fk_risk'] ?? 0);
+                    $lastEvaluation = null;
+                    if ($fkRisk > 0) {
+                        $risk->fetch($fkRisk);
+                        $lastEvaluation = $riskassessment->fetchFromParent($risk->id, 1);
+                        if ($lastEvaluation > 0 && !empty($lastEvaluation) && is_array($lastEvaluation)) {
+                            $lastEvaluation = array_shift($lastEvaluation);
+                        }
+                    }
 
                     $users          = $object->lines[$i]->liste_contact(-1, 'internal');
                     $userExecutives = [];
@@ -417,7 +423,7 @@ class pdf_papripact_a3_paysage_projectdocument
                         }
                     };
 
-                    $risk->category = $risk->getDangerCategoryName($risk);
+                    $risk->category = $fkRisk > 0 ? $risk->getDangerCategoryName($risk) : '';
 
 					$tmpArray = array("cotation" => empty($lastEvaluation->cotation) ? 0 : $lastEvaluation->cotation);
 					$tmpArray += array("task_ref" => $object->lines[$i]->ref);
