@@ -1,11 +1,3 @@
-# Digirisk Dolibarr - English translations
-# Copyright (C) Evarisk
-#
-# This file is a i18n/l10n file for Dolibarr.
-# Strings in this file can contain special characters.
-# A string can be used as a title, a menu entry, a label, a description...
-# Keys can be the same as the English string (when empty of accents).
-
 CurativeAction                           = Curative actions
 CorrectiveAction                         = Corrective actions
 PreventiveAction                         = Preventive actions
@@ -29,3 +21,45 @@ ActionClosed                             = Action has been closed
 ActionsAreProjectTasks                   = Actions are Dolibarr project sub-tasks
 SeeProjectTasksView                      = See parent task
 OpenTask                                 = Open task
+
+# MeteoVigilance - Météo-France weather warnings
+MeteoVigilance = Météo-France weather warning
+MeteoVigilancePanelTitle = %s warning
+MeteoVigilanceAdvice2 = Be alert
+MeteoVigilanceAdvice3 = Be very vigilant
+MeteoVigilanceAdvice4 = Take action
+MeteoVigilanceUpdatedAt = Updated %s
+MeteoVigilanceEnabled = Enable weather warnings
+MeteoVigilanceEnabledDescription = Show the Météo-France weather warning widget on the dashboard (and the alert banner for orange/red warnings).
+MeteoVigilanceLevel = Warning level
+MeteoVigilanceActivePhenomena = Active phenomena
+MeteoVigilanceNoAlert = No particular warning
+MeteoVigilanceSource = Source
+MeteoVigilanceSeeOnMeteoFrance = View on vigilance.meteofrance.fr
+MeteoVigilanceNotConfigured = Météo-France API key not configured — click to configure
+MeteoVigilanceUnknownDepartment = Company department could not be determined
+MeteoVigilanceUnavailable = Warning data temporarily unavailable
+MeteoVigilanceBannerTitle = %s warning in effect for department %s
+MeteoVigilanceLevel1 = Green
+MeteoVigilanceLevel2 = Yellow
+MeteoVigilanceLevel3 = Orange
+MeteoVigilanceLevel4 = Red
+MeteoVigilancePhenomenon1 = Strong wind
+MeteoVigilancePhenomenon2 = Rain-flood
+MeteoVigilancePhenomenon3 = Thunderstorms
+MeteoVigilancePhenomenon4 = Floods
+MeteoVigilancePhenomenon5 = Snow-ice
+MeteoVigilancePhenomenon6 = Heatwave
+MeteoVigilancePhenomenon7 = Extreme cold
+MeteoVigilancePhenomenon8 = Avalanches
+MeteoVigilancePhenomenon9 = Coastal flooding
+MeteoVigilanceSetup = Weather warning configuration
+MeteoVigilanceApiKey = Météo-France API key
+MeteoVigilanceApiKeyDescription = API key from the Météo-France portal (create an account and a "Bulletin Vigilance" application on <a href="https://portail-api.meteofrance.fr" target="_blank">portail-api.meteofrance.fr</a> to generate the key).
+MeteoVigilanceDepartment = Department code (override)
+MeteoVigilanceDepartmentDescription = Leave empty to auto-detect the department from the company address. Otherwise enter a code (e.g. 35, 2A).
+MeteoVigilanceCacheTTL = Cache duration (seconds)
+MeteoVigilanceCacheTTLDescription = How long API data is cached before a new call (default 3600).
+MeteoVigilanceSettings = Weather warning configuration
+MeteoVigilanceRefreshNow = Refresh now
+MeteoVigilanceRefreshed = Data refreshed: %s warning for department %s

@@ -453,7 +453,7 @@ class Risk extends SaturneObject
 							foreach ($digiriskElementOfEntity->linkedObjectsIds['digiriskdolibarr_risk'] as $sharedRiskId) {
                                 $sharedRisk         = $riskList[$sharedRiskId];
                                 $sharedParentActive = array_search($sharedRisk->fk_element, array_column($activeDigiriskElements, 'id'));
-								if (is_object($sharedRisk) && $sharedParentActive > 0 && !in_array($sharedRisk->id, $inserted)) {
+								if (is_object($sharedRisk) && $sharedParentActive !== false && !in_array($sharedRisk->id, $inserted)) {
                                     $clonedRisk              = clone $sharedRisk;
                                     $clonedRisk->appliedOn   = $digiriskElementOfEntity->id;
                                     $clonedRisk->origin_type = 'shared';
@@ -472,7 +472,7 @@ class Risk extends SaturneObject
 						foreach ($parentElement->linkedObjectsIds['digiriskdolibarr_risk'] as $sharedRiskId) {
 							$sharedRisk         = $riskList[$sharedRiskId];
                             $sharedParentActive = array_search($sharedRisk->fk_element, array_column($activeDigiriskElements, 'id'));
-                            if (is_object($sharedRisk)  && $sharedParentActive > 0 && !in_array($sharedRisk->id, $inserted)) {
+                            if (is_object($sharedRisk)  && $sharedParentActive !== false && !in_array($sharedRisk->id, $inserted)) {
                                 $clonedRisk              = clone $sharedRisk;
                                 $clonedRisk->appliedOn   = $parent_id;
                                 $clonedRisk->origin_type = 'shared';
@@ -495,6 +495,80 @@ class Risk extends SaturneObject
 			return -1;
 		}
 	}
+
+    /**
+     * Build risk levels (1 to 4) for an element, split in two buckets:
+     *  - 'inherited': inherited (parent tree) + children (descendants) risks of the same entity;
+     *  - 'shared':    shared (multi-entity linked) risks from other entities.
+     * Own risks are excluded: they are already handled by loadRiskInfos() with the element filter.
+     *
+     * @param  array     $moreParam More param (object)
+     * @return array                ['inherited' => ['riskByRiskAssessmentLevels' => array, 'digiriskElements' => array],
+     *                                'shared'    => ['riskByRiskAssessmentLevels' => array, 'digiriskElements' => array]]
+     * @throws Exception
+     */
+    public function getInheritedAndSharedRiskLevels(array $moreParam): array
+    {
+        $result = [
+            'inherited' => ['riskByRiskAssessmentLevels' => [], 'digiriskElements' => []],
+            'shared'    => ['riskByRiskAssessmentLevels' => [], 'digiriskElements' => []],
+        ];
+
+        $object = $moreParam['object'] ?? null;
+        if (!is_object($object) || $object->id <= 0) {
+            return $result;
+        }
+
+        // Own + children (descendants) + inherited (ancestors) + shared (multi-entity linked) risks for this element.
+        $fetchParam = ['filterRisk' => '', 'filterRiskAssessment' => ''];
+        $risks      = $this->fetchRisksOrderedByCotation($object->id, true, true, true, $fetchParam);
+        if (!is_array($risks) || empty($risks)) {
+            return $result;
+        }
+
+        $digiriskElement = new DigiriskElement($this->db);
+        $riskAssessment  = new RiskAssessment($this->db);
+
+        $currentElements = $digiriskElement->getActiveDigiriskElements();
+        $sharedElements  = $digiriskElement->getActiveDigiriskElements('shared');
+        $allElements     = (is_array($currentElements) ? $currentElements : []) + (is_array($sharedElements) ? $sharedElements : []);
+
+        foreach ($risks as $riskSingle) {
+            $isShared = (isset($riskSingle->origin_type) && $riskSingle->origin_type === 'shared');
+
+            // Skip own risks: they are already rendered by the base "current" segment.
+            if (!$isShared && $riskSingle->fk_element == $object->id) {
+                continue;
+            }
+
+            $lastEvaluation = $riskSingle->lastEvaluation;
+            if (!is_object($lastEvaluation)) {
+                continue;
+            }
+
+            // Flatten the risk assessment fields expected by setRiskByRiskAssessmentLevelsSegment().
+            $riskSingle->riskAssessmentRef          = $lastEvaluation->ref;
+            $riskSingle->riskAssessmentCotation     = $lastEvaluation->cotation;
+            $riskSingle->riskAssessmentDate         = $lastEvaluation->date_riskassessment;
+            $riskSingle->riskAssessmentDateCreation = $lastEvaluation->date_creation;
+            $riskSingle->riskAssessmentComment      = $lastEvaluation->comment;
+            $riskSingle->riskAssessmentPhoto        = $lastEvaluation->photo;
+
+            $riskAssessment->cotation = $lastEvaluation->cotation;
+            $scale                    = $riskAssessment->getEvaluationScale();
+
+            $bucket = $isShared ? 'shared' : 'inherited';
+
+            $result[$bucket]['riskByRiskAssessmentLevels'][$scale][] = $riskSingle;
+
+            $fkElement = $riskSingle->fk_element;
+            if (!isset($result[$bucket]['digiriskElements'][$fkElement]) && isset($allElements[$fkElement])) {
+                $result[$bucket]['digiriskElements'][$fkElement] = ['object' => $allElements[$fkElement], 'depth' => 0];
+            }
+        }
+
+        return $result;
+    }
 
     /**
      * Get risk categories from the JSON file
@@ -965,7 +1039,7 @@ class Risk extends SaturneObject
         $array['dataset']    = 1;
         $array['labels']     = $this->cotations;
 
-        $array['data'] = $riskByDangerCategoriesAndRiskAssessments['nbRiskByCotations'];
+        $array['data'] = $riskByDangerCategoriesAndRiskAssessments['nbRiskByCotations'] ?? [];
 
         return $array;
     }
@@ -1040,7 +1114,7 @@ class Risk extends SaturneObject
 
         foreach ($dangerCategories as $dangerCategory) {
             $array['data'][$dangerCategory['position']][] = $dangerCategory['name'];
-            $array['data'][$dangerCategory['position']][] = $riskByDangerCategoriesAndRiskAssessments[$dangerCategory['name']]['risk'];
+            $array['data'][$dangerCategory['position']][] = $riskByDangerCategoriesAndRiskAssessments[$dangerCategory['name']]['risk'] ?? 0;
         }
 
         return $array;

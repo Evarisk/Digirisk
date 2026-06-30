@@ -77,7 +77,7 @@ if (!empty($related_tasks) && is_array($related_tasks)) {
 				}
 				if ($nb_of_tasks_in_progress == 0) : ?>
 					<div class="riskassessment-task-container riskassessment-no-task">
-						<div class="riskassessment-task-single-content riskassessment-task-single-content-<?php echo $risk->id ?>" value="<?php echo $related_task->id ?>">
+						<div class="riskassessment-task-single-content riskassessment-task-single-content-<?php echo $risk->id ?>" value="<?php echo $related_task->id ?? 0 ?>">
 							<div class="riskassessment-task-single riskassessment-task-single-<?php echo $risk->id ?>">
 								<div class="riskassessment-task-content">
 									<div class="riskassessment-task-data" style="justify-content: center;">
@@ -119,7 +119,7 @@ if (!empty($related_tasks) && is_array($related_tasks)) {
 		<?php else : ?>
 			<div class="riskassessment-task-listing-wrapper riskassessment-task-listing-wrapper-<?php echo $risk->id ?>">
 				<div class="riskassessment-task-container riskassessment-no-task">
-					<div class="riskassessment-task-single-content riskassessment-task-single-content-<?php echo $risk->id ?>" value="<?php echo $related_task->id ?>">
+					<div class="riskassessment-task-single-content riskassessment-task-single-content-<?php echo $risk->id ?>" value="0">
 						<div class="riskassessment-task-single riskassessment-task-single-<?php echo $risk->id ?>">
 							<div class="riskassessment-task-content">
 								<div class="riskassessment-task-data" style="justify-content: center;">

@@ -1,4 +1,5 @@
 <?php
+$allRisks             = $allRisks ?? 0;
 $selectedfields_label = 'risklist_selectedfields';
 // Selection of new fields
 require __DIR__ . '/../../../../class/actions_changeselectedfields.php';
@@ -487,8 +488,8 @@ if ( ! preg_match('/(evaluation)/', $sortfield)) {
 
     foreach ($search as $key => $val) {
         if ($key == 'status' && $search[$key] == -1) continue;
-        $mode_search = (($evaluation->isInt($evaluation->fields[$key]) || $evaluation->isFloat($evaluation->fields[$key])) ? 1 : 0);
-        if (strpos($evaluation->fields[$key]['type'], 'integer:') === 0) {
+        $mode_search = (($risk->isInt($risk->fields[$key]) || $risk->isFloat($risk->fields[$key])) ? 1 : 0);
+        if (strpos($risk->fields[$key]['type'], 'integer:') === 0) {
             if ($search[$key] == '-1') $search[$key] = '';
             $mode_search                             = 2;
         }
@@ -597,6 +598,13 @@ $massactionbutton = $form->selectMassAction('', $arrayofmassactions);
         $newcardbutton .= '<i class="fas fa-brain button-icon"></i><i class="fas fa-plus-circle button-add animated"></i>';
         $newcardbutton .= '	<input type="hidden" class="modal-options" data-modal-to-open="psychosocial_risk_add" data-from-id="'. $object->id .'" data-from-type="digiriskelement" data-from-subtype="photo" data-from-subdir="photos"/>';
         $newcardbutton .= '</div>';
+
+        // Bouton importer des risques partagés : icône seule + texte en tooltip, à côté des boutons d'ajout (id conservé pour déclencher la popup de confirmation)
+        if (!empty($conf->global->DIGIRISKDOLIBARR_SHOW_SHARED_RISKS)) {
+            $newcardbutton .= '<div class="import-shared-risks wpeo-button button-square-40 button-secondary wpeo-tooltip-event" id="actionButtonImportSharedRisks" style="margin-left: 10px;" aria-label="' . $langs->trans('ImportShared' . ucfirst($riskType) . 's') . '" value="' . $object->id . '">';
+            $newcardbutton .= '<i class="fas fa-file-import button-icon"></i>';
+            $newcardbutton .= '</div>';
+        }
     } else {
         $newcardbutton = '<div class="wpeo-button button-square-40 button-grey wpeo-tooltip-event" aria-label="' . $langs->trans('PermissionDenied') . '" data-direction="left" value="' . $object->id . '"><i class="fas fa-exclamation-triangle button-icon"></i><i class="fas fa-plus-circle button-add animated"></i></div>';
 

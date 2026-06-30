@@ -380,7 +380,7 @@ class modDigiriskdolibarr extends DolibarrModules
 		$this->descriptionlong = "Digirisk";
 		$this->editor_name     = 'Evarisk';
 		$this->editor_url      = 'https://evarisk.com';
-		$this->version         = '22.1.0';
+		$this->version         = '23.1.0';
 		$this->const_name      = 'MAIN_MODULE_' . strtoupper($this->name);
 		$this->picto           = 'digiriskdolibarr_color@digiriskdolibarr';
 
@@ -441,7 +441,8 @@ class modDigiriskdolibarr extends DolibarrModules
                 'category',
                 'categoryindex',
                 'main',
-                'saturnegetobjectsmetadata'
+                'saturnegetobjectsmetadata',
+                'digiriskdolibarrindex'
 			],
 			'tabs' => [
 				'mycompany_admin'
@@ -593,6 +594,10 @@ class modDigiriskdolibarr extends DolibarrModules
 			$i++ => ['DIGIRISKDOLIBARR_GROUPMENTDOCUMENT_CUSTOM_ADDON_ODT_PATH', 'chaine', 'DOL_DATA_ROOT' . (($conf->entity == 1 ) ? '/' : '/' . $conf->entity . '/') . 'ecm/digiriskdolibarr/groupmentdocument/', '', 0, 'current'],
 			$i++ => ['DIGIRISKDOLIBARR_GROUPMENTDOCUMENT_DEFAULT_MODEL', 'chaine', 'groupmentdocument_odt', '', 0, 'current'],
 			$i++ => ['DIGIRISKDOLIBARR_GROUPMENTDOCUMENT_SHOW_TASK_DONE', 'integer', 1, '', 0, 'current'],
+			$i++ => ['DIGIRISKDOLIBARR_GROUPMENTDOCUMENTINHERITED_ADDON_ODT_PATH', 'chaine', 'DOL_DOCUMENT_ROOT/custom/digiriskdolibarr/documents/doctemplates/groupmentdocument/groupmentdocumentinherited/', '', 0, 'current'],
+			$i++ => ['DIGIRISKDOLIBARR_GROUPMENTDOCUMENTINHERITED_CUSTOM_ADDON_ODT_PATH', 'chaine', 'DOL_DATA_ROOT' . (($conf->entity == 1 ) ? '/' : '/' . $conf->entity . '/') . 'ecm/digiriskdolibarr/groupmentdocumentinherited/', '', 0, 'current'],
+			$i++ => ['DIGIRISKDOLIBARR_GROUPMENTDOCUMENTSHARED_ADDON_ODT_PATH', 'chaine', 'DOL_DOCUMENT_ROOT/custom/digiriskdolibarr/documents/doctemplates/groupmentdocument/groupmentdocumentshared/', '', 0, 'current'],
+			$i++ => ['DIGIRISKDOLIBARR_GROUPMENTDOCUMENTSHARED_CUSTOM_ADDON_ODT_PATH', 'chaine', 'DOL_DATA_ROOT' . (($conf->entity == 1 ) ? '/' : '/' . $conf->entity . '/') . 'ecm/digiriskdolibarr/groupmentdocumentshared/', '', 0, 'current'],
 
 
 			// CONST WORKUNIT DOCUMENT
@@ -602,6 +607,10 @@ class modDigiriskdolibarr extends DolibarrModules
 			$i++ => ['DIGIRISKDOLIBARR_WORKUNITDOCUMENT_CUSTOM_ADDON_ODT_PATH', 'chaine', 'DOL_DATA_ROOT' . (($conf->entity == 1 ) ? '/' : '/' . $conf->entity . '/') . 'ecm/digiriskdolibarr/workunitdocument/', '', 0, 'current'],
 			$i++ => ['DIGIRISKDOLIBARR_WORKUNITDOCUMENT_DEFAULT_MODEL', 'chaine', 'workunitdocument_odt', '', 0, 'current'],
 			$i++ => ['DIGIRISKDOLIBARR_WORKUNITDOCUMENT_SHOW_TASK_DONE', 'integer', 1, '', 0, 'current'],
+			$i++ => ['DIGIRISKDOLIBARR_WORKUNITDOCUMENTINHERITED_ADDON_ODT_PATH', 'chaine', 'DOL_DOCUMENT_ROOT/custom/digiriskdolibarr/documents/doctemplates/workunitdocument/workunitdocumentinherited/', '', 0, 'current'],
+			$i++ => ['DIGIRISKDOLIBARR_WORKUNITDOCUMENTINHERITED_CUSTOM_ADDON_ODT_PATH', 'chaine', 'DOL_DATA_ROOT' . (($conf->entity == 1 ) ? '/' : '/' . $conf->entity . '/') . 'ecm/digiriskdolibarr/workunitdocumentinherited/', '', 0, 'current'],
+			$i++ => ['DIGIRISKDOLIBARR_WORKUNITDOCUMENTSHARED_ADDON_ODT_PATH', 'chaine', 'DOL_DOCUMENT_ROOT/custom/digiriskdolibarr/documents/doctemplates/workunitdocument/workunitdocumentshared/', '', 0, 'current'],
+			$i++ => ['DIGIRISKDOLIBARR_WORKUNITDOCUMENTSHARED_CUSTOM_ADDON_ODT_PATH', 'chaine', 'DOL_DATA_ROOT' . (($conf->entity == 1 ) ? '/' : '/' . $conf->entity . '/') . 'ecm/digiriskdolibarr/workunitdocumentshared/', '', 0, 'current'],
 
 			// CONST PREVENTION PLAN
 			$i++ => ['DIGIRISKDOLIBARR_MAIN_AGENDA_ACTIONAUTO_PREVENTIONPLAN_CREATE', 'integer', 1, '', 0, 'current'],
@@ -987,14 +996,14 @@ class modDigiriskdolibarr extends DolibarrModules
             ],
             // Condition to show each dictionary
             'tabcond' => [
-                $conf->digiriskdolibarr->enabled,
-                $conf->digiriskdolibarr->enabled,
-                $conf->digiriskdolibarr->enabled,
-                $conf->digiriskdolibarr->enabled,
-                $conf->digiriskdolibarr->enabled,
-                $conf->digiriskdolibarr->enabled,
-                $conf->digiriskdolibarr->enabled,
-                $conf->digiriskdolibarr->enabled
+                !empty($conf->digiriskdolibarr->enabled),
+                !empty($conf->digiriskdolibarr->enabled),
+                !empty($conf->digiriskdolibarr->enabled),
+                !empty($conf->digiriskdolibarr->enabled),
+                !empty($conf->digiriskdolibarr->enabled),
+                !empty($conf->digiriskdolibarr->enabled),
+                !empty($conf->digiriskdolibarr->enabled),
+                !empty($conf->digiriskdolibarr->enabled)
             ]
         ];
 
@@ -1397,7 +1406,7 @@ class modDigiriskdolibarr extends DolibarrModules
 			'url'      => '/digiriskdolibarr/digiriskdolibarrindex.php',
 			'langs'    => 'digiriskdolibarr@digiriskdolibarr', // Lang file to use (without .lang) by module. File must be in langs/code_CODE/ directory.
 			'position' => 100 + $r,
-			'enabled'  => '$conf->digiriskdolibarr->enabled', // Define condition to show or hide menu entry. Use '$conf->digiriskdolibarr->enabled' if entry must be visible if module is enabled.
+			'enabled'  => 'isModEnabled(\'digiriskdolibarr\')', // Define condition to show or hide menu entry. Use '!empty($conf->digiriskdolibarr->enabled)' if entry must be visible if module is enabled.
 			'perms'    => '$user->rights->digiriskdolibarr->lire', // Use 'perms'=>'$user->rights->digiriskdolibarr->level1->level2' if you want your menu with a permission rules
 			'target'   => '',
 			'user'     => 2, // 0=Menu for internal users, 1=external users, 2=both
@@ -1415,7 +1424,7 @@ class modDigiriskdolibarr extends DolibarrModules
 			'url'      => '/digiriskdolibarr/digiriskdolibarrindex.php',
 			'langs'    => 'digiriskdolibarr@digiriskdolibarr', // Lang file to use (without .lang) by module. File must be in langs/code_CODE/ directory.
 			'position' => 100 + $r,
-			'enabled'  => '$conf->digiriskdolibarr->enabled', // Define condition to show or hide menu entry. Use '$conf->digiriskdolibarr->enabled' if entry must be visible if module is enabled.
+			'enabled'  => 'isModEnabled(\'digiriskdolibarr\')', // Define condition to show or hide menu entry. Use '!empty($conf->digiriskdolibarr->enabled)' if entry must be visible if module is enabled.
 			'perms'    => '$user->rights->digiriskdolibarr->lire', // Use 'perms'=>'$user->rights->digiriskdolibarr->digiriskconst->read' if you want your menu with a permission rules
 			'target'   => '',
 			'user'     => 2, // 0=Menu for internal users, 1=external users, 2=both
@@ -1431,7 +1440,7 @@ class modDigiriskdolibarr extends DolibarrModules
 			'url'      => '/digiriskdolibarr/view/digiriskstandard/digiriskstandard_card.php?risk_type=risk',
 			'langs'    => 'digiriskdolibarr@digiriskdolibarr',	        // Lang file to use (without .lang) by module. File must be in langs/code_CODE/ directory.
 			'position' => 100 + $r,
-			'enabled'  => '$conf->digiriskdolibarr->enabled',  // Define condition to show or hide menu entry. Use '$conf->digiriskdolibarr->enabled' if entry must be visible if module is enabled. Use '$leftmenu==\'system\'' to show if leftmenu system is selected.
+			'enabled'  => 'isModEnabled(\'digiriskdolibarr\')',  // Define condition to show or hide menu entry. Use '!empty($conf->digiriskdolibarr->enabled)' if entry must be visible if module is enabled. Use '$leftmenu==\'system\'' to show if leftmenu system is selected.
 			'perms'    => '$user->rights->digiriskdolibarr->riskassessmentdocument->read', // Use 'perms'=>'$user->rights->digiriskdolibarr->level1->level2' if you want your menu with a permission rules
 			'target'   => '',
 			'user'     => 0,				                // 0=Menu for internal users, 1=external users, 2=both
@@ -1446,7 +1455,7 @@ class modDigiriskdolibarr extends DolibarrModules
 			'url'      => '/digiriskdolibarr/view/digiriskelement/risk_list.php?risk_type=risk',
 			'langs'    => 'digiriskdolibarr@digiriskdolibarr',	        // Lang file to use (without .lang) by module. File must be in langs/code_CODE/ directory.
 			'position' => 100 + $r,
-			'enabled'  => '$conf->digiriskdolibarr->enabled',  // Define condition to show or hide menu entry. Use '$conf->digiriskdolibarr->enabled' if entry must be visible if module is enabled. Use '$leftmenu==\'system\'' to show if leftmenu system is selected.
+			'enabled'  => 'isModEnabled(\'digiriskdolibarr\')',  // Define condition to show or hide menu entry. Use '!empty($conf->digiriskdolibarr->enabled)' if entry must be visible if module is enabled. Use '$leftmenu==\'system\'' to show if leftmenu system is selected.
 			'perms'    => '$user->rights->digiriskdolibarr->risk->read', // Use 'perms'=>'$user->rights->digiriskdolibarr->level1->level2' if you want your menu with a permission rules
 			'target'   => '',
 			'user'     => 0,				                // 0=Menu for internal users, 1=external users, 2=both
@@ -1458,12 +1467,12 @@ class modDigiriskdolibarr extends DolibarrModules
             'titre'    => '<i class="fas fa-tasks pictofixedwidth" style="padding-right: 4px;"></i>' . $langs->trans('PAPRIPACT'),
             'mainmenu' => 'digiriskdolibarr',
             'leftmenu' => 'digiriskactionplan',
-            'url'      => '/projet/tasks.php?id=' . $conf->global->DIGIRISKDOLIBARR_DU_PROJECT,
+            'url'      => '/digiriskdolibarr/view/digiriskstandard/actionplan_list.php?view=kanban',
             'langs'    => 'digiriskdolibarr@digiriskdolibarr',
             'position' => 100 + $r,
-            'enabled'  => '$conf->digiriskdolibarr->enabled && $conf->projet->enabled',
+            'enabled'  => 'isModEnabled(\'digiriskdolibarr\') && isModEnabled(\'projet\')',
             'perms'    => '$user->rights->projet->lire',
-            'target'   => '_blank',
+            'target'   => '',
             'user'     => 0,
         ];
 
@@ -1476,7 +1485,7 @@ class modDigiriskdolibarr extends DolibarrModules
             'url'      => '/categories/index.php?type=risk',
             'langs'    => 'digiriskdolibarr@digiriskdolibarr',
             'position' => 100 + $r,
-            'enabled'  => '$conf->digiriskdolibarr->enabled && $conf->categorie->enabled && $user->rights->digiriskdolibarr->risk->read && $conf->global->DIGIRISKDOLIBARR_CATEGORY_ON_RISK',
+            'enabled'  => 'isModEnabled(\'digiriskdolibarr\') && isModEnabled(\'categorie\') && $user->rights->digiriskdolibarr->risk->read && getDolGlobalString(\'DIGIRISKDOLIBARR_CATEGORY_ON_RISK\')',
             'perms'    => '$user->rights->digiriskdolibarr->risk->read',
             'target'   => '',
             'user'     => 0,
@@ -1492,7 +1501,7 @@ class modDigiriskdolibarr extends DolibarrModules
             'url'      => '/digiriskdolibarr/view/digiriskstandard/digiriskstandard_card.php?risk_type=riskenvironmental',
             'langs'    => 'digiriskdolibarr@digiriskdolibarr',
             'position' => 100 + $r,
-            'enabled'  => '$conf->digiriskdolibarr->enabled',
+            'enabled'  => 'isModEnabled(\'digiriskdolibarr\')',
             'perms'    => '$user->rights->digiriskdolibarr->riskassessmentdocument->read && $user->rights->digiriskdolibarr->riskenvironmental->read',
             'target'   => '',
             'user'     => 0
@@ -1507,7 +1516,7 @@ class modDigiriskdolibarr extends DolibarrModules
             'url'      => '/digiriskdolibarr/view/digiriskelement/risk_list.php?risk_type=riskenvironmental',
             'langs'    => 'digiriskdolibarr@digiriskdolibarr',
             'position' => 100 + $r,
-            'enabled'  => '$conf->digiriskdolibarr->enabled',
+            'enabled'  => 'isModEnabled(\'digiriskdolibarr\')',
             'perms'    => '$user->rights->digiriskdolibarr->riskenvironmental->read',
             'target'   => '',
             'user'     => 0
@@ -1519,10 +1528,10 @@ class modDigiriskdolibarr extends DolibarrModules
             'titre'    => '<i class="fas fa-tasks pictofixedwidth" style="padding-right: 4px;"></i>' . $langs->trans('ActionPlan'),
             'mainmenu' => 'digiriskdolibarr',
             'leftmenu' => 'digiriskenvironmentalactionplan',
-            'url'      => '/projet/tasks.php?id=' . $conf->global->DIGIRISKDOLIBARR_ENVIRONMENT_PROJECT,
+            'url'      => '/projet/tasks.php?id=' . ($conf->global->DIGIRISKDOLIBARR_ENVIRONMENT_PROJECT ?? ''),
             'langs'    => 'digiriskdolibarr@digiriskdolibarr',
             'position' => 100 + $r,
-            'enabled'  => '$conf->digiriskdolibarr->enabled && $conf->projet->enabled',
+            'enabled'  => 'isModEnabled(\'digiriskdolibarr\') && isModEnabled(\'projet\')',
             'perms'    => '$user->rights->projet->lire',
             'target'   => '_blank',
             'user'     => 0,
@@ -1538,7 +1547,7 @@ class modDigiriskdolibarr extends DolibarrModules
 			'url'      => '/digiriskdolibarr/view/preventionplan/preventionplan_list.php',
 			'langs'    => 'digiriskdolibarr@digiriskdolibarr',	        // Lang file to use (without .lang) by module. File must be in langs/code_CODE/ directory.
 			'position' => 100 + $r,
-			'enabled'  => '$conf->digiriskdolibarr->enabled',  // Define condition to show or hide menu entry. Use '$conf->digiriskdolibarr->enabled' if entry must be visible if module is enabled. Use '$leftmenu==\'system\'' to show if leftmenu system is selected.
+			'enabled'  => 'isModEnabled(\'digiriskdolibarr\')',  // Define condition to show or hide menu entry. Use '!empty($conf->digiriskdolibarr->enabled)' if entry must be visible if module is enabled. Use '$leftmenu==\'system\'' to show if leftmenu system is selected.
 			'perms'    => '$user->rights->digiriskdolibarr->preventionplan->read', // Use 'perms'=>'$user->rights->digiriskdolibarr->level1->level2' if you want your menu with a permission rules
 			'target'   => '',
 			'user'     => 0,				                // 0=Menu for internal users, 1=external users, 2=both
@@ -1553,7 +1562,7 @@ class modDigiriskdolibarr extends DolibarrModules
             'url'      => '/categories/index.php?type=preventionplan',
             'langs'    => 'digiriskdolibarr@digiriskdolibarr',
             'position' => 100 + $r,
-            'enabled'  => '$conf->digiriskdolibarr->enabled && $conf->categorie->enabled && $user->rights->digiriskdolibarr->preventionplan->read',
+            'enabled'  => 'isModEnabled(\'digiriskdolibarr\') && isModEnabled(\'categorie\') && $user->rights->digiriskdolibarr->preventionplan->read',
             'perms'    => '$user->rights->digiriskdolibarr->preventionplan->read',
             'target'   => '',
             'user'     => 0,
@@ -1569,7 +1578,7 @@ class modDigiriskdolibarr extends DolibarrModules
 			'url'      => '/digiriskdolibarr/view/firepermit/firepermit_list.php',
 			'langs'    => 'digiriskdolibarr@digiriskdolibarr',	        // Lang file to use (without .lang) by module. File must be in langs/code_CODE/ directory.
 			'position' => 100 + $r,
-			'enabled'  => '$conf->digiriskdolibarr->enabled',  // Define condition to show or hide menu entry. Use '$conf->digiriskdolibarr->enabled' if entry must be visible if module is enabled. Use '$leftmenu==\'system\'' to show if leftmenu system is selected.
+			'enabled'  => 'isModEnabled(\'digiriskdolibarr\')',  // Define condition to show or hide menu entry. Use '!empty($conf->digiriskdolibarr->enabled)' if entry must be visible if module is enabled. Use '$leftmenu==\'system\'' to show if leftmenu system is selected.
 			'perms'    => '$user->rights->digiriskdolibarr->firepermit->read', // Use 'perms'=>'$user->rights->digiriskdolibarr->level1->level2' if you want your menu with a permission rules
 			'target'   => '',
 			'user'     => 0,				                // 0=Menu for internal users, 1=external users, 2=both
@@ -1584,11 +1593,27 @@ class modDigiriskdolibarr extends DolibarrModules
             'url'      => '/categories/index.php?type=firepermit',
             'langs'    => 'digiriskdolibarr@digiriskdolibarr',
             'position' => 100 + $r,
-            'enabled'  => '$conf->digiriskdolibarr->enabled && $conf->categorie->enabled && $user->rights->digiriskdolibarr->firepermit->read',
+            'enabled'  => 'isModEnabled(\'digiriskdolibarr\') && isModEnabled(\'categorie\') && $user->rights->digiriskdolibarr->firepermit->read',
             'perms'    => '$user->rights->digiriskdolibarr->firepermit->read',
             'target'   => '',
             'user'     => 0,
         ];
+
+		$this->menu[$r++] = [
+			'fk_menu'  => 'fk_mainmenu=digiriskdolibarr,fk_leftmenu=digiriskfirepermit',
+			'type'     => 'left',
+			'titre'    => $langs->transnoentities('Application'),
+			'prefix'   => '<i class="fas fa-mobile-alt pictofixedwidth" style="padding-right: 4px;"></i>',
+			'mainmenu' => 'digiriskdolibarr',
+			'leftmenu' => 'digiriskfirepermitpwa',
+			'url'      => '/custom/digiriskdolibarr/public/mobile_firepermit.php' . ((!isModEnabled('multicompany')) ? '?entity=' . $conf->entity : ''),
+			'langs'    => '',
+			'position' => 100 + $r,
+			'enabled'  => 'isModEnabled(\'digiriskdolibarr\')',
+			'perms'    => '$user->rights->digiriskdolibarr->firepermit->read',
+			'target'   => '',
+			'user'     => 0,
+		];
 
 		$this->menu[$r++] = [
 			'fk_menu'  => 'fk_mainmenu=digiriskdolibarr',	    // '' if this is a top menu. For left menu, use 'fk_mainmenu=xxx' or 'fk_mainmenu=xxx,fk_leftmenu=yyy' where xxx is mainmenucode and yyy is a leftmenucode
@@ -1600,7 +1625,7 @@ class modDigiriskdolibarr extends DolibarrModules
 			'url'      => '/digiriskdolibarr/view/accident/accident.php',
 			'langs'    => 'digiriskdolibarr@digiriskdolibarr',	        // Lang file to use (without .lang) by module. File must be in langs/code_CODE/ directory.
 			'position' => 100 + $r,
-			'enabled'  => '$conf->digiriskdolibarr->enabled',  // Define condition to show or hide menu entry. Use '$conf->digiriskdolibarr->enabled' if entry must be visible if module is enabled. Use '$leftmenu==\'system\'' to show if leftmenu system is selected.
+			'enabled'  => 'isModEnabled(\'digiriskdolibarr\')',  // Define condition to show or hide menu entry. Use '!empty($conf->digiriskdolibarr->enabled)' if entry must be visible if module is enabled. Use '$leftmenu==\'system\'' to show if leftmenu system is selected.
 			'perms'    => '$user->rights->digiriskdolibarr->accident->read', // Use 'perms'=>'$user->rights->digiriskdolibarr->level1->level2' if you want your menu with a permission rules
 			'target'   => '',
 			'user'     => 0,				                // 0=Menu for internal users, 1=external users, 2=both
@@ -1615,7 +1640,7 @@ class modDigiriskdolibarr extends DolibarrModules
 			'url'      => '/digiriskdolibarr/view/accident/accident_list.php',
 			'langs'    => 'digiriskdolibarr@digiriskdolibarr',	        // Lang file to use (without .lang) by module. File must be in langs/code_CODE/ directory.
 			'position' => 100 + $r,
-			'enabled'  => '$conf->digiriskdolibarr->enabled',  // Define condition to show or hide menu entry. Use '$conf->digiriskdolibarr->enabled' if entry must be visible if module is enabled. Use '$leftmenu==\'system\'' to show if leftmenu system is selected.
+			'enabled'  => 'isModEnabled(\'digiriskdolibarr\')',  // Define condition to show or hide menu entry. Use '!empty($conf->digiriskdolibarr->enabled)' if entry must be visible if module is enabled. Use '$leftmenu==\'system\'' to show if leftmenu system is selected.
 			'perms'    => '$user->rights->digiriskdolibarr->accident->read', // Use 'perms'=>'$user->rights->digiriskdolibarr->level1->level2' if you want your menu with a permission rules
 			'target'   => '',
 			'user'     => 0,				                // 0=Menu for internal users, 1=external users, 2=both
@@ -1630,7 +1655,7 @@ class modDigiriskdolibarr extends DolibarrModules
             'url'      => '/categories/index.php?type=accident',
             'langs'    => 'digiriskdolibarr@digiriskdolibarr',
             'position' => 100 + $r,
-            'enabled'  => '$conf->digiriskdolibarr->enabled && $conf->categorie->enabled && $user->rights->digiriskdolibarr->accident->read',
+            'enabled'  => 'isModEnabled(\'digiriskdolibarr\') && isModEnabled(\'categorie\') && $user->rights->digiriskdolibarr->accident->read',
             'perms'    => '$user->rights->digiriskdolibarr->accident->read',
             'target'   => '',
             'user'     => 0,
@@ -1645,7 +1670,7 @@ class modDigiriskdolibarr extends DolibarrModules
             'url'      => '/digiriskdolibarr/view/accidentinvestigation/accidentinvestigation_list.php',
             'langs'    => 'digiriskdolibarr@digiriskdolibarr',	        // Lang file to use (without .lang) by module. File must be in langs/code_CODE/ directory.
             'position' => 100 + $r,
-            'enabled'  => '$conf->digiriskdolibarr->enabled && $conf->saturne->enabled',  // Define condition to show or hide menu entry. Use '$conf->digiriskdolibarr->enabled' if entry must be visible if module is enabled. Use '$leftmenu==\'system\'' to show if leftmenu system is selected.
+            'enabled'  => 'isModEnabled(\'digiriskdolibarr\') && isModEnabled(\'saturne\')',  // Define condition to show or hide menu entry. Use '!empty($conf->digiriskdolibarr->enabled)' if entry must be visible if module is enabled. Use '$leftmenu==\'system\'' to show if leftmenu system is selected.
             'perms'    => '$user->rights->digiriskdolibarr->lire && $user->rights->digiriskdolibarr->accidentinvestigation->read', // Use 'perms'=>'$user->rights->digiriskdolibarr->level1->level2' if you want your menu with a permission rules
             'target'   => '',
             'user'     => 0,				                // 0=Menu for internal users, 1=external users, 2=both
@@ -1661,7 +1686,7 @@ class modDigiriskdolibarr extends DolibarrModules
 			'url'      => '/digiriskdolibarr/view/digiriskusers.php',
 			'langs'    => 'digiriskdolibarr@digiriskdolibarr',	        // Lang file to use (without .lang) by module. File must be in langs/code_CODE/ directory.
 			'position' => 100 + $r,
-			'enabled'  => '$conf->digiriskdolibarr->enabled',  // Define condition to show or hide menu entry. Use '$conf->digiriskdolibarr->enabled' if entry must be visible if module is enabled. Use '$leftmenu==\'system\'' to show if leftmenu system is selected.
+			'enabled'  => 'isModEnabled(\'digiriskdolibarr\')',  // Define condition to show or hide menu entry. Use '!empty($conf->digiriskdolibarr->enabled)' if entry must be visible if module is enabled. Use '$leftmenu==\'system\'' to show if leftmenu system is selected.
 			'perms'    => '$user->rights->digiriskdolibarr->adminpage->read', // Use 'perms'=>'$user->rights->digiriskdolibarr->level1->level2' if you want your menu with a permission rules
 			'target'   => '',
 			'user'     => 0,				                // 0=Menu for internal users, 1=external users, 2=both
@@ -1677,7 +1702,7 @@ class modDigiriskdolibarr extends DolibarrModules
 			'url'      => '/digiriskdolibarr/view/digirisktools.php',
 			'langs'    => 'digiriskdolibarr@digiriskdolibarr',	        // Lang file to use (without .lang) by module. File must be in langs/code_CODE/ directory.
 			'position' => 100 + $r,
-			'enabled'  => '$conf->digiriskdolibarr->enabled',  // Define condition to show or hide menu entry. Use '$conf->digiriskdolibarr->enabled' if entry must be visible if module is enabled. Use '$leftmenu==\'system\'' to show if leftmenu system is selected.
+			'enabled'  => 'isModEnabled(\'digiriskdolibarr\')',  // Define condition to show or hide menu entry. Use '!empty($conf->digiriskdolibarr->enabled)' if entry must be visible if module is enabled. Use '$leftmenu==\'system\'' to show if leftmenu system is selected.
 			'perms'    => '$user->rights->digiriskdolibarr->adminpage->read',			                // Use 'perms'=>'$user->rights->digiriskdolibarr->level1->level2' if you want your menu with a permission rules
 			'target'   => '',
 			'user'     => 0,				                // 0=Menu for internal users, 1=external users, 2=both
@@ -1693,7 +1718,7 @@ class modDigiriskdolibarr extends DolibarrModules
 			'url'      => '/digiriskdolibarr/view/digiriskelement/digiriskelement_organization.php',
 			'langs'    => 'digiriskdolibarr@digiriskdolibarr',	        // Lang file to use (without .lang) by module. File must be in langs/code_CODE/ directory.
 			'position' => 100 + $r,
-			'enabled'  => '$conf->digiriskdolibarr->enabled',  // Define condition to show or hide menu entry. Use '$conf->digiriskdolibarr->enabled' if entry must be visible if module is enabled. Use '$leftmenu==\'system\'' to show if leftmenu system is selected.
+			'enabled'  => 'isModEnabled(\'digiriskdolibarr\')',  // Define condition to show or hide menu entry. Use '!empty($conf->digiriskdolibarr->enabled)' if entry must be visible if module is enabled. Use '$leftmenu==\'system\'' to show if leftmenu system is selected.
 			'perms'    => '$user->rights->digiriskdolibarr->digiriskelement->read', // Use 'perms'=>'$user->rights->digiriskdolibarr->level1->level2' if you want your menu with a permission rules
 			'target'   => '',
 			'user'     => 0,				                // 0=Menu for internal users, 1=external users, 2=both
@@ -1706,14 +1731,15 @@ class modDigiriskdolibarr extends DolibarrModules
 			'prefix'   => '<i class="fa fa-ticket-alt pictofixedwidth"></i>',
 			'mainmenu' => 'digiriskdolibarr',
 			'leftmenu' => '',
-			'url'      => '/custom/digiriskdolibarr/public/ticket/create_ticket.php' . ((!$conf->multicompany->enabled) ? '?entity=' . $conf->entity : ''),
+			'url'      => '/custom/digiriskdolibarr/public/ticket/create_ticket.php' . ((!isModEnabled('multicompany')) ? '?entity=' . $conf->entity : ''),
 			'langs'    => '',	        // Lang file to use (without .lang) by module. File must be in langs/code_CODE/ directory.
 			'position' => 100 + $r,
-			'enabled'  => '$conf->digiriskdolibarr->enabled && $conf->global->DIGIRISKDOLIBARR_TICKET_ENABLE_PUBLIC_INTERFACE',  // Define condition to show or hide menu entry. Use '$conf->digiriskdolibarr->enabled' if entry must be visible if module is enabled. Use '$leftmenu==\'system\'' to show if leftmenu system is selected.
+			'enabled'  => 'isModEnabled(\'digiriskdolibarr\') && getDolGlobalString(\'DIGIRISKDOLIBARR_TICKET_ENABLE_PUBLIC_INTERFACE\')',  // Define condition to show or hide menu entry. Use '!empty($conf->digiriskdolibarr->enabled)' if entry must be visible if module is enabled. Use '$leftmenu==\'system\'' to show if leftmenu system is selected.
 			'perms'    => 1,			                // Use 'perms'=>'$user->rights->digiriskdolibarr->level1->level2' if you want your menu with a permission rules
 			'target'   => '',
 			'user'     => 0,				                // 0=Menu for internal users, 1=external users, 2=both
 		];
+
 
 		$this->menu[$r++] = [
 			'fk_menu'  => 'fk_mainmenu=digiriskdolibarr',	    // '' if this is a top menu. For left menu, use 'fk_mainmenu=xxx' or 'fk_mainmenu=xxx,fk_leftmenu=yyy' where xxx is mainmenucode and yyy is a leftmenucode
@@ -1725,7 +1751,7 @@ class modDigiriskdolibarr extends DolibarrModules
 			'url'      => '/admin/company.php',
 			'langs'    => 'digiriskdolibarr@digiriskdolibarr',	        // Lang file to use (without .lang) by module. File must be in langs/code_CODE/ directory.
 			'position' => 100 + $r,
-			'enabled'  => '$conf->digiriskdolibarr->enabled && $user->admin',  // Define condition to show or hide menu entry. Use '$conf->digiriskdolibarr->enabled' if entry must be visible if module is enabled. Use '$leftmenu==\'system\'' to show if leftmenu system is selected.
+			'enabled'  => 'isModEnabled(\'digiriskdolibarr\') && $user->admin',  // Define condition to show or hide menu entry. Use '!empty($conf->digiriskdolibarr->enabled)' if entry must be visible if module is enabled. Use '$leftmenu==\'system\'' to show if leftmenu system is selected.
 			'perms'    => '$user->admin',			                // Use 'perms'=>'$user->rights->digiriskdolibarr->level1->level2' if you want your menu with a permission rules
 			'target'   => '',
 			'user'     => 0,				                // 0=Menu for internal users, 1=external users, 2=both
@@ -1741,10 +1767,44 @@ class modDigiriskdolibarr extends DolibarrModules
 			'url'      => '/digiriskdolibarr/view/ticket/ticket_management_dashboard.php',
 			'langs'    => 'digiriskdolibarr@digiriskdolibarr',	        // Lang file to use (without .lang) by module. File must be in langs/code_CODE/ directory.
 			'position' => 100 + $r,
-			'enabled'  => '$conf->digiriskdolibarr->enabled && $conf->ticket->enabled',  // Define condition to show or hide menu entry. Use '$conf->digiriskdolibarr->enabled' if entry must be visible if module is enabled. Use '$leftmenu==\'system\'' to show if leftmenu system is selected.
+			'enabled'  => 'isModEnabled(\'digiriskdolibarr\') && isModEnabled(\'ticket\')',  // Define condition to show or hide menu entry. Use '!empty($conf->digiriskdolibarr->enabled)' if entry must be visible if module is enabled. Use '$leftmenu==\'system\'' to show if leftmenu system is selected.
 			'perms'    => '$user->rights->ticket->read && $user->rights->digiriskdolibarr->lire', // Use 'perms'=>'$user->rights->digiriskdolibarr->level1->level2' if you want your menu with a permission rules
 			'target'   => '',
 			'user'     => 0,				                // 0=Menu for internal users, 1=external users, 2=both
+		];
+
+		// Issue #4443 — 1-click ticket action card, nested under Ticket > Tableau de bord (ticketstats).
+		$this->menu[$r++] = [
+			'fk_menu'  => 'fk_mainmenu=ticket,fk_leftmenu=ticketstats',
+			'type'     => 'left',
+			'titre'    => $langs->transnoentities('TicketKanban'),
+			'prefix'   => '<i class="fas fa-columns pictofixedwidth"></i>',
+			'mainmenu' => 'ticket',
+			'leftmenu' => 'digiriskticketkanban',
+			'url'      => '/digiriskdolibarr/view/ticket/ticket_action_card.php',
+			'langs'    => 'digiriskdolibarr@digiriskdolibarr',
+			'position' => 100 + $r,
+			'enabled'  => 'isModEnabled(\'digiriskdolibarr\') && isModEnabled(\'ticket\')',
+			'perms'    => '$user->rights->ticket->read && $user->rights->digiriskdolibarr->lire',
+			'target'   => '',
+			'user'     => 0,
+		];
+
+		// Entrée liste de tickets (vue standard Dolibarr).
+		$this->menu[$r++] = [
+			'fk_menu'  => 'fk_mainmenu=ticket,fk_leftmenu=ticketstats',
+			'type'     => 'left',
+			'titre'    => $langs->transnoentities('List'),
+			'prefix'   => '<i class="fas fa-list pictofixedwidth"></i>',
+			'mainmenu' => 'ticket',
+			'leftmenu' => 'digiriskticketlist',
+			'url'      => '/ticket/list.php',
+			'langs'    => 'digiriskdolibarr@digiriskdolibarr',
+			'position' => 101 + $r,
+			'enabled'  => 'isModEnabled(\'digiriskdolibarr\') && isModEnabled(\'ticket\')',
+			'perms'    => '$user->rights->ticket->read && $user->rights->digiriskdolibarr->lire',
+			'target'   => '',
+			'user'     => 0,
 		];
 
 		// Exports profiles provided by this module
@@ -2060,7 +2120,11 @@ class modDigiriskdolibarr extends DolibarrModules
 		delDocumentModel('preventionplandocument_odt', 'preventionplandocument');
 		delDocumentModel('preventionplandocument_specimen_odt', 'preventionplandocumentspecimen');
 		delDocumentModel('groupmentdocument_odt', 'groupmentdocument');
+		delDocumentModel('groupmentdocumentinherited_odt', 'groupmentdocument');
+		delDocumentModel('groupmentdocumentshared_odt', 'groupmentdocument');
 		delDocumentModel('workunitdocument_odt', 'workunitdocument');
+		delDocumentModel('workunitdocumentinherited_odt', 'workunitdocument');
+		delDocumentModel('workunitdocumentshared_odt', 'workunitdocument');
 		delDocumentModel('listingrisksaction_odt', 'listingrisksdocument');
         delDocumentModel('listingrisksdocument_odt', 'listingrisksdocument');
         delDocumentModel('listingrisksphoto_odt', 'listingrisksdocument');
@@ -2080,7 +2144,11 @@ class modDigiriskdolibarr extends DolibarrModules
 		addDocumentModel('preventionplandocument_odt', 'preventionplandocument', 'ODT templates', 'DIGIRISKDOLIBARR_PREVENTIONPLANDOCUMENT_ADDON_ODT_PATH');
 		addDocumentModel('preventionplandocument_specimen_odt', 'preventionplandocumentspecimen', 'ODT templates', 'DIGIRISKDOLIBARR_PREVENTIONPLANDOCUMENT_SPECIMEN_ADDON_ODT_PATH');
 		addDocumentModel('groupmentdocument_odt', 'groupmentdocument', 'ODT templates', 'DIGIRISKDOLIBARR_GROUPMENTDOCUMENT_ADDON_ODT_PATH');
+		addDocumentModel('groupmentdocumentinherited_odt', 'groupmentdocument', 'ODT templates', 'DIGIRISKDOLIBARR_GROUPMENTDOCUMENTINHERITED_ADDON_ODT_PATH');
+		addDocumentModel('groupmentdocumentshared_odt', 'groupmentdocument', 'ODT templates', 'DIGIRISKDOLIBARR_GROUPMENTDOCUMENTSHARED_ADDON_ODT_PATH');
 		addDocumentModel('workunitdocument_odt', 'workunitdocument', 'ODT templates', 'DIGIRISKDOLIBARR_WORKUNITDOCUMENT_ADDON_ODT_PATH');
+		addDocumentModel('workunitdocumentinherited_odt', 'workunitdocument', 'ODT templates', 'DIGIRISKDOLIBARR_WORKUNITDOCUMENTINHERITED_ADDON_ODT_PATH');
+		addDocumentModel('workunitdocumentshared_odt', 'workunitdocument', 'ODT templates', 'DIGIRISKDOLIBARR_WORKUNITDOCUMENTSHARED_ADDON_ODT_PATH');
         addDocumentModel('listingrisksdocument_odt', 'listingrisksdocument', 'ODT templates', 'DIGIRISKDOLIBARR_LISTINGRISKSDOCUMENT_ADDON_ODT_PATH');
         addDocumentModel('listingrisksaction_odt', 'listingrisksdocument', 'ODT templates', 'DIGIRISKDOLIBARR_LISTINGRISKSACTION_ADDON_ODT_PATH');
         addDocumentModel('listingrisksphoto_odt', 'listingrisksdocument', 'ODT templates', 'DIGIRISKDOLIBARR_LISTINGRISKSPHOTO_ADDON_ODT_PATH');
@@ -2093,9 +2161,29 @@ class modDigiriskdolibarr extends DolibarrModules
         addDocumentModel('accidentinvestigationdocument_odt', 'accidentinvestigationdocument', 'ODT templates', 'DIGIRISKDOLIBARR_ACCIDENTINVESTIGATIONDOCUMENT_ADDON_ODT_PATH');
         addDocumentModel('registerdocument_odt', 'registerdocument', 'ODT templates', 'DIGIRISKDOLIBARR_REGISTERDOCUMENT_ADDON_ODT_PATH');
 
-		if ( $conf->global->DIGIRISKDOLIBARR_DIGIRISKELEMENT_TRASH == 0 ) {
-			require_once __DIR__ . '/../../class/digiriskelement/groupment.class.php';
+		// The entity conf may have been cloned from another entity (multicompany): the constants can point
+		// to objects of the source entity, so check the pointed object entity, not only the constant emptiness.
+		// The standard is checked before the trash so a recreated trash gets the right fk_standard.
+		require_once __DIR__ . '/../../class/digiriskstandard.class.php';
+		require_once __DIR__ . '/../../class/digiriskelement/groupment.class.php';
 
+		$digiriskstandard = new DigiriskStandard($this->db);
+		$activeStandardID = getDolGlobalInt('DIGIRISKDOLIBARR_ACTIVE_STANDARD');
+		if ($activeStandardID <= 0 || $digiriskstandard->fetch($activeStandardID) <= 0 || $digiriskstandard->entity != $conf->entity) {
+			$digiriskstandard                = new DigiriskStandard($this->db);
+			$digiriskstandard->ref           = 'DU';
+			$digiriskstandard->description   = 'DUDescription';
+			$digiriskstandard->date_creation = dol_now();
+			$digiriskstandard->status        = 1;
+
+			$standard_id = $digiriskstandard->create($user);
+
+			dolibarr_set_const($this->db, 'DIGIRISKDOLIBARR_ACTIVE_STANDARD', $standard_id, 'integer', 0, '', $conf->entity);
+		}
+
+		$trash           = new DigiriskElement($this->db);
+		$previousTrashID = getDolGlobalInt('DIGIRISKDOLIBARR_DIGIRISKELEMENT_TRASH');
+		if ($previousTrashID <= 0 || $trash->fetch($previousTrashID) <= 0 || $trash->entity != $conf->entity) {
 			$trashRef                      = 'GP0';
 			$digiriskelement               = new Groupment($this->db);
 			$digiriskelement->ref          = $trashRef;
@@ -2106,21 +2194,17 @@ class modDigiriskdolibarr extends DolibarrModules
 			$digiriskelement->status       = DigiriskElement::STATUS_TRASHED;
 			$trash_id                      = $digiriskelement->create($user);
 
+			// Elements of the current entity already trashed under the foreign trash must follow the new one
+			if ($previousTrashID > 0 && $trash_id > 0) {
+				$trashedElements = $trash->fetchAll('', '', 0, 0, ['customsql' => 't.fk_parent = ' . $previousTrashID . ' AND t.entity = ' . ((int) $conf->entity)]);
+				if (is_array($trashedElements)) {
+					foreach ($trashedElements as $trashedElement) {
+						$trashedElement->setValueFrom('fk_parent', $trash_id, '', null, '', '', $user);
+					}
+				}
+			}
+
 			dolibarr_set_const($this->db, 'DIGIRISKDOLIBARR_DIGIRISKELEMENT_TRASH', $trash_id, 'integer', 0, '', $conf->entity);
-		}
-
-		if ( $conf->global->DIGIRISKDOLIBARR_ACTIVE_STANDARD == 0 ) {
-			require_once __DIR__ . '/../../class/digiriskstandard.class.php';
-
-			$digiriskstandard                = new DigiriskStandard($this->db);
-			$digiriskstandard->ref           = 'DU';
-			$digiriskstandard->description   = 'DUDescription';
-			$digiriskstandard->date_creation = dol_now();
-			$digiriskstandard->status        = 1;
-
-			$standard_id = $digiriskstandard->create($user);
-
-			dolibarr_set_const($this->db, 'DIGIRISKDOLIBARR_ACTIVE_STANDARD', $standard_id, 'integer', 0, '', $conf->entity);
 		}
 
         require_once DOL_DOCUMENT_ROOT . '/societe/class/societe.class.php';
@@ -2374,7 +2458,7 @@ class modDigiriskdolibarr extends DolibarrModules
                 'digiriskdolibarr_ticket_lastname'   => ['Label' => 'LastName',         'type' => 'varchar', 'length' => 255,  'elementtype' => ['ticket'], 'position' => $this->numero . 10,                                                                                                        ],
                 'digiriskdolibarr_ticket_firstname'  => ['Label' => 'FirstName',        'type' => 'varchar', 'length' => 255,  'elementtype' => ['ticket'], 'position' => $this->numero . 20,                                                                                                        ],
                 'digiriskdolibarr_ticket_phone'      => ['Label' => 'Phone',            'type' => 'varchar', 'length' => 255,  'elementtype' => ['ticket'], 'position' => $this->numero . 30,                                                                                                        ],
-				'digiriskdolibarr_ticket_service'    => ['Label' => 'GP/UT', 'type' => 'chkbxlst', 'elementtype' => ['ticket'], 'position' => $this->numero . 40, 'params' => ['digiriskdolibarr_digiriskelement:ref|label:rowid::((status:>:0) AND (entity:=:$ENTITY$))' => null], 'list' => 4],
+				'digiriskdolibarr_ticket_service'    => ['Label' => 'GP/UT', 'type' => 'chkbxlst', 'elementtype' => ['ticket'], 'position' => $this->numero . 40, 'params' => ['digiriskdolibarr_digiriskelement:ref|label:rowid::((status:>:0) AND (entity:=:$ENTITY$))::' => null], 'list' => 4],
 				'digiriskdolibarr_ticket_location'   => ['Label' => 'Location',         'type' => 'varchar',  'length' => 255, 'elementtype' => ['ticket'], 'position' => $this->numero . 50,                                                                                                        ],
                 'digiriskdolibarr_ticket_date'       => ['Label' => 'DeclarationDate',  'type' => 'datetime',                  'elementtype' => ['ticket'], 'position' => $this->numero . 60,                                                                                                        ],
                 'digiriskdolibarr_condition_message' => ['Label' => 'ConditionMessage', 'type' => 'text',                      'elementtype' => ['ticket'], 'position' => $this->numero . 70]
@@ -2385,7 +2469,7 @@ class modDigiriskdolibarr extends DolibarrModules
         }
 
 		//DigiriskElement favorite medias backward compatibility
-		if ($conf->global->DIGIRISKDOLIBARR_DIGIRISKELEMENT_MEDIAS_BACKWARD_COMPATIBILITY == 0) {
+		if (empty($conf->global->DIGIRISKDOLIBARR_DIGIRISKELEMENT_MEDIAS_BACKWARD_COMPATIBILITY)) {
 			require_once __DIR__ . '/../../class/digiriskelement.class.php';
 
 			$digiriskelement     = new DigiriskElement($this->db);
@@ -2466,7 +2550,7 @@ class modDigiriskdolibarr extends DolibarrModules
             dolibarr_set_const($this->db, 'DIGIRISKDOLIBARR_PROJECT_TAGS_SET', 4, 'integer', 0, '', $conf->entity);
         }
 
-		if ($conf->global->DIGIRISKDOLIBARR_TRIGGERS_UPDATED == 0) {
+		if (empty($conf->global->DIGIRISKDOLIBARR_TRIGGERS_UPDATED)) {
 			require_once DOL_DOCUMENT_ROOT . '/comm/action/class/actioncomm.class.php';
 
 			$actioncomm = new Actioncomm($this->db);
@@ -2520,7 +2604,7 @@ class modDigiriskdolibarr extends DolibarrModules
 						'icon'    => 'info-circle',																	// Font Awesome icon
 						'lang'    => 'digiriskdolibarr@digiriskdolibarr',											// Fichier de langue contenant les traductions
 						'tooltip' => 'DigiriskElementSharedTooltip',												// Message Tooltip (ne pas mettre cette clé si pas de tooltip)
-						'enable'  => '! empty($conf->digiriskdolibarr->enabled)',									// Conditions d'activation du partage
+						'enable'  => 'isModEnabled(\'digiriskdolibarr\')',									// Conditions d'activation du partage
 						'input'   => [																			// input : Paramétrage de la réaction du bouton on/off
 							'global' => [																		// global : réaction lorsqu'on désactive l'option de partage global
 								'showhide' => true,																	// showhide : afficher/cacher le bloc de partage lors de l'activation/désactivation du partage global
@@ -2536,7 +2620,7 @@ class modDigiriskdolibarr extends DolibarrModules
 						'lang'      => 'digiriskdolibarr@digiriskdolibarr',											// Fichier de langue contenant les traductions
 						'tooltip'   => 'RiskSharedTooltip',															// Message Tooltip (ne pas mettre cette clé si pas de tooltip)
 						'mandatory' => 'digiriskelement',															// partage principal obligatoire
-						'enable'    => '! empty($conf->digiriskdolibarr->enabled)',									// Conditions d'activation du partage
+						'enable'    => 'isModEnabled(\'digiriskdolibarr\')',									// Conditions d'activation du partage
 						'display'   => '! empty($conf->global->MULTICOMPANY_DIGIRISKELEMENT_SHARING_ENABLED)', 		// L'affichage de ce bloc de partage dépend de l'activation d'un partage parent
 						'input'     => [																		// input : Paramétrage de la réaction du bouton on/off
 							'global' => [																		// global : réaction lorsqu'on désactive l'option de partage global
@@ -2557,7 +2641,7 @@ class modDigiriskdolibarr extends DolibarrModules
 						'lang'      => 'digiriskdolibarr@digiriskdolibarr',											// Fichier de langue contenant les traductions
 						'tooltip'   => 'RiskSignSharedTooltip',														// Message Tooltip (ne pas mettre cette clé si pas de tooltip)
 						'mandatory' => 'digiriskelement',															// partage principal obligatoire
-						'enable'    => '! empty($conf->digiriskdolibarr->enabled)',									// Conditions d'activation du partage
+						'enable'    => 'isModEnabled(\'digiriskdolibarr\')',									// Conditions d'activation du partage
 						'display'   => '! empty($conf->global->MULTICOMPANY_DIGIRISKELEMENT_SHARING_ENABLED)', 		// L'affichage de ce bloc de partage dépend de l'activation d'un partage parent
 						'input'     => [																		// input : Paramétrage de la réaction du bouton on/off
 							'global' => [																		// global : réaction lorsqu'on désactive l'option de partage global

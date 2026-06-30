@@ -208,14 +208,21 @@ class Evaluator extends SaturneObject
      */
     public function getNbEmployees(array $moreParam = []): array
     {
-        global $user;
+        global $db;
 
         if (getDolGlobalInt('DIGIRISKDOLIBARR_NB_EMPLOYEES') > 0 && getDolGlobalInt('DIGIRISKDOLIBARR_MANUAL_INPUT_NB_EMPLOYEES')) {
             $array['nbemployees'] = getDolGlobalInt('DIGIRISKDOLIBARR_NB_EMPLOYEES');
         } else {
-            $users = $user->get_full_tree(0, 'u.employee = 1' . ($moreParam['filter'] ?? ''));
-            if (!empty($users) && is_array($users)) {
-                $array['nbemployees'] = count($users);
+            $sql  = 'SELECT COUNT(DISTINCT u.rowid) as nb';
+            $sql .= ' FROM ' . MAIN_DB_PREFIX . 'user AS u';
+            $sql .= ' WHERE u.entity IN (' . getEntity('user') . ')';
+            $sql .= ' AND u.employee = 1';
+            $sql .= ' AND u.statut = 1';
+
+            $resql = $db->query($sql);
+            if ($resql) {
+                $obj = $db->fetch_object($resql);
+                $array['nbemployees'] = (int) $obj->nb;
             } else {
                 $array['nbemployees'] = 0;
             }

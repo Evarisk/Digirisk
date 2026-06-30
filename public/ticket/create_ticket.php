@@ -361,7 +361,7 @@ if (empty($resHook)) {
                 // Creation OK
                 dol_delete_dir_recursive($ticket_upload_dir . '/ticket/' . $ticketTmpId . '/');
                 $urltogo = $_SERVER['PHP_SELF'] . '/../ticket_success.php?track_id=' . $track_id;
-                setEventMessages($langs->trans("TicketSent", ''), null);
+                setEventMessages($langs->trans('TicketSent') . ' ' . getNomUrlTicketPublic($object), null);
                 header("Location: " . $urltogo);
                 exit;
             }

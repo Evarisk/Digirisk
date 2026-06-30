@@ -1,0 +1,41 @@
+/** Risk page banner: cotation counts replacing the native status (moreHtmlStatus hook) */
+.banner-risk-badges {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  gap: 4px;
+  max-width: 100%;
+  font-size: 12px;
+
+  .banner-risk-badge {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    max-width: 100%;
+    color: #333;
+    font-weight: 600;
+
+    .brb-count {
+      flex: 0 0 auto;
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      min-width: 22px;
+      height: 22px;
+      padding: 0 6px;
+      border-radius: 5px;
+      color: #fff;
+      font-size: 13px;
+      font-weight: 800;
+    }
+
+    &.black .brb-count  { background: #2b2b2b; }
+    &.red .brb-count    { background: #e05353; }
+    &.orange .brb-count { background: #e9ad4f; }
+    &.grey .brb-count   { background: #b0b0b0; }
+
+    &.empty {
+      opacity: 0.5;
+    }
+  }
+}

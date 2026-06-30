@@ -111,7 +111,7 @@ $search_array_options = $extrafields->getOptionalsFromPost($risk->table_element,
 // Default sort order (if not yet defined by previous GETPOST)
 if ( ! $sortfield) $sortfield = $conf->global->DIGIRISKDOLIBARR_SORT_LISTINGS_BY_COTATION ? "evaluation.cotation" : "r." . key($risk->fields);; // Set here default search field. By default 1st field in definition.
 if ( ! $sortorder) $sortorder         = $conf->global->DIGIRISKDOLIBARR_SORT_LISTINGS_BY_COTATION ? "DESC" : "ASC" ;
-if ( ! $evalsortfield) $evalsortfield = "evaluation." . key($evaluation->fields);
+if (!isset($evalsortfield) || !$evalsortfield) $evalsortfield = "evaluation." . key($evaluation->fields);
 
 $offset   = $limit * $page;
 $pageprev = $page - 1;
@@ -121,7 +121,7 @@ $pagenext = $page + 1;
 $search_all = GETPOST('search_all', 'alphanohtml') ? trim(GETPOST('search_all', 'alphanohtml')) : trim(GETPOST('sall', 'alphanohtml'));
 $search     = array();
 foreach ($risk->fields as $key => $val) {
-	if (GETPOST('search_' . $key, 'alpha') !== '') $search[$key] = GETPOST('search_' . $key, 'alpha');
+	$search[$key] = (GETPOST('search_' . $key, 'alpha') !== '') ? GETPOST('search_' . $key, 'alpha') : '';
 
 	if ($key == 'fk_element' && $contextpage == 'sharedrisk') {
 		$search[$key] = GETPOST('search_' . $key . '_sharedrisk', 'alpha');
@@ -131,7 +131,7 @@ foreach ($risk->fields as $key => $val) {
 // List of fields to search into when doing a "search in all"
 $fieldstosearchall = array();
 foreach ($risk->fields as $key => $val) {
-	if ($val['searchall']) $fieldstosearchall['r.' . $key] = $val['label'];
+	if (!empty($val['searchall'])) $fieldstosearchall['r.' . $key] = $val['label'];
 }
 
 // Definition of fields for list
@@ -148,7 +148,7 @@ foreach ($risk->fields as $key => $val) {
             'checked'     => (($visible < 0) ? 0 : 1),
             'enabled'     => ($visible != 3 && dol_eval($val['enabled'], 1)),
             'position'    => $val['position'],
-            'help'        => $val['help']
+            'help'        => $val['help'] ?? ''
         ];
     }
 }
@@ -162,7 +162,7 @@ foreach ($evaluation->fields as $key => $val) {
             'checked'     => (($visible < 0) ? 0 : 1),
             'enabled'     => ($visible != 3 && dol_eval($val['enabled'], 1)),
             'position'    => $val['position'],
-            'help'        => $val['help']
+            'help'        => $val['help'] ?? ''
         ];
     }
 }
@@ -228,7 +228,9 @@ $form    = new Form($db);
 $title   = $langs->trans(ucfirst($riskType) . 's');
 $helpUrl = 'FR:Module_Digirisk#.C3.89valuation_des_Risques';
 
-digirisk_header($title, $helpUrl);
+// classforhorizontalscrolloftabs constrains #id-right width so the wide risk list table
+// scrolls inside its own .div-table-responsive instead of widening the whole page
+digirisk_header($title, $helpUrl, [], [], '', 'classforhorizontalscrolloftabs');
 
 if ($conf->browser->layout == 'phone') {
     $onPhone = 1;
@@ -372,10 +374,8 @@ if ($object->id > 0) {
     saturne_banner_tab($object,'ref','none', 0, 'ref', 'ref', $morehtmlref, true, $moreParams);
 
 	// Buttons for actions
+	// The "import shared risks" action moved next to the "add risk" buttons (icon + tooltip) in the risk list view
 	print '<div class="tabsAction" >';
-	if ($permissiontoadd && !empty($conf->global->DIGIRISKDOLIBARR_SHOW_SHARED_RISKS)) {
-		print '<span class="butAction" id="actionButtonImportSharedRisks" title="" href="' . $_SERVER["PHP_SELF"] . '?id=' . $object->id . '&risk_type=' . $riskType . '&action=import_shared_risks' . '">' . $langs->trans('ImportShared' . ucfirst($riskType) . 's') . '</span>';
-	}
 	print '</div>';
 
 	if ($conf->global->DIGIRISKDOLIBARR_SHOW_RISKS == 1) {

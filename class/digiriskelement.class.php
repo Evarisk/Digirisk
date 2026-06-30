@@ -264,7 +264,7 @@ class DigiriskElement extends SaturneObject
     {
         global $conf, $form, $langs;
 
-        if (dol_strlen($filter['customsql'])) {
+        if (isset($filter['customsql']) && dol_strlen($filter['customsql'])) {
             $filter['customsql'] .= ' AND t.rowid != ' . ($this->id ?? 0);
         }
 
@@ -549,6 +549,7 @@ class DigiriskElement extends SaturneObject
         // ParentElement
         $parent_element = new self($db);
         $result         = $parent_element->fetch($this->fk_parent);
+        $morehtmlref    = '';
         if ($result > 0) {
             $morehtmlref .= $langs->trans("Description") . ' : ' . $this->description;
             $morehtmlref .= '<br>' . $langs->trans("ParentElement") . ' : ' . $parent_element->getNomUrl(1, 'blank', 1);

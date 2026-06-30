@@ -446,7 +446,8 @@ foreach ($object->fields as $key => $val) {
                 } else {
                     $disablesort = 1;
                 }
-                print getTitleFieldOfList($resource['label'], 0, $_SERVER['PHP_SELF'], $resource['sortfield'], '', $param, ($cssforfield ? 'class="' . $cssforfield . '"' : ''), $sortfield, $sortorder, ($cssforfield ? $cssforfield . ' ' : ''), $disablesort) . "\n";
+                $resourceSortfield = !empty($resource['sortfield']) ? $resource['sortfield'] : '';
+                print getTitleFieldOfList($resource['label'], 0, $_SERVER['PHP_SELF'], $resourceSortfield, '', $param, ($cssforfield ? 'class="' . $cssforfield . '"' : ''), $sortfield, $sortorder, ($cssforfield ? $cssforfield . ' ' : ''), $disablesort) . "\n";
 			}
 		}
 	}

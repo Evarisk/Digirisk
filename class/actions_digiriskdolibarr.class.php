@@ -111,6 +111,39 @@ class ActionsDigiriskdolibarr
     }
 
     /**
+     * Overloading the saturneIndex hook: print a weather vigilance banner on the Digirisk dashboard.
+     *
+     * @param  array        $parameters Hook metadata (context, etc...)
+     * @param  CommonObject $object     Current object
+     * @return int                      0 to let Dolibarr continue
+     */
+    public function saturneIndex($parameters, &$object)
+    {
+        if (strpos($parameters['context'], 'digiriskdolibarrindex') === false) {
+            return 0;
+        }
+
+        // Feature disabled in the module configuration (off by default): no banner.
+        if (!getDolGlobalInt('DIGIRISKDOLIBARR_METEOFRANCE_VIGILANCE_ENABLED')) {
+            return 0;
+        }
+
+        require_once __DIR__ . '/meteovigilance.class.php';
+
+        $meteoVigilance = new MeteoVigilance($this->db);
+        $vigilance      = $meteoVigilance->fetchVigilance();
+        if (is_array($vigilance) && (int) $vigilance['level'] >= 3) {
+            global $langs;
+            $departmentCode = $meteoVigilance->getDepartmentCode();
+            ob_start();
+            require __DIR__ . '/../core/tpl/meteovigilance/banner.tpl.php';
+            $this->resprints = ob_get_clean();
+        }
+
+        return 0;
+    }
+
+    /**
      * Overloading the addHtmlHeader function : replacing the parent's function with the one below
      *
      * @param  array $parameters Hook metadata (context, etc...)
@@ -241,15 +274,17 @@ class ActionsDigiriskdolibarr
                 </script>
                 <?php
 
-                $digiriskelement    = new DigiriskElement($db);
-                $res = $digiriskelement->fetch($object->array_options['options_digiriskdolibarr_ticket_service']);
-                if ($res > 0) {
-                    $outDigiriskElement = $digiriskelement->getNomUrl(1, 'blank', 0, '', -1, 1);
-                    ?>
-                    <script>
-                        jQuery('td[id*="digiriskdolibarr_ticket_service"]').html('<?= $outDigiriskElement ?>');
-                    </script>
-                    <?php
+                if (!empty($object->array_options['options_digiriskdolibarr_ticket_service'])) {
+                    $digiriskelement    = new DigiriskElement($db);
+                    $res = $digiriskelement->fetch((int)$object->array_options['options_digiriskdolibarr_ticket_service']);
+                    if ($res > 0) {
+                        $outDigiriskElement = $digiriskelement->getNomUrl(1, 'blank', 0, '', -1, 1);
+                        ?>
+                        <script>
+                            jQuery('td[id*="digiriskdolibarr_ticket_service"]').html('<?= $outDigiriskElement ?>');
+                        </script>
+                        <?php
+                    }
                 }
 
                 // Collect ticket category IDs including their ancestors (getListForItem returns the full hierarchy)
@@ -468,8 +503,9 @@ class ActionsDigiriskdolibarr
 				require_once DOL_DOCUMENT_ROOT.'/projet/class/project.class.php';
                 require_once __DIR__ . '/../../saturne/class/task/saturnetask.class.php';
 
-				$task    = new SaturneTask($db);
-				$project = new Project($db);
+				$task        = new SaturneTask($db);
+				$project     = new Project($db);
+				$extrafields = new ExtraFields($db);
 
 				if (preg_match('/projectcard|projectcontactcard|projecttaskcard|projecttaskscard|projecttasktime|projectOverview/', $parameters['context']) || (strpos($parameters['context'], 'category') !== false && preg_match('/contacttpl/', $parameters['context']))) {
                     if (strpos($parameters['context'], 'projecttaskcard') !== false && !GETPOSTISSET('withproject')) {
@@ -485,24 +521,23 @@ class ActionsDigiriskdolibarr
                             $projectId = $task->fk_project;
                         }
                         $allTasks = $task->getTasksArray(null, null, $projectId, 0, 0, '', '-1', '', 0, 0, $extrafields);
+                        $totalConsumedTime       = 0;
+                        $totatConsumedTimeAmount = 0;
+                        $nbTasks                 = 0;
+                        $totalProgress           = 0;
+                        $totalTasksBudget        = 0;
                         if (is_array($allTasks) && !empty($allTasks)) {
                             $nbTasks = count($allTasks);
                             foreach ($allTasks as $taskSingle) {
                                 $filter       = ' AND fk_element = ' . $taskSingle->id;
                                 $allTimespent = $task->fetchAllTimeSpentAllUsers($filter);
                                 foreach ($allTimespent as $timespent) {
-                                    $totatConsumedTimeAmount += convertSecondToTime($timespent->timespent_duration, 'allhourmin') * $timespent->timespent_thm;
+                                    $totatConsumedTimeAmount += ((float)$timespent->timespent_duration / 3600) * (float)$timespent->timespent_thm;
                                 }
-                                $totalConsumedTime += $taskSingle->duration;
-                                $totalProgress     += $taskSingle->progress;
-                                $totalTasksBudget  += $taskSingle->budget_amount;
+                                $totalConsumedTime += (float)$taskSingle->duration;
+                                $totalProgress     += (float)$taskSingle->progress;
+                                $totalTasksBudget  += (float)$taskSingle->budget_amount;
                             }
-                        } else {
-                            $totalConsumedTime       = 0;
-                            $totatConsumedTimeAmount = 0;
-                            $nbTasks                 = 0;
-                            $totalProgress           = 0;
-                            $totalTasksBudget        = 0;
                         }
                         $outTotatConsumedTime       = '<tr><td>' . $langs->trans('TotalConsumedTime') . '</td><td>' . convertSecondToTime($totalConsumedTime, 'allhourmin') . '</td></tr>';
                         $outTotatConsumedTimeAmount = '<tr><td>' . $langs->trans('TotalConsumedTimeAmount') . '</td><td>' . price($totatConsumedTimeAmount, 0, $langs, 1, -1, 2, $conf->currency) . '</td></tr>';
@@ -1066,6 +1101,57 @@ class ActionsDigiriskdolibarr
         return 0; // or return 1 to replace standard code
     }
 
+    /**
+     * Overloading the moreHtmlStatus function : on the risk page, replace the banner status by the risk cotation counts (black/red/orange/grey) of the current element.
+     *
+     * @param  array        $parameters Hook metadatas (context, morehtmlstatus, etc...).
+     * @param  CommonObject $object     Current object.
+     * @return int                      0 to keep the standard status, 1 to replace it.
+     */
+    public function moreHtmlStatus(array $parameters, $object): int
+    {
+        if (strpos($parameters['context'], 'riskcard') === false || !is_a($object, 'DigiriskElement')) {
+            return 0;
+        }
+
+        global $langs;
+
+        require_once __DIR__ . '/riskanalysis/risk.class.php';
+
+        $riskType = GETPOST('risk_type', 'aZ09');
+        if (empty($riskType)) {
+            $riskType = 'risk';
+        }
+
+        // Count only this element's risks of the current type (lightweight filtered fetch)
+        $risk      = new Risk($this->db);
+        $riskInfos = $risk->loadRiskInfos([
+            'filter'     => ' AND t.fk_element = ' . (int) $object->id,
+            'filterRisk' => ' AND t.type = \'' . $this->db->escape($riskType) . '\''
+        ]);
+        $counts = $riskInfos['current']['riskByRiskAssessmentCotations'][$object->id] ?? [];
+
+        // Cotation scale: 4 = black, 3 = red, 2 = orange, 1 = grey
+        $cotations = [
+            4 => ['class' => 'black',  'label' => 'BlackRisk'],
+            3 => ['class' => 'red',    'label' => 'RedRisk'],
+            2 => ['class' => 'orange', 'label' => 'OrangeRisk'],
+            1 => ['class' => 'grey',   'label' => 'GreyRisk'],
+        ];
+        $out = '<div class="banner-risk-badges">';
+        foreach ($cotations as $scale => $info) {
+            $count = (int) ($counts[$scale] ?? 0);
+            // Short label to keep the badge compact in the banner (e.g. "Risque inacceptable" -> "Inacceptable")
+            $label = dol_ucfirst(preg_replace('/^risque\s+/i', '', $langs->trans($info['label'])));
+            $out  .= '<span class="banner-risk-badge ' . $info['class'] . ($count ? '' : ' empty') . '"><span class="brb-count">' . $count . '</span>' . dol_escape_htmltag($label) . '</span>';
+        }
+        $out .= '</div>';
+
+        $this->resprints = $out;
+
+        return 1;
+    }
+
 	/**
 	 *  Overloading the saturneAttendantsBackToCard function : replacing the parent's function with the one below.
 	 *
@@ -1341,7 +1427,10 @@ class ActionsDigiriskdolibarr
             </script>
             <?php
 
-            $serviceId = $parameters['obj']->options_digiriskdolibarr_ticket_service;
+            $serviceId = (int) ($parameters['obj']->options_digiriskdolibarr_ticket_service ?? 0);
+            if ($serviceId <= 0) {
+                return 0;
+            }
 
             $digiriskelement = new DigiriskElement($db);
             $res = $digiriskelement->fetch($serviceId);

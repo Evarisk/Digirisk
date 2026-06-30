@@ -87,7 +87,7 @@ abstract class ModeleODTDigiriskDolibarrDocument extends SaturneDocumentModel
                     continue; // Skip if digirisk element not found (case of GP/UT fiche with spécific id)
                 }
 
-                $depthHyphens                     = str_repeat('- ', $digiriskElement['depth']);
+                $depthHyphens                     = str_repeat('  ', $digiriskElement['depth']);
                 $tmpArray['digiriskElementLabel'] = $depthHyphens . 'S' . $digiriskElement['object']->entity . ' - ' . $digiriskElement['object']->ref . ' - ' . $digiriskElement['object']->label;
 
                 $tmpArray['picto']                  = DOL_DOCUMENT_ROOT . '/custom/digiriskdolibarr/img/categorieDangers/' . $risk->getDangerCategory($risk, $risk->type) . '.png';
@@ -508,6 +508,22 @@ abstract class ModeleODTDigiriskDolibarrDocument extends SaturneDocumentModel
             for ($i = 4; $i >= 1; $i--) {
                 $moreParam['segmentName'] = $moreParam['entity'] . 'Risks' . $i;
                 static::setRiskByRiskAssessmentLevelsSegment($odfHandler, $outputLangs, $moreParam);
+            }
+
+            // Opt-in: render inherited/children and shared risks in their own dedicated tables
+            // (segments inheritedRisks1..4 and sharedRisks1..4). Missing segments are skipped silently.
+            if (!empty($moreParam['includeInheritedAndShared'])) {
+                $ownDigiriskElements = $moreParam['digiriskElements'];
+                $inheritedAndShared  = $risk->getInheritedAndSharedRiskLevels($moreParam);
+
+                foreach (['inherited', 'shared'] as $bucket) {
+                    $moreParam['riskByRiskAssessmentLevels'] = $inheritedAndShared[$bucket]['riskByRiskAssessmentLevels'];
+                    $moreParam['digiriskElements']           = $ownDigiriskElements + $inheritedAndShared[$bucket]['digiriskElements'];
+                    for ($i = 4; $i >= 1; $i--) {
+                        $moreParam['segmentName'] = $bucket . 'Risks' . $i;
+                        static::setRiskByRiskAssessmentLevelsSegment($odfHandler, $outputLangs, $moreParam);
+                    }
+                }
             }
 
             $moreParam['riskSigns'] = $loadRiskSignInfos['riskSigns'];
