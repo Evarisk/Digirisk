@@ -3384,6 +3384,7 @@ td > .risk-evaluation-list-content .risk-evaluation-container:not(.advanced, .st
 }
 .wpeo-modal[class*=modal-risk] .modal-container .risk-content .risk-description textarea {
   width: 100%;
+  height: 50px;
   resize: vertical;
 }
 
@@ -3414,6 +3415,7 @@ td > .risk-evaluation-list-content .risk-evaluation-container:not(.advanced, .st
 }
 .wpeo-modal[class*=modal-risk] .modal-container .risk-evaluation-container .risk-evaluation-content-wrapper .risk-evaluation-comment textarea {
   width: 100%;
+  height: 50px;
   resize: vertical;
 }
 .wpeo-modal[class*=modal-risk] .modal-container .risk-evaluation-container.advanced .risk-evaluation-content-wrapper {
