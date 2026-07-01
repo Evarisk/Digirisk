@@ -857,6 +857,8 @@ workunitdocumentinherited.odt           = Fiche d'Unité de travail - Risques h�
 workunitdocumentinherited_custom.odt    = Fiche d'Unité de travail - Risques hérités personnalisée
 workunitdocumentshared.odt              = Fiche d'Unité de travail - Risques partagés
 workunitdocumentshared_custom.odt       = Fiche d'Unité de travail - Risques partagés personnalisée
+workunitdocumentcomplete.odt            = Fiche d'Unité de travail - Tous les risques (propres, hérités, partagés)
+workunitdocumentcomplete_custom.odt     = Fiche d'Unité de travail - Tous les risques personnalisée
 DigiriskWorkUnitDocumentData            = Données configurables des fiches d'unités de travail
 ShowTaskDoneWorkUnitDocumentDescription = Permettre d'afficher ou non les tâches soldées dans la fiche d'unité de travail
 
