@@ -678,9 +678,9 @@ $massactionbutton = $form->selectMassAction('', $arrayofmassactions);
                         </div><hr>
                     <?php endif; ?>
                     <div class="risk-evaluation-container standard">
-                        <span class="section-title"><?php echo ' ' . $langs->trans('RiskAssessment'); ?></span>
                         <div style="display: flex; gap: 20px; flex-wrap: wrap;">
                             <div style="flex: 3; min-width: 300px;">
+                                <span class="section-title"><?php echo ' ' . $langs->trans('RiskAssessment'); ?></span>
                                 <div class="risk-evaluation-header">
                                     <?php if ($conf->global->DIGIRISKDOLIBARR_ADVANCED_RISKASSESSMENT_METHOD) : ?>
                                         <div class="wpeo-button evaluation-standard select-evaluation-method selected button-blue button-radius-2">
