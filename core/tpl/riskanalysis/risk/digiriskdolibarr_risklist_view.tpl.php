@@ -802,8 +802,10 @@ $massactionbutton = $form->selectMassAction('', $arrayofmassactions);
                     <?php if ($conf->global->DIGIRISKDOLIBARR_TASK_MANAGEMENT) : ?>
                         <hr>
                         <div class="riskassessment-task">
-                            <span class="section-title"><?php echo $langs->trans('Task'); ?></span>
-                            <span class="title"><?php echo $langs->trans('Label'); ?> <input type="text" class="" name="label" value=""></span>
+                            <div style="display: flex; align-items: center; margin-bottom: 5px;">
+                                <span class="section-title" style="margin-bottom: 0; margin-right: 15px; white-space: nowrap;"><?php echo $langs->trans('Task'); ?></span>
+                                <input type="text" class="widthcentpercent" name="label" value="" placeholder="<?php echo dol_escape_htmltag($langs->trans('Label')); ?>" style="flex-grow: 1; height: 30px; box-sizing: border-box; padding-left: 10px;">
+                            </div>
                             <div class="wpeo-gridlayout grid-4" style="margin-top: 5px; align-items: center;">
                                 <div>
                                     <div style="position: relative;">
@@ -818,8 +820,8 @@ $massactionbutton = $form->selectMassAction('', $arrayofmassactions);
                                     </div>
                                 </div>
                                 <div>
-                                    <div style="position: relative; display: flex; align-items: center; border: 1px solid #ccc; height: 30px; border-radius: 3px; box-sizing: border-box;">
-                                        <i class="fas fa-user-tie fa-fw" style="padding-left: 10px; padding-right: 5px; color: #888;"></i>
+                                    <div style="display: flex; align-items: center; gap: 5px; height: 30px;">
+                                        <i class="fas fa-user-tie fa-fw" style="color: #888;"></i>
                                         <div style="flex-grow: 1; min-width: 0;">
                                             <?php print $form->select_dolusers(0, 'executive_id', $langs->trans('Responsible'), null, 0, '', 0, '', 0, 'widthcentpercent', '', 0, '', 'executiveSelect'); ?>
                                         </div>
