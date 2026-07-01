@@ -795,7 +795,7 @@ $massactionbutton = $form->selectMassAction('', $arrayofmassactions);
                                 </div>
                             </div>
                             <div class="risk-evaluation-comment">
-                                <span class="title"><i class="fas fa-comment-dots"></i> <?php echo $langs->trans('Comment'); ?> (<span class="char-counter">65535</span> <?php echo $langs->trans('CharRemaining'); ?>)</span>
+                                <span class="title"><i class="fas fa-comment-dots"></i> <?php echo $langs->trans('Comment'); ?></span>
                                 <?php print '<textarea class="evaluation-comment-textarea" data-maxlength="65535" maxlength="65535" name="evaluationComment' . $risk->id . '" cols="50" rows="' . ROWS_2 . '">' . ('') . '</textarea>' . "\n"; ?>
                             </div>
                         </div>
