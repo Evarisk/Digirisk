@@ -796,7 +796,7 @@ $massactionbutton = $form->selectMassAction('', $arrayofmassactions);
                             </div>
                             <div class="risk-evaluation-comment">
                                 <span class="title"><i class="fas fa-comment-dots"></i> <?php echo $langs->trans('Comment'); ?></span>
-                                <?php print '<textarea class="evaluation-comment-textarea" data-maxlength="65535" maxlength="65535" name="evaluationComment' . $risk->id . '" cols="50" rows="' . ROWS_2 . '">' . ('') . '</textarea>' . "\n"; ?>
+                                <?php print '<textarea class="evaluation-comment-textarea" name="evaluationComment' . $risk->id . '" cols="50" rows="' . ROWS_2 . '">' . ('') . '</textarea>' . "\n"; ?>
                             </div>
                         </div>
                     <?php if ($conf->global->DIGIRISKDOLIBARR_TASK_MANAGEMENT) : ?>
