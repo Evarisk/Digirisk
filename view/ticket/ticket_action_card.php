@@ -764,9 +764,14 @@ if ($object->id <= 0) {
         'BLOCKING' => '#dc3545',
     ];
 
+    // "Undefined" sits first (leftmost). Columns are ordered by the dictionary
+    // position (pos) so severity rises from least to most critical left→right,
+    // leaving the most critical (BLOCKING) on the right. Issue #4858.
+    $pickerSeverityColumns['__none__'] = ['label' => $langs->trans('Undefined'), 'icon' => 'fa-exclamation-triangle', 'color' => '#adb5bd'];
+
     $sqlSevs = 'SELECT code, label FROM ' . MAIN_DB_PREFIX . 'c_ticket_severity'
         . ' WHERE active = 1 AND entity IN (' . getEntity('c_ticket_severity') . ')'
-        . ' ORDER BY code';
+        . ' ORDER BY pos';
     $resSevs = $db->query($sqlSevs);
     if ($resSevs) {
         while ($r = $db->fetch_object($resSevs)) {
@@ -783,7 +788,6 @@ if ($object->id <= 0) {
         }
         $db->free($resSevs);
     }
-    $pickerSeverityColumns['__none__'] = ['label' => $langs->trans('Undefined'), 'icon' => 'fa-exclamation-triangle', 'color' => '#adb5bd'];
 
     foreach (array_keys($pickerSeverityColumns) as $sc) {
         $pickerSeverityTickets[$sc] = [];
