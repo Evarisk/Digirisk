@@ -820,12 +820,16 @@ $massactionbutton = $form->selectMassAction('', $arrayofmassactions);
                                     <div style="position: relative;">
                                         <i class="far fa-calendar-plus fa-fw" style="position: absolute; left: 10px; top: 50%; transform: translateY(-50%); color: #888;"></i>
                                         <?php print '<input type="datetime-local" id="RiskassessmentTaskDateStartModalRisk" class="widthcentpercent" name="RiskassessmentTaskDateStartModalRisk" style="height: 30px; box-sizing: border-box; padding-left: 30px;" value="' . dol_print_date(dol_now('tzuser'), '%Y-%m-%dT%H:%M:%S') . '">'; ?>
+                                        <?php print '<input type="hidden" id="RiskassessmentTaskDateStartModalRiskhour" name="RiskassessmentTaskDateStartModalRiskhour" value="' . dol_print_date(dol_now('tzuser'), '%H') . '">'; ?>
+                                        <?php print '<input type="hidden" id="RiskassessmentTaskDateStartModalRiskmin" name="RiskassessmentTaskDateStartModalRiskmin" value="' . dol_print_date(dol_now('tzuser'), '%M') . '">'; ?>
                                     </div>
                                 </div>
                                 <div>
                                     <div style="position: relative;">
                                         <i class="far fa-calendar-check fa-fw" style="position: absolute; left: 10px; top: 50%; transform: translateY(-50%); color: #888;"></i>
                                         <?php print '<input type="datetime-local" id="RiskassessmentTaskDateEndModalRisk" class="widthcentpercent" name="RiskassessmentTaskDateEndModalRisk" style="height: 30px; box-sizing: border-box; padding-left: 30px;">'; ?>
+                                        <?php print '<input type="hidden" id="RiskassessmentTaskDateEndModalRiskhour" name="RiskassessmentTaskDateEndModalRiskhour" value="">'; ?>
+                                        <?php print '<input type="hidden" id="RiskassessmentTaskDateEndModalRiskmin" name="RiskassessmentTaskDateEndModalRiskmin" value="">'; ?>
                                     </div>
                                 </div>
                                 <div>
