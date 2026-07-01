@@ -162,7 +162,8 @@ window.digiriskdolibarr.risk.createRisk = function ( event ) {
 	let dateEnd   = elementTask.find('#RiskassessmentTaskDateEndModalRisk').val();
 	let hourEnd   = elementTask.find('#RiskassessmentTaskDateEndModalRiskhour').val();
 	let minEnd    = elementTask.find('#RiskassessmentTaskDateEndModalRiskmin').val();
-	let budget    = elementTask.find('.riskassessment-task-budget').val()
+	let budget    = elementTask.find('.riskassessment-task-budget').val();
+	let executiveId = elementTask.find('.executiveSelect').val();
 
 	//Loader
 	window.saturne.loader.display($('.fichecenter.risklist'));
@@ -186,6 +187,7 @@ window.digiriskdolibarr.risk.createRisk = function ( event ) {
 			hourEnd: hourEnd,
 			minEnd: minEnd,
 			budget: budget,
+			executiveId: executiveId,
       categories: categories,
 			criteres: {
 				gravite: criteres['gravite'] ? criteres['gravite'] : 0,

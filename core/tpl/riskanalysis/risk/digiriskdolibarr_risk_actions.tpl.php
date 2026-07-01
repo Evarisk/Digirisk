@@ -96,6 +96,7 @@ if ( ! $error && $action == 'add' && $permissiontoadd) {
 				$dateStart = dol_stringtotime($data['dateStart']);
                 $dateEnd   = dol_stringtotime($data['dateEnd']);
 				$budget    = $data['budget'];
+				$executive_id = isset($data['executiveId']) ? $data['executiveId'] : 0;
 				if ( ! empty($tasktitle) && $tasktitle !== 'undefined') {
 					$extrafields->fetch_name_optionals_label($task->table_element);
 
@@ -122,7 +123,12 @@ if ( ! $error && $action == 'add' && $permissiontoadd) {
 						}
 
 						$DUProject->add_contact($user->id, $conf->global->DIGIRISKDOLIBARR_DEFAULT_PROJECT_CONTACT_TYPE, 'internal');
-						$task->add_contact($user->id, $conf->global->DIGIRISKDOLIBARR_DEFAULT_TASK_CONTACT_TYPE, 'internal');
+						
+						if ($executive_id > 0) {
+							$task->add_contact($executive_id, 'TASKEXECUTIVE', 'internal');
+						} else {
+							$task->add_contact($user->id, $conf->global->DIGIRISKDOLIBARR_DEFAULT_TASK_CONTACT_TYPE, 'internal');
+						}
 
 						// Creation risk + evaluation + task OK
 						$urltogo = str_replace('__ID__', $result3, $backtopage);

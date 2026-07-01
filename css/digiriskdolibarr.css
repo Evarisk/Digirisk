@@ -30,6 +30,8 @@
 .risk-evaluation-cotation.selected-cotation {
   -webkit-box-shadow: 0 0 0 2px #0d8aff;
   box-shadow: 0 0 0 2px #0d8aff;
+  z-index: 1;
+  position: relative;
 }
 
 .can-select, .wpeo-modal[class*=modal-risk] .modal-container .risk-evaluation-container .risk-evaluation-content-wrapper .cotation-standard .risk-evaluation-cotation {
