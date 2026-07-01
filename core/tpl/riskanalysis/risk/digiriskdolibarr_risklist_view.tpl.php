@@ -616,8 +616,17 @@ $massactionbutton = $form->selectMassAction('', $arrayofmassactions);
         <div class="wpeo-modal modal-risk-0 modal-risk" id="risk_add<?php echo $object->id ?>" value="new">
             <div class="modal-container wpeo-modal-event">
                 <!-- Modal-Header -->
-                <div class="modal-header">
-                    <h2 class="modal-title"><?php print $langs->trans('Add' . ucfirst($riskType) . 'Title') . ' ' . $refRiskMod->getNextValue($risk); ?></h2>
+                <div class="modal-header" style="align-items: center; display: flex;">
+                    <h2 class="modal-title" style="flex: 1;"><?php print $langs->trans('Add' . ucfirst($riskType) . 'Title') . ' ' . $refRiskMod->getNextValue($risk); ?></h2>
+                    <?php if ($permissiontoadd) : ?>
+                        <div class="risk-create wpeo-button button-primary button-disable modal-close" style="margin-right: 15px; margin-bottom: 0;">
+                            <span><i class="fas fa-plus"></i>  <?php echo $langs->trans('AddRiskButton'); ?></span>
+                        </div>
+                    <?php else : ?>
+                        <div class="wpeo-button button-grey wpeo-tooltip-event" aria-label="<?php echo $langs->trans('PermissionDenied') ?>" style="margin-right: 15px; margin-bottom: 0;">
+                            <span><i class="fas fa-plus"></i>  <?php echo $langs->trans('AddRiskButton'); ?></span>
+                        </div>
+                    <?php endif;?>
                     <div class="modal-close"><i class="fas fa-times"></i></div>
                 </div>
                 <!-- Modal-ADD Risk Content-->
@@ -837,18 +846,7 @@ $massactionbutton = $form->selectMassAction('', $arrayofmassactions);
                         </div>
                     <?php endif; ?>
                 </div>
-                <!-- Modal-Footer -->
-                <div class="modal-footer">
-                    <?php if ($permissiontoadd) : ?>
-                        <div class="risk-create wpeo-button button-primary button-disable modal-close">
-                            <span><i class="fas fa-plus"></i>  <?php echo $langs->trans('AddRiskButton'); ?></span>
-                        </div>
-                    <?php else : ?>
-                        <div class="wpeo-button button-grey wpeo-tooltip-event" aria-label="<?php echo $langs->trans('PermissionDenied') ?>">
-                            <span><i class="fas fa-plus"></i>  <?php echo $langs->trans('AddRiskButton'); ?></span>
-                        </div>
-                    <?php endif;?>
-                </div>
+
             </div>
         </div>
     </div>
