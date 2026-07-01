@@ -678,131 +678,125 @@ $massactionbutton = $form->selectMassAction('', $arrayofmassactions);
                         </div><hr>
                     <?php endif; ?>
                     <div class="risk-evaluation-container standard">
-                        <div style="display: flex; gap: 20px; flex-wrap: wrap;">
-                            <div style="flex: 3; min-width: 300px;">
-                                <span class="section-title"><?php echo ' ' . $langs->trans('RiskAssessment'); ?></span>
-                                <div class="risk-evaluation-header">
-                                    <?php if ($conf->global->DIGIRISKDOLIBARR_ADVANCED_RISKASSESSMENT_METHOD) : ?>
-                                        <div class="wpeo-button evaluation-standard select-evaluation-method selected button-blue button-radius-2">
-                                            <span><?php echo $langs->trans('SimpleEvaluation') ?></span>
-                                        </div>
-                                        <div class="wpeo-button evaluation-advanced select-evaluation-method button-grey button-radius-2">
-                                            <span><?php echo $langs->trans('AdvancedEvaluation') ?></span>
-                                        </div>
-                                        <?php if (!getDolGlobalInt('DIGIRISKDOLIBARR_MULTIPLE_RISKASSESSMENT_METHOD')) : ?>
-                                            <i class="fas fa-info-circle wpeo-tooltip-event" aria-label="<?php echo $langs->trans("HowToSetMultipleRiskAssessmentMethod") ?>"></i>
-                                        <?php endif; ?>
+                        <div class="risk-evaluation-header" style="display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap;">
+                            <div class="risk-evaluation-header-left">
+                                <?php if ($conf->global->DIGIRISKDOLIBARR_ADVANCED_RISKASSESSMENT_METHOD) : ?>
+                                    <div class="wpeo-button evaluation-standard select-evaluation-method selected button-blue button-radius-2">
+                                        <span><?php echo $langs->trans('SimpleEvaluation') ?></span>
+                                    </div>
+                                    <div class="wpeo-button evaluation-advanced select-evaluation-method button-grey button-radius-2">
+                                        <span><?php echo $langs->trans('AdvancedEvaluation') ?></span>
+                                    </div>
+                                    <?php if (!getDolGlobalInt('DIGIRISKDOLIBARR_MULTIPLE_RISKASSESSMENT_METHOD')) : ?>
+                                        <i class="fas fa-info-circle wpeo-tooltip-event" aria-label="<?php echo $langs->trans("HowToSetMultipleRiskAssessmentMethod") ?>"></i>
                                     <?php endif; ?>
-                                    <input class="risk-evaluation-method" type="hidden" value="standard">
-                                    <input class="risk-evaluation-multiple-method" type="hidden" value="1">
-                                </div>
-                                <div class="risk-evaluation-content-wrapper">
-                                    <div class="risk-evaluation-content">
-                                        <div class="cotation-container">
-                                            <div class="cotation-standard">
-                                                <span class="title"><i class="fas fa-chart-line"></i><?php echo ' ' . $langs->trans('RiskAssessment'); ?><required>*</required></span>
-                                                <div class="cotation-listing wpeo-gridlayout grid-4 grid-gap-0">
-                                                    <?php
-                                                    $defaultCotation = array(0 => '0-47', 48 => '48-50', 51 => '51-80', 100 => '81-100');
-                                                    if ( ! empty($defaultCotation)) :
-                                                        foreach ($defaultCotation as $cotation => $shownCotation) :
-                                                            $evaluation->cotation = $cotation; ?>
-                                                            <div data-id="<?php echo 0; ?>"
-                                                                 data-evaluation-method="standard"
-                                                                 data-evaluation-id="<?php echo $cotation; ?>"
-                                                                 data-variable-id="<?php echo 152 + $cotation; ?>"
-                                                                 data-seuil="<?php echo  $evaluation->getEvaluationScale(); ?>"
-                                                                 data-scale="<?php echo  $evaluation->getEvaluationScale(); ?>"
-                                                                 class="risk-evaluation-cotation cotation"><?php echo $shownCotation; ?></div>
-                                                        <?php endforeach;
-                                                    endif; ?>
-                                                </div>
-                                            </div>
-                                            <input class="risk-evaluation-seuil" type="hidden" value="undefined">
-                                            <?php
-                                            $evaluationMethod       = $advancedCotationMethodArray[0];
-                                            $evaluationMethodSurvey = $evaluationMethod['option'][$risk->type . '_variable'];
-                                            ?>
-                                            <div class="wpeo-gridlayout cotation-advanced" style="display:none">
-                                                <input type="hidden" class="digi-method-evaluation-id" value="<?php echo $risk->id ; ?>" />
-                                                <textarea style="display: none" name="evaluation_variables" class="tmp_evaluation_variable"><?php echo '{}'; ?></textarea>
-                                                <span class="title"><i class="fas fa-info-circle"></i> <?php echo $langs->trans('SelectEvaluation') ?><required>*</required></span>
-                                                <div class="wpeo-table evaluation-method table-flex table-<?php echo count($evaluationMethodSurvey) + 1; ?> <?php echo $riskType; ?>">
-                                                    <div class="table-row table-header">
-                                                        <div class="table-cell">
-                                                            <span></span>
-                                                        </div>
-                                                        <?php for ( $l = 0; $l < count($evaluationMethodSurvey); $l++ ) : ?>
-                                                            <div class="table-cell">
-                                                                <span><?php echo $l; ?></span>
-                                                            </div>
-                                                        <?php endfor; ?>
+                                <?php endif; ?>
+                                <input class="risk-evaluation-method" type="hidden" value="standard">
+                                <input class="risk-evaluation-multiple-method" type="hidden" value="1">
+                            </div>
+                            <div class="risk-evaluation-header-right riskassessment-medias linked-medias photo">
+                                <div class="element-linked-medias element-linked-medias-0 risk-new">
+                                    <table class="add-medias">
+                                        <tr>
+                                            <td>
+                                                <input hidden multiple class="fast-upload" id="fast-upload-photo-default" type="file" name="userfile[]" capture="environment" accept="image/*">
+                                                <label for="fast-upload-photo-default">
+                                                    <div class="wpeo-button <?php echo ($onPhone ? 'button-square-40' : 'button-square-50'); ?>">
+                                                        <i class="fas fa-camera"></i><i class="fas fa-plus-circle button-add"></i>
                                                     </div>
-                                                    <?php $l = 0; ?>
-                                                    <?php foreach ($evaluationMethodSurvey as $critere) :
-                                                        $name = strtolower($critere['name']); ?>
-                                                        <div class="table-row">
-                                                            <div class="table-cell"><?php echo $critere['name'] ; ?></div>
-                                                            <?php foreach ($critere['option']['survey']['request'] as $request) : ?>
-                                                                <div class="table-cell can-select cell-0"
-                                                                     data-type="<?php echo $name ?>"
-                                                                     data-id="0"
-                                                                     data-evaluation-id="0"
-                                                                     data-variable-id="<?php echo $l ; ?>"
-                                                                     data-seuil="<?php echo  $request['seuil']; ?>">
-                                                                    <?php echo  $request['question'] ; ?>
-                                                                </div>
-                                                            <?php endforeach; $l++; ?>
-                                                        </div>
-                                                    <?php endforeach; ?>
+                                                </label>
+                                                <input type="hidden" class="favorite-photo" id="photo" name="photo" value="<?php echo $object->photo ?>"/>
+                                            </td>
+                                            <td>
+                                                <div class="wpeo-button <?php echo ($onPhone ? 'button-square-40' : 'button-square-50'); ?> 'open-media-gallery add-media modal-open" value="0">
+                                                    <input type="hidden" class="modal-options" data-modal-to-open="media_gallery" data-from-id="0" data-from-type="riskassessment" data-from-subtype="photo" data-from-subdir=""/>
+                                                    <i class="fas fa-folder-open"></i><i class="fas fa-plus-circle button-add"></i>
                                                 </div>
+                                            </td>
+                                            <td>
+                                                <?php
+                                                $relativepath = 'digiriskdolibarr/medias/thumbs';
+                                                print saturne_show_medias_linked('digiriskdolibarr', $conf->digiriskdolibarr->multidir_output[$conf->entity] . '/riskassessment/tmp/RA0', 'small', 0, 0, 0, 0, $onPhone ? 40 : 50, $onPhone ? 40 : 50, 1, 0, 0, '/riskassessment/tmp/RA0');
+                                                ?>
+                                            </td>
+                                        </tr>
+                                    </table>
+                                </div>
+                            </div>
+                        </div>
+                        <hr style="margin: 15px 0; border: 0; border-top: 1px solid rgba(0, 0, 0, 0.2);">
+                        <div class="risk-evaluation-content-wrapper">
+                            <div class="risk-evaluation-content">
+                                <div class="cotation-container">
+                                    <div class="cotation-standard">
+                                        <span class="title"><i class="fas fa-chart-line"></i><?php echo ' ' . $langs->trans('RiskAssessment'); ?><required>*</required></span>
+                                        <div class="cotation-listing wpeo-gridlayout grid-4 grid-gap-0">
+                                            <?php
+                                            $defaultCotation = array(0 => '0-47', 48 => '48-50', 51 => '51-80', 100 => '81-100');
+                                            if ( ! empty($defaultCotation)) :
+                                                foreach ($defaultCotation as $cotation => $shownCotation) :
+                                                    $evaluation->cotation = $cotation; ?>
+                                                    <div data-id="<?php echo 0; ?>"
+                                                         data-evaluation-method="standard"
+                                                         data-evaluation-id="<?php echo $cotation; ?>"
+                                                         data-variable-id="<?php echo 152 + $cotation; ?>"
+                                                         data-seuil="<?php echo  $evaluation->getEvaluationScale(); ?>"
+                                                         data-scale="<?php echo  $evaluation->getEvaluationScale(); ?>"
+                                                         class="risk-evaluation-cotation cotation"><?php echo $shownCotation; ?></div>
+                                                <?php endforeach;
+                                            endif; ?>
+                                        </div>
+                                    </div>
+                                    <input class="risk-evaluation-seuil" type="hidden" value="undefined">
+                                    <?php
+                                    $evaluationMethod       = $advancedCotationMethodArray[0];
+                                    $evaluationMethodSurvey = $evaluationMethod['option'][$risk->type . '_variable'];
+                                    ?>
+                                    <div class="wpeo-gridlayout cotation-advanced" style="display:none">
+                                        <input type="hidden" class="digi-method-evaluation-id" value="<?php echo $risk->id ; ?>" />
+                                        <textarea style="display: none" name="evaluation_variables" class="tmp_evaluation_variable"><?php echo '{}'; ?></textarea>
+                                        <span class="title"><i class="fas fa-info-circle"></i> <?php echo $langs->trans('SelectEvaluation') ?><required>*</required></span>
+                                        <div class="wpeo-table evaluation-method table-flex table-<?php echo count($evaluationMethodSurvey) + 1; ?> <?php echo $riskType; ?>">
+                                            <div class="table-row table-header">
+                                                <div class="table-cell">
+                                                    <span></span>
+                                                </div>
+                                                <?php for ( $l = 0; $l < count($evaluationMethodSurvey); $l++ ) : ?>
+                                                    <div class="table-cell">
+                                                        <span><?php echo $l; ?></span>
+                                                    </div>
+                                                <?php endfor; ?>
                                             </div>
+                                            <?php $l = 0; ?>
+                                            <?php foreach ($evaluationMethodSurvey as $critere) :
+                                                $name = strtolower($critere['name']); ?>
+                                                <div class="table-row">
+                                                    <div class="table-cell"><?php echo $critere['name'] ; ?></div>
+                                                    <?php foreach ($critere['option']['survey']['request'] as $request) : ?>
+                                                        <div class="table-cell can-select cell-0"
+                                                             data-type="<?php echo $name ?>"
+                                                             data-id="0"
+                                                             data-evaluation-id="0"
+                                                             data-variable-id="<?php echo $l ; ?>"
+                                                             data-seuil="<?php echo  $request['seuil']; ?>">
+                                                            <?php echo  $request['question'] ; ?>
+                                                        </div>
+                                                    <?php endforeach; $l++; ?>
+                                                </div>
+                                            <?php endforeach; ?>
                                         </div>
-                                    </div>
-                                    <div class="risk-evaluation-calculated-cotation" style="display: none">
-                                        <span class="title"><i class="fas fa-chart-line"></i> <?php echo $langs->trans('CalculatedEvaluation'); ?><required>*</required></span>
-                                        <div data-scale="1" class="risk-evaluation-cotation cotation">
-                                            <span><?php echo 0 ?></span>
-                                        </div>
-                                    </div>
-                                    <div class="risk-evaluation-comment">
-                                        <span class="title"><i class="fas fa-comment-dots"></i> <?php echo $langs->trans('Comment'); ?> (<span class="char-counter">65535</span> <?php echo $langs->trans('CharRemaining'); ?>)</span>
-                                        <?php print '<textarea class="evaluation-comment-textarea" data-maxlength="65535" maxlength="65535" name="evaluationComment' . $risk->id . '" cols="50" rows="' . ROWS_2 . '">' . ('') . '</textarea>' . "\n"; ?>
                                     </div>
                                 </div>
                             </div>
-                            <div style="flex: 1; min-width: 250px;">
-                                <div class="riskassessment-medias linked-medias photo">
-                                    <div class="element-linked-medias element-linked-medias-0 risk-new">
-                                        <div class="medias section-title"><i class="fas fa-picture-o"></i><?php echo $langs->trans('Medias'); ?></div>
-                                        <table class="add-medias">
-                                            <tr>
-                                                <td>
-                                                    <input hidden multiple class="fast-upload" id="fast-upload-photo-default" type="file" name="userfile[]" capture="environment" accept="image/*">
-                                                    <label for="fast-upload-photo-default">
-                                                        <div class="wpeo-button <?php echo ($onPhone ? 'button-square-40' : 'button-square-50'); ?>">
-                                                            <i class="fas fa-camera"></i><i class="fas fa-plus-circle button-add"></i>
-                                                        </div>
-                                                    </label>
-                                                    <input type="hidden" class="favorite-photo" id="photo" name="photo" value="<?php echo $object->photo ?>"/>
-                                                </td>
-                                                <td>
-            
-                                                    <div class="wpeo-button <?php echo ($onPhone ? 'button-square-40' : 'button-square-50'); ?> 'open-media-gallery add-media modal-open" value="0">
-                                                        <input type="hidden" class="modal-options" data-modal-to-open="media_gallery" data-from-id="0" data-from-type="riskassessment" data-from-subtype="photo" data-from-subdir=""/>
-                                                        <i class="fas fa-folder-open"></i><i class="fas fa-plus-circle button-add"></i>
-                                                    </div>
-                                                </td>
-                                                <td>
-                                                    <?php
-                                                    $relativepath = 'digiriskdolibarr/medias/thumbs';
-                                                    print saturne_show_medias_linked('digiriskdolibarr', $conf->digiriskdolibarr->multidir_output[$conf->entity] . '/riskassessment/tmp/RA0', 'small', 0, 0, 0, 0, $onPhone ? 40 : 50, $onPhone ? 40 : 50, 1, 0, 0, '/riskassessment/tmp/RA0');
-                                                    ?>
-                                                </td>
-                                            </tr>
-                                        </table>
-                                    </div>
+                            <div class="risk-evaluation-calculated-cotation" style="display: none">
+                                <span class="title"><i class="fas fa-chart-line"></i> <?php echo $langs->trans('CalculatedEvaluation'); ?><required>*</required></span>
+                                <div data-scale="1" class="risk-evaluation-cotation cotation">
+                                    <span><?php echo 0 ?></span>
                                 </div>
+                            </div>
+                            <div class="risk-evaluation-comment">
+                                <span class="title"><i class="fas fa-comment-dots"></i> <?php echo $langs->trans('Comment'); ?> (<span class="char-counter">65535</span> <?php echo $langs->trans('CharRemaining'); ?>)</span>
+                                <?php print '<textarea class="evaluation-comment-textarea" data-maxlength="65535" maxlength="65535" name="evaluationComment' . $risk->id . '" cols="50" rows="' . ROWS_2 . '">' . ('') . '</textarea>' . "\n"; ?>
                             </div>
                         </div>
                     <?php if ($conf->global->DIGIRISKDOLIBARR_TASK_MANAGEMENT) : ?>
