@@ -804,18 +804,34 @@ $massactionbutton = $form->selectMassAction('', $arrayofmassactions);
                         <div class="riskassessment-task">
                             <span class="section-title"><?php echo $langs->trans('Task'); ?></span>
                             <span class="title"><?php echo $langs->trans('Label'); ?> <input type="text" class="" name="label" value=""></span>
-                            <div class="riskassessment-task-date wpeo-gridlayout grid-2">
+                            <div class="wpeo-gridlayout grid-4" style="margin-top: 5px; align-items: center;">
                                 <div>
-                                    <span class="title"><?php echo $langs->trans('DateStart'); ?></span>
-                                    <?php print '<input type="datetime-local" id="RiskassessmentTaskDateStartModalRisk" name="RiskassessmentTaskDateStartModalRisk" value="' . dol_print_date(dol_now('tzuser'), '%Y-%m-%dT%H:%M:%S') . '">'; ?>
+                                    <div style="position: relative;">
+                                        <i class="far fa-calendar-plus fa-fw" style="position: absolute; left: 10px; top: 50%; transform: translateY(-50%); color: #888;"></i>
+                                        <?php print '<input type="datetime-local" id="RiskassessmentTaskDateStartModalRisk" class="widthcentpercent" name="RiskassessmentTaskDateStartModalRisk" style="height: 30px; box-sizing: border-box; padding-left: 30px;" value="' . dol_print_date(dol_now('tzuser'), '%Y-%m-%dT%H:%M:%S') . '">'; ?>
+                                    </div>
                                 </div>
                                 <div>
-                                    <span class="title"><?php echo $langs->trans('Deadline'); ?></span>
-                                    <?php print '<input type="datetime-local" id="RiskassessmentTaskDateStartModalRisk" name="RiskassessmentTaskDateEndModalRisk">'; ?>
+                                    <div style="position: relative;">
+                                        <i class="far fa-calendar-check fa-fw" style="position: absolute; left: 10px; top: 50%; transform: translateY(-50%); color: #888;"></i>
+                                        <?php print '<input type="datetime-local" id="RiskassessmentTaskDateEndModalRisk" class="widthcentpercent" name="RiskassessmentTaskDateEndModalRisk" style="height: 30px; box-sizing: border-box; padding-left: 30px;">'; ?>
+                                    </div>
+                                </div>
+                                <div>
+                                    <div style="position: relative; display: flex; align-items: center; border: 1px solid #ccc; height: 30px; border-radius: 3px; box-sizing: border-box;">
+                                        <i class="fas fa-user-tie fa-fw" style="padding-left: 10px; padding-right: 5px; color: #888;"></i>
+                                        <div style="flex-grow: 1; min-width: 0;">
+                                            <?php print $form->select_dolusers(0, 'executive_id', $langs->trans('Responsible'), null, 0, '', 0, '', 0, 'widthcentpercent', '', 0, '', 'executiveSelect'); ?>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div>
+                                    <div style="position: relative;">
+                                        <input type="text" class="riskassessment-task-budget widthcentpercent" name="budget" value="" placeholder="<?php echo dol_escape_htmltag($langs->trans('Budget')); ?>" style="height: 30px; box-sizing: border-box; padding-left: 10px; padding-right: 20px;">
+                                        <span style="position: absolute; right: 10px; top: 50%; transform: translateY(-50%); font-weight: bold;">&euro;</span>
+                                    </div>
                                 </div>
                             </div>
-                            <span class="title"><?php echo $langs->trans('Budget'); ?></span>
-                            <input type="text" class="riskassessment-task-budget" name="budget" value="">
                         </div>
                     <?php endif; ?>
                 </div>
