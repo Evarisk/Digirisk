@@ -163,7 +163,7 @@ window.digiriskdolibarr.risk.createRisk = function ( event ) {
 	let hourEnd   = elementTask.find('#RiskassessmentTaskDateEndModalRiskhour').val();
 	let minEnd    = elementTask.find('#RiskassessmentTaskDateEndModalRiskmin').val();
 	let budget    = elementTask.find('.riskassessment-task-budget').val();
-	let executiveId = elementTask.find('.executiveSelect').val();
+	let executiveId = elementTask.find('select[name="executive_id"]').val();
 
 	//Loader
 	window.saturne.loader.display($('.fichecenter.risklist'));
