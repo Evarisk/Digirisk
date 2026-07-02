@@ -5918,6 +5918,13 @@ td > .risk-evaluation-list-content .risk-evaluation-container:not(.advanced, .st
   box-shadow: none;
 }
 
+.wpeo-modal[class*=modal-risk] .modal-container .modal-header {
+  align-items: center;
+}
+.wpeo-modal[class*=modal-risk] .modal-container .modal-header .wpeo-button {
+  margin-bottom: 0;
+}
+
 .wpeo-modal[class*=modal-risk] .modal-container .title {
   display: block;
   font-weight: 600;
@@ -5968,7 +5975,6 @@ td > .risk-evaluation-list-content .risk-evaluation-container:not(.advanced, .st
 .wpeo-modal[class*=modal-risk] .modal-container .risk-evaluation-container {
   padding-bottom: 1em;
   margin-bottom: 1em;
-  border-bottom: 1px solid rgba(0, 0, 0, 0.2);
 }
 .wpeo-modal[class*=modal-risk] .modal-container .risk-evaluation-container .risk-evaluation-header {
   margin-bottom: 1em;
@@ -6005,6 +6011,12 @@ td > .risk-evaluation-list-content .risk-evaluation-container:not(.advanced, .st
 }
 .wpeo-modal[class*=modal-risk] .modal-container .risk-evaluation-container.advanced .risk-evaluation-photo {
   margin-right: 1em;
+}
+
+.wpeo-modal[class*=modal-risk] .modal-container .riskassessment-task {
+  padding-top: 1em;
+  margin-top: 1em;
+  border-top: 1px solid rgba(0, 0, 0, 0.2);
 }
 
 /** Listing */

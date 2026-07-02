@@ -733,7 +733,7 @@ $massactionbutton = $form->selectMassAction('', $arrayofmassactions);
                                 </div>
                             </div>
                         </div>
-                        <hr style="margin: 15px 0; border: 0; border-top: 1px solid rgba(0, 0, 0, 0.2);">
+
                         <div class="risk-evaluation-content-wrapper">
                             <div class="risk-evaluation-content">
                                 <div class="cotation-container">
@@ -809,7 +809,6 @@ $massactionbutton = $form->selectMassAction('', $arrayofmassactions);
                             </div>
                         </div>
                     <?php if ($conf->global->DIGIRISKDOLIBARR_TASK_MANAGEMENT) : ?>
-                        <hr>
                         <div class="riskassessment-task">
                             <div style="display: flex; align-items: center; margin-bottom: 5px;">
                                 <span class="section-title" style="margin-bottom: 0; margin-right: 15px; white-space: nowrap;"><?php echo $langs->trans('Task'); ?></span>
