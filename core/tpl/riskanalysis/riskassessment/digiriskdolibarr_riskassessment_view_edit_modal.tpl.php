@@ -80,7 +80,7 @@
                             </div>
                         </div>
 					</div>
-                    <hr style="margin: 15px 0; border: 0; border-top: 1px solid rgba(0, 0, 0, 0.2);">
+
                     <div class="risk-evaluation-content-wrapper">
                         <div class="risk-evaluation-content">
                             <div class="cotation-container">
