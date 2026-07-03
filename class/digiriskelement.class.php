@@ -364,7 +364,10 @@ class DigiriskElement extends SaturneObject
             }
             $this->db->free($resql);
 
-            return $obj->fk_object;
+            if ($num > 0 && isset($obj->fk_object)) {
+                return $obj->fk_object;
+            }
+            return 0;
         } else {
             $this->errors[] = 'Error ' . $this->db->lasterror();
             dol_syslog(__METHOD__ . ' ' . join(',', $this->errors), LOG_ERR);

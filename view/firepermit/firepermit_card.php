@@ -662,12 +662,12 @@ if ($action == 'create') {
 
 	//Start Date -- Date début
 	print '<tr><td class="minwidth400"><label for="date_debut">' . $langs->trans("StartDate") . '</label></td><td>';
-	print $form->selectDate(dol_now('tzuser'), 'dateo', 1, 1, 0, '', 1);
+	print $form->selectDate('', 'dateo', 1, 1, 0, '', 1);
 	print '</td></tr>';
 
 	//End Date -- Date fin
 	print '<tr class="oddeven"><td class="minwidth400"><label for="date_fin">' . $langs->trans("EndDate") . '</label></td><td>';
-	print $form->selectDate(dol_time_plus_duree(dol_now('tzuser'), 1, 'y'), 'datee', 1, 1, 0, '', 1);
+	print $form->selectDate('', 'datee', 1, 1, 0, '', 1);
 	print '</td></tr>';
 
 	//Maitre d'oeuvre

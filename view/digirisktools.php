@@ -625,8 +625,9 @@ if (GETPOST('dataMigrationExportGlobal', 'alpha') && ! empty($conf->global->MAIN
 if ($action == 'import_global_dolibarr' && ! empty($conf->global->MAIN_UPLOAD_DOC)) {
 	// Submit file
     $actionError = [];
+		$filedir = $upload_dir . '/temp/';
     if ( ! empty($_FILES)) {
-		if ( ! preg_match('/dolibarr_global_export.zip/', $_FILES['file']['name'][0]) || $_FILES['file']['size'][0] < 1) {
+		if ( ! preg_match('/\.zip$/i', $_FILES['file']['name'][0]) || $_FILES['file']['size'][0] < 1) {
             $actionError[] = $langs->trans('ErrorFileNotWellFormattedZIP');
 		} else {
 
@@ -640,7 +641,6 @@ if ($action == 'import_global_dolibarr' && ! empty($conf->global->MAIN_UPLOAD_DO
             }
 
 			if ( ! $error) {
-				$filedir = $upload_dir . '/temp/';
 				if ( ! empty($filedir)) {
 					$result = dol_add_file_process($filedir, 0, 1, 'file', '', null, '', 0, null);
 				}
@@ -654,9 +654,12 @@ if ($action == 'import_global_dolibarr' && ! empty($conf->global->MAIN_UPLOAD_DO
 				}
 			}
 
-			$filename = preg_replace( '/\.zip/', '.json', $_FILES['file']['name'][0]);
-
-			$json                = file_get_contents($filedir . $filename);
+			// Search for the .json file in the extracted directory
+			$jsonFiles = dol_dir_list($filedir, 'files', 0, '\.json$');
+			$json = false;
+			if (!empty($jsonFiles)) {
+				$json = file_get_contents($jsonFiles[0]['fullname']);
+			}
 			$digiriskExportArray = json_decode($json, true);
 
             if ($digiriskExportArray != null) {
@@ -728,8 +731,8 @@ if ($action == 'import_global_dolibarr' && ! empty($conf->global->MAIN_UPLOAD_DO
                                         if (array_key_exists('tasks', $digiriskExportRisk)) {
                                             foreach ($digiriskExportRisk['tasks'] as $digiriskExportTask) {
                                                 $task->ref = $refTaskMod->getNextValue('', $task);
-                                                $task->date_start = $digiriskExportTask['date_start'];
-                                                $task->date_end = $digiriskExportTask['date_end'];
+                                                $task->date_start = !empty($digiriskExportTask['dateo']) ? (int) $digiriskExportTask['dateo'] : null;
+                                                $task->date_end = !empty($digiriskExportTask['datee']) ? (int) $digiriskExportTask['datee'] : null;
                                                 $task->label = $digiriskExportTask['label'];
                                                 $task->description = $digiriskExportTask['description'];
                                                 $task->duration_effective = $digiriskExportTask['duration_effective'];

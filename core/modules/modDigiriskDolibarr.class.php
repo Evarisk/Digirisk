@@ -445,7 +445,6 @@ class modDigiriskdolibarr extends DolibarrModules
                 'digiriskdolibarrindex'
 			],
 			'tabs' => [
-				'mycompany_admin'
 			],
 			// Set this to 1 if features of module are opened to external users
 			'moduleforexternal' => 0,
