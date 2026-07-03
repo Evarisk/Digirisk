@@ -1,0 +1,242 @@
+// Ticket card (issue #4443) — light, modern restyle layered over the native
+// Dolibarr ticket card. Fully scoped to .digirisk-ticket-card so it never leaks
+// to other pages. Self-contained variables (no dependency on global colors).
+
+$dtc-radius:      12px;
+$dtc-shadow:      0 1px 3px rgba(17, 24, 39, 0.06), 0 1px 2px rgba(17, 24, 39, 0.04);
+$dtc-shadow-hov:  0 6px 18px rgba(17, 24, 39, 0.10);
+$dtc-blue:        #2b6cb0;
+$dtc-grey:        #6b7280;
+$dtc-bg:          #f6f8fb;
+$dtc-border:      #e5e7eb;
+$dtc-hairline:    #f1f3f5;
+$dtc-title:       #111827;
+
+.digirisk-ticket-card {
+
+    // ---- Two-column layout with a real gap (override native float) ----
+    .fichecenter {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 12px;
+        align-items: flex-start;
+        margin-top: 8px;
+    }
+    .fichecenter > .fichehalfleft,
+    .fichecenter > .fichehalfright {
+        float: none;
+        width: auto;
+        flex: 1 1 380px;
+        min-width: 0;
+    }
+    .underbanner { display: none; } // decorative native separator, not needed here
+
+    // ---- Section cards (tableforfield) ----
+    table.tableforfield {
+        background: #fff;
+        border: 1px solid $dtc-border;
+        border-radius: $dtc-radius;
+        box-shadow: $dtc-shadow;
+        border-collapse: separate;
+        border-spacing: 0;
+        // No overflow:hidden here — it would clip the tag dropdown that overflows the card.
+        // Rounded top corners are handled directly on the header cell below.
+        margin: 0 0 10px 0;
+        transition: box-shadow .18s ease;
+
+        &:hover { box-shadow: $dtc-shadow-hov; }
+
+        // Section header row — the TD stays a table-cell so colspan and the
+        // full-width background are preserved; an inner flex wrapper (.dtc-head)
+        // handles vertical centering and the left title / right edit layout.
+        tr.liste_titre > td {
+            background: $dtc-bg;
+            border-top-left-radius: $dtc-radius;
+            border-top-right-radius: $dtc-radius;
+            border-bottom: 1px solid $dtc-border;
+            padding: 0;
+            vertical-align: middle;
+
+            > .dtc-head {
+                display: flex;
+                align-items: center;
+                gap: 8px;
+                padding: 7px 12px;
+                font-weight: 700;
+                font-size: 0.92em;
+                letter-spacing: .01em;
+                color: $dtc-title;
+
+                img { vertical-align: middle; }
+                img.pictoModule { height: 20px; width: auto; }
+
+                .dtc-head-edit {
+                    margin-left: auto;
+                    display: inline-flex;
+                    align-items: center;
+                    gap: 6px;
+                    font-weight: 400;
+                    flex: 0 0 auto;
+                }
+
+                // Inline (on-the-fly) editable subject, shown on the same line as the label
+                .dtc-head-label { flex: 0 0 auto; }
+                .dtc-subject {
+                    flex: 1 1 auto;
+                    min-width: 0;
+                    font-weight: 400;
+                }
+                .dtc-subject-value {
+                    cursor: text;
+                    padding: 1px 5px;
+                    border-radius: 5px;
+                    transition: background .15s ease;
+                }
+                .dtc-subject:hover .dtc-subject-value { background: rgba(43, 108, 176, .10); }
+                .dtc-subject-input {
+                    width: 100%;
+                    box-sizing: border-box;
+                    font: inherit;
+                    font-weight: 400;
+                    padding: 3px 7px;
+                    border: 1px solid $dtc-blue;
+                    border-radius: 6px;
+                    outline: none;
+                }
+            }
+        }
+
+        // Body cells — vertical-align middle so labels line up with their values
+        // (avatars / pictos are taller than the label text).
+        > tbody > tr > td {
+            padding: 5px 12px;
+            border-top: 1px solid $dtc-hairline;
+            vertical-align: middle;
+            line-height: 1.35;
+        }
+        > tbody > tr.liste_titre + tr > td,
+        > tbody > tr:first-child > td { border-top: 0; }
+
+        // Field labels
+        td.titlefield,
+        td.titlefieldmiddle {
+            color: $dtc-grey;
+            font-weight: 500;
+        }
+
+        // Nested helper tables (label + edit pencil) stay transparent
+        table.nobordernopadding,
+        table.nobordernopadding > tbody > tr > td {
+            background: none;
+            border: 0;
+            padding: 0;
+            box-shadow: none;
+        }
+        table.nobordernopadding td.none,
+        table.nobordernopadding td.nowrap { color: $dtc-grey; font-weight: 500; }
+    }
+
+    // Edit pencils: discreet, highlight on hover
+    a.editfielda {
+        color: $dtc-grey;
+        opacity: .5;
+        transition: opacity .15s ease, color .15s ease;
+        &:hover { opacity: 1; color: $dtc-blue; }
+    }
+
+    // ---- Linked tasks table ----
+    table.noborder {
+        background: #fff;
+        border: 1px solid $dtc-border;
+        border-radius: $dtc-radius;
+        box-shadow: $dtc-shadow;
+        border-collapse: separate;
+        border-spacing: 0;
+        overflow: hidden;
+        margin: 0 0 18px 0;
+
+        tr.liste_titre th {
+            background: $dtc-bg;
+            border-bottom: 1px solid $dtc-border;
+            padding: 6px 10px;
+            font-size: 0.78em;
+            text-transform: uppercase;
+            letter-spacing: .04em;
+            color: $dtc-grey;
+        }
+        td {
+            padding: 5px 10px;
+            border-top: 1px solid $dtc-hairline;
+        }
+        tr:hover td { background: #fafbfc; }
+    }
+
+    // ---- Classification tags ----
+    // Uses the exact kanban tag markup (kanban-card-tags / kanban-tag / kanban-add-tag-btn /
+    // kanban-tag-dropdown / kanban-tag-option), so styling comes from the global kanban rules
+    // in _page-actionplan.scss — identical look to the ticket kanban.
+    // Cap the dropdown height and scroll instead of growing sky-high with many categories.
+    .kanban-tag-dropdown {
+        max-height: 240px;
+        overflow-y: auto;
+    }
+
+    // ---- Inline edit (assignee / progress) — click the value, no pencil ----
+    .dtc-assignee-editor { display: inline-block; }
+    .dtc-editable {
+        cursor: pointer;
+        border-radius: 5px;
+        padding: 1px 5px;
+        transition: background .15s ease;
+
+        &:hover { background: rgba(43, 108, 176, .10); }
+    }
+    .dtc-progress-value {
+        display: inline-block;
+        min-width: 1.4em;
+        text-align: center;
+
+        &[contenteditable]:focus {
+            outline: none;
+            background: #fff;
+            box-shadow: 0 0 0 2px rgba(43, 108, 176, .35);
+            border-radius: 5px;
+        }
+    }
+
+    // ---- Status action buttons (native .butAction.butStatus) → pills ----
+    .navBarForStatus .butAction.butStatus {
+        display: inline-flex;
+        align-items: center;
+        gap: 6px;
+        margin: 3px 0 3px 6px;
+        padding: 5px 12px;
+        border: 1px solid $dtc-border;
+        border-radius: 999px;
+        background: #fff;
+        color: $dtc-title;
+        font-weight: 600;
+        box-shadow: $dtc-shadow;
+        text-transform: none;
+        transition: transform .15s ease, box-shadow .15s ease, background .15s ease, color .15s ease, border-color .15s ease;
+
+        &:hover {
+            transform: translateY(-1px);
+            box-shadow: $dtc-shadow-hov;
+            background: $dtc-blue;
+            color: #fff;
+            border-color: $dtc-blue;
+        }
+    }
+
+    // Keep list bullets tidy inside the Accidents section
+    ul.nomargin { margin: 0; padding-left: 18px; }
+}
+
+// ---- Responsive: stack the two columns ----
+@media (max-width: 900px) {
+    .digirisk-ticket-card .fichecenter > .fichehalfleft,
+    .digirisk-ticket-card .fichecenter > .fichehalfright {
+        flex: 1 1 100%;
+    }
+}
