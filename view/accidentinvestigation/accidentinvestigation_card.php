@@ -155,13 +155,15 @@ if (empty($reshook)) {
 					$task->ref            = $modTask->getNextValue(0, $task);
 					$task->label          = $accident->ref . ' - T1 - ' . $langs->transnoentities('CurativeAction');
 					$task->fk_task_parent = $result;
+                    $task->array_options['options_digirisk_action_type'] = 1;
 					$resOne               = $task->create($user);
                     $getNomResOne         = $task->getNomUrl(1, '', 'task', 1);
 
                     $task->fk_project     = $accident->fk_project;
 					$task->ref            = $modTask->getNextValue(0, $task);
-					$task->label          = $accident->ref . ' - T2 - ' . $langs->transnoentities('PreventiveAction');
+					$task->label          = $accident->ref . ' - T2 - ' . $langs->transnoentities('CorrectiveAction');
 					$task->fk_task_parent = $result;
+                    $task->array_options['options_digirisk_action_type'] = 2;
 					$resTwo               = $task->create($user);
                     $getNomResTwo         = $task->getNomUrl(1, '', 'task', 1);
 

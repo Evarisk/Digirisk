@@ -1,17 +1,26 @@
-# Copyright (C) 2021-2023 EVARISK <technique@evarisk.com>
-#
-# This program is free software: you can redistribute it and/or modify
-# it under the terms of the GNU General Public License as published by
-# the Free Software Foundation, either version 3 of the License, or
-# (at your option) any later version.
-#
-# This program is distributed in the hope that it will be useful,
-# but WITHOUT ANY WARRANTY; without even the implied warranty of
-# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-# GNU General Public License for more details.
-#
-# You should have received a copy of the GNU General Public License
-# along with this program.  If not, see <https://www.gnu.org/licenses/>.
+CurativeAction                           = Curative actions
+CorrectiveAction                         = Corrective actions
+PreventiveAction                         = Preventive actions
+DigiriskActionType                       = Digirisk action type
+Actions                                  = Actions
+ActionsTab                               = Actions
+CurativeActions                          = Curative actions
+CorrectiveActions                        = Corrective actions
+AddCurativeAction                        = Add a curative action
+AddCorrectiveAction                      = Add a corrective action
+InvestigationNotValidatedYet             = Please validate the accident investigation first to create actions
+ActionLabel                              = Action label
+ActionDeadline                           = Deadline
+ActionAssignedTo                         = Assigned to
+ActionProgress                           = Progress
+MarkAsDone                               = Mark as done
+XActionsOfY                              = %s / %s done
+NoActionsYet                             = No actions yet
+ActionAdded                              = Action has been created
+ActionClosed                             = Action has been closed
+ActionsAreProjectTasks                   = Actions are Dolibarr project sub-tasks
+SeeProjectTasksView                      = See parent task
+OpenTask                                 = Open task
 
 # MeteoVigilance - Météo-France weather warnings
 MeteoVigilance = Météo-France weather warning

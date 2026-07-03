@@ -30,6 +30,8 @@
 .risk-evaluation-cotation.selected-cotation {
   -webkit-box-shadow: 0 0 0 2px #0d8aff;
   box-shadow: 0 0 0 2px #0d8aff;
+  z-index: 1;
+  position: relative;
 }
 
 .can-select, .wpeo-modal[class*=modal-risk] .modal-container .risk-evaluation-container .risk-evaluation-content-wrapper .cotation-standard .risk-evaluation-cotation {
@@ -3382,6 +3384,13 @@ td > .risk-evaluation-list-content .risk-evaluation-container:not(.advanced, .st
 }
 .wpeo-modal[class*=modal-risk] .modal-container .risk-content .risk-description textarea {
   width: 100%;
+  height: 48px !important;
+  min-height: 48px !important;
+  max-height: 48px !important;
+  box-sizing: border-box !important;
+  padding: 4px 8px !important;
+  line-height: 1.3 !important;
+  resize: vertical;
 }
 
 .wpeo-modal[class*=modal-risk] .modal-container .risk-evaluation-container {
@@ -3411,6 +3420,13 @@ td > .risk-evaluation-list-content .risk-evaluation-container:not(.advanced, .st
 }
 .wpeo-modal[class*=modal-risk] .modal-container .risk-evaluation-container .risk-evaluation-content-wrapper .risk-evaluation-comment textarea {
   width: 100%;
+  height: 48px !important;
+  min-height: 48px !important;
+  max-height: 48px !important;
+  box-sizing: border-box !important;
+  padding: 4px 8px !important;
+  line-height: 1.3 !important;
+  resize: vertical;
 }
 .wpeo-modal[class*=modal-risk] .modal-container .risk-evaluation-container.advanced .risk-evaluation-content-wrapper {
   -ms-flex-wrap: wrap;

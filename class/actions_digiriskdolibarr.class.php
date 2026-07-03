@@ -263,7 +263,8 @@ class ActionsDigiriskdolibarr
                     }
                 }
 
-                $fieldLinkedAccidents  = '<tr class="trextrafields_collapse_2"><td class="titlefield">'.$langs->trans('AccidentsLinked').'</td>';
+                $pictoDigirisk = img_picto('', 'digiriskdolibarr_color@digiriskdolibarr', 'class="pictoModule"');
+                $fieldLinkedAccidents  = '<tr class="trextrafields_collapse_2"><td class="titlefield">' . $pictoDigirisk . $langs->trans('AccidentsLinked').'</td>';
                 $fieldLinkedAccidents .= '<td id="ticket_extras_digiriskdolibarr_ticket_accident_'. $object->id .'" class="valuefield ticket_extras_digiriskdolibarr_ticket_accident wordbreak">';
                 $fieldLinkedAccidents .= $linkedAccidentList;
                 $fieldLinkedAccidents .= '</td>';
@@ -321,7 +322,8 @@ class ActionsDigiriskdolibarr
 
                     $object->fetch_optionals();
 
-                    $signatureTab  = '<tr class="trextrafields_collapse_2"><td class="titlefield"><span class="fas fa-edit paddingrightonly" style=""></span>' . $langs->trans('ValidateText').'</td>';
+                    $pictoDigirisk2 = img_picto('', 'digiriskdolibarr_color@digiriskdolibarr', 'class="pictoModule"');
+                    $signatureTab  = '<tr class="trextrafields_collapse_2"><td class="titlefield">' . $pictoDigirisk2 . '<span class="fas fa-edit paddingrightonly" style=""></span>' . $langs->trans('ValidateText').'</td>';
                     $signatureTab .= '<td id="ticket_extras_digiriskdolibarr_ticket_signature_'. $object->id .'" class="valuefield ticket_extras_digiriskdolibarr_ticket_signature wordbreak">';
                     $signatureTab .= $object->array_options['options_digiriskdolibarr_condition_message'] ?? '';
                     if ($signature && !empty($signature->signature)) {
@@ -330,7 +332,7 @@ class ActionsDigiriskdolibarr
                     $signatureTab .= '</td>';
                     $signatureTab .= '</tr>';
 
-                    $signatureTab .= '<tr class="trextrafields_collapse_2"><td class="titlefield">' . $langs->trans('RegisterSigned') .'</td>';
+                    $signatureTab .= '<tr class="trextrafields_collapse_2"><td class="titlefield">' . $pictoDigirisk2 . $langs->trans('RegisterSigned') .'</td>';
                     $signatureTab .= '<td id="ticket_extras_digiriskdolibarr_ticket_signature_ok_'. $object->id .'" class="valuefield ticket_extras_digiriskdolibarr_ticket_signature_ok wordbreak">';
                     $signatureTab .= '<input type="checkbox"' . ($signature && !empty($signature->signature) ? ' checked' : '') . ' disabled>';
                     $signatureTab .= '</td>';
@@ -1000,8 +1002,8 @@ class ActionsDigiriskdolibarr
         if (strpos($parameters['context'], 'ticketcard') !== false) {
             $picto = img_picto('', 'digiriskdolibarr_color@digiriskdolibarr', 'class="pictoModule"');
             foreach ($extrafields->attributes['ticket']['label'] as $key => $value) {
-                if (strpos($key, 'digiriskdolibarr_ticket') === false) {
-                    continue; // Goes to the next element if ‘digiriskdolibarr_ticket’ is not found
+                if (strpos($key, 'digiriskdolibarr_') === false) {
+                    continue; // Goes to the next element if 'digiriskdolibarr_' is not found
                 }
                 $extrafields->attributes['ticket']['label'][$key] = $picto . $langs->transnoentities($value);
             }
@@ -1032,8 +1034,8 @@ class ActionsDigiriskdolibarr
         if (strpos($parameters['context'], 'ticketlist') !== false) {
             $picto = img_picto('', 'digiriskdolibarr_color@digiriskdolibarr', 'class="pictoModule"');
             foreach ($extrafields->attributes['ticket']['label'] as $key => $value) {
-                if (strpos($key, 'digiriskdolibarr_ticket') === false) {
-                    continue; // Goes to the next element if ‘digiriskdolibarr_ticket’ is not found
+                if (strpos($key, 'digiriskdolibarr_') === false) {
+                    continue; // Goes to the next element if 'digiriskdolibarr_' is not found
                 }
                 $extrafields->attributes['ticket']['label'][$key] = $picto . $langs->transnoentities($value);
             }

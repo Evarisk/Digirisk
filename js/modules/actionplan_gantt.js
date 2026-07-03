@@ -11,6 +11,7 @@ window.digiriskdolibarr.actionplanGantt = {};
 window.digiriskdolibarr.actionplanGantt.init = function() {
     window.digiriskdolibarr.actionplanGantt.event();
     window.digiriskdolibarr.actionplanGantt.render();
+    window.digiriskdolibarr.actionplanGantt.maybeAutoExport();
 };
 
 /**
@@ -228,5 +229,79 @@ window.digiriskdolibarr.actionplanGantt.renderBars = function(tasks, startDate, 
         barHtml += '</div>';
 
         $row.append(barHtml);
+    });
+};
+
+/**
+ * Trigger a PNG export of the Gantt chart when the page was opened with ?export=png
+ * (the toolbar "Gantt" button links to the Gantt view with that flag)
+ */
+window.digiriskdolibarr.actionplanGantt.maybeAutoExport = function() {
+    var $container = $('.gantt-container');
+    if ($container.data('autoexport') !== 'png' || $('.gantt-chart').length === 0) {
+        return;
+    }
+
+    // Drop the export flag from the URL so a manual refresh does not re-export
+    if (window.history && window.history.replaceState) {
+        var search   = window.location.search.replace(/([&?])export=png(&|$)/, '$1').replace(/[&?]$/, '');
+        var cleanUrl = window.location.pathname + search + window.location.hash;
+        window.history.replaceState({}, document.title, cleanUrl);
+    }
+
+    if (typeof window.html2canvas === 'function') {
+        window.digiriskdolibarr.actionplanGantt.exportToPng();
+        return;
+    }
+
+    var libUrl = $container.data('html2canvas-url');
+    if (libUrl) {
+        $.getScript(libUrl).done(function() {
+            window.digiriskdolibarr.actionplanGantt.exportToPng();
+        });
+    }
+};
+
+/**
+ * Capture the full Gantt chart (including the horizontally scrolled timeline) and download it as PNG
+ */
+window.digiriskdolibarr.actionplanGantt.exportToPng = function() {
+    var chart = $('.gantt-chart').get(0);
+    if (typeof window.html2canvas !== 'function' || !chart) {
+        return;
+    }
+
+    var $wrapper         = $('.gantt-timeline-wrapper');
+    var body             = $('.gantt-timeline-body').get(0);
+    var originalOverflow = $wrapper.css('overflow');
+    var originalWidth    = $wrapper.css('width');
+
+    // Expand the scrollable timeline so the whole chart fits in the capture
+    $wrapper.css('overflow', 'visible');
+    if (body && body.scrollWidth > 0) {
+        $wrapper.css('width', body.scrollWidth + 'px');
+    }
+
+    var restore = function() {
+        $wrapper.css('overflow', originalOverflow);
+        $wrapper.css('width', originalWidth);
+    };
+
+    window.html2canvas(chart, {
+        backgroundColor: '#ffffff',
+        scale:           1,
+        useCORS:         true,
+        windowWidth:     chart.scrollWidth,
+        windowHeight:    chart.scrollHeight
+    }).then(function(canvas) {
+        restore();
+        var link      = document.createElement('a');
+        link.download = 'papripact_gantt.png';
+        link.href     = canvas.toDataURL('image/png');
+        document.body.appendChild(link);
+        link.click();
+        document.body.removeChild(link);
+    }).catch(function() {
+        restore();
     });
 };

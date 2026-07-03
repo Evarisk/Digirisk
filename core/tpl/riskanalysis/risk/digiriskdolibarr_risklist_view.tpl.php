@@ -616,8 +616,17 @@ $massactionbutton = $form->selectMassAction('', $arrayofmassactions);
         <div class="wpeo-modal modal-risk-0 modal-risk" id="risk_add<?php echo $object->id ?>" value="new">
             <div class="modal-container wpeo-modal-event">
                 <!-- Modal-Header -->
-                <div class="modal-header">
-                    <h2 class="modal-title"><?php print $langs->trans('Add' . ucfirst($riskType) . 'Title') . ' ' . $refRiskMod->getNextValue($risk); ?></h2>
+                <div class="modal-header" style="align-items: center; display: flex;">
+                    <h2 class="modal-title" style="flex: 1;"><?php print $langs->trans('Add' . ucfirst($riskType) . 'Title') . ' ' . $refRiskMod->getNextValue($risk); ?></h2>
+                    <?php if ($permissiontoadd) : ?>
+                        <div class="risk-create wpeo-button button-primary button-disable modal-close" style="margin-right: 15px; margin-bottom: 0;">
+                            <span><i class="fas fa-plus"></i>  <?php echo $langs->trans('AddRiskButton'); ?></span>
+                        </div>
+                    <?php else : ?>
+                        <div class="wpeo-button button-grey wpeo-tooltip-event" aria-label="<?php echo $langs->trans('PermissionDenied') ?>" style="margin-right: 15px; margin-bottom: 0;">
+                            <span><i class="fas fa-plus"></i>  <?php echo $langs->trans('AddRiskButton'); ?></span>
+                        </div>
+                    <?php endif;?>
                     <div class="modal-close"><i class="fas fa-times"></i></div>
                 </div>
                 <!-- Modal-ADD Risk Content-->
@@ -678,22 +687,53 @@ $massactionbutton = $form->selectMassAction('', $arrayofmassactions);
                         </div><hr>
                     <?php endif; ?>
                     <div class="risk-evaluation-container standard">
-                        <span class="section-title"><?php echo ' ' . $langs->trans('RiskAssessment'); ?></span>
-                        <div class="risk-evaluation-header">
-                            <?php if ($conf->global->DIGIRISKDOLIBARR_ADVANCED_RISKASSESSMENT_METHOD) : ?>
-                                <div class="wpeo-button evaluation-standard select-evaluation-method selected button-blue button-radius-2">
-                                    <span><?php echo $langs->trans('SimpleEvaluation') ?></span>
-                                </div>
-                                <div class="wpeo-button evaluation-advanced select-evaluation-method button-grey button-radius-2">
-                                    <span><?php echo $langs->trans('AdvancedEvaluation') ?></span>
-                                </div>
-                                <?php if (!getDolGlobalInt('DIGIRISKDOLIBARR_MULTIPLE_RISKASSESSMENT_METHOD')) : ?>
-                                    <i class="fas fa-info-circle wpeo-tooltip-event" aria-label="<?php echo $langs->trans("HowToSetMultipleRiskAssessmentMethod") ?>"></i>
+                        <div class="risk-evaluation-header" style="display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap;">
+                            <div class="risk-evaluation-header-left">
+                                <?php if ($conf->global->DIGIRISKDOLIBARR_ADVANCED_RISKASSESSMENT_METHOD) : ?>
+                                    <div class="wpeo-button evaluation-standard select-evaluation-method selected button-blue button-radius-2">
+                                        <span><?php echo $langs->trans('SimpleEvaluation') ?></span>
+                                    </div>
+                                    <div class="wpeo-button evaluation-advanced select-evaluation-method button-grey button-radius-2">
+                                        <span><?php echo $langs->trans('AdvancedEvaluation') ?></span>
+                                    </div>
+                                    <?php if (!getDolGlobalInt('DIGIRISKDOLIBARR_MULTIPLE_RISKASSESSMENT_METHOD')) : ?>
+                                        <i class="fas fa-info-circle wpeo-tooltip-event" aria-label="<?php echo $langs->trans("HowToSetMultipleRiskAssessmentMethod") ?>"></i>
+                                    <?php endif; ?>
                                 <?php endif; ?>
-                            <?php endif; ?>
-                            <input class="risk-evaluation-method" type="hidden" value="standard">
-                            <input class="risk-evaluation-multiple-method" type="hidden" value="1">
+                                <input class="risk-evaluation-method" type="hidden" value="standard">
+                                <input class="risk-evaluation-multiple-method" type="hidden" value="1">
+                            </div>
+                            <div class="risk-evaluation-header-right riskassessment-medias linked-medias photo">
+                                <div class="element-linked-medias element-linked-medias-0 risk-new">
+                                    <table class="add-medias">
+                                        <tr>
+                                            <td>
+                                                <input hidden multiple class="fast-upload" id="fast-upload-photo-default" type="file" name="userfile[]" capture="environment" accept="image/*">
+                                                <label for="fast-upload-photo-default">
+                                                    <div class="wpeo-button <?php echo ($onPhone ? 'button-square-40' : 'button-square-50'); ?>">
+                                                        <i class="fas fa-camera"></i><i class="fas fa-plus-circle button-add"></i>
+                                                    </div>
+                                                </label>
+                                                <input type="hidden" class="favorite-photo" id="photo" name="photo" value="<?php echo $object->photo ?>"/>
+                                            </td>
+                                            <td>
+                                                <div class="wpeo-button <?php echo ($onPhone ? 'button-square-40' : 'button-square-50'); ?> 'open-media-gallery add-media modal-open" value="0">
+                                                    <input type="hidden" class="modal-options" data-modal-to-open="media_gallery" data-from-id="0" data-from-type="riskassessment" data-from-subtype="photo" data-from-subdir=""/>
+                                                    <i class="fas fa-folder-open"></i><i class="fas fa-plus-circle button-add"></i>
+                                                </div>
+                                            </td>
+                                            <td>
+                                                <?php
+                                                $relativepath = 'digiriskdolibarr/medias/thumbs';
+                                                print saturne_show_medias_linked('digiriskdolibarr', $conf->digiriskdolibarr->multidir_output[$conf->entity] . '/riskassessment/tmp/RA0', 'small', 0, 0, 0, 0, $onPhone ? 40 : 50, $onPhone ? 40 : 50, 1, 0, 0, '/riskassessment/tmp/RA0');
+                                                ?>
+                                            </td>
+                                        </tr>
+                                    </table>
+                                </div>
+                            </div>
                         </div>
+
                         <div class="risk-evaluation-content-wrapper">
                             <div class="risk-evaluation-content">
                                 <div class="cotation-container">
@@ -764,80 +804,52 @@ $massactionbutton = $form->selectMassAction('', $arrayofmassactions);
                                 </div>
                             </div>
                             <div class="risk-evaluation-comment">
-                                <span class="title"><i class="fas fa-comment-dots"></i> <?php echo $langs->trans('Comment'); ?> (<span class="char-counter">65535</span> <?php echo $langs->trans('CharRemaining'); ?>)</span>
-                                <?php print '<textarea class="evaluation-comment-textarea" data-maxlength="65535" maxlength="65535" name="evaluationComment' . $risk->id . '" cols="50" rows="' . ROWS_2 . '">' . ('') . '</textarea>' . "\n"; ?>
+                                <span class="title"><i class="fas fa-comment-dots"></i> <?php echo $langs->trans('Comment'); ?></span>
+                                <?php print '<textarea class="evaluation-comment-textarea" name="evaluationComment' . $risk->id . '" cols="50" rows="' . ROWS_2 . '">' . ('') . '</textarea>' . "\n"; ?>
                             </div>
                         </div>
-                        <?php if ($conf->global->DIGIRISKDOLIBARR_SHOW_RISKASSESSMENT_DATE) : ?>
-                            <div class="risk-evaluation-date">
-                                <span class="title"><?php echo $langs->trans('Date'); ?></span>
-                                <?php print $form->selectDate('', 'RiskAssessmentDate0', 0, 0, 0, '', 1, 1); ?>
-                            </div>
-                        <?php endif; ?>
-                    </div>
-                    <div class="riskassessment-medias linked-medias photo">
-                        <div class="element-linked-medias element-linked-medias-0 risk-new">
-                            <div class="medias section-title"><i class="fas fa-picture-o"></i><?php echo $langs->trans('Medias'); ?></div>
-                            <table class="add-medias">
-                                <tr>
-                                    <td>
-                                        <input hidden multiple class="fast-upload" id="fast-upload-photo-default" type="file" name="userfile[]" capture="environment" accept="image/*">
-                                        <label for="fast-upload-photo-default">
-                                            <div class="wpeo-button <?php echo ($onPhone ? 'button-square-40' : 'button-square-50'); ?>">
-                                                <i class="fas fa-camera"></i><i class="fas fa-plus-circle button-add"></i>
-                                            </div>
-                                        </label>
-                                        <input type="hidden" class="favorite-photo" id="photo" name="photo" value="<?php echo $object->photo ?>"/>
-                                    </td>
-                                    <td>
-
-                                        <div class="wpeo-button <?php echo ($onPhone ? 'button-square-40' : 'button-square-50'); ?> 'open-media-gallery add-media modal-open" value="0">
-                                            <input type="hidden" class="modal-options" data-modal-to-open="media_gallery" data-from-id="0" data-from-type="riskassessment" data-from-subtype="photo" data-from-subdir=""/>
-                                            <i class="fas fa-folder-open"></i><i class="fas fa-plus-circle button-add"></i>
-                                        </div>
-                                    </td>
-                                    <td>
-                                        <?php
-                                        $relativepath = 'digiriskdolibarr/medias/thumbs';
-                                        print saturne_show_medias_linked('digiriskdolibarr', $conf->digiriskdolibarr->multidir_output[$conf->entity] . '/riskassessment/tmp/RA0', 'small', 0, 0, 0, 0, $onPhone ? 40 : 50, $onPhone ? 40 : 50, 1, 0, 0, '/riskassessment/tmp/RA0');
-                                        ?>
-                                    </td>
-                                </tr>
-                            </table>
-                        </div>
-                    </div>
                     <?php if ($conf->global->DIGIRISKDOLIBARR_TASK_MANAGEMENT) : ?>
-                        <hr>
                         <div class="riskassessment-task">
-                            <span class="section-title"><?php echo $langs->trans('Task'); ?></span>
-                            <span class="title"><?php echo $langs->trans('Label'); ?> <input type="text" class="" name="label" value=""></span>
-                            <div class="riskassessment-task-date wpeo-gridlayout grid-2">
+                            <div style="display: flex; align-items: center; margin-bottom: 5px;">
+                                <span class="section-title" style="margin-bottom: 0; margin-right: 15px; white-space: nowrap;"><?php echo $langs->trans('Task'); ?></span>
+                                <input type="text" class="widthcentpercent" name="label" value="" placeholder="<?php echo dol_escape_htmltag($langs->trans('Label')); ?>" style="flex-grow: 1; height: 30px; box-sizing: border-box; padding-left: 10px;">
+                            </div>
+                            <div class="wpeo-gridlayout grid-4" style="margin-top: 5px; align-items: center;">
                                 <div>
-                                    <span class="title"><?php echo $langs->trans('DateStart'); ?></span>
-                                    <?php print '<input type="datetime-local" id="RiskassessmentTaskDateStartModalRisk" name="RiskassessmentTaskDateStartModalRisk" value="' . dol_print_date(dol_now('tzuser'), '%Y-%m-%dT%H:%M:%S') . '">'; ?>
+                                    <div style="position: relative;">
+                                        <i class="far fa-calendar-plus fa-fw" style="position: absolute; left: 10px; top: 50%; transform: translateY(-50%); color: #888;"></i>
+                                        <?php print '<input type="datetime-local" id="RiskassessmentTaskDateStartModalRisk" class="widthcentpercent" name="RiskassessmentTaskDateStartModalRisk" style="height: 30px; box-sizing: border-box; padding-left: 30px;" value="' . dol_print_date(dol_now('tzuser'), '%Y-%m-%dT%H:%M:%S') . '">'; ?>
+                                        <?php print '<input type="hidden" id="RiskassessmentTaskDateStartModalRiskhour" name="RiskassessmentTaskDateStartModalRiskhour" value="' . dol_print_date(dol_now('tzuser'), '%H') . '">'; ?>
+                                        <?php print '<input type="hidden" id="RiskassessmentTaskDateStartModalRiskmin" name="RiskassessmentTaskDateStartModalRiskmin" value="' . dol_print_date(dol_now('tzuser'), '%M') . '">'; ?>
+                                    </div>
                                 </div>
                                 <div>
-                                    <span class="title"><?php echo $langs->trans('Deadline'); ?></span>
-                                    <?php print '<input type="datetime-local" id="RiskassessmentTaskDateStartModalRisk" name="RiskassessmentTaskDateEndModalRisk">'; ?>
+                                    <div style="position: relative;">
+                                        <i class="far fa-calendar-check fa-fw" style="position: absolute; left: 10px; top: 50%; transform: translateY(-50%); color: #888;"></i>
+                                        <?php print '<input type="datetime-local" id="RiskassessmentTaskDateEndModalRisk" class="widthcentpercent" name="RiskassessmentTaskDateEndModalRisk" style="height: 30px; box-sizing: border-box; padding-left: 30px;">'; ?>
+                                        <?php print '<input type="hidden" id="RiskassessmentTaskDateEndModalRiskhour" name="RiskassessmentTaskDateEndModalRiskhour" value="">'; ?>
+                                        <?php print '<input type="hidden" id="RiskassessmentTaskDateEndModalRiskmin" name="RiskassessmentTaskDateEndModalRiskmin" value="">'; ?>
+                                    </div>
+                                </div>
+                                <div>
+                                    <div style="display: flex; align-items: center; gap: 5px; height: 30px;">
+                                        <i class="fas fa-user-tie fa-fw" style="color: #888;"></i>
+                                        <div style="flex-grow: 1; min-width: 0;">
+                                            <?php print $form->select_dolusers(0, 'executive_id', $langs->trans('Responsible'), null, 0, '', 0, '', 0, 'widthcentpercent', '', 0, '', 'executiveSelect'); ?>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div>
+                                    <div style="position: relative;">
+                                        <input type="text" class="riskassessment-task-budget widthcentpercent" name="budget" value="" placeholder="<?php echo dol_escape_htmltag($langs->trans('Budget')); ?>" style="height: 30px; box-sizing: border-box; padding-left: 10px; padding-right: 20px;">
+                                        <span style="position: absolute; right: 10px; top: 50%; transform: translateY(-50%); font-weight: bold;">&euro;</span>
+                                    </div>
                                 </div>
                             </div>
-                            <span class="title"><?php echo $langs->trans('Budget'); ?></span>
-                            <input type="text" class="riskassessment-task-budget" name="budget" value="">
                         </div>
                     <?php endif; ?>
                 </div>
-                <!-- Modal-Footer -->
-                <div class="modal-footer">
-                    <?php if ($permissiontoadd) : ?>
-                        <div class="risk-create wpeo-button button-primary button-disable modal-close">
-                            <span><i class="fas fa-plus"></i>  <?php echo $langs->trans('AddRiskButton'); ?></span>
-                        </div>
-                    <?php else : ?>
-                        <div class="wpeo-button button-grey wpeo-tooltip-event" aria-label="<?php echo $langs->trans('PermissionDenied') ?>">
-                            <span><i class="fas fa-plus"></i>  <?php echo $langs->trans('AddRiskButton'); ?></span>
-                        </div>
-                    <?php endif;?>
-                </div>
+
             </div>
         </div>
     </div>

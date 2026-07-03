@@ -611,6 +611,8 @@ class modDigiriskdolibarr extends DolibarrModules
 			$i++ => ['DIGIRISKDOLIBARR_WORKUNITDOCUMENTINHERITED_CUSTOM_ADDON_ODT_PATH', 'chaine', 'DOL_DATA_ROOT' . (($conf->entity == 1 ) ? '/' : '/' . $conf->entity . '/') . 'ecm/digiriskdolibarr/workunitdocumentinherited/', '', 0, 'current'],
 			$i++ => ['DIGIRISKDOLIBARR_WORKUNITDOCUMENTSHARED_ADDON_ODT_PATH', 'chaine', 'DOL_DOCUMENT_ROOT/custom/digiriskdolibarr/documents/doctemplates/workunitdocument/workunitdocumentshared/', '', 0, 'current'],
 			$i++ => ['DIGIRISKDOLIBARR_WORKUNITDOCUMENTSHARED_CUSTOM_ADDON_ODT_PATH', 'chaine', 'DOL_DATA_ROOT' . (($conf->entity == 1 ) ? '/' : '/' . $conf->entity . '/') . 'ecm/digiriskdolibarr/workunitdocumentshared/', '', 0, 'current'],
+			$i++ => ['DIGIRISKDOLIBARR_WORKUNITDOCUMENTCOMPLETE_ADDON_ODT_PATH', 'chaine', 'DOL_DOCUMENT_ROOT/custom/digiriskdolibarr/documents/doctemplates/workunitdocument/workunitdocumentcomplete/', '', 0, 'current'],
+			$i++ => ['DIGIRISKDOLIBARR_WORKUNITDOCUMENTCOMPLETE_CUSTOM_ADDON_ODT_PATH', 'chaine', 'DOL_DATA_ROOT' . (($conf->entity == 1 ) ? '/' : '/' . $conf->entity . '/') . 'ecm/digiriskdolibarr/workunitdocumentcomplete/', '', 0, 'current'],
 
 			// CONST PREVENTION PLAN
 			$i++ => ['DIGIRISKDOLIBARR_MAIN_AGENDA_ACTIONAUTO_PREVENTIONPLAN_CREATE', 'integer', 1, '', 0, 'current'],
@@ -2125,6 +2127,7 @@ class modDigiriskdolibarr extends DolibarrModules
 		delDocumentModel('workunitdocument_odt', 'workunitdocument');
 		delDocumentModel('workunitdocumentinherited_odt', 'workunitdocument');
 		delDocumentModel('workunitdocumentshared_odt', 'workunitdocument');
+		delDocumentModel('workunitdocumentcomplete_odt', 'workunitdocument');
 		delDocumentModel('listingrisksaction_odt', 'listingrisksdocument');
         delDocumentModel('listingrisksdocument_odt', 'listingrisksdocument');
         delDocumentModel('listingrisksphoto_odt', 'listingrisksdocument');
@@ -2149,6 +2152,7 @@ class modDigiriskdolibarr extends DolibarrModules
 		addDocumentModel('workunitdocument_odt', 'workunitdocument', 'ODT templates', 'DIGIRISKDOLIBARR_WORKUNITDOCUMENT_ADDON_ODT_PATH');
 		addDocumentModel('workunitdocumentinherited_odt', 'workunitdocument', 'ODT templates', 'DIGIRISKDOLIBARR_WORKUNITDOCUMENTINHERITED_ADDON_ODT_PATH');
 		addDocumentModel('workunitdocumentshared_odt', 'workunitdocument', 'ODT templates', 'DIGIRISKDOLIBARR_WORKUNITDOCUMENTSHARED_ADDON_ODT_PATH');
+		addDocumentModel('workunitdocumentcomplete_odt', 'workunitdocument', 'ODT templates', 'DIGIRISKDOLIBARR_WORKUNITDOCUMENTCOMPLETE_ADDON_ODT_PATH');
         addDocumentModel('listingrisksdocument_odt', 'listingrisksdocument', 'ODT templates', 'DIGIRISKDOLIBARR_LISTINGRISKSDOCUMENT_ADDON_ODT_PATH');
         addDocumentModel('listingrisksaction_odt', 'listingrisksdocument', 'ODT templates', 'DIGIRISKDOLIBARR_LISTINGRISKSACTION_ADDON_ODT_PATH');
         addDocumentModel('listingrisksphoto_odt', 'listingrisksdocument', 'ODT templates', 'DIGIRISKDOLIBARR_LISTINGRISKSPHOTO_ADDON_ODT_PATH');
@@ -2161,9 +2165,29 @@ class modDigiriskdolibarr extends DolibarrModules
         addDocumentModel('accidentinvestigationdocument_odt', 'accidentinvestigationdocument', 'ODT templates', 'DIGIRISKDOLIBARR_ACCIDENTINVESTIGATIONDOCUMENT_ADDON_ODT_PATH');
         addDocumentModel('registerdocument_odt', 'registerdocument', 'ODT templates', 'DIGIRISKDOLIBARR_REGISTERDOCUMENT_ADDON_ODT_PATH');
 
-		if (empty($conf->global->DIGIRISKDOLIBARR_DIGIRISKELEMENT_TRASH)) {
-			require_once __DIR__ . '/../../class/digiriskelement/groupment.class.php';
+		// The entity conf may have been cloned from another entity (multicompany): the constants can point
+		// to objects of the source entity, so check the pointed object entity, not only the constant emptiness.
+		// The standard is checked before the trash so a recreated trash gets the right fk_standard.
+		require_once __DIR__ . '/../../class/digiriskstandard.class.php';
+		require_once __DIR__ . '/../../class/digiriskelement/groupment.class.php';
 
+		$digiriskstandard = new DigiriskStandard($this->db);
+		$activeStandardID = getDolGlobalInt('DIGIRISKDOLIBARR_ACTIVE_STANDARD');
+		if ($activeStandardID <= 0 || $digiriskstandard->fetch($activeStandardID) <= 0 || $digiriskstandard->entity != $conf->entity) {
+			$digiriskstandard                = new DigiriskStandard($this->db);
+			$digiriskstandard->ref           = 'DU';
+			$digiriskstandard->description   = 'DUDescription';
+			$digiriskstandard->date_creation = dol_now();
+			$digiriskstandard->status        = 1;
+
+			$standard_id = $digiriskstandard->create($user);
+
+			dolibarr_set_const($this->db, 'DIGIRISKDOLIBARR_ACTIVE_STANDARD', $standard_id, 'integer', 0, '', $conf->entity);
+		}
+
+		$trash           = new DigiriskElement($this->db);
+		$previousTrashID = getDolGlobalInt('DIGIRISKDOLIBARR_DIGIRISKELEMENT_TRASH');
+		if ($previousTrashID <= 0 || $trash->fetch($previousTrashID) <= 0 || $trash->entity != $conf->entity) {
 			$trashRef                      = 'GP0';
 			$digiriskelement               = new Groupment($this->db);
 			$digiriskelement->ref          = $trashRef;
@@ -2174,21 +2198,17 @@ class modDigiriskdolibarr extends DolibarrModules
 			$digiriskelement->status       = DigiriskElement::STATUS_TRASHED;
 			$trash_id                      = $digiriskelement->create($user);
 
+			// Elements of the current entity already trashed under the foreign trash must follow the new one
+			if ($previousTrashID > 0 && $trash_id > 0) {
+				$trashedElements = $trash->fetchAll('', '', 0, 0, ['customsql' => 't.fk_parent = ' . $previousTrashID . ' AND t.entity = ' . ((int) $conf->entity)]);
+				if (is_array($trashedElements)) {
+					foreach ($trashedElements as $trashedElement) {
+						$trashedElement->setValueFrom('fk_parent', $trash_id, '', null, '', '', $user);
+					}
+				}
+			}
+
 			dolibarr_set_const($this->db, 'DIGIRISKDOLIBARR_DIGIRISKELEMENT_TRASH', $trash_id, 'integer', 0, '', $conf->entity);
-		}
-
-		if (empty($conf->global->DIGIRISKDOLIBARR_ACTIVE_STANDARD)) {
-			require_once __DIR__ . '/../../class/digiriskstandard.class.php';
-
-			$digiriskstandard                = new DigiriskStandard($this->db);
-			$digiriskstandard->ref           = 'DU';
-			$digiriskstandard->description   = 'DUDescription';
-			$digiriskstandard->date_creation = dol_now();
-			$digiriskstandard->status        = 1;
-
-			$standard_id = $digiriskstandard->create($user);
-
-			dolibarr_set_const($this->db, 'DIGIRISKDOLIBARR_ACTIVE_STANDARD', $standard_id, 'integer', 0, '', $conf->entity);
 		}
 
         require_once DOL_DOCUMENT_ROOT . '/societe/class/societe.class.php';
@@ -2412,7 +2432,8 @@ class modDigiriskdolibarr extends DolibarrModules
             'fk_preventionplan'        => ['Label' => 'PreventionPlan',        'type' => 'link', 'elementtype' => ['projet_task'], 'position' => $this->numero . 20, 'params' => ['PreventionPlan:digiriskdolibarr/class/preventionplan.class.php:1:(entity:IN:__SHARED_ENTITIES__)' => NULL],             ],
             'fk_firepermit'            => ['Label' => 'FirePermit',            'type' => 'link', 'elementtype' => ['projet_task'], 'position' => $this->numero . 30, 'params' => ['FirePermit:digiriskdolibarr/class/firepermit.class.php:1:(entity:IN:__SHARED_ENTITIES__)' => NULL],                     ],
             'fk_accident'              => ['Label' => 'Accident',              'type' => 'link', 'elementtype' => ['projet_task'], 'position' => $this->numero . 40, 'params' => ['Accident:digiriskdolibarr/class/accident.class.php:1:(entity:IN:__SHARED_ENTITIES__)' => NULL],                         ],
-            'fk_accidentinvestigation' => ['Label' => 'AccidentInvestigation', 'type' => 'link', 'elementtype' => ['projet_task'], 'position' => $this->numero . 50, 'params' => ['AccidentInvestigation:digiriskdolibarr/class/accidentinvestigation.class.php:1:(entity:IN:__SHARED_ENTITIES__)' => NULL]],
+            'fk_accidentinvestigation' => ['Label' => 'AccidentInvestigation', 'type' => 'link',   'elementtype' => ['projet_task'], 'position' => $this->numero . 50, 'params' => ['AccidentInvestigation:digiriskdolibarr/class/accidentinvestigation.class.php:1:(entity:IN:__SHARED_ENTITIES__)' => NULL]],
+            'digirisk_action_type'     => ['Label' => 'DigiriskActionType',    'type' => 'select', 'elementtype' => ['projet_task'], 'position' => $this->numero . 60, 'params' => [1 => 'Curative', 2 => 'Corrective'],                                                                                                                                                       ],
 
             'wp_digi_id' => ['Label' => 'WPDigiID', 'type' => 'int', 'length' => 100, 'elementtype' => ['digiriskdolibarr_digiriskelement'], 'position' => $this->numero . 10, 'list' => 0, 'enabled' => "isModEnabled('digiriskdolibarr')"],
             'entity'     => ['Label' => 'Entity',   'type' => 'int', 'length' => 100, 'elementtype' => ['digiriskdolibarr_digiriskelement'], 'position' => $this->numero . 20, 'list' => 0, 'enabled' => "isModEnabled('digiriskdolibarr')"],
