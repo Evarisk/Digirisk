@@ -85,6 +85,22 @@ window.digiriskdolibarr.ticket.event = function() {
   $(document).on( 'keyup', '#email', window.digiriskdolibarr.ticket.checkValidEmail);
   $(document).on( 'keyup', '#options_digiriskdolibarr_ticket_phone', window.digiriskdolibarr.ticket.checkValidPhone);
 
+  // Ticket card (issue #4443) — inline (on-the-fly) editing
+  $(document).on( 'click',   '.digirisk-ticket-card .dtc-subject-value', window.digiriskdolibarr.ticket.editSubjectInline);
+  $(document).on( 'keydown', '.digirisk-ticket-card .dtc-subject-input', window.digiriskdolibarr.ticket.subjectInputKeydown);
+  $(document).on( 'blur',    '.digirisk-ticket-card .dtc-subject-input', window.digiriskdolibarr.ticket.saveSubjectInline);
+  $(document).on( 'click',   '.digirisk-ticket-card .kanban-add-tag-btn', window.digiriskdolibarr.ticket.toggleTagDropdown);
+  $(document).on( 'click',   '.digirisk-ticket-card .kanban-tag-option', window.digiriskdolibarr.ticket.addCategoryInline);
+  $(document).on( 'click',   '.digirisk-ticket-card .kanban-tag-remove', window.digiriskdolibarr.ticket.removeCategoryInline);
+  $(document).on( 'click',   '.digirisk-ticket-card .kanban-tag-dropdown', function(event) { event.stopPropagation(); });
+  $(document).on( 'click',   window.digiriskdolibarr.ticket.closeTagDropdowns);
+  $(document).on( 'click',   '.digirisk-ticket-card .dtc-assignee-value', window.digiriskdolibarr.ticket.editAssigneeInline);
+  $(document).on( 'change',  '.digirisk-ticket-card .dtc-assignee-select', window.digiriskdolibarr.ticket.saveAssigneeInline);
+  $(document).on( 'blur',    '.digirisk-ticket-card .dtc-assignee-select', window.digiriskdolibarr.ticket.closeAssigneeInline);
+  $(document).on( 'focus',   '.digirisk-ticket-card .dtc-progress-value[contenteditable]', window.digiriskdolibarr.ticket.progressFocus);
+  $(document).on( 'keydown', '.digirisk-ticket-card .dtc-progress-value[contenteditable]', window.digiriskdolibarr.ticket.progressKeydown);
+  $(document).on( 'blur',    '.digirisk-ticket-card .dtc-progress-value[contenteditable]', window.digiriskdolibarr.ticket.saveProgressInline);
+
   $(document).on( 'change', '.param-table input, .param-table select, .param-table textarea', window.digiriskdolibarr.ticket.handleParamChange);
   // CKEDITOR is only loaded on pages with a rich-text editor. Guard the global
   // so this handler never throws "CKEDITOR is not defined" — an uncaught error
@@ -352,4 +368,341 @@ window.digiriskdolibarr.ticket.handleParamChange = function() {
 	}
 	var $btn = $('.' + $table.data('btn'));
 	$btn.prop('disabled', false);
+};
+
+/**
+ * Ticket card (#4443) — start inline edit of the subject.
+ *
+ * @since   23.0.0
+ * @version 23.0.0
+ *
+ * @param  {Object} event Click event.
+ * @return {void}
+ */
+window.digiriskdolibarr.ticket.editSubjectInline = function(event) {
+  event.preventDefault();
+  var $wrap = $(this).closest('.dtc-head').find('.dtc-subject');
+  if (!$wrap.length || $wrap.find('.dtc-subject-input').length) {
+    return;
+  }
+  var current = String($wrap.attr('data-value') || '');
+  var $input  = $('<input type="text" class="dtc-subject-input" />').val(current);
+  $wrap.html($input);
+  $input.trigger('focus').trigger('select');
+};
+
+/**
+ * Ticket card (#4443) — Enter saves, Escape cancels the subject edit.
+ *
+ * @since   23.0.0
+ * @version 23.0.0
+ *
+ * @param  {Object} event Keydown event.
+ * @return {void}
+ */
+window.digiriskdolibarr.ticket.subjectInputKeydown = function(event) {
+  if (event.key === 'Enter' || event.keyCode === 13) {
+    event.preventDefault();
+    $(this).trigger('blur');
+  } else if (event.key === 'Escape' || event.keyCode === 27) {
+    var $wrap = $(this).closest('.dtc-subject');
+    $(this).data('done', true);
+    window.digiriskdolibarr.ticket.renderSubject($wrap, String($wrap.attr('data-value') || ''));
+  }
+};
+
+/**
+ * Ticket card (#4443) — save the subject on the fly (AJAX), no page reload.
+ *
+ * @since   23.0.0
+ * @version 23.0.0
+ *
+ * @return {void}
+ */
+window.digiriskdolibarr.ticket.saveSubjectInline = function() {
+  var $input = $(this);
+  var $wrap  = $input.closest('.dtc-subject');
+  if ($input.data('done')) {
+    return;
+  }
+  $input.data('done', true);
+  var newValue = $input.val().trim();
+  var oldValue = String($wrap.attr('data-value') || '');
+  if (newValue === '' || newValue === oldValue) {
+    window.digiriskdolibarr.ticket.renderSubject($wrap, oldValue);
+    return;
+  }
+  var token = window.saturne.toolbox.getToken();
+  var sep   = window.saturne.toolbox.getQuerySeparator(document.URL);
+  $.ajax({
+    url: document.URL + sep + 'action=setsubject_ajax&token=' + token,
+    type: 'POST',
+    data: { subject: newValue },
+    dataType: 'json',
+    success: function(resp) {
+      var saved = (resp && resp.subject != null) ? resp.subject : newValue;
+      $wrap.attr('data-value', saved);
+      window.digiriskdolibarr.ticket.renderSubject($wrap, saved);
+    },
+    error: function() {
+      window.digiriskdolibarr.ticket.renderSubject($wrap, oldValue);
+    }
+  });
+};
+
+/**
+ * Ticket card (#4443) — render the subject value span.
+ *
+ * @since   23.0.0
+ * @version 23.0.0
+ *
+ * @param  {jQuery} $wrap Subject wrapper.
+ * @param  {string} value Subject value.
+ * @return {void}
+ */
+window.digiriskdolibarr.ticket.renderSubject = function($wrap, value) {
+  var text = (value && value.length) ? $('<div>').text(value).html() : '';
+  $wrap.html('<span class="dtc-subject-value">' + text + '</span>');
+};
+
+/**
+ * Ticket card (#4443) — toggle the "add tag" dropdown (same UX as the ticket kanban).
+ *
+ * @since   23.0.0
+ * @version 23.0.0
+ *
+ * @param  {Object} event Click event.
+ * @return {void}
+ */
+window.digiriskdolibarr.ticket.toggleTagDropdown = function(event) {
+  event.preventDefault();
+  event.stopPropagation();
+  var $dropdown = $(this).siblings('.kanban-tag-dropdown');
+  $('.digirisk-ticket-card .kanban-tag-dropdown').not($dropdown).removeClass('visible');
+  $dropdown.toggleClass('visible');
+};
+
+/**
+ * Ticket card (#4443) — close any open tag dropdown (outside click).
+ *
+ * @since   23.0.0
+ * @version 23.0.0
+ *
+ * @return {void}
+ */
+window.digiriskdolibarr.ticket.closeTagDropdowns = function() {
+  $('.digirisk-ticket-card .kanban-tag-dropdown.visible').removeClass('visible');
+};
+
+/**
+ * Ticket card (#4443) — add a category on the fly (same endpoint/behaviour as the kanban).
+ *
+ * @since   23.0.0
+ * @version 23.0.0
+ *
+ * @param  {Object} event Click event.
+ * @return {void}
+ */
+window.digiriskdolibarr.ticket.addCategoryInline = function(event) {
+  event.stopPropagation();
+  var $opt = $(this);
+  if ($opt.hasClass('assigned')) {
+    return;
+  }
+  var $dropdown = $opt.closest('.kanban-tag-dropdown');
+  var $tagsRow  = $opt.closest('.kanban-card-tags');
+  var catId     = $opt.data('value');
+  $dropdown.removeClass('visible');
+  $.ajax({
+    url: $tagsRow.data('tag-url') + '?action=addTicketCategory&ticket_id=' + $tagsRow.data('ticket-id') + '&cat_id=' + catId + '&token=' + window.saturne.toolbox.getToken(),
+    type: 'POST',
+    dataType: 'json',
+    success: function(response) {
+      if (!response || !response.success) {
+        return;
+      }
+      var bgColor = response.color ? '#' + response.color : '#8c8c8c';
+      var $tag = $('<span class="kanban-tag" data-cat-id="' + response.id + '" style="background:' + bgColor + '">'
+        + $('<div>').text(response.label).html()
+        + '<span class="kanban-tag-remove" title="&times;">&times;</span></span>');
+      $tagsRow.find('.kanban-tag-dropdown-wrapper').before($tag);
+      $opt.addClass('assigned').append('<i class="fas fa-check" style="margin-left:auto;font-size:9px;color:#28a745"></i>');
+    }
+  });
+};
+
+/**
+ * Ticket card (#4443) — remove a category on the fly (same endpoint/behaviour as the kanban).
+ *
+ * @since   23.0.0
+ * @version 23.0.0
+ *
+ * @param  {Object} event Click event.
+ * @return {void}
+ */
+window.digiriskdolibarr.ticket.removeCategoryInline = function(event) {
+  event.stopPropagation();
+  var $tag     = $(this).closest('.kanban-tag');
+  var $tagsRow = $tag.closest('.kanban-card-tags');
+  var catId    = $tag.data('cat-id');
+  $tag.css('opacity', '0.4');
+  $.ajax({
+    url: $tagsRow.data('tag-url') + '?action=removeTicketCategory&ticket_id=' + $tagsRow.data('ticket-id') + '&cat_id=' + catId + '&token=' + window.saturne.toolbox.getToken(),
+    type: 'POST',
+    dataType: 'json',
+    success: function(response) {
+      if (!response || !response.success) {
+        $tag.css('opacity', '1');
+        return;
+      }
+      $tag.slideUp(150, function() {
+        $(this).remove();
+        $tagsRow.find('.kanban-tag-option[data-value="' + catId + '"]').removeClass('assigned').find('.fa-check').remove();
+      });
+    },
+    error: function() {
+      $tag.css('opacity', '1');
+    }
+  });
+};
+
+/**
+ * Ticket card (#4443) — reveal the assignee select for on-the-fly editing.
+ *
+ * @since   23.0.0
+ * @version 23.0.0
+ *
+ * @param  {Object} event Click event.
+ * @return {void}
+ */
+window.digiriskdolibarr.ticket.editAssigneeInline = function(event) {
+  event.preventDefault();
+  var $cell = $(this).closest('.dtc-assignee');
+  if ($cell.find('.dtc-assignee-editor').is(':visible')) {
+    return;
+  }
+  $cell.find('.dtc-assignee-value').hide();
+  $cell.find('.dtc-assignee-editor').show();
+  $cell.find('.dtc-assignee-select').trigger('focus');
+};
+
+/**
+ * Ticket card (#4443) — save the assignee on the fly (same endpoint as the kanban).
+ *
+ * @since   23.0.0
+ * @version 23.0.0
+ *
+ * @return {void}
+ */
+window.digiriskdolibarr.ticket.saveAssigneeInline = function() {
+  var $sel   = $(this);
+  var $cell  = $sel.closest('.dtc-assignee');
+  var userId = parseInt($sel.val(), 10) || 0;
+  $.ajax({
+    url: $cell.data('assign-url') + '?action=setassignee_ajax&id=' + $cell.data('ticket-id') + '&user_id=' + userId + '&token=' + window.saturne.toolbox.getToken(),
+    type: 'POST',
+    dataType: 'json',
+    success: function(resp) {
+      if (resp && resp.nomurl) {
+        $cell.find('.dtc-assignee-value').html(resp.nomurl).show();
+      } else {
+        $cell.find('.dtc-assignee-value').show();
+      }
+      $cell.find('.dtc-assignee-editor').hide();
+    },
+    error: function() {
+      $cell.find('.dtc-assignee-value').show();
+      $cell.find('.dtc-assignee-editor').hide();
+    }
+  });
+};
+
+/**
+ * Ticket card (#4443) — close the assignee editor on blur (no selection made).
+ *
+ * @since   23.0.0
+ * @version 23.0.0
+ *
+ * @return {void}
+ */
+window.digiriskdolibarr.ticket.closeAssigneeInline = function() {
+  var $cell = $(this).closest('.dtc-assignee');
+  window.setTimeout(function() {
+    if ($cell.find('.dtc-assignee-editor').is(':visible')) {
+      $cell.find('.dtc-assignee-editor').hide();
+      $cell.find('.dtc-assignee-value').show();
+    }
+  }, 200);
+};
+
+/**
+ * Ticket card (#4443) — select the whole progress value when it gains focus.
+ *
+ * @since   23.0.0
+ * @version 23.0.0
+ *
+ * @return {void}
+ */
+window.digiriskdolibarr.ticket.progressFocus = function() {
+  var el = this;
+  window.setTimeout(function() {
+    var range = document.createRange();
+    range.selectNodeContents(el);
+    var sel = window.getSelection();
+    sel.removeAllRanges();
+    sel.addRange(range);
+  }, 0);
+};
+
+/**
+ * Ticket card (#4443) — Enter validates the progress (triggers blur), no line break.
+ *
+ * @since   23.0.0
+ * @version 23.0.0
+ *
+ * @param  {Object} event Keydown event.
+ * @return {void}
+ */
+window.digiriskdolibarr.ticket.progressKeydown = function(event) {
+  if (event.key === 'Enter' || event.keyCode === 13) {
+    event.preventDefault();
+    $(this).trigger('blur');
+  }
+};
+
+/**
+ * Ticket card (#4443) — save the progress on the fly from the contenteditable value.
+ *
+ * @since   23.0.0
+ * @version 23.0.0
+ *
+ * @return {void}
+ */
+window.digiriskdolibarr.ticket.saveProgressInline = function() {
+  var $val     = $(this);
+  var $cell    = $val.closest('.dtc-progress');
+  var oldValue = parseInt($cell.attr('data-value'), 10) || 0;
+  var newValue = parseInt(($val.text() || '').replace(/[^0-9]/g, ''), 10);
+  if (isNaN(newValue)) {
+    newValue = oldValue;
+  }
+  newValue = Math.max(0, Math.min(100, newValue));
+  $val.text(newValue);
+  if (newValue === oldValue) {
+    return;
+  }
+  $.ajax({
+    url: $cell.data('progress-url') + '?action=setprogress_ajax&id=' + $cell.data('ticket-id') + '&token=' + window.saturne.toolbox.getToken(),
+    type: 'POST',
+    data: { progress: newValue },
+    dataType: 'json',
+    success: function(resp) {
+      var val = (resp && resp.progress != null) ? resp.progress : newValue;
+      $cell.attr('data-value', val);
+      $val.text(val);
+    },
+    error: function() {
+      $val.text(oldValue);
+    }
+  });
 };
