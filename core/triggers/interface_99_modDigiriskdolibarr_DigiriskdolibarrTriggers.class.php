@@ -401,7 +401,10 @@ class InterfaceDigiriskdolibarrTriggers extends DolibarrTriggers
 				break;
 
 			case 'TICKET_CREATE' :
-				if (getDolGlobalInt('DIGIRISKDOLIBARR_SEND_EMAIL_ON_TICKET_SUBMIT')) {
+				// Only send this notification for tickets submitted through the DigiRisk public interface.
+				// TICKET_CREATE is fired by Dolibarr core on every ticket creation (back-office, API, ...),
+				// but the email content below is built solely from public-interface extrafields.
+				if (getDolGlobalInt('DIGIRISKDOLIBARR_SEND_EMAIL_ON_TICKET_SUBMIT') && !empty($object->context['digiriskdolibarrpublicinterface'])) {
 					// envoi du mail avec les infos de l'objet aux adresses mail configurées
 					// envoi du mail avec une trad puis avec un model
 
