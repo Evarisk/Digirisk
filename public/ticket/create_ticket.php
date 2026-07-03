@@ -506,7 +506,10 @@ saturne_header(0,'', $title, '', '', 0, 0, $moreJS, [], '', 'page-public-card pa
 	print '<p><strong>' . $conf->global->DIGIRISKDOLIBARR_TICKET_PARENT_CATEGORY_LABEL . '</strong><span style="color:red"> *</span></p>';
 
 	$mainCategoryObject              = $category->rechercher($conf->global->DIGIRISKDOLIBARR_TICKET_MAIN_CATEGORY, '', 'ticket', true);
-    $mainCategoryExtrafields         = json_decode($mainCategoryObject[0]->array_options['options_ticket_category_config']);
+    $mainCategoryExtrafields         = null;
+    if (!empty($mainCategoryObject) && is_array($mainCategoryObject) && isset($mainCategoryObject[0])) {
+        $mainCategoryExtrafields     = json_decode($mainCategoryObject[0]->array_options['options_ticket_category_config']);
+    }
 	$mainCategoryChildrenExtrafields = new StdClass();
     $subCategoryExtrafields          = new StdClass();
     $categoryDescription             = '';
