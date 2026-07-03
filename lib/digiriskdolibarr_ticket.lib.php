@@ -64,6 +64,33 @@ function createTicketCategory($label, $description, $color, $visible, $type, $fk
 }
 
 /**
+ * Prepare ticket card header — issue #4443.
+ *
+ * Reuses the native Dolibarr ticket tabs (so the Digirisk hook tabs stay) but rewrites
+ * the main "Ticket" tab so it points back to the Digirisk custom card
+ * (view/ticket/ticket_card.php) instead of the native /ticket/card.php. This keeps
+ * navigation inside the custom UI instead of falling back to native Dolibarr.
+ *
+ * @param  Ticket $object Ticket object
+ * @return array          Array of tabs
+ */
+function digiriskdolibarr_ticket_prepare_head(Ticket $object): array
+{
+    require_once DOL_DOCUMENT_ROOT . '/core/lib/ticket.lib.php';
+
+    $head          = ticket_prepare_head($object);
+    $customCardUrl = dol_buildpath('/custom/digiriskdolibarr/view/ticket/ticket_card.php', 1) . '?id=' . (int) $object->id;
+
+    foreach ($head as $key => $tab) {
+        if (isset($tab[2]) && $tab[2] === 'tabTicket') {
+            $head[$key][0] = $customCardUrl;
+        }
+    }
+
+    return $head;
+}
+
+/**
  * Prepare ticket statistics pages header
  *
  * @return array $head   Array of tabs
