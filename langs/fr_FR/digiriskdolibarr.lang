@@ -831,6 +831,7 @@ auditreportdocument.odt = Rapport d'audit
 # Data - Donnée
 GroupmentDocument                        = Fiche de Groupement
 Groupmentdocument                        = Fiche de Groupement
+DocumentModelStandardPDF                 = Modèle PDF standard
 GroupmentDocumentGenerated               = Génération de fiche de Groupement
 groupmentdocument.odt                    = Fiche de Groupement
 groupmentdocument_custom.odt             = Fiche de Groupement personnalisée
@@ -1785,6 +1786,8 @@ TicketActionAssignedOtherDone        = Ticket assigné
 TicketActionCloseConfirm             = Confirmer la clôture
 TicketActionCancelConfirm            = Confirmer l'annulation
 TicketActionCardRegistresSection      = Informations registres
+TicketMessageTitle                    = Titre du message
+TicketResponsibleAndProgress          = Responsable et avancement
 TicketActionCardClassificationSection = Classification
 TicketActionCardDatesSection          = Dates clés
 TicketActionCardIdentificationSection = Identification
