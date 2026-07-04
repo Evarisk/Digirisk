@@ -691,8 +691,9 @@ window.digiriskdolibarr.ticket.saveProgressInline = function() {
   if (newValue === oldValue) {
     return;
   }
+  var action = $cell.data('action') || 'setprogress_ajax';
   $.ajax({
-    url: $cell.data('progress-url') + '?action=setprogress_ajax&id=' + $cell.data('ticket-id') + '&token=' + window.saturne.toolbox.getToken(),
+    url: $cell.data('progress-url') + '?action=' + action + '&id=' + $cell.data('ticket-id') + '&token=' + window.saturne.toolbox.getToken(),
     type: 'POST',
     data: { progress: newValue },
     dataType: 'json',
