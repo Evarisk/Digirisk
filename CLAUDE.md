@@ -323,6 +323,8 @@ EditorConfig is picked up automatically by most editors (VSCode, PhpStorm, etc.)
 
 **Never commit directly to `main` or `develop`.** Dev branch: `develop`. PR required with ≥1 reviewer.
 
+**Never commit anything until the user has explicitly validated the changes locally.** Always wait for user confirmation before running any `git commit` or `git push` command.
+
 **One issue = one branch = one PR.** Never mix multiple issues in a single branch or PR.
 
 **Commit format**: `#{issue} [{Scope}] {type}: {short description}`

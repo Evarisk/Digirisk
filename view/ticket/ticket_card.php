@@ -128,6 +128,77 @@ if ($action === 'setprogress_ajax' && $permissionToWrite) {
     exit;
 }
 
+// AJAX: inline (on-the-fly) progress save for tasks
+if ($action === 'set_task_progress_ajax' && $permissionToWrite) {
+    require_once DOL_DOCUMENT_ROOT . '/projet/class/task.class.php';
+    $taskObj = new Task($db);
+    $taskObj->fetch(GETPOSTINT('id'));
+    $newProgress = GETPOSTINT('progress');
+    if ($newProgress < 0) {
+        $newProgress = 0;
+    }
+    if ($newProgress > 100) {
+        $newProgress = 100;
+    }
+    $taskObj->progress = $newProgress;
+    $taskObj->update($user);
+    header('Content-Type: application/json');
+    print json_encode(['success' => 1, 'progress' => (int) $taskObj->progress]);
+    exit;
+}
+
+// Action: create parent task manually (#4881)
+if ($action === 'create_parent_task' && $permissionToWrite && !empty($object->fk_project)) {
+    require_once DOL_DOCUMENT_ROOT . '/projet/class/task.class.php';
+    $t = new Task($db);
+    $t->fk_project = $object->fk_project;
+    $t->ref = 'TKP-' . $object->ref;
+    $t->label = $langs->trans('Ticket') . ' ' . $object->ref;
+    $t->progress = 0;
+    $t->create($user);
+    $db->query("UPDATE " . MAIN_DB_PREFIX . "projet_task SET ref = '" . $db->escape($t->ref) . "' WHERE rowid = " . (int) $t->id);
+    header('Location: ' . $url_page_current . '?id=' . $object->id);
+    exit;
+}
+
+// Action: add child task from popup (#4881)
+if ($action === 'add_child_task_modal' && $permissionToWrite && !empty($object->fk_project)) {
+    require_once DOL_DOCUMENT_ROOT . '/projet/class/task.class.php';
+    $t = new Task($db);
+    $t->fk_project = $object->fk_project;
+    $t->fk_task_parent = GETPOST('task_parent', 'int');
+    $t->label = GETPOST('label', 'alphanohtml');
+    $t->date_start = dol_mktime(0, 0, 0, GETPOST('date_startmonth', 'int'), GETPOST('date_startday', 'int'), GETPOST('date_startyear', 'int'));
+    $t->date_end = dol_mktime(0, 0, 0, GETPOST('date_endmonth', 'int'), GETPOST('date_endday', 'int'), GETPOST('date_endyear', 'int'));
+    
+    // Parse datetime-local from standard input if used
+    $date_start_local = GETPOST('date_start_local', 'alpha');
+    if (!empty($date_start_local)) $t->date_start = strtotime($date_start_local);
+    $date_end_local = GETPOST('date_end_local', 'alpha');
+    if (!empty($date_end_local)) $t->date_end = strtotime($date_end_local);
+
+    $t->planned_workload = 0;
+    $t->progress = 0;
+    $t->budget_amount = GETPOST('budget', 'int');
+    
+    // Auto-generate ref using task numbering module
+    $classnamemodtask = getDolGlobalString('PROJECT_TASK_ADDON', 'mod_task_simple');
+    if (getDolGlobalString('PROJECT_TASK_ADDON') && is_readable(DOL_DOCUMENT_ROOT."/core/modules/project/task/" . getDolGlobalString('PROJECT_TASK_ADDON').".php")) {
+        require_once DOL_DOCUMENT_ROOT."/core/modules/project/task/" . getDolGlobalString('PROJECT_TASK_ADDON').'.php';
+        $modTask = new $classnamemodtask();
+        $t->ref = $modTask->getNextValue($object->thirdparty, $object);
+    }
+    
+    $t->create($user);
+    
+    $executive_id = GETPOST('user_id', 'int');
+    if ($executive_id > 0) {
+        $t->add_contact($executive_id, 'TASKEXECUTIVE', 'internal');
+    }
+    header('Location: ' . $url_page_current . '?id=' . $object->id);
+    exit;
+}
+
 // Action: classify (set project — native form_project posts action=classin)
 if ($action === 'classin' && $permissionToWrite) {
     $object->fetch($id);
@@ -394,6 +465,22 @@ print '</div>'; // fichehalfleft
 print '<div class="fichehalfright">';
 print '<div class="underbanner clearboth"></div>';
 
+// ---- Prepare parent task info ----
+$parentRef = 'TKP-' . $object->ref;
+$parentTaskId = 0;
+$parentTask = null;
+if (!empty($object->fk_project) && isModEnabled('project')) {
+    require_once DOL_DOCUMENT_ROOT . '/projet/class/task.class.php';
+    $sql = "SELECT rowid FROM " . MAIN_DB_PREFIX . "projet_task WHERE ref = '" . $db->escape($parentRef) . "' AND fk_projet = " . (int) $object->fk_project;
+    $resql = $db->query($sql);
+    if ($resql && $db->num_rows($resql) > 0) {
+        $objTask = $db->fetch_object($resql);
+        $parentTaskId = $objTask->rowid;
+        $parentTask = new Task($db);
+        $parentTask->fetch($parentTaskId);
+    }
+}
+
 // ---- Responsable et avancement ----
 print '<table class="border centpercent tableforfield"><tbody>';
 print '<tr class="liste_titre trforfield"><td colspan="2"><div class="dtc-head">' . $langs->trans('TicketResponsibleAndProgress') . '</div></td></tr>';
@@ -417,30 +504,86 @@ if ($permissionToWrite) {
 }
 print '</td></tr>';
 
-// Progression (inline, on-the-fly editable — contenteditable, click to edit)
+// Progression (inline editable — modifying PARENT TASK if it exists)
 print '<tr><td class="titlefieldmiddle">' . $langs->trans('Progression') . '</td>';
-print '<td class="dtc-progress" data-ticket-id="' . (int) $object->id . '" data-progress-url="' . dol_escape_htmltag($url_page_current) . '" data-value="' . (int) $object->progress . '">';
-print '<span class="dtc-progress-value' . ($permissionToWrite ? ' dtc-editable' : '') . '"' . ($permissionToWrite ? ' contenteditable="true"' : '') . '>' . ((int) $object->progress) . '</span> %';
-print '</td></tr>';
+if ($parentTask) {
+    print '<td class="dtc-progress" data-ticket-id="' . (int) $parentTask->id . '" data-action="set_task_progress_ajax" data-progress-url="' . dol_escape_htmltag($url_page_current) . '" data-value="' . (int) $parentTask->progress . '">';
+    print '<span class="dtc-progress-value' . ($permissionToWrite ? ' dtc-editable' : '') . '"' . ($permissionToWrite ? ' contenteditable="true"' : '') . '>' . ((int) $parentTask->progress) . '</span> %';
+    print '</td></tr>';
+} else {
+    print '<td><span class="opacitymedium">0 %</span></td></tr>';
+}
 print '</tbody></table>';
 
-// ---- Linked tasks table (STRUCTURE ONLY — data wiring is step 2) ----
-// TODO (#4443 step 2): populate rows from the tasks linked to this ticket.
-//   $task->getTasksArray(null, null, $object->fk_project, 0, 0, '', '-1', '', 0, 0, $extrafields);
-//   then render each row with projectLinesa() (native progress bar / resources).
-//   Refs: projet/tasks.php:956/1216, core/lib/project.lib.php:600,
-//   actions_digiriskdolibarr.class.php:523 (TotalProgress pattern).
+// ---- Linked tasks table (data wired for #4881) ----
 print '<div class="div-table-responsive-no-min">';
 print '<table class="noborder centpercent">';
 print '<tr class="liste_titre">';
-print '<th>' . $langs->trans('RefTask') . '</th>';
+// Add actions to header
+$tasksHeaderActions = '';
+if (!empty($object->fk_project) && $permissionToWrite) {
+    if ($parentTask) {
+        $tasksHeaderActions .= '<span style="margin-left:5px;">' . $parentTask->getNomUrl(2) . '</span>';
+        $tasksHeaderActions .= '<a style="margin-left:5px; cursor:pointer;" class="modal-open wpeo-tooltip-event" title="' . dol_escape_htmltag($langs->trans('NewTask')) . '"><input type="hidden" class="modal-options" data-modal-to-open="ticket_task_add_modal" />' . img_picto('', 'plus') . '</a>';
+    } else {
+        $tasksHeaderActions .= '<a style="margin-left:5px" href="' . dol_buildpath('/custom/digiriskdolibarr/view/ticket/ticket_card.php', 1) . '?id=' . $object->id . '&action=create_parent_task" title="' . dol_escape_htmltag($langs->trans('Add')) . '">' . img_picto('', 'plus') . '</a>';
+    }
+}
+print '<th>' . $langs->trans('RefTask') . $tasksHeaderActions . '</th>';
 print '<th>' . $langs->trans('Label') . '</th>';
 print '<th class="center">' . $langs->trans('DateStart') . '</th>';
 print '<th class="center">' . $langs->trans('Deadline') . '</th>';
 print '<th class="center">' . $langs->trans('Progress') . '</th>';
 print '<th class="right">' . $langs->trans('Resp') . '</th>';
 print '</tr>';
-print '<tr class="oddeven"><td colspan="6" class="opacitymedium center">' . $langs->trans('NoRecordFound') . '</td></tr>';
+
+$tasksarray = [];
+if ($parentTask) {
+    $taskObj = new Task($db);
+    $extrafieldsObj = new ExtraFields($db);
+    $allTasks = $taskObj->getTasksArray(null, null, $object->fk_project, 0, 0, '', '-1', '', 0, 0, $extrafieldsObj);
+    if (!empty($allTasks)) {
+        foreach ($allTasks as $tsk) {
+            if ($tsk->fk_task_parent == $parentTaskId) {
+                $tasksarray[] = $tsk;
+            }
+        }
+    }
+}
+
+if (!empty($tasksarray)) {
+    foreach ($tasksarray as $t) {
+        print '<tr class="oddeven">';
+        print '<td>' . $t->getNomUrl(1, 'withproject') . '</td>';
+        print '<td>' . dol_escape_htmltag($t->label) . '</td>';
+        print '<td class="center">' . dol_print_date($t->date_start, 'day') . '</td>';
+        print '<td class="center">' . dol_print_date($t->date_end, 'day') . '</td>';
+        
+        // Progress inline editable (using dynamic data-action added to JS)
+        print '<td class="center dtc-progress" data-ticket-id="' . (int) $t->id . '" data-action="set_task_progress_ajax" data-progress-url="' . dol_escape_htmltag($url_page_current) . '" data-value="' . (int) $t->progress . '">';
+        print '<span class="dtc-progress-value' . ($permissionToWrite ? ' dtc-editable' : '') . '"' . ($permissionToWrite ? ' contenteditable="true"' : '') . '>' . ((int) $t->progress) . '</span> %';
+        print '</td>';
+        
+        // Responsable (display names/avatars)
+        print '<td class="right">';
+        $contacts = $t->getListContactId('internal');
+        if (!empty($contacts)) {
+            $userstat = new User($db);
+            foreach ($contacts as $contactId) {
+                if ($userstat->fetch($contactId) > 0) {
+                    print $userstat->getNomUrl(-2, '', 0, 0, 24, 0, 'paddingright') . ' ';
+                }
+            }
+        } else {
+            print '<span class="opacitymedium">' . $langs->trans('NotAssigned') . '</span>';
+        }
+        print '</td>';
+        print '</tr>';
+    }
+} else {
+    print '<tr class="oddeven"><td colspan="6" class="opacitymedium center">' . $langs->trans('NoRecordFound') . '</td></tr>';
+}
+
 print '</table>';
 print '</div>';
 
@@ -537,6 +680,57 @@ print '</div>'; // fichecenter
 print dol_get_fiche_end();
 
 print '</div>'; // digirisk-ticket-card
+
+// --- Modal Add Child Task (#4881) ---
+if (!empty($object->fk_project) && $permissionToWrite && $parentTask) {
+    print '<div class="wpeo-modal modal-task" id="ticket_task_add_modal">';
+    print '<div class="modal-container wpeo-modal-event">';
+    print '<form method="POST" action="' . $_SERVER["PHP_SELF"] . '?id=' . $object->id . '">';
+    print '<input type="hidden" name="token" value="' . newToken() . '">';
+    print '<input type="hidden" name="action" value="add_child_task_modal">';
+    print '<input type="hidden" name="task_parent" value="' . $parentTask->id . '">';
+    print '<div class="modal-header">';
+    print '<h2 class="modal-title">' . $langs->trans('NewTask') . '</h2>';
+    print '<div class="modal-close"><i class="fas fa-times"></i></div>';
+    print '</div>';
+    print '<div class="modal-content">';
+    print '<div class="riskassessment-task-container">';
+    print '<div class="riskassessment-task">';
+    print '<div class="wpeo-gridlayout flex flex-row items-center">';
+    print '<i class="fas fa-paragraph" style="margin-right:1em;"></i>';
+    print '<input type="text" class="riskassessment-task-label" name="label" required="required" placeholder="' . dol_escape_htmltag($langs->trans('Label')) . '">';
+    print '</div>';
+    print '<div class="riskassessment-task-date wpeo-gridlayout grid-3" style="margin-top: 1em; margin-bottom: 1em;">';
+    print '<div class="flex flex-row items-center">';
+    print '<i class="fas fa-calendar-day" style="margin-right: 1em;"></i>';
+    print '<input type="datetime-local" name="date_start_local" required>';
+    print '</div>';
+    print '<div class="flex flex-row items-center">';
+    print '<i class="fas fa-calendar-check" style="margin-right: 1em;"></i>';
+    print '<input type="datetime-local" name="date_end_local">';
+    print '</div>';
+    print '<div class="flex flex-row items-center paddingright">';
+    print '<i class="fas fa-euro-sign" style="margin-right: 1em;"></i>';
+    print '<input type="number" step="0.01" class="riskassessment-task-budget" name="budget" placeholder="Budget">';
+    print '</div>';
+    print '</div>';
+    print '<div>';
+    print '<div class="flex flex-row items-center justify-center">';
+    print '<i class="fas fa-user-tie" style="margin-right: 1em;"></i>';
+    print $form->select_dolusers(0, 'user_id', 1, null, 0, '', 0, '', 0, 'minwidth200');
+    print '</div>';
+    print '</div>';
+    print '</div>';
+    print '</div>';
+    print '</div>';
+    print '<div class="modal-footer">';
+    print '<button type="submit" class="wpeo-button button-blue" style="color: #fff"><i class="fas fa-plus"></i></button>';
+    print '</div>';
+    print '</form>';
+    print '</div>';
+    print '</div>';
+}
+// ------------------------------------
 
 llxFooter();
 $db->close();
