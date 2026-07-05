@@ -436,9 +436,12 @@ if (file_exists(DOL_DOCUMENT_ROOT . '/custom/digiriskdolibarr/class/digiriskelem
     $elementList = $digiriskElementTmp->fetchDigiriskElementFlat(0);
     if (is_array($elementList)) {
         foreach ($elementList as $el) {
-            $obj = $el['object'];
-            $indent = str_repeat('&nbsp;&nbsp;&nbsp;&nbsp;', $el['level']);
-            $serviceOptions[$obj->id] = $indent . dol_escape_htmltag($obj->ref . ' - ' . $obj->label);
+            $obj = $el['object'] ?? null;
+            if ($obj && isset($obj->id)) {
+                $depth = (int)($el['depth'] ?? 0);
+                $indent = str_repeat('&nbsp;&nbsp;&nbsp;&nbsp;', $depth);
+                $serviceOptions[$obj->id] = $indent . dol_escape_htmltag($obj->ref . ' - ' . $obj->label);
+            }
         }
     }
 }
