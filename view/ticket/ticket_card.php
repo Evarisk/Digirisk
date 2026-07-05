@@ -410,11 +410,6 @@ if ($firstServiceId > 0 && file_exists(DOL_DOCUMENT_ROOT . '/custom/digiriskdoli
     }
 }
 
-// A warning icon flags an unfilled registre field, mirroring the target design.
-$regWarn = static function (string $value) use ($langs): string {
-    return $value === '' ? img_warning($langs->trans('None')) . ' ' : '';
-};
-
 // Helper to render an inline editable field
 $renderInlineEditable = static function (string $field, string $type, string $val, string $placeholder, string $rawVal = '', array $options = []) use ($langs, $permissionToWrite, $url_page_current, $object): string {
     if (!$permissionToWrite) {
@@ -444,25 +439,38 @@ if (class_exists('DigiriskElement')) {
     }
 }
 
+// Build the direct select HTML for GP/UT
+$serviceSelectHtml = '';
+if (!$permissionToWrite) {
+    $serviceSelectHtml = $regService !== '' ? $regService : '<span class="opacitymedium">' . $langs->trans('None') . '</span>';
+} else {
+    $serviceSelectHtml = '<select class="dtc-direct-select flat" data-field="digiriskdolibarr_ticket_service" style="max-width: 100%; border: 1px solid #ddd; padding: 2px; border-radius: 3px; outline: none;">';
+    foreach ($serviceOptions as $optVal => $optText) {
+        $selected = ((string)$optVal === (string)$firstServiceId) ? ' selected="selected"' : '';
+        $serviceSelectHtml .= '<option value="' . dol_escape_htmltag((string)$optVal) . '"' . $selected . '>' . dol_escape_htmltag($optText) . '</option>';
+    }
+    $serviceSelectHtml .= '</select>';
+}
+
 print '<table class="border centpercent tableforfield"><tbody>';
 print '<tr class="liste_titre trforfield"><td colspan="4"><div class="dtc-head">' . img_picto('', 'digiriskdolibarr_color@digiriskdolibarr', 'class="pictoModule"') . ' ' . $langs->trans('TicketActionCardRegistresSection') . '</div></td></tr>';
 
 print '<tr>';
-print '<td class="titlefieldmiddle" width="25%">' . $drPicto . $langs->trans('LastName') . '</td><td width="25%">' . $renderInlineEditable('digiriskdolibarr_ticket_lastname', 'text', dol_escape_htmltag($regLastname), $langs->trans('LastName')) . ' ' . $regWarn($regLastname) . '</td>';
-print '<td class="titlefieldmiddle" width="25%">' . $drPicto . $langs->trans('FirstName') . '</td><td width="25%">' . $renderInlineEditable('digiriskdolibarr_ticket_firstname', 'text', dol_escape_htmltag($regFirstname), $langs->trans('FirstName')) . ' ' . $regWarn($regFirstname) . '</td>';
+print '<td class="titlefieldmiddle" width="25%">' . $drPicto . $langs->trans('LastName') . '</td><td width="25%">' . $renderInlineEditable('digiriskdolibarr_ticket_lastname', 'text', dol_escape_htmltag($regLastname), $langs->trans('LastName')) . '</td>';
+print '<td class="titlefieldmiddle" width="25%">' . $drPicto . $langs->trans('FirstName') . '</td><td width="25%">' . $renderInlineEditable('digiriskdolibarr_ticket_firstname', 'text', dol_escape_htmltag($regFirstname), $langs->trans('FirstName')) . '</td>';
 print '</tr>';
 
 print '<tr>';
-print '<td class="titlefieldmiddle">' . $drPicto . $langs->trans('Phone') . '</td><td>' . $renderInlineEditable('digiriskdolibarr_ticket_phone', 'text', dol_print_phone($regPhone), $langs->trans('Phone'), $regPhone) . ' ' . $regWarn($regPhone) . '</td>';
-print '<td class="titlefieldmiddle">' . $drPicto . $langs->trans('DeclarationDate') . '</td><td>' . $renderInlineEditable('digiriskdolibarr_ticket_date', 'date', $regDate, $langs->trans('DeclarationDate'), (string)$regDateRaw) . ' ' . $regWarn($regDate) . '</td>';
+print '<td class="titlefieldmiddle">' . $drPicto . $langs->trans('Phone') . '</td><td>' . $renderInlineEditable('digiriskdolibarr_ticket_phone', 'text', dol_print_phone($regPhone), $langs->trans('Phone'), $regPhone) . '</td>';
+print '<td class="titlefieldmiddle">' . $drPicto . $langs->trans('DeclarationDate') . '</td><td>' . $renderInlineEditable('digiriskdolibarr_ticket_date', 'date', $regDate, $langs->trans('DeclarationDate'), (string)$regDateRaw) . '</td>';
 print '</tr>';
 
 print '<tr>';
-print '<td class="titlefieldmiddle">' . $drPicto . $langs->trans('GP/UT') . '</td><td>' . $renderInlineEditable('digiriskdolibarr_ticket_service', 'select', $regService, $langs->trans('None'), (string)$firstServiceId, $serviceOptions) . ' ' . $regWarn((string)$firstServiceId > 0 ? '1' : '') . '</td>';
-print '<td class="titlefieldmiddle">' . $drPicto . $langs->trans('Location') . '</td><td>' . $renderInlineEditable('digiriskdolibarr_ticket_location', 'text', dol_escape_htmltag($regLocation), $langs->trans('Location')) . ' ' . $regWarn($regLocation) . '</td>';
+print '<td class="titlefieldmiddle">' . $drPicto . $langs->trans('GP/UT') . '</td><td>' . $serviceSelectHtml . '</td>';
+print '<td class="titlefieldmiddle">' . $drPicto . $langs->trans('Location') . '</td><td>' . $renderInlineEditable('digiriskdolibarr_ticket_location', 'text', dol_escape_htmltag($regLocation), $langs->trans('Location')) . '</td>';
 print '</tr>';
 
-print '<tr><td class="titlefieldmiddle">' . $drPicto . $langs->trans('ConditionMessage') . '</td><td colspan="3">' . $renderInlineEditable('digiriskdolibarr_condition_message', 'textarea', ($regCondition !== '' ? dolPrintHTML($regCondition) : ''), $langs->trans('ConditionMessage'), $regCondition) . ' ' . $regWarn($regCondition) . '</td></tr>';
+print '<tr><td class="titlefieldmiddle">' . $drPicto . $langs->trans('ConditionMessage') . '</td><td colspan="3">' . $renderInlineEditable('digiriskdolibarr_condition_message', 'textarea', ($regCondition !== '' ? dolPrintHTML($regCondition) : ''), $langs->trans('ConditionMessage'), $regCondition) . '</td></tr>';
 
 // "Registre signé": disabled indicator. TODO (#4443 step 2): reflect real SaturneSignature state
 // and add the "Conditions à accepter pour la signature" (ValidateText) + category-scoped
