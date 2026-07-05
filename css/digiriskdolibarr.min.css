@@ -5413,6 +5413,12 @@ textarea.action-textarea:not(:last-child) {
 .digirisk-ticket-card table.dtc-registres-table > tbody > tr > td:nth-child(4) {
   width: 35%;
 }
+.digirisk-ticket-card table.dtc-registres-table select.dtc-direct-select,
+.digirisk-ticket-card table.dtc-registres-table .select2-container--default.dtc-direct-select + .select2-container,
+.digirisk-ticket-card table.dtc-registres-table .select2-container.select2-container--default {
+  max-width: 170px !important;
+  width: 170px !important;
+}
 .digirisk-ticket-card a.editfielda {
   color: #6b7280;
   opacity: 0.5;

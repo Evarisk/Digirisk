@@ -888,7 +888,7 @@ $(function() {
     });
 
     $sel.select2({
-      width: '220px',
+      width: '170px',
       dropdownAutoWidth: true,
       data: data,
       // Allow raw HTML in option text (for &nbsp; indentation)
