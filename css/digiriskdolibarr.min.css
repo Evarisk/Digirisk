@@ -5400,6 +5400,19 @@ textarea.action-textarea:not(:last-child) {
   color: #6b7280;
   font-weight: 500;
 }
+.digirisk-ticket-card table.dtc-registres-table {
+  table-layout: fixed;
+  width: 100%;
+}
+.digirisk-ticket-card table.dtc-registres-table > tbody > tr > td:nth-child(1),
+.digirisk-ticket-card table.dtc-registres-table > tbody > tr > td:nth-child(3) {
+  width: 15%;
+  white-space: nowrap;
+}
+.digirisk-ticket-card table.dtc-registres-table > tbody > tr > td:nth-child(2),
+.digirisk-ticket-card table.dtc-registres-table > tbody > tr > td:nth-child(4) {
+  width: 35%;
+}
 .digirisk-ticket-card a.editfielda {
   color: #6b7280;
   opacity: 0.5;

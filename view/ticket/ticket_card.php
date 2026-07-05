@@ -465,22 +465,22 @@ if (!$permissionToWrite) {
     $serviceSelectHtml .= '</select>';
 }
 
-print '<table class="border centpercent tableforfield"><tbody>';
+print '<table class="border centpercent tableforfield dtc-registres-table"><tbody>';
 print '<tr class="liste_titre trforfield"><td colspan="4"><div class="dtc-head">' . img_picto('', 'digiriskdolibarr_color@digiriskdolibarr', 'class="pictoModule"') . ' ' . $langs->trans('TicketActionCardRegistresSection') . '</div></td></tr>';
 
 print '<tr>';
-print '<td class="titlefieldmiddle" style="width: 15%;">' . $drPicto . $langs->trans('LastName') . '</td><td style="width: 35%;">' . $renderInlineEditable('digiriskdolibarr_ticket_lastname', 'text', dol_escape_htmltag($regLastname), $langs->trans('LastName'), '', ['tabindex' => 3]) . '</td>';
-print '<td class="titlefieldmiddle" style="width: 15%;">' . $drPicto . $langs->trans('FirstName') . '</td><td style="width: 35%;">' . $renderInlineEditable('digiriskdolibarr_ticket_firstname', 'text', dol_escape_htmltag($regFirstname), $langs->trans('FirstName'), '', ['tabindex' => 7]) . '</td>';
+print '<td class="titlefieldmiddle">' . $drPicto . $langs->trans('LastName') . '</td><td>' . $renderInlineEditable('digiriskdolibarr_ticket_lastname', 'text', dol_escape_htmltag($regLastname), $langs->trans('LastName'), '', ['tabindex' => 3]) . '</td>';
+print '<td class="titlefieldmiddle">' . $drPicto . $langs->trans('FirstName') . '</td><td>' . $renderInlineEditable('digiriskdolibarr_ticket_firstname', 'text', dol_escape_htmltag($regFirstname), $langs->trans('FirstName'), '', ['tabindex' => 7]) . '</td>';
 print '</tr>';
 
 print '<tr>';
-print '<td class="titlefieldmiddle" style="width: 15%;">' . $drPicto . $langs->trans('Phone') . '</td><td style="width: 35%;">' . $renderInlineEditable('digiriskdolibarr_ticket_phone', 'text', dol_print_phone($regPhone), $langs->trans('Phone'), $regPhone, ['tabindex' => 4]) . '</td>';
-print '<td class="titlefieldmiddle" style="width: 15%;">' . $drPicto . $langs->trans('DeclarationDate') . '</td><td style="width: 35%;">' . $renderInlineEditable('digiriskdolibarr_ticket_date', 'date', $regDate, $langs->trans('DeclarationDate'), (string)$regDateRaw, ['tabindex' => 8]) . '</td>';
+print '<td class="titlefieldmiddle">' . $drPicto . $langs->trans('Phone') . '</td><td>' . $renderInlineEditable('digiriskdolibarr_ticket_phone', 'text', dol_print_phone($regPhone), $langs->trans('Phone'), $regPhone, ['tabindex' => 4]) . '</td>';
+print '<td class="titlefieldmiddle">' . $drPicto . $langs->trans('DeclarationDate') . '</td><td>' . $renderInlineEditable('digiriskdolibarr_ticket_date', 'date', $regDate, $langs->trans('DeclarationDate'), (string)$regDateRaw, ['tabindex' => 8]) . '</td>';
 print '</tr>';
 
 print '<tr>';
-print '<td class="titlefieldmiddle" style="width: 15%;">' . $drPicto . $langs->trans('GP/UT') . '</td><td style="width: 35%;">' . $serviceSelectHtml . '</td>';
-print '<td class="titlefieldmiddle" style="width: 15%;">' . $drPicto . $langs->trans('Location') . '</td><td style="width: 35%;">' . $renderInlineEditable('digiriskdolibarr_ticket_location', 'text', dol_escape_htmltag($regLocation), $langs->trans('Location'), '', ['tabindex' => 9]) . '</td>';
+print '<td class="titlefieldmiddle">' . $drPicto . $langs->trans('GP/UT') . '</td><td>' . $serviceSelectHtml . '</td>';
+print '<td class="titlefieldmiddle">' . $drPicto . $langs->trans('Location') . '</td><td>' . $renderInlineEditable('digiriskdolibarr_ticket_location', 'text', dol_escape_htmltag($regLocation), $langs->trans('Location'), '', ['tabindex' => 9]) . '</td>';
 print '</tr>';
 
 print '<tr><td class="titlefieldmiddle">' . $drPicto . $langs->trans('Condition') . '</td><td colspan="3">' . $renderInlineEditable('digiriskdolibarr_condition_message', 'textarea', ($regCondition !== '' ? dolPrintHTML($regCondition) : ''), $langs->trans('ConditionMessage'), $regCondition, ['tabindex' => 6]) . '</td></tr>';

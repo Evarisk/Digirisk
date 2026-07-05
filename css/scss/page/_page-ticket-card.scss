@@ -136,6 +136,22 @@ $dtc-title:       #111827;
         table.nobordernopadding td.nowrap { color: $dtc-grey; font-weight: 500; }
     }
 
+    // ---- Registres table: locked 15/35/15/35% column widths via CSS (never rely on inline styles) ----
+    table.dtc-registres-table {
+        table-layout: fixed;
+        width: 100%;
+
+        > tbody > tr > td:nth-child(1),
+        > tbody > tr > td:nth-child(3) {
+            width: 15%;
+            white-space: nowrap;
+        }
+        > tbody > tr > td:nth-child(2),
+        > tbody > tr > td:nth-child(4) {
+            width: 35%;
+        }
+    }
+
     // Edit pencils: discreet, highlight on hover
     a.editfielda {
         color: $dtc-grey;
