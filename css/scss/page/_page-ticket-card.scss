@@ -150,6 +150,14 @@ $dtc-title:       #111827;
         > tbody > tr > td:nth-child(4) {
             width: 35%;
         }
+
+        // GP/UT select and its Select2 wrapper — capped so they don't fill the whole 35% column
+        select.dtc-direct-select,
+        .select2-container--default.dtc-direct-select + .select2-container,
+        .select2-container.select2-container--default {
+            max-width: 170px !important;
+            width: 170px !important;
+        }
     }
 
     // Edit pencils: discreet, highlight on hover
