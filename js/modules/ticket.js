@@ -873,8 +873,26 @@ $(document).on('change', '.dtc-direct-select', function() {
 
 
 $(function() {
-  if ($.fn.select2) {
-    $('.dtc-direct-select').select2({ width: '220px', dropdownAutoWidth: true });
-  }
+  if (!$.fn.select2) { return; }
+
+  $('.dtc-direct-select').each(function() {
+    var $sel = $(this);
+
+    // Build data array from <option> elements preserving HTML (&nbsp; indentation)
+    var data = [];
+    $sel.find('option').each(function() {
+      data.push({ id: $(this).val(), text: $(this).html(), selected: $(this).is(':selected') });
+    });
+
+    $sel.select2({
+      width: '220px',
+      dropdownAutoWidth: true,
+      data: data,
+      // Allow raw HTML in option text (for &nbsp; indentation)
+      escapeMarkup: function(m) { return m; },
+      templateResult: function(d) { return d.text; },
+      templateSelection: function(d) { return d.text; }
+    });
+  });
 });
 
