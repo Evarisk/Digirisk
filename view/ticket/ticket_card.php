@@ -430,14 +430,11 @@ $drPicto = img_picto('', 'digiriskdolibarr_color@digiriskdolibarr', 'class="pict
 
 // Fetch all GP/UT options for select
 $serviceOptions = ['' => '']; // Empty option
-if (class_exists('DigiriskElement')) {
-    $digiriskElementTmp = new DigiriskElement($db);
-    global $conf;
-    $elementList = $digiriskElementTmp->fetchAll('', '', 0, 0, ['customsql' => 'status > 0 AND entity = ' . $conf->entity]);
-    if (is_array($elementList)) {
-        foreach ($elementList as $el) {
-            $serviceOptions[$el->id] = $el->ref . ' - ' . $el->label;
-        }
+$sql = "SELECT rowid as id, ref, label FROM " . MAIN_DB_PREFIX . "digiriskdolibarr_digiriskelement WHERE status > 0 AND entity IN (" . getEntity('digiriskdolibarr') . ") ORDER BY ref ASC";
+$resql = $db->query($sql);
+if ($resql) {
+    while ($obj = $db->fetch_object($resql)) {
+        $serviceOptions[$obj->id] = $obj->ref . ' - ' . $obj->label;
     }
 }
 
