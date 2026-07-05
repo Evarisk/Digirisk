@@ -204,6 +204,37 @@ $dtc-title:       #111827;
         }
     }
 
+    // ---- Inline edit (extrafields) ----
+    .dtc-inline-editable {
+        cursor: pointer;
+        border-bottom: 1px dashed #d1d5db;
+        display: inline-block;
+        transition: border-color .15s ease, color .15s ease;
+        padding-bottom: 1px;
+        min-width: 20px;
+
+        &:hover {
+            border-bottom-color: $dtc-blue;
+        }
+
+        &.is-empty {
+            font-style: italic;
+            color: #9ca3af;
+        }
+    }
+
+    .edit-message-on-click {
+        border: 1px dashed transparent;
+        padding: 4px;
+        border-radius: 4px;
+        transition: border-color .15s ease, background .15s ease;
+
+        &:hover {
+            border-color: $dtc-blue;
+            background: rgba(43, 108, 176, .05);
+        }
+    }
+
     // ---- Status action buttons (native .butAction.butStatus) → pills ----
     .navBarForStatus .butAction.butStatus {
         display: inline-flex;
