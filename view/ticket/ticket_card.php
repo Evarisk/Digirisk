@@ -338,7 +338,7 @@ print '<div class="fichecenter">';
 /*
  * Left column
  */
-print '<div class="fichehalfleft">';
+print '<div class="fichehalfleft" style="overflow: hidden; min-width: 0;">';
 print '<div class="underbanner clearboth"></div>';
 
 // ---- Titre du message (label + subject on the same line, inline on-the-fly edit) ----

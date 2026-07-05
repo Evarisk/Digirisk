@@ -899,7 +899,7 @@ $(function() {
 
     // Restore the selected value (Select2 data[] doesn't propagate the selection)
     if (selectedId !== null && selectedId !== '') {
-      $sel.val(selectedId).trigger('change.select2');
+      $sel.val(selectedId).trigger('change');
     }
   });
 });
