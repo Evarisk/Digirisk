@@ -862,3 +862,9 @@ $(document).on('change', '.dtc-direct-select', function() {
   });
 });
 
+
+$(function() {
+  if ($.fn.select2) {
+    $('.dtc-direct-select').select2({ width: '100%' });
+  }
+});
