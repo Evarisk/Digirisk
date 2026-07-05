@@ -151,12 +151,20 @@ $dtc-title:       #111827;
             width: 35%;
         }
 
-        // GP/UT select and its Select2 wrapper — capped so they don't fill the whole 35% column
-        select.dtc-direct-select,
-        .select2-container--default.dtc-direct-select + .select2-container,
-        .select2-container.select2-container--default {
-            max-width: 170px !important;
-            width: 170px !important;
+        // Value cells must clip overflowing content (long combobox etc.)
+        > tbody > tr > td:nth-child(2),
+        > tbody > tr > td:nth-child(4) {
+            overflow: hidden;
+        }
+
+        // GP/UT select and its Select2 wrapper — never exceed the column width
+        select.dtc-direct-select {
+            max-width: 100%;
+            box-sizing: border-box;
+        }
+        .select2-container {
+            max-width: 100% !important;
+            box-sizing: border-box !important;
         }
     }
 
