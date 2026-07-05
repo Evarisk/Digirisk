@@ -830,3 +830,35 @@ window.digiriskdolibarr.ticket.editExtrafieldInline = function(event) {
     }
   }
 };
+
+// Direct select handler
+$(document).on('change', '.dtc-direct-select', function() {
+  var $select = $(this);
+  var field = $select.data('field');
+  var newValue = $select.val();
+  var token = window.saturne.toolbox.getToken();
+  var sep = window.saturne.toolbox.getQuerySeparator(document.URL);
+  
+  $select.prop('disabled', true);
+  $select.css({'border-color': '#10b981', 'box-shadow': '0 0 0 1px #10b981'});
+  
+  $.ajax({
+    url: document.URL + sep + 'action=setextrafield_ajax&token=' + token,
+    type: 'POST',
+    data: { field: field, value: newValue },
+    dataType: 'json',
+    success: function() {
+      $select.prop('disabled', false);
+      $select.css({'border-color': '#10b981', 'box-shadow': ''});
+      setTimeout(function() {
+          $select.css({'border-color': '', 'box-shadow': ''});
+      }, 1200);
+    },
+    error: function() {
+      $select.prop('disabled', false);
+      $select.css({'border-color': '', 'box-shadow': ''});
+      $.jnotify('Erreur lors de la sauvegarde', 'error');
+    }
+  });
+});
+
