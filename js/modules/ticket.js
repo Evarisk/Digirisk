@@ -395,7 +395,7 @@ window.digiriskdolibarr.ticket.editSubjectInline = function(event) {
     return;
   }
   var current = String($wrap.attr('data-value') || '');
-  var $input  = $('<input type="text" class="dtc-subject-input" />').val(current);
+  var $input  = $('<input type="text" class="dtc-subject-input" autocomplete="off" />').val(current);
   $wrap.html($input);
   $input.trigger('focus').trigger('select');
 };
