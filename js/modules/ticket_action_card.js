@@ -1304,9 +1304,7 @@ window.digiriskdolibarr.ticketActionCard.onFieldClick = function(event) {
     };
 
     if (type === 'longtext') {
-        // Init CKEditor on the textarea after it's in the DOM. Save is via the floating
-        // "Enregistrer" button injected next to the editor (blur on a CKEditor area is
-        // unreliable because the user may click any toolbar button).
+        // Init CKEditor on the textarea after it's in the DOM.
         if (window.CKEDITOR && $input.attr('id')) {
             try {
                 window.CKEDITOR.replace($input.attr('id'), {
@@ -1319,21 +1317,20 @@ window.digiriskdolibarr.ticketActionCard.onFieldClick = function(event) {
                     height: 200,
                     width: '100%'
                 });
+                // Auto-save on CKEditor blur (click outside) — no floating bar needed.
+                window.CKEDITOR.instances[$input.attr('id')].on('blur', function() {
+                    commit();
+                });
             } catch (e) {
                 console.warn('CKEditor init failed, falling back to plain textarea:', e);
+                // Fallback: plain textarea saves on blur
+                $input.on('blur', commit);
             }
+        } else {
+            // No CKEditor: save on blur
+            $input.on('blur', commit);
         }
-        // Floating action bar for longtext (Save / Cancel) — blur would fire on every
-        // toolbar click otherwise.
-        var $bar = $('<div class="tac-edit-actions">'
-            + '<button type="button" class="tac-edit-actions__save">Enregistrer</button> '
-            + '<button type="button" class="tac-edit-actions__cancel">Annuler</button>'
-            + '</div>');
-        $input.after($bar);
-        $bar.find('.tac-edit-actions__save').on('click', function(e) { e.stopPropagation(); commit(); });
-        $bar.find('.tac-edit-actions__cancel').on('click', function(e) { e.stopPropagation(); cancel(); });
-        $wrap.data('tac-edit-bar', $bar);
-        // Keep Escape support too.
+        // Escape to cancel
         $(document).on('keydown.tac-longtext-' + ($input.attr('id') || ''), function(e) {
             if (e.key === 'Escape') { cancel(); }
         });
