@@ -100,6 +100,8 @@ window.digiriskdolibarr.ticket.event = function() {
   $(document).on( 'focus',   '.digirisk-ticket-card .dtc-progress-value[contenteditable]', window.digiriskdolibarr.ticket.progressFocus);
   $(document).on( 'keydown', '.digirisk-ticket-card .dtc-progress-value[contenteditable]', window.digiriskdolibarr.ticket.progressKeydown);
   $(document).on( 'blur',    '.digirisk-ticket-card .dtc-progress-value[contenteditable]', window.digiriskdolibarr.ticket.saveProgressInline);
+  $(document).on( 'click',   '.edit-message-on-click', function() { window.location.href = $(this).data('edit-url'); });
+  $(document).on( 'click',   '.digirisk-ticket-card .dtc-extrafield-value', window.digiriskdolibarr.ticket.editExtrafieldInline);
 
   $(document).on( 'change', '.param-table input, .param-table select, .param-table textarea', window.digiriskdolibarr.ticket.handleParamChange);
   // CKEDITOR is only loaded on pages with a rich-text editor. Guard the global
@@ -706,4 +708,86 @@ window.digiriskdolibarr.ticket.saveProgressInline = function() {
       $val.text(oldValue);
     }
   });
+};
+
+/**
+ * Ticket card (#4883) — inline (on-the-fly) editing for extrafields
+ *
+ * @since   23.0.0
+ * @version 23.0.0
+ *
+ * @param  {Object} event Click event.
+ * @return {void}
+ */
+window.digiriskdolibarr.ticket.editExtrafieldInline = function(event) {
+  event.preventDefault();
+  var $span = $(this);
+  if ($span.data('editing')) return;
+  $span.data('editing', true);
+
+  var type = $span.data('type') || 'text';
+  var rawValue = $span.data('raw');
+  if (typeof rawValue === 'undefined') rawValue = '';
+  
+  var $input;
+  if (type === 'textarea') {
+    $input = $('<textarea class="dtc-extrafield-input" style="width:100%; min-height:80px;"></textarea>');
+  } else {
+    $input = $('<input type="' + type + '" class="dtc-extrafield-input" style="width:100%;">');
+  }
+  
+  $input.val(rawValue);
+  $span.hide().after($input);
+  $input.trigger('focus');
+
+  var saveFunc = function() {
+    var newValue = $input.val();
+    if (newValue === rawValue) {
+      $input.remove();
+      $span.show();
+      $span.data('editing', false);
+      return;
+    }
+    
+    var field = $span.data('field');
+    var token = window.saturne.toolbox.getToken();
+    var sep = window.saturne.toolbox.getQuerySeparator(document.URL);
+    
+    $input.prop('disabled', true);
+    $.ajax({
+      url: document.URL + sep + 'action=setextrafield_ajax&token=' + token,
+      type: 'POST',
+      data: { field: field, value: newValue },
+      dataType: 'json',
+      success: function(resp) {
+        $input.remove();
+        $span.data('raw', newValue);
+        if (type === 'textarea') {
+          $span.html(newValue.replace(/\n/g, '<br>'));
+        } else {
+          $span.text(newValue);
+        }
+        if (newValue === '') {
+          $span.html('<span class="opacitymedium">Non défini</span>');
+        }
+        $span.show();
+        $span.data('editing', false);
+      },
+      error: function() {
+        $input.remove();
+        $span.show();
+        $span.data('editing', false);
+      }
+    });
+  };
+
+  $input.on('blur', saveFunc);
+  if (type !== 'textarea') {
+    $input.on('keydown', function(e) {
+      if (e.key === 'Enter') {
+        e.preventDefault();
+        $input.trigger('blur');
+      }
+    });
+  }
 };
