@@ -878,10 +878,13 @@ $(function() {
   $('.dtc-direct-select').each(function() {
     var $sel = $(this);
 
+    // Capture the currently selected value BEFORE rebuilding with Select2
+    var selectedId = $sel.val();
+
     // Build data array from <option> elements preserving HTML (&nbsp; indentation)
     var data = [];
     $sel.find('option').each(function() {
-      data.push({ id: $(this).val(), text: $(this).html(), selected: $(this).is(':selected') });
+      data.push({ id: $(this).val(), text: $(this).html() });
     });
 
     $sel.select2({
@@ -893,6 +896,11 @@ $(function() {
       templateResult: function(d) { return d.text; },
       templateSelection: function(d) { return d.text; }
     });
+
+    // Restore the selected value (Select2 data[] doesn't propagate the selection)
+    if (selectedId !== null && selectedId !== '') {
+      $sel.val(selectedId).trigger('change.select2');
+    }
   });
 });
 
