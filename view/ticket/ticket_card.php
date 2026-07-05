@@ -433,14 +433,12 @@ $serviceOptions = ['' => '']; // Empty option
 if (file_exists(DOL_DOCUMENT_ROOT . '/custom/digiriskdolibarr/class/digiriskelement.class.php')) {
     require_once DOL_DOCUMENT_ROOT . '/custom/digiriskdolibarr/class/digiriskelement.class.php';
     $digiriskElementTmp = new DigiriskElement($db);
-    $elementList = $digiriskElementTmp->getActiveDigiriskElements();
+    $elementList = $digiriskElementTmp->fetchDigiriskElementFlat(0);
     if (is_array($elementList)) {
-        // Sort elements by ref alphabetically to mimic the ORDER BY
-        usort($elementList, function($a, $b) {
-            return strcasecmp($a->ref, $b->ref);
-        });
         foreach ($elementList as $el) {
-            $serviceOptions[$el->id] = $el->ref . ' - ' . $el->label;
+            $obj = $el['object'];
+            $indent = str_repeat('&nbsp;&nbsp;&nbsp;&nbsp;', $el['level']);
+            $serviceOptions[$obj->id] = $indent . dol_escape_htmltag($obj->ref . ' - ' . $obj->label);
         }
     }
 }
@@ -450,10 +448,11 @@ $serviceSelectHtml = '';
 if (!$permissionToWrite) {
     $serviceSelectHtml = $regService !== '' ? $regService : '<span class="opacitymedium">' . $langs->trans('None') . '</span>';
 } else {
-    $serviceSelectHtml = '<select class="dtc-direct-select flat" data-field="digiriskdolibarr_ticket_service" style="max-width: 100%; border: 1px solid #ddd; padding: 2px; border-radius: 3px; outline: none;">';
+    $serviceSelectHtml = '<select class="dtc-direct-select flat select2 minwidth300" data-field="digiriskdolibarr_ticket_service" style="max-width: 100%;">';
     foreach ($serviceOptions as $optVal => $optText) {
         $selected = ((string)$optVal === (string)$firstServiceId) ? ' selected="selected"' : '';
-        $serviceSelectHtml .= '<option value="' . dol_escape_htmltag((string)$optVal) . '"' . $selected . '>' . dol_escape_htmltag($optText) . '</option>';
+        // optText is already escaped and contains HTML (&nbsp;), so we don't escape it here
+        $serviceSelectHtml .= '<option value="' . dol_escape_htmltag((string)$optVal) . '"' . $selected . '>' . $optText . '</option>';
     }
     $serviceSelectHtml .= '</select>';
 }
