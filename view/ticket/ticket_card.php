@@ -483,7 +483,7 @@ print '<tr><td class="titlefieldmiddle">' . $drPicto . $langs->trans('Condition'
 // "Registre signé": disabled indicator. TODO (#4443 step 2): reflect real SaturneSignature state
 // and add the "Conditions à accepter pour la signature" (ValidateText) + category-scoped
 // "Date de départ anticipé" rows (see actions_digiriskdolibarr.class.php printCommonFooter:324-337 / 291-310).
-print '<tr><td class="titlefieldmiddle">' . $langs->trans('RegisterSigned') . '</td><td colspan="3"><input type="checkbox" disabled></td></tr>';
+print '<tr><td class="titlefieldmiddle">' . $drPicto . $langs->trans('RegisterSigned') . '</td><td colspan="3"><input type="checkbox" disabled></td></tr>';
 
 print '</tbody></table>';
 
