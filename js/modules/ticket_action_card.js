@@ -1215,14 +1215,14 @@ window.digiriskdolibarr.ticketActionCard.onFieldClick = function(event) {
 
     var $input;
     if (type === 'text') {
-        $input = $('<input type="text" class="tac-edit-input" autocomplete="off">').val(current);
+        $input = $('<input type="text" class="tac-edit-input" autocomplete="new-password">').val(current);
     } else if (type === 'longtext') {
         // Unique id so CKEditor.replace() can target the textarea after it's inserted in the DOM.
         var taId = 'tac-longtext-' + Math.random().toString(36).slice(2, 8);
-        $input = $('<textarea class="tac-edit-textarea" rows="6" autocomplete="off">').attr('id', taId).val(current);
+        $input = $('<textarea class="tac-edit-textarea" rows="6" autocomplete="new-password">').attr('id', taId).val(current);
         $wrap.data('tac-editor-id', taId);
     } else if (type === 'number') {
-        $input = $('<input type="number" min="0" max="100" step="1" class="tac-edit-input tac-edit-input--narrow" autocomplete="off">').val(current);
+        $input = $('<input type="number" min="0" max="100" step="1" class="tac-edit-input tac-edit-input--narrow" autocomplete="new-password">').val(current);
     } else if (type === 'date') {
         // Render YYYY-MM-DD for the native picker. Source value may be a timestamp.
         var dateValue = current;
