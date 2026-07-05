@@ -728,6 +728,7 @@ window.digiriskdolibarr.ticket.editExtrafieldInline = function(event) {
   var type = $span.data('type') || 'text';
   var rawValue = $span.data('raw');
   if (typeof rawValue === 'undefined') rawValue = '';
+  var tabIdx = $span.data('tabindex') || '';
   
   var $input;
   if (type === 'textarea') {
@@ -752,6 +753,7 @@ window.digiriskdolibarr.ticket.editExtrafieldInline = function(event) {
   if (type !== 'select') {
     $input.val(rawValue);
   }
+  if (tabIdx) { $input.attr('tabindex', tabIdx); }
   $span.hide().after($input);
   $input.trigger('focus');
 
