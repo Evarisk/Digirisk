@@ -5283,6 +5283,243 @@ textarea.action-textarea:not(:last-child) {
   background: rgba(224, 83, 83, 0.08);
 }
 
+.digirisk-ticket-card .fichecenter {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 12px;
+  align-items: flex-start;
+  margin-top: 8px;
+}
+.digirisk-ticket-card .fichecenter > .fichehalfleft,
+.digirisk-ticket-card .fichecenter > .fichehalfright {
+  float: none;
+  width: auto;
+  flex: 1 1 380px;
+  min-width: 0;
+}
+.digirisk-ticket-card .underbanner {
+  display: none;
+}
+.digirisk-ticket-card table.tableforfield {
+  background: #fff;
+  border: 1px solid #e5e7eb;
+  border-radius: 12px;
+  box-shadow: 0 1px 3px rgba(17, 24, 39, 0.06), 0 1px 2px rgba(17, 24, 39, 0.04);
+  border-collapse: separate;
+  border-spacing: 0;
+  margin: 0 0 10px 0;
+  transition: box-shadow 0.18s ease;
+}
+.digirisk-ticket-card table.tableforfield:hover {
+  box-shadow: 0 6px 18px rgba(17, 24, 39, 0.1);
+}
+.digirisk-ticket-card table.tableforfield tr.liste_titre > td {
+  background: #f6f8fb;
+  border-top-left-radius: 12px;
+  border-top-right-radius: 12px;
+  border-bottom: 1px solid #e5e7eb;
+  padding: 0;
+  vertical-align: middle;
+}
+.digirisk-ticket-card table.tableforfield tr.liste_titre > td > .dtc-head {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 7px 12px;
+  font-weight: 700;
+  font-size: 0.92em;
+  letter-spacing: 0.01em;
+  color: #111827;
+}
+.digirisk-ticket-card table.tableforfield tr.liste_titre > td > .dtc-head img {
+  vertical-align: middle;
+}
+.digirisk-ticket-card table.tableforfield tr.liste_titre > td > .dtc-head img.pictoModule {
+  height: 20px;
+  width: auto;
+}
+.digirisk-ticket-card table.tableforfield tr.liste_titre > td > .dtc-head .dtc-head-edit {
+  margin-left: auto;
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  font-weight: 400;
+  flex: 0 0 auto;
+}
+.digirisk-ticket-card table.tableforfield tr.liste_titre > td > .dtc-head .dtc-head-label {
+  flex: 0 0 auto;
+}
+.digirisk-ticket-card table.tableforfield tr.liste_titre > td > .dtc-head .dtc-subject {
+  flex: 1 1 auto;
+  min-width: 0;
+  font-weight: 400;
+}
+.digirisk-ticket-card table.tableforfield tr.liste_titre > td > .dtc-head .dtc-subject-value {
+  cursor: text;
+  padding: 1px 5px;
+  border-radius: 5px;
+  transition: background 0.15s ease;
+}
+.digirisk-ticket-card table.tableforfield tr.liste_titre > td > .dtc-head .dtc-subject:hover .dtc-subject-value {
+  background: rgba(43, 108, 176, 0.1);
+}
+.digirisk-ticket-card table.tableforfield tr.liste_titre > td > .dtc-head .dtc-subject-input {
+  width: 100%;
+  box-sizing: border-box;
+  font: inherit;
+  font-weight: 400;
+  padding: 3px 7px;
+  border: 1px solid #2b6cb0;
+  border-radius: 6px;
+  outline: none;
+}
+.digirisk-ticket-card table.tableforfield > tbody > tr > td {
+  padding: 5px 12px;
+  border-top: 1px solid #f1f3f5;
+  vertical-align: middle;
+  line-height: 1.35;
+}
+.digirisk-ticket-card table.tableforfield > tbody > tr.liste_titre + tr > td,
+.digirisk-ticket-card table.tableforfield > tbody > tr:first-child > td {
+  border-top: 0;
+}
+.digirisk-ticket-card table.tableforfield td.titlefield,
+.digirisk-ticket-card table.tableforfield td.titlefieldmiddle {
+  color: #6b7280;
+  font-weight: 500;
+}
+.digirisk-ticket-card table.tableforfield table.nobordernopadding,
+.digirisk-ticket-card table.tableforfield table.nobordernopadding > tbody > tr > td {
+  background: none;
+  border: 0;
+  padding: 0;
+  box-shadow: none;
+}
+.digirisk-ticket-card table.tableforfield table.nobordernopadding td.none,
+.digirisk-ticket-card table.tableforfield table.nobordernopadding td.nowrap {
+  color: #6b7280;
+  font-weight: 500;
+}
+.digirisk-ticket-card a.editfielda {
+  color: #6b7280;
+  opacity: 0.5;
+  transition: opacity 0.15s ease, color 0.15s ease;
+}
+.digirisk-ticket-card a.editfielda:hover {
+  opacity: 1;
+  color: #2b6cb0;
+}
+.digirisk-ticket-card table.noborder {
+  background: #fff;
+  border: 1px solid #e5e7eb;
+  border-radius: 12px;
+  box-shadow: 0 1px 3px rgba(17, 24, 39, 0.06), 0 1px 2px rgba(17, 24, 39, 0.04);
+  border-collapse: separate;
+  border-spacing: 0;
+  overflow: hidden;
+  margin: 0 0 18px 0;
+}
+.digirisk-ticket-card table.noborder tr.liste_titre th {
+  background: #f6f8fb;
+  border-bottom: 1px solid #e5e7eb;
+  padding: 6px 10px;
+  font-size: 0.78em;
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+  color: #6b7280;
+}
+.digirisk-ticket-card table.noborder td {
+  padding: 5px 10px;
+  border-top: 1px solid #f1f3f5;
+}
+.digirisk-ticket-card table.noborder tr:hover td {
+  background: #fafbfc;
+}
+.digirisk-ticket-card .kanban-tag-dropdown {
+  max-height: 240px;
+  overflow-y: auto;
+}
+.digirisk-ticket-card .dtc-assignee-editor {
+  display: inline-block;
+}
+.digirisk-ticket-card .dtc-editable {
+  cursor: pointer;
+  border-radius: 5px;
+  padding: 1px 5px;
+  transition: background 0.15s ease;
+}
+.digirisk-ticket-card .dtc-editable:hover {
+  background: rgba(43, 108, 176, 0.1);
+}
+.digirisk-ticket-card .dtc-progress-value {
+  display: inline-block;
+  min-width: 1.4em;
+  text-align: center;
+}
+.digirisk-ticket-card .dtc-progress-value[contenteditable]:focus {
+  outline: none;
+  background: #fff;
+  box-shadow: 0 0 0 2px rgba(43, 108, 176, 0.35);
+  border-radius: 5px;
+}
+.digirisk-ticket-card .dtc-inline-editable {
+  cursor: pointer;
+  border-bottom: 1px dashed #d1d5db;
+  display: inline-block;
+  transition: border-color 0.15s ease, color 0.15s ease;
+  padding-bottom: 1px;
+  min-width: 20px;
+}
+.digirisk-ticket-card .dtc-inline-editable:hover {
+  border-bottom-color: #2b6cb0;
+}
+.digirisk-ticket-card .dtc-inline-editable.is-empty {
+  font-style: italic;
+  color: #9ca3af;
+}
+.digirisk-ticket-card .edit-message-on-click {
+  border: 1px dashed transparent;
+  padding: 4px;
+  border-radius: 4px;
+  transition: border-color 0.15s ease, background 0.15s ease;
+}
+.digirisk-ticket-card .edit-message-on-click:hover {
+  border-color: #2b6cb0;
+  background: rgba(43, 108, 176, 0.05);
+}
+.digirisk-ticket-card .navBarForStatus .butAction.butStatus {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  margin: 3px 0 3px 6px;
+  padding: 5px 12px;
+  border: 1px solid #e5e7eb;
+  border-radius: 999px;
+  background: #fff;
+  color: #111827;
+  font-weight: 600;
+  box-shadow: 0 1px 3px rgba(17, 24, 39, 0.06), 0 1px 2px rgba(17, 24, 39, 0.04);
+  text-transform: none;
+  transition: transform 0.15s ease, box-shadow 0.15s ease, background 0.15s ease, color 0.15s ease, border-color 0.15s ease;
+}
+.digirisk-ticket-card .navBarForStatus .butAction.butStatus:hover {
+  transform: translateY(-1px);
+  box-shadow: 0 6px 18px rgba(17, 24, 39, 0.1);
+  background: #2b6cb0;
+  color: #fff;
+  border-color: #2b6cb0;
+}
+.digirisk-ticket-card ul.nomargin {
+  margin: 0;
+  padding-left: 18px;
+}
+
+@media (max-width: 900px) {
+  .digirisk-ticket-card .fichecenter > .fichehalfleft,
+  .digirisk-ticket-card .fichecenter > .fichehalfright {
+    flex: 1 1 100%;
+  }
+}
 /** Risk page banner: cotation counts replacing the native status (moreHtmlStatus hook) */
 .banner-risk-badges {
   display: flex;
