@@ -430,11 +430,18 @@ $drPicto = img_picto('', 'digiriskdolibarr_color@digiriskdolibarr', 'class="pict
 
 // Fetch all GP/UT options for select
 $serviceOptions = ['' => '']; // Empty option
-$sql = "SELECT rowid as id, ref, label FROM " . MAIN_DB_PREFIX . "digiriskdolibarr_digiriskelement WHERE status > 0 AND entity IN (" . getEntity('digiriskdolibarr') . ") ORDER BY ref ASC";
-$resql = $db->query($sql);
-if ($resql) {
-    while ($obj = $db->fetch_object($resql)) {
-        $serviceOptions[$obj->id] = $obj->ref . ' - ' . $obj->label;
+if (file_exists(DOL_DOCUMENT_ROOT . '/custom/digiriskdolibarr/class/digiriskelement.class.php')) {
+    require_once DOL_DOCUMENT_ROOT . '/custom/digiriskdolibarr/class/digiriskelement.class.php';
+    $digiriskElementTmp = new DigiriskElement($db);
+    $elementList = $digiriskElementTmp->getActiveDigiriskElements();
+    if (is_array($elementList)) {
+        // Sort elements by ref alphabetically to mimic the ORDER BY
+        usort($elementList, function($a, $b) {
+            return strcasecmp($a->ref, $b->ref);
+        });
+        foreach ($elementList as $el) {
+            $serviceOptions[$el->id] = $el->ref . ' - ' . $el->label;
+        }
     }
 }
 
