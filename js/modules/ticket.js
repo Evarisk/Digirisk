@@ -731,9 +731,9 @@ window.digiriskdolibarr.ticket.editExtrafieldInline = function(event) {
   
   var $input;
   if (type === 'textarea') {
-    $input = $('<textarea class="dtc-extrafield-input" style="width:100%; min-height:80px;"></textarea>');
+    $input = $('<textarea class="dtc-extrafield-input" style="width:100%; min-height:80px; outline:none; transition: border-color 0.2s;" autocomplete="off"></textarea>');
   } else {
-    $input = $('<input type="' + type + '" class="dtc-extrafield-input" style="width:100%;">');
+    $input = $('<input type="' + type + '" class="dtc-extrafield-input" style="width:100%; outline:none; transition: border-color 0.2s;" autocomplete="off">');
   }
   
   $input.val(rawValue);
@@ -754,6 +754,9 @@ window.digiriskdolibarr.ticket.editExtrafieldInline = function(event) {
     var sep = window.saturne.toolbox.getQuerySeparator(document.URL);
     
     $input.prop('disabled', true);
+    // Visual feedback: green border during save
+    $input.css({'border-color': '#10b981', 'box-shadow': '0 0 0 1px #10b981'});
+    
     $.ajax({
       url: document.URL + sep + 'action=setextrafield_ajax&token=' + token,
       type: 'POST',
@@ -768,15 +771,25 @@ window.digiriskdolibarr.ticket.editExtrafieldInline = function(event) {
           $span.text(newValue);
         }
         if (newValue === '') {
-          $span.html('<span class="opacitymedium">Non défini</span>');
+          var placeholder = $span.data('placeholder') || 'Non défini';
+          $span.html(placeholder).addClass('is-empty');
+        } else {
+          $span.removeClass('is-empty');
         }
         $span.show();
         $span.data('editing', false);
+
+        // Flash green on the span after saving
+        $span.css({'border-bottom-color': '#10b981', 'color': '#10b981'});
+        setTimeout(function() {
+            $span.css({'border-bottom-color': '', 'color': ''});
+        }, 1200);
       },
       error: function() {
         $input.remove();
         $span.show();
         $span.data('editing', false);
+        $.jnotify('Erreur lors de la sauvegarde', 'error');
       }
     });
   };
