@@ -1304,6 +1304,12 @@ window.digiriskdolibarr.ticketActionCard.onFieldClick = function(event) {
     };
 
     if (type === 'longtext') {
+        // Inline Save / Cancel buttons — appear directly under the editor (no floating overlay)
+        var $bar = $('<div class="tac-edit-bar" style="margin-top:4px;display:flex;gap:6px;">'
+            + '<button type="button" class="tac-edit-bar__save button smallpaddingimp">Enregistrer</button>'
+            + '<button type="button" class="tac-edit-bar__cancel button button-cancel smallpaddingimp">Annuler</button>'
+            + '</div>');
+
         // Init CKEditor on the textarea after it's in the DOM.
         if (window.CKEDITOR && $input.attr('id')) {
             try {
@@ -1317,19 +1323,17 @@ window.digiriskdolibarr.ticketActionCard.onFieldClick = function(event) {
                     height: 200,
                     width: '100%'
                 });
-                // Auto-save on CKEditor blur (click outside) — no floating bar needed.
-                window.CKEDITOR.instances[$input.attr('id')].on('blur', function() {
-                    commit();
-                });
             } catch (e) {
                 console.warn('CKEditor init failed, falling back to plain textarea:', e);
-                // Fallback: plain textarea saves on blur
-                $input.on('blur', commit);
             }
-        } else {
-            // No CKEditor: save on blur
-            $input.on('blur', commit);
         }
+
+        // Insert the bar after the textarea/editor
+        $input.after($bar);
+        $bar.find('.tac-edit-bar__save').on('click', function(e) { e.stopPropagation(); commit(); });
+        $bar.find('.tac-edit-bar__cancel').on('click', function(e) { e.stopPropagation(); cancel(); });
+        $wrap.data('tac-edit-bar', $bar);
+
         // Escape to cancel
         $(document).on('keydown.tac-longtext-' + ($input.attr('id') || ''), function(e) {
             if (e.key === 'Escape') { cancel(); }
