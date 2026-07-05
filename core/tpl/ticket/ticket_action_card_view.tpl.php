@@ -883,7 +883,7 @@ if (!in_array($severityKey, ['low', 'normal', 'high', 'blocking'], true)) {
                 <h3 class="tac-section__title"><i class="fas fa-envelope-open-text"></i> <?php print $langs->trans('InitialMessage'); ?></h3>
                 <?php $sectionControls('initial_message'); ?>
                 <div class="tac-grid tac-grid--single">
-                    <?php $renderField('message', 'longtext', 'InitialMessage',
+                    <?php $renderField('message', 'readonly', 'InitialMessage',
                         $object->message ?? '',
                         !empty($object->message) ? dolPrintHTML($object->message) : ''); ?>
                 </div>
