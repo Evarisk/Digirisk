@@ -93,6 +93,18 @@ if ($action === 'setsubject_ajax' && $permissionToWrite) {
     exit;
 }
 
+// AJAX: inline (on-the-fly) extrafield save
+if ($action === 'setextrafield_ajax' && $permissionToWrite) {
+    $field = GETPOST('field', 'alpha');
+    $value = GETPOST('value', 'none');
+    $object->fetch($id);
+    $object->array_options['options_' . $field] = $value;
+    $res = $object->insertExtraFields();
+    header('Content-Type: application/json');
+    print json_encode(['success' => ($res > 0), 'field' => $field, 'value' => $value]);
+    exit;
+}
+
 // AJAX: inline (on-the-fly) assignee save — returns getNomUrl so the display stays a proper user link
 if ($action === 'setassignee_ajax' && $permissionToWrite) {
     $newUserId = GETPOSTINT('user_id');
@@ -352,22 +364,20 @@ print '<input type="hidden" name="id" value="' . (int) $object->id . '">';
 print '<table class="border centpercent tableforfield"><tbody>';
 print '<tr class="liste_titre trforfield"><td colspan="2"><div class="dtc-head">';
 print $langs->trans('TicketInitialMessage');
-print '<span class="dtc-head-edit">';
-if ($permissionToWrite && $action === 'editmessage') {
-    print '<input type="submit" class="button button-edit smallpaddingimp" value="' . $langs->trans('Modify') . '"> ';
-    print '<input type="submit" class="button button-cancel smallpaddingimp" name="cancel" value="' . $langs->trans('Cancel') . '">';
-} elseif ($permissionToWrite) {
-    print '<a class="editfielda" href="' . dol_escape_htmltag($url_page_current . '?id=' . $object->id . '&action=editmessage&token=' . newToken()) . '">' . img_edit($langs->trans('Modify'), 0) . '</a>';
-}
-print '</span>';
 print '</div></td></tr>';
 print '<tr><td colspan="2">';
 if ($action === 'editmessage' && $permissionToWrite) {
     require_once DOL_DOCUMENT_ROOT . '/core/class/doleditor.class.php';
     $doleditor = new DolEditor('message', $object->message, '', 120, 'dolibarr_details', 'In', false, true, getDolGlobalString('FCKEDITOR_ENABLE_TICKET'), ROWS_9, '95%');
     $doleditor->Create();
+    print '<br>';
+    print '<input type="submit" class="button button-edit smallpaddingimp" value="' . $langs->trans('Modify') . '"> ';
+    print '<input type="submit" class="button button-cancel smallpaddingimp" name="cancel" value="' . $langs->trans('Cancel') . '">';
 } else {
+    $msgClass = $permissionToWrite ? ' class="dtc-message-value wpeo-tooltip-event" title="' . dol_escape_htmltag($langs->trans('Modify')) . '" style="cursor:pointer;" data-edit-url="' . dol_escape_htmltag($url_page_current . '?id=' . $object->id . '&action=editmessage&token=' . newToken()) . '"' : '';
+    print '<div' . $msgClass . '>';
     print !empty($object->message) ? dol_htmlentitiesbr($object->message) : '<span class="opacitymedium">' . $langs->trans('None') . '</span>';
+    print '</div>';
 }
 print '</td></tr>';
 print '</tbody></table>';
@@ -405,25 +415,36 @@ $regWarn = static function (string $value) use ($langs): string {
     return $value === '' ? img_warning($langs->trans('None')) . ' ' : '';
 };
 
+// Helper to render an inline editable field
+$renderInlineEditable = static function (string $field, string $type, string $val, string $rawVal = '') use ($langs, $permissionToWrite, $url_page_current, $object): string {
+    if (!$permissionToWrite) {
+        return $val === '' ? '<span class="opacitymedium">' . $langs->trans('None') . '</span>' : $val;
+    }
+    $displayVal = $val === '' ? '<span class="opacitymedium">' . $langs->trans('None') . '</span>' : $val;
+    $rawValAttr = ' data-raw="' . dol_escape_htmltag($rawVal === '' ? $val : $rawVal) . '"';
+    return '<span class="dtc-extrafield-value wpeo-tooltip-event" title="' . dol_escape_htmltag($langs->trans('Modify')) . '" style="cursor:pointer;" data-field="' . dol_escape_htmltag($field) . '" data-type="' . dol_escape_htmltag($type) . '" data-ticket-id="' . (int) $object->id . '" data-url="' . dol_escape_htmltag($url_page_current) . '"' . $rawValAttr . '>' . $displayVal . '</span>';
+};
+
 print '<table class="border centpercent tableforfield"><tbody>';
 print '<tr class="liste_titre trforfield"><td colspan="4"><div class="dtc-head">' . img_picto('', 'digiriskdolibarr_color@digiriskdolibarr', 'class="pictoModule"') . ' ' . $langs->trans('TicketActionCardRegistresSection') . '</div></td></tr>';
 
 print '<tr>';
-print '<td class="titlefieldmiddle">' . $regWarn($regLastname) . $langs->trans('LastName') . '</td><td>' . dol_escape_htmltag($regLastname) . '</td>';
-print '<td class="titlefieldmiddle">' . $regWarn($regFirstname) . $langs->trans('FirstName') . '</td><td>' . dol_escape_htmltag($regFirstname) . '</td>';
+print '<td class="titlefieldmiddle">' . $regWarn($regLastname) . $langs->trans('LastName') . '</td><td>' . $renderInlineEditable('digiriskdolibarr_ticket_lastname', 'text', dol_escape_htmltag($regLastname)) . '</td>';
+print '<td class="titlefieldmiddle">' . $regWarn($regFirstname) . $langs->trans('FirstName') . '</td><td>' . $renderInlineEditable('digiriskdolibarr_ticket_firstname', 'text', dol_escape_htmltag($regFirstname)) . '</td>';
 print '</tr>';
 
 print '<tr>';
-print '<td class="titlefieldmiddle">' . $regWarn($regPhone) . $langs->trans('Phone') . '</td><td>' . dol_print_phone($regPhone) . '</td>';
-print '<td class="titlefieldmiddle">' . $regWarn($regDate) . $langs->trans('DeclarationDate') . '</td><td>' . $regDate . '</td>';
+print '<td class="titlefieldmiddle">' . $regWarn($regPhone) . $langs->trans('Phone') . '</td><td>' . $renderInlineEditable('digiriskdolibarr_ticket_phone', 'text', dol_print_phone($regPhone), $regPhone) . '</td>';
+print '<td class="titlefieldmiddle">' . $regWarn($regDate) . $langs->trans('DeclarationDate') . '</td><td>' . $renderInlineEditable('digiriskdolibarr_ticket_date', 'date', $regDate, (string)$regDateRaw) . '</td>';
 print '</tr>';
 
 print '<tr>';
-print '<td class="titlefieldmiddle">' . $regWarn($regService) . $langs->trans('GP/UT') . '</td><td>' . $regService . '</td>';
-print '<td class="titlefieldmiddle">' . $regWarn($regLocation) . $langs->trans('Location') . '</td><td>' . dol_escape_htmltag($regLocation) . '</td>';
+// Note: GP/UT (Service) remains read-only for now because it is a complex chkbxlst linking to DigiriskElement
+print '<td class="titlefieldmiddle">' . $regWarn($regService) . $langs->trans('GP/UT') . '</td><td>' . ($regService !== '' ? $regService : '<span class="opacitymedium">' . $langs->trans('None') . '</span>') . '</td>';
+print '<td class="titlefieldmiddle">' . $regWarn($regLocation) . $langs->trans('Location') . '</td><td>' . $renderInlineEditable('digiriskdolibarr_ticket_location', 'text', dol_escape_htmltag($regLocation)) . '</td>';
 print '</tr>';
 
-print '<tr><td class="titlefieldmiddle">' . $langs->trans('ConditionMessage') . '</td><td colspan="3">' . ($regCondition !== '' ? dolPrintHTML($regCondition) : '<span class="opacitymedium">' . $langs->trans('None') . '</span>') . '</td></tr>';
+print '<tr><td class="titlefieldmiddle">' . $langs->trans('ConditionMessage') . '</td><td colspan="3">' . $renderInlineEditable('digiriskdolibarr_condition_message', 'textarea', ($regCondition !== '' ? dolPrintHTML($regCondition) : ''), $regCondition) . '</td></tr>';
 
 // "Registre signé": disabled indicator. TODO (#4443 step 2): reflect real SaturneSignature state
 // and add the "Conditions à accepter pour la signature" (ValidateText) + category-scoped
