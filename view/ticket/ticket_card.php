@@ -456,8 +456,8 @@ print '<table class="border centpercent tableforfield"><tbody>';
 print '<tr class="liste_titre trforfield"><td colspan="4"><div class="dtc-head">' . img_picto('', 'digiriskdolibarr_color@digiriskdolibarr', 'class="pictoModule"') . ' ' . $langs->trans('TicketActionCardRegistresSection') . '</div></td></tr>';
 
 print '<tr>';
-print '<td class="titlefieldmiddle" style="width: 1%; white-space: nowrap;">' . $drPicto . $langs->trans('LastName') . '</td><td>' . $renderInlineEditable('digiriskdolibarr_ticket_lastname', 'text', dol_escape_htmltag($regLastname), $langs->trans('LastName')) . '</td>';
-print '<td class="titlefieldmiddle" style="width: 1%; white-space: nowrap;">' . $drPicto . $langs->trans('FirstName') . '</td><td>' . $renderInlineEditable('digiriskdolibarr_ticket_firstname', 'text', dol_escape_htmltag($regFirstname), $langs->trans('FirstName')) . '</td>';
+print '<td class="titlefieldmiddle" style="width: 1%; white-space: nowrap;">' . $drPicto . $langs->trans('LastName') . '</td><td style="width: 49%;">' . $renderInlineEditable('digiriskdolibarr_ticket_lastname', 'text', dol_escape_htmltag($regLastname), $langs->trans('LastName')) . '</td>';
+print '<td class="titlefieldmiddle" style="width: 1%; white-space: nowrap;">' . $drPicto . $langs->trans('FirstName') . '</td><td style="width: 49%;">' . $renderInlineEditable('digiriskdolibarr_ticket_firstname', 'text', dol_escape_htmltag($regFirstname), $langs->trans('FirstName')) . '</td>';
 print '</tr>';
 
 print '<tr>';
