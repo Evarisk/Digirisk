@@ -101,7 +101,7 @@ if ($action === 'setextrafield_ajax' && $permissionToWrite) {
     $object->array_options['options_' . $field] = $value;
     $res = $object->insertExtraFields();
     header('Content-Type: application/json');
-    print json_encode(['success' => ($res > 0), 'field' => $field, 'value' => $value]);
+    print json_encode(['success' => ($res >= 0), 'field' => $field, 'value' => $value]);
     exit;
 }
 
