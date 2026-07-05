@@ -416,19 +416,33 @@ $regWarn = static function (string $value) use ($langs): string {
 };
 
 // Helper to render an inline editable field
-$renderInlineEditable = static function (string $field, string $type, string $val, string $placeholder, string $rawVal = '') use ($langs, $permissionToWrite, $url_page_current, $object): string {
+$renderInlineEditable = static function (string $field, string $type, string $val, string $placeholder, string $rawVal = '', array $options = []) use ($langs, $permissionToWrite, $url_page_current, $object): string {
     if (!$permissionToWrite) {
         return $val === '' ? '<span class="opacitymedium">' . dol_escape_htmltag($placeholder) . '</span>' : $val;
     }
     $isEmpty = ($val === '');
     $displayVal = $isEmpty ? dol_escape_htmltag($placeholder) : $val;
-    $rawValAttr = ' data-raw="' . dol_escape_htmltag($rawVal === '' ? $val : $rawVal) . '"';
+    $rawValAttr = ' data-raw="' . dol_escape_htmltag($rawVal === '' && $type !== 'select' ? $val : $rawVal) . '"';
+    $optionsAttr = !empty($options) ? ' data-options="' . dol_escape_htmltag(json_encode($options)) . '"' : '';
     $classes = 'dtc-extrafield-value dtc-inline-editable' . ($isEmpty ? ' is-empty' : '');
     
-    return '<span class="' . $classes . '" title="' . dol_escape_htmltag($langs->trans('Modify')) . '" data-placeholder="' . dol_escape_htmltag($placeholder) . '" data-field="' . dol_escape_htmltag($field) . '" data-type="' . dol_escape_htmltag($type) . '" data-ticket-id="' . (int) $object->id . '" data-url="' . dol_escape_htmltag($url_page_current) . '"' . $rawValAttr . '>' . $displayVal . '</span>';
+    return '<span class="' . $classes . '" title="' . dol_escape_htmltag($langs->trans('Modify')) . '" data-placeholder="' . dol_escape_htmltag($placeholder) . '" data-field="' . dol_escape_htmltag($field) . '" data-type="' . dol_escape_htmltag($type) . '" data-ticket-id="' . (int) $object->id . '" data-url="' . dol_escape_htmltag($url_page_current) . '"' . $rawValAttr . $optionsAttr . '>' . $displayVal . '</span>';
 };
 
 $drPicto = img_picto('', 'digiriskdolibarr_color@digiriskdolibarr', 'class="pictoModule" style="margin-right: 5px;"');
+
+// Fetch all GP/UT options for select
+$serviceOptions = ['' => '']; // Empty option
+if (class_exists('DigiriskElement')) {
+    $digiriskElementTmp = new DigiriskElement($db);
+    global $conf;
+    $elementList = $digiriskElementTmp->fetchAll('', '', 0, 0, ['customsql' => 'status > 0 AND entity = ' . $conf->entity]);
+    if (is_array($elementList)) {
+        foreach ($elementList as $el) {
+            $serviceOptions[$el->id] = $el->ref . ' - ' . $el->label;
+        }
+    }
+}
 
 print '<table class="border centpercent tableforfield"><tbody>';
 print '<tr class="liste_titre trforfield"><td colspan="4"><div class="dtc-head">' . img_picto('', 'digiriskdolibarr_color@digiriskdolibarr', 'class="pictoModule"') . ' ' . $langs->trans('TicketActionCardRegistresSection') . '</div></td></tr>';
@@ -444,8 +458,7 @@ print '<td class="titlefieldmiddle">' . $drPicto . $langs->trans('DeclarationDat
 print '</tr>';
 
 print '<tr>';
-// Note: GP/UT (Service) remains read-only for now because it is a complex chkbxlst linking to DigiriskElement
-print '<td class="titlefieldmiddle">' . $drPicto . $langs->trans('GP/UT') . '</td><td>' . ($regService !== '' ? $regService : '<span class="opacitymedium">' . $langs->trans('None') . '</span>') . ' ' . $regWarn($regService) . '</td>';
+print '<td class="titlefieldmiddle">' . $drPicto . $langs->trans('GP/UT') . '</td><td>' . $renderInlineEditable('digiriskdolibarr_ticket_service', 'select', $regService, $langs->trans('None'), (string)$firstServiceId, $serviceOptions) . ' ' . $regWarn((string)$firstServiceId > 0 ? '1' : '') . '</td>';
 print '<td class="titlefieldmiddle">' . $drPicto . $langs->trans('Location') . '</td><td>' . $renderInlineEditable('digiriskdolibarr_ticket_location', 'text', dol_escape_htmltag($regLocation), $langs->trans('Location')) . ' ' . $regWarn($regLocation) . '</td>';
 print '</tr>';
 

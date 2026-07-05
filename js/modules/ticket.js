@@ -732,11 +732,26 @@ window.digiriskdolibarr.ticket.editExtrafieldInline = function(event) {
   var $input;
   if (type === 'textarea') {
     $input = $('<textarea class="dtc-extrafield-input" style="width:100%; min-height:80px; outline:none; transition: border-color 0.2s;" autocomplete="off"></textarea>');
+  } else if (type === 'select') {
+    $input = $('<select class="dtc-extrafield-input" style="width:100%; outline:none; transition: border-color 0.2s;"></select>');
+    var optionsObj = $span.data('options');
+    if (typeof optionsObj === 'string') {
+      try { optionsObj = JSON.parse(optionsObj); } catch(e) {}
+    }
+    if (typeof optionsObj === 'object' && optionsObj !== null) {
+      $.each(optionsObj, function(val, text) {
+        var $opt = $('<option></option>').attr('value', val).text(text);
+        if (val == rawValue) $opt.prop('selected', true);
+        $input.append($opt);
+      });
+    }
   } else {
     $input = $('<input type="' + type + '" class="dtc-extrafield-input" style="width:100%; outline:none; transition: border-color 0.2s;" autocomplete="off">');
   }
   
-  $input.val(rawValue);
+  if (type !== 'select') {
+    $input.val(rawValue);
+  }
   $span.hide().after($input);
   $input.trigger('focus');
 
@@ -765,11 +780,18 @@ window.digiriskdolibarr.ticket.editExtrafieldInline = function(event) {
       success: function(resp) {
         $input.remove();
         $span.data('raw', newValue);
-        if (type === 'textarea') {
-          $span.html(newValue.replace(/\n/g, '<br>'));
-        } else {
-          $span.text(newValue);
+        
+        var displayValue = newValue;
+        if (type === 'select') {
+          displayValue = $input.find('option[value="' + newValue + '"]').text() || newValue;
         }
+
+        if (type === 'textarea') {
+          $span.html(displayValue.replace(/\n/g, '<br>'));
+        } else {
+          $span.text(displayValue);
+        }
+        
         if (newValue === '') {
           var placeholder = $span.data('placeholder') || 'Non défini';
           $span.html(placeholder).addClass('is-empty');
@@ -794,13 +816,17 @@ window.digiriskdolibarr.ticket.editExtrafieldInline = function(event) {
     });
   };
 
-  $input.on('blur', saveFunc);
-  if (type !== 'textarea') {
-    $input.on('keydown', function(e) {
-      if (e.key === 'Enter') {
-        e.preventDefault();
-        $input.trigger('blur');
-      }
-    });
+  if (type === 'select') {
+    $input.on('change blur', saveFunc);
+  } else {
+    $input.on('blur', saveFunc);
+    if (type !== 'textarea') {
+      $input.on('keydown', function(e) {
+        if (e.key === 'Enter') {
+          e.preventDefault();
+          $input.trigger('blur');
+        }
+      });
+    }
   }
 };
