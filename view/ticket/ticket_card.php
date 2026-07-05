@@ -402,11 +402,13 @@ $regCondition = (string) ($extra['digiriskdolibarr_condition_message'] ?? '');
 $regServiceRaw  = $extra['digiriskdolibarr_ticket_service'] ?? '';
 $firstServiceId = (int) (is_string($regServiceRaw) ? strtok($regServiceRaw, ',') : $regServiceRaw);
 $regService     = '';
-if ($firstServiceId > 0 && file_exists(DOL_DOCUMENT_ROOT . '/custom/digiriskdolibarr/class/digiriskelement.class.php')) {
+if (file_exists(DOL_DOCUMENT_ROOT . '/custom/digiriskdolibarr/class/digiriskelement.class.php')) {
     require_once DOL_DOCUMENT_ROOT . '/custom/digiriskdolibarr/class/digiriskelement.class.php';
-    $digiriskElement = new DigiriskElement($db);
-    if ($digiriskElement->fetch($firstServiceId) > 0) {
-        $regService = $digiriskElement->getNomUrl(1, '', 0, '', -1, 1);
+    if ($firstServiceId > 0) {
+        $digiriskElement = new DigiriskElement($db);
+        if ($digiriskElement->fetch($firstServiceId) > 0) {
+            $regService = $digiriskElement->getNomUrl(1, '', 0, '', -1, 1);
+        }
     }
 }
 
