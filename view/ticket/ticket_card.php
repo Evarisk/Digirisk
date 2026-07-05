@@ -451,13 +451,20 @@ $serviceSelectHtml = '';
 if (!$permissionToWrite) {
     $serviceSelectHtml = $regService !== '' ? $regService : '<span class="opacitymedium">' . $langs->trans('None') . '</span>';
 } else {
-    $serviceSelectHtml = '<select class="dtc-direct-select flat select2 minwidth300" data-field="digiriskdolibarr_ticket_service" style="max-width: 100%;">';
+    $serviceSelectHtml = '<select class="dtc-direct-select flat select2" data-field="digiriskdolibarr_ticket_service" style="width: 100%; max-width: 100%;">';
     foreach ($serviceOptions as $optVal => $optText) {
         $selected = ((string)$optVal === (string)$firstServiceId) ? ' selected="selected"' : '';
         // optText is already escaped and contains HTML (&nbsp;), so we don't escape it here
         $serviceSelectHtml .= '<option value="' . dol_escape_htmltag((string)$optVal) . '"' . $selected . '>' . $optText . '</option>';
     }
     $serviceSelectHtml .= '</select>';
+    $serviceSelectHtml .= '<script>
+        $(document).ready(function() {
+            if ($.fn.select2) {
+                $(".dtc-direct-select").select2({ width: "100%" });
+            }
+        });
+    </script>';
 }
 
 print '<table class="border centpercent tableforfield"><tbody>';
