@@ -1215,14 +1215,14 @@ window.digiriskdolibarr.ticketActionCard.onFieldClick = function(event) {
 
     var $input;
     if (type === 'text') {
-        $input = $('<input type="text" class="tac-edit-input">').val(current);
+        $input = $('<input type="text" class="tac-edit-input" autocomplete="off">').val(current);
     } else if (type === 'longtext') {
         // Unique id so CKEditor.replace() can target the textarea after it's inserted in the DOM.
         var taId = 'tac-longtext-' + Math.random().toString(36).slice(2, 8);
-        $input = $('<textarea class="tac-edit-textarea" rows="6">').attr('id', taId).val(current);
+        $input = $('<textarea class="tac-edit-textarea" rows="6" autocomplete="off">').attr('id', taId).val(current);
         $wrap.data('tac-editor-id', taId);
     } else if (type === 'number') {
-        $input = $('<input type="number" min="0" max="100" step="1" class="tac-edit-input tac-edit-input--narrow">').val(current);
+        $input = $('<input type="number" min="0" max="100" step="1" class="tac-edit-input tac-edit-input--narrow" autocomplete="off">').val(current);
     } else if (type === 'date') {
         // Render YYYY-MM-DD for the native picker. Source value may be a timestamp.
         var dateValue = current;
@@ -1230,7 +1230,7 @@ window.digiriskdolibarr.ticketActionCard.onFieldClick = function(event) {
             var d = new Date(parseInt(current, 10) * 1000);
             dateValue = d.toISOString().substring(0, 10);
         }
-        $input = $('<input type="date" class="tac-edit-input">').val(dateValue);
+        $input = $('<input type="date" class="tac-edit-input" autocomplete="off">').val(dateValue);
     } else if (type === 'select') {
         var options = $wrap.data('edit-options') || [];
         // Long lists (or any server-searched field) get a searchable combo; short
