@@ -102,6 +102,13 @@ window.digiriskdolibarr.ticket.event = function() {
   $(document).on( 'blur',    '.digirisk-ticket-card .dtc-progress-value[contenteditable]', window.digiriskdolibarr.ticket.saveProgressInline);
   $(document).on( 'click',   '.edit-message-on-click', function() { window.location.href = $(this).data('edit-url'); });
   $(document).on( 'click',   '.digirisk-ticket-card .dtc-extrafield-value', window.digiriskdolibarr.ticket.editExtrafieldInline);
+  // Keyboard navigation: Enter/Space on a tabbable extrafield span triggers inline edit
+  $(document).on( 'keydown', '.digirisk-ticket-card .dtc-extrafield-value[tabindex]', function(e) {
+    if (e.key === 'Enter' || e.key === ' ' || e.keyCode === 13 || e.keyCode === 32) {
+      e.preventDefault();
+      $(this).trigger('click');
+    }
+  });
 
   $(document).on( 'change', '.param-table input, .param-table select, .param-table textarea', window.digiriskdolibarr.ticket.handleParamChange);
   // CKEDITOR is only loaded on pages with a rich-text editor. Guard the global

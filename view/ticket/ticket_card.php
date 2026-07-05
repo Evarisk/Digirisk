@@ -345,7 +345,7 @@ print '<div class="underbanner clearboth"></div>';
 $subjectRaw = (string) ($object->subject ?? '');
 print '<table class="border centpercent tableforfield"><tbody>';
 print '<tr class="liste_titre trforfield"><td colspan="2"><div class="dtc-head">';
-print '<span class="dtc-head-label">' . $langs->trans('TicketMessageTitle') . '</span>';
+print '<span class="dtc-head-label">' . $langs->trans('Subject') . '</span>';
 print '<span class="dtc-subject" data-value="' . dol_escape_htmltag($subjectRaw) . '">';
 if ($subjectRaw !== '') {
     print '<span class="dtc-subject-value">' . dolPrintLabel($subjectRaw) . '</span>';
@@ -420,12 +420,15 @@ $renderInlineEditable = static function (string $field, string $type, string $va
     $isEmpty = ($val === '');
     $displayVal = $isEmpty ? dol_escape_htmltag($placeholder) : $val;
     $rawValAttr = ' data-raw="' . dol_escape_htmltag($rawVal === '' && $type !== 'select' ? $val : $rawVal) . '"';
-    $tabindex  = isset($options['tabindex']) ? ' data-tabindex="' . (int)$options['tabindex'] . '"' : '';
-    unset($options['tabindex']);
+    $tabAttr = '';
+    if (isset($options['tabindex'])) {
+        $tabAttr = ' tabindex="' . (int)$options['tabindex'] . '"';
+        unset($options['tabindex']);
+    }
     $optionsAttr = !empty($options) ? ' data-options="' . dol_escape_htmltag(json_encode($options)) . '"' : '';
     $classes = 'dtc-extrafield-value dtc-inline-editable' . ($isEmpty ? ' is-empty' : '');
     
-    return '<span class="' . $classes . '" title="' . dol_escape_htmltag($langs->trans('Modify')) . '" data-placeholder="' . dol_escape_htmltag($placeholder) . '" data-field="' . dol_escape_htmltag($field) . '" data-type="' . dol_escape_htmltag($type) . '" data-ticket-id="' . (int) $object->id . '" data-url="' . dol_escape_htmltag($url_page_current) . '"' . $rawValAttr . $optionsAttr . $tabindex . '>' . $displayVal . '</span>';
+    return '<span class="' . $classes . '"' . $tabAttr . ' title="' . dol_escape_htmltag($langs->trans('Modify')) . '" data-placeholder="' . dol_escape_htmltag($placeholder) . '" data-field="' . dol_escape_htmltag($field) . '" data-type="' . dol_escape_htmltag($type) . '" data-ticket-id="' . (int) $object->id . '" data-url="' . dol_escape_htmltag($url_page_current) . '"' . $rawValAttr . $optionsAttr . '>' . $displayVal . '</span>';
 };
 
 $drPicto = img_picto('', 'digiriskdolibarr_color@digiriskdolibarr', 'class="pictoModule" style="margin-right: 5px;"');
