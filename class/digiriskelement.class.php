@@ -277,7 +277,7 @@ class DigiriskElement extends SaturneObject
         if (is_array($objectList) && !empty($objectList)) {
             foreach ($objectList as $digiriskElement) {
                 $tmpdigiriskElement = current($digiriskElement);
-                if ($digiriskElement->status < 0) {
+                if ($tmpdigiriskElement->status < 0) {
                     continue;
                 }
                 $digiriskElementsData[$tmpdigiriskElement->id] = '<span style="margin-left: ' . (15 * $digiriskElement['depth']) . 'px;"></span> ' . ($hideref ? '' : $tmpdigiriskElement->ref . ' - ') . $tmpdigiriskElement->label;

@@ -33,15 +33,20 @@
 		$DUProject->fetch($riskType == 'risk' ? $conf->global->DIGIRISKDOLIBARR_DU_PROJECT : $conf->global->DIGIRISKDOLIBARR_ENVIRONMENT_PROJECT);
 		$extrafields->fetch_name_optionals_label($digiriskTask->table_element);
 
-		$riskAssessmentList        = $riskAssessment->fetchAll();
-		$riskAssessmentNextValue   = $refEvaluationMod->getNextValue($evaluation);
-		$riskAssessmentTaskList    = $risk->getTasksWithFkRisk();
-		$taskNextValue             = $refTaskMod->getNextValue('', $task);
-		$usertmp->fetchAll();
-		$usersList                 = $usertmp->users;
-		$timeSpentSortedByTasks    = $digiriskTask->fetchAllTimeSpentAllUsers('AND fk_element > 0', 'element_datehour', 'DESC', 1);
+		// Reuse the data already loaded by the main risk list when both are rendered on the same
+		// page (same variable names); only load what is missing so these full "load all" queries
+		// (users, riskassessments, tasks, time spent) are not run a second time.
+		if (!isset($riskAssessmentList))      $riskAssessmentList      = $riskAssessment->fetchAll();
+		if (!isset($riskAssessmentNextValue)) $riskAssessmentNextValue = $refEvaluationMod->getNextValue($evaluation);
+		if (!isset($riskAssessmentTaskList))  $riskAssessmentTaskList  = $risk->getTasksWithFkRisk();
+		if (!isset($taskNextValue))           $taskNextValue           = $refTaskMod->getNextValue('', $task);
+		if (!isset($usersList)) {
+			$usertmp->fetchAll();
+			$usersList = $usertmp->users;
+		}
+		if (!isset($timeSpentSortedByTasks))  $timeSpentSortedByTasks  = $digiriskTask->fetchAllTimeSpentAllUsers('AND fk_element > 0', 'element_datehour', 'DESC', 1);
 
-		if (is_array($riskAssessmentList) && !empty($riskAssessmentList)) {
+		if (!isset($riskAssessmentsOrderedByRisk) && is_array($riskAssessmentList) && !empty($riskAssessmentList)) {
 			foreach ($riskAssessmentList as $riskAssessmentSingle) {
 				$riskAssessmentsOrderedByRisk[$riskAssessmentSingle->fk_risk][$riskAssessmentSingle->id] = $riskAssessmentSingle;
 			}
