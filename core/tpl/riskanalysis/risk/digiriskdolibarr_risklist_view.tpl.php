@@ -835,7 +835,7 @@ $massactionbutton = $form->selectMassAction('', $arrayofmassactions);
                                     <div style="display: flex; align-items: center; gap: 5px; height: 30px;">
                                         <i class="fas fa-user-tie fa-fw" style="color: #888;"></i>
                                         <div style="flex-grow: 1; min-width: 0;">
-                                            <?php print $form->select_dolusers(0, 'executive_id', $langs->trans('Responsible'), null, 0, '', 0, '', 0, 'widthcentpercent', '', 0, '', 'executiveSelect'); ?>
+                                            <?php print saturne_select_users('executive_id', 0, $langs->trans('Responsible'), 'executiveSelect widthcentpercent'); ?>
                                         </div>
                                     </div>
                                 </div>

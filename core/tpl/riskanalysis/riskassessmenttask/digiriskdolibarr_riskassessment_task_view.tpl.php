@@ -174,7 +174,7 @@ if (!empty($related_tasks) && is_array($related_tasks)) {
                                 <div>
                                     <div class="flex flex-row items-center justify-center">
                                         <i class="fas fa-user-tie 100" style="margin-right: 1em;"></i>
-                                        <?php print $form->select_dolusers(0, 'executive_id', 1, null, 0, '', 0, '', 0, 'minwidth200', '', 0, '', 'executiveSelect'); ?>
+                                        <?php print saturne_select_users('executive_id', 0, 1, 'executiveSelect minwidth200'); ?>
                                     </div>
                                 </div>
                             </div>
@@ -385,7 +385,7 @@ if (!empty($related_tasks) && is_array($related_tasks)) {
 										}
 									}
 								}
-								print $form->select_dolusers($currentExecutiveId, 'executive_id_edit' . $related_task->id, 1, null, 0, '', 0, '', 0, 'minwidth200', '', 0, '', 'executiveSelectEdit');
+								print saturne_select_users('executive_id_edit' . $related_task->id, $currentExecutiveId, 1, 'executiveSelectEdit minwidth200');
 								?>
 							</div>
 						</div>
