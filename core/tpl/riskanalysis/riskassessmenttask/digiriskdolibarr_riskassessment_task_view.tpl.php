@@ -370,7 +370,12 @@ if (!empty($related_tasks) && is_array($related_tasks)) {
 							<div class="flex flex-row items-center" style="margin-top: 1em;">
 								<i class="fas fa-user-tie" style="margin-right: 1em;"></i>
 								<?php
-								$contactsIntern     = $related_task->liste_contact(-1, 'internal');
+								// Reuse the per-task contacts already loaded by the task fragment (falls back to a direct fetch).
+									if (isset($taskContactsCache[$related_task->id])) {
+										$contactsIntern = $taskContactsCache[$related_task->id];
+									} else {
+										$contactsIntern = $related_task->liste_contact(-1, 'internal');
+									}
 								$currentExecutiveId = '';
 								if (!empty($contactsIntern)) {
 									foreach ($contactsIntern as $contact) {
