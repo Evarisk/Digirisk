@@ -249,7 +249,10 @@ function digirisk_header($title = '', $helpUrl = '', $arrayofjs = [], $arrayofcs
 								});
 
 								<?php
-								$idToFetch = GETPOSTINT('id') ?: GETPOSTINT('fromid');
+								// "id" only maps to a digiriskelement on the element/accident pages; on other
+								// pages (e.g. the standard card) it refers to a different object, so don't use it
+								// to expand the tree branch of the element that happens to share that id.
+								$idToFetch = (strpos($_SERVER['PHP_SELF'], 'digiriskelement') !== false || strpos($_SERVER['PHP_SELF'], 'accident') !== false) ? (GETPOSTINT('id') ?: GETPOSTINT('fromid')) : 0;
 								if ($idToFetch > 0) {
 									$object->fetch($idToFetch);
 								}
