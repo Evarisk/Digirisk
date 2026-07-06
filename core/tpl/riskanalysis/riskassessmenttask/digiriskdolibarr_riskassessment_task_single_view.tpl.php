@@ -17,18 +17,36 @@
 							}
 						}
 						require_once DOL_DOCUMENT_ROOT . '/ecm/class/ecmfiles.class.php';
-						$ecmfiles = new EcmFiles($db);
-						$ecmfiles->fetchAll('', '', 0, 0, "(t.src_object_type:=:'projet_task') AND (t.src_object_id:=:{$related_task->id})");
+						// This task fragment is rendered twice per task (inline card + list modal);
+						// cache the linked-files count per task id to avoid re-querying ecm_files each time.
+						if (!isset($taskLinkedFilesCountCache)) {
+							$taskLinkedFilesCountCache = [];
+						}
+						if (!isset($taskLinkedFilesCountCache[$related_task->id])) {
+							$ecmfiles = new EcmFiles($db);
+							$ecmfiles->fetchAll('', '', 0, 0, "(t.src_object_type:=:'projet_task') AND (t.src_object_id:=:{$related_task->id})");
+							$taskLinkedFilesCountCache[$related_task->id] = count($ecmfiles->lines);
+						}
+						$linkedFilesCount = $taskLinkedFilesCountCache[$related_task->id];
 						?>
 						<i class="fas fa-clock"></i> <?php echo $allTimeSpent/60 . '/' . $related_task->planned_workload/60 ?>
 					</span>
 					<span class="riskassessment-task-budget"><i class="fas fa-coins"></i> <?php echo price($related_task->budget_amount, 0, $langs, 1, 0, 0, $conf->currency); ?></span>
 					<span class="riskassessment-task-progress <?php echo $related_task->getTaskProgressColorClass($task_progress); ?>"><?php echo $task_progress ? $task_progress . " %" : 0 . " %" ?></span>
-					<span class="riskassessment-taks-linked-files badge badge-secondary classfortooltip" title="<?php echo $langs->transnoentities('NumberOfLinkedFiles') ?>"><?php echo count($ecmfiles->lines); ?></span>
+					<span class="riskassessment-taks-linked-files badge badge-secondary classfortooltip" title="<?php echo $langs->transnoentities('NumberOfLinkedFiles') ?>"><?php echo $linkedFilesCount; ?></span>
                     <?php
-                    $contactsIntern  = $related_task->liste_contact(-1, 'internal');
-                    $contactsExtern  = $related_task->liste_contact();
-                    $taskContacts    = array_merge($contactsIntern, $contactsExtern);
+                    // Same double-render as above: cache the task contacts per task id so
+                    // liste_contact() is not executed twice per task.
+                    if (!isset($taskContactsCache)) {
+                        $taskContactsCache = [];
+                    }
+                    if (!isset($taskContactsCache[$related_task->id])) {
+                        $taskContactsCache[$related_task->id] = array_merge(
+                            $related_task->liste_contact(-1, 'internal'),
+                            $related_task->liste_contact()
+                        );
+                    }
+                    $taskContacts    = $taskContactsCache[$related_task->id];
                     $taskContributor = [];
                     $taskExecutive   = [];
 

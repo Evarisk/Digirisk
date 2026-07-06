@@ -380,10 +380,15 @@ class DigiriskElement extends SaturneObject
      */
     public function getMultiEntityTrashList()
     {
+        // This trash tree is built only from id/status/fk_parent, so disable extrafield
+        // loading to avoid one extrafields query per element (N+1) inside fetchAll().
+        $savedIsExtrafieldManaged   = $this->isextrafieldmanaged;
+        $this->isextrafieldmanaged  = 0;
         $this->ismultientitymanaged = 0;
         $objects = $this->fetchAll('',  'ranks', 0,0, array('customsql' => ' status > 0'));
         $digiriskelement_trashes = $this->fetchAll('',  'ranks', 0,0, array('customsql' => ' status = 0'));
         $this->ismultientitymanaged = 1;
+        $this->isextrafieldmanaged  = $savedIsExtrafieldManaged;
         if (is_array($digiriskelement_trashes) && !empty($digiriskelement_trashes)) {
             $ids          = [];
             foreach($digiriskelement_trashes as $digiriskelement_trash) {
@@ -457,7 +462,16 @@ class DigiriskElement extends SaturneObject
     {
         global $conf;
 
-        $digiriskElements =  $this->fetchAll('',  '',  0,  0, ['customsql' => 't.status = ' . self::STATUS_VALIDATED . ($moreParams['filter'] ?? '')]);
+        // Called many times per page (search header, one "move risk" dropdown per risk row,
+        // inherited/shared lists…). Each call re-ran fetchAll(), which loads every element's
+        // extrafields one row at a time (N+1). Cache the raw fetch per request, keyed by
+        // everything that changes the result set (filter, entity scope).
+        static $activeElementsCache = [];
+        $cacheKey = ($moreParams['filter'] ?? '') . '|' . (string) ($this->ismultientitymanaged ?? '') . '|' . getEntity($this->element);
+        if (!array_key_exists($cacheKey, $activeElementsCache)) {
+            $activeElementsCache[$cacheKey] = $this->fetchAll('', '', 0, 0, ['customsql' => 't.status = ' . self::STATUS_VALIDATED . ($moreParams['filter'] ?? '')]);
+        }
+        $digiriskElements = $activeElementsCache[$cacheKey];
         if (!is_array($digiriskElements) || empty($digiriskElements)) {
             return -1;
         }
