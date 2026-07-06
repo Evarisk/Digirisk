@@ -554,7 +554,7 @@ class DigiriskElement extends SaturneObject
      */
     public function getBannerTabContent(): array
     {
-        global $conf, $db, $langs;
+        global $conf, $db, $langs, $user;
 
         require_once __DIR__ . '/digiriskstandard.class.php';
 
@@ -564,12 +564,22 @@ class DigiriskElement extends SaturneObject
         $parent_element = new self($db);
         $result         = $parent_element->fetch($this->fk_parent);
         $morehtmlref    = '';
+
+        // Description shown after a comment icon, made inline-editable (contenteditable) when the
+        // user can write; saved via saturne_update_field.php like the list inline edits.
+        $descriptionIcon = '<i class="fas fa-comment-dots" title="' . dol_escape_htmltag($langs->trans("Description")) . '"></i> ';
+        if (!empty($user->rights->digiriskdolibarr->digiriskelement->write)) {
+            $descriptionHtml = $descriptionIcon . '<span class="contenteditable" contenteditable="true" role="textbox" aria-label="' . dol_escape_htmltag($langs->trans("Description")) . '" data-field="description" data-id="' . ((int) $this->id) . '" data-element="' . dol_escape_htmltag($this->element . '@' . $this->module) . '" data-table="' . dol_escape_htmltag($this->table_element) . '" data-type="text" data-success="' . dol_escape_htmltag($langs->trans("RecordSaved")) . '" data-error="' . dol_escape_htmltag($langs->trans("Error")) . '">' . dol_escape_htmltag($this->description) . '</span>';
+        } else {
+            $descriptionHtml = $descriptionIcon . dol_escape_htmltag($this->description);
+        }
+
         if ($result > 0) {
-            $morehtmlref .= '<i class="fas fa-comment-dots" title="' . dol_escape_htmltag($langs->trans("Description")) . '"></i> ' . $this->description;
+            $morehtmlref .= $descriptionHtml;
             $morehtmlref .= '<br>' . $parent_element->getNomUrl(1, 'blank', 1, '', -1, 1);
         } else {
             $digiriskstandard->fetch($conf->global->DIGIRISKDOLIBARR_ACTIVE_STANDARD);
-            $morehtmlref .= '<i class="fas fa-comment-dots" title="' . dol_escape_htmltag($langs->trans("Description")) . '"></i> ' . $this->description;
+            $morehtmlref .= $descriptionHtml;
             $morehtmlref .= '<br>' . $digiriskstandard->getNomUrl(1, 'blank', 1, '', -1, 1);
         }
         $morehtmlref .= '<br>';
