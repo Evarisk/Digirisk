@@ -6898,3 +6898,20 @@ tr.liste_titre th.liste_titre:not(.maxwidthsearch), tr.liste_titre td.liste_titr
     padding-left: 0px;
   }
 }
+.arearef[class*="banner-element-"] .banner-ref-sep {
+  display: none;
+}
+.arearef[class*="banner-element-"] .refid > span.valignmiddle:first-child {
+  display: inline-block;
+  padding: 4px 8px;
+  margin-right: 12px;
+  border-radius: 4px;
+  font-size: 11px;
+  font-weight: 700;
+  text-transform: uppercase;
+  color: #fff;
+  background: #263c5c;
+}
+.arearef.banner-element-workunit .refid > span.valignmiddle:first-child {
+  background: #0d8aff;
+}

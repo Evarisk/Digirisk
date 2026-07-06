@@ -39,3 +39,28 @@
     }
   }
 }
+
+/** Element banner: render the ref as a badge (same look as the GP/UT tree), colored by element type.
+    Scoped to the banner-element-* class (added by saturne_banner_tab only for elements with a subtype),
+    so it never affects other modules' banners. */
+.arearef[class*="banner-element-"] {
+  .banner-ref-sep {
+    display: none; /* the badge uses its own right margin instead of a " - " separator */
+  }
+
+  .refid > span.valignmiddle:first-child {
+    display: inline-block;
+    padding: 4px 8px;
+    margin-right: 12px;
+    border-radius: 4px;
+    font-size: 11px;
+    font-weight: 700;
+    text-transform: uppercase;
+    color: #fff;
+    background: #263c5c; /* default / groupment */
+  }
+}
+
+.arearef.banner-element-workunit .refid > span.valignmiddle:first-child {
+  background: #0d8aff;
+}
