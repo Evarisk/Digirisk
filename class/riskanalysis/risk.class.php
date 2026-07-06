@@ -110,6 +110,10 @@ class Risk extends SaturneObject
 	public $fk_projet;
 	public $lastEvaluation;
 	public $appliedOn;
+	public $riskAssessmentRef;
+	public $riskAssessmentDateCreation;
+	public $riskAssessmentCotation;
+	public $riskAssessmentDate;
 
     private $cotations = [];
 
@@ -254,17 +258,17 @@ class Risk extends SaturneObject
             $array[$entity]['riskByRiskAssessmentCotations'][$fkElement][$scale]
                 = $array[$entity]['riskByRiskAssessmentCotations'][$fkElement][$scale] ?? 0;
 
-            $array[$entity]['riskByCategories'][$risk->category][$scale]
-                = $array[$entity]['riskByCategories'][$risk->category][$scale] ?? 0;
+            $array[$entity]['riskByCategories'][$risk->category ?? ''][$scale]
+                = $array[$entity]['riskByCategories'][$risk->category ?? ''][$scale] ?? 0;
 
-            $array[$entity]['riskBySubCategories'][$risk->sub_category][$scale]
-                = $array[$entity]['riskBySubCategories'][$risk->sub_category][$scale] ?? 0;
+            $array[$entity]['riskBySubCategories'][$risk->sub_category ?? ''][$scale]
+                = $array[$entity]['riskBySubCategories'][$risk->sub_category ?? ''][$scale] ?? 0;
 
-            $array['riskByEntities'][$risk->entity]['nbTotalRisks']
-                = $array['riskByEntities'][$risk->entity]['nbTotalRisks'] ?? 0;
+            $array['riskByEntities'][$risk->entity ?? '']['nbTotalRisks']
+                = $array['riskByEntities'][$risk->entity ?? '']['nbTotalRisks'] ?? 0;
 
-            $array['riskByEntities'][$risk->entity][$scale]
-                = $array['riskByEntities'][$risk->entity][$scale] ?? 0;
+            $array['riskByEntities'][$risk->entity ?? ''][$scale]
+                = $array['riskByEntities'][$risk->entity ?? ''][$scale] ?? 0;
 
             $nbTotalRisks[$entity] = $nbTotalRisks[$entity] ?? 0;
 
@@ -274,7 +278,7 @@ class Risk extends SaturneObject
             if ($risk->sub_category >= 0) {
                 $array[$entity]['psychosocialRisksByGPUT'][$fkElement][$risk->sub_category][$risk->riskAssessmentDate] = $riskAssessment->cotation;
             }
-            $array[$entity]['riskByCategories'][$risk->category][$scale]++;
+            $array[$entity]['riskByCategories'][$risk->category ?? ''][$scale]++;
             $array[$entity]['riskBySubCategories'][$risk->sub_category][$scale]++;
             $array['riskByEntities'][$risk->entity]['nbTotalRisks']++;
             $array['riskByEntities'][$risk->entity][$scale]++;

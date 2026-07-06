@@ -377,7 +377,7 @@ $evaluation->method = $lastRiskAssessment->method ?: "standard" ;
                     </div>
 				</div>
 				<!-- RISK EVALUATION SINGLE -->
-				<?php if ( ! empty($lastRiskAssessment) && $lastRiskAssessment > 0) : ?>
+				<?php if ( ! empty($lastRiskAssessment) && $lastRiskAssessment->id > 0) : ?>
 					<div class="risk-evaluation-container last-risk-assessment risk-evaluation-container-<?php echo $lastRiskAssessment->id ?>">
 						<h2><?php echo $langs->trans('LastRiskAssessment') . ' ' . $risk->ref; ?></h2>
 						<div class="risk-evaluation-single-content risk-evaluation-single-content-<?php echo $risk->id ?>">
