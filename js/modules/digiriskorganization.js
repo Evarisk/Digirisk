@@ -56,7 +56,7 @@ window.digiriskdolibarr.organization.event = function() {
 	$(document).on('click', '.organization-tree .delete-element-btn', window.digiriskdolibarr.organization.openDelete);
 	$(document).on('click', '#confirm-delete-yes', window.digiriskdolibarr.organization.confirmDelete);
 	$(document).on('click', '.confirm-delete-cancel', window.digiriskdolibarr.organization.closeDelete);
-	$(document).on('click', '.organization-tree .row-container', window.digiriskdolibarr.organization.navigateToElement);
+	$(document).on('click', '.organization-tree .ref-badge', window.digiriskdolibarr.organization.navigateToElement);
 };
 
 /**
@@ -399,22 +399,17 @@ window.digiriskdolibarr.organization.closeDelete = function() {
 };
 
 /**
- * Navigation : un clic sur la carte de l'élément (hors libellé éditable et hors contrôles)
- * ouvre la page de l'élément (lien du badge de référence).
+ * Navigation : un clic sur le badge de référence (ex. GP1) ouvre la page de l'élément.
+ * Restreint au seul badge — et non à toute la ligne — pour ne pas entrer en conflit
+ * avec l'édition du libellé au clic sur la carte.
  *
  * @since   9.0.0
  * @version 9.0.0
  *
- * @param  {MouseEvent} event Les attributs lors du clic.
  * @return {void}
  */
-window.digiriskdolibarr.organization.navigateToElement = function(event) {
-	// Laisser leur comportement au libellé éditable et aux contrôles interactifs (chevron, photo, poignée, boutons, liens)
-	if ($(event.target).closest('.element-label, .drag-handle, .toggle-unit, .chevron, .actions, .open-media-gallery, .photo-container, a, input, button').length) {
-		return;
-	}
-
-	let href = $(this).find('.ref-badge a').attr('href');
+window.digiriskdolibarr.organization.navigateToElement = function() {
+	let href = $(this).find('a').attr('href');
 	if (href) {
 		window.location.href = href;
 	}
