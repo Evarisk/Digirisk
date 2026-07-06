@@ -566,11 +566,11 @@ class DigiriskElement extends SaturneObject
         $morehtmlref    = '';
         if ($result > 0) {
             $morehtmlref .= $langs->trans("Description") . ' : ' . $this->description;
-            $morehtmlref .= '<br>' . $langs->trans("ParentElement") . ' : ' . $parent_element->getNomUrl(1, 'blank', 1);
+            $morehtmlref .= '<br>' . $parent_element->getNomUrl(1, 'blank', 1, '', -1, 1);
         } else {
             $digiriskstandard->fetch($conf->global->DIGIRISKDOLIBARR_ACTIVE_STANDARD);
             $morehtmlref .= $langs->trans("Description") . ' : ' . $this->description;
-            $morehtmlref .= '<br>' . $langs->trans("ParentElement") . ' : ' . $digiriskstandard->getNomUrl(1, 'blank', 1);
+            $morehtmlref .= '<br>' . $digiriskstandard->getNomUrl(1, 'blank', 1, '', -1, 1);
         }
         $morehtmlref .= '<br>';
         $this->fetch($this->id);
