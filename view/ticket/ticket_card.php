@@ -37,6 +37,7 @@ require_once DOL_DOCUMENT_ROOT . '/core/class/html.form.class.php';
 require_once DOL_DOCUMENT_ROOT . '/core/class/html.formprojet.class.php';
 require_once DOL_DOCUMENT_ROOT . '/categories/class/categorie.class.php';
 require_once DOL_DOCUMENT_ROOT . '/comm/action/class/actioncomm.class.php';
+require_once DOL_DOCUMENT_ROOT . '/societe/class/societe.class.php';
 
 global $conf, $db, $hookmanager, $langs, $moduleNameLowerCase, $user;
 
@@ -120,6 +121,44 @@ if ($action === 'setassignee_ajax' && $permissionToWrite) {
     }
     header('Content-Type: application/json');
     print json_encode(['success' => 1, 'nomurl' => $nomUrl]);
+    exit;
+}
+
+// AJAX: inline (on-the-fly) thirdparty save — returns structured data to rebuild the badge
+if ($action === 'setthirdparty_ajax' && $permissionToWrite) {
+    $newSocId = GETPOSTINT('socid');
+    $object->fetch($id);
+    $object->setCustomer($newSocId);
+    $socName    = '';
+    $cardUrl    = '';
+    $historyUrl = '';
+    if ($newSocId > 0) {
+        $soc = new Societe($db);
+        $soc->fetch($newSocId);
+        $socName    = trim($soc->name);
+        $cardUrl    = DOL_URL_ROOT . '/societe/card.php?socid=' . $newSocId;
+        $historyUrl = DOL_URL_ROOT . '/ticket/list.php?socid=' . $newSocId . '&sortfield=t.datec&sortorder=desc';
+    }
+    header('Content-Type: application/json');
+    print json_encode(['success' => 1, 'id' => $newSocId, 'name' => $socName, 'cardurl' => $cardUrl, 'historyurl' => $historyUrl]);
+    exit;
+}
+
+// AJAX: inline (on-the-fly) project save — returns structured data to rebuild the badge
+if ($action === 'setproject_ajax' && $permissionToWrite) {
+    $newProjectId = GETPOSTINT('projectid');
+    $object->fetch($id);
+    $object->setProject($newProjectId);
+    $projRef = '';
+    $cardUrl = '';
+    if ($newProjectId > 0) {
+        $proj = new Project($db);
+        $proj->fetch($newProjectId);
+        $projRef = trim($proj->ref);
+        $cardUrl = DOL_URL_ROOT . '/projet/card.php?id=' . $newProjectId;
+    }
+    header('Content-Type: application/json');
+    print json_encode(['success' => 1, 'id' => $newProjectId, 'name' => $projRef, 'cardurl' => $cardUrl]);
     exit;
 }
 
@@ -211,14 +250,6 @@ if ($action === 'add_child_task_modal' && $permissionToWrite && !empty($object->
     exit;
 }
 
-// Action: classify (set project — native form_project posts action=classin)
-if ($action === 'classin' && $permissionToWrite) {
-    $object->fetch($id);
-    $object->setProject(GETPOSTINT('projectid'));
-    header('Location: ' . $url_page_current . '?id=' . $object->id);
-    exit;
-}
-
 // Action: set initial message
 if ($action === 'setmessage' && $permissionToWrite) {
     if (GETPOST('cancel', 'alpha')) {
@@ -301,30 +332,65 @@ if ($object->fk_user_create > 0) {
     $morehtmlref .= $fuser->getNomUrl(-1);
 }
 
-// Thirdparty
+// Thirdparty (reedcrm-style inline badge: logo + nav icon + editable name + hidden select2)
 if (isModEnabled('societe')) {
     $morehtmlref .= '<br>';
-    $morehtmlref .= img_picto($langs->trans('ThirdParty'), 'company', 'class="pictofixedwidth"');
-    if ($object->socid > 0 && is_object($object->thirdparty)) {
-        $morehtmlref .= $object->thirdparty->getNomUrl(1);
-    } else {
-        $morehtmlref .= '<span class="opacitymedium">' . $langs->trans('NoThirdParty') . '</span>';
+    $hasSoc    = ($object->socid > 0 && is_object($object->thirdparty));
+    $socUrl    = $hasSoc ? DOL_URL_ROOT . '/societe/card.php?socid=' . (int) $object->socid : '#';
+    $histUrl   = $hasSoc ? DOL_URL_ROOT . '/ticket/list.php?socid=' . (int) $object->socid . '&sortfield=t.datec&sortorder=desc' : '';
+    $emptyLabel = $langs->trans('SetThirdParty');
+    $morehtmlref .= '<span class="dtc-inline-badge dtc-thirdparty" data-ticket-id="' . (int) $object->id . '" data-url="' . dol_escape_htmltag($url_page_current) . '" data-empty-label="' . dol_escape_htmltag($emptyLabel) . '">';
+    $morehtmlref .= img_picto('', 'digiriskdolibarr_color@digiriskdolibarr', 'class="dtc-badge-logo"');
+    $morehtmlref .= '<a class="dtc-badge-nav" href="' . dol_escape_htmltag($socUrl) . '" title="' . dol_escape_htmltag($langs->trans('ThirdParty')) . '"' . ($hasSoc ? '' : ' style="display:none;"') . '><i class="fas fa-building"></i></a>';
+    $nameClass = 'dtc-thirdparty-name dtc-badge-name' . ($permissionToWrite ? ' dtc-inline-edit' : '') . ($hasSoc ? '' : ' is-empty');
+    $nameText  = $hasSoc ? dol_escape_htmltag($object->thirdparty->name) : dol_escape_htmltag($emptyLabel);
+    $nameTitle = $permissionToWrite ? $langs->trans('SetThirdParty') : $langs->trans('ThirdParty');
+    $morehtmlref .= '<a class="' . $nameClass . '" href="' . dol_escape_htmltag($socUrl) . '" title="' . dol_escape_htmltag($nameTitle) . '">' . $nameText . '</a>';
+    $morehtmlref .= '<a class="dtc-badge-history" href="' . dol_escape_htmltag($histUrl) . '" title="' . dol_escape_htmltag($langs->trans('TicketHistory')) . '"' . ($hasSoc ? '' : ' style="display:none;"') . '><i class="fas fa-ticket-alt"></i></a>';
+    if ($permissionToWrite) {
+        $morehtmlref .= '<span class="dtc-thirdparty-selector dtc-inline-selector" style="display:none;">';
+        $morehtmlref .= $form->select_company((int) $object->socid, 'dtc_thirdparty_select', '', 1, 0, 1, [], 0, 'dtc-inline-select minwidth200');
+        $morehtmlref .= '</span>';
     }
+    $morehtmlref .= '</span>';
 }
 
-// Project
+// Project (reedcrm-style inline badge: logo + nav icon + editable name + hidden select2)
 if (isModEnabled('project')) {
     $morehtmlref .= '<br>';
     $object->fetchProject();
-    $morehtmlref .= img_picto($langs->trans('Project'), 'project', 'class="pictofixedwidth"');
+    $hasProject      = (!empty($object->fk_project) && is_object($object->project));
+    $projUrl         = $hasProject ? DOL_URL_ROOT . '/projet/card.php?id=' . (int) $object->fk_project : '#';
+    $emptyProjLabel  = $langs->trans('SetProject');
+    $morehtmlref .= '<span class="dtc-inline-badge dtc-project" data-ticket-id="' . (int) $object->id . '" data-url="' . dol_escape_htmltag($url_page_current) . '" data-empty-label="' . dol_escape_htmltag($emptyProjLabel) . '">';
+    $morehtmlref .= img_picto('', 'digiriskdolibarr_color@digiriskdolibarr', 'class="dtc-badge-logo"');
+    $morehtmlref .= '<a class="dtc-badge-nav" href="' . dol_escape_htmltag($projUrl) . '" title="' . dol_escape_htmltag($langs->trans('Project')) . '"' . ($hasProject ? '' : ' style="display:none;"') . '><i class="fas fa-project-diagram"></i></a>';
+    $projNameClass = 'dtc-project-name dtc-badge-name' . ($permissionToWrite ? ' dtc-inline-edit' : '') . ($hasProject ? '' : ' is-empty');
+    $projNameText  = $hasProject ? dol_escape_htmltag($object->project->ref) : dol_escape_htmltag($emptyProjLabel);
+    $projNameTitle = $permissionToWrite ? $langs->trans('SetProject') : $langs->trans('Project');
+    $morehtmlref .= '<a class="' . $projNameClass . '" href="' . dol_escape_htmltag($projUrl) . '" title="' . dol_escape_htmltag($projNameTitle) . '">' . $projNameText . '</a>';
     if ($permissionToWrite) {
-        if ($action != 'classify') {
-            $morehtmlref .= '<a class="editfielda" href="' . $url_page_current . '?action=classify&token=' . newToken() . '&id=' . $object->id . '">' . img_edit($langs->transnoentitiesnoconv('SetProject')) . '</a> ';
+        require_once DOL_DOCUMENT_ROOT . '/core/class/html.formprojet.class.php';
+        $formproject = new FormProjets($db);
+        // mode=1 → array; we build a plain <select> (avoids the search-to-select autocompleter), select2-ified by JS on reveal.
+        $projectArray = $formproject->select_projects_list((int) $object->socid, (string) $object->fk_project, 'dtc_project_select', 24, 0, 0, 0, 0, 0, 1, '', 1, 0, '', '', '');
+        $morehtmlref .= '<span class="dtc-project-selector dtc-inline-selector" style="display:none;">';
+        $morehtmlref .= '<select class="dtc-inline-select minwidth200" id="dtc_project_select" name="dtc_project_select">';
+        $morehtmlref .= '<option value="0"' . (empty($object->fk_project) ? ' selected' : '') . '></option>';
+        if (is_array($projectArray)) {
+            foreach ($projectArray as $projLine) {
+                $projId = (int) $projLine['key'];
+                if ($projId <= 0) {
+                    continue;
+                }
+                $selectedAttr = ($projId === (int) $object->fk_project) ? ' selected' : '';
+                $morehtmlref .= '<option value="' . $projId . '"' . $selectedAttr . '>' . dol_escape_htmltag($projLine['value']) . '</option>';
+            }
         }
-        $morehtmlref .= $form->form_project($url_page_current . '?id=' . $object->id, $object->socid, (string) $object->fk_project, ($action == 'classify' ? 'projectid' : 'none'), 0, 0, 0, 1, '', 'maxwidth300');
-    } elseif (!empty($object->fk_project) && is_object($object->project)) {
-        $morehtmlref .= $object->project->getNomUrl(1);
+        $morehtmlref .= '</select>';
+        $morehtmlref .= '</span>';
     }
+    $morehtmlref .= '</span>';
 }
 
 $morehtmlref .= '</div>';

@@ -1,4 +1,4 @@
-@charset "UTF-8";
+﻿@charset "UTF-8";
 .risk-evaluation-cotation {
   width: 50px;
   min-width: 50px;
@@ -247,25 +247,25 @@ body:has(.page-ut-gp-list) {
 /** Content - GP/UT organization tree inside the navigation panel */
 .page-ut-gp-list .side-nav .workunit-list {
   padding-left: 0;
+  /* Drag & drop placeholder inside the narrow panel */
+  /* Compact the organization row (.row-container styles come from the organization partial) to fit the panel width */
+  /* Active element highlight (saturneElement.getLeftMenuCurrentUnit) */
+  /* Toggle: children hidden unless the unit is toggled (saturneElement.js) */
 }
 .page-ut-gp-list .side-nav .workunit-list ul, .page-ut-gp-list .side-nav .workunit-list li {
   list-style-type: none;
   margin: 0;
 }
-.page-ut-gp-list .side-nav .workunit-list {
-  /* Drag & drop placeholder inside the narrow panel */
-}
 .page-ut-gp-list .side-nav .workunit-list .ui-sortable-placeholder {
   height: 40px !important;
   margin-bottom: 5px;
-}
-.page-ut-gp-list .side-nav .workunit-list {
-  /* Compact the organization row (.row-container styles come from the organization partial) to fit the panel width */
 }
 .page-ut-gp-list .side-nav .workunit-list .row-container {
   position: relative;
   padding: 5px 7px;
   margin-bottom: 5px;
+  /* Long GP/UT names wrap onto new lines instead of stretching the row; flex-grow + min-width:0 keep the row within the fixed panel width */
+  /* Actions float over the right edge on hover so they never reserve width nor push other elements */
 }
 .page-ut-gp-list .side-nav .workunit-list .row-container .drag-handle {
   margin-right: 6px;
@@ -299,9 +299,6 @@ body:has(.page-ut-gp-list) {
   font-size: 10px;
   padding: 3px 6px;
 }
-.page-ut-gp-list .side-nav .workunit-list .row-container {
-  /* Long GP/UT names wrap onto new lines instead of stretching the row; flex-grow + min-width:0 keep the row within the fixed panel width */
-}
 .page-ut-gp-list .side-nav .workunit-list .row-container .title.element-label {
   font-size: 13px;
   padding-left: 0;
@@ -309,9 +306,6 @@ body:has(.page-ut-gp-list) {
   white-space: normal;
   overflow-wrap: anywhere;
   word-break: break-word;
-}
-.page-ut-gp-list .side-nav .workunit-list .row-container {
-  /* Actions float over the right edge on hover so they never reserve width nor push other elements */
 }
 .page-ut-gp-list .side-nav .workunit-list .row-container .actions {
   position: absolute;
@@ -330,15 +324,9 @@ body:has(.page-ut-gp-list) {
   line-height: 26px;
   font-size: 11px;
 }
-.page-ut-gp-list .side-nav .workunit-list {
-  /* Active element highlight (saturneElement.getLeftMenuCurrentUnit) */
-}
 .page-ut-gp-list .side-nav .workunit-list .unit.active > .unit-container.row-container {
   border-color: #0d8aff;
   box-shadow: 0 0 0 1px #0d8aff;
-}
-.page-ut-gp-list .side-nav .workunit-list {
-  /* Toggle: children hidden unless the unit is toggled (saturneElement.js) */
 }
 .page-ut-gp-list .side-nav .workunit-list .unit > .sub-list {
   padding: 0 0 0 13px;
@@ -939,6 +927,7 @@ li.route .row-container .actions {
   transition: opacity 0.2s;
   display: flex;
   gap: 8px;
+  /* Keep the trash icon white on the red delete button */
 }
 li.route .row-container .actions a {
   text-decoration: none;
@@ -952,9 +941,6 @@ li.route .row-container .actions a {
 }
 li.route .row-container .actions a:hover {
   background: #e9ecef;
-}
-li.route .row-container .actions {
-  /* Keep the trash icon white on the red delete button */
 }
 li.route .row-container .actions .delete-element-btn,
 li.route .row-container .actions .delete-element-btn i {
@@ -999,7 +985,7 @@ li.route .row-container .actions .delete-element-btn i {
   pointer-events: none;
 }
 .save-organization:hover {
-  background: rgb(0, 112.0867768595, 217);
+  background: #0070d9;
   box-shadow: 0 6px 20px rgba(13, 138, 255, 0.5);
   transform: scale(1.1);
 }
@@ -3108,7 +3094,7 @@ textarea.action-textarea:not(:last-child) {
 }
 .tac-timeline__step--current {
   background: rgba(233, 173, 79, 0.16);
-  color: rgb(222.9333333333, 146.9333333333, 27.8666666667);
+  color: #df931c;
   font-weight: 600;
   box-shadow: 0 0 0 2px rgba(233, 173, 79, 0.18);
   animation: tac-timeline-pulse 1.6s ease-in-out infinite;
@@ -3359,7 +3345,7 @@ textarea.action-textarea:not(:last-child) {
 .tac-hero__density-btn.is-active:hover,
 .tac-hero__tagsmode-btn.is-active:hover,
 .tac-hero__actionsmode-btn.is-active:hover {
-  background: rgb(0, 125.2582644628, 242.5);
+  background: #007df3;
   color: #fff;
 }
 
@@ -3392,7 +3378,7 @@ textarea.action-textarea:not(:last-child) {
   border-color: #0d8aff;
 }
 .tac-hero__customize--active:hover {
-  background: rgb(0, 125.2582644628, 242.5);
+  background: #007df3;
   color: #fff;
 }
 
@@ -3785,9 +3771,9 @@ textarea.action-textarea:not(:last-child) {
   color: #fff;
 }
 .tac-edit-actions__save:hover {
-  background: rgb(0, 125.2582644628, 242.5);
+  background: #007df3;
   color: #fff;
-  border-color: rgb(0, 125.2582644628, 242.5);
+  border-color: #007df3;
 }
 
 .tac-editing {
@@ -4443,7 +4429,7 @@ textarea.action-textarea:not(:last-child) {
 }
 .tac-thread__tag--private {
   background: rgba(233, 173, 79, 0.18);
-  color: rgb(213.8666666667, 140.9575757576, 26.7333333333);
+  color: #d68d1b;
 }
 .tac-thread__tag--mail {
   background: rgba(122, 92, 240, 0.14);
@@ -4653,7 +4639,7 @@ textarea.action-textarea:not(:last-child) {
   gap: 6px;
 }
 .tac-thread__reply-send:hover {
-  background: rgb(0, 125.2582644628, 242.5);
+  background: #007df3;
 }
 .tac-thread__reply-send[disabled] {
   opacity: 0.5;
@@ -4723,13 +4709,13 @@ textarea.action-textarea:not(:last-child) {
 .tac-toast.is-success,
 .ticket-action-card__toast.is-success {
   background: rgba(34, 191, 78, 0.12);
-  color: rgb(20.128, 113.072, 46.176);
+  color: #14712e;
   border: 1px solid rgba(34, 191, 78, 0.4);
 }
 .tac-toast.is-error,
 .ticket-action-card__toast.is-error {
   background: rgba(224, 83, 83, 0.12);
-  color: rgb(208.2640394089, 37.5359605911, 37.5359605911);
+  color: #d02626;
   border: 1px solid rgba(224, 83, 83, 0.4);
 }
 
@@ -4929,7 +4915,7 @@ textarea.action-textarea:not(:last-child) {
   transition: background 0.15s ease, box-shadow 0.15s ease;
 }
 .tac-picker-topbar__btn:hover {
-  background: rgb(0, 122.6239669421, 237.4);
+  background: #007bed;
   box-shadow: 0 4px 12px rgba(13, 138, 255, 0.3);
 }
 .tac-picker-topbar__btn i {
@@ -5103,12 +5089,12 @@ textarea.action-textarea:not(:last-child) {
 .tac-qc-toast.is-error {
   background: rgba(224, 83, 83, 0.1);
   border: 1px solid rgba(224, 83, 83, 0.4);
-  color: rgb(216.2118226601, 39.7881773399, 39.7881773399);
+  color: #d82828;
 }
 .tac-qc-toast.is-success {
   background: rgba(34, 191, 78, 0.1);
   border: 1px solid rgba(34, 191, 78, 0.4);
-  color: rgb(21.6693333333, 121.7306666667, 49.712);
+  color: #167a32;
 }
 
 .tac-qc-actions {
@@ -5144,7 +5130,7 @@ textarea.action-textarea:not(:last-child) {
 }
 .tac-qc-btn--secondary:hover {
   background: rgba(0, 0, 0, 0.04);
-  border-color: rgb(200.1739130435, 204.3913043478, 212.8260869565);
+  border-color: #c8ccd5;
 }
 .tac-qc-btn--primary {
   background: #0d8aff;
@@ -5152,7 +5138,7 @@ textarea.action-textarea:not(:last-child) {
   border-color: #0d8aff;
 }
 .tac-qc-btn--primary:hover {
-  background: rgb(0, 122.6239669421, 237.4);
+  background: #007bed;
   box-shadow: 0 4px 12px rgba(13, 138, 255, 0.3);
 }
 .tac-qc-btn--primary[disabled] {
@@ -5222,7 +5208,7 @@ textarea.action-textarea:not(:last-child) {
 }
 .tac-qc-dropzone__hint {
   font-size: 0.75em;
-  color: rgb(146.8808510638, 152.7936170213, 164.6191489362);
+  color: #9399a5;
 }
 
 .tac-qc-file-input {
@@ -5487,6 +5473,71 @@ textarea.action-textarea:not(:last-child) {
   box-shadow: 0 0 0 2px rgba(43, 108, 176, 0.35);
   border-radius: 5px;
 }
+.digirisk-ticket-card .dtc-inline-badge {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  background: #f8fbff;
+  border: 1px solid #e5e7eb;
+  border-radius: 6px;
+  padding: 3px 8px 3px 6px;
+  vertical-align: middle;
+  font-weight: 500;
+  font-size: 0.9em;
+  color: #6b7280;
+  margin: 2px 0;
+}
+.digirisk-ticket-card .dtc-inline-badge a {
+  text-decoration: none;
+}
+.digirisk-ticket-card .dtc-inline-badge .dtc-badge-logo {
+  height: 16px;
+  width: 16px;
+  object-fit: contain;
+  border-right: 1px solid #e5e7eb;
+  padding-right: 6px;
+}
+.digirisk-ticket-card .dtc-inline-badge .dtc-badge-nav,
+.digirisk-ticket-card .dtc-inline-badge .dtc-badge-history {
+  color: #64748b;
+  display: inline-flex;
+  align-items: center;
+  transition: color 0.15s ease;
+}
+.digirisk-ticket-card .dtc-inline-badge .dtc-badge-nav:hover,
+.digirisk-ticket-card .dtc-inline-badge .dtc-badge-history:hover {
+  color: #2b6cb0;
+}
+.digirisk-ticket-card .dtc-inline-badge .dtc-badge-name {
+  color: #111827;
+  max-width: 260px;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+.digirisk-ticket-card .dtc-inline-badge .dtc-badge-name.dtc-inline-edit {
+  cursor: pointer;
+  border-bottom: 1px dashed #cbd5e0;
+  line-height: 1;
+  padding-bottom: 1px;
+  transition: color 0.2s ease;
+}
+.digirisk-ticket-card .dtc-inline-badge .dtc-badge-name.dtc-inline-edit:hover {
+  color: #2b6cb0;
+}
+.digirisk-ticket-card .dtc-inline-badge .dtc-badge-name.is-empty {
+  color: #94a3b8;
+  font-style: italic;
+}
+.digirisk-ticket-card .dtc-inline-badge .dtc-inline-selector {
+  display: inline-flex;
+}
+.digirisk-ticket-card .dtc-inline-badge select.dtc-inline-select {
+  min-width: 200px;
+}
+.digirisk-ticket-card .dtc-inline-badge .select2-container {
+  vertical-align: middle;
+}
 .digirisk-ticket-card .dtc-inline-editable {
   cursor: pointer;
   border-bottom: 1px dashed #d1d5db;
@@ -5589,6 +5640,28 @@ textarea.action-textarea:not(:last-child) {
 }
 .banner-risk-badges .banner-risk-badge.empty {
   opacity: 0.5;
+}
+
+/** Element banner: render the ref as a badge (same look as the GP/UT tree), colored by element type.
+    Scoped to the banner-element-* class (added by saturne_banner_tab only for elements with a subtype),
+    so it never affects other modules' banners. */
+.arearef[class*=banner-element-] .banner-ref-sep {
+  display: none; /* the badge uses its own right margin instead of a " - " separator */
+}
+.arearef[class*=banner-element-] .refid > span.valignmiddle:first-child {
+  display: inline-block;
+  padding: 4px 8px;
+  margin-right: 12px;
+  border-radius: 4px;
+  font-size: 11px;
+  font-weight: 700;
+  text-transform: uppercase;
+  color: #fff;
+  background: #263c5c; /* default / groupment */
+}
+
+.arearef.banner-element-workunit .refid > span.valignmiddle:first-child {
+  background: #0d8aff;
 }
 
 /** Cell header */
@@ -5993,13 +6066,13 @@ td > .risk-evaluation-list-content .risk-evaluation-container:not(.advanced, .st
   background: #0d8aff;
 }
 .wpeo-table.evaluation-method .table-row:not(.header) .table-cell:nth-of-type(3).active::after {
-  background: rgb(0, 98.9152892562, 191.5);
+  background: #0063c0;
 }
 .wpeo-table.evaluation-method .table-row:not(.header) .table-cell:nth-of-type(4).active::after {
-  background: rgb(0, 59.4008264463, 115);
+  background: #003b73;
 }
 .wpeo-table.evaluation-method .table-row:not(.header) .table-cell:nth-of-type(5).active::after {
-  background: rgb(0, 19.8863636364, 38.5);
+  background: #001427;
 }
 .wpeo-table.evaluation-method .table-row:not(.header) .table-cell:nth-of-type(6).active::after {
   background: black;
@@ -6799,7 +6872,7 @@ td > .risk-evaluation-list-content .risk-evaluation-container:not(.advanced, .st
   }
   #id-container.page-ut-gp-list .side-nav .side-nav-responsive:hover {
     cursor: pointer;
-    background: rgb(67.8153846154, 107.0769230769, 164.1846153846);
+    background: #446ba4;
   }
   #id-container.page-ut-gp-list .side-nav #id-left {
     position: absolute;
@@ -6897,21 +6970,4 @@ tr.liste_titre th.liste_titre:not(.maxwidthsearch), tr.liste_titre td.liste_titr
   div.secondcolumn div.box {
     padding-left: 0px;
   }
-}
-.arearef[class*="banner-element-"] .banner-ref-sep {
-  display: none;
-}
-.arearef[class*="banner-element-"] .refid > span.valignmiddle:first-child {
-  display: inline-block;
-  padding: 4px 8px;
-  margin-right: 12px;
-  border-radius: 4px;
-  font-size: 11px;
-  font-weight: 700;
-  text-transform: uppercase;
-  color: #fff;
-  background: #263c5c;
-}
-.arearef.banner-element-workunit .refid > span.valignmiddle:first-child {
-  background: #0d8aff;
 }

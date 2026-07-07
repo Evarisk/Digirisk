@@ -236,6 +236,68 @@ $dtc-title:       #111827;
         }
     }
 
+    // ---- Inline edit badges (thirdparty / project in the banner) — reedcrm-style ----
+    // Badge chrome: module logo + a dedicated navigation icon + the editable name
+    // (dashed underline, click to reveal a searchable select) + (thirdparty only) a
+    // ticket-history icon.
+    .dtc-inline-badge {
+        display: inline-flex;
+        align-items: center;
+        gap: 6px;
+        background: #f8fbff;
+        border: 1px solid $dtc-border;
+        border-radius: 6px;
+        padding: 3px 8px 3px 6px;
+        vertical-align: middle;
+        font-weight: 500;
+        font-size: 0.9em;
+        color: $dtc-grey;
+        margin: 2px 0;
+
+        a { text-decoration: none; }
+
+        .dtc-badge-logo {
+            height: 16px;
+            width: 16px;
+            object-fit: contain;
+            border-right: 1px solid $dtc-border;
+            padding-right: 6px;
+        }
+        .dtc-badge-nav,
+        .dtc-badge-history {
+            color: #64748b;
+            display: inline-flex;
+            align-items: center;
+            transition: color .15s ease;
+
+            &:hover { color: $dtc-blue; }
+        }
+        .dtc-badge-name {
+            color: $dtc-title;
+            max-width: 260px;
+            overflow: hidden;
+            text-overflow: ellipsis;
+            white-space: nowrap;
+
+            &.dtc-inline-edit {
+                cursor: pointer;
+                border-bottom: 1px dashed #cbd5e0;
+                line-height: 1;
+                padding-bottom: 1px;
+                transition: color .2s ease;
+
+                &:hover { color: $dtc-blue; }
+            }
+            &.is-empty {
+                color: #94a3b8;
+                font-style: italic;
+            }
+        }
+        .dtc-inline-selector { display: inline-flex; }
+        select.dtc-inline-select { min-width: 200px; }
+        .select2-container { vertical-align: middle; }
+    }
+
     // ---- Inline edit (extrafields) ----
     .dtc-inline-editable {
         cursor: pointer;
