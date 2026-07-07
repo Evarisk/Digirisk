@@ -159,6 +159,213 @@ if ($action === 'set_task_progress_ajax' && $permissionToWrite) {
     exit;
 }
 
+// AJAX: post a conversation message (note interne here; public recipients + email in later steps)
+if ($action === 'post_message_ajax' && $permissionToWrite) {
+    $body    = trim(GETPOST('body', 'restricthtml'));
+    $subject = trim(GETPOST('subject', 'alphanohtml'));
+    $private = GETPOSTINT('private');
+    $toList  = GETPOST('to', 'array') ?: [];
+    $ccList  = GETPOST('cc', 'array') ?: [];
+    if ($body === '') {
+        header('Content-Type: application/json');
+        print json_encode(['success' => 0, 'message' => $langs->trans('ErrorBadParameters')]);
+        exit;
+    }
+    $object->fetch($id);
+    $object->subject = $subject ?: ($object->subject ?? '');
+    $object->message = $body;
+    $object->private = $private;
+    $willMail = (!$private && (!empty($toList) || !empty($ccList)));
+    $newMsgId = $object->createTicketMessage($user, 0, [], [], [], $willMail);
+    if (!$newMsgId || $newMsgId <= 0) {
+        header('Content-Type: application/json');
+        print json_encode(['success' => 0, 'message' => $object->error ?: $langs->trans('Error')]);
+        exit;
+    }
+    // Process uploaded attachments: move into the ticket dir + index in ecm_files (linked to the message).
+    $fileNameList     = [];
+    $mimeTypeList     = [];
+    $mimeFileNameList = [];
+    if (!empty($_FILES['files']) && !empty($_FILES['files']['name'])) {
+        require_once DOL_DOCUMENT_ROOT . '/ecm/class/ecmfiles.class.php';
+        $ticketDir = $conf->ticket->dir_output . '/' . dol_sanitizeFileName($object->ref);
+        dol_mkdir($ticketDir);
+        $relDir    = 'ticket/' . dol_sanitizeFileName($object->ref);
+        $fileNames = (array) $_FILES['files']['name'];
+        $fileTmps  = (array) $_FILES['files']['tmp_name'];
+        $nbFiles   = count($fileNames);
+        for ($fi = 0; $fi < $nbFiles; $fi++) {
+            if (empty($fileNames[$fi]) || empty($fileTmps[$fi])) {
+                continue;
+            }
+            $safeName = dol_sanitizeFileName($fileNames[$fi]);
+            $destFile = $ticketDir . '/' . $safeName;
+            if (dol_move_uploaded_file($fileTmps[$fi], $destFile, 1) > 0) {
+                $fileNameList[]     = $destFile;
+                $mimeTypeList[]     = dol_mimetype($destFile);
+                $mimeFileNameList[] = $safeName;
+                $ecmFile = new EcmFiles($db);
+                $ecmFile->filepath        = $relDir;
+                $ecmFile->filename        = $safeName;
+                $ecmFile->fullpath_orig   = $safeName;
+                $ecmFile->gen_or_uploaded = 'uploaded';
+                $ecmFile->entity          = $conf->entity;
+                $ecmFile->src_object_type = 'ticket';
+                $ecmFile->src_object_id   = (int) $object->id;
+                $ecmFile->agenda_id       = (int) $newMsgId;
+                if ($ecmFile->create($user) <= 0) {
+                    dol_syslog('ticket conversation: ecm index failed for ' . $destFile, LOG_WARNING);
+                }
+            }
+        }
+    }
+    $mailNotice = '';
+    if ($willMail && !getDolGlobalString('TICKET_DISABLE_ALL_MAILS')) {
+        $sendto   = [];
+        $sendtocc = [];
+        foreach ($toList as $recipient) {
+            $recipient = trim((string) $recipient);
+            if (filter_var($recipient, FILTER_VALIDATE_EMAIL)) {
+                $sendto[$recipient] = $recipient;
+            }
+        }
+        foreach ($ccList as $recipient) {
+            $recipient = trim((string) $recipient);
+            if (filter_var($recipient, FILTER_VALIDATE_EMAIL)) {
+                $sendtocc[$recipient] = $recipient;
+            }
+        }
+        if (!empty($sendto)) {
+            global $mysoc;
+            $modelId       = GETPOSTINT('model_id');
+            $mailSubject   = $subject;
+            $mailBodyInner = $body;
+            if ($modelId > 0) {
+                require_once DOL_DOCUMENT_ROOT . '/core/class/html.formmail.class.php';
+                $formmailTpl = new FormMail($db);
+                $tpl = $formmailTpl->getEMailTemplate($db, 'ticket_send', $user, $langs, $modelId);
+                if (is_object($tpl)) {
+                    if ($mailSubject === '' && !empty($tpl->topic)) {
+                        $mailSubject = $tpl->topic;
+                    }
+                    if (!empty($tpl->content)) {
+                        $mailBodyInner = $tpl->content . '<br><br>' . $body;
+                    }
+                }
+            }
+            $appli = getDolGlobalString('MAIN_APPLICATION_TITLE', !empty($mysoc->name) ? $mysoc->name : 'Dolibarr');
+            if ($mailSubject === '') {
+                $mailSubject = '[' . $appli . ' - ' . $langs->transnoentities('Ticket') . ' #' . $object->track_id . '] ' . $langs->transnoentities('TicketNewMessage');
+            }
+            $intro     = getDolGlobalString('TICKET_MESSAGE_MAIL_INTRO', $langs->transnoentities('TicketMessageMailIntroText'));
+            $signature = getDolGlobalString('TICKET_MESSAGE_MAIL_SIGNATURE');
+            $urlTicket = dol_buildpath('/ticket/card.php', 2) . '?track_id=' . $object->track_id;
+            $mailBody  = ($intro !== '' ? $intro . '<br><br>' : '') . $mailBodyInner . '<br><br>'
+                . $langs->transnoentities('TicketNotificationEmailBodyInfosTrackUrlinternal') . ' : <a href="' . $urlTicket . '">' . $object->track_id . '</a>'
+                . (!empty($signature) ? '<br><br>' . $signature : '');
+            $from    = getDolGlobalString('TICKET_NOTIFICATION_EMAIL_FROM');
+            $replyto = getDolGlobalString('TICKET_NOTIFICATION_EMAIL_REPLYTO');
+            $sentOk  = $object->sendTicketMessageByEmail($mailSubject, $mailBody, 0, $sendto, $sendtocc, $fileNameList, $mimeTypeList, $mimeFileNameList, $from, $replyto);
+            // Persist recipients on the actioncomm so past public messages show To/Cc chips.
+            $db->query('UPDATE ' . MAIN_DB_PREFIX . "actioncomm SET email_to = '" . $db->escape(implode(',', array_keys($sendto))) . "', email_tocc = '" . $db->escape(implode(',', array_keys($sendtocc))) . "' WHERE id = " . (int) $newMsgId);
+            $mailNotice = $sentOk
+                ? ' — ' . $langs->transnoentities('MailSentToNRecipients', (string) count($sendto))
+                : ' — ' . $langs->transnoentities('MailNotSent');
+        } else {
+            $mailNotice = ' — ' . $langs->trans('NoRecipientFound');
+        }
+    }
+    // Notify mentioned agents (@mentions on internal notes) + record them on the message.
+    $mentions     = GETPOST('mentions', 'array') ?: [];
+    $mentionNames = [];
+    if (!empty($mentions)) {
+        require_once DOL_DOCUMENT_ROOT . '/core/class/CMailFile.class.php';
+        $ticketUrlAbs = dol_buildpath('/custom/digiriskdolibarr/view/ticket/ticket_card.php', 2) . '?id=' . (int) $object->id;
+        $mentionFrom  = getDolGlobalString('TICKET_NOTIFICATION_EMAIL_FROM', getDolGlobalString('MAIN_MAIL_EMAIL_FROM'));
+        foreach ($mentions as $mentionUid) {
+            $mentionUid = (int) $mentionUid;
+            if ($mentionUid <= 0) {
+                continue;
+            }
+            $mentionUser = new User($db);
+            if ($mentionUser->fetch($mentionUid) <= 0) {
+                continue;
+            }
+            $mentionNames[] = $mentionUser->getFullName($langs) ?: $mentionUser->login;
+            if ($mentionUid !== (int) $user->id && !empty($mentionUser->email) && !getDolGlobalString('TICKET_DISABLE_ALL_MAILS')) {
+                $mentionSubject = $langs->trans('YouWereMentionedOnTicket', $object->ref);
+                $mentionBody    = $langs->trans('YouWereMentionedOnTicketBody', $user->getFullName($langs), $object->ref) . '<br><br>' . $body . '<br><br><a href="' . $ticketUrlAbs . '">' . dol_escape_htmltag($object->ref) . '</a>';
+                $mentionMail    = new CMailFile($mentionSubject, $mentionUser->email, $mentionFrom, $mentionBody, [], [], [], '', '', 0, 1);
+                $mentionMail->sendfile();
+            }
+        }
+        // Record the mentioned names on the private note (email_to is free for notes).
+        if ($private && !empty($mentionNames)) {
+            $db->query('UPDATE ' . MAIN_DB_PREFIX . "actioncomm SET email_to = '" . $db->escape(implode(', ', $mentionNames)) . "' WHERE id = " . (int) $newMsgId);
+        }
+    }
+    // Build the V2 bubble via the shared lib helper so it matches the initial render.
+    $bubbleItem            = new stdClass();
+    $bubbleItem->id        = (int) $newMsgId;
+    $bubbleItem->type      = $private ? 'internal' : 'public';
+    $bubbleItem->mine      = true;
+    $bubbleItem->author    = $user->getFullName($langs) ?: $user->login;
+    $bubbleItem->av_uid    = $user->id;
+    $bubbleItem->av_first  = $user->firstname;
+    $bubbleItem->av_last   = $user->lastname;
+    $bubbleItem->av_login  = $user->login;
+    $bubbleItem->av_photo  = $user->photo;
+    $bubbleItem->ts        = (int) dol_now();
+    $bubbleItem->subject   = $subject;
+    $bubbleItem->body_html = dolPrintHTML($body);
+    $bubbleItem->sent_mail  = (bool) $willMail;
+    $bubbleItem->to         = $private ? [] : $toList;
+    $bubbleItem->cc         = $private ? [] : $ccList;
+    $bubbleItem->mentions   = $private ? $mentionNames : [];
+    $bubbleItem->file_count = count($fileNameList);
+    $bubble = digiriskdolibarr_ticket_conversation_bubble($langs, $conf, $bubbleItem, (int) dol_now());
+    header('Content-Type: application/json');
+    print json_encode(['success' => 1, 'message' => $langs->trans('MessagePosted') . $mailNotice, 'message_id' => (int) $newMsgId, 'bubble' => $bubble]);
+    exit;
+}
+
+// AJAX: edit own conversation message (author-only)
+if ($action === 'edit_message_ajax' && $permissionToWrite) {
+    $msgId   = GETPOSTINT('message_id');
+    $newBody = trim(GETPOST('body', 'restricthtml'));
+    require_once DOL_DOCUMENT_ROOT . '/comm/action/class/actioncomm.class.php';
+    $ac = new ActionComm($db);
+    $ac->fetch($msgId);
+    header('Content-Type: application/json');
+    if ($ac->id > 0 && (int) $ac->userownerid === (int) $user->id && strpos((string) $ac->code, 'TICKET_MSG') === 0 && $newBody !== '') {
+        $ac->note_private = $newBody;
+        $ac->note         = $newBody;
+        if ($ac->update($user) > 0) {
+            print json_encode(['success' => 1, 'body_html' => dolPrintHTML($newBody)]);
+            exit;
+        }
+    }
+    print json_encode(['success' => 0, 'message' => $langs->trans('NotAllowed')]);
+    exit;
+}
+
+// AJAX: delete own conversation message (author-only)
+if ($action === 'delete_message_ajax' && $permissionToWrite) {
+    $msgId = GETPOSTINT('message_id');
+    require_once DOL_DOCUMENT_ROOT . '/comm/action/class/actioncomm.class.php';
+    $ac = new ActionComm($db);
+    $ac->fetch($msgId);
+    header('Content-Type: application/json');
+    if ($ac->id > 0 && (int) $ac->userownerid === (int) $user->id && strpos((string) $ac->code, 'TICKET_MSG') === 0) {
+        if ($ac->delete($user) > 0) {
+            print json_encode(['success' => 1]);
+            exit;
+        }
+    }
+    print json_encode(['success' => 0, 'message' => $langs->trans('NotAllowed')]);
+    exit;
+}
+
 // Action: create parent task manually (#4881)
 if ($action === 'create_parent_task' && $permissionToWrite && !empty($object->fk_project)) {
     require_once DOL_DOCUMENT_ROOT . '/projet/class/task.class.php';
@@ -736,6 +943,215 @@ $formactions->showactions($object, 'ticket', 0, 1, 'listactions', 5);
 
 print '</div>'; // fichehalfright
 print '</div>'; // fichecenter
+
+/*
+ * Conversation (full-width) — ticket conversation system.
+ * Timeline = synthetic initial (from $object->message) + all ticket actioncomm rows
+ * (TICKET_MSG* = message cards, others = discrete event lines), oldest first.
+ */
+$threadItems = [];
+if (!empty($object->message)) {
+    $init = new stdClass();
+    $init->kind = 'message';
+    $init->id   = 0;
+    $init->type = 'initial';
+    $init->mine = false;
+    if ($object->fk_user_create > 0) {
+        $creatorUser = new User($db);
+        $creatorUser->fetch($object->fk_user_create);
+        $init->author   = $creatorUser->getFullName($langs) ?: ($creatorUser->login ?: $langs->trans('Unknown'));
+        $init->av_uid   = $creatorUser->id;
+        $init->av_first = $creatorUser->firstname;
+        $init->av_last  = $creatorUser->lastname;
+        $init->av_login = $creatorUser->login;
+        $init->av_photo = $creatorUser->photo;
+    } else {
+        $init->author = $langs->trans('Unknown');
+        $init->av_uid = 0;
+        $init->av_first = $init->av_last = $init->av_login = $init->av_photo = '';
+    }
+    $init->ts        = (int) $object->datec;
+    $init->subject   = '';
+    $init->body_html = dolPrintHTML((string) $object->message);
+    $init->sent_mail = false;
+    $init->to        = [];
+    $init->cc        = [];
+    $threadItems[]   = $init;
+}
+$sqlThread = 'SELECT a.id, a.code, a.label, a.note as note_private, a.datep,'
+    . ' a.fk_user_author, a.email_to, a.email_tocc,'
+    . ' u.firstname, u.lastname, u.login, u.photo'
+    . ' FROM ' . MAIN_DB_PREFIX . 'actioncomm a'
+    . ' LEFT JOIN ' . MAIN_DB_PREFIX . 'user u ON u.rowid = a.fk_user_author'
+    . ' WHERE a.fk_element = ' . (int) $object->id . " AND a.elementtype = 'ticket'"
+    . ' ORDER BY a.datep ASC, a.id ASC';
+$resThread = $db->query($sqlThread);
+if ($resThread) {
+    while ($rowThread = $db->fetch_object($resThread)) {
+        if ($rowThread->code === 'AC_TICKET_CREATE') {
+            // Redundant with the synthetic initial rendered above.
+            continue;
+        }
+        $tsThread = (int) $db->jdate($rowThread->datep);
+        if (strpos((string) $rowThread->code, 'TICKET_MSG') === 0) {
+            $msgItem = new stdClass();
+            $msgItem->kind     = 'message';
+            $msgItem->id       = (int) $rowThread->id;
+            $msgItem->type     = preg_match('/PRIVATE/', (string) $rowThread->code) ? 'internal' : 'public';
+            $msgItem->mine     = ((int) $rowThread->fk_user_author === (int) $user->id);
+            $msgItem->author   = trim(((string) $rowThread->firstname) . ' ' . ((string) $rowThread->lastname)) ?: ((string) $rowThread->login ?: $langs->trans('Unknown'));
+            $msgItem->av_uid   = (int) $rowThread->fk_user_author;
+            $msgItem->av_first = $rowThread->firstname;
+            $msgItem->av_last  = $rowThread->lastname;
+            $msgItem->av_login = $rowThread->login;
+            $msgItem->av_photo = $rowThread->photo;
+            $msgItem->ts       = $tsThread;
+            $msgItem->subject  = (string) $rowThread->label;
+            $msgItem->body_html = dolPrintHTML((string) $rowThread->note_private);
+            $msgItem->sent_mail = (bool) preg_match('/SENTBYMAIL/', (string) $rowThread->code);
+            $isPublicMsg        = ($msgItem->type === 'public');
+            $msgItem->to        = ($isPublicMsg && !empty($rowThread->email_to)) ? explode(',', (string) $rowThread->email_to) : [];
+            $msgItem->cc        = ($isPublicMsg && !empty($rowThread->email_tocc)) ? explode(',', (string) $rowThread->email_tocc) : [];
+            $msgItem->mentions  = (!$isPublicMsg && !empty($rowThread->email_to)) ? explode(',', (string) $rowThread->email_to) : [];
+            $threadItems[]      = $msgItem;
+        } else {
+            $evItem = new stdClass();
+            $evItem->kind = 'event';
+            $evItem->ts   = $tsThread;
+            $evWho        = trim(((string) $rowThread->firstname) . ' ' . ((string) $rowThread->lastname)) ?: (string) $rowThread->login;
+            $evItem->text = ((string) ($rowThread->label ?: $rowThread->code)) . ($evWho !== '' ? ' · ' . $evWho : '') . ' · ' . dol_print_date($tsThread, 'dayhour', 'tzuser');
+            $threadItems[] = $evItem;
+        }
+    }
+    $db->free($resThread);
+}
+$threadMsgCount = 0;
+$threadMsgIds   = [];
+foreach ($threadItems as $threadItem) {
+    if ($threadItem->kind === 'message') {
+        $threadMsgCount++;
+        $threadItem->file_count = 0;
+        if ((int) $threadItem->id > 0) {
+            $threadMsgIds[] = (int) $threadItem->id;
+        }
+    }
+}
+if (!empty($threadMsgIds)) {
+    $resFiles = $db->query('SELECT agenda_id, COUNT(*) as nb FROM ' . MAIN_DB_PREFIX . 'ecm_files WHERE agenda_id IN (' . implode(',', $threadMsgIds) . ') GROUP BY agenda_id');
+    if ($resFiles) {
+        $fileCounts = [];
+        while ($rowFile = $db->fetch_object($resFiles)) {
+            $fileCounts[(int) $rowFile->agenda_id] = (int) $rowFile->nb;
+        }
+        $db->free($resFiles);
+        foreach ($threadItems as $threadItem) {
+            if ($threadItem->kind === 'message' && isset($fileCounts[(int) $threadItem->id])) {
+                $threadItem->file_count = $fileCounts[(int) $threadItem->id];
+            }
+        }
+    }
+}
+
+$nowConv = dol_now();
+print '<div class="dtc-conversation" data-ticket-id="' . (int) $object->id . '" data-url="' . dol_escape_htmltag($url_page_current) . '" data-lang-confirm-delete="' . dol_escape_htmltag($langs->transnoentities('ConfirmDeleteMessage')) . '">';
+print '<div class="dtc-conversation__head"><i class="fas fa-comments"></i> ' . $langs->trans('Conversation') . ' <span class="opacitymedium">(' . (int) $threadMsgCount . ')</span></div>';
+print '<ul class="dtc-thread">';
+$lastDay = '';
+foreach ($threadItems as $threadItem) {
+    $dayLabel = dol_print_date((int) $threadItem->ts, 'day', 'tzuser');
+    if ($dayLabel !== $lastDay) {
+        print '<li class="dtc-thread__daysep"><span>' . dol_escape_htmltag($dayLabel) . '</span></li>';
+        $lastDay = $dayLabel;
+    }
+    if ($threadItem->kind === 'event') {
+        print '<li class="dtc-event">' . dol_escape_htmltag($threadItem->text) . '</li>';
+    } else {
+        print digiriskdolibarr_ticket_conversation_bubble($langs, $conf, $threadItem, (int) $nowConv);
+    }
+}
+if ($threadMsgCount === 0) {
+    print '<li class="dtc-thread__empty"><i class="fas fa-comments"></i><div>' . $langs->trans('NoMessageYet') . '</div><div class="opacitymedium">' . $langs->trans('BeFirstToReply') . '</div></li>';
+}
+print '</ul>';
+// Composer — note interne (public recipients/attachments/mentions added in later tasks).
+if ($permissionToWrite) {
+    require_once DOL_DOCUMENT_ROOT . '/core/class/doleditor.class.php';
+    // Preloaded recipient suggestions (external ticket contacts + thirdparty email).
+    $convSuggestions = [];
+    $object->fetch_thirdparty();
+    $convExtContacts = $object->liste_contact(-1, 'external');
+    if (is_array($convExtContacts)) {
+        foreach ($convExtContacts as $convContact) {
+            $convEmail = (string) ($convContact['email'] ?? '');
+            if ($convEmail !== '') {
+                $convName = trim(((string) ($convContact['firstname'] ?? '')) . ' ' . ((string) ($convContact['lastname'] ?? ''))) ?: $convEmail;
+                $convSuggestions[$convEmail] = $convName . ' <' . $convEmail . '>';
+            }
+        }
+    }
+    if (is_object($object->thirdparty) && !empty($object->thirdparty->email)) {
+        $convSuggestions[$object->thirdparty->email] = $object->thirdparty->name . ' <' . $object->thirdparty->email . '>';
+    }
+    // Available ticket_send email templates.
+    $convTemplates = [];
+    $resConvTpl = $db->query("SELECT rowid, label FROM " . MAIN_DB_PREFIX . "c_email_templates WHERE type_template = 'ticket_send' AND active = 1 AND entity IN (" . getEntity('c_email_templates') . ") ORDER BY label");
+    if ($resConvTpl) {
+        while ($objConvTpl = $db->fetch_object($resConvTpl)) {
+            $convTemplates[(int) $objConvTpl->rowid] = $objConvTpl->label;
+        }
+        $db->free($resConvTpl);
+    }
+    // Internal agents for @mentions.
+    $convAgents = [];
+    $resConvAg = $db->query('SELECT rowid, firstname, lastname, login FROM ' . MAIN_DB_PREFIX . 'user WHERE statut = 1 AND entity IN (' . getEntity('user') . ') ORDER BY lastname, firstname');
+    if ($resConvAg) {
+        while ($objConvAg = $db->fetch_object($resConvAg)) {
+            $convAgents[(int) $objConvAg->rowid] = trim(((string) $objConvAg->firstname) . ' ' . ((string) $objConvAg->lastname)) ?: (string) $objConvAg->login;
+        }
+        $db->free($resConvAg);
+    }
+    print '<form class="dtc-composer dtc-composer--internal" data-mode="internal" data-lang-savenote="' . dol_escape_htmltag($langs->transnoentities('SaveNote')) . '" data-lang-send="' . dol_escape_htmltag($langs->transnoentities('Send')) . '">';
+    print '<div class="dtc-composer__switch">';
+    print '<button type="button" class="dtc-composer__tab is-active" data-mode="internal"><i class="fas fa-lock"></i> ' . $langs->trans('PrivateMessage') . '</button>';
+    print '<button type="button" class="dtc-composer__tab" data-mode="public"><i class="fas fa-share"></i> ' . $langs->trans('PublicMessage') . '</button>';
+    print '</div>';
+    print '<div class="dtc-composer__public" style="display:none;">';
+    print '<datalist id="dtc_recipient_suggestions">';
+    foreach ($convSuggestions as $convEmail => $convLabel) {
+        print '<option value="' . dol_escape_htmltag($convEmail) . '">' . dol_escape_htmltag($convLabel) . '</option>';
+    }
+    print '</datalist>';
+    print '<div class="dtc-recipients" data-target="to"><span class="dtc-recipients__label">' . $langs->trans('ConvTo') . '</span><span class="dtc-chips"></span><input type="text" class="dtc-chip-input" list="dtc_recipient_suggestions" placeholder="' . dol_escape_htmltag($langs->trans('AddRecipient')) . '"></div>';
+    print '<div class="dtc-recipients" data-target="cc"><span class="dtc-recipients__label">' . $langs->trans('ConvCc') . '</span><span class="dtc-chips"></span><input type="text" class="dtc-chip-input" list="dtc_recipient_suggestions" placeholder="Cc"></div>';
+    print '<input type="text" class="dtc-composer__subject" name="subject" placeholder="' . dol_escape_htmltag($langs->trans('Subject')) . '" value="' . dol_escape_htmltag('Re: ' . (string) $object->subject . ' — ' . (string) $object->ref) . '">';
+    if (!empty($convTemplates)) {
+        print '<select class="dtc-model-select" name="model_id"><option value="0">' . dol_escape_htmltag($langs->trans('EMailTemplates')) . '…</option>';
+        foreach ($convTemplates as $convTplId => $convTplLabel) {
+            print '<option value="' . (int) $convTplId . '">' . dol_escape_htmltag($convTplLabel) . '</option>';
+        }
+        print '</select>';
+    }
+    print '</div>';
+    print '<div class="dtc-composer__mentions">';
+    print '<span class="dtc-recipients__label" title="' . dol_escape_htmltag($langs->trans('MentionAgents')) . '"><i class="fas fa-at"></i></span>';
+    print $form->multiselectarray('dtc_mentions', $convAgents, [], 0, 0, 'dtc-mention-select', 0, 0, '', '', $langs->trans('MentionAgents'));
+    print '</div>';
+    print '<div class="dtc-composer__editor">';
+    $convEditor = new DolEditor('dtc_body', '', '', 140, 'dolibarr_notes', 'In', false, true, getDolGlobalString('FCKEDITOR_ENABLE_TICKET'), ROWS_4, '100%');
+    $convEditor->Create();
+    print '</div>';
+    print '<div class="dtc-composer__attach">';
+    print '<input type="file" class="dtc-file-input" multiple style="display:none;">';
+    print '<button type="button" class="dtc-attach-btn"><i class="fas fa-paperclip"></i> ' . $langs->trans('AddFile') . '</button>';
+    print '<span class="dtc-file-list"></span>';
+    print '</div>';
+    print '<div class="dtc-composer__foot">';
+    print '<button type="button" class="dtc-composer__send" data-thread-send><i class="fas fa-paper-plane"></i> <span class="dtc-composer__send-label">' . $langs->trans('SaveNote') . '</span></button>';
+    print '<span class="opacitymedium dtc-composer__hint"><kbd>Ctrl</kbd>+<kbd>Enter</kbd></span>';
+    print '</div>';
+    print '</form>';
+}
+print '</div>';
 
 print dol_get_fiche_end();
 
