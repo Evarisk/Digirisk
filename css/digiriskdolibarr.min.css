@@ -5473,6 +5473,71 @@ textarea.action-textarea:not(:last-child) {
   box-shadow: 0 0 0 2px rgba(43, 108, 176, 0.35);
   border-radius: 5px;
 }
+.digirisk-ticket-card .dtc-inline-badge {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  background: #f8fbff;
+  border: 1px solid #e5e7eb;
+  border-radius: 6px;
+  padding: 3px 8px 3px 6px;
+  vertical-align: middle;
+  font-weight: 500;
+  font-size: 0.9em;
+  color: #6b7280;
+  margin: 2px 0;
+}
+.digirisk-ticket-card .dtc-inline-badge a {
+  text-decoration: none;
+}
+.digirisk-ticket-card .dtc-inline-badge .dtc-badge-logo {
+  height: 16px;
+  width: 16px;
+  object-fit: contain;
+  border-right: 1px solid #e5e7eb;
+  padding-right: 6px;
+}
+.digirisk-ticket-card .dtc-inline-badge .dtc-badge-nav,
+.digirisk-ticket-card .dtc-inline-badge .dtc-badge-history {
+  color: #64748b;
+  display: inline-flex;
+  align-items: center;
+  transition: color 0.15s ease;
+}
+.digirisk-ticket-card .dtc-inline-badge .dtc-badge-nav:hover,
+.digirisk-ticket-card .dtc-inline-badge .dtc-badge-history:hover {
+  color: #2b6cb0;
+}
+.digirisk-ticket-card .dtc-inline-badge .dtc-badge-name {
+  color: #111827;
+  max-width: 260px;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+.digirisk-ticket-card .dtc-inline-badge .dtc-badge-name.dtc-inline-edit {
+  cursor: pointer;
+  border-bottom: 1px dashed #cbd5e0;
+  line-height: 1;
+  padding-bottom: 1px;
+  transition: color 0.2s ease;
+}
+.digirisk-ticket-card .dtc-inline-badge .dtc-badge-name.dtc-inline-edit:hover {
+  color: #2b6cb0;
+}
+.digirisk-ticket-card .dtc-inline-badge .dtc-badge-name.is-empty {
+  color: #94a3b8;
+  font-style: italic;
+}
+.digirisk-ticket-card .dtc-inline-badge .dtc-inline-selector {
+  display: inline-flex;
+}
+.digirisk-ticket-card .dtc-inline-badge select.dtc-inline-select {
+  min-width: 200px;
+}
+.digirisk-ticket-card .dtc-inline-badge .select2-container {
+  vertical-align: middle;
+}
 .digirisk-ticket-card .dtc-inline-editable {
   cursor: pointer;
   border-bottom: 1px dashed #d1d5db;
