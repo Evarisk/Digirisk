@@ -63,3 +63,31 @@ MeteoVigilanceCacheTTLDescription = How long API data is cached before a new cal
 MeteoVigilanceSettings = Weather warning configuration
 MeteoVigilanceRefreshNow = Refresh now
 MeteoVigilanceRefreshed = Data refreshed: %s warning for department %s
+
+# Ticket conversation system
+Conversation = Conversation
+PublicMessage = Public message
+ConvTo = To
+ConvCc = Cc
+PrivateMessage = Private message
+OriginalMessage = Original message
+SentByMail = Sent by email
+NoMessageYet = No message yet
+BeFirstToReply = Be the first to reply
+JustNow = just now
+Quote = Quote
+
+SaveNote = Save note
+
+AddRecipient = Add recipient
+NoRecipientFound = No recipient found
+
+AddFile = Add file
+NAttachedFiles = %s attached file(s)
+
+MentionAgents = Mention agents
+YouWereMentionedOnTicket = You were mentioned on ticket %s
+YouWereMentionedOnTicketBody = %s mentioned you on ticket %s:
+ConfirmDeleteMessage = Delete this message?
+
+Mentioned = Mentioned
