@@ -153,3 +153,110 @@ function load_ticket_infos(array $moreParam = []): array
 
     return $array;
 }
+
+/**
+ * Render one conversation bubble (<li>) for the ticket card thread (V2 style).
+ *
+ * Shared by the initial server render and the AJAX post_message response so both
+ * produce identical markup.
+ *
+ * @param  Translate $langs Lang object.
+ * @param  Conf      $conf  Conf object.
+ * @param  stdClass  $m     Normalized message: id(int), type(initial|internal|public),
+ *                          mine(bool), author(string), av_uid, av_first, av_last, av_login,
+ *                          av_photo, ts(int), subject(string), body_html(string),
+ *                          sent_mail(bool), to(array), cc(array).
+ * @param  int       $now   Current timestamp (dol_now()).
+ * @return string           The <li> HTML.
+ */
+function digiriskdolibarr_ticket_conversation_bubble($langs, $conf, stdClass $m, int $now): string
+{
+    $diff = $now - (int) $m->ts;
+    if ($diff < 60) {
+        $rel = $langs->trans('JustNow');
+    } elseif ($diff < 3600) {
+        $rel = round($diff / 60) . ' min';
+    } elseif ($diff < 86400) {
+        $rel = round($diff / 3600) . ' h';
+    } elseif ($diff < 172800) {
+        $rel = $langs->trans('Yesterday');
+    } else {
+        $rel = dol_print_date((int) $m->ts, 'day', 'tzuser');
+    }
+
+    $initials = strtoupper(dol_substr((string) ($m->av_first ?: ($m->av_last ?: ($m->av_login ?: '?'))), 0, 1));
+    if (!empty($m->av_photo) && (int) $m->av_uid > 0 && file_exists(DOL_DATA_ROOT . '/users/' . (int) $m->av_uid . '/' . $m->av_photo)) {
+        $photoUrl = DOL_URL_ROOT . '/viewimage.php?modulepart=userphoto&entity=' . (int) $conf->entity . '&file=' . urlencode((int) $m->av_uid . '/' . $m->av_photo) . '&cache=' . (int) $m->av_uid;
+        $avatar   = '<img class="dtc-msg__avatar" src="' . dol_escape_htmltag($photoUrl) . '" alt="' . dol_escape_htmltag($initials) . '">';
+    } else {
+        $avatar   = '<span class="dtc-msg__avatar">' . dol_escape_htmltag($initials) . '</span>';
+    }
+
+    $type = in_array($m->type, ['initial', 'internal', 'public'], true) ? $m->type : 'public';
+    if ($type === 'internal') {
+        $typeLabel = '<i class="fas fa-lock"></i> ' . $langs->trans('PrivateMessage');
+    } elseif ($type === 'initial') {
+        $typeLabel = '<i class="fas fa-flag"></i> ' . $langs->trans('OriginalMessage');
+    } else {
+        $typeLabel = '<i class="fas fa-share"></i> ' . $langs->trans('PublicMessage');
+    }
+
+    $cls = 'dtc-msg dtc-msg--' . $type . (!empty($m->mine) ? ' dtc-msg--mine' : '');
+    $out = '<li class="' . $cls . '" data-msg-id="' . (int) $m->id . '" data-msg-mine="' . (!empty($m->mine) ? '1' : '0') . '">';
+    $out .= $avatar;
+    $out .= '<div class="dtc-msg__card">';
+    $out .= '<div class="dtc-msg__head">';
+    $out .= '<span class="dtc-msg__author">' . dol_escape_htmltag((string) $m->author) . '</span>';
+    $out .= '<span class="dtc-msg__type">' . $typeLabel . '</span>';
+    $out .= '<span class="dtc-msg__time" title="' . dol_escape_htmltag(dol_print_date((int) $m->ts, 'dayhour', 'tzuser')) . '">' . dol_escape_htmltag($rel) . '</span>';
+    $out .= '</div>';
+    if ($type === 'public' && (!empty($m->to) || !empty($m->cc))) {
+        $out .= '<div class="dtc-msg__to">';
+        if (!empty($m->to)) {
+            $out .= dol_escape_htmltag($langs->trans('ConvTo')) . ' : ';
+            foreach ($m->to as $recipient) {
+                if (trim((string) $recipient) !== '') {
+                    $out .= '<span class="dtc-pill">' . dol_escape_htmltag(trim((string) $recipient)) . '</span> ';
+                }
+            }
+        }
+        if (!empty($m->cc)) {
+            $out .= ' ' . dol_escape_htmltag($langs->trans('ConvCc')) . ' : ';
+            foreach ($m->cc as $recipient) {
+                if (trim((string) $recipient) !== '') {
+                    $out .= '<span class="dtc-pill">' . dol_escape_htmltag(trim((string) $recipient)) . '</span> ';
+                }
+            }
+        }
+        $out .= '</div>';
+    }
+    if ($type === 'internal' && !empty($m->mentions)) {
+        $out .= '<div class="dtc-msg__to dtc-msg__mentions"><i class="fas fa-bell"></i> ' . dol_escape_htmltag($langs->trans('Mentioned')) . ' : ';
+        foreach ($m->mentions as $mentionName) {
+            if (trim((string) $mentionName) !== '') {
+                $out .= '<span class="dtc-pill">' . dol_escape_htmltag(trim((string) $mentionName)) . '</span> ';
+            }
+        }
+        $out .= '</div>';
+    }
+    if (!empty($m->subject)) {
+        $out .= '<div class="dtc-msg__subject">' . dol_escape_htmltag((string) $m->subject) . '</div>';
+    }
+    $out .= '<div class="dtc-msg__body" data-msg-body>' . $m->body_html . '</div>';
+    if (!empty($m->file_count)) {
+        $out .= '<a class="dtc-msg__files" href="' . DOL_URL_ROOT . '/comm/action/document.php?id=' . (int) $m->id . '" target="_blank" rel="noopener"><i class="fas fa-paperclip"></i> ' . dol_escape_htmltag($langs->trans('NAttachedFiles', (string) (int) $m->file_count)) . '</a>';
+    }
+    if (!empty($m->sent_mail)) {
+        $out .= '<div class="dtc-msg__sent"><i class="fas fa-check"></i> ' . $langs->trans('SentByMail') . '</div>';
+    }
+    $out .= '<div class="dtc-msg__actions">';
+    $out .= '<button type="button" class="dtc-msg__act" data-dtc-quote title="' . dol_escape_htmltag($langs->trans('Quote')) . '"><i class="fas fa-quote-right"></i></button>';
+    if (!empty($m->mine) && $type !== 'initial') {
+        $out .= '<button type="button" class="dtc-msg__act" data-dtc-edit title="' . dol_escape_htmltag($langs->trans('Modify')) . '"><i class="fas fa-pen"></i></button>';
+        $out .= '<button type="button" class="dtc-msg__act dtc-msg__act--danger" data-dtc-delete title="' . dol_escape_htmltag($langs->trans('Delete')) . '"><i class="fas fa-trash"></i></button>';
+    }
+    $out .= '</div>';
+    $out .= '</div></li>';
+
+    return $out;
+}

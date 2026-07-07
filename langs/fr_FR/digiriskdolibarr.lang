@@ -1947,3 +1947,22 @@ MeteoVigilanceCacheTTLDescription = Durée pendant laquelle les données de l'AP
 MeteoVigilanceSettings = Configuration Vigilance Météo
 MeteoVigilanceRefreshNow = Rafraîchir maintenant
 MeteoVigilanceRefreshed = Données rafraîchies : vigilance %s sur le département %s
+
+# Ticket conversation system
+Conversation = Conversation
+PublicMessage = Message public
+ConvTo = À
+ConvCc = Cc
+
+SaveNote = Enregistrer la note
+
+AddRecipient = Ajouter un destinataire
+NoRecipientFound = Aucun destinataire
+
+AddFile = Ajouter un fichier
+
+MentionAgents = Mentionner des agents
+YouWereMentionedOnTicket = Vous avez été mentionné sur le ticket %s
+YouWereMentionedOnTicketBody = %s vous a mentionné sur le ticket %s :
+
+Mentioned = Mentionné
