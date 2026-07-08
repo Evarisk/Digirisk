@@ -494,6 +494,25 @@ if ($action === 'confirm_set_status' && $permissionToWrite && !GETPOST('cancel')
     setEventMessages($object->error, $object->errors, 'errors');
 }
 
+// Action: ticket attached-files box — upload (sendit) + delete (remove_file) for the native showdocuments widget
+$ticketFilesDir = $conf->ticket->dir_output . '/' . dol_sanitizeFileName($object->ref);
+if (GETPOST('sendit', 'alpha') && $permissionToWrite && getDolGlobalString('MAIN_UPLOAD_DOC')) {
+    require_once DOL_DOCUMENT_ROOT . '/core/lib/files.lib.php';
+    dol_mkdir($ticketFilesDir);
+    dol_add_file_process($ticketFilesDir, 0, 1, 'userfile');
+    header('Location: ' . $url_page_current . '?id=' . $object->id);
+    exit;
+}
+if ($action === 'remove_file' && $permissionToWrite) {
+    require_once DOL_DOCUMENT_ROOT . '/core/lib/files.lib.php';
+    $ticketFileToDelete = dol_sanitizeFileName(basename(GETPOST('file', 'alphanohtml')));
+    if ($ticketFileToDelete !== '') {
+        dol_delete_file($ticketFilesDir . '/' . $ticketFileToDelete);
+    }
+    header('Location: ' . $url_page_current . '?id=' . $object->id);
+    exit;
+}
+
 /*
  * View
  */
@@ -787,6 +806,21 @@ if (!empty($linkedAccidents)) {
 } else {
     print '<span class="opacitymedium">' . $langs->trans('AccidentsLinked') . ' : ' . $langs->trans('None') . '</span>';
 }
+print '</td></tr>';
+print '</tbody></table>';
+
+// ---- Attached files (native Dolibarr documents widget: upload + list + delete + download) ----
+require_once DOL_DOCUMENT_ROOT . '/core/class/html.formfile.class.php';
+$formfileTicket  = new FormFile($db);
+$ticketFilesName = dol_sanitizeFileName($object->ref);
+$ticketFilesDir  = $conf->ticket->dir_output . '/' . $ticketFilesName;
+print '<table class="border centpercent tableforfield"><tbody>';
+print '<tr class="liste_titre trforfield"><td><div class="dtc-head">' . img_picto('', 'object_generic', 'class="pictoModule"') . ' ' . $langs->trans('Files') . '</div></td></tr>';
+print '<tr><td>';
+if ($permissionToWrite) {
+    print $formfileTicket->form_attach_new_file($url_page_current . '?id=' . $object->id, $langs->trans('AddFile'), 0, 0, 1, 40, $object, '', 0, '', 0);
+}
+print $formfileTicket->showdocuments('ticket', $ticketFilesName, $ticketFilesDir, $url_page_current . '?id=' . $object->id, 0, $permissionToWrite ? 1 : 0, '', 1, 0, 0, 28, 0, '', '', '', '');
 print '</td></tr>';
 print '</tbody></table>';
 
