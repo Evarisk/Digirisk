@@ -22,7 +22,9 @@
  */
 
 /**
- * Process the GP/UT organization actions (reorder, rename, quick create, delete).
+ * Process the GP/UT organization actions (reorder, quick create, delete).
+ * Renaming a label is not handled here: it goes through the generic Saturne contentEditable
+ * endpoint (core/ajax/saturne_update_field.php), see digirisk_element_label().
  * Shared by the left navigation panel (digirisk_header, rendered on every digirisk page)
  * and the standalone organization page. Must run before any HTML output: AJAX actions
  * answer JSON and form actions redirect, both ending with exit().
@@ -34,7 +36,7 @@ function digirisk_organization_actions()
     global $conf, $db, $langs, $user;
 
     $action = GETPOST('action', 'aZ09');
-    if (!in_array($action, ['saveOrganization', 'renameElement', 'quickCreateElement', 'deleteElement'])) {
+    if (!in_array($action, ['saveOrganization', 'quickCreateElement', 'deleteElement'])) {
         return;
     }
 
@@ -56,30 +58,6 @@ function digirisk_organization_actions()
 
         header('Content-Type: application/json');
         echo json_encode(['status' => 'success']);
-        exit;
-    }
-
-    if ($action == 'renameElement') {
-        $data      = json_decode(file_get_contents('php://input'), true);
-        $elementId = (int) $data['elementId'];
-        $newLabel  = trim($data['label']);
-
-        header('Content-Type: application/json');
-
-        if ($elementId > 0 && !empty($newLabel) && $user->rights->digiriskdolibarr->digiriskelement->write) {
-            $digiriskelement = new DigiriskElement($db);
-            $digiriskelement->fetch($elementId);
-            $digiriskelement->label = $newLabel;
-            $result = $digiriskelement->update($user);
-
-            if ($result > 0) {
-                echo json_encode(['status' => 'success', 'label' => $newLabel]);
-            } else {
-                echo json_encode(['status' => 'error', 'message' => $digiriskelement->error]);
-            }
-        } else {
-            echo json_encode(['status' => 'error', 'message' => 'Invalid data']);
-        }
         exit;
     }
 
@@ -159,7 +137,7 @@ function digirisk_header($title = '', $helpUrl = '', $arrayofjs = [], $arrayofcs
 {
 	global $conf, $langs, $db, $user, $moduleNameLowerCase;
 
-	// Process GP/UT organization actions (drag & drop save, rename, quick add, delete) before any HTML output
+	// Process GP/UT organization actions (drag & drop save, quick add, delete) before any HTML output
 	digirisk_organization_actions();
 
 	require_once __DIR__ . '/../class/digiriskelement/groupment.class.php';
@@ -348,6 +326,41 @@ function flatten_tree($tree)
 }
 
 /**
+ * Render the label of a GP/UT tree row, inline-editable when the user can write.
+ *
+ * Relies on the generic Saturne contentEditable mechanism (js/modules/contentEditable.js +
+ * core/ajax/saturne_update_field.php), the same one used by the banner and the lists, so the
+ * save path, the feedback and the permission checks are identical everywhere.
+ *
+ * The editable node is an inner span, not the <h3> itself: the title grows to fill the row
+ * (flex-grow) so its box would drag the hover outline and the ✓ feedback icon away from the
+ * text, up against the risk badges.
+ *
+ * @param  DigiriskElement $object    Element of the row
+ * @param  string          $moreClass Extra CSS classes appended to the tag
+ * @return string                     HTML of the label
+ */
+function digirisk_element_label(DigiriskElement $object, string $moreClass = ''): string
+{
+    global $langs, $user;
+
+    $class = trim('title element-label ' . $moreClass);
+    $label = dol_escape_htmltag($object->label);
+
+    if (empty($user->rights->digiriskdolibarr->digiriskelement->write)) {
+        return '<h3 class="' . $class . '">' . $label . '</h3>';
+    }
+
+    return '<h3 class="' . $class . '"><span class="contenteditable" contenteditable="true" role="textbox"'
+        . ' aria-label="' . dol_escape_htmltag($langs->trans('Label')) . '"'
+        . ' data-field="label"'
+        . ' data-id="' . ((int) $object->id) . '"'
+        . ' data-element="' . dol_escape_htmltag($object->element . '@' . $object->module) . '"'
+        . ' data-type="text"'
+        . ' data-error="' . dol_escape_htmltag($langs->trans('ErrorSaving')) . '">' . $label . '</span></h3>';
+}
+
+/**
  *	Display Recursive tree process for the left GP/UT navigation panel.
  *  Keeps the navigation hooks (.unit / #unit / #menu / data-object-id / .sub-list / .toggled)
  *  used by saturneElement.js and adds the organization interactions: drag & drop reorder,
@@ -427,7 +440,7 @@ function display_recurse_tree($digiriskElementTree, $i = 1)
                     <a id="slider" class="linkElement id<?php echo $obj->id; ?>" value="<?php echo $obj->id; ?>" href="<?php echo $navLink; ?>"><?php echo $obj->ref; ?></a>
                 </div>
 
-                <h3 class="title element-label name"><?php echo $obj->label; ?></h3>
+                <?php echo digirisk_element_label($obj, 'name'); ?>
 
                 <div class="actions">
                     <?php if ($user->rights->digiriskdolibarr->digiriskelement->write && $type == 'groupment' && !$isTrash) : ?>
@@ -501,8 +514,8 @@ function display_recurse_tree_organization($digiriskElementTree, $i = 1, $riskIn
                             <a href="<?php echo dol_buildpath('/digiriskdolibarr/view/digiriskelement/digiriskelement_card.php', 1) . '?id=' . $obj->id ?>"><?php echo $obj->ref; ?></a>
                         </div>
                         
-                        <h3 class="title element-label"><?php echo $obj->label; ?></h3>
-                        
+                        <?php echo digirisk_element_label($obj); ?>
+
                         <div class="risk-badges">
                             <?php foreach(array(4 => 'black', 3 => 'red', 2 => 'orange', 1 => 'grey') as $scale => $colorClass) { ?>
                             <span class="badge <?php echo $colorClass ?><?php echo (empty($counts[$scale]) ? ' empty' : '') ?>"><?php echo $counts[$scale] ?></span>
