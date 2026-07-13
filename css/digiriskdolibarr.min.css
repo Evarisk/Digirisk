@@ -866,28 +866,6 @@ li.route .row-container .title {
   font-weight: 500;
   color: #333;
 }
-li.route .row-container .title.element-label {
-  cursor: text;
-  border-bottom: 1px dashed transparent;
-  transition: border-color 0.2s, color 0.3s;
-  padding-bottom: 2px;
-}
-li.route .row-container .title.element-label:hover {
-  border-bottom-color: #b0b0b0;
-}
-li.route .row-container .title.element-label .inline-edit-input {
-  font-size: 15px;
-  font-weight: 500;
-  font-family: inherit;
-  color: #333;
-  border: none;
-  border-bottom: 2px solid #0d8aff;
-  background: transparent;
-  outline: none;
-  width: 100%;
-  padding: 0 0 2px 0;
-  margin: 0;
-}
 li.route .row-container .risk-badges {
   display: flex;
   gap: 8px;
