@@ -681,13 +681,11 @@ $regCondition = (string) ($extra['digiriskdolibarr_condition_message'] ?? '');
 $regServiceRaw  = $extra['digiriskdolibarr_ticket_service'] ?? '';
 $firstServiceId = (int) (is_string($regServiceRaw) ? strtok($regServiceRaw, ',') : $regServiceRaw);
 $regService     = '';
-if (file_exists(DOL_DOCUMENT_ROOT . '/custom/digiriskdolibarr/class/digiriskelement.class.php')) {
-    require_once DOL_DOCUMENT_ROOT . '/custom/digiriskdolibarr/class/digiriskelement.class.php';
-    if ($firstServiceId > 0) {
-        $digiriskElement = new DigiriskElement($db);
-        if ($digiriskElement->fetch($firstServiceId) > 0) {
-            $regService = $digiriskElement->getNomUrl(1, '', 0, '', -1, 1);
-        }
+dol_include_once('/digiriskdolibarr/class/digiriskelement.class.php');
+if ($firstServiceId > 0) {
+    $digiriskElement = new DigiriskElement($db);
+    if ($digiriskElement->fetch($firstServiceId) > 0) {
+        $regService = $digiriskElement->getNomUrl(1, '', 0, '', -1, 1);
     }
 }
 
@@ -714,18 +712,16 @@ $drPicto = img_picto('', 'digiriskdolibarr_color@digiriskdolibarr', 'class="pict
 
 // Fetch all GP/UT options for select
 $serviceOptions = ['' => '']; // Empty option
-if (file_exists(DOL_DOCUMENT_ROOT . '/custom/digiriskdolibarr/class/digiriskelement.class.php')) {
-    require_once DOL_DOCUMENT_ROOT . '/custom/digiriskdolibarr/class/digiriskelement.class.php';
-    $digiriskElementTmp = new DigiriskElement($db);
-    $elementList = $digiriskElementTmp->fetchDigiriskElementFlat(0);
-    if (is_array($elementList)) {
-        foreach ($elementList as $el) {
-            $obj = $el['object'] ?? null;
-            if ($obj && isset($obj->id)) {
-                $depth = (int)($el['depth'] ?? 0);
-                $indent = str_repeat('&nbsp;&nbsp;&nbsp;&nbsp;', $depth);
-                $serviceOptions[$obj->id] = $indent . dol_escape_htmltag($obj->ref . ' - ' . $obj->label);
-            }
+dol_include_once('/digiriskdolibarr/class/digiriskelement.class.php');
+$digiriskElementTmp = new DigiriskElement($db);
+$elementList = $digiriskElementTmp->fetchDigiriskElementFlat(0);
+if (is_array($elementList)) {
+    foreach ($elementList as $el) {
+        $obj = $el['object'] ?? null;
+        if ($obj && isset($obj->id)) {
+            $depth = (int)($el['depth'] ?? 0);
+            $indent = str_repeat('&nbsp;&nbsp;&nbsp;&nbsp;', $depth);
+            $serviceOptions[$obj->id] = $indent . dol_escape_htmltag($obj->ref . ' - ' . $obj->label);
         }
     }
 }
@@ -773,13 +769,11 @@ print '</tbody></table>';
 
 // ---- Accidents linked to this ticket ----
 $linkedAccidents = [];
-if (file_exists(DOL_DOCUMENT_ROOT . '/custom/digiriskdolibarr/class/accident.class.php')) {
-    require_once DOL_DOCUMENT_ROOT . '/custom/digiriskdolibarr/class/accident.class.php';
-    $accident = new Accident($db);
-    $fetched  = $accident->fetchAll('', '', 0, 0, ['customsql' => 't.fk_ticket = ' . (int) $object->id]);
-    if (is_array($fetched)) {
-        $linkedAccidents = $fetched;
-    }
+dol_include_once('/digiriskdolibarr/class/accident.class.php');
+$accident = new Accident($db);
+$fetched  = $accident->fetchAll('', '', 0, 0, ['customsql' => 't.fk_ticket = ' . (int) $object->id]);
+if (is_array($fetched)) {
+    $linkedAccidents = $fetched;
 }
 print '<table class="border centpercent tableforfield"><tbody>';
 print '<tr class="liste_titre trforfield"><td><div class="dtc-head">' . img_picto('', 'digiriskdolibarr_color@digiriskdolibarr', 'class="pictoModule"') . ' ' . $langs->trans('Accidents') . '</div></td></tr>';
