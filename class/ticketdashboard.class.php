@@ -293,10 +293,18 @@ class TicketDashboard extends DigiriskDolibarrDashboard
 
         $mainCategoriesImploded = implode(',', array_column($mainCategories, 'id'));
 
+        // Apply the stats page date range so the category/GP-UT cross-tab graphs honor the same filter as the other graphs
+        $dateStart  = dol_mktime(0, 0, 0, GETPOST('dateStartmonth', 'int'), GETPOST('dateStartday', 'int'), GETPOST('dateStartyear', 'int'));
+        $dateEnd    = dol_mktime(23, 59, 59, GETPOST('dateEndmonth', 'int'), GETPOST('dateEndday', 'int'), GETPOST('dateEndyear', 'int'));
+        $dateFilter = '';
+        if (!empty($dateStart) && !empty($dateEnd)) {
+            $dateFilter = " AND t.datec BETWEEN '" . $this->db->idate($dateStart) . "' AND '" . $this->db->idate($dateEnd) . "'";
+        }
+
         $select      = ', cp.fk_categorie';
         $moreSelects = ['fk_categorie'];
         $join        = ' INNER JOIN ' . MAIN_DB_PREFIX . $this->module . '_digiriskelement AS d ON d.rowid = eft.digiriskdolibarr_ticket_service';
-        $filter      = 't.fk_statut > 0 AND t.entity = ' . $conf->entity . ' AND cp.fk_categorie IN (' . $mainCategoriesImploded  . ') AND d.status = ' . DigiriskElement::STATUS_VALIDATED;
+        $filter      = 't.fk_statut > 0 AND t.entity = ' . $conf->entity . ' AND cp.fk_categorie IN (' . $mainCategoriesImploded  . ') AND d.status = ' . DigiriskElement::STATUS_VALIDATED . $dateFilter;
         $tickets     = saturne_fetch_all_object_type('Ticket', 'ASC', 'eft.digiriskdolibarr_ticket_service', 0, 0, ['customsql' => $filter], 'AND', true, false, true, $join, [], $select, $moreSelects);
         if (!is_array($tickets) || empty($tickets)) {
             return $array;
@@ -317,7 +325,7 @@ class TicketDashboard extends DigiriskDolibarrDashboard
 
         $mainSubCategoriesImploded = implode(',', array_column($mainSubCategories, 'id'));
 
-        $filter  = 't.fk_statut > 0 AND t.entity = ' . $conf->entity . ' AND cp.fk_categorie IN (' . $mainSubCategoriesImploded  . ') AND d.status = ' . DigiriskElement::STATUS_VALIDATED;
+        $filter  = 't.fk_statut > 0 AND t.entity = ' . $conf->entity . ' AND cp.fk_categorie IN (' . $mainSubCategoriesImploded  . ') AND d.status = ' . DigiriskElement::STATUS_VALIDATED . $dateFilter;
         $tickets = saturne_fetch_all_object_type('Ticket', 'ASC', 'eft.digiriskdolibarr_ticket_service', 0, 0, ['customsql' => $filter], 'AND', true, false, true, $join, [], $select, $moreSelects);
         if (!is_array($tickets) || empty($tickets)) {
             return $array;
