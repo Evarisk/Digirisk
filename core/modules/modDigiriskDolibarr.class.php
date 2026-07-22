@@ -1396,6 +1396,13 @@ class modDigiriskdolibarr extends DolibarrModules
 		$this->rights[$r][5] = 'categoryconfig';
 		$r++;
 
+		/* MOBILE PREVENTION PLAN QUICK CREATION PERMISSIONS - appended at the end to avoid renumbering existing permission ids */
+		$this->rights[$r][0] = $this->numero . sprintf('%02d', $r + 1);
+		$this->rights[$r][1] = $langs->transnoentities('CreateObjects', $langs->transnoentities('MobilePreventionPlanMin'));
+		$this->rights[$r][4] = 'mobilepreventionplan';
+		$this->rights[$r][5] = 'write';
+		$r++;
+
 		// Main menu entries to add
 		$this->menu       = [];
 		$r                = 0;
@@ -1553,6 +1560,21 @@ class modDigiriskdolibarr extends DolibarrModules
 			'perms'    => '$user->rights->digiriskdolibarr->preventionplan->read', // Use 'perms'=>'$user->rights->digiriskdolibarr->level1->level2' if you want your menu with a permission rules
 			'target'   => '',
 			'user'     => 0,				                // 0=Menu for internal users, 1=external users, 2=both
+		];
+
+		$this->menu[$r++] = [
+			'fk_menu'  => 'fk_mainmenu=digiriskdolibarr,fk_leftmenu=digiriskpreventionplan',
+			'type'     => 'left',
+			'titre'    => '<i class="fas fa-mobile-alt pictofixedwidth"></i>' . $langs->transnoentities('MobileQuickCreation'),
+			'mainmenu' => 'digiriskdolibarr',
+			'leftmenu' => 'digiriskdolibarr_preventionplanmobile',
+			'url'      => '/digiriskdolibarr/view/preventionplan/preventionplan_mobile_create.php',
+			'langs'    => 'digiriskdolibarr@digiriskdolibarr',
+			'position' => 100 + $r,
+			'enabled'  => 'isModEnabled(\'digiriskdolibarr\')',
+			'perms'    => '$user->rights->digiriskdolibarr->mobilepreventionplan->write',
+			'target'   => '',
+			'user'     => 2,
 		];
 
         $this->menu[$r++] = [
@@ -2122,6 +2144,7 @@ class modDigiriskdolibarr extends DolibarrModules
 		delDocumentModel('preventionplandocument_odt', 'preventionplandocument');
 		delDocumentModel('preventionplandocument_specimen_odt', 'preventionplandocumentspecimen');
 		delDocumentModel('groupmentdocument_odt', 'groupmentdocument');
+		delDocumentModel('groupmentdocument', 'groupmentdocument');
 		delDocumentModel('groupmentdocumentinherited_odt', 'groupmentdocument');
 		delDocumentModel('groupmentdocumentshared_odt', 'groupmentdocument');
 		delDocumentModel('workunitdocument_odt', 'workunitdocument');
@@ -2147,6 +2170,7 @@ class modDigiriskdolibarr extends DolibarrModules
 		addDocumentModel('preventionplandocument_odt', 'preventionplandocument', 'ODT templates', 'DIGIRISKDOLIBARR_PREVENTIONPLANDOCUMENT_ADDON_ODT_PATH');
 		addDocumentModel('preventionplandocument_specimen_odt', 'preventionplandocumentspecimen', 'ODT templates', 'DIGIRISKDOLIBARR_PREVENTIONPLANDOCUMENT_SPECIMEN_ADDON_ODT_PATH');
 		addDocumentModel('groupmentdocument_odt', 'groupmentdocument', 'ODT templates', 'DIGIRISKDOLIBARR_GROUPMENTDOCUMENT_ADDON_ODT_PATH');
+		addDocumentModel('groupmentdocument', 'groupmentdocument', 'Fiche de Groupement PDF', '');
 		addDocumentModel('groupmentdocumentinherited_odt', 'groupmentdocument', 'ODT templates', 'DIGIRISKDOLIBARR_GROUPMENTDOCUMENTINHERITED_ADDON_ODT_PATH');
 		addDocumentModel('groupmentdocumentshared_odt', 'groupmentdocument', 'ODT templates', 'DIGIRISKDOLIBARR_GROUPMENTDOCUMENTSHARED_ADDON_ODT_PATH');
 		addDocumentModel('workunitdocument_odt', 'workunitdocument', 'ODT templates', 'DIGIRISKDOLIBARR_WORKUNITDOCUMENT_ADDON_ODT_PATH');
@@ -2443,7 +2467,10 @@ class modDigiriskdolibarr extends DolibarrModules
 
             'ticket_category_config' => ['Label' => 'TicketCategoryConfig', 'type' => 'text', 'elementtype' => ['categorie'], 'position' => $this->numero . 10, 'list' => 0, 'enabled' => "isModEnabled('digiriskdolibarr') && isModEnabled('categorie') && isModEnabled('ticket')", 'moreparams' => []],
 
-			'ticket_categories' => ['Label' => 'Categories', 'type' => 'text', 'elementtype' => ['ticket'], 'position' => 1, 'list' => 2, 'enabled' => "isModEnabled('digiriskdolibarr') && isModEnabled('categorie') && isModEnabled('ticket')", 'moreparams' => []]
+			'ticket_categories' => ['Label' => 'Categories', 'type' => 'text', 'elementtype' => ['ticket'], 'position' => 1, 'list' => 2, 'enabled' => "isModEnabled('digiriskdolibarr') && isModEnabled('categorie') && isModEnabled('ticket')", 'moreparams' => []],
+
+			'mobile_protections'   => ['Label' => 'MobileProtections',   'type' => 'text', 'elementtype' => ['digiriskdolibarr_preventionplan'], 'position' => $this->numero . 10, 'list' => 0, 'enabled' => "isModEnabled('digiriskdolibarr')", 'moreparams' => []],
+			'mobile_certifications' => ['Label' => 'MobileCertifications', 'type' => 'text', 'elementtype' => ['digiriskdolibarr_preventionplan'], 'position' => $this->numero . 11, 'list' => 0, 'enabled' => "isModEnabled('digiriskdolibarr')", 'moreparams' => []]
 		];
 
         saturne_manage_extrafields($extraFieldsArrays, $commonExtraFieldsValue);
