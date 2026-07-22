@@ -1160,7 +1160,7 @@ if ((empty($action) || ($action != 'create' && $action != 'edit'))) {
 			// Modify
 			$displayButton = $onPhone ? '<i class="fas fa-edit fa-2x"></i>' : '<i class="fas fa-edit"></i>' . ' ' . $langs->trans('Modify');
 			if ($object->status == $object::STATUS_DRAFT) {
-				print '<a class="butAction" id="actionButtonEdit" href="' . $_SERVER['PHP_SELF'] . '?id=' . $object->id . '&action=edit&token=' . newToken() . '">' . $displayButton . '</a>';
+				print '<a class="butAction" id="actionButtonEdit" href="' . dol_buildpath('/custom/digiriskdolibarr/view/preventionplan/preventionplan_mobile_create.php', 1) . '?id=' . $object->id . '">' . $displayButton . '</a>';
 			} else {
 				print '<span class="butActionRefused classfortooltip" title="' . dol_escape_htmltag($langs->trans('PreventionPlanMustBeInProgress')) . '">' . $displayButton . '</span>';
 			}
@@ -1201,8 +1201,8 @@ if ((empty($action) || ($action != 'create' && $action != 'edit'))) {
             $displayButton = $onPhone ? '<i class="fas fa-envelope fa-2x"></i>' : '<i class="fas fa-envelope"></i>' . ' ' . $langs->trans('SendMail') . ' ';
             if ($object->status == PreventionPlan::STATUS_LOCKED) {
                 $fileParams = dol_most_recent_file($upload_dir . '/' . $object->element . 'document' . '/' . $object->ref);
-                $file       = $fileParams['fullname'];
-                if (file_exists($file) && !strstr($fileParams['name'], 'specimen')) {
+                $file       = is_array($fileParams) ? $fileParams['fullname'] : '';
+                if (!empty($file) && file_exists($file) && !strstr($fileParams['name'], 'specimen')) {
                     $forcebuilddoc = 0;
                 } else {
                     $forcebuilddoc = 1;
@@ -1228,18 +1228,21 @@ if ((empty($action) || ($action != 'create' && $action != 'edit'))) {
 
 		// PREVENTIONPLAN LINES
 		print '<div class="div-table-responsive-no-min" style="overflow-x: unset !important">';
-		print load_fiche_titre($langs->trans("PreventionPlanRiskList"), '', '');
-		print '<table id="tablelines" class="noborder noshadow" width="100%">';
-
+		print load_fiche_titre('<i class="fas fa-exclamation-triangle digirisk-risk-title-icon"></i> ' . $langs->trans("PreventionPlanRiskList"), '', '');
 		global $forceall, $forcetoshowtitlelines;
 
 		if (empty($forceall)) $forceall = 0;
 
 		// Define colspan for the button 'Add'
 		$colspan = 3;
+		$var     = true;
 
 		// Lines
 		$preventionplandets = $preventionplandet->fetchAll('', '', 0, 0, ['fk_preventionplan' => GETPOST('id')]);
+
+		// Draft plans keep the editable table; validated/locked plans show a read-only card list (theme-consistent with the protections block).
+		if ($object->status == PreventionPlan::STATUS_DRAFT) {
+		print '<table id="tablelines" class="noborder noshadow" width="100%">';
 
 		print '<tr class="liste_titre">';
 		print '<td><span>' . $langs->trans('Ref.') . '</span></td>';
@@ -1253,6 +1256,8 @@ if ((empty($action) || ($action != 'create' && $action != 'edit'))) {
 		if ( ! empty($preventionplandets) && $preventionplandets > 0) {
 			print '<tr>';
 			foreach ($preventionplandets as $key => $item) {
+				$coldisplay = 0;
+				$var        = !$var;
 				if ($action == 'editline' && $lineid == $key) {
 					print '<form method="POST" action="' . $_SERVER["PHP_SELF"] . '?id=' . $object->id . '">';
 					print '<input type="hidden" name="token" value="' . newToken() . '">';
@@ -1331,31 +1336,36 @@ if ((empty($action) || ($action != 'create' && $action != 'edit'))) {
 					print '</td>';
 
 					print '<td>';
-					$digiriskelement->fetch($item->fk_element);
-					print $digiriskelement->getNomUrl(1, 'blank', 0, '', -1, 1);
+					if ($item->fk_element > 0) {
+						$resFetchElement = $digiriskelement->fetch($item->fk_element);
+						print $resFetchElement > 0 ? $digiriskelement->getNomUrl(1, 'blank', 0, '', -1, 1) : '<span class="opacitymedium">&mdash;</span>';
+					} else {
+						print '<span class="opacitymedium">&mdash;</span>';
+					}
 					print '</td>';
 
 					$coldisplay++;
 					print '<td>';
-					print $item->description;
+					print dol_strlen($item->description) ? $item->description : '<span class="opacitymedium">&mdash;</span>';
 					print '</td>';
 
 					$coldisplay++;
-					print '<td class="center">'; ?>
-					<div class="table-cell table-50 cell-risk" data-title="Risque">
-						<div class="wpeo-dropdown dropdown-large category-danger padding wpeo-tooltip-event"
-							 aria-label="<?php echo $risk->getDangerCategoryName($item) ?>">
-							<img class="danger-category-pic hover"
-								 src="<?php echo DOL_URL_ROOT . '/custom/digiriskdolibarr/img/categorieDangers/' . $risk->getDangerCategory($item) . '.png'; ?>"
-								 alt=""/>
-						</div>
-					</div>
-					<?php
+					print '<td class="center">';
+					$dangerThumb = $risk->getDangerCategory($item);
+					$dangerName  = $risk->getDangerCategoryName($item);
+					if ($dangerThumb != -1) {
+						print '<div class="cell-risk-view">';
+						print '<img class="cell-risk-view__pic" src="' . DOL_URL_ROOT . '/custom/digiriskdolibarr/img/categorieDangers/' . $dangerThumb . '.png" alt="" title="' . dol_escape_htmltag($dangerName) . '">';
+						print '<span class="cell-risk-view__name">' . dol_escape_htmltag($dangerName) . '</span>';
+						print '</div>';
+					} else {
+						print '<span class="opacitymedium">&mdash;</span>';
+					}
 					print '</td>';
 
 					$coldisplay++;
 					print '<td>';
-					print $item->prevention_method;
+					print dol_strlen($item->prevention_method) ? $item->prevention_method : '<span class="opacitymedium">&mdash;</span>';
 					print '</td>';
 
 					$coldisplay += $colspan;
@@ -1390,6 +1400,8 @@ if ((empty($action) || ($action != 'create' && $action != 'edit'))) {
 			print '<input type="hidden" name="backtopage" value="' . $backtopage . '">';
 			print '<input type="hidden" name="parent_id" value="' . $object->id . '">';
 
+			$coldisplay = 0;
+			$var        = !$var;
 			print '<tr>';
 			print '<td>';
 			print $refPreventionPlanDetMod->getNextValue($preventionplandet);
@@ -1449,8 +1461,95 @@ if ((empty($action) || ($action != 'create' && $action != 'edit'))) {
 			print '</form>';
 		}
 		print '</table>';
+		} else {
+			// Read-only risk list, styled like the protections block for theme consistency
+			if (is_array($preventionplandets) && !empty($preventionplandets)) {
+				print '<div class="preventionplan-protections-view__list">';
+				foreach ($preventionplandets as $riskLine) {
+					$riskThumb = $risk->getDangerCategory($riskLine);
+					$riskName  = $risk->getDangerCategoryName($riskLine);
+					print '<div class="preventionplan-protections-view__item">';
+					if ($riskThumb != -1) {
+						print '<img src="' . DOL_URL_ROOT . '/custom/digiriskdolibarr/img/categorieDangers/' . $riskThumb . '.png" alt="" title="' . dol_escape_htmltag($riskName != -1 ? $riskName : '') . '">';
+					}
+					print '<div class="preventionplan-protections-view__info">';
+					print '<div class="preventionplan-protections-view__name">' . dol_escape_htmltag($riskName != -1 ? $riskName : $riskLine->ref) . '</div>';
+					if (dol_strlen($riskLine->description)) {
+						print '<div class="preventionplan-protections-view__comment">' . dol_escape_htmltag($riskLine->description) . '</div>';
+					}
+					print '</div>';
+					print '</div>';
+				}
+				print '</div>';
+			} else {
+				print '<span class="opacitymedium">' . $langs->trans('None') . '</span>';
+			}
+		}
 		print '</div>';
 	}
+
+	// Protections (EPI) captured from the mobile quick-creation interface
+	$object->fetch_optionals();
+	$mobileProtections = !empty($object->array_options['options_mobile_protections']) ? json_decode($object->array_options['options_mobile_protections'], true) : [];
+	if (is_array($mobileProtections) && !empty($mobileProtections)) {
+		$signalisationFile       = DOL_DOCUMENT_ROOT . '/custom/digiriskdolibarr/js/json/signalisationCategories.json';
+		$signalisationCategories = file_exists($signalisationFile) ? json_decode(file_get_contents($signalisationFile), true) : [];
+		$protectionMap           = [];
+		if (is_array($signalisationCategories)) {
+			foreach ($signalisationCategories as $signalisationCategory) {
+				$protectionMap[$signalisationCategory['position']] = $signalisationCategory;
+			}
+		}
+
+		print '<div class="preventionplan-protections-view">';
+		print '<div class="preventionplan-protections-view__title"><i class="fas fa-hard-hat"></i> ' . $langs->trans('MobilePPProtections') . '</div>';
+		print '<div class="preventionplan-protections-view__list">';
+		foreach ($mobileProtections as $mobileProtection) {
+			if (!isset($protectionMap[$mobileProtection['position']])) {
+				continue;
+			}
+			$protectionCategory = $protectionMap[$mobileProtection['position']];
+			$thumb              = DOL_URL_ROOT . '/custom/digiriskdolibarr/img/' . $protectionCategory['name_thumbnail'];
+			print '<div class="preventionplan-protections-view__item">';
+			print '<img src="' . $thumb . '" alt="" title="' . dol_escape_htmltag($protectionCategory['name']) . '">';
+			print '<div class="preventionplan-protections-view__info">';
+			print '<div class="preventionplan-protections-view__name">' . dol_escape_htmltag($protectionCategory['name']) . '</div>';
+			if (!empty($mobileProtection['comment'])) {
+				print '<div class="preventionplan-protections-view__comment">' . dol_escape_htmltag($mobileProtection['comment']) . '</div>';
+			}
+			if (!empty($mobileProtection['mandatory'])) {
+				print '<span class="badge badge-info">' . $langs->trans('MobilePPMandatory') . '</span>';
+			}
+			print '</div>';
+			print '</div>';
+		}
+		print '</div>';
+		print '</div>';
+	}
+
+	// Required certifications captured from the mobile quick-creation interface
+	$mobileCertifications = !empty($object->array_options['options_mobile_certifications']) ? json_decode($object->array_options['options_mobile_certifications'], true) : [];
+	if (is_array($mobileCertifications) && !empty($mobileCertifications)) {
+		require_once __DIR__ . '/../../lib/digiriskdolibarr_mobile.lib.php';
+		$certificationOptions = digiriskGetCertificationOptions();
+		print '<div class="preventionplan-protections-view">';
+		print '<div class="preventionplan-protections-view__title"><i class="fas fa-id-badge"></i> ' . $langs->trans('MobilePPCertifications') . '</div>';
+		print '<div class="preventionplan-protections-view__list">';
+		foreach ($mobileCertifications as $mobileCertification) {
+			$certLabel = isset($certificationOptions[$mobileCertification['code']]) ? $certificationOptions[$mobileCertification['code']] : $mobileCertification['code'];
+			print '<div class="preventionplan-protections-view__item">';
+			print '<div class="preventionplan-protections-view__info">';
+			print '<div class="preventionplan-protections-view__name">' . dol_escape_htmltag($certLabel) . '</div>';
+			if (!empty($mobileCertification['mandatory'])) {
+				print '<span class="badge badge-info">' . $langs->trans('MobilePPMandatory') . '</span>';
+			}
+			print '</div>';
+			print '</div>';
+		}
+		print '</div>';
+		print '</div>';
+	}
+
 	// Document Generation -- Génération des documents
 	if ($permissiontoadd) {
 		print '<div class=""><div class="preventionplanDocument fichehalfleft">';
@@ -1496,10 +1595,12 @@ if ((empty($action) || ($action != 'create' && $action != 'edit'))) {
 	print '</div></div></div>';
 
 	// Presend form
-	$labourInspector    = $digiriskresources->fetchResourcesFromObject('LabourInspector', $object);
-	$labourInspectorId = $labourInspector->id;
-	$thirdparty->fetch($labourInspectorId);
-	$object->thirdparty = $thirdparty;
+	$labourInspector   = $digiriskresources->fetchResourcesFromObject('LabourInspector', $object);
+	$labourInspectorId = is_object($labourInspector) ? $labourInspector->id : 0;
+	if ($labourInspectorId > 0) {
+		$thirdparty->fetch($labourInspectorId);
+		$object->thirdparty = $thirdparty;
+	}
 
 	$modelmail    = 'preventionplan';
 	$defaulttopic = 'Information';

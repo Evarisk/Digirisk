@@ -342,7 +342,7 @@ class PreventionPlan extends SaturneObject
 	{
 		global $form;
 
-		if (dol_strlen($filter['customsql'])) {
+		if (dol_strlen($filter['customsql'] ?? '')) {
 			$filter['customsql'] .= ' AND t.rowid != ' . ($this->id ?? 0);
 		}
 		$objectList = saturne_fetch_all_object_type('preventionplan', '', '', $limit, 0, $filter);

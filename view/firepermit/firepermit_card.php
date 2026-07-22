@@ -613,9 +613,11 @@ if (empty($reshook)) {
 	$triggersendname     = 'FIREPERMIT_SENTBYMAIL';
 	$trackid             = 'firepermit' . $object->id;
 	$labourInspector     = $digiriskresources->fetchResourcesFromObject('LabourInspector', $object);
-	$labourInspectorId   = $labourInspector->id;
-	$thirdparty->fetch($labourInspectorId);
-	$object->thirdparty  = $thirdparty;
+	$labourInspectorId   = is_object($labourInspector) ? $labourInspector->id : 0;
+	if ($labourInspectorId > 0) {
+		$thirdparty->fetch($labourInspectorId);
+		$object->thirdparty = $thirdparty;
+	}
 
 	include DOL_DOCUMENT_ROOT . '/core/actions_sendmails.inc.php';
 }
