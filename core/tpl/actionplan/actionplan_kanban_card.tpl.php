@@ -109,16 +109,25 @@
                   style="background: <?= $respColor ?>">
                 <?= $respInitial ?: '?' ?>
             </span>
-            <!-- Hidden select, shown on click -->
-            <select class="kanban-responsible-select" data-task-id="<?= $t['id'] ?>">
-                <option value="0"><?= dol_escape_htmltag($langs->trans('Unassigned')) ?></option>
-                <?php foreach ($allUsers as $u) : ?>
-                    <option value="<?= $u['id'] ?>" data-initial="<?= $u['initials'] ?>"
-                        <?= ($respId == $u['id']) ? 'selected' : '' ?>>
-                        <?= dol_escape_htmltag($u['fullname']) ?>
-                    </option>
-                <?php endforeach; ?>
-            </select>
+            <!-- Hidden searchable dropdown, shown on click (same UI as contributor selector) -->
+            <div class="kanban-responsible-dropdown" data-task-id="<?= $t['id'] ?>">
+                <input type="text" class="kanban-responsible-search" placeholder="<?= dol_escape_htmltag($langs->trans('Search')) ?>..." autocomplete="off">
+                <div class="kanban-responsible-options">
+                    <div class="kanban-responsible-option<?= empty($respId) ? ' assigned' : '' ?>" data-value="0" data-initial="?" data-search="<?= dol_escape_htmltag(strtolower($langs->trans('Unassigned'))) ?>">
+                        <?= dol_escape_htmltag($langs->trans('Unassigned')) ?>
+                        <?php if (empty($respId)) : ?><i class="fas fa-check" style="margin-left:4px;font-size:9px;color:#28a745"></i><?php endif; ?>
+                    </div>
+                    <div class="kanban-optgroup-label"><?= dol_escape_htmltag($langs->trans('InternalUsers')) ?></div>
+                    <?php foreach ($allUsers as $u) :
+                        $isCurrentResp = ($respId == $u['id']);
+                    ?>
+                        <div class="kanban-responsible-option<?= $isCurrentResp ? ' assigned' : '' ?>" data-value="<?= $u['id'] ?>" data-initial="<?= $u['initials'] ?>" data-search="<?= dol_escape_htmltag(strtolower($u['fullname'])) ?>">
+                            <?= dol_escape_htmltag($u['fullname']) ?>
+                            <?php if ($isCurrentResp) : ?><i class="fas fa-check" style="margin-left:4px;font-size:9px;color:#28a745"></i><?php endif; ?>
+                        </div>
+                    <?php endforeach; ?>
+                </div>
+            </div>
         </div>
 
         <span class="kanban-separator">|</span>
