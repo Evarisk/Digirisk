@@ -179,3 +179,11 @@ PwaTilePreventionPlanInProgress = Plans in progress
 PwaTilePreventionPlanToSign = Plans to sign
 PwaTileFirePermitInProgress = Permits in progress
 PwaTileFirePermitToSign = Permits to sign
+
+# Task mass actions
+MassValidateTasks = Validate tasks
+MassChangeTasksProject = Change project
+ConfirmMassValidateTasksQuestion = Are you sure you want to validate the %s selected task(s)? Only draft tasks will be validated.
+ConfirmMassChangeTasksProjectQuestion = Are you sure you want to attach the %s selected task(s) to the chosen project?
+MassValidateTasksSuccess = %s task(s) validated out of %s selected
+MassChangeTasksProjectSuccess = %s task(s) attached to project %s
