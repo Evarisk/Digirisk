@@ -18,7 +18,8 @@
 /**
  * \file    core/ajax/preventionplan_siren_lookup.php
  * \ingroup digiriskdolibarr
- * \brief   AJAX endpoint to look up an existing third party by SIREN (idprof1) in the current entity.
+ * \brief   AJAX endpoint to look up an existing third party by SIREN (idprof1) or SIRET (idprof2)
+ *          in the current entity.
  */
 
 // Load DigiriskDolibarr environment
@@ -31,6 +32,8 @@ if (file_exists('../digiriskdolibarr.main.inc.php')) {
 }
 
 require_once DOL_DOCUMENT_ROOT . '/societe/class/societe.class.php';
+
+require_once __DIR__ . '/../../lib/digiriskdolibarr_mobile.lib.php';
 
 global $db, $user;
 
@@ -47,17 +50,21 @@ if (!$user->hasRight('digiriskdolibarr', 'mobilepreventionplan', 'write')) {
 }
 
 // Keep only digits: matches numbers stored with or without spaces/dots.
-$sirenClean = preg_replace('/[^0-9]/', '', GETPOST('siren', 'alphanohtml'));
+$idProfClean = digiriskMobileCleanIdProf(GETPOST('siren', 'alphanohtml'));
 
-if (dol_strlen($sirenClean) < 9) {
+if (!digiriskMobileIsValidIdProf($idProfClean)) {
     echo json_encode(['success' => false, 'error' => 'InvalidSiren']);
     exit;
 }
 
-// Search the third party by normalized SIREN in the current entity.
-$sql  = 'SELECT rowid, nom, email FROM ' . MAIN_DB_PREFIX . 'societe';
+// A SIRET starts with the SIREN of its company, so comparing the first 9 digits on both columns
+// matches whichever of the two the user typed and whichever of the two the company has on file.
+$sirenPart = substr($idProfClean, 0, 9);
+
+$sql  = 'SELECT rowid, nom, email, siren, siret FROM ' . MAIN_DB_PREFIX . 'societe';
 $sql .= ' WHERE entity IN (' . getEntity('societe') . ')';
-$sql .= " AND REPLACE(REPLACE(REPLACE(siren, ' ', ''), '.', ''), '-', '') = '" . $db->escape($sirenClean) . "'";
+$sql .= " AND (REPLACE(REPLACE(REPLACE(siren, ' ', ''), '.', ''), '-', '') = '" . $db->escape($sirenPart) . "'";
+$sql .= "  OR LEFT(REPLACE(REPLACE(REPLACE(siret, ' ', ''), '.', ''), '-', ''), 9) = '" . $db->escape($sirenPart) . "')";
 $sql .= ' ORDER BY rowid ASC';
 
 $resql = $db->query($sql);
@@ -96,6 +103,8 @@ echo json_encode([
         'id'    => (int) $obj->rowid,
         'name'  => $obj->nom,
         'email' => $obj->email,
+        'siren' => $obj->siren,
+        'siret' => $obj->siret,
     ],
     'contacts' => $contacts,
 ]);

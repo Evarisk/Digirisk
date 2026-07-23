@@ -106,7 +106,8 @@ if ($id > 0 && $object->fetch($id) > 0) {
         $prefill['ext_society_id']    = $extSociety->id;
         $prefill['ext_society_name']  = $extSociety->name;
         $prefill['ext_society_email'] = $extSociety->email;
-        $prefill['siren']             = $extSociety->idprof1;
+        // Show back the most precise identifier the company has on file.
+        $prefill['siren']             = dol_strlen($extSociety->idprof2) ? $extSociety->idprof2 : $extSociety->idprof1;
     }
 
     // Exterior responsible (ExtSocietyResponsible signatory)
@@ -158,7 +159,7 @@ if ($action == 'add_mobile' && $permissiontoadd) {
 
     // Read parameters
     $extSocietyId  = GETPOSTINT('ext_society_id');
-    $sirenInput    = preg_replace('/[^0-9]/', '', GETPOST('siren', 'alphanohtml'));
+    $idProfInput   = digiriskMobileCleanIdProf(GETPOST('siren', 'alphanohtml'));
     $societyName   = trim(GETPOST('ext_society_name', 'alphanohtml'));
     $societyEmail  = trim(GETPOST('ext_society_email', 'alphanohtml'));
     $respContactId = GETPOSTINT('resp_contact_id');
@@ -229,7 +230,7 @@ if ($action == 'add_mobile' && $permissiontoadd) {
         if (!dol_strlen($societyName)) {
             $addError($langs->trans('ErrorFieldRequired', $langs->transnoentitiesnoconv('ExtSociety')));
         }
-        if (dol_strlen($sirenInput) < 9) {
+        if (!digiriskMobileIsValidIdProf($idProfInput)) {
             $addError($langs->trans('MobilePPErrorInvalidSiren'));
         }
     }
@@ -266,8 +267,10 @@ if ($action == 'add_mobile' && $permissiontoadd) {
         if ($extSocietyId > 0) {
             $thirdparty->fetch($extSocietyId);
         } else {
+            // The first 9 digits are always the SIREN; a 14 digit input is a full SIRET.
             $thirdparty->name    = $societyName;
-            $thirdparty->idprof1 = $sirenInput;
+            $thirdparty->idprof1 = substr($idProfInput, 0, 9);
+            $thirdparty->idprof2 = (dol_strlen($idProfInput) == 14) ? $idProfInput : '';
             $thirdparty->email   = $societyEmail;
             $thirdparty->client  = 0;
             $thirdparty->status  = 1;
