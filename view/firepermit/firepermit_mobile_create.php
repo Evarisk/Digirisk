@@ -16,11 +16,13 @@
  */
 
 /**
- * \file    view/preventionplan/preventionplan_mobile_create.php
+ * \file    view/firepermit/firepermit_mobile_create.php
  * \ingroup digiriskdolibarr
- * \brief   Mobile/phone interface to quickly create a prevention plan
+ * \brief   Mobile/phone interface to quickly create a fire permit
  *          (interior company auto-signed by the connected responsible with their saved signature,
- *           exterior company resolved by SIREN and asked to sign by email, start/end dates capped to one year).
+ *           exterior company resolved by SIREN and asked to sign by email, parent prevention plan,
+ *           types of work with the equipment used, protections and required certifications).
+ *          The labour inspector is taken from the module configuration instead of being asked for.
  */
 
 // Load DigiriskDolibarr environment
@@ -42,52 +44,66 @@ require_once DOL_DOCUMENT_ROOT . '/contact/class/contact.class.php';
 require_once __DIR__ . '/../../../saturne/class/saturnesignature.class.php';
 
 // Load DigiriskDolibarr libraries
+require_once __DIR__ . '/../../class/firepermit.class.php';
 require_once __DIR__ . '/../../class/preventionplan.class.php';
 require_once __DIR__ . '/../../class/digiriskresources.class.php';
+require_once __DIR__ . '/../../class/digiriskelement.class.php';
 require_once __DIR__ . '/../../class/riskanalysis/risk.class.php';
 require_once __DIR__ . '/../../lib/digiriskdolibarr_mobile.lib.php';
 
 // Global variables definitions
-global $conf, $db, $hookmanager, $langs, $moduleNameLowerCase, $user;
+global $conf, $db, $form, $hookmanager, $langs, $moduleNameLowerCase, $user;
+
+// Both select_preventionplan_list() and selectDigiriskElementList() render through the global $form
+$form = new Form($db);
 
 // Load translation files required by the page
 saturne_load_langs(['other', 'mails', 'companies', 'projects', 'errors']);
 
+/**
+ * A fire permit covers a short, well-delimited job: the period is capped to one month
+ * (the prevention plan it depends on is the one capped to one year).
+ */
+const DIGIRISK_MOBILE_FIREPERMIT_MAX_SPAN_DAYS = 31;
+
 // Get parameters
 $action  = GETPOST('action', 'aZ09');
 $created = GETPOSTINT('created');
-$id      = GETPOSTINT('id'); // > 0 => edit an existing prevention plan with the same interface
+$id      = GETPOSTINT('id'); // > 0 => edit an existing fire permit with the same interface
 
 // Initialize technical objects
-$object            = new PreventionPlan($db);
-$preventionplandet = new PreventionPlanLine($db);
+$object            = new FirePermit($db);
+$firepermitdet     = new FirePermitLine($db);
+$preventionplan    = new PreventionPlan($db);
 $signatory         = new SaturneSignature($db, $moduleNameLowerCase, $object->element);
 $digiriskresources = new DigiriskResources($db);
+$digiriskelement   = new DigiriskElement($db);
 $thirdparty        = new Societe($db);
 $contact           = new Contact($db);
 
-// Load numbering modules for the prevention plan ref and its lines
+// Load numbering modules for the fire permit ref and its lines
 $numberingModules = [
-    'digiriskelement/' . $object->element            => getDolGlobalString('DIGIRISKDOLIBARR_PREVENTIONPLAN_ADDON'),
-    'digiriskelement/' . $preventionplandet->element => getDolGlobalString('DIGIRISKDOLIBARR_PREVENTIONPLANDET_ADDON'),
+    'digiriskelement/' . $object->element        => getDolGlobalString('DIGIRISKDOLIBARR_FIREPERMIT_ADDON'),
+    'digiriskelement/' . $firepermitdet->element => getDolGlobalString('DIGIRISKDOLIBARR_FIREPERMITDET_ADDON'),
 ];
-list($refPreventionPlanMod, $refPreventionPlanDetMod) = saturne_require_objects_mod($numberingModules, $moduleNameLowerCase);
+list($refFirePermitMod, $refFirePermitDetMod) = saturne_require_objects_mod($numberingModules, $moduleNameLowerCase);
 
 // Initialize hooks
-$hookmanager->initHooks(['preventionplanmobilecreate', 'globalcard']);
+$hookmanager->initHooks(['firepermitmobilecreate', 'globalcard']);
 
 // Security check
-$permissiontoadd = $user->hasRight('digiriskdolibarr', 'mobilepreventionplan', 'write');
+$permissiontoadd = $user->hasRight('digiriskdolibarr', 'mobilefirepermit', 'write');
 saturne_check_access($permissiontoadd);
 
 /*
- * Edit mode: load the existing plan and pre-fill every field of this same interface
+ * Edit mode: load the existing fire permit and pre-fill every field of this same interface
  */
 
 $isEdit  = false;
 $prefill = [
     'ext_society_id' => 0, 'ext_society_name' => '', 'ext_society_email' => '', 'siren' => '',
     'resp_contact_id' => 0, 'resp_lastname' => '', 'resp_firstname' => '', 'resp_email' => '', 'resp_phone' => '',
+    'fk_preventionplan' => 0, 'fk_element' => 0,
     'date_start' => '', 'date_end' => '',
     'risks' => [], 'protections' => [], 'certifications' => [],
 ];
@@ -96,8 +112,9 @@ if ($id > 0 && $object->fetch($id) > 0) {
     $isEdit = true;
     $object->fetch_optionals();
 
-    $prefill['date_start'] = $object->date_start ? dol_print_date($object->date_start, '%Y-%m-%d') : '';
-    $prefill['date_end']   = $object->date_end   ? dol_print_date($object->date_end, '%Y-%m-%d')   : '';
+    $prefill['fk_preventionplan'] = (int) $object->fk_preventionplan;
+    $prefill['date_start']        = $object->date_start ? dol_print_date($object->date_start, '%Y-%m-%dT%H:%M') : '';
+    $prefill['date_end']          = $object->date_end   ? dol_print_date($object->date_end, '%Y-%m-%dT%H:%M')   : '';
 
     // Exterior company: fetchResourcesFromObject() returns the resolved object itself (an already
     // fetched Societe) for a single match, and 0 when there is none.
@@ -111,21 +128,29 @@ if ($id > 0 && $object->fetch($id) > 0) {
     }
 
     // Exterior responsible (ExtSocietyResponsible signatory)
-    $editSignatories = $signatory->fetchSignatory('ExtSocietyResponsible', $object->id, 'preventionplan');
+    $editSignatories = $signatory->fetchSignatory('ExtSocietyResponsible', $object->id, 'firepermit');
     if (is_array($editSignatories) && !empty($editSignatories)) {
-        $editSignatory                = array_shift($editSignatories);
-        $prefill['resp_contact_id']   = $editSignatory->element_id;
-        $prefill['resp_lastname']     = $editSignatory->lastname;
-        $prefill['resp_firstname']    = $editSignatory->firstname;
-        $prefill['resp_email']        = $editSignatory->email;
-        $prefill['resp_phone']        = $editSignatory->phone;
+        $editSignatory              = array_shift($editSignatories);
+        $prefill['resp_contact_id'] = $editSignatory->element_id;
+        $prefill['resp_lastname']   = $editSignatory->lastname;
+        $prefill['resp_firstname']  = $editSignatory->firstname;
+        $prefill['resp_email']      = $editSignatory->email;
+        $prefill['resp_phone']      = $editSignatory->phone;
     }
 
-    // Risks (existing lines)
-    $existingLines = $preventionplandet->fetchAll('', '', 0, 0, ['fk_preventionplan' => $object->id]);
+    // Types of work (existing lines). The mobile interface uses a single location for the whole
+    // permit, so the location of the first line is the one shown back.
+    $existingLines = $firepermitdet->fetchAll('', '', 0, 0, ['fk_firepermit' => $object->id]);
     if (is_array($existingLines)) {
         foreach ($existingLines as $existingLine) {
-            $prefill['risks'][] = ['category' => $existingLine->category, 'description' => $existingLine->description];
+            if (empty($prefill['fk_element'])) {
+                $prefill['fk_element'] = (int) $existingLine->fk_element;
+            }
+            $prefill['risks'][] = [
+                'category'       => $existingLine->category,
+                'description'    => $existingLine->description,
+                'used_equipment' => $existingLine->used_equipment,
+            ];
         }
     }
 
@@ -158,21 +183,24 @@ if ($action == 'add_mobile' && $permissiontoadd) {
     };
 
     // Read parameters
-    $extSocietyId  = GETPOSTINT('ext_society_id');
-    $idProfInput   = digiriskMobileCleanIdProf(GETPOST('siren', 'alphanohtml'));
-    $societyName   = trim(GETPOST('ext_society_name', 'alphanohtml'));
-    $societyEmail  = trim(GETPOST('ext_society_email', 'alphanohtml'));
-    $respContactId = GETPOSTINT('resp_contact_id');
-    $respLastname  = trim(GETPOST('resp_lastname', 'alphanohtml'));
-    $respFirstname = trim(GETPOST('resp_firstname', 'alphanohtml'));
-    $respEmail     = trim(GETPOST('resp_email', 'alphanohtml'));
-    $respPhone     = trim(GETPOST('resp_phone', 'alphanohtml'));
-    $dateStartStr  = GETPOST('date_start', 'alpha');
-    $dateEndStr    = GETPOST('date_end', 'alpha');
+    $extSocietyId      = GETPOSTINT('ext_society_id');
+    $idProfInput       = digiriskMobileCleanIdProf(GETPOST('siren', 'alphanohtml'));
+    $societyName       = trim(GETPOST('ext_society_name', 'alphanohtml'));
+    $societyEmail      = trim(GETPOST('ext_society_email', 'alphanohtml'));
+    $respContactId     = GETPOSTINT('resp_contact_id');
+    $respLastname      = trim(GETPOST('resp_lastname', 'alphanohtml'));
+    $respFirstname     = trim(GETPOST('resp_firstname', 'alphanohtml'));
+    $respEmail         = trim(GETPOST('resp_email', 'alphanohtml'));
+    $respPhone         = trim(GETPOST('resp_phone', 'alphanohtml'));
+    $fkPreventionPlan  = GETPOSTINT('fk_preventionplan');
+    $fkElement         = GETPOSTINT('fk_element');
+    $dateStartStr      = GETPOST('date_start', 'alpha');
+    $dateEndStr        = GETPOST('date_end', 'alpha');
 
-    // Selected risks (danger categories) — read here so both the create and the edit paths can use them
+    // Selected types of work — read here so both the create and the edit paths can use them
     $riskCategories = GETPOST('risk_category', 'array');
     $riskComments   = GETPOST('risk_comment', 'array');
+    $riskEquipments = GETPOST('risk_equipment', 'array');
 
     // Selected protections (signalisation OBLIGATION pictos): position + comment + mandatory checkbox, keyed by row index
     $protectionPositions = GETPOST('protection_position', 'array');
@@ -209,11 +237,11 @@ if ($action == 'add_mobile' && $permissiontoadd) {
         }
     }
 
-    // Convert "YYYY-MM-DD" HTML date inputs to timestamps
+    // Convert "YYYY-MM-DDTHH:MM" HTML datetime-local inputs to timestamps
     $dateStart = digiriskMobileParseDateTime($dateStartStr);
     $dateEnd   = digiriskMobileParseDateTime($dateEndStr);
 
-    // Interior company: a saved electronic signature is only required to create (and auto-sign) a plan
+    // Interior company: a saved electronic signature is only required to create (and auto-sign) a permit
     $savedSignature = digiriskGetUserElectronicSignature($db, $user->id);
     if (!$isEdit && !digiriskIsValidSignature($savedSignature)) {
         $addError($langs->trans('MobilePPErrorNoSignature'));
@@ -234,7 +262,12 @@ if ($action == 'add_mobile' && $permissiontoadd) {
         $addError($langs->trans('ErrorFieldRequired', $langs->transnoentitiesnoconv('ExtSocietyResponsible')));
     }
 
-    // Dates: both required (say which one), end after start, at most one year apart
+    // A fire permit always depends on a prevention plan
+    if ($fkPreventionPlan <= 0) {
+        $addError($langs->trans('ErrorFieldRequired', $langs->transnoentitiesnoconv('PreventionPlanLinked')));
+    }
+
+    // Dates: both required (say which one), end after start, at most one month apart
     if (empty($dateStart) && empty($dateEnd)) {
         $addError($langs->trans('MobilePPErrorDatesRequired'));
     } elseif (empty($dateStart)) {
@@ -243,14 +276,14 @@ if ($action == 'add_mobile' && $permissiontoadd) {
         $addError($langs->trans('MobilePPErrorEndRequired'));
     } elseif ($dateEnd < $dateStart) {
         $addError($langs->trans('MobilePPErrorEndBeforeStart'));
-    } elseif ($dateEnd > dol_time_plus_duree($dateStart, 1, 'y')) {
-        $addError($langs->trans('MobilePPErrorMaxOneYear'));
+    } elseif ($dateEnd > dol_time_plus_duree($dateStart, DIGIRISK_MOBILE_FIREPERMIT_MAX_SPAN_DAYS, 'd')) {
+        $addError($langs->trans('MobileFPErrorMaxOneMonth'));
     }
 
-    // The prevention plan is attached to the entity default prevention plan project (PPR)
-    $fkProject = getDolGlobalInt('DIGIRISKDOLIBARR_PREVENTIONPLAN_PROJECT');
+    // The fire permit is attached to the entity default fire permit project (FPR)
+    $fkProject = getDolGlobalInt('DIGIRISKDOLIBARR_FIREPERMIT_PROJECT');
     if ($fkProject <= 0) {
-        $addError($langs->trans('MobilePPErrorNoProject'));
+        $addError($langs->trans('MobileFPErrorNoProject'));
     }
 
     if (!$error) {
@@ -307,47 +340,33 @@ if ($action == 'add_mobile' && $permissiontoadd) {
             }
         }
 
-        // 3b. Edit mode: update the existing plan (no re-validation, no re-signature, no email)
+        // 3a. Edit mode: update the existing permit (no re-validation, no re-signature, no email)
         if (!$subError && $isEdit) {
-            $object->label      = $langs->transnoentities('PreventionPlan') . ' - ' . $thirdparty->name;
-            $object->date_start = $dateStart;
-            $object->date_end   = $dateEnd;
+            $object->label             = $langs->transnoentities('FirePermit') . ' - ' . $thirdparty->name;
+            $object->date_start        = $dateStart;
+            $object->date_end          = $dateEnd;
+            $object->fk_preventionplan = $fkPreventionPlan;
             $object->array_options['options_mobile_protections']    = json_encode($protections);
             $object->array_options['options_mobile_certifications'] = json_encode($certifications);
 
             if ($object->update($user, true) > 0) {
                 // Replace the linked exterior company and its responsible
-                $digiriskresources->setDigiriskResources($db, $user->id, 'ExtSociety', 'societe', [$extSocietyId], $conf->entity, 'preventionplan', $object->id, 0);
-                $signatory->setSignatory($object->id, 'preventionplan', 'socpeople', [$respContactId], 'ExtSocietyResponsible');
+                $digiriskresources->setDigiriskResources($db, $user->id, 'ExtSociety', 'societe', [$extSocietyId], $conf->entity, 'firepermit', $object->id, 0);
+                $signatory->setSignatory($object->id, 'firepermit', 'socpeople', [$respContactId], 'ExtSocietyResponsible');
 
-                // Replace the risk lines by the ones currently in the form
-                $oldLines = $preventionplandet->fetchAll('', '', 0, 0, ['fk_preventionplan' => $object->id]);
+                // Replace the lines by the ones currently in the form
+                $oldLines = $firepermitdet->fetchAll('', '', 0, 0, ['fk_firepermit' => $object->id]);
                 if (is_array($oldLines)) {
                     foreach ($oldLines as $oldLine) {
                         // Hard delete: a soft delete would keep the rows and they would come back in the form
                         $oldLine->delete($user, true, false);
                     }
                 }
-                foreach ($riskCategories as $riskIndex => $riskCategory) {
-                    if ($riskCategory === '' || !is_numeric($riskCategory)) {
-                        continue;
-                    }
-                    $line                    = new PreventionPlanLine($db);
-                    $line->ref               = $refPreventionPlanDetMod->getNextValue($line);
-                    $line->entity            = $conf->entity;
-                    $line->date_creation     = $db->idate(dol_now());
-                    $line->status            = PreventionPlanLine::STATUS_VALIDATED;
-                    $line->category          = (int) $riskCategory;
-                    $line->description       = isset($riskComments[$riskIndex]) ? $riskComments[$riskIndex] : '';
-                    $line->prevention_method = '';
-                    $line->fk_preventionplan = $object->id;
-                    $line->fk_element        = 0;
-                    $line->create($user, true);
-                }
+                digiriskMobileCreateFirePermitLines($db, $user, $object->id, $fkElement, $riskCategories, $riskComments, $riskEquipments, $refFirePermitDetMod);
 
                 $db->commit();
                 $redirect = $_SERVER['PHP_SELF'] . '?created=' . $object->id;
-                setEventMessages($langs->trans('MobilePPUpdated', $object->ref), null, 'mesgs');
+                setEventMessages($langs->trans('MobileFPUpdated', $object->ref), null, 'mesgs');
                 if ($isAjax) {
                     while (ob_get_level()) {
                         ob_end_clean();
@@ -367,56 +386,50 @@ if ($action == 'add_mobile' && $permissiontoadd) {
             $subError++;
         }
 
-        // 3. Create the prevention plan and wire everything together
+        // 3b. Create the fire permit and wire everything together
         if (!$subError && !$isEdit) {
-            $now                   = dol_now();
-            $object->ref           = $refPreventionPlanMod->getNextValue($object);
-            $object->ref_ext       = 'digirisk_' . $object->ref;
-            $object->date_creation = $db->idate($now);
-            $object->tms           = $now;
-            $object->label         = $langs->transnoentities('PreventionPlan') . ' - ' . $thirdparty->name;
-            $object->status        = PreventionPlan::STATUS_DRAFT;
-            $object->fk_project    = $fkProject;
-            $object->date_start    = $dateStart;
-            $object->date_end      = $dateEnd;
-            $object->fk_user_creat = $user->id;
+            $now                       = dol_now();
+            $object->ref               = $refFirePermitMod->getNextValue($object);
+            $object->ref_ext           = 'digirisk_' . $object->ref;
+            $object->date_creation     = $db->idate($now);
+            $object->tms               = $now;
+            $object->label             = $langs->transnoentities('FirePermit') . ' - ' . $thirdparty->name;
+            $object->status            = FirePermit::STATUS_DRAFT;
+            $object->fk_project        = $fkProject;
+            $object->fk_preventionplan = $fkPreventionPlan;
+            $object->date_start        = $dateStart;
+            $object->date_end          = $dateEnd;
+            $object->fk_user_creat     = $user->id;
 
             // Store the selected protections (EPI) and required certifications as JSON in dedicated extrafields
-            $object->array_options['options_mobile_protections']   = json_encode($protections);
+            $object->array_options['options_mobile_protections']    = json_encode($protections);
             $object->array_options['options_mobile_certifications'] = json_encode($certifications);
 
-            $resPP = $object->create($user, true);
-            if ($resPP > 0) {
+            $resFP = $object->create($user, true);
+            if ($resFP > 0) {
                 $object->setInProgress($user, true);
-                $digiriskresources->setDigiriskResources($db, $user->id, 'ExtSociety', 'societe', [$extSocietyId], $conf->entity, 'preventionplan', $object->id, 1);
-                $signatory->setSignatory($object->id, 'preventionplan', 'user', [$user->id], 'MasterWorker');
-                $signatory->setSignatory($object->id, 'preventionplan', 'socpeople', [$respContactId], 'ExtSocietyResponsible');
+                $digiriskresources->setDigiriskResources($db, $user->id, 'ExtSociety', 'societe', [$extSocietyId], $conf->entity, 'firepermit', $object->id, 1);
 
-                // Selected risks (danger categories) become prevention plan lines
-                if (is_array($riskCategories) && !empty($riskCategories)) {
-                    foreach ($riskCategories as $riskIndex => $riskCategory) {
-                        if ($riskCategory === '' || !is_numeric($riskCategory)) {
-                            continue;
-                        }
-                        $line                    = new PreventionPlanLine($db);
-                        $line->ref               = $refPreventionPlanDetMod->getNextValue($line);
-                        $line->entity            = $conf->entity;
-                        $line->date_creation     = $db->idate(dol_now());
-                        $line->status            = PreventionPlanLine::STATUS_VALIDATED;
-                        $line->category          = (int) $riskCategory;
-                        $line->description       = isset($riskComments[$riskIndex]) ? $riskComments[$riskIndex] : '';
-                        $line->prevention_method = '';
-                        $line->fk_preventionplan = $object->id;
-                        $line->fk_element        = 0; // no GP/UT in the simplified mobile flow
-                        $line->create($user, true);
-                    }
+                // The labour inspector is not asked for on mobile: reuse the one configured for the entity
+                $allLinks = $digiriskresources->fetchDigiriskResources();
+                if (!empty($allLinks['LabourInspectorSociety']->id[0])) {
+                    $digiriskresources->setDigiriskResources($db, $user->id, 'LabourInspector', 'societe', [$allLinks['LabourInspectorSociety']->id[0]], $conf->entity, 'firepermit', $object->id, 1);
                 }
+                if (!empty($allLinks['LabourInspectorContact']->id[0])) {
+                    $digiriskresources->setDigiriskResources($db, $user->id, 'LabourInspectorAssigned', 'socpeople', [$allLinks['LabourInspectorContact']->id[0]], $conf->entity, 'firepermit', $object->id, 1);
+                }
+
+                $signatory->setSignatory($object->id, 'firepermit', 'user', [$user->id], 'MasterWorker');
+                $signatory->setSignatory($object->id, 'firepermit', 'socpeople', [$respContactId], 'ExtSocietyResponsible');
+
+                // Selected types of work become fire permit lines
+                digiriskMobileCreateFirePermitLines($db, $user, $object->id, $fkElement, $riskCategories, $riskComments, $riskEquipments, $refFirePermitDetMod);
 
                 // Validate so signatures can be collected
                 $object->setPendingSignature($user, true);
 
                 // Auto-sign the interior side (MasterWorker) with the responsible saved signature
-                $masterWorkers = $signatory->fetchSignatory('MasterWorker', $object->id, 'preventionplan');
+                $masterWorkers = $signatory->fetchSignatory('MasterWorker', $object->id, 'firepermit');
                 if (is_array($masterWorkers) && !empty($masterWorkers)) {
                     $masterWorker                 = array_shift($masterWorkers);
                     $masterWorker->signature      = $savedSignature;
@@ -427,17 +440,17 @@ if ($action == 'add_mobile' && $permissiontoadd) {
                 }
 
                 // Ask the exterior responsible to sign by email (email-only, no SMS configured)
-                $extSignatories = $signatory->fetchSignatory('ExtSocietyResponsible', $object->id, 'preventionplan');
+                $extSignatories = $signatory->fetchSignatory('ExtSocietyResponsible', $object->id, 'firepermit');
                 if (is_array($extSignatories) && !empty($extSignatories)) {
                     $extSignatory = array_shift($extSignatories);
                     if (isValidEmail($extSignatory->email) && dol_strlen(getDolGlobalString('MAIN_MAIL_EMAIL_FROM'))) {
                         require_once DOL_DOCUMENT_ROOT . '/core/class/CMailFile.class.php';
 
-                        $signatureUrl = dol_buildpath('/custom/saturne/public/signature/add_signature.php?track_id=' . $extSignatory->signature_url . '&entity=' . $conf->entity . '&module_name=' . $moduleNameLowerCase . '&object_type=preventionplan&document_type=PreventionPlanDocument', 3);
+                        $signatureUrl = dol_buildpath('/custom/saturne/public/signature/add_signature.php?track_id=' . $extSignatory->signature_url . '&entity=' . $conf->entity . '&module_name=' . $moduleNameLowerCase . '&object_type=firepermit&document_type=FirePermitDocument', 3);
 
                         $from    = getDolGlobalString('MAIN_MAIL_EMAIL_FROM');
-                        $subject = $langs->transnoentities('MobilePPSignatureEmailSubject', $object->ref);
-                        $message = $langs->transnoentities('MobilePPSignatureEmailContent', $thirdparty->name, $signatureUrl);
+                        $subject = $langs->transnoentities('MobileFPSignatureEmailSubject', $object->ref);
+                        $message = $langs->transnoentities('MobileFPSignatureEmailContent', $thirdparty->name, $signatureUrl);
 
                         $mailfile = new CMailFile($subject, $extSignatory->email, $from, $message, [], [], [], '', '', 0, -1, '', '', '', '', 'mail');
                         if (!$mailfile->error && (dol_strlen(getDolGlobalString('MAIN_MAIL_SMTPS_ID')) || getDolGlobalInt('SATURNE_USE_ALL_EMAIL_MODE') > 0)) {
@@ -458,7 +471,7 @@ if ($action == 'add_mobile' && $permissiontoadd) {
 
                 $db->commit();
                 $redirect = $_SERVER['PHP_SELF'] . '?created=' . $object->id;
-                setEventMessages($langs->trans('MobilePPCreated', $object->ref), null, 'mesgs');
+                setEventMessages($langs->trans('MobileFPCreated', $object->ref), null, 'mesgs');
                 if ($isAjax) {
                     while (ob_get_level()) {
                         ob_end_clean();
@@ -529,11 +542,11 @@ require_once __DIR__ . '/../../core/tpl/frontend/digiriskdolibarr_pwa_header.tpl
 if ($created > 0) {
     // Success screen
     $object->fetch($created);
-    require_once __DIR__ . '/../../core/tpl/frontend/preventionplan_mobile_success.tpl.php';
+    require_once __DIR__ . '/../../core/tpl/frontend/firepermit_mobile_success.tpl.php';
 } else {
     // Creation form screen
     $savedSignature = digiriskGetUserElectronicSignature($db, $user->id);
-    require_once __DIR__ . '/../../core/tpl/frontend/preventionplan_mobile_form.tpl.php';
+    require_once __DIR__ . '/../../core/tpl/frontend/firepermit_mobile_form.tpl.php';
 }
 
 llxFooter();

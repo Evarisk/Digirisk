@@ -1087,7 +1087,7 @@ if ((empty($action) || ($action != 'create' && $action != 'edit'))) {
 			// Modify
 			$displayButton = $onPhone ? '<i class="fas fa-edit fa-2x"></i>' : '<i class="fas fa-edit"></i>' . ' ' . $langs->trans('Modify');
 			if ($object->status == $object::STATUS_DRAFT) {
-				print '<a class="butAction" id="actionButtonEdit" href="' . $_SERVER['PHP_SELF'] . '?id=' . $object->id . '&action=edit&token=' . newToken() . '">' . $displayButton . '</a>';
+				print '<a class="butAction" id="actionButtonEdit" href="' . dol_buildpath('/custom/digiriskdolibarr/view/firepermit/firepermit_mobile_create.php', 1) . '?id=' . $object->id . '">' . $displayButton . '</a>';
 			} else {
 				print '<span class="butActionRefused classfortooltip" title="' . dol_escape_htmltag($langs->trans('PreventionPlanMustBeInProgress')) . '">' . $displayButton . '</span>';
 			}
@@ -1477,6 +1477,10 @@ if ((empty($action) || ($action != 'create' && $action != 'edit'))) {
 		print '</table>';
 		print '</div>';
 	}
+
+	// Protections (EPI) and required certifications captured from the mobile quick-creation interface
+	require __DIR__ . '/../../core/tpl/digiriskdolibarr_mobile_protections_view.tpl.php';
+
 	// Document Generation -- Génération des documents
 	$includedocgeneration = 1;
 	if ($includedocgeneration) {

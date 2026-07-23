@@ -16,25 +16,25 @@
  */
 
 /**
- * \file    core/tpl/frontend/preventionplan_mobile_success.tpl.php
+ * \file    core/tpl/frontend/firepermit_mobile_success.tpl.php
  * \ingroup digiriskdolibarr
- * \brief   Success screen of the mobile prevention plan interface.
- *          Expects: $langs, $object (fetched prevention plan).
+ * \brief   Success screen of the mobile fire permit interface.
+ *          Expects: $langs, $object (fetched fire permit).
  */
 
 global $langs;
 
-$cardUrl = dol_buildpath('/custom/digiriskdolibarr/view/preventionplan/preventionplan_card.php', 1) . '?id=' . $object->id;
+$cardUrl = dol_buildpath('/custom/digiriskdolibarr/view/firepermit/firepermit_card.php', 1) . '?id=' . $object->id;
 ?>
 <div class="pwa-container digirisk-mobile">
     <div class="digirisk-mobile-card digirisk-mobile-success">
         <i class="fas fa-check-circle digirisk-mobile-success__icon"></i>
-        <div class="digirisk-mobile-success__title"><?php print $langs->trans('MobilePPSuccessTitle'); ?></div>
+        <div class="digirisk-mobile-success__title"><?php print $langs->trans('MobileFPSuccessTitle'); ?></div>
         <div class="digirisk-mobile-success__ref"><?php print dol_escape_htmltag($object->ref); ?></div>
         <div class="digirisk-mobile-success__text"><?php print $langs->trans('MobilePPSuccessText'); ?></div>
         <div class="digirisk-mobile-success__actions">
-            <a class="wpeo-button button-blue" href="<?php print $cardUrl; ?>"><i class="fas fa-eye"></i> <?php print $langs->trans('MobilePPViewPlan'); ?></a>
-            <a class="wpeo-button button-grey" href="<?php print $_SERVER['PHP_SELF']; ?>"><i class="fas fa-plus-circle"></i> <?php print $langs->trans('MobilePPCreateAnother'); ?></a>
+            <a class="wpeo-button button-blue" href="<?php print $cardUrl; ?>"><i class="fas fa-eye"></i> <?php print $langs->trans('MobileFPViewPermit'); ?></a>
+            <a class="wpeo-button button-grey" href="<?php print $_SERVER['PHP_SELF']; ?>"><i class="fas fa-plus-circle"></i> <?php print $langs->trans('MobileFPCreateAnother'); ?></a>
         </div>
     </div>
 </div>
