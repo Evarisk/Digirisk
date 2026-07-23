@@ -2020,3 +2020,22 @@ MobilePPCertifications = Certifications obligatoires
 MobilePPAddCertification = Ajouter une certification
 MobileCertifications = Certifications (mobile)
 MobilePPUploadCertPhoto = Envoyer une photo
+
+# Mobile fire permit quick creation
+MobileFirePermitMin = permis de feu depuis l'interface mobile
+MobileFPPreventionPlanHelp = L'entreprise extérieure et la période du plan sélectionné sont reprises automatiquement.
+MobileFPPeriod = Lieu et période des travaux
+MobileFPMaxOneMonthHint = Un mois maximum entre le début et la fin des travaux.
+MobileFPErrorMaxOneMonth = La durée ne peut pas dépasser un mois.
+MobileFPErrorNoProject = Aucun projet permis de feu par défaut n'est configuré.
+MobileFPWorkTypes = Types de travaux
+MobileFPAddWorkType = Ajouter un type de travaux
+MobileFPWorkTypeModalTitle = Choisir un type de travaux
+MobileFPSubmit = Créer le permis de feu
+MobileFPCreated = Permis de feu %s créé.
+MobileFPUpdated = Permis de feu %s mis à jour.
+MobileFPSignatureEmailSubject = Demande de signature du permis de feu %s
+MobileFPSignatureEmailContent = Bonjour,<br><br>Vous êtes invité à signer le permis de feu pour %s.<br><br><a href="%s">Cliquez ici pour signer</a><br><br>Cordialement.
+MobileFPSuccessTitle = Permis de feu créé
+MobileFPViewPermit = Voir le permis
+MobileFPCreateAnother = Créer un autre permis

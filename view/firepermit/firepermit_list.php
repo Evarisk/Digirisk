@@ -216,7 +216,7 @@ $massactionbutton = $form->selectMassAction('', $arrayofmassactions);
 
 $newcardbutton = '';
 if ($permissiontoadd) {
-	$newcardbutton .= dolGetButtonTitle($langs->trans('NewFirePermit'), '', 'fa fa-plus-circle', DOL_URL_ROOT . '/custom/digiriskdolibarr/view/firepermit/firepermit_card.php?action=create');
+	$newcardbutton .= dolGetButtonTitle($langs->trans('NewFirePermit'), '', 'fa fa-plus-circle', DOL_URL_ROOT . '/custom/digiriskdolibarr/view/firepermit/firepermit_mobile_create.php');
 }
 
 print '<form method="POST" id="searchFormList" action="' . $_SERVER["PHP_SELF"] . '">';
