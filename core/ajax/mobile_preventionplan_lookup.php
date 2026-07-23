@@ -78,6 +78,7 @@ if (is_object($extSociety) && $extSociety->id > 0) {
         'name'  => $extSociety->name,
         'email' => $extSociety->email,
         'siren' => $extSociety->idprof1,
+        'siret' => $extSociety->idprof2,
     ];
 }
 

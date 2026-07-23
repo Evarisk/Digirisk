@@ -158,6 +158,29 @@ function digiriskMobileCreateFirePermitLines(DoliDB $db, User $user, int $firePe
 }
 
 /**
+ * Keep only the digits of a company identifier typed by the user.
+ * SIREN and SIRET are commonly written with spaces or dots ("552 100 554 00012").
+ *
+ * @param  string $value Raw input value
+ * @return string        Digits only
+ */
+function digiriskMobileCleanIdProf(string $value): string
+{
+    return preg_replace('/[^0-9]/', '', $value);
+}
+
+/**
+ * A company identifier is either a 9 digit SIREN or a 14 digit SIRET (SIREN + NIC).
+ *
+ * @param  string $value Cleaned identifier (digits only)
+ * @return bool          True when the length matches one of the two formats
+ */
+function digiriskMobileIsValidIdProf(string $value): bool
+{
+    return in_array(dol_strlen($value), [9, 14], true);
+}
+
+/**
  * Available required-certification options for the mobile quick-creation interfaces (code => label).
  *
  * @return array

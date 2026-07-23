@@ -168,7 +168,7 @@ window.digiriskdolibarr.mobilequickcreate.saveSignature = function() {
 };
 
 /**
- * Look up an existing third party by SIREN and pre-fill the exterior company block.
+ * Look up an existing third party by SIREN or SIRET and pre-fill the exterior company block.
  *
  * @return {void}
  */
@@ -177,8 +177,9 @@ window.digiriskdolibarr.mobilequickcreate.searchSiren = function() {
     var siren  = $('.digirisk-mobile-siren-input').val().replace(/[^0-9]/g, '');
     var result = $('.digirisk-mobile-siren-result');
 
-    if (siren.length < 9) {
-        result.removeClass('success').addClass('error').text(form.data('invalid-siren-label') || 'SIREN invalide');
+    // Either a 9 digit SIREN or a 14 digit SIRET.
+    if (siren.length !== 9 && siren.length !== 14) {
+        result.removeClass('success').addClass('error').text(form.data('invalid-siren-label') || 'SIREN/SIRET invalide');
         return;
     }
 
@@ -221,6 +222,10 @@ window.digiriskdolibarr.mobilequickcreate.fillFoundCompany = function(resp) {
     $('.digirisk-mobile-ext-society-name').val(resp.societe.name);
     if (resp.societe.email) {
         $('.digirisk-mobile-ext-society-email').val(resp.societe.email);
+    }
+    // Show back the identifier the company actually has on file, SIRET first.
+    if (resp.societe.siret || resp.societe.siren) {
+        $('.digirisk-mobile-siren-input').val(resp.societe.siret || resp.societe.siren);
     }
     $('.digirisk-mobile-siren-result').removeClass('error').addClass('success').text((form.data('company-found-label') || '') + ' ' + resp.societe.name);
 
@@ -304,7 +309,7 @@ window.digiriskdolibarr.mobilequickcreate.selectPreventionPlan = function() {
                 $('.digirisk-mobile-ext-society-id').val(resp.societe.id);
                 $('.digirisk-mobile-ext-society-name').val(resp.societe.name || '');
                 $('.digirisk-mobile-ext-society-email').val(resp.societe.email || '');
-                $('.digirisk-mobile-siren-input').val(resp.societe.siren || '');
+                $('.digirisk-mobile-siren-input').val(resp.societe.siret || resp.societe.siren || '');
             }
             if (resp.responsible && resp.responsible.id) {
                 $('.digirisk-mobile-resp-contact-id').val(resp.responsible.id);

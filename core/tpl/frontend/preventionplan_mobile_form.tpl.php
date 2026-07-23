@@ -91,9 +91,9 @@ $saveSignatureUrl = dol_buildpath('/custom/digiriskdolibarr/core/ajax/save_user_
         <div class="digirisk-mobile-card">
             <div class="digirisk-mobile-card__title"><i class="fas fa-industry"></i> <?php print $langs->trans('MobilePPExteriorCompany'); ?></div>
             <div class="digirisk-mobile-field">
-                <label><?php print $langs->trans('Siren'); ?></label>
+                <label><?php print $langs->trans('MobileSirenOrSiret'); ?></label>
                 <div class="digirisk-mobile-siren-row">
-                    <input type="text" name="siren" class="digirisk-mobile-siren-input" inputmode="numeric" autocomplete="off" maxlength="14" value="<?php print dol_escape_htmltag($prefill["siren"]); ?>">
+                    <input type="text" name="siren" class="digirisk-mobile-siren-input" inputmode="numeric" autocomplete="off" maxlength="20" placeholder="<?php print dol_escape_htmltag($langs->trans('MobileSirenOrSiretPlaceholder')); ?>" value="<?php print dol_escape_htmltag($prefill["siren"]); ?>">
                     <button type="button" class="digirisk-mobile-siren-search wpeo-button button-blue" aria-label="<?php print dol_escape_htmltag($langs->trans('Search')); ?>"><i class="fas fa-search"></i></button>
                 </div>
             </div>
