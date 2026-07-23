@@ -2040,3 +2040,19 @@ MobileFPSignatureEmailContent = Bonjour,<br><br>Vous êtes invité à signer le 
 MobileFPSuccessTitle = Permis de feu créé
 MobileFPViewPermit = Voir le permis
 MobileFPCreateAnother = Créer un autre permis
+
+# Digirisk PWA
+PwaApplication = Application
+PwaNavHome = Accueil
+PwaNavPreventionPlans = Plans
+PwaNavFirePermits = Permis
+PwaNavMenu = Menu
+PwaNavFavoritesHint = Favoris affichés en bas (max %s)
+PwaNavAddFavorite = Ajouter aux favoris
+PwaNavRemoveFavorite = Retirer des favoris
+PwaHello = Bonjour %s
+PwaResultCount = %s résultat(s)
+PwaTilePreventionPlanInProgress = Plans en cours
+PwaTilePreventionPlanToSign = Plans à signer
+PwaTileFirePermitInProgress = Permis en cours
+PwaTileFirePermitToSign = Permis à signer

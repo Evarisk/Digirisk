@@ -172,7 +172,17 @@ class ActionsDigiriskdolibarr
             </script>
             <?php
 
-            $this->resprints = '<link rel="manifest" href="' . DOL_URL_ROOT . '/custom/digiriskdolibarr/manifest.json.php' . '" />';
+            // The internal application (prevention plans and fire permits) declares its own manifest,
+            // so it installs separately from the public ticket declaration app.
+            $manifestFile = 'manifest.json.php';
+            foreach (['/view/frontend/', 'preventionplan_mobile_create.php', 'firepermit_mobile_create.php'] as $pwaPath) {
+                if (strpos($_SERVER['PHP_SELF'], $pwaPath) !== false) {
+                    $manifestFile = 'manifest_pwa.json.php';
+                    break;
+                }
+            }
+
+            $this->resprints = '<link rel="manifest" href="' . DOL_URL_ROOT . '/custom/digiriskdolibarr/' . $manifestFile . '" />';
         }
 
         return 0; // or return 1 to replace standard code

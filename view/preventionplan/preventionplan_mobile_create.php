@@ -536,5 +536,8 @@ if ($created > 0) {
     require_once __DIR__ . '/../../core/tpl/frontend/preventionplan_mobile_form.tpl.php';
 }
 
+// Application navigation, so this screen is not a dead end when reached from the PWA
+require_once __DIR__ . '/../../core/tpl/frontend/digiriskdolibarr_pwa_bottom_nav.tpl.php';
+
 llxFooter();
 $db->close();
