@@ -46,7 +46,7 @@ if (empty($user->id)) {
 }
 
 // Either mobile interface may resolve a company by SIREN.
-if (!$user->hasRight('digiriskdolibarr', 'mobilepreventionplan', 'write') && !$user->hasRight('digiriskdolibarr', 'mobilefirepermit', 'write')) {
+if (!$user->hasRight('digiriskdolibarr', 'preventionplan', 'write') && !$user->hasRight('digiriskdolibarr', 'firepermit', 'write')) {
     echo json_encode(['success' => false, 'error' => 'Forbidden']);
     exit;
 }

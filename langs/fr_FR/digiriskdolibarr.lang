@@ -1969,7 +1969,6 @@ Mentioned = Mentionné
 
 # Mobile prevention plan quick creation
 MobileQuickCreation = Création rapide mobile
-MobilePreventionPlanMin = plans de prévention via l'interface mobile
 MobilePPInteriorCompany = Entreprise utilisatrice (intérieure)
 MobilePPResponsibleAutoSign = Responsable (signe automatiquement)
 MobilePPSignatureSaved = Signature enregistrée
@@ -2023,7 +2022,6 @@ MobileCertifications = Certifications (mobile)
 MobilePPUploadCertPhoto = Envoyer une photo
 
 # Mobile fire permit quick creation
-MobileFirePermitMin = permis de feu depuis l'interface mobile
 MobileFPPreventionPlanHelp = L'entreprise extérieure et la période du plan sélectionné sont reprises automatiquement.
 MobileFPPeriod = Lieu et période des travaux
 MobileFPMaxOneMonthHint = Un mois maximum entre le début et la fin des travaux.

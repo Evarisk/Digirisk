@@ -92,7 +92,7 @@ list($refFirePermitMod, $refFirePermitDetMod) = saturne_require_objects_mod($num
 $hookmanager->initHooks(['firepermitmobilecreate', 'globalcard']);
 
 // Security check
-$permissiontoadd = $user->hasRight('digiriskdolibarr', 'mobilefirepermit', 'write');
+$permissiontoadd = $user->hasRight('digiriskdolibarr', 'firepermit', 'write');
 saturne_check_access($permissiontoadd);
 
 /*
