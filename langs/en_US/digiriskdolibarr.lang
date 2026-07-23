@@ -165,3 +165,23 @@ MobileFPSignatureEmailContent = Hello,<br><br>You are invited to sign the fire p
 MobileFPSuccessTitle = Fire permit created
 MobileFPViewPermit = View permit
 MobileFPCreateAnother = Create another permit
+
+# Digirisk PWA
+PwaApplication = Application
+PwaNavHome = Home
+PwaNavPreventionPlans = Plans
+PwaNavNewPreventionPlan = + Plan
+PwaNavFirePermits = Permits
+PwaNavNewFirePermit = + Permit
+PwaNavMenu = Menu
+PwaNavFavoritesHint = Favorites shown at the bottom (max %s)
+PwaNavAddFavorite = Add to favorites
+PwaNavRemoveFavorite = Remove from favorites
+PwaHello = Hello %s
+PwaResultCount = %s result(s)
+PwaTilePreventionPlanInProgress = Plans in progress
+PwaTilePreventionPlanToSign = Plans to sign
+PwaTileFirePermitInProgress = Permits in progress
+PwaTileFirePermitToSign = Permits to sign
+PwaCreatePreventionPlan = Create a prevention plan
+PwaCreateFirePermit = Create a fire permit
