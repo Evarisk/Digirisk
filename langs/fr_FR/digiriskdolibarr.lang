@@ -2054,3 +2054,11 @@ PwaTilePreventionPlanInProgress = Plans en cours
 PwaTilePreventionPlanToSign = Plans à signer
 PwaTileFirePermitInProgress = Permis en cours
 PwaTileFirePermitToSign = Permis à signer
+
+# Actions de masse sur les tâches
+MassValidateTasks = Valider les tâches
+MassChangeTasksProject = Changer de projet
+ConfirmMassValidateTasksQuestion = Êtes-vous sûr de vouloir valider les %s tâche(s) sélectionnée(s) ? Seules les tâches au statut brouillon seront validées.
+ConfirmMassChangeTasksProjectQuestion = Êtes-vous sûr de vouloir rattacher les %s tâche(s) sélectionnée(s) au projet choisi ?
+MassValidateTasksSuccess = %s tâche(s) validée(s) sur %s sélectionnée(s)
+MassChangeTasksProjectSuccess = %s tâche(s) rattachée(s) au projet %s
