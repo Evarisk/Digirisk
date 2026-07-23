@@ -93,7 +93,72 @@ function digiriskIsValidSignature(string $signature): bool
 }
 
 /**
- * Available required-certification options for the mobile prevention plan interface (code => label).
+ * Convert the value of a native date / datetime-local input into a timestamp.
+ * Accepts "YYYY-MM-DD" (prevention plan) and "YYYY-MM-DDTHH:MM" (fire permit).
+ *
+ * @param  string $value Raw input value
+ * @return int           Timestamp, or 0 when the value is empty or malformed
+ */
+function digiriskMobileParseDateTime(string $value): int
+{
+    if (!preg_match('/^(\d{4})-(\d{2})-(\d{2})(?:[T ](\d{2}):(\d{2}))?$/', $value, $parts)) {
+        return 0;
+    }
+
+    return (int) dol_mktime(
+        isset($parts[4]) ? (int) $parts[4] : 0,
+        isset($parts[5]) ? (int) $parts[5] : 0,
+        0,
+        (int) $parts[2],
+        (int) $parts[3],
+        (int) $parts[1]
+    );
+}
+
+/**
+ * Create the fire permit lines (types of work) posted by the mobile interface.
+ * The mobile interface uses a single location for the whole permit, applied to every line.
+ *
+ * @param  DoliDB $db             Database handler
+ * @param  User   $user           User performing the action
+ * @param  int    $firePermitId   Parent fire permit id
+ * @param  int    $fkElement      GP/UT the work takes place in
+ * @param  array  $categories     Posted danger category positions
+ * @param  array  $comments       Posted descriptions, keyed like $categories
+ * @param  array  $equipments     Posted used equipments, keyed like $categories
+ * @param  object $refLineModule  Numbering module used to compute each line ref
+ * @return void
+ */
+function digiriskMobileCreateFirePermitLines(DoliDB $db, User $user, int $firePermitId, int $fkElement, $categories, $comments, $equipments, $refLineModule)
+{
+    global $conf;
+
+    if (!is_array($categories) || empty($categories)) {
+        return;
+    }
+
+    require_once __DIR__ . '/../class/firepermit.class.php';
+
+    foreach ($categories as $index => $category) {
+        if ($category === '' || !is_numeric($category)) {
+            continue;
+        }
+        $line                 = new FirePermitLine($db);
+        $line->ref            = $refLineModule->getNextValue($line);
+        $line->entity         = $conf->entity;
+        $line->date_creation  = $db->idate(dol_now());
+        $line->status         = FirePermitLine::STATUS_VALIDATED;
+        $line->category       = (int) $category;
+        $line->description    = isset($comments[$index])   ? $comments[$index]   : '';
+        $line->used_equipment = isset($equipments[$index]) ? $equipments[$index] : '';
+        $line->fk_firepermit  = $firePermitId;
+        $line->fk_element     = $fkElement;
+        $line->create($user, true);
+    }
+}
+
+/**
+ * Available required-certification options for the mobile quick-creation interfaces (code => label).
  *
  * @return array
  */

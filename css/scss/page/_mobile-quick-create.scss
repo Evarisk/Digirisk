@@ -1,6 +1,8 @@
-/* Mobile prevention plan quick-creation interface (view/preventionplan/preventionplan_mobile_create.php) */
+/* Mobile quick-creation interfaces, shared by the prevention plan
+   (view/preventionplan/preventionplan_mobile_create.php) and the fire permit
+   (view/firepermit/firepermit_mobile_create.php). */
 
-body.preventionplan-mobile-create {
+body.digirisk-mobile-create {
   padding: 0 !important;
   padding-top: 52px !important;
   margin: 0 !important;
@@ -151,6 +153,7 @@ body.preventionplan-mobile-create {
     input[type="email"],
     input[type="tel"],
     input[type="date"],
+    input[type="datetime-local"],
     select {
       width: 100%;
       box-sizing: border-box;
@@ -339,6 +342,7 @@ body.preventionplan-mobile-create {
   .digirisk-mobile-risk-item {
     display: flex;
     align-items: center;
+    flex-wrap: wrap;
     gap: 8px;
     padding: 6px 0;
     border-bottom: 1px solid #f1f5f9;
@@ -359,6 +363,25 @@ body.preventionplan-mobile-create {
     flex: 1;
     min-width: 0;
     box-sizing: border-box;
+    padding: 8px 10px;
+    font-size: 14px;
+    border: 1px solid #cbd5e1;
+    border-radius: 7px;
+    color: #1e293b;
+
+    &:focus {
+      outline: none;
+      border-color: #2b7de9;
+      box-shadow: 0 0 0 2px rgba(43, 125, 233, 0.2);
+    }
+  }
+
+  /* Fire permit only: the equipment used for a type of work, on its own line
+     under the comment and aligned with it (picto width + gap). */
+  .digirisk-mobile-risk-item-equipment {
+    flex: 1 1 100%;
+    box-sizing: border-box;
+    margin-left: 48px;
     padding: 8px 10px;
     font-size: 14px;
     border: 1px solid #cbd5e1;
@@ -786,7 +809,7 @@ body.preventionplan-mobile-create {
 }
 
 /* Read-only protections (EPI) display on the prevention plan card (desktop, not scoped to the mobile body) */
-.preventionplan-protections-view {
+.digirisk-protections-view {
   margin: 12px 0;
 
   &__title {

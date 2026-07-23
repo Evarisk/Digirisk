@@ -25,10 +25,10 @@
 global $conf, $langs, $mysoc, $user;
 
 $hasSignature     = digiriskIsValidSignature($savedSignature);
-$sirenLookupUrl   = dol_buildpath('/custom/digiriskdolibarr/core/ajax/preventionplan_siren_lookup.php', 1);
+$sirenLookupUrl   = dol_buildpath('/custom/digiriskdolibarr/core/ajax/mobile_siren_lookup.php', 1);
 $saveSignatureUrl = dol_buildpath('/custom/digiriskdolibarr/core/ajax/save_user_signature.php', 1);
 ?>
-<div class="pwa-container preventionplan-mobile">
+<div class="pwa-container digirisk-mobile">
     <form method="POST" action="<?php print $_SERVER['PHP_SELF']; ?>" class="digirisk-mobile-form"
           data-has-signature="<?php print ($hasSignature || !empty($isEdit)) ? '1' : '0'; ?>"
           data-siren-lookup-url="<?php print dol_escape_htmltag($sirenLookupUrl); ?>"
@@ -39,7 +39,8 @@ $saveSignatureUrl = dol_buildpath('/custom/digiriskdolibarr/core/ajax/save_user_
           data-company-found-label="<?php print dol_escape_htmltag($langs->trans('MobilePPCompanyFound')); ?>"
           data-company-not-found-label="<?php print dol_escape_htmltag($langs->trans('MobilePPCompanyNotFound')); ?>"
           data-end-before-start-label="<?php print dol_escape_htmltag($langs->trans('MobilePPErrorEndBeforeStart')); ?>"
-          data-max-one-year-label="<?php print dol_escape_htmltag($langs->trans('MobilePPErrorMaxOneYear')); ?>"
+          data-max-span-label="<?php print dol_escape_htmltag($langs->trans('MobilePPErrorMaxOneYear')); ?>"
+          data-max-span-days="365"
           data-dates-required-label="<?php print dol_escape_htmltag($langs->trans('MobilePPErrorDatesRequired')); ?>"
           data-date-start-required-label="<?php print dol_escape_htmltag($langs->trans('MobilePPErrorStartRequired')); ?>"
           data-date-end-required-label="<?php print dol_escape_htmltag($langs->trans('MobilePPErrorEndRequired')); ?>"

@@ -26,7 +26,7 @@ global $langs;
 
 $cardUrl = dol_buildpath('/custom/digiriskdolibarr/view/preventionplan/preventionplan_card.php', 1) . '?id=' . $object->id;
 ?>
-<div class="pwa-container preventionplan-mobile">
+<div class="pwa-container digirisk-mobile">
     <div class="digirisk-mobile-card digirisk-mobile-success">
         <i class="fas fa-check-circle digirisk-mobile-success__icon"></i>
         <div class="digirisk-mobile-success__title"><?php print $langs->trans('MobilePPSuccessTitle'); ?></div>

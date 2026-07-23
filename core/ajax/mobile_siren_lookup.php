@@ -16,9 +16,10 @@
  */
 
 /**
- * \file    core/ajax/preventionplan_siren_lookup.php
+ * \file    core/ajax/mobile_siren_lookup.php
  * \ingroup digiriskdolibarr
  * \brief   AJAX endpoint to look up an existing third party by SIREN (idprof1) in the current entity.
+ *          Shared by the mobile prevention plan and fire permit quick-creation interfaces.
  */
 
 // Load DigiriskDolibarr environment
@@ -41,7 +42,8 @@ if (empty($user->id)) {
     exit;
 }
 
-if (!$user->hasRight('digiriskdolibarr', 'mobilepreventionplan', 'write')) {
+// Either mobile interface may resolve a company by SIREN.
+if (!$user->hasRight('digiriskdolibarr', 'mobilepreventionplan', 'write') && !$user->hasRight('digiriskdolibarr', 'mobilefirepermit', 'write')) {
     echo json_encode(['success' => false, 'error' => 'Forbidden']);
     exit;
 }

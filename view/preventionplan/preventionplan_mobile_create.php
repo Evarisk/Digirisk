@@ -209,14 +209,8 @@ if ($action == 'add_mobile' && $permissiontoadd) {
     }
 
     // Convert "YYYY-MM-DD" HTML date inputs to timestamps
-    $dateStart = 0;
-    $dateEnd   = 0;
-    if (preg_match('/^(\d{4})-(\d{2})-(\d{2})$/', $dateStartStr, $ds)) {
-        $dateStart = dol_mktime(0, 0, 0, (int) $ds[2], (int) $ds[3], (int) $ds[1]);
-    }
-    if (preg_match('/^(\d{4})-(\d{2})-(\d{2})$/', $dateEndStr, $de)) {
-        $dateEnd = dol_mktime(0, 0, 0, (int) $de[2], (int) $de[3], (int) $de[1]);
-    }
+    $dateStart = digiriskMobileParseDateTime($dateStartStr);
+    $dateEnd   = digiriskMobileParseDateTime($dateEndStr);
 
     // Interior company: a saved electronic signature is only required to create (and auto-sign) a plan
     $savedSignature = digiriskGetUserElectronicSignature($db, $user->id);
@@ -518,7 +512,7 @@ $conf->dol_hide_topmenu         = 1;
 $conf->dol_hide_leftmenu        = 1;
 $conf->global->MAIN_FAVICON_URL = DOL_URL_ROOT . '/custom/digiriskdolibarr/img/digiriskdolibarr_color.png';
 
-llxHeader('', $title, $help_url, '', 0, 0, $moreJS, $moreCSS, '', 'template-pwa preventionplan-mobile-create');
+llxHeader('', $title, $help_url, '', 0, 0, $moreJS, $moreCSS, '', 'template-pwa digirisk-mobile-create');
 
 if (!$permissiontoadd) {
     accessforbidden($langs->trans('NotEnoughPermissions'), 0);
