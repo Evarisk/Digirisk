@@ -77,7 +77,7 @@ list($refPreventionPlanMod, $refPreventionPlanDetMod) = saturne_require_objects_
 $hookmanager->initHooks(['preventionplanmobilecreate', 'globalcard']);
 
 // Security check
-$permissiontoadd = $user->hasRight('digiriskdolibarr', 'mobilepreventionplan', 'write');
+$permissiontoadd = $user->hasRight('digiriskdolibarr', 'preventionplan', 'write');
 saturne_check_access($permissiontoadd);
 
 /*

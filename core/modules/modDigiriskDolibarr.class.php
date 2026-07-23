@@ -1396,18 +1396,8 @@ class modDigiriskdolibarr extends DolibarrModules
 		$this->rights[$r][5] = 'categoryconfig';
 		$r++;
 
-		/* MOBILE QUICK CREATION PERMISSIONS - appended at the end to avoid renumbering existing permission ids */
-		$this->rights[$r][0] = $this->numero . sprintf('%02d', $r + 1);
-		$this->rights[$r][1] = $langs->transnoentities('CreateObjects', $langs->transnoentities('MobilePreventionPlanMin'));
-		$this->rights[$r][4] = 'mobilepreventionplan';
-		$this->rights[$r][5] = 'write';
-		$r++;
-
-		$this->rights[$r][0] = $this->numero . sprintf('%02d', $r + 1);
-		$this->rights[$r][1] = $langs->transnoentities('CreateObjects', $langs->transnoentities('MobileFirePermitMin'));
-		$this->rights[$r][4] = 'mobilefirepermit';
-		$this->rights[$r][5] = 'write';
-		$r++;
+		// The mobile interfaces and the application create the very same objects as the classic cards:
+		// they rely on preventionplan/write and firepermit/write rather than on rights of their own.
 
 		// Main menu entries to add
 		$this->menu       = [];
@@ -1578,7 +1568,7 @@ class modDigiriskdolibarr extends DolibarrModules
 			'langs'    => 'digiriskdolibarr@digiriskdolibarr',
 			'position' => 100 + $r,
 			'enabled'  => 'isModEnabled(\'digiriskdolibarr\')',
-			'perms'    => '$user->rights->digiriskdolibarr->mobilepreventionplan->write',
+			'perms'    => '$user->rights->digiriskdolibarr->preventionplan->write',
 			'target'   => '',
 			'user'     => 2,
 		];
@@ -1640,7 +1630,7 @@ class modDigiriskdolibarr extends DolibarrModules
 			'langs'    => 'digiriskdolibarr@digiriskdolibarr',
 			'position' => 100 + $r,
 			'enabled'  => 'isModEnabled(\'digiriskdolibarr\')',
-			'perms'    => '$user->rights->digiriskdolibarr->mobilefirepermit->write',
+			'perms'    => '$user->rights->digiriskdolibarr->firepermit->write',
 			'target'   => '',
 			'user'     => 2,
 		];

@@ -47,7 +47,7 @@ if (empty($user->id)) {
     exit;
 }
 
-if (!$user->hasRight('digiriskdolibarr', 'mobilefirepermit', 'write')) {
+if (!$user->hasRight('digiriskdolibarr', 'firepermit', 'write')) {
     echo json_encode(['success' => false, 'error' => 'Forbidden']);
     exit;
 }

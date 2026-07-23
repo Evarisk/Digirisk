@@ -82,7 +82,7 @@ list($listRows, $listTotal, $listTotalPages) = digiriskPwaFetchList('FirePermit'
 
     return [
         'url'        => dol_buildpath('/custom/digiriskdolibarr/view/firepermit/firepermit_card.php', 1) . '?id=' . $record->id,
-        'editUrl'    => ($record->status == FirePermit::STATUS_DRAFT && $user->hasRight('digiriskdolibarr', 'mobilefirepermit', 'write'))
+        'editUrl'    => ($record->status == FirePermit::STATUS_DRAFT && $user->hasRight('digiriskdolibarr', 'firepermit', 'write'))
             ? dol_buildpath('/custom/digiriskdolibarr/view/firepermit/firepermit_mobile_create.php', 1) . '?id=' . $record->id
             : '',
         'ref'        => $record->ref,
@@ -92,7 +92,7 @@ list($listRows, $listTotal, $listTotalPages) = digiriskPwaFetchList('FirePermit'
     ];
 });
 
-$listCreateUrl = $user->hasRight('digiriskdolibarr', 'mobilefirepermit', 'write')
+$listCreateUrl = $user->hasRight('digiriskdolibarr', 'firepermit', 'write')
     ? dol_buildpath('/custom/digiriskdolibarr/view/firepermit/firepermit_mobile_create.php', 1)
     : '';
 
