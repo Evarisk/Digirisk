@@ -77,23 +77,6 @@ if ($canReadFirePermit) {
     ];
 }
 
-// Creation shortcuts
-$homeActions = [];
-if ($user->hasRight('digiriskdolibarr', 'mobilepreventionplan', 'write')) {
-    $homeActions[] = [
-        'icon'  => 'fa-plus-circle',
-        'label' => $langs->transnoentities('PwaCreatePreventionPlan'),
-        'url'   => dol_buildpath('/custom/digiriskdolibarr/view/preventionplan/preventionplan_mobile_create.php', 1),
-    ];
-}
-if ($user->hasRight('digiriskdolibarr', 'mobilefirepermit', 'write')) {
-    $homeActions[] = [
-        'icon'  => 'fa-plus-square',
-        'label' => $langs->transnoentities('PwaCreateFirePermit'),
-        'url'   => dol_buildpath('/custom/digiriskdolibarr/view/firepermit/firepermit_mobile_create.php', 1),
-    ];
-}
-
 /*
  * View
  */

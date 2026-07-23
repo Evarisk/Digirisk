@@ -105,17 +105,18 @@ $manifest->scope            = dol_buildpath('/custom/digiriskdolibarr/', 1);
 $manifest->theme_color      = '#2b7de9';
 $manifest->description      = 'Consultez et creez vos plans de prevention et vos permis de feu depuis votre telephone';
 
-// Shortcuts offered by a long press on the installed application icon
+// Shortcuts offered by a long press on the installed application icon.
+// They open the lists, which are the single entry point to the creation screens.
 $shortcut              = new stdClass();
-$shortcut->name        = 'Nouveau plan de prevention';
-$shortcut->short_name  = 'Plan';
-$shortcut->url         = dol_buildpath('/custom/digiriskdolibarr/view/preventionplan/preventionplan_mobile_create.php', 1);
+$shortcut->name        = 'Plans de prevention';
+$shortcut->short_name  = 'Plans';
+$shortcut->url         = dol_buildpath('/custom/digiriskdolibarr/view/frontend/pwa_preventionplan_list.php', 1);
 $manifest->shortcuts[] = $shortcut;
 
 $shortcut              = new stdClass();
-$shortcut->name        = 'Nouveau permis de feu';
+$shortcut->name        = 'Permis de feu';
 $shortcut->short_name  = 'Permis';
-$shortcut->url         = dol_buildpath('/custom/digiriskdolibarr/view/firepermit/firepermit_mobile_create.php', 1);
+$shortcut->url         = dol_buildpath('/custom/digiriskdolibarr/view/frontend/pwa_firepermit_list.php', 1);
 $manifest->shortcuts[] = $shortcut;
 
 $img                     = new stdClass();

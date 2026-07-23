@@ -34,6 +34,9 @@ if (!defined('DIGIRISKDOLIBARR_PWA_NAV_MAX_FAVORITES')) {
  * Items the user has no permission for are dropped, so a slug kept in an old favorites
  * list simply disappears instead of showing a link leading to an access denied page.
  *
+ * Navigation only: creating a prevention plan or a fire permit is reached from the "+"
+ * button of the matching list, which is the single entry point to the creation screens.
+ *
  * @param  User $user User whose permissions filter the list
  * @return array<string,array{url:string,page:string,icon:string,label:string}>
  */
@@ -60,30 +63,12 @@ function digiriskPwaNavGetItems(User $user): array
         ];
     }
 
-    if ($user->hasRight('digiriskdolibarr', 'mobilepreventionplan', 'write')) {
-        $items['new_preventionplan'] = [
-            'url'   => dol_buildpath('/custom/digiriskdolibarr/view/preventionplan/preventionplan_mobile_create.php', 1),
-            'page'  => 'preventionplan_mobile_create.php',
-            'icon'  => 'fa-plus-circle',
-            'label' => $langs->transnoentities('PwaNavNewPreventionPlan'),
-        ];
-    }
-
     if ($user->hasRight('digiriskdolibarr', 'firepermit', 'read')) {
         $items['firepermits'] = [
             'url'   => $frontendBase . 'pwa_firepermit_list.php',
             'page'  => 'pwa_firepermit_list.php',
             'icon'  => 'fa-fire-alt',
             'label' => $langs->transnoentities('PwaNavFirePermits'),
-        ];
-    }
-
-    if ($user->hasRight('digiriskdolibarr', 'mobilefirepermit', 'write')) {
-        $items['new_firepermit'] = [
-            'url'   => dol_buildpath('/custom/digiriskdolibarr/view/firepermit/firepermit_mobile_create.php', 1),
-            'page'  => 'firepermit_mobile_create.php',
-            'icon'  => 'fa-plus-square',
-            'label' => $langs->transnoentities('PwaNavNewFirePermit'),
         ];
     }
 

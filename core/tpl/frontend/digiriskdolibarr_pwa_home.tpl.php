@@ -18,8 +18,9 @@
 /**
  * \file    core/tpl/frontend/digiriskdolibarr_pwa_home.tpl.php
  * \ingroup digiriskdolibarr
- * \brief   Home screen of the PWA: status tiles and creation shortcuts.
- *          Expects: $langs, $user, $homeTiles, $homeActions.
+ * \brief   Home screen of the PWA: status tiles, each opening the matching filtered list.
+ *          Creating an object is done from the "+" button of those lists, not from here.
+ *          Expects: $langs, $user, $homeTiles.
  */
 
 global $langs, $user;
@@ -34,17 +35,6 @@ global $langs, $user;
             <i class="fas <?php print dol_escape_htmltag($homeTile['icon']); ?>"></i>
             <span class="digirisk-pwa-tile__count"><?php print (int) $homeTile['count']; ?></span>
             <span class="digirisk-pwa-tile__label"><?php print dol_escape_htmltag($homeTile['label']); ?></span>
-        </a>
-        <?php } ?>
-    </div>
-    <?php } ?>
-
-    <?php if (!empty($homeActions)) { ?>
-    <div class="digirisk-pwa-actions">
-        <?php foreach ($homeActions as $homeAction) { ?>
-        <a class="digirisk-pwa-action" href="<?php print dol_escape_htmltag($homeAction['url']); ?>">
-            <i class="fas <?php print dol_escape_htmltag($homeAction['icon']); ?>"></i>
-            <span><?php print dol_escape_htmltag($homeAction['label']); ?></span>
         </a>
         <?php } ?>
     </div>
