@@ -1,0 +1,506 @@
+/* DigiriskDolibarr PWA: home screen, list screens and bottom navigation.
+   The body class (digirisk-mobile-create) and the fixed top header come from
+   _mobile-quick-create.scss, which every PWA screen reuses. */
+
+body.digirisk-mobile-create {
+
+  /* Leave room for the fixed bottom navigation bar, on the list screens
+     as well as on the mobile creation forms that also carry it */
+  .digirisk-pwa,
+  .pwa-container.digirisk-mobile {
+    padding-bottom: 78px;
+  }
+
+  /* ---- Home ---- */
+
+  .digirisk-pwa-hello {
+    font-size: 18px;
+    font-weight: 700;
+    color: #1e293b;
+    margin: 4px 0 12px;
+  }
+
+  .digirisk-pwa-tiles {
+    display: grid;
+    grid-template-columns: repeat(2, 1fr);
+    gap: 10px;
+  }
+
+  .digirisk-pwa-tile {
+    display: flex;
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 2px;
+    padding: 12px;
+    background: #ffffff;
+    border-radius: 10px;
+    box-shadow: 0 1px 3px rgba(0, 0, 0, 0.08);
+    color: #1e293b;
+    text-decoration: none;
+
+    i {
+      font-size: 18px;
+      color: #2b7de9;
+    }
+
+    &__count {
+      font-size: 26px;
+      font-weight: 700;
+      line-height: 1.1;
+      color: #1e293b;
+    }
+
+    &__label {
+      font-size: 12px;
+      color: #64748b;
+    }
+  }
+
+  .digirisk-pwa-actions {
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+    margin-top: 12px;
+  }
+
+  .digirisk-pwa-action {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    padding: 12px 14px;
+    background: #2b7de9;
+    border-radius: 10px;
+    color: #ffffff;
+    font-size: 15px;
+    font-weight: 600;
+    text-decoration: none;
+
+    i {
+      font-size: 18px;
+    }
+  }
+
+  /* ---- List toolbar ---- */
+
+  .digirisk-pwa-toolbar {
+    display: flex;
+    align-items: stretch;
+    gap: 8px;
+    margin-bottom: 8px;
+  }
+
+  .digirisk-pwa-search {
+    display: flex;
+    align-items: stretch;
+    gap: 6px;
+    flex: 1;
+    min-width: 0;
+
+    &__field {
+      position: relative;
+      flex: 1;
+      min-width: 0;
+
+      i {
+        position: absolute;
+        left: 10px;
+        top: 50%;
+        transform: translateY(-50%);
+        font-size: 12px;
+        color: #94a3b8;
+      }
+
+      input {
+        width: 100%;
+        box-sizing: border-box;
+        padding: 8px 10px 8px 28px;
+        font-size: 14px;
+        border: 1px solid #cbd5e1;
+        border-radius: 7px;
+        background: #ffffff;
+        color: #1e293b;
+
+        &:focus {
+          outline: none;
+          border-color: #2b7de9;
+          box-shadow: 0 0 0 2px rgba(43, 125, 233, 0.2);
+        }
+      }
+    }
+
+    &__status {
+      flex: 0 0 auto;
+      max-width: 120px;
+      box-sizing: border-box;
+      padding: 8px 6px;
+      font-size: 13px;
+      border: 1px solid #cbd5e1;
+      border-radius: 7px;
+      background: #ffffff;
+      color: #1e293b;
+    }
+
+    &__submit {
+      flex: 0 0 auto;
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      width: 36px;
+      border: none;
+      border-radius: 7px;
+      background: #2b7de9;
+      color: #ffffff;
+      cursor: pointer;
+    }
+  }
+
+  .digirisk-pwa-create {
+    flex: 0 0 auto;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    width: 40px;
+    border-radius: 7px;
+    background: #16a34a;
+    color: #ffffff;
+    font-size: 16px;
+    text-decoration: none;
+  }
+
+  .digirisk-pwa-count {
+    font-size: 12px;
+    color: #64748b;
+    margin-bottom: 8px;
+  }
+
+  /* ---- List cards ---- */
+
+  .digirisk-pwa-cards {
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+  }
+
+  .digirisk-pwa-card {
+    display: flex;
+    align-items: stretch;
+    gap: 8px;
+    background: #ffffff;
+    border-radius: 10px;
+    box-shadow: 0 1px 3px rgba(0, 0, 0, 0.08);
+    overflow: hidden;
+
+    &__main {
+      flex: 1;
+      min-width: 0;
+      display: block;
+      padding: 10px 12px;
+      color: #1e293b;
+      text-decoration: none;
+    }
+
+    &__head {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 8px;
+    }
+
+    &__ref {
+      font-size: 14px;
+      font-weight: 700;
+      color: #2b7de9;
+    }
+
+    &__status {
+      flex: 0 0 auto;
+    }
+
+    &__title {
+      font-size: 13px;
+      font-weight: 600;
+      margin: 2px 0 4px;
+      overflow: hidden;
+      text-overflow: ellipsis;
+      white-space: nowrap;
+    }
+
+    &__line {
+      font-size: 12px;
+      color: #64748b;
+      overflow: hidden;
+      text-overflow: ellipsis;
+      white-space: nowrap;
+
+      i {
+        width: 14px;
+        color: #94a3b8;
+      }
+    }
+
+    &__edit {
+      flex: 0 0 auto;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      width: 44px;
+      background: #f1f5f9;
+      color: #2b7de9;
+      font-size: 15px;
+      text-decoration: none;
+    }
+  }
+
+  .digirisk-pwa-empty {
+    text-align: center;
+    padding: 40px 20px;
+    color: #94a3b8;
+
+    i {
+      display: block;
+      font-size: 38px;
+      margin-bottom: 12px;
+      color: #cbd5e1;
+    }
+  }
+
+  /* ---- Pagination ---- */
+
+  .digirisk-pwa-pagination {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 12px;
+    margin-top: 12px;
+
+    &__btn {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      width: 32px;
+      height: 32px;
+      border-radius: 50%;
+      background: #ffffff;
+      color: #475569;
+      text-decoration: none;
+      box-shadow: 0 1px 3px rgba(0, 0, 0, 0.08);
+
+      &.disabled {
+        color: #cbd5e1;
+        box-shadow: none;
+      }
+    }
+
+    &__page {
+      font-size: 13px;
+      font-weight: 600;
+      color: #475569;
+    }
+  }
+}
+
+/* ---- Bottom navigation ----
+   Outside the body scope on purpose: the bar is fixed to the viewport and is also
+   rendered on the mobile creation screens. */
+
+.digirisk-pwa-nav {
+  position: fixed;
+  bottom: 0;
+  left: 0;
+  right: 0;
+  z-index: 1000;
+  box-sizing: border-box;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 6px 12px 10px;
+  background: #ffffff;
+  box-shadow: 0 -2px 10px rgba(0, 0, 0, 0.06);
+
+  &__favorites {
+    display: flex;
+    align-items: center;
+    justify-content: space-evenly;
+    flex: 1;
+    min-width: 0;
+    gap: 6px;
+  }
+
+  &__item {
+    position: relative;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    min-width: 48px;
+    padding: 4px 6px;
+    border: none;
+    border-radius: 8px;
+    background: none;
+    color: #475569;
+    font-size: 10px;
+    font-weight: 600;
+    text-align: center;
+    text-decoration: none;
+    cursor: pointer;
+
+    i {
+      font-size: 17px;
+      margin-bottom: 3px;
+    }
+
+    span {
+      max-width: 64px;
+      overflow: hidden;
+      text-overflow: ellipsis;
+      white-space: nowrap;
+    }
+
+    &.active {
+      background: #2b7de9;
+      color: #ffffff;
+
+      i {
+        color: #ffffff;
+      }
+    }
+  }
+
+  &__burger {
+    flex: 0 0 auto;
+    border-left: 1px solid #e2e8f0;
+    border-radius: 0;
+    padding-left: 12px;
+  }
+}
+
+.digirisk-pwa-nav-overlay {
+  position: fixed;
+  inset: 0;
+  z-index: 1001;
+  background: rgba(15, 23, 42, 0.45);
+  opacity: 0;
+  visibility: hidden;
+  transition: opacity 0.2s ease;
+
+  &.is-open {
+    opacity: 1;
+    visibility: visible;
+  }
+}
+
+.digirisk-pwa-nav-drawer {
+  position: fixed;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  z-index: 1002;
+  box-sizing: border-box;
+  padding: 14px 14px 20px;
+  background: #ffffff;
+  border-radius: 14px 14px 0 0;
+  box-shadow: 0 -4px 20px rgba(0, 0, 0, 0.15);
+  transform: translateY(100%);
+  transition: transform 0.25s ease;
+
+  &.is-open {
+    transform: translateY(0);
+  }
+
+  &__header {
+    display: flex;
+    align-items: baseline;
+    justify-content: space-between;
+    gap: 10px;
+    margin-bottom: 10px;
+    padding-bottom: 8px;
+    border-bottom: 1px solid #e2e8f0;
+  }
+
+  &__title {
+    font-size: 15px;
+    font-weight: 700;
+    color: #1e293b;
+  }
+
+  &__hint {
+    font-size: 11px;
+    color: #64748b;
+    text-align: right;
+
+    i {
+      color: #f59e0b;
+    }
+
+    /* Flashed when the favorites bar is already full */
+    &.limit-reached {
+      color: #dc2626;
+      font-weight: 600;
+
+      i {
+        color: #dc2626;
+      }
+    }
+  }
+
+  &__grid {
+    display: grid;
+    grid-template-columns: repeat(2, 1fr);
+    gap: 8px;
+  }
+
+  &__item {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    padding: 8px 10px;
+    border-radius: 8px;
+    background: #f8fafc;
+
+    &.active {
+      background: #e0edff;
+    }
+  }
+
+  &__link {
+    flex: 1;
+    min-width: 0;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    color: #1e293b;
+    font-size: 13px;
+    font-weight: 600;
+    text-decoration: none;
+
+    i {
+      width: 18px;
+      color: #2b7de9;
+      text-align: center;
+    }
+
+    span {
+      overflow: hidden;
+      text-overflow: ellipsis;
+      white-space: nowrap;
+    }
+  }
+
+  &__star {
+    flex: 0 0 auto;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    width: 28px;
+    height: 28px;
+    border: none;
+    border-radius: 50%;
+    background: none;
+    color: #cbd5e1;
+    cursor: pointer;
+
+    &.is-favorite {
+      color: #f59e0b;
+    }
+  }
+}
