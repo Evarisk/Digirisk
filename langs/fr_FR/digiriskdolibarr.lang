@@ -26,6 +26,9 @@ ModuleDigiriskdolibarrDesc = Digirisk pour Dolibarr
 # Module Saturne manquant
 SaturneModuleMissing = Le module Saturne est requis par Digirisk. Téléchargez-le gratuitement sur le Dolistore (https://dolistore.com/fr/modules/1906-Saturne.html) et installez-le avant d'activer Digirisk.
 
+# Colonne des images tuto des pages de configuration
+TutoImage = Image
+
 #
 # Page d'administration
 #
@@ -1735,7 +1738,6 @@ ActionPlanNoProjectConfigured      = Aucun projet configuré
 # ActionPlan — ActionComm Logging
 ActionPlanLogging                  = Plan d'Action — Historique des modifications
 ActionPlanLoggingDescription       = Activer la création d'événements lors des modifications Kanban
-ActionPlanLogTuto                  = Image
 ActionPlanLogLabel                 = Modification du label
 ActionPlanLogLabelDesc             = Créer un événement lorsque le label d'une tâche est modifié
 ActionPlanLogWorkload              = Modification de la charge

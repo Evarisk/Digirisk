@@ -22,6 +22,75 @@
  */
 
 /**
+ * Return the tuto image illustrating a configuration setting
+ *
+ * Images live in img/config_tuto/<page>/<slug>.png and are optional: a missing file
+ * renders an empty cell instead of a broken image.
+ *
+ * @param  string $page Configuration page the image belongs to (sub directory name)
+ * @param  string $slug Image name, without its .png extension
+ * @param  string $alt  Alternative text, usually the setting label
+ * @return string       HTML img tag, empty string when the file does not exist
+ */
+function digiriskdolibarr_tuto_image(string $page, string $slug, string $alt = ''): string
+{
+    $file = '/digiriskdolibarr/img/config_tuto/' . $page . '/' . $slug . '.png';
+
+    if (!dol_is_file(dol_buildpath($file, 0))) {
+        return '';
+    }
+
+    return '<img class="config-tuto" loading="lazy" src="' . dol_buildpath($file, 1) . '" alt="' . dol_escape_htmltag($alt) . '">';
+}
+
+/**
+ * Print the styles and scripts displaying a tuto image full size when clicked
+ *
+ * Safe to call several times: only the first call prints something.
+ *
+ * @return void
+ */
+function digiriskdolibarr_tuto_overlay()
+{
+    static $printed = false;
+
+    if ($printed) {
+        return;
+    }
+    $printed = true;
+
+    print '<style>
+.config-tuto { width: 150px; max-width: 100%; border: 1px solid #ddd; border-radius: 4px; cursor: zoom-in; vertical-align: middle; }
+.config-tuto-overlay { display: none; position: fixed; inset: 0; z-index: 1200; background: rgba(0, 0, 0, .7); cursor: zoom-out; }
+.config-tuto-overlay.opened { display: flex; align-items: center; justify-content: center; }
+.config-tuto-overlay img { max-width: 90vw; max-height: 90vh; border-radius: 4px; box-shadow: 0 4px 24px rgba(0, 0, 0, .5); }
+</style>';
+
+    print '<div class="config-tuto-overlay"><img src="" alt=""></div>';
+
+    print '<script>
+jQuery(document).ready(function() {
+    var overlay = jQuery(".config-tuto-overlay");
+
+    jQuery(".config-tuto").on("click", function() {
+        overlay.find("img").attr("src", jQuery(this).attr("src")).attr("alt", jQuery(this).attr("alt"));
+        overlay.addClass("opened");
+    });
+
+    overlay.on("click", function() {
+        overlay.removeClass("opened");
+    });
+
+    jQuery(document).on("keydown", function(event) {
+        if (event.key === "Escape") {
+            overlay.removeClass("opened");
+        }
+    });
+});
+</script>';
+}
+
+/**
  * Prepare admin pages header
  *
  * @return array
