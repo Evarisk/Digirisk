@@ -1901,6 +1901,17 @@ TicketKanbanLogDeadlineDesc            = Créer un événement lorsque la date l
 TicketKanbanClosedLimit                = Limite tickets fermés
 TicketKanbanClosedLimitDesc            = Nombre maximum de tickets fermés/annulés affichés dans le kanban (0 = illimité)
 
+# ===========================================================================
+# Ticket — traçabilité des modifications — issue #4885
+# ===========================================================================
+TicketLogModifications                 = Traçabilité des modifications
+TicketLogModificationsDesc             = Créer un événement pour chaque édition faite depuis la fiche ticket (sujet, message, registres, assigné, tiers, projet, avancement, statut, tâches, documents)
+TicketMessageEdited                    = Message modifié
+TicketMessageDeleted                   = Message supprimé
+TicketTaskCreated                      = Tâche créée : %s
+TicketDocumentGenerated                = Document généré
+TicketFileDeleted                      = Fichier supprimé
+
 # Drawer de création rapide de ticket
 SelectNothing                          = — Sélectionner —
 QuickCreateTicket                      = Créer rapidement un ticket

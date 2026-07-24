@@ -53,8 +53,9 @@ saturne_check_access($permissiontoread);
  * Actions
  */
 
-// Initialize ticket kanban logging constants with defaults (all OFF)
+// Initialize ticket logging constants with defaults (per-field kanban toggles OFF, global traceability ON)
 $ticketKanbanLogDefaults = [
+    'DIGIRISKDOLIBARR_TICKET_LOG_MODIFICATIONS'          => 1,
     'DIGIRISKDOLIBARR_TICKET_KANBAN_LOG_STATUS'          => 0,
     'DIGIRISKDOLIBARR_TICKET_KANBAN_LOG_ASSIGNEE'        => 0,
     'DIGIRISKDOLIBARR_TICKET_KANBAN_LOG_CATEGORY_ADD'    => 0,
@@ -109,6 +110,7 @@ print '<td class="center">' . $langs->trans('Status') . '</td>';
 print '</tr>';
 
 $ticketKanbanLogs = [
+    'DIGIRISKDOLIBARR_TICKET_LOG_MODIFICATIONS'          => ['TicketLogModifications',         'TicketLogModificationsDesc'],
     'DIGIRISKDOLIBARR_TICKET_KANBAN_LOG_STATUS'          => ['TicketKanbanLogStatus',         'TicketKanbanLogStatusDesc'],
     'DIGIRISKDOLIBARR_TICKET_KANBAN_LOG_ASSIGNEE'        => ['TicketKanbanLogAssignee',        'TicketKanbanLogAssigneeDesc'],
     'DIGIRISKDOLIBARR_TICKET_KANBAN_LOG_CATEGORY_ADD'    => ['TicketKanbanLogCategoryAdd',     'TicketKanbanLogCategoryAddDesc'],

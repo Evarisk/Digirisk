@@ -1513,6 +1513,89 @@ textarea.action-textarea:not(:last-child) {
   }
 }
 /* =============================================
+ * DISPLAYED PROJECT BAR (info + switcher)
+ * ============================================= */
+.actionplan-project-bar {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  flex-wrap: wrap;
+  gap: 12px;
+  background: #fff;
+  border: 1px solid #e0e0e0;
+  border-radius: 10px;
+  padding: 10px 16px;
+  margin-bottom: 12px;
+  box-shadow: 0 1px 4px rgba(0, 0, 0, 0.06);
+}
+
+.app-project-current {
+  display: flex;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 8px;
+  font-size: 13px;
+  color: #333;
+}
+.app-project-current > i {
+  color: #3085d6;
+  font-size: 15px;
+}
+.app-project-current a {
+  font-weight: 700;
+}
+
+.app-project-caption {
+  color: #888;
+  text-transform: uppercase;
+  font-size: 11px;
+  font-weight: 700;
+  letter-spacing: 0.4px;
+}
+
+.app-project-title {
+  font-weight: 600;
+}
+
+.app-project-badge {
+  background: #eef4fc;
+  color: #3085d6;
+  border: 1px solid #cfe0f5;
+  border-radius: 12px;
+  padding: 2px 10px;
+  font-size: 11px;
+  font-weight: 700;
+}
+
+.app-project-none {
+  color: #e05353;
+  font-weight: 600;
+}
+
+.app-project-form {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  margin: 0;
+}
+.app-project-form label {
+  font-size: 11px;
+  font-weight: 600;
+  color: #666;
+  white-space: nowrap;
+}
+.app-project-form label i {
+  color: #999;
+  margin-right: 3px;
+}
+
+@media (max-width: 767px) {
+  .actionplan-project-bar {
+    align-items: flex-start;
+    flex-direction: column;
+  }
+}
+/* =============================================
  * KANBAN SETTINGS
  * ============================================= */
 .kanban-settings-wrapper {
@@ -5371,9 +5454,22 @@ textarea.action-textarea:not(:last-child) {
   border-top: 0;
 }
 .digirisk-ticket-card table.tableforfield td.titlefield,
-.digirisk-ticket-card table.tableforfield td.titlefieldmiddle {
+.digirisk-ticket-card table.tableforfield td.titlefieldmiddle,
+.digirisk-ticket-card table.tableforfield td.dtc-reg-label {
   color: #6b7280;
   font-weight: 500;
+}
+.digirisk-ticket-card table.tableforfield .dtc-field-picto {
+  display: inline-block;
+  width: 16px;
+  margin-right: 6px;
+  text-align: center;
+  color: #2b6cb0;
+  opacity: 0.75;
+  flex: 0 0 auto;
+}
+.digirisk-ticket-card table.tableforfield .dtc-head .dtc-field-picto {
+  margin-right: 0;
 }
 .digirisk-ticket-card table.tableforfield table.nobordernopadding,
 .digirisk-ticket-card table.tableforfield table.nobordernopadding > tbody > tr > td {
@@ -5391,17 +5487,18 @@ textarea.action-textarea:not(:last-child) {
   table-layout: fixed;
   width: 100%;
 }
-.digirisk-ticket-card table.dtc-registres-table > tbody > tr > td:nth-child(1),
-.digirisk-ticket-card table.dtc-registres-table > tbody > tr > td:nth-child(3) {
-  width: 15%;
+.digirisk-ticket-card table.dtc-registres-table > colgroup > col.dtc-reg-col-label {
+  width: 22%;
+}
+.digirisk-ticket-card table.dtc-registres-table > colgroup > col.dtc-reg-col-value {
+  width: 28%;
+}
+.digirisk-ticket-card table.dtc-registres-table > tbody > tr > td.dtc-reg-label {
   white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
 }
-.digirisk-ticket-card table.dtc-registres-table > tbody > tr > td:nth-child(2),
-.digirisk-ticket-card table.dtc-registres-table > tbody > tr > td:nth-child(4) {
-  width: 35%;
-}
-.digirisk-ticket-card table.dtc-registres-table > tbody > tr > td:nth-child(2),
-.digirisk-ticket-card table.dtc-registres-table > tbody > tr > td:nth-child(4) {
+.digirisk-ticket-card table.dtc-registres-table > tbody > tr > td:not(.dtc-reg-label) {
   overflow: hidden;
 }
 .digirisk-ticket-card table.dtc-registres-table select.dtc-direct-select {
@@ -6813,36 +6910,198 @@ body.digirisk-mobile-create .digirisk-mobile-submit {
   cursor: pointer;
 }
 body.digirisk-mobile-create {
-  /* Success screen */
+  /* Success screen — reads as the receipt of a filed document: the reference is the anchor,
+     then what already happened, then the QR code handed round on site. */
 }
 body.digirisk-mobile-create .digirisk-mobile-success {
-  text-align: center;
+  padding: 16px 14px;
+  border-top: 3px solid #16a34a;
 }
-body.digirisk-mobile-create .digirisk-mobile-success__icon {
-  font-size: 48px;
+body.digirisk-mobile-create .digirisk-mobile-success__eyebrow {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  font-size: 11px;
+  font-weight: 700;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
   color: #16a34a;
 }
-body.digirisk-mobile-create .digirisk-mobile-success__title {
-  font-size: 17px;
-  font-weight: 700;
-  color: #1e293b;
-  margin: 10px 0 4px;
-}
 body.digirisk-mobile-create .digirisk-mobile-success__ref {
-  font-size: 15px;
+  margin-top: 6px;
+  font-family: ui-monospace, SFMono-Regular, "SF Mono", Menlo, Consolas, monospace;
+  font-size: 30px;
   font-weight: 700;
-  color: #2b7de9;
-  margin-bottom: 10px;
+  line-height: 1.1;
+  letter-spacing: 0.04em;
+  color: #0f172a;
+  word-break: break-all;
 }
-body.digirisk-mobile-create .digirisk-mobile-success__text {
+body.digirisk-mobile-create .digirisk-mobile-success__label {
+  margin-top: 4px;
   font-size: 13px;
-  color: #475569;
-  margin-bottom: 14px;
+  line-height: 1.4;
+  color: #64748b;
+}
+body.digirisk-mobile-create .digirisk-mobile-success__facts {
+  list-style: none;
+  margin: 14px 0 0;
+  padding: 12px 0 0;
+  border-top: 1px solid #e2e8f0;
+}
+body.digirisk-mobile-create .digirisk-mobile-success__facts li {
+  display: flex;
+  align-items: flex-start;
+  gap: 8px;
+  font-size: 13px;
+  line-height: 1.45;
+  color: #334155;
+}
+body.digirisk-mobile-create .digirisk-mobile-success__facts li + li {
+  margin-top: 8px;
+}
+body.digirisk-mobile-create .digirisk-mobile-success__facts i {
+  flex-shrink: 0;
+  margin-top: 2px;
+  font-size: 13px;
+  color: #16a34a;
 }
 body.digirisk-mobile-create .digirisk-mobile-success__actions {
   display: flex;
-  flex-direction: column;
   gap: 8px;
+}
+body.digirisk-mobile-create .digirisk-mobile-success__actions .digirisk-mobile-success__button {
+  flex: 1;
+}
+body.digirisk-mobile-create .digirisk-mobile-success__button {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  padding: 12px;
+  font-size: 14px;
+  font-weight: 600;
+  text-decoration: none;
+  color: #334155;
+  background: #ffffff;
+  border: 1px solid #cbd5e1;
+  border-radius: 9px;
+}
+body.digirisk-mobile-create .digirisk-mobile-success__button i {
+  font-size: 13px;
+  color: #64748b;
+}
+body.digirisk-mobile-create .digirisk-mobile-success__button:hover {
+  border-color: #94a3b8;
+  color: #0f172a;
+}
+body.digirisk-mobile-create .digirisk-mobile-success__button--primary {
+  margin-top: 12px;
+  color: #ffffff;
+  background: #2b7de9;
+  border-color: #2b7de9;
+}
+body.digirisk-mobile-create .digirisk-mobile-success__button--primary i {
+  color: #ffffff;
+}
+body.digirisk-mobile-create .digirisk-mobile-success__button--primary:hover {
+  color: #ffffff;
+  background: #1b5fc1;
+  border-color: #1b5fc1;
+}
+body.digirisk-mobile-create {
+  /* Share the spread: the QR code is the point of the screen — on site, people scan it there and then */
+}
+body.digirisk-mobile-create .digirisk-mobile-share {
+  padding: 16px 14px;
+}
+body.digirisk-mobile-create .digirisk-mobile-share__title {
+  font-size: 11px;
+  font-weight: 700;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: #2b7de9;
+}
+body.digirisk-mobile-create .digirisk-mobile-share__text {
+  margin-top: 6px;
+  font-size: 13px;
+  line-height: 1.45;
+  color: #475569;
+}
+body.digirisk-mobile-create .digirisk-mobile-share__qr {
+  display: flex;
+  justify-content: center;
+  margin: 16px 0;
+}
+body.digirisk-mobile-create .digirisk-mobile-share {
+  /* Corner brackets read as a scanner viewfinder: they say "point a camera here" */
+}
+body.digirisk-mobile-create .digirisk-mobile-share__qr-frame {
+  position: relative;
+  width: 200px;
+  max-width: 100%;
+  padding: 14px;
+  background: #ffffff;
+  box-sizing: border-box;
+}
+body.digirisk-mobile-create .digirisk-mobile-share__qr-frame::before, body.digirisk-mobile-create .digirisk-mobile-share__qr-frame::after {
+  content: "";
+  position: absolute;
+  width: 22px;
+  height: 22px;
+  border: 3px solid #2b7de9;
+}
+body.digirisk-mobile-create .digirisk-mobile-share__qr-frame::before {
+  top: 0;
+  left: 0;
+  border-right: none;
+  border-bottom: none;
+  border-radius: 6px 0 0 0;
+}
+body.digirisk-mobile-create .digirisk-mobile-share__qr-frame::after {
+  right: 0;
+  bottom: 0;
+  border-top: none;
+  border-left: none;
+  border-radius: 0 0 6px 0;
+}
+body.digirisk-mobile-create .digirisk-mobile-share__qr-frame svg {
+  display: block;
+}
+body.digirisk-mobile-create .digirisk-mobile-share__link {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  overflow: hidden;
+  padding: 9px 11px;
+  background: #f8fafc;
+  border: 1px solid #e2e8f0;
+  border-radius: 9px;
+}
+body.digirisk-mobile-create .digirisk-mobile-share__link a {
+  flex: 1 1 auto;
+  min-width: 0;
+  overflow: hidden;
+  white-space: nowrap;
+  text-overflow: ellipsis;
+  font-size: 12px;
+  color: #475569;
+  text-decoration: none;
+}
+body.digirisk-mobile-create .digirisk-mobile-share__link .copy-signatureurl {
+  flex-shrink: 0;
+  padding: 2px;
+  font-size: 15px;
+  color: #2b7de9;
+  cursor: pointer;
+}
+body.digirisk-mobile-create .digirisk-mobile-share .copied-to-clipboard {
+  display: block;
+  margin-top: 6px;
+  font-size: 12px;
+  font-weight: 600;
+  color: #16a34a;
+  text-align: center;
 }
 
 /* Read-only protections (EPI) display on the prevention plan card (desktop, not scoped to the mobile body) */
