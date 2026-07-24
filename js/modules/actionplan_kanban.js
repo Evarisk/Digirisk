@@ -407,9 +407,35 @@ window.digiriskdolibarr.actionplanKanban.event = function() {
         $value.replaceWith($input);
         $input.trigger('focus');
 
+        var isTyping    = false; // keyboard edit under way, don't save on intermediate values
+        var typingTimer = null;
+        var isDone      = false; // guard: blur still fires after Enter / Escape / picker save
+
+        function restore(text) {
+            $input.replaceWith($('<span class="kanban-date-value"></span>').text(text));
+        }
+
         function saveDate() {
+            if (isDone) return;
+            isDone = true;
+            clearTimeout(typingTimer);
+            $input.off('blur change keydown');
+
             var val = $input.val();
             var $card = $date.closest('.kanban-card');
+
+            // A half-typed date reads as an empty value: restore instead of erasing
+            // the date the user was in the middle of editing.
+            if (!val && $input[0].validity && $input[0].validity.badInput) {
+                restore(origText);
+                return;
+            }
+
+            // Nothing changed: no need for a round trip
+            if (val === rawVal) {
+                restore(origText);
+                return;
+            }
 
             // Cross-validate start vs end date
             if (val) {
@@ -434,8 +460,7 @@ window.digiriskdolibarr.actionplanKanban.event = function() {
                         }, 3000);
 
                         // Restore original text
-                        var $newValue = $('<span class="kanban-date-value"></span>').text(origText);
-                        $input.replaceWith($newValue);
+                        restore(origText);
                         return;
                     }
                 }
@@ -475,17 +500,33 @@ window.digiriskdolibarr.actionplanKanban.event = function() {
             });
         }
 
+        // Picking a date in the native calendar fires `change` without any keystroke:
+        // that one is a deliberate choice, save it right away.
         $input.on('change', function() {
-            $input.off('blur');
+            if (isTyping) return;
             saveDate();
         });
         $input.on('blur', saveDate);
         $input.on('keydown', function(ev) {
             if (ev.key === 'Escape') {
-                $input.off('blur').off('change');
-                var $newValue = $('<span class="kanban-date-value"></span>').text(origText);
-                $input.replaceWith($newValue);
+                isDone = true;
+                clearTimeout(typingTimer);
+                $input.off('blur change');
+                restore(origText);
+                return;
             }
+            if (ev.key === 'Enter') {
+                ev.preventDefault();
+                saveDate();
+                return;
+            }
+            // Typing digits rewrites the field segment by segment and the browser
+            // fires a `change` on every intermediate value (typing "18" validates
+            // "01" first, which saved and closed the input mid-edit). Hold the save
+            // until the user leaves the field or presses Enter.
+            isTyping = true;
+            clearTimeout(typingTimer);
+            typingTimer = setTimeout(function() { isTyping = false; }, 1500);
         });
     });
 
