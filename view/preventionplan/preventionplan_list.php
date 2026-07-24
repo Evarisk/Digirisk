@@ -282,7 +282,8 @@ $sql       .= " FROM " . MAIN_DB_PREFIX . $object->table_element . " as t";
 
 if (isset($extrafields->attributes[$object->table_element]['label']) &&
     is_array($extrafields->attributes[$object->table_element]['label']) && count($extrafields->attributes[$object->table_element]['label'])) $sql .= " LEFT JOIN " . MAIN_DB_PREFIX . $object->table_element . "_extrafields as ef on (t.rowid = ef.fk_object)";
-$sql .= ' LEFT JOIN ' . MAIN_DB_PREFIX . 'digiriskdolibarr_digiriskresources as rs ON rs.ref = "ExtSociety" AND rs.object_type = "preventionplan" AND rs.object_id = t.rowid';
+// Only join the active resource: setDigiriskResources keeps previous ones with status = 0, they would duplicate the object row
+$sql .= ' LEFT JOIN ' . MAIN_DB_PREFIX . 'digiriskdolibarr_digiriskresources as rs ON rs.ref = "ExtSociety" AND rs.object_type = "preventionplan" AND rs.object_id = t.rowid AND rs.status = 1';
 
 if ($object->ismultientitymanaged == 1) $sql                                                                                                      .= " WHERE t.entity IN (" . getEntity($object->element) . ")";
 else $sql                                                                                                                                         .= " WHERE 1 = 1";
