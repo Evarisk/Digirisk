@@ -346,6 +346,11 @@ class modDigiriskdolibarr extends DolibarrModules
 	public $dictionaries = [];
 
 	/**
+	 * @var bool Whether the Saturne module files are available on the filesystem.
+	 */
+	public $saturneAvailable;
+
+	/**
 	 * Constructor. Define names, constants, directories, boxes, permissions
 	 *
 	 * @param DoliDB $db Database handler
@@ -356,7 +361,9 @@ class modDigiriskdolibarr extends DolibarrModules
 
 		$this->db = $db;
 
-		if (file_exists(__DIR__ . '/../../../saturne/lib/saturne_functions.lib.php')) {
+		$this->saturneAvailable = file_exists(__DIR__ . '/../../../saturne/lib/saturne_functions.lib.php');
+
+		if ($this->saturneAvailable) {
 			require_once __DIR__ . '/../../../saturne/lib/saturne_functions.lib.php';
 			saturne_load_langs(['digiriskdolibarr@digiriskdolibarr']);
 		} else {
@@ -1936,6 +1943,11 @@ class modDigiriskdolibarr extends DolibarrModules
 		$this->export_sql_end[$r] .= ' WHERE cat.entity IN ('.getEntity('category').')';
 		$this->export_sql_end[$r] .= ' AND cat.type = 12';
 
+        // Export and import profiles below load Digirisk classes that all extend SaturneObject : without Saturne they raise an uncatchable fatal error that breaks the whole module list page.
+        if (!$this->saturneAvailable) {
+            return;
+        }
+
         $objectMetaDatas = [
             'digiriskelement'       => ['langs' => 'DigiriskElement',       'picto' => 'fontawesome_fa-network-wired_fas_#d35968'],
             'risk'                  => ['langs' => 'Risk',                  'picto' => 'fontawesome_fa-exclamation-triangle_fas_#d35968', 'classPath' => 'riskanalysis'],
@@ -2132,6 +2144,12 @@ class modDigiriskdolibarr extends DolibarrModules
 		global $conf, $langs, $user;
 
 		$langs->load("digiriskdolibarr@digiriskdolibarr");
+
+        // Digirisk cannot run without the Saturne framework : refuse the activation instead of breaking every page of the Dolibarr instance.
+        if (!$this->saturneAvailable) {
+            $this->error = $langs->trans('SaturneModuleMissing');
+            return 0;
+        }
 
         if (empty($conf->global->DIGIRISKDOLIBARR_ACCIDENT_REMOVE_FK_USER_VICTIM)) {
 
