@@ -32,7 +32,9 @@ if (file_exists('../digiriskdolibarr.main.inc.php')) {
 
 // Load Dolibarr libraries
 require_once DOL_DOCUMENT_ROOT . '/projet/class/task.class.php';
+require_once DOL_DOCUMENT_ROOT . '/projet/class/project.class.php';
 require_once DOL_DOCUMENT_ROOT . '/categories/class/categorie.class.php';
+require_once DOL_DOCUMENT_ROOT . '/core/class/html.formprojet.class.php';
 
 // Load Saturne libraries
 require_once __DIR__ . '/../../../saturne/class/task/saturnetask.class.php';
@@ -57,15 +59,56 @@ if (empty($view) || !in_array($view, ['gantt', 'kanban'])) {
 }
 
 // Initialize technical objects
-$object  = new DigiriskStandard($db);
-$task    = new SaturneTask($db);
-$risk    = new Risk($db);
+$object      = new DigiriskStandard($db);
+$task        = new SaturneTask($db);
+$risk        = new Risk($db);
+$project     = new Project($db);
+$formproject = new FormProjets($db);
 
 $hookmanager->initHooks(['actionplanlist', 'globalcard']);
 
 // Load object
 $object->fetch(0, '', ' AND t.entity = ' . $conf->entity);
-$projectId = getDolGlobalInt('DIGIRISKDOLIBARR_DU_PROJECT');
+
+// Displayed project — the Document Unique project stays the default, but the user
+// can switch to any other project he is allowed to read. The last choice is kept in
+// an entity-scoped cookie so coming back on the page reopens the same project.
+$duProjectId       = getDolGlobalInt('DIGIRISKDOLIBARR_DU_PROJECT');
+$projectCookieName = 'digiriskdolibarr_actionplan_project_' . $conf->entity;
+$askedProjectId    = GETPOSTINT('projectid');
+$isExplicitChoice  = ($askedProjectId > 0);
+
+if (!$isExplicitChoice && !empty($_COOKIE[$projectCookieName])) {
+    $askedProjectId = (int) $_COOKIE[$projectCookieName];
+}
+
+// The Document Unique project is always allowed (historical behaviour of this page),
+// any other one must be visible from the current entity and readable by the user
+$allowedEntities = array_map('intval', explode(',', getEntity('project')));
+if ($askedProjectId > 0 && $project->fetch($askedProjectId) > 0
+    && ($askedProjectId == $duProjectId
+        || (in_array((int) $project->entity, $allowedEntities, true) && $project->restrictedProjectArea($user, 'read') > 0))) {
+    $projectId = $askedProjectId;
+} else {
+    // Deleted, forbidden or not configured project — fall back on the Document Unique
+    $project   = new Project($db);
+    $projectId = $duProjectId;
+    if ($projectId > 0) {
+        $project->fetch($projectId);
+    }
+}
+
+// Persist the choice for the next visits (kept in sync when the stored value is stale)
+if ($projectId > 0 && ($isExplicitChoice || (int) ($_COOKIE[$projectCookieName] ?? 0) != $projectId)) {
+    setcookie($projectCookieName, (string) $projectId, [
+        'expires'  => dol_now() + 365 * 24 * 3600,
+        'path'     => '/',
+        'secure'   => !empty($_SERVER['HTTPS']),
+        'httponly' => true,
+        'samesite' => 'Lax',
+    ]);
+    $_COOKIE[$projectCookieName] = (string) $projectId;
+}
 
 // Security check
 $permissiontoread = $user->hasRight('digiriskdolibarr', 'riskassessmentdocument', 'read');
@@ -987,6 +1030,9 @@ print dol_get_fiche_head($head, $view, $title, -1, 'task');
 
 // Top-right export toolbar (CSV / PAPRIPACT A3 PDF / Gantt PNG), shared by both views
 require __DIR__ . '/../../core/tpl/actionplan/actionplan_export_buttons.tpl.php';
+
+// Displayed project banner + project switcher, shared by both views
+require __DIR__ . '/../../core/tpl/actionplan/actionplan_project_selector.tpl.php';
 
 // Include appropriate TPL
 if ($view === 'kanban') {

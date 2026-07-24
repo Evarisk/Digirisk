@@ -10,7 +10,7 @@
  * - $globalProgress     int    Global PAPRIPACT progress (average of all task percentages)
  * - $globalTaskCount    int    Total number of corrective actions
  * - $langs              Translate
- * - $projectId          int    DU project ID
+ * - $projectId          int    Displayed project ID
  */
 
 // Number of cards rendered live per column; the rest are lazy-loaded by the JS module
