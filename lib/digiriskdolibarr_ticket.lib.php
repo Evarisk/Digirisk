@@ -91,6 +91,138 @@ function digiriskdolibarr_ticket_prepare_head(Ticket $object): array
 }
 
 /**
+ * Flatten a field value into the one-line, tag-free text used by the traceability log.
+ *
+ * @param  mixed $value Raw value (may be HTML, an array, a null or a scalar)
+ * @return string       Single-line text, or the translated "None" when empty
+ */
+function digiriskdolibarr_ticket_log_value($value): string
+{
+    global $langs;
+
+    if (is_array($value)) {
+        $value = implode(', ', $value);
+    }
+
+    $text = trim(preg_replace('/\s+/', ' ', dol_string_nohtmltag((string) $value)));
+
+    return $text !== '' ? $text : $langs->transnoentities('None');
+}
+
+/**
+ * Log a ticket modification as an automatic agenda event — issue #4885.
+ *
+ * The event is written by hand rather than left to the native TICKET_MODIFY trigger: that
+ * trigger only fires when the matching MAIN_AGENDA_ACTIONAUTO_* option is on, and it never
+ * says which field changed. The ActionComm is attached to the ticket, so it shows up both in
+ * the "5 derniers événements" widget and in the card conversation timeline.
+ *
+ * @param  Ticket $ticket       Ticket the change belongs to
+ * @param  string $label        Short event title (actioncomm.label, shown in the widget)
+ * @param  string $note         Full detail (actioncomm.note_private); falls back to $label
+ * @param  string $constName    Constant gating the log; an empty name always logs
+ * @param  int    $constDefault Value assumed when the constant has never been set
+ * @return int                  <0 KO, 0 not logged, >0 id of the created event
+ */
+function digiriskdolibarr_ticket_log_event(Ticket $ticket, string $label, string $note = '', string $constName = '', int $constDefault = 1): int
+{
+    global $db, $user;
+
+    if (empty($ticket->id) || trim($label) === '') {
+        return 0;
+    }
+    if ($constName !== '' && getDolGlobalInt($constName, $constDefault) <= 0) {
+        return 0;
+    }
+
+    require_once DOL_DOCUMENT_ROOT . '/comm/action/class/actioncomm.class.php';
+
+    $actioncomm = new ActionComm($db);
+    $actioncomm->type_code = 'AC_OTH_AUTO';
+    $actioncomm->code      = 'AC_TICKET_MODIFY';
+    // actioncomm.label is a varchar(255): keep the title short, the full detail lives in the note.
+    $actioncomm->label        = dol_trunc($label, 250);
+    $actioncomm->note_private = $note !== '' ? $note : $label;
+    $actioncomm->fk_element   = $ticket->id;
+    $actioncomm->elementtype  = 'ticket';
+    $actioncomm->fk_project   = (int) ($ticket->fk_project ?? 0);
+    $actioncomm->socid        = (int) ($ticket->socid ?? 0);
+    $actioncomm->datep        = dol_now();
+    $actioncomm->userownerid  = $user->id;
+    $actioncomm->percentage   = -1;
+
+    return $actioncomm->create($user);
+}
+
+/**
+ * Resolve a ticket extrafield's translated label and printable value for the traceability log.
+ *
+ * Ids stored by sellist/chkbxlst/link fields (GP/UT, …) are resolved to their human label, and
+ * timestamps to a formatted date, so the history reads "GP/UT : GP1 - Siège → GP4 - Atelier"
+ * instead of "12 → 15".
+ *
+ * @param  string $key   Extrafield key, without the "options_" prefix
+ * @param  mixed  $value Raw stored value
+ * @return array         [translated label, printable value]
+ */
+function digiriskdolibarr_ticket_extrafield_log_parts(string $key, $value): array
+{
+    global $db, $langs;
+
+    require_once DOL_DOCUMENT_ROOT . '/core/class/extrafields.class.php';
+
+    static $extrafields = null;
+    if ($extrafields === null) {
+        $extrafields = new ExtraFields($db);
+        $extrafields->fetch_name_optionals_label('ticket');
+    }
+
+    $attributes = $extrafields->attributes['ticket'] ?? [];
+    $label      = $langs->transnoentities($attributes['label'][$key] ?? $key);
+    $type       = (string) ($attributes['type'][$key] ?? 'varchar');
+
+    if (in_array($type, ['date', 'datetime'], true)) {
+        $timestamp = is_numeric($value) ? (int) $value : (int) strtotime((string) $value);
+
+        return [$label, $timestamp > 0 ? dol_print_date($timestamp, $type === 'date' ? 'day' : 'dayhour', 'tzuser') : ''];
+    }
+
+    if (in_array($type, ['sellist', 'chkbxlst', 'link', 'select', 'checkbox', 'radio', 'boolean'], true)) {
+        return [$label, $extrafields->showOutputField($key, $value, '', 'ticket')];
+    }
+
+    return [$label, $value];
+}
+
+/**
+ * Log a "field : old value -> new value" ticket modification — issue #4885.
+ *
+ * Nothing is written when the flattened values match, so a save that did not actually change
+ * anything (re-opening an inline editor and leaving it) never pollutes the history.
+ *
+ * @param  Ticket $ticket       Ticket the change belongs to
+ * @param  string $fieldLabel   Translated field name
+ * @param  mixed  $oldValue     Value before the change
+ * @param  mixed  $newValue     Value after the change
+ * @param  string $constName    Constant gating the log; an empty name always logs
+ * @param  int    $constDefault Value assumed when the constant has never been set
+ * @return int                  <0 KO, 0 not logged, >0 id of the created event
+ */
+function digiriskdolibarr_ticket_log_field_change(Ticket $ticket, string $fieldLabel, $oldValue, $newValue, string $constName = '', int $constDefault = 1): int
+{
+    $old = digiriskdolibarr_ticket_log_value($oldValue);
+    $new = digiriskdolibarr_ticket_log_value($newValue);
+
+    if ($old === $new) {
+        return 0;
+    }
+
+    $detail = $fieldLabel . ' : ' . $old . ' → ' . $new;
+
+    return digiriskdolibarr_ticket_log_event($ticket, $detail, $detail, $constName, $constDefault);
+}
+
+/**
  * Prepare ticket statistics pages header
  *
  * @return array $head   Array of tabs

@@ -112,6 +112,14 @@ window.digiriskdolibarr.ticket.event = function() {
     }
   });
 
+  // Ticket card (issue #4885) — Tab / Shift+Tab walks the inline-editable fields and opens the
+  // next one straight in edit mode, both from a resting field and from inside an open editor.
+  $(document).on( 'keydown', '.digirisk-ticket-card .dtc-tabfield', window.digiriskdolibarr.ticket.tabFieldKeydown);
+  $(document).on( 'keydown', '.digirisk-ticket-card .dtc-extrafield-input,'
+                           + '.digirisk-ticket-card .dtc-subject-input,'
+                           + '.digirisk-ticket-card .dtc-assignee-select', window.digiriskdolibarr.ticket.tabEditorKeydown);
+  $(document).on( 'keydown', '.digirisk-ticket-card .select2-selection', window.digiriskdolibarr.ticket.tabSelect2Keydown);
+
   $(document).on( 'change', '.param-table input, .param-table select, .param-table textarea', window.digiriskdolibarr.ticket.handleParamChange);
   // CKEDITOR is only loaded on pages with a rich-text editor. Guard the global
   // so this handler never throws "CKEDITOR is not defined" — an uncaught error
@@ -473,7 +481,8 @@ window.digiriskdolibarr.ticket.saveSubjectInline = function() {
  */
 window.digiriskdolibarr.ticket.renderSubject = function($wrap, value) {
   var text = (value && value.length) ? $('<div>').text(value).html() : '';
-  $wrap.html('<span class="dtc-subject-value">' + text + '</span>');
+  // Keep dtc-tabfield/tabindex: the subject is the first link of the Tab chain (#4885).
+  $wrap.html('<span class="dtc-subject-value dtc-tabfield" tabindex="0">' + text + '</span>');
 };
 
 /**
@@ -901,8 +910,12 @@ window.digiriskdolibarr.ticket.saveProgressInline = function() {
     return;
   }
   var action = $cell.data('action') || 'setprogress_ajax';
+  // On a task row "id" carries the task id, so the ticket to trace the change on (#4885) travels apart.
+  var logTicketId = $cell.data('log-ticket-id');
   $.ajax({
-    url: $cell.data('progress-url') + '?action=' + action + '&id=' + $cell.data('ticket-id') + '&token=' + window.saturne.toolbox.getToken(),
+    url: $cell.data('progress-url') + '?action=' + action + '&id=' + $cell.data('ticket-id')
+       + (logTicketId ? '&ticket_id=' + logTicketId : '')
+       + '&token=' + window.saturne.toolbox.getToken(),
     type: 'POST',
     data: { progress: newValue },
     dataType: 'json',
@@ -935,8 +948,7 @@ window.digiriskdolibarr.ticket.editExtrafieldInline = function(event) {
   var type = $span.data('type') || 'text';
   var rawValue = $span.data('raw');
   if (typeof rawValue === 'undefined') rawValue = '';
-  var tabIdx = $span.data('tabindex') || '';
-  
+
   var $input;
   if (type === 'textarea') {
     $input = $('<textarea class="dtc-extrafield-input" style="width:100%; min-height:80px; outline:none; transition: border-color 0.2s;" autocomplete="off"></textarea>');
@@ -960,7 +972,6 @@ window.digiriskdolibarr.ticket.editExtrafieldInline = function(event) {
   if (type !== 'select') {
     $input.val(rawValue);
   }
-  if (tabIdx) { $input.attr('tabindex', tabIdx); }
   $span.hide().after($input);
   $input.trigger('focus');
 
@@ -1038,6 +1049,164 @@ window.digiriskdolibarr.ticket.editExtrafieldInline = function(event) {
       });
     }
   }
+};
+
+/**
+ * Ticket card (#4885) — every inline-editable field of the card, in DOM order.
+ *
+ * Not filtered on :visible: a field being edited is hidden behind its own editor, and it still
+ * has to count as a step of the chain.
+ *
+ * @since   23.0.0
+ * @version 23.0.0
+ *
+ * @return {jQuery} The .dtc-tabfield elements.
+ */
+window.digiriskdolibarr.ticket.getTabFields = function() {
+  return $('.digirisk-ticket-card').find('.dtc-tabfield');
+};
+
+/**
+ * Ticket card (#4885) — find the field just before/after a node in document order.
+ *
+ * The node is compared by DOM position rather than by index, because an open editor may have
+ * replaced its own field in the DOM (the subject is rebuilt from scratch on save).
+ *
+ * @since   23.0.0
+ * @version 23.0.0
+ *
+ * @param  {Element} node Reference node (a field or the editor rendered in its place).
+ * @param  {number}  step 1 for Tab, -1 for Shift+Tab.
+ * @return {Element|null} The neighbouring field, null when the chain ends.
+ */
+window.digiriskdolibarr.ticket.findAdjacentField = function(node, step) {
+  var target = null;
+  window.digiriskdolibarr.ticket.getTabFields().each(function() {
+    if (this === node || $.contains(this, node) || $.contains(node, this)) {
+      return true;
+    }
+    // 4 = Node.DOCUMENT_POSITION_FOLLOWING — "this" comes after "node" in the document.
+    var isAfter = (node.compareDocumentPosition(this) & 4) !== 0;
+    if (step > 0) {
+      if (isAfter && target === null) {
+        target = this;
+        return false;
+      }
+      return true;
+    }
+    // Backwards: the last field still placed before the node is the previous one.
+    if (!isAfter) {
+      target = this;
+    }
+    return true;
+  });
+
+  return target;
+};
+
+/**
+ * Ticket card (#4885) — give focus to a field and open its editor when it has one.
+ *
+ * @since   23.0.0
+ * @version 23.0.0
+ *
+ * @param  {jQuery} $field Field to open.
+ * @return {void}
+ */
+window.digiriskdolibarr.ticket.openTabField = function($field) {
+  // Select2 hides the original <select> behind its own focusable box.
+  if ($field.is('select')) {
+    var $container = $field.next('.select2-container');
+    if ($container.length) {
+      $container.find('.select2-selection').trigger('focus');
+    } else {
+      $field.trigger('focus');
+    }
+    return;
+  }
+
+  $field.trigger('focus');
+  // contenteditable cells (progress) are edited in place — focusing is already editing.
+  if ($field.is('[contenteditable]')) {
+    return;
+  }
+  $field.trigger('click');
+};
+
+/**
+ * Ticket card (#4885) — Tab pressed on a resting field: jump to the neighbouring one.
+ *
+ * @since   23.0.0
+ * @version 23.0.0
+ *
+ * @param  {Object} event Keydown event.
+ * @return {void}
+ */
+window.digiriskdolibarr.ticket.tabFieldKeydown = function(event) {
+  if (event.key !== 'Tab' && event.keyCode !== 9) {
+    return;
+  }
+  var step   = event.shiftKey ? -1 : 1;
+  var target = window.digiriskdolibarr.ticket.findAdjacentField(this, step);
+  if (!target) {
+    return; // end of the chain: let the browser move on to the rest of the page
+  }
+  event.preventDefault();
+  // A contenteditable field is its own editor: blur it so the value is saved before moving.
+  if ($(this).is('[contenteditable]')) {
+    $(this).trigger('blur');
+  }
+  window.digiriskdolibarr.ticket.openTabField($(target));
+};
+
+/**
+ * Ticket card (#4885) — Tab pressed inside an open editor: commit, then open the neighbour.
+ *
+ * The target is resolved before the blur, because committing an unchanged value removes the
+ * editor synchronously and a detached node can no longer be positioned in the document.
+ *
+ * @since   23.0.0
+ * @version 23.0.0
+ *
+ * @param  {Object} event Keydown event.
+ * @return {void}
+ */
+window.digiriskdolibarr.ticket.tabEditorKeydown = function(event) {
+  if (event.key !== 'Tab' && event.keyCode !== 9) {
+    return;
+  }
+  event.preventDefault();
+  var step   = event.shiftKey ? -1 : 1;
+  var target = window.digiriskdolibarr.ticket.findAdjacentField(this, step);
+  $(this).trigger('blur');
+  if (target) {
+    window.digiriskdolibarr.ticket.openTabField($(target));
+  }
+};
+
+/**
+ * Ticket card (#4885) — Tab pressed on a Select2 box (GP/UT): keep the chain going.
+ *
+ * @since   23.0.0
+ * @version 23.0.0
+ *
+ * @param  {Object} event Keydown event.
+ * @return {void}
+ */
+window.digiriskdolibarr.ticket.tabSelect2Keydown = function(event) {
+  if (event.key !== 'Tab' && event.keyCode !== 9) {
+    return;
+  }
+  var $select = $(this).closest('.select2-container').prev('.dtc-tabfield');
+  if (!$select.length) {
+    return;
+  }
+  var target = window.digiriskdolibarr.ticket.findAdjacentField($select.get(0), event.shiftKey ? -1 : 1);
+  if (!target) {
+    return;
+  }
+  event.preventDefault();
+  window.digiriskdolibarr.ticket.openTabField($(target));
 };
 
 // Direct select handler

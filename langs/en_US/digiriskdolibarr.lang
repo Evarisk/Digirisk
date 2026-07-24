@@ -195,3 +195,12 @@ MassChangeTasksProjectSuccess = %s task(s) attached to project %s
 
 # Missing Saturne module
 SaturneModuleMissing = The Saturne module is required by Digirisk. Download it for free on the Dolistore (https://dolistore.com/en/modules/1906-Saturne.html) and install it before enabling Digirisk.
+
+# Ticket - modification traceability - issue #4885
+TicketLogModifications = Modification traceability
+TicketLogModificationsDesc = Create an event for every edit made from the ticket card (subject, message, registers, assignee, third party, project, progress, status, tasks, documents)
+TicketMessageEdited = Message edited
+TicketMessageDeleted = Message deleted
+TicketTaskCreated = Task created: %s
+TicketDocumentGenerated = Document generated
+TicketFileDeleted = File deleted

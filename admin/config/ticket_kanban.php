@@ -53,8 +53,9 @@ saturne_check_access($permissiontoread);
  * Actions
  */
 
-// Initialize ticket kanban logging constants with defaults (all OFF)
+// Initialize ticket logging constants with defaults (per-field kanban toggles OFF, global traceability ON)
 $ticketKanbanLogDefaults = [
+    'DIGIRISKDOLIBARR_TICKET_LOG_MODIFICATIONS'          => 1,
     'DIGIRISKDOLIBARR_TICKET_KANBAN_LOG_STATUS'          => 0,
     'DIGIRISKDOLIBARR_TICKET_KANBAN_LOG_ASSIGNEE'        => 0,
     'DIGIRISKDOLIBARR_TICKET_KANBAN_LOG_CATEGORY_ADD'    => 0,
@@ -111,6 +112,7 @@ print '</tr>';
 
 // Each entry: constant => [label key, description key, tuto image name in img/config_tuto/ticket_kanban/]
 $ticketKanbanLogs = [
+    'DIGIRISKDOLIBARR_TICKET_LOG_MODIFICATIONS'          => ['TicketLogModifications',        'TicketLogModificationsDesc',        ''],
     'DIGIRISKDOLIBARR_TICKET_KANBAN_LOG_STATUS'          => ['TicketKanbanLogStatus',         'TicketKanbanLogStatusDesc',         'status'],
     'DIGIRISKDOLIBARR_TICKET_KANBAN_LOG_ASSIGNEE'        => ['TicketKanbanLogAssignee',        'TicketKanbanLogAssigneeDesc',       'assignee'],
     'DIGIRISKDOLIBARR_TICKET_KANBAN_LOG_CATEGORY_ADD'    => ['TicketKanbanLogCategoryAdd',     'TicketKanbanLogCategoryAddDesc',    'category_add'],
@@ -129,7 +131,9 @@ foreach ($ticketKanbanLogs as $constName => $transKeys) {
     print $langs->trans($transKeys[1]);
     print '</td>';
     print '<td class="center">';
-    print digiriskdolibarr_tuto_image('ticket_kanban', $transKeys[2], $langs->trans($transKeys[0]));
+    if (!empty($transKeys[2])) {
+        print digiriskdolibarr_tuto_image('ticket_kanban', $transKeys[2], $langs->trans($transKeys[0]));
+    }
     print '</td>';
     print '<td class="center">';
     print ajax_constantonoff($constName);
