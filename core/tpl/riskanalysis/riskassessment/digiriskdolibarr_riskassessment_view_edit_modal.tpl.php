@@ -70,10 +70,12 @@
                                             </div>
                                         </td>
                                         <td>
-                                            <?php
-                                            $relativepath = 'digiriskdolibarr/medias/thumbs';
-                                            print saturne_show_medias_linked('digiriskdolibarr', $conf->digiriskdolibarr->multidir_output[$conf->entity] . '/riskassessment/' . $lastEvaluation->ref, 'small', 0, 0, 0, 0, $onPhone ? 40 : 50, $onPhone ? 40 : 50, 1, 0, 0, '/riskassessment/' . $lastEvaluation->ref, $lastEvaluation);
-                                            ?>
+                                            <div class="element-linked-medias-list">
+                                                <?php
+                                                $relativepath = 'digiriskdolibarr/medias/thumbs';
+                                                print saturne_show_medias_linked('digiriskdolibarr', $conf->digiriskdolibarr->multidir_output[$conf->entity] . '/riskassessment/' . $lastEvaluation->ref, 'small', 0, 0, 0, 0, $onPhone ? 40 : 50, $onPhone ? 40 : 50, 1, 0, 0, '/riskassessment/' . $lastEvaluation->ref, $lastEvaluation);
+                                                ?>
+                                            </div>
                                         </td>
                                     </tr>
                                 </table>
