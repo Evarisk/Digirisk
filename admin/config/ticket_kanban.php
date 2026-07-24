@@ -106,20 +106,22 @@ print '<table class="noborder centpercent">';
 print '<tr class="liste_titre">';
 print '<td>' . $langs->trans('Name') . '</td>';
 print '<td>' . $langs->trans('Description') . '</td>';
+print '<td class="center">' . $langs->trans('TutoImage') . '</td>';
 print '<td class="center">' . $langs->trans('Status') . '</td>';
 print '</tr>';
 
+// Each entry: constant => [label key, description key, tuto image name in img/config_tuto/ticket_kanban/]
 $ticketKanbanLogs = [
-    'DIGIRISKDOLIBARR_TICKET_LOG_MODIFICATIONS'          => ['TicketLogModifications',         'TicketLogModificationsDesc'],
-    'DIGIRISKDOLIBARR_TICKET_KANBAN_LOG_STATUS'          => ['TicketKanbanLogStatus',         'TicketKanbanLogStatusDesc'],
-    'DIGIRISKDOLIBARR_TICKET_KANBAN_LOG_ASSIGNEE'        => ['TicketKanbanLogAssignee',        'TicketKanbanLogAssigneeDesc'],
-    'DIGIRISKDOLIBARR_TICKET_KANBAN_LOG_CATEGORY_ADD'    => ['TicketKanbanLogCategoryAdd',     'TicketKanbanLogCategoryAddDesc'],
-    'DIGIRISKDOLIBARR_TICKET_KANBAN_LOG_CATEGORY_REMOVE' => ['TicketKanbanLogCategoryRemove',  'TicketKanbanLogCategoryRemoveDesc'],
-    'DIGIRISKDOLIBARR_TICKET_KANBAN_LOG_TYPE'            => ['TicketKanbanLogType',            'TicketKanbanLogTypeDesc'],
-    'DIGIRISKDOLIBARR_TICKET_KANBAN_LOG_GROUP'           => ['TicketKanbanLogGroup',           'TicketKanbanLogGroupDesc'],
-    'DIGIRISKDOLIBARR_TICKET_KANBAN_LOG_SEVERITY'        => ['TicketKanbanLogSeverity',        'TicketKanbanLogSeverityDesc'],
-    'DIGIRISKDOLIBARR_TICKET_KANBAN_LOG_SUBJECT'         => ['TicketKanbanLogSubject',         'TicketKanbanLogSubjectDesc'],
-    'DIGIRISKDOLIBARR_TICKET_KANBAN_LOG_DEADLINE'        => ['TicketKanbanLogDeadline',        'TicketKanbanLogDeadlineDesc'],
+    'DIGIRISKDOLIBARR_TICKET_LOG_MODIFICATIONS'          => ['TicketLogModifications',        'TicketLogModificationsDesc',        ''],
+    'DIGIRISKDOLIBARR_TICKET_KANBAN_LOG_STATUS'          => ['TicketKanbanLogStatus',         'TicketKanbanLogStatusDesc',         'status'],
+    'DIGIRISKDOLIBARR_TICKET_KANBAN_LOG_ASSIGNEE'        => ['TicketKanbanLogAssignee',        'TicketKanbanLogAssigneeDesc',       'assignee'],
+    'DIGIRISKDOLIBARR_TICKET_KANBAN_LOG_CATEGORY_ADD'    => ['TicketKanbanLogCategoryAdd',     'TicketKanbanLogCategoryAddDesc',    'category_add'],
+    'DIGIRISKDOLIBARR_TICKET_KANBAN_LOG_CATEGORY_REMOVE' => ['TicketKanbanLogCategoryRemove',  'TicketKanbanLogCategoryRemoveDesc', 'category_remove'],
+    'DIGIRISKDOLIBARR_TICKET_KANBAN_LOG_TYPE'            => ['TicketKanbanLogType',            'TicketKanbanLogTypeDesc',           'type'],
+    'DIGIRISKDOLIBARR_TICKET_KANBAN_LOG_GROUP'           => ['TicketKanbanLogGroup',           'TicketKanbanLogGroupDesc',          'group'],
+    'DIGIRISKDOLIBARR_TICKET_KANBAN_LOG_SEVERITY'        => ['TicketKanbanLogSeverity',        'TicketKanbanLogSeverityDesc',       'severity'],
+    'DIGIRISKDOLIBARR_TICKET_KANBAN_LOG_SUBJECT'         => ['TicketKanbanLogSubject',         'TicketKanbanLogSubjectDesc',        'subject'],
+    'DIGIRISKDOLIBARR_TICKET_KANBAN_LOG_DEADLINE'        => ['TicketKanbanLogDeadline',        'TicketKanbanLogDeadlineDesc',       'deadline'],
 ];
 
 foreach ($ticketKanbanLogs as $constName => $transKeys) {
@@ -129,12 +131,20 @@ foreach ($ticketKanbanLogs as $constName => $transKeys) {
     print $langs->trans($transKeys[1]);
     print '</td>';
     print '<td class="center">';
+    if (!empty($transKeys[2])) {
+        print digiriskdolibarr_tuto_image('ticket_kanban', $transKeys[2], $langs->trans($transKeys[0]));
+    }
+    print '</td>';
+    print '<td class="center">';
     print ajax_constantonoff($constName);
     print '</td>';
     print '</tr>';
 }
 
 print '</table>';
+
+// Click on a tuto image to display it full size
+digiriskdolibarr_tuto_overlay();
 
 // Closed tickets limit
 print load_fiche_titre('<i class="fas fa-eye-slash"></i> ' . $langs->trans('TicketKanbanClosedLimit'), '', '');
