@@ -366,10 +366,12 @@ $evaluation->method = $lastRiskAssessment->method ?: "standard" ;
                                         </div>
                                     </td>
                                     <td>
-                                        <?php
-                                        $relativepath = 'digiriskdolibarr/medias/thumbs';
-                                        print saturne_show_medias_linked('digiriskdolibarr', $conf->digiriskdolibarr->multidir_output[$conf->entity] . '/riskassessment/tmp/RA0/' . $risk->ref, 'small', 0, 0, 0, 0, $onPhone ? 40 : 50, $onPhone ? 40 : 50, 1, 0, 0, '/riskassessment/tmp/RA0/' . $risk->ref);
-                                        ?>
+                                        <div class="element-linked-medias-list">
+                                            <?php
+                                            $relativepath = 'digiriskdolibarr/medias/thumbs';
+                                            print saturne_show_medias_linked('digiriskdolibarr', $conf->digiriskdolibarr->multidir_output[$conf->entity] . '/riskassessment/tmp/RA0/' . $risk->ref, 'small', 0, 0, 0, 0, $onPhone ? 40 : 50, $onPhone ? 40 : 50, 1, 0, 0, '/riskassessment/tmp/RA0/' . $risk->ref);
+                                            ?>
+                                        </div>
                                     </td>
                                 </tr>
                             </table>

@@ -8248,6 +8248,20 @@ td > .risk-evaluation-list-content .risk-evaluation-container:not(.advanced, .st
   resize: vertical;
 }
 
+/** Medias linked to a risk / a risk assessment
+    The media action buttons overflow their container (top: -10px / bottom: -10px), so stacked medias
+    cover each other and steal their neighbour clicks: keep them spaced on a wrapping row */
+.element-linked-medias .add-medias td {
+  vertical-align: top;
+}
+.element-linked-medias .element-linked-medias-list {
+  display: flex;
+  flex-wrap: wrap;
+  align-content: flex-start;
+  gap: 24px 16px;
+  max-width: 200px;
+}
+
 .wpeo-modal[class*=modal-risk] .modal-container .risk-evaluation-container {
   padding-bottom: 1em;
   margin-bottom: 1em;
