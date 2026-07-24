@@ -1724,6 +1724,10 @@ ColumnGap                          = Espacement
 ActionPlanExportCsv                = Télécharger le PAPRIPACT au format CSV
 ActionPlanExportA3                 = Télécharger le PAPRIPACT en PDF A3 paysage
 ActionPlanExportGantt              = Télécharger le diagramme de Gantt en image PNG
+ActionPlanDisplayedProject         = Projet affiché
+ActionPlanChangeProject            = Changer de projet
+ActionPlanDefaultProject           = Document Unique (par défaut)
+ActionPlanNoProjectConfigured      = Aucun projet configuré
 
 # ActionPlan — ActionComm Logging
 ActionPlanLogging                  = Plan d'Action — Historique des modifications

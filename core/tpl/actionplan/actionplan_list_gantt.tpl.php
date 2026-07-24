@@ -7,7 +7,7 @@
  * Variables expected from calling PHP:
  * - $tasksJson   array  Task data (enriched)
  * - $langs       Translate
- * - $projectId   int    DU project ID
+ * - $projectId   int    Displayed project ID
  */
 
 // Create clean data for Gantt JS (without HTML fields like risk_nomurl)
