@@ -497,6 +497,42 @@ class DigiriskElement extends SaturneObject
     }
 
     /**
+     * Get digirisk elements visible in the current entity organization, ordered as the navigation tree
+     *
+     * fetchAll() alone is not enough for an export: it keeps the trashed elements and, when
+     * digirisk element sharing is on, getEntity() widens the query to every shared entity.
+     * Only elements reachable from the tree root are kept, so orphans left behind by a
+     * deleted parent are dropped too.
+     *
+     * @return DigiriskElement[] Visible digirisk elements indexed by id, parents before children
+     * @throws Exception
+     */
+    public function getVisibleElements(): array
+    {
+        $digiriskElements = $this->getActiveDigiriskElements('current');
+        if (!is_array($digiriskElements) || empty($digiriskElements)) {
+            return [];
+        }
+
+        // Instances created before the trash groupment was marked as trashed still expose it as validated
+        $trashID = getDolGlobalInt('DIGIRISKDOLIBARR_DIGIRISKELEMENT_TRASH');
+        if ($trashID > 0) {
+            $trashedElements  = $this->fetchDigiriskElementFlat($trashID, $digiriskElements, 'current', true);
+            $digiriskElements = array_diff_key($digiriskElements, $trashedElements);
+            if (empty($digiriskElements)) {
+                return [];
+            }
+        }
+
+        $visibleElements = [];
+        foreach ($this->fetchDigiriskElementFlat(0, $digiriskElements) as $id => $flatDigiriskElement) {
+            $visibleElements[$id] = $flatDigiriskElement['object'];
+        }
+
+        return $visibleElements;
+    }
+
+    /**
      * Return the status
      *
      * @param  int    $status ID status
