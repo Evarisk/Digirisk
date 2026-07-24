@@ -254,8 +254,9 @@ if ($object->id > 0) {
     $moduleNameLowerCase = 'digiriskdolibarr';
     $moduleName = 'DigiriskDolibarr';
     $moduleNameUpperCase = 'DIGIRISKDOLIBARR';
-    if (file_exists(DOL_DOCUMENT_ROOT . '/custom/saturne/core/tpl/medias/medias_gallery_modal.tpl.php')) {
-        include DOL_DOCUMENT_ROOT . '/custom/saturne/core/tpl/medias/medias_gallery_modal.tpl.php';
+    $mediasGalleryModalPath = dol_buildpath('/saturne/core/tpl/medias/medias_gallery_modal.tpl.php');
+    if (file_exists($mediasGalleryModalPath)) {
+        include $mediasGalleryModalPath;
     }
 
     ?>
