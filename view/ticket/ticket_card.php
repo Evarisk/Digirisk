@@ -66,6 +66,8 @@ $permissionToWrite = $user->hasRight('ticket', 'write') && !$user->socid;
 $url_page_current  = dol_buildpath('/custom/digiriskdolibarr/view/ticket/ticket_card.php', 1);
 // Kanban AJAX endpoint (reused for on-the-fly tags & assignee — same server behaviour, incl. kanban event logging).
 $kanbanAjaxUrl     = dol_buildpath('/custom/digiriskdolibarr/view/ticket/ticket_action_card.php', 1);
+// Traceability (#4885) — constant gating the agenda event written on every edit made from this card.
+$ticketLogConst    = 'DIGIRISKDOLIBARR_TICKET_LOG_MODIFICATIONS';
 
 /*
  * Actions
@@ -77,17 +79,8 @@ if ($action === 'setsubject_ajax' && $permissionToWrite) {
     $object->fetch($id);
     $oldSubject      = $object->subject;
     $object->subject = $newSubject;
-    if ($object->update($user) > 0 && trim($newSubject) !== trim($oldSubject)) {
-        $actioncomm = new ActionComm($db);
-        $actioncomm->type_code   = 'AC_OTH_AUTO';
-        $actioncomm->code        = 'AC_TICKET_MODIFY';
-        $actioncomm->label       = $langs->trans('Subject') . ' : ' . $oldSubject . ' -> ' . $newSubject;
-        $actioncomm->fk_element  = $object->id;
-        $actioncomm->elementtype = 'ticket';
-        $actioncomm->datep       = dol_now();
-        $actioncomm->userownerid = $user->id;
-        $actioncomm->percentage  = -1;
-        $actioncomm->create($user);
+    if ($object->update($user) > 0) {
+        digiriskdolibarr_ticket_log_field_change($object, $langs->transnoentities('Subject'), $oldSubject, $newSubject, $ticketLogConst);
     }
     header('Content-Type: application/json');
     print json_encode(['success' => 1, 'subject' => $object->subject]);
@@ -99,8 +92,15 @@ if ($action === 'setextrafield_ajax' && $permissionToWrite) {
     $field = GETPOST('field', 'alpha');
     $value = GETPOST('value', 'none');
     $object->fetch($id);
+    $object->fetch_optionals();
+    $oldValue = $object->array_options['options_' . $field] ?? '';
     $object->array_options['options_' . $field] = $value;
     $res = $object->insertExtraFields();
+    if ($res >= 0) {
+        [$logLabel, $logOld] = digiriskdolibarr_ticket_extrafield_log_parts($field, $oldValue);
+        [, $logNew]          = digiriskdolibarr_ticket_extrafield_log_parts($field, $value);
+        digiriskdolibarr_ticket_log_field_change($object, $logLabel, $logOld, $logNew, $ticketLogConst);
+    }
     header('Content-Type: application/json');
     print json_encode(['success' => ($res >= 0), 'field' => $field, 'value' => $value]);
     exit;
@@ -110,6 +110,7 @@ if ($action === 'setextrafield_ajax' && $permissionToWrite) {
 if ($action === 'setassignee_ajax' && $permissionToWrite) {
     $newUserId = GETPOSTINT('user_id');
     $object->fetch($id);
+    $oldUserId = (int) $object->fk_user_assign;
     $object->fk_user_assign = $newUserId;
     $object->update($user);
     if ($newUserId > 0) {
@@ -119,6 +120,15 @@ if ($action === 'setassignee_ajax' && $permissionToWrite) {
     } else {
         $nomUrl = '<span class="opacitymedium">' . $langs->trans('NotAssigned') . '</span>';
     }
+    $userLogName = static function (int $userId) use ($db, $langs): string {
+        if ($userId <= 0) {
+            return '';
+        }
+        $logUser = new User($db);
+
+        return $logUser->fetch($userId) > 0 ? $logUser->getFullName($langs) : (string) $userId;
+    };
+    digiriskdolibarr_ticket_log_field_change($object, $langs->transnoentities('AssignedTo'), $userLogName($oldUserId), $userLogName($newUserId), $ticketLogConst);
     header('Content-Type: application/json');
     print json_encode(['success' => 1, 'nomurl' => $nomUrl]);
     exit;
@@ -128,6 +138,13 @@ if ($action === 'setassignee_ajax' && $permissionToWrite) {
 if ($action === 'setthirdparty_ajax' && $permissionToWrite) {
     $newSocId = GETPOSTINT('socid');
     $object->fetch($id);
+    $oldSocName = '';
+    if ((int) $object->socid > 0) {
+        $oldSoc = new Societe($db);
+        if ($oldSoc->fetch((int) $object->socid) > 0) {
+            $oldSocName = trim($oldSoc->name);
+        }
+    }
     $object->setCustomer($newSocId);
     $socName    = '';
     $cardUrl    = '';
@@ -139,6 +156,7 @@ if ($action === 'setthirdparty_ajax' && $permissionToWrite) {
         $cardUrl    = DOL_URL_ROOT . '/societe/card.php?socid=' . $newSocId;
         $historyUrl = DOL_URL_ROOT . '/ticket/list.php?socid=' . $newSocId . '&sortfield=t.datec&sortorder=desc';
     }
+    digiriskdolibarr_ticket_log_field_change($object, $langs->transnoentities('ThirdParty'), $oldSocName, $socName, $ticketLogConst);
     header('Content-Type: application/json');
     print json_encode(['success' => 1, 'id' => $newSocId, 'name' => $socName, 'cardurl' => $cardUrl, 'historyurl' => $historyUrl]);
     exit;
@@ -148,6 +166,13 @@ if ($action === 'setthirdparty_ajax' && $permissionToWrite) {
 if ($action === 'setproject_ajax' && $permissionToWrite) {
     $newProjectId = GETPOSTINT('projectid');
     $object->fetch($id);
+    $oldProjRef = '';
+    if ((int) $object->fk_project > 0) {
+        $oldProj = new Project($db);
+        if ($oldProj->fetch((int) $object->fk_project) > 0) {
+            $oldProjRef = trim($oldProj->ref);
+        }
+    }
     $object->setProject($newProjectId);
     $projRef = '';
     $cardUrl = '';
@@ -157,6 +182,7 @@ if ($action === 'setproject_ajax' && $permissionToWrite) {
         $projRef = trim($proj->ref);
         $cardUrl = DOL_URL_ROOT . '/projet/card.php?id=' . $newProjectId;
     }
+    digiriskdolibarr_ticket_log_field_change($object, $langs->transnoentities('Project'), $oldProjRef, $projRef, $ticketLogConst);
     header('Content-Type: application/json');
     print json_encode(['success' => 1, 'id' => $newProjectId, 'name' => $projRef, 'cardurl' => $cardUrl]);
     exit;
@@ -172,8 +198,10 @@ if ($action === 'setprogress_ajax' && $permissionToWrite) {
         $newProgress = 100;
     }
     $object->fetch($id);
+    $oldProgress      = (int) $object->progress;
     $object->progress = $newProgress;
     $object->update($user);
+    digiriskdolibarr_ticket_log_field_change($object, $langs->transnoentities('Progression'), $oldProgress . ' %', $newProgress . ' %', $ticketLogConst);
     header('Content-Type: application/json');
     print json_encode(['success' => 1, 'progress' => (int) $object->progress]);
     exit;
@@ -191,8 +219,20 @@ if ($action === 'set_task_progress_ajax' && $permissionToWrite) {
     if ($newProgress > 100) {
         $newProgress = 100;
     }
+    $oldProgress       = (int) $taskObj->progress;
     $taskObj->progress = $newProgress;
     $taskObj->update($user);
+    // "id" carries the task id here, so the ticket to log against is passed separately.
+    $logTicket = new Ticket($db);
+    if ($logTicket->fetch(GETPOSTINT('ticket_id')) > 0) {
+        digiriskdolibarr_ticket_log_field_change(
+            $logTicket,
+            $langs->transnoentities('Progression') . ' — ' . $taskObj->ref,
+            $oldProgress . ' %',
+            $newProgress . ' %',
+            $ticketLogConst
+        );
+    }
     header('Content-Type: application/json');
     print json_encode(['success' => 1, 'progress' => (int) $taskObj->progress]);
     exit;
@@ -380,6 +420,7 @@ if ($action === 'edit_message_ajax' && $permissionToWrite) {
         $ac->note_private = $newBody;
         $ac->note         = $newBody;
         if ($ac->update($user) > 0) {
+            digiriskdolibarr_ticket_log_event($object, $langs->transnoentities('TicketMessageEdited'), dol_trunc(dol_string_nohtmltag($newBody), 500), $ticketLogConst);
             print json_encode(['success' => 1, 'body_html' => dolPrintHTML($newBody)]);
             exit;
         }
@@ -396,7 +437,9 @@ if ($action === 'delete_message_ajax' && $permissionToWrite) {
     $ac->fetch($msgId);
     header('Content-Type: application/json');
     if ($ac->id > 0 && (int) $ac->userownerid === (int) $user->id && strpos((string) $ac->code, 'TICKET_MSG') === 0) {
+        $deletedBody = dol_trunc(dol_string_nohtmltag((string) $ac->note_private), 500);
         if ($ac->delete($user) > 0) {
+            digiriskdolibarr_ticket_log_event($object, $langs->transnoentities('TicketMessageDeleted'), $deletedBody, $ticketLogConst);
             print json_encode(['success' => 1]);
             exit;
         }
@@ -415,6 +458,7 @@ if ($action === 'create_parent_task' && $permissionToWrite && !empty($object->fk
     $t->progress = 0;
     $t->create($user);
     $db->query("UPDATE " . MAIN_DB_PREFIX . "projet_task SET ref = '" . $db->escape($t->ref) . "' WHERE rowid = " . (int) $t->id);
+    digiriskdolibarr_ticket_log_event($object, $langs->transnoentities('TicketTaskCreated', $t->ref), $t->label, $ticketLogConst);
     header('Location: ' . $url_page_current . '?id=' . $object->id);
     exit;
 }
@@ -453,6 +497,7 @@ if ($action === 'add_child_task_modal' && $permissionToWrite && !empty($object->
     if ($executive_id > 0) {
         $t->add_contact($executive_id, 'TASKEXECUTIVE', 'internal');
     }
+    digiriskdolibarr_ticket_log_event($object, $langs->transnoentities('TicketTaskCreated', $t->ref), $t->label, $ticketLogConst);
     header('Location: ' . $url_page_current . '?id=' . $object->id);
     exit;
 }
@@ -464,8 +509,16 @@ if ($action === 'setmessage' && $permissionToWrite) {
         exit;
     } else {
         $object->fetch($id);
+        $oldMessage      = (string) $object->message;
         $object->message = GETPOST('message', 'restricthtml');
         $object->update($user);
+        digiriskdolibarr_ticket_log_field_change(
+            $object,
+            $langs->transnoentities('TicketInitialMessage'),
+            dol_trunc(dol_string_nohtmltag($oldMessage), 250),
+            dol_trunc(dol_string_nohtmltag((string) $object->message), 250),
+            $ticketLogConst
+        );
         header('Location: ' . $url_page_current . '?id=' . $object->id);
         exit;
     }
@@ -487,7 +540,10 @@ if ($action === 'set_read' && $permissionToWrite) {
 if ($action === 'confirm_set_status' && $permissionToWrite && !GETPOST('cancel')) {
     $object->fetch(GETPOSTINT('id'), GETPOST('track_id', 'alpha'));
     $newStatus = GETPOSTINT('new_status');
+    $oldStatus = $object->getLibStatut(1);
     if ($object->setStatut($newStatus, null, '', 'TICKET_MODIFY')) {
+        $object->fetch($object->id);
+        digiriskdolibarr_ticket_log_field_change($object, $langs->transnoentities('Status'), $oldStatus, $object->getLibStatut(1), $ticketLogConst);
         header('Location: ' . $url_page_current . '?track_id=' . urlencode($object->track_id));
         exit;
     }
@@ -498,7 +554,19 @@ if ($action === 'confirm_set_status' && $permissionToWrite && !GETPOST('cancel')
 $upload_dir         = $conf->ticket->dir_output;
 $permissiontoadd    = $permissionToWrite ? 1 : 0;
 $permissiontodelete = $permissionToWrite ? 1 : 0;
+// Captured before the include: actions_builddoc.inc.php resets $action once it is done.
+$fileActionBefore   = $action;
+$fileNameBefore     = GETPOST('file', 'alpha') ?: GETPOST('urlfile', 'alpha');
 include DOL_DOCUMENT_ROOT . '/core/actions_builddoc.inc.php';
+
+// Traceability (#4885) — the attached-files box goes through the native include, which emits no event.
+if ($object->id > 0 && $permissionToWrite && in_array($fileActionBefore, ['builddoc', 'remove_file'], true)) {
+    if ($fileActionBefore === 'builddoc') {
+        digiriskdolibarr_ticket_log_event($object, $langs->transnoentities('TicketDocumentGenerated'), (string) $object->model_pdf, $ticketLogConst);
+    } else {
+        digiriskdolibarr_ticket_log_event($object, $langs->transnoentities('TicketFileDeleted'), basename((string) $fileNameBefore), $ticketLogConst);
+    }
+}
 
 /*
  * View
@@ -624,12 +692,12 @@ print '<div class="underbanner clearboth"></div>';
 $subjectRaw = (string) ($object->subject ?? '');
 print '<table class="border centpercent tableforfield"><tbody>';
 print '<tr class="liste_titre trforfield"><td colspan="2"><div class="dtc-head">';
-print '<span class="dtc-head-label">' . $langs->trans('Subject') . '</span>';
+print '<span class="dtc-head-label"><i class="fas fa-heading dtc-field-picto"></i>' . $langs->trans('Subject') . '</span>';
 print '<span class="dtc-subject" data-value="' . dol_escape_htmltag($subjectRaw) . '">';
 if ($subjectRaw !== '') {
-    print '<span class="dtc-subject-value">' . dolPrintLabel($subjectRaw) . '</span>';
+    print '<span class="dtc-subject-value dtc-tabfield" tabindex="0">' . dolPrintLabel($subjectRaw) . '</span>';
 } else {
-    print '<span class="dtc-subject-value opacitymedium">' . $langs->trans('NoSubject') . '</span>';
+    print '<span class="dtc-subject-value dtc-tabfield opacitymedium" tabindex="0">' . $langs->trans('NoSubject') . '</span>';
 }
 print '</span>';
 print '</div></td></tr>';
@@ -642,7 +710,7 @@ print '<input type="hidden" name="action" value="setmessage">';
 print '<input type="hidden" name="id" value="' . (int) $object->id . '">';
 print '<table class="border centpercent tableforfield"><tbody>';
 print '<tr class="liste_titre trforfield"><td colspan="2"><div class="dtc-head">';
-print $langs->trans('TicketInitialMessage');
+print '<i class="fas fa-comment-alt dtc-field-picto"></i>' . $langs->trans('TicketInitialMessage');
 print '</div></td></tr>';
 print '<tr><td colspan="2">';
 if ($action === 'editmessage' && $permissionToWrite) {
@@ -689,7 +757,9 @@ if ($firstServiceId > 0) {
     }
 }
 
-// Helper to render an inline editable field
+// Helper to render an inline editable field.
+// tabindex="0" (never a positive value, which would hijack the tab order of the whole page):
+// the fields are chained in DOM order by the "dtc-tabfield" class, see js/modules/ticket.js.
 $renderInlineEditable = static function (string $field, string $type, string $val, string $placeholder, string $rawVal = '', array $options = []) use ($langs, $permissionToWrite, $url_page_current, $object): string {
     if (!$permissionToWrite) {
         return $val === '' ? '<span class="opacitymedium">' . dol_escape_htmltag($placeholder) . '</span>' : $val;
@@ -697,18 +767,16 @@ $renderInlineEditable = static function (string $field, string $type, string $va
     $isEmpty = ($val === '');
     $displayVal = $isEmpty ? dol_escape_htmltag($placeholder) : $val;
     $rawValAttr = ' data-raw="' . dol_escape_htmltag($rawVal === '' && $type !== 'select' ? $val : $rawVal) . '"';
-    $tabAttr = '';
-    if (isset($options['tabindex'])) {
-        $tabAttr = ' tabindex="' . (int)$options['tabindex'] . '"';
-        unset($options['tabindex']);
-    }
     $optionsAttr = !empty($options) ? ' data-options="' . dol_escape_htmltag(json_encode($options)) . '"' : '';
-    $classes = 'dtc-extrafield-value dtc-inline-editable' . ($isEmpty ? ' is-empty' : '');
-    
-    return '<span class="' . $classes . '"' . $tabAttr . ' title="' . dol_escape_htmltag($langs->trans('Modify')) . '" data-placeholder="' . dol_escape_htmltag($placeholder) . '" data-field="' . dol_escape_htmltag($field) . '" data-type="' . dol_escape_htmltag($type) . '" data-ticket-id="' . (int) $object->id . '" data-url="' . dol_escape_htmltag($url_page_current) . '"' . $rawValAttr . $optionsAttr . '>' . $displayVal . '</span>';
+    $classes = 'dtc-extrafield-value dtc-inline-editable dtc-tabfield' . ($isEmpty ? ' is-empty' : '');
+
+    return '<span class="' . $classes . '" tabindex="0" title="' . dol_escape_htmltag($langs->trans('Modify')) . '" data-placeholder="' . dol_escape_htmltag($placeholder) . '" data-field="' . dol_escape_htmltag($field) . '" data-type="' . dol_escape_htmltag($type) . '" data-ticket-id="' . (int) $object->id . '" data-url="' . dol_escape_htmltag($url_page_current) . '"' . $rawValAttr . $optionsAttr . '>' . $displayVal . '</span>';
 };
 
-$drPicto = img_picto('', 'digiriskdolibarr_color@digiriskdolibarr', 'class="pictoModule" style="margin-right: 5px;"');
+// Field pictos (#4885) — one meaningful icon per field instead of the module logo repeated on every row.
+$fieldPicto = static function (string $icon): string {
+    return '<i class="fas fa-' . $icon . ' dtc-field-picto"></i>';
+};
 
 // Fetch all GP/UT options for select
 $serviceOptions = ['' => '']; // Empty option
@@ -731,7 +799,7 @@ $serviceSelectHtml = '';
 if (!$permissionToWrite) {
     $serviceSelectHtml = $regService !== '' ? $regService : '<span class="opacitymedium">' . $langs->trans('None') . '</span>';
 } else {
-    $serviceSelectHtml = '<select class="dtc-direct-select flat" data-field="digiriskdolibarr_ticket_service" tabindex="5" style="width: 100%; max-width: 200px;">';
+    $serviceSelectHtml = '<select class="dtc-direct-select dtc-tabfield flat" data-field="digiriskdolibarr_ticket_service" tabindex="0">';
     foreach ($serviceOptions as $optVal => $optText) {
         $selected = ((string)$optVal === (string)$firstServiceId) ? ' selected="selected"' : '';
         // optText is already escaped and contains HTML (&nbsp;), so we don't escape it here
@@ -740,30 +808,34 @@ if (!$permissionToWrite) {
     $serviceSelectHtml .= '</select>';
 }
 
-print '<table class="border centpercent tableforfield dtc-registres-table"><tbody>';
+// A colgroup + table-layout:fixed (SCSS) keeps the two label/value column pairs aligned, whatever
+// the content length and whatever the colspan used by the full-width rows below.
+print '<table class="border centpercent tableforfield dtc-registres-table">';
+print '<colgroup><col class="dtc-reg-col-label"><col class="dtc-reg-col-value"><col class="dtc-reg-col-label"><col class="dtc-reg-col-value"></colgroup>';
+print '<tbody>';
 print '<tr class="liste_titre trforfield"><td colspan="4"><div class="dtc-head">' . img_picto('', 'digiriskdolibarr_color@digiriskdolibarr', 'class="pictoModule"') . ' ' . $langs->trans('TicketActionCardRegistresSection') . '</div></td></tr>';
 
 print '<tr>';
-print '<td class="titlefieldmiddle">' . $drPicto . $langs->trans('LastName') . '</td><td>' . $renderInlineEditable('digiriskdolibarr_ticket_lastname', 'text', dol_escape_htmltag($regLastname), $langs->trans('LastName'), '', ['tabindex' => 3]) . '</td>';
-print '<td class="titlefieldmiddle">' . $drPicto . $langs->trans('FirstName') . '</td><td>' . $renderInlineEditable('digiriskdolibarr_ticket_firstname', 'text', dol_escape_htmltag($regFirstname), $langs->trans('FirstName'), '', ['tabindex' => 7]) . '</td>';
+print '<td class="dtc-reg-label">' . $fieldPicto('user') . $langs->trans('LastName') . '</td><td>' . $renderInlineEditable('digiriskdolibarr_ticket_lastname', 'text', dol_escape_htmltag($regLastname), $langs->trans('LastName')) . '</td>';
+print '<td class="dtc-reg-label">' . $fieldPicto('id-card') . $langs->trans('FirstName') . '</td><td>' . $renderInlineEditable('digiriskdolibarr_ticket_firstname', 'text', dol_escape_htmltag($regFirstname), $langs->trans('FirstName')) . '</td>';
 print '</tr>';
 
 print '<tr>';
-print '<td class="titlefieldmiddle">' . $drPicto . $langs->trans('Phone') . '</td><td>' . $renderInlineEditable('digiriskdolibarr_ticket_phone', 'text', dol_print_phone($regPhone), $langs->trans('Phone'), $regPhone, ['tabindex' => 4]) . '</td>';
-print '<td class="titlefieldmiddle">' . $drPicto . $langs->trans('DeclarationDate') . '</td><td>' . $renderInlineEditable('digiriskdolibarr_ticket_date', 'date', $regDate, $langs->trans('DeclarationDate'), (string)$regDateRaw, ['tabindex' => 8]) . '</td>';
+print '<td class="dtc-reg-label">' . $fieldPicto('phone') . $langs->trans('Phone') . '</td><td>' . $renderInlineEditable('digiriskdolibarr_ticket_phone', 'text', dol_print_phone($regPhone), $langs->trans('Phone'), $regPhone) . '</td>';
+print '<td class="dtc-reg-label">' . $fieldPicto('calendar-day') . $langs->trans('DeclarationDate') . '</td><td>' . $renderInlineEditable('digiriskdolibarr_ticket_date', 'date', $regDate, $langs->trans('DeclarationDate'), (string) $regDateRaw) . '</td>';
 print '</tr>';
 
 print '<tr>';
-print '<td class="titlefieldmiddle">' . $drPicto . $langs->trans('GP/UT') . '</td><td>' . $serviceSelectHtml . '</td>';
-print '<td class="titlefieldmiddle">' . $drPicto . $langs->trans('Location') . '</td><td>' . $renderInlineEditable('digiriskdolibarr_ticket_location', 'text', dol_escape_htmltag($regLocation), $langs->trans('Location'), '', ['tabindex' => 9]) . '</td>';
+print '<td class="dtc-reg-label">' . $fieldPicto('sitemap') . $langs->trans('GP/UT') . '</td><td>' . $serviceSelectHtml . '</td>';
+print '<td class="dtc-reg-label">' . $fieldPicto('map-marker-alt') . $langs->trans('Location') . '</td><td>' . $renderInlineEditable('digiriskdolibarr_ticket_location', 'text', dol_escape_htmltag($regLocation), $langs->trans('Location')) . '</td>';
 print '</tr>';
 
-print '<tr><td class="titlefieldmiddle">' . $drPicto . $langs->trans('Condition') . '</td><td colspan="3">' . $renderInlineEditable('digiriskdolibarr_condition_message', 'textarea', ($regCondition !== '' ? dolPrintHTML($regCondition) : ''), $langs->trans('ConditionMessage'), $regCondition, ['tabindex' => 6]) . '</td></tr>';
+print '<tr><td class="dtc-reg-label">' . $fieldPicto('comment-dots') . $langs->trans('Condition') . '</td><td colspan="3">' . $renderInlineEditable('digiriskdolibarr_condition_message', 'textarea', ($regCondition !== '' ? dolPrintHTML($regCondition) : ''), $langs->trans('ConditionMessage'), $regCondition) . '</td></tr>';
 
 // "Registre signé": disabled indicator. TODO (#4443 step 2): reflect real SaturneSignature state
 // and add the "Conditions à accepter pour la signature" (ValidateText) + category-scoped
 // "Date de départ anticipé" rows (see actions_digiriskdolibarr.class.php printCommonFooter:324-337 / 291-310).
-print '<tr><td class="titlefieldmiddle">' . $drPicto . $langs->trans('RegisterSigned') . '</td><td colspan="3"><input type="checkbox" disabled></td></tr>';
+print '<tr><td class="dtc-reg-label">' . $fieldPicto('file-signature') . $langs->trans('RegisterSigned') . '</td><td colspan="3"><input type="checkbox" disabled></td></tr>';
 
 print '</tbody></table>';
 
@@ -827,12 +899,12 @@ if (!empty($object->fk_project) && isModEnabled('project')) {
 
 // ---- Responsable et avancement ----
 print '<table class="border centpercent tableforfield"><tbody>';
-print '<tr class="liste_titre trforfield"><td colspan="2"><div class="dtc-head">' . $langs->trans('TicketResponsibleAndProgress') . '</div></td></tr>';
+print '<tr class="liste_titre trforfield"><td colspan="2"><div class="dtc-head">' . $fieldPicto('user-clock') . $langs->trans('TicketResponsibleAndProgress') . '</div></td></tr>';
 
 // Assigned user (inline, on-the-fly editable)
-print '<tr><td class="titlefieldmiddle">' . $langs->trans('AssignedTo') . '</td>';
+print '<tr><td class="titlefieldmiddle">' . $fieldPicto('user-tie') . $langs->trans('AssignedTo') . '</td>';
 print '<td class="dtc-assignee" data-ticket-id="' . (int) $object->id . '" data-assign-url="' . dol_escape_htmltag($url_page_current) . '">';
-print '<span class="dtc-assignee-value' . ($permissionToWrite ? ' dtc-editable' : '') . '">';
+print '<span class="dtc-assignee-value' . ($permissionToWrite ? ' dtc-editable dtc-tabfield' : '') . '"' . ($permissionToWrite ? ' tabindex="0"' : '') . '>';
 if ($object->fk_user_assign > 0) {
     $userstat->fetch($object->fk_user_assign);
     print $userstat->getNomUrl(-1);
@@ -849,10 +921,10 @@ if ($permissionToWrite) {
 print '</td></tr>';
 
 // Progression (inline editable — modifying PARENT TASK if it exists)
-print '<tr><td class="titlefieldmiddle">' . $langs->trans('Progression') . '</td>';
+print '<tr><td class="titlefieldmiddle">' . $fieldPicto('tasks') . $langs->trans('Progression') . '</td>';
 if ($parentTask) {
-    print '<td class="dtc-progress" data-ticket-id="' . (int) $parentTask->id . '" data-action="set_task_progress_ajax" data-progress-url="' . dol_escape_htmltag($url_page_current) . '" data-value="' . (int) $parentTask->progress . '">';
-    print '<span class="dtc-progress-value' . ($permissionToWrite ? ' dtc-editable' : '') . '"' . ($permissionToWrite ? ' contenteditable="true"' : '') . '>' . ((int) $parentTask->progress) . '</span> %';
+    print '<td class="dtc-progress" data-ticket-id="' . (int) $parentTask->id . '" data-action="set_task_progress_ajax" data-log-ticket-id="' . (int) $object->id . '" data-progress-url="' . dol_escape_htmltag($url_page_current) . '" data-value="' . (int) $parentTask->progress . '">';
+    print '<span class="dtc-progress-value' . ($permissionToWrite ? ' dtc-editable dtc-tabfield' : '') . '"' . ($permissionToWrite ? ' contenteditable="true" tabindex="0"' : '') . '>' . ((int) $parentTask->progress) . '</span> %';
     print '</td></tr>';
 } else {
     print '<td><span class="opacitymedium">0 %</span></td></tr>';
@@ -904,8 +976,8 @@ if (!empty($tasksarray)) {
         print '<td class="center">' . dol_print_date($t->date_end, 'day') . '</td>';
         
         // Progress inline editable (using dynamic data-action added to JS)
-        print '<td class="center dtc-progress" data-ticket-id="' . (int) $t->id . '" data-action="set_task_progress_ajax" data-progress-url="' . dol_escape_htmltag($url_page_current) . '" data-value="' . (int) $t->progress . '">';
-        print '<span class="dtc-progress-value' . ($permissionToWrite ? ' dtc-editable' : '') . '"' . ($permissionToWrite ? ' contenteditable="true"' : '') . '>' . ((int) $t->progress) . '</span> %';
+        print '<td class="center dtc-progress" data-ticket-id="' . (int) $t->id . '" data-action="set_task_progress_ajax" data-log-ticket-id="' . (int) $object->id . '" data-progress-url="' . dol_escape_htmltag($url_page_current) . '" data-value="' . (int) $t->progress . '">';
+        print '<span class="dtc-progress-value' . ($permissionToWrite ? ' dtc-editable dtc-tabfield' : '') . '"' . ($permissionToWrite ? ' contenteditable="true" tabindex="0"' : '') . '>' . ((int) $t->progress) . '</span> %';
         print '</td>';
         
         // Responsable (display names/avatars)
@@ -933,7 +1005,7 @@ print '</div>';
 
 // ---- Classification (categories) + key dates ----
 print '<table class="border centpercent tableforfield"><tbody>';
-print '<tr class="liste_titre trforfield"><td colspan="2"><div class="dtc-head">' . $langs->trans('TicketActionCardClassificationSection') . '</div></td></tr>';
+print '<tr class="liste_titre trforfield"><td colspan="2"><div class="dtc-head">' . $fieldPicto('tags') . $langs->trans('TicketActionCardClassificationSection') . '</div></td></tr>';
 
 if (isModEnabled('category')) {
     $catObj           = new Categorie($db);
@@ -947,7 +1019,7 @@ if (isModEnabled('category')) {
     }
     $assignedCategoryIds = array_map(static fn($c) => (int) $c->id, $ticketCategories);
 
-    print '<tr><td class="titlefieldmiddle">' . $langs->trans('Categories') . '</td><td>';
+    print '<tr><td class="titlefieldmiddle">' . $fieldPicto('tag') . $langs->trans('Categories') . '</td><td>';
     // Exact same markup as the ticket kanban (core/tpl/ticket/ticket_action_card_picker.tpl.php)
     // so it inherits the identical kanban tag styling (_page-actionplan.scss).
     print '<div class="kanban-card-tags" data-ticket-id="' . (int) $object->id . '" data-tag-url="' . dol_escape_htmltag($kanbanAjaxUrl) . '">';
@@ -990,18 +1062,18 @@ if (isModEnabled('category')) {
 }
 
 // Creation date + elapsed time
-print '<tr><td class="titlefieldmiddle">' . $langs->trans('DateCreation') . '</td><td>';
+print '<tr><td class="titlefieldmiddle">' . $fieldPicto('calendar-plus') . $langs->trans('DateCreation') . '</td><td>';
 print dol_print_date($object->datec, 'dayhour', 'tzuser');
 print '<span class="opacitymedium"><span class="small"> - ' . $langs->trans('TimeElapsedSince') . ': <b><i>' . convertSecondToTime(roundUpToNextMultiple($now - $object->datec, 60)) . '</i></b></span></span>';
 print '</td></tr>';
 
 // Read date
-print '<tr><td class="titlefieldmiddle">' . $langs->trans('TicketReadOn') . '</td><td>';
+print '<tr><td class="titlefieldmiddle">' . $fieldPicto('eye') . $langs->trans('TicketReadOn') . '</td><td>';
 print !empty($object->date_read) ? dol_print_date($object->date_read, 'dayhour', 'tzuser') : '';
 print '</td></tr>';
 
 // Close date
-print '<tr><td class="titlefieldmiddle">' . $langs->trans('TicketCloseOn') . '</td><td>';
+print '<tr><td class="titlefieldmiddle">' . $fieldPicto('calendar-check') . $langs->trans('TicketCloseOn') . '</td><td>';
 print !empty($object->date_close) ? dol_print_date($object->date_close, 'dayhour', 'tzuser') : '';
 print '</td></tr>';
 
