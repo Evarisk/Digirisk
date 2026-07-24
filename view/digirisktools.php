@@ -496,9 +496,14 @@ if (GETPOST('dataMigrationImportGlobal', 'alpha') && ! empty($conf->global->MAIN
 	}
 }
 
-if (GETPOST('dataMigrationExportGlobal', 'alpha') && ! empty($conf->global->MAIN_UPLOAD_DOC)) {
+if ((GETPOST('dataMigrationExportGlobal', 'alpha') || GETPOST('dataMigrationExportTree', 'alpha')) && ! empty($conf->global->MAIN_UPLOAD_DOC)) {
+	// Tree export carries the GP/WU organization only, global export adds the risks, evaluations, tasks and risk signs
+	$exportTreeOnly      = GETPOST('dataMigrationExportTree', 'alpha') ? 1 : 0;
+	// An entity without any visible element is now a valid case: keep a well formed json instead of null
+	$digiriskExportArray = ['digiriskelements' => []];
+
 	// DigiriskElements data
-	$alldigiriskelements = $digiriskElement->fetchAll();
+	$alldigiriskelements = $digiriskElement->getVisibleElements();
 	if (is_array($alldigiriskelements) && !empty($alldigiriskelements)) {
 		foreach ($alldigiriskelements as $digiriskelementsingle) {
 			$digiriskelementsExportArray['rowid']            = $digiriskelementsingle->id;
@@ -512,6 +517,10 @@ if (GETPOST('dataMigrationExportGlobal', 'alpha') && ! empty($conf->global->MAIN
 			$digiriskelementsExportArray['ranks']            = $digiriskelementsingle->ranks;
 
 			$digiriskExportArray['digiriskelements'][$digiriskelementsingle->id] = $digiriskelementsExportArray;
+
+			if ($exportTreeOnly) {
+				continue;
+			}
 
 			// Risks data
 			$allrisks = $risk->fetchFromParent($digiriskelementsingle->id);
@@ -598,7 +607,9 @@ if (GETPOST('dataMigrationExportGlobal', 'alpha') && ! empty($conf->global->MAIN
 	$digiriskExportArray = json_encode($digiriskExportArray, JSON_PRETTY_PRINT);
 
 	$filedir = $upload_dir . '/temp/';
-	$export_base = $filedir . dol_print_date(dol_now(), 'dayhourlog', 'tzuser') . '_dolibarr_global_export';
+	// Name built once: the zip link is rebuilt from it below and a second dol_now() could land on the next second
+	$exportName = dol_print_date(dol_now(), 'dayhourlog', 'tzuser') . ($exportTreeOnly ? '_dolibarr_tree_export' : '_dolibarr_global_export');
+	$export_base = $filedir . $exportName;
 	$filename = $export_base . '.json';
 
 	file_put_contents($filename, $digiriskExportArray);
@@ -607,7 +618,7 @@ if (GETPOST('dataMigrationExportGlobal', 'alpha') && ! empty($conf->global->MAIN
 	if ($zip->open($export_base . '.zip', ZipArchive::CREATE ) === TRUE) {
 		$zip->addFile($filename, basename($filename));
 		$zip->close();
-		$filenamezip = dol_print_date(dol_now(), 'dayhourlog', 'tzuser') . '_dolibarr_global_export.zip';
+		$filenamezip = $exportName . '.zip';
 		$filepath = DOL_URL_ROOT . '/document.php?modulepart=digiriskdolibarr&file=' . urlencode('temp/'.$filenamezip);
 
 		?>
@@ -626,7 +637,7 @@ if ($action == 'import_global_dolibarr' && ! empty($conf->global->MAIN_UPLOAD_DO
 	// Submit file
     $actionError = [];
     if ( ! empty($_FILES)) {
-		if ( ! preg_match('/dolibarr_global_export.zip/', $_FILES['file']['name'][0]) || $_FILES['file']['size'][0] < 1) {
+		if ( ! preg_match('/dolibarr_(global|tree)_export\.zip/', $_FILES['file']['name'][0]) || $_FILES['file']['size'][0] < 1) {
             $actionError[] = $langs->trans('ErrorFileNotWellFormattedZIP');
 		} else {
 
@@ -1089,6 +1100,18 @@ if ($user->rights->digiriskdolibarr->adminpage->read) {
 
 	print '<td class="center data-migration-export-global">';
 	print '<input type="submit" class="button reposition data-migration-submit" name="dataMigrationExportGlobal" value="' . $langs->trans("ExportData") . '">';
+	print '</td>';
+	print '</tr>';
+
+	// Export tree only from Dolibarr
+	print '<tr class="oddeven"><td>';
+	print $langs->trans('DataMigrationExportTree');
+	print "</td><td>";
+	print $langs->trans('DataMigrationExportTreeDescription');
+	print '</td>';
+
+	print '<td class="center data-migration-export-tree">';
+	print '<input type="submit" class="button reposition data-migration-submit" name="dataMigrationExportTree" value="' . $langs->trans("ExportData") . '">';
 	print '</td>';
 	print '</tr>';
 	print '</form>';
