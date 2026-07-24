@@ -132,9 +132,9 @@ if (empty($resHook)) {
         $ticketTmpId  = GETPOST('ticket_id');
 
         $mainCategoryObject              = $category->rechercher($conf->global->DIGIRISKDOLIBARR_TICKET_MAIN_CATEGORY, '', 'ticket', true);
-        $mainCategoryExtrafields         = json_decode($mainCategoryObject[0]->array_options['options_ticket_category_config'], true);
-        $mainCategoryChildrenExtrafields = new StdClass();
-        $subCategoryExtrafields          = new StdClass();
+        $mainCategoryExtrafields         = json_decode($mainCategoryObject[0]->array_options['options_ticket_category_config'] ?? '', true);
+        $mainCategoryChildrenExtrafields = [];
+        $subCategoryExtrafields          = [];
         $mainCategoryChildrenItem        = null;
 
         if ( ! empty($mainCategoryObject) && $mainCategoryObject > 0) {
@@ -160,7 +160,7 @@ if (empty($resHook)) {
                 }
             }
         }
-        $config = array_merge(array_filter($mainCategoryExtrafields ?? []), array_filter($mainCategoryChildrenExtrafields ?? []), array_filter($subCategoryExtrafields ?? []));
+        $config = array_merge(array_filter((array) $mainCategoryExtrafields), array_filter((array) $mainCategoryChildrenExtrafields), array_filter((array) $subCategoryExtrafields));
 
         // Check parameters
         if (empty($parentCategoryId)) {
