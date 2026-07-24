@@ -129,75 +129,41 @@ print '<table class="noborder centpercent">';
 print '<tr class="liste_titre">';
 print '<td>' . $langs->trans("Name") . '</td>';
 print '<td>' . $langs->trans("Description") . '</td>';
+print '<td class="center">' . $langs->trans("TutoImage") . '</td>';
 print '<td class="center">' . $langs->trans("Status") . '</td>';
 print '</tr>';
 
-print '<tr class="oddeven"><td>';
-print $langs->trans('DigiriskManagement');
-print '</td><td>';
-print $langs->trans('DigiriskDescription');
-print '</td>';
+// Each entry: constant => [label key, description key, tuto image name in img/config_tuto/setup/]
+// The captcha has no tuto image: it only shows on the public pages once enabled.
+$digiriskSettings = [
+    'DIGIRISKDOLIBARR_REDIRECT_AFTER_CONNECTION'    => ['DigiriskManagement', 'DigiriskDescription', 'redirect'],
+    'DIGIRISKDOLIBARR_USE_CAPTCHA'                  => ['UseCaptcha', 'UseCaptchaDescription', ''],
+    'DIGIRISKDOLIBARR_TOOLS_ADVANCED_IMPORT'        => ['AdvancedImport', 'AdvancedImportDescription', 'advanced_import'],
+    'DIGIRISKDOLIBARR_MANUAL_INPUT_NB_EMPLOYEES'    => ['ManuelInputNBEmployees', 'ManuelInputNBEmployeesDescription', 'nb_employees'],
+    'DIGIRISKDOLIBARR_MANUAL_INPUT_NB_WORKED_HOURS' => ['ManuelInputNBWorkedHours', 'ManuelInputNBWorkedHoursDescription', 'nb_worked_hours'],
+    'DIGIRISKDOLIBARR_SHOW_PATCH_NOTE'              => ['ShowPatchNoteAgain', 'ShowPatchNoteAgainDescription', 'patch_note'],
+];
 
-print '<td class="center">';
-print ajax_constantonoff('DIGIRISKDOLIBARR_REDIRECT_AFTER_CONNECTION');
-print '</td>';
-print '</tr>';
-
-//Use captcha
-print '<tr class="oddeven"><td>';
-print  $langs->trans("UseCaptcha");
-print '</td><td>';
-print $langs->trans('UseCaptchaDescription');
-print '</td>';
-print '<td class="center">';
-print ajax_constantonoff('DIGIRISKDOLIBARR_USE_CAPTCHA');
-print '</td>';
-print '</tr>';
-
-// Advanced Import
-print '<tr class="oddeven"><td>';
-print  $langs->trans("AdvancedImport");
-print '</td><td>';
-print $langs->trans('AdvancedImportDescription');
-print '</td>';
-print '<td class="center">';
-print ajax_constantonoff('DIGIRISKDOLIBARR_TOOLS_ADVANCED_IMPORT');
-print '</td>';
-print '</tr>';
-
-// Manuel input number employees
-print '<tr class="oddeven"><td>';
-print  $langs->trans("ManuelInputNBEmployees");
-print '</td><td>';
-print $langs->trans('ManuelInputNBEmployeesDescription');
-print '</td>';
-print '<td class="center">';
-print ajax_constantonoff('DIGIRISKDOLIBARR_MANUAL_INPUT_NB_EMPLOYEES');
-print '</td>';
-print '</tr>';
-
-// Manuel input number worked hours
-print '<tr class="oddeven"><td>';
-print  $langs->trans("ManuelInputNBWorkedHours");
-print '</td><td>';
-print $langs->trans('ManuelInputNBWorkedHoursDescription');
-print '</td>';
-print '<td class="center">';
-print ajax_constantonoff('DIGIRISKDOLIBARR_MANUAL_INPUT_NB_WORKED_HOURS');
-print '</td>';
-print '</tr>';
-
-// Show patch note again on module home page
-print '<tr class="oddeven"><td>';
-print  $langs->trans("ShowPatchNoteAgain");
-print '</td><td>';
-print $langs->trans('ShowPatchNoteAgainDescription');
-print '</td>';
-print '<td class="center">';
-print ajax_constantonoff('DIGIRISKDOLIBARR_SHOW_PATCH_NOTE');
-print '</td>';
-print '</tr>';
+foreach ($digiriskSettings as $constName => $transKeys) {
+    print '<tr class="oddeven"><td>';
+    print $langs->trans($transKeys[0]);
+    print '</td><td>';
+    print $langs->trans($transKeys[1]);
+    print '</td>';
+    print '<td class="center">';
+    if (!empty($transKeys[2])) {
+        print digiriskdolibarr_tuto_image('setup', $transKeys[2], $langs->trans($transKeys[0]));
+    }
+    print '</td>';
+    print '<td class="center">';
+    print ajax_constantonoff($constName);
+    print '</td>';
+    print '</tr>';
+}
 print '</table>';
+
+// Click on a tuto image to display it full size
+digiriskdolibarr_tuto_overlay();
 
 print load_fiche_titre($langs->trans("MediaData"), '', '');
 

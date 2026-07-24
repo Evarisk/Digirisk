@@ -439,6 +439,7 @@ if ($conf->global->DIGIRISKDOLIBARR_TICKET_ENABLE_PUBLIC_INTERFACE == 1) {
 	print '<table class="noborder centpercent">';
 	print '<tr class="liste_titre">';
 	print '<td>' . $langs->transnoentities("Parameters") . '</td>';
+	print '<td class="center">' . $langs->transnoentities("TutoImage") . '</td>';
 	print '<td class="center">' . $langs->transnoentities("Status") . '</td>';
 	print '<td class="center">' . $langs->transnoentities("Action") . '</td>';
 	print '<td class="center">' . $langs->transnoentities("ShortInfo") . '</td>';
@@ -446,6 +447,9 @@ if ($conf->global->DIGIRISKDOLIBARR_TICKET_ENABLE_PUBLIC_INTERFACE == 1) {
 
     // Show logo for company
     print '<tr class="oddeven"><td>' . $langs->transnoentities("TicketShowCompanyLogo") . '</td>';
+    print '<td class="center">';
+    print digiriskdolibarr_tuto_image('ticket_sst', 'company_logo', $langs->transnoentities("TicketShowCompanyLogo"));
+    print '</td>';
     print '<td class="center">';
     print ajax_constantonoff('DIGIRISKDOLIBARR_TICKET_SHOW_COMPANY_LOGO');
     print '</td>';
@@ -457,21 +461,11 @@ if ($conf->global->DIGIRISKDOLIBARR_TICKET_ENABLE_PUBLIC_INTERFACE == 1) {
     print '</td>';
     print '</tr>';
 
-	// Show logo for company
-	print '<tr class="oddeven"><td>' . $langs->transnoentities("TicketShowCompanyLogo") . '</td>';
-	print '<td class="center">';
-	print ajax_constantonoff('DIGIRISKDOLIBARR_TICKET_SHOW_COMPANY_LOGO');
-	print '</td>';
-	print '<td class="center">';
-	print '';
-	print '</td>';
-	print '<td class="center">';
-	print $form->textwithpicto('', $langs->transnoentities("TicketShowCompanyLogoHelp"));
-	print '</td>';
-	print '</tr>';
-
 	// GP/UT Hide ref
 	print '<tr class="oddeven"><td>' . $langs->transnoentities("TicketDigiriskElementHideRef") . '</td>';
+	print '<td class="center">';
+	print digiriskdolibarr_tuto_image('ticket_sst', 'hide_ref', $langs->transnoentities("TicketDigiriskElementHideRef"));
+	print '</td>';
 	print '<td class="center">';
 	print ajax_constantonoff('DIGIRISKDOLIBARR_TICKET_DIGIRISKELEMENT_HIDE_REF');
 	print '</td>';
@@ -486,6 +480,7 @@ if ($conf->global->DIGIRISKDOLIBARR_TICKET_ENABLE_PUBLIC_INTERFACE == 1) {
 	if (isModEnabled('multicompany')) {
 		//Page de sélection de l'entité
 		print '<tr class="oddeven"><td>' . $langs->transnoentities("ShowSelectorOnTicketPublicInterface") . '</td>';
+		print '<td class="center"></td>';
 		print '<td class="center">';
 		print ajax_constantonoff('DIGIRISKDOLIBARR_SHOW_MULTI_ENTITY_SELECTOR_ON_TICKET_PUBLIC_INTERFACE', [], 0);
 		print '</a>';
@@ -501,6 +496,7 @@ if ($conf->global->DIGIRISKDOLIBARR_TICKET_ENABLE_PUBLIC_INTERFACE == 1) {
 
 	//Envoi d'emails automatique
 	print '<tr class="oddeven"><td>' . $langs->transnoentities("SendEmailOnTicketSubmit") . '</td>';
+	print '<td class="center"></td>';
 	print '<td class="center">';
 	print ajax_constantonoff('DIGIRISKDOLIBARR_SEND_EMAIL_ON_TICKET_SUBMIT');
 	print '</td>';
@@ -520,6 +516,7 @@ if ($conf->global->DIGIRISKDOLIBARR_TICKET_ENABLE_PUBLIC_INTERFACE == 1) {
     print '<input type="hidden" name="page_y">';
 
 	print '<tr class="oddeven"><td>' . $langs->transnoentities("SendEmailTo") . '</td>';
+	print '<td class="center"></td>';
 	print '<td class="center">';
 	print '<input name="emails" id="emails" value="' . $conf->global->DIGIRISKDOLIBARR_TICKET_SUBMITTED_SEND_MAIL_TO . '">';
 	print '</td>';
@@ -533,6 +530,9 @@ if ($conf->global->DIGIRISKDOLIBARR_TICKET_ENABLE_PUBLIC_INTERFACE == 1) {
 	print '</form>';
 
 	print '</div>';
+
+	// Click on a tuto image to display it full size
+	digiriskdolibarr_tuto_overlay();
 
     // Multi company ticket public interface config
     print load_fiche_titre($langs->transnoentities('MultiCompanyTicketPublicInterfaceConfig'), '', '');
