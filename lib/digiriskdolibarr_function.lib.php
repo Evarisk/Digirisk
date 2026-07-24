@@ -427,7 +427,7 @@ function display_recurse_tree($digiriskElementTree, $i = 1)
                 <span class="open-media-gallery add-media modal-open photo-container digirisk-element-photo-<?php echo $obj->id; ?>" value="0">
                     <input type="hidden" class="modal-options" data-modal-to-open="media_gallery" data-from-id="<?php echo $obj->id; ?>" data-from-type="<?php echo $type; ?>" data-from-subtype="photo" data-from-subdir="" data-photo-class="digirisk-element-photo-<?php echo $obj->id; ?>"/>
                     <?php
-                    $mediaOutput = saturne_show_medias_linked('digiriskdolibarr', $conf->digiriskdolibarr->multidir_output[$conf->entity] . '/' . $type . '/' . $obj->ref, 'small', 1, 0, 0, 0, 40, 40, 1, 0, 0, $type . '/' . $obj->ref, $obj, 'photo', 0, 0, 0, 1, 'cursorpointer');
+                    $mediaOutput = saturne_show_medias_linked('digiriskdolibarr', $conf->digiriskdolibarr->multidir_output[$conf->entity] . '/' . $type . '/' . $obj->ref, 'small', 1, 0, 0, 0, 40, 40, 1, 0, 0, $type . '/' . $obj->ref, $obj, 'photo', 0, 0, 1, 1, 'cursorpointer');
                     if (strpos($mediaOutput, 'nophoto.png') !== false) {
                         print '<svg class="nophoto-placeholder" width="40" height="40" viewBox="0 0 40 40" fill="none" xmlns="http://www.w3.org/2000/svg"><rect width="40" height="40" rx="6" fill="#f0f0f0"/><path d="M20 16a3 3 0 100 6 3 3 0 000-6z" fill="#bbb"/><path d="M14 13h3l1.5-2h3l1.5 2h3a2 2 0 012 2v10a2 2 0 01-2 2H14a2 2 0 01-2-2V15a2 2 0 012-2z" stroke="#bbb" stroke-width="1.5" fill="none"/></svg>';
                     } else {
@@ -501,7 +501,7 @@ function display_recurse_tree_organization($digiriskElementTree, $i = 1, $riskIn
 
                         <div class="photo-container">
                             <?php
-                            $mediaOutput = saturne_show_medias_linked('digiriskdolibarr', $conf->digiriskdolibarr->multidir_output[$conf->entity] . '/' . $obj->element_type . '/' . $obj->ref, 'small', 1, 0, 0, 0, 40, 40, 1, 0, 0, $obj->element_type . '/' . $obj->ref, $obj, 'photo', 0, 0, 0, 1, 'cursorpointer');
+                            $mediaOutput = saturne_show_medias_linked('digiriskdolibarr', $conf->digiriskdolibarr->multidir_output[$conf->entity] . '/' . $obj->element_type . '/' . $obj->ref, 'small', 1, 0, 0, 0, 40, 40, 1, 0, 0, $obj->element_type . '/' . $obj->ref, $obj, 'photo', 0, 0, 1, 1, 'cursorpointer');
                             if (strpos($mediaOutput, 'nophoto.png') !== false) {
                                 print '<svg class="nophoto-placeholder" width="40" height="40" viewBox="0 0 40 40" fill="none" xmlns="http://www.w3.org/2000/svg"><rect width="40" height="40" rx="6" fill="#f0f0f0"/><path d="M20 16a3 3 0 100 6 3 3 0 000-6z" fill="#bbb"/><path d="M14 13h3l1.5-2h3l1.5 2h3a2 2 0 012 2v10a2 2 0 01-2 2H14a2 2 0 01-2-2V15a2 2 0 012-2z" stroke="#bbb" stroke-width="1.5" fill="none"/></svg>';
                             } else {
