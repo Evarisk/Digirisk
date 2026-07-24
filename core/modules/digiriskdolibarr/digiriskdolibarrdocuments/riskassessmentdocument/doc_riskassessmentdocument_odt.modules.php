@@ -301,6 +301,10 @@ class doc_riskassessmentdocument_odt extends ModeleODTDigiriskDolibarrDocument
                 $tmpArray[$entityTag . $totalNbRiskByRiskAssessmentCotationType[$riskAssessmentCotationType]['tmpArrayName']] = $totalNbRiskByRiskAssessmentCotationType[$riskAssessmentCotationType]['value'] ?: 0; // Total number by cotation type
             }
 
+            // Drop the segment-only picto left by the loop above: at document level it would register the
+            // last category image a second time and duplicate its entry in the ODT manifest (invalid ODF)
+            unset($tmpArray['picto']);
+
             static::setTmpArrayVars($tmpArray, $odfHandler, $outputLangs, false);
         }
     }
@@ -403,6 +407,10 @@ class doc_riskassessmentdocument_odt extends ModeleODTDigiriskDolibarrDocument
             foreach ($riskAssessmentCotationTypes as $riskAssessmentCotationType) {
                 $tmpArray[$entityTag . $totalNbRiskByRiskAssessmentCotationType[$riskAssessmentCotationType]['tmpArrayName']] = $totalNbRiskByRiskAssessmentCotationType[$riskAssessmentCotationType]['value'] ?: 0; // Total number by cotation type
             }
+
+            // Drop the segment-only picto left by the loop above: at document level it would register the
+            // last category image a second time and duplicate its entry in the ODT manifest (invalid ODF)
+            unset($tmpArray['picto']);
 
             static::setTmpArrayVars($tmpArray, $odfHandler, $outputLangs, false);
         }
