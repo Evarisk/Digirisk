@@ -119,10 +119,24 @@ $dtc-title:       #111827;
 
         // Field labels
         td.titlefield,
-        td.titlefieldmiddle {
+        td.titlefieldmiddle,
+        td.dtc-reg-label {
             color: $dtc-grey;
             font-weight: 500;
         }
+
+        // Per-field picto (#4885) — fixed width so every label text starts on the same column.
+        .dtc-field-picto {
+            display: inline-block;
+            width: 16px;
+            margin-right: 6px;
+            text-align: center;
+            color: $dtc-blue;
+            opacity: .75;
+            flex: 0 0 auto;
+        }
+        // .dtc-head is a flex row with its own gap — the margin would double the spacing.
+        .dtc-head .dtc-field-picto { margin-right: 0; }
 
         // Nested helper tables (label + edit pencil) stay transparent
         table.nobordernopadding,
@@ -136,24 +150,27 @@ $dtc-title:       #111827;
         table.nobordernopadding td.nowrap { color: $dtc-grey; font-weight: 500; }
     }
 
-    // ---- Registres table: locked 15/35/15/35% column widths via CSS (never rely on inline styles) ----
+    // ---- Registres table: locked column widths (#4885) ----
+    // Widths live on the <colgroup>, not on nth-child: the first row of the table is the
+    // colspan=4 section header, so with table-layout:fixed the browser would size the columns
+    // from that single cell (four equal columns) and the label/value pairs would drift apart.
+    // <col> widths take precedence and also survive the colspan=3 rows at the bottom.
     table.dtc-registres-table {
         table-layout: fixed;
         width: 100%;
 
-        > tbody > tr > td:nth-child(1),
-        > tbody > tr > td:nth-child(3) {
-            width: 15%;
+        > colgroup > col.dtc-reg-col-label { width: 22%; }
+        > colgroup > col.dtc-reg-col-value { width: 28%; }
+
+        // Labels stay on one line so the value column always starts at the same offset.
+        > tbody > tr > td.dtc-reg-label {
             white-space: nowrap;
-        }
-        > tbody > tr > td:nth-child(2),
-        > tbody > tr > td:nth-child(4) {
-            width: 35%;
+            overflow: hidden;
+            text-overflow: ellipsis;
         }
 
         // Value cells must clip overflowing content (long combobox etc.)
-        > tbody > tr > td:nth-child(2),
-        > tbody > tr > td:nth-child(4) {
+        > tbody > tr > td:not(.dtc-reg-label) {
             overflow: hidden;
         }
 
