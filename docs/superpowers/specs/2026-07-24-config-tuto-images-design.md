@@ -71,6 +71,16 @@ Script Playwright par page, avec dans tous les cas :
 effectif (`naturalWidth`), présence de `alt`, nombre de colonnes du tableau, unicité de l'overlay dans
 le DOM, ouverture au clic et fermeture au clic et à l'Échap.
 
+## Portée retenue au sein d'une page
+
+La colonne *Image* est ajoutée aux **tableaux de réglages** (bascules et valeurs). Les listes de
+gestion (catégories de tickets, extrafields), les formulaires de saisie d'URL et les blocs de
+numérotation gardent leur structure : ce ne sont pas des réglages à illustrer.
+
+Un réglage sans zone d'interface observable garde une cellule vide plutôt qu'une capture
+approximative. C'est le cas des envois d'e-mails (Registre SST) et du captcha, ce dernier
+n'apparaissant sur les pages publiques qu'une fois activé.
+
 ## Points ouverts
 
 `DIGIRISKDOLIBARR_TICKET_KANBAN_LOG_DEADLINE` est proposée dans la configuration du Kanban tickets
