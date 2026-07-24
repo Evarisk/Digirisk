@@ -23,6 +23,9 @@ ModuleDigiriskdolibarrName = Digirisk
 # Module description 'ModuleDigiriskdolibarrDesc'
 ModuleDigiriskdolibarrDesc = Digirisk pour Dolibarr
 
+# Module Saturne manquant
+SaturneModuleMissing = Le module Saturne est requis par Digirisk. Téléchargez-le gratuitement sur le Dolistore (https://dolistore.com/fr/modules/1906-Saturne.html) et installez-le avant d'activer Digirisk.
+
 #
 # Page d'administration
 #

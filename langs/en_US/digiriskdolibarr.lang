@@ -192,3 +192,6 @@ ConfirmMassValidateTasksQuestion = Are you sure you want to validate the %s sele
 ConfirmMassChangeTasksProjectQuestion = Are you sure you want to attach the %s selected task(s) to the chosen project?
 MassValidateTasksSuccess = %s task(s) validated out of %s selected
 MassChangeTasksProjectSuccess = %s task(s) attached to project %s
+
+# Missing Saturne module
+SaturneModuleMissing = The Saturne module is required by Digirisk. Download it for free on the Dolistore (https://dolistore.com/en/modules/1906-Saturne.html) and install it before enabling Digirisk.
