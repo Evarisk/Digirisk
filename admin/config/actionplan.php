@@ -96,20 +96,25 @@ print '<table class="noborder centpercent">';
 print '<tr class="liste_titre">';
 print '<td>' . $langs->trans("Name") . '</td>';
 print '<td>' . $langs->trans("Description") . '</td>';
+print '<td class="center">' . $langs->trans("ActionPlanLogTuto") . '</td>';
 print '<td class="center">' . $langs->trans("Status") . '</td>';
 print '</tr>';
 
+// Each entry: constant => [label key, description key, tuto image name in img/actionplan_log/]
 $actionPlanLogs = [
-    'DIGIRISKDOLIBARR_ACTIONPLAN_LOG_LABEL'              => ['ActionPlanLogLabel', 'ActionPlanLogLabelDesc'],
-    'DIGIRISKDOLIBARR_ACTIONPLAN_LOG_WORKLOAD'            => ['ActionPlanLogWorkload', 'ActionPlanLogWorkloadDesc'],
-    'DIGIRISKDOLIBARR_ACTIONPLAN_LOG_BUDGET'              => ['ActionPlanLogBudget', 'ActionPlanLogBudgetDesc'],
-    'DIGIRISKDOLIBARR_ACTIONPLAN_LOG_CONTRIBUTOR_ADD'      => ['ActionPlanLogContributorAdd', 'ActionPlanLogContributorAddDesc'],
-    'DIGIRISKDOLIBARR_ACTIONPLAN_LOG_CONTRIBUTOR_REMOVE'   => ['ActionPlanLogContributorRemove', 'ActionPlanLogContributorRemoveDesc'],
-    'DIGIRISKDOLIBARR_ACTIONPLAN_LOG_PROGRESS'             => ['ActionPlanLogProgress', 'ActionPlanLogProgressDesc'],
-    'DIGIRISKDOLIBARR_ACTIONPLAN_LOG_TAG'                  => ['ActionPlanLogTag', 'ActionPlanLogTagDesc'],
-    'DIGIRISKDOLIBARR_ACTIONPLAN_LOG_DATE_START'           => ['ActionPlanLogDateStart', 'ActionPlanLogDateStartDesc'],
-    'DIGIRISKDOLIBARR_ACTIONPLAN_LOG_DATE_END'             => ['ActionPlanLogDateEnd', 'ActionPlanLogDateEndDesc'],
+    'DIGIRISKDOLIBARR_ACTIONPLAN_LOG_LABEL'              => ['ActionPlanLogLabel', 'ActionPlanLogLabelDesc', 'label'],
+    'DIGIRISKDOLIBARR_ACTIONPLAN_LOG_WORKLOAD'            => ['ActionPlanLogWorkload', 'ActionPlanLogWorkloadDesc', 'workload'],
+    'DIGIRISKDOLIBARR_ACTIONPLAN_LOG_BUDGET'              => ['ActionPlanLogBudget', 'ActionPlanLogBudgetDesc', 'budget'],
+    'DIGIRISKDOLIBARR_ACTIONPLAN_LOG_CONTRIBUTOR_ADD'      => ['ActionPlanLogContributorAdd', 'ActionPlanLogContributorAddDesc', 'contributor_add'],
+    'DIGIRISKDOLIBARR_ACTIONPLAN_LOG_CONTRIBUTOR_REMOVE'   => ['ActionPlanLogContributorRemove', 'ActionPlanLogContributorRemoveDesc', 'contributor_remove'],
+    'DIGIRISKDOLIBARR_ACTIONPLAN_LOG_PROGRESS'             => ['ActionPlanLogProgress', 'ActionPlanLogProgressDesc', 'progress'],
+    'DIGIRISKDOLIBARR_ACTIONPLAN_LOG_TAG'                  => ['ActionPlanLogTag', 'ActionPlanLogTagDesc', 'tag'],
+    'DIGIRISKDOLIBARR_ACTIONPLAN_LOG_DATE_START'           => ['ActionPlanLogDateStart', 'ActionPlanLogDateStartDesc', 'date_start'],
+    'DIGIRISKDOLIBARR_ACTIONPLAN_LOG_DATE_END'             => ['ActionPlanLogDateEnd', 'ActionPlanLogDateEndDesc', 'date_end'],
 ];
+
+$tutoDir = dol_buildpath('/digiriskdolibarr/img/actionplan_log/', 0);
+$tutoUrl = dol_buildpath('/digiriskdolibarr/img/actionplan_log/', 1);
 
 foreach ($actionPlanLogs as $constName => $transKeys) {
     print '<tr class="oddeven"><td>';
@@ -118,12 +123,49 @@ foreach ($actionPlanLogs as $constName => $transKeys) {
     print $langs->trans($transKeys[1]);
     print '</td>';
     print '<td class="center">';
+    // Tuto image is optional: show nothing rather than a broken image when the file is missing
+    if (dol_is_file($tutoDir . $transKeys[2] . '.png')) {
+        print '<img class="actionplan-log-tuto" loading="lazy" src="' . $tutoUrl . $transKeys[2] . '.png" alt="' . dol_escape_htmltag($langs->trans($transKeys[0])) . '">';
+    }
+    print '</td>';
+    print '<td class="center">';
     print ajax_constantonoff($constName);
     print '</td>';
     print '</tr>';
 }
 
 print '</table>';
+
+// Click on a tuto image to display it full size
+print '<style>
+.actionplan-log-tuto { width: 150px; max-width: 100%; border: 1px solid #ddd; border-radius: 4px; cursor: zoom-in; vertical-align: middle; }
+.actionplan-log-tuto-overlay { display: none; position: fixed; inset: 0; z-index: 1200; background: rgba(0, 0, 0, .7); cursor: zoom-out; }
+.actionplan-log-tuto-overlay.opened { display: flex; align-items: center; justify-content: center; }
+.actionplan-log-tuto-overlay img { max-width: 90vw; max-height: 90vh; border-radius: 4px; box-shadow: 0 4px 24px rgba(0, 0, 0, .5); }
+</style>';
+
+print '<div class="actionplan-log-tuto-overlay"><img src="" alt=""></div>';
+
+print '<script>
+jQuery(document).ready(function() {
+    var overlay = jQuery(".actionplan-log-tuto-overlay");
+
+    jQuery(".actionplan-log-tuto").on("click", function() {
+        overlay.find("img").attr("src", jQuery(this).attr("src")).attr("alt", jQuery(this).attr("alt"));
+        overlay.addClass("opened");
+    });
+
+    overlay.on("click", function() {
+        overlay.removeClass("opened");
+    });
+
+    jQuery(document).on("keydown", function(event) {
+        if (event.key === "Escape") {
+            overlay.removeClass("opened");
+        }
+    });
+});
+</script>';
 
 // Kanban display settings
 print '<br>';
