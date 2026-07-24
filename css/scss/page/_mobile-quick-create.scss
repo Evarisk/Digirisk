@@ -771,39 +771,221 @@ body.digirisk-mobile-create {
     cursor: pointer;
   }
 
-  /* Success screen */
+  /* Success screen — reads as the receipt of a filed document: the reference is the anchor,
+     then what already happened, then the QR code handed round on site. */
   .digirisk-mobile-success {
-    text-align: center;
+    padding: 16px 14px;
+    border-top: 3px solid #16a34a;
 
-    &__icon {
-      font-size: 48px;
+    &__eyebrow {
+      display: flex;
+      align-items: center;
+      gap: 6px;
+      font-size: 11px;
+      font-weight: 700;
+      letter-spacing: 0.08em;
+      text-transform: uppercase;
       color: #16a34a;
     }
 
-    &__title {
-      font-size: 17px;
-      font-weight: 700;
-      color: #1e293b;
-      margin: 10px 0 4px;
-    }
-
     &__ref {
-      font-size: 15px;
+      margin-top: 6px;
+      font-family: ui-monospace, SFMono-Regular, "SF Mono", Menlo, Consolas, monospace;
+      font-size: 30px;
       font-weight: 700;
-      color: #2b7de9;
-      margin-bottom: 10px;
+      line-height: 1.1;
+      letter-spacing: 0.04em;
+      color: #0f172a;
+      word-break: break-all;
     }
 
-    &__text {
+    &__label {
+      margin-top: 4px;
       font-size: 13px;
-      color: #475569;
-      margin-bottom: 14px;
+      line-height: 1.4;
+      color: #64748b;
+    }
+
+    &__facts {
+      list-style: none;
+      margin: 14px 0 0;
+      padding: 12px 0 0;
+      border-top: 1px solid #e2e8f0;
+
+      li {
+        display: flex;
+        align-items: flex-start;
+        gap: 8px;
+        font-size: 13px;
+        line-height: 1.45;
+        color: #334155;
+
+        + li {
+          margin-top: 8px;
+        }
+      }
+
+      i {
+        flex-shrink: 0;
+        margin-top: 2px;
+        font-size: 13px;
+        color: #16a34a;
+      }
     }
 
     &__actions {
       display: flex;
-      flex-direction: column;
       gap: 8px;
+
+      .digirisk-mobile-success__button {
+        flex: 1;
+      }
+    }
+
+    &__button {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 8px;
+      padding: 12px;
+      font-size: 14px;
+      font-weight: 600;
+      text-decoration: none;
+      color: #334155;
+      background: #ffffff;
+      border: 1px solid #cbd5e1;
+      border-radius: 9px;
+
+      i {
+        font-size: 13px;
+        color: #64748b;
+      }
+
+      &:hover {
+        border-color: #94a3b8;
+        color: #0f172a;
+      }
+
+      &--primary {
+        margin-top: 12px;
+        color: #ffffff;
+        background: #2b7de9;
+        border-color: #2b7de9;
+
+        i {
+          color: #ffffff;
+        }
+
+        &:hover {
+          color: #ffffff;
+          background: #1b5fc1;
+          border-color: #1b5fc1;
+        }
+      }
+    }
+  }
+
+  /* Share the spread: the QR code is the point of the screen — on site, people scan it there and then */
+  .digirisk-mobile-share {
+    padding: 16px 14px;
+
+    &__title {
+      font-size: 11px;
+      font-weight: 700;
+      letter-spacing: 0.08em;
+      text-transform: uppercase;
+      color: #2b7de9;
+    }
+
+    &__text {
+      margin-top: 6px;
+      font-size: 13px;
+      line-height: 1.45;
+      color: #475569;
+    }
+
+    &__qr {
+      display: flex;
+      justify-content: center;
+      margin: 16px 0;
+    }
+
+    /* Corner brackets read as a scanner viewfinder: they say "point a camera here" */
+    &__qr-frame {
+      position: relative;
+      width: 200px;
+      max-width: 100%;
+      padding: 14px;
+      background: #ffffff;
+      box-sizing: border-box;
+
+      &::before,
+      &::after {
+        content: "";
+        position: absolute;
+        width: 22px;
+        height: 22px;
+        border: 3px solid #2b7de9;
+      }
+
+      &::before {
+        top: 0;
+        left: 0;
+        border-right: none;
+        border-bottom: none;
+        border-radius: 6px 0 0 0;
+      }
+
+      &::after {
+        right: 0;
+        bottom: 0;
+        border-top: none;
+        border-left: none;
+        border-radius: 0 0 6px 0;
+      }
+
+      svg {
+        display: block;
+      }
+    }
+
+    &__link {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      overflow: hidden;
+      padding: 9px 11px;
+      background: #f8fafc;
+      border: 1px solid #e2e8f0;
+      border-radius: 9px;
+
+      a {
+        flex: 1 1 auto;
+        min-width: 0;
+        overflow: hidden;
+        white-space: nowrap;
+        text-overflow: ellipsis;
+        font-size: 12px;
+        color: #475569;
+        text-decoration: none;
+      }
+
+      .copy-signatureurl {
+        flex-shrink: 0;
+        padding: 2px;
+        font-size: 15px;
+        color: #2b7de9;
+        cursor: pointer;
+      }
+    }
+
+    .copied-to-clipboard {
+      display: block;
+      margin-top: 6px;
+      font-size: 12px;
+      font-weight: 600;
+      color: #16a34a;
+      text-align: center;
     }
   }
 }

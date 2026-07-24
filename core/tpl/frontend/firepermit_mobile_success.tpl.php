@@ -24,17 +24,23 @@
 
 global $langs;
 
-$cardUrl = dol_buildpath('/custom/digiriskdolibarr/view/firepermit/firepermit_card.php', 1) . '?id=' . $object->id;
-?>
-<div class="pwa-container digirisk-mobile">
-    <div class="digirisk-mobile-card digirisk-mobile-success">
-        <i class="fas fa-check-circle digirisk-mobile-success__icon"></i>
-        <div class="digirisk-mobile-success__title"><?php print $langs->trans('MobileFPSuccessTitle'); ?></div>
-        <div class="digirisk-mobile-success__ref"><?php print dol_escape_htmltag($object->ref); ?></div>
-        <div class="digirisk-mobile-success__text"><?php print $langs->trans('MobilePPSuccessText'); ?></div>
-        <div class="digirisk-mobile-success__actions">
-            <a class="wpeo-button button-blue" href="<?php print $cardUrl; ?>"><i class="fas fa-eye"></i> <?php print $langs->trans('MobileFPViewPermit'); ?></a>
-            <a class="wpeo-button button-grey" href="<?php print $_SERVER['PHP_SELF']; ?>"><i class="fas fa-plus-circle"></i> <?php print $langs->trans('MobileFPCreateAnother'); ?></a>
-        </div>
-    </div>
-</div>
+$successTitle = $langs->trans('MobileFPSuccessTitle');
+$successRef   = $object->ref;
+$successLabel = $object->label;
+$successFacts = [
+    $langs->trans('MobileSuccessInteriorSigned'),
+    $langs->trans('MobileSuccessExteriorNotified'),
+];
+
+// Public spread page, shareable straight away with the people who have to join and sign this permit.
+// Only relevant when DoliLetter (which serves the spread public page) is enabled.
+$successShareUrl = isModEnabled('doliletter')
+    ? dol_buildpath('/custom/doliletter/public/spread/add_spread.php', 3) . '?id=' . $object->id . '&object_type=digiriskdolibarr_firepermit'
+    : '';
+
+$successViewUrl   = dol_buildpath('/custom/digiriskdolibarr/view/firepermit/firepermit_card.php', 1) . '?id=' . $object->id;
+$successViewLabel  = $langs->trans('MobileFPViewPermit');
+$successAgainUrl   = $_SERVER['PHP_SELF'];
+$successAgainLabel = $langs->trans('MobileFPCreateAnother');
+
+require __DIR__ . '/digiriskdolibarr_mobile_success.tpl.php';
