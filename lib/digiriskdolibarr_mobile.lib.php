@@ -209,3 +209,38 @@ function digiriskGetCertificationOptions(): array
         'PONTIER'           => 'Pontier élingueur',
     ];
 }
+
+/**
+ * Build a QR code as inline SVG, ready to be dropped in an HTML page.
+ *
+ * Inline rather than a generated file: the mobile interfaces are shown right after a creation,
+ * on site, and must not depend on an extra request to display the code people scan.
+ *
+ * @param  string $data  Content to encode
+ * @param  string $color Foreground colour of the modules
+ * @return string        SVG markup scaling to its container, empty string when nothing to encode
+ */
+function digiriskGetQrCodeSvg(string $data, string $color = '#0f172a'): string
+{
+    if (!dol_strlen($data)) {
+        return '';
+    }
+
+    require_once DOL_DOCUMENT_ROOT . '/includes/tecnickcom/tcpdf/tcpdf_barcodes_2d.php';
+
+    $barcode = new TCPDF2DBarcode($data, 'QRCODE,M');
+
+    // One user unit per module, so the viewBox added below maps to the module grid
+    $svg = $barcode->getBarcodeSVGcode(1, 1, $color);
+
+    // TCPDF returns a standalone document: drop the XML prolog and the DOCTYPE, which are invalid inline
+    $svg = preg_replace('/^.*?(?=<svg)/s', '', $svg);
+
+    // Swap the fixed pixel size for a viewBox so CSS drives the rendered size
+    return preg_replace(
+        '/<svg width="([\d.]+)" height="([\d.]+)"/',
+        '<svg viewBox="0 0 $1 $2" width="100%" height="100%" preserveAspectRatio="xMidYMid meet" focusable="false" aria-hidden="true"',
+        $svg,
+        1
+    );
+}
