@@ -1604,6 +1604,8 @@ DataMigrationImportGlobal                    = Importation des données globales
 DataMigrationImportGlobalDescription         = Importation des données globales de Digirisk WordPress au format ZIP <br> (Arborescence, risques et signalisations)
 DataMigrationExportGlobal                    = Exportation des données globales de Digirisk <br> (Arborescence, risques et signalisations)
 DataMigrationExportGlobalDescription         = Exportation des données globales de Digirisk Dolibarr au format ZIP <br> (Arborescence, risques et signalisations)
+DataMigrationExportTree                      = Exportation de l'arborescence de Digirisk <br> (Arborescence uniquement)
+DataMigrationExportTreeDescription           = Exportation de l'arborescence de Digirisk Dolibarr au format ZIP <br> (GP/UT visibles de l'entité courante, sans les risques ni les signalisations)
 DataMigrationImportGlobalDolibarrDescription = Importation des données globales de Digirisk Dolibarr au format ZIP <br> (Arborescence, risques et signalisations)
 DataMigrationTreeAlreadyImported             = Importation des données de l'arborescence déjà réalisée
 DataMigrationRisksAlreadyImported            = Importation des données des risques déjà réalisée
@@ -1902,6 +1904,17 @@ TicketKanbanLogDeadline                = Modification de la date limite
 TicketKanbanLogDeadlineDesc            = Créer un événement lorsque la date limite d'un ticket est modifiée via le kanban
 TicketKanbanClosedLimit                = Limite tickets fermés
 TicketKanbanClosedLimitDesc            = Nombre maximum de tickets fermés/annulés affichés dans le kanban (0 = illimité)
+
+# ===========================================================================
+# Ticket — traçabilité des modifications — issue #4885
+# ===========================================================================
+TicketLogModifications                 = Traçabilité des modifications
+TicketLogModificationsDesc             = Créer un événement pour chaque édition faite depuis la fiche ticket (sujet, message, registres, assigné, tiers, projet, avancement, statut, tâches, documents)
+TicketMessageEdited                    = Message modifié
+TicketMessageDeleted                   = Message supprimé
+TicketTaskCreated                      = Tâche créée : %s
+TicketDocumentGenerated                = Document généré
+TicketFileDeleted                      = Fichier supprimé
 
 # Drawer de création rapide de ticket
 SelectNothing                          = — Sélectionner —
