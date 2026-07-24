@@ -453,18 +453,15 @@ class TicketDashboard extends DigiriskDolibarrDashboard
             ];
         }
 
+        // Chaque ligne doit compter exactement une valeur par catégorie, dans l'ordre des libellés :
+        // une ligne plus courte déclenche des warnings "Undefined array key" dans DolGraph et décale les séries
         foreach ($digiriskElements as $digiriskElement) {
-            $array['data'][$digiriskElement->id][0] = $digiriskElement->ref . ' - ' . $digiriskElement->label;
-            if (!isset($ticketByCategoriesAndDigiriskElements[$digiriskElement->id])) {
-                continue;
+            $data = [$digiriskElement->ref . ' - ' . $digiriskElement->label];
+            foreach ($categories as $category) {
+                $data[] = $ticketByCategoriesAndDigiriskElements[$digiriskElement->id][$category->id] ?? 0;
             }
 
-            $array['data'][$digiriskElement->id] = $array['data'][$digiriskElement->id] + $ticketByCategoriesAndDigiriskElements[$digiriskElement->id];
-            $array['data'][$digiriskElement->id] = array_values($array['data'][$digiriskElement->id]);
-
-            if (count($array['data'][$digiriskElement->id]) - 1 < count($categories)) {
-                $array['data'][$digiriskElement->id] = array_pad($array['data'][$digiriskElement->id], count($categories) + 1, 0);
-            }
+            $array['data'][$digiriskElement->id] = $data;
         }
 
         return $array;
