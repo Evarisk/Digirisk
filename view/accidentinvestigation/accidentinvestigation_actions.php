@@ -93,16 +93,23 @@ if ($action === 'addAction' && $permissiontoadd) {
     $object->fetch($id);
     $accident->fetch($object->fk_accident);
 
+    // Actions are grouped under the T1/T2 container task created when the investigation is validated
+    $containerTaskId = getAccidentInvestigationActionContainerTask($db, (int) $object->fk_task, $action_type);
+
+    // Each section renders its own form, so field names are suffixed with the action type
+    $deadlinePrefix = 'actiondeadline' . $action_type;
+
     $newTask                 = new Task($db);
     $newTask->fk_project     = $accident->fk_project;
-    $newTask->fk_task_parent = (int) $object->fk_task;
+    $newTask->fk_task_parent = $containerTaskId > 0 ? $containerTaskId : (int) $object->fk_task;
     $newTask->ref            = $modTask->getNextValue(0, $newTask);
     $newTask->label          = GETPOST('action_label', 'alphanohtml');
-    $newTask->datee          = dol_mktime(
+    // Task::create() only writes date_end, the datee property is deprecated and ignored
+    $newTask->date_end       = dol_mktime(
         23, 59, 59,
-        GETPOST('actiondeadlinemonth', 'int'),
-        GETPOST('actiondeadlineday',   'int'),
-        GETPOST('actiondeadlineyear',  'int')
+        GETPOST($deadlinePrefix . 'month', 'int'),
+        GETPOST($deadlinePrefix . 'day',   'int'),
+        GETPOST($deadlinePrefix . 'year',  'int')
     );
     $newTask->progress       = 0;
 
@@ -112,7 +119,7 @@ if ($action === 'addAction' && $permissiontoadd) {
 
     $result = $newTask->create($user);
     if ($result > 0) {
-        $assignedUser = GETPOST('assigned_user', 'int');
+        $assignedUser = GETPOST('assigned_user' . $action_type, 'int');
         if ($assignedUser > 0) {
             $newTask->add_contact($assignedUser, 'TASKEXECUTIVE', 'internal');
         }
@@ -332,12 +339,14 @@ if ($id > 0 || !empty($ref)) {
 
                 print '<td style="width:20%">';
                 print '<label>' . $langs->trans('ActionDeadline') . '</label><br>';
-                print $form->selectDate('', 'actiondeadline', 0, 0, 1, 'addActionForm' . $type);
+                // Prefix suffixed with the type: both sections are rendered on the same page and
+                // the datepicker fills its hidden day/month/year fields through getElementById
+                print $form->selectDate('', 'actiondeadline' . $type, 0, 0, 1, 'addActionForm' . $type);
                 print '</td>';
 
                 print '<td style="width:24%">';
                 print '<label>' . $langs->trans('ActionAssignedTo') . '</label><br>';
-                print $form->select_dolusers('', 'assigned_user', 1, null, 0, '', '', 0, 0, 0, '', 0, '', 'maxwidth200');
+                print $form->select_dolusers('', 'assigned_user' . $type, 1, null, 0, '', '', 0, 0, 0, '', 0, '', 'maxwidth200');
                 print '</td>';
 
                 print '<td style="vertical-align:bottom;white-space:nowrap">';
