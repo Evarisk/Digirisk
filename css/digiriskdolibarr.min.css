@@ -6481,6 +6481,26 @@ body.digirisk-mobile-create .digirisk-mobile-siren-row .digirisk-mobile-siren-se
   font-size: 13px;
   line-height: 1;
 }
+body.digirisk-mobile-create {
+  /* "or fill in the details" between the third party picker and the manual fields */
+}
+body.digirisk-mobile-create .digirisk-mobile-separator {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  margin: 10px 0 8px;
+  font-size: 11px;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.03em;
+  color: #94a3b8;
+}
+body.digirisk-mobile-create .digirisk-mobile-separator::before, body.digirisk-mobile-create .digirisk-mobile-separator::after {
+  content: "";
+  flex: 1;
+  height: 1px;
+  background: #e2e8f0;
+}
 body.digirisk-mobile-create .digirisk-mobile-siren-result {
   font-size: 12px;
   margin: 4px 0;
@@ -6586,6 +6606,207 @@ body.digirisk-mobile-create .digirisk-mobile-risk-item-delete {
   background: #fee2e2;
   color: #dc2626;
   cursor: pointer;
+}
+body.digirisk-mobile-create {
+  /* Prevention plan: each risk is a block holding its description, photos and protections.
+     The fire permit keeps the flat risk rows above, hence the dedicated list modifier. */
+}
+body.digirisk-mobile-create .digirisk-mobile-risk-list--blocks {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  margin-bottom: 10px;
+}
+body.digirisk-mobile-create .digirisk-mobile-risk-empty {
+  margin-bottom: 10px;
+  font-size: 13px;
+  color: #94a3b8;
+}
+body.digirisk-mobile-create {
+  /* EU / EE chip: the whole label lights up when its box is ticked */
+}
+body.digirisk-mobile-create .digirisk-mobile-risk-company {
+  display: inline-flex;
+  align-items: center;
+  gap: 3px;
+  padding: 2px 6px;
+  font-size: 11px;
+  font-weight: 700;
+  line-height: 1.4;
+  color: #64748b;
+  background: #ffffff;
+  border: 1px solid #cbd5e1;
+  border-radius: 999px;
+  cursor: pointer;
+}
+body.digirisk-mobile-create .digirisk-mobile-risk-company input {
+  width: 13px;
+  height: 13px;
+  margin: 0;
+}
+body.digirisk-mobile-create .digirisk-mobile-risk-company:has(input:checked) {
+  color: #1d4ed8;
+  border-color: #2b7de9;
+  background: #eff6ff;
+}
+body.digirisk-mobile-create {
+  /* Prior formalities */
+}
+body.digirisk-mobile-create .digirisk-mobile-check {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  font-size: 13px;
+  font-weight: 600;
+  color: #334155;
+  cursor: pointer;
+}
+body.digirisk-mobile-create .digirisk-mobile-check input {
+  width: 16px;
+  height: 16px;
+  margin: 0;
+}
+body.digirisk-mobile-create .digirisk-mobile-check + .digirisk-mobile-check {
+  margin-top: 10px;
+}
+body.digirisk-mobile-create .digirisk-mobile-prior-visit-detail {
+  margin-top: 8px;
+}
+body.digirisk-mobile-create .digirisk-mobile-prior-visit-detail textarea {
+  width: 100%;
+  box-sizing: border-box;
+  padding: 8px 10px;
+  font-size: 14px;
+  font-family: inherit;
+  border: 1px solid #cbd5e1;
+  border-radius: 7px;
+  background: #ffffff;
+  color: #1e293b;
+  resize: vertical;
+}
+body.digirisk-mobile-create .digirisk-mobile-prior-visit-detail textarea:focus {
+  outline: none;
+  border-color: #2b7de9;
+  box-shadow: 0 0 0 2px rgba(43, 125, 233, 0.2);
+}
+body.digirisk-mobile-create .digirisk-mobile-risk-block {
+  padding: 8px;
+  border: 1px solid #e2e8f0;
+  border-radius: 10px;
+  background: #f8fafc;
+}
+body.digirisk-mobile-create .digirisk-mobile-risk-block__header {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+body.digirisk-mobile-create .digirisk-mobile-risk-block__picto {
+  flex: 0 0 auto;
+  width: 36px;
+  height: 36px;
+  object-fit: contain;
+}
+body.digirisk-mobile-create .digirisk-mobile-risk-block__name {
+  flex: 1;
+  min-width: 0;
+  font-size: 14px;
+  font-weight: 700;
+  color: #1e293b;
+  overflow-wrap: anywhere;
+}
+body.digirisk-mobile-create .digirisk-mobile-risk-block {
+  /* EU / EE toggles, pinned to the right of the risk name */
+}
+body.digirisk-mobile-create .digirisk-mobile-risk-block__companies {
+  flex: 0 0 auto;
+  display: flex;
+  gap: 4px;
+}
+body.digirisk-mobile-create .digirisk-mobile-risk-block__delete {
+  flex: 0 0 auto;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 32px;
+  height: 32px;
+  border: none;
+  border-radius: 7px;
+  background: #fee2e2;
+  color: #dc2626;
+  cursor: pointer;
+}
+body.digirisk-mobile-create .digirisk-mobile-risk-block__label {
+  display: block;
+  margin-bottom: 4px;
+  font-size: 12px;
+  font-weight: 600;
+  color: #475569;
+}
+body.digirisk-mobile-create .digirisk-mobile-risk-block {
+  /* Description and photos on the same line, each dropping to its own once too narrow */
+}
+body.digirisk-mobile-create .digirisk-mobile-risk-block__main {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: flex-start;
+  gap: 8px;
+  margin-top: 8px;
+}
+body.digirisk-mobile-create .digirisk-mobile-risk-block__description {
+  flex: 1 1 150px;
+  min-width: 0;
+  box-sizing: border-box;
+  padding: 8px 10px;
+  font-size: 14px;
+  font-family: inherit;
+  border: 1px solid #cbd5e1;
+  border-radius: 7px;
+  color: #1e293b;
+  resize: vertical;
+}
+body.digirisk-mobile-create .digirisk-mobile-risk-block__description:focus {
+  outline: none;
+  border-color: #2b7de9;
+  box-shadow: 0 0 0 2px rgba(43, 125, 233, 0.2);
+}
+body.digirisk-mobile-create .digirisk-mobile-risk-block__photos {
+  flex: 0 1 auto;
+}
+body.digirisk-mobile-create .digirisk-mobile-risk-block__section {
+  margin-top: 8px;
+  padding-top: 8px;
+  border-top: 1px solid #e2e8f0;
+}
+body.digirisk-mobile-create .digirisk-mobile-risk-block {
+  /* The Saturne media block brings its own styles: only place it here and shrink its tiles,
+     so shooting, picking and the gallery still fit next to the description on a phone */
+}
+body.digirisk-mobile-create .digirisk-mobile-risk-block .linked-medias {
+  margin: 0;
+}
+body.digirisk-mobile-create .digirisk-mobile-risk-block .saturne-media-upload-block {
+  gap: 6px;
+}
+body.digirisk-mobile-create .digirisk-mobile-risk-block .saturne-upload-label,
+body.digirisk-mobile-create .digirisk-mobile-risk-block .saturne-media-gallery .open-media-editor-as-gallery {
+  width: 44px;
+  min-width: 44px;
+  height: 44px;
+  min-height: 44px;
+  border-radius: 9px;
+}
+body.digirisk-mobile-create .digirisk-mobile-risk-block .saturne-upload-label i,
+body.digirisk-mobile-create .digirisk-mobile-risk-block .saturne-media-gallery .open-media-editor-as-gallery i {
+  font-size: 17px;
+}
+body.digirisk-mobile-create .digirisk-mobile-risk-block .digirisk-mobile-protection-list {
+  margin-top: 0;
+}
+body.digirisk-mobile-create .digirisk-mobile-risk-block .digirisk-mobile-protection-list:not(:empty) {
+  margin-bottom: 8px;
+}
+body.digirisk-mobile-create .digirisk-mobile-risk-block .digirisk-mobile-protection-item {
+  border-bottom-color: #e2e8f0;
 }
 body.digirisk-mobile-create {
   /* Risk picker modal */
@@ -6762,6 +6983,48 @@ body.digirisk-mobile-create .digirisk-mobile-protection-modal__overlay {
   position: absolute;
   inset: 0;
   background: rgba(15, 23, 42, 0.6);
+}
+body.digirisk-mobile-create {
+  /* Delete confirmation, reusing the dialog and header of the picker modals */
+}
+body.digirisk-mobile-create .digirisk-mobile-confirm-modal {
+  position: fixed;
+  inset: 0;
+  z-index: 2100;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 12px;
+}
+body.digirisk-mobile-create .digirisk-mobile-confirm-modal.hidden {
+  display: none;
+}
+body.digirisk-mobile-create .digirisk-mobile-confirm-modal__overlay {
+  position: absolute;
+  inset: 0;
+  background: rgba(15, 23, 42, 0.6);
+}
+body.digirisk-mobile-create .digirisk-mobile-confirm-modal__body {
+  padding: 14px;
+  font-size: 14px;
+  color: #334155;
+}
+body.digirisk-mobile-create .digirisk-mobile-confirm-modal__actions {
+  display: flex;
+  justify-content: flex-end;
+  gap: 8px;
+  padding: 0 14px 14px;
+}
+body.digirisk-mobile-create .digirisk-mobile-confirm-modal__actions button {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  padding: 8px 14px;
+  font-size: 14px;
+  font-weight: 600;
+  border: none;
+  border-radius: 7px;
+  cursor: pointer;
 }
 body.digirisk-mobile-create .digirisk-mobile-protection-option {
   display: flex;
@@ -7147,6 +7410,38 @@ body.digirisk-mobile-create .digirisk-mobile-share .copied-to-clipboard {
 .digirisk-protections-view__comment {
   font-size: 12px;
   color: #64748b;
+}
+.digirisk-protections-view {
+  /* Photos taken for a risk from the mobile interface */
+}
+.digirisk-protections-view__photos {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+  margin-top: 6px;
+}
+.digirisk-protections-view__photos img {
+  width: 56px;
+  height: 56px;
+  object-fit: cover;
+  border: 1px solid #e2e8f0;
+  border-radius: 6px;
+}
+.digirisk-protections-view {
+  /* Protection (EPI) attached to the risk shown above it */
+}
+.digirisk-protections-view__subitem {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  margin-top: 6px;
+  font-size: 12px;
+  color: #475569;
+}
+.digirisk-protections-view__subitem img {
+  width: 28px;
+  height: 28px;
+  object-fit: contain;
 }
 
 /* Risk list title icon on the prevention plan card (matches the protections block icon) */

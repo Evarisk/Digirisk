@@ -51,22 +51,30 @@ if (!$user->hasRight('digiriskdolibarr', 'preventionplan', 'write') && !$user->h
     exit;
 }
 
-// Keep only digits: matches numbers stored with or without spaces/dots.
-$idProfClean = digiriskMobileCleanIdProf(GETPOST('siren', 'alphanohtml'));
+$sql = 'SELECT rowid, nom, email, siren, siret FROM ' . MAIN_DB_PREFIX . 'societe';
+$sql .= ' WHERE entity IN (' . getEntity('societe') . ')';
 
-if (!digiriskMobileIsValidIdProf($idProfClean)) {
-    echo json_encode(['success' => false, 'error' => 'InvalidSiren']);
-    exit;
+// Two ways in: the company was picked in the third party list, or its SIREN/SIRET was typed
+$socid = GETPOSTINT('socid');
+if ($socid > 0) {
+    $sql .= ' AND rowid = ' . $socid;
+} else {
+    // Keep only digits: matches numbers stored with or without spaces/dots.
+    $idProfClean = digiriskMobileCleanIdProf(GETPOST('siren', 'alphanohtml'));
+
+    if (!digiriskMobileIsValidIdProf($idProfClean)) {
+        echo json_encode(['success' => false, 'error' => 'InvalidSiren']);
+        exit;
+    }
+
+    // A SIRET starts with the SIREN of its company, so comparing the first 9 digits on both columns
+    // matches whichever of the two the user typed and whichever of the two the company has on file.
+    $sirenPart = substr($idProfClean, 0, 9);
+
+    $sql .= " AND (REPLACE(REPLACE(REPLACE(siren, ' ', ''), '.', ''), '-', '') = '" . $db->escape($sirenPart) . "'";
+    $sql .= "  OR LEFT(REPLACE(REPLACE(REPLACE(siret, ' ', ''), '.', ''), '-', ''), 9) = '" . $db->escape($sirenPart) . "')";
 }
 
-// A SIRET starts with the SIREN of its company, so comparing the first 9 digits on both columns
-// matches whichever of the two the user typed and whichever of the two the company has on file.
-$sirenPart = substr($idProfClean, 0, 9);
-
-$sql  = 'SELECT rowid, nom, email, siren, siret FROM ' . MAIN_DB_PREFIX . 'societe';
-$sql .= ' WHERE entity IN (' . getEntity('societe') . ')';
-$sql .= " AND (REPLACE(REPLACE(REPLACE(siren, ' ', ''), '.', ''), '-', '') = '" . $db->escape($sirenPart) . "'";
-$sql .= "  OR LEFT(REPLACE(REPLACE(REPLACE(siret, ' ', ''), '.', ''), '-', ''), 9) = '" . $db->escape($sirenPart) . "')";
 $sql .= ' ORDER BY rowid ASC';
 
 $resql = $db->query($sql);

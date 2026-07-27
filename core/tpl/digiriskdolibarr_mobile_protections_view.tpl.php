@@ -29,8 +29,13 @@ require_once __DIR__ . '/../../lib/digiriskdolibarr_mobile.lib.php';
 
 $object->fetch_optionals();
 
-// Protections (EPI)
+// Protections (EPI). The ones tied to a risk are displayed with their risk, not here.
 $mobileProtections = !empty($object->array_options['options_mobile_protections']) ? json_decode($object->array_options['options_mobile_protections'], true) : [];
+if (is_array($mobileProtections)) {
+    $mobileProtections = array_filter($mobileProtections, function ($mobileProtection) {
+        return empty($mobileProtection['risk_category']);
+    });
+}
 if (is_array($mobileProtections) && !empty($mobileProtections)) {
     $signalisationFile       = DOL_DOCUMENT_ROOT . '/custom/digiriskdolibarr/js/json/signalisationCategories.json';
     $signalisationCategories = file_exists($signalisationFile) ? json_decode(file_get_contents($signalisationFile), true) : [];
@@ -70,7 +75,7 @@ if (is_array($mobileProtections) && !empty($mobileProtections)) {
 // Required certifications
 $mobileCertifications = !empty($object->array_options['options_mobile_certifications']) ? json_decode($object->array_options['options_mobile_certifications'], true) : [];
 if (is_array($mobileCertifications) && !empty($mobileCertifications)) {
-    $certificationOptions = digiriskGetCertificationOptions();
+    $certificationOptions = digiriskGetCertificationOptions(false);
     print '<div class="digirisk-protections-view">';
     print '<div class="digirisk-protections-view__title"><i class="fas fa-id-badge"></i> ' . $langs->trans('MobilePPCertifications') . '</div>';
     print '<div class="digirisk-protections-view__list">';

@@ -921,7 +921,8 @@ class modDigiriskdolibarr extends DolibarrModules
                 MAIN_DB_PREFIX . 'c_digiriskdolibarr_action_trigger',
                 MAIN_DB_PREFIX . 'c_accidentinvestigation_attendants_role',
                 MAIN_DB_PREFIX . 'c_preventionplan_attendants_role',
-                MAIN_DB_PREFIX . 'c_firepermit_attendants_role'
+                MAIN_DB_PREFIX . 'c_firepermit_attendants_role',
+                MAIN_DB_PREFIX . 'c_digiriskdolibarr_certification'
             ],
             // Label of tables
             'tablib' => [
@@ -932,7 +933,8 @@ class modDigiriskdolibarr extends DolibarrModules
                 'DigiriskDolibarrActionTrigger',
                 'AccidentInvestigationRole',
                 'PreventionPlanRole',
-                'FirePermitRole'
+                'FirePermitRole',
+                'CertificationDictionary'
             ],
             // Request to select fields
             'tabsql' => [
@@ -943,11 +945,13 @@ class modDigiriskdolibarr extends DolibarrModules
                 'SELECT f.rowid as rowid, f.elementtype, f.ref, f.label, f.description, f.position, f.active FROM ' . MAIN_DB_PREFIX . 'c_digiriskdolibarr_action_trigger as f',
                 'SELECT f.rowid as rowid, f.ref, f.label, f.description, f.position, f.active FROM ' . MAIN_DB_PREFIX . 'c_accidentinvestigation_attendants_role as f',
                 'SELECT f.rowid as rowid, f.ref, f.label, f.description, f.position, f.active FROM ' . MAIN_DB_PREFIX . 'c_preventionplan_attendants_role as f',
-                'SELECT f.rowid as rowid, f.ref, f.label, f.description, f.position, f.active FROM ' . MAIN_DB_PREFIX . 'c_firepermit_attendants_role as f'
+                'SELECT f.rowid as rowid, f.ref, f.label, f.description, f.position, f.active FROM ' . MAIN_DB_PREFIX . 'c_firepermit_attendants_role as f',
+                'SELECT f.rowid as rowid, f.ref, f.label, f.description, f.position, f.active FROM ' . MAIN_DB_PREFIX . 'c_digiriskdolibarr_certification as f'
             ],
             // Sort order
             'tabsqlsort' => [
                 'code ASC',
+                'position ASC',
                 'position ASC',
                 'position ASC',
                 'position ASC',
@@ -1001,10 +1005,12 @@ class modDigiriskdolibarr extends DolibarrModules
                 'rowid',
                 'rowid',
                 'rowid',
+                'rowid',
                 'rowid'
             ],
             // Condition to show each dictionary
             'tabcond' => [
+                !empty($conf->digiriskdolibarr->enabled),
                 !empty($conf->digiriskdolibarr->enabled),
                 !empty($conf->digiriskdolibarr->enabled),
                 !empty($conf->digiriskdolibarr->enabled),
@@ -2515,7 +2521,8 @@ class modDigiriskdolibarr extends DolibarrModules
 			'ticket_categories' => ['Label' => 'Categories', 'type' => 'text', 'elementtype' => ['ticket'], 'position' => 1, 'list' => 2, 'enabled' => "isModEnabled('digiriskdolibarr') && isModEnabled('categorie') && isModEnabled('ticket')", 'moreparams' => []],
 
 			'mobile_protections'   => ['Label' => 'MobileProtections',   'type' => 'text', 'elementtype' => ['digiriskdolibarr_preventionplan', 'digiriskdolibarr_firepermit'], 'position' => $this->numero . 10, 'list' => 0, 'enabled' => "isModEnabled('digiriskdolibarr')", 'moreparams' => []],
-			'mobile_certifications' => ['Label' => 'MobileCertifications', 'type' => 'text', 'elementtype' => ['digiriskdolibarr_preventionplan', 'digiriskdolibarr_firepermit'], 'position' => $this->numero . 11, 'list' => 0, 'enabled' => "isModEnabled('digiriskdolibarr')", 'moreparams' => []]
+			'mobile_certifications' => ['Label' => 'MobileCertifications', 'type' => 'text', 'elementtype' => ['digiriskdolibarr_preventionplan', 'digiriskdolibarr_firepermit'], 'position' => $this->numero . 11, 'list' => 0, 'enabled' => "isModEnabled('digiriskdolibarr')", 'moreparams' => []],
+			'mobile_risk_companies' => ['Label' => 'MobileRiskCompanies', 'type' => 'text', 'elementtype' => ['digiriskdolibarr_preventionplan'], 'position' => $this->numero . 12, 'list' => 0, 'enabled' => "isModEnabled('digiriskdolibarr')", 'moreparams' => []]
 		];
 
         saturne_manage_extrafields($extraFieldsArrays, $commonExtraFieldsValue);

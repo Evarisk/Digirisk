@@ -225,7 +225,7 @@ if ($action == 'add_mobile' && $permissiontoadd) {
     $certMandatory  = GETPOST('cert_mandatory', 'array');
     $certifications = [];
     if (is_array($certCodes)) {
-        $certificationOptions = digiriskGetCertificationOptions();
+        $certificationOptions = digiriskGetCertificationOptions(false);
         foreach ($certCodes as $certKey => $certCode) {
             if ($certCode === '' || !isset($certificationOptions[$certCode])) {
                 continue;

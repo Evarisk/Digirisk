@@ -55,15 +55,21 @@ window.digiriskdolibarr.mobilequickcreate.bound = false;
  * @return {void}
  */
 window.digiriskdolibarr.mobilequickcreate.init = function() {
+    // The prevention plan interface shares every selector of this one, and both modules delegate on
+    // document: bind only when the fire permit form is the one on screen.
+    var form = $('.digirisk-mobile-form--firepermit');
+    if (!form.length) {
+        return;
+    }
+
     window.digiriskdolibarr.mobilequickcreate.event();
     // Initialise the drawing canvas straight away if it is visible.
-    if ($('.digirisk-mobile-signature-draw').length && !$('.digirisk-mobile-signature-draw').hasClass('hidden')) {
+    if (form.find('.digirisk-mobile-signature-draw').length && !form.find('.digirisk-mobile-signature-draw').hasClass('hidden')) {
         window.digiriskdolibarr.mobilequickcreate.initCanvas();
     }
     // The certification picker is turned into select2 by Dolibarr's ajax_combobox() (printed in the tpl).
 
     // Edit mode: rows already rendered server-side occupy the first indexes, so keep counting after them
-    var form = $('.digirisk-mobile-form');
     if (form.length) {
         window.digiriskdolibarr.mobilequickcreate.protectionIndex = parseInt(form.data('protection-start-index'), 10) || 0;
         window.digiriskdolibarr.mobilequickcreate.certIndex       = parseInt(form.data('cert-start-index'), 10) || 0;
@@ -105,7 +111,7 @@ window.digiriskdolibarr.mobilequickcreate.event = function() {
  * @return {void}
  */
 window.digiriskdolibarr.mobilequickcreate.initCanvas = function() {
-    var canvas = document.querySelector('.digirisk-mobile-signature-canvas');
+    var canvas = document.querySelector('.digirisk-mobile-form--firepermit .digirisk-mobile-signature-canvas');
     if (!canvas || typeof SignaturePad === 'undefined' || window.digiriskdolibarr.mobilequickcreate.signaturePad) {
         return;
     }
@@ -728,7 +734,5 @@ window.digiriskdolibarr.mobilequickcreate.showFormErrors = function(errors) {
 // error could otherwise prevent this module from initialising and let the form POST natively).
 // The `bound` guard in event() ensures the handlers are attached exactly once.
 $(function() {
-    if ($('.digirisk-mobile-form').length) {
-        window.digiriskdolibarr.mobilequickcreate.init();
-    }
+    window.digiriskdolibarr.mobilequickcreate.init();
 });

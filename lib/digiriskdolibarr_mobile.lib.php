@@ -24,6 +24,20 @@
  *          shared across the ecosystem — not a Digirisk-specific storage.
  */
 
+// Load Dolibarr libraries — the risk photo helpers work on the object document directory
+require_once DOL_DOCUMENT_ROOT . '/core/lib/files.lib.php';
+
+// Load Saturne libraries — photos are captured through the Saturne media block
+require_once __DIR__ . '/../../saturne/lib/medias.lib.php';
+
+/**
+ * Directory, relative to the module output directory, holding the photos of the mobile
+ * interfaces while they are not attached to an object yet.
+ */
+if (!defined('DIGIRISK_MOBILE_UPLOAD_DIR')) {
+    define('DIGIRISK_MOBILE_UPLOAD_DIR', 'mobile_upload');
+}
+
 /**
  * Get the reusable electronic signature (base64 data URL) of a user.
  * Reads the "UserSignature" SaturneSignature record (the ElectronicSignature shown on the user card).
@@ -181,11 +195,188 @@ function digiriskMobileIsValidIdProf(string $value): bool
 }
 
 /**
- * Available required-certification options for the mobile quick-creation interfaces (code => label).
+ * Directory holding the photos taken for one risk of a mobile-created object.
  *
- * @return array
+ * Keyed by danger category rather than by line ref: the edit path replaces the lines (new refs),
+ * while the category identifies the risk for the whole life of the object.
+ *
+ * @param  string $elementType Object element (preventionplan, firepermit...)
+ * @param  string $objectRef   Object reference
+ * @param  int    $category    Danger category position
+ * @return string              Absolute directory path, without trailing slash
  */
-function digiriskGetCertificationOptions(): array
+function digiriskMobileRiskPhotoDir(string $elementType, string $objectRef, int $category): string
+{
+    global $conf;
+
+    // dir_output, like the Saturne media helpers reading those photos back
+    return $conf->digiriskdolibarr->dir_output . '/' . $elementType . '/' . dol_sanitizeFileName($objectRef) . '/risks/' . $category;
+}
+
+/**
+ * Sub directory, relative to the module output directory, where the Saturne media block stores
+ * the photos of one risk block while the form is being filled in.
+ *
+ * Uploads happen before the object exists (and before the danger category is even known for a
+ * brand new block), so they land in a per-session token directory keyed by the block index.
+ *
+ * @param  string     $uploadToken Upload token of the form (see saturne_get_upload_token)
+ * @param  int|string $blockIndex  Index of the risk block in the form
+ * @return string                  Sub directory, without leading nor trailing slash
+ */
+function digiriskMobileRiskUploadSubDir(string $uploadToken, $blockIndex): string
+{
+    return DIGIRISK_MOBILE_UPLOAD_DIR . '/' . $uploadToken . '/' . $blockIndex;
+}
+
+/**
+ * List the photos already stored for one risk.
+ *
+ * @param  string $elementType Object element (preventionplan, firepermit...)
+ * @param  string $objectRef   Object reference
+ * @param  int    $category    Danger category position
+ * @return array               List of ['name' => file name, 'url' => displayable URL]
+ */
+function digiriskMobileGetRiskPhotos(string $elementType, string $objectRef, int $category): array
+{
+    $photoSubDir = $elementType . '/' . dol_sanitizeFileName($objectRef) . '/risks/' . $category;
+
+    return saturne_get_media_files('digiriskdolibarr', $photoSubDir, '', '', ['type' => 'image', 'sort_order' => 'asc']);
+}
+
+/**
+ * Move the photos uploaded for one risk block from the temporary upload directory to the
+ * final one, keyed by danger category. The final directory is emptied first, so removing a
+ * photo in the form removes it for good.
+ *
+ * @param  string     $elementType Object element (preventionplan, firepermit...)
+ * @param  string     $objectRef   Object reference
+ * @param  int        $category    Danger category position
+ * @param  string     $uploadToken Upload token of the form
+ * @param  int|string $blockIndex  Index of the risk block in the form
+ * @return int                     Number of photos moved
+ */
+function digiriskMobileMoveRiskPhotos(string $elementType, string $objectRef, int $category, string $uploadToken, $blockIndex): int
+{
+    $uploadedPhotos = saturne_get_media_files('digiriskdolibarr', digiriskMobileRiskUploadSubDir($uploadToken, $blockIndex), '', '', ['type' => 'image']);
+    $photoDir       = digiriskMobileRiskPhotoDir($elementType, $objectRef, $category);
+
+    if (dol_is_dir($photoDir)) {
+        dol_delete_dir_recursive($photoDir);
+    }
+    if (empty($uploadedPhotos)) {
+        return 0;
+    }
+    dol_mkdir($photoDir);
+
+    $moved = 0;
+    foreach ($uploadedPhotos as $uploadedPhoto) {
+        if (dol_move($uploadedPhoto['fullname'], $photoDir . '/' . $uploadedPhoto['name'], '0', 1, 0, 0)) {
+            $moved++;
+        }
+    }
+
+    return $moved;
+}
+
+/**
+ * Copy the photos already attached to a risk into the temporary upload directory, so the media
+ * block of the edit form shows them and can remove them like the freshly taken ones.
+ * Does nothing once the temporary directory exists: the user changes must not be undone by a reload.
+ *
+ * @param  string     $elementType Object element (preventionplan, firepermit...)
+ * @param  string     $objectRef   Object reference
+ * @param  int        $category    Danger category position
+ * @param  string     $uploadToken Upload token of the form
+ * @param  int|string $blockIndex  Index of the risk block in the form
+ * @return void
+ */
+function digiriskMobileSeedRiskPhotos(string $elementType, string $objectRef, int $category, string $uploadToken, $blockIndex)
+{
+    global $conf;
+
+    $uploadDir = $conf->digiriskdolibarr->dir_output . '/' . digiriskMobileRiskUploadSubDir($uploadToken, $blockIndex);
+    if (dol_is_dir($uploadDir)) {
+        return;
+    }
+
+    $photoDir = digiriskMobileRiskPhotoDir($elementType, $objectRef, $category);
+    if (!dol_is_dir($photoDir)) {
+        return;
+    }
+
+    dol_mkdir($uploadDir);
+    foreach (dol_dir_list($photoDir, 'files', 0, '', '(\.meta|_preview.*\.png)$') as $photoFile) {
+        dol_copy($photoFile['fullname'], $uploadDir . '/' . $photoFile['name'], '0', 1);
+    }
+}
+
+/**
+ * Delete the photo directories of the risks that are no longer part of the object.
+ *
+ * @param  string $elementType     Object element (preventionplan, firepermit...)
+ * @param  string $objectRef       Object reference
+ * @param  array  $keptCategories  Danger category positions still submitted
+ * @return void
+ */
+function digiriskMobileCleanRiskPhotoDirs(string $elementType, string $objectRef, array $keptCategories)
+{
+    global $conf;
+
+    $risksDir = $conf->digiriskdolibarr->dir_output . '/' . $elementType . '/' . dol_sanitizeFileName($objectRef) . '/risks';
+    if (!is_dir($risksDir)) {
+        return;
+    }
+
+    foreach (dol_dir_list($risksDir, 'directories', 0) as $categoryDir) {
+        if (!in_array((int) $categoryDir['name'], $keptCategories, true)) {
+            dol_delete_dir_recursive($categoryDir['fullname']);
+        }
+    }
+}
+
+/**
+ * Available required-certification options for the mobile quick-creation interfaces (code => label).
+ * Read from the "Certifications et habilitations" dictionary, so new entries only need the
+ * dictionary editor of Dolibarr.
+ *
+ * @param  bool  $activeOnly True to keep only the entries currently enabled in the dictionary.
+ *                           Pass false to label what an object already stores: a certification
+ *                           disabled afterwards must still be displayed and kept on save.
+ * @return array             Certification code => label
+ */
+function digiriskGetCertificationOptions(bool $activeOnly = true): array
+{
+    global $conf, $db;
+
+    $sql  = 'SELECT ref, label FROM ' . MAIN_DB_PREFIX . 'c_digiriskdolibarr_certification';
+    $sql .= ' WHERE entity IN (0, ' . ((int) $conf->entity) . ')';
+    $sql .= $activeOnly ? ' AND active = 1' : '';
+    $sql .= ' ORDER BY position ASC, label ASC';
+
+    $resql = $db->query($sql);
+    if (!$resql) {
+        // Dictionary table not created yet (module not reactivated since the update): fall back on
+        // the values it is seeded with, so the pickers keep working and nothing is lost on save
+        return digiriskGetDefaultCertificationOptions();
+    }
+
+    $options = [];
+    while ($obj = $db->fetch_object($resql)) {
+        $options[$obj->ref] = $obj->label;
+    }
+    $db->free($resql);
+
+    return $options;
+}
+
+/**
+ * Certifications the dictionary is seeded with. Only used while the dictionary table does not
+ * exist yet, the dictionary is the reference once the module has been reactivated.
+ *
+ * @return array Certification code => label
+ */
+function digiriskGetDefaultCertificationOptions(): array
 {
     return [
         'CACES_R482'        => 'CACES R482 - Engins de chantier',
