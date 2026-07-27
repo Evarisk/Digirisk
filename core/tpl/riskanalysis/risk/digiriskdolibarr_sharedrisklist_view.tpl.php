@@ -401,7 +401,7 @@ foreach ($risk->fields as $key => $val) {
 		}  elseif ($key == 'applied_on') {
 //				print $digiriskelement->select_digiriskelement_list($search['search_applied_on_sharedrisk'], 'search_applied_on_sharedrisk', '', 1, 0, array(), 0, 0, 'minwidth100', 0, false, 1, $contextpage);
 		} elseif ($key == 'category') { ?>
-			<div class="wpeo-dropdown dropdown-large dropdown-grid category-danger padding" style="position: inherit">
+			<div class="wpeo-dropdown dropdown-large dropdown-grid category-danger padding">
 				<input class="input-hidden-danger" type="hidden" name="<?php echo 'search_' . $key ?>" value="<?php echo dol_escape_htmltag($search[$key] ?? '') ?>" />
 				<?php if (dol_strlen(dol_escape_htmltag($search[$key] ?? '')) == 0) : ?>
 					<div class="dropdown-toggle dropdown-add-button button-cotation">
