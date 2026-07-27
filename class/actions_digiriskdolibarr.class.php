@@ -523,8 +523,9 @@ class ActionsDigiriskdolibarr
                     if (strpos($parameters['context'], 'projecttaskcard') !== false && !GETPOSTISSET('withproject')) {
                         return 0;
                     } else {
-                        if (preg_match('/projectcard|projectcontactcard|projecttaskscard/', $parameters['context'])) {
-                            $projectId = GETPOST('id');
+                        if (preg_match('/projectcard|projectcontactcard|projecttaskscard|projectOverview/', $parameters['context'])) {
+                            $project->fetch(GETPOSTINT('id'), GETPOST('ref', 'alpha'));
+                            $projectId = $project->id;
                         } else if (GETPOSTISSET('projectid') || GETPOSTISSET('ref')) {
                             $project->fetch( GETPOST('projectid'), GETPOST('ref'));
                             $projectId = $project->id;
@@ -532,6 +533,12 @@ class ActionsDigiriskdolibarr
                             $task->fetch(GETPOST('id'));
                             $projectId = $task->fk_project;
                         }
+
+                        // Sans projet identifié, getTasksArray() agrégerait les tâches de toute l'instance
+                        if ($projectId <= 0) {
+                            return 0;
+                        }
+
                         $allTasks = $task->getTasksArray(null, null, $projectId, 0, 0, '', '-1', '', 0, 0, $extrafields);
                         $totalConsumedTime       = 0;
                         $totatConsumedTimeAmount = 0;
@@ -541,14 +548,16 @@ class ActionsDigiriskdolibarr
                         if (is_array($allTasks) && !empty($allTasks)) {
                             $nbTasks = count($allTasks);
                             foreach ($allTasks as $taskSingle) {
-                                $filter       = ' AND fk_element = ' . $taskSingle->id;
-                                $allTimespent = $task->fetchAllTimeSpentAllUsers($filter);
-                                foreach ($allTimespent as $timespent) {
-                                    $totatConsumedTimeAmount += ((float)$timespent->timespent_duration / 3600) * (float)$timespent->timespent_thm;
-                                }
-                                $totalConsumedTime += (float)$taskSingle->duration;
-                                $totalProgress     += (float)$taskSingle->progress;
-                                $totalTasksBudget  += (float)$taskSingle->budget_amount;
+                                $totalConsumedTime += (float) $taskSingle->duration_effective;
+                                $totalProgress     += (float) $taskSingle->progress;
+                                $totalTasksBudget  += (float) $taskSingle->budget_amount;
+                            }
+                        }
+
+                        $allTimespent = $task->fetchAllTimeSpentAllUsers(' AND project_id = ' . ((int) $projectId));
+                        if (is_array($allTimespent)) {
+                            foreach ($allTimespent as $timespent) {
+                                $totatConsumedTimeAmount += ((float) $timespent->timespent_duration / 3600) * (float) $timespent->timespent_thm;
                             }
                         }
                         $outTotatConsumedTime       = '<tr><td>' . $langs->trans('TotalConsumedTime') . '</td><td>' . convertSecondToTime($totalConsumedTime, 'allhourmin') . '</td></tr>';
