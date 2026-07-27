@@ -98,7 +98,7 @@ window.digiriskdolibarr.evaluator.haveDataInInput = function( elementParent ) {
  * Action create evaluator.
  *
  * @since   1.0.0
- * @version 9.0.0
+ * @version 23.1.0
  *
  * @return {void}
  */
@@ -107,12 +107,18 @@ window.digiriskdolibarr.evaluator.createEvaluator = function ( event ) {
 
 	let elementEvaluator = $(this).closest('.fichecenter').find('.evaluator-content');
 
-	var userName = $('#select2-fk_user_employer-container').attr('title')
-	var userID  = $('#fk_user_employer').find("option:contains('"+userName+"')").attr('value')
+	// L'id est lu directement sur le select : le retrouver à partir du libellé affiché échoue dès que
+	// celui-ci contient une apostrophe (sélecteur invalide) ou est contenu dans le libellé d'un autre utilisateur.
+	var userID = elementEvaluator.find('#fk_user_employer').val();
 
 	var date     = elementEvaluator.find('#EvaluatorDate').val();
 	var duration = elementEvaluator.find('.evaluator-duration .duration').val();
 	var job      = elementEvaluator.find('.evaluatorJob').val();
+
+	// Filet de sécurité : le bouton est déjà désactivé tant qu'aucun utilisateur n'est choisi
+	if (!(userID > 0)) {
+		return;
+	}
 
 	let elementParent = $(this).closest('.fichecenter').find('.div-table-responsive');
 
