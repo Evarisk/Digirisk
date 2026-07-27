@@ -19,7 +19,7 @@
  * \file    core/tpl/frontend/preventionplan_mobile_form.tpl.php
  * \ingroup digiriskdolibarr
  * \brief   Creation form screen of the mobile prevention plan interface.
- *          Expects: $conf, $langs, $mysoc, $user, $savedSignature.
+ *          Expects: $conf, $form, $langs, $mysoc, $user, $savedSignature, $uploadToken.
  */
 
 global $conf, $langs, $mysoc, $user;
@@ -27,9 +27,24 @@ global $conf, $langs, $mysoc, $user;
 $hasSignature     = digiriskIsValidSignature($savedSignature);
 $sirenLookupUrl   = dol_buildpath('/custom/digiriskdolibarr/core/ajax/mobile_siren_lookup.php', 1);
 $saveSignatureUrl = dol_buildpath('/custom/digiriskdolibarr/core/ajax/save_user_signature.php', 1);
+
+// Danger categories (risks) and signalisation pictos (protections), indexed by position:
+// used both to render the already selected items and to fill the picker modals
+$dangerCategories = Risk::getDangerCategories();
+$dangerMap        = [];
+foreach ($dangerCategories as $dangerCategoryItem) {
+    $dangerMap[$dangerCategoryItem['position']] = $dangerCategoryItem;
+}
+
+$signalisationFile       = DOL_DOCUMENT_ROOT . '/custom/digiriskdolibarr/js/json/signalisationCategories.json';
+$signalisationCategories = file_exists($signalisationFile) ? (json_decode(file_get_contents($signalisationFile), true) ?: []) : [];
+$protectionMap           = [];
+foreach ($signalisationCategories as $signalisationItem) {
+    $protectionMap[$signalisationItem['position']] = $signalisationItem;
+}
 ?>
 <div class="pwa-container digirisk-mobile">
-    <form method="POST" action="<?php print $_SERVER['PHP_SELF']; ?>" class="digirisk-mobile-form"
+    <form method="POST" action="<?php print $_SERVER['PHP_SELF']; ?>" class="digirisk-mobile-form digirisk-mobile-form--preventionplan"
           data-has-signature="<?php print ($hasSignature || !empty($isEdit)) ? '1' : '0'; ?>"
           data-siren-lookup-url="<?php print dol_escape_htmltag($sirenLookupUrl); ?>"
           data-save-signature-url="<?php print dol_escape_htmltag($saveSignatureUrl); ?>"
@@ -46,7 +61,8 @@ $saveSignatureUrl = dol_buildpath('/custom/digiriskdolibarr/core/ajax/save_user_
           data-date-end-required-label="<?php print dol_escape_htmltag($langs->trans('MobilePPErrorEndRequired')); ?>"
           data-risk-comment-label="<?php print dol_escape_htmltag($langs->trans('MobilePPRiskComment')); ?>"
           data-mandatory-label="<?php print dol_escape_htmltag($langs->trans('MobilePPMandatory')); ?>"
-          data-protection-start-index="<?php print count($prefill['protections']); ?>"
+          data-risk-start-index="<?php print count($prefill['risks']); ?>"
+          data-delete-risk-label="<?php print dol_escape_htmltag($langs->trans('MobilePPDeleteRiskConfirm')); ?>"
           data-cert-start-index="<?php print count($prefill['certifications']); ?>">
         <input type="hidden" name="token" value="<?php print newToken(); ?>">
         <input type="hidden" name="action" value="add_mobile">
@@ -87,9 +103,15 @@ $saveSignatureUrl = dol_buildpath('/custom/digiriskdolibarr/core/ajax/save_user_
             </div>
         </div>
 
-        <!-- Card 2: exterior company resolved by SIREN, asked to sign by email -->
+        <!-- Card 2: exterior company, asked to sign by email. Three ways to fill it in: pick it in
+             the third party list, resolve it by SIREN, or type everything for a company to create -->
         <div class="digirisk-mobile-card">
             <div class="digirisk-mobile-card__title"><i class="fas fa-industry"></i> <?php print $langs->trans('MobilePPExteriorCompany'); ?></div>
+            <div class="digirisk-mobile-field">
+                <label><?php print $langs->trans('MobilePPChooseExistingCompany'); ?></label>
+                <?php print $form->select_company($prefill['ext_society_id'], 'ext_society_picker', '', '&nbsp;', 0, 0, [], 0, 'digirisk-mobile-society-select maxwidth500'); ?>
+            </div>
+            <div class="digirisk-mobile-separator"><span><?php print $langs->trans('MobilePPOrFillManually'); ?></span></div>
             <div class="digirisk-mobile-field">
                 <label><?php print $langs->trans('MobileSirenOrSiret'); ?></label>
                 <div class="digirisk-mobile-siren-row">
@@ -158,66 +180,82 @@ $saveSignatureUrl = dol_buildpath('/custom/digiriskdolibarr/core/ajax/save_user_
             <div class="digirisk-mobile-date-error hidden"></div>
         </div>
 
-        <!-- Card 4: risks (danger categories) -->
+        <!-- Prior formalities: CSSCT intervention then joint prior inspection, in that order,
+             like the classic prevention plan card (native cssct_intervention / prior_visit_* fields) -->
+        <div class="digirisk-mobile-card">
+            <div class="digirisk-mobile-card__title"><i class="fas fa-clipboard-check"></i> <?php print $langs->trans('MobilePPPriorFormalities'); ?></div>
+            <label class="digirisk-mobile-check">
+                <input type="checkbox" name="cssct_intervention" value="1"<?php print !empty($prefill['cssct_intervention']) ? ' checked' : ''; ?>>
+                <span><?php print $langs->trans('CSSCTIntervention'); ?></span>
+            </label>
+            <label class="digirisk-mobile-check">
+                <input type="checkbox" name="prior_visit_bool" class="digirisk-mobile-prior-visit-toggle" value="1"<?php print !empty($prefill['prior_visit_bool']) ? ' checked' : ''; ?>>
+                <span><?php print $langs->trans('MobilePPPriorVisitDone'); ?></span>
+            </label>
+            <div class="digirisk-mobile-prior-visit-detail <?php print !empty($prefill['prior_visit_bool']) ? '' : 'hidden'; ?>">
+                <div class="digirisk-mobile-field">
+                    <label><?php print $langs->trans('PriorVisitDate'); ?></label>
+                    <input type="date" name="prior_visit_date" value="<?php print dol_escape_htmltag($prefill['prior_visit_date']); ?>">
+                </div>
+                <div class="digirisk-mobile-field">
+                    <label><?php print $langs->trans('PriorVisitText'); ?></label>
+                    <textarea name="prior_visit_text" rows="2" placeholder="<?php print dol_escape_htmltag($langs->trans('MobilePPPriorVisitTextPlaceholder')); ?>"><?php print dol_escape_htmltag($prefill['prior_visit_text']); ?></textarea>
+                </div>
+            </div>
+        </div>
+
+        <!-- Tags of the plan (native preventionplan category type) -->
+        <?php if (isModEnabled('categorie')) { ?>
+        <div class="digirisk-mobile-card">
+            <div class="digirisk-mobile-card__title"><i class="fas fa-tags"></i> <?php print $langs->trans('Categories'); ?></div>
+            <?php print $form->multiselectarray('categories', $form->select_all_categories('preventionplan', '', 'parent', 64, 0, 1), $prefill['categories'], '', 0, 'digirisk-mobile-tags-select maxwidth500'); ?>
+        </div>
+        <?php } ?>
+
+        <!-- Card 4: risks — one self-contained block per danger category (description, photos, protections) -->
         <div class="digirisk-mobile-card">
             <div class="digirisk-mobile-card__title"><i class="fas fa-exclamation-triangle"></i> <?php print $langs->trans('MobilePPRisks'); ?></div>
-            <button type="button" class="digirisk-mobile-risk-add wpeo-button button-blue"><i class="fas fa-plus-circle"></i> <?php print $langs->trans('MobilePPAddRisk'); ?></button>
-            <div class="digirisk-mobile-risk-list">
+            <div class="digirisk-mobile-risk-list digirisk-mobile-risk-list--blocks">
                 <?php
-                // Edit mode: render the already selected risks exactly like the JS does
-                $dangerMap = [];
-                foreach (Risk::getDangerCategories() as $dangerCategoryItem) {
-                    $dangerMap[$dangerCategoryItem['position']] = $dangerCategoryItem;
-                }
-                foreach ($prefill['risks'] as $prefillRisk) {
+                // Edit mode: render the already selected risks with the very same fragment the JS clones
+                foreach ($prefill['risks'] as $prefillRiskIndex => $prefillRisk) {
                     if (!isset($dangerMap[$prefillRisk['category']])) {
                         continue;
                     }
                     $prefillRiskCat = $dangerMap[$prefillRisk['category']];
-                    $prefillThumb   = DOL_URL_ROOT . '/custom/digiriskdolibarr/img/categorieDangers/' . $prefillRiskCat['thumbnail_name'] . '.png';
-                ?>
-                <div class="digirisk-mobile-risk-item" data-position="<?php print dol_escape_htmltag($prefillRisk['category']); ?>">
-                    <img class="digirisk-mobile-risk-item-photo" src="<?php print $prefillThumb; ?>" alt="" title="<?php print dol_escape_htmltag($prefillRiskCat['name']); ?>">
-                    <input type="hidden" name="risk_category[]" value="<?php print dol_escape_htmltag($prefillRisk['category']); ?>">
-                    <input type="text" name="risk_comment[]" class="digirisk-mobile-risk-item-comment" placeholder="<?php print dol_escape_htmltag($langs->trans('MobilePPRiskComment')); ?>" value="<?php print dol_escape_htmltag($prefillRisk['description']); ?>">
-                    <button type="button" class="digirisk-mobile-risk-item-delete"><i class="fas fa-trash"></i></button>
-                </div>
-                <?php } ?>
-            </div>
-        </div>
 
-        <!-- Card 5: protections (EPI / mandatory equipment) -->
-        <div class="digirisk-mobile-card">
-            <div class="digirisk-mobile-card__title"><i class="fas fa-hard-hat"></i> <?php print $langs->trans('MobilePPProtections'); ?></div>
-            <button type="button" class="digirisk-mobile-protection-add wpeo-button button-blue"><i class="fas fa-plus-circle"></i> <?php print $langs->trans('MobilePPAddProtection'); ?></button>
-            <div class="digirisk-mobile-protection-list">
-                <?php
-                // Edit mode: render the already selected protections exactly like the JS does
-                $signalisationFile     = DOL_DOCUMENT_ROOT . '/custom/digiriskdolibarr/js/json/signalisationCategories.json';
-                $prefillProtectionMap  = [];
-                if (file_exists($signalisationFile)) {
-                    foreach ((json_decode(file_get_contents($signalisationFile), true) ?: []) as $signalisationItem) {
-                        $prefillProtectionMap[$signalisationItem['position']] = $signalisationItem;
+                    $blockIndex       = (int) $prefillRiskIndex;
+                    $blockPosition    = $prefillRisk['category'];
+                    $blockName        = $prefillRiskCat['name'];
+                    $blockThumbnail   = DOL_URL_ROOT . '/custom/digiriskdolibarr/img/categorieDangers/' . $prefillRiskCat['thumbnail_name'] . '.png';
+                    $blockDescription = $prefillRisk['description'];
+                    $blockCompanyEu   = $prefillRisk['company_eu'];
+                    $blockCompanyEe   = $prefillRisk['company_ee'];
+
+                    // Edit mode: bring the photos already attached to the risk into the temporary
+                    // upload directory, so the media block manages them like the new ones
+                    digiriskMobileSeedRiskPhotos($object->element, $object->ref, (int) $prefillRisk['category'], $uploadToken, $blockIndex);
+                    $blockUploadSubDir = digiriskMobileRiskUploadSubDir($uploadToken, $blockIndex);
+
+                    $blockProtections = [];
+                    foreach ($prefillRisk['protections'] as $prefillProtection) {
+                        if (!isset($protectionMap[$prefillProtection['position']])) {
+                            continue;
+                        }
+                        $blockProtections[] = [
+                            'position'  => $prefillProtection['position'],
+                            'thumbnail' => DOL_URL_ROOT . '/custom/digiriskdolibarr/img/' . $protectionMap[$prefillProtection['position']]['name_thumbnail'],
+                            'name'      => $protectionMap[$prefillProtection['position']]['name'],
+                            'comment'   => $prefillProtection['comment'],
+                        ];
                     }
+
+                    include __DIR__ . '/preventionplan_mobile_risk_block.tpl.php';
                 }
-                foreach ($prefill['protections'] as $prefillProtectionIndex => $prefillProtection) {
-                    if (!isset($prefillProtectionMap[$prefillProtection['position']])) {
-                        continue;
-                    }
-                    $prefillProtectionCat = $prefillProtectionMap[$prefillProtection['position']];
                 ?>
-                <div class="digirisk-mobile-protection-item" data-position="<?php print dol_escape_htmltag($prefillProtection['position']); ?>">
-                    <img class="digirisk-mobile-protection-item-photo" src="<?php print DOL_URL_ROOT . '/custom/digiriskdolibarr/img/' . $prefillProtectionCat['name_thumbnail']; ?>" alt="" title="<?php print dol_escape_htmltag($prefillProtectionCat['name']); ?>">
-                    <input type="hidden" name="protection_position[<?php print (int) $prefillProtectionIndex; ?>]" value="<?php print dol_escape_htmltag($prefillProtection['position']); ?>">
-                    <input type="text" name="protection_comment[<?php print (int) $prefillProtectionIndex; ?>]" class="digirisk-mobile-protection-item-comment" placeholder="<?php print dol_escape_htmltag($langs->trans('MobilePPRiskComment')); ?>" value="<?php print dol_escape_htmltag($prefillProtection['comment']); ?>">
-                    <label class="digirisk-mobile-protection-item-mandatory">
-                        <input type="checkbox" name="protection_mandatory[<?php print (int) $prefillProtectionIndex; ?>]" value="1"<?php print !empty($prefillProtection['mandatory']) ? ' checked' : ''; ?>>
-                        <span><?php print $langs->trans('MobilePPMandatory'); ?></span>
-                    </label>
-                    <button type="button" class="digirisk-mobile-protection-item-delete"><i class="fas fa-trash"></i></button>
-                </div>
-                <?php } ?>
             </div>
+            <div class="digirisk-mobile-risk-empty <?php print empty($prefill['risks']) ? '' : 'hidden'; ?>"><?php print $langs->trans('MobilePPNoRiskYet'); ?></div>
+            <button type="button" class="digirisk-mobile-risk-add wpeo-button button-blue"><i class="fas fa-plus-circle"></i> <?php print $langs->trans('MobilePPAddRisk'); ?></button>
         </div>
 
         <!-- Card 6: required certifications (CACES, permits...) -->
@@ -236,7 +274,7 @@ $saveSignatureUrl = dol_buildpath('/custom/digiriskdolibarr/core/ajax/save_user_
             <div class="digirisk-mobile-cert-list">
                 <?php
                 // Edit mode: render the already selected certifications exactly like the JS does
-                $prefillCertOptions = digiriskGetCertificationOptions();
+                $prefillCertOptions = digiriskGetCertificationOptions(false);
                 foreach ($prefill['certifications'] as $prefillCertIndex => $prefillCert) {
                     $prefillCertLabel = $prefillCertOptions[$prefillCert['code']] ?? $prefillCert['code'];
                 ?>
@@ -268,7 +306,6 @@ $saveSignatureUrl = dol_buildpath('/custom/digiriskdolibarr/core/ajax/save_user_
                 </div>
                 <div class="digirisk-mobile-risk-modal__grid">
                     <?php
-                    $dangerCategories = Risk::getDangerCategories();
                     if (!empty($dangerCategories)) {
                         foreach ($dangerCategories as $dangerCategory) {
                             $thumb = DOL_URL_ROOT . '/custom/digiriskdolibarr/img/categorieDangers/' . $dangerCategory['thumbnail_name'] . '.png';
@@ -295,25 +332,76 @@ $saveSignatureUrl = dol_buildpath('/custom/digiriskdolibarr/core/ajax/save_user_
                 </div>
                 <div class="digirisk-mobile-risk-modal__grid">
                     <?php
-                    $signalisationFile       = DOL_DOCUMENT_ROOT . '/custom/digiriskdolibarr/js/json/signalisationCategories.json';
-                    $signalisationCategories = file_exists($signalisationFile) ? json_decode(file_get_contents($signalisationFile), true) : [];
-                    if (is_array($signalisationCategories)) {
-                        foreach ($signalisationCategories as $signalisationCategory) {
-                            if (strpos($signalisationCategory['name_thumbnail'], 'OBLIGATION/') !== 0) {
-                                continue; // keep only the protection (mandatory EPI) pictos
-                            }
-                            $thumb = DOL_URL_ROOT . '/custom/digiriskdolibarr/img/' . $signalisationCategory['name_thumbnail'];
-                            ?>
-                            <div class="digirisk-mobile-protection-option" data-position="<?php print dol_escape_htmltag($signalisationCategory['position']); ?>" data-name="<?php print dol_escape_htmltag($signalisationCategory['name']); ?>" data-thumbnail="<?php print dol_escape_htmltag($thumb); ?>">
-                                <img src="<?php print $thumb; ?>" alt="">
-                                <span><?php print dol_escape_htmltag($signalisationCategory['name']); ?></span>
-                            </div>
-                            <?php
+                    foreach ($signalisationCategories as $signalisationCategory) {
+                        if (strpos($signalisationCategory['name_thumbnail'], 'OBLIGATION/') !== 0) {
+                            continue; // keep only the protection (mandatory EPI) pictos
                         }
+                        $thumb = DOL_URL_ROOT . '/custom/digiriskdolibarr/img/' . $signalisationCategory['name_thumbnail'];
+                        ?>
+                        <div class="digirisk-mobile-protection-option" data-position="<?php print dol_escape_htmltag($signalisationCategory['position']); ?>" data-name="<?php print dol_escape_htmltag($signalisationCategory['name']); ?>" data-thumbnail="<?php print dol_escape_htmltag($thumb); ?>">
+                            <img src="<?php print $thumb; ?>" alt="">
+                            <span><?php print dol_escape_htmltag($signalisationCategory['name']); ?></span>
+                        </div>
+                        <?php
                     }
                     ?>
                 </div>
             </div>
         </div>
+
+        <!-- Delete confirmation: a risk block carries its photos and its protections, losing it by
+             mistake on a phone is easy and there is no undo before the form is submitted -->
+        <div class="digirisk-mobile-confirm-modal hidden">
+            <div class="digirisk-mobile-confirm-modal__overlay digirisk-mobile-confirm-cancel"></div>
+            <div class="digirisk-mobile-risk-modal__dialog">
+                <div class="digirisk-mobile-risk-modal__header">
+                    <span><?php print $langs->trans('MobilePPDeleteRiskTitle'); ?></span>
+                    <button type="button" class="digirisk-mobile-confirm-cancel"><i class="fas fa-times"></i></button>
+                </div>
+                <div class="digirisk-mobile-confirm-modal__body"></div>
+                <div class="digirisk-mobile-confirm-modal__actions">
+                    <button type="button" class="digirisk-mobile-confirm-cancel wpeo-button button-grey"><?php print $langs->trans('Cancel'); ?></button>
+                    <button type="button" class="digirisk-mobile-confirm-delete wpeo-button button-red"><i class="fas fa-trash"></i> <?php print $langs->trans('Delete'); ?></button>
+                </div>
+            </div>
+        </div>
+
+        <?php
+        /*
+         * Fragments the JavaScript clones when the user adds a risk or a protection.
+         * Rendered with the very same templates as the server-side rows, so both stay in sync;
+         * only the row indexes are placeholders the JS replaces.
+         */
+        ?>
+        <template class="digirisk-mobile-risk-block-template"><?php
+            $blockIndex        = '__RISKINDEX__';
+            $blockPosition     = '';
+            $blockName         = '';
+            $blockThumbnail    = '';
+            $blockDescription  = '';
+            // A risk added on site concerns both companies until the user says otherwise
+            $blockCompanyEu    = 1;
+            $blockCompanyEe    = 1;
+            $blockUploadSubDir = digiriskMobileRiskUploadSubDir($uploadToken, $blockIndex);
+            $blockProtections  = [];
+            include __DIR__ . '/preventionplan_mobile_risk_block.tpl.php';
+
+            // The media block creates its upload directory as it renders: drop the one the
+            // placeholder index just created, the real ones are created block by block
+            dol_delete_dir_recursive($conf->digiriskdolibarr->dir_output . '/' . $blockUploadSubDir);
+        ?></template>
+        <template class="digirisk-mobile-protection-row-template"><?php
+            $rowRiskIndex = '__RISKINDEX__';
+            $rowIndex     = '__INDEX__';
+            $rowPosition  = '';
+            $rowThumbnail = '';
+            $rowName      = '';
+            $rowComment   = '';
+            include __DIR__ . '/preventionplan_mobile_protection_row.tpl.php';
+        ?></template>
     </form>
 </div>
+<?php
+// Photo editor the Saturne media block opens on every shot (crop, rotate, annotate)
+$langs->load('medias@saturne');
+include dol_buildpath('/saturne/core/tpl/medias/photo_editor_modal.tpl.php');

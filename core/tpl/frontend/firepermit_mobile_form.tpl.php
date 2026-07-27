@@ -39,7 +39,7 @@ if (empty($deletedElements)) {
 $risk = new Risk($db);
 ?>
 <div class="pwa-container digirisk-mobile">
-    <form method="POST" action="<?php print $_SERVER['PHP_SELF']; ?>" class="digirisk-mobile-form"
+    <form method="POST" action="<?php print $_SERVER['PHP_SELF']; ?>" class="digirisk-mobile-form digirisk-mobile-form--firepermit"
           data-has-signature="<?php print ($hasSignature || !empty($isEdit)) ? '1' : '0'; ?>"
           data-siren-lookup-url="<?php print dol_escape_htmltag($sirenLookupUrl); ?>"
           data-save-signature-url="<?php print dol_escape_htmltag($saveSignatureUrl); ?>"
@@ -263,7 +263,7 @@ $risk = new Risk($db);
             <div class="digirisk-mobile-cert-list">
                 <?php
                 // Edit mode: render the already selected certifications exactly like the JS does
-                $prefillCertOptions = digiriskGetCertificationOptions();
+                $prefillCertOptions = digiriskGetCertificationOptions(false);
                 foreach ($prefill['certifications'] as $prefillCertIndex => $prefillCert) {
                     $prefillCertLabel = $prefillCertOptions[$prefillCert['code']] ?? $prefillCert['code'];
                 ?>

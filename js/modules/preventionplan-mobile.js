@@ -33,9 +33,9 @@ window.digiriskdolibarr.preventionplanmobile = {};
 window.digiriskdolibarr.preventionplanmobile.signaturePad = null;
 
 /**
- * Monotonic index used to key protection rows (kept unique across deletions).
+ * Monotonic index used to key risk blocks (kept unique across deletions).
  */
-window.digiriskdolibarr.preventionplanmobile.protectionIndex = 0;
+window.digiriskdolibarr.preventionplanmobile.riskIndex = 0;
 
 /**
  * Monotonic index used to key certification rows (kept unique across deletions).
@@ -53,18 +53,24 @@ window.digiriskdolibarr.preventionplanmobile.bound = false;
  * @return {void}
  */
 window.digiriskdolibarr.preventionplanmobile.init = function() {
+    // The fire permit interface shares every selector of this one, and both modules delegate on
+    // document: bind only when the prevention plan form is the one on screen.
+    var form = $('.digirisk-mobile-form--preventionplan');
+    if (!form.length) {
+        return;
+    }
+
     window.digiriskdolibarr.preventionplanmobile.event();
     // Initialise the drawing canvas straight away if it is visible.
-    if ($('.preventionplan-mobile .digirisk-mobile-signature-draw').length && !$('.preventionplan-mobile .digirisk-mobile-signature-draw').hasClass('hidden')) {
+    if (form.find('.digirisk-mobile-signature-draw').length && !form.find('.digirisk-mobile-signature-draw').hasClass('hidden')) {
         window.digiriskdolibarr.preventionplanmobile.initCanvas();
     }
     // The certification picker is turned into select2 by Dolibarr's ajax_combobox() (printed in the tpl).
 
     // Edit mode: rows already rendered server-side occupy the first indexes, so keep counting after them
-    var form = $('.digirisk-mobile-form');
     if (form.length) {
-        window.digiriskdolibarr.preventionplanmobile.protectionIndex = parseInt(form.data('protection-start-index'), 10) || 0;
-        window.digiriskdolibarr.preventionplanmobile.certIndex       = parseInt(form.data('cert-start-index'), 10) || 0;
+        window.digiriskdolibarr.preventionplanmobile.riskIndex = parseInt(form.data('risk-start-index'), 10) || 0;
+        window.digiriskdolibarr.preventionplanmobile.certIndex = parseInt(form.data('cert-start-index'), 10) || 0;
     }
 };
 
@@ -81,12 +87,18 @@ window.digiriskdolibarr.preventionplanmobile.event = function() {
     $(document).on('click', '.digirisk-mobile-signature-clear', window.digiriskdolibarr.preventionplanmobile.clearSignature);
     $(document).on('click', '.digirisk-mobile-signature-save', window.digiriskdolibarr.preventionplanmobile.saveSignature);
     $(document).on('click', '.digirisk-mobile-siren-search', window.digiriskdolibarr.preventionplanmobile.searchSiren);
+    // Bound on the id: select_company renders either a select or, on big databases, an ajax
+    // autocompleter whose hidden input carries that same id
+    $(document).on('change', '#ext_society_picker', window.digiriskdolibarr.preventionplanmobile.selectSociety);
     $(document).on('change', '.digirisk-mobile-contact-select', window.digiriskdolibarr.preventionplanmobile.selectContact);
     $(document).on('change', '.digirisk-mobile-date-start, .digirisk-mobile-date-end', window.digiriskdolibarr.preventionplanmobile.checkDates);
+    $(document).on('change', '.digirisk-mobile-prior-visit-toggle', window.digiriskdolibarr.preventionplanmobile.togglePriorVisit);
     $(document).on('click', '.digirisk-mobile-risk-add', window.digiriskdolibarr.preventionplanmobile.openRiskModal);
     $(document).on('click', '.digirisk-mobile-risk-modal-close, .digirisk-mobile-risk-modal__overlay', window.digiriskdolibarr.preventionplanmobile.closeRiskModal);
     $(document).on('click', '.digirisk-mobile-risk-option', window.digiriskdolibarr.preventionplanmobile.addRisk);
-    $(document).on('click', '.digirisk-mobile-risk-item-delete', window.digiriskdolibarr.preventionplanmobile.removeRisk);
+    $(document).on('click', '.digirisk-mobile-risk-block__delete', window.digiriskdolibarr.preventionplanmobile.confirmRemoveRisk);
+    $(document).on('click', '.digirisk-mobile-confirm-cancel', window.digiriskdolibarr.preventionplanmobile.closeConfirmModal);
+    $(document).on('click', '.digirisk-mobile-confirm-delete', window.digiriskdolibarr.preventionplanmobile.removeRisk);
     $(document).on('click', '.digirisk-mobile-protection-add', window.digiriskdolibarr.preventionplanmobile.openProtectionModal);
     $(document).on('click', '.digirisk-mobile-protection-modal-close, .digirisk-mobile-protection-modal__overlay', window.digiriskdolibarr.preventionplanmobile.closeProtectionModal);
     $(document).on('click', '.digirisk-mobile-protection-option', window.digiriskdolibarr.preventionplanmobile.addProtection);
@@ -102,7 +114,7 @@ window.digiriskdolibarr.preventionplanmobile.event = function() {
  * @return {void}
  */
 window.digiriskdolibarr.preventionplanmobile.initCanvas = function() {
-    var canvas = document.querySelector('.preventionplan-mobile .digirisk-mobile-signature-canvas');
+    var canvas = document.querySelector('.digirisk-mobile-form--preventionplan .digirisk-mobile-signature-canvas');
     if (!canvas || typeof SignaturePad === 'undefined' || window.digiriskdolibarr.preventionplanmobile.signaturePad) {
         return;
     }
@@ -201,6 +213,37 @@ window.digiriskdolibarr.preventionplanmobile.searchSiren = function() {
         error: function() {
             $('.digirisk-mobile-siren-search').removeClass('wpeo-loader');
             result.removeClass('success').addClass('error').text('KO');
+        }
+    });
+};
+
+/**
+ * Fill the exterior company block from the third party picked in the list. Clearing the picker
+ * only drops the link to the existing company: what was typed stays, so the same fields can be
+ * used to describe a company to create.
+ *
+ * @return {void}
+ */
+window.digiriskdolibarr.preventionplanmobile.selectSociety = function() {
+    var form  = $('.digirisk-mobile-form');
+    var socid = parseInt($(this).val(), 10) || 0;
+
+    if (socid <= 0) {
+        window.digiriskdolibarr.preventionplanmobile.resetFoundCompany();
+        $('.digirisk-mobile-siren-result').removeClass('error success').text('');
+        return;
+    }
+
+    $.ajax({
+        url: form.data('siren-lookup-url') + '?socid=' + encodeURIComponent(socid),
+        type: 'GET',
+        dataType: 'json',
+        success: function(resp) {
+            if (!resp || !resp.success || !resp.found) {
+                return;
+            }
+            window.digiriskdolibarr.preventionplanmobile.fillFoundCompany(resp);
+            $('.digirisk-mobile-siren-input').val(resp.societe.siret || resp.societe.siren || '');
         }
     });
 };
@@ -365,6 +408,15 @@ window.digiriskdolibarr.preventionplanmobile.validateDatesForSubmit = function()
 };
 
 /**
+ * Show the prior visit comment and date only once the visit is declared done.
+ *
+ * @return {void}
+ */
+window.digiriskdolibarr.preventionplanmobile.togglePriorVisit = function() {
+    $('.digirisk-mobile-prior-visit-detail').toggleClass('hidden', !$(this).is(':checked'));
+};
+
+/**
  * Open the risk picker modal.
  *
  * @return {void}
@@ -383,7 +435,32 @@ window.digiriskdolibarr.preventionplanmobile.closeRiskModal = function() {
 };
 
 /**
- * Add the picked risk (danger category) to the selected list.
+ * Build a DOM fragment from one of the <template> elements printed by the form, with its
+ * index placeholders resolved. Keeps the JS rows identical to the server-side ones.
+ *
+ * @param  {string} templateClass Class of the template element
+ * @param  {Object} indexes       Placeholder name (without the underscores) => value
+ * @return {Object}               jQuery object of the built row
+ */
+window.digiriskdolibarr.preventionplanmobile.buildFromTemplate = function(templateClass, indexes) {
+    var markup = $('.' + templateClass).prop('innerHTML') || '';
+    $.each(indexes, function(name, value) {
+        markup = markup.split('__' + name + '__').join(value);
+    });
+    return $($.parseHTML($.trim(markup))).filter('div').first();
+};
+
+/**
+ * Show the "no risk yet" hint only while the list is empty.
+ *
+ * @return {void}
+ */
+window.digiriskdolibarr.preventionplanmobile.refreshRiskEmptyState = function() {
+    $('.digirisk-mobile-risk-empty').toggleClass('hidden', $('.digirisk-mobile-risk-block').length > 0);
+};
+
+/**
+ * Add the picked risk (danger category) as a new block: description, photos and its own protections.
  *
  * @return {void}
  */
@@ -393,7 +470,7 @@ window.digiriskdolibarr.preventionplanmobile.addRisk = function() {
 
     // Avoid adding the same danger category twice.
     var exists = false;
-    $('.digirisk-mobile-risk-item').each(function() {
+    $('.digirisk-mobile-risk-block').each(function() {
         if (String($(this).attr('data-position')) === position) {
             exists = true;
         }
@@ -403,34 +480,65 @@ window.digiriskdolibarr.preventionplanmobile.addRisk = function() {
         return;
     }
 
-    var placeholder = $('.digirisk-mobile-form').data('risk-comment-label') || '';
+    var index  = window.digiriskdolibarr.preventionplanmobile.riskIndex++;
+    var $block = window.digiriskdolibarr.preventionplanmobile.buildFromTemplate('digirisk-mobile-risk-block-template', { RISKINDEX: index });
 
-    var $row = $('<div class="digirisk-mobile-risk-item"></div>').attr('data-position', position);
-    $('<img class="digirisk-mobile-risk-item-photo" alt="">').attr('src', option.data('thumbnail')).attr('title', option.data('name')).appendTo($row);
-    $('<input type="hidden" name="risk_category[]">').val(position).appendTo($row);
-    $('<input type="text" name="risk_comment[]" class="digirisk-mobile-risk-item-comment">').attr('placeholder', placeholder).appendTo($row);
-    $('<button type="button" class="digirisk-mobile-risk-item-delete"><i class="fas fa-trash"></i></button>').appendTo($row);
+    $block.attr('data-position', position);
+    $block.find('.digirisk-mobile-risk-block__picto').attr('src', option.data('thumbnail')).attr('alt', option.data('name'));
+    $block.find('.digirisk-mobile-risk-block__name').text(option.data('name'));
+    $block.find('.digirisk-mobile-risk-block__category').val(position);
 
-    $('.digirisk-mobile-risk-list').append($row);
+    $('.digirisk-mobile-risk-list').append($block);
+    window.digiriskdolibarr.preventionplanmobile.refreshRiskEmptyState();
     window.digiriskdolibarr.preventionplanmobile.closeRiskModal();
 };
 
 /**
- * Remove a selected risk from the list.
+ * Ask before dropping a risk: the block carries its photos and its protections, and there is
+ * no way back before the form is submitted.
+ *
+ * @return {void}
+ */
+window.digiriskdolibarr.preventionplanmobile.confirmRemoveRisk = function() {
+    var $block  = $(this).closest('.digirisk-mobile-risk-block');
+    var $modal  = $('.digirisk-mobile-confirm-modal');
+    var message = $('.digirisk-mobile-form').data('delete-risk-label') || '';
+
+    $modal.attr('data-risk-index', $block.attr('data-index'));
+    $modal.find('.digirisk-mobile-confirm-modal__body').text(message.replace('%s', $block.find('.digirisk-mobile-risk-block__name').text()));
+    $modal.removeClass('hidden');
+};
+
+/**
+ * Close the delete confirmation without touching the risk.
+ *
+ * @return {void}
+ */
+window.digiriskdolibarr.preventionplanmobile.closeConfirmModal = function() {
+    $('.digirisk-mobile-confirm-modal').addClass('hidden').removeAttr('data-risk-index');
+};
+
+/**
+ * Remove the confirmed risk block, with everything it holds.
  *
  * @return {void}
  */
 window.digiriskdolibarr.preventionplanmobile.removeRisk = function() {
-    $(this).closest('.digirisk-mobile-risk-item').remove();
+    var riskIndex = $('.digirisk-mobile-confirm-modal').attr('data-risk-index');
+
+    $('.digirisk-mobile-risk-block[data-index="' + riskIndex + '"]').remove();
+    window.digiriskdolibarr.preventionplanmobile.closeConfirmModal();
+    window.digiriskdolibarr.preventionplanmobile.refreshRiskEmptyState();
 };
 
 /**
- * Open the protection picker modal.
+ * Open the protection picker modal for the risk block the button belongs to.
  *
  * @return {void}
  */
 window.digiriskdolibarr.preventionplanmobile.openProtectionModal = function() {
-    $('.digirisk-mobile-protection-modal').removeClass('hidden');
+    var riskIndex = $(this).closest('.digirisk-mobile-risk-block').attr('data-index');
+    $('.digirisk-mobile-protection-modal').attr('data-risk-index', riskIndex).removeClass('hidden');
 };
 
 /**
@@ -439,21 +547,28 @@ window.digiriskdolibarr.preventionplanmobile.openProtectionModal = function() {
  * @return {void}
  */
 window.digiriskdolibarr.preventionplanmobile.closeProtectionModal = function() {
-    $('.digirisk-mobile-protection-modal').addClass('hidden');
+    $('.digirisk-mobile-protection-modal').addClass('hidden').removeAttr('data-risk-index');
 };
 
 /**
- * Add the picked protection (EPI) to the selected list, with a mandatory checkbox.
+ * Add the picked protection (EPI) to the risk that opened the modal, with a mandatory checkbox.
  *
  * @return {void}
  */
 window.digiriskdolibarr.preventionplanmobile.addProtection = function() {
-    var option   = $(this);
-    var position = String(option.data('position'));
+    var option    = $(this);
+    var position  = String(option.data('position'));
+    var riskIndex = $('.digirisk-mobile-protection-modal').attr('data-risk-index');
+    var $block    = $('.digirisk-mobile-risk-block[data-index="' + riskIndex + '"]');
 
-    // Avoid adding the same protection twice.
+    if (!$block.length) {
+        window.digiriskdolibarr.preventionplanmobile.closeProtectionModal();
+        return;
+    }
+
+    // Avoid adding the same protection twice on the same risk.
     var exists = false;
-    $('.digirisk-mobile-protection-item').each(function() {
+    $block.find('.digirisk-mobile-protection-item').each(function() {
         if (String($(this).attr('data-position')) === position) {
             exists = true;
         }
@@ -463,29 +578,20 @@ window.digiriskdolibarr.preventionplanmobile.addProtection = function() {
         return;
     }
 
-    var form            = $('.digirisk-mobile-form');
-    var placeholder     = form.data('risk-comment-label') || '';
-    var mandatoryLabel  = form.data('mandatory-label') || '';
-    var index           = window.digiriskdolibarr.preventionplanmobile.protectionIndex++;
+    var index = parseInt($block.attr('data-protection-index'), 10) || 0;
+    $block.attr('data-protection-index', index + 1);
 
-    var $row = $('<div class="digirisk-mobile-protection-item"></div>').attr('data-position', position);
-    $('<img class="digirisk-mobile-protection-item-photo" alt="">').attr('src', option.data('thumbnail')).attr('title', option.data('name')).appendTo($row);
-    $('<input type="hidden" name="protection_position[' + index + ']">').val(position).appendTo($row);
-    $('<input type="text" name="protection_comment[' + index + ']" class="digirisk-mobile-protection-item-comment">').attr('placeholder', placeholder).appendTo($row);
+    var $row = window.digiriskdolibarr.preventionplanmobile.buildFromTemplate('digirisk-mobile-protection-row-template', { RISKINDEX: riskIndex, INDEX: index });
+    $row.attr('data-position', position);
+    $row.find('.digirisk-mobile-protection-item-photo').attr('src', option.data('thumbnail')).attr('title', option.data('name'));
+    $row.find('input[type="hidden"]').val(position);
 
-    var $mandatory = $('<label class="digirisk-mobile-protection-item-mandatory"></label>');
-    $('<input type="checkbox" value="1">').attr('name', 'protection_mandatory[' + index + ']').appendTo($mandatory);
-    $('<span></span>').text(mandatoryLabel).appendTo($mandatory);
-    $mandatory.appendTo($row);
-
-    $('<button type="button" class="digirisk-mobile-protection-item-delete"><i class="fas fa-trash"></i></button>').appendTo($row);
-
-    $('.digirisk-mobile-protection-list').append($row);
+    $block.find('.digirisk-mobile-protection-list').append($row);
     window.digiriskdolibarr.preventionplanmobile.closeProtectionModal();
 };
 
 /**
- * Remove a selected protection from the list.
+ * Remove a selected protection from its risk.
  *
  * @return {void}
  */
@@ -636,7 +742,5 @@ window.digiriskdolibarr.preventionplanmobile.showFormErrors = function(errors) {
 // error could otherwise prevent this module from initialising and let the form POST natively).
 // The `bound` guard in event() ensures the handlers are attached exactly once.
 $(function() {
-    if ($('.digirisk-mobile-form').length) {
-        window.digiriskdolibarr.preventionplanmobile.init();
-    }
+    window.digiriskdolibarr.preventionplanmobile.init();
 });
