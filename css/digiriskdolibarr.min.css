@@ -7900,6 +7900,17 @@ body.digirisk-mobile-create .digirisk-pwa-pagination__page {
   color: #f59e0b;
 }
 
+/** Dropdown de catégories de danger dans une cellule de liste */
+/* Le panneau du dropdown fait 360px et reste dans le flux même fermé (il est masqué par opacity).
+   Ancré au dropdown (position: relative héritée de Saturne), il reste contenu dans le tableau.
+   S'il est ancré au body, il échappe au conteneur .div-table-responsive et élargit la page entière :
+   la mise en page casse dès que l'écran est plus étroit que le panneau.
+   On ne le détache donc qu'une fois le dropdown ouvert, pour qu'il déborde du tableau
+   au lieu d'être rogné par celui-ci. */
+td .wpeo-dropdown.category-danger.dropdown-active {
+  position: static;
+}
+
 /** Cell header */
 .table-cell-header {
   display: flex;

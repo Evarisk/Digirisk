@@ -1158,7 +1158,7 @@ if ($user->rights->digiriskdolibarr->adminpage->read) {
             print '<tr class="oddeven">';
             print '<td class="center">'
             ?>
-                <div class="wpeo-dropdown dropdown-large dropdown-grid category-danger padding" style="position: inherit">
+                <div class="wpeo-dropdown dropdown-large dropdown-grid category-danger padding">
                     <input class="input-hidden-danger" type="hidden" name="<?php echo 'search_' . $key ?>" />
                         <div class="dropdown-toggle dropdown-add-button button-cotation">
                             <span class="wpeo-button button-square-50 button-grey"><i class="fas fa-exclamation-triangle button-icon"></i></span>
