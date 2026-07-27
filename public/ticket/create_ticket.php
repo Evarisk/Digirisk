@@ -169,7 +169,7 @@ if (empty($resHook)) {
         }
 
         $email = GETPOST('email', 'alpha');
-        if ($config['digiriskdolibarr_ticket_email_visible'] && $config['digiriskdolibarr_ticket_email_required']) {
+        if (!empty($config['digiriskdolibarr_ticket_email_visible']) && !empty($config['digiriskdolibarr_ticket_email_required'])) {
             if (empty($email)) {
                 setEventMessages($langs->trans('ErrorFieldNotEmpty', $langs->transnoentities('Email')), array(), 'errors');
                 $error++;
@@ -177,7 +177,7 @@ if (empty($resHook)) {
         }
 
         $firstname = GETPOST('options_digiriskdolibarr_ticket_firstname', 'alpha');
-        if ($config['digiriskdolibarr_ticket_firstname_visible'] && $config['digiriskdolibarr_ticket_firstname_required']) {
+        if (!empty($config['digiriskdolibarr_ticket_firstname_visible']) && !empty($config['digiriskdolibarr_ticket_firstname_required'])) {
             if (empty($firstname)) {
                 setEventMessages($langs->trans('ErrorFieldNotEmpty', $langs->transnoentities('FirstName')), array(), 'errors');
                 $error++;
@@ -185,7 +185,7 @@ if (empty($resHook)) {
         }
 
         $lastname = GETPOST('options_digiriskdolibarr_ticket_lastname', 'alpha');
-        if ($config['digiriskdolibarr_ticket_lastname_visible'] && $config['digiriskdolibarr_ticket_lastname_required']) {
+        if (!empty($config['digiriskdolibarr_ticket_lastname_visible']) && !empty($config['digiriskdolibarr_ticket_lastname_required'])) {
             if (empty($lastname)) {
                 setEventMessages($langs->trans('ErrorFieldNotEmpty', $langs->transnoentities('LastName')), array(), 'errors');
                 $error++;
@@ -193,7 +193,7 @@ if (empty($resHook)) {
         }
 
         $phone = GETPOST('options_digiriskdolibarr_ticket_phone', 'alpha');
-        if ($config['digiriskdolibarr_ticket_phone_visible'] && $config['digiriskdolibarr_ticket_phone_required']) {
+        if (!empty($config['digiriskdolibarr_ticket_phone_visible']) && !empty($config['digiriskdolibarr_ticket_phone_required'])) {
             if (empty($phone)) {
                 setEventMessages($langs->trans('ErrorFieldNotEmpty', $langs->transnoentities('Phone')), array(), 'errors');
                 $error++;
@@ -201,7 +201,7 @@ if (empty($resHook)) {
         }
 
         $location = GETPOST('options_digiriskdolibarr_ticket_location', 'alpha');
-        if ($config['digiriskdolibarr_ticket_location_visible'] && $config['digiriskdolibarr_ticket_location_required']) {
+        if (!empty($config['digiriskdolibarr_ticket_location_visible']) && !empty($config['digiriskdolibarr_ticket_location_required'])) {
             if (empty($location)) {
                 setEventMessages($langs->trans('ErrorFieldNotEmpty', $langs->transnoentities('Location')), array(), 'errors');
                 $error++;
@@ -232,7 +232,7 @@ if (empty($resHook)) {
             $error++;
         }
 
-        if ($config['digiriskdolibarr_ticket_service_visible'] && $config['digiriskdolibarr_ticket_service_required']) {
+        if (!empty($config['digiriskdolibarr_ticket_service_visible']) && !empty($config['digiriskdolibarr_ticket_service_required'])) {
             if (empty(GETPOST('options_digiriskdolibarr_ticket_service')) || GETPOST('options_digiriskdolibarr_ticket_service') == -1) {
                 setEventMessages($langs->trans('ErrorFieldNotEmpty', $langs->transnoentitiesnoconv('GP/UT')), array(), 'errors');
                 $error++;
@@ -240,14 +240,15 @@ if (empty($resHook)) {
         }
 
         $date = GETPOST('options_digiriskdolibarr_ticket_date', 'alpha');
-        if ($config['digiriskdolibarr_ticket_date_visible'] && $config['digiriskdolibarr_ticket_date_required']) {
+        if (!empty($config['digiriskdolibarr_ticket_date_visible']) && !empty($config['digiriskdolibarr_ticket_date_required'])) {
             if (empty($date)) {
                 setEventMessages($langs->trans('ErrorFieldNotEmpty', $langs->transnoentitiesnoconv('Date')), array(), 'errors');
                 $error++;
             }
         }
 
-        $object->ref = $modTicket->getNextValue($thirdparty, $object);
+        // Public interface has no third party attached at this point
+        $object->ref = $modTicket->getNextValue(null, $object);
 
         $object->type_code  = 'OTHER';
         $label_type         = ($langs->trans("TicketTypeShort" . $object->type_code) != ("TicketTypeShort" . $object->type_code) ? $langs->trans("TicketTypeShort" . $object->type_code) : ($object->type_label != '-' ? $object->type_label : ''));
@@ -506,9 +507,10 @@ saturne_header(0,'', $title, '', '', 0, 0, $moreJS, [], '', 'page-public-card pa
 	print '<p><strong>' . $conf->global->DIGIRISKDOLIBARR_TICKET_PARENT_CATEGORY_LABEL . '</strong><span style="color:red"> *</span></p>';
 
 	$mainCategoryObject              = $category->rechercher($conf->global->DIGIRISKDOLIBARR_TICKET_MAIN_CATEGORY, '', 'ticket', true);
-    $mainCategoryExtrafields         = null;
+    // json_decode() returns null when the category has no config saved yet, fall back on an empty object to keep property access safe
+    $mainCategoryExtrafields         = new stdClass();
     if (!empty($mainCategoryObject) && is_array($mainCategoryObject) && isset($mainCategoryObject[0])) {
-        $mainCategoryExtrafields     = json_decode($mainCategoryObject[0]->array_options['options_ticket_category_config']);
+        $mainCategoryExtrafields     = json_decode($mainCategoryObject[0]->array_options['options_ticket_category_config']) ?: new stdClass();
     }
 	$mainCategoryChildrenExtrafields = new StdClass();
     $subCategoryExtrafields          = new StdClass();
@@ -523,10 +525,10 @@ saturne_header(0,'', $title, '', '', 0, 0, $moreJS, [], '', 'page-public-card pa
 			foreach ($mainCategoryChildren as $cat) {
 				$catArrayOptions = json_decode($cat->array_options['options_ticket_category_config']);
 				if (!empty($catArrayOptions->external_link)) {
-					print '<a href="' . $catArrayOptions->external_link . '" class="category-redirect"' . ($catArrayOptions->external_link_new_tab ? 'target="_blank"' : '') . '>';
+					print '<a href="' . $catArrayOptions->external_link . '" class="category-redirect"' . (!empty($catArrayOptions->external_link_new_tab) ? 'target="_blank"' : '') . '>';
 				}
 				if ($cat->id == GETPOST('parentCategory')) {
-					$mainCategoryChildrenExtrafields = $catArrayOptions;
+					$mainCategoryChildrenExtrafields = $catArrayOptions ?: new stdClass();
                     $categoryDescription             = $cat->description;
 					$mainCategoryChildrenItem        = $cat;
 					print '<div class="ticket-parentCategory ticket-parentCategory'. $cat->id .' active" id="' . $cat->id . '" data-rowid="' . $cat->id . '">';
@@ -560,11 +562,11 @@ saturne_header(0,'', $title, '', '', 0, 0, $moreJS, [], '', 'page-public-card pa
 					foreach ($selectedParentCategoryChildren as $subCategory) {
 						$subCategoryExtrafieldsTmp = json_decode($subCategory->array_options['options_ticket_category_config']);
 						if (!empty($subCategoryExtrafieldsTmp->external_link)) {
-							print '<a href="' . $subCategoryExtrafieldsTmp->external_link . '" class="category-redirect"' . ($subCategoryExtrafieldsTmp->external_link_new_tab ? 'target="_blank"' : '') . '>';
+							print '<a href="' . $subCategoryExtrafieldsTmp->external_link . '" class="category-redirect"' . (!empty($subCategoryExtrafieldsTmp->external_link_new_tab) ? 'target="_blank"' : '') . '>';
 						}
 						if ($subCategory->id == GETPOSTINT('subCategory')) {
 							$categoryDescription    = $subCategory->description;
-							$subCategoryExtrafields = $subCategoryExtrafieldsTmp;
+							$subCategoryExtrafields = $subCategoryExtrafieldsTmp ?: new stdClass();
 							print '<div class="ticket-subCategory ticket-subCategory'. $subCategory->id .' center active" id="' . $subCategory->id . '" data-rowid="' . $subCategory->id . '">';
 						} else {
 							print '<div class="ticket-subCategory ticket-subCategory'. $subCategory->id .' center" id="' . $subCategory->id . '" data-rowid="' . $subCategory->id . '" style="background:#ffffff">';
@@ -589,7 +591,7 @@ saturne_header(0,'', $title, '', '', 0, 0, $moreJS, [], '', 'page-public-card pa
         <div class="wpeo-form tableforinputfields">
             <div class="wpeo-gridlayout grid-2">
                 <?php
-				$visible = $mainCategoryExtrafields->show_description || $mainCategoryChildrenExtrafields->show_description || $subCategoryExtrafields->show_description;
+				$visible = ($mainCategoryExtrafields->show_description ?? false) || ($mainCategoryChildrenExtrafields->show_description ?? false) || ($subCategoryExtrafields->show_description ?? false);
                 if ($visible && dol_strlen($categoryDescription) > 0) : ?>
                     <div class="form-element gridw-2">
                         <span class="form-label"><?php print $langs->trans('Description'); ?>
@@ -661,8 +663,8 @@ saturne_header(0,'', $title, '', '', 0, 0, $moreJS, [], '', 'page-public-card pa
 					if ($key == 'digiriskdolibarr_ticket_photo') {
 						$key = 'photo';
 					}
-					$visible = $mainCategoryExtrafields->{$key . '_visible'} || $mainCategoryChildrenExtrafields->{$key . '_visible'} || $subCategoryExtrafields->{$key . '_visible'};
-					$required = $mainCategoryExtrafields->{$key . '_required'} || $mainCategoryChildrenExtrafields->{$key . '_required'} || $subCategoryExtrafields->{$key . '_required'};
+					$visible = ($mainCategoryExtrafields->{$key . '_visible'} ?? false) || ($mainCategoryChildrenExtrafields->{$key . '_visible'} ?? false) || ($subCategoryExtrafields->{$key . '_visible'} ?? false);
+					$required = ($mainCategoryExtrafields->{$key . '_required'} ?? false) || ($mainCategoryChildrenExtrafields->{$key . '_required'} ?? false) || ($subCategoryExtrafields->{$key . '_required'} ?? false);
 					if (!$visible && $key != 'message') {
 						continue;
 					}
@@ -732,7 +734,7 @@ saturne_header(0,'', $title, '', '', 0, 0, $moreJS, [], '', 'page-public-card pa
                             }
                             break;
 						default:
-							$out .= $extrafields->showInputField($key, GETPOST($fields[$key]['name'] ?? 'options_' . $key), ($required ? 'required' : ''), '', '', 0, $object->id, $object->table_element);
+							$out .= $extrafields->showInputField($key, GETPOST($fields[$key]['name'] ?? 'options_' . $key), ($required ? 'required' : ''), '', '', 0, $object, $object->table_element);
 							break;
 					}
 
@@ -756,12 +758,12 @@ saturne_header(0,'', $title, '', '', 0, 0, $moreJS, [], '', 'page-public-card pa
         print '</div>';
         print dol_get_fiche_end();
 
-        $visible = $mainCategoryExtrafields->use_signatory || $mainCategoryChildrenExtrafields->use_signatory || $subCategoryExtrafields->use_signatory;
+        $visible = ($mainCategoryExtrafields->use_signatory ?? false) || ($mainCategoryChildrenExtrafields->use_signatory ?? false) || ($subCategoryExtrafields->use_signatory ?? false);
         if ($visible) {
 
             $validateText = !empty($mainCategoryExtrafields->validate_text) || !empty($mainCategoryChildrenExtrafields->validate_text) || !empty($subCategoryExtrafields->validate_text);
             if ($validateText) {
-                $content = $subCategoryExtrafields->validate_text ?: $mainCategoryChildrenExtrafields->validate_text ?: $mainCategoryExtrafields->validate_text;
+                $content = ($subCategoryExtrafields->validate_text ?? '') ?: (($mainCategoryChildrenExtrafields->validate_text ?? '') ?: ($mainCategoryExtrafields->validate_text ?? ''));
 
                 print '<label style="display: flex; align-items: flex-start; margin: 1em 0;">';
                 print '<input type="checkbox" id="validate_text_checkbox" name="validate_text" style="margin-right: 1em; margin-top: 0.2em;" required>';
