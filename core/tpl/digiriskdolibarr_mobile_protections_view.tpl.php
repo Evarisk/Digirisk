@@ -48,26 +48,29 @@ if (is_array($mobileProtections) && !empty($mobileProtections)) {
 
     print '<div class="digirisk-protections-view">';
     print '<div class="digirisk-protections-view__title"><i class="fas fa-hard-hat"></i> ' . $langs->trans('MobilePPProtections') . '</div>';
-    print '<div class="digirisk-protections-view__list">';
+    print '<div class="div-table-responsive-no-min">';
+    print '<table class="noborder centpercent">';
+    print '<tr class="liste_titre">';
+    print '<td>' . $langs->trans('Label') . '</td>';
+    print '<td>' . $langs->trans('Comment') . '</td>';
+    print '<td class="center">' . $langs->trans('MobilePPMandatory') . '</td>';
+    print '</tr>';
     foreach ($mobileProtections as $mobileProtection) {
         if (!isset($protectionMap[$mobileProtection['position']])) {
             continue;
         }
         $protectionCategory = $protectionMap[$mobileProtection['position']];
         $thumb              = DOL_URL_ROOT . '/custom/digiriskdolibarr/img/' . $protectionCategory['name_thumbnail'];
-        print '<div class="digirisk-protections-view__item">';
-        print '<img src="' . $thumb . '" alt="" title="' . dol_escape_htmltag($protectionCategory['name']) . '">';
-        print '<div class="digirisk-protections-view__info">';
-        print '<div class="digirisk-protections-view__name">' . dol_escape_htmltag($protectionCategory['name']) . '</div>';
-        if (!empty($mobileProtection['comment'])) {
-            print '<div class="digirisk-protections-view__comment">' . dol_escape_htmltag($mobileProtection['comment']) . '</div>';
-        }
-        if (!empty($mobileProtection['mandatory'])) {
-            print '<span class="badge badge-info">' . $langs->trans('MobilePPMandatory') . '</span>';
-        }
-        print '</div>';
-        print '</div>';
+        print '<tr class="oddeven">';
+        print '<td class="nowraponall">';
+        print '<img class="cell-risk-view__pic valignmiddle marginrightonly" src="' . $thumb . '" alt="" title="' . dol_escape_htmltag($protectionCategory['name']) . '">';
+        print '<span class="valignmiddle">' . dol_escape_htmltag($protectionCategory['name']) . '</span>';
+        print '</td>';
+        print '<td class="wordbreak">' . (!empty($mobileProtection['comment']) ? dol_escape_htmltag($mobileProtection['comment']) : '<span class="opacitymedium">-</span>') . '</td>';
+        print '<td class="center">' . (!empty($mobileProtection['mandatory']) ? '<span class="badge badge-info">' . $langs->trans('Yes') . '</span>' : '<span class="opacitymedium">' . $langs->trans('No') . '</span>') . '</td>';
+        print '</tr>';
     }
+    print '</table>';
     print '</div>';
     print '</div>';
 }
@@ -78,18 +81,20 @@ if (is_array($mobileCertifications) && !empty($mobileCertifications)) {
     $certificationOptions = digiriskGetCertificationOptions(false);
     print '<div class="digirisk-protections-view">';
     print '<div class="digirisk-protections-view__title"><i class="fas fa-id-badge"></i> ' . $langs->trans('MobilePPCertifications') . '</div>';
-    print '<div class="digirisk-protections-view__list">';
+    print '<div class="div-table-responsive-no-min">';
+    print '<table class="noborder centpercent">';
+    print '<tr class="liste_titre">';
+    print '<td>' . $langs->trans('Label') . '</td>';
+    print '<td class="center">' . $langs->trans('MobilePPMandatory') . '</td>';
+    print '</tr>';
     foreach ($mobileCertifications as $mobileCertification) {
         $certLabel = isset($certificationOptions[$mobileCertification['code']]) ? $certificationOptions[$mobileCertification['code']] : $mobileCertification['code'];
-        print '<div class="digirisk-protections-view__item">';
-        print '<div class="digirisk-protections-view__info">';
-        print '<div class="digirisk-protections-view__name">' . dol_escape_htmltag($certLabel) . '</div>';
-        if (!empty($mobileCertification['mandatory'])) {
-            print '<span class="badge badge-info">' . $langs->trans('MobilePPMandatory') . '</span>';
-        }
-        print '</div>';
-        print '</div>';
+        print '<tr class="oddeven">';
+        print '<td class="wordbreak">' . dol_escape_htmltag($certLabel) . '</td>';
+        print '<td class="center">' . (!empty($mobileCertification['mandatory']) ? '<span class="badge badge-info">' . $langs->trans('Yes') . '</span>' : '<span class="opacitymedium">' . $langs->trans('No') . '</span>') . '</td>';
+        print '</tr>';
     }
+    print '</table>';
     print '</div>';
     print '</div>';
 }

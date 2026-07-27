@@ -2045,6 +2045,7 @@ MobilePPDeleteRiskTitle = Supprimer le risque
 MobilePPDeleteRiskConfirm = « %s » va être retiré du plan, avec sa description, ses photos et ses protections.
 MobilePPUserCompany = Entreprise utilisatrice
 MobilePPUserCompanyShort = EU
+MobilePPConcernedCompanies = Concerne
 MobilePPExteriorCompanyShort = EE
 MobilePPPriorFormalities = Formalités préalables
 MobilePPPriorVisitDone = Inspection commune préalable effectuée
