@@ -591,10 +591,15 @@ if ($action == 'add_mobile' && $permissiontoadd) {
                     $line->create($user, true);
                 }
 
-                $saveRiskPhotos();
-
                 // Validate so signatures can be collected
                 $object->setPendingSignature($user, true);
+
+                // The definitive ref is only assigned during validation: until then the object
+                // carries its provisional one, which would send the photos to a directory nothing
+                // reads back, and put "(PROV12)" in the signature email
+                $object->fetch($object->id);
+
+                $saveRiskPhotos();
 
                 // Auto-sign the interior side (MasterWorker) with the responsible saved signature
                 $masterWorkers = $signatory->fetchSignatory('MasterWorker', $object->id, 'preventionplan');

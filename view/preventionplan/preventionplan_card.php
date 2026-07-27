@@ -1477,60 +1477,82 @@ if ((empty($action) || ($action != 'create' && $action != 'edit'))) {
 					}
 				}
 
-				print '<div class="digirisk-protections-view__list">';
+				print '<div class="div-table-responsive-no-min">';
+				print '<table class="noborder centpercent">';
+				print '<tr class="liste_titre">';
+				print '<td>' . $langs->trans('INRSRisk') . '</td>';
+				print '<td>' . $langs->trans('Description') . '</td>';
+				print '<td class="center">' . $langs->trans('MobilePPConcernedCompanies') . '</td>';
+				print '<td>' . $langs->trans('MobilePPProtections') . '</td>';
+				print '<td>' . $langs->trans('Photos') . '</td>';
+				print '</tr>';
+
 				foreach ($preventionplandets as $riskLine) {
 					$riskThumb = $risk->getDangerCategory($riskLine);
 					$riskName  = $risk->getDangerCategoryName($riskLine);
-					print '<div class="digirisk-protections-view__item">';
+
+					print '<tr class="oddeven">';
+
+					// Danger category: picto and name
+					print '<td class="nowraponall">';
 					if ($riskThumb != -1) {
-						print '<img src="' . DOL_URL_ROOT . '/custom/digiriskdolibarr/img/categorieDangers/' . $riskThumb . '.png" alt="" title="' . dol_escape_htmltag($riskName != -1 ? $riskName : '') . '">';
+						print '<img class="cell-risk-view__pic valignmiddle marginrightonly" src="' . DOL_URL_ROOT . '/custom/digiriskdolibarr/img/categorieDangers/' . $riskThumb . '.png" alt="" title="' . dol_escape_htmltag($riskName != -1 ? $riskName : '') . '">';
 					}
-					print '<div class="digirisk-protections-view__info">';
-					print '<div class="digirisk-protections-view__name">' . dol_escape_htmltag($riskName != -1 ? $riskName : $riskLine->ref);
+					print '<span class="valignmiddle">' . dol_escape_htmltag($riskName != -1 ? $riskName : $riskLine->ref) . '</span>';
+					print '</td>';
+
+					print '<td class="wordbreak">' . dol_escape_htmltag($riskLine->description) . '</td>';
+
 					// Which company the risk concerns, as captured by the mobile interface
+					print '<td class="center nowraponall">';
 					if (isset($mobileRiskCompanies[(string) $riskLine->category])) {
 						$riskCompanies = $mobileRiskCompanies[(string) $riskLine->category];
 						if (!empty($riskCompanies['eu'])) {
-							print ' <span class="badge badge-info" title="' . dol_escape_htmltag($langs->trans('MobilePPUserCompany')) . '">' . $langs->trans('MobilePPUserCompanyShort') . '</span>';
+							print '<span class="badge badge-info" title="' . dol_escape_htmltag($langs->trans('MobilePPUserCompany')) . '">' . $langs->trans('MobilePPUserCompanyShort') . '</span> ';
 						}
 						if (!empty($riskCompanies['ee'])) {
-							print ' <span class="badge badge-info" title="' . dol_escape_htmltag($langs->trans('MobilePPExteriorCompany')) . '">' . $langs->trans('MobilePPExteriorCompanyShort') . '</span>';
+							print '<span class="badge badge-info" title="' . dol_escape_htmltag($langs->trans('MobilePPExteriorCompany')) . '">' . $langs->trans('MobilePPExteriorCompanyShort') . '</span>';
 						}
+					} else {
+						print '<span class="opacitymedium">-</span>';
 					}
-					print '</div>';
-					if (dol_strlen($riskLine->description)) {
-						print '<div class="digirisk-protections-view__comment">' . dol_escape_htmltag($riskLine->description) . '</div>';
-					}
+					print '</td>';
 
-					$riskPhotos = digiriskMobileGetRiskPhotos($object->element, $object->ref, (int) $riskLine->category);
-					if (!empty($riskPhotos)) {
-						print '<div class="digirisk-protections-view__photos">';
-						foreach ($riskPhotos as $riskPhoto) {
-							print '<a href="' . $riskPhoto['url'] . '" target="_blank"><img src="' . $riskPhoto['url'] . '" alt=""></a>';
-						}
-						print '</div>';
-					}
-
+					// Protections (EPI) attached to this risk: pictos, the name is in the tooltip
+					print '<td class="nowraponall">';
+					$riskHasProtection = false;
 					if (is_array($mobileRiskProtections)) {
 						foreach ($mobileRiskProtections as $mobileRiskProtection) {
 							if (!isset($mobileRiskProtection['risk_category']) || (int) $mobileRiskProtection['risk_category'] !== (int) $riskLine->category || !isset($signalisationMap[$mobileRiskProtection['position']])) {
 								continue;
 							}
 							$protectionCategory = $signalisationMap[$mobileRiskProtection['position']];
-							print '<div class="digirisk-protections-view__subitem">';
-							print '<img src="' . DOL_URL_ROOT . '/custom/digiriskdolibarr/img/' . $protectionCategory['name_thumbnail'] . '" alt="" title="' . dol_escape_htmltag($protectionCategory['name']) . '">';
-							print '<span>' . dol_escape_htmltag($protectionCategory['name']);
-							if (!empty($mobileRiskProtection['comment'])) {
-								print ' — ' . dol_escape_htmltag($mobileRiskProtection['comment']);
-							}
-							print '</span>';
-							print '</div>';
+							$protectionTitle    = $protectionCategory['name'] . (dol_strlen($mobileRiskProtection['comment'] ?? '') ? ' - ' . $mobileRiskProtection['comment'] : '');
+							print '<img class="cell-risk-view__pic marginrightonly" src="' . DOL_URL_ROOT . '/custom/digiriskdolibarr/img/' . $protectionCategory['name_thumbnail'] . '" alt="" title="' . dol_escape_htmltag($protectionTitle) . '">';
+							$riskHasProtection = true;
 						}
 					}
+					if (!$riskHasProtection) {
+						print '<span class="opacitymedium">-</span>';
+					}
+					print '</td>';
 
-					print '</div>';
-					print '</div>';
+					// Photos taken on site from the mobile interface
+					print '<td class="nowraponall">';
+					$riskPhotos = digiriskMobileGetRiskPhotos($object->element, $object->ref, (int) $riskLine->category);
+					if (!empty($riskPhotos)) {
+						foreach ($riskPhotos as $riskPhoto) {
+							// attachment=0 : document.php affiche l'image dans l'onglet au lieu de la telecharger
+							print '<a href="' . $riskPhoto['url'] . '&attachment=0" target="_blank"><img class="digirisk-risk-list-photo marginrightonly" src="' . $riskPhoto['url'] . '" alt=""></a>';
+						}
+					} else {
+						print '<span class="opacitymedium">-</span>';
+					}
+					print '</td>';
+
+					print '</tr>';
 				}
+				print '</table>';
 				print '</div>';
 			} else {
 				print '<span class="opacitymedium">' . $langs->trans('None') . '</span>';
