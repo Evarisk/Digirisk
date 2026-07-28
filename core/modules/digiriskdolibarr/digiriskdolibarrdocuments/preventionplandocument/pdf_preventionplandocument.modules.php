@@ -332,11 +332,31 @@ class pdf_preventionplandocument extends SaturneDocumentModel
      */
     protected function twoBoxes($pdf, array $left, array $right, float $size)
     {
-        $gap      = 6;
-        $boxWidth = ($this->contentWidth($pdf) - $gap) / 2;
-        $rowCount = max(count($left['rows']), count($right['rows']));
+        $gap        = 6;
+        $boxWidth   = ($this->contentWidth($pdf) - $gap) / 2;
+        $labelWidth = $boxWidth * 0.34;
+        $valueWidth = $boxWidth - $labelWidth;
+        $rowCount   = max(count($left['rows']), count($right['rows']));
 
-        $this->reserveSpace($pdf, 10 + $rowCount * ($this->height + 1));
+        // Hauteur de chaque ligne, calculee sur les deux encadres a la fois : une adresse longue
+        // passe a la ligne au lieu de deborder du cadre, et les deux colonnes restent alignees
+        $rowHeights = [];
+        for ($index = 0; $index < $rowCount; $index++) {
+            $rowHeight = $this->height + 1;
+            foreach ([$left, $right] as $content) {
+                if (!isset($content['rows'][$index])) {
+                    continue;
+                }
+                $pdf->SetFont('', 'B', $size - 2);
+                $rowHeight = max($rowHeight, $pdf->getStringHeight($labelWidth, ' ' . $content['rows'][$index][0]));
+                $pdf->SetFont('', '', $size - 2);
+                $rowHeight = max($rowHeight, $pdf->getStringHeight($valueWidth, ' ' . $content['rows'][$index][1]));
+            }
+            $rowHeights[$index] = $rowHeight;
+        }
+
+        $bodyHeight = array_sum($rowHeights);
+        $this->reserveSpace($pdf, 10 + $bodyHeight);
 
         // Meme raison que pour les signatures : les deux colonnes partent du meme Y
         $pdf->SetAutoPageBreak(false);
@@ -351,18 +371,22 @@ class pdf_preventionplandocument extends SaturneDocumentModel
             $pdf->SetFillColor($this->headBg[0], $this->headBg[1], $this->headBg[2]);
             $pdf->Cell($boxWidth, 7, ' ' . $content['title'], 1, 1, 'L', true);
 
-            $labelWidth = $boxWidth * 0.34;
-            foreach ($content['rows'] as $row) {
-                $pdf->SetX($x);
+            $rowY = $startY + 7;
+            foreach ($content['rows'] as $index => $row) {
+                $pdf->SetXY($x, $rowY);
                 $pdf->SetFont('', 'B', $size - 2);
-                $pdf->Cell($labelWidth, $this->height + 1, ' ' . $row[0], 1, 0, 'L');
+                $pdf->MultiCell($labelWidth, $rowHeights[$index], ' ' . $row[0], 1, 'L', false, 0);
+
+                $pdf->SetXY($x + $labelWidth, $rowY);
                 $pdf->SetFont('', '', $size - 2);
-                $pdf->Cell($boxWidth - $labelWidth, $this->height + 1, ' ' . $row[1], 1, 1, 'L');
+                $pdf->MultiCell($valueWidth, $rowHeights[$index], ' ' . $row[1], 1, 'L', false, 0);
+
+                $rowY += $rowHeights[$index];
             }
         }
 
         $pdf->SetAutoPageBreak(true, self::FOOTER_BAND);
-        $pdf->SetY($startY + 7 + $rowCount * ($this->height + 1) + 2);
+        $pdf->SetY($startY + 7 + $bodyHeight + 2);
     }
 
     /**
