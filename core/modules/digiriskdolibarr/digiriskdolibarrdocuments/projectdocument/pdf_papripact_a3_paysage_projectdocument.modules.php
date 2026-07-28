@@ -128,6 +128,21 @@ class pdf_papripact_a3_paysage_projectdocument
     public string $document_type = 'papripact_a3_paysage_projectdocument';
 
 	/**
+	 * @var string Error message
+	 */
+	public $error = '';
+
+	/**
+	 * @var string[] Array of error strings
+	 */
+	public $errors = array();
+
+	/**
+	 * @var string[] Array of warnings strings
+	 */
+	public $warnings = array();
+
+	/**
 	 *	Constructor
 	 *
 	 *  @param		DoliDB		$db      Database handler
@@ -442,6 +457,7 @@ class pdf_papripact_a3_paysage_projectdocument
 					return $b['cotation'] <=> $a['cotation'];
 				});
 				// Loop on each lines
+				$totalbudget = 0;
 
 				for ($i = 0; $i < $nblines; $i++) {
 					$curY = $nexY;
@@ -464,7 +480,7 @@ class pdf_papripact_a3_paysage_projectdocument
 					$dateend          = dol_print_date($objectDoc[$i]['date_end'], 'day');
 					$planned_workload = convertSecondToTime((int) $objectDoc[$i]['workload'], 'allhourmin');
                     $userExecutive    = $objectDoc[$i]['userExecutive'];
-					$totalbudget      += $objectDoc[$i]['budget'];
+					$totalbudget      += (float) $objectDoc[$i]['budget'];
 
 					$showpricebeforepagebreak = 1;
                     $labelHeightBefore = $pdf->GetY();
@@ -474,6 +490,7 @@ class pdf_papripact_a3_paysage_projectdocument
 					$pdf->MultiCell($this->posxdatestart - $this->posxlabel, 3, $outputLangs->convToOutputCharset($libelleline), 0, 'L');
                     $labelHeightAfter = $pdf->GetY();
                     $labelHeight = $labelHeightAfter - $labelHeightBefore;
+					$posyafter = $labelHeightAfter; // Y position reached by the label, used below to know if there is still room for the total block
 					$pageposafter = $pdf->getPage();
 					if ($pageposafter > $pageposbefore) { // There is a pagebreak
 						$pdf->rollbackTransaction(true);
@@ -575,7 +592,9 @@ class pdf_papripact_a3_paysage_projectdocument
 
                     // Executive name
                     $pdf->SetXY($this->posxuser, $curY);
-                    $pdf->MultiCell($this->posxrisk - $this->posxuser, 6, ucfirst(substr($userExecutive['firstname'], 0, 1)) . ucfirst(substr($userExecutive['lastname'], 0, 1)), 0, 'C');
+                    // A task has not necessarily a TASKEXECUTIVE contact, then $userExecutive is an empty array
+                    $userExecutiveInitials = ucfirst(substr($userExecutive['firstname'] ?? '', 0, 1)) . ucfirst(substr($userExecutive['lastname'] ?? '', 0, 1));
+                    $pdf->MultiCell($this->posxrisk - $this->posxuser, 6, $userExecutiveInitials, 0, 'C');
                     $pdf->SetFont(pdf_getPDFFont($outputLangs), '', $default_font_size - 1); // We restore font
 
 					// Risk
