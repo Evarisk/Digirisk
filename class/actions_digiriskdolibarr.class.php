@@ -872,12 +872,9 @@ class ActionsDigiriskdolibarr
 
         $sql = '';
 		/* print_r($parameters); print_r($object); echo "action: " . $action; */
-		if (preg_match('/ticketlist|thirdpartyticket|projectticket/', $parameters['context'])) {	    // do something only for the context 'somecontext1' or 'somecontext2'
-			$searchCategoryTicketList = GETPOST('search_category_ticket_list');
-			if (!empty($searchCategoryTicketList)) {
-				$sql = ' LEFT JOIN '.MAIN_DB_PREFIX."categorie_ticket as ct ON t.rowid = ct.fk_ticket"; // We'll need this table joined to the select in order to filter by categ
-			}
-		}
+		// No join on categorie_ticket: the category filter is built with subqueries in printFieldListWhere().
+		// Joining would return one row per category link, and the record count of the list (a COUNT(*) built
+		// from this same request, with the GROUP BY stripped) would count those links instead of the tickets.
 
         $this->resprints = $sql;
         return 0; // or return 1 to replace standard code
@@ -900,7 +897,7 @@ class ActionsDigiriskdolibarr
 			if (is_array($searchCategoryTicketList) && !empty($searchCategoryTicketList)) {
 				foreach ($searchCategoryTicketList as $searchCategoryTicket) {
 					if (intval($searchCategoryTicket) == -2) {
-						$searchCategoryTicketSqlList[] = "ct.fk_categorie IS NULL";
+						$searchCategoryTicketSqlList[] = "t.rowid NOT IN (SELECT fk_ticket FROM " . MAIN_DB_PREFIX . "categorie_ticket)";
 					} elseif (intval($searchCategoryTicket) > 0) {
 						$searchCategoryTicketSqlList[] = "t.rowid IN (SELECT fk_ticket FROM " . MAIN_DB_PREFIX . "categorie_ticket WHERE fk_categorie = " . ((int)$searchCategoryTicket) . ")";
 					}
@@ -910,15 +907,14 @@ class ActionsDigiriskdolibarr
 				}
 			} else {
 				if (!empty($searchCategoryTicketList) && $searchCategoryTicketList > 0) {
-					$sql = " AND ct.fk_categorie = ".((int) $searchCategoryTicketList);
+					$sql = " AND t.rowid IN (SELECT fk_ticket FROM " . MAIN_DB_PREFIX . "categorie_ticket WHERE fk_categorie = " . ((int) $searchCategoryTicketList) . ")";
 				}
 				if ($searchCategoryTicketList == -2) {
-					$sql = " AND ct.fk_categorie IS NULL";
+					$sql = " AND t.rowid NOT IN (SELECT fk_ticket FROM " . MAIN_DB_PREFIX . "categorie_ticket)";
 				}
 			}
-			if (!empty($searchCategoryTicketList)) {
-				$sql .= " GROUP BY t.rowid";
-			}
+			// No GROUP BY: the subqueries above never duplicate a ticket, and a GROUP BY here would be
+			// stripped from the COUNT(*) request of the list, giving a wrong number of records and phantom pages.
 
             $this->resprints = $sql;
 		}
@@ -1658,6 +1654,8 @@ class ActionsDigiriskdolibarr
             if ($serviceId <= 0) {
                 return 0;
             }
+
+            require_once __DIR__ . '/digiriskelement.class.php';
 
             $digiriskelement = new DigiriskElement($db);
             $res = $digiriskelement->fetch($serviceId);
